@@ -251,6 +251,18 @@ void stop_grouped_bards(CHAR_DATA *ch)
    }
 }
 
+void get_instrument_bonus(char_data * ch, int & comb, int & non_comb)
+{
+   comb = 0;
+   non_comb = 0;
+
+   if(!ch->equipment[HOLD])                                     return;
+   if(GET_ITEM_TYPE(ch->equipment[HOLD]) != ITEM_INSTRUMENT)    return;
+
+   comb = ch->equipment[HOLD]->obj_flags.value[1];
+   non_comb = ch->equipment[HOLD]->obj_flags.value[0];
+}
+
 int do_sing(CHAR_DATA *ch, char *arg, int cmd)
 {
   CHAR_DATA *tar_char = 0;
@@ -602,8 +614,7 @@ int song_disrupt( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int s
       return eFAILURE|eINTERNAL_ERROR;
       }
 
-   if((!ch->equipment[WIELD] || GET_ITEM_TYPE(ch->equipment[WIELD]) != ITEM_INSTRUMENT)
-     && (!ch->equipment[SECOND_WIELD] || GET_ITEM_TYPE(ch->equipment[SECOND_WIELD]) != ITEM_INSTRUMENT))
+   if(!ch->equipment[HOLD] || GET_ITEM_TYPE(ch->equipment[HOLD]) != ITEM_INSTRUMENT)
    {
       send_to_char("You need an instrument to sing this.\r\n", ch);
       return eFAILURE;
@@ -637,7 +648,10 @@ int song_whistle_sharp( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim,
 
    set_cantquit( ch, victim );
 
-   dam = GET_LEVEL(ch) + GET_INT(ch);
+   int combat, non_combat;
+   get_instrument_bonus(ch, combat, non_combat);
+
+   dam = GET_LEVEL(ch) + GET_INT(ch) + combat;
 
    act("You send a sharp piercing whistle at $N.", ch, 0, victim, TO_CHAR, 0);
    act("$n whistles a sharp tune that ravages your ear drums and pierces you to the bone!", 
@@ -688,6 +702,11 @@ int execute_song_healing_melody( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA
    skill %= 100;
 
    heal = 3*(GET_LEVEL(ch)/5);
+
+   int combat, non_combat;
+   get_instrument_bonus(ch, combat, non_combat);
+
+   heal += non_combat;
 
    if(specialization > 0)
      heal = (int)(heal * 1.5);
@@ -830,7 +849,10 @@ int execute_song_terrible_clef( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA 
       return eSUCCESS;
    }
 
-   dam = GET_LEVEL(ch) * 4 + GET_WIS(ch) * 2;
+   int combat, non_combat;
+   get_instrument_bonus(ch, combat, non_combat);
+
+   dam = GET_LEVEL(ch) * 4 + GET_WIS(ch) * 2 + combat*2;
 
    send_to_char("Your singing hurts your opponent!\r\n", ch);
    act("$n's sings causes pain in $N's ears!\r\n", ch, 0, victim, TO_ROOM, NOTVICT);
@@ -891,6 +913,11 @@ int execute_song_soothing_remembrance( byte level, CHAR_DATA *ch, char *arg, CHA
 
    heal = GET_LEVEL(ch)/5;
 
+   int combat, non_combat;
+   get_instrument_bonus(ch, combat, non_combat);
+
+   heal += non_combat;
+
    if(specialization > 0)
       heal = (int) (heal * 1.5);
 
@@ -950,6 +977,11 @@ int execute_song_traveling_march( byte level, CHAR_DATA *ch, char *arg, CHAR_DAT
    skill %= 100;
 
    heal = ((GET_LEVEL(ch)/3)+1)*2;
+
+   int combat, non_combat;
+   get_instrument_bonus(ch, combat, non_combat);
+
+   heal += non_combat;
 
    if(specialization > 0)
       heal = (int) (heal * 1.5);

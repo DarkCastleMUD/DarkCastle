@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: const.cpp,v 1.40 2002/09/10 20:36:28 pirahna Exp $ */
+/* $Id: const.cpp,v 1.41 2002/09/10 22:31:59 pirahna Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1265,7 +1265,6 @@ struct class_skill_defines m_skills[] = { // mage skills
 {    "dispel minor",	SPELL_DISPEL_MINOR,	22,	90,	3020,	NULL },
 {    "mass invisibility", SPELL_MASS_INVISIBILITY,	24,	90,	3020,	NULL },
 {    "wizard eye",	SPELL_WIZARD_EYE,	26,	90,	3020,	NULL },
-{    "haste other",	SPELL_HASTE_OTHER,	28,	90,	3020,	NULL },
 {    "meteor swarm",	SPELL_METEOR_SWARM,	30,	90,	3020,	NULL },
 {    "stone skin",	SPELL_STONE_SKIN,	32,	90,	-2, "A woman strong in battle surrounded by heavy magical influences calls to you." },
 {    "group fly",	SPELL_GROUP_FLY,	34,	90, -2,	"It’s a bird! It’s an air traffic controller! No, but whatever it is, its elementary :)." },
