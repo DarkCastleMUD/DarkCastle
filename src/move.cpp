@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.26 2004/04/24 10:42:40 urizen Exp $
+| $Id: move.cpp,v 1.27 2004/04/24 11:09:18 urizen Exp $
 | move.C
 | Movement commands and stuff.
 *************************************************************************
@@ -189,7 +189,9 @@ int do_fall(CHAR_DATA *ch, short dir)
   int dam = number(50,100);
   if(IS_AFFECTED(ch, AFF_FLYING))
     return eFAILURE;
-
+  if (GET_LEVEL(ch) == 50) dam = number(100,200);
+  if (GET_MAX_HIT(ch) > 2000) dam = number(400,500);
+  else if (GET_MAX_HIT(ch) > 1000) dam = number(200,400);
   // Don't effect mobs
   if(IS_NPC(ch)) {
     act("$n's clings to the terrain around $m and avoids falling.", ch, 0, 0, TO_ROOM, 0);

@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.78 2004/04/22 23:07:18 urizen Exp $ */
+/* $Id: const.cpp,v 1.79 2004/04/24 11:09:18 urizen Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1109,6 +1109,7 @@ struct class_skill_defines a_skills[] = {
 {    "protection from good",	SPELL_PROTECT_FROM_GOOD,	45,	90,	10005,	NULL,{0,0} },
 {    "stone skin",	SPELL_STONE_SKIN,	46,	90,	-2, "A woman strong in battle surrounded by heavy magical influences calls to you.",{0,0} }, 
 {    "acid blast",	SPELL_ACID_BLAST,	48,	90,	 10005,	NULL ,{0,0}}, 
+{    "vampiric aura",  SPELL_VAMPIRIC_AURA, 50, 95, -2, "I don't know it myself.. but I heard Lord Soth knew something about it.",{0,0}},
 {    "\n",		0,			1,	0,	0, 	NULL,{0,0}}
 };
 
