@@ -1083,6 +1083,15 @@ int execute_song_astral_chanty( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA 
 
    victim = get_char_vis(ch, ch->song_data);
 
+   if(!victim) {
+      if(ch->song_data) {
+        dc_free(ch->song_data);
+        ch->song_data = 0;
+      }
+      send_to_char("Ye can't seem to recall the right words.\r\n", ch);
+      return eFAILURE;
+   }
+
    if(GET_LEVEL(victim) > GET_LEVEL(ch)) {
       send_to_char("Your target resists the songs draw.\r\n", ch);
       if(ch->song_data) {
@@ -1092,9 +1101,7 @@ int execute_song_astral_chanty( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA 
       return eFAILURE;
    }
 
-   if(!victim)
-      send_to_char("Ye can't seem to recall the right words.\r\n", ch);
-   else if(IS_SET(world[victim->in_room].room_flags, NO_PORTAL) ||
+   if(IS_SET(world[victim->in_room].room_flags, NO_PORTAL) ||
            (IS_SET(world[victim->in_room].room_flags, ARENA) && !IS_SET(world[ch->in_room].room_flags, ARENA)) ||
            (IS_SET(world[ch->in_room].room_flags, ARENA) && !IS_SET(world[victim->in_room].room_flags, ARENA)))
       send_to_char("Something seems to be keeping you out.\r\n", ch);
