@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.23 2003/06/05 00:54:33 pirahna Exp $
+| $Id: objects.cpp,v 1.24 2003/06/23 02:27:21 pirahna Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -1303,12 +1303,10 @@ int will_screwup_worn_sizes(char_data * ch, obj_data * obj, int add)
     GET_HEIGHT(ch) += mod;
   else GET_HEIGHT(ch) -= mod;
 
-  if(size_restricted(ch, obj))
+  if(add == 1 && size_restricted(ch, obj))
   {
-    if(add)
-      GET_HEIGHT(ch) -= mod;
-    else GET_HEIGHT(ch) += mod;
-
+    // Only have to check the item itself if we're wearing it, not removing
+    GET_HEIGHT(ch) -= mod;
     send_to_char("After modifying your height that item would not fit!\r\n", ch);
     return TRUE;
   }
