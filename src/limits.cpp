@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.12 2004/04/16 00:56:35 urizen Exp $ */
+/* $Id: limits.cpp,v 1.13 2004/04/19 20:21:02 urizen Exp $ */
 
 extern "C"
 {
@@ -661,8 +661,8 @@ void update_corpses_and_portals(void)
   /* objects */
   for(j = object_list; j ; j = next_thing)
   {
-    next_thing = j->next; /* Next in object list */
     last_thing = j;
+    next_thing = j->next; /* Next in object list */
     /* Type 1 is a permanent game portal, and type 3 is a look_only
     |  object.  Type 0 is the spell portal and type 2 is a game_portal
     */

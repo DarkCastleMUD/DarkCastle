@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.20 2004/04/19 16:48:29 urizen Exp $ */
+/* $Id: utility.cpp,v 1.21 2004/04/19 20:21:02 urizen Exp $ */
 
 extern "C"
 {
@@ -1383,10 +1383,11 @@ void check_timer()
 { // Called once/sec
   struct timer_data *curr,*nex,*las;
   las = NULL;
-  for (curr = timer_list; curr; curr = curr->next)
+  for (curr = timer_list; curr; curr = nex)
   {
     nex = curr->next;
-    if (--curr->timeleft <= 0)
+    curr->timeleft--;
+    if (curr->timeleft <= 0)
     {
 	(*(curr->function))(curr->arg1,curr->arg2,curr->arg3);	
         if (las)
@@ -1398,5 +1399,4 @@ void check_timer()
     }
     las = curr;
   }
- 
 }
