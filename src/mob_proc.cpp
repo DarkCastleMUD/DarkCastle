@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.17 2002/09/10 01:45:32 pirahna Exp $ */
+/* $Id: mob_proc.cpp,v 1.18 2002/09/17 21:46:31 pirahna Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -2896,8 +2896,12 @@ static char *dethSayText [ ] =
   "Nothing says 'I love you' like oral sex in the morning.",
   "The White Man?    No good.",
   "There's 10 kinds of people in this world, those who understand binary and those who don't.",
-  "I think other prisoners' penises are a big pain in the ass."
-
+  "I think other prisoners' penises are a big pain in the ass.",
+  "Vote Quimby.",
+  "It's time to trade in my 26 year old for two 13s.",
+  "Nothing says luvin like a tasty porkchop.",
+  "Hey guys, ya know...it tastes just like salty tapioca.  No no, really...it does.",
+  "Pirahna is such a loser with women.  Skanky hoes flee in terror from him."
 };
 
 #define DETH_SAY_TEXT_SIZE    ( sizeof ( dethSayText )    / sizeof ( char * ) )
