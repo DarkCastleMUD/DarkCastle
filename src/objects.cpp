@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.21 2003/01/30 05:32:22 pirahna Exp $
+| $Id: objects.cpp,v 1.22 2003/06/05 00:05:42 pirahna Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -1230,6 +1230,9 @@ int size_restricted(struct char_data *ch, struct obj_data *obj)
     return FALSE;
 
   if(GET_RACE(ch) == RACE_HUMAN)  // human can wear all sizes
+    return FALSE;
+
+  if(IS_MOB(ch))  // mobs (ie charmies) can wear all sizes
     return FALSE;
 
   if(GET_HEIGHT(ch) < 42)
