@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: const.cpp,v 1.30 2002/08/11 14:53:56 pirahna Exp $ */
+/* $Id: const.cpp,v 1.31 2002/08/14 19:11:45 dcastle Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1082,6 +1082,7 @@ struct class_skill_defines r_skills[] = {
 {    "dual wield",	SKILL_DUAL_WIELD,       5,      80,	-2,	"With whirling blades and rigid honor, only these masters of weaponry can teach you the skill you need." },
 {    "trip",		SKILL_TRIP,		7,	75,	-2, 	"The old goblin in the caves knows, but he will not be cooperative.  You might need to use violence." },
 {    "shield block",    SKILL_SHIELDBLOCK,      9,      40,     -2,	"To learn this skill you must seek its master, the God of War in his arena.  Ask him to please teach you." },
+{    "kick",		SKILL_KICK,		11,	50,	-2, 	"Only the king of lobsters can teach you this." },
 {    "archery",		SKILL_ARCHERY,		12,	80,	-2, 	"Seek out the local fletcher." },
 {    "ambush",		SKILL_AMBUSH,		13,	75,	-2, 	"Seek out Samuel, one of the oldest rangers, for this skill.  He roams in a forest." },
 {    "double",		SKILL_SECOND_ATTACK,	14,	80,	-2, 	"See the King of Delcim's son." },
