@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.132 2004/05/20 00:07:06 urizen Exp $ */
+/* $Id: magic.cpp,v 1.133 2004/05/20 01:59:12 urizen Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -1497,6 +1497,11 @@ int spell_curse(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
         else if (skill < 91) { duration = 3; chance = 2; save = -4;}
 	else { duration = 3; chance = 2; save = -5; }
 
+	if (GET_LEVEL(victim) < 10)
+	{
+	  send_to_char("The spell fizzles!\r\n",ch);
+ 	  return eSUCCESS;
+	}
 	 if(number(0,chance))
 		{
 	act("$N seems to be unaffected!", ch, NULL, victim, TO_CHAR, 0);
