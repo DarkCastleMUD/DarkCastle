@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.6 2002/08/14 22:24:18 dcastle Exp $ */
+/* $Id: limits.cpp,v 1.7 2002/08/19 16:45:38 pirahna Exp $ */
 
 extern "C"
 {
@@ -482,6 +482,11 @@ void advance_level(CHAR_DATA *ch, int is_conversion)
     if (GET_LEVEL(ch) > IMMORTAL)
 	for (i = 0; i < 3; i++)
 	    ch->conditions[i] = -1;
+
+    if(GET_LEVEL(ch) == 10)
+      send_to_char("You will no longer keep your equipment when you die.\r\n", ch);
+    if(GET_LEVEL(ch) == 11)
+      send_to_char("It now costs you gold every time you recall.\r\n", ch);
 }   
 
 void gain_exp( CHAR_DATA *ch, int gain )
