@@ -3129,7 +3129,7 @@ mob_index[mob_num].virt);
           send_to_char(buf, ch);
           send_to_char("\r\n$3Valid types$R:\r\n", ch);
           for(i = 0; *affected_bits2[i] != '\n'; i++) {
-            sprintf(buf, "  %s\n\r", isr_bits[i]);
+            sprintf(buf, "  %s\n\r", affected_bits2[i]);
             send_to_char(buf, ch);
           }
           return eFAILURE;
