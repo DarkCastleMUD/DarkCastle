@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: utility.h,v 1.7 2002/08/02 05:05:59 pirahna Exp $ */
+/* $Id: utility.h,v 1.8 2002/08/03 15:29:33 pirahna Exp $ */
 
 #ifndef UTILITY_H_
 #define UTILITY_H_
@@ -365,6 +365,8 @@ bool check_valid_and_convert(int & value, char * buf);
 void parse_bitstrings_into_int(char * bits[], char * strings, char_data * ch, uint32 & value);
 void parse_bitstrings_into_int(char * bits[], char * strings, char_data * ch, uint16 & value);
 void display_string_list(char * list[], char_data *ch);
+int contains_no_trade_item(obj_data * obj);
+int contents_cause_unique_problem(obj_data * obj, char_data * vict);
 
 // MOBProgs prototypes
 int     mprog_wordlist_check    ( char * arg, CHAR_DATA *mob,

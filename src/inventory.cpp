@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.6 2002/08/02 20:59:00 pirahna Exp $
+| $Id: inventory.cpp,v 1.7 2002/08/03 15:29:28 pirahna Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -50,9 +50,6 @@ void special_log(char *arg);
 struct obj_data * bring_type_to_front(char_data * ch, int item_type);
 struct obj_data * search_char_for_item(char_data * ch, sh_int item_number);
 
-// local function declerations
-int contains_no_trade_item(obj_data * obj);
-
 
 /* procedures related to get */
 void get(struct char_data *ch, struct obj_data *obj_object, 
@@ -65,6 +62,10 @@ void get(struct char_data *ch, struct obj_data *obj_object,
          send_to_char("The item's uniqueness prevents it!\r\n", ch);
          return;
       }
+    }
+    if(contents_cause_unique_problem(obj_object, ch)) {
+       send_to_char("Something inside the item is unique and prevents it!\r\n", ch);
+       return;
     }
 
     if (sub_object) {
@@ -525,6 +526,24 @@ int do_consent(struct char_data *ch, char *arg, int cmd)
           "molested by\n\ranyone named %s.\n\r", buf);
   send_to_char(buf2, ch);
   return eSUCCESS;
+}
+
+int contents_cause_unique_problem(obj_data * obj, char_data * vict)
+{
+  int lastnum = -1;
+
+  for(obj_data * inside = obj->contains; inside; inside = inside->next_content)
+  {
+    if(inside->item_number < 0) // skip -1 items
+       continue;
+    if(lastnum == inside->item_number) // items are in order.  If we've already checked
+       continue;                       // this item, don't do it again. 
+
+    if(search_char_for_item(vict, inside->item_number))
+       return TRUE;
+    lastnum = inside->item_number;
+  }
+  return FALSE;
 }
 
 int contains_no_trade_item(obj_data * obj)
@@ -1031,6 +1050,11 @@ int do_give(struct char_data *ch, char *argument, int cmd)
          return eFAILURE;
       }
     }
+    if(contents_cause_unique_problem(obj, vict)) {
+      send_to_char("The uniqueness of something inside it prevents it.\r\n", ch);
+      csendf(vict, "%s tried to give you an item but was unable.\r\n", GET_NAME(ch));
+      return eFAILURE;
+    }
 
     if(GET_LEVEL(ch) >= IMMORTAL)
     {
@@ -1108,7 +1132,7 @@ struct obj_data * search_char_for_item(char_data * ch, sh_int item_number)
     // does not support containers inside containers
     if(GET_ITEM_TYPE(i) == ITEM_CONTAINER) { // search inside
       for(j = i->contains; j ; j = j->next_content) {
-        if(i->item_number == item_number) 
+        if(j->item_number == item_number) 
           return j;
       }
     }

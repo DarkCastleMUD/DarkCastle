@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: non_off.cpp,v 1.5 2002/08/01 20:05:34 dcastle Exp $
+| $Id: non_off.cpp,v 1.6 2002/08/03 15:29:28 pirahna Exp $
 | non_off.C
 | Description:  Implementation of generic, non-offensive commands.
 */
@@ -138,6 +138,15 @@ int do_donate(struct char_data *ch, char *argument, int cmd)
     send_to_char("It seems magically attached to you.\r\n", ch);
     return eFAILURE;
   }
+
+  if(contains_no_trade_item(obj)) {
+    if(GET_LEVEL(ch) > IMMORTAL)
+       send_to_char("That was a NO_TRADE item btw....\r\n", ch);
+    else {
+      send_to_char("Something inside it seems magically attached to you.\r\n", ch);
+      return eFAILURE;
+    }
+  } 
 
   if(IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL)) {
     do_gossip(ch, "I just tried to donate my gl, I'm fucking stupid.", 9);

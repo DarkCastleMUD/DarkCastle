@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.28 2002/08/03 07:30:29 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.29 2002/08/03 15:29:28 pirahna Exp $ */
 
 extern "C"
 {
@@ -2644,7 +2644,7 @@ void group_gain(CHAR_DATA * ch, CHAR_DATA * victim)
       case -7:  tmp_share = (int) (tmp_share * 0.5); break;
       case -8:  tmp_share = (int) (tmp_share * 0.4); break;
       case -9:  tmp_share = (int) (tmp_share * 0.3); break;
-      case -10:  tmp_share = (int) (tmp_share * 0.2); break;
+      case -10: tmp_share = (int) (tmp_share * 0.2); break;
       case -11: tmp_share = (int) (tmp_share * 0.1); break;
       case -12: tmp_share = (int) (tmp_share * 0.1); break;
       case -13: tmp_share = (int) (tmp_share * 0.1); break;

@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.7 2002/07/30 21:35:22 pirahna Exp $ */
+/* $Id: handler.cpp,v 1.8 2002/08/03 15:29:28 pirahna Exp $ */
     
 extern "C"
 {
@@ -1761,15 +1761,34 @@ int obj_from_room(struct obj_data *object)
 // put an object in an object (quaint)
 int obj_to_obj(struct obj_data *obj, struct obj_data *obj_to)
 {
-  struct obj_data *tmp_obj;
+  struct obj_data *tobj;
 
-  obj->next_content = obj_to->contains;
-  obj_to->contains = obj;
   obj->in_obj = obj_to;
 
-  for(tmp_obj = obj->in_obj; tmp_obj;
-      GET_OBJ_WEIGHT(tmp_obj) += GET_OBJ_WEIGHT(obj),
-      tmp_obj = tmp_obj->in_obj)
+  // search through for the last object, or another object just like this one
+  for(tobj = obj_to->contains;
+      tobj && tobj->next_content;
+      tobj = tobj->next_content)
+  { 
+    if(tobj->item_number == obj->item_number)
+      break;
+  }
+     
+  // put it in the list
+  if(!tobj) {
+    obj->next_content = NULL;
+    obj_to->contains = obj;
+  }
+  else {
+    obj->next_content = tobj->next_content;
+    tobj->next_content = obj;
+  }
+
+  // recursively upwards add the weight.  Since we only have 1 layer of containers,
+  // this loop only happens once, but it's good to leave later in case we change our mind
+  for(tobj = obj->in_obj; tobj;
+      GET_OBJ_WEIGHT(tobj) += GET_OBJ_WEIGHT(obj),
+      tobj = tobj->in_obj)
     ;
 
   return 1;

@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: shop.cpp,v 1.3 2002/07/13 19:19:29 azrack Exp $ */
+/* $Id: shop.cpp,v 1.4 2002/08/03 15:29:28 pirahna Exp $ */
 
 extern "C"
 {
@@ -335,6 +335,15 @@ void shopping_sell( char *arg, CHAR_DATA *ch,
         send_to_char("It seems magically attached to you.\r\n", ch);
         return;
     }
+
+    if(contains_no_trade_item(obj)) {
+      if(GET_LEVEL(ch) > IMMORTAL)
+         send_to_char("That was a NO_TRADE item btw....\r\n", ch);
+      else {
+        send_to_char("Something inside it seems magically attached to you.\r\n", ch);
+        return;
+      }
+    } 
 
     if(IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL))
     {
