@@ -97,10 +97,12 @@ char *mprog_next_command( char *clist )
 
   while ( *pointer != '\n' && *pointer != '\0' )
     pointer++;
-  if ( *pointer == '\n' )
+  while (*pointer == '\n' || *pointer == '\r')
+     *pointer++ = '\0';
+/*  if ( *pointer == '\n' )
     *pointer++ = '\0';
   if ( *pointer == '\r' )
-    *pointer++ = '\0';
+    *pointer++ = '\0';*/
 
   return ( pointer );
 
@@ -1619,8 +1621,6 @@ void mprog_driver ( char *com_list, CHAR_DATA *mob, CHAR_DATA *actor,
  }
 
  strcpy( tmpcmndlst, com_list );
- if (vch && !IS_NPC(vch))
-   send_to_char(tmpcmndlst, vch);
  command_list = tmpcmndlst;
  cmnd         = command_list;
  command_list = mprog_next_command( command_list );
