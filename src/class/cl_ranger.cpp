@@ -1,9 +1,11 @@
 /******************************************************************************
- * $Id: cl_ranger.cpp,v 1.28 2003/11/10 19:37:14 staylor Exp $ | cl_ranger.C  *
+ * $Id: cl_ranger.cpp,v 1.29 2003/12/09 08:40:57 staylor Exp $ | cl_ranger.C  *
  * Description: Ranger skills/spells                                          *
  *                                                                            *
  * Revision History                                                           *
  * 10/28/2003  Onager   Modified do_tame() to remove hate flag for tamer      *
+ * 12/08/2003  Onager   Added eq check to do_tame() to remove !charmie eq     *
+ *                      from charmies                                         *
  ******************************************************************************/
 
 extern "C"  {
@@ -38,6 +40,7 @@ extern int rev_dir[];
 
 int saves_spell(CHAR_DATA *ch, CHAR_DATA *vict, int spell_base, sh_int save_type);
 bool any_charms(CHAR_DATA *ch);
+void check_eq(CHAR_DATA *ch);
 
 int do_tame(CHAR_DATA *ch, char *arg, int cmd)
 {
@@ -148,6 +151,9 @@ int do_tame(CHAR_DATA *ch, char *arg, int cmd)
   af.location  = 0;
   af.bitvector = AFF_CHARM;
   affect_to_char(victim, &af);
+
+  /* remove any !charmie eq the charmie is wearing */
+  check_eq(victim);
 
   act("Isn't $n just such a nice person?", ch , 0, victim, TO_VICT, 0);
   return eSUCCESS;
@@ -1312,4 +1318,14 @@ int do_mind_delve(struct char_data *ch, char *arg, int cmd)
             "Noone!");
   send_to_char(buf, ch);
   return eSUCCESS;
+}
+
+void check_eq(CHAR_DATA *ch)
+{
+   int pos;
+
+   for (pos = 0; pos < MAX_WEAR; pos++) {
+      if (ch->equipment[pos])
+         equip_char(ch, unequip_char(ch, pos), pos);
+   }
 }
