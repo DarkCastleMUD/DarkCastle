@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.52 2004/05/14 02:17:14 urizen Exp $
+| $Id: guild.cpp,v 1.53 2004/05/14 02:40:37 urizen Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -536,7 +536,7 @@ void skill_increase_check(char_data * ch, int skill, int learned, int difficulty
 	if (thing > 0)
          to += (get_stat(ch,skilllist[i].attrs[1])-20);
    }
-   if (to > maximum) maximum = to;
+   if (to > maximum) to = maximum;
    if(learned >= to)
      return;
 

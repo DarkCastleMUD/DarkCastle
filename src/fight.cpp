@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.184 2004/05/14 02:09:48 urizen Exp $ */
+/* $Id: fight.cpp,v 1.185 2004/05/14 02:40:36 urizen Exp $ */
 
 extern "C"
 {
@@ -1893,7 +1893,7 @@ int check_riposte(CHAR_DATA * ch, CHAR_DATA * victim)
   }
 
   if (IS_NPC(victim) && number(0,4)) return eFAILURE;
-
+  else (!IS_NPC(victim) && !has_skill(victim, SKILL_RIPOSTE)) return eFAILURE;
   if (skill_success(victim, ch, SKILL_RIPOSTE))
     return eFAILURE;
   
