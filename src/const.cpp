@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: const.cpp,v 1.26 2002/08/07 03:53:54 pirahna Exp $ */
+/* $Id: const.cpp,v 1.27 2002/08/08 01:02:11 pirahna Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -925,7 +925,7 @@ struct class_skill_defines w_skills[] = {
 {    "double",		SKILL_SECOND_ATTACK,	8,	80,	-2, 	"I cannot teach you that. You must journey north to see the son of the Delcim king.  He will train you." },
 {    "headbutt",	SKILL_SHOCK,		10,	75,	-2, 	"A queen of the light holds the knowledge within her tiny skull." },
 {    "dodge",		SKILL_DODGE,		12,	40,	-2, 	"Hop like a bunny, quick like a bee, this location is so funny, you'll go wee wee wee.  Don't forget to bring your scythe however." },
-{    "dual wield",      SKILL_DUAL_WIELD,       15,     90,	-2,	"Dunna naanna nunna nanna BATMAN!!!" },
+{    "dual wield",      SKILL_DUAL_WIELD,       15,     90,	-2,	"With whirling blades and rigid honor, only these masters of weaponry can teach you the skill you need." },
 {    "retreat",		SKILL_RETREAT,		17,	75,	-2, 	"A warrior of diverse colors, including yellow, can teach you this one." },
 {    "frenzy",		SKILL_FRENZY,		18,	50,	-2,	"There is a highlander chief.  The chief of mountain trail guard.  You must locate him to learn this skill." },
 {    "parry",		SKILL_PARRY,		20,	50,	-2, 	"You must see the constable of Newtonia to learn parry." },
@@ -951,7 +951,7 @@ struct class_skill_defines t_skills[] = {
 {    "pick",		SKILL_PICK_LOCK,	7,	75,	-2, 	"One of those swine that are homage to the old god, they are hard to find but they reside in sorpigal." },
 {    "slip",  		SKILL_SLIP,		10,	80,	-2, 	"The desert banditos know, but they take their secrets to the grave." },
 {    "palm",		SKILL_PALM,		10,	80,	-2, 	"Seek out a pirate captain in a relatively calm port of call.  He believes in honor amongst thieves." },
-{    "dual wield",      SKILL_DUAL_WIELD,       10,	90,     -2, "Dunna naanna nunna nanna BATMAN!!!" },
+{    "dual wield",      SKILL_DUAL_WIELD,       10,	90,     -2, "With whirling blades and rigid honor, only these masters of weaponry can teach you the skill you need." },
 {    "pocket",		SKILL_POCKET,		12,	80,	-2, 	"You might wish to find that conniving dullard in silverdale, can't 'member his name but it rhymes with knave." },
 {    "dodge",		SKILL_DODGE,		15,	90,	-2, 	"Hop like a bunny, quick like a bee, this location is so funny, you'll go wee wee wee.  Don't forget to bring your scythe however." },
 {    "stalk",		SKILL_STALK,		15,	80,	-2, 	"Seek out the sneaky little rodent who is a gossiper and thief!" },
@@ -970,7 +970,7 @@ struct class_skill_defines a_skills[] = {
 {    "sneak",		SKILL_SNEAK,		2,	60,	-2,	"You require the essence of a forest creature, a particularly sly one at that." },
 {    "kick",		SKILL_KICK,		3,	75,	10005,	NULL },
 {    "shield block",    SKILL_SHIELDBLOCK, 5, 50, -2, "To learn this skill you must seek its master, the God of War in his arena.  Ask him to please teach you." },
-{    "dual wield",      SKILL_DUAL_WIELD, 10,	60, -2, "Dunna naanna nunna nanna BATMAN!!!" },
+{    "dual wield",      SKILL_DUAL_WIELD, 10,	60, -2, "With whirling blades and rigid honor, only these masters of weaponry can teach you the skill you need." },
 {    "hide", 		SKILL_HIDE,		15,	60,	-2, "Seek out the Abbot of a hidden monastery off shore road." },
 {    "backstab",	SKILL_BACKSTAB,		17,	80, 10005, 	NULL},
 {    "double",		SKILL_SECOND_ATTACK,	20,	75, -2, 	"Travel to Delcim and seek the prince.  He will teach you that." },
@@ -1005,7 +1005,7 @@ struct class_skill_defines p_skills[] = {
 {    "shield block",    SKILL_SHIELDBLOCK, 3, 50, 10006, 	"To learn this skill you must seek its master, the God of War in his arena.  Ask him to please teach you." },
 {    "kick",		SKILL_KICK,		5,	80,	-2,	"Only the king of lobsters can teach you this." },
 {    "rescue",		SKILL_RESCUE,		7,	80,	-2, 	"The chief of the gnomes is who you want, lad."  },
-{    "dual wield",      SKILL_DUAL_WIELD,       10,     60,-2, "Dunna naanna nunna nanna BATMAN!!!"  },
+{    "dual wield",      SKILL_DUAL_WIELD,       10,     60,-2, "With whirling blades and rigid honor, only these masters of weaponry can teach you the skill you need."  },
 {    "dodge",		SKILL_DODGE,		13,	20,	-2, 	"Hop like a bunny, quick like a bee, this location is so funny, you'll go wee wee wee.  Don't forget to bring your scythe however." },
 {    "double",		SKILL_SECOND_ATTACK,	20,	75,	-2, 	"Seek the Delcim Prince my child.  He shall train you." },
 {    "parry",		SKILL_PARRY,		25,	50,	-2, 	"You have to go see the constable of Newtonia to learn parry." },
@@ -1060,13 +1060,13 @@ struct class_skill_defines k_skills[] = {
 {    "shield block",    SKILL_SHIELDBLOCK,      7,      60,     -2, 	"To learn this skill you must seek its master, the God of War in his arena.  Ask him to please teach you."},
 {    "rescue",  	SKILL_RESCUE,		10,	70,	-2, 	"The chief of the gnomes is who you want, lad." },
 {    "eagleclaw",	SKILL_EAGLE_CLAW,	17,	75,	-2, 	"A hermit has the knowledge to this skill, but luckily for you this hermit is a nice one."},
-{    "dual wield",      SKILL_DUAL_WIELD,       20,     60,	-2,	"Dunna naanna nunna nanna BATMAN!!!" },
+{    "dual wield",      SKILL_DUAL_WIELD,       20,     60,	-2,	"With whirling blades and rigid honor, only these masters of weaponry can teach you the skill you need." },
 {    "stun",		SKILL_STUN,		30,	60,	-2, 	"You must see a master shaolin monk."},
 {    "quiver",		SKILL_QUIVERING_PALM,	40,	75,	-2, 	"A knight of a most dangerous and twisted place quite large holds the knowledge you seek."},
 {    "purify",		KI_PURIFY+KI_OFFSET,	5,	80,	-2, 	"A tower of water so pure, only he could know."},
 {    "punch",		KI_PUNCH+KI_OFFSET,	10,	80,	-2, 	"You seek a brother in a secret monastery."},
 {    "sense",		KI_SENSE+KI_OFFSET,	20,	80,	-2, 	"A creature who lives in the damp dark, and causes it, could know."},
-{    "stance",		KI_STANCE+KI_OFFSET,	24,	80,	10008, 	NULL},
+{    "stance",		KI_STANCE+KI_OFFSET,	24,	80,	-2, "A fair-skinned warrior of untold skill in weapons awaits your challenge in the thundering depths."},
 {    "speed",		KI_SPEED+KI_OFFSET,	27,	80,	-2, 	"Hmm, I do not know where the knowledge went, but I sense it on the east content, moving around."},
 {    "storm",		KI_STORM+KI_OFFSET,	35,	80,	-2, 	"See a purveyer of storms about this one"},
 {    "disrupt",		KI_DISRUPT+KI_OFFSET,	41,	80,	10008, NULL},
@@ -1079,7 +1079,7 @@ struct class_skill_defines r_skills[] = {
 {    "redirect",	SKILL_REDIRECT,		2,	75,	-2, 	"Seek out Joshua, last I heard he was exploring somewhere north of the turning point." },
 {    "tame",		SKILL_TAME,		3,	75,	10013, 	"You have to go see Hawk the ranger guildmaster." },
 {    "dodge",		SKILL_DODGE,		4,	70,	-2, 	"Hop like a bunny, quick like a bee, this location is so funny, you'll go wee wee wee.  Don't forget to bring your scythe however." },
-{    "dual wield",	SKILL_DUAL_WIELD,       5,      80,	-2,	"Dunna naanna nunna nanna BATMAN!!!" },
+{    "dual wield",	SKILL_DUAL_WIELD,       5,      80,	-2,	"With whirling blades and rigid honor, only these masters of weaponry can teach you the skill you need." },
 {    "trip",		SKILL_TRIP,		7,	75,	-2, 	"The old goblin in the caves knows, but he will not be cooperative.  You might need to use violence." },
 {    "shield block",    SKILL_SHIELDBLOCK,      9,      40,     -2,	"To learn this skill you must seek its master, the God of War in his arena.  Ask him to please teach you." },
 {    "archery",		SKILL_ARCHERY,		12,	80,	-2, 	"Seek out the local fletcher." },
@@ -1107,7 +1107,7 @@ struct class_skill_defines r_skills[] = {
 struct class_skill_defines d_skills[] = { // bard skills
 {      "hide",			SKILL_HIDE,			2,	75,	-2, 	"Seek out the Abbot of a hidden monastery off shore road."},
 {      "dodge",			SKILL_DODGE,			5,	85,	-2, 	"Hop like a bunny, quick like a bee, this location is so funny, you'll go wee wee wee.  Don't forget to bring your scythe however." },
-{      "dual wield",    	SKILL_DUAL_WIELD,       	10,     75, -2, "Dunna naanna nunna nanna BATMAN!!!" },
+{      "dual wield",    	SKILL_DUAL_WIELD,       	10,     75, -2, "With whirling blades and rigid honor, only these masters of weaponry can teach you the skill you need." },
 {      "double",		SKILL_SECOND_ATTACK,		17,	85,	-2, 	"You must travel to the Prince of Delcim to recieve training."},
 {      "listsongs",		SKILL_SONG_LIST_SONGS,		1,	100,	3201, 	NULL},
 {      "whistle sharp",		SKILL_SONG_WHISTLE_SHARP, 	1,	90,	3201, 	NULL},
@@ -1138,7 +1138,7 @@ struct class_skill_defines d_skills[] = { // bard skills
 // 3203 is the druid guild guard
 struct class_skill_defines u_skills[] = { // druid skills
 {    "dodge",		SKILL_DODGE,		7,	5,	-2, 	NULL},
-{    "dual wield",      SKILL_DUAL_WIELD,       11,      40, -2, "Dunna naanna nunna nanna BATMAN!!!" },
+{    "dual wield",      SKILL_DUAL_WIELD,       11,      40, -2, "With whirling blades and rigid honor, only these masters of weaponry can teach you the skill you need." },
 {    "eyes of the owl",	SPELL_EYES_OF_THE_OWL,	1,	90,	-2,	"Find and kill a weak goblin in the mushroom caverns." },
 {    "blue bird",       SPELL_BLUE_BIRD,        2,      90,     3203,   NULL },
 {    "cure light",	SPELL_CURE_LIGHT,	3,	90,	3203,	NULL },
@@ -1150,7 +1150,7 @@ struct class_skill_defines u_skills[] = { // druid skills
 {    "water breathing",	SPELL_WATER_BREATHING,	17,	90,	3203,	NULL },
 {    "stone shield",	SPELL_STONE_SHIELD,	20,	90,	-2, "The druid of druids can help you learn this most quintisential skill."},
 {    "drown",		SPELL_DROWN,		22,	90,	3203,	NULL },
-{    "lightning shield",SPELL_LIGHTNING_SHIELD,	23,	90,	-2, "An electric individual who will surely light you up with his mastery of energetic discourse. (phew)"},
+{    "lightning shield",SPELL_LIGHTNING_SHIELD,	23,	90,	-2, "A near victim of infanticide the Lord of the Tallest mountain knows lightning shield."},
 {    "power heal",	SPELL_POWER_HEAL,	26,	90,	-2,	"Only the most pure of beasts with horn atop head can help you.  Look in the mountains." },
 {    "camouflague",	SPELL_CAMOUFLAGUE,	28,	90,	3203,	NULL },
 {    "barkskin",	SPELL_BARKSKIN,		35,	90,-2, "Talk to Shargugh, he's the MAN! Baby! Just ask dinas ;)"},
@@ -1165,7 +1165,7 @@ struct class_skill_defines u_skills[] = { // druid skills
 // cleric 3021 guildmaster
 struct class_skill_defines c_skills[] = { // cleric skills
 {    "dodge",		SKILL_DODGE,		7,	5,	-2, 	"Hop like a bunny, quick like a bee, this location is so funny, you'll go wee wee wee.  Don't forget to bring your scythe however." },
-{    "dual wield",      SKILL_DUAL_WIELD,       10,      40,-2, "Dunna naanna nunna nanna BATMAN!!!"  },
+{    "dual wield",      SKILL_DUAL_WIELD,       10,      40,-2, "With whirling blades and rigid honor, only these masters of weaponry can teach you the skill you need."  },
 {    "armor",		SPELL_ARMOR,		1,	90,	3021,	NULL },
 {    "cause light",	SPELL_CAUSE_LIGHT,	1,	90,	3021,	NULL },
 {    "cure light",	SPELL_CURE_LIGHT,	1,	90,	3021,	NULL },
@@ -1224,7 +1224,7 @@ struct class_skill_defines c_skills[] = { // cleric skills
 // mage 3020 guildmaster
 struct class_skill_defines m_skills[] = { // mage skills 
 {    "dodge",		SKILL_DODGE,		7,	5,	-2, 	"Hop like a bunny, quick like a bee, this location is so funny, you'll go wee wee wee.  Don't forget to bring our scythe however." },
-{    "dual wield",      SKILL_DUAL_WIELD,       10,      25, -2, "Dunna naanna nunna nanna BATMAN!!!" },
+{    "dual wield",      SKILL_DUAL_WIELD,       10,      25, -2, "With whirling blades and rigid honor, only these masters of weaponry can teach you the skill you need." },
 {    "focused repelance",SKILL_FOCUSED_REPELANCE, 25,	80,	3020,	NULL },
 {    "magic missile",	SPELL_MAGIC_MISSILE,	1,	90,	3020,	NULL },
 {    "ventriloquate",	SPELL_VENTRILOQUATE,	1,	90,	3020,	NULL },
