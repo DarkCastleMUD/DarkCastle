@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: who.cpp,v 1.4 2002/06/29 18:16:22 pirahna Exp $
+| $Id: who.cpp,v 1.5 2002/07/06 22:21:27 pirahna Exp $
 | who.C
 | Commands for who, maybe? :P
 */
@@ -298,7 +298,7 @@ int do_who(struct char_data *ch, char *argument, int cmd)
         "   --------  ",
         "   --------  ",
         "   --------  ",
-        "   --------  ",
+        "PirsLoveSlave",
         " Implementor "
     };
     char *clss_types[] = {
