@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.158 2004/06/06 18:05:06 urizen Exp $ */
+/* $Id: magic.cpp,v 1.159 2004/06/10 01:31:23 urizen Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -282,11 +282,11 @@ int spell_souldrain(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
 //   level *= 2;
    set_cantquit( ch, victim );
 
-   if(saves_spell(ch, victim, 1, SAVE_TYPE_MAGIC) < 0) {
+/*   if(saves_spell(ch, victim, 1, SAVE_TYPE_MAGIC) < 0) {
       if (GET_LEVEL(victim) <= 2) {
          return spell_damage(ch, victim, 100, TYPE_MAGIC, SPELL_SOULDRAIN, 0);
 	 }
-      else {
+      else {*/
          mana = dam_percent(skill,125);
          if(mana > GET_MANA(victim))
             mana = GET_MANA(victim);
@@ -312,7 +312,7 @@ int spell_souldrain(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
          return retval;//spell_damage(ch, victim, dam, TYPE_MAGIC, 
 //SPELL_SOULDRAIN, 0);
          }
-      } // ! saves spell
+  //    } // ! saves spell
       
    // Miss
    else {
