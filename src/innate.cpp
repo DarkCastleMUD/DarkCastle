@@ -58,10 +58,10 @@ struct in_skills {
 const struct in_skills innates[] = {
   { "powerwield", RACE_GIANT, innate_powerwield },
   { "regeneration", RACE_TROLL, innate_regeneration },
-  { "farsight", RACE_ELVEN, innate_farsight },
+  { "farsight", RACE_GNOME, innate_farsight },
   { "bloodlust", RACE_ORC, innate_bloodlust},
   { "repair", RACE_DWARVEN, innate_repair},
-  { "focus", RACE_GNOME, innate_focus},
+  { "focus", RACE_ELVEN, innate_focus},
   { "evasion", RACE_PIXIE, innate_evasion},
   { "shadowslip", RACE_HOBBIT, innate_shadowslip},
   { "\n", 0, NULL}
