@@ -151,6 +151,7 @@ int do_sqedit(struct char_data *ch, char *argument, int cmd)
     "class",
     "show",
     "list",
+    "ignorethistest",
     "\n"
   };
   if (!has_skill(ch, COMMAND_SQEDIT))
@@ -169,7 +170,7 @@ int do_sqedit(struct char_data *ch, char *argument, int cmd)
   }
   int i;
   for (i = 0; fields[i] != "\n"; i++)
-  {
+  {	
      if (!str_cmp((char*)fields[i], command))
        break;
   }
@@ -241,6 +242,7 @@ int do_sqedit(struct char_data *ch, char *argument, int cmd)
 	send_to_char("Error in sqedit. Tell Urizen.\r\n",ch);
         break;
       }
+     break;
     case 2:
       send_to_char("Enter new message. End with ~.\r\n",ch);
       ch->desc->connected = CON_EDITING;
