@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.160 2004/06/10 01:46:12 urizen Exp $ */
+/* $Id: magic.cpp,v 1.161 2004/06/10 01:48:21 urizen Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -295,7 +295,8 @@ int spell_souldrain(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
 		act("$N resists your attempt to souldrain $m!", ch, NULL, victim,TO_CHAR,0);
 		act("$N resists $n's attempt to souldrain $m!", ch, NULL, victim, TO_ROOM,NOTVICT);
 		act("You resist $n's attempt to souldrain you!",ch,NULL,victim,TO_VICT,0);
-		mana /= 2;
+		return eFAILURE;
+//		mana /= 2;
 	 }
          GET_MANA(victim) -= mana;
 
