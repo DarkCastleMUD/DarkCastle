@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.198 2004/05/21 04:09:44 urizen Exp $ */
+/* $Id: fight.cpp,v 1.199 2004/05/21 05:44:54 urizen Exp $ */
 
 extern "C"
 {
@@ -3190,7 +3190,7 @@ void group_gain(CHAR_DATA * ch, CHAR_DATA * victim)
        continue;
     }
     
-    if(GET_LEVEL(tmp_ch) - GET_LEVEL(highest) <= -20) {
+    if(GET_LEVEL(tmp_ch) - GET_LEVEL(highest) <= -20 && !IS_NPC(tmp_ch)) {
        act("You are too low for this group.  You gain no experience.", tmp_ch, 0, 0, TO_CHAR, 0);
 
        tmp_ch = loop_followers(&f);
