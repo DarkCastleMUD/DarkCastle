@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.16 2002/08/26 22:29:16 pirahna Exp $ */
+/* $Id: handler.cpp,v 1.17 2002/10/13 01:56:35 pirahna Exp $ */
     
 extern "C"
 {
@@ -1013,7 +1013,12 @@ int equip_char(CHAR_DATA *ch, struct obj_data *obj, int pos)
 
     if ((IS_OBJ_STAT(obj, ITEM_ANTI_EVIL) && IS_EVIL(ch)) ||
 	(IS_OBJ_STAT(obj, ITEM_ANTI_GOOD) && IS_GOOD(ch)) ||
-	(IS_OBJ_STAT(obj, ITEM_ANTI_NEUTRAL) && IS_NEUTRAL(ch))) {
+	(IS_OBJ_STAT(obj, ITEM_ANTI_NEUTRAL) && IS_NEUTRAL(ch))) 
+    {
+	if(IS_SET(obj->obj_flags.more_flags, ITEM_NO_TRADE)) {
+	    act("You are zapped by $p but it stays with you.", ch, obj, 0, TO_CHAR, 0);
+            return 1;
+        }
 	if (ch->in_room != NOWHERE) {
 	    act("You are zapped by $p and instantly drop it.", ch, obj, 0, TO_CHAR, 0);
 	    act("$n is zapped by $p and instantly drops it.", ch, obj, 0, TO_ROOM, 0);
