@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.50 2004/05/13 20:20:18 urizen Exp $
+| $Id: guild.cpp,v 1.51 2004/05/14 00:54:01 urizen Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -633,7 +633,7 @@ void check_maxes(CHAR_DATA *ch)
               to += (get_stat(ch,skilllist[i].attrs[1])-20);
        }
        if (to > maximum) to = maximum;
-       if (has_skill(ch,i) > to)
+       if (has_skill(ch,skilllist[i].skillnum) > to)
        {
 	  struct char_skill_data * curr = ch->skills;
 
