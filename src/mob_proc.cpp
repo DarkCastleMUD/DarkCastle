@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.55 2004/05/28 18:35:14 pirahna Exp $ */
+/* $Id: mob_proc.cpp,v 1.56 2004/05/28 23:44:02 pirahna Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -3012,7 +3012,8 @@ static char *dethSayText [ ] =
   "I put racing strips on my computer.  Makes me feel like it goes faster.",
   "What happened to sex, drugs, and rock'n'roll.  Now we have AIDS, crack, and techno.",
   "It's a good thing Microsoft isn't in the condom busines.",
-  "Whenever I clean my glasses, my monitor becomes dirty as hell."
+  "Whenever I clean my glasses, my monitor becomes dirty as hell.",
+  "Okay so this baby seal walks into a club...."
 };
 
 #define DETH_SAY_TEXT_SIZE    ( sizeof ( dethSayText )    / sizeof ( char * ) )
