@@ -14,12 +14,24 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.h,v 1.38 2004/04/16 13:23:08 urizen Exp $ */
+/* $Id: spells.h,v 1.39 2004/04/16 16:57:21 urizen Exp $ */
 #include <structs.h> // byte, sh_int
 
 #define MAX_BUF_LENGTH               240
 
 void extractFamiliar(CHAR_DATA *ch);
+
+
+/* New skill quest thingy. */
+struct skill_quest
+{
+  struct skill_quest *next;
+  char *message;
+  int num;
+  int clas;
+  int level;
+};
+
 /*
  * Spell numbers are well known.
  * They appear in tinyworld files attached to magical items.

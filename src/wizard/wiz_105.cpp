@@ -127,3 +127,9 @@ int do_pardon(struct char_data *ch, char *argument, int cmd)
 }
 
 // do_string is in modify.C
+
+int do_sqedit(struct char_data *ch, char *argument, int cmd)
+{
+  
+
+}

@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.37 2004/04/16 12:20:24 urizen Exp $ */
+/* $Id: db.cpp,v 1.38 2004/04/16 16:57:17 urizen Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -110,6 +110,7 @@ struct wizlist_info
   char *name;
   int level;
 };
+struct skill_quest *skill_list; // List of skill quests.
  
 char webpage[MAX_STRING_LENGTH];       /* the webbrowser connect screen*/
 char greetings1[MAX_STRING_LENGTH];    /* the greeting screen          */
@@ -394,6 +395,67 @@ void funny_boot_message()
     write_to_descriptor(d->descriptor, funnybootmessages[num]);
 }
 
+/* Write skillquest file. 
+It checks if ch exists everywhere it is used,
+so this can be called from other places without
+a character attached. */
+int do_write_skillquest(struct char_data *ch, char *argument, int cmd)
+{
+   struct skill_quest *curr;
+   FILE *fl;
+   if (!dc_fopen(SKILL_QUEST_FILE,"w"))
+   {
+      if (ch)
+        send_to_char("Can't open the skill quest file.\r\n",ch);
+      return eFAILURE;
+   }
+   for (curr = skill_list; curr; curr = curr->next)
+   {
+     fprintf(fl,"%d %s~\n",curr->num, curr->message);
+     fprintf(fl,"%d %d\n",curr->clas,curr->level);
+   }
+   fprintf(fl,"0");
+   dc_fclose(fl);
+   return eSUCCESS;
+}
+
+void load_skillquests()
+{
+  struct skill_quest *newsq,*last = 0;
+  skill_list = NULL;
+  int i;
+  FILE *fl;
+
+  if (!dc_fopen(SKILL_QUEST_FILE, "r"))
+  {
+    log("Cannot open skill quest file.", 0, LOG_MISC);
+    abort();
+  }
+
+  while ( ( i = fread_int(fl,0,1000) ) != 0)
+  {
+     #ifdef LEAK_CHECK
+	newsq = (struct skill_quest *) calloc(1, sizeof(struct skill_quest));
+     #else
+	newsq = (struct skill_quest *) dc_alloc(1, sizeof(struct skill_quest));
+     #endif
+
+     newsq->num = i;
+     newsq->message = fread_string(fl,0);
+     newsq->clas = fread_int(fl,0, 30);
+     newsq->level = fread_int(fl,0,200);
+     newsq->next = 0;
+
+     if (last) 
+	last->next = newsq;
+     else
+        skill_list = newsq;
+
+     last = newsq;
+  }
+  dc_fclose(fl);
+}
+
 /*************************************************************************
 *  routines for booting the system                                       *
 *********************************************************************** */
@@ -523,6 +585,9 @@ void boot_db(void)
 
     log ("Loading banned list", 0, LOG_MISC);
     load_banned();
+
+    log ("Loading skill quests.", 0, LOG_MISC);
+    load_skillquests();
 
     log ("Assigning inventory to shopkeepers", 0, LOG_MISC);
     fix_shopkeepers_inventory ();

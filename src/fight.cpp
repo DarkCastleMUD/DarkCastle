@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.143 2004/04/16 01:24:02 urizen Exp $ */
+/* $Id: fight.cpp,v 1.144 2004/04/16 16:57:17 urizen Exp $ */
 
 extern "C"
 {
@@ -273,6 +273,8 @@ bool gets_dual_wield_attack(char_data * ch)
   return TRUE;
 }
 
+void debug_point() { return; }
+
 // int attack(...) FUNCTION SHOULD BE CALLED *INSTEAD* OF HIT IN ALL CASES!
 // standard retvals
 int attack(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
@@ -285,6 +287,7 @@ int attack(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
 
   if (!ch || !vict) { 
     log("NULL Victim or Ch sent to attack!  This crashes us!", -1, LOG_BUG);
+    debug_point();
     return eINTERNAL_ERROR;
   }
 

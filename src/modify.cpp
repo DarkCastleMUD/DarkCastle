@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: modify.cpp,v 1.5 2003/01/29 03:12:08 pirahna Exp $ */
+/* $Id: modify.cpp,v 1.6 2004/04/16 16:57:18 urizen Exp $ */
 
 extern "C"
 {
@@ -106,39 +106,40 @@ void string_add(struct descriptor_data *d, char *str)
       scan++;
     }
  
-    if(!(*d->str)) {
+    if(!(d->astr)) {
       if(strlen(str) > (unsigned) d->max_str) {
 	send_to_char("String too long - Truncated.\n\r", d->character);
 	*(str + d->max_str) = '\0';
 	terminator = 1;
       }
 #ifdef LEAK_CHECK
-      (*d->str) = (char *)calloc(strlen(str) + 3, sizeof(char));
+      d->astr = (char *)calloc(strlen(str) + 3, sizeof(char));
 #else
-      (*d->str) = (char *)dc_alloc(strlen(str) + 3, sizeof(char));
+      d->astr = (char *)dc_alloc(strlen(str) + 3, sizeof(char));
 #endif
-      strcpy(*d->str, str);
+      strcpy(d->astr, str);
     }
-
     else {
-      if(strlen(str) + strlen(*d->str) > (unsigned) d->max_str) {
+      if(strlen(str) + strlen(d->astr) > (unsigned) d->max_str) {
 	send_to_char("String too long. Last line skipped.\n\r", d->character);
 	terminator = 1;
       }
 
       else {
-	if(!(*d->str = (char *) realloc(*d->str, strlen(*d->str) + 
+	if(!(d->astr = (char *) realloc(d->astr, strlen(d->astr) + 
 	    strlen(str) + 3))) {
 	  perror("string_add");
 	  abort();
 	}
 
-	strcat(*d->str, str);
+	strcat(d->astr, str);
       }
     }
 
     if(terminator) {
+      *d->str = d->astr;
       d->str = 0;
+      d->astr = 0;
       if(d->connected == CON_EXDSCR) {
         if(GET_LEVEL(d->character) > 1)
           save_char_obj(d->character);
@@ -163,7 +164,7 @@ void string_add(struct descriptor_data *d, char *str)
       }
     }
     else
-       strcat(*d->str, "\n\r");
+       strcat(d->astr, "\n\r");
 }
 
 

@@ -1551,7 +1551,7 @@ int new_descriptor(int s)
   newd->bufspace = SMALL_BUFSIZE - 1;
   newd->next = descriptor_list;
   newd->login_time = time(0);
-
+  newd->astr = 0;
   if (++last_desc == 1000)
     last_desc = 1;
   newd->desc_num = last_desc;

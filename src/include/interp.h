@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.h,v 1.18 2004/04/14 17:05:05 urizen Exp $ */
+/* $Id: interp.h,v 1.19 2004/04/16 16:57:21 urizen Exp $ */
 
 #ifndef INTERP_H_
 #define INTERP_H_
@@ -353,6 +353,7 @@ DO_FUN  do_wizhelp;
 DO_FUN  do_wizinvis;
 DO_FUN  do_wizlist;
 DO_FUN  do_wizlock;
+DO_FUN  do_write_skillquest;
 DO_FUN  do_write;
 DO_FUN  do_zap;
 DO_FUN  do_zedit;

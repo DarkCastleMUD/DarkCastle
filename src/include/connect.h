@@ -1,7 +1,7 @@
 #ifndef CONNECT_H_
 #define CONNECT_H_
 /************************************************************************
-| $Id: connect.h,v 1.5 2003/04/23 00:01:30 pirahna Exp $
+| $Id: connect.h,v 1.6 2004/04/16 16:57:21 urizen Exp $
 | connect.h
 | Description: State of connectedness information.
 */
@@ -82,6 +82,7 @@ struct descriptor_data
     bool	new_newline;		/* prepend newline in output	*/
     char	**str;			/* for the modify-str system	*/
     char        **hashstr;
+    char        *astr;
     int		max_str;		/*	-			*/
     char	buf[10 * MAX_INPUT_LENGTH];	/* buffer for raw input	*/
     char	last_input[MAX_INPUT_LENGTH];	/* the last input	*/
