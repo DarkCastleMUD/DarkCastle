@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.20 2002/08/01 22:59:15 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.21 2002/08/01 23:18:35 pirahna Exp $ */
 
 extern "C"
 {
@@ -1667,7 +1667,7 @@ bool check_dodge(CHAR_DATA * ch, CHAR_DATA * victim)
   if(chance > 100)
     chance = 100;
 
-  skill_increase_check(ch, SKILL_DODGE, chance, SKILL_INCREASE_HARD);
+  skill_increase_check(victim, SKILL_DODGE, chance, SKILL_INCREASE_HARD);
 
   percent = number(1, 101);
   if (percent >= chance)
