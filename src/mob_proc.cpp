@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.60 2004/05/31 16:22:04 urizen Exp $ */
+/* $Id: mob_proc.cpp,v 1.61 2004/05/31 19:48:32 urizen Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -2202,33 +2202,32 @@ int guild_guard(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     // room that no longer exist on the mud
     switch (world[ch->in_room].number)
     {
-	case 3017:
-	  dir = 1; clas = CLASS_MAGIC_USER; break;
-	case 3070:
+	case 1978:
+	  dir = 4; clas = CLASS_MAGIC_USER; break;
+	case 1910:
 	  dir = 1; clas = CLASS_THIEF; break;
 	case 3004:
-	  dir = 1; clas = CLASS_CLERIC; break;
-	case 9921:
-	  dir = 1; dir2 = 4; clas = CLASS_MONK; break;
-	case 9905:
-	  dir = 1; clas = CLASS_BARBARIAN; break;
-	case 9900:
-	  dir = 1; clas = CLASS_PALADIN; align = 3; break;
-	case 3021:
+	  dir = 0; clas = CLASS_CLERIC; break;
+	case 1960:
+	  dir = 0; clas = CLASS_MONK; break;
+	case 1926:
+	  dir = 0; clas = CLASS_BARBARIAN; break;
+	case 1968:
+	  dir = 0; clas = CLASS_PALADIN; align = 3; break;
+	case 1942:
 	  dir = 2; clas = CLASS_WARRIOR; break;
-	case 3216:
+	case 1988:
 	  dir = 2; clas = CLASS_DRUID; break;
- 	case 3213:
-	  dir = 4; clas = CLASS_BARD; break;
-	case 9910:
-	  dir = 4; align = 1; clas = CLASS_ANTI_PAL; break;
-	case 9924:
+ 	case 1900:
+	  dir = 3; clas = CLASS_BARD; break;
+	case 1920:
+	  dir = 3; align = 1; clas = CLASS_ANTI_PAL; break;
+	case 1935:
 	  dir = 3; clas = CLASS_RANGER; break;
         default: return eFAILURE;
     }
-
-    if ((cmd == dir || cmd == dir2) && (/*(IS_AFFECTED(ch,AFF_CANTQUIT) 
-||*/
+    cmd++;
+    if ((cmd == dir || cmd == dir2) && (
         (!IS_MOB(ch) && affected_by_spell(ch, FUCK_PTHIEF)) || 
 GET_CLASS(ch) != clas || (align == 1 && !IS_EVIL(ch)) || (align == 3 && 
 !IS_GOOD(ch)))) {
