@@ -734,9 +734,6 @@ int do_show(struct char_data *ch, char *argument, int cmd)
        }
        else {
          for(i = begin; i < top_of_world && i <= end; i++) {
-            if(!world_array[i])
-              continue;
-
            count++;
            sprintf(buf, "[%3d] [%5d] %s\n\r", count, i, world[i].name);
            send_to_char(buf, ch);
@@ -819,8 +816,9 @@ int do_show(struct char_data *ch, char *argument, int cmd)
 	return eFAILURE;
        }
 	char buf[MAX_INPUT_LENGTH];
-       for (i = zone_table[zon].bottom_rnum;  i < zone_table[zon].top_rnum;i++)
+       for (i = zone_table[zon].bottom_rnum; i < zone_table[zon].top_rnum;i++)
        {
+	 if (!world_array[i]) continue;
 	 if (bits)
   	   if (!IS_SET(world[i].room_flags,bits))
 	 	continue;
