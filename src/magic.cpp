@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.69 2003/04/23 00:01:24 pirahna Exp $ */
+/* $Id: magic.cpp,v 1.70 2003/04/23 06:28:05 pirahna Exp $ */
 
 extern "C"
 {
@@ -8505,8 +8505,7 @@ int spell_rapid_mend(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
     struct affected_type af;
 
     if(!affected_by_spell(victim, SPELL_RAPID_MEND)) {
-       act("$N's starts to heal quicker.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-       act("$N's starts to heal quicker.", ch, 0, 0, TO_CHAR, INVIS_NULL);
+       act("$n starts to heal quicker.", victim, 0, 0, TO_ROOM, INVIS_NULL);
        send_to_char("You feel your body begin to heal quicker.", victim);
 
        skill_increase_check(ch, SPELL_RAPID_MEND, skill, SKILL_INCREASE_MEDIUM);
@@ -8960,7 +8959,7 @@ int spell_debility(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data
      return eSUCCESS;
   }
 
-  int save = saves_spell(ch, victim, skill / 10, SAVE_TYPE_MAGIC);
+  int save = saves_spell(ch, victim, 5, SAVE_TYPE_MAGIC);
 
   if(save < 0)
   {
@@ -9050,7 +9049,7 @@ int spell_attrition(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
      return eSUCCESS;
   }
 
-  int save = saves_spell(ch, victim, skill / 10, SAVE_TYPE_POISON);
+  int save = saves_spell(ch, victim, 0, SAVE_TYPE_POISON);
 
   if(save < 0)
   {
