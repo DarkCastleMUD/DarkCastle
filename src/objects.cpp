@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.19 2002/12/27 02:13:12 dcastle Exp $
+| $Id: objects.cpp,v 1.20 2002/12/27 02:20:48 pirahna Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -224,6 +224,7 @@ int do_quaff(struct char_data *ch, char *argument, int cmd)
   bool equipped;
   int retval = eSUCCESS;
   int is_mob = IS_MOB(ch);
+  int lvl;
 
   equipped = FALSE;
 
@@ -274,8 +275,11 @@ int do_quaff(struct char_data *ch, char *argument, int cmd)
      if (temp->obj_flags.value[i] >= 1) 
      {
         if(spell_info[temp->obj_flags.value[i]].spell_pointer)
+        {
+           lvl = (int) (1.5 * temp->obj_flags.value[0]); 
            retval = ((*spell_info[temp->obj_flags.value[i]].spell_pointer)
-              ((byte) temp->obj_flags.value[0], ch, "", SPELL_TYPE_POTION, ch, 0, 50));
+              ((byte) temp->obj_flags.value[0], ch, "", SPELL_TYPE_POTION, ch, 0, lvl));
+        }
      }
      if(IS_SET(retval, eCH_DIED))
         break;
@@ -300,6 +304,7 @@ int do_recite(struct char_data *ch, char *argument, int cmd)
     bool equipped;
     int retval = eSUCCESS;
     int is_mob = IS_MOB(ch);
+    int lvl;
     
     if(IS_SET(world[ch->in_room].room_flags, NO_MAGIC)) {
        send_to_char("Your magic is muffled by greater beings...\n\r", ch);
@@ -345,8 +350,9 @@ int do_recite(struct char_data *ch, char *argument, int cmd)
     for (i=1; i<4; i++)
       if (scroll->obj_flags.value[i] >= 1)
       {
+        lvl = (int) (1.5 * scroll->obj_flags.value[0]); 
         retval = ((*spell_info[scroll->obj_flags.value[i]].spell_pointer)
-          ((byte) scroll->obj_flags.value[0], ch, "", SPELL_TYPE_SCROLL, victim, obj, 50));
+          ((byte) scroll->obj_flags.value[0], ch, "", SPELL_TYPE_SCROLL, victim, obj, lvl));
         if(SOMEONE_DIED(retval))
           break;
       }
@@ -505,9 +511,9 @@ int do_mortal_set(struct char_data *ch, char *argument, int cmd)
 int do_use(struct char_data *ch, char *argument, int cmd)
 {
   char buf[MAX_INPUT_LENGTH+1];
-    struct char_data *tmp_char;
+  struct char_data *tmp_char;
   struct obj_data *tmp_object, *stick;
-
+  int lvl;
   int bits;
 
   if (IS_SET(world[ch->in_room].room_flags, QUIET))
@@ -538,8 +544,9 @@ int do_use(struct char_data *ch, char *argument, int cmd)
 
     if (stick->obj_flags.value[2] > 0) { /* Charges left? */
       stick->obj_flags.value[2]--;
+      lvl = (int) (1.5 * stick->obj_flags.value[0]); 
       return ((*spell_info[stick->obj_flags.value[3]].spell_pointer)
-        ((byte) stick->obj_flags.value[0], ch, "", SPELL_TYPE_STAFF, 0, 0, 50));
+        ((byte) stick->obj_flags.value[0], ch, "", SPELL_TYPE_STAFF, 0, 0, lvl));
     } else {
       send_to_char("The staff seems powerless.\n\r", ch);
     }
@@ -557,8 +564,9 @@ int do_use(struct char_data *ch, char *argument, int cmd)
 
       if (stick->obj_flags.value[2] > 0) { // are there any charges left? 
         stick->obj_flags.value[2]--;
+        lvl = (int) (1.5 * stick->obj_flags.value[0]); 
         return ((*spell_info[stick->obj_flags.value[3]].spell_pointer)
-          ((byte) stick->obj_flags.value[0], ch, "", SPELL_TYPE_WAND, tmp_char, tmp_object, 50));
+          ((byte) stick->obj_flags.value[0], ch, "", SPELL_TYPE_WAND, tmp_char, tmp_object, lvl));
       } else {
         send_to_char("The wand seems powerless.\n\r", ch);
       }
