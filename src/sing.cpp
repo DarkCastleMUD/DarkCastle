@@ -2224,12 +2224,12 @@ int execute_song_unresistable_ditty( byte level, CHAR_DATA *ch, char *arg, CHAR_
 
    for (i = world[ch->in_room].people; i; i = i->next_in_room)
    {
-   if (number(1,101) < get_saves(victim, SAVE_TYPE_MAGIC))
+   if (number(1,101) < get_saves(i, SAVE_TYPE_MAGIC))
    {
-act("$N resists your irresistible ditty!", ch, NULL, victim, 
+act("$N resists your irresistible ditty!", ch, NULL, i, 
 TO_CHAR,0);
-act("$N resists $n's irresitble ditty! Not so irresistible, eh!", ch, NULL, victim, TO_ROOM,NOTVICT);
-act("You resist $n's \"irresistible\" ditty!!",ch,NULL,victim,TO_VICT,0);
+act("$N resists $n's irresitble ditty! Not so irresistible, eh!", ch, NULL, i, TO_ROOM,NOTVICT);
+act("You resist $n's \"irresistible\" ditty!!",ch,NULL,i,TO_VICT,0);
      continue;
    }
 
