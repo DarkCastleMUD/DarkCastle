@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.135 2004/02/19 04:26:33 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.136 2004/04/13 11:37:33 urizen Exp $ */
 
 extern "C"
 {
@@ -1043,7 +1043,11 @@ void eq_destroyed(char_data * ch, obj_data * obj, int pos)
     }
     act("$p carried by $n is destroyed.", ch, obj, 0, TO_ROOM, 0);
   }
-  else act("$p worn by $n is destroyed.", ch, obj, 0, TO_ROOM, 0);
+  else { 
+    act("$p worn by $n is destroyed.", ch, obj, 0, TO_ROOM, 0);
+    recheck_height_wears(ch); // Make sure $n can still wear the rest of
+				// the eq
+  }
 
   act("Your $p has been destroyed.", ch, obj, 0, TO_CHAR, 0);
 
@@ -3289,6 +3293,7 @@ void disarm(CHAR_DATA * ch, CHAR_DATA * victim)
       obj = unequip_char(victim, SECOND_WIELD);
       equip_char(victim, obj, WIELD);
     }
+    recheck_height_wears(victim);
     return;
 //  }
 

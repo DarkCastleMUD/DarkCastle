@@ -1195,8 +1195,13 @@ char *mprog_process_if( char *ifchck, char *com_list, CHAR_DATA *mob,
    }
  else /*false ifcheck, find else and do existing commands or quit at endif*/
    {
-     while ( ( str_cmp( buf, "else" ) ) && ( str_cmp( buf, "endif" ) ) )
-       {
+     int nest = 0;
+     while ( true )
+     { // Fix here 13/4 2004. Nested ifs are now taken into account.
+	if ( !str_cmp(buf, "if")) nest++;
+        if (!str_cmp(buf,"endif")) { if (nest == 0) break; else nest--; }
+        if (nest) continue;
+        if (str_cmp(buf,"else)) continue;
 	 cmnd     = com_list;
 	 com_list = mprog_next_command( com_list );
 	 while ( *cmnd == ' ' )
@@ -1569,7 +1574,7 @@ void mprog_driver ( char *com_list, CHAR_DATA *mob, CHAR_DATA *actor,
 
  // count valid random victs in room
  for ( vch = world[mob->in_room].people; vch; vch = vch->next_in_room )
-   if ( !IS_NPC( vch )  &&  vch->level < IMMORTAL  &&  CAN_SEE( mob, vch ) )
+   if ( !IS_NPC( vch )  &&  CAN_SEE( mob, vch ) )
        count++;
 
  if(count)
@@ -1578,7 +1583,7 @@ void mprog_driver ( char *com_list, CHAR_DATA *mob, CHAR_DATA *actor,
  if(count) 
  {
    for ( vch = world[mob->in_room].people; vch && count; vch = vch->next_in_room )
-     if ( !IS_NPC( vch )  &&  vch->level < IMMORTAL  &&  CAN_SEE( mob, vch ) )
+     if ( !IS_NPC( vch )  &&  CAN_SEE( mob, vch ) )
        count--;
 
    rndm = vch;

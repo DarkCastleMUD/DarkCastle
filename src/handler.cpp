@@ -21,7 +21,7 @@
  *  12/08/2003   Onager    Added check for charmies and !charmie eq to     *
  *                         equip_char()                                    *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.27 2003/12/09 08:40:49 staylor Exp $ */
+/* $Id: handler.cpp,v 1.28 2004/04/13 11:37:33 urizen Exp $ */
     
 extern "C"
 {
@@ -326,18 +326,25 @@ void check_weapon_weights(char_data * ch)
   }
 }
 
-void affect_modify(CHAR_DATA *ch, int32 loc, int32 mod, long bitv, bool add)
+void affect_modify(CHAR_DATA *ch, int32 loc, int32 mod, long bitv, bool add, bool aff2fix = FALSE)
 {
     char log_buf[256];
     int i;
-
-    if(add)
-      SET_BIT(ch->affected_by, bitv);
-    else {
-      REMOVE_BIT(ch->affected_by, bitv);
-      mod = -mod;
+    if (!aff2fix) {
+      if(add)
+        SET_BIT(ch->affected_by, bitv);
+      else {
+        REMOVE_BIT(ch->affected_by, bitv);
+        mod = -mod;
+      }
+    } else { // Fixes spells to modify affected_by2 instead
+      if (add)
+	SET_BIT(ch->affected_by2, bitv);
+      else {
+	REMOVE_BIT(ch->affected_by2,bitv);
+	mod = -mod;
+      }
     }
-
     switch(loc)
     {
 	case APPLY_NONE:
@@ -816,7 +823,7 @@ void affect_total(CHAR_DATA *ch)
    Automatically sets apropriate bits and apply's */
 void affect_to_char( CHAR_DATA *ch, struct affected_type *af )
 {
-
+    bool secFix;
     struct affected_type *affected_alloc;
 
 #ifdef LEAK_CHECK
@@ -824,7 +831,16 @@ void affect_to_char( CHAR_DATA *ch, struct affected_type *af )
 #else
     affected_alloc = (struct affected_type *) dc_alloc(1, sizeof(struct affected_type));
 #endif
-
+    switch (af->type)
+    { // Some spells use affected_by2 instead..
+	case SPELL_SHADOWSLIP:
+	case SPELL_CAMOUFLAGE:
+	  secFix = TRUE;
+	  break;
+	default:
+	  secFix = FALSE;
+	  break;
+    }
     *affected_alloc = *af;
     affected_alloc->next = ch->affected;
     ch->affected = affected_alloc;
@@ -838,7 +854,7 @@ void affect_to_char( CHAR_DATA *ch, struct affected_type *af )
 /* Remove an affected_type structure from a char (called when duration
    reaches zero). Pointer *af must never be NIL! Frees mem and calls 
    affect_location_apply                                                */
-void affect_remove( CHAR_DATA *ch, struct affected_type *af, int flags )
+void affect_remove( CHAR_DATA *ch, struct affected_type *af, int flags, bool aff2fix = FALSE )
 {
     struct affected_type *hjp;
     char buf[200];
@@ -852,7 +868,7 @@ void affect_remove( CHAR_DATA *ch, struct affected_type *af, int flags )
     assert(ch->affected);
 
     affect_modify(ch, af->location, af->modifier,
-		  af->bitvector, FALSE);
+		  af->bitvector, FALSE, aff2fix);
 
 
     /* remove structure *af from linked list */
@@ -974,14 +990,24 @@ void affect_remove( CHAR_DATA *ch, struct affected_type *af, int flags )
 void affect_from_char( CHAR_DATA *ch, int skill)
 {
     struct affected_type *hjp, *afc;
+    bool aff2Fix;
 
     if(skill < 0)  // affect types are unsigned, so no negatives are possible
        return;
-
+    switch (skill)
+    { // Hack for affected_by2
+        case SPELL_SHADOWSLIP:
+        case SPELL_CAMOUFLAGE:
+	  aff2Fix = TRUE;
+	  break;
+	default:
+	  aff2Fix = FALSE;
+	  break;
+    }
     for(hjp = ch->affected; hjp; hjp = afc) {
         afc = hjp->next;
 	if (hjp->type == (unsigned)skill)
-	    affect_remove( ch, hjp, 0 );
+	    affect_remove( ch, hjp, 0, aff2Fix );
     }
 }
 
@@ -1148,12 +1174,14 @@ int equip_char(CHAR_DATA *ch, struct obj_data *obj, int pos)
     {
 	if(IS_SET(obj->obj_flags.more_flags, ITEM_NO_TRADE)) {
 	    act("You are zapped by $p but it stays with you.", ch, obj, 0, TO_CHAR, 0);
+	    recheck_height_wears(ch);
             obj_to_char(obj, ch);
             return 1;
         }
 	if (ch->in_room != NOWHERE) {
 	    act("You are zapped by $p and instantly drop it.", ch, obj, 0, TO_CHAR, 0);
 	    act("$n is zapped by $p and instantly drops it.", ch, obj, 0, TO_ROOM, 0);
+	    recheck_height_wears(ch);
 	    obj_to_room(obj, ch->in_room);
 	    return 1;
 	} else {
