@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.4 2002/06/29 18:16:21 pirahna Exp $ */
+/* $Id: info.cpp,v 1.5 2002/07/16 20:51:56 pirahna Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -152,7 +152,6 @@ void show_obj_to_char(struct obj_data *object, struct char_data *ch, int mode)
    char flagbuf[MAX_STRING_LENGTH];
    int found = 0;
    int percent;
-   int value, value2;
 
    // Don't show NO_NOTICE items in a room with "look" unless they have holylite
    if(mode == 0 && IS_SET(object->obj_flags.more_flags, ITEM_NONOTICE) &&
@@ -224,19 +223,15 @@ void show_obj_to_char(struct obj_data *object, struct char_data *ch, int mode)
       }
       
       /* show object's condition if is an armor...  */
-      if (object->obj_flags.type_flag == ITEM_ARMOR)
+      if (object->obj_flags.type_flag == ITEM_ARMOR || 
+          object->obj_flags.type_flag == ITEM_WEAPON ||
+          object->obj_flags.type_flag == ITEM_FIREWEAPON ||
+          object->obj_flags.type_flag == ITEM_CONTAINER ||
+          object->obj_flags.type_flag == ITEM_INSTRUMENT
+         )
       {
-         value = object->obj_flags.value[0];
-         value2= (object->obj_flags.value[0]) - (object->obj_flags.value[1]);
-         
-         if (value == 0) {
-            if (value2 == 0)
-               percent = 100;
-            else 
-               percent = -1;
-         } else percent = (100* value2 / value);
-         
-         
+         percent = 100 - (int)(100 * ((float)eq_current_damage(object) / (float)eq_max_damage(object)));
+                  
          if (percent >= 100) 
             strcat(buffer, " [$B$2Excellent$R]");
          else if (percent >= 80)
@@ -252,31 +247,6 @@ void show_obj_to_char(struct obj_data *object, struct char_data *ch, int mode)
          else strcat(buffer, " [$5Pile of Scraps$R]");
       }
       
-      if (object->obj_flags.type_flag == ITEM_WEAPON)
-      {
-         value = object->obj_flags.value[2];
-         value2= (object->obj_flags.value[0]) + (object->obj_flags.value[2]);
-         
-         if (value2 == 0)
-            percent = -1;
-         else
-            percent = (100* value / value2);
-         
-         
-         if (percent >= 100) 
-            strcat(buffer, " [$B$2Excellent$R]");
-         else if (percent >= 80)
-            strcat(buffer, " [$2Good$R]");
-         else if (percent >= 60)
-            strcat(buffer, " [$3Decent$R]");
-         else if (percent >= 40)
-            strcat(buffer, " [$B$5Damaged$R]");
-         else if (percent >= 20)
-            strcat(buffer, " [$4Quite Damaged$R]");
-         else if (percent >= 0)
-            strcat(buffer, " [$B$4Falling Apart$R]");
-         else strcat(buffer, " [$5Pile of Scraps$R]");
-      }
       if(mode == 0) // 'look' 
          strcat(buffer, "$B$1"); // setup color background
    }

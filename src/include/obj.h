@@ -12,14 +12,16 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: obj.h,v 1.6 2002/07/14 17:45:29 pirahna Exp $ */
+/* $Id: obj.h,v 1.7 2002/07/16 20:52:01 pirahna Exp $ */
 #ifndef OBJ_H_
 #define OBJ_H_
 
 #include <structs.h> // byte
 
 // functions from objects.cpp
-int get_max_damage(obj_data * obj);
+int eq_max_damage(obj_data * obj);
+int damage_eq_once(obj_data * obj);
+int eq_current_damage(obj_data * obj);
 
 /* The following defs are for obj_data  */
 
@@ -35,7 +37,7 @@ int get_max_damage(obj_data * obj);
 #define ITEM_TREASURE    8
 #define ITEM_ARMOR       9
 #define ITEM_POTION     10
-#define ITEM_WORN       11   // used, can change
+#define ITEM_WORN       11   // not used, can change
 #define ITEM_OTHER      12
 #define ITEM_TRASH      13
 #define ITEM_TRAP       14 
@@ -191,7 +193,6 @@ struct obj_flag_data
      int16 timer;          /* Timer for object                 */
 };
 
-/* Used in OBJ_FILE_ELEM *DO*NOT*CHANGE* */
 struct obj_affected_type
 {
      int32 location;      /* Which ability to change (APPLY_XXX) */

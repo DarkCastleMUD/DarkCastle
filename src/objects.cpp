@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.4 2002/07/13 21:11:06 pirahna Exp $
+| $Id: objects.cpp,v 1.5 2002/07/16 20:51:57 pirahna Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -48,7 +48,7 @@ struct obj_data *get_object_in_equip_vis(struct char_data *ch,
 
 // given an object, return the maximum points of damage the item
 // can take before being scrapped
-int get_max_damage(obj_data * obj)
+int eq_max_damage(obj_data * obj)
 {
    int amount = 0;
 
@@ -56,13 +56,59 @@ int get_max_damage(obj_data * obj)
       case ITEM_ARMOR:
          amount = 3;
          amount += ((obj->obj_flags.value[0]) / 2);  // + 1 hit per 2ac
-         return amount;
+         break;
       case ITEM_WEAPON:
          amount = 5;
-         return amount;
+         break;
+      case ITEM_FIREWEAPON:
+         amount = 2;
+         break;
+      case ITEM_CONTAINER:
+         amount = 2;
+         break;
+      case ITEM_INSTRUMENT:
+         amount = 3;
+         break;
       default:
-         return 1;
+         amount = 1;
+         break;
    }
+
+   return amount;
+}
+
+int eq_current_damage(obj_data * obj)
+{
+  for(int i = 0; i < obj->num_affects; i++) 
+    if(obj->affected[i].modifier == APPLY_DAMAGED)
+       return (obj->affected[i].location);
+
+  return 0;
+}
+
+// Damage a piece of eq once and return the amount of damage currently on it
+int damage_eq_once(obj_data * obj)
+{
+  // look for existing damage
+  for(int i = 0; i < obj->num_affects; i++) 
+    if(obj->affected[i].modifier == APPLY_DAMAGED)
+    {
+       obj->affected[i].location++;
+       return (obj->affected[i].location);
+    }
+
+  // no existing damage.  Damage it once
+  obj->num_affects++;
+#ifdef LEAK_CHECK
+  obj->affected = (obj_affected_type *) realloc(obj->affected,
+                               (sizeof(obj_affected_type) * obj->num_affects));
+#else
+  obj->affected = (obj_affected_type *) dc_realloc(obj->affected,
+                               (sizeof(obj_affected_type) * obj->num_affects));
+#endif
+  obj->affected[obj->num_affects - 1].modifier = APPLY_DAMAGED;
+  obj->affected[obj->num_affects - 1].location = 1;
+  return 1;
 }
 
 void object_activity()

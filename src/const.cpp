@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: const.cpp,v 1.4 2002/07/14 17:45:25 pirahna Exp $ */
+/* $Id: const.cpp,v 1.5 2002/07/16 20:51:56 pirahna Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1053,7 +1053,7 @@ struct class_skill_defines k_skills[] = {
 {    "dodge",		SKILL_DODGE,		2,	75,	10008,  "You have to go see Grox the monk guildmaster." },
 {    "redirect",	SKILL_REDIRECT,		3,	75,	10008, 	"You have to go see Grox the monk guildmaster."},
 {    "trip",		SKILL_TRIP,		5,	75,	10008, 	"You have to go see Grox the monk guildmaster."},
-{    "shield block",    SKILL_SHIELDBLOCK,      7,      80,     725, 	"You must see the prince of Sarina."},
+{    "shield block",    SKILL_SHIELDBLOCK,      7,      60,     725, 	"You must see the prince of Sarina."},
 {    "rescue",  	SKILL_RESCUE,		10,	70,	10008, 	"You have to go see Grox the monk guildmaster."},
 {    "eagleclaw",	SKILL_EAGLE_CLAW,	17,	75,	10008, 	"You have to go see Grox the monk guildmaster."},
 {    "stun",		SKILL_STUN,		30,	60,	6902, 	"You must see a master shaolin monk."},

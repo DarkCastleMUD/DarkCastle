@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.7 2002/07/12 17:59:00 pirahna Exp $
+| $Id: wizard.cpp,v 1.8 2002/07/16 20:52:01 pirahna Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -928,7 +928,7 @@ void obj_stat(struct char_data *ch, struct obj_data *j)
 	          j->obj_flags.value[2]);
 	  break;
       case ITEM_WEAPON :
-	  sprintf(buf, "$3Tohit(v1)$R: %d\n\r$3Todam(v2)d(v3)$R: %dD%d\n\r$3Type(v4)$R: %d",
+	  sprintf(buf, "$3Unused(v1)$R: %d (make 0)\n\r$3Todam(v2)d(v3)$R: %dD%d\n\r$3Type(v4)$R: %d",
 	          j->obj_flags.value[0],
 	          j->obj_flags.value[1],
 	          j->obj_flags.value[2],
@@ -951,10 +951,10 @@ void obj_stat(struct char_data *ch, struct obj_data *j)
       case ITEM_ARMOR :
           value = j->obj_flags.value[0] - j->obj_flags.value[1];
 	  sprintf(buf, "$3AC-apply(v1)$R: [%d]\n\r"
-                       "$3AC-apply with current Damage(v1 - v2)$R: [%d]\n\r"
-                       "$3Damage(v2)$R: [%d]\n\r"
-                       "$3Resistance Factor$R: [%d]",
-	          j->obj_flags.value[0], value, j->obj_flags.value[1], j->obj_flags.value[2]);
+                       "$3Unused  (v2)$R: [%d] (make 0)\n\r"
+                       "$3Unused  (v3)$R: [%d] (make 0)\n\r"
+                       "$3Unused  (v4)$R: [%d] (make 0)",
+	          j->obj_flags.value[0], j->obj_flags.value[1], j->obj_flags.value[2], j->obj_flags.value[3]);
 	  break;
       case ITEM_POTION : 
           sprinttype(j->obj_flags.value[1]-1,spells,buf2); 

@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.6 2002/07/08 21:11:14 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.7 2002/07/16 20:51:56 pirahna Exp $ */
 
 extern "C"
 {
@@ -121,22 +121,23 @@ void perform_violence(void)
             continue;
         }
         else {
+          retval = 0;
           switch(GET_CLASS(ch)) {
-          case CLASS_WARRIOR:       retval = fighter(ch, NULL, 0, "", ch);           break;
-          case CLASS_THIEF:         retval = thief(ch, NULL, 0, "", ch);             break;
-          case CLASS_MONK:          retval = monk(ch, NULL, 0, "", ch);              break;
-          case CLASS_BARD:          retval = bard_combat(ch, NULL, 0, "", ch);       break;
-          case CLASS_RANGER:        retval = ranger_combat(ch, NULL, 0, "", ch);     break;
-          case CLASS_MAGIC_USER:    retval = active_magic_user(ch, NULL, 0, "", ch); break;
-          case CLASS_CLERIC:        retval = active_cleric(ch, NULL, 0, "", ch);     break;
-          case CLASS_PALADIN:       retval = paladin(ch, NULL, 0, "", ch);           break;
-          case CLASS_ANTI_PAL:      retval = antipaladin(ch, NULL, 0, "", ch);       break;
-          case CLASS_BARBARIAN:     retval = barbarian(ch, NULL, 0, "", ch);         break;
-          case CLASS_NECROMANCER:   retval = active_necro(ch, NULL, 0, "", ch);      break;
-          default:                  break;
+           case CLASS_WARRIOR:       retval = fighter(ch, NULL, 0, "", ch);           break;
+           case CLASS_THIEF:         retval = thief(ch, NULL, 0, "", ch);             break;
+           case CLASS_MONK:          retval = monk(ch, NULL, 0, "", ch);              break;
+           case CLASS_BARD:          retval = bard_combat(ch, NULL, 0, "", ch);       break;
+           case CLASS_RANGER:        retval = ranger_combat(ch, NULL, 0, "", ch);     break;
+           case CLASS_MAGIC_USER:    retval = active_magic_user(ch, NULL, 0, "", ch); break;
+           case CLASS_CLERIC:        retval = active_cleric(ch, NULL, 0, "", ch);     break;
+           case CLASS_PALADIN:       retval = paladin(ch, NULL, 0, "", ch);           break;
+           case CLASS_ANTI_PAL:      retval = antipaladin(ch, NULL, 0, "", ch);       break;
+           case CLASS_BARBARIAN:     retval = barbarian(ch, NULL, 0, "", ch);         break;
+           case CLASS_NECROMANCER:   retval = active_necro(ch, NULL, 0, "", ch);      break;
+           default:                  break;
           }
-        if(SOMEONE_DIED(retval))
-          continue;
+          if(SOMEONE_DIED(retval))
+            continue;
         }
       } // if is_mob
 
@@ -764,340 +765,121 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
 
 // It still sucks, but i'm working on it...-pir  02/16/01
 
+// pos of -1 means inventory
+void eq_destroyed(char_data * ch, obj_data * obj, int pos)
+{
+  if(pos != -1)
+  {
+    unequip_char(ch, pos);
+
+    if(pos == WEAR_LIGHT) {
+      world[ch->in_room].light--;
+      ch->glow_factor--;
+    }
+    else if((pos == WIELD) && (ch->equipment[SECOND_WIELD])) {
+      obj_data * temp;
+      temp = unequip_char(ch, SECOND_WIELD);
+      equip_char(ch, temp, WIELD);
+    }
+    act("$p carried by $n is destroyed.", ch, obj, 0, TO_ROOM, 0);
+  }
+  else act("$p worn by $n is destroyed.", ch, obj, 0, TO_ROOM, 0);
+
+  act("Your $p has been destroyed.", ch, obj, 0, TO_CHAR, 0);
+  act("$p falls to the ground in scraps.", ch, obj, 0, TO_CHAR, 0);
+  act("$p falls to the ground in scraps.", ch, obj, 0, TO_ROOM, 0);
+  make_scraps(ch, obj);
+  extract_obj(obj);
+}
+
 void eq_damage(CHAR_DATA * ch, CHAR_DATA * victim,
     int dam, int weapon_type, int attacktype) 
 {
-  int count, value, value0, value1, value2, eqdam;
-  struct obj_data * obj, * tmp_obj, * obj_list;
-  int pos, old_value;
+  int count, eqdam, chance, value;
+  struct obj_data * obj;
+  int pos;
     
-  if(IS_SET(world[ch->in_room].room_flags, ARENA))
+  if(IS_SET(world[ch->in_room].room_flags, ARENA)) // Don't damage eq in arena
     return;
+  if(!IS_NPC(victim) && !IS_NPC(ch))        // Don't damage eq on pc->pc fights
+    return;
+
+  chance = GET_DEX(ch);
+  if(dam < 40)                              // Under 40 damage decreases chance of damage
+    chance += 40 - dam;                     // Helps out the lower level chars
     
-  if((dam >= 30) && ( (IS_NPC(ch)) || (IS_NPC(victim))) )
-    if((number(0,10)==0) || ((attacktype > TYPE_SUFFERING) &&
-      (number(0,1)==0)) ) 
-    {
-      eqdam = dam;
-        
-      if((weapon_type == TYPE_CRUSH) || (weapon_type == TYPE_BLUDGEON))
-        eqdam *= 6;
-      if(weapon_type == TYPE_FIRE)
-        eqdam *= 2;
-      if(weapon_type == TYPE_ACID)
-        eqdam *= 6;
-        
-      eqdam /= 100;
-      if(eqdam <= 0)
-        eqdam = 1;
-        
-      //  First we try to scrap some worn eq..
-      if(number(0, 3) == 0) 
-      {
-        pos = -1;
-          
-        if((number(0,3)==0) && (victim->equipment[WEAR_ARMS]))
-          pos = WEAR_ARMS;
-        else if((number(0,3)==0) && (victim->equipment[WEAR_BODY]))
-          pos = WEAR_BODY;
-        else if((number(0,3)==0) && (victim->equipment[WIELD]))
-          pos = WIELD;
-        else if((number(0,4)==0) && (victim->equipment[WEAR_ABOUT]))
-          pos = WEAR_ABOUT;
-        else if((number(0,4)==0) && (victim->equipment[SECOND_WIELD]))
-          pos = SECOND_WIELD;
-        else if((number(0,4)==0) && (victim->equipment[WEAR_LEGS]))
-          pos = WEAR_LEGS;
-        else if((number(0,4)==0) && (victim->equipment[WEAR_LIGHT]))
-          pos = WEAR_LIGHT;
-        else if((number(0,4)==0) && (victim->equipment[WEAR_HANDS]))
-          pos = WEAR_HANDS;
-        else if((number(0,4)==0) && (victim->equipment[WEAR_WRIST_R]))
-          pos = WEAR_WRIST_R;
-        else if((number(0,4)==0) && (victim->equipment[WEAR_WRIST_L]))
-          pos = WEAR_WRIST_L;
-        else if((number(0,4)==0) && (victim->equipment[WEAR_FINGER_R]))
-          pos = WEAR_FINGER_R;
-        else if((number(0,4)==0) && (victim->equipment[WEAR_FINGER_L]))
-          pos = WEAR_FINGER_L;
-        else if((number(0,4)==0) && (victim->equipment[WEAR_HEAD]))
-          pos = WEAR_HEAD;
-        else if((number(0,4)==0) && (victim->equipment[WEAR_NECK_1]))
-          pos = WEAR_NECK_1;
-        else if((number(0,4)==0) && (victim->equipment[WEAR_NECK_2]))
-          pos = WEAR_NECK_2;
-        else if((number(0,4)==0) && (victim->equipment[WEAR_SHIELD]))
-          pos = WEAR_SHIELD;
-        else if((number(0,4)==0) && (victim->equipment[WEAR_WAISTE]))
-          pos = WEAR_WAISTE;
-        else if((number(0,4)==0) && (victim->equipment[WEAR_LIGHT]))
-          pos = WEAR_LIGHT;
-        else if((number(0,4)==0) && (victim->equipment[HOLD]))
-          pos = HOLD;
-        else if((number(0,4)==0) && (victim->equipment[WEAR_FACE]))
-          pos = WEAR_FACE;
-        else if((number(0,3)==0) && (victim->equipment[WEAR_EAR_L]))
-          pos = WEAR_EAR_L;
-        else if((number(0,3)==0) && (victim->equipment[WEAR_EAR_R]))
-          pos = WEAR_EAR_R;
-          
-        if((pos < 0) && (victim->equipment[WEAR_BODY]))
-          pos = WEAR_BODY;
-          
-        if(pos > -1 && victim->equipment[pos]) 
-        {
-          obj_list = unequip_char(victim, pos);
-            
-          if(IS_SET(obj_list->obj_flags.extra_flags, ITEM_SPECIAL) &&
-            (GET_ITEM_TYPE(obj_list) == ITEM_CONTAINER)) {
-            equip_char(victim, obj_list, pos);
-            // return;
-          }
-          else if(obj_list->obj_flags.type_flag == ITEM_ARMOR) 
-          {
-            value0 = obj_list->obj_flags.value[0];
-            value1 = obj_list->obj_flags.value[1];
-            value2 = obj_list->obj_flags.value[2];
-              
-            eqdam -= value2;
-            if(eqdam <= 0)
-              eqdam = 1;
-              
-            value1 += eqdam;
-            old_value =  obj_list->obj_flags.value[1];
-            obj_list->obj_flags.value[1] = value1;
-            value = value0 - value1;
-              
-            if(value < 0) 
-            {
-              if(IS_SET(obj_list->obj_flags.extra_flags, ITEM_SPECIAL)) {
-                obj_list->obj_flags.value[1] = old_value;
-                equip_char(victim, obj_list, pos);
-                // return;
-              }
-              else {
-                act("$p is destroyed.", victim, obj_list, 0, TO_CHAR, 0);
-                act("$p worn by $n is destroyed.", victim, obj_list, 0, TO_ROOM, 0);
-                act("$p falls to the ground in scraps.", victim, obj_list, 0, TO_CHAR, 0);
-                act("$p falls to the ground in scraps.", victim, obj_list, 0, TO_ROOM, 0);
-                make_scraps(victim, obj_list);
-                extract_obj(obj_list);
-                  
-                if(pos == WEAR_LIGHT) {
-                  world[victim->in_room].light--;
-                  ch->glow_factor--;
-                }
-              }
-            }
-            else {
-              act("$p is damaged.", victim, obj_list, 0, TO_CHAR, 0);
-              act("$p worn by $n is damaged.", victim, obj_list, 0, TO_ROOM, 0);
-              equip_char(victim, obj_list, pos);
-            }
-          }
-          else if(obj_list->obj_flags.type_flag == ITEM_WEAPON) 
-          {
-            value0 = obj_list->obj_flags.value[0];
-            value2 = obj_list->obj_flags.value[2];
-              
-            if((weapon_type == TYPE_CRUSH) || (weapon_type == TYPE_BLUDGEON))
-              eqdam /= 2;
-              
-            if(eqdam <= 0)
-              eqdam = 1;
-              
-            obj_list->obj_flags.value[0] += eqdam;
-            obj_list->obj_flags.value[2] -= eqdam;
-            value0 = obj_list->obj_flags.value[0];
-            value2 = obj_list->obj_flags.value[2];
-            value = value2 - value0;
-              
-            if(value < 1) 
-            {
-              if(IS_SET(obj_list->obj_flags.extra_flags, ITEM_SPECIAL)) {
-                obj_list->obj_flags.value[0] -= eqdam;
-                obj_list->obj_flags.value[2] += eqdam;
-                equip_char(victim, obj_list, pos);
-                // obj_list->obj_flags.value[1] = 1;
-                // return;
-              }
-              else {
-                act("$p is destroyed.", victim, obj_list, 0, TO_CHAR, 0);
-                act("$p wielded by $n is destroyed.", victim, obj_list, 0, TO_ROOM, 0);
-                act("$p falls to the ground in scraps.", victim, obj_list, 0, TO_CHAR, 0);
-                act("$p falls to the ground in scraps.", victim, obj_list, 0, TO_ROOM, 0);
-                make_scraps(victim, obj_list);
-                extract_obj(obj_list);
-                  
-                if((pos == WIELD) && (victim->equipment[SECOND_WIELD])) {
-                  tmp_obj = unequip_char(victim, SECOND_WIELD);
-                  equip_char(victim, tmp_obj, WIELD);
-                }
-              }
-            }
-            else {
-              act("$p is damaged.", victim, obj_list, 0, TO_CHAR, 0);
-              act("$p wielded by $n is damaged.", victim, obj_list, 0, TO_ROOM, 0);
-              equip_char(victim, obj_list, pos);
-            }
-          }   /* end if type_flag == ITEM_WEAPON */
-            
-          else if(obj_list->obj_flags.type_flag != ITEM_KEY) 
-          {
-            if(IS_SET(obj_list->obj_flags.extra_flags, ITEM_SPECIAL)) {
-              equip_char(victim, obj_list, pos);
-              // return;
-            }
-            else 
-            {
-              act("$p is destroyed.", victim, obj_list, 0, TO_CHAR, 0);
-              act("$p worn by $n is destroyed.", victim, obj_list, 0, TO_ROOM, 0);
-              act("$p falls to the ground in scraps.", victim, obj_list, 0, TO_CHAR, 0);
-              act("$p falls to the ground in scraps.", victim, obj_list, 0, TO_ROOM, 0);
-              
-              if(IS_SET(obj_list->obj_flags.extra_flags, ITEM_GLOW)) {
-                world[victim->in_room].light--;
-                ch->glow_factor--;
-              }
-                
-              if(obj_list->contains) {
-                for(obj = obj_list->contains; obj; obj = tmp_obj) {
-                  tmp_obj = obj->next_content;
+  if(number(0, chance))                     // 1 in chance of eq damage
+    return;
 
-                  if(IS_SET(obj->obj_flags.more_flags, ITEM_NO_TRADE)) {
-                    move_obj(obj, victim);
-                  } else {
-                    act("$p falls to the ground.", victim, obj, 0, TO_CHAR, 0);
-                    act("$p falls to the ground.", victim, obj, 0, TO_ROOM, 0);
-                    move_obj(obj, victim->in_room);
-                  }
-                }
-              }
-                
-              make_scraps(victim,obj_list);
-              extract_obj(obj_list);
-            } // else if not special god item
-          } // else if not key
-        } // end if position found..
-      } // number(0, 3) == 0
-   
-      // let's scrap something in the inventory 
-      else if(victim->carrying && (number(0, 6) == 0)) 
-      { 
-        count = 0;
-     
-        for(obj_list = victim->carrying; obj_list; obj_list = obj_list->next_content)
-          if(obj_list->obj_flags.type_flag != ITEM_KEY)
-            count++;
-       
-        value = number(0, count); // choose a random inventory item
-        count = 0;
-       
-        // loop up to that item
-        for(obj_list = victim->carrying; obj_list && value < count; obj_list = obj_list->next_content) {
-          if(obj_list->obj_flags.type_flag != ITEM_KEY)
-            count++;
-        }
-       
-        if(!obj_list)
-          obj_list = victim->carrying;
-       
-        if(obj_list->obj_flags.type_flag == ITEM_ARMOR) 
-        {
-          value0 = obj_list->obj_flags.value[0];
-          value1 = obj_list->obj_flags.value[1];
-          value2 = obj_list->obj_flags.value[2];
-          eqdam -= value2;
-          if(eqdam <= 0)
-            eqdam = 1;
-         
-          value1 += eqdam;
-          old_value                    = obj_list->obj_flags.value[1];
-          obj_list->obj_flags.value[1] = value1;
-          value = value0 - value1;
-         
-          if(value < 0) {
-            if(IS_SET(obj_list->obj_flags.extra_flags, ITEM_SPECIAL)) {
-              obj_list->obj_flags.value[1] = old_value;
-              return;
-            }
-            act("$p is destroyed.", victim, obj_list, 0, TO_CHAR, 0);
-            act("$p carried by $n is destroyed.", victim, obj_list, 0, TO_ROOM, 0);
-            act("$p falls to the ground in scraps.", victim, obj_list, 0, TO_CHAR, 0);
-            act("$p falls to the ground in scraps.", victim, obj_list, 0, TO_ROOM, 0);
-            obj_from_char(obj_list);
-            make_scraps(victim,obj_list);
-            extract_obj(obj_list);
-          }
-          else {
-            act("$p is damaged.", victim, obj_list, 0, TO_CHAR, 0);
-            act("$p carried by $n is damaged.", victim, obj_list, 0, TO_ROOM, 0);
-          }
-        }
-       
-        else if(obj_list->obj_flags.type_flag == ITEM_WEAPON) {
-          value0 = obj_list->obj_flags.value[0];
-          value2 = obj_list->obj_flags.value[2];
-          if((weapon_type == TYPE_CRUSH) || (weapon_type == TYPE_BLUDGEON))
-            eqdam /= 2;
-         
-          if(eqdam <= 0)
-            eqdam = 1;
+  //  let's scrap some worn eq
+  if(number(0, 3) == 0) 
+  {
+    // TODO - eventually we need to determine where someone gets hit and just pass the location
 
-          obj_list->obj_flags.value[0] += eqdam;
-          obj_list->obj_flags.value[2] -= eqdam;
-          value0 = obj_list->obj_flags.value[0];
-          value2 = obj_list->obj_flags.value[2];
-          value = value2 - value0;
-         
-          if(value < 1) {
-            if(IS_SET(obj_list->obj_flags.extra_flags, ITEM_SPECIAL)) {
-              obj_list->obj_flags.value[0] -= eqdam;
-              obj_list->obj_flags.value[2] += eqdam;
-              // obj_list->obj_flags.value[1] = 1;
-              return;
-            }
-            act("$p is destroyed.",victim, obj_list, 0, TO_CHAR, 0);
-            act("$p carried by $n is destroyed.", victim, obj_list, 0, TO_ROOM, 0);
-            act("$p falls to the ground in scraps.", victim, obj_list, 0, TO_CHAR, 0);
-            act("$p falls to the ground in scraps.", victim, obj_list, 0, TO_ROOM, 0);
-            obj_from_char(obj_list);
-            make_scraps(victim,obj_list);
-            extract_obj(obj_list);
-          }
-          else {
-            act("$p is damaged.", victim, obj_list, 0, TO_CHAR, 0);
-            act("$p carried by $n is damaged.", victim, obj_list, 0, TO_ROOM, 0);
-          }
-        } // end if type_flag == ITEM_WEAPON 
-       
-        else if(obj_list->obj_flags.type_flag != ITEM_KEY) 
-        {
-          if(IS_SET(obj_list->obj_flags.extra_flags, ITEM_SPECIAL))
-            return;
-         
-          act("$p is destroyed.",victim,obj_list,0,TO_CHAR, 0);
-          act("$p carried by $n is destroyed.", victim, obj_list, 0, TO_ROOM, 0);
-          act("$p falls to the ground in scraps.",  victim, obj_list, 0, TO_CHAR, 0);
-          act("$p falls to the ground in scraps.", victim, obj_list, 0, TO_ROOM, 0);
-         
-          if(obj_list->contains) {
-            for(obj = obj_list->contains; obj; obj = tmp_obj) {
-              tmp_obj = obj->next_content;
-              act("$p falls to the ground.", victim, obj, 0, TO_CHAR, 0);
-              act("$p falls to the ground.", victim, obj, 0, TO_ROOM, 0);
-              move_obj(obj, victim->in_room);
-            }
-          } // end if has contents..  
-
-          obj_from_char(obj_list);
-          make_scraps(victim, obj_list);
-          extract_obj(obj_list);
-        } 
-      }  // end of inventory damage... 
-      // Prevent people from waiting until a crash to get scrapped inv back 
-      save_char_obj(victim);
+    // determine which location takes the damage giving a higher chance to certain locations
+    pos = number(0, WEAR_MAX+6);
+    switch(pos) {
+      case WEAR_MAX+1:
+      case WEAR_MAX+2:
+         pos = WEAR_BODY;
+         break;
+      case WEAR_MAX+3:
+         pos = WEAR_LEGS;
+         break;
+      case WEAR_MAX+4:
+         pos = WEAR_ARMS;
+         break;
+      case WEAR_MAX+5:
+         pos = WEAR_HEAD;
+         break;
+      case WEAR_MAX+6:
+         pos = WEAR_SHIELD;
+         break;
+      default:
+         break; // pos = itself
     }
+          
+    if(!victim->equipment[pos])  // they lucked out and didn't get anything hit
+       return;
+
+    obj = victim->equipment[pos];
+            
+    // add a point
+    eqdam = damage_eq_once(obj);
+
+    // determine if time to scrap it              
+    if(eqdam >= eq_max_damage(obj))
+      eq_destroyed(victim, obj, pos);
+    else {
+      act("$p is damaged.", victim, obj, 0, TO_CHAR, 0);
+      act("$p worn by $n is damaged.", victim, obj, 0, TO_ROOM, 0);
+    }
+  } // number(0, 3) == 0
+  else if(victim->carrying && (number(0, 6) == 0)) 
+  { 
+    // let's scrap something in the inventory 
+    for(count = 0, obj = victim->carrying; obj; obj = obj->next_content)
+        count++;
+    value = number(1, count); // choose a random inventory item
+    // loop up to that item
+    for(count = 0, obj = victim->carrying; obj && value < count; obj = obj->next_content)
+        count++;
+
+    assert(obj);
+       
+    // add a point
+    eqdam = damage_eq_once(obj);
+
+    // determine if time to scrap it              
+    if(eqdam >= eq_max_damage(obj))
+      eq_destroyed(victim, obj, -1);
+    else {
+      act("$p is damaged.", victim, obj, 0, TO_CHAR, 0);
+      act("$p carried by $n is damaged.", victim, obj, 0, TO_ROOM, 0);
+    }
+  }  // end of inventory damage... 
+
+  save_char_obj(victim);
 }
 
 void pir_stat_loss(char_data * victim)
@@ -1681,6 +1463,7 @@ int check_riposte(CHAR_DATA * ch, CHAR_DATA * victim)
   return newretval;  
 }
 
+
 bool check_shieldblock(CHAR_DATA * ch, CHAR_DATA * victim)
 {
   int percent;
@@ -1696,10 +1479,25 @@ bool check_shieldblock(CHAR_DATA * ch, CHAR_DATA * victim)
     return FALSE;
   
   chance = 0;
-  
-  // TODO - when mobs have skills, remove this
-  if (!(chance = has_skill(victim, SKILL_SHIELDBLOCK)))
-    return eFAILURE;
+
+  // TODO - remove this when mobs have "skills"
+  if (IS_NPC(victim))
+  {
+    switch(GET_CLASS(victim)) {
+      case CLASS_MONK:
+      case CLASS_ANTI_PAL:
+      case CLASS_PALADIN:
+      case CLASS_WARRIOR:  chance = GET_LEVEL(victim); break;
+      case CLASS_RANGER:
+      case CLASS_BARBARIAN:
+      case CLASS_THIEF:    chance = GET_LEVEL(victim) - 10;
+                           if(chance < 10) chance = 1; break;
+      default:
+         return FALSE;
+    }
+  }
+  else if (!(chance = has_skill(victim, SKILL_SHIELDBLOCK)))
+    return FALSE;
 
   chance /= 2;
   chance += (int)(GET_DEX(ch) / 2);
