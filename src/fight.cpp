@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.106 2003/04/23 03:11:36 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.107 2003/04/23 03:16:04 pirahna Exp $ */
 
 extern "C"
 {
@@ -695,7 +695,7 @@ void check_weapon_skill_bonus(char_data * ch, int type, obj_data *wielded,
       specialization = learned / 100;
       learned = learned % 100;
 
-      weapon_skill_hit_bonus += learned / 10;
+      weapon_skill_hit_bonus += learned / 8;
       weapon_skill_dam_bonus += number(1, learned / 10);
 
       if(specialization)
@@ -3104,19 +3104,23 @@ void dam_message(int dam, CHAR_DATA * ch, CHAR_DATA * victim,
     vs = "cremate";
     vp = "cremates";
   }
-  else if(dam <= 85) {
+  else if(dam <= 90) {
     vs = "beat the shit out of";
     vp = "beats the shit out of";
   } 
-  else if(dam <= 100) {
+  else if(dam <= 115) {
+    vs = "brutally pummel";
+    vp = "brutally pummels";
+  }
+  else if(dam <= 140) {
     vs = "BEAT THE LIVING SHIT out of";
     vp = "BEATS THE LIVING SHIT out of";
   }
-  else if(dam <= 150) {
+  else if(dam <= 180) {
     vs = "POUND THE FUCK out of";
     vp = "POUNDS THE FUCK out of";
   }
-  else if(dam <= 200) {
+  else if(dam <= 230) {
     vs = "FUCKING DEMOLISH";
     vp = "FUCKING DEMOLISHES";
   }
