@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.21 2004/04/23 12:40:10 urizen Exp $ */
+/* $Id: clan.cpp,v 1.22 2004/04/23 12:42:55 urizen Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -2261,6 +2261,7 @@ int do_cdeposit(CHAR_DATA *ch, char *arg, int cmd)
   GET_GOLD(ch) -= dep;
   get_clan(ch)->balance += dep;
   csendf(ch,"You deposit %d gold coins into your clan's account.\r\n",dep);
+  save_clans();
   return eSUCCESS;
 }
 
@@ -2292,6 +2293,7 @@ int do_cwithdraw(CHAR_DATA *ch, char *arg, int cmd)
   GET_GOLD(ch) += (int)wdraw;
   get_clan(ch)->balance -= wdraw;
   csendf(ch,"You withdraw %d gold coins.",wdraw);
+  save_clans();
   return eSUCCESS;
 }
 
