@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.8 2002/07/18 19:45:15 pirahna Exp $ */
+/* $Id: db.cpp,v 1.9 2002/07/26 21:46:42 dcastle Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -3133,8 +3133,20 @@ void reset_zone(int zone)
         break;
 
         case 'D': /* set state of door */
-            assert(ZCMD.arg1 >= 0 && ZCMD.arg1 <= top_of_world);
-	    assert(ZCMD.arg2 >= 0 && ZCMD.arg2 < 6);
+	    if(ZCMD.arg1 < 0 || ZCMD.arg1 > top_of_world)
+	    {
+	      sprintf(log_buf,
+	      "Illegal room number Z: %d cmd %d", zone, cmd_no);
+	      log(log_buf, IMMORTAL, LOG_WORLD);
+	      break;
+	    }
+	    if(ZCMD.arg2 < 0 || ZCMD.arg2 >=6)
+	    {
+	      sprintf(log_buf,
+	      "Illegal direction %d doesn't exist Z: %d cmd %d", ZCMD.arg2, zone, cmd_no);
+	      log(log_buf, IMMORTAL, LOG_WORLD);
+	      break;
+	    }
 	    if(world[ZCMD.arg1].dir_option[ZCMD.arg2] == 0)
 	    {
 	      sprintf(log_buf,
