@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.5 2002/07/06 21:28:34 pirahna Exp $ */
+/* $Id: mob_proc2.cpp,v 1.6 2002/08/04 23:00:51 pirahna Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -79,7 +79,7 @@ int repair_guy(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
           struct char_data *owner)
 {
   char buf[256], item[256];
-  int value0, value1, cost, price, x;
+  int value0, cost, price, x;
   int percent, eqdam;
 
   if ((cmd != 66) && (cmd != 65)) return eFAILURE;
@@ -117,17 +117,16 @@ int repair_guy(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     return eSUCCESS;
   }
   cost = obj->obj_flags.cost;
-  value0 = obj->obj_flags.value[0];
-  value1 = obj->obj_flags.value[1];
+  value0 = eq_max_damage(obj);
+  eqdam = eq_current_damage(obj);
 
-  if (value1 == 0) {
+  if (eqdam == 0) {
     act("The Repair Guy says 'Looks fine to me.'",ch,0,0, TO_CHAR, 0);
     act("The Repair Guy says 'Looks fine to me.'",ch,0,0, TO_ROOM, 0);
     act("The Repair Guy gives you $p.", ch,obj,0, TO_CHAR, 0);
     act("The Repair Guy gives $n $p.", ch,obj,0, TO_ROOM, INVIS_NULL);
     return eSUCCESS;
   }
-  eqdam = value0 - value1;
   if (eqdam <= 0)
     percent = 0;
   else
@@ -150,9 +149,9 @@ int repair_guy(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     act("The Repair Guy gives $n $p.", ch,obj,0, TO_ROOM, INVIS_NULL);
     return eSUCCESS;
 
-  } else {
+  } 
 
-    if (cmd == 65) {
+  if (cmd == 65) {
       sprintf(buf, "The Repair Guy says 'It will only cost you %d coins to repair %s.'",
           price, obj->short_description);
       act(buf, ch,0,0, TO_CHAR, 0);
@@ -160,22 +159,20 @@ int repair_guy(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
       act("The Repair Guy gives you $p.", ch,obj,0, TO_CHAR, 0);
       act("The Repair Guy gives $n $p.", ch,obj,0, TO_ROOM, INVIS_NULL);
       return eSUCCESS;
-    }   /* price quote */
+  }   /* price quote */
 
-    GET_GOLD(ch) -= price;
-    obj->obj_flags.value[1] = 0;
-    sprintf(buf, "The Repair Guy says 'It will cost you %d coins to repair %s.'",
+  GET_GOLD(ch) -= price;
+  eq_remove_damage(obj);
+  sprintf(buf, "The Repair Guy says 'It will cost you %d coins to repair %s.'",
           price, obj->short_description);
-    act(buf, ch,0,0, TO_CHAR, 0);
-    act(buf, ch,0,0, TO_ROOM, 0);
-    act("You watch The Repair Guy fix $p...\n\r\n\r"
+  act(buf, ch,0,0, TO_CHAR, 0);
+  act(buf, ch,0,0, TO_ROOM, 0);
+  act("You watch The Repair Guy fix $p...\n\r\n\r"
         "The Repair Guy says 'All fixed!'\n\r"
         "The Repair Guy gives you $p.", ch, obj, 0, TO_CHAR, 0);
-    act("You watch The Repair Guy fix $p...\n\r\n\r"
+  act("You watch The Repair Guy fix $p...\n\r\n\r"
         "The Repair Guy says 'All fixed!'\n\r"
         "The Repair Guy gives $n $p.", ch, obj, 0, TO_ROOM, INVIS_NULL);
-    return eSUCCESS;
-  }
   return eSUCCESS;
 }
 
@@ -183,7 +180,7 @@ int super_repair_guy(struct char_data *ch, struct obj_data *obj, int cmd, char *
           struct char_data *owner)
 {
   char buf[256], item[256];
-  int value0, value1, value2, cost, price, x;
+  int value0, value2, cost, price, x;
   int percent, eqdam;
 
   if ((cmd != 66) && (cmd != 65)) return eFAILURE;
@@ -213,17 +210,16 @@ int super_repair_guy(struct char_data *ch, struct obj_data *obj, int cmd, char *
   if (obj->obj_flags.type_flag == ITEM_ARMOR) {
 
     cost = obj->obj_flags.cost;
-    value0 = obj->obj_flags.value[0];
-    value1 = obj->obj_flags.value[1];
+    value0 = eq_max_damage(obj);
+    eqdam = eq_current_damage(obj);
 
-    if (value1 == 0) {
+    if (eqdam == 0) {
       act("The Super Repair Guy says 'Looks fine to me.'",ch,0,0, TO_CHAR, 0);
       act("The Super Repair Guy says 'Looks fine to me.'",ch,0,0, TO_ROOM, 0);
       act("The Super Repair Guy gives you $p.", ch,obj,0, TO_CHAR, 0);
       act("The Super Repair Guy gives $n $p.", ch,obj,0, TO_ROOM, INVIS_NULL);
       return eSUCCESS;
     }
-    eqdam = value0 - value1;
     if (eqdam <= 0)
       percent = 0;
     else
@@ -263,7 +259,7 @@ int super_repair_guy(struct char_data *ch, struct obj_data *obj, int cmd, char *
 
 
       GET_GOLD(ch) -= price;
-      obj->obj_flags.value[1] = 0;
+      eq_remove_damage(obj);
       sprintf(buf, "The Super Repair Guy says 'It will cost you %d coins to repair %s.'",
           price, obj->short_description);
       act(buf, ch,0,0, TO_CHAR, 0);
@@ -279,17 +275,16 @@ int super_repair_guy(struct char_data *ch, struct obj_data *obj, int cmd, char *
   } else if (obj->obj_flags.type_flag == ITEM_WEAPON) {
 
     cost = obj->obj_flags.cost;
-    value0 = obj->obj_flags.value[0];
-    value2 = obj->obj_flags.value[2];
+    value0 = eq_max_damage(obj);
+    eqdam = eq_current_damage(obj);
 
-    if (value0 == 0) {
+    if (eqdam == 0) {
       act("The Super Repair Guy says 'Looks fine to me.'",ch,0,0, TO_CHAR, 0);
       act("The Super Repair Guy says 'Looks fine to me.'",ch,0,0, TO_ROOM, 0);
       act("The Super Repair Guy gives you $p.", ch,obj,0, TO_CHAR, 0);
       act("The Super Repair Guy gives $n $p.", ch,obj,0, TO_ROOM, INVIS_NULL);
       return eSUCCESS;
     }
-    eqdam = value2;
     if (eqdam <= 0)
       percent = 0;
     else
@@ -315,8 +310,7 @@ int super_repair_guy(struct char_data *ch, struct obj_data *obj, int cmd, char *
     } else {
 
       GET_GOLD(ch) -= price;
-      obj->obj_flags.value[2] = (value0 + value2);
-      obj->obj_flags.value[0] = 0;
+      eq_remove_damage(obj);
 
       sprintf(buf, "The Super Repair Guy says 'It will cost you %d coins to repair %s.'",
           price, obj->short_description);
@@ -343,7 +337,7 @@ int repair_shop(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
           struct char_data *owner)
 {
   char buf[256], item[256];
-  int value0, value1, value2, cost, price, x;
+  int value0, value2, cost, price, x;
   int percent, eqdam;
 
     if ((cmd != 66) && (cmd != 65)) return eFAILURE;
@@ -370,17 +364,16 @@ act("\n\rFingers examines $p...",ch,obj,0, TO_ROOM, 0);
   if (obj->obj_flags.type_flag == ITEM_ARMOR) {
 
       cost = obj->obj_flags.cost;
-    value0 = obj->obj_flags.value[0];
-    value1 = obj->obj_flags.value[1];
+    value0 = eq_max_damage(obj);
+    eqdam = eq_current_damage(obj);
 
-    if (value1 == 0) {
+    if (eqdam == 0) {
 act("Fingers says 'Looks fine to me.'",ch,0,0, TO_CHAR, 0);
 act("Fingers says 'Looks fine to me.'",ch,0,0, TO_ROOM, 0);
 act("Fingers gives you $p.", ch,obj,0, TO_CHAR, 0);
 act("Fingers gives $n $p.", ch,obj,0, TO_ROOM, 0);
     return eSUCCESS;
       }
-    eqdam = value0 - value1;
 if (eqdam <= 0)
      percent = 0;
    else
@@ -421,7 +414,7 @@ act("Fingers gives $n $p.", ch,obj,0, TO_ROOM, INVIS_NULL);
 
 
   GET_GOLD(ch) -= price;
-obj->obj_flags.value[1] = 0;
+  eq_remove_damage(obj);
 sprintf(buf, "Fingers says 'It will cost you %d coins to repair %s.'",
           price, obj->short_description);
 act(buf, ch,0,0, TO_CHAR, 0);
@@ -437,17 +430,16 @@ act("Fingers gives $n $p.", ch,obj,0, TO_ROOM, INVIS_NULL);
   } else if (obj->obj_flags.type_flag == ITEM_WEAPON) {
 
       cost = obj->obj_flags.cost;
-    value0 = obj->obj_flags.value[0];
-    value2 = obj->obj_flags.value[2];
+    value0 = eq_max_damage(obj);
+    eqdam = eq_current_damage(obj);
 
-    if (value0 == 0) {
+    if (eqdam == 0) {
 act("Fingers says 'Looks fine to me.'",ch,0,0, TO_CHAR, 0);
 act("Fingers says 'Looks fine to me.'",ch,0,0, TO_ROOM, 0);
 act("Fingers gives you $p.", ch,obj,0, TO_CHAR, 0);
 act("Fingers gives $n $p.", ch,obj,0, TO_ROOM, INVIS_NULL);
     return eSUCCESS;
       }
-    eqdam = value2;
 if (eqdam <= 0)
      percent = 0;
    else
@@ -474,8 +466,7 @@ act("Fingers gives $n $p.", ch,obj,0, TO_ROOM, INVIS_NULL);
      } else {
 
   GET_GOLD(ch) -= price;
-obj->obj_flags.value[2] = (value0 + value2);
-obj->obj_flags.value[0] = 0;
+  eq_remove_damage(obj);
 
 sprintf(buf, "Fingers says 'It will cost you %d coins to repair %s.'",
           price, obj->short_description);

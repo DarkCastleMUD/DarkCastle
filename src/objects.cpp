@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.12 2002/08/03 07:30:29 pirahna Exp $
+| $Id: objects.cpp,v 1.13 2002/08/04 23:00:51 pirahna Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -84,6 +84,18 @@ int eq_current_damage(obj_data * obj)
        return (obj->affected[i].modifier);
 
   return 0;
+}
+
+// when repairing eq, we just leave the affect of 0 in there.  That way when
+// it gets damaged again, we don't have to realloc the affect list again
+void eq_remove_damage(obj_data * obj)
+{
+  for(int i = 0; i < obj->num_affects; i++)
+    if(obj->affected[i].location == APPLY_DAMAGED)
+    {
+      obj->affected[i].modifier = 0;
+      break;
+    }
 }
 
 // Damage a piece of eq once and return the amount of damage currently on it
