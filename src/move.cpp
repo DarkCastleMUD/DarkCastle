@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.5 2002/07/10 17:15:57 pirahna Exp $
+| $Id: move.cpp,v 1.6 2002/07/13 17:13:55 pirahna Exp $
 | move.C
 | Movement commands and stuff.
 */
@@ -241,6 +241,9 @@ int do_fall(CHAR_DATA *ch, short dir)
      send_to_char("Luckily the ground breaks your fall.\n\r", ch);
      send_to_char("\n\rYou have been KILLED!\n\r", ch);
      fight_kill(ch, ch, TYPE_CHOOSE); 
+     sprintf(damage,"%s fall from %d was lethal and killed them.",
+          GET_NAME(ch), world[ch->in_room].number);
+     log(damage, IMMORTAL, LOG_MORTAL);
      return eSUCCESS|eCH_DIED;
   }
   if((IS_SET(world[ch->in_room].room_flags, FALL_DOWN) && (dir = 5)) ||
