@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.55 2004/05/20 00:07:08 urizen Exp $
+| $Id: cl_thief.cpp,v 1.56 2004/05/20 02:10:02 urizen Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -100,7 +100,7 @@ int do_eyegouge(CHAR_DATA *ch, char *argument, int cmd)
     return eFAILURE;
   }
   int retval = 0;
-  if (skill_success(ch,victim, SKILL_EYEGOUGE))
+  if (!skill_success(ch,victim, SKILL_EYEGOUGE))
   {
      act("You miss $N's eye.",ch, NULL, victim, TO_CHAR, 0);
      act("$n walks up to $N and tries to push $s thumb into $N's eye, but misses!",ch, NULL, victim, TO_ROOM, NOTVICT);
@@ -395,7 +395,7 @@ int do_trip(CHAR_DATA *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if(skill_success(ch,victim,SKILL_TRIP)) {
+  if(!skill_success(ch,victim,SKILL_TRIP)) {
     act("$n fumbles clumsily as $s attempts to trip you!", ch, NULL, victim, TO_VICT, 0 );
     act("You fumble the trip!", ch, NULL, victim, TO_CHAR , 0);
     act("$n fumbles as $s tries to trip $N!", ch, NULL, victim, TO_ROOM, NOTVICT );
