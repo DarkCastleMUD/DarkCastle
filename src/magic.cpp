@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.34 2002/09/29 02:30:13 pirahna Exp $ */
+/* $Id: magic.cpp,v 1.35 2002/10/01 03:07:24 pirahna Exp $ */
 
 extern "C"
 {
@@ -1187,7 +1187,7 @@ int spell_create_food(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 {
   struct obj_data *tmp_obj;
 
-
+/*
   tmp_obj = (struct obj_data *)dc_alloc(1, sizeof(struct obj_data));
   clear_object(tmp_obj);
 
@@ -1203,10 +1203,12 @@ int spell_create_food(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 
   tmp_obj->next = object_list;
   object_list = tmp_obj;
+  tmp_obj->item_number = -1;
+*/
+
+  tmp_obj = clone_object(real_object(7));
 
   obj_to_room(tmp_obj, ch->in_room);
-
-  tmp_obj->item_number = -1;
 
   act("$p suddenly appears.",ch,tmp_obj,0,TO_ROOM, INVIS_NULL);
   act("$p suddenly appears.",ch,tmp_obj,0,TO_CHAR, INVIS_NULL);
