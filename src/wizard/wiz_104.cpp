@@ -734,6 +734,7 @@ int do_show(struct char_data *ch, char *argument, int cmd)
        }
        else {
          for(i = begin; i < top_of_world && i <= end; i++) {
+	   if (!world_array[i]) continue;
            count++;
            sprintf(buf, "[%3d] [%5d] %s\n\r", count, i, world[i].name);
            send_to_char(buf, ch);
