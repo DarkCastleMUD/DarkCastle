@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.12 2002/08/21 14:38:11 pirahna Exp $
+| $Id: cl_thief.cpp,v 1.13 2002/09/11 02:56:59 pirahna Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -1372,7 +1372,7 @@ int do_vitalstrike(struct char_data *ch, char *argument, int cmd)
 
   skill_increase_check(ch, SKILL_VITAL_STRIKE, learned, SKILL_INCREASE_EASY);
   
-  if(learned < chance) {
+  if(percent < chance) {
     act("$n starts jabbing $s weapons around $mself and almost chops off $s pinkie finger."
          , ch, 0, 0, TO_ROOM, NOTVICT);
     send_to_char("You try to begin the vital strike technique and slice off your own pinkie finger!\r\n", ch);
