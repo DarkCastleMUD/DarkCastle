@@ -14,7 +14,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.h,v 1.30 2003/07/08 04:22:19 pirahna Exp $ */
+/* $Id: spells.h,v 1.31 2003/07/22 18:29:06 pirahna Exp $ */
 #include <structs.h> // byte, sh_int
 
 #define MAX_BUF_LENGTH               240
@@ -167,7 +167,9 @@
 #define SPELL_HOLY_AURA             138
 #define SPELL_DISMISS_FAMILIAR      139
 #define SPELL_DISMISS_CORPSE        140
-#define MAX_SPL_LIST                140
+#define SPELL_BLESSED_HALO          141
+#define SPELL_VISAGE_OF_HATE        142
+#define MAX_SPL_LIST                142
 
 // if you add a spell, make sure you update "spells[]" in spells.C
 
@@ -186,7 +188,8 @@
 #define KI_PURIFY     5
 #define KI_DISRUPT    6
 #define KI_STANCE     7
-#define MAX_KI_LIST   7 
+#define KI_AGILITY    8
+#define MAX_KI_LIST   8 
 #define KI_OFFSET     250     // why this is done differently than the rest, I have no
                               // idea....ki skills are 250-297.  -pir
 
@@ -259,7 +262,10 @@
 #define SKILL_TWO_HANDED_WEAPONS     362
 #define SKILL_HAND_TO_HAND           363
 #define SKILL_BULLRUSH               364
-#define SKILL_MAX                    364
+#define SKILL_AGGRESSION             365
+#define SKILL_TACTICS                366
+#define SKILL_DECEIT                 367
+#define SKILL_MAX                    367
 
 // if you add a skill, make sure you update "skills[]" in spells.C
 // as well as SKILL_MAX

@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.9 2003/06/12 23:15:31 pirahna Exp $ */
+/* $Id: ki.cpp,v 1.10 2003/07/22 18:29:00 pirahna Exp $ */
 
 extern "C"
 {
@@ -78,6 +78,11 @@ struct ki_info_type ki_info [ ] = {
 { /* 7 */
 	12, POSITION_FIGHTING, 10,
         TAR_IGNORE, ki_stance
+},
+
+{ /* 8 */
+	12, POSITION_FIGHTING, 20,
+        TAR_IGNORE, ki_agility
 }
 
 };
@@ -91,6 +96,7 @@ char *ki[] = {
         "purify",
         "disrupt",
         "stance",
+        "agility",
 	"\n"
 };
 void set_cantquit(CHAR_DATA *ch, CHAR_DATA *victim);
@@ -660,3 +666,62 @@ int ki_stance( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
    affect_to_char(ch, &af);
    return eSUCCESS;
 }
+
+int ki_agility( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
+{
+  int learned, chance, specialization, percent;
+  struct affected_type af;
+   
+  if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
+    learned = 75;
+  else if(!(learned = has_skill(ch, KI_AGILITY+KI_OFFSET))) {
+    send_to_char("You aren't experienced enough to teach others graceful movement.\r\n", ch);
+    return eFAILURE;
+  }
+
+  if(!IS_AFFECTED(ch, AFF_GROUP)) {
+    send_to_char("You have no group to instruct.\r\n", ch);
+    return eFAILURE;
+  }
+
+  specialization = learned / 100;
+  learned = learned % 100;
+
+  chance = 75;
+
+  // 101% is a complete failure
+  percent = number(1, 101);
+  if (percent > chance) {
+     send_to_char("Hopefully none of them noticed you trip on that rock.\r\n", ch);
+     act ("$n tries to show everyone how to be graceful and trips over a rock.", ch, 0, 0, TO_ROOM, 0);
+  } 
+  else {
+    send_to_char("You instruct your party on more graceful movement.\r\n", ch);
+    act("$n holds a quick tai chi class.", ch, 0, 0, TO_ROOM, 0);
+   
+    for(char_data * tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+    {
+      if(tmp_char == ch)
+        continue;
+      if(!ARE_GROUPED(ch, tmp_char))
+        continue;
+      affect_from_char(tmp_char, KI_AGILITY+KI_OFFSET);
+      affect_from_char(tmp_char, KI_AGILITY+KI_OFFSET);
+      act ("$n's graceful movement inspires you to better form.", ch, 0, tmp_char, TO_VICT, 0);
+   
+      af.type      = KI_AGILITY+KI_OFFSET;
+      af.duration  = 1 + learned / 10;
+      af.modifier  = 1;
+      af.location  = APPLY_MOVE_REGEN;
+      af.bitvector = 0;
+      affect_to_char(tmp_char, &af);
+      af.modifier  = -20;
+      af.location  = APPLY_ARMOR;
+      affect_to_char(tmp_char, &af);
+    }
+  }
+  
+  skill_increase_check(ch, KI_AGILITY+KI_OFFSET, learned, SKILL_INCREASE_EASY);
+  WAIT_STATE(ch, PULSE_VIOLENCE * 2);
+  return eSUCCESS;  
+}  

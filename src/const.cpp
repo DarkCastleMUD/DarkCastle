@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: const.cpp,v 1.62 2003/07/08 03:15:27 pirahna Exp $ */
+/* $Id: const.cpp,v 1.63 2003/07/22 18:29:00 pirahna Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1156,7 +1156,7 @@ struct class_skill_defines k_skills[] = {
 {    "punch",		KI_PUNCH+KI_OFFSET,	10,	80,	-2, 	"You seek a brother in a secret monastery."},
 {    "sense",		KI_SENSE+KI_OFFSET,	20,	80,	-2, 	"A creature who lives in the damp dark, and causes it, could know."},
 {    "stance",		KI_STANCE+KI_OFFSET,	24,	80,	-2, "A fair-skinned warrior of untold skill in weapons awaits your challenge in the thundering depths."},
-{    "speed",		KI_SPEED+KI_OFFSET,	27,	80,	-2, 	"Hmm, I do not know where the knowledge went, but I sense it on the east content, moving around."},
+{    "speed",		KI_SPEED+KI_OFFSET,	27,	80,	-2, 	"Hmm, I do not know where the knowledge went, but I sense it on the east continent, moving around."},
 {    "storm",		KI_STORM+KI_OFFSET,	35,	80,	-2, 	"See a purveyer of storms about this one"},
 {    "disrupt",		KI_DISRUPT+KI_OFFSET,	41,	80,	10008, NULL},
 {    "blast",		KI_BLAST+KI_OFFSET,	45,	80,	-2, 	"The brother of a secret monastery who is constantly plagued by indegestion can help you out."},

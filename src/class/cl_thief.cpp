@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.30 2003/06/13 00:32:42 pirahna Exp $
+| $Id: cl_thief.cpp,v 1.31 2003/07/22 18:29:06 pirahna Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -1494,5 +1494,65 @@ int do_vitalstrike(struct char_data *ch, char *argument, int cmd)
   af.location  = APPLY_NONE;
   af.bitvector = 0;
   affect_to_char(ch, &af);
+  return eSUCCESS;
+}
+
+
+int do_deceit(struct char_data *ch, char *argument, int cmd)
+{
+  int learned, chance, specialization, percent;
+  struct affected_type af;
+  
+  if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
+    learned = 75;
+  else if(!(learned = has_skill(ch, SKILL_DECEIT))) {
+    send_to_char("You do not yet understand the workings of your marks.\r\n", ch);
+    return eFAILURE;
+  }   
+      
+  if(!IS_AFFECTED(ch, AFF_GROUP)) {
+    send_to_char("You have no group to instruct.\r\n", ch);
+    return eFAILURE;
+  }   
+      
+  specialization = learned / 100;
+  learned = learned % 100;
+      
+  chance = 75;
+      
+  // 101% is a complete failure
+  percent = number(1, 101);
+  if (percent > chance) {
+     send_to_char("Guess your class just isn't up to the task.\r\n", ch);
+     act ("$n tried to explain the weaknesses of other but you do not understand.", ch, 0, 0, TO_ROOM, 0);
+  }
+  else {
+    act ("$n instructs $s group on the virtues of deceit.", ch, 0, 0, TO_ROOM, 0);
+    send_to_char("Your instruction is well received and your pupils more able to exploit weakness.\r\n", ch);
+    
+    for(char_data * tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+    { 
+      if(tmp_char == ch)
+        continue;
+      if(!ARE_GROUPED(ch, tmp_char))
+        continue;
+      affect_from_char(tmp_char, SKILL_DECEIT);
+      affect_from_char(tmp_char, SKILL_DECEIT);
+      act ("$n lures your mind into the thought patterns of the morally corrupt.", ch, 0, tmp_char, TO_VICT, 0);
+  
+      af.type      = SKILL_DECEIT;
+      af.duration  = 1 + learned / 10;
+      af.modifier  = 1;
+      af.location  = APPLY_MANA_REGEN;
+      af.bitvector = 0;
+      affect_to_char(tmp_char, &af);
+      af.location  = APPLY_DAMROLL;
+      affect_to_char(tmp_char, &af);
+    }   
+  }
+    
+  skill_increase_check(ch, SKILL_DECEIT, learned, SKILL_INCREASE_EASY);
+  WAIT_STATE(ch, PULSE_VIOLENCE * 2);
+  GET_MOVE(ch) /= 2;
   return eSUCCESS;
 }

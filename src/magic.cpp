@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.84 2003/07/22 04:24:58 pirahna Exp $ */
+/* $Id: magic.cpp,v 1.85 2003/07/22 18:29:00 pirahna Exp $ */
 
 extern "C"
 {
@@ -9420,6 +9420,101 @@ int cast_dismiss_corpse( byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DA
   return eFAILURE;
 }
 
+int spell_visage_of_hate(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
+{
+  struct affected_type af;
+   
+  if(!IS_AFFECTED(ch, AFF_GROUP)) {
+    send_to_char("You have no group to cast this upon.\r\n", ch);
+    return eFAILURE;
+  }
 
+  for(char_data * tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+  {
+    if(tmp_char == ch)
+      continue;
+    if(!ARE_GROUPED(ch, tmp_char))
+      continue;
+    affect_from_char(tmp_char, SPELL_VISAGE_OF_HATE);
+    affect_from_char(tmp_char, SPELL_VISAGE_OF_HATE);
+    send_to_char("The violence hate brings shows upon your face.\r\n", tmp_char);
+   
+    af.type      = SPELL_VISAGE_OF_HATE;
+    af.duration  = 1 + skill / 10;
+    af.modifier  = -1;
+    af.location  = APPLY_HITROLL;
+    af.bitvector = 0;
+    affect_to_char(tmp_char, &af);
+    af.modifier  = 2;
+    af.location  = APPLY_DAMROLL;
+    affect_to_char(tmp_char, &af);
+  }
 
+  send_to_char("Your disdain and hate for all settles upon your peers.\r\n", ch);  
+  skill_increase_check(ch, SPELL_VISAGE_OF_HATE, skill, SKILL_INCREASE_EASY);
+  return eSUCCESS;  
+}
+
+int cast_visage_of_hate( byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill )
+{
+  switch (type) 
+  {
+    case SPELL_TYPE_SPELL:
+       return spell_visage_of_hate(level, ch, tar_ch, 0, skill);
+       break;
+    default :
+       log("Serious screw-up in visage_of_hate!", ANGEL, LOG_BUG);
+       break;
+  }
+  return eFAILURE;
+}
+
+int spell_blessed_halo(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
+{
+  struct affected_type af;
+   
+  if(!IS_AFFECTED(ch, AFF_GROUP)) {
+    send_to_char("You have no group to cast this upon.\r\n", ch);
+    return eFAILURE;
+  }
+
+  for(char_data * tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+  {
+    if(tmp_char == ch)
+      continue;
+    if(!ARE_GROUPED(ch, tmp_char))
+      continue;
+    affect_from_char(tmp_char, SPELL_BLESSED_HALO);
+    affect_from_char(tmp_char, SPELL_BLESSED_HALO);
+    send_to_char("You feel blessed.\r\n", tmp_char);
+
+    af.type      = SPELL_BLESSED_HALO;
+    af.duration  = 1 + skill / 10;
+    af.modifier  = 3;
+    af.location  = APPLY_HITROLL;
+    af.bitvector = 0;
+    affect_to_char(tmp_char, &af);
+    af.modifier  = 1;
+    af.location  = APPLY_HP_REGEN;
+    affect_to_char(tmp_char, &af);
+  }
+
+  send_to_char("Your group feels blessed.\r\n", ch);  
+  skill_increase_check(ch, SPELL_BLESSED_HALO, skill, SKILL_INCREASE_EASY);
+  return eSUCCESS;  
+}
+
+int cast_blessed_halo( byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill )
+{
+  switch (type) 
+  {
+    case SPELL_TYPE_SPELL:
+       return spell_blessed_halo(level, ch, tar_ch, 0, skill);
+       break;
+    default :
+       log("Serious screw-up in blessed_halo!", ANGEL, LOG_BUG);
+       break;
+  }
+  return eFAILURE;
+}
 

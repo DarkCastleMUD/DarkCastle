@@ -5,7 +5,7 @@
  *                                                                           *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-/* $Id: magic.h,v 1.10 2003/06/23 02:02:29 pirahna Exp $ */
+/* $Id: magic.h,v 1.11 2003/07/22 18:29:06 pirahna Exp $ */
 #ifndef MAGIC_H_
 #define MAGIC_H_
 
@@ -577,6 +577,16 @@ int cast_dismiss_familiar(byte level, CHAR_DATA * ch, char *arg, int type,
 int spell_dismiss_corpse(byte level, CHAR_DATA * ch,
    CHAR_DATA * victim, struct obj_data * obj, int skill);
 int cast_dismiss_corpse(byte level, CHAR_DATA * ch, char *arg, int type,
+   CHAR_DATA * victim, struct obj_data * tar_obj, int skill);
+
+int spell_visage_of_hate(byte level, CHAR_DATA * ch,
+   CHAR_DATA * victim, struct obj_data * obj, int skill);
+int cast_visage_of_hate(byte level, CHAR_DATA * ch, char *arg, int type,
+   CHAR_DATA * victim, struct obj_data * tar_obj, int skill);
+
+int spell_blessed_halo(byte level, CHAR_DATA * ch,
+   CHAR_DATA * victim, struct obj_data * obj, int skill);
+int cast_blessed_halo(byte level, CHAR_DATA * ch, char *arg, int type,
    CHAR_DATA * victim, struct obj_data * tar_obj, int skill);
 
 #endif

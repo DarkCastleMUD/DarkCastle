@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_barbarian.cpp,v 1.11 2003/07/08 04:22:17 pirahna Exp $
+| $Id: cl_barbarian.cpp,v 1.12 2003/07/22 18:29:06 pirahna Exp $
 | cl_barbarian.C
 | Description:  Commands for the barbarian class.
 */
@@ -565,3 +565,67 @@ int do_bullrush(struct char_data *ch, char *argument, int cmd)
        ch, NULL, NULL, TO_ROOM, NOTVICT );
   return attack(ch, victim, TYPE_UNDEFINED);
 }
+
+int do_aggression(struct char_data *ch, char *argument, int cmd)
+{
+  int learned, chance, specialization, percent;
+  struct affected_type af;
+
+  if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
+    learned = 75;
+  else if(!(learned = has_skill(ch, SKILL_AGGRESSION))) {
+    send_to_char("You're just not angry enough!\r\n", ch);
+    return eFAILURE;
+  }
+
+  if(!IS_AFFECTED(ch, AFF_GROUP)) {
+    send_to_char("You have no group to inspire.\r\n", ch);
+    return eFAILURE;
+  }
+
+  specialization = learned / 100;
+  learned = learned % 100;
+
+  chance = 75;
+
+  // 101% is a complete failure
+  percent = number(1, 101);
+
+  if (percent > chance) {
+     send_to_char("Guess you just weren't that angry.\r\n", ch);
+     act ("$n tries to rile you up but just seems to be pouty.", ch, 0, 0, TO_ROOM, 0);
+  }
+  else {
+    act ("$n gives you an encouraging pat on the butt.", ch, 0, 0, TO_ROOM, 0);
+    send_to_char("You give everyone an encouraging pat on the butt!\r\n", ch);
+    do_say(ch, "Look alive out there and kick ass.  This is the big game.", 9);
+
+    for(char_data * tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+    {
+      if(tmp_char == ch)
+        continue;
+      if(!ARE_GROUPED(ch, tmp_char))
+        continue;
+
+      affect_from_char(tmp_char, SKILL_AGGRESSION);
+      affect_from_char(tmp_char, SKILL_AGGRESSION);
+      act("$n's pep-talk has you feeling more aggressive!", ch, 0, tmp_char, TO_VICT, 0);
+
+      af.type      = SKILL_AGGRESSION;
+      af.duration  = 1 + learned / 10;
+      af.modifier  = 50;
+      af.location  = APPLY_HIT;
+      af.bitvector = 0;
+      affect_to_char(tmp_char, &af);
+      af.modifier  = 1;
+      af.location  = APPLY_HP_REGEN;
+      affect_to_char(tmp_char, &af);
+    }
+  }
+
+  skill_increase_check(ch, SKILL_AGGRESSION, learned, SKILL_INCREASE_EASY);
+  WAIT_STATE(ch, PULSE_VIOLENCE * 2);
+  GET_MOVE(ch) /= 2;
+  return eSUCCESS;
+}
+

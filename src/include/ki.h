@@ -3,7 +3,7 @@
  * ki powers, although the ki structure is in
  * spells.h, so that must be included
  */
-/* $Id: ki.h,v 1.4 2002/07/13 06:37:11 pirahna Exp $ */
+/* $Id: ki.h,v 1.5 2003/07/22 18:29:06 pirahna Exp $ */
 
 #ifndef KI_H_
 #define KI_H_
@@ -53,5 +53,6 @@ KI_FUN ki_speed;
 KI_FUN ki_purify;
 KI_FUN ki_disrupt;
 KI_FUN ki_stance;
+KI_FUN ki_agility;
 
 #endif

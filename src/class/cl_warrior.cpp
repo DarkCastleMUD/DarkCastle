@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.14 2003/06/05 02:23:55 pirahna Exp $
+| $Id: cl_warrior.cpp,v 1.15 2003/07/22 18:29:06 pirahna Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -961,3 +961,63 @@ int do_guard(struct char_data *ch, char *argument, int cmd)
    send_to_char(name, ch);
    return eSUCCESS;   
 }
+
+int do_tactics(struct char_data *ch, char *argument, int cmd)
+{
+  int learned, chance, specialization, percent;
+  struct affected_type af;
+  
+  if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
+    learned = 75;
+  else if(!(learned = has_skill(ch, SKILL_TACTICS))) {
+    send_to_char("You just don't have the mind for strategic battle.\r\n", ch);
+    return eFAILURE;
+  }   
+      
+  if(!IS_AFFECTED(ch, AFF_GROUP)) {
+    send_to_char("You have no group to command.\r\n", ch);
+    return eFAILURE;
+  }   
+      
+  specialization = learned / 100;
+  learned = learned % 100;
+      
+  chance = 75;
+      
+  // 101% is a complete failure
+  percent = number(1, 101);
+  if (percent > chance) {
+     send_to_char("Guess you just weren't the Patton you thought you were.\r\n", ch);
+     act ("$n goes on about team not being spelled with an 'I' or something.", ch, 0, 0, TO_ROOM, 0);
+  }
+  else {
+    act ("$n takes command coordinating $s group's efforts.", ch, 0, 0, TO_ROOM, 0);
+    send_to_char("You take command coordinating the group's attacks.\r\n", ch);
+    
+    for(char_data * tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+    { 
+      if(tmp_char == ch)
+        continue;
+      if(!ARE_GROUPED(ch, tmp_char))
+        continue;
+      affect_from_char(tmp_char, SKILL_TACTICS);
+      affect_from_char(tmp_char, SKILL_TACTICS);
+  
+      act("$n's leadership makes you feel more comfortable with battle.", ch, 0, tmp_char, TO_VICT, 0);
+      af.type      = SKILL_TACTICS;
+      af.duration  = 1 + learned / 10;
+      af.modifier  = 1;
+      af.location  = APPLY_HITROLL;
+      af.bitvector = 0;
+      affect_to_char(tmp_char, &af);
+      af.location  = APPLY_DAMROLL;
+      affect_to_char(tmp_char, &af);
+    }   
+  }
+    
+  skill_increase_check(ch, SKILL_TACTICS, learned, SKILL_INCREASE_EASY);
+  WAIT_STATE(ch, PULSE_VIOLENCE * 2);
+  GET_MOVE(ch) /= 2;
+  return eSUCCESS;
+}
+
