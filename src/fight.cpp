@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.47 2002/08/19 16:42:19 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.48 2002/08/21 03:19:18 pirahna Exp $ */
 
 extern "C"
 {
@@ -508,7 +508,7 @@ int do_acidshield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
   extern struct race_shit race_info[];
   
   if (!ch || !vict || ch == vict) {
-    log("Null ch or vict, or ch==vict sent to do_fireshield!", IMP, LOG_BUG);
+    log("Null ch or vict, or ch==vict sent to do_acidshield!", IMP, LOG_BUG);
     abort();
   }
   
@@ -1249,7 +1249,7 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
 
   inform_victim(ch, victim, dam);
 
-  if(typeofdamage == DAMAGE_TYPE_PHYSICAL && dam > 0)
+  if(typeofdamage == DAMAGE_TYPE_PHYSICAL && dam > 0 && ch != victim)
   {
     retval = do_fireshield(ch, victim, dam);
     if(SOMEONE_DIED(retval))
