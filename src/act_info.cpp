@@ -52,7 +52,6 @@ extern char *dirs[];
 extern char *where[];
 extern char *color_liquid[];
 extern char *fullness[];
-extern struct str_app_type str_app[];
 extern struct race_shit race_info[];
 
 /* Used for "who" */
