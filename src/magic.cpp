@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.159 2004/06/10 01:31:23 urizen Exp $ */
+/* $Id: magic.cpp,v 1.160 2004/06/10 01:46:12 urizen Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -290,7 +290,7 @@ int spell_souldrain(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
          mana = dam_percent(skill,125);
          if(mana > GET_MANA(victim))
             mana = GET_MANA(victim);
-	  if (number(1,101) < get_saves(victim, SAVE_TYPE_MAGIC))
+	  if (number(1,101) < get_saves(victim, SAVE_TYPE_MAGIC)+40)
 	   {
 		act("$N resists your attempt to souldrain $m!", ch, NULL, victim,TO_CHAR,0);
 		act("$N resists $n's attempt to souldrain $m!", ch, NULL, victim, TO_ROOM,NOTVICT);
@@ -311,13 +311,14 @@ int spell_souldrain(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
         else retval = eSUCCESS;
          return retval;//spell_damage(ch, victim, dam, TYPE_MAGIC, 
 //SPELL_SOULDRAIN, 0);
-         }
+//         }
   //    } // ! saves spell
       
    // Miss
-   else {
-      return spell_damage(ch, victim, 0, TYPE_MAGIC, SPELL_SOULDRAIN, 0); 
-      }
+//   else {
+  //    return spell_damage(ch, victim, 0, TYPE_MAGIC, SPELL_SOULDRAIN, 
+//0/); /
+     // }
 }
 
 int spell_vampiric_touch (byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
