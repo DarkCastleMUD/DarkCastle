@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_monk.cpp,v 1.8 2002/09/10 22:55:06 pirahna Exp $
+| $Id: cl_monk.cpp,v 1.9 2002/10/13 15:49:23 pirahna Exp $
 | cl_monk.C
 | Description:  Monk skills.
 */
@@ -258,13 +258,30 @@ int do_stun(struct char_data *ch, char *argument, int cmd)
     else WAIT_STATE(ch, PULSE_VIOLENCE*4);
     retval = damage (ch, victim, 0,TYPE_UNDEFINED, SKILL_STUN, 0);
   }
-  else {
+  else 
+  {
+    set_fighting(victim, ch);
+    WAIT_STATE(ch, PULSE_VIOLENCE*5);
+
+    if(IS_SET(victim->combat, COMBAT_STUNNED) ||
+       IS_SET(victim->combat, COMBAT_STUNNED2))
+    {
+       act("$n delivers another HARD BLOW to your solar plexus!", ch, NULL, victim, TO_VICT , 0);
+       act("You deliver another HARD BLOW into $N's solar plexus!", ch, NULL, victim, TO_CHAR , 0);
+       act("$n delivers another HARD BLOW into $N's solar plexus!", ch, NULL, victim, TO_ROOM, NOTVICT );
+       if(number(0, 1))
+       {
+          send_to_char("The hit knocks the sense back into you!\r\n", ch);
+          act("The hit knocks the sense back into $N and $E is no longer stunned!", ch, 0, victim, TO_ROOM, NOTVICT);
+          REMOVE_BIT(victim->combat, COMBAT_STUNNED);
+          REMOVE_BIT(victim->combat, COMBAT_STUNNED2);
+       }
+       return damage (ch, victim, 0,TYPE_UNDEFINED, SKILL_STUN, 0);;
+    }
+
     act("$n delivers a HARD BLOW into your solar plexus!  You are STUNNED!", ch, NULL, victim, TO_VICT , 0);
     act("You deliver a HARD BLOW into $N's solar plexus!  $N is STUNNED!", ch, NULL, victim, TO_CHAR , 0);
     act("$n delivers a HARD BLOW into $N's solar plexus!  $N is STUNNED!", ch, NULL, victim, TO_ROOM, NOTVICT );
-
-    set_fighting(victim, ch);
-    WAIT_STATE(ch, PULSE_VIOLENCE*5);
     WAIT_STATE(victim, PULSE_VIOLENCE*2);
     if(GET_POS(victim) > POSITION_STUNNED)
       GET_POS(victim) = POSITION_STUNNED;
