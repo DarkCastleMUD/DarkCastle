@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: const.cpp,v 1.12 2002/07/31 19:05:02 dcastle Exp $ */
+/* $Id: const.cpp,v 1.13 2002/08/01 05:34:21 dcastle Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -954,7 +954,7 @@ struct class_skill_defines t_skills[] = {
 {    "stalk",		SKILL_STALK,		15,	80,	3022, 	"You have to go see Skiv the thief guildmaster." },
 {    "trip",		SKILL_TRIP,		17,	75,	3022, 	"You have to go see Skiv the thief guildmaster." },
 {    "blindfighting",   SKILL_BLINDFIGHTING,    19,     60,     3022,   NULL },
-{    "steal",		SKILL_STEAL,		20,	80,	3022, 	"You have to go see Skiv the thief guildmaster." },
+{    "steal",		SKILL_STEAL,		20,	80,	-2, 	"There's a little thief around town named Caijin.  Annoying little bastard.  Ask him to please teach you." },
 {    "disarm",		SKILL_DISARM,		23,	60,	3022, 	"You have to go see Skiv the thief guildmaster." },
 {    "vitalstrike",     SKILL_VITAL_STRIKE,	25,	80,	3022,	NULL },
 {    "circle",		SKILL_CIRCLE,		30,	75,	3022, 	"You have to go see Skiv the thief guildmaster." },
