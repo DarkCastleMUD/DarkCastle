@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.12 2003/03/17 03:42:30 pirahna Exp $
+| $Id: cl_warrior.cpp,v 1.13 2003/06/05 00:54:46 pirahna Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -636,20 +636,16 @@ int do_disarm( struct char_data *ch, char *argument, int cmd )
     if ( percent < chance )
     {
         if ((IS_SET(wielded->obj_flags.extra_flags,ITEM_NODROP)) || 
-            (GET_LEVEL(victim) >= IMMORTAL)) {
+            (GET_LEVEL(victim) >= IMMORTAL)) 
           send_to_char("You can't seem to work it loose.\n\r", ch);
-	WAIT_STATE( ch, 3 * PULSE_VIOLENCE );
+        else
+	  disarm( ch, victim );
+	WAIT_STATE( ch, 2 * PULSE_VIOLENCE );
         if (IS_NPC(victim) && !victim->fighting)
-	  retval = one_hit(ch, victim, TYPE_UNDEFINED, 0);
+        {
+	  retval = one_hit( victim, ch, TYPE_UNDEFINED, 0 );
           retval = SWAP_CH_VICT(retval);
-          return retval;
-        }
-
-	disarm( ch, victim );
-        if (IS_NPC(victim) && !victim->fighting)
-	WAIT_STATE( ch, 3 * PULSE_VIOLENCE );
-	retval = one_hit( victim, ch, TYPE_UNDEFINED, 0 );
-        retval = SWAP_CH_VICT(retval);
+	}
     }
     else
     {
@@ -658,8 +654,10 @@ int do_disarm( struct char_data *ch, char *argument, int cmd )
        act("$n attempts to disarm $N, but fails!", ch, NULL, victim, TO_ROOM, NOTVICT);
        WAIT_STATE( ch, PULSE_VIOLENCE*2 );
        if (IS_NPC(victim) && !victim->fighting)
+       {
           retval = one_hit( victim, ch, TYPE_UNDEFINED, 0 );
-        retval = SWAP_CH_VICT(retval);
+          retval = SWAP_CH_VICT(retval);
+       }
     }
     return retval;
 }
