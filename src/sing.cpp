@@ -1907,12 +1907,33 @@ int execute_song_dischordant_dirge( byte level, CHAR_DATA *ch, char *arg, CHAR_D
       send_to_char("You cannot break their bonds of loyalty.\r\n", ch);
       return eFAILURE;
    }
-   if (!affected_by_spell(target, SPELL_CHARM_PERSON))
+   if (number(0,1))
+   {
+        send_to_char("Ooops, that didn't work out like you hoped.\r\n",ch);
+	act("$N charges at $n, for trying to break its bond with its master.\r\n",ch, 0, target, TO_ROOM,NOTVICT);
+	act("$N charges at you!",ch,0,target,TO_CHAR,0);
+	return attack(target, ch, TYPE_UNDEFINED);
+   }
+   if (!affected_by_spell(target, SPELL_CHARM_PERSON) && !IS_AFFECTED2(target, AFF_FAMILIAR))
    {
 	send_to_char("As far as you can tell, they are not loyal to anyone.\r\n",ch);
 	return eFAILURE;
    }
+   int i;
+   for (i = 22394; i < 22399; i++)
+     if (real_mobile(i) == target->mobdata->nr)
+     {
+	send_to_char("The undead being is unaffected by your song.\r\n",ch);
+	return eFAILURE;
+     }
    skill_increase_check(ch, SKILL_SONG_DISCHORDANT_DIRGE, skill, SKILL_INCREASE_MEDIUM);
+   if (IS_AFFECTED2(target, AFF_FAMILIAR))
+   {
+     act("$n shatters $N's bond with this realm, and the creature vanishes.",ch, 0, target, TO_ROOM, NOTVICT);
+     act("At your dirge's completion, $N vanishes.", ch, 0, target, TO_CHAR,0);
+     extract_char(target, TRUE);
+     return eSUCCESS;
+   }
    affect_from_char(target, SPELL_CHARM_PERSON);
    send_to_char("You shatter their magical chains.\r\n",ch);
    send_to_char("Boogie! Your mind has been set free!\r\n",target);

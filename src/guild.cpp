@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.59 2004/05/19 06:58:14 urizen Exp $
+| $Id: guild.cpp,v 1.60 2004/05/19 20:38:55 urizen Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -564,7 +564,7 @@ void skill_increase_check(char_data * ch, int skill, int learned, int difficulty
        log("Illegal difficulty value sent to skill_increase_check", IMMORTAL, LOG_BUG);
        break;
    }
- 
+   csendf(ch, "%d %d", oi, chance); 
    if (oi < chance) return;
    // figure out the name of the affect (if any)
    char * skillname = get_skill_name(skill);
