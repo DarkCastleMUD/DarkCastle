@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.70 2003/04/23 06:28:05 pirahna Exp $ */
+/* $Id: magic.cpp,v 1.71 2003/06/05 02:34:46 pirahna Exp $ */
 
 extern "C"
 {
@@ -2454,6 +2454,11 @@ int spell_sleep(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
   if(affected_by_spell(victim, SPELL_SLEEP)) {
      act("$N's mind still has the lingering effects of a past sleep spell active.",
          ch, NULL, victim, TO_CHAR, 0);
+     return eFAILURE;
+  }
+
+  if (affected_by_spell(victim, SPELL_PARALYZE)) {
+     send_to_char("That person is paralyzed and couldn't close their eyes if they tried.\r\n", ch);
      return eFAILURE;
   }
 

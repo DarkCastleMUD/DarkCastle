@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.26 2003/03/04 05:18:50 pirahna Exp $ */
+/* $Id: info.cpp,v 1.27 2003/06/05 02:34:46 pirahna Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -319,6 +319,10 @@ void show_spells(char_data * i, char_data * ch)
    }
    if (i->affected_by & AFF_FLYING) {
       sprintf(send_buf, "%s$B$1flying!", send_buf);
+      has_spells = 1;
+   }
+   if (affected_by_spell(i, SPELL_STONE_SHIELD) || affected_by_spell(i, SPELL_GREATER_STONE_SHIELD)) {
+      sprintf(send_buf, "%s$B$0stones! ", send_buf);
       has_spells = 1;
    }
          
