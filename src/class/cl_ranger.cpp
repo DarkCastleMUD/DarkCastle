@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: cl_ranger.cpp,v 1.39 2004/05/22 20:01:03 urizen Exp $ | cl_ranger.C  *
+ * $Id: cl_ranger.cpp,v 1.40 2004/05/25 16:39:03 urizen Exp $ | cl_ranger.C  *
  * Description: Ranger skills/spells                                          *
  *                                                                            *
  * Revision History                                                           *
@@ -458,7 +458,7 @@ int ambush(CHAR_DATA *ch)
          if(!IS_MOB(i) && IS_SET(i->pcdata->toggles, PLR_WIMPY))
             WAIT_STATE(i, PULSE_VIOLENCE * 2);
          else WAIT_STATE(i, PULSE_VIOLENCE * 1);
-         WAIT_STATE(ch, PULSE_VIOLENCE * 1);
+         WAIT_STATE(ch, PULSE_VIOLENCE * 2);
        }
        // we continue instead of breaking in case there are any OTHER rangers in the room
      }
