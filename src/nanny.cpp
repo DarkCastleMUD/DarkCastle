@@ -11,7 +11,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.24 2003/01/02 03:28:38 pirahna Exp $ */
+/* $Id: nanny.cpp,v 1.25 2003/04/20 22:14:54 pirahna Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -58,6 +58,8 @@ extern "C" {
 #include <spells.h>
 #include <fight.h>
 
+#include <Account.h>
+
 #define STATE(d)    ((d)->connected)
 
 
@@ -101,7 +103,9 @@ char *crypt(const char *key, const char *salt)
 
 
 int isbanned(char *hostname);
+int _parse_email( char * arg );
 int _parse_name(char *arg, char *name);
+int _parse_account(char *arg, char *name);
 bool check_deny( struct descriptor_data *d, char *name );
 void update_wizlist(CHAR_DATA *ch);
 void isr_set(CHAR_DATA *ch);
@@ -431,6 +435,8 @@ void nanny(struct descriptor_data *d, char *arg)
    struct  char_data *ch;
    int x, y;
    char    badclssmsg[] = "You must choose a class that matches your stats. These are marked by a '*'.\n\rSelect a class-> ";
+   string  stringtemp;
+   CAccount * acc;
    
    CHAR_DATA *get_pc(char *name);
    void remove_clan_member(int clannumber, struct char_data * ch);
@@ -486,9 +492,57 @@ void nanny(struct descriptor_data *d, char *arg)
       if(!*arg)
         break;
 
+   case CON_GET_ACCOUNT:
+
+      if (!*arg) {
+         SEND_TO_Q( "Empty account.  Disconnecting...", d );
+         close_socket( d ); 
+         return; 
+      }
+
+      // Capitlize first letter, lowercase rest      
+      arg[0] = UPPER(arg[0]);
+      for(y = 1; arg[y] != '\0'; y++)
+         arg[y] = LOWER(arg[y]);
+      
+      if ( _parse_account(arg, tmp_name)) { 
+         SEND_TO_Q( "Illegal account name, try another.\n\rAccount: ", d );
+         return;
+      }
+
+      stringtemp = tmp_name;
+      acc = new CAccount( tmp_name );
+
+      // Attach to descriptor
+      d->account = acc;
+
+      if( 0 == stringtemp.compare( "new" ) ) {
+         SEND_TO_Q( "\n\rCreating new Dark Castle MUD character account.\n\r"
+                        "Keep in mind that you may only have ONE account per person.\n\r"
+                        "Do you wish to continue with new account creation (Y/N)? ", d );
+         STATE(d) = CON_CONFIRM_NEW_ACCOUNT;
+         return;
+      }
+
+      if( ! acc->ReadFromFile() ) {
+         sprintf( buf, "Account '%s' does not exist.\n\r"
+                       "Please enter your account name: ", stringtemp.c_str() );
+         SEND_TO_Q( buf, d );
+         d->account = NULL;
+         delete acc;
+         return;
+      }
+
+      sprintf( buf, "Please enter password for account '%s': ", stringtemp.c_str() );
+      SEND_TO_Q( buf, d );
+      SEND_TO_Q( echo_off_str, d );
+      STATE(d) = CON_ACCOUNT_GET_OLD_PASSWORD;
+      break;
+      
    case CON_GET_NAME:
 
       if (!*arg) { 
+         SEND_TO_Q( "Empty name.  Disconnecting...", d );
          close_socket( d ); 
          return; 
       }
@@ -624,6 +678,40 @@ void nanny(struct descriptor_data *d, char *arg)
       STATE(d) = CON_READ_MOTD;
       break;
       
+   case CON_ACCOUNT_GET_OLD_PASSWORD:
+      SEND_TO_Q( "\n\r", d );
+      stringtemp = arg;
+      if( 0 != stringtemp.compare( d->account->getPassword() ) )
+      {
+         SEND_TO_Q( "Wrong password.\n\r", d );
+         sprintf(log_buf, "%s wrong password: %s", GET_NAME(ch), d->host);
+         log( log_buf, SERAPH, LOG_SOCKET );
+         d->account->badPWAttempt();
+         d->account->WriteToFile();
+         close_socket(d);
+         return;
+      }
+      
+      SEND_TO_Q( echo_on_str, d ); 
+      
+      sprintf( log_buf, "Account %s@%s has connected.", (d->account->getName()).c_str(), d->host);
+      if(GET_LEVEL(ch) < ANGEL)
+         log( log_buf, DEITY, LOG_SOCKET );
+      else
+         log( log_buf, GET_LEVEL(ch), LOG_SOCKET );
+
+      SEND_TO_Q( "Remember to check for account already connected.\n\r", d );
+      SEND_TO_Q( "Remember to do MOTD and IMOTD and CMOTD later.\n\r", d );
+
+      if(d->account->getPWAttempts() > 0)
+      {
+         sprintf(buf, "\r\n\r\n$4$BYou have had %d wrong passwords entered since your last complete login.$R\r\n\r\n", 
+                 d->account->getPWAttempts());
+         SEND_TO_Q(buf, d);
+      }
+      STATE(d) = CON_ACCOUNT_MENU;
+      break;
+      
    case CON_CONFIRM_NEW_NAME:
       switch (*arg)
       {
@@ -668,6 +756,38 @@ void nanny(struct descriptor_data *d, char *arg)
       }
       break;
       
+   case CON_CONFIRM_NEW_ACCOUNT:
+      switch (*arg)
+      {
+      case 'y': case 'Y':
+
+         if(isbanned(d->host) >= BAN_NEW) 
+         {
+            sprintf(buf, "Request for new account %s denied from [%s] (siteban)", (d->account->getName()).c_str(), d->host);
+            log(buf, ANGEL, LOG_SOCKET);
+            SEND_TO_Q("Sorry, new accounts are not allowed from your site.\n\r"
+               "Questions may be directed to Pirahna at dcpirahna@hotmail.com.\n\r", d);
+            STATE(d) = CON_CLOSE;
+            return;
+         }
+         SEND_TO_Q("Entering account creation...\n\rPlease enter a password: ", d);
+         SEND_TO_Q( echo_off_str, d );
+         STATE(d) = CON_ACCOUNT_GET_NEW_PASSWORD;
+         break;
+         
+      case 'n': case 'N':
+         SEND_TO_Q( "Canceling account creation.\n\rPlease enter your account: ", d );
+         delete d->account;
+         d->account = NULL;
+         STATE(d) = CON_GET_ACCOUNT;
+         break;
+         
+      default:
+         SEND_TO_Q( "Please type Yes or No.\n\rWould you like to create a new account? ", d );
+         break;
+      }
+      break;
+      
    case CON_GET_NEW_PASSWORD:
       SEND_TO_Q("\n\r", d);
       
@@ -680,6 +800,21 @@ void nanny(struct descriptor_data *d, char *arg)
       ch->pcdata->pwd[PASSWORD_LEN] = '\0';
       SEND_TO_Q( "Please retype password: ", d );
       STATE(d) = CON_CONFIRM_NEW_PASSWORD;
+      break;
+      
+   case CON_ACCOUNT_GET_NEW_PASSWORD:
+
+      SEND_TO_Q("\n\r", d);
+      if(arg == 0 || strlen(arg) < 6) {
+         SEND_TO_Q("Password must be at least six characters long.\n\rEnter Password: ", d );
+         return;
+      }
+
+      // For now, account passwords are not encrypted
+      stringtemp = arg;
+      d->account->setPassword( stringtemp );
+      SEND_TO_Q( "Please confirm password: ", d );
+      STATE(d) = CON_ACCOUNT_CONFIRM_NEW_PASSWORD;
       break;
       
    case CON_CONFIRM_NEW_PASSWORD:
@@ -695,8 +830,92 @@ void nanny(struct descriptor_data *d, char *arg)
       SEND_TO_Q( "What is your sex (M/F)? ", d );
       STATE(d) = CON_GET_NEW_SEX;
       break;
+
+   case CON_ACCOUNT_CONFIRM_NEW_PASSWORD:
+      SEND_TO_Q( "\n\r", d );
+
+      stringtemp = arg;
       
-      
+      if( 0 != stringtemp.compare( d->account->getPassword() ) ) {
+         SEND_TO_Q("Passwords don't match.\n\rRetype password: ", d );
+         STATE(d) = CON_GET_NEW_PASSWORD;
+         return;
+      }
+      SEND_TO_Q( echo_on_str, d );
+
+      SEND_TO_Q( "Your email address is used to send you a confirmation id that is\n\r"
+                 "required in order to play Dark Castle MUD.  Your email address will\n\r"
+                 "not be sold/lent/auctioned/given to anyone and is only visible to\n\r"
+                 "high level gods on the game.  You will not get any spam mail from us.\n\r"
+                 "This is used only as a form of contact if you lose your password,\n\r"
+                 "or something horrible happens to your character we need to tell you\n\r"
+                 "about.  If you still don't want to trust us, use a fake one or change\n\r"
+                 "it after the account creation process.\n\r"
+                 "\n\rPlease enter your email address: ", d );
+      STATE(d) = CON_ACCOUNT_GET_EMAIL_ADDRESS;
+      break;
+
+   case CON_ACCOUNT_GET_EMAIL_ADDRESS:
+      SEND_TO_Q( "\n\r", d );
+      if( ! _parse_email( arg ) ) {
+         sprintf( buf, "'%s' is not a valid email address.\n\r"
+                       "Please enter your email address: ", arg );
+         return;
+      }
+
+      stringtemp = arg;
+      d->account->setEmail( stringtemp );
+
+      sprintf( buf, "Email set to: '%s'\n\r"
+                    "If this is incorrect, please fix it at menu screen before you\n\r"
+                    "create your first character.\n\r\n\r", stringtemp.c_str() );
+      SEND_TO_Q( buf, d );
+      SEND_TO_Q( "The new few questions are personal information.  You are NOT REQUIRED\n\r"
+                 "to answer these if you do not wish.  All information is kept private\n\r"
+                 "and can only be viewed by the Implementors of the game.  This info is\n\r"
+                 "used as a worst case to verify your identify in case of lost passwords.\n\r"
+                 "Again, this information is NOT REQUIRED but we encourage you to fill\n\r"
+                 "it out.\n\r\n\r", d );
+      SEND_TO_Q( "Just hit enter to leave a field blank.\n\r", d );
+      SEND_TO_Q( "Enter your first name: ", d );
+      STATE(d) = CON_ACCOUNT_GET_FIRST_NAME;  
+      break;
+
+   case CON_ACCOUNT_GET_FIRST_NAME:
+      stringtemp = arg;
+      d->account->setFirstName( stringtemp );
+      SEND_TO_Q( "Enter your last name: ", d );
+      STATE(d) = CON_ACCOUNT_GET_LAST_NAME;
+      break;
+
+   case CON_ACCOUNT_GET_LAST_NAME:
+      stringtemp = arg;
+      d->account->setLastName( stringtemp );
+      SEND_TO_Q( "Enter your mailing street address: ", d );
+      STATE(d) = CON_ACCOUNT_GET_ADDR1;
+      break;
+
+   case CON_ACCOUNT_GET_ADDR1:
+      stringtemp = arg;
+      d->account->setAddr1( stringtemp );
+      SEND_TO_Q( "Enter your city, state, zip: ", d );
+      STATE(d) = CON_ACCOUNT_GET_CITYSTATEZIP;
+      break;
+
+   case CON_ACCOUNT_GET_CITYSTATEZIP:
+      stringtemp = arg;
+      d->account->setCityStateZip( stringtemp );
+      SEND_TO_Q( "Enter your country: ", d );
+      STATE(d) = CON_ACCOUNT_GET_COUNTRY;
+      break;
+
+   case CON_ACCOUNT_GET_COUNTRY:
+      stringtemp = arg;
+      d->account->setCountry( stringtemp );
+      SEND_TO_Q( "Account Creation Successful.\n\r\n\r", d );
+      STATE(d) = CON_ACCOUNT_MENU;
+      break;
+
    case CON_GET_NEW_SEX:
       switch ( *arg )
       {
@@ -1146,7 +1365,21 @@ void nanny(struct descriptor_data *d, char *arg)
     }
 }
 
+// This is mostly just to keep people from putting meta-chars
+// into their email address.
+int _parse_email( char * arg )
+{
+   if( strlen(arg) < 4 )
+      return 0;
 
+   for(; *arg != '\0'; arg++)
+      if( !isalnum(*arg) && *arg != '@' && *arg != '.' &&
+                            *arg != '_' && *arg != '-' 
+        )
+         return 0;
+
+   return 1;
+}
 
 // Parse a name for acceptability.
 int _parse_name(char *arg, char *name)
@@ -1200,6 +1433,29 @@ int _parse_name(char *arg, char *name)
       )
       return 1;
    
+   return 0;
+}
+
+
+// Parse an account name for acceptability.
+// Return 1 for failure
+// Return 0 for valid account name
+int _parse_account(char * arg, char * name)
+{
+   int i;
+   
+   /* skip whitespaces */
+   for (; isspace(*arg); arg++);
+   
+   for (i = 0; (name[i] = arg[i]) != '\0'; i++)
+   {
+      if ( name[i] < 0 || !isalpha(name[i]) || i > ACCOUNT_MAX_LENGTH )
+         return 1;
+   }
+   
+   if ( i < 2 )
+      return 1;
+
    return 0;
 }
 

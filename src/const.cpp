@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: const.cpp,v 1.55 2003/04/18 01:24:51 pirahna Exp $ */
+/* $Id: const.cpp,v 1.56 2003/04/20 22:14:53 pirahna Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -197,6 +197,7 @@ char *spell_wear_off_msg[] =
   "!Blue bird!",
   "With a rush of strength, the $6debility$R fades from your body.",
   "Your rapid decay ends and your health returns to normal.",
+  "The shadow in your aura fades away into the ethereal.",
   "!UNUSED!"
 };
 
@@ -242,7 +243,7 @@ char *connected_states[] =
     "CON_GET_ACCOUNT",                  
     "CON_CONFIRM_NEW_ACCOUNT",
     "CON_ACCOUNT_GET_EMAIL_ADDRESS",
-    "CON_ACCOUNT_CONFIRM_EMAIL_ADDRESS",
+    "CON_ACCOUNT_CONFIRM_NEW_PASSWORD",
     "CON_ACCOUNT_GET_FIRST_NAME",
     "CON_ACCOUNT_GET_LAST_NAME",      
     "CON_ACCOUNT_GET_ADDR1",       
@@ -253,6 +254,9 @@ char *connected_states[] =
     "CON_ACCOUNT_GET_PHONE",
     "CON_ACCOUNT_GET_SECRET_QUESTION",
     "CON_ACCOUNT_GET_SECRET_ANSWER",
+    "CON_ACCOUNT_GET_OLD_PASSWORD",
+    "CON_ACCOUNT_GET_NEW_PASSWORD",
+    "CON_ACCOUNT_MENU",
     "\n"
 };
 

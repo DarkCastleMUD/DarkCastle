@@ -5,7 +5,7 @@
  *                                                                           *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-/* $Id: magic.h,v 1.7 2002/12/27 01:45:12 pirahna Exp $ */
+/* $Id: magic.h,v 1.8 2003/04/20 22:15:01 pirahna Exp $ */
 #ifndef MAGIC_H_
 #define MAGIC_H_
 
@@ -557,6 +557,11 @@ int cast_debility(byte level, CHAR_DATA * ch, char *arg, int type,
 int spell_attrition(byte level, CHAR_DATA * ch,
    CHAR_DATA * victim, struct obj_data * obj, int skill);
 int cast_attrition(byte level, CHAR_DATA * ch, char *arg, int type,
+   CHAR_DATA * victim, struct obj_data * tar_obj, int skill);
+
+int spell_vampiric_aura(byte level, CHAR_DATA * ch,
+   CHAR_DATA * victim, struct obj_data * obj, int skill);
+int cast_vampiric_aura(byte level, CHAR_DATA * ch, char *arg, int type,
    CHAR_DATA * victim, struct obj_data * tar_obj, int skill);
 
 

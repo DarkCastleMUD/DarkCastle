@@ -164,6 +164,7 @@ void assign_non_combat_procs() {
     SPEC_FUN    generic_doorpick_blocker;
     SPEC_FUN    startrek_miles;
     SPEC_FUN    generic_area_guard;
+    SPEC_FUN    pthief_hater;
 
     assign_one_mob_non(1,  deth);
     assign_one_mob_non(2,  charon);
@@ -237,6 +238,7 @@ void assign_non_combat_procs() {
     assign_one_mob_non(5200, passive_magic_user);
     assign_one_mob_non(5900,  turtle_green);
     assign_one_mob_non(6437,  generic_blocker);
+    assign_one_mob_non(6500,  pthief_hater);
     assign_one_mob_non(6902,  guild); // master shaolin monks teach 'stun'
     assign_one_mob_non(6910, passive_magic_user);
     assign_one_mob_non(7200, passive_magic_user);

@@ -1,26 +1,21 @@
 #ifndef CONNECT_H_
 #define CONNECT_H_
 /************************************************************************
-| $Id: connect.h,v 1.3 2003/04/18 01:24:56 pirahna Exp $
+| $Id: connect.h,v 1.4 2003/04/20 22:15:01 pirahna Exp $
 | connect.h
 | Description: State of connectedness information.
 */
 #include <structs.h>  // MAX_INPUT_LENGTH
 #include <comm.h>
-//#include <netinet/in.h>
  
-#ifdef NeXT
-#ifndef bool
-#define bool int
-#endif
-#endif
+#include <Account.h>
 
 #define STATE(d)  ((d)->connected) 
 #define CON_PLAYING                        0 
 #define CON_GET_NAME                       1 
-#define CON_GET_OLD_PASSWORD               2 
+#define CON_GET_OLD_PASSWORD               2  // this gets replaced by account version
 #define CON_CONFIRM_NEW_NAME               3 
-#define CON_GET_NEW_PASSWORD               4 
+#define CON_GET_NEW_PASSWORD               4  // this gets replaces by account version
 #define CON_CONFIRM_NEW_PASSWORD           5 
 #define CON_GET_NEW_SEX                    6 
 #define CON_GET_NEW_CLASS                  7 
@@ -46,7 +41,7 @@
 #define CON_GET_ACCOUNT                    26 
 #define CON_CONFIRM_NEW_ACCOUNT            27 
 #define CON_ACCOUNT_GET_EMAIL_ADDRESS      28 
-#define CON_ACCOUNT_CONFIRM_EMAIL_ADDRESS  29 
+#define CON_ACCOUNT_CONFIRM_NEW_PASSWORD   29 
 #define CON_ACCOUNT_GET_FIRST_NAME         30 
 #define CON_ACCOUNT_GET_LAST_NAME          31 
 #define CON_ACCOUNT_GET_ADDR1              32 
@@ -57,6 +52,10 @@
 #define CON_ACCOUNT_GET_PHONE              37 
 #define CON_ACCOUNT_GET_SECRET_QUESTION    38 
 #define CON_ACCOUNT_GET_SECRET_ANSWER      39
+#define CON_ACCOUNT_GET_OLD_PASSWORD       40
+#define CON_ACCOUNT_GET_NEW_PASSWORD       41
+#define CON_ACCOUNT_MENU                   42
+
 // if you change, make sure you update char *connected_states[] in const.C
 // also update connected_types[]
 
@@ -69,14 +68,10 @@ struct stat_shit
 
 struct descriptor_data
 {
-    unsigned		descriptor;		/* file descriptor for socket	*/
+    unsigned	descriptor;		/* file descriptor for socket	*/
     int         desc_num;    
     char *	name;			/* Copy of the player name	*/
     char	host[80];              	/* hostname			*/
-
-// have a feeling this isn't used
-//    int		pos;			/* position in player-file	*/
-
     int		connected;		/* mode of 'connectedness'	*/
     int		wait;			/* wait for how many loops	*/
     char *	showstr_head;		/* for paging through texts	*/
@@ -107,6 +102,8 @@ struct descriptor_data
     byte        idle_tics;
     time_t      login_time;
     struct stat_shit * stats;            // for rolling up a char 
+
+    CAccount  * account;                 // Account attached to this desc
 };
 
 #endif

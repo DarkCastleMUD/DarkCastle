@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.67 2003/04/18 01:00:49 pirahna Exp $ */
+/* $Id: magic.cpp,v 1.68 2003/04/20 22:14:53 pirahna Exp $ */
 
 extern "C"
 {
@@ -9139,4 +9139,57 @@ int cast_attrition( byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *t
   return eFAILURE;
 }
 
+
+int spell_vampiric_aura(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
+{
+  struct affected_type af;
+
+  if (affected_by_spell(victim, SPELL_ACID_SHIELD)) {
+     act("A film of shadow begins to rise around $n but fades around $s ankles.", victim, 0, 0, TO_ROOM, INVIS_NULL);
+     send_to_char("A film of shadow tries to rise around you but dissolves in your acid shield.\n\r", ch);
+     return eFAILURE;
+  }
+
+  if (!affected_by_spell(victim, SPELL_VAMPIRIC_AURA))
+  {
+    skill_increase_check(ch, SPELL_VAMPIRIC_AURA, skill, SKILL_INCREASE_HARD);
+    act("A film of shadow encompasses $n then fades from view.", victim, 0, 0, TO_ROOM, INVIS_NULL);
+    act("A film of shadow encompasses you then fades from view.", victim, 0, 0, TO_CHAR, 0);
+
+    af.type      = SPELL_VAMPIRIC_AURA;
+    af.duration  = skill / 25;
+    af.modifier  = skill;
+    af.location  = APPLY_NONE;
+    af.bitvector = 0;
+    affect_to_char(victim, &af);
+  }
+  return eSUCCESS;
+}
+
+int cast_vampiric_aura( byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill )
+{
+  switch (type) 
+  {
+    case SPELL_TYPE_SPELL:
+       return spell_vampiric_aura(level, ch, tar_ch, 0, skill);
+       break;
+    case SPELL_TYPE_POTION:
+       return spell_vampiric_aura(level, ch, ch, 0, skill);
+       break;
+    case SPELL_TYPE_SCROLL:
+       if(tar_obj)
+          return eFAILURE;
+       if(!tar_ch) tar_ch = ch;
+          return spell_vampiric_aura(level, ch, tar_ch, 0, skill);
+       break;
+    case SPELL_TYPE_STAFF:
+       for (tar_ch = world[ch->in_room].people ; tar_ch ; tar_ch = tar_ch->next_in_room)
+          spell_vampiric_aura(level,ch,tar_ch,0, skill);
+       break;
+    default :
+       log("Serious screw-up in vampiric aura!", ANGEL, LOG_BUG);
+       break;
+  }
+  return eFAILURE;
+}
 

@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.104 2003/04/16 04:10:03 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.105 2003/04/20 22:14:53 pirahna Exp $ */
 
 extern "C"
 {
@@ -55,6 +55,7 @@ int is_stunned(CHAR_DATA *ch);
 int do_lightning_shield(CHAR_DATA *ch, CHAR_DATA *vict, int dam);
 bool do_frostshield(CHAR_DATA *ch, CHAR_DATA *vict);
 int do_fireshield(CHAR_DATA *ch, CHAR_DATA *vict, int dam);
+int do_vampiric_aura(CHAR_DATA *ch, CHAR_DATA *vict);
 void do_dam_msgs(CHAR_DATA *ch, CHAR_DATA *victim, int dam, int attacktype, int weapon);
 void inform_victim(CHAR_DATA *ch, CHAR_DATA *vict, int dam);
 void update_stuns(CHAR_DATA *ch);
@@ -519,6 +520,34 @@ int do_lightning_shield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
   }
 
   return eSUCCESS;
+}
+
+
+// standard retvals
+int do_vampiric_aura(CHAR_DATA *ch, CHAR_DATA *vict)
+{
+  if (!ch || !vict || ch == vict) {
+    log("Null ch or vict, or ch==vict sent to do_vampiric_aura!", IMP, LOG_BUG);
+    abort();
+  }
+  
+  if(GET_POS(vict) == POSITION_DEAD)            return eFAILURE;
+  if(!IS_NPC(ch) && GET_LEVEL(ch) >= IMMORTAL)  return eFAILURE;
+
+  struct affected_type * af;
+
+  if( NULL == ( af = affected_by_spell(vict, SPELL_VAMPIRIC_AURA) ) )
+     return eFAILURE;
+
+  // ch just hit vict...vict has Vampiric aura up
+  if( number(0, 101) < ( (af->modifier)/10 ) )
+  {
+    int level = MAX(1, af->modifier/6);
+    int retval = spell_vampiric_touch(level, vict, ch, 0, af->modifier);
+    retval = SWAP_CH_VICT( retval );
+    return retval;
+  }
+  return eFAILURE;
 }
 
 // standard retvals
@@ -1483,6 +1512,9 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
     if(SOMEONE_DIED(retval))
       return damage_retval(ch, victim, retval);
     retval = do_lightning_shield(ch, victim, dam);
+    if(SOMEONE_DIED(retval))
+      return damage_retval(ch, victim, retval);
+    retval = do_vampiric_aura(ch, victim);
     if(SOMEONE_DIED(retval))
       return damage_retval(ch, victim, retval);
   }

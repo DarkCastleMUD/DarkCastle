@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.31 2003/04/01 04:26:32 pirahna Exp $ */
+/* $Id: mob_proc.cpp,v 1.32 2003/04/20 22:14:54 pirahna Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -5250,6 +5250,29 @@ int generic_area_guard(struct char_data *ch, struct obj_data *obj, int cmd, char
         for(vict = world[world[ch->in_room].dir_option[i]->to_room].people; vict; vict = vict->next_in_room)
             if(vict->fighting)
               return attempt_move( ch, ++i );
+
+   return eFAILURE;
+}
+
+int pthief_hater(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
+          struct char_data *owner)
+{
+   if(cmd)
+      return eFAILURE;
+
+   char_data * vict;
+   for(vict = world[ch->in_room].people; vict; vict = vict->next_in_room)
+      if(affected_by_spell(vict, FUCK_PTHIEF))
+      {
+         switch(ch->mobdata->nr) {
+            case 6500: // Chandos
+               do_say(ch, "The honorable enchanters cannot abide with thieves.", 9);
+               return attack( ch, vict, TYPE_UNDEFINED );
+            default:
+               do_say(ch, "I hate thieves!", 9);
+               return attack( ch, vict, TYPE_UNDEFINED );
+         }
+      }
 
    return eFAILURE;
 }
