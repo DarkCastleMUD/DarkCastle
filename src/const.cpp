@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: const.cpp,v 1.53 2003/01/16 06:33:41 dcastle Exp $ */
+/* $Id: const.cpp,v 1.54 2003/02/13 22:54:12 pirahna Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1223,6 +1223,7 @@ struct class_skill_defines u_skills[] = { // druid skills
 {    "sun ray",		SPELL_SUN_RAY,		14,	90,	3203,	NULL },
 {    "sense life",	SPELL_SENSE_LIFE,	15,	90,	-2, "Find the Black Queen in the game of life." },
 {    "water breathing",	SPELL_WATER_BREATHING,	17,	90,	3203,	NULL },
+{    "rapid mend",	SPELL_RAPID_MEND,	18,	90,	-2, "I will teach you this if you return to me a stolen peacock's feather." },
 {    "attrition",	SPELL_ATTRITION,	19,	90,	-2, "Bring me a pair of indigo gloves if you wish to learn this." },
 {    "stone shield",	SPELL_STONE_SHIELD,	20,	90,	-2, "The druid of druids can help you learn this most quintisential skill."},
 {    "drown",		SPELL_DROWN,		22,	90,	3203,	NULL },
