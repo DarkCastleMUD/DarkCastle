@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.22 2002/08/01 23:21:26 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.23 2002/08/02 00:39:50 pirahna Exp $ */
 
 extern "C"
 {
@@ -689,11 +689,9 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
     chance = 102; // can't miss
   else
   {
-    if(GET_LEVEL(ch) < 20)
-       chance = 30 - GET_LEVEL(ch);        // set base
-    else chance = 10;
+    chance = 50 - GET_LEVEL(vict);
 
-    chance += GET_LEVEL(ch) - GET_LEVEL(vict);
+    //chance += GET_LEVEL(ch) - GET_LEVEL(vict);
     chance += GET_HITROLL(ch);
     chance += str_app[STRENGTH_APPLY_INDEX(ch)].tohit;
     chance += ( GET_AC(vict) / 10 );  // (positive ac hurts you, negative helps)
