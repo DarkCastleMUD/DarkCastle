@@ -1596,7 +1596,7 @@ int new_descriptor(int s)
     CLOSE_SOCKET(desc);
     sprintf(buf, "Connection attempt denied from [%s]", newd->host);
     log(buf, ANGEL, LOG_SOCKET);
-    dc_free(newd->host);
+   // dc_free(newd->host);
     dc_free(newd);
     return 0;
   }
@@ -2459,7 +2459,7 @@ char *any_one_arg(char *argument, char *first_arg)
 void warn_if_duplicate_ip(char_data * ch)
 {
    char buf[256];
-
+   int highlev = 51;
    for(descriptor_data * d = descriptor_list; d; d = d->next) 
    {
       if( d->character && 
@@ -2467,8 +2467,10 @@ void warn_if_duplicate_ip(char_data * ch)
           !strcmp(d->host, ch->desc->host)
         )
       {
+	highlev = MAX(GET_LEVEL(d->character), GET_LEVEL(ch));
+	highlev = MAX(highlev, IMMORTAL);
         sprintf(buf, "MultipleIP: %s -> %s / %s", d->host, GET_NAME(ch), GET_NAME(d->character));
-        log(buf, IMMORTAL, LOG_WARNINGS );
+        log(buf, highlev, LOG_WARNINGS );
       }
    }
 
