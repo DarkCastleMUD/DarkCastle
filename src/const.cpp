@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: const.cpp,v 1.13 2002/08/01 05:34:21 dcastle Exp $ */
+/* $Id: const.cpp,v 1.14 2002/08/01 19:14:33 pirahna Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -928,10 +928,10 @@ struct class_skill_defines w_skills[] = {
 {    "parry",		SKILL_PARRY,		20,	50,	18015, 	"You must see the constable of Newtonia to learn parry." },
 {    "blindfighting",   SKILL_BLINDFIGHTING,    21,     80,     3023,   NULL },
 {    "triple",		SKILL_THIRD_ATTACK,	23,	75,	3023, 	"You have to go see Bjorn the warrior guildmaster." },
-{    "hitall",		SKILL_HITALL,		25,	75,	3023, 	"You have to go see Bjorn the warrior guildmaster." },
+{    "hitall",		SKILL_HITALL,		25,	75,	3023, 	"Ask the son of the Sarina King to please teach you that." },
 {    "archery",		SKILL_ARCHERY,		27,	60,	3023, 	"You have to go see Bjorn the warrior guildmaster." },
 {    "deathstroke",	SKILL_DEATHSTROKE,	30,	75,	3023, 	"You have to go see Bjorn the warrior guildmaster." },
-{    "shield block",    SKILL_SHIELDBLOCK,      33,     50,     725, 	"You must see the prince of Sarina." },
+{    "shield block",    SKILL_SHIELDBLOCK,      33,     50,     725, 	"To learn this skill you must seek its master, the God of War in his arena.  Ask him to please teach you." },
 {    "stun",		SKILL_STUN,		35,	50,	6902, 	"Go to see any master shaolin monk." },
 {    "guard",		SKILL_GUARD,		37,	75,	3023,	NULL },
 {    "riposte",		SKILL_RIPOSTE,		40,	75,	3023, 	"You have to go see Bjorn the warrior guildmaster." },
@@ -942,7 +942,7 @@ struct class_skill_defines w_skills[] = {
 
 struct class_skill_defines t_skills[] = {
 {    "sneak",		SKILL_SNEAK,		1,	75,	3022, 	"You have to go see Skiv the thief guildmaster." },
-{    "shield block",    SKILL_SHIELDBLOCK,      1,      40,     725, 	"You must see the prince of Sarina." },
+{    "shield block",    SKILL_SHIELDBLOCK,      1,      40,     725, 	"To learn this skill you must seek its master, the God of War in his arena.  Ask him to please teach you." },
 {    "backstab",	SKILL_BACKSTAB,		2,	90,	3022, 	"You have to go see Skiv the thief guildmaster." },
 {    "hide",		SKILL_HIDE,		5, 	75,	3022, 	"You have to go see Skiv the thief guildmaster." },
 {    "pick",		SKILL_PICK_LOCK,	7,	75,	3022, 	"You have to go see Skiv the thief guildmaster." },
@@ -966,7 +966,7 @@ struct class_skill_defines a_skills[] = {
 {    "harmtouch",	SKILL_HARM_TOUCH,	1,	90,	10005, 	"You have to go see Skarl the anti-paladin guildmaster." },
 {    "sneak",		SKILL_SNEAK,		2,	60,	10005,	"You have to go see Skarl the anti-paladin guildmaster." },
 {    "kick",		SKILL_KICK,		3,	75,	10005, 	"You have to go see Skarl the anti-paladin guildmaster." },
-{    "shield block",    SKILL_SHIELDBLOCK,      5,      50,     725, 	"You must see the prince of Sarina." },
+{    "shield block",    SKILL_SHIELDBLOCK,      5,      50,     725, 	"To learn this skill you must seek its master, the God of War in his arena.  Ask him to please teach you." },
 {    "dual wield",      SKILL_DUAL_WIELD,       10,	60,     10005, 	"You have to go see Skarl the anti-paladin guildmaster." },
 {    "hide", 		SKILL_HIDE,		15,	60,	10005, 	"You have to go see Skarl the anti-paladin guildmaster." },
 {    "backstab",	SKILL_BACKSTAB,		17,	80,	10005, 	"You have to go see Skarl the anti-paladin guildmaster." },
@@ -1000,7 +1000,7 @@ struct class_skill_defines a_skills[] = {
 struct class_skill_defines p_skills[] = {
 {    "layhands",	SKILL_LAY_HANDS,	1,	90,	10006, 	"You have to go see the paladin guildmaster." },
 {    "bash",		SKILL_BASH,		2,	75,	14517, 	"You must find a local warrior.  He said something about a field filled with bees." },
-{    "shield block",    SKILL_SHIELDBLOCK,      3,      50,     725, 	"You must see the prince of Sarina." },
+{    "shield block",    SKILL_SHIELDBLOCK,      3,      50,     725, 	"To learn this skill you must seek its master, the God of War in his arena.  Ask him to please teach you." },
 {    "kick",		SKILL_KICK,		5,	80,	10006, 	"You have to go see the paladin guildmaster." },
 {    "rescue",		SKILL_RESCUE,		7,	80,	10006, 	"You have to go see the paladin guildmaster." },
 {    "dual wield",      SKILL_DUAL_WIELD,       10,     60,     10006, 	"You have to go see the paladin guildmaster." },
@@ -1038,7 +1038,7 @@ struct class_skill_defines b_skills[] = {
 {    "bash",		SKILL_BASH,		3,	75,	14517, 	"You must find a local warrior.  He said something about a field filled with bees." },
 {    "parry",		SKILL_PARRY,		5,	40,	18015, 	"You must see the constable of Newtonia to learn parry." },
 {    "dodge",		SKILL_DODGE,		7,	10,	10007, 	"You have to go see Mooral the barbarian guildmaster." },
-{    "shield block",    SKILL_SHIELDBLOCK,      8,      40,     725, 	"You must see the prince of Sarina." },
+{    "shield block",    SKILL_SHIELDBLOCK,      8,      40,     725, 	"To learn this skill you must seek its master, the God of War in his arena.  Ask him to please teach you." },
 {    "double",		SKILL_SECOND_ATTACK,	10,	80,	702, 	"Seek the Prince of Delcim for your training in that." },
 {    "blood fury",	SKILL_BLOOD_FURY,	13,	80,	10007, 	"You have to go see Mooral the barbarian guildmaster." },
 {    "frenzy",		SKILL_FRENZY,		18,	50,	16006,	"There is a highlander chief.  The chief of mountain trail guard.  You must locate him to learn this skill." },
@@ -1056,7 +1056,7 @@ struct class_skill_defines k_skills[] = {
 {    "dodge",		SKILL_DODGE,		2,	75,	10008,  "You have to go see Grox the monk guildmaster." },
 {    "redirect",	SKILL_REDIRECT,		3,	75,	10008, 	"You have to go see Grox the monk guildmaster."},
 {    "trip",		SKILL_TRIP,		5,	75,	10008, 	"You have to go see Grox the monk guildmaster."},
-{    "shield block",    SKILL_SHIELDBLOCK,      7,      60,     725, 	"You must see the prince of Sarina."},
+{    "shield block",    SKILL_SHIELDBLOCK,      7,      60,     725, 	"To learn this skill you must seek its master, the God of War in his arena.  Ask him to please teach you."},
 {    "rescue",  	SKILL_RESCUE,		10,	70,	10008, 	"You have to go see Grox the monk guildmaster."},
 {    "eagleclaw",	SKILL_EAGLE_CLAW,	17,	75,	10008, 	"You have to go see Grox the monk guildmaster."},
 {    "dual wield",      SKILL_DUAL_WIELD,       20,     60,     10008, 	NULL},
@@ -1080,7 +1080,7 @@ struct class_skill_defines r_skills[] = {
 {    "dodge",		SKILL_DODGE,		4,	70,	10013, 	"You have to go see Hawk the ranger guildmaster." },
 {    "dual wield",	SKILL_DUAL_WIELD,       5,      80,     10013, 	"You have to go see Hawk the ranger guildmaster." },
 {    "trip",		SKILL_TRIP,		7,	75,	10013, 	"You have to go see Hawk the ranger guildmaster." },
-{    "shield block",    SKILL_SHIELDBLOCK,      9,      40,     725, 	"See the King of Sarina's son." },
+{    "shield block",    SKILL_SHIELDBLOCK,      9,      40,     725, 	"To learn this skill you must seek its master, the God of War in his arena.  Ask him to please teach you." },
 {    "archery",		SKILL_ARCHERY,		12,	80,	10013, 	"You have to go see Hawk the ranger guildmaster." },
 {    "ambush",		SKILL_AMBUSH,		13,	75,	10013, 	"You have to go see Hawk the ranger guildmaster." },
 {    "double",		SKILL_SECOND_ATTACK,	14,	80,	702, 	"See the King of Delcim's son." },
