@@ -1,7 +1,7 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.8 2003/01/21 05:34:38 pirahna Exp $
+| $Id: character.h,v 1.9 2003/03/07 02:46:40 pirahna Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
@@ -156,7 +156,8 @@ struct pc_data
 
      int16 statmetas;           // How many times I've metad a stat
                                 // This number could go negative from stat loss
- 
+    uint16 kimetas;             // How many times I've metad ki (pc only)
+
     long wizinvis;
 
     uint16 practices;         // How many can you learn yet this level

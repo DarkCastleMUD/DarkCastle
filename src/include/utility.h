@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: utility.h,v 1.16 2003/01/21 05:34:38 pirahna Exp $ */
+/* $Id: utility.h,v 1.17 2003/03/07 02:46:40 pirahna Exp $ */
 
 #ifndef UTILITY_H_
 #define UTILITY_H_
@@ -133,9 +133,10 @@ bool IS_DARK( int room );
 #define GET_GROUP_PKILLS(ch)        ((ch)->pcdata->group_kills)
 #define GET_GROUP_PKILLSTOTAL(ch)   ((ch)->pcdata->grplvl)
 
-#define GET_HP_METAS(ch) ((ch)->hpmetas)
+#define GET_HP_METAS(ch)   ((ch)->hpmetas)
 #define GET_MANA_METAS(ch) ((ch)->manametas)
 #define GET_MOVE_METAS(ch) ((ch)->movemetas)
+#define GET_KI_METAS(ch)   ((ch)->pcdata->kimetas)
 
 #define GET_POS(ch)     ((ch)->position)
 #define GET_COND(ch, i) ((ch)->conditions[(i)])

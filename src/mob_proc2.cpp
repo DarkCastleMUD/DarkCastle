@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.22 2003/03/06 23:36:32 pirahna Exp $ */
+/* $Id: mob_proc2.cpp,v 1.23 2003/03/07 02:46:34 pirahna Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -1049,6 +1049,19 @@ int meta_get_mana_plat_cost(char_data * ch)
    return cost;
 }
 
+int meta_get_ki_exp_cost(char_data * ch)
+{
+  int cost = GET_MAX_KI(ch);
+  cost *= 10000;  // approx 500k
+  cost += GET_KI_METAS(ch)*100000;
+  return cost;
+}
+ 
+int meta_get_ki_plat_cost(char_data * ch)
+{
+  int cost = 100 + 100 * GET_KI_METAS(ch);
+  return cost;
+}
 
 int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,        
           struct char_data *owner)
@@ -1059,7 +1072,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
   int stat;
   int choice;
   int increase;
-  int hit_cost, mana_cost, move_cost, hit_exp, move_exp, mana_exp;
+  int hit_cost, mana_cost, move_cost, ki_cost, hit_exp, move_exp, mana_exp, ki_exp;
   int price, statplatprice, max_stat;
 
   long gold;
@@ -1095,6 +1108,11 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
   move_cost = meta_get_moves_plat_cost(ch);
   mana_cost = meta_get_mana_plat_cost(ch); 
 
+  if(!IS_MOB(ch)) {
+    ki_exp = meta_get_ki_exp_cost(ch);
+    ki_cost = meta_get_ki_plat_cost(ch);
+  }
+
   if(cmd == 59) {           /* List */
     send_to_char("The Meta-physician tells you, 'This is what I can do for you... \n\r", ch);
 
@@ -1123,7 +1141,12 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 /*
     csendf(ch, "18) Add 1 lonely hit point:      %d exp + %d "
             "Platinum coins.\n\r", hit_exp/5, hit_cost/5); 
-*/    
+*/ 
+    if(!IS_MOB(ch)) {   // mobs can't meta ki
+      if(GET_KI_METAS(ch) > 4)
+	send_to_char("19) Your ki is already meta'd fully.\n\r", ch);
+      else csendf(ch, "19) Add a point of ki:           %d exp + %d Platinum coins.\n\r", ki_exp, ki_cost);
+    }
     return eSUCCESS;
   }
 
@@ -1465,6 +1488,35 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
      return eSUCCESS;
    }
 */
+  if(choice == 19) {
+    if(IS_MOB(ch)) {
+      send_to_char("Mobs cannot meta ki.\r\n", ch);
+      return eSUCCESS;
+    }
+    if(GET_EXP(ch) < ki_exp) {
+      send_to_char("The Meta-physician tells you, 'You lack the experience.'\n\r", ch);
+      return eSUCCESS;
+    }    
+    if(GET_PLATINUM(ch) < (uint32)(ki_cost)) {
+      send_to_char("The Meta-physician tells you, 'You can't afford my services!  SCRAM!'\n\r", ch);
+      return eSUCCESS;
+    }
+    if(GET_KI_METAS(ch) > 4) {
+      send_to_char("The Meta-physician tells you, 'You have already meta'd your ki to the maximum.'\n\r", ch);
+      return eSUCCESS;
+    }
+
+    GET_EXP(ch) -= ki_exp;
+    GET_PLATINUM(ch) -= ki_cost;
+    
+    ch->raw_ki += 1;
+    ch->max_ki += 1;
+    GET_KI_METAS(ch) += 1;
+    
+    act("The Meta-physician touches $n.",  ch, 0, 0, TO_ROOM, 0);
+    act("The Meta-physician touches you.",  ch, 0, 0, TO_CHAR, 0);
+    return eSUCCESS;
+  }
  }
   send_to_char("The Meta-physician tells you, 'Buy what?!'\n\r", ch);
   return eSUCCESS;
