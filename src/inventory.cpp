@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.14 2002/09/12 00:00:40 pirahna Exp $
+| $Id: inventory.cpp,v 1.15 2002/09/12 00:56:48 pirahna Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -119,6 +119,7 @@ int do_get(struct char_data *ch, char *argument, int cmd)
     bool has_consent = FALSE;
     int type   = 3;
     bool alldot = FALSE;
+    bool inventorycontainer = FALSE;
     char allbuf[MAX_STRING_LENGTH];
 
     argument_interpreter(argument, arg1, arg2);
@@ -320,8 +321,10 @@ int do_get(struct char_data *ch, char *argument, int cmd)
 	    fail    = FALSE; 
 	    sub_object = get_obj_in_list_vis(ch, arg2, 
 		world[ch->in_room].contents);
-	    if (!sub_object)
+	    if (!sub_object) {
 		sub_object = get_obj_in_list_vis(ch, arg2, ch->carrying);
+                inventorycontainer = TRUE;
+            }
 
 	    if (sub_object) {
 	        if(sub_object->obj_flags.type_flag == ITEM_CONTAINER && 
@@ -353,7 +356,10 @@ int do_get(struct char_data *ch, char *argument, int cmd)
 		    }
 		    if (CAN_SEE_OBJ(ch,obj_object)) {
 		      if ((IS_CARRYING_N(ch) + 1 < CAN_CARRY_N(ch))) {
-		        if ((IS_CARRYING_W(ch) + obj_object->obj_flags.weight) < CAN_CARRY_W(ch) || GET_LEVEL(ch) > IMMORTAL) {
+		        if (inventorycontainer || 
+                            (IS_CARRYING_W(ch) + obj_object->obj_flags.weight) < CAN_CARRY_W(ch) ||
+                            GET_LEVEL(ch) > IMMORTAL) 
+                        {
                           if(has_consent && IS_SET(obj_object->obj_flags.more_flags, ITEM_NO_TRADE)) {
                             // if I have consent and i'm touching the corpse, then I shouldn't be able
                             // to pick up no_trade items because it is someone else's corpse.  If I am
@@ -412,6 +418,7 @@ int do_get(struct char_data *ch, char *argument, int cmd)
 			   world[ch->in_room].contents);
 	  if (!sub_object){
 	    sub_object = get_obj_in_list_vis(ch, arg2, ch->carrying);
+            inventorycontainer = TRUE;
 	  }
 	  if(sub_object) {
 	    if(sub_object->obj_flags.type_flag == ITEM_CONTAINER && 
@@ -436,8 +443,9 @@ int do_get(struct char_data *ch, char *argument, int cmd)
 	      obj_object = get_obj_in_list_vis(ch, arg1, sub_object->contains);
 	      if (obj_object) {
 	    if ((IS_CARRYING_N(ch) + 1 < CAN_CARRY_N(ch))) {
-	      if ((IS_CARRYING_W(ch) + obj_object->obj_flags.weight) < 
-		  CAN_CARRY_W(ch)) {
+	      if (inventorycontainer || 
+                  (IS_CARRYING_W(ch) + obj_object->obj_flags.weight) < CAN_CARRY_W(ch)) 
+              {
                 if(has_consent && IS_SET(obj_object->obj_flags.more_flags, ITEM_NO_TRADE)) {
                   // if I have consent and i'm touching the corpse, then I shouldn't be able
                   // to pick up no_trade items because it is someone else's corpse.  If I am
