@@ -2257,6 +2257,8 @@ int glove_combat_procs(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
 int hot_potato(struct char_data*ch, struct obj_data *obj, int cmd, char*arg, 
                    CHAR_DATA *invoker)
 {
+   
+   int dropped = 0;
    char_data * vict = NULL;
 
    if(obj->equipped_by)
@@ -2326,10 +2328,14 @@ int hot_potato(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
       return eFAILURE;
    }
 
+   if (number(1, 100) > 90 && GET_LEVEL(vict) < 100) {
+     dropped = 1;
+   }
+
    if(cmd)
       return eFAILURE;
 
-   if(obj->obj_flags.value[3] > 0) 
+   if(obj->obj_flags.value[3] > 0 && dropped == 0) 
    {
       obj->obj_flags.value[3]--;
       if(obj->obj_flags.value[3] % 3 == 0)
@@ -2339,6 +2345,12 @@ int hot_potato(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
       for(descriptor_data * i = descriptor_list; i; i = i->next)
          if(i->character && i->character->in_room != vict->in_room && !i->connected)
             send_to_char("You hear a large BOOM from somewhere in the distance.\n\r", i->character);
+
+       if (dropped == 1) {
+         send_to_char("OOPS!!! The hot potato burned you and you dropped it!!!", vict);
+         act("$n screams in agony as they are burned by the potato and DROPS it!", vict, 0, 0, TO_ROOM, 0);
+       }
+
        act("The hot potato $n is carrying beeps one final time.\n\r"
            "\n\r$B"
            "BBBB   OOO   OOO  M   M !! !!\n\r"
