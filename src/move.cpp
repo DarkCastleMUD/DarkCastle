@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.22 2004/04/19 18:55:42 urizen Exp $
+| $Id: move.cpp,v 1.23 2004/04/19 19:22:50 urizen Exp $
 | move.C
 | Movement commands and stuff.
 *************************************************************************
@@ -453,7 +453,7 @@ int do_simple_move(CHAR_DATA *ch, int cmd, int following)
           add_memory(ch, GET_NAME(chaser), 'f');
           remove_memory(ch, 'h');
        }
-       if (IS_NPC(chaser)) {
+       if (IS_NPC(chaser) && chaser->hunting == 0) {
          if (GET_LEVEL(ch) - GET_LEVEL(chaser)/2 <= 0)
           {
                 add_memory(chaser, GET_NAME(ch), 't');

@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.149 2004/04/19 19:02:43 urizen Exp $ */
+/* $Id: fight.cpp,v 1.150 2004/04/19 19:22:49 urizen Exp $ */
 
 extern "C"
 {
@@ -2167,10 +2167,12 @@ void set_fighting(CHAR_DATA * ch, CHAR_DATA * vict)
      ch->master && !IS_NPC(ch->master))
     if(!IS_SET(vict->mobdata->actflags, ACT_STUPID))
       add_memory(vict, GET_NAME(ch->master), 'h');
+
+
   if (!IS_NPC(ch) && IS_NPC(vict))
-     if (!IS_SET(vict->mobdata->actflags, ACT_STUPID))
+     if (!IS_SET(vict->mobdata->actflags, ACT_STUPID) && !vict->hunting)
      {
-       if (GET_LEVEL(ch) - GET_LEVEL(vict)/2 <= 0)
+       if (GET_LEVEL(ch) - GET_LEVEL(vict)/2 > 0)
           {
                 add_memory(vict, GET_NAME(ch), 't');
                 struct timer_data *timer;
@@ -2187,9 +2189,9 @@ void set_fighting(CHAR_DATA * ch, CHAR_DATA * vict)
                 timer->timeleft = (ch->level==50?24 * 60:(ch->level/5 )*60);
            }
   if (!IS_NPC(vict) && IS_NPC(ch))
-     if (!IS_SET(ch->mobdata->actflags, ACT_STUPID))
+     if (!IS_SET(ch->mobdata->actflags, ACT_STUPID) && !ch->hunting)
      {
-       if (GET_LEVEL(vict) - GET_LEVEL(ch)/2 <= 0)
+       if (GET_LEVEL(vict) - GET_LEVEL(ch)/2 > 0)
           {
                 add_memory(ch, GET_NAME(vict), 't');
                 struct timer_data *timer;
