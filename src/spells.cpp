@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.80 2004/05/14 13:32:57 urizen Exp $ */
+/* $Id: spells.cpp,v 1.81 2004/05/14 16:36:04 urizen Exp $ */
 
 extern "C"
 {
@@ -1577,6 +1577,9 @@ bool skill_success(CHAR_DATA *ch, CHAR_DATA *victim, int skillnum, int mod = 0)
     }
   i += mod;
   if (i < 33) i = 33;
+  if (IS_AFFECTED2(ch, AFF_FOCUS) && ((skillnum >= SKILL_SONG_BASE && 
+skillnum <= SKILL_SONG_MAX) || (skillnum >= KI_OFFSET && skillnum <= (KI_OFFSET+MAX_KI_LIST))))
+   i = 101; // auto success on songs and ki
   if (i > number(1,101))
     return TRUE; // Success
   else
