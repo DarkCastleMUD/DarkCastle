@@ -21,7 +21,7 @@
  *  12/08/2003   Onager    Added check for charmies and !charmie eq to     *
  *                         equip_char()                                    *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.58 2004/05/25 01:04:49 urizen Exp $ */
+/* $Id: handler.cpp,v 1.59 2004/05/25 01:13:48 urizen Exp $ */
     
 extern "C"
 {
@@ -2300,7 +2300,7 @@ void extract_char(CHAR_DATA *ch, bool pull)
     }
    if (!IS_NPC(ch)) {
 	void shatter_message(CHAR_DATA *ch);
-
+        void release_message(CHAR_DATA *ch);
 	if (ch->pcdata->golem)
 	{
 	  if (ch->pcdata->golem->in_room)
