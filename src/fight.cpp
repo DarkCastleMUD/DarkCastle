@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.200 2004/05/21 06:17:15 urizen Exp $ */
+/* $Id: fight.cpp,v 1.201 2004/05/21 14:16:43 urizen Exp $ */
 
 extern "C"
 {
@@ -2990,7 +2990,12 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
      stop_grouped_bards(ch);
   }
 
-  
+  if (victim->pcdata->golem)
+  {
+    act ("$n shatters!", victim->pcdata->golem, 0, 0, TO_ROOM, 0);
+    extract_char(victim->pcdata->golem, TRUE);
+     // Golems. Extract char puts the gear in the room.
+  }
   victim->pcdata->group_kills = 0;
   victim->pcdata->grplvl      = 0;
   if(IS_SET(victim->pcdata->punish, PUNISH_SPAMMER))
