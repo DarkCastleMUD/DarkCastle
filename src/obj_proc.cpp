@@ -2124,37 +2124,6 @@ int hot_potato(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
 {
    char_data * vict = NULL;
 
-   if(cmd == 89) {
-      send_to_char("You can't drop anything when you have a hot potato!\n\r", ch);
-      return eSUCCESS;
-   }
-   if(cmd == 90) {
-      send_to_char("You can't donate anything when you have a hot potato!\n\r", ch);
-      return eSUCCESS;
-   }
-   if(cmd == 91) {
-      send_to_char("You can't quit when you have a hot potato!\n\r", ch);
-      return eSUCCESS;
-   }
-   if(cmd == 87 || cmd == 88) {
-      // make sure vict for GIVE/SLIP is a pc
-      char obj[MAX_INPUT_LENGTH];
-      char target[MAX_INPUT_LENGTH];
-      half_chop(arg, obj, target);
-      if (!(vict = get_char_room_vis(ch, target)))
-         return eFAILURE; // Not giving to char/mob, so ok
-      if(IS_MOB(vict)) {
-         send_to_char("You can only give things to other players when you have a hot potato!\n\r", ch);
-         return eSUCCESS;
-      }
-      // if it's a player, go ahead
-      return eFAILURE;
-   }
-
-   if(cmd)
-      return eFAILURE;
-
-   vict = NULL;
    if(obj->equipped_by)
       vict = obj->equipped_by;
    if(obj->carried_by)
@@ -2166,37 +2135,83 @@ int hot_potato(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
    if(!vict)
       return eFAILURE;
 
+
+   if(cmd == 89) {
+      send_to_char("You can't drop anything when you have a hot potato!\n\r", vict);
+      return eSUCCESS;
+   }
+   if(cmd == 90) {
+      send_to_char("You can't donate anything when you have a hot potato!\n\r", vict);
+      return eSUCCESS;
+   }
+   if(cmd == 91) {
+      send_to_char("You can't quit when you have a hot potato!\n\r", vict);
+      return eSUCCESS;
+   }
+   if(cmd == 92) {
+      send_to_char("You can't junk stuff when you have a hot potato!\n\r", vict);
+      return eSUCCESS;
+   }
+   if(cmd == 87 || cmd == 88) {
+      // make sure vict for GIVE/SLIP is a pc
+      char obj[MAX_INPUT_LENGTH];
+      char target[MAX_INPUT_LENGTH];
+      half_chop(arg, obj, target);
+      char_data * give_vict;
+      if (!(give_vict = get_char_room_vis(ch, target)))
+         return eFAILURE; // Not giving to char/mob, so ok
+      if(IS_MOB(give_vict)) {
+         send_to_char("You can only give things to other players when you have a hot potato!\n\r", vict);
+         return eSUCCESS;
+      }
+      // if it's a player, go ahead
+      return eFAILURE;
+   }
+
+   if(cmd)
+      return eFAILURE;
+
    if(obj->obj_flags.value[3] > 0) 
    {
       obj->obj_flags.value[3]--;
-      if(obj->obj_flags.value[3] % 10 == 0)
-         send_to_room("You smell a delicious baked potato and hear a faint *beep*.\n\r", ch->in_room );
+      if(obj->obj_flags.value[3] % 3 == 0)
+         send_to_room("You smell a delicious baked potato and hear a faint *beep*.\n\r", vict->in_room );
    }
    else {
       if(GET_LEVEL(vict) > MORTAL) {
-         send_to_char("Hot potato timer set to 100.\n\r", ch);
-         obj->obj_flags.value[3] = 100;
+         send_to_char("Hot potato timer set to 23.\n\r", vict);
+         obj->obj_flags.value[3] = 23;
          return eFAILURE;
       }
 
       for(descriptor_data * i = descriptor_list; i; i = i->next)
-         if(i->character->in_room != ch->in_room && !i->connected)
+         if(i->character->in_room != vict->in_room && !i->connected)
             send_to_char("You hear a large BOOM from somewhere in the distance.\n\r", i->character);
        act("The hot potato $n is carrying beeps one final time.\n\r"
-           "\n\r"
+           "\n\r$B"
            "BBBB   OOO   OOO  M   M !! !!\n\r"
            "B   B O   O O   O MM MM !! !!\n\r"
            "BBBB  O   O O   O M M M !! !!\n\r"
            "B   B O   O O   O M   M \n\r"
            "BBBB   OOO   OOO  M   M !! !!\n\r"
-           "\n\r"
-           "Small piece of $n and mashed potato splatter everything."
-            , ch, 0, 0, TO_ROOM, 0);
+           "\n\r$R"
+           "Small piece of $n and mashed potato splatter everywhere!!!\n\r"
+           "$n has been KILLED!!"
+            , vict, 0, 0, TO_ROOM, 0);
 
-       GET_HIT(ch) = -1;
-       update_pos(ch);
-       send_to_char("\n\rYou have been KILLED!\n\r", ch);
-       fight_kill(ch, ch, TYPE_PKILL);
+       GET_HIT(vict) = -1;
+       update_pos(vict);
+       send_to_char("$B"
+           "BBBB   OOO   OOO  M   M !! !!\n\r"
+           "B   B O   O O   O MM MM !! !!\n\r"
+           "BBBB  O   O O   O M M M !! !!\n\r"
+           "B   B O   O O   O M   M \n\r"
+           "BBBB   OOO   OOO  M   M !! !!\n\r\n\r"
+           "$R"
+           , vict );
+       send_to_char("The baked potato you are carrying EXPLODES!!!\n\r"
+                    "You have been KILLED!\n\r", vict);
+       fight_kill(vict, vict, TYPE_PKILL);
        extract_obj(obj);      
        return eSUCCESS|eCH_DIED;
    }

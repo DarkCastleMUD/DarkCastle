@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.cpp,v 1.23 2003/04/23 01:16:58 pirahna Exp $ */
+/* $Id: interp.cpp,v 1.24 2003/04/23 01:38:21 pirahna Exp $ */
 
 extern "C"
 {
@@ -175,8 +175,8 @@ struct command_info cmd_info[] =
     { "track",      do_track,       POSITION_STANDING,  0,  10,  0 },
     { "take",       do_get,         POSITION_RESTING,   0,  9,  COM_CHARMIE_OK },
     { "palm",       do_get,         POSITION_RESTING,   3,  10,  0 },
-    { "junk",       do_tap,         POSITION_RESTING,   0,  9,  COM_CHARMIE_OK },
-    { "sacrifice",  do_tap,         POSITION_RESTING,   0,  9,  COM_CHARMIE_OK },
+    { "junk",       do_tap,         POSITION_RESTING,   0,  92, COM_CHARMIE_OK },
+    { "sacrifice",  do_tap,         POSITION_RESTING,   0,  92, COM_CHARMIE_OK },
     { "taste",      do_taste,       POSITION_RESTING,   0,  9,  COM_CHARMIE_OK },
     { "unlock",     do_unlock,      POSITION_RESTING,   0,  9,  COM_CHARMIE_OK },
     { "use",        do_use,         POSITION_RESTING,   0,  9,  COM_CHARMIE_OK },
