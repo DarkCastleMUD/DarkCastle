@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.25 2004/05/18 22:57:07 urizen Exp $ */
+/* $Id: limits.cpp,v 1.26 2004/05/19 07:26:08 urizen Exp $ */
 
 extern "C"
 {
@@ -137,10 +137,8 @@ int32 move_limit(CHAR_DATA *ch)
 }
 
 const int mana_regens[] = {
-  0, 8, 1, 1, 4, 3, 1, 1, 4, 1, 7, 0, 0
+  0, 8, 7, 1, 1, 4, 3, 1, 1, 4, 1, 7, 0, 0
 };
-
-
 
 /* manapoint gain pr. game hour */
 int mana_gain(CHAR_DATA *ch)
@@ -180,7 +178,7 @@ int mana_gain(CHAR_DATA *ch)
 
   if((GET_COND(ch,FULL)==0)||(GET_COND(ch,THIRST)==0))
     gain >>= 2;
- 
+  gain /= 4; 
   return (gain);
 }
 
@@ -237,7 +235,7 @@ int hit_gain(CHAR_DATA *ch)
 
   if((GET_COND(ch, FULL)==0) || (GET_COND(ch, THIRST)==0))
     gain >>= 2;
-
+  gain /= 4;
   return (gain);
 }
 
