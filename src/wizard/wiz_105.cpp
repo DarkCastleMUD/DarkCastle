@@ -151,7 +151,6 @@ int do_sqedit(struct char_data *ch, char *argument, int cmd)
     "class",
     "show",
     "list",
-    "ignorethistest",
     "\n"
   };
   if (!has_skill(ch, COMMAND_SQEDIT))
@@ -161,13 +160,13 @@ int do_sqedit(struct char_data *ch, char *argument, int cmd)
   }
 //  if (argument && *argument && !is_number(argument))
  //   argument = one_argument(argument, skill+strlen(skill));
-  if (!argument || !*argument)
+/*  if (!argument || !*argument)
   {
      send_to_char("$2Syntax:$R sqedit <level/class> <skill> <value> OR\r\n"
                   "$2Syntax:$R sqedit message/new/delete <skillname>\r\n",ch);
      send_to_char("$2Syntax:$R sqedit list.\r\n",ch);
      return eFAILURE;
-  }
+  }*/
   int i;
   for (i = 0; fields[i] != "\n"; i++)
   {	
@@ -224,6 +223,7 @@ int do_sqedit(struct char_data *ch, char *argument, int cmd)
         newOne->clas = 1;
         newOne->next = skill_list;
 	skill_list = newOne;
+	send_to_char("Skill quest added.\r\n",ch);
      break;
     case 1:
       for (curren = skill_list; curren; curren = curren->next)
@@ -288,9 +288,15 @@ int do_sqedit(struct char_data *ch, char *argument, int cmd)
       csendf(ch,"$2Skill$R: %s\r\n$2Message$R: %s\r\n$2Class$R: %s\r\n$2Level$R: %d\r\n",             get_skill_name(skill->num), skill->message, pc_clss_types[skill->clas],skill->level);
       break;
      case 6:
-      for (curren = skill_list; curren; curren = curren->next)
+      send_to_char("These are the current sqs:\r\n",ch);
+      for (i = 0; i < 12; i++)
       {
-	csendf(ch, "$2%d$R. %s\r\n", curren->num, get_skill_name(curren->num));
+	csendf(ch, "%s skillquests.\r\n",pc_clss_types[i]);
+        for (curren = skill_list; curren; curren = curren->next)
+        {
+	  if (curren->clas == i)
+  	    csendf(ch, "$2%d$R. %s\r\n", curren->num, get_skill_name(curren->num));
+        }
       }
       break;
     default:
