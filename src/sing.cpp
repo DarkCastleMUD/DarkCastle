@@ -344,8 +344,13 @@ int do_sing(CHAR_DATA *ch, char *arg, int cmd)
     else {
       if(GET_LEVEL(ch) < ARCHANGEL && spl != 0 && spl != 2)
         if(!(learned = has_skill(ch, song_info[spl].skill_num))) {
-          send_to_char("You haven't learned that song.\n\r", ch);
-          return eFAILURE;
+          if(IS_MOB(ch) && !ch->master)
+            learned = 50;
+          else 
+          {
+            send_to_char("You haven't learned that song.\n\r", ch);
+            return eFAILURE;
+          }
         }
     }
     argument += qend; /* Point to the space after the last ' */
