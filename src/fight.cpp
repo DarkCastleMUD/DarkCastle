@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.100 2003/03/06 23:36:32 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.101 2003/03/07 01:29:24 pirahna Exp $ */
 
 extern "C"
 {
@@ -3107,6 +3107,7 @@ void dam_message(int dam, CHAR_DATA * ch, CHAR_DATA * victim,
      if(IS_SET(modifier, COMBAT_MOD_RESIST)) {
        strcpy(endstring, " but is resisted");
      }
+     else *endstring = '\0';
    }
    else *endstring = '\0';
 
