@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.53 2003/01/08 21:32:39 dcastle Exp $ */
+/* $Id: magic.cpp,v 1.54 2003/01/08 21:36:07 dcastle Exp $ */
 
 extern "C"
 {
@@ -2462,7 +2462,7 @@ int spell_sleep(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
   if(saves_spell(ch, victim, -10, SAVE_TYPE_MAGIC) < 0)
   {
 	af.type      = SPELL_SLEEP;
-	af.duration  = 24;
+	af.duration  = 10;
 	af.modifier  = 1;
 	af.location  = APPLY_NONE;
 	af.bitvector = AFF_SLEEP;
