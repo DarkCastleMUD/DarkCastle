@@ -814,6 +814,8 @@ obj_data *)(obj_index[nr].item))->obj_flags.eq_level,
           SET_BIT(more, 1<<i);
           continue;
         }*/
+       send_to_char("Unknown argument.\r\n",ch);
+       return eFAILURE;
      }
      int c,nr;
 //     csendf(ch,"%d %d %d %d %d", more, extra, wear, size, affect);
@@ -834,11 +836,13 @@ obj_data *)(obj_index[nr].item))->obj_flags.eq_level,
       if (!IS_SET(((struct obj_data *)(obj_index[nr].item))->obj_flags.more_flags, more))
 	continue;
       int aff,total = 0;
+      bool found = FALSE;
       for (aff = 0; aff < ((struct obj_data *)(obj_index[nr].item))->num_affects;aff++)
-	SET_BIT(total, ((struct obj_data *)(obj_index[nr].item))->affected[aff].location);
+	 if (affect== ((struct obj_data *)(obj_index[nr].item))->affected[aff].location)
+	   found = TRUE;
      if (affect)
-     if (!IS_SET(total, affect))
-        continue;
+        if (!found)
+          continue;
       count++;
       if (count > 200)
       {
