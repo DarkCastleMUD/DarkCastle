@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.115 2003/06/13 00:44:35 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.116 2003/06/22 22:10:15 pirahna Exp $ */
 
 extern "C"
 {
@@ -3454,7 +3454,8 @@ int can_be_attacked(CHAR_DATA *ch, CHAR_DATA *vict)
   {
     if(IS_AFFECTED2(vict, AFF_FAMILIAR) && 
        vict->master && 
-       !IS_AFFECTED(vict->master, AFF_CANTQUIT)
+       !IS_AFFECTED(vict->master, AFF_CANTQUIT) &&
+       IS_SET(world[vict->in_room].room_flags, SAFE)
       )
     {
       send_to_char("No fighting permitted in a safe room.\n\r", ch);

@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.74 2003/06/13 00:43:53 pirahna Exp $ */
+/* $Id: magic.cpp,v 1.75 2003/06/22 22:10:15 pirahna Exp $ */
 
 extern "C"
 {
@@ -7884,16 +7884,14 @@ int cast_companion(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *vi
 // Expects SPELL_xxx, the caster, and boolean as to destroy the components      
 // Returns TRUE for success and FALSE for failure                               
                                                                                 
-int check_components(int spell, CHAR_DATA *ch, int destroy)                     
-{                                                                               
+int check_components(CHAR_DATA *ch, int destroy, int item_one = 0, 
+                     int item_two = 0, int item_three = 0, int item_four = 0)
+{
+  // We're going to assume you never have more than 4 items                       
+  // for a spell, though you can easily change to take more                       
+  int all_ok = 0;     
+  obj_data *ptr_one, *ptr_two, *ptr_three, *ptr_four;                             
                                                                                 
-// We're going to assume you never have more than 4 items                       
-// for a spell, though you can easily change to take more                       
-                                                                                
-int item_one, item_two, item_three, item_four, all_ok;                          
-obj_data *ptr_one, *ptr_two, *ptr_three, *ptr_four;                             
-                                                                                
-  item_one = item_two = item_three = item_four = all_ok = 0;                    
   ptr_one = ptr_two = ptr_three = ptr_four = NULL;                              
                                                                                 
   if(!ch)                                                                       
@@ -7902,26 +7900,6 @@ obj_data *ptr_one, *ptr_two, *ptr_three, *ptr_four;
     return FALSE;                                                               
   }                                                                             
 
-// This shouldn't go here, but i donno where else to put it
-                                                                                
-// Put spell and regents here.  There's probably an easier way                  
-// to do this, but I like nice easy to read/change code                         
-// Leave blank if not used, but always start with item_one                      
-                                                                                
-  switch(spell) {                                                               
-     case SPELL_CREATE_GOLEM: item_one = 14905; // small glowing stone
-                              item_two = 2256;  // some druidic herbs  
-                              item_three = 3181;// grub (forage)
-                              break;          
-     case SPELL_SUMMON_FAMILIAR: item_one = 4;  // batwing
-                              break;                                  
-     default: log("Invalid spell sent to check components", ANGEL,
-                  LOG_BUG);    
-              return FALSE;                                                     
-              break;
-                                                                               
-  } /* of switch(spell) */                                                      
-                                                                                
   if(!ch->carrying)                                                             
     return FALSE;                                                               
                                                                                 
@@ -7980,6 +7958,8 @@ int spell_create_golem(int level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 
   struct affected_type af;
 
+  send_to_char("Disabled currently,\r\n", ch);
+
   // make sure its a charmie
   if((!IS_NPC(victim)) || (victim->master != ch))
   {
@@ -7998,8 +7978,7 @@ int spell_create_golem(int level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
   }
 
   // check_special_room !
-
-  if(!check_components(SPELL_CREATE_GOLEM, ch, TRUE)) {
+  if(!check_components(ch, TRUE, 14905, 2256, 3181)) {
      send_to_char("Without the proper spell components, your spell fizzles out and dies.\r\n", ch);
      act("$n's hands pop and sizzle with misused spell components.", ch, 0, 0, TO_ROOM, 0);
      return eFAILURE;
@@ -8263,21 +8242,73 @@ int spell_reflect(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *vic
    return eFAILURE;
 }
 
-#define FAMILIAR_MOB    5
+#define FAMILIAR_MOB_IMP        5
+#define FAMILIAR_MOB_CHIPMUNK   6
+
+int choose_druid_familiar(char_data * ch, char * arg)
+{
+   char buf[MAX_INPUT_LENGTH];
+   
+   one_argument(arg, buf);
+
+   if(!strcmp(buf, "chipmunk"))
+   {
+     if(!check_components(ch, TRUE, 27800)) {
+       send_to_char("You remember at the last second, you don't have an acorn ready!\r\n", ch);
+       act("$n's hands pop with unused mystical energy. $e seems confused.", ch, 0, 0, TO_ROOM, 0);
+       return eFAILURE;
+     }
+     return FAMILIAR_MOB_CHIPMUNK;
+   }
+
+   send_to_char("You must specify the type of familiar you wish to summon.\r\n"
+                "You currently may summon:  chipmunk\r\n", ch);
+   return -1;
+}
+
+int choose_mage_familiar(char_data * ch, char * arg)
+{
+   char buf[MAX_INPUT_LENGTH];
+   
+   one_argument(arg, buf);
+
+   if(!strcmp(buf, "imp")) 
+   {
+     if(!check_components(ch, TRUE, 4)) {
+       send_to_char("You remember at the last second, you don't have a batwing ready!\r\n", ch);
+       act("$n's hands pop with unused mystical energy. $e seems confused.", ch, 0, 0, TO_ROOM, 0);
+       return eFAILURE;
+     }
+     return FAMILIAR_MOB_IMP;
+   }
+   send_to_char("You must specify the type of familiar you wish to summon.\r\n"
+                "You currently may summon:  imp\r\n", ch);
+   return -1;
+}
+
+int choose_familiar(char_data * ch, char * arg)
+{
+   if(GET_CLASS(ch) == CLASS_DRUID)
+      return choose_druid_familiar(ch, arg);
+   if(GET_CLASS(ch) == CLASS_MAGIC_USER)
+      return choose_mage_familiar(ch, arg);
+   return -1;
+}
+
+
 int spell_summon_familiar(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *victim, struct obj_data * tar_obj, int skill)
 {
   char_data * mob = NULL;
   int r_num;
   struct affected_type af;
   follow_type * k = NULL;
+  int fam_type;
 
-  if(!check_components(SPELL_SUMMON_FAMILIAR, ch, TRUE)) {
-     send_to_char("You remember at the last second, you don't have a batwing ready!\r\n", ch);
-     act("$n's hands pop with unused mystical energy. $e seems confused.", ch, 0, 0, TO_ROOM, 0);
-     return eFAILURE;
-  }
+  fam_type = choose_familiar(ch, arg);
+  if(-1 == fam_type)
+    return eFAILURE;
 
-  if ((r_num = real_mobile(FAMILIAR_MOB)) < 0) {
+  if ((r_num = real_mobile(fam_type)) < 0) {
     send_to_char("Summon familiar mob not found.  Tell a god.\n\r", ch);
     return eFAILURE;
   }
