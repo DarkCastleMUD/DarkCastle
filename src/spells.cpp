@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.51 2004/04/14 17:05:02 urizen Exp $ */
+/* $Id: spells.cpp,v 1.52 2004/04/14 17:14:00 urizen Exp $ */
 
 extern "C"
 {
@@ -1312,13 +1312,19 @@ int do_release(CHAR_DATA *ch, char *argument, int cmd)
 	  printed=TRUE;
        }
        if (spell_info[aff->type].targets & TAR_SELF_DEFAULT)
-       {
+       { // Spells that default to self seems a good measure of
+	 // allow to release spells..
          char * aff_name = get_skill_name(aff->type);
 	 send_to_char(aff_name,ch);
          send_to_char("\r\n",ch);
        }
     }
     } else {
+       if (ch->mana < 25)
+       {
+	send_to_char("You don't have enough mana.\r\n",ch);
+	return eSUCCESS;
+       }
        for (aff = ch->affected; aff; aff = aff_next)
        {
          aff_next = aff->next;
@@ -1333,9 +1339,12 @@ int do_release(CHAR_DATA *ch, char *argument, int cmd)
                 send_to_char(spell_wear_off_msg[aff->type], ch);
                 send_to_char("\n\r", ch);
              }
+	  ch->mana -= 25;
 	  affect_remove(ch,aff,0);
+          return eSUCCESS;
        }
     }
+    send_to_char("No such spell to release.",ch);
     return eSUCCESS;
 }
 
