@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.92 2004/04/14 17:05:02 urizen Exp $ */
+/* $Id: magic.cpp,v 1.93 2004/04/14 18:06:29 urizen Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -2430,7 +2430,7 @@ int spell_shadowslip(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
      act("Portals will no longer find you.", victim, 0, 0, TO_CHAR, 0);
 
      af.type           = SPELL_SHADOWSLIP;
-     af.duration       = level;
+     af.duration       = level/5;
      af.modifier       = 0;
      af.location       = APPLY_NONE;
      af.bitvector      = AFF_SHADOWSLIP;
@@ -5466,6 +5466,16 @@ int cast_create_food( byte level, CHAR_DATA *ch, char *arg, int type,
 		   0);
 	 return spell_create_food(level,ch,0,0, skill);
 		 break;
+         case SPELL_TYPE_WAND:
+         if(tar_obj) return eFAILURE;
+         if(tar_ch) return eFAILURE;
+         return spell_create_food(level,ch,0,0, skill);
+                 break;
+         case SPELL_TYPE_STAFF:
+         if(tar_obj) return eFAILURE;
+         if(tar_ch) return eFAILURE;
+         return spell_create_food(level,ch,0,0, skill);
+                 break;
 	 case SPELL_TYPE_SCROLL:
 	 if(tar_obj) return eFAILURE;
 	 if(tar_ch) return eFAILURE;
@@ -5491,6 +5501,17 @@ int cast_create_water( byte level, CHAR_DATA *ch, char *arg, int type,
 	 }
 	 return spell_create_water(level,ch,0,tar_obj, skill);
 	 break;
+         case SPELL_TYPE_WAND:
+         if(!tar_obj) return eFAILURE;
+//         if(tar_ch) return eFAILURE;
+         return spell_create_food(level,ch,0,tar_obj, skill);
+                 break;
+         case SPELL_TYPE_SCROLL:
+         if(!tar_obj) return eFAILURE;
+//         if(tar_ch) return eFAILURE;
+         return spell_create_water(level,ch,0,tar_obj, skill);
+                 break;
+
 	 default :
 		log("Serious screw-up in create water!", ANGEL, LOG_BUG);
 	 break;
@@ -5576,6 +5597,10 @@ int cast_cure_critic( byte level, CHAR_DATA *ch, char *arg, int type,
   case SPELL_TYPE_POTION:
 	 return spell_cure_critic(level,ch,ch,0, skill);
 	 break;
+  case SPELL_TYPE_WAND:
+         if(!tar_ch) return eFAILURE;
+         return spell_cure_critic(level, ch, tar_ch, 0, skill);
+         break;
   case SPELL_TYPE_SCROLL:
 	 if (tar_obj) return eFAILURE;
 	 if (!tar_ch) tar_ch = ch;
@@ -5604,7 +5629,7 @@ int cast_cure_light( byte level, CHAR_DATA *ch, char *arg, int type,
 	 return spell_cure_light(level,ch,tar_ch,0, skill);
 	 break;
   case SPELL_TYPE_WAND:
-    if(tar_ch)
+    if(tar_ch) return eFAILURE;
       return spell_cure_light(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_POTION:
@@ -5771,6 +5796,9 @@ int cast_detect_invisibility( byte level, CHAR_DATA *ch, char *arg, int type,
   case SPELL_TYPE_POTION:
 	 return spell_detect_invisibility(level,ch,ch,0, skill);
 	 break;
+  case SPELL_TYPE_WAND:
+	 if (!tar_ch) return eFAILURE;
+	 return spell_detect_invisibility(level,ch,tar_ch,0,skill);
   case SPELL_TYPE_SCROLL:
 	 if (tar_obj) return eFAILURE;
 	 if (!tar_ch) tar_ch = ch;
@@ -6043,6 +6071,10 @@ int cast_heal( byte level, CHAR_DATA *ch, char *arg, int type,
 		 act("You heal $N.", ch, 0, tar_ch, TO_CHAR, 0);
 		 return spell_heal(level, ch, tar_ch, 0, skill);
 		 break;
+	case SPELL_TYPE_WAND:
+	   if (!tar_ch) return eFAILURE;
+	  return spell_heal(level,ch,tar_ch,0,skill);
+	break;
 	 case SPELL_TYPE_POTION:
 	 return spell_heal(level, ch, ch, 0, skill);
 	 break;
@@ -6072,6 +6104,10 @@ int cast_power_heal( byte level, CHAR_DATA *ch, char *arg, int type,
 	 case SPELL_TYPE_POTION:
 	 return spell_power_heal(level, ch, ch, 0, skill);
 	 break;
+	 case SPELL_TYPE_WAND:
+	   if (!tar_ch) return eFAILURE;
+		return spell_power_heal(level,ch,tar_ch,0,skill);
+		break;		
 	 case SPELL_TYPE_STAFF:
 	 for (tar_ch = world[ch->in_room].people ;
 			tar_ch ; tar_ch = tar_ch->next_in_room)
@@ -6334,6 +6370,10 @@ int cast_remove_poison( byte level, CHAR_DATA *ch, char *arg, int type,
 	 case SPELL_TYPE_SPELL:
 		 return spell_remove_poison(level, ch, tar_ch, tar_obj, skill);
 		 break;
+	 case SPELL_TYPE_WAND:
+	         if(!tar_ch) return eFAILURE;
+         return spell_remove_poison(level, ch, tar_ch, 0, skill);
+	break;
 	 case SPELL_TYPE_POTION:
 	 return spell_remove_poison(level, ch, ch, 0, skill);
 	 break;

@@ -21,7 +21,7 @@
  *  12/08/2003   Onager    Added check for charmies and !charmie eq to     *
  *                         equip_char()                                    *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.28 2004/04/13 11:37:33 urizen Exp $ */
+/* $Id: handler.cpp,v 1.29 2004/04/14 18:06:29 urizen Exp $ */
     
 extern "C"
 {
@@ -800,8 +800,20 @@ void affect_total(CHAR_DATA *ch)
     }
     for(af = ch->affected; af; af = tmp_af)
     {
+        bool secFix = FALSE;
         tmp_af = af->next;
-        affect_modify(ch, af->location, af->modifier, af->bitvector, FALSE);
+           switch (af->type)
+	    { // Some spells use affected_by2 instead..
+	        case SPELL_SHADOWSLIP:
+	        case SPELL_CAMOUFLAGE:
+	          secFix = TRUE;
+	          break;
+	        default:
+	          secFix = FALSE;
+	          break;
+	    }
+
+        affect_modify(ch, af->location, af->modifier, af->bitvector, FALSE,secFix);
     }
             
     // add everything back
@@ -813,7 +825,20 @@ void affect_total(CHAR_DATA *ch)
                               0, TRUE);
     }
     for(af = ch->affected; af; af=af->next)
-        affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE);
+    {
+      bool secFix = FALSE;
+	   switch (af->type)
+	    { // Some spells use affected_by2 instead..
+	        case SPELL_SHADOWSLIP:
+	        case SPELL_CAMOUFLAGE:
+	          secFix = TRUE;
+	          break;
+	        default:
+	          secFix = FALSE;
+	          break;
+	    }
+        affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE,secFix);
+    }
 
     REMOVE_BIT(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT); // so weapons stop fall off
 }
