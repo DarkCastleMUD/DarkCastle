@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.26 2004/04/30 10:49:34 urizen Exp $
+| $Id: guild.cpp,v 1.27 2004/05/02 19:39:44 urizen Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -14,7 +14,7 @@
 #include <string.h>
 #include <returnvals.h>
 #include <ki.h>
-
+#include <mobile.h>
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -236,9 +236,22 @@ int skills_guild(struct char_data *ch, char *arg, struct char_data *owner)
     ( !IS_MOB(owner) || (skilllist[skillnumber].trainer != mob_index[owner->mobdata->nr].virt)
     )) 
   {
-    if(skilllist[skillnumber].clue && mob_index[owner->mobdata->nr].virt == default_master[GET_CLASS(ch)])
-      do_say(owner, skilllist[skillnumber].clue, 9);
-    else do_say(owner, "I'm sorry, I can't teach you that.  You'll have to find another trainer.", 9);
+    int classon = 1<<CLASS_WARRIOR + 1<<CLASS_THIEF;
+   if (default_master[GET_CLASS(ch)] != mob_index[owner->mobdata->nr].virt)
+	do_say(owner, "I'm sorry, I can't teach you that.  You'll have to find another trainer.",9);
+   else {
+      struct skill_quest *sq;
+     if (IS_SET(classon, 1<<GET_CLASS(ch)) && (sq=find_sq(skillnumber)) != NULL && sq->message)
+     {
+	mprog_driver(sq->message, owner, ch, NULL, NULL);
+     } else if (skilllist[skillnumber].clue)
+     do_say(owner, skilllist[skillnumber].clue,9);
+   }
+//    if(skilllist[skillnumber].clue && mob_index[owner->mobdata->nr].virt 
+//== default_master[GET_CLASS(ch)])
+ //     do_say(owner, skilllist[skillnumber].clue, 9);
+   // else do_say(owner, "I'm sorry, I can't teach you that.  You'll have 
+//to find another trainer.", 9);
     return eSUCCESS;
   }
 
