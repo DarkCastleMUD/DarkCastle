@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.29 2004/07/06 01:09:34 urizen Exp $ */
+/* $Id: clan.cpp,v 1.30 2004/07/09 15:34:07 urizen Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -532,6 +532,7 @@ void delete_clan(struct clan_data * dead_clan)
       if(dead_clan->description)
         dc_free(dead_clan->description);
       dc_free(dead_clan);
+      return;
     } 
     else {
       last = curr;
