@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: const.cpp,v 1.5 2002/07/16 20:51:56 pirahna Exp $ */
+/* $Id: const.cpp,v 1.6 2002/07/16 21:24:06 pirahna Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -988,6 +988,7 @@ struct class_skill_defines a_skills[] = {
 {    "beacon",		SPELL_BEACON,		33,	90,	10005,	NULL },
 {    "dispel good",	SPELL_DISPEL_GOOD,	35,	90,	10005,	NULL },
 {    "firestorm",	SPELL_FIRESTORM,	38,	90,	10005,	NULL },
+{    "acid shield",	SPELL_ACID_SHIELD,	40,	90,	10005,	NULL },
 {    "blindness",	SPELL_BLINDNESS,	42,	90,	10005,	NULL },
 {    "stone skin",	SPELL_STONE_SKIN,	46,	90,	10005,	NULL },
 {    "acid blast",	SPELL_ACID_BLAST,	48,	90,	10005,	NULL },
@@ -1143,6 +1144,7 @@ struct class_skill_defines u_skills[] = { // druid skills
 {    "sense life",	SPELL_SENSE_LIFE,	15,	90,	0,	NULL },
 {    "water breathing",	SPELL_WATER_BREATHING,	17,	90,	0,	NULL },
 {    "stone shield",	SPELL_STONE_SHIELD,	20,	90,	0,	NULL },
+{    "drown",		SPELL_DROWN,		22,	90,	0,	NULL },
 {    "power heal",	SPELL_POWER_HEAL,	26,	90,	0,	NULL },
 {    "barkskin",	SPELL_BARKSKIN,		35,	90,	0,	NULL },
 {    "iron roots",	SPELL_IRON_ROOTS,	36,	90,	0,	NULL },
