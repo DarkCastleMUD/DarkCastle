@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.5 2002/07/28 02:04:14 pirahna Exp $
+| $Id: guild.cpp,v 1.6 2002/07/31 19:12:30 pirahna Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -371,6 +371,9 @@ void skill_increase_check(char_data * ch, int skill, int learned, int difficulty
    int chance, maximum;
 
    if(learned > ( GET_LEVEL(ch) * 2 ))
+      return;
+
+   if(IS_MOB(ch))
       return;
 
    class_skill_defines * skilllist = get_skill_list(ch);

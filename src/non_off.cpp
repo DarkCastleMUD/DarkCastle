@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: non_off.cpp,v 1.2 2002/06/13 04:41:08 dcastle Exp $
+| $Id: non_off.cpp,v 1.3 2002/07/31 19:12:30 pirahna Exp $
 | non_off.C
 | Description:  Implementation of generic, non-offensive commands.
 */
@@ -673,7 +673,6 @@ int do_rest(CHAR_DATA *ch, char *argument, int cmd)
  
 int do_sleep(CHAR_DATA *ch, char *argument, int cmd)
 {
- 
     if (IS_SET(world[ch->in_room].room_flags, QUIET)) {
       send_to_char ("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
       return eFAILURE;
@@ -682,6 +681,9 @@ int do_sleep(CHAR_DATA *ch, char *argument, int cmd)
        send_to_char("You are far too alert for that.\n\r", ch);
        return eFAILURE;
     }
+    if (!IS_SET(world[ch->in_room].room_flags, SAFE))
+      send_to_char ("Be careful sleeping out here!  This isn't a safe room, so people can steal your equipment while you sleep!\r\n", ch);
+
     switch(GET_POS(ch)) {
         case POSITION_STANDING :
             send_to_char("You lie down and go to sleep.\n\r", ch);
@@ -781,7 +783,7 @@ int do_wake(CHAR_DATA *ch, char *argument, int cmd)
         if ((af = affected_by_spell(ch, SPELL_SLEEP)) && af->modifier == 1) {
             send_to_char("You can't wake up!\n\r", ch);
         } else if ((af = affected_by_spell(ch, INTERNAL_SLEEPING))) {
-            send_to_char("But you just went to sleep!  Your body refuses to wake up.\r\n", ch);
+            send_to_char("You just went to sleep!  Your body is still too tired.  Your dreaming continues...\r\n", ch);
         } else {
             if (GET_POS(ch) > POSITION_SLEEPING)
                 send_to_char("You are already awake...\n\r", ch);

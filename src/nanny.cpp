@@ -11,7 +11,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.6 2002/07/10 18:00:36 pirahna Exp $ */
+/* $Id: nanny.cpp,v 1.7 2002/07/31 19:12:30 pirahna Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -726,7 +726,7 @@ void nanny(struct descriptor_data *d, char *arg)
             
          case '2':
             ch->race = RACE_ELVEN;
-            ch->height = number(55, 70);
+            ch->height = number(71, 84);
             ch->weight = number(70, 90);
             ch->alignment = 1000;
             GET_RAW_STR(ch) += RACE_ELVEN_STR_MOD;

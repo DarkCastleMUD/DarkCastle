@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.14 2002/07/31 18:41:09 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.15 2002/07/31 19:12:30 pirahna Exp $ */
 
 extern "C"
 {
@@ -190,11 +190,14 @@ void perform_violence(void)
 
 bool gets_dual_wield_attack(char_data * ch)
 {
-  byte learned = has_skill(ch, SKILL_DUAL_WIELD);
-  byte percent = number(1, 101);
+  int learned = has_skill(ch, SKILL_DUAL_WIELD);
+  int percent = number(1, 101);
 
   if(percent > learned)
     return FALSE;
+
+  skill_increase_check(ch, SKILL_DUAL_WIELD, learned, SKILL_INCREASE_HARD);
+
   return TRUE;
 }
 
@@ -319,12 +322,11 @@ int attack(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
       result = one_hit(ch, vict, type, FIRST);
       if(SOMEONE_DIED(result))       return result;
     }
-    if(second_wield(ch) && gets_dual_wield_attack(ch)) {
+    // if(second_wield(ch) && gets_dual_wield_attack(ch)) {
+    if(gets_dual_wield_attack(ch)) {
       result = one_hit(ch, vict, type, SECOND);
       if(SOMEONE_DIED(result))       return result;
     }
-    
-    // Now we handle monk attacks
   }	
 
   return eSUCCESS;
@@ -1458,6 +1460,8 @@ int check_riposte(CHAR_DATA * ch, CHAR_DATA * victim)
       chance = 1;
   }
 
+  skill_increase_check(ch, SKILL_RIPOSTE, chance, SKILL_INCREASE_HARD);
+
   percent = (number(1, 101) - GET_LEVEL(victim)) + GET_LEVEL(ch);
   if (percent >= chance)
     return eFAILURE;
@@ -1518,6 +1522,8 @@ bool check_shieldblock(CHAR_DATA * ch, CHAR_DATA * victim)
   if((GET_LEVEL(ch) - GET_LEVEL(victim)) < 0)
     chance += (int)((GET_LEVEL(ch) - GET_LEVEL(victim)));
 
+  skill_increase_check(ch, SKILL_SHIELDBLOCK, chance, SKILL_INCREASE_HARD);
+
   percent = number(1, 101);
   if (percent >= chance)
     return FALSE;
@@ -1572,6 +1578,8 @@ bool check_parry(CHAR_DATA * ch, CHAR_DATA * victim)
      IS_SET(victim->combat, COMBAT_BLADESHIELD1) || 
      IS_SET(victim->combat, COMBAT_BLADESHIELD2))
     chance = 100;
+
+  skill_increase_check(ch, SKILL_PARRY, chance, SKILL_INCREASE_HARD);
   
   percent = number(1, 101);
   if (percent >= chance)
@@ -1626,7 +1634,9 @@ bool check_dodge(CHAR_DATA * ch, CHAR_DATA * victim)
 
   if(chance > 100)
     chance = 100;
-  
+
+  skill_increase_check(ch, SKILL_DODGE, chance, SKILL_INCREASE_HARD);
+
   percent = number(1, 101);
   if (percent >= chance)
     return FALSE;
@@ -3244,19 +3254,29 @@ int weapon_spells(CHAR_DATA *ch, CHAR_DATA *vict, int weapon)
 
 int second_attack(CHAR_DATA *ch)
 {
+  int learned;
+
   if((IS_NPC(ch)) && (IS_SET(ch->mobdata->actflags, ACT_2ND_ATTACK)))
     return TRUE;
-  if(number(1, 101) < has_skill(ch, SKILL_SECOND_ATTACK))
+  learned = has_skill(ch, SKILL_SECOND_ATTACK);
+  if(number(1, 101) < MAX(25, learned)) {
+    skill_increase_check(ch, SKILL_SECOND_ATTACK, learned, SKILL_INCREASE_HARD);
     return TRUE;
+  }
   return FALSE;
 }
 
 int third_attack(CHAR_DATA *ch)
 {
+  int learned;
+
   if((IS_NPC(ch)) && (IS_SET(ch->mobdata->actflags, ACT_3RD_ATTACK)))
     return TRUE;
-  if(number(1, 101) < has_skill(ch, SKILL_THIRD_ATTACK))
+  learned = has_skill(ch, SKILL_THIRD_ATTACK);
+  if(number(1, 101) < MAX(learned, 20)) {
+    skill_increase_check(ch, SKILL_THIRD_ATTACK, learned, SKILL_INCREASE_HARD);
     return TRUE;
+  }
   return FALSE;
 }
 
@@ -3267,13 +3287,16 @@ int fourth_attack(CHAR_DATA *ch)
   return FALSE;
 }
 
+/*  No longer used.  Any class can try to use their second wield if they have
+    the skill.
 int second_wield(CHAR_DATA *ch)
 {
-  /* If the ch is capable of using the SECOND_WIELD */
+  // If the ch is capable of using the SECOND_WIELD 
   if((GET_CLASS(ch) == CLASS_MAGIC_USER) || (GET_CLASS(ch) == CLASS_MONK))
     return FALSE;
   return TRUE;
 }	
+*/
 
 void inform_victim(CHAR_DATA *ch, CHAR_DATA *victim, int dam)
 {
