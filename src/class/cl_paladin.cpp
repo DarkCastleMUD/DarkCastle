@@ -200,7 +200,7 @@ int do_layhands(struct char_data *ch, char *argument, int cmd)
      send_to_char("Your god refuses you.\r\n", ch);
    }
    else {
-     GET_HIT(victim) += specialization * 2000;
+     GET_HIT(victim) += specialization * 1000;
      if(GET_HIT(victim) > GET_MAX_HIT(victim))
        GET_HIT(victim) = GET_MAX_HIT(victim);
 

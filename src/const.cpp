@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: const.cpp,v 1.16 2002/08/03 01:34:40 pirahna Exp $ */
+/* $Id: const.cpp,v 1.17 2002/08/03 03:18:24 pirahna Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1107,7 +1107,6 @@ struct class_skill_defines d_skills[] = { // bard skills
 {      "dual wield",    	SKILL_DUAL_WIELD,       	10,     75, -2, "Dunna naanna nunna nanna BATMAN!!!" },
 {      "double",		SKILL_SECOND_ATTACK,		17,	85,	-2, 	"You must travel to the Prince of Delcim to recieve training."},
 {      "whistle sharp",		SKILL_SONG_WHISTLE_SHARP, 	1,	90,	3201, 	NULL},
-{      "stop",			SKILL_SONG_STOP,		7,	90,	3201, 	NULL},
 {      "traveling march",	SKILL_SONG_TRAVELING_MARCH,	7,	90,	3201, 	NULL},
 {      "bountiful sonnet",	SKILL_SONG_BOUNT_SONNET,	9,	90,	3201, 	NULL},
 {      "insane chant",		SKILL_SONG_INSANE_CHANT,	10,	90,	3201, 	NULL},

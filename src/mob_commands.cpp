@@ -884,6 +884,8 @@ int do_mpteachskill( CHAR_DATA *ch, char *argument, int cmd )
     char skill[ MAX_INPUT_LENGTH ];
 
     int learn_skill(char_data * ch, int skill, int amount, int maximum);
+    class_skill_defines * get_skill_list(char_data * ch);
+    int search_skills(char * arg, class_skill_defines * list_skills);
 
     if ( !IS_NPC( ch ) )
     {
@@ -918,6 +920,18 @@ int do_mpteachskill( CHAR_DATA *ch, char *argument, int cmd )
 
     if(has_skill(ch, skillnum)) {
        csendf(ch, "You already know the basics of %s!\r\n", skillname ? skillname : "Unknown");
+       return eFAILURE;
+    }
+
+    class_skill_defines * skilllist = get_skill_list(ch);
+    if(!skilllist) {
+      logf( IMMORTAL, LOG_WORLD, "Mpteachskill - ch had no skill list?");
+      return eFAILURE;  // no skills to train
+    }
+
+    int index = search_skills(arg, skilllist);
+    if(GET_LEVEL(ch) < skilllist[index].levelavailable) {
+       csendf(ch, "You try to learn the basics of %s, but it is too advanced for you right now.\r\n", skillname);
        return eFAILURE;
     }
 
