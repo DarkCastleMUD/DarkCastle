@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.25 2002/08/03 01:34:40 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.26 2002/08/03 05:10:12 pirahna Exp $ */
 
 extern "C"
 {
@@ -2628,19 +2628,22 @@ void group_gain(CHAR_DATA * ch, CHAR_DATA * victim)
     
     if(GET_LEVEL(tmp_ch) == 0 || share == 0)
       tmp_share = 0;
-    else tmp_share = (GET_LEVEL(tmp_ch) * share / totallevels);
+    else if(GET_LEVEL(ch) > 10 || no_members < 2)
+       tmp_share = (GET_LEVEL(tmp_ch) * share / totallevels);
+    else tmp_share = ((GET_LEVEL(tmp_ch)+1) * share / totallevels);  // small bonus for grouped lowbies
 
     // reduce xp if you are higher level than mob
     switch(GET_LEVEL(victim) - GET_LEVEL(ch)) {
-      case -1: tmp_share = (int) (tmp_share * 0.9); break;
-      case -2: tmp_share = (int) (tmp_share * 0.8); break;
-      case -3: tmp_share = (int) (tmp_share * 0.7); break;
-      case -4: tmp_share = (int) (tmp_share * 0.6); break;
-      case -5: tmp_share = (int) (tmp_share * 0.5); break;
-      case -6: tmp_share = (int) (tmp_share * 0.4); break;
-      case -7: tmp_share = (int) (tmp_share * 0.3); break;
-      case -8: tmp_share = (int) (tmp_share * 0.2); break;
-      case -9: tmp_share = (int) (tmp_share * 0.1); break;
+      case -1:  break;
+      case -2:  tmp_share = (int) (tmp_share * 0.9); break;
+      case -3:  tmp_share = (int) (tmp_share * 0.8); break;
+      case -4:  tmp_share = (int) (tmp_share * 0.7); break;
+      case -5:  tmp_share = (int) (tmp_share * 0.6); break;
+      case -6:  tmp_share = (int) (tmp_share * 0.5); break;
+      case -7:  tmp_share = (int) (tmp_share * 0.4); break;
+      case -8:  tmp_share = (int) (tmp_share * 0.3); break;
+      case -9:  tmp_share = (int) (tmp_share * 0.2); break;
+      case -10: tmp_share = (int) (tmp_share * 0.1); break;
       default:  if(GET_LEVEL(victim) < GET_LEVEL(ch))
                   tmp_share = 0;
                break;
