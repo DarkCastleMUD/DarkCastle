@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.227 2004/07/22 04:23:14 rahz Exp $ */
+/* $Id: fight.cpp,v 1.228 2004/07/22 07:17:32 rahz Exp $ */
 
 extern "C"
 {
@@ -3676,7 +3676,7 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim, int type)
       sprintf(killer_message,"\n\r##%s just commited SUICIDE!\n\r", GET_NAME(victim));
     else if(GET_LEVEL(victim) < PKILL_COUNT_LIMIT || ch == victim)
       //sprintf(killer_message,"\n\r##%s just DIED!\n\r", GET_NAME(victim));
-      //sprintf(killer_message,"\n\r##%s was just introduced to the warm hospitality of Dark Castle!!\n\r", GET_NAME(victim));
+      sprintf(killer_message,"\n\r##%s was just introduced to the warm hospitality of Dark Castle!!\n\r", GET_NAME(victim));
     else if(IS_AFFECTED2(ch, AFF_FAMILIAR) && ch->master)
       sprintf(killer_message,"\n\r##%s was just DEFEATED in battle by %s's familiar!\n\r",
             GET_NAME(victim), GET_NAME(ch->master));

@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.108 2004/07/13 12:42:48 urizen Exp $ */
+/* $Id: spells.cpp,v 1.109 2004/07/22 07:17:33 rahz Exp $ */
 
 extern "C"
 {
@@ -1333,6 +1333,8 @@ bool skill_success(CHAR_DATA *ch, CHAR_DATA *victim, int skillnum, int mod )
 	break;
      case SKILL_STALK:
 	stat = CON;
+     case SKILL_CONSIDER:
+        stat = WIS;
 	break;
      case SKILL_EYEGOUGE: 
 	stat = CON;

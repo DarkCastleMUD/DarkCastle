@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.29 2004/05/30 18:59:04 urizen Exp $ */
+/* $Id: utility.cpp,v 1.30 2004/07/22 07:17:33 rahz Exp $ */
 
 extern "C"
 {
@@ -691,7 +691,7 @@ int do_order(struct char_data *ch, char *argument, int cmd)
     int retval;
     struct char_data *victim;
     struct follow_type *k;
-
+  
     half_chop(argument, name, message);
 
 
@@ -708,7 +708,6 @@ int do_order(struct char_data *ch, char *argument, int cmd)
 	    send_to_char("That person isn't here.\n\r", ch);
     else if (ch == victim)
 	send_to_char("You obviously suffer from schitzophrenia.\n\r", ch);
-
     else {
        if (IS_AFFECTED(ch, AFF_CHARM)) {
           send_to_char("Your superior would not aprove of you giving orders.\n\r",ch);

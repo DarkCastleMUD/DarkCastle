@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.52 2004/07/21 22:33:20 rahz Exp $ */
+/* $Id: info.cpp,v 1.53 2004/07/22 07:17:32 rahz Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -1941,6 +1941,11 @@ int do_consider(struct char_data *ch, char *argument, int cmd)
    
    if (victim == ch) {
       send_to_char("Looks like a WIMP! (Used to be \"Looks like a PUSSY!\" but we got complaints.)\n\r", ch);
+      return eFAILURE;
+   }
+
+   if (!skill_success(ch,NULL,SKILL_CONSIDER)) {
+      send_to_char("You try really hard, but you really have no idea about their capabilties!\n\r", ch);
       return eFAILURE;
    }
 

@@ -21,7 +21,7 @@
  *  12/08/2003   Onager    Added check for charmies and !charmie eq to     *
  *                         equip_char()                                    *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.72 2004/07/21 10:16:09 rahz Exp $ */
+/* $Id: handler.cpp,v 1.73 2004/07/22 07:17:32 rahz Exp $ */
     
 extern "C"
 {
@@ -2306,6 +2306,7 @@ void extract_char(CHAR_DATA *ch, bool pull)
     void remove_from_bard_list(char_data * ch);
     void stop_guarding_me(char_data * victim);
     void stop_guarding(char_data * guard);
+    struct obj_data *i;
 
     if ( !IS_NPC(ch) && !ch->desc )
        for ( t_desc = descriptor_list; t_desc; t_desc = t_desc->next )
@@ -2390,13 +2391,19 @@ void extract_char(CHAR_DATA *ch, bool pull)
        stop_guarding_me(ch);
 
     // make sure no eq left on char.  But only if pulling completely
-    if(pull )
-       for ( l = 0; l < MAX_WEAR; l++ )
-       {
+    if (pull) {
+       for ( l = 0; l < MAX_WEAR; l++ ) {
           if ( ch->equipment[l] ) {
              obj_to_room(unequip_char(ch,l), was_in);
 	  }
        }
+       if (ch->carrying) {
+         for(i = ch->carrying ; i ; i = i->next_content)  {
+            obj_to_room(i, was_in);
+         }
+       }
+      // MIKE
+    }
 
     GET_AC(ch) = 100;
 
