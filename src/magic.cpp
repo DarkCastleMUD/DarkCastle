@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.135 2004/05/21 02:09:44 urizen Exp $ */
+/* $Id: magic.cpp,v 1.136 2004/05/21 02:52:51 urizen Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -1419,7 +1419,10 @@ int spell_cure_critic(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
     send_to_char("Heal spells seem to be useless on the undead.\n\r", ch);
     return eFAILURE;
   }
-
+  if (GET_RACE(victim) == RACE_GOLEM) {
+	send_to_char("The heavy magics surrounding this being prevents it.\r\n",ch);
+	return eFAILURE;
+  }
   skill_increase_check(ch, SPELL_CURE_CRITIC, skill, SKILL_INCREASE_MEDIUM);
 
 //  healpoints = dice(3,8)-6+skill;
@@ -1449,6 +1452,11 @@ int spell_cure_light(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
     send_to_char("Heal spells seem to be useless on the undead.\n\r", ch);
     return eFAILURE;
   }
+  if (GET_RACE(victim) == RACE_GOLEM) {
+        send_to_char("The heavy magics surrounding this being prevents it.\r\n",ch);
+        return eFAILURE;
+  }
+
 
   skill_increase_check(ch, SPELL_CURE_LIGHT, skill, SKILL_INCREASE_MEDIUM);
 //  healpoints = dice(1,8)+(skill/3);
@@ -1913,6 +1921,11 @@ int spell_heal(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *ob
     send_to_char("Heal spells seem to be useless on the undead.\n\r", ch);
     return eFAILURE;
   }
+  if (GET_RACE(victim) == RACE_GOLEM) {
+        send_to_char("The heavy magics surrounding this being prevents it.\r\n",ch);
+        return eFAILURE;
+  }
+
 
   skill_increase_check(ch, SPELL_HEAL, skill, SKILL_INCREASE_MEDIUM);
 
@@ -1941,6 +1954,11 @@ int spell_power_heal(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
     send_to_char("Heal spells seem to be useless on the undead.\n\r", ch);
     return eFAILURE;
   }
+  if (GET_RACE(victim) == RACE_GOLEM) {
+        send_to_char("The heavy magics surrounding this being prevents it.\r\n",ch);
+        return eFAILURE;
+  }
+
 
   skill_increase_check(ch, SPELL_POWER_HEAL, skill, SKILL_INCREASE_MEDIUM);
 
@@ -1967,6 +1985,11 @@ int spell_full_heal(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
     send_to_char("Heal spells seem to be useless on the undead.\n\r", ch);
     return eFAILURE;
   }
+  if (GET_RACE(victim) == RACE_GOLEM) {
+        send_to_char("The heavy magics surrounding this being prevents it.\r\n",ch);
+        return eFAILURE;
+  }
+
 
   spell_cure_blind(level, ch, victim, obj, skill);
 
@@ -4196,6 +4219,11 @@ int spell_cure_serious(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
     send_to_char("Heal spells seem to be useless on the undead.\n\r", ch);
     return eFAILURE;
   }
+  if (GET_RACE(victim) == RACE_GOLEM) {
+        send_to_char("The heavy magics surrounding this being prevents it.\r\n",ch);
+        return eFAILURE;
+  }
+
 
   skill_increase_check(ch, SPELL_CURE_SERIOUS, skill, SKILL_INCREASE_MEDIUM);
 
@@ -7974,6 +8002,11 @@ int cast_herb_lore(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *vi
     send_to_char("Heal spells seem to be useless on the undead.\n\r", ch);
     return eFAILURE;
   }
+  if (GET_RACE(victim) == RACE_GOLEM) {
+        send_to_char("The heavy magics surrounding this being prevents it.\r\n",ch);
+        return eFAILURE;
+  }
+
 
   skill_increase_check(ch, SPELL_HERB_LORE, skill, SKILL_INCREASE_MEDIUM);
 
@@ -8293,11 +8326,11 @@ int check_components(CHAR_DATA *ch, int destroy, int item_one = 0,
                                                                                 
   ptr_one = get_obj_in_list_num(real_object(item_one), ch->carrying);                        
   if(item_two)                                                                  
-    ptr_two = get_obj_in_list_num(real_object(item_two), ch->carrying);                      
+    ptr_two = get_obj_in_list_num(real_object(item_two), ch->carrying); 
   if(item_three)                                                                
-    ptr_three = get_obj_in_list_num(real_object(item_three),ch->carrying);                  
+    ptr_three = get_obj_in_list_num(real_object(item_three), ch->carrying);                  
   if(item_four)                                                                 
-    ptr_four = get_obj_in_list_num(real_object(item_four), ch->carrying);                    
+    ptr_four = get_obj_in_list_num(real_object(item_four),ch->carrying);                    
                                                                                 
 // Destroy the components if needed                                             
                                                                                 
