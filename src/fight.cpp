@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.21 2002/08/01 23:18:35 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.22 2002/08/01 23:21:26 pirahna Exp $ */
 
 extern "C"
 {
@@ -2940,9 +2940,6 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim)
   // have to be level 10 and linkalive to count as a pkill and not yourself
   if(!IS_MOB(ch) && GET_LEVEL(victim) > 9 && victim->desc && ch != victim)
   {
-    GET_PKILLS(ch) += 1;
-    GET_PKILLS_LOGIN(ch) += 1;
-
     GET_PDEATHS(victim) += 1;
     GET_PDEATHS_LOGIN(victim) += 1;
 
