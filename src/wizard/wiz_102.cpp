@@ -935,26 +935,31 @@ int find_skill_num(char * name)
 {
   extern char * skills[];
   extern char * spells[];
+  extern char * songs[];
+  extern char * ki[];
   int i;
 
+  // try skills
   for(i = 0; *skills[i] != '\n'; i++)
     if(isname(name, skills[i]))
-      break;
+      return (i + SKILL_BASE);
 
-  if(*skills[i] == '\n')
-  {
-    // try spells
-    for(i = 0; *skills[i] != '\n'; i++)
-      if(isname(name, spells[i]))
-        break;
-    
-    if(*spells[i] == '\n')
-      return -1;
+  // try spells
+  for(i = 0; *spells[i] != '\n'; i++)
+    if(isname(name, spells[i]))
+      return (i + 1);
 
-    return (i+1);
-  }
+  // try songs
+  for(i = 0; *songs[i] != '\n'; i++)
+    if(isname(name, songs[i]))
+      return (i + SKILL_SONG_BASE);
 
-  return (i + SKILL_BASE);
+  // try ki
+  for(i = 0; *ki[i] != '\n'; i++)
+    if(isname(name, ki[i]))
+      return (i + KI_OFFSET);
+
+  return -1;    
 }
 
 int do_sedit(struct char_data *ch, char *argument, int cmd)
