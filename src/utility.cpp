@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.21 2004/04/19 20:21:02 urizen Exp $ */
+/* $Id: utility.cpp,v 1.22 2004/05/20 00:07:06 urizen Exp $ */
 
 extern "C"
 {
@@ -624,8 +624,10 @@ bool CAN_SEE( struct char_data *sub, struct char_data *obj )
       if(x == 101)
         return TRUE; // auto failure
 
-      if ( x < (has_skill(obj, SKILL_HIDE)))
+      if ( x < (has_skill(obj, SKILL_HIDE))) {
+	skill_increase_check(obj, SKILL_HIDE, has_skill(obj,SKILL_HIDE), SKILL_INCREASE_HARD);
          return FALSE;
+	}
    }
 
    if ( !IS_AFFECTED( obj, AFF_INVISIBLE ) )
@@ -955,6 +957,11 @@ int do_recall( CHAR_DATA *ch, char *argument, int cmd )
     }
     GET_GOLD(ch) -= cost;
   }
+   if (IS_AFFECTED(victim, AFF_CURSE))
+   {
+	send_to_char("Something blocks it.\r\n",ch);
+	return eFAILURE;
+   }
 
     for(loop_ch = world[victim->in_room].people; loop_ch; loop_ch = loop_ch->next_in_room)
        if(loop_ch == victim || loop_ch->fighting == victim)

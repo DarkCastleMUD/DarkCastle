@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.131 2004/05/19 16:53:06 urizen Exp $ */
+/* $Id: magic.cpp,v 1.132 2004/05/20 00:07:06 urizen Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -1489,25 +1489,29 @@ int spell_curse(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
   } else {
         if(!ch || !victim)
           return eFAILURE;
-
+	int duration =0, chance = 10000, save = 0;
         set_cantquit(ch, victim);
+	if (skill < 41) { duration = 1; chance = 7; save = -1;}
+        else if (skill < 61) { duration = 2; chance = 5; save = -2;}
+        else if (skill < 81) { duration = 3; chance = 3; save = -3;}
+        else if (skill < 91) { duration = 3; chance = 2; save = -4;}
+	else { duration = 3; chance = 2; save = -5; }
 
-	 if(saves_spell(ch, victim, 15, SAVE_TYPE_MAGIC) >= 0)
+	 if(number(0,chance))
 		{
 	act("$N seems to be unaffected!", ch, NULL, victim, TO_CHAR, 0);
+	if (IS_NPC(victim)) {
 	retval = one_hit( victim, ch, TYPE_UNDEFINED, FIRST);
 	retval = SWAP_CH_VICT(retval);
-	return retval;
+	return retval; }
+	else return eFAILURE;
 		}
    if (number(1,101) < get_saves(victim, SAVE_TYPE_MAGIC))
    {
-act("$N resists your attempt to curse $m!", ch, NULL, victim, 
-TO_CHAR,0);
-act("$N resists $n's attempt to curse $m!", ch, NULL, victim, 
-TO_ROOM,
-NOTVICT);
-act("You resist $n's attempt to curse you!",ch,NULL,victim,TO_VICT,0);
-     return eFAILURE;
+	act("$N resists your attempt to curse $m!", ch, NULL, victim, TO_CHAR,0);
+	act("$N resists $n's attempt to curse $m!", ch, NULL, victim, TO_ROOM,NOTVICT);
+	act("You resist $n's attempt to curse you!",ch,NULL,victim,TO_VICT,0);
+        return eFAILURE;
    }
 
 
@@ -1515,21 +1519,32 @@ act("You resist $n's attempt to curse you!",ch,NULL,victim,TO_VICT,0);
 		return eFAILURE;
 
 	 af.type      = SPELL_CURSE;
-	 af.duration  = 5*level;
-	 af.modifier  = -1;
-	 af.location  = APPLY_HITROLL;
+	 af.duration  = duration;
+	 af.modifier  = save;
+	 af.location  = APPLY_SAVING_MAGIC;
 	 af.bitvector = AFF_CURSE;
 	 affect_to_char(victim, &af);
 
-	 af.location = APPLY_SAVING_MAGIC;
-	 af.modifier = -1; /* Make worse */
+	 af.location = APPLY_SAVING_FIRE;
 	 affect_to_char(victim, &af);
 
+	 af.location = APPLY_SAVING_COLD;
+	 affect_to_char(victim, &af);
+
+	 af.location = APPLY_SAVING_ENERGY;
+	 affect_to_char(victim, &af);
+	 af.location = APPLY_SAVING_ACID;
+	 affect_to_char(victim, &af);
+	 af.location = APPLY_SAVING_POISON;
+	 affect_to_char(victim, &af);
+         skill_increase_check(ch, SPELL_CURSE, skill, SKILL_INCREASE_MEDIUM);
 	 act("$n briefly reveals a red aura!", victim, 0, 0, TO_ROOM, 0);
 	 act("You feel very uncomfortable.",victim,0,0,TO_CHAR, 0);
-	 retval = one_hit( victim, ch, TYPE_UNDEFINED, FIRST);
-	retval = SWAP_CH_VICT(retval);
-        return retval;
+	if (IS_NPC(victim)) {
+	   retval = one_hit( victim, ch, TYPE_UNDEFINED, FIRST);
+ 	   retval = SWAP_CH_VICT(retval);
+         return retval;
+	}
   }
   return eSUCCESS;
 }
@@ -2720,7 +2735,11 @@ int spell_word_of_recall(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct ob
 
   if(IS_AFFECTED(ch, AFF_CHARM))
     return eFAILURE;
-
+  if (IS_AFFECTED(ch, AFF_CURSE))
+  {
+     send_to_char("Something blocks your attempt to recall.\r\n",ch);
+	return eSUCCESS;
+  }
   if (IS_NPC(victim))
     location = real_room(GET_HOME(victim));
   else
@@ -4417,40 +4436,48 @@ int spell_weaken(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *
 	 struct affected_type af;
 	 float modifier;
 	 int retval;
-
+	int chance = 10000, duration = 0, str = 0, con = 0;
     if(!ch || !victim)
     {
       log("NULL ch or victim sent to weaken!", ANGEL, LOG_BUG);
         return eFAILURE;
     }
-
-
+    int x = has_skill(ch, SPELL_WEAKEN);
+     if (x < 41) { duration = 1; chance = 7; str = -2; con = -1; }
+     else if (x < 61) { duration = 2; chance = 5; str = -3; con = -2; }
+     else if (x < 81) { duration = 2; chance = 3; str = -4; con = -2; }
+     else if (x < 91) { duration = 3; chance = 2; str = -5; con = -3; }
+     else {duration = 3; chance = 2; str = -6;  con = -3;}
+   
     set_cantquit (ch, victim);
    if (number(1,101) < get_saves(victim, SAVE_TYPE_MAGIC))
    {
-act("$N resists your attempt to weaken $m!", ch, NULL, victim, 
-TO_CHAR,0);
-act("$N resists $n's attempt to weaken $m!", ch, NULL, victim, TO_ROOM,
-NOTVICT);
-act("You resist $n's attempt to weaken you!",ch,NULL,victim,TO_VICT,0);
-     return eFAILURE;
+	act("$N resists your attempt to weaken $m!", ch, NULL, victim, TO_CHAR,0);
+	act("$N resists $n's attempt to weaken $m!", ch, NULL, victim, TO_ROOM,NOTVICT);
+	act("You resist $n's attempt to weaken you!",ch,NULL,victim,TO_VICT,0);
+        return eFAILURE;
    }
 
     
 	 if (!affected_by_spell(victim, SPELL_WEAKEN))
       {
-	if (saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC) < 0) {
-	  modifier = level / 10.0f;
+	if (!number(0,chance)) 
+	{
 	  act("You feel weaker.", ch, 0, victim, TO_VICT, 0);
 	  act("$n seems weaker.", victim, 0, 0, TO_ROOM, INVIS_NULL);
 
 	  af.type = SPELL_WEAKEN;
-	  af.duration = (int) level / 2;
-	  af.modifier = (int)(0 - modifier);
+	  af.duration = duration;
+	  af.modifier = str;
 	  af.location = APPLY_STR;
 	  af.bitvector = 0;
-
 	  affect_to_char(victim, &af);
+	  af.modifier = con;
+	  af.location = APPLY_CON;
+	  affect_to_char(victim, &af);
+void check_weapon_weights(char_data * ch);
+
+	  check_weapon_weights(victim);
 	}
 	else
 	  {
@@ -4458,10 +4485,12 @@ act("You resist $n's attempt to weaken you!",ch,NULL,victim,TO_VICT,0);
 		ch, NULL, victim, TO_CHAR, 0);
 	  }
       }
-
+	if (IS_NPC(victim)) {
 	 retval = one_hit(victim, ch, TYPE_UNDEFINED, FIRST);
          retval = SWAP_CH_VICT(retval);
          return retval;
+	}
+  return eSUCCESS;
 }
 
 // TODO - make this use skill        

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.54 2004/05/18 00:17:44 urizen Exp $
+| $Id: cl_thief.cpp,v 1.55 2004/05/20 00:07:08 urizen Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -440,7 +440,8 @@ int do_sneak(CHAR_DATA *ch, char *argument, int cmd)
 
    send_to_char("You try to move silently for a while.\n\r", ch);
 
-   skill_increase_check(ch, SKILL_SNEAK, has_skill(ch,SKILL_SNEAK), SKILL_INCREASE_HARD);
+//   skill_increase_check(ch, SKILL_SNEAK, has_skill(ch,SKILL_SNEAK), 
+//SKILL_INCREASE_HARD);
 
    af.type = SKILL_SNEAK;
    af.duration = MAX(5, GET_LEVEL(ch) / 2);

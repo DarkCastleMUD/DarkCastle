@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.194 2004/05/18 22:50:06 urizen Exp $ */
+/* $Id: fight.cpp,v 1.195 2004/05/20 00:07:05 urizen Exp $ */
 
 extern "C"
 {
@@ -2910,7 +2910,7 @@ int do_skewer(CHAR_DATA *ch, CHAR_DATA *vict, int dam, int weapon)
   if((GET_CLASS(ch) != CLASS_WARRIOR) && GET_LEVEL(ch) < ARCHANGEL)  return 0;  
   if(!IS_NPC(vict) && GET_LEVEL(vict) >= IMMORTAL)                   return 0;	
   if(!ch->equipment[weapon])                                         return 0;
-
+  if (!has_skill(ch, SKILL_SKEWER)) return 0;
   // TODO - need to make this take specialization into consideration
   if(skill_success(ch,vict, SKILL_SKEWER))                          return 0;
 

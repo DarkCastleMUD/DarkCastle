@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.27 2004/05/19 16:53:06 urizen Exp $ */
+/* $Id: limits.cpp,v 1.28 2004/05/20 00:07:06 urizen Exp $ */
 
 extern "C"
 {
@@ -154,7 +154,7 @@ int mana_gain(CHAR_DATA *ch)
 //    gain = graf(age(ch).year, 2,3,4,6,7,8,9);
 
     gain = (int)(ch->max_mana * (float)mana_regens[GET_CLASS(ch)] / 100);
-
+    gain /= 4;
     switch (GET_POS(ch)) {
       case POSITION_SLEEPING: divisor = 1; break;
       case POSITION_RESTING:  divisor = 2; break;
@@ -179,7 +179,6 @@ int mana_gain(CHAR_DATA *ch)
 
   if((GET_COND(ch,FULL)==0)||(GET_COND(ch,THIRST)==0))
     gain >>= 2;
-  gain /= 4; 
   return (gain);
 }
 
@@ -200,7 +199,7 @@ int hit_gain(CHAR_DATA *ch)
   /* PC's */
   else {
     gain = (int)(ch->max_hit * (float)hit_regens[GET_CLASS(ch)] /100);
-
+    gain /= 4;
     /* Position calculations    */
     switch (GET_POS(ch)) {
       case POSITION_SLEEPING: divisor = 1; break;
@@ -236,7 +235,6 @@ int hit_gain(CHAR_DATA *ch)
 
   if((GET_COND(ch, FULL)==0) || (GET_COND(ch, THIRST)==0))
     gain >>= 2;
-  gain /= 4;
   return (gain);
 }
 
@@ -270,6 +268,7 @@ int move_gain(CHAR_DATA *ch)
     } else {
 //	gain = graf(age(ch).year, 4,5,6,7,4,3,2);
 	gain = (int)(ch->max_move * 0.06);
+	gain /= 4;
 	switch (GET_POS(ch)) {
 	    case POSITION_SLEEPING: divisor = 1; break;
 	    case POSITION_RESTING:  divisor = 2; break;
@@ -379,7 +378,7 @@ void redo_ki(CHAR_DATA *ch)
 void advance_level(CHAR_DATA *ch, int is_conversion)
 {
     int add_hp = 0;
-    int add_mana = 0;
+    int add_mana = 1;
     int add_moves = 0;
     int add_ki = 0;
     int add_practices;
@@ -429,7 +428,7 @@ void advance_level(CHAR_DATA *ch, int is_conversion)
    
     case CLASS_BARBARIAN:
 	add_ki	     += (GET_LEVEL(ch) % 2);
-        add_hp       += number(14,18);
+        add_hp       += number(16,20);
         add_moves    += number(1, (GET_CON(ch) / 2));
         break;
 

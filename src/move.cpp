@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.28 2004/05/14 13:32:57 urizen Exp $
+| $Id: move.cpp,v 1.29 2004/05/20 00:07:06 urizen Exp $
 | move.C
 | Movement commands and stuff.
 *************************************************************************
@@ -426,6 +426,7 @@ int do_simple_move(CHAR_DATA *ch, int cmd, int following)
          act(tmp, ch, 0, 0, TO_ROOM, INVIS_NULL|STAYHIDE);
       }
       else {
+	skill_increase_check(ch, SKILL_SNEAK, has_skill(ch, SKILL_SNEAK),SKILL_INCREASE_HARD);
         sprintf(tmp, "$n sneaks %s.", dirs[cmd]);
         act(tmp, ch, 0, 0, TO_ROOM, GODS);
       }

@@ -525,7 +525,8 @@ int do_show(struct char_data *ch, char *argument, int cmd)
                    "  mfiles\r\n"
                    "  ofiles\r\n"
 		   "  search\r\n"
-		   " msearch\r\n", ch);
+		   " msearch\r\n"
+		   " rsearch\r\n", ch);
     return eFAILURE;
   }
 
@@ -780,6 +781,56 @@ int do_show(struct char_data *ch, char *argument, int cmd)
 
     } // else was a digit
   } // zone
+  else if (is_abbrev(type, "rsearch") && has_range)
+  {
+     char arg1[MAX_INPUT_LENGTH];
+     int zon, bits = 0, sector = 0;
+     extern char *room_bits[], *sector_types[];
+     argument = one_argument(argument,arg1);
+     if (!is_number(arg1))
+     {
+	send_to_char("Syntax: show rsearch <zone#> <sectorname/roomflag>\r\n",ch);
+	return eSUCCESS;
+     }
+     zon = atoi(arg1);
+//     room_data  
+//   zone
+//   sector_type
+// room_flags
+       while ( (argument = one_argument(argument,arg1))!=NULL)
+       {
+	  if (arg1[0] == '\0') break;
+	  int i;
+	  for (i = 0; room_bits[i][0] != '\n'; i++)
+	    if (!str_cmp(arg1, room_bits[i])) {
+		SET_BIT(bits, 1<<i);
+		continue;
+	    }
+	   for (i = 0; sector_types[i][0] != '\n'; i++)
+	     if (!str_cmp(arg1,sector_types[i])) {
+		sector = i-1;
+		continue;
+	    }
+	   send_to_char("Unknown room-flag or sector type.\r\n",ch);
+       }
+       if (zon > top_of_zone_table)
+       {
+	send_to_char("Unknown zone.\r\n",ch);
+	return eFAILURE;
+       }
+	char buf[MAX_INPUT_LENGTH];
+       for (i = zone_table[zon].bottom_rnum;  i < zone_table[zon].top_rnum;i++)
+       {
+	 if (bits)
+  	   if (!IS_SET(world[i].room_flags,bits))
+	 	continue;
+	  if (sector)
+	    if (world[i].sector_type != sector)
+		continue;
+	 sprintf(buf,"[%3d] %s\r\n", i, world[i].name);
+	 send_to_char(buf,ch);
+       }
+  }
   else if (is_abbrev(type, "msearch") && has_range)
   {  // Mobile search.
     char arg1[MAX_STRING_LENGTH];
