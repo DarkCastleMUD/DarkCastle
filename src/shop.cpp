@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: shop.cpp,v 1.4 2002/08/03 15:29:28 pirahna Exp $ */
+/* $Id: shop.cpp,v 1.5 2003/01/22 16:12:19 pirahna Exp $ */
 
 extern "C"
 {
@@ -318,7 +318,7 @@ void shopping_sell( char *arg, CHAR_DATA *ch,
         return;
     }
 
-    if(IS_AFFECTED(ch, AFF_CANTQUIT) && !IS_MOB(ch) && IS_SET(ch->pcdata->punish, PUNISH_THIEF)) 
+    if(IS_AFFECTED(ch, AFF_CANTQUIT) && !IS_MOB(ch) && affected_by_spell(ch, FUCK_PTHIEF)) 
     {
       send_to_char("Your criminal acts prohibit it.\n\r", ch);
       return;

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: non_off.cpp,v 1.9 2002/09/13 17:50:51 pirahna Exp $
+| $Id: non_off.cpp,v 1.10 2003/01/22 16:12:19 pirahna Exp $
 | non_off.C
 | Description:  Implementation of generic, non-offensive commands.
 */
@@ -79,7 +79,7 @@ int do_tap(struct char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if(IS_AFFECTED(ch, AFF_CANTQUIT) && !IS_MOB(ch) && IS_SET(ch->pcdata->punish, PUNISH_THIEF)) {
+  if(IS_AFFECTED(ch, AFF_CANTQUIT) && !IS_MOB(ch) && affected_by_spell(ch, FUCK_PTHIEF)) {
     send_to_char("Your criminal acts prohibit it.\n\r", ch);
     return eFAILURE;
   }
@@ -144,7 +144,7 @@ int do_donate(struct char_data *ch, char *argument, int cmd)
 	return eFAILURE;
   }
   
-  if(IS_AFFECTED(ch, AFF_CANTQUIT) && !IS_MOB(ch) && IS_SET(ch->pcdata->punish, PUNISH_THIEF)) {
+  if(IS_AFFECTED(ch, AFF_CANTQUIT) && !IS_MOB(ch) && affected_by_spell(ch, FUCK_PTHIEF)) {
     send_to_char("Your criminal acts prohibit it.\n\r", ch);
     return eFAILURE;
   }

@@ -13,6 +13,7 @@
 #include <room.h>
 #include <handler.h>
 #include <returnvals.h>
+#include <spells.h>
 
 int do_boot(struct char_data *ch, char *arg, int cmd)
 {
@@ -43,7 +44,7 @@ int do_boot(struct char_data *ch, char *arg, int cmd)
 
     if(IS_AFFECTED(victim, AFF_CANTQUIT))
     {
-      if(IS_SET(victim->pcdata->punish, PUNISH_THIEF))
+      if(affected_by_spell(victim, FUCK_PTHIEF))
       {
         act("$N is a thief.  Don't boot $M.", ch, 0, victim, TO_CHAR, 0);
         return eFAILURE;

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.15 2002/10/03 00:43:13 pirahna Exp $
+| $Id: move.cpp,v 1.16 2003/01/22 16:12:19 pirahna Exp $
 | move.C
 | Movement commands and stuff.
 */
@@ -700,7 +700,7 @@ int do_enter(CHAR_DATA *ch, char *argument, int cmd)
      return eFAILURE;
    }
 
-   if (!IS_MOB(ch) && IS_SET(ch->pcdata->punish, PUNISH_THIEF) &&
+   if (!IS_MOB(ch) && affected_by_spell(ch, FUCK_PTHIEF) &&
        IS_SET(world[real_room(portal->obj_flags.value[0])].room_flags, CLAN_ROOM))
    {
      send_to_char("The portal's destination rebels against you.\r\n", ch);

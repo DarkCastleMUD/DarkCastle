@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.27 2003/01/16 03:59:10 dcastle Exp $ */
+/* $Id: mob_proc.cpp,v 1.28 2003/01/22 16:12:19 pirahna Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -2193,7 +2193,7 @@ int guild_guard(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     || (GET_CLASS(ch) != CLASS_MONK
         && ch->in_room == real_room(10094) && cmd == 3)
     ||   (IS_AFFECTED(ch, AFF_CANTQUIT) 
-        && (!IS_MOB(ch) && IS_SET(ch->pcdata->punish, PUNISH_THIEF)))
+        && (!IS_MOB(ch) && affected_by_spell(ch, FUCK_PTHIEF)))
 
 
 	)
@@ -2296,19 +2296,13 @@ int clan_guard(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     ||   (ch->clan != 15 && in_room == real_room(9344)) // overlords
 	)
     {
-	act( "$n is turned away from the clan hall.",
-	    ch, 0, 0, TO_ROOM , 0);
-	send_to_char(
-	    "The clan guard throws you out on your ass.\n\r", ch );
+	act( "$n is turned away from the clan hall.", ch, 0, 0, TO_ROOM , 0);
+	send_to_char("The clan guard throws you out on your ass.\n\r", ch );
 	return eSUCCESS;
     }
-    else if(IS_AFFECTED(ch, AFF_CANTQUIT) &&
-            (!IS_MOB(ch) && IS_SET(ch->pcdata->punish, PUNISH_THIEF))) { 
-	act( "$n is turned away from the clan hall.",
-	    ch, 0, 0, TO_ROOM , 0);
-	send_to_char(
-	    "The clan guard says 'Hey don't be bringing trouble "
-	    "around here!'\n\r", ch );
+    else if(IS_AFFECTED(ch, AFF_CANTQUIT) && affected_by_spell(ch, FUCK_PTHIEF)) { 
+	act( "$n is turned away from the clan hall.", ch, 0, 0, TO_ROOM , 0);
+	send_to_char("The clan guard says 'Hey don't be bringing trouble around here!'\n\r", ch );
 	return eSUCCESS;
     }
     return eFAILURE;

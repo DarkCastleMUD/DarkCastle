@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.24 2003/01/21 07:13:52 pirahna Exp $ */
+/* $Id: info.cpp,v 1.25 2003/01/22 16:12:19 pirahna Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -1288,6 +1288,9 @@ int do_score(struct char_data *ch, char *argument, int cmd)
            case FUCK_CANTQUIT:
              aff_name = "CANT_QUIT";
              break;
+           case FUCK_PTHIEF:
+             aff_name = "AWWW_CRAP";
+             break;
            case SKILL_HARM_TOUCH:
              aff_name = "harmtouch reuse timer";
              break;
@@ -1311,16 +1314,6 @@ int do_score(struct char_data *ch, char *argument, int cmd)
          found = TRUE;
          if(++level == 4)
             level = 0;
-      }
-      if(!IS_MOB(ch) && IS_SET(ch->pcdata->punish, PUNISH_THIEF)) 
-      {
-         scratch = frills[level];
-         sprintf(buf, "|%c| Affected by %-22s          Modifier %-16s  |%c|\n\r",						 
-               scratch, "PLAYER_THIEF", "AWW_CRAP", scratch);
-         send_to_char(buf, ch);
-         if(++level == 4) // doing this in case i add something after this in
-            level = 0;    // the future
-         found = TRUE;
       }
       if(found)
         send_to_char(

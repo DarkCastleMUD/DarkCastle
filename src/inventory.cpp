@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.15 2002/09/12 00:56:48 pirahna Exp $
+| $Id: inventory.cpp,v 1.16 2003/01/22 16:12:19 pirahna Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -24,6 +24,7 @@ extern "C"
 #include <act.h>
 #include <string.h>
 #include <returnvals.h>
+#include <spells.h>
 
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
@@ -636,7 +637,7 @@ int do_drop(struct char_data *ch, char *argument, int cmd)
          if(IS_SET(tmp_object->obj_flags.extra_flags, ITEM_SPECIAL))
            continue;
 
-      if(!IS_MOB(ch) && IS_AFFECTED(ch, AFF_CANTQUIT) && IS_SET(ch->pcdata->punish, PUNISH_THIEF)) {
+      if(!IS_MOB(ch) && IS_AFFECTED(ch, AFF_CANTQUIT) && affected_by_spell(ch, FUCK_PTHIEF)) {
         send_to_char("Your criminal acts prohibit it.\n\r", ch);
         return eFAILURE;
       }
@@ -678,7 +679,7 @@ int do_drop(struct char_data *ch, char *argument, int cmd)
       tmp_object = get_obj_in_list_vis(ch, arg, ch->carrying);
       if(tmp_object) {
 
-      if(!IS_MOB(ch) && IS_AFFECTED(ch, AFF_CANTQUIT) && IS_SET(ch->pcdata->punish, PUNISH_THIEF)) {
+      if(!IS_MOB(ch) && IS_AFFECTED(ch, AFF_CANTQUIT) && affected_by_spell(ch, FUCK_PTHIEF)) {
         send_to_char("Your criminal acts prohibit it.\n\r", ch);
         return eFAILURE;
       }
@@ -990,7 +991,7 @@ int do_give(struct char_data *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
-    if(!IS_MOB(ch) && IS_AFFECTED(ch, AFF_CANTQUIT) && IS_SET(ch->pcdata->punish, PUNISH_THIEF)) {
+    if(!IS_MOB(ch) && IS_AFFECTED(ch, AFF_CANTQUIT) && affected_by_spell(ch, FUCK_PTHIEF)) {
       send_to_char("Your criminal acts prohibit it.\n\r", ch);
       return eFAILURE;
     }
@@ -1043,9 +1044,8 @@ int do_give(struct char_data *ch, char *argument, int cmd)
        return eFAILURE;
     }
 
-    if(!IS_MOB(ch) && IS_SET(ch->pcdata->punish, PUNISH_THIEF) && !vict->desc) {
-      send_to_char("Now WHY would a thief give something to a linkdead "
-                   "char..?\n\r", ch);
+    if(!IS_MOB(ch) && affected_by_spell(ch, FUCK_PTHIEF) && !vict->desc) {
+      send_to_char("Now WHY would a thief give something to a linkdead char..?\n\r", ch);
       return eFAILURE;
     }
 

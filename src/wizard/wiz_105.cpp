@@ -14,7 +14,6 @@
 #include <returnvals.h>
 
 
-
 int do_log(struct char_data *ch, char *argument, int cmd)
 {
     struct char_data *vict;
@@ -87,13 +86,11 @@ int do_pardon(struct char_data *ch, char *argument, int cmd)
 
     if(!str_cmp("thief", flag))
     {
-      if(IS_SET(victim->pcdata->punish, PUNISH_THIEF))
+      if(affected_by_spell(victim, FUCK_PTHIEF))
       {
         send_to_char("Thief flag removed.\n\r",ch);
-        REMOVE_BIT(victim->pcdata->punish, PUNISH_THIEF);
-        send_to_char(
-                "A nice god has pardoned you of your thievery.\n\r", victim);
-
+        affect_from_char(victim, FUCK_PTHIEF);
+        send_to_char("A nice god has pardoned you of your thievery.\n\r", victim);
       }
       else
       {

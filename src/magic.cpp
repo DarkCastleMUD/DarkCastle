@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.56 2003/01/16 03:59:09 dcastle Exp $ */
+/* $Id: magic.cpp,v 1.57 2003/01/22 16:12:19 pirahna Exp $ */
 
 extern "C"
 {
@@ -2558,7 +2558,7 @@ int spell_word_of_recall(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct ob
     location = real_room(GET_HOME(victim));
   else
   {
-    if(IS_SET(victim->pcdata->punish, PUNISH_THIEF))
+    if(affected_by_spell(victim, FUCK_PTHIEF))
       location = real_room(START_ROOM);
     else
       location = real_room(GET_HOME(victim));

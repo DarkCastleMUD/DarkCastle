@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.19 2003/01/08 21:19:46 dcastle Exp $
+| $Id: cl_thief.cpp,v 1.20 2003/01/22 16:12:22 pirahna Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -530,7 +530,7 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
 {
   CHAR_DATA *victim;
   struct obj_data *obj, *loop_obj, *next_obj;
-  struct affected_type af, *paf;
+  struct affected_type af, pthiefaf, *paf;
   char victim_name[240];
   char obj_name[240];
   char buf[240];
@@ -550,6 +550,12 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
   af.modifier = 0;
   af.location = APPLY_NONE;
   af.bitvector = AFF_CANTQUIT;
+
+  pthiefaf.type = FUCK_PTHIEF;
+  pthiefaf.duration = 20;
+  pthiefaf.modifier = 0;
+  pthiefaf.location = APPLY_NONE;
+  pthiefaf.bitvector = 0;
 
   if(!(victim = get_char_room_vis(ch, victim_name))) {
     send_to_char("Steal what from who?\n\r", ch);
@@ -600,7 +606,7 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
   }
 
   if(!IS_NPC(victim) &&
-    !(victim->desc) && !IS_SET(victim->pcdata->punish, PUNISH_THIEF)) {
+    !(victim->desc) && !affected_by_spell(victim, FUCK_PTHIEF) ) {
     send_to_char("That person isn't really there.\n\r", ch);
     return eFAILURE;
   }
@@ -629,7 +635,7 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
     if(IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL)) 
     {
       send_to_char("That item is protected by the gods.\n\r", ch);
-        return eFAILURE;
+      return eFAILURE;
     }
     else 
     {  // obj found in inventory
@@ -685,7 +691,8 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
                   do_wake(ch, GET_NAME(victim), 9);
                 }
               }
-              if(!IS_SET(victim->pcdata->punish, PUNISH_THIEF)) 
+              // if victim isn't a pthief
+              if(!affected_by_spell(victim, FUCK_PTHIEF) ) 
               {
                 if(!IS_AFFECTED(ch, AFF_CANTQUIT))
                   affect_to_char(ch, &af);
@@ -697,9 +704,14 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
                        paf->duration = 5;
                   }
                 }
+                if(affected_by_spell(ch, FUCK_PTHIEF))
+                {
+                  affect_from_char(ch, FUCK_PTHIEF);
+                  affect_to_char(ch, &pthiefaf);
+                }
+                else
+                  affect_to_char(ch, &pthiefaf);
               }
-
-              SET_BIT(ch->pcdata->punish, PUNISH_THIEF);
             }
             if(!IS_NPC(victim))
             {
@@ -779,7 +791,7 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
         sprintf(buf,"%s stole from %s while victim was asleep",
                 GET_NAME(ch), GET_NAME(victim));
         log(buf, ANGEL, LOG_MORTAL);
-        if(!IS_NPC(victim)) 
+        if(!IS_MOB(victim)) 
         {
           do_save(victim, "", 666);
           do_save(ch, "", 666);
@@ -800,7 +812,7 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
           }
 
           // You don't get a thief flag from stealing from a pthief
-          if(!IS_MOB(victim) && !IS_SET(victim->pcdata->punish, PUNISH_THIEF)) 
+          if(!affected_by_spell(victim, FUCK_PTHIEF)) 
           {
             if(!IS_AFFECTED(ch, AFF_CANTQUIT))
               affect_to_char(ch, &af);
@@ -812,10 +824,14 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
                    paf->duration = 5;
               }
             }
-          }
-  
-          if(!IS_MOB(victim) && !IS_SET(victim->pcdata->punish, PUNISH_THIEF))
-                  SET_BIT(ch->pcdata->punish, PUNISH_THIEF);
+            if(affected_by_spell(ch, FUCK_PTHIEF))
+            {
+              affect_from_char(ch, FUCK_PTHIEF);
+              affect_to_char(ch, &pthiefaf);
+            }
+            else
+              affect_to_char(ch, &pthiefaf);
+          }  
         } // !is_npc
 
         if(IS_SET(obj->obj_flags.more_flags, ITEM_NO_TRADE))
@@ -864,7 +880,7 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
 int do_pocket(CHAR_DATA *ch, char *argument, int cmd)
 {
   CHAR_DATA *victim;
-  struct affected_type af, *paf;
+  struct affected_type af, pthiefaf, *paf;
   char victim_name[240];
   char buf[240];
   int percent, learned, chance, specialization;
@@ -880,6 +896,12 @@ int do_pocket(CHAR_DATA *ch, char *argument, int cmd)
   af.modifier = 0;
   af.location = APPLY_NONE;
   af.bitvector = AFF_CANTQUIT;
+
+  pthiefaf.type = FUCK_PTHIEF;
+  pthiefaf.duration = 20;
+  pthiefaf.modifier = 0;
+  pthiefaf.location = APPLY_NONE;
+  pthiefaf.bitvector = 0;
 
   if(!(victim = get_char_room_vis(ch, victim_name))) {
     send_to_char("Steal what from who?\n\r", ch);
@@ -931,7 +953,7 @@ int do_pocket(CHAR_DATA *ch, char *argument, int cmd)
 
 
   if(!IS_NPC(victim) &&
-    !(victim->desc) && !IS_SET(victim->pcdata->punish, PUNISH_THIEF)) {
+    !(victim->desc) && !affected_by_spell(victim, FUCK_PTHIEF) ) {
     send_to_char("That person isn't really there.\n\r", ch);
     return eFAILURE;
   }
@@ -987,7 +1009,7 @@ int do_pocket(CHAR_DATA *ch, char *argument, int cmd)
       {
         do_save(victim, "", 666);
         do_save(ch, "", 666);
-        if(!IS_SET(victim->pcdata->punish, PUNISH_THIEF)) 
+        if(!affected_by_spell(victim, FUCK_PTHIEF) ) 
         {
           if(!IS_AFFECTED(ch, AFF_CANTQUIT))
             affect_to_char(ch, &af);
@@ -999,8 +1021,20 @@ int do_pocket(CHAR_DATA *ch, char *argument, int cmd)
                 paf->duration = 5;
             }
           }
+          if(affected_by_spell(ch, FUCK_PTHIEF))
+          {
+            affect_from_char(ch, FUCK_PTHIEF);
+            affect_to_char(ch, &pthiefaf);
+          }
+          else
+            affect_to_char(ch, &pthiefaf);
         }
-        SET_BIT(ch->pcdata->punish, PUNISH_THIEF);
+        af.type = FUCK_PTHIEF;
+        af.duration = 20;
+        af.modifier = 0;
+        af.location = APPLY_NONE;
+        af.bitvector = AFF_CANTQUIT;
+        affect_to_char(ch, &af);
       }
       if ((GET_LEVEL(ch)<ANGEL) && (!IS_NPC(victim))) 
       {
@@ -1132,7 +1166,7 @@ int do_slip(struct char_data *ch, char *argument, int cmd)
       learned = 75;
    else learned = has_skill(ch, SKILL_SLIP);
 
-    if(!IS_MOB(ch) && IS_AFFECTED(ch, AFF_CANTQUIT) && IS_SET(ch->pcdata->punish, PUNISH_THIEF)) { 
+    if(!IS_MOB(ch) && IS_AFFECTED(ch, AFF_CANTQUIT) && affected_by_spell(ch, FUCK_PTHIEF) ) { 
       send_to_char("Your criminal acts prohibit it.\n\r", ch);
       return eFAILURE;
     }
@@ -1292,7 +1326,7 @@ int do_slip(struct char_data *ch, char *argument, int cmd)
       return eFAILURE;
       }
 
-   if(IS_SET(ch->pcdata->punish, PUNISH_THIEF) && !vict->desc) {
+   if(affected_by_spell(ch, FUCK_PTHIEF) && !vict->desc) {
       send_to_char("Now WHY would a thief slip something to a "
              "linkdead char..?\n\r", ch);
       return eFAILURE;

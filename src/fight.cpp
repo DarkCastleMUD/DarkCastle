@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.93 2003/01/22 06:45:31 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.94 2003/01/22 16:12:18 pirahna Exp $ */
 
 extern "C"
 {
@@ -2229,7 +2229,7 @@ void make_corpse(CHAR_DATA * ch)
   // Thieves don't deserve consent! Loot time!
   // Morc
   
-  if(IS_NPC(ch) || IS_SET(ch->pcdata->punish, PUNISH_THIEF)) {
+  if(IS_NPC(ch) || affected_by_spell(ch, FUCK_PTHIEF) ) {
     corpse->obj_flags.wear_flags = 0;
     sprintf(buf, "corpse %s", GET_NAME(ch));
   }
@@ -2722,9 +2722,9 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
   victim->pcdata->grplvl      = 0;
   if(IS_SET(victim->pcdata->punish, PUNISH_SPAMMER))
     REMOVE_BIT(victim->pcdata->punish, PUNISH_SPAMMER);
-  if(IS_SET(victim->pcdata->punish, PUNISH_THIEF)) {
+  if(affected_by_spell(victim, FUCK_PTHIEF)) {
     is_thief = 1;
-    REMOVE_BIT(victim->pcdata->punish, PUNISH_THIEF);
+    affect_from_char(victim, FUCK_PTHIEF);
   }
 
   GET_POS(victim) = POSITION_RESTING;
@@ -2769,10 +2769,11 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
     GET_RDEATHS(victim) += 1;
 
     /* New death system... dying is a BITCH!  */
-    // Stat loss if they are a thief and they were killed by:  mob/self/clannie
-    // or they're not a thief, and got a bad roll
-    if((is_thief && ((ch && (IS_NPC(ch) || ch == victim || (ch->clan && ch->clan == victim->clan))))) ||
-       (!is_thief && (GET_LEVEL(victim)>20 && number(1,101) <= GET_LEVEL(victim))) )
+    // thief + mob kill = stat loss
+    // or got a bad roll
+    if( ( is_thief && IS_MOB(ch) ) ||
+        ( GET_LEVEL(victim)>20 && number(1,101) <= GET_LEVEL(victim) ) 
+      )
     {
       if(GET_LEVEL(ch) >= 50 || 0 == number(0, 2)) 
       {
@@ -3215,7 +3216,7 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim)
     return;
   }
 
-  if(IS_SET(victim->pcdata->punish, PUNISH_THIEF)) {
+  if(affected_by_spell(victim, FUCK_PTHIEF)) {
     GET_MOVE(victim) = 2;
     fight_kill(ch, victim, TYPE_RAW_KILL);
     return;
