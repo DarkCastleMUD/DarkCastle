@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_ranger.cpp,v 1.24 2003/06/05 02:51:41 pirahna Exp $ | cl_ranger.C |
+| $Id: cl_ranger.cpp,v 1.25 2003/06/13 00:02:37 pirahna Exp $ | cl_ranger.C |
 Description: Ranger skills/spells */ extern "C"  {
   #include <string.h>
 }
@@ -92,6 +92,8 @@ int do_tame(CHAR_DATA *ch, char *arg, int cmd)
    }
 
   act("$n holds out $s hand to $N and beckons softly.", ch, NULL, victim, TO_ROOM, INVIS_NULL); 
+
+  WAIT_STATE(ch, PULSE_VIOLENCE * 1);
 
   if((IS_SET(victim->immune, ISR_CHARM)) ||
       !IS_SET(victim->mobdata->actflags, ACT_CHARM)) {
