@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.72 2004/05/01 00:38:48 urizen Exp $ */
+/* $Id: spells.cpp,v 1.73 2004/05/02 19:45:47 urizen Exp $ */
 
 extern "C"
 {
@@ -725,7 +725,7 @@ char *skills[]=
   "two_handed_weapons",
   "hand_to_hand",
   "bullrush",
-  "aggression",
+  "ferocity",
   "tactics",
   "deceit",
   "release",

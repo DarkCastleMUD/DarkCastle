@@ -1,12 +1,16 @@
 #ifndef MOBILE_H_
 #define MOBILE_H_
 /************************************************************************
-| $Id: mobile.h,v 1.6 2004/04/24 15:45:03 urizen Exp $
+| $Id: mobile.h,v 1.7 2004/05/02 19:39:53 urizen Exp $
 | mobile.h
 | Description:  This file contains the header information for mobile
 |   control.
 */
 void rebuild_rnum_references(int startAt, int type);
+void    mprog_driver            ( char* com_list, CHAR_DATA* mob,
+                                       CHAR_DATA* actor, OBJ_DATA* obj,
+                                       void* vo );
+
 
 #define ACT_SPEC       1
 #define ACT_SENTINEL   1<<1

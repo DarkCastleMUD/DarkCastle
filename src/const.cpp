@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.88 2004/04/30 17:03:53 urizen Exp $ */
+/* $Id: const.cpp,v 1.89 2004/05/02 19:39:44 urizen Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -28,12 +28,11 @@ extern "C"
 #include <dmalloc.h>
 #endif
 
-#include <mobile.h> // race_shit
 #include <player.h> // *app_type
 #include <character.h>
 #include <spells.h>
 #include <levels.h>
-
+#include <mobile.h>
 bestowable_god_commands_type bestowable_god_commands[] =
 {
 { "goto",	COMMAND_GOTO },
@@ -1045,30 +1044,30 @@ struct class_skill_defines w_skills[] = {
 1,	0, 	0, 	NULL,{0,0} } };
 
 struct class_skill_defines t_skills[] = {
-{    "sneak",		SKILL_SNEAK,		1,	75,	-2, 	"You require the essence of a forest creature, a particularly sly one at that.",{0,0} },
-{    "shield block",    SKILL_SHIELDBLOCK,      1, 40, -2, 	"To learn this skill you must seek its master, the God of War in his arena.  Ask him to please teach you.",{0,0} },
-{    "backstab",	SKILL_BACKSTAB,		2,	90,	3022,	"You have to go see Skiv the thief guildmaster.",{0,0} },
-{    "hide",		SKILL_HIDE,		5, 	75,	-2, "Seek out the Abbot of a hidden monastery off shore road.",{0,0} },
-{    "pick",		SKILL_PICK_LOCK,	7,	75,	-2,	"One of those swine that are homage to the old god, they are hard to find but they reside in sorpigal.",{0,0} },
-{    "slip",  		SKILL_SLIP,		10,	80,	-2,	"The desert banditos know, but they take their secrets to the grave.",{0,0} },
-{    "palm",		SKILL_PALM,		10,	80,	-2,	"Seek out a pirate captain in a relatively calm port of call.  He believes in honor amongst thieves.",{0,0} },
-{    "dual wield",      SKILL_DUAL_WIELD,       10,	90,     -2, "With whirling blades and rigid honor, only these masters of weaponry can teach you the skill you need.",{0,0} },
-{    "pocket",		SKILL_POCKET,		12,	80,	-2, 	"You might wish to find that conniving dullard in silverdale, can't 'member his name but it rhymes with knave.",{0,0} },
-{    "dodge",		SKILL_DODGE,		15,	90,	-2, 	"Hop like a bunny, quick like a bee, this location is so funny, you'll go wee wee wee.  Don't forget to bring your scythe however.",{0,0} },
-{    "stalk",		SKILL_STALK,		15,	80,	-2, 	"Seek out the sneaky little rodent who is a gossiper and thief!",{0,0} },
-{    "trip",		SKILL_TRIP,		17,	75,	-2, 	"The old goblin in the caves knows, but he will not be cooperative.  You might need to use violence.",{0,0} },
-{    "blindfighting",   SKILL_BLINDFIGHTING, 19, 60,     -2, "Only on the astral planes can you find what you seek.",{0,0}},
-{    "steal",		SKILL_STEAL,		20,	80,	-2, "There's a little thief around town named Caijin.  Annoying little bastard.  Ask him to please teach you.",{0,0} },
-{    "disarm",		SKILL_DISARM,		23,	60,	-2, "The duke of Marok is who you need to see.",{0,0}},
-{    "eyegouge", SKILL_EYEGOUGE, 42, 95, 3022, NULL, {0,0}},
-{    "vitalstrike",     SKILL_VITAL_STRIKE,	25,	80,	-2,	"The individual you seek is skilled in the arts of legerdemain, both verbal and physical.",{0,0} },
-{    "circle",		SKILL_CIRCLE,		30,	75,	-2, "Seek the king of a long lost civilization.  I only hear that they are the last of the Jiran.",{0,0} },
-{    "bludgeoning",	SKILL_BLUDGEON_WEAPONS,	30,	80,	3022,	NULL,{0,0} },
-{    "piercing",	SKILL_PIERCEING_WEAPONS,30,	80,	3022,	NULL,{0,0} },
-{    "slashing",	SKILL_SLASHING_WEAPONS,	30,	80,	3022,	NULL,{0,0} },
-{    "crushing",	SKILL_CRUSHING_WEAPONS,	30,	80,	3022,	NULL,{0,0} },
-{    "deceit",		SKILL_DECEIT,		31,	90,	-2,	"The guardian of this guild has the knowledge you seek.  Speak the name of this skill in his presence.",{0,0} },
-{    "dualbackstab",	SKILL_DUAL_BACKSTAB,	40,	80,	-2, 	"Look for a thief who travels in the most dangerous of places.",{0,0} },
+{    "sneak",		SKILL_SNEAK,		1,	90,	-2, 	"You require the essence of a forest creature, a particularly sly one at that.",{DEX,0} },
+{    "shield block",    SKILL_SHIELDBLOCK,      4, 55, -2, 	"To learn this skill you must seek its master, the God of War in his arena.  Ask him to please teach you.",{STR,0} },
+{    "backstab",	SKILL_BACKSTAB,		2,	90,	3022,	"You have to go see Skiv the thief guildmaster.",{STR,0} },
+{    "hide",		SKILL_HIDE,		7, 	90,	-2, "Seek out the Abbot of a hidden monastery off shore road.",{INT,0} },
+{    "pick",		SKILL_PICK_LOCK,	6,	95,	-2,	"One of those swine that are homage to the old god, they are hard to find but they reside in sorpigal.",{DEX,WIS} },
+{    "slip",  		SKILL_SLIP,		13,	95,	-2,	"The desert banditos know, but they take their secrets to the grave.",{DEX,INT} },
+{    "palm",		SKILL_PALM,		12,	95,	-2,	"Seek out a pirate captain in a relatively calm port of call.  He believes in honor amongst thieves.",{DEX,INT} },
+{    "dual wield",      SKILL_DUAL_WIELD,       10,	90,     -2, "With whirling blades and rigid honor, only these masters of weaponry can teach you the skill you need.",{DEX,0} },
+{    "pocket",		SKILL_POCKET,		20,	95,	-2, 	"You might wish to find that conniving dullard in silverdale, can't 'member his name but it rhymes with knave.",{INT,DEX} },
+{    "dodge",		SKILL_DODGE,		15,	90,	-2, 	"Hop like a bunny, quick like a bee, this location is so funny, you'll go wee wee wee.  Don't forget to bring your scythe however.",{DEX,0} },
+{    "stalk",		SKILL_STALK,		22,	95,	-2, 	"Seek out the sneaky little rodent who is a gossiper and thief!",{CON,DEX} },
+{    "trip",		SKILL_TRIP,		17,	85,	-2, 	"The old goblin in the caves knows, but he will not be cooperative.  You might need to use violence.",{DEX,0} },
+{    "blindfighting",   SKILL_BLINDFIGHTING, 28, 80,     -2, "Only on the astral planes can you find what you seek.",{INT,0}},
+{    "steal",		SKILL_STEAL,		25,	95,	-2, "There's a little thief around town named Caijin.  Annoying little bastard.  Ask him to please teach you.",{DEX,WIS} },
+{    "disarm",		SKILL_DISARM,		38,	85,	-2, "The duke of Marok is who you need to see.",{DEX,0}},
+{    "eyegouge", SKILL_EYEGOUGE, 42, 95, 3022, NULL, {STR,CON}},
+{    "vitalstrike",     SKILL_VITAL_STRIKE,	45,	95,	-2,	"The individual you seek is skilled in the arts of legerdemain, both verbal and physical.",{CON,DEX} },
+{    "circle",		SKILL_CIRCLE,		35,	95,	-2, "Seek the king of a long lost civilization.  I only hear that they are the last of the Jiran.",{STR,DEX} },
+{    "bludgeoning",	SKILL_BLUDGEON_WEAPONS,	30,	70,	3022,	NULL,{STR,0} },
+{    "piercing",	SKILL_PIERCEING_WEAPONS,30,	90,	3022,	NULL,{DEX,0} },
+{    "slashing",	SKILL_SLASHING_WEAPONS,	30,	55,	3022,	NULL,{DEX,0} },
+{    "crushing",	SKILL_CRUSHING_WEAPONS,	30,	55,	3022,	NULL,{STR,0} },
+{    "deceit",		SKILL_DECEIT,		31,	95,	-2,	"The guardian of this guild has the knowledge you seek.  Speak the name of this skill in his presence.",{WIS,INT} },
+{    "dualbackstab",	SKILL_DUAL_BACKSTAB,	40,	95,	-2, 	"Look for a thief who travels in the most dangerous of places.",{DEX,INT} },
 {    "\n",		0,			1,	0,	0,	NULL,{0,0}}
 };
 

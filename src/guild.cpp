@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.27 2004/05/02 19:39:44 urizen Exp $
+| $Id: guild.cpp,v 1.28 2004/05/02 19:42:35 urizen Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -236,7 +236,7 @@ int skills_guild(struct char_data *ch, char *arg, struct char_data *owner)
     ( !IS_MOB(owner) || (skilllist[skillnumber].trainer != mob_index[owner->mobdata->nr].virt)
     )) 
   {
-    int classon = 1<<CLASS_WARRIOR + 1<<CLASS_THIEF;
+    int classon = 1<<CLASS_WARRIOR + 1<<CLASS_THIEF + 1<<CLASS_BARBARIAN;
    if (default_master[GET_CLASS(ch)] != mob_index[owner->mobdata->nr].virt)
 	do_say(owner, "I'm sorry, I can't teach you that.  You'll have to find another trainer.",9);
    else {

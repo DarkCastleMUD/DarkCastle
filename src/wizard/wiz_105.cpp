@@ -155,6 +155,16 @@ struct skill_quest *find_sq(char *testa)
    return NULL;
 }
 
+struct skill_quest *find_sq(int sq)
+{
+   struct skill_quest *curr;
+   for (curr = skill_list; curr; curr = curr->next)
+     if (sq == curr->num)
+       return curr;
+   return NULL;
+}
+
+
 int do_sqedit(struct char_data *ch, char *argument, int cmd)
 {
   char command[MAX_INPUT_LENGTH];

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_monk.cpp,v 1.14 2004/05/02 12:27:02 urizen Exp $
+| $Id: cl_monk.cpp,v 1.15 2004/05/02 19:39:47 urizen Exp $
 | cl_monk.C
 | Description:  Monk skills.
 */
@@ -181,7 +181,7 @@ int do_quivering_palm(struct char_data *ch, char *argument, int cmd)
 
   WAIT_STATE(ch, PULSE_VIOLENCE*2);
   af.type = SKILL_QUIVERING_PALM;
-  af.duration = 48;
+  af.duration = 12;
   af.modifier = 0;
   af.location = APPLY_NONE;
   af.bitvector = 0;

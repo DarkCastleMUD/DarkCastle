@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.121 2004/05/02 18:24:51 urizen Exp $ */
+/* $Id: magic.cpp,v 1.122 2004/05/02 19:39:44 urizen Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -123,7 +123,7 @@ int spell_chill_touch(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
   dam = dice(2,8) * level/2;
 
   save = saves_spell(ch, victim, (level/2), SAVE_TYPE_COLD);
-
+  
   skill_increase_check(ch, SPELL_CHILL_TOUCH, skill, SKILL_INCREASE_MEDIUM);
 
   if(save < 0 && skill > 50) // if failed
@@ -150,10 +150,10 @@ int spell_burning_hands(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
   set_cantquit( ch, victim );
 
   dam = dice(3,8) + level / 2 + skill / 10;
-  save = saves_spell(ch, victim, 3, SAVE_TYPE_FIRE);
+//  save = saves_spell(ch, victim, 3, SAVE_TYPE_FIRE);
 
   // modify the damage by how much they resisted
-  dam += (int) (dam * (save/100));
+  //dam += (int) (dam * (save/100));
 
   skill_increase_check(ch, SPELL_BURNING_HANDS, skill, SKILL_INCREASE_MEDIUM);
 
@@ -166,10 +166,10 @@ int spell_shocking_grasp(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct ob
   int save;
 
   dam = dice(4,8) + level / 2 + skill / 10;
-  save = saves_spell(ch, victim, 5, SAVE_TYPE_ENERGY);
+//  save = saves_spell(ch, victim, 5, SAVE_TYPE_ENERGY);
 
   // modify the damage by how much they resisted
-  dam += (int) (dam * (save/100));
+  //dam += (int) (dam * (save/100));
 
   skill_increase_check(ch, SPELL_SHOCKING_GRASP, skill, SKILL_INCREASE_MEDIUM);
 
@@ -184,10 +184,10 @@ int spell_lightning_bolt(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct ob
   set_cantquit( ch, victim );
 
   dam = (level + GET_INT(ch) + skill / 10) * 3;
-  save = saves_spell(ch, victim, 10, SAVE_TYPE_ENERGY);
+//  save = saves_spell(ch, victim, 10, SAVE_TYPE_ENERGY);
 
   // modify the damage by how much they resisted
-  dam += (int) (dam * (save/100));
+  //dam += (int) (dam * (save/100));
 
   skill_increase_check(ch, SPELL_LIGHTNING_BOLT, skill, SKILL_INCREASE_MEDIUM);
 
@@ -366,10 +366,10 @@ int spell_meteor_swarm(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
 
   skill_increase_check(ch, SPELL_METEOR_SWARM, skill, SKILL_INCREASE_MEDIUM);
 
-  int save = saves_spell(ch, victim, 50, SAVE_TYPE_MAGIC);
+//  int save = saves_spell(ch, victim, 50, SAVE_TYPE_MAGIC);
 
   // modify the damage by how much they resisted
-  dam += (int) (dam * (save/100));
+//  dam += (int) (dam * (save/100));
 
   return spell_damage(ch, victim, dam,TYPE_MAGIC, SPELL_METEOR_SWARM, 0);
 }
@@ -381,12 +381,12 @@ int spell_fireball(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data
    set_cantquit( ch, victim );
    dam = ((level * 2) + GET_INT(ch)) * 2;
 
-   int save = saves_spell(ch, victim, 25, SAVE_TYPE_FIRE);
+//   int save = saves_spell(ch, victim, 25, SAVE_TYPE_FIRE);
 
    skill_increase_check(ch, SPELL_FIREBALL, skill, SKILL_INCREASE_MEDIUM);
 
    // modify the damage by how much they resisted
-   dam += (int) (dam * (save/100));
+  // dam += (int) (dam * (save/100));
 
    int retval = spell_damage(ch, victim, dam, TYPE_FIRE, SPELL_FIREBALL, 0);
 
@@ -396,8 +396,8 @@ int spell_fireball(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data
    if(number(0, 100) < ( skill / 5 ) ) {
      act("The expanding flames suddenly recombine and fly at $N again!", ch, 0, victim, TO_ROOM, 0);
      act("The expanding flames suddenly recombine and fly at $N again!", ch, 0, victim, TO_CHAR, 0);
-     save = saves_spell(ch, victim, 25, SAVE_TYPE_FIRE);
-     dam += (int) (dam * (save/100));
+//     save = saves_spell(ch, victim, 25, SAVE_TYPE_FIRE);
+  //   dam += (int) (dam * (save/100));
      retval = spell_damage(ch, victim, dam, TYPE_FIRE, SPELL_FIREBALL, 0);
    }
    return retval;
@@ -412,10 +412,10 @@ int spell_sparks(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *
 
    skill_increase_check(ch, SPELL_SPARKS, skill, SKILL_INCREASE_MEDIUM);
 
-   int save = saves_spell(ch, victim, ( skill / 5 ), SAVE_TYPE_ENERGY);
+//   int save = saves_spell(ch, victim, ( skill / 5 ), SAVE_TYPE_ENERGY);
 
-   if(save >= 0)
-     dam >>= 1;
+  // if(save >= 0)
+    // dam >>= 1;
 
    return spell_damage(ch, victim, dam, TYPE_FIRE, SPELL_SPARKS, 0);
 }
@@ -656,8 +656,8 @@ int spell_life_leech(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
 
 		 dam = dice(8, 6);
 
-		 if(saves_spell(ch, tmp_victim, 10, SAVE_TYPE_MAGIC) >= 0)
-		    dam >>= 1;
+//		 if(saves_spell(ch, tmp_victim, 10, SAVE_TYPE_MAGIC) >= 0)
+//		    dam >>= 1;
 
 		 if (GET_HIT(tmp_victim) < dam)
 			  GET_HIT(ch) += GET_HIT(tmp_victim);
@@ -997,8 +997,8 @@ int spell_dispel_evil(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
   skill_increase_check(ch, SPELL_DISPEL_EVIL, skill, SKILL_INCREASE_MEDIUM);
 
   dam = dice(skill, 4);
-  int save = saves_spell(ch, victim, 25, SAVE_TYPE_MAGIC);
-  dam += (int) (dam * (save/100));
+//  int save = saves_spell(ch, victim, 25, SAVE_TYPE_MAGIC);
+  //dam += (int) (dam * (save/100));
 
   return spell_damage(ch, victim, dam, TYPE_MAGIC, SPELL_DISPEL_EVIL, 0);
 }
@@ -1021,8 +1021,8 @@ int spell_dispel_good(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
   skill_increase_check(ch, SPELL_DISPEL_GOOD, skill, SKILL_INCREASE_MEDIUM);
 
   dam = dice(skill,4);
-  int save = saves_spell(ch, victim, 25, SAVE_TYPE_MAGIC);
-  dam += (int) (dam * (save/100));
+//  int save = saves_spell(ch, victim, 25, SAVE_TYPE_MAGIC);
+  //dam += (int) (dam * (save/100));
 
   return spell_damage(ch, victim, dam, TYPE_MAGIC, SPELL_DISPEL_GOOD, 0);
 }
@@ -1038,8 +1038,8 @@ int spell_call_lightning(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct ob
   {
      skill_increase_check(ch, SPELL_CALL_LIGHTNING, skill, SKILL_INCREASE_HARD);
      dam = dice(MIN((int)GET_MANA(ch),700), 1);
-     if(saves_spell(ch, victim, skill/6, SAVE_TYPE_ENERGY) >= 0)
-        dam >>= 1;
+//     if(saves_spell(ch, victim, skill/6, SAVE_TYPE_ENERGY) >= 0)
+  //      dam >>= 1;
      return spell_damage(ch, victim, dam,TYPE_ENERGY, SPELL_CALL_LIGHTNING, 0);
   }
   return eFAILURE;
@@ -1053,8 +1053,8 @@ int spell_harm(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *ob
 
   dam = 100;
   skill_increase_check(ch, SPELL_HARM, skill, SKILL_INCREASE_MEDIUM);
-  int save = saves_spell(ch, victim, skill / 2, SAVE_TYPE_MAGIC);
-  dam += (int) (dam * (save/100));
+//  int save = saves_spell(ch, victim, skill / 2, SAVE_TYPE_MAGIC);
+  //dam += (int) (dam * (save/100));
 
   return spell_damage(ch, victim, dam, TYPE_MAGIC, SPELL_HARM, 0);
 }
@@ -1067,8 +1067,8 @@ int spell_power_harm(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
 
   skill_increase_check(ch, SPELL_POWER_HARM, skill, SKILL_INCREASE_MEDIUM);
   dam = 100 + 4 * ( skill / 2 );
-  int save = saves_spell(ch, victim, skill / 2, SAVE_TYPE_MAGIC);
-  dam += (int) (dam * (save/100));
+//  int save = saves_spell(ch, victim, skill / 2, SAVE_TYPE_MAGIC);
+  //dam += (int) (dam * (save/100));
 
   return spell_damage(ch, victim, dam, TYPE_MAGIC, SPELL_POWER_HARM, 0);
 }
@@ -3209,8 +3209,8 @@ int spell_frost_breath(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
 
 	 dam = number((hpch/8)+1,(hpch/4));
 
-	 if(saves_spell(ch, victim, 0, SAVE_TYPE_COLD) >= 0)
-	   dam >>= 1;
+//	 if(saves_spell(ch, victim, 0, SAVE_TYPE_COLD) >= 0)
+//	   dam >>= 1;
 
 	 retval = spell_damage(ch, victim, dam,TYPE_COLD, SPELL_FROST_BREATH, 0);
          if(SOMEONE_DIED(retval))
@@ -3261,8 +3261,8 @@ int spell_acid_breath(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 
 	 dam = number((hpch/8)+1,(hpch/4));
 
-	 if(saves_spell(ch, victim, 0, SAVE_TYPE_ACID) >= 0)
-	   dam >>= 1;
+//	 if(saves_spell(ch, victim, 0, SAVE_TYPE_ACID) >= 0)
+//	   dam >>= 1;
 
 	 retval = spell_damage(ch, victim, dam,TYPE_ACID, SPELL_ACID_BREATH, 0);
          if(SOMEONE_DIED(retval))
@@ -3321,8 +3321,8 @@ int spell_fire_breath(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 
       dam = dice(level, 8);
 
-      if(saves_spell(ch,  tmp_victim, 0, SAVE_TYPE_FIRE) >= 0)
-        dam >>= 1;
+//      if(saves_spell(ch,  tmp_victim, 0, SAVE_TYPE_FIRE) >= 0)
+  //      dam >>= 1;
 
       retval = spell_damage(ch, tmp_victim, dam, TYPE_FIRE, SPELL_FIRE_BREATH, 0);
       if(IS_SET(retval, eCH_DIED))
@@ -3352,8 +3352,9 @@ int spell_gas_breath(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
 
 	  dam = dice(level, 6);
 
-		 if(saves_spell(ch,  tmp_victim, 0, SAVE_TYPE_POISON) >= 0)
-			dam >>= 1;
+		// if(saves_spell(ch,  tmp_victim, 0, SAVE_TYPE_POISON) >= 
+//0)
+		//	dam >>= 1;
 
 		 retval = spell_damage(ch, tmp_victim, dam,TYPE_POISON, SPELL_GAS_BREATH, 0);
                  if(IS_SET(retval, eCH_DIED))
@@ -3377,8 +3378,8 @@ int spell_lightning_breath(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct 
 
 	 dam = number((hpch/8)+1,(hpch/4));
 
-	 if(saves_spell(ch, victim, 0, SAVE_TYPE_ENERGY) >= 0)
-	   dam >>= 1;
+//	 if(saves_spell(ch, victim, 0, SAVE_TYPE_ENERGY) >= 0)
+//	   dam >>= 1;
 
 	 return spell_damage(ch, victim, dam,TYPE_ENERGY, SPELL_LIGHTNING_BREATH, 0);
 }
@@ -4192,8 +4193,8 @@ int spell_flamestrike(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
    set_cantquit (ch, victim);
    dam = dice(skill/2, 10);
 
-   if (saves_spell(ch, victim, 0, SAVE_TYPE_FIRE) >= 0)
-      dam >>= 1;
+//   if (saves_spell(ch, victim, 0, SAVE_TYPE_FIRE) >= 0)
+  //    dam >>= 1;
 
    retval = spell_damage(ch, victim, dam, TYPE_FIRE, SPELL_FLAMESTRIKE, 0);
 
@@ -7691,8 +7692,8 @@ int spell_bee_sting(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
    set_cantquit(ch, victim);
    dam = dice(2, 8) + skill/2;
    
-   if (saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC) >= 0)
-      dam >>= 1;
+//   if (saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC) >= 0)
+  //    dam >>= 1;
 
    for (i = 0; i < bees; i++) {
      skill_increase_check(ch, SPELL_BEE_STING, skill, SKILL_INCREASE_MEDIUM);
@@ -7777,8 +7778,8 @@ int cast_creeping_death(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DAT
    set_cantquit(ch, victim);
    dam = dice(6+skill/2, 19);
 
-   if (saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC) >= 0)
-      dam >>= 1;
+//   if (saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC) >= 0)
+  //    dam >>= 1;
    
    if (!OUTSIDE(ch)) {
       send_to_char("Your spell is more draining because you are indoors!\n\r", ch);
@@ -8773,8 +8774,8 @@ int spell_sun_ray(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data 
 
   if (OUTSIDE(ch) && (weather_info.sky <= SKY_CLOUDY)) {
 
-	 if(saves_spell(ch, victim, 0, SAVE_TYPE_FIRE) >= 0)
-		dam >>= 1;
+//	 if(saves_spell(ch, victim, 0, SAVE_TYPE_FIRE) >= 0)
+//		dam >>= 1;
 
 	 return spell_damage(ch, victim, dam, TYPE_FIRE, SPELL_SUN_RAY, 0);
   }
@@ -9116,10 +9117,10 @@ int spell_ice_shards(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
 
   dam = dice(2,level/2);
 
-  save = saves_spell(ch, victim, (level/2), SAVE_TYPE_COLD);
+//  save =saves_spell(ch, victim, (level/2), SAVE_TYPE_COLD);
 
   // modify the damage by how much they resisted
-  dam += (int) (dam * (save/100));
+  //dam += (int) (dam * (save/100));
   
   return spell_damage(ch, victim, dam, TYPE_COLD, SPELL_ICE_SHARDS, 0);
 }
@@ -9295,8 +9296,8 @@ int spell_debility(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data
 
   set_cantquit( ch, victim );
 
-  int save = saves_spell(ch, victim, 5, SAVE_TYPE_MAGIC);
-
+//  int save = saves_spell(ch, victim, 5, SAVE_TYPE_MAGIC);
+  int save = -1;
   if(save < 0)
   {
     int hitmod = skill / 10;       hitmod = MAX(1, hitmod);      hitmod *= -1;
@@ -9387,7 +9388,7 @@ int spell_attrition(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
 
   set_cantquit( ch, victim );
 
-  int save = saves_spell(ch, victim, 0, SAVE_TYPE_POISON);
+  int save = -1;//saves_spell(ch, victim, 0, SAVE_TYPE_POISON);
 
   if(save < 0)
   {
