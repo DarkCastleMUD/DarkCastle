@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.30 2004/07/22 07:17:33 rahz Exp $ */
+/* $Id: utility.cpp,v 1.31 2004/07/25 09:01:39 rahz Exp $ */
 
 extern "C"
 {
@@ -178,7 +178,7 @@ void log( char *str, int god_level, long type )
     FILE **f = 0;
     int stream = 1;
     
-    switch(type) {
+/*    switch(type) {
       default:
 	stream = 0;
 	break;
@@ -258,7 +258,7 @@ void log( char *str, int god_level, long type )
       fprintf(*f, "%s :: %s\n", tmstr, str);
       dc_fclose(*f);
     }
-
+*/
     if(god_level >= IMMORTAL)
       send_to_gods(str, god_level, type);
 }
@@ -1135,7 +1135,6 @@ int do_quit(struct char_data *ch, char *argument, int cmd)
 int do_save(struct char_data *ch, char *argument, int cmd)
 {
     char buf[100];
-
     // With the cmd numbers
     // 666 = save quietly
     // 10 = save

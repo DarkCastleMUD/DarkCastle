@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.44 2004/07/25 05:53:41 rahz Exp $
+| $Id: inventory.cpp,v 1.45 2004/07/25 09:01:38 rahz Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -222,7 +222,7 @@ int do_get(struct char_data *ch, char *argument, int cmd)
                   continue;
 
                 // Ignore NO_TRADE items on a 'get all'
-                if(IS_SET(obj_object->obj_flags.more_flags, ITEM_NO_TRADE)) {
+                if(IS_SET(obj_object->obj_flags.more_flags, ITEM_NO_TRADE) && GET_LEVEL(ch) < 100) {
                   csendf(ch, "The %s appears to be NO_TRADE so you don't pick it up.\r\n", obj_object->short_description);
                   continue;
                 }
@@ -382,7 +382,7 @@ int do_get(struct char_data *ch, char *argument, int cmd)
 		    }
 
                     // Ignore NO_TRADE items on a 'get all'
-                    if(IS_SET(obj_object->obj_flags.more_flags, ITEM_NO_TRADE)) {
+                    if(IS_SET(obj_object->obj_flags.more_flags, ITEM_NO_TRADE) && GET_LEVEL(ch) < 100) {
                       csendf(ch, "The %s appears to be NO_TRADE so you don't pick it up.\r\n", obj_object->short_description);
                       continue;
                     }
@@ -406,8 +406,10 @@ int do_get(struct char_data *ch, char *argument, int cmd)
                             // if I have consent and i'm touching the corpse, then I shouldn't be able
                             // to pick up no_trade items because it is someone else's corpse.  If I am
                             // the other of the corpse, has_consent will be false.
-                            csendf(ch, "%s : It seems magically attached to the corpse.\n\r", fname(obj_object->name));
-                            continue;
+                            if (GET_LEVEL(ch) < 100) {
+                              csendf(ch, "%s : It seems magically attached to the corpse.\n\r", fname(obj_object->name));
+                              continue;
+                            }
                           }
 		          if (CAN_WEAR(obj_object,ITEM_TAKE)) {
 			    get(ch,obj_object,sub_object);
@@ -497,8 +499,10 @@ int do_get(struct char_data *ch, char *argument, int cmd)
                   // if I have consent and i'm touching the corpse, then I shouldn't be able
                   // to pick up no_trade items because it is someone else's corpse.  If I am
                   // the other of the corpse, has_consent will be false.
-                    csendf(ch, "%s : It seems magically attached to the corpse.\n\r", fname(obj_object->name));
-                    fail = TRUE;
+                      if (GET_LEVEL(ch) < 100) {
+                        csendf(ch, "%s : It seems magically attached to the corpse.\n\r", fname(obj_object->name));
+                        fail = TRUE;
+                      }
                     }
 		    else if (CAN_WEAR(obj_object,ITEM_TAKE)) 
                     {

@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.165 2004/07/21 10:16:09 rahz Exp $ */
+/* $Id: magic.cpp,v 1.166 2004/07/25 09:01:39 rahz Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -9886,6 +9886,8 @@ int cast_dismiss_familiar( byte level, CHAR_DATA *ch, char *arg, int type, CHAR_
 int spell_dismiss_corpse(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
    victim = NULL;
+   //send_to_char("Disabled.\r\n",ch);
+   //return eFAILURE;
 
    for(struct follow_type *k = ch->followers; k; k = k->next)
      if(IS_MOB(k->follower) && affected_by_spell(k->follower, SPELL_CHARM_PERSON))

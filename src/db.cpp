@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.73 2004/07/20 11:05:23 urizen Exp $ */
+/* $Id: db.cpp,v 1.74 2004/07/25 09:01:38 rahz Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -3565,11 +3565,9 @@ void reset_zone(int zone)
     last_cmd = last_mob = last_obj = last_percent = -1;
 
     char buf[MAX_STRING_LENGTH];
-
     // reset number of mobs that have died this tick to 0
     zone_table[zone].died_this_tick = 0;
     zone_table[zone].num_mob_on_repop = 0;
-
     // find last command in zone
     last_no = 0;
     while(zone_table[zone].cmd[last_no].command != 'S')

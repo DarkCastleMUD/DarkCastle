@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.51 2004/07/04 19:02:13 urizen Exp $ */
+/* $Id: limits.cpp,v 1.52 2004/07/25 09:01:38 rahz Exp $ */
 
 extern "C"
 {
@@ -699,6 +699,7 @@ void point_update( void )
 
 void update_corpses_and_portals(void)
 {
+  char buf[256];
   struct obj_data *j, *next_thing;
   struct obj_data *jj, *next_thing2;
   struct obj_data *last_thing;
@@ -712,6 +713,9 @@ void update_corpses_and_portals(void)
     /* Type 1 is a permanent game portal, and type 3 is a look_only
     |  object.  Type 0 is the spell portal and type 2 is a game_portal
     */
+  //  if (!j || !j->item_number || !obj_index[j->item_number].virt)
+  //    continue;
+
     last_vnum = obj_index[j->item_number].virt;
     last_type = GET_ITEM_TYPE(j);
     if((GET_ITEM_TYPE(j) == ITEM_PORTAL) && (j->obj_flags.value[1] == 0
@@ -805,6 +809,8 @@ void update_corpses_and_portals(void)
       last_thing = j;
     }
   }
+  //sprintf(buf, "DEBUG: Processed Objects: %d", proc);
+  //log(buf, 108, LOG_BUG);
   /* Now process the portals */
  // process_portals();
 }

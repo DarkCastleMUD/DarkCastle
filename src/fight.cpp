@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.236 2004/07/25 07:32:52 rahz Exp $ */
+/* $Id: fight.cpp,v 1.237 2004/07/25 09:01:38 rahz Exp $ */
 
 extern "C"
 {
@@ -91,6 +91,7 @@ int druid_combat(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 int ranger_combat(struct char_data *ch, struct obj_data *obj, int cmd, char *arg, struct char_data *invoker);
 void remove_memory(CHAR_DATA *ch, char type, CHAR_DATA *vict);
 void clan_death (char_data *ch, char_data *victim);
+void remove_active_potato(CHAR_DATA *vict);
 
 // local
 void check_weapon_skill_bonus(char_data * ch, int type, obj_data *wielded, 
@@ -3815,7 +3816,8 @@ void arena_kill(CHAR_DATA *ch, CHAR_DATA *victim, int type)
   // end up in the right room
   // why did we do this? -pir
   // remove_nosave(victim);
-  
+  remove_active_potato(victim);
+
   move_player_home(victim);
   bool isaff2(int spellnum);
   

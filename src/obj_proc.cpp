@@ -2353,11 +2353,11 @@ int hot_potato(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
 
        act("The hot potato $n is carrying beeps one final time.\n\r"
            "\n\r$B"
-           "BBBB   OOO   OOO  M   M !! !!\n\r"
-           "B   B O   O O   O MM MM !! !!\n\r"
-           "BBBB  O   O O   O M M M !! !!\n\r"
-           "B   B O   O O   O M   M \n\r"
-           "BBBB   OOO   OOO  M   M !! !!\n\r"
+           "BBBB     OOO     OOO    M   M   !!   !!\n\r"
+           "B   B   O   O   O   O   MM MM   !!   !!\n\r"
+           "BBBB    O   O   O   O   M M M   !!   !!\n\r"
+           "B   B   O   O   O   O   M   M \n\r"
+           "BBBB     OOO     OOO    M   M   !!   !!\n\r"
            "\n\r$R"
            "Small pieces of $n and mashed potato splatter everywhere!!!\n\r"
            "$n has been KILLED!!"
@@ -2373,11 +2373,11 @@ int hot_potato(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
        GET_HIT(vict) = -1;
        update_pos(vict);
        send_to_char("$B"
-           "BBBB   OOO   OOO  M   M !! !!\n\r"
-           "B   B O   O O   O MM MM !! !!\n\r"
-           "BBBB  O   O O   O M M M !! !!\n\r"
-           "B   B O   O O   O M   M \n\r"
-           "BBBB   OOO   OOO  M   M !! !!\n\r\n\r"
+           "BBBB     OOO     OOO    M   M !!   !!\n\r"
+           "B   B   O   O   O   O   MM MM !!   !!\n\r"
+           "BBBB    O   O   O   O   M M M !!   !!\n\r"
+           "B   B   O   O   O   O   M   M \n\r"
+           "BBBB     OOO     OOO    M   M !!   !!\n\r\n\r"
            "$R"
            , vict );
        send_to_char("The baked potato you are carrying EXPLODES!!!\n\r"
