@@ -11,7 +11,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.16 2002/09/06 23:27:23 dcastle Exp $ */
+/* $Id: nanny.cpp,v 1.17 2002/09/08 15:13:59 pirahna Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -618,8 +618,9 @@ void nanny(struct descriptor_data *d, char *arg)
          SEND_TO_Q( "Ok, what IS it, then? ", d );
          // TODO - double check this to make sure we're free'ing properly
          dc_free( GET_NAME(ch) );
+         GET_NAME(ch) = NULL;
          dc_free( d->character );
-         d->character = 0;
+         d->character = NULL;
          STATE(d) = CON_GET_NAME;
          break;
          
@@ -696,6 +697,7 @@ void nanny(struct descriptor_data *d, char *arg)
             GET_RAW_DEX(ch) = ch->desc->stats->dex[y-1];
             GET_RAW_CON(ch) = ch->desc->stats->con[y-1];
             dc_free(ch->desc->stats);
+            ch->desc->stats = NULL;
             SEND_TO_Q("\n\rChoose a race.\n\r", d );
             sprintf(buf, "   1: Human\n\r   2: Elf\n\r   3: Dwarf\n\r"
                "   4: Hobbit\n\r   5: Pixie\n\r   6: Giant\n\r"

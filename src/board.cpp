@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: board.cpp,v 1.2 2002/06/13 04:41:07 dcastle Exp $
+| $Id: board.cpp,v 1.3 2002/09/08 15:13:59 pirahna Exp $
 | board.C
 | Description:  This file contains the implementation for the board
 |   code.  It's old and should be rewritten --Morc XXX
@@ -411,9 +411,13 @@ void board_write_msg(CHAR_DATA *ch, char *arg, int bnum) {
   if (!(strcmp("Topic", arg)) && GET_LEVEL(ch) > IMMORTAL) {
     curr_msg = &curr_board->msg[0];
     dc_free(curr_msg->title);
-    dc_free(curr_msg->text);
+    curr_msg->title = NULL;
     dc_free(curr_msg->author);
+    curr_msg->author = NULL;
     dc_free(curr_msg->date);
+    curr_msg->date = NULL;
+    dc_free(curr_msg->text);
+    curr_msg->text = NULL;
     (boards[bnum].number)--;
   }
 

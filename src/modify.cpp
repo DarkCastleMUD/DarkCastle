@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: modify.cpp,v 1.2 2002/06/13 04:41:08 dcastle Exp $ */
+/* $Id: modify.cpp,v 1.3 2002/09/08 15:13:59 pirahna Exp $ */
 
 extern "C"
 {
@@ -765,6 +765,7 @@ void show_string(struct descriptor_data *d, char *input)
 
   else if (*buf) {
     dc_free(d->showstr_vector);
+    d->showstr_vector = 0;
     d->showstr_count = 0;
     if(d->showstr_head) {
         dc_free(d->showstr_head);
@@ -780,6 +781,7 @@ void show_string(struct descriptor_data *d, char *input)
     // send them a carriage return first to make sure it looks right
     colorCharSend(d->showstr_vector[d->showstr_page], d->character);
     dc_free(d->showstr_vector);
+    d->showstr_vector = 0;
     d->showstr_count = 0;
     if (d->showstr_head) {
       dc_free(d->showstr_head);

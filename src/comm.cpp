@@ -390,6 +390,7 @@ int load_hotboot_descs()
       log(buf, 0, LOG_MISC);
       CLOSE_SOCKET(desc);
       dc_free(d);
+      d = NULL;
       continue;
     }
 
@@ -402,6 +403,7 @@ int load_hotboot_descs()
       log(buf, 0, LOG_MISC);
       CLOSE_SOCKET(desc);
       dc_free(d);
+      d = NULL;
       continue; 
     }
 
@@ -1006,8 +1008,8 @@ int do_prompt(CHAR_DATA *ch, char *arg, int cmd)
     return eFAILURE;
   }
 
-  // dc_free only frees non_null pointers, so this is okay
-  dc_free(GET_PROMPT(ch));
+  if(GET_PROMPT(ch))
+    dc_free(GET_PROMPT(ch));
   GET_PROMPT(ch) = str_dup(arg);
   send_to_char("Ok.\n\r", ch);
   return eSUCCESS;
@@ -1970,6 +1972,7 @@ int close_socket(struct descriptor_data *d)
     dc_free(d->showstr_vector);
 
   dc_free(d);
+  d = NULL;
 
   if(descriptor_list == NULL) 
   {

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_ranger.cpp,v 1.14 2002/08/20 02:37:23 pirahna Exp $ | cl_ranger.C |
+| $Id: cl_ranger.cpp,v 1.15 2002/09/08 15:14:02 pirahna Exp $ | cl_ranger.C |
 Description: Ranger skills/spells */ extern "C"  {
   #include <string.h>
 }
@@ -476,9 +476,9 @@ int do_ambush(CHAR_DATA *ch, char *arg, int cmd)
     return eSUCCESS;
   }
 
-  dc_free(ch->ambush);
   sprintf(buf, "You will now ambush %s on sight.\n\r", arg);
   send_to_char(buf, ch);
+  dc_free(ch->ambush);
   ch->ambush = str_dup(arg);
   return eSUCCESS;
 }

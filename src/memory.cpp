@@ -39,7 +39,10 @@ void * dc_realloc(void * oldptr, size_t size)
 
   // realloc would handle this fine, but let's use out dc_free to it get's 0'd
   if(0 == size)
-    return(dc_free(oldptr));
+  {
+    dc_free(oldptr);
+    return NULL;
+  }
 
   if(size < 0)  {
     fprintf(stderr, "Attempt to realloc with negative size?");

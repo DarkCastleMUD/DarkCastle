@@ -579,8 +579,10 @@ void update_bard_singing()
           send_to_char("No singing in safe rooms yet.\r\n", i);
           if((song_info[i->song_number].intrp_pointer))
             ((*song_info[i->song_number].intrp_pointer) (GET_LEVEL(i), i, NULL, NULL, -1));
-          if(i->song_data)
+          if(i->song_data) {
             dc_free(i->song_data);
+            i->song_data = 0;
+          }
           return;
         }
 
@@ -794,6 +796,7 @@ int execute_song_note_of_knowledge( byte level, CHAR_DATA *ch, char *arg, CHAR_D
    obj = get_obj_in_list_vis(ch, ch->song_data, ch->carrying);
 
    dc_free(ch->song_data);
+   ch->song_data = 0;
 
    if(obj) {
       spell_identify(GET_LEVEL(ch), ch, 0, obj, 0);
@@ -997,8 +1000,10 @@ int song_stop( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skil
       send_to_char("Might wanna start the performance first...Hope this isn't indicative of your love life...\r\n", ch);
       return eFAILURE;
    }
-   if(ch->song_data)
+   if(ch->song_data) {
       dc_free(ch->song_data);
+      ch->song_data = 0;
+   }
 
    send_to_char("You finish off your song with a flourish...\n\r", ch);
    act("$n finishes $s song in a flourish and a bow.", ch, 0, 0, TO_ROOM, 0);
@@ -1048,8 +1053,10 @@ int execute_song_astral_chanty( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA 
 
    if(GET_LEVEL(victim) > GET_LEVEL(ch)) {
       send_to_char("Your target resists the songs draw.\r\n", ch);
-      if(ch->song_data)
+      if(ch->song_data) {
         dc_free(ch->song_data);
+        ch->song_data = 0;
+      }
       return eFAILURE;
    }
 
@@ -1095,9 +1102,10 @@ int execute_song_astral_chanty( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA 
    }
 
    // free our stored char name
-   if(ch->song_data)
+   if(ch->song_data) {
      dc_free(ch->song_data);
-
+     ch->song_data = 0;
+   }
    return eSUCCESS;
 }
 
@@ -1127,9 +1135,11 @@ int execute_song_forgetful_rhythm( byte level, CHAR_DATA *ch, char *arg, CHAR_DA
    {
       send_to_char("You don't see that person here.\r\n", ch);
       dc_free(ch->song_data);
+      ch->song_data = 0;
       return eFAILURE;
    }
    dc_free(ch->song_data);
+   ch->song_data = 0;
 
    act("$n sings to $N about beautiful rainbows.", ch, 0, victim, TO_ROOM, NOTVICT);
 
@@ -1186,9 +1196,11 @@ int execute_song_shattering_resonance( byte level, CHAR_DATA *ch, char *arg, CHA
    {
       send_to_char("You don't see that object here.\r\n", ch);
       dc_free(ch->song_data);
+      ch->song_data = 0;
       return eFAILURE;
    }
    dc_free(ch->song_data);
+   ch->song_data = 0;
 
    // code to shatter a beacon
    if(GET_ITEM_TYPE(obj) == ITEM_BEACON) {
@@ -1395,6 +1407,7 @@ int execute_song_searching_song( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA
    target = get_char_vis(ch, ch->song_data);
 
    dc_free(ch->song_data);
+   ch->song_data = 0;
 
    act("$n's song ends and quietly fades away.", ch, 0, 0, TO_ROOM, 0);
 
@@ -1635,7 +1648,8 @@ int execute_song_synchronous_chord( byte level, CHAR_DATA *ch, char *arg, CHAR_D
    target = get_char_room_vis(ch, ch->song_data);
       
    dc_free(ch->song_data);
-   
+   ch->song_data = 0;
+
    act("$n's song ends with an abrupt stop.", ch, 0, 0, TO_ROOM, 0);
    
    if(!target || GET_LEVEL(ch) < GET_LEVEL(target))
@@ -1683,9 +1697,11 @@ int execute_song_sticky_lullaby( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA
    {
       send_to_char("You don't see that person here.\r\n", ch);
       dc_free(ch->song_data);
+      ch->song_data = 0;
       return eFAILURE;
    }
    dc_free(ch->song_data);
+   ch->song_data = 0;
 
    skill_increase_check(ch, SKILL_SONG_STICKY_LULL, skill, SKILL_INCREASE_MEDIUM);
 

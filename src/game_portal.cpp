@@ -232,6 +232,7 @@ int make_arbitrary_portal(int from_room, int to_room, int duplicate, int timer)
       sprintf(log_buf, "Non-portal object (%d) sent to make_arbitrary_portal!", duplicate);
       dc_free(from_portal);
       log(log_buf, OVERSEER, LOG_BUG);
+      return 0;
     }
   }
   /* Nonspecific things -- done to all portals */
