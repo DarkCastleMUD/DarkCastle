@@ -70,7 +70,7 @@ int do_wizhelp(struct char_data *ch, char *argument, int cmd_arg)
              cmd_info[cmd].minimum_level,
              cmd_info[cmd].command_name);
 
-     if((no-2) % 5 == 0)
+     if((no) % 5 == 0)
        strcat(buf, "\n\r");
      no++;
   }

@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.122 2004/07/12 20:59:27 urizen Exp $ */
+/* $Id: const.cpp,v 1.123 2004/07/17 19:04:37 urizen Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1665,6 +1665,7 @@ char
     "STAY_NO_TOWN",
     "NOMAGIC",
     "DRAINY",
+    "BARDCHARM",
     "\n"
 };
 
