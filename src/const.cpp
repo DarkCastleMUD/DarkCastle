@@ -12,7 +12,12 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: const.cpp,v 1.67 2003/12/09 01:31:43 staylor Exp $ */
+/**************************************************************************/
+/* Revision History                                                       */
+/* 12/09/2003   Onager   Added protection from good to cleric and anti    */
+/*                       spell list                                       */
+/**************************************************************************/
+/* $Id: const.cpp,v 1.68 2003/12/09 09:11:25 staylor Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1079,6 +1084,7 @@ struct class_skill_defines a_skills[] = {
 {    "firestorm",	SPELL_FIRESTORM,	38,	90,	10005,	NULL },
 {    "acid shield",	SPELL_ACID_SHIELD,	40,	90,	10005,	NULL },
 {    "blindness",	SPELL_BLINDNESS,	42,	90,	10005,	NULL },
+{    "protection from good",	SPELL_PROTECT_FROM_GOOD,	45,	90,	10005,	NULL },
 {    "stone skin",	SPELL_STONE_SKIN,	46,	90,	-2, "A woman strong in battle surrounded by heavy magical influences calls to you." },
 {    "acid blast",	SPELL_ACID_BLAST,	48,	90,	10005,	NULL },
 {    "\n",		0,			1,	0,	0, 	NULL}
@@ -1326,6 +1332,7 @@ struct class_skill_defines c_skills[] = { // cleric skills
 {    "portal",		SPELL_PORTAL,		20,	90,	3021,	NULL },
 {    "full heal",	SPELL_FULL_HEAL,	25,	90,	-2, "Seek out a druid who is charmed by all. His healing skills are second only to a Physician in Sorpigal." },
 {    "protection from evil", SPELL_PROTECT_FROM_EVIL,	26,	90,	-2, "A short rotund priest with a face you could cut diamonds with can help you." },
+{    "protection from good", SPELL_PROTECT_FROM_GOOD,	26,	90,	3021, NULL },
 {    "dispel magic",	SPELL_DISPEL_MAGIC,	28,	90,	-2, "Find a mage at the junction of three dreams."},
 {    "dispel minor",	SPELL_DISPEL_MINOR,	28,	90,	3021,	NULL },
 {    "power harm",	SPELL_POWER_HARM,	30,	90,	-2, "Find a shaman amongst the muck who has crooked teeth." },
