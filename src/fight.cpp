@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.5 2002/07/07 06:59:38 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.6 2002/07/08 21:11:14 pirahna Exp $ */
 
 extern "C"
 {
@@ -1279,6 +1279,9 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
   // sanct is 3/4 damage now
   if (IS_AFFECTED(victim, AFF_SANCTUARY))
       dam -= (int) (dam/4);
+
+  if(IS_SET(victim->combat, COMBAT_MONK_STANCE))  // half damage
+      dam /= 2;
 
   if (attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING)
   {
