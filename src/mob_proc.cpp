@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.20 2002/10/03 00:24:12 pirahna Exp $ */
+/* $Id: mob_proc.cpp,v 1.21 2002/10/16 02:21:09 pirahna Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -2974,7 +2974,7 @@ int janitor(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     for (i = world[ch->in_room].contents; i; i = i->next_content) 
     {
         if (IS_SET(i->obj_flags.wear_flags, ITEM_TAKE) &&
-            GET_OBJ_WEIGHT(obj) < 20)
+            GET_OBJ_WEIGHT(i) < 20)
         {
             act("$n picks up some trash.", ch, 0, 0, TO_ROOM, 0);
             move_obj(i, ch);
