@@ -1193,8 +1193,10 @@ char_data *)(mob_index[nr].item))->level,
 	if (IS_SET(size, 1<<i))
       if (!IS_SET(((struct obj_data *)(obj_index[nr].item))->obj_flags.size, 1<<i))
 	goto endLoop;
+if (((struct obj_data *)(obj_index[nr].item))->obj_flags.type_flag == ITEM_WEAPON) {
 int get_weapon_damage_type(struct obj_data * wielded);
 its = get_weapon_damage_type(((struct obj_data *)(obj_index[nr].item)));
+	}
      if (dam && dam != (its-1000))
   	  continue;
       if(extra)

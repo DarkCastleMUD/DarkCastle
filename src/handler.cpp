@@ -21,7 +21,7 @@
  *  12/08/2003   Onager    Added check for charmies and !charmie eq to     *
  *                         equip_char()                                    *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.42 2004/04/30 10:49:34 urizen Exp $ */
+/* $Id: handler.cpp,v 1.43 2004/04/30 17:03:53 urizen Exp $ */
     
 extern "C"
 {
@@ -1284,7 +1284,8 @@ int equip_char(CHAR_DATA *ch, struct obj_data *obj, int pos)
 	(IS_OBJ_STAT(obj, ITEM_ANTI_GOOD) && IS_GOOD(ch)) ||
 	(IS_OBJ_STAT(obj, ITEM_ANTI_NEUTRAL) && IS_NEUTRAL(ch))&& !IS_NPC(ch)) 
     {
-	if(IS_SET(obj->obj_flags.more_flags, ITEM_NO_TRADE)) {
+	if(IS_SET(obj->obj_flags.more_flags, ITEM_NO_TRADE) ||
+	   affected_by_spell(ch, FUCK_PTHIEF)) {
 	    act("You are zapped by $p but it stays with you.", ch, obj, 0, TO_CHAR, 0);
 	    recheck_height_wears(ch);
             obj_to_char(obj, ch);

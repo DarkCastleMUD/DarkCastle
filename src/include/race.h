@@ -1,7 +1,7 @@
 #ifndef RACE_H_
 #define RACE_H_
 /************************************************************************
-| $Id: race.h,v 1.6 2004/04/27 17:54:42 urizen Exp $
+| $Id: race.h,v 1.7 2004/04/30 17:03:55 urizen Exp $
 | race.h
 | This file defines racial information.
 */
@@ -72,6 +72,8 @@
 
 // Following are modifiers from the base maximum stat for a race
 #define BASE_MAX_STAT              27
+// Modifiers below only happen on creation and has little influence
+// On actual maxes
 
 #define RACE_HUMAN_STR_MOD          0
 #define RACE_HUMAN_DEX_MOD          0
