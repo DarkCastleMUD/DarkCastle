@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.110 2003/05/03 23:59:35 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.111 2003/05/07 04:29:27 pirahna Exp $ */
 
 extern "C"
 {
@@ -2975,22 +2975,21 @@ void group_gain(CHAR_DATA * ch, CHAR_DATA * victim)
       case -3:  break;
       case -4:  break;
       case -5:  break;
-      case -6:  break;
-      case -7:  
-      case -8:  tmp_share = (int) (tmp_share * 0.9); break;
-      case -9:  
-      case -10:  tmp_share = (int) (tmp_share * 0.8); break;
-      case -11:  
-      case -12:  tmp_share = (int) (tmp_share * 0.7); break;
-      case -13:
-      case -14: tmp_share = (int) (tmp_share * 0.6); break;
-      case -15: 
-      case -16: tmp_share = (int) (tmp_share * 0.5); break;
-      case -17: tmp_share = (int) (tmp_share * 0.4); break;
-      case -18: tmp_share = (int) (tmp_share * 0.3); break;
-      case -19: 
-      case -20: tmp_share = (int) (tmp_share * 0.2); break;
-      default:  if(GET_LEVEL(victim) < GET_LEVEL(tmp_ch))
+      case -6:  
+      case -7:  tmp_share = (int) (tmp_share * 0.9); break;
+      case -8:  
+      case -9:  tmp_share = (int) (tmp_share * 0.8); break;
+      case -10:  
+      case -11:  tmp_share = (int) (tmp_share * 0.7); break;
+      case -12:
+      case -13: tmp_share = (int) (tmp_share * 0.6); break;
+      case -14: 
+      case -15: tmp_share = (int) (tmp_share * 0.5); break;
+      case -16: tmp_share = (int) (tmp_share * 0.4); break;
+      case -17: tmp_share = (int) (tmp_share * 0.3); break;
+      case -18: 
+      case -19: tmp_share = (int) (tmp_share * 0.2); break;
+      default:  if(GET_LEVEL(victim)+5 < GET_LEVEL(tmp_ch))
                   tmp_share = (int) (tmp_share * 0.1);
                 else tmp_share = (int) (tmp_share * 1.1); break;
                break;
