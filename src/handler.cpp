@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.6 2002/07/14 17:45:25 pirahna Exp $ */
+/* $Id: handler.cpp,v 1.7 2002/07/30 21:35:22 pirahna Exp $ */
     
 extern "C"
 {
@@ -975,35 +975,36 @@ int apply_ac(CHAR_DATA *ch, int eq_pos)
 }
 
 
-
-void equip_char(CHAR_DATA *ch, struct obj_data *obj, int pos)
+// return 0 on failure
+// 1 on success
+int equip_char(CHAR_DATA *ch, struct obj_data *obj, int pos)
 {
     int j;
 
     if(!ch || !obj)
     {
       log("Null ch or obj in equp_char()!", ANGEL, LOG_BUG);
-      return;
+      return 0;
     }  
     if(pos < 0 || pos >= MAX_WEAR)
     {
        log("Invalid eq position in equip_char!", ANGEL, LOG_BUG);
-       return;
+       return 0;
     }
     if(ch->equipment[pos])
     {
        log("Already equipped in equip_char!", ANGEL, LOG_BUG);
-       return;
+       return 0;
     }
 
     if (obj->carried_by) {
 	log("EQUIP: Obj is carried_by when equip.", ANGEL, LOG_BUG);
-	return;
+	return 0;
     }
 
     if (obj->in_room != NOWHERE) {
 	log("EQUIP: Obj is in_room when equip.", ANGEL, LOG_BUG);
-	return;
+	return 0;
     }
 
     if ((IS_OBJ_STAT(obj, ITEM_ANTI_EVIL) && IS_EVIL(ch)) ||
@@ -1013,7 +1014,7 @@ void equip_char(CHAR_DATA *ch, struct obj_data *obj, int pos)
 	    act("You are zapped by $p and instantly drop it.", ch, obj, 0, TO_CHAR, 0);
 	    act("$n is zapped by $p and instantly drops it.", ch, obj, 0, TO_ROOM, 0);
 	    obj_to_room(obj, ch->in_room);
-	    return;
+	    return 1;
 	} else {
 	    log("ch->in_room = NOWHERE when equipping char.", 0, LOG_BUG);
 	}
@@ -1046,10 +1047,10 @@ void equip_char(CHAR_DATA *ch, struct obj_data *obj, int pos)
 
     for(j=0; j<ch->equipment[pos]->num_affects; j++)
 	affect_modify(ch, obj->affected[j].location,
-	  obj->affected[j].modifier,
-	  0, TRUE);
+	  obj->affected[j].modifier, 0, TRUE);
 
     affect_total(ch);
+    return 1;
 }
 
 

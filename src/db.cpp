@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.9 2002/07/26 21:46:42 dcastle Exp $ */
+/* $Id: db.cpp,v 1.10 2002/07/30 21:35:22 pirahna Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -3121,7 +3121,10 @@ void reset_zone(int zone)
         if((ZCMD.arg2 == -1 || obj_index[ZCMD.arg1].number < ZCMD.arg2) 
            && (obj = clone_object(ZCMD.arg1))) 
         { 
-          equip_char(mob, obj, ZCMD.arg3);
+          if(!equip_char(mob, obj, ZCMD.arg3)) {
+             sprintf(buf, "Bad equip_char zone %d cmd %d", zone, cmd_no);
+             log(buf, IMMORTAL, LOG_WORLD);
+          }
           last_obj = 1;
           last_cmd = 1;
         }

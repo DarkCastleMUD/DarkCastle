@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.h,v 1.3 2002/07/13 21:11:10 pirahna Exp $ */
+/* $Id: handler.h,v 1.4 2002/07/30 21:35:26 pirahna Exp $ */
 
 #ifndef HANDLER_H_
 #define HANDLER_H_
@@ -57,7 +57,7 @@ int obj_from_room(struct obj_data *object);
 int obj_to_obj(struct obj_data *obj, struct obj_data *obj_to);
 int obj_from_obj(struct obj_data *obj);
 
-void equip_char(CHAR_DATA *ch, struct obj_data *obj, int pos);
+int equip_char(CHAR_DATA *ch, struct obj_data *obj, int pos);
 struct obj_data *unequip_char(CHAR_DATA *ch, int pos);
 
 struct obj_data *get_obj_in_list(char *name, struct obj_data *list);
