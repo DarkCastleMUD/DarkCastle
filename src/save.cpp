@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: save.cpp,v 1.26 2004/05/18 22:50:06 urizen Exp $ */
+/* $Id: save.cpp,v 1.27 2004/05/21 02:04:18 urizen Exp $ */
 
 extern "C"
 {
@@ -278,7 +278,7 @@ void save_pc_data(struct pc_data * i, FILE * fpsave, struct time_data tmpage)
 void read_pc_data(struct pc_data * i, FILE* fpsave)
 {
   char typeflag[4];
-
+  i->golem = 0;
   fread(i->pwd,            sizeof(char),       PASSWORD_LEN+1, fpsave);
   i->alias = read_char_aliases(fpsave);
   fread(&(i->rdeaths),     sizeof(i->rdeaths),  1, fpsave);
