@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.12 2002/08/13 21:54:23 pirahna Exp $ */
+/* $Id: handler.cpp,v 1.13 2002/08/23 16:31:06 dcastle Exp $ */
     
 extern "C"
 {
@@ -2047,12 +2047,13 @@ void extract_char(CHAR_DATA *ch, bool pull)
     if( ch->guarded_by )
        stop_guarding_me(ch);
 
-    /* clear equipment_list */
-    for ( l = 0; l < MAX_WEAR; l++ )
-    {
-	if ( ch->equipment[l] )
-	    obj_to_room(unequip_char(ch,l), was_in);
-    }
+    // make sure no eq left on char.  But only if pulling completely
+    if(pull)
+       for ( l = 0; l < MAX_WEAR; l++ )
+       {
+          if ( ch->equipment[l] )
+             obj_to_room(unequip_char(ch,l), was_in);
+       }
 
     GET_AC(ch) = 100;
 
