@@ -2,6 +2,16 @@
 | Level 102 wizard commands
 | 11/20/95 -- Azrack
 **********************/
+/*****************************************************************************/
+/* Revision History                                                          */
+/* 12/04/2003   Onager  Fixed find_skill() to find skills/spells consisting  */
+/*                      of multi-word space-separated names                  */
+/*                      Fixed "remove" action of do_sedit() to remove skill  */
+/*                      from player (instead of invoking god ;-)             */
+/* 12/08/2003   Onager  Fixed do_sedit() to allow setting of multi-word      */
+/*                      skills                                               */
+/*****************************************************************************/
+
 extern "C"
 {
   #include <ctype.h> // isspace
@@ -943,22 +953,22 @@ int find_skill_num(char * name)
 
   // try skills
   for(i = 0; *skills[i] != '\n'; i++)
-    if(isname(name, skills[i]))
+    if (strlen(name) <= strlen(skills[i]) && !strncasecmp(name, skills[i], strlen(name)))
       return (i + SKILL_BASE);
 
   // try spells
   for(i = 0; *spells[i] != '\n'; i++)
-    if(isname(name, spells[i]))
+    if (strlen(name) <= strlen(spells[i]) && !strncasecmp(name, spells[i], strlen(name)))
       return (i + 1);
 
   // try songs
   for(i = 0; *songs[i] != '\n'; i++)
-    if(isname(name, songs[i]))
+    if (strlen(name) <= strlen(songs[i]) && !strncasecmp(name, songs[i], strlen(name)))
       return (i + SKILL_SONG_BASE);
 
   // try ki
   for(i = 0; *ki[i] != '\n'; i++)
-    if(isname(name, ki[i]))
+    if (strlen(name) <= strlen(ki[i]) && !strncasecmp(name, ki[i], strlen(name)))
       return (i + KI_OFFSET);
 
   return -1;    
@@ -1069,14 +1079,15 @@ int do_sedit(struct char_data *ch, char *argument, int cmd)
         return eFAILURE;
       }
       lastskill = NULL;
-      for(skill = ch->skills; skill; lastskill = skill, skill = skill->next)
+      for(skill = vict->skills; skill; lastskill = skill, skill = skill->next) {
         if(skill->skillnum == skillnum)
           break;
+      }
 
       if(skill) {
         if(lastskill) 
           lastskill->next = skill->next;
-        else ch->skills = skill->next;
+        else vict->skills = skill->next;
 
         sprintf(buf, "Skill '%s'(%d) removed from %s by %s.", text, 
                      skill->learned, GET_NAME(vict), GET_NAME(ch));
@@ -1100,7 +1111,8 @@ int do_sedit(struct char_data *ch, char *argument, int cmd)
                      "This will set the character's skill to amount.\r\n", ch);
         return eFAILURE;
       }
-      half_chop(text, target, select);
+      chop_half(text, select, target);
+fprintf(stderr, "do_select(): target=%s, select=%s\n", target, select);
       if((skillnum = find_skill_num(target)) < 0) {
         sprintf(buf, "Cannot find skill '%s' in master skill list.\r\n", text);
         send_to_char(buf, ch);
