@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.24 2004/07/08 12:37:47 urizen Exp $
+| $Id: cl_warrior.cpp,v 1.25 2004/07/21 10:16:18 rahz Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -154,7 +154,7 @@ int do_deathstroke(struct char_data *ch, char *argument, int cmd)
         GET_HIT(ch) -= dam;
         update_pos(ch);
         if (GET_POS(ch) == POSITION_DEAD) {
-          fight_kill(ch, ch, TYPE_CHOOSE);
+          fight_kill(ch, ch, TYPE_CHOOSE, 0);
           return eSUCCESS|eCH_DIED;
         }
     } else {

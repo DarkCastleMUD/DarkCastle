@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.36 2004/07/04 17:46:21 urizen Exp $ */
+/* $Id: mob_proc2.cpp,v 1.37 2004/07/21 10:16:10 rahz Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -1228,19 +1228,23 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
             " Platinum coins.\n\r", move_exp, move_cost);
     else
     csendf(ch, "8) Add to your movement points:  You cannot do this.\r\n");
-    send_to_char(
-    "9) Freedom from HUNGER and THIRST:  Currently out of stock.\n\r"
-    "10) Five (5) Platinum coins   Cost: 100,000 Gold Coins.\n\r"
-    "11) One (1) Platinum coin     Cost: 20,000 Gold Coins.\n\r"
-    "12) 250 Platinum coins        Cost: 5,000,000 Gold Coins.\n\r"
-    "13) Buy a practice session for 100 plats.\n\r"
-                 , ch);
 
     if(!IS_MOB(ch) && ki_cost && ki_exp) {   // mobs can't meta ki
       if(GET_KI_METAS(ch) > 4)
-	send_to_char("14) Your ki is already meta'd fully.\n\r", ch);
-      else csendf(ch, "14) Add a point of ki:       %d experience points and %d Platinum.\n\r", ki_exp, ki_cost);
+        send_to_char("9) Your ki is already meta'd fully.\n\r", ch);
+      else csendf(ch, "9) Add a point of ki:        %d experience points and %d Platinum.\n\r", ki_exp, ki_cost);
     }
+    else if (!IS_MOB(ch))
+    csendf(ch, "9) Add a point of ki:        You cannot do this.\r\n");
+
+    send_to_char(
+    "10) One (1) Platinum coin     Cost: 20,000 Gold Coins.\n\r"
+    "11) Five (5) Platinum coins   Cost: 100,000 Gold Coins.\n\r"
+    "12) 250 Platinum coins        Cost: 5,000,000 Gold Coins.\n\r"
+    "13) Buy a practice session for 100 plats.\n\r"
+    "14) Freedom from HUNGER and THIRST:  Currently out of stock.\n\r"
+                 , ch);
+
     return eSUCCESS;
   }
 
@@ -1387,7 +1391,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
      redo_mana(ch);
      return eSUCCESS;
    }
-/*   if(choice == 9) {
+/*   if(choice == 14) {
      price = 100000000;
      if(GET_COND(ch, FULL) == -1) {
        send_to_char("The Meta-physician tells you, 'You already have "
@@ -1419,7 +1423,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
      return eSUCCESS;
    }
 */
-   if(choice == 10) {
+   if(choice == 11) {
      if (affected_by_spell(ch, FUCK_PTHIEF))
      {
 	send_to_char("The Meta-physician tells you, 'You cannot do this because of your criminal actions!'\r\n",ch);
@@ -1435,7 +1439,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
      send_to_char("Ok.\n\r", ch);
      return eSUCCESS;
    }
-   if(choice == 11) {
+   if(choice == 10) {
      if (affected_by_spell(ch, FUCK_PTHIEF))
      {
         send_to_char("The Meta-physician tells you, 'You cannot do this because of your criminal actions!'\r\n",ch);
@@ -1478,7 +1482,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     ch->pcdata->practices += 1;
     return eSUCCESS;
   }
-  if(choice == 14 && ki_exp && ki_cost) {
+  if(choice == 9 && ki_exp && ki_cost) {
     if(IS_MOB(ch)) {
       send_to_char("Mobs cannot meta ki.\r\n", ch);
       return eSUCCESS;

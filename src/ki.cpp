@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.30 2004/07/03 11:44:13 urizen Exp $ */
+/* $Id: ki.cpp,v 1.31 2004/07/21 10:16:09 rahz Exp $ */
 
 extern "C"
 {
@@ -501,7 +501,7 @@ int ki_punch( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
 	     "ebbs away.", ch, 0, vict, TO_VICT, INVIS_VISIBLE);
 	 int retval = damage(ch,vict,dam, TYPE_UNDEFINED, KI_OFFSET+KI_PUNCH,0);
 //         group_gain(ch, vict);
-//         fight_kill(ch, vict, TYPE_CHOOSE);
+//         fight_kill(ch, vict, TYPE_CHOOSE, 0);
 //         GET_HIT(ch) -= 1/10 * (GET_MAX_HIT(ch));
 //         if (GET_HIT(ch) <= 0)
 //	    GET_HIT(ch) = 1;

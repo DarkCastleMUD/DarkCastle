@@ -2,7 +2,7 @@
 #define FIGHT_H_
 
 /************************************************************************
-| $Id: fight.h,v 1.15 2004/07/03 11:44:19 urizen Exp $
+| $Id: fight.h,v 1.16 2004/07/21 10:16:22 rahz Exp $
 | fight.h
 | This file defines the header information for fight.
 */
@@ -24,7 +24,7 @@ int  damage(CHAR_DATA *ch, CHAR_DATA *victim, int dam,
 int spell_damage(CHAR_DATA *ch, CHAR_DATA *victim, int dam, 
             int weapon_type, int attacktype, int weapon);
 int noncombat_damage(CHAR_DATA * ch, int dam, char *char_death_msg,
-                     char *room_death_msg, char *death_log_msg);
+                     char *room_death_msg, char *death_log_msg, int type);
 
 
  
@@ -67,7 +67,7 @@ int do_skewer(CHAR_DATA *ch, CHAR_DATA *vict, int dam, int weapon);
 int do_behead(CHAR_DATA *ch, CHAR_DATA *victim, int dam, int weapon);
 int weapon_spells(CHAR_DATA *ch, CHAR_DATA *vict, int weapon);
 void eq_damage(CHAR_DATA *ch, CHAR_DATA *vict, int dam, int weapon_type, int attacktype);
-void fight_kill(CHAR_DATA *ch, CHAR_DATA *vict, int type);
+void fight_kill(CHAR_DATA *ch, CHAR_DATA *vict, int type, int spec_type);
 int can_attack(CHAR_DATA *ch);
 int can_be_attacked(CHAR_DATA *ch, CHAR_DATA *vict);
 int second_attack(CHAR_DATA *ch);
@@ -77,7 +77,7 @@ int second_wield(CHAR_DATA *ch);
 void set_cantquit(CHAR_DATA *, CHAR_DATA *, bool = FALSE);
 int is_pkill(CHAR_DATA *ch, CHAR_DATA *vict);
 void raw_kill(CHAR_DATA *ch, CHAR_DATA *victim);
-void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim);
+void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim, int type);
 void arena_kill(CHAR_DATA *ch, CHAR_DATA *victim);
 void do_dead(CHAR_DATA *ch, CHAR_DATA *victim);
 bool ArenaIsOpen();
@@ -90,6 +90,12 @@ void eq_destroyed(char_data * ch, obj_data * obj, int pos);
 #define TYPE_PKILL        1
 #define TYPE_RAW_KILL     2
 #define TYPE_ARENA_KILL   3
+
+#define KILL_OTHER        0
+#define KILL_DROWN        1
+#define KILL_FALL         2
+#define KILL_POISON       3
+#define KILL_SUICIDE      4
 
 #define COMBAT_SHOCKED      1
 #define COMBAT_BASH1        1<<1

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.32 2004/07/03 11:44:14 urizen Exp $
+| $Id: move.cpp,v 1.33 2004/07/21 10:16:10 rahz Exp $
 | move.C
 | Movement commands and stuff.
 *************************************************************************
@@ -173,7 +173,7 @@ int do_unstable(CHAR_DATA *ch)
     retval = noncombat_damage(ch, GET_MAX_HIT(ch) / 12, 
         "You feel your back snap painfully and all goes dark...",
         "$n's frail body snaps in half as $e is buffeted about the room.",
-        death_log);
+        death_log, KILL_FALL);
     if (SOMEONE_DIED(retval))
         return eSUCCESS|eCH_DIED;
     else
@@ -277,7 +277,7 @@ int do_fall(CHAR_DATA *ch, short dir)
   retval = noncombat_damage(ch, dam,
          "Luckily the ground breaks your fall.\n\r",
          "$n plummets into the room and hits the ground with a wet-sounding splat!",
-        damage);
+        damage, KILL_FALL);
   if (!SOMEONE_DIED(retval)) {
     act("$n plummets into the room and hits the floor HARD.", ch, 0, 0, TO_ROOM, 0);
   }

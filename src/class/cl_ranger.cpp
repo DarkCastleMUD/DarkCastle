@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: cl_ranger.cpp,v 1.42 2004/05/30 21:28:32 urizen Exp $ | cl_ranger.C  *
+ * $Id: cl_ranger.cpp,v 1.43 2004/07/21 10:16:18 rahz Exp $ | cl_ranger.C  *
  * Description: Ranger skills/spells                                          *
  *                                                                            *
  * Revision History                                                           *
@@ -941,7 +941,7 @@ int do_arrow_damage(struct char_data *ch, struct char_data *victim,
   if(GET_HIT(victim) < 0)
   {
     group_gain(ch, victim);
-    fight_kill(ch, victim, TYPE_CHOOSE);
+    fight_kill(ch, victim, TYPE_CHOOSE, 0);
     return (eSUCCESS | eVICT_DIED);
   } /* End of Hit < 0 */
 

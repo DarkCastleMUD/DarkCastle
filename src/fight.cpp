@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.222 2004/07/20 11:05:16 urizen Exp $ */
+/* $Id: fight.cpp,v 1.223 2004/07/21 10:16:09 rahz Exp $ */
 
 extern "C"
 {
@@ -608,7 +608,7 @@ int do_lightning_shield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
     
   if (GET_POS(ch) == POSITION_DEAD) {
       group_gain(vict, ch);
-      fight_kill(vict, ch, TYPE_CHOOSE);
+      fight_kill(vict, ch, TYPE_CHOOSE, 0);
       return eSUCCESS|eCH_DIED;
   }
 
@@ -678,7 +678,7 @@ int do_fireshield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
     
   if (GET_POS(ch) == POSITION_DEAD) {
       group_gain(vict, ch);
-      fight_kill(vict, ch, TYPE_CHOOSE);
+      fight_kill(vict, ch, TYPE_CHOOSE, 0);
       return eSUCCESS|eCH_DIED;
   }
 
@@ -718,7 +718,7 @@ int do_acidshield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
     
   if (GET_POS(ch) == POSITION_DEAD) {
       group_gain(vict, ch);
-      fight_kill(vict, ch, TYPE_CHOOSE);
+      fight_kill(vict, ch, TYPE_CHOOSE, 0);
       return eSUCCESS|eCH_DIED;
   }
 
@@ -1049,7 +1049,7 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
   // HA!  skewered the bastard to death!
   if(IS_SET(retval, eVICT_DIED)) { 
     group_gain(ch, vict);
-    fight_kill(ch, vict, TYPE_CHOOSE);
+    fight_kill(ch, vict, TYPE_CHOOSE, 0);
     return ( eSUCCESS|eVICT_DIED );
   }
   
@@ -1694,7 +1694,10 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
   if(GET_POS(victim) == POSITION_DEAD)
   {
     group_gain(ch, victim);
-    fight_kill(ch, victim, TYPE_CHOOSE);
+    if (attacktype == SPELL_POISON)
+      fight_kill(ch, victim, TYPE_CHOOSE, KILL_POISON);
+    else
+      fight_kill(ch, victim, TYPE_CHOOSE, 0);
     return damage_retval(ch, victim, (eSUCCESS|eVICT_DIED));
   } 
   return eSUCCESS;
@@ -1716,7 +1719,7 @@ int spell_damage(CHAR_DATA * ch, CHAR_DATA * victim,
 // etc.)
 // returns standard returnvals.h return codes
 int noncombat_damage(CHAR_DATA * ch, int dam, char *char_death_msg,
-                     char *room_death_msg, char *death_log_msg)
+                     char *room_death_msg, char *death_log_msg, int type)
 {
   GET_HIT(ch) -= dam;
   update_pos(ch);
@@ -1729,7 +1732,7 @@ int noncombat_damage(CHAR_DATA * ch, int dam, char *char_death_msg,
         act(room_death_msg, ch, 0, 0, TO_ROOM, 0);
      if (death_log_msg)
         log(death_log_msg, IMMORTAL, LOG_MORTAL);
-     fight_kill(NULL, ch, TYPE_PKILL);
+     fight_kill(NULL, ch, TYPE_PKILL, type);
      return eSUCCESS|eCH_DIED;
   } else {
      return eSUCCESS;
@@ -1850,7 +1853,7 @@ void set_cantquit(CHAR_DATA *ch, CHAR_DATA *vict, bool forced )
   }
 }
 
-void fight_kill(CHAR_DATA *ch, CHAR_DATA *vict, int type)
+void fight_kill(CHAR_DATA *ch, CHAR_DATA *vict, int type, int spec_type)
 {
   if (!vict) {
     log("Null vict sent to fight_kill()!", -1, LOG_BUG);
@@ -1880,11 +1883,11 @@ void fight_kill(CHAR_DATA *ch, CHAR_DATA *vict, int type)
       else if(IS_ARENA(vict->in_room))
         arena_kill(ch, vict);
       else if(is_pkill(ch, vict))
-        do_pkill(ch, vict);
+        do_pkill(ch, vict, spec_type);
       else
         raw_kill(ch, vict);
       break;
-    case TYPE_PKILL: do_pkill(ch, vict); break;
+    case TYPE_PKILL: do_pkill(ch, vict, spec_type); break;
     case TYPE_RAW_KILL: raw_kill(ch, vict); break;
     case TYPE_ARENA_KILL: arena_kill(ch, vict); break;
   }
@@ -1973,7 +1976,9 @@ bool check_shieldblock(CHAR_DATA * ch, CHAR_DATA * victim, int attacktype)
   modifier -= GET_DEX(victim)/2;
   if (!skill_success(victim, ch, SKILL_SHIELDBLOCK,modifier))
     return FALSE;
-  
+ 
+  // victim->equipment[WEAR_SHIELD]  
+
   act("$n blocks $N's attack with $s shield.", victim, NULL, ch, TO_ROOM, NOTVICT);
   act("$n blocks your attack with $s shield.", victim, NULL, ch, TO_VICT, 0);
   act("You block $N's attack with your shield.", victim, NULL, ch, TO_CHAR, 0);
@@ -2968,7 +2973,7 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
   }
   
   if (IS_SET(world[victim->in_room].room_flags, ARENA)) {
-    fight_kill(ch, victim, TYPE_ARENA_KILL);
+    fight_kill(ch, victim, TYPE_ARENA_KILL, 0);
     return;
   }
   
@@ -3602,7 +3607,7 @@ void trip(CHAR_DATA * ch, CHAR_DATA * victim)
 
 // 'ch' can be null
 // do_pkill should never be called directly, only through "fight_kill"
-void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim)
+void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim, int type)
 {
   char killer_message[MAX_STRING_LENGTH];
 //  CHAR_DATA *i = 0;
@@ -3621,13 +3626,13 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim)
     
   // Kill charmed mobs outright
   if(IS_NPC(victim)) {
-    fight_kill(ch, victim, TYPE_RAW_KILL);
+    fight_kill(ch, victim, TYPE_RAW_KILL, 0);
     return;
   }
 
   if(affected_by_spell(victim, FUCK_PTHIEF)) {
     GET_MOVE(victim) = 2;
-    fight_kill(ch, victim, TYPE_RAW_KILL);
+    fight_kill(ch, victim, TYPE_RAW_KILL, 0);
     return;
   }
   
@@ -3647,7 +3652,8 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim)
        af->type != SKILL_BLOOD_FURY &&
        af->type != SKILL_QUIVERING_PALM &&
        af->type != SKILL_INNATE_TIMER &&
-	af->type != SPELL_HOLY_AURA_TIMER)
+       af->type != SPELL_HOLY_AURA_TIMER &&
+       af->type != SKILL_CRAZED_ASSAULT)
       affect_remove(victim, af, SUPPRESS_ALL,isaff2(af->type));
   }
   
@@ -3665,7 +3671,15 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim)
 
   // have to be level 10 and linkalive to count as a pkill and not yourself
   if (ch != NULL) {
-    if(GET_LEVEL(victim) < PKILL_COUNT_LIMIT || ch == victim)
+    if (!str_cmp(GET_NAME(ch), GET_NAME(victim))) 
+      sprintf(killer_message,"\n\r##%s just commited SUICIDE!\n\r", GET_NAME(victim));
+    else if (type == KILL_DROWN)
+      sprintf(killer_message,"\n\r##%s just DROWNED!\n\r", GET_NAME(victim));
+    else if (type == KILL_POISON)
+      sprintf(killer_message,"\n\r##%s has perished from POISON!\n\r", GET_NAME(victim));
+    else if (type == KILL_FALL)
+      sprintf(killer_message,"\n\r##%s has FALLEN to death!\n\r", GET_NAME(victim));
+    else if(GET_LEVEL(victim) < PKILL_COUNT_LIMIT || ch == victim)
       sprintf(killer_message,"\n\r##%s just DIED!\n\r", GET_NAME(victim));
     else if(IS_AFFECTED2(ch, AFF_FAMILIAR) && ch->master)
       sprintf(killer_message,"\n\r##%s was just DEFEATED in battle by %s's familiar!\n\r",

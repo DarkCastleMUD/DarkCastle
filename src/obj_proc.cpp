@@ -254,7 +254,7 @@ int souldrainer(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
 			    ch, 0, vict, TO_ROOM, NOTVICT);
                         GET_HIT(vict) = -20; 
 			group_gain(ch, vict);
-			fight_kill(ch, vict, TYPE_CHOOSE);
+			fight_kill(ch, vict, TYPE_CHOOSE, 0);
 			return eSUCCESS;
 
                    } else { // Missed the fucker
@@ -300,7 +300,7 @@ int holyavenger(CHAR_DATA *ch, struct obj_data *obj,  int cmd, char *arg,
                        GET_HIT(vict) = -20;
                        make_head(vict);
                        group_gain(ch, vict); 
-                       fight_kill(ch, vict, TYPE_CHOOSE);
+                       fight_kill(ch, vict, TYPE_CHOOSE, 0);
                        return eSUCCESS; /* Zero means kill it! */
                    } else { /* You MISS the fucker! */
                        act("You feel $n's sword slice by your head!", ch, 0, vict, TO_VICT, 0);
@@ -362,7 +362,7 @@ int goldenbatleth(CHAR_DATA *ch, struct obj_data *obj,  int cmd, char *arg,
    }
    GET_HIT(vict) = -20;
    group_gain(ch, vict); 
-   fight_kill(ch, vict, TYPE_CHOOSE);
+   fight_kill(ch, vict, TYPE_CHOOSE, 0);
    return eSUCCESS; 
 } 
 
@@ -2370,7 +2370,7 @@ int hot_potato(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
            , vict );
        send_to_char("The baked potato you are carrying EXPLODES!!!\n\r"
                     "You have been KILLED!\n\r", vict);
-       fight_kill(vict, vict, TYPE_PKILL);
+       fight_kill(vict, vict, TYPE_PKILL, 0);
        extract_obj(obj);      
        return eSUCCESS|eCH_DIED;
    }

@@ -395,6 +395,9 @@ int do_golem_score(struct char_data *ch, char *argument, int cmd)
            case SKILL_BLOOD_FURY:
              aff_name = "blood fury reuse timer";
              break;
+           case SKILL_CRAZED_ASSAULT:
+             aff_name = "crazed assault reuse timer";
+             break;
            case SPELL_HOLY_AURA_TIMER:
              aff_name = "holy aura timer";
              break;

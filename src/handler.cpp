@@ -21,7 +21,7 @@
  *  12/08/2003   Onager    Added check for charmies and !charmie eq to     *
  *                         equip_char()                                    *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.71 2004/07/04 19:02:13 urizen Exp $ */
+/* $Id: handler.cpp,v 1.72 2004/07/21 10:16:09 rahz Exp $ */
     
 extern "C"
 {
@@ -986,6 +986,10 @@ void affect_remove( CHAR_DATA *ch, struct affected_type *af, int flags, bool aff
          if (!(flags & SUPPRESS_MESSAGES))
             send_to_char("Your blood cools to normal levels.\r\n", ch);
          break;
+      case SKILL_CRAZED_ASSAULT:
+         if (!(flags & SUPPRESS_MESSAGES))
+            send_to_char("Your craziness has subsided.\r\n", ch);
+         break;
       case SKILL_INNATE_BLOODLUST:
          if (!(flags & SUPPRESS_MESSAGES))
  	 send_to_char("Your lust for battle has left you.\r\n",ch);
@@ -1054,7 +1058,7 @@ void affect_remove( CHAR_DATA *ch, struct affected_type *af, int flags, bool aff
             "$n is DEAD!!", ch, 0, 0, TO_ROOM, 0);
             send_to_char("The water rushes into your lungs and the light fades with your oxygen.\n\r"
             "You have been KILLED!!!\n\r", ch);
-            fight_kill(NULL, ch, TYPE_RAW_KILL);
+            fight_kill(NULL, ch, TYPE_RAW_KILL, 0);
             char_died = TRUE;
 #else
             act("$n begins to choke on the water, a look of panic filling $s eyes as it fill $s lungs.\n\r", ch, 0, 0, TO_ROOM, 0);

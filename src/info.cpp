@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.50 2004/07/03 11:44:13 urizen Exp $ */
+/* $Id: info.cpp,v 1.51 2004/07/21 10:16:09 rahz Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -1353,6 +1353,9 @@ GET_AGE(ch));
              break;
            case SKILL_BLOOD_FURY:
              aff_name = "blood fury reuse timer";
+             break;
+           case SKILL_CRAZED_ASSAULT:
+             aff_name = "crazed assault reuse timer";
              break;
            case SPELL_HOLY_AURA_TIMER:
              aff_name = "holy aura timer";

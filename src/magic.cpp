@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.164 2004/07/11 02:05:06 urizen Exp $ */
+/* $Id: magic.cpp,v 1.165 2004/07/21 10:16:09 rahz Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -1454,6 +1454,10 @@ int spell_cure_critic(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
   send_to_char("You feel better!\n\r", victim);
 
   update_pos(victim);
+  if (ch!=victim)
+  {
+     send_to_char("They look much better.\r\n",ch);
+  }
   return eSUCCESS;
 }
 
@@ -8540,7 +8544,7 @@ int spell_create_golem(int level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
   while(k) 
      if(IS_AFFECTED(k->follower, AFF_CHARM))                                    
      {
-        fight_kill(ch, k->follower, TYPE_RAW_KILL);
+        fight_kill(ch, k->follower, TYPE_RAW_KILL, 0);
         k = ch->followers;
      }
      else k = k->next;
@@ -8631,7 +8635,7 @@ int spell_release_golem(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DAT
       return eFAILURE;
    }
 
-   fight_kill(ch, temp->follower, TYPE_RAW_KILL);   
+   fight_kill(ch, temp->follower, TYPE_RAW_KILL, 0);   
    return eSUCCESS;
 }
 */

@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.64 2004/07/08 12:37:45 urizen Exp $ */
+/* $Id: mob_proc.cpp,v 1.65 2004/07/21 10:16:10 rahz Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -357,7 +357,7 @@ void damage_all_players_in_room(struct char_data *ch, int damage)
       update_pos(vict);
       inform_victim(ch, vict, damage);
       if(GET_HIT(vict) < 1)
-        fight_kill(ch, vict, TYPE_CHOOSE);
+        fight_kill(ch, vict, TYPE_CHOOSE, 0);
     }
 }
 
