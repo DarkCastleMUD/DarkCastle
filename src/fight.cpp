@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.105 2003/04/20 22:14:53 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.106 2003/04/23 03:11:36 pirahna Exp $ */
 
 extern "C"
 {
@@ -673,7 +673,7 @@ void check_weapon_skill_bonus(char_data * ch, int type, obj_data *wielded,
       specialization = learned / 100;
       learned = learned % 100;
 
-      weapon_skill_hit_bonus = learned / 10;
+      weapon_skill_hit_bonus = learned / 6;
       weapon_skill_dam_bonus = number(1, learned / 10);
 
       if(specialization)
