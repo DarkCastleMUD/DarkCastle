@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.104 2004/07/03 19:09:18 urizen Exp $ */
+/* $Id: spells.cpp,v 1.105 2004/07/04 21:18:19 urizen Exp $ */
 
 extern "C"
 {
@@ -1178,16 +1178,16 @@ int do_release(CHAR_DATA *ch, char *argument, int cmd)
     }
      return eSUCCESS;
     } else {
-       if (ch->mana < 25)
+       if (ch->move < 25)
        {
-	send_to_char("You don't have enough mana.\r\n",ch);
+	send_to_char("You don't have enough moves.\r\n",ch);
 	return eFAILURE;
        }
        if (!skill_success(ch,NULL, SKILL_RELEASE))
        {
          send_to_char("You failed to release the spell, and are left momentarily dazed.\r\n",ch);
          WAIT_STATE(ch,PULSE_VIOLENCE/2);
-	 ch->mana -= 10;
+	 ch->move -= 10;
          return eFAILURE;
        }
 
@@ -1206,7 +1206,7 @@ int do_release(CHAR_DATA *ch, char *argument, int cmd)
                 send_to_char(spell_wear_off_msg[aff->type], ch);
                 send_to_char("\n\r", ch);
              }
-	  ch->mana -= 25;
+	  ch->move -= 25;
 bool isaff2(int spellnum);
 	  affect_remove(ch,aff,0,isaff2(aff->type));
           return eSUCCESS;
