@@ -315,6 +315,26 @@ int holyavenger(CHAR_DATA *ch, struct obj_data *obj,  int cmd, char *arg,
    return eFAILURE;  
 } 
 
+int hooktippedsteelhalberd(CHAR_DATA *ch, struct obj_data *obj, int cmd,
+                            char* arg, CHAR_DATA *invoker)
+{
+   CHAR_DATA *victim;
+   if (!(victim = ch->fighting))
+     return eFAILURE;
+   if (number(1,101) > 5) return eFAILURE;
+   int which = number(0, MAX_WEAR);
+   if (!victim->equipment[which])
+     return eFAILURE;
+   int i = damage_eq_once(victim->equipment[which]);
+   if (i > eq_max_damage(victim->equipment[which]))
+     eq_destroyed(victim, victim->equipment[which], which);
+   else {
+      act("$n's hook-tipped steel halberd tears your $p!", ch, victim->equipment[which], victim, TO_VICT, 0 );
+      act("$n latches $m hook-tipped steel halberd into $N's $p and tears it!",ch,victim->equipment[which],victim, TO_ROOM, 0);
+    }
+   return eSUCCESS;
+}
+
 int goldenbatleth(CHAR_DATA *ch, struct obj_data *obj,  int cmd, char *arg, 
                    CHAR_DATA *invoker)
 {
@@ -631,6 +651,51 @@ int gem_assembler(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
    }
    
    obj_to_char(reward, ch);
+   return eSUCCESS;
+}
+// Fear gaze.
+int gazeofgaiot(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
+		   CHAR_DATA *invoker)
+{
+   CHAR_DATA *victim;
+   char vict[256];
+
+   one_argument(arg, vict);
+   if (cmd != 187) return eFAILURE;
+   if (!ch->equipment[WEAR_FACE] || real_object(9603) != ch->equipment[WEAR_FACE]->item_number)
+     return eFAILURE;
+   if (!(victim = get_char_room_vis(ch, vict))) {
+      if (ch->fighting) {
+         victim = ch->fighting;
+      } else {
+         send_to_char("Gaze on whom?\n\r", ch);
+         return eFAILURE;
+      }
+    }
+    if(!can_attack(ch) || !can_be_attacked(ch, victim))
+          return eFAILURE;
+    if (IS_SET(world[ch->in_room].room_flags, NO_MAGIC))
+    {
+	send_to_char("That action is impossible to perform in these restrictive confinements.\r\n",ch);
+	return eFAILURE;
+    }
+    if (GET_LEVEL(victim) > 70) 
+    {
+        send_to_char("Some great force prevents you.\r\n",ch);
+	return eFAILURE;
+    }
+    // All is good, set timer and perform it.
+    struct affected_type af;
+    af.type = SKILL_FEARGAZE;
+    af.duration  = 30;
+    af.modifier  = 0;
+    af.location  = APPLY_NONE;
+    af.bitvector = 0;
+    affect_to_char(ch, &af);
+    act("You eyes glow red from hatred, and you discharge it all on $N.",ch,0,victim,TO_CHAR,0);
+    act("$n's eyes glow with hatred, and $e directs it all at you. OoO, scary!",ch,0,victim,TO_VICT,0);
+    while (number(0,1))
+       do_flee(victim, "", 0);
    return eSUCCESS;
 }
 

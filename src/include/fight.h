@@ -2,7 +2,7 @@
 #define FIGHT_H_
 
 /************************************************************************
-| $Id: fight.h,v 1.8 2003/11/10 19:37:44 staylor Exp $
+| $Id: fight.h,v 1.9 2004/04/16 13:23:08 urizen Exp $
 | fight.h
 | This file defines the header information for fight.
 */
@@ -80,6 +80,7 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim);
 void arena_kill(CHAR_DATA *ch, CHAR_DATA *victim);
 void do_dead(CHAR_DATA *ch, CHAR_DATA *victim);
 bool ArenaIsOpen();
+void eq_destroyed(char_data * ch, obj_data * obj, int pos);
 
 // These are so that we only need one copy of one_hit and weapon_spells and
 // skewer and behead

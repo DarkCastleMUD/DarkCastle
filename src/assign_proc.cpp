@@ -522,13 +522,16 @@ void assign_objects(void)
   SPEC_FUN generic_weapon_combat;
   SPEC_FUN TOHS_locator;
   SPEC_FUN stupid_message;
+  SPEC_FUN hooktippedsteelhalberd;
   SPEC_FUN goldenbatleth;
   SPEC_FUN gotta_dance_boots;
   SPEC_FUN random_dir_boots;
   SPEC_FUN noremove_eq;
   SPEC_FUN glove_combat_procs;
   SPEC_FUN hot_potato;
+  SPEC_FUN gazeofgaiot;
 
+  assign_one_obj_non(9603, gazeofgaiot);
   assign_one_obj_non(9,  phish_locator);	
   assign_one_obj_non(13,  board); /* Quest Board */
   assign_one_obj_non(25,  mob_summoner);
@@ -598,7 +601,7 @@ void assign_objects(void)
   assign_one_obj_com(19503,  glove_combat_procs);
   assign_one_obj_com(26807,  goldenbatleth);
   assign_one_obj_com(30627,  eliara_combat);  
-
+  assign_one_obj_com(9565, hooktippedsteelhalberd);
 //  assign_one_obj_com(22732,  drainingstaff);
 //  assign_one_obj_com(22743,  bonusattack);
 //  assign_one_obj_com(22605,  souldrainer);
