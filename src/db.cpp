@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.25 2003/12/01 17:39:00 staylor Exp $ */
+/* $Id: db.cpp,v 1.26 2004/02/19 03:48:32 pirahna Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -2295,6 +2295,15 @@ CHAR_DATA *read_mobile(int nr, FILE *fl)
                  mob->c_class = fread_int (fl, 0, LONG_MAX);
                  fread_new_newline (fl);
                  break;
+              case 'T': // sTats
+                 mob->raw_str   = mob->str   = fread_int (fl, 0, 100);
+                 mob->raw_intel = mob->intel = fread_int (fl, 0, 100); 
+                 mob->raw_wis   = mob->wis   = fread_int (fl, 0, 100);
+                 mob->raw_dex   = mob->dex   = fread_int (fl, 0, 100);
+                 mob->raw_con   = mob->con   = fread_int (fl, 0, 100);
+                 fread_int (fl, 0, 100); // junk var in case we add another stat
+                 fread_new_newline (fl);
+                 break;
               case '>':
                  ungetc( letter, fl );
                  mprog_read_programs( fl, nr );
@@ -2395,6 +2404,11 @@ void write_mobile(char_data * mob, FILE *fl)
 
     if(mob->c_class) 
       fprintf(fl, "C %d\n", mob->c_class);
+
+    if(mob->raw_str != 11 || mob->raw_intel != 11 || mob->raw_wis != 11 ||
+       mob->raw_dex != 11 || mob->raw_con != 11) {
+       fprintf(fl, "T %d %d %d %d %d 0\n", mob->raw_str, mob->raw_intel, mob->raw_wis, mob->raw_dex, mob->raw_con);
+    }
 
     if(mob_index[mob->mobdata->nr].mobprogs) {
       write_mprog_recur(fl, mob_index[mob->mobdata->nr].mobprogs);

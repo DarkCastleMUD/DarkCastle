@@ -2340,6 +2340,11 @@ int do_medit(struct char_data *ch, char *argument, int cmd)
       "resist",
       "armorclass",
       "stat",
+      "strength",
+      "dexterity",
+      "intelligence",
+      "wisdom",
+      "constitution",
       "\n"
     };
    
@@ -2891,6 +2896,97 @@ int do_medit(struct char_data *ch, char *argument, int cmd)
         mob_stat(ch, (char_data *) mob_index[mob_num].item);
         break;
       }
+      // strength
+      case 25: {
+         if(!*buf4) {
+          send_to_char("$3Syntax$R: medit [mob_num] strength <str>\n\r"
+                       "$3Current$R: ", ch);
+          sprintf(buf, "%d\n", ((char_data *)mob_index[mob_num].item)->raw_str);
+          send_to_char(buf, ch);
+          send_to_char("$3Valid Range$R: 1 to 28\r\n", ch);
+          return eFAILURE;
+        }
+        if(!check_range_valid_and_convert(intval, buf4, 1, 28)) {
+          send_to_char("Value out of valid range.\r\n", ch);
+          return eFAILURE;
+        }
+        ((char_data *)mob_index[mob_num].item)->raw_str = intval;
+        sprintf(buf, "Mob raw strength set to %d.\r\n", intval);
+        send_to_char(buf, ch);
+      } break;
+      // dexterity
+      case 26: {
+         if(!*buf4) {
+          send_to_char("$3Syntax$R: medit [mob_num] dexterity <dex>\n\r"
+                       "$3Current$R: ", ch);
+          sprintf(buf, "%d\n", ((char_data *)mob_index[mob_num].item)->raw_dex);
+          send_to_char(buf, ch);
+          send_to_char("$3Valid Range$R: 1 to 28\r\n", ch);
+          return eFAILURE;
+        }
+        if(!check_range_valid_and_convert(intval, buf4, 1, 28)) {
+          send_to_char("Value out of valid range.\r\n", ch);
+          return eFAILURE;
+        }
+        ((char_data *)mob_index[mob_num].item)->raw_dex = intval;
+        sprintf(buf, "Mob raw dexterity set to %d.\r\n", intval);
+        send_to_char(buf, ch);
+      } break;
+      // intelligence
+      case 27: {
+         if(!*buf4) {
+          send_to_char("$3Syntax$R: medit [mob_num] intelligence <int>\n\r"
+                       "$3Current$R: ", ch);
+          sprintf(buf, "%d\n", ((char_data *)mob_index[mob_num].item)->raw_intel);
+          send_to_char(buf, ch);
+          send_to_char("$3Valid Range$R: 1 to 28\r\n", ch);
+          return eFAILURE;
+        }
+        if(!check_range_valid_and_convert(intval, buf4, 1, 28)) {
+          send_to_char("Value out of valid range.\r\n", ch);
+          return eFAILURE;
+        }
+        ((char_data *)mob_index[mob_num].item)->raw_intel = intval;
+        sprintf(buf, "Mob raw intelligence set to %d.\r\n", intval);
+        send_to_char(buf, ch);
+      } break;
+      // wisdom
+      case 28: {
+         if(!*buf4) {
+          send_to_char("$3Syntax$R: medit [mob_num] wisdom <wis>\n\r"
+                       "$3Current$R: ", ch);
+          sprintf(buf, "%d\n", ((char_data *)mob_index[mob_num].item)->raw_wis);
+          send_to_char(buf, ch);
+          send_to_char("$3Valid Range$R: 1 to 28\r\n", ch);
+          return eFAILURE;
+        }
+        if(!check_range_valid_and_convert(intval, buf4, 1, 28)) {
+          send_to_char("Value out of valid range.\r\n", ch);
+          return eFAILURE;
+        }
+        ((char_data *)mob_index[mob_num].item)->raw_wis = intval;
+        sprintf(buf, "Mob raw wisdom set to %d.\r\n", intval);
+        send_to_char(buf, ch);
+      } break;
+      // constitution
+      case 29: {
+         if(!*buf4) {
+          send_to_char("$3Syntax$R: medit [mob_num] constituion <con>\n\r"
+                       "$3Current$R: ", ch);
+          sprintf(buf, "%d\n", ((char_data *)mob_index[mob_num].item)->raw_con);
+          send_to_char(buf, ch);
+          send_to_char("$3Valid Range$R: 1 to 28\r\n", ch);
+          return eFAILURE;
+        }
+        if(!check_range_valid_and_convert(intval, buf4, 1, 28)) {
+          send_to_char("Value out of valid range.\r\n", ch);
+          return eFAILURE;
+        }
+        ((char_data *)mob_index[mob_num].item)->raw_con = intval;
+        sprintf(buf, "Mob raw constituion set to %d.\r\n", intval);
+        send_to_char(buf, ch);
+      } break;
+        
     }
 
     set_zone_modified_mob(mob_num);
