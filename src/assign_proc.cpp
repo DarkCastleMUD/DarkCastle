@@ -285,7 +285,6 @@ void assign_non_combat_procs() {
     assign_one_mob_non(27120,  backstabber);
     assign_one_mob_non(27860,  frosty);
     assign_one_mob_non(27871,  poet);
-    assign_one_mob_non(30001, ranger_non_combat);
     assign_one_mob_non(32044,  passive_tarrasque);
     assign_one_mob_non(32045,  repair_guy);
     assign_one_mob_non(32046,  super_repair_guy);
@@ -471,7 +470,6 @@ void assign_combat_procs() {
     assign_one_mob_com(27124,  active_magic_user2);
     assign_one_mob_com(27133,  firestormer);
     assign_one_mob_com(27140,  hellstreamer);
-    assign_one_mob_com(30001,  ranger_combat);
     assign_one_mob_com(32044,  active_tarrasque);
 
     return;    
