@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: const.cpp,v 1.56 2003/04/20 22:14:53 pirahna Exp $ */
+/* $Id: const.cpp,v 1.57 2003/04/23 00:01:24 pirahna Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -257,6 +257,7 @@ char *connected_states[] =
     "CON_ACCOUNT_GET_OLD_PASSWORD",
     "CON_ACCOUNT_GET_NEW_PASSWORD",
     "CON_ACCOUNT_MENU",
+    "CON_ACCOUNT_LOGIN_CHAR",
     "\n"
 };
 

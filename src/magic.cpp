@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.68 2003/04/20 22:14:53 pirahna Exp $ */
+/* $Id: magic.cpp,v 1.69 2003/04/23 00:01:24 pirahna Exp $ */
 
 extern "C"
 {
@@ -4067,24 +4067,17 @@ int spell_resist_cold(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 {
    struct affected_type af;
 
-   if(!ch)
-   {
-      log("NULL ch or victim sent to resist_cold!", ANGEL, LOG_BUG);
-      return eFAILURE;
-   }
-	  
-
-   if (!affected_by_spell(ch, SPELL_RESIST_COLD)) {
+   if (!affected_by_spell(victim, SPELL_RESIST_COLD)) {
       skill_increase_check(ch, SPELL_RESIST_COLD, skill, SKILL_INCREASE_MEDIUM);
-      act("$n's skin turns blue momentarily.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-      act("Your skin turns blue momentarily.", ch, 0, 0, TO_CHAR, 0);
+      act("$n's skin turns blue momentarily.", victim, 0, 0, TO_ROOM, INVIS_NULL);
+      act("Your skin turns blue momentarily.", victim, 0, 0, TO_CHAR, 0);
 
       af.type = SPELL_RESIST_COLD;
       af.duration = 1 + skill / 10;
       af.modifier = 10 + skill / 6;
       af.location = APPLY_SAVING_COLD;
       af.bitvector = 0;
-      affect_to_char(ch, &af);
+      affect_to_char(victim, &af);
    }
    return eSUCCESS;
 }
@@ -4095,23 +4088,16 @@ int spell_resist_fire(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 {
    struct affected_type af;
 
-   if(!ch)
-   {
-      log("NULL ch sent to resist_fire!", ANGEL, LOG_BUG);
-      return eFAILURE;
-   }
-
-
-   if (!affected_by_spell(ch, SPELL_RESIST_FIRE)) {
+   if (!affected_by_spell(victim, SPELL_RESIST_FIRE)) {
       skill_increase_check(ch, SPELL_RESIST_FIRE, skill, SKILL_INCREASE_MEDIUM);
-      act("$n's skin turns red momentarily.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-      act("Your skin turns red momentarily.", ch, 0, 0, TO_CHAR, 0);
+      act("$n's skin turns red momentarily.", victim, 0, 0, TO_ROOM, INVIS_NULL);
+      act("Your skin turns red momentarily.", victim, 0, 0, TO_CHAR, 0);
       af.type = SPELL_RESIST_FIRE;
       af.duration = 1 + skill / 10;
       af.modifier = 10 + skill / 6;
       af.location = APPLY_SAVING_FIRE;
       af.bitvector = 0;
-      affect_to_char(ch, &af);
+      affect_to_char(victim, &af);
    }
    return eSUCCESS;
 }
@@ -4139,16 +4125,16 @@ int spell_resist_energy(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
 {
    struct affected_type af;
 
-   if(!affected_by_spell(ch, SPELL_RESIST_ENERGY)) {
+   if(!affected_by_spell(victim, SPELL_RESIST_ENERGY)) {
       skill_increase_check(ch, SPELL_RESIST_ENERGY, skill, SKILL_INCREASE_MEDIUM);
-      act("$n's skin turns gold momentarily.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-      act("Your skin turns gold momentarily.", ch, 0, 0, TO_CHAR, 0);
+      act("$n's skin turns gold momentarily.", victim, 0, 0, TO_ROOM, INVIS_NULL);
+      act("Your skin turns gold momentarily.", victim, 0, 0, TO_CHAR, 0);
       af.type = SPELL_RESIST_ENERGY;
       af.duration = 1 + skill / 10;
       af.modifier = 10 + skill / 6;
       af.location = APPLY_SAVING_ENERGY;
       af.bitvector = 0;
-      affect_to_char(ch, &af);
+      affect_to_char(victim, &af);
    }
    return eSUCCESS;
 }
@@ -7076,15 +7062,15 @@ int cast_resist_cold( byte level, CHAR_DATA *ch, char *arg,
 {
   switch (type) {
   case SPELL_TYPE_SPELL:
-	 return spell_resist_cold(level, ch, 0, 0, skill);
+	 return spell_resist_cold(level, ch, tar_ch, 0, skill);
 	 break;
   case SPELL_TYPE_POTION:
-    return spell_resist_cold(level, ch, 0, 0, skill);
+    return spell_resist_cold(level, ch, tar_ch, 0, skill);
 	 break;
   case SPELL_TYPE_SCROLL:
       if (tar_obj) return eFAILURE;
       if (!tar_ch) tar_ch = ch;
-    return spell_resist_cold(level, tar_ch, 0, 0, skill);
+    return spell_resist_cold(level, ch, tar_ch, 0, skill);
     break;
   default:
 	 log("Serious screw-up in resist_cold!", ANGEL, LOG_BUG);
@@ -7117,15 +7103,15 @@ int cast_resist_energy(byte level, CHAR_DATA *ch, char *arg, int type,
                         CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill) {
   switch(type) {
     case SPELL_TYPE_SPELL:
-      return spell_resist_energy(level, ch, 0, 0, skill);
+      return spell_resist_energy(level, ch, tar_ch, 0, skill);
       break;
     case SPELL_TYPE_POTION:
-      return spell_resist_energy(level, ch, 0, 0, skill);
+      return spell_resist_energy(level, ch, tar_ch, 0, skill);
       break;
     case SPELL_TYPE_SCROLL:
       if (tar_obj) return eFAILURE;
       if (!tar_ch) tar_ch = ch;
-      return spell_resist_energy(level, tar_ch, 0, 0, skill);
+      return spell_resist_energy(level, ch, tar_ch, 0, skill);
       break;
     default:
       log("Serious screw-up in resist energy!", ANGEL, LOG_BUG);
@@ -7140,15 +7126,15 @@ int cast_resist_fire( byte level, CHAR_DATA *ch, char *arg,
 {
   switch (type) {
   case SPELL_TYPE_SPELL:
-	 return spell_resist_fire(level, ch, 0, 0, skill);
+	 return spell_resist_fire(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_POTION:
-	 return spell_resist_fire(level, ch, 0, 0, skill);
+	 return spell_resist_fire(level, ch, tar_ch, 0, skill);
 	 break;
   case SPELL_TYPE_SCROLL:
       if (tar_obj) return eFAILURE;
       if (!tar_ch) tar_ch = ch;
-    return spell_resist_fire(level, tar_ch, 0, 0, skill);
+    return spell_resist_fire(level, ch, tar_ch, 0, skill);
     break;
   default:
 	 log("Serious screw-up in resist_fire!", ANGEL, LOG_BUG);
@@ -8407,17 +8393,17 @@ int spell_resist_acid(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 {
     struct affected_type af;
 
-    if(!affected_by_spell(ch, SPELL_RESIST_ACID)) {
+    if(!affected_by_spell(victim, SPELL_RESIST_ACID)) {
        skill_increase_check(ch, SPELL_RESIST_ACID, skill, SKILL_INCREASE_MEDIUM);
-       act("$n's skin turns green momentarily.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-       act("Your skin turns green momentarily.", ch, 0, 0, TO_CHAR, 0);
+       act("$n's skin turns green momentarily.", victim, 0, 0, TO_ROOM, INVIS_NULL);
+       act("Your skin turns green momentarily.", victim, 0, 0, TO_CHAR, 0);
 
        af.type = SPELL_RESIST_ACID;
        af.duration = 1 + skill / 10;
        af.modifier = 10 + skill / 6;
        af.location = APPLY_SAVING_ACID;
        af.bitvector = 0;
-       affect_to_char(ch, &af);
+       affect_to_char(victim, &af);
     }
   return eSUCCESS;
 }
@@ -8426,15 +8412,15 @@ int cast_resist_acid(byte level, CHAR_DATA *ch, char *arg, int type,
                         CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill) {
   switch(type) {
     case SPELL_TYPE_SPELL:
-      return spell_resist_acid(level, ch, 0, 0, skill);
+      return spell_resist_acid(level, ch, tar_ch, 0, skill);
       break;
     case SPELL_TYPE_POTION:
-      return spell_resist_acid(level, ch, 0, 0, skill);
+      return spell_resist_acid(level, ch, tar_ch, 0, skill);
       break;
     case SPELL_TYPE_SCROLL:
       if (tar_obj) return eFAILURE;
       if (!tar_ch) tar_ch = ch;
-      return spell_resist_acid(level, tar_ch, 0, 0, skill);
+      return spell_resist_acid(level, ch, tar_ch, 0, skill);
       break;
     default:
       log("Serious screw-up in resist acid!", ANGEL, LOG_BUG);

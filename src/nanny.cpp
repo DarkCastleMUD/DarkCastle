@@ -11,7 +11,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.25 2003/04/20 22:14:54 pirahna Exp $ */
+/* $Id: nanny.cpp,v 1.26 2003/04/23 00:01:24 pirahna Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -74,6 +74,17 @@ char menu[] = "\n\rWelcome to Dark Castle Mud\n\r\n\r"
               "4) Archive this character.\n\r"
               "5) Delete this character.\n\r\n\r"
               "   Make your choice: ";
+
+char accountmenu[] = "\n\rWelcome to Dark Castle Mud\n\r\n\r"
+                         "0) Exit Dark Castle.\n\r"
+                         "1) Enter the game with a character.\n\r"
+                         "2) Enter a character's description.\n\r"
+                         "3) Change your account password.\n\r"
+                         "4) Archive this account.\n\r"
+                         "5) Delete a character.\n\r"
+                         "6) Change/View account details.\n\r"
+                         "7) Create a new character.\n\r\n\r"
+                         "   Make your choice: ";
 
 bool wizlock = false;
 
@@ -1179,7 +1190,113 @@ void nanny(struct descriptor_data *d, char *arg)
        SEND_TO_Q( menu, d );
        STATE(d) = CON_SELECT_MENU;
        break;
+
+    case CON_ACCOUNT_LOGIN_CHAR:
+
+       // Verify char name entered is valid else back to menu
+       // copy name into tmp_name
+       // continue
+
+       load_char_obj(d, tmp_name);
+       ch = d->character;
+          
+       send_to_char("\n\rWelcome to Dark Castle Diku Mud.  May your visit here suck.\n\r", ch );
+       ch->next            = character_list;
+       character_list      = ch;
+          
+       do_on_login_stuff(ch);
+          
+       if(GET_LEVEL(ch) < OVERSEER)
+          clan_login(ch);
+          
+       act( "$n has entered the game.", ch, 0, 0, TO_ROOM , INVIS_NULL);
+       if(!GET_SHORT_ONLY(ch)) GET_SHORT_ONLY(ch) = str_dup(GET_NAME(ch)); 
+       update_wizlist(ch);
+          
+       STATE(d) = CON_PLAYING;
+       if ( GET_LEVEL(ch) == 0 )
+          do_start( ch );
+       do_look( ch, "", 8 );
+       break;
        
+    case CON_ACCOUNT_MENU:
+       switch( *arg )
+       {
+       case '0':
+          close_socket( d );
+          d = NULL;
+          break;
+          
+       case '1':
+          // List characters available to player
+          SEND_TO_Q("Which of the following characters would you like to login?\n\r", d);
+          SEND_TO_Q("TODO - List player names\n\r", d);
+          SEND_TO_Q("\n\rName? ", d);
+          STATE(d) = CON_ACCOUNT_LOGIN_CHAR;
+          break;
+          
+       case '2':
+SEND_TO_Q("TODO\n\r", d);
+break;
+          SEND_TO_Q("Enter a text you'd like others to see when they look at you.\n\r"
+                    "Terminate with an '~'\n\r", d);
+          if(ch->description) {
+             SEND_TO_Q("Old description:\n\r", d);
+             SEND_TO_Q(ch->description, d);
+             dc_free(ch->description);
+          }
+#ifdef LEAK_CHECK
+          ch->description = (char *)calloc(240, sizeof(char));
+#else
+          ch->description = (char *)dc_alloc(240, sizeof(char));
+#endif
+
+ // TODO - what happens if I get to this point, then disconnect, and reconnect?  memory leak?
+
+          d->str     = &ch->description;
+          d->max_str = 239;
+          STATE(d)   = CON_EXDSCR;
+          break;
+      
+       case '3':
+SEND_TO_Q("TODO\n\r", d);
+break;
+          SEND_TO_Q( "Enter current password: ", d );
+          SEND_TO_Q( echo_off_str, d );
+          STATE(d) = CON_CONFIRM_PASSWORD_CHANGE;
+          break;
+      
+       case '4':
+          // Archive this account 
+          SEND_TO_Q("Archiving still TODO\n\rDon't worry, noone will get deleted from inactivity for a while.\n\r", d);
+
+//          SEND_TO_Q("This will archive your character until you ask to be unarchived.\n\rYou will need to speak to a god greater than level 107.\n\rType ARCHIVE ME if this is what you want:  ", d);
+//          STATE(d) = CON_ARCHIVE_CHAR;
+          break;
+      
+       case '5':
+          // delete a character 
+          SEND_TO_Q("Deletion still TODO\n\r", d);
+//          SEND_TO_Q("This will _permanently_ erase you.\n\rType ERASE ME if this is really what you want: ", d);
+//          STATE(d) = CON_DELETE_CHAR;
+          break;
+
+       case '6':
+          // View/Change account details
+SEND_TO_Q("TODO\n\r", d);
+break;
+
+       case '7':
+          // create a new character
+SEND_TO_Q("TODO\n\r", d);
+break;
+             
+       default:
+          SEND_TO_Q( accountmenu, d );
+          break;
+       }
+       break;
+
     case CON_SELECT_MENU:
        switch( *arg )
        {

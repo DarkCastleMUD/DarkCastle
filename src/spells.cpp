@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.36 2003/04/20 22:14:54 pirahna Exp $ */
+/* $Id: spells.cpp,v 1.37 2003/04/23 00:01:24 pirahna Exp $ */
 
 extern "C"
 {
@@ -463,11 +463,11 @@ struct spell_info_type spell_info [ ] =
     },
 
     { /* 98 */
-	12, POSITION_STANDING, 33, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_resist_fire
+	12, POSITION_STANDING, 33, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_resist_fire
     },
 
     { /* 99 */
-	12, POSITION_STANDING, 33, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_resist_cold
+	12, POSITION_STANDING, 33, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_resist_cold
     },
 
     { /* 100 */
@@ -551,7 +551,7 @@ struct spell_info_type spell_info [ ] =
     },
     
     { // 120
-        12, POSITION_STANDING, 20, TAR_CHAR_ROOM|TAR_SELF_ONLY, cast_resist_energy
+        12, POSITION_STANDING, 20, TAR_CHAR_ROOM, cast_resist_energy
     },
 
     { // 121
