@@ -2082,3 +2082,40 @@ int noremove_eq(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
 
 
 
+int glove_combat_procs(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, 
+                   CHAR_DATA *invoker)
+{
+   if(cmd)                                  return eFAILURE;
+   if(!ch || !ch->fighting)                 return eFAILURE;
+   if(ch->equipment[WEAR_HANDS] != obj)     return eFAILURE;
+
+   int dam;
+
+   switch(obj_index[obj->item_number].virt) {
+     case 9806:  // muddy gloves
+       if(number(0, 17))
+         return eFAILURE;
+
+       dam = dice(1, GET_LEVEL(ch));
+       act("The mud on $n's gloves spoils $N's flesh causing boils.", ch, obj, ch->fighting, TO_ROOM, NOTVICT);
+       act("The mud on $n's gloves spoils your flesh causing boils.", ch, obj, ch->fighting, TO_VICT, 0);
+       send_to_char("The mud on your gloves spoils the flesh of your enemy.\r\n", ch);
+       return spell_damage(ch, ch->fighting, dam, TYPE_MAGIC, TYPE_UNDEFINED, 0);
+     break;
+
+     case 19503: // Gloves of the Dreamer
+       if(number(0, 17))
+         return eFAILURE;
+
+       act("$n's $o begin pulse with a white light for a moment.", ch, obj, 0, TO_ROOM, 0);
+       send_to_char("Your gloves begin to pulse with a white light for a moment.\r\n", ch);
+       return spell_cure_serious(30, ch, ch, 0, 50);
+     break;
+
+     default:
+       break; 
+   }
+
+   return eFAILURE;
+}
+

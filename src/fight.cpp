@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.92 2003/01/21 07:02:56 dcastle Exp $ */
+/* $Id: fight.cpp,v 1.93 2003/01/22 06:45:31 pirahna Exp $ */
 
 extern "C"
 {
@@ -794,9 +794,9 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
 
   check_weapon_skill_bonus(ch, w_type, wielded, weapon_skill_hit_bonus, weapon_skill_dam_bonus);
 
-weapon_type = w_type;
- if(type == SKILL_BACKSTAB)
- w_type = SKILL_BACKSTAB;
+  weapon_type = w_type;
+  if(type == SKILL_BACKSTAB)
+    w_type = SKILL_BACKSTAB;
   
   /* Calculate thac0 vs. armor clss.  Thac0 for mobs is in hitroll */
 //  if(!IS_NPC(ch))
@@ -930,8 +930,21 @@ weapon_type = w_type;
   if(!IS_SET(retval, eCH_DIED) && 
      !IS_SET(retval, eVICT_DIED) && 
       IS_SET(retval, eSUCCESS))
-    retval = weapon_spells(ch, vict, weapon);
+  {
+    if(wielded)
+       retval = weapon_spells(ch, vict, weapon);
+    else
+    {
+      // if our gloves have a combat proc, and we did damage, let'um have it!
+      if(ch->equipment[WEAR_HANDS]) {
+        if(obj_index[ch->equipment[WEAR_HANDS]->item_number].combat_func) {
+          retval = ((*obj_index[ch->equipment[WEAR_HANDS]->item_number].combat_func)
+                       (ch, ch->equipment[WEAR_HANDS], 0, "", ch));
+        }
+    }
 
+    }
+  }
   // weapon spells is going to return failure if a spell didn't go off.  However,
   // we did actually hit the opponent, so set it to success and get out
   SET_BIT(retval, eSUCCESS);
