@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.13 2002/08/23 16:31:06 dcastle Exp $ */
+/* $Id: handler.cpp,v 1.14 2002/08/25 17:52:57 pirahna Exp $ */
     
 extern "C"
 {
@@ -752,7 +752,8 @@ void affect_total(CHAR_DATA *ch)
       if(ch->equipment[SECOND_WIELD] && 
            GET_OBJ_WEIGHT(ch->equipment[SECOND_WIELD]) <= (str_app[STRENGTH_APPLY_INDEX(ch)].wield_w/2))
       {
-        act("You move your $p to be your primary weapon.", ch, ch->equipment[SECOND_WIELD], 0, TO_ROOM, INVIS_NULL);
+        act("You move your $p to be your primary weapon.", ch, ch->equipment[SECOND_WIELD], 0, TO_CHAR, INVIS_NULL);
+        act("$n moves $s $p to be $s primary weapon.", ch, ch->equipment[SECOND_WIELD], 0, TO_ROOM, INVIS_NULL);
         weapon = unequip_char(ch, SECOND_WIELD);
         equip_char(ch, weapon, WIELD);
       }
