@@ -739,9 +739,9 @@ act("You resist $n's whistle sharp!",ch,NULL,victim,TO_VICT,0);
    if(IS_SET(retval, eVICT_DIED))
    {
 
-      act("$n's whistling pierces directly into $N's head and turns their brain to mush!", ch, NULL, victim, TO_ROOM, NOTVICT);
-      act("$n's whistling pierces into your brain, which is now mush!", ch, NULL, victim, TO_VICT, 0);
-      act("$N's brain has been turned to mush.", ch, NULL, victim, TO_CHAR, 0);
+      act("$n's whistle goes off the scale and $N's head explodes!", ch, NULL, victim, TO_ROOM, NOTVICT);
+      act("$n's whistle goes off the scale and your head explodes!", ch, NULL, victim, TO_VICT, 0);
+      act("$N's head exploes as your whistle goes off the scale.", ch, NULL, victim, TO_CHAR, 0);
 
       send_to_char("You dance a small jig on the corpse.\r\n", ch);
       act("$n dances a little jig on the fallen corpse.",
