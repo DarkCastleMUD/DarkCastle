@@ -1,7 +1,7 @@
 #ifndef CONNECT_H_
 #define CONNECT_H_
 /************************************************************************
-| $Id: connect.h,v 1.4 2003/04/20 22:15:01 pirahna Exp $
+| $Id: connect.h,v 1.5 2003/04/23 00:01:30 pirahna Exp $
 | connect.h
 | Description: State of connectedness information.
 */
@@ -55,6 +55,7 @@
 #define CON_ACCOUNT_GET_OLD_PASSWORD       40
 #define CON_ACCOUNT_GET_NEW_PASSWORD       41
 #define CON_ACCOUNT_MENU                   42
+#define CON_ACCOUNT_LOGIN_CHAR             43
 
 // if you change, make sure you update char *connected_states[] in const.C
 // also update connected_types[]
