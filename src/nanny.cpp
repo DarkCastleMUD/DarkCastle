@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.50 2004/05/02 12:19:10 urizen Exp $ */
+/* $Id: nanny.cpp,v 1.51 2004/05/06 21:05:55 urizen Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -462,7 +462,7 @@ int more_than_ten_people_from_this_ip(struct descriptor_data *new_conn)
          count++;
    }
 
-   if(count > 99)
+   if(count > 12)
    {
       SEND_TO_Q("Sorry, there are more than 9 connections from this IP address\r\n"
                 "already logged into Dark Castle.  If you have a valid reason\r\n"
