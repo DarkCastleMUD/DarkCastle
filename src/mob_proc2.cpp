@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.30 2004/05/31 23:31:15 urizen Exp $ */
+/* $Id: mob_proc2.cpp,v 1.31 2004/06/01 02:24:55 urizen Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -1143,7 +1143,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     csendf(ch, "7) Add to your mana points:  Currently out of stock\r\n");
   //          "Platinum coins.\n\r", mana_exp, mana_cost);
 
-    csendf(ch, "8) Add to your movement points: Currently out of stock\r\n ");
+    csendf(ch, "8) Add to your movement points: Currently out of stock\r\n");
 //            "Platinum coins.\n\r", move_exp, move_cost);
 
     send_to_char(
@@ -1156,8 +1156,8 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 
     if(!IS_MOB(ch)) {   // mobs can't meta ki
       if(GET_KI_METAS(ch) > 4)
-	send_to_char("19) Your ki is already meta'd fully.\n\r", ch);
-      else csendf(ch, "19) Add a point of ki:       Current out of stock..\n\r");
+	send_to_char("14) Your ki is already meta'd fully.\n\r", ch);
+      else csendf(ch, "14) Add a point of ki:       Current out of stock..\n\r");
 //, ki_exp, ki_cost);
     }
     return eSUCCESS;
