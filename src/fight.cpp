@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.103 2003/03/21 22:04:53 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.104 2003/04/16 04:10:03 pirahna Exp $ */
 
 extern "C"
 {
@@ -1469,7 +1469,7 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
   }
   
   /*  Now for eq damage...   */
-  if(dam > 0 && typeofdamage == DAMAGE_TYPE_PHYSICAL)
+  if(dam > 2 && typeofdamage == DAMAGE_TYPE_PHYSICAL)
       eq_damage(ch, victim, dam, weapon_type, attacktype);
 
   inform_victim(ch, victim, dam);
