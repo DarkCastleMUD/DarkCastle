@@ -11,7 +11,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.11 2002/08/04 15:31:38 dcastle Exp $ */
+/* $Id: nanny.cpp,v 1.12 2002/08/06 21:47:02 dcastle Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -1137,7 +1137,7 @@ int _parse_name(char *arg, char *name)
       !str_cmp( name, "the")           || !str_cmp( name, "to") ||
       !str_cmp( name, "someone")       || !str_cmp( name, "through") ||
       !str_cmp( name, "pc")            || !str_cmp( name, "corpse") ||
-      !str_cmp( name, "you")
+      !str_cmp( name, "you")           || !str_cmp( name, "on")
       )
       return 1;
    
