@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.12 2003/01/16 04:26:34 dcastle Exp $ */
+/* $Id: clan.cpp,v 1.13 2003/01/21 06:08:44 pirahna Exp $ */
 extern "C"
 {
   #include <string.h> // strcat
@@ -1197,6 +1197,11 @@ int do_ctell(CHAR_DATA *ch, char *arg, int cmd)
 
   while(isspace(*arg))
     arg++;
+
+  if(!(IS_SET(ch->misc, CHANNEL_CLAN))) {
+    send_to_char("You have that channel off!!\n\r", ch);
+    return eFAILURE;
+  }
     
   if(!*arg) {
     send_to_char("Tell your clan members what?\n\r", ch);
