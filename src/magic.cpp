@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.31 2002/09/20 18:42:54 pirahna Exp $ */
+/* $Id: magic.cpp,v 1.32 2002/09/28 23:27:42 pirahna Exp $ */
 
 extern "C"
 {
@@ -2224,17 +2224,6 @@ int cast_sanctuary( byte level, CHAR_DATA *ch, char *arg, int type,
 {
   switch (type) {
     case SPELL_TYPE_SPELL:
-      // this oughta fix their wagon.
-      // - Sadus
-      if(GET_CLASS(ch) == CLASS_PALADIN) {
-        if(GET_ALIGNMENT(ch) < 1000) {
-	  send_to_char("You must be of the utmost purity to cast a spell "
-	               "of sanctification.\n\r", ch);
-	  GET_MANA(ch) += 75;
-          return eFAILURE;
-	}
-	GET_MANA(ch) = 75;
-      }
       return spell_sanctuary(level, ch, tar_ch, 0, skill);
       break;
     case SPELL_TYPE_POTION:
