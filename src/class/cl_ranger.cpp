@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_ranger.cpp,v 1.19 2002/09/29 00:18:15 pirahna Exp $ | cl_ranger.C |
+| $Id: cl_ranger.cpp,v 1.20 2002/10/16 23:43:24 pirahna Exp $ | cl_ranger.C |
 Description: Ranger skills/spells */ extern "C"  {
   #include <string.h>
 }
@@ -693,20 +693,19 @@ return 0;
 *  return pointer if success */
 struct obj_data * find_arrow(struct obj_data *quiver)
 {
-
   struct obj_data *target;
 
   struct obj_data *get_obj_in_list(char *, struct obj_data *);
 
   target = get_obj_in_list("arrow", quiver->contains);
   
-  if(!(target->obj_flags.type_flag == ITEM_MISSILE))
-    target=NULL;
-
   if(!target)
     return NULL;
   
-return target;
+  if(!(target->obj_flags.type_flag == ITEM_MISSILE))
+    target=NULL;
+
+  return target;
 }
 
 void do_arrow_miss(struct char_data *ch, struct char_data *victim, int
