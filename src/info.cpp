@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.38 2004/05/14 00:04:12 urizen Exp $ */
+/* $Id: info.cpp,v 1.39 2004/05/14 14:43:10 urizen Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -945,7 +945,7 @@ int do_look(struct char_data *ch, char *argument, int cmd)
                }
                /* wrong argument */
                
-               if (bits)
+               if (bits && !found)
                { /* If an object was found */
                   if (!found)
                      /* Show no-description */
