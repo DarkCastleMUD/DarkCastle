@@ -12,7 +12,14 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: mob_act.cpp,v 1.10 2003/12/01 17:39:01 staylor Exp $ */
+/**************************************************************************/
+/* Revision History                                                       */
+/* 12/05/2003   Onager   Created is_protected() to break out PFE/PFG code */
+/* 12/05/2003   Onager   Created scavenge() to simplify mobile_activity() */
+/* 12/06/2003   Onager   Modified mobile_activity() to prevent charmie    */
+/*                       scavenging                                       */
+/**************************************************************************/
+/* $Id: mob_act.cpp,v 1.11 2003/12/09 01:31:44 staylor Exp $ */
 
 extern "C"
 {
@@ -76,6 +83,8 @@ int druid_non_combat(struct char_data *ch, struct obj_data *obj, int cmd, char *
           struct char_data *owner);
 int passive_cleric(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,        
           struct char_data *owner);
+bool is_protected(struct char_data *vict, struct char_data *ch);
+void scavenge(struct char_data *ch);
 
 void mobile_activity(void)
 {
@@ -85,7 +94,6 @@ void mobile_activity(void)
   extern struct str_app_type str_app[];
   char buf[1000];
   int door, max;
-  int keyword;
   int done;
   int tmp_race, tmp_bitv;
   int retval;
@@ -246,281 +254,10 @@ void mobile_activity(void)
 
     if (world[ch->in_room].contents &&
       IS_SET(ch->mobdata->actflags, ACT_SCAVENGER) &&
+      !IS_AFFECTED(ch, AFF_CHARM) &&
       number(0, 2) == 0) 
     {
-      max      = 1;
-      done     = 0;
-      best_obj = 0;
-      for(obj = world[ch->in_room].contents; obj; obj = obj->next_content) 
-      {
-        if(!CAN_GET_OBJ(ch, obj))
-          continue;
-        
-        keyword = keywordfind(obj);
-        
-        if(keyword != -2) {
-          if((hands_are_free(ch, 1)) && (CAN_WEAR(obj, WIELD))) 
-          {
-            if(GET_OBJ_WEIGHT(obj) < 
-              str_app[STRENGTH_APPLY_INDEX(ch)].wield_w) 
-            {
-              if(!ch->equipment[WIELD]) 
-              {
-                move_obj( obj, ch );
-                act( "$n gets $p.", ch, obj, 0, TO_ROOM , 0);
-                perform_wear(ch, obj, keyword);
-                obj_from_char(obj);
-                equip_char(ch, obj, WIELD);
-                break;
-              }
-              /* damage check */
-              if((ch->equipment[WIELD]) && (!ch->equipment[SECOND_WIELD])) 
-              {
-                move_obj( obj, ch );
-                act( "$n gets $p.", ch, obj, 0, TO_ROOM , 0);
-                perform_wear(ch, obj, keyword);
-                obj_from_char(obj);
-                equip_char(ch,obj, SECOND_WIELD);
-                break;
-              }
-            } // GET_OBJ_WEIGHT()
-            else
-              continue;
-          } /* if hands are free and can wear */            
-          else 
-          {
-            if(((keyword == 13) || (keyword == 14)) && !hands_are_free(ch, 1)) 
-              continue;
-            
-            switch (keyword) 
-            {
-              
-            case 0: 
-              if ((CAN_WEAR(obj, ITEM_WEAR_FINGER)) && 
-                ( (!ch->equipment[WEAR_FINGER_L]) || (!ch->equipment[WEAR_FINGER_R])) ) 
-              {
-                move_obj( obj, ch );
-                act( "$n gets $p.",  ch, obj, 0, TO_ROOM , 0);
-                perform_wear(ch, obj, keyword);
-                obj_from_char(obj);
-                if (!ch->equipment[WEAR_FINGER_L])
-                  equip_char(ch,obj, WEAR_FINGER_L);
-                else
-                  equip_char(ch,obj, WEAR_FINGER_R);
-                done = 1;
-              } 
-              break;
-              
-            case 1:
-              if ((CAN_WEAR(obj, ITEM_WEAR_NECK)) && 
-                ( (!ch->equipment[WEAR_NECK_1]) || (!ch->equipment[WEAR_NECK_2])) ) 
-              {
-                move_obj( obj, ch );
-                act( "$n gets $p.",  ch, obj, 0, TO_ROOM , 0);
-                perform_wear(ch, obj, keyword);
-                obj_from_char(obj);
-                if (!ch->equipment[WEAR_NECK_1])
-                  equip_char(ch,obj, WEAR_NECK_1);
-                else
-                  equip_char(ch,obj, WEAR_NECK_2);
-                done = 1;
-              }  
-              break;
-              
-            case 2:
-              if ((CAN_WEAR(obj, ITEM_WEAR_BODY)) && (!ch->equipment[WEAR_BODY])) 
-              {
-                move_obj( obj, ch );
-                act( "$n gets $p.",  ch, obj, 0, TO_ROOM , 0);
-                perform_wear(ch, obj, keyword);
-                obj_from_char(obj);
-                equip_char(ch,obj, WEAR_BODY);
-                done =1;
-              } 
-              break;
-              
-            case 3:
-              if ((CAN_WEAR(obj, ITEM_WEAR_HEAD)) && (!ch->equipment[WEAR_HEAD])) 
-              {
-                move_obj( obj, ch );
-                act( "$n gets $p.",  ch, obj, 0, TO_ROOM , 0);
-                perform_wear(ch, obj, keyword);
-                obj_from_char(obj);
-                equip_char(ch,obj, WEAR_HEAD);
-                done = 1;
-              } 
-              break;
-              
-            case 4:
-              if ((CAN_WEAR(obj, ITEM_WEAR_LEGS)) && (!ch->equipment[WEAR_LEGS])) 
-              {
-                move_obj( obj, ch );
-                act( "$n gets $p.", ch, obj, 0, TO_ROOM , 0);
-                perform_wear(ch, obj, keyword);
-                obj_from_char(obj);
-                equip_char(ch,obj, WEAR_LEGS);
-                done = 1;
-              } 
-              break;
-              
-            case 5:
-              if ((CAN_WEAR(obj, ITEM_WEAR_FEET)) && (!ch->equipment[WEAR_FEET])) 
-              {
-                move_obj( obj, ch );
-                act( "$n gets $p.", ch, obj, 0, TO_ROOM , 0);
-                perform_wear(ch, obj, keyword);
-                obj_from_char(obj);
-                equip_char(ch,obj, WEAR_FEET);
-                done = 1;
-              }  
-              break;
-                              
-            case 6:
-              if ((CAN_WEAR(obj, ITEM_WEAR_HANDS)) && (!ch->equipment[WEAR_HANDS])) 
-              {
-                move_obj( obj, ch );
-                act( "$n gets $p.",  ch, obj, 0, TO_ROOM , 0);
-                perform_wear(ch, obj, keyword);
-                obj_from_char(obj);
-                equip_char(ch,obj, WEAR_HANDS);
-                done = 1;
-              } 
-              break;
-              
-            case 7:
-              if ((CAN_WEAR(obj, ITEM_WEAR_ARMS)) && (!ch->equipment[WEAR_ARMS])) 
-              {
-                move_obj( obj, ch );
-                act( "$n gets $p.",  ch, obj, 0, TO_ROOM , 0);
-                perform_wear(ch, obj, keyword);
-                obj_from_char(obj);
-                equip_char(ch,obj, WEAR_ARMS);
-                done = 1;
-              } 
-              break;
-              
-            case 8:
-              if ((CAN_WEAR(obj, ITEM_WEAR_ABOUT)) && (!ch->equipment[WEAR_ABOUT])) 
-              {
-                move_obj( obj, ch );
-                act( "$n gets $p.",  ch, obj, 0, TO_ROOM , 0);
-                perform_wear(ch, obj, keyword);
-                obj_from_char(obj);
-                equip_char(ch,obj, WEAR_ABOUT);
-                done = 1;
-              } 
-              break;
-              
-            case 9:
-              if ((CAN_WEAR(obj, ITEM_WEAR_WAISTE)) && (!ch->equipment[WEAR_WAISTE])) 
-              {
-                move_obj( obj, ch );
-                act( "$n gets $p.",  ch, obj, 0, TO_ROOM , 0);
-                perform_wear(ch, obj, keyword);
-                obj_from_char(obj);
-                equip_char(ch,obj, WEAR_WAISTE);
-                done = 1;
-              } 
-              break;
-
-            case 10: 
-              if ((CAN_WEAR(obj, ITEM_WEAR_WRIST)) && 
-                ( (!ch->equipment[WEAR_WRIST_L]) || (!ch->equipment[WEAR_WRIST_R])) ) 
-              {
-                move_obj( obj, ch );
-                act( "$n gets $p.",  ch, obj, 0, TO_ROOM , 0);
-                perform_wear(ch, obj, keyword);
-                obj_from_char(obj);
-                if (!ch->equipment[WEAR_WRIST_L])
-                  equip_char(ch,obj, WEAR_WRIST_L);
-                else
-                  equip_char(ch,obj, WEAR_WRIST_R);
-                done = 1;
-              }
-              break;
-              
-            case 11:
-              if ((CAN_WEAR(obj, ITEM_WEAR_FACE)) && (!ch->equipment[WEAR_FACE])) 
-              {
-                move_obj( obj, ch );
-                act( "$n gets $p.",  ch, obj, 0, TO_ROOM , 0);
-                perform_wear(ch, obj, keyword);
-                obj_from_char(obj);
-                equip_char(ch,obj, WEAR_FACE);
-                done =1;
-              } 
-              break;
-              
-            case 12:  
-                done = 1;
-              break;
-              
-            case 13:
-              if ((CAN_WEAR(obj, ITEM_WEAR_SHIELD)) && (!ch->equipment[WEAR_SHIELD])) 
-              {
-                move_obj( obj, ch );
-                act( "$n gets $p.",  ch, obj, 0, TO_ROOM , 0);
-                perform_wear(ch, obj, keyword);
-                obj_from_char(obj);
-                equip_char(ch,obj, WEAR_SHIELD);
-                done = 1;
-              } 
-              break;
-              
-            case 14:
-              if ((CAN_WEAR(obj, ITEM_HOLD)) && (!ch->equipment[HOLD])) 
-              {  
-                if ( (obj->obj_flags.type_flag == ITEM_LIGHT) &&
-                  (!ch->equipment[WEAR_LIGHT]) ) 
-                {
-                  move_obj( obj, ch );
-                  act( "$n gets $p.",  ch, obj, 0, TO_ROOM , 0);
-                  perform_wear(ch, obj, 16);
-                  obj_from_char(obj);
-                  equip_char(ch,obj, WEAR_LIGHT);
-                  done = 1;
-                } 
-                else if (obj->obj_flags.type_flag != ITEM_LIGHT) 
-                {
-                  move_obj( obj, ch );
-                  act( "$n gets $p.",  ch, obj, 0, TO_ROOM , 0);
-                  perform_wear(ch, obj, keyword);
-                  obj_from_char(obj);
-                  equip_char(ch,obj, HOLD);
-                  done = 1;
-                }
-              } 
-              break;
-              
-            case 15: 
-              if ((CAN_WEAR(obj, ITEM_WEAR_EAR)) && 
-                ( (!ch->equipment[WEAR_EAR_L]) || (!ch->equipment[WEAR_EAR_R])) ) 
-              {
-                move_obj( obj, ch );
-                act( "$n gets $p.",  ch, obj, 0, TO_ROOM , 0);
-                perform_wear(ch, obj, keyword);
-                obj_from_char(obj);
-                if (!ch->equipment[WEAR_EAR_L])
-                  equip_char(ch,obj, WEAR_EAR_L);
-                else
-                  equip_char(ch,obj, WEAR_EAR_R);
-                done = 1;
-              } 
-              break;
-              
-            default:
-                log("Bad switch in mob_act.C", 0, LOG_BUG);
-                break;
-
-            } /* end switch */
-     
-            if(done == 1)
-              break;
-            else
-                continue;
-          } 
-        } /* if keyword != -2 */ 
-      } /* for obj */
+       scavenge(ch);
     }
   
     // TODO - I believe this is second, so that we go through and pick up armor/weapons first
@@ -531,6 +268,7 @@ void mobile_activity(void)
 
     // Scavenge 
     if(IS_SET(ch->mobdata->actflags, ACT_SCAVENGER)
+      && !IS_AFFECTED(ch, AFF_CHARM)
       && world[ch->in_room].contents && number(0,4) == 0) 
     {
       max         = 1;
@@ -599,11 +337,7 @@ void mobile_activity(void)
       
         if(isname(GET_NAME(tmp_ch), ch->mobdata->hatred)) // use isname since hatred is a list
         {
-          if((IS_AFFECTED(tmp_ch, AFF_PROTECT_EVIL) && IS_EVIL(ch) &&
-                (GET_LEVEL(ch) <= ( GET_LEVEL(tmp_ch)+2))) ||
-            (IS_AFFECTED(tmp_ch, AFF_PROTECT_GOOD) && IS_GOOD(ch) &&
-                (GET_LEVEL(ch) <= (GET_LEVEL(tmp_ch)+2))) ||
-              IS_SET(world[ch->in_room].room_flags, SAFE))  
+          if(IS_SET(world[ch->in_room].room_flags, SAFE))  
           {
             act("You growl at $N.", ch,0,tmp_ch,TO_CHAR, 0);
             act("$n growls at YOU!.",ch,0,tmp_ch,TO_VICT, 0);
@@ -673,18 +407,9 @@ void mobile_activity(void)
           if(!IS_MOB(tmp_ch) && IS_SET(tmp_ch->pcdata->toggles, PLR_NOHASSLE) )
             continue;
       
-          if((IS_AFFECTED(tmp_ch, AFF_PROTECT_EVIL)) ||
-            (GET_CLASS(tmp_ch) == CLASS_ANTI_PAL)) {
-              if(IS_EVIL(ch) && GET_LEVEL(ch) <= (GET_LEVEL(tmp_ch)))
-                continue;
-          }
-      
-          if((IS_AFFECTED(tmp_ch, AFF_PROTECT_GOOD)) ||
-            (GET_CLASS(tmp_ch) == CLASS_PALADIN)) 
-          {
-            if(IS_GOOD(ch) && GET_LEVEL(ch) <= (GET_LEVEL(tmp_ch)))
-                continue;
-          }
+          /* check for PFG/PFE, (anti)pal perma-protections, etc. */
+          if (is_protected(tmp_ch, ch))
+            continue;
 
           if(number(0, 1)) {
             done = 1;
@@ -722,6 +447,10 @@ void mobile_activity(void)
         if(ch == tmp_ch)
            continue;
       
+        /* check for PFE/PFG, (anti)pal perma-protections, etc. */
+        if (is_protected(tmp_ch, ch))
+           continue;
+
         tmp_bitv = GET_BITV(tmp_ch);
 
         if(IS_SET(ch->mobdata->actflags, ACT_FRIENDLY) &&
@@ -829,11 +558,309 @@ void mob_suprised_sayings(char_data * ch, char_data * aggressor)
                break;
       case 3:  do_say(ch, "Foolish.", 9);
                break;
-      case 4:  do_say(ch, "I'm going to treat you like a baby treats a daiper.", 9);
+      case 4:  do_say(ch, "I'm going to treat you like a baby treats a diaper.", 9);
                break;
       case 5:  do_say(ch, "Here comes the pain baby!", 9);
                break;
       case 6:  do_emote(ch, " wiggles its bottom.", 9);
                break;
    }
+}
+
+/* check to see if the player is protected from the mob */
+bool is_protected(struct char_data *vict, struct char_data *ch)
+{
+   if(IS_EVIL(ch) && GET_LEVEL(ch) <= (GET_LEVEL(vict))) {
+      if((IS_AFFECTED(vict, AFF_PROTECT_EVIL)) ||
+        (GET_CLASS(vict) == CLASS_ANTI_PAL && IS_EVIL(vict)))
+           return(true);
+   }
+      
+   if(IS_GOOD(ch) && GET_LEVEL(ch) <= (GET_LEVEL(vict))) {
+      if((IS_AFFECTED(vict, AFF_PROTECT_GOOD)) ||
+        (GET_CLASS(vict) == CLASS_PALADIN && IS_GOOD(vict)))
+           return(true);
+   }
+   return(false);
+}
+
+void scavenge(struct char_data *ch)
+{
+  struct obj_data *obj, *best_obj;
+  int max, done;
+  int keyword;
+
+  max      = 1;
+  done     = 0;
+  best_obj = 0;
+  for(obj = world[ch->in_room].contents; obj; obj = obj->next_content) 
+  {
+    if(!CAN_GET_OBJ(ch, obj))
+      continue;
+    
+    keyword = keywordfind(obj);
+    
+    if(keyword != -2) {
+      if((hands_are_free(ch, 1)) && (CAN_WEAR(obj, WIELD))) 
+      {
+        if(GET_OBJ_WEIGHT(obj) < 
+          str_app[STRENGTH_APPLY_INDEX(ch)].wield_w) 
+        {
+          if(!ch->equipment[WIELD]) 
+          {
+            move_obj( obj, ch );
+            act( "$n gets $p.", ch, obj, 0, TO_ROOM , 0);
+            perform_wear(ch, obj, keyword);
+            obj_from_char(obj);
+            equip_char(ch, obj, WIELD);
+            break;
+          }
+          /* damage check */
+          if((ch->equipment[WIELD]) && (!ch->equipment[SECOND_WIELD])) 
+          {
+            move_obj( obj, ch );
+            act( "$n gets $p.", ch, obj, 0, TO_ROOM , 0);
+            perform_wear(ch, obj, keyword);
+            obj_from_char(obj);
+            equip_char(ch,obj, SECOND_WIELD);
+            break;
+          }
+        } // GET_OBJ_WEIGHT()
+        else
+          continue;
+      } /* if hands are free and can wear */            
+      else 
+      {
+        if(((keyword == 13) || (keyword == 14)) && !hands_are_free(ch, 1)) 
+          continue;
+        
+        switch (keyword) 
+        {
+          
+        case 0: 
+          if ((CAN_WEAR(obj, ITEM_WEAR_FINGER)) && 
+            ( (!ch->equipment[WEAR_FINGER_L]) || (!ch->equipment[WEAR_FINGER_R])) ) 
+          {
+            move_obj( obj, ch );
+            act( "$n gets $p.",  ch, obj, 0, TO_ROOM , 0);
+            perform_wear(ch, obj, keyword);
+            obj_from_char(obj);
+            if (!ch->equipment[WEAR_FINGER_L])
+              equip_char(ch,obj, WEAR_FINGER_L);
+            else
+              equip_char(ch,obj, WEAR_FINGER_R);
+            done = 1;
+          } 
+          break;
+          
+        case 1:
+          if ((CAN_WEAR(obj, ITEM_WEAR_NECK)) && 
+            ( (!ch->equipment[WEAR_NECK_1]) || (!ch->equipment[WEAR_NECK_2])) ) 
+          {
+            move_obj( obj, ch );
+            act( "$n gets $p.",  ch, obj, 0, TO_ROOM , 0);
+            perform_wear(ch, obj, keyword);
+            obj_from_char(obj);
+            if (!ch->equipment[WEAR_NECK_1])
+              equip_char(ch,obj, WEAR_NECK_1);
+            else
+              equip_char(ch,obj, WEAR_NECK_2);
+            done = 1;
+          }  
+          break;
+          
+        case 2:
+          if ((CAN_WEAR(obj, ITEM_WEAR_BODY)) && (!ch->equipment[WEAR_BODY])) 
+          {
+            move_obj( obj, ch );
+            act( "$n gets $p.",  ch, obj, 0, TO_ROOM , 0);
+            perform_wear(ch, obj, keyword);
+            obj_from_char(obj);
+            equip_char(ch,obj, WEAR_BODY);
+            done =1;
+          } 
+          break;
+          
+        case 3:
+          if ((CAN_WEAR(obj, ITEM_WEAR_HEAD)) && (!ch->equipment[WEAR_HEAD])) 
+          {
+            move_obj( obj, ch );
+            act( "$n gets $p.",  ch, obj, 0, TO_ROOM , 0);
+            perform_wear(ch, obj, keyword);
+            obj_from_char(obj);
+            equip_char(ch,obj, WEAR_HEAD);
+            done = 1;
+          } 
+          break;
+          
+        case 4:
+          if ((CAN_WEAR(obj, ITEM_WEAR_LEGS)) && (!ch->equipment[WEAR_LEGS])) 
+          {
+            move_obj( obj, ch );
+            act( "$n gets $p.", ch, obj, 0, TO_ROOM , 0);
+            perform_wear(ch, obj, keyword);
+            obj_from_char(obj);
+            equip_char(ch,obj, WEAR_LEGS);
+            done = 1;
+          } 
+          break;
+          
+        case 5:
+          if ((CAN_WEAR(obj, ITEM_WEAR_FEET)) && (!ch->equipment[WEAR_FEET])) 
+          {
+            move_obj( obj, ch );
+            act( "$n gets $p.", ch, obj, 0, TO_ROOM , 0);
+            perform_wear(ch, obj, keyword);
+            obj_from_char(obj);
+            equip_char(ch,obj, WEAR_FEET);
+            done = 1;
+          }  
+          break;
+                          
+        case 6:
+          if ((CAN_WEAR(obj, ITEM_WEAR_HANDS)) && (!ch->equipment[WEAR_HANDS])) 
+          {
+            move_obj( obj, ch );
+            act( "$n gets $p.",  ch, obj, 0, TO_ROOM , 0);
+            perform_wear(ch, obj, keyword);
+            obj_from_char(obj);
+            equip_char(ch,obj, WEAR_HANDS);
+            done = 1;
+          } 
+          break;
+          
+        case 7:
+          if ((CAN_WEAR(obj, ITEM_WEAR_ARMS)) && (!ch->equipment[WEAR_ARMS])) 
+          {
+            move_obj( obj, ch );
+            act( "$n gets $p.",  ch, obj, 0, TO_ROOM , 0);
+            perform_wear(ch, obj, keyword);
+            obj_from_char(obj);
+            equip_char(ch,obj, WEAR_ARMS);
+            done = 1;
+          } 
+          break;
+          
+        case 8:
+          if ((CAN_WEAR(obj, ITEM_WEAR_ABOUT)) && (!ch->equipment[WEAR_ABOUT])) 
+          {
+            move_obj( obj, ch );
+            act( "$n gets $p.",  ch, obj, 0, TO_ROOM , 0);
+            perform_wear(ch, obj, keyword);
+            obj_from_char(obj);
+            equip_char(ch,obj, WEAR_ABOUT);
+            done = 1;
+          } 
+          break;
+          
+        case 9:
+          if ((CAN_WEAR(obj, ITEM_WEAR_WAISTE)) && (!ch->equipment[WEAR_WAISTE])) 
+          {
+            move_obj( obj, ch );
+            act( "$n gets $p.",  ch, obj, 0, TO_ROOM , 0);
+            perform_wear(ch, obj, keyword);
+            obj_from_char(obj);
+            equip_char(ch,obj, WEAR_WAISTE);
+            done = 1;
+          } 
+          break;
+
+        case 10: 
+          if ((CAN_WEAR(obj, ITEM_WEAR_WRIST)) && 
+            ( (!ch->equipment[WEAR_WRIST_L]) || (!ch->equipment[WEAR_WRIST_R])) ) 
+          {
+            move_obj( obj, ch );
+            act( "$n gets $p.",  ch, obj, 0, TO_ROOM , 0);
+            perform_wear(ch, obj, keyword);
+            obj_from_char(obj);
+            if (!ch->equipment[WEAR_WRIST_L])
+              equip_char(ch,obj, WEAR_WRIST_L);
+            else
+              equip_char(ch,obj, WEAR_WRIST_R);
+            done = 1;
+          }
+          break;
+          
+        case 11:
+          if ((CAN_WEAR(obj, ITEM_WEAR_FACE)) && (!ch->equipment[WEAR_FACE])) 
+          {
+            move_obj( obj, ch );
+            act( "$n gets $p.",  ch, obj, 0, TO_ROOM , 0);
+            perform_wear(ch, obj, keyword);
+            obj_from_char(obj);
+            equip_char(ch,obj, WEAR_FACE);
+            done =1;
+          } 
+          break;
+          
+        case 12:  
+            done = 1;
+          break;
+          
+        case 13:
+          if ((CAN_WEAR(obj, ITEM_WEAR_SHIELD)) && (!ch->equipment[WEAR_SHIELD])) 
+          {
+            move_obj( obj, ch );
+            act( "$n gets $p.",  ch, obj, 0, TO_ROOM , 0);
+            perform_wear(ch, obj, keyword);
+            obj_from_char(obj);
+            equip_char(ch,obj, WEAR_SHIELD);
+            done = 1;
+          } 
+          break;
+          
+        case 14:
+          if ((CAN_WEAR(obj, ITEM_HOLD)) && (!ch->equipment[HOLD])) 
+          {  
+            if ( (obj->obj_flags.type_flag == ITEM_LIGHT) &&
+              (!ch->equipment[WEAR_LIGHT]) ) 
+            {
+              move_obj( obj, ch );
+              act( "$n gets $p.",  ch, obj, 0, TO_ROOM , 0);
+              perform_wear(ch, obj, 16);
+              obj_from_char(obj);
+              equip_char(ch,obj, WEAR_LIGHT);
+              done = 1;
+            } 
+            else if (obj->obj_flags.type_flag != ITEM_LIGHT) 
+            {
+              move_obj( obj, ch );
+              act( "$n gets $p.",  ch, obj, 0, TO_ROOM , 0);
+              perform_wear(ch, obj, keyword);
+              obj_from_char(obj);
+              equip_char(ch,obj, HOLD);
+              done = 1;
+            }
+          } 
+          break;
+          
+        case 15: 
+          if ((CAN_WEAR(obj, ITEM_WEAR_EAR)) && 
+            ( (!ch->equipment[WEAR_EAR_L]) || (!ch->equipment[WEAR_EAR_R])) ) 
+          {
+            move_obj( obj, ch );
+            act( "$n gets $p.",  ch, obj, 0, TO_ROOM , 0);
+            perform_wear(ch, obj, keyword);
+            obj_from_char(obj);
+            if (!ch->equipment[WEAR_EAR_L])
+              equip_char(ch,obj, WEAR_EAR_L);
+            else
+              equip_char(ch,obj, WEAR_EAR_R);
+            done = 1;
+          } 
+          break;
+          
+        default:
+            log("Bad switch in mob_act.C", 0, LOG_BUG);
+            break;
+
+        } /* end switch */
+ 
+        if(done == 1)
+          break;
+        else
+            continue;
+      } 
+    } /* if keyword != -2 */ 
+  } /* for obj */
 }

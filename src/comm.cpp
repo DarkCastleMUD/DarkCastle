@@ -1402,6 +1402,10 @@ void write_to_output(char *txt, struct descriptor_data *t)
   char * temp = NULL;
   char * handle_ansi(char * s, char_data * ch);
 
+  /* if there's no descriptor, don't worry about output */
+  if (t->descriptor == NULL)
+    return;
+
   /* if we're in the overflow state already, ignore this new output */
   if (t->bufptr < 0)
     return;

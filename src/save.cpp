@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: save.cpp,v 1.15 2003/03/07 02:46:35 pirahna Exp $ */
+/* $Id: save.cpp,v 1.16 2003/12/09 01:31:44 staylor Exp $ */
 
 extern "C"
 {
@@ -48,6 +48,7 @@ struct obj_data * obj_store_to_char( CHAR_DATA *ch, FILE *fpsave, struct obj_dat
 bool put_obj_in_store( struct obj_data *obj, CHAR_DATA *ch, FILE *fpsave, int wear_pos);
 void restore_weight(struct obj_data *obj);
 void store_to_char(struct char_file_u *st, CHAR_DATA *ch);
+char *fread_alias_string(FILE *fpsave);
 
 // return 1 on success
 // return 0 on failure
@@ -88,7 +89,6 @@ int save_char_aliases(char_player_alias * alias, FILE * fpsave)
 struct char_player_alias * read_char_aliases(FILE * fpsave)
 {
   uint32 total, x;  
-  uint32 tmp_size;
   struct char_player_alias * top = NULL;  
   struct char_player_alias * curr = NULL;  
 
@@ -105,28 +105,43 @@ struct char_player_alias * read_char_aliases(FILE * fpsave)
     curr = (char_player_alias *) dc_alloc(1, sizeof(char_player_alias));    
 #endif
 
-    fread (&tmp_size, sizeof tmp_size, 1, fpsave);
-    if(tmp_size > 0) {
-#ifdef LEAK_CHECK
-       curr->keyword = (char *)calloc(tmp_size + 1, sizeof(char));
-#else
-       curr->keyword = (char *)dc_alloc(tmp_size + 1, sizeof(char));
-#endif
-       fread(curr->keyword, sizeof(char), (tmp_size+1), fpsave);
-
-       fread(&tmp_size, sizeof tmp_size, 1, fpsave);
-#ifdef LEAK_CHECK
-       curr->command = (char *)calloc(tmp_size + 1, sizeof(char));
-#else
-       curr->command = (char *)dc_alloc(tmp_size + 1, sizeof(char));
-#endif
-       fread(curr->command, sizeof(char), (tmp_size+1), fpsave);
-
+    curr->keyword = fread_alias_string(fpsave);
+    curr->command = fread_alias_string(fpsave);
+    if (curr->keyword == NULL || curr->command == NULL) {
+       if (curr->keyword == NULL && curr->command)
+          dc_free(curr->command);
+       if (curr->command == NULL && curr->keyword)
+          dc_free(curr->keyword);
+       dc_free(curr);
+    } else {
        curr->next = top;
        top = curr;
-     }
+    }
   }
   return top;
+}
+
+char *fread_alias_string(FILE *fpsave)
+{
+    uint32 tmp_size;
+    char *buf = NULL;
+
+    fread (&tmp_size, sizeof tmp_size, 1, fpsave);
+    if(tmp_size > 0) {
+       if (tmp_size > MAX_INPUT_LENGTH) {
+          /* flush this string and continue on with the next */
+          while (fgetc(fpsave))
+             ;
+       } else {
+#ifdef LEAK_CHECK
+          buf = (char *)calloc(tmp_size + 1, sizeof(char));
+#else
+          buf = (char *)dc_alloc(tmp_size + 1, sizeof(char));
+#endif
+          fread(buf, sizeof(char), (tmp_size+1), fpsave);
+       }
+    }
+    return(buf);
 }
 
 void fwrite_var_string(char * string, FILE * fpsave)

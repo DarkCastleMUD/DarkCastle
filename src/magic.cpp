@@ -12,11 +12,13 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.89 2003/12/01 17:39:00 staylor Exp $ */
+/* $Id: magic.cpp,v 1.90 2003/12/09 01:31:44 staylor Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
 /*                       quietly remove spell effects                      */
+/* 12/07/2003   Onager   Changed PFE/PFG to check alignments, prevent      */
+/*                       stacking, and only allow clerics to cast on others*/
 /***************************************************************************/
 
 extern "C"
@@ -2021,7 +2023,8 @@ int spell_protection_from_evil(byte level, CHAR_DATA *ch, CHAR_DATA *victim, str
 
 	 assert(victim);
 
-  if ( IS_AFFECTED(victim,AFF_PROTECT_EVIL) )
+  /* keep spells from stacking/being cast on targets with built-in affect */
+  if (IS_AFFECTED(victim,AFF_PROTECT_EVIL) || IS_AFFECTED(victim, AFF_PROTECT_GOOD) || affected_by_spell(victim, SPELL_PROTECT_FROM_GOOD) || GET_CLASS(victim) == CLASS_ANTI_PAL)
 	 return eFAILURE;
 
   if (!affected_by_spell(victim, SPELL_PROTECT_FROM_EVIL) ) 
@@ -2045,10 +2048,10 @@ int spell_protection_from_good(byte level, CHAR_DATA *ch, CHAR_DATA *victim, str
 
   assert(victim);
 
-  if ( IS_AFFECTED(victim,AFF_PROTECT_GOOD) )
+  if (IS_AFFECTED(victim,AFF_PROTECT_GOOD) || IS_AFFECTED(victim, AFF_PROTECT_EVIL) || affected_by_spell(victim, SPELL_PROTECT_FROM_EVIL) || GET_CLASS(victim) == CLASS_PALADIN)
 	 return eFAILURE;
 
-  if (!affected_by_spell(victim, SPELL_PROTECT_FROM_GOOD) ) 
+  if (!affected_by_spell(victim, SPELL_PROTECT_FROM_GOOD)) 
   {
 	 skill_increase_check(ch, SPELL_PROTECT_FROM_GOOD, skill, SKILL_INCREASE_MEDIUM);
 
@@ -6222,7 +6225,15 @@ int cast_protection_from_evil( byte level, CHAR_DATA *ch, char *arg, int type,
 {
   switch (type) {
     case SPELL_TYPE_SPELL:
-      return spell_protection_from_evil(level, ch, tar_ch, 0, skill);
+      if(IS_EVIL(ch) && GET_LEVEL(ch) < ARCHANGEL) {
+         send_to_char("You are too evil to invoke the protection of your god.\n\r", ch);
+         return eFAILURE;
+      } else if (ch != tar_ch && GET_CLASS(ch) != CLASS_CLERIC) {
+         /* only let clerics cast on others */
+         send_to_char("You can only cast this spell on yourself.\n\r", ch);
+         return eFAILURE;
+      } else
+         return spell_protection_from_evil(level, ch, tar_ch, 0, skill);
       break;
     case SPELL_TYPE_POTION:
       return spell_protection_from_evil(level, ch, ch, 0, skill);
@@ -6252,7 +6263,15 @@ int cast_protection_from_good( byte level, CHAR_DATA *ch, char *arg, int type,
 {
   switch (type) {
     case SPELL_TYPE_SPELL:
-      return spell_protection_from_good(level, ch, tar_ch, 0, skill);
+      if(IS_GOOD(ch) && GET_LEVEL(ch) < ARCHANGEL) {
+         send_to_char("Your goodness finds disfavor amongst the forces of darkness.\n\r", ch);
+         return eFAILURE;
+      } else if (ch != tar_ch && GET_CLASS(ch) != CLASS_CLERIC) {
+         /* only let clerics cast on others */
+         send_to_char("You can only cast this spell on yourself.\n\r", ch);
+         return eFAILURE;
+      } else
+         return spell_protection_from_good(level, ch, tar_ch, 0, skill);
       break;
     case SPELL_TYPE_POTION:
       return spell_protection_from_good(level, ch, ch, 0, skill);

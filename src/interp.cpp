@@ -12,7 +12,11 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.cpp,v 1.31 2003/08/12 03:45:34 pirahna Exp $ */
+/* Revision History                                                        */
+/* 12/08/2003   Onager   Added chop_half() to work like half_chop() but    */
+/*                       chopping off the last word.                       */
+/***************************************************************************/
+/* $Id: interp.cpp,v 1.32 2003/12/09 01:31:44 staylor Exp $ */
 
 extern "C"
 {
@@ -1007,6 +1011,41 @@ void half_chop(char *string, char *arg1, char *arg2)
 	;
 }
 
+/* return last 'word' plus leading substring of input string */
+void chop_half(char *string, char *arg1, char *arg2)
+{
+    long i, j;
+
+    // skip over trailing space
+    i = strlen(string)-1;
+    j = 0;
+    while (isspace(string[i]))
+       i--;
+
+    // find beginning of last 'word'
+    while (!isspace(string[i])) {
+       i--;
+       j++;
+    }
+
+    // copy last word to arg1
+    strncpy(arg1, string+i+1, j);
+    arg1[j] = '\0';
+
+    // skip over leading space in string
+    while(isspace(*string)) {
+       string++;
+       i--;
+    }
+
+    // copy string to arg2
+    strncpy(arg2, string, i);
+
+    // remove trailing space from arg2
+    while (isspace(arg2[i]))
+       i--;
+    arg2[i] = '\0';
+}
 
 
 int special(CHAR_DATA *ch, int cmd, char *arg)

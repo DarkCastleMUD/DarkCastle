@@ -17,8 +17,10 @@
  *                        affect_update() (moved to affect_remove())        *
  *  10/27/2003   Onager   Changed stop_follower() cmd values to be readable *
  *                        #defines, added a BROKE_CHARM cmd                 *
+ *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
+ *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.49 2003/12/01 17:39:01 staylor Exp $ */
+/* $Id: spells.cpp,v 1.50 2003/12/09 01:31:44 staylor Exp $ */
 
 extern "C"
 {
@@ -213,7 +215,7 @@ struct spell_info_type spell_info [ ] =
     },
 
     { /* 34 */
-	12, POSITION_STANDING, 50, TAR_CHAR_ROOM|TAR_SELF_ONLY, cast_protection_from_evil
+	12, POSITION_STANDING, 50, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_protection_from_evil
     },
 
     { /* 35 */
@@ -649,7 +651,7 @@ struct spell_info_type spell_info [ ] =
     },
 
     { /* 143 */
-	12, POSITION_STANDING, 50, TAR_CHAR_ROOM|TAR_SELF_ONLY, cast_protection_from_good
+	12, POSITION_STANDING, 50, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_protection_from_good
     },
 };
 
@@ -915,7 +917,6 @@ void affect_update( void )
 {
     static struct affected_type *af, *next_af_dude;
     static CHAR_DATA *i, * i_next;
-    short dir;
     void update_char_objects( CHAR_DATA *ch ); /* handler.c */
 
     for (i = character_list; i; i = i_next) { 

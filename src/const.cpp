@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: const.cpp,v 1.66 2003/12/01 17:39:00 staylor Exp $ */
+/* $Id: const.cpp,v 1.67 2003/12/09 01:31:43 staylor Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -204,6 +204,7 @@ char *spell_wear_off_msg[] =
   "!DismissCorpse!",
   "Your blessed halo fades.",
   "You don't feel quite so angry anymore.",
+  "The foul mantle surrounding you dissipates.",
   "!UNUSED!"
 };
 

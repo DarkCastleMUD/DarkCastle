@@ -19,7 +19,7 @@
  *  11/8/2003    Onager    Added flags to affect_remove() to allow it to   *
  *                         be called without penalties or wear-off messages*
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.25 2003/12/01 17:39:00 staylor Exp $ */
+/* $Id: handler.cpp,v 1.26 2003/12/09 01:31:43 staylor Exp $ */
     
 extern "C"
 {
@@ -1184,7 +1184,7 @@ int equip_char(CHAR_DATA *ch, struct obj_data *obj, int pos)
     if (GET_ITEM_TYPE(obj) == ITEM_ARMOR)
 	GET_AC(ch) -= apply_ac(ch, pos);
 
-    for(j=0; j<ch->equipment[pos]->num_affects; j++)
+    for(j=0; ch->equipment[pos] && j<ch->equipment[pos]->num_affects; j++)
 	affect_modify(ch, obj->affected[j].location,
 	  obj->affected[j].modifier, 0, TRUE);
 
