@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.23 2004/05/18 22:13:41 urizen Exp $ */
+/* $Id: limits.cpp,v 1.24 2004/05/18 22:42:04 urizen Exp $ */
 
 extern "C"
 {
@@ -146,7 +146,7 @@ const int mana_regens[] = {
 int mana_gain(CHAR_DATA *ch)
 {
   int gain;
-  int divisor = 100000;
+  int divisor = 0;
   int modifier;
   
   if(IS_NPC(ch))
@@ -154,7 +154,7 @@ int mana_gain(CHAR_DATA *ch)
   else {
 //    gain = graf(age(ch).year, 2,3,4,6,7,8,9);
 
-    gain = (int)(ch->max_mana * (float)(mana_regens[GET_CLASS(ch)] / 100));
+    gain = (int)(ch->max_mana * (float)mana_regens[GET_CLASS(ch)] / 100);
 
     switch (GET_POS(ch)) {
       case POSITION_SLEEPING: divisor = 1; break;
@@ -162,21 +162,16 @@ int mana_gain(CHAR_DATA *ch)
       case POSITION_SITTING:  divisor = 2; break;
       default:                divisor = 4; break;
     }
-    
+    gain /= divisor;
+
     if(GET_CLASS(ch) == CLASS_MAGIC_USER ||
        GET_CLASS(ch) == CLASS_ANTI_PAL || GET_CLASS(ch) == CLASS_RANGER)
       modifier = int_app[GET_INT(ch)].mana_regen;
     else
-      modifier = wis_app[GET_WIS(ch)].mana_regen;;
+      modifier = wis_app[GET_WIS(ch)].mana_regen;
     gain += modifier;
     gain += age(ch).year / 20;
-/*    gain += (int)(modifier / divisor);
-
-    // int bonus modifier.  1.1 at 16int/wis up to 2.5 at 30int/wis
-    if(modifier > 15)
-      gain = (int)(gain * (((float)modifier - 5.0) / 10.0));*/
-    
-  }
+ }
 
   gain += ch->mana_regen;
 
@@ -205,7 +200,7 @@ int hit_gain(CHAR_DATA *ch)
   
   /* PC's */
   else {
-    gain = (int)(ch->max_hit * (float)(hit_regens[GET_CLASS(ch)] /100));
+    gain = (int)(ch->max_hit * (float)hit_regens[GET_CLASS(ch)] /100);
 
     /* Position calculations    */
     switch (GET_POS(ch)) {
@@ -214,7 +209,7 @@ int hit_gain(CHAR_DATA *ch)
       case POSITION_SITTING:  divisor = 2; break;
       default:                divisor = 4; break;
     }
-
+   gain /= divisor;
     if(gain < 1) 
       gain = 1;
 
@@ -233,7 +228,6 @@ int hit_gain(CHAR_DATA *ch)
      gain += con_app[GET_CON(ch)].hp_regen;
      gain -= age(ch).year / 20;
   }
-
   gain += ch->hit_regen;
   if (ch->affected_by2 & AFF_REGENERATION)
     gain += (gain/2);
