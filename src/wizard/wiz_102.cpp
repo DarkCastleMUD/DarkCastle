@@ -1962,6 +1962,11 @@ int do_oedit(struct char_data *ch, char *argument, int cmd)
           send_to_char("Please specifiy a valid number.\r\n", ch);
           return eFAILURE;
         }
+        if (real_object(intval))
+        {
+	  send_to_char("Object already exists.\r\n",ch);
+	  return eFAILURE;
+	}
         if(!can_modify_object(ch, intval)) {
           send_to_char("You are unable to work creation outside of your range.\n\r", ch);
           return eFAILURE;   
