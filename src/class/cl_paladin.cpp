@@ -69,7 +69,7 @@ int do_harmtouch(struct char_data *ch, char *argument, int cmd)
 
    // Can't do it in !magic rooms....
    if(IS_SET(world[ch->in_room].room_flags, NO_MAGIC)) {
-      send_to_char("The area seems to prohibit you from giving such magical assistance!\r\n", ch);
+      send_to_char("The area seems to prohibit you from such magical actions!\r\n", ch);
       return eFAILURE;
    }
 
