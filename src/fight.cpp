@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.230 2004/07/22 19:57:03 urizen Exp $ */
+/* $Id: fight.cpp,v 1.231 2004/07/23 03:05:18 urizen Exp $ */
 
 extern "C"
 {
@@ -162,7 +162,7 @@ void perform_violence(void)
     }
    if (over) continue;
 // DEBUG CODE
-   int last_virt = -1;;
+   int last_virt = -1;
    int last_class = GET_CLASS(ch);
    if(IS_MOB(ch))
       last_virt  = mob_index[ch->mobdata->nr].virt;
@@ -3932,7 +3932,7 @@ int can_be_attacked(CHAR_DATA *ch, CHAR_DATA *vict)
   { // New charmie stuff. No attacking pcs unless yer master's a ranger/cleric. 
     // Those guys are soo convincing.
     if (!ch->master) return FALSE; // What the hell?
-    if (GET_CLASS(ch->master) != CLASS_RANGER && GET_CLASS(ch->master) == CLASS_CLERIC) return FALSE;
+    if (GET_CLASS(ch->master) != CLASS_RANGER && GET_CLASS(ch->master) != CLASS_CLERIC) return FALSE;
   }
   if(IS_SET(world[ch->in_room].room_flags, SAFE))
   {
