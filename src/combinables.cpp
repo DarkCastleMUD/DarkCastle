@@ -217,8 +217,16 @@ int do_poisonweapon(struct char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
+  for(int j = 0; j < weapon->num_affects; j++)
+    if(weapon->affected[j].location == WEP_THIEF_POISON)
+    {
+      send_to_char("Your weapon is already poisoned.\r\n", ch);
+      return eFAILURE;
+    }
+
   // poison weapon
-  
+  add_obj_affect(weapon, WEP_THIEF_POISON, found);
+
   // remove vial
   extract_obj(vial);
 
@@ -302,26 +310,34 @@ int handle_poisoned_weapon_attack(char_data * ch, char_data * vict, int type)
    int retval = eSUCCESS;
    int dam;
 
+   if(!ch->equipment[WIELD]) {
+      send_to_char("In handle_poisoned_weapon_atack() with null wield.  Tell a god.\r\n", ch);
+      return (eFAILURE | eINTERNAL_ERROR);
+   }
+
    switch(type)
    {
       case 0: // bee stinger poison
          if(saves_spell(ch, vict, 1, SAVE_TYPE_POISON) < 0)
            dam = 25;
          else dam = 15;
-         damage(ch, vict, dam, TYPE_POISON, POISON_MESSAGE_BASE+type, 0);         
+         retval = damage(ch, vict, dam, TYPE_POISON, POISON_MESSAGE_BASE+type, 0);         
          break;
 
       case 1: // low quality cyanide
          if(saves_spell(ch, vict, 10, SAVE_TYPE_POISON) < 0)
            dam = 35;
          else dam = 25;
-         damage(ch, vict, dam, TYPE_POISON, POISON_MESSAGE_BASE+type, 0);         
+         retval = damage(ch, vict, dam, TYPE_POISON, POISON_MESSAGE_BASE+type, 0);         
          break;
 
       default:
          csendf(ch, "Unknown poison type %d.  Let a god know.\r\n", type);
          break;
    }
+
+   // you can do this even if the mob died, because the weapon is still valid
+   remove_obj_affect_by_type(ch->equipment[WIELD], WEP_THIEF_POISON);
 
    return retval;
 }

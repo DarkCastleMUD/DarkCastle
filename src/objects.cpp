@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.16 2002/08/25 16:31:52 pirahna Exp $
+| $Id: objects.cpp,v 1.17 2002/09/06 23:26:58 pirahna Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -45,6 +45,48 @@ int FOUNTAINisPresent (CHAR_DATA *ch);
 int hands_are_free(CHAR_DATA *ch, int number);
 struct obj_data *get_object_in_equip_vis(struct char_data *ch,
     char *arg, struct obj_data *equipment[], int *j);
+
+// add an affect to an item
+void add_obj_affect(obj_data * obj, int loc, int mod)
+{
+  obj->num_affects++;
+#ifdef LEAK_CHECK
+  obj->affected = (obj_affected_type *) realloc(obj->affected,
+                               (sizeof(obj_affected_type) * obj->num_affects));
+#else
+  obj->affected = (obj_affected_type *) dc_realloc(obj->affected,
+                               (sizeof(obj_affected_type) * obj->num_affects));
+#endif
+  obj->affected[obj->num_affects - 1].location = loc;
+  obj->affected[obj->num_affects - 1].modifier = mod;
+}
+
+void remove_obj_affect_by_index(obj_data * obj, int index)
+{
+   // shift everyone to right of the one we're deleting to the left
+   // TODO - redo this with memmove
+   for(int i = index; i < obj->num_affects - 1; i++)
+   {
+      obj->affected[i].location = obj->affected[i+1].location;
+      obj->affected[i].modifier = obj->affected[i+1].modifier;
+   }
+
+   // remove the last unused affect
+   obj->num_affects--;
+   if(obj->num_affects)
+      obj->affected = (obj_affected_type *)realloc(obj->affected, (sizeof(obj_affected_type)*obj->num_affects));
+   else {
+      dc_free(obj->affected);
+      obj->affected = NULL;
+   }
+}
+
+void remove_obj_affect_by_type(obj_data * obj, int loc)
+{
+   for(int i = 0; i < obj->num_affects; i++)
+      if(obj->affected[i].location == loc)
+         remove_obj_affect_by_index(obj, i);
+}
 
 // given an object, return the maximum points of damage the item
 // can take before being scrapped
@@ -110,16 +152,7 @@ int damage_eq_once(obj_data * obj)
     }
 
   // no existing damage.  Damage it once
-  obj->num_affects++;
-#ifdef LEAK_CHECK
-  obj->affected = (obj_affected_type *) realloc(obj->affected,
-                               (sizeof(obj_affected_type) * obj->num_affects));
-#else
-  obj->affected = (obj_affected_type *) dc_realloc(obj->affected,
-                               (sizeof(obj_affected_type) * obj->num_affects));
-#endif
-  obj->affected[obj->num_affects - 1].modifier = 1;
-  obj->affected[obj->num_affects - 1].location = APPLY_DAMAGED;
+  add_obj_affect(obj, APPLY_DAMAGED, 1);
   return 1;
 }
 

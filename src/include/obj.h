@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: obj.h,v 1.10 2002/08/28 04:58:26 pirahna Exp $ */
+/* $Id: obj.h,v 1.11 2002/09/06 23:27:02 pirahna Exp $ */
 #ifndef OBJ_H_
 #define OBJ_H_
 
@@ -23,6 +23,9 @@ int eq_max_damage(obj_data * obj);
 int damage_eq_once(obj_data * obj);
 int eq_current_damage(obj_data * obj);
 void eq_remove_damage(obj_data * obj);
+void add_obj_affect(obj_data * obj, int loc, int mod);
+void remove_obj_affect_by_index(obj_data * obj, int index);
+void remove_obj_affect_by_type(obj_data * obj, int loc);
 
 /* The following defs are for obj_data  */
 

@@ -1381,10 +1381,7 @@ int oedit_affects(char_data * ch, int item_num, char * buf)
                        "This adds a new blank affect to the end of the list.\r\n", ch);
           return eFAILURE;
         }
-        obj->num_affects++;
-        obj->affected = (obj_affected_type *)realloc(obj->affected, (sizeof(obj_affected_type) * obj->num_affects));
-        obj->affected[obj->num_affects-1].location = 0;
-        obj->affected[obj->num_affects-1].modifier = 0;
+        add_obj_affect(obj, 0, 0);
         send_to_char("New affect created.\r\n", ch);
         break;
       }
@@ -1406,16 +1403,7 @@ int oedit_affects(char_data * ch, int item_num, char * buf)
           send_to_char(buf, ch);
           return eFAILURE;
         }
-        // get rid of the deleted one by shifting everything to it's right, 1 left
-        for(x = num - 1; x < obj->num_affects; x++)
-          if((x + 1) < obj->num_affects) {
-            obj->affected[x].location = obj->affected[x+1].location;
-            obj->affected[x].modifier = obj->affected[x+1].modifier;
-          }
-
-        // realloc to get rid of the memory
-        obj->num_affects--;
-        obj->affected = (obj_affected_type *)realloc(obj->affected, (sizeof(obj_affected_type)*obj->num_affects));
+        remove_obj_affect_by_index(obj, num-1);
         send_to_char("Affect deleted.\r\n", ch);
         break;
       }
@@ -4042,6 +4030,11 @@ int do_sockets(struct char_data *ch, char *argument, int cmd)
       send_to_char( "Monsters don't care who's logged in.\n\r", ch );
       return eFAILURE;
       }
+
+   if(!has_skill(ch, COMMAND_SOCKETS)) {
+        send_to_char("Huh?\r\n", ch);
+        return eFAILURE;
+   }
 
    buf[0]  = '\0';
    name[0] = '\0';

@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.13 2002/08/21 16:32:44 pirahna Exp $ */
+/* $Id: db.cpp,v 1.14 2002/09/06 23:26:58 pirahna Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -2812,6 +2812,7 @@ struct obj_data *read_object(int nr, FILE *fl)
     {
     struct obj_data *obj;
     int tmpp;
+    int loc, mod;
 
     char chk;
     struct extra_descr_data *new_new_descr;
@@ -2881,17 +2882,10 @@ struct obj_data *read_object(int nr, FILE *fl)
           break;
 
         case 'A':
-          obj->num_affects++;
-#ifdef LEAK_CHECK
-          obj->affected = (obj_affected_type *) realloc(obj->affected, 
-                                       (sizeof(obj_affected_type) * obj->num_affects));
-#else
-          obj->affected = (obj_affected_type *) dc_realloc(obj->affected, 
-                                       (sizeof(obj_affected_type) * obj->num_affects));
-#endif
           // these are only two members of obj_affected_type, so nothing else needs initializing
-          obj->affected[(obj->num_affects - 1)].location = fread_int (fl, -1000, 1000);
-          obj->affected[(obj->num_affects - 1)].modifier = fread_int (fl, -1000, 1000);
+          loc = fread_int (fl, -1000, 1000);
+          mod = fread_int (fl, -1000, 1000);
+          add_obj_affect(obj, loc, mod);
           break;
 
         default:
