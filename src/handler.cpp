@@ -21,7 +21,7 @@
  *  12/08/2003   Onager    Added check for charmies and !charmie eq to     *
  *                         equip_char()                                    *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.73 2004/07/22 07:17:32 rahz Exp $ */
+/* $Id: handler.cpp,v 1.74 2004/07/22 19:38:42 urizen Exp $ */
     
 extern "C"
 {
@@ -2399,6 +2399,7 @@ void extract_char(CHAR_DATA *ch, bool pull)
        }
        if (ch->carrying) {
          for(i = ch->carrying ; i ; i = i->next_content)  {
+	    obj_from_char(i);
             obj_to_room(i, was_in);
          }
        }
