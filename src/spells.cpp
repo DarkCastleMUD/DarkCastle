@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.67 2004/04/24 19:22:30 urizen Exp $ */
+/* $Id: spells.cpp,v 1.68 2004/04/24 20:36:29 urizen Exp $ */
 
 extern "C"
 {
@@ -479,7 +479,7 @@ struct spell_info_type spell_info [ ] =
     },
 
     { /* 100 */
-	12, POSITION_FIGHTING, 5, TAR_CHAR_ROOM|TAR_FIGHT_VICT, cast_bee_sting
+	12, POSITION_FIGHTING, 8, TAR_CHAR_ROOM|TAR_FIGHT_VICT, cast_bee_sting
     }, 
 
     { /* 101 */
@@ -652,6 +652,9 @@ struct spell_info_type spell_info [ ] =
 
     { /* 143 */
 	12, POSITION_STANDING, 50, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_protection_from_good
+    },
+    { /* 144 */
+	12, POSITION_STANDING, 30, TAR_CHAR_ROOM|TAR_SELF_ONLY, cast_oaken_fortitude
     },
 };
 
@@ -876,6 +879,7 @@ char *spells[]=
    "blessed halo",
    "visage of hate",
    "protection from good",
+   "oaken fortitude",
    "\n"
 };
 
@@ -1395,6 +1399,52 @@ bool isaff2(int spellnum);
     return eSUCCESS;
 }
 
+int conc_bonus(int val)
+{
+ switch(val)
+ {
+    case 1:
+	return -5;
+    case 2:
+    case 3:
+	return -4;
+    case 4:
+    case 5:
+	return -3;
+    case 6:
+    case 7:
+	return -2;
+    case 8:
+    case 9:
+	return -1;
+    case 10:
+    case 11:
+    case 12:
+    case 13:
+    case 14:
+         return 0;
+    case 15: 
+    case 16:
+	return 1;
+    case 17:
+    case 18:
+	return 2;
+    case 19:
+    case 20:
+	return 3;
+    case 21:
+    case 22:
+	return 4;
+    case 23:
+    case 24:
+	return 5;
+    case 25:
+    case 26:
+	return 6;
+    default:
+	return val-20;
+ }
+}
 int skill_value(CHAR_DATA *ch, int skillnum, int min)
 {
   struct char_skill_data * curr = ch->skills;
@@ -1686,9 +1736,11 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
           chance += learned/10;
           if(GET_CLASS(ch) == CLASS_MAGIC_USER || GET_CLASS(ch) == CLASS_ANTI_PAL)
              chance += GET_INT(ch);
-          else chance += GET_WIS(ch);
-        }*/
+          else chance += GET_WIS(ch);*/
 	chance = skill_value(ch, spl, 33);
+	if (GET_CLASS(ch) == CLASS_MAGIC_USER || GET_CLASS(ch) == CLASS_ANTI_PAL)
+	  chance += conc_bonus(GET_INT(ch));
+	else chance += conc_bonus(GET_WIS(ch));
         if(GET_LEVEL(ch) < IMMORTAL && number(1,101) > chance )
         {
           csendf(ch, "You lost your concentration and are unable to cast %s!\n\r", spells[spl-1]);

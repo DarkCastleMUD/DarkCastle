@@ -14,7 +14,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.h,v 1.42 2004/04/21 22:18:52 urizen Exp $ */
+/* $Id: spells.h,v 1.43 2004/04/24 20:36:33 urizen Exp $ */
 #include <structs.h> // byte, sh_int
 
 #define MAX_BUF_LENGTH               240
@@ -183,7 +183,8 @@ struct skill_quest
 #define SPELL_BLESSED_HALO          141
 #define SPELL_VISAGE_OF_HATE        142
 #define SPELL_PROTECT_FROM_GOOD     143
-#define MAX_SPL_LIST                143
+#define SPELL_OAKEN_FORTITUDE	    144
+#define MAX_SPL_LIST                144
 
 // if you add a spell, make sure you update "spells[]" in spells.C
 

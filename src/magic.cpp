@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.114 2004/04/24 19:22:29 urizen Exp $ */
+/* $Id: magic.cpp,v 1.115 2004/04/24 20:36:28 urizen Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -7666,20 +7666,23 @@ int spell_bee_sting(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
 {
    int dam;
    int retval;
+   int bees = GET_LEVEL(ch) / 15 + GET_LEVEL(ch)==50;
    affected_type af;
-
+   int i;
    set_cantquit(ch, victim);
    dam = dice(2, 8) + skill/2;
    
    if (saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC) >= 0)
       dam >>= 1;
+  
 
+   for (i = 1; i <= bees; i++) {
    skill_increase_check(ch, SPELL_BEE_STING, skill, SKILL_INCREASE_MEDIUM);
 
    retval = spell_damage(ch, victim, dam, TYPE_MAGIC, SPELL_BEE_STING, 0);
    if(SOMEONE_DIED(retval))
       return retval;
-
+   }
    // Extra added bonus 1% of the time
    if (dice(1, 100) == 1)
       if (!IS_SET(victim->immune, ISR_POISON))
@@ -7694,7 +7697,6 @@ int spell_bee_sting(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
             act("$N seems to be allergic to your bees!", ch, 0, victim,
 	        TO_CHAR, 0);
             }
-
   return eSUCCESS;
 }
 
@@ -7965,9 +7967,10 @@ int cast_feline_agility(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DAT
 		GET_MANA(ch) += 20;
 		return eFAILURE;
 	}
+       skill_increase_check(ch, SPELL_FELINE_AGILITY, level, SKILL_INCREASE_EASY);
 
 	af.type 	= SPELL_FELINE_AGILITY;
-	af.duration	= level - 10;
+	af.duration	= 1+(level/4);
 	af.modifier	= -40;			/* -40 Ac!! */
 	af.location 	= APPLY_AC;
 	af.bitvector	= 0;
@@ -7986,6 +7989,37 @@ int cast_feline_agility(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DAT
 	}
 	return eSUCCESS;
 }
+int cast_oaken_fortitude(byte level, CHAR_DATA *ch, char *arg, int type, 
+CHAR_DATA  *victim, struct obj_data * tar_obj, int skill)
+{ // Feline agility rip
+        struct affected_type af;
+
+        if(ch != victim)
+        {
+                send_to_char("You can only cast this spell on yourself!\n\r", ch);
+                return eFAILURE;
+        }
+        if(affected_by_spell(victim, SPELL_OAKEN_FORTITUDE))
+        {
+	 	send_to_char("You cannot enhance your fortitude further.\r\n",ch);
+		return eFAILURE;
+        }
+       skill_increase_check(ch, SPELL_OAKEN_FORTITUDE, level, SKILL_INCREASE_EASY);
+
+
+        af.type         = SPELL_OAKEN_FORTITUDE;
+        af.duration     = 1+(level/4);
+        af.modifier     = -40;                  /* -40 Ac!! */
+        af.location     = APPLY_AC;
+        af.bitvector    = 0;
+        affect_to_char(victim, &af);
+
+        af.modifier             = 2;
+        af.location             = APPLY_CON;
+        affect_to_char(victim, &af);
+	return eSUCCESS;
+}
+
 
 int cast_forest_meld(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *victim, struct obj_data * tar_obj, int skill)
 {

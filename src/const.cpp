@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.80 2004/04/24 15:45:00 urizen Exp $ */
+/* $Id: const.cpp,v 1.81 2004/04/24 20:36:28 urizen Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1281,6 +1281,7 @@ struct class_skill_defines u_skills[] = { // druid skills
 {    "blue bird",       SPELL_BLUE_BIRD,        2,      90,     3203,   NULL ,{0,0}},
 {    "cure light",	SPELL_CURE_LIGHT,	3,	90,	3203,	NULL ,{0,0}},
 {    "cure serious",	SPELL_CURE_SERIOUS,	6,	90, -2, "Go see the newt priest in Newtonia.",{0,0}},
+{    "oaken fortitude", SPELL_OAKEN_FORTITUDE,  8,      95, 3203, NULL, {0,0}},
 {    "cure critic",	SPELL_CURE_CRITIC,	10,	90,	-2, "Find Aruncus the Druid in the fields north of town!" ,{0,0}},
 {    "control weather",	SPELL_CONTROL_WEATHER,	13,	90, -2, "Only a wizard skilled in weather can teach you, Duhh!",{0,0}},
 {    "sun ray",		SPELL_SUN_RAY,		14,	90,	3203,	NULL ,{0,0}},

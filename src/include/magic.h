@@ -5,7 +5,7 @@
  *                                                                           *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-/* $Id: magic.h,v 1.12 2003/12/01 17:39:08 staylor Exp $ */
+/* $Id: magic.h,v 1.13 2004/04/24 20:36:33 urizen Exp $ */
 #ifndef MAGIC_H_
 #define MAGIC_H_
 
@@ -35,10 +35,15 @@ int spell_bless(byte level, CHAR_DATA * ch,
 int spell_blindness(byte level, CHAR_DATA * ch,
    CHAR_DATA * victim, struct obj_data * obj, int skill);
 
+
 int spell_burning_hands(byte level, CHAR_DATA * ch,
    CHAR_DATA * victim, struct obj_data * obj, int skill);
 int cast_burning_hands(byte level, CHAR_DATA * ch, char *arg, int type,
    CHAR_DATA * victim, struct obj_data * tar_obj, int skill);
+
+int cast_oaken_fortitude(byte level, CHAR_DATA * ch, char *arg, int type,
+   CHAR_DATA * victim, struct obj_data * tar_obj, int skill);
+
 
 int spell_call_lightning(byte level, CHAR_DATA * ch,
    CHAR_DATA * victim, struct obj_data * obj, int skill);
