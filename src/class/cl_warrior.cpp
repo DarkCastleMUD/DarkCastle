@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.7 2002/12/26 20:21:17 pirahna Exp $
+| $Id: cl_warrior.cpp,v 1.8 2003/01/08 21:19:46 dcastle Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -111,6 +111,8 @@ int do_deathstroke(struct char_data *ch, char *argument, int cmd)
     int dam;
     int retval;
 
+    extern struct str_app_type str_app[];
+
     if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)   
       learned = 75;
     else if(!(learned = has_skill(ch, SKILL_DEATHSTROKE))) {
@@ -154,9 +156,13 @@ int do_deathstroke(struct char_data *ch, char *argument, int cmd)
 
     chance = 60;
 
+    int to_dam = ( str_app[STRENGTH_APPLY_INDEX(ch)].todam ) + ( GET_DAMROLL(ch));
+    if(IS_MOB(victim))
+       to_dam = (int) ((float)to_dam * .8);
+ 
     dam = dice(ch->equipment[WIELD]->obj_flags.value[1],
                ch->equipment[WIELD]->obj_flags.value[2]);
-
+    dam += to_dam;
     dam *= (GET_LEVEL(ch) / 5); // 10 at level 50
 
      /* 101% is a complete failure */

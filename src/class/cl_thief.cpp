@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.18 2003/01/08 03:45:17 dcastle Exp $
+| $Id: cl_thief.cpp,v 1.19 2003/01/08 21:19:46 dcastle Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -669,6 +669,7 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
             if(!IS_NPC(victim)) 
             {
               do_save(victim, "", 666);
+              do_save(ch, "", 666);
               if(!AWAKE(victim))
               {
                 if(number(1, 3) == 1)
@@ -781,6 +782,7 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
         if(!IS_NPC(victim)) 
         {
           do_save(victim, "", 666);
+          do_save(ch, "", 666);
           if(!AWAKE(victim))
           {
             if(number(1, 3) == 1)
@@ -984,6 +986,7 @@ int do_pocket(CHAR_DATA *ch, char *argument, int cmd)
       if(!IS_NPC(victim)) 
       {
         do_save(victim, "", 666);
+        do_save(ch, "", 666);
         if(!IS_SET(victim->pcdata->punish, PUNISH_THIEF)) 
         {
           if(!IS_AFFECTED(ch, AFF_CANTQUIT))
