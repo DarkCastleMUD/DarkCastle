@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_ranger.cpp,v 1.21 2003/03/07 00:17:38 pirahna Exp $ | cl_ranger.C |
+| $Id: cl_ranger.cpp,v 1.22 2003/03/07 03:04:02 pirahna Exp $ | cl_ranger.C |
 Description: Ranger skills/spells */ extern "C"  {
   #include <string.h>
 }
@@ -431,10 +431,12 @@ int ambush(CHAR_DATA *ch)
          act("$n ambushes you as you enter the room!", i, 0, ch, TO_VICT, 0);
          act("You ambush $N with a brilliant surprise attack!", i, 0, ch, TO_CHAR, 0);
          retval = damage(i, ch, GET_LEVEL(i) * 10, TYPE_UNDEFINED, TYPE_UNDEFINED, 0); 
-         WAIT_STATE(i, PULSE_VIOLENCE * 2);
-         WAIT_STATE(ch, PULSE_VIOLENCE * 1);
          if(IS_SET(retval, eVICT_DIED))
            return (eSUCCESS|eCH_DIED);  // ch = damage vict
+         if(IS_SET(retval, eCH_DIED))
+           return (eSUCCESS); // doesn't matter, but don't lag vict
+         WAIT_STATE(i, PULSE_VIOLENCE * 2);
+         WAIT_STATE(ch, PULSE_VIOLENCE * 1);
        }
        // we continue instead of breaking in case there are any OTHER rangers in the room
      }
