@@ -951,7 +951,7 @@ void heartbeat()
   if (--pulse_regen < 1)
   {
     // random pulse timer for regen to make tick sleeping impossible
-    pulse_regen = number(PULSE_REGEN/2, PULSE_REGEN*2);
+    pulse_regen = number(PULSE_REGEN-8, PULSE_REGEN+5);
     point_update();
   }
 

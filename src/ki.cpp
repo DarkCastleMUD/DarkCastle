@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.24 2004/05/19 20:38:55 urizen Exp $ */
+/* $Id: ki.cpp,v 1.25 2004/05/21 17:20:39 urizen Exp $ */
 
 extern "C"
 {
@@ -388,8 +388,8 @@ int ki_gain(CHAR_DATA *ch)
 	int gain;
 
         /* gain 1 - 7 depedant on level */
-        gain = GET_CLASS(ch) == CLASS_MONK?ch->max_ki * 0.05:ch->max_ki * 0.04;/*(GET_LEVEL(ch) / 8) + 1;*/
-        gain /= 4;
+        gain = GET_CLASS(ch) == CLASS_MONK?(int)(ch->max_ki * 0.05):(int)(ch->max_ki * 0.04);/*(GET_LEVEL(ch) / 8) + 1;*/
+        gain = (int)(gain / 1.5);
         gain += ch->ki_regen;
 	if (GET_CLASS(ch) == CLASS_MONK) gain += wis_app[GET_WIS(ch)].ki_regen;
         else if (GET_CLASS(ch) == CLASS_BARD) gain += int_app[GET_INT(ch)].ki_regen;
