@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.32 2002/08/05 00:24:34 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.33 2002/08/05 02:24:40 pirahna Exp $ */
 
 extern "C"
 {
@@ -2525,13 +2525,15 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
     if((is_thief && ((ch && (IS_NPC(ch) || ch == victim || (ch->clan && ch->clan == victim->clan))))) ||
        (!is_thief && (GET_LEVEL(victim)>20 && number(1,101) <= GET_LEVEL(victim))) )
     {
-      GET_CON(victim) -= 1;
-      victim->raw_con -= 1;
-      send_to_char("*** You lose one constitution point ***\n\r", victim);
-      if(!IS_NPC(victim)) 
-      {
-        sprintf(log_buf, "%s lost a con. ouch.", GET_NAME(victim));
-        log(log_buf, SERAPH, LOG_MORTAL);
+      if(GET_LEVEL(ch) >= 50 || number(0, 1)) {
+         GET_CON(victim) -= 1;
+         victim->raw_con -= 1;
+         send_to_char("*** You lose one constitution point ***\n\r", victim);
+         if(!IS_NPC(victim)) 
+         {
+           sprintf(log_buf, "%s lost a con. ouch.", GET_NAME(victim));
+           log(log_buf, SERAPH, LOG_MORTAL);
+         }
       }
       pir_stat_loss(victim);
       if(GET_CON(victim) <= 4)
