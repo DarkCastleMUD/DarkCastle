@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.9 2002/08/05 00:55:54 pirahna Exp $
+| $Id: inventory.cpp,v 1.10 2002/08/21 19:09:33 pirahna Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -930,7 +930,8 @@ int do_give(struct char_data *ch, char *argument, int cmd)
         log(buf, 110, LOG_GOD);
       }
       
-      sprintf(buf, "%s gives you %d gold coins.\n\r", PERS(ch, vict), amount);
+      sprintf(buf, "%s gives you %d gold coin%s.\n\r", PERS(ch, vict), amount,
+               amount == 1 ? "" : "s");
       act(buf, ch, 0, vict, TO_VICT, INVIS_NULL);
       act("$n gives some gold to $N.", ch, 0, vict,TO_ROOM,INVIS_NULL|NOTVICT);
       
