@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.101 2004/05/15 18:57:10 urizen Exp $ */
+/* $Id: const.cpp,v 1.102 2004/05/16 02:12:42 urizen Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1042,13 +1042,13 @@ struct class_skill_defines w_skills[] = { // warrior skills
 {    "whipping",        SKILL_WHIPPING_WEAPONS,   30,   90,     {DEX,STR} },
 {    "tactics",         SKILL_TACTICS,            31,   98,     {INT,WIS} },
 {    "archery",         SKILL_ARCHERY,            32,   55,     {DEX,WIS} },
-{    "two handers",     SKILL_TWO_HANDED_WEAPONS, 34,   85,     {STR,CON} },
 {    "stun",            SKILL_STUN,               35,   75,     {DEX,STR} },
 {    "guard",           SKILL_GUARD,              37,   98,     {STR,WIS} },
 {    "deathstroke",     SKILL_DEATHSTROKE,        39,   98,     {STR,INT} },
 {    "riposte",         SKILL_RIPOSTE,            40,   98,     {INT,DEX} },
 //{    "dodge",           SKILL_DODGE,              42,   55,     
 //{DEX,INT} },
+{    "two handers",     SKILL_TWO_HANDED_WEAPONS, 42,   85,     {STR,CON} },
 {    "skewer",          SKILL_SKEWER,             45,   98,     {STR,CON} },
 {    "blade shield",    SKILL_BLADESHIELD,        47,   98,     {CON,DEX} },
 //{  "combat mastery",  SKILL_COMBAT_MASTERY      50,   98,     {0,0} },

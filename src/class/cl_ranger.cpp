@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: cl_ranger.cpp,v 1.37 2004/05/16 00:37:19 urizen Exp $ | cl_ranger.C  *
+ * $Id: cl_ranger.cpp,v 1.38 2004/05/16 02:12:45 urizen Exp $ | cl_ranger.C  *
  * Description: Ranger skills/spells                                          *
  *                                                                            *
  * Revision History                                                           *
@@ -911,9 +911,9 @@ int do_arrow_damage(struct char_data *ch, struct char_data *victim,
     sprintf(buf, "You hit %s with %s!\r\n", GET_SHORT(victim),
        found->short_description);
     send_to_char(buf, ch);
-    sprintf(buf, "You get shot with %s from the %s.  Ouch.\r\n",
+    sprintf(buf, "You get shot with %s from the %s.  Ouch.",
           found->short_description, dirs[rev_dir[dir]]);
-    send_to_char(buf, victim);
+    act(buf, victim, 0, 0, TO_CHAR, 0);
     sprintf(buf, "%s from the %s hits $n!",
           found->short_description, dirs[rev_dir[dir]]);
     act(buf, victim, 0, 0, TO_ROOM, 0);
