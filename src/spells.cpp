@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.17 2002/08/04 21:13:15 pirahna Exp $ */
+/* $Id: spells.cpp,v 1.18 2002/08/04 21:14:01 dcastle Exp $ */
 
 extern "C"
 {
@@ -1061,13 +1061,13 @@ void stop_follower(CHAR_DATA *ch, int cmd)
     log( "Stop_follower: null ch_master!", ARCHANGEL, LOG_BUG );
     return;
   }
-
+/*
   if(IS_SET(ch->affected_by2, AFF_FAMILIAR)) {
     do_emote(ch, "screams in pain as its connection with its master is broken.", 9); 
     extract_char(ch, TRUE);
     return;
   }
-
+*/
   if(IS_AFFECTED(ch, AFF_CHARM)) {
     act("You realize that $N is a jerk!", ch, 0, ch->master, TO_CHAR, 0);
     act("$n is free from the bondage of the spell.", ch, 0, 0, TO_ROOM, 0);
