@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.60 2004/05/30 21:06:44 urizen Exp $ */
+/* $Id: nanny.cpp,v 1.61 2004/05/30 21:09:46 urizen Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -476,7 +476,7 @@ int more_than_ten_people_from_this_ip(struct descriptor_data *new_conn)
    return 0;
 }
 
-const char *host_list[]
+const char *host_list[]=
 {
   "62.65.107.", // Urizen
   "24.165.167.45.", // Dasein
@@ -491,6 +491,7 @@ const char *host_list[]
 bool allowed_host(char *host)
 { /* Wizlock uses hosts for wipe. */
   int i;
+  extern bool str_prefix(const char *astr, const char *bstr);
   for (i = 0; i < (sizeof(host_list) / sizeof(char*));i++)
     if (!str_prefix(host_list[i], host))
       return TRUE;
