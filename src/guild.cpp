@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.44 2004/05/07 07:33:23 urizen Exp $
+| $Id: guild.cpp,v 1.45 2004/05/07 22:55:05 urizen Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -299,6 +299,25 @@ int skills_guild(struct char_data *ch, char *arg, struct char_data *owner)
 	break;
      case CLASS_MONK:
       do_say(owner,"Ahh, well met grasshopper!  I can teach you of this from my own knowledge.",9);
+	break;
+     case CLASS_RANGER:
+     do_say(owner,"My woodland lore is more than sufficient to teach you this myself young apprentice!",9);
+	break;
+     case CLASS_ANTI_PAL:
+     do_say(owner,"Ahh, young dark lord, it is but a simple matter to learn this ability.  Follow my instruction.",9);
+	break;
+     case CLASS_PALADIN:
+     do_say(owner,"This ability is one that I am capable of teaching you myself young novice.  Observe closely.",9);
+	break;
+//     case CLASS_BARD:
+     case CLASS_MAGIC_USER:
+     do_say(owner,"Ahh young apprentice, this is a simple matter for me to teach you if you are capable of comprehending.",9);
+	break;
+     case CLASS_CLERIC:
+     do_say(owner, "Well met Acolyte!  I shall pray for you to receive knowledge of the blessing you request.",9);
+	break;
+     case CLASS_DRUID:
+     do_say(owner, "Nature be with you, young druid.  I can teach you the ability you seek myself if you are willing.",9);
 	break;
   }
   send_to_char("You practice for a while...\n\r", ch);

@@ -1079,8 +1079,8 @@ char * cond_txtc[] = {
   GREEN "a few scratches" NTEXT,
   BOLD YELLOW "slightly hurt" NTEXT,
   YELLOW "fairly fucked up" NTEXT,
-  BOLD RED "bleeding freely" NTEXT,
-  RED "covered in blood" NTEXT,
+  RED "bleeding freely" NTEXT,
+  BOLD RED "covered in blood" NTEXT,
   BOLD GREY "near death" NTEXT,
   "dead as a doornail"
 };

@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.122 2004/05/02 19:39:44 urizen Exp $ */
+/* $Id: magic.cpp,v 1.123 2004/05/07 22:55:05 urizen Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -1151,6 +1151,8 @@ int spell_bless(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
   if(GET_POS(victim) != POSITION_FIGHTING) 
   {
 		send_to_char("You feel righteous.\n\r", victim);
+		if (victim != ch)
+		  act("$N receives the blessing from your god.", ch, NULL, victim, TO_CHAR, 0);
 		af.type      = SPELL_BLESS;
 		af.duration  = 6+ skill;
 		af.modifier  = 1 + skill / 45;
@@ -3471,8 +3473,10 @@ int spell_fly(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj
   skill_increase_check(ch, SPELL_FLY, skill, SKILL_INCREASE_MEDIUM);
 
   send_to_char("You start flapping and rise off the ground!\n\r", victim);
+  if (ch != victim)
+    act("$N start flapping and rise off the ground!", ch, NULL, victim, TO_CHAR, 0);
   act("$N's feet rise off the ground.", ch, 0, victim, TO_ROOM, INVIS_NULL|NOTVICT);
-
+  
   af.type = SPELL_FLY;
   af.duration = skill + 3;
   af.modifier = 0;
@@ -5270,7 +5274,7 @@ int cast_armor( byte level, CHAR_DATA *ch, char *arg, int type,
   switch (type) {
 	case SPELL_TYPE_SPELL:
 		 if (ch != tar_ch)
-			act("$N is protected by your deity.", ch, 0, tar_ch, TO_CHAR,0);
+			act("$N is protected by mystical armour.", ch, 0, tar_ch, TO_CHAR,0);
 		 return spell_armor(level,ch,tar_ch,0, skill);
 		 break;
 	case SPELL_TYPE_POTION:

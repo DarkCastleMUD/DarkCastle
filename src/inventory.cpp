@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.35 2004/05/03 23:40:28 urizen Exp $
+| $Id: inventory.cpp,v 1.36 2004/05/07 22:55:05 urizen Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -562,6 +562,11 @@ int do_consent(struct char_data *ch, char *arg, int cmd)
     send_to_char("Silly, you don't need to consent yourself!\r\n", ch);
     return eFAILURE;
   }
+  if (GET_LEVEL(vict) < 10)
+  {
+    send_to_char("That person is too low level to be consented.\r\n",ch);
+    return eFAILURE;
+  }
 
   // prevent consenting of NPCs
   if (IS_NPC(vict)) {
@@ -853,7 +858,11 @@ int do_put(struct char_data *ch, char *argument, int cmd)
           }
           else
             send_to_char("(This item is cursed, BTW.)\n\r", ch);
-        }  
+        } 
+	if (IS_SET(obj_object->obj_flags.extra_flags, ITEM_NEWBIE)) {
+	  send_to_char("The protective enchantment this item holds cannot be held within this container.\r\n",ch);
+	  return eFAILURE;
+	}
 	if(GET_ITEM_TYPE(obj_object) == ITEM_CONTAINER)
 	{
 	  send_to_char("You would ruin it!\n\r", ch);

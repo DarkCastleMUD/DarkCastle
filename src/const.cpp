@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.91 2004/05/06 20:58:09 urizen Exp $ */
+/* $Id: const.cpp,v 1.92 2004/05/07 22:55:05 urizen Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -636,7 +636,7 @@ char *extra_bits[] =
     "NO_SAVE",
     "NO_SEE",
     "NO_REPAIR",
-    "UNUSED",
+    "NEWBIE",
     "\n"
 };
 
@@ -1103,7 +1103,8 @@ struct class_skill_defines a_skills[] = {
 {    "poison",          SPELL_POISON,           27,     70,     -2, "Find the spider with a red hourglass in the mushroom caverns.",{CON,0} },
 //{    "weaken",          SPELL_WEAKEN,           23,     90,     -2,     "What tangled web we weave, when we first deceive.",{0,0} },
 //{    "enchant weapon",  SPELL_ENCHANT_WEAPON,   24,     90,10005,       NULL,{0,0} },
-{    "fireball",	SPELL_FIREBALL,		28,	90,	10005,	NULL,{0,0} },
+//{    "fireball",	SPELL_FIREBALL,		28,	90,	10005,	
+//NULL,{0,0} },
 {    "visage of hate",  SPELL_VISAGE_OF_HATE,   31,     95,     -2,     "The guardian of this guild has the knowledge you seek.  Speak the name of this spell in his presence.",{INT,WIS} },
 {    "beacon",          SPELL_BEACON,           35,     95,     10005,  NULL,{DEX,INT} },
 {    "dispel good",     SPELL_DISPEL_GOOD,      38,     90, 10005,      NULL,{WIS,0} },
@@ -1124,6 +1125,7 @@ struct class_skill_defines p_skills[] = {
 {    "shield block",    SKILL_SHIELDBLOCK, 7, 90, 10006,        "To learn this skill you must seek its master, the God of War in his arena.  Ask him to please teach you.",{STR,0} },
 {    "kick",            SKILL_KICK,             2,      70,     -2,     "Only the king of lobsters can teach you this.",{DEX,0} },
 {    "rescue",          SKILL_RESCUE,           8,      85,     -2,     "The chief of the gnomes is who you want, lad." ,{WIS,0} },
+
 {    "dual wield",      SKILL_DUAL_WIELD,       10,     80,-2, "With whirling blades and rigid honor, only these masters of weaponry can teach you the skill you need.",{DEX,0}  },
 //{    "dodge",           SKILL_DODGE,            13,     20,     -2,     "Hop like a bunny, quick like a bee, this location is so funny, you'll go wee wee wee.  Don't forget to bring your scythe however.",{0,0} },
 {    "double",          SKILL_SECOND_ATTACK,    5,     85,     -2,     "Seek the Delcim Prince my child.  He shall train you." ,{DEX,0}},
@@ -1403,6 +1405,7 @@ struct class_skill_defines m_skills[] = { // mage skills
 {    "continual light", SPELL_CONT_LIGHT,       8,      80,     3020,   NULL ,{INT,0}},
 {    "invisibility",    SPELL_INVISIBLE,        5,      90,     3020,   NULL ,{INT,0}},
 {    "armor",           SPELL_ARMOR,            7,      80,     3020,   NULL ,{STR,0}},
+{    "know alignment", SPELL_KNOW_ALIGNMENT, 14, 95, 3020, NULL, {INT, WIS}},
 {    "burning hands",   SPELL_BURNING_HANDS,    6,      95,     3020,   NULL ,{INT,DEX}},
 {    "refresh",         SPELL_REFRESH,          9,      90,     3020,   NULL ,{DEX,0}},
 {    "fear",            SPELL_FEAR,             15,      90,     3020,   NULL ,{WIS,0}},
@@ -1423,7 +1426,7 @@ struct class_skill_defines m_skills[] = { // mage skills
 {    "teleport",        SPELL_TELEPORT,         38,     95,     -2, "A mage of much knowledge, he is wise in the ways of the world." ,{CON,INT}},
 {    "dispel magic",    SPELL_DISPEL_MAGIC,     35,     90,     -2, "Find a mage at the junction of three dreams." ,{INT,0}},
 {    "dispel minor",    SPELL_DISPEL_MINOR,     25,     90,     3020,   NULL ,{INT,0}},
-{    "mass invisibility", SPELL_MASS_INVISIBILITY,      26,     95,     3020,   NULL ,{INT,CON}},
+{    "mass invisibility", SPELL_MASS_INVISIBILITY,      26,     95,     3020,   NULL ,{DEX,INT}},
 {    "wizard eye",      SPELL_WIZARD_EYE,       37,     95,     3020,   NULL ,{INT,WIS}},
 {    "meteor swarm",    SPELL_METEOR_SWARM,     40,     95,     3020,   NULL ,{STR,INT}},
 {    "stone skin",      SPELL_STONE_SKIN,       39,     70,     -2, "A woman strong in battle surrounded by heavy magical influences calls to you." ,{STR,0}},

@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: obj.h,v 1.14 2004/05/01 00:50:35 urizen Exp $ */
+/* $Id: obj.h,v 1.15 2004/05/07 22:55:10 urizen Exp $ */
 #ifndef OBJ_H_
 #define OBJ_H_
 
@@ -117,7 +117,7 @@ int recheck_height_wears(char_data *ch);
 #define ITEM_NOSAVE             1<<26
 #define ITEM_NOSEE		1<<27 
 #define ITEM_NOREPAIR           1<<28
-#define ITEM_UNUSED2            1<<29 // Unused2
+#define ITEM_NEWBIE            1<<29 // Newbie flagged.
 
 /* Bitvector for 'more_flags' */
 

@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: shop.cpp,v 1.7 2004/04/16 12:13:58 urizen Exp $ */
+/* $Id: shop.cpp,v 1.8 2004/05/07 22:55:06 urizen Exp $ */
 
 extern "C"
 {
@@ -422,11 +422,12 @@ void shopping_list( char *arg, CHAR_DATA *ch,
      CHAR_DATA *keeper, int shop_nr )
 {
     char buf[MAX_STRING_LENGTH];
-    struct obj_data *obj;
+    struct obj_data *obj,*tobj;
     int cost;
     extern char *drinks[];
     int found;
-
+    int done[40]; // To show 'em numbered instead of a long list of duplicates
+    int i,a;
     if ( !is_ok( keeper, ch, shop_nr ) )
         return;
 
@@ -438,7 +439,7 @@ void shopping_list( char *arg, CHAR_DATA *ch,
         do_tell (keeper, buf, 0);
         restock_keeper (keeper, shop_nr);
     }
-
+    i = 0;
     send_to_char( "[ Price ] Item\n\r", ch );
     found = FALSE;
     for ( obj = keeper->carrying; obj; obj = obj->next_content )
@@ -449,16 +450,28 @@ void shopping_list( char *arg, CHAR_DATA *ch,
         found = TRUE;
 
         cost = (int) ( obj->obj_flags.cost * shop_index[shop_nr].profit_buy );
+
+        int vnum = obj_index[obj->item_number].virt;
+	bool loop = FALSE;
+        for (a = 0; a < i; a++)
+           if (done[a] == vnum)
+              loop = TRUE;
+        if (loop) continue;
+	done[i++] = a;
+        a = 1;	
+	for (tobj = keeper->carrying; tobj; tobj = tobj->next_content)
+          if (obj_index[tobj->item_number].virt == obj_index[obj->item_number].virt)
+	    a++;
         if ( GET_ITEM_TYPE(obj) == ITEM_DRINKCON && obj->obj_flags.value[1] )
         {
-            sprintf( buf, "[%7d] %s of %s.\n\r",
-                cost, obj->short_description,
+            sprintf( buf, "[%3d] [%7d] %s of %s.\n\r",
+                a, cost, obj->short_description,
                 drinks[obj->obj_flags.value[2]] );
         }
         else
         {
-            sprintf( buf, "[%7d] %s.\n\r",
-                cost, obj->short_description );
+            sprintf( buf, "[%3d] [%7d] %s.\n\r",
+                a, cost, obj->short_description );
         }
         send_to_char(buf, ch);
     }

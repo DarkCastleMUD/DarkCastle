@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.50 2004/05/05 23:53:32 urizen Exp $ */
+/* $Id: db.cpp,v 1.51 2004/05/07 22:55:05 urizen Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -2869,15 +2869,21 @@ int create_blank_mobile(int nr)
 
     clear_char(mob);
     reset_char(mob);
-    mob->name         = str_hsh("insignificant archdemon demon");
-    mob->short_desc = str_hsh("a small insignificant arch-demon");
-    mob->long_desc = str_hsh("An giant, firespewing arch-demon stands here, lighting cigarettes.");
-    mob->description  = str_hsh(".");
-    mob->title = str_hsh(".");
+    mob->name         = str_hsh("empty mob");
+    mob->short_desc = str_hsh("an empty mob");
+    mob->long_desc = str_hsh("an empty mob description");
+    mob->description  = str_hsh("");
+    mob->title = str_hsh("");
     mob->fighting = 0;
     mob->pcdata       = 0;
     mob->desc       = 0;
-   
+    GET_RAW_DEX(mob) = 11;
+    GET_RAW_STR(mob) = 11;
+    GET_RAW_INT(mob) = 11;
+    GET_RAW_WIS(mob) = 11;
+    GET_RAW_CON(mob) = 11;
+    mob->height = 198;
+    mob->weight = 200;
 #ifdef LEAK_CHECK
     mob->mobdata = (mob_data *) calloc(1, sizeof(mob_data));
 #else

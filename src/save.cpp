@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: save.cpp,v 1.24 2004/04/24 19:22:30 urizen Exp $ */
+/* $Id: save.cpp,v 1.25 2004/05/07 22:55:06 urizen Exp $ */
 
 extern "C"
 {
@@ -500,7 +500,7 @@ int store_to_char_variable_data(CHAR_DATA * ch, FILE * fpsave)
        fread(&(af->modifier),  sizeof(af->modifier),  1, fpsave);
        fread(&(af->location),  sizeof(af->location),  1, fpsave);
        fread(&(af->bitvector), sizeof(af->bitvector), 1, fpsave);
-   bool isaff2(int spellnum);
+      bool isaff2(int spellnum);
        affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE,isaff2(af->type)); // re-affect the char
     }
     fread(&typeflag, sizeof(char), 3, fpsave);

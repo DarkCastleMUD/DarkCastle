@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.27 2003/06/23 00:36:38 pirahna Exp $ */
+/* $Id: mob_proc2.cpp,v 1.28 2004/05/07 22:55:05 urizen Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -27,6 +27,7 @@
 #include <act.h>
 #include <string.h>
 #include <returnvals.h>
+#include <spells.h>
 
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
@@ -1394,6 +1395,11 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
    }
 */
    if(choice == 12) {
+     if (affected_by_spell(ch, FUCK_PTHIEF))
+     {
+	send_to_char("The Meta-physician tells you, 'You cannot do this because of your criminal actions!'\r\n",ch);
+	return eSUCCESS;
+     }
      if(GET_GOLD(ch) < 100000) {
        send_to_char("The Meta-physician tells you, 'You can't afford "
                     "that!'\n\r", ch);
