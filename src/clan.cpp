@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.17 2003/12/01 17:38:59 staylor Exp $ */
+/* $Id: clan.cpp,v 1.18 2004/04/16 17:26:15 urizen Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -910,10 +910,10 @@ int clan_desc(CHAR_DATA *ch, char *arg)
     return 0;
   }
 
-  if(clan->description)
+/*  if(clan->description)
     dc_free(clan->description);
   clan->description = NULL;
-
+*/
   send_to_char("Write new description.  ~ to end.\r\n", ch);
 
   ch->desc->connected = CON_EDITING;
@@ -950,10 +950,10 @@ int clan_motd(CHAR_DATA *ch, char *arg)
     return 0;
   }
 
-  if(clan->clanmotd)
+/*  if(clan->clanmotd)
     dc_free(clan->clanmotd);
   clan->clanmotd = NULL;
-
+*/
   send_to_char("Write new motd.  ~ to end.\r\n", ch);
 
   ch->desc->connected = CON_EDITING;

@@ -1373,7 +1373,7 @@ int oedit_exdesc(char_data * ch, int item_num, char * buf)
 
         send_to_char("Enter your obj's description below."
                      " Terminate with '~' on a new line.\n\r\n\r", ch);
-        curr->description = 0;
+//        curr->description = 0;
 	
         ch->desc->connected = CON_EDITING;
         ch->desc->str = &(curr->description);
@@ -2323,8 +2323,8 @@ int do_mpedit(struct char_data *ch, char *argument, int cmd)
           return eFAILURE;
         }
 
-        dc_free(currprog->comlist);
-        currprog->comlist = NULL;
+//        dc_free(currprog->comlist);
+  //      currprog->comlist = NULL;
 
         send_to_char("Enter the new command response now."
                      " Terminate with '~' on a new line.\n\r\n\r", ch);
@@ -2545,7 +2545,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd)
         send_to_char("Enter the mob's description below."
                      " Terminate with '~' on a new line.\n\r\n\r", ch);
 // TODO - this causes a memory leak if you edit the desc twice (first one is hsh'd)
-        ((char_data *)mob_index[mob_num].item)->description = NULL;
+//        ((char_data *)mob_index[mob_num].item)->description = NULL;
         ch->desc->connected = CON_EDITING;
         ch->desc->str = &(((char_data *)mob_index[mob_num].item)->description);
         ch->desc->max_str = MAX_MESSAGE_LENGTH;
@@ -3185,8 +3185,8 @@ int do_redit(struct char_data *ch, char *argument, int cmd)
         }
         send_to_char("Enter your room's description below."
                      " Terminate with '~' on a new line.\n\r\n\r", ch);
-        FREE(world[ch->in_room].description);
-        world[ch->in_room].description = 0;
+//        FREE(world[ch->in_room].description);
+  //      world[ch->in_room].description = 0;
 	
         ch->desc->connected = CON_EDITING;
         ch->desc->str = &(world[ch->in_room].description);
@@ -3334,8 +3334,8 @@ int do_redit(struct char_data *ch, char *argument, int cmd)
 
         send_to_char("Enter your extra description below. Terminate with "
                      "'~' on a new line.\n\r\n\r", ch);
-        FREE(extra->description);
-        extra->description = 0;
+//        FREE(extra->description);
+  //      extra->description = 0;
         ch->desc->str = &extra->description;
         ch->desc->max_str = MAX_MESSAGE_LENGTH;
         ch->desc->connected = CON_EDITING;
@@ -3365,11 +3365,11 @@ int do_redit(struct char_data *ch, char *argument, int cmd)
 
         send_to_char("Enter the exit's description below. Terminate with "
                      "'~' on a new line.\n\r\n\r", ch);
-        if(world[ch->in_room].dir_option[x]->general_description) {
+/*        if(world[ch->in_room].dir_option[x]->general_description) {
           dc_free(world[ch->in_room].dir_option[x]->general_description);
           world[ch->in_room].dir_option[x]->general_description = 0;
         }
-        ch->desc->str = &world[ch->in_room].dir_option[x]->general_description;
+   */     ch->desc->str = &world[ch->in_room].dir_option[x]->general_description;
         ch->desc->max_str = MAX_MESSAGE_LENGTH;
         ch->desc->connected = CON_EDITING;
       } break;

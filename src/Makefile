@@ -9,7 +9,7 @@ SRCS = $(shell find $(SRC_DIR) -name "*.cpp" -maxdepth 2)
 OBJS = $(SRCS:.cpp=.o)
 
 #FAST_FLAGS  = -02
-DEBUG_FLAGS = -ggdb
+DEBUG_FLAGS = -ggdb2
 PROF_FLAGS = $(DEBUG_FLAGS) -pg
 
 #LDFLAGS = -lg++ -lgcc -lm -lc -lg -lWiz -lClass
