@@ -2325,15 +2325,15 @@ int hot_potato(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
          return eSUCCESS;
       }
       // if it's a player, go ahead
-      return eFAILURE;
-   }
-
-   if (number(1, 100) > 90 && GET_LEVEL(vict) < 100) {
-     dropped = 1;
+      if (number(1, 100) > 90 && GET_LEVEL(vict) < 100) 
+        dropped = 1;
+      else
+        return eFAILURE;
    }
 
    if(cmd)
-      return eFAILURE;
+     if (cmd != 88 || dropped != 1)
+       return eFAILURE;
 
    if(obj->obj_flags.value[3] > 0 && dropped == 0) 
    {
@@ -2342,14 +2342,14 @@ int hot_potato(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
          send_to_room("You smell a delicious baked potato and hear a faint *beep*.\n\r", vict->in_room );
    }
    else {
+      if (dropped == 1) {
+        send_to_char("OOPS!!! The hot potato burned you and you dropped it!!!", vict);
+        act("$n screams in agony as they are burned by the potato and DROPS it!", vict, 0, 0, TO_ROOM, 0);
+      }
+
       for(descriptor_data * i = descriptor_list; i; i = i->next)
          if(i->character && i->character->in_room != vict->in_room && !i->connected)
             send_to_char("You hear a large BOOM from somewhere in the distance.\n\r", i->character);
-
-       if (dropped == 1) {
-         send_to_char("OOPS!!! The hot potato burned you and you dropped it!!!", vict);
-         act("$n screams in agony as they are burned by the potato and DROPS it!", vict, 0, 0, TO_ROOM, 0);
-       }
 
        act("The hot potato $n is carrying beeps one final time.\n\r"
            "\n\r$B"
