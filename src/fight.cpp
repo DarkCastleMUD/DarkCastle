@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.136 2004/04/13 11:37:33 urizen Exp $ */
+/* $Id: fight.cpp,v 1.137 2004/04/13 21:43:04 urizen Exp $ */
 
 extern "C"
 {
@@ -57,7 +57,7 @@ extern "C"
 #include <clan.h>
 #include <returnvals.h>
 #include <assert.h>
-
+#include <sing.h> // stop_grouped_bards
 extern int top_of_world;
 extern CHAR_DATA *character_list;
 extern struct descriptor_data *descriptor_list;
@@ -162,7 +162,7 @@ void perform_violence(void)
     if(can_attack(ch)) {
       is_mob = IS_MOB(ch);
       if(is_mob) {
-        if((mob_index[ch->mobdata->nr].combat_func)) {
+        if((mob_index[ch->mobdata->nr].combat_func)&&MOB_WAIT_STATE(ch) <=0) {
           retval = ((*mob_index[ch->mobdata->nr].combat_func)(ch, NULL, 0, "", ch));
           if(SOMEONE_DIED(retval))
             continue;
@@ -2472,8 +2472,9 @@ void change_alignment(CHAR_DATA *ch, CHAR_DATA *victim)
 
   change = (GET_ALIGNMENT(victim) * 2) / 100;
   if (IS_NEUTRAL(ch))
+    change /= 4;
+  else
     change /= 2;
-
   GET_ALIGNMENT(ch) -= change;
   GET_ALIGNMENT(ch) = MIN(1000, MAX((-1000), GET_ALIGNMENT(ch)));  
 #if 0
@@ -2835,6 +2836,11 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
     return;
   }
   
+  if (ch->followers || ch->master)
+  {
+     stop_grouped_bards(ch);
+  }
+
   
   victim->pcdata->group_kills = 0;
   victim->pcdata->grplvl      = 0;
@@ -2878,6 +2884,7 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
     if(ch)
       sprintf(buf, "%s killed by %s", GET_NAME(victim), GET_NAME(ch));
     else sprintf(buf, "%s killed by [null killer]", GET_NAME(victim));
+
     // notify the clan members - clan_death checks for null ch/vict
     clan_death (victim, ch);
     sprintf(log_buf, "%s at %d", buf, world[death_room].number);
