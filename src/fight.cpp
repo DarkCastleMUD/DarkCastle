@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.62 2002/09/03 19:14:41 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.63 2002/09/04 18:00:17 pirahna Exp $ */
 
 extern "C"
 {
@@ -2445,6 +2445,7 @@ int do_skewer(CHAR_DATA *ch, CHAR_DATA *vict, int dam, int weapon)
   if(!ch->equipment[weapon])                                         return 0;
 
   percent = number(1, 101); // 101 is complete failure
+  // TODO - need to make this take specialization into consideration
   if(percent > has_skill(ch, SKILL_SKEWER))                          return 0;
 
   int type = ch->equipment[weapon]->obj_flags.value[3];
