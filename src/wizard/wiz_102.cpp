@@ -4056,6 +4056,9 @@ int do_sockets(struct char_data *ch, char *argument, int cmd)
            continue;
       }
 
+      if(!d->character)
+         continue;
+
       // TODO - determine if I need to leave this uncommented for some reason
       if (*name &&
           !str_str(d->host, name) && !isname(name, GET_NAME(d->character)))
