@@ -16,7 +16,7 @@
 *                       groupies                                             *
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.130 2003/12/02 00:29:53 staylor Exp $ */
+/* $Id: fight.cpp,v 1.131 2003/12/02 05:33:02 staylor Exp $ */
 
 extern "C"
 {
@@ -3049,7 +3049,7 @@ long scale_char_xp(CHAR_DATA *ch, CHAR_DATA *killer, CHAR_DATA *victim,
 {
     long scaled_share;
     long levelmod;
-    long bonus_multiplier;
+    long bonus_multiplier, bonus_percentage;
 
     if(no_killers < 2) {
        /* solo kill */
@@ -3064,18 +3064,19 @@ long scale_char_xp(CHAR_DATA *ch, CHAR_DATA *killer, CHAR_DATA *victim,
     } else {
        /* group kill */
        if (no_killers > 6)
-          /* limit max bonus to 30% (6 killers * 5%) */
+          /* no extra bonus for more than 6 killers */
           no_killers = 6;
+       bonus_percentage = 5 * (no_killers - 1);
        if (highest_level - GET_LEVEL(victim) <= 0)
-          *bonus_xp = (base_xp * no_killers * 5) / 100;
+          *bonus_xp = (base_xp * no_killers * bonus_percentage) / 100;
        else {
-          bonus_multiplier = 5 - (highest_level - GET_LEVEL(victim)) / 3;
+          bonus_multiplier = bonus_percentage - ((highest_level - GET_LEVEL(victim)) * (no_killers - 1)) / 3;
           if (bonus_multiplier < 0)
              bonus_multiplier = 0;
           *bonus_xp = (base_xp * no_killers * bonus_multiplier) / 100;
        }
 
-       scaled_share = ((base_xp * GET_LEVEL(ch)) / total_levels) + *bonus_xp;
+       scaled_share = ((base_xp + *bonus_xp) * GET_LEVEL(ch)) / total_levels;
     }
 
     if (scaled_share > (GET_LEVEL(ch) * 8000))
