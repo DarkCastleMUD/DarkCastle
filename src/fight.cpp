@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.206 2004/05/27 21:07:17 urizen Exp $ */
+/* $Id: fight.cpp,v 1.207 2004/05/28 02:28:00 urizen Exp $ */
 
 extern "C"
 {
@@ -1474,8 +1474,11 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
     }
     if(IS_SET(ch->combat, COMBAT_VITAL_STRIKE))
       dam = (int)(dam * 2);
-    if (affected_by_spell(victim, SPELL_HOLY_AURA))
+    if (affected_by_spell(victim, SPELL_HOLY_AURA) && affected_by_spell(victim, SPELL_HOLY_AURA)->modifier == 50)
       dam /= 2; // half damage against physical attacks
+  } else {
+    if (affected_by_spell(victim, SPELL_HOLY_AURA) && affected_by_spell(victim, SPELL_HOLY_AURA)->modifier == 25);
+	dam /= 2;
   }
 
   if (IS_AFFECTED(victim, AFF_EAS))

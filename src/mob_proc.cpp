@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.53 2004/05/27 20:40:15 urizen Exp $ */
+/* $Id: mob_proc.cpp,v 1.54 2004/05/28 02:28:01 urizen Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -3004,8 +3004,9 @@ static char *dethSayText [ ] =
   "Hello Kitty is one cat I'd like to violate.",
   "Damn needy players. They should be happy with 2600 baud and dual wield.",
   "Philosophy SUCKS!",
-  "Dyslexics of the world, UNTIE",
-  "I love Swedes and Canadians...my puny American ways are insignificant when compared to the power of Moose and Meatballs!"
+  "Dyslexics of the world, UNTIE!",
+  "I love Swedes and Canadians...my puny American ways are insignificant when compared to the power of Moose and Meatballs!",
+  "I got fired from work trying to find this amulet of Yendor, and I finally have it. Now what?"
 };
 
 #define DETH_SAY_TEXT_SIZE    ( sizeof ( dethSayText )    / sizeof ( char * ) )

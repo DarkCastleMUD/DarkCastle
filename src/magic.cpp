@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.147 2004/05/27 22:02:35 urizen Exp $ */
+/* $Id: magic.cpp,v 1.148 2004/05/28 02:28:00 urizen Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -4545,8 +4545,6 @@ int spell_weaken(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *
    } else {
 	 if (!affected_by_spell(victim, SPELL_WEAKEN))
       {
-	if (!number(0,chance)) 
-	{
 	  act("You feel weaker.", ch, 0, victim, TO_VICT, 0);
 	  act("$n seems weaker.", victim, 0, 0, TO_ROOM, INVIS_NULL);
 
@@ -4563,12 +4561,6 @@ void check_weapon_weights(char_data * ch);
 
 	  check_weapon_weights(victim);
 	}
-	else
-	  {
-		 act("$N isn't the wimp you made $m out to be!",
-		ch, NULL, victim, TO_CHAR, 0);
-	  }
-      }
      }
 	if (IS_NPC(victim)) {
 	 retval = one_hit(victim, ch, TYPE_UNDEFINED, FIRST);
@@ -7660,6 +7652,11 @@ int cast_weaken( byte level, CHAR_DATA *ch, char *arg,
 	 if (!tar_ch) tar_ch = ch;
 	 return spell_weaken(level, ch, tar_ch, 0, skill);
 	 break;
+  case SPELL_TYPE_POTION:
+     if (tar_obj) return eFAILURE;
+     if (!tar_ch) tar_ch = ch;
+         return spell_weaken(level, ch, tar_ch, 0, skill);
+	break;
   case SPELL_TYPE_WAND:
 	 if (tar_obj) return eFAILURE;
 	 if (!tar_ch) tar_ch = ch;
@@ -7724,6 +7721,12 @@ int cast_acid_blast( byte level, CHAR_DATA *ch, char *arg,
 	 if (!tar_ch) tar_ch = ch;
 	 return spell_acid_blast(level, ch, tar_ch, 0, skill);
     break;
+  case SPELL_TYPE_POTION:
+         if (tar_obj) return eFAILURE;
+         if (!tar_ch) tar_ch = ch;
+         return spell_acid_blast(level, ch, tar_ch, 0, skill);
+    break;
+
   case SPELL_TYPE_WAND:
     if (tar_obj) return eFAILURE;
     if (!tar_ch) tar_ch = ch;
@@ -9742,14 +9745,15 @@ int spell_holy_aura(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
   struct affected_type af;
 
   if(affected_by_spell(ch, SPELL_HOLY_AURA_TIMER)) {
-     send_to_char("Your god is not so foolish as to grant that power to you so soon again.\r\n", ch);
+     send_to_char("Your god is not so foolish as to grant that 
+power to you so soon again.\r\n", ch);
      return eFAILURE;
   }
 
   skill_increase_check(ch, SPELL_HOLY_AURA, skill, SKILL_INCREASE_HARD);
   act("A serene calm comes over $n.", victim, 0, 0, TO_ROOM, INVIS_NULL);
   act("A serene calm encompasses you.", victim, 0, 0, TO_CHAR, 0);
-  GET_ALIGNMENT(ch) -= 250;
+  GET_ALIGNMENT(ch) -= 200;
   GET_ALIGNMENT(ch) = MIN(1000, MAX((-1000), GET_ALIGNMENT(ch)));
   extern void zap_eq_check(char_data *ch);
   zap_eq_check(ch);
@@ -9769,23 +9773,53 @@ int spell_holy_aura(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
 
 int cast_holy_aura( byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill )
 {
+
   switch (type) 
   {
     case SPELL_TYPE_SPELL:
-       return spell_holy_aura(level, ch, tar_ch, 0, skill);
-       break;
-    case SPELL_TYPE_POTION:
-       return spell_holy_aura(level, ch, ch, 0, skill);
-       break;
-    case SPELL_TYPE_SCROLL:
-       if(tar_obj)
-          return eFAILURE;
-       if(!tar_ch) tar_ch = ch;
-          return spell_holy_aura(level, ch, tar_ch, 0, skill);
-       break;
-    case SPELL_TYPE_STAFF:
-       for (tar_ch = world[ch->in_room].people ; tar_ch ; tar_ch = tar_ch->next_in_room)
-          spell_holy_aura(level,ch,tar_ch,0, skill);
+	char buf[MAX_INPUT_LENGTH];
+        if (affected_by_spell(ch, SPELL_SANCTUARY))
+	{
+	  act("Your god does not allow that much power to be bestowed upon you.",ch, 0, 0, TO_CHAR,0);
+	  return eFAILURE;
+	}
+	one_argument(arg,buf);
+	int mod;
+	if (!str_cmp(buf,"magic"))
+	   mod = 25;
+	else if (!str_cmp(buf,"physical"))
+	  mod = 50;
+	else {
+	send_to_char("You need to specify whether you want protection against magic or physical.\r\n",ch);
+	return eFAILURE;
+	}
+  struct affected_type af;
+
+  if(affected_by_spell(ch, SPELL_HOLY_AURA_TIMER)) {
+     send_to_char("Your god is not so foolish as to grant that
+power to you so soon again.\r\n", ch);
+     return eFAILURE;
+  }
+
+
+  skill_increase_check(ch, SPELL_HOLY_AURA, skill, SKILL_INCREASE_HARD);
+  act("A serene calm comes over $n.", ch, 0, 0, TO_ROOM, INVIS_NULL);
+  act("A serene calm encompasses you.", ch, 0, 0, TO_CHAR, 0);
+  GET_ALIGNMENT(ch) -= 250;
+  GET_ALIGNMENT(ch) = MIN(1000, MAX((-1000), GET_ALIGNMENT(ch)));
+  extern void zap_eq_check(char_data *ch);
+  zap_eq_check(ch);
+  af.type      = SPELL_HOLY_AURA;
+  af.duration  = 4;
+  af.modifier  = mod;
+  af.location  = APPLY_NONE;
+  af.bitvector = 0;
+  affect_to_char(ch, &af);
+
+  af.type      = SPELL_HOLY_AURA_TIMER;
+  af.duration  = 20;
+  affect_to_char(ch, &af);
+
        break;
     default :
        log("Serious screw-up in holy aura!", ANGEL, LOG_BUG);
