@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.154 2004/05/30 19:21:08 urizen Exp $ */
+/* $Id: magic.cpp,v 1.155 2004/06/02 20:36:41 urizen Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -78,6 +78,33 @@ void update_pos( CHAR_DATA *victim );
 bool many_charms(CHAR_DATA *ch);
 bool ARE_GROUPED( CHAR_DATA *sub, CHAR_DATA *obj);
 void add_memory(CHAR_DATA *ch, char *victim, char type);
+
+bool can_heal(CHAR_DATA *ch, CHAR_DATA *victim, int spellnum)
+{
+  bool can_cast = TRUE;
+  if (GET_HIT(victim) > GET_MAX_HIT(victim)-10)
+  {
+    if (spellnum != SPELL_CURE_LIGHT)
+       can_cast = FALSE;
+  } else if (GET_HIT(victim) > GET_MAX_HIT(victim) - 25)
+  {
+     if (spellnum != SPELL_CURE_LIGHT && spellnum != SPELL_CURE_SERIOUS)
+        can_cast = FALSE;
+  } else if (GET_HIT(victim) > GET_MAX_HIT(victim) -50)
+  {
+     if (spellnum != SPELL_CURE_LIGHT && spellnum != SPELL_CURE_SERIOUS &&
+           spellnum != SPELL_CURE_CRITIC)
+         can_cast = FALSE;
+  }
+  if (!can_cast)
+  {
+    if (ch == victim)
+      send_to_char("You are not in need of healing!",ch);
+    else
+      act("$N is not in need of healing!", ch, 0, victim, TO_CHAR, 0);
+  }
+  return can_cast;
+}
 
 bool resist_spell(int perc)
 {
@@ -1409,7 +1436,7 @@ int spell_cure_critic(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 	send_to_char("The heavy magics surrounding this being prevents it.\r\n",ch);
 	return eFAILURE;
   }
-
+  if (!can_heal(ch,victim, SPELL_CURE_CRITIC)) return eFAILURE;
 //  healpoints = dice(3,8)-6+skill;
   healpoints = dam_percent(skill, 100);
   if ( (healpoints + GET_HIT(victim)) > hit_limit(victim) )
@@ -1444,6 +1471,7 @@ int spell_cure_light(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
 
 
 //  healpoints = dice(1,8)+(skill/3);
+  if (!can_heal(ch,victim, SPELL_CURE_LIGHT)) return eFAILURE;
   healpoints = dam_percent(skill, 25);
   if ( (healpoints+GET_HIT(victim)) > hit_limit(victim) )
 	 GET_HIT(victim) = hit_limit(victim);
@@ -1460,7 +1488,6 @@ int spell_cure_light(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
   return eSUCCESS;
 }
 
-// TODO - make this use skill and increase
 int spell_curse(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
   struct affected_type af;
@@ -1885,7 +1912,7 @@ int spell_heal(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *ob
         return eFAILURE;
   }
 
-
+  if (!can_heal(ch,victim,SPELL_HEAL)) return eFAIILURE;
   spell_cure_blind(level, ch, victim, obj, skill);
   int healy = dam_percent(skill,250);
   GET_HIT(victim) += healy;
@@ -1916,7 +1943,7 @@ int spell_power_heal(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
         return eFAILURE;
   }
 
-
+  if (!can_heal(ch,victim, SPELL_POWER_HEAL)) return eFAILURE;
   spell_cure_blind(level, ch, victim, obj, skill);
   int healy = dam_percent(skill, 300);
   GET_HIT(victim) += healy;
@@ -1945,7 +1972,7 @@ int spell_full_heal(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
         return eFAILURE;
   }
 
-
+  if (!can_heal(ch,victim, SPELL_FULL_HEAL)) return eFAILURE;
   spell_cure_blind(level, ch, victim, obj, skill);
 
   healamount = 10 * (skill/2 + 5);
@@ -4191,7 +4218,7 @@ int spell_cure_serious(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
         return eFAILURE;
   }
 
-
+  if (!can_heal(ch,victim, SPELL_CURE_SERIOUS)) return eFAILURE;
 //  healpoints = dice(2, 8) +(skill/2);
   healpoints = dam_percent(skill,50);
   if ((healpoints + GET_HIT(victim)) > hit_limit(victim))
