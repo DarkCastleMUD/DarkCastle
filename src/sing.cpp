@@ -1242,7 +1242,7 @@ int execute_song_insane_chant( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *
    struct affected_type af;
 
    af.type      = SKILL_INSANE_CHANT;
-   af.duration  = 2;
+   af.duration  = 1;
    af.modifier  = 0;
    af.location  = APPLY_INSANE_CHANT;
    af.bitvector = 0;
