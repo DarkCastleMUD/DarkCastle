@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.21 2003/02/17 21:09:26 pirahna Exp $ */
+/* $Id: mob_proc2.cpp,v 1.22 2003/03/06 23:36:32 pirahna Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -438,7 +438,7 @@ int mortician(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 
     cost /= 20000;
     cost = MAX(cost, 30);
-    csendf(ch, "The Undertaker takes a look at you and estimates your corpse would cost around %d coins.\n\r", cost);
+    csendf(ch, "The Undertaker takes a look at you and estimates your corpse would cost around %d platinum coins.\n\r", cost);
     return eSUCCESS;
   }
 
