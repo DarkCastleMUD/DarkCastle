@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.70 2002/10/13 15:35:41 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.71 2002/10/23 04:02:55 pirahna Exp $ */
 
 extern "C"
 {
@@ -911,9 +911,18 @@ void eq_destroyed(char_data * ch, obj_data * obj, int pos)
 
   while(obj->contains) // drop contents to floor
   {
-    act("A $p falls to the ground from $n.", ch, obj->contains, 0, TO_ROOM, 0);
-    act("A $p falls to the ground from your destroyed container.", ch, obj->contains, 0, TO_CHAR, 0);
-    move_obj(obj->contains, ch->in_room);  // this updates obj->contains
+    if(IS_SET(obj->contains->obj_flags.more_flags, ITEM_NO_TRADE))
+    {
+      act("A $p falls to $n's inventory.", ch, obj->contains, 0, TO_ROOM, 0);
+      act("A $p falls to your inventory from your destroyed container.", ch, obj->contains, 0, TO_CHAR, 0);
+      move_obj(obj->contains, ch);
+    }
+    else
+    {
+      act("A $p falls to the ground from $n.", ch, obj->contains, 0, TO_ROOM, 0);
+      act("A $p falls to the ground from your destroyed container.", ch, obj->contains, 0, TO_CHAR, 0);
+      move_obj(obj->contains, ch->in_room);  // this updates obj->contains
+    }
   }
 
   act("$p falls to the ground in scraps.", ch, obj, 0, TO_CHAR, 0);
