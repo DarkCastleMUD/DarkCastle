@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.111 2003/05/07 04:29:27 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.112 2003/05/12 02:50:14 pirahna Exp $ */
 
 extern "C"
 {
@@ -1108,7 +1108,7 @@ void eq_damage(CHAR_DATA * ch, CHAR_DATA * victim,
         count++;
     value = number(1, count); // choose a random inventory item
     // loop up to that item
-    for(count = 0, obj = victim->carrying; obj && value < count; obj = obj->next_content)
+    for(count = 1, obj = victim->carrying; obj && count < value ; obj = obj->next_content)
         count++;
 
     assert(obj);
