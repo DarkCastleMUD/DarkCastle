@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.183 2004/05/14 01:15:01 urizen Exp $ */
+/* $Id: fight.cpp,v 1.184 2004/05/14 02:09:48 urizen Exp $ */
 
 extern "C"
 {
@@ -1940,11 +1940,13 @@ bool check_shieldblock(CHAR_DATA * ch, CHAR_DATA * victim, int attacktype)
       default:
 	modifier = -5;break;
     }
-  }
-  modifier += speciality_bonus(victim,attacktype);
+  } else if (!has_skill(ch,SKILL_SHIELDBLOCK))
+     return eFAILURE;
+  modifier += speciality_bonus(ch,attacktype);
   extern int stat_mod[];
-  modifier -= stat_mod[GET_DEX(victim)];
+  modifier += stat_mod[GET_DEX(victim)];
 
+  if (IS_NPC(victim)) modifier -= 50;
   if (skill_success(victim,ch, SKILL_SHIELDBLOCK,modifier))
     return FALSE;
   
@@ -1986,12 +1988,14 @@ bool check_parry(CHAR_DATA * ch, CHAR_DATA * victim, int attacktype)
       case CLASS_NECROMANCER:   modifier = -5; break;
       default:                  modifier = 0; break;
   }
-  }
+  } else if (!has_skill(victim, SKILL_PARRY))
+     return eFAILURE;
   if (!modifier && IS_NPC(victim) && (IS_SET(victim->mobdata->actflags, ACT_PARRY)))
     modifier = 10;
-  else if (!IS_NPC(victim))
-    modifier += speciality_bonus(ch,attacktype);
 
+  modifier += speciality_bonus(ch,attacktype);
+  if (IS_NPC(victim)) modifier -= 50;
+  
   if(skill_success(victim,ch, SKILL_PARRY, modifier)&&
      !IS_SET(victim->combat, COMBAT_BLADESHIELD1)&&
      !IS_SET(victim->combat, COMBAT_BLADESHIELD2))
@@ -2036,7 +2040,7 @@ int speciality_bonus(CHAR_DATA *ch,int attacktype)
    }
    if (!skill) return 0;
    int l = has_skill(ch,skill);
-   if (IS_NPC(ch)) return -(GET_LEVEL(ch)+17);
+   if (IS_NPC(ch)) return 0-(GET_LEVEL(ch)+17);
    return 0 - l;
 }
 
@@ -2072,12 +2076,14 @@ bool check_dodge(CHAR_DATA * ch, CHAR_DATA * victim, int attacktype)
     }
     if(0 == modifier && IS_SET(victim->mobdata->actflags, ACT_DODGE))
       modifier = 5;
-  }
+  } else if (!has_skill(victim, SKILL_DODGE))
+      return eFAILURE;
 
   if (modifier == 0 && IS_NPC(victim))
     return FALSE;
 
-  modifier += speciality_bonus(victim, attacktype);
+  modifier += speciality_bonus(ch, attacktype);
+  if (IS_NPC(victim)) modifier -= 50; // 75 is base, and it's calculated around here
   if (!skill_success(victim,ch,SKILL_DODGE, modifier))
     return FALSE;
   
