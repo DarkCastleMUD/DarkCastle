@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.80 2003/06/23 02:54:38 pirahna Exp $ */
+/* $Id: magic.cpp,v 1.81 2003/06/23 03:03:16 pirahna Exp $ */
 
 extern "C"
 {
@@ -8356,13 +8356,6 @@ int spell_summon_familiar(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_D
   IS_CARRYING_N(mob) = 0;
 
   familiar_creation_message(ch, fam_type);
-
-  act("$n throws a batwing into the air which explodes into flame.\r\n"
-      "a small imp appears from the smoke and perches on $n's shoulder.",
-      ch, 0, 0, TO_ROOM, 0);
-  send_to_char("You channel a miniture fireball into the wing and throw it into the air.\r\n"
-               "A small imp appears from the flames and perches upon your shoulder.\r\n", ch);
-
   add_follower(mob, ch, 0);
 
   return eSUCCESS;
