@@ -99,6 +99,7 @@ int do_harmtouch(struct char_data *ch, char *argument, int cmd)
    else {
      dam = 750;
      retval = damage(ch, victim, dam, TYPE_ACID, SKILL_HARM_TOUCH, 0);
+     WAIT_STATE(ch, PULSE_VIOLENCE);
    }
    if(IS_SET(retval, eVICT_DIED) && !IS_SET(retval, eCH_DIED)) {
      if(has_skill(ch,SKILL_HARM_TOUCH) > 30 && number(1, 3) == 1) {
