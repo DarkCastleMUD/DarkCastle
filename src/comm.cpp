@@ -74,7 +74,7 @@
 short code_testing_mode = 0;
 short code_testing_mode_mob = 0;
 short code_testing_mode_world = 0;
-unsigned mother_desc, other_desc, third_desc;
+unsigned mother_desc, other_desc, third_desc, fourth_desc;
 
 // This is turned on right before we call game_loop
 int try_to_hotboot_on_crash = 0;
@@ -94,6 +94,7 @@ extern int restrict;
 //extern int no_rent_check;
 extern FILE *player_fl;
 int DFLT_PORT = 23, DFLT_PORT2 = 6666, DFLT_PORT3 = 80;
+int DFLT_PORT4 = 4000;
 
 extern CWorld world;	/* In db.c */
 extern int top_of_world;	/* In db.c */
@@ -117,7 +118,7 @@ int scheck = 0;			/* for syntax checking mode */
 //extern int autosave_time;	/* see config.c */
 struct timeval null_time;	/* zero-valued time structure */
 time_t start_time;
-int port, port2, port3;
+int port, port2, port3, port4;
 
 // heartbeat globals
 int pulse_timer;
@@ -138,9 +139,9 @@ char * calc_color(int hit, int max_hit);
 char * calc_condition(CHAR_DATA *ch, bool colour = FALSE);
 void generate_prompt(CHAR_DATA *ch, char *prompt);
 int get_from_q(struct txt_q *queue, char *dest, int *aliased);
-void init_game(int port, int port2, int port3);
+void init_game(int port, int port2, int port3, int port4);
 void signal_setup(void);
-void game_loop(unsigned mother_desc, unsigned other_desc, unsigned third_desc);
+void game_loop(unsigned mother_desc, unsigned other_desc, unsigned third_desc, unsigned fourth_desc);
 int init_socket(int port);
 int new_descriptor(int s);
 int process_output(struct descriptor_data *t);
@@ -199,6 +200,7 @@ int main(int argc, char **argv)
   port = DFLT_PORT;
   port2 = DFLT_PORT2;
   port3 = DFLT_PORT3;
+  port4 = DFLT_PORT4;
   ext_argv = argv;
 
   while ((pos < argc) && (*(argv[pos]) == '-')) {
@@ -236,6 +238,7 @@ int main(int argc, char **argv)
        port = 1500;
        port2 = 1501;
        port3 = 1502;
+       port4 = 1503;
        break;
     default:
       sprintf(buf, "SYSERR: Unknown option -%c in argument string.", *(argv[pos] + 1));
@@ -258,6 +261,7 @@ int main(int argc, char **argv)
    if (port != DFLT_PORT) { 
      port2 = port + 1; 
      port3 = port + 2;
+     port4 = port + 3;
      }
 #ifndef WIN32
   if (chdir(dir) < 0) {
@@ -287,7 +291,7 @@ int main(int argc, char **argv)
   } else {
     sprintf(buf, "Running game on port %d, %d and %d.", port, port2, port3);
     log(buf, 0, LOG_MISC);
-    init_game(port, port2, port3);
+    init_game(port, port2, port3, port4);
   }
   return 0;
 }
@@ -310,7 +314,7 @@ int write_hotboot_file()
     log("Hotboot failed, unable to open hotboot file.", 0, LOG_MISC);
     return 0; 
   }
-  fprintf(fp, "%d\n%d\n%d\n", mother_desc, other_desc, third_desc);
+  fprintf(fp, "%d\n%d\n%d\n%d\n", mother_desc, other_desc, third_desc, fourth_desc);
   for (d=descriptor_list;d;d=sd)
   {
     sd = d->next;  
@@ -369,7 +373,7 @@ int load_hotboot_descs()
   log("Hotboot, reloading characters.", 0, LOG_MISC);
   unlink("hotboot"); // remove the file, it's in memory for reading anyways
 
-  fscanf(fp, "%d\n%d\n%d\n", &mother_desc, &other_desc, &third_desc);
+  fscanf(fp, "%d\n%d\n%d\n%d\n", &mother_desc, &other_desc, &third_desc, &fourth_desc);
 
   while(!feof(fp)) {
     desc =0;
@@ -460,7 +464,7 @@ void finish_hotboot()
 }
 
 /* Init sockets, run game, and cleanup sockets */
-void init_game(int port, int port2, int port3)
+void init_game(int port, int port2, int port3, int port4)
 {
 	/* Azrack -- do these need to be here?
   extern int mother_desc;
@@ -516,6 +520,7 @@ void init_game(int port, int port2, int port3)
     // no need for the other ports rinetd handles it now. Scratch that.
        other_desc = init_socket(port2);
        third_desc = init_socket(port3);
+       fourth_desc = init_socket(port4);
   }
 
   start_time = time(0);
@@ -536,7 +541,7 @@ void init_game(int port, int port2, int port3)
 
   unlink("died_in_bootup");
 
-  game_loop(mother_desc, other_desc, third_desc);
+  game_loop(mother_desc, other_desc, third_desc, fourth_desc);
 
   log("Closing all sockets.", 0, LOG_MISC);
   while (descriptor_list)
@@ -544,6 +549,7 @@ void init_game(int port, int port2, int port3)
   CLOSE_SOCKET(mother_desc);
   CLOSE_SOCKET(other_desc);
   CLOSE_SOCKET(third_desc);
+  CLOSE_SOCKET(fourth_desc);
 
 #ifdef LEAK_CHECK
   log("Freeing all mobs in world.", 0, LOG_MISC);
@@ -687,7 +693,7 @@ struct descriptor_data * next_d;
  * new connections, polling existing connections for input, dequeueing
  * output and sending it out to players, and calling "heartbeat" function
  */
-void game_loop(unsigned mother_desc, unsigned other_desc, unsigned third_desc)
+void game_loop(unsigned mother_desc, unsigned other_desc, unsigned third_desc, unsigned fourth_desc)
 {
  
   fd_set input_set, output_set, exc_set, null_set;
@@ -724,9 +730,11 @@ void game_loop(unsigned mother_desc, unsigned other_desc, unsigned third_desc)
     FD_SET(mother_desc, &input_set);
     FD_SET(other_desc, &input_set);
     FD_SET(third_desc, &input_set);
+    FD_SET(fourth_desc, &input_set);
 
     maxdesc = ((mother_desc > other_desc) ? mother_desc : other_desc);
     maxdesc = ((maxdesc > third_desc) ? maxdesc : third_desc);
+    maxdesc = ((maxdesc > fourth_desc) ? maxdesc : fourth_desc);
     //maxdesc = mother_desc;   
  
     for (d = descriptor_list; d; d = d->next) {
@@ -750,6 +758,8 @@ void game_loop(unsigned mother_desc, unsigned other_desc, unsigned third_desc)
       new_descriptor(other_desc);
     if (FD_ISSET(third_desc, &input_set))
       new_descriptor(third_desc);
+    if (FD_ISSET(fourth_desc, &input_set))
+      new_descriptor(fourth_desc);
 
     // close the weird descriptors in the exception set 
     for (d = descriptor_list; d; d = next_d) {
