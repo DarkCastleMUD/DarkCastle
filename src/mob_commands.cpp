@@ -622,7 +622,6 @@ int do_mpxpreward( CHAR_DATA *ch, char *argument, int cmd )
     char_data *      vict;
     
     CHAR_DATA *get_pc_room_vis_exact(CHAR_DATA *ch, char *name);
-    void gain_exp(struct char_data *ch, int gain);
 
     if ( !IS_NPC( ch ) )
     {
