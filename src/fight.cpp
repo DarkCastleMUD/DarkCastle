@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.101 2003/03/07 01:29:24 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.102 2003/03/17 03:38:45 pirahna Exp $ */
 
 extern "C"
 {
@@ -348,8 +348,15 @@ int attack(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
   } // End of the monk attacks
   else // It's a normal attack
   {
-    result = one_hit(ch, vict, type, FIRST); // Everyone gets one hit 
-    if(SOMEONE_DIED(result))       return result;
+    if(IS_SET(ch->combat, COMBAT_MISS_AN_ATTACK))
+    {
+      send_to_char("Your body refuses to work properly and you miss an attack.\r\n", ch);
+      REMOVE_BIT(ch->combat, COMBAT_MISS_AN_ATTACK);
+    }
+    else {
+      result = one_hit(ch, vict, type, FIRST);       // everyone get's one hit (normally)
+      if(SOMEONE_DIED(result))       return result;
+    }
 
     // This is here so we only show this after the PC's first
     // attack rather than after every hit.
@@ -1319,7 +1326,15 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
 
     if(check_parry(ch, victim)) {
       if(typeofdamage == DAMAGE_TYPE_PHYSICAL)
-          return damage_retval(ch, victim, check_riposte(ch, victim));
+      {
+        int last_class = GET_CLASS(ch);
+        int retval = damage_retval(ch, victim, check_riposte(ch, victim));
+        if(GET_CLASS(ch) != last_class && !IS_SET(retval, eCH_DIED)) {
+           csendf(ch, "The mud just freaked out.  Contact Pir immediatly with a log of the last fight.\r\n");
+           return (retval | eCH_DIED);
+        }
+        return retval;
+      }
     }
     if (check_dodge(ch, victim))
       return eFAILURE;
