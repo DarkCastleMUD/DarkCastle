@@ -18,9 +18,9 @@ int do_boot(struct char_data *ch, char *arg, int cmd)
 {
   struct char_data *victim;
   int room;
-  char name[100], buf[500];
+  char name[MAX_INPUT_LENGTH], type[MAX_INPUT_LENGTH], buf[500];
 
-  one_argument(arg,name);
+  half_chop(arg,name,type);
 
   if(!(*name)) {
     send_to_char("Boot who?\n\r", ch);
@@ -71,6 +71,34 @@ int do_boot(struct char_data *ch, char *arg, int cmd)
     sprintf(name,"%s has booted %s.", GET_NAME(ch), GET_NAME(victim));
     log(name, GET_LEVEL(ch), LOG_GOD);
 
+    if(!strcmp(type, "boot")) {
+       send_to_char(
+"\n"
+"                       $1/               /\n"
+"                      $1/               /\n"
+"                     $1/               /\n"
+"                    $1/               /$R\n"
+"                   $5/\\_             $1/$R\n"
+"      $5____        /   \\_          $1/$R\n"
+"     $5/    \\      /\\     \\_       $1/$R\n"
+"    $5/      \\    /\\        \\_    $1/$R\n"
+"   $5/        \\  /\\           \\_ $1/$R\n"
+"  $5/          \\/\\              /\n"
+"  |\\                         /\n"
+"   \\\\                       /\n"
+"    \\\\                     /\n"
+"     \\\\                   /\n"
+"      \\\\                 /\n"
+"       \\\\               /\n"
+"        \\\\             /\n"
+"         \\\\           /\n"
+"          \\\\         /\n"
+"           \\\\       /\n"
+"            \\\\     /\n"
+"             \\\\   /\n"
+"              \\__/$R\n", victim);
+
+}
     move_char(victim, real_room(3001));
     do_quit(victim, "", 666);
   }
