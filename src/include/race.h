@@ -1,7 +1,7 @@
 #ifndef RACE_H_
 #define RACE_H_
 /************************************************************************
-| $Id: race.h,v 1.5 2004/04/21 21:47:47 urizen Exp $
+| $Id: race.h,v 1.6 2004/04/27 17:54:42 urizen Exp $
 | race.h
 | This file defines racial information.
 */
@@ -85,10 +85,10 @@
 #define RACE_ELVEN_WIS_MOD        0
 #define RACE_ELVEN_CON_MOD         -1
 
-#define RACE_DWARVEN_STR_MOD 	2
-#define RACE_DWARVEN_DEX_MOD -2
-#define RACE_DWARVEN_WIS_MOD  1
-#define RACE_DWARVEN_INT_MOD -2
+#define RACE_DWARVEN_STR_MOD 	    2
+#define RACE_DWARVEN_DEX_MOD 	   -2
+#define RACE_DWARVEN_WIS_MOD  	    1
+#define RACE_DWARVEN_INT_MOD 	   -2
 #define RACE_DWARVEN_CON_MOD        1
 
 #define RACE_HOBBIT_STR_MOD 	    -2

@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.117 2004/04/24 21:54:22 urizen Exp $ */
+/* $Id: magic.cpp,v 1.118 2004/04/27 17:54:40 urizen Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -7666,7 +7666,7 @@ int spell_bee_sting(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
 {
    int dam;
    int retval;
-   int bees = (GET_LEVEL(ch) / 15) + (GET_LEVEL(ch)==50);
+   int bees = 1 + (GET_LEVEL(ch) / 15) + (GET_LEVEL(ch)==50);
    affected_type af;
    int i;
    set_cantquit(ch, victim);
@@ -7674,10 +7674,9 @@ int spell_bee_sting(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
    
    if (saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC) >= 0)
       dam >>= 1;
-  
 
    for (i = 0; i < bees; i++) {
-   skill_increase_check(ch, SPELL_BEE_STING, skill, SKILL_INCREASE_MEDIUM);
+     skill_increase_check(ch, SPELL_BEE_STING, skill, SKILL_INCREASE_MEDIUM);
 
    retval = spell_damage(ch, victim, dam, TYPE_STING, SPELL_BEE_STING, 0);
    if(SOMEONE_DIED(retval))
