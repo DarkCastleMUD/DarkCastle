@@ -11,7 +11,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.17 2002/09/08 15:13:59 pirahna Exp $ */
+/* $Id: nanny.cpp,v 1.18 2002/10/12 23:45:40 pirahna Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -396,6 +396,31 @@ void roll_and_display_stats(CHAR_DATA * ch)
 	WAIT_STATE(ch, PULSE_VIOLENCE);
 }
 
+int more_than_ten_people_from_this_ip(struct descriptor_data *new_conn)
+{
+   int count = 0;
+   for(struct descriptor_data *d = descriptor_list; d; d = d->next)
+   {
+      if(!d->host)
+         continue;
+      if(!strcmp(new_conn->host, d->host))
+         count++;
+   }
+
+   if(count > 9)
+   {
+      SEND_TO_Q("Sorry, there are more than 9 connections from this IP address\r\n"
+                "already logged into Dark Castle.  If you have a valid reason\r\n"
+                "for having this many connections from one IP please let Pirahna\r\n"
+                "know and he will make an exception for you. (dcpirahna@hotmail.com)\r\n",
+                new_conn);
+      close_socket( new_conn );
+      return 1;
+   }
+
+   return 0;
+}
+
 // Deal with sockets that haven't logged in yet.
 void nanny(struct descriptor_data *d, char *arg)
 {
@@ -450,6 +475,9 @@ void nanny(struct descriptor_data *d, char *arg)
       else if(x < 75)
         SEND_TO_Q(greetings3, d);  // greeting 3 is the dc++ one we don't use now
 */
+
+      if(more_than_ten_people_from_this_ip(d))
+        break;
 
       SEND_TO_Q("What name for the roster? ", d);
       STATE(d) = CON_GET_NAME;
