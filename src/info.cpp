@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.17 2002/09/01 16:13:54 pirahna Exp $ */
+/* $Id: info.cpp,v 1.18 2002/10/26 01:42:50 pirahna Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -2115,6 +2115,33 @@ int do_consider(struct char_data *ch, char *argument, int cmd)
    
    send_to_char("Level comparison: ", ch);
    csendf(ch, level_messages[y], GET_SHORT(victim));
+
+   if(Learned > 89)
+   {
+      send_to_char("Training: ", ch);
+
+      if(GET_CLASS(victim) == CLASS_WARRIOR ||
+         GET_CLASS(victim) == CLASS_THIEF ||
+         GET_CLASS(victim) == CLASS_BARBARIAN ||
+         GET_CLASS(victim) == CLASS_MONK ||
+         GET_CLASS(victim) == CLASS_BARD
+         )
+         csendf(ch, "%s appears to be a trained fighter.\r\n", GET_SHORT(victim));
+      else if(GET_CLASS(victim) == CLASS_MAGIC_USER ||
+              GET_CLASS(victim) == CLASS_CLERIC ||
+              GET_CLASS(victim) == CLASS_DRUID ||
+              GET_CLASS(victim) == CLASS_PSIONIC ||
+              GET_CLASS(victim) == CLASS_NECROMANCER)
+         csendf(ch, "%s appears to be trained in mystical arts.\r\n", GET_SHORT(victim));
+      else if(GET_CLASS(victim) == CLASS_ANTI_PAL ||
+              GET_CLASS(victim) == CLASS_PALADIN ||
+              GET_CLASS(victim) == CLASS_RANGER)
+         csendf(ch, "%s appears to have training in both combat and magic.\r\n", GET_SHORT(victim));
+      else if(GET_CLASS(victim))
+         csendf(ch, "%s appears to have training, but you are unfamiliar with what.\r\n", GET_SHORT(victim));
+      else csendf(ch, "You've seen stray dogs that were better trained.\r\n");
+   }
+
    return eSUCCESS;
 }
 

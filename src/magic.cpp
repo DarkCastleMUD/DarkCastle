@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.40 2002/10/13 16:40:43 pirahna Exp $ */
+/* $Id: magic.cpp,v 1.41 2002/10/26 01:42:51 pirahna Exp $ */
 
 extern "C"
 {
@@ -680,13 +680,12 @@ int spell_solar_gate(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
   // we also now use .people instead of the character_list -pir 12/26
   for(tmp_victim = world[orig_room].people; tmp_victim; tmp_victim = temp) 
   {
-     temp = tmp_victim->next;
+     temp = tmp_victim->next_in_room;
      if((orig_room == tmp_victim->in_room) && (tmp_victim != ch) &&
         (!ARE_GROUPED(ch,tmp_victim)) && (can_be_attacked(ch, tmp_victim)))
      {
        dam = dice(level, 20) + level;
 
-       /* If it's -1, the character died -- don't affect further */
        retval = spell_damage(ch, tmp_victim, dam,TYPE_MAGIC, SPELL_SOLAR_GATE, 0);
        if(IS_SET(retval, eCH_DIED))
 	 return retval;
