@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.205 2004/05/25 01:08:30 urizen Exp $ */
+/* $Id: fight.cpp,v 1.206 2004/05/27 21:07:17 urizen Exp $ */
 
 extern "C"
 {
@@ -1956,7 +1956,7 @@ bool check_shieldblock(CHAR_DATA * ch, CHAR_DATA * victim, int attacktype)
   modifier += stat_mod[GET_DEX(ch)];
 
   if (IS_NPC(victim)) modifier -= 50;
-
+  modifier -= GET_DEX(victim)/2;
   if (!skill_success(victim, ch, SKILL_SHIELDBLOCK,modifier))
     return FALSE;
   
@@ -2007,6 +2007,7 @@ bool check_parry(CHAR_DATA * ch, CHAR_DATA * victim, int attacktype)
   if (IS_NPC(victim)) modifier -= 50;
   if (attacktype==TYPE_HIT) modifier -= 30; // Harder to parry unarmed attacks
   else modifier -= 22;
+  modifier -= GET_DEX(victim)  / 2;
   if(!skill_success(victim,ch, SKILL_PARRY, modifier)&&
      !IS_SET(victim->combat, COMBAT_BLADESHIELD1)&&
      !IS_SET(victim->combat, COMBAT_BLADESHIELD2))
@@ -2096,6 +2097,7 @@ bool check_dodge(CHAR_DATA * ch, CHAR_DATA * victim, int attacktype)
   modifier += speciality_bonus(ch, attacktype);
   if (IS_NPC(victim)) modifier -= 50; // 75 is base, and it's calculated around here
 
+  modifier -= GET_DEX(victim) / 2;
   if (!skill_success(victim,ch,SKILL_DODGE, modifier))
     return FALSE;
   
