@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.171 2004/05/02 21:07:44 urizen Exp $ */
+/* $Id: fight.cpp,v 1.172 2004/05/02 21:09:06 urizen Exp $ */
 
 extern "C"
 {
@@ -2979,8 +2979,9 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
   
   if(GET_RACE(victim) == RACE_UNDEAD ||
      GET_RACE(victim) == RACE_GHOST ||
-     GET_RACE(victim) == RACE_ELEMENTAL ||
-     GET_RACE(victim) == RACE_PLANAR
+     GET_RACE(victim) == RACE_ELEMENT ||
+     GET_RACE(victim) == RACE_ASTRAL ||
+     GET_RACE(victim) == RACE_SLIME
     )
     make_dust(victim);
   else make_corpse(victim);
