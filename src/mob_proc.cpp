@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.42 2004/04/14 17:05:02 urizen Exp $ */
+/* $Id: mob_proc.cpp,v 1.43 2004/04/20 15:12:47 urizen Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -1933,7 +1933,7 @@ int backstabber(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
          if (IS_EVIL(ch) && (GET_LEVEL(ch) <= GET_LEVEL(tch)))
              continue;
                }
-    if (IS_AFFECTED(tch, AFF_PROTECT_GOOD)) {
+    if (affected_by_spell(tch, SPELL_PROTECT_FROM_GOOD)) {
          if (IS_GOOD(ch) && (GET_LEVEL(ch) <= GET_LEVEL(tch)))
              continue;
                }
@@ -3726,7 +3726,7 @@ int humaneater(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
               if (IS_AFFECTED(tch, AFF_PROTECT_EVIL))
                 if (IS_EVIL(ch) && (GET_LEVEL(ch) <= GET_LEVEL(tch)))
                   continue;
-              if (IS_AFFECTED(tch, AFF_PROTECT_GOOD))
+              if (affected_by_spell(tch, SPELL_PROTECT_FROM_GOOD))
                 if (IS_GOOD(ch) && (GET_LEVEL(ch) <= GET_LEVEL(tch)))
                   continue;
 

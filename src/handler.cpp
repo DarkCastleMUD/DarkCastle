@@ -21,7 +21,7 @@
  *  12/08/2003   Onager    Added check for charmies and !charmie eq to     *
  *                         equip_char()                                    *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.31 2004/04/18 13:59:33 urizen Exp $ */
+/* $Id: handler.cpp,v 1.32 2004/04/20 15:12:46 urizen Exp $ */
     
 extern "C"
 {
@@ -762,9 +762,9 @@ void affect_modify(CHAR_DATA *ch, int32 loc, int32 mod, long bitv, bool add, boo
 
         case APPLY_PROTECT_GOOD:
            if (add)
-              SET_BIT(ch->affected_by, AFF_PROTECT_GOOD);
+              SET_BIT(ch->affected_by2, AFF_PROTECT_GOOD);
            else
-              REMOVE_BIT(ch->affected_by, AFF_PROTECT_GOOD);
+              REMOVE_BIT(ch->affected_by2, AFF_PROTECT_GOOD);
            break;
 
 	default:
@@ -3047,7 +3047,7 @@ void add_memory(CHAR_DATA *ch, char *victim, char type)
   else if(type == 'f')
     ch->mobdata->fears   = str_hsh(victim);
   else if(type == 't')
-    ch->hunting = str_hsh(victim);
+    ch->hunting = str_dup(victim);
 }
 
 

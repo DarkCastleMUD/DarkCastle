@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.108 2004/04/19 22:23:36 urizen Exp $ */
+/* $Id: magic.cpp,v 1.109 2004/04/20 15:12:47 urizen Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -3424,7 +3424,7 @@ int spell_fly(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj
   }
 
   if((cur_af = affected_by_spell(victim, SPELL_FLY)))
-    affect_remove(victim, cur_af, SUPPRESS_ALL);
+    affect_remove(victim, cur_af, SUPPRESS_ALL,FALSE);
     //affect_from_char(victim, SPELL_FLY);
 
   if(IS_AFFECTED(victim, AFF_FLYING))
@@ -8913,7 +8913,7 @@ int spell_water_breathing(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct o
 
   
   if ((cur_af = affected_by_spell(victim, SPELL_WATER_BREATHING)))
-    affect_remove(victim, cur_af, SUPPRESS_ALL);
+    affect_remove(victim, cur_af, SUPPRESS_ALL,FALSE);
     //affect_from_char(victim, SPELL_WATER_BREATHING);
 
   act("Small gills spring forth from $n's neck and begin fanning as $e breathes.", victim, 0, 0, TO_ROOM, INVIS_NULL);

@@ -19,7 +19,7 @@
 /* 12/06/2003   Onager   Modified mobile_activity() to prevent charmie    */
 /*                       scavenging                                       */
 /**************************************************************************/
-/* $Id: mob_act.cpp,v 1.19 2004/04/20 08:48:24 urizen Exp $ */
+/* $Id: mob_act.cpp,v 1.20 2004/04/20 15:12:47 urizen Exp $ */
 
 extern "C"
 {
@@ -42,6 +42,7 @@ extern "C"
 #include <interp.h>
 #include <returnvals.h>
 #include <string.h>
+#include <spells.h>
 
 extern CHAR_DATA *character_list;
 extern struct index_data *mob_index;
@@ -577,7 +578,7 @@ bool is_protected(struct char_data *vict, struct char_data *ch)
    }
       
    if(IS_GOOD(ch) && GET_LEVEL(ch) <= (GET_LEVEL(vict))) {
-      if((IS_AFFECTED(vict, AFF_PROTECT_GOOD)) ||
+      if((affected_by_spell(vict, SPELL_PROTECT_FROM_GOOD)) ||
         (GET_CLASS(vict) == CLASS_PALADIN && IS_GOOD(vict)))
            return(true);
    }
