@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.76 2003/06/22 22:39:26 pirahna Exp $ */
+/* $Id: magic.cpp,v 1.77 2003/06/22 22:55:37 pirahna Exp $ */
 
 extern "C"
 {
@@ -8295,6 +8295,28 @@ int choose_familiar(char_data * ch, char * arg)
    return -1;
 }
 
+void familiar_creation_message(char_data * ch, int fam_type)
+{
+  switch(fam_type) {
+    case FAMILIAR_MOB_IMP:
+      act("$n throws a batwing into the air which explodes into flame.\r\n"
+        "a small imp appears from the smoke and perches on $n's shoulder.",
+        ch, 0, 0, TO_ROOM, 0);
+      send_to_char("You channel a miniture fireball into the wing and throw it into the air.\r\n"
+               "A small imp appears from the flames and perches upon your shoulder.\r\n", ch);
+    break;
+    case FAMILIAR_MOB_CHIPMUNK:
+      act("$n coaxs a chipmunk from nowhere and gives it an acorn to eat.\r\n"
+          "a small chipmunk eats the acorn and looks at $n lovingly.",
+          ch, 0, 0, TO_ROOM, 0);
+      send_to_char("You whistle a little tune summoning a chipmunk to you and give it an acorn.\r\n"
+               "The small chipmunk eats the acorn and looks at you adoringly.\r\n", ch);
+    break;
+    default:
+      send_to_char("Illegal message in familar_creation_message.  Tell pir.\r\n", ch);
+    break;
+  }
+}
 
 int spell_summon_familiar(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *victim, struct obj_data * tar_obj, int skill)
 {
@@ -8336,6 +8358,8 @@ int spell_summon_familiar(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_D
 
   IS_CARRYING_W(mob) = 0;
   IS_CARRYING_N(mob) = 0;
+
+  familiar_creation_message(ch, fam_type);
 
   act("$n throws a batwing into the air which explodes into flame.\r\n"
       "a small imp appears from the smoke and perches on $n's shoulder.",

@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.35 2003/06/22 22:39:26 pirahna Exp $ */
+/* $Id: mob_proc.cpp,v 1.36 2003/06/22 22:55:37 pirahna Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -4321,12 +4321,6 @@ int antipaladin_non_combat(struct char_data *ch, struct obj_data *obj, int cmd, 
     if(!IS_AFFECTED(ch,AFF_DETECT_INVISIBLE) && GET_LEVEL(ch) > 11) {
       act("$n utters the words 'ghost eye'.", ch, 0, 0, TO_ROOM, INVIS_NULL);
       cast_detect_invisibility(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
-      return eSUCCESS;
-    }      
-
-    if(!affected_by_spell(ch, SPELL_SHIELD) && GET_LEVEL(ch) > 19) {
-      act("$n utters the words 'pongun'.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-      cast_shield(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
       return eSUCCESS;
     }      
 

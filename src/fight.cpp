@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.116 2003/06/22 22:10:15 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.117 2003/06/22 22:55:37 pirahna Exp $ */
 
 extern "C"
 {
@@ -3302,7 +3302,7 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim)
   save_char_obj(victim);
 
   // have to be level 10 and linkalive to count as a pkill and not yourself
-  if(GET_LEVEL(victim) < 10 || ch == victim)
+  if(GET_LEVEL(victim) < 20 || ch == victim)
     sprintf(killer_message,"\n\r##%s just DIED!\n\r", GET_NAME(victim));
   else if(IS_AFFECTED2(ch, AFF_FAMILIAR) && ch->master)
     sprintf(killer_message,"\n\r##%s was just DEFEATED in battle by %s's familiar!\n\r",
