@@ -732,38 +732,39 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
   {
     struct obj_data *obj=0;
     CHAR_DATA *take;
-        extern void debug_here();
-        debug_here();
-      struct obj_data * search_char_for_item(char_data * ch, sh_int item_number);
- 
+    extern void debug_here();
+    debug_here();
+    struct obj_data * search_char_for_item(char_data * ch, sh_int item_number);
+    char bufeh[MAX_STRING_LENGTH];
+    char *valu = one_argument(val, bufeh);
     switch (arg[1] )
     {
        case 'i': // mob
-          obj = search_char_for_item(mob, real_object(atoi(val)));
+          obj = search_char_for_item(mob, real_object(atoi(valu)));
 	  take = mob;
 	     break;
        case 'n': // actor
 	 if (!actor) return -1;
-         obj = search_char_for_item(actor, real_object(atoi(val)));
+         obj = search_char_for_item(actor, real_object(atoi(valu)));
 	 take = actor;
 	     break;
 	case 't': // vict
 	  if (!vict) return -1;
-          obj = search_char_for_item(vict, real_object(atoi(val)));
+          obj = search_char_for_item(vict, real_object(atoi(valu)));
 	  take = vict;
 	  break;
        case 'r': // rndm
 	 if (!rndm) return -1;
-	  obj = search_char_for_item(rndm, real_object(atoi(val)));
+	  obj = search_char_for_item(rndm, real_object(atoi(valu)));
 	  break;
 	default:
           logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'carries'", mob_index[mob->mobdata->nr].virt );
 	  return -1;
     }
     if (!obj) return -1;
-    if (!str_cmp(opr, "keep"))
+    if (!str_cmp(bufeh, "keep"))
        return 1;
-    else if (!str_cmp(opr, "take"))
+    else if (!str_cmp(bufeh, "take"))
     {
 	int location = 0,i;
        if (obj->carried_by)

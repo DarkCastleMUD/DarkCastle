@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.148 2004/05/28 02:28:00 urizen Exp $ */
+/* $Id: magic.cpp,v 1.149 2004/05/28 19:20:51 urizen Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -64,6 +64,8 @@ extern CHAR_DATA *character_list;
 extern struct zone_data *zone_table;
 
 #define BEACON_OBJ_NUMBER 405
+
+extern struct spell_info_type spell_info [ ];
 
 bool improve = TRUE;
 /* Extern procedures */
@@ -9745,8 +9747,7 @@ int spell_holy_aura(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
   struct affected_type af;
 
   if(affected_by_spell(ch, SPELL_HOLY_AURA_TIMER)) {
-     send_to_char("Your god is not so foolish as to grant that 
-power to you so soon again.\r\n", ch);
+     send_to_char("Your god is not so foolish as to grant that power to you so soon again.\r\n", ch);
      return eFAILURE;
   }
 
@@ -9791,6 +9792,7 @@ int cast_holy_aura( byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *t
 	  mod = 50;
 	else {
 	send_to_char("You need to specify whether you want protection against magic or physical.\r\n",ch);
+	ch->mana += spell_info[SPELL_HOLY_AURA].min_usesmana;	
 	return eFAILURE;
 	}
   struct affected_type af;
