@@ -328,14 +328,14 @@ int goldenbatleth(CHAR_DATA *ch, struct obj_data *obj,  int cmd, char *arg,
 
    switch(number(0, 1)) {
      case 0:
-       act("$n's blow rips your leg from your body.  Extreme pain is your to know until you hit the ground mercifully dead.", ch, 0, vict, TO_VICT, 0);
+       act("$n's blow rips your leg from your body.  Extreme pain is yours to know until you hit the ground mercifully dead.", ch, 0, vict, TO_VICT, 0);
        act("You attack takes off $N's leg at the knee!  Ahh the blood!", ch, 0, vict, TO_CHAR, 0);
        act("$n fierce swing takes off $N's leg at the knee leaving a bloody stump and a brief scream.", ch, 0, vict, TO_ROOM, NOTVICT);
        make_leg(vict);
        break;
      case 1:
        act("$n's attack takes off your arm at the shoulder.  You stare in shock at the fountaining blood before $e crushes your skull.", ch, 0, vict, TO_VICT, 0);
-       act("You violently rip off $S arm with the attack before caving in $n's forehead.", ch, 0, vict, TO_CHAR, 0);
+       act("You violently rip off $S arm with the attack before caving in $N's forehead.", ch, 0, vict, TO_CHAR, 0);
        act("With a grunt of exertion, $n swings with enough force to rip $N's arm off!", ch, 0, vict, TO_ROOM, NOTVICT);
        make_arm(vict);
        break;
