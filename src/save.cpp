@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: save.cpp,v 1.16 2003/12/09 01:31:44 staylor Exp $ */
+/* $Id: save.cpp,v 1.17 2004/04/19 23:14:35 urizen Exp $ */
 
 extern "C"
 {
@@ -754,7 +754,7 @@ struct obj_data *  obj_store_to_char(CHAR_DATA *ch, FILE *fpsave, struct obj_dat
 
 #ifdef LEAK_CHECK
     obj->affected = (obj_affected_type *) calloc(obj->num_affects, sizeof(obj_affected_type));
-#else
+#e lse
     obj->affected = (obj_affected_type *) dc_alloc(obj->num_affects, sizeof(obj_affected_type));
 #endif
 
