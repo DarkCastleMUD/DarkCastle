@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.229 2004/07/22 16:52:32 urizen Exp $ */
+/* $Id: fight.cpp,v 1.230 2004/07/22 19:57:03 urizen Exp $ */
 
 extern "C"
 {
@@ -3932,8 +3932,7 @@ int can_be_attacked(CHAR_DATA *ch, CHAR_DATA *vict)
   { // New charmie stuff. No attacking pcs unless yer master's a ranger/cleric. 
     // Those guys are soo convincing.
     if (!ch->master) return FALSE; // What the hell?
-    if (GET_CLASS(ch->master) != CLASS_RANGER) return FALSE;
-    if (GET_CLASS(ch->master) != CLASS_CLERIC) return FALSE;
+    if (GET_CLASS(ch->master) != CLASS_RANGER && GET_CLASS(ch->master) == CLASS_CLERIC) return FALSE;
   }
   if(IS_SET(world[ch->in_room].room_flags, SAFE))
   {
