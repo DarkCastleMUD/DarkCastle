@@ -943,6 +943,8 @@ int do_mpteachskill( CHAR_DATA *ch, char *argument, int cmd )
        return eFAILURE|eINTERNAL_ERROR;
     }
 
+    send_to_char(skill, victim);
+
     if(learn_skill(victim, skillnum, 1, 1)) {
     // TEMP until borodin is happy
         sprintf(skill, "borodin I just taught %s the basics of %s.", GET_NAME(victim), skillname);
@@ -950,8 +952,6 @@ int do_mpteachskill( CHAR_DATA *ch, char *argument, int cmd )
     }
 
     act("$n takes some time to teach $N a new thing or two.", ch, 0, victim, TO_ROOM, NOTVICT);
-
-    send_to_char(skill, victim);
 
     return eSUCCESS;
 }
