@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.41 2004/05/28 16:13:54 urizen Exp $ */
+/* $Id: limits.cpp,v 1.42 2004/05/28 16:33:59 urizen Exp $ */
 
 extern "C"
 {
@@ -755,20 +755,20 @@ void update_corpses_and_portals(void)
           next_thing2 = jj->next_content; /* Next in inventory */
 
           if (j->in_obj) {
-            if(IS_SET(jj->obj_flags.more_flags, ITEM_NO_TRADE))
+            if(IS_SET(jj->obj_flags.more_flags, ITEM_NO_TRADE)|| (GET_ITEM_TYPE(jj) == ITEM_CONTAINER && contains_no_trade_item(jj)))
             {
              if (next_thing == jj)
-              next_thing = jj->next;
+                next_thing = jj->next;
              extract_obj(jj);
             }
             else
               move_obj(jj, j->in_obj);
           }
           else if (j->carried_by) {
-            if(IS_SET(jj->obj_flags.more_flags, ITEM_NO_TRADE))
+            if(IS_SET(jj->obj_flags.more_flags, ITEM_NO_TRADE)|| (GET_ITEM_TYPE(jj) == ITEM_CONTAINER && contains_no_trade_item(jj)))
             {
              if (next_thing == jj)
-              next_thing = jj->next;
+               next_thing = jj->next;
              extract_obj(jj);
             }
             else
@@ -778,14 +778,14 @@ void update_corpses_and_portals(void)
           {
             // no trade objects disappear when the corpse decays
 	    // Caused a crasher. Fixed it. 
-            if(IS_SET(jj->obj_flags.more_flags, ITEM_NO_TRADE))
+            if(IS_SET(jj->obj_flags.more_flags, ITEM_NO_TRADE)|| (GET_ITEM_TYPE(jj) == ITEM_CONTAINER && contains_no_trade_item(jj)))
             {
 	     if (next_thing == jj)
-	      next_thing = jj->next;
+	       next_thing = jj->next;
 	     extract_obj(jj);
 	    }
 	    else
-   	    move_obj(jj, j->in_room);
+   	      move_obj(jj, j->in_room);
           }
           else {
             log("BIIIG problem in limits.c!", OVERSEER, LOG_BUG);

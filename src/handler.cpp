@@ -21,7 +21,7 @@
  *  12/08/2003   Onager    Added check for charmies and !charmie eq to     *
  *                         equip_char()                                    *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.60 2004/05/27 22:02:13 urizen Exp $ */
+/* $Id: handler.cpp,v 1.61 2004/05/28 16:33:59 urizen Exp $ */
     
 extern "C"
 {
@@ -1413,7 +1413,7 @@ int get_number(char **name)
 
     for(i = 0; *(number + i); i++)
        if(!isdigit(*(number + i)))
-         return(0);
+         return(-1);
 
     return(atoi(number));
   }
@@ -1432,7 +1432,7 @@ struct obj_data *get_obj_in_list(char *name, struct obj_data *list)
 
   strcpy(tmpname, name);
   tmp = tmpname;
-  if(!(number = get_number(&tmp)))
+  if((number = get_number(&tmp)) < 0)
     return(0);
  
   for(i = list, j = 1; i && (j <= number); i = i->next_content)
@@ -1473,7 +1473,7 @@ struct obj_data *get_obj(char *name)
 
   strcpy(tmpname,name);
   tmp = tmpname;
-  if(!(number = get_number(&tmp)))
+  if((number = get_number(&tmp)) < 0)
     return(0);
 
   for(i = object_list, j = 1; i && (j <= number); i = i->next)
@@ -1517,7 +1517,7 @@ CHAR_DATA *get_char_room(char *name, int room)
 
   strcpy(tmpname,name);
   tmp = tmpname;
-  if(!(number = get_number(&tmp)))
+  if((number = get_number(&tmp)) < 0)
   return(0);
 
   for(i = world[room].people, j = 1; i && (j <= number); i = i->next_in_room)
@@ -1568,7 +1568,7 @@ CHAR_DATA *get_char(char *name)
    
    strcpy(tmpname,name);
    tmp = tmpname;
-   if(!(number = get_number(&tmp)))
+   if((number = get_number(&tmp)) < 0)
       return(0);
 
    for (i = character_list, j = 1; i && (j <= number); i = i->next)
@@ -2426,11 +2426,12 @@ CHAR_DATA *get_char_room_vis(CHAR_DATA *ch, char *name)
 
    strcpy(tmpname,name);
    tmp = tmpname;
-   if(!(number = get_number(&tmp)))
+   if((number = get_number(&tmp))<0)
       return(0);
 
    for (i = world[ch->in_room].people, j = 1; i && (j <= number); i = i->next_in_room)
       {
+      if (number == 0 && IS_NPC(i)) continue;
       if (number == 1)
          {
          if (isname(tmp, GET_NAME(i))&& CAN_SEE(ch,i))
@@ -2472,7 +2473,7 @@ CHAR_DATA *get_mob_room_vis(CHAR_DATA *ch, char *name)
 
    strcpy(tmpname,name);
    tmp = tmpname;
-   if(!(number = get_number(&tmp)))
+   if((number = get_number(&tmp))<0)
       return(0);
 
    for (i = world[ch->in_room].people, j = 1; i && (j <= number); i = i->next_in_room)
@@ -2541,7 +2542,7 @@ CHAR_DATA *get_mob_vis(CHAR_DATA *ch, char *name)
 
   strcpy(tmpname,name);
   tmp = tmpname;
-  if(!(number = get_number(&tmp)))
+  if((number = get_number(&tmp))<0)
     return(0);
 
   for(i = character_list, j = 1; i && (j <= number); i = i->next)
@@ -2606,7 +2607,7 @@ CHAR_DATA *get_char_vis(CHAR_DATA *ch, char *name)
 
    strcpy(tmpname,name);
    tmp = tmpname;
-   if(!(number = get_number(&tmp)))
+   if((number = get_number(&tmp))<0)
 	   return(0);
 
    for(i = character_list, j = 1; i && (j <= number); i = i->next)
@@ -2792,7 +2793,7 @@ struct obj_data *get_obj_in_list_vis(CHAR_DATA *ch, char *name,
 
     strcpy(tmpname,name);
     tmp = tmpname;
-    if(!(number = get_number(&tmp)))
+    if((number = get_number(&tmp))<0)
 	return(0);
 
     for (i = list, j = 1; i && (j <= number); i = i->next_content)
@@ -2828,7 +2829,7 @@ struct obj_data *get_obj_vis(CHAR_DATA *ch, char *name)
 
     strcpy(tmpname,name);
     tmp = tmpname;
-    if ( ( number = get_number(&tmp) ) == 0 )
+    if ( ( number = get_number(&tmp) ) < 0 )
 	return(0);
 
     /* ok.. no luck yet. scan the entire obj list   */
