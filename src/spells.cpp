@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.45 2003/07/08 03:15:27 pirahna Exp $ */
+/* $Id: spells.cpp,v 1.46 2003/07/08 04:22:14 pirahna Exp $ */
 
 extern "C"
 {
@@ -701,6 +701,7 @@ char *skills[]=
   "crushing_weapons",
   "two_handed_weapons",
   "hand_to_hand",
+  "bullrush",
   "\n"
 };
 

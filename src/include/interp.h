@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.h,v 1.13 2003/03/04 06:45:42 pirahna Exp $ */
+/* $Id: interp.h,v 1.14 2003/07/08 04:22:19 pirahna Exp $ */
 
 #ifndef INTERP_H_
 #define INTERP_H_
@@ -84,6 +84,7 @@ DO_FUN  do_boot;
 DO_FUN  do_boss;
 DO_FUN  do_brief;
 DO_FUN  do_bug;
+DO_FUN  do_bullrush;
 DO_FUN  do_cast;
 DO_FUN  do_channel;
 DO_FUN  do_check;

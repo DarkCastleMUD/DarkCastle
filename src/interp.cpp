@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.cpp,v 1.27 2003/07/08 01:45:56 pirahna Exp $ */
+/* $Id: interp.cpp,v 1.28 2003/07/08 04:22:14 pirahna Exp $ */
 
 extern "C"
 {
@@ -201,20 +201,21 @@ struct command_info cmd_info[] =
     { "battlecry",  do_battlecry,   POSITION_FIGHTING,  1,  9,  0 },
     { "rage",       do_rage,        POSITION_FIGHTING,  1,  9,  0 },
     { "berserk",    do_berserk,     POSITION_FIGHTING,  1,  9,  0 },
-    { "stun",       do_stun,        POSITION_FIGHTING, 1,  9,  0 },
-    { "redirect",   do_redirect,    POSITION_FIGHTING, 1,  9,  0 },
-    { "hitall",     do_hitall,      POSITION_FIGHTING, 1,  9,  0 },
+    { "stun",       do_stun,        POSITION_FIGHTING,  1,  9,  0 },
+    { "redirect",   do_redirect,    POSITION_FIGHTING,  1,  9,  0 },
+    { "hitall",     do_hitall,      POSITION_FIGHTING,  1,  9,  0 },
  { "quiveringpalm", do_quivering_palm, POSITION_FIGHTING, 1,  9,  0},
-    { "eagleclaw",  do_eagle_claw,  POSITION_FIGHTING, 1,  9,  0 },
-    { "headbutt",   do_headbutt,    POSITION_FIGHTING, 1,  9,  0 },
-    { "fire",       do_fire,        POSITION_FIGHTING, 1,   9,  0 },
-    { "layhands",   do_layhands,    POSITION_FIGHTING, 1,   9,  0 },
-    { "harmtouch",  do_harmtouch,   POSITION_FIGHTING, 1,   9,  0 },
-    { "bloodfury",  do_bloodfury,   POSITION_FIGHTING, 1,   9,  0 },
-    { "bladeshield",do_bladeshield, POSITION_FIGHTING, 1,   9,  0 },
+    { "eagleclaw",  do_eagle_claw,  POSITION_FIGHTING,  1,  9,  0 },
+    { "headbutt",   do_headbutt,    POSITION_FIGHTING,  1,  9,  0 },
+    { "fire",       do_fire,        POSITION_FIGHTING,  1,  9,  0 },
+    { "layhands",   do_layhands,    POSITION_FIGHTING,  1,  9,  0 },
+    { "harmtouch",  do_harmtouch,   POSITION_FIGHTING,  1,  9,  0 },
+    { "bloodfury",  do_bloodfury,   POSITION_FIGHTING,  1,  9,  0 },
+    { "bladeshield",do_bladeshield, POSITION_FIGHTING,  1,  9,  0 },
     { "repelance",  do_focused_repelance, POSITION_FIGHTING, 1, 9,  0 },
     { "vitalstrike", do_vitalstrike, POSITION_FIGHTING, 1,  9,  0 },
     { "crazedassault", do_crazedassault, POSITION_FIGHTING, 1,  9,  0 },
+    { "bullrush",   do_bullrush,    POSITION_STANDING,  1,  9,  0 },
 
     /*
      * Position commands.

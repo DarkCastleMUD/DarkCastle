@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_barbarian.cpp,v 1.10 2003/01/08 05:02:34 dcastle Exp $
+| $Id: cl_barbarian.cpp,v 1.11 2003/07/08 04:22:17 pirahna Exp $
 | cl_barbarian.C
 | Description:  Commands for the barbarian class.
 */
@@ -16,6 +16,11 @@
 #include <act.h>
 #include <interp.h>
 #include <returnvals.h>
+#include <room.h>
+#include <db.h>
+
+extern CWorld world;
+int attempt_move(CHAR_DATA *ch, int cmd, int is_retreat = 0);
 
 int do_rage(struct char_data *ch, char *argument, int cmd)
 {
@@ -478,3 +483,85 @@ int do_crazedassault(struct char_data *ch, char *argument, int cmd)
   affect_to_char(ch, &af);
   return eSUCCESS;
 } 
+
+int do_bullrush(struct char_data *ch, char *argument, int cmd)
+{
+  int learned;
+  int specialization;
+  char name[MAX_INPUT_LENGTH];
+  int dir = 0;
+  int retval;
+
+  extern char *dirs[];
+
+  if(GET_HIT(ch) == 1) {
+    send_to_char("You are feeling too weak right now for rushing to and fro.\r\n", ch);
+    return eFAILURE;
+  }
+ 
+  if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL )
+    learned = 75;
+  else if(!(learned = has_skill(ch, SKILL_BULLRUSH))) {
+    send_to_char("Closest yer gonna get to a bull right now is a Red one..and you have to drink it...\r\n", ch);          
+    return eFAILURE;
+  }   
+    
+  specialization = learned / 100;
+  learned = learned % 100;
+  
+  // TODO - specialization allow "target" after direction
+   
+  one_argument(argument, name);
+
+  if(!*name) {
+     send_to_char("Bullrush which direction?\r\n", ch);
+     return eFAILURE;
+  }
+
+  for(int i = 0; i < 6; i++) {
+    if(strstr(dirs[i], name))
+    {
+      dir = i + 1;
+      break;
+    }
+  }
+  
+  if(!dir) {
+    send_to_char("Bullrush a valid direction dumb barb...like north maybe?\r\n", ch);
+    return eFAILURE;
+  }
+
+  retval = attempt_move(ch, dir);
+  if(SOMEONE_DIED(retval))
+    return retval;
+
+  int chance = 50 + learned/4;
+
+  WAIT_STATE(ch, PULSE_VIOLENCE);
+
+  if(number(1, 101) > chance )
+  {
+    send_to_char("You rush in madly and fail to find your target!\r\n", ch);
+    act( "$n rushes into the room with nostrils flaring then looks around sheepishly.",
+	  ch, NULL, NULL, TO_ROOM, NOTVICT );
+    return eFAILURE;
+  }
+
+  skill_increase_check(ch, SKILL_BULLRUSH, learned, SKILL_INCREASE_MEDIUM);
+
+  // set victim to person "after" me in room
+  char_data * victim = ch->next_in_room;
+
+  // loop to first person i can see after me
+  while(victim && !CAN_SEE(ch, victim))
+    victim = victim->next_in_room;
+
+  if(!victim || victim == ch) {
+    send_to_char("You successfully rush in and bushwack....the air.\r\n", ch);
+    return eFAILURE;
+  }
+
+  act( "$n rushes into the room with an amazingly violent speed!",
+       ch, NULL, NULL, TO_ROOM, NOTVICT );
+  return attack(ch, victim, TYPE_UNDEFINED);
+}
