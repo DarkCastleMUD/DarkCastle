@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.25 2003/04/17 23:15:08 pirahna Exp $
+| $Id: cl_thief.cpp,v 1.26 2003/04/22 23:48:09 pirahna Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -1226,7 +1226,10 @@ int do_slip(struct char_data *ch, char *argument, int cmd)
          send_to_char("To who?\n\r", ch);
          return eFAILURE;
          }
-    
+      if (ch == vict) {
+         send_to_char("To yourself?!  Very cute...\n\r", ch);
+         return eFAILURE;
+      }    
       // Failure
       if (percent > 60) {
          send_to_char("Whoops!  You dropped them.\n\r", ch);
@@ -1346,6 +1349,11 @@ int do_slip(struct char_data *ch, char *argument, int cmd)
       act("$N graciously refuses your gift.", ch, 0, vict, TO_CHAR, 0);
       return eFAILURE;
       }
+
+   if (ch == vict) {
+      send_to_char("To yourself?!  Very cute...\n\r", ch);
+      return eFAILURE;
+   }    
 
    if(affected_by_spell(ch, FUCK_PTHIEF) && !vict->desc) {
       send_to_char("Now WHY would a thief slip something to a "
