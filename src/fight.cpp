@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.213 2004/05/31 16:11:34 urizen Exp $ */
+/* $Id: fight.cpp,v 1.214 2004/05/31 17:16:18 urizen Exp $ */
 
 extern "C"
 {
@@ -80,7 +80,6 @@ void inform_victim(CHAR_DATA *ch, CHAR_DATA *vict, int dam);
 void update_stuns(CHAR_DATA *ch);
 int is_fighting_mob(CHAR_DATA *ch);
 int fighter(struct char_data *ch, struct obj_data *obj, int cmd, char *arg, struct char_data *invoker);
-int active_magic_user(struct char_data *ch, struct obj_data *obj, int cmd, char *arg, struct char_data *invoker);
 int active_necro(struct char_data *ch, struct obj_data *obj, int cmd, char *arg, struct char_data *invoker);
 int paladin(struct char_data *ch, struct obj_data *obj, int cmd, char *arg, struct char_data *invoker);
 int antipaladin(struct char_data *ch, struct obj_data *obj, int cmd, char *arg, struct char_data *invoker);
@@ -90,7 +89,6 @@ int monk(struct char_data *ch, struct obj_data *obj, int cmd, char *arg, struct 
 int bard_combat(struct char_data *ch, struct obj_data *obj, int cmd, char *arg, struct char_data *invoker);
 int druid_combat(struct char_data *ch, struct obj_data *obj, int cmd, char *arg, struct char_data *invoker);
 int ranger_combat(struct char_data *ch, struct obj_data *obj, int cmd, char *arg, struct char_data *invoker);
-int active_cleric(struct char_data *ch, struct obj_data *obj, int cmd, char *arg, struct char_data *invoker);
 void remove_memory(CHAR_DATA *ch, char type, CHAR_DATA *vict);
 void clan_death (char_data *ch, char_data *victim);
 
@@ -188,8 +186,6 @@ void perform_violence(void)
            case CLASS_MONK:          retval = monk(ch, NULL, 0, "", ch);              break;
            case CLASS_BARD:          retval = bard_combat(ch, NULL, 0, "", ch);       break;
            case CLASS_RANGER:        retval = ranger_combat(ch, NULL, 0, "", ch);     break;
-           case CLASS_MAGIC_USER:    retval = active_magic_user(ch, NULL, 0, "", ch); break;
-           case CLASS_CLERIC:        retval = active_cleric(ch, NULL, 0, "", ch);     break;
            case CLASS_PALADIN:       retval = paladin(ch, NULL, 0, "", ch);           break;
            case CLASS_ANTI_PAL:      retval = antipaladin(ch, NULL, 0, "", ch);       break;
            case CLASS_BARBARIAN:     retval = barbarian(ch, NULL, 0, "", ch);         break;
