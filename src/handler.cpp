@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.10 2002/08/04 19:43:02 pirahna Exp $ */
+/* $Id: handler.cpp,v 1.11 2002/08/05 20:37:21 pirahna Exp $ */
     
 extern "C"
 {
@@ -2018,6 +2018,10 @@ void extract_char(CHAR_DATA *ch, bool pull)
 	if ( k->fighting == ch )
 	    stop_fighting( k );
     }
+
+    // remove any and all affects from the character
+    while(ch->affected)
+      affect_remove(ch, ch->affected);
 
     /* Must remove from room before removing the equipment! */
     was_in = ch->in_room;

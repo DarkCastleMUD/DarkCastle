@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: save.cpp,v 1.7 2002/08/03 08:04:50 pirahna Exp $ */
+/* $Id: save.cpp,v 1.8 2002/08/05 20:37:22 pirahna Exp $ */
 
 extern "C"
 {
@@ -460,6 +460,7 @@ int store_to_char_variable_data(CHAR_DATA * ch, FILE * fpsave)
        fread(&(af->modifier),  sizeof(af->modifier),  1, fpsave);
        fread(&(af->location),  sizeof(af->location),  1, fpsave);
        fread(&(af->bitvector), sizeof(af->bitvector), 1, fpsave);
+       affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE); // re-affect the char
     }
     fread(&typeflag, sizeof(char), 3, fpsave);
   }

@@ -182,7 +182,6 @@ void assign_non_combat_procs() {
     assign_one_mob_non(501,  arena_only);
     assign_one_mob_non(502,  arena_only);
     assign_one_mob_non(503,  arena_only);
-    assign_one_mob_non(702,  guild); // Delcim Prince teaches 'double'
     assign_one_mob_non(901, passive_magic_user2);
     assign_one_mob_non(903, passive_magic_user2);
     assign_one_mob_non(904, passive_magic_user2);

@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.14 2002/08/05 15:42:50 pirahna Exp $ */
+/* $Id: magic.cpp,v 1.15 2002/08/05 20:37:21 pirahna Exp $ */
 
 extern "C"
 {
@@ -8628,7 +8628,7 @@ int spell_blue_bird(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
   }
   
   while(!SOMEONE_DIED(retval) && count--) {
-     dam = number(1, GET_LEVEL(ch) + 1);
+     dam = number(1, GET_LEVEL(ch) + 3);
      retval = damage(ch, victim, dam, TYPE_PHYSICAL_MAGIC, SPELL_BLUE_BIRD, 0);
   }
 

@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.33 2002/08/05 02:24:40 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.34 2002/08/05 20:37:21 pirahna Exp $ */
 
 extern "C"
 {
@@ -2479,9 +2479,6 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
   death_room = victim->in_room;
   extract_char(victim, FALSE);
   
-  while(victim->affected)
-    affect_remove(victim, victim->affected);
-  
   GET_HIT(victim)  = 1;
   if(GET_MOVE(victim) <= 0)
     GET_MOVE(victim) = 1;
@@ -2956,6 +2953,7 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim)
     afpk = af->next;
     if(af->type != FUCK_CANTQUIT && 
        af->type != SKILL_LAY_HANDS &&
+       af->type != SKILL_HARM_TOUCH &&
        af->type != SKILL_BLOOD_FURY)
       affect_remove(victim, af);
   }

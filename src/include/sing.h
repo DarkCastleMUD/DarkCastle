@@ -3,14 +3,14 @@
  * singing bard powers, although the sing structure is in
  * spells.h, so that must be included
  */
-/* $Id: sing.h,v 1.2 2002/06/13 04:41:15 dcastle Exp $ */
+/* $Id: sing.h,v 1.3 2002/08/05 20:37:25 pirahna Exp $ */
 
 #ifndef SING_H_
 #define SING_H_
 
 #include <structs.h> // byte, ubyte, etc..
 
-typedef int	SING_FUN		( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim);
+typedef int	SING_FUN		( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill);
 
 struct song_info_type
 {

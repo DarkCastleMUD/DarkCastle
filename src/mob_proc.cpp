@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.14 2002/08/04 19:43:03 pirahna Exp $ */
+/* $Id: mob_proc.cpp,v 1.15 2002/08/05 20:37:21 pirahna Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -1064,7 +1064,7 @@ int bard_combat(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     return eFAILURE;
 
   // whistle sharp every round
-  return song_whistle_sharp(GET_LEVEL(ch), ch, "", vict);
+  return song_whistle_sharp(GET_LEVEL(ch), ch, "", vict, GET_LEVEL(ch));
 }
 
 // combat proc for mob monks
