@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.cpp,v 1.24 2003/04/23 01:38:21 pirahna Exp $ */
+/* $Id: interp.cpp,v 1.25 2003/04/26 02:22:51 pirahna Exp $ */
 
 extern "C"
 {
@@ -166,7 +166,7 @@ struct command_info cmd_info[] =
     { "lock",       do_lock,        POSITION_RESTING,   0,  9,  COM_CHARMIE_OK },
     { "open",       do_open,        POSITION_RESTING,   0,  9,  COM_CHARMIE_OK },
     { "pour",       do_pour,        POSITION_RESTING,   0,  9,  COM_CHARMIE_OK },
-    { "put",        do_put,         POSITION_RESTING,   0,  9,  COM_CHARMIE_OK },
+    { "put",        do_put,         POSITION_RESTING,   0,  93, COM_CHARMIE_OK },
     { "quaff",      do_quaff,       POSITION_RESTING,   0,  9,  COM_CHARMIE_OK },
     { "read",       do_read,        POSITION_RESTING,   0,  67,  0 },
     { "remove",     do_remove,      POSITION_RESTING,   0,  69,  0 },

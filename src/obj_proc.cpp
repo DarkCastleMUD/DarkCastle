@@ -2150,6 +2150,10 @@ int hot_potato(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
    if(obj->obj_flags.value[3] < 0) // not active yet:)
       return eFAILURE;
 
+   if(cmd == 87) {
+      send_to_char("You can't slip anything when you have a hot potato! (sorry)\n\r", vict);
+      return eSUCCESS;
+   }
    if(cmd == 89) {
       send_to_char("You can't drop anything when you have a hot potato!\n\r", vict);
       return eSUCCESS;
@@ -2166,7 +2170,12 @@ int hot_potato(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
       send_to_char("You can't junk stuff when you have a hot potato!\n\r", vict);
       return eSUCCESS;
    }
-   if(cmd == 87 || cmd == 88) {
+   if(cmd == 93) {
+      send_to_char("You can't 'put' stuff when you have a hot potato!\n\r", vict);
+      return eSUCCESS;
+   }
+
+   if(cmd == 88) {
       // make sure vict for GIVE/SLIP is a pc
       char obj[MAX_INPUT_LENGTH];
       char target[MAX_INPUT_LENGTH];
@@ -2206,6 +2215,13 @@ int hot_potato(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
            "Small pieces of $n and mashed potato splatter everywhere!!!\n\r"
            "$n has been KILLED!!"
             , vict, 0, 0, TO_ROOM, 0);
+
+       if(IS_MOB(vict)) {
+        act("$n gets back up.", vict, 0, 0, TO_ROOM, 0);
+        do_say(vict, "HA!  Fooled ya!", 9);
+        extract_obj(obj);
+        return eSUCCESS;
+       }
 
        GET_HIT(vict) = -1;
        update_pos(vict);
