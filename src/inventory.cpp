@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.19 2003/05/04 00:43:33 pirahna Exp $
+| $Id: inventory.cpp,v 1.20 2003/05/04 00:49:49 pirahna Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -460,7 +460,7 @@ int do_get(struct char_data *ch, char *argument, int cmd)
 	      obj_object = get_obj_in_list_vis(ch, arg1, sub_object->contains);
 	      if (obj_object) 
               {
-	        if ((IS_CARRYING_N(ch) + 1 < CAN_CARRY_N(ch)) &&
+	        if ((IS_CARRYING_N(ch) + 1 > CAN_CARRY_N(ch)) &&
                     !( GET_ITEM_TYPE(obj_object) == ITEM_MONEY && obj_object->item_number == -1 )
                    )
                 { 
