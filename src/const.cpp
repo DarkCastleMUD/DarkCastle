@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: const.cpp,v 1.17 2002/08/03 03:18:24 pirahna Exp $ */
+/* $Id: const.cpp,v 1.18 2002/08/03 04:21:37 pirahna Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1023,7 +1023,7 @@ struct class_skill_defines p_skills[] = {
 {    "heal",		SPELL_HEAL,		30,	90,	10006,	NULL },
 {    "protection from evil", SPELL_PROTECT_FROM_EVIL,	33,	90,	10006,	NULL },
 {    "harm",		SPELL_HARM,		35,	90,	10006,	NULL },
-{    "dispel evil",	SPELL_DISPEL_EVIL,	40,	90,10006,	NULL },
+{    "dispel evil",	SPELL_DISPEL_EVIL,	40,	90,	10006,	NULL },
 {    "sanctuary",	SPELL_SANCTUARY,	45,	90,	10006,	NULL },
 {    "power harm",	SPELL_POWER_HARM,	48,	90,	10006,	NULL },
 {    "\n",		0,			2,	0,	0,	NULL}
@@ -1031,8 +1031,8 @@ struct class_skill_defines p_skills[] = {
 
 
 struct class_skill_defines b_skills[] = {
-{    "dual wield",      SKILL_DUAL_WIELD,       1,      75,     -2, 	"You have to go see Mooral the barbarian guildmaster." },
-{    "kick",  		SKILL_KICK,		2,	75,	-2,	"Only the king of lobsters can teach you this."  },
+{    "dual wield",      SKILL_DUAL_WIELD,       1,      75,     10007, 	"You have to go see Mooral the barbarian guildmaster." },
+{    "kick",  		SKILL_KICK,		2,	75,	10007,	"Only the king of lobsters can teach you this."  },
 {    "bash",		SKILL_BASH,		3,	75,	-2, 	"You must find a local warrior.  He said something about a field filled with bees." },
 {    "parry",		SKILL_PARRY,		5,	40,	-2, 	"You must see the constable of Newtonia to learn parry." },
 {    "dodge",		SKILL_DODGE,		7,	10,	-2, 	"Hop like a bunny, quick like a bee, this location is so funny, you'll go wee wee wee.  Don't forget to bring your scythe however." },
@@ -1043,7 +1043,7 @@ struct class_skill_defines b_skills[] = {
 {    "rage",		SKILL_RAGE,		20,	80,	-2, 	"A fierceful force of elementals is who you seek." },
 {    "triple",		SKILL_THIRD_ATTACK,	25,	70,	-2, 	"Only a palace chef could move his blades so fast." },
 {    "battlecry",	SKILL_BATTLECRY,	27,	75,	-2, 	"Ahh! You must seek out the bravest barbarian of them all, a mortal god of the norse he is." },
-{    "blindfighting",   SKILL_BLINDFIGHTING,    28,     50,-2, "Only on the astral planes can you find what you seek."},
+{    "blindfighting",   SKILL_BLINDFIGHTING,    28,     50,	-2,	"Only on the astral planes can you find what you seek."},
 {    "headbutt",	SKILL_SHOCK,		30,	75,	-2, 	"A queen of the light holds the knowledge within her tiny skull." },
 {    "berserk",		SKILL_BERSERK,		40,	90,	-2, 	"A being of pure rage who lives in a tower, he is a overgrown lizard with a forked tongue." },
 {    "\n",		0,			1,	0,	0, 	NULL}
@@ -1135,8 +1135,10 @@ struct class_skill_defines u_skills[] = { // druid skills
 {    "dodge",		SKILL_DODGE,		7,	5,	-2, 	NULL},
 {    "dual wield",      SKILL_DUAL_WIELD,       11,      40, -2, "Dunna naanna nunna nanna BATMAN!!!" },
 {    "eyes of the owl",	SPELL_EYES_OF_THE_OWL,	1,	90,	3203,	NULL },
+{    "blue bird",	SPELL_BLUE_BIRD,	2,	90,	3202,	NULL },
 {    "cure light",	SPELL_CURE_LIGHT,	3,	90,	3203,	NULL },
 {    "cure serious",	SPELL_CURE_SERIOUS,	6,	90,	3203,	NULL },
+{    "remove poison",	SPELL_REMOVE_POISON,	9,	90,	3203,	NULL },
 {    "cure critic",	SPELL_CURE_CRITIC,	10,	90,	3203,	NULL },
 {    "control weather",	SPELL_CONTROL_WEATHER,	13,	90,	3203,	NULL },
 {    "sun ray",		SPELL_SUN_RAY,		14,	90,	3203,	NULL },

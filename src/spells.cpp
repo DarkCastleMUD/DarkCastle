@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.12 2002/08/03 01:34:41 pirahna Exp $ */
+/* $Id: spells.cpp,v 1.13 2002/08/03 04:21:38 pirahna Exp $ */
 
 extern "C"
 {
@@ -604,6 +604,10 @@ struct spell_info_type spell_info [ ] =
 
     { // 133
 	12, POSITION_STANDING, 50, TAR_CHAR_ROOM, cast_lightning_shield
+    },
+
+    { // 134
+	12, POSITION_FIGHTING, 50, TAR_CHAR_ROOM|TAR_FIGHT_VICT, cast_blue_bird
     }
 
 };
@@ -803,6 +807,7 @@ char *spells[]=
    "haste other",
    "ice shards",
    "lightning shield",
+   "blue bird",
    "\n"
 };
 

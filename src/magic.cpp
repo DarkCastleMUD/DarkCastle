@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.10 2002/08/03 01:34:41 pirahna Exp $ */
+/* $Id: magic.cpp,v 1.11 2002/08/03 04:21:37 pirahna Exp $ */
 
 extern "C"
 {
@@ -8593,3 +8593,60 @@ int cast_lightning_shield( byte level, CHAR_DATA *ch, char *arg, int type, CHAR_
 }
 
 
+int spell_blue_bird(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
+{
+  int dam;
+  int count;
+  int retval = eSUCCESS;
+
+  set_cantquit( ch, victim );
+  switch(world[ch->in_room].sector_type) {
+
+     case SECT_SWAMP:
+     case SECT_FOREST:    count = 3;   break;
+
+     case SECT_HILLS:
+     case SECT_MOUNTAIN:
+     case SECT_WATER_SWIM:
+     case SECT_WATER_NOSWIM:
+     case SECT_BEACH:     count = 2;   break;
+     
+     case SECT_UNDERWATER:
+        send_to_char("But you're underwater!  Your poor birdie would drown:(\r\n", ch);
+        return eFAILURE;
+
+     default:             count = 1;   break;
+
+  }
+  
+  while(!SOMEONE_DIED(retval) && count--) {
+     dam = number(1, GET_LEVEL(ch) + 1);
+     retval = damage(ch, victim, dam, TYPE_PHYSICAL_MAGIC, SPELL_BLUE_BIRD, 0);
+  }
+
+  return retval;
+}
+
+int cast_blue_bird( byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill)
+{
+  switch (type)
+  {
+    case SPELL_TYPE_SPELL:
+       return spell_blue_bird(level, ch, tar_ch, 0, skill);
+       break;
+    case SPELL_TYPE_SCROLL:
+       if(tar_obj)
+          return eFAILURE;
+       if(!tar_ch) tar_ch = ch;
+          return spell_blue_bird(level, ch, tar_ch, 0, skill);
+       break;
+    case SPELL_TYPE_STAFF:   
+       for (tar_ch = world[ch->in_room].people ; tar_ch ; tar_ch = tar_ch->next_in_room)
+          spell_blue_bird(level,ch,tar_ch,0, skill);
+       break;
+    default :
+       log("Serious screw-up in blue_bird!", ANGEL, LOG_BUG);
+       break;
+  }
+  return eFAILURE;
+}
