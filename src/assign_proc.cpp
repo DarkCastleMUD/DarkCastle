@@ -521,6 +521,7 @@ void assign_objects(void)
   SPEC_FUN generic_weapon_combat;
   SPEC_FUN TOHS_locator;
   SPEC_FUN stupid_message;
+  SPEC_FUN goldenbatleth;
 
   assign_one_obj_non(9,  phish_locator);	
   assign_one_obj_non(13,  board); /* Quest Board */
@@ -582,6 +583,7 @@ void assign_objects(void)
   assign_one_obj_com(9520,   dk_rend);
   assign_one_obj_com(30627,  eliara_combat);  
   assign_one_obj_com(10000,  holyavenger);
+  assign_one_obj_com(26807,  goldenbatleth);
   assign_one_obj_com(16903,  generic_weapon_combat);
 
 //  assign_one_obj_com(22732,  drainingstaff);

@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.7 2002/07/16 20:51:56 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.8 2002/07/17 15:44:03 pirahna Exp $ */
 
 extern "C"
 {
@@ -2121,6 +2121,100 @@ void make_head(CHAR_DATA * ch)
    corpse->description = str_hsh(buf);
    
    sprintf(buf, "Head of %s",
+	    (IS_NPC(ch) ? ch->short_desc : GET_NAME(ch)));
+   corpse->short_description = str_hsh(buf);
+   
+   
+   corpse->obj_flags.type_flag = ITEM_TRASH;
+   corpse->obj_flags.wear_flags = ITEM_TAKE + ITEM_HOLD;
+   corpse->obj_flags.value[0] = 0;	/* You can't store stuff in a corpse */
+   corpse->obj_flags.value[3] = 1;	/* corpse identifyer */
+   corpse->obj_flags.weight = 5;
+   corpse->obj_flags.eq_level = 0;
+   if (IS_NPC(ch))
+   {
+     corpse->obj_flags.more_flags = 0;
+     corpse->obj_flags.timer = MAX_NPC_CORPSE_TIME;
+   }
+   else
+   {
+     corpse->obj_flags.more_flags = 0;
+     corpse->obj_flags.timer = MAX_PC_CORPSE_TIME;
+   }
+   
+   obj_to_room(corpse, ch->in_room);
+   
+   return;
+}
+
+void make_arm(CHAR_DATA * ch)
+{
+  struct obj_data *corpse;
+  char buf[MAX_STRING_LENGTH];
+  
+#ifdef LEAK_CHECK
+  corpse = (struct obj_data *)calloc(1, sizeof(struct obj_data));
+#else
+  corpse = (struct obj_data *)dc_alloc(1, sizeof(struct obj_data));
+#endif
+  clear_object(corpse);
+  
+  corpse->item_number = NOWHERE;
+  corpse->in_room = NOWHERE;
+  corpse->name = str_hsh("arm");
+  
+   sprintf(buf, "The arm of %s is lying here.",
+	    (IS_NPC(ch) ? ch->short_desc : GET_NAME(ch)));
+   corpse->description = str_hsh(buf);
+   
+   sprintf(buf, "Arm of %s",
+	    (IS_NPC(ch) ? ch->short_desc : GET_NAME(ch)));
+   corpse->short_description = str_hsh(buf);
+   
+   
+   corpse->obj_flags.type_flag = ITEM_TRASH;
+   corpse->obj_flags.wear_flags = ITEM_TAKE + ITEM_HOLD;
+   corpse->obj_flags.value[0] = 0;	/* You can't store stuff in a corpse */
+   corpse->obj_flags.value[3] = 1;	/* corpse identifyer */
+   corpse->obj_flags.weight = 5;
+   corpse->obj_flags.eq_level = 0;
+   if (IS_NPC(ch))
+   {
+     corpse->obj_flags.more_flags = 0;
+     corpse->obj_flags.timer = MAX_NPC_CORPSE_TIME;
+   }
+   else
+   {
+     corpse->obj_flags.more_flags = 0;
+     corpse->obj_flags.timer = MAX_PC_CORPSE_TIME;
+   }
+   
+   obj_to_room(corpse, ch->in_room);
+   
+   return;
+}
+
+void make_leg(CHAR_DATA * ch)
+{
+  struct obj_data *corpse;
+  char buf[MAX_STRING_LENGTH];
+  
+#ifdef LEAK_CHECK
+  corpse = (struct obj_data *)calloc(1, sizeof(struct obj_data));
+#else
+  corpse = (struct obj_data *)dc_alloc(1, sizeof(struct obj_data));
+#endif
+  clear_object(corpse);
+  
+  corpse->item_number = NOWHERE;
+  corpse->in_room = NOWHERE;
+  corpse->name = str_hsh("leg");
+  
+   sprintf(buf, "The leg of %s is lying here.",
+	    (IS_NPC(ch) ? ch->short_desc : GET_NAME(ch)));
+   corpse->description = str_hsh(buf);
+   
+   sprintf(buf, "Leg of %s",
 	    (IS_NPC(ch) ? ch->short_desc : GET_NAME(ch)));
    corpse->short_description = str_hsh(buf);
    

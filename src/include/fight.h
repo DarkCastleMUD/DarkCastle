@@ -2,7 +2,7 @@
 #define FIGHT_H_
 
 /************************************************************************
-| $Id: fight.h,v 1.3 2002/07/07 06:59:43 pirahna Exp $
+| $Id: fight.h,v 1.4 2002/07/17 15:44:06 pirahna Exp $
 | fight.h
 | This file defines the header information for fight.
 */
@@ -37,6 +37,8 @@ extern CHAR_DATA *character_list;
 void make_husk(CHAR_DATA *ch);
 void make_heart(CHAR_DATA *ch, CHAR_DATA *vict);
 void make_head(CHAR_DATA *ch);
+void make_arm(CHAR_DATA *ch);
+void make_leg(CHAR_DATA *ch);
 void make_scraps(CHAR_DATA *ch, struct obj_data *obj);
 void remove_memory(CHAR_DATA *ch, char type);
 void add_memory(CHAR_DATA *ch, char *victim, char type);
