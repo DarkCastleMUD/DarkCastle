@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.54 2004/05/28 02:28:01 urizen Exp $ */
+/* $Id: mob_proc.cpp,v 1.55 2004/05/28 18:35:14 pirahna Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -3006,7 +3006,13 @@ static char *dethSayText [ ] =
   "Philosophy SUCKS!",
   "Dyslexics of the world, UNTIE!",
   "I love Swedes and Canadians...my puny American ways are insignificant when compared to the power of Moose and Meatballs!",
-  "I got fired from work trying to find this amulet of Yendor, and I finally have it. Now what?"
+  "I got fired from work trying to find this amulet of Yendor, and I finally have it. Now what?",
+  "People who gives blowjobs are fucked in the head.",
+  "What's difference between Michael Jackson and acne? Acne waits till 13 to come on your face.",
+  "I put racing strips on my computer.  Makes me feel like it goes faster.",
+  "What happened to sex, drugs, and rock'n'roll.  Now we have AIDS, crack, and techno.",
+  "It's a good thing Microsoft isn't in the condom busines.",
+  "Whenever I clean my glasses, my monitor becomes dirty as hell."
 };
 
 #define DETH_SAY_TEXT_SIZE    ( sizeof ( dethSayText )    / sizeof ( char * ) )
