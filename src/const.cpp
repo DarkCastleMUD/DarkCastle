@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: const.cpp,v 1.19 2002/08/03 06:29:58 pirahna Exp $ */
+/* $Id: const.cpp,v 1.20 2002/08/03 06:30:40 dcastle Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1135,7 +1135,7 @@ struct class_skill_defines u_skills[] = { // druid skills
 {    "dodge",		SKILL_DODGE,		7,	5,	-2, 	NULL},
 {    "dual wield",      SKILL_DUAL_WIELD,       11,      40, -2, "Dunna naanna nunna nanna BATMAN!!!" },
 {    "eyes of the owl",	SPELL_EYES_OF_THE_OWL,	1,	90,	3203,	NULL },
-{    "blue bird",	SPELL_BLUE_BIRD,	2,	90,	3202,	NULL },
+{    "blue bird",	SPELL_BLUE_BIRD,	2,	90,	3203,	NULL },
 {    "cure light",	SPELL_CURE_LIGHT,	3,	90,	3203,	NULL },
 {    "cure serious",	SPELL_CURE_SERIOUS,	6,	90,	3203,	NULL },
 {    "remove poison",	SPELL_REMOVE_POISON,	9,	90,	3203,	NULL },
