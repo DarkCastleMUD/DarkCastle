@@ -975,6 +975,24 @@ int determine_attack_type(char * attacktype)
     return 0;
 }
 
+int do_mpsettemp(CHAR_DATA *ch, char *argument, int cmd)
+{
+  char arg[MAX_INPUT_LENGTH];
+  char temp[MAX_INPUT_LENGTH];
+  CHAR_DATA *victim;
+  if (!IS_NPC(ch)) {
+    send_to_char("Huh?\r\n",ch);
+    return eFAILURE;
+  }
+  half_chop(argument, arg, temp);
+  victim = get_char_room( arg, ch->in_room );
+  if (!victim) return eFAILURE;
+  if (victim->tempVariable) 
+     dc_free(victim->tempVariable);
+  victim->tempVariable = str_dup(temp);
+  return eSUCCESS;
+}
+
 int do_mpdamage( CHAR_DATA *ch, char *argument, int cmd )
 {
     char arg[ MAX_INPUT_LENGTH ];

@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.h,v 1.24 2004/04/23 12:43:02 urizen Exp $ */
+/* $Id: interp.h,v 1.25 2004/04/25 13:01:35 urizen Exp $ */
 
 #ifndef INTERP_H_
 #define INTERP_H_
@@ -211,6 +211,7 @@ DO_FUN( do_mpmload      );
 DO_FUN( do_mpoload      );
 DO_FUN( do_mppurge      );
 DO_FUN( do_mpteachskill );
+DO_FUN( do_mpsettemp);
 DO_FUN( do_mpthrow      );
 DO_FUN( do_mptransfer   );
 DO_FUN( do_mpxpreward   );

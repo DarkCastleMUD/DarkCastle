@@ -1,7 +1,7 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.15 2004/04/24 15:45:03 urizen Exp $
+| $Id: character.h,v 1.16 2004/04/25 13:01:35 urizen Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
@@ -342,6 +342,7 @@ struct char_data
                                        timer to check for WAIT_STATE */
 
     struct timer_data *timerAttached;
+    char *tempVariable; // Mprogs get one now.
 };
 
 

@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.45 2004/04/25 02:38:25 urizen Exp $ */
+/* $Id: db.cpp,v 1.46 2004/04/25 13:01:33 urizen Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -442,7 +442,7 @@ void load_skillquests()
 
      newsq->num = i;
      newsq->message = fread_string(fl,0);
-     newsq->clas = fread_int(fl,0, 30);
+     newsq->clas = fread_int(fl,0, INT_MAX);
      newsq->level = fread_int(fl,0,200);
      newsq->next = 0;
 
@@ -2284,8 +2284,8 @@ CHAR_DATA *read_mobile(int nr, FILE *fl)
 
     /* *** Numeric data *** */
     mob->mobdata->actflags = fread_bitvector (fl, LONG_MIN, LONG_MAX);
-    if (IS_SET(mob->mobdata->actflags, NOTRACK))
-       REMOVE_BIT(mob->mobdata->actflags, NOTRAC);
+    if (IS_SET(mob->mobdata->actflags, ACT_NOTRACK))
+       REMOVE_BIT(mob->mobdata->actflags, ACT_NOTRACK);
     SET_BIT(mob->misc, MISC_IS_MOB);
 
     mob->affected_by = fread_bitvector (fl, LONG_MIN, LONG_MAX);
@@ -3895,6 +3895,8 @@ void free_char( CHAR_DATA *ch )
   struct char_player_alias * next;
   MPROG_ACT_LIST * currmprog;
 
+  if (ch->tempVariable)
+    dc_free(ch->tempVariable);
   if(!IS_NPC(ch)) {
     if(ch->name)
       dc_free(ch->name);
@@ -4101,6 +4103,7 @@ void clear_char(CHAR_DATA *ch)
 
   ch->in_room = NOWHERE;
   ch->position = POSITION_STANDING;
+  ch->tempVariable = NULL;
   GET_HOME(ch) = START_ROOM;
   GET_AC(ch) = 100; /* Basic Armor */
 }

@@ -172,7 +172,8 @@ bool str_infix( const char *astr, const char *bstr
  */
 int mprog_seval( char *lhs, char *opr, char *rhs )
 {
-
+ if (!lhs || !rhs)
+     return FALSE;
   if ( !str_cmp( opr, "==" ) )
     return ( !str_cmp( lhs, rhs ) );
   if ( !str_cmp( opr, "!=" ) )
@@ -952,6 +953,34 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
 	  return -1;
 	}
     }
+
+  if ( !str_cmp( buf, "tempvar" ) )
+    {
+      switch ( arg[1] )  /* arg should be "$*" so just get the letter */
+        {
+        case 'i': return mprog_seval( mob->tempVariable, opr, val );
+        case 'n': if ( actor )
+                    return mprog_seval( actor->tempVariable, opr, val );
+                  else
+                    return -1;
+        case 't': if ( vict )
+                    return mprog_seval( vict->tempVariable, opr, val );
+                  else
+                    return -1;
+        case 'r': if ( rndm )
+                    return mprog_seval( rndm->tempVariable, opr, val );
+                  else
+                    return -1;
+        case 'o': 
+                    return -1;
+        case 'p': 
+                    return -1;
+        default:
+          logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'tempvar'",mob_index[mob->mobdata->nr].virt );
+          return -1;
+        }
+    }
+
 
   if ( !str_cmp( buf, "name" ) )
     {
