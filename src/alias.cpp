@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: alias.cpp,v 1.2 2002/06/13 04:41:07 dcastle Exp $
+| $Id: alias.cpp,v 1.3 2002/10/01 03:55:29 pirahna Exp $
 | alias.C
 | Description:  Commands for the alias processor.
 */
@@ -47,7 +47,7 @@ int do_alias(struct char_data *ch, char *arg, int cmd)
       send_to_char(outbuf, ch);
     }
   } else {
-    if (strlen(arg) > 180) {
+    if (strlen(arg) > MAX_INPUT_LENGTH - 10) {
       send_to_char("That's a little to long for an alias. Try something shorter. \n\r", ch);
       return eSUCCESS;
     }
