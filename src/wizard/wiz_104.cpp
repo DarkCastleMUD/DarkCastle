@@ -133,7 +133,7 @@ int do_load(struct char_data *ch, char *arg, int cmd)
           send_to_char("No such mobile.\n\r", ch);
           return eFAILURE;
         }
-        if(GET_LEVEL(ch) < DEITY && !can_modify_mobile(ch, number)) {
+        if(GET_LEVEL(ch) < DEITY && !can_modify_mobile(ch, num)) {
           send_to_char("You may only load mobs inside of your range.\n\r", ch);
           return eFAILURE;
         } 
@@ -160,7 +160,7 @@ int do_load(struct char_data *ch, char *arg, int cmd)
           send_to_char("Why would you want to load that?\n\r", ch);
           return eFAILURE;
         }
-        if(GET_LEVEL(ch) < DEITY && !can_modify_object(ch, number)) {
+        if(GET_LEVEL(ch) < DEITY && !can_modify_object(ch, num)) {
           send_to_char("You may only load objects inside of your range.\n\r", ch);
           return eFAILURE;
         } 

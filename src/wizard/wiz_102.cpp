@@ -1636,9 +1636,10 @@ int do_oedit(struct char_data *ch, char *argument, int cmd)
       display_string_list(fields, ch);
       return eFAILURE;
     }
-
+    int itemvnum = -1;
     if(isdigit(*buf)) {
       item_num = atoi(buf);
+      itemvnum = item_num;
       if( ((item_num = real_object(item_num)) < 0) ||
           (item_num == 0 && *buf != '0')
         )
@@ -1662,12 +1663,12 @@ int do_oedit(struct char_data *ch, char *argument, int cmd)
       ch->pcdata->last_obj_edit = item_num;
     }
 
+  if (itemvnum == -1) itemvnum = obj_index[item_num].virt;
   if(!*buf3) // no field.  Stat the item.
     {
       obj_stat(ch, (obj_data *) obj_index[item_num].item);
       return eSUCCESS;
     }
-
 
 // MOVED
     for(x = 0 ;; x++)
@@ -1683,7 +1684,7 @@ int do_oedit(struct char_data *ch, char *argument, int cmd)
 
     // a this point, item_num is the index
     if (x!=18) // Checked in there
-    if(!can_modify_object(ch, item_num)) {
+    if(!can_modify_object(ch, itemvnum)) {
       send_to_char("You are unable to work creation outside of your range.\n\r", ch);
       return eFAILURE;
     }
@@ -2097,7 +2098,6 @@ int do_mpedit(struct char_data *ch, char *argument, int cmd)
     // buf = field
     // buf3 = args[0]
     // buf4 = args[1-+]
-  
     if(!*buf) {
       send_to_char("$3Syntax$R:  mpedit [mob_num] [field] [arg]\r\n"
                    "  Edit a field with no args for help on that field.\r\n\r\n"
@@ -2107,9 +2107,10 @@ int do_mpedit(struct char_data *ch, char *argument, int cmd)
       send_to_char(buf2, ch);
       return eFAILURE;
     }
-
+    int mobvnum = -1;
     if(isdigit(*buf)) {
       mob_num = atoi(buf);
+      mobvnum = mob_num;
       if( ((mob_num = real_mobile(mob_num)) < 0) ||
           (mob_num == 0 && *buf != '0')
         )
@@ -2127,8 +2128,9 @@ int do_mpedit(struct char_data *ch, char *argument, int cmd)
     }
 
     // a this point, mob_num is the index
+    if (mobvnum == -1) mobvnum = mob_index[mob_num].virt;
 
-    if(!can_modify_mobile(ch, mob_num)) {
+    if(!can_modify_mobile(ch, mobvnum)) {
       send_to_char("You are unable to work creation outside of your range.\n\r", ch);
       return eFAILURE;
     }
@@ -2469,9 +2471,10 @@ int do_medit(struct char_data *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
-
+   int mobvnum = -1;
     if(isdigit(*buf)) {
       mob_num = atoi(buf);  // there is no mob 0, so this is okay.  Bad 0's get caught in real_mobile
+	mobvnum = mob_num;
       if( ((mob_num = real_mobile(mob_num)) < 0))
       {
         send_to_char("Invalid mob number.\r\n", ch);
@@ -2501,6 +2504,7 @@ mob_index[mob_num].virt);
       return eSUCCESS;
     }
 
+    if (mobvnum == -1) mobvnum = mob_index[mob_num].virt;
  // MOVED
     for(x = 0 ;; x++)
     {
@@ -2516,7 +2520,7 @@ mob_index[mob_num].virt);
     // a this point, mob_num is the index
 
     if (x != 30) // Checked in there.
-      if(!can_modify_mobile(ch, mob_num)) {
+      if(!can_modify_mobile(ch, mobvnum)) {
         send_to_char("You are unable to work creation outside of your range.\n\r", ch);
         return eFAILURE;
       }
@@ -4407,7 +4411,7 @@ int do_punish(struct char_data *ch, char *arg, int cmd)
   if (i > 5) 
     i = 5;
 
-  if (GET_LEVEL(vict) >= GET_LEVEL(ch)) {
+  if (GET_LEVEL(vict) > GET_LEVEL(ch)) {
      act("$E might object to that.. better not.", ch, 0, vict, TO_CHAR, 0);
      return eFAILURE;
    }

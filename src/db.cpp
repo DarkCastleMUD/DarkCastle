@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.71 2004/07/03 11:44:12 urizen Exp $ */
+/* $Id: db.cpp,v 1.72 2004/07/17 18:57:25 urizen Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -63,6 +63,8 @@ extern int _filbuf(FILE *);
 char* curr_type;
 char* curr_name;
 int   curr_virtno;
+
+extern bool str_prefix(const char *astr, const char *bstr);
 
 /*  Sizes */
 
@@ -1519,19 +1521,28 @@ bool can_modify_room(char_data * ch, long room)
 bool can_modify_this_mobile(char_data * ch, long mob)
 {
   world_file_list_item * curr = mob_file_list;
-
   if(!GET_MOB_RANGE(ch))
     return 0;
 
-  while(curr && strcmp(curr->filename, GET_MOB_RANGE(ch)))
+  while(curr && strcmp(curr->filename,GET_MOB_RANGE(ch)))
     curr = curr->next;
-
+  
   if(!curr) {
     send_to_char("You have a non-existant range.  Tell an imp.\r\n", ch);
     return 0;
   }
+  world_file_list_item * curr2 = world_file_list;
+  while (curr2 && 
+(curr2->firstnum / 100 != mob_index[curr->firstnum].virt / 100) && 
+(mob_index[curr->lastnum].virt / 100 != curr2->lastnum))
+     curr2 = curr2->next;
 
-  if(mob >= curr->firstnum && mob <= curr->lastnum)
+  if (!curr2) {
+     send_to_char("Cannot find corresponding room range.\r\n",ch);
+     return 0;
+  }
+
+  if(mob >= curr2->firstnum && mob <= curr2->lastnum)
     return 1;
 
   return 0;
@@ -1555,7 +1566,7 @@ bool can_modify_mobile(char_data * ch, long mob)
       GET_MOB_RANGE(ch) = NULL;
    }
    for(world_file_list_item * curr = mob_file_list; curr; curr = curr->next)
-      if(mob >= curr->firstnum && mob <= curr->lastnum)
+      if(real_mobile(mob) >= curr->firstnum && real_mobile(mob) <= curr->lastnum)
       {
          GET_MOB_RANGE(ch) = str_dup(curr->filename);
          csendf(ch, "Range set to '%s'...\r\n", GET_MOB_RANGE(ch));
@@ -1577,15 +1588,25 @@ bool can_modify_this_object(char_data * ch, long obj)
   if(!GET_OBJ_RANGE(ch))
     return 0;
 
-  while(curr && strcmp(curr->filename, GET_OBJ_RANGE(ch)))
+  while(curr && strcmp(GET_OBJ_RANGE(ch), curr->filename))
     curr = curr->next;
 
   if(!curr) {
     send_to_char("You have a non-existant range.  Tell an imp.\r\n", ch);
     return 0;
   }
+  world_file_list_item * curr2 = world_file_list;
+  while (curr2 &&
+(curr2->firstnum / 100 != obj_index[curr->firstnum].virt / 100) &&
+(obj_index[curr->lastnum].virt / 100 != curr2->lastnum))
+     curr2 = curr2->next;
 
-  if(obj >= curr->firstnum && obj <= curr->lastnum)
+  if (!curr2) {
+     send_to_char("Cannot find corresponding room range.\r\n",ch);
+     return 0;
+  }
+
+  if (obj>= curr2->firstnum && obj <= curr2->lastnum)
     return 1;
 
   return 0;
@@ -1609,7 +1630,7 @@ bool can_modify_object(char_data * ch, long obj)
       GET_OBJ_RANGE(ch) = NULL;
    }
    for(world_file_list_item * curr = obj_file_list; curr; curr = curr->next)
-      if(obj >= curr->firstnum && obj <= curr->lastnum)
+      if(real_object(obj) >= curr->firstnum && real_object(obj) <= curr->lastnum)
       {
          GET_OBJ_RANGE(ch) = str_dup(curr->filename);
          csendf(ch, "Range set to '%s'...\r\n", GET_OBJ_RANGE(ch));
@@ -4475,7 +4496,6 @@ int real_mobile(int virt)
         bot = mid + 1;
     }
 }
-
 
 
 /* returns the real number of the object with given virt number */
