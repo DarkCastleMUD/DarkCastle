@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.42 2004/05/06 21:01:24 urizen Exp $
+| $Id: guild.cpp,v 1.43 2004/05/07 07:04:36 urizen Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -248,7 +248,6 @@ int skills_guild(struct char_data *ch, char *arg, struct char_data *owner)
      {
 	mprog_driver(sq->message, owner, ch, NULL, NULL);
 	return eSUCCESS;
-     }
      }
    }
 //    if(skilllist[skillnumber].clue && mob_index[owner->mobdata->nr].virt 

@@ -947,7 +947,7 @@ int do_mpteachskill( CHAR_DATA *ch, char *argument, int cmd )
 
     send_to_char(skill, victim);
 
-/*    if(learn_skill(victim, skillnum, 1, 1)) {
+    learn_skill(victim, skillnum, 1, 1);/*
     // TEMP until borodin is happy
         char_data * boro = get_char("Borodin");
         if(boro) {
@@ -955,7 +955,7 @@ int do_mpteachskill( CHAR_DATA *ch, char *argument, int cmd )
           send_to_char(skill, boro);
         }
     }*/
-    sprintf(skill,"$n has learned the basics of %s.",skillname);
+    sprintf(skill,"$N has learned the basics of %s.",skillname);
     act(skill, ch, 0, victim, TO_ROOM, NOTVICT);
 
     return eSUCCESS;
