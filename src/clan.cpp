@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.9 2003/01/02 06:16:04 pirahna Exp $ */
+/* $Id: clan.cpp,v 1.10 2003/01/03 03:31:03 pirahna Exp $ */
 extern "C"
 {
   #include <string.h> // strcat
@@ -52,6 +52,7 @@ char * clan_rights[] = {
    "info",
    "\n"
 };
+
 
 void boot_clans(void)
 {
@@ -572,6 +573,7 @@ void message_to_clan(char_data *ch, char buf[])
     ansi_color (GREY, pch);
   }
 }
+
 void clan_death (char_data *ch, char_data *killer)
 {
   if (!ch || ch->clan == 0) return;
@@ -899,7 +901,7 @@ int clan_desc(CHAR_DATA *ch, char *arg)
 
   if(strcmp(text, "change"))
   {
-    sprintf(buf, "Syntax:  clans description change\r\n\r\nCurrent description: %s\r\n",
+    sprintf(buf, "$3Syntax$R:  clans description change\r\n\r\nCurrent description: %s\r\n",
             clan->description ? clan->description : "(No Description)");
     send_to_char(buf, ch);
     send_to_char("To not have any description use:  clans description delete\r\n", ch);
@@ -939,7 +941,7 @@ int clan_motd(CHAR_DATA *ch, char *arg)
 
   if(strcmp(text, "change"))
   {
-    sprintf(buf, "Syntax:  clans motd change\r\n\r\nCurrent motd: %s\r\n",
+    sprintf(buf, "$3Syntax$R:  clans motd change\r\n\r\nCurrent motd: %s\r\n",
             clan->clanmotd ? clan->clanmotd : "(No Motd)");
     send_to_char(buf, ch);
     send_to_char("To not have any motd use:  clans motd delete\r\n", ch);
@@ -967,7 +969,7 @@ int clan_death_message(CHAR_DATA *ch, char *arg)
   clan = get_clan(ch);
   if(!*arg)
   {
-    sprintf(buf, "Syntax:  clans death <new message>\r\n\r\nCurrent message: %s\r\n", 
+    sprintf(buf, "$3Syntax$R:  clans death <new message>\r\n\r\nCurrent message: %s\r\n", 
                  clan->death_message);
     send_to_char(buf, ch);
     send_to_char("To not have any message use:  clans death delete\r\n", ch);
@@ -1035,7 +1037,7 @@ int clan_logout_message(CHAR_DATA *ch, char *arg)
   clan = get_clan(ch);
   if(!*arg)
   {
-    sprintf(buf, "Syntax:  clans logout <new message>\r\n\r\nCurrent message: %s\r\n", 
+    sprintf(buf, "$3Syntax$R:  clans logout <new message>\r\n\r\nCurrent message: %s\r\n", 
                  clan->logout_message);
     send_to_char(buf, ch);
     send_to_char("To not have any message use:  clans logout delete\r\n", ch);
@@ -1091,7 +1093,7 @@ int clan_login_message(CHAR_DATA *ch, char *arg)
   clan = get_clan(ch);
   if(!*arg)
   {
-    sprintf(buf, "Syntax:  clans login <new message>\r\n\r\nCurrent message: %s\r\n", 
+    sprintf(buf, "$3Syntax$R:  clans login <new message>\r\n\r\nCurrent message: %s\r\n", 
                  clan->login_message);
     send_to_char(buf, ch);
     send_to_char("To not have any message use:  clans login delete\r\n", ch);
@@ -1149,7 +1151,7 @@ int clan_email(CHAR_DATA *ch, char *arg)
   arg = one_argumentnolow(arg, text);
   if(!*text)
   {
-    sprintf(buf, "Syntax:  clans email <new address>\r\n\r\nCurrent address: %s\r\n", clan->email);
+    sprintf(buf, "$3Syntax$R:  clans email <new address>\r\n\r\nCurrent address: %s\r\n", clan->email);
     send_to_char(buf, ch);
     send_to_char("To not have any email use:  clans email delete\r\n", ch);
     return 0;
@@ -1292,7 +1294,7 @@ void do_clan_rights(CHAR_DATA * ch, char * arg)
   half_chop(arg, name, last);
 
   if(!*name) {
-    send_to_char("Syntax:  clan rights <member> [right]\n\r", ch);
+    send_to_char("$3Syntax$R:  clan rights <member> [right]\n\r", ch);
     return;
   }
 
@@ -1370,7 +1372,7 @@ void do_god_clans(CHAR_DATA *ch, char *arg, int cmd)
   arg = one_argumentnolow(arg, select);
 
   if(!*select) {
-    send_to_char("Usage: clans <field> <correct arguments>\r\n"
+    send_to_char("$3Syntax$R: clans <field> <correct arguments>\r\n"
                  "just clan <field> will give you the syntax for that field.\r\n"
                  "Fields are the following.\r\n"
                  , ch);
@@ -1403,7 +1405,7 @@ void do_god_clans(CHAR_DATA *ch, char *arg, int cmd)
       arg = one_argumentnolow(arg, text);
       arg = one_argumentnolow(arg, last);
       if(!*text || !*last) {
-        send_to_char("Syntax: clans create <clanname> <clannumber>\r\n", ch);
+        send_to_char("$3Syntax$R: clans create <clanname> <clannumber>\r\n", ch);
         return;
       }
       if(strlen(text) > 29) {
@@ -1433,7 +1435,7 @@ void do_god_clans(CHAR_DATA *ch, char *arg, int cmd)
       arg = one_argumentnolow(arg, text);
       arg = one_argumentnolow(arg, last);
       if(!*text || !*last) {
-        send_to_char("Syntax: clans rename <targetclannum> <newname>\r\n", ch);
+        send_to_char("$3Syntax$r: clans rename <targetclannum> <newname>\r\n", ch);
         return;
       }
       x = atoi(text);
@@ -1459,7 +1461,7 @@ void do_god_clans(CHAR_DATA *ch, char *arg, int cmd)
       arg = one_argumentnolow(arg, text);
       arg = one_argumentnolow(arg, last);
       if(!*text || !*last) {
-        send_to_char("Syntax: clans leader <clannumber> <leadername>\r\n", ch);
+        send_to_char("$3Syntax$R: clans leader <clannumber> <leadername>\r\n", ch);
         return;
       }
 
@@ -1485,7 +1487,7 @@ void do_god_clans(CHAR_DATA *ch, char *arg, int cmd)
       arg = one_argumentnolow(arg, text);
       one_argumentnolow(arg, last);
       if(!*text || !*last) {
-        send_to_char("Syntax: clans delete <clannumber> dElEtE\r\n", ch);
+        send_to_char("$3Syntax$R: clans delete <clannumber> dElEtE\r\n", ch);
         return;
       }
       if(!isname(last, "dElEtE")) {
@@ -1508,7 +1510,7 @@ void do_god_clans(CHAR_DATA *ch, char *arg, int cmd)
       arg = one_argumentnolow(arg, text);
       arg = one_argumentnolow(arg, last);
       if(!*text || !*last) {
-        send_to_char("Syntax: clans addroom <clannumber> <roomnumber>\r\n", ch);
+        send_to_char("$3Syntax$R: clans addroom <clannumber> <roomnumber>\r\n", ch);
         return;
       }
       x = atoi(text);
@@ -1552,7 +1554,7 @@ void do_god_clans(CHAR_DATA *ch, char *arg, int cmd)
     {
       arg = one_argumentnolow(arg, text);
       if(!*text) {
-        send_to_char("Syntax: clans showrooms <clannumber>\r\n", ch);
+        send_to_char("$3Syntax$R: clans showrooms <clannumber>\r\n", ch);
         return;
       }
       x = atoi(text);
@@ -1583,7 +1585,7 @@ void do_god_clans(CHAR_DATA *ch, char *arg, int cmd)
       arg = one_argumentnolow(arg, text);
       one_argumentnolow(arg, last);
       if(!*text || !*last) {
-        send_to_char("Syntax: clans killroom <clannumber> <roomnumber>\r\n", ch);
+        send_to_char("$3Syntax$R: clans killroom <clannumber> <roomnumber>\r\n", ch);
         return;
       }
       x = atoi(text);
@@ -1637,7 +1639,7 @@ void do_god_clans(CHAR_DATA *ch, char *arg, int cmd)
       one_argumentnolow(arg, last);
 
       if(!*text || !*last) {
-        send_to_char("Syntax: clans email <clannumber> <address>\r\n", ch);
+        send_to_char("$3Syntax$R: clans email <clannumber> <address>\r\n", ch);
         send_to_char("To not have any email use:  clans email <clannumber> delete\r\n", ch);
         return;
       }
@@ -1664,7 +1666,7 @@ void do_god_clans(CHAR_DATA *ch, char *arg, int cmd)
       one_argumentnolow(arg, last);
 
       if(!*text || !*last) {
-        send_to_char("Syntax: clans description <clannumber> change\r\n", ch);
+        send_to_char("$3Syntax$R: clans description <clannumber> change\r\n", ch);
         send_to_char("To not have any description use:  clans description <clannumber> delete\r\n", ch);
         return;
       }
@@ -1688,7 +1690,7 @@ void do_god_clans(CHAR_DATA *ch, char *arg, int cmd)
       half_chop(arg, text, last);
 
       if(!*text || !*last) {
-        send_to_char("Syntax: clans login <clannumber> <login message>\r\n", ch);
+        send_to_char("$3Syntax$R: clans login <clannumber> <login message>\r\n", ch);
         send_to_char("To not have any message use:  clans login <clannumber> delete\r\n", ch);
         return;
       }
@@ -1714,7 +1716,7 @@ void do_god_clans(CHAR_DATA *ch, char *arg, int cmd)
       half_chop(arg, text, last);
 
       if(!*text || !*last) {
-        send_to_char("Syntax: clans logout <clannumber> <logout message>\r\n", ch);
+        send_to_char("$3Syntax$R: clans logout <clannumber> <logout message>\r\n", ch);
         send_to_char("To not have any message use:  clans logout <clannumber> delete\r\n", ch);
         return;
       }
@@ -1738,7 +1740,7 @@ void do_god_clans(CHAR_DATA *ch, char *arg, int cmd)
       half_chop(arg, text, last);
 
       if(!*text || !*last) {
-        send_to_char("Syntax: clans death <clannumber> <death message>\r\n", ch);
+        send_to_char("$3Syntax$R: clans death <clannumber> <death message>\r\n", ch);
         send_to_char("To not have any message use:  clans death <clannumber> delete\r\n", ch);
         return;
       }
@@ -1762,7 +1764,7 @@ void do_god_clans(CHAR_DATA *ch, char *arg, int cmd)
       one_argument(arg, text);
 
       if(!*text) {
-        send_to_char("Syntax: clans members <clannumber>\r\n", ch);
+        send_to_char("$3Syntax$R: clans members <clannumber>\r\n", ch);
         return;
       }
 
@@ -1785,7 +1787,7 @@ void do_god_clans(CHAR_DATA *ch, char *arg, int cmd)
       half_chop(arg, text, last);
 
       if(!*text) {
-        send_to_char("Syntax: clans rights <clannumber>\r\n", ch);
+        send_to_char("$3Syntax$R: clans rights <clannumber>\r\n", ch);
         return;
       }
 
@@ -1809,7 +1811,7 @@ void do_god_clans(CHAR_DATA *ch, char *arg, int cmd)
       one_argumentnolow(arg, last);
 
       if(!*text || !*last) {
-        send_to_char("Syntax: clans motd <clannumber> change\r\n", ch);
+        send_to_char("$3Syntax$R: clans motd <clannumber> change\r\n", ch);
         send_to_char("To not have any motd use:  clans motd <clannumber> delete\r\n", ch);
         return;
       }
@@ -1863,6 +1865,7 @@ void do_leader_clans(CHAR_DATA *ch, char *arg, int cmd)
           "members", 
           "rights",
           "motd",
+          "help",
           "\n"
   };
 
@@ -1888,7 +1891,7 @@ void do_leader_clans(CHAR_DATA *ch, char *arg, int cmd)
   arg = one_argumentnolow(arg, select);
 
   if(!*select) {
-    send_to_char("Usage: clans <field> <correct arguments>\r\n"
+    send_to_char("$3Syntax$R: clans <field> <correct arguments>\r\n"
                  "just clan <field> will give you the syntax for that field.\r\n"
                  "Fields are the following.\r\n"
                  , ch);
@@ -1979,6 +1982,34 @@ void do_leader_clans(CHAR_DATA *ch, char *arg, int cmd)
         save_clans();
       break;
     }
+    case 9: // help
+    {
+      send_to_char("$3Command Help$R\r\n"
+                   "------------\r\n"
+                   " list    - Shows the clans list\r\n"
+                   " email   - Changes email listed in cinfo\r\n"
+                   " login   - Changes clan member login message\r\n"
+                   " logout  - Changes clan member logout message\r\n"
+                   " death   - Changes clan member death message\r\n"
+                   " members - Shows list of current clan members\r\n"
+                   " rights  - Shows/Changes clan members rights\r\n"
+                   " motd    - Changes clan message of the day\r\n"
+                   " help    - duh....\r\n"
+                   "\r\n"
+                   "$3Clan Members Rights$R\r\n"
+                   "-------------------\r\n"
+                   " accept  - Ability to accept people into clan\r\n"
+                   " outcast - Ability to outcast people from clan\r\n"
+                   " read    - Ability to read clan board\r\n"
+                   " write   - Ability to write on clan board\r\n"
+                   " remove  - Ability to remove clan board posts\r\n"
+                   " member  - Ability to view the clan member list\r\n"
+                   " rights  - Ability to modify other member's rights\r\n"
+                   " messages- Ability to modify clan login/out/death messages\r\n"
+                   " info    - Ability to modify clan email/description\r\n"
+                   , ch);
+      break; 
+    }
     default: {
       send_to_char("Default hit in clans switch statement.\r\n", ch);
       return;
@@ -2029,7 +2060,7 @@ int do_cinfo(CHAR_DATA *ch, char *arg, int cmd)
 
   if(!*arg)
   {
-    send_to_char("Usage:  cinfo <clannumber>\r\n", ch);
+    send_to_char("$3Syntax$R:  cinfo <clannumber>\r\n", ch);
     return eSUCCESS;
   }
 
