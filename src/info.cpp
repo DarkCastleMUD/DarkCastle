@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.10 2002/08/01 19:35:28 pirahna Exp $ */
+/* $Id: info.cpp,v 1.11 2002/08/01 20:47:52 dcastle Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -695,6 +695,7 @@ int do_look(struct char_data *ch, char *argument, int cmd)
       {
          send_to_char("It is pitch black...\n\r", ch);
          list_char_to_char(world[ch->in_room].people, ch, 0);
+         send_to_char("$R", ch);
       }
       else
       {
