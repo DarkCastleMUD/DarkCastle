@@ -14,7 +14,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.h,v 1.52 2004/05/20 15:07:36 urizen Exp $ */
+/* $Id: spells.h,v 1.53 2004/05/29 21:20:03 urizen Exp $ */
 #include <structs.h> // byte, sh_int
 
 #define MAX_BUF_LENGTH               240
@@ -455,6 +455,7 @@ struct spell_info_type
     ubyte	min_usesmana;		/* Mana used			*/
     sh_int	targets;		/* Legal targets		*/
     SPELL_FUN *	spell_pointer;		/* Function to call		*/
+    sh_int      difficulty; 		/* Spell difficulty */
 };
 
 
