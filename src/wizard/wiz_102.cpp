@@ -802,7 +802,7 @@ int do_zedit(struct char_data *ch, char *argument, int cmd)
       else {
         sprintf(buf, "'%s' invalid.  Enter 'true' or 'false'.\r\n", text);
         send_to_char(buf, ch);
-        break;
+        return eFAILURE;
       }
  
       sprintf(buf, "Zone %d's lifetime changed to %s.\r\n", zone, 
