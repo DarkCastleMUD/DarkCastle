@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.34 2002/08/05 20:37:21 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.35 2002/08/06 21:27:13 pirahna Exp $ */
 
 extern "C"
 {
@@ -3480,12 +3480,22 @@ int do_flee(struct char_data *ch, char *argument, int cmd)
           act("$n panics, and attempts to flee.", ch, 0, 0, TO_ROOM,
             INVIS_NULL);
           act("You panic, and attempt to flee.", ch, 0, 0, TO_CHAR, 0);
-          
+
           // The escape has succeded
-          if (!IS_SET((retval = do_simple_move(ch, attempt, FALSE)), eCH_DIED) &&
-               IS_SET(retval, eSUCCESS)) 
+          chTemp = ch->fighting;
+          ch->fighting = NULL;
+
+          char tempcommand[32];
+          extern char *dirs[];
+          strcpy(tempcommand, dirs[attempt]);
+          // we do this so that any spec procs overriding movement can take effect
+          retval = command_interpreter(ch, tempcommand);
+          if(IS_SET(retval, eCH_DIED))
+             return retval;
+
+          if (IS_SET(retval, eSUCCESS)) 
           {
-            // They got away.  Stop fighting for everyone not in room
+            // They got away.  Stop fighting for everyone not in the new room from fighting
             for (chTemp = combat_list; chTemp; chTemp = chTemp->next_fighting) 
             {
               
@@ -3496,8 +3506,8 @@ int do_flee(struct char_data *ch, char *argument, int cmd)
               }
             } // for
             
-            // If anyone in current room is fighting them, we're done
-            // otherwise keep going
+            // If anyone in current room is fighting them, we're done otherwise keep going
+            // Note this is support for later on if we have a skill for 'auto-following' flees
             for(loop_ch = world[ch->in_room].people; loop_ch; loop_ch = loop_ch->next_in_room)
               if(loop_ch->fighting == ch)
                 return 1;
@@ -3509,6 +3519,7 @@ int do_flee(struct char_data *ch, char *argument, int cmd)
           else {
             if (!IS_SET(retval, eCH_DIED)) 
               act("$n tries to flee, but is too exhausted!", ch, 0, 0, TO_ROOM, INVIS_NULL);
+            ch->fighting = chTemp; // set them back to fighting
             return retval;
           }
       } // if CAN_GO
