@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: mob_act.cpp,v 1.2 2002/06/13 04:41:08 dcastle Exp $ */
+/* $Id: mob_act.cpp,v 1.3 2002/07/12 00:12:32 pirahna Exp $ */
 
 extern "C"
 {
@@ -119,6 +119,9 @@ void mobile_activity(void)
     // These are done BEFORE checks for awake and stuff, so the proc needs
     // to check that stuff on it's own to make sure it doesn't do something 
     // silly.  This is to allow for mob procs to "wake" the mob and stuff
+    // It also means the mob has to check to make sure he's not already in
+    // combat for stuff he shouldn't be able to do while fighting:)
+    // And paralyze...
     if(mob_index[ch->mobdata->nr].non_combat_func) {
       retval = ((*mob_index[ch->mobdata->nr].non_combat_func) (ch, 0, 0, "", ch));
       if(!IS_SET(retval, eFAILURE))
@@ -184,22 +187,22 @@ void mobile_activity(void)
             default:
               break;
     }      
+    if(SOMEONE_DIED(retval))  // paranoia check in case someone screwed up
+       continue;              // and returned CH_DIED along with FAILURE
 
 // TODO - we might want to think about doing some spec procs that are called
 //     for certain races.  Ie, "snakes" all try to "bite" you, or horses kick, etc.    
 
-    /* That's all for busy monster */
     if(!AWAKE(ch))
       continue;
-    
-    if(IS_AFFECTED(ch, AFF_PARALYSIS))
+        if(IS_AFFECTED(ch, AFF_PARALYSIS))
       continue;
     
     done = 0;
 
 // TODO - Try to make the 'average' mob IQ higher
 
-    // Activate mprog random triggers if someone is in the zone
+    // Only activate mprog random triggers if someone is in the zone
     if(zone_table[world[ch->in_room].zone].players)
       retval = mprog_random_trigger( ch );
 
@@ -254,19 +257,14 @@ void mobile_activity(void)
             if(GET_OBJ_WEIGHT(obj) < 
               str_app[STRENGTH_APPLY_INDEX(ch)].wield_w) 
             {
-              if((obj->obj_flags.value[1] * obj->obj_flags.value[2]) >
-                (ch->mobdata->damnodice * ch->mobdata->damsizedice))  
+              if(!ch->equipment[WIELD]) 
               {
-                
-                if(!ch->equipment[WIELD]) 
-                {
-                  move_obj( obj, ch );
-                  act( "$n gets $p.", ch, obj, 0, TO_ROOM , 0);
-                  perform_wear(ch, obj, keyword);
-                  obj_from_char(obj);
-                  equip_char(ch, obj, WIELD);
-                  break;
-                }
+                move_obj( obj, ch );
+                act( "$n gets $p.", ch, obj, 0, TO_ROOM , 0);
+                perform_wear(ch, obj, keyword);
+                obj_from_char(obj);
+                equip_char(ch, obj, WIELD);
+                break;
               }
               /* damage check */
               if((ch->equipment[WIELD]) && (!ch->equipment[SECOND_WIELD])) 
@@ -517,8 +515,6 @@ void mobile_activity(void)
         } /* if keyword != -2 */ 
       } /* for obj */
     }
-    //if(world[ch->in_room].contents && mob_index[ch->nr].virt != 9999 &&
-    //number(0, 2) == 0)  ends at the bracket above
   
     // TODO - I believe this is second, so that we go through and pick up armor/weapons first
     // and then we pick up the best item and work our way down.  This makes sense but really 
@@ -559,7 +555,7 @@ void mobile_activity(void)
       && !IS_SET(world[EXIT(ch,door)->to_room].room_flags, NO_MOB)
       && ( IS_AFFECTED(ch, AFF_FLYING) ||
            !IS_SET(world[EXIT(ch,door)->to_room].room_flags, 
-                   FALL_UP | FALL_SOUTH | FALL_NORTH | FALL_EAST | FALL_WEST | FALL_DOWN)
+                   (FALL_UP | FALL_SOUTH | FALL_NORTH | FALL_EAST | FALL_WEST | FALL_DOWN))
          )
       && ( !IS_SET(ch->mobdata->actflags, ACT_STAY_ZONE) ||
            world[EXIT(ch, door)->to_room].zone == world[ch->in_room].zone
@@ -579,7 +575,7 @@ void mobile_activity(void)
     }
   
     // check hatred 
-    if((ch->mobdata->hatred != NULL) && (!ch->fighting)) 
+    if((ch->mobdata->hatred != NULL))    //  && (!ch->fighting)) (we check fighting earlier)
     {
       CHAR_DATA *next_blah;
     
@@ -594,7 +590,7 @@ void mobile_activity(void)
         if(!IS_MOB(tmp_ch) && IS_SET(tmp_ch->pcdata->toggles, PLR_NOHASSLE))
           continue;
       
-        if(!strcmp(GET_NAME(tmp_ch), ch->mobdata->hatred)) 
+        if(isname(GET_NAME(tmp_ch), ch->mobdata->hatred)) // use isname since hatred is a list
         {
           if( ( IS_AFFECTED(tmp_ch, AFF_PROTECT_EVIL) && IS_EVIL(ch) &&
                 ( GET_LEVEL(ch) <= ( GET_LEVEL(tmp_ch)+2) )
@@ -619,7 +615,7 @@ void mobile_activity(void)
       if(done)
         continue;
 
-      if(ch->mobdata->hatred && !ch->fighting) 
+      if(!ch->hunting && !IS_SET(ch->mobdata->actflags, ACT_STUPID)) 
       {
         add_memory(ch, get_random_hate(ch), 't');
         if(!IS_AFFECTED(ch, AFF_BLIND)) {
