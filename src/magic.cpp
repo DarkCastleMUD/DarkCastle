@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.23 2002/08/25 16:13:46 pirahna Exp $ */
+/* $Id: magic.cpp,v 1.24 2002/08/26 21:14:43 pirahna Exp $ */
 
 extern "C"
 {
@@ -4541,6 +4541,7 @@ int cast_heroes_feast( byte level, CHAR_DATA *ch, char *arg, int type,
 	 case SPELL_TYPE_SPELL:
 	 case SPELL_TYPE_STAFF:
 	 case SPELL_TYPE_SCROLL:
+         case SPELL_TYPE_POTION:
 		 return spell_heroes_feast(level, ch, 0, 0, skill);
 	  break;
 	 default :

@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.55 2002/08/26 20:50:31 dcastle Exp $ */
+/* $Id: fight.cpp,v 1.56 2002/08/26 21:14:43 pirahna Exp $ */
 
 extern "C"
 {
@@ -214,6 +214,7 @@ int attack(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
 {
   int do_say(struct char_data *ch, char *argument, int cmd);
   int result = 0;  
+  int chance;
   obj_data * wielded = 0;
   int handle_any_guard(char_data * ch);
 
@@ -289,8 +290,14 @@ int attack(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
     }
 
     if(IS_AFFECTED(ch, AFF_HASTE)) {
-      result = one_hit(ch, vict, type, FIRST);
-      if(SOMEONE_DIED(result))       return result;
+      if(affected_by_spell(ch, SPELL_HASTE))  // spell is 33%
+        chance = 33;
+      else chance = 66;                       // eq/bard is 66%
+      if(chance > number(1, 100))
+      {
+        result = one_hit(ch, vict, type, FIRST);
+        if(SOMEONE_DIED(result))       return result;
+      }
     }
 
     // lose an attack if using a shield
@@ -326,8 +333,14 @@ int attack(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
       if(SOMEONE_DIED(result))       return result;
     }
     if(IS_AFFECTED(ch, AFF_HASTE)) {
-      result = one_hit(ch, vict, type, FIRST);
-      if(SOMEONE_DIED(result))       return result;
+      if(affected_by_spell(ch, SPELL_HASTE))  // spell is 33%
+        chance = 33;
+      else chance = 66;                       // eq/bard is 66%
+      if(chance > number(1, 100))
+      {
+        result = one_hit(ch, vict, type, FIRST); 
+        if(SOMEONE_DIED(result))       return result;
+      }
     }
     // if(second_wield(ch) && gets_dual_wield_attack(ch)) {
     if(gets_dual_wield_attack(ch)) {
