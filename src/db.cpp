@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.38 2004/04/16 16:57:17 urizen Exp $ */
+/* $Id: db.cpp,v 1.39 2004/04/16 17:07:07 urizen Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -403,7 +403,7 @@ int do_write_skillquest(struct char_data *ch, char *argument, int cmd)
 {
    struct skill_quest *curr;
    FILE *fl;
-   if (!dc_fopen(SKILL_QUEST_FILE,"w"))
+   if (!(fl = dc_fopen(SKILL_QUEST_FILE,"w")))
    {
       if (ch)
         send_to_char("Can't open the skill quest file.\r\n",ch);
@@ -416,7 +416,7 @@ int do_write_skillquest(struct char_data *ch, char *argument, int cmd)
    }
    fprintf(fl,"0");
    dc_fclose(fl);
-   return eSUCCESS;
+   return eSUCCESS;	
 }
 
 void load_skillquests()
@@ -426,7 +426,7 @@ void load_skillquests()
   int i;
   FILE *fl;
 
-  if (!dc_fopen(SKILL_QUEST_FILE, "r"))
+  if (!(fl = dc_fopen(SKILL_QUEST_FILE, "r")))
   {
     log("Cannot open skill quest file.", 0, LOG_MISC);
     abort();
