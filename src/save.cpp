@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: save.cpp,v 1.11 2002/08/14 22:24:18 dcastle Exp $ */
+/* $Id: save.cpp,v 1.12 2002/08/16 18:03:26 pirahna Exp $ */
 
 extern "C"
 {
@@ -828,7 +828,7 @@ bool put_obj_in_store (struct obj_data *obj, CHAR_DATA *ch, FILE *fpsave, int we
   int    change;
   uint16 length;  // do not change this type
   struct obj_file_elem object;
-  int16 tmp_weight = 0;
+  int16 tmp_weight = 0; // do not change this type
 
   if (GET_ITEM_TYPE(obj) == ITEM_KEY)
     return TRUE;

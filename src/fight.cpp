@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.43 2002/08/16 18:02:44 dcastle Exp $ */
+/* $Id: fight.cpp,v 1.44 2002/08/16 18:03:26 pirahna Exp $ */
 
 extern "C"
 {
@@ -780,22 +780,6 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
 } // one_hit 
 
 
-
-
-//   Handles equipment damage...   was tired of modifying it in both
-//   procedures..  besides, kinda redundant having it in both anyhows....
-//   Eventually I will do the same for ISR code,and hopefully clean up
-//   fight.c some more.. :)     -Godflesh...
-
-// This code sucks!!
-// I just went through this to fix the gl lantern scrap thing,
-// and it had it all.  crash bugs, memory leaks, item corruptions,
-// it was and still is a gross piece of shit, although i fixed the
-// glaring problems.
-// -Sadus 8/23/96
-
-// It still sucks, but i'm working on it...-pir  02/16/01
-
 // pos of -1 means inventory
 void eq_destroyed(char_data * ch, obj_data * obj, int pos)
 {
@@ -817,6 +801,14 @@ void eq_destroyed(char_data * ch, obj_data * obj, int pos)
   else act("$p worn by $n is destroyed.", ch, obj, 0, TO_ROOM, 0);
 
   act("Your $p has been destroyed.", ch, obj, 0, TO_CHAR, 0);
+
+  while(obj->contains) // drop contents to floor
+  {
+    act("A $p falls to the ground from $n.", ch, obj->contains, 0, TO_ROOM, 0);
+    act("A $p falls to the ground from your destroyed container.", ch, obj->contains, 0, TO_CHAR, 0);
+    move_obj(obj->contains, ch->in_room);  // this updates obj->contains
+  }
+
   act("$p falls to the ground in scraps.", ch, obj, 0, TO_CHAR, 0);
   act("$p falls to the ground in scraps.", ch, obj, 0, TO_ROOM, 0);
   make_scraps(ch, obj);
