@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.cpp,v 1.3 2002/08/01 22:59:16 pirahna Exp $ */
+/* $Id: interp.cpp,v 1.4 2002/08/02 02:30:35 pirahna Exp $ */
 
 extern "C"
 {
@@ -189,18 +189,18 @@ struct command_info cmd_info[] =
     { "murder",     do_murder,      POSITION_FIGHTING,  5,  9,  COM_CHARMIE_OK },
     { "rescue",     do_rescue,      POSITION_FIGHTING,  0,  9,  0 },
     { "trip",       do_trip,        POSITION_FIGHTING,  0,  9,  0 },
-    { "deathstroke",do_deathstroke, POSITION_FIGHTING, 30,  9,  0 },
-    { "circle",     do_circle,      POSITION_FIGHTING, 30,  9,  0 },
+    { "deathstroke",do_deathstroke, POSITION_FIGHTING,  1,  9,  0 },
+    { "circle",     do_circle,      POSITION_FIGHTING,  1,  9,  0 },
     { "kick",       do_kick,        POSITION_FIGHTING,  0,  9,  0 },
     { "battlecry",  do_battlecry,   POSITION_FIGHTING,  1,  9,  0 },
     { "rage",       do_rage,        POSITION_FIGHTING,  1,  9,  0 },
     { "berserk",    do_berserk,     POSITION_FIGHTING,  1,  9,  0 },
-    { "stun",       do_stun,        POSITION_FIGHTING, 30,  9,  0 },
-    { "redirect",   do_redirect,    POSITION_FIGHTING,  1,  9,  0 },
-    { "hitall",     do_hitall,      POSITION_FIGHTING, 20,  9,  0 },
- { "quiveringpalm", do_quivering_palm, POSITION_FIGHTING, 40,  9,  0},
-    { "eagleclaw",  do_eagle_claw,  POSITION_FIGHTING, 20,  9,  0 },
-    { "headbutt",   do_headbutt,    POSITION_FIGHTING, 15,  9,  0 },
+    { "stun",       do_stun,        POSITION_FIGHTING, 1,  9,  0 },
+    { "redirect",   do_redirect,    POSITION_FIGHTING, 1,  9,  0 },
+    { "hitall",     do_hitall,      POSITION_FIGHTING, 1,  9,  0 },
+ { "quiveringpalm", do_quivering_palm, POSITION_FIGHTING, 1,  9,  0},
+    { "eagleclaw",  do_eagle_claw,  POSITION_FIGHTING, 1,  9,  0 },
+    { "headbutt",   do_headbutt,    POSITION_FIGHTING, 1,  9,  0 },
     { "fire",       do_fire,        POSITION_FIGHTING, 1,   9,  0 },
     { "layhands",   do_layhands,    POSITION_FIGHTING, 1,   9,  0 },
     { "harmtouch",  do_harmtouch,   POSITION_FIGHTING, 1,   9,  0 },

@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: save.cpp,v 1.5 2002/07/06 20:53:21 pirahna Exp $ */
+/* $Id: save.cpp,v 1.6 2002/08/02 02:30:35 pirahna Exp $ */
 
 extern "C"
 {
@@ -796,7 +796,7 @@ bool put_obj_in_store (struct obj_data *obj, CHAR_DATA *ch, FILE *fpsave, int we
   if(IS_SET(obj->obj_flags.extra_flags, ITEM_NOSAVE))
     return TRUE;
 
-  if (obj->item_number == NOWHERE)
+  if (obj->item_number < 0)
     return TRUE;
 
   // Set up items saved for all items
