@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.29 2002/08/03 15:29:28 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.30 2002/08/04 16:48:34 pirahna Exp $ */
 
 extern "C"
 {
@@ -2096,11 +2096,29 @@ void make_dust(CHAR_DATA * ch)
 }
 
 
+int alignment_value(int val)
+{
+  if(val >= 350)
+    return 1;
+  if(val <= -350)
+    return -1;
+  return 0;
+}
+
+// run through eq removing and rewearing is
+void zap_eq_check(char_data * ch)
+{
+  for(int i = 0; i < MAX_WEAR; i++)
+    if(ch->equipment[i])
+      equip_char(ch, unequip_char(ch, i), i);
+}
+
 // ch kills victim
 void change_alignment(CHAR_DATA *ch, CHAR_DATA *victim)
 {
+  int change = alignment_value(GET_ALIGNMENT(ch));
   int x = (abs(GET_ALIGNMENT(victim)) + 1000) / 100;
-  
+      
   x += ((GET_LEVEL(victim) - GET_LEVEL(ch)) / 5);  
   
   if(GET_ALIGNMENT(victim) >= 0)
@@ -2110,6 +2128,9 @@ void change_alignment(CHAR_DATA *ch, CHAR_DATA *victim)
   GET_ALIGNMENT(ch) += x;
   
   GET_ALIGNMENT(ch) = MIN(1000, MAX((-1000), GET_ALIGNMENT(ch)));  
+
+  if(change != alignment_value(GET_ALIGNMENT(ch)))
+    zap_eq_check(ch);
 }
 
 
@@ -2469,6 +2490,8 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
   
   if (GET_CLASS(victim) == CLASS_MONK)
     GET_AC(victim) -= (GET_LEVEL(victim) * 3);
+  if (IS_SET(ch->combat, COMBAT_BERSERK))
+    GET_AC(victim) -= 80;
   
   save_char_obj(victim);
   

@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: const.cpp,v 1.21 2002/08/03 06:43:49 dcastle Exp $ */
+/* $Id: const.cpp,v 1.22 2002/08/04 16:48:34 pirahna Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -53,6 +53,7 @@ bestowable_god_commands_type bestowable_god_commands[] =
 { "range",      COMMAND_RANGE },
 { "mpstat",     COMMAND_MPSTAT },
 { "pshopedit",  COMMAND_PSHOPEDIT },
+{ "sedit",	COMMAND_SEDIT },
 { "\n",		-1 }
 };
 

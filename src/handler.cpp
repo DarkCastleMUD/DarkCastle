@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.8 2002/08/03 15:29:28 pirahna Exp $ */
+/* $Id: handler.cpp,v 1.9 2002/08/04 16:48:34 pirahna Exp $ */
     
 extern "C"
 {
@@ -1088,10 +1088,10 @@ struct obj_data *unequip_char(CHAR_DATA *ch, int pos)
     }
 
     for(j=0; j<obj->num_affects; j++)
-	affect_modify(ch, obj->affected[j].location,
-	  obj->affected[j].modifier,
-	  0, FALSE);
+	affect_modify(ch, obj->affected[j].location, obj->affected[j].modifier, 0, FALSE);
 
+// TODO - make sure we actually need this affect_total.  It seems a little redundant for
+// me.  If we do need it, comment why.
     affect_total(ch);
 
     return(obj);

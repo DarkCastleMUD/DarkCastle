@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.7 2002/07/31 19:22:58 pirahna Exp $ */
+/* $Id: utility.cpp,v 1.8 2002/08/04 16:48:34 pirahna Exp $ */
 
 extern "C"
 {
@@ -491,7 +491,7 @@ int DARK_AMOUNT(int room)
      glow += 3;
 
    if(IS_SET(world[room].room_flags, DARK))
-     glow -= 10;
+     glow -= 5;
 
    if(weather_info.sunlight == SUN_DARK)
      glow -= 1;

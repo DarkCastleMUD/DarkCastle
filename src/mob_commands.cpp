@@ -923,9 +923,9 @@ int do_mpteachskill( CHAR_DATA *ch, char *argument, int cmd )
        return eFAILURE;
     }
 
-    class_skill_defines * skilllist = get_skill_list(ch);
+    class_skill_defines * skilllist = get_skill_list(victim);
     if(!skilllist) {
-      logf( IMMORTAL, LOG_WORLD, "Mpteachskill - ch had no skill list?");
+      logf( IMMORTAL, LOG_WORLD, "Mpteachskill - (%s) %s had no skill list?", GET_SHORT(ch), GET_NAME(victim));
       return eFAILURE;  // no skills to train
     }
 

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.12 2002/08/03 08:14:29 dcastle Exp $
+| $Id: guild.cpp,v 1.13 2002/08/04 16:48:34 pirahna Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -52,10 +52,16 @@ char *how_good(int percent)
 {
   if (percent == 0)
     return ( " (not learned)");
+  if (percent <= 5)
+    return ( " (horrible)");
   if (percent <= 10)
     return ( " (shitty)");
+  if (percent <= 15)
+    return ( " (bad)");
   if (percent <= 20)
     return ( " (crappy)");
+  if (percent <= 30)
+    return ( " (meager)");
   if (percent <= 40)
     return ( " (poor)");
   if (percent <= 55)

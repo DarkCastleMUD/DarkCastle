@@ -492,9 +492,10 @@ void init_game(int port, int port2, int port3)
   srand(time(0));
 #endif
 
+  FILE * fp;
   // create boot'ing lockfile
-  FILE * fp = fopen("died_in_bootup","w");
-  fclose(fp);
+  if((fp = fopen("died_in_bootup","w")))
+    fclose(fp);
 
   log("Attempting to load hotboot file.", 0, LOG_MISC);
   if(load_hotboot_descs()) {

@@ -982,6 +982,11 @@ int do_sedit(struct char_data *ch, char *argument, int cmd)
     "\n"
   };
 
+  if(!has_skill(ch, COMMAND_SEDIT)) {
+      send_to_char("Huh?\r\n", ch);
+      return eFAILURE;
+  }
+
   half_chop(argument, target, text);
   half_chop(text, select, text);
   // at this point target is the character's name

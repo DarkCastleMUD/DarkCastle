@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_barbarian.cpp,v 1.3 2002/07/28 02:04:19 pirahna Exp $
+| $Id: cl_barbarian.cpp,v 1.4 2002/08/04 16:48:37 pirahna Exp $
 | cl_barbarian.C
 | Description:  Commands for the barbarian class.
 */
@@ -248,7 +248,6 @@ int do_berserk(struct char_data *ch, char *argument, int cmd)
     act ("$n starts FOAMING at the mouth, and goes BERSERK on you!", ch, 0, victim, TO_VICT, 0);
     act ("$n starts FOAMING at the mouth, as $e goes BERSERK on $N!", ch, 0, victim, TO_ROOM, NOTVICT);
     bSuccess = 1;
-    GET_AC(ch) += 80;
   }
 
   if (bSuccess && !IS_SET(ch->combat, COMBAT_RAGE1))
@@ -267,8 +266,12 @@ int do_berserk(struct char_data *ch, char *argument, int cmd)
      
     // I set the berserk bit AFTER the attack, to reduce the advantage
     // a bit.
-    if (bSuccess)
+    if (bSuccess) {
        SET_BIT(ch->combat, COMBAT_BERSERK);
+       if(!IS_NPC(ch))
+          GET_AC(ch) += 80; // we do this here, so we know if someone dies with COMBAT_BERSERK to 
+                            // give them their AC back
+    }
   }
   return retval;
 }

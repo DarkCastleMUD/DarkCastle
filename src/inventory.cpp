@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.7 2002/08/03 15:29:28 pirahna Exp $
+| $Id: inventory.cpp,v 1.8 2002/08/04 16:48:34 pirahna Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -57,15 +57,20 @@ void get(struct char_data *ch, struct obj_data *obj_object,
 {
     char buffer[MAX_STRING_LENGTH];
 
-    if(IS_SET(obj_object->obj_flags.more_flags, ITEM_UNIQUE)) {
-      if(search_char_for_item(ch, obj_object->item_number)) {
-         send_to_char("The item's uniqueness prevents it!\r\n", ch);
+    if(!sub_object || sub_object->carried_by != ch) 
+    {
+      // we only have to check for uniqueness if the container is not on the character
+      // or if there is no container
+      if(IS_SET(obj_object->obj_flags.more_flags, ITEM_UNIQUE)) {
+        if(search_char_for_item(ch, obj_object->item_number)) {
+           send_to_char("The item's uniqueness prevents it!\r\n", ch);
+           return;
+        }
+      }
+      if(contents_cause_unique_problem(obj_object, ch)) {
+         send_to_char("Something inside the item is unique and prevents it!\r\n", ch);
          return;
       }
-    }
-    if(contents_cause_unique_problem(obj_object, ch)) {
-       send_to_char("Something inside the item is unique and prevents it!\r\n", ch);
-       return;
     }
 
     if (sub_object) {

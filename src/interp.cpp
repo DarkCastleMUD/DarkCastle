@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.cpp,v 1.7 2002/08/03 01:34:40 pirahna Exp $ */
+/* $Id: interp.cpp,v 1.8 2002/08/04 16:48:34 pirahna Exp $ */
 
 extern "C"
 {
@@ -315,7 +315,6 @@ struct command_info cmd_info[] =
     { "advance",    do_advance,      POSITION_DEAD,      IMP, 9,  0 },
 
     { "linkload",   do_linkload,     POSITION_DEAD,      OVERSEER, 9,  0 },
-    { "sedit",      do_sedit,        POSITION_DEAD,      OVERSEER, 9,  0 },
     { "zap",        do_zap,          POSITION_DEAD,      OVERSEER, 9,  0 },
     { "slay",       do_kill,         POSITION_DEAD,      OVERSEER, 9,  0 },
     { "rename",     do_rename_char,  POSITION_DEAD,      OVERSEER, 9,  0 },
@@ -351,6 +350,7 @@ struct command_info cmd_info[] =
     { "mpstat",     do_mpstat,       POSITION_DEAD,      GIFTED_COMMAND, 9,  0 },
     { "range",      do_range,        POSITION_DEAD,      GIFTED_COMMAND, 9,  0 },
     { "pshopedit",  do_pshopedit,    POSITION_DEAD,      GIFTED_COMMAND, 9,  0 },
+    { "sedit",      do_sedit,        POSITION_DEAD,      GIFTED_COMMAND, 9,  0 },
 
     { "bellow",     do_thunder,      POSITION_DEAD,      DEITY, 8,  0 },
     { "plats",      do_plats,        POSITION_DEAD,      DEITY, 9,  0 },
