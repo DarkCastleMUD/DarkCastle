@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_barbarian.cpp,v 1.4 2002/08/04 16:48:37 pirahna Exp $
+| $Id: cl_barbarian.cpp,v 1.5 2002/08/13 18:25:12 pirahna Exp $
 | cl_barbarian.C
 | Description:  Commands for the barbarian class.
 */
@@ -351,6 +351,7 @@ int do_headbutt(struct char_data *ch, char *argument, int cmd)
     if (IS_SET(victim->combat, COMBAT_BERSERK))
        REMOVE_BIT(victim->combat, COMBAT_BERSERK);
 
+    set_fighting(victim, ch);
     WAIT_STATE(ch, PULSE_VIOLENCE*4);
     WAIT_STATE(victim, PULSE_VIOLENCE*2);
     SET_BIT(victim->combat, COMBAT_SHOCKED);

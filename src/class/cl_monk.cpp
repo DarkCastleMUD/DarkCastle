@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_monk.cpp,v 1.4 2002/08/04 22:33:53 pirahna Exp $
+| $Id: cl_monk.cpp,v 1.5 2002/08/13 18:25:12 pirahna Exp $
 | cl_monk.C
 | Description:  Monk skills.
 */
@@ -229,12 +229,17 @@ int do_stun(struct char_data *ch, char *argument, int cmd)
   }
 
   // 101% is a complete failure
-  percent = number(1, 101) + (GET_LEVEL(victim) - GET_LEVEL(ch));
+  percent = number(1, 101);
 
   chance = 50;
   if(learned > 50)
     chance+= learned - 50;   // monks rangers get up to 60 skill
-
+  if( ( GET_LEVEL(ch) + 5 ) < GET_LEVEL(victim) )
+  {
+    if( ( chance - ( GET_LEVEL(ch) + 5 - GET_LEVEL(victim) ) ) < 1 )
+      chance = 1;
+    else chance -= GET_LEVEL(ch) + 5 - GET_LEVEL(victim);
+  } 
 
   if(percent > chance) {
     act("$n attempts to hit you in your solar plexus!  You block $s attempt.", ch, NULL, victim, TO_VICT , 0);
@@ -253,6 +258,7 @@ int do_stun(struct char_data *ch, char *argument, int cmd)
     act("You deliver a HARD BLOW into $N's solar plexus!  $N is STUNNED!", ch, NULL, victim, TO_CHAR , 0);
     act("$n delivers a HARD BLOW into $N's solar plexus!  $N is STUNNED!", ch, NULL, victim, TO_ROOM, NOTVICT );
 
+    set_fighting(victim, ch);
     WAIT_STATE(ch, PULSE_VIOLENCE*5);
     WAIT_STATE(victim, PULSE_VIOLENCE*2);
     if(GET_POS(victim) > POSITION_STUNNED)

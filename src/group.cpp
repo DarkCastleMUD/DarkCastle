@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: group.cpp,v 1.5 2002/07/18 17:48:13 pirahna Exp $
+| $Id: group.cpp,v 1.6 2002/08/13 18:25:08 pirahna Exp $
 | group.C
 | Description:  Group related commands; join, abandon, follow, etc..
 */
@@ -164,14 +164,16 @@ int do_split(CHAR_DATA *ch, char *argument, int cmd)
     k = ch->master;
   else k = ch;
 
-  if ( (!IS_AFFECTED(k, AFF_GROUP)) || (!IS_AFFECTED(ch, AFF_GROUP)) ||
-     (k->in_room != ch->in_room) )
+  if ( (!IS_AFFECTED(k, AFF_GROUP)) || (!IS_AFFECTED(ch, AFF_GROUP)))
   {
     send_to_char("You must be grouped to split your money!\n\r", ch);
     return eFAILURE;
   }
 
-  no_members = 1;
+  if(k->in_room == ch->in_room)
+    no_members = 1; 
+  else no_members = 0;
+
   for (f=k->followers; f; f=f->next)
   {
     if (IS_AFFECTED(f->follower, AFF_GROUP) &&
@@ -179,34 +181,40 @@ int do_split(CHAR_DATA *ch, char *argument, int cmd)
       no_members++;
   }
 
+  if(no_members == 0) // should be impossible
+  {
+    send_to_char("You got a divide by 0.  Tell a god how.\r\n", ch);
+    return eFAILURE;
+  }
+
   share = amount / no_members;
   extra = amount % no_members;
   GET_GOLD(ch) -= amount;
   do_save(ch, "", 666);
 
-  if ( k==ch ) {
-      sprintf( buf, "You split %d gold coins.  ", amount );
-      extra = amount - ( no_members * share );
-  } else {
-      sprintf( buf, "%s splits %d gold coins.  ", GET_SHORT(ch), amount );
-  }
-  send_to_char( buf, k );
-  sprintf( buf, "Your share is %d gold coins.\n\r", share + extra );
-  send_to_char( buf, k );
-  GET_GOLD(k) += share + extra;
+  
+  sprintf( buf, "You split %d gold coins.  "
+                "Your share is %d gold coins.\n\r", amount, share + extra );
+  send_to_char( buf, ch );
+  GET_GOLD(ch) += share + extra;
 
-  for (f=k->followers; f; f=f->next) {
+  sprintf( buf, "%s splits %d gold coins.  "
+                "Your share is %d gold coins.\n\r", GET_SHORT(ch), amount, share );
+
+  if(k != ch && k->in_room == ch->in_room) {
+    send_to_char(buf, k);
+    GET_GOLD(k) += share;
+  }
+
+  for (f=k->followers; f; f=f->next) 
+  {
     if (IS_AFFECTED(f->follower, AFF_GROUP) &&
-    (f->follower->in_room == ch->in_room)) {
-      if (f->follower==ch)
-	sprintf( buf, "You split %d gold coins.  ", amount );
-      else 
-	sprintf( buf, "%s splits %d gold coins.  ", GET_SHORT(ch), amount );
-      send_to_char( buf, f->follower );
-      sprintf( buf, "Your share is %d gold coins.\n\r", share );
+        f->follower->in_room == ch->in_room &&
+        f->follower != ch) 
+    {
       send_to_char( buf, f->follower );
       GET_GOLD(f->follower) += share;
-      } 
+    } 
   }
   return eSUCCESS;
 }

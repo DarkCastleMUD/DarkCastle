@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.39 2002/08/11 15:50:34 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.40 2002/08/13 18:25:08 pirahna Exp $ */
 
 extern "C"
 {
@@ -3076,6 +3076,9 @@ void arena_kill(CHAR_DATA *ch, CHAR_DATA *victim)
   GET_MANA(victim) = GET_MAX_MANA(victim);
   GET_MOVE(victim) = GET_MAX_MOVE(victim);
   GET_KI(victim) = GET_MAX_KI(victim);
+
+  ch->combat = 0;  // remove all combat effects
+
   save_char_obj(victim);
 }
 

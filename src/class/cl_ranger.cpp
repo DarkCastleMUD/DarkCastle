@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_ranger.cpp,v 1.12 2002/08/13 17:09:47 pirahna Exp $ | cl_ranger.C |
+| $Id: cl_ranger.cpp,v 1.13 2002/08/13 18:25:12 pirahna Exp $ | cl_ranger.C |
 Description: Ranger skills/spells */ extern "C"  {
   #include <string.h>
 }
@@ -424,7 +424,7 @@ int ambush(CHAR_DATA *ch)
 
        skill_increase_check(ch, SKILL_AMBUSH, learned, SKILL_INCREASE_EASY);
 
-       if(number(1, 101) <= chance || IS_NPC(i)) 
+       if(number(1, 101) <= chance) 
        { 
          act("$n ambushes $N in a brilliant surprise attack!", i, 0, ch, TO_ROOM, NOTVICT);
          act("$n ambushes you as you enter the room!", i, 0, ch, TO_VICT, 0);
