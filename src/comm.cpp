@@ -93,7 +93,7 @@ extern int restrict;
 //extern int mini_mud;
 //extern int no_rent_check;
 extern FILE *player_fl;
-int DFLT_PORT = 6666, DFLT_PORT2 = 6666, DFLT_PORT3 = 80;
+int DFLT_PORT = 23, DFLT_PORT2 = 6666, DFLT_PORT3 = 80;
 
 extern CWorld world;	/* In db.c */
 extern int top_of_world;	/* In db.c */
@@ -507,9 +507,9 @@ void init_game(int port, int port2, int port3)
     log("Hotboot failed.  Starting regular sockets.", 0, LOG_MISC);
     log("Opening mother connections.", 0, LOG_MISC);
     mother_desc = init_socket(port);
-    // no need for the other ports rinetd handles it now
-    //   other_desc = init_socket(port2);
-    //   third_desc = init_socket(port3);
+    // no need for the other ports rinetd handles it now. Scratch that.
+       other_desc = init_socket(port2);
+       third_desc = init_socket(port3);
   }
 
   start_time = time(0);
@@ -536,8 +536,8 @@ void init_game(int port, int port2, int port3)
   while (descriptor_list)
     close_socket(descriptor_list);
   CLOSE_SOCKET(mother_desc);
-  //CLOSE_SOCKET(other_desc);
-  //CLOSE_SOCKET(third_desc);
+  CLOSE_SOCKET(other_desc);
+  CLOSE_SOCKET(third_desc);
 
 #ifdef LEAK_CHECK
   log("Freeing all mobs in world.", 0, LOG_MISC);
@@ -693,6 +693,7 @@ void game_loop(unsigned mother_desc, unsigned other_desc, unsigned third_desc)
   // comm must be much longer than MAX_INPUT_LENGTH since we allow aliases in-game
   // otherwise an alias'd command could easily overrun the buffer
   char comm[MAX_STRING_LENGTH];
+  char buf[128];
   struct descriptor_data *d;
   unsigned maxdesc;
   int aliased;
@@ -715,12 +716,12 @@ void game_loop(unsigned mother_desc, unsigned other_desc, unsigned third_desc)
     FD_ZERO(&output_set);
     FD_ZERO(&exc_set);
     FD_SET(mother_desc, &input_set);
-    //FD_SET(other_desc, &input_set);
-    //FD_SET(third_desc, &input_set);
+    FD_SET(other_desc, &input_set);
+    FD_SET(third_desc, &input_set);
 
-    //maxdesc = ((mother_desc > other_desc) ? mother_desc : other_desc);
-    //maxdesc = ((maxdesc > third_desc) ? maxdesc : third_desc);
-    maxdesc = mother_desc;   
+    maxdesc = ((mother_desc > other_desc) ? mother_desc : other_desc);
+    maxdesc = ((maxdesc > third_desc) ? maxdesc : third_desc);
+    //maxdesc = mother_desc;   
  
     for (d = descriptor_list; d; d = d->next) {
       if(d->descriptor > maxdesc) 
@@ -739,11 +740,11 @@ void game_loop(unsigned mother_desc, unsigned other_desc, unsigned third_desc)
     // If new connection waiting, accept it
     if (FD_ISSET(mother_desc, &input_set))
       new_descriptor(mother_desc);
-/*    if (FD_ISSET(other_desc, &input_set))
+    if (FD_ISSET(other_desc, &input_set))
       new_descriptor(other_desc);
     if (FD_ISSET(third_desc, &input_set))
       new_descriptor(third_desc);
-*/
+
     // close the weird descriptors in the exception set 
     for (d = descriptor_list; d; d = next_d) {
       next_d = d->next;
@@ -758,8 +759,16 @@ void game_loop(unsigned mother_desc, unsigned other_desc, unsigned third_desc)
     for (d = descriptor_list; d; d = next_d) {
       next_d = d->next;
       if (FD_ISSET(d->descriptor, &input_set))
-	if (process_input(d) < 0)
+	if (process_input(d) < 0) {
+	  //	  if (d->character && GET_LEVEL(d->character) == 1) {
+    sprintf(buf, "Connection attempt bailed from %s", d->host);
+	  //  sprintf(buf, "Level 1, %s, dropping link. Byebye!", GET_NAME(d->character));
+    printf(buf);
+	   log(buf, ANGEL, LOG_SOCKET);
+	    //	    free_char(d->character);
+	  //}
 	  close_socket(d);
+	}
     }
 
     /* process commands we just read from process_input */

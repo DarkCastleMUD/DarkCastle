@@ -11,7 +11,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.20 2002/12/26 21:47:16 pirahna Exp $ */
+/* $Id: nanny.cpp,v 1.21 2002/12/26 22:07:48 dcastle Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -407,7 +407,7 @@ int more_than_ten_people_from_this_ip(struct descriptor_data *new_conn)
          count++;
    }
 
-   if(count > 9)
+   if(count > 99)
    {
       SEND_TO_Q("Sorry, there are more than 9 connections from this IP address\r\n"
                 "already logged into Dark Castle.  If you have a valid reason\r\n"
