@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.24 2003/03/07 03:08:54 pirahna Exp $ */
+/* $Id: mob_proc2.cpp,v 1.25 2003/06/12 23:57:28 pirahna Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -376,6 +376,7 @@ int mortician(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
           struct char_data *owner)
 {
   struct obj_data *obj2;
+  struct obj_data *curr_cont;
   int x = 0, cost = 0, which;
   char buf[100];
   bool has_consent = FALSE;
@@ -383,8 +384,8 @@ int mortician(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
   if(cmd != 56 && cmd != 59 && cmd != 58)
     return eFAILURE;
 
-  // TODO - don't think undertaker takes into consideration stuff inside
-  // containers when deciding price....probably should change that
+  // TODO - when determining price, it WILL NOT work if we ever institute
+  // containers being inside other containers.
 
   if(cmd == 59)  // list 
   {
@@ -407,8 +408,15 @@ int mortician(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
        for(obj2 = obj->contains; obj2; obj2 = obj2->next_content) {
           if(obj2->obj_flags.type_flag == ITEM_MONEY)
             continue;
+          for(curr_cont = obj2->contains; curr_cont; curr_cont = curr_cont->next_content)
+            cost += curr_cont->obj_flags.cost; 
           cost += obj2->obj_flags.cost; 
        } 
+       for(x = 0; x <= WEAR_MAX; x++) {
+         if(ch->equipment[x]) {
+           cost += ch->equipment[x]->obj_flags.cost;
+         }
+       }
        cost /= 20000;
        cost = MAX(cost, 30); 
        sprintf(buf, "%d) %-21s %d Platinum coins.\n\r", ++x, obj->short_description,
@@ -428,6 +436,8 @@ int mortician(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     for(obj2 = ch->carrying; obj2; obj2 = obj2->next_content) {
       if(obj2->obj_flags.type_flag == ITEM_MONEY)
         continue;
+      for(curr_cont = obj2->contains; curr_cont; curr_cont = curr_cont->next_content)
+        cost += curr_cont->obj_flags.cost; 
       cost += obj2->obj_flags.cost;
     }
     for(x = 0; x <= WEAR_MAX; x++) {
@@ -471,7 +481,14 @@ int mortician(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
      for(obj2 = obj->contains; obj2; obj2 = obj2->next_content) {
         if(obj2->obj_flags.type_flag == ITEM_MONEY)
           continue;
+        for(curr_cont = obj2->contains; curr_cont; curr_cont = curr_cont->next_content)
+          cost += curr_cont->obj_flags.cost; 
         cost += obj2->obj_flags.cost;
+     }
+     for(x = 0; x <= WEAR_MAX; x++) {
+       if(ch->equipment[x]) {
+         cost += ch->equipment[x]->obj_flags.cost;
+       }
      }
      cost /= 20000;
      cost = MAX(cost, 30);
@@ -479,18 +496,10 @@ int mortician(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
        send_to_char("You can't afford that!\n\r", ch);
        return eSUCCESS;
      } 
-//     obj->obj_flags.timer = 1;
-//     if(has_consent) {
-       move_obj(obj, ch->in_room);
-       send_to_char("The mortician goes into his freezer and returns with a corpse, which he\n\r"
-                    "places at your feet.\n\r", ch);
-//     } else {
-//       move_obj(obj, ch);
-//       send_to_char("The mortician goes into his freezer and returns with a corpse, which 
-//he\n\r"
-//                    "places in your arms.\n\r", ch);
-//     }
-
+     move_obj(obj, ch->in_room);
+     REMOVE_BIT(obj->obj_flags.extra_flags, ITEM_INVISIBLE);
+     send_to_char("The mortician goes into his freezer and returns with a corpse, which he\n\r"
+                  "places at your feet.\n\r", ch);
      GET_PLATINUM(ch) -= cost;
      do_save(ch, "", 10);
      return eSUCCESS; 
