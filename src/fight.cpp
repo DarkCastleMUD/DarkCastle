@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.174 2004/05/02 21:22:56 urizen Exp $ */
+/* $Id: fight.cpp,v 1.175 2004/05/02 21:56:19 urizen Exp $ */
 
 extern "C"
 {
@@ -1297,7 +1297,7 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
   typeofdamage = damage_type(weapon_type);
 
   if(GET_POS(victim) == POSITION_DEAD)           return (eSUCCESS|eVICT_DIED);
-  if (ch->in_room != victim->in_room) return eSUCCESS;
+  if (ch->in_room != victim->in_room && attacktype != SPELL_SOLAR_GATE) return eSUCCESS;
 //  csendf(victim, "damage: dam = %d  type = %d\r\n", dam, weapon_type);
   if (dam!=0 && !IS_NPC(ch) && attacktype)
   { // Skill damages based on learned %
@@ -1367,11 +1367,10 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
    if (save < 0)
    { double mult = 0 - save; // Turns positive.
      mult = 1 + (mult/100);
-     dam *= mult;
+     dam = (int)(dam * mult);
         act("$n is susceptable against $N's assault and sustain additional damage.", victim, 0, ch, TO_ROOM, NOTVICT);
-        act("$n is susceptable against your assault and sustain additional damage.",victim,0,ch, TO_VICT, 0)
-        act("You are susceptable to $N's assault and sustain additional damage.", victim, 0, ch, TO_CHAR, 0)
- 
+        act("$n is susceptable against your assault and sustain additional damage.",victim,0,ch, TO_VICT, 0);
+        act("You are susceptable to $N's assault and sustain additional damage.", victim, 0, ch, TO_CHAR, 0); 
    }
    if (number(1,100) < save) {
 	dam /= 2; // Save chance.
@@ -2273,7 +2272,7 @@ void set_fighting(CHAR_DATA * ch, CHAR_DATA * vict)
                 timer->function = clear_hunt;
                 timer->next = timer_list;
                 timer_list = timer;
-                timer->timeleft = (ch->level/4)*60;
+                timer->timeleft = (ch->level / 4) * 60;
            }
   if (!IS_NPC(vict) && IS_NPC(ch))
      if (!IS_SET(ch->mobdata->actflags, ACT_STUPID) && !ch->hunting)
@@ -2936,8 +2935,8 @@ int do_skewer(CHAR_DATA *ch, CHAR_DATA *vict, int dam, int weapon)
   if(percent > has_skill(ch, SKILL_SKEWER))                          return 0;
 
   int type = get_weapon_damage_type(ch->equipment[weapon]);
-  if( ! (type == TYPE_STING || type == TYPE_PIERCE) )  return 0;
-  
+  if( ! (type == TYPE_STING || type == TYPE_PIERCE || type == TYPE_SLASH ))  return 0;
+  skill_increase_check(ch, SKILL_SKEWER, has_skill(ch,SKILL_SKEWER), SKILL_INCREASE_MEDIUM);
   if (number(0, 100) < 5) {
     act("$n jams his weapon into $N!", ch, 0, vict, TO_ROOM, NOTVICT);
     act("You jam your weapon in $N's heart!", ch, 0, vict, TO_CHAR, 0);
