@@ -651,7 +651,10 @@ int song_whistle_sharp( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim,
       return retval;
    }
 
-   WAIT_STATE(ch, song_info[ch->song_number].beats);
+//   WAIT_STATE(ch, song_info[ch->song_number].beats);
+
+   // temp one round of lag for now
+   WAIT_STATE(ch, 12);
    return eSUCCESS;
 }
 
