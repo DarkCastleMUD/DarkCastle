@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.18 2004/05/02 12:27:00 urizen Exp $ */
+/* $Id: ki.cpp,v 1.19 2004/05/02 21:22:56 urizen Exp $ */
 
 extern "C"
 {
@@ -482,7 +482,7 @@ int ki_punch( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
    int dam = GET_HIT(vict) / 4;
    if (dam > 1000)
      dam = 1000;
-   if (GET_HIT(vict) < 5000) {
+   if (GET_HIT(vict) < 500000) {
       if (number(1, 101) <
           (GET_LEVEL(ch) / 2) + GET_LEVEL(ch) - GET_LEVEL(vict))
       {
