@@ -47,9 +47,14 @@ int do_harmtouch(struct char_data *ch, char *argument, int cmd)
       return eFAILURE;
    }
 
-   if (!(victim = get_char_room_vis(ch, victim_name))) {
-     send_to_char("Whom do you want to harmtouch?\n\r", ch);
-     return eFAILURE;
+   if (!(victim = get_char_room_vis(ch, victim_name))) 
+   {
+     victim = ch->fighting;
+     if(!victim) 
+     {
+       send_to_char("Whom do you want to harmtouch?\n\r", ch);
+       return eFAILURE;
+     }
    }
 
    if (victim == ch) {
