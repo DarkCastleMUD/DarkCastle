@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.190 2004/05/15 18:57:10 urizen Exp $ */
+/* $Id: fight.cpp,v 1.191 2004/05/16 17:23:48 urizen Exp $ */
 
 extern "C"
 {
@@ -949,8 +949,8 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
     chance = 45;
    extern struct dex_app_type dex_app[];
     chance += GET_LEVEL(ch) - GET_LEVEL(vict);
-    chance += GET_HITROLL(ch);
-  chance += dex_app[GET_DEX(ch)].tohit;
+    chance += GET_REAL_HITROLL(ch);
+  //  chance += dex_app[GET_DEX(ch)].tohit;
     chance += ( GET_AC(vict) / 10 );  // (positive ac hurts you, negative helps)
     chance += weapon_skill_hit_bonus;
 /*
@@ -987,8 +987,8 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
   else dam = number(0, GET_LEVEL(ch)/2);
 
   /* Damage bonuses */
-  dam += str_app[STRENGTH_APPLY_INDEX(ch)].todam;
-  dam += GET_DAMROLL(ch);
+//  dam += str_app[STRENGTH_APPLY_INDEX(ch)].todam;
+  dam += GET_REAL_DAMROLL(ch);
   dam += weapon_skill_dam_bonus;
   dam += calculate_paladin_damage_bonus(ch, vict);
   
@@ -1299,7 +1299,7 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
   if(GET_POS(victim) == POSITION_DEAD)           return (eSUCCESS|eVICT_DIED);
   if (ch->in_room != victim->in_room && attacktype != SPELL_SOLAR_GATE) return eSUCCESS;
 //  csendf(victim, "damage: dam = %d  type = %d\r\n", dam, weapon_type);
-  if (dam!=0 && attacktype && !IS_NPC(ch) && attacktype < TYPE_HIT)
+  if (dam!=0 && attacktype && attacktype < TYPE_HIT)
   { // Skill damages based on learned %
     int l = has_skill(ch,attacktype);
     if (IS_NPC(ch)) l = 50;
@@ -1375,6 +1375,8 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
         act("$n resists $N's assault and sustains reduced damage.", victim, 0, ch, TO_ROOM, NOTVICT);
         act("$n resists your assault and sustains reduced damage.",victim,0,ch, TO_VICT,0);
         act("You resist $N's assault and sustains reduced damage.", victim, 0, ch, TO_CHAR, 0);
+	if (has_skill(victim, SKILL_MAGIC_RESIST))
+	  skill_increase_check(victim, SKILL_MAGIC_RESIST, has_skill(victim,SKILL_MAGIC_RESIST), SKILL_INCREASE_HARD);
    }
 
 

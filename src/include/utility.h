@@ -16,7 +16,7 @@
  *  10/21/2003   Onager    Changed IS_ANONYMOUS() to handle mobs without   *
  *                         crashing                                        *
  ***************************************************************************/
-/* $Id: utility.h,v 1.22 2004/04/22 16:29:03 urizen Exp $ */
+/* $Id: utility.h,v 1.23 2004/05/16 17:23:50 urizen Exp $ */
 
 #ifndef UTILITY_H_
 #define UTILITY_H_
@@ -189,6 +189,7 @@ bool IS_DARK( int room );
 			(GET_STR(ch))
 
 #define GET_AC(ch)       ((ch)->armor)
+#define GET_ARMOR(ch)    ((ch)->armor + dex_app[GET_DEX((ch))].ac_mod)
 #define GET_HIT(ch)      ((ch)->hit)
 #define GET_RAW_HIT(ch)  ((ch)->raw_hit)
 #define GET_MAX_HIT(ch)  (hit_limit(ch))
@@ -209,7 +210,10 @@ bool IS_DARK( int room );
 #define GET_WEIGHT(ch)   ((ch)->weight)
 #define GET_SEX(ch)      ((ch)->sex)
 #define GET_HITROLL(ch)  ((ch)->hitroll)
+#define GET_REAL_HITROLL(ch) ((ch)->hitroll + dex_app[GET_DEX((ch))].tohit)
 #define GET_DAMROLL(ch)  ((ch)->damroll)
+#define GET_REAL_DAMROLL(ch) ((ch)->damroll + str_app[GET_STR((ch))].todam)
+
 
 #define GET_RACE(ch)     ((ch)->race)
 #define GET_BITV(ch)     ((ch)->race==1?1:(1<<(((ch)->race)-1)))

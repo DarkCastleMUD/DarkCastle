@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.41 2004/05/15 17:08:28 urizen Exp $ */
+/* $Id: info.cpp,v 1.42 2004/05/16 17:23:48 urizen Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -1243,8 +1243,8 @@ int do_score(struct char_data *ch, char *argument, int cmd)
    sprintf(race, "%s", race_info[(int)GET_RACE(ch)].singular_name);
    exp_needed = (int)(exp_table[(int)GET_LEVEL(ch) + 1] - (long)GET_EXP(ch));
    
-   to_hit = ( dex_app[GET_DEX(ch)].tohit ) + ( GET_HITROLL(ch));
-   to_dam = ( str_app[STRENGTH_APPLY_INDEX(ch)].todam ) + ( GET_DAMROLL(ch));
+   to_hit = GET_REAL_HITROLL(ch);
+   to_dam = GET_REAL_DAMROLL(ch);
    
    
    sprintf(buf,

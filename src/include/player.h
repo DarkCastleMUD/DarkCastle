@@ -1,7 +1,7 @@
 #ifndef PLAYER_H_
 #define PLAYER_H_
 /************************************************************************
-| $Id: player.h,v 1.11 2004/05/15 17:08:30 urizen Exp $
+| $Id: player.h,v 1.12 2004/05/16 17:23:50 urizen Exp $
 | player.h
 | Description: This file defines the player vectors..punishment, specials,
 |   etc...
@@ -239,7 +239,7 @@ struct dex_app_type
   sh_int tohit;
   sh_int ac_mod;
 };
-
+extern struct dex_app_type dex_app[];
 
 // Constructor commented out for const.C initialization purposes
 struct wis_app_type
