@@ -1922,13 +1922,20 @@ int shield_combat_procs(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
 int generic_weapon_combat(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, 
                    CHAR_DATA *invoker)
 {
-   if(cmd)                                  return eFAILURE;
-   if(!ch || !ch->fighting)                 return eFAILURE;
+   extern int top_of_objt;
+
+   if(cmd)                                    return eFAILURE;
+   if(!ch || !ch->fighting)                   return eFAILURE;
    if(!obj || (
        ch->equipment[WIELD] != obj &&
        ch->equipment[SECOND_WIELD] != obj))   return eFAILURE;
 
-   switch(obj->item_number) {
+   if(obj->item_number < 0 || obj->item_number > top_of_objt) {
+      logf(IMMORTAL, LOG_BUG, "generic_weapon_combat: illegal obj->item_number");
+      return eFAILURE;
+   }
+
+   switch(obj_index[obj->item_number].virt) {
      case 16903:  // valhalla hammer
        if(number(1, 100) < GET_DEX(ch)/4)
          break;

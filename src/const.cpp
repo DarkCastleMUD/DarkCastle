@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: const.cpp,v 1.50 2002/11/01 16:27:20 pirahna Exp $ */
+/* $Id: const.cpp,v 1.51 2003/01/08 21:19:28 dcastle Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1302,7 +1302,7 @@ struct class_skill_defines m_skills[] = { // mage skills
 {    "shield",		SPELL_SHIELD,		13,	90,	3020,	NULL },
 {    "charm person",	SPELL_CHARM_PERSON,	14,	90,	3020,	NULL },
 {    "haste",		SPELL_HASTE,		14,	90,	3020,	NULL },
-{    "sleep",		SPELL_SLEEP,		14,	90,	3020,	NULL },
+{    "sleep",		SPELL_SLEEP,		15,	90,	3020,	NULL },
 {    "summon familiar", SPELL_SUMMON_FAMILIAR,	16,	90,	3020,	NULL },
 {    "fireball",	SPELL_FIREBALL,		20,	90,	3020,	NULL },
 {    "teleport",	SPELL_TELEPORT,		21,	90,	-2, "A mage of much knowledge, he is wise in the ways of the world." },

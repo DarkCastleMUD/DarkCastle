@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.51 2003/01/08 03:45:02 dcastle Exp $ */
+/* $Id: magic.cpp,v 1.52 2003/01/08 21:19:28 dcastle Exp $ */
 
 extern "C"
 {
@@ -2427,6 +2427,11 @@ int spell_sleep(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
   int retval;
 
   set_cantquit( ch, victim );
+
+  if(!IS_MOB(victim) && GET_LEVEL(victim) <= 15) {
+     send_to_char("Oh come on....at least wait till they're high enough level to have decent eq.\r\n", ch);
+     return eFAILURE;
+  }
 
   /* You can't sleep someone higher level than you*/
   if(affected_by_spell(victim, SPELL_INSOMNIA)
