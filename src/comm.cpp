@@ -394,7 +394,7 @@ int load_hotboot_descs()
     d->bufspace                = SMALL_BUFSIZE - 1;
     d->login_time              = time(0);
 
-    if ( write_to_descriptor( desc, "Recovering...\n" ) == -1) {
+    if ( write_to_descriptor( desc, "Recovering...\r\n" ) == -1) {
       sprintf(buf,"Host %s Char %s Desc %d FAILED to recover from hotboot.",host,chr,desc);
       log(buf, 0, LOG_MISC);
       CLOSE_SOCKET(desc);
@@ -438,17 +438,17 @@ void finish_hotboot()
 
   for (d=descriptor_list;d;d=d->next)
   {
-    write_to_descriptor( d->descriptor, "Reconnecting your link to your character...\n" );
+    write_to_descriptor( d->descriptor, "Reconnecting your link to your character...\r\n" );
 
     if (!load_char_obj(d, d->output)) {
       sprintf(buf, "Could not load char '%s' in hotboot.",  d->output);
       log(buf, 0, LOG_MISC);
-      write_to_descriptor( d->descriptor, "Link Failed!  Tell Pirahna when you can.\n" );
+      write_to_descriptor( d->descriptor, "Link Failed!  Tell Pirahna when you can.\n\r" );
       close_socket(d);
       continue;
     }
 
-    write_to_descriptor( d->descriptor, "Success...May your visit continue to suck...\n" );
+    write_to_descriptor( d->descriptor, "Success...May your visit continue to suck...\n\r" );
 
     *d->output = '\0';
     d->character->next = character_list;
