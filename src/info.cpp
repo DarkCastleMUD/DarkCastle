@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.21 2002/12/26 21:47:16 pirahna Exp $ */
+/* $Id: info.cpp,v 1.22 2002/12/26 23:11:35 pirahna Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -554,7 +554,7 @@ void show_char_to_char(struct char_data *i, struct char_data *ch, int mode)
 void list_char_to_char(struct char_data *list, struct char_data *ch, int mode)
 {
    struct char_data *i;
-   int known;
+   int known = has_skill(ch, SKILL_BLINDFIGHTING);
 
    for (i = list; i ; i = i->next_in_room) {
       if (ch == i)
@@ -565,7 +565,7 @@ void list_char_to_char(struct char_data *list, struct char_data *ch, int mode)
          show_char_to_char(i, ch, 0);
       else if (IS_DARK(ch->in_room))
       {
-         if((known = has_skill(ch, SKILL_BLINDFIGHTING)) && known > number(1, 101))
+         if(known && known > number(1, 101))
             send_to_char("Your blindfighting awareness alerts you to a presense in the area.\n\r", ch);
          else if(number(1, 10) == 1)
             send_to_char("$B$4You see a pair of glowing red eyes looking your way.$R$7\n\r", ch);
@@ -658,6 +658,7 @@ int do_look(struct char_data *ch, char *argument, int cmd)
          send_to_char("It is pitch black...\n\r", ch);
          list_char_to_char(world[ch->in_room].people, ch, 0);
          send_to_char("$R", ch);
+         // TODO - if have blindfighting, list some of the room exits sometimes
       }
       else
       {

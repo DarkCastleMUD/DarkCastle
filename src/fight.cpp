@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.80 2002/12/26 19:45:30 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.81 2002/12/26 23:11:35 pirahna Exp $ */
 
 extern "C"
 {
@@ -2816,9 +2816,9 @@ void group_gain(CHAR_DATA * ch, CHAR_DATA * victim)
 
   switch(no_members) {
     case 1:  break; // * 1.0 
-    case 2:  share = (int) (share * 1.4); break;  
-    case 3:  share = (int) (share * 1.6); break; 
-    default:  share = (int) (share * 1.8); break; 
+    case 2:  share = (int) (share * 1.2); break;  
+    case 3:  share = (int) (share * 1.4); break; 
+    default:  share = (int) (share * 1.6); break; 
   }
 
   // loop with k first, then all the followers
@@ -2863,14 +2863,22 @@ void group_gain(CHAR_DATA * ch, CHAR_DATA * victim)
       case -2:  break;
       case -3:  break;
       case -4:  break;
-      case -5:  tmp_share = (int) (tmp_share * 0.9); break;
-      case -6:  tmp_share = (int) (tmp_share * 0.8); break;
-      case -7:  tmp_share = (int) (tmp_share * 0.7); break;
-      case -8:  tmp_share = (int) (tmp_share * 0.6); break;
-      case -9:  tmp_share = (int) (tmp_share * 0.5); break;
-      case -10:  tmp_share = (int) (tmp_share * 0.4); break;
-      case -11: tmp_share = (int) (tmp_share * 0.3); break;
-      case -12: tmp_share = (int) (tmp_share * 0.2); break;
+      case -5:  break;
+      case -6:  break;
+      case -7:  
+      case -8:  tmp_share = (int) (tmp_share * 0.9); break;
+      case -9:  
+      case -10:  tmp_share = (int) (tmp_share * 0.8); break;
+      case -11:  
+      case -12:  tmp_share = (int) (tmp_share * 0.7); break;
+      case -13:
+      case -14: tmp_share = (int) (tmp_share * 0.6); break;
+      case -15: 
+      case -16: tmp_share = (int) (tmp_share * 0.5); break;
+      case -17: tmp_share = (int) (tmp_share * 0.4); break;
+      case -18: tmp_share = (int) (tmp_share * 0.3); break;
+      case -19: 
+      case -20: tmp_share = (int) (tmp_share * 0.2); break;
       default:  if(GET_LEVEL(victim) < GET_LEVEL(tmp_ch))
                   tmp_share = (int) (tmp_share * 0.1);
                 else tmp_share = (int) (tmp_share * 1.1); break;
