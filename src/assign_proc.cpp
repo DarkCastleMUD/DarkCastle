@@ -233,7 +233,6 @@ void assign_non_combat_procs() {
     assign_one_mob_non(4714,  backstabber);
     assign_one_mob_non(4901,  humaneater);
     assign_one_mob_non(5107, passive_magic_user2);
-    assign_one_mob_non(5108, passive_magic_user2);
     assign_one_mob_non(5109, passive_magic_user2);
     assign_one_mob_non(5200, passive_magic_user);
     assign_one_mob_non(5900,  turtle_green);
