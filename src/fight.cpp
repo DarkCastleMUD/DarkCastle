@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.51 2002/08/25 16:44:42 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.52 2002/08/25 16:57:04 pirahna Exp $ */
 
 extern "C"
 {
@@ -3511,8 +3511,6 @@ int do_flee(struct char_data *ch, char *argument, int cmd)
           act("You panic, and attempt to flee.", ch, 0, 0, TO_CHAR, 0);
 
           // The escape has succeded
-//          chTemp = ch->fighting;
-//          ch->fighting = NULL;
           GET_POS(ch) = POSITION_STANDING;
 
           char tempcommand[32];
@@ -3525,7 +3523,6 @@ int do_flee(struct char_data *ch, char *argument, int cmd)
 
           if (IS_SET(retval, eSUCCESS)) 
           {
-            ch->fighting = chTemp;
             
             // They got away.  Stop fighting for everyone not in the new room from fighting
             for (chTemp = combat_list; chTemp; chTemp = loop_ch) 
@@ -3543,7 +3540,6 @@ int do_flee(struct char_data *ch, char *argument, int cmd)
             if (!IS_SET(retval, eCH_DIED)) 
               act("$n tries to flee, but is too exhausted!", ch, 0, 0, TO_ROOM, INVIS_NULL);
             GET_POS(ch) = POSITION_FIGHTING;
-//            ch->fighting = chTemp; // set them back to fighting
             return retval;
           }
       } // if CAN_GO
