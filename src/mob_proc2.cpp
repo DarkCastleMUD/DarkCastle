@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.7 2002/08/05 00:24:34 pirahna Exp $ */
+/* $Id: mob_proc2.cpp,v 1.8 2002/08/05 23:46:47 pirahna Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -1073,19 +1073,19 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     
     csendf(ch, "8) Add to your movement points: %d exp + %d "
             "Platinum coins.\n\r", move_exp, move_cost);
-    
+*/    
     send_to_char(
-    "9) Freedom from HUNGER and THIRST:  100000000 exp + 2000 Platinum coins.\n\r"
+//    "9) Freedom from HUNGER and THIRST:  100000000 exp + 2000 Platinum coins.\n\r"
 //    "10) Deep Red Vial:     10 Platinum coins.\n\r"
 //    "11) Deep Blue Potion:   5 Platinum coins.\n\r"
     "12) Five (5) Platinum coins   Cost: 100,000 Gold Coins.\n\r"
-    "13) 100,000 Gold Coins        Cost: 5 Platinum Coins.\n\r"
-    "14) One (1) Platinum coin     Cost: 20,000 Gold Coins.\n\r"
-    "15) 20,000 Gold Coins         Cost: 1 Platinum Coin.\n\r"
-    "16) Convert your experience points to gold coins.\n\r"
+//    "13) 100,000 Gold Coins        Cost: 5 Platinum Coins.\n\r"
+//    "14) One (1) Platinum coin     Cost: 20,000 Gold Coins.\n\r"
+//    "15) 20,000 Gold Coins         Cost: 1 Platinum Coin.\n\r"
+//    "16) Convert your experience points to gold coins.\n\r"
     "17) Buy a practice session for 50 plats.\n\r"
                  , ch);
-
+/*
     csendf(ch, "18) Add 1 lonely hit point:      %d exp + %d "
             "Platinum coins.\n\r", hit_exp/5, hit_cost/5); 
 */    
@@ -1318,6 +1318,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
      send_to_char("Ok.\n\r", ch);
      return eSUCCESS;
    }
+*/
    if(choice == 12) {
      if(GET_GOLD(ch) < 100000) {
        send_to_char("The Meta-physician tells you, 'You can't afford "
@@ -1329,6 +1330,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
      send_to_char("Ok.\n\r", ch);
      return eSUCCESS;
    }
+/*
   if(choice == 13) {
     if(GET_PLATINUM(ch) < 5) {
       send_to_char("The Meta-physician tells you, 'You can't afford "
@@ -1388,6 +1390,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     GET_EXP(ch) = 0;
     return eSUCCESS;
   }
+*/
   if(choice == 17) {
     if (GET_PLATINUM(ch) < 50) {
        send_to_char ("Costs 50 plats...which you don't have.\n\r", ch);
@@ -1403,7 +1406,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     ch->pcdata->practices += 1;
     return eSUCCESS;
   }
-
+/*
    if(choice == 18) {
      if(GET_EXP(ch) < hit_exp/5) {
        send_to_char("The Meta-physician tells you, 'You lack the "
