@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.23 2003/04/08 02:50:29 pirahna Exp $
+| $Id: cl_thief.cpp,v 1.24 2003/04/15 03:09:48 pirahna Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -403,7 +403,7 @@ int do_trip(CHAR_DATA *ch, char *argument, int cmd)
  
    skill_increase_check(ch, SKILL_TRIP, learned, SKILL_INCREASE_MEDIUM);
 
-  if(affected_by_spell(ch, SPELL_IRON_ROOTS)) {
+  if(affected_by_spell(victim, SPELL_IRON_ROOTS)) {
     act("You try to trip $N but tree roots around $S legs keep him upright.", ch, 0, victim, TO_CHAR, 0);
     act("$n trips you but the roots around your legs keep you from falling.", ch, 0, victim, TO_VICT, 0);
     act("The tree roots support $N keeping $M from falling after $n's trip.", ch, 0, victim, TO_ROOM, NOTVICT);
