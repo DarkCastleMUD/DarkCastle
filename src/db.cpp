@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.12 2002/08/19 16:27:11 pirahna Exp $ */
+/* $Id: db.cpp,v 1.13 2002/08/21 16:32:44 pirahna Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -50,6 +50,7 @@ extern "C"
 #include <game_portal.h> // load_game_portals()
 #include <interp.h>
 #include <returnvals.h>
+#include <spells.h> // command_range
 
 extern int fflush(FILE *);
 extern int _filbuf(FILE *);
@@ -1214,13 +1215,9 @@ char * read_next_worldfile_name(FILE * flWorldIndex)
 }
 
 // room should be the realroom number in memory
-bool can_modify_room(char_data * ch, long room)
+bool can_modify_this_room(char_data * ch, long room)
 {
-  world_file_list_item * curr = NULL;
-  
-  extern world_file_list_item * world_file_list;
-
-  curr = world_file_list;
+  world_file_list_item * curr = world_file_list;
 
   if(!GET_RANGE(ch))
     return 0;
@@ -1239,14 +1236,42 @@ bool can_modify_room(char_data * ch, long room)
   return 0;
 }
 
-// mob realnum
-bool can_modify_mobile(char_data * ch, long mob)
+bool can_modify_room(char_data * ch, long room)
 {
-  world_file_list_item * curr = NULL;
-  
-  extern world_file_list_item * mob_file_list;
+   int ok = can_modify_this_room(ch, room);
 
-  curr = mob_file_list;
+   if(ok)
+      return 1;
+
+   if(!has_skill(ch, COMMAND_RANGE))
+      return 0;
+
+   // we have range, but we're in the wrong one
+   if(GET_RANGE(ch))
+   {
+      csendf(ch, "Leave existing range %s...\r\n", GET_RANGE(ch));
+      dc_free(GET_RANGE(ch));
+      GET_RANGE(ch) = NULL;
+   }
+   for(world_file_list_item * curr = world_file_list; curr; curr = curr->next)
+      if(room >= curr->firstnum && room <= curr->lastnum)
+      {
+         GET_RANGE(ch) = str_dup(curr->filename);
+         csendf(ch, "Range set to '%s'...\r\n", GET_RANGE(ch));
+         break;
+      }
+
+   if(!GET_RANGE(ch)) {
+      send_to_char("Error, could not find range for this value.\r\n", ch);
+      return 0;
+   }
+   return 1;
+}
+
+// mob realnum
+bool can_modify_this_mobile(char_data * ch, long mob)
+{
+  world_file_list_item * curr = mob_file_list;
 
   if(!GET_MOB_RANGE(ch))
     return 0;
@@ -1265,14 +1290,42 @@ bool can_modify_mobile(char_data * ch, long mob)
   return 0;
 }
 
-// obj realnum
-bool can_modify_object(char_data * ch, long obj)
+bool can_modify_mobile(char_data * ch, long mob)
 {
-  world_file_list_item * curr = NULL;
-  
-  extern world_file_list_item * obj_file_list;
+   int ok = can_modify_this_mobile(ch, mob);
 
-  curr = obj_file_list;
+   if(ok)
+      return 1;
+
+   if(!has_skill(ch, COMMAND_RANGE))
+      return 0;
+
+   // we have range, but we're in the wrong one
+   if(GET_MOB_RANGE(ch))
+   {
+      csendf(ch, "Leave existing range %s...\r\n", GET_MOB_RANGE(ch));
+      dc_free(GET_MOB_RANGE(ch));
+      GET_MOB_RANGE(ch) = NULL;
+   }
+   for(world_file_list_item * curr = mob_file_list; curr; curr = curr->next)
+      if(mob >= curr->firstnum && mob <= curr->lastnum)
+      {
+         GET_MOB_RANGE(ch) = str_dup(curr->filename);
+         csendf(ch, "Range set to '%s'...\r\n", GET_MOB_RANGE(ch));
+         break;
+      }
+
+   if(!GET_MOB_RANGE(ch)) {
+      send_to_char("Error, could not find range for this value.\r\n", ch);
+      return 0;
+   }
+   return 1;
+}
+
+// obj realnum
+bool can_modify_this_object(char_data * ch, long obj)
+{
+  world_file_list_item * curr = obj_file_list;
 
   if(!GET_OBJ_RANGE(ch))
     return 0;
@@ -1289,6 +1342,38 @@ bool can_modify_object(char_data * ch, long obj)
     return 1;
 
   return 0;
+}
+
+bool can_modify_object(char_data * ch, long obj)
+{
+   int ok = can_modify_this_object(ch, obj);
+
+   if(ok)
+      return 1;
+
+   if(!has_skill(ch, COMMAND_RANGE))
+      return 0;
+
+   // we have range, but we're in the wrong one
+   if(GET_OBJ_RANGE(ch))
+   {
+      csendf(ch, "Leave existing range %s...\r\n", GET_OBJ_RANGE(ch));
+      dc_free(GET_OBJ_RANGE(ch));
+      GET_OBJ_RANGE(ch) = NULL;
+   }
+   for(world_file_list_item * curr = obj_file_list; curr; curr = curr->next)
+      if(obj >= curr->firstnum && obj <= curr->lastnum)
+      {
+         GET_OBJ_RANGE(ch) = str_dup(curr->filename);
+         csendf(ch, "Range set to '%s'...\r\n", GET_OBJ_RANGE(ch));
+         break;
+      }
+
+   if(!GET_OBJ_RANGE(ch)) {
+      send_to_char("Error, could not find range for this value.\r\n", ch);
+      return 0;
+   }
+   return 1;
 }
 
 void set_zone_saved_zone(long room)
