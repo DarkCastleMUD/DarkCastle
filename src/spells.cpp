@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.13 2002/08/03 04:21:38 pirahna Exp $ */
+/* $Id: spells.cpp,v 1.14 2002/08/03 06:00:42 pirahna Exp $ */
 
 extern "C"
 {
@@ -74,7 +74,7 @@ struct spell_info_type spell_info [ ] =
     },
 
     { /* 01 */
-	12, POSITION_STANDING,  5, TAR_CHAR_ROOM, cast_armor
+	12, POSITION_STANDING,  5, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_armor
     },
 
     { /* 02 */
@@ -82,7 +82,7 @@ struct spell_info_type spell_info [ ] =
     },
 
     { /* 03 */
-	12, POSITION_STANDING, 5, TAR_OBJ_INV|TAR_OBJ_EQUIP|TAR_CHAR_ROOM, cast_bless
+	12, POSITION_STANDING, 5, TAR_OBJ_INV|TAR_OBJ_EQUIP|TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_bless
     },
 
     { /* 04 */
@@ -127,15 +127,15 @@ struct spell_info_type spell_info [ ] =
     },
 
     { /* 14 */
-	12, POSITION_STANDING, 5, TAR_CHAR_ROOM, cast_cure_blind
+	12, POSITION_STANDING, 5, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_cure_blind
     },
 
     { /* 15 */
-	12, POSITION_FIGHTING, 20, TAR_CHAR_ROOM, cast_cure_critic
+	12, POSITION_FIGHTING, 20, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_cure_critic
     },
 
     { /* 16 */
-	12, POSITION_FIGHTING, 15, TAR_CHAR_ROOM, cast_cure_light
+	12, POSITION_FIGHTING, 15, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_cure_light
     },
 
     { /* 17 */
@@ -143,15 +143,15 @@ struct spell_info_type spell_info [ ] =
     },
 
     { /* 18 */
-	12, POSITION_STANDING, 5, TAR_CHAR_ROOM|TAR_SELF_ONLY, cast_detect_evil
+	12, POSITION_STANDING, 5, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_detect_evil
     },
 
     { /* 19 */
-	12, POSITION_STANDING, 5, TAR_CHAR_ROOM, cast_detect_invisibility
+	12, POSITION_STANDING, 5, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_detect_invisibility
     },
 
     { /* 20 */
-	12, POSITION_STANDING, 5, TAR_CHAR_ROOM, cast_detect_magic
+	12, POSITION_STANDING, 5, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_detect_magic
     },
 
     { /* 21 */
@@ -183,11 +183,11 @@ struct spell_info_type spell_info [ ] =
     },
 
     { /* 28 */
-	12, POSITION_FIGHTING, 50, TAR_CHAR_ROOM, cast_heal
+	12, POSITION_FIGHTING, 50, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_heal
     },
 
     { /* 29 */
-	12, POSITION_STANDING, 5, TAR_CHAR_ROOM|TAR_OBJ_INV|TAR_OBJ_ROOM|TAR_OBJ_EQUIP, cast_invisibility
+	12, POSITION_STANDING, 5, TAR_CHAR_ROOM|TAR_OBJ_INV|TAR_OBJ_ROOM|TAR_OBJ_EQUIP|TAR_SELF_DEFAULT, cast_invisibility
     },
 
     { /* 30 */
@@ -215,7 +215,7 @@ struct spell_info_type spell_info [ ] =
     },
 
     { /* 36 */
-	12, POSITION_STANDING, 75, TAR_CHAR_ROOM, cast_sanctuary
+	12, POSITION_STANDING, 75, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_sanctuary
     },
 
     { /* 37 */
@@ -227,7 +227,7 @@ struct spell_info_type spell_info [ ] =
     },
 
     { /* 39 */
-	12, POSITION_STANDING, 20, TAR_CHAR_ROOM, cast_strength
+	12, POSITION_STANDING, 20, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_strength
     },
 
     { /* 40 */
@@ -243,11 +243,11 @@ struct spell_info_type spell_info [ ] =
     },
 
     { /* 43 */
-	12, POSITION_STANDING, 5, TAR_CHAR_ROOM|TAR_OBJ_INV|TAR_OBJ_ROOM, cast_remove_poison
+	12, POSITION_STANDING, 5, TAR_CHAR_ROOM|TAR_OBJ_INV|TAR_OBJ_ROOM|TAR_SELF_DEFAULT, cast_remove_poison
     },
 
     { /* 44 */
-	12, POSITION_STANDING, 15, TAR_CHAR_ROOM|TAR_SELF_ONLY, cast_sense_life
+	12, POSITION_STANDING, 15, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_sense_life
     },
 
     { /* 45 */
@@ -259,7 +259,7 @@ struct spell_info_type spell_info [ ] =
     },
 
     { /* 47 */
-	 12, POSITION_STANDING, 33, TAR_CHAR_ROOM, cast_resist_acid
+	 12, POSITION_STANDING, 33, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_resist_acid
     },
 
     { /* 48 */
@@ -275,7 +275,7 @@ struct spell_info_type spell_info [ ] =
     },
 
     { /* 51 */
-	 12, POSITION_STANDING, 20, TAR_CHAR_ROOM, cast_water_breathing
+	 12, POSITION_STANDING, 20, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_water_breathing
     },
 
     { // 52
@@ -295,7 +295,7 @@ struct spell_info_type spell_info [ ] =
     },
 
     { /* 56 */
-	12, POSITION_STANDING, 10, TAR_CHAR_ROOM, cast_fly
+	12, POSITION_STANDING, 10, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_fly
     },
 
     { /* 57 */
@@ -315,7 +315,7 @@ struct spell_info_type spell_info [ ] =
     },
 
     { /* 61 */
-	12, POSITION_FIGHTING, 17, TAR_CHAR_ROOM, cast_cure_serious
+	12, POSITION_FIGHTING, 17, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_cure_serious
     },
 
     { /* 62 */
@@ -339,7 +339,7 @@ struct spell_info_type spell_info [ ] =
     },
 
     { /* 67 */
-	12, POSITION_STANDING, 12, TAR_CHAR_ROOM, cast_shield
+	12, POSITION_STANDING, 12, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_shield
     },
 
     { /* 68 */
@@ -359,11 +359,11 @@ struct spell_info_type spell_info [ ] =
     },
 
     { /* 72 */
-	12, POSITION_STANDING, 5, TAR_CHAR_ROOM, cast_infravision
+	12, POSITION_STANDING, 5, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_infravision
     },
 
     { /* 73 */
-	12, POSITION_STANDING, 12, TAR_CHAR_ROOM, cast_refresh
+	12, POSITION_STANDING, 12, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_refresh
     },
 
     { /* 74 */
@@ -379,11 +379,11 @@ struct spell_info_type spell_info [ ] =
     },
 
     { /* 77 */
-	12, POSITION_FIGHTING, 75, TAR_CHAR_ROOM, cast_power_heal 
+	12, POSITION_FIGHTING, 75, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_power_heal 
     },
 
     { /* 78 */
-	12, POSITION_FIGHTING, 80, TAR_CHAR_ROOM, cast_full_heal
+	12, POSITION_FIGHTING, 80, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_full_heal
     },
 
     { /* 79 */
@@ -395,7 +395,7 @@ struct spell_info_type spell_info [ ] =
     },
 
     { /* 81 */
-	12, POSITION_STANDING, 5, TAR_CHAR_ROOM|TAR_SELF_ONLY, cast_detect_good
+	12, POSITION_STANDING, 5, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_detect_good
     },
 
     { /* 82 */
@@ -427,7 +427,7 @@ struct spell_info_type spell_info [ ] =
     },
 
     { /* 89 */
-	12, POSITION_STANDING, 33, TAR_CHAR_ROOM|TAR_SELF_ONLY, cast_true_sight
+	12, POSITION_STANDING, 33, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_true_sight
     },
 
     { /* 90 */
@@ -463,11 +463,11 @@ struct spell_info_type spell_info [ ] =
     },
 
     { /* 98 */
-	12, POSITION_STANDING, 33, TAR_CHAR_ROOM|TAR_SELF_ONLY, cast_resist_fire
+	12, POSITION_STANDING, 33, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_resist_fire
     },
 
     { /* 99 */
-	12, POSITION_STANDING, 33, TAR_CHAR_ROOM|TAR_SELF_ONLY, cast_resist_cold
+	12, POSITION_STANDING, 33, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_resist_cold
     },
 
     { /* 100 */
@@ -483,11 +483,11 @@ struct spell_info_type spell_info [ ] =
     }, 
 
     { /* 103 */
-    	12, POSITION_STANDING, 20, TAR_CHAR_ROOM|TAR_SELF_ONLY, cast_barkskin
+    	12, POSITION_STANDING, 20, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_barkskin
     }, 
 
     { /* 104 */
-	12, POSITION_FIGHTING, 50, TAR_CHAR_ROOM, cast_herb_lore
+	12, POSITION_FIGHTING, 50, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_herb_lore
     }, 
 
     { /* 105 */
@@ -499,15 +499,15 @@ struct spell_info_type spell_info [ ] =
     }, 
 
     { /* 107 */
-    	12, POSITION_STANDING, 5, TAR_CHAR_ROOM|TAR_SELF_ONLY, cast_eyes_of_the_owl
+    	12, POSITION_STANDING, 5, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_eyes_of_the_owl
     },
 
     { /* 108 */
-    	12, POSITION_STANDING, 30, TAR_CHAR_ROOM|TAR_SELF_ONLY, cast_feline_agility
+    	12, POSITION_STANDING, 30, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_feline_agility
     }, 
 
     { /* 109 */
-    	12, POSITION_STANDING, 20, TAR_CHAR_ROOM|TAR_SELF_ONLY, cast_forest_meld
+    	12, POSITION_STANDING, 20, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_forest_meld
     },
     
     { // 110
@@ -579,19 +579,19 @@ struct spell_info_type spell_info [ ] =
     },
 
     { // 127
-        12, POSITION_STANDING, 30, TAR_CHAR_ROOM, cast_stone_shield
+        12, POSITION_STANDING, 30, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_stone_shield
     },
 
     { // 128
-        12, POSITION_STANDING, 50, TAR_CHAR_ROOM|TAR_SELF_ONLY, cast_greater_stone_shield
+        12, POSITION_STANDING, 50, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_greater_stone_shield
     },
 
     { // 129
-        12, POSITION_STANDING, 50, TAR_CHAR_ROOM|TAR_SELF_ONLY, cast_iron_roots
+        12, POSITION_STANDING, 50, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_iron_roots
     },
 
     { // 130
-        12, POSITION_STANDING, 50, TAR_CHAR_ROOM|TAR_SELF_ONLY, cast_eyes_of_the_eagle
+        12, POSITION_STANDING, 50, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_eyes_of_the_eagle
     },
 
     { // 131
@@ -603,7 +603,7 @@ struct spell_info_type spell_info [ ] =
     },
 
     { // 133
-	12, POSITION_STANDING, 50, TAR_CHAR_ROOM, cast_lightning_shield
+	12, POSITION_STANDING, 50, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_lightning_shield
     },
 
     { // 134
@@ -1477,7 +1477,8 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
               target_ok = TRUE;
             }
 
-          if (!target_ok && IS_SET(spell_info[spl].targets, TAR_SELF_ONLY)) {
+          if (!target_ok && ( IS_SET(spell_info[spl].targets, TAR_SELF_ONLY) ||
+                              IS_SET(spell_info[spl].targets, TAR_SELF_DEFAULT))) {
             tar_char = ch;
             target_ok = TRUE;
           }

@@ -14,7 +14,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.h,v 1.8 2002/08/03 04:21:44 pirahna Exp $ */
+/* $Id: spells.h,v 1.9 2002/08/03 06:00:46 pirahna Exp $ */
 #include <structs.h> // byte, sh_int
 
 #define MAX_BUF_LENGTH               240
@@ -357,6 +357,7 @@
 #define TAR_OBJ_WORLD      1<<9
 #define TAR_OBJ_EQUIP      1<<10
 #define TAR_NONE_OK        1<<11
+#define TAR_SELF_DEFAULT   1<<12
 
 typedef	int	SPELL_FUN	( byte level, CHAR_DATA *ch,
 				  char *arg, int type,
