@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.6 2002/07/28 02:04:14 pirahna Exp $ */
+/* $Id: info.cpp,v 1.7 2002/07/31 18:41:09 pirahna Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -1908,7 +1908,7 @@ int do_consider(struct char_data *ch, char *argument, int cmd)
 
    Learned = has_skill(ch, SKILL_CONSIDER);
    
-   if (Learned > 20) {
+   if (Learned > 0) {
       /* ARMOR CLASS */
       x = GET_AC(victim)/20+5;
       if(x > 10) x = 10;
@@ -1933,7 +1933,7 @@ int do_consider(struct char_data *ch, char *argument, int cmd)
    
    /* HIT POINTS */
    
-   if (Learned > 40) {
+   if (Learned > 0) {
       
       if(!IS_NPC(victim) && GET_LEVEL(victim) > IMMORTAL) {
          csendf(ch, "Compared to your hps, %s can definitely take anything you can dish out.\n\r",
@@ -1981,7 +1981,7 @@ int do_consider(struct char_data *ch, char *argument, int cmd)
          }
       }
       
-      if (Learned > 70) {
+      if (Learned > 0) {
          
          /* Average Damage */
          
@@ -2030,7 +2030,7 @@ int do_consider(struct char_data *ch, char *argument, int cmd)
       }
    }
    
-   if (Learned > 30) {
+   if (Learned > 0) {
       /* CHANCES TO STEAL */
       if((GET_CLASS(ch) == CLASS_THIEF) || (GET_LEVEL(ch) > IMMORTAL)) {
          
@@ -2132,7 +2132,7 @@ int do_scan(struct char_data *ch, char *argument, int cmd)
          else for(vict = room->people; vict; vict = vict->next_in_room) {
             if(CAN_SEE(ch, vict)  && !IS_AFFECTED2(vict, AFF_CAMOUFLAGUE)) { 
                percent = number(1,101);
-               if(percent < Learned) {
+               if(percent < 75) {
                   csendf(ch,"%35s -- a little bit %s\n\r", GET_SHORT(vict),
                      possibilities[i]);
                }
@@ -2154,7 +2154,7 @@ int do_scan(struct char_data *ch, char *argument, int cmd)
             else for(vict = room->people; vict; vict = vict->next_in_room) {
                if(CAN_SEE(ch, vict) && !IS_AFFECTED2(vict, AFF_CAMOUFLAGUE)){ 
                   percent = number(1,101);
-                  if(percent < (Learned *2 /3)) {
+                  if(percent < 50) {
                      csendf(ch,"%35s -- a ways off %s\n\r",
                         GET_SHORT(vict),
                         possibilities[i]);
@@ -2174,7 +2174,7 @@ int do_scan(struct char_data *ch, char *argument, int cmd)
                   else for(vict = room->people; vict; vict = vict->next_in_room) {
                      if(CAN_SEE(ch, vict) && !IS_AFFECTED2(vict, AFF_CAMOUFLAGUE)) {
                         percent = number(1,101);
-                        if(percent < (Learned * 2 / 3)) {
+                        if(percent < 40) {
                            csendf(ch, "%35s -- extremely far off %s\n\r",
                               GET_SHORT(vict),
                               possibilities[i]);

@@ -476,7 +476,7 @@ int do_sing(CHAR_DATA *ch, char *arg, int cmd)
       specialization = learned / 100;
       learned %= 100;
 
-      if(number(1, 101) > learned) {
+      if(number(1, 101) > 70) {
         send_to_char("You forgot the words!\n\r", ch);
         GET_KI(ch) -= use_song(ch, spl)/2;
         return eSUCCESS;

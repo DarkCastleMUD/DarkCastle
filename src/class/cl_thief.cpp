@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.6 2002/07/28 02:04:19 pirahna Exp $
+| $Id: cl_thief.cpp,v 1.7 2002/07/31 18:41:12 pirahna Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -383,7 +383,7 @@ int do_trip(CHAR_DATA *ch, char *argument, int cmd)
    chance += learned / 100;
    chance += (GET_DEX(ch) - GET_DEX(victim)) / 2;
  
-   skill_increase_check(ch, SKILL_CIRCLE, learned, SKILL_INCREASE_MEDIUM);
+   skill_increase_check(ch, SKILL_TRIP, learned, SKILL_INCREASE_MEDIUM);
 
   if(affected_by_spell(ch, SPELL_IRON_ROOTS)) {
     act("You try to trip $N but tree roots around $S legs keep him upright.", ch, 0, victim, TO_CHAR, 0);
@@ -1334,6 +1334,8 @@ int do_vitalstrike(struct char_data *ch, char *argument, int cmd)
   chance += learned / 10;
 
   percent = number(1, 101);
+
+  skill_increase_check(ch, SKILL_VITAL_STRIKE, learned, SKILL_INCREASE_EASY);
   
   if(learned < chance) {
     act("$n starts jabbing $s weapons around $mself and almost chops off $s pinkie finger."

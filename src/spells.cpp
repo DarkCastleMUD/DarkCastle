@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.6 2002/07/28 02:04:15 pirahna Exp $ */
+/* $Id: spells.cpp,v 1.7 2002/07/31 18:41:09 pirahna Exp $ */
 
 extern "C"
 {
@@ -1570,7 +1570,7 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
 
         // TODO - make this use int for mages
         if(GET_LEVEL(ch) < IMMORTAL && number(1,105) >
-           (learned - (20 - (GET_WIS(ch)==0 ? 20 : GET_WIS(ch))))
+           (80 - (20 - (GET_WIS(ch)==0 ? 20 : GET_WIS(ch))))
           )
         {
           send_to_char("You lost your concentration!\n\r", ch);
@@ -1578,6 +1578,9 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
           return eSUCCESS;
         }
         send_to_char("Ok.\n\r", ch);
+
+// TODO - pass 'learned' to the spell so it can use it to determine spell effect
+//        (we could just call "has_skill" again, but that wouldn't be very smart)
 
         GET_MANA(ch) -= (use_mana(ch, spl));
         return ((*spell_info[spl].spell_pointer) (GET_LEVEL(ch), ch, argument, SPELL_TYPE_SPELL, tar_char, tar_obj));

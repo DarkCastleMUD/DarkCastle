@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.6 2002/07/18 19:37:59 pirahna Exp $
+| $Id: objects.cpp,v 1.7 2002/07/31 18:41:09 pirahna Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -142,7 +142,7 @@ void name_from_drinkcon(struct obj_data *obj)
 
 int do_switch(struct char_data *ch, char *arg, int cmd)
 {
-  int percent;
+  int percent, learned;
   struct obj_data *between;
 
   if(IS_SET(world[ch->in_room].room_flags, QUIET)) {
@@ -156,8 +156,9 @@ int do_switch(struct char_data *ch, char *arg, int cmd)
      return eFAILURE;
   }
   percent = number(1,101);
+  learned = has_skill(ch, SKILL_SWITCH);
 
-  if (percent > has_skill(ch, SKILL_SWITCH)) {
+  if (percent > 60 || !learned) {
     act("$n fails to switch $s weapons.", ch,0,0, TO_ROOM, 0);
     act("You fail to switch your weapons.", ch, 0,0, TO_CHAR, 0);
     return eFAILURE;

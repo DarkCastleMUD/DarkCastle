@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: const.cpp,v 1.10 2002/07/30 21:35:22 pirahna Exp $ */
+/* $Id: const.cpp,v 1.11 2002/07/31 18:41:09 pirahna Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1149,6 +1149,7 @@ struct class_skill_defines u_skills[] = { // druid skills
 {    "drown",		SPELL_DROWN,		22,	90,	0,	NULL },
 {    "lightning shield",SPELL_LIGHTNING_SHIELD,	23,	90,	0,	NULL },
 {    "power heal",	SPELL_POWER_HEAL,	26,	90,	0,	NULL },
+{    "camouflague",	SPELL_CAMOUFLAGUE,	28,	90,	0,	NULL },
 {    "barkskin",	SPELL_BARKSKIN,		35,	90,	0,	NULL },
 {    "iron roots",	SPELL_IRON_ROOTS,	36,	90,	0,	NULL },
 {    "resist energy",	SPELL_RESIST_ENERGY,	39,	90,	0,	NULL },

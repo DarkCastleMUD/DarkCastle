@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.5 2002/07/23 19:04:48 pirahna Exp $ */
+/* $Id: ki.cpp,v 1.6 2002/07/31 18:41:09 pirahna Exp $ */
 
 extern "C"
 {
@@ -264,7 +264,7 @@ int do_ki(CHAR_DATA *ch, char *argument, int cmd)
     if((ki_info[spl].ki_pointer == NULL) && spl > 0)
       send_to_char("Sorry, this power has not yet been implemented.\n\r", ch);
     else {
-      if(number(1, 101) > learned) {
+      if(number(1, 101) > 75) {
         send_to_char("You lost your concentration!\n\r", ch);
         GET_KI(ch) -= use_ki(ch, spl)/2;
         return eSUCCESS;

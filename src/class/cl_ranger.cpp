@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_ranger.cpp,v 1.8 2002/07/28 02:04:19 pirahna Exp $ | cl_ranger.C |
+| $Id: cl_ranger.cpp,v 1.9 2002/07/31 18:41:12 pirahna Exp $ | cl_ranger.C |
 Description: Ranger skills/spells */ extern "C"  {
   #include <string.h>
 }
@@ -561,6 +561,8 @@ int do_forage(CHAR_DATA *ch, char *arg, int cmd)
     send_to_char("You can't carry that many items!\r\n", ch);
     return eFAILURE;
   }
+
+  skill_increase_check(ch, SKILL_FORAGE, learned, SKILL_INCREASE_HARD);
 
   // TODO - have forage use learned to modify how often you get rare items
   // TODO - add ability for zones to add zone-specific forage items
@@ -1208,6 +1210,8 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
 
   if(prob < 10) prob = 10;
   if(prob > 100) prob = 100;
+
+  skill_increase_check(ch, SKILL_ARCHERY, learned, SKILL_INCREASE_HARD);
 
   if(percent > prob)
   {

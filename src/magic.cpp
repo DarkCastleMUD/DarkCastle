@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.4 2002/07/24 19:01:12 pirahna Exp $ */
+/* $Id: magic.cpp,v 1.5 2002/07/31 18:41:09 pirahna Exp $ */
 
 extern "C"
 {
@@ -2321,7 +2321,7 @@ int spell_camouflague(byte level, CHAR_DATA *ch,
      act("You fade into the plant life.", victim, 0, 0, TO_CHAR, 0);
      
      af.type          = SPELL_CAMOUFLAGUE;
-     af.duration      = level;
+     af.duration      = 3;
      af.modifier      = 0;
      af.location      = APPLY_NONE;
      af.bitvector     = AFF_CAMOUFLAGUE;

@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.13 2002/07/30 21:35:22 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.14 2002/07/31 18:41:09 pirahna Exp $ */
 
 extern "C"
 {
@@ -2778,7 +2778,7 @@ void disarm(CHAR_DATA * ch, CHAR_DATA * victim)
   if (victim->equipment[WIELD] == NULL)            return;
   if (ch->equipment[WIELD] == NULL)                return;
   
-  act("$n disarms you and sends your weapon flying!", ch, NULL, victim, TO_VICT, 0);
+  act("$B$n disarms you and sends your weapon flying!$R", ch, NULL, victim, TO_VICT, 0);
   act("You disarm $N and send $S weapon flying!", ch, NULL, victim, TO_CHAR, 0);
   act("$n disarms $N and sends $S weapon flying!", ch, NULL, victim, TO_ROOM, NOTVICT);
 
