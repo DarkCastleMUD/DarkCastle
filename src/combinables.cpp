@@ -264,3 +264,24 @@ void determine_trade_skill_increase(char_data * ch, int skillnum, int learned, i
    // learn a point
    learn_skill(ch, skillnum, 1, 500);
 }
+
+int handle_poisoned_weapon_attack(char_data * ch, char_data * vict, int type)
+{
+   int retval = eSUCCESS;
+
+   switch(type)
+   {
+      case 0: // bee stinger poison
+         
+      case 1: // low quality cyanide
+
+         break;
+
+      default:
+         csendf(ch, "Unknown poison type %d.  Let a god know.\r\n", type);
+         break;
+   }
+
+   return retval;
+}
+

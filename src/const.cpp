@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: const.cpp,v 1.35 2002/08/26 22:29:16 pirahna Exp $ */
+/* $Id: const.cpp,v 1.36 2002/08/28 04:58:22 pirahna Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -583,6 +583,7 @@ char *more_obj_bits[] =
     "UNIQUE",
     "NO_TRADE",
     "NO_NOTICE",
+    "NO_LOCATE",
     "\n"
 };
 

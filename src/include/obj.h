@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: obj.h,v 1.9 2002/08/04 23:00:54 pirahna Exp $ */
+/* $Id: obj.h,v 1.10 2002/08/28 04:58:26 pirahna Exp $ */
 #ifndef OBJ_H_
 #define OBJ_H_
 
@@ -123,6 +123,7 @@ void eq_remove_damage(obj_data * obj);
 #define ITEM_NO_TRADE           1<<3
 #define ITEM_NONOTICE           1<<4  // Item doesn't show up on 'look' but
                                       // can still be accessed with 'get' etc FUTURE
+#define ITEM_NOLOCATE           1<<5 
 
 /* Bitvector for 'size' */
 #define SIZE_ANY		1

@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: utility.h,v 1.9 2002/08/11 16:10:08 pirahna Exp $ */
+/* $Id: utility.h,v 1.10 2002/08/28 04:58:26 pirahna Exp $ */
 
 #ifndef UTILITY_H_
 #define UTILITY_H_
@@ -407,5 +407,8 @@ struct mprog_throw_type {
 
    mprog_throw_type * next;
 };
+
+
+int handle_poisoned_weapon_attack(char_data * ch, char_data * vict, int percent);
 
 #endif /* UTILITY_H_ */

@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.24 2002/08/26 21:14:43 pirahna Exp $ */
+/* $Id: magic.cpp,v 1.25 2002/08/28 04:58:22 pirahna Exp $ */
 
 extern "C"
 {
@@ -1890,22 +1890,23 @@ int spell_locate_object(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
 
   for (i = object_list; i && (j>0); i = i->next)
   {
-	 if (isname(name, i->name)) {
-		if(i->carried_by) {
-	sprintf(buf,"%s carried by %s.\n\r",
-	  i->short_description,PERS(i->carried_by,ch));
-	send_to_char(buf,ch);
-		} else if (i->in_obj) {
-	sprintf(buf,"%s in %s.\n\r",i->short_description,
-	  i->in_obj->short_description);
-	send_to_char(buf,ch);
-		} else {
-	sprintf(buf,"%s in %s.\n\r",i->short_description,
-	(i->in_room == NOWHERE ? "Used but uncertain." : world[i->in_room].name));
-	send_to_char(buf,ch);
-	 j--;
-		}
-	 }
+    if(IS_SET(obj->obj_flags.more_flags, ITEM_NOLOCATE))
+       continue;
+
+    if (isname(name, i->name)) {
+      if(i->carried_by) {
+        sprintf(buf,"%s carried by %s.\n\r", i->short_description,PERS(i->carried_by,ch));
+        send_to_char(buf,ch);
+      } else if (i->in_obj) {
+        sprintf(buf,"%s in %s.\n\r",i->short_description, i->in_obj->short_description);
+        send_to_char(buf,ch);
+      } else {
+        sprintf(buf,"%s in %s.\n\r",i->short_description,
+           (i->in_room == NOWHERE ? "Used but uncertain." : world[i->in_room].name));
+        send_to_char(buf,ch);
+        j--;
+      }
+    }
   }
 
   if(j==0)

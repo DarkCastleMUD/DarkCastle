@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.58 2002/08/28 04:18:45 dcastle Exp $ */
+/* $Id: fight.cpp,v 1.59 2002/08/28 04:58:22 pirahna Exp $ */
 
 extern "C"
 {
@@ -3342,6 +3342,10 @@ int weapon_spells(CHAR_DATA *ch, CHAR_DATA *vict, int weapon)
       break;
     case WEP_CREATE_FOOD:
       retval = cast_create_food(GET_LEVEL(ch), ch, "", 0, vict, 0, 0);
+      break;
+
+    case WEP_THIEF_POISON:
+      retval = handle_poisoned_weapon_attack(ch, vict, percent);
       break;
 
     default:
