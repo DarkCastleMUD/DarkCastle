@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: obj.h,v 1.5 2002/07/13 19:19:35 azrack Exp $ */
+/* $Id: obj.h,v 1.6 2002/07/14 17:45:29 pirahna Exp $ */
 #ifndef OBJ_H_
 #define OBJ_H_
 
@@ -179,7 +179,7 @@ struct extra_descr_data
 
 struct obj_flag_data
 {
-    int16 value[4];       /* Values of the item (see list)    */
+    int32 value[4];       /* Values of the item (see list)    */
     ubyte type_flag;     /* Type of item                     */
     uint32 wear_flags;     /* Where you can wear it            */
     uint16 size;           /* Race restrictions                */

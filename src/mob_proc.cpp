@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.4 2002/06/29 18:16:22 pirahna Exp $ */
+/* $Id: mob_proc.cpp,v 1.5 2002/07/14 17:45:25 pirahna Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -3723,7 +3723,7 @@ int ranger_combat(struct char_data *ch, struct obj_data *obj, int cmd, char *arg
    
    if(number(1, 5) == 1 && GET_LEVEL(ch) > 44) {
       act("$n utters the words 'Save this Dinas!'.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-      return cast_creeping_death(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0);
+      return cast_creeping_death(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0);
    }
 
    if(number(1, 5) == 1 && GET_LEVEL(ch) > 29)
@@ -3743,7 +3743,7 @@ int ranger_combat(struct char_data *ch, struct obj_data *obj, int cmd, char *arg
 
    if(number(1, 2) == 1) {
      act("$n utters the words 'Get the point?'.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-     return cast_bee_sting(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0);
+     return cast_bee_sting(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0);
    }
 
    return eFAILURE;

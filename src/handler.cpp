@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.5 2002/07/13 21:11:06 pirahna Exp $ */
+/* $Id: handler.cpp,v 1.6 2002/07/14 17:45:25 pirahna Exp $ */
     
 extern "C"
 {
@@ -663,6 +663,9 @@ void affect_modify(CHAR_DATA *ch, int32 loc, int32 mod, long bitv, bool add)
             break;
 
         case WEP_CREATE_FOOD:
+            break;
+
+        case APPLY_DAMAGED: // this is for storing damage to the item
             break;
 
 	default:

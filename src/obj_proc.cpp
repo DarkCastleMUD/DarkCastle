@@ -295,24 +295,18 @@ int holyavenger(CHAR_DATA *ch, struct obj_data *obj,  int cmd, char *arg,
                if(chance > (2 * percent)) {
                    chance = number(0, 101);
                    if(chance > (2 * percent)) {
-                       act("You feel your life end as $n's sword SLICES YOUR HEAD OFF!",
-                           ch, 0, vict, TO_VICT, 0);
-                       act("You SLICE $N's head CLEAN OFF $S body!",
-                           ch, 0, vict, TO_CHAR, 0);
-                       act("$n cleanly slices $N's head off $S body!",
-                           ch, 0, vict, TO_ROOM, NOTVICT);
+                       act("You feel your life end as $n's sword SLICES YOUR HEAD OFF!", ch, 0, vict, TO_VICT, 0);
+                       act("You SLICE $N's head CLEAN OFF $S body!", ch, 0, vict, TO_CHAR, 0);
+                       act("$n cleanly slices $N's head off $S body!", ch, 0, vict, TO_ROOM, NOTVICT);
                        GET_HIT(vict) = -20;
                        make_head(vict);
                        fight_kill(ch, vict, TYPE_CHOOSE);
                        group_gain(ch, vict); 
                        return eSUCCESS; /* Zero means kill it! */
                    } else { /* You MISS the fucker! */
-                       act("You feel $n's sword slice by your head!",
-                           ch, 0, vict, TO_VICT, 0);
-                       act("You miss your attempt to behead $N.",
-                           ch, 0, vict, TO_CHAR, 0);
-                       act("$N jumps back as $n makes an attempt to BEHEAD $M!",
-                           ch, 0, vict, TO_ROOM, NOTVICT);
+                       act("You feel $n's sword slice by your head!", ch, 0, vict, TO_VICT, 0);
+                       act("You miss your attempt to behead $N.", ch, 0, vict, TO_CHAR, 0);
+                       act("$N jumps back as $n makes an attempt to BEHEAD $M!", ch, 0, vict, TO_ROOM, NOTVICT);
                    }
                }
            }

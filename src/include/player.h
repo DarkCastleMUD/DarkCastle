@@ -1,7 +1,7 @@
 #ifndef PLAYER_H_
 #define PLAYER_H_
 /************************************************************************
-| $Id: player.h,v 1.2 2002/06/13 04:41:15 dcastle Exp $
+| $Id: player.h,v 1.3 2002/07/14 17:45:29 pirahna Exp $
 | player.h
 | Description: This file defines the player vectors..punishment, specials,
 |   etc...
@@ -205,7 +205,8 @@
 #define APPLY_MOVE_REGEN       92
 #define APPLY_KI_REGEN         93
 #define WEP_CREATE_FOOD        94
-#define APPLY_MAXIMUM_VALUE    94
+#define APPLY_DAMAGED          95
+#define APPLY_MAXIMUM_VALUE    95
 
 /* RESERVED: 100-150 for more weapon affects */
 /* Morc XXX */
