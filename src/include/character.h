@@ -1,7 +1,7 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.5 2002/07/13 19:19:35 azrack Exp $
+| $Id: character.h,v 1.6 2002/08/01 15:13:32 dcastle Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
@@ -12,10 +12,8 @@
 #include <event.h> // eventBrief
 #include <isr.h>   // SAVE_TYPE_MAX
 
-//#define START_ROOM        3001 // Where you login
-#define START_ROOM      350 // Where you login
-//#define SECOND_START_ROOM 3059 // Where you go if killed in start room
-#define SECOND_START_ROOM 351 // Where you go if killed in start room
+#define START_ROOM        3001 // Where you login
+#define SECOND_START_ROOM 3059 // Where you go if killed in start room
 
 #define PASSWORD_LEN    20
 #define DESC_LENGTH     80
