@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: board.cpp,v 1.6 2004/05/30 23:49:06 urizen Exp $
+| $Id: board.cpp,v 1.7 2004/05/31 00:16:49 urizen Exp $
 | board.C
 | Description:  This file contains the implementation for the board
 |   code.  It's old and should be rewritten --Morc XXX
@@ -99,7 +99,8 @@ int board_clan[] = { -1,
                      22,  5, 17,  7, 24,  9, 19, -1, 29, 11, // 11 through 20
                      -1,  3, 26, 13, 27, 18,  5,  4, 6,  17, // 21 - 30
                      28, -1, 34, 12, -1, -1, 10, 26, 11, 15, // 31 - 40
-                     -1, 21, -1
+                     -1, 21, -1, -1, -1, -1, -1, -1, -1, -1,
+		     -1, -1, -1, -1, -1
 		     };
 
 int board_class[] = {

@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.61 2004/05/30 21:09:46 urizen Exp $ */
+/* $Id: nanny.cpp,v 1.62 2004/05/31 00:19:35 urizen Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -479,7 +479,7 @@ int more_than_ten_people_from_this_ip(struct descriptor_data *new_conn)
 const char *host_list[]=
 {
   "62.65.107.", // Urizen
-  "24.165.167.45.", // Dasein
+  "24.165.167.", // Dasein
   "24.43.54.", // Apocalypse
   "127.0.0.1", // localhost (duh)
   "68.124.193.", // Valkyrie
