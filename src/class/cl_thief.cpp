@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.13 2002/09/11 02:56:59 pirahna Exp $
+| $Id: cl_thief.cpp,v 1.14 2002/12/26 22:16:40 pirahna Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -1159,8 +1159,6 @@ int do_slip(struct char_data *ch, char *argument, int cmd)
          return eFAILURE;
          }
     
-      skill_increase_check(ch, SKILL_SLIP, learned, SKILL_INCREASE_EASY);
-
       // Failure
       if (percent > 60) {
          send_to_char("Whoops!  You dropped them.\n\r", ch);
@@ -1303,6 +1301,8 @@ int do_slip(struct char_data *ch, char *argument, int cmd)
         return eFAILURE;
      }
    }
+
+   skill_increase_check(ch, SKILL_SLIP, learned, SKILL_INCREASE_EASY);
 
    // Failure
    if (percent > learned) {
