@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.65 2004/05/28 02:28:00 urizen Exp $
+| $Id: guild.cpp,v 1.66 2004/05/29 21:29:32 urizen Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -33,7 +33,6 @@ extern struct class_skill_defines u_skills[];
 extern struct class_skill_defines c_skills[];
 extern struct class_skill_defines m_skills[];
 extern struct index_data *mob_index;
-extern bool improve;
 
 char *str_nospace(char *stri);
 
@@ -504,7 +503,6 @@ int get_stat(CHAR_DATA *ch, int stat)
 void skill_increase_check(char_data * ch, int skill, int learned, int difficulty)
 {
    int chance, maximum;
-   if (!improve) return; // Improving turned off. Quaff/Weaponspell etc.
    if( ! ( learned = has_skill(ch, skill) ) )
       return; // get out if i don't have the skill
 

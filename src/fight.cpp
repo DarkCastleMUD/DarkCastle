@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.207 2004/05/28 02:28:00 urizen Exp $ */
+/* $Id: fight.cpp,v 1.208 2004/05/29 21:29:32 urizen Exp $ */
 
 extern "C"
 {
@@ -3929,8 +3929,6 @@ int weapon_spells(CHAR_DATA *ch, CHAR_DATA *vict, int weapon)
     log("Null ch or vict sent to weapon spells!", -1, LOG_BUG);
     return eFAILURE|eINTERNAL_ERROR;
   }
-  extern bool improve;
-  
   if(!weapon)
     return eFAILURE;
   
@@ -3956,7 +3954,6 @@ int weapon_spells(CHAR_DATA *ch, CHAR_DATA *vict, int weapon)
     
     /* If they don't roll under chance, it doesn't work! */
     if(chance > percent) continue;
-    improve = FALSE;
     switch(current_affect)
     {
     case WEP_MAGIC_MISSILE:
@@ -4081,7 +4078,6 @@ int weapon_spells(CHAR_DATA *ch, CHAR_DATA *vict, int weapon)
       //     current_affect, obj_index[ch->equipment[weapon]->item_number].virt);
       break;
     } /* switch statement */
-    improve = TRUE;
     if(SOMEONE_DIED(retval))
       return retval;      
   } /* for loop */

@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.95 2004/05/29 21:20:02 urizen Exp $ */
+/* $Id: spells.cpp,v 1.96 2004/05/29 21:29:33 urizen Exp $ */
 
 extern "C"
 {
@@ -163,7 +163,7 @@ struct spell_info_type spell_info [ ] =
 
  { /* 41 */ 12, POSITION_FIGHTING,  5, TAR_CHAR_ROOM|TAR_OBJ_ROOM|TAR_SELF_NONO, cast_ventriloquate, SKILL_INCREASE_EASY },
 
- { /* 42 */ 12, POSITION_FIGHTING, 50, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_word_of_recall, SKILL_INCREASE_HARD },
+ { /* 42 */ 12, POSITION_FIGHTING, 50, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_word_of_recall, SKILL_INCREASE_MEDIUM },
 
  { /* 43 */ 12, POSITION_STANDING, 12, TAR_CHAR_ROOM|TAR_OBJ_INV|TAR_OBJ_ROOM|TAR_SELF_DEFAULT, cast_remove_poison, SKILL_INCREASE_MEDIUM },
 
@@ -1556,6 +1556,7 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
           csendf(ch, "You lost your concentration and are unable to cast %s!\n\r", spells[spl-1]);
           GET_MANA(ch) -= (use_mana(ch, spl) >> 1);
           act("$n loses $s concentration and is unable to complete $s spell.", ch, 0, 0, TO_ROOM, 0);
+	  skill_increase_check(ch, spl, learned, spell_info[spl].difficulty);
           return eSUCCESS;
         }
 

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.39 2004/05/21 01:57:38 urizen Exp $
+| $Id: objects.cpp,v 1.40 2004/05/29 21:29:33 urizen Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -35,7 +35,6 @@ extern "C"
 extern char *drinks[];
 extern int drink_aff[][3];
 extern CWorld world;
-extern bool improve;
  
 extern struct spell_info_type spell_info[MAX_SPL_LIST];
 extern struct active_object active_head;
@@ -285,7 +284,6 @@ int do_quaff(struct char_data *ch, char *argument, int cmd)
   gain_condition(ch,FULL,2);
   gain_condition(ch,THIRST,2);
 
-  improve = FALSE;
   for (i = 1; i < 4; i++) 
   {
      if (temp->obj_flags.value[i] >= 1) 
@@ -300,7 +298,6 @@ int do_quaff(struct char_data *ch, char *argument, int cmd)
      if(IS_SET(retval, eCH_DIED))
         break;
   }
-  improve = TRUE;
   if(!is_mob || !IS_SET(retval, eCH_DIED)) // it's already been free'd when mob died
   {     
     if (equipped)
@@ -380,7 +377,6 @@ int do_recite(struct char_data *ch, char *argument, int cmd)
     }
     else
     {
-      improve = FALSE;
       // success
       for (i=1; i<4; i++)
       {
@@ -394,7 +390,6 @@ int do_recite(struct char_data *ch, char *argument, int cmd)
         }
       }
     }
-    improve = TRUE;
     if(!is_mob || !IS_SET(retval, eCH_DIED)) // it's already been free'd when mob died
     {
       if (equipped)
@@ -575,7 +570,6 @@ int do_use(struct char_data *ch, char *argument, int cmd)
 
   stick = ch->equipment[HOLD];
 
-  improve = FALSE;
   if (stick->obj_flags.type_flag == ITEM_STAFF)
   {
     act("$n taps $p three times on the ground.", ch, stick, 0,TO_ROOM, 0);
@@ -586,7 +580,6 @@ int do_use(struct char_data *ch, char *argument, int cmd)
       WAIT_STATE(ch,PULSE_VIOLENCE);
       int retval = ((*spell_info[stick->obj_flags.value[3]].spell_pointer)
         ((byte) stick->obj_flags.value[0], ch, "", SPELL_TYPE_STAFF, 0, 0, lvl));
-      improve = TRUE;
       return retval;
     } else {
       send_to_char("The staff seems powerless.\n\r", ch);
@@ -609,7 +602,6 @@ int do_use(struct char_data *ch, char *argument, int cmd)
 	WAIT_STATE(ch,PULSE_VIOLENCE);
         int retval= ((*spell_info[stick->obj_flags.value[3]].spell_pointer)
           ((byte) stick->obj_flags.value[0], ch, "", SPELL_TYPE_WAND, tmp_char, tmp_object, lvl));
-        improve = TRUE;
 	return retval;
       } else {
         send_to_char("The wand seems powerless.\n\r", ch);
