@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.30 2003/03/04 06:45:29 pirahna Exp $ */
+/* $Id: mob_proc.cpp,v 1.31 2003/04/01 04:26:32 pirahna Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -2897,7 +2897,18 @@ static char *dethSayText [ ] =
   "Hey guys, ya know...it tastes just like salty tapioca.  No no, really...it does.",
   "Pirahna is such a loser with women.  Skanky hoes flee in terror from him.",
   "Outside a dog, a book is a man's best friend.  Inside a dog, it's too dark to read.",
-  "You can't spell 'Crap' without 'Rap'."
+  "You can't spell 'Crap' without 'Rap'.",
+  "Give a person a fish and you feed them for a day. Teach that person to use the internet and they won't bother you for weeks.",
+  "Some people are like Slinkies...not really good for anything, but you can't help but smile when you see one tumble down the stairs.",
+  "I read recipes the same way I read science fiction. I get to the end and I think, 'Well, that's never going to happen!'",
+  "Doctors can be frustrating. You wait a month-and-a-half for an appointment, and he says, 'I wish you would've come to me sooner.'",
+  "Have you ever noticed that a slight tax increase costs you two hundred dollars, and a substantial tax cut saves you thirty cents?",
+  "In the 60's people took acid to make the world weird. Now the world is weird and people take Prozac to make it normal.",
+  "Politics is supposed to be the second oldest profession. I have come to realize it bears a very close resemblance to the first.",
+  "How is it one careless match can start a forest fire, but it takes a whole box to start a campfire?",
+  "Marriage is like taking a hot bath. After you've been in for a while...it isn't so hot.",
+  "If you're playing a poker game and you look around the table and can't tell who the sucker is, guess what....it's you!",
+  "Whenever I feel blue, I start breathing again."
 };
 
 #define DETH_SAY_TEXT_SIZE    ( sizeof ( dethSayText )    / sizeof ( char * ) )
