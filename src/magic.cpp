@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.81 2003/06/23 03:03:16 pirahna Exp $ */
+/* $Id: magic.cpp,v 1.82 2003/07/08 01:38:36 pirahna Exp $ */
 
 extern "C"
 {
@@ -3560,12 +3560,9 @@ int spell_know_alignment(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct ob
 // TODO - make this use skill
 int spell_dispel_minor(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
-	 int yes = 0;
-         int rots = 0;
-       int done = FALSE;
-	int retval;
-
-	 /*char buf[100];*/
+   int rots = 0;
+   int done = FALSE;
+   int retval;
 
    if(obj) /* Trying to dispel_minor an obj */
    {
@@ -3576,11 +3573,11 @@ int spell_dispel_minor(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
       if(!obj->equipped_by) {
          // Someone load it or something?
          send_to_char("The magic fades away back to the ether.\n\r", ch);
-	 act("$p fades away gently.", ch, obj, 0, TO_ROOM, INVIS_NULL);
+         act("$p fades away gently.", ch, obj, 0, TO_ROOM, INVIS_NULL);
       }
       else {
          send_to_char("The magic is shattered by your will!\n\r", ch);
-	 act("$p blinks out of existance with a bang!", ch, obj, 0, TO_ROOM, INVIS_NULL);
+         act("$p blinks out of existance with a bang!", ch, obj, 0, TO_ROOM, INVIS_NULL);
          send_to_char("Your magic beacon is shattered!\n\r", obj->equipped_by);
          obj->equipped_by->beacon = NULL;
          obj->equipped_by = NULL;
@@ -3588,324 +3585,335 @@ int spell_dispel_minor(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
       extract_obj(obj);
       return eSUCCESS;
    }
-	 if(!ch || !victim)
-	 {
-	   log("Null ch or victim sent to dispel_minor!", ANGEL, LOG_BUG);
-	   return eFAILURE;
-	 }
 
-    if((GET_LEVEL(victim) <= GET_LEVEL(ch)) && (GET_LEVEL(victim) > 0))
-	yes = TRUE;
-    else
-	yes = FALSE;
+   if(!ch || !victim)
+   {
+      log("Null ch or victim sent to dispel_minor!", ANGEL, LOG_BUG);
+      return eFAILURE;
+   }
 
-	if(!IS_NPC(ch) && !IS_NPC(victim) && victim->fighting &&
-	    IS_NPC(victim->fighting)) {
-	  send_to_char("You misfire!\n\r", ch);
-	  victim = ch;
-	}
+   if(!IS_NPC(ch) && !IS_NPC(victim) && victim->fighting &&
+      IS_NPC(victim->fighting)) 
+   {
+      send_to_char("You misfire!\n\r", ch);
+      victim = ch;
+   }
 
-// Input max number of spells in switch statement here
-     while(!done && ((rots += 1) < 10))
-     switch(number(1, 12)) {
+   // If victim higher level, they get a save vs magic for no effect
+   if((GET_LEVEL(victim) > GET_LEVEL(ch)) && 0 > saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC))
+      return eFAILURE;
 
-	case 1: if (affected_by_spell(victim, SPELL_INVISIBLE))
-	         if (yes || 0 > saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC)) {
-		   affect_from_char(victim, SPELL_INVISIBLE);
-		   send_to_char("You feel exposed.\n\r", victim);
+   // Input max number of spells in switch statement here
+   while(!done && ((rots += 1) < 10))
+   {
+      switch(number(1, 12)) 
+      {
+         case 1: 
+            if (affected_by_spell(victim, SPELL_INVISIBLE))
+            {
+               affect_from_char(victim, SPELL_INVISIBLE);
+               send_to_char("You feel exposed.\n\r", victim);
                done = TRUE;
-		  }
-	      if (IS_AFFECTED(victim, AFF_INVISIBLE))
-	      if (yes || 0 > saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC)) {
-		 REMOVE_BIT(victim->affected_by, AFF_INVISIBLE);
-		 send_to_char("You feel exposed.\n\r", victim);
-		 act("$n fades into existance.", victim, 0, 0, TO_ROOM, 0);
-             done = TRUE;
-		}
+            }
+            if (IS_AFFECTED(victim, AFF_INVISIBLE))
+            {
+               REMOVE_BIT(victim->affected_by, AFF_INVISIBLE);
+               send_to_char("You feel exposed.\n\r", victim);
+               act("$n fades into existance.", victim, 0, 0, TO_ROOM, 0);
+               done = TRUE;
+            }
             break;
 
-	 case 2: if (affected_by_spell(victim, SPELL_DETECT_INVISIBLE))
-	         if (yes || 0 > saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC)) {
-		    affect_from_char(victim, SPELL_DETECT_INVISIBLE);
-		    send_to_char("You feel less perceptive.\n\r", victim);
+	 case 2: 
+            if (affected_by_spell(victim, SPELL_DETECT_INVISIBLE))
+            {
+               affect_from_char(victim, SPELL_DETECT_INVISIBLE);
+               send_to_char("You feel less perceptive.\n\r", victim);
                 done = TRUE;
-		   }
-               break;
+            }
+            break;
 
-	 case 3: if (affected_by_spell(victim, SPELL_DETECT_EVIL))
-	         if (yes || 0 > saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC)) {
-		    affect_from_char(victim, SPELL_DETECT_EVIL);
-		    send_to_char("You feel less morally alert.\n\r", victim);
-                done = TRUE;
-		   }
-               break;
+	 case 3: 
+            if (affected_by_spell(victim, SPELL_DETECT_EVIL))
+            {
+               affect_from_char(victim, SPELL_DETECT_EVIL);
+               send_to_char("You feel less morally alert.\n\r", victim);
+               done = TRUE;
+            }
+            break;
 
-	 case 4: if (affected_by_spell(victim, SPELL_DETECT_MAGIC))
-	         if (yes || 0 > saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC)) {
-		    affect_from_char(victim, SPELL_DETECT_MAGIC);
-		    send_to_char("You stop noticing the magic in your life.\n\r", victim);
-                done = TRUE;
-		   }
-               break;
+	 case 4: 
+            if (affected_by_spell(victim, SPELL_DETECT_MAGIC))
+            {
+               affect_from_char(victim, SPELL_DETECT_MAGIC);
+               send_to_char("You stop noticing the magic in your life.\n\r", victim);
+               done = TRUE;
+            }
+            break;
 
-	 case 5: if (affected_by_spell(victim, SPELL_SENSE_LIFE))
-	         if (yes || 0 > saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC)) {
-		    affect_from_char(victim, SPELL_SENSE_LIFE);
-		    send_to_char("You feel less in touch with living things.\n\r", victim);
-                done = TRUE;
-		   }
-               break;
+	 case 5: 
+            if (affected_by_spell(victim, SPELL_SENSE_LIFE))
+            {
+               affect_from_char(victim, SPELL_SENSE_LIFE);
+               send_to_char("You feel less in touch with living things.\n\r", victim);
+               done = TRUE;
+            }
+            break;
 
-	 case 6: if (affected_by_spell(victim, SPELL_INFRAVISION))
-		   if (yes || 0 > saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC)) {
-	          affect_from_char(victim, SPELL_INFRAVISION);
-	          send_to_char("Your sight grows dimmer.\n\r", victim);
-                done = TRUE;
-		   }
-               break;
+	 case 6: 
+            if (affected_by_spell(victim, SPELL_INFRAVISION))
+            {
+               affect_from_char(victim, SPELL_INFRAVISION);
+               send_to_char("Your sight grows dimmer.\n\r", victim);
+               done = TRUE;
+            }
+            break;
 
-	 case 7: if (affected_by_spell(victim, SPELL_STRENGTH))
-	         if (yes || 0 > saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC)) {
-		    affect_from_char(victim, SPELL_STRENGTH);
-		    send_to_char("You don't feel so strong.\n\r", victim);
-                done = TRUE;
-		   }
-               break;
+	 case 7: 
+            if (affected_by_spell(victim, SPELL_STRENGTH))
+            {
+               affect_from_char(victim, SPELL_STRENGTH);
+               send_to_char("You don't feel so strong.\n\r", victim);
+               done = TRUE;
+            }
+            break;
 
-	 case 8: if (affected_by_spell(victim, SPELL_DETECT_POISON))
-	         if (yes || 0 > saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC)) {
-		    affect_from_char(victim, SPELL_DETECT_POISON);
-		    send_to_char("You don't feel so sensitive to fumes.\n\r", victim);
-                done = TRUE;
-		   }
-               break;
+	 case 8: 
+            if (affected_by_spell(victim, SPELL_DETECT_POISON))
+            {
+               affect_from_char(victim, SPELL_DETECT_POISON);
+               send_to_char("You don't feel so sensitive to fumes.\n\r", victim);
+               done = TRUE;
+            }
+            break;
 
-	 case 9: if (affected_by_spell(victim, SPELL_BLESS))
-	         if (yes || 0 > saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC)) {
-		    affect_from_char(victim, SPELL_BLESS);
-		    send_to_char("You don't feel so blessed.\n\r", victim);
-                done = TRUE;
-		   }
-               break;
+	 case 9: 
+            if (affected_by_spell(victim, SPELL_BLESS))
+            {
+               affect_from_char(victim, SPELL_BLESS);
+               send_to_char("You don't feel so blessed.\n\r", victim);
+               done = TRUE;
+            }
+            break;
 
-	 case 10: if (affected_by_spell(victim, SPELL_FLY))
-	          if (yes || 0 > saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC)) {
-		     affect_from_char(victim, SPELL_FLY);
-		     send_to_char("You don't feel lighter than air anymore.\n\r", victim);
-                 done = TRUE;
-		    }
- 	          if (IS_AFFECTED(victim, AFF_FLYING))
-	          if (yes || 0 > saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC)) {
-		     REMOVE_BIT(victim->affected_by, AFF_FLYING);
-		     send_to_char("You don't feel lighter than air anymore.\n\r", victim);
-		     act("$n drops to the ground, no longer lighter than air.", victim, 0, 0, TO_ROOM, 0);
-                 done = TRUE;
-		    }
-                break;
+	 case 10: 
+            if (affected_by_spell(victim, SPELL_FLY))
+            {
+               affect_from_char(victim, SPELL_FLY);
+               send_to_char("You don't feel lighter than air anymore.\n\r", victim);
+               done = TRUE;
+            }
+ 	    if (IS_AFFECTED(victim, AFF_FLYING))
+            {
+               REMOVE_BIT(victim->affected_by, AFF_FLYING);
+               send_to_char("You don't feel lighter than air anymore.\n\r", victim);
+               act("$n drops to the ground, no longer lighter than air.", victim, 0, 0, TO_ROOM, 0);
+               done = TRUE;
+            }
+            break;
  
-	 case 11: if (affected_by_spell(victim, SPELL_DETECT_GOOD))
-		    if (yes || 0 > saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC)) {
-		     affect_from_char(victim, SPELL_DETECT_GOOD);
-		     send_to_char("You can't see the good in a person anymore.\n\r", victim);
-                 done = TRUE;
-	          }
-                break;
+	 case 11: 
+            if (affected_by_spell(victim, SPELL_DETECT_GOOD))
+            {
+               affect_from_char(victim, SPELL_DETECT_GOOD);
+               send_to_char("You can't see the good in a person anymore.\n\r", victim);
+               done = TRUE;
+            }
+            break;
       
-	 case 12: if (affected_by_spell(victim, SPELL_CAMOUFLAGUE))
-		    if (yes || 0 > saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC)) {
-		     affect_from_char(victim, SPELL_CAMOUFLAGUE);
-		     send_to_char("You don't seem to be camouflaged anymore.\n\r", victim);
-                 done = TRUE;
-	          }
-                break;
+	 case 12: 
+            if (affected_by_spell(victim, SPELL_CAMOUFLAGUE))
+            {
+               affect_from_char(victim, SPELL_CAMOUFLAGUE);
+               send_to_char("You don't seem to be camouflaged anymore.\n\r", victim);
+               done = TRUE;
+            }
+            break;
       
-       default: send_to_char("Illegal Value send to switch in dispel_minor, tell a god.\r\n", ch);
-                done = TRUE;
-                break;
+         default: send_to_char("Illegal Value send to switch in dispel_minor, tell a god.\r\n", ch);
+            done = TRUE;
+            break;
+      } // of switch
+   } // of while
 
-      } /* of switch */
-
-	  if (IS_NPC(victim))
-		 if (!victim->fighting) {
-			 retval = one_hit(victim, ch, TYPE_UNDEFINED, FIRST);
-			 retval = SWAP_CH_VICT(retval);
-			 return retval;
-		}
-  return eSUCCESS;
+   if (IS_NPC(victim) && !victim->fighting) 
+   {
+      retval = one_hit(victim, ch, TYPE_UNDEFINED, FIRST);
+      retval = SWAP_CH_VICT(retval);
+      return retval;
+   }
+   return eSUCCESS;
 }
 
 // TODO - make this use skill
 int spell_dispel_magic(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
-	 int yes = 0;
-         int rots = 0;
-       int done = FALSE;
-	int retval;
+   int rots = 0;
+   int done = FALSE;
+   int retval;
 
-	 /*char buf[100];*/
+   if(!ch || !victim)
+   {
+      log("Null ch or victim sent to dispel_magic!", ANGEL, LOG_BUG);
+      return eFAILURE;
+   }
 
-	 if(!ch || !victim)
-	 {
-	   log("Null ch or victim sent to dispel_magic!", ANGEL, LOG_BUG);
-	   return eFAILURE;
-	 }
+   set_cantquit(ch, victim);
 
-    set_cantquit(ch, victim);
+   if(IS_SET(victim->affected_by2, AFF_GOLEM)) {
+      send_to_char("The golem seems to shrug off your attempt!\r\n", ch);
+      act("The golem seems to ignore $n!", ch, 0, 0, TO_ROOM, 0);
+      return eFAILURE;
+   }
 
-    if(IS_SET(victim->affected_by2, AFF_GOLEM)) {
-        send_to_char("The golem seems to shrug off your attempt!\r\n", ch);
-        act("The golem seems to ignore $n!", ch, 0, 0, TO_ROOM, 0);
-        return eFAILURE;
-    }
+   if(!IS_NPC(ch) && !IS_NPC(victim) && victim->fighting &&
+       IS_NPC(victim->fighting) && 
+      !IS_AFFECTED(victim->fighting, AFF_CHARM)) 
+   {
+      send_to_char("You misfire!\n\r", ch);
+      victim = ch;
+   }
 
-    if((GET_LEVEL(victim) <= GET_LEVEL(ch)) && (GET_LEVEL(victim) > 0))
-	yes = TRUE;
-    else
-	yes = FALSE;
-
-	if(!IS_NPC(ch) && !IS_NPC(victim) && victim->fighting &&
-	    IS_NPC(victim->fighting) && 
-            !IS_AFFECTED(victim->fighting, AFF_CHARM)) {
-	  send_to_char("You misfire!\n\r", ch);
-	  victim = ch;
-	}
+   // If victim higher level, they get a save vs magic for no effect
+   if((GET_LEVEL(victim) > GET_LEVEL(ch)) && 0 > saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC))
+      return eFAILURE;
 
 // Number of spells in the switch statement goes here
    while(!done && ((rots += 1) < 10))
-    switch(number(1, 10)) {	
-
-	 case 1: if (affected_by_spell(victim, SPELL_SANCTUARY))
-	      if (yes || 0 > saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC)) {
-		 affect_from_char(victim, SPELL_SANCTUARY);
-		 send_to_char("You don't feel so invulnerable anymore.\n\r", victim);
-		 act("The white glow around $n's body fades.", victim, 0, 0, TO_ROOM, 0);
-             done = TRUE;
-		}
-	      if (IS_AFFECTED(victim, AFF_SANCTUARY))
-	      if (yes || 0 > saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC)) {
-		 REMOVE_BIT(victim->affected_by, AFF_SANCTUARY);
-		 send_to_char("You don't feel so invulnerable anymore.\n\r", victim);
-		 act("The white glow around $n's body fades.", victim, 0, 0, TO_ROOM, 0);
-             done = TRUE;
-		}
-            break;
-
-	 case 2: if (affected_by_spell(victim, SPELL_PROTECT_FROM_EVIL))
-            if (yes || 0 > saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC)) {
-		 affect_from_char(victim, SPELL_PROTECT_FROM_EVIL);
-		 send_to_char("You feel less morally protected.\n\r", victim);
-             done = TRUE;
-		}
-            break;
-
-	 case 3: if (affected_by_spell(victim, SPELL_SLEEP))
-            if (yes || 0 > saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC)) {
-		 affect_from_char(victim, SPELL_SLEEP);
-		 send_to_char("You don't feel so tired.\n\r", victim);
-             done = TRUE;
-		}
-            break;
-
-	 case 4: if (affected_by_spell(victim, SPELL_CHARM_PERSON) &&
-                     !victim->fighting)
-	      if (yes || 0 > saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC)) {
-                 stop_follower(victim, 0);
-		 affect_from_char(victim, SPELL_CHARM_PERSON);
-		 send_to_char("You feel less enthused about your master.\n\r", victim);
-             done = TRUE;
-		}
-            break;
-
-	 case 5: if (affected_by_spell(victim, SPELL_ARMOR))
-	      if (yes || 0 > saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC)) {
-		 affect_from_char(victim, SPELL_ARMOR);
-		 send_to_char("You don't feel so well protected.\n\r", victim);
-             done = TRUE;
-		}
-            break;
-
-	 case 6: if (affected_by_spell(victim, SPELL_BLINDNESS))
-		if (yes || 0 > saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC)) {
-             affect_from_char(victim, SPELL_BLINDNESS);
-	       send_to_char("Your vision returns.\n\r", victim);
-             done = TRUE;
-		}
-            break;
-
-	 case 7: if (affected_by_spell(victim, SPELL_POISON))
-		if (yes || 0 > saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC)) {
-	       affect_from_char(victim, SPELL_POISON);
-             done = TRUE;
-		}
-            break;
-
-	 case 8: if (affected_by_spell(victim, SPELL_FIRESHIELD))
-		 if (yes || 0 > saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC)) {
-		  affect_from_char(victim, SPELL_FIRESHIELD);
-		  send_to_char("Your flames seem to have been extinguished.\n\r", victim);
-	        act("The flames around $n's body fade away.", victim, 0, 0, TO_ROOM, 0);
+   {
+     switch(number(1, 10)) 
+     {
+        case 1: 
+           if (affected_by_spell(victim, SPELL_SANCTUARY))
+           {
+              affect_from_char(victim, SPELL_SANCTUARY);
+              send_to_char("You don't feel so invulnerable anymore.\n\r", victim);
+              act("The white glow around $n's body fades.", victim, 0, 0, TO_ROOM, 0);
               done = TRUE;
-	       }
-	       if (IS_AFFECTED(victim, AFF_FIRESHIELD))
-		 if (yes || 0 > saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC)) {
-		  REMOVE_BIT(victim->affected_by, AFF_FIRESHIELD);
-		  send_to_char("Your flames seem to have been extuinguised.\n\r", victim);
+           }
+           if (IS_AFFECTED(victim, AFF_SANCTUARY))
+           {
+              REMOVE_BIT(victim->affected_by, AFF_SANCTUARY);
+              send_to_char("You don't feel so invulnerable anymore.\n\r", victim);
+              act("The white glow around $n's body fades.", victim, 0, 0, TO_ROOM, 0);
+              done = TRUE;
+           }
+           break;
+
+        case 2: 
+           if (affected_by_spell(victim, SPELL_PROTECT_FROM_EVIL))
+           {
+              affect_from_char(victim, SPELL_PROTECT_FROM_EVIL);
+              send_to_char("You feel less morally protected.\n\r", victim);
+              done = TRUE;
+           }
+           break;
+
+        case 3: 
+           if (affected_by_spell(victim, SPELL_SLEEP))
+           {
+              affect_from_char(victim, SPELL_SLEEP);
+              send_to_char("You don't feel so tired.\n\r", victim);
+              done = TRUE;
+           }
+           break;
+
+        case 4: 
+           if (affected_by_spell(victim, SPELL_CHARM_PERSON) && !victim->fighting) 
+           {
+              stop_follower(victim, 0);
+              affect_from_char(victim, SPELL_CHARM_PERSON);
+              send_to_char("You feel less enthused about your master.\n\r", victim);
+              done = TRUE;
+           }
+           break;
+
+	 case 5: 
+           if (affected_by_spell(victim, SPELL_ARMOR))
+           {
+              affect_from_char(victim, SPELL_ARMOR);
+              send_to_char("You don't feel so well protected.\n\r", victim);
+              done = TRUE;
+           }
+           break;
+
+	 case 6: 
+           if (affected_by_spell(victim, SPELL_BLINDNESS))
+           {
+              affect_from_char(victim, SPELL_BLINDNESS);
+              send_to_char("Your vision returns.\n\r", victim);
+              done = TRUE;
+           }
+           break;
+
+	 case 7: 
+           if (affected_by_spell(victim, SPELL_POISON))
+           {
+              affect_from_char(victim, SPELL_POISON);
+              done = TRUE;
+           }
+           break;
+
+	 case 8: 
+           if (affected_by_spell(victim, SPELL_FIRESHIELD))
+           {
+              affect_from_char(victim, SPELL_FIRESHIELD);
+              send_to_char("Your flames seem to have been extinguished.\n\r", victim);
               act("The flames around $n's body fade away.", victim, 0, 0, TO_ROOM, 0);
               done = TRUE;
-	       }
-             break;
-
-	 case 9: if (affected_by_spell(victim, SPELL_PARALYZE))
-		 if (yes || 0 > saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC)) {
-		  affect_from_char(victim, SPELL_PARALYZE);
-		  send_to_char("You can move again.\n\r", victim);
+           }
+           if (IS_AFFECTED(victim, AFF_FIRESHIELD))
+           {
+              REMOVE_BIT(victim->affected_by, AFF_FIRESHIELD);
+              send_to_char("Your flames seem to have been extuinguised.\n\r", victim);
+              act("The flames around $n's body fade away.", victim, 0, 0, TO_ROOM, 0);
               done = TRUE;
-             }
-	       if (IS_AFFECTED(victim, AFF_PARALYSIS))
-		  if (yes || 0 > saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC)) {
-		  REMOVE_BIT(victim->affected_by, AFF_PARALYSIS);
+	   }
+           break;
+
+	 case 9: 
+           if (affected_by_spell(victim, SPELL_PARALYZE))
+           {
+              affect_from_char(victim, SPELL_PARALYZE);
               send_to_char("You can move again.\n\r", victim);
               done = TRUE;
-             }
-             break;
+           }
+	   if (IS_AFFECTED(victim, AFF_PARALYSIS))
+           {
+              REMOVE_BIT(victim->affected_by, AFF_PARALYSIS);
+              send_to_char("You can move again.\n\r", victim);
+              done = TRUE;
+           }
+           break;
       
-       case 10:
-/*
-             if(affected_by_spell(victim, SPELL_BARKSKIN))
-		 if (yes || 0 > saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC)) {
-		  affect_from_char(victim, SPELL_BARKSKIN);
-		  send_to_char("Your skin feels softer.\n\r", victim);
+	 case 10: 
+           if (affected_by_spell(victim, SPELL_HASTE))
+           {
+              affect_from_char(victim, SPELL_HASTE);
+              send_to_char("You don't feel so fast anymore.\n\r", victim);
               done = TRUE;
-             }
-             break;
-*/
-	 case 11: if (affected_by_spell(victim, SPELL_HASTE))
-		 if (yes || 0 > saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC)) {
-		  affect_from_char(victim, SPELL_HASTE);
-		  send_to_char("You don't feel so fast anymore.\n\r", victim);
+           }
+           if (IS_AFFECTED(victim, AFF_HASTE))
+           {
+              REMOVE_BIT(victim->affected_by, AFF_HASTE);
+              send_to_char("You don't feel so fast anymore.\n\r", victim);
               done = TRUE;
-	       }
- 	       if (IS_AFFECTED(victim, AFF_HASTE))
-		 if (yes || !saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC)) {
-		  REMOVE_BIT(victim->affected_by, AFF_HASTE);
-	        send_to_char("You don't feel so fast anymore.\n\r", victim);
-              done = TRUE;
-	       }
-             break;
-       
+           }
+           break;
 
-       default: send_to_char("Illegal Value sent to dispel_magic switch statement.  Tell a god.", ch);
+           default: send_to_char("Illegal Value sent to dispel_magic switch statement.  Tell a god.", ch);
               done = TRUE;
               break;
-    } /* end of switch */
+      } // end of switch
+   } // end of while
 
-	  if (IS_NPC(victim))
-		 if (!victim->fighting) {
-			 retval = one_hit(victim, ch, TYPE_UNDEFINED, FIRST);
-			 retval = SWAP_CH_VICT(retval);
-			 return retval;
-		}
-  return eSUCCESS;
+   if (IS_NPC(victim) && !victim->fighting) 
+   {
+      retval = one_hit(victim, ch, TYPE_UNDEFINED, FIRST);
+      retval = SWAP_CH_VICT(retval);
+      return retval;
+   }
+   return eSUCCESS;
 }
 
 
