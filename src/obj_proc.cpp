@@ -33,6 +33,8 @@ extern struct index_data *mob_index;
 extern struct str_app_type str_app[];
 extern struct obj_data *object_list;
 
+extern struct zone_data *zone_table;
+
 // TODO - go over emoting object stuff and make sure it's as effecient as we can get it
  
 struct obj_emote_data {
@@ -984,6 +986,29 @@ int weenie_weedy(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
          send_to_room("Someone's weenie weedy doll says, 'BLARG!'\r\n", obj->carried_by->in_room);
       else if(obj->in_room != NOWHERE)
          send_to_room("a weenie weedy doll says, 'BLARG!'\r\n", obj->in_room);
+
+   return eSUCCESS;
+}
+
+// this hsould really be a azrack megaphone, but i'm too lazy to figure out how they
+// work right now
+// TODO - figure out how azrack's megaphone's work
+int stupid_message(struct char_data*ch, struct obj_data *obj, int cmd, char*arg, 
+                   CHAR_DATA *invoker)
+{
+   if (cmd)
+     return eFAILURE;
+
+  if(!obj || obj->in_room < 0)
+     return eFAILURE;
+
+  if(!zone_table[world[obj->in_room].zone].players)
+     return eFAILURE;
+
+   if(number(1, 4))
+      send_to_room("The shadows swirl to reveal a face before you.  "
+                   "It speaks suddenly, 'Only with the key can you unlock the masters name' "
+                   "and then fades away.\r\n", obj->in_room);
 
    return eSUCCESS;
 }

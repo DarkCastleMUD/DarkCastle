@@ -520,6 +520,7 @@ void assign_objects(void)
   SPEC_FUN generic_push_proc;
   SPEC_FUN generic_weapon_combat;
   SPEC_FUN TOHS_locator;
+  SPEC_FUN stupid_message;
 
   assign_one_obj_non(9,  phish_locator);	
   assign_one_obj_non(13,  board); /* Quest Board */
@@ -538,6 +539,7 @@ void assign_objects(void)
   assign_one_obj_non(9530,  no_magic_while_alive);
   assign_one_obj_non(9531,  boat_proc);
   assign_one_obj_non(9532,  leave_boat_proc);
+  assign_one_obj_non(9606,  stupid_message);
   assign_one_obj_non(9996,  board); /* builder board */
   assign_one_obj_non(9997,  board); /* imp board */ 
   assign_one_obj_non(9999,  board); /* wiz board */ 
