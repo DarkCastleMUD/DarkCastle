@@ -207,7 +207,7 @@ int do_sqedit(struct char_data *ch, char *argument, int cmd)
 	  i = find_skill_num(arg3);
 	if (i<=0)
 	  i = find_skill_num(arg1);
-	if (i<=0)
+	if (i<=0 || arg2[0] == '\0')
 	{
 	  send_to_char("Skill not found.\r\n",ch);
 	  return eFAILURE;

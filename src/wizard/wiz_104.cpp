@@ -502,7 +502,9 @@ int do_show(struct char_data *ch, char *argument, int cmd)
     if(has_range)
       send_to_char("  rfiles\r\n"
                    "  mfiles\r\n"
-                   "  ofiles\r\n", ch);
+                   "  ofiles\r\n"
+		   "  search\r\n"
+		   " msearch\r\n", ch);
     return eFAILURE;
   }
 
@@ -572,7 +574,8 @@ int do_show(struct char_data *ch, char *argument, int cmd)
              ((struct char_data *)(mob_index[nr].item))->name)) 
           {
             count++;
-            sprintf(buf, "[%3d] [%5d] %s\n\r", count, i, 
+            sprintf(buf, "[%3d] [%5d] [%2d] %s\n\r", count, i, ((struct 
+char_data*)(mob_index[nr].item))->level,
                  ((struct char_data *)(mob_index[nr].item))->short_desc);
             send_to_char(buf, ch);
 
@@ -629,7 +632,8 @@ int do_show(struct char_data *ch, char *argument, int cmd)
               continue;
 
            count++;
-           sprintf(buf, "[%3d] [%5d] %s\n\r", count, i, 
+           sprintf(buf, "[%3d] [%5d] [%2d] %s\n\r", count, i, ((struct 
+obj_data *)(obj_index[nr].item))->obj_flags.eq_level,
               ((struct obj_data *)(obj_index[nr].item))->short_description);
            send_to_char(buf, ch);
 
@@ -747,6 +751,81 @@ int do_show(struct char_data *ch, char *argument, int cmd)
 
     } // else was a digit
   } // zone
+  else if (is_abbrev(type, "search") && has_range)
+  {  // Object search.
+    char arg1[MAX_STRING_LENGTH];
+    int affect = 0, size = 0, extra = 0, more = 0, wear = 0;
+    extern char *wear_bits[];
+    extern char *extra_bits[];
+    extern char *more_obj_bits[];
+    extern char *size_bitfields[];
+    extern char *apply_types[];
+    extern char *pc_clss_types[];
+    while ( ( argument = one_argument(argument, arg1) ) )
+    {
+       int i;
+       for (i = 0; *wear_bits[i] != '\n' ; i++)
+	if (is_abbrev(wear_bits[i],arg1))
+	{
+	  SET_BIT(wear, 1<<i);
+	  continue;
+	}
+       for (i = 0; *extra_bits[i] != '\n' ; i++)
+        if (is_abbrev(extra_bits[i],arg1))
+        {
+          SET_BIT(extra, 1<<i);
+          continue;
+        }
+       for (i = 0; *more_obj_bits[i] != '\n' ; i++)
+        if (is_abbrev(more_obj_bits[i],arg1))
+        {
+          SET_BIT(more, 1<<i);
+          continue;
+        }
+       for (i = 0; *size_bitfields[i] != '\n' ; i++)
+        if (is_abbrev(size_bitfields[i],arg1))
+        {
+          SET_BIT(size, 1<<i);
+          continue;
+        }
+       for (i = 0; *apply_types[i] != '\n' ; i++)
+        if (is_abbrev(apply_types[i],arg1))
+        {
+          SET_BIT(more, 1<<i);
+          continue;
+        }
+       for (i = 0; *pc_clss_types[i] != '\n' ; i++)
+        if (is_abbrev(pc_clss_types[i],arg1))
+        {
+          SET_BIT(more, 1<<i);
+          continue;
+        }
+     int found = 0,c,nr;
+     for (c=0;c < obj_index[top_of_objt].virt;c++)
+     {
+      if ((nr = real_object(c)) < 0)
+           continue;
+      if (!IS_SET(((struct obj_data *)(obj_index[nr].item))->obj_flags.wear_flags, wear))
+	continue;
+      if (!IS_SET(    ((struct obj_data *)(obj_index[nr].item))->obj_flags.size, size))
+	continue;
+      if (!IS_SET(    ((struct obj_data *)(obj_index[nr].item))->obj_flags.extra_flags, extra))
+	continue;
+      if (!IS_SET(((struct obj_data *)(obj_index[nr].item))->obj_flags.more_flags, more))
+	continue;
+      int aff,total = 0;
+      for (aff = 0; aff < ((struct obj_data *)(obj_index[nr].item))->num_affects;i++)
+	SET_BIT(total, ((struct obj_data *)(obj_index[nr].item))->affected[aff].location);
+      if (!IS_SET(total, affect))
+        continue;
+      count++;
+           sprintf(buf, "[%3d] [%5d] [%2d] %s\n\r", count, i, ((struct
+obj_data *)(obj_index[nr].item))->obj_flags.eq_level,
+              ((struct obj_data *)(obj_index[nr].item))->short_description);
+           send_to_char(buf, ch);
+     }
+    }
+  }
   else if (is_abbrev(type, "rfiles") && has_range)
   {
     curr = world_file_list;
