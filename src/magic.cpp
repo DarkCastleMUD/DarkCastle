@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.30 2002/09/17 22:04:36 pirahna Exp $ */
+/* $Id: magic.cpp,v 1.31 2002/09/20 18:42:54 pirahna Exp $ */
 
 extern "C"
 {
@@ -437,11 +437,13 @@ int spell_stone_shield(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
   struct affected_type af;
   char buf[160];
 
-  if(affected_by_spell(victim, SPELL_STONE_SHIELD) || affected_by_spell(victim, SPELL_GREATER_STONE_SHIELD)) {
-    sprintf(buf, "%s is already surrounded by a stone shield.\r\n", GET_SHORT(victim));
+  if(affected_by_spell(victim, SPELL_GREATER_STONE_SHIELD)) {
+    sprintf(buf, "%s is already surrounded by a greater stone shield.\r\n", GET_SHORT(victim));
     send_to_char(buf, ch);
     return eSUCCESS;
   }
+  if(affected_by_spell(victim, SPELL_STONE_SHIELD))
+    affect_from_char(victim, SPELL_STONE_SHIELD);
 
   af.type      = SPELL_STONE_SHIELD;
   af.duration  = 5 + (level / 10) + (GET_WIS(ch) > 23);

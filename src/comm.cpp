@@ -2031,11 +2031,13 @@ void report_debug_logging()
 {
   extern char last_processed_cmd[MAX_INPUT_LENGTH];
   extern char last_char_name[MAX_INPUT_LENGTH];
+  extern int  last_char_room;
 
   log("Last cmd:", ANGEL, LOG_BUG);
   log(last_processed_cmd, ANGEL, LOG_BUG);
   log("Owner's Name:", ANGEL, LOG_BUG);
   log(last_char_name, ANGEL, LOG_BUG);
+  logf(ANGEL, LOG_BUG, "Last room: %d", last_char_room);
 }
 
 void crash_hotboot()

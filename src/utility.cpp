@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.11 2002/09/06 23:27:23 dcastle Exp $ */
+/* $Id: utility.cpp,v 1.12 2002/09/20 18:42:54 pirahna Exp $ */
 
 extern "C"
 {
@@ -1064,6 +1064,8 @@ int do_quit(struct char_data *ch, char *argument, int cmd)
   // Finish off any performances
   if(IS_SINGING(ch))
     do_sing(ch, "stop", 9);
+
+  affect_from_char(ch, SPELL_IRON_ROOTS);
 
   if(ch->beacon)
     extract_obj(ch->beacon);

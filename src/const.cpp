@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: const.cpp,v 1.43 2002/09/14 20:08:23 pirahna Exp $ */
+/* $Id: const.cpp,v 1.44 2002/09/20 18:42:54 pirahna Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -180,7 +180,7 @@ char *spell_wear_off_msg[] =
   "!FreeFloat!",
   "!Insomnia!",
   "!ShadowSlip!",
-  "!ResistEnergy!",  // 120
+  "The yellow in your skin fades.",  // 120
   "!StaunchBlood!",
   "!CreateGolem!",  // 122
   "!Reflect!",

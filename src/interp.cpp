@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.cpp,v 1.15 2002/09/10 20:36:28 pirahna Exp $ */
+/* $Id: interp.cpp,v 1.16 2002/09/20 18:42:54 pirahna Exp $ */
 
 extern "C"
 {
@@ -52,6 +52,7 @@ extern CWorld world;
 // to the log files.  (char name is so long, in case it was a mob)
 char last_processed_cmd[MAX_INPUT_LENGTH];
 char last_char_name[MAX_INPUT_LENGTH];
+int  last_char_room;
 
 void update_wizlist(CHAR_DATA *ch);
 // int system(const char *); 
@@ -612,6 +613,7 @@ int command_interpreter( CHAR_DATA *ch, char *pcomm )
     // it into the debugging globals
     strncpy(last_processed_cmd, pcomm, (MAX_INPUT_LENGTH-1));    
     strncpy(last_char_name, GET_NAME(ch), (MAX_INPUT_LENGTH-1));    
+    last_char_room = ch->in_room;
 
     // Look for command in command table.
 
