@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.155 2004/04/20 21:57:16 urizen Exp $ */
+/* $Id: fight.cpp,v 1.156 2004/04/20 21:58:17 urizen Exp $ */
 
 extern "C"
 {
@@ -3634,7 +3634,7 @@ bool isaff2(int spellnum);
   
   while(victim->affected)
     affect_remove(victim, victim->affected, SUPPRESS_ALL, isaff2(victim->affected->type));  
-
+  victim->affected_by2 = 0;
   if(ch && arena[2] == -2)
   {
     if(ch && ch->clan && GET_LEVEL(ch) < IMMORTAL)        clan  = get_clan(ch);
