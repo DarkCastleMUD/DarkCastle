@@ -1,6 +1,12 @@
-/************************************************************************
-| $Id: cl_ranger.cpp,v 1.27 2003/06/13 00:43:56 pirahna Exp $ | cl_ranger.C |
-Description: Ranger skills/spells */ extern "C"  {
+/******************************************************************************
+ * $Id: cl_ranger.cpp,v 1.28 2003/11/10 19:37:14 staylor Exp $ | cl_ranger.C  *
+ * Description: Ranger skills/spells                                          *
+ *                                                                            *
+ * Revision History                                                           *
+ * 10/28/2003  Onager   Modified do_tame() to remove hate flag for tamer      *
+ ******************************************************************************/
+
+extern "C"  {
   #include <string.h>
 }
 #include <iostream.h>
@@ -42,6 +48,8 @@ int do_tame(CHAR_DATA *ch, char *arg, int cmd)
 
   void add_follower(CHAR_DATA *ch, CHAR_DATA *leader, int cmd);
   void stop_follower(CHAR_DATA *ch, int cmd);
+  void remove_memory(CHAR_DATA *ch, char type, CHAR_DATA *vict);
+
 
   while(*arg == ' ')
     arg++;
@@ -123,6 +131,9 @@ int do_tame(CHAR_DATA *ch, char *arg, int cmd)
 
   if(victim->master)
     stop_follower(victim, 0);
+
+  /* make charmie stop hating tamer */
+  remove_memory(victim, 'h', ch);
 
   add_follower(victim, ch, 0);
 
