@@ -125,7 +125,7 @@ int do_goto(struct char_data *ch, char *argument, int cmd)
        location = loc_nr;
      else
      {
-       if(can_modify_room(ch, loc_nr)) {
+       if(can_modify_this_room(ch, loc_nr)) {
          if(create_one_room(ch, loc_nr)) {
            send_to_char("You form order out of chaos.\n\r\n\r", ch);
            location = loc_nr;

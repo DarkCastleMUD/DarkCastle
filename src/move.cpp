@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.16 2003/01/22 16:12:19 pirahna Exp $
+| $Id: move.cpp,v 1.17 2003/06/13 00:43:54 pirahna Exp $
 | move.C
 | Movement commands and stuff.
 */
@@ -634,7 +634,7 @@ int do_leave(struct char_data *ch, char *arguement, int cmd)
          do_look(ch, "", 9);         
          sprintf(buf, "%s walks out of %s.", GET_NAME(ch), k->short_description);
          act(buf, ch, 0, 0, TO_ROOM, INVIS_NULL|STAYHIDE);
-         return eSUCCESS;
+         return ambush(ch);
         }
      } 
   }
@@ -761,7 +761,7 @@ int do_enter(CHAR_DATA *ch, char *argument, int cmd)
       default:
          break;
    }
-   return eSUCCESS;
+   return ambush(ch);
 }
 
 /************************************************************************

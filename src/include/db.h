@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: db.h,v 1.3 2003/01/16 08:08:41 dcastle Exp $ */
+/* $Id: db.h,v 1.4 2003/06/13 00:44:37 pirahna Exp $ */
 #ifndef DB_H_
 #define DB_H_
 
@@ -76,6 +76,7 @@ void set_zone_modified_mob(long room);
 void set_zone_saved_mob(long room);
 void set_zone_modified_obj(long room);
 void set_zone_saved_obj(long room);
+bool can_modify_this_room(char_data * ch, long room);
 bool can_modify_room(char_data * ch, long room);
 bool can_modify_mobile(char_data * ch, long room);
 bool can_modify_object(char_data * ch, long room);

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_ranger.cpp,v 1.26 2003/06/13 00:40:06 pirahna Exp $ | cl_ranger.C |
+| $Id: cl_ranger.cpp,v 1.27 2003/06/13 00:43:56 pirahna Exp $ | cl_ranger.C |
 Description: Ranger skills/spells */ extern "C"  {
   #include <string.h>
 }
@@ -441,7 +441,9 @@ int ambush(CHAR_DATA *ch)
            return (eSUCCESS|eCH_DIED);  // ch = damage vict
          if(IS_SET(retval, eCH_DIED))
            return (eSUCCESS); // doesn't matter, but don't lag vict
-         WAIT_STATE(i, PULSE_VIOLENCE * 2);
+         if(!IS_MOB(i) && IS_SET(i->pcdata->toggles, PLR_WIMPY))
+            WAIT_STATE(i, PULSE_VIOLENCE * 3);
+         else WAIT_STATE(i, PULSE_VIOLENCE * 2);
          WAIT_STATE(ch, PULSE_VIOLENCE * 1);
        }
        // we continue instead of breaking in case there are any OTHER rangers in the room

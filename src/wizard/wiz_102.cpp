@@ -655,7 +655,7 @@ int do_zedit(struct char_data *ch, char *argument, int cmd)
       }
       
       // if the zone memory is full, allocate another 10 commands worth       
-      if(last_cmd == (zone_table[zone].reset_total-1))
+      if(last_cmd >= (zone_table[zone].reset_total-2))
       {
         zone_table[zone].cmd = (struct reset_com *)
             realloc(zone_table[zone].cmd, (zone_table[zone].reset_total + 10) * sizeof(struct reset_com));
@@ -673,6 +673,7 @@ int do_zedit(struct char_data *ch, char *argument, int cmd)
         zone_table[zone].cmd[i-1].arg1 = 0;   
         zone_table[zone].cmd[i-1].arg2 = 0;   
         zone_table[zone].cmd[i-1].arg3 = 0;   
+        zone_table[zone].cmd[i-1].comment = NULL;
         sprintf(buf, "New command 'J' added at %d.\r\n", i);
       }
       else // tack it on the end
@@ -685,6 +686,7 @@ int do_zedit(struct char_data *ch, char *argument, int cmd)
         zone_table[zone].cmd[last_cmd].arg1 = 0;   
         zone_table[zone].cmd[last_cmd].arg2 = 0;   
         zone_table[zone].cmd[last_cmd].arg3 = 0;   
+        zone_table[zone].cmd[last_cmd].comment = NULL;
         sprintf(buf, "New command 'J' added at %d.\r\n", last_cmd+1);
       } 
       send_to_char(buf, ch);
@@ -1882,7 +1884,7 @@ int do_oedit(struct char_data *ch, char *argument, int cmd)
       // new
       case 18: {
         if(!*buf4) {
-          send_to_char("$3Syntax$R: oedit [item_num] new <new_obj_num>\n\r", ch);
+          send_to_char("$3Syntax$R: oedit [item_num] new\n\r", ch);
           return eFAILURE;
         }
         if(!check_range_valid_and_convert(intval, buf4, 0, 35000)) {
@@ -1893,6 +1895,8 @@ int do_oedit(struct char_data *ch, char *argument, int cmd)
           send_to_char("You are unable to work creation outside of your range.\n\r", ch);
           return eFAILURE;   
         }
+        send_to_char("Command disabled until pirahna has it updating zonefiles properly.\r\n", ch);
+        return eFAILURE;
 
         x = create_blank_item(intval);
         if(x < 0) {

@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.114 2003/06/13 00:12:07 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.115 2003/06/13 00:44:35 pirahna Exp $ */
 
 extern "C"
 {
@@ -1130,7 +1130,6 @@ void eq_damage(CHAR_DATA * ch, CHAR_DATA * victim,
 
 void pir_stat_loss(char_data * victim)
 {
-  int loss = 0;
 
   /* Pir's extra stat loss.  Bwahahah */
   if(number(1,100) <= GET_LEVEL(victim)/2 && GET_LEVEL(victim) >= 50 && 
@@ -1144,7 +1143,6 @@ void pir_stat_loss(char_data * victim)
               victim->raw_str -=1 ;
               send_to_char("*** You lose one strength point ***\r\n", victim);
               sprintf(log_buf, "%s lost a str too. ouch.", GET_NAME(victim));
-              loss = 1;
             }
       break;
     case 2: if(GET_WIS(victim) > 4) 
@@ -1153,14 +1151,12 @@ void pir_stat_loss(char_data * victim)
               victim->raw_wis -=1 ;
               send_to_char("*** You lose one wisdom point ***\r\n", victim);
               sprintf(log_buf, "%s lost a wis too. ouch.", GET_NAME(victim));
-              loss = 1;
             }
       break;
     case 3: GET_CON(victim) -= 1;
       victim->raw_con -=1 ;
       send_to_char("*** You lose another constitution point ***\r\n", victim);
       sprintf(log_buf, "%s lost a con too. ouch.", GET_NAME(victim));
-      loss = 1;
       break;
     case 4: if(GET_INT(victim) > 4) 
             {
@@ -1168,7 +1164,6 @@ void pir_stat_loss(char_data * victim)
               victim->raw_intel -=1 ;
               send_to_char("*** You lose one intelligence point ***\r\n", victim);
               sprintf(log_buf, "%s lost a int too. ouch.", GET_NAME(victim));
-              loss = 1;
             }
       break;
     case 5: if(GET_DEX(victim) > 4) 
@@ -1177,15 +1172,11 @@ void pir_stat_loss(char_data * victim)
               victim->raw_dex -=1 ;
               send_to_char("*** You lose one dexterity point ***\r\n", victim);
               sprintf(log_buf, "%s lost a dex too. ouch.", GET_NAME(victim));
-              loss = 1;
             }
       break;
     } // of switch
     log(log_buf, SERAPH, LOG_MORTAL);
-
-    if(loss)
-      victim->pcdata->statmetas--;   // we lost a stat, so don't charge extra meta
-
+    victim->pcdata->statmetas -= 1;   // we lost a stat, so don't charge extra meta
   } // of pir's extra stat loss
 }
 

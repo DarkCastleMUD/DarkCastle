@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.73 2003/06/13 00:16:03 pirahna Exp $ */
+/* $Id: magic.cpp,v 1.74 2003/06/13 00:43:53 pirahna Exp $ */
 
 extern "C"
 {
@@ -7470,14 +7470,6 @@ int spell_bee_sting(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
 	        TO_CHAR, 0);
             }
 
-   // If they are NOT outside it costs extra mana
-/* Temp removed to keep the GL weapon from making people -mana
-   if (!OUTSIDE(ch)) {
-      send_to_char("Your spell is more draining because you are indoors!\n\r",
-                   ch);
-      ch->mana -= (level / 2);
-      }
-*/
   return eSUCCESS;
 }
 
@@ -7488,10 +7480,11 @@ int cast_bee_sting(byte level, CHAR_DATA *ch, char *arg, int type,
    switch (type) {
       case SPELL_TYPE_SPELL:
          if (!OUTSIDE(ch)) {
-            send_to_char("Your spell is more draining because you are "
-	                 "indoors!\n\r", ch);
-            ch->mana -= level / 2;
-            }
+            send_to_char("Your spell is more draining because you are indoors!\n\r", ch);
+            GET_MANA(ch) -= level / 2;
+            if(GET_MANA(ch) < 0)
+               GET_MANA(ch) = 0;
+         }
          return spell_bee_sting(level, ch, victim, 0, skill);
          break;
       case SPELL_TYPE_POTION:
@@ -7545,7 +7538,9 @@ int cast_creeping_death(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DAT
    if (!OUTSIDE(ch)) {
       send_to_char("Your spell is more draining because you are indoors!\n\r", ch);
       // If they are NOT outside it costs extra mana
-      ch->mana -= level / 2;
+      GET_MANA(ch) -= level / 2;
+      if(GET_MANA(ch) < 0)
+         GET_MANA(ch) = 0;
    }
 
    skill_increase_check(ch, SPELL_CREEPING_DEATH, skill, SKILL_INCREASE_MEDIUM);
@@ -7611,7 +7606,9 @@ int cast_barkskin(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *vic
   if(!OUTSIDE(ch))
   {
     send_to_char("Your spell is more draining because you are indoors!\n\r", ch);
-    ch->mana -= 25;
+    GET_MANA(ch) -= 25;
+    if(GET_MANA(ch) < 0)
+       GET_MANA(ch) = 0;
   }
   return eSUCCESS;
 }
@@ -7674,10 +7671,11 @@ int cast_call_follower(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA
       do_look(victim, "", 15);
 	 
       if (!OUTSIDE(ch)) {
-         send_to_char("Your spell is more draining because you are "
-                      "indoors!\n\r", ch);
+         send_to_char("Your spell is more draining because you are indoors!\n\r", ch);
          // If they are NOT outside it costs extra mana
-         ch->mana -= level / 2; 
+         GET_MANA(ch) -= level / 2; 
+         if(GET_MANA(ch) < 0)
+            GET_MANA(ch) = 0;
          }
       }
   return eSUCCESS;
@@ -7761,7 +7759,9 @@ int cast_feline_agility(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DAT
 	if(!OUTSIDE(ch))
 	{
 		send_to_char("Your spell is more draining because you are indoors!\n\r", ch);
-		ch->mana -= level / 2; /* If they are NOT outside it costs extra mana */
+		GET_MANA(ch) -= level / 2; /* If they are NOT outside it costs extra mana */
+		if(GET_MANA(ch) < 0)
+			GET_MANA(ch) = 0;
 	}
 	return eSUCCESS;
 }
