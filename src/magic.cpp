@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.41 2002/10/26 01:42:51 pirahna Exp $ */
+/* $Id: magic.cpp,v 1.42 2002/11/01 16:14:52 dcastle Exp $ */
 
 extern "C"
 {
@@ -8724,7 +8724,7 @@ int spell_debility(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data
     af.modifier = acmod;  // ac penalty
     affect_to_char(victim, &af);
 
-    send_to_char("Your body becomes $6debilitized$R hurting your abilities.\r\n", ch);
+    send_to_char("Your body becomes $6debilitized$R hurting your abilities.\r\n", victim);
     act("$N's body looks a little more frail.", ch, 0, victim, TO_ROOM, NOTVICT);
   }
   else {
@@ -8795,7 +8795,7 @@ int spell_attrition(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
     af.bitvector = 0;
     affect_to_char(victim, &af);
     
-    send_to_char("Your body's natural decay rate has been increased!\r\n", ch);
+    send_to_char("Your body's natural decay rate has been increased!\r\n", victim);
     act("$N's body takes on an unhealthy coloring.", ch, 0, victim, TO_ROOM, NOTVICT);
   }
   else {

@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: mob_act.cpp,v 1.7 2002/10/13 15:35:42 pirahna Exp $ */
+/* $Id: mob_act.cpp,v 1.8 2002/11/01 16:14:52 dcastle Exp $ */
 
 extern "C"
 {
@@ -124,7 +124,7 @@ void mobile_activity(void)
     // And paralyze...
     if(mob_index[ch->mobdata->nr].non_combat_func) {
       retval = ((*mob_index[ch->mobdata->nr].non_combat_func) (ch, 0, 0, "", ch));
-      if(!IS_SET(retval, eFAILURE))
+      if(!IS_SET(retval, eFAILURE) || SOMEONE_DIED(retval))
         continue;
     }
 
