@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.145 2004/05/27 20:25:58 urizen Exp $ */
+/* $Id: magic.cpp,v 1.146 2004/05/27 21:44:15 urizen Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -1193,6 +1193,12 @@ TO_CHAR,0);
 act("$N resists $n's attempt to paralyze $m!", ch, NULL, victim, TO_ROOM,
 NOTVICT);
 act("You resist $n's attempt to paralyze you!",ch,NULL,victim,TO_VICT,0);
+      if (IS_NPC(victim) && (!victim->fighting) && GET_POS(ch) > POSITION_SLEEPING) {
+         retval = attack(victim, ch, TYPE_UNDEFINED);
+         retval = SWAP_CH_VICT(retval);
+         return retval;
+      }
+
      return eFAILURE;
    }
 
@@ -1217,7 +1223,7 @@ act("You resist $n's attempt to paralyze you!",ch,NULL,victim,TO_VICT,0);
       if(!IS_NPC(victim)) {
          act("$n tried to paralyze you!", ch, NULL, victim, TO_VICT, 0);
       }
-      if ((!victim->fighting) && GET_POS(ch) > POSITION_SLEEPING) {
+      if (IS_NPC(victim) && (!victim->fighting) && GET_POS(ch) > POSITION_SLEEPING) {
          retval = attack(victim, ch, TYPE_UNDEFINED);
          retval = SWAP_CH_VICT(retval);
          return retval;
@@ -1279,6 +1285,12 @@ int spell_blindness(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
 act("$N resists your attempt to blind $m!", ch, NULL, victim, TO_CHAR,0);
 act("$N resists $n's attempt to blind $m!", ch, NULL, victim, TO_ROOM,NOTVICT);
 act("You resist $n's attempt to blind you!",ch,NULL,victim,TO_VICT,0);
+      if (IS_NPC(victim) && (!victim->fighting) && GET_POS(ch) > POSITION_SLEEPING) {
+         retval = attack(victim, ch, TYPE_UNDEFINED);
+         retval = SWAP_CH_VICT(retval);
+         return retval;
+      }
+
      return eFAILURE;
    }
 
@@ -2121,6 +2133,12 @@ TO_CHAR,0);
 act("$N resists $n's attempt to poison $m!", ch, NULL, victim, TO_ROOM,
 NOTVICT);
 act("You resist $n's attempt to posion you!",ch,NULL,victim,TO_VICT,0);
+      if (IS_NPC(victim) && (!victim->fighting) && GET_POS(ch) > POSITION_SLEEPING) {
+         retval = attack(victim, ch, TYPE_UNDEFINED);
+         retval = SWAP_CH_VICT(retval);
+         return retval;
+      }
+
      return eFAILURE;
    }
 
@@ -2655,6 +2673,12 @@ TO_CHAR,0);
 act("$N resists $n's attempt to sleep $m!", ch, NULL, victim, TO_ROOM,
 NOTVICT);
 act("You resist $n's attempt to sleep you!",ch,NULL,victim,TO_VICT,0);
+      if (IS_NPC(victim) && (!victim->fighting) && GET_POS(ch) > POSITION_SLEEPING) {
+         retval = attack(victim, ch, TYPE_UNDEFINED);
+         retval = SWAP_CH_VICT(retval);
+         return retval;
+      }
+
      return eFAILURE;
    }
 
@@ -3519,6 +3543,12 @@ TO_CHAR,0);
 act("$N resists $n's attempt to fear $m!", ch, NULL, victim, TO_ROOM,
 NOTVICT);
 act("You resist $n's attempt to fear you!",ch,NULL,victim,TO_VICT,0);
+      if (IS_NPC(victim) && (!victim->fighting) && GET_POS(ch) > POSITION_SLEEPING) {
+         retval = attack(victim, ch, TYPE_UNDEFINED);
+         retval = SWAP_CH_VICT(retval);
+         return retval;
+      }
+
      return eFAILURE;
    }
 
@@ -3843,6 +3873,12 @@ act("$N resists your attempt to dispel minor!", ch, NULL, victim, TO_CHAR,0);
 act("$N resists $n's attempt to dispel minor!", ch, NULL, victim, TO_ROOM, 
 NOTVICT);
 act("You resist $n's attempt to dispel minor!",ch,NULL,victim,TO_VICT,0);
+      if (IS_NPC(victim) && (!victim->fighting) && GET_POS(ch) > POSITION_SLEEPING) {
+         retval = attack(victim, ch, TYPE_UNDEFINED);
+         retval = SWAP_CH_VICT(retval);
+         return retval;
+      }
+
      return eFAILURE;
    }
 
@@ -4027,6 +4063,12 @@ TO_CHAR,0);
 act("$N resists $n's attempt to dispel magic!", ch, NULL, victim, TO_ROOM,
 NOTVICT);
 act("You resist $n's attempt to dispel magic!",ch,NULL,victim,TO_VICT,0);
+      if (IS_NPC(victim) && (!victim->fighting) && GET_POS(ch) > POSITION_SLEEPING) {
+         retval = attack(victim, ch, TYPE_UNDEFINED);
+         retval = SWAP_CH_VICT(retval);
+         return retval;
+      }
+
      return eFAILURE;
    }
 
