@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.152 2004/04/19 22:23:36 urizen Exp $ */
+/* $Id: fight.cpp,v 1.153 2004/04/20 00:03:53 urizen Exp $ */
 
 extern "C"
 {
@@ -3065,9 +3065,9 @@ void group_gain(CHAR_DATA * ch, CHAR_DATA * victim)
 
     /* calculate base XP value */
     base_xp = GET_EXP(victim);
-    
+    if (IS_AFFECTED(victim, AFF_CHARM)) { share = 0; base_xp = 0; bonus_xp = 0;}
     /* calculate this character's share of the XP */
-    share = scale_char_xp(tmp_ch, ch, victim, no_members, total_levels, GET_LEVEL(highest), base_xp, &bonus_xp);
+    else {share = scale_char_xp(tmp_ch, ch, victim, no_members, total_levels, GET_LEVEL(highest), base_xp, &bonus_xp); }
     
     sprintf(buf, "You receive %ld exps of %ld total.\n\r", share, base_xp + bonus_xp);
     send_to_char(buf, tmp_ch);
