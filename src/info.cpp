@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.23 2003/01/02 03:07:10 pirahna Exp $ */
+/* $Id: info.cpp,v 1.24 2003/01/21 07:13:52 pirahna Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -355,7 +355,7 @@ void show_char_to_char(struct char_data *i, struct char_data *ch, int mode)
                strcpy(buffer, "*linkdead*  ");
             strcat(buffer, GET_SHORT(i));
             if((GET_LEVEL(i) < OVERSEER) && i->clan && (clan = get_clan(i))) { 
-               if(!IS_MOB(i) & !IS_SET(ch->pcdata->toggles, PLR_BRIEF)) { 
+               if(!IS_MOB(ch) && !IS_SET(ch->pcdata->toggles, PLR_BRIEF)) { 
                   sprintf(buf, " %s [%s]", GET_TITLE(i), clan->name);
                   strcat(buffer, buf);
                }
