@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.37 2004/07/21 10:16:10 rahz Exp $ */
+/* $Id: mob_proc2.cpp,v 1.38 2004/07/24 00:46:46 rahz Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -1243,6 +1243,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     "12) 250 Platinum coins        Cost: 5,000,000 Gold Coins.\n\r"
     "13) Buy a practice session for 100 plats.\n\r"
     "14) Freedom from HUNGER and THIRST:  Currently out of stock.\n\r"
+    "15) Convert experience to gold. (1mil Gold = 400mil Exp.)\n\r"
                  , ch);
 
     return eSUCCESS;
@@ -1506,6 +1507,23 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     ch->raw_ki += 1;
     GET_KI_METAS(ch) += 1;
     redo_ki(ch);
+    act("The Meta-physician touches $n.",  ch, 0, 0, TO_ROOM, 0);
+    act("The Meta-physician touches you.",  ch, 0, 0, TO_CHAR, 0);
+    return eSUCCESS;
+  }
+  if (choice == 15) {
+    if (GET_EXP(ch) < 1000000) {
+      send_to_char("The Meta-physician tells you, 'You lack the experience.'\n\r", ch);
+      return eSUCCESS;
+    }
+    if (IS_MOB(ch)) {
+       send_to_char ("What would you have to spend gold on chode?\r\n", ch);
+       return eSUCCESS;
+    }
+    
+    GET_EXP(ch) -= 1000000;
+    GET_GOLD(ch) += 4000000;
+
     act("The Meta-physician touches $n.",  ch, 0, 0, TO_ROOM, 0);
     act("The Meta-physician touches you.",  ch, 0, 0, TO_CHAR, 0);
     return eSUCCESS;

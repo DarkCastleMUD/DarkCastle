@@ -2370,7 +2370,10 @@ int hot_potato(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
            , vict );
        send_to_char("The baked potato you are carrying EXPLODES!!!\n\r"
                     "You have been KILLED!\n\r", vict);
-       fight_kill(vict, vict, TYPE_PKILL, KILL_POTATO);
+       if(!IS_SET(world[vict->in_room].room_flags, ARENA))
+         fight_kill(vict, vict, TYPE_PKILL, KILL_POTATO);
+       else 
+         fight_kill(vict, vict, TYPE_ARENA_KILL, KILL_POTATO);
        extract_obj(obj);      
        return eSUCCESS|eCH_DIED;
    }

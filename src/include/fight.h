@@ -2,7 +2,7 @@
 #define FIGHT_H_
 
 /************************************************************************
-| $Id: fight.h,v 1.17 2004/07/23 22:47:36 rahz Exp $
+| $Id: fight.h,v 1.18 2004/07/24 00:46:51 rahz Exp $
 | fight.h
 | This file defines the header information for fight.
 */
@@ -78,7 +78,7 @@ void set_cantquit(CHAR_DATA *, CHAR_DATA *, bool = FALSE);
 int is_pkill(CHAR_DATA *ch, CHAR_DATA *vict);
 void raw_kill(CHAR_DATA *ch, CHAR_DATA *victim);
 void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim, int type);
-void arena_kill(CHAR_DATA *ch, CHAR_DATA *victim);
+void arena_kill(CHAR_DATA *ch, CHAR_DATA *victim, int type);
 void do_dead(CHAR_DATA *ch, CHAR_DATA *victim);
 bool ArenaIsOpen();
 void eq_destroyed(char_data * ch, obj_data * obj, int pos);

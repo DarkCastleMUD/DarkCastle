@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.232 2004/07/23 22:47:31 rahz Exp $ */
+/* $Id: fight.cpp,v 1.233 2004/07/24 00:46:46 rahz Exp $ */
 
 extern "C"
 {
@@ -1881,7 +1881,7 @@ void fight_kill(CHAR_DATA *ch, CHAR_DATA *vict, int type, int spec_type)
       if(IS_NPC(vict))
         raw_kill(ch, vict);
       else if(IS_ARENA(vict->in_room))
-        arena_kill(ch, vict);
+        arena_kill(ch, vict, spec_type);
       else if(is_pkill(ch, vict))
         do_pkill(ch, vict, spec_type);
       else
@@ -1889,7 +1889,7 @@ void fight_kill(CHAR_DATA *ch, CHAR_DATA *vict, int type, int spec_type)
       break;
     case TYPE_PKILL: do_pkill(ch, vict, spec_type); break;
     case TYPE_RAW_KILL: raw_kill(ch, vict); break;
-    case TYPE_ARENA_KILL: arena_kill(ch, vict); break;
+    case TYPE_ARENA_KILL: arena_kill(ch, vict, spec_type); break;
   }
 }
 
@@ -3782,7 +3782,7 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim, int type)
 }
 
 // 'ch' can be null
-void arena_kill(CHAR_DATA *ch, CHAR_DATA *victim)
+void arena_kill(CHAR_DATA *ch, CHAR_DATA *victim, int type)
 {
   void remove_nosave(CHAR_DATA *vict);
   
@@ -3834,7 +3834,10 @@ bool isaff2(int spellnum);
   else if(ch)
     sprintf(killer_message, "\n\r## %s just SLAUGHTERED %s in the arena!\n\r", GET_SHORT(ch), GET_SHORT(victim));
   else
-    sprintf(killer_message, "\n\r## %s just DIED in the arena!\n\r", GET_SHORT(victim));
+    if (type == KILL_POTATO) 
+      sprintf(killer_message, "\n\r## %s just got POTATOED in the arena!\n\r", GET_SHORT(victim));
+    else
+      sprintf(killer_message, "\n\r## %s just DIED in the arena!\n\r", GET_SHORT(victim));
   
   send_info(killer_message);
   
