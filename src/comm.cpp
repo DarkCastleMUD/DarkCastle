@@ -1243,6 +1243,7 @@ void generate_prompt(CHAR_DATA *ch, char *prompt)
          if(world_array[ch->in_room])
            sprintf(pro, "%s", sector_types[world[ch->in_room].sector_type]);
          else sprintf(pro, " ");
+         break;
        case '0':
          sprintf(pro, "%s", NTEXT);
          break;
