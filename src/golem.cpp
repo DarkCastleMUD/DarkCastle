@@ -173,6 +173,8 @@ void set_golem(CHAR_DATA *golem, int golemtype)
         golem->affected_by2 = 0;
         if (!golemtype)
           SET_BIT(golem->affected_by2, AFF_GOLEM);
+        SET_BIT(golem->affected_by, AFF_INFRARED);
+        SET_BIT(golem->affected_by2, AFF_STABILITY);
         golem->mobdata->actflags = ACT_2ND_ATTACK;
 	golem->misc = MISC_IS_MOB;
         golem->affected_by = 0;
@@ -299,7 +301,7 @@ int do_golem_score(struct char_data *ch, char *argument, int cmd)
    int exp_needed;
 
    sprintf(race, "%s", race_info[(int)GET_RACE(ch)].singular_name);
-   exp_needed = (int)(exp_table[(int)GET_LEVEL(ch) + 29] - (long)GET_EXP(ch));
+   exp_needed = (int)(exp_table[(int)GET_LEVEL(ch) + 19] - (long)GET_EXP(ch));
 
    to_hit = GET_REAL_HITROLL(ch);
    to_dam = GET_REAL_DAMROLL(ch);
@@ -392,7 +394,21 @@ int do_golem_score(struct char_data *ch, char *argument, int cmd)
          if(++level == 4)
             level = 0;
       }
-      if(found)
+       sprintf(buf, "|%c| Affected by %-22s  Modifier %-16s  |%c|\n\r",
+               frills[level],"STABILITY","NONE",frills[level]);
+	send_to_char(buf,master);
+       sprintf(buf, "|%c| Affected by %-22s  Modifier %-16s  |%c|\n\r",
+               frills[level],"INFRARED","NONE",frills[level]);
+        send_to_char(buf,master);
+       if (IS_SET(ch->affected_by, AFF_LIGHTNINGSHIELD))
+       sprintf(buf, "|%c| Affected by %-22s  Modifier %-16s  |%c|\n\r",
+               frills[level],"LIGHTNING SHIELD","NONE",frills[level]);
+        send_to_char(buf,master);
+	if (IS_SET(ch->resist, ISR_PIERCE))
+       sprintf(buf, "|%c| Affected by %-22s  Modifier %-16s  |%c|\n\r",
+               frills[level],"STONE SKIN","NONE",frills[level]);
+        found = TRUE;
+     if(found)
         send_to_char(
          "($5:$7)========================================================================($5:$7)\n\r", master);
    }

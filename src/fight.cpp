@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.202 2004/05/21 15:25:13 urizen Exp $ */
+/* $Id: fight.cpp,v 1.203 2004/05/25 00:21:25 urizen Exp $ */
 
 extern "C"
 {
@@ -3843,7 +3843,8 @@ int can_be_attacked(CHAR_DATA *ch, CHAR_DATA *vict)
   
   if(IS_NPC(vict))
   {
-    if(IS_AFFECTED2(vict, AFF_FAMILIAR) && 
+    if((IS_AFFECTED2(vict, AFF_FAMILIAR) || mob_index[vict->mobdata->nr].virt == 8
+	|| affected_by_spell(vict, SPELL_CHARM_PERSON)) && 
        vict->master && 
        vict->fighting != ch && 
        !IS_AFFECTED(vict->master, AFF_CANTQUIT) &&

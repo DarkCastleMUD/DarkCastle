@@ -21,7 +21,7 @@
  *  12/08/2003   Onager    Added check for charmies and !charmie eq to     *
  *                         equip_char()                                    *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.56 2004/05/24 16:07:54 urizen Exp $ */
+/* $Id: handler.cpp,v 1.57 2004/05/25 00:21:25 urizen Exp $ */
     
 extern "C"
 {
@@ -2298,9 +2298,11 @@ void extract_char(CHAR_DATA *ch, bool pull)
    }
    if (IS_NPC(ch) && mob_index[ch->mobdata->nr].virt == 8)
     {
-	if (ch->level > 1)
-	 ch->level--;
-	ch->exp = 0; // Lower level, lose exp.
+        if (pull) {
+	   if (ch->level > 1)
+	   ch->level--;
+	  ch->exp = 0; // Lower level, lose exp.
+	}
 	do_save(ch->master,"",666);
         if (mob_index[ch->mobdata->nr].virt == 8)
           if (ch->master)

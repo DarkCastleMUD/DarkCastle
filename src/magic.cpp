@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.140 2004/05/24 16:07:54 urizen Exp $ */
+/* $Id: magic.cpp,v 1.141 2004/05/25 00:21:25 urizen Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -2824,6 +2824,7 @@ int spell_word_of_recall(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct ob
 		act("$n disappears.", victim->pcdata->golem, 0, 0, TO_ROOM, INVIS_NULL);
 		move_char(victim->pcdata->golem, location);
 		act("$n appears out of nowhere.",victim->pcdata->golem, 0, 0, TO_ROOM, INVIS_NULL);
+	        GET_MANA(victim) -= 50;
 	    }
 	}
   }
