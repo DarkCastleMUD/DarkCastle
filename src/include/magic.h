@@ -5,7 +5,7 @@
  *                                                                           *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-/* $Id: magic.h,v 1.9 2003/06/23 00:26:44 pirahna Exp $ */
+/* $Id: magic.h,v 1.10 2003/06/23 02:02:29 pirahna Exp $ */
 #ifndef MAGIC_H_
 #define MAGIC_H_
 
@@ -567,6 +567,16 @@ int cast_vampiric_aura(byte level, CHAR_DATA * ch, char *arg, int type,
 int spell_holy_aura(byte level, CHAR_DATA * ch,
    CHAR_DATA * victim, struct obj_data * obj, int skill);
 int cast_holy_aura(byte level, CHAR_DATA * ch, char *arg, int type,
+   CHAR_DATA * victim, struct obj_data * tar_obj, int skill);
+
+int spell_dismiss_familiar(byte level, CHAR_DATA * ch,
+   CHAR_DATA * victim, struct obj_data * obj, int skill);
+int cast_dismiss_familiar(byte level, CHAR_DATA * ch, char *arg, int type,
+   CHAR_DATA * victim, struct obj_data * tar_obj, int skill);
+
+int spell_dismiss_corpse(byte level, CHAR_DATA * ch,
+   CHAR_DATA * victim, struct obj_data * obj, int skill);
+int cast_dismiss_corpse(byte level, CHAR_DATA * ch, char *arg, int type,
    CHAR_DATA * victim, struct obj_data * tar_obj, int skill);
 
 #endif

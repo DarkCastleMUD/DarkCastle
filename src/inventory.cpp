@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.20 2003/05/04 00:49:49 pirahna Exp $
+| $Id: inventory.cpp,v 1.21 2003/06/23 02:02:24 pirahna Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -985,7 +985,7 @@ int do_give(struct char_data *ch, char *argument, int cmd)
       GET_GOLD(vict) += amount;
       do_save(ch, "", 10);
       do_save(vict, "", 10);
-
+      // bribe trigger automatically removes any gold given to mob
       mprog_bribe_trigger( vict, ch, amount );
 
       return eSUCCESS;

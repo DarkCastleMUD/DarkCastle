@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.42 2003/06/23 00:26:39 pirahna Exp $ */
+/* $Id: spells.cpp,v 1.43 2003/06/23 02:02:24 pirahna Exp $ */
 
 extern "C"
 {
@@ -624,8 +624,15 @@ struct spell_info_type spell_info [ ] =
 
     { // 138
 	12, POSITION_FIGHTING, 200, TAR_CHAR_ROOM|TAR_SELF_ONLY, cast_holy_aura
-    }
+    },
 
+    { // 139
+	12, POSITION_FIGHTING, 1, TAR_CHAR_ROOM|TAR_SELF_ONLY, cast_dismiss_familiar
+    },
+
+    { // 140
+	12, POSITION_FIGHTING, 15, TAR_CHAR_ROOM|TAR_SELF_ONLY, cast_dismiss_corpse
+    }
 };
 
 char *skills[]=
@@ -836,6 +843,8 @@ char *spells[]=
    "attrition",
    "vampiric aura",
    "holy aura",
+   "dismiss familiar",
+   "dismiss corpse",
    "\n"
 };
 

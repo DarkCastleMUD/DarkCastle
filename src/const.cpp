@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: const.cpp,v 1.59 2003/06/23 01:10:42 pirahna Exp $ */
+/* $Id: const.cpp,v 1.60 2003/06/23 02:02:24 pirahna Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -198,6 +198,9 @@ char *spell_wear_off_msg[] =
   "With a rush of strength, the $6debility$R fades from your body.",
   "Your rapid decay ends and your health returns to normal.",
   "The shadow in your aura fades away into the ethereal.",
+  "!Holy Aura!",
+  "!DismissFamiliar!",
+  "!DismissCorpse!",
   "!UNUSED!"
 };
 
@@ -1054,6 +1057,7 @@ struct class_skill_defines a_skills[] = {
 {    "curse",		SPELL_CURSE,		13,	90,	10005,	NULL },
 {    "vampiric touch",	SPELL_VAMPIRIC_TOUCH,	15,	90,	10005,	NULL },
 {    "animate dead",	SPELL_ANIMATE_DEAD,	15,	90,	10005,	NULL },
+{    "dismiss corpse",  SPELL_DISMISS_CORPSE,	15,	90,	10005,	NULL },
 {    "invisibility",	SPELL_INVISIBLE,	16,	90,	10005,	NULL },
 {    "globe of darkness",SPELL_GLOBE_OF_DARKNESS, 17,	90, -2, "Find the Black King in the game of life." },
 {    "lightning bolt",	SPELL_LIGHTNING_BOLT,	18,	90,	10005,	NULL },
@@ -1251,6 +1255,7 @@ struct class_skill_defines u_skills[] = { // druid skills
 {    "power heal",	SPELL_POWER_HEAL,	26,	90,	-2,	"Only the most pure of beasts with horn atop head can help you.  Look in the mountains." },
 {    "camouflague",	SPELL_CAMOUFLAGUE,	28,	90,	3203,	NULL },
 {    "summon familiar", SPELL_SUMMON_FAMILIAR,	30,	90,	-2,	"To learn this skill you must bust a nut....err...bring me a nut."},
+{    "dismiss familiar",SPELL_DISMISS_FAMILIAR, 30,	90,	3203,	NULL },
 {    "lighted path",    SPELL_LIGHTED_PATH,	33,	90,	-2,	"You must learn about tracking to accomplish this spell.  Go talk to the ranger Woody about lighted path."},
 {    "barkskin",	SPELL_BARKSKIN,		35,	90,	-2,	"Talk to Shargugh, he's the MAN! Baby! Just ask dinas ;)"},
 {    "iron roots",	SPELL_IRON_ROOTS,	36,	90,	-2,	"A druid of old age and virulance is who you want. He will be in the company of other druids."},
@@ -1313,6 +1318,7 @@ struct class_skill_defines c_skills[] = { // cleric skills
 {    "power harm",	SPELL_POWER_HARM,	30,	90,	-2, "Find a shaman amongst the muck who has crooked teeth." },
 {    "heroes feast",	SPELL_HEROES_FEAST,	33,	90,	-2, "She has a story like no other, and the lives of her kinsmen are on display for you." },
 {    "animate dead",	SPELL_ANIMATE_DEAD,	35,	90,	3021,	NULL },
+{    "dismiss corpse",  SPELL_DISMISS_CORPSE,	35,	90,	3021,	NULL },
 {    "true sight",	SPELL_TRUE_SIGHT,	35,	90,	-2, "As his name suggests, this is a bright and wise person." },
 {    "group recall",	SPELL_GROUP_RECALL,	38,	90, -2, "An elven queen of sparkling radiance possesses the knowledge to save your people." },
 {    "group fly",	SPELL_GROUP_FLY,	39,	90,	-2, "It’s a bird! It’s an air traffic controller! No, but whatever it is, its elementary :)." },
@@ -1358,6 +1364,7 @@ struct class_skill_defines m_skills[] = { // mage skills
 {    "haste",		SPELL_HASTE,		14,	90,	3020,	NULL },
 {    "sleep",		SPELL_SLEEP,		15,	90,	3020,	NULL },
 {    "summon familiar", SPELL_SUMMON_FAMILIAR,	16,	90,	3020,	NULL },
+{    "dismiss familiar",SPELL_DISMISS_FAMILIAR, 16,	90,	3020,	NULL },
 {    "fireball",	SPELL_FIREBALL,		20,	90,	3020,	NULL },
 {    "teleport",	SPELL_TELEPORT,		21,	90,	-2, "A mage of much knowledge, he is wise in the ways of the world." },
 {    "dispel magic",	SPELL_DISPEL_MAGIC,	22,	90,	-2, "Find a mage at the junction of three dreams." },

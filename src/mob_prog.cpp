@@ -1770,8 +1770,6 @@ int mprog_bribe_trigger( CHAR_DATA *mob, CHAR_DATA *ch, int amount )
   if ( IS_NPC( mob )
       && ( mob_index[mob->mobdata->nr].progtypes & BRIBE_PROG ) )
     {
-      obj = create_money( amount );
-      obj_to_char( obj, mob );
       mob->gold -= amount;
 
       for ( mprg = mob_index[mob->mobdata->nr].mobprogs; mprg != NULL; mprg = mprg->next )

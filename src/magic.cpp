@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.78 2003/06/23 00:26:39 pirahna Exp $ */
+/* $Id: magic.cpp,v 1.79 2003/06/23 02:02:24 pirahna Exp $ */
 
 extern "C"
 {
@@ -7641,44 +7641,40 @@ int cast_herb_lore(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *vi
 // TODO - make this use skill
 int cast_call_follower(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *victim, struct obj_data * tar_obj, int skill)
 {
-   CHAR_DATA *tmp_vict;
-   int valid = 0;
-   int target;
-   
    if(IS_SET(world[ch->in_room].room_flags, CLAN_ROOM)) {
       send_to_char("I don't think your fellow clan members would appreciate the wildlife.\n\r", ch);
       GET_MANA(ch) += 75;
       return eFAILURE;
    }
-   for(tmp_vict = character_list; tmp_vict; tmp_vict = tmp_vict->next)
-      if (tmp_vict == victim && IS_NPC(victim) && (ch == tmp_vict->master)) {
-         valid = 1;
-         break;
-         }
 
-   if (!valid) {
-      send_to_char("This spell will only summon your tame friends!\n\r", ch);
-      GET_MANA(ch) += 75; // Kludge since mana is already subtracted
+   victim = NULL;
+
+   for(struct follow_type *k = ch->followers; k; k = k->next)
+     if(IS_MOB(k->follower) && affected_by_spell(k->follower, SPELL_CHARM_PERSON))
+     {
+        victim = k->follower;
+        break;
+     }
+
+   if (NULL == victim) {
+      send_to_char("You don't have any tame friends to summon!\n\r", ch);
       return eFAILURE;
-      }
-      
-   else {
-      act("$n disappears suddenly.", victim, 0, 0, TO_ROOM, INVIS_NULL);
-      target = ch->in_room;
-      move_char(victim, target);
-      act("$n arrives suddenly.", victim, 0, 0, TO_ROOM, INVIS_NULL);
-      act("$n has summoned you!", ch, 0, victim, TO_VICT, 0);
-      do_look(victim, "", 15);
+   }
+
+   act("$n disappears suddenly.", victim, 0, 0, TO_ROOM, INVIS_NULL);
+   move_char(victim, ch->in_room);
+   act("$n arrives suddenly.", victim, 0, 0, TO_ROOM, INVIS_NULL);
+   act("$n has summoned you!", ch, 0, victim, TO_VICT, 0);
+   do_look(victim, "", 15);
 	 
-      if (!OUTSIDE(ch)) {
-         send_to_char("Your spell is more draining because you are indoors!\n\r", ch);
-         // If they are NOT outside it costs extra mana
-         GET_MANA(ch) -= level / 2; 
-         if(GET_MANA(ch) < 0)
-            GET_MANA(ch) = 0;
-         }
-      }
-  return eSUCCESS;
+   if (!OUTSIDE(ch)) {
+      send_to_char("Your spell is more draining because you are indoors!\n\r", ch);
+      // If they are NOT outside it costs extra mana
+      GET_MANA(ch) -= level / 2; 
+      if(GET_MANA(ch) < 0)
+         GET_MANA(ch) = 0;
+   }
+   return eSUCCESS;
 }
 
 // TODO - make this use skill
@@ -9303,5 +9299,111 @@ int cast_holy_aura( byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *t
   }
   return eFAILURE;
 }
+
+
+int spell_dismiss_familiar(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
+{
+   victim = NULL;
+
+   for(struct follow_type *k = ch->followers; k; k = k->next)
+     if(IS_MOB(k->follower) && IS_AFFECTED2(k->follower, AFF_FAMILIAR))
+     {
+        victim = k->follower;
+        break;
+     }
+
+   if (NULL == victim) {
+      send_to_char("You don't have a familiar!\n\r", ch);
+      return eFAILURE;
+   }
+
+   act("$n disappears in a flash of flame and shadow.", victim, 0, 0, TO_ROOM, INVIS_NULL);
+   extract_char(victim, TRUE);
+	 
+   GET_MANA(ch) += 51;
+   if(GET_MANA(ch) > GET_MAX_MANA(ch))
+      GET_MANA(ch) = GET_MAX_MANA(ch);
+
+   return eSUCCESS;
+}
+
+int cast_dismiss_familiar( byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill )
+{
+  switch (type) 
+  {
+    case SPELL_TYPE_SPELL:
+       return spell_dismiss_familiar(level, ch, tar_ch, 0, skill);
+       break;
+    case SPELL_TYPE_POTION:
+       return spell_dismiss_familiar(level, ch, ch, 0, skill);
+       break;
+    case SPELL_TYPE_SCROLL:
+       if(tar_obj)
+          return eFAILURE;
+       if(!tar_ch) tar_ch = ch;
+          return spell_dismiss_familiar(level, ch, tar_ch, 0, skill);
+       break;
+    case SPELL_TYPE_STAFF:
+       for (tar_ch = world[ch->in_room].people ; tar_ch ; tar_ch = tar_ch->next_in_room)
+          spell_dismiss_familiar(level,ch,tar_ch,0, skill);
+       break;
+    default :
+       log("Serious screw-up in dismiss_familiar!", ANGEL, LOG_BUG);
+       break;
+  }
+  return eFAILURE;
+}
+
+
+int spell_dismiss_corpse(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
+{
+   victim = NULL;
+
+   for(struct follow_type *k = ch->followers; k; k = k->next)
+     if(IS_MOB(k->follower) && affected_by_spell(k->follower, SPELL_CHARM_PERSON))
+     {
+        victim = k->follower;
+        break;
+     }
+
+   if (NULL == victim) {
+      send_to_char("You don't have a corpse!\n\r", ch);
+      return eFAILURE;
+   }
+
+   act("$n begins to melt and dissolves into the ground... dust to dust.", victim, 0, 0, TO_ROOM, INVIS_NULL);
+   extract_char(victim, TRUE);
+	 
+   return eSUCCESS;
+}
+
+int cast_dismiss_corpse( byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill )
+{
+  switch (type) 
+  {
+    case SPELL_TYPE_SPELL:
+       return spell_dismiss_corpse(level, ch, tar_ch, 0, skill);
+       break;
+    case SPELL_TYPE_POTION:
+       return spell_dismiss_corpse(level, ch, ch, 0, skill);
+       break;
+    case SPELL_TYPE_SCROLL:
+       if(tar_obj)
+          return eFAILURE;
+       if(!tar_ch) tar_ch = ch;
+          return spell_dismiss_corpse(level, ch, tar_ch, 0, skill);
+       break;
+    case SPELL_TYPE_STAFF:
+       for (tar_ch = world[ch->in_room].people ; tar_ch ; tar_ch = tar_ch->next_in_room)
+          spell_dismiss_corpse(level,ch,tar_ch,0, skill);
+       break;
+    default :
+       log("Serious screw-up in dismiss_corpse!", ANGEL, LOG_BUG);
+       break;
+  }
+  return eFAILURE;
+}
+
+
 
 
