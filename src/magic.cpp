@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.124 2004/05/08 11:49:11 urizen Exp $ */
+/* $Id: magic.cpp,v 1.125 2004/05/09 01:05:38 urizen Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -315,6 +315,8 @@ int spell_souldrain(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
   //       GET_HIT(ch) += dam;
 	 send_to_char("You drain their very soul!\r\n",ch);
          send_to_char("You feel your very soul being drained!\n\r", victim);
+
+   skill_increase_check(ch, SPELL_SOULDRAIN, skill, SKILL_INCREASE_MEDIUM);
 
          return eSUCCESS;//spell_damage(ch, victim, dam, TYPE_MAGIC, 
 //SPELL_SOULDRAIN, 0);
