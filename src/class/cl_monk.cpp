@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_monk.cpp,v 1.5 2002/08/13 18:25:12 pirahna Exp $
+| $Id: cl_monk.cpp,v 1.6 2002/08/21 02:43:51 dcastle Exp $
 | cl_monk.C
 | Description:  Monk skills.
 */
@@ -250,7 +250,7 @@ int do_stun(struct char_data *ch, char *argument, int cmd)
        send_to_char("Your advanced knowledge of stun helps you to recover faster.\r\n", ch);
        WAIT_STATE(ch, PULSE_VIOLENCE*3);
     }
-    WAIT_STATE(ch, PULSE_VIOLENCE*4);
+    else WAIT_STATE(ch, PULSE_VIOLENCE*4);
     retval = damage (ch, victim, 0,TYPE_UNDEFINED, SKILL_STUN, 0);
   }
   else {
