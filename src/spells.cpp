@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.70 2004/04/28 07:37:40 urizen Exp $ */
+/* $Id: spells.cpp,v 1.71 2004/04/28 07:57:21 urizen Exp $ */
 
 extern "C"
 {
@@ -1089,12 +1089,12 @@ void stop_follower(CHAR_DATA *ch, int cmd)
     act("You realize that $N is a jerk!", ch, 0, ch->master, TO_CHAR, 0);
     act("$n is free from the bondage of the spell.", ch, 0, 0, TO_ROOM, 0);
     act("$n hates your guts!", ch, 0, ch->master, TO_VICT, 0);
-   if (ch->fighting && ch->fighting != ch->master)
-   {
-     do_say(ch, "Screw this, I'm going home!",9);
-     stop_fighting(ch->fighting);
-     stop_fighting(ch);
-   }
+    if (ch->fighting && ch->fighting != ch->master)
+    {
+      do_say(ch, "Screw this, I'm going home!",9);
+      stop_fighting(ch->fighting);
+      stop_fighting(ch);
+    }
   }
   else {
     if(cmd == END_STALK) {

@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: cl_ranger.cpp,v 1.32 2004/04/28 07:37:45 urizen Exp $ | cl_ranger.C  *
+ * $Id: cl_ranger.cpp,v 1.33 2004/04/28 07:57:26 urizen Exp $ | cl_ranger.C  *
  * Description: Ranger skills/spells                                          *
  *                                                                            *
  * Revision History                                                           *
@@ -101,7 +101,7 @@ int do_tame(CHAR_DATA *ch, char *arg, int cmd)
 //     send_to_char("How you plan on controlling so many followers?\n\r", 
 //ch);
 //     return eFAILURE;
-   CHAR_DATA * vict;
+   CHAR_DATA * vict = NULL;
    for(struct follow_type *k = ch->followers; k; k = k->next)
      if(IS_MOB(k->follower) && affected_by_spell(k->follower, SPELL_CHARM_PERSON))
      {
@@ -112,9 +112,10 @@ int do_tame(CHAR_DATA *ch, char *arg, int cmd)
 	if (vict->in_room == ch->in_room && vict->position > POSITION_SLEEPING)
 	  do_say(vict, "Hey... but what about ME!?", 9);
          remove_memory(vict, 'h');
+	if (vict->master) { 
+         stop_follower(vict, BROKE_CHARM);	
          add_memory(vict, GET_NAME(vict->master), 'h');
-         stop_follower(vict, BROKE_CHARM);
-	
+ 	}
      }
    }
 
