@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.29 2002/09/17 20:28:54 pirahna Exp $ */
+/* $Id: magic.cpp,v 1.30 2002/09/17 22:04:36 pirahna Exp $ */
 
 extern "C"
 {
@@ -8465,7 +8465,7 @@ int spell_globe_of_darkness(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct
     return eFAILURE;
   }
 
-  globe->obj_flags.value[0] = level/10;
+  globe->obj_flags.value[0] = level/5;
   globe->obj_flags.value[1] = 5;
 
   act("$n's hand blurs and $B$0darkens$R then quickly expands plunging the entire area in lightlessness.",
