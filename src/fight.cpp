@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.38 2002/08/07 06:14:20 dcastle Exp $ */
+/* $Id: fight.cpp,v 1.39 2002/08/11 15:50:34 pirahna Exp $ */
 
 extern "C"
 {
@@ -2972,6 +2972,13 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim)
   save_char_obj(victim);
 
   // have to be level 10 and linkalive to count as a pkill and not yourself
+  if(GET_LEVEL(victim) < 10 || ch == victim)
+    sprintf(killer_message,"\n\r##%s just DIED!\n\r", GET_NAME(victim));
+  else sprintf(killer_message,"\n\r##%s was just DEFEATED in battle by %s!\n\r", 
+          GET_NAME(victim), GET_NAME(ch));
+
+  // have to be level 10 and linkalive to count as a pkill and not yourself
+  // (we check earlier to make sure victim isn't a mob)
   if(!IS_MOB(ch) && GET_LEVEL(victim) > 9 && victim->desc && ch != victim)
   {
     GET_PDEATHS(victim) += 1;
@@ -2989,13 +2996,7 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim)
           master->pcdata->group_kills += 1;
         }
       }
-    
-    sprintf(killer_message,"\n\r##%s was just DEFEATED in battle by %s!\n\r",
-      GET_NAME(victim), GET_NAME(ch));
   } // if (ch && ch != victim)
-  
-  else
-    sprintf(killer_message,"\n\r##%s just DIED!\n\r", GET_NAME(victim));
   
   send_info(killer_message);
 }
