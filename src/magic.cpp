@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.39 2002/10/13 15:35:41 pirahna Exp $ */
+/* $Id: magic.cpp,v 1.40 2002/10/13 16:40:43 pirahna Exp $ */
 
 extern "C"
 {
@@ -79,7 +79,9 @@ int spell_magic_missile(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
 
   set_cantquit( ch, victim );
   dam = level;
-  count += (dam > 5) + (dam > 15) + (dam > 25) + (dam > 35);  // since dam == level
+  count += (skill > 15) + (skill > 35) + (skill > 55) + (skill > 75); 
+
+  skill_increase_check(ch, SPELL_MAGIC_MISSILE, skill, SKILL_INCREASE_MEDIUM);
 
   while(!SOMEONE_DIED(retval) && count--)
      retval = damage(ch, victim, dam, TYPE_PHYSICAL_MAGIC, SPELL_MAGIC_MISSILE, 0);
