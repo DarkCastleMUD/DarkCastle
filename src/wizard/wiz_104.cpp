@@ -773,13 +773,16 @@ obj_data *)(obj_index[nr].item))->obj_flags.eq_level,
     extern struct race_shit race_info[];
     extern char *isr_bits[];
     extern char *affected_bits[];
-    extern char *pc_clss_types[];
+    extern char *pc_clss_types2[];
+//    if (
+    bool fo = FALSE;
     while ( ( argument = one_argument(argument, arg1) ) )
     {
        int i;
        if (strlen(arg1) < 2) break;
-       for (i = 0; *pc_clss_types[i] != '\n' ; i++)
-        if (!str_cmp(pc_clss_types[i],arg1))
+	fo = TRUE;
+       for (i = 0; *pc_clss_types2[i] != '\n' ; i++)
+        if (!str_cmp(pc_clss_types2[i],arg1))
         {
           clas = i;
           goto thisLoop;
@@ -830,6 +833,56 @@ obj_data *)(obj_index[nr].item))->obj_flags.eq_level,
 	}
        thisLoop:
 	continue;
+     }
+     if (!fo)
+     {
+	int z,o=0;
+	for (z = 0; *action_bits[z] != '\n';z++)
+	{
+	   o++;
+	   send_to_char(action_bits[z],ch);
+	   if (o%7)
+	     send_to_char("\r\n",ch);
+	   else
+	     send_to_char(" ", ch);
+	}
+	for (z = 0; *isr_bits[z] != '\n';z++)
+	{
+	   o++;
+	   send_to_char(isr_bits[z],ch);
+	   if (o%7)
+	     send_to_char("\r\n",ch);
+	   else
+	     send_to_char(" ", ch);
+	}
+	for (z = 0; *affected_bits[z] != '\n';z++)
+	{
+	   o++;
+	   send_to_char(affected_bits[z],ch);
+	   if (o%7)
+	     send_to_char("\r\n",ch);
+	   else
+	     send_to_char(" ", ch);
+	}
+	for (z = 0; *pc_clss_types2[z] != '\n';z++)
+	{
+	   o++;
+	   send_to_char(pc_clss_types2[z],ch);
+	   if (o%7)
+	     send_to_char("\r\n",ch);
+	   else
+	     send_to_char(" ", ch);
+	}
+      for (i = 0; i <= MAX_RACE; i++)
+	{
+	   o++;
+	   send_to_char(race_info[z].singular_name,ch);
+	   if (o%7)
+	     send_to_char("\r\n",ch);
+	   else
+	     send_to_char(" ", ch);
+	}
+	return eSUCCESS;
      }
      int c,nr;
 	if (!act && !clas && !levlow && !levhigh && !affect && !immune && !race && !align)
@@ -894,10 +947,12 @@ char_data *)(mob_index[nr].item))->level,
     extern char *more_obj_bits[];
     extern char *size_bitfields[];
     extern char *apply_types[];
+    bool fo = FALSE;
     while ( ( argument = one_argument(argument, arg1) ) )
     {
        int i;
        if (strlen(arg1) < 2) break;
+	fo = TRUE;
        for (i = 0; *wear_bits[i] != '\n' ; i++)
 	if (!str_cmp(wear_bits[i],arg1))
 	{
@@ -947,6 +1002,56 @@ if (!affect && !size && !extra && !more && !wear)
    send_to_char("No valid search supplied.\r\n",ch);
    return eFAILURE;
 }
+    int o = 0, z;
+    if (!fo)
+    {
+	for (z = 0; *wear_bits[z] != '\n';z++)
+	{
+	   o++;
+	   send_to_char(wear_bits[z],ch);
+	   if (o%7)
+	     send_to_char("\r\n",ch);
+	   else
+	     send_to_char(" ", ch);
+	}
+	for (z = 0; *extra_bits[z] != '\n';z++)
+	{
+	   o++;
+	   send_to_char(extra_bits[z],ch);
+	   if (o%7)
+	     send_to_char("\r\n",ch);
+	   else
+	     send_to_char(" ", ch);
+	}
+	for (z = 0; *more_obj_bits[z] != '\n';z++)
+	{
+	   o++;
+	   send_to_char(more_obj_bits[z],ch);
+	   if (o%7)
+	     send_to_char("\r\n",ch);
+	   else
+	     send_to_char(" ", ch);
+	}
+	for (z = 0; *size_bitfields[z] != '\n';z++)
+	{
+	   o++;
+	   send_to_char(size_bitfields[z],ch);
+	   if (o%7)
+	     send_to_char("\r\n",ch);
+	   else
+	     send_to_char(" ", ch);
+	}
+	for (z = 0; *apply_types[z] != '\n';z++)
+	{
+	   o++;
+	   send_to_char(apply_types[z],ch);
+	   if (o%7)
+	     send_to_char("\r\n",ch);
+	   else
+	     send_to_char(" ", ch);
+	}
+
+    }
 
      for (c=0;c < obj_index[top_of_objt].virt;c++)
      {

@@ -522,11 +522,11 @@ int do_wiz(struct char_data *ch, char *argument, int cmd)
             "What do you want to tell all gods and immortals?\n\r", ch);
     else {
         if(cmd == 9)
-          sprintf(buf1, "%s: %s\n\r", GET_SHORT(ch), argument);
+          sprintf(buf1, "$B$4%s$7: $7$B%s$R\n\r", GET_SHORT(ch), argument);
         else
-          sprintf(buf1, "%s> %s\n\r", GET_SHORT(ch), argument);
+          sprintf(buf1, "$B$7%s> %s$R\n\r", GET_SHORT(ch), argument);
 
-        if(cmd == 9)  {
+/*        if(cmd == 9)  {
           ansi_color( PURPLE, ch);
 	  ansi_color( BOLD, ch);
 	}
@@ -534,23 +534,21 @@ int do_wiz(struct char_data *ch, char *argument, int cmd)
           ansi_color( GREY, ch);
           ansi_color( BOLD, ch); 
         }
-        send_to_char(buf1, ch);
+  */      send_to_char(buf1, ch);
         ansi_color( NTEXT, ch);
 
         for (i = descriptor_list; i; i = i->next)
         if (i->character != ch && !i->connected && 
                 GET_LEVEL(i->character) >= IMMORTAL)
                 if((cmd == 8) && has_skill(i->character, COMMAND_IMP_CHAN)) { 
-                  ansi_color( PURPLE, i->character);
-		  ansi_color( BOLD, i->character);
                   send_to_char(buf1, i->character);
-                  ansi_color( NTEXT, i->character);
+//                  ansi_color( NTEXT, i->character);
                 }
                 else if (cmd != 8) { 
-                  ansi_color( GREY, i->character);
-		  ansi_color( BOLD, i->character);
+//                  ansi_color( GREY, i->character);
+//		  ansi_color( BOLD, i->character);
                   send_to_char(buf1, i->character);
-                  ansi_color( NTEXT, i->character);
+//                  ansi_color( NTEXT, i->character);
                 }
     }
     return eSUCCESS;
