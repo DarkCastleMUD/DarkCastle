@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.23 2004/04/23 22:38:52 urizen Exp $
+| $Id: guild.cpp,v 1.24 2004/04/27 19:50:17 urizen Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -57,23 +57,25 @@ char *how_good(int percent)
   if (percent <= 10)
     return ( " (shitty)");
   if (percent <= 15)
-    return ( " (bad)");
-  if (percent <= 20)
     return ( " (crappy)");
+  if (percent <= 20)
+    return ( " (bad)");
   if (percent <= 30)
     return ( " (meager)");
   if (percent <= 40)
     return ( " (poor)");
-  if (percent <= 55)
+  if (percent <= 50)
     return ( " (average)");
-  if (percent <= 70)
+  if (percent <= 60)
     return ( " (fair)");
-  if (percent <= 80)
+  if (percent <= 70)
     return ( " (good)");
-  if (percent <= 85)
+  if (percent <= 80)
     return ( " (very good)");
-  if(percent <= 90)
-    return ( " (superb)");
+  if(percent <= 85)
+    return ( " (excellent)");
+  if (percent <= 90)
+    return (" (superb)");
 
   return (" (Masterful)");
 }

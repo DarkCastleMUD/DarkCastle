@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.84 2004/04/25 21:19:51 urizen Exp $ */
+/* $Id: const.cpp,v 1.85 2004/04/27 19:50:17 urizen Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1160,7 +1160,7 @@ struct class_skill_defines b_skills[] = {
 {    "shield block",    SKILL_SHIELDBLOCK,      10,     70,     -2, 	"To learn this skill you must seek its master, the God of War in his arena.  Ask him to please teach you." ,{DEX,0}},
 {    "double",		SKILL_SECOND_ATTACK,	8,	85,	-2, 	"Seek the Prince of Delcim for your training in that." ,{DEX,0}},
 {    "blood fury",	SKILL_BLOOD_FURY,	12,	95,	-2, 	"Look for a gpaceless kimg who pigks his nose" ,{CON,WIS}},
-{    "crazedassault",	SKILL_CRAZED_ASSAULT,	15,	95,	-2, 	"Speak with the guard of the monk guild.  He is skilled in matters of concentration such as this." ,{DEX,STR}},
+{    "crazedassault",	SKILL_CRAZED_ASSAULT,	15,	95,	-2, 	"Speak with the guard of the monk guild.  He is skilled in matters of concentration such as this." ,{WIS,STR}},
 {    "frenzy",		SKILL_FRENZY,		18,	90,	-2,	"There is a highlander chief.  The chief of mountain trail guard.  You must locate him to learn this skill." ,{CON,0}},
 {    "rage",		SKILL_RAGE,		20,	95,	-2, 	"A fierceful force of elementals is who you seek." ,{STR,CON}},
 {    "triple",		SKILL_THIRD_ATTACK,	25,	85,	-2, 	"Only a palace chef could move his blades so fast." ,{DEX,0}},
@@ -1172,7 +1172,7 @@ struct class_skill_defines b_skills[] = {
 {    "piercing",	SKILL_PIERCEING_WEAPONS,30,	85,	10007,	NULL ,{DEX,0}},
 {    "slashing",	SKILL_SLASHING_WEAPONS,	30,	85,	10007,	NULL ,{DEX,0}},
 {    "crushing",	SKILL_CRUSHING_WEAPONS,	30,	85,	10007,	NULL ,{STR,0}},
-{    "ferocity",	SKILL_FEROCITY,		31,	95,	-2,	"The guardian of this guild has the knowledge you seek.  Speak the name of this skill in his presence." ,{STR,INT}},
+{    "ferocity",	SKILL_FEROCITY,		31,	95,	-2,	"The guardian of this guild has the knowledge you seek.  Speak the name of this skill in his presence." ,{INT,STR}},
 {    "two handers",     SKILL_TWO_HANDED_WEAPONS,35,	90,	10007,	NULL ,{STR,0}},
 {    "archery",		SKILL_ARCHERY, 		38,	80,	10007, NULL,{DEX,0}},
 {    "berserk",		SKILL_BERSERK,		40,	95,	-2, 	"A being of pure rage who lives in a tower, he is a overgrown lizard with a forked tongue." ,{CON,STR}}, 

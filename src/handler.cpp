@@ -21,7 +21,7 @@
  *  12/08/2003   Onager    Added check for charmies and !charmie eq to     *
  *                         equip_char()                                    *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.39 2004/04/24 15:45:01 urizen Exp $ */
+/* $Id: handler.cpp,v 1.40 2004/04/27 19:50:17 urizen Exp $ */
     
 extern "C"
 {
@@ -236,79 +236,79 @@ int get_max_stat(char_data * ch, byte stat)
     switch(GET_RACE(ch)) {
       case RACE_ELVEN:
         switch(stat) {
-          case STRENGTH:      return (BASE_MAX_STAT + RACE_ELVEN_STR_MOD);
-          case DEXTERITY:     return (BASE_MAX_STAT + RACE_ELVEN_DEX_MOD);
-          case INTELLIGENCE:  return (BASE_MAX_STAT + RACE_ELVEN_INT_MOD);
-          case WISDOM:        return (BASE_MAX_STAT + RACE_ELVEN_WIS_MOD);
-          case CONSTITUTION:  return (BASE_MAX_STAT + RACE_ELVEN_CON_MOD);
+          case STRENGTH:      return 24;
+          case DEXTERITY:     return 27;
+          case INTELLIGENCE:  return 27;
+          case WISDOM:        return 24;
+          case CONSTITUTION:  return 23;
         }
 
     case RACE_TROLL:
 	switch(stat) {
-	  case STRENGTH:   return (BASE_MAX_STAT + RACE_TROLL_STR_MOD);
-	  case DEXTERITY:  return (BASE_MAX_STAT + RACE_TROLL_DEX_MOD);
-	  case INTELLIGENCE: return (BASE_MAX_STAT + RACE_TROLL_INT_MOD);
-	  case WISDOM: 	    return (BASE_MAX_STAT + RACE_TROLL_WIS_MOD);
-	  case CONSTITUTION: return (BASE_MAX_STAT + RACE_TROLL_CON_MOD);
+	  case STRENGTH:   return 28;
+	  case DEXTERITY:  return 25;
+	  case INTELLIGENCE: return 20;
+	  case WISDOM: 	    return 22;
+	  case CONSTITUTION: return 30;
 	}
 
   case RACE_DWARVEN:
         switch(stat) {
-          case STRENGTH:      return (BASE_MAX_STAT + RACE_DWARVEN_STR_MOD);
-          case DEXTERITY:     return (BASE_MAX_STAT + RACE_DWARVEN_DEX_MOD);
-          case INTELLIGENCE:  return (BASE_MAX_STAT + RACE_DWARVEN_INT_MOD);
-          case WISDOM:        return (BASE_MAX_STAT + RACE_DWARVEN_WIS_MOD);
-          case CONSTITUTION:  return (BASE_MAX_STAT + RACE_DWARVEN_CON_MOD);
+          case STRENGTH:      return 27;
+          case DEXTERITY:     return 22;
+          case INTELLIGENCE:  return 22;
+          case WISDOM:        return 26;
+          case CONSTITUTION:  return 28;
         }
 
       case RACE_HOBBIT:
         switch(stat) {
-          case STRENGTH:      return (BASE_MAX_STAT + RACE_HOBBIT_STR_MOD);
-          case DEXTERITY:     return (BASE_MAX_STAT + RACE_HOBBIT_DEX_MOD);
-          case INTELLIGENCE:  return (BASE_MAX_STAT + RACE_HOBBIT_INT_MOD);
-          case WISDOM:        return (BASE_MAX_STAT + RACE_HOBBIT_WIS_MOD);
-          case CONSTITUTION:  return (BASE_MAX_STAT + RACE_HOBBIT_CON_MOD);
+          case STRENGTH:      return 22;
+          case DEXTERITY:     return 30;
+          case INTELLIGENCE:  return 25;
+          case WISDOM:        return 25;
+          case CONSTITUTION:  return 23;
         }
 
       case RACE_PIXIE:
         switch(stat) {
-          case STRENGTH:      return (BASE_MAX_STAT + RACE_PIXIE_STR_MOD);
-          case DEXTERITY:     return (BASE_MAX_STAT + RACE_PIXIE_DEX_MOD);
-          case INTELLIGENCE:  return (BASE_MAX_STAT + RACE_PIXIE_INT_MOD);
-          case WISDOM:        return (BASE_MAX_STAT + RACE_PIXIE_WIS_MOD);
-          case CONSTITUTION:  return (BASE_MAX_STAT + RACE_PIXIE_CON_MOD);
+          case STRENGTH:      return 20;
+          case DEXTERITY:     return 28;
+          case INTELLIGENCE:  return 30;
+          case WISDOM:        return 27;
+          case CONSTITUTION:  return 20;
         }
 
       case RACE_GIANT:
         switch(stat) {
-          case STRENGTH:      return (BASE_MAX_STAT + RACE_GIANT_STR_MOD);
-          case DEXTERITY:     return (BASE_MAX_STAT + RACE_GIANT_DEX_MOD);
-          case INTELLIGENCE:  return (BASE_MAX_STAT + RACE_GIANT_INT_MOD);
-          case WISDOM:        return (BASE_MAX_STAT + RACE_GIANT_WIS_MOD);
-          case CONSTITUTION:  return (BASE_MAX_STAT + RACE_GIANT_CON_MOD);
+          case STRENGTH:      return 30;
+          case DEXTERITY:     return 23;
+          case INTELLIGENCE:  return 22;
+          case WISDOM:        return 23;
+          case CONSTITUTION:  return 27;
         }
 
       case RACE_GNOME:
         switch(stat) {
-          case STRENGTH:      return (BASE_MAX_STAT + RACE_GNOME_STR_MOD);
-          case DEXTERITY:     return (BASE_MAX_STAT + RACE_GNOME_DEX_MOD);
-          case INTELLIGENCE:  return (BASE_MAX_STAT + RACE_GNOME_INT_MOD);
-          case WISDOM:        return (BASE_MAX_STAT + RACE_GNOME_WIS_MOD);
-          case CONSTITUTION:  return (BASE_MAX_STAT + RACE_GNOME_CON_MOD);
+          case STRENGTH:      return 22;
+          case DEXTERITY:     return 22;
+          case INTELLIGENCE:  return 27;
+          case WISDOM:        return 30;
+          case CONSTITUTION:  return 24;
         }
 
       case RACE_ORC:
         switch(stat) {
-          case STRENGTH:      return (BASE_MAX_STAT + RACE_ORC_STR_MOD);
-          case DEXTERITY:     return (BASE_MAX_STAT + RACE_ORC_DEX_MOD);
-          case INTELLIGENCE:  return (BASE_MAX_STAT + RACE_ORC_INT_MOD);
-          case WISDOM:        return (BASE_MAX_STAT + RACE_ORC_WIS_MOD);
-          case CONSTITUTION:  return (BASE_MAX_STAT + RACE_ORC_CON_MOD);
+          case STRENGTH:      return 27;
+          case DEXTERITY:     return 25;
+          case INTELLIGENCE:  return 24;
+          case WISDOM:        return 23;
+          case CONSTITUTION:  return 26;
         }
 
       case RACE_HUMAN:
       default:
-        return 27;
+        return 25;
     }
 }
 
