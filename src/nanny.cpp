@@ -11,7 +11,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.22 2002/12/31 05:20:33 dcastle Exp $ */
+/* $Id: nanny.cpp,v 1.23 2003/01/02 03:13:25 pirahna Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -607,7 +607,9 @@ void nanny(struct descriptor_data *d, char *arg)
       if((clan = get_clan(ch->clan)) && clan->clanmotd)
          send_to_char(clan->clanmotd, ch);
         
-      sprintf(log_buf, "\n\rLast connected from:\n\r%s\n\r", ch->pcdata->last_site); 
+      sprintf(log_buf, "\n\rIf you have read this motd, press Return."
+                       "\n\rLast connected from:\n\r%s\n\r", 
+                         ch->pcdata->last_site); 
       SEND_TO_Q(log_buf, d);
       
       if(d->character->pcdata->bad_pw_tries)

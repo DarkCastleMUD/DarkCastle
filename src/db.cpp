@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.18 2002/11/17 19:17:47 pirahna Exp $ */
+/* $Id: db.cpp,v 1.19 2003/01/02 03:13:25 pirahna Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -421,8 +421,6 @@ void boot_db(void)
     file_to_string(CREDITS_FILE, credits);
     file_to_string(MOTD_FILE, motd);
     file_to_string(IMOTD_FILE, imotd);
-    strcat( motd, "\n\rIf you have read this motd, press Return." );
-    strcat( imotd, "\n\rIf you have read this motd, press Return." );
     file_to_string(STORY_FILE, story);
     file_to_string(HELP_PAGE_FILE, help);
     file_to_string(INFO_FILE, info);
