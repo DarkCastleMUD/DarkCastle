@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.4 2002/06/29 18:16:22 pirahna Exp $ */
+/* $Id: mob_proc2.cpp,v 1.5 2002/07/06 21:28:34 pirahna Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -999,6 +999,12 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
                  "Prove to me you are gonna stick around first!'.", ch);
     return eSUCCESS;
   }
+
+  // TODO - redo these more class specific and how we're sure we want them
+  send_to_char("The Meta-physician tells you, 'I'm sorry, but my services are currently\r\n"
+               "unavailable.  Check back with me later.'\r\n", ch);
+  return eSUCCESS;
+
 
   hit_exp = (GET_MAX_HIT(ch) * 8000);
   move_exp = (GET_MAX_MOVE(ch) * 8000);
