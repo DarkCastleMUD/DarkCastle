@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.15 2002/07/31 19:12:30 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.16 2002/08/01 06:25:03 pirahna Exp $ */
 
 extern "C"
 {
@@ -602,12 +602,13 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
   struct obj_data *wielded;	/* convenience */
   int w_type;			/* Holds type info for damage() */
   int weapon_type;
-  int victim_ac, calc_thaco;	/* Holders for Calculation */
+//  int victim_ac, calc_thaco;	/* Holders for Calculation */
   int dam;			/* Self explan. */
-  int diceroll;			/* ... */
+//  int diceroll;			/* ... */
   int retval = 0;
+  int chance;
   
-  extern int thaco[8][61];
+//  extern int thaco[8][61];
   extern struct str_app_type str_app[];
   extern byte backstab_mult[];
   
@@ -648,34 +649,57 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
     w_type = SKILL_BACKSTAB;
   
   /* Calculate thac0 vs. armor clss.  Thac0 for mobs is in hitroll */
-  if(!IS_NPC(ch))
-    calc_thaco = thaco[(int)GET_CLASS(ch) - 1][(int)GET_LEVEL(ch)];
-  else /* ch is a mob */
-    calc_thaco = 20;
+//  if(!IS_NPC(ch))
+//    calc_thaco = thaco[(int)GET_CLASS(ch) - 1][(int)GET_LEVEL(ch)];
+//  else /* ch is a mob */
+//    calc_thaco = 20;
   
-  calc_thaco -= str_app[STRENGTH_APPLY_INDEX(ch)].tohit;
-  calc_thaco -= GET_HITROLL(ch);
+//  calc_thaco -= str_app[STRENGTH_APPLY_INDEX(ch)].tohit;
+//  calc_thaco -= GET_HITROLL(ch);
   
   /* Calculate victim's ac */
-  victim_ac = GET_AC(vict) / 10;
-  victim_ac = MAX(-20, victim_ac);
+//  victim_ac = GET_AC(vict) / 10;
+//  victim_ac = MAX(-20, victim_ac);
   
   /* Roll the dice! */
-  diceroll = number(1, 20);
+//  diceroll = number(1, 20);
   
   /* Can't miss a victim with these effects! */
+//  if(IS_AFFECTED(vict, AFF_PARALYSIS) || !AWAKE(vict) ||
+//    IS_SET(vict->combat, COMBAT_STUNNED) ||
+//    IS_SET(vict->combat, COMBAT_STUNNED2) ||
+//    IS_SET(vict->combat, COMBAT_SHOCKED))
+//    diceroll = 20;
+  
+  /* miss! */
+//  if(diceroll < 20 && AWAKE(vict) &&
+//    (diceroll == 1 || diceroll < calc_thaco - victim_ac)) { 
+//    return damage(ch, vict, 0, w_type, w_type, weapon);
+//  }
+
   if(IS_AFFECTED(vict, AFF_PARALYSIS) || !AWAKE(vict) ||
     IS_SET(vict->combat, COMBAT_STUNNED) ||
     IS_SET(vict->combat, COMBAT_STUNNED2) ||
     IS_SET(vict->combat, COMBAT_SHOCKED))
-    diceroll = 20;
-  
-  /* miss! */
-  if(diceroll < 20 && AWAKE(vict) &&
-    (diceroll == 1 || diceroll < calc_thaco - victim_ac)) { 
-    return damage(ch, vict, 0, w_type, w_type, weapon);
+    chance = 102; // can't miss
+  else
+  {
+    if(GET_LEVEL(ch) < 20)
+       chance = 30 - GET_LEVEL(ch);        // set base
+    else chance = 10;
+
+    chance += GET_LEVEL(ch) - GET_LEVEL(vict);
+    chance += GET_HITROLL(ch);
+    chance += str_app[STRENGTH_APPLY_INDEX(ch)].tohit;
+    chance += ( GET_AC(vict) / 10 );  // (positive ac hurts you, negative helps)
+
+    chance = MIN(90, chance);  // 10 - 90
+    chance = MAX(10, chance);  // 10 - 90
   }
-  
+
+  if(number(0, 101) > chance) 
+    return damage(ch, vict, 0, w_type, w_type, weapon); // miss
+
   if(wielded)  {
     dam = dice(wielded->obj_flags.value[1], wielded->obj_flags.value[2]);
     if(IS_NPC(ch)) {
