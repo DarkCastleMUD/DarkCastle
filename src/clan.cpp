@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.20 2004/04/23 11:55:00 urizen Exp $ */
+/* $Id: clan.cpp,v 1.21 2004/04/23 12:40:10 urizen Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -58,7 +58,6 @@ char * clan_rights[] = {
    "info",
    "tax",
    "withdraw",
-   "deposit",
    "\n"
 };
 
@@ -140,6 +139,7 @@ void boot_clans(void)
 	}
 	case 'T': { // Tax
 	  new_new_clan->tax = fread_int(fl,0,50);
+	  break;
 	}
         case 'L': {
           new_new_clan->login_message = fread_string(fl, 0);
@@ -1254,8 +1254,14 @@ void do_clan_list(CHAR_DATA *ch)
   send_to_char("Clan                 Leader\n\r", ch);
   
   for(clan = clan_list; clan; clan = clan->next) {
-     sprintf(buf, "%-20s$R %-16s %d\n\r", clan->name, clan->leader, 
+     sprintf(buf, "%-20s$R %-16s %d", clan->name, clan->leader, 
            clan->number);
+     if (GET_LEVEL(ch) > 103)
+     {
+       sprintf(buf,"%s  Balance: %ld Tax: %d\r\n",buf,clan->balance, clan->tax);
+     } else {
+	sprintf(buf,"%s\r\n",buf);
+     }
      send_to_char(buf, ch);
   }
 }
@@ -2059,7 +2065,7 @@ int do_clans(CHAR_DATA *ch, char *arg, int cmd)
 
   if(!strcmp("Pirahna", GET_NAME(ch)) || 
      !strcmp("Apocalypse", GET_NAME(ch)) ||
-     !strcmp("Onager", GET_NAME(ch)) ||
+     !strcmp("Urizen", GET_NAME(ch)) ||
      !strcmp("Valkyrie", GET_NAME(ch))
     ) 
   {
@@ -2205,7 +2211,7 @@ int do_ctax(CHAR_DATA *ch, char *arg, int cmd)
   arg = one_argument(arg,arg1);
   if (!is_number(arg1))
   {
-     send_to_char("Taxes need to be numeric.\r\n",ch);
+     csendf(ch,"Your clan's current tax rate is %d.\r\n",get_clan(ch)->tax);
      return eFAILURE;
   }
   int tax = atoi(arg1);
@@ -2220,3 +2226,83 @@ int do_ctax(CHAR_DATA *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
+
+int do_cdeposit(CHAR_DATA *ch, char *arg, int cmd)
+{
+  char arg1[MAX_INPUT_LENGTH];
+  if (!ch->clan)
+  {
+     send_to_char("You not a member of a clan.\r\n",ch);
+     return eFAILURE;
+  }
+/*  if (!has_right(ch, CLAN_RIGHTS_DEPOSIT))
+  {
+     send_to_char("You don't have the right to .\r\n",ch);
+     return eFAILURE;
+  }*/
+  if (world[ch->in_room].number != 3005)
+  {
+    send_to_char("This can only be done at the Sorpigal bank.\r\n",ch);
+    return eFAILURE;
+  }
+  arg = one_argument(arg,arg1);
+  if (!is_number(arg1))
+  {
+    send_to_char("How much do you want to deposit?\r\n",ch);
+    return eFAILURE;
+  }
+  unsigned int dep = atoi(arg1);
+  if (GET_GOLD(ch) < dep || dep < 0)
+  {
+    send_to_char("You don't have that much gold.\r\n",ch);
+    return eFAILURE;
+
+  }
+  GET_GOLD(ch) -= dep;
+  get_clan(ch)->balance += dep;
+  csendf(ch,"You deposit %d gold coins into your clan's account.\r\n",dep);
+  return eSUCCESS;
+}
+
+int do_cwithdraw(CHAR_DATA *ch, char *arg, int cmd)
+{
+  char arg1[MAX_INPUT_LENGTH];
+  if (!ch->clan)
+  {
+     send_to_char("You not a member of a clan.\r\n",ch);
+     return eFAILURE;
+  }
+  if (!has_right(ch, CLAN_RIGHTS_WITHDRAW))
+  {
+     send_to_char("You don't have the right to withdraw gold from your clan's account.\r\n",ch);
+     return eFAILURE;
+  }
+  arg = one_argument(arg,arg1);
+  if (!is_number(arg1))
+  {
+    send_to_char("How much do you want to withdraw?\r\n",ch);
+    return eFAILURE;
+  }
+  long wdraw = atoi(arg1);
+  if (get_clan(ch)->balance < wdraw || wdraw < 0)
+  {
+     send_to_char("Your clan lacks the funds.\r\n",ch);
+     return eFAILURE;
+  }
+  GET_GOLD(ch) += (int)wdraw;
+  get_clan(ch)->balance -= wdraw;
+  csendf(ch,"You withdraw %d gold coins.",wdraw);
+  return eSUCCESS;
+}
+
+int do_cbalance(CHAR_DATA *ch, char *arg, int cmd)
+{
+  char arg1[MAX_INPUT_LENGTH];
+  if (!ch->clan)
+  {
+     send_to_char("You not a member of a clan.\r\n",ch);
+     return eFAILURE;
+  }
+  csendf(ch, "Your clan has %d gold coins in the bank.\r\n",get_clan(ch)->balance);
+  return eSUCCESS;
+}
