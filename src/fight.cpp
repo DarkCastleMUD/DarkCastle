@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.201 2004/05/21 14:16:43 urizen Exp $ */
+/* $Id: fight.cpp,v 1.202 2004/05/21 15:25:13 urizen Exp $ */
 
 extern "C"
 {
@@ -2975,7 +2975,7 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
      GET_RACE(victim) == RACE_ELEMENT ||
      GET_RACE(victim) == RACE_ASTRAL ||
      GET_RACE(victim) == RACE_SLIME ||
-     mob_index[victim->mobdata->nr].virt == 8
+     (IS_NPC(victim) && mob_index[victim->mobdata->nr].virt == 8)
     )
     make_dust(victim);
   else make_corpse(victim);
@@ -3204,7 +3204,7 @@ void group_gain(CHAR_DATA * ch, CHAR_DATA * victim)
 
     /* calculate base XP value */
     base_xp = GET_EXP(victim);
-    if (IS_AFFECTED(victim, AFF_CHARM) && (IS_NPC(victim) && !mob_index[victim->mobdata->nr].virt == 8)) { share = 0; base_xp = 0; bonus_xp = 0;}
+    if (IS_AFFECTED(victim, AFF_CHARM)) { share = 0; base_xp = 0; bonus_xp = 0;}
     /* calculate this character's share of the XP */
     else {share = scale_char_xp(tmp_ch, ch, victim, no_members, total_levels, GET_LEVEL(highest), base_xp, &bonus_xp); }
     
