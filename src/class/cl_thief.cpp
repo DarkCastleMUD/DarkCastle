@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.59 2004/05/25 01:04:52 urizen Exp $
+| $Id: cl_thief.cpp,v 1.60 2004/05/25 12:52:33 urizen Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -622,7 +622,7 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
     if (has_skill(ch,SKILL_STEAL))
       skill_increase_check(ch, SKILL_STEAL, has_skill(ch,SKILL_STEAL), SKILL_INCREASE_HARD);
 
-    if (skill_success(ch,victim,SKILL_STEAL)) 
+    if (!skill_success(ch,victim,SKILL_STEAL)) 
     {
       set_cantquit( ch, victim, TRUE );
       send_to_char("Oops..", ch);
@@ -633,6 +633,7 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
       } else {
 	send_to_char("You managed to keep them unaware of your failed attempt.\r\n",ch);
       }
+      return eFAILURE;
     } 
     else 
     { /* Steal the item */
