@@ -2773,11 +2773,15 @@ int do_medit(struct char_data *ch, char *argument, int cmd)
                        "$3Current$R: ", ch);
           sprintf(buf, "%d\n", ((char_data *)mob_index[mob_num].item)->gold);
           send_to_char(buf, ch);
-          send_to_char("$3Valid Range$R: 0 to 50000\r\n", ch);
+          send_to_char("$3Valid Range$R: 0 to 5000000\r\n", ch);
           return eFAILURE;
         }
-        if(!check_range_valid_and_convert(intval, buf4, 0, 50000)) {
+        if(!check_range_valid_and_convert(intval, buf4, 0, 5000000)) {
           send_to_char("Value out of valid range.\r\n", ch);
+          return eFAILURE;
+        }
+        if(intval > 250000 && GET_LEVEL(ch) <= DEITY) {
+          send_to_char("104-'s can only set a mob to 250k gold.  If you need more ask someone.\r\n", ch);
           return eFAILURE;
         }
         ((char_data *)mob_index[mob_num].item)->gold = intval;
