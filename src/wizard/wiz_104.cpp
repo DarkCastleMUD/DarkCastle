@@ -484,6 +484,7 @@ int do_show(struct char_data *ch, char *argument, int cmd)
   if(!*type) {
     send_to_char("Format: show <type> <name>.\n\r"
                  "Types:\r\n"
+                 "  keydoorcombo\r\n"
                  "  mob\r\n"
                  "  obj\r\n"
                  "  room\r\n"
@@ -493,9 +494,6 @@ int do_show(struct char_data *ch, char *argument, int cmd)
       send_to_char("  wfiles\r\n"
                    "  mfiles\r\n"
                    "  ofiles\r\n", ch);
-    if(GET_LEVEL(ch) >= OVERSEER)
-      send_to_char("  keydoorcombo\r\n", ch);
-
     return eFAILURE;
   }
 
@@ -791,7 +789,7 @@ int do_show(struct char_data *ch, char *argument, int cmd)
       curr = curr->next;
     }
   }
-  else if (is_abbrev(type, "keydoorcombo") && GET_LEVEL(ch) >= OVERSEER)
+  else if (is_abbrev(type, "keydoorcombo"))
   {
     if(!*name) {
        send_to_char("Show which key? (# of key)\r\n", ch);
