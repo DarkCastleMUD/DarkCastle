@@ -41,18 +41,22 @@ struct golem_data
   int roll1, roll2; // Damage maxes
   int dam, hit; // bonus maxes
   int components[5]; // Components(vnums)
-  int special_aff; // Special affect(s)
+  int special_aff; // Special affect(s). (iron)
+  int special_res; // Resists(stone).
   int ac; // armor
+  char *creation_message;
 };
 
 const struct golem_data golem_list[] = {
   {"iron", "iron golem", "an iron golem", "An iron golem stands here, awaiting its master's commands. ", 
-    "The golem looks inanimate, except when it performs some task for its\nmaster. During those periods it moves with suprising speed.",
-    1000, 15, 5, 25, 50, {4, 2, 3, 5, 6}, AFF_LIGHTNINGSHIELD, -100},
+    "The golem looks inanimate, except when it performs some task for its\nmaster. During those periods it moves with suprising speed.\r\n",
+    1000, 15, 5, 25, 50, {4, 2, 3, 5, 6}, AFF_LIGHTNINGSHIELD, 0, -100,
+    "Hey, you like.. made an iron golem.\r\n"},
  {  "stone","stone golem", "a stone golem", "A stone golem stands here, awaiting its master's commands.",
-    "The golem looks inanimate, except when it performs some task for its\nmaster. During those periods it moves with suprising speed.",
-    2000, 5, 5, 25, 50, {4,2,3,5,6},0, -100}
+    "The golem looks inanimate, except when it performs some task for its\nmaster. During those periods it moves with suprising speed.\r\n",
+    2000, 5, 5, 25, 50, {4,2,3,5,6}, 0, ISR_PIERCE, -100, "Stone golem created.\r\n"}
 };
+
 #define MAX_GOLEMS 2 // amount of golems above +1
 
 void golem_gain_exp(CHAR_DATA *ch)
@@ -167,7 +171,7 @@ void load_golem_data(CHAR_DATA *ch, int golemtype)
 }
 
 int check_components(CHAR_DATA *ch, int destroy, int item_one = 0,
-                     int item_two = 0, int item_three = 0, int item_four = 0); // magic.cpp
+                     int item_two = 0, int item_three = 0, int item_four = 0, bool silent = FALSE); // magic.cpp
 
 int cast_create_golem(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill)
 {
@@ -192,23 +196,30 @@ int cast_create_golem(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA 
     return eFAILURE;
   }
   if (!check_components(ch, TRUE, golem_list[i].components[0], golem_list[i].components[1], 
-				golem_list[i].components[2]) ||
-	!check_components(ch, TRUE, golem_list[i].components[3],0,0))
+				golem_list[i].components[2], TRUE) ||
+	!check_components(ch, TRUE, golem_list[i].components[3],0,0, TRUE))
   {
       send_to_char("Since you do not have the require spell components, the magic fades into nothingness.\r\n",ch);
       return eFAILURE;
   }
   load_golem_data(ch, i); // Load the golem up;
+
   golem = ch->pcdata->golem;
   if (!golem)
-  {
+  { // Returns false if something goes wrong. (Not a mage, etc).
     send_to_char("Something goes wrong, and you fail!",ch);
     return eFAILURE;
   }
+  if (check_components(ch, TRUE, golem_list[i].components[4], 0, 0, TRUE))
+  {
+    send_to_char("Adding in the final ingredient, your golem increases in strength!\r\n",ch);
+    SET_BIT(golem->affected_by, golem_list[i].special_aff);
+    SET_BIT(golem->resist, golem_list[i].special_res);
+  }
   char_to_room(golem, ch->in_room);
-  add_follower(golem,ch,0);
+  add_follower(golem, ch, 0);
   SET_BIT(golem->affected_by, AFF_CHARM);
   struct affected_type af;
-  send_to_char("Whow man, you like made a golem.",ch);
+  send_to_char(golem_list[i].creation_message,ch);
   return eSUCCESS;
 }
