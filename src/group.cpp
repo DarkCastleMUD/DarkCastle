@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: group.cpp,v 1.4 2002/06/29 18:16:21 pirahna Exp $
+| $Id: group.cpp,v 1.5 2002/07/18 17:48:13 pirahna Exp $
 | group.C
 | Description:  Group related commands; join, abandon, follow, etc..
 */
@@ -473,6 +473,8 @@ int do_disband(CHAR_DATA *ch, char *argument, int cmd)
     act(buf, k, 0, 0, TO_ROOM, 0);
 
     dc_free(k->group_name);
+    k->group_name = 0;
+
     if(!IS_MOB(k)) {
       k->pcdata->group_kills = 0;
       k->pcdata->grplvl      = 0;
@@ -515,7 +517,6 @@ int do_disband(CHAR_DATA *ch, char *argument, int cmd)
     adios->pcdata->grplvl      = 0;
     adios->pcdata->group_kills = 0;
   }
-  dc_free(adios->group_name);
   stop_follower(adios, 0);
   return eSUCCESS;
 }
