@@ -469,7 +469,7 @@ int show_zone_commands(struct char_data *ch, int i, int start = 0)
 
 char *str_nospace(char *stri)
 {
-  static char test[512]; // Why not
+  char test[512]; // Why not
   int i = 0;
   while (*(stri+i))
   {
