@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.22 2002/10/22 04:53:35 pirahna Exp $ */
+/* $Id: mob_proc.cpp,v 1.23 2002/10/23 17:53:49 pirahna Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -2930,7 +2930,7 @@ int deth (struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 int fido(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,        
           struct char_data *owner)
 {
-    struct obj_data *i, *temp, *next_obj;
+    struct obj_data *i, *temp, *next_obj, *deep, *next_deep;
 
     if (cmd || !AWAKE(ch))
 	return eFAILURE;
@@ -2946,10 +2946,18 @@ int fido(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 	    for(temp = i->contains; temp; temp=next_obj)
 	    {
 		next_obj = temp->next_content;
+                // don't trade no_trade items
                 if(IS_SET(temp->obj_flags.more_flags, ITEM_NO_TRADE))
                 {
                   extract_obj(temp);
                   continue;
+                }
+                // take care of any no-trades inside the item
+                for(deep = temp->contains; deep; deep = next_deep)
+                {
+                  next_deep = deep->next_content;
+                  if(IS_SET(deep->obj_flags.more_flags, ITEM_NO_TRADE))
+                    extract_obj(deep);                   
                 }
 		move_obj(temp, ch->in_room);
 	    }
