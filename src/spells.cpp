@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.100 2004/06/06 12:07:30 urizen Exp $ */
+/* $Id: spells.cpp,v 1.101 2004/06/10 04:57:13 urizen Exp $ */
 
 extern "C"
 {
@@ -1222,7 +1222,7 @@ int skill_value(CHAR_DATA *ch, int skillnum, int min = 33)
 
   while(curr) {
     if(curr->skillnum == skillnum)
-      return MAX(min,(int)curr->learned);
+      return MAX(min, (int)curr->learned);
     curr = curr->next;
   }
   return 0;
@@ -1361,13 +1361,15 @@ bool skill_success(CHAR_DATA *ch, CHAR_DATA *victim, int skillnum, int mod = 0)
 skillnum <= SKILL_SONG_MAX) || (skillnum >= KI_OFFSET && skillnum <= (KI_OFFSET+MAX_KI_LIST))))
    i = 101; // auto success on songs and ki with focus
 
-
+  int a = get_difficulty(skillnum);
   if (i > number(1,101))
+  {
+    skill_increase_check(ch,skillnum,learned,a+500);
     return TRUE; // Success
+  }
   else {
   /* Check for skill improvement anyway */
-   int i = get_difficulty(skillnum);
-   skill_increase_check(ch, skillnum, learned,i);
+   skill_increase_check(ch, skillnum, learned,a);
    return FALSE; // Failure  
   }
 }
@@ -1651,7 +1653,6 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
           if(GET_CLASS(ch) == CLASS_MAGIC_USER || GET_CLASS(ch) == CLASS_ANTI_PAL)
              chance += GET_INT(ch);
           else chance += GET_WIS(ch);*/
-
         chance = has_skill(ch, spl);
         if (chance <= 33) chance = 33;
         else chance = chance + ((chance-33)/1.5);
