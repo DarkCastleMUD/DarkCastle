@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.32 2002/12/27 01:45:08 pirahna Exp $ */
+/* $Id: spells.cpp,v 1.33 2003/03/04 06:45:29 pirahna Exp $ */
 
 extern "C"
 {
@@ -1279,19 +1279,19 @@ int saves_spell(CHAR_DATA *ch, CHAR_DATA *vict, int spell_base, sh_int save_type
     // Get the base save type for this roll
     switch(save_type) {
       case SAVE_TYPE_FIRE:
-            save = ch->saves[SAVE_TYPE_FIRE];
+            save = vict->saves[SAVE_TYPE_FIRE];
             break;
       case SAVE_TYPE_COLD:
-            save = ch->saves[SAVE_TYPE_COLD];
+            save = vict->saves[SAVE_TYPE_COLD];
             break;
       case SAVE_TYPE_ENERGY:
-            save = ch->saves[SAVE_TYPE_ENERGY];
+            save = vict->saves[SAVE_TYPE_ENERGY];
             break;
       case SAVE_TYPE_ACID:
-            save = ch->saves[SAVE_TYPE_ACID];
+            save = vict->saves[SAVE_TYPE_ACID];
             break;
       case SAVE_TYPE_MAGIC:
-            save = ch->saves[SAVE_TYPE_MAGIC];
+            save = vict->saves[SAVE_TYPE_MAGIC];
             // ISR Magic has to affect saving throws as well as damage so they don't get
             // para'd or slept or something
             if(IS_SET(vict->immune, ISR_MAGIC))       return(TRUE);
@@ -1299,7 +1299,7 @@ int saves_spell(CHAR_DATA *ch, CHAR_DATA *vict, int spell_base, sh_int save_type
             if(IS_SET(vict->resist, ISR_MAGIC))       save *= 1.3;
             break;
       case SAVE_TYPE_POISON:
-            save = ch->saves[SAVE_TYPE_POISON];
+            save = vict->saves[SAVE_TYPE_POISON];
             break;
       default:
         break;

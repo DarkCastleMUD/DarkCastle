@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.64 2003/03/04 05:35:21 pirahna Exp $ */
+/* $Id: magic.cpp,v 1.65 2003/03/04 06:45:28 pirahna Exp $ */
 
 extern "C"
 {
@@ -1973,8 +1973,10 @@ int spell_locate_object(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
 int spell_poison(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
   struct affected_type af;
+  int retval = eSUCCESS;
 
-  if (victim) {
+  if (victim) 
+  {
     set_cantquit(ch, victim);
     if(!IS_SET(victim->immune, ISR_POISON))
       if(saves_spell(ch, victim, 0, SAVE_TYPE_POISON) < 0)
@@ -1991,7 +1993,7 @@ int spell_poison(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *
         act("$N seems to be unaffected!", ch, NULL, victim, TO_CHAR, 0);
 
     if (!( ch == victim ))
-      one_hit(victim,ch,TYPE_UNDEFINED, FIRST);
+      retval = one_hit(victim,ch,TYPE_UNDEFINED, FIRST);
   } else { /* Object poison */
     if ((obj->obj_flags.type_flag == ITEM_DRINKCON) ||
         (obj->obj_flags.type_flag == ITEM_FOOD)) 
@@ -1999,7 +2001,7 @@ int spell_poison(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *
       obj->obj_flags.value[3] = 1;
     }
   }
-  return eSUCCESS;
+  return retval;
 }
 
 int spell_protection_from_evil(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
@@ -7436,7 +7438,6 @@ int cast_animate_dead( byte level, CHAR_DATA *ch, char *arg, int type,
   return eFAILURE;
 }
 
-// BLAH BLAH spells below here don't use skill yet
 int spell_bee_sting(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
    int dam;
@@ -7444,10 +7445,12 @@ int spell_bee_sting(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
    affected_type af;
 
    set_cantquit(ch, victim);
-   dam = dice(2, 8) + level / 2;
+   dam = dice(2, 8) + skill/2;
    
    if (saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC) >= 0)
       dam >>= 1;
+
+   skill_increase_check(ch, SPELL_BEE_STING, skill, SKILL_INCREASE_MEDIUM);
 
    retval = spell_damage(ch, victim, dam, TYPE_MAGIC, SPELL_BEE_STING, 0);
    if(SOMEONE_DIED(retval))
@@ -7507,10 +7510,10 @@ int cast_bee_swarm(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *vi
    int retval;
    CHAR_DATA *tmp_victim, *temp;
 
-   dam = dice(level, 5);
+   dam = dice(6+skill/2, 5);
+   skill_increase_check(ch, SPELL_BEE_SWARM, skill, SKILL_INCREASE_MEDIUM);
 
-   act("$n Calls upon the insect world!\n\r",
-       ch, 0, 0, TO_ROOM, INVIS_NULL);
+   act("$n Calls upon the insect world!\n\r", ch, 0, 0, TO_ROOM, INVIS_NULL);
 
    for(tmp_victim = character_list; tmp_victim; tmp_victim = temp) {
       temp = tmp_victim->next;
@@ -7535,7 +7538,7 @@ int cast_creeping_death(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DAT
    affected_type af;
 
    set_cantquit(ch, victim);
-   dam = dice(level, 19);
+   dam = dice(6+skill/2, 19);
 
    if (saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC) >= 0)
       dam >>= 1;
@@ -7546,12 +7549,17 @@ int cast_creeping_death(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DAT
       ch->mana -= level / 2;
    }
 
+   skill_increase_check(ch, SPELL_CREEPING_DEATH, skill, SKILL_INCREASE_MEDIUM);
+
    retval = spell_damage(ch, victim, dam, TYPE_MAGIC, SPELL_CREEPING_DEATH, 0);
    if(SOMEONE_DIED(retval))
       return retval;
 
    // 5% of the time the victim will need a save vs. poison
-   if (dice(1, 20) == 1 && !IS_SET(victim->immune, ISR_POISON)) {
+   if (dice(1, 20) == 1 && 
+       skill > 25 &&
+      !IS_SET(victim->immune, ISR_POISON)) 
+   {
       af.type = SPELL_POISON;
       af.duration = level*2;
       af.modifier = -2;
@@ -7563,7 +7571,10 @@ int cast_creeping_death(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DAT
    }
 	    
    // 1% of the time the victim will actually die from the swarm
-   if (number(1, 101) > 99 && GET_LEVEL(victim) < IMMORTAL) {
+   if (number(1, 101) > 99 && 
+       skill > 70 &&
+       GET_LEVEL(victim) < IMMORTAL) 
+   {
       dam = GET_HIT(victim)*2 + 20;
       send_to_char("The insects are crawling in your mouth, out of your eyes, "
                    "through your stomach!\n\r", victim);
@@ -7576,31 +7587,33 @@ int cast_creeping_death(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DAT
 
 int cast_barkskin(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *victim, struct obj_data * tar_obj, int skill)
 {
-	struct affected_type af;
+  struct affected_type af;
 
-	if(affected_by_spell(victim, SPELL_BARKSKIN)) {
-	  send_to_char("You cannot make your skin any stronger!\n\r", ch);
-	  GET_MANA(ch) += 20;
-	  return eFAILURE;
-	}
+  if(affected_by_spell(victim, SPELL_BARKSKIN)) {
+    send_to_char("You cannot make your skin any stronger!\n\r", ch);
+    GET_MANA(ch) += 20;
+    return eFAILURE;
+  }
 
-	af.type      = SPELL_BARKSKIN;
-	af.duration  = 24 + level / 2;
-	af.modifier  = -20;
-	af.location  = APPLY_AC;
-	af.bitvector = 0;
+  skill_increase_check(ch, SPELL_BARKSKIN, skill, SKILL_INCREASE_EASY);
 
-	affect_join(victim, &af, FALSE, FALSE);
-		
-	SET_BIT(victim->resist, ISR_SLASH);
-	send_to_char("Your skin turns stiff and bark-like.\n\r", victim);
-	act("$N begins to look rather woody.", ch, 0, victim, TO_ROOM,
-	  INVIS_NULL|NOTVICT);
-	if(!OUTSIDE(ch))
-	{
-		send_to_char("Your spell is more draining because you are indoors!\n\r", ch);
-		ch->mana -= level / 2; /* If they are NOT outside it costs extra mana */
-	}
+  af.type      = SPELL_BARKSKIN;
+  af.duration  = 5 + level/7;
+  af.modifier  = -20;
+  af.location  = APPLY_AC;
+  af.bitvector = 0;
+
+  affect_join(victim, &af, FALSE, FALSE);
+
+  SET_BIT(victim->resist, ISR_SLASH);
+
+  send_to_char("Your skin turns stiff and bark-like.\n\r", victim);
+  act("$N begins to look rather woody.", ch, 0, victim, TO_ROOM, INVIS_NULL|NOTVICT);
+  if(!OUTSIDE(ch))
+  {
+    send_to_char("Your spell is more draining because you are indoors!\n\r", ch);
+    ch->mana -= 25;
+  }
   return eSUCCESS;
 }
 
@@ -7612,12 +7625,15 @@ int cast_herb_lore(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *vi
     return eFAILURE;
   }
 
+  skill_increase_check(ch, SPELL_HERB_LORE, skill, SKILL_INCREASE_MEDIUM);
+
   send_to_char("These herbs really do the trick!\n\r", ch);
   send_to_char("You feel much better!\n\r", victim);
   if(OUTSIDE(ch))
-    GET_HIT(victim) += 120;
+    GET_HIT(victim) += skill + 60;
   else /* if not outside */
-    GET_HIT(victim) += 60;
+    GET_HIT(victim) += 30 + skill/2;
+
   if (GET_HIT(victim) >= hit_limit(victim))
     GET_HIT(victim) = hit_limit(victim)-dice(1,4);
 
@@ -7626,6 +7642,7 @@ int cast_herb_lore(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *vi
   return eSUCCESS;
 }
 
+// TODO - make this use skill
 int cast_call_follower(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *victim, struct obj_data * tar_obj, int skill)
 {
    CHAR_DATA *tmp_vict;
@@ -7667,6 +7684,7 @@ int cast_call_follower(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA
   return eSUCCESS;
 }
 
+// TODO - make this use skill
 int cast_entangle(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *victim, struct obj_data * tar_obj, int skill)
 {
 
@@ -7689,6 +7707,7 @@ int cast_entangle(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *vic
 	return eSUCCESS;
 }
 
+// TODO - make this use skill
 int cast_eyes_of_the_owl(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *victim, struct obj_data * tar_obj, int skill)
 {
 	struct affected_type af;
@@ -7713,6 +7732,7 @@ int cast_eyes_of_the_owl(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DA
   return eSUCCESS;
 }
 
+// TODO - spells from here down do not yet use skill
 int cast_feline_agility(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *victim, struct obj_data * tar_obj, int skill)
 {
 	struct affected_type af;
@@ -7722,30 +7742,12 @@ int cast_feline_agility(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DAT
 		send_to_char("You can only cast this spell on yourself!\n\r", ch);
 		return eFAILURE;
 	}
-/* Donno what point of this really is.  Don't get good eq or meta if you
-   want to cast this spell? -pir
-	if(GET_AC(victim) < -150 || GET_DEX(victim) > 20)
-	{
-		send_to_char("You are already more agile than any cat!\n\r", victim);
-		GET_MANA(ch) += 20;
-		return eFAILURE;
-	}
-*/
 	if(affected_by_spell(victim, SPELL_FELINE_AGILITY))
 	{
 		send_to_char("You cannot be as agile as TWO cats!\n\r", ch);
 		GET_MANA(ch) += 20;
 		return eFAILURE;
 	}
-
-
-	/* Uncomment this is tree ever becomes a reality
-	if(IS_AFFECTED(victim, SPELL_TREE))
-	{
-		send_to_char("A tree can never be as agile as a cat!\n\r", ch);
-		return eFAILURE;
-	}
-	*/
 
 	af.type 	= SPELL_FELINE_AGILITY;
 	af.duration	= level - 10;

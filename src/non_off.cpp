@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: non_off.cpp,v 1.13 2003/03/04 05:16:02 pirahna Exp $
+| $Id: non_off.cpp,v 1.14 2003/03/04 06:45:29 pirahna Exp $
 | non_off.C
 | Description:  Implementation of generic, non-offensive commands.
 */
@@ -12,6 +12,7 @@ extern "C"
 #include <dmalloc.h>
 #endif
 
+#include <connect.h>
 #include <character.h>
 #include <room.h>
 #include <obj.h>
@@ -26,6 +27,8 @@ extern "C"
 #include <spells.h>
 #include <fight.h>
 #include <returnvals.h>
+#include <comm.h>
+#include <utility.h>
 
 extern CWorld world;
  
@@ -403,7 +406,7 @@ int do_toggle(struct char_data * ch, char * arg, int cmd)
     do_lfg_toggle(ch, "", 9);
     break;
     
-    case 11:
+    case 12:
     do_notell_toggle(ch, "", 9);
     break;
     

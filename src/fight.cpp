@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.98 2003/03/04 05:18:50 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.99 2003/03/04 06:45:28 pirahna Exp $ */
 
 extern "C"
 {
@@ -1296,6 +1296,8 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
         dam = (int)(dam * 1.2);
         SET_BIT(modifier, COMBAT_MOD_FRENZY);
       }
+      else
+        skill_increase_check(ch, SKILL_FRENZY, learned, SKILL_INCREASE_HARD);
     }
     if(IS_SET(ch->combat, COMBAT_VITAL_STRIKE))
       dam = (int)(dam * 2);
