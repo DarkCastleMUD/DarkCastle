@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.29 2004/05/18 00:17:41 urizen Exp $ */
+/* $Id: mob_proc2.cpp,v 1.30 2004/05/31 23:31:15 urizen Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -879,29 +879,58 @@ int platmerchant(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 int meta_get_stat_exp_cost(char_data * ch, byte stat)
 {
     int xp_price;
-
+    int curr_stat;
     switch(stat) {
       case CONSTITUTION:
-        xp_price = ((GET_LEVEL(ch)*4)*10000)+((ch->raw_con*8)*30000);
+	curr_stat = ch->raw_con;
+//        xp_price = ((GET_LEVEL(ch)*4)*10000)+((ch->raw_con*8)*30000);
         break;
       case STRENGTH:
-        xp_price = ((GET_LEVEL(ch)*4)*10000)+((ch->raw_str*8)*30000);
+	  curr_stat = ch->raw_str;
+//        xp_price = ((GET_LEVEL(ch)*4)*10000)+((ch->raw_str*8)*30000);
         break;
       case DEXTERITY:
-        xp_price = ((GET_LEVEL(ch)*4)*10000)+((ch->raw_dex*8)*30000);
+	curr_stat = ch->raw_dex;
+//        xp_price = ((GET_LEVEL(ch)*4)*10000)+((ch->raw_dex*8)*30000);
         break;
       case INTELLIGENCE:
-        xp_price = ((GET_LEVEL(ch)*4)*10000)+((ch->raw_intel*8)*30000);
+	curr_stat = ch->raw_intel;
+//        xp_price = ((GET_LEVEL(ch)*4)*10000)+((ch->raw_intel*8)*30000);
         break;
       case WISDOM:
-        xp_price = ((GET_LEVEL(ch)*4)*10000)+((ch->raw_wis*8)*30000);
+	curr_stat = ch->raw_wis;
+//        xp_price = ((GET_LEVEL(ch)*4)*10000)+((ch->raw_wis*8)*30000);
         break;
       default:
         xp_price = 9999999;
         break;
     }
-    if(ch->pcdata->statmetas > 0)
-      xp_price += ch->pcdata->statmetas * 20000;
+    switch(curr_stat)
+    {
+	case 1:
+	case 2:
+	case 3:
+	case 4:
+          xp_price = 2000000; break;
+        case 5:
+          xp_price = 3000000; break;
+        case 6: xp_price = 4000000;break;
+        case 7: xp_price = 5000000;break;
+        case 8: xp_price = 5500000;break;
+        case 9: xp_price = 6000000;break;
+        case 10: xp_price = 6500000;break;
+        case 11: xp_price = 7000000;break;
+        case 12: xp_price = 7500000;break;
+        case 13: xp_price = 8000000;break;
+        case 14: xp_price = 8500000; break;
+        case 15: xp_price = 9000000; break;
+        case 16: xp_price = 9500000; break;
+        case 29: xp_price = 25000000;break;
+        default: xp_price = (curr_stat-7)*1000000; break;
+    }
+
+//    if(ch->pcdata->statmetas > 0)
+ //     xp_price += ch->pcdata->statmetas * 20000;
 
     return xp_price;
 }
@@ -917,54 +946,26 @@ int meta_get_stat_plat_cost(char_data * ch, byte targetstat)
       break;
     case STRENGTH:
       stat = ch->raw_str;
-      if(GET_CLASS(ch) == CLASS_MAGIC_USER ||
-         GET_CLASS(ch) == CLASS_CLERIC ||
-         GET_CLASS(ch) == CLASS_DRUID)
-       stat += 2;
-      if(GET_CLASS(ch) == CLASS_BARD ||
-         GET_CLASS(ch) == CLASS_THIEF ||
-         GET_CLASS(ch) == CLASS_MONK)
-       stat += 1;
       break;
     case DEXTERITY:
       stat = ch->raw_dex;
-      if(GET_CLASS(ch) == CLASS_MAGIC_USER ||
-         GET_CLASS(ch) == CLASS_CLERIC ||
-         GET_CLASS(ch) == CLASS_DRUID)
-       stat += 2;
-      if(GET_CLASS(ch) == CLASS_WARRIOR ||
-         GET_CLASS(ch) == CLASS_BARBARIAN ||
-         GET_CLASS(ch) == CLASS_PALADIN)
-       stat += 1;
       break;
     case WISDOM:
       stat = ch->raw_wis;
-      if(GET_CLASS(ch) == CLASS_WARRIOR ||
-         GET_CLASS(ch) == CLASS_PALADIN ||
-         GET_CLASS(ch) == CLASS_BARBARIAN)
-       stat += 2;
-      if(GET_CLASS(ch) == CLASS_MONK ||
-         GET_CLASS(ch) == CLASS_RANGER ||
-         GET_CLASS(ch) == CLASS_THIEF)
-       stat += 1;
       break;
     case INTELLIGENCE:
       stat = ch->raw_intel;
-      if(GET_CLASS(ch) == CLASS_WARRIOR ||
-         GET_CLASS(ch) == CLASS_PALADIN ||
-         GET_CLASS(ch) == CLASS_BARBARIAN)
-       stat += 2;
-      if(GET_CLASS(ch) == CLASS_MONK ||
-         GET_CLASS(ch) == CLASS_RANGER ||
-         GET_CLASS(ch) == CLASS_THIEF)
-       stat += 1;
       break;
     default:
       stat = 99;
       break;
   }
 
-  if(stat >= 18) {
+  if (stat < 5) plat_cost = 100;
+  else if (stat < 13) plat_cost = 250;
+  else if (stat < 29) plat_cost = 250 + ((stat-12) *50);
+  else plat_cost = 1500;
+/*  if(stat >= 18) {
      plat_cost = 500;
      if(ch->pcdata->statmetas > 0)
         plat_cost += ch->pcdata->statmetas * 20;
@@ -972,7 +973,7 @@ int meta_get_stat_plat_cost(char_data * ch, byte targetstat)
      plat_cost = 100;
      if(ch->pcdata->statmetas > 0)
         plat_cost += ch->pcdata->statmetas * 10;
-  }
+  }*/
 
   return plat_cost;
 }
@@ -1136,34 +1137,28 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 
     meta_list_stats(ch);
 
-    csendf(ch, "6) Add to your hit points:   %d exp + %d "
-            "Platinum coins.\n\r", hit_exp, hit_cost); 
+    csendf(ch, "6) Add to your hit points:   Currently out of stock\r\n");
+    //        "Platinum coins.\n\r", hit_exp, hit_cost); 
 
-    csendf(ch, "7) Add to your mana points:  %d exp + %d "
-            "Platinum coins.\n\r", mana_exp, mana_cost);
+    csendf(ch, "7) Add to your mana points:  Currently out of stock\r\n");
+  //          "Platinum coins.\n\r", mana_exp, mana_cost);
 
-    csendf(ch, "8) Add to your movement points: %d exp + %d "
-            "Platinum coins.\n\r", move_exp, move_cost);
+    csendf(ch, "8) Add to your movement points: Currently out of stock\r\n ");
+//            "Platinum coins.\n\r", move_exp, move_cost);
 
     send_to_char(
-//    "9) Freedom from HUNGER and THIRST:  100000000 exp + 2000 Platinum coins.\n\r"
-//    "10) Deep Red Vial:     10 Platinum coins.\n\r"
-//    "11) Deep Blue Potion:   5 Platinum coins.\n\r"
-    "12) Five (5) Platinum coins   Cost: 100,000 Gold Coins.\n\r"
-//    "13) 100,000 Gold Coins        Cost: 5 Platinum Coins.\n\r"
-//    "14) One (1) Platinum coin     Cost: 20,000 Gold Coins.\n\r"
-//    "15) 20,000 Gold Coins         Cost: 1 Platinum Coin.\n\r"
-//    "16) Convert your experience points to gold coins.\n\r"
-    "17) Buy a practice session for 50 plats.\n\r"
+    "9) Freedom from HUNGER and THIRST:  Currently out of stock.\n\r"
+    "10) Five (5) Platinum coins   Cost: 100,000 Gold Coins.\n\r"
+    "11) One (1) Platinum coin     Cost: 20,000 Gold Coins.\n\r"
+    "12) 250 Platinum coins        Cost: 5,000,000 Gold Coins.\n\r"
+    "13) Buy a practice session for 100 plats.\n\r"
                  , ch);
-/*
-    csendf(ch, "18) Add 1 lonely hit point:      %d exp + %d "
-            "Platinum coins.\n\r", hit_exp/5, hit_cost/5); 
-*/ 
+
     if(!IS_MOB(ch)) {   // mobs can't meta ki
       if(GET_KI_METAS(ch) > 4)
 	send_to_char("19) Your ki is already meta'd fully.\n\r", ch);
-      else csendf(ch, "19) Add a point of ki:       %d exp + %d Platinum coins.\n\r", ki_exp, ki_cost);
+      else csendf(ch, "19) Add a point of ki:       Current out of stock..\n\r");
+//, ki_exp, ki_cost);
     }
     return eSUCCESS;
   }
@@ -1245,7 +1240,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
       return eSUCCESS;
     }
 
-   if(choice == 6) {
+   if(choice == -1) {
      if(GET_EXP(ch) < hit_exp) {
        send_to_char("The Meta-physician tells you, 'You lack the experience.'\n\r", ch);
        return eSUCCESS;
@@ -1275,7 +1270,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
      return eSUCCESS;
    }
 
-   if(choice == 7) {
+   if(choice == -1) {
 
      if(GET_EXP(ch) < mana_exp) {
        send_to_char("The Meta-physician tells you, 'You lack the experience.'\n\r", ch);
@@ -1307,7 +1302,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
      return eSUCCESS;
    }
 
-   if(choice == 8) 
+   if(choice == -1) 
    {
      if(GET_EXP(ch) < move_exp) {
        send_to_char("The Meta-physician tells you, 'You lack the experience.'\n\r", ch);
@@ -1329,8 +1324,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
      redo_mana(ch);
      return eSUCCESS;
    }
-/*
-   if(choice == 9) {
+/*   if(choice == 9) {
      price = 100000000;
      if(GET_COND(ch, FULL) == -1) {
        send_to_char("The Meta-physician tells you, 'You already have "
@@ -1361,41 +1355,8 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 
      return eSUCCESS;
    }
-
-   if(choice == 10) {
-
-     send_to_char("The Meta-physician tells you, 'I don't offer that right now.'\n\r", ch);
-     return eSUCCESS;
-
-     if(GET_PLATINUM(ch) < 10) {
-       send_to_char("The Meta-physician tells you, 'You can't afford "
-                    "that!'\n\r", ch);
-       return eSUCCESS;
-     }
-     GET_PLATINUM(ch) -= 10;
-     new_new_obj = clone_object(real_object(10004));
-     obj_to_char(new_new_obj, ch);
-     send_to_char("Ok.\n\r", ch);
-     return eSUCCESS;
-   }
-   if(choice == 11) {
-
-     send_to_char("The Meta-physician tells you, 'I don't offer that right now.'\n\r", ch);
-     return eSUCCESS;
-
-     if(GET_PLATINUM(ch) < 5) {
-       send_to_char("The Meta-physician tells you, 'You can't afford "
-                    "that!'\n\r", ch);
-       return eSUCCESS;
-     }
-     GET_PLATINUM(ch) -= 5;
-     new_new_obj = clone_object(real_object(10003));
-     obj_to_char(new_new_obj, ch);
-     send_to_char("Ok.\n\r", ch);
-     return eSUCCESS;
-   }
 */
-   if(choice == 12) {
+   if(choice == 10) {
      if (affected_by_spell(ch, FUCK_PTHIEF))
      {
 	send_to_char("The Meta-physician tells you, 'You cannot do this because of your criminal actions!'\r\n",ch);
@@ -1411,25 +1372,12 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
      send_to_char("Ok.\n\r", ch);
      return eSUCCESS;
    }
-/*
-  if(choice == 13) {
-    if(GET_PLATINUM(ch) < 5) {
-      send_to_char("The Meta-physician tells you, 'You can't afford "
-                   "that!'\n\r", ch);
-      return eSUCCESS;
-    }
-    if(GET_GOLD(ch) > 2000000000) {
-      send_to_char("The Meta-physician tells you, 'You got too much gold already dude.\r\n", ch);
-      return eSUCCESS;
-    }
-
-    GET_PLATINUM(ch) -= 5;
-    GET_GOLD(ch) += 100000;
-    send_to_char("Ok.\n\r", ch);
-    return eSUCCESS;
-  }
-
-   if(choice == 14) {
+   if(choice == 11) {
+     if (affected_by_spell(ch, FUCK_PTHIEF))
+     {
+        send_to_char("The Meta-physician tells you, 'You cannot do this because of your criminal actions!'\r\n",ch);
+        return eSUCCESS;
+     }
      if(GET_GOLD(ch) < 20000) {
        send_to_char("The Meta-physician tells you, 'You can't afford "
                     "that!'\n\r", ch);
@@ -1440,41 +1388,21 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
      send_to_char("Ok.\n\r", ch);
      return eSUCCESS;
    }
-  if(choice == 15) {
-    if(GET_PLATINUM(ch) < 1) {
+  if(choice == 12) {
+    if(GET_GOLD(ch) < 5000000) {
       send_to_char("The Meta-physician tells you, 'You can't afford "
                    "that!'\n\r", ch);
       return eSUCCESS;
     }
-    GET_PLATINUM(ch) -= 1;
-    GET_GOLD(ch) += 20000;
+    GET_PLATINUM(ch) += 250;
+    GET_GOLD(ch) -= 5000000;
     send_to_char("Ok.\n\r", ch);
     return eSUCCESS;
   }
 
-  if(choice == 16) {
-    if (GET_EXP(ch) < EXPCONV) {
-       send_to_char ("You need more experience before it can be "
-                     "converted!\n\r", ch);
-       return eSUCCESS;
-    }
-    
-    gold = (long)((GET_EXP(ch) / EXPCONV) * GOLDCONV);
-     
-    csendf(ch, "The Meta-Physician converted your %d experience into "
-           "%ld gold!\n\r", GET_EXP(ch), gold);
-    
-    logf(IMMORTAL, LOG_GOD, "%s converts %d exp to %ld gold",
-         GET_SHORT(ch), GET_EXP(ch), gold);
-     
-    GET_GOLD(ch) = GET_GOLD(ch) + gold;
-    GET_EXP(ch) = 0;
-    return eSUCCESS;
-  }
-*/
-  if(choice == 17) {
-    if (GET_PLATINUM(ch) < 50) {
-       send_to_char ("Costs 50 plats...which you don't have.\n\r", ch);
+  if(choice == 13) {
+    if (GET_PLATINUM(ch) < 100) {
+       send_to_char ("Costs 100 plats...which you don't have.\n\r", ch);
        return eSUCCESS;
     }
     if (IS_MOB(ch)) {
@@ -1482,37 +1410,12 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
        return eSUCCESS;
     }
     send_to_char("The Meta-Physician gives you a practice session.\n\r", ch);
-    
-    GET_PLATINUM(ch) -= 50;
+ 
+    GET_PLATINUM(ch) -= 100;
     ch->pcdata->practices += 1;
     return eSUCCESS;
   }
-/*
-   if(choice == 18) {
-     if(GET_EXP(ch) < hit_exp/5) {
-       send_to_char("The Meta-physician tells you, 'You lack the "
-                    "experience.'\n\r", ch);
-       return eSUCCESS;
-     }
-
-     if(GET_PLATINUM(ch) < (uint32)(hit_cost/5)) {
-       send_to_char("The Meta-physician tells you, 'You can't "
-                    "afford my services!  SCRAM!'\n\r", ch);
-       return eSUCCESS;
-     }
-     GET_EXP(ch) -= hit_exp/5;
-     GET_PLATINUM(ch) -= hit_cost/5;
-
-     ch->raw_hit += 1;
-
-     act("The Meta-physician touches $n.",  ch, 0, 0, TO_ROOM, 0);
-     act("The Meta-physician touches you.",  ch, 0, 0, TO_CHAR, 0);
-
-     redo_hitpoints(ch);
-     return eSUCCESS;
-   }
-*/
-  if(choice == 19) {
+  if(choice == -1) {
     if(IS_MOB(ch)) {
       send_to_char("Mobs cannot meta ki.\r\n", ch);
       return eSUCCESS;

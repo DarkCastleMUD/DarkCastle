@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.68 2004/05/31 16:02:45 urizen Exp $
+| $Id: guild.cpp,v 1.69 2004/05/31 23:31:15 urizen Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -140,17 +140,17 @@ int search_skills(char * arg, class_skill_defines * list_skills)
 
 int default_master[] = {
   -1,        // no class 0
-   3020,     // CLASS_MAGIC_USER   1
-   3021,     // CLASS_CLERIC       2   
-   3022,     // CLASS_THIEF        3   
-   3023,     // CLASS_WARRIOR      4   
-   10005,    // CLASS_ANTI_PAL     5   
-   10006,    // CLASS_PALADIN      6   
-   10007,    // CLASS_BARBARIAN    7   
-   10008,    // CLASS_MONK         8   
-   10013,    // CLASS_RANGER       9   
-   3201,     // CLASS_BARD        10   
-   3203,     // CLASS_DRUID       11
+   1937,     // CLASS_MAGIC_USER   1
+   1930,     // CLASS_CLERIC       2   
+   1928,     // CLASS_THIEF        3   
+   1926,     // CLASS_WARRIOR      4   
+   1920,    // CLASS_ANTI_PAL     5   
+   1935,    // CLASS_PALADIN      6   
+   1922,    // CLASS_BARBARIAN    7   
+   1932,    // CLASS_MONK         8   
+   1924,    // CLASS_RANGER       9   
+   1939,     // CLASS_BARD        10   
+   1941,     // CLASS_DRUID       11
    0,        // CLASS_PSIONIC     12
    0         // CLASS_NECROMANCER 13
 };
