@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: shop.cpp,v 1.8 2004/05/07 22:55:06 urizen Exp $ */
+/* $Id: shop.cpp,v 1.9 2004/05/12 18:21:42 urizen Exp $ */
 
 extern "C"
 {
@@ -440,7 +440,7 @@ void shopping_list( char *arg, CHAR_DATA *ch,
         restock_keeper (keeper, shop_nr);
     }
     i = 0;
-    send_to_char( "[ Price ] Item\n\r", ch );
+    send_to_char( "[Amt] [ Price ] Item\n\r", ch );
     found = FALSE;
     for ( obj = keeper->carrying; obj; obj = obj->next_content )
     {

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.47 2004/05/09 19:45:58 urizen Exp $
+| $Id: guild.cpp,v 1.48 2004/05/12 18:21:42 urizen Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -524,20 +524,20 @@ void skill_increase_check(char_data * ch, int skill, int learned, int difficulty
        maximum = skilllist[i].maximum;
        break;
      }
-   int percent = 75;
+   int to = (int)((float)maximum*(float)0.75);
    if (skilllist[i].attrs[0])
    {
 	int thing = get_stat(ch,skilllist[i].attrs[0])-20;
 	if (thing > 0)
-	percent += (get_stat(ch,skilllist[i].attrs[0])-20)*2;
+ 	 to += (int)((get_stat(ch,skilllist[i].attrs[0])-20)*2.5);
+	if (to > 90) to = 90;
    }
    if (skilllist[i].attrs[1])
    {
 	int thing = get_stat(ch,skilllist[i].attrs[1])-20;
 	if (thing > 0)
-        percent += (get_stat(ch,skilllist[i].attrs[1])-20);
+         to += (get_stat(ch,skilllist[i].attrs[1])-20);
    }
-   int to = (int)((float)maximum*(float)((float)percent/100.0));
    if(learned >= to)
      return;
 
