@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.43 2004/05/07 07:04:36 urizen Exp $
+| $Id: guild.cpp,v 1.44 2004/05/07 07:33:23 urizen Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -32,6 +32,8 @@ extern struct class_skill_defines u_skills[];
 extern struct class_skill_defines c_skills[];
 extern struct class_skill_defines m_skills[];
 extern struct index_data *mob_index;
+
+char *str_nospace(char *stri);
 
 int guild(struct char_data *ch, struct obj_data *obj, int cmd, char *arg, struct char_data *owner);
 
@@ -244,7 +246,7 @@ int skills_guild(struct char_data *ch, char *arg, struct char_data *owner)
    }
    else {
       struct skill_quest *sq;
-     if ((sq=find_sq(skilllist[skillnumber].skillname)) != NULL && sq->message && IS_SET(sq->clas, 1<<(GET_CLASS(ch)-1)))
+     if ((sq=find_sq(str_nospace(skilllist[skillnumber].skillname))) != NULL && sq->message && IS_SET(sq->clas, 1<<(GET_CLASS(ch)-1)))
      {
 	mprog_driver(sq->message, owner, ch, NULL, NULL);
 	return eSUCCESS;
