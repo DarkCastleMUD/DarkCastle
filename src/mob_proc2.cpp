@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.14 2002/09/11 02:51:35 pirahna Exp $ */
+/* $Id: mob_proc2.cpp,v 1.15 2002/09/17 20:39:56 pirahna Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -534,9 +534,7 @@ int mortician(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     }
     send_to_char("$RIf any corpses were listed, they are still where you left them.  This\n\r"
                  "list is therefore always changing.  If you purchase one, it will be\n\r"
-                 "transferred to your inventory instantly if it is your corpse.  If it is\n\r"
-                 "someone else's corpse you have consent for, it will be placed at your feet.\n\r"
-                 "Use \"buy <number>\" to purchase a corpse.\n\r", ch);
+                 "placed at your feet. Use \"buy <number>\" to purchase a corpse.\n\r", ch);
     return eSUCCESS;
   }
 
