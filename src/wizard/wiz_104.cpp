@@ -827,7 +827,6 @@ obj_data *)(obj_index[nr].item))->obj_flags.eq_level,
 	    send_to_char("Incorrect level requirement.\r\n",ch);
 	    return eFAILURE;
 	  }
-	  
 	}
      }
      int c,nr;
@@ -836,7 +835,7 @@ obj_data *)(obj_index[nr].item))->obj_flags.eq_level,
       if ((nr = real_mobile(c)) < 0)	
            continue;
       if(race)
-       if (((struct char_data *)(mob_index[nr].item))->race == race)
+       if (((struct char_data *)(mob_index[nr].item))->race != race)
          continue;
       if (align) {
 	if (align == 1 && ((struct char_data *)(mob_index[nr].item))->alignment < 350)
@@ -847,13 +846,13 @@ obj_data *)(obj_index[nr].item))->obj_flags.eq_level,
 	continue;
       }
       if (clas)
-        if (((struct char_data *)(mob_index[nr].item))->c_class == clas)
+        if (((struct char_data *)(mob_index[nr].item))->c_class != clas)
           continue;
       if (levlow)
-	if (((struct char_data *)(mob_index[nr].item))->level >= levlow)
+	if (((struct char_data *)(mob_index[nr].item))->level < levlow)
 	  continue;
       if (levhigh)
-	if (((struct char_data *)(mob_index[nr].item))->level <= levhigh)
+	if (((struct char_data *)(mob_index[nr].item))->level > levhigh)
 	  continue;
       if(act)
 	for (i = 0; i < 31; i++)
