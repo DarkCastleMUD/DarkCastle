@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.66 2003/03/17 03:39:07 pirahna Exp $ */
+/* $Id: magic.cpp,v 1.67 2003/04/18 01:00:49 pirahna Exp $ */
 
 extern "C"
 {
@@ -7709,7 +7709,6 @@ int cast_entangle(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *vic
 	return eSUCCESS;
 }
 
-// TODO - make this use skill
 int cast_eyes_of_the_owl(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *victim, struct obj_data * tar_obj, int skill)
 {
 	struct affected_type af;
@@ -7724,7 +7723,7 @@ int cast_eyes_of_the_owl(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DA
 	}
 
 	af.type      = SPELL_INFRAVISION;
-	af.duration  = level*5;
+	af.duration  = skill*2;
 	af.modifier  = 0;
 	af.location  = APPLY_NONE;
 	af.bitvector = AFF_INFRARED;
@@ -8606,7 +8605,7 @@ int cast_iron_roots(byte level, CHAR_DATA *ch, char *arg, int type,
   return eFAILURE;
 }
 
-
+// TODO - make this use and increase in skill
 int spell_acid_shield(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
   struct affected_type af;
@@ -8708,6 +8707,7 @@ int cast_water_breathing( byte level, CHAR_DATA *ch, char *arg, int type, CHAR_D
   return eFAILURE;
 }
 
+// TODO - make this use and increase in skill
 int spell_globe_of_darkness(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
   obj_data * globe;
@@ -8920,7 +8920,7 @@ int spell_blue_bird(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
   }
   
   while(!SOMEONE_DIED(retval) && count--) {
-     dam = number(1, GET_LEVEL(ch) + 3);
+     dam = number(4, GET_LEVEL(ch) + 3);
      retval = damage(ch, victim, dam, TYPE_PHYSICAL_MAGIC, SPELL_BLUE_BIRD, 0);
   }
 
