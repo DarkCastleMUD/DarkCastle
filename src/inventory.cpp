@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.8 2002/08/04 16:48:34 pirahna Exp $
+| $Id: inventory.cpp,v 1.9 2002/08/05 00:55:54 pirahna Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -544,7 +544,8 @@ int contents_cause_unique_problem(obj_data * obj, char_data * vict)
     if(lastnum == inside->item_number) // items are in order.  If we've already checked
        continue;                       // this item, don't do it again. 
 
-    if(search_char_for_item(vict, inside->item_number))
+    if( IS_SET(inside->obj_flags.more_flags, ITEM_UNIQUE) &&
+        search_char_for_item(vict, inside->item_number))
        return TRUE;
     lastnum = inside->item_number;
   }
