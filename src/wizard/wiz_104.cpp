@@ -842,9 +842,7 @@ obj_data *)(obj_index[nr].item))->obj_flags.eq_level,
       if (align) {
 	if (align == 1 && ((struct char_data *)(mob_index[nr].item))->alignment < 350)
 	  continue;
-	else if (align == 2 && (((struct 
-char_data*)(mob_index[nr].item))->alignment < -350 || ((struct 
-char_data*)(mob_index[nr].item))->alignment > 350))
+	else if (align == 2 && (((struct char_data*)(mob_index[nr].item))->alignment < -350 || ((struct char_data*)(mob_index[nr].item))->alignment > 350))
 	continue;
 	else if (align == 3 && ((struct char_data *)(mob_index[nr].item))->alignment > -350)
 	continue;
@@ -859,16 +857,14 @@ char_data*)(mob_index[nr].item))->alignment > 350))
 	if (((struct char_data *)(mob_index[nr].item))->level <= levhigh)
 	  continue;
       if(act)
-	for (i = 0; i < 1 << 31; i++)
+	for (i = 0; i < 31; i++)
            if (IS_SET(act,1<<i))
-      if (!IS_SET(((struct char_data 
-*)(mob_index[nr].item))->mobdata->actflags, 1<<i))
-        continue;
+      if (!IS_SET(((struct char_data *)(mob_index[nr].item))->mobdata->actflags, 1<<i))
+         goto eheh;
       if(affect)
-	for (i = 0; i < 1 << 31; i++)
+	for (i = 0; i < 31; i++)
            if (IS_SET(affect,1<<i))
-      		if (!IS_SET(((struct char_data 
-*)(mob_index[nr].item))->affected_by, 1<<i))
+      		if (!IS_SET(((struct char_data *)(mob_index[nr].item))->affected_by, 1<<i))
         		continue;
       count++;
       if (count > 200)
@@ -880,6 +876,8 @@ char_data*)(mob_index[nr].item))->alignment > 350))
 char_data *)(mob_index[nr].item))->level,
               ((struct char_data *)(mob_index[nr].item))->short_desc);
       send_to_char(buf,ch);
+     eheh:
+	continue;
      }
   }
   else if (is_abbrev(type, "search") && has_range)
