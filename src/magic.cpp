@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.96 2004/04/16 11:55:25 urizen Exp $ */
+/* $Id: magic.cpp,v 1.97 2004/04/16 14:12:59 urizen Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -1153,8 +1153,8 @@ int spell_paralyze(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data
 
   int spellret = saves_spell(ch, victim, -10, SAVE_TYPE_MAGIC);
 
-  logf(IMP, LOG_BUG, "%s para attempt on %s.  Result: %d",
-       GET_NAME(ch), GET_NAME(victim), spellret);
+///  logf(IMP, LOG_BUG, "%s para attempt on %s.  Result: %d",
+///       GET_NAME(ch), GET_NAME(victim), spellret);
 
   /* ideally, we would do a dice roll to see if spell hits or not */
   if(spellret >= 0 && (victim != ch)) {
