@@ -221,13 +221,14 @@ void assign_non_combat_procs() {
     assign_one_mob_non(1921,  guild_guard);
     assign_one_mob_non(1923,  guild_guard);
     assign_one_mob_non(1925,  guild_guard);
-    assign_one_mob_non(1927,  platinumsmith); 
-    assign_one_mob_non(1929,  meta_dude);
+    assign_one_mob_non(1927,  guild_guard); 
+    assign_one_mob_non(1929,  guild_guard);
     assign_one_mob_non(1920,  guild);
     assign_one_mob_non(1922,  guild);
     assign_one_mob_non(1924,  guild);
     assign_one_mob_non(1926,  guild);
     assign_one_mob_non(10011,  skill_master);
+    assign_one_mob_non(10009, meta_dude);
     assign_one_mob_non(1927,  guild_guard);
     assign_one_mob_non(1928,  guild);
     assign_one_mob_non(14537, apiary_worker);
