@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: const.cpp,v 1.28 2002/08/08 01:13:57 pirahna Exp $ */
+/* $Id: const.cpp,v 1.29 2002/08/10 06:07:06 pirahna Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -945,22 +945,22 @@ struct class_skill_defines w_skills[] = {
 
 struct class_skill_defines t_skills[] = {
 {    "sneak",		SKILL_SNEAK,		1,	75,	-2, 	"You require the essence of a forest creature, a particularly sly one at that." },
-{    "shield block",    SKILL_SHIELDBLOCK,      1,      40,     -2, 	"To learn this skill you must seek its master, the God of War in his arena.  Ask him to please teach you." },
-{    "backstab",	SKILL_BACKSTAB,		2,	90,	3022, 	"You have to go see Skiv the thief guildmaster." },
+{    "shield block",    SKILL_SHIELDBLOCK,      1, 40, -2, 	"To learn this skill you must seek its master, the God of War in his arena.  Ask him to please teach you." },
+{    "backstab",	SKILL_BACKSTAB,		2,	90,	3022,	"You have to go see Skiv the thief guildmaster." },
 {    "hide",		SKILL_HIDE,		5, 	75,	-2, "Seek out the Abbot of a hidden monastery off shore road." },
-{    "pick",		SKILL_PICK_LOCK,	7,	75,	-2, 	"One of those swine that are homage to the old god, they are hard to find but they reside in sorpigal." },
-{    "slip",  		SKILL_SLIP,		10,	80,	-2, 	"The desert banditos know, but they take their secrets to the grave." },
-{    "palm",		SKILL_PALM,		10,	80,	-2, 	"Seek out a pirate captain in a relatively calm port of call.  He believes in honor amongst thieves." },
+{    "pick",		SKILL_PICK_LOCK,	7,	75,	-2,	"One of those swine that are homage to the old god, they are hard to find but they reside in sorpigal." },
+{    "slip",  		SKILL_SLIP,		10,	80,	-2,	"The desert banditos know, but they take their secrets to the grave." },
+{    "palm",		SKILL_PALM,		10,	80,	-2,	"Seek out a pirate captain in a relatively calm port of call.  He believes in honor amongst thieves." },
 {    "dual wield",      SKILL_DUAL_WIELD,       10,	90,     -2, "With whirling blades and rigid honor, only these masters of weaponry can teach you the skill you need." },
 {    "pocket",		SKILL_POCKET,		12,	80,	-2, 	"You might wish to find that conniving dullard in silverdale, can't 'member his name but it rhymes with knave." },
 {    "dodge",		SKILL_DODGE,		15,	90,	-2, 	"Hop like a bunny, quick like a bee, this location is so funny, you'll go wee wee wee.  Don't forget to bring your scythe however." },
 {    "stalk",		SKILL_STALK,		15,	80,	-2, 	"Seek out the sneaky little rodent who is a gossiper and thief!" },
 {    "trip",		SKILL_TRIP,		17,	75,	-2, 	"The old goblin in the caves knows, but he will not be cooperative.  You might need to use violence." },
-{    "blindfighting",   SKILL_BLINDFIGHTING,    19,     60,     -2, "Only on the astral planes can you find what you seek."},
-{    "steal",		SKILL_STEAL,		20,	80,	-2, 	"There's a little thief around town named Caijin.  Annoying little bastard.  Ask him to please teach you." },
-{    "disarm",		SKILL_DISARM,		23,	60,	-2, 	"The duke of Marok is who you need to see."},
+{    "blindfighting",   SKILL_BLINDFIGHTING, 19, 60,     -2, "Only on the astral planes can you find what you seek."},
+{    "steal",		SKILL_STEAL,		20,	80,	-2, "There's a little thief around town named Caijin.  Annoying little bastard.  Ask him to please teach you." },
+{    "disarm",		SKILL_DISARM,		23,	60,	-2, "The duke of Marok is who you need to see."},
 {    "vitalstrike",     SKILL_VITAL_STRIKE,	25,	80,	-2,	NULL },
-{    "circle",		SKILL_CIRCLE,		30,	75,	-2, 	"Find the hobgoblin king, but be careful." },
+{    "circle",		SKILL_CIRCLE,		30,	75,	-2, "Seek the king of a long lost civilization.  I only hear that they are the last of the Jiran." },
 {    "dualbackstab",	SKILL_DUAL_BACKSTAB,	40,	80,	-2, 	"Look for a thief who travels in the most dangerous of places." },
 {    "\n",		0,			1,	0,	0,	NULL}
 };
@@ -1027,7 +1027,7 @@ struct class_skill_defines p_skills[] = {
 {    "protection from evil", SPELL_PROTECT_FROM_EVIL, 33, 90,	-2,	"A short rotund priest with a face you could cut diamonds with can help you."},
 {    "harm",		SPELL_HARM,		35,	90,	-2,	"You want an Abbot of mystical power who stands menancingly." },
 {    "dispel evil",	SPELL_DISPEL_EVIL,	40,	90,	10006,	NULL },
-{    "sanctuary",	SPELL_SANCTUARY,	45,	90,	10006,	NULL },
+{    "sanctuary",	SPELL_SANCTUARY,	45,	90,	-2, "Find a dragon in the forest, she is armed and dangerous." },
 {    "power harm",	SPELL_POWER_HARM,	48,	90,	10006,	NULL },
 {    "\n",		0,			2,	0,	0,	NULL}
 };
@@ -1207,11 +1207,11 @@ struct class_skill_defines c_skills[] = { // cleric skills
 {    "protection from evil", SPELL_PROTECT_FROM_EVIL,	26,	90,	-2, "A short rotund priest with a face you could cut diamonds with can help you." },
 {    "dispel magic",	SPELL_DISPEL_MAGIC,	28,	90,	-2, "Find a mage at the junction of three dreams."},
 {    "dispel minor",	SPELL_DISPEL_MINOR,	28,	90,	3021,	NULL },
-{    "power harm",	SPELL_POWER_HARM,	30,	90,	3021,	NULL },
+{    "power harm",	SPELL_POWER_HARM,	30,	90,	-2, "Find a shaman amongst the muck who has crooked teeth." },
 {    "heroes feast",	SPELL_HEROES_FEAST,	33,	90,	-2, "She has a story like no other, and the lives of her kinsmen are on display for you." },
 {    "animate dead",	SPELL_ANIMATE_DEAD,	35,	90,	3021,	NULL },
 {    "true sight",	SPELL_TRUE_SIGHT,	35,	90,	-2, "As his name suggests, this is a bright and wise person." },
-{    "group recall",	SPELL_GROUP_RECALL,	38,	90,	3021,	NULL },
+{    "group recall",	SPELL_GROUP_RECALL,	38,	90, -2, "An elven queen of sparkling radiance possesses the knowledge to save your people." },
 {    "group fly",	SPELL_GROUP_FLY,	39,	90,	-2, "It’s a bird! It’s an air traffic controller! No, but whatever it is, its elementary :)." },
 {    "resist cold",	SPELL_RESIST_COLD,	39,	90,	-2, "This cold worm lies beneath the surface of the earth in a very cold place." },
 {    "heal spray",	SPELL_HEAL_SPRAY,	40,	90,	3021,	NULL },
