@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.25 2004/02/19 04:29:59 pirahna Exp $
+| $Id: inventory.cpp,v 1.26 2004/04/16 02:58:51 urizen Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -231,6 +231,7 @@ int do_get(struct char_data *ch, char *argument, int cmd)
                    }
                    if(has_consent && contains_no_trade_item(obj_object)) {
                      send_to_char("This item contains no_trade items that cannot be picked up.\n\r", ch);
+		     has_consent = FALSE; // bugfix, could loot without
                      continue;
                    }
                    has_consent = FALSE;  // reset it for the next item:P
