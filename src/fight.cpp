@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.214 2004/05/31 17:16:18 urizen Exp $ */
+/* $Id: fight.cpp,v 1.215 2004/06/09 22:06:30 urizen Exp $ */
 
 extern "C"
 {
@@ -179,7 +179,7 @@ void perform_violence(void)
             MOB_WAIT_STATE(ch) -= 1;
 	  } else {
 
-          retval = 0;
+/*          retval = 0;
           switch(GET_CLASS(ch)) {
            case CLASS_WARRIOR:       retval = fighter(ch, NULL, 0, "", ch);           break;
            case CLASS_THIEF:         retval = thief(ch, NULL, 0, "", ch);             break;
@@ -194,7 +194,7 @@ void perform_violence(void)
            default:                  break;
           }
           if(SOMEONE_DIED(retval))
-            continue;
+            continue;*/
            }
         }
       } // if is_mob

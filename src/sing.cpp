@@ -1143,7 +1143,7 @@ void do_astral_chanty_movement(CHAR_DATA *victim, CHAR_DATA *target)
     act("$n shudders as magical reality refuses to set in.", victim, 0, 0, TO_ROOM, 0);
     return;
   }
-
+  WAIT_STATE(victim, PULSE_VIOLENCE*2);
   do_look(victim, "", 9);
   act("$n appears out of nowhere in a chorus of light and song.", victim, 0, 0, TO_ROOM, 0);
 }
@@ -2104,6 +2104,7 @@ int execute_song_vigilant_siren( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA
          send_to_char("You stop watching your back so closely.\r\n", fvictim->follower);
          continue;
       }
+      if (ch->in_room != fvictim->follower->in_room) continue;
       SET_BIT(fvictim->follower->affected_by2, AFF_ALERT);
       send_to_char("You nervously watch your surroundings with magical speed!\r\n", fvictim->follower);
    }

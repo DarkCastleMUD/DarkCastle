@@ -309,7 +309,7 @@ int do_golem_score(struct char_data *ch, char *argument, int cmd)
    if (IS_NPC(ch)) return eFAILURE;
    if (!ch->pcdata->golem) 
    {
-      send_to_char("But you don't have a golem!",ch);
+      send_to_char("But you don't have a golem!\r\n",ch);
       return eFAILURE;
    }
    ch = ch->pcdata->golem;

@@ -12,14 +12,14 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.h,v 1.27 2004/05/21 15:01:27 urizen Exp $ */
+/* $Id: interp.h,v 1.28 2004/06/09 22:06:33 urizen Exp $ */
 
 #ifndef INTERP_H_
 #define INTERP_H_
 
 
 
-int command_interpreter(CHAR_DATA *ch, char *argument );
+int command_interpreter(CHAR_DATA *ch, char *argument, bool procced = 0 );
 int search_block(char *arg, char **list, bool exact);
 int old_search_block(char *argument,int begin,int length,char **list,int mode);
 char lower( char c );
