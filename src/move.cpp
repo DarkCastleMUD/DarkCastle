@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.12 2002/08/02 16:27:28 pirahna Exp $
+| $Id: move.cpp,v 1.13 2002/08/13 17:09:38 pirahna Exp $
 | move.C
 | Movement commands and stuff.
 */
@@ -546,9 +546,10 @@ int attempt_move(CHAR_DATA *ch, int cmd, int is_retreat = 0)
     return_val = do_simple_move(ch, cmd, FALSE);
     if(SOMEONE_DIED(return_val) || !IS_SET(return_val, eSUCCESS))
       return return_val; 
-    if(!IS_AFFECTED(ch, AFF_SNEAK) && 
-        IS_SET(return_val, eSUCCESS) &&
-       !IS_SET(return_val, eCH_DIED))
+    if(!IS_AFFECTED(ch, AFF_SNEAK)) // && 
+        //IS_SET(return_val, eSUCCESS) &&
+       //!IS_SET(return_val, eCH_DIED))
+       // Don't need to check success or ch_died since they are checked on the line before
       return ambush(ch);
     return return_val;
   }
