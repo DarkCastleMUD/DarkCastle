@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.83 2003/01/08 05:02:24 dcastle Exp $ */
+/* $Id: fight.cpp,v 1.84 2003/01/08 21:30:50 dcastle Exp $ */
 
 extern "C"
 {
@@ -2178,10 +2178,14 @@ void make_corpse(CHAR_DATA * ch)
   // Thieves don't deserve consent! Loot time!
   // Morc
   
-  if(IS_NPC(ch) || IS_SET(ch->pcdata->punish, PUNISH_THIEF))
+  if(IS_NPC(ch) || IS_SET(ch->pcdata->punish, PUNISH_THIEF)) {
+    corpse->obj_flags.wear_flags = 0;
     sprintf(buf, "corpse %s", GET_NAME(ch));
-  else
+  }
+  else {
+    corpse->obj_flags.wear_flags = ITEM_TAKE;
     sprintf(buf, "corpse %s pc", GET_NAME(ch));
+  }
   corpse->name = str_hsh(buf);
   
   sprintf(buf, "the corpse of %s is lying here.",
@@ -2193,7 +2197,6 @@ void make_corpse(CHAR_DATA * ch)
   corpse->short_description = str_hsh(buf);
   
   corpse->obj_flags.type_flag = ITEM_CONTAINER;
-  corpse->obj_flags.wear_flags = ITEM_TAKE;
   corpse->obj_flags.value[0] = 0;	/* You can't store stuff in a corpse */
   corpse->obj_flags.value[3] = 1;	/* corpse identifier */
   corpse->obj_flags.weight = GET_WEIGHT(ch) + IS_CARRYING_W(ch);
