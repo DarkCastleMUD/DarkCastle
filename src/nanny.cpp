@@ -11,7 +11,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.4 2002/06/29 18:16:22 pirahna Exp $ */
+/* $Id: nanny.cpp,v 1.5 2002/07/01 00:30:36 pirahna Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -616,6 +616,8 @@ void nanny(struct descriptor_data *d, char *arg)
          SEND_TO_Q( "Ok, what IS it, then? ", d );
          // TODO - double check this to make sure we're free'ing properly
          dc_free( GET_NAME(ch) );
+         dc_free( d->character );
+         d->character = 0;
          STATE(d) = CON_GET_NAME;
          break;
          
