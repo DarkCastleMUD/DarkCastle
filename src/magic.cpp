@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.50 2003/01/03 05:11:56 dcastle Exp $ */
+/* $Id: magic.cpp,v 1.51 2003/01/08 03:45:02 dcastle Exp $ */
 
 extern "C"
 {
@@ -2498,7 +2498,7 @@ int spell_strength(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data
     }
   }
 
-  skill_increase_check(ch, STRENGTH, skill, SKILL_INCREASE_MEDIUM);
+  skill_increase_check(ch, SPELL_STRENGTH, skill, SKILL_INCREASE_MEDIUM);
 
   act("You feel stronger.", victim,0,0,TO_CHAR, 0);
 
