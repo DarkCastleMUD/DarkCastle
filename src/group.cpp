@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: group.cpp,v 1.8 2002/12/26 19:49:55 pirahna Exp $
+| $Id: group.cpp,v 1.9 2003/05/12 02:56:41 pirahna Exp $
 | group.C
 | Description:  Group related commands; join, abandon, follow, etc..
 */
@@ -337,11 +337,11 @@ int do_group(struct char_data *ch, char *argument, int cmd)
       if((abs(GET_LEVEL(ch) - GET_LEVEL(victim)) ) <= 99) {
         if (IS_AFFECTED(victim, AFF_GROUP)) {
                 stop_grouped_bards(ch);
-		act("$n has been kicked out of the group!", victim, 0, ch, TO_ROOM, ASLEEP);
+		act("$n has been kicked out of the group!", victim, 0, ch, TO_ROOM, 0);
 		act("You are no longer a member of the group!", victim, 0, 0, TO_CHAR, ASLEEP);
 		REMOVE_BIT(victim->affected_by, AFF_GROUP);
         } else {
-		act("$n is now a group member.", victim, 0, 0, TO_ROOM, ASLEEP);
+		act("$n is now a group member.", victim, 0, 0, TO_ROOM, 0);
 		act("You are now a group member.", victim, 0, 0, TO_CHAR, ASLEEP);
 		SET_BIT(victim->affected_by, AFF_GROUP);
                 if(!IS_NPC(victim))
