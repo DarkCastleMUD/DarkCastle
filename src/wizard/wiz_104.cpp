@@ -772,7 +772,6 @@ obj_data *)(obj_index[nr].item))->obj_flags.eq_level,
     extern char *action_bits[];
     extern struct race_shit race_info[];
     extern char *isr_bits[];
-    //extern char *size_bitfields[];
     extern char *affected_bits[];
     extern char *pc_clss_types[];
     while ( ( argument = one_argument(argument, arg1) ) )
@@ -865,7 +864,7 @@ obj_data *)(obj_index[nr].item))->obj_flags.eq_level,
 	for (i = 0; i < 31; i++)
            if (IS_SET(affect,1<<i))
       		if (!IS_SET(((struct char_data *)(mob_index[nr].item))->affected_by, 1<<i))
-        		continue;
+        		goto eheh;
       count++;
       if (count > 200)
       {
