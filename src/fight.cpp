@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.204 2004/05/25 01:04:49 urizen Exp $ */
+/* $Id: fight.cpp,v 1.205 2004/05/25 01:08:30 urizen Exp $ */
 
 extern "C"
 {
@@ -500,6 +500,11 @@ void update_flags(CHAR_DATA *vict)
      // stance lasts 'modifier' rounds.  Remove bit once used up
      struct affected_type * pspell;
      pspell = affected_by_spell(vict, KI_STANCE+KI_OFFSET);
+     if (!pspell)
+     {
+	REMOVE_BIT(vict->combat, COMBAT_MONK_STANCE);
+	return;
+     }
      pspell->modifier--;
      if(pspell->modifier < 0)
      {
