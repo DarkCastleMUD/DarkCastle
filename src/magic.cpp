@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.37 2002/10/01 03:13:39 pirahna Exp $ */
+/* $Id: magic.cpp,v 1.38 2002/10/02 21:18:02 pirahna Exp $ */
 
 extern "C"
 {
@@ -6683,8 +6683,8 @@ int cast_cure_serious( byte level, CHAR_DATA *ch, char *arg, int type,
 {
   switch (type) {
   case SPELL_TYPE_SPELL:
-	 return spell_cure_serious(level, ch, tar_ch, 0, skill);
-    break;
+     return spell_cure_serious(level, ch, tar_ch, 0, skill);
+     break;
   case SPELL_TYPE_SCROLL:
 	 if (tar_obj) return eFAILURE;
 	 if (!tar_ch) tar_ch = ch;
@@ -6700,6 +6700,9 @@ int cast_cure_serious( byte level, CHAR_DATA *ch, char *arg, int type,
 	 tar_ch; tar_ch = tar_ch->next_in_room)
 		spell_cure_serious(level, ch, tar_ch, 0, skill);
 	 break;
+  case SPELL_TYPE_POTION:
+     return spell_cure_serious(level, ch, tar_ch, 0, skill);
+     break;
   default:
 	 log("Serious screw-up in cure serious!", ANGEL, LOG_BUG);
 	 break;
@@ -6732,6 +6735,9 @@ int cast_cause_light( byte level, CHAR_DATA *ch, char *arg, int type,
 		if (IS_NPC(tar_ch))
 	spell_cause_light(level, ch, tar_ch, 0, skill);
 	 break;
+  case SPELL_TYPE_POTION:
+	 return spell_cause_light(level, ch, tar_ch, 0, skill);
+	 break;
   default:
 	 log("Serious screw-up in cause light!", ANGEL, LOG_BUG);
 	 break;
@@ -6763,6 +6769,9 @@ int cast_cause_critical( byte level, CHAR_DATA *ch, char *arg,
 		if (IS_NPC(tar_ch))
 	spell_cause_critical(level, ch, tar_ch, 0, skill);
 	 break;
+  case SPELL_TYPE_POTION:
+     return spell_cause_critical(level, ch, tar_ch, 0, skill);
+     break;
   default:
 	 log("Serious screw-up in cause critical!", ANGEL, LOG_BUG);
 	 break;
@@ -6794,6 +6803,9 @@ int cast_cause_serious( byte level, CHAR_DATA *ch, char *arg,
 		if (IS_NPC(tar_ch))
 	spell_cause_serious(level, ch, tar_ch, 0, skill);
 	 break;
+  case SPELL_TYPE_POTION:
+    return spell_cause_serious(level, ch, tar_ch, 0, skill);
+    break;
   default:
 	 log("Serious screw-up in cause serious!", ANGEL, LOG_BUG);
 	 break;
