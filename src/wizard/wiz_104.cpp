@@ -979,6 +979,8 @@ char_data *)(mob_index[nr].item))->level,
 obj_data *)(obj_index[nr].item))->obj_flags.eq_level,
               ((struct obj_data *)(obj_index[nr].item))->short_description);
            send_to_char(buf, ch);
+       endLoop:
+	continue;
      }
   }
   else if (is_abbrev(type, "rfiles") && has_range)
