@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.146 2004/05/27 21:44:15 urizen Exp $ */
+/* $Id: magic.cpp,v 1.147 2004/05/27 22:02:35 urizen Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -2126,7 +2126,7 @@ int spell_poison(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *
   if (victim) 
   {
     set_cantquit(ch, victim);
-   if (number(1,101) < (get_saves(victim, SAVE_TYPE_POISON) + 5 + (skill < 40 ? 5 : 0) + (skill < 60 ? 5 : 0) + (skill < 80 ? 5 : 0)))
+   if (IS_SET(victim->immune, ISR_POISON) || (number(1,101) < (get_saves(victim, SAVE_TYPE_POISON) + 5 + (skill < 40 ? 5 : 0) + (skill < 60 ? 5 : 0) + (skill < 80 ? 5 : 0))))
    {
 act("$N resists your attempt to poison $m!", ch, NULL, victim, 
 TO_CHAR,0);
@@ -2142,9 +2142,6 @@ act("You resist $n's attempt to posion you!",ch,NULL,victim,TO_VICT,0);
      return eFAILURE;
    }
 
-    if(!IS_SET(victim->immune, ISR_POISON))
-      if(saves_spell(ch, victim, 0, SAVE_TYPE_POISON) < 0)
-      {
         af.type = SPELL_POISON;
         af.duration = 1 + (skill > 80);
         af.modifier = -5;
@@ -2152,12 +2149,6 @@ act("You resist $n's attempt to posion you!",ch,NULL,victim,TO_VICT,0);
         af.bitvector = AFF_POISON;
         affect_join(victim, &af, FALSE, FALSE);
         send_to_char("You feel very sick.\n\r", victim);
-      }
-      else
-        act("$N seems to be unaffected!", ch, NULL, victim, TO_CHAR, 0);
-
-    if (!( ch == victim ))
-      retval = one_hit(victim,ch,TYPE_UNDEFINED, FIRST);
   } else { /* Object poison */
     if ((obj->obj_flags.type_flag == ITEM_DRINKCON) ||
         (obj->obj_flags.type_flag == ITEM_FOOD)) 
