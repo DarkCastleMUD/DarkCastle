@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: non_off.cpp,v 1.4 2002/08/01 06:29:31 dcastle Exp $
+| $Id: non_off.cpp,v 1.5 2002/08/01 20:05:34 dcastle Exp $
 | non_off.C
 | Description:  Implementation of generic, non-offensive commands.
 */
@@ -714,7 +714,7 @@ int do_sleep(CHAR_DATA *ch, char *argument, int cmd)
 
     struct affected_type af;
     af.type      = INTERNAL_SLEEPING;
-    af.duration  = 1;
+    af.duration  = 0;
     af.modifier  = 0;
     af.location  = APPLY_NONE;
     af.bitvector = 0;
