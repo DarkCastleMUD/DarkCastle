@@ -14,7 +14,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.h,v 1.49 2004/05/16 12:22:11 urizen Exp $ */
+/* $Id: spells.h,v 1.50 2004/05/17 07:11:25 urizen Exp $ */
 #include <structs.h> // byte, sh_int
 
 #define MAX_BUF_LENGTH               240
@@ -320,7 +320,8 @@ void check_maxes(CHAR_DATA *ch);
 #define SKILL_SONG_DISARMING_LIMERICK 545
 #define SKILL_SONG_SHATTERING_RESO   546
 #define SKILL_SONG_UNRESIST_DITTY    547
-#define SKILL_SONG_MAX               547
+#define SKILL_SONG_FANATICAL_FANFARE 548
+#define SKILL_SONG_MAX               548
 // if you add a song, make sure you update "songs[]" in sing.C
 // as well as SKILL_SONG_MAX
 

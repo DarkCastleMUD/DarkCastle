@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.52 2004/05/14 00:04:15 urizen Exp $
+| $Id: cl_thief.cpp,v 1.53 2004/05/17 07:11:23 urizen Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -614,7 +614,7 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
     }
     if (GET_OBJ_WEIGHT(obj) > 40)
     {
-	send_to_char("That item is too heavy to seal.\r\n",ch);
+	send_to_char("That item is too heavy to steal.\r\n",ch);
 	return eFAILURE;
     }
 
@@ -977,7 +977,7 @@ int do_pocket(CHAR_DATA *ch, char *argument, int cmd)
       act("You discover that $n has $s hands in your wallet.", ch,0,victim,TO_VICT, 0);
       act("$n tries to steal gold from $N.", ch, 0, victim, TO_ROOM, NOTVICT|INVIS_NULL);
     } else {
-      send_to_char("You managed to keep the unaware of your botched attempt.\r\n",ch);
+      send_to_char("You managed to keep them unaware of your botched attempt.\r\n",ch);
     }
   } else 
   {

@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.55 2004/05/16 12:26:02 urizen Exp $ */
+/* $Id: db.cpp,v 1.56 2004/05/17 07:11:21 urizen Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -2357,12 +2357,15 @@ CHAR_DATA *read_mobile(int nr, FILE *fl)
 
         // if all three are 0, then chances are someone just didn't set them, so go with
         // the race defaults.
-        if(mob->immune == 0 && mob->suscept == 0 && mob->resist == 0)
-        {
-            mob->immune  = race_info[(int)GET_RACE(mob)].immune;
-            mob->suscept = race_info[(int)GET_RACE(mob)].suscept;
-            mob->resist  = race_info[(int)GET_RACE(mob)].resist;
-        }
+//        if(mob->immune == 0 && mob->suscept == 0 && mob->resist == 0)
+  //      {
+	   SET_BIT(mob->immune, race_info[(int)GET_RACE(mob)].immune);
+	   SET_BIT(mob->suscept, race_info[(int)GET_RACE(mob)].suscept);
+ 	   SET_BIT(mob->resist, race_info[(int)GET_RACE(mob)].resist);
+      //      mob->immune  = race_info[(int)GET_RACE(mob)].immune;
+        //    mob->suscept = race_info[(int)GET_RACE(mob)].suscept;
+          //  mob->resist  = race_info[(int)GET_RACE(mob)].resist;
+    //    }
 
         mob->c_class = 0;
 

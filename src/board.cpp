@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: board.cpp,v 1.3 2002/09/08 15:13:59 pirahna Exp $
+| $Id: board.cpp,v 1.4 2004/05/17 07:11:21 urizen Exp $
 | board.C
 | Description:  This file contains the implementation for the board
 |   code.  It's old and should be rewritten --Morc XXX
@@ -361,7 +361,7 @@ void board_write_msg(CHAR_DATA *ch, char *arg, int bnum) {
 
   curr_board = &boards[bnum];
 
-  if(board_clan[bnum] != -1 && strcmp("Mace", GET_NAME(ch)) && GET_LEVEL(ch) < OVERSEER) {
+  if(board_clan[bnum] != -1 && GET_LEVEL(ch) < OVERSEER) {
     if(ch->clan !=  board_clan[bnum]) {
       send_to_char("You aren't in the right clan bucko.\n\r", ch);
       return;
@@ -507,7 +507,7 @@ int board_remove_msg(CHAR_DATA *ch, char *arg, int bnum) {
   ind = tmessage;
 
   // if clan board
-  if(board_clan[bnum] != -1 && strcmp("Mace", GET_NAME(ch)) && GET_LEVEL(ch) < OVERSEER) {
+  if(board_clan[bnum] != -1 && GET_LEVEL(ch) < OVERSEER) {
     if(ch->clan !=  board_clan[bnum]) {
       send_to_char("You aren't in the right clan bucko.\n\r", ch);
       return 1;
@@ -738,7 +738,7 @@ int board_display_msg(CHAR_DATA *ch, char *arg, int bnum)
   curr_board = &boards[bnum];
 
 
-  if(board_clan[bnum] != -1 && strcmp("Mace", GET_NAME(ch)) && GET_LEVEL(ch) < OVERSEER) {
+  if(board_clan[bnum] != -1 && GET_LEVEL(ch) < OVERSEER) {
     if(ch->clan !=  board_clan[bnum]) {
       send_to_char("You aren't in the right clan bucko.\n\r", ch);
       return 1;
@@ -801,7 +801,7 @@ int board_show_board(CHAR_DATA *ch, char *arg, int bnum)
 
   curr_board = &boards[bnum];
 
-  if(board_clan[bnum] != -1 && strcmp("Mace", GET_NAME(ch)) && GET_LEVEL(ch) < OVERSEER) {
+  if(board_clan[bnum] != -1 && GET_LEVEL(ch) < OVERSEER) {
     if(ch->clan !=  board_clan[bnum]) {
       send_to_char("You aren't in the right clan bucko.\n\r", ch);
       return eSUCCESS;

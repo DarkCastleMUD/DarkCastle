@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.82 2004/05/16 12:22:07 urizen Exp $ */
+/* $Id: spells.cpp,v 1.83 2004/05/17 07:11:21 urizen Exp $ */
 
 extern "C"
 {
@@ -77,585 +77,295 @@ void make_dust(CHAR_DATA * ch);
 
 struct spell_info_type spell_info [ ] =
 {
-    { /* 00 */ /* THIS WAS MISSING... Arrays start a 0!!! CGT */
-         0, 0, 0, 0, 0
-    },
+ { /* 00 */ /* Note: All arrays start at 0! CGT */  0, 0, 0, 0, 0 },
 
-    { /* 01 */
-	12, POSITION_STANDING,  5, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_armor
-    },
+ { /* 01 */ 12, POSITION_STANDING,  8, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_armor },
 
-    { /* 02 */
-	12, POSITION_FIGHTING, 35, TAR_SELF_ONLY, cast_teleport
-    },
+ { /* 02 */ 12, POSITION_FIGHTING, 35, TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_teleport },
 
-    { /* 03 */
-	12, POSITION_STANDING, 5, TAR_OBJ_INV|TAR_OBJ_EQUIP|TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_bless
-    },
+ { /* 03 */ 12, POSITION_STANDING,  6, TAR_CHAR_ROOM|TAR_SELF_DEFAULT|TAR_OBJ_INV|TAR_OBJ_ROOM|TAR_OBJ_EQUIP, cast_bless },
 
-    { /* 04 */
-	12, POSITION_FIGHTING,  5, TAR_CHAR_ROOM|TAR_FIGHT_VICT, cast_blindness
-    },
+ { /* 04 */ 12, POSITION_FIGHTING, 20, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_blindness },
 
-    { /* 05 */
-	12, POSITION_FIGHTING, 15, TAR_CHAR_ROOM|TAR_FIGHT_VICT, cast_burning_hands
-    },
+ { /* 05 */ 12, POSITION_FIGHTING, 15, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_burning_hands },
 
-    { /* 06 */
-	12, POSITION_FIGHTING, 40, TAR_CHAR_ROOM|TAR_FIGHT_VICT, cast_call_lightning
-    },
+ { /* 06 */ 12, POSITION_FIGHTING, 35, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_call_lightning },
 
-    { /* 07 */
-	12, POSITION_STANDING, 5, TAR_CHAR_ROOM|TAR_SELF_NONO, cast_charm_person
-    },
+ { /* 07 */ /* 12, POSITION_STANDING, 15, TAR_CHAR_ROOM|TAR_SELF_NONO, cast_charm_person */ 0, 0, 0, 0, 0 },
 
-    { /* 08 */
-	12, POSITION_FIGHTING, 20, TAR_CHAR_ROOM|TAR_FIGHT_VICT, cast_chill_touch
-    },
+ { /* 08 */ 12, POSITION_FIGHTING, 20, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_chill_touch },
 
-    { /* 09 */ 
-         /* 12,POSITION_STANDING,15, 32, 40, TAR_CHAR_ROOM, cast_clone); */
-         0, 0, 0, 0, 0
-    },
+ { /* 09 */ /* 12, POSITION_STANDING, 40, TAR_CHAR_ROOM, cast_clone); */ 0, 0, 0, 0, 0 },
 
-    { /* 10 */
-	12, POSITION_FIGHTING, 15, TAR_CHAR_ROOM|TAR_FIGHT_VICT, cast_colour_spray
-    },
+ { /* 10 */ 12, POSITION_FIGHTING, 40, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_colour_spray },
 
-    { /* 11 */
-	12, POSITION_STANDING, 25, TAR_IGNORE, cast_control_weather
-    },
+ { /* 11 */ 12, POSITION_STANDING, 25, TAR_IGNORE, cast_control_weather },
 
-    { /* 12 */
-	12, POSITION_STANDING, 5, TAR_IGNORE, cast_create_food
-    },
+ { /* 12 */ 12, POSITION_STANDING,  5, TAR_IGNORE, cast_create_food },
 
-    { /* 13 */
-	12, POSITION_STANDING, 5, TAR_OBJ_INV|TAR_OBJ_EQUIP, cast_create_water
-    },
+ { /* 13 */ 12, POSITION_STANDING,  5, TAR_OBJ_INV|TAR_OBJ_EQUIP, cast_create_water },
 
-    { /* 14 */
-	12, POSITION_STANDING, 5, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_cure_blind
-    },
+ { /* 14 */ 12, POSITION_STANDING, 15, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_cure_blind },
 
-    { /* 15 */
-	12, POSITION_FIGHTING, 20, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_cure_critic
-    },
+ { /* 15 */ 12, POSITION_FIGHTING, 20, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_cure_critic },
 
-    { /* 16 */
-	12, POSITION_FIGHTING, 15, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_cure_light
-    },
+ { /* 16 */ 12, POSITION_FIGHTING, 10, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_cure_light },
 
-    { /* 17 */
-	12, POSITION_STANDING, 20, TAR_CHAR_ROOM|TAR_OBJ_ROOM|TAR_OBJ_INV|TAR_OBJ_EQUIP, cast_curse
-    },
+ { /* 17 */ 12, POSITION_STANDING, 33, TAR_CHAR_ROOM|TAR_OBJ_ROOM|TAR_OBJ_INV|TAR_OBJ_EQUIP, cast_curse },
 
-    { /* 18 */
-	12, POSITION_STANDING, 5, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_detect_evil
-    },
+ { /* 18 */ 12, POSITION_STANDING,  5, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_detect_evil },
 
-    { /* 19 */
-	12, POSITION_STANDING, 5, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_detect_invisibility
-    },
+ { /* 19 */ 12, POSITION_STANDING,  8, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_detect_invisibility },
 
-    { /* 20 */
-	12, POSITION_STANDING, 5, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_detect_magic
-    },
+ { /* 20 */ 12, POSITION_STANDING,  6, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_detect_magic },
 
-    { /* 21 */
-	12, POSITION_STANDING, 5, TAR_CHAR_ROOM|TAR_OBJ_INV|TAR_OBJ_EQUIP, cast_detect_poison
-    },
+ { /* 21 */ 12, POSITION_STANDING,  5, TAR_CHAR_ROOM|TAR_OBJ_ROOM|TAR_OBJ_INV|TAR_OBJ_EQUIP, cast_detect_poison },
 
-    { /* 22 */
-	12, POSITION_FIGHTING, 25, TAR_CHAR_ROOM|TAR_FIGHT_VICT, cast_dispel_evil
-    },
+ { /* 22 */ 12, POSITION_FIGHTING, 25, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_dispel_evil },
 
-    { /* 23 */
-	12, POSITION_FIGHTING, 15, TAR_IGNORE, cast_earthquake
-    },
+ { /* 23 */ 12, POSITION_FIGHTING, 25, TAR_IGNORE, cast_earthquake },
 
-    { /* 24 */
-	24, POSITION_STANDING, 100, TAR_OBJ_INV|TAR_OBJ_EQUIP, cast_enchant_weapon
-    },
+ { /* 24 */ 24, POSITION_STANDING, 50, TAR_OBJ_INV|TAR_OBJ_EQUIP, cast_enchant_weapon },
 
-    { /* 25 */
-	12, POSITION_FIGHTING, 15, TAR_CHAR_ROOM|TAR_FIGHT_VICT, cast_energy_drain
-    },
+ { /* 25 */ 12, POSITION_FIGHTING, 20, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_energy_drain },
 
-    { /* 26 */
-	12, POSITION_FIGHTING, 20, TAR_CHAR_ROOM|TAR_FIGHT_VICT, cast_fireball
-    },
+ { /* 26 */ 12, POSITION_FIGHTING, 25, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_fireball },
 
-    { /* 27 */
-	12, POSITION_FIGHTING, 33, TAR_CHAR_ROOM|TAR_FIGHT_VICT, cast_harm
-    },
+ { /* 27 */ 12, POSITION_FIGHTING, 33, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_harm },
 
-    { /* 28 */
-	12, POSITION_FIGHTING, 50, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_heal
-    },
+ { /* 28 */ 12, POSITION_FIGHTING, 40, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_heal },
 
-    { /* 29 */
-	12, POSITION_STANDING, 5, TAR_CHAR_ROOM|TAR_OBJ_INV|TAR_OBJ_ROOM|TAR_OBJ_EQUIP|TAR_SELF_DEFAULT, cast_invisibility
-    },
+ { /* 29 */ 12, POSITION_STANDING,  7, TAR_CHAR_ROOM|TAR_OBJ_INV|TAR_OBJ_ROOM|TAR_OBJ_EQUIP|TAR_SELF_DEFAULT, cast_invisibility },
 
-    { /* 30 */
-	12, POSITION_FIGHTING, 20, TAR_CHAR_ROOM|TAR_FIGHT_VICT, cast_lightning_bolt
-    },
+ { /* 30 */ 12, POSITION_FIGHTING, 17, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_lightning_bolt },
 
-    { /* 31 */
-	12, POSITION_STANDING, 20, TAR_OBJ_WORLD, cast_locate_object
-    },
+ { /* 31 */ 12, POSITION_STANDING, 20, TAR_OBJ_WORLD, cast_locate_object },
 
-    { /* 32 */
-	12, POSITION_FIGHTING, 15, TAR_CHAR_ROOM|TAR_FIGHT_VICT, cast_magic_missile
-    },
+ { /* 32 */ 12, POSITION_FIGHTING, 10, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_magic_missile },
 
-    { /* 33 */
-	12, POSITION_STANDING, 10, TAR_CHAR_ROOM|TAR_SELF_NONO|TAR_OBJ_INV|TAR_OBJ_EQUIP, cast_poison
-    },
+ { /* 33 */ 12, POSITION_STANDING, 15, TAR_CHAR_ROOM|TAR_SELF_NONO|TAR_OBJ_INV|TAR_OBJ_ROOM, cast_poison },
 
-    { /* 34 */
-	12, POSITION_STANDING, 50, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_protection_from_evil
-    },
+ { /* 34 */ 12, POSITION_STANDING, 50, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_protection_from_evil },
 
-    { /* 35 */
-	12, POSITION_STANDING, 5, TAR_CHAR_ROOM|TAR_OBJ_INV|TAR_OBJ_EQUIP|TAR_OBJ_ROOM, cast_remove_curse
-    },
+ { /* 35 */ 12, POSITION_STANDING, 18, TAR_CHAR_ROOM|TAR_OBJ_INV|TAR_OBJ_EQUIP|TAR_OBJ_ROOM, cast_remove_curse },
 
-    { /* 36 */
-	12, POSITION_STANDING, 75, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_sanctuary
-    },
+ { /* 36 */ 12, POSITION_STANDING, 60, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_sanctuary },
 
-    { /* 37 */
-	12, POSITION_FIGHTING, 15, TAR_CHAR_ROOM|TAR_FIGHT_VICT, cast_shocking_grasp
-    },
+ { /* 37 */ 12, POSITION_FIGHTING, 15, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_shocking_grasp },
 
-    { /* 38 */
-	12, POSITION_STANDING, 15, TAR_CHAR_ROOM, cast_sleep
-    },
+ { /* 38 */ 12, POSITION_STANDING, 33, TAR_CHAR_ROOM|TAR_SELF_NONO, cast_sleep },
 
-    { /* 39 */
-	12, POSITION_STANDING, 20, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_strength
-    },
+ { /* 39 */ 12, POSITION_STANDING, 20, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_strength },
 
-    { /* 40 */
-	12, POSITION_STANDING, 50, TAR_CHAR_WORLD|TAR_SELF_NONO, cast_summon
-    },
+ { /* 40 */ 12, POSITION_STANDING, 50, TAR_CHAR_WORLD|TAR_SELF_NONO, cast_summon },
 
-    { /* 41 */
-	12, POSITION_STANDING, 5, TAR_CHAR_ROOM|TAR_OBJ_ROOM|TAR_SELF_NONO, cast_ventriloquate
-    },
+ { /* 41 */ 12, POSITION_STANDING,  5, TAR_CHAR_ROOM|TAR_OBJ_ROOM|TAR_SELF_NONO, cast_ventriloquate },
 
-    { /* 42 */
-	12, POSITION_FIGHTING, 50, TAR_CHAR_ROOM|TAR_SELF_ONLY, cast_word_of_recall
-    },
+ { /* 42 */ 12, POSITION_FIGHTING, 50, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_word_of_recall },
 
-    { /* 43 */
-	12, POSITION_STANDING, 5, TAR_CHAR_ROOM|TAR_OBJ_INV|TAR_OBJ_ROOM|TAR_SELF_DEFAULT, cast_remove_poison
-    },
+ { /* 43 */ 12, POSITION_STANDING, 12, TAR_CHAR_ROOM|TAR_OBJ_INV|TAR_OBJ_ROOM|TAR_SELF_DEFAULT, cast_remove_poison },
 
-    { /* 44 */
-	12, POSITION_STANDING, 15, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_sense_life
-    },
+ { /* 44 */ 12, POSITION_STANDING, 15, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_sense_life },
 
-    { /* 45 */
-	12, POSITION_STANDING, 50, TAR_IGNORE, cast_summon_familiar
-    },
+ { /* 45 */ 12, POSITION_STANDING, 45, TAR_IGNORE, cast_summon_familiar },
 
-    { /* 46 */
-	 12, POSITION_STANDING, 30, TAR_IGNORE, cast_lighted_path
-    },
+ { /* 46 */ 12, POSITION_STANDING, 30, TAR_IGNORE, cast_lighted_path },
 
-    { /* 47 */
-	 12, POSITION_STANDING, 33, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_resist_acid
-    },
+ { /* 47 */ 12, POSITION_STANDING, 33, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_resist_acid },
 
-    { /* 48 */
-	 12, POSITION_FIGHTING, 40, TAR_CHAR_ROOM|TAR_FIGHT_VICT, cast_sun_ray
-    },
+ { /* 48 */ 12, POSITION_FIGHTING, 35, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_sun_ray },
 
-    { /* 49 */
-	 12, POSITION_STANDING, 30, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_rapid_mend
-    },
+ { /* 49 */ 12, POSITION_STANDING, 30, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_rapid_mend },
 
-    { /* 50 */
-	12, POSITION_STANDING, 150, TAR_CHAR_ROOM|TAR_SELF_ONLY, cast_acid_shield
-    },
+ { /* 50 */ 12, POSITION_STANDING, 120, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_acid_shield },
 
-    { /* 51 */
-	 12, POSITION_STANDING, 20, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_water_breathing
-    },
+ { /* 51 */ 12, POSITION_STANDING, 22, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_water_breathing },
 
-    { // 52
-	 12, POSITION_STANDING, 20, TAR_IGNORE, cast_globe_of_darkness
-    },
+ { /* 52 */ 12, POSITION_STANDING, 20, TAR_IGNORE, cast_globe_of_darkness },
 
-    { // 53
-	24, POSITION_STANDING, 12, TAR_CHAR_ROOM|TAR_OBJ_INV|TAR_OBJ_ROOM, cast_identify
-    },
+ { /* 53 */ 24, POSITION_STANDING, 12, TAR_CHAR_ROOM|TAR_OBJ_INV|TAR_OBJ_ROOM, cast_identify },
     
-    { // 54
-        24, POSITION_STANDING, 20, TAR_OBJ_ROOM, cast_animate_dead
-    },
+ { /* 54 */ 24, POSITION_STANDING, 75, TAR_OBJ_ROOM, cast_animate_dead },
 
-    { // 55
-	12, POSITION_FIGHTING, 7, TAR_CHAR_ROOM|TAR_FIGHT_VICT, cast_fear
-    },
+ { /* 55 */ 12, POSITION_FIGHTING, 17, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_fear },
 
-    { /* 56 */
-	12, POSITION_STANDING, 10, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_fly
-    },
+ { /* 56 */ 12, POSITION_STANDING, 10, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_fly },
 
-    { /* 57 */
-	12, POSITION_STANDING, 7, TAR_NONE_OK|TAR_OBJ_INV, cast_cont_light
-    },
+ { /* 57 */ 12, POSITION_STANDING,  7, TAR_NONE_OK|TAR_OBJ_INV|TAR_OBJ_ROOM, cast_cont_light },
 
-    { /* 58 */
-	12, POSITION_STANDING, 9, TAR_CHAR_ROOM, cast_know_alignment
-    },
+ { /* 58 */ 12, POSITION_STANDING,  5, TAR_CHAR_ROOM, cast_know_alignment },
 
-    { /* 59 */
-	12, POSITION_FIGHTING, 20, TAR_CHAR_ROOM|TAR_FIGHT_VICT, cast_dispel_magic
-    },
+ { /* 59 */ 12, POSITION_FIGHTING, 28, TAR_CHAR_ROOM|TAR_FIGHT_VICT, cast_dispel_magic },
 
-    { /* 60 */
-	24, POSITION_STANDING, 33, TAR_CHAR_WORLD, cast_conjure_elemental
-    },
+ { /* 60 */ /* 24, POSITION_STANDING, 150, TAR_NONE_OK, cast_conjure_elemental */ 0, 0, 0, 0, 0 },
 
-    { /* 61 */
-	12, POSITION_FIGHTING, 17, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_cure_serious
-    },
+ { /* 61 */ 12, POSITION_FIGHTING, 15, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_cure_serious },
 
-    { /* 62 */
-	12, POSITION_FIGHTING, 15, TAR_CHAR_ROOM|TAR_FIGHT_VICT, cast_cause_light
-    },
+ { /* 62 */ 12, POSITION_FIGHTING, 12, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_cause_light },
 
-    { /* 63 */
-	12, POSITION_FIGHTING, 20, TAR_CHAR_ROOM|TAR_FIGHT_VICT, cast_cause_critical
-    },
+ { /* 63 */ 12, POSITION_FIGHTING, 24, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_cause_critical },
 
-    { /* 64 */
-	12, POSITION_FIGHTING, 17, TAR_CHAR_ROOM|TAR_FIGHT_VICT, cast_cause_serious
-    },
+ { /* 64 */ 12, POSITION_FIGHTING, 18, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_cause_serious },
 
-    { /* 65 */
-	12, POSITION_FIGHTING, 33, TAR_CHAR_ROOM|TAR_FIGHT_VICT, cast_flamestrike
-    },
+ { /* 65 */ 12, POSITION_FIGHTING, 45, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_flamestrike },
 
-    { /* 66 */
-	12, POSITION_STANDING, 33, TAR_CHAR_ROOM|TAR_SELF_ONLY, cast_stone_skin
-    },
+ { /* 66 */ 12, POSITION_STANDING, 33, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_stone_skin },
 
-    { /* 67 */
-	12, POSITION_STANDING, 12, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_shield
-    },
+ { /* 67 */ 12, POSITION_STANDING, 12, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_shield },
 
-    { /* 68 */
-	12, POSITION_FIGHTING, 20, TAR_CHAR_ROOM|TAR_FIGHT_VICT, cast_weaken
-    },
+ { /* 68 */ 12, POSITION_FIGHTING, 20, TAR_CHAR_ROOM|TAR_FIGHT_VICT, cast_weaken },
 
-    { /* 69 */
-	24, POSITION_STANDING, 33, TAR_IGNORE, cast_mass_invis
-    },
+ { /* 69 */ 24, POSITION_STANDING, 33, TAR_IGNORE, cast_mass_invis },
 
-    { /* 70 */
-	12, POSITION_FIGHTING, 45, TAR_CHAR_ROOM|TAR_FIGHT_VICT, cast_acid_blast
-    },
+ { /* 70 */ 12, POSITION_FIGHTING, 45, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_acid_blast },
 
-    { /* 71 */
-	12, POSITION_STANDING, 50, TAR_CHAR_WORLD, cast_portal
-    },
+ { /* 71 */ 12, POSITION_STANDING, 55, TAR_CHAR_WORLD, cast_portal },
 
-    { /* 72 */
-	12, POSITION_STANDING, 5, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_infravision
-    },
+ { /* 72 */ 12, POSITION_STANDING,  7, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_infravision },
 
-    { /* 73 */
-	12, POSITION_STANDING, 12, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_refresh
-    },
+ { /* 73 */ 12, POSITION_STANDING, 12, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_refresh },
 
-    { /* 74 */
-	12, POSITION_STANDING, 33, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_haste
-    },
+ { /* 74 */ 12, POSITION_STANDING, 33, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_haste },
 
-    { /* 75 */
-	12, POSITION_FIGHTING, 25, TAR_CHAR_ROOM|TAR_FIGHT_VICT, cast_dispel_good
-    },
+ { /* 75 */ 12, POSITION_FIGHTING, 25, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_dispel_good },
 
-    { /* 76 */
-	12, POSITION_FIGHTING, 80, TAR_CHAR_ROOM|TAR_FIGHT_VICT, cast_hellstream
-    },
+ { /* 76 */ 12, POSITION_FIGHTING, 80, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_hellstream },
 
-    { /* 77 */
-	12, POSITION_FIGHTING, 75, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_power_heal 
-    },
+ { /* 77 */ 12, POSITION_FIGHTING, 60, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_power_heal },
 
-    { /* 78 */
-	12, POSITION_FIGHTING, 80, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_full_heal
-    },
+ { /* 78 */ 12, POSITION_FIGHTING, 80, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_full_heal },
 
-    { /* 79 */
-	12, POSITION_FIGHTING, 60, TAR_IGNORE, cast_firestorm
-    },
+ { /* 79 */ 12, POSITION_FIGHTING, 55, TAR_IGNORE, cast_firestorm },
 
-    { /* 80 */
-	12, POSITION_FIGHTING, 40, TAR_CHAR_ROOM|TAR_FIGHT_VICT, cast_power_harm
-    },
+ { /* 80 */ 12, POSITION_FIGHTING, 45, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_power_harm },
 
-    { /* 81 */
-	12, POSITION_STANDING, 5, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_detect_good
-    },
+ { /* 81 */ 12, POSITION_STANDING,  5, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_detect_good },
 
-    { /* 82 */
-	12, POSITION_FIGHTING, 33, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_vampiric_touch
-    },
+ { /* 82 */ 12, POSITION_FIGHTING, 33, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_vampiric_touch },
 
-    { /* 83 */
-	12, POSITION_FIGHTING, 40, TAR_IGNORE, cast_life_leech
-    },
+ { /* 83 */ 12, POSITION_FIGHTING, 40, TAR_IGNORE, cast_life_leech },
 
-    { /* 84 */
-	12, POSITION_FIGHTING, 25, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_paralyze
-    },
+ { /* 84 */ 12, POSITION_FIGHTING, 33, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_paralyze },
 
-    { /* 85 */
-	12, POSITION_STANDING, 5, TAR_CHAR_ROOM, cast_remove_paralysis
-    },
+ { /* 85 */ 12, POSITION_STANDING, 18, TAR_CHAR_ROOM, cast_remove_paralysis },
 
-    { /* 86 */
-	12, POSITION_STANDING, 150, TAR_CHAR_ROOM|TAR_SELF_ONLY, cast_fireshield
-    },
+ { /* 86 */ 12, POSITION_STANDING, 160, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_fireshield },
 
-    { /* 87 */
-	12, POSITION_FIGHTING, 40, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_meteor_swarm
-    },
+ { /* 87 */ 12, POSITION_FIGHTING, 40, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_meteor_swarm },
 
-    { /* 88 */
-	12, POSITION_STANDING, 20, TAR_CHAR_WORLD, cast_wizard_eye
-    },
+ { /* 88 */ 12, POSITION_STANDING, 20, TAR_CHAR_WORLD, cast_wizard_eye },
 
-    { /* 89 */
-	12, POSITION_STANDING, 33, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_true_sight
-    },
+ { /* 89 */ 12, POSITION_STANDING, 33, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_true_sight },
 
-    { /* 90 */
-	12, POSITION_RESTING, 0, TAR_CHAR_ROOM|TAR_SELF_ONLY, cast_mana
-    },
+ { /* 90 */ 12, POSITION_STANDING,  0, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_mana },
 
-    { /* 91 */
-	12, POSITION_FIGHTING, 200, TAR_IGNORE, cast_solar_gate
-    },
+ { /* 91 */ 12, POSITION_FIGHTING, 200, TAR_IGNORE, cast_solar_gate },
 
-    { /* 92 */
-	12, POSITION_STANDING, 33, TAR_IGNORE, cast_heroes_feast
-    },
+ { /* 92 */ 12, POSITION_STANDING, 30, TAR_IGNORE, cast_heroes_feast },
 
-    { /* 93 */
-	12, POSITION_STANDING, 100, TAR_IGNORE, cast_heal_spray
-    },
+ { /* 93 */ 12, POSITION_STANDING, 100, TAR_IGNORE, cast_heal_spray },
 
-    { /* 94 */
-	12, POSITION_STANDING, 200, TAR_IGNORE, cast_group_sanc
-    },
+ { /* 94 */ 12, POSITION_STANDING, 180, TAR_IGNORE, cast_group_sanc },
 
-    { /* 95 */
-     12, POSITION_STANDING, 100, TAR_IGNORE, cast_group_recall
-    },
+ { /* 95 */ 12, POSITION_STANDING, 100, TAR_IGNORE, cast_group_recall },
 
-    { /* 96 */
-	12, POSITION_STANDING, 40, TAR_IGNORE, cast_group_fly
-    },
+ { /* 96 */ 12, POSITION_STANDING, 40, TAR_IGNORE, cast_group_fly },
 
-    { /* 97 */
-	12, POSITION_STANDING, 250, TAR_OBJ_INV|TAR_OBJ_EQUIP, cast_enchant_armor
-    },
+ { /* 97 */ /* 12, POSITION_STANDING, 250, TAR_OBJ_INV|TAR_OBJ_EQUIP, cast_enchant_armor */ 0, 0, 0, 0, 0 },
 
-    { /* 98 */
-	12, POSITION_STANDING, 33, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_resist_fire
-    },
+ { /* 98 */ 12, POSITION_STANDING, 33, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_resist_fire },
 
-    { /* 99 */
-	12, POSITION_STANDING, 33, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_resist_cold
-    },
+ { /* 99 */ 12, POSITION_STANDING, 33, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_resist_cold },
 
-    { /* 100 */
-	12, POSITION_FIGHTING, 8, TAR_CHAR_ROOM|TAR_FIGHT_VICT, cast_bee_sting
-    }, 
+ { /* 100 */ 12, POSITION_FIGHTING, 8, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_bee_sting }, 
 
-    { /* 101 */
-	12, POSITION_FIGHTING, 15, TAR_IGNORE, cast_bee_swarm
-    }, 
+ { /* 101 */ 12, POSITION_FIGHTING, 25, TAR_IGNORE, cast_bee_swarm }, 
 
-    { /* 102 */
-	12, POSITION_FIGHTING, 50, TAR_CHAR_ROOM|TAR_FIGHT_VICT, cast_creeping_death
-    }, 
+ { /* 102 */ 12, POSITION_FIGHTING, 45, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_creeping_death }, 
 
-    { /* 103 */
-    	12, POSITION_STANDING, 20, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_barkskin
-    }, 
+ { /* 103 */ 12, POSITION_STANDING, 20, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_barkskin }, 
 
-    { /* 104 */
-	12, POSITION_FIGHTING, 50, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_herb_lore
-    }, 
+ { /* 104 */ 12, POSITION_FIGHTING, 45, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_herb_lore }, 
 
-    { /* 105 */
-    	12, POSITION_STANDING, 75, TAR_IGNORE, cast_call_follower
-    }, 
+ { /* 105 */ 12, POSITION_STANDING, 75, TAR_IGNORE, cast_call_follower }, 
 
-    { /* 106 */
-	12, POSITION_FIGHTING, 10, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_entangle
-    }, 
+ { /* 106 */ 12, POSITION_FIGHTING, 15, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_entangle }, 
 
-    { /* 107 */
-    	12, POSITION_STANDING, 5, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_eyes_of_the_owl
-    },
+ { /* 107 */ 12, POSITION_STANDING,  5, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_eyes_of_the_owl },
 
-    { /* 108 */
-    	12, POSITION_STANDING, 30, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_feline_agility
-    }, 
+ { /* 108 */ 12, POSITION_STANDING, 20, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_feline_agility }, 
 
-    { /* 109 */
-    	12, POSITION_STANDING, 20, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_forest_meld
-    },
+ { /* 109 */ 12, POSITION_STANDING, 30, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_forest_meld },
+
+ { /* 110 */ /* 12, POSITION_STANDING, 150, TAR_IGNORE, cast_companion */ 0, 0, 0, 0, 0 },
+
+ { /* 111 */ 12, POSITION_FIGHTING, 33, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_drown },
+
+ { /* 112 */ 12, POSITION_FIGHTING, 25, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_howl },
+
+ { /* 113 */ 12, POSITION_FIGHTING, 25, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_souldrain },
+
+ { /* 114 */ 12, POSITION_FIGHTING, 18, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_sparks },
+
+ { /* 115 */ 12, POSITION_STANDING, 20, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_camouflague },
+
+ { /* 116 */ 12, POSITION_STANDING, 24, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_farsight },
+
+ { /* 117 */ 12, POSITION_STANDING, 20, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_freefloat },
+
+ { /* 118 */ 12, POSITION_STANDING, 33, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_insomnia },
+
+ { /* 119 */ 12, POSITION_STANDING, 50, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_shadowslip },
     
-    { // 110
-    	12, POSITION_STANDING, 150, TAR_IGNORE, cast_companion
-    },
+ { /* 120 */ 12, POSITION_STANDING, 33, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_resist_energy },
 
-    { // 111
-    	12, POSITION_FIGHTING, 15, TAR_CHAR_ROOM|TAR_FIGHT_VICT, cast_drown
-    },
+ { /* 121 */ 12, POSITION_STANDING, 20, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_staunchblood },
 
-    { // 112
-    	12, POSITION_FIGHTING, 30, TAR_FIGHT_VICT, cast_howl
-    },
+ { /* 122 */ 12, POSITION_STANDING, 300, TAR_CHAR_ROOM, cast_create_golem },
 
-    { // 113
-    	12, POSITION_FIGHTING, 20, TAR_CHAR_ROOM|TAR_FIGHT_VICT, cast_souldrain
-    },
+ { /* 123 */ 12, POSITION_STANDING, 60, TAR_IGNORE, spell_reflect },
 
-    { // 114
-    	12, POSITION_FIGHTING, 20, TAR_CHAR_ROOM|TAR_FIGHT_VICT, cast_sparks
-    },
+ { /* 124 */ 12, POSITION_FIGHTING, 22, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_OBJ_ROOM, cast_dispel_minor },
 
-    { // 115
-        12, POSITION_STANDING, 20, TAR_CHAR_ROOM|TAR_SELF_ONLY, cast_camouflague
-    },
+ { /* 125 */ 12, POSITION_STANDING, 25, TAR_IGNORE, spell_release_golem },
 
-    { // 116
-        12, POSITION_STANDING, 20, TAR_CHAR_ROOM|TAR_SELF_ONLY, cast_farsight
-    },
+ { /* 126 */ 12, POSITION_FIGHTING, 30, TAR_IGNORE, spell_beacon },
 
-    { // 117
-        12, POSITION_STANDING, 20, TAR_CHAR_ROOM|TAR_SELF_ONLY, cast_freefloat
-    },
+ { /* 127 */ 12, POSITION_STANDING, 40, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_stone_shield },
 
-    { // 118
-        12, POSITION_STANDING, 20, TAR_CHAR_ROOM|TAR_SELF_ONLY, cast_insomnia
-    },
+ { /* 128 */ 12, POSITION_STANDING, 55, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_greater_stone_shield },
 
-    { // 119
-        12, POSITION_STANDING, 20, TAR_CHAR_ROOM|TAR_SELF_ONLY, cast_shadowslip
-    },
-    
-    { // 120
-        12, POSITION_STANDING, 33, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_resist_energy
-    },
+ { /* 129 */ 12, POSITION_FIGHTING, 15, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_iron_roots },
 
-    { // 121
-         12, POSITION_STANDING, 20, TAR_CHAR_ROOM|TAR_SELF_ONLY, cast_staunchblood
-    },
+ { /* 130 */ /* 12, POSITION_STANDING, 50, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_eyes_of_the_eagle */ 0, 0, 0, 0, 0 },
 
-    { // 122
-	12, POSITION_STANDING, 255, TAR_CHAR_ROOM, cast_create_golem
-    },
+ { /* 131 */ /* 12, POSITION_STANDING,  0, TAR_CHAR_ROOM, NULL */ 0, 0, 0, 0, 0 },
 
-    { // 123  this spell isn't castable but this has to be here.
-        12, POSITION_STANDING, 1, TAR_IGNORE, spell_reflect
-    },
+ { /* 132 */ /* 12, POSITION_FIGHTING, 25, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_ice_shards */ 0, 0, 0, 0, 0 },
 
-    { /* 124 */
-	12, POSITION_FIGHTING, 20, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_OBJ_ROOM, cast_dispel_minor
-    },
+ { /* 133 */ 12, POSITION_STANDING, 65, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_lightning_shield },
 
-    { // 125
-        12, POSITION_STANDING, 5, TAR_IGNORE, spell_release_golem
-    },
+ { /* 134 */ 12, POSITION_FIGHTING, 10, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_blue_bird },
 
-    { // 126
-        12, POSITION_FIGHTING, 30, TAR_IGNORE, spell_beacon
-    },
+ { /* 135 */ 12, POSITION_FIGHTING, 15, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_debility },
 
-    { // 127
-        12, POSITION_STANDING, 30, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_stone_shield
-    },
+ { /* 136 */ 12, POSITION_FIGHTING, 30, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_attrition },
 
-    { // 128
-        12, POSITION_STANDING, 50, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_greater_stone_shield
-    },
+ { /* 137 */ 12, POSITION_FIGHTING, 120, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_vampiric_aura },
 
-    { // 129
-        12, POSITION_FIGHTING, 15, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_iron_roots
-    },
+ { /* 138 */ 12, POSITION_FIGHTING, 200, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_holy_aura },
 
-    { // 130
-        12, POSITION_STANDING, 50, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_eyes_of_the_eagle
-    },
+ { /* 139 */ 12, POSITION_FIGHTING,  5, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_dismiss_familiar },
 
-    { // 131
-        12, POSITION_STANDING, 40, TAR_CHAR_ROOM, NULL
-    },
+ { /* 140 */ 12, POSITION_FIGHTING, 15, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_dismiss_corpse },
 
-    { // 132
-        12, POSITION_FIGHTING, 25, TAR_CHAR_ROOM|TAR_FIGHT_VICT, cast_ice_shards
-    },
+ { /* 141 */ 12, POSITION_FIGHTING, 30, TAR_IGNORE, cast_blessed_halo },
 
-    { // 133
-	12, POSITION_STANDING, 50, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_lightning_shield
-    },
+ { /* 142 */ 12, POSITION_FIGHTING, 40, TAR_IGNORE, cast_visage_of_hate },
 
-    { // 134
-	12, POSITION_FIGHTING, 10, TAR_CHAR_ROOM|TAR_FIGHT_VICT, cast_blue_bird
-    },
+ { /* 143 */ 12, POSITION_STANDING, 50, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_protection_from_good },
 
-    { // 135
-	12, POSITION_FIGHTING, 15, TAR_CHAR_ROOM|TAR_FIGHT_VICT, cast_debility
-    },
-
-    { // 136
-	12, POSITION_FIGHTING, 30, TAR_CHAR_ROOM|TAR_FIGHT_VICT, cast_attrition
-    },
-
-    { // 137
-	12, POSITION_FIGHTING, 200, TAR_CHAR_ROOM|TAR_SELF_ONLY, cast_vampiric_aura
-    },
-
-    { // 138
-	12, POSITION_FIGHTING, 200, TAR_CHAR_ROOM|TAR_SELF_ONLY, cast_holy_aura
-    },
-
-    { // 139
-	12, POSITION_FIGHTING, 1, TAR_CHAR_ROOM|TAR_SELF_ONLY, cast_dismiss_familiar
-    },
-
-    { // 140
-	12, POSITION_FIGHTING, 15, TAR_CHAR_ROOM|TAR_SELF_ONLY, cast_dismiss_corpse
-    },
-
-    { // 141
-	12, POSITION_FIGHTING, 30, TAR_IGNORE, cast_blessed_halo
-    },
-
-    { // 142
-	12, POSITION_FIGHTING, 40, TAR_IGNORE, cast_visage_of_hate
-    },
-
-    { /* 143 */
-	12, POSITION_STANDING, 50, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_protection_from_good
-    },
-    { /* 144 */
-	12, POSITION_STANDING, 30, TAR_CHAR_ROOM|TAR_SELF_ONLY, cast_oaken_fortitude
-    },
+ { /* 144 */ 12, POSITION_STANDING, 24, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_oaken_fortitude },
 };
 
 char *skills[]=
@@ -731,7 +441,7 @@ char *skills[]=
   "release",
   "fear gaze",
   "eyegouge",
-  "magic_resist",
+  "magic resist",
   "\n"
 };
 

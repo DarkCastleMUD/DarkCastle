@@ -202,8 +202,12 @@ struct song_info_type song_info [ ] = {
         TAR_IGNORE, 
         song_unresistable_ditty, execute_song_unresistable_ditty,
 	NULL, NULL
-}
+},
+{ /* 19 */
+        8, POSITION_STANDING, 4, SKILL_SONG_FANATICAL_FANFARE,
+       TAR_IGNORE,  NULL, NULL, NULL
 
+}
 };
 
 char *songs[] = {
@@ -230,6 +234,7 @@ char *songs[] = {
         "disarming limerick",
         "shattering resonance",
         "irresistable ditty",
+	"fanatical fanfare",
 	"\n"
 };
 
