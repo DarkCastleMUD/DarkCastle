@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.38 2004/07/24 00:46:46 rahz Exp $ */
+/* $Id: mob_proc2.cpp,v 1.39 2004/07/24 01:53:54 urizen Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -1512,7 +1512,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     return eSUCCESS;
   }
   if (choice == 15) {
-    if (GET_EXP(ch) < 1000000) {
+    if (GET_EXP(ch) < 400000000) {
       send_to_char("The Meta-physician tells you, 'You lack the experience.'\n\r", ch);
       return eSUCCESS;
     }
@@ -1521,8 +1521,8 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
        return eSUCCESS;
     }
     
-    GET_EXP(ch) -= 1000000;
-    GET_GOLD(ch) += 4000000;
+    GET_EXP(ch) -= 400000000;
+    GET_GOLD(ch) += 1000000;
 
     act("The Meta-physician touches $n.",  ch, 0, 0, TO_ROOM, 0);
     act("The Meta-physician touches you.",  ch, 0, 0, TO_CHAR, 0);
