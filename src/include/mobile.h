@@ -1,7 +1,7 @@
 #ifndef MOBILE_H_
 #define MOBILE_H_
 /************************************************************************
-| $Id: mobile.h,v 1.8 2004/05/09 19:46:01 urizen Exp $
+| $Id: mobile.h,v 1.9 2004/05/25 00:39:40 urizen Exp $
 | mobile.h
 | Description:  This file contains the header information for mobile
 |   control.
@@ -59,6 +59,7 @@ struct race_shit
   long friendly;    /* bitvector for friendliness     */
   int  weight;      /* average weight of ths race    */
   int  height;      /* average height for ths race   */
+  int affects;      /* automatically added affects   */
 };
 
 

@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.62 2004/05/21 06:17:15 urizen Exp $ */
+/* $Id: db.cpp,v 1.63 2004/05/25 00:39:38 urizen Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -2370,6 +2370,7 @@ CHAR_DATA *read_mobile(int nr, FILE *fl)
 	   SET_BIT(mob->immune, race_info[(int)GET_RACE(mob)].immune);
 	   SET_BIT(mob->suscept, race_info[(int)GET_RACE(mob)].suscept);
  	   SET_BIT(mob->resist, race_info[(int)GET_RACE(mob)].resist);
+	   SET_BIT(mob->affected_by, race_info[(int)GET_RACE(mob)].affects);
       //      mob->immune  = race_info[(int)GET_RACE(mob)].immune;
         //    mob->suscept = race_info[(int)GET_RACE(mob)].suscept;
           //  mob->resist  = race_info[(int)GET_RACE(mob)].resist;
