@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.90 2004/05/27 20:25:58 urizen Exp $ */
+/* $Id: spells.cpp,v 1.91 2004/05/27 20:53:50 urizen Exp $ */
 
 extern "C"
 {
@@ -607,7 +607,7 @@ char *spells[]=
    "word of recall",
    "remove poison",
    "sense life",         /* 44 */
-   "summon familiar",        /* 45 */
+   "call familiar",        /* 45 */
    "lighted path",
    "resist acid",
    "sun ray",
@@ -628,7 +628,7 @@ char *spells[]=
    "cause critical",
    "cause serious",
    "flamestrike",        /* 65 */
-   "stone skin",
+   "stoneskin",
    "shield",
    "weaken",
    "mass invisibility",
@@ -689,8 +689,8 @@ char *spells[]=
    "dispel minor",
    "release golem",
    "beacon",
-   "stone shield",
-   "greater stone shield",
+   "stoneshield",
+   "greater stoneshield",
    "iron roots",
    "eyes of the eagle",
    "unused",

@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.116 2004/05/27 20:45:09 urizen Exp $ */
+/* $Id: const.cpp,v 1.117 2004/05/27 20:53:40 urizen Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -111,7 +111,7 @@ char *spell_wear_off_msg[] =
   "!Word of Recall!",
   "!Remove Poison!",
   "You feel less aware of your surroundings.",
-  "!Summon Familiar!",                                         /* 45 */
+  "!Call Familiar!",                                         /* 45 */
   "!Lighted Path!",
   "The green in your skin fades.",
   "!Sun ray!",
@@ -1127,7 +1127,7 @@ struct class_skill_defines a_skills[] = { // anti-paladin skills
 {    "acid shield",          SPELL_ACID_SHIELD,       40,     98,     {INT,STR} },
 {    "curse",                SPELL_CURSE,             41,     70,     {WIS,CON} },
 {    "firestorm",            SPELL_FIRESTORM,         42,     85,     {INT,STR} },
-{    "stone skin",           SPELL_STONE_SKIN,        44,     85,     {STR,CON} },
+{    "stoneskin",           SPELL_STONE_SKIN,        44,     85,     {STR,CON} },
 {    "protection from good", SPELL_PROTECT_FROM_GOOD, 45,     90,     {WIS,DEX} },
 {    "acid blast",           SPELL_ACID_BLAST,        48,     98,     {STR,INT} },
 {    "vampiric aura",        SPELL_VAMPIRIC_AURA,     50,     98,     {INT,CON} },
@@ -1348,10 +1348,10 @@ struct class_skill_defines u_skills[] = { // druid skills
 {    "oaken fortitude",      SPELL_OAKEN_FORTITUDE,      15,     98,     {CON,STR} },
 {    "water breathing",      SPELL_WATER_BREATHING,      17,     98,     {DEX,INT} },
 {    "resist acid",          SPELL_RESIST_ACID,          18,     98,     {CON,WIS} },
-{    "stone shield",         SPELL_STONE_SHIELD,         20,     98,     {STR,WIS} },
+{    "stoneshield",         SPELL_STONE_SHIELD,         20,     98,     {STR,WIS} },
 {    "poison",               SPELL_POISON,               21,     90,     {CON,WIS} },
 {    "cure critic",          SPELL_CURE_CRITIC,          23,     85,     {WIS,INT} },
-{    "summon familiar",      SPELL_SUMMON_FAMILIAR,      25,     90,     {INT,STR} },
+{    "call familiar",      SPELL_SUMMON_FAMILIAR,      25,     90,     {INT,STR} },
 {    "dismiss familiar",     SPELL_DISMISS_FAMILIAR,     26,     90,     {WIS,CON} },  
 {    "debility",             SPELL_DEBILITY,             27,     98,     {DEX,CON} },  
 {    "drown",                SPELL_DROWN,                28,     98,     {INT,CON} },  
@@ -1371,10 +1371,10 @@ struct class_skill_defines u_skills[] = { // druid skills
 {    "lightning shield",     SPELL_LIGHTNING_SHIELD,     41,     98,     {WIS,INT} },
 {    "blindness",            SPELL_BLINDNESS,            42,     98,     {CON,WIS} },  
 {    "forage",               SKILL_FORAGE,               43,     90,     {INT,CON} },  
-{    "stone skin",           SPELL_STONE_SKIN,           44,     70,     {STR,CON} },  
+{    "stoneskin",           SPELL_STONE_SKIN,           44,     70,     {STR,CON} },  
 {    "power heal",           SPELL_POWER_HEAL,           45,     98,     {WIS,STR} },  
 {    "forest meld",          SPELL_FOREST_MELD,          45,     90,     {WIS,DEX} },  
-{    "greater stone shield", SPELL_GREATER_STONE_SHIELD, 47,     98,     {STR,WIS} },  
+{    "greater stoneshield", SPELL_GREATER_STONE_SHIELD, 47,     98,     {STR,WIS} },  
 {    "colour spray",         SPELL_COLOUR_SPRAY,         48,     98,     {WIS,INT} },  
 {    "summon",               SPELL_SUMMON,               49,     98,     {INT,STR} },  
 //{ "conjure elemental",     SPELL_CONJURE_ELEMENTAL,    50,     98,     {0,0} },
@@ -1464,7 +1464,7 @@ struct class_skill_defines m_skills[] = { // mage skills
 {    "fear",                SPELL_FEAR,              15,     90,     {WIS,INT} },
 {    "identify",            SPELL_IDENTIFY,          16,     98,     {INT,WIS} }, 
 {    "locate object",       SPELL_LOCATE_OBJECT,     17,     90,     {INT,WIS} }, 
-{    "summon familiar",     SPELL_SUMMON_FAMILIAR,   18,     90,     {INT,STR} }, 
+{    "call familiar",     SPELL_SUMMON_FAMILIAR,   18,     90,     {INT,STR} }, 
 {    "dismiss familiar",    SPELL_DISMISS_FAMILIAR,  18,     90,     {WIS,CON} }, 
 {    "chill touch",         SPELL_CHILL_TOUCH,       20,     90,     {CON,WIS} }, 
 {    "shield",              SPELL_SHIELD,            21,     98,     {WIS,STR} }, 
@@ -1485,7 +1485,7 @@ struct class_skill_defines m_skills[] = { // mage skills
 {    "resist fire",         SPELL_RESIST_FIRE,       36,     70,     {INT,CON} }, 
 {    "wizard eye",          SPELL_WIZARD_EYE,        37,     98,     {INT,WIS} }, 
 {    "teleport",            SPELL_TELEPORT,          38,     98,     {CON,INT} }, 
-{    "stone skin",          SPELL_STONE_SKIN,        39,     70,     {STR,CON} }, 
+{    "stoneskin",          SPELL_STONE_SKIN,        39,     70,     {STR,CON} }, 
 {    "meteor swarm",        SPELL_METEOR_SWARM,      40,     98,     {STR,INT} }, 
 {    "word of recall",      SPELL_WORD_OF_RECALL,    42,     85,     {STR,WIS} }, 
 {    "firestorm",           SPELL_FIRESTORM,         43,     90,     {INT,STR} }, 
