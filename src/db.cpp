@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.7 2002/07/18 19:37:59 pirahna Exp $ */
+/* $Id: db.cpp,v 1.8 2002/07/18 19:45:15 pirahna Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -3113,7 +3113,7 @@ void reset_zone(int zone)
         if ( mob == NULL )
         {
             sprintf(buf, "Null mob in E reseting zone %d cmd %d", zone, cmd_no);
-            log(buf, OVERSEER, LOG_WORLD);
+            log(buf, IMMORTAL, LOG_WORLD);
             last_cmd = 0;
             last_obj = 0;
             break;
@@ -3140,7 +3140,7 @@ void reset_zone(int zone)
 	      sprintf(log_buf,
 	      "Attempt to reset direction %d on room %d that doesn't exist Z: %d cmd %d"
 	      , ZCMD.arg2, world[ZCMD.arg1].number, zone, cmd_no);
-	      log(log_buf, OVERSEER, LOG_WORLD);
+	      log(log_buf, IMMORTAL, LOG_WORLD);
 	      break;
 	    }
         switch (ZCMD.arg3)
@@ -3214,7 +3214,7 @@ void reset_zone(int zone)
         default:
         sprintf(log_buf, "UNKNOWN COMMAND!!! ZONE %d cmd %d: '%c' Skipping zone..",
             zone, cmd_no, ZCMD.command);
-        log(log_buf, ANGEL, LOG_WORLD);
+        log(log_buf, IMMORTAL, LOG_WORLD);
         zone_table[zone].age = 0;
         return;
         break;
