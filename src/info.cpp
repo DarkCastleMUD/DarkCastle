@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.53 2004/07/22 07:17:32 rahz Exp $ */
+/* $Id: info.cpp,v 1.54 2004/07/24 00:56:46 rahz Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -1944,6 +1944,7 @@ int do_consider(struct char_data *ch, char *argument, int cmd)
       return eFAILURE;
    }
 
+   GET_MOVE(ch) -= 5;
    if (!skill_success(ch,NULL,SKILL_CONSIDER)) {
       send_to_char("You try really hard, but you really have no idea about their capabilties!\n\r", ch);
       return eFAILURE;
@@ -2276,6 +2277,7 @@ int do_scan(struct char_data *ch, char *argument, int cmd)
          ch->in_room = was_in;
       }
    }
+   GET_MOVE(ch) -= 2;
    return eSUCCESS;
 }
 
