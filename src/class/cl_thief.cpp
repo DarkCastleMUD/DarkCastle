@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.24 2003/04/15 03:09:48 pirahna Exp $
+| $Id: cl_thief.cpp,v 1.25 2003/04/17 23:15:08 pirahna Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -544,6 +544,7 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
   int eq_pos;
   int _exp;
   int retval;
+  obj_data * has_item = NULL;
   bool ohoh = FALSE;
 
   extern struct index_data *obj_index;
@@ -731,18 +732,25 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
                           loop_obj->short_description,
                           obj_index[loop_obj->item_number].virt);
           }
-          if(IS_SET(obj->obj_flags.more_flags, ITEM_NO_TRADE))
+          has_item = search_char_for_item(ch, obj->item_number);
+          if(IS_SET(obj->obj_flags.more_flags, ITEM_NO_TRADE) ||
+                ( IS_SET(obj->obj_flags.more_flags, ITEM_UNIQUE) && has_item )
+            )
           {
             csendf(ch, "Whoa!  The %s poofed into thin air!\r\n", obj->short_description);
             extract_obj(obj);
           }
+          // check for no_trade inside containers
           else for(loop_obj = obj->contains; loop_obj; loop_obj = next_obj)
           {
              // this is 'else' since if the container was no_trade everything in it
              // has already been extracted
              next_obj = loop_obj->next_content;
 
-             if(IS_SET(loop_obj->obj_flags.more_flags, ITEM_NO_TRADE)) {
+             if(IS_SET(loop_obj->obj_flags.more_flags, ITEM_NO_TRADE) ||
+                ( IS_SET(obj->obj_flags.more_flags, ITEM_UNIQUE) && has_item )
+               ) 
+             {
                 csendf(ch, "Whoa!  The %s inside the %s poofed into thin air!\r\n",
                            loop_obj->short_description, obj->short_description);
                 extract_obj(loop_obj);
@@ -841,7 +849,10 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
           }  
         } // !is_npc
 
-        if(IS_SET(obj->obj_flags.more_flags, ITEM_NO_TRADE))
+        has_item = search_char_for_item(ch, obj->item_number);
+        if(IS_SET(obj->obj_flags.more_flags, ITEM_NO_TRADE) ||
+            ( IS_SET(obj->obj_flags.more_flags, ITEM_UNIQUE) && has_item )
+          )
         {
           send_to_char("Whoa!  If poofed into thin air!\r\n", ch);
           extract_obj(obj);
@@ -852,7 +863,10 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
            // has already been extracted
            next_obj = loop_obj->next_content;
 
-           if(IS_SET(loop_obj->obj_flags.more_flags, ITEM_NO_TRADE)) {
+           if(IS_SET(loop_obj->obj_flags.more_flags, ITEM_NO_TRADE) ||
+               ( IS_SET(obj->obj_flags.more_flags, ITEM_UNIQUE) && has_item )
+             ) 
+           {
               csendf(ch, "Whoa!  The %s inside the %s poofed into thin air!\r\n",
                          loop_obj->short_description, obj->short_description);
               extract_obj(loop_obj);
