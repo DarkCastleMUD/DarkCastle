@@ -199,17 +199,27 @@ int innate_bloodlust(CHAR_DATA *ch, char *arg, int cmd)
 int innate_repair(CHAR_DATA *ch, char *arg, int cmd)
 {
   struct obj_data *obj;
-  int i;
+  int i, chance = 60-GET_LEVEL(ch);
   bool found = FALSE;
   if ( ( obj = get_obj_in_list_vis( ch, arg, ch->carrying ) ) == NULL )
   {
     send_to_char("You are not carrying anything like that.\r\n",ch);
     return eFAILURE;
   }
+  if (GET_LEVEL(ch))
+  {
+   send_to_char("You are not versed enough in the ways of your people to perform such an action.\r\n",ch);
+   return eFAILURE;
+  }
   for (i = 0; i < obj->num_affects;i++)
   {
     if (obj->affected[i].location == APPLY_DAMAGED)
     {
+       if (number(1,101) < chance)
+       {
+	  send_to_char("You failed to repair it!\r\n",ch);
+	  return eSUCCESS;
+       }
        found = TRUE;
        obj->num_affects--;
     } else if (found) {

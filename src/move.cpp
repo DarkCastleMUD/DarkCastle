@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.24 2004/04/19 19:40:08 urizen Exp $
+| $Id: move.cpp,v 1.25 2004/04/20 20:10:07 urizen Exp $
 | move.C
 | Movement commands and stuff.
 *************************************************************************
@@ -28,6 +28,7 @@
 #include <string.h>
 #include <returnvals.h>
 #include <game_portal.h>
+#include <innate.h>
 
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
@@ -409,6 +410,10 @@ int do_simple_move(CHAR_DATA *ch, int cmd, int following)
       char tmp[100];
       int learned = has_skill(ch, SKILL_SNEAK);
       int percent = number(1, 101); // 101% is a complete failure
+      if (affected_by_spell(ch,SKILL_INNATE_SNEAK))
+      {
+	learned = 30 + GET_LEVEL(ch);
+      }
 
       // TODO - when mobs have skills, remove this
       if(IS_MOB(ch))
