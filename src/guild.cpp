@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.11 2002/08/02 05:54:58 pirahna Exp $
+| $Id: guild.cpp,v 1.12 2002/08/03 08:14:29 dcastle Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -125,8 +125,8 @@ int default_master[] = {
    10007,    // CLASS_BARBARIAN    7   
    10008,    // CLASS_MONK         8   
    10013,    // CLASS_RANGER       9   
-   0,        // CLASS_BARD        10   
-   0,        // CLASS_DRUID       11
+   3201,     // CLASS_BARD        10   
+   3203,     // CLASS_DRUID       11
    0,        // CLASS_PSIONIC     12
    0         // CLASS_NECROMANCER 13
 };
