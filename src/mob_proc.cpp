@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.23 2002/10/23 17:53:49 pirahna Exp $ */
+/* $Id: mob_proc.cpp,v 1.24 2002/11/01 16:20:56 pirahna Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -2901,7 +2901,8 @@ static char *dethSayText [ ] =
   "It's time to trade in my 26 year old for two 13s.",
   "Nothing says luvin like a tasty porkchop.",
   "Hey guys, ya know...it tastes just like salty tapioca.  No no, really...it does.",
-  "Pirahna is such a loser with women.  Skanky hoes flee in terror from him."
+  "Pirahna is such a loser with women.  Skanky hoes flee in terror from him.",
+  "Outside a dog, a book is a man's best friend.  Inside a dog, it's too dark to read."
 };
 
 #define DETH_SAY_TEXT_SIZE    ( sizeof ( dethSayText )    / sizeof ( char * ) )
