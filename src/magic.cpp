@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.79 2003/06/23 02:02:24 pirahna Exp $ */
+/* $Id: magic.cpp,v 1.80 2003/06/23 02:54:38 pirahna Exp $ */
 
 extern "C"
 {
@@ -8252,7 +8252,7 @@ int choose_druid_familiar(char_data * ch, char * arg)
      if(!check_components(ch, TRUE, 27800)) {
        send_to_char("You remember at the last second, you don't have an acorn ready!\r\n", ch);
        act("$n's hands pop with unused mystical energy. $e seems confused.", ch, 0, 0, TO_ROOM, 0);
-       return eFAILURE;
+       return -1;
      }
      return FAMILIAR_MOB_CHIPMUNK;
    }
@@ -8273,7 +8273,7 @@ int choose_mage_familiar(char_data * ch, char * arg)
      if(!check_components(ch, TRUE, 4)) {
        send_to_char("You remember at the last second, you don't have a batwing ready!\r\n", ch);
        act("$n's hands pop with unused mystical energy. $e seems confused.", ch, 0, 0, TO_ROOM, 0);
-       return eFAILURE;
+       return -1;
      }
      return FAMILIAR_MOB_IMP;
    }
