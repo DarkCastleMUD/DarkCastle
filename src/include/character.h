@@ -1,10 +1,13 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.10 2004/04/13 19:32:24 urizen Exp $
+| $Id: character.h,v 1.11 2004/04/18 14:46:47 urizen Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
+
+#define  COMPILE_WITH_CHANGES 1
+
 #include <affect.h>  /* MAX_AFFECTS, etc.. */
 #include <alias.h>   /* struct char_player_alias, MAX_ALIASES, etc.. */
 #include <structs.h> /* byte, ubyte, sh_int, etc.. */

@@ -196,13 +196,13 @@ int do_innate_fly(CHAR_DATA *ch, char *arg, int cmd)
 
    struct affected_type af;
    af.type = SKILL_INNATE_FLY;
-   af.duration = 40;
+   af.duration = 24;
    af.modifier = 0;
    af.location = 0;
    af.bitvector = 0;
    affect_to_char(ch, &af);
 
-   return spell_fly( ( GET_LEVEL(ch) / 2 ), ch, ch, 0, GET_LEVEL(ch) );
+   return spell_fly( ( GET_LEVEL(ch) / 2 ), ch, ch, 0, 5 );
 }
 
 int do_innate_infra(CHAR_DATA *ch, char *arg, int cmd)

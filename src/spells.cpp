@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.58 2004/04/16 13:23:04 urizen Exp $ */
+/* $Id: spells.cpp,v 1.59 2004/04/18 14:46:45 urizen Exp $ */
 
 extern "C"
 {
@@ -1326,7 +1326,7 @@ int do_release(CHAR_DATA *ch, char *argument, int cmd)
 
   if (!learned)
   {
-     send_to_char("You don't know how!",ch);
+     send_to_char("You don't know how!\r\n",ch);
      return eFAILURE;
   }
   if (!*argument)

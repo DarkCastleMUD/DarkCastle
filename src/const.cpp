@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.71 2004/04/17 05:13:11 urizen Exp $ */
+/* $Id: const.cpp,v 1.72 2004/04/18 14:46:45 urizen Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -950,6 +950,26 @@ char *pc_clss_types[] =
     "Necromancer",
     "\n"
 };
+char *pc_clss_types2[] =
+{
+    "UNDEFINED",
+    "MagicUser",
+    "Cleric",
+    "Rogue",
+    "Warrior",
+    "AntiPaladin",
+    "Paladin",
+    "Barbarian",
+    "Monk",
+    "Ranger",
+    "Bard",
+    "Druid",
+    "Psionic",
+    "Necromancer",
+    "\n"
+};
+
+
 
 char* pc_clss_abbrev[] =
 {

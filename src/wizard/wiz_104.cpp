@@ -782,31 +782,31 @@ obj_data *)(obj_index[nr].item))->obj_flags.eq_level,
         if (!str_cmp(pc_clss_types[i],arg1))
         {
           clas = i;
-          continue;
+          goto thisLoop;
         }
        for (i = 0; *isr_bits[i] != '\n' ; i++)
         if (!str_cmp(isr_bits[i],arg1))
         {
           SET_BIT(immune, 1<<i);
-          continue;
+          goto thisLoop;
         }
        for (i = 0; *action_bits[i] != '\n' ; i++)
         if (!str_cmp(action_bits[i],arg1))
         {
           SET_BIT(act, 1<<i);
-          continue;
+          goto thisLoop;
         }
        for (i = 0; *affected_bits[i] != '\n' ; i++)
         if (!str_cmp(affected_bits[i],arg1))
         {
           SET_BIT(affect, 1<<i);
-          continue;
+          goto thisLoop;
         }
        for (i = 0; i <= MAX_RACE; i++)
         if (!str_cmp(race_info[i].singular_name,arg1))
         {
           race = i;
-          continue;
+          goto thisLoop;
         }
 	if (!str_cmp(arg1,"evil"))
 	  align = 3;
@@ -828,6 +828,8 @@ obj_data *)(obj_index[nr].item))->obj_flags.eq_level,
 	    return eFAILURE;
 	  }
 	}
+       thisLoop:
+	continue;
      }
      int c,nr;
      for (c=0;c < mob_index[top_of_mobt].virt;c++)
