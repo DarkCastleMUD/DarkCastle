@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.8 2002/08/23 17:27:44 pirahna Exp $ */
+/* $Id: limits.cpp,v 1.9 2003/06/04 23:58:36 pirahna Exp $ */
 
 extern "C"
 {
@@ -44,6 +44,7 @@ extern "C"
 #include <handler.h>
 #include <race.h>
 #include <returnvals.h>
+#include <interp.h>
 
 extern CHAR_DATA *character_list;
 extern struct obj_data *object_list;
@@ -624,7 +625,7 @@ void food_update( void )
 }
 
 // Update the HP of mobs and players
-//
+// Also clears out any linkdead level 1s
 void point_update( void )
 {   
 
@@ -642,7 +643,10 @@ void point_update( void )
       GET_MOVE(i) = MIN(GET_MOVE(i) + move_gain(i), move_limit(i));
       GET_KI(i)   = MIN(GET_KI(i)   + ki_gain(i),   ki_limit(i));
     }
-
+    else if( !IS_MOB(i) && GET_LEVEL(i) < 2 && !i->desc ) {
+      act("$n fades away into obscurity; $s life leaving history with nothing of note.", i, 0, 0, TO_ROOM, 0);
+      do_quit(i, "", 666);
+    }
   } /* for */
 }
 
