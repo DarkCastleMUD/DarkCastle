@@ -140,8 +140,8 @@ void load_golem_data(CHAR_DATA *ch, int golemtype)
      advance_golem_level(golem); // Level it up again.
   struct obj_data *last_cont; // Last container.
   while(!feof(fpfile)) {
-    last_cont = obj_store_to_char( ch, fpfile, last_cont );
-  }  
+    last_cont = obj_store_to_char( golem, fpfile, last_cont );
+  }
   dc_fclose(fpfile);
 }
 
