@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: save.cpp,v 1.4 2002/06/29 18:16:22 pirahna Exp $ */
+/* $Id: save.cpp,v 1.5 2002/07/06 20:53:21 pirahna Exp $ */
 
 extern "C"
 {
@@ -366,7 +366,8 @@ int char_to_store_variable_data(CHAR_DATA * ch, FILE * fpsave)
     fwrite("SKL", sizeof(char), 3, fpsave);
     fwrite(&(skill->skillnum), sizeof(skill->skillnum), 1, fpsave);
     fwrite(&(skill->learned), sizeof(skill->learned), 1, fpsave);
-    fwrite(&(skill->unused), sizeof(skill->unused), 5, fpsave);
+    // this writes all 5 of them
+    fwrite(&(skill->unused), sizeof(skill->unused[0]), 5, fpsave);
     skill = skill->next;
   }
   fwrite("END", sizeof(char), 3, fpsave);
@@ -391,7 +392,13 @@ void read_skill(CHAR_DATA * ch, FILE * fpsave)
 
   fread(&(curr->skillnum), sizeof(curr->skillnum), 1, fpsave);
   fread(&(curr->learned), sizeof(curr->learned), 1, fpsave);
-  fread(&(curr->unused), sizeof(curr->unused), 5, fpsave);
+  fread(&(curr->unused), sizeof(curr->unused[0]), 5, fpsave);
+
+//  The above line takes care of these four.  They are here for future use
+//  fread(&(curr->unused[1]), sizeof(curr->unused[1]), 1, fpsave);
+//  fread(&(curr->unused[2]), sizeof(curr->unused[2]), 1, fpsave);
+//  fread(&(curr->unused[3]), sizeof(curr->unused[3]), 1, fpsave);
+//  fread(&(curr->unused[4]), sizeof(curr->unused[4]), 1, fpsave);
 
   curr->next = ch->skills;
   ch->skills = curr;
