@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.6 2002/07/14 17:50:07 pirahna Exp $ */
+/* $Id: db.cpp,v 1.7 2002/07/18 19:37:59 pirahna Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -2985,7 +2985,7 @@ void reset_zone(int zone)
       {
          sprintf(buf, "Trapped zone error, Command is null, zone: %d cmd_no: %d",
 	 zone, cmd_no);
-         log(buf, OVERSEER, LOG_WORLD);
+         log(buf, IMMORTAL, LOG_WORLD);
          break;
       }
       if (ZCMD.command == 'S')
@@ -3042,7 +3042,7 @@ void reset_zone(int zone)
           else { 
             if(!code_testing_mode) {
                sprintf(buf, "Obj %d loaded to NOWHERE. Zone %d Cmd %d", obj_index[ZCMD.arg1].virt, zone, cmd_no);
-               log(buf, IMP, LOG_WORLD);
+               log(buf, IMMORTAL, LOG_WORLD);
             }
             last_cmd = 0;
             last_obj = 0;
@@ -3062,6 +3062,8 @@ void reset_zone(int zone)
           if((obj_to = get_obj_num(ZCMD.arg3)) &&
                      (obj = clone_object(ZCMD.arg1)))
             obj_to_obj(obj, obj_to);
+          else logf(IMMORTAL, LOG_WORLD, "Null container obj in P command Zone: %d, Cmd: %d", zone, cmd_no);
+
           last_cmd = 1;
           last_obj = 1;
         }
@@ -3076,7 +3078,7 @@ void reset_zone(int zone)
         if ( mob == NULL )
         {
             sprintf(buf, "Null mob in G, reseting zone %d cmd %d", zone, cmd_no);
-            log(buf, OVERSEER, LOG_WORLD);
+            log(buf, IMMORTAL, LOG_WORLD);
             last_cmd = 0;
             last_obj = 0;
             break;
@@ -3110,7 +3112,7 @@ void reset_zone(int zone)
         case 'E': /* object to equipment list */
         if ( mob == NULL )
         {
-            sprintf(buf, "Null mob in E reseting zone %d", zone);
+            sprintf(buf, "Null mob in E reseting zone %d cmd %d", zone, cmd_no);
             log(buf, OVERSEER, LOG_WORLD);
             last_cmd = 0;
             last_obj = 0;
@@ -3136,8 +3138,8 @@ void reset_zone(int zone)
 	    if(world[ZCMD.arg1].dir_option[ZCMD.arg2] == 0)
 	    {
 	      sprintf(log_buf,
-	      "Attempt to reset direction %d on room %d that doesn't exist"
-	      , ZCMD.arg2, world[ZCMD.arg1].number);
+	      "Attempt to reset direction %d on room %d that doesn't exist Z: %d cmd %d"
+	      , ZCMD.arg2, world[ZCMD.arg1].number, zone, cmd_no);
 	      log(log_buf, OVERSEER, LOG_WORLD);
 	      break;
 	    }
@@ -3210,13 +3212,11 @@ void reset_zone(int zone)
         break;
 
         default:
-        sprintf(log_buf, "MAJOR FUCKUP RESETTING ZONE %d cmd %d: %c",
+        sprintf(log_buf, "UNKNOWN COMMAND!!! ZONE %d cmd %d: '%c' Skipping zone..",
             zone, cmd_no, ZCMD.command);
         log(log_buf, ANGEL, LOG_WORLD);
-                log("NORMALLY WHEN THIS HAPPENS WE CRASH...WATCH CAREFULLY"
-                    " FOR ZONE-RELATED BUGS", ANGEL, LOG_WORLD);
-                zone_table[zone].age = 0;
-        return; /* there was an exit() here... */ 
+        zone_table[zone].age = 0;
+        return;
         break;
     }
     else

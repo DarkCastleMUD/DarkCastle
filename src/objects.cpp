@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.5 2002/07/16 20:51:57 pirahna Exp $
+| $Id: objects.cpp,v 1.6 2002/07/18 19:37:59 pirahna Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -91,10 +91,10 @@ int damage_eq_once(obj_data * obj)
 {
   // look for existing damage
   for(int i = 0; i < obj->num_affects; i++) 
-    if(obj->affected[i].modifier == APPLY_DAMAGED)
+    if(obj->affected[i].location == APPLY_DAMAGED)
     {
-       obj->affected[i].location++;
-       return (obj->affected[i].location);
+       obj->affected[i].modifier++;
+       return (obj->affected[i].modifier);
     }
 
   // no existing damage.  Damage it once
@@ -106,8 +106,8 @@ int damage_eq_once(obj_data * obj)
   obj->affected = (obj_affected_type *) dc_realloc(obj->affected,
                                (sizeof(obj_affected_type) * obj->num_affects));
 #endif
-  obj->affected[obj->num_affects - 1].modifier = APPLY_DAMAGED;
-  obj->affected[obj->num_affects - 1].location = 1;
+  obj->affected[obj->num_affects - 1].modifier = 1;
+  obj->affected[obj->num_affects - 1].location = APPLY_DAMAGED;
   return 1;
 }
 

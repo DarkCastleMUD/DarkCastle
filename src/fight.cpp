@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.8 2002/07/17 15:44:03 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.9 2002/07/18 19:37:59 pirahna Exp $ */
 
 extern "C"
 {
@@ -3370,7 +3370,7 @@ int do_flee(struct char_data *ch, char *argument, int cmd)
      return eFAILURE;
   }
   
-  for(i = 0; i < 6; i++) {
+  for(i = 0; i < 3; i++) {
     attempt = number(0, 5);  // Select a random direction
     // keep mobs from fleeing into a no_track room
     if(CAN_GO(ch, attempt))
