@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.42 2004/07/03 19:13:40 urizen Exp $
+| $Id: objects.cpp,v 1.43 2004/07/20 01:44:05 urizen Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -581,8 +581,11 @@ int do_use(struct char_data *ch, char *argument, int cmd)
       stick->obj_flags.value[2]--;
       lvl = (int) (1.5 * stick->obj_flags.value[0]); 
       WAIT_STATE(ch,PULSE_VIOLENCE);
-      int retval = ((*spell_info[stick->obj_flags.value[3]].spell_pointer)
+	int retval = 0;
+      if (spell_info[stick->obj_flags.value[3]].spell_pointer)
+      retval = ((*spell_info[stick->obj_flags.value[3]].spell_pointer)
         ((byte) stick->obj_flags.value[0], ch, "", SPELL_TYPE_STAFF, 0, 0, lvl));
+	else retval= eFAILURE;
       return retval;
     } else {
       send_to_char("The staff seems powerless.\n\r", ch);
@@ -603,8 +606,12 @@ int do_use(struct char_data *ch, char *argument, int cmd)
         stick->obj_flags.value[2]--;
         lvl = (int) (1.5 * stick->obj_flags.value[0]); 
 	WAIT_STATE(ch,PULSE_VIOLENCE);
-        int retval= ((*spell_info[stick->obj_flags.value[3]].spell_pointer)
+	int retval;
+        if (spell_info[stick->obj_flags.value[3]].spell_pointer)
+	retval= ((*spell_info[stick->obj_flags.value[3]].spell_pointer)
           ((byte) stick->obj_flags.value[0], ch, "", SPELL_TYPE_WAND, tmp_char, tmp_object, lvl));
+	else
+	retval = eFAILURE;
 	return retval;
       } else {
         send_to_char("The wand seems powerless.\n\r", ch);
