@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.71 2003/06/05 02:34:46 pirahna Exp $ */
+/* $Id: magic.cpp,v 1.72 2003/06/12 23:19:51 pirahna Exp $ */
 
 extern "C"
 {
@@ -1124,6 +1124,12 @@ int spell_paralyze(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data
   send_to_char("Temporily removed...again..sorry...\r\n", ch);
   return eFAILURE;
 */
+
+  if(affected_by_spell(victim, SPELL_SLEEP)) {
+     act("$N's mind still has the lingering effects of a past sleep spell active which interferes with the magic required to paralyze the body.",
+         ch, NULL, victim, TO_CHAR, 0);
+     return eFAILURE;
+  }
 
   /* save the newbies! */
   if(!IS_NPC(ch) && !IS_NPC(victim) && (GET_LEVEL(victim) < 10)) {
