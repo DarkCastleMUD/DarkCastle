@@ -11,7 +11,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.26 2003/04/23 00:01:24 pirahna Exp $ */
+/* $Id: nanny.cpp,v 1.27 2003/04/23 00:04:27 pirahna Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -503,53 +503,8 @@ void nanny(struct descriptor_data *d, char *arg)
       if(!*arg)
         break;
 
-   case CON_GET_ACCOUNT:
+      // TODO - remember that this "Drops through" when I switch to Accounts
 
-      if (!*arg) {
-         SEND_TO_Q( "Empty account.  Disconnecting...", d );
-         close_socket( d ); 
-         return; 
-      }
-
-      // Capitlize first letter, lowercase rest      
-      arg[0] = UPPER(arg[0]);
-      for(y = 1; arg[y] != '\0'; y++)
-         arg[y] = LOWER(arg[y]);
-      
-      if ( _parse_account(arg, tmp_name)) { 
-         SEND_TO_Q( "Illegal account name, try another.\n\rAccount: ", d );
-         return;
-      }
-
-      stringtemp = tmp_name;
-      acc = new CAccount( tmp_name );
-
-      // Attach to descriptor
-      d->account = acc;
-
-      if( 0 == stringtemp.compare( "new" ) ) {
-         SEND_TO_Q( "\n\rCreating new Dark Castle MUD character account.\n\r"
-                        "Keep in mind that you may only have ONE account per person.\n\r"
-                        "Do you wish to continue with new account creation (Y/N)? ", d );
-         STATE(d) = CON_CONFIRM_NEW_ACCOUNT;
-         return;
-      }
-
-      if( ! acc->ReadFromFile() ) {
-         sprintf( buf, "Account '%s' does not exist.\n\r"
-                       "Please enter your account name: ", stringtemp.c_str() );
-         SEND_TO_Q( buf, d );
-         d->account = NULL;
-         delete acc;
-         return;
-      }
-
-      sprintf( buf, "Please enter password for account '%s': ", stringtemp.c_str() );
-      SEND_TO_Q( buf, d );
-      SEND_TO_Q( echo_off_str, d );
-      STATE(d) = CON_ACCOUNT_GET_OLD_PASSWORD;
-      break;
-      
    case CON_GET_NAME:
 
       if (!*arg) { 
@@ -620,6 +575,53 @@ void nanny(struct descriptor_data *d, char *arg)
          STATE(d) = CON_CONFIRM_NEW_NAME;
          return;
       }
+      break;
+      
+   case CON_GET_ACCOUNT:
+
+      if (!*arg) {
+         SEND_TO_Q( "Empty account.  Disconnecting...", d );
+         close_socket( d ); 
+         return; 
+      }
+
+      // Capitlize first letter, lowercase rest      
+      arg[0] = UPPER(arg[0]);
+      for(y = 1; arg[y] != '\0'; y++)
+         arg[y] = LOWER(arg[y]);
+      
+      if ( _parse_account(arg, tmp_name)) { 
+         SEND_TO_Q( "Illegal account name, try another.\n\rAccount: ", d );
+         return;
+      }
+
+      stringtemp = tmp_name;
+      acc = new CAccount( tmp_name );
+
+      // Attach to descriptor
+      d->account = acc;
+
+      if( 0 == stringtemp.compare( "new" ) ) {
+         SEND_TO_Q( "\n\rCreating new Dark Castle MUD character account.\n\r"
+                        "Keep in mind that you may only have ONE account per person.\n\r"
+                        "Do you wish to continue with new account creation (Y/N)? ", d );
+         STATE(d) = CON_CONFIRM_NEW_ACCOUNT;
+         return;
+      }
+
+      if( ! acc->ReadFromFile() ) {
+         sprintf( buf, "Account '%s' does not exist.\n\r"
+                       "Please enter your account name: ", stringtemp.c_str() );
+         SEND_TO_Q( buf, d );
+         d->account = NULL;
+         delete acc;
+         return;
+      }
+
+      sprintf( buf, "Please enter password for account '%s': ", stringtemp.c_str() );
+      SEND_TO_Q( buf, d );
+      SEND_TO_Q( echo_off_str, d );
+      STATE(d) = CON_ACCOUNT_GET_OLD_PASSWORD;
       break;
       
    case CON_GET_OLD_PASSWORD:
