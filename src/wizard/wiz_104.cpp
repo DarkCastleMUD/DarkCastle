@@ -925,10 +925,11 @@ char_data *)(mob_index[nr].item))->level,
        for (i = 0; *apply_types[i] != '\n' ; i++)
         if (!str_cmp(apply_types[i],arg1))
         {
-	  affect = i;
+  	    affect = i;
 //          SET_BIT(affect, 1<<i);
           continue;
-        }/*
+        }
+/*
        for (i = 0; *pc_clss_types[i] != '\n' ; i++)
         if (!str_cmp(pc_clss_types[i],arg1))
         {
@@ -949,6 +950,7 @@ if (!affect && !size && !extra && !more && !wear)
 
      for (c=0;c < obj_index[top_of_objt].virt;c++)
      {
+       found = FALSE;
       if ((nr = real_object(c)) < 0)
            continue;
       if(wear)
