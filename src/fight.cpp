@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.145 2004/04/19 16:48:28 urizen Exp $ */
+/* $Id: fight.cpp,v 1.146 2004/04/19 18:07:03 urizen Exp $ */
 
 extern "C"
 {
@@ -2167,7 +2167,9 @@ void set_fighting(CHAR_DATA * ch, CHAR_DATA * vict)
      ch->master && !IS_NPC(ch->master))
     if(!IS_SET(vict->mobdata->actflags, ACT_STUPID))
       add_memory(vict, GET_NAME(ch->master), 'h');
-   
+  if (!IS_NPC(ch) && IS_NPC(vict))
+     if (!IS_SET(vict->mobdata->actflags, ACT_STUPID))
+       add_memory(vict, GET_NAME(ch), 't');
   for (k = combat_list; k; k = next_char) {
     next_char = k->next_fighting;
     if (k->fighting == vict)
