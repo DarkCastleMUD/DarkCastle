@@ -1,7 +1,7 @@
 #ifndef PLAYER_H_
 #define PLAYER_H_
 /************************************************************************
-| $Id: player.h,v 1.10 2004/05/14 22:04:35 urizen Exp $
+| $Id: player.h,v 1.11 2004/05/15 17:08:30 urizen Exp $
 | player.h
 | Description: This file defines the player vectors..punishment, specials,
 |   etc...
@@ -234,6 +234,12 @@ struct str_app_type
     sh_int wield_w;  /* Maximum weight that can be wielded  */
     sh_int resis;   /* Resistance modifer. Used for all of 'em actuall.*/
 };
+struct dex_app_type
+{
+  sh_int tohit;
+  sh_int ac_mod;
+};
+
 
 // Constructor commented out for const.C initialization purposes
 struct wis_app_type

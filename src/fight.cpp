@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.188 2004/05/14 22:04:32 urizen Exp $ */
+/* $Id: fight.cpp,v 1.189 2004/05/15 17:08:28 urizen Exp $ */
 
 extern "C"
 {
@@ -947,10 +947,10 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
   else
   {
     chance = 45;
-
+   extern struct dex_app_type dex_app[];
     chance += GET_LEVEL(ch) - GET_LEVEL(vict);
     chance += GET_HITROLL(ch);
-//TODO    chance += str_app[STRENGTH_APPLY_INDEX(ch)].tohit;
+  chance += dex_app[GET_DEX(ch)].tohit;
     chance += ( GET_AC(vict) / 10 );  // (positive ac hurts you, negative helps)
     chance += weapon_skill_hit_bonus;
 /*
@@ -1355,9 +1355,6 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
             break;
       case TYPE_MAGIC:
             save = victim->saves[SAVE_TYPE_MAGIC];
-            if(IS_SET(victim->immune, ISR_MAGIC))       return(TRUE);
-            if(IS_SET(victim->suscept, ISR_MAGIC))      save = (int)(save *0.7);
-            if(IS_SET(victim->resist, ISR_MAGIC))       save = (int)(save *1.3);
             break;
       case TYPE_POISON:
             save = victim->saves[SAVE_TYPE_POISON];

@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.40 2004/05/14 14:48:16 urizen Exp $ */
+/* $Id: info.cpp,v 1.41 2004/05/15 17:08:28 urizen Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -1232,6 +1232,7 @@ int do_score(struct char_data *ch, char *argument, int cmd)
    int to_dam, to_hit;
    
    extern struct str_app_type str_app[];
+   extern struct dex_app_type dex_app[];
    
    struct affected_type *aff;
    extern char *apply_types[];
@@ -1242,7 +1243,7 @@ int do_score(struct char_data *ch, char *argument, int cmd)
    sprintf(race, "%s", race_info[(int)GET_RACE(ch)].singular_name);
    exp_needed = (int)(exp_table[(int)GET_LEVEL(ch) + 1] - (long)GET_EXP(ch));
    
-   to_hit = ( str_app[STRENGTH_APPLY_INDEX(ch)].tohit ) + ( GET_HITROLL(ch));
+   to_hit = ( dex_app[GET_DEX(ch)].tohit ) + ( GET_HITROLL(ch));
    to_dam = ( str_app[STRENGTH_APPLY_INDEX(ch)].todam ) + ( GET_DAMROLL(ch));
    
    
@@ -1256,17 +1257,17 @@ int do_score(struct char_data *ch, char *argument, int cmd)
    send_to_char(buf, ch);
    
    sprintf(buf,
-      "|\\|  $4Strength$7:      %9d |/|  $1Race$7:   %-10s $1HitPts$7:%5d$1/$7(%5d) |~|\n\r"
-      "|~|  $4Dexterity$7:     %9d |o|  $1Class$7:  %-11s$1Mana$7:   %4d$1/$7(%5d) |\\|\n\r"
-      "|/|  $4Constitution$7:  %9d |\\|  $1Lvl$7:    %-8d   $1Fatigue$7:%4d$1/$7(%5d) |o|\n\r"
-      "|o|  $4Intelligence$7:  %9d |~|  $1Height$7: %3d        $1Ki$7:     %4d$1/$7(%5d) |/|\n\r"
-      "|\\|  $4Wisdom$7:        %9d |/|  $1Weight$7: %3d        $1Alignment$7: %-9d |~|\n\r"
+      "|\\|  $4Strength$7:      %4d (%2d) |/|  $1Race$7:   %-10s $1HitPts$7:%5d$1/$7(%5d) |~|\n\r"
+      "|~|  $4Dexterity$7:     %4d (%2d) |o|  $1Class$7:  %-11s$1Mana$7:   %4d$1/$7(%5d) |\\|\n\r"
+      "|/|  $4Constitution$7:  %4d (%2d) |\\|  $1Lvl$7:    %-8d   $1Fatigue$7:%4d$1/$7(%5d) |o|\n\r"
+      "|o|  $4Intelligence$7:  %4d (%2d) |~|  $1Height$7: %3d        $1Ki$7:     %4d$1/$7(%5d) |/|\n\r"
+      "|\\|  $4Wisdom$7:        %4d (%2d) |/|  $1Weight$7: %3d        $1Alignment$7: %-9d |~|\n\r"
       "|~|  $3Rgn$7: $4H$7:%2d $4M$7:%2d $4V$7:%2d $4K$7:%2d |o|  $1Age$7:    %3d years                       |\\|\n\r",
-      GET_STR(ch), race, GET_HIT(ch), GET_MAX_HIT(ch),
-      GET_DEX(ch), pc_clss_types[(int)GET_CLASS(ch)], GET_MANA(ch), GET_MAX_MANA(ch),
-      GET_CON(ch), GET_LEVEL(ch), GET_MOVE(ch), GET_MAX_MOVE(ch),
-      GET_INT(ch), GET_HEIGHT(ch), GET_KI(ch),  GET_MAX_KI(ch), 
-      GET_WIS(ch), GET_WEIGHT(ch), GET_ALIGNMENT(ch),
+      GET_STR(ch), GET_RAW_STR(ch), race, GET_HIT(ch), GET_MAX_HIT(ch),
+      GET_DEX(ch), GET_RAW_DEX(ch), pc_clss_types[(int)GET_CLASS(ch)], GET_MANA(ch), GET_MAX_MANA(ch),
+      GET_CON(ch), GET_RAW_CON(ch), GET_LEVEL(ch), GET_MOVE(ch), GET_MAX_MOVE(ch),
+      GET_INT(ch), GET_RAW_INT(ch), GET_HEIGHT(ch), GET_KI(ch),  GET_MAX_KI(ch), 
+      GET_WIS(ch), GET_RAW_WIS(ch), GET_WEIGHT(ch), GET_ALIGNMENT(ch),
       ch->hit_regen, ch->mana_regen, ch->move_regen, ch->ki_regen, GET_AGE(ch));
    send_to_char(buf, ch);
 

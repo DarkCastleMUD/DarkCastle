@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.37 2004/05/14 23:58:32 urizen Exp $
+| $Id: inventory.cpp,v 1.38 2004/05/15 17:08:28 urizen Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -1113,7 +1113,7 @@ int do_give(struct char_data *ch, char *argument, int cmd)
        act("$N graciously refuses your gift.", ch, 0, vict, TO_CHAR, 0);
        return eFAILURE;
     }
-    if (IS_NPC(vict) && IS_AFFECTED(vict, AFF_CHARM))
+    if (IS_NPC(vict) && IS_AFFECTED(vict, AFF_CHARM) && (IS_SET(obj->obj_flags.more_flags, ITEM_NO_TRADE)  || contains_no_trade_item(obj)))
     {
 	send_to_char("The creature doesn't understand what you're trying to do.\r\n",ch);
 	return eFAILURE;

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.33 2004/05/14 00:04:12 urizen Exp $
+| $Id: objects.cpp,v 1.34 2004/05/15 17:08:28 urizen Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -212,7 +212,8 @@ int do_switch(struct char_data *ch, char *arg, int cmd)
     act("You fail to switch your weapons.", ch, 0,0, TO_CHAR, 0);
     return eFAILURE;
   }
-  if (GET_OBJ_WEIGHT(ch->equipment[WIELD]) > str_app[STRENGTH_APPLY_INDEX(ch)].wield_w)
+  if (GET_OBJ_WEIGHT(ch->equipment[WIELD]) > str_app[STRENGTH_APPLY_INDEX(ch)].wield_w
+       && !IS_AFFECTED2(ch, AFF_POWERWIELD))
   {
      send_to_char("Your primary wield is too heavy to wield as secondary.\r\n",ch);
       return eFAILURE;

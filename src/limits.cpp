@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.18 2004/05/01 00:50:33 urizen Exp $ */
+/* $Id: limits.cpp,v 1.19 2004/05/15 17:08:28 urizen Exp $ */
 
 extern "C"
 {
@@ -658,11 +658,11 @@ void update_corpses_and_portals(void)
   struct obj_data *j, *next_thing;
   struct obj_data *jj, *next_thing2;
   struct obj_data *last_thing;
-
+  int proc = 0; // Processed items. Debugging.
   void extract_obj(struct obj_data *obj); /* handler.c */
 
   /* objects */
-  for(j = object_list; j ; j = next_thing)
+  for(j = object_list; j ; j = next_thing,proc++)
   {
     last_thing = j;
     next_thing = j->next; /* Next in object list */
