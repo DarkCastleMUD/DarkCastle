@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.11 2002/08/01 08:04:56 pirahna Exp $ */
+/* $Id: db.cpp,v 1.12 2002/08/19 16:27:11 pirahna Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -358,7 +358,9 @@ char * funnybootmessages[] =
   "Verifying void alignment...\r\n",
   "Initializing BFS search parameters...\r\n",
   "Shaving fuzzy logic...\r\n",
-  "Upgrading RAM...\r\n"
+  "Upgrading RAM...\r\n",
+  "Checking code for tpyos...\r\n",
+  "Generating loot tables..\r\n"
 };
 
 void funny_boot_message()
