@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.119 2003/06/22 23:37:48 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.120 2003/06/22 23:41:24 pirahna Exp $ */
 
 extern "C"
 {
@@ -2414,6 +2414,9 @@ void change_alignment(CHAR_DATA *ch, CHAR_DATA *victim)
     x *= (-2);
   else x /= 2;
   
+  if(0 == change)
+    x /= 2;
+
   GET_ALIGNMENT(ch) += x;
   
   GET_ALIGNMENT(ch) = MIN(1000, MAX((-1000), GET_ALIGNMENT(ch)));  
