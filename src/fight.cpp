@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.162 2004/04/23 22:38:52 urizen Exp $ */
+/* $Id: fight.cpp,v 1.163 2004/04/24 10:42:39 urizen Exp $ */
 
 extern "C"
 {
@@ -1750,7 +1750,7 @@ void do_dam_msgs(CHAR_DATA *ch, CHAR_DATA *victim, int dam, int attacktype, int 
   }
 }
 
-void set_cantquit(CHAR_DATA *ch, CHAR_DATA *vict)
+void set_cantquit(CHAR_DATA *ch, CHAR_DATA *vict, bool forced = FALSE)
 {
   struct affected_type af, *paf;
   
@@ -1763,7 +1763,7 @@ void set_cantquit(CHAR_DATA *ch, CHAR_DATA *vict)
   if(IS_ARENA(ch->in_room))
     return;
   
-  if(is_pkill(ch, vict) && !IS_SET(vict->affected_by, AFF_CANTQUIT)) { 
+  if(is_pkill(ch, vict) && !IS_SET(vict->affected_by, AFF_CANTQUIT) || forced) { 
     af.type = FUCK_CANTQUIT;
     af.duration = 5;
     af.modifier = 0;

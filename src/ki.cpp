@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.15 2004/04/22 20:33:49 urizen Exp $ */
+/* $Id: ki.cpp,v 1.16 2004/04/24 10:42:40 urizen Exp $ */
 
 extern "C"
 {
@@ -99,7 +99,7 @@ char *ki[] = {
         "agility",
 	"\n"
 };
-void set_cantquit(CHAR_DATA *ch, CHAR_DATA *victim);
+void set_cantquit(CHAR_DATA *ch, CHAR_DATA *victim, bool forced = FALSE);
 void update_pos(CHAR_DATA *victim);
 sh_int use_ki(CHAR_DATA *ch, int kn);
 bool ARE_GROUPED(CHAR_DATA *sub, CHAR_DATA *obj);

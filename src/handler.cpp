@@ -21,7 +21,7 @@
  *  12/08/2003   Onager    Added check for charmies and !charmie eq to     *
  *                         equip_char()                                    *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.37 2004/04/22 18:32:20 urizen Exp $ */
+/* $Id: handler.cpp,v 1.38 2004/04/24 10:42:40 urizen Exp $ */
     
 extern "C"
 {
@@ -95,6 +95,7 @@ bool isaff2(int spellnum)
 		case SKILL_INNATE_POWERWIELD:
 		case SKILL_INNATE_REGENERATION:
 		case SKILL_INNATE_SHADOWSLIP:
+		case SKILL_INNATE_FARSIGHT:
                   return TRUE;
                   break;
                 default:
@@ -833,7 +834,7 @@ void affect_total(CHAR_DATA *ch)
     }
     for(af = ch->affected; af; af = tmp_af)
     {
-        bool secFix = FALSE;
+//        bool secFix = FALSE;
         tmp_af = af->next;
         affect_modify(ch, af->location, af->modifier, af->bitvector, FALSE,isaff2(af->type));
     }
@@ -848,7 +849,7 @@ void affect_total(CHAR_DATA *ch)
     }
     for(af = ch->affected; af; af=af->next)
     {
-      bool secFix = FALSE;
+//      bool secFix = FALSE;
         affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE,isaff2(af->type));
     }
 
@@ -860,7 +861,7 @@ void affect_total(CHAR_DATA *ch)
    Automatically sets apropriate bits and apply's */
 void affect_to_char( CHAR_DATA *ch, struct affected_type *af )
 {
-    bool secFix;
+//    bool secFix;
     struct affected_type *affected_alloc;
 
 #ifdef LEAK_CHECK
@@ -1038,7 +1039,7 @@ void affect_remove( CHAR_DATA *ch, struct affected_type *af, int flags, bool aff
 void affect_from_char( CHAR_DATA *ch, int skill)
 {
     struct affected_type *hjp, *afc;
-    bool aff2Fix;
+//    bool aff2Fix;
 
     if(skill < 0)  // affect types are unsigned, so no negatives are possible
        return;

@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.112 2004/04/23 22:38:52 urizen Exp $ */
+/* $Id: magic.cpp,v 1.113 2004/04/24 10:42:40 urizen Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -71,7 +71,7 @@ int saves_spell(CHAR_DATA *ch, CHAR_DATA *vict, int spell_base, sh_int save_type
 struct clan_data * get_clan(struct char_data *);
 
 int dice(int number, int size);
-void set_cantquit(CHAR_DATA *ch, CHAR_DATA *victim);
+void set_cantquit(CHAR_DATA *ch, CHAR_DATA *victim, bool forced = FALSE);
 void update_pos( CHAR_DATA *victim );
 bool many_charms(CHAR_DATA *ch);
 bool ARE_GROUPED( CHAR_DATA *sub, CHAR_DATA *obj);

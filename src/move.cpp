@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.25 2004/04/20 20:10:07 urizen Exp $
+| $Id: move.cpp,v 1.26 2004/04/24 10:42:40 urizen Exp $
 | move.C
 | Movement commands and stuff.
 *************************************************************************
@@ -186,7 +186,7 @@ int do_fall(CHAR_DATA *ch, short dir)
   int target;
   char damage[MAX_STRING_LENGTH];
   int retval;
-
+  int dam = number(50,100);
   if(IS_AFFECTED(ch, AFF_FLYING))
     return eFAILURE;
 
@@ -204,7 +204,7 @@ int do_fall(CHAR_DATA *ch, short dir)
     return eFAILURE;  // not gonna do it
 
   sprintf(damage,"%s falls from %d and sustains %d damage.",
-          GET_NAME(ch), world[ch->in_room].number, (GET_MAX_HIT(ch)/6)); 
+          GET_NAME(ch), world[ch->in_room].number, dam); 
   log(damage, IMMORTAL, LOG_MORTAL);
 
   switch(dir) {
@@ -246,7 +246,7 @@ int do_fall(CHAR_DATA *ch, short dir)
 
   sprintf(damage,"%s fall from %d was lethal and killed them.",
        GET_NAME(ch), world[ch->in_room].number);
-  retval = noncombat_damage(ch, (GET_MAX_HIT(ch)/6),
+  retval = noncombat_damage(ch, dam,
          "Luckily the ground breaks your fall.\n\r",
          "$n plummets into the room and hits the ground with a wet-sounding splat!",
         damage);

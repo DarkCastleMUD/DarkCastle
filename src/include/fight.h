@@ -2,13 +2,13 @@
 #define FIGHT_H_
 
 /************************************************************************
-| $Id: fight.h,v 1.12 2004/04/21 22:18:52 urizen Exp $
+| $Id: fight.h,v 1.13 2004/04/24 10:42:44 urizen Exp $
 | fight.h
 | This file defines the header information for fight.
 */
 #include <structs.h> // byte, ubyte, etc..
 #include <obj.h> // WIELD, SECOND_WIELD
-
+#include <utility.h> // FALSE
 #ifdef NeXT
 #ifndef bool
 #define bool int
@@ -73,7 +73,7 @@ int second_attack(CHAR_DATA *ch);
 int third_attack(CHAR_DATA *ch);
 int fourth_attack(CHAR_DATA *ch);
 int second_wield(CHAR_DATA *ch);
-void set_cantquit(CHAR_DATA *ch, CHAR_DATA *vict);
+void set_cantquit(CHAR_DATA *ch, CHAR_DATA *vict, bool forced = FALSE);
 int is_pkill(CHAR_DATA *ch, CHAR_DATA *vict);
 void raw_kill(CHAR_DATA *ch, CHAR_DATA *victim);
 void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim);

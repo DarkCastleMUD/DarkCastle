@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.25 2004/04/23 21:23:25 urizen Exp $ */
+/* $Id: clan.cpp,v 1.26 2004/04/24 10:42:39 urizen Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -2316,7 +2316,6 @@ int do_cwithdraw(CHAR_DATA *ch, char *arg, int cmd)
 
 int do_cbalance(CHAR_DATA *ch, char *arg, int cmd)
 {
-  char arg1[MAX_INPUT_LENGTH];
   if (!ch->clan)
   {
      send_to_char("You not a member of a clan.\r\n",ch);

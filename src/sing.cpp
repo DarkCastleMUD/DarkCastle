@@ -233,7 +233,7 @@ char *songs[] = {
 	"\n"
 };
 
-void set_cantquit(CHAR_DATA *ch, CHAR_DATA *victim);
+void set_cantquit(CHAR_DATA *ch, CHAR_DATA *victim, bool forced = FALSE);
 void update_pos(CHAR_DATA *victim);
 sh_int use_song(CHAR_DATA *ch, int kn);
 bool ARE_GROUPED(CHAR_DATA *sub, CHAR_DATA *obj);

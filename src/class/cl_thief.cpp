@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.45 2004/04/23 21:13:35 urizen Exp $
+| $Id: cl_thief.cpp,v 1.46 2004/04/24 10:42:42 urizen Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -710,7 +710,7 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
 
     if (percent > chance) 
     {
-      set_cantquit( ch, victim );
+      set_cantquit( ch, victim, TRUE );
       send_to_char("Oops..", ch);
       ohoh = TRUE;
       if(!number(0, 4)) {
@@ -759,7 +759,7 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
             // if victim isn't a pthief
             if(!affected_by_spell(victim, FUCK_PTHIEF) ) 
             {
-              set_cantquit( ch, victim );
+              set_cantquit( ch, victim, TRUE );
               if(affected_by_spell(ch, FUCK_PTHIEF))
               {
                 affect_from_char(ch, FUCK_PTHIEF);
@@ -915,7 +915,7 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
           // You don't get a thief flag from stealing from a pthief
           if(!affected_by_spell(victim, FUCK_PTHIEF)) 
           {
-            set_cantquit( ch, victim );
+            set_cantquit( ch, victim, TRUE );
             if(affected_by_spell(ch, FUCK_PTHIEF))
             {
               affect_from_char(ch, FUCK_PTHIEF);
@@ -1075,7 +1075,7 @@ int do_pocket(CHAR_DATA *ch, char *argument, int cmd)
 
   if (percent > chance) 
   {
-    set_cantquit( ch, victim );
+    set_cantquit( ch, victim, TRUE );
     send_to_char("Oops..\r\n", ch);
     ohoh = TRUE;
 	    if(!number(0, 6)) {
@@ -1086,7 +1086,7 @@ int do_pocket(CHAR_DATA *ch, char *argument, int cmd)
   {
     // Steal some gold coins
     percent = learned / 10 + number(-1,1);
-    gold = (int) ((float)GET_GOLD(victim)*(float)((float)percent/100.0));
+    gold = (int) ((float)(GET_GOLD(victim))*(float)((float)percent/100.0));
 //    gold = MIN(10000, gold);
     if (gold > 0) {
       GET_GOLD(ch)     += gold;
@@ -1106,7 +1106,7 @@ int do_pocket(CHAR_DATA *ch, char *argument, int cmd)
         do_save(ch, "", 666);
         if(!affected_by_spell(victim, FUCK_PTHIEF) ) 
         {
-          set_cantquit( ch, victim );
+          set_cantquit( ch, victim, TRUE );
           if(affected_by_spell(ch, FUCK_PTHIEF))
           {
             affect_from_char(ch, FUCK_PTHIEF);
