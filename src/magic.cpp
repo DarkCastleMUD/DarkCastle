@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.28 2002/09/12 01:47:28 pirahna Exp $ */
+/* $Id: magic.cpp,v 1.29 2002/09/17 20:28:54 pirahna Exp $ */
 
 extern "C"
 {
@@ -7277,8 +7277,14 @@ int cast_creeping_death(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DAT
    if (saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC) >= 0)
       dam >>= 1;
    
+   if (!OUTSIDE(ch)) {
+      send_to_char("Your spell is more draining because you are indoors!\n\r", ch);
+      // If they are NOT outside it costs extra mana
+      ch->mana -= level / 2;
+   }
+
    retval = spell_damage(ch, victim, dam, TYPE_MAGIC, SPELL_CREEPING_DEATH, 0);
-   if(IS_SET(retval, eCH_DIED))
+   if(SOMEONE_DIED(retval))
       return retval;
 
    // 5% of the time the victim will need a save vs. poison
@@ -7289,31 +7295,20 @@ int cast_creeping_death(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DAT
       af.location = APPLY_STR;
       af.bitvector = AFF_POISON;
       affect_join(victim, &af, FALSE, FALSE);
-      send_to_char("The insect poison has gotten into your blood!\n\r",
-                   victim);
-      act("$N has been poisoned by your insect swarm!", ch, 0, victim,
-          TO_CHAR, 0);
-      if (!OUTSIDE(ch)) {
-         send_to_char("Your spell is more draining because you are "
-                      "indoors!\n\r", ch);
-			    
-         // If they are NOT outside it costs extra mana
-         ch->mana -= level / 2;
-         }
-      }
+      send_to_char("The insect poison has gotten into your blood!\n\r", victim);
+      act("$N has been poisoned by your insect swarm!", ch, 0, victim, TO_CHAR, 0);
+   }
 	    
    // 1% of the time the victim will actually die from the swarm
    if (number(1, 101) > 99 && GET_LEVEL(victim) < IMMORTAL) {
       dam = GET_HIT(victim)*2 + 20;
       send_to_char("The insects are crawling in your mouth, out of your eyes, "
                    "through your stomach!\n\r", victim);
-      act("$N is completely consumed by insects!",
-          ch, 0, victim, TO_ROOM, NOTVICT);
-      act("$N is completely consumed by insects!",
-          ch, 0, victim, TO_CHAR, 0);
+      act("$N is completely consumed by insects!", ch, 0, victim, TO_ROOM, NOTVICT);
+      act("$N is completely consumed by insects!", ch, 0, victim, TO_CHAR, 0);
       return spell_damage(ch, victim, dam, TYPE_MAGIC, SPELL_CREEPING_DEATH, 0);
-      }
-  return eSUCCESS;
+   }
+   return eSUCCESS;
 }
 
 int cast_barkskin(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *victim, struct obj_data * tar_obj, int skill)
