@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.25 2004/05/21 01:57:38 urizen Exp $ */
+/* $Id: utility.cpp,v 1.26 2004/05/25 01:04:50 urizen Exp $ */
 
 extern "C"
 {
@@ -1249,7 +1249,6 @@ int has_skill (CHAR_DATA *ch, sh_int skill)
       return ((int)curr->learned);
     curr = curr->next;
   }
-
   return 0;
 }
 

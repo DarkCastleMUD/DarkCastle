@@ -21,7 +21,7 @@
  *  12/08/2003   Onager    Added check for charmies and !charmie eq to     *
  *                         equip_char()                                    *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.57 2004/05/25 00:21:25 urizen Exp $ */
+/* $Id: handler.cpp,v 1.58 2004/05/25 01:04:49 urizen Exp $ */
     
 extern "C"
 {
@@ -987,21 +987,27 @@ void affect_remove( CHAR_DATA *ch, struct affected_type *af, int flags, bool aff
             send_to_char("Your blood cools to normal levels.\r\n", ch);
          break;
       case SKILL_INNATE_BLOODLUST:
-	 send_to_char("Your lust for battle has left you.\r\n",ch);
+         if (!(flags & SUPPRESS_MESSAGES))
+ 	 send_to_char("Your lust for battle has left you.\r\n",ch);
 	 break;
       case SKILL_INNATE_FARSIGHT:
-	  send_to_char("Your vision returns to its normal state.\r\n",ch);
+         if (!(flags & SUPPRESS_MESSAGES))
+ 	  send_to_char("Your vision returns to its normal state.\r\n",ch);
 	  break;
       case SKILL_INNATE_EVASION:
+         if (!(flags & SUPPRESS_MESSAGES))
 	  send_to_char("Your magical obscurity has left you.\r\n",ch);
 	  break;
       case SKILL_INNATE_SHADOWSLIP:
+         if (!(flags & SUPPRESS_MESSAGES))
 	  send_to_char("The ability to avoid magical pathways has leftyou.\r\n",ch);
 	  break;
       case SKILL_INNATE_FOCUS:
-	  send_to_char("Your concentration lessens to its regular amount.\r\n",ch);
+         if (!(flags & SUPPRESS_MESSAGES))
+ 	  send_to_char("Your concentration lessens to its regular amount.\r\n",ch);
 	  break;
       case SKILL_INNATE_REGENERATION:
+         if (!(flags & SUPPRESS_MESSAGES))
 	 send_to_char("Your regeneration slows back to normal.\r\n",ch);
 	 break;
       case SKILL_INNATE_POWERWIELD:
@@ -1011,6 +1017,8 @@ void affect_remove( CHAR_DATA *ch, struct affected_type *af, int flags, bool aff
 	   if (obj->obj_flags.extra_flags & ITEM_TWO_HANDED)
            {
 	     obj_to_char(unequip_char(ch, WIELD),ch);
+	         if (!(flags & SUPPRESS_MESSAGES))
+ 
 	     act("You shift $p into your inventory.",ch, obj, NULL, TO_CHAR, 0);
   	   }
            obj = ch->equipment[SECOND_WIELD];
@@ -1018,9 +1026,11 @@ void affect_remove( CHAR_DATA *ch, struct affected_type *af, int flags, bool aff
            if (obj->obj_flags.extra_flags & ITEM_TWO_HANDED)
            {
              obj_to_char(unequip_char(ch, SECOND_WIELD),ch);
+	         if (!(flags & SUPPRESS_MESSAGES))
              act("You shift $p into your inventory.",ch, obj, NULL, TO_CHAR, 0);
            }
-  	   send_to_char("You can no longer wield two handed weapons.\r\n",ch);
+         if (!(flags & SUPPRESS_MESSAGES))
+   	   send_to_char("You can no longer wield two handed weapons.\r\n",ch);
 	 break;
       case SKILL_BLADESHIELD:
          if (!(flags & SUPPRESS_MESSAGES))
@@ -2272,7 +2282,7 @@ void extract_char(CHAR_DATA *ch, bool pull)
     struct descriptor_data *t_desc;
     int l, was_in;
     /*CHAR_DATA *i;*/
-
+    bool isGolem = FALSE;
     extern CHAR_DATA *combat_list;
     void die_follower(CHAR_DATA *ch);
     void remove_from_bard_list(char_data * ch);
@@ -2289,10 +2299,12 @@ void extract_char(CHAR_DATA *ch, bool pull)
         return;
     }
    if (!IS_NPC(ch)) {
+	void shatter_message(CHAR_DATA *ch);
+
 	if (ch->pcdata->golem)
 	{
 	  if (ch->pcdata->golem->in_room)
-	   act("$n shatters!", ch->pcdata->golem, 0, 0, TO_ROOM, 0);
+	     release_message(ch->pcdata->golem);
 	  extract_char(ch->pcdata->golem, FALSE);
 	}
    }
@@ -2336,7 +2348,7 @@ void extract_char(CHAR_DATA *ch, bool pull)
     /* Must remove from room before removing the equipment! */
     was_in = ch->in_room;
     char_from_room( ch );
-    if ( !pull ) {
+    if ( !pull && !isGolem) {
       if (world[was_in].number == START_ROOM)
    	   char_to_room(ch, real_room(SECOND_START_ROOM));
       else
@@ -2361,8 +2373,9 @@ void extract_char(CHAR_DATA *ch, bool pull)
     if(pull)
        for ( l = 0; l < MAX_WEAR; l++ )
        {
-          if ( ch->equipment[l] )
+          if ( ch->equipment[l] ) {
              obj_to_room(unequip_char(ch,l), was_in);
+	  }
        }
 
     GET_AC(ch) = 100;
@@ -2373,7 +2386,7 @@ void extract_char(CHAR_DATA *ch, bool pull)
     if ( IS_NPC(ch) && ch->mobdata->nr > -1 )
 	mob_index[ch->mobdata->nr].number--;
 
-    if ( pull ) {
+    if ( pull || isGolem) {
         remove_from_bard_list(ch);
 	if ( ch == character_list )
 	   character_list = ch->next;

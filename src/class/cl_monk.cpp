@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_monk.cpp,v 1.17 2004/05/14 15:51:50 urizen Exp $
+| $Id: cl_monk.cpp,v 1.18 2004/05/25 01:04:52 urizen Exp $
 | cl_monk.C
 | Description:  Monk skills.
 */
@@ -245,7 +245,7 @@ int do_stun(struct char_data *ch, char *argument, int cmd)
           REMOVE_BIT(victim->combat, COMBAT_STUNNED);
           REMOVE_BIT(victim->combat, COMBAT_STUNNED2);
        }
-       return damage (ch, victim, 0,TYPE_UNDEFINED, SKILL_STUN, 0);;
+       return damage (ch, victim, 0,TYPE_UNDEFINED, SKILL_STUN, 0);
     }
 
     act("$n delivers a HARD BLOW into your solar plexus!  You are STUNNED!", ch, NULL, victim, TO_VICT , 0);

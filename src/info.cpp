@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.46 2004/05/19 07:26:08 urizen Exp $ */
+/* $Id: info.cpp,v 1.47 2004/05/25 01:04:49 urizen Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -318,7 +318,7 @@ void show_spells(char_data * i, char_data * ch)
    int has_spells = 0;
 
    if(IS_MOB(i))
-     sprintf(send_buf, "$B$7-$1%s has: ", GET_SHORT(i));        
+     sprintf(send_buf, "$B$7-$1%s has: ", GET_SHORT(i));
    else sprintf(send_buf, "$B$7-$1%s has: ", i->name);
          
    if (IS_AFFECTED(i,AFF_SANCTUARY)) {

@@ -5,7 +5,7 @@
 set port = 6666
 # Change to lib directory.
 cd ../lib
-unlimit
+ulimit
 
 while ( 1 )
     # If you want to have logs in a different directory,
@@ -28,7 +28,7 @@ while ( 1 )
    # gdb -x ~dcastle/dcastle/src/.gdbinit ../src/research1 < ../src/runit >& $logfile
 
    # This line is to run without the debugger
-   ~dcastle/dcastle/src/research1 >& $logfile
+   /home/dcastle/dcastle/src/research1 >& $logfile
    #------------------------------------------------------------
 
     # Delete this out if no adb.

@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.114 2004/05/25 00:39:38 urizen Exp $ */
+/* $Id: const.cpp,v 1.115 2004/05/25 01:04:48 urizen Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1909,7 +1909,7 @@ const struct con_app_type con_app[] = {
 // Intelligence Attribute Modifiers
 const struct int_app_type int_app[] = {
 /* STAT# { MANA_REGEN/TICK, KI_REGEN/TICK, EASY_BONUS,   MEDIUM_BONUS, 
-HARD_BONUS, PRAC_BONUS, MAGIC_RES, CONC_BONUS	},*/
+HARD_BONUS, PRAC_BONUS, MAGIC_RES, CONC_BONUS, MANA_GAIN	},*/
 /*  0 */ {	-10,		-5,		-12,		-3,	 
 -1,		0,  	-6,	  -5,		-5},
 /*  1 */ {	-10,		-5,		-10,		-3,	 
@@ -1977,7 +1977,7 @@ HARD_BONUS, PRAC_BONUS, MAGIC_RES, CONC_BONUS	},*/
 // Wisdom Attribute Modifiers
 const struct wis_app_type wis_app[] = {
 /* STAT# { MANA_REGEN/TICK, KI_REGEN/TICK, PRACS/LEVEL BONUS, ENERGY_RES, 
-CONC_BONUS 	},*/
+CONC_BONUS, MANA_GAIN 	},*/
 /*  0 */ {	-10,		-9,		-1,		  -6,		
 -5,	-5},
 /*  1 */ {	-10,		-8,		-1,		  -5,		

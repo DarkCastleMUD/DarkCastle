@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.32 2004/05/24 18:16:21 urizen Exp $ */
+/* $Id: limits.cpp,v 1.33 2004/05/25 01:04:49 urizen Exp $ */
 
 extern "C"
 {
@@ -145,7 +145,7 @@ const int mana_regens[] = {
 int mana_gain(CHAR_DATA *ch)
 {
   int gain;
-  int divisor = 0;
+  int divisor = 1;
   int modifier;
   
   if(IS_NPC(ch))
@@ -161,7 +161,6 @@ int mana_gain(CHAR_DATA *ch)
       case POSITION_SITTING:  divisor = 2; break;
       default:                divisor = 4; break;
     }
-    gain /= divisor;
 
     if(GET_CLASS(ch) == CLASS_MAGIC_USER ||
        GET_CLASS(ch) == CLASS_ANTI_PAL || GET_CLASS(ch) == CLASS_RANGER)
@@ -179,6 +178,7 @@ int mana_gain(CHAR_DATA *ch)
 
   if((GET_COND(ch,FULL)==0)||(GET_COND(ch,THIRST)==0))
     gain >>= 2;
+  gain /= divisor; 
   return (gain);
 }
 
@@ -191,7 +191,7 @@ int hit_gain(CHAR_DATA *ch)
 {
   int gain = 1;
   struct affected_type * af;
-  int divisor;
+  int divisor =1;
   /* Neat and fast */
   if(IS_NPC(ch))
     gain = (GET_MAX_HIT(ch) / 30);
@@ -207,7 +207,6 @@ int hit_gain(CHAR_DATA *ch)
       case POSITION_SITTING:  divisor = 2; break;
       default:                divisor = 4; break;
     }
-   gain /= divisor;
     if(gain < 1) 
       gain = 1;
 
@@ -235,6 +234,7 @@ int hit_gain(CHAR_DATA *ch)
 
   if((GET_COND(ch, FULL)==0) || (GET_COND(ch, THIRST)==0))
     gain >>= 2;
+    gain /= divisor;
   return (gain);
 }
 
@@ -272,9 +272,9 @@ int move_gain(CHAR_DATA *ch)
 	switch (GET_POS(ch)) {
 	    case POSITION_SLEEPING: divisor = 1; break;
 	    case POSITION_RESTING:  divisor = 2; break;
-	    default:                divisor = 4; break;
+	    default:                divisor = 3; break;
 	}
-	gain += (GET_CON(ch) + GET_DEX(ch)) / divisor;
+ 	gain += (GET_CON(ch) + GET_DEX(ch)) / divisor;
 
         if((af = affected_by_spell(ch, SPELL_RAPID_MEND)))
           gain += (int)(af->modifier * 1.5);
@@ -287,7 +287,7 @@ int move_gain(CHAR_DATA *ch)
 
     if((GET_COND(ch,FULL)==0)||(GET_COND(ch,THIRST)==0))
 	gain >>= 2;
-
+   gain /= divisor;
     return (gain);
 }
 
@@ -505,7 +505,7 @@ void advance_level(CHAR_DATA *ch, int is_conversion)
     if(!is_conversion)
       send_to_char( buf, ch );
 
-    if(GET_LEVEL(ch) % 2 == 0)
+    if(GET_LEVEL(ch) % 3 == 0)
       for(int i = 0; i <= SAVE_TYPE_MAX; i++)
         ch->saves[i]++;
 
@@ -540,7 +540,12 @@ void gain_exp( CHAR_DATA *ch, int gain )
   GET_EXP(ch) += gain;
   if( GET_EXP(ch) < 0 )
     GET_EXP(ch) = 0;
-   void golem_gain_exp(CHAR_DATA *ch);
+
+  void golem_gain_exp(CHAR_DATA *ch);
+
+  if (!IS_NPC(ch) && ch->pcdata->golem && ch->in_room == ch->pcdata->golem->in_room) // Golems get mage's exp, when they're in the same room
+    gain_exp(ch->pcdata->golem, gain);
+
   if (IS_NPC(ch) && mob_index[ch->mobdata->nr].virt == 8) // it's a golem
     golem_gain_exp(ch);
 
@@ -694,7 +699,6 @@ void update_corpses_and_portals(void)
   /* objects */
   for(j = object_list; j ; j = next_thing,proc++)
   {
-    last_thing = j;
     next_thing = j->next; /* Next in object list */
     /* Type 1 is a permanent game portal, and type 3 is a look_only
     |  object.  Type 0 is the spell portal and type 2 is a game_portal
@@ -751,8 +755,8 @@ void update_corpses_and_portals(void)
             if(IS_SET(jj->obj_flags.more_flags, ITEM_NO_TRADE))
             {
 	     if (next_thing == jj)
-	      next_thing = jj->next;
-	       extract_obj(jj);
+	      next_thing = j->next;
+	     extract_obj(jj);
 	    }
 	    else
    	    move_obj(jj, j->in_room);
@@ -762,9 +766,9 @@ void update_corpses_and_portals(void)
             return;
           }
         }
-
         extract_obj(j);
       }
+      last_thing = j;
     }
   }
   /* Now process the portals */

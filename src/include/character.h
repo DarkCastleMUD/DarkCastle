@@ -1,7 +1,7 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.19 2004/05/21 01:57:40 urizen Exp $
+| $Id: character.h,v 1.20 2004/05/25 01:04:53 urizen Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
@@ -393,7 +393,7 @@ struct char_file_u
     int32 raw_ki;
 
     int16 alignment;
-   uint32 hpmetas;
+   uint32 hpmetas; // Used by familiars too... why not.
    uint32 manametas;
    uint32 movemetas;
 
@@ -410,7 +410,9 @@ struct char_file_u
     int32 extra_ints[5];             // available just in case
 };
 
+
 void clear_hunt(void *arg1, void *arg2, void *arg3);
 void clear_hunt(char *arg1, CHAR_DATA *arg2, void *arg3);
+
 
 #endif

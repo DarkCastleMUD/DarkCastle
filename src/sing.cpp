@@ -633,7 +633,8 @@ void update_bard_singing()
           if((song_info[i->song_number].intrp_pointer))
             ((*song_info[i->song_number].intrp_pointer) (GET_LEVEL(i), i, NULL, NULL, -1));
           if(i->song_data) {
-            dc_free(i->song_data);
+	    if ((int)i->song_data > 10) // Otherwise it's a temp variable.
+              dc_free(i->song_data);
             i->song_data = 0;
           }
           return;
@@ -877,7 +878,7 @@ int execute_song_note_of_knowledge( byte level, CHAR_DATA *ch, char *arg, CHAR_D
    obj_data * obj = NULL;
 
    obj = get_obj_in_list_vis(ch, ch->song_data, ch->carrying);
-
+  
    dc_free(ch->song_data);
    ch->song_data = 0;
 
@@ -1110,7 +1111,8 @@ int song_stop( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skil
       return eFAILURE;
    }
    if(ch->song_data) {
-      dc_free(ch->song_data);
+	if ((int)ch->song_data > 10)
+	      dc_free(ch->song_data);
       ch->song_data = 0;
    }
 
@@ -2275,7 +2277,7 @@ int execute_song_crushing_crescendo( byte level, CHAR_DATA *ch, char *arg, CHAR_
 
    int i;
    dam = 75;
-   for (i = 0; i < (int)ch->song_data; i--)
+   for (i = 0; i < (int)ch->song_data; i++)
       dam = dam * 2;
    dam += combat * 5; // Make it hurt some more.
    if ((int)ch->song_data < 3) // Doesn't help beyond that.

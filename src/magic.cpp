@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.141 2004/05/25 00:21:25 urizen Exp $ */
+/* $Id: magic.cpp,v 1.142 2004/05/25 01:04:49 urizen Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -8380,7 +8380,7 @@ int check_components(CHAR_DATA *ch, int destroy, int item_one = 0,
   if(all_ok && item_four)                                                       
      all_ok = (int) ptr_four;                                                   
 
-  if(GET_LEVEL(ch) > ARCHANGEL && !all_ok) {
+  if(GET_LEVEL(ch) > ARCHANGEL && !all_ok && !silent) {
      send_to_char("You didn't have the right components, but yer a god:)\r\n", ch);
      return TRUE;
   }

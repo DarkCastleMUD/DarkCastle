@@ -441,7 +441,7 @@ int spell_release_golem(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DAT
   for (fol = ch->followers; fol; fol = fol->next)
     if (IS_NPC(fol->follower) && mob_index[fol->follower->mobdata->nr].virt == 8)
     {
-      act("$n shatters!", fol->follower, 0, 0, TO_ROOM, 0);
+      release_message(fol->follower);
       extract_char(fol->follower, FALSE);
       return eSUCCESS;
     }

@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.203 2004/05/25 00:21:25 urizen Exp $ */
+/* $Id: fight.cpp,v 1.204 2004/05/25 01:04:49 urizen Exp $ */
 
 extern "C"
 {
@@ -2992,9 +2992,17 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
 
   if (victim->pcdata->golem)
   {
-    act ("$n shatters!", victim->pcdata->golem, 0, 0, TO_ROOM, 0);
-    extract_char(victim->pcdata->golem, TRUE);
-     // Golems. Extract char puts the gear in the room.
+    void release_message(CHAR_DATA *ch);
+    void shatter_message(CHAR_DATA *ch);
+
+    if (number(0,1))
+    { /* rk */
+      shatter_message(victim->pcdata->golem);     
+      extract_char(victim->pcdata->golem, TRUE);
+    } else { /* release */
+      release_message(victim->pcdata->golem);
+      extract_char(victim->pcdata->golem, FALSE);
+    }
   }
   victim->pcdata->group_kills = 0;
   victim->pcdata->grplvl      = 0;

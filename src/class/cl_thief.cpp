@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.58 2004/05/24 16:07:56 urizen Exp $
+| $Id: cl_thief.cpp,v 1.59 2004/05/25 01:04:52 urizen Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -114,7 +114,7 @@ int do_eyegouge(CHAR_DATA *ch, char *argument, int cmd)
      SET_BIT(victim->affected_by, AFF_BLIND);
      SET_BIT(victim->combat, COMBAT_THI_EYEGOUGE);
   }
-  WAIT_STATE(ch, PULSE_VIOLENCE);
+  WAIT_STATE(ch, PULSE_VIOLENCE*2);
    skill_increase_check(ch, SKILL_EYEGOUGE, has_skill(ch,SKILL_EYEGOUGE), SKILL_INCREASE_MEDIUM);
   return retval | eSUCCESS;
 }
