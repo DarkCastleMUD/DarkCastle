@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.26 2003/04/22 23:48:09 pirahna Exp $
+| $Id: cl_thief.cpp,v 1.27 2003/04/23 01:00:18 pirahna Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -732,7 +732,9 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
                           loop_obj->short_description,
                           obj_index[loop_obj->item_number].virt);
           }
+          obj_from_char(obj);
           has_item = search_char_for_item(ch, obj->item_number);
+          obj_to_char(obj, ch);
           if(IS_SET(obj->obj_flags.more_flags, ITEM_NO_TRADE) ||
                 ( IS_SET(obj->obj_flags.more_flags, ITEM_UNIQUE) && has_item )
             )
@@ -848,8 +850,9 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
               affect_to_char(ch, &pthiefaf);
           }  
         } // !is_npc
-
+        obj_from_char(obj);
         has_item = search_char_for_item(ch, obj->item_number);
+        obj_to_char(obj, ch);
         if(IS_SET(obj->obj_flags.more_flags, ITEM_NO_TRADE) ||
             ( IS_SET(obj->obj_flags.more_flags, ITEM_UNIQUE) && has_item )
           )

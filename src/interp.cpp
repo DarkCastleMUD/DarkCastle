@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.cpp,v 1.21 2003/01/22 05:26:49 pirahna Exp $ */
+/* $Id: interp.cpp,v 1.22 2003/04/23 01:00:14 pirahna Exp $ */
 
 extern "C"
 {
@@ -447,7 +447,7 @@ struct command_info cmd_info[] =
 
 
 
-char *fill[]=
+char *fillwords[]=
 {
     "in", "from", "with", "the", "on", "at", "to", "\n"
 };
@@ -885,7 +885,7 @@ char *one_argument(char *argument, char *first_arg )
 
 int fill_wordnolow(char *argument)
 {
-    return ( search_blocknolow(argument,fill,TRUE) >= 0);
+    return ( search_blocknolow(argument,fillwords,TRUE) >= 0);
 }
 
 char *one_argumentnolow(char *argument, char *first_arg )
@@ -916,7 +916,7 @@ char *one_argumentnolow(char *argument, char *first_arg )
 
 int fill_word(char *argument)
 {
-    return ( search_block(argument,fill,TRUE) >= 0);
+    return ( search_block(argument,fillwords,TRUE) >= 0);
 }
 
 int do_spam(CHAR_DATA *ch, char *arg, int cmd)
