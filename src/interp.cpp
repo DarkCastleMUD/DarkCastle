@@ -16,7 +16,7 @@
 /* 12/08/2003   Onager   Added chop_half() to work like half_chop() but    */
 /*                       chopping off the last word.                       */
 /***************************************************************************/
-/* $Id: interp.cpp,v 1.44 2004/05/18 20:58:57 urizen Exp $ */
+/* $Id: interp.cpp,v 1.45 2004/05/21 15:01:25 urizen Exp $ */
 
 extern "C"
 {
@@ -205,10 +205,11 @@ struct command_info cmd_info[] =
     { "battlecry",  do_battlecry,   POSITION_FIGHTING,  1,  9,  0 },
     { "rage",       do_rage,        POSITION_FIGHTING,  1,  9,  0 },
     { "berserk",    do_berserk,     POSITION_FIGHTING,  1,  9,  0 },
+    { "golemscore", do_golem_score, POSITION_FIGHTING,  1,  9,  0 },
     { "stun",       do_stun,        POSITION_FIGHTING,  1,  9,  0 },
     { "redirect",   do_redirect,    POSITION_FIGHTING,  1,  9,  0 },
     { "hitall",     do_hitall,      POSITION_FIGHTING,  1,  9,  0 },
- { "quiveringpalm", do_quivering_palm, POSITION_FIGHTING, 1,  9,  0},
+    { "quiveringpalm", do_quivering_palm, POSITION_FIGHTING, 1,  9,  0},
     { "eagleclaw",  do_eagle_claw,  POSITION_FIGHTING,  1,  9,  0 },
     { "headbutt",   do_headbutt,    POSITION_FIGHTING,  1,  9,  0 },
     { "fire",       do_fire,        POSITION_FIGHTING,  1,  9,  0 },

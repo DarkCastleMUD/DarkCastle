@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.h,v 1.26 2004/05/21 01:57:40 urizen Exp $ */
+/* $Id: interp.h,v 1.27 2004/05/21 15:01:27 urizen Exp $ */
 
 #ifndef INTERP_H_
 #define INTERP_H_
@@ -147,6 +147,7 @@ DO_FUN  do_get;
 DO_FUN  do_give;
 DO_FUN  do_global;
 DO_FUN  do_gossip; 
+DO_FUN  do_golem_score;
 DO_FUN  do_goto;
 DO_FUN  do_grab;
 DO_FUN  do_group;

@@ -223,3 +223,125 @@ int cast_create_golem(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA 
   send_to_char(golem_list[i].creation_message,ch);
   return eSUCCESS;
 }
+
+int do_golem_score(struct char_data *ch, char *argument, int cmd)
+{ /* Pretty much a rip of score*/
+   char race[100];
+   char buf[MAX_STRING_LENGTH], scratch;
+   int  level = 0;
+   int to_dam, to_hit;
+   struct char_data *master = ch;
+   if (IS_NPC(ch)) return;
+   if (!ch->pcdata->golem) 
+   {
+      send_to_char("But you don't have a golem!",ch);
+      return eFAILURE;
+   }
+   ch = ch->pcdata->golem;
+   struct affected_type *aff;
+   extern char *apply_types[];
+   extern char *pc_clss_types[];
+
+   int exp_needed;
+
+   sprintf(race, "%s", race_info[(int)GET_RACE(ch)].singular_name);
+   exp_needed = (int)(exp_table[(int)GET_LEVEL(ch) + 29] - (long)GET_EXP(ch));
+
+   to_hit = GET_REAL_HITROLL(ch);
+   to_dam = GET_REAL_DAMROLL(ch);
+
+   sprintf(buf,
+      "$7($5:$7)================================================="
+      "=======================($5:$7)\n\r"
+      "|=|  %-29s -- Character Attributes (DarkCastleMUD) |=|\n\r"
+      "($5:$7)===========================($5:$7)==================="
+      "=======================($5:$7)\n\r", GET_SHORT(ch));
+
+   send_to_char(buf, master);
+
+   sprintf(buf,
+      "|\\|  $4Strength$7:      %4d (%2d) |/|  $1Race$7:   %-10s $1HitPts$7:%5d$1/$7(%5d) |~|\n\r"
+      "|~|  $4Dexterity$7:     %4d (%2d) |o|  $1Class$7:  %-11s$1Mana$7:   %4d$1/$7(%5d) |\\|\n\r"
+      "|/|  $4Constitution$7:  %4d (%2d) |\\|  $1Lvl$7:    %-8d   $1Fatigue$7:%4d$1/$7(%5d) |o|\n\r"
+      "|o|  $4Intelligence$7:  %4d (%2d) |~|  $1Height$7: %3d        $1Ki$7:     %4d$1/$7(%5d) |/|\n\r"
+      "|\\|  $4Wisdom$7:        %4d (%2d) |/|  $1Weight$7: %3d        $1Alignment$7: %-9d |~|\n\r"
+      "|~|  $3Rgn$7: $4H$7:%2d $4M$7:%2d $4V$7:%2d $4K$7:%2d |o|  $1Age$7:    %3d years                       |\\|\n\r",
+       GET_STR(ch), GET_RAW_STR(ch), race, GET_HIT(ch), GET_MAX_HIT(ch),
+      GET_DEX(ch), GET_RAW_DEX(ch), pc_clss_types[(int)GET_CLASS(ch)], GET_MANA(ch), GET_MAX_MANA(ch),
+      GET_CON(ch), GET_RAW_CON(ch), GET_LEVEL(ch), GET_MOVE(ch), GET_MAX_MOVE(ch),
+      GET_INT(ch), GET_RAW_INT(ch), GET_HEIGHT(ch), GET_KI(ch),  GET_MAX_KI(ch),
+      GET_WIS(ch), GET_RAW_WIS(ch), GET_WEIGHT(ch), GET_ALIGNMENT(ch),
+      hit_gain(ch), mana_gain(ch), move_gain(ch), ki_gain(ch), GET_AGE(ch));
+   send_to_char(buf, master);
+
+     sprintf(buf,
+      "($5:$7)===========================($5:$7)===($5:$7)====================================($5:$7)\n\r"
+      "|/|  $2Combat Statistics...$7           |\\|   $2Equipment and Valuables$7          |o|\n\r"
+      "|o|   $3Armor$7:   %5d $3Pkills$7:  %5d |~|    $3Items Carried$7:  %-3d/(%-3d)       |/|\n\r"
+      "|\\|   $3RDeaths$7: %5d $3PDeaths$7: %5d |/|    $3Weight Carried$7: %-3d/(%-4d)      |~|\n\r"
+      "|~|   $3BonusHit$7: %+4d $3BonusDam$7: %+4d |o|    $3Experience$7:     %-10d      |\\|\n\r"
+      "|/|   $B$4FIRE$R[%+3d] $BCOLD$R[%+3d] $B$5NRGY$R[%+3d] |\\|    $3ExpTillLevel$7:   %-10d      |o|\n\r"
+      "|o|   $B$2ACID$R[%+3d] $B$3MAGK$R[%+3d] $2POIS$7[%+3d] |~|    $3Gold$7: %-9d $3Platinum$7: %-5d |/|\n\r"
+      "($5:$7)=================================($5:$7)====================================($5:$7)\n\r",
+   GET_ARMOR(ch),         GET_PKILLS(ch),   IS_CARRYING_N(ch), CAN_CARRY_N(ch),
+   GET_RDEATHS(ch), GET_PDEATHS(ch),  IS_CARRYING_W(ch), CAN_CARRY_W(ch),
+   to_hit, to_dam, GET_EXP(ch),
+   get_saves(ch,SAVE_TYPE_FIRE), get_saves(ch, SAVE_TYPE_COLD), get_saves(ch, SAVE_TYPE_ENERGY), GET_LEVEL(ch) == 50 ? 0 : exp_needed,
+   get_saves(ch, SAVE_TYPE_ACID), get_saves(ch, SAVE_TYPE_MAGIC), get_saves(ch, SAVE_TYPE_POISON), (int)GET_GOLD(ch), 
+(int)GET_PLATINUM(ch));
+     send_to_char(buf, master);
+
+   if((aff = ch->affected))
+   {
+      int found = FALSE;
+
+      for( ; aff; aff = aff->next) {
+         if(aff->type == SKILL_SNEAK)
+            continue;
+         scratch = frills[level];
+         // figure out the name of the affect (if any)
+         char * aff_name = get_skill_name(aff->type);
+         switch(aff->type) {
+           case FUCK_CANTQUIT:
+             aff_name = "CANT_QUIT";
+             break;
+           case FUCK_PTHIEF:
+             aff_name = "DIRTY_DIRTY_THIEF";
+             break;
+           case SKILL_HARM_TOUCH:
+             aff_name = "harmtouch reuse timer";
+             break;
+           case SKILL_LAY_HANDS:
+             aff_name = "layhands reuse timer";
+             break;
+           case SKILL_QUIVERING_PALM:
+             aff_name = "quiver reuse timer";
+             break;
+           case SKILL_BLOOD_FURY:
+             aff_name = "blood fury reuse timer";
+             break;
+           case SPELL_HOLY_AURA_TIMER:
+             aff_name = "holy aura timer";
+             break;
+           default: break;
+         }
+         if(!aff_name) // not one we want displayed
+           continue;
+
+         sprintf(buf, "|%c| Affected by %-22s %s Modifier %-16s  |%c|\n\r",
+               scratch, aff_name,
+               ((IS_AFFECTED(ch, AFF_DETECT_MAGIC) && aff->duration < 3) ?
+                          "$2(fading)$7" : "        "),
+               apply_types[(int)aff->location], scratch);
+         send_to_char(buf, master);
+         found = TRUE;
+         if(++level == 4)
+            level = 0;
+      }
+      if(found)
+        send_to_char(
+         "($5:$7)========================================================================($5:$7)\n\r", master);
+   }
+   return eSUCCESS;
+}
+
