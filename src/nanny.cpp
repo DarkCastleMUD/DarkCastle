@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.62 2004/05/31 00:19:35 urizen Exp $ */
+/* $Id: nanny.cpp,v 1.63 2004/05/31 00:23:02 urizen Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -483,7 +483,7 @@ const char *host_list[]=
   "24.43.54.", // Apocalypse
   "127.0.0.1", // localhost (duh)
   "68.124.193.", // Valkyrie
-  "65.27.237.", //Moldovian
+  "12.202.19.", //Moldovian
   "68.32.21.", // Bob
   "80.5.107." // Wynn
 };
