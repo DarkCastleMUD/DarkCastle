@@ -33,6 +33,58 @@ extern "C"
 #include <race.h>
 #include <returnvals.h>
 
+// Urizen's rebuild rnum references to enable additions to mob/obj arrays w/out screwing everything up.
+// A hack of renum_zone_tables *yawns*
+// type 1 = mobs, type 2 = objs. Simple as that.
+// This should obviously not be called at any other time than additions to the previously mentioned
+// arrays, as it'd screw things up. 
+// Saving zones after this SHOULD not be required, as the old savefiles contain vnums, which should remain correct.
+void rebuild_rnum_references(int startAt, int type)
+{
+    int zone, comm;
+
+    for (zone = 0; zone <= top_of_zone_table; zone++)
+    for (comm = 0; zone_table[zone].cmd[comm].command != 'S'; comm++)
+    {
+        switch(zone_table[zone].cmd[comm].command)
+        {
+        case 'M':
+          if (type==1 && zone_table[zone].cmd[comm].arg1 >= startAt)
+	      zone_table[zone].cmd[comm].arg1++;
+        break;
+        case 'O':
+          if (type==2 && zone_table[zone].cmd[comm].arg1 >= startAt)
+	      zone_table[zone].cmd[comm].arg1++;
+        break;
+        case 'G':
+          if (type==2 && zone_table[zone].cmd[comm].arg1 >= startAt)
+	      zone_table[zone].cmd[comm].arg1++;
+        break;
+        case 'E':
+          if (type==2 && zone_table[zone].cmd[comm].arg1 >= startAt)
+	      zone_table[zone].cmd[comm].arg1++;
+        break;
+        case 'P':
+          if (type==2 && zone_table[zone].cmd[comm].arg1 >= startAt)
+	      zone_table[zone].cmd[comm].arg1++;
+          if (type==2 && zone_table[zone].cmd[comm].arg3 >= startAt)
+	      zone_table[zone].cmd[comm].arg3++;
+        break;
+        case '%':
+        case 'K':
+        case 'D':
+        case 'X':
+        case '*':
+        case 'J':
+        break;
+        default:
+          log("Illegal char hit in rebuild_rnum_references", 0, LOG_WORLD);
+          break;
+	}
+    }
+}
+
+
 int do_check(struct char_data *ch, char *arg, int cmd) {
   struct descriptor_data d;
   struct char_data *vict;
@@ -1696,6 +1748,12 @@ int do_oedit(struct char_data *ch, char *argument, int cmd)
           send_to_char("Value out of valid range.\r\n", ch);
           return eFAILURE;
         }
+	if (intval==24)
+	{
+	  ((obj_data *)obj_index[item_num].item)->obj_flags.value[2] = -1;
+	} else {
+	  ((obj_data *)obj_index[item_num].item)->obj_flags.value[2] = 0;
+	}
         ((obj_data *)obj_index[item_num].item)->obj_flags.type_flag = intval;
         sprintf(buf, "Item type set to %d.\r\n", intval);
         send_to_char(buf, ch);
@@ -1908,9 +1966,10 @@ int do_oedit(struct char_data *ch, char *argument, int cmd)
           send_to_char("You are unable to work creation outside of your range.\n\r", ch);
           return eFAILURE;   
         }
-        send_to_char("Command disabled until pirahna has it updating zonefiles properly.\r\n", ch);
+/*        send_to_char("Command disabled until pirahna has it updating 
+zonefiles properly.\r\n", ch);
         return eFAILURE;
-
+*/
         x = create_blank_item(intval);
         if(x < 0) {
           csendf(ch, "Could not create item '%d'.  Max index hit or obj already exists.\r\n", intval);
@@ -2351,6 +2410,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd)
       "intelligence",
       "wisdom",
       "constitution",
+//      "new"
       "\n"
     };
    

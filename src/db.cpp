@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.30 2004/04/14 20:00:54 urizen Exp $ */
+/* $Id: db.cpp,v 1.31 2004/04/14 21:45:04 urizen Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -2753,6 +2753,7 @@ int create_blank_item(int nr)
       wcurr = wcurr->next;
     }
 
+    rebuild_rnum_references(cur_index, 2);
     return cur_index;
 }
 

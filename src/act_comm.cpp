@@ -316,6 +316,11 @@ int do_write(struct char_data *ch, char *argument, int cmd)
 
     if (!ch->desc)
 	return eSUCCESS;
+    if (GET_LEVEL(ch) < 5)
+    {
+      send_to_char("You need to be at least level 5 to write on the board.\r\n",ch);
+      return eSUCCESS;
+    }
 
     if (!*papername)  /* nothing was delivered */
     {   

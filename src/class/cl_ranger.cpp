@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: cl_ranger.cpp,v 1.29 2003/12/09 08:40:57 staylor Exp $ | cl_ranger.C  *
+ * $Id: cl_ranger.cpp,v 1.30 2004/04/14 21:45:07 urizen Exp $ | cl_ranger.C  *
  * Description: Ranger skills/spells                                          *
  *                                                                            *
  * Revision History                                                           *
@@ -128,7 +128,7 @@ int do_tame(CHAR_DATA *ch, char *arg, int cmd)
   skill_increase_check(ch, SKILL_TAME, learned, SKILL_INCREASE_MEDIUM);
 
   if(percent > chance || saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC) >= 0) {
-    act("$N is unreceptive to your attempts to tame $m.", ch, NULL, victim, TO_CHAR, 0);
+    act("$N is unreceptive to your attempts to tame $M.", ch, NULL, victim, TO_CHAR, 0);
     return eFAILURE;
   }
 
@@ -695,7 +695,7 @@ int do_forage(CHAR_DATA *ch, char *arg, int cmd)
 int parse_arrow(struct char_data * ch, char * arrow)
 {
 
-  if(GET_CLASS(ch) != CLASS_RANGER)
+  if(GET_CLASS(ch) != CLASS_RANGER && GET_LEVEL(ch) < 100)
      return 0;
 
   while(*arrow == ' ')

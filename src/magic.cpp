@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.94 2004/04/14 19:13:03 urizen Exp $ */
+/* $Id: magic.cpp,v 1.95 2004/04/14 21:45:04 urizen Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -4728,6 +4728,7 @@ int cast_heroes_feast( byte level, CHAR_DATA *ch, char *arg, int type,
 	 case SPELL_TYPE_STAFF:
 	 case SPELL_TYPE_SCROLL:
          case SPELL_TYPE_POTION:
+	 case SPELL_TYPE_WAND:
 		 return spell_heroes_feast(level, ch, 0, 0, skill);
 	  break;
 	 default :

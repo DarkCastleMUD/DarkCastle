@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.36 2004/04/13 22:25:19 urizen Exp $ */
+/* $Id: nanny.cpp,v 1.37 2004/04/14 21:45:04 urizen Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -363,6 +363,10 @@ void do_on_login_stuff(char_data * ch)
        GET_AC(ch) -= (GET_LEVEL(ch) * 2);
     }
 
+    if (affected_by_spell(ch,INTERNAL_SLEEPING))
+    {
+      affect_from_char(ch,INTERNAL_SLEEPING);
+    }
     /* Set ISR's cause they're not saved...   */
     isr_set(ch);
     
@@ -639,7 +643,7 @@ void nanny(struct descriptor_data *d, char *arg)
          SEND_TO_Q( "Wrong password.\n\r", d );
          sprintf(log_buf, "%s wrong password: %s", GET_NAME(ch), d->host);
          log( log_buf, SERAPH, LOG_SOCKET );
-         if((ch == get_pc(GET_NAME(d->character))))
+         if((ch = get_pc(GET_NAME(d->character))))
          {
             sprintf(log_buf, "$4$BWARNING: Someone just tried to log in as you with the wrong password.\r\n"
                "Attempt was from %s.$R\r\n"
