@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.76 2002/11/01 16:47:25 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.77 2002/11/01 16:51:19 pirahna Exp $ */
 
 extern "C"
 {
@@ -611,20 +611,23 @@ void check_weapon_skill_bonus(char_data * ch, int type, obj_data *wielded,
          return;
    }
 
-   // rare skill increases
-   if(0 == number(0, 5))
-      skill_increase_check(ch, skill, learned, SKILL_INCREASE_HARD);
-
-   specialization = learned / 100;
-   learned = learned % 100;
-
-   weapon_skill_hit_bonus = learned / 10;
-   weapon_skill_dam_bonus = number(1, learned / 10);
-
-   if(specialization)
+   if(learned)
    {
-      weapon_skill_hit_bonus += 5;
-      weapon_skill_dam_bonus += number(1, 5);
+      // rare skill increases
+      if(0 == number(0, 5))
+         skill_increase_check(ch, skill, learned, SKILL_INCREASE_HARD);
+
+      specialization = learned / 100;
+      learned = learned % 100;
+
+      weapon_skill_hit_bonus = learned / 10;
+      weapon_skill_dam_bonus = number(1, learned / 10);
+
+      if(specialization)
+      {
+         weapon_skill_hit_bonus += 5;
+         weapon_skill_dam_bonus += number(1, 5);
+      }
    }
 
    // now check for two-handed weapons
