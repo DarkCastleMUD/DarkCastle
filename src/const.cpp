@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: const.cpp,v 1.20 2002/08/03 06:30:40 dcastle Exp $ */
+/* $Id: const.cpp,v 1.21 2002/08/03 06:43:49 dcastle Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -442,7 +442,7 @@ int exp_table[ ] =
 0,
 1,          L(1 K),     L(3 K),     L(9 K),     L(15 K),   // level 5
 L(30 K),    L(50 K),    L(100 K),   L(200 K),   L(300 K),  // level 10
-L(400 K),   L(550 K),   L(850 K),   L(1.2 K),   L(1.4 M),  // level 15
+L(400 K),   L(550 K),   L(850 K),   L(1.2 M),   L(1.4 M),  // level 15
 L(1.8 M),   L(2.3 M),   L(3 M),     L(3.8 M),   L(4.8 M),  // level 20
 L(7 M),     L(8.8 M),   L(9.7 M),   L(11 M),    L(12 M),   // level 25
 L(13.5 M),  L(14.5 M),  L(16.5 M),  L(18 M),    L(21.5 M), // level 30
