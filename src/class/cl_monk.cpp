@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_monk.cpp,v 1.2 2002/06/13 04:41:13 dcastle Exp $
+| $Id: cl_monk.cpp,v 1.3 2002/07/28 02:04:19 pirahna Exp $
 | cl_monk.C
 | Description:  Monk skills.
 */
@@ -21,132 +21,101 @@
 */
 int do_eagle_claw(struct char_data *ch, char *argument, int cmd)
 {
-    struct obj_data *wielded, *held;
-    /*struct affected_type af;*/
-    struct char_data *victim;
-    char name[256];
-    byte percent;
-    byte learned;
-    int dam;
-    int retval;
+   struct char_data *victim;
+   char name[MAX_INPUT_LENGTH];
+   byte percent;
+   int learned, specialization, chance;
+   int dam;
+   int retval;
 
+   if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
+     learned = 75;
+   else if(!(learned = has_skill(ch, SKILL_EAGLE_CLAW))) {
+     send_to_char("Eagle my ass...you're still just a pigeon boy.\r\n", ch);
+     return eFAILURE;
+   }
 
-    if (((GET_CLASS(ch) != CLASS_MONK ))
-        && GET_LEVEL(ch)<ARCHANGEL) {
-	send_to_char("You better leave all the kung-fu to monks.\n\r", ch);
-	return eFAILURE;
-    }
+   if (ch->equipment[WIELD] || ch->equipment[HOLD]) {
+     send_to_char ("You can't wield or hold anything to perform this!\n\r", ch);
+     return eFAILURE;
+   }
 
-      if (GET_LEVEL(ch) < 20) {
-         send_to_char("You can't perform such a ancient skill!\n\r", ch);
-            return eFAILURE;
-            }
+   one_argument(argument, name);
 
-  if(IS_MOB(ch))
-    learned = 75;
-  else if(!(learned = has_skill(ch, SKILL_EAGLE_CLAW))) {
-    send_to_char("Eagle my ass...you're still just a pigeon boy.\r\n", ch);
-    return eFAILURE;
-  }
+   if (!(victim = get_char_room_vis(ch, name))) {
+      if (ch->fighting) {
+         victim = ch->fighting;
+      } else {
+         send_to_char("Eagle claw whom?\n\r", ch);
+         return eFAILURE;
+      }
+   }
 
-     wielded = ch->equipment[WIELD];
-     held = ch->equipment[HOLD];
-
-     if (wielded || held) {
-    send_to_char ("You can't wield or hold anything to perform ths!\n\r", ch);
-           return eFAILURE;
-       }
-
-
-
-    one_argument(argument, name);
-
-    if (!(victim = get_char_room_vis(ch, name))) {
-	if (ch->fighting) {
-	    victim = ch->fighting;
-	} else {
-	    send_to_char("Eagle claw whom?\n\r", ch);
-	    return eFAILURE;
-	}
-    }
-
-    if(ch->in_room != victim->in_room)
-    {
-      send_to_char("That person seems to have left.\n\r", ch);
+   if (victim == ch) {
+      send_to_char("Aren't we funny today...\n\r", ch);
       return eFAILURE;
-    }
+   }
 
-    if (victim == ch) {
-	send_to_char("Aren't we funny today...\n\r", ch);
-	return eFAILURE;
-    }
-
-    if(!can_attack(ch) || !can_be_attacked(ch, victim))
+   if(!can_attack(ch) || !can_be_attacked(ch, victim))
       return eFAILURE;
 
-     /* 101% is a complete failure */
-    percent= number(1,101);
+   specialization = learned / 100;
+   learned = learned % 100;
 
-    WAIT_STATE(ch, PULSE_VIOLENCE*3);
+   chance = 67;
+   chance += (GET_DEX(ch) > 26);
+   chance += (GET_DEX(ch) > 24);
+   chance += (GET_DEX(ch) > 22);
+   chance += (GET_DEX(ch) > 20);
+   chance += (GET_DEX(ch) > 18);    // chance = 67-72
+   chance += learned / 10;          // chance = 67-80 (max of 75 learned for monk)
 
-    if (percent > learned) 
-    {
-	retval = damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_EAGLE_CLAW, 0);
+   skill_increase_check(ch, SKILL_EAGLE_CLAW, learned, SKILL_INCREASE_MEDIUM);
 
-    } else {
+   percent = number(1,101);
 
+   WAIT_STATE(ch, PULSE_VIOLENCE*3);
+
+   if (percent > chance) 
+      retval = damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_EAGLE_CLAW, 0);
+   else 
+   {
       dam = dice(GET_LEVEL(ch), 8);
 
-        if (dam > GET_HIT(victim)) {
-             make_heart(ch, victim);
-             dam += 20;
-         }
-	retval = damage(ch, victim, dam,TYPE_UNDEFINED, SKILL_EAGLE_CLAW, 0);
-    }
-    return retval;
+      if (dam > GET_HIT(victim)) {
+         // TODO - have 'learned' effect how good the heart is that you grab out
+         // for the later modifications to this.  Hearts regen ki, etc etc.
+         make_heart(ch, victim);
+         dam += 20;
+      }
+      retval = damage(ch, victim, dam,TYPE_UNDEFINED, SKILL_EAGLE_CLAW, 0);
+   }
+   return retval;
 }
 
 
-// removed affect and made it ki based while upping damage a lil
 int do_quivering_palm(struct char_data *ch, char *argument, int cmd)
 {
-  struct obj_data *wielded, *held;
   // struct affected_type af;
   struct char_data *victim;
   char name[256];
-  byte percent;
-  byte learned;
-  int dam;
-  int retval;
+  int learned, specialization, chance, percent, dam, retval;
 
-  if(GET_CLASS(ch) != CLASS_MONK && GET_LEVEL(ch) < ARCHANGEL) {
-    send_to_char("You better leave all the kung-fu to monks.\n\r", ch);
-    return eFAILURE;
-  }
-
-  if(GET_LEVEL(ch) < 40) {
-    send_to_char("You can't perform such an ancient skill!\n\r", ch);
-    return eFAILURE;
-  }
-
-  if(IS_MOB(ch))
+  if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
     learned = 75;
   else if(!(learned = has_skill(ch, SKILL_QUIVERING_PALM))) {
     send_to_char("Stick to palming yourself for now bucko.\r\n", ch);
     return eFAILURE;
   }
 
-  if(affected_by_spell(ch, SKILL_QUIVERING_PALM)) {
-     send_to_char("You can't perform such an ancient power more than "
-                  "once a day!\n\r", ch);
-     return eFAILURE;
-  }
+//  if(affected_by_spell(ch, SKILL_QUIVERING_PALM)) {
+//     send_to_char("You can't perform such an ancient power more than "
+//                  "once a day!\n\r", ch);
+//     return eFAILURE;
+//  }
 
-  wielded = ch->equipment[WIELD];
-  held = ch->equipment[HOLD];
-
-  if(wielded || held) {
-    send_to_char ("You can't wield or hold anything to perform ths!\n\r", ch);
+  if(ch->equipment[WIELD] || ch->equipment[HOLD]) {
+    send_to_char ("You can't wield or hold anything to perform this!\n\r", ch);
     return eFAILURE;
   }
 
@@ -161,38 +130,45 @@ int do_quivering_palm(struct char_data *ch, char *argument, int cmd)
     }
   }
 
-    if(ch->in_room != victim->in_room)
-    {
-      send_to_char("That person seems to have left.\n\r", ch);
-      return eFAILURE;
-    }
-
   if(victim == ch) {
     send_to_char("Masturbate on your own time.\n\r", ch);
     return eFAILURE;
   }
 
+  if(!can_attack(ch) || !can_be_attacked(ch, victim))
+     return eFAILURE;
+	   
   if(GET_KI(ch) < 40 && GET_LEVEL(ch) < ARCHANGEL) {
     send_to_char("You don't possess enough ki!\r\n", ch);
     return eFAILURE;
   }
 
-    if(!can_attack(ch) || !can_be_attacked(ch, victim))
-          return eFAILURE;
-	   
   GET_KI(ch) -= 40;
 
-  /* 101% is a complete failure */
   percent = number(1, 101);
+
+  specialization = learned / 100;
+  learned = learned % 100;
+
+  chance = 67;
+  chance += (GET_DEX(ch) > 26);
+  chance += (GET_DEX(ch) > 24);
+  chance += (GET_DEX(ch) > 22);
+  chance += (GET_DEX(ch) > 20);
+  chance += (GET_DEX(ch) > 18);    // chance = 67-72
+  chance += learned / 10;          // chance = 67-80 (max of 75 learned for monk)
+
+  skill_increase_check(ch, SKILL_QUIVERING_PALM, learned, SKILL_INCREASE_EASY);
 
   WAIT_STATE(ch, PULSE_VIOLENCE*2);
   // af.type = SKILL_QUIVERING_PALM;
+  // af.duration = 24;
   // af.modifier = 0;
   // af.location = APPLY_NONE;
   // af.bitvector = 0;
   // affect_to_char(ch, &af);
 
-  if(percent > learned) {
+  if(percent > chance) {
     retval = damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_QUIVERING_PALM, 0);
   }
   else {
@@ -212,12 +188,7 @@ int do_stun(struct char_data *ch, char *argument, int cmd)
   int retval;
   int specialization;
 
-  if((GET_CLASS(ch) == CLASS_WARRIOR) && (GET_LEVEL(ch) < 45)) {
-    send_to_char("You aren't quite the man you think!\n\r", ch);
-    return eFAILURE;
-  }
-
-  if(IS_MOB(ch))
+  if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
     learned = 75;
   else if(!(learned = has_skill(ch, SKILL_STUN))) {
     send_to_char("Your lack of knowledge is stunning...\r\n", ch);
@@ -243,12 +214,6 @@ int do_stun(struct char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-    if(ch->in_room != victim->in_room)
-    {
-      send_to_char("That person seems to have left.\n\r", ch);
-      return eFAILURE;
-    }
-
   if(!can_attack(ch) || !can_be_attacked(ch, victim))
     return eFAILURE;
 
@@ -266,29 +231,27 @@ int do_stun(struct char_data *ch, char *argument, int cmd)
   // 101% is a complete failure
   percent = number(1, 101) + (GET_LEVEL(victim) - GET_LEVEL(ch));
 
-  if(GET_CLASS(ch) == CLASS_MONK)
-    chance = learned * 2 /3;
-  else
-    chance = learned / 2;
+  chance = 50;
+  if(learned > 50)
+    chance+= learned - 50;   // monks rangers get up to 60 skill
+
 
   if(percent > chance) {
-    act("$n attempts to hit you in your solar plexus!  You block $s attempt.",
-	  ch, NULL, victim, TO_VICT , 0);
+    act("$n attempts to hit you in your solar plexus!  You block $s attempt.", ch, NULL, victim, TO_VICT , 0);
+    act("You attempt to hit $N in $s solar plexus...   YOU MISS!", ch, NULL, victim, TO_CHAR , 0);
+    act("$n attempts to hit $N in $S solar plexus...   $e MISSES!", ch, NULL, victim, TO_ROOM, NOTVICT );
 
-    act("You attempt to hit $N in $s solar plexus...   YOU MISS!",
-        ch, NULL, victim, TO_CHAR , 0);
-    act("$n attempts to hit $N in $S solar plexus...   $e MISSES!",
-        ch, NULL, victim, TO_ROOM, NOTVICT );
+    if(learned > 25 && !number(0, 7)) {
+       send_to_char("Your advanced knowledge of stun helps you to recover faster.\r\n", ch);
+       WAIT_STATE(ch, PULSE_VIOLENCE*3);
+    }
     WAIT_STATE(ch, PULSE_VIOLENCE*4);
     retval = damage (ch, victim, 0,TYPE_UNDEFINED, SKILL_STUN, 0);
   }
   else {
-    act("$n delivers a HARD BLOW into your solar plexus!  You are STUNNED!",
-	ch, NULL, victim, TO_VICT , 0);
-    act("You deliver a HARD BLOW into $N's solar plexus!  $N is STUNNED!",
-        ch, NULL, victim, TO_CHAR , 0);
-    act("$n delivers a HARD BLOW into $N's solar plexus!  $N is STUNNED!",
-	   ch, NULL, victim, TO_ROOM, NOTVICT );
+    act("$n delivers a HARD BLOW into your solar plexus!  You are STUNNED!", ch, NULL, victim, TO_VICT , 0);
+    act("You deliver a HARD BLOW into $N's solar plexus!  $N is STUNNED!", ch, NULL, victim, TO_CHAR , 0);
+    act("$n delivers a HARD BLOW into $N's solar plexus!  $N is STUNNED!", ch, NULL, victim, TO_ROOM, NOTVICT );
 
     WAIT_STATE(ch, PULSE_VIOLENCE*5);
     WAIT_STATE(victim, PULSE_VIOLENCE*2);

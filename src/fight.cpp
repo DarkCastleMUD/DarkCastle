@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.11 2002/07/23 20:03:27 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.12 2002/07/28 02:04:14 pirahna Exp $ */
 
 extern "C"
 {
@@ -962,23 +962,39 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
   typeofdamage = damage_type(weapon_type);
 
   if(GET_POS(victim) == POSITION_DEAD)           return eSUCCESS|eVICT_DIED;
-  
-  if(IS_AFFECTED(victim, AFF_REFLECT)  && 
-     number(1,101) < 6 &&
-     typeofdamage == DAMAGE_TYPE_MAGIC) 
+
+  if(typeofdamage == DAMAGE_TYPE_MAGIC)  
   {
-    if(ch == victim) { // some idiot was shooting at himself
-      act("Your spell reflects into the unknown.", ch, 0, 0, TO_CHAR, 0);
-      act("$n's spell rebounds into the unknown.", ch, 0, 0, TO_ROOM, 0);
-      return eSUCCESS;
-    } else {
-      act("$n's spell bounces back at him", ch, 0, victim, TO_VICT, 0);
-      act("Oh SHIT! Your spell bounces off of $N and heads right back at you.", ch, 0, victim, TO_CHAR, 0);
-      act("$n's spell reflects off of $N's magical aura", ch, 0, victim, TO_ROOM, NOTVICT);
-      victim = ch;
+    if(IS_AFFECTED(victim, AFF_REFLECT)  && 
+       number(1,101) < 6)
+    {
+      if(ch == victim) { // some idiot was shooting at himself
+        act("Your spell reflects into the unknown.", ch, 0, 0, TO_CHAR, 0);
+        act("$n's spell rebounds into the unknown.", ch, 0, 0, TO_ROOM, 0);
+        return eSUCCESS;
+      } else {
+        act("$n's spell bounces back at him", ch, 0, victim, TO_VICT, 0);
+        act("Oh SHIT! Your spell bounces off of $N and heads right back at you.", ch, 0, victim, TO_CHAR, 0);
+        act("$n's spell reflects off of $N's magical aura", ch, 0, victim, TO_ROOM, NOTVICT);
+        victim = ch;
+      }
+    }
+    if(IS_SET(victim->combat, COMBAT_REPELANCE))
+    {
+       if(GET_LEVEL(ch) > 70)
+         send_to_char("The power of the spell bursts through your mental barriers as if they weren't there!\r\n", victim);
+       else if(!(number(0, 9)))
+         send_to_char("Your mental shields cannot hold back the force of the spell!\r\n", victim);
+       else {
+        act("$n's spell is dissolved into nothingness by your will.", ch, 0, victim, TO_VICT, 0);
+        act("$N supreme will dissolves your spell into formless mana.", ch, 0, victim, TO_CHAR, 0);
+        act("$n's spell streaks at $N and suddenly ceases to be.", ch, 0, victim, TO_ROOM, NOTVICT);
+        REMOVE_BIT(victim->combat, COMBAT_REPELANCE);
+        return eSUCCESS;
+       }
+       REMOVE_BIT(victim->combat, COMBAT_REPELANCE);
     }
   }
-
   // Can't hurt god, but he likes to see the messages. 
   if (GET_LEVEL(victim) >= IMMORTAL && !IS_NPC(victim))
     dam = 0;
@@ -1041,7 +1057,7 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
   if(typeofdamage == DAMAGE_TYPE_PHYSICAL) {
     if (IS_SET(ch->combat, COMBAT_BERSERK))
       dam = (int)(dam * 1.6);
-    if (IS_SET(ch->combat, COMBAT_RAGE1) || IS_SET(ch->combat, COMBAT_RAGE2))
+    if (IS_SET(ch->combat, COMBAT_RAGE1) || IS_SET(ch->combat, COMBAT_RAGE2) && attacktype != SKILL_BACKSTAB)
       dam = (int)(dam * 1.3);
     if (IS_SET(ch->combat, COMBAT_HITALL))
       dam = (int)(dam * 2);

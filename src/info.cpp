@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.5 2002/07/16 20:51:56 pirahna Exp $ */
+/* $Id: info.cpp,v 1.6 2002/07/28 02:04:14 pirahna Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -1262,10 +1262,6 @@ int do_score(struct char_data *ch, char *argument, int cmd)
    
    struct affected_type *aff;
    extern char *apply_types[];
-   extern char *skills[];
-   extern char *spells[];
-   extern char *ki[];
-   extern char *songs[];
    extern char *pc_clss_types[];
    
    int exp_needed;
@@ -1333,16 +1329,7 @@ int do_score(struct char_data *ch, char *argument, int cmd)
          scratch = frills[level];
 
          // figure out the name of the affect (if any)
-         char * aff_name = NULL;
-         if(aff->type <= MAX_SPL_LIST)
-           aff_name = spells[aff->type-1];
-         else if(aff->type >= KI_OFFSET && aff->type <= (KI_OFFSET + MAX_KI_LIST))
-           aff_name = ki[aff->type - KI_OFFSET];
-         else if(aff->type >= SKILL_BASE && aff->type <= SKILL_MAX)
-           aff_name = skills[aff->type - SKILL_BASE];
-         else if(aff->type >= SKILL_SONG_BASE && aff->type <= SKILL_SONG_MAX)
-           aff_name = songs[aff->type - SKILL_SONG_BASE];
-
+         char * aff_name = get_skill_name(aff->type);
          if(!aff_name) // not one we want displayed
            continue;
 

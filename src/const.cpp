@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: const.cpp,v 1.8 2002/07/23 20:34:33 pirahna Exp $ */
+/* $Id: const.cpp,v 1.9 2002/07/28 02:04:14 pirahna Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -929,7 +929,7 @@ struct class_skill_defines w_skills[] = {
 {    "blindfighting",   SKILL_BLINDFIGHTING,    21,     80,     3023,   NULL },
 {    "triple",		SKILL_THIRD_ATTACK,	23,	75,	3023, 	"You have to go see Bjorn the warrior guildmaster." },
 {    "hitall",		SKILL_HITALL,		25,	75,	3023, 	"You have to go see Bjorn the warrior guildmaster." },
-{    "archery",		SKILL_ARCHERY,		27,	75,	3023, 	"You have to go see Bjorn the warrior guildmaster." },
+{    "archery",		SKILL_ARCHERY,		27,	60,	3023, 	"You have to go see Bjorn the warrior guildmaster." },
 {    "deathstroke",	SKILL_DEATHSTROKE,	30,	75,	3023, 	"You have to go see Bjorn the warrior guildmaster." },
 {    "shield block",    SKILL_SHIELDBLOCK,      33,     50,     725, 	"You must see the prince of Sarina." },
 {    "stun",		SKILL_STUN,		35,	50,	6902, 	"Go to see any master shaolin monk." },
@@ -1220,6 +1220,7 @@ struct class_skill_defines c_skills[] = { // cleric skills
 struct class_skill_defines m_skills[] = { // mage skills
 {    "dodge",		SKILL_DODGE,		7,	5,	3020, 	"You have to go see Alianna the mage guildmaster." },
 {    "dual wield",      SKILL_DUAL_WIELD,       10,      25,     3020, 	"You have to go see Alianna the mage guildmaster." },
+{    "focused repelance",SKILL_FOCUSED_REPELANCE, 25,	80,	3020,	NULL },
 
 {    "magic missile",	SPELL_MAGIC_MISSILE,	1,	90,	3020,	NULL }, 
 {    "ventriloquate",	SPELL_VENTRILOQUATE,	1,	90,	3020,	NULL },

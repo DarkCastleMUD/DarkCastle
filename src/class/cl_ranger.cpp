@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_ranger.cpp,v 1.7 2002/07/23 19:04:52 pirahna Exp $ | cl_ranger.C |
+| $Id: cl_ranger.cpp,v 1.8 2002/07/28 02:04:19 pirahna Exp $ | cl_ranger.C |
 Description: Ranger skills/spells */ extern "C"  {
   #include <string.h>
 }
@@ -29,7 +29,6 @@ extern struct zone_data *zone_table;
  
 extern struct race_shit race_info[];
 extern int rev_dir[];
-extern struct index_data *obj_index;
 
 int saves_spell(CHAR_DATA *ch, CHAR_DATA *vict, int spell_base, sh_int save_type);
 bool any_charms(CHAR_DATA *ch);
@@ -38,9 +37,8 @@ int do_tame(CHAR_DATA *ch, char *arg, int cmd)
 {
   struct affected_type af;
   CHAR_DATA *victim;
-  int percent;
-  byte learned;
-  char buf[200];
+  int percent, learned, specialization, chance;
+  char buf[MAX_INPUT_LENGTH];
 
   void add_follower(CHAR_DATA *ch, CHAR_DATA *leader, int cmd);
   void stop_follower(CHAR_DATA *ch, int cmd);
@@ -53,7 +51,7 @@ int do_tame(CHAR_DATA *ch, char *arg, int cmd)
     return eFAILURE;
   }
 
-  if(IS_MOB(ch))
+  if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
     learned = 75;
   else if(!(learned = has_skill(ch, SKILL_TAME))) {
     send_to_char("Try learning HOW to tame first.\r\n", ch);
@@ -78,7 +76,7 @@ int do_tame(CHAR_DATA *ch, char *arg, int cmd)
   }
 
   if(IS_AFFECTED(victim, AFF_CHARM) || IS_AFFECTED(ch, AFF_CHARM) ||
-     (GET_LEVEL(ch) < GET_LEVEL(victim))) {
+     (GET_LEVEL(ch) <= GET_LEVEL(victim))) {
     send_to_char("You find yourself unable to tame this creature.\n\r", ch);
     return eFAILURE;
   }
@@ -101,11 +99,23 @@ int do_tame(CHAR_DATA *ch, char *arg, int cmd)
     return eFAILURE;
   }
 
+  specialization = learned / 100;
+  learned = learned % 100;
+
+  chance = 67;
+  chance += (GET_WIS(ch) > 26);
+  chance += (GET_WIS(ch) > 24);
+  chance += (GET_WIS(ch) > 22);
+  chance += (GET_WIS(ch) > 20);
+  chance += (GET_WIS(ch) > 18);    // chance = 67-72
+  chance += learned / 10;          // chance = 67-80 
+
   percent = number(1,101);
 
-  if(percent > learned || saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC) >= 0) {
-    act("$N is unreceptive to your attempts to tame $m.", ch, NULL, 
-        victim, TO_CHAR, 0);
+  skill_increase_check(ch, SKILL_TAME, learned, SKILL_INCREASE_MEDIUM);
+
+  if(percent > chance || saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC) >= 0) {
+    act("$N is unreceptive to your attempts to tame $m.", ch, NULL, victim, TO_CHAR, 0);
     return eFAILURE;
   }
 
@@ -133,9 +143,8 @@ int do_tame(CHAR_DATA *ch, char *arg, int cmd)
 int do_track(CHAR_DATA *ch, char *argument, int cmd)
 {
   int x,y;
-  int retval;
+  int retval, how_deep, learned;
   char buf[300];
-  int  how_deep = ((has_skill(ch, SKILL_TRACK) / 10) + 1);
   char race[40];
   char sex[20];
   char condition[60];
@@ -149,6 +158,11 @@ int do_track(CHAR_DATA *ch, char *argument, int cmd)
 
   one_argument(argument, victim);
 
+  learned = how_deep = ((has_skill(ch, SKILL_TRACK) / 10) + 1);
+
+  if(GET_LEVEL(ch) >= IMMORTAL)
+    how_deep = 50;
+ 
   quarry = get_char_room_vis(ch, victim);
  
   if(ch->hunting) {
@@ -171,14 +185,15 @@ int do_track(CHAR_DATA *ch, char *argument, int cmd)
 
   if(*victim && !IS_NPC(ch) && GET_CLASS(ch) != CLASS_RANGER
      && GET_CLASS(ch) != CLASS_DRUID && GET_LEVEL(ch) < ANGEL) {
-    send_to_char("Only a ranger or a druid could track someone by name.\n\r",
-                 ch);
+    send_to_char("Only a ranger or a druid could track someone by name.\n\r", ch);
     return eFAILURE;
   }
 
-  act("$n walks about slowly, searching for signs of $s quarry", ch, 0, 0,
-      TO_ROOM, INVIS_NULL);
-  send_to_char("You sniff the air...\n\r\n\r", ch);
+  act("$n walks about slowly, searching for signs of $s quarry", ch, 0, 0, TO_ROOM, INVIS_NULL);
+  send_to_char("You search for signs of your quarry...\n\r\n\r", ch);
+
+  if(learned)
+    skill_increase_check(ch, SKILL_TRACK, learned, SKILL_INCREASE_MEDIUM);
 
   // TODO - once we're sure that act_mob is properly checking for this,
   // and that it isn't call from anywhere else, we can probably remove it.
@@ -204,26 +219,28 @@ int do_track(CHAR_DATA *ch, char *argument, int cmd)
   if(IS_NPC(ch))
     how_deep = 10;
 
-  if (*victim) { 
+  if (*victim) 
+  { 
     for(x = 1; x <= how_deep; x++) {
         
       if ( (x > world[ch->in_room].nTracks) ||
-          !(pScent = world[ch->in_room].TrackItem(x))) {
-         if (ch->hunting) {
+          !(pScent = world[ch->in_room].TrackItem(x))) 
+      {
+         if (ch->hunting) 
+         {
             ansi_color( RED, ch);
             ansi_color( BOLD, ch);
             send_to_char("You have lost the trail.\n\r", ch);
             ansi_color( NTEXT, ch);
-            }
+         }
          else
             send_to_char("You can't find any traces of such a scent.\n\r",ch);
          remove_memory(ch, 't');
          if(IS_NPC(ch))
            swap_hate_memory(ch);
          return eFAILURE;
-         }
+      }
 
-      
       if (isname(victim, pScent->trackee)) {
           y = pScent->direction;
           add_memory(ch, pScent->trackee, 't'); 
@@ -275,36 +292,34 @@ int do_track(CHAR_DATA *ch, char *argument, int cmd)
               else 
                  act("$n says 'You can't stay here forever.'",
                      ch, 0, 0, TO_ROOM, 0);
-              } // if IS_NPC
+           } // if IS_NPC
 	 
            return eSUCCESS;
-           } // if isname
-        } // for
+        } // if isname
+     } // for
 	
      if (ch->hunting) {
         ansi_color( RED, ch);
         ansi_color( BOLD, ch);
         send_to_char("You have lost the trail.\n\r", ch);
         ansi_color( NTEXT, ch);
-        }
+     }
     else 
        send_to_char("You can't find any traces of such a scent.\n\r", ch);
     
     remove_memory(ch, 't');
     return eFAILURE; 
-    } // if *victim
+  } // if *victim
 
 
-  how_deep = MAX(5, how_deep);
- 
-  for(x = 1; x <= how_deep; x++) {
-
-     if ( (x > world[ch->in_room].nTracks) ||
-         !(pScent = world[ch->in_room].TrackItem(x))) {
+  for(x = 1; x <= how_deep; x++) 
+  {
+     if ( (x > world[ch->in_room].nTracks) || !(pScent = world[ch->in_room].TrackItem(x))) 
+     {
         if (x == 1)
            send_to_char("There are no distinct smells here.\n\r", ch);
         break;
-        }
+     }
         
      y = pScent->direction;
 
@@ -374,44 +389,53 @@ int do_track(CHAR_DATA *ch, char *argument, int cmd)
 int ambush(CHAR_DATA *ch)
 {
   CHAR_DATA *i, *next_i;
-  int retval;
-  byte learned;
+  int retval, learned, specialization, chance;
 
-  if(IS_MOB(ch))
-    learned = 75;
-  else if(!(learned = has_skill(ch, SKILL_AMBUSH))) {
-    return eFAILURE;
-  }
-
-  for(i = world[ch->in_room].people; i; i = next_i) {
-  
+  for(i = world[ch->in_room].people; i; i = next_i) 
+  {
      next_i = i->next_in_room;
   
      if(i == ch || !i->ambush || !CAN_SEE(i, ch))
        continue;
-     if(!IS_NPC(i) && GET_CLASS(i) != CLASS_RANGER)
-       continue;
-     if(GET_POS(i) < POSITION_RESTING || GET_POS(i) == POSITION_FIGHTING ||
-        (IS_SET(world[i->in_room].room_flags, SAFE) &&
-	 !IS_AFFECTED(ch, AFF_CANTQUIT)))
-       continue;
-     if(isname(i->ambush, GET_NAME(ch)) &&
-        number(1, 101) <= learned || IS_NPC(i)) { 
-       act("$n ambushes $N in a brilliant surprise attack!",
-           i, 0, ch, TO_ROOM, NOTVICT);
-       act("$n ambushes you as you enter the room!",
-           i, 0, ch, TO_VICT, 0);
-       act("You ambush $N with a brilliant surprise attack!",
-           i, 0, ch, TO_CHAR, 0);
-       WAIT_STATE(i, PULSE_VIOLENCE * 2);
-       WAIT_STATE(ch, PULSE_VIOLENCE * 2);
-       retval = damage(i, ch, GET_LEVEL(i) * 10, TYPE_UNDEFINED, TYPE_UNDEFINED, 0); 
-       if(IS_SET(retval, eVICT_DIED))
-         return eSUCCESS|eCH_DIED;  // ch = damage vict
 
+//     As long as they have ambush skill, this is fine
+//     if(!IS_NPC(i) && GET_CLASS(i) != CLASS_RANGER)
+//       continue;
+
+     if(  GET_POS(i) < POSITION_RESTING || 
+          GET_POS(i) == POSITION_FIGHTING ||
+          ( IS_SET(world[i->in_room].room_flags, SAFE) &&
+	    !IS_AFFECTED(ch, AFF_CANTQUIT)
+          ))
        continue;
-//  we continue instead of breaking in case there are any OTHER rangers in the room
-//       break;
+     if(isname(i->ambush, GET_NAME(ch)))
+     {
+
+       if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
+         learned = 75;
+       else if(!(learned = has_skill(ch, SKILL_AMBUSH)))
+         continue;
+
+       specialization = learned / 100;
+       learned %= 100;
+
+       chance = 65;
+       chance += learned / 10;
+
+       skill_increase_check(ch, SKILL_AMBUSH, learned, SKILL_INCREASE_EASY);
+
+       if(number(1, 101) <= chance || IS_NPC(i)) 
+       { 
+         act("$n ambushes $N in a brilliant surprise attack!", i, 0, ch, TO_ROOM, NOTVICT);
+         act("$n ambushes you as you enter the room!", i, 0, ch, TO_VICT, 0);
+         act("You ambush $N with a brilliant surprise attack!", i, 0, ch, TO_CHAR, 0);
+         WAIT_STATE(i, PULSE_VIOLENCE * 1);
+         WAIT_STATE(ch, PULSE_VIOLENCE * 1);
+         retval = damage(i, ch, GET_LEVEL(i) * 10, TYPE_UNDEFINED, TYPE_UNDEFINED, 0); 
+         if(IS_SET(retval, eVICT_DIED))
+           return (eSUCCESS|eCH_DIED);  // ch = damage vict
+       }
+       // we continue instead of breaking in case there are any OTHER rangers in the room
      }
   }
   return eSUCCESS;
@@ -419,19 +443,20 @@ int ambush(CHAR_DATA *ch)
 
 int do_ambush(CHAR_DATA *ch, char *arg, int cmd)
 {
-  char buf[200];
+  char buf[MAX_INPUT_LENGTH];
+  int learned;
 
-  if(GET_CLASS(ch) != CLASS_RANGER) {
-    send_to_char("You aren't a ranger!\n\r", ch);
-    return eFAILURE;
+  if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
+     ; // do nothing!
+  else if(!(learned = has_skill(ch, SKILL_AMBUSH))) {
+     send_to_char("You don't know how to ambush people!\r\n", ch);
+     return eFAILURE;
   }
 
-  while(*arg == ' ')
-    arg++;
+  one_argument(arg, arg);
 
   if(!*arg) { 
-    sprintf(buf, "You will ambush %s on sight.\n\r", ch->ambush ?
-            ch->ambush : "no one");
+    sprintf(buf, "You will ambush %s on sight.\n\r", ch->ambush ? ch->ambush : "no one");
     send_to_char(buf, ch);
     return eSUCCESS;
   }
@@ -451,7 +476,9 @@ int do_ambush(CHAR_DATA *ch, char *arg, int cmd)
   }
 
   dc_free(ch->ambush);
-  do_ambush(ch, arg, 9); 
+  sprintf(buf, "You will now ambush %s on sight.\n\r", arg);
+  send_to_char(buf, ch);
+  ch->ambush = str_dup(arg);
   return eSUCCESS;
 }
 
@@ -505,34 +532,44 @@ int pick_one(int a, int b, int c, int d)
 
 int do_forage(CHAR_DATA *ch, char *arg, int cmd)
 {
-  int foraged;
-  int forage_cost;
+  int foraged, learned, specialization;
   struct obj_data * new_obj = 0;
-  byte learned = has_skill(ch, SKILL_FORAGE);
+  struct affected_type af;
 
-  forage_cost = GET_MAX_MOVE(ch) / 35;
-  if(GET_MOVE(ch) < forage_cost) {
+  if(affected_by_spell(ch, SKILL_FORAGE)) {
+     send_to_char("You already foraged recently.  Give mother nature a break!\n\r", ch);
+     return eFAILURE;
+  }
+  
+  if(GET_MOVE(ch) < 5) {
     send_to_char("You are too tired to be foraging around right now.\n\r", ch);
     return eFAILURE;
   }
+
+  GET_MOVE(ch) -= 5;
+ 
+  learned = has_skill(ch, SKILL_FORAGE);
+  specialization = learned / 100;
+  learned = learned % 100;
   
+  if(!learned) {
+    send_to_char("Not knowing how to forage, you poke at the dirt with a stick, finding nothing.\r\n", ch);
+    return eFAILURE;
+  }
+
   if ((1+IS_CARRYING_N(ch)) > CAN_CARRY_N(ch)) {
     send_to_char("You can't carry that many items!\r\n", ch);
     return eFAILURE;
   }
 
-  GET_MOVE(ch) -= forage_cost;
- 
-  if(!learned) {
-    send_to_char("Not knowing how to forage, you poke at the dirt with a stick a little, finding nothing.\r\n", ch);
-    return eFAILURE;
-  }
+  // TODO - have forage use learned to modify how often you get rare items
+  // TODO - add ability for zones to add zone-specific forage items
 
   if(GET_CLASS(ch) == CLASS_RANGER) 
     foraged = number(1,
-            (learned + (GET_LEVEL(ch)*2)) / 2 );
+            (75 + (GET_LEVEL(ch)*2)) / 2 );
   else
-    foraged = number(1, learned);
+    foraged = number(1, 75);
 
   switch(world[ch->in_room].sector_type) {
   case SECT_FIELD:
@@ -587,11 +624,16 @@ int do_forage(CHAR_DATA *ch, char *arg, int cmd)
     break;
   }
 
+  af.type = SKILL_FORAGE;
+  af.duration = 5 - (learned / 50);
+  af.modifier = 0;
+  af.location = APPLY_NONE;
+  af.bitvector = 0;
+  affect_to_char(ch, &af);
+
   if(!new_obj) {
-    act("$n forages around for some food, but turns up nothing.", ch,
-        0, 0, TO_ROOM, 0);
-    act("You forage around for some food, but turn up nothing.", ch,
-        0, 0, TO_CHAR, 0);
+    act("$n forages around for some food, but turns up nothing.", ch, 0, 0, TO_ROOM, 0);
+    act("You forage around for some food, but turn up nothing.", ch, 0, 0, TO_CHAR, 0);
     return eFAILURE;
   }
   
@@ -599,408 +641,6 @@ int do_forage(CHAR_DATA *ch, char *arg, int cmd)
   act("You forage around, turning up $p.", ch, new_obj, 0, TO_CHAR, 0);
   obj_to_char(new_obj, ch);
   new_obj->obj_flags.timer = 4;
-  return eSUCCESS;
-}
-
-int find_door(CHAR_DATA *ch, char *type, char *dir)
-{
-    char buf[MAX_STRING_LENGTH];
-    int door;
-    char *dirs[] = 
-    {
-	"north",
-	"east",
-	"south",
-	"west",
-	"up",
-	"down",
-	"\n"
-    };
-
-    if (*dir) /* a direction was specified */
-    {
-	if ((door = search_block(dir, dirs, FALSE)) == -1) /* Partial Match */
-	{
-	    send_to_char("That's not a direction.\n\r", ch);
-	    return(-1);
-	}
-
-	if (EXIT(ch, door))
-	    if (EXIT(ch, door)->keyword)
-		if (isname(type, EXIT(ch, door)->keyword))
-		    return(door);
-		else
-		{
-		    sprintf(buf, "There is no %s there.\n\r", type);
-		    send_to_char(buf, ch);
-		    return(-1);
-		}
-	    else
-		return(door);
-	else
-	{
-	    sprintf(buf, "There is no %s there.\n\r", type);
-	    send_to_char(buf, ch);
-	    return(-1);
-	}
-    }
-    else // try to locate the keyword
-    {
-	for (door = 0; door <= 5; door++)
-	    if (EXIT(ch, door))
-		if (EXIT(ch, door)->keyword)
-		    if (isname(type, EXIT(ch, door)->keyword))
-			return(door);
-
-	sprintf(buf, "I see no %s here.\n\r", type);
-	send_to_char(buf, ch);
-	return(-1);
-    }
-}
-
-int do_open(CHAR_DATA *ch, char *argument, int cmd)
-{
-    int door, other_room, retval;
-    char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
-    struct room_direction_data *back;
-    struct obj_data *obj;
-    CHAR_DATA *victim;
-    CHAR_DATA *next_vict;
-
-    int do_fall(CHAR_DATA *ch, short dir);
-
-    retval = 0;
-
-    argument_interpreter(argument, type, dir);
-
-    if (!*type)
-	send_to_char("Open what?\n\r", ch);
-    else if (generic_find(argument, FIND_OBJ_INV | FIND_OBJ_ROOM, ch, &victim, &obj))
-    {
-	// this is an object
-
-	if (obj->obj_flags.type_flag != ITEM_CONTAINER)
-	    send_to_char("That's not a container.\n\r", ch);
-	else if (!IS_SET(obj->obj_flags.value[1], CONT_CLOSED))
-	    send_to_char("But it's already open!\n\r", ch);
-	else if (!IS_SET(obj->obj_flags.value[1], CONT_CLOSEABLE))
-	    send_to_char("You can't do that.\n\r", ch);
-	else if (IS_SET(obj->obj_flags.value[1], CONT_LOCKED))
-	    send_to_char("It seems to be locked.\n\r", ch);
-	else
-	{
-	    REMOVE_BIT(obj->obj_flags.value[1], CONT_CLOSED);
-	    send_to_char("Ok.\n\r", ch);
-	    act("$n opens $p.", ch, obj, 0, TO_ROOM, 0);
-	}
-    }
-    else if ((door = find_door(ch, type, dir)) >= 0)
-
-	/* perhaps it is a door */
-
-	if (!IS_SET(EXIT(ch, door)->exit_info, EX_ISDOOR))
-	    send_to_char("That's impossible, I'm afraid.\n\r", ch);
-	else if (!IS_SET(EXIT(ch, door)->exit_info, EX_CLOSED))
-	    send_to_char("It's already open!\n\r", ch);
-	else if (IS_SET(EXIT(ch, door)->exit_info, EX_LOCKED))
-	    send_to_char("It seems to be locked.\n\r", ch);
-	else if (IS_SET(EXIT(ch, door)->exit_info, EX_IMM_ONLY) && GET_LEVEL(ch) < IMMORTAL)
-	    send_to_char("It seems to slither and resist your attempt to touch it.\n\r", ch);
-	else
-	{
-	    REMOVE_BIT(EXIT(ch, door)->exit_info, EX_CLOSED);
-	    
-	    if(IS_SET(EXIT(ch, door)->exit_info, EX_HIDDEN)) {
-	      if (EXIT(ch, door)->keyword) {
-	        act("$n reveals a hidden $F!", ch, 0, EXIT(ch, door)->keyword,
-		    TO_ROOM, 0);
-	        csendf(ch, "You reveal a hidden %s!\n\r",
-	              fname((char *)EXIT(ch, door)->keyword));
-	      }
-	      else {
-	        act("$n reveals a hidden door!",ch, 0, EXIT(ch, door)->keyword,
-		    TO_ROOM, 0);
-	        send_to_char("You reveal a hidden door!\n\r", ch);
-	      }
-	    }
-	    else {
-	      if (EXIT(ch, door)->keyword)
-		  act("$n opens the $F.", ch, 0, EXIT(ch, door)->keyword,
-		      TO_ROOM, 0);
-	      else
-                act("$n opens the door.", ch, 0, 0, TO_ROOM, 0);
-	      send_to_char("Ok.\n\r", ch);
-	    }
-	    
-	    /* now for opening the OTHER side of the door! */
-	    if ((other_room = EXIT(ch, door)->to_room) != NOWHERE)
-	    if ( ( back = world[other_room].dir_option[rev_dir[door]] ) != 0 ) 
-		    if (back->to_room == ch->in_room)
-		    {
-			REMOVE_BIT(back->exit_info, EX_CLOSED);
-			if ((back->keyword) &&
-                  !IS_SET(world[EXIT(ch, door)->to_room].room_flags, QUIET))
-			{                    
-
-			    sprintf(buf,
-				"The %s is opened from the other side.\n\r",
-				fname(back->keyword));
-			    send_to_room(buf, EXIT(ch, door)->to_room);
-			}
-			else
-			    send_to_room(
-			    "The door is opened from the other side.\n\r",
-			    EXIT(ch, door)->to_room);
-		    }  
-                      
-	    if((IS_SET(world[ch->in_room].room_flags, FALL_DOWN) && (door = 5)) ||
-	       (IS_SET(world[ch->in_room].room_flags, FALL_UP) && (door = 4)) ||
-	       (IS_SET(world[ch->in_room].room_flags, FALL_EAST) && (door = 1)) ||
-	       (IS_SET(world[ch->in_room].room_flags, FALL_WEST) && (door = 3)) ||
-	       (IS_SET(world[ch->in_room].room_flags, FALL_SOUTH) && (door = 2)) ||
-	       (IS_SET(world[ch->in_room].room_flags, FALL_NORTH) && (door = 0))) 
-	    {
-                int success = 0;
-
-	        // opened the door that kept them from falling out
-	        for(victim = world[ch->in_room].people; victim; victim = next_vict)
-                {
-                   next_vict = victim->next_in_room;
-                   if(IS_NPC(victim) || IS_AFFECTED(victim, AFF_FLYING))
-                      continue;
-                   if(!success) {
-                      send_to_room("With the door no longer closed for support, this areas strange gravity takes over!\r\n", victim->in_room);
-                      success = 1;
-                   }
-                   if(victim == ch)
-                      retval = do_fall(victim, door);
-                   else do_fall(victim, door);
-                }
-	    }
-	}
-  // in case ch died or anything
-  if(retval)
-     return retval;
-  return eSUCCESS;
-}
-
-
-int do_close(CHAR_DATA *ch, char *argument, int cmd)
-{
-    int door, other_room;
-    char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
-    struct room_direction_data *back;
-    struct obj_data *obj;
-    CHAR_DATA *victim;
-
-    argument_interpreter(argument, type, dir);
-
-    if (!*type)
-	send_to_char("Close what?\n\r", ch);
-    else if (generic_find(argument, FIND_OBJ_INV | FIND_OBJ_ROOM,
-	ch, &victim, &obj))
-
-	/* ths is an object */
-
-	if (obj->obj_flags.type_flag != ITEM_CONTAINER)
-	    send_to_char("That's not a container.\n\r", ch);
-	else if (IS_SET(obj->obj_flags.value[1], CONT_CLOSED))
-	    send_to_char("But it's already closed!\n\r", ch);
-	else if (!IS_SET(obj->obj_flags.value[1], CONT_CLOSEABLE))
-	    send_to_char("That's impossible.\n\r", ch);
-	else
-	{
-	    SET_BIT(obj->obj_flags.value[1], CONT_CLOSED);
-	    send_to_char("Ok.\n\r", ch);
-	    act("$n closes $p.", ch, obj, 0, TO_ROOM, 0);
-	}
-    else if ((door = find_door(ch, type, dir)) >= 0)
-
-	/* Or a door */
-
-	if (!IS_SET(EXIT(ch, door)->exit_info, EX_ISDOOR))
-	    send_to_char("That's absurd.\n\r", ch);
-	else if (IS_SET(EXIT(ch, door)->exit_info, EX_CLOSED))
-	    send_to_char("It's already closed!\n\r", ch);
-	else
-	{
-	    SET_BIT(EXIT(ch, door)->exit_info, EX_CLOSED);
-	    if (EXIT(ch, door)->keyword)
-		act("$n closes the $F.", ch, 0, EXIT(ch, door)->keyword,
-		    TO_ROOM, 0);
-	    else
-		act("$n closes the door.", ch, 0, 0, TO_ROOM, 0);
-	    send_to_char("Ok.\n\r", ch);
-	    /* now for closing the other side, too */
-	    if ((other_room = EXIT(ch, door)->to_room) != NOWHERE)
-	    if ( ( back = world[other_room].dir_option[rev_dir[door]] ) != 0 )
-		    if (back->to_room == ch->in_room)
-		    {
-			SET_BIT(back->exit_info, EX_CLOSED);
-			if ((back->keyword) && 
-                   !IS_SET(world[EXIT(ch, door)->to_room].room_flags, QUIET))
-                        {
-			   sprintf(buf, "The %s closes quietly.\n\r",
-			           fname(back->keyword));
-			   send_to_room(buf, EXIT(ch, door)->to_room);
-			}
-			else
-			  send_to_room("The door closes quietly.\n\r",
-				       EXIT(ch, door)->to_room);
-		    }                        
-	}
-  return eSUCCESS;
-}
-
-
-int has_key(CHAR_DATA *ch, int key)
-{
-    struct obj_data *o;
-
-    if (ch->equipment[HOLD]) {
-	if (obj_index[ch->equipment[HOLD]->item_number].virt == key)
-	    return(1);
-        // This item is the 'enchanted box' contest prize (master key)
-	if (obj_index[ch->equipment[HOLD]->item_number].virt == 458)
-	    return(1);
-    }
-
-    for (o = ch->carrying; o; o = o->next_content)
-	if (obj_index[o->item_number].virt == key)
-	    return(1);
-
-    return(0);
-}
-
-
-int do_lock(CHAR_DATA *ch, char *argument, int cmd)
-{
-    int door, other_room;
-    char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH];
-    struct room_direction_data *back;
-    struct obj_data *obj;
-    CHAR_DATA *victim;
-
-    argument_interpreter(argument, type, dir);
-
-    if (!*type)
-	send_to_char("Lock what?\n\r", ch);
-    else if (generic_find(argument, FIND_OBJ_INV | FIND_OBJ_ROOM,
-	ch, &victim, &obj))
-
-	/* ths is an object */
-
-	if (obj->obj_flags.type_flag != ITEM_CONTAINER)
-	    send_to_char("That's not a container.\n\r", ch);
-	else if (!IS_SET(obj->obj_flags.value[1], CONT_CLOSED))
-	    send_to_char("Maybe you should close it first...\n\r", ch);
-	else if (obj->obj_flags.value[2] < 0)
-	    send_to_char("That thing can't be locked.\n\r", ch);
-	else if (!has_key(ch, obj->obj_flags.value[2]))
-	    send_to_char("You don't seem to have the proper key.\n\r", ch); 
-	else if (IS_SET(obj->obj_flags.value[1], CONT_LOCKED))
-	    send_to_char("It is locked already.\n\r", ch);
-	else
-	{
-	    SET_BIT(obj->obj_flags.value[1], CONT_LOCKED);
-	    send_to_char("*Cluck*\n\r", ch);
-	    act("$n locks $p - 'cluck', it says.", ch, obj, 0, TO_ROOM, 0);
-	}
-    else if ((door = find_door(ch, type, dir)) >= 0)
-
-	/* a door, perhaps */
-
-	if (!IS_SET(EXIT(ch, door)->exit_info, EX_ISDOOR))
-	    send_to_char("That's absurd.\n\r", ch);
-	else if (!IS_SET(EXIT(ch, door)->exit_info, EX_CLOSED))
-	    send_to_char("You have to close it first, I'm afraid.\n\r", ch);
-	else if (EXIT(ch, door)->key < 0)
-	    send_to_char("There does not seem to be any keyholes.\n\r", ch);
-	else if (!has_key(ch, EXIT(ch, door)->key))
-	    send_to_char("You don't have the proper key.\n\r", ch);
-	else if (IS_SET(EXIT(ch, door)->exit_info, EX_LOCKED))
-	    send_to_char("It's already locked!\n\r", ch);
-	else
-	{
-	    SET_BIT(EXIT(ch, door)->exit_info, EX_LOCKED);
-	    if (EXIT(ch, door)->keyword)
-		act("$n locks the $F.", ch, 0,  EXIT(ch, door)->keyword,
-		    TO_ROOM, 0);
-	    else
-		act("$n locks the door.", ch, 0, 0, TO_ROOM, 0);
-	    send_to_char("*Click*\n\r", ch);
-	    /* now for locking the other side, too */
-	    if ((other_room = EXIT(ch, door)->to_room) != NOWHERE)
-	    if ( ( back = world[other_room].dir_option[rev_dir[door]] ) != 0 )
-		    if (back->to_room == ch->in_room)
-			SET_BIT(back->exit_info, EX_LOCKED);
-	}
-  return eSUCCESS;
-}
-
-
-int do_unlock(CHAR_DATA *ch, char *argument, int cmd)
-{
-    int door, other_room;
-    char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH];
-    struct room_direction_data *back;
-    struct obj_data *obj;
-    CHAR_DATA *victim;
-
-    argument_interpreter(argument, type, dir);
-
-    if (!*type)
-	send_to_char("Unlock what?\n\r", ch);
-    else if (generic_find(argument, FIND_OBJ_INV | FIND_OBJ_ROOM,
-	ch, &victim, &obj))
-
-	/* ths is an object */
-
-	if (obj->obj_flags.type_flag != ITEM_CONTAINER)
-	    send_to_char("That's not a container.\n\r", ch);
-	else if (!IS_SET(obj->obj_flags.value[1], CONT_CLOSED))
-	    send_to_char("Silly - it ain't even closed!\n\r", ch);
-	else if (obj->obj_flags.value[2] < 0)
-	    send_to_char("Odd - you can't seem to find a keyhole.\n\r", ch);
-	else if (!has_key(ch, obj->obj_flags.value[2]))
-	    send_to_char("You don't seem to have the proper key.\n\r", ch); 
-	else if (!IS_SET(obj->obj_flags.value[1], CONT_LOCKED))
-	    send_to_char("Oh.. it wasn't locked, after all.\n\r", ch);
-	else
-	{
-	    REMOVE_BIT(obj->obj_flags.value[1], CONT_LOCKED);
-	    send_to_char("*Click*\n\r", ch);
-	    act("$n unlocks $p.", ch, obj, 0, TO_ROOM, 0);
-	}
-    else if ((door = find_door(ch, type, dir)) >= 0)
-
-	/* it is a door */
-
-	if (!IS_SET(EXIT(ch, door)->exit_info, EX_ISDOOR))
-	    send_to_char("That's absurd.\n\r", ch);
-	else if (!IS_SET(EXIT(ch, door)->exit_info, EX_CLOSED))
-	    send_to_char("Heck ... it ain't even closed!\n\r", ch);
-	else if (EXIT(ch, door)->key < 0)
-	    send_to_char("You can't seem to spot any keyholes.\n\r", ch);
-	else if (!has_key(ch, EXIT(ch, door)->key))
-	    send_to_char("You do not have the proper key for that.\n\r", ch);
-	else if (!IS_SET(EXIT(ch, door)->exit_info, EX_LOCKED))
-	    send_to_char("It's already unlocked, it seems.\n\r", ch);
-	else
-	{
-	    REMOVE_BIT(EXIT(ch, door)->exit_info, EX_LOCKED);
-	    if (EXIT(ch, door)->keyword)
-		act("$n unlocks the $F.", ch, 0, EXIT(ch, door)->keyword,
-		    TO_ROOM, 0);
-	    else
-		act("$n unlocks the door.", ch, 0, 0, TO_ROOM, 0);
-	    send_to_char("*click*\n\r", ch);
-	    /* now for unlocking the other side, too */
-	    if ((other_room = EXIT(ch, door)->to_room) != NOWHERE)
-	    if ( ( back = world[other_room].dir_option[rev_dir[door]] ) != 0 )
-		    if (back->to_room == ch->in_room)
-			REMOVE_BIT(back->exit_info, EX_LOCKED);
-	}
   return eSUCCESS;
 }
 
@@ -1058,12 +698,9 @@ void do_arrow_miss(struct char_data *ch, struct char_data *victim, int
 {
   char buf[200];
 
-  extern int rev_dir[];
   extern char * dirs[];
 
-  buf[199] = '\0'; /* cause I'm paranoid */
-
-  switch(number(1,5))
+  switch(number(1,6))
   {
      case 1: send_to_char("You miss your shot.\r\n", ch);
              break;
@@ -1108,13 +745,11 @@ void do_arrow_miss(struct char_data *ch, struct char_data *victim, int
   }
 }
 
-void mob_arrow_response(struct char_data *ch, struct char_data *victim, 
+int mob_arrow_response(struct char_data *ch, struct char_data *victim, 
                         int dir)
 {
   int dir2 = 0;
-
-  /* extern char * dirs[]; */
-  extern int rev_dir[]; 
+  int retval;
 
   int attempt_move(CHAR_DATA *, int, int);
 
@@ -1127,7 +762,7 @@ void mob_arrow_response(struct char_data *ch, struct char_data *victim,
   {
     if(!number(0,20))
        do_shout(victim, "Duh George, someone keeps shooting me!", 9);    
-    return;
+    return eSUCCESS;
   }
 
   /* make mob hate the person, but _not_ track them, this should 
@@ -1137,9 +772,9 @@ void mob_arrow_response(struct char_data *ch, struct char_data *victim,
 
   add_memory(victim, GET_NAME(ch), 'h');
 
-/* don't want the mob leaving a fight its already in */
+  /* don't want the mob leaving a fight its already in */
   if(victim->fighting)
-     return;
+     return eSUCCESS;
 
   if(number(0,1))
   {
@@ -1154,7 +789,7 @@ void mob_arrow_response(struct char_data *ch, struct char_data *victim,
               )
              && !IS_SET(world[EXIT(victim, dir2)->to_room].room_flags,NO_TRACK))
              /* send 1-6 since attempt move --cmd's it */
-             attempt_move(victim, dir2, 0);
+             return attempt_move(victim, dir2+1, 0);
        }
     }
   }
@@ -1175,9 +810,12 @@ void mob_arrow_response(struct char_data *ch, struct char_data *victim,
         if(!IS_SET(world[EXIT(victim, dir2)->to_room].room_flags,NO_TRACK))       
         {
           /* dir+1 it since attempt_move will --cmd it */    
-          if(!attempt_move(victim, (dir2+1), 0))
-            /* The monster can't go after the archer */
-            {do_flee(victim, "", 0); return; }
+          retval = attempt_move(victim, (dir2+1), 0);
+          if(SOMEONE_DIED(retval))
+             return retval;
+
+          if(IS_SET(retval, eFAILURE))   // can't go after the archer
+            return do_flee(victim, "", 0); 
         }
     }    
       if(number(1, 5) == 1)
@@ -1185,15 +823,16 @@ void mob_arrow_response(struct char_data *ch, struct char_data *victim,
         do_shout(victim, "Where the fuck are these arrows coming from?!", 9);
         else do_shout(victim, "Quit shooting me dammit!", 9);
   }
+  return eSUCCESS;
 }
 
-void do_arrow_damage(struct char_data *ch, struct char_data *victim, 
+int do_arrow_damage(struct char_data *ch, struct char_data *victim, 
                      int dir, int dam, int artype,
                      struct obj_data *found)
 {
   char buf[200];
+  int retval;
 
-  extern int rev_dir[];
   extern char * dirs[];
   void inform_victim(CHAR_DATA *, CHAR_DATA *, int);
 
@@ -1250,7 +889,9 @@ void do_arrow_damage(struct char_data *ch, struct char_data *victim,
       default: break;
     }
     if(IS_NPC(victim)) 
-      mob_arrow_response(ch, victim, dir);
+      retval = mob_arrow_response(ch, victim, dir);
+      if(SOMEONE_DIED(retval)) // mob died somehow while moving
+         return retval;
   } 
 
   GET_HIT(victim) -= dam;
@@ -1260,23 +901,24 @@ void do_arrow_damage(struct char_data *ch, struct char_data *victim,
   if(GET_HIT(victim) > 0)
      GET_POS(victim) = POSITION_STANDING;
 
-/* This is a cut & paste from fight.C cause I can't think of a better way
-to do it */
+/* This is a cut & paste from fight.C cause I can't think of a better way to do it */
 
   /* Payoff for killing things. */
   if(GET_HIT(victim) < 0)
   {
     group_gain(ch, victim);
     fight_kill(ch, victim, TYPE_CHOOSE);
-    return;
+    return (eSUCCESS | eVICT_DIED);
   } /* End of Hit < 0 */
+
+  return eSUCCESS;
 }
 
 
 int do_fire(struct char_data *ch, char *arg, int cmd)
 {
   struct char_data *victim;
-  int percent, prob, dam, dir, artype, cost;
+  int percent, prob, dam, dir, artype, cost, retval, learned, specialization;
   struct obj_data *found;
   unsigned cur_room, new_room;
   char direct[MAX_STRING_LENGTH], arrow[MAX_STRING_LENGTH], 
@@ -1293,11 +935,14 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
   *target = '\0';
   *arrow = '\0';
 
-  if(GET_CLASS(ch) != CLASS_RANGER && GET_CLASS(ch) != CLASS_WARRIOR)
-  {
-    send_to_char("Leave it to those accomplished enough to do it.\r\n", ch);
+  if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
+    learned = 75;
+  else if(!(learned = has_skill(ch, SKILL_ARCHERY))) {
+    send_to_char("You've no idea how those pointy things with strings and feathers work.\r\n", ch);
     return eFAILURE;
   }
+  specialization = learned / 100;
+  learned = learned % 100;
 
   if (!ch->equipment[HOLD])
   {
@@ -1323,6 +968,7 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
     return eFAILURE;
   }
 */
+
 /*  Command syntax is: fire <dir> [arrowtype] [target] 
     if there is !arrowtype, then choose standard arrow
     if there is !target, then choose a random target in room */
@@ -1549,43 +1195,39 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
             break;
   }
 
+
   percent = number(1, 101);
-  prob = has_skill(ch, SKILL_ARCHERY);
+  prob = 65;
+
   GET_MANA(ch) -= cost;
-
-  if((GET_CLASS(ch) != CLASS_RANGER) && (GET_CLASS(ch) != CLASS_WARRIOR))
-    prob /= 2;
-
-  if(GET_CLASS(ch) == CLASS_WARRIOR) 
-    prob -= 10;
 
   prob += ch->equipment[HOLD]->obj_flags.value[0];
   prob += found->obj_flags.value[2];
 
-  prob += (GET_AC(victim)/10);
+  prob += -10 - (GET_AC(victim)/10);
+
   if(prob < 10) prob = 10;
   if(prob > 100) prob = 100;
 
   if(percent > prob)
-  { /* missed */
+  {
+    retval = eSUCCESS;
     do_arrow_miss(ch, victim, dir, found);
   }
   else 
-  { /* hit */
-    do_arrow_damage(ch, victim, dir, dam, artype, found);
-  }
-/* command lag the ranger for a round */
-   add_command_lag(ch, 1);
+    retval = do_arrow_damage(ch, victim, dir, dam, artype, found);
 
-/* take the arrow from the game */
+  add_command_lag(ch, 1);
   extract_obj(found);
-  return eSUCCESS;
+
+  return retval;
 }
 
 int do_mind_delve(struct char_data *ch, char *arg, int cmd)
 {
   char buf[1000];
   char_data * target = NULL;
+//  int learned, specialization;
 
   if(!*arg) {
     send_to_char("Delve into whom?\r\n", ch);
@@ -1593,6 +1235,20 @@ int do_mind_delve(struct char_data *ch, char *arg, int cmd)
   }
 
   one_argument(arg, arg);
+
+/*
+  TODO - make this into a skill and put it in
+
+  if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
+     learned = 75;
+  else if(!(learned = has_skill(ch, SKILL_MIND_DELVE))) {
+     send_to_char("You try to think like a chipmunk and go nuts.\r\n", ch);
+     return eFAILURE;
+  }
+  specialization = learned / 100;
+  learned = learned % 100;
+
+*/
 
   target = get_char_room_vis(ch, arg);
 

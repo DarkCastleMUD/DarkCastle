@@ -55,12 +55,11 @@ void * dc_realloc(void * oldptr, size_t size)
   return(new_mem);
 }
 
-void *dc_free(void *ptr)
+void *dc_free(void * ptr)
 {
 	if(ptr)
 	{
 		free(ptr);
 	}
-	ptr = NULL;
-	return(ptr);
+	return NULL;
 }

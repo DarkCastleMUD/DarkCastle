@@ -832,44 +832,42 @@ int do_trans(struct char_data *ch, char *argument, int cmd)
     one_argument(argument,buf);
     if (!*buf)
         send_to_char("Whom do you wish to transfer?\n\r",ch);
-    else if (str_cmp("all", buf)) {
-        if (!(victim = get_char_vis(ch,buf)))
-            send_to_char("No-one by that name around.\n\r",ch);
-        else {
-    if (world[ch->in_room].number == 25 && !isname(GET_NAME(ch), "Pirahna"))
-      {
-      send_to_char ("Damn! that is rude! This ain't your place. :P\n\r", ch);
-      return eFAILURE;
-      }
-            act("$n disappears in a mushroom cloud.",
-                victim, 0, 0, TO_ROOM, 0);
-            target = ch->in_room;
-	    csendf(ch, "Moving %s from %d to %d.\n\r", GET_NAME(victim),
-	           world[victim->in_room].number, world[target].number);
-	    move_char(victim, target);
-            act("$n arrives from a puff of smoke.",
-                victim, 0, 0, TO_ROOM, 0);
-            act("$n has transferred you!",ch,0,victim,TO_VICT, 0);
-            do_look(victim,"",15);
-            send_to_char("Ok.\n\r",ch);
-        }
+    else if (str_cmp("all", buf)) 
+    {
+       if (!(victim = get_char_vis(ch,buf)))
+          send_to_char("No-one by that name around.\n\r",ch);
+       else {
+          if (world[ch->in_room].number == 25 && !isname(GET_NAME(ch), "Pirahna"))
+          {
+            send_to_char ("Damn! That is rude! This ain't your place. :P\n\r", ch);
+            return eFAILURE;
+          }
+          act("$n disappears in a mushroom cloud.", victim, 0, 0, TO_ROOM, 0);
+          target = ch->in_room;
+          csendf(ch, "Moving %s from %d to %d.\n\r", GET_NAME(victim),
+               world[victim->in_room].number, world[target].number);
+          move_char(victim, target);
+          act("$n arrives from a puff of smoke.", victim, 0, 0, TO_ROOM, 0);
+          act("$n has transferred you!",ch,0,victim,TO_VICT, 0);
+          do_look(victim,"",15);
+          send_to_char("Ok.\n\r",ch);
+       }
     } else { /* Trans All */
-    for (i = descriptor_list; i; i = i->next)
-            if (i->character != ch && !i->connected) {
-                victim = i->character;
-                act("$n disappears in a mushroom cloud.",
-                     victim, 0, 0, TO_ROOM, 0);
-                target = ch->in_room;
-		move_char(victim, target);
-                act("$n arrives from a puff of smoke.",
-                     victim, 0, 0, TO_ROOM, 0);
-                act("$n has transferred you!",ch,0,victim,TO_VICT, 0);
-                do_look(victim,"",15);
-            }
+       for (i = descriptor_list; i; i = i->next)
+          if (i->character != ch && !i->connected) 
+          {
+             victim = i->character;
+             act("$n disappears in a mushroom cloud.", victim, 0, 0, TO_ROOM, 0);
+             target = ch->in_room;
+             move_char(victim, target);
+             act("$n arrives from a puff of smoke.", victim, 0, 0, TO_ROOM, 0);
+             act("$n has transferred you!",ch,0,victim,TO_VICT, 0);
+             do_look(victim,"",15);
+          }
 
-        send_to_char("Ok.\n\r",ch);
+       send_to_char("Ok.\n\r",ch);
     }
-  return eSUCCESS;
+    return eSUCCESS;
 }
 
 int do_teleport(struct char_data *ch, char *argument, int cmd)

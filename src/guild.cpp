@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.4 2002/07/13 06:37:04 pirahna Exp $
+| $Id: guild.cpp,v 1.5 2002/07/28 02:04:14 pirahna Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -363,3 +363,59 @@ int skill_master(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     return eSUCCESS;
 }
 
+// we could always look up learned in here, but it's better if it's passed in
+// most skills already have the learned looked up, and there's no point in traversing
+// the skill list once again just to find out
+void skill_increase_check(char_data * ch, int skill, int learned, int difficulty)
+{
+   int chance, maximum;
+
+   if(learned > ( GET_LEVEL(ch) * 2 ))
+      return;
+
+   class_skill_defines * skilllist = get_skill_list(ch);
+   if(!skilllist)
+     return;  // class has no skills by default
+
+   maximum = 0;
+   for(int i = 0; *skilllist[i].skillname != '\n'; i++)
+     if(skilllist[i].skillnum == skill)
+     {
+       maximum = skilllist[i].maximum;
+       break;
+     }
+
+   if(learned >= maximum)
+     return;
+
+   chance = number(1, 101);
+   switch(difficulty) {
+     case SKILL_INCREASE_EASY:
+        if(chance < 86)
+           return;
+        break;
+     case SKILL_INCREASE_MEDIUM:
+        if(chance < 96)
+           return;
+        break;
+     case SKILL_INCREASE_HARD:
+        if(chance < 101)
+           return;
+        break;
+     default:
+       log("Illegal difficulty value sent to skill_increase_check", IMMORTAL, LOG_BUG);
+       break;
+   }
+
+   // figure out the name of the affect (if any)
+   char * skillname = get_skill_name(skill);
+
+   if(!skillname) {
+      csendf(ch, "Increase in unknown skill %d.  Tell a god. (bug)\r\n", skill);
+      return;
+   }
+
+   // increase the skill by one
+   learn_skill(ch, skill, 1, maximum);
+   csendf(ch, "You feel more competent in your %s ability.\r\n", skillname);
+}

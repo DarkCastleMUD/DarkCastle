@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.8 2002/07/23 21:56:34 pirahna Exp $ */
+/* $Id: mob_proc.cpp,v 1.9 2002/07/28 02:04:15 pirahna Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -3767,7 +3767,10 @@ int ranger_non_combat(struct char_data *ch, struct obj_data *obj, int cmd, char 
       ch->ambush = str_dup(get_random_hate(ch));
     }
     else if(ch->ambush)
+    {
       dc_free(ch->ambush);
+      ch->ambush = NULL;
+    }
 
     if(GET_HIT(ch) < GET_MAX_HIT(ch) && number(1,3) == 1) {
       act("$n utters the words 'Herb Lore'.", ch, 0, 0, TO_ROOM, INVIS_NULL);

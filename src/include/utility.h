@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: utility.h,v 1.5 2002/07/13 19:19:35 azrack Exp $ */
+/* $Id: utility.h,v 1.6 2002/07/28 02:04:19 pirahna Exp $ */
 
 #ifndef UTILITY_H_
 #define UTILITY_H_
@@ -47,7 +47,19 @@ char *index(char *buf, char op);
 
 // END TODO
 
+// Defines for gradual skill increase code
+// Usage is defined in guild.cpp
 
+#define SKILL_INCREASE_EASY           100
+#define SKILL_INCREASE_MEDIUM         200
+#define SKILL_INCREASE_HARD           300
+
+void skill_increase_check(char_data * ch, int skill, int learned, int difficulty);
+
+// End defines for gradual skill increase code
+
+
+// TODO - I don't think we ever use this
 #define REMOVE_FROM_LIST(item, head, next)      \
    if ((item) == (head))                \
       head = (item)->next;              \
@@ -93,12 +105,7 @@ int  DARK_AMOUNT( int room );
 bool IS_DARK( int room );
 #define IS_LIGHT(room)  (!IS_DARK(room))
 
-#define IS_ARENA(room) \
-	(IS_SET(world[room].room_flags, ARENA))
-
-#define GET_REQ(i) (i<2  ? "Awful" :(i<4  ? "Bad"     :(i<7  ? "Poor"      :\
-(i<10 ? "Average" :(i<14 ? "Fair"    :(i<20 ? "Good"    :(i<24 ? "Very good" :\
-	"Superb" )))))))
+#define IS_ARENA(room) (IS_SET(world[room].room_flags, ARENA))
 
 #define HSHR(ch) ((ch)->sex ?                    \
     (((ch)->sex == 1) ? "his" : "her") : "its")
@@ -282,8 +289,8 @@ int32	move_limit	(CHAR_DATA *ch);
 int32	mana_limit	(CHAR_DATA *ch);
 int32	ki_limit	(CHAR_DATA *ch);
 int32	hit_limit	(CHAR_DATA *ch);
-//int	guild		(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, CHAR_DATA *ch);
 int	has_skill	(CHAR_DATA *ch, sh_int skill);
+char *  get_skill_name  (int skillnum);
 void	gain_exp_regardless	(CHAR_DATA *ch, int gain);
 void	advance_level	(CHAR_DATA *ch, int is_conversion);
 void	close_socket	(struct descriptor_data *d);

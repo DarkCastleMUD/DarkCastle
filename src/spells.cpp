@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.5 2002/07/24 19:01:13 pirahna Exp $ */
+/* $Id: spells.cpp,v 1.6 2002/07/28 02:04:15 pirahna Exp $ */
 
 extern "C"
 {
@@ -934,7 +934,7 @@ void affect_update( void )
                break;
              case SKILL_FOCUSED_REPELANCE:
                REMOVE_BIT(i->combat, COMBAT_REPELANCE);
-               send_to_char("Your mind can no longer maintain your magical barriers.\n\r", i);
+               send_to_char("Your mind recovers from the repelance.\n\r", i);
                break;
              case SKILL_VITAL_STRIKE:
                send_to_char("The internal strength and speed from your vital strike has returned.\r\n", i);

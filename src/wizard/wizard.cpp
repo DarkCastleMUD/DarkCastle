@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.8 2002/07/16 20:52:01 pirahna Exp $
+| $Id: wizard.cpp,v 1.9 2002/07/28 02:04:19 pirahna Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -758,19 +758,14 @@ void mob_stat(struct char_data *ch, struct char_data *k)
     send_to_char("\n\r$3Affecting Spells$R:\n\r--------------\n\r", ch);
     for(aff = k->affected; aff; aff = aff->next) {
 
-      char * aff_name = NULL;
-      if(aff->type <= MAX_SPL_LIST)
-           aff_name = spells[aff->type-1];
-      else if(aff->type >= KI_OFFSET && aff->type <= (KI_OFFSET + MAX_KI_LIST))
-           aff_name = ki[aff->type - KI_OFFSET];
-      else if(aff->type >= SKILL_BASE && aff->type <= SKILL_MAX)
-           aff_name = skills[aff->type - SKILL_BASE];
-      else if(aff->type >= SKILL_SONG_BASE && aff->type <= SKILL_SONG_MAX)
-           aff_name = songs[aff->type - SKILL_SONG_BASE];
-      else if(aff->type == INTERNAL_SLEEPING)
+      char * aff_name = get_skill_name(aff->type);
+      
+      if(!aff_name)
+      {
+         if(aff->type == INTERNAL_SLEEPING)
            aff_name = "Internal Sleeping";
-      else aff_name = "Unknown!!!";
-
+         else aff_name = "Unknown!!!";
+      }
       sprintf(buf, "Spell : '%s'\n\r", aff_name);
       send_to_char(buf, ch);
       sprintf(buf,"     Modifies %s by %d points\n\r",

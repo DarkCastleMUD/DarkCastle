@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: mob_act.cpp,v 1.3 2002/07/12 00:12:32 pirahna Exp $ */
+/* $Id: mob_act.cpp,v 1.4 2002/07/28 02:04:15 pirahna Exp $ */
 
 extern "C"
 {
@@ -619,8 +619,9 @@ void mobile_activity(void)
       {
         add_memory(ch, get_random_hate(ch), 't');
         if(!IS_AFFECTED(ch, AFF_BLIND)) {
-          do_track(ch, get_random_hate(ch), 9);
-          continue;
+          retval = do_track(ch, get_random_hate(ch), 9);
+          if(SOMEONE_DIED(retval))
+             continue;
         }
       }
     }  //  end FIRST hatred IF statement 

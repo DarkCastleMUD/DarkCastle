@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.5 2002/07/13 19:19:30 azrack Exp $ */
+/* $Id: utility.cpp,v 1.6 2002/07/28 02:04:15 pirahna Exp $ */
 
 extern "C"
 {
@@ -1219,6 +1219,26 @@ int has_skill (CHAR_DATA *ch, sh_int skill)
   }
 
   return 0;
+}
+
+// if a skill has a valid name, return it, else NULL
+char * get_skill_name(int skillnum)
+{
+    extern char *skills[];
+    extern char *spells[];
+    extern char *ki[];
+    extern char *songs[];
+
+    if(skillnum >= SKILL_SONG_BASE && skillnum <= SKILL_SONG_MAX)
+       return songs[skillnum-SKILL_SONG_BASE];
+    else if(skillnum >= SKILL_BASE && skillnum <= SKILL_MAX)
+       return skills[skillnum-SKILL_BASE];
+    else if(skillnum >= KI_OFFSET && skillnum <= (KI_OFFSET+MAX_KI_LIST))
+       return ki[skillnum-KI_OFFSET];
+    else if(skillnum >= 0 && skillnum <= MAX_SPL_LIST)
+       return spells[skillnum-1];
+
+   return NULL;      
 }
 
 void double_dollars(char * destination, char * source)

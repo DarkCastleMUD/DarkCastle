@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.4 2002/06/29 18:16:22 pirahna Exp $
+| $Id: inventory.cpp,v 1.5 2002/07/28 02:04:14 pirahna Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -34,11 +34,12 @@ extern "C"
 /* extern variables */
 
 extern CWorld world;
- 
+extern struct index_data *obj_index; 
 extern struct descriptor_data *descriptor_list;
 extern struct str_app_type str_app[];
 extern struct index_data *mob_index;
 extern struct obj_data *object_list;
+extern int rev_dir[];
 
 /* extern functions */
 char *fname(char *namelist);
@@ -1105,5 +1106,393 @@ struct obj_data * search_char_for_item(char_data * ch, sh_int item_number)
     }
   }
   return NULL;
+}
+
+int find_door(CHAR_DATA *ch, char *type, char *dir)
+{
+    char buf[MAX_STRING_LENGTH];
+    int door;
+    char *dirs[] =
+    {
+        "north",
+        "east",
+        "south",
+        "west",
+        "up",
+        "down",
+        "\n"
+    };
+  
+    if (*dir) /* a direction was specified */
+    {
+        if ((door = search_block(dir, dirs, FALSE)) == -1) /* Partial Match */
+        {
+            send_to_char("That's not a direction.\n\r", ch);
+            return(-1);
+        }
+     
+        if (EXIT(ch, door))
+            if (EXIT(ch, door)->keyword)
+                if (isname(type, EXIT(ch, door)->keyword))
+                    return(door);
+                else
+                {
+                    sprintf(buf, "There is no %s there.\n\r", type);
+                    send_to_char(buf, ch);
+                    return(-1);
+                }
+            else
+                return(door);
+        else
+        {   
+            sprintf(buf, "There is no %s there.\n\r", type);
+            send_to_char(buf, ch);
+            return(-1);
+        }
+    }
+    else // try to locate the keyword
+    {
+        for (door = 0; door <= 5; door++)
+            if (EXIT(ch, door))
+                if (EXIT(ch, door)->keyword)
+                    if (isname(type, EXIT(ch, door)->keyword))
+                        return(door);
+                        
+        sprintf(buf, "I see no %s here.\n\r", type);
+        send_to_char(buf, ch);
+        return(-1);
+    }
+}
+
+
+int do_open(CHAR_DATA *ch, char *argument, int cmd)
+{
+   int door, other_room, retval;
+   char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
+   struct room_direction_data *back;
+   struct obj_data *obj;
+   CHAR_DATA *victim;
+   CHAR_DATA *next_vict;
+            
+   int do_fall(CHAR_DATA *ch, short dir);
+            
+   retval = 0;
+         
+   argument_interpreter(argument, type, dir);
+            
+   if (!*type)
+      send_to_char("Open what?\n\r", ch);
+   else if (generic_find(argument, FIND_OBJ_INV | FIND_OBJ_ROOM, ch, &victim, &obj))
+   {
+      // this is an object
+      if (obj->obj_flags.type_flag != ITEM_CONTAINER)
+         send_to_char("That's not a container.\n\r", ch);
+      else if (!IS_SET(obj->obj_flags.value[1], CONT_CLOSED))
+         send_to_char("But it's already open!\n\r", ch);
+      else if (!IS_SET(obj->obj_flags.value[1], CONT_CLOSEABLE))
+         send_to_char("You can't do that.\n\r", ch);
+      else if (IS_SET(obj->obj_flags.value[1], CONT_LOCKED))
+         send_to_char("It seems to be locked.\n\r", ch);   
+      else
+      {   
+         REMOVE_BIT(obj->obj_flags.value[1], CONT_CLOSED);
+         send_to_char("Ok.\n\r", ch);
+         act("$n opens $p.", ch, obj, 0, TO_ROOM, 0);
+      }
+   }
+   else if ((door = find_door(ch, type, dir)) >= 0)
+   { 
+      if (!IS_SET(EXIT(ch, door)->exit_info, EX_ISDOOR))
+         send_to_char("That's impossible, I'm afraid.\n\r", ch);
+      else if (!IS_SET(EXIT(ch, door)->exit_info, EX_CLOSED))
+         send_to_char("It's already open!\n\r", ch);
+      else if (IS_SET(EXIT(ch, door)->exit_info, EX_LOCKED))
+         send_to_char("It seems to be locked.\n\r", ch);   
+      else if (IS_SET(EXIT(ch, door)->exit_info, EX_IMM_ONLY) && GET_LEVEL(ch) < IMMORTAL)
+         send_to_char("It seems to slither and resist your attempt to touch it.\n\r", ch);
+      else
+      {   
+         REMOVE_BIT(EXIT(ch, door)->exit_info, EX_CLOSED);
+            
+         if(IS_SET(EXIT(ch, door)->exit_info, EX_HIDDEN)) {
+            if (EXIT(ch, door)->keyword) {
+               act("$n reveals a hidden $F!", ch, 0, EXIT(ch, door)->keyword, TO_ROOM, 0);
+               csendf(ch, "You reveal a hidden %s!\n\r", fname((char *)EXIT(ch, door)->keyword));
+            }
+            else {
+               act("$n reveals a hidden door!",ch, 0, EXIT(ch, door)->keyword, TO_ROOM, 0);
+               send_to_char("You reveal a hidden door!\n\r", ch);
+            }
+         }  
+         else {
+           if (EXIT(ch, door)->keyword)
+              act("$n opens the $F.", ch, 0, EXIT(ch, door)->keyword, TO_ROOM, 0);
+           else
+              act("$n opens the door.", ch, 0, 0, TO_ROOM, 0);
+              send_to_char("Ok.\n\r", ch);
+         }
+             
+         /* now for opening the OTHER side of the door! */
+         if ((other_room = EXIT(ch, door)->to_room) != NOWHERE)
+            if ( ( back = world[other_room].dir_option[rev_dir[door]] ) != 0 )
+               if (back->to_room == ch->in_room)
+               {
+                  REMOVE_BIT(back->exit_info, EX_CLOSED);
+                  if ((back->keyword) && !IS_SET(world[EXIT(ch, door)->to_room].room_flags, QUIET))
+                  {
+                     sprintf(buf, "The %s is opened from the other side.\n\r",
+                                fname(back->keyword));
+                     send_to_room(buf, EXIT(ch, door)->to_room);
+                  }
+                  else
+                     send_to_room("The door is opened from the other side.\n\r",
+                                EXIT(ch, door)->to_room);
+               }
+
+         if((IS_SET(world[ch->in_room].room_flags, FALL_DOWN) && (door = 5)) ||
+            (IS_SET(world[ch->in_room].room_flags, FALL_UP) && (door = 4)) ||
+            (IS_SET(world[ch->in_room].room_flags, FALL_EAST) && (door = 1)) ||
+            (IS_SET(world[ch->in_room].room_flags, FALL_WEST) && (door = 3)) ||
+            (IS_SET(world[ch->in_room].room_flags, FALL_SOUTH) && (door = 2)) ||
+            (IS_SET(world[ch->in_room].room_flags, FALL_NORTH) && (door = 0)))
+         {
+            int success = 0;
+
+            // opened the door that kept them from falling out
+            for(victim = world[ch->in_room].people; victim; victim = next_vict)
+            {
+               next_vict = victim->next_in_room;
+               if(IS_NPC(victim) || IS_AFFECTED(victim, AFF_FLYING))  
+                  continue;
+               if(!success) {
+                  send_to_room("With the door no longer closed for support, this areas strange gravity takes over!\r\n", victim->in_room);
+                  success = 1;
+               }
+               if(victim == ch)
+                  retval = do_fall(victim, door);
+               else do_fall(victim, door);
+            }
+         }
+      }
+   }
+   // in case ch died or anything
+   if(retval)
+      return retval;
+   return eSUCCESS;
+}
+
+int do_close(CHAR_DATA *ch, char *argument, int cmd)
+{
+   int door, other_room;
+   char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
+   struct room_direction_data *back;
+   struct obj_data *obj;
+   CHAR_DATA *victim;   
+    
+   argument_interpreter(argument, type, dir);
+    
+   if (!*type)
+      send_to_char("Close what?\n\r", ch);
+   else if (generic_find(argument, FIND_OBJ_INV | FIND_OBJ_ROOM, ch, &victim, &obj))
+   {     
+      if (obj->obj_flags.type_flag != ITEM_CONTAINER)
+         send_to_char("That's not a container.\n\r", ch);
+      else if (IS_SET(obj->obj_flags.value[1], CONT_CLOSED))
+         send_to_char("But it's already closed!\n\r", ch); 
+      else if (!IS_SET(obj->obj_flags.value[1], CONT_CLOSEABLE))
+         send_to_char("That's impossible.\n\r", ch);
+      else
+      {   
+         SET_BIT(obj->obj_flags.value[1], CONT_CLOSED);
+         send_to_char("Ok.\n\r", ch);
+         act("$n closes $p.", ch, obj, 0, TO_ROOM, 0);
+      }
+   }
+   else if ((door = find_door(ch, type, dir)) >= 0)
+   {    
+      if (!IS_SET(EXIT(ch, door)->exit_info, EX_ISDOOR))
+         send_to_char("That's absurd.\n\r", ch);
+      else if (IS_SET(EXIT(ch, door)->exit_info, EX_CLOSED))
+         send_to_char("It's already closed!\n\r", ch);
+      else
+      {   
+         SET_BIT(EXIT(ch, door)->exit_info, EX_CLOSED);
+         if (EXIT(ch, door)->keyword)
+            act("$n closes the $F.", ch, 0, EXIT(ch, door)->keyword, TO_ROOM, 0);
+         else
+            act("$n closes the door.", ch, 0, 0, TO_ROOM, 0);
+         send_to_char("Ok.\n\r", ch);
+         /* now for closing the other side, too */
+         if ((other_room = EXIT(ch, door)->to_room) != NOWHERE)
+            if ( ( back = world[other_room].dir_option[rev_dir[door]] ) != 0 )
+               if (back->to_room == ch->in_room)
+               {
+                  SET_BIT(back->exit_info, EX_CLOSED);
+                  if ((back->keyword) &&
+                       !IS_SET(world[EXIT(ch, door)->to_room].room_flags, QUIET))
+                  {
+                     sprintf(buf, "The %s closes quietly.\n\r",
+                                   fname(back->keyword));
+                     send_to_room(buf, EXIT(ch, door)->to_room);
+                  }
+                  else
+                     send_to_room("The door closes quietly.\n\r",
+                                       EXIT(ch, door)->to_room);
+               }
+      }
+   }
+   return eSUCCESS;
+}
+
+
+int has_key(CHAR_DATA *ch, int key)
+{
+    struct obj_data *o;
+    
+    if (ch->equipment[HOLD]) {
+        if (obj_index[ch->equipment[HOLD]->item_number].virt == key)
+            return(1);
+    }
+     
+    for (o = ch->carrying; o; o = o->next_content)
+        if (obj_index[o->item_number].virt == key)
+            return(1);
+            
+    return(0);
+}
+
+int do_lock(CHAR_DATA *ch, char *argument, int cmd)
+{
+    int door, other_room;
+    char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH];
+    struct room_direction_data *back;
+    struct obj_data *obj;
+    CHAR_DATA *victim;   
+    
+    argument_interpreter(argument, type, dir);
+    
+    if (!*type)
+        send_to_char("Lock what?\n\r", ch);
+    else if (generic_find(argument, FIND_OBJ_INV | FIND_OBJ_ROOM,
+        ch, &victim, &obj))
+    {    
+        /* ths is an object */
+        
+        if (obj->obj_flags.type_flag != ITEM_CONTAINER)
+            send_to_char("That's not a container.\n\r", ch);
+        else if (!IS_SET(obj->obj_flags.value[1], CONT_CLOSED))
+            send_to_char("Maybe you should close it first...\n\r", ch);
+        else if (obj->obj_flags.value[2] < 0)
+            send_to_char("That thing can't be locked.\n\r", ch);
+        else if (!has_key(ch, obj->obj_flags.value[2]))
+            send_to_char("You don't seem to have the proper key.\n\r", ch);
+        else if (IS_SET(obj->obj_flags.value[1], CONT_LOCKED))
+            send_to_char("It is locked already.\n\r", ch);
+        else
+        {   
+            SET_BIT(obj->obj_flags.value[1], CONT_LOCKED);
+            send_to_char("*Cluck*\n\r", ch);
+            act("$n locks $p - 'cluck', it says.", ch, obj, 0, TO_ROOM, 0);
+        }
+    }
+    else if ((door = find_door(ch, type, dir)) >= 0)
+    {
+        /* a door, perhaps */
+        
+        if (!IS_SET(EXIT(ch, door)->exit_info, EX_ISDOOR))
+            send_to_char("That's absurd.\n\r", ch);
+        else if (!IS_SET(EXIT(ch, door)->exit_info, EX_CLOSED))
+            send_to_char("You have to close it first, I'm afraid.\n\r", ch);
+        else if (EXIT(ch, door)->key < 0)
+            send_to_char("There does not seem to be any keyholes.\n\r", ch);
+        else if (!has_key(ch, EXIT(ch, door)->key))
+            send_to_char("You don't have the proper key.\n\r", ch);
+        else if (IS_SET(EXIT(ch, door)->exit_info, EX_LOCKED))
+            send_to_char("It's already locked!\n\r", ch);
+        else
+        {   
+            SET_BIT(EXIT(ch, door)->exit_info, EX_LOCKED);
+            if (EXIT(ch, door)->keyword)
+                act("$n locks the $F.", ch, 0,  EXIT(ch, door)->keyword,
+                    TO_ROOM, 0);
+            else
+                act("$n locks the door.", ch, 0, 0, TO_ROOM, 0);
+            send_to_char("*Click*\n\r", ch);
+            /* now for locking the other side, too */
+            if ((other_room = EXIT(ch, door)->to_room) != NOWHERE)
+            if ( ( back = world[other_room].dir_option[rev_dir[door]] ) != 0 )
+                    if (back->to_room == ch->in_room)
+                        SET_BIT(back->exit_info, EX_LOCKED);
+        }
+    }
+   return eSUCCESS;
+}
+ 
+ 
+int do_unlock(CHAR_DATA *ch, char *argument, int cmd)
+{
+    int door, other_room;
+    char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH];
+    struct room_direction_data *back;
+    struct obj_data *obj;
+    CHAR_DATA *victim;   
+    
+    argument_interpreter(argument, type, dir);
+    
+    if (!*type)
+        send_to_char("Unlock what?\n\r", ch);
+    else if (generic_find(argument, FIND_OBJ_INV | FIND_OBJ_ROOM,
+        ch, &victim, &obj))
+    {
+        /* ths is an object */
+        
+        if (obj->obj_flags.type_flag != ITEM_CONTAINER)
+            send_to_char("That's not a container.\n\r", ch);
+        else if (!IS_SET(obj->obj_flags.value[1], CONT_CLOSED))
+            send_to_char("Silly - it ain't even closed!\n\r", ch);
+        else if (obj->obj_flags.value[2] < 0)
+            send_to_char("Odd - you can't seem to find a keyhole.\n\r", ch);
+        else if (!has_key(ch, obj->obj_flags.value[2]))
+            send_to_char("You don't seem to have the proper key.\n\r", ch);
+        else if (!IS_SET(obj->obj_flags.value[1], CONT_LOCKED))
+            send_to_char("Oh.. it wasn't locked, after all.\n\r", ch);
+        else
+        {   
+            REMOVE_BIT(obj->obj_flags.value[1], CONT_LOCKED);
+            send_to_char("*Click*\n\r", ch);
+            act("$n unlocks $p.", ch, obj, 0, TO_ROOM, 0);
+        }
+    }
+    else if ((door = find_door(ch, type, dir)) >= 0)
+    {
+        /* it is a door */
+        
+        if (!IS_SET(EXIT(ch, door)->exit_info, EX_ISDOOR))
+            send_to_char("That's absurd.\n\r", ch);
+        else if (!IS_SET(EXIT(ch, door)->exit_info, EX_CLOSED))
+            send_to_char("Heck ... it ain't even closed!\n\r", ch);
+        else if (EXIT(ch, door)->key < 0)
+            send_to_char("You can't seem to spot any keyholes.\n\r", ch);
+        else if (!has_key(ch, EXIT(ch, door)->key))
+            send_to_char("You do not have the proper key for that.\n\r", ch);
+        else if (!IS_SET(EXIT(ch, door)->exit_info, EX_LOCKED))
+            send_to_char("It's already unlocked, it seems.\n\r", ch);
+        else
+        {   
+            REMOVE_BIT(EXIT(ch, door)->exit_info, EX_LOCKED);
+            if (EXIT(ch, door)->keyword)
+                act("$n unlocks the $F.", ch, 0, EXIT(ch, door)->keyword,
+                    TO_ROOM, 0);
+            else
+                act("$n unlocks the door.", ch, 0, 0, TO_ROOM, 0);
+            send_to_char("*click*\n\r", ch);
+            /* now for unlocking the other side, too */
+            if ((other_room = EXIT(ch, door)->to_room) != NOWHERE)
+            if ( ( back = world[other_room].dir_option[rev_dir[door]] ) != 0 )
+                    if (back->to_room == ch->in_room)
+                        REMOVE_BIT(back->exit_info, EX_LOCKED);
+        }
+    }
+    return eSUCCESS;
 }
 

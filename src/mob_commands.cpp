@@ -885,11 +885,6 @@ int do_mpteachskill( CHAR_DATA *ch, char *argument, int cmd )
 
     void learn_skill(char_data * ch, int skill, int amount, int maximum);
 
-    extern char *skills[];
-    extern char *spells[];
-    extern char *ki[];
-    extern char *songs[];
-
     if ( !IS_NPC( ch ) )
     {
 	send_to_char( "Huh?\n\r", ch );
@@ -919,14 +914,10 @@ int do_mpteachskill( CHAR_DATA *ch, char *argument, int cmd )
         return eFAILURE|eINTERNAL_ERROR;
     }
 
-    if(skillnum >= SKILL_SONG_BASE && skillnum <= SKILL_SONG_MAX)
-       sprintf(skill, "$BYou have learned the basics of %s.$R\n\r", songs[skillnum-SKILL_SONG_BASE]);
-    else if(skillnum >= SKILL_BASE && skillnum <= SKILL_MAX)
-       sprintf(skill, "$BYou have learned the basics of %s.$R\n\r", skills[skillnum-SKILL_BASE]);
-    else if(skillnum >= KI_OFFSET && skillnum <= (KI_OFFSET+MAX_KI_LIST))
-       sprintf(skill, "$BYou have learned the basics of %s.$R\n\r", ki[skillnum-KI_OFFSET]);
-    else if(skillnum >= 0 && skillnum <= MAX_SPL_LIST)
-       sprintf(skill, "$BYou have learned the basics of %s.$R\n\r", spells[skillnum-1]);
+    char * skillname = get_skill_name(skillnum);
+
+    if(skillname)
+       sprintf(skill, "$BYou have learned the basics of %s.$R\n\r", skillname);
     else {
        send_to_char("I just tried to teach you an invalid skill.  Tell a god.\r\n", victim);
        logf( IMMORTAL, LOG_WORLD, "Mpteachskill - invalid skill number");
