@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.36 2002/10/01 03:09:33 pirahna Exp $ */
+/* $Id: magic.cpp,v 1.37 2002/10/01 03:13:39 pirahna Exp $ */
 
 extern "C"
 {
@@ -1206,8 +1206,10 @@ int spell_create_food(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
   tmp_obj->item_number = -1;
 */
 
+  skill_increase_check(ch, SPELL_CREATE_FOOD, skill, SKILL_INCREASE_MEDIUM);
+
   tmp_obj = clone_object(real_object(7));
-  tmp_obj->obj_flags.value[0] += level;
+  tmp_obj->obj_flags.value[0] += skill/2;
 
   obj_to_room(tmp_obj, ch->in_room);
 
