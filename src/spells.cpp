@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.109 2004/07/22 07:17:33 rahz Exp $ */
+/* $Id: spells.cpp,v 1.110 2004/07/23 00:22:54 rahz Exp $ */
 
 extern "C"
 {
@@ -1520,7 +1520,7 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
           }
 
           if (!target_ok && IS_SET(spell_info[spl].targets, TAR_OBJ_WORLD))
-            if ( ( tar_obj = get_obj_vis(ch, name) ) != NULL )
+            if ( ( tar_obj = get_obj_vis(ch, name) ) != NULL && !(IS_SET(tar_obj->obj_flags.more_flags, ITEM_NOLOCATE)))
               target_ok = TRUE;
 
           if (!target_ok && IS_SET(spell_info[spl].targets, TAR_OBJ_EQUIP)) 
