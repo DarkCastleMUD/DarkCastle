@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.45 2004/07/24 00:56:46 rahz Exp $
+| $Id: objects.cpp,v 1.46 2004/07/24 02:49:34 rahz Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -210,6 +210,10 @@ int do_switch(struct char_data *ch, char *arg, int cmd)
      return eFAILURE;
   }
 
+  if (GET_MOVE(ch) < 4) {
+     send_to_char("You are too tired to switch your weapons!", ch);
+     return eFAILURE;
+  }
   GET_MOVE(ch) -= 4;
 
   percent = number(1,101);

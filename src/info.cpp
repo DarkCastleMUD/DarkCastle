@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.54 2004/07/24 00:56:46 rahz Exp $ */
+/* $Id: info.cpp,v 1.55 2004/07/24 02:49:34 rahz Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -1944,7 +1944,13 @@ int do_consider(struct char_data *ch, char *argument, int cmd)
       return eFAILURE;
    }
 
+   if (GET_MOVE(ch) < 5) {
+      send_to_char("You are too tired to consider much of anything at the moment.\n\r", ch);
+      return eFAILURE;
+   }
+
    GET_MOVE(ch) -= 5;
+
    if (!skill_success(ch,NULL,SKILL_CONSIDER)) {
       send_to_char("You try really hard, but you really have no idea about their capabilties!\n\r", ch);
       return eFAILURE;
@@ -2174,7 +2180,12 @@ int do_scan(struct char_data *ch, char *argument, int cmd)
          "below you",
          "\n",
    };
-   
+ 
+   if (GET_MOVE(ch) < 2) {
+     send_to_char("You are to tired to scan right now.\r\n", ch);
+     return eSUCCESS;
+   }
+  
    Learned = has_skill(ch, SKILL_SCAN);
 
    act("$n carefully searches the surroundings...", ch, 0, 0, TO_ROOM,
