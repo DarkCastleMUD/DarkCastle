@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_monk.cpp,v 1.13 2004/04/24 21:01:31 urizen Exp $
+| $Id: cl_monk.cpp,v 1.14 2004/05/02 12:27:02 urizen Exp $
 | cl_monk.C
 | Description:  Monk skills.
 */
@@ -191,7 +191,8 @@ int do_quivering_palm(struct char_data *ch, char *argument, int cmd)
     retval = damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_QUIVERING_PALM, 0);
   }
   else {
-    dam = dice((GET_LEVEL(ch)), MORTAL) + (25 * (GET_LEVEL(ch)));
+    dam = GET_MAX_HIT(victim) /2;
+    if (dam > 2000) dam = 2000;
     retval = damage(ch, victim, dam, TYPE_UNDEFINED, SKILL_QUIVERING_PALM, 0);
   }
   return retval;

@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.17 2004/04/25 21:19:52 urizen Exp $ */
+/* $Id: ki.cpp,v 1.18 2004/05/02 12:27:00 urizen Exp $ */
 
 extern "C"
 {
@@ -472,30 +472,34 @@ int ki_blast( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
 }
 
 int ki_punch( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
-{
+{	
    if (!vict) {
       log("Serious problem in ki punch!", ANGEL, LOG_BUG);
       return eINTERNAL_ERROR;
       }
 
    set_cantquit(ch, vict);
-
+   int dam = GET_HIT(vict) / 4;
+   if (dam > 1000)
+     dam = 1000;
    if (GET_HIT(vict) < 5000) {
       if (number(1, 101) <
           (GET_LEVEL(ch) / 2) + GET_LEVEL(ch) - GET_LEVEL(vict))
       {
-         act("$n punches RIGHT THROUGH $N!", ch, 0, vict,
+         act("$n punches $s fist RIGHT INTO $N!", ch, 0, vict,
              TO_ROOM, NOTVICT);
-         act("The blood gushes as you put your fist through $N's chest!",
+         act("The blood gushes as you put your fist into $N's chest!",
              ch, 0, vict, TO_CHAR, 0);
-         act("$n shoves $s hand through your chest, and your lifeblood "
+         act("$n shoves $s hand into your chest, and your lifeblood "
 	     "ebbs away.", ch, 0, vict, TO_VICT, INVIS_VISIBLE);
-         group_gain(ch, vict);
-         fight_kill(ch, vict, TYPE_CHOOSE);
-         GET_HIT(ch) -= 1/10 * (GET_MAX_HIT(ch));
-         if (GET_HIT(ch) <= 0)
-	    GET_HIT(ch) = 1;
-         return eSUCCESS|eVICT_DIED;
+	 int retval = damage(ch,vict,dam, TYPE_UNDEFINED, KI_OFFSET+KI_PUNCH,0);
+//         group_gain(ch, vict);
+//         fight_kill(ch, vict, TYPE_CHOOSE);
+//         GET_HIT(ch) -= 1/10 * (GET_MAX_HIT(ch));
+//         if (GET_HIT(ch) <= 0)
+//	    GET_HIT(ch) = 1;
+ //        return eSUCCESS|eVICT_DIED;
+	return retval;
       }
       else {
          act("$N narrowly avoids $n's deadly thrust!", ch, 0, vict,
