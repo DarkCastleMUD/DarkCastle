@@ -1,7 +1,7 @@
 #ifndef PLAYER_H_
 #define PLAYER_H_
 /************************************************************************
-| $Id: player.h,v 1.12 2004/05/16 17:23:50 urizen Exp $
+| $Id: player.h,v 1.13 2004/05/18 00:17:46 urizen Exp $
 | player.h
 | Description: This file defines the player vectors..punishment, specials,
 |   etc...
@@ -221,63 +221,61 @@
 // Constructor commented out for const.C initialization purposes
 struct str_app_type
 {
-   /*
-   str_app_type() {
-      tohit   = 0;  
-      todam   = 0;  
-      carry_w = 0;
-      wield_w = 0;
-      }
-*/
     sh_int todam;    /* Damage Bonus/Penalty                */
     sh_int carry_w;  /* Maximum weight that can be carrried */
-    sh_int wield_w;  /* Maximum weight that can be wielded  */
-    sh_int resis;   /* Resistance modifer. Used for all of 'em actuall.*/
+    sh_int cold_resistance; /* Cold resistance */
 };
+
 struct dex_app_type
 {
   sh_int tohit;
   sh_int ac_mod;
+  sh_int move_gain;
+  sh_int fire_resistance;
 };
-extern struct dex_app_type dex_app[];
 
 // Constructor commented out for const.C initialization purposes
 struct wis_app_type
 {
-   /*
-   wis_app_type() {
-      bonus = 0;
-      }
-*/
-    byte bonus;       /* how many bonus skills a player can */
+    sh_int mana_regen;
+    sh_int ki_regen;
+    sh_int bonus;       /* how many bonus skills a player can */
 		      /* practice pr. level                 */
+    sh_int energy_resistance;
+    sh_int conc_bonus;
 };
 
 // Constructor commented out for const.C initialization purposes
 struct int_app_type
 {
-   /*
-   int_app_type() {
-      learn = 0;
-      }
-*/
-    byte learn;       /* how many % a player learns a spell/skill */
+    sh_int mana_regen;
+    sh_int ki_regen;
+    sh_int easy_bonus;
+    sh_int medium_bonus;
+    sh_int hard_bonus;
+    sh_int learn_bonus;
+    sh_int magic_resistance;
+    sh_int conc_bonus;
 };
 
 // Constructor commented out for const.C initialization purposes
 struct con_app_type
 {
-   /*
-   con_app_type() {
-      hitp  = 0;
-      shock = 0;
-      }
-*/
-
-    sh_int hitp;
-    sh_int shock;
-    sh_int hpregen;
-    sh_int moveregen;
+    sh_int hp_regen;
+    sh_int move_regen;
+    sh_int hp_gain;
+    sh_int poison_resistance;
 };
+
+/* Extern definitions. These are all in const.cpp. */
+extern const struct dex_app_type dex_app[];
+extern const struct con_app_type con_app[];
+extern const struct int_app_type int_app[];
+extern const struct str_app_type str_app[];
+extern const struct wis_app_type wis_app[];
+
+/* Various function declarations */
+int get_saves(CHAR_DATA *ch, int savetype);
+
 
 #endif

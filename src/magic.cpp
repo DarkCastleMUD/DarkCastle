@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.129 2004/05/14 13:32:56 urizen Exp $ */
+/* $Id: magic.cpp,v 1.130 2004/05/18 00:17:40 urizen Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -1184,7 +1184,7 @@ int spell_paralyze(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data
     send_to_char("Your cold-blooded act causes your magic to misfire!\n\r", ch);
     victim = ch;
   }
-   if (number(1,101) < victim->saves[SAVE_TYPE_MAGIC])
+   if (number(1,101) < get_saves(victim, SAVE_TYPE_MAGIC))
    {
 act("$N resists your attempt to paralyze $m!", ch, NULL, victim, 
 TO_CHAR,0);
@@ -1272,7 +1272,7 @@ int spell_blindness(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
       retval = SWAP_CH_VICT(retval);
       return retval;
   }
-   if (number(1,101) < victim->saves[SAVE_TYPE_MAGIC])
+   if (number(1,101) < get_saves(victim, SAVE_TYPE_MAGIC))
    {
 act("$N resists your attempt to blind $m!", ch, NULL, victim, TO_CHAR,0);
 act("$N resists $n's attempt to blind $m!", ch, NULL, victim, TO_ROOM,NOTVICT);
@@ -1499,7 +1499,7 @@ int spell_curse(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
 	retval = SWAP_CH_VICT(retval);
 	return retval;
 		}
-   if (number(1,101) < victim->saves[SAVE_TYPE_MAGIC])
+   if (number(1,101) < get_saves(victim, SAVE_TYPE_MAGIC))
    {
 act("$N resists your attempt to curse $m!", ch, NULL, victim, 
 TO_CHAR,0);
@@ -2066,7 +2066,7 @@ int spell_poison(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *
   if (victim) 
   {
     set_cantquit(ch, victim);
-   if (number(1,101) < victim->saves[SAVE_TYPE_POISON])
+   if (number(1,101) < get_saves(victim, SAVE_TYPE_POISON))
    {
 act("$N resists your attempt to poison $m!", ch, NULL, victim, 
 TO_CHAR,0);
@@ -2600,7 +2600,7 @@ int spell_sleep(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
 	 return eFAILURE;
 	}
   }
-   if (number(1,101) < victim->saves[SAVE_TYPE_MAGIC])
+   if (number(1,101) < get_saves(victim, SAVE_TYPE_MAGIC))
    {
 act("$N resists your attempt to sleep $m!", ch, NULL, victim, 
 TO_CHAR,0);
@@ -3443,7 +3443,7 @@ int spell_fear(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *ob
                ch, NULL, victim, TO_VICT, 0);
            return eFAILURE;
          }
-   if (number(1,101) < victim->saves[SAVE_TYPE_COLD])
+   if (number(1,101) < get_saves(victim, SAVE_TYPE_COLD))
    {
 act("$N resists your attempt to fear $m!", ch, NULL, victim, 
 TO_CHAR,0);
@@ -3768,7 +3768,7 @@ int spell_dispel_minor(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
    // If victim higher level, they get a save vs magic for no effect
    if((GET_LEVEL(victim) > GET_LEVEL(ch)) && 0 > saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC))
       return eFAILURE;
-   if (number(1,101) < victim->saves[SAVE_TYPE_MAGIC])
+   if (number(1,101) < get_saves(victim, SAVE_TYPE_MAGIC))
    {
 act("$N resists your attempt to dispel minor!", ch, NULL, victim, TO_CHAR,0);
 act("$N resists $n's attempt to dispel minor!", ch, NULL, victim, TO_ROOM, 
@@ -3951,7 +3951,7 @@ int spell_dispel_magic(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
    // If victim higher level, they get a save vs magic for no effect
    if((GET_LEVEL(victim) > GET_LEVEL(ch)) && 0 > saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC))
       return eFAILURE;
-   if (number(1,101) < victim->saves[SAVE_TYPE_MAGIC])
+   if (number(1,101) < get_saves(victim, SAVE_TYPE_MAGIC))
    {
 act("$N resists your attempt to dispel magic!", ch, NULL, victim, 
 TO_CHAR,0);
@@ -4426,7 +4426,7 @@ int spell_weaken(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *
 
 
     set_cantquit (ch, victim);
-   if (number(1,101) < victim->saves[SAVE_TYPE_MAGIC])
+   if (number(1,101) < get_saves(victim, SAVE_TYPE_MAGIC))
    {
 act("$N resists your attempt to weaken $m!", ch, NULL, victim, 
 TO_CHAR,0);
@@ -9375,7 +9375,7 @@ int spell_debility(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data
 
   set_cantquit( ch, victim );
 
-   if (number(1,101) < victim->saves[SAVE_TYPE_POISON])
+   if (number(1,101) < get_saves(victim, SAVE_TYPE_POISON))
    {
 act("$N resists your attempt to debilitize $m!", ch, NULL, victim, 
 TO_CHAR,0);
@@ -9480,7 +9480,7 @@ int spell_attrition(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
   set_cantquit( ch, victim );
 
   int save = -1;//saves_spell(ch, victim, 0, SAVE_TYPE_POISON);
-   if (number(1,101) < victim->saves[SAVE_TYPE_POISON])
+   if (number(1,101) < get_saves(victim, SAVE_TYPE_POISON))
    {
 act("$N resists your attempt to attrition $m!", ch, NULL, victim, 
 TO_CHAR,0);

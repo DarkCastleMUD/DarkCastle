@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.19 2004/05/15 17:08:28 urizen Exp $ */
+/* $Id: limits.cpp,v 1.20 2004/05/18 00:17:40 urizen Exp $ */
 
 extern "C"
 {
@@ -159,16 +159,17 @@ int mana_gain(CHAR_DATA *ch)
     }
     
     if(GET_CLASS(ch) == CLASS_MAGIC_USER ||
-       GET_CLASS(ch) == CLASS_ANTI_PAL)
-      modifier = GET_INT(ch);
+       GET_CLASS(ch) == CLASS_ANTI_PAL || GET_CLASS(ch) == CLASS_RANGER)
+      modifier = int_app[GET_INT(ch)].mana_regen;
     else
-      modifier = GET_WIS(ch);
-    
-    gain += (int)(modifier / divisor);
+      modifier = wis_app[GET_WIS(ch)].mana_regen;;
+    gain += modifier;
+/*    gain += (int)(modifier / divisor);
 
     // int bonus modifier.  1.1 at 16int/wis up to 2.5 at 30int/wis
     if(modifier > 15)
-      gain = (int)(gain * (((float)modifier - 5.0) / 10.0));
+      gain = (int)(gain * (((float)modifier - 5.0) / 10.0));*/
+    
   }
 
   gain += ch->mana_regen;
@@ -214,11 +215,13 @@ int hit_gain(CHAR_DATA *ch)
       gain += af->modifier;
 
     // con multiplier modifier 15 = 1.0  30 = 1.45 (.03 increments)
-    if(GET_CON(ch) > 15)
+/*    if(GET_CON(ch) > 15)
       gain = (int)(gain * ((float)1+ (.03 * (GET_CON(ch) - 15.0))));
  
     if(GET_CLASS(ch) == CLASS_MAGIC_USER || GET_CLASS(ch) == CLASS_CLERIC || GET_CLASS(ch) == CLASS_DRUID)
-      gain = (int)((float)gain * 0.7);
+      gain = (int)((float)gain * 0.7);*/
+
+     gain += con_app[GET_CON(ch)].hp_regen;
   }
 
   gain += ch->hit_regen;
@@ -288,16 +291,11 @@ int move_gain(CHAR_DATA *ch)
 
 void redo_hitpoints( CHAR_DATA *ch)
 {
-  extern struct con_app_type con_app[];
   /*struct affected_type *af;*/
   int i, j, bonus;
 
   ch->max_hit = ch->raw_hit;
-  bonus = (GET_LEVEL(ch)) * (con_app[GET_CON(ch)].hitp);
- 
-  if ((GET_CLASS(ch) == CLASS_MAGIC_USER) ||
-     (GET_CLASS(ch) == CLASS_CLERIC))
-    bonus /= 2;
+   bonus = (GET_CON(ch) * GET_CON(ch)) / 30; 
 
   ch->max_hit += bonus;
 
@@ -318,16 +316,16 @@ void redo_hitpoints( CHAR_DATA *ch)
 void redo_mana ( CHAR_DATA *ch)
 
 {
-  extern int mana_bonus[];
    /*struct affected_type *af;*/
-   int i, j, bonus;
+   int i, j, bonus = 0;
 
   ch->max_mana = ch->raw_mana;
-  bonus = mana_bonus[GET_INT(ch)];
 
-  if ((GET_CLASS(ch) == CLASS_ANTI_PAL) ||
-     (GET_CLASS(ch) == CLASS_PALADIN))
-    bonus /= 2;
+  if (GET_CLASS(ch) == CLASS_MAGIC_USER || GET_CLASS(ch) == CLASS_ANTI_PAL || GET_CLASS(ch) == CLASS_RANGER)
+     bonus = (GET_INT(ch) * GET_INT(ch)) / 30;
+  else
+     bonus = (GET_WIS(ch) * GET_WIS(ch)) / 30;
+
 
   if ((GET_CLASS(ch) == CLASS_WARRIOR) || (GET_CLASS(ch) == CLASS_THIEF) ||
       (GET_CLASS(ch) == CLASS_BARBARIAN) || (GET_CLASS(ch) == CLASS_MONK))
@@ -348,6 +346,15 @@ void redo_mana ( CHAR_DATA *ch)
   }
 }
 
+void redo_ki(CHAR_DATA *ch)
+{
+   ch->max_ki = ch->raw_ki;
+   if (GET_CLASS(ch) == CLASS_MONK) 
+     ch->max_ki += (GET_WIS(ch) > 15?GET_WIS(ch)-15:0);
+   else if (GET_CLASS(ch) == CLASS_BARD)
+     ch->max_ki += (GET_INT(ch) > 15?GET_INT(ch)-15:0);   
+}
+
 /* Gain maximum in various */
 void advance_level(CHAR_DATA *ch, int is_conversion)
 {
@@ -358,9 +365,6 @@ void advance_level(CHAR_DATA *ch, int is_conversion)
     int add_practices;
     int i;
     char buf[MAX_STRING_LENGTH];
-
-    extern struct wis_app_type wis_app[];
-    extern struct con_app_type con_app[];
 
     switch(GET_CLASS(ch)) { 
     case CLASS_MAGIC_USER:
@@ -441,29 +445,33 @@ void advance_level(CHAR_DATA *ch, int is_conversion)
        return;
     }
 
-    if ((GET_CLASS(ch) == CLASS_MAGIC_USER) ||
-        (GET_CLASS(ch) == CLASS_CLERIC) ||
-        (GET_CLASS(ch) == CLASS_DRUID))
-       add_hp += number(0, (con_app[GET_CON(ch)].hitp/2));
-    else add_hp += number(1, con_app[GET_CON(ch)].hitp);
-
+  /*  if ((GET_CLASS(ch) == CLASS_MAGIC_USER) ||
+        (GET_CLASS(ch) == CLASS_RANGER) ||
+        (GET_CLASS(ch) == CLASS_ANTI_PAL))
+       add_mana +=  int_app[GET_INT(ch)].mana_gain;
+    else if (GET_CLASS(ch) == CLASS_CLERIC || GET_CLASS(ch) == CLASS_DRUID || 
+	     GET_CLASS(ch) == CLASS_PALADIN)
+       add_mana += wis_app[GET_WIS(ch)].mana_gain;
+*/
+    add_hp += con_app[GET_CON(ch)].hp_gain;
+    add_moves += dex_app[GET_DEX(ch)].move_gain;
     add_hp			 = MAX( 1, add_hp);
     add_mana			 = MAX( 0, add_mana);
     add_moves			 = MAX( 1, add_moves);
-    add_practices		 = wis_app[GET_WIS(ch)].bonus;
+    add_practices		 = 1+wis_app[GET_WIS(ch)].bonus;
 
     // hp and mana have stat bonuses related to level so have to have their stuff recalculated
     ch->raw_hit			+= add_hp;
     ch->raw_mana		+= add_mana;
     redo_hitpoints(ch);
     redo_mana (ch);
-
     // move and ki aren't stat related, so we just add directly to the totals
     ch->raw_move		+= add_moves;
     ch->max_move		+= add_moves;
+
     ch->raw_ki			+= add_ki;
     ch->max_ki			+= add_ki;
-
+    redo_ki(ch); // Ki gets level bonuses now
     if(!IS_MOB(ch) && !is_conversion)
       ch->pcdata->practices	+= add_practices;
 

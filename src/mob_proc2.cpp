@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.28 2004/05/07 22:55:05 urizen Exp $ */
+/* $Id: mob_proc2.cpp,v 1.29 2004/05/18 00:17:41 urizen Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -1241,6 +1241,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 
       redo_hitpoints(ch);
       redo_mana(ch);
+      redo_ki(ch);
       return eSUCCESS;
     }
 
@@ -1535,7 +1536,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     ch->raw_ki += 1;
     ch->max_ki += 1;
     GET_KI_METAS(ch) += 1;
-    
+    redo_ki(ch);
     act("The Meta-physician touches $n.",  ch, 0, 0, TO_ROOM, 0);
     act("The Meta-physician touches you.",  ch, 0, 0, TO_CHAR, 0);
     return eSUCCESS;

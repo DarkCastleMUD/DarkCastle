@@ -21,7 +21,7 @@
  *  12/08/2003   Onager    Added check for charmies and !charmie eq to     *
  *                         equip_char()                                    *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.47 2004/05/17 18:34:45 urizen Exp $ */
+/* $Id: handler.cpp,v 1.48 2004/05/18 00:17:40 urizen Exp $ */
     
 extern "C"
 {
@@ -329,12 +329,10 @@ bool still_affected_by_poison(CHAR_DATA * ch)
 void check_weapon_weights(char_data * ch)
 {
   struct obj_data * weapon;
-  extern struct str_app_type str_app[];
 
   // make sure we're still strong enough to wield our weapons
   if(!IS_MOB(ch) && ch->equipment[WIELD] &&
-       GET_OBJ_WEIGHT(ch->equipment[WIELD]) > 
-str_app[STRENGTH_APPLY_INDEX(ch)].wield_w && !IS_SET(ch->affected_by2, AFF_POWERWIELD))
+       GET_OBJ_WEIGHT(ch->equipment[WIELD]) > GET_STR(ch) && !IS_SET(ch->affected_by2, AFF_POWERWIELD))
   {
     act("Being too heavy to wield, you move your $p to your inventory.",
          ch, ch->equipment[WIELD], 0, TO_CHAR, 0);
@@ -352,7 +350,7 @@ str_app[STRENGTH_APPLY_INDEX(ch)].wield_w && !IS_SET(ch->affected_by2, AFF_POWER
   }
 
   if(ch->equipment[SECOND_WIELD] &&
-       GET_OBJ_WEIGHT(ch->equipment[SECOND_WIELD]) > str_app[STRENGTH_APPLY_INDEX(ch)].wield_w/2 && !IS_SET(ch->affected_by2, AFF_POWERWIELD))
+       GET_OBJ_WEIGHT(ch->equipment[SECOND_WIELD]) > GET_STR(ch)/2 && !IS_SET(ch->affected_by2, AFF_POWERWIELD))
   {
     act("Being too heavy to wield, you move your $p to your inventory.",
          ch, ch->equipment[SECOND_WIELD], 0, TO_CHAR, 0);

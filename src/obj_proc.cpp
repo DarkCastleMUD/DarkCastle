@@ -30,7 +30,6 @@
 extern CWorld world;
 extern struct index_data *obj_index; 
 extern struct index_data *mob_index; 
-extern struct str_app_type str_app[];
 extern struct obj_data *object_list;
 
 extern struct zone_data *zone_table;
@@ -382,7 +381,6 @@ int drainingstaff(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
     staff = ch->equipment[WIELD + cmd];
     dam = dice(staff->obj_flags.value[1], staff->obj_flags.value[2]);  
     dam += GET_DAMROLL(ch);
-    dam += str_app[STRENGTH_APPLY_INDEX(ch)].todam;
     dam = (dam * 2) / 10; // Mages usually have 2-3 attacks
     if(IS_NPC(ch)) { // NPC'S have no mana, so we'll drain hp instead
         if(dam >= GET_HIT(vict)) {

@@ -16,7 +16,7 @@
  *  10/21/2003   Onager    Changed IS_ANONYMOUS() to handle mobs without   *
  *                         crashing                                        *
  ***************************************************************************/
-/* $Id: utility.h,v 1.23 2004/05/16 17:23:50 urizen Exp $ */
+/* $Id: utility.h,v 1.24 2004/05/18 00:17:46 urizen Exp $ */
 
 #ifndef UTILITY_H_
 #define UTILITY_H_
@@ -329,6 +329,7 @@ void	page_string	(struct descriptor_data *d, char *str,
 void	gain_exp	(CHAR_DATA *ch, int gain);
 void	redo_hitpoints  (CHAR_DATA *ch);       /* Rua's put in  */
 void	redo_mana	(CHAR_DATA *ch);       /* Rua's put in  */
+void    redo_ki		(CHAR_DATA *ch);	/* And Urizen*/
 void assign_rooms(void);
 void assign_objects(void);
 void assign_mobiles(void);

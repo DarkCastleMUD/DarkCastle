@@ -1,7 +1,7 @@
 #ifndef WIZARD_H_
 #define WIZARD_H_
 /************************************************************************
-| $Id: wizard.h,v 1.3 2002/06/20 21:39:49 pirahna Exp $
+| $Id: wizard.h,v 1.4 2004/05/18 00:17:47 urizen Exp $
 | wizard.h
 | Description:  This is NOT a global include file, it's used only
 |   for the wiz_1*.C files to consolidate the header files they
@@ -39,7 +39,6 @@ extern int top_of_zone_table;
 extern struct zone_data *zone_table;
 extern int top_of_world;
 extern struct descriptor_data *descriptor_list;
-extern byte ac_dex_apply[];
 extern char globalBuf[MAX_STRING_LENGTH];
 extern bool   wizlock;
 extern struct race_shit race_info[];
@@ -48,8 +47,6 @@ extern CHAR_DATA *character_list;
 extern CHAR_DATA *combat_list;
 extern struct index_data *mob_index;
 extern struct index_data *obj_index;
-extern struct int_app_type int_app[26];
-extern struct wis_app_type wis_app[26];
 extern char *ban_list[30];
 extern char *nonew_new_list[30];
 

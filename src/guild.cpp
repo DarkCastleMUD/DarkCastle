@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.55 2004/05/17 19:20:44 urizen Exp $
+| $Id: guild.cpp,v 1.56 2004/05/18 00:17:40 urizen Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -188,8 +188,6 @@ int skills_guild(struct char_data *ch, char *arg, struct char_data *owner)
   int specialization;
   int loop;
 
-  extern struct int_app_type int_app[26];
-
   class_skill_defines * skilllist = get_skill_list(ch);
   if(!skilllist)
     return eFAILURE;  // no skills to train
@@ -330,7 +328,7 @@ int skills_guild(struct char_data *ch, char *arg, struct char_data *owner)
   send_to_char("You practice for a while...\n\r", ch);
   ch->pcdata->practices--;
 
-  percent = (int)int_app[GET_INT(ch)].learn;
+  percent = (int)int_app[GET_INT(ch)].learn_bonus;
 
   learn_skill(ch, x, percent, skilllist[skillnumber].maximum);
     
@@ -412,8 +410,6 @@ int skill_master(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
   int number, i, percent;
   int learned = 0;
 
-  extern struct int_app_type int_app[26];
-  
   if(IS_MOB(ch)) {
     send_to_char("Why practice?  You're just going to die anyway...\r\n", ch);
     return eFAILURE;
@@ -464,7 +460,7 @@ int skill_master(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     send_to_char("You practice for a while...\n\r", ch);
     ch->pcdata->practices--;
     
-    percent = (int)int_app[GET_INT(ch)].learn;
+    percent = (int)int_app[GET_INT(ch)].learn_bonus;
 
     learn_skill(ch, g_skills[number].skillnum, percent, g_skills[number].maximum);
     learned = has_skill(ch, g_skills[number].skillnum);

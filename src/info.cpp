@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.42 2004/05/16 17:23:48 urizen Exp $ */
+/* $Id: info.cpp,v 1.43 2004/05/18 00:17:40 urizen Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -61,7 +61,6 @@ extern char *color_liquid[];
 extern char *fullness[];
 extern char *sector_types[];
 extern char *room_bits[];
-extern struct str_app_type str_app[];
 extern struct race_shit race_info[];
 
 /* Used for "who" */
@@ -78,6 +77,32 @@ char *str_str(char *first, char *second);
 /* intern functions */
 
 void list_obj_to_char(struct obj_data *list,struct char_data *ch, int mode, bool show);
+
+int get_saves(CHAR_DATA *ch, int savetype)
+{
+  int save = ch->saves[savetype];
+  switch (savetype)
+  {
+    case SAVE_TYPE_MAGIC:
+	 save += int_app[GET_INT(ch)].magic_resistance;
+         break;
+    case SAVE_TYPE_COLD:
+	save += str_app[GET_STR(ch)].cold_resistance;
+	break;
+    case SAVE_TYPE_ENERGY:
+	save += wis_app[GET_WIS(ch)].energy_resistance;
+        break;
+     case SAVE_TYPE_FIRE:
+	save += dex_app[GET_DEX(ch)].fire_resistance;
+        break;
+     case SAVE_TYPE_POISON:
+	save += con_app[GET_CON(ch)].poison_resistance;
+	break;
+     default:
+	break;
+  }
+  return save;
+}
 
 /* Procedures related to 'look' */
 
@@ -1231,9 +1256,6 @@ int do_score(struct char_data *ch, char *argument, int cmd)
    int  level = 0;
    int to_dam, to_hit;
    
-   extern struct str_app_type str_app[];
-   extern struct dex_app_type dex_app[];
-   
    struct affected_type *aff;
    extern char *apply_types[];
    extern char *pc_clss_types[];
@@ -1285,8 +1307,9 @@ int do_score(struct char_data *ch, char *argument, int cmd)
    GET_AC(ch), 	  GET_PKILLS(ch),   IS_CARRYING_N(ch), CAN_CARRY_N(ch),
    GET_RDEATHS(ch), GET_PDEATHS(ch),  IS_CARRYING_W(ch), CAN_CARRY_W(ch),
    to_hit, to_dam, GET_EXP(ch),
-   ch->saves[SAVE_TYPE_FIRE], ch->saves[SAVE_TYPE_COLD], ch->saves[SAVE_TYPE_ENERGY], GET_LEVEL(ch) == IMP ? 0 : exp_needed, 
-   ch->saves[SAVE_TYPE_ACID], ch->saves[SAVE_TYPE_MAGIC], ch->saves[SAVE_TYPE_POISON], (int)GET_GOLD(ch), (int)GET_PLATINUM(ch));
+   get_saves(ch,SAVE_TYPE_FIRE), get_saves(ch, SAVE_TYPE_COLD), get_saves(ch, SAVE_TYPE_ENERGY), GET_LEVEL(ch) == IMP ? 0 
+: exp_needed, 
+   get_saves(ch, SAVE_TYPE_ACID), get_saves(ch, SAVE_TYPE_MAGIC), get_saves(ch, SAVE_TYPE_POISON), (int)GET_GOLD(ch), (int)GET_PLATINUM(ch));
    
      send_to_char(buf, ch);
    }
@@ -1813,8 +1836,6 @@ int do_consider(struct char_data *ch, char *argument, int cmd)
    int percent, x, y;
    int Learned;
    
-   extern struct str_app_type str_app[];
-   
    char *level_messages[] = {
       "You can kill %s naked and weaponless.\n\r",
          "%s is no match for you.\n\r",
@@ -2002,7 +2023,6 @@ int do_consider(struct char_data *ch, char *argument, int cmd)
             else 
                x = number(0,2);
          }
-         x += str_app[STRENGTH_APPLY_INDEX(victim)].todam;
          x += GET_DAMROLL(victim);
          
          if(x <= 5)	x = 0;

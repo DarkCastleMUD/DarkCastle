@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.37 2004/05/17 19:28:12 urizen Exp $
+| $Id: objects.cpp,v 1.38 2004/05/18 00:17:41 urizen Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -38,7 +38,6 @@ extern CWorld world;
 extern bool improve;
  
 extern struct spell_info_type spell_info[MAX_SPL_LIST];
-extern struct str_app_type str_app[];
 extern struct active_object active_head;
 extern struct index_data *obj_index;
  
@@ -219,8 +218,7 @@ int do_switch(struct char_data *ch, char *arg, int cmd)
     act("You fail to switch your weapons.", ch, 0,0, TO_CHAR, 0);
     return eFAILURE;
   }
-  if (GET_OBJ_WEIGHT(ch->equipment[WIELD]) > str_app[STRENGTH_APPLY_INDEX(ch)].wield_w
-       && !IS_AFFECTED2(ch, AFF_POWERWIELD))
+  if (GET_OBJ_WEIGHT(ch->equipment[WIELD]) > GET_STR(ch)       && !IS_AFFECTED2(ch, AFF_POWERWIELD))
   {
      send_to_char("Your primary wield is too heavy to wield as secondary.\r\n",ch);
       return eFAILURE;
@@ -1636,9 +1634,9 @@ void wear(struct char_data *ch, struct obj_data *obj_object, int keyword)
 
   case 12:
     if(CAN_WEAR(obj_object,ITEM_WIELD)) {
-      if(!ch->equipment[WIELD] && GET_OBJ_WEIGHT(obj_object) > str_app[STRENGTH_APPLY_INDEX(ch)].wield_w && !IS_SET(ch->affected_by2,AFF_POWERWIELD))
+      if(!ch->equipment[WIELD] && GET_OBJ_WEIGHT(obj_object) > GET_STR(ch) && !IS_SET(ch->affected_by2,AFF_POWERWIELD))
         send_to_char("It is too heavy for you to use.\n\r",ch);
-      else if(ch->equipment[WIELD] && GET_OBJ_WEIGHT(obj_object) > (str_app[STRENGTH_APPLY_INDEX(ch)].wield_w/2) && !IS_SET(ch->affected_by2, AFF_POWERWIELD))
+      else if(ch->equipment[WIELD] && GET_OBJ_WEIGHT(obj_object) > GET_STR(ch)/2 && !IS_SET(ch->affected_by2, AFF_POWERWIELD))
         send_to_char("It is too heavy for you to use as a secondary weapon.\n\r",ch);
       else if((!hands_are_free(ch, 2)) && 
              (IS_SET(obj_object->obj_flags.extra_flags, ITEM_TWO_HANDED) 
@@ -1759,6 +1757,7 @@ void wear(struct char_data *ch, struct obj_data *obj_object, int keyword)
  }
         redo_hitpoints(ch);
         redo_mana(ch);
+	redo_ki(ch);
 
 }
 

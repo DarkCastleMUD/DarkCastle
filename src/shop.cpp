@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: shop.cpp,v 1.9 2004/05/12 18:21:42 urizen Exp $ */
+/* $Id: shop.cpp,v 1.10 2004/05/18 00:17:41 urizen Exp $ */
 
 extern "C"
 {
@@ -40,7 +40,6 @@ extern "C"
 #include <shop.h>
 #include <spells.h>
 
-extern struct str_app_type str_app[];
 extern struct index_data *mob_index;
 
 struct player_shop * g_playershops;

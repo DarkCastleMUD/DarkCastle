@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.53 2004/05/17 07:11:23 urizen Exp $
+| $Id: cl_thief.cpp,v 1.54 2004/05/18 00:17:44 urizen Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -25,7 +25,6 @@
 extern int rev_dir[];
 extern CWorld world;
  
-extern struct str_app_type str_app[];
 extern struct index_data *mob_index;
 extern struct index_data *obj_index;
 

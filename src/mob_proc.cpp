@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.47 2004/04/22 20:33:49 urizen Exp $ */
+/* $Id: mob_proc.cpp,v 1.48 2004/05/18 00:17:41 urizen Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -1398,8 +1398,6 @@ int active_necro(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
 int passive_tarrasque(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,        
           struct char_data *owner)
 {
-    extern struct str_app_type str_app[];
-
     /*struct descriptor_data *d;*/
     struct char_data *vict;
     struct obj_data *best_obj;

@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.57 2004/05/14 00:43:19 urizen Exp $ */
+/* $Id: nanny.cpp,v 1.58 2004/05/18 00:17:41 urizen Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -373,7 +373,7 @@ void do_on_login_stuff(char_data * ch)
     ch->pcdata->bad_pw_tries = 0;
     redo_hitpoints (ch);
     redo_mana (ch);
-
+    redo_ki(ch);
     do_inate_race_abilities(ch);
 
     // add character base saves to saving throws

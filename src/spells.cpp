@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.84 2004/05/17 19:01:12 urizen Exp $ */
+/* $Id: spells.cpp,v 1.85 2004/05/18 00:17:42 urizen Exp $ */
 
 extern "C"
 {
@@ -1120,19 +1120,19 @@ int saves_spell(CHAR_DATA *ch, CHAR_DATA *vict, int spell_base, sh_int save_type
     // Get the base save type for this roll
     switch(save_type) {
       case SAVE_TYPE_FIRE:
-            save = vict->saves[SAVE_TYPE_FIRE];
+            save = get_saves(vict, SAVE_TYPE_FIRE);
             break;
       case SAVE_TYPE_COLD:
-            save = vict->saves[SAVE_TYPE_COLD];
+            save = get_saves(vict, SAVE_TYPE_COLD);
             break;
       case SAVE_TYPE_ENERGY:
-            save = vict->saves[SAVE_TYPE_ENERGY];
+            save = get_saves(vict, SAVE_TYPE_ENERGY);
             break;
       case SAVE_TYPE_ACID:
-            save = vict->saves[SAVE_TYPE_ACID];
+            save = get_saves(vict, SAVE_TYPE_ACID);
             break;
       case SAVE_TYPE_MAGIC:
-            save = vict->saves[SAVE_TYPE_MAGIC];
+            save = get_saves(vict, SAVE_TYPE_MAGIC);
             // ISR Magic has to affect saving throws as well as damage so they don't get
             // para'd or slept or something
             if(IS_SET(vict->immune, ISR_MAGIC))       return(TRUE);
@@ -1140,7 +1140,7 @@ int saves_spell(CHAR_DATA *ch, CHAR_DATA *vict, int spell_base, sh_int save_type
             if(IS_SET(vict->resist, ISR_MAGIC))       save *= 1.3;
             break;
       case SAVE_TYPE_POISON:
-            save = vict->saves[SAVE_TYPE_POISON];
+            save = get_saves(vict, SAVE_TYPE_POISON);
             break;
       default:
         break;

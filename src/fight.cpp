@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.191 2004/05/16 17:23:48 urizen Exp $ */
+/* $Id: fight.cpp,v 1.192 2004/05/18 00:17:40 urizen Exp $ */
 
 extern "C"
 {
@@ -872,7 +872,6 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
 
  
 //  extern int thaco[8][61];
-  extern struct str_app_type str_app[];
   extern byte backstab_mult[];
   
   int do_say(struct char_data *ch, char *argument, int cmd);
@@ -947,7 +946,6 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
   else
   {
     chance = 45;
-   extern struct dex_app_type dex_app[];
     chance += GET_LEVEL(ch) - GET_LEVEL(vict);
     chance += GET_REAL_HITROLL(ch);
   //  chance += dex_app[GET_DEX(ch)].tohit;
@@ -1342,22 +1340,22 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
   int save = 0;
     switch(weapon_type) {
        case TYPE_FIRE:
-            save = victim->saves[SAVE_TYPE_FIRE];
+            save = get_saves(victim, SAVE_TYPE_FIRE);
             break;
       case TYPE_COLD:
-            save = victim->saves[SAVE_TYPE_COLD];
+            save = get_saves(victim, SAVE_TYPE_COLD);
             break;
       case TYPE_ENERGY:
-            save = victim->saves[SAVE_TYPE_ENERGY];
+            save = get_saves(victim, SAVE_TYPE_ENERGY);
             break;
     case TYPE_ACID:
-            save = victim->saves[SAVE_TYPE_ACID];
+            save = get_saves(victim, SAVE_TYPE_ACID);
             break;
       case TYPE_MAGIC:
-            save = victim->saves[SAVE_TYPE_MAGIC];
+            save = get_saves(victim,SAVE_TYPE_MAGIC);
             break;
       case TYPE_POISON:
-            save = victim->saves[SAVE_TYPE_POISON];
+            save = get_saves(victim,SAVE_TYPE_POISON);
             break;
       default:
         break;

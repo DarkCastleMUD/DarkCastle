@@ -19,7 +19,7 @@
 /* 12/06/2003   Onager   Modified mobile_activity() to prevent charmie    */
 /*                       scavenging                                       */
 /**************************************************************************/
-/* $Id: mob_act.cpp,v 1.22 2004/05/02 18:24:51 urizen Exp $ */
+/* $Id: mob_act.cpp,v 1.23 2004/05/18 00:17:41 urizen Exp $ */
 
 extern "C"
 {
@@ -50,7 +50,6 @@ extern struct index_data *mob_index;
 extern CWorld world;
 extern struct zone_data *zone_table;
 
-extern struct str_app_type str_app[];
 extern struct race_shit race_info[30];
 
 extern char doing[500];  /* write to log if we crash */
@@ -93,7 +92,6 @@ void mobile_activity(void)
   CHAR_DATA *ch;
   CHAR_DATA *tmp_ch, *pch, *next_dude;
   struct obj_data *obj, *best_obj;
-  extern struct str_app_type str_app[];
   char buf[1000];
   int door, max;
   int done;
@@ -642,8 +640,7 @@ void scavenge(struct char_data *ch)
     if(keyword != -2) {
       if((hands_are_free(ch, 1)) && (CAN_WEAR(obj, WIELD))) 
       {
-        if(GET_OBJ_WEIGHT(obj) < 
-          str_app[STRENGTH_APPLY_INDEX(ch)].wield_w) 
+        if(GET_OBJ_WEIGHT(obj) < GET_STR(ch)) 
         {
           if(!ch->equipment[WIELD]) 
           {
