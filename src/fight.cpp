@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.164 2004/04/24 19:22:29 urizen Exp $ */
+/* $Id: fight.cpp,v 1.166 2004/04/25 21:21:23 urizen Exp $ */
 
 extern "C"
 {
@@ -1297,9 +1297,15 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
   typeofdamage = damage_type(weapon_type);
 
   if(GET_POS(victim) == POSITION_DEAD)           return (eSUCCESS|eVICT_DIED);
-
+  if (ch->in_room != victim->in_room) return eSUCCESS;
 //  csendf(victim, "damage: dam = %d  type = %d\r\n", dam, weapon_type);
-
+  if (dam!=0 && !IS_NPC(ch) && attacktype)
+  { // Skill damages based on learned %
+    int l = has_skill(ch,attacktype);
+    if (l)
+    dam = dam_percent(l, dam);
+    dam = number(dam-(dam/10), dam+(dam/10)); // +- 10%
+  }
   if(typeofdamage == DAMAGE_TYPE_MAGIC)  
   {
     if(IS_AFFECTED(victim, AFF_REFLECT)  && 
@@ -3723,7 +3729,7 @@ bool isaff2(int spellnum);
     sprintf(killer_message, "\n\r## %s [%s] just SLAUGHTERED %s [%s] in the arena!\n\r", 
          GET_NAME(ch), clan ? clan->name : "no clan", 
          GET_NAME(victim), clan2 ? clan2->name : "no clan");
-    logf(111, LOG_CHAOS, "%s [%s] killed %s [%s]", GET_NAME(ch),
+    logf(105, LOG_CHAOS, "%s [%s] killed %s [%s]", GET_NAME(ch),
          clan ? clan->name : "no clan", GET_NAME(victim), 
          clan2 ? clan2->name : "no clan");
   }
