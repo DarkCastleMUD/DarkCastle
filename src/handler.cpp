@@ -21,7 +21,7 @@
  *  12/08/2003   Onager    Added check for charmies and !charmie eq to     *
  *                         equip_char()                                    *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.70 2004/07/03 19:13:40 urizen Exp $ */
+/* $Id: handler.cpp,v 1.71 2004/07/04 19:02:13 urizen Exp $ */
     
 extern "C"
 {
@@ -2324,6 +2324,7 @@ void extract_char(CHAR_DATA *ch, bool pull)
    }
    if (IS_NPC(ch) && mob_index[ch->mobdata->nr].virt == 8)
     {
+	isGolem = TRUE;
         if (pull) {
 	   if (ch->level > 1)
 	   ch->level--;
@@ -2385,7 +2386,7 @@ void extract_char(CHAR_DATA *ch, bool pull)
        stop_guarding_me(ch);
 
     // make sure no eq left on char.  But only if pulling completely
-    if(pull)
+    if(pull )
        for ( l = 0; l < MAX_WEAR; l++ )
        {
           if ( ch->equipment[l] ) {

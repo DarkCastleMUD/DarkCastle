@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.218 2004/07/03 17:58:44 urizen Exp $ */
+/* $Id: fight.cpp,v 1.219 2004/07/04 19:02:13 urizen Exp $ */
 
 extern "C"
 {
@@ -3019,7 +3019,7 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
 
     if (number(0,1))
     { /* rk */
-      shatter_message(victim->pcdata->golem);     
+      shatter_message(victim->pcdata->golem);
       extract_char(victim->pcdata->golem, TRUE);
     } else { /* release */
       release_message(victim->pcdata->golem);

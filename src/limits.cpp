@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.50 2004/07/03 11:44:13 urizen Exp $ */
+/* $Id: limits.cpp,v 1.51 2004/07/04 19:02:13 urizen Exp $ */
 
 extern "C"
 {
@@ -324,7 +324,7 @@ void redo_mana ( CHAR_DATA *ch)
 {
    /*struct affected_type *af;*/
    int i, j, bonus = 0, stat = 0;
-
+   if (IS_NPC(ch)) return;
   ch->max_mana = ch->raw_mana;
 
   if (GET_CLASS(ch) == CLASS_MAGIC_USER || GET_CLASS(ch) == CLASS_ANTI_PAL || GET_CLASS(ch) == CLASS_RANGER)
