@@ -242,12 +242,17 @@ int do_sqedit(struct char_data *ch, char *argument, int cmd)
 	  send_to_char("Skill not found.\r\n",ch);
 	  return eFAILURE;
 	}
+	if (find_sq(i))
+	{
+	  send_to_char("Skill quest already exists. Stop duping the damn sqs ;)\r\n",ch);
+	  return eFAILURE;
+	}
 //	argument = one_argument(argument,arg3);
         if (arg3[0] != '\0')
           for (int x = 0; *pc_clss_types2[x] != '\n'; x++)
           {
              if (!str_cmp(pc_clss_types2[x],arg2))
-               clas = x;
+             clas = x;
           }
 
       #ifdef LEAK_CHECK

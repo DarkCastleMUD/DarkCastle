@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.175 2004/05/02 21:56:19 urizen Exp $ */
+/* $Id: fight.cpp,v 1.176 2004/05/02 23:17:15 urizen Exp $ */
 
 extern "C"
 {
@@ -1368,15 +1368,15 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
    { double mult = 0 - save; // Turns positive.
      mult = 1 + (mult/100);
      dam = (int)(dam * mult);
-        act("$n is susceptable against $N's assault and sustain additional damage.", victim, 0, ch, TO_ROOM, NOTVICT);
-        act("$n is susceptable against your assault and sustain additional damage.",victim,0,ch, TO_VICT, 0);
-        act("You are susceptable to $N's assault and sustain additional damage.", victim, 0, ch, TO_CHAR, 0); 
+        act("$n is susceptable against $N's assault and sustains additional damage.", victim, 0, ch, TO_ROOM, NOTVICT);
+        act("$n is susceptable against your assault and sustains additional damage.",victim,0,ch, TO_VICT, 0);
+        act("You are susceptable to $N's assault and sustains additional damage.", victim, 0, ch, TO_CHAR, 0); 
    }
    if (number(1,100) < save) {
 	dam /= 2; // Save chance.
-        act("$n resists $N's assault and sustain reduced damage.", victim, 0, ch, TO_ROOM, NOTVICT);
-        act("$n resists your assault and sustain reduced damage.",victim,0,ch, TO_VICT,0);
-        act("You resist $N's assault and sustain reduced damage.", victim, 0, ch, TO_CHAR, 0);
+        act("$n resists $N's assault and sustains reduced damage.", victim, 0, ch, TO_ROOM, NOTVICT);
+        act("$n resists your assault and sustains reduced damage.",victim,0,ch, TO_VICT,0);
+        act("You resist $N's assault and sustains reduced damage.", victim, 0, ch, TO_CHAR, 0);
    }
 
 
