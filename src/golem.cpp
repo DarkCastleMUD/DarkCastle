@@ -22,10 +22,12 @@
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
-
+#include <handler.h>
 // Locals
 void advance_golem_level(CHAR_DATA *golem);
 
+// db.cpp
+extern struct index_data obj_index[];
 // save.cpp
 int store_worn_eq(char_data * ch, FILE * fpsave);
 struct obj_data *  obj_store_to_char(CHAR_DATA *ch, FILE *fpsave, struct obj_data * last_cont );
@@ -82,6 +84,44 @@ void golem_gain_exp(CHAR_DATA *ch)
      do_save(ch->master,"",666);
      do_say(ch, "Errrrrhhgg...",0);     
   }
+}
+
+int  verify_existing_components(CHAR_DATA *ch, int golemtype)
+{ // check_components didn't suit me.
+  int retval = eSUCCESS,i;
+  struct obj_data *curr, *next_content;
+  char buf[MAX_STRING_LENGTH];
+  for (i = 0; i < 5; i++)
+  {
+    if (golem_list[golemtype].components[i] == 0) continue;
+    bool found = FALSE;
+    for (curr = ch->carrying; curr; curr = next_content)
+    {
+      next_content = curr->next_content;
+       int vnum = obj_index[curr->item_number].virt,i;
+	if (vnum == golem_list[golemtype].components[i])
+	{
+	  found = TRUE;
+	  if (i == 4) SET_BIT(retval, eEXTRA_VALUE); // Special effect.
+	}
+     }
+     if (!found) { REMOVE_BIT(retval, eSUCCESS); SET_BIT(retval, eFAILURE); }
+  }
+  if (IS_SET(retval, eSUCCESS))
+  {
+    for (i = 0; i<5; i++)
+    for (curr = ch->carrying; curr; curr = next_content)
+    {
+      if (golem_list[golemtype].components[i] == obj_index[curr->item_number].virt)
+      {
+         sprintf(buf, "%s explodes, releasing a stream of magical energies!\r\n", curr->short_description);
+          send_to_char(buf,ch);
+          obj_from_char(curr);
+          extract_obj(curr);
+      }
+    }
+  }
+  return retval;  
 }
 
 void save_golem_data(CHAR_DATA *ch)

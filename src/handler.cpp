@@ -21,7 +21,7 @@
  *  12/08/2003   Onager    Added check for charmies and !charmie eq to     *
  *                         equip_char()                                    *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.54 2004/05/21 14:20:53 urizen Exp $ */
+/* $Id: handler.cpp,v 1.55 2004/05/22 18:16:25 urizen Exp $ */
     
 extern "C"
 {
@@ -962,7 +962,7 @@ void affect_remove( CHAR_DATA *ch, struct affected_type *af, int flags, bool aff
 	    case RACE_TROLL:
 		send_to_char("Your regenerative abilitiy feels restored.\r\n",ch);
 		break;
-	    case RACE_ELVEN:
+	    case RACE_GNOME:
 		send_to_char("Your ability to improve your vision has returned.\r\n",ch);
 		break;
 	    case RACE_ORC:
@@ -971,8 +971,8 @@ void affect_remove( CHAR_DATA *ch, struct affected_type *af, int flags, bool aff
 	    case RACE_DWARVEN:
 		send_to_char("You feel ready to attempt more repairs.\r\n",ch);
 		break;
-	    case RACE_GNOME:
-		send_to_char("Your ability to move stealthily has returned.\r\n",ch);
+	    case RACE_ELVEN:
+		send_to_char("Your mind regains its ability to sharpen concentration for brief periods.\r\n",ch);
 		break;
 	    case RACE_PIXIE:
 		send_to_char("Your ability to avoid magical vision has returned.\r\n",ch);
