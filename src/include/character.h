@@ -1,7 +1,7 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.21 2004/05/29 20:45:23 urizen Exp $
+| $Id: character.h,v 1.22 2004/05/31 11:57:18 urizen Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
@@ -218,7 +218,7 @@ struct mob_data
     char *hatred;      /* List of PC's I hate */
 
     MPROG_ACT_LIST *    mpact; // list of MOBProgs
-    MPROG_ACT_LIST *    mpspec; // Special stuff assigned to the mob
+//    MPROG_ACT_LIST *    mpspec; // Special stuff assigned to the mob
 				// during runtime. (Class stuff, at the moment).
      int16                 mpactnum; // num
     int32 last_room; // Room rnum the mob was last in. Used

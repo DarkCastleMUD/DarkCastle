@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: db.h,v 1.9 2004/05/01 00:38:50 urizen Exp $ */
+/* $Id: db.h,v 1.10 2004/05/31 11:57:18 urizen Exp $ */
 #ifndef DB_H_
 #define DB_H_
 
@@ -197,6 +197,7 @@ struct index_data
 
     // TODO - clean this up so it's only in the MOB index data instead of both
     MPROG_DATA *        mobprogs;
+    MPROG_DATA *	mobspec;
     int			progtypes;
 };
 
