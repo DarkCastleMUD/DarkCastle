@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.219 2004/07/04 19:02:13 urizen Exp $ */
+/* $Id: fight.cpp,v 1.220 2004/07/08 12:37:45 urizen Exp $ */
 
 extern "C"
 {
@@ -331,8 +331,10 @@ int attack(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
 
   if(type != SKILL_BACKSTAB)
     if(handle_any_guard(vict))
-      vict = ch->fighting;
-
+    {
+      if ((vict = ch->fighting)==NULL)
+        return eFAILURE;
+    }
   assert(vict);
 
   /* if it's backstab send it to one_hit so it can be handled */

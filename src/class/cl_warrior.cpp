@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.23 2004/07/03 11:44:16 urizen Exp $
+| $Id: cl_warrior.cpp,v 1.24 2004/07/08 12:37:47 urizen Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -740,7 +740,9 @@ int handle_any_guard(char_data * ch)
 
    if(skill_success(guard,ch,SKILL_GUARD)) {
       do_rescue(guard, GET_NAME(ch), 9);
+      if (ch->fighting)
       return TRUE;
+      else return FALSE;
    }
    return FALSE;
 }

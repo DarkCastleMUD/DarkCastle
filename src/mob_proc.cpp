@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.63 2004/07/03 11:44:13 urizen Exp $ */
+/* $Id: mob_proc.cpp,v 1.64 2004/07/08 12:37:45 urizen Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -3613,7 +3613,7 @@ int newbie_zone_guard(struct char_data *ch, struct obj_data *obj, int cmd, char 
     if(IS_NPC(ch))
         return eFAILURE;
 
-    if ( ( GET_LEVEL(ch) > 15 /* mud school */
+    if ( ( GET_LEVEL(ch) > 5 /* mud school */
 	&& ch->in_room == real_room(257) && cmd == 1 ) /* north */
         || 
          ( GET_LEVEL(ch) > 20 /* newbie caves */
