@@ -5,7 +5,7 @@
  *                                                                           *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-/* $Id: magic.h,v 1.11 2003/07/22 18:29:06 pirahna Exp $ */
+/* $Id: magic.h,v 1.12 2003/12/01 17:39:08 staylor Exp $ */
 #ifndef MAGIC_H_
 #define MAGIC_H_
 
@@ -162,6 +162,8 @@ int spell_locate_object(byte level, CHAR_DATA * ch,
 int spell_poison(byte level, CHAR_DATA * ch,
    CHAR_DATA * victim, struct obj_data * obj, int skill);
 int spell_protection_from_evil(byte level, CHAR_DATA * ch,
+   CHAR_DATA * victim, struct obj_data * obj, int skill);
+int spell_protection_from_good(byte level, CHAR_DATA * ch,
    CHAR_DATA * victim, struct obj_data * obj, int skill);
 int spell_remove_curse(byte level, CHAR_DATA * ch,
    CHAR_DATA * victim, struct obj_data * obj, int skill);
@@ -329,6 +331,8 @@ int cast_locate_object(byte level, CHAR_DATA * ch, char *arg, int type,
 int cast_poison(byte level, CHAR_DATA * ch, char *arg, int type,
    CHAR_DATA * tar_ch, struct obj_data * tar_obj, int skill);
 int cast_protection_from_evil(byte level, CHAR_DATA * ch, char *arg, int type,
+   CHAR_DATA * tar_ch, struct obj_data * tar_obj, int skill);
+int cast_protection_from_good(byte level, CHAR_DATA * ch, char *arg, int type,
    CHAR_DATA * tar_ch, struct obj_data * tar_obj, int skill);
 int cast_remove_curse(byte level, CHAR_DATA * ch, char *arg, int type,
    CHAR_DATA * tar_ch, struct obj_data * tar_obj, int skill);

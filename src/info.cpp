@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.31 2003/07/08 03:15:27 pirahna Exp $ */
+/* $Id: info.cpp,v 1.32 2003/12/01 17:39:00 staylor Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -297,7 +297,7 @@ void show_spells(char_data * i, char_data * ch)
       sprintf(send_buf, "%s$7aura! ", send_buf);
       has_spells = 1;
    }
-   if (IS_AFFECTED(i,AFF_PROTECT_EVIL)) {
+   if (IS_AFFECTED(i,AFF_PROTECT_EVIL) || IS_AFFECTED(i,AFF_PROTECT_GOOD)) {
       sprintf(send_buf, "%s$R$6pulsing! ", send_buf);
       has_spells = 1;
    }

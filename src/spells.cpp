@@ -18,7 +18,7 @@
  *  10/27/2003   Onager   Changed stop_follower() cmd values to be readable *
  *                        #defines, added a BROKE_CHARM cmd                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.48 2003/11/10 19:36:29 staylor Exp $ */
+/* $Id: spells.cpp,v 1.49 2003/12/01 17:39:01 staylor Exp $ */
 
 extern "C"
 {
@@ -646,7 +646,11 @@ struct spell_info_type spell_info [ ] =
 
     { // 142
 	12, POSITION_FIGHTING, 40, TAR_IGNORE, cast_visage_of_hate
-    }
+    },
+
+    { /* 143 */
+	12, POSITION_STANDING, 50, TAR_CHAR_ROOM|TAR_SELF_ONLY, cast_protection_from_good
+    },
 };
 
 char *skills[]=
@@ -866,6 +870,7 @@ char *spells[]=
    "dismiss corpse",
    "blessed halo",
    "visage of hate",
+   "protection from good",
    "\n"
 };
 

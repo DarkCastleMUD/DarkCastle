@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.16 2003/11/10 19:36:28 staylor Exp $ */
+/* $Id: clan.cpp,v 1.17 2003/12/01 17:38:59 staylor Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -2041,6 +2041,7 @@ int do_clans(CHAR_DATA *ch, char *arg, int cmd)
 
   if(!strcmp("Pirahna", GET_NAME(ch)) || 
      !strcmp("Apocalypse", GET_NAME(ch)) ||
+     !strcmp("Onager", GET_NAME(ch)) ||
      !strcmp("Valkyrie", GET_NAME(ch))
     ) 
   {

@@ -12,7 +12,12 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.88 2003/11/10 19:36:28 staylor Exp $ */
+/* $Id: magic.cpp,v 1.89 2003/12/01 17:39:00 staylor Exp $ */
+/***************************************************************************/
+/* Revision History                                                        */
+/* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
+/*                       quietly remove spell effects                      */
+/***************************************************************************/
 
 extern "C"
 {
@@ -1475,7 +1480,7 @@ int spell_detect_evil(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 
   affect_to_char(victim, &af);
 
-  send_to_char("Your eyes tingle.\n\r", victim);
+  send_to_char("You become more conscious of the evil around you.\n\r", victim);
   return eSUCCESS;
 }
 
@@ -1504,7 +1509,7 @@ int spell_detect_good(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 
   affect_to_char(victim, &af);
 
-  send_to_char("Your eyes tingle.\n\r", victim);
+  send_to_char("You are now able to truly recognize the good in others.\n\r", victim);
   return eSUCCESS;
 }
 
@@ -1535,7 +1540,7 @@ int spell_true_sight(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
 
   affect_to_char(victim, &af);
 
-  send_to_char("Your eyes tingle.\n\r", victim);
+  send_to_char("You feel your vision enhanced with an incredibly keen perception.\n\r", victim);
   return eSUCCESS;
 }
 
@@ -1622,7 +1627,7 @@ int spell_detect_magic(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
   af.bitvector = AFF_DETECT_MAGIC;
 
   affect_to_char(victim, &af);
-  send_to_char("Your eyes tingle.\n\r", victim);
+  send_to_char("Your vision temporarily blurs, your focus shifting to the metaphysical realm.\n\r", victim);
   return eSUCCESS;
 }
 
@@ -2030,6 +2035,30 @@ int spell_protection_from_evil(byte level, CHAR_DATA *ch, CHAR_DATA *victim, str
 	 af.bitvector = AFF_PROTECT_EVIL;
 	 affect_to_char(victim, &af);
 	 send_to_char("You have a righteous, protected feeling!\n\r", victim);
+  }
+  return eSUCCESS;
+}
+
+int spell_protection_from_good(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
+{
+  struct affected_type af;
+
+  assert(victim);
+
+  if ( IS_AFFECTED(victim,AFF_PROTECT_GOOD) )
+	 return eFAILURE;
+
+  if (!affected_by_spell(victim, SPELL_PROTECT_FROM_GOOD) ) 
+  {
+	 skill_increase_check(ch, SPELL_PROTECT_FROM_GOOD, skill, SKILL_INCREASE_MEDIUM);
+
+	 af.type      = SPELL_PROTECT_FROM_GOOD;
+	 af.duration  = (int) (skill / 3.75);
+	 af.modifier  = 0;
+	 af.location  = APPLY_NONE;
+	 af.bitvector = AFF_PROTECT_GOOD;
+	 affect_to_char(victim, &af);
+	 send_to_char("You feel yourself wrapped in a protective mantle of evil.\n\r", victim);
   }
   return eSUCCESS;
 }
@@ -3336,6 +3365,7 @@ int spell_refresh(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data 
 int spell_fly(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
   struct affected_type af;
+  struct affected_type *cur_af;
 
   if(!ch || !victim)
   {
@@ -3343,8 +3373,9 @@ int spell_fly(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj
     return eFAILURE;
   }
 
-  if(affected_by_spell(victim, SPELL_FLY))
-    affect_from_char(victim, SPELL_FLY);
+  if((cur_af = affected_by_spell(victim, SPELL_FLY)))
+    affect_remove(victim, cur_af, SUPPRESS_ALL);
+    //affect_from_char(victim, SPELL_FLY);
 
   if(IS_AFFECTED(victim, AFF_FLYING))
     return eFAILURE;
@@ -6216,6 +6247,35 @@ int cast_protection_from_evil( byte level, CHAR_DATA *ch, char *arg, int type,
 }
 
 
+int cast_protection_from_good( byte level, CHAR_DATA *ch, char *arg, int type,
+  CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill )
+{
+  switch (type) {
+    case SPELL_TYPE_SPELL:
+      return spell_protection_from_good(level, ch, tar_ch, 0, skill);
+      break;
+    case SPELL_TYPE_POTION:
+      return spell_protection_from_good(level, ch, ch, 0, skill);
+      break;
+    case SPELL_TYPE_WAND:
+      if(tar_obj) return eFAILURE;
+      return spell_protection_from_good(level, ch, tar_ch, 0, skill);
+    case SPELL_TYPE_SCROLL:
+      if(tar_obj) return eFAILURE;
+      if(!tar_ch) tar_ch = ch;
+        return spell_protection_from_good(level, ch, tar_ch, 0, skill);
+      break;
+    case SPELL_TYPE_STAFF:
+      for (tar_ch = world[ch->in_room].people; tar_ch ; tar_ch = tar_ch->next_in_room)
+        spell_protection_from_good(level,ch,tar_ch,0, skill);
+      break;
+    default :
+      log("Serious screw-up in protection from good!", ANGEL, LOG_BUG);
+      break;
+  }
+  return eFAILURE;
+}
+
 int cast_remove_curse( byte level, CHAR_DATA *ch, char *arg, int type,
   CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill )
 {
@@ -8728,10 +8788,12 @@ int cast_acid_shield( byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA 
 int spell_water_breathing(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
   struct affected_type af;
+  struct affected_type *cur_af;
 
   
-  if (affected_by_spell(victim, SPELL_WATER_BREATHING))
-    affect_from_char(victim, SPELL_WATER_BREATHING);
+  if ((cur_af = affected_by_spell(victim, SPELL_WATER_BREATHING)))
+    affect_remove(victim, cur_af, SUPPRESS_ALL);
+    //affect_from_char(victim, SPELL_WATER_BREATHING);
 
   act("Small gills spring forth from $n's neck and begin fanning as $e breathes.", victim, 0, 0, TO_ROOM, INVIS_NULL);
   act("Your neck springs gills and the air around you suddenly seems so dry.", victim, 0, 0, TO_CHAR, 0);

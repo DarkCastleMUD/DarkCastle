@@ -9,9 +9,12 @@
 *                       Changed raw_kill() to make imms immune to stat loss  *
 *  11/09/2003  Onager   Added noncombat_damage() to do noncombat-related     *
 *                       damage (such as falls, drowning) that may kill       *
+*  11/24/2003  Onager   Totally revamped group_gain(); subbed out a lot of   *
+*                       the code and revised exp calculations for soloers    *
+ *                      and groups.                                          *
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.128 2003/11/10 19:56:38 staylor Exp $ */
+/* $Id: fight.cpp,v 1.129 2003/12/01 17:39:00 staylor Exp $ */
 
 extern "C"
 {
@@ -89,6 +92,12 @@ void check_weapon_skill_bonus(char_data * ch, int type, obj_data *wielded,
                               int & weapon_skill_hit_bonus, int & weapon_skill_dam_bonus);
 
 void update_flags(CHAR_DATA *vict);
+long scale_char_xp(CHAR_DATA *ch, CHAR_DATA *killer, CHAR_DATA *victim,
+                   long no_killers, long highest_level, long base_share);
+CHAR_DATA *loop_followers(struct follow_type **f);
+long count_xp_eligibles(CHAR_DATA *leader, CHAR_DATA *killer,
+                        long highest_level);
+CHAR_DATA *get_highest_level_killer(CHAR_DATA *leader, CHAR_DATA *killer);
  
 CHAR_DATA *combat_list = NULL, *combat_next_dude = NULL;
 
@@ -2911,9 +2920,9 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
 void group_gain(CHAR_DATA * ch, CHAR_DATA * victim)
 {
   char buf[256];
-  long no_members, share, tmp_share;
-  long totallevels;
-  CHAR_DATA *k, *highest, *tmp_ch;
+  long no_members = 0, share, tmp_share;
+  long base_xp = 0;
+  CHAR_DATA *leader, *highest, *tmp_ch;
   struct follow_type *f;
   
   if(is_pkill(ch, victim))        return;
@@ -2928,50 +2937,16 @@ void group_gain(CHAR_DATA * ch, CHAR_DATA * victim)
                 && ch->in_room == ch->master->in_room)
     ch = ch->master;
 
-  // Set k to group leader
-  if(!(k = ch->master))
-    k = ch;
+  // Set group leader
+  if(!(leader = ch->master))
+    leader = ch;
 
-  no_members = 0;
-  totallevels = 0;
-  
-  if(IS_AFFECTED(k, AFF_GROUP) && k->in_room == ch->in_room) { 
-    highest = k; // set group leader as highest level to start
-    no_members += 1;
-    totallevels += GET_LEVEL(k);
-  }
-  else highest = ch; // since group leader isn't here, set myself as highest in room
+  highest = get_highest_level_killer(leader, ch);
+  no_members = count_xp_eligibles(leader, ch, GET_LEVEL(highest));
 
-  for(f = k->followers; f; f = f->next) 
-  {
-    if(IS_AFFECTED(f->follower, AFF_GROUP) &&    // if grouped
-      f->follower->in_room == ch->in_room  &&    // and in the room
-      !IS_MOB(f->follower))
-    {
-      no_members += 1;
-      totallevels += GET_LEVEL(f->follower);
-      if(GET_LEVEL(f->follower) > GET_LEVEL(highest))
-        highest = f->follower;                  // changest 'highest' if it's not me
-    }
-  }
-
-  if(no_members == 0) { 
-    no_members = 1;
-    totallevels = GET_LEVEL(ch);
-  }
-
-  share = GET_EXP(victim);
-
-  switch(no_members) {
-    case 1:  break; // * 1.0 
-    case 2:  share = (int) (share * 1.2); break;  
-    case 3:  share = (int) (share * 1.4); break; 
-    default:  share = (int) (share * 1.6); break; 
-  }
-
-  // loop with k first, then all the followers
-  tmp_ch = k;
-  f = k->followers;
+  // loop with leader first, then all the followers
+  tmp_ch = leader;
+  f = leader->followers;
   do
   { 
     if(( tmp_ch->in_room != ch->in_room )                         ||
@@ -2980,101 +2955,142 @@ void group_gain(CHAR_DATA * ch, CHAR_DATA * victim)
        ( (tmp_ch != ch) && (!IS_AFFECTED(ch, AFF_GROUP)) )
       )
     {
-       // this loops the followers (cut and pasted below)
-       if(f) {
-          tmp_ch = f->follower;
-          f = f->next;
-       }
-       else tmp_ch = NULL;
+       tmp_ch = loop_followers(&f);
        continue;
     }
     
     if(GET_LEVEL(tmp_ch) - GET_LEVEL(highest) <= -20) {
        act("You are too low for this group.  You gain no experience.", tmp_ch, 0, 0, TO_CHAR, 0);
 
-       // this loops the followers (cut and pasted above and below)
-       if(f) {
-          tmp_ch = f->follower;
-          f = f->next;
-       }
-       else tmp_ch = NULL;
+       tmp_ch = loop_followers(&f);
        continue;
     }
-    
-    if(no_members < 2)
-       tmp_share = share;
-    else tmp_share = (((GET_LEVEL(tmp_ch)+2) * share) / totallevels);  
 
-    int levelmod = GET_LEVEL(victim) - GET_LEVEL(tmp_ch);
-    if(no_members < 2) {
-       if(GET_LEVEL(ch) < 25)
-          levelmod += (int) ( ((double)GET_LEVEL(ch)/25) * 5);
-       else levelmod += 5; // Solo'rs get xp off lower level mobs
-    }
-    // reduce xp if you are higher level than mob
-    switch(levelmod) {
-      case -1:  break;
-      case -2:  break;
-      case -3:  break;
-      case -4:  break;
-      case -5:  break;
-      case -6:  
-      case -7:  tmp_share = (int) (tmp_share * 0.9); break;
-      case -8:  
-      case -9:  tmp_share = (int) (tmp_share * 0.8); break;
-      case -10:  
-      case -11:  tmp_share = (int) (tmp_share * 0.7); break;
-      case -12:
-      case -13: tmp_share = (int) (tmp_share * 0.6); break;
-      case -14: 
-      case -15: tmp_share = (int) (tmp_share * 0.5); break;
-      case -16: tmp_share = (int) (tmp_share * 0.4); break;
-      case -17: tmp_share = (int) (tmp_share * 0.3); break;
-      case -18: 
-      case -19: tmp_share = (int) (tmp_share * 0.2); break;
-      default:  if(GET_LEVEL(victim)+5 < GET_LEVEL(tmp_ch))
-                  tmp_share = (int) (tmp_share * 0.1);
-                else tmp_share = (int) (tmp_share * 1.1); break;
-               break;
-    }
- 
-    // reduce/add to xp depending on number of people in group
-    switch(no_members) {
-      case 1:
-        tmp_share = MIN((GET_LEVEL(tmp_ch) * 6000), tmp_share);
-        break;
-      case 2:
-        tmp_share = MIN((GET_LEVEL(tmp_ch) * 7000), tmp_share);
-        break;
-      case 3:
-        tmp_share = MIN((GET_LEVEL(tmp_ch) * 8000), tmp_share);
-        break;
-      default: 
-        tmp_share = MIN((GET_LEVEL(tmp_ch) * 8500), tmp_share);
-        break;
-    }
+    /* calculate base XP value */
+    base_xp = GET_LEVEL(tmp_ch) * 8000;
+    if (base_xp > 400000)
+       base_xp = 400000;
+    if (base_xp > GET_EXP(victim))
+       base_xp = GET_EXP(victim);
+    share = base_xp;
     
-    if(tmp_share > share)      tmp_share = share;
-    if(tmp_share < 0)          tmp_share = 0;
-    if(IS_NPC(tmp_ch))         tmp_share /= 2;
+    /* calculate this character's share of the XP */
+    tmp_share = scale_char_xp(tmp_ch, ch, victim, no_members, GET_LEVEL(highest), share);
     
-    sprintf(buf, "You receive %ld exps of %ld total.\n\r", tmp_share, share);
+    sprintf(buf, "You receive %ld exps.\n\r", tmp_share);
     send_to_char(buf, tmp_ch);
     gain_exp(tmp_ch, tmp_share);
     change_alignment(tmp_ch, victim);
 
     // this loops the followers (cut and pasted above)
-    if(f) {
-       tmp_ch = f->follower;
-       f = f->next;
-    }
-    else tmp_ch = NULL;
+    tmp_ch = loop_followers(&f);
   }
   while(tmp_ch);
 }
 
+/* find the highest level present at the kill */
+CHAR_DATA *get_highest_level_killer(CHAR_DATA *leader, CHAR_DATA *killer)
+{
+  struct follow_type *f;
+  CHAR_DATA *highest = killer;
 
+  /* check to see if the group leader was involved and outranks the killer */
+  if (leader->in_room == killer->in_room
+      && GET_LEVEL(leader) > GET_LEVEL(killer))
+    highest = leader;
 
+  /* loop through all groupies */
+  for(f = leader->followers; f; f = f->next) 
+  {
+    if(IS_AFFECTED(f->follower, AFF_GROUP) &&    // if grouped
+      f->follower->in_room == killer->in_room  &&    // and in the room
+      !IS_MOB(f->follower))
+    {
+      if(GET_LEVEL(f->follower) > GET_LEVEL(highest))
+        highest = f->follower;
+    }
+  }
+  return(highest);
+}
+
+/* count the number of group members eligible for XP from a kill */
+long count_xp_eligibles(CHAR_DATA *leader, CHAR_DATA *killer,
+                        long highest_level)
+{
+  struct follow_type *f;
+  long num_eligibles = 0;
+
+  /* check to see if the group leader was involved and eligible for XP */
+  if (leader->in_room == killer->in_room
+      && highest_level - GET_LEVEL(leader) < 20)
+      num_eligibles += 1;
+
+  /* loop through all the groupies */
+  for(f = leader->followers; f; f = f->next) 
+  {
+    if(IS_AFFECTED(f->follower, AFF_GROUP) &&    // if grouped
+      f->follower->in_room == killer->in_room  &&    // and in the room
+      !IS_MOB(f->follower) &&
+      (highest_level - GET_LEVEL(f->follower)) < 20)
+    {
+      num_eligibles += 1;
+    }
+  }
+  return(num_eligibles);
+}
+
+/* scale character XP based on various factors */
+long scale_char_xp(CHAR_DATA *ch, CHAR_DATA *killer, CHAR_DATA *victim,
+                  long no_killers, long highest_level, long base_share)
+{
+    long scaled_share;
+    long levelmod;
+    long bonus, bonus_multiplier;
+
+    if(no_killers < 2) {
+       /* solo kill */
+       levelmod = GET_LEVEL(ch) - GET_LEVEL(victim);
+       if (levelmod <= 15)
+          scaled_share = base_share;
+       else if (levelmod <= 25)
+          scaled_share = (base_share * 75) / 100;
+       else
+          scaled_share = (base_share * 50) / 100;
+    } else {
+       /* group kill */
+       if (no_killers > 6)
+          /* limit max bonus to 30% (6 killers * 5%) */
+          no_killers = 6;
+       if (highest_level - GET_LEVEL(victim) <= 0)
+          bonus = (base_share * no_killers * 5) / 100;
+       else {
+          bonus_multiplier = 5 - (highest_level - GET_LEVEL(victim)) / 3;
+          if (bonus_multiplier < 0)
+             bonus_multiplier = 0;
+          bonus = (base_share * no_killers * bonus_multiplier) / 100;
+       }
+
+       scaled_share = base_share + bonus;
+    }
+
+    return(scaled_share);
+}
+
+/* advance to the next follower in the list */
+CHAR_DATA *loop_followers(struct follow_type **f)
+{
+   CHAR_DATA *tmp_ch;
+
+   // this loops the followers
+   if(*f) {
+      tmp_ch = (*f)->follower;
+      *f = (*f)->next;
+   }
+   else
+      tmp_ch = NULL;
+
+   return(tmp_ch);
+}
 
 void dam_message(int dam, CHAR_DATA * ch, CHAR_DATA * victim,
                  int w_type, long modifier)

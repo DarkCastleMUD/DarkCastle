@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.40 2003/09/07 00:25:30 pirahna Exp $ */
+/* $Id: mob_proc.cpp,v 1.41 2003/12/01 17:39:01 staylor Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -1933,6 +1933,10 @@ int backstabber(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
          if (IS_EVIL(ch) && (GET_LEVEL(ch) <= GET_LEVEL(tch)))
              continue;
                }
+    if (IS_AFFECTED(tch, AFF_PROTECT_GOOD)) {
+         if (IS_GOOD(ch) && (GET_LEVEL(ch) <= GET_LEVEL(tch)))
+             continue;
+               }
   
          if (ch->equipment[WIELD])  {
 
@@ -3719,6 +3723,9 @@ int humaneater(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 
               if (IS_AFFECTED(tch, AFF_PROTECT_EVIL))
                 if (IS_EVIL(ch) && (GET_LEVEL(ch) <= GET_LEVEL(tch)))
+                  continue;
+              if (IS_AFFECTED(tch, AFF_PROTECT_GOOD))
+                if (IS_GOOD(ch) && (GET_LEVEL(ch) <= GET_LEVEL(tch)))
                   continue;
 
               if (GET_RACE(tch) != RACE_HUMAN)

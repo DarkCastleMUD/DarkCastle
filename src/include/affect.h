@@ -2,7 +2,7 @@
 #define AFFECT_H_
 
 /************************************************************************
-| $Id: affect.h,v 1.5 2003/01/21 05:34:38 pirahna Exp $
+| $Id: affect.h,v 1.6 2003/12/01 17:39:08 staylor Exp $
 | affect.h
 | This contains the bitvectors for affected_by
 */
@@ -56,5 +56,6 @@
 #define AFF_ALERT               1<<12
 #define AFF_NO_FLEE             1<<13
 #define AFF_FAMILIAR            1<<14
+#define AFF_PROTECT_GOOD        1<<15
 
 #endif

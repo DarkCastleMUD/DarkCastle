@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.22 2003/10/19 05:47:42 staylor Exp $
+| $Id: inventory.cpp,v 1.23 2003/12/01 17:39:00 staylor Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -8,6 +8,8 @@
 | 10/17/2003   Onager   Changed do_consent() to fix buffer overflow crash bug
 |                       and to only add consented character's name to the
 |                       corpse name once (it was getting added on every consent)
+| 11/10/2003   Onager   Added check to prevent consenting NPCs, and limited
+|                       consented string lenth to 1/2 max string length
 */
 extern "C"
 {
@@ -549,6 +551,12 @@ int do_consent(struct char_data *ch, char *arg, int cmd)
     return eFAILURE;
   }
 
+  // prevent consenting of NPCs
+  if (IS_NPC(vict)) {
+    send_to_char("Now what business would THAT thing have with your mortal remains?\n\r", ch);
+    return eFAILURE;
+  }
+
   for(obj = object_list; obj; obj = obj->next) {
      if(obj->obj_flags.type_flag != ITEM_CONTAINER || obj->obj_flags.value[3] != 1 || !obj->name)
        continue;
@@ -564,7 +572,7 @@ int do_consent(struct char_data *ch, char *arg, int cmd)
         continue;
 
      // check for buffer overflow before adding the new name to the list
-     if ((strlen(obj->name) + strlen(buf) + strlen(" _consent")) > MAX_STRING_LENGTH) {
+     if ((strlen(obj->name) + strlen(buf) + strlen(" _consent")) > (MAX_STRING_LENGTH / 2)) {
        send_to_char("Don't you think there are enough perverts molesting "
                     "your\n\rmaggot-ridden corpse already?\n\r", ch);
        return eFAILURE;

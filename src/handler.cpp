@@ -19,7 +19,7 @@
  *  11/8/2003    Onager    Added flags to affect_remove() to allow it to   *
  *                         be called without penalties or wear-off messages*
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.24 2003/11/10 19:36:28 staylor Exp $ */
+/* $Id: handler.cpp,v 1.25 2003/12/01 17:39:00 staylor Exp $ */
     
 extern "C"
 {
@@ -540,11 +540,11 @@ void affect_modify(CHAR_DATA *ch, int32 loc, int32 mod, long bitv, bool add)
 
     
         case APPLY_PROTECT_EVIL: {
-               if (add) {
+            if (add) {
                      SET_BIT(ch->affected_by, AFF_PROTECT_EVIL);
             } else {
                   REMOVE_BIT(ch->affected_by, AFF_PROTECT_EVIL);
-             }
+            }
           } break;
 
     
@@ -750,6 +750,13 @@ void affect_modify(CHAR_DATA *ch, int32 loc, int32 mod, long bitv, bool add)
 
         case WEP_THIEF_POISON:
             break;
+
+        case APPLY_PROTECT_GOOD:
+           if (add)
+              SET_BIT(ch->affected_by, AFF_PROTECT_GOOD);
+           else
+              REMOVE_BIT(ch->affected_by, AFF_PROTECT_GOOD);
+           break;
 
 	default:
           sprintf(log_buf, "Unknown apply adjust attempt: %d. (handler.c, "

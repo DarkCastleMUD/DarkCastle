@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: const.cpp,v 1.65 2003/08/12 03:59:02 pirahna Exp $ */
+/* $Id: const.cpp,v 1.66 2003/12/01 17:39:00 staylor Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -816,6 +816,7 @@ char *affected_bits[] =
     "LIGHTNING_SHIELD",
     "HASTE",
     "FAMILIAR",
+    "PROTECT-GOOD",
     "\n"
 };
 
@@ -920,6 +921,7 @@ char *apply_types[] =
     "CREATE FOOD",
     "DAMAGED",
     "THIEF_POISON",
+    "PROTECTION FROM GOOD",
     "\n"
 };
 

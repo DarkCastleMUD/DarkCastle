@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: mob_act.cpp,v 1.9 2003/06/22 23:37:48 pirahna Exp $ */
+/* $Id: mob_act.cpp,v 1.10 2003/12/01 17:39:01 staylor Exp $ */
 
 extern "C"
 {
@@ -599,9 +599,10 @@ void mobile_activity(void)
       
         if(isname(GET_NAME(tmp_ch), ch->mobdata->hatred)) // use isname since hatred is a list
         {
-          if( ( IS_AFFECTED(tmp_ch, AFF_PROTECT_EVIL) && IS_EVIL(ch) &&
-                ( GET_LEVEL(ch) <= ( GET_LEVEL(tmp_ch)+2) )
-              ) ||
+          if((IS_AFFECTED(tmp_ch, AFF_PROTECT_EVIL) && IS_EVIL(ch) &&
+                (GET_LEVEL(ch) <= ( GET_LEVEL(tmp_ch)+2))) ||
+            (IS_AFFECTED(tmp_ch, AFF_PROTECT_GOOD) && IS_GOOD(ch) &&
+                (GET_LEVEL(ch) <= (GET_LEVEL(tmp_ch)+2))) ||
               IS_SET(world[ch->in_room].room_flags, SAFE))  
           {
             act("You growl at $N.", ch,0,tmp_ch,TO_CHAR, 0);
@@ -673,14 +674,18 @@ void mobile_activity(void)
             continue;
       
           if((IS_AFFECTED(tmp_ch, AFF_PROTECT_EVIL)) ||
-            (GET_CLASS(tmp_ch) == CLASS_ANTI_PAL)) 
-          {
-            if(IS_EVIL(ch)) {
-              if(GET_LEVEL(ch) <= (GET_LEVEL(tmp_ch)))
+            (GET_CLASS(tmp_ch) == CLASS_ANTI_PAL)) {
+              if(IS_EVIL(ch) && GET_LEVEL(ch) <= (GET_LEVEL(tmp_ch)))
                 continue;
-            }
           }
       
+          if((IS_AFFECTED(tmp_ch, AFF_PROTECT_GOOD)) ||
+            (GET_CLASS(tmp_ch) == CLASS_PALADIN)) 
+          {
+            if(IS_GOOD(ch) && GET_LEVEL(ch) <= (GET_LEVEL(tmp_ch)))
+                continue;
+          }
+
           if(number(0, 1)) {
             done = 1;
             retval = mprog_attack_trigger( ch, tmp_ch );

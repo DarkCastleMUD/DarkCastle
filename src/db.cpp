@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.24 2003/11/10 19:36:28 staylor Exp $ */
+/* $Id: db.cpp,v 1.25 2003/12/01 17:39:00 staylor Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -2862,6 +2862,9 @@ struct obj_data *read_object(int nr, FILE *fl)
     obj->obj_flags.weight       = fread_int (fl, -1000, LONG_MAX);
     obj->obj_flags.cost         = fread_int (fl, -1000, LONG_MAX);
     obj->obj_flags.more_flags   = fread_bitvector (fl, -1000, LONG_MAX);
+
+    /* currently not stored in object file */
+    obj->obj_flags.timer = 0;
 
     obj->ex_description = NULL;
     obj->affected = NULL;
