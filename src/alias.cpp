@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: alias.cpp,v 1.3 2002/10/01 03:55:29 pirahna Exp $
+| $Id: alias.cpp,v 1.4 2002/10/21 18:09:55 waz Exp $
 | alias.C
 | Description:  Commands for the alias processor.
 */
@@ -98,6 +98,20 @@ int do_alias(struct char_data *ch, char *arg, int cmd)
         tmp[0] = arg[x];
         strcat(buf1, tmp);
       }
+
+      /*
+       * alias is a bad alias to have! waz
+       */
+      if (!str_cmp(buf, "alias")) {
+          sprintf(outbuf, "Setting 'alias' as an alias would be silly!\n\r");
+          send_to_char(outbuf, ch);
+          dc_free (curr->command);
+          curr->command = str_dup(buf1);      
+          dc_free(buf);
+          dc_free(buf1);
+          return eSUCCESS;
+      }
+
 	    
       /*   Check for keyword match...
        *   If match found, replace command with command...
