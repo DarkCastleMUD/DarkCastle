@@ -486,8 +486,11 @@ int do_show(struct char_data *ch, char *argument, int cmd)
   extern int top_of_objt;
   extern int top_of_world;
 
-  half_chop(argument, type, name);
+//  half_chop(argument, type, name);
+  argument = one_argument(argument,type);
 
+  //argument = one_argument(argument,name);
+  
   int has_range = has_skill(ch, COMMAND_RANGE);
 
   if(!*type) {
@@ -510,6 +513,7 @@ int do_show(struct char_data *ch, char *argument, int cmd)
 
   if(is_abbrev(type,"mobile")) 
   {
+    argument = one_argument(argument,name);
     if(!*name) {
        send_to_char("Format:  show mob <keyword>\r\n"
                     "                  <number>\r\n"
@@ -518,8 +522,10 @@ int do_show(struct char_data *ch, char *argument, int cmd)
     }
 
     if(isdigit(*name)) {
-       half_chop(name, beginrange, endrange);
-       if(!*endrange)
+//       half_chop(name, beginrange, endrange);
+        beginrange = name;
+        argument = one_argument(argument,endrange);
+        if(!*endrange)
          strcpy(endrange, "-1");
 
        if(!check_range_valid_and_convert(begin, beginrange, 0, 100000) ||
@@ -591,7 +597,8 @@ char_data*)(mob_index[nr].item))->level,
   } /* "mobile" */
   else if (is_abbrev(type,"object")) 
   {
-    if(!*name) {
+    argument = one_argument(argument,name);
+     if(!*name) {
        send_to_char("Format:  show obj <keyword>\r\n"
                     "                  <number>\r\n"
                     "                  <beginrange> <endrange>\r\n", ch);
@@ -599,8 +606,10 @@ char_data*)(mob_index[nr].item))->level,
     }
 
     if(isdigit(*name)) {
-       half_chop(name, beginrange, endrange);
-       if(!*endrange)
+ //      half_chop(name, beginrange, endrange);
+    argument = one_argument(argument,endrange);
+	beginrange = name;
+        if(!*endrange)
          strcpy(endrange, "-1");
 
        if(!check_range_valid_and_convert(begin, beginrange, 0, 100000) ||
@@ -672,14 +681,17 @@ obj_data *)(obj_index[nr].item))->obj_flags.eq_level,
   } /* "object" */
   else if (is_abbrev(type,"room")) 
   {
-    if(!*name) {
+    argument = one_argument(argument,name);
+     if(!*name) {
        send_to_char("Format:  show room <beginrange> <endrange>\r\n", ch);
        return eFAILURE;
     }
 
     if(isdigit(*name)) {
-       half_chop(name, beginrange, endrange);
-       if(!*endrange)
+ //      half_chop(name, beginrange, endrange);
+      argument = one_argument(argument,endrange);
+	beginrange = name;
+        if(!*endrange)
          strcpy(endrange, "-1");
 
        if(!check_range_valid_and_convert(begin, beginrange, 0, 100000) ||
@@ -724,7 +736,8 @@ obj_data *)(obj_index[nr].item))->obj_flags.eq_level,
   } /* "object" */
   else if (is_abbrev(type, "zone"))
   {
-    if(!*name) {
+    argument = one_argument(argument,name);
+     if(!*name) {
        send_to_char("Show which zone? (# or 'all')\r\n", ch);
        return eFAILURE;
     }
@@ -764,67 +777,79 @@ obj_data *)(obj_index[nr].item))->obj_flags.eq_level,
     while ( ( argument = one_argument(argument, arg1) ) )
     {
        int i;
+       if (strlen(arg1) < 2) break;
        for (i = 0; *wear_bits[i] != '\n' ; i++)
-	if (is_abbrev(wear_bits[i],arg1))
+	if (!str_cmp(wear_bits[i],arg1))
 	{
 	  SET_BIT(wear, 1<<i);
 	  continue;
 	}
        for (i = 0; *extra_bits[i] != '\n' ; i++)
-        if (is_abbrev(extra_bits[i],arg1))
+        if (!str_cmp(extra_bits[i],arg1))
         {
           SET_BIT(extra, 1<<i);
           continue;
         }
        for (i = 0; *more_obj_bits[i] != '\n' ; i++)
-        if (is_abbrev(more_obj_bits[i],arg1))
+        if (!str_cmp(more_obj_bits[i],arg1))
         {
           SET_BIT(more, 1<<i);
           continue;
         }
        for (i = 0; *size_bitfields[i] != '\n' ; i++)
-        if (is_abbrev(size_bitfields[i],arg1))
+        if (!str_cmp(size_bitfields[i],arg1))
         {
           SET_BIT(size, 1<<i);
           continue;
         }
        for (i = 0; *apply_types[i] != '\n' ; i++)
-        if (is_abbrev(apply_types[i],arg1))
+        if (!str_cmp(apply_types[i],arg1))
         {
-          SET_BIT(more, 1<<i);
+          SET_BIT(affect, 1<<i);
           continue;
-        }
+        }/*
        for (i = 0; *pc_clss_types[i] != '\n' ; i++)
-        if (is_abbrev(pc_clss_types[i],arg1))
+        if (!str_cmp(pc_clss_types[i],arg1))
         {
           SET_BIT(more, 1<<i);
           continue;
-        }
-     int found = 0,c,nr;
+        }*/
+     }
+     int c,nr;
+//     csendf(ch,"%d %d %d %d %d", more, extra, wear, size, affect);
      for (c=0;c < obj_index[top_of_objt].virt;c++)
      {
       if ((nr = real_object(c)) < 0)
            continue;
+      if(wear)
       if (!IS_SET(((struct obj_data *)(obj_index[nr].item))->obj_flags.wear_flags, wear))
 	continue;
-      if (!IS_SET(    ((struct obj_data *)(obj_index[nr].item))->obj_flags.size, size))
+      if (size)
+      if (!IS_SET(((struct obj_data *)(obj_index[nr].item))->obj_flags.size, size))
 	continue;
-      if (!IS_SET(    ((struct obj_data *)(obj_index[nr].item))->obj_flags.extra_flags, extra))
+      if(extra)
+      if (!IS_SET(((struct obj_data *)(obj_index[nr].item))->obj_flags.extra_flags, extra))
 	continue;
+      if (more)
       if (!IS_SET(((struct obj_data *)(obj_index[nr].item))->obj_flags.more_flags, more))
 	continue;
       int aff,total = 0;
-      for (aff = 0; aff < ((struct obj_data *)(obj_index[nr].item))->num_affects;i++)
+      for (aff = 0; aff < ((struct obj_data *)(obj_index[nr].item))->num_affects;aff++)
 	SET_BIT(total, ((struct obj_data *)(obj_index[nr].item))->affected[aff].location);
-      if (!IS_SET(total, affect))
+     if (affect)
+     if (!IS_SET(total, affect))
         continue;
       count++;
-           sprintf(buf, "[%3d] [%5d] [%2d] %s\n\r", count, i, ((struct
+      if (count > 200)
+      {
+	send_to_char("Limit reached.\r\n",ch);
+	break;
+      }
+           sprintf(buf, "[%3d] [%5d] [%2d] %s\n\r", count, c, ((struct
 obj_data *)(obj_index[nr].item))->obj_flags.eq_level,
               ((struct obj_data *)(obj_index[nr].item))->short_description);
            send_to_char(buf, ch);
      }
-    }
   }
   else if (is_abbrev(type, "rfiles") && has_range)
   {
