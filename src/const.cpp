@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: const.cpp,v 1.61 2003/07/08 01:45:56 pirahna Exp $ */
+/* $Id: const.cpp,v 1.62 2003/07/08 03:15:27 pirahna Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1150,6 +1150,7 @@ struct class_skill_defines k_skills[] = {
 {    "eagleclaw",	SKILL_EAGLE_CLAW,	17,	75,	-2, 	"A hermit has the knowledge to this skill, but luckily for you this hermit is a nice one."},
 {    "dual wield",      SKILL_DUAL_WIELD,       20,     60,	-2,	"With whirling blades and rigid honor, only these masters of weaponry can teach you the skill you need." },
 {    "stun",		SKILL_STUN,		30,	60,	-2, 	"You must see a master shaolin monk."},
+{    "hand to hand",	SKILL_HAND_TO_HAND,	30,	90,	10008,	NULL },
 {    "quiver",		SKILL_QUIVERING_PALM,	40,	75,	-2, 	"A knight of a most dangerous and twisted place quite large holds the knowledge you seek."},
 {    "purify",		KI_PURIFY+KI_OFFSET,	5,	80,	-2, 	"A tower of water so pure, only he could know."},
 {    "punch",		KI_PUNCH+KI_OFFSET,	10,	80,	-2, 	"You seek a brother in a secret monastery."},

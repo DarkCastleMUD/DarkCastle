@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.122 2003/07/08 01:04:11 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.123 2003/07/08 03:15:27 pirahna Exp $ */
 
 extern "C"
 {
@@ -659,6 +659,10 @@ void check_weapon_skill_bonus(char_data * ch, int type, obj_data *wielded,
       case TYPE_PIERCE:
          learned = has_skill(ch, SKILL_PIERCEING_WEAPONS);
          skill = SKILL_PIERCEING_WEAPONS;
+         break;
+      case TYPE_HIT:
+         learned = has_skill(ch, SKILL_HAND_TO_HAND);
+         skill = SKILL_HAND_TO_HAND;
          break;
       default:
          weapon_skill_hit_bonus = 0;
@@ -3292,7 +3296,8 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim)
     if(af->type != FUCK_CANTQUIT && 
        af->type != SKILL_LAY_HANDS &&
        af->type != SKILL_HARM_TOUCH &&
-       af->type != SKILL_BLOOD_FURY)
+       af->type != SKILL_BLOOD_FURY &&
+       af->type != SKILL_QUIVERING_PALM)
       affect_remove(victim, af);
   }
   
