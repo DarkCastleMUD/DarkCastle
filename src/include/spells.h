@@ -14,7 +14,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.h,v 1.12 2002/08/25 16:13:49 pirahna Exp $ */
+/* $Id: spells.h,v 1.13 2002/08/29 15:01:19 pirahna Exp $ */
 #include <structs.h> // byte, sh_int
 
 #define MAX_BUF_LENGTH               240
@@ -353,6 +353,11 @@
 
 // NOTE  "skill" numbers 1500-1599 are reserved for innate skill abilities
 // These are in innate.h
+
+// NOTE  "skill" numbers 2000-2199 are reserved for weapon poisoning damage message
+
+#define POISON_MESSAGE_BASE          2000
+
 
 
 #define TAR_IGNORE         1

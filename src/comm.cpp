@@ -101,6 +101,7 @@ extern struct time_info_data time_info;		/* In db.c */
 extern char help[];
 extern char * sector_types[];
 extern struct room_data ** world_array;
+extern struct char_data *character_list;
 
 /* local globals */
 struct descriptor_data *descriptor_list = NULL;		/* master desc list */
@@ -420,7 +421,6 @@ int load_hotboot_descs()
 void finish_hotboot() 
 {
   struct descriptor_data *d;
-  extern struct char_data *character_list;
   char buf[MAX_STRING_LENGTH];
 
   void do_on_login_stuff(char_data * ch);
@@ -1970,6 +1970,20 @@ void close_socket(struct descriptor_data *d)
     dc_free(d->showstr_vector);
 
   dc_free(d);
+
+  if(descriptor_list == NULL) 
+  {
+    // if there is NOONE on (everyone got disconnected) loop through and
+    // boot all of the linkdeads.  That way if the mud's link is cut, the
+    // first person back on can't RK everyone
+    char_data * next_i;
+    for(char_data * i = character_list; i; i = next_i) {
+       next_i = i->next;
+       if(IS_NPC(i))
+         continue;
+       do_quit(i, "", 666);
+    }
+  }
 }
 
 

@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.59 2002/08/28 04:58:22 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.60 2002/08/29 15:01:16 pirahna Exp $ */
 
 extern "C"
 {
@@ -1001,7 +1001,7 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
     weapon = WIELD;
   typeofdamage = damage_type(weapon_type);
 
-  if(GET_POS(victim) == POSITION_DEAD)           return eSUCCESS|eVICT_DIED;
+  if(GET_POS(victim) == POSITION_DEAD)           return (eSUCCESS|eVICT_DIED);
 
   if(typeofdamage == DAMAGE_TYPE_MAGIC)  
   {

@@ -28,6 +28,8 @@ using namespace std;
 extern CWorld world;
 extern struct index_data *obj_index; 
 
+int saves_spell(CHAR_DATA *ch, CHAR_DATA *vict, int spell_base, sh_int save_type);
+
 ////////////////////////////////////////////////////////////////////////////
 // local function declarations
 void determine_trade_skill_increase(char_data * ch, int skillnum, int learned, int trivial);
@@ -148,6 +150,7 @@ int do_poisonmaking(struct char_data *ch, char *argument, int cmd)
 
   if(failure) {
      send_to_char("Ahh crap, something got screwed up.  You are forced to throw away this attempt.\r\n", ch);
+     act("$n fiddles with a mortar and pestle and looks unhappy.", ch, 0, 0, TO_ROOM, 0);
      return eFAILURE;
   }
     
@@ -161,6 +164,7 @@ int do_poisonmaking(struct char_data *ch, char *argument, int cmd)
   obj_data * reward = clone_object(rewardnum);
   obj_to_char(reward, ch);
   csendf(ch, "You succesfully make a %s!\r\n", reward->short_description);
+  act("$n successfully makes a $p.", ch, reward, 0, TO_ROOM, 0);
 
   return eSUCCESS;
 }
@@ -172,23 +176,51 @@ int do_poisonweapon(struct char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  char weaponarg[MAX_INPUT_LENGTH];
   char vialarg[MAX_INPUT_LENGTH];
 
-  half_chop(argument, weaponarg, vialarg);
+  one_argument(argument, vialarg);
 
-  if(!*weaponarg || !*vialarg) {
-    send_to_char("Poison which weapon with what?\r\n", ch);
+  if(!*vialarg) {
+    send_to_char("Poison your weapon with what?\r\n", ch);
+    return eFAILURE;
+  }
+
+  if(ch->fighting) {
+    send_to_char("You can't do that while fighting!\r\n", ch);
     return eFAILURE;
   }
 
   // find weapon
+  obj_data * weapon = ch->equipment[WIELD];
+  if(!weapon) {
+    send_to_char("You aren't wielding a weapon to poison.\r\n", ch);
+    return eFAILURE;
+  }
 
   // find vial and verify it's a valid poison vial
+  obj_data * vial = get_obj_in_list_vis(ch, vialarg, ch->carrying);
+  if(!vial) {
+    csendf(ch, "You don't seem to have any %s.\r\n", vialarg);
+    return eFAILURE;
+  }
+
+  int found = -1;
+  for(int i = 0; poison_vial_data[i].result != -1; i++)
+    if( poison_vial_data[i].result == obj_index[vial->item_number].virt )
+    {
+      found = i;
+      break;
+    }
+
+  if(found < 0) {
+    csendf(ch, "The %s is not a valid weapon poison.\r\n", vial->short_description );
+    return eFAILURE;
+  }
 
   // poison weapon
-
+  
   // remove vial
+  extract_obj(vial);
 
   return eSUCCESS;
 }
@@ -268,13 +300,22 @@ void determine_trade_skill_increase(char_data * ch, int skillnum, int learned, i
 int handle_poisoned_weapon_attack(char_data * ch, char_data * vict, int type)
 {
    int retval = eSUCCESS;
+   int dam;
 
    switch(type)
    {
       case 0: // bee stinger poison
-         
-      case 1: // low quality cyanide
+         if(saves_spell(ch, vict, 1, SAVE_TYPE_POISON) < 0)
+           dam = 25;
+         else dam = 15;
+         damage(ch, vict, dam, TYPE_POISON, POISON_MESSAGE_BASE+type, 0);         
+         break;
 
+      case 1: // low quality cyanide
+         if(saves_spell(ch, vict, 10, SAVE_TYPE_POISON) < 0)
+           dam = 35;
+         else dam = 25;
+         damage(ch, vict, dam, TYPE_POISON, POISON_MESSAGE_BASE+type, 0);         
          break;
 
       default:
