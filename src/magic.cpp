@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.98 2004/04/17 05:13:11 urizen Exp $ */
+/* $Id: magic.cpp,v 1.99 2004/04/17 13:09:34 urizen Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -273,7 +273,7 @@ int spell_energy_drain(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
 int spell_souldrain(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
    int dam, xp, mana;
-
+   level *= 2;
    set_cantquit( ch, victim );
 
    if(saves_spell(ch, victim, 1, SAVE_TYPE_MAGIC) < 0) {
@@ -646,6 +646,9 @@ int spell_life_leech(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
 		 if (GET_HIT(tmp_victim) < dam)
 			  GET_HIT(ch) += GET_HIT(tmp_victim);
 		 else GET_HIT(ch) += dam;
+
+
+		skill_increase_check(ch, SPELL_LIFE_LEECH, skill, SKILL_INCREASE_MEDIUM);
 
 		 if (GET_HIT(ch) > GET_MAX_HIT(ch))
 			GET_HIT(ch) = GET_MAX_HIT(ch);

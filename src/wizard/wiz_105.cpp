@@ -189,7 +189,7 @@ int do_sqedit(struct char_data *ch, char *argument, int cmd)
     strcat(arg3,arg2);
     skill = find_sq(arg3);
   }
-  if (skill==NULL && (skill = find_sq(arg1))==NULL)
+  if (skill==NULL && (skill = find_sq(arg1))==NULL && cmd!=0)
   {
     send_to_char("Unknown skill.",ch);
     return eFAILURE;
@@ -199,6 +199,11 @@ int do_sqedit(struct char_data *ch, char *argument, int cmd)
   {
     case 0:
        struct skill_quest *newOne;
+	int i;
+        if (arg3[0] != '\0')
+	  i = find_skill_num(arg3);
+	else
+	  i = find_skill_num(arg1);
       #ifdef LEAK_CHECK
 	newOne = (struct skill_quest *) calloc(1, sizeof(struct skill_quest));
       #else
