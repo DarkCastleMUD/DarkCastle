@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.6 2002/08/04 23:00:51 pirahna Exp $ */
+/* $Id: mob_proc2.cpp,v 1.7 2002/08/05 00:24:34 pirahna Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -954,6 +954,7 @@ int platmerchant(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 // and is a little more balanced depending on class
 // TODO - make sure meta checks for get_stat_max to make sure you can't meta
 // past your racial maximum
+
 int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,        
           struct char_data *owner)
 {
@@ -992,10 +993,6 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
   }
 
   // TODO - redo these more class specific and how we're sure we want them
-  send_to_char("The Meta-physician tells you, 'I'm sorry, but my services are currently\r\n"
-               "unavailable.  Check back with me later.'\r\n", ch);
-  return eSUCCESS;
-
 
   hit_exp = (GET_MAX_HIT(ch) * 8000);
   move_exp = (GET_MAX_MOVE(ch) * 8000);
@@ -1018,12 +1015,13 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
   stat = ch->raw_dex;
   dex_price = 1000000+((GET_LEVEL(ch)*4)*10000)+((stat*8)*30000);
   stat = ch->raw_con;
-  con_price = 1000000+((GET_LEVEL(ch)*4)*10000)+((stat*8)*30000);
+//  con_price = 1000000+((GET_LEVEL(ch)*4)*10000)+((stat*8)*30000);
+  con_price = ((GET_LEVEL(ch)*4)*10000)+((stat*8)*30000);
 
   if(cmd == 59) {           /* List */
     send_to_char("The Meta-physician tells you, 'This is what I can do "
                  "for you... \n\r", ch);
-
+/*
     stat = ch->raw_str;
     if(stat == 25)
       strcpy(buf, "1) Str:       Your strength is already 25.\n\r");
@@ -1055,15 +1053,15 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
       sprintf(buf, "4) Dex: %d        Cost: %d exp + %d Platinum coins.\n\r",
               stat+1, dex_price, stat < 18 ? 100 : 500);
     send_to_char(buf, ch);
-
+*/
     stat = ch->raw_con;
-    if(stat == 25)
-      strcpy(buf, "5) Con:       Your constitution is already 25.\n\r");
+    if(stat >= 16)
+      strcpy(buf, "5) Con:       Your constitution is already 16+.\n\r");
     else
       sprintf(buf, "5) Con: %d        Cost: %d exp + %d Platinum coins.\n\r",
-              stat+1, con_price, stat < 18 ? 100 : 500);
+              stat+1, con_price, stat < 16 ? 100 : 500);
     send_to_char(buf, ch);
-    
+/*    
     csendf(ch, "6) Add to your hit points:   %d exp + %d "
             "Platinum coins.\n\r", hit_exp, hit_cost); 
 
@@ -1090,7 +1088,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 
     csendf(ch, "18) Add 1 lonely hit point:      %d exp + %d "
             "Platinum coins.\n\r", hit_exp/5, hit_cost/5); 
-    
+*/    
     return eSUCCESS;
   }
 
@@ -1114,14 +1112,15 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
       default: stat = 0;
     }
 
-    if(choice < 6) {
+//    if(choice < 6) {
+    if(choice == 5) {
       if(GET_PLATINUM(ch) < 100 || 
          (*pstat >= 18 && GET_PLATINUM(ch) < 500)) {
         send_to_char("The Meta-physician tells you, 'You can't afford "
                      "my services.  FUCK OFF!\n\r", ch);
         return eSUCCESS;
       }
-      if(stat == 25) {
+      if(stat >= 16) {
         send_to_char("The Meta-physician tells you, 'I can't help you "
                      "anymore with that!'\n\r", ch); 
         return eSUCCESS;
@@ -1146,7 +1145,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
       redo_mana(ch);
       return eSUCCESS;
     }
-
+/*
    if(choice == 6) {
      if(GET_EXP(ch) < hit_exp) {
        send_to_char("The Meta-physician tells you, 'You lack the "
@@ -1404,7 +1403,6 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     ch->pcdata->practices += 1;
     return eSUCCESS;
   }
-}
 
    if(choice == 18) {
      if(GET_EXP(ch) < hit_exp/5) {
@@ -1431,7 +1429,8 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
      redo_mana(ch);
      return eSUCCESS;
    }
-
+*/
+ }
   send_to_char("The Meta-physician tells you, 'Buy what?!'\n\r", ch);
   return eSUCCESS;
 }

@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.31 2002/08/04 19:43:02 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.32 2002/08/05 00:24:34 pirahna Exp $ */
 
 extern "C"
 {
@@ -2581,9 +2581,14 @@ void group_gain(CHAR_DATA * ch, CHAR_DATA * victim)
   if(!IS_NPC(victim))
     return;
   
-  if(!IS_AFFECTED(ch, AFF_CHARM) && IS_NPC(ch))
-    return;
-  
+  if(!( IS_AFFECTED(ch, AFF_CHARM) || IS_AFFECTED2(ch, AFF_FAMILIAR))
+      && IS_NPC(ch))
+    return; // non charmies/familiars get out
+
+  // if i'm not grouped, give my master the credit
+  if(IS_NPC(ch) && !IS_AFFECTED(ch, AFF_GROUP) && ch->master)
+    ch = ch->master;
+
   if((k = ch->master) == NULL)
     k = ch;
   
