@@ -211,7 +211,7 @@ int innate_repair(CHAR_DATA *ch, char *arg, int cmd)
     send_to_char("You are not carrying anything like that.\r\n",ch);
     return eFAILURE;
   }
-  if (GET_LEVEL(ch))
+  if (GET_LEVEL(ch) < 10)
   {
    send_to_char("You are not versed enough in the ways of your people to perform such an action.\r\n",ch);
    return eFAILURE;

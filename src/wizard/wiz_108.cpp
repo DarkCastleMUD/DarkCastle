@@ -536,7 +536,7 @@ int do_set(struct char_data *ch, char *argument, int cmd)
             } 
             break;
             case 28:
-	    if (!*buf || !is_number(buf)
+	    if (!*buf || !is_number(buf))
 	    { send_to_char("No.\r\n",ch); return eFAILURE; }
             vict->affected_by2 = atoi(buf);
 	    break;

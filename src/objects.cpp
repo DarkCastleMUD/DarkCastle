@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.29 2004/04/20 21:57:16 urizen Exp $
+| $Id: objects.cpp,v 1.30 2004/04/20 22:19:17 urizen Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -1623,16 +1623,14 @@ void wear(struct char_data *ch, struct obj_data *obj_object, int keyword)
     if(CAN_WEAR(obj_object,ITEM_WIELD)) {
 
        
-      if(!ch->equipment[WIELD] && GET_OBJ_WEIGHT(obj_object) > str_app[STRENGTH_APPLY_INDEX(ch)].wield_w && !ch->affected_by2 & AFF_POWERWIELD)
+      if(!ch->equipment[WIELD] && GET_OBJ_WEIGHT(obj_object) > str_app[STRENGTH_APPLY_INDEX(ch)].wield_w && !IS_SET(ch->affected_by2,AFF_POWERWIELD))
         send_to_char("It is too heavy for you to use.\n\r",ch);
-      else if(ch->equipment[WIELD] && GET_OBJ_WEIGHT(obj_object) > (str_app[STRENGTH_APPLY_INDEX(ch)].wield_w/2) && !ch->affected_by2 & AFF_POWERWIELD)
+      else if(ch->equipment[WIELD] && GET_OBJ_WEIGHT(obj_object) > (str_app[STRENGTH_APPLY_INDEX(ch)].wield_w/2) && !IS_SET(ch->affected_by2, AFF_POWERWIELD))
         send_to_char("It is too heavy for you to use as a secondary weapon.\n\r",ch);
-
       else if((!hands_are_free(ch, 2)) && 
-             (IS_SET(obj_object->obj_flags.extra_flags, ITEM_TWO_HANDED) && !
-	      ch->affected_by2 & AFF_POWERWIELD))
+             (IS_SET(obj_object->obj_flags.extra_flags, ITEM_TWO_HANDED) 
+&& !IS_SET(ch->affected_by2, AFF_POWERWIELD)))
         send_to_char("You need both hands for this weapon.\n\r", ch);
-
       else if(!hands_are_free(ch, 1))
         send_to_char("Your hands are already full.\n\r", ch);
 
@@ -1930,7 +1928,7 @@ int hands_are_free(struct char_data *ch, int number)
    wielded = ch->equipment[WIELD];
 
   if(wielded)
-    if (IS_SET(wielded->obj_flags.extra_flags, ITEM_TWO_HANDED) && !ch->affected_by2 & AFF_POWERWIELD)
+    if (IS_SET(wielded->obj_flags.extra_flags, ITEM_TWO_HANDED) && !IS_SET(ch->affected_by2, AFF_POWERWIELD))
        hands = 2;
 
   if(ch->equipment[WIELD]) hands++;
