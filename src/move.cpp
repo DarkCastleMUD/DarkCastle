@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.8 2002/07/24 19:01:12 pirahna Exp $
+| $Id: move.cpp,v 1.9 2002/07/30 04:01:56 pirahna Exp $
 | move.C
 | Movement commands and stuff.
 */
@@ -566,6 +566,8 @@ int attempt_move(CHAR_DATA *ch, int cmd, int is_retreat = 0)
 
   if(!ch->followers && !ch->master) { 
     return_val = do_simple_move(ch, cmd, FALSE);
+    if(SOMEONE_DIED(return_val) || !IS_SET(return_val, eSUCCESS))
+      return return_val; 
     if(!IS_AFFECTED(ch, AFF_SNEAK) && 
         IS_SET(return_val, eSUCCESS) &&
        !IS_SET(return_val, eCH_DIED))
