@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.7 2002/07/23 19:12:35 pirahna Exp $ */
+/* $Id: mob_proc.cpp,v 1.8 2002/07/23 21:56:34 pirahna Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -2879,7 +2879,8 @@ static char *dethSayText [ ] =
   "A blizzard is when it snows sideways.",
   "It is so hot in some parts of the world that the people there have to live other places.",
   "The wind is like the air, only pushier.",
-  "Nothing says 'I love you' like oral sex in the morning."
+  "Nothing says 'I love you' like oral sex in the morning.",
+  "The White Man?    No good."
 };
 
 #define DETH_SAY_TEXT_SIZE    ( sizeof ( dethSayText )    / sizeof ( char * ) )
