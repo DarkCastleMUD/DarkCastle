@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: utility.h,v 1.12 2002/10/13 15:35:46 pirahna Exp $ */
+/* $Id: utility.h,v 1.13 2002/10/23 04:18:06 pirahna Exp $ */
 
 #ifndef UTILITY_H_
 #define UTILITY_H_
@@ -199,7 +199,7 @@ bool IS_DARK( int room );
 #define GET_RACE(ch)     ((ch)->race)
 #define GET_BITV(ch)     ((ch)->race==1?1:(1<<(((ch)->race)-1)))
 
-#define AWAKE(ch) (GET_POS(ch) > POSITION_SLEEPING)
+#define AWAKE(ch) (GET_POS(ch) == POSITION_SLEEPING)
 
 inline const short IS_ANONYMOUS(CHAR_DATA *ch)
 {
