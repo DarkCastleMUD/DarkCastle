@@ -1470,7 +1470,7 @@ int execute_song_flight_of_bee( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA 
          send_to_char("Your musical flight ends.\n\r", master);
       }
    }
-
+   if (skill_success(ch, 0, SKILL_SONG_FLIGHT_OF_BEE))
    ch->song_timer = song_info[ch->song_number].beats;
    return eSUCCESS;
 }
@@ -2063,7 +2063,7 @@ act("You resist $n's sticky lullaby!",ch,NULL,victim,TO_VICT,0);
    }
 
    act("$n lulls $N's feet into a numbing sleep.", ch, 0, victim, TO_ROOM, NOTVICT);
-   act("$N's feet falls into a numbing sleep.", ch, 0, victim, TO_CHAR, 0);
+   act("$N's feet fall into a numbing sleep.", ch, 0, victim, TO_CHAR, 0);
    send_to_char("Your eyes begin to droop, and your feet fall asleep!\r\n", victim);
    SET_BIT(victim->affected_by2, AFF_NO_FLEE);
    return eSUCCESS;

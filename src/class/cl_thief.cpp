@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.67 2004/07/04 21:18:25 urizen Exp $
+| $Id: cl_thief.cpp,v 1.68 2004/07/11 02:05:09 urizen Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -975,6 +975,7 @@ int do_pocket(CHAR_DATA *ch, char *argument, int cmd)
       act("$n tries to steal gold from $N.", ch, 0, victim, TO_ROOM, NOTVICT|INVIS_NULL);
     } else {
       send_to_char("You managed to keep them unaware of your botched attempt.\r\n",ch);
+      return eFAILURE;
     }
   } else 
   {
@@ -985,10 +986,9 @@ int do_pocket(CHAR_DATA *ch, char *argument, int cmd)
     if (gold > 0) {
       GET_GOLD(ch)     += gold;
       GET_GOLD(victim) -= gold;
-      if(GET_POS(victim) <= POSITION_SLEEPING) _exp = 1;
-      else if(!IS_NPC(victim)) _exp = 0;
-      else if(IS_SET(victim->mobdata->actflags, ACT_NICE_THIEF)) _exp = 1; 
-      else _exp = gold;
+	_exp = gold / 1000;
+    if(IS_SET(victim->mobdata->actflags, ACT_NICE_THIEF)) _exp = 1; 
+
       GET_EXP(ch)      += _exp;
       sprintf(buf, "Bingo! You got %d gold coins.\n\r", gold);
       send_to_char(buf, ch);

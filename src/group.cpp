@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: group.cpp,v 1.11 2004/05/21 15:12:39 urizen Exp $
+| $Id: group.cpp,v 1.12 2004/07/11 02:10:00 urizen Exp $
 | group.C
 | Description:  Group related commands; join, abandon, follow, etc..
 */
@@ -223,9 +223,9 @@ int do_split(CHAR_DATA *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-void setup_group_buf(char * report, char_data * j)
+void setup_group_buf(char * report, char_data * j, char_data *i)
 {
-  if(IS_NPC(j) || IS_ANONYMOUS(j))
+  if(IS_NPC(j) || (IS_ANONYMOUS(j) && i != j && i->clan != j->clan))
   {
     if(GET_CLASS(j) == CLASS_MONK || GET_CLASS(j) == CLASS_BARD)
       sprintf(report, "[-====-|      %3d%%    hp     %3d%%   k     %3d%%   mv]",
@@ -279,7 +279,7 @@ int do_group(struct char_data *ch, char *argument, int cmd)
       else
         k = ch;
 		
-      setup_group_buf(report, k);
+      setup_group_buf(report, k, ch);
       sprintf(buf, "%s    $N (Leader)", report);
 
       if(IS_AFFECTED(k, AFF_GROUP))
@@ -288,7 +288,7 @@ int do_group(struct char_data *ch, char *argument, int cmd)
       for(f = k->followers; f; f = f->next) {
         if(IS_AFFECTED(f->follower, AFF_GROUP)) {
 	  j = f->follower;
-          setup_group_buf(report, j);
+          setup_group_buf(report, j,ch);
           sprintf(buf, "%s    $N", report);
           act(buf,  ch, 0, f->follower, TO_CHAR, ASLEEP);
         }

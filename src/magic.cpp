@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.163 2004/07/03 16:07:02 urizen Exp $ */
+/* $Id: magic.cpp,v 1.164 2004/07/11 02:05:06 urizen Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -9153,7 +9153,6 @@ int cast_acid_shield( byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA 
        if(GET_CLASS(ch) == CLASS_ANTI_PAL) {
           if(GET_ALIGNMENT(ch) > -1000) {
              send_to_char("You must be uttery vile to cast a spell of acid shield.\n\r", ch);
-             GET_MANA(ch) += 150; 
              return eFAILURE;
           }
        } 
