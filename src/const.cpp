@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: const.cpp,v 1.18 2002/08/03 04:21:37 pirahna Exp $ */
+/* $Id: const.cpp,v 1.19 2002/08/03 06:29:58 pirahna Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -441,14 +441,14 @@ int exp_table[ ] =
 {
 0,
 1,          L(1 K),     L(3 K),     L(9 K),     L(15 K),   // level 5
-L(30 K),    L(60 K),    L(120 K),   L(240 K),   L(350 K),  // level 10
-L(450 K),   L(600 K),   L(850 K),   L(1.2 M),   L(2.5 M),  // level 15
-L(3.6 M),   L(4.8 M),   L(6 M),     L(7.1 M),   L(8.4 M),  // level 20
-L(9.4 M),   L(10.4 M),  L(11.7 M),  L(13.3 M),  L(14.5 M), // level 25
-L(15.7 M),  L(17.3 M),  L(18.5 M),  L(20.3 M),  L(22.5 M), // level 30
-L(24.5 M),  L(26.5 M),  L(29.5 M),  L(32.5 M),  L(35.5 M), // level 35
-L(37.5 M),  L(40.5 M),  L(43.5 M),  L(46.5 M),  L(50 M),   // level 40
-L(55 M),    L(70 M),    L(80 M),    L(90 M),    L(100 M),  // level 45
+L(30 K),    L(50 K),    L(100 K),   L(200 K),   L(300 K),  // level 10
+L(400 K),   L(550 K),   L(850 K),   L(1.2 K),   L(1.4 M),  // level 15
+L(1.8 M),   L(2.3 M),   L(3 M),     L(3.8 M),   L(4.8 M),  // level 20
+L(7 M),     L(8.8 M),   L(9.7 M),   L(11 M),    L(12 M),   // level 25
+L(13.5 M),  L(14.5 M),  L(16.5 M),  L(18 M),    L(21.5 M), // level 30
+L(22 M),    L(24 M),    L(26 M),    L(28 M),    L(31 M),   // level 35
+L(34 M),    L(37 M),    L(40 M),    L(45 M),    L(50 M),   // level 40
+L(60 M),    L(70 M),    L(80 M),    L(90 M),    L(100 M),  // level 45
 L(120 M),   L(140 M),   L(160 M),   L(180 M),   L(200 M),  // level50
 L(125 M),   L(2 M),     L(3 M),     L(4 M),     L(5 M),    // level 55
 L(6 M),     L(7 M),     L(8 M),     L(9 M),     L(10 M),   // level 60
