@@ -525,6 +525,7 @@ void assign_objects(void)
   SPEC_FUN random_dir_boots;
   SPEC_FUN noremove_eq;
   SPEC_FUN glove_combat_procs;
+  SPEC_FUN hot_potato;
 
   assign_one_obj_non(9,  phish_locator);	
   assign_one_obj_non(13,  board); /* Quest Board */
@@ -535,6 +536,7 @@ void assign_objects(void)
   assign_one_obj_non(101,  globe_of_darkness_proc);
   assign_one_obj_non(185,  devilsword);
   assign_one_obj_non(225,  weenie_weedy);
+  assign_one_obj_non(393,  hot_potato);
   assign_one_obj_non(396,  noremove_eq);
   assign_one_obj_non(397,  random_dir_boots);
   assign_one_obj_non(398,  gotta_dance_boots);

@@ -34,6 +34,8 @@ extern struct str_app_type str_app[];
 extern struct obj_data *object_list;
 
 extern struct zone_data *zone_table;
+extern struct descriptor_data *descriptor_list;
+
 
 // TODO - go over emoting object stuff and make sure it's as effecient as we can get it
  
@@ -2048,37 +2050,31 @@ int random_dir_boots(struct char_data*ch, struct obj_data *obj, int cmd, char*ar
 
 // WARNING - uses obj_flags.value[3] to store stuff
 
-int noremove_eq(struct char_data*ch, struct obj_data *obj, int cmd, char*arg, 
+int noremove_eq(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
                    CHAR_DATA *invoker)
 {
    if(cmd && cmd != 69)
       return eFAILURE;
-
    if(!obj->equipped_by)
       return eFAILURE;
-
    if(!cmd && obj->obj_flags.value[3] > 0) {
       obj->obj_flags.value[3]--;
       if(!obj->obj_flags.value[3])
          csendf(obj->equipped_by, "The %s loses it's grip on your body.\r\n", obj->short_description);
       return eSUCCESS;
    }
-
    if(!cmd && obj->obj_flags.value[3] <= 0) {
       if(number(0, 4))
          return eSUCCESS;
-
-      csendf(obj->equipped_by, "The %s clamps down onto your body locking your equipment in place!\r\n", 
+      csendf(obj->equipped_by, "The %s clamps down onto your body locking your equipment in place!\r\n",
              obj->short_description);
       obj->obj_flags.value[3] = 5;
       return eSUCCESS;
    }
- 
    if(obj->obj_flags.value[3] > 0) {
       csendf(obj->equipped_by, "The %s refuses to let you remove anything!\r\n", obj->short_description);
       return eSUCCESS;
    }
-
    return eFAILURE;
 }
 
@@ -2116,6 +2112,93 @@ int glove_combat_procs(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
 
      default:
        break; 
+   }
+
+   return eFAILURE;
+}
+
+// Fun item to give to mortals...ticks for a while and then when it blows
+// up BOOM!!!
+int hot_potato(struct char_data*ch, struct obj_data *obj, int cmd, char*arg, 
+                   CHAR_DATA *invoker)
+{
+   char_data * vict = NULL;
+
+   if(cmd == 89) {
+      send_to_char("You can't drop anything when you have a hot potato!\n\r", ch);
+      return eSUCCESS;
+   }
+   if(cmd == 90) {
+      send_to_char("You can't donate anything when you have a hot potato!\n\r", ch);
+      return eSUCCESS;
+   }
+   if(cmd == 91) {
+      send_to_char("You can't quit when you have a hot potato!\n\r", ch);
+      return eSUCCESS;
+   }
+   if(cmd == 87 || cmd == 88) {
+      // make sure vict for GIVE/SLIP is a pc
+      char obj[MAX_INPUT_LENGTH];
+      char target[MAX_INPUT_LENGTH];
+      half_chop(arg, obj, target);
+      if (!(vict = get_char_room_vis(ch, target)))
+         return eFAILURE; // Not giving to char/mob, so ok
+      if(IS_MOB(vict)) {
+         send_to_char("You can only give things to other players when you have a hot potato!\n\r", ch);
+         return eSUCCESS;
+      }
+      // if it's a player, go ahead
+      return eFAILURE;
+   }
+
+   if(cmd)
+      return eFAILURE;
+
+   vict = NULL;
+   if(obj->equipped_by)
+      vict = obj->equipped_by;
+   if(obj->carried_by)
+      vict = obj->carried_by;
+   if(obj->in_obj && obj->in_obj->carried_by)
+      vict = obj->in_obj->carried_by;
+   if(obj->in_obj && obj->in_obj->equipped_by)
+      vict = obj->in_obj->equipped_by;
+   if(!vict)
+      return eFAILURE;
+
+   if(obj->obj_flags.value[3] > 0) 
+   {
+      obj->obj_flags.value[3]--;
+      if(obj->obj_flags.value[3] % 10 == 0)
+         send_to_room("You smell a delicious baked potato and hear a faint *beep*.\n\r", ch->in_room );
+   }
+   else {
+      if(GET_LEVEL(vict) > MORTAL) {
+         send_to_char("Hot potato timer set to 100.\n\r", ch);
+         obj->obj_flags.value[3] = 100;
+         return eFAILURE;
+      }
+
+      for(descriptor_data * i = descriptor_list; i; i = i->next)
+         if(i->character->in_room != ch->in_room && !i->connected)
+            send_to_char("You hear a large BOOM from somewhere in the distance.\n\r", i->character);
+       act("The hot potato $n is carrying beeps one final time.\n\r"
+           "\n\r"
+           "BBBB   OOO   OOO  M   M !! !!\n\r"
+           "B   B O   O O   O MM MM !! !!\n\r"
+           "BBBB  O   O O   O M M M !! !!\n\r"
+           "B   B O   O O   O M   M \n\r"
+           "BBBB   OOO   OOO  M   M !! !!\n\r"
+           "\n\r"
+           "Small piece of $n and mashed potato splatter everything."
+            , ch, 0, 0, TO_ROOM, 0);
+
+       GET_HIT(ch) = -1;
+       update_pos(ch);
+       send_to_char("\n\rYou have been KILLED!\n\r", ch);
+       fight_kill(ch, ch, TYPE_PKILL);
+       extract_obj(obj);      
+       return eSUCCESS|eCH_DIED;
    }
 
    return eFAILURE;

@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.cpp,v 1.22 2003/04/23 01:00:14 pirahna Exp $ */
+/* $Id: interp.cpp,v 1.23 2003/04/23 01:16:58 pirahna Exp $ */
 
 extern "C"
 {
@@ -153,11 +153,11 @@ struct command_info cmd_info[] =
     /*
      * Object manipulation commands.
      */
-    { "slip",       do_slip,        POSITION_STANDING,  0,  9,  0 },
+    { "slip",       do_slip,        POSITION_STANDING,  0,  87, 0 },
     { "close",      do_close,       POSITION_RESTING,   0,  9,  COM_CHARMIE_OK },
-    { "donate",     do_donate,      POSITION_RESTING,   0,  9,  COM_CHARMIE_OK },
+    { "donate",     do_donate,      POSITION_RESTING,   0,  90, COM_CHARMIE_OK },
     { "drink",      do_drink,       POSITION_RESTING,   0,  9,  COM_CHARMIE_OK },
-    { "drop",       do_drop,        POSITION_RESTING,   0,  9,  COM_CHARMIE_OK },
+    { "drop",       do_drop,        POSITION_RESTING,   0,  89, COM_CHARMIE_OK },
     { "eat",        do_eat,         POSITION_RESTING,   0,  9,  COM_CHARMIE_OK },
     { "fill",       do_fill,        POSITION_RESTING,   0,  9,  COM_CHARMIE_OK },
     { "give",       do_give,        POSITION_RESTING,   0,  88,  COM_CHARMIE_OK },
@@ -261,7 +261,7 @@ struct command_info cmd_info[] =
     { "pick",       do_pick,        POSITION_STANDING,  0,  35,  0 },
     { "qui",        do_qui,         POSITION_DEAD,      0,  9,  0 },
     { "levels",     do_levels,      POSITION_DEAD,      0,  9,  0 },
-    { "quit",       do_quit,        POSITION_DEAD,      0,  9,  0 },
+    { "quit",       do_quit,        POSITION_DEAD,      0,  91, 0 },
     { "return",     do_return,      POSITION_DEAD,      0,  9,  0 },
     { "tame",       do_tame,        POSITION_RESTING,   0,  9,  0 },
     { "prompt",     do_prompt,      POSITION_DEAD,      0,  9,  0 },
