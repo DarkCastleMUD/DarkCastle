@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.113 2003/05/12 02:51:04 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.114 2003/06/13 00:12:07 pirahna Exp $ */
 
 extern "C"
 {
@@ -3460,8 +3460,19 @@ int can_be_attacked(CHAR_DATA *ch, CHAR_DATA *vict)
     return FALSE;
   
   if(IS_NPC(vict))
+  {
+    if(IS_AFFECTED2(vict, AFF_FAMILIAR) && 
+       vict->master && 
+       !IS_AFFECTED(vict->master, AFF_CANTQUIT)
+      )
+    {
+      send_to_char("No fighting permitted in a safe room.\n\r", ch);
+      return FALSE;
+    }
+    // Any other mob can be attacked at any time
     return TRUE;
-  
+  }
+
   if(!IS_NPC(ch) && !IS_NPC(vict) && GET_LEVEL(ch) == 1) {
     send_to_char("You are too new in this realm to make enemies!\n\r", ch);
     return FALSE;
