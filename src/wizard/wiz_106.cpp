@@ -52,6 +52,7 @@ int do_plats (struct char_data *ch, char *argument, int cmd)
 int do_force(struct char_data *ch, char *argument, int cmd)
 {
   struct descriptor_data *i;
+  struct descriptor_data *next_i;
   struct char_data *vict;
   char name[100], to_force[400],buf[400]; 
 
@@ -104,7 +105,8 @@ int do_force(struct char_data *ch, char *argument, int cmd)
       send_to_char("Not gonna happen.\n\r", ch);
       return eFAILURE;
     }
-    for(i = descriptor_list; i; i = i->next)
+    for(i = descriptor_list; i; i = next_i) {
+       next_i = i->next;
        if(i->character != ch && !i->connected) {
          vict = i->character;
          if(GET_LEVEL(ch) <= GET_LEVEL(vict))
@@ -117,7 +119,7 @@ int do_force(struct char_data *ch, char *argument, int cmd)
            command_interpreter(vict, to_force);
          }
        }
-
+    }
     send_to_char("Ok.\n\r", ch);
     sprintf(buf,"%s just forced all to %s.", GET_NAME(ch), to_force);
     log(buf, GET_LEVEL(ch), LOG_GOD);
