@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.33 2004/07/03 18:50:42 urizen Exp $ */
+/* $Id: mob_proc2.cpp,v 1.34 2004/07/03 18:56:46 urizen Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -1216,13 +1216,13 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     csendf(ch, "6) Add to your hit points:   You cannot do this.\r\n");
 
     if (mana_exp && mana_cost)
-    csendf(ch, "7) Add to your mana points:  %d experience points and %d\r\n"
+    csendf(ch, "7) Add to your mana points:  %d experience points and %d"
             " Platinum coins.\n\r", mana_exp, mana_cost);
     else
     csendf(ch, "7) Add to your mana points:  You cannot do this.\r\n");
 
     if (move_exp && move_cost)
-    csendf(ch, "8) Add to your movement points: %d experience points and %d\r\n"
+    csendf(ch, "8) Add to your movement points: %d experience points and %d"
             " Platinum coins.\n\r", move_exp, move_cost);
     else
     csendf(ch, "8) Add to your movement points:  You cannot do this.\r\n");
@@ -1237,8 +1237,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     if(!IS_MOB(ch)) {   // mobs can't meta ki
       if(GET_KI_METAS(ch) > 4)
 	send_to_char("14) Your ki is already meta'd fully.\n\r", ch);
-      else csendf(ch, "14) Add a point of ki:       Current out of stock..\n\r");
-//, ki_exp, ki_cost);
+      else csendf(ch, "14) Add a point of ki:       %d experience points and %d Platinum.\n\r", ki_exp, ki_cost);
     }
     return eSUCCESS;
   }
@@ -1320,7 +1319,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
       return eSUCCESS;
     }
 
-   if(choice == -1) {
+   if(choice == 6) {
      if(GET_EXP(ch) < hit_exp) {
        send_to_char("The Meta-physician tells you, 'You lack the experience.'\n\r", ch);
        return eSUCCESS;
@@ -1332,16 +1331,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
      GET_EXP(ch) -= hit_exp;
      GET_PLATINUM(ch) -= hit_cost;
 
-     switch(GET_CLASS(ch)) {
-       case CLASS_MAGIC_USER:
-       case CLASS_CLERIC:
-       case CLASS_DRUID:
-         increase = 1;
-         break;
-       default:
-         increase = 2;
-     }
-
+     increase = 1;
      ch->raw_hit += increase;
      GET_HP_METAS(ch) += 1;
      act("The Meta-physician touches $n.",  ch, 0, 0, TO_ROOM, 0);
@@ -1350,7 +1340,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
      return eSUCCESS;
    }
 
-   if(choice == -1) {
+   if(choice == 7) {
 
      if(GET_EXP(ch) < mana_exp) {
        send_to_char("The Meta-physician tells you, 'You lack the experience.'\n\r", ch);
@@ -1364,16 +1354,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
      GET_EXP(ch) -= mana_exp;
      GET_PLATINUM(ch) -= mana_cost;
 
-     switch(GET_CLASS(ch)) {
-       case CLASS_MAGIC_USER:
-       case CLASS_CLERIC:
-       case CLASS_DRUID:
-         increase = 2;
-         break;
-       default:
-         increase = 1;
-     }
-
+     increase = 1;
      ch->raw_mana += increase;
      GET_MANA_METAS(ch) += 1;
      act("The Meta-physician touches $n.",  ch, 0, 0, TO_ROOM, 0);
@@ -1382,7 +1363,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
      return eSUCCESS;
    }
 
-   if(choice == -1) 
+   if(choice == 8) 
    {
      if(GET_EXP(ch) < move_exp) {
        send_to_char("The Meta-physician tells you, 'You lack the experience.'\n\r", ch);
