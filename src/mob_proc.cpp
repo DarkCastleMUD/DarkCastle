@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.12 2002/08/03 01:34:41 pirahna Exp $ */
+/* $Id: mob_proc.cpp,v 1.13 2002/08/03 06:17:15 pirahna Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -1158,9 +1158,7 @@ int monk(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
   // If all else fails, kick
   if (GET_LEVEL(ch) > 2) {
     MOB_WAIT_STATE(ch) = 2;
-    if(number(1, 4) == 1) // miss the kick 25%
-      return damage (ch, vict, 0, TYPE_HIT, SKILL_KICK, 0);
-    return damage (ch, vict, GET_LEVEL(ch)>>1, TYPE_HIT, SKILL_KICK, 0);
+    do_kick(ch, "", 9);
   }
 
   return eFAILURE;
@@ -4262,7 +4260,7 @@ int antipaladin(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     if (vict==ch->fighting && GET_LEVEL(ch)>2 && number(0,1)==0 )
     {
        MOB_WAIT_STATE(ch) = 2;
-       return damage (ch, vict, GET_LEVEL(ch)>>1, TYPE_HIT, SKILL_KICK, 0);
+       return do_kick(ch, "", 9);
     }
     if(GET_LEVEL(ch) > 47)
     {

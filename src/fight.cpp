@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.26 2002/08/03 05:10:12 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.27 2002/08/03 06:17:15 pirahna Exp $ */
 
 extern "C"
 {
@@ -688,9 +688,9 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
     chance = 102; // can't miss
   else
   {
-    chance = 50 - GET_LEVEL(vict);
+    chance = 40;
 
-    //chance += GET_LEVEL(ch) - GET_LEVEL(vict);
+    chance += GET_LEVEL(ch) - GET_LEVEL(vict);
     chance += GET_HITROLL(ch);
     chance += str_app[STRENGTH_APPLY_INDEX(ch)].tohit;
     chance += ( GET_AC(vict) / 10 );  // (positive ac hurts you, negative helps)
@@ -2596,7 +2596,8 @@ void group_gain(CHAR_DATA * ch, CHAR_DATA * victim)
     case 1:  share = (int) (share * 0.8); break;  
     case 2:  break; // * 1.0 
     case 3:  share = (int) (share * 1.2); break;  
-    default:  share = (int) (share * 1.4); break; 
+    case 4:  share = (int) (share * 1.4); break; 
+    default:  share = (int) (share * 1.6); break; 
   }
 
   /* Kludgy loop to get k in at end. */
@@ -2635,17 +2636,21 @@ void group_gain(CHAR_DATA * ch, CHAR_DATA * victim)
     // reduce xp if you are higher level than mob
     switch(GET_LEVEL(victim) - GET_LEVEL(ch)) {
       case -1:  break;
-      case -2:  tmp_share = (int) (tmp_share * 0.9); break;
-      case -3:  tmp_share = (int) (tmp_share * 0.8); break;
-      case -4:  tmp_share = (int) (tmp_share * 0.7); break;
-      case -5:  tmp_share = (int) (tmp_share * 0.6); break;
-      case -6:  tmp_share = (int) (tmp_share * 0.5); break;
-      case -7:  tmp_share = (int) (tmp_share * 0.4); break;
-      case -8:  tmp_share = (int) (tmp_share * 0.3); break;
-      case -9:  tmp_share = (int) (tmp_share * 0.2); break;
-      case -10: tmp_share = (int) (tmp_share * 0.1); break;
+      case -2:  break;
+      case -3:  tmp_share = (int) (tmp_share * 0.9); break;
+      case -4:  tmp_share = (int) (tmp_share * 0.8); break;
+      case -5:  tmp_share = (int) (tmp_share * 0.7); break;
+      case -6:  tmp_share = (int) (tmp_share * 0.6); break;
+      case -7:  tmp_share = (int) (tmp_share * 0.5); break;
+      case -8:  tmp_share = (int) (tmp_share * 0.4); break;
+      case -9:  tmp_share = (int) (tmp_share * 0.3); break;
+      case -10:  tmp_share = (int) (tmp_share * 0.2); break;
+      case -11: tmp_share = (int) (tmp_share * 0.1); break;
+      case -12: tmp_share = (int) (tmp_share * 0.1); break;
+      case -13: tmp_share = (int) (tmp_share * 0.1); break;
       default:  if(GET_LEVEL(victim) < GET_LEVEL(ch))
                   tmp_share = 0;
+                else tmp_share = (int) (tmp_share * 1.1); break;
                break;
     }
  
