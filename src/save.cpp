@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: save.cpp,v 1.25 2004/05/07 22:55:06 urizen Exp $ */
+/* $Id: save.cpp,v 1.26 2004/05/18 22:50:06 urizen Exp $ */
 
 extern "C"
 {
@@ -1129,7 +1129,7 @@ void store_to_char(struct char_file_u *st, CHAR_DATA *ch)
     GET_MOVE(ch)     = st->move;
     ch->max_move     = GET_RAW_MOVE(ch) = st->raw_move;
     GET_KI(ch)       = st->ki;
-    GET_MAX_KI(ch)   = GET_RAW_KI(ch)   = st->raw_ki;
+    GET_RAW_KI(ch)   = st->raw_ki;
 
     ch->alignment    = st->alignment;
     ch->misc         = st->misc;

@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.193 2004/05/18 20:58:57 urizen Exp $ */
+/* $Id: fight.cpp,v 1.194 2004/05/18 22:50:06 urizen Exp $ */
 
 extern "C"
 {
@@ -945,24 +945,26 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
     chance = 102; // can't miss
   else
   {
-    chance = 45;
+    chance = 25;
+    if (IS_NPC(vict)) chance += 25;
     chance += GET_LEVEL(ch) - GET_LEVEL(vict);
     chance += GET_REAL_HITROLL(ch);
   //  chance += dex_app[GET_DEX(ch)].tohit;
     chance += ( GET_ARMOR(vict) / 10 );  // (positive ac hurts you, negative helps)
     chance += weapon_skill_hit_bonus;
-/*
+
     if(IS_SET(vict->combat, COMBAT_STUNNED) ||
-       IS_SET(vict->combat, COMBAT_STUNNED2) ||
-       IS_SET(vict->combat, COMBAT_SHOCKED))
-      chance += 10;
+       IS_SET(vict->combat, COMBAT_STUNNED2))// ||
+	chance += 20;
+       if (IS_SET(vict->combat, COMBAT_SHOCKED))
+      chance += 15;
 
     if(IS_SET(vict->combat, COMBAT_BASH1) ||
        IS_SET(vict->combat, COMBAT_BASH2))
       chance += 10;
-*/
+
     if(IS_NPC(ch))
-      chance += 5;
+      chance += 15;
 
     chance = MIN(90, chance);  // 10 - 90
     chance = MAX(10, chance);  // 10 - 90
@@ -2915,7 +2917,7 @@ int do_skewer(CHAR_DATA *ch, CHAR_DATA *vict, int dam, int weapon)
   int type = get_weapon_damage_type(ch->equipment[weapon]);
   if( ! (type == TYPE_STING || type == TYPE_PIERCE || type == TYPE_SLASH ))  return 0;
   skill_increase_check(ch, SKILL_SKEWER, has_skill(ch,SKILL_SKEWER), SKILL_INCREASE_MEDIUM);
-  if (number(0, 100) < 5) {
+  if (number(0, 100) < 25) {
     act("$n jams his weapon into $N!", ch, 0, vict, TO_ROOM, NOTVICT);
     act("You jam your weapon in $N's heart!", ch, 0, vict, TO_CHAR, 0);
     act("$n's weapon is speared into you! Ouch!", ch, 0, vict, TO_VICT, 0);
