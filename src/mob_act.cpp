@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: mob_act.cpp,v 1.6 2002/09/20 21:27:47 pirahna Exp $ */
+/* $Id: mob_act.cpp,v 1.7 2002/10/13 15:35:42 pirahna Exp $ */
 
 extern "C"
 {
@@ -801,9 +801,27 @@ void mobile_activity(void)
   } // for() all mobs
 }
 
-
-
-
-
-
-
+// Just a function to have mobs say random stuff when they are "suprised"
+// about finding a player doing something and decide to attack them.
+// For example, when a mob finds a player casting "spell" on them.
+void mob_suprised_sayings(char_data * ch, char_data * aggressor)
+{
+   switch(number(0, 6))
+   {
+      case 0:  do_say(ch, "What do you think you are doing?!", 9);
+               break;
+      case 1:  do_say(ch, "Mess with the best?  Die like the rest!", 9);
+               break;
+      case 2:  do_emote(ch, " looks around for a moment, confused.", 9);
+               do_say(ch, "YOU!!", 9);
+               break;
+      case 3:  do_say(ch, "Foolish.", 9);
+               break;
+      case 4:  do_say(ch, "I'm going to treat you like a baby treats a daiper.", 9);
+               break;
+      case 5:  do_say(ch, "Here comes the pain baby!", 9);
+               break;
+      case 6:  do_emote(ch, " wiggles its bottom.", 9);
+               break;
+   }
+}

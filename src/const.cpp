@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: const.cpp,v 1.44 2002/09/20 18:42:54 pirahna Exp $ */
+/* $Id: const.cpp,v 1.45 2002/10/13 15:35:41 pirahna Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -195,6 +195,8 @@ char *spell_wear_off_msg[] =
   "!Ice Shards!",  
   "The lightning around you fades away leaving only static cling.",
   "!Blue bird!",
+  "With a rush of strength, the $6debility$R fades from your body.",
+  "Your rapid decay ends and your health returns to normal.",
   "!UNUSED!"
 };
 

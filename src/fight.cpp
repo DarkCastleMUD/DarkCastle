@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.69 2002/10/03 00:24:12 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.70 2002/10/13 15:35:41 pirahna Exp $ */
 
 extern "C"
 {
@@ -101,20 +101,29 @@ void perform_violence(void)
       return;
     }
     
-    /* remove a tick of para lag every round of combat yer in */
-    if(IS_AFFECTED(ch, AFF_PARALYSIS))
-      for (af = ch->affected; af; af = next_af_dude) {
+    // some spells remove a tick of duration each round of combat yer in
+    for (af = ch->affected; af; af = next_af_dude) 
+    {
         next_af_dude = af->next;
-        if (af->type == SPELL_PARALYZE)
-          if (af->duration >= 1)
-            af->duration--;
-          if(af->duration == 0)
-            if (*spell_wear_off_msg[af->type]) { 
-              send_to_char(spell_wear_off_msg[af->type], ch);
-              send_to_char("\n\r", ch);
-              affect_remove(ch, af);
-            }  
-      }
+        if (af->type == SPELL_ATTRITION)
+        {
+           send_to_char("Your body aches at the effort of combat.\r\n", ch);
+           GET_HIT(ch) -= 25;
+           GET_HIT(ch) = MAX(1, GET_HIT(ch));  // doesn't kill only hurts
+        }
+        else if (af->type != SPELL_PARALYZE)
+           continue;
+
+        if (af->duration >= 1)
+          af->duration--;
+        if(af->duration == 0) {
+          if (*spell_wear_off_msg[af->type]) { 
+            send_to_char(spell_wear_off_msg[af->type], ch);
+            send_to_char("\n\r", ch);
+            affect_remove(ch, af);
+          }  
+        }
+    }
       
     if(can_attack(ch)) {
       is_mob = IS_MOB(ch);
@@ -425,7 +434,8 @@ void update_stuns(CHAR_DATA *ch)
   }
 }
 
-bool do_frostshield(CHAR_DATA *ch, CHAR_DATA *vict) {
+bool do_frostshield(CHAR_DATA *ch, CHAR_DATA *vict) 
+{
   if(!ch || !vict) {
     log("Null ch or vict sent to do_frostshield", IMP, LOG_BUG);
     return(false);
@@ -443,7 +453,8 @@ bool do_frostshield(CHAR_DATA *ch, CHAR_DATA *vict) {
   }
 }  
 
-int do_lightning_shield(CHAR_DATA *ch, CHAR_DATA *vict, int dam) {
+int do_lightning_shield(CHAR_DATA *ch, CHAR_DATA *vict, int dam) 
+{
   extern struct race_shit race_info[];
   
   if(!ch || !vict) {
@@ -762,10 +773,7 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
 //    return damage(ch, vict, 0, w_type, w_type, weapon);
 //  }
 
-  if(IS_AFFECTED(vict, AFF_PARALYSIS) || !AWAKE(vict) ||
-    IS_SET(vict->combat, COMBAT_STUNNED) ||
-    IS_SET(vict->combat, COMBAT_STUNNED2) ||
-    IS_SET(vict->combat, COMBAT_SHOCKED))
+  if(IS_AFFECTED(vict, AFF_PARALYSIS) || !AWAKE(vict))
     chance = 102; // can't miss
   else
   {
@@ -776,6 +784,15 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
     chance += str_app[STRENGTH_APPLY_INDEX(ch)].tohit;
     chance += ( GET_AC(vict) / 10 );  // (positive ac hurts you, negative helps)
     chance += weapon_skill_hit_bonus;
+
+    if(IS_SET(vict->combat, COMBAT_STUNNED) ||
+       IS_SET(vict->combat, COMBAT_STUNNED2) ||
+       IS_SET(vict->combat, COMBAT_SHOCKED))
+      chance += 10;
+
+    if(IS_SET(vict->combat, COMBAT_BASH1) ||
+       IS_SET(vict->combat, COMBAT_BASH2))
+      chance += 10;
 
     if(IS_NPC(ch))
       chance += 5;

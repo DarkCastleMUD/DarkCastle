@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.38 2002/10/02 21:18:02 pirahna Exp $ */
+/* $Id: magic.cpp,v 1.39 2002/10/13 15:35:41 pirahna Exp $ */
 
 extern "C"
 {
@@ -8694,3 +8694,152 @@ int cast_blue_bird( byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *t
   }
   return eFAILURE;
 }
+
+int spell_debility(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
+{
+  struct affected_type af;
+  int retval = eSUCCESS;
+
+  if(affected_by_spell(victim, SPELL_DEBILITY)) {
+     send_to_char("Your victim has already been debilitized.\r\n", ch);
+     return eSUCCESS;
+  }
+
+  int save = saves_spell(ch, victim, skill / 10, SAVE_TYPE_MAGIC);
+
+  if(save < 0)
+  {
+    int hitmod = skill / 10;       hitmod = MAX(1, hitmod);      hitmod *= -1;
+    int  acmod = skill / 3;         acmod = MAX(1,  acmod);
+
+    af.type      = SPELL_DEBILITY;
+    af.duration  = 2;
+    af.modifier  = hitmod;
+    af.location  = APPLY_HITROLL;
+    af.bitvector = 0;
+    affect_to_char(victim, &af);
+    
+    af.location = APPLY_AC;
+    af.modifier = acmod;  // ac penalty
+    affect_to_char(victim, &af);
+
+    send_to_char("Your body becomes $6debilitized$R hurting your abilities.\r\n", ch);
+    act("$N's body looks a little more frail.", ch, 0, victim, TO_ROOM, NOTVICT);
+  }
+  else {
+    act("$n just tried to cast something on you and you're sure it isn't good.", ch, 0, victim, TO_VICT, 0);
+  }
+
+  if(IS_NPC(victim)) 
+  {
+     skill_increase_check(ch, SPELL_DEBILITY, skill, SKILL_INCREASE_MEDIUM);
+
+     if(!victim->fighting)
+     {
+        if(number(0, 5) == 0)
+        {
+           mob_suprised_sayings(victim, ch);
+           retval = attack(victim, ch, 0);
+        }
+     }
+  }
+
+  return retval;
+}
+
+int cast_debility( byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill)
+{
+  switch (type)
+  {
+    case SPELL_TYPE_SPELL:
+       return spell_debility(level, ch, tar_ch, 0, skill);
+       break;
+    case SPELL_TYPE_SCROLL:
+       if(tar_obj)
+          return eFAILURE;
+       if(!tar_ch) tar_ch = ch;
+          return spell_debility(level, ch, tar_ch, 0, skill);
+       break;
+    case SPELL_TYPE_STAFF:   
+       for (tar_ch = world[ch->in_room].people ; tar_ch ; tar_ch = tar_ch->next_in_room)
+          spell_debility(level,ch,tar_ch,0, skill);
+       break;
+    default :
+       log("Serious screw-up in debility!", ANGEL, LOG_BUG);
+       break;
+  }
+  return eFAILURE;
+}
+
+int spell_attrition(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
+{
+  struct affected_type af;
+  int retval = eSUCCESS;
+
+  if(affected_by_spell(victim, SPELL_ATTRITION)) {
+     send_to_char("Your victim is already affected by that spell.\r\n", ch);
+     return eSUCCESS;
+  }
+
+  int save = saves_spell(ch, victim, skill / 10, SAVE_TYPE_POISON);
+
+  if(save < 0)
+  {
+    int  acmod = (skill / 5) + 2;         acmod = MAX(1,  acmod);
+
+    af.type      = SPELL_ATTRITION;
+    af.duration  = 2;
+    af.modifier  = acmod;
+    af.location  = APPLY_AC;
+    af.bitvector = 0;
+    affect_to_char(victim, &af);
+    
+    send_to_char("Your body's natural decay rate has been increased!\r\n", ch);
+    act("$N's body takes on an unhealthy coloring.", ch, 0, victim, TO_ROOM, NOTVICT);
+  }
+  else {
+    act("$n just tried to cast something on you and you're sure it isn't good.", ch, 0, victim, TO_VICT, 0);
+  }
+
+  if(IS_NPC(victim)) 
+  {
+     skill_increase_check(ch, SPELL_ATTRITION, skill, SKILL_INCREASE_MEDIUM);
+
+     if(!victim->fighting)
+     {
+        if(number(0, 5) == 0)
+        {
+           mob_suprised_sayings(victim, ch);
+           retval = attack(victim, ch, 0);
+        }
+     }
+  }
+
+  return retval;
+}
+
+int cast_attrition( byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill)
+{
+  switch (type)
+  {
+    case SPELL_TYPE_SPELL:
+       return spell_attrition(level, ch, tar_ch, 0, skill);
+       break;
+    case SPELL_TYPE_SCROLL:
+       if(tar_obj)
+          return eFAILURE;
+       if(!tar_ch) tar_ch = ch;
+          return spell_attrition(level, ch, tar_ch, 0, skill);
+       break;
+    case SPELL_TYPE_STAFF:   
+       for (tar_ch = world[ch->in_room].people ; tar_ch ; tar_ch = tar_ch->next_in_room)
+          spell_attrition(level,ch,tar_ch,0, skill);
+       break;
+    default :
+       log("Serious screw-up in attrition!", ANGEL, LOG_BUG);
+       break;
+  }
+  return eFAILURE;
+}
+
+
