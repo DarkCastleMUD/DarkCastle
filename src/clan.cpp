@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.19 2004/04/22 23:07:17 urizen Exp $ */
+/* $Id: clan.cpp,v 1.20 2004/04/23 11:55:00 urizen Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -2216,6 +2216,7 @@ int do_ctax(CHAR_DATA *ch, char *arg, int cmd)
   }
   get_clan(ch)->tax = tax;
   send_to_char("Your clan's tax rate has been modified.\r\n",ch);
+  save_clans();
   return eSUCCESS;
 }
 
