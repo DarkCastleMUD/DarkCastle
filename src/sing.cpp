@@ -472,7 +472,10 @@ int do_sing(CHAR_DATA *ch, char *arg, int cmd)
        return eFAILURE|eINTERNAL_ERROR;
      }
 
-    if(GET_LEVEL(ch) < ARCHANGEL && GET_KI(ch) < use_song(ch, spl)) {
+    if(GET_LEVEL(ch) < ARCHANGEL        &&
+       !IS_MOB(ch)                      && 
+       GET_KI(ch) < use_song(ch, spl)) 
+    {
       send_to_char("You do not have enough ki!\n\r", ch);
       return eFAILURE;
     }
