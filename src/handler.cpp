@@ -21,7 +21,7 @@
  *  12/08/2003   Onager    Added check for charmies and !charmie eq to     *
  *                         equip_char()                                    *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.59 2004/05/25 01:13:48 urizen Exp $ */
+/* $Id: handler.cpp,v 1.60 2004/05/27 22:02:13 urizen Exp $ */
     
 extern "C"
 {
@@ -1289,6 +1289,7 @@ int equip_char(CHAR_DATA *ch, struct obj_data *obj, int pos)
 	return 0;
     }
 
+    if (!IS_NPC(ch))
     if ((IS_OBJ_STAT(obj, ITEM_ANTI_EVIL) && IS_EVIL(ch)) ||
 	(IS_OBJ_STAT(obj, ITEM_ANTI_GOOD) && IS_GOOD(ch)) ||
 	(IS_OBJ_STAT(obj, ITEM_ANTI_NEUTRAL) && IS_NEUTRAL(ch))&& !IS_NPC(ch)) 

@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.92 2004/05/27 21:19:13 urizen Exp $ */
+/* $Id: spells.cpp,v 1.93 2004/05/27 21:58:25 urizen Exp $ */
 
 extern "C"
 {
@@ -1311,7 +1311,7 @@ bool skill_success(CHAR_DATA *ch, CHAR_DATA *victim, int skillnum, int mod = 0)
 	break;
      case SKILL_STUN:
 	stat = DEX;
-	mod -= GET_DEX(victim) /2); // ADDITIONAL mod
+	mod -= GET_DEX(victim) / 2; // ADDITIONAL mod
 	break;
      case SKILL_DEATHSTROKE:
 	stat = STR;
