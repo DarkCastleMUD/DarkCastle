@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.11 2002/08/01 20:47:52 dcastle Exp $ */
+/* $Id: info.cpp,v 1.12 2002/08/04 22:24:12 pirahna Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -390,23 +390,23 @@ void show_char_to_char(struct char_data *i, struct char_data *ch, int mode)
          has_spells = 0;
          
          if (IS_AFFECTED(i,AFF_SANCTUARY)) {
-            sprintf(send_buf, "%s$R$B$7white aura!$R ", send_buf);
+            sprintf(send_buf, "%s$7white aura! ", send_buf);
             has_spells = 1;
          }
          if (IS_AFFECTED(i,AFF_PROTECT_EVIL)) {
-            sprintf(send_buf, "%s$R$6pulsing aura!$R ", send_buf);
+            sprintf(send_buf, "%s$R$6pulsing aura! ", send_buf);
             has_spells = 1;
          }
          if (IS_AFFECTED(i,AFF_FIRESHIELD)) {
-            sprintf(send_buf, "%s$R$B$4flames!$R ", send_buf);
+            sprintf(send_buf, "%s$B$4flames! ", send_buf);
             has_spells = 1;
          }
          if (IS_AFFECTED(i,AFF_LIGHTNINGSHIELD)) {
-            sprintf(send_buf, "%s$R$B$5electricity!$R ", send_buf);
+            sprintf(send_buf, "%s$B$5electricity! ", send_buf);
             has_spells = 1;
          }
          if (IS_AFFECTED(i,AFF_PARALYSIS)) {
-            sprintf(send_buf,"%s$2paralyze!$R ", send_buf);
+            sprintf(send_buf,"%s$R$2paralyze! ", send_buf);
             has_spells = 1;
          }
          if (i->affected_by & AFF_FLYING) {
@@ -415,7 +415,7 @@ void show_char_to_char(struct char_data *i, struct char_data *ch, int mode)
          }
          
          if(has_spells) {
-            sprintf(send_buf, "%s\r\n", send_buf);
+            sprintf(send_buf, "%s$R\r\n", send_buf);
             colorCharSend(send_buf, ch);
          }
          
@@ -435,7 +435,6 @@ void show_char_to_char(struct char_data *i, struct char_data *ch, int mode)
               strcat(buffer, "$B$5(Halo)$3 ");
         }
         
-        /*bonk*/ 
         strcat(buffer, i->long_desc);
         colorCharSend(buffer, ch);
         
@@ -445,23 +444,23 @@ void show_char_to_char(struct char_data *i, struct char_data *ch, int mode)
         has_spells = 0;
         
         if (IS_AFFECTED(i,AFF_SANCTUARY)) {
-           sprintf(send_buf, "%s$R$B$7white aura!$R ", send_buf);
+           sprintf(send_buf, "%s$B$7white aura! ", send_buf);
            has_spells = 1;
         }
         if (IS_AFFECTED(i,AFF_PROTECT_EVIL)) {
-           sprintf(send_buf, "%s$B$6pulsing aura!$R ", send_buf);
+           sprintf(send_buf, "%s$B$6pulsing aura! ", send_buf);
            has_spells = 1;
         }
         if (IS_AFFECTED(i,AFF_FIRESHIELD)) {
-           sprintf(send_buf, "%s$R$B$4flames!$R ", send_buf);
+           sprintf(send_buf, "%s$B$4flames! ", send_buf);
            has_spells = 1;
         }
         if (IS_AFFECTED(i, AFF_LIGHTNINGSHIELD)) {
-           sprintf(send_buf, "%s$R$B$5electricity!$R ", send_buf);
+           sprintf(send_buf, "%s$B$5electricity! ", send_buf);
            has_spells = 1;
         }
         if (IS_AFFECTED(i,AFF_PARALYSIS)) {
-           sprintf(send_buf,"%s$2paralyze!$R ", send_buf);
+           sprintf(send_buf,"%s$R$2paralyze! ", send_buf);
            has_spells = 1;
         }
         if (i->affected_by & AFF_FLYING) {
@@ -519,19 +518,38 @@ void show_char_to_char(struct char_data *i, struct char_data *ch, int mode)
 
        if(mode == 3) // If it was a glance, show spells then get out
        {
-         if (IS_AFFECTED(i, AFF_SANCTUARY))
-            send_to_char("$R$B$7white aura!$R ", ch);
-         if (IS_AFFECTED(i, AFF_PROTECT_EVIL))
-            send_to_char("$R$6pulsing aura!$R ", ch);
-         if (IS_AFFECTED(i, AFF_FIRESHIELD))
-            send_to_char("$R$B$4flames!$R ", ch);
-         if (IS_AFFECTED(i, AFF_LIGHTNINGSHIELD))
-            send_to_char("$R$B$5electricity!$R ", ch);
-         if (IS_AFFECTED(i, AFF_PARALYSIS))
-            send_to_char("$2paralyze!$R ", ch);
-         if (i->affected_by & AFF_FLYING)
-            send_to_char("$B$1flying!", ch);
-         send_to_char("\r\n", ch);
+          sprintf(send_buf, "-%s has: ", i->short_desc);
+          has_spells = 0;
+        
+          if (IS_AFFECTED(i,AFF_SANCTUARY)) {
+             sprintf(send_buf, "%s$B$7white aura! ", send_buf);
+             has_spells = 1;
+          }
+          if (IS_AFFECTED(i,AFF_PROTECT_EVIL)) {
+             sprintf(send_buf, "%s$6pulsing aura! ", send_buf);
+             has_spells = 1;
+          }
+          if (IS_AFFECTED(i,AFF_FIRESHIELD)) {
+             sprintf(send_buf, "%s$B$4flames! ", send_buf);
+             has_spells = 1;
+          }
+          if (IS_AFFECTED(i, AFF_LIGHTNINGSHIELD)) {
+             sprintf(send_buf, "%s$B$5electricity! ", send_buf);
+             has_spells = 1;
+          }
+          if (IS_AFFECTED(i,AFF_PARALYSIS)) {
+             sprintf(send_buf,"%s$R$2paralyze! ", send_buf);
+             has_spells = 1;
+          }
+          if (i->affected_by & AFF_FLYING) {
+             sprintf(send_buf, "%s$B$1flying!", send_buf);
+             has_spells = 1;
+          }
+          if(has_spells) {
+             sprintf(send_buf, "%s$R\r\n", send_buf);
+             colorCharSend(send_buf, ch);
+          }
+          return;
        }
 
        found = FALSE;
