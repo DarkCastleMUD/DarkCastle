@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.47 2002/12/27 02:03:52 pirahna Exp $ */
+/* $Id: magic.cpp,v 1.48 2002/12/31 04:05:54 pirahna Exp $ */
 
 extern "C"
 {
@@ -449,7 +449,7 @@ int spell_armor(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
 
   af.type      = SPELL_ARMOR;
   af.duration  = 24 + level / 2;
-  af.modifier  = -20 + skill / 6;
+  af.modifier  = -20 - skill / 6;
   af.location  = APPLY_AC;
   af.bitvector = 0;
 

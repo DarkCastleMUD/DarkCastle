@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.81 2002/12/26 23:11:35 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.82 2002/12/31 04:05:54 pirahna Exp $ */
 
 extern "C"
 {
@@ -1306,7 +1306,7 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
      )
     )
   {
-    dam -= 30;
+    dam += pspell->modifier;  // modifier is negative
     if(dam < 1)  dam = 1;
     pspell->duration--;
     if(0 == pspell->duration) {
