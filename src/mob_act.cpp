@@ -19,7 +19,7 @@
 /* 12/06/2003   Onager   Modified mobile_activity() to prevent charmie    */
 /*                       scavenging                                       */
 /**************************************************************************/
-/* $Id: mob_act.cpp,v 1.18 2004/04/19 19:40:08 urizen Exp $ */
+/* $Id: mob_act.cpp,v 1.19 2004/04/20 08:48:24 urizen Exp $ */
 
 extern "C"
 {
@@ -326,7 +326,7 @@ void mobile_activity(void)
     if((ch->mobdata->hatred != NULL))    //  && (!ch->fighting)) (we check fighting earlier)
     {
       CHAR_DATA *next_blah;
-       CHAR_DATA *temp = get_char(get_random_hate(ch));    
+//      CHAR_DATA *temp = get_char(get_random_hate(ch));    
       done = 0;
     
       for(tmp_ch = world[ch->in_room].people; tmp_ch; tmp_ch = next_blah) 
