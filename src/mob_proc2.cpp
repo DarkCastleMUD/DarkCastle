@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.20 2003/01/21 05:34:23 pirahna Exp $ */
+/* $Id: mob_proc2.cpp,v 1.21 2003/02/17 21:09:26 pirahna Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -73,12 +73,52 @@ struct social_type
 };
 
 
-// TODO - clean up the repair guys.  We can probably pull some of this out into a 
-// function and/or clear up the act's to run faster.
+void repair_shop_fix_eq(char_data * ch, char_data * owner, int price,
+                        obj_data * obj)
+{
+  char buf[256];
+
+  GET_GOLD(ch) -= price;
+  eq_remove_damage(obj);
+  sprintf(buf, "It will cost you %d coins to repair %s.", price, obj->short_description);
+  do_say(owner, buf, 9);
+  act("You watch $N fix $p...\n\r\n\r", ch, obj, owner, TO_CHAR, 0);
+  act("You watch $N fix $p...\n\r\n\r", ch, obj, owner, TO_ROOM, 0);
+  do_say(owner, "All fixed!", 9);
+  act("$N gives you $p.", ch, obj, owner, TO_CHAR, 0);
+  act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
+}
+
+void repair_shop_complain_no_cash(char_data * ch, char_data * owner, int price,
+                                  obj_data * obj)
+{
+  char buf[256];
+
+  do_say(owner, "Trying to sucker me for a free repair job?", 9); 
+  sprintf(buf, "It would cost %d coins to repair %s, which you don't have!",
+          price, obj->short_description);
+  do_say(owner, buf, 9);
+  act("$N gives you $p.", ch, obj, owner, TO_CHAR, 0);
+  act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
+}
+
+void repair_shop_price_check(char_data * ch, char_data * owner, int price,
+                             obj_data * obj)
+{
+  char buf[256];
+
+  sprintf(buf, "It will only cost you %d coins to repair %s.'",
+          price, obj->short_description);
+  do_say(owner, buf, 9);
+  act("$N gives you $p.", ch, obj, owner, TO_CHAR, 0);
+  act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
+}
+
+
 int repair_guy(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,        
           struct char_data *owner)
 {
-  char buf[256], item[256];
+  char item[256];
   int value0, cost, price, x;
   int percent, eqdam;
 
@@ -97,89 +137,60 @@ int repair_guy(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     send_to_char("You don't have that item.\n\r", ch);
     return eSUCCESS;
   }
-  if(IS_OBJ_STAT(obj, ITEM_NOREPAIR)) {
-    act("The Repair Guy says, 'I can't fix this.'", ch, 0, 0, TO_CHAR, 0);     
+
+  act("You give $N $p.", ch, obj, owner, TO_CHAR, 0);
+  act("$n gives $p to $N.", ch, obj, owner, TO_ROOM, INVIS_NULL);
+  act("\n\r$N examines $p...", ch, obj, owner, TO_CHAR, 0);
+  act("\n\r$N examines $p...", ch, obj, owner, TO_ROOM, INVIS_NULL);
+
+  if(IS_OBJ_STAT(obj, ITEM_NOREPAIR)                     ||
+     IS_SET(obj->obj_flags.extra_flags, ITEM_ENCHANTED)  ||
+     obj->obj_flags.type_flag != ITEM_ARMOR
+    ) 
+  {
+    do_say(owner, "I can't repair this.", 9);
+    act("$N gives you $p.", ch, obj, owner, TO_CHAR, 0);
+    act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
     return eSUCCESS;
   }
 
-  act("You give The Repair Guy $p.",ch,obj,0,TO_CHAR, 0);
-  act("$n gives $p to The Repair Guy.", ch,obj,0, TO_ROOM, INVIS_NULL);
-  act("\n\rThe Repair Guy examines $p...",ch,obj,0, TO_CHAR, 0);
-  act("\n\rThe Repair Guy examines $p...",ch,obj,0, TO_ROOM, INVIS_NULL);
-
-  if((obj->obj_flags.type_flag != ITEM_ARMOR) || 
-      ( IS_SET(obj->obj_flags.extra_flags, ITEM_ENCHANTED))) {
-
-    act("The Repair Guy says 'I can't repair this.'",ch,0,0, TO_CHAR, 0);
-    act("The Repair Guy says 'I can't repair this.'",ch,0,0, TO_ROOM, INVIS_NULL);
-    act("The Repair Guy gives you $p.", ch,obj,0, TO_CHAR, 0);
-    act("The Repair Guy gives $n $p.", ch,obj,0, TO_ROOM, INVIS_NULL);
-    return eSUCCESS;
-  }
-  cost = obj->obj_flags.cost;
-  value0 = eq_max_damage(obj);
   eqdam = eq_current_damage(obj);
 
-  if (eqdam == 0) {
-    act("The Repair Guy says 'Looks fine to me.'",ch,0,0, TO_CHAR, 0);
-    act("The Repair Guy says 'Looks fine to me.'",ch,0,0, TO_ROOM, 0);
-    act("The Repair Guy gives you $p.", ch,obj,0, TO_CHAR, 0);
-    act("The Repair Guy gives $n $p.", ch,obj,0, TO_ROOM, INVIS_NULL);
+  if (eqdam <= 0) 
+  {
+    do_say(owner, "Looks fine to me.", 9);
+    act("$N gives you $p.", ch, obj, owner, TO_CHAR, 0);
+    act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
     return eSUCCESS;
   }
-  if (eqdam <= 0)
-    percent = 0;
-  else
-    percent = ((100* eqdam) / value0);
 
+  cost = obj->obj_flags.cost;
+  value0 = eq_max_damage(obj);
+  percent = ((100* eqdam) / value0);
   x = (100 - percent);          // now we know what percent to repair ..  
   price = ((cost * x) / 100);   // now we know what to charge them fuckers! 
 
   if (price < 100)
     price = 100;     // Welp.. Repair Guy needs to feed the kids somehow.. :)
-  
-  if (GET_GOLD(ch) < (uint32)price) {
-    act("The Repair Guy says 'Trying to sucker me for a free repair job?'",ch,0,0, TO_CHAR, 0);
-    act("The Repair Guy says 'Trying to sucker me for a free repair job?'",ch,0,0, TO_ROOM, 0);
-    sprintf(buf, "The Repair Guy says 'It would cost %d coins to repair %s, which you don't have!'",
-          price, obj->short_description);
-    act(buf, ch,0,0, TO_CHAR, 0);
-    act(buf, ch,0,0, TO_ROOM, 0);
-    act("The Repair Guy gives you $p.", ch,obj,0, TO_CHAR, 0);
-    act("The Repair Guy gives $n $p.", ch,obj,0, TO_ROOM, INVIS_NULL);
-    return eSUCCESS;
-
-  } 
 
   if (cmd == 65) {
-      sprintf(buf, "The Repair Guy says 'It will only cost you %d coins to repair %s.'",
-          price, obj->short_description);
-      act(buf, ch,0,0, TO_CHAR, 0);
-      act(buf, ch,0,0, TO_ROOM, 0);
-      act("The Repair Guy gives you $p.", ch,obj,0, TO_CHAR, 0);
-      act("The Repair Guy gives $n $p.", ch,obj,0, TO_ROOM, INVIS_NULL);
-      return eSUCCESS;
-  }   /* price quote */
+    repair_shop_price_check(ch, owner, price, obj);
+    return eSUCCESS;
+  }
 
-  GET_GOLD(ch) -= price;
-  eq_remove_damage(obj);
-  sprintf(buf, "The Repair Guy says 'It will cost you %d coins to repair %s.'",
-          price, obj->short_description);
-  act(buf, ch,0,0, TO_CHAR, 0);
-  act(buf, ch,0,0, TO_ROOM, 0);
-  act("You watch The Repair Guy fix $p...\n\r\n\r"
-        "The Repair Guy says 'All fixed!'\n\r"
-        "The Repair Guy gives you $p.", ch, obj, 0, TO_CHAR, 0);
-  act("You watch The Repair Guy fix $p...\n\r\n\r"
-        "The Repair Guy says 'All fixed!'\n\r"
-        "The Repair Guy gives $n $p.", ch, obj, 0, TO_ROOM, INVIS_NULL);
+  if (GET_GOLD(ch) < (uint32)price) {
+    repair_shop_complain_no_cash(ch, owner, price, obj);
+    return eSUCCESS;
+  } 
+
+  repair_shop_fix_eq(ch, owner, price, obj);
   return eSUCCESS;
 }
 
 int super_repair_guy(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,        
           struct char_data *owner)
 {
-  char buf[256], item[256];
+  char item[256];
   int value0, value2, cost, price, x;
   int percent, eqdam;
 
@@ -198,298 +209,167 @@ int super_repair_guy(struct char_data *ch, struct obj_data *obj, int cmd, char *
     send_to_char("You don't have that item.\n\r", ch);
     return eSUCCESS;
   }
+
   if(IS_OBJ_STAT(obj, ITEM_NOREPAIR)) {
-    act("The Super Repair Guy says, 'I can't fix this.'", ch, 0,0, TO_ROOM, 0);
+    do_say(owner, "I can't repair this.", 9);
     return eSUCCESS;
   }
-  act("You give The Super Repair Guy $p.",ch,obj,0,TO_CHAR, 0);
-  act("$n gives $p to The Super Repair Guy.", ch,obj,0, TO_ROOM, INVIS_NULL);
-  act("\n\rThe Super Repair Guy examines $p...",ch,obj,0, TO_CHAR, 0);
-  act("\n\rThe Super Repair Guy examines $p...",ch,obj,0, TO_ROOM, INVIS_NULL);
+
+  act("You give $N $p.", ch, obj, owner, TO_CHAR, 0);
+  act("$n gives $p to $N.", ch, obj, owner, TO_ROOM, INVIS_NULL);
+  act("\n\r$N examines $p...", ch, obj, owner, TO_CHAR, 0);
+  act("\n\r$N examines $p...", ch, obj, owner, TO_ROOM, INVIS_NULL);
+
+  eqdam = eq_current_damage(obj);
+
+  if (eqdam <= 0) {
+    do_say(owner, "Looks fine to me.", 9);
+    act("$N gives you $p.", ch, obj, owner, TO_CHAR, 0);
+    act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
+    return eSUCCESS;
+  }
+
+  cost = obj->obj_flags.cost;
+  value0 = eq_max_damage(obj);
 
   if (obj->obj_flags.type_flag == ITEM_ARMOR ||
       obj->obj_flags.type_flag == ITEM_CONTAINER)
   {
-
-    cost = obj->obj_flags.cost;
-    value0 = eq_max_damage(obj);
-    eqdam = eq_current_damage(obj);
-
-    if (eqdam == 0) {
-      act("The Super Repair Guy says 'Looks fine to me.'",ch,0,0, TO_CHAR, 0);
-      act("The Super Repair Guy says 'Looks fine to me.'",ch,0,0, TO_ROOM, 0);
-      act("The Super Repair Guy gives you $p.", ch,obj,0, TO_CHAR, 0);
-      act("The Super Repair Guy gives $n $p.", ch,obj,0, TO_ROOM, INVIS_NULL);
-      return eSUCCESS;
-    }
-    if (eqdam <= 0)
-      percent = 0;
-    else
-      percent = ((100* eqdam) / value0);
-
-    x = (100 - percent);    /* now we know what percent to repair ..  */
-    price = ((cost * x) / 100);   /* now we know what to charge them fuckers! */
-    price *= 2;             /* he likes to charge more..  */
-                           /*  for armor... cuz he can.. */
-
-    if (IS_SET(obj->obj_flags.extra_flags, ITEM_ENCHANTED))
-      price *= 2;
-
-    if (price < 1000)
-      price = 1000;     /* Welp.. Repair Guy needs to feed the kids somehow.. :) */
-  
-    if (GET_GOLD(ch) < (uint32)price) {
-      act("The Super Repair Guy says 'Trying to sucker me for a free repair job?'",ch,0,0, TO_CHAR, 0);
-      act("The Super Repair Guy says 'Trying to sucker me for a free repair job?'",ch,0,0, TO_ROOM, 0);
-      sprintf(buf, "The Super Repair Guy says 'It would cost %d coins to repair %s, which you don't have!'",
-          price, obj->short_description);
-      act(buf, ch,0,0, TO_CHAR, 0);
-      act(buf, ch,0,0, TO_ROOM, 0);
-      act("The Super Repair Guy gives you $p.", ch,obj,0, TO_CHAR, 0);
-      act("The Super Repair Guy gives $n $p.", ch,obj,0, TO_ROOM, INVIS_NULL);
-      return eSUCCESS;
-    } else {
-      if (cmd == 65) {
-        sprintf(buf, "The Super Repair Guy says 'It will only cost you %d coins to repair %s.'",
-          price, obj->short_description);
-        act(buf, ch,0,0, TO_CHAR, 0);
-        act(buf, ch,0,0, TO_ROOM, 0);
-        act("The Super Repair Guy gives you $p.", ch,obj,0, TO_CHAR, 0);
-        act("The Super Repair Guy gives $n $p.", ch,obj,0, TO_ROOM, 0);
-        return eSUCCESS;
-      }   /* price quote */
-
-
-      GET_GOLD(ch) -= price;
-      eq_remove_damage(obj);
-      sprintf(buf, "The Super Repair Guy says 'It will cost you %d coins to repair %s.'",
-          price, obj->short_description);
-      act(buf, ch,0,0, TO_CHAR, 0);
-      act(buf, ch,0,0, TO_ROOM, 0);
-      act("You watch The Super Repair Guy fix $p...\n\r",ch,obj,0, TO_CHAR, 0);
-      act("You watch The Super Repair Guy fix $p...\n\r",ch,obj,0,TO_ROOM,INVIS_NULL);
-      act("The Super Repair Guy says 'All fixed!'",ch,obj,0, TO_CHAR, 0);
-      act("The Super Repair Guy says 'All fixed!'",ch,obj,0, TO_ROOM, 0);
-      act("The Super Repair Guy gives you $p.", ch,obj,0, TO_CHAR, 0);
-      act("The Super Repair Guy gives $n $p.", ch,obj,0, TO_ROOM, INVIS_NULL);
-      return eSUCCESS;
-    }
-  } else if (obj->obj_flags.type_flag == ITEM_WEAPON) {
-
-    cost = obj->obj_flags.cost;
-    value0 = eq_max_damage(obj);
-    eqdam = eq_current_damage(obj);
-
-    if (eqdam == 0) {
-      act("The Super Repair Guy says 'Looks fine to me.'",ch,0,0, TO_CHAR, 0);
-      act("The Super Repair Guy says 'Looks fine to me.'",ch,0,0, TO_ROOM, 0);
-      act("The Super Repair Guy gives you $p.", ch,obj,0, TO_CHAR, 0);
-      act("The Super Repair Guy gives $n $p.", ch,obj,0, TO_ROOM, INVIS_NULL);
-      return eSUCCESS;
-    }
-    if (eqdam <= 0)
-      percent = 0;
-    else
-      percent = ((100* eqdam) / (value0 + value2));
-
-    x = (100 - percent);    /* now we know what percent to repair ..  */
-    price = ((cost * x) / 100);   /* now we know what to charge them fuckers! */
-
-    if (price < 1000)
-      price = 1000;     /* Welp.. Repair Guy needs to feed the kids somehow.. :) */
-  
-    if (GET_GOLD(ch) < (uint32)price) {
-      act("The Super Repair Guy says 'Trying to sucker me for a free repair job?'",ch,0,0, TO_CHAR, 0);
-      act("The Super Repair Guy says 'Trying to sucker me for a free repair job?'",ch,0,0, TO_ROOM, 0);
-      sprintf(buf, "The Super Repair Guy says 'It would cost %d coins to repair %s, which you don't have!'",
-          price, obj->short_description);
-      act(buf, ch,0,0, TO_CHAR, 0);
-      act(buf, ch,0,0, TO_ROOM, 0);
-      act("The Super Repair Guy gives you $p.", ch,obj,0, TO_CHAR, 0);
-      act("The Super Repair Guy gives $n $p.", ch,obj,0, TO_ROOM, INVIS_NULL);
-      return eSUCCESS;
-
-    } else {
-
-      GET_GOLD(ch) -= price;
-      eq_remove_damage(obj);
-
-      sprintf(buf, "The Super Repair Guy says 'It will cost you %d coins to repair %s.'",
-          price, obj->short_description);
-      act(buf, ch,0,0, TO_CHAR, 0);
-      act(buf, ch,0,0, TO_ROOM, 0);
-      act("You watch The Super Repair Guy fix $p...\n\r",ch,obj,0, TO_CHAR, 0);
-      act("You watch The Super Repair Guy fix $p...\n\r",ch,obj,0, TO_ROOM, 0);
-      act("The Super Repair Guy says 'All fixed!'",ch,obj,0, TO_CHAR, 0);
-      act("The Super Repair Guy says 'All fixed!'",ch,obj,0, TO_ROOM, 0);
-      act("The Super Repair Guy gives you $p.", ch,obj,0, TO_CHAR, 0);
-      act("The Super Repair Guy gives $n $p.", ch,obj,0, TO_ROOM, INVIS_NULL);
-      return eSUCCESS;
-    }
+    percent = ((100* eqdam) / value0);
+    x = (100 - percent);               /* now we know what percent to repair ..  */
+    price = ((cost * x) / 100);        /* now we know what to charge */
+    price *= 2;                        /* he likes to charge more..  */
+                                       /*  for armor... cuz he can.. */
+  } 
+  else if (obj->obj_flags.type_flag == ITEM_WEAPON) 
+  {
+    percent = ((100* eqdam) / (value0 + value2));
+    x = (100 - percent);               /* now we know what percent to repair ..  */
+    price = ((cost * x) / 100);        /* now we know what to charge */
   }
-  act("The Super Repair Guy says 'I can't repair this.'",ch,0,0, TO_CHAR, 0);
-  act("The Super Repair Guy says 'I can't repair this.'",ch,0,0, TO_ROOM, 0);
-  act("The Super Repair Guy gives you $p.", ch,obj,0, TO_CHAR, 0);
-  act("The Super Repair Guy gives $n $p.", ch,obj,0, TO_ROOM, INVIS_NULL);
+  else {
+    // Dunno how to repair non-weapons/armor
+    do_say(owner, "I can't repair this.", 9);
+    act("$N gives you $p.", ch, obj, owner, TO_CHAR, 0);
+    act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
+  }
+
+  if (IS_SET(obj->obj_flags.extra_flags, ITEM_ENCHANTED))
+    price *= 2;
+
+  if (price < 1000)
+    price = 1000;                      // Minimum price
+  
+  if (cmd == 65) {
+    repair_shop_price_check(ch, owner, price, obj);
+    return eSUCCESS;
+  }
+
+  if (GET_GOLD(ch) < (uint32)price) {
+    repair_shop_complain_no_cash(ch, owner, price, obj);
+    return eSUCCESS;
+  } 
+  else {
+      repair_shop_fix_eq(ch, owner, price, obj);
+      return eSUCCESS;
+  }
+
   return eSUCCESS;
 }
 
-
+// Fingers
 int repair_shop(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,        
           struct char_data *owner)
 {
-  char buf[256], item[256];
+  char item[256];
   int value0, value2, cost, price, x;
   int percent, eqdam;
 
-    if ((cmd != 66) && (cmd != 65)) return eFAILURE;
+  if ((cmd != 66) && (cmd != 65)) return eFAILURE;
 
-       one_argument(arg, item);
+  one_argument(arg, item);
 
-      if (!*item) {
-send_to_char("What item?\n\r", ch);
-        return eSUCCESS;
-         }
-
-      obj = get_obj_in_list_vis(ch, item, ch->carrying);
-
-     if (obj == NULL) {
-send_to_char("You don't have that item.\n\r", ch);
-       return eSUCCESS;
-        }
-
-act("You give Fingers $p.",ch,obj,0,TO_CHAR, 0);
-act("$n gives $p to Fingers.", ch,obj,0, TO_ROOM, INVIS_NULL);
-act("\n\rFingers examines $p...",ch,obj,0, TO_CHAR, 0);
-act("\n\rFingers examines $p...",ch,obj,0, TO_ROOM, 0);
-
-  if (obj->obj_flags.type_flag == ITEM_ARMOR) {
-
-      cost = obj->obj_flags.cost;
-    value0 = eq_max_damage(obj);
-    eqdam = eq_current_damage(obj);
-
-    if (eqdam == 0) {
-act("Fingers says 'Looks fine to me.'",ch,0,0, TO_CHAR, 0);
-act("Fingers says 'Looks fine to me.'",ch,0,0, TO_ROOM, 0);
-act("Fingers gives you $p.", ch,obj,0, TO_CHAR, 0);
-act("Fingers gives $n $p.", ch,obj,0, TO_ROOM, 0);
+  if (!*item) {
+    send_to_char("What item?\n\r", ch);
     return eSUCCESS;
-      }
-if (eqdam <= 0)
-     percent = 0;
-   else
-     percent = ((100* eqdam) / value0);
+  }
 
-      x = (100 - percent);    /* now we know what percent to repair ..  */
-  price = ((cost * x) / 100);   /* now we know what to charge them fuckers! */
-  price *= 4;             /* he likes to charge more..  */
-                         /*  for armor... cuz he's a crook..  */
+  obj = get_obj_in_list_vis(ch, item, ch->carrying);
 
- if (IS_SET(obj->obj_flags.extra_flags, ITEM_ENCHANTED))
-    price *= 2;
-
- if (price < 5000)
-   price = 5000;     /* Welp.. Repair Guy needs to feed the kids somehow.. :) */
-  
-    if (GET_GOLD(ch) < (uint32)price) {
-act("Fingers says 'Trying to sucker me for a free repair job?'",ch,0,0, TO_CHAR, 0);
-act("Fingers says 'Trying to sucker me for a free repair job?'",ch,0,0, TO_ROOM, 0);
-sprintf(buf, "Fingers says 'It would cost %d coins to repair %s, which you don't have!'",
-          price, obj->short_description);
-act(buf, ch,0,0, TO_CHAR, 0);
-act(buf, ch,0,0, TO_ROOM, 0);
-act("Fingers gives you $p.", ch,obj,0, TO_CHAR, 0);
-act("Fingers gives $n $p.", ch,obj,0, TO_ROOM, INVIS_NULL);
+  if (obj == NULL) {
+    send_to_char("You don't have that item.\n\r", ch);
     return eSUCCESS;
+  }
 
-     } else {
-   if (cmd == 65) {
-sprintf(buf, "Fingers says 'It will only cost you %d coins to repair %s.'",
-          price, obj->short_description);
-act(buf, ch,0,0, TO_CHAR, 0);
-act(buf, ch,0,0, TO_ROOM, 0);
-act("Fingers gives you $p.", ch,obj,0, TO_CHAR, 0);
-act("Fingers gives $n $p.", ch,obj,0, TO_ROOM, INVIS_NULL);
+  if(IS_OBJ_STAT(obj, ITEM_NOREPAIR)) {
+    do_say(owner, "I can't repair this.", 9);
     return eSUCCESS;
-     }   /* price quote */
+  }
 
+  act("You give $N $p.", ch, obj, owner, TO_CHAR, 0);
+  act("$n gives $p to $N.", ch, obj, owner, TO_ROOM, INVIS_NULL);
+  act("\n\r$N examines $p...", ch, obj, owner, TO_CHAR, 0);
+  act("\n\r$N examines $p...", ch, obj, owner, TO_ROOM, INVIS_NULL);
 
-  GET_GOLD(ch) -= price;
-  eq_remove_damage(obj);
-sprintf(buf, "Fingers says 'It will cost you %d coins to repair %s.'",
-          price, obj->short_description);
-act(buf, ch,0,0, TO_CHAR, 0);
-act(buf, ch,0,0, TO_ROOM, 0);
-act("You watch Fingers fix $p...\n\r",ch,obj,0, TO_CHAR, 0);
-act("You watch Fingers fix $p...\n\r",ch,obj,0, TO_ROOM, 0);
-act("Fingers says 'All fixed!'",ch,obj,0, TO_CHAR, 0);
-act("Fingers says 'All fixed!'",ch,obj,0, TO_ROOM, 0);
-act("Fingers gives you $p.", ch,obj,0, TO_CHAR, 0);
-act("Fingers gives $n $p.", ch,obj,0, TO_ROOM, INVIS_NULL);
+  eqdam = eq_current_damage(obj);
+
+  if (eqdam <= 0) {
+    do_say(owner, "Looks fine to me.", 9);
+    act("$N gives you $p.", ch, obj, owner, TO_CHAR, 0);
+    act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
     return eSUCCESS;
-   }
+  }
+
+  cost = obj->obj_flags.cost;
+  value0 = eq_max_damage(obj);
+
+  if (obj->obj_flags.type_flag == ITEM_ARMOR) 
+  {
+
+    percent = ((100* eqdam) / value0);
+    x = (100 - percent);          /* now we know what percent to repair ..  */
+    price = ((cost * x) / 100);   /* now we know what to charge them fuckers! */
+    price *= 4;                   /* he likes to charge more..  */
+                                  /*  for armor... cuz he's a crook..  */
   } else if (obj->obj_flags.type_flag == ITEM_WEAPON ||
              obj->obj_flags.type_flag == ITEM_CONTAINER) 
   {
 
-      cost = obj->obj_flags.cost;
-    value0 = eq_max_damage(obj);
-    eqdam = eq_current_damage(obj);
-
-    if (eqdam == 0) {
-act("Fingers says 'Looks fine to me.'",ch,0,0, TO_CHAR, 0);
-act("Fingers says 'Looks fine to me.'",ch,0,0, TO_ROOM, 0);
-act("Fingers gives you $p.", ch,obj,0, TO_CHAR, 0);
-act("Fingers gives $n $p.", ch,obj,0, TO_ROOM, INVIS_NULL);
+    percent = ((100* eqdam) / (value0 + value2));
+    x = (100 - percent);          /* now we know what percent to repair ..  */
+    price = ((cost * x) / 100);   /* now we know what to charge them fuckers! */
+    price *= 3;
+  }
+  else
+  {
+    // Dunno how to repair non-weapons/armor
+    do_say(owner, "I can't repair this.", 9);
+    act("$N gives you $p.", ch, obj, owner, TO_CHAR, 0);
+    act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
     return eSUCCESS;
-      }
-if (eqdam <= 0)
-     percent = 0;
-   else
-     percent = ((100* eqdam) / (value0 + value2));
+  }
 
-      x = (100 - percent);    /* now we know what percent to repair ..  */
-  price = ((cost * x) / 100);   /* now we know what to charge them fuckers! */
-  price *= 3;
+  if (IS_SET(obj->obj_flags.extra_flags, ITEM_ENCHANTED))
+    price *= 2;
 
- if (price < 5000)
-   price = 5000;     /* Welp.. Repair Guy needs to feed the kids somehow.. :) */
+  if (price < 5000)
+    price = 5000;     /* Welp.. Repair Guy needs to feed the kids somehow.. :) */
   
-    if (GET_GOLD(ch) < (uint32)price) {
-act("Fingers says 'Trying to sucker me for a free repair job?'",ch,0,0, TO_CHAR, 0);
-act("Fingers says 'Trying to sucker me for a free repair job?'",ch,0,0, TO_ROOM, 0);
-sprintf(buf, "Fingers says 'It would cost %d coins to repair %s, which you don't have!'",
-          price, obj->short_description);
-act(buf, ch,0,0, TO_CHAR, 0);
-act(buf, ch,0,0, TO_ROOM, 0);
-act("Fingers gives you $p.", ch,obj,0, TO_CHAR, 0);
-act("Fingers gives $n $p.", ch,obj,0, TO_ROOM, INVIS_NULL);
+  if (cmd == 65) 
+  {
+    repair_shop_price_check(ch, owner, price, obj);
     return eSUCCESS;
+  }
 
-     } else {
-
-  GET_GOLD(ch) -= price;
-  eq_remove_damage(obj);
-
-sprintf(buf, "Fingers says 'It will cost you %d coins to repair %s.'",
-          price, obj->short_description);
-act(buf, ch,0,0, TO_CHAR, 0);
-act(buf, ch,0,0, TO_ROOM, 0);
-act("You watch Fingers fix $p...\n\r",ch,obj,0, TO_CHAR, 0);
-act("You watch Fingers fix $p...\n\r",ch,obj,0, TO_ROOM, 0);
-act("Fingers says 'All fixed!'",ch,obj,0, TO_CHAR, 0);
-act("Fingers says 'All fixed!'",ch,obj,0, TO_ROOM, 0);
-act("Fingers gives you $p.", ch,obj,0, TO_CHAR, 0);
-act("Fingers gives $n $p.", ch,obj,0, TO_ROOM, INVIS_NULL);
-     return eSUCCESS;
-     }
-   }
-act("Fingers says 'I can't repair this.'",ch,0,0, TO_CHAR, 0);
-act("Fingers says 'I can't repair this.'",ch,0,0, TO_ROOM, 0);
-act("Fingers gives you $p.", ch,obj,0, TO_CHAR, 0);
-act("Fingers gives $n $p.", ch,obj,0, TO_ROOM, INVIS_NULL);
-   return eSUCCESS;
+  if (GET_GOLD(ch) < (uint32)price) {
+    repair_shop_complain_no_cash(ch, owner, price, obj);
+    return eSUCCESS;
+  } 
+  else 
+  {
+    repair_shop_fix_eq(ch, owner, price, obj);
+    return eSUCCESS;
+  }
 }
 
 int mortician(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,        
@@ -537,7 +417,9 @@ int mortician(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     }
     send_to_char("$RIf any corpses were listed, they are still where you left them.  This\n\r"
                  "list is therefore always changing.  If you purchase one, it will be\n\r"
-                 "placed at your feet. Use \"buy <number>\" to purchase a corpse.\n\r", ch);
+                 "placed at your feet. Use \"buy <number>\" to purchase a corpse.\n\r"
+                 "Use 'value' to find how much your eq would cost with what you\n\r"
+                 "have on you now.\n\r", ch);
     return eSUCCESS;
   }
 

@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.13 2003/01/22 15:22:57 pirahna Exp $ */
+/* $Id: utility.cpp,v 1.14 2003/02/17 21:09:26 pirahna Exp $ */
 
 extern "C"
 {
@@ -706,7 +706,7 @@ int do_order(struct char_data *ch, char *argument, int cmd)
        if (victim) {
           sprintf(buf, "$N orders you to '%s'", message);
           act(buf,  victim, 0, ch, TO_CHAR, 0);
-          act("$n gives $N an order.", ch, 0, victim, TO_ROOM, 0);
+          act("$n gives $N an order.", ch, 0, victim, TO_ROOM, NOTVICT);
           if ( (victim->master!=ch) || 
                !IS_AFFECTED(victim, AFF_CHARM) ||
                IS_AFFECTED2(victim, AFF_FAMILIAR))

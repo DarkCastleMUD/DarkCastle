@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_monk.cpp,v 1.9 2002/10/13 15:49:23 pirahna Exp $
+| $Id: cl_monk.cpp,v 1.10 2003/02/17 21:09:32 pirahna Exp $
 | cl_monk.C
 | Description:  Monk skills.
 */
@@ -96,7 +96,7 @@ int do_eagle_claw(struct char_data *ch, char *argument, int cmd)
 
 int do_quivering_palm(struct char_data *ch, char *argument, int cmd)
 {
-  // struct affected_type af;
+  struct affected_type af;
   struct char_data *victim;
   char name[256];
   int learned, specialization, chance, percent, dam, retval;
@@ -108,11 +108,11 @@ int do_quivering_palm(struct char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-//  if(affected_by_spell(ch, SKILL_QUIVERING_PALM)) {
-//     send_to_char("You can't perform such an ancient power more than "
-//                  "once a day!\n\r", ch);
-//     return eFAILURE;
-//  }
+  if(affected_by_spell(ch, SKILL_QUIVERING_PALM)) {
+     send_to_char("You can't perform such an ancient power more than "
+                  "once a day!\n\r", ch);
+     return eFAILURE;
+  }
 
   if(ch->equipment[WIELD] || ch->equipment[HOLD]) {
     send_to_char ("You can't wield or hold anything to perform this!\n\r", ch);
@@ -161,12 +161,12 @@ int do_quivering_palm(struct char_data *ch, char *argument, int cmd)
   skill_increase_check(ch, SKILL_QUIVERING_PALM, learned, SKILL_INCREASE_EASY);
 
   WAIT_STATE(ch, PULSE_VIOLENCE*2);
-  // af.type = SKILL_QUIVERING_PALM;
-  // af.duration = 24;
-  // af.modifier = 0;
-  // af.location = APPLY_NONE;
-  // af.bitvector = 0;
-  // affect_to_char(ch, &af);
+  af.type = SKILL_QUIVERING_PALM;
+  af.duration = 48;
+  af.modifier = 0;
+  af.location = APPLY_NONE;
+  af.bitvector = 0;
+  affect_to_char(ch, &af);
 
   if(percent > chance) {
     retval = damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_QUIVERING_PALM, 0);

@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.60 2003/02/17 21:08:54 pirahna Exp $ */
+/* $Id: magic.cpp,v 1.61 2003/02/17 21:09:26 pirahna Exp $ */
 
 extern "C"
 {
@@ -2456,12 +2456,10 @@ int spell_sleep(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
   }
 
   if (level < GET_LEVEL(victim)){
-	 sprintf(buf,"%s laughs in your face at your feeble attempt.\n\r",
-	GET_SHORT(victim));
+	 sprintf(buf,"%s laughs in your face at your feeble attempt.\n\r", GET_SHORT(victim));
 	 send_to_char(buf,ch);
-	 sprintf(buf,"%s tries to make you sleep you, but fails miserably.\n\r",
-	GET_SHORT(ch));
-	 send_to_char(buf,ch);
+	 sprintf(buf,"%s tries to make you sleep, but fails miserably.\n\r", GET_SHORT(ch));
+	 send_to_char(buf,victim);
 	 retval = one_hit(victim,ch,TYPE_UNDEFINED, FIRST);
          retval = SWAP_CH_VICT(retval);
 	 return retval;
@@ -3334,7 +3332,7 @@ int spell_fly(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj
 
   skill_increase_check(ch, SPELL_FLY, skill, SKILL_INCREASE_MEDIUM);
 
-  send_to_char("You start flapping and rise off the ground!", victim);
+  send_to_char("You start flapping and rise off the ground!\n\r", victim);
   act("$N's feet rise off the ground.", ch, 0, victim, TO_ROOM, INVIS_NULL|NOTVICT);
 
   af.type = SPELL_FLY;
