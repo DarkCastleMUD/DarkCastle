@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.20 2003/01/21 06:58:17 pirahna Exp $ */
+/* $Id: handler.cpp,v 1.21 2003/04/18 01:24:51 pirahna Exp $ */
     
 extern "C"
 {
@@ -847,6 +847,24 @@ void affect_remove( CHAR_DATA *ch, struct affected_type *af )
          return;
       }
       hjp->next = af->next; /* skip the af element */
+   }
+
+   switch( af->type ) 
+   {
+      // Put anything here that MUST go away whenever the spell wears off
+      // That isn't handled in affect_modify
+
+      case SPELL_IRON_ROOTS:
+         REMOVE_BIT(ch->affected_by2, AFF_NO_FLEE);
+         break;
+      case SPELL_STONE_SKIN:  /* Stone skin wears off... Remove resistance */
+         REMOVE_BIT(ch->resist, ISR_PIERCE);
+         break;
+      case SPELL_BARKSKIN: /* barkskin wears off */
+         REMOVE_BIT(ch->resist, ISR_SLASH);
+         break;
+      default:
+        break;
    }
 
    dc_free ( af );

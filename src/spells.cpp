@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.34 2003/04/16 04:10:03 pirahna Exp $ */
+/* $Id: spells.cpp,v 1.35 2003/04/18 01:24:51 pirahna Exp $ */
 
 extern "C"
 {
@@ -909,7 +909,12 @@ void affect_update( void )
 
 	  affect_remove(i, af);
 
-          switch( af->type ) { // Anything special goes here
+          switch( af->type ) 
+          { 
+            // Anything special messagewise goes here
+            // Do NOT put anything important like RESIST/SUSCEPT stuff in here
+            // Put it in affect_remove.
+
             case SPELL_FLY: 
             { /* Fly wears off...you fall :) */ 
              if((IS_SET(world[i->in_room].room_flags, FALL_DOWN) && (dir = 5)) ||
@@ -923,49 +928,26 @@ void affect_update( void )
                }
                break;
             }
-            case SPELL_IRON_ROOTS:
-               REMOVE_BIT(i->affected_by2, AFF_NO_FLEE);
-               break;
-            case SPELL_STONE_SKIN:  /* Stone skin wears off... Remove resistance */
-               REMOVE_BIT(i->resist, ISR_PIERCE);
-               break;
-            case SPELL_RESIST_FIRE:   /* resist fire wears off  */
-               REMOVE_BIT(i->resist, ISR_FIRE);
-               break;
-	     case SPELL_BARKSKIN: /* barkskin wears off */
- 	       REMOVE_BIT(i->resist, ISR_SLASH);
-               break;
-             case SPELL_RESIST_ENERGY:
-               REMOVE_BIT(i->resist, ISR_ENERGY);
-               break;
-             case SPELL_RESIST_ACID:
-               REMOVE_BIT(i->resist, ISR_ACID);
-             case 191:
-               REMOVE_BIT(i->immune, ISR_POISON);
-               break;
-             case SPELL_RESIST_COLD:   /* resist cold wears off */
-               REMOVE_BIT(i->resist, ISR_COLD);
-               break;
-             case SKILL_INSANE_CHANT:
+            case SKILL_INSANE_CHANT:
                send_to_char("The insane chanting in your mind wears off.\r\n", i);
                break;
-             case SKILL_GLITTER_DUST:
+            case SKILL_GLITTER_DUST:
                send_to_char("The dust around your body stops glowing.\r\n", i);
                break;
-             case SKILL_BLOOD_FURY:
+            case SKILL_BLOOD_FURY:
                send_to_char("Your blood cools to normal levels.\r\n", i);
                break;
-             case SKILL_BLADESHIELD:
+            case SKILL_BLADESHIELD:
                send_to_char("The draining affect of the blade shield technique has worn off.\r\n", i);
                break;
-             case SKILL_FOCUSED_REPELANCE:
+            case SKILL_FOCUSED_REPELANCE:
                REMOVE_BIT(i->combat, COMBAT_REPELANCE);
                send_to_char("Your mind recovers from the repelance.\n\r", i);
                break;
-             case SKILL_VITAL_STRIKE:
+            case SKILL_VITAL_STRIKE:
                send_to_char("The internal strength and speed from your vital strike has returned.\r\n", i);
                break;
-             case SPELL_WATER_BREATHING:
+            case SPELL_WATER_BREATHING:
                if(world[i->in_room].sector_type == SECT_UNDERWATER) // uh oh
                {
                   // you just drowned!
@@ -979,7 +961,7 @@ void affect_update( void )
              case KI_STANCE + KI_OFFSET:
                send_to_char("Your body finishes venting the energy absorbed from your last ki stance.\r\n", i);
                break;
-             case 7: {   /* Charm Wears off */
+            case 7: {   /* Charm Wears off */
                remove_memory(i, 'h');
                add_memory(i, GET_NAME(i->master), 'h');
                stop_follower(i,0);

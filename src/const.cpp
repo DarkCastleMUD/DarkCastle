@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: const.cpp,v 1.54 2003/02/13 22:54:12 pirahna Exp $ */
+/* $Id: const.cpp,v 1.55 2003/04/18 01:24:51 pirahna Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -239,6 +239,20 @@ char *connected_states[] =
     "CON_EDIT_MPROG",
     "CON_DISPLAY_ENTRANCE",
     "CON_PRE_DISPLAY_ENTRANCE",
+    "CON_GET_ACCOUNT",                  
+    "CON_CONFIRM_NEW_ACCOUNT",
+    "CON_ACCOUNT_GET_EMAIL_ADDRESS",
+    "CON_ACCOUNT_CONFIRM_EMAIL_ADDRESS",
+    "CON_ACCOUNT_GET_FIRST_NAME",
+    "CON_ACCOUNT_GET_LAST_NAME",      
+    "CON_ACCOUNT_GET_ADDR1",       
+    "CON_ACCOUNT_GET_ADDR2",           
+    "CON_ACCOUNT_GET_ADDR3",   
+    "CON_ACCOUNT_GET_CITYSTATEZIP",
+    "CON_ACCOUNT_GET_COUNTRY",    
+    "CON_ACCOUNT_GET_PHONE",
+    "CON_ACCOUNT_GET_SECRET_QUESTION",
+    "CON_ACCOUNT_GET_SECRET_ANSWER",
     "\n"
 };
 
