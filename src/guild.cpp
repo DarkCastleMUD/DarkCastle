@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.36 2004/05/02 20:38:49 urizen Exp $
+| $Id: guild.cpp,v 1.37 2004/05/02 20:42:36 urizen Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -248,7 +248,6 @@ int skills_guild(struct char_data *ch, char *arg, struct char_data *owner)
       struct skill_quest *sq;
      if (IS_SET(classon, 1<<GET_CLASS(ch)) && (sq=find_sq(skilllist[skillnumber].skillname)) != NULL && sq->message)
      {
-	send_to_char(sq->message,ch);
 	mprog_driver(sq->message, owner, ch, NULL, NULL);
      } else if (skilllist[skillnumber].clue)
      do_say(owner, skilllist[skillnumber].clue,9);
