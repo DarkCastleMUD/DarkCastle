@@ -189,7 +189,7 @@ int do_sqedit(struct char_data *ch, char *argument, int cmd)
     strcat(arg3,arg2);
     skill = find_sq(arg3);
   }
-  if (skill==NULL && (skill = find_sq(arg1))==NULL && cmd!=0)
+  if (skill==NULL && (skill = find_sq(arg1))==NULL && i!=0)
   {
     send_to_char("Unknown skill.",ch);
     return eFAILURE;
