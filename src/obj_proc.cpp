@@ -1995,3 +1995,55 @@ int TOHS_locator(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
    return eSUCCESS;   
 }
 
+int gotta_dance_boots(struct char_data*ch, struct obj_data *obj, int cmd, char*arg, 
+                   CHAR_DATA *invoker)
+{
+   void make_person_dance(char_data * ch);
+
+   if(cmd)
+      return eFAILURE;
+
+   if(!obj->equipped_by)
+      return eFAILURE;
+
+   if(number(0, 3))
+      return eFAILURE;
+
+   act("$n eyes widen and $e begins to shake violently.", obj->equipped_by, 0,0,TO_ROOM, INVIS_NULL);
+   send_to_char("Your boots grasp violently to your legs and rhythmic urges flood your body.\r\n", obj->equipped_by);
+   do_say(obj->equipped_by, "I...I.....I've gotta dance!!!!", 9);
+   make_person_dance(obj->equipped_by);
+   send_to_char("You slump back down, exhausted.\r\n", obj->equipped_by);
+   if(GET_LEVEL(obj->equipped_by) <= MORTAL)
+      WAIT_STATE(obj->equipped_by, PULSE_VIOLENCE*3);
+
+   return eSUCCESS;   
+}
+
+
+int random_dir_boots(struct char_data*ch, struct obj_data *obj, int cmd, char*arg, 
+                   CHAR_DATA *invoker)
+{
+   extern char *dirs[];
+
+   if(cmd)
+      return eFAILURE;
+
+   if(!obj->equipped_by)
+      return eFAILURE;
+
+   if(number(0, 3))
+      return eFAILURE;
+
+   act("$n boots just keep on going!", obj->equipped_by, 0,0,TO_ROOM, INVIS_NULL);
+   send_to_char("Your boots just keep on running!\r\n", obj->equipped_by);
+
+   char dothis[32];
+
+   strcpy(dothis, dirs[number(0, 5)]);
+
+   return command_interpreter(obj->equipped_by, dothis);
+}
+
+
+

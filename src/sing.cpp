@@ -1863,3 +1863,24 @@ int intrp_vigilant_siren( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victi
    return eSUCCESS;
 }
 
+void make_person_dance(char_data * ch)
+{
+   char * dances[] =
+   {
+      "dance",         // 0
+      "tango",
+      "boogie",
+      "jig",
+      "waltz",
+      "bellydance",    // 5
+      "\n"
+   };
+
+   int numdances = 5;
+   char dothis[50];
+
+   strcpy(dothis, dances[number(0, numdances)]);
+
+   command_interpreter(ch, dothis);
+}
+

@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.cpp,v 1.19 2003/01/16 03:59:09 dcastle Exp $ */
+/* $Id: interp.cpp,v 1.20 2003/01/16 05:27:44 dcastle Exp $ */
 
 extern "C"
 {
@@ -691,11 +691,7 @@ int command_interpreter( CHAR_DATA *ch, char *pcomm )
     if(check_social( ch, pcomm, look_at, &pcomm[look_at]))
      return eSUCCESS;
 
-   /* Still here?  Unknown command */
-
-   /*
-    * Unknown command (or char too low level).
-    */
+    // Unknown command (or char too low level)
     send_to_char( "Huh?\n\r", ch );
     return eSUCCESS;
 }
