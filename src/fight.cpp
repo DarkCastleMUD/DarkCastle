@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.225 2004/07/21 18:07:49 urizen Exp $ */
+/* $Id: fight.cpp,v 1.226 2004/07/22 01:46:42 rahz Exp $ */
 
 extern "C"
 {
@@ -1977,11 +1977,12 @@ bool check_shieldblock(CHAR_DATA * ch, CHAR_DATA * victim, int attacktype)
   if (!skill_success(victim, ch, SKILL_SHIELDBLOCK,modifier))
     return FALSE;
  
-  // victim->equipment[WEAR_SHIELD]  
-
-  act("$n blocks $N's attack with $s shield.", victim, NULL, ch, TO_ROOM, NOTVICT);
-  act("$n blocks your attack with $s shield.", victim, NULL, ch, TO_VICT, 0);
-  act("You block $N's attack with your shield.", victim, NULL, ch, TO_CHAR, 0);
+  //act("$n blocks $N's attack with $s shield.", victim, NULL, ch, TO_ROOM, NOTVICT);
+  //act("$n blocks your attack with $s shield.", victim, NULL, ch, TO_VICT, 0);
+  //act("You block $N's attack with your shield.", victim, NULL, ch, TO_CHAR, 0);
+  act("$n blocks $N's attack with $s $p.", victim, victim->equipment[WEAR_SHIELD], ch, TO_ROOM, NOTVICT);
+  act("$n blocks your attack with $s $p.", victim, victim->equipment[WEAR_SHIELD], ch, TO_VICT, 0);
+  act("You block $N's attack with your $p.", victim, victim->equipment[WEAR_SHIELD], ch, TO_CHAR, 0);
 
   return TRUE;
 }
