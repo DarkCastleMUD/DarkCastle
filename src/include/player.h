@@ -1,7 +1,7 @@
 #ifndef PLAYER_H_
 #define PLAYER_H_
 /************************************************************************
-| $Id: player.h,v 1.9 2004/04/22 23:07:21 urizen Exp $
+| $Id: player.h,v 1.10 2004/05/14 22:04:35 urizen Exp $
 | player.h
 | Description: This file defines the player vectors..punishment, specials,
 |   etc...
@@ -229,10 +229,10 @@ struct str_app_type
       wield_w = 0;
       }
 */
-    sh_int tohit;    /* To Hit (THAC0) Bonus/Penalty        */
     sh_int todam;    /* Damage Bonus/Penalty                */
     sh_int carry_w;  /* Maximum weight that can be carrried */
     sh_int wield_w;  /* Maximum weight that can be wielded  */
+    sh_int resis;   /* Resistance modifer. Used for all of 'em actuall.*/
 };
 
 // Constructor commented out for const.C initialization purposes
@@ -270,6 +270,8 @@ struct con_app_type
 
     sh_int hitp;
     sh_int shock;
+    sh_int hpregen;
+    sh_int moveregen;
 };
 
 #endif

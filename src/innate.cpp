@@ -163,7 +163,7 @@ int innate_focus(CHAR_DATA *ch, char *arg, int cmd)
 
    struct affected_type af;
    af.type = SKILL_INNATE_FOCUS;
-   af.duration = 2;
+   af.duration = 1;
    af.modifier = 0;
    af.location = APPLY_NONE;
    af.bitvector = AFF_FOCUS;

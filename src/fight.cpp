@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.187 2004/05/14 16:18:32 urizen Exp $ */
+/* $Id: fight.cpp,v 1.188 2004/05/14 22:04:32 urizen Exp $ */
 
 extern "C"
 {
@@ -177,8 +177,9 @@ void perform_violence(void)
         }
         else if(!IS_AFFECTED(ch, AFF_CHARM)) 
         {
-          if(MOB_WAIT_STATE(ch) > 0)
+          if(MOB_WAIT_STATE(ch) > 0) {
             MOB_WAIT_STATE(ch) -= 1;
+	  } else {
 
           retval = 0;
           switch(GET_CLASS(ch)) {
@@ -198,6 +199,7 @@ void perform_violence(void)
           }
           if(SOMEONE_DIED(retval))
             continue;
+           }
         }
       } // if is_mob
 
@@ -948,7 +950,7 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
 
     chance += GET_LEVEL(ch) - GET_LEVEL(vict);
     chance += GET_HITROLL(ch);
-    chance += str_app[STRENGTH_APPLY_INDEX(ch)].tohit;
+//TODO    chance += str_app[STRENGTH_APPLY_INDEX(ch)].tohit;
     chance += ( GET_AC(vict) / 10 );  // (positive ac hurts you, negative helps)
     chance += weapon_skill_hit_bonus;
 /*
@@ -1297,9 +1299,10 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
   if(GET_POS(victim) == POSITION_DEAD)           return (eSUCCESS|eVICT_DIED);
   if (ch->in_room != victim->in_room && attacktype != SPELL_SOLAR_GATE) return eSUCCESS;
 //  csendf(victim, "damage: dam = %d  type = %d\r\n", dam, weapon_type);
-  if (dam!=0 && !IS_NPC(ch) && attacktype)
+  if (dam!=0 && attacktype)
   { // Skill damages based on learned %
     int l = has_skill(ch,attacktype);
+    if (IS_NPC(ch)) l = 50;
     if (l)
       dam = dam_percent(l, dam);
     dam = number(dam-(dam/10), dam+(dam/10)); // +- 10%
@@ -1940,8 +1943,8 @@ bool check_shieldblock(CHAR_DATA * ch, CHAR_DATA * victim, int attacktype)
       default:
 	modifier = -5;break;
     }
-  } else if (!has_skill(ch,SKILL_SHIELDBLOCK))
-     return eFAILURE;
+  } else if (!has_skill(victim,SKILL_SHIELDBLOCK))
+     return FALSE;
 
   modifier += speciality_bonus(ch,attacktype);
 
@@ -1992,13 +1995,14 @@ bool check_parry(CHAR_DATA * ch, CHAR_DATA * victim, int attacktype)
       default:                  modifier = 0; break;
   }
   } else if (!has_skill(victim, SKILL_PARRY))
-     return eFAILURE;
+     return FALSE;
   if (!modifier && IS_NPC(victim) && (IS_SET(victim->mobdata->actflags, ACT_PARRY)))
     modifier = 10;
 
   modifier += speciality_bonus(ch,attacktype);
   if (IS_NPC(victim)) modifier -= 50;
-  
+  if (attacktype==TYPE_HIT) modifier -= 30; // Harder to parry unarmed attacks
+  else modifier -= 22;
   if(!skill_success(victim,ch, SKILL_PARRY, modifier)&&
      !IS_SET(victim->combat, COMBAT_BLADESHIELD1)&&
      !IS_SET(victim->combat, COMBAT_BLADESHIELD2))
@@ -2080,13 +2084,14 @@ bool check_dodge(CHAR_DATA * ch, CHAR_DATA * victim, int attacktype)
     if(0 == modifier && IS_SET(victim->mobdata->actflags, ACT_DODGE))
       modifier = 5;
   } else if (!has_skill(victim, SKILL_DODGE))
-      return eFAILURE;
+      return FALSE;
 
   if (modifier == 0 && IS_NPC(victim))
     return FALSE;
 
   modifier += speciality_bonus(ch, attacktype);
   if (IS_NPC(victim)) modifier -= 50; // 75 is base, and it's calculated around here
+
   if (!skill_success(victim,ch,SKILL_DODGE, modifier))
     return FALSE;
   
@@ -3595,7 +3600,8 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim)
        af->type != SKILL_HARM_TOUCH &&
        af->type != SKILL_BLOOD_FURY &&
        af->type != SKILL_QUIVERING_PALM &&
-       af->type != SKILL_INNATE_TIMER)
+       af->type != SKILL_INNATE_TIMER &&
+	af->type != SPELL_HOLY_AURA_TIMER)
       affect_remove(victim, af, SUPPRESS_ALL,isaff2(af->type));
   }
   
