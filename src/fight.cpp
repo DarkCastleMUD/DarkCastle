@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.209 2004/05/30 18:59:03 urizen Exp $ */
+/* $Id: fight.cpp,v 1.210 2004/05/30 22:23:40 urizen Exp $ */
 
 extern "C"
 {
@@ -1306,11 +1306,12 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
 //  csendf(victim, "damage: dam = %d  type = %d\r\n", dam, weapon_type);
   if (dam!=0 && attacktype && attacktype < TYPE_HIT)
   { // Skill damages based on learned %
-    int l = has_skill(ch,attacktype);
+    int l = has_skill(ch, attacktype);
     if (IS_NPC(ch)) l = 50;
     if (l)
       dam = dam_percent(l, dam);
     dam = number(dam-(dam/10), dam+(dam/10)); // +- 10%
+     csend(ch, "%d %d\n", l, dam);
   }
   if(typeofdamage == DAMAGE_TYPE_MAGIC)  
   {
