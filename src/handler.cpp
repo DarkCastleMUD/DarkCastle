@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.21 2003/04/18 01:24:51 pirahna Exp $ */
+/* $Id: handler.cpp,v 1.22 2003/05/04 00:38:13 pirahna Exp $ */
     
 extern "C"
 {
@@ -2565,8 +2565,6 @@ struct obj_data *create_money( int amount )
 {
     struct obj_data *obj;
     struct extra_descr_data *new_new_descr;
-    char buf[80];
-
 
     if(amount<=0)
     {
@@ -2602,25 +2600,7 @@ struct obj_data *create_money( int amount )
 	obj->description = str_hsh("A pile of gold coins.");
 
 	new_new_descr->keyword = str_hsh("coins gold");
-	if(amount<10) {
-	    sprintf(buf,"There are %d coins.", amount);
-	    new_new_descr->description = str_hsh(buf);
-	} 
-	else if (amount<100) {
-	    sprintf(buf,"There are about %d coins",10*(amount/10));
-	    new_new_descr->description = str_hsh(buf);
-	}
-	else if (amount<1000) {
-	    sprintf(buf,"There are maybe %d coins",100*(amount/100));
-	    new_new_descr->description = str_hsh(buf);
-	}
-	else if (amount<100000) {
-	    sprintf(buf,"There are maybe %d coins",
-                    1000*((amount/1000)+ number(0,(amount/1000))));
-	    new_new_descr->description = str_hsh(buf);
-	}
-	else 
-	    new_new_descr->description = str_hsh("There are A LOT of coins");
+	new_new_descr->description = str_hsh("They look like coins...of gold...duh.");
     }
 
     new_new_descr->next = 0;
