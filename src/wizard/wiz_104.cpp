@@ -957,12 +957,13 @@ char_data *)(mob_index[nr].item))->level,
   else if (is_abbrev(type, "search") && has_range)
   {  // Object search.
     char arg1[MAX_STRING_LENGTH];
-    int affect = 0, size = 0, extra = 0, more = 0, wear = 0;
+    int affect = 0, size = 0, extra = 0, more = 0, wear = 0,type =0;
     extern char *wear_bits[];
     extern char *extra_bits[];
     extern char *more_obj_bits[];
     extern char *size_bitfields[];
     extern char *apply_types[];
+    extern char *item_types[];
     bool fo = FALSE;
     while ( ( argument = one_argument(argument, arg1) ) )
     {
@@ -974,6 +975,13 @@ char_data *)(mob_index[nr].item))->level,
 	{
 	  SET_BIT(wear, 1<<i);
 	  continue;
+	}
+	for (i=0; *item_types[i] != '\n';i++)
+	{
+	  if (!str_cmp(item_types[i],arg1))
+	  {
+	     type = i;
+	  }
 	}
        for (i = 0; *extra_bits[i] != '\n' ; i++)
         if (!str_cmp(extra_bits[i],arg1))
@@ -1034,10 +1042,19 @@ char_data *)(mob_index[nr].item))->level,
 	   else
 	     send_to_char(" ", ch);
 	}
-	for (z = 0; *more_obj_bits[z] != '\n';z++)
+        for (z = 0; *more_obj_bits[z] != '\n';z++)
+        {
+           o++;
+           send_to_char(more_obj_bits[z],ch);
+           if (o%7==0)
+             send_to_char("\r\n",ch);
+           else
+             send_to_char(" ", ch);
+        }
+	for (z = 0; *item_types[z] != '\n';z++)
 	{
 	   o++;
-	   send_to_char(more_obj_bits[z],ch);
+	   send_to_char(item_types[z],ch);
 	   if (o%7==0)
 	     send_to_char("\r\n",ch);
 	   else
@@ -1074,6 +1091,9 @@ char_data *)(mob_index[nr].item))->level,
 	  if (IS_SET(wear, 1 << i))
       if (!IS_SET(((struct obj_data *)(obj_index[nr].item))->obj_flags.wear_flags, 1<<i))
 	goto endLoop;
+	if (type)
+	  if (((struct obj_data *)(obj_index[nr].item))->obj_flags.type_flag != type)
+	    continue;
       if (size)
        for (i = 0; i < 10; i++)
 	if (IS_SET(size, 1<<i))
