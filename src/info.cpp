@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.16 2002/09/01 15:56:58 pirahna Exp $ */
+/* $Id: info.cpp,v 1.17 2002/09/01 16:13:54 pirahna Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -1973,8 +1973,6 @@ int do_consider(struct char_data *ch, char *argument, int cmd)
       
       if(!IS_NPC(victim) && GET_LEVEL(victim) > IMMORTAL) {
          csendf(ch, "Compared to your hps, %s can definitely take anything you can dish out.\n\r",
-            GET_SHORT(victim));
-         csendf(ch, "Average damage: %s will pound the living shit out of you.\n\r",
             GET_SHORT(victim));
       }
       else {
