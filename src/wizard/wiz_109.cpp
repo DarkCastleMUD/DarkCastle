@@ -240,7 +240,7 @@ int do_zap(struct char_data *ch, char *arg, int cmd)
 
   if (victim) {
     if(!IS_NPC(victim) && (GET_LEVEL(ch) < GET_LEVEL(victim)) &&
-       strcmp(GET_NAME(ch), "Sadus")) { 
+       strcmp(GET_NAME(ch), "Pirahna")) { 
       act("$n casts a massive lightning bolt at you.", ch, 0, victim,
           TO_VICT, 0);
       act("$n casts a massive lightning bolt at $N.", ch, 0, victim,
