@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.31 2004/04/14 21:45:04 urizen Exp $ */
+/* $Id: db.cpp,v 1.32 2004/04/16 01:59:17 urizen Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -2742,15 +2742,30 @@ int create_blank_item(int nr)
     extern world_file_list_item * obj_file_list;
  
     wcurr = obj_file_list;
-
+    bool done = FALSE;
     while(wcurr)
     {
+      if (cur_index == wcurr->firstnum-1 && !done)
+      {
+          done = TRUE;
+          wcurr->firstnum--; // Hrm, beginning of area.
+      }
       if(wcurr->firstnum >= cur_index)
         wcurr->firstnum++;
 
+      if (cur_index == wcurr->lastnum+1 && !done) {
+         wcurr->lastnum++; // Add to the end of an area.
+         done = TRUE;
+      }
+      if (!done && cur_index <= wcurr->lastnum && cur_index >= wcurr->firstnum)
+      {
+        wcurr->lastnum++;
+	done = TRUE;
+      }
       if(wcurr->lastnum >= cur_index)
         wcurr->lastnum++;
-      wcurr = wcurr->next;
+     
+       wcurr = wcurr->next;
     }
 
     rebuild_rnum_references(cur_index, 2);
