@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: group.cpp,v 1.7 2002/08/25 17:36:32 pirahna Exp $
+| $Id: group.cpp,v 1.8 2002/12/26 19:49:55 pirahna Exp $
 | group.C
 | Description:  Group related commands; join, abandon, follow, etc..
 */
@@ -178,7 +178,8 @@ int do_split(CHAR_DATA *ch, char *argument, int cmd)
   for (f=k->followers; f; f=f->next)
   {
     if (IS_AFFECTED(f->follower, AFF_GROUP) &&
-    (f->follower->in_room == ch->in_room))
+    (f->follower->in_room == ch->in_room) &&
+    !IS_MOB(f->follower))
       no_members++;
   }
 
@@ -211,7 +212,8 @@ int do_split(CHAR_DATA *ch, char *argument, int cmd)
   {
     if (IS_AFFECTED(f->follower, AFF_GROUP) &&
         f->follower->in_room == ch->in_room &&
-        f->follower != ch) 
+        f->follower != ch &&
+        !IS_MOB(f->follower)) 
     {
       send_to_char( buf, f->follower );
       GET_GOLD(f->follower) += share;
