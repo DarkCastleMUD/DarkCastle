@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: const.cpp,v 1.22 2002/08/04 16:48:34 pirahna Exp $ */
+/* $Id: const.cpp,v 1.23 2002/08/04 19:43:02 pirahna Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -715,6 +715,7 @@ char *affected_bits2[] =
     "UTILITY",
     "ALERT",
     "NO_FLEE",
+    "FAMILIAR",
     "\n"
 };
 
@@ -751,7 +752,6 @@ char *affected_bits[] =
     "FLYING",
     "LIGHTNING_SHIELD",
     "HASTE",
-    "FAMILIAR",
     "\n"
 };
 
@@ -1220,7 +1220,7 @@ struct class_skill_defines c_skills[] = { // cleric skills
 // mage 3020 guildmaster
 struct class_skill_defines m_skills[] = { // mage skills 
 {    "dodge",		SKILL_DODGE,		7,	5,	-2, 	"Hop like a bunny, quick like a bee, this location is so funny, you'll go wee wee wee.  Don't forget to bring your scythe however." },
-{    "dual wield",      SKILL_DUAL_WIELD,       10,      25, -2, "Dunna naanna nunna nanna BATMAN!!!" },
+{    "dual wield",      SKILL_DUAL_WIELD,       10,     15, -2, "Dunna naanna nunna nanna BATMAN!!!" },
 {    "focused repelance",SKILL_FOCUSED_REPELANCE, 25,	80,	3020,	NULL },
 {    "magic missile",	SPELL_MAGIC_MISSILE,	1,	90,	3020,	NULL },
 {    "ventriloquate",	SPELL_VENTRILOQUATE,	1,	90,	3020,	NULL },
@@ -1239,21 +1239,22 @@ struct class_skill_defines m_skills[] = { // mage skills
 {    "strength",	SPELL_STRENGTH,		7,	90,	3020,	NULL },
 {    "weaken",		SPELL_WEAKEN,		7,	90,	3020,	NULL },
 {    "blindness",	SPELL_BLINDNESS,	8,	90,	3020,	NULL },
+{    "identify",	SPELL_IDENTIFY,		9,	90,	3020,	NULL },
 {    "enchant weapon",	SPELL_ENCHANT_WEAPON,	10,	90,	3020,	NULL },
 {    "lightning bolt",	SPELL_LIGHTNING_BOLT,	10,	90,	3020,	NULL },
+{    "haste",		SPELL_HASTE,		11,	90,	3020,	NULL },
 {    "curse",		SPELL_CURSE,		12,	90,	3020,	NULL },
 {    "energy drain",	SPELL_ENERGY_DRAIN,	13,	90,	3020,	NULL },
 {    "shield",		SPELL_SHIELD,		13,	90,	3020,	NULL },
 {    "charm person",	SPELL_CHARM_PERSON,	14,	90,	3020,	NULL },
-{    "haste",		SPELL_HASTE,		14,	90,	3020,	NULL },
 {    "sleep",		SPELL_SLEEP,		14,	90,	3020,	NULL },
+{    "summon familiar", SPELL_SUMMON_FAMILIAR,	16,	90,	3020,	NULL },
 {    "fireball",	SPELL_FIREBALL,		20,	90,	3020,	NULL },
 {    "teleport",	SPELL_TELEPORT,		21,	90,	3020,	NULL },
 {    "dispel magic",	SPELL_DISPEL_MAGIC,	22,	90,	3020,	NULL },
 {    "dispel minor",	SPELL_DISPEL_MINOR,	22,	90,	3020,	NULL },
 {    "mass invisibility", SPELL_MASS_INVISIBILITY,	24,	90,	3020,	NULL },
 {    "wizard eye",	SPELL_WIZARD_EYE,	26,	90,	3020,	NULL },
-{    "haste other",	SPELL_HASTE_OTHER,	28,	90,	3020,	NULL },
 {    "meteor swarm",	SPELL_METEOR_SWARM,	30,	90,	3020,	NULL },
 {    "stone skin",	SPELL_STONE_SKIN,	32,	90,	3020,	NULL },
 {    "group fly",	SPELL_GROUP_FLY,	34,	90,	3020,	NULL },

@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.8 2002/08/04 16:48:34 pirahna Exp $ */
+/* $Id: utility.cpp,v 1.9 2002/08/04 19:43:03 pirahna Exp $ */
 
 extern "C"
 {
@@ -491,7 +491,7 @@ int DARK_AMOUNT(int room)
      glow += 3;
 
    if(IS_SET(world[room].room_flags, DARK))
-     glow -= 5;
+     glow -= 2;
 
    if(weather_info.sunlight == SUN_DARK)
      glow -= 1;
@@ -708,7 +708,7 @@ int do_order(struct char_data *ch, char *argument, int cmd)
           act("$n gives $N an order.", ch, 0, victim, TO_ROOM, 0);
           if ( (victim->master!=ch) || 
                !IS_AFFECTED(victim, AFF_CHARM) ||
-               IS_AFFECTED(victim, AFF_FAMILIAR))
+               IS_AFFECTED2(victim, AFF_FAMILIAR))
              act("$n has an indifferent look.", victim, 0, 0, TO_ROOM, 0);
           else {
              send_to_char("Ok.\n\r", ch);

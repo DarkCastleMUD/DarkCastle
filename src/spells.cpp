@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.15 2002/08/04 16:48:34 pirahna Exp $ */
+/* $Id: spells.cpp,v 1.16 2002/08/04 19:43:03 pirahna Exp $ */
 
 extern "C"
 {
@@ -367,7 +367,7 @@ struct spell_info_type spell_info [ ] =
     },
 
     { /* 74 */
-	12, POSITION_STANDING, 33, TAR_CHAR_ROOM|TAR_SELF_ONLY, cast_haste
+	12, POSITION_STANDING, 33, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_haste
     },
 
     { /* 75 */
@@ -1062,6 +1062,12 @@ void stop_follower(CHAR_DATA *ch, int cmd)
     return;
   }
 
+  if(IS_SET(ch->affected_by2, AFF_FAMILIAR)) {
+    do_emote(ch, "screams in pain as its connection with its master is broken.", 9); 
+    extract_char(ch, TRUE);
+    return;
+  }
+
   if(IS_AFFECTED(ch, AFF_CHARM)) {
     act("You realize that $N is a jerk!", ch, 0, ch->master, TO_CHAR, 0);
     act("$n is free from the bondage of the spell.", ch, 0, 0, TO_ROOM, 0);
@@ -1118,7 +1124,6 @@ void die_follower(CHAR_DATA *ch)
 	zombie = k->follower;
         if(!IS_SET(zombie->affected_by2, AFF_GOLEM))
 	  stop_follower(zombie, 0);
-	
 	if(GET_RACE(zombie) == RACE_UNDEAD) {
           send_to_char("The forces holding you together are gone.  You cease "
                        "to exist.", zombie);

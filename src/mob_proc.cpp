@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.13 2002/08/03 06:17:15 pirahna Exp $ */
+/* $Id: mob_proc.cpp,v 1.14 2002/08/04 19:43:03 pirahna Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -5075,14 +5075,30 @@ int mage_familiar_non(struct char_data *ch, struct obj_data *obj, int cmd, char 
   if(ch->fighting)
     return eFAILURE;
 
-  if(ch->master && ch->master->fighting) { // help him!
-    do_join(ch, GET_NAME(ch->master), 9);
-    return eFAILURE;
+  if(!ch->master) {
+    log("Familiar without a master.", IMMORTAL, LOG_BUG);
+    extract_char(ch, TRUE);
+    return (eCH_DIED | eSUCCESS);
   }
 
-  if(number(1, 500) == 1) {
-    do_emote(ch, "chitters about for a bit then settles down.", 9);
-    return eFAILURE;
+  if(!ch->fighting) 
+  {
+    if(ch->master && ch->master->fighting) { // help him!
+      do_join(ch, GET_NAME(ch->master), 9);
+      return eFAILURE;
+    }
+
+    if(ch->in_room != ch->master->in_room) {
+      do_emote(ch, "looks around for it's master than *eep*'s and dissolves into a shadow.\r\n", 9);
+      move_char(ch, ch->master->in_room);
+      do_emote(ch, "steps out of a nearby shadow relieved to be back in it's master's presence.\r\n", 9);
+      return eFAILURE;
+    }
+
+    if(number(1, 500) == 1) {
+      do_emote(ch, "chitters about for a bit then settles down.", 9);
+      return eFAILURE;
+    }
   }
 
   return eFAILURE;

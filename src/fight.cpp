@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.30 2002/08/04 16:48:34 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.31 2002/08/04 19:43:02 pirahna Exp $ */
 
 extern "C"
 {
@@ -228,8 +228,8 @@ int attack(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
   // TODO - until I can make sure that area effects don't attack other mobs
   // when cast by mobs, I need to make sure mobs aren't killing each other  
   if (IS_NPC(ch) && IS_NPC(vict) && 
-      !IS_AFFECTED(ch, AFF_CHARM) &&   !IS_AFFECTED(ch, AFF_FAMILIAR) &&
-      !IS_AFFECTED(vict, AFF_CHARM) && !IS_AFFECTED(vict, AFF_FAMILIAR)) 
+      !IS_AFFECTED(ch, AFF_CHARM) &&   !IS_AFFECTED2(ch, AFF_FAMILIAR) &&
+      !IS_AFFECTED(vict, AFF_CHARM) && !IS_AFFECTED2(vict, AFF_FAMILIAR)) 
   {
     remove_memory(ch, 'h');
     remove_memory(ch, 't');
@@ -688,7 +688,7 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
     chance = 102; // can't miss
   else
   {
-    chance = 40;
+    chance = 45;
 
     chance += GET_LEVEL(ch) - GET_LEVEL(vict);
     chance += GET_HITROLL(ch);
@@ -2616,11 +2616,10 @@ void group_gain(CHAR_DATA * ch, CHAR_DATA * victim)
   share = GET_EXP(victim);
 
   switch(no_members) {
-    case 1:  share = (int) (share * 0.8); break;  
-    case 2:  break; // * 1.0 
-    case 3:  share = (int) (share * 1.2); break;  
-    case 4:  share = (int) (share * 1.4); break; 
-    default:  share = (int) (share * 1.6); break; 
+    case 1:  break; // * 1.0 
+    case 2:  share = (int) (share * 1.4); break;  
+    case 3:  share = (int) (share * 1.6); break; 
+    default:  share = (int) (share * 1.8); break; 
   }
 
   /* Kludgy loop to get k in at end. */
@@ -2652,25 +2651,26 @@ void group_gain(CHAR_DATA * ch, CHAR_DATA * victim)
     
     if(GET_LEVEL(tmp_ch) == 0 || share == 0)
       tmp_share = 0;
-    else if(GET_LEVEL(ch) > 10 || no_members < 2)
+    else if(no_members < 2)
        tmp_share = (GET_LEVEL(tmp_ch) * share / totallevels);
-    else tmp_share = ((GET_LEVEL(tmp_ch)+1) * share / totallevels);  // small bonus for grouped lowbies
+    else tmp_share = ((GET_LEVEL(tmp_ch)+6) * share / totallevels);  // small bonus for grouped lowbies
 
     // reduce xp if you are higher level than mob
     switch(GET_LEVEL(victim) - GET_LEVEL(ch)) {
       case -1:  break;
       case -2:  break;
-      case -3:  tmp_share = (int) (tmp_share * 0.9); break;
-      case -4:  tmp_share = (int) (tmp_share * 0.8); break;
-      case -5:  tmp_share = (int) (tmp_share * 0.7); break;
-      case -6:  tmp_share = (int) (tmp_share * 0.6); break;
-      case -7:  tmp_share = (int) (tmp_share * 0.5); break;
-      case -8:  tmp_share = (int) (tmp_share * 0.4); break;
-      case -9:  tmp_share = (int) (tmp_share * 0.3); break;
-      case -10: tmp_share = (int) (tmp_share * 0.2); break;
-      case -11: tmp_share = (int) (tmp_share * 0.1); break;
+      case -3:  break;
+      case -4:  tmp_share = (int) (tmp_share * 0.9); break;
+      case -5:  tmp_share = (int) (tmp_share * 0.8); break;
+      case -6:  tmp_share = (int) (tmp_share * 0.7); break;
+      case -7:  tmp_share = (int) (tmp_share * 0.6); break;
+      case -8:  tmp_share = (int) (tmp_share * 0.5); break;
+      case -9:  tmp_share = (int) (tmp_share * 0.4); break;
+      case -10: tmp_share = (int) (tmp_share * 0.3); break;
+      case -11: tmp_share = (int) (tmp_share * 0.2); break;
       case -12: tmp_share = (int) (tmp_share * 0.1); break;
       case -13: tmp_share = (int) (tmp_share * 0.1); break;
+      case -14: tmp_share = (int) (tmp_share * 0.1); break;
       default:  if(GET_LEVEL(victim) < GET_LEVEL(ch))
                   tmp_share = 0;
                 else tmp_share = (int) (tmp_share * 1.1); break;

@@ -330,7 +330,7 @@ int do_sing(CHAR_DATA *ch, char *arg, int cmd)
       return eFAILURE;
     }
     else {
-      if(GET_LEVEL(ch) < ARCHANGEL)
+      if(GET_LEVEL(ch) < ARCHANGEL && spl != 0 && spl != 2)
         if(!(learned = has_skill(ch, song_info[spl].skill_num))) {
           send_to_char("You haven't learned that song.\n\r", ch);
           return eFAILURE;
@@ -1654,7 +1654,7 @@ int execute_song_sticky_lullaby( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA
    dc_free(ch->song_data);
 
    act("$n lulls $N's feet into a numbing sleep.", ch, 0, victim, TO_ROOM, NOTVICT);
-   act("$N's feel falls into a numbing sleep.", ch, 0, victim, TO_CHAR, 0);
+   act("$N's feet falls into a numbing sleep.", ch, 0, victim, TO_CHAR, 0);
    send_to_char("Your eyes begin to droop, and your feet fall asleep!\r\n", victim);
    SET_BIT(victim->affected_by2, AFF_NO_FLEE);
    return eSUCCESS;

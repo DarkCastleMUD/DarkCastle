@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.9 2002/08/04 16:48:34 pirahna Exp $ */
+/* $Id: handler.cpp,v 1.10 2002/08/04 19:43:02 pirahna Exp $ */
     
 extern "C"
 {
@@ -2810,6 +2810,10 @@ void add_memory(CHAR_DATA *ch, char *victim, char type)
   char * buf = NULL;
 
   if(!IS_MOB(ch))
+    return;
+
+  // pets don't know to hate people
+  if(IS_AFFECTED(ch, AFF_CHARM) || IS_AFFECTED2(ch, AFF_FAMILIAR))
     return;
 
   if(type == 'h')

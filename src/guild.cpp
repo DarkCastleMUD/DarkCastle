@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.13 2002/08/04 16:48:34 pirahna Exp $
+| $Id: guild.cpp,v 1.14 2002/08/04 19:43:02 pirahna Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -199,6 +199,7 @@ int skills_guild(struct char_data *ch, char *arg, struct char_data *owner)
       {
         for(loop = 0; loop < specialization; loop++)
           send_to_char("*", ch);
+        send_to_char("\r\n", ch);
       }
       else send_to_char("\n\r", ch);
     }

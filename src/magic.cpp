@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.12 2002/08/03 15:29:28 pirahna Exp $ */
+/* $Id: magic.cpp,v 1.13 2002/08/04 19:43:03 pirahna Exp $ */
 
 extern "C"
 {
@@ -348,7 +348,7 @@ int spell_fireball(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data
    if(SOMEONE_DIED(retval))
      return retval;
 
-   if(!number(0, 4)) {
+   if(!number(0, 5)) {
      act("The expanding flames suddenly recombine and fly at $N again!", ch, 0, victim, TO_ROOM, 0);
      act("The expanding flames suddenly recombine and fly at $N again!", ch, 0, victim, TO_CHAR, 0);
      save = saves_spell(ch, victim, 25, SAVE_TYPE_FIRE);
@@ -1575,7 +1575,7 @@ int spell_haste(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
 	 return eFAILURE;
 
   af.type      = SPELL_HASTE;
-  af.duration  = level/10+5;
+  af.duration  = level/10+2;
   af.modifier  = 0;
   af.location  = APPLY_NONE;
   af.bitvector = AFF_HASTE;
@@ -2631,6 +2631,9 @@ int spell_charm_person(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
 
   void add_follower(CHAR_DATA *ch, CHAR_DATA *leader, int cmd);
   void stop_follower(CHAR_DATA *ch, int cmd);
+
+  send_to_char("Disabled currently.\r\n", ch);
+  return eFAILURE;
 
   if(victim == ch) {
 	 send_to_char("You like yourself even better!\n\r", ch);
@@ -4045,24 +4048,24 @@ int spell_shield(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *
         return eFAILURE;
      }
 
+  if(affected_by_spell(victim, SPELL_SHIELD))
+    affect_from_char(victim, SPELL_SHIELD);
 
-    if (!affected_by_spell(victim, SPELL_SHIELD)) {
-	act("$N is surrounded by a strong force shield.", ch, 0, victim,
-	   TO_ROOM, INVIS_NULL|NOTVICT);
-	if (ch != victim) {
-		 act("$N is surrounded by a strong force shield.", ch, 0, victim, TO_CHAR, 0);
-		 act("You are surrounded by a strong force shield.", ch, 0, victim, TO_VICT, 0);
-		} else {
-		 act("You are surrounded by a strong force shield.", ch, 0, victim, TO_VICT, 0);
-      }
+  act("$N is surrounded by a strong force shield.", ch, 0, victim, TO_ROOM, INVIS_NULL|NOTVICT);
+  if (ch != victim) {
+     act("$N is surrounded by a strong force shield.", ch, 0, victim, TO_CHAR, 0);
+     act("You are surrounded by a strong force shield.", ch, 0, victim, TO_VICT, 0);
+  } else {
+     act("You are surrounded by a strong force shield.", ch, 0, victim, TO_VICT, 0);
+  }
 
-	af.type = SPELL_SHIELD;
-	af.duration = 8 + level;
-	af.modifier = -10;
-	af.location = APPLY_AC;
-	af.bitvector = 0;
-	affect_to_char(victim, &af);
-		}
+  af.type = SPELL_SHIELD;
+  af.duration = 8 + level;
+  af.modifier = -10;
+  af.location = APPLY_AC;
+  af.bitvector = 0;
+  affect_to_char(victim, &af);
+
   return eSUCCESS;
 }
 
@@ -8018,7 +8021,7 @@ int spell_summon_familiar(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_D
 
   k = ch->followers;
   while(k)
-     if(IS_AFFECTED(k->follower, AFF_FAMILIAR))
+     if(IS_AFFECTED2(k->follower, AFF_FAMILIAR))
      {
        send_to_char("But you already have a devoted pet!\r\n", ch);
        return eFAILURE;
@@ -8028,11 +8031,13 @@ int spell_summon_familiar(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_D
   mob = clone_mobile(r_num);
   char_to_room(mob, ch->in_room);
 
+  SET_BIT(mob->affected_by2, AFF_FAMILIAR);
+
   af.type = SPELL_SUMMON_FAMILIAR;
   af.duration = -1;
   af.modifier = 0;
   af.location = 0;
-  af.bitvector = AFF_FAMILIAR;
+  af.bitvector = 0;
   affect_to_char(mob, &af);
 
   IS_CARRYING_W(mob) = 0;
