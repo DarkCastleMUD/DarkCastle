@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.50 2002/08/25 16:31:52 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.51 2002/08/25 16:44:42 pirahna Exp $ */
 
 extern "C"
 {
@@ -3525,8 +3525,7 @@ int do_flee(struct char_data *ch, char *argument, int cmd)
 
           if (IS_SET(retval, eSUCCESS)) 
           {
-            // set them back fighting to link it properly
-//            ch->fighting = chTemp;
+            ch->fighting = chTemp;
             
             // They got away.  Stop fighting for everyone not in the new room from fighting
             for (chTemp = combat_list; chTemp; chTemp = loop_ch) 
@@ -3536,12 +3535,6 @@ int do_flee(struct char_data *ch, char *argument, int cmd)
                 stop_fighting(chTemp);
             } // for
             
-            // If anyone in current room is fighting them, we're done otherwise keep going
-            // Note this is support for later on if we have a skill for 'auto-following' flees
-            for(loop_ch = world[ch->in_room].people; loop_ch; loop_ch = loop_ch->next_in_room)
-              if(loop_ch->fighting == ch)
-                return 1;
-              
             stop_fighting(ch);
             return eSUCCESS;
           } // do_simple_move
