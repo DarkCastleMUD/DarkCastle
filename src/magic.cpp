@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.15 2002/08/05 20:37:21 pirahna Exp $ */
+/* $Id: magic.cpp,v 1.16 2002/08/06 00:28:20 pirahna Exp $ */
 
 extern "C"
 {
@@ -563,7 +563,7 @@ int spell_earthquake(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
            && (ch != tmp_victim) 
            && (!ARE_GROUPED(ch,tmp_victim))) 
          {
-                  if(IS_NPC(ch) && IS_NPC(victim)) // mobs don't earthquake each other
+                  if(IS_NPC(ch) && IS_NPC(tmp_victim)) // mobs don't earthquake each other
                     continue;
                   if(IS_AFFECTED2(tmp_victim, AFF_FREEFLOAT))
                     retval = spell_damage(ch, tmp_victim, 0, TYPE_MAGIC, SPELL_EARTHQUAKE, 0);
