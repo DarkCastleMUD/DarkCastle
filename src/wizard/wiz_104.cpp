@@ -597,8 +597,7 @@ int do_show(struct char_data *ch, char *argument, int cmd)
              ((struct char_data *)(mob_index[nr].item))->name)) 
           {
             count++;
-            sprintf(buf, "[%3d] [%5d] [%2d] %s\n\r", count, i, ((struct 
-char_data*)(mob_index[nr].item))->level,
+            sprintf(buf, "[%3d] [%5d] [%2d] %s\n\r", count, i, ((struct char_data*)(mob_index[nr].item))->level,
                  ((struct char_data *)(mob_index[nr].item))->short_desc);
             send_to_char(buf, ch);
 
@@ -658,8 +657,7 @@ char_data*)(mob_index[nr].item))->level,
               continue;
 
            count++;
-           sprintf(buf, "[%3d] [%5d] [%2d] %s\n\r", count, i, ((struct 
-obj_data *)(obj_index[nr].item))->obj_flags.eq_level,
+           sprintf(buf, "[%3d] [%5d] [%2d] %s\n\r", count, i, ((struct obj_data *)(obj_index[nr].item))->obj_flags.eq_level,
               ((struct obj_data *)(obj_index[nr].item))->short_description);
            send_to_char(buf, ch);
 

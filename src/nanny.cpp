@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.39 2004/04/20 19:42:43 urizen Exp $ */
+/* $Id: nanny.cpp,v 1.40 2004/04/20 20:47:48 urizen Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -471,9 +471,15 @@ void nanny(struct descriptor_data *d, char *arg)
    
    CHAR_DATA *get_pc(char *name);
    void remove_clan_member(int clannumber, struct char_data * ch);
-   
+  extern bool str_prefix(const char *astr, const char *bstr);
+
    ch  = d->character;
    if(arg) for ( ; isspace(*arg); arg++ );
+   if (str_prefix("help",arg) && (STATE(d) == CON_GET_NEW_CLASS || STATE(d) == GET_RACE) )
+   {
+     do_help(d->character, arg+4, 88);
+     return;
+   }
    
    switch (STATE(d))
    {
@@ -995,7 +1001,7 @@ void nanny(struct descriptor_data *d, char *arg)
             sprintf(buf, "   1: Human\n\r   2: Elf\n\r   3: Dwarf\n\r"
                "   4: Hobbit\n\r   5: Pixie\n\r   6: Giant\n\r"
                "   7: Gnome\r\n   8: Orc\r\n   9: Troll\r\n"
-               "\n\rSelect a race-> ");
+               "\n\rSelect a race(You can use the helpfiles from here)-> ");
             SEND_TO_Q(buf, d);
             STATE(d) = CON_GET_RACE;
             break;
@@ -1163,7 +1169,7 @@ void nanny(struct descriptor_data *d, char *arg)
                       " %c 9: Ranger\n\r"
                       " %c 10: Bard\n\r"
                       " %c 11: Druid\n\r"
-                      "\n\rSelect a class-> ", 
+                      "\n\rSelect a class(You can use the helpfiles from here)-> ", 
             (is_clss_eligible(ch, CLASS_WARRIOR) ? '*' : ' '),
             (is_clss_eligible(ch, CLASS_CLERIC) ? '*' : ' '),
             (is_clss_eligible(ch, CLASS_MAGIC_USER) ? '*' : ' '),
@@ -1427,9 +1433,11 @@ break;
           update_wizlist(ch);
           
           STATE(d) = CON_PLAYING;
-          if ( GET_LEVEL(ch) == 0 )
+          if ( GET_LEVEL(ch) == 0 ) {
              do_start( ch );
-          do_look( ch, "", 8 );
+	     do_help(ch, "new", 99);
+          }
+	  do_look( ch, "", 8 );
           break;
           
        case '2':

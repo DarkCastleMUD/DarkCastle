@@ -69,14 +69,14 @@ const struct in_skills innates[] = {
 
 char * innate_skills[] = 
 {
-   "innate powerwield timer",
-   "innate sneak timer",
-   "innate regeneration timer",
-   "innate bloodlust timer",
-   "innate farsight timer",
-   "innate evasion timer",
-   "innate shadowslip timer",
-   "innate repair timer",
+   "Powerwield",
+   "Innate Sneak",
+   "Regeneration",
+   "Bloodlust",
+   "Farsight",
+   "Evasion",
+   "Shadowslip",
+   "!repairr!",
    "innate skill timer",
    "\n"
 };
