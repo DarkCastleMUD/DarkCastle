@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_barbarian.cpp,v 1.5 2002/08/13 18:25:12 pirahna Exp $
+| $Id: cl_barbarian.cpp,v 1.6 2002/09/10 20:36:31 pirahna Exp $
 | cl_barbarian.C
 | Description:  Commands for the barbarian class.
 */
@@ -427,3 +427,54 @@ int do_bloodfury(struct char_data *ch, char *argument, int cmd)
 
   return eSUCCESS;
 }
+
+int do_crazedassault(struct char_data *ch, char *argument, int cmd)
+{
+  struct affected_type af;
+  int learned, percent, specialization, chance;
+
+  if(affected_by_spell(ch, SKILL_CRAZED_ASSAULT) && GET_LEVEL(ch) < IMMORTAL) {
+    send_to_char("Your body is still recovering from your last crazed assault technique.\r\n", ch);
+    return eFAILURE; 
+  }
+
+  if(IS_MOB(ch))
+    learned = 75;
+  else if(!(learned = has_skill(ch, SKILL_CRAZED_ASSAULT))) {
+    send_to_char("You just aren't crazy enough...try assaulting old ladies.\r\n", ch);
+    return eFAILURE;
+  }
+          
+  specialization = learned / 100;
+  learned %= 100;
+      
+  chance = 70;
+  chance += learned / 10;
+      
+  percent = number(1, 101);
+       
+  skill_increase_check(ch, SKILL_CRAZED_ASSAULT, learned, SKILL_INCREASE_MEDIUM);
+ 
+  if(learned < chance) {
+    send_to_char("You try to psyche yourself up for it but just can't muster the concentration.\r\n", ch);
+  }
+  else {
+    send_to_char("Your mind focuses completely on hitting your opponent.\r\n", ch);
+    af.type = SKILL_CRAZED_ASSAULT;
+    af.duration  = 2;
+    af.modifier  = (learned / 5); 
+    af.location  = APPLY_HIT;
+    af.bitvector = 0;
+    affect_to_char(ch, &af);
+  }
+  
+  WAIT_STATE(ch, PULSE_VIOLENCE);
+  
+  af.type = SKILL_CRAZED_ASSAULT;
+  af.duration  = 16 - learned / 10;
+  af.modifier  = 0; 
+  af.location  = APPLY_NONE;
+  af.bitvector = 0;
+  affect_to_char(ch, &af);
+  return eSUCCESS;
+} 

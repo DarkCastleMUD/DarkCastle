@@ -7,4 +7,5 @@
 
 #define SKILL_INNATE_BASE               1500
 #define SKILL_INNATE_FLY                1500
-#define SKILL_INNATE_MAX                1500
+#define SKILL_INNATE_SNEAK              1501
+#define SKILL_INNATE_MAX                1501

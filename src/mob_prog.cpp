@@ -1309,7 +1309,7 @@ void mprog_translate( char ch, char *t, CHAR_DATA *mob, CHAR_DATA *actor,
            if ( !IS_NPC( actor ) )
              *t = UPPER( *t );
          }
-         else logf(IMMORTAL, LOG_WORLD, "Mob %d trying illegal $n in MOBProg.", mob->mobdata->nr);
+         else logf(IMMORTAL, LOG_WORLD, "Mob %d trying illegal $ n in MOBProg.", mob_index[mob->mobdata->nr].virt);
       break;
 
      case 'N':
@@ -1325,7 +1325,7 @@ void mprog_translate( char ch, char *t, CHAR_DATA *mob, CHAR_DATA *actor,
 	       }
 	    else
 	      strcpy( t, "someone" );
-         else logf(IMMORTAL, LOG_WORLD, "Mob %d trying illegal $N in MOBProg.", mob->mobdata->nr);
+         else logf(IMMORTAL, LOG_WORLD, "Mob %d trying illegal $ N in MOBProg.", mob->mobdata->nr);
 	 break;
 
      case 't':
@@ -1335,7 +1335,7 @@ void mprog_translate( char ch, char *t, CHAR_DATA *mob, CHAR_DATA *actor,
            if ( !IS_NPC( vict ) )
              *t = UPPER( *t );
          }
-         else logf(IMMORTAL, LOG_WORLD, "Mob %d trying illegal $t in MOBProg.", mob->mobdata->nr);
+         else logf(IMMORTAL, LOG_WORLD, "Mob %d trying illegal $ t in MOBProg.", mob_index[mob->mobdata->nr].virt);
 	 break;
 
      case 'T':
@@ -1351,7 +1351,7 @@ void mprog_translate( char ch, char *t, CHAR_DATA *mob, CHAR_DATA *actor,
 	       }
 	    else
 	      strcpy( t, "someone" );
-         else logf(IMMORTAL, LOG_WORLD, "Mob %d trying illegal $T in MOBProg.", mob->mobdata->nr);
+         else logf(IMMORTAL, LOG_WORLD, "Mob %d trying illegal $T in MOBProg.", mob_index[mob->mobdata->nr].virt);
 	 break;
      
      case 'r':

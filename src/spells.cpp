@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.23 2002/09/04 17:59:19 pirahna Exp $ */
+/* $Id: spells.cpp,v 1.24 2002/09/10 20:36:28 pirahna Exp $ */
 
 extern "C"
 {
@@ -669,6 +669,7 @@ char *skills[]=
   "blindfighting",
   "focused_repelance",
   "vital_strike",
+  "crazed_assault",
   "\n"
 };
 

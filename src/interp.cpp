@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.cpp,v 1.14 2002/09/06 23:27:23 dcastle Exp $ */
+/* $Id: interp.cpp,v 1.15 2002/09/10 20:36:28 pirahna Exp $ */
 
 extern "C"
 {
@@ -212,6 +212,7 @@ struct command_info cmd_info[] =
     { "bladeshield",do_bladeshield, POSITION_FIGHTING, 1,   9,  0 },
     { "repelance",  do_focused_repelance, POSITION_FIGHTING, 1, 9,  0 },
     { "vitalstrike", do_vitalstrike, POSITION_FIGHTING, 1,  9,  0 },
+    { "crazedassault", do_crazedassault, POSITION_FIGHTING, 1,  9,  0 },
 
     /*
      * Position commands.

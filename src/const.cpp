@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: const.cpp,v 1.39 2002/09/10 19:16:03 dcastle Exp $ */
+/* $Id: const.cpp,v 1.40 2002/09/10 20:36:28 pirahna Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1046,6 +1046,7 @@ struct class_skill_defines b_skills[] = {
 {    "shield block",    SKILL_SHIELDBLOCK,      8,      40,     -2, 	"To learn this skill you must seek its master, the God of War in his arena.  Ask him to please teach you." },
 {    "double",		SKILL_SECOND_ATTACK,	10,	80,	-2, 	"Seek the Prince of Delcim for your training in that." },
 {    "blood fury",	SKILL_BLOOD_FURY,	13,	80,	-2, 	"Look for a gpaceless kimg who pigks his nose" },
+{    "crazedassault",	SKILL_CRAZED_ASSAULT,	15,	80,	-2, 	"Speak with the guard of the monk guild.  He is skilled in matters of concentration such as this." },
 {    "frenzy",		SKILL_FRENZY,		18,	50,	-2,	"There is a highlander chief.  The chief of mountain trail guard.  You must locate him to learn this skill." },
 {    "rage",		SKILL_RAGE,		20,	80,	-2, 	"A fierceful force of elementals is who you seek." },
 {    "triple",		SKILL_THIRD_ATTACK,	25,	70,	-2, 	"Only a palace chef could move his blades so fast." },

@@ -36,8 +36,10 @@ extern struct index_data *obj_index;
 ////////////////////////////////////////////////////////////////////////////
 // local function declarations
 int do_innate_pixie(CHAR_DATA *ch, char *arg, int cmd);
+int do_innate_hobbit(CHAR_DATA *ch, char *arg, int cmd);
 
 int do_innate_fly(CHAR_DATA *ch, char *arg, int cmd);
+int do_innate_sneak(CHAR_DATA *ch, char *arg, int cmd);
 
 ////////////////////////////////////////////////////////////////////////////
 // local definitions
@@ -45,6 +47,7 @@ int do_innate_fly(CHAR_DATA *ch, char *arg, int cmd);
 char * innate_skills[] = 
 {
    "innate fly timer",
+   "innate sneak timer",
    "\n"
 };
 
@@ -55,6 +58,7 @@ int do_innate(CHAR_DATA *ch, char *arg, int cmd)
 {
    switch(GET_RACE(ch)) {
       case RACE_PIXIE:    return do_innate_pixie(ch, arg, cmd);
+      case RACE_HOBBIT:   return do_innate_hobbit(ch, arg, cmd);
       default:
          send_to_char("You do not have any innate powers!\r\n", ch);
          return eSUCCESS;
@@ -79,6 +83,31 @@ int do_innate_pixie(CHAR_DATA *ch, char *arg, int cmd)
 
    if(!strcmp(buf, "fly"))
       return do_innate_fly(ch, buf, cmd);
+   else
+   {
+      csendf(ch, "You do not know of any '%s' ability.\r\n", buf);
+      return eSUCCESS;
+   }
+}
+
+int do_innate_hobbit(CHAR_DATA *ch, char *arg, int cmd)
+{
+   char buf[MAX_INPUT_LENGTH];
+
+   one_argument(arg, buf);
+
+   if(!*buf)
+   {
+      send_to_char("As a hobbit, you have the following abilities:\r\n"
+                   "   sneak\r\n"
+                   "\r\n"
+                   "You can activate your innate ability with innate <skill>.\r\n"
+                   , ch);
+      return eSUCCESS;
+   }
+
+   if(!strcmp(buf, "sneak"))
+      return do_innate_sneak(ch, buf, cmd);
    else
    {
       csendf(ch, "You do not know of any '%s' ability.\r\n", buf);
@@ -114,3 +143,38 @@ int do_innate_fly(CHAR_DATA *ch, char *arg, int cmd)
 
    return spell_fly( ( GET_LEVEL(ch) / 2 ), ch, ch, 0, GET_LEVEL(ch) );
 }
+
+int do_innate_sneak(CHAR_DATA *ch, char *arg, int cmd)
+{
+   if(affected_by_spell(ch, SKILL_INNATE_SNEAK))
+   {
+      send_to_char("It is still too soon for you to be able to call upon your ancestral powers again.\r\n", ch);
+      return eSUCCESS;
+   }
+
+   if(IS_AFFECTED(ch, AFF_SNEAK))
+   {
+      send_to_char("But you are already sneaking!  Why waste it?\r\n", ch);
+      return eSUCCESS;
+   }
+
+   send_to_char("You begin sneaking.\r\n", ch);
+
+   struct affected_type af;
+   af.type = SKILL_SNEAK;
+   af.duration = MAX(5, GET_LEVEL(ch) / 2);
+   af.modifier = 0;
+   af.location = APPLY_NONE;
+   af.bitvector = AFF_SNEAK;
+   affect_to_char(ch, &af);
+
+   af.type = SKILL_INNATE_SNEAK;
+   af.duration = 40;
+   af.modifier = 0;
+   af.location = 0;   
+   af.bitvector = 0;
+   affect_to_char(ch, &af);
+
+   return eSUCCESS;   
+}
+

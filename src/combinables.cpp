@@ -73,6 +73,11 @@ struct trade_data_type poison_vial_data[] =
      10         // a vial of crude strychnine
    },
 
+   { { 697, 6447, -1, -1, -1, -1, -1, -1, -1, -1 },  // vial, albino bat blood
+     693,
+     25         // a vial of vampire kiss
+   },
+
    // This must come last
    { { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
      -1,
@@ -96,6 +101,10 @@ struct thief_poison_data poison_vial_combat_data[] =
 
    {
       "crude strychnine"
+   },
+
+   {
+      "vampire kiss poison"
    },
 
    {
@@ -351,6 +360,10 @@ int handle_poisoned_weapon_attack(char_data * ch, char_data * vict, int type)
          }
          else dam = 0;
          retval = damage(ch, vict, dam, TYPE_POISON, POISON_MESSAGE_BASE+type, 0);
+         break;
+
+      case 3: // vampire kiss
+         retval = cast_vampiric_touch(6, ch, "", SPELL_TYPE_SPELL, vict, 0, 35);
          break;
 
       default:
