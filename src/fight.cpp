@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.77 2002/11/01 16:51:19 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.78 2002/11/01 23:53:29 waz Exp $ */
 
 extern "C"
 {
@@ -74,7 +74,8 @@ void clan_death (char_data *ch, char_data *victim);
 
 
 // local
-void check_weapon_skill_bonus(char_data * ch, int type, int & weapon_skill_hit_bonus, int & weapon_skill_dam_bonus);
+void check_weapon_skill_bonus(char_data * ch, int type, obj_data *wielded, 
+                              int & weapon_skill_hit_bonus, int & weapon_skill_dam_bonus);
 
 void update_flags(CHAR_DATA *vict);
  
@@ -583,7 +584,7 @@ void check_weapon_skill_bonus(char_data * ch, int type, obj_data *wielded,
    int learned;
    int specialization;
    int skill;
-
+         
    switch(type) {
       case TYPE_BLUDGEON:
          learned = has_skill(ch, SKILL_BLUDGEON_WEAPONS);
@@ -738,9 +739,10 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
 //  int diceroll;			/* ... */
   int retval = 0;
   int chance;
-  int weapon_skill_hit_bonus;
-  int weapon_skill_dam_bonus;  
+  int weapon_skill_hit_bonus = 0;
+  int weapon_skill_dam_bonus = 0;  
 
+ 
 //  extern int thaco[8][61];
   extern struct str_app_type str_app[];
   extern byte backstab_mult[];
@@ -779,9 +781,9 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
 
   check_weapon_skill_bonus(ch, w_type, wielded, weapon_skill_hit_bonus, weapon_skill_dam_bonus);
 
-  weapon_type = w_type;
-  if(type == SKILL_BACKSTAB)
-    w_type = SKILL_BACKSTAB;
+weapon_type = w_type;
+ if(type == SKILL_BACKSTAB)
+ w_type = SKILL_BACKSTAB;
   
   /* Calculate thac0 vs. armor clss.  Thac0 for mobs is in hitroll */
 //  if(!IS_NPC(ch))
