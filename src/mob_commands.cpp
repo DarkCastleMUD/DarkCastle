@@ -888,7 +888,7 @@ int do_mpteachskill( CHAR_DATA *ch, char *argument, int cmd )
     int learn_skill(char_data * ch, int skill, int amount, int maximum);
     class_skill_defines * get_skill_list(char_data * ch);
     int search_skills(char * arg, class_skill_defines * list_skills);
-
+    int search_skills2(int arg, class_skill_defines * list_skills);
     if ( !IS_NPC( ch ) )
     {
 	send_to_char( "Huh?\n\r", ch );
@@ -931,7 +931,7 @@ int do_mpteachskill( CHAR_DATA *ch, char *argument, int cmd )
       return eFAILURE;  // no skills to train
     }
 
-    int index = search_skills(skillname, skilllist);
+    int index = search_skills2(skillnum, skilllist);
     if(GET_LEVEL(victim) < skilllist[index].levelavailable) {
        csendf(victim, "You try to learn the basics of %s, but it is too advanced for you right now.\r\n", skillname);
        return eFAILURE;
