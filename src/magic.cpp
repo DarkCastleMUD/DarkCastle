@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.91 2004/04/13 12:59:00 urizen Exp $ */
+/* $Id: magic.cpp,v 1.92 2004/04/14 17:05:02 urizen Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -7669,7 +7669,7 @@ int cast_creeping_death(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DAT
       act("$N has been poisoned by your insect swarm!", ch, 0, victim, TO_CHAR, 0);
    }
 	    
-   // 1% of the time the victim will actually die from the swarm
+   // 2% of the time the victim will actually die from the swarm
    if (number(1, 101) > 99 && 
        skill > 70 &&
        GET_LEVEL(victim) < IMMORTAL) 

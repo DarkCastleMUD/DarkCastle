@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.50 2003/12/09 01:31:44 staylor Exp $ */
+/* $Id: spells.cpp,v 1.51 2004/04/14 17:05:02 urizen Exp $ */
 
 extern "C"
 {
@@ -1287,6 +1287,56 @@ char *skip_spaces(char *string)
     for(;*string && (*string)==' ';string++);
 
     return(string);
+}
+
+/* 
+    Release command. 
+*/
+int do_release(CHAR_DATA *ch, char *argument, int cmd)
+{
+  struct affected_type *aff,*aff_next;
+  bool printed = FALSE;
+  argument = skip_spaces(argument);
+  extern bool str_prefix(const char *astr, const char *bstr);  
+  if (!*argument)
+  {
+    send_to_char("Release what spell?\r\n",ch);
+    for (aff = ch->affected; aff; aff = aff_next)
+    {
+       aff_next = aff->next;
+       if (!get_skill_name(aff->type))
+          continue;
+       if (!printed)
+       {
+	  send_to_char("You can release the following spells:\r\n",ch);
+	  printed=TRUE;
+       }
+       if (spell_info[aff->type].targets & TAR_SELF_DEFAULT)
+       {
+         char * aff_name = get_skill_name(aff->type);
+	 send_to_char(aff_name,ch);
+         send_to_char("\r\n",ch);
+       }
+    }
+    } else {
+       for (aff = ch->affected; aff; aff = aff_next)
+       {
+         aff_next = aff->next;
+         if (!get_skill_name(aff->type))
+            continue;
+	 if (str_prefix(argument,get_skill_name(aff->type)))
+            continue;
+          if (!spell_info[aff->type].targets & TAR_SELF_DEFAULT)
+            continue;
+         if ((aff->type > 0) && (aff->type <= MAX_SPL_LIST))
+             if (*spell_wear_off_msg[aff->type]) {
+                send_to_char(spell_wear_off_msg[aff->type], ch);
+                send_to_char("\n\r", ch);
+             }
+	  affect_remove(ch,aff,0);
+       }
+    }
+    return eSUCCESS;
 }
 
 

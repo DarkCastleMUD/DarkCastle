@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.41 2003/12/01 17:39:01 staylor Exp $ */
+/* $Id: mob_proc.cpp,v 1.42 2004/04/14 17:05:02 urizen Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -1938,6 +1938,8 @@ int backstabber(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
              continue;
                }
   
+         if (MOB_WAIT_STATE(ch)) continue;
+         if (IS_AFFECTED(tch,AFF_ALERT)) continue;
          if (ch->equipment[WIELD])  {
 
         if (tch->fighting) {
@@ -4435,7 +4437,7 @@ int thief_non_combat(struct char_data *ch, struct obj_data *obj, int cmd, char *
            ch->equipment[WIELD]->obj_flags.value[3] == 8 
          )
       && (!ch->fighting) && (!vict->fighting)
-     ) 
+     && !MOB_WAIT_STATE(ch)) 
    {
       return do_backstab(ch, GET_NAME(vict), 9);
    }

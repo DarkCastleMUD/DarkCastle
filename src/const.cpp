@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.69 2004/04/13 12:59:00 urizen Exp $ */
+/* $Id: const.cpp,v 1.70 2004/04/14 17:05:02 urizen Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1273,6 +1273,7 @@ struct class_skill_defines u_skills[] = { // druid skills
 {    "lightning shield",SPELL_LIGHTNING_SHIELD,	23,	90,	-2,	"A near victim of infanticide the Lord of the Tallest mountain knows lightning shield."},
 {    "power heal",	SPELL_POWER_HEAL,	26,	90,	-2,	"Only the most pure of beasts with horn atop head can help you.  Look in the mountains." },
 {    "camouflage",	SPELL_CAMOUFLAGE,	28,	90,	3203,	NULL },
+{    "summon",SPELL_SUMMON,40,90,-2,"You seek out an individual of much control over the transcendental in a tower of pure energy."},
 {    "summon familiar", SPELL_SUMMON_FAMILIAR,	30,	90,	-2,	"To learn this skill you must bust a nut....err...bring me a nut."},
 {    "dismiss familiar",SPELL_DISMISS_FAMILIAR, 30,	90,	3203,	NULL },
 {    "lighted path",    SPELL_LIGHTED_PATH,	33,	90,	-2,	"You must learn about tracking to accomplish this spell.  Go talk to the ranger Woody about lighted path."},
@@ -1280,7 +1281,10 @@ struct class_skill_defines u_skills[] = { // druid skills
 {    "iron roots",	SPELL_IRON_ROOTS,	36,	90,	-2,	"A druid of old age and virulance is who you want. He will be in the company of other druids."},
 {    "resist acid",	SPELL_RESIST_ACID,	37,	90,	-2,	"You need to seek out Bill the pharmicist.  He knows about such things." },
 {    "resist energy",	SPELL_RESIST_ENERGY,	39,	90,	-2,	"An electric individual who will surely light you up with his mastery of energetic discourse. (phew)" },
-{    "summon",		SPELL_SUMMON,		40,	90,	-2,	"You seek out an individual of much control over the transcendental in a tower of pure energy." },
+//{    "summon",		SPELL_SUMMON,		40,	90,	
+//-2,	
+//"You seek out an individual of much control over the transcendental in a 
+//tower of pure energy." },
 {    "greater stone shield",SPELL_GREATER_STONE_SHIELD,	42,	90,-2,	"He of an earthy personality who rules with a stone fist is who you want."},
 {    "stone skin",	SPELL_STONE_SKIN,	45,	90,	-2,	"A woman strong in battle surrounded by heavy magical influences calls to you." },
 {    "\n",		0,			1,	0,	0, 	NULL}
