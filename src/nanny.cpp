@@ -11,7 +11,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.31 2003/06/05 00:54:33 pirahna Exp $ */
+/* $Id: nanny.cpp,v 1.32 2003/06/22 23:47:34 pirahna Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -158,7 +158,7 @@ int is_clss_eligible(CHAR_DATA *ch, int clss)
          x = 1;
       break; 
    case CLASS_BARBARIAN:
-      if(GET_RAW_STR(ch) >= 16 && GET_RAW_CON(ch) >= 16)
+      if(GET_RAW_STR(ch) >= 15 && GET_RAW_CON(ch) >= 15)
          x = 1;
       break; 
    case CLASS_MONK:
