@@ -943,22 +943,22 @@ char_data *)(mob_index[nr].item))->level,
       if ((nr = real_object(c)) < 0)
            continue;
       if(wear)
-	for (i = 0; i < 1 << 20; i++)
+	for (i = 0; i < 20; i++)
 	  if (IS_SET(wear, 1 << i))
       if (!IS_SET(((struct obj_data *)(obj_index[nr].item))->obj_flags.wear_flags, 1<<i))
 	goto endLoop;
       if (size)
-       for (i = 0; i < 1 << 10; i++)
+       for (i = 0; i < 10; i++)
 	if (IS_SET(size, 1<<i))
       if (!IS_SET(((struct obj_data *)(obj_index[nr].item))->obj_flags.size, 1<<i))
 	goto endLoop;
       if(extra)
-        for (i = 0; i < 1 << 30; i++)
+        for (i = 0; i < 30; i++)
 	  if (IS_SET(extra,1<<i))
       if (!IS_SET(((struct obj_data *)(obj_index[nr].item))->obj_flags.extra_flags, 1<<i))
 	goto endLoop;
       if (more)
-	for (i = 0; i < 1 << 10; i++)
+	for (i = 0; i < 10; i++)
 	  if (IS_SET(more,1<<i))
       if (!IS_SET(((struct obj_data *)(obj_index[nr].item))->obj_flags.more_flags, 1<<i))
 	goto endLoop;
