@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.63 2003/02/18 22:36:43 pirahna Exp $ */
+/* $Id: magic.cpp,v 1.64 2003/03/04 05:35:21 pirahna Exp $ */
 
 extern "C"
 {
@@ -8516,8 +8516,8 @@ int spell_rapid_mend(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
     struct affected_type af;
 
     if(!affected_by_spell(victim, SPELL_RAPID_MEND)) {
-       act("$n's starts to heal quicker.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-       act("$n's starts to heal quicker.", ch, 0, 0, TO_CHAR, INVIS_NULL);
+       act("$N's starts to heal quicker.", ch, 0, 0, TO_ROOM, INVIS_NULL);
+       act("$N's starts to heal quicker.", ch, 0, 0, TO_CHAR, INVIS_NULL);
        send_to_char("You feel your body begin to heal quicker.", victim);
 
        skill_increase_check(ch, SPELL_RAPID_MEND, skill, SKILL_INCREASE_MEDIUM);
