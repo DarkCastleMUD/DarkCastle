@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.56 2004/05/28 23:44:02 pirahna Exp $ */
+/* $Id: mob_proc.cpp,v 1.57 2004/05/29 00:53:28 pirahna Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -3013,7 +3013,16 @@ static char *dethSayText [ ] =
   "What happened to sex, drugs, and rock'n'roll.  Now we have AIDS, crack, and techno.",
   "It's a good thing Microsoft isn't in the condom busines.",
   "Whenever I clean my glasses, my monitor becomes dirty as hell.",
-  "Okay so this baby seal walks into a club...."
+  "Okay so this baby seal walks into a club....",
+  "There's two types of women on the internet.  .jpg and .gif",
+  "It's sad when Perl is the closest thing you have to a relationship with a woman.",
+  "Lucifer is sooo 20th centery.  The Devil should rename himself something like 1337Ki11@r.",
+  "What does God do when a kitten masturbates?",
+  "This is great...some guy in Nigeria wants to transfer me a huge sum of money if I help him out!",
+  "The truth, like my penis, sometimes slips out at inopportune times.",
+  "I wonder if anyone ever calls Steve Jobs 'Mac Daddy'.",
+  "Ever get the urge to call the operator and say 'I need an exit fast!'",
+  "The thing that attracts me to fat chicks the most is probably the gravitational pull."
 };
 
 #define DETH_SAY_TEXT_SIZE    ( sizeof ( dethSayText )    / sizeof ( char * ) )
