@@ -56,9 +56,14 @@ struct trade_data_type {
 // POISON DEFINES
 struct trade_data_type poison_vial_data[] = 
 {
-   { { 600, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
+   { { 600, -1, -1, -1, -1, -1, -1, -1, -1, -1 },   // bee stinger
      697,
-     10
+     10         // a vial of bee stinger poison
+   },
+
+   { { 3175, -1, -1, -1, -1, -1, -1, -1, -1, -1 },  // foraged apple
+     697,
+     10         // a vial of bee stinger poison
    },
 
    // This must come last
@@ -67,6 +72,22 @@ struct trade_data_type poison_vial_data[] =
      -1
    }
 };
+
+struct thief_poison_data {
+   char * poison_type;
+};
+
+struct thief_poison_data poison_vial_combat_data[] =
+{
+   {
+      "bee stinger poison"
+   },
+
+   {
+      "invalid poison type"
+   }
+};
+
 
 ////////////////////////////////////////////////////////////////////////////
 // command functions
@@ -137,8 +158,33 @@ int do_poisonmaking(struct char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
+int do_poisonweapon(struct char_data *ch, char *argument, int cmd)
+{
+  if(GET_CLASS(ch) != CLASS_THIEF && GET_LEVEL(ch) <= IMMORTAL) {
+    send_to_char("Only thieves are trained enough to poison their weapons.\r\n", ch);
+    return eFAILURE;
+  }
 
+  char weaponarg[MAX_INPUT_LENGTH];
+  char vialarg[MAX_INPUT_LENGTH];
 
+  half_chop(argument, weaponarg, vialarg);
+
+  if(!*weaponarg || !*vialarg) {
+    send_to_char("Poison which weapon with what?\r\n", ch);
+    return eFAILURE;
+  }
+
+  // find weapon
+
+  // find vial and verify it's a valid poison vial
+
+  // poison weapon
+
+  // remove vial
+
+  return eSUCCESS;
+}
 
 ////////////////////////////////////////////////////////////////////////////
 // Utility functions

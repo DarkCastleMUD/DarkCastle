@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.16 2002/08/06 00:28:20 pirahna Exp $ */
+/* $Id: magic.cpp,v 1.17 2002/08/13 23:02:21 pirahna Exp $ */
 
 extern "C"
 {
@@ -55,7 +55,7 @@ extern struct obj_data  *object_list;
 extern CHAR_DATA *character_list;
 extern struct zone_data *zone_table;
 
-#define BEACON_OBJ_NUMBER 459
+#define BEACON_OBJ_NUMBER 405
 
 /* Extern procedures */
 
