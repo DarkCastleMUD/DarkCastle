@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.130 2004/05/18 00:17:40 urizen Exp $ */
+/* $Id: magic.cpp,v 1.131 2004/05/19 16:53:06 urizen Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -432,12 +432,12 @@ int spell_howl(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *ob
                 ch, 0, tmp_char, TO_CHAR, 0);
          act("$N blinks and shakes its head, clearing its thoughts.\n\r",
 		ch, 0, tmp_char, TO_ROOM, NOTVICT);
-	if (ch->fighting)
+	if (tmp_char->fighting)
 	{
-	   do_say(ch,"Screw this! I'm going home!", 9);
-	   if (ch->fighting->fighting == ch)
-	     stop_fighting(ch->fighting);
-	   stop_fighting(ch);
+	   do_say(tmp_char,"Screw this! I'm going home!", 9);
+	   if (tmp_char->fighting->fighting == tmp_char)
+	     stop_fighting(tmp_char->fighting);
+	   stop_fighting(tmp_char);
 	   
 	}
          }

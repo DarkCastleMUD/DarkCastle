@@ -208,6 +208,11 @@ struct song_info_type song_info [ ] = {
        TAR_IGNORE, song_fanatical_fanfare, execute_song_fanatical_fanfare,pulse_song_fanatical_fanfare,
        intrp_song_fanatical_fanfare
 
+},
+{ /* 20 */
+        12, POSITION_FIGHTING, 7, SKILL_SONG_DISCHORDANT_DIRGE,
+	        TAR_CHAR_ROOM|TAR_FIGHT_VICT,
+        song_dischordant_dirge, execute_song_dischordant_dirge, NULL, NULL
 }
 };
 
@@ -236,6 +241,7 @@ char *songs[] = {
         "shattering resonance",
         "irresistable ditty",
 	"fanatical fanfare",
+        "dischordant dirge",
 	"\n"
 };
 
@@ -1875,6 +1881,71 @@ int execute_song_bountiful_sonnet( byte level, CHAR_DATA *ch, char *arg, CHAR_DA
    return eSUCCESS;
 }
 
+int execute_song_dischordant_dirge( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+{
+   char_data * target = NULL;
+   char buf[400];
+
+   target = get_char_room_vis(ch, ch->song_data);
+
+   dc_free(ch->song_data);
+   ch->song_data = 0;
+   act("$n's dirge ends in a shriek.", ch, 0, 0, TO_ROOM, 0);
+
+   if(!target || GET_LEVEL(ch) < GET_LEVEL(target))
+   {
+      send_to_char("Your dirge fades, it's effect neutralized.\r\n", ch);
+      return eFAILURE;
+   }
+
+   if(ch==target ) {
+      send_to_char("Your loyalties has been broken. And stuff. What did you think?\r\n", ch);
+      return eFAILURE;
+   }
+
+   if(!IS_NPC(target)) {
+      send_to_char("You cannot break their bonds of loyalty.\r\n", ch);
+      return eFAILURE;
+   }
+   if (!affected_by_spell(target, SPELL_CHARM_PERSON))
+   {
+	send_to_char("As far as you can tell, they are not loyal to anyone.\r\n",ch);
+	return eFAILURE;
+   }
+   skill_increase_check(ch, SKILL_SONG_DISCHORDANT_DIRGE, skill, SKILL_INCREASE_MEDIUM);
+   affect_from_char(target, SPELL_CHARM_PERSON);
+   send_to_char("You shatter their magical chains.\r\n",ch);
+   send_to_char("Boogie! Your mind has been set free!\r\n",target);
+   
+   act("$N blinks and shakes its head, clearing its thoughts.",
+        ch, 0, target, TO_CHAR, 0);
+   act("$N blinks and shakes its head, clearing its thoughts.\n\r",
+          ch, 0, target, TO_ROOM, NOTVICT);
+   if (target->fighting)
+   {
+	do_say(target, "Hey, this sucks. I'm goin' home!",9);
+        if (target->fighting->fighting == target)
+	  stop_fighting(target->fighting);
+	stop_fighting(target);
+   }
+   return eSUCCESS;
+}
+
+int song_dischordant_dirge( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+{
+   // store the char name here, cause A, we don't pass tar_char
+   // and B, there's no place to save it before we execute
+   ch->song_data = str_dup(arg);
+
+   send_to_char("You begin a wailing dirge...\n\r", ch);
+   act("$n begins to sing a wailing dirge...", ch, 0, 0, TO_ROOM, 0);
+   ch->song_timer = song_info[ch->song_number].beats - (GET_LEVEL(ch)/10);
+   if(ch->song_timer < 1)
+      ch->song_timer = 1;
+   return eSUCCESS;
+}
+
+
 int song_synchronous_chord( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    // store the char name here, cause A, we don't pass tar_char
@@ -1889,24 +1960,25 @@ int song_synchronous_chord( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vic
    return eSUCCESS;
 }
 
+
 int execute_song_synchronous_chord( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    char_data * target = NULL;
    char buf[400];
    char * get_random_hate(CHAR_DATA *ch);
-      
+
    target = get_char_room_vis(ch, ch->song_data);
-      
+
    dc_free(ch->song_data);
    ch->song_data = 0;
 
    act("$n's song ends with an abrupt stop.", ch, 0, 0, TO_ROOM, 0);
-   
+
    if(!target || GET_LEVEL(ch) < GET_LEVEL(target))
    {
       send_to_char("Your song fades away, it's target unknown.\r\n", ch);
       return eFAILURE;
-   }     
+   }
 
    if(ch == target) {
       send_to_char("You hate yourself, you self-loathing bastard.\r\n", ch);
@@ -1921,11 +1993,12 @@ int execute_song_synchronous_chord( byte level, CHAR_DATA *ch, char *arg, CHAR_D
    skill_increase_check(ch, SKILL_SONG_SYNC_CHORD, skill, SKILL_INCREASE_EASY);
 
    act("You enter $S mind...", ch, 0, target, TO_CHAR, INVIS_NULL);
-   sprintf(buf, "%s seems to hate... %s.\r\n", GET_SHORT(target), 
+   sprintf(buf, "%s seems to hate... %s.\r\n", GET_SHORT(target),
             get_random_hate(target) ? get_random_hate(target) : "Noone!");
    send_to_char(buf, ch);
    return eSUCCESS;
 }
+
 
 int song_sticky_lullaby( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {

@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.26 2004/05/19 07:26:08 urizen Exp $ */
+/* $Id: limits.cpp,v 1.27 2004/05/19 16:53:06 urizen Exp $ */
 
 extern "C"
 {
@@ -49,6 +49,7 @@ extern "C"
 extern CHAR_DATA *character_list;
 extern struct obj_data *object_list;
 extern CWorld world;
+extern struct index_data *obj_index;
 
 /* External procedures */
 
@@ -408,7 +409,7 @@ void advance_level(CHAR_DATA *ch, int is_conversion)
 
     case CLASS_WARRIOR:
 	add_ki	    += (GET_LEVEL(ch) % 2);
-	add_hp      += number(14,181);
+	add_hp      += number(14,18);
 	add_moves   += number(1, (GET_CON(ch) / 2));
 	break;
 
@@ -687,7 +688,7 @@ void update_corpses_and_portals(void)
   struct obj_data *last_thing;
   int proc = 0; // Processed items. Debugging.
   void extract_obj(struct obj_data *obj); /* handler.c */
-
+  int last_vnum = 0, last_type = 0;
   /* objects */
   for(j = object_list; j ; j = next_thing,proc++)
   {
@@ -696,6 +697,8 @@ void update_corpses_and_portals(void)
     /* Type 1 is a permanent game portal, and type 3 is a look_only
     |  object.  Type 0 is the spell portal and type 2 is a game_portal
     */
+    last_vnum = obj_index[j->item_number].virt;
+    last_type = GET_ITEM_TYPE(j);
     if((GET_ITEM_TYPE(j) == ITEM_PORTAL) && (j->obj_flags.value[1] == 0
         || j->obj_flags.value[1] == 2)) 
     {
