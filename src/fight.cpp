@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.19 2002/08/01 19:55:48 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.20 2002/08/01 22:59:15 pirahna Exp $ */
 
 extern "C"
 {
@@ -120,7 +120,8 @@ void perform_violence(void)
           if(SOMEONE_DIED(retval))
             continue;
         }
-        else {
+        else if(!IS_AFFECTED(ch, AFF_CHARM)) 
+        {
           retval = 0;
           switch(GET_CLASS(ch)) {
            case CLASS_WARRIOR:       retval = fighter(ch, NULL, 0, "", ch);           break;

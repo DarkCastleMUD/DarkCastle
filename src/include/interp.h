@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.h,v 1.2 2002/06/13 04:41:15 dcastle Exp $ */
+/* $Id: interp.h,v 1.3 2002/08/01 22:59:19 pirahna Exp $ */
 
 #ifndef INTERP_H_
 #define INTERP_H_
@@ -45,7 +45,10 @@ struct command_info
     byte minimum_position;          /* Position commander must be in    */
     byte minimum_level;             /* Minimum level needed             */
     ubyte command_number;           /* Passed to function as argument   */
+    int flags;                      // what flags the skills has 
 };
+
+#define COM_CHARMIE_OK       1
 
 DO_FUN  do_boro;
 
