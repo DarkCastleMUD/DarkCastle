@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.7 2002/07/31 18:41:09 pirahna Exp $
+| $Id: objects.cpp,v 1.8 2002/08/01 06:55:43 dcastle Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -80,8 +80,8 @@ int eq_max_damage(obj_data * obj)
 int eq_current_damage(obj_data * obj)
 {
   for(int i = 0; i < obj->num_affects; i++) 
-    if(obj->affected[i].modifier == APPLY_DAMAGED)
-       return (obj->affected[i].location);
+    if(obj->affected[i].location == APPLY_DAMAGED)
+       return (obj->affected[i].modifier);
 
   return 0;
 }
