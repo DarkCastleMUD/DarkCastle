@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.20 2003/01/22 16:12:22 pirahna Exp $
+| $Id: cl_thief.cpp,v 1.21 2003/01/30 05:32:30 pirahna Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -552,7 +552,7 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
   af.bitvector = AFF_CANTQUIT;
 
   pthiefaf.type = FUCK_PTHIEF;
-  pthiefaf.duration = 20;
+  pthiefaf.duration = 10;
   pthiefaf.modifier = 0;
   pthiefaf.location = APPLY_NONE;
   pthiefaf.bitvector = 0;
