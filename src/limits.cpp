@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.22 2004/05/18 21:36:39 urizen Exp $ */
+/* $Id: limits.cpp,v 1.23 2004/05/18 22:13:41 urizen Exp $ */
 
 extern "C"
 {
@@ -136,6 +136,9 @@ int32 move_limit(CHAR_DATA *ch)
   return (max);
 }
 
+const int mana_regens[] = {
+  0, 8, 1, 1, 4, 3, 1, 1, 4, 1, 7, 0, 0
+};
 
 
 
@@ -150,7 +153,9 @@ int mana_gain(CHAR_DATA *ch)
     gain = GET_LEVEL(ch);
   else {
 //    gain = graf(age(ch).year, 2,3,4,6,7,8,9);
-    gain = ch->max_mana / 12.5;
+
+    gain = (int)(ch->max_mana * (float)(mana_regens[GET_CLASS(ch)] / 100));
+
     switch (GET_POS(ch)) {
       case POSITION_SLEEPING: divisor = 1; break;
       case POSITION_RESTING:  divisor = 2; break;
@@ -164,6 +169,7 @@ int mana_gain(CHAR_DATA *ch)
     else
       modifier = wis_app[GET_WIS(ch)].mana_regen;;
     gain += modifier;
+    gain += age(ch).year / 20;
 /*    gain += (int)(modifier / divisor);
 
     // int bonus modifier.  1.1 at 16int/wis up to 2.5 at 30int/wis
@@ -183,27 +189,30 @@ int mana_gain(CHAR_DATA *ch)
   return (gain);
 }
 
+const int hit_regens[] = {
+ 0, 2, 3, 3, 6, 8, 5, 6, 8, 6, 5, 5, 3, 0, 0
+};
 
 /* Hitpoint gain pr. game hour */
 int hit_gain(CHAR_DATA *ch)
 {
   int gain = 1;
   struct affected_type * af;
-
+  int divisor;
   /* Neat and fast */
   if(IS_NPC(ch))
     gain = (GET_MAX_HIT(ch) / 30);
   
   /* PC's */
   else {
-    gain = 1;
+    gain = (int)(ch->max_hit * (float)(hit_regens[GET_CLASS(ch)] /100));
 
     /* Position calculations    */
     switch (GET_POS(ch)) {
-      case POSITION_SLEEPING: gain += 10;  break;
-      case POSITION_RESTING:  gain += 5;   break;
-      case POSITION_SITTING:  gain += 1;   break;
-      default:                             break;
+      case POSITION_SLEEPING: divisor = 1; break;
+      case POSITION_RESTING:  divisor = 2; break;
+      case POSITION_SITTING:  divisor = 2; break;
+      default:                divisor = 4; break;
     }
 
     if(gain < 1) 
@@ -222,6 +231,7 @@ int hit_gain(CHAR_DATA *ch)
       gain = (int)((float)gain * 0.7);*/
 
      gain += con_app[GET_CON(ch)].hp_regen;
+     gain -= age(ch).year / 20;
   }
 
   gain += ch->hit_regen;
@@ -265,8 +275,8 @@ int move_gain(CHAR_DATA *ch)
 	return(GET_LEVEL(ch));  
 	/* Neat and fast */
     } else {
-	gain = graf(age(ch).year, 4,5,6,7,4,3,2);
-
+//	gain = graf(age(ch).year, 4,5,6,7,4,3,2);
+	gain = (int)(ch->max_move * 0.06);
 	switch (GET_POS(ch)) {
 	    case POSITION_SLEEPING: divisor = 1; break;
 	    case POSITION_RESTING:  divisor = 2; break;
@@ -354,9 +364,9 @@ void redo_ki(CHAR_DATA *ch)
 {
    ch->max_ki = ch->raw_ki;
    if (GET_CLASS(ch) == CLASS_MONK) 
-     ch->max_ki += (GET_WIS(ch) > 15?GET_WIS(ch)-15:0);
+     ch->max_ki += GET_WIS(ch) > 15?GET_WIS(ch)-15:0;
    else if (GET_CLASS(ch) == CLASS_BARD)
-     ch->max_ki += (GET_INT(ch) > 15?GET_INT(ch)-15:0);   
+     ch->max_ki += GET_INT(ch) > 15?GET_INT(ch)-15:0;   
 }
 
 /* Gain maximum in various */
