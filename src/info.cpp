@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.14 2002/08/16 19:13:42 pirahna Exp $ */
+/* $Id: info.cpp,v 1.15 2002/08/21 14:51:53 pirahna Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -1369,6 +1369,16 @@ int do_score(struct char_data *ch, char *argument, int cmd)
          if(++level == 4)
             level = 0;
       }
+      if(IS_SET(ch->pcdata->punish, PUNISH_THIEF)) 
+      {
+         scratch = frills[level];
+         sprintf(buf, "|%c| Affected by %-22s          Modifier %-16s  |%c|\n\r",						 
+               scratch, "PLAYER_THIEF", "AWW_CRAP", scratch);
+         send_to_char(buf, ch);
+         if(++level == 4) // doing this in case i add something after this in
+            level = 0;    // the future
+         found = TRUE;
+      }
       if(found)
         colorCharSend(
          "($5:$7)========================================================================($5:$7)\n\r", ch);
@@ -1386,9 +1396,6 @@ int do_score(struct char_data *ch, char *argument, int cmd)
       if(GET_OBJ_RANGE(ch) && GET_LEVEL(ch) > IMMORTAL) {
          sprintf(buf, "O RANGE: %s\n\r", GET_OBJ_RANGE(ch));
          send_to_char(buf, ch);
-      }
-      if(IS_SET(ch->pcdata->punish, PUNISH_THIEF)) {
-         send_to_char("You are flagged a pthief.\r\n", ch);
       }
    }
    return eSUCCESS;
