@@ -14,7 +14,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.h,v 1.21 2002/12/27 01:45:12 pirahna Exp $ */
+/* $Id: spells.h,v 1.22 2003/01/16 03:59:27 dcastle Exp $ */
 #include <structs.h> // byte, sh_int
 
 #define MAX_BUF_LENGTH               240
@@ -338,6 +338,7 @@
  * Types of attacks.
  * Must be non-overlapping with spell/skill types,
  * but may be arbitrary beyond that.
+ * If you change this, update strs_damage_types[] in const.cpp
  */
 #define TYPE_HIT                     1000
 #define TYPE_BLUDGEON                (TYPE_HIT +  1)
@@ -362,6 +363,9 @@
 #define TYPE_SONG                    (TYPE_HIT + 20)
 #define TYPE_PHYSICAL_MAGIC          (TYPE_HIT + 21)
 #define TYPE_WATER                   (TYPE_HIT + 22)
+// If you change this, update strs_damage_types[] in const.cpp
+////////////////////////////////////////////////////////////////
+
 
 // NOTE  "skill" numbers 1500-1599 are reserved for innate skill abilities
 // These are in innate.h
