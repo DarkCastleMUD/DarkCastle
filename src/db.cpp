@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.20 2003/01/16 08:08:39 dcastle Exp $ */
+/* $Id: db.cpp,v 1.21 2003/01/22 15:22:57 pirahna Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -3746,6 +3746,8 @@ void free_char( CHAR_DATA *ch )
   ch->title = NULL;
 
   remove_memory(ch, 't');
+
+  SET_BIT(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT); // so weapons stop falling off
 
   for(iWear = 0; iWear < MAX_WEAR; iWear++) {
      if(ch->equipment[iWear])

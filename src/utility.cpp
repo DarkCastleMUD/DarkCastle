@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.12 2002/09/20 18:42:54 pirahna Exp $ */
+/* $Id: utility.cpp,v 1.13 2003/01/22 15:22:57 pirahna Exp $ */
 
 extern "C"
 {
@@ -1096,6 +1096,8 @@ int do_quit(struct char_data *ch, char *argument, int cmd)
   } else {
     save_char_obj(ch);
   } 
+
+  SET_BIT(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT); // so weapons stop falling off
 
   for(iWear = 0; iWear < MAX_WEAR; iWear++) 
      if(ch->equipment[iWear])
