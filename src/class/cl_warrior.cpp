@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.10 2003/03/04 06:45:35 pirahna Exp $
+| $Id: cl_warrior.cpp,v 1.11 2003/03/07 01:29:37 pirahna Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -193,7 +193,7 @@ int do_deathstroke(struct char_data *ch, char *argument, int cmd)
 
 int do_retreat(struct char_data *ch, char *argument, int cmd)
 {
-   int attempt, die, percent;
+   int attempt, percent;
    int learned, specialization, chance;
    char buf[MAX_INPUT_LENGTH];
    // Azrack -- retval should be initialized to something
@@ -253,15 +253,19 @@ int do_retreat(struct char_data *ch, char *argument, int cmd)
          INVIS_NULL);
       send_to_char("You try to beat a hasty retreat....\n\r", ch);
 
-      die = attempt_move(ch, attempt + 1, 1);
-      if(IS_SET(die, eSUCCESS))
+      // check for any spec procs
+      retval = special( ch, attempt + 1, "" );
+      if(IS_SET(retval, eSUCCESS) || IS_SET(retval, eCH_DIED))
+          return retval;
+
+      retval = attempt_move(ch, attempt + 1, 1);
+      if(IS_SET(retval, eSUCCESS))
          // The escape has succeded
          return retval;
 	  
       else {
-         if (!die)
-	    act("$n tries to retreat, but is too exhausted!",
-                ch, 0, 0, TO_ROOM, INVIS_NULL);
+         if (!IS_SET(retval, eCH_DIED))
+	    act("$n tries to retreat, but is too exhausted!", ch, 0, 0, TO_ROOM, INVIS_NULL);
          return retval;
       }
    }
