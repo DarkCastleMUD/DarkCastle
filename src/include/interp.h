@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.h,v 1.30 2004/07/12 20:21:18 urizen Exp $ */
+/* $Id: interp.h,v 1.31 2004/07/13 16:50:47 urizen Exp $ */
 
 #ifndef INTERP_H_
 #define INTERP_H_
@@ -95,6 +95,7 @@ DO_FUN  do_cinfo;
 DO_FUN  do_circle;
 DO_FUN  do_clans; 
 DO_FUN  do_clear;
+DO_FUN  do_clearaff;
 DO_FUN  do_climb;
 DO_FUN  do_close;
 DO_FUN  do_cmotd;

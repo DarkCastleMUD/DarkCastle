@@ -12,9 +12,44 @@
 #include <levels.h>
 #include <interp.h>
 #include <returnvals.h>
-
+#include <innate.h>
 
 char *str_nospace(char *stri);
+
+int do_clearaff(struct char_data *ch, char *argument, int cmd)
+{
+
+   char buf[MAX_INPUT_LENGTH];
+   struct char_data *victim;
+   struct affected_type *af, *afpk;
+    struct obj_data *dummy;
+ 
+
+   one_argument(argument, buf);
+
+    if (!*buf)
+        send_to_char("Log who?\n\r", ch);
+
+    else if (!generic_find(argument, FIND_CHAR_WORLD, ch, &victim, &dummy))
+        send_to_char("Couldn't find any such creature.\n\r", ch);
+    else {
+  for(af = victim->affected; af; af = afpk) {
+    afpk = af->next;
+        bool isaff2(int spellnum);
+    if(af->type != FUCK_CANTQUIT &&
+       af->type != SKILL_LAY_HANDS &&
+       af->type != SKILL_HARM_TOUCH &&
+       af->type != SKILL_BLOOD_FURY &&
+       af->type != SKILL_QUIVERING_PALM &&
+       af->type != SKILL_INNATE_TIMER &&
+        af->type != SPELL_HOLY_AURA_TIMER)
+      affect_remove(victim, af, SUPPRESS_ALL,isaff2(af->type));
+  }
+  send_to_char("Done.\r\n",ch);
+  send_to_char("Your affects have been cleared.\r\n",victim);
+  return eSUCCESS;
+  }
+}
 
 int do_log(struct char_data *ch, char *argument, int cmd)
 {
