@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.116 2004/04/24 21:01:29 urizen Exp $ */
+/* $Id: magic.cpp,v 1.117 2004/04/24 21:54:22 urizen Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -7666,7 +7666,7 @@ int spell_bee_sting(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
 {
    int dam;
    int retval;
-   int bees = GET_LEVEL(ch) / 15 + GET_LEVEL(ch)==50;
+   int bees = (GET_LEVEL(ch) / 15) + (GET_LEVEL(ch)==50);
    affected_type af;
    int i;
    set_cantquit(ch, victim);
@@ -7676,7 +7676,7 @@ int spell_bee_sting(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
       dam >>= 1;
   
 
-   for (i = 1; i <= bees; i++) {
+   for (i = 0; i < bees; i++) {
    skill_increase_check(ch, SPELL_BEE_STING, skill, SKILL_INCREASE_MEDIUM);
 
    retval = spell_damage(ch, victim, dam, TYPE_STING, SPELL_BEE_STING, 0);
@@ -8013,7 +8013,7 @@ CHAR_DATA  *victim, struct obj_data * tar_obj, int skill)
         af.location     = APPLY_AC;
         af.bitvector    = 0;
         affect_to_char(victim, &af);
-
+	send_to_char("Your fortitude increases to that of an oak.\r\n",ch);
         af.modifier             = 2;
         af.location             = APPLY_CON;
         affect_to_char(victim, &af);
