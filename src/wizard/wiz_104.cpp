@@ -832,6 +832,11 @@ obj_data *)(obj_index[nr].item))->obj_flags.eq_level,
 	continue;
      }
      int c,nr;
+	if (!act && !clas && !levlow && !levhigh && !affect && !immune && !race && !align)
+	{
+	   send_to_char("No valid search supplied.\r\n",ch);
+	   return eFAILURE;
+	}
      for (c=0;c < mob_index[top_of_mobt].virt;c++)
      {
       if ((nr = real_mobile(c)) < 0)	
@@ -936,6 +941,12 @@ char_data *)(mob_index[nr].item))->level,
      int c,nr,aff;
 //     csendf(ch,"%d %d %d %d %d", more, extra, wear, size, affect);
      bool found = FALSE;
+if (!affect && !size && !extra && !more && !wear)
+{
+   send_to_char("No valid search supplied.\r\n",ch);
+   return eFAILURE;
+}
+
      for (c=0;c < obj_index[top_of_objt].virt;c++)
      {
       if ((nr = real_object(c)) < 0)
