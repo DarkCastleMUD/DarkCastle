@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: utility.h,v 1.8 2002/08/03 15:29:33 pirahna Exp $ */
+/* $Id: utility.h,v 1.9 2002/08/11 16:10:08 pirahna Exp $ */
 
 #ifndef UTILITY_H_
 #define UTILITY_H_
@@ -327,7 +327,7 @@ int process_output(struct descriptor_data *t);
 int file_to_string(const char *name, char *buf);
 bool load_char_obj( struct descriptor_data *d, char *name );
 void save_char_obj( CHAR_DATA *ch );
-void char_to_store(CHAR_DATA *ch, struct char_file_u *st);
+void char_to_store(CHAR_DATA *ch, struct char_file_u *st, struct time_data & tmpage);
 bool obj_to_store( struct obj_data *obj, CHAR_DATA *ch, FILE *fpsave, int wear_pos );
 void check_idling(CHAR_DATA *ch);
 void affect_to_char( CHAR_DATA *ch, struct affected_type *af );

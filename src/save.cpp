@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: save.cpp,v 1.9 2002/08/11 14:53:56 pirahna Exp $ */
+/* $Id: save.cpp,v 1.10 2002/08/11 16:10:04 pirahna Exp $ */
 
 extern "C"
 {
@@ -48,7 +48,6 @@ struct obj_data * obj_store_to_char( CHAR_DATA *ch, FILE *fpsave, struct obj_dat
 bool put_obj_in_store( struct obj_data *obj, CHAR_DATA *ch, FILE *fpsave, int wear_pos);
 void restore_weight(struct obj_data *obj);
 void store_to_char(struct char_file_u *st, CHAR_DATA *ch);
-void char_to_store(CHAR_DATA *ch, struct char_file_u *st);
 
 // return 1 on success
 // return 0 on failure
@@ -205,7 +204,7 @@ void read_mob_data(struct mob_data * i, FILE * fpsave)
 // TODO - make sure I go back and update the time_data structs everywhere when 
 // we lose link, or logout, etc so that the 'played' variable is correct
 
-void save_pc_data(struct pc_data * i, FILE * fpsave)
+void save_pc_data(struct pc_data * i, FILE * fpsave, struct time_data tmpage)
 {
   fwrite(i->pwd,            sizeof(char),        PASSWORD_LEN+1, fpsave);
   save_char_aliases(i->alias, fpsave);
@@ -213,7 +212,8 @@ void save_pc_data(struct pc_data * i, FILE * fpsave)
   fwrite(&(i->pdeaths),     sizeof(i->pdeaths),  1, fpsave);
   fwrite(&(i->pkills),      sizeof(i->pkills),   1, fpsave);
   fwrite(&(i->pklvl),       sizeof(i->pklvl),    1, fpsave);
-  fwrite(&(i->time),        sizeof(time_data),   1, fpsave);
+  // we save tmpage cause it was calculated when all eq was off
+  fwrite(&(tmpage),         sizeof(time_data),   1, fpsave);
   fwrite(&(i->bad_pw_tries),sizeof(i->bad_pw_tries), 1, fpsave);
   fwrite(&(i->practices),   sizeof(i->practices), 1, fpsave);
   fwrite(&(i->bank),        sizeof(i->bank),     1, fpsave);
@@ -301,11 +301,11 @@ void read_pc_data(struct pc_data * i, FILE* fpsave)
   // at this point, typeflag should = "STP", and we're done reading mob data
 }
 
-int save_pc_or_mob_data(CHAR_DATA *ch, FILE * fpsave)
+int save_pc_or_mob_data(CHAR_DATA *ch, FILE * fpsave, struct time_data tmpage)
 {
   if(IS_MOB(ch))
     save_mob_data(ch->mobdata, fpsave);
-  else save_pc_data(ch->pcdata, fpsave);
+  else save_pc_data(ch->pcdata, fpsave, tmpage);
 
   return 1;
 }
@@ -486,7 +486,8 @@ void save_char_obj (CHAR_DATA *ch)
   char    strsave[MAX_INPUT_LENGTH];
   char    name[200];
   int     safe = START_ROOM;
-   
+  struct time_data tmpage;
+
   if(IS_NPC(ch) || GET_LEVEL(ch) < 2)
     return;
 
@@ -503,7 +504,7 @@ void save_char_obj (CHAR_DATA *ch)
     return;
   }
 
-  char_to_store (ch, &uchar);
+  char_to_store (ch, &uchar, tmpage);
 
   // if they're in a safe room, save them there.
   // otherwise save them in tavern
@@ -514,7 +515,7 @@ void save_char_obj (CHAR_DATA *ch)
 
   if((fwrite(&uchar, sizeof(uchar), 1, fpsave))               &&
      (char_to_store_variable_data(ch, fpsave))                &&
-     (save_pc_or_mob_data(ch, fpsave))                        &&
+     (save_pc_or_mob_data(ch, fpsave, tmpage))                &&
      (obj_to_store (ch->carrying, ch, fpsave, -1))            &&
      (store_worn_eq(ch, fpsave))
     )
@@ -1079,8 +1080,9 @@ void store_to_char(struct char_file_u *st, CHAR_DATA *ch)
 
 
 
-/* copy vital data from a players char-structure to the file structure */
-void char_to_store(CHAR_DATA *ch, struct char_file_u *st)
+// copy vital data from a players char-structure to the file structure 
+// return 'age' of character unmodified
+void char_to_store(CHAR_DATA *ch, struct char_file_u *st, struct time_data & tmpage)
 {
   int i;
   int x;
@@ -1161,6 +1163,7 @@ void char_to_store(CHAR_DATA *ch, struct char_file_u *st)
     st->damroll =  0;
     st->afected_by = 0;
     st->afected_by2 = 0;
+    tmpage = ch->pcdata->time;
   }
 
   // re-affect the character with spells
