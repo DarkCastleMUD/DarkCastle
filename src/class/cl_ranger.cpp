@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_ranger.cpp,v 1.23 2003/03/21 20:43:48 pirahna Exp $ | cl_ranger.C |
+| $Id: cl_ranger.cpp,v 1.24 2003/06/05 02:51:41 pirahna Exp $ | cl_ranger.C |
 Description: Ranger skills/spells */ extern "C"  {
   #include <string.h>
 }
@@ -399,12 +399,9 @@ int ambush(CHAR_DATA *ch)
      if(i == ch || !i->ambush || !CAN_SEE(i, ch))
        continue;
 
-//     As long as they have ambush skill, this is fine
-//     if(!IS_NPC(i) && GET_CLASS(i) != CLASS_RANGER)
-//       continue;
-
      if(  GET_POS(i) < POSITION_RESTING || 
           GET_POS(i) == POSITION_FIGHTING ||
+          IS_AFFECTED(i, AFF_PARALYSIS) ||
           ( IS_SET(world[i->in_room].room_flags, SAFE) &&
 	    !IS_AFFECTED(ch, AFF_CANTQUIT)
           ))
