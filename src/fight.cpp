@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.156 2004/04/20 21:58:17 urizen Exp $ */
+/* $Id: fight.cpp,v 1.157 2004/04/21 19:09:29 urizen Exp $ */
 
 extern "C"
 {
@@ -2979,24 +2979,42 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
        /* New death system... dying is a BITCH!  */
        // thief + mob kill = stat loss
        // or got a bad roll
+//       int chance = GET_RACE(victim)==RACE_TROLL?;
        if( ( is_thief && ch && IS_MOB(ch) ) ||
            ( GET_LEVEL(victim)>20 && number(1,101) <= GET_LEVEL(victim) ) 
          )
        {
          if ((ch && GET_LEVEL(ch) >= 50) || 0 == number(0, 2))
          {
-            GET_CON(victim) -= 1;
-            victim->raw_con -= 1;
-            send_to_char("*** You lose one constitution point ***\n\r", victim);
-            if(!IS_NPC(victim)) 
-            {
-              sprintf(log_buf, "%s lost a con. ouch.", GET_NAME(victim));
-              log(log_buf, SERAPH, LOG_MORTAL);
-              victim->pcdata->statmetas--;
-            }
-         }
+              if (GET_RACE(victim) != RACE_TROLL) {
+                GET_CON(victim) -= 1;
+                victim->raw_con -= 1;
+                send_to_char("*** You lose one constitution point ***\n\r", victim);
+                if(!IS_NPC(victim)) 
+                {
+                  sprintf(log_buf, "%s lost a con. ouch.", GET_NAME(victim));
+                  log(log_buf, SERAPH, LOG_MORTAL);
+                  victim->pcdata->statmetas--;
+               }
+          } else {
+                GET_DEX(victim) -= 1;
+                victim->raw_dex -= 1;
+                send_to_char("*** You lose one dexterity point ***\n\r", victim);
+                if(!IS_NPC(victim))
+                {
+                  sprintf(log_buf, "%s lost a dex. ouch.", GET_NAME(victim));
+                  log(log_buf, SERAPH, LOG_MORTAL);
+                  victim->pcdata->statmetas--;
+               }
+
+          }
+        }
          pir_stat_loss(victim);
-         if(GET_CON(victim) <= 4)
+         if (GET_DEX(victim) <= 4 && GET_RACE(victim) == RACE_TROLL)
+         {
+	   
+         }
+         if(GET_CON(victim) <= 4 && GET_RACE(victim) != RACE_TROLL)
          {
            sprintf(buf1, "%s/%c/%s", SAVE_DIR, victim->name[0], victim->name);
            send_to_char("Your Constitution has reached 4...you are permanently dead!\n\r", victim);
@@ -3012,6 +3030,38 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
            do_quit(victim, "", 666);
            unlink(buf1);
            sprintf(buf2, "%s permanently dies.", buf1);
+           log(buf2, ANGEL, LOG_MORTAL);
+           return;
+         } else if (GET_DEX(victim) <= 4 && GET_RACE(ch) == RACE_TROLL) {
+            sprintf(buf1, "%s/%c/%s", SAVE_DIR, victim->name[0], victim->name);
+            send_to_char("Your Dexterity has reached 4...you are permanently dead!\r\n",victim);
+		send_to_char("\r\n"
+		" Dear Mudder, you suck.\r\nSincerly - Urizen\r\n"
+		"$4              /                  \\\r\n"
+		"             /|      ,             |\\\r\n"
+		"           /' |     /(     )\\      | `\\\r\n"
+		"         /'   \\    | `~~~~~' |    /    `\\\r\n"
+		"       /'      \\   \\  \\ , /  /   /      `\\\r\n"
+		"     /C         \\   |  ___  |   /        C\\\r\n"
+		"    OC       |   `\\  \\ ` ' /  /'   |      CO\r\n"
+		"   OC   \\    |   __\\_/~\\ /~\\_/__   |   \\   CO\r\n"
+		"  Oo   |      \\/'  `    '    '  `\\/     |   oO\r\n"
+		" OC    |      |         :         |     |    CO\r\n"
+		"oOC    /~~~\\_ |    ;,__,',__,;    | _/~~~\\   COo\r\n"
+		"oOC   |      \\\\   '\\   _|_   /`   //      |  COo\r\n"
+		"oOC   |       ~\\    |  _|_   |   /~       |  COo\r\n"
+		"oOC    \\     ,  \\   \\_______/   /  ,     /   COo\r\n"
+		" OC     `\\    \\  \\   \\_____/   /  /    /'    CO\r\n"
+		"  O       `\\   \\, \\   \\   /   / ,/   /'      O\r\n"
+		"   O    /~~\\\\   \\\\_\\  |___|  /_//   /~~\\    O\r\n"
+		"    \\  |    `\\,  \\ |  |   |  | /  ,/    |  /\r\n"
+		"     \\ |     /   /  '''    ``` \\   \\    | /\r\n"
+		"      \\|    /   /               \\   \\   |/\r\n"
+		"       `\\   VVV~                 ~VVV  /'$R\r\n",victim);
+
+           do_quit(victim, "", 666);
+           unlink(buf1);
+           sprintf(buf2, "%s permanently dies the horrible dex-death.",buf1);
            log(buf2, ANGEL, LOG_MORTAL);
            return;
          }
