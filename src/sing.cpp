@@ -1598,8 +1598,8 @@ int execute_song_jig_of_alacrity( byte level, CHAR_DATA *ch, char *arg, CHAR_DAT
 
    for(fvictim = master->followers; fvictim; fvictim = fvictim->next)
    {
-      if(ch == fvictim->follower)
-         continue;
+//      if(ch == fvictim->follower) This affects singer.
+  //       continue;
 
       if(!IS_SET(fvictim->follower->affected_by, AFF_GROUP))
          continue;
@@ -1623,7 +1623,7 @@ int execute_song_jig_of_alacrity( byte level, CHAR_DATA *ch, char *arg, CHAR_DAT
       send_to_char("Your dance quickens your pulse!\r\n", fvictim->follower);
    }
 
-  if(ch != master)
+//  if(ch != master)
    if(ch->in_room == master->in_room)
    {
       SET_BIT(master->affected_by, AFF_HASTE);
@@ -1658,7 +1658,7 @@ int execute_song_fanatical_fanfare(byte level, CHAR_DATA *ch, char *arg, CHAR_DA
 
    if(GET_KI(ch) < 2) // we don't have the ki to keep the song going
    {
-     return intrp_jig_of_alacrity(level, ch, arg, victim, -1);
+     return intrp_song_fanatical_fanfare(level, ch, arg, victim, -1);
    }
 
    if(ch->master && ch->master->in_room == ch->in_room && 
@@ -1690,7 +1690,7 @@ int execute_song_fanatical_fanfare(byte level, CHAR_DATA *ch, char *arg, CHAR_DA
          send_to_char("Your mind returns to its normal state.\n\r", fvictim->follower);
       }
       SET_BIT(fvictim->follower->affected_by2, AFF_INSOMNIA);
-      send_to_char("Your mind races at a thousand miles an hour, to the beat of the song!\r\n", fvictim->follower);
+      send_to_char("Your mind races at a thousand miles an hour, following the beat of the song!\r\n", fvictim->follower);
    }
 
   if(ch != master)
