@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.3 2002/07/23 20:34:33 pirahna Exp $ */
+/* $Id: magic.cpp,v 1.4 2002/07/24 19:01:12 pirahna Exp $ */
 
 extern "C"
 {
@@ -2787,6 +2787,16 @@ int spell_sense_life(byte level, CHAR_DATA *ch,
   return eSUCCESS;
 }
 
+void show_obj_class_size_mini(obj_data * obj, char_data * ch)
+{
+   extern char *extra_bits[];
+
+   
+   for(int i = 12; i < 23; i++)
+      if(IS_SET(obj->obj_flags.extra_flags, 1<<i))
+         csendf(ch, " %s", extra_bits[i]);
+}
+
 int spell_identify(byte level, CHAR_DATA *ch,
   CHAR_DATA *victim, struct obj_data *obj)
 {
@@ -2812,6 +2822,29 @@ int spell_identify(byte level, CHAR_DATA *ch,
   assert(obj || victim);
 
   if (obj) {
+         if(obj->in_room > -1)
+         {
+            // it's an obj in a room.  If it's not a corpse, don't id it
+            if(GET_ITEM_TYPE(obj) != ITEM_CONTAINER || obj->obj_flags.value[3] != 1) {
+               send_to_char("Your magical probing reveals nothing of interest.\r\n", ch);
+               return eSUCCESS;
+            }
+            send_to_char("You probe the contents of the corpse magically....\r\n", ch);
+            // it's a corpse
+            struct obj_data *iobj;
+            for(iobj = obj->contains; iobj; iobj = iobj->next_content)
+            {
+               if(!CAN_SEE_OBJ(ch, iobj))
+                  continue;
+               send_to_char(iobj->short_description, ch);
+               if(IS_SET(iobj->obj_flags.more_flags, ITEM_NO_TRADE)) {
+                  send_to_char(" $BNO_TRADE$R", ch);
+                  show_obj_class_size_mini(iobj, ch);
+               }
+               send_to_char("\r\n", ch);
+            }
+            return eSUCCESS;
+         }
          if(IS_SET(obj->obj_flags.extra_flags, ITEM_DARK) && GET_LEVEL(ch)
                                                        < POWER)
          {

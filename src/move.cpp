@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.7 2002/07/18 18:23:52 pirahna Exp $
+| $Id: move.cpp,v 1.8 2002/07/24 19:01:12 pirahna Exp $
 | move.C
 | Movement commands and stuff.
 */
@@ -843,9 +843,9 @@ int do_climb(struct char_data *ch, char *argument, int cmd)
 
    int retval = move_char(ch, real_room(dest));
    
-   sprintf(buf, "You climb up %s.\r\n", obj->short_description);
+   sprintf(buf, "You climb %s.\r\n", obj->short_description);
    send_to_char(buf, ch);
-   act("$n climbs up $p.", ch, obj, 0, TO_ROOM, INVIS_NULL);
+   act("$n climbs $p.", ch, obj, 0, TO_ROOM, INVIS_NULL);
   
    if(SOMEONE_DIED(retval))
       return retval;

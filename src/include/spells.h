@@ -14,7 +14,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.h,v 1.4 2002/07/23 20:34:37 pirahna Exp $ */
+/* $Id: spells.h,v 1.5 2002/07/24 19:01:16 pirahna Exp $ */
 #include <structs.h> // byte, sh_int
 
 #define MAX_BUF_LENGTH               240
@@ -344,31 +344,17 @@
 #define TYPE_WATER                   (TYPE_HIT + 22)
 
 
-/*
- *  Target types:
- *
- *  bit 0 : IGNORE TARGET
- *  bit 1 : PC/NPC in room
- *  bit 2 : PC/NPC in world
- *  bit 3 : Object held
- *  bit 4 : Object in inventory
- *  bit 5 : Object in room
- *  bit 6 : Object in world
- *  bit 7 : If fighting, and no argument, select tar_char as self
- *  bit 8 : If fighting, and no argument, select tar_char as victim (fighting)
- *  bit 9 : If no argument, select self, if argument check that it IS self.
- */
 #define TAR_IGNORE         1
-#define TAR_CHAR_ROOM      2
-#define TAR_CHAR_WORLD     4
-#define TAR_FIGHT_SELF     8
-#define TAR_FIGHT_VICT    16
-#define TAR_SELF_ONLY     32
-#define TAR_SELF_NONO     64
-#define TAR_OBJ_INV      128
-#define TAR_OBJ_ROOM     256
-#define TAR_OBJ_WORLD    512
-#define TAR_OBJ_EQUIP   1024
+#define TAR_CHAR_ROOM      1<<1
+#define TAR_CHAR_WORLD     1<<2
+#define TAR_FIGHT_SELF     1<<3
+#define TAR_FIGHT_VICT     1<<4
+#define TAR_SELF_ONLY      1<<5
+#define TAR_SELF_NONO      1<<6
+#define TAR_OBJ_INV        1<<7
+#define TAR_OBJ_ROOM       1<<8
+#define TAR_OBJ_WORLD      1<<9
+#define TAR_OBJ_EQUIP      1<<10
 
 typedef	int	SPELL_FUN	( byte level, CHAR_DATA *ch,
 				  char *arg, int type,
