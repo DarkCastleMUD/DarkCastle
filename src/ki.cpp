@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.4 2002/07/13 06:37:04 pirahna Exp $ */
+/* $Id: ki.cpp,v 1.5 2002/07/23 19:04:48 pirahna Exp $ */
 
 extern "C"
 {
@@ -475,11 +475,8 @@ int ki_punch( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
              ch, 0, vict, TO_CHAR, 0);
          act("$n shoves $s hand through your chest, and your lifeblood "
 	     "ebbs away.", ch, 0, vict, TO_VICT, INVIS_VISIBLE);
+         group_gain(ch, vict);
          fight_kill(ch, vict, TYPE_CHOOSE);
-         if (IS_NPC(vict)) 
-         {
-            group_gain(ch, vict);
-         }
          GET_HIT(ch) -= 1/10 * (GET_MAX_HIT(ch));
          if (GET_HIT(ch) <= 0)
 	    GET_HIT(ch) = 1;

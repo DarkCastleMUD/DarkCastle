@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.9 2002/07/18 19:37:59 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.10 2002/07/23 19:04:48 pirahna Exp $ */
 
 extern "C"
 {
@@ -446,8 +446,8 @@ int do_lightning_shield(CHAR_DATA *ch, CHAR_DATA *vict, int dam) {
   update_pos(ch);
     
   if (GET_POS(ch) == POSITION_DEAD) {
-      fight_kill(vict, ch, TYPE_CHOOSE);
       group_gain(vict, ch);
+      fight_kill(vict, ch, TYPE_CHOOSE);
       return eSUCCESS|eCH_DIED;
   }
 
@@ -486,8 +486,8 @@ int do_fireshield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
   update_pos(ch);
     
   if (GET_POS(ch) == POSITION_DEAD) {
-      fight_kill(vict, ch, TYPE_CHOOSE);
       group_gain(vict, ch);
+      fight_kill(vict, ch, TYPE_CHOOSE);
       return eSUCCESS|eCH_DIED;
   }
 
@@ -526,8 +526,8 @@ int do_acidshield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
   update_pos(ch);
     
   if (GET_POS(ch) == POSITION_DEAD) {
-      fight_kill(vict, ch, TYPE_CHOOSE);
       group_gain(vict, ch);
+      fight_kill(vict, ch, TYPE_CHOOSE);
       return eSUCCESS|eCH_DIED;
   }
 
@@ -728,8 +728,8 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
 
   // HA!  skewered the bastard to death!
   if(IS_SET(retval, eVICT_DIED)) { 
-    fight_kill(ch, vict, TYPE_CHOOSE);
     group_gain(ch, vict);
+    fight_kill(ch, vict, TYPE_CHOOSE);
     return eSUCCESS|eVICT_DIED;
   }
   
@@ -1242,11 +1242,8 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
   // Payoff for killing things. 
   if(GET_POS(victim) == POSITION_DEAD)
   {
-    if(!is_pkill(ch, victim))
-      group_gain(ch, victim);
-    if(is_pkill(ch, victim) || IS_ARENA(victim->in_room))
-      fight_kill(ch, victim, TYPE_CHOOSE);
-    else fight_kill(ch, victim, TYPE_RAW_KILL);
+    group_gain(ch, victim);
+    fight_kill(ch, victim, TYPE_CHOOSE);
     return damage_retval(ch, victim, (eSUCCESS|eVICT_DIED));
   } 
   return eSUCCESS;

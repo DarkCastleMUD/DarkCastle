@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_ranger.cpp,v 1.6 2002/07/18 18:23:56 pirahna Exp $ | cl_ranger.C |
+| $Id: cl_ranger.cpp,v 1.7 2002/07/23 19:04:52 pirahna Exp $ | cl_ranger.C |
 Description: Ranger skills/spells */ extern "C"  {
   #include <string.h>
 }
@@ -1266,15 +1266,8 @@ to do it */
   /* Payoff for killing things. */
   if(GET_HIT(victim) < 0)
   {
-    if(!is_pkill(ch, victim))
-      group_gain(ch, victim);
-    if(is_pkill(ch, victim) || IS_ARENA(victim->in_room))
-    {
-      fight_kill(ch, victim, TYPE_CHOOSE);
-      return;
-    }
-    GET_EXP(victim) /= 2;
-    fight_kill(ch, victim, TYPE_RAW_KILL);
+    group_gain(ch, victim);
+    fight_kill(ch, victim, TYPE_CHOOSE);
     return;
   } /* End of Hit < 0 */
 }

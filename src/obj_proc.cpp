@@ -252,10 +252,8 @@ int souldrainer(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
                         act("$N screams as his soul is destroyed by $n's dark magics",
 			    ch, 0, vict, TO_ROOM, NOTVICT);
                         GET_HIT(vict) = -20; 
-			fight_kill(ch, vict, TYPE_CHOOSE);
-                        // TODO - double check this group_gain...we might not want to be calling
-                        // that...i'm not sure though.
 			group_gain(ch, vict);
+			fight_kill(ch, vict, TYPE_CHOOSE);
 			return eSUCCESS;
 
                    } else { // Missed the fucker
@@ -300,8 +298,8 @@ int holyavenger(CHAR_DATA *ch, struct obj_data *obj,  int cmd, char *arg,
                        act("$n cleanly slices $N's head off $S body!", ch, 0, vict, TO_ROOM, NOTVICT);
                        GET_HIT(vict) = -20;
                        make_head(vict);
-                       fight_kill(ch, vict, TYPE_CHOOSE);
                        group_gain(ch, vict); 
+                       fight_kill(ch, vict, TYPE_CHOOSE);
                        return eSUCCESS; /* Zero means kill it! */
                    } else { /* You MISS the fucker! */
                        act("You feel $n's sword slice by your head!", ch, 0, vict, TO_VICT, 0);
@@ -344,8 +342,8 @@ int goldenbatleth(CHAR_DATA *ch, struct obj_data *obj,  int cmd, char *arg,
        break;
    }
    GET_HIT(vict) = -20;
-   fight_kill(ch, vict, TYPE_CHOOSE);
    group_gain(ch, vict); 
+   fight_kill(ch, vict, TYPE_CHOOSE);
    return eSUCCESS; 
 } 
 
