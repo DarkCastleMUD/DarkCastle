@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.185 2004/05/14 02:40:36 urizen Exp $ */
+/* $Id: fight.cpp,v 1.186 2004/05/14 10:35:33 urizen Exp $ */
 
 extern "C"
 {
@@ -951,7 +951,7 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
     chance += str_app[STRENGTH_APPLY_INDEX(ch)].tohit;
     chance += ( GET_AC(vict) / 10 );  // (positive ac hurts you, negative helps)
     chance += weapon_skill_hit_bonus;
-
+/*
     if(IS_SET(vict->combat, COMBAT_STUNNED) ||
        IS_SET(vict->combat, COMBAT_STUNNED2) ||
        IS_SET(vict->combat, COMBAT_SHOCKED))
@@ -960,7 +960,7 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
     if(IS_SET(vict->combat, COMBAT_BASH1) ||
        IS_SET(vict->combat, COMBAT_BASH2))
       chance += 10;
-
+*/
     if(IS_NPC(ch))
       chance += 5;
 
@@ -1486,7 +1486,7 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
     if(check_shieldblock(ch, victim,attacktype))
       return eFAILURE;
 
-    if(check_parry(ch, victim,attacktype) && attacktype != TYPE_HIT) {
+    if(check_parry(ch, victim,attacktype)) {
       if(typeofdamage == DAMAGE_TYPE_PHYSICAL)
       {
         return damage_retval(ch, victim, check_riposte(ch, victim));
@@ -1893,7 +1893,7 @@ int check_riposte(CHAR_DATA * ch, CHAR_DATA * victim)
   }
 
   if (IS_NPC(victim) && number(0,4)) return eFAILURE;
-  else (!IS_NPC(victim) && !has_skill(victim, SKILL_RIPOSTE)) return eFAILURE;
+  else if (!IS_NPC(victim) && !has_skill(victim, SKILL_RIPOSTE)) return eFAILURE;
   if (skill_success(victim, ch, SKILL_RIPOSTE))
     return eFAILURE;
   
@@ -1947,7 +1947,7 @@ bool check_shieldblock(CHAR_DATA * ch, CHAR_DATA * victim, int attacktype)
   modifier += stat_mod[GET_DEX(victim)];
 
   if (IS_NPC(victim)) modifier -= 50;
-  if (skill_success(victim,ch, SKILL_SHIELDBLOCK,modifier))
+  if (!skill_success(victim,ch, SKILL_SHIELDBLOCK,modifier))
     return FALSE;
   
   act("$n blocks $N's attack with $s shield.", victim, NULL, ch, TO_ROOM, NOTVICT);
@@ -1996,7 +1996,7 @@ bool check_parry(CHAR_DATA * ch, CHAR_DATA * victim, int attacktype)
   modifier += speciality_bonus(ch,attacktype);
   if (IS_NPC(victim)) modifier -= 50;
   
-  if(skill_success(victim,ch, SKILL_PARRY, modifier)&&
+  if(!skill_success(victim,ch, SKILL_PARRY, modifier)&&
      !IS_SET(victim->combat, COMBAT_BLADESHIELD1)&&
      !IS_SET(victim->combat, COMBAT_BLADESHIELD2))
      return FALSE;

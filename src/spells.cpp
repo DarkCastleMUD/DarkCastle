@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.78 2004/05/14 01:53:16 urizen Exp $ */
+/* $Id: spells.cpp,v 1.79 2004/05/14 10:35:34 urizen Exp $ */
 
 extern "C"
 {
@@ -883,7 +883,6 @@ char *spells[]=
    "\n"
 };
 
-
 // Figures out how many % of max your damage does
 int dam_percent(int learned, int damage)
 {
@@ -1577,7 +1576,7 @@ bool skill_success(CHAR_DATA *ch, CHAR_DATA *victim, int skillnum, int mod = 0)
 	i -= stat_mod[get_stat(victim,stat)];
     }
   i += mod;
-  if (i < 10) i = 10;
+  if (i < 33) i = 33;
   if (i > number(1,101))
     return TRUE; // Success
   else
