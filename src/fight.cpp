@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.108 2003/05/03 23:48:03 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.109 2003/05/03 23:52:04 pirahna Exp $ */
 
 extern "C"
 {
@@ -2962,8 +2962,12 @@ void group_gain(CHAR_DATA * ch, CHAR_DATA * victim)
        tmp_share = share;
     else tmp_share = (((GET_LEVEL(tmp_ch)+2) * share) / totallevels);  
 
+    int levelmod = GET_LEVEL(victim) - GET_LEVEL(tmp_ch);
+    if(no_members < 2)
+       levelmod += 5; // Solo'rs get xp off lower level mobs
+
     // reduce xp if you are higher level than mob
-    switch(GET_LEVEL(victim) - GET_LEVEL(tmp_ch)) {
+    switch(levelmod) {
       case -1:  break;
       case -2:  break;
       case -3:  break;
