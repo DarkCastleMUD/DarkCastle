@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.13 2003/04/20 22:15:16 pirahna Exp $
+| $Id: wizard.cpp,v 1.14 2004/04/19 22:23:40 urizen Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -810,7 +810,7 @@ void obj_stat(struct char_data *ch, struct obj_data *j)
   extern char *size_bits[];
   extern char *spells[];
   extern char *portal_bits[];
-
+  int its;
   /* For chars */
   extern char *equipment_types[];
   extern char *apply_types[];
@@ -930,11 +930,16 @@ void obj_stat(struct char_data *ch, struct obj_data *j)
 	          j->obj_flags.value[2]);
 	  break;
       case ITEM_WEAPON :
-	  sprintf(buf, "$3Unused(v1)$R: %d (make 0)\n\r$3Todam(v2)d(v3)$R: %dD%d\n\r$3Type(v4)$R: %d",
+int get_weapon_damage_type(struct obj_data * wielded);
+its = get_weapon_damage_type(j) -1000;
+extern char * strs_damage_types[];
+	  sprintf(buf, "$3Unused(v1)$R: %d (make 0)\n\r$3Todam(v2)d(v3)$R: %dD%d\n\r$3Type(v4)$R: %d (%s)",
 	          j->obj_flags.value[0],
 	          j->obj_flags.value[1],
 	          j->obj_flags.value[2],
-	          j->obj_flags.value[3]);
+	          j->obj_flags.value[3],
+		  strs_damage_types[its]
+		  );
 	  break;
       case ITEM_FIREWEAPON : 
 	  sprintf(buf, "$3Tohit(v1)$R: %d\n\r$3Todam(v2)d<v3)$R: %dD%d\n\r$3Type(v4)$R: %d",

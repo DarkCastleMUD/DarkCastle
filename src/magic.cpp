@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.107 2004/04/19 21:41:39 urizen Exp $ */
+/* $Id: magic.cpp,v 1.108 2004/04/19 22:23:36 urizen Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -1160,11 +1160,19 @@ int spell_paralyze(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data
   if (affected_by_spell(victim, SPELL_PARALYZE))
          return eFAILURE;
 
-/*  if(affected_by_spell(victim, SPELL_SLEEP)) {
-     act("$N's mind still has the lingering effects of a past sleep spell active which interferes with the magic required to paralyze the body.",
-         ch, NULL, victim, TO_CHAR, 0);
-     return eFAILURE;
-  }*/
+  if(affected_by_spell(victim, SPELL_SLEEP)) {
+     if (number(1,5)<2)
+     {
+       int retval;
+       if (number(0,1))
+          send_to_char("The combined magics fizzle!\r\n",ch);
+       else {
+          send_to_char("The combined magics cause an explosion!\r\n",ch);
+	  retval = damage(ch,ch,number(5,10), 0, TYPE_MAGIC, 0);
+      }
+       return retval|eFAILURE;
+     }
+  }
 
   /* save the newbies! */
   if(!IS_NPC(ch) && !IS_NPC(victim) && (GET_LEVEL(victim) < 10)) {
@@ -1190,7 +1198,7 @@ int spell_paralyze(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data
       if(!IS_NPC(victim)) {
          act("$n tried to paralyze you!", ch, NULL, victim, TO_VICT, 0);
       }
-      if ((!victim->fighting)) {
+      if ((!victim->fighting) && GET_POS(ch) > POSITION_SLEEPING) {
          retval = attack(victim, ch, TYPE_UNDEFINED);
          retval = SWAP_CH_VICT(retval);
          return retval;
@@ -2554,7 +2562,7 @@ int spell_sleep(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
   if(saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC) < 0)
   {
 	af.type      = SPELL_SLEEP;
-	af.duration  = (ch->level == 50?3:2);
+	af.duration  = 2;//(ch->level == 50?3:2);
 	af.modifier  = 1;
 	af.location  = APPLY_NONE;
 	af.bitvector = AFF_SLEEP;

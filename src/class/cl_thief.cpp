@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.34 2004/04/19 16:48:43 urizen Exp $
+| $Id: cl_thief.cpp,v 1.35 2004/04/19 22:23:38 urizen Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -142,8 +142,8 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if(ch->equipment[WIELD]->obj_flags.value[3] != 11) {
-    send_to_char("You can't stab without a piercing weapon...\n\r", ch);
+  if(ch->equipment[WIELD]->obj_flags.value[3] != 11 && ch->equipment[WIELD]->obj_flags.value[3] != 9) {
+    send_to_char("You can't stab without a stabby weapon...\n\r", ch);
     return eFAILURE;
   }
 

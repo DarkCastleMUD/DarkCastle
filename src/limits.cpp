@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.13 2004/04/19 20:21:02 urizen Exp $ */
+/* $Id: limits.cpp,v 1.14 2004/04/19 22:23:36 urizen Exp $ */
 
 extern "C"
 {
@@ -597,7 +597,8 @@ void food_update( void )
   for(i = character_list; i; i = next_dude) 
   {
     next_dude = i->next;
-
+    if (affected_by_spell(i,SPELL_PARALYZE))
+      continue;
     gain_condition(i,FULL,-1);
     if(!GET_COND(i, FULL)) { // i'm hungry
       if(!IS_MOB(i) && IS_SET(i->pcdata->toggles, PLR_AUTOEAT) && (GET_POS(i) > POSITION_SLEEPING)) {

@@ -1173,7 +1173,7 @@ char_data *)(mob_index[nr].item))->level,
 	goto endLoop;
 int get_weapon_damage_type(struct obj_data * wielded);
 its = get_weapon_damage_type(((struct obj_data *)(obj_index[nr].item)));
-     if (dam && dam != its)
+     if (dam && dam != (its-1000))
   	  continue;
       if(extra)
         for (i = 0; i < 30; i++)

@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.151 2004/04/19 19:40:08 urizen Exp $ */
+/* $Id: fight.cpp,v 1.152 2004/04/19 22:23:36 urizen Exp $ */
 
 extern "C"
 {
@@ -763,15 +763,15 @@ int get_weapon_damage_type(struct obj_data * wielded) {
 
     switch(wielded->obj_flags.value[3]) { 
     case 0:
-    case 1:
-    case 2:  return TYPE_WHIP;     break;
+    case 1:  return TYPE_WHIP;     break;
+    case 2:
     case 3:  return TYPE_SLASH;    break;
     case 4:
-    case 5:
-    case 6:  return TYPE_CRUSH;    break;
+    case 5:  return TYPE_CRUSH;    break;
+    case 6:
     case 7:  return TYPE_BLUDGEON; break;
-    case 8:  return TYPE_STING;    break;
-    case 9:
+    case 8:  
+    case 9:  return TYPE_STING;    break;
     case 10:
     case 11: return TYPE_PIERCE;   break;
     default: 
