@@ -161,7 +161,8 @@ int do_channel(struct char_data *ch, char *arg, int cmd)
     "shout",
     "world",    // 15
     "chaos",
-    "logclan",  
+    "logclan",
+    "warnings",
     "\\@"
   };
 
@@ -185,7 +186,7 @@ int do_channel(struct char_data *ch, char *arg, int cmd)
       }
     }
     else {
-      for(x = 0; x <= 17; x++) {
+      for(x = 0; x <= 18; x++) {
          if(IS_SET(ch->misc, (1<<x)))
            y = 1;
          else
@@ -197,8 +198,8 @@ int do_channel(struct char_data *ch, char *arg, int cmd)
     return eSUCCESS;
   }
 
-  for(x = 0; x <= 17; x++) {
-     if(x == 17) {
+  for(x = 0; x <= 19; x++) {
+     if(x == 19) {
        send_to_char("That type was not found.\n\r", ch);
        return eSUCCESS;
      }

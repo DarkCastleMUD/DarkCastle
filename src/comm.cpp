@@ -1958,8 +1958,7 @@ int close_socket(struct descriptor_data *d)
               world[d->character->in_room].number);
       if(IS_AFFECTED(d->character, AFF_CANTQUIT))
               sprintf(buf, "%s with CQ.", buf);
-      log(buf, GET_LEVEL(d->character) > SERAPH ? GET_LEVEL(d->character) : SERAPH,
-               LOG_SOCKET);
+      log(buf, GET_LEVEL(d->character) > SERAPH ? GET_LEVEL(d->character) : SERAPH, LOG_SOCKET);
       d->character->desc = NULL;
     } else {
       sprintf(buf, "Losing player: %s.",
@@ -2391,4 +2390,22 @@ char *any_one_arg(char *argument, char *first_arg)
 
   *first_arg = '\0';
   return argument;
+}
+
+void warn_if_duplicate_ip(char_data * ch)
+{
+   char buf[256];
+
+   for(descriptor_data * d = descriptor_list; d; d = d->next) 
+   {
+      if( d->character && 
+          strcmp(GET_NAME(ch), GET_NAME(d->character)) &&
+          !strcmp(d->host, ch->desc->host)
+        )
+      {
+        sprintf(buf, "MultipleIP: %s -> %s / %s", d->host, GET_NAME(ch), GET_NAME(d->character));
+        log(buf, IMMORTAL, LOG_WARNINGS );
+      }
+   }
+
 }

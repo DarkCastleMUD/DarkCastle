@@ -11,7 +11,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.30 2003/05/07 04:10:18 pirahna Exp $ */
+/* $Id: nanny.cpp,v 1.31 2003/06/05 00:54:33 pirahna Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -39,13 +39,13 @@ extern "C" {
 #include <dmalloc.h>
 #endif
 
+#include <character.h>
 #include <comm.h>
 #include <connect.h>
 #include <race.h>
 #include <player.h>
 #include <structs.h> // TRUE
 #include <utility.h>
-#include <character.h>
 #include <levels.h>
 #include <ki.h>
 #include <fileinfo.h> // SAVE_DIR
@@ -665,6 +665,8 @@ void nanny(struct descriptor_data *d, char *arg)
          log( log_buf, DEITY, LOG_SOCKET );
       else
          log( log_buf, GET_LEVEL(ch), LOG_SOCKET );
+
+      warn_if_duplicate_ip(ch);
       
       //    SEND_TO_Q(motd, d);
       if(GET_LEVEL(ch) < IMMORTAL)

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.22 2003/06/05 00:05:42 pirahna Exp $
+| $Id: objects.cpp,v 1.23 2003/06/05 00:54:33 pirahna Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -350,23 +350,43 @@ int do_recite(struct char_data *ch, char *argument, int cmd)
     act("$n recites $p.",  ch, scroll, 0, TO_ROOM, INVIS_NULL);
     act("You recite $p which dissolves.",ch,scroll,0,TO_CHAR, 0);
 
-    for (i=1; i<4; i++)
-      if (scroll->obj_flags.value[i] >= 1)
-      {
-        lvl = (int) (1.5 * scroll->obj_flags.value[0]); 
-        retval = ((*spell_info[scroll->obj_flags.value[i]].spell_pointer)
-          ((byte) scroll->obj_flags.value[0], ch, "", SPELL_TYPE_SCROLL, victim, obj, lvl));
-        if(SOMEONE_DIED(retval))
-          break;
-      }
+    int failmark = 35 - GET_INT(ch);
 
-  if(!is_mob || !IS_SET(retval, eCH_DIED)) // it's already been free'd when mob died
-  {     
-    if (equipped)
-      unequip_char(ch, HOLD);
-    extract_obj(scroll);
-  }
-  return eSUCCESS;
+    if( GET_CLASS(ch) == CLASS_MAGIC_USER ||
+        GET_CLASS(ch) == CLASS_CLERIC     ||
+        GET_CLASS(ch) == CLASS_DRUID
+      )
+      failmark -= 5;
+
+    if( number(0, 100) < failmark )
+    {
+      // failed to read scroll
+      act("$n mumbles the words on the scroll and it goes up in flame!", ch, 0, 0, TO_ROOM, 0);
+      send_to_char("You mumble the words and the scroll goes up in flame!\r\n", ch);
+    }
+    else
+    {
+      // success
+      for (i=1; i<4; i++)
+      {
+        if (scroll->obj_flags.value[i] >= 1)
+        {
+          lvl = (int) (1.5 * scroll->obj_flags.value[0]); 
+          retval = ((*spell_info[scroll->obj_flags.value[i]].spell_pointer)
+            ((byte) scroll->obj_flags.value[0], ch, "", SPELL_TYPE_SCROLL, victim, obj, lvl));
+          if(SOMEONE_DIED(retval))
+            break;
+        }
+      }
+    }
+
+    if(!is_mob || !IS_SET(retval, eCH_DIED)) // it's already been free'd when mob died
+    {
+      if (equipped)
+        unequip_char(ch, HOLD);
+      extract_obj(scroll);
+    }
+    return eSUCCESS;
 }
 
 #define GOD_TRAP_ITEM    193
