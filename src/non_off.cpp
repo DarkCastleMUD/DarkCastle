@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: non_off.cpp,v 1.7 2002/08/04 21:13:15 pirahna Exp $
+| $Id: non_off.cpp,v 1.8 2002/08/25 17:36:32 pirahna Exp $
 | non_off.C
 | Description:  Implementation of generic, non-offensive commands.
 */
@@ -249,6 +249,7 @@ char * toggle_txt[] = {
   "bard-songs",
   "auto-eat",
   "summonable",
+  "lfg",
   ""
 };
 
@@ -323,6 +324,11 @@ int do_toggle(struct char_data * ch, char * arg, int cmd)
 	   IS_SET(ch->pcdata->toggles, PLR_SUMMONABLE) ? "on" : "off");
 	 break;
 	 
+         case 11:
+	 sprintf(buf + strlen(buf), "%s\n\r",
+	   IS_SET(ch->pcdata->toggles, PLR_LFG) ? "on" : "off");
+	 break;
+	 
          default:
 	 break;
        }
@@ -385,6 +391,10 @@ int do_toggle(struct char_data * ch, char * arg, int cmd)
     
     case 10:
     do_summon_toggle(ch, "", 9);
+    break;
+    
+    case 11:
+    do_lfg_toggle(ch, "", 9);
     break;
     
     default:
@@ -482,6 +492,24 @@ int do_summon_toggle(struct char_data *ch, char *argument, int cmd)
 	send_to_char( "You may now be summoned by other players.\n\r"
                       "Make _sure_ you want this... they could summon you to your death..\r\n", ch);
 	SET_BIT(ch->pcdata->toggles, PLR_SUMMONABLE);
+    }
+    return eSUCCESS;
+}
+
+int do_lfg_toggle(struct char_data *ch, char *argument, int cmd)
+{
+    if (IS_NPC(ch))
+	return eFAILURE;
+
+    if (IS_SET(ch->pcdata->toggles, PLR_LFG))
+    {
+	send_to_char( "You are no longer Looking For Group.\n\r", ch);
+	REMOVE_BIT(ch->pcdata->toggles, PLR_LFG);
+    }
+    else
+    {
+	send_to_char( "You are now Looking For Group.\n\r", ch);
+	SET_BIT(ch->pcdata->toggles, PLR_LFG);
     }
     return eSUCCESS;
 }

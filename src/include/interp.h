@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.h,v 1.7 2002/08/25 16:13:49 pirahna Exp $ */
+/* $Id: interp.h,v 1.8 2002/08/25 17:36:35 pirahna Exp $ */
 
 #ifndef INTERP_H_
 #define INTERP_H_
@@ -168,6 +168,7 @@ DO_FUN  do_kill;
 DO_FUN  do_layhands;
 DO_FUN  do_leave;
 DO_FUN  do_levels;
+DO_FUN  do_lfg_toggle;
 DO_FUN  do_linkdead;
 DO_FUN  do_linkload;
 DO_FUN  do_load;

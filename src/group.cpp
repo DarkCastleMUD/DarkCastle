@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: group.cpp,v 1.6 2002/08/13 18:25:08 pirahna Exp $
+| $Id: group.cpp,v 1.7 2002/08/25 17:36:32 pirahna Exp $
 | group.C
 | Description:  Group related commands; join, abandon, follow, etc..
 */
@@ -120,6 +120,7 @@ int do_found(CHAR_DATA *ch, char *argument, int cmd)
   }
 
   SET_BIT(ch->affected_by, AFF_GROUP);
+  REMOVE_BIT(ch->pcdata->toggles, PLR_LFG);
   return eSUCCESS;  
 }
 
@@ -341,6 +342,8 @@ int do_group(struct char_data *ch, char *argument, int cmd)
 		act("$n is now a group member.", victim, 0, 0, TO_ROOM, ASLEEP);
 		act("You are now a group member.", victim, 0, 0, TO_CHAR, ASLEEP);
 		SET_BIT(victim->affected_by, AFF_GROUP);
+                if(!IS_NPC(victim))
+                   REMOVE_BIT(victim->pcdata->toggles, PLR_LFG);
         }
         return eSUCCESS;
       }

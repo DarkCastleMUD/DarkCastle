@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: who.cpp,v 1.5 2002/07/06 22:21:27 pirahna Exp $
+| $Id: who.cpp,v 1.6 2002/08/25 17:36:32 pirahna Exp $
 | who.C
 | Commands for who, maybe? :P
 */
@@ -288,7 +288,7 @@ int do_who(struct char_data *ch, char *argument, int cmd)
     int   nomatch = 0;
     int   currentmatch = 0;
     int   hasholylight = 0;
-
+    int   lfgcheck = 0;
 
     char* immortFields[] = {
         "   Immortal  ",
@@ -347,6 +347,10 @@ int do_who(struct char_data *ch, char *argument, int cmd)
         else if(is_abbrev(oneword, "other")) {
             sexcheck = 1;
             sextype = SEX_NEUTRAL;
+            currentmatch = 1;
+        }
+        else if(is_abbrev(oneword, "lfg")) {
+            lfgcheck = 1;
             currentmatch = 1;
         }
         else for(clss = 0; clss <= 12; clss++)  {
@@ -417,6 +421,7 @@ int do_who(struct char_data *ch, char *argument, int cmd)
                        ) && !charmatchistrue
           )                                                                     continue;
         if(levelarg > 0 && IS_ANONYMOUS(i) && !hasholylight)                    continue;
+        if(lfgcheck && !IS_SET(i->pcdata->toggles, PLR_LFG))                   continue;
         
         infoField = infoBuf;
         extraBuf[0] = '\0';
@@ -460,7 +465,10 @@ int do_who(struct char_data *ch, char *argument, int cmd)
             strcpy(tailBuf, "$1$B(writing)");
         }
         else *tailBuf = '\0'; // clear it
-        
+
+        if(IS_SET(i->pcdata->toggles, PLR_LFG))
+           strcat(tailBuf, "$3(LFG)");
+
         if(i->clan && (clan = get_clan(i)) && GET_LEVEL(i) < OVERSEER) 
            sprintf(buf,"[%s] $3%s %s %s $2[%s$R$2] %s$R\n\r",
                 infoField,   GET_SHORT(i),   i->title,
