@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: const.cpp,v 1.64 2003/08/12 03:45:33 pirahna Exp $ */
+/* $Id: const.cpp,v 1.65 2003/08/12 03:59:02 pirahna Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -202,6 +202,8 @@ char *spell_wear_off_msg[] =
   "Your serene aura of holiness fades.",
   "!DismissFamiliar!",
   "!DismissCorpse!",
+  "Your blessed halo fades.",
+  "You don't feel quite so angry anymore.",
   "!UNUSED!"
 };
 
@@ -1001,6 +1003,7 @@ struct class_skill_defines w_skills[] = {
 {    "slashing",	SKILL_SLASHING_WEAPONS,	30,	90,	3023,	NULL },
 {    "whipping",	SKILL_WHIPPING_WEAPONS,	30,	90,	3023,	NULL },
 {    "crushing",	SKILL_CRUSHING_WEAPONS,	30,	90,	3023,	NULL },
+{    "tactics",		SKILL_TACTICS,		31,	90,	-2,	"The guardian of this guild has the knowledge you seek.  Speak the name of this skill in his presence." },
 {    "shield block",    SKILL_SHIELDBLOCK,      33,     50,     -2, 	"To learn this skill you must seek its master, the God of War in his arena.  Ask him to please teach you." },
 {    "two handers",     SKILL_TWO_HANDED_WEAPONS,34,	70,	3023,	NULL },
 {    "stun",		SKILL_STUN,		35,	50,	-2, 	"Go to see any master shaolin monk." },
@@ -1033,6 +1036,7 @@ struct class_skill_defines t_skills[] = {
 {    "piercing",	SKILL_PIERCEING_WEAPONS,30,	80,	3022,	NULL },
 {    "slashing",	SKILL_SLASHING_WEAPONS,	30,	80,	3022,	NULL },
 {    "crushing",	SKILL_CRUSHING_WEAPONS,	30,	80,	3022,	NULL },
+{    "deceit",		SKILL_DECEIT,		31,	90,	-2,	"The guardian of this guild has the knowledge you seek.  Speak the name of this skill in his presence." },
 {    "dualbackstab",	SKILL_DUAL_BACKSTAB,	40,	80,	-2, 	"Look for a thief who travels in the most dangerous of places." },
 {    "\n",		0,			1,	0,	0,	NULL}
 };
@@ -1066,6 +1070,7 @@ struct class_skill_defines a_skills[] = {
 {    "weaken",		SPELL_WEAKEN,		23,	90,	-2,	"What tangled web we weave, when we first deceive." },
 {    "enchant weapon",	SPELL_ENCHANT_WEAPON,	24,	90,10005,	NULL },
 {    "fireball",	SPELL_FIREBALL,		28,	90,	10005,	NULL },
+{    "visage of hate",  SPELL_VISAGE_OF_HATE,	31,	90,	-2,	"The guardian of this guild has the knowledge you seek.  Speak the name of this spell in his presence." },
 {    "beacon",		SPELL_BEACON,		33,	90,	10005,	NULL },
 {    "dispel good",	SPELL_DISPEL_GOOD,	35,	90, 10005,	NULL },
 {    "firestorm",	SPELL_FIRESTORM,	38,	90,	10005,	NULL },
@@ -1105,6 +1110,7 @@ struct class_skill_defines p_skills[] = {
 {    "sense life",	SPELL_SENSE_LIFE,	26,	90,	-2,	"Find the Black Queen in the game of life." },
 {    "strength",	SPELL_STRENGTH,		27,	90,	10006,	NULL },
 {    "heal",		SPELL_HEAL,		30,	90,	10006,	NULL },
+{    "blessed halo",	SPELL_BLESSED_HALO,	31,	90,	-2,	"The guardian of this guild has the knowledge you seek.  Speak the name of this spell in his presence." },
 {    "protection from evil", SPELL_PROTECT_FROM_EVIL, 33, 90,	-2,	"A short rotund priest with a face you could cut diamonds with can help you."},
 {    "harm",		SPELL_HARM,		35,	90,	-2,	"You want an Abbot of mystical power who stands menancingly." },
 {    "dispel evil",	SPELL_DISPEL_EVIL,	40,	90,	10006,	NULL },
@@ -1135,6 +1141,7 @@ struct class_skill_defines b_skills[] = {
 {    "piercing",	SKILL_PIERCEING_WEAPONS,30,	90,	10007,	NULL },
 {    "slashing",	SKILL_SLASHING_WEAPONS,	30,	90,	10007,	NULL },
 {    "crushing",	SKILL_CRUSHING_WEAPONS,	30,	90,	10007,	NULL },
+{    "ferocity",	SKILL_FEROCITY,		31,	90,	-2,	"The guardian of this guild has the knowledge you seek.  Speak the name of this skill in his presence." },
 {    "two handers",     SKILL_TWO_HANDED_WEAPONS,34,	50,	10007,	NULL },
 {    "berserk",		SKILL_BERSERK,		40,	90,	-2, 	"A being of pure rage who lives in a tower, he is a overgrown lizard with a forked tongue." },
 {    "\n",		0,			1,	0,	0, 	NULL}
@@ -1157,6 +1164,7 @@ struct class_skill_defines k_skills[] = {
 {    "sense",		KI_SENSE+KI_OFFSET,	20,	80,	-2, 	"A creature who lives in the damp dark, and causes it, could know."},
 {    "stance",		KI_STANCE+KI_OFFSET,	24,	80,	-2, "A fair-skinned warrior of untold skill in weapons awaits your challenge in the thundering depths."},
 {    "speed",		KI_SPEED+KI_OFFSET,	27,	80,	-2, 	"Hmm, I do not know where the knowledge went, but I sense it on the east continent, moving around."},
+{    "agility",		KI_AGILITY+KI_OFFSET,	31,	90,	-2,	"The guardian of this guild has the knowledge you seek.  Speak the name of this spell in his presence." },
 {    "storm",		KI_STORM+KI_OFFSET,	35,	80,	-2, 	"See a purveyer of storms about this one"},
 {    "disrupt",		KI_DISRUPT+KI_OFFSET,	41,	80,	10008, NULL},
 {    "blast",		KI_BLAST+KI_OFFSET,	45,	80,	-2, 	"The brother of a secret monastery who is constantly plagued by indegestion can help you out."},
