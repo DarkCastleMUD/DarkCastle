@@ -77,6 +77,7 @@ char * innate_skills[] =
    "innate evasion timer",
    "innate shadowslip timer",
    "innate repair timer",
+   "innate skill timer",
    "\n"
 };
 
