@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_monk.cpp,v 1.16 2004/05/14 00:04:15 urizen Exp $
+| $Id: cl_monk.cpp,v 1.17 2004/05/14 15:51:50 urizen Exp $
 | cl_monk.C
 | Description:  Monk skills.
 */
@@ -215,7 +215,7 @@ int do_stun(struct char_data *ch, char *argument, int cmd)
 
   skill_increase_check(ch, SKILL_STUN, has_skill(ch,SKILL_STUN), SKILL_INCREASE_MEDIUM);
 
-  if(skill_success(ch,victim, SKILL_STUN) ) {
+  if(!skill_success(ch,victim, SKILL_STUN) ) {
     act("$n attempts to hit you in your solar plexus!  You block $s attempt.", ch, NULL, victim, TO_VICT , 0);
     act("You attempt to hit $N in $s solar plexus...   YOU MISS!", ch, NULL, victim, TO_CHAR , 0);
     act("$n attempts to hit $N in $S solar plexus...   $e MISSES!", ch, NULL, victim, TO_ROOM, NOTVICT );

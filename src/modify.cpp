@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: modify.cpp,v 1.9 2004/05/14 14:25:25 urizen Exp $ */
+/* $Id: modify.cpp,v 1.10 2004/05/14 15:51:48 urizen Exp $ */
 
 extern "C"
 {
@@ -633,11 +633,10 @@ struct help_index_element *build_help_index(FILE *fl, int *num)
 char *next_page(char *str)
 {
   int col = 1, line = 1, spec_code = FALSE;
-  if (*str == '\0') return NULL;
   for (;; str++) {
     // If end of string, return NULL. 
     if (*str == '\0')
-      return str; // Test fix, see if it works better now..
+      return NULL; 
 
     // Check for $ ANSI codes.  They have to be kept together
     // Might wanna put a && *(str+1) != '$' so that $'s are wrapped...
