@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.96 2003/01/30 05:48:10 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.97 2003/03/04 05:08:28 pirahna Exp $ */
 
 extern "C"
 {
@@ -932,7 +932,8 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
 
   if(!IS_SET(retval, eCH_DIED) && 
      !IS_SET(retval, eVICT_DIED) && 
-      IS_SET(retval, eSUCCESS))
+      IS_SET(retval, eSUCCESS) &&
+     ch->fighting) // make sure it didn't flee
   {
     if(wielded)
        retval = weapon_spells(ch, vict, weapon);
@@ -1333,6 +1334,7 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
 
   struct affected_type * pspell = NULL;
   if(GET_LEVEL(victim) < IMMORTAL && 
+     dam > 0 &&
      (
       (pspell = affected_by_spell(victim, SPELL_STONE_SHIELD)) ||
       (pspell = affected_by_spell(victim, SPELL_GREATER_STONE_SHIELD))

@@ -275,6 +275,8 @@ int do_innate_bloodlust(CHAR_DATA *ch, char *arg, int cmd)
       return eSUCCESS;
    }
 
+   SET_BIT(ch->combat, COMBAT_ORC_BLOODLUST);
+
    struct affected_type af;
    af.type = SKILL_INNATE_BLOODLUST;
    af.duration = 40;
