@@ -59,19 +59,39 @@ struct golem_data
   int special_res; // Resists(stone).
   int ac; // armor
   char *creation_message;
+  char *shatter_message;
+  char *release_message;
 };
 
 const struct golem_data golem_list[] = {
-  {"iron", "iron golem", "an iron golem", "An iron golem stands here, awaiting its master's commands. ", 
-    "The golem looks inanimate, except when it performs some task for its\nmaster. During those periods it moves with suprising speed.\r\n",
+  {"iron", "iron golem enchanted", "an enchanted iron golem", "A powerfully enchanted iron golem stands here, guarding its master.\n", 
+    "The iron golem is bound by its master's magics.  A mindless automaton,\nthe iron golem is one of the most powerful forces available in a\nwizard's aresenal.  Nearly a full 8 feet tall and weighing several\ntons, this behemoth of pure iron is absolutely loyal to its master and\nsilently follows commands without fail.\n",
     1000, 15, 5, 25, 50, {107, 108, 109, 0, 7004}, AFF_LIGHTNINGSHIELD, 0, -100,
-    "Hey, you like.. made an iron golem.\r\n"},
- {  "stone","stone golem", "a stone golem", "A stone golem stands here, awaiting its master's commands.",
-    "The golem looks inanimate, except when it performs some task for its\nmaster. During those periods it moves with suprising speed.\r\n",
-    2000, 5, 5, 25, 50, {104,105,106,0,7003}, 0, ISR_PIERCE, -100, "Stone golem created.\r\n"}
+    "There is a grinding and shrieking of metal as an iron golem is slowly formed.\n",
+    "Unable to sustain further damage, the iron golem falls into unrecoverable scrap.",
+    "As the magic binding it is released, the iron golem rusts to pieces."
+},
+ {  "stone","stone enchanted golem", "a enchant stone golem", "A powerfully enchanted stone golem stands here, guarding its master.\n",
+    "The stone golem is bound by its caster's magics.  A mindless automaton,\nthe stone golem is one of the sturdiest and most resilliant creatures\nknown in the realms.  Nearly a full 8 feet tall and weighing several\ntons, this mountain of rock is absolutely loyal to its master and\nsilently follows orders without fail.\n",
+    2000, 5, 5, 25, 50, {104,105,106,0,7003}, 0, ISR_PIERCE, -100, "There is a deep rumbling as a stone golem slowly rises from the ground.\n",
+    "Unable to sustain further damage, the stone golem shaters to pieces.",
+    "As the magic binding it is released, the golem crumbles to dust."
+}
+
 };
 
 #define MAX_GOLEMS 2 // amount of golems above +1
+
+void shatter_message(CHAR_DATA *ch)
+{
+   int golemtype = !IS_AFFECTED2(ch, AFF_GOLEM); // 0 or 1
+   act(golem_list[golemtype].shatter_message, ch, 0, 0, TO_ROOM,0);
+}
+void release_message(CHAR_DATA *ch)
+{
+   int golemtype = !IS_AFFECTED(ch, AFF_GOLEM);
+   act(golem_list[golemtype].release_message, ch, 0, 0, TO_ROOM, 0);
+}
 
 void golem_gain_exp(CHAR_DATA *ch)
 {
