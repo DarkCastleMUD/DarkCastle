@@ -7,7 +7,7 @@
 /* Revision History                                                          */
 /* 12/09/2003   Onager   Tweaked do_join() to remove combat-related bits     */
 /*****************************************************************************/
-/* $Id: arena.cpp,v 1.6 2004/04/13 12:59:00 urizen Exp $ */
+/* $Id: arena.cpp,v 1.7 2004/07/25 05:53:41 rahz Exp $ */
 
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
@@ -90,6 +90,8 @@ int do_arena(CHAR_DATA *ch, char *arg, int cmd)
       arena[2] = atoi(buf3);
       if(!strcmp(buf3, "chaos"))
         arena[2] = -2;
+      if(!strcmp(buf3, "potato"))
+        arena[2] = -3;
       if(arena[2] > 0) {
           sprintf(buf, "## Only %d can join the bloodbath!\n\r", arena[2]);
           send_info(buf);
@@ -98,6 +100,10 @@ int do_arena(CHAR_DATA *ch, char *arg, int cmd)
           sprintf(buf, "## Only clan members can join the bloodbath!\r\n");
           send_info(buf);
           logf(111, LOG_CHAOS, "%s started a CC.", GET_NAME(ch));
+      }
+      if(arena[2] == -3) {
+          sprintf(buf, "## Special POTATO Arena!!\r\n");
+          send_info(buf);
       }
   }
   send_to_char("The Arena has been opened for the specified levels.\n\r", ch); 
@@ -126,6 +132,7 @@ int do_joinarena(CHAR_DATA *ch, char *arg, int cmd)
     send_to_char("Only clan members may join this arena.\r\n", ch);
     return eFAILURE;
   }
+
   if(IS_SET(world[ch->in_room].room_flags, ARENA)) {
     send_to_char("You are already there!\n\r", ch);
     return eFAILURE; 

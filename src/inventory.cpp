@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.43 2004/07/11 02:05:06 urizen Exp $
+| $Id: inventory.cpp,v 1.44 2004/07/25 05:53:41 rahz Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -947,6 +947,8 @@ int do_give(struct char_data *ch, char *argument, int cmd)
   char arg[80];
   int amount;
   int retval;
+  extern int arena[4];
+  extern int top_of_world;
   struct char_data *vict;
   struct obj_data *obj;
 
@@ -1129,13 +1131,25 @@ int do_give(struct char_data *ch, char *argument, int cmd)
 
     if ((1+IS_CARRYING_N(vict)) > CAN_CARRY_N(vict))
     {
-	act("$N seems to have $S hands full.", ch, 0, vict, TO_CHAR, 0);
-	return eFAILURE;
+       if((ch->in_room >= 0 && ch->in_room <= top_of_world) && !strcmp(obj_name, "potato") &&
+          IS_SET(world[ch->in_room].room_flags, ARENA) && IS_SET(world[vict->in_room].room_flags, ARENA) &&
+          arena[2] == -3) {
+         ;
+       } else {
+         act("$N seems to have $S hands full.", ch, 0, vict, TO_CHAR, 0);
+         return eFAILURE;
+       }
     }
     if (obj->obj_flags.weight + IS_CARRYING_W(vict) > CAN_CARRY_W(vict))
     {
-	act("$E can't carry that much weight.", ch, 0, vict, TO_CHAR, 0);
-	return eFAILURE;
+      if((ch->in_room >= 0 && ch->in_room <= top_of_world) && !strcmp(obj_name, "potato") &&
+         IS_SET(world[ch->in_room].room_flags, ARENA) && IS_SET(world[vict->in_room].room_flags, ARENA) &&
+         arena[2] == -3) {
+         ;
+      } else {
+        act("$E can't carry that much weight.", ch, 0, vict, TO_CHAR, 0);
+        return eFAILURE;
+      } 
     }
     if(IS_SET(obj->obj_flags.more_flags, ITEM_UNIQUE)) {
       if(search_char_for_item(vict, obj->item_number)) {

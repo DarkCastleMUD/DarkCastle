@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.234 2004/07/24 01:24:09 rahz Exp $ */
+/* $Id: fight.cpp,v 1.235 2004/07/25 05:53:41 rahz Exp $ */
 
 extern "C"
 {
@@ -3885,11 +3885,20 @@ int is_stunned(CHAR_DATA *ch)
 
 int can_attack(CHAR_DATA *ch)
 {
+  extern int arena[4];
+
   if((ch->in_room >= 0 && ch->in_room <= top_of_world) &&
     IS_SET(world[ch->in_room].room_flags, ARENA) && ArenaIsOpen()) {
-    send_to_char("Wait until it closes\n\r", ch);
+    send_to_char("Wait until it closes!\n\r", ch);
     return FALSE;
   }
+
+  if((ch->in_room >= 0 && ch->in_room <= top_of_world) &&
+    IS_SET(world[ch->in_room].room_flags, ARENA) && arena[2] == -3) {
+    send_to_char("You can't attack in a potato arena, go find a potato would ya?!\n\r", ch);
+    return FALSE;
+  }
+
   if(IS_AFFECTED(ch, AFF_PARALYSIS))
     return FALSE;
   if(is_stunned(ch))
