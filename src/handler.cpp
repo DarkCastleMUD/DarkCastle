@@ -21,7 +21,7 @@
  *  12/08/2003   Onager    Added check for charmies and !charmie eq to     *
  *                         equip_char()                                    *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.53 2004/05/21 05:41:41 urizen Exp $ */
+/* $Id: handler.cpp,v 1.54 2004/05/21 14:20:53 urizen Exp $ */
     
 extern "C"
 {
@@ -2288,7 +2288,14 @@ void extract_char(CHAR_DATA *ch, bool pull)
 	log( "Extract_char: NOWHERE", ANGEL, LOG_BUG );
         return;
     }
-
+   if (!IS_NPC(ch)) {
+	if (ch->pcdata->golem)
+	{
+	  if (ch->pcdata->golem->in_room)
+	   act("$n shatters!", ch->pcdata->golem, 0, 0, TO_ROOM, 0);
+	  extract_char(ch->pcdata->golem, TRUE);
+	}
+   }
    if (IS_NPC(ch) && mob_index[ch->mobdata->nr].virt == 8)
     {
 	if (ch->level > 1)
