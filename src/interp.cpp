@@ -16,7 +16,7 @@
 /* 12/08/2003   Onager   Added chop_half() to work like half_chop() but    */
 /*                       chopping off the last word.                       */
 /***************************************************************************/
-/* $Id: interp.cpp,v 1.49 2004/07/03 11:44:13 urizen Exp $ */
+/* $Id: interp.cpp,v 1.50 2004/07/04 01:28:30 urizen Exp $ */
 
 extern "C"
 {
@@ -604,7 +604,7 @@ int command_interpreter( CHAR_DATA *ch, char *pcomm, bool procced  )
       return eSUCCESS;
     }
 
-    if (!IS_NPC(ch) && IS_SET(ch->combat, COMBAT_BERSERK)) {
+    if (IS_SET(ch->combat, COMBAT_BERSERK)) {
        if (ch->fighting) {
           send_to_char("You've gone BERSERK! ALL you can do is KILL!\n\r", ch);
           return eSUCCESS;
