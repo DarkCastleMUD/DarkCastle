@@ -664,6 +664,12 @@ int gazeofgaiot(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
    if (cmd != 187) return eFAILURE;
    if (!ch->equipment[WEAR_FACE] || real_object(9603) != ch->equipment[WEAR_FACE]->item_number)
      return eFAILURE;
+
+   if (affected_by_spell(ch,SKILL_FEARGAZE)) {
+      send_to_char("You need to build up more hatred before you can unleash it again.\r\n",ch);
+      return eFAILURE;
+   }
+
    if (!(victim = get_char_room_vis(ch, vict))) {
       if (ch->fighting) {
          victim = ch->fighting;
