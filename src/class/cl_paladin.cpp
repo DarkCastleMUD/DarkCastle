@@ -98,7 +98,7 @@ int do_harmtouch(struct char_data *ch, char *argument, int cmd)
      send_to_char("Your god refuses you.\r\n", ch);
    }
    else {
-     send_to_char("Praying fervently to your god, you direct the hate and despair from deep inside you at your victim.", ch);
+     send_to_char("Praying fervently to your god, you direct the hate and despair from deep inside you at your victim.\r\n", ch);
      act("Your body surges with holy wrath as $N's hate and despair pour into you!", victim, 0, ch, TO_CHAR, 0);
      act("The surrounding light seems to dim as $n's life force pours from $s body into $N", ch, 0, victim, TO_ROOM, NOTVICT);
 
