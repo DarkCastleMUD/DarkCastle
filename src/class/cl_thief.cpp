@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.42 2004/04/22 23:07:20 urizen Exp $
+| $Id: cl_thief.cpp,v 1.43 2004/04/23 11:55:07 urizen Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -99,7 +99,7 @@ int do_eyegouge(CHAR_DATA *ch, char *argument, int cmd)
 
   if(!(victim = get_char_room_vis(ch, name)) && (victim = ch->fighting)==NULL) {
     send_to_char("There's noone like that here to eyegouge.\n\r", ch);
-    return eFAILURE;
+	    return eFAILURE;
   }
   if (IS_AFFECTED(victim, AFF_BLIND))
   {
@@ -230,7 +230,7 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
   was_in = ch->in_room;
 
   // if they're hurt they are going to be suspicious of backstabs so half the chance
-  if( ( (float)GET_HIT(victim) / (float)GET_MAX_HIT(victim) ) < .7) 
+  if( ( (tfloat)GET_HIT(victim) / (float)GET_MAX_HIT(victim) ) < .7) 
   {
     chance /= 2;
     chance += 5;
@@ -1078,7 +1078,7 @@ int do_pocket(CHAR_DATA *ch, char *argument, int cmd)
     set_cantquit( ch, victim );
     send_to_char("Oops..\r\n", ch);
     ohoh = TRUE;
-    if(!number(0, 6)) {
+	    if(!number(0, 6)) {
       act("You discover that $n has $s hands in your wallet.", ch,0,victim,TO_VICT, 0);
       act("$n tries to steal gold from $N.", ch, 0, victim, TO_ROOM, NOTVICT|INVIS_NULL);
     }
@@ -1086,7 +1086,7 @@ int do_pocket(CHAR_DATA *ch, char *argument, int cmd)
   {
     // Steal some gold coins
     percent = learned / 10 + number(-1,1);
-    gold = (int) ((float)GET_GOLD(victim)*(float)(percent/100));
+    gold = (int) ((float)GET_GOLD(victim)*(float)((float)percent/100.0));
 //    gold = MIN(10000, gold);
     if (gold > 0) {
       GET_GOLD(ch)     += gold;
