@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.107 2004/07/13 03:12:24 urizen Exp $ */
+/* $Id: spells.cpp,v 1.108 2004/07/13 12:42:48 urizen Exp $ */
 
 extern "C"
 {
@@ -314,21 +314,21 @@ struct spell_info_type spell_info [ ] =
 
  { /* 115 */ 12, POSITION_STANDING, 20, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_camouflague, SKILL_INCREASE_HARD },
 
- { /* 116 */ 12, POSITION_STANDING, 24, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_farsight, 0 },
+ { /* 116 */ 12, POSITION_STANDING, 24, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_farsight, SKILL_INCREASE_HARD },
 
- { /* 117 */ 12, POSITION_STANDING, 20, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_freefloat, 0 },
+ { /* 117 */ 12, POSITION_STANDING, 20, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_freefloat, SKILL_INCREASE_HARD },
 
- { /* 118 */ 12, POSITION_STANDING, 33, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_insomnia, 0 },
+ { /* 118 */ 12, POSITION_STANDING, 33, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_insomnia, SKILL_INCREASE_HARD  },
 
- { /* 119 */ 12, POSITION_STANDING, 50, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_shadowslip, 0 },
+ { /* 119 */ 12, POSITION_STANDING, 50, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_shadowslip, SKILL_INCREASE_HARD  },
 
  { /* 120 */ 12, POSITION_STANDING, 33, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_resist_energy, SKILL_INCREASE_HARD },
 
- { /* 121 */ 12, POSITION_STANDING, 20, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_staunchblood, 0 },
+ { /* 121 */ 12, POSITION_STANDING, 20, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_staunchblood, SKILL_INCREASE_HARD  },
 
  { /* 122 */ 24, POSITION_STANDING, 500, TAR_IGNORE, cast_create_golem, SKILL_INCREASE_EASY },
 
- { /* 123 */ 12, POSITION_STANDING, 60, TAR_IGNORE, spell_reflect, 0 },
+ { /* 123 */ 12, POSITION_STANDING, 60, TAR_IGNORE, spell_reflect, SKILL_INCREASE_HARD },
 
  { /* 124 */ 12, POSITION_FIGHTING, 22, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_OBJ_ROOM, cast_dispel_minor, SKILL_INCREASE_MEDIUM },
 
