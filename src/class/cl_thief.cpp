@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.62 2004/05/27 21:17:02 urizen Exp $
+| $Id: cl_thief.cpp,v 1.63 2004/05/27 21:36:15 urizen Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -639,8 +639,8 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
         act("$n tries to steal something from $N.", ch, 0, victim, TO_ROOM, INVIS_NULL|NOTVICT);
       } else {
 	send_to_char("You managed to keep them unaware of your failed attempt.\r\n",ch);
+	return eFAILURE;
       }
-      return eFAILURE;
     } 
     else 
     { /* Steal the item */
