@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.h,v 1.21 2004/04/21 21:47:46 urizen Exp $ */
+/* $Id: interp.h,v 1.22 2004/04/21 22:18:52 urizen Exp $ */
 
 #ifndef INTERP_H_
 #define INTERP_H_
@@ -122,7 +122,7 @@ DO_FUN  do_echo;
 DO_FUN  do_emote;
 DO_FUN  do_enter;
 DO_FUN  do_equipment;
-DO_FUN  do_eyegogue;
+DO_FUN  do_eyegouge;
 DO_FUN  do_examine;
 DO_FUN  do_exits;
 DO_FUN  do_ferocity;

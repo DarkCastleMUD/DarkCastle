@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.37 2004/04/21 21:47:45 urizen Exp $
+| $Id: cl_thief.cpp,v 1.38 2004/04/21 22:18:47 urizen Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -90,15 +90,15 @@ int palm(CHAR_DATA *ch, struct obj_data *obj_object,
   return eSUCCESS;
 }
 
-int do_eyegogue(CHAR_DATA *ch, char *argument, int cmd)
+int do_eyegouge(CHAR_DATA *ch, char *argument, int cmd)
 {
   CHAR_DATA *victim;
   char name[256];
-  int learned = has_skill(ch, SKILL_EYEGOGUE);
+  int learned = has_skill(ch, SKILL_EYEGOUGE);
   argument = one_argument(argument,name);
 
   if(!(victim = get_char_room_vis(ch, name))) {
-    send_to_char("There's noone like that here to eyegogue.\n\r", ch);
+    send_to_char("There's noone like that here to eyegouge.\n\r", ch);
     return eFAILURE;
   }
   if (IS_AFFECTED(victim, AFF_BLIND))
@@ -106,22 +106,36 @@ int do_eyegogue(CHAR_DATA *ch, char *argument, int cmd)
     send_to_char("They're already blinded!\r\n",ch);
     return eFAILURE;
   }
+  if(victim == ch) {
+    send_to_char("That sounds... stupid.\n\r", ch);
+    return eFAILURE;
+  }
+ if(!can_be_attacked(ch, victim) || !can_attack(ch))
+    return eFAILURE;
+
+  if (!learned)
+  {
+    send_to_char("You would.. if you knew how.\r\n",ch);
+    return eFAILURE;
+  }
   int retval = 0;
-  if (learned > number(1,101))
+  if (learned < number(1,101))
   {
      act("You miss $N's eye.",ch, NULL, victim, TO_CHAR, 0);
      act("$n walks up to $N and tries to push $s thumb into $N's eye, but misses!",ch, NULL, victim, TO_ROOM, NOTVICT);
      act("$n walks up to you and tries to push $s thumb into your eye, but misses!",ch, NULL, victim, TO_VICT, 0);
+     retval = damage(ch,victim, 0, TYPE_UNDEFINED, SKILL_EYEGOUGE, 0);
   } else {
      act("You press your thumb into $N's eye.",ch, NULL, victim, TO_CHAR, 0);
      act("$n walks up to $N and pushes $s thumb into $N's eye!",ch, NULL, victim, TO_ROOM, NOTVICT);
      act("$n walks up to you and pushes $s thumb into your eye! Ow!",ch, NULL, victim, TO_VICT, 0);
      int dam = 100 * learned>50?learned:50;
-     retval = damage(ch, victim, dam, TYPE_UNDEFINED, SKILL_EYEGOGUE, 0);
+     retval = damage(ch, victim, dam, TYPE_UNDEFINED, SKILL_EYEGOUGE, 0);
      SET_BIT(victim->affected_by, AFF_BLIND);
-     SET_BIT(victim->combat, COMBAT_THI_EYEGOGUE);
+     SET_BIT(victim->combat, COMBAT_THI_EYEGOUGE);
   }
   WAIT_STATE(ch, PULSE_VIOLENCE);
+   skill_increase_check(ch, SKILL_EYEGOUGE, learned, SKILL_INCREASE_MEDIUM);
   return retval | eSUCCESS;
 }
 

@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.76 2004/04/21 21:50:21 urizen Exp $ */
+/* $Id: const.cpp,v 1.77 2004/04/21 22:18:45 urizen Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1059,7 +1059,7 @@ struct class_skill_defines t_skills[] = {
 {    "blindfighting",   SKILL_BLINDFIGHTING, 19, 60,     -2, "Only on the astral planes can you find what you seek.",{0,0}},
 {    "steal",		SKILL_STEAL,		20,	80,	-2, "There's a little thief around town named Caijin.  Annoying little bastard.  Ask him to please teach you.",{0,0} },
 {    "disarm",		SKILL_DISARM,		23,	60,	-2, "The duke of Marok is who you need to see.",{0,0}},
-{    "eyegogue", SKILL_EYEGOGUE, 42, 95, 3022, NULL, {0,0}},
+{    "eyegouge", SKILL_EYEGOUGE, 42, 95, 3022, NULL, {0,0}},
 {    "vitalstrike",     SKILL_VITAL_STRIKE,	25,	80,	-2,	"The individual you seek is skilled in the arts of legerdemain, both verbal and physical.",{0,0} },
 {    "circle",		SKILL_CIRCLE,		30,	75,	-2, "Seek the king of a long lost civilization.  I only hear that they are the last of the Jiran.",{0,0} },
 {    "bludgeoning",	SKILL_BLUDGEON_WEAPONS,	30,	80,	3022,	NULL,{0,0} },
