@@ -191,6 +191,9 @@ int do_innate_fly(CHAR_DATA *ch, char *arg, int cmd)
       return eSUCCESS;
    }
 
+   act("Pixie wings magically sprout from $n's back and $e begins to hover.", ch, 0, 0, TO_ROOM, 0);
+   send_to_char("Small wings protrude from your back and you hover above the ground.\r\n", ch);
+
    struct affected_type af;
    af.type = SKILL_INNATE_FLY;
    af.duration = 40;
@@ -215,6 +218,8 @@ int do_innate_infra(CHAR_DATA *ch, char *arg, int cmd)
       send_to_char("But you are already seeing in the dark!  Why waste it?\r\n", ch);
       return eSUCCESS;
    }
+
+   send_to_char("Your eyes shift spectrums allowing you better vision.\r\n", ch);
 
    struct affected_type af;
    af.type = SKILL_INNATE_INFRA;
@@ -274,6 +279,9 @@ int do_innate_bloodlust(CHAR_DATA *ch, char *arg, int cmd)
       send_to_char("You must be in combat to bring forth a bloodlust.\r\n", ch);
       return eSUCCESS;
    }
+
+   act("$n mumbles an orcish chant and begins to pant with the heat of battle.\r\n", ch, 0, 0, TO_ROOM, 0);
+   send_to_char("You chant in orcish and begin to feel the heat of battle and lust for blood.\r\n", ch);
 
    SET_BIT(ch->combat, COMBAT_ORC_BLOODLUST);
 
