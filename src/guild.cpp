@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.19 2003/06/23 01:12:02 pirahna Exp $
+| $Id: guild.cpp,v 1.20 2004/04/19 23:53:41 urizen Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -109,6 +109,15 @@ int learn_skill(char_data * ch, int skill, int amount, int maximum)
     return 1;
   }
   return 0;
+}
+int search_skills2(int arg, class_skill_defines * list_skills)
+{
+  for(int i = 0; *list_skills[i].skillname != '\n'; i++)
+    if(arg == list_skills[i].skillnum)
+      return i;
+
+  return -1;
+
 }
 
 int search_skills(char * arg, class_skill_defines * list_skills)
