@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.13 2002/08/04 19:43:03 pirahna Exp $ */
+/* $Id: magic.cpp,v 1.14 2002/08/05 15:42:50 pirahna Exp $ */
 
 extern "C"
 {
@@ -8287,16 +8287,19 @@ int spell_iron_roots(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
        affect_from_char(ch, SPELL_IRON_ROOTS);
        act("The tree roots encasing $n's legs sink away under the surface.", ch, 0, 0, TO_ROOM, INVIS_NULL);
        act("The roots release their hold upon you and melt away beneath the surface.", ch, 0, 0, TO_CHAR, 0);
+       REMOVE_BIT(ch->affected_by2, AFF_NO_FLEE);
     }
     else {
        act("Tree roots spring from the ground bracing $n's legs, holding $m down firmly to the ground.", ch, 0, 0, TO_ROOM, INVIS_NULL);
        act("Tree roots spring from the ground firmly holding you to the ground.", ch, 0, 0, TO_CHAR, 0);
 
+       SET_BIT(ch->affected_by2, AFF_NO_FLEE);
+
        af.type = SPELL_IRON_ROOTS;
        af.duration = level;
        af.modifier = 0;
        af.location = APPLY_NONE;
-       af.bitvector = AFF_NO_FLEE;
+       af.bitvector = 0;
        affect_to_char(ch, &af);
     }
   return eSUCCESS;

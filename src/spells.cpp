@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.18 2002/08/04 21:14:01 dcastle Exp $ */
+/* $Id: spells.cpp,v 1.19 2002/08/05 15:42:50 pirahna Exp $ */
 
 extern "C"
 {
@@ -419,11 +419,11 @@ struct spell_info_type spell_info [ ] =
     },
 
     { /* 87 */
-	12, POSITION_STANDING, 20, TAR_CHAR_WORLD, cast_wizard_eye
+	12, POSITION_FIGHTING, 40, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_meteor_swarm
     },
 
     { /* 88 */
-	12, POSITION_FIGHTING, 40, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_meteor_swarm
+	12, POSITION_STANDING, 20, TAR_CHAR_WORLD, cast_wizard_eye
     },
 
     { /* 89 */
@@ -760,8 +760,8 @@ char *spells[]=
    "paralyze",
    "remove paralysis",
    "fireshield",
-   "wizard eye",
    "meteor swarm",
+   "wizard eye",
    "true sight",
    "mana", /* 90 */
    "solar gate",
@@ -905,6 +905,9 @@ void affect_update( void )
                }
                break;
             }
+            case SPELL_IRON_ROOTS:
+               REMOVE_BIT(i->affected_by2, AFF_NO_FLEE);
+               break;
             case SPELL_STONE_SKIN:  /* Stone skin wears off... Remove resistance */
                REMOVE_BIT(i->resist, ISR_PIERCE);
                break;

@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: const.cpp,v 1.23 2002/08/04 19:43:02 pirahna Exp $ */
+/* $Id: const.cpp,v 1.24 2002/08/05 15:42:50 pirahna Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -192,6 +192,9 @@ char *spell_wear_off_msg[] =
   "!Iron Roots!",
   "!Eyes of the Eagle!",
   "!Haste Other!",
+  "!Ice Shards!",
+  "The lightning around you fades away leaving only static cling.",
+  "!Blue bird!",
   "!UNUSED!"
 };
 
