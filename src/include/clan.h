@@ -2,7 +2,7 @@
 #define CLAN_H_
 
 /************************************************************************
-| $Id: clan.h,v 1.6 2003/04/18 01:29:58 pirahna Exp $
+| $Id: clan.h,v 1.7 2003/07/22 04:08:21 pirahna Exp $
 | clan.h
 | Description:  Header information for clans.
 */
@@ -23,7 +23,7 @@ struct clan_data * get_clan(int nClan);
 #define CLAN_RIGHTS_INFO         1<<8
 // if you add to the clan rights, update clan_rights[] in clan.C
 
-#define CLAN_MAX_MEMBERS   6
+#define CLAN_MAX_MEMBERS   15
 
 
 struct clan_room_data
