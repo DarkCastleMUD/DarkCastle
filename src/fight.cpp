@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.160 2004/04/21 22:18:45 urizen Exp $ */
+/* $Id: fight.cpp,v 1.161 2004/04/23 21:40:44 urizen Exp $ */
 
 extern "C"
 {
@@ -607,7 +607,7 @@ int do_vampiric_aura(CHAR_DATA *ch, CHAR_DATA *vict)
   }
   
   if(GET_POS(vict) == POSITION_DEAD)            return eFAILURE;
-  if(!IS_NPC(ch) && GET_LEVEL(ch) >= IMMORTAL)  return eFAILURE;
+//  if(!IS_NPC(ch) && GET_LEVEL(ch) >= IMMORTAL)  return eFAILURE;
 
   struct affected_type * af;
 
