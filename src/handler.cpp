@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.11 2002/08/05 20:37:21 pirahna Exp $ */
+/* $Id: handler.cpp,v 1.12 2002/08/13 21:54:23 pirahna Exp $ */
     
 extern "C"
 {
@@ -2439,6 +2439,23 @@ CHAR_DATA *get_active_pc_vis(CHAR_DATA *ch, char *name)
 }
 
 
+// search by item number
+struct obj_data *get_obj_in_list_vis(CHAR_DATA *ch, int item_num, 
+		struct obj_data *list)
+{
+    struct obj_data *i;
+    int number = real_object(item_num);
+
+    // never match invalid items
+    if(number == -1)
+       return NULL;
+
+    for (i = list ; i ; i = i->next_content)
+       if (i->item_number == number && CAN_SEE_OBJ(ch, i))
+          return i;
+
+    return NULL;
+}
 
 struct obj_data *get_obj_in_list_vis(CHAR_DATA *ch, char *name, 
 		struct obj_data *list)

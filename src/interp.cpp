@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.cpp,v 1.11 2002/08/06 21:09:20 pirahna Exp $ */
+/* $Id: interp.cpp,v 1.12 2002/08/13 21:54:23 pirahna Exp $ */
 
 extern "C"
 {
@@ -176,7 +176,7 @@ struct command_info cmd_info[] =
     { "unlock",     do_unlock,      POSITION_RESTING,   0,  9,  COM_CHARMIE_OK },
     { "use",        do_use,         POSITION_RESTING,   0,  9,  COM_CHARMIE_OK },
     { "wear",       do_wear,        POSITION_RESTING,   0,  9,  COM_CHARMIE_OK },
-    { "meta",       do_not_here,    POSITION_RESTING,   0,  80,  0 },
+    { "poisonmaking", do_poisonmaking, POSITION_RESTING, 0, 9,   0 },
 
     /*
      * Combat commands.
@@ -277,6 +277,7 @@ struct command_info cmd_info[] =
     /*
      * Special procedure commands.
      */
+    { "meta",       do_not_here,    POSITION_RESTING,   0,  80,  0 },
     { "design",     do_not_here,    POSITION_STANDING,  0,  62,  0 },
     { "stock",      do_not_here,    POSITION_STANDING,  0,  61,  0 },
     { "buy",        do_not_here,    POSITION_STANDING,  0,  56,  0 },

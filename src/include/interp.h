@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.h,v 1.5 2002/08/05 00:55:58 pirahna Exp $ */
+/* $Id: interp.h,v 1.6 2002/08/13 21:54:27 pirahna Exp $ */
 
 #ifndef INTERP_H_
 #define INTERP_H_
@@ -222,6 +222,7 @@ DO_FUN  do_peace;
 DO_FUN  do_pick;
 DO_FUN  do_plats;
 DO_FUN  do_pocket;
+DO_FUN  do_poisonmaking;
 DO_FUN  do_pour;
 DO_FUN  do_poof;
 DO_FUN  do_possess;
