@@ -489,15 +489,15 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
     {
       switch ( arg[1] )  /* arg should be "$*" so just get the letter */
 	{
-	case 'i': return ( mob->affected_by & atoi( arg ) );
+	case 'i': return ( mob->affected_by & atoi( val ) );
 	case 'n': if ( actor )
-	             return ( actor->affected_by & atoi( arg ) );
+	             return ( actor->affected_by & atoi( val ) );
 	          else return -1;
 	case 't': if ( vict )
-	             return ( vict->affected_by & atoi( arg ) );
+	             return ( vict->affected_by & atoi( val ) );
 	          else return -1;
 	case 'r': if ( rndm )
-	             return ( rndm->affected_by & atoi( arg ) );
+	             return ( rndm->affected_by & atoi( val ) );
 	          else return -1;
 	default:
 	  logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'isaffected'",
@@ -742,7 +742,7 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
        case 'i': // mob
           obj = search_char_for_item(mob, real_object(atoi(valu)));
 	  take = mob;
-	     break;
+	   break;
        case 'n': // actor
 	 if (!actor) return -1;
          obj = search_char_for_item(actor, real_object(atoi(valu)));
