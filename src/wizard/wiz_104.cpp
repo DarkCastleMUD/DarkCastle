@@ -1001,60 +1001,65 @@ char_data *)(mob_index[nr].item))->level,
 	if (!str_cmp(str_nospace(wear_bits[i]),arg1))
 	{
 	  SET_BIT(wear, 1<<i);
-	  continue;
+	  goto endy;
 	}
 	for (i=0; *item_types[i] != '\n';i++)
 	{
 	  if (!str_cmp(str_nospace(item_types[i]),arg1))
 	  {
 	     type = i;
+	     goto endy;
 	  }
 	}
        for (i = 0; *strs_damage_types[i] != '\n' ; i++)
         if (!str_cmp(str_nospace(strs_damage_types[i]),arg1))
         {
 	  dam = i;
-          continue;
+          goto endy;
         }
        for (i = 0; *extra_bits[i] != '\n' ; i++)
         if (!str_cmp(str_nospace(extra_bits[i]),arg1))
         {
           SET_BIT(extra, 1<<i);
-          continue;
+          goto endy;
         }
        for (i = 0; *more_obj_bits[i] != '\n' ; i++)
         if (!str_cmp(str_nospace(more_obj_bits[i]),arg1))
         {
           SET_BIT(more, 1<<i);
-          continue;
+          goto endy;
         }
        for (i = 0; *size_bitfields[i] != '\n' ; i++)
         if (!str_cmp(str_nospace(size_bitfields[i]),arg1))
         {
           SET_BIT(size, 1<<i);
-          continue;
+          goto endy;
         }
        for (i = 0; *apply_types[i] != '\n' ; i++)
         if (!str_cmp(str_nospace(apply_types[i]),arg1))
         {
   	    affect = i;
-          continue;
+            goto endy;
         }
-        if (!str_cmp(arg1,"level"))
-        {
-          argument = one_argument(argument,arg1);
-          if (is_number(arg1))
-            levlow = atoi(arg1);
-          argument = one_argument(argument,arg1);
-          if (is_number(arg1))
-            levhigh = atoi(arg1);
-          if (!levhigh || !levlow)
-          {
-            send_to_char("Incorrect level requirement.\r\n",ch);
-            return eFAILURE;
-          }
-        }
-        csendf(ch, "Unknown type: %s.\r\n", arg1);
+       if (!str_cmp(arg1,"level"))
+       {
+         argument = one_argument(argument,arg1);
+         if (is_number(arg1))
+           levlow = atoi(arg1);
+
+         argument = one_argument(argument,arg1);
+         if (is_number(arg1))
+           levhigh = atoi(arg1);
+
+         if (!levhigh || !levlow)
+         {
+           send_to_char("Incorrect level requirement.\r\n",ch);
+           return eFAILURE;
+         }
+       }
+       csendf(ch, "Unknown type: %s.\r\n", arg1);
+       endy:
+	continue;
      }
      int c,nr,aff;
 //     csendf(ch,"%d %d %d %d %d", more, extra, wear, size, affect);
