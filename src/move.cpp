@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.6 2002/07/13 17:13:55 pirahna Exp $
+| $Id: move.cpp,v 1.7 2002/07/18 18:23:52 pirahna Exp $
 | move.C
 | Movement commands and stuff.
 */
@@ -296,8 +296,31 @@ int do_simple_move(CHAR_DATA *ch, int cmd, int following)
 	/ 2;
 
       // if I'm trying to go "up" into a "fall down" room, etc.
-      if(((cmd == 0 && !IS_AFFECTED(ch, AFF_FLYING)) &&
-         (IS_SET(world[world[ch->in_room].dir_option[0]->to_room].room_flags, FALL_SOUTH))) ||
+      // it's OK to go east into a "fall north" room though
+      // not ok, if room we're going to is AIR though
+      if( !IS_AFFECTED(ch, AFF_FLYING) &&
+         (
+           ( cmd == 0 && IS_SET( world[world[ch->in_room].dir_option[0]->to_room].room_flags, FALL_SOUTH ) ) ||
+           ( cmd == 1 && IS_SET( world[world[ch->in_room].dir_option[1]->to_room].room_flags, FALL_WEST ) ) ||
+           ( cmd == 2 && IS_SET( world[world[ch->in_room].dir_option[2]->to_room].room_flags, FALL_NORTH ) ) ||
+           ( cmd == 3 && IS_SET( world[world[ch->in_room].dir_option[3]->to_room].room_flags, FALL_EAST ) ) ||
+           ( cmd == 4 && IS_SET( world[world[ch->in_room].dir_option[4]->to_room].room_flags, FALL_DOWN ) ) ||
+           ( cmd == 5 && IS_SET( world[world[ch->in_room].dir_option[5]->to_room].room_flags, FALL_UP ) ) ||
+           world[world[ch->in_room].dir_option[cmd]->to_room].sector_type == SECT_AIR
+         )
+        )
+      {
+         send_to_char("You would need to fly to go there!\n\r", ch);
+         return eFAILURE;
+      }
+     
+/*  above is a little more effecient since we aren't checking AFF_FLYING every single time.
+    Looks nicer too:)
+    Added sector_air check on it as well
+    7/18/02 - pir
+      if( ( 
+         (cmd == 0 && !IS_AFFECTED(ch, AFF_FLYING) ) &&
+         ( IS_SET( world[world[ch->in_room].dir_option[0]->to_room].room_flags, FALL_SOUTH ) )) ||
          ((cmd == 1 && !IS_AFFECTED(ch, AFF_FLYING)) &&
          (IS_SET(world[world[ch->in_room].dir_option[1]->to_room].room_flags, FALL_WEST))) ||
          ((cmd == 2 && !IS_AFFECTED(ch, AFF_FLYING)) &&
@@ -311,7 +334,9 @@ int do_simple_move(CHAR_DATA *ch, int cmd, int following)
          send_to_char("You would need to fly to go there!\n\r", ch);
          return eFAILURE;
       }
- 
+*/
+
+      // fly down't work over water 
       if ((world[ch->in_room].sector_type == SECT_WATER_NOSWIM) ||
           (world[world[ch->in_room].dir_option[cmd]->to_room].sector_type == SECT_WATER_NOSWIM)) {
 	 has_boat = FALSE;

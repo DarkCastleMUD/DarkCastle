@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: const.cpp,v 1.6 2002/07/16 21:24:06 pirahna Exp $ */
+/* $Id: const.cpp,v 1.7 2002/07/18 18:23:52 pirahna Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -250,7 +250,8 @@ int movement_loss[]=
     1,  /* Paved_road */
     4,  /* Desert     */
     6,  /* Underwater */
-    5   /* Swamp      */
+    5,  /* Swamp      */
+    1   /* Air        */
 };
 
 char *dirs[] =
@@ -664,6 +665,7 @@ char *sector_types[] =
     "desert",
     "underwater",
     "swamp",
+    "air",
     "\n"
 };
 

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_ranger.cpp,v 1.5 2002/07/13 17:14:14 pirahna Exp $ | cl_ranger.C |
+| $Id: cl_ranger.cpp,v 1.6 2002/07/18 18:23:56 pirahna Exp $ | cl_ranger.C |
 Description: Ranger skills/spells */ extern "C"  {
   #include <string.h>
 }
@@ -467,6 +467,9 @@ SECT_WATER_NOSWIM     7
 SECT_NO_LOW           8
 SECT_NO_HIGH          9
 SECT_DESERT          10
+underwater
+swamp
+air
 */
 
 int pick_one(int a, int b)
@@ -505,11 +508,7 @@ int do_forage(CHAR_DATA *ch, char *arg, int cmd)
   int foraged;
   int forage_cost;
   struct obj_data * new_obj = 0;
-  // Azrack -- learned should be initialized to something
-  byte learned = 0;
-
-  int check_command_lag(CHAR_DATA * ch);
-  void add_command_lag(CHAR_DATA * ch, int amount);
+  byte learned = has_skill(ch, SKILL_FORAGE);
 
   forage_cost = GET_MAX_MOVE(ch) / 35;
   if(GET_MOVE(ch) < forage_cost) {
@@ -517,12 +516,6 @@ int do_forage(CHAR_DATA *ch, char *arg, int cmd)
     return eFAILURE;
   }
   
-  if(check_command_lag(ch))
-  {
-    send_to_char("You should wait a little while before you try to forage again.  Give mother nature time to copulate.\r\n", ch);
-    return eFAILURE;
-  }
-
   if ((1+IS_CARRYING_N(ch)) > CAN_CARRY_N(ch)) {
     send_to_char("You can't carry that many items!\r\n", ch);
     return eFAILURE;
@@ -530,6 +523,11 @@ int do_forage(CHAR_DATA *ch, char *arg, int cmd)
 
   GET_MOVE(ch) -= forage_cost;
  
+  if(!learned) {
+    send_to_char("Not knowing how to forage, you poke at the dirt with a stick a little, finding nothing.\r\n", ch);
+    return eFAILURE;
+  }
+
   if(GET_CLASS(ch) == CLASS_RANGER) 
     foraged = number(1,
             (learned + (GET_LEVEL(ch)*2)) / 2 );
@@ -585,9 +583,9 @@ int do_forage(CHAR_DATA *ch, char *arg, int cmd)
     else if(foraged > 15)
       new_obj = clone_object( real_object( pick_one(2057, 2058, 2059) ) );
     break;
+  default:
+    break;
   }
-
-  add_command_lag(ch, 1);
 
   if(!new_obj) {
     act("$n forages around for some food, but turns up nothing.", ch,
