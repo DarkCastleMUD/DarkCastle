@@ -1,4 +1,4 @@
-/********************************
+/**********************
 | Level 102 wizard commands
 | 11/20/95 -- Azrack
 **********************/
@@ -1656,6 +1656,19 @@ int do_oedit(struct char_data *ch, char *argument, int cmd)
       strcpy(buf4, buf2);
       strcpy(buf3, buf);
     }
+   if(item_num != ch->pcdata->last_obj_edit) {
+      sprintf(buf2, "$3Current obj set to$R: %d\n\r", obj_index[item_num].virt);
+      send_to_char(buf2, ch);
+      ch->pcdata->last_obj_edit = item_num;
+    }
+
+  if(!*buf3) // no field.  Stat the item.
+    {
+      obj_stat(ch, (obj_data *) obj_index[item_num].item);
+      return eSUCCESS;
+    }
+
+
 // MOVED
     for(x = 0 ;; x++)
     {
@@ -1673,18 +1686,6 @@ int do_oedit(struct char_data *ch, char *argument, int cmd)
     if(!can_modify_object(ch, item_num)) {
       send_to_char("You are unable to work creation outside of your range.\n\r", ch);
       return eFAILURE;
-    }
-
-    if(item_num != ch->pcdata->last_obj_edit) {
-      sprintf(buf2, "$3Current obj set to$R: %d\n\r", obj_index[item_num].virt);
-      send_to_char(buf2, ch);
-      ch->pcdata->last_obj_edit = item_num;
-    }
-
-    if(!*buf3) // no field.  Stat the item.
-    {
-      obj_stat(ch, (obj_data *) obj_index[item_num].item);
-      return eSUCCESS;
     }
 
     switch(x) {
@@ -2484,6 +2485,19 @@ int do_medit(struct char_data *ch, char *argument, int cmd)
       strcpy(buf4, buf2);
       strcpy(buf3, buf);
     }
+    if(mob_num != ch->pcdata->last_mob_edit) {
+      sprintf(buf2, "$3Current mob set to$R: %d\n\r", 
+mob_index[mob_num].virt);
+      send_to_char(buf2, ch);
+      ch->pcdata->last_mob_edit = mob_num;
+    }
+
+    if(!*buf3) // no field.  Stat the item.
+    {
+      mob_stat(ch, (char_data *) mob_index[mob_num].item);
+      return eSUCCESS;
+    }
+
  // MOVED
     for(x = 0 ;; x++)
     {
@@ -2503,18 +2517,6 @@ int do_medit(struct char_data *ch, char *argument, int cmd)
         send_to_char("You are unable to work creation outside of your range.\n\r", ch);
         return eFAILURE;
       }
-
-    if(mob_num != ch->pcdata->last_mob_edit) {
-      sprintf(buf2, "$3Current mob set to$R: %d\n\r", mob_index[mob_num].virt);
-      send_to_char(buf2, ch);
-      ch->pcdata->last_mob_edit = mob_num;
-    }
-
-    if(!*buf3) // no field.  Stat the item.
-    {
-      mob_stat(ch, (char_data *) mob_index[mob_num].item);
-      return eSUCCESS;
-    }
 
     switch(x) {
 
