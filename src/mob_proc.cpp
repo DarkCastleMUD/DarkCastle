@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.43 2004/04/20 15:12:47 urizen Exp $ */
+/* $Id: mob_proc.cpp,v 1.44 2004/04/22 16:28:58 urizen Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -2199,62 +2199,38 @@ int guild_guard(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 {
     if (cmd>6 || cmd<1)
 	return eFAILURE;
-
+    int dir = 0,clas=0, align = 3, dir2 = 0;
     // TODO - go through these and remove all of the ones that are in
     // room that no longer exist on the mud
-
-    if ( ( GET_CLASS(ch) != CLASS_MAGIC_USER
-	&& ch->in_room == real_room(3017) && cmd == 1 )
-    ||   ( GET_CLASS(ch) != CLASS_CLERIC
-	&& ch->in_room == real_room(3004) && cmd == 1 )
-    ||   ( GET_CLASS(ch) != CLASS_THIEF
-	&& ch->in_room == real_room(3027) && cmd == 2 )
-    ||   ( GET_CLASS(ch) != CLASS_WARRIOR
-	&& ch->in_room == real_room(3021) && cmd == 2 )
-    ||   ( GET_CLASS(ch) != CLASS_DRUID
-	&& ch->in_room == real_room(3216) && cmd == 2 )
-    ||   ( GET_CLASS(ch) != CLASS_BARD
-	&& ch->in_room == real_room(3213) && cmd == 4 )
-    ||   ( GET_CLASS(ch) != CLASS_ANTI_PAL
-        && ch->in_room == real_room(9910) && cmd == 4 )
-    ||   ( GET_CLASS(ch) != CLASS_PALADIN
-        && ch->in_room == real_room(9900) && cmd == 1 )
-    ||   ( GET_CLASS(ch) != CLASS_BARBARIAN 
-        && ch->in_room == real_room(9905) && cmd == 1 )
-    ||   ( GET_CLASS(ch) != CLASS_MONK
-        && ch->in_room == real_room(9921) && cmd == 1 )
-    ||   ( GET_CLASS(ch) != CLASS_MONK
-        && ch->in_room == real_room(9921) && cmd == 4 )
-    ||   ( GET_CLASS(ch) != CLASS_RANGER
-        && ch->in_room == real_room(9924) && cmd == 3 ) 
-    ||   ( !IS_EVIL(ch) 
-        && ch->in_room == real_room(9910) && cmd == 4 )
-    ||   ( !IS_GOOD(ch)
-        && ch->in_room == real_room(9900) && cmd == 1 )
-    || (GET_CLASS(ch) != CLASS_BARBARIAN
-        && ch->in_room == real_room(10053) && cmd == 2)
-    || (GET_CLASS(ch) != CLASS_THIEF
-        && ch->in_room == real_room(10057) && cmd == 2)
-    || (GET_CLASS(ch) != CLASS_PALADIN
-        && ch->in_room == real_room(10083) && cmd == 2)
-    || (GET_CLASS(ch) != CLASS_MAGIC_USER
-        && ch->in_room == real_room(10097) && cmd == 2)
-    || (GET_CLASS(ch) != CLASS_CLERIC
-        && ch->in_room == real_room(10095) && cmd == 2)
-    || (GET_CLASS(ch) != CLASS_RANGER
-        && ch->in_room == real_room(10085) && cmd == 3)
-    || (GET_CLASS(ch) != CLASS_ANTI_PAL
-        && ch->in_room == real_room(10088) && cmd == 1)
-    || (GET_CLASS(ch) != CLASS_WARRIOR
-        && ch->in_room == real_room(10091) && cmd == 3)
-    || (GET_CLASS(ch) != CLASS_MONK
-        && ch->in_room == real_room(10094) && cmd == 3)
-    ||   (IS_AFFECTED(ch, AFF_CANTQUIT) 
-        && (!IS_MOB(ch) && affected_by_spell(ch, FUCK_PTHIEF)))
-
-
-	)
+    switch (world[ch->in_room].number)
     {
+	case 3017:
+	  dir = 1; clas = CLASS_MAGIC_USER; break;
+	case 3004:
+	  dir = 1; clas = CLASS_CLERIC; break;
+	case 9921:
+	  dir = 1; dir2 = 4; clas = CLASS_MONK; break;
+	case 9905:
+	  dir = 1; clas = CLASS_BARBARIAN; break;
+	case 9900:
+	  dir = 1; clas = CLASS_PALADIN; align = 3; break;
+	case 3021:
+	  dir = 2; clas = CLASS_WARRIOR; break;
+	case 3216:
+	  dir = 2; clas = CLASS_DRUID; break;
+ 	case 3213:
+	  dir = 4; clas = CLASS_BARD; break;
+	case 9910:
+	  dir = 4; align = 1; clas = CLASS_ANTI_PAL; break;
+	case 9924:
+	  dir = 3; clas = CLASS_RANGER; break;
+        default: return eFAILURE;
+    }
+
+    if ((cmd == dir || cmd == dir2) && ((IS_AFFECTED(ch,AFF_CANTQUIT) ||
+        (!IS_MOB(ch) && affected_by_spell(ch, FUCK_PTHIEF))) || 
+GET_CLASS(ch) != clas || (align == 1 && !IS_EVIL(ch)) || (align == 3 && 
+!IS_GOOD(ch)))) {
 	act( "The guard humiliates $n, and blocks $s way.",
 	    ch, 0, 0, TO_ROOM , 0);
 	send_to_char(

@@ -16,7 +16,7 @@
  *  10/21/2003   Onager    Changed IS_ANONYMOUS() to handle mobs without   *
  *                         crashing                                        *
  ***************************************************************************/
-/* $Id: utility.h,v 1.21 2004/04/19 16:48:47 urizen Exp $ */
+/* $Id: utility.h,v 1.22 2004/04/22 16:29:03 urizen Exp $ */
 
 #ifndef UTILITY_H_
 #define UTILITY_H_
@@ -48,10 +48,11 @@ char *index(char *buf, char op);
 // TODO - FIX THESE
 
 #define MOB_WAIT_STATE(ch)  ((ch)->deaths)
-#define WAIT_STATE(ch, cycle)  (((ch)->desc) ? (ch)->desc->wait += (cycle) : 0 )
+//#define WAIT_STATE(ch, cycle)  (((ch)->desc) ? (ch)->desc->wait += 
+//(cycle) : 0 )
 
-//#define WAIT_STATE(ch, cycle)  (((ch)->desc) ? (ch)->desc->wait += (cycle) : 
-//                                  (IS_MOB(ch) ? MOB_WAIT_STATE(ch) = cycle : 0))
+#define WAIT_STATE(ch, cycle)  (((ch)->desc) ? (ch)->desc->wait += (cycle) :  \
+                                  (IS_MOB((ch)) ? MOB_WAIT_STATE((ch)) += (cycle) : 0))
 
 // END TODO
 
