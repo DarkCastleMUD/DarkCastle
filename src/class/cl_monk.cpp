@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_monk.cpp,v 1.11 2003/03/07 00:17:38 pirahna Exp $
+| $Id: cl_monk.cpp,v 1.12 2003/06/23 02:28:04 pirahna Exp $
 | cl_monk.C
 | Description:  Monk skills.
 */
@@ -290,7 +290,7 @@ int do_stun(struct char_data *ch, char *argument, int cmd)
        act("$n delivers another HARD BLOW into $N's solar plexus!", ch, NULL, victim, TO_ROOM, NOTVICT );
        if(number(0, 1))
        {
-          send_to_char("The hit knocks the sense back into you!\r\n", ch);
+          send_to_char("The hit knocks the sense back into you!\r\n", victim);
           act("The hit knocks the sense back into $N and $E is no longer stunned!", ch, 0, victim, TO_ROOM, NOTVICT);
           REMOVE_BIT(victim->combat, COMBAT_STUNNED);
           REMOVE_BIT(victim->combat, COMBAT_STUNNED2);
