@@ -450,12 +450,13 @@ int do_zone_single_edit(struct char_data * ch, char * argument, int zone)
          case 'K':
          case 'X':
          case '%':
+	 case '*':
            zone_table[zone].cmd[cmd].command = result;
            sprintf(select, "Type for command %d changed to %c.\r\n", cmd+1, result);
            send_to_char(select, ch);
            break;
          default:
-           send_to_char("Type must be:  M, O, P, G, E, D, X, K, or %.\r\n", ch);
+           send_to_char("Type must be:  M, O, P, G, E, D, X, K, *, or %.\r\n", ch);
            break;
        }
     }

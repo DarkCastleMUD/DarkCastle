@@ -41,7 +41,7 @@ int do_boot(struct char_data *ch, char *arg, int cmd)
        send_to_char ("Oops! They ain't linkdead! Just possessing.", ch);
        return eFAILURE;
     }
-
+    send_to_char("You have been disconnected.\r\n", victim);
     if(IS_AFFECTED(victim, AFF_CANTQUIT))
     {
       if(affected_by_spell(victim, FUCK_PTHIEF))
@@ -66,7 +66,7 @@ int do_boot(struct char_data *ch, char *arg, int cmd)
     room = victim->in_room;
 
     act("A stream of fire arcs down from the heavens, striking "
-        "$n between\n\rthe eyes.  $n has been removed from the world "
+        "$n between the eyes.\r\n$n has been removed from the world "
         "by $N.", victim, 0, ch, TO_ROOM, INVIS_NULL);
 
     sprintf(name,"%s has booted %s.", GET_NAME(ch), GET_NAME(victim));

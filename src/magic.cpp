@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.125 2004/05/09 01:05:38 urizen Exp $ */
+/* $Id: magic.cpp,v 1.126 2004/05/09 19:45:58 urizen Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -65,6 +65,7 @@ extern struct zone_data *zone_table;
 
 #define BEACON_OBJ_NUMBER 405
 
+bool improve = TRUE;
 /* Extern procedures */
 
 int saves_spell(CHAR_DATA *ch, CHAR_DATA *vict, int spell_base, sh_int save_type);
@@ -246,46 +247,19 @@ int spell_drown(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
 // Drain XP, MANA, HP - caster gains HP and MANA
 int spell_energy_drain(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
-   int dam, xp, mana;
-
-   if (GET_ALIGNMENT(ch) > -1) {
-      send_to_char("You aren't evil enough to harness such magic!\n\r", ch);
-      return eFAILURE;
-      }
-
+   int mult = 20000;
    if(IS_SET(world[ch->in_room].room_flags, SAFE))
      return eFAILURE;
 
    set_cantquit( ch, victim );
 
-   if(saves_spell(ch, victim, 1, SAVE_TYPE_MAGIC) < 0) 
-   {
-      if (GET_LEVEL(victim) <= 2) {
-         return spell_damage(ch, victim, 100, TYPE_ENERGY, SPELL_ENERGY_DRAIN, 0);
-	 }
-      else {
-         xp = number(level>>1, level)*1000;
-         gain_exp(victim, -xp);
+   if(saves_spell(ch, victim, 1, SAVE_TYPE_ENERGY) > 0) 
+      mult = 10000;
+   // Here's the spell..
 
-         dam = dice(1,10);
-
-         mana = GET_MANA(victim)>>1;
-         GET_MOVE(victim) >>= 1;
-         GET_MANA(victim) = mana;
-
-         GET_MANA(ch) += mana>>1;
-         GET_HIT(ch) += dam;
-
-         send_to_char("Your life energy is drained!\n\r", victim);
-
-         return spell_damage(ch, victim, dam, TYPE_ENERGY, SPELL_ENERGY_DRAIN, 0);
-      }
-   } // saves spell
-      
-   // Miss
-   else {
-      return spell_damage(ch, victim, 0, TYPE_ENERGY, SPELL_ENERGY_DRAIN, 0); 
-      }
+   gain_exp(victim, GET_LEVEL(victim)*mult);
+   send_to_char("Your life energy is drained!\n\r", victim);
+   return eSUCCESS;
 }
 
 // Drain XP, MANA, HP - caster gains HP and MANA
@@ -7892,9 +7866,9 @@ int cast_herb_lore(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *vi
   send_to_char("These herbs really do the trick!\n\r", ch);
   send_to_char("You feel much better!\n\r", victim);
   if(OUTSIDE(ch))
-    GET_HIT(victim) += dam_percent(skill,80);
-  else /* if not outside */
     GET_HIT(victim) += dam_percent(skill,180);
+  else /* if not outside */
+    GET_HIT(victim) += dam_percent(skill,80);
 
   if (GET_HIT(victim) >= hit_limit(victim))
     GET_HIT(victim) = hit_limit(victim)-dice(1,4);
@@ -7922,6 +7896,9 @@ int cast_call_follower(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA
         break;
      }
 
+  skill_increase_check(ch, SPELL_CALL_FOLLOWER, skill, SKILL_INCREASE_EASY);
+
+   
    if (NULL == victim) {
       send_to_char("You don't have any tame friends to summon!\n\r", ch);
       return eFAILURE;
@@ -7960,6 +7937,9 @@ int cast_entangle(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *vic
 	  ch, 0, victim, TO_VICT, 0);
 	act("$n raises the plants which attack $N!", ch, 0, victim,
 		TO_ROOM, NOTVICT);
+  skill_increase_check(ch, SPELL_ENTANGLE, skill, SKILL_INCREASE_MEDIUM);
+
+
 	spell_blindness(level, ch, victim, 0, 0); /* The plants blind the victim . . */
 	GET_POS(victim) = POSITION_SITTING;		/* And pull the victim down to the ground */
 	update_pos(victim);

@@ -1,7 +1,7 @@
 #ifndef MOBILE_H_
 #define MOBILE_H_
 /************************************************************************
-| $Id: mobile.h,v 1.7 2004/05/02 19:39:53 urizen Exp $
+| $Id: mobile.h,v 1.8 2004/05/09 19:46:01 urizen Exp $
 | mobile.h
 | Description:  This file contains the header information for mobile
 |   control.
@@ -44,6 +44,7 @@ void    mprog_driver            ( char* com_list, CHAR_DATA* mob,
 #define ACT_FRIENDLY        1<<21
 #define ACT_STAY_NO_TOWN    1<<22
 #define ACT_NOMAGIC 	    1<<23
+#define ACT_DRAINY          1<<24
 
 struct race_shit
 {

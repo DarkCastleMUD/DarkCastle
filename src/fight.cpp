@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.178 2004/05/08 11:49:11 urizen Exp $ */
+/* $Id: fight.cpp,v 1.179 2004/05/09 19:45:58 urizen Exp $ */
 
 extern "C"
 {
@@ -1070,6 +1070,11 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
 
     }
   }
+  if (!SOMEONE_DIED(retval))
+    if (IS_MOB(ch) && IS_SET(ch->mobdata->actflags, ACT_DRAINY))
+       if (number(1,101) == 1)
+          SET_BIT(retval, spell_energy_drain(1,ch,vict,0,0));
+
   // weapon spells is going to return failure if a spell didn't go off.  However,
   // we did actually hit the opponent, so set it to success and get out
   SET_BIT(retval, eSUCCESS);
@@ -3919,6 +3924,7 @@ int weapon_spells(CHAR_DATA *ch, CHAR_DATA *vict, int weapon)
     log("Null ch or vict sent to weapon spells!", -1, LOG_BUG);
     return eFAILURE|eINTERNAL_ERROR;
   }
+  extern bool improve;
   
   if(!weapon)
     return eFAILURE;
@@ -3945,7 +3951,7 @@ int weapon_spells(CHAR_DATA *ch, CHAR_DATA *vict, int weapon)
     
     /* If they don't roll under chance, it doesn't work! */
     if(chance > percent) continue;
-
+    improve = FALSE;
     switch(current_affect)
     {
     case WEP_MAGIC_MISSILE:
@@ -4070,7 +4076,7 @@ int weapon_spells(CHAR_DATA *ch, CHAR_DATA *vict, int weapon)
       //     current_affect, obj_index[ch->equipment[weapon]->item_number].virt);
       break;
     } /* switch statement */
-
+    improve = TRUE;
     if(SOMEONE_DIED(retval))
       return retval;      
   } /* for loop */
