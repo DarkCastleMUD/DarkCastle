@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.60 2004/04/20 21:57:16 urizen Exp $ */
+/* $Id: spells.cpp,v 1.61 2004/04/21 21:47:42 urizen Exp $ */
 
 extern "C"
 {
@@ -727,6 +727,7 @@ char *skills[]=
   "deceit",
   "release",
   "fear gaze",
+  "eyegogue",
   "\n"
 };
 

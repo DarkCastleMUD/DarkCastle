@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.20 2004/04/19 23:53:41 urizen Exp $
+| $Id: guild.cpp,v 1.21 2004/04/21 21:47:42 urizen Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -117,7 +117,6 @@ int search_skills2(int arg, class_skill_defines * list_skills)
       return i;
 
   return -1;
-
 }
 
 int search_skills(char * arg, class_skill_defines * list_skills)
@@ -191,7 +190,7 @@ int skills_guild(struct char_data *ch, char *arg, struct char_data *owner)
     for(int i=0; *skilllist[i].skillname != '\n';i++) 
     {
       known = has_skill(ch, skilllist[i].skillnum);
-      if(!known && GET_LEVEL(ch) < skilllist[i].levelavailable) 
+      if(!known && GET_LEVEL(ch) < skilllist[i].levelavailable)
           continue;
       specialization = known / 100;
       known = known % 100;
@@ -245,10 +244,17 @@ int skills_guild(struct char_data *ch, char *arg, struct char_data *owner)
     send_to_char("You are already learned in this area.\n\r", ch);
     return eSUCCESS;
   }
+  float maxlearn = (float)skilllist[skillnumber].maximum;
+  maxlearn *= 0.5;
 
-  if (known >= ( GET_LEVEL(ch) * 2 ) ) {
+  if (known >= ( GET_LEVEL(ch) * 2 )) {
     send_to_char("You aren't experienced enough to practice that any further right now.\n\r", ch);
     return eSUCCESS;
+  }
+  if (known >= maxlearn)
+  {
+    send_to_char("You cannot learn more here.. you need to go out into the world and use it.\r\n",ch);
+    return eFAILURE;
   }
 
   send_to_char("You practice for a while...\n\r", ch);
@@ -400,6 +406,30 @@ int skill_master(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     return eSUCCESS;
 }
 
+int get_stat(CHAR_DATA *ch, int stat)
+{
+      switch (stat)
+      {
+        case STRENGTH:
+          return GET_STR(ch);
+          break;
+        case INTELLIGENCE:
+          return GET_INT(ch);
+          break;
+        case WISDOM:
+          return GET_WIS(ch);
+          break;
+        case DEXTERITY:
+          return GET_DEX(ch);
+          break;
+        case CONSTITUTION:
+          return GET_CON(ch);
+          break;
+      };
+ return 0;
+}
+
+
 // TODO - go ahead and remove 'learned' from everywhere to use it.
 // We can't always pass it in, since in 'group' type spells or
 // object affects someone that doesn't have the skill is getting a
@@ -423,14 +453,24 @@ void skill_increase_check(char_data * ch, int skill, int learned, int difficulty
      return;  // class has no skills by default
 
    maximum = 0;
-   for(int i = 0; *skilllist[i].skillname != '\n'; i++)
+   int i;
+   for(i = 0; *skilllist[i].skillname != '\n'; i++)
      if(skilllist[i].skillnum == skill)
      {
        maximum = skilllist[i].maximum;
        break;
      }
+   int percent = 75;
+   if (skilllist[i].attrs[0])
+   {
+	percent += (get_stat(ch,skilllist[i].attrs[0])-20)*2;
+   }
+   if (skilllist[i].attrs[1])
+   {
+        percent += (get_stat(ch,skilllist[i].attrs[1])-20);
+   }
 
-   if(learned >= maximum)
+   if(learned >= (maximum*(percent/100)))
      return;
 
    chance = number(1, 101);

@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.158 2004/04/21 19:28:05 urizen Exp $ */
+/* $Id: fight.cpp,v 1.159 2004/04/21 21:47:42 urizen Exp $ */
 
 extern "C"
 {
@@ -466,6 +466,32 @@ void update_flags(CHAR_DATA *vict)
 
   if (IS_SET(vict->combat, COMBAT_VITAL_STRIKE))
     REMOVE_BIT(vict->combat, COMBAT_VITAL_STRIKE);
+
+
+  if(IS_SET(vict->combat, COMBAT_ORC_BLOODLUST2)) {
+     REMOVE_BIT(vict->combat, COMBAT_ORC_BLOODLUST2);
+    send_to_char("Your bloodlust fades.\r\n", vict);
+    act("$n's bloodlust fades.", vict, 0, 0, TO_ROOM, 0);
+  }
+
+  if(IS_SET(vict->combat, COMBAT_ORC_BLOODLUST1)) {
+    REMOVE_BIT(vict->combat, COMBAT_ORC_BLOODLUST1);
+    SET_BIT(vict->combat, COMBAT_ORC_BLOODLUST2);
+  }
+
+   if (IS_SET(vict->combat, COMBAT_THI_EYEGOGUE2))
+   {
+      REMOVE_BIT(vict->combat, COMBAT_THI_EYEGOGUE2);
+      REMOVE_BIT(vict->affected_by,AFF_BLIND);
+      act("$n clears the blood out of $m eyes.\r\n",vict, NULL, NULL, TO_ROOM,0);
+      send_to_char("You clear the blood out of your eyes.\r\n",vict);
+   }
+
+    if (IS_SET(vict->combat, COMBAT_THI_EYEGOGUE))
+    {
+       REMOVE_BIT(vict->combat, COMBAT_THI_EYEGOGUE);
+       SET_BIT(vict->combat, COMBAT_THI_EYEGOGUE2);
+    }
 
   if(IS_SET(vict->combat, COMBAT_MONK_STANCE)) {
      // stance lasts 'modifier' rounds.  Remove bit once used up
@@ -2296,14 +2322,22 @@ void stop_fighting(CHAR_DATA * ch)
 
   if(IS_SET(ch->combat, COMBAT_ORC_BLOODLUST1)) {
     REMOVE_BIT(ch->combat, COMBAT_ORC_BLOODLUST1);
-    SET_BIT(ch->combat, COMBAT_ORC_BLOODLUST2);
   }
   if(IS_SET(ch->combat, COMBAT_ORC_BLOODLUST2)) {
      REMOVE_BIT(ch->combat, COMBAT_ORC_BLOODLUST2);
-    send_to_char("Your bloodlust fades.\r\n", ch);
-    act("$n's bloodlust fades.", ch, 0, 0, TO_ROOM, 0);
   }
-  
+  if (IS_SET(ch->combat, COMBAT_VITAL_STRIKE))
+     REMOVE_BIT(ch->combat, COMBAT_VITAL_STRIKE);
+  if (IS_SET(ch->combat, COMBAT_THI_EYEGOGUE))
+  {
+    REMOVE_BIT(ch->combat, COMBAT_THI_EYEGOGUE);
+    REMOVE_BIT(ch->affected_by, AFF_BLIND);
+  }  
+  if (IS_SET(ch->combat, COMBAT_THI_EYEGOGUE2))
+  {
+    REMOVE_BIT(ch->combat, COMBAT_THI_EYEGOGUE2);
+    REMOVE_BIT(ch->affected_by, AFF_BLIND);
+  }
   GET_POS(ch) = POSITION_STANDING;
   update_pos(ch);
   
@@ -3033,11 +3067,11 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
             send_to_char("Your Dexterity has reached 4...you are permanently dead!\r\n",victim);
 		send_to_char("\r\n"
 		" Dear Mudder, you suck.\r\nSincerly - Urizen\r\n"
-		"$4              /                  \\\r\n"
+		"$4              /                   \\\r\n"
 		"             /|      ,             |\\\r\n"
 		"           /' |     /(     )\\      | `\\\r\n"
 		"         /'   \\    | `~~~~~' |    /    `\\\r\n"
-		"       /'      \\   \\  \\ , /  /   /      `\\\r\n"
+		"       /'      \\   \\  $1\\$4 , $1/$4  /   /      `\\\r\n"
 		"     /C         \\   |  ___  |   /        C\\\r\n"
 		"    OC       |   `\\  \\ ` ' /  /'   |      CO\r\n"
 		"   OC   \\    |   __\\_/~\\ /~\\_/__   |   \\   CO\r\n"

@@ -1,7 +1,7 @@
 #ifndef RACE_H_
 #define RACE_H_
 /************************************************************************
-| $Id: race.h,v 1.4 2004/04/20 19:42:49 urizen Exp $
+| $Id: race.h,v 1.5 2004/04/21 21:47:47 urizen Exp $
 | race.h
 | This file defines racial information.
 */
@@ -14,8 +14,8 @@
 #define RACE_GIANT        6
 #define RACE_GNOME        7
 #define RACE_ORC          8
-/* Not player races from here down */ 
 #define RACE_TROLL        9
+/* Not player races from here down */
 #define RACE_GOBLIN      10
 #define RACE_REPTILE     11
 #define RACE_DRAGON      12
@@ -82,24 +82,20 @@
 #define RACE_ELVEN_STR_MOD         -1
 #define RACE_ELVEN_DEX_MOD          1
 #define RACE_ELVEN_INT_MOD          1
-#ifdef COMILE_WITH_CHANGES
-  #define RACE_ELVEN_WIS_MOD        0
-#else
-  #define RACE_ELVEN_WIS_MOD          1
-#endif
+#define RACE_ELVEN_WIS_MOD        0
 #define RACE_ELVEN_CON_MOD         -1
 
-  #define RACE_DWARVEN_STR_MOD 	2
-  #define RACE_DWARVEN_DEX_MOD -2
-  #define RACE_DWARVEN_WIS_MOD  1
-  #define RACE_DWARVEN_INT_MOD -2
+#define RACE_DWARVEN_STR_MOD 	2
+#define RACE_DWARVEN_DEX_MOD -2
+#define RACE_DWARVEN_WIS_MOD  1
+#define RACE_DWARVEN_INT_MOD -2
 #define RACE_DWARVEN_CON_MOD        1
 
-  #define RACE_HOBBIT_STR_MOD 	    -2
-  #define RACE_HOBBIT_DEX_MOD	    3
-  #define RACE_HOBBIT_CON_MOD	    -1
-  #define RACE_HOBBIT_INT_MOD       0
-  #define RACE_HOBBIT_WIS_MOD       0
+#define RACE_HOBBIT_STR_MOD 	    -2
+#define RACE_HOBBIT_DEX_MOD	    3
+#define RACE_HOBBIT_CON_MOD	    -1
+#define RACE_HOBBIT_INT_MOD       0
+#define RACE_HOBBIT_WIS_MOD       0
 
 #define RACE_PIXIE_STR_MOD	   -4
 #define RACE_PIXIE_CON_MOD	   -2
@@ -108,22 +104,22 @@
 #define RACE_PIXIE_DEX_MOD         2
 
 #define RACE_GIANT_STR_MOD          3
-  #define RACE_GIANT_DEX_MOD	    -2
-  #define RACE_GIANT_CON_MOD	    1
-  #define RACE_GIANT_WIS_MOD	    0
+#define RACE_GIANT_DEX_MOD	    -2
+#define RACE_GIANT_CON_MOD	    1
+#define RACE_GIANT_WIS_MOD	    0
 #define RACE_GIANT_INT_MOD         -2
 
- #define RACE_GNOME_STR_MOD         -2
- #define RACE_GNOME_DEX_MOD         -2
- #define RACE_GNOME_INT_MOD          1
- #define RACE_GNOME_WIS_MOD          3
- #define RACE_GNOME_CON_MOD          0
+#define RACE_GNOME_STR_MOD         -2
+#define RACE_GNOME_DEX_MOD         -2
+#define RACE_GNOME_INT_MOD          1
+#define RACE_GNOME_WIS_MOD          3
+#define RACE_GNOME_CON_MOD          0
 
 #define RACE_ORC_STR_MOD            1
 #define RACE_ORC_DEX_MOD            0
-  #define RACE_ORC_INT_MOD           -2
-  #define RACE_ORC_WIS_MOD           -1
-  #define RACE_ORC_CON_MOD            2
+#define RACE_ORC_INT_MOD           -2
+#define RACE_ORC_WIS_MOD           -1
+#define RACE_ORC_CON_MOD            2
 
 #define RACE_TROLL_STR_MOD 2
 #define RACE_TROLL_DEX_MOD 0

@@ -2,7 +2,7 @@
 #define FIGHT_H_
 
 /************************************************************************
-| $Id: fight.h,v 1.10 2004/04/20 19:42:49 urizen Exp $
+| $Id: fight.h,v 1.11 2004/04/21 21:47:46 urizen Exp $
 | fight.h
 | This file defines the header information for fight.
 */
@@ -108,6 +108,8 @@ void eq_destroyed(char_data * ch, obj_data * obj, int pos);
 #define COMBAT_MISS_AN_ATTACK 1<<15
 #define COMBAT_ORC_BLOODLUST1 1<<16
 #define COMBAT_ORC_BLOODLUST2 1<<17
+#define COMBAT_THI_EYEGOGUE 1<<18
+#define COMBAT_THI_EYEGOGUE2 1<<19
 
 #define DAMAGE_TYPE_PHYSICAL  0
 #define DAMAGE_TYPE_MAGIC     1
