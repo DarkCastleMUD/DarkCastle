@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.56 2004/04/16 00:56:35 urizen Exp $ */
+/* $Id: spells.cpp,v 1.57 2004/04/16 12:45:11 urizen Exp $ */
 
 extern "C"
 {
@@ -725,6 +725,7 @@ char *skills[]=
   "aggression",
   "tactics",
   "deceit",
+  "release",
   "\n"
 };
 
@@ -1320,6 +1321,13 @@ int do_release(CHAR_DATA *ch, char *argument, int cmd)
   bool printed = FALSE;
   argument = skip_spaces(argument);
   extern bool str_prefix(const char *astr, const char *bstr);  
+  int learned = has_skill(ch,SKILL_RELEASE);
+
+  if (!learned)
+  {
+     send_to_char("You don't know how!",ch);
+     return eFAILURE;
+  }
   if (!*argument)
   {
     send_to_char("Release what spell?\r\n",ch);
@@ -1346,8 +1354,16 @@ int do_release(CHAR_DATA *ch, char *argument, int cmd)
        if (ch->mana < 25)
        {
 	send_to_char("You don't have enough mana.\r\n",ch);
-	return eSUCCESS;
+	return eFAILURE;
        }
+       if (number(1,101) > learned)
+       {
+         send_to_char("You failed to release the spell, and is left momentarily dazed.\r\n",ch);
+         WAIT_STATE(ch,PULSE_VIOLENCE/2);
+	 ch->mana -= 10;
+         return eFAILURE;
+       }
+
        for (aff = ch->affected; aff; aff = aff_next)
        {
          aff_next = aff->next;
