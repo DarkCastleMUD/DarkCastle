@@ -56,14 +56,14 @@ struct trade_data_type {
 // POISON DEFINES
 struct trade_data_type poison_vial_data[] = 
 {
-   { { 600, -1, -1, -1, -1, -1, -1, -1, -1, -1 },   // bee stinger
-     697,
-     10         // a vial of bee stinger poison
+   { { 600, 697, -1, -1, -1, -1, -1, -1, -1, -1 },   // bee stinger
+     696,
+     15         // a vial of bee stinger poison
    },
 
    { { 3175, -1, -1, -1, -1, -1, -1, -1, -1, -1 },  // foraged apple
-     697,
-     10         // a vial of bee stinger poison
+     695,
+     10         // a small vial of low quality cyanide
    },
 
    // This must come last
@@ -81,6 +81,10 @@ struct thief_poison_data poison_vial_combat_data[] =
 {
    {
       "bee stinger poison"
+   },
+
+   {
+      "low quality cyanide"
    },
 
    {
@@ -114,6 +118,9 @@ int do_poisonmaking(struct char_data *ch, char *argument, int cmd)
 
   // search if the items in mortar and pestle match any poison vial types
   int index = valid_trade_skill_combine(container, poison_vial_data, ch);
+
+  if(index == -2)
+    return eFAILURE;
 
   send_to_char("You mix the ingrediants together in an attempt to make a poison..\r\n", ch);
 
@@ -192,11 +199,12 @@ int do_poisonweapon(struct char_data *ch, char *argument, int cmd)
 // Search through the different types of data looking for a match
 // Return index of match on successful find
 // Return -1 on failure
+// Return -2 if there's nothing in the container
 int valid_trade_skill_combine(obj_data * container, trade_data_type * data, char_data * ch)
 {
    if(!(container->contains)) {
      csendf(ch, "Your %s appears to be empty.\r\n", container->short_description);
-     return -1;
+     return -2;
    }
 
    vector<int> current;
@@ -215,7 +223,7 @@ int valid_trade_skill_combine(obj_data * container, trade_data_type * data, char
    for(int i = 0; data[i].result != -1; i++)
    {
       valid.clear();
-      for(int k = 0; k < MAX_INGREDIANTS && k != -1; k++)
+      for(int k = 0; k < MAX_INGREDIANTS && data[i].pieces[k] != -1; k++)
          valid.push_back(data[i].pieces[k]);
 
       sort(valid.begin(), valid.end());
@@ -230,7 +238,15 @@ int valid_trade_skill_combine(obj_data * container, trade_data_type * data, char
 
 int determine_trade_skill_chance(int learned, int trivial)
 {
-   return 50;  // flat 50/50 chance
+   int chance = 50;
+
+   chance -= trivial;
+   chance += learned;
+
+   chance = MIN(chance, 90);
+   chance = MAX(chance, 10);
+
+   return chance;
 }
 
 void determine_trade_skill_increase(char_data * ch, int skillnum, int learned, int trivial)
@@ -238,8 +254,10 @@ void determine_trade_skill_increase(char_data * ch, int skillnum, int learned, i
    int learn_skill(char_data * ch, int skill, int amount, int maximum);
 
    // can't learn past item's trivial value
-   if(learned >= trivial)
+   if(learned >= trivial) {
+      send_to_char("You have learned all you can from making this item.\r\n", ch);
       return;
+   }
 
    // TODO - add other requirements when done debugging
 

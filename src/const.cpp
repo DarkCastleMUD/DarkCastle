@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: const.cpp,v 1.32 2002/08/14 19:13:39 pirahna Exp $ */
+/* $Id: const.cpp,v 1.33 2002/08/25 18:59:08 pirahna Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1512,6 +1512,11 @@ char *combat_bits[] =
     "Hitall",
     "Rage1",
     "Rage2",
+    "Bladeshield1",
+    "Bladeshield2",
+    "Repelance",
+    "VitalStrike",
+    "MonkStance",
     "\n"
 };
 

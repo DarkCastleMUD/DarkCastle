@@ -61,6 +61,7 @@ int do_focused_repelance(struct char_data *ch, char *argument, int cmd)
 	  ch, NULL, NULL, TO_ROOM, NOTVICT );
     send_to_char("Your mystical vision is clear, your senses of the arcane sharpened.  " 
                  "No mortal can break through _your_ magical barrier.\r\n", ch);
+    SET_BIT(ch->combat, COMBAT_REPELANCE);
   }
 
   af.type      = SKILL_FOCUSED_REPELANCE;
@@ -70,8 +71,6 @@ int do_focused_repelance(struct char_data *ch, char *argument, int cmd)
   af.bitvector = 0;
 
   affect_to_char(ch, &af);
-
-  SET_BIT(ch->combat, COMBAT_REPELANCE);
 
   skill_increase_check(ch, SKILL_FOCUSED_REPELANCE, learned, SKILL_INCREASE_EASY);
 
