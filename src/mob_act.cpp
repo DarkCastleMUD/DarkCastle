@@ -19,7 +19,7 @@
 /* 12/06/2003   Onager   Modified mobile_activity() to prevent charmie    */
 /*                       scavenging                                       */
 /**************************************************************************/
-/* $Id: mob_act.cpp,v 1.23 2004/05/18 00:17:41 urizen Exp $ */
+/* $Id: mob_act.cpp,v 1.24 2004/05/20 22:05:21 urizen Exp $ */
 
 extern "C"
 {
@@ -504,8 +504,12 @@ void mobile_activity(void)
           if(IS_SET(ch->mobdata->actflags, ACT_AGGR_EVIL) &&
             GET_ALIGNMENT(tmp_ch) <= -350)
           {
-	   if (i==1)
+	   if (i==1) {
+	    if (GET_ALIGNMENT(ch) <= -350)
+           act("$n screams 'Get outta here, freak!'", ch, 0, 0, TO_ROOM, 0);
+		else
             act("$n screams 'May truth and justice prevail!'", ch, 0, 0, TO_ROOM, 0);
+	   }
 	   else {
 	    act("$n senses your evil intentions and attacks!", ch, 0,tmp_ch, TO_VICT,0);
 	    act("$n senses $t's evil intentions and attacks!", ch, 0,tmp_ch,TO_ROOM,NOTVICT);
@@ -520,8 +524,12 @@ void mobile_activity(void)
           if(IS_SET(ch->mobdata->actflags, ACT_AGGR_GOOD) &&
             GET_ALIGNMENT(tmp_ch) >= 350)
           {
-	   if (i==1)
-            act("$n screams 'The forces of evil shall crush your goodness!'", ch, 0, 0, TO_ROOM, 0);
+	   if (i==1) {
+	    if (GET_ALIGNMENT(ch) >= 350)
+	      act("$n screams 'I'm afraid I cannot let you trespass onto these grounds!'",ch,0,0,TO_ROOM,0);
+	    else
+              act("$n screams 'The forces of evil shall crush your goodness!'", ch, 0, 0, TO_ROOM, 0);
+	   }
 	   else {
 	    act("$n is offended by your good nature and attacks!",ch,0, tmp_ch, TO_VICT,0);
 	    act("$n is offended by $t's good nature and attacks!", ch, 0,tmp_ch,  TO_ROOM,NOTVICT);

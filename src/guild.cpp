@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.61 2004/05/19 20:42:59 urizen Exp $
+| $Id: guild.cpp,v 1.62 2004/05/20 22:05:21 urizen Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -15,10 +15,11 @@
 #include <returnvals.h>
 #include <ki.h>
 #include <mobile.h>
+#include <room.h>
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
-
+extern CWorld world;
 extern struct class_skill_defines g_skills[];
 extern struct class_skill_defines w_skills[];
 extern struct class_skill_defines t_skills[];
@@ -513,6 +514,7 @@ void skill_increase_check(char_data * ch, int skill, int learned, int difficulty
 
    if(IS_MOB(ch))
       return;
+   if (IS_SET(world[ch->in_room].room_flags, SAFE)) return;
    class_skill_defines * skilllist = get_skill_list(ch);
    if(!skilllist)
      return;  // class has no skills by default
