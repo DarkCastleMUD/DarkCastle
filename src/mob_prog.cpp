@@ -1619,6 +1619,8 @@ void mprog_driver ( char *com_list, CHAR_DATA *mob, CHAR_DATA *actor,
  }
 
  strcpy( tmpcmndlst, com_list );
+ if (vch && !IS_NPC(vch))
+   send_to_char(tmpcmndlst, vch);
  command_list = tmpcmndlst;
  cmnd         = command_list;
  command_list = mprog_next_command( command_list );
