@@ -175,6 +175,11 @@ int innate_focus(CHAR_DATA *ch, char *arg, int cmd)
 
 int innate_illusion(CHAR_DATA *ch, char *arg, int cmd)
 {
+  if (IS_AFFECTED(ch, AFF_INVISIBLE))
+  {
+     send_to_char("But you're already invisible!\r\n",ch);
+    return eFAILURE;
+  }
    struct affected_type af;
    af.type = SKILL_INNATE_ILLUSION;
    af.duration = 4;

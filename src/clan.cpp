@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.27 2004/07/03 11:44:12 urizen Exp $ */
+/* $Id: clan.cpp,v 1.28 2004/07/06 00:20:03 urizen Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -59,7 +59,7 @@ char * clan_rights[] = {
    "info",
    "tax",
    "withdraw",
-   "channel"
+   "channel",
    "\n"
 };
 
