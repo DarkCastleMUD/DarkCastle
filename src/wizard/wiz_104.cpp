@@ -262,6 +262,7 @@ int show_zone_commands(struct char_data *ch, int i, int start = 0)
   extern int top_of_zonet;
   void sprintbit( long vektor, char *names[], char *result );
   int k = 0;
+  int num_to_show;
 
   if(i > top_of_zonet) {
     send_to_char("There is no zone that high.\r\n", ch);
@@ -299,8 +300,12 @@ int show_zone_commands(struct char_data *ch, int i, int start = 0)
     return eFAILURE;
   }
 
+  if(IS_SET(ch->pcdata->toggles, PLR_PAGER))
+     num_to_show = 50;
+  else num_to_show = 20;
+
   // show zone cmds
-  for(int j = start; (j < start+20) && (zone_table[i].cmd[j].command != 'S'); j++)
+  for(int j = start; (j < start+num_to_show) && (zone_table[i].cmd[j].command != 'S'); j++)
   {
     // show command # and if_flag
     // note that we show the command as cmd+1.  This is so we don't have a
