@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.5 2002/10/12 23:45:52 pirahna Exp $
+| $Id: cl_warrior.cpp,v 1.6 2002/10/17 02:07:35 pirahna Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -615,6 +615,9 @@ int do_disarm( struct char_data *ch, char *argument, int cmd )
     percent = number( 1, 100 ) + GET_LEVEL(victim) - GET_LEVEL(ch);
 
     skill_increase_check(ch, SKILL_DISARM, learned, SKILL_INCREASE_MEDIUM);
+
+    if(GET_LEVEL(ch) < 50 && GET_LEVEL(ch) + 10 < GET_LEVEL(victim))  // keep lowbies from disarming big mobs
+       percent = 0;
 
     // Two handed weapons are twice as hard to disarm
     if (IS_SET(wielded->obj_flags.extra_flags, ITEM_TWO_HANDED))
