@@ -785,7 +785,8 @@ int execute_song_healing_melody( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA
 
    skill_increase_check(ch, SKILL_SONG_HEALING_MELODY, skill, SKILL_INCREASE_EASY);
 
-   if(number(1, 101) > ( 50 + skill/2 ) ) {
+   if(//number(1, 101) > ( 50 + skill/2 )
+	!skill_success(ch, NULL, SKILL_SONG_HEALING_MELODY)  ) {
       send_to_char("You run out of lyrics and end the song.\r\n", ch);
       return eSUCCESS;
    }
@@ -835,7 +836,8 @@ int execute_song_revealing_stacato( byte level, CHAR_DATA *ch, char *arg, CHAR_D
 
    skill_increase_check(ch, SKILL_SONG_REVEAL_STACATO, skill, SKILL_INCREASE_EASY);
 
-   if(number(1, 101) > ( 50 + skill/ 2 )) {
+  if(//number(1, 101) > ( 50 + skill/2 )
+        !skill_success(ch,NULL,  SKILL_SONG_REVEAL_STACATO)  ) {
       send_to_char("You run out of lyrics and end the song.\r\n", ch);
       return eSUCCESS;
    }
@@ -924,11 +926,13 @@ act("You resist $n's terrible clef!",ch,NULL,victim,TO_VICT,0);
       send_to_char("You dance a small jig on the corpse.\r\n", ch);
       act("$n dances a little jig on the fallen corpse.",
           ch, 0, victim, TO_ROOM, 0);
+	return retval;
    }
 
    skill_increase_check(ch, SKILL_SONG_TERRIBLE_CLEF, skill, SKILL_INCREASE_EASY);
 
-   if(number(1, 101) > ( 50 + skill/2 ) ) {
+  if(//number(1, 101) > ( 50 + skill/2 )
+        !skill_success(ch, victim, SKILL_SONG_TERRIBLE_CLEF)  ) {
       send_to_char("You run out of lyrics and end the song.\r\n", ch);
       return eSUCCESS;
    }
@@ -1005,7 +1009,8 @@ int execute_song_soothing_remembrance( byte level, CHAR_DATA *ch, char *arg, CHA
 
    skill_increase_check(ch, SKILL_SONG_SOOTHING_REMEM, skill, SKILL_INCREASE_MEDIUM);
 
-   if(number(1, 101) > ( 50 + skill/2 ) ) {
+  if(//number(1, 101) > ( 50 + skill/2 )
+        !skill_success(ch, NULL, SKILL_SONG_SOOTHING_REMEM)  ) {
       send_to_char("You run out of lyrics and end the song.\r\n", ch);
       return eSUCCESS;
    }
@@ -1070,7 +1075,8 @@ int execute_song_traveling_march( byte level, CHAR_DATA *ch, char *arg, CHAR_DAT
 
    skill_increase_check(ch, SKILL_SONG_TRAVELING_MARCH, skill, SKILL_INCREASE_EASY);
 
-   if(number(1, 101) > ( 50 + skill/2 )) {
+  if(//number(1, 101) > ( 50 + skill/2 )
+        !skill_success(ch, NULL, SKILL_SONG_TRAVELING_MARCH)  ) {
       send_to_char("You run out of lyrics and end the song.\r\n", ch);
       return eSUCCESS;
    }
@@ -1712,6 +1718,12 @@ int execute_song_fanatical_fanfare(byte level, CHAR_DATA *ch, char *arg, CHAR_DA
    GET_KI(ch) -= (has_skill(ch,SKILL_SONG_FANATICAL_FANFARE) > 60?1:2);
 
    skill_increase_check(ch, SKILL_SONG_FANATICAL_FANFARE, skill, SKILL_INCREASE_MEDIUM);
+
+   if (!skill_success(ch, NULL, SKILL_SONG_FANATICAL_FANFARE))
+   {
+	send_to_char("You run out of lyrics and end the song.\r\n",ch);
+	return eSUCCESS;
+   }
 
    ch->song_timer = song_info[ch->song_number].beats + 
                              (GET_LEVEL(ch) > 33) +

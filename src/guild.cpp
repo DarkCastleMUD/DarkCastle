@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.56 2004/05/18 00:17:40 urizen Exp $
+| $Id: guild.cpp,v 1.57 2004/05/18 20:58:57 urizen Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -58,15 +58,15 @@ char *how_good(int percent)
   if (percent <= 5)
     return ( " (horrible)");
   if (percent <= 10)
-    return ( " (shitty)");
-  if (percent <= 15)
     return ( " (crappy)");
+  if (percent <= 15)
+    return ( " (meager)");
   if (percent <= 20)
     return ( " (bad)");
   if (percent <= 30)
-    return ( " (meager)");
-  if (percent <= 40)
     return ( " (poor)");
+  if (percent <= 40)
+    return ( " (decent)");
   if (percent <= 50)
     return ( " (average)");
   if (percent <= 60)
@@ -328,7 +328,7 @@ int skills_guild(struct char_data *ch, char *arg, struct char_data *owner)
   send_to_char("You practice for a while...\n\r", ch);
   ch->pcdata->practices--;
 
-  percent = (int)int_app[GET_INT(ch)].learn_bonus;
+  percent = 1+(int)int_app[GET_INT(ch)].learn_bonus;
 
   learn_skill(ch, x, percent, skilllist[skillnumber].maximum);
     
@@ -546,25 +546,25 @@ void skill_increase_check(char_data * ch, int skill, int learned, int difficulty
    chance = number(1, 101);
    if(learned < 15)
       chance += 5;
-
+   int oi = 100;
    switch(difficulty) {
      case SKILL_INCREASE_EASY:
-        if(chance < 88)
-           return;
+	 oi = 88;
+	 oi -= int_app[GET_INT(ch)].easy_bonus;
         break;
      case SKILL_INCREASE_MEDIUM:
-        if(chance < 97)
-           return;
+	oi = 97;
+	oi -= int_app[GET_INT(ch)].medium_bonus;
         break;
      case SKILL_INCREASE_HARD:
-        if(chance < 100)
-           return;
+	oi = 100;
+	oi -= int_app[GET_INT(ch)].hard_bonus;
         break;
      default:
        log("Illegal difficulty value sent to skill_increase_check", IMMORTAL, LOG_BUG);
        break;
    }
-
+ 
    // figure out the name of the affect (if any)
    char * skillname = get_skill_name(skill);
 

@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.85 2004/05/18 00:17:42 urizen Exp $ */
+/* $Id: spells.cpp,v 1.86 2004/05/18 20:58:57 urizen Exp $ */
 
 extern "C"
 {
@@ -1238,53 +1238,6 @@ bool isaff2(int spellnum);
     return eSUCCESS;
 }
 
-int conc_bonus(int val)
-{
- switch(val)
- {
-    case 1:
-	return -5;
-    case 2:
-    case 3:
-	return -4;
-    case 4:
-    case 5:
-	return -3;
-    case 6:
-    case 7:
-	return -2;
-    case 8:
-    case 9:
-	return -1;
-    case 10:
-    case 11:
-    case 12:
-    case 13:
-    case 14:
-         return 0;
-    case 15: 
-    case 16:
-	return 1;
-    case 17:
-    case 18:
-	return 2;
-    case 19:
-    case 20:
-	return 3;
-    case 21:
-    case 22:
-	return 4;
-    case 23:
-    case 24:
-	return 5;
-    case 25:
-    case 26:
-	return 6;
-    default:
-	return val-20;
- }
-}
-
 int skill_value(CHAR_DATA *ch, int skillnum, int min = 33)
 {
   struct char_skill_data * curr = ch->skills;
@@ -1403,6 +1356,10 @@ bool skill_success(CHAR_DATA *ch, CHAR_DATA *victim, int skillnum, int mod = 0)
 	i -= stat_mod[get_stat(victim,stat)];
     }
   i += mod;
+  if (GET_CLASS(ch) == CLASS_MAGIC_USER || GET_CLASS(ch) == CLASS_ANTI_PAL || GET_CLASS(ch) == CLASS_THIEF)
+       i += int_app[GET_INT(ch)].conc_bonus;
+  else i += wis_app[GET_WIS(ch)].conc_bonus;
+  
   if (i < 33) i = 33;
   if (IS_AFFECTED2(ch, AFF_FOCUS) && ((skillnum >= SKILL_SONG_BASE && 
 skillnum <= SKILL_SONG_MAX) || (skillnum >= KI_OFFSET && skillnum <= (KI_OFFSET+MAX_KI_LIST))))
@@ -1694,8 +1651,9 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
           else chance += GET_WIS(ch);*/
 	chance = skill_value(ch, spl, 33);
 	if (GET_CLASS(ch) == CLASS_MAGIC_USER || GET_CLASS(ch) == CLASS_ANTI_PAL)
-	  chance += conc_bonus(GET_INT(ch));
-	else chance += conc_bonus(GET_WIS(ch));
+	  chance += int_app[GET_INT(ch)].conc_bonus;
+	else chance += wis_app[GET_WIS(ch)].conc_bonus;
+
         if(GET_LEVEL(ch) < IMMORTAL && number(1,101) > chance && !IS_AFFECTED2(ch,AFF_FOCUS))
         {
           csendf(ch, "You lost your concentration and are unable to cast %s!\n\r", spells[spl-1]);

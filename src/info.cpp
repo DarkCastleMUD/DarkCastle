@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.43 2004/05/18 00:17:40 urizen Exp $ */
+/* $Id: info.cpp,v 1.44 2004/05/18 20:58:57 urizen Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -1304,7 +1304,7 @@ int do_score(struct char_data *ch, char *argument, int cmd)
       "|/|   $B$4FIRE$R[%+3d] $BCOLD$R[%+3d] $B$5NRGY$R[%+3d] |\\|    $3ExpTillLevel$7:   %-10d      |o|\n\r"
       "|o|   $B$2ACID$R[%+3d] $B$3MAGK$R[%+3d] $2POIS$7[%+3d] |~|    $3Gold$7: %-9d $3Platinum$7: %-5d |/|\n\r"
       "($5:$7)=================================($5:$7)====================================($5:$7)\n\r",
-   GET_AC(ch), 	  GET_PKILLS(ch),   IS_CARRYING_N(ch), CAN_CARRY_N(ch),
+   GET_ARMOR(ch), 	  GET_PKILLS(ch),   IS_CARRYING_N(ch), CAN_CARRY_N(ch),
    GET_RDEATHS(ch), GET_PDEATHS(ch),  IS_CARRYING_W(ch), CAN_CARRY_W(ch),
    to_hit, to_dam, GET_EXP(ch),
    get_saves(ch,SAVE_TYPE_FIRE), get_saves(ch, SAVE_TYPE_COLD), get_saves(ch, SAVE_TYPE_ENERGY), GET_LEVEL(ch) == IMP ? 0 
@@ -1936,7 +1936,7 @@ int do_consider(struct char_data *ch, char *argument, int cmd)
    
    if (Learned > 20) {
       /* ARMOR CLASS */
-      x = GET_AC(victim)/20+5;
+      x = GET_ARMOR(victim)/20+5;
       if(x > 10) x = 10;
       if(x < 0)  x = 0;
       

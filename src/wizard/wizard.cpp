@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.16 2004/05/17 19:43:38 urizen Exp $
+| $Id: wizard.cpp,v 1.17 2004/05/18 20:59:02 urizen Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -338,7 +338,7 @@ void boro_mob_stat(struct char_data *ch, struct char_data *k)
 
 	sprintf(buf,
 	"|~|  $3Int$R: %2d    $3Wis$R: %2d    $3Ac$R: %-3d |o| $3Carried Items$R: %d $3Equipped Items$R: %d |/|\r\n",
-	GET_INT(k), GET_WIS(k), GET_AC(k), IS_CARRYING_N(k), i2);
+	GET_INT(k), GET_WIS(k), GET_ARMOR(k), IS_CARRYING_N(k), i2);
 	send_to_char(buf,ch);
 
 	sprintf(buf,
@@ -602,7 +602,7 @@ void mob_stat(struct char_data *ch, struct char_data *k)
   send_to_char(buf,ch);
      
   sprintf(buf, "$3AC$R:[%d]  $3Exp$R:[%d]  $3Hitroll$R:[%d]  $3Damroll$R:[%d]  $3Gold$R: [$B$5%d$R]\n\r",
-          GET_AC(k), GET_EXP(k), k->hitroll, k->damroll, k->gold );
+          GET_ARMOR(k), GET_EXP(k), GET_REAL_HITROLL(k), GET_REAL_DAMROLL(k), k->gold );
   send_to_char(buf, ch);
 
   if(!IS_MOB(k)) {

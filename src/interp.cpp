@@ -16,7 +16,7 @@
 /* 12/08/2003   Onager   Added chop_half() to work like half_chop() but    */
 /*                       chopping off the last word.                       */
 /***************************************************************************/
-/* $Id: interp.cpp,v 1.43 2004/04/28 22:05:45 urizen Exp $ */
+/* $Id: interp.cpp,v 1.44 2004/05/18 20:58:57 urizen Exp $ */
 
 extern "C"
 {
@@ -596,7 +596,8 @@ int command_interpreter( CHAR_DATA *ch, char *pcomm )
     }
 
     // Implement freeze command.
-    if(!IS_NPC(ch) && IS_SET(ch->pcdata->punish, PUNISH_FREEZE)) {
+    if(!IS_NPC(ch) && IS_SET(ch->pcdata->punish, PUNISH_FREEZE) &&
+	  str_cmp(pcomm, "quit")) { // they can now quit.
       send_to_char( "You're totally frozen!\n\r", ch );
       return eSUCCESS;
     }

@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.20 2004/05/18 00:17:40 urizen Exp $ */
+/* $Id: limits.cpp,v 1.21 2004/05/18 20:58:57 urizen Exp $ */
 
 extern "C"
 {
@@ -369,15 +369,15 @@ void advance_level(CHAR_DATA *ch, int is_conversion)
     switch(GET_CLASS(ch)) { 
     case CLASS_MAGIC_USER:
 	add_ki	    += (GET_LEVEL(ch) % 2);
-	add_hp      += number(2, 6);
-	add_mana    += number(2, 7);
+	add_hp      += number(3, 6);
+	add_mana    += number(5, 10);
 	add_moves   += number(1, (GET_CON(ch) / 2));
 	break;
 
     case CLASS_CLERIC:
 	add_ki	    += (GET_LEVEL(ch) % 2);
-	add_hp      += number(3, 13);
-	add_mana    += number(2, 7);
+	add_hp      += number(4, 8);
+	add_mana    += number(4, 9);
 	add_moves   += number(1, (GET_CON(ch) / 2));
 	break;
 
@@ -389,55 +389,55 @@ void advance_level(CHAR_DATA *ch, int is_conversion)
 
     case CLASS_WARRIOR:
 	add_ki	    += (GET_LEVEL(ch) % 2);
-	add_hp      += number(10, 21);
+	add_hp      += number(14,181);
 	add_moves   += number(1, (GET_CON(ch) / 2));
 	break;
 
     case CLASS_ANTI_PAL:
 	add_ki	    += (GET_LEVEL(ch) % 2);
-        add_hp      += number(8, 15);
-        add_mana    += number(1, 3);
+        add_hp      += number(8, 12);
+        add_mana    += number(3, 5);
         add_moves   += number(1, (GET_CON(ch) / 2));
         break;
 
     case CLASS_PALADIN:
 	add_ki	    += (GET_LEVEL(ch) % 2);
-        add_hp      += number(8, 15);
-        add_mana    += number(1, 3);
+        add_hp      += number(10, 14);
+        add_mana    += number(2, 4);
         add_moves   += number(1, (GET_CON(ch) / 2));
         break;
    
     case CLASS_BARBARIAN:
 	add_ki	     += (GET_LEVEL(ch) % 2);
-        add_hp       += number(12,23);
+        add_hp       += number(14,18);
         add_moves    += number(1, (GET_CON(ch) / 2));
         break;
 
      case CLASS_MONK:
 	add_ki	     += 1;
-        add_hp       += number(7, 16);
+        add_hp       += number(10, 14);
         add_moves    += number(1, (GET_CON(ch) / 2));
         GET_AC(ch)   += -2;
         break;
 
      case CLASS_RANGER:
 	add_ki       += (GET_LEVEL(ch) % 2);
-        add_hp       += number(8, 15);
-        add_mana     += number(1, 3);
+        add_hp       += number(8, 12);
+        add_mana     += number(3, 5);
         add_moves    += number(1, (GET_CON(ch) / 2)); 
         break;
 
      case CLASS_BARD:
        add_ki       += 1;
-       add_hp       += number(8, 15);
+       add_hp       += number(6, 10);
        add_mana     += 0;
        add_moves    += number(1, (GET_CON(ch) / 2)); 
        break;
 
      case CLASS_DRUID:
        add_ki       += (GET_LEVEL(ch) % 2);;
-       add_hp       += number(3, 8);
-       add_mana     += number(2, 7);
+       add_hp       += number(5, 9);
+       add_mana     += number(4, 9);
        add_moves    += number(1, (GET_CON(ch) / 2)); 
        break;
 

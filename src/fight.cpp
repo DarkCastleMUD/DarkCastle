@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.192 2004/05/18 00:17:40 urizen Exp $ */
+/* $Id: fight.cpp,v 1.193 2004/05/18 20:58:57 urizen Exp $ */
 
 extern "C"
 {
@@ -949,7 +949,7 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
     chance += GET_LEVEL(ch) - GET_LEVEL(vict);
     chance += GET_REAL_HITROLL(ch);
   //  chance += dex_app[GET_DEX(ch)].tohit;
-    chance += ( GET_AC(vict) / 10 );  // (positive ac hurts you, negative helps)
+    chance += ( GET_ARMOR(vict) / 10 );  // (positive ac hurts you, negative helps)
     chance += weapon_skill_hit_bonus;
 /*
     if(IS_SET(vict->combat, COMBAT_STUNNED) ||
@@ -3847,7 +3847,7 @@ int can_be_attacked(CHAR_DATA *ch, CHAR_DATA *vict)
     return TRUE;
   }
 
-  if(!IS_NPC(ch) && !IS_NPC(vict) && GET_LEVEL(ch) == 1) {
+  if(!IS_NPC(ch) && !IS_NPC(vict) && GET_LEVEL(ch) < 5) {
     send_to_char("You are too new in this realm to make enemies!\n\r", ch);
     return FALSE;
   }
@@ -3855,8 +3855,8 @@ int can_be_attacked(CHAR_DATA *ch, CHAR_DATA *vict)
   if(IS_AFFECTED(vict, AFF_CANTQUIT))
     return TRUE;
   
-  if(!IS_NPC(ch) && GET_LEVEL(vict) == 1)  {
-    send_to_char("You would slaughter a level one player?!\n\r", ch);
+  if(!IS_NPC(ch) && GET_LEVEL(vict) < 5)  {
+    send_to_char("The magics of the MUD school seems to be protecting them from harm.\n\r", ch);
     return FALSE;
   }
   
