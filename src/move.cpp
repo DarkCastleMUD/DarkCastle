@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.11 2002/08/01 17:56:39 pirahna Exp $
+| $Id: move.cpp,v 1.12 2002/08/02 16:27:28 pirahna Exp $
 | move.C
 | Movement commands and stuff.
 */
@@ -314,28 +314,6 @@ int do_simple_move(CHAR_DATA *ch, int cmd, int following)
          return eFAILURE;
       }
      
-/*  above is a little more effecient since we aren't checking AFF_FLYING every single time.
-    Looks nicer too:)
-    Added sector_air check on it as well
-    7/18/02 - pir
-      if( ( 
-         (cmd == 0 && !IS_AFFECTED(ch, AFF_FLYING) ) &&
-         ( IS_SET( world[world[ch->in_room].dir_option[0]->to_room].room_flags, FALL_SOUTH ) )) ||
-         ((cmd == 1 && !IS_AFFECTED(ch, AFF_FLYING)) &&
-         (IS_SET(world[world[ch->in_room].dir_option[1]->to_room].room_flags, FALL_WEST))) ||
-         ((cmd == 2 && !IS_AFFECTED(ch, AFF_FLYING)) &&
-         (IS_SET(world[world[ch->in_room].dir_option[2]->to_room].room_flags, FALL_NORTH))) ||
-         ((cmd == 3 && !IS_AFFECTED(ch, AFF_FLYING)) &&
-         (IS_SET(world[world[ch->in_room].dir_option[3]->to_room].room_flags, FALL_EAST))) ||
-         ((cmd == 4 && !IS_AFFECTED(ch, AFF_FLYING)) &&
-         (IS_SET(world[world[ch->in_room].dir_option[4]->to_room].room_flags, FALL_DOWN))) ||
-         ((cmd == 5 && !IS_AFFECTED(ch, AFF_FLYING)) &&
-         (IS_SET(world[world[ch->in_room].dir_option[5]->to_room].room_flags, FALL_UP)))) {
-         send_to_char("You would need to fly to go there!\n\r", ch);
-         return eFAILURE;
-      }
-*/
-
       // fly down't work over water 
       if ((world[ch->in_room].sector_type == SECT_WATER_NOSWIM) ||
           (world[world[ch->in_room].dir_option[cmd]->to_room].sector_type == SECT_WATER_NOSWIM)) {
@@ -359,15 +337,6 @@ int do_simple_move(CHAR_DATA *ch, int cmd, int following)
 	 }
       }
 
-      if(!IS_NPC(ch) &&
-         world[world[ch->in_room].dir_option[cmd]->to_room].sector_type == SECT_UNDERWATER &&
-         !affected_by_spell(ch, SPELL_WATER_BREATHING)
-        )
-      {
-         send_to_char("Underwater?!\r\n", ch);
-         return eFAILURE;
-      }
-
       if(world[world[ch->in_room].dir_option[cmd]->to_room].sector_type != SECT_WATER_NOSWIM &&
          world[world[ch->in_room].dir_option[cmd]->to_room].sector_type != SECT_WATER_SWIM &&
          world[world[ch->in_room].dir_option[cmd]->to_room].sector_type != SECT_UNDERWATER)
@@ -386,6 +355,15 @@ int do_simple_move(CHAR_DATA *ch, int cmd, int following)
       send_to_char("No.\n\r", ch);
       return eFAILURE;
     } 
+
+    if(!IS_NPC(ch) &&
+       world[world[ch->in_room].dir_option[cmd]->to_room].sector_type == SECT_UNDERWATER &&
+       !affected_by_spell(ch, SPELL_WATER_BREATHING)
+      )
+    {
+       send_to_char("Underwater?!\r\n", ch);
+       return eFAILURE;
+    }
 
     // if I'm STAY_NO_TOWN, don't enter a ZONE_IS_TOWN zone no matter what
     if(IS_NPC(ch) && 
