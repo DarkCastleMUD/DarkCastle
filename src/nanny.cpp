@@ -11,7 +11,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.5 2002/07/01 00:30:36 pirahna Exp $ */
+/* $Id: nanny.cpp,v 1.6 2002/07/10 18:00:36 pirahna Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -1298,9 +1298,11 @@ void update_command_lag_and_poison()
       // handle poison
       if(IS_AFFECTED(i, AFF_POISON)) {
         tmp = GET_POISON_AMOUNT(i);
-        retval = damage(i, i, tmp, TYPE_POISON, SPELL_POISON, 0);
-        if(SOMEONE_DIED(retval))
-          continue;
+        if(tmp) {
+           retval = damage(i, i, tmp, TYPE_POISON, SPELL_POISON, 0);
+           if(SOMEONE_DIED(retval))
+             continue;
+        }
       }
 
       // handle command lag
