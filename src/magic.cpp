@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.157 2004/06/06 18:01:36 urizen Exp $ */
+/* $Id: magic.cpp,v 1.158 2004/06/06 18:05:06 urizen Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -7981,6 +7981,8 @@ int cast_herb_lore(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *vi
   }
 
 
+
+  if (!can_heal(ch,victim, SPELL_HERB_LORE)) return eFAILURE;
 
   send_to_char("These herbs really do the trick!\n\r", ch);
   send_to_char("You feel much better!\n\r", victim);
