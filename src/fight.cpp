@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.182 2004/05/14 00:11:17 urizen Exp $ */
+/* $Id: fight.cpp,v 1.183 2004/05/14 01:15:01 urizen Exp $ */
 
 extern "C"
 {
@@ -1892,6 +1892,8 @@ int check_riposte(CHAR_DATA * ch, CHAR_DATA * victim)
       return eFAILURE;
   }
 
+  if (IS_NPC(victim) && number(0,4)) return eFAILURE;
+
   if (skill_success(victim, ch, SKILL_RIPOSTE))
     return eFAILURE;
   
@@ -2034,7 +2036,8 @@ int speciality_bonus(CHAR_DATA *ch,int attacktype)
    }
    if (!skill) return 0;
    int l = has_skill(ch,skill);
-   return 0 - l;   
+   if (IS_NPC(ch)) return -(GET_LEVEL(ch)+17);
+   return 0 - l;
 }
 
 /*
@@ -2071,10 +2074,10 @@ bool check_dodge(CHAR_DATA * ch, CHAR_DATA * victim, int attacktype)
       modifier = 5;
   }
 
-  if (modifier == 0 && (IS_NPC(victim) || !has_skill(victim,SKILL_DODGE)))
+  if (modifier == 0 && IS_NPC(victim))
     return FALSE;
 
-  modifier += speciality_bonus(ch, attacktype);
+  modifier += speciality_bonus(victim, attacktype);
   if (!skill_success(victim,ch,SKILL_DODGE, modifier))
     return FALSE;
   
