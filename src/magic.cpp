@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.118 2004/04/27 17:54:40 urizen Exp $ */
+/* $Id: magic.cpp,v 1.119 2004/04/28 07:37:40 urizen Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -2549,7 +2549,7 @@ int spell_sleep(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
 		break;
 	     case 2:
 	     case 3:
-	      send_to_char("The combined magics fizzle, and cause an explosion!",ch);
+	      send_to_char("The combined magics fizzle, and cause an explosion!\r\n",ch);
 		{
 		  act("$n wakes up in a burst of magical energies!",victim, NULL, NULL, TO_ROOM,0);
 		  affect_from_char(victim, SPELL_PARALYZE);

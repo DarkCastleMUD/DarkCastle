@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.85 2004/04/27 19:50:17 urizen Exp $ */
+/* $Id: const.cpp,v 1.86 2004/04/28 07:37:39 urizen Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1035,7 +1035,7 @@ struct class_skill_defines w_skills[] = {
 {    "crushing",	SKILL_CRUSHING_WEAPONS,	30,	90,	3023,	NULL,{STR,0} },
 {    "tactics",		SKILL_TACTICS,		31,	95,	-2,	"The guardian of this guild has the knowledge you seek.  Speak the name of this skill in his presence.",{INT,WIS} },
 {    "two handers",     SKILL_TWO_HANDED_WEAPONS,33,	85,	3023,	NULL,{STR,0} },
-{    "stun",		SKILL_STUN,		35,	55,	-2, 	"Go to see any master shaolin monk.",{DEX,0} },
+{    "stun",		SKILL_STUN,		35,	75,	-2, 	"Go to see any master shaolin monk.",{DEX,0} },
 {    "guard",		SKILL_GUARD,		37,	95,	-2,	"A crabby old hermit who lives alone and failed college is who you want.",{STR,WIS} },
 {    "riposte",		SKILL_RIPOSTE,		40,	95,	-2, 	"A race not entirely of thise world holds the knowledge, they special in weapons.",{DEX,INT} },
 {    "skewer",		SKILL_SKEWER,		45,	95,	-2, 	"The man who runs the guard of sorpigal knows how to skewer, I believe.",{STR,CON} },

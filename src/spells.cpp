@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.69 2004/04/25 21:19:52 urizen Exp $ */
+/* $Id: spells.cpp,v 1.70 2004/04/28 07:37:40 urizen Exp $ */
 
 extern "C"
 {
@@ -1092,7 +1092,7 @@ void stop_follower(CHAR_DATA *ch, int cmd)
    if (ch->fighting && ch->fighting != ch->master)
    {
      do_say(ch, "Screw this, I'm going home!",9);
-     stop_fighting(ch->master);
+     stop_fighting(ch->fighting);
      stop_fighting(ch);
    }
   }

@@ -21,7 +21,7 @@
  *  12/08/2003   Onager    Added check for charmies and !charmie eq to     *
  *                         equip_char()                                    *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.40 2004/04/27 19:50:17 urizen Exp $ */
+/* $Id: handler.cpp,v 1.41 2004/04/28 07:37:40 urizen Exp $ */
     
 extern "C"
 {
@@ -340,7 +340,7 @@ str_app[STRENGTH_APPLY_INDEX(ch)].wield_w && !IS_SET(ch->affected_by2, AFF_POWER
     obj_to_char(unequip_char(ch, WIELD), ch);
     if(ch->equipment[SECOND_WIELD] && (
          GET_OBJ_WEIGHT(ch->equipment[SECOND_WIELD]) <= 
-(str_app[STRENGTH_APPLY_INDEX(ch)].wield_w/2 || !IS_SET(ch->affected_by2, 
+(str_app[STRENGTH_APPLY_INDEX(ch)].wield_w && !IS_SET(ch->affected_by2, 
 AFF_POWERWIELD))))
     {
       act("You move your $p to be your primary weapon.", ch, ch->equipment[SECOND_WIELD], 0, TO_CHAR, INVIS_NULL);
