@@ -976,6 +976,8 @@ int do_sedit(struct char_data *ch, char *argument, int cmd)
 
   extern char * skills[];
   extern char * spells[];
+  extern char * ki[];
+  extern char * songs[];
 
   char * sedit_values[] = {
     "add", 
@@ -1128,10 +1130,14 @@ int do_sedit(struct char_data *ch, char *argument, int cmd)
       send_to_char(buf, ch);
       for(skill = vict->skills; skill; skill = skill->next)
       {
-        if(skill->skillnum < SKILL_BASE)
+        if(skill->skillnum < MAX_SPL_LIST)
           sprintf(buf, "  %-15s%d\r\n", spells[(skill->skillnum)-1], skill->learned);
-        else if(skill->skillnum < COMMAND_BASE)
+        else if(skill->skillnum <= MAX_KI_LIST+KI_OFFSET && skill->skillnum >= KI_OFFSET)
+          sprintf(buf, "  %-15s%d\r\n", ki[skill->skillnum - KI_OFFSET], skill->learned);
+        else if(skill->skillnum <= SKILL_MAX && skill->skillnum >= SKILL_BASE)
           sprintf(buf, "  %-15s%d\r\n", skills[(skill->skillnum)-SKILL_BASE], skill->learned);
+        else if(skill->skillnum <= SKILL_SONG_MAX && skill->skillnum >= SKILL_SONG_BASE)
+          sprintf(buf, "  %-15s%d\r\n", songs[(skill->skillnum)-SKILL_SONG_BASE], skill->learned);
         else continue;
 
         send_to_char(buf, ch);
