@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.22 2002/12/26 23:11:35 pirahna Exp $ */
+/* $Id: info.cpp,v 1.23 2003/01/02 03:07:10 pirahna Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -287,9 +287,11 @@ void list_obj_to_char(struct obj_data *list, struct char_data *ch, int mode,
 void show_spells(char_data * i, char_data * ch)
 {
    char send_buf[MAX_STRING_LENGTH];
-
-   sprintf(send_buf, "$B$7-$1%s has: ", i->name);
    int has_spells = 0;
+
+   if(IS_MOB(i))
+     sprintf(send_buf, "$B$7-$1%s has: ", GET_SHORT(i));        
+   else sprintf(send_buf, "$B$7-$1%s has: ", i->name);
          
    if (IS_AFFECTED(i,AFF_SANCTUARY)) {
       sprintf(send_buf, "%s$7white aura! ", send_buf);
