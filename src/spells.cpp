@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.9 2002/08/02 02:32:48 pirahna Exp $ */
+/* $Id: spells.cpp,v 1.10 2002/08/02 16:19:14 pirahna Exp $ */
 
 extern "C"
 {
@@ -1002,35 +1002,20 @@ void isr_set(CHAR_DATA *ch)
 bool many_charms(CHAR_DATA *ch)
 {
   struct follow_type *k;
-  int counter = 0;
    
   for(k = ch->followers; k; k = k->next) {
      if(IS_AFFECTED(k->follower, AFF_CHARM)) 
-       counter++;
-
-   // Only one charmie if the mage has a golem
-     if(isname("golem", GET_NAME(k->follower)))
-       return TRUE;
+        return TRUE;
   }
 
-  if(counter < 2 && GET_CLASS(ch) == CLASS_MAGIC_USER)
-    return FALSE;
-  else 
-
-   if(counter < 1 && (GET_CLASS(ch) == CLASS_CLERIC ||
-                          GET_CLASS(ch) == CLASS_ANTI_PAL)
-                          || GET_CLASS(ch) == CLASS_MAGIC_USER
-     )
-      return FALSE;
-  else if(counter < 2 && GET_CLASS(ch) == CLASS_RANGER)
-      return FALSE;
-  else
-    return TRUE;
+  return FALSE;
 }
 
 
 bool any_charms(CHAR_DATA *ch)
 {
+  return many_charms(ch);
+/*
   struct follow_type *k;
   int counter = 0;
 
@@ -1043,6 +1028,7 @@ bool any_charms(CHAR_DATA *ch)
     return TRUE;
   else
     return FALSE;
+*/
 }
 
 
