@@ -738,6 +738,11 @@ act("You resist $n's whistle sharp!",ch,NULL,victim,TO_VICT,0);
 
    if(IS_SET(retval, eVICT_DIED))
    {
+
+      act("$n's whistling pierces directly into $N's head and turns their brain to mush!", ch, NULL, victim, TO_ROOM, NOTVICT);
+      act("$n's whistling pierces into your brain, which is now mush!", ch, NULL, victim, TO_VICT, 0);
+      act("$N's brain has been turned to mush.", ch, NULL, victim, TO_CHAR, 0);
+
       send_to_char("You dance a small jig on the corpse.\r\n", ch);
       act("$n dances a little jig on the fallen corpse.",
           ch, 0, victim, TO_ROOM, 0);
@@ -941,6 +946,12 @@ act("You resist $n's terrible clef!",ch,NULL,victim,TO_VICT,0);
      return retval;
    if(IS_SET(retval, eVICT_DIED))
    {
+
+
+      act("$n's terrible clef bangs against $N until they are no more!", ch, NULL, victim, TO_ROOM, NOTVICT);
+      act("$n's terrible clef has beaten you to a pulp!", ch, NULL, victim, TO_VICT, 0);
+      act("The terrible clef has left $N broken, bloody, and dead!", ch, NULL, victim, TO_CHAR, 0);
+
       send_to_char("You dance a small jig on the corpse.\r\n", ch);
       act("$n dances a little jig on the fallen corpse.",
           ch, 0, victim, TO_ROOM, 0);
@@ -2293,6 +2304,10 @@ int execute_song_crushing_crescendo( byte level, CHAR_DATA *ch, char *arg, CHAR_
      return retval;
    if(IS_SET(retval, eVICT_DIED))
    {
+      act("$n's crushing crescendo has completely crushed $N and they are no more!", ch, NULL, victim, TO_ROOM, NOTVICT);
+      act("$n's song has completely crushed you!", ch, NULL, victim, TO_VICT, 0);
+      act("The power of your song has completely crushed $N!", ch, NULL, victim, TO_CHAR, 0);
+
       send_to_char("You dance a small jig on the corpse.\r\n", ch);
       act("$n dances a little jig on the fallen corpse.",
           ch, 0, victim, TO_ROOM, 0);
