@@ -1597,7 +1597,7 @@ char*arg, CHAR_DATA *invoker)
       case 11305:
           low = 11300;
 	  high = 11599;
-	  time = 12;
+	  time = 60;
 	  sector = SECT_WATER_NOSWIM;
 	  sprintf(msg1,"The ship sails off into the distance.");
 	  sprintf(msg2,"A ship sails in.");
@@ -1605,7 +1605,7 @@ char*arg, CHAR_DATA *invoker)
       case 5911: // Carnival gates
 	  low = 18100;
 	  high = 18213;
-	  time = 15;
+	  time = 75;
 	  sprintf(msg1,"The carnival breaks off and moves off into the distance.");
 	  sprintf(msg2,"A band of wagons enter, and set up a carnival here.");
           break;
@@ -2067,7 +2067,7 @@ int generic_weapon_combat(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *ar
 
    switch(obj_index[obj->item_number].virt) {
      case 16903:  // valhalla hammer
-       if(number(1, 100) < GET_DEX(ch)/4)
+       if(number(1, 100) > GET_DEX(ch)/4)
          break;
        send_to_char("The hammer begins to hum and strikes out with the power of Thor!\r\n", ch);
        act("$n's hammer begins to hum and strikes out with the power of Thor!", 
