@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.9 2002/08/01 17:31:19 pirahna Exp $ */
+/* $Id: info.cpp,v 1.10 2002/08/01 19:35:28 pirahna Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -1435,7 +1435,7 @@ int do_time(struct char_data *ch, char *argument, int cmd)
    if(!pTime)
       return eFAILURE;
    
-   sprintf(buf, "The system time is %d/%d/%02d (%d:%02d)\n",
+   sprintf(buf, "The system time is %d/%d/%02d (%d:%02d)\n\r",
       (pTime->tm_mon)+1,
       (pTime->tm_mday),
       ((pTime->tm_year) % 100), // mod 100 fixes yXk bug -pir
