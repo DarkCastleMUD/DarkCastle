@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: non_off.cpp,v 1.3 2002/07/31 19:12:30 pirahna Exp $
+| $Id: non_off.cpp,v 1.4 2002/08/01 06:29:31 dcastle Exp $
 | non_off.C
 | Description:  Implementation of generic, non-offensive commands.
 */
@@ -450,7 +450,8 @@ int do_summon_toggle(struct char_data *ch, char *argument, int cmd)
     }
     else
     {
-	send_to_char( "You may now be summoned by other players.\n\r", ch);
+	send_to_char( "You may now be summoned by other players.\n\r"
+                      "Make _sure_ you want this... they could summon you to your death..\r\n", ch);
 	SET_BIT(ch->pcdata->toggles, PLR_SUMMONABLE);
     }
     return eSUCCESS;
