@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: non_off.cpp,v 1.16 2004/04/22 23:07:18 urizen Exp $
+| $Id: non_off.cpp,v 1.17 2004/04/23 12:11:00 urizen Exp $
 | non_off.C
 | Description:  Implementation of generic, non-offensive commands.
 */
@@ -554,12 +554,12 @@ int do_notax_toggle(struct char_data *ch, char *argument, int cmd)
 
     if (IS_SET(ch->pcdata->toggles, PLR_NOTAX))
     {
-        send_to_char( "You will no longer be taxed.\n\r", ch);
+        send_to_char( "You will now be taxed on all your loot.\n\r", ch);
         REMOVE_BIT(ch->pcdata->toggles, PLR_NOTAX);
     }
     else
     {
-        send_to_char( "You will now be taxed on all your loot.\n\r", ch);
+        send_to_char( "You will no longer be taxed.\n\r", ch);
         SET_BIT(ch->pcdata->toggles, PLR_NOTAX);
     }
 
