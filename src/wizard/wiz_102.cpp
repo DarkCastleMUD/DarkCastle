@@ -1656,9 +1656,20 @@ int do_oedit(struct char_data *ch, char *argument, int cmd)
       strcpy(buf4, buf2);
       strcpy(buf3, buf);
     }
+// MOVED
+    for(x = 0 ;; x++)
+    {
+      if(fields[x][0] == '\n')
+      {
+        send_to_char("Invalid field.\n\r", ch);
+        return eFAILURE;
+      }
+      if(is_abbrev(buf3, fields[x]))
+        break;
+    }
 
     // a this point, item_num is the index
-
+    if (x!=18) // Checked in there
     if(!can_modify_object(ch, item_num)) {
       send_to_char("You are unable to work creation outside of your range.\n\r", ch);
       return eFAILURE;
@@ -1674,17 +1685,6 @@ int do_oedit(struct char_data *ch, char *argument, int cmd)
     {
       obj_stat(ch, (obj_data *) obj_index[item_num].item);
       return eSUCCESS;
-    }
-
-    for(x = 0 ;; x++)
-    {
-      if(fields[x][0] == '\n')
-      {
-        send_to_char("Invalid field.\n\r", ch);
-        return eFAILURE;
-      }
-      if(is_abbrev(buf3, fields[x]))
-        break;
     }
 
     switch(x) {
@@ -2484,13 +2484,25 @@ int do_medit(struct char_data *ch, char *argument, int cmd)
       strcpy(buf4, buf2);
       strcpy(buf3, buf);
     }
+ // MOVED
+    for(x = 0 ;; x++)
+    {
+      if(fields[x][0] == '\n')
+      {
+        send_to_char("Invalid field.\n\r", ch);
+        return eFAILURE;
+      }
+      if(is_abbrev(buf3, fields[x]))
+        break;
+    }
 
     // a this point, mob_num is the index
 
-    if(!can_modify_mobile(ch, mob_num)) {
-      send_to_char("You are unable to work creation outside of your range.\n\r", ch);
-      return eFAILURE;
-    }
+    if (x != 30) // Checked in there.
+      if(!can_modify_mobile(ch, mob_num)) {
+        send_to_char("You are unable to work creation outside of your range.\n\r", ch);
+        return eFAILURE;
+      }
 
     if(mob_num != ch->pcdata->last_mob_edit) {
       sprintf(buf2, "$3Current mob set to$R: %d\n\r", mob_index[mob_num].virt);
@@ -2502,17 +2514,6 @@ int do_medit(struct char_data *ch, char *argument, int cmd)
     {
       mob_stat(ch, (char_data *) mob_index[mob_num].item);
       return eSUCCESS;
-    }
-
-    for(x = 0 ;; x++)
-    {
-      if(fields[x][0] == '\n')
-      {
-        send_to_char("Invalid field.\n\r", ch);
-        return eFAILURE;
-      }
-      if(is_abbrev(buf3, fields[x]))
-        break;
     }
 
     switch(x) {

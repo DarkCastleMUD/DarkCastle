@@ -1,7 +1,7 @@
 #ifndef FILEINFO_H_
 #define FILEINFO_H_
 /*
-| $Id: fileinfo.h,v 1.5 2004/05/01 11:05:47 urizen Exp $
+| $Id: fileinfo.h,v 1.6 2004/05/20 15:51:12 urizen Exp $
 | fileinfo.h
 | Description:  Contains information for loading files, ie "../lib", etc..
 */
@@ -20,6 +20,7 @@
 #define  PLAYER_SHOP_DIR     "../lib/playershops"
 #define  FORBIDDEN_NAME_FILE "../lib/forbidden_names.txt"
 #define  SKILL_QUEST_FILE    "../lib/skill_quests.txt"
+#define  FAMILIAR_DIR        "../familiar"
 #else
 #define DFLT_DIR             "lib"
 #define  SAVE_DIR            "save"
@@ -31,6 +32,7 @@
 #define  PLAYER_SHOP_DIR     "playershops"
 #define  FORBIDDEN_NAME_FILE "forbidden_names.txt"
 #define SKILL_QUEST_FILE "skill_quests.txt"
+#define FAMILIAR_DIR		"familiar"
 #endif
 
 // TODO - Remove tinyworld.shp and divide the stops up into some meaningful
