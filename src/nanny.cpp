@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.56 2004/05/14 00:30:11 urizen Exp $ */
+/* $Id: nanny.cpp,v 1.57 2004/05/14 00:43:19 urizen Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -1434,7 +1434,6 @@ break;
              load_char_obj(d, tmp_name);
              ch = d->character;
           }
-	  affect_total(ch);
 	  if  (GET_GOLD(ch) > 10000000)
           {
              sprintf(log_buf, "%s has more than 10 mil gold. Bugged?", GET_NAME(ch));
@@ -1472,6 +1471,8 @@ break;
 	     do_help(ch, "new", 99);
           }
 	  do_look( ch, "", 8 );
+  	  extern void zap_eq_check(char_data *ch);
+	  zap_eq_check(ch);
           break;
           
        case '2':
