@@ -192,6 +192,7 @@ int cast_create_golem(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA 
     send_to_char("Something goes wrong, and you fail!",ch);
     return eFAILURE;
   }
+  char_to_room(golem, ch->in_room);
   add_follower(golem,ch,0);
   SET_BIT(golem->affected_by, AFF_CHARM);
   struct affected_type af;
