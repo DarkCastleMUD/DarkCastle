@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.5 2002/07/01 01:02:36 pirahna Exp $
+| $Id: wizard.cpp,v 1.6 2002/07/10 17:16:01 pirahna Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -807,6 +807,7 @@ void obj_stat(struct char_data *ch, struct obj_data *j)
   extern char *more_obj_bits[];
   extern char *size_bits[];
   extern char *spells[];
+  extern char *portal_bits[];
 
   /* For chars */
   extern char *equipment_types[];
@@ -1028,7 +1029,23 @@ void obj_stat(struct char_data *ch, struct obj_data *j)
                   j->obj_flags.value[0],
                   j->obj_flags.value[1]);
           break;
-
+      case ITEM_PORTAL :
+          sprintf(buf, "$3ToRoom (v1)$R : %d\n"
+                       "$3Type   (v2)$R : ",  j->obj_flags.value[0]);
+          switch(j->obj_flags.value[1]) {
+             case 0: strcat(buf, "Player-Portal");       break;
+             case 1: // no break on purpose
+             case 2: strcat(buf, "Game-portal");         break;
+             default: strcat(buf, "Unknown!!!");         break;
+          }
+          sprintf(buf2, "(Should be 2 unless from spell)\n"
+                      "$3Zone   (v3)$R : %d (can 'leave' anywhere from this zone (set to -1 otherwise))\n"
+                      "$3Flags  (v4)$R : ", j->obj_flags.value[2] );
+          strcat(buf, buf2);
+          sprintbit(j->obj_flags.value[3],portal_bits,buf2);
+          strcat(buf, buf2);
+          strcat(buf, "\n(0 = nobits, 1 = no_leave, 2 = no_enter)");
+          break;
       default :
 	  sprintf(buf,"Values 0-3 : [%d] [%d] [%d] [%d]",
 	          j->obj_flags.value[0],

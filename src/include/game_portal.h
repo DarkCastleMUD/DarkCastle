@@ -4,6 +4,9 @@
 #define MAX_GAME_PORTALS 9
 #define FOREVER          -5
 
+#define PORTAL_NO_LEAVE   1<<0
+#define PORTAL_NO_ENTER   1<<1
+
 struct game_portal
 {
   int to_room;       /* Room to make the portal to */

@@ -34,6 +34,12 @@ struct game_portal game_portals[MAX_GAME_PORTALS];
 |   hard coded!
 */
 
+char * portal_bits[] = {
+  "NO_LEAVE",
+  "NO_ENTER",
+  "\n"
+};
+
 void load_game_portals()
 {
 

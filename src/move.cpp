@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.4 2002/06/29 18:16:22 pirahna Exp $
+| $Id: move.cpp,v 1.5 2002/07/10 17:15:57 pirahna Exp $
 | move.C
 | Movement commands and stuff.
 */
@@ -22,6 +22,7 @@
 #include <clan.h> // clan_room_data
 #include <string.h>
 #include <returnvals.h>
+#include <game_portal.h>
 
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
@@ -602,7 +603,8 @@ int do_leave(struct char_data *ch, char *arguement, int cmd)
   for(k = object_list; k; k = k->next) {
    if((k->obj_flags.type_flag == ITEM_PORTAL) &&
      (k->obj_flags.value[1] == 1 || (k->obj_flags.value[1] == 2)) &&
-     (k->in_room > -1))
+     (k->in_room > -1) &&
+     !IS_SET(k->obj_flags.value[3], PORTAL_NO_LEAVE))
      {
      if((k->obj_flags.value[0] == world[ch->in_room].number) ||
         (k->obj_flags.value[2] == world[ch->in_room].zone))
@@ -671,6 +673,13 @@ int do_enter(CHAR_DATA *ch, char *argument, int cmd)
    else {
       sesame = ch;
       }
+
+   // should probably just combine this with 'if' below it, but i'm lazy
+   if(IS_SET(portal->obj_flags.value[3], PORTAL_NO_ENTER)) {
+     send_to_char("The portal's destination rebels against you.\r\n", ch);
+     act("$n finds $mself unable to enter!", ch, 0, 0, TO_ROOM, 0);
+     return eFAILURE;
+   }
 
    if (!IS_MOB(ch) && IS_SET(ch->pcdata->punish, PUNISH_THIEF) &&
        IS_SET(world[real_room(portal->obj_flags.value[0])].room_flags, CLAN_ROOM))
