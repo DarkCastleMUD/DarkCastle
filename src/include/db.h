@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: db.h,v 1.8 2004/04/17 05:13:13 urizen Exp $ */
+/* $Id: db.h,v 1.9 2004/05/01 00:38:50 urizen Exp $ */
 #ifndef DB_H_
 #define DB_H_
 
@@ -98,6 +98,7 @@ char *fread_string(FILE *fl, int hasher);
 int create_blank_item(int nr);
 int create_blank_mobile(int nr);
 void delete_item_from_index(int nr);
+void delete_mob_from_index(int nr);
 int  real_object(int virt);
 int  real_mobile(int virt);
 int  fread_int(FILE *fl, long minval, long maxval);

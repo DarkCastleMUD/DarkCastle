@@ -86,7 +86,6 @@ void rebuild_rnum_references(int startAt, int type)
     }
 }
 
-
 int do_check(struct char_data *ch, char *arg, int cmd) {
   struct descriptor_data d;
   struct char_data *vict;
@@ -2436,6 +2435,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd)
       "wisdom",
       "constitution",
       "new",
+      "delete",
       "\n"
     };
    
@@ -3098,6 +3098,21 @@ int do_medit(struct char_data *ch, char *argument, int cmd)
           return eFAILURE;
         }
         csendf(ch, "Mobile '%d' created successfully.\r\n", intval);
+      } break;
+      case 31: {
+        if(!*buf4 || strncmp(buf4, "yesiwanttodeletethismob", 23)) {
+	 send_to_char("$3Syntax$R: medit [mob_number] delete yesiwanttodeletethismob\n\r",ch);
+	 return eFAILURE;
+	}
+	CHAR_DATA *v,*n;
+	for (v = character_list; v; v = n)
+	{
+	 n = v->next;
+         if (IS_NPC(v) && v->mobdata->nr == mob_num)
+	   extract_char(v, TRUE);
+	}
+	delete_mob_from_index(mob_num);
+	send_to_char("Mobile deleted.\r\n",ch);
       } break;
     }
     set_zone_modified_mob(mob_num);

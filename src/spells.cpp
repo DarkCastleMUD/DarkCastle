@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.71 2004/04/28 07:57:21 urizen Exp $ */
+/* $Id: spells.cpp,v 1.72 2004/05/01 00:38:48 urizen Exp $ */
 
 extern "C"
 {
@@ -891,7 +891,7 @@ int dam_percent(int learned, int damage)
   if (learned <= 50) percent = 50;
   else if (learned <= 90) percent = learned;
   else percent = 90 + ((learned - 90) *2);
-
+  
   return (int)((float)damage * (float)(percent/100.0));
 }
 

@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.16 2004/04/21 17:59:26 urizen Exp $ */
+/* $Id: limits.cpp,v 1.17 2004/05/01 00:38:48 urizen Exp $ */
 
 extern "C"
 {
@@ -715,9 +715,11 @@ void update_corpses_and_portals(void)
           else if (j->in_room != NOWHERE)
           {
             // no trade objects disappear when the corpse decays
+	    // Caused a crasher. Fixed it. 
             if(IS_SET(jj->obj_flags.more_flags, ITEM_NO_TRADE))
-              extract_obj(jj);
-            else move_obj(jj, j->in_room);
+            //  extract_obj(jj);
+	      SET_BIT(jj->obj_flags.extra_flags, ITEM_TOREMOVE);
+   	    move_obj(jj, j->in_room);
           }
           else {
             log("BIIIG problem in limits.c!", OVERSEER, LOG_BUG);
@@ -728,6 +730,12 @@ void update_corpses_and_portals(void)
         extract_obj(j);
       }
     }
+  }
+  for (j = object_list; j ; j = next_thing)
+  { // Remove notrades that were in a container
+    next_thing = j;
+    if (IS_SET(j->obj_flags.extra_flags, ITEM_TOREMOVE))
+      extract_obj(j);
   }
   /* Now process the portals */
  // process_portals();

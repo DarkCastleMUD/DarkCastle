@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.46 2004/04/25 13:01:33 urizen Exp $ */
+/* $Id: db.cpp,v 1.47 2004/05/01 00:38:48 urizen Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -2946,6 +2946,72 @@ int create_blank_mobile(int nr)
     return cur_index;
 }
 
+// Hack of delete_item_from_index
+// Note:  ALL copies of this mobile must have been removed from the game
+// before calling this function.  Otherwise these old mobiles will think
+// they are the restrung version of the mobile that now holds that index.
+//
+// Args:  int nr = real number of object (index in array)
+//
+// return index of mobile on success, -1 on failure
+//
+void delete_mob_from_index(int nr)
+{
+    int i = 0, j = 0;
+    CHAR_DATA * curr;
+
+    if(nr < 0 || nr > top_of_mobt) // doesn't exist!
+      return;
+
+    dc_free(mob_index[nr].item);
+    // shift > items left
+    memmove( &mob_index[nr], &mob_index[nr+1],
+              ( (top_of_mobt - nr) * sizeof(index_data) )
+           );
+    top_of_mobt--;
+
+    // update index of all mobiles in game - these store rnums
+    for(curr = character_list; curr; curr = curr->next)
+      if(IS_NPC(curr) && curr->mobdata->nr >= nr)
+         curr->mobdata->nr--;
+
+    // update index of all the mob prototypes
+    for(i = nr; i <= top_of_mobt; i++)
+       ((CHAR_DATA *)mob_index[i].item)->mobdata->nr--;
+
+    // update mob file indices - these store rnums
+    world_file_list_item * wcurr = NULL;
+
+    extern world_file_list_item * mob_file_list;
+
+    wcurr = mob_file_list;
+
+    while(wcurr)
+    {
+      if(wcurr->firstnum > nr)
+        wcurr->firstnum--;
+      if(wcurr->lastnum >= nr)
+        wcurr->lastnum--;
+      wcurr = wcurr->next;
+    }
+
+    // update zonefile commands - these store rnums
+    for(i = 0; i <= top_of_zonet; i++)
+    {
+       for(j = 0; zone_table[i].cmd[j].command != 'S'; j++)
+       {
+          switch( zone_table[i].cmd[j].command )
+          {
+             case 'M': // just #1
+                if( zone_table[i].cmd[j].arg1 >= nr )
+                   zone_table[i].cmd[j].arg1--;
+                break;
+             default:
+                break;
+          }
+       }
+    }
+}
 
 
 // Delete an item from the index and update everything to continue working
