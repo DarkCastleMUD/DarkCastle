@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.34 2004/04/28 07:44:35 urizen Exp $
+| $Id: inventory.cpp,v 1.35 2004/05/03 23:40:28 urizen Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -1387,7 +1387,7 @@ int do_open(CHAR_DATA *ch, char *argument, int cmd)
                if(IS_NPC(victim) || IS_AFFECTED(victim, AFF_FLYING))  
                   continue;
                if(!success) {
-                  send_to_room("With the door no longer closed for support, this areas strange gravity takes over!\r\n", victim->in_room);
+                  send_to_room("With the door no longer closed for support, this area's strange gravity takes over!\r\n", victim->in_room);
                   success = 1;
                }
                if(victim == ch)

@@ -135,7 +135,7 @@ void update_command_lag_and_poison(void);
 void skip_spaces(char **string);
 char *any_one_arg(char *argument, char *first_arg);
 char * calc_color(int hit, int max_hit);
-char * calc_condition(CHAR_DATA *ch);
+char * calc_condition(CHAR_DATA *ch, bool colour = FALSE);
 void generate_prompt(CHAR_DATA *ch, char *prompt);
 int get_from_q(struct txt_q *queue, char *dest, int *aliased);
 void init_game(int port, int port2, int port3);
@@ -1041,13 +1041,15 @@ int do_prompt(CHAR_DATA *ch, char *arg, int cmd)
 
 char * calc_color_align(int align)
 {
-  if(align <= -350)
+  if(align <= -401)
     return BOLD RED;
-
-  if(align >= 350)
-    return BOLD YELLOW;
-
-  return NTEXT;
+  if (align <= -300) 
+     return BOLD YELLOW;
+  if (align <= 299)
+     return BOLD GREY;
+  if (align <= 400)
+     return BOLD YELLOW;
+  return BOLD GREEN;
 }
 
 char * calc_color(int hit, int max_hit)
@@ -1061,7 +1063,7 @@ char * calc_color(int hit, int max_hit)
   return GREEN;
 }
 
-char * cond_txt[] = {
+char * cond_txtz[] = {
   "excellent condition",
   "a few scratches",
   "slightly hurt",
@@ -1072,17 +1074,33 @@ char * cond_txt[] = {
   "dead as a doornail"
 };
 
-char * calc_condition(CHAR_DATA *ch)
+char * cond_txtc[] = {
+  "$B$2excellent condition$R",
+  "$2a few scratches$R",
+  "$B$5slightly hurt$R",
+  "$5fairly fucked up$R",
+  "$B$4bleeding freely$R",
+  "$4covered in blood$R",
+  "$B$7near death$R",
+  "dead as a doornail"
+};
+
+
+char * calc_condition(CHAR_DATA *ch, bool colour = FALSE)
 {
   int percent;
-
+  char *cond_txt[8];// = cond_txtz;
+  if (colour)
+   cond_txt = cond_txtc;
+  else
+   cond_txt = cond_txtz;
   if(GET_HIT(ch) == 0 || GET_MAX_HIT(ch) == 0)
     percent = 0;
   else
     percent = GET_HIT(ch) * 100 / GET_MAX_HIT(ch);
 
   if(percent >= 100)
-    return cond_txt[0];
+      return cond_txt[0];
   else if(percent >= 90)
     return cond_txt[1];
   else if(percent >= 75)
@@ -1093,7 +1111,7 @@ char * calc_condition(CHAR_DATA *ch)
     return cond_txt[4];
   else if(percent >= 15)
     return cond_txt[5];
-  else if(percent >= 0)
+  else if(percent >= 0) 
     return cond_txt[6];
   else
     return cond_txt[7];
@@ -1251,12 +1269,26 @@ void generate_prompt(CHAR_DATA *ch, char *prompt)
 /* added by pir to stop "prompt %c" crash bug */
          else sprintf(pro, " ");
          break;
+	case 'C':
+         if(ch->fighting)
+           sprintf(pro, "<%s>", calc_condition(ch,TRUE));
+/* added by pir to stop "prompt %c" crash bug */
+         else sprintf(pro, " ");
+         break;
+
        case 'f':
          if(ch->fighting)
            sprintf(pro, "(%s)", calc_condition(ch->fighting));
 /* added by pir to stop "prompt %c" crash bug */
          else sprintf(pro, " ");
          break;
+	case 'F':
+         if(ch->fighting)
+           sprintf(pro, "<%s>", calc_condition(ch->fighting,TRUE));
+/* added by pir to stop "prompt %c" crash bug */
+         else sprintf(pro, " ");
+         break;
+
        case 't':
          if(ch->fighting && ch->fighting->fighting)
            sprintf(pro, "[%s]",
@@ -1264,6 +1296,13 @@ void generate_prompt(CHAR_DATA *ch, char *prompt)
 /* added by pir to stop "prompt %c" crash bug */
          else sprintf(pro, " ");
          break;
+        case 'T':
+         if(ch->fighting && ch->fighting->fighting)
+           sprintf(pro, "<%s>", calc_condition(ch->fighting->fighting,TRUE));
+/* added by pir to stop "prompt %c" crash bug */
+         else sprintf(pro, " ");
+         break;
+
        case 's':
          if(world_array[ch->in_room])
            sprintf(pro, "%s", sector_types[world[ch->in_room].sector_type]);
