@@ -1005,12 +1005,6 @@ int find_skill_num(char * name)
   extern char * ki[];
   int i;
 
-  // try skills
-  for(i = 0; *skills[i] != '\n'; i++)
-    if (strlen(name) <= strlen(skills[i]) && !strncasecmp(name, str_nospace(skills[i]), strlen(name)))
-      return (i + SKILL_BASE);
-
-
   // try ki
   for(i = 0; *ki[i] != '\n'; i++)
     if (strlen(name) <= strlen(ki[i]) && !strncasecmp(name, str_nospace(ki[i]),strlen(name)))
@@ -1020,6 +1014,11 @@ int find_skill_num(char * name)
   for(i = 0; *spells[i] != '\n'; i++)
     if (strlen(name) <= strlen(spells[i]) && !strncasecmp(name, str_nospace(spells[i]), strlen(name)))
       return (i + 1);
+  // try skills
+  for(i = 0; *skills[i] != '\n'; i++)
+    if (strlen(name) <= strlen(skills[i]) && !strncasecmp(name, str_nospace(skills[i]), strlen(name)))
+      return (i + SKILL_BASE);
+
 
   // try songs
   for(i = 0; *songs[i] != '\n'; i++)

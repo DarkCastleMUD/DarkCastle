@@ -14,6 +14,8 @@
 #include <returnvals.h>
 
 
+char *str_nospace(char *stri);
+
 int do_log(struct char_data *ch, char *argument, int cmd)
 {
     struct char_data *vict;
@@ -132,7 +134,7 @@ struct skill_quest *find_sq(char *testa)
 {
    struct skill_quest *curr;
    for (curr = skill_list; curr; curr = curr->next)
-     if (!str_cmp(get_skill_name(curr->num), testa))
+     if (!str_cmp(str_nospace(get_skill_name(curr->num)), testa))
        return curr;
    return NULL;
 }
