@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.17 2002/08/13 23:02:21 pirahna Exp $ */
+/* $Id: magic.cpp,v 1.18 2002/08/16 18:36:37 pirahna Exp $ */
 
 extern "C"
 {
@@ -2436,12 +2436,12 @@ int spell_strength(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data
 
   af.type      = SPELL_STRENGTH;
   af.duration  = level;
-  af.modifier  = 1+(level>20)+(level>40);
+  af.modifier  = 1 + (skill/20);
 
   af.location  = APPLY_STR;
   af.bitvector = 0;
 
-  affect_join(victim, &af, TRUE, FALSE);
+  affect_to_char(victim, &af);
   return eSUCCESS;
 }
 

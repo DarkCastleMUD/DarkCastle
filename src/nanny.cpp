@@ -11,7 +11,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.13 2002/08/11 15:29:33 pirahna Exp $ */
+/* $Id: nanny.cpp,v 1.14 2002/08/16 18:36:38 pirahna Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -1124,6 +1124,8 @@ int _parse_name(char *arg, char *name)
    
    if ( i < 2 )
       return 1;
+
+   // TODO - make this into a text file in the /lib dir
    
    if ( !str_cmp( name, "all" )        || !str_cmp( name, "local" ) ||
       !str_cmp( name, "at" )           || !str_cmp( name, "out" )   ||
@@ -1138,7 +1140,20 @@ int _parse_name(char *arg, char *name)
       !str_cmp( name, "someone")       || !str_cmp( name, "through") ||
       !str_cmp( name, "pc")            || !str_cmp( name, "corpse") ||
       !str_cmp( name, "you")           || !str_cmp( name, "on") ||
-      !str_cmp( name, "from")          || !str_cmp( name, "with")
+      !str_cmp( name, "from")          || !str_cmp( name, "with") ||
+      !str_cmp( name, "chain")         || !str_cmp( name, "ou") || // ou is 'out'
+      !str_cmp( name, "th")            || !str_cmp( name, "thr") ||
+      !str_cmp( name, "thro")          || !str_cmp( name, "throu") ||
+      !str_cmp( name, "through")       || !str_cmp( name, "throug") ||
+      !str_cmp( name, "no")            || !str_cmp( name, "nor") ||
+      !str_cmp( name, "nort")          || !str_cmp( name, "north") ||
+      !str_cmp( name, "so")            || !str_cmp( name, "sou") ||
+      !str_cmp( name, "sout")          || !str_cmp( name, "south") ||
+      !str_cmp( name, "ea")            || !str_cmp( name, "eas") ||
+      !str_cmp( name, "east")          || !str_cmp( name, "we") ||
+      !str_cmp( name, "wes")           || !str_cmp( name, "west") ||
+      !str_cmp( name, "up")            || !str_cmp( name, "do") ||
+      !str_cmp( name, "dow")           || !str_cmp( name, "down")
       )
       return 1;
    
