@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.82 2004/04/24 21:54:22 urizen Exp $ */
+/* $Id: const.cpp,v 1.83 2004/04/25 02:38:25 urizen Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -211,7 +211,7 @@ char *spell_wear_off_msg[] =
   "Your blessed halo fades.",
   "You don't feel quite so angry anymore.",
   "The foul mantle surrounding you dissipates.",
-  "Youur Oaken Fortitude fades."
+  "Youur Oaken Fortitude fades.",
   "!UNUSED!"
 };
 

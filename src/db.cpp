@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.44 2004/04/24 15:48:56 urizen Exp $ */
+/* $Id: db.cpp,v 1.45 2004/04/25 02:38:25 urizen Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -2284,7 +2284,8 @@ CHAR_DATA *read_mobile(int nr, FILE *fl)
 
     /* *** Numeric data *** */
     mob->mobdata->actflags = fread_bitvector (fl, LONG_MIN, LONG_MAX);
-
+    if (IS_SET(mob->mobdata->actflags, NOTRACK))
+       REMOVE_BIT(mob->mobdata->actflags, NOTRAC);
     SET_BIT(mob->misc, MISC_IS_MOB);
 
     mob->affected_by = fread_bitvector (fl, LONG_MIN, LONG_MAX);
