@@ -97,15 +97,15 @@ int  verify_existing_components(CHAR_DATA *ch, int golemtype)
     bool found = FALSE;
     for (curr = ch->carrying; curr; curr = next_content)
     {
-      next_content = curr->next_content;
+       next_content = curr->next_content;
        int vnum = obj_index[curr->item_number].virt,i;
-	if (vnum == golem_list[golemtype].components[i])
+       if (vnum == golem_list[golemtype].components[i])
 	{
 	  found = TRUE;
 	  if (i == 4) SET_BIT(retval, eEXTRA_VALUE); // Special effect.
 	}
      }
-     if (!found) { REMOVE_BIT(retval, eSUCCESS); SET_BIT(retval, eFAILURE); }
+     if (!found && i != 4) { REMOVE_BIT(retval, eSUCCESS); SET_BIT(retval, eFAILURE); }
   }
   if (IS_SET(retval, eSUCCESS))
   {
@@ -118,6 +118,7 @@ int  verify_existing_components(CHAR_DATA *ch, int golemtype)
           send_to_char(buf,ch);
           obj_from_char(curr);
           extract_obj(curr);
+	  break; // Only remove ONE of the components.
       }
     }
   }
@@ -211,7 +212,7 @@ void load_golem_data(CHAR_DATA *ch, int golemtype)
   fread(&(golem->level), sizeof(golem->level), 1, fpfile);
   fread(&(golem->exp),   sizeof(golem->exp),  1, fpfile);
   int level = golem->level;
-  for ( ; level > 0; level--)
+  for ( ; level > 1; level--)
      advance_golem_level(golem); // Level it up again.
   struct obj_data *last_cont; // Last container.
   while(!feof(fpfile)) {
@@ -242,20 +243,21 @@ int cast_create_golem(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA 
     send_to_char("You cannot create any such golem.\r\n",ch);
     return eFAILURE;
   }
-  if (verify_existing_components(ch, i))
+  int retval;
+  if (IS_SET((retval = verify_existing_components(ch, i)), eFAILURE))
   {
       send_to_char("Since you do not have the require spell components, the magic fades into nothingness.\r\n",ch);
       return eFAILURE;
   }
   load_golem_data(ch, i); // Load the golem up;
-
+  skill_increase_check(ch, SPELL_CREATE_GOLEM, skill, SKILL_INCREASE_EASY);
   golem = ch->pcdata->golem;
   if (!golem)
   { // Returns false if something goes wrong. (Not a mage, etc).
     send_to_char("Something goes wrong, and you fail!",ch);
     return eFAILURE;
   }
-  if (check_components(ch, TRUE, golem_list[i].components[4], 0, 0, TRUE))
+  if (IS_SET(retval, eEXTRA_VALUE))
   {
     send_to_char("Adding in the final ingredient, your golem increases in strength!\r\n",ch);
     SET_BIT(golem->affected_by, golem_list[i].special_aff);
