@@ -301,10 +301,10 @@ int do_sqedit(struct char_data *ch, char *argument, int cmd)
         {
 	  if (!IS_SET(curren->clas, 1<<(i-1)))
 	    continue;
-	  if (curren->clas == i) {
+//	  if (curren->clas == i) {
   	    csendf(ch, "$2%d$R. %s\r\n", curren->num, get_skill_name(curren->num));
 	    done = TRUE;
-	  }
+//	  }
         }
         if (!done)
 	  send_to_char("    No skill quests.\r\n",ch);

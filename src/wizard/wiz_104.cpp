@@ -805,7 +805,8 @@ obj_data *)(obj_index[nr].item))->obj_flags.eq_level,
        for (i = 0; *apply_types[i] != '\n' ; i++)
         if (!str_cmp(apply_types[i],arg1))
         {
-          SET_BIT(affect, 1<<i);
+	  affect = i;
+//          SET_BIT(affect, 1<<i);
           continue;
         }/*
        for (i = 0; *pc_clss_types[i] != '\n' ; i++)
