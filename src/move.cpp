@@ -1,7 +1,12 @@
 /************************************************************************
-| $Id: move.cpp,v 1.17 2003/06/13 00:43:54 pirahna Exp $
+| $Id: move.cpp,v 1.18 2003/11/10 19:36:29 staylor Exp $
 | move.C
 | Movement commands and stuff.
+*************************************************************************
+*  Revision History                                                     *
+*  11/09/2003   Onager   Changed do_unstable() and do_fall() to call    *
+*                        noncombat_damage() for damage                  *
+*************************************************************************
 */
 #include <character.h>
 #include <affect.h>
@@ -144,6 +149,9 @@ void record_track_data(CHAR_DATA *ch, int cmd)
 
 int do_unstable(CHAR_DATA *ch) 
 {
+    char death_log[MAX_STRING_LENGTH];
+    int retval;
+
     if(IS_NPC(ch))
         return eFAILURE;
 
@@ -158,17 +166,17 @@ int do_unstable(CHAR_DATA *ch)
     }
     act("$n looses his footing on the unstable ground.", ch, 0, 0, TO_ROOM, 0);
     act("You fall flat on your ass.", ch, 0, 0, TO_CHAR, 0);
-    GET_HIT(ch) -= GET_MAX_HIT(ch) / 12;
     GET_POS(ch) = POSITION_SITTING;
 
-    if((GET_HIT(ch) <= 0)) {
-        act("$n's frail body snaps in half as $e is buffeted about the room.", ch, 0, 0, TO_ROOM, 0);
-        act("You feel your back snap painfully and all goes dark...", ch, 0, 0, TO_CHAR, 0);
-        send_to_char("You have been KILLED!\n\r", ch);
-        fight_kill(ch, ch, TYPE_CHOOSE);
+    sprintf(death_log, "%s slipped to death in room %d.", GET_NAME(ch), world[ch->in_room].number);
+    retval = noncombat_damage(ch, GET_MAX_HIT(ch) / 12, 
+        "You feel your back snap painfully and all goes dark...",
+        "$n's frail body snaps in half as $e is buffeted about the room.",
+        death_log);
+    if (SOMEONE_DIED(retval))
         return eSUCCESS|eCH_DIED;
-    }
-    return eSUCCESS;
+    else
+        return eSUCCESS;
 }
 
 
@@ -235,17 +243,16 @@ int do_fall(CHAR_DATA *ch, short dir)
   }
   do_look(ch, "\0", 15);
 
-  GET_HIT(ch) -= (GET_MAX_HIT(ch)/6);
-  update_pos(ch);
-  if(GET_POS(ch) == POSITION_DEAD) {
-     send_to_char("Luckily the ground breaks your fall.\n\r", ch);
-     send_to_char("\n\rYou have been KILLED!\n\r", ch);
-     fight_kill(ch, ch, TYPE_CHOOSE); 
-     sprintf(damage,"%s fall from %d was lethal and killed them.",
-          GET_NAME(ch), world[ch->in_room].number);
-     log(damage, IMMORTAL, LOG_MORTAL);
-     return eSUCCESS|eCH_DIED;
+  sprintf(damage,"%s fall from %d was lethal and killed them.",
+       GET_NAME(ch), world[ch->in_room].number);
+  retval = noncombat_damage(ch, (GET_MAX_HIT(ch)/6),
+         "Luckily the ground breaks your fall.\n\r",
+         "$n plummets into the room and hits the ground with a wet-sounding splat!",
+        damage);
+  if (!SOMEONE_DIED(retval)) {
+    act("$n plummets into the room and hits the floor HARD.", ch, 0, 0, TO_ROOM, 0);
   }
+
   if((IS_SET(world[ch->in_room].room_flags, FALL_DOWN) && (dir = 5)) ||
     (IS_SET(world[ch->in_room].room_flags, FALL_UP) && (dir = 4)) ||
     (IS_SET(world[ch->in_room].room_flags, FALL_EAST) && (dir = 1)) ||
@@ -254,13 +261,6 @@ int do_fall(CHAR_DATA *ch, short dir)
     (IS_SET(world[ch->in_room].room_flags, FALL_NORTH) && (dir = 0))) {
     return do_fall(ch, dir);
   }
-/* Don't think we need this - pir
-  else if(GET_POS(ch) == POSITION_DEAD) { 
-    send_to_char("SPLAT! You have been KILLED!\n\r", ch);
-    fight_kill(ch, ch, TYPE_CHOOSE); 
-    return 0;
-  }
-*/
   return eSUCCESS; // if we're here, we lived.
 }
 

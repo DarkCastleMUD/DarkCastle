@@ -1,18 +1,24 @@
-/***************************************************************************
- *  file: spells.c , Basic routines and parsing            Part of DIKUMUD *
- *  Usage : Interpreter of spells                                          *
- *  Copyright (C) 1990, 1991 - see 'license.doc' for complete information. *
- *                                                                         *
- *  Copyright (C) 1992, 1993 Michael Chastain, Michael Quan, Mitchell Tse  *
- *  Performance optimization and bug fixes by MERC Industries.             *
- *  You can use our stuff in any way you like whatsoever so long as ths   *
- *  copyright notice remains intact.  If you like it please drop a line    *
- *  to mec@garnet.berkeley.edu.                                            *
- *                                                                         *
- *  This is free software and you are benefitting.  We hope that you       *
- *  share your changes too.  What goes around, comes around.               *
+/****************************************************************************
+ *  file: spells.c , Basic routines and parsing            Part of DIKUMUD  *
+ *  Usage : Interpreter of spells                                           *
+ *  Copyright (C) 1990, 1991 - see 'license.doc' for complete information.  *
+ *                                                                          *
+ *  Copyright (C) 1992, 1993 Michael Chastain, Michael Quan, Mitchell Tse   *
+ *  Performance optimization and bug fixes by MERC Industries.              *
+ *  You can use our stuff in any way you like whatsoever so long as ths     *
+ *  copyright notice remains intact.  If you like it please drop a line     *
+ *  to mec@garnet.berkeley.edu.                                             *
+ *                                                                          *
+ *  This is free software and you are benefitting.  We hope that you        *
+ *  share your changes too.  What goes around, comes around.                *
+ *                                                                          *
+ *  Revision History                                                        *
+ *  10/23/2003   Onager   Commented out effect wear-off stuff in            *
+ *                        affect_update() (moved to affect_remove())        *
+ *  10/27/2003   Onager   Changed stop_follower() cmd values to be readable *
+ *                        #defines, added a BROKE_CHARM cmd                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.47 2003/07/22 18:29:00 pirahna Exp $ */
+/* $Id: spells.cpp,v 1.48 2003/11/10 19:36:29 staylor Exp $ */
 
 extern "C"
 {
@@ -940,70 +946,7 @@ void affect_update( void )
 	        send_to_char(spell_wear_off_msg[af->type], i);
 	        send_to_char("\n\r", i);
 	     }
-
-	  affect_remove(i, af);
-
-          switch( af->type ) 
-          { 
-            // Anything special messagewise goes here
-            // Do NOT put anything important like RESIST/SUSCEPT stuff in here
-            // Put it in affect_remove.
-
-            case SPELL_FLY: 
-            { /* Fly wears off...you fall :) */ 
-             if((IS_SET(world[i->in_room].room_flags, FALL_DOWN) && (dir = 5)) ||
-               (IS_SET(world[i->in_room].room_flags, FALL_UP) && (dir = 4)) ||
-               (IS_SET(world[i->in_room].room_flags, FALL_EAST) && (dir = 1)) ||
-               (IS_SET(world[i->in_room].room_flags, FALL_WEST) && (dir = 3)) ||
-               (IS_SET(world[i->in_room].room_flags, FALL_SOUTH) && (dir = 2))||
-               (IS_SET(world[i->in_room].room_flags, FALL_NORTH) && (dir = 0))) 
-               { 
-                  do_fall(i, dir);
-               }
-               break;
-            }
-            case SKILL_INSANE_CHANT:
-               send_to_char("The insane chanting in your mind wears off.\r\n", i);
-               break;
-            case SKILL_GLITTER_DUST:
-               send_to_char("The dust around your body stops glowing.\r\n", i);
-               break;
-            case SKILL_BLOOD_FURY:
-               send_to_char("Your blood cools to normal levels.\r\n", i);
-               break;
-            case SKILL_BLADESHIELD:
-               send_to_char("The draining affect of the blade shield technique has worn off.\r\n", i);
-               break;
-            case SKILL_FOCUSED_REPELANCE:
-               REMOVE_BIT(i->combat, COMBAT_REPELANCE);
-               send_to_char("Your mind recovers from the repelance.\n\r", i);
-               break;
-            case SKILL_VITAL_STRIKE:
-               send_to_char("The internal strength and speed from your vital strike has returned.\r\n", i);
-               break;
-            case SPELL_WATER_BREATHING:
-               if(world[i->in_room].sector_type == SECT_UNDERWATER) // uh oh
-               {
-                  // you just drowned!
-                  act("$n begins to choke on the water, a look of panic filling $s eyes as it fill $s lungs.\n\r"
-                      "$n is DEAD!!", i, 0, 0, TO_ROOM, 0);
-                  send_to_char("The water rushes into your lungs and the light fades with your oxygen.\n\r"
-                               "You have been KILLED!!!\n\r", i);
-                  fight_kill(NULL, i, TYPE_RAW_KILL);
-               }
-               break;
-             case KI_STANCE + KI_OFFSET:
-               send_to_char("Your body finishes venting the energy absorbed from your last ki stance.\r\n", i);
-               break;
-            case 7: {   /* Charm Wears off */
-               remove_memory(i, 'h');
-               add_memory(i, GET_NAME(i->master), 'h');
-               stop_follower(i,0);
-               break;
-              } 
-             default:
-               break;
-          }
+	  affect_remove(i, af, 0);
 	}
       }
   }
@@ -1097,17 +1040,14 @@ void stop_follower(CHAR_DATA *ch, int cmd)
     return;
   }
 */
-  if(IS_AFFECTED(ch, AFF_CHARM)) {
+//  if(IS_AFFECTED(ch, AFF_CHARM)) {
+  if(cmd == BROKE_CHARM) {
     act("You realize that $N is a jerk!", ch, 0, ch->master, TO_CHAR, 0);
     act("$n is free from the bondage of the spell.", ch, 0, 0, TO_ROOM, 0);
     act("$n hates your guts!", ch, 0, ch->master, TO_VICT, 0);
-    if(affected_by_spell(ch, SPELL_CHARM_PERSON))
-      affect_from_char(ch, SPELL_CHARM_PERSON);
-    if(IS_SET(ch->affected_by, AFF_CHARM))
-      REMOVE_BIT(ch->affected_by, AFF_CHARM); 
   }
   else {
-    if(cmd == 1) {
+    if(cmd == END_STALK) {
       act("You sneakily stop following $N.",
            ch, 0, ch->master, TO_CHAR, 0);
     }
@@ -1133,8 +1073,14 @@ void stop_follower(CHAR_DATA *ch, int cmd)
   }
 
   ch->master = 0;
-  if(cmd != 2)
-    REMOVE_BIT(ch->affected_by, AFF_CHARM | AFF_GROUP);
+
+  /* do this after setting master to NULL, to prevent endless loop */
+  /* between affect_remove() and stop_follower()                   */
+  if (cmd != CHANGE_LEADER) {
+     if(affected_by_spell(ch, SPELL_CHARM_PERSON))
+       affect_from_char(ch, SPELL_CHARM_PERSON);
+     REMOVE_BIT(ch->affected_by, AFF_CHARM | AFF_GROUP); 
+  }
 }
 
 
@@ -1146,13 +1092,16 @@ void die_follower(CHAR_DATA *ch)
     CHAR_DATA * zombie;
     
     if (ch->master)
-	stop_follower(ch, 0);
+	stop_follower(ch, STOP_FOLLOW);
 
     for (k = ch->followers; k; k = j) {
 	j = k->next;
 	zombie = k->follower;
-        if(!IS_SET(zombie->affected_by2, AFF_GOLEM))
-	  stop_follower(zombie, 0);
+        if(!IS_SET(zombie->affected_by2, AFF_GOLEM)) {
+          if(affected_by_spell(zombie, SPELL_CHARM_PERSON))
+             affect_from_char(zombie, SPELL_CHARM_PERSON);
+	  stop_follower(zombie, STOP_FOLLOW);
+        }
 	if(GET_RACE(zombie) == RACE_UNDEAD) {
           send_to_char("The forces holding you together are gone.  You cease "
                        "to exist.", zombie);

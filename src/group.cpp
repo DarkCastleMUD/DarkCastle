@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: group.cpp,v 1.9 2003/05/12 02:56:41 pirahna Exp $
+| $Id: group.cpp,v 1.10 2003/11/10 19:36:28 staylor Exp $
 | group.C
 | Description:  Group related commands; join, abandon, follow, etc..
 */
@@ -25,6 +25,7 @@ extern "C"
 #include <sing.h> // stop_grouped_bards
 #include <string.h>
 #include <returnvals.h>
+#include <spells.h>
 
 extern CWorld world;
  
@@ -71,7 +72,7 @@ int do_abandon(CHAR_DATA *ch, char *argument, int cmd)
     ch->pcdata->group_kills = 0;
   }
 
-  stop_follower(ch, 0);
+  stop_follower(ch, STOP_FOLLOW);
   return eSUCCESS;
 }
 
@@ -431,13 +432,13 @@ int do_promote(CHAR_DATA *ch, char *argument, int cmd)
   else
     new_new_leader->group_name  = str_dup("I am a dork");
 
-  stop_follower(new_new_leader, 2);
+  stop_follower(new_new_leader, CHANGE_LEADER);
 
   for(f = ch->followers; f; f = next_f) { 
      next_f = f->next;
      if(!IS_NPC(f->follower)) {
        k = f->follower;
-       stop_follower(k, 2);
+       stop_follower(k, CHANGE_LEADER);
        add_follower(k, new_new_leader, 2);
      }
   }
@@ -496,7 +497,7 @@ int do_disband(CHAR_DATA *ch, char *argument, int cmd)
     for(f = k->followers; f; f = next_f) { 
        next_f = f->next;
        if (!IS_NPC(f->follower)) 
-          stop_follower(f->follower, 0);
+          stop_follower(f->follower, STOP_FOLLOW);
        }
 
     REMOVE_BIT(k->affected_by, AFF_GROUP);
@@ -530,7 +531,7 @@ int do_disband(CHAR_DATA *ch, char *argument, int cmd)
     adios->pcdata->grplvl      = 0;
     adios->pcdata->group_kills = 0;
   }
-  stop_follower(adios, 0);
+  stop_follower(adios, STOP_FOLLOW);
   return eSUCCESS;
 }
 
@@ -577,7 +578,7 @@ int do_follow(CHAR_DATA *ch, char *argument, int cmd)
 		send_to_char("You are already following yourself.\n\r", ch);
 		return eFAILURE;
 	    }
-	    stop_follower(ch, 0);
+	    stop_follower(ch, STOP_FOLLOW);
 	} else {
 	    if (circle_follow(ch, leader)) {
 		act("Sorry, but following in 'loops' is not allowed.",
@@ -585,8 +586,8 @@ int do_follow(CHAR_DATA *ch, char *argument, int cmd)
 		return eFAILURE;
 	    }
 	    if (ch->master) { 
-	      if(cmd == 10) stop_follower(ch, 1);  /* stalk  */
-              else          stop_follower(ch, 0);  /* follow */ 
+	      if(cmd == 10) stop_follower(ch, END_STALK);  /* stalk  */
+              else          stop_follower(ch, STOP_FOLLOW);  /* follow */ 
             }
 
 	    if((abs(GET_LEVEL(ch)-GET_LEVEL(leader))<60) || GET_LEVEL(ch)>=IMMORTAL) { 

@@ -3,6 +3,10 @@
  * Pirahna
  *
  */
+/**************************************************************************
+ *  Revision History                                                      *
+ *  10/23/2003  Onager  Changed do_sing() to allow non-bard imms to sing  *
+ **************************************************************************/
 
 extern "C"
 {
@@ -284,7 +288,7 @@ int do_sing(CHAR_DATA *ch, char *arg, int cmd)
   int learned;
   int specialization;
 
-   if (GET_CLASS(ch) != CLASS_BARD) {
+   if (GET_CLASS(ch) != CLASS_BARD && GET_LEVEL(ch) < IMMORTAL) {
       check_social(ch, "sing", 0, arg); // do the social:)
       return eSUCCESS;
    }

@@ -1,8 +1,17 @@
 /*	Fight1.c written from the original by Morcallen 1/17/95
 *	This contains all the fight starting mechanisms as well
 *	as damage.
+*
+******************************************************************************
+*  Revision History                                                          *
+*  10/23/2003  Onager   Added checks for ch == NULL in raw_kill() to prevent *
+*                       crashes from non-(N)PC deaths                        *
+*                       Changed raw_kill() to make imms immune to stat loss  *
+*  11/09/2003  Onager   Added noncombat_damage() to do noncombat-related     *
+*                       damage (such as falls, drowning) that may kill       *
+******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.126 2003/07/22 19:08:14 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.127 2003/11/10 19:36:28 staylor Exp $ */
 
 extern "C"
 {
@@ -75,7 +84,6 @@ int active_cleric(struct char_data *ch, struct obj_data *obj, int cmd, char *arg
 void remove_memory(CHAR_DATA *ch, char type, CHAR_DATA *vict);
 void clan_death (char_data *ch, char_data *victim);
 
-
 // local
 void check_weapon_skill_bonus(char_data * ch, int type, obj_data *wielded, 
                               int & weapon_skill_hit_bonus, int & weapon_skill_dam_bonus);
@@ -123,7 +131,7 @@ void perform_violence(void)
           if (*spell_wear_off_msg[af->type]) { 
             send_to_char(spell_wear_off_msg[af->type], ch);
             send_to_char("\n\r", ch);
-            affect_remove(ch, af);
+            affect_remove(ch, af, 0);
           }  
         }
     }
@@ -1554,6 +1562,31 @@ int spell_damage(CHAR_DATA * ch, CHAR_DATA * victim,
   return damage(ch, victim, dam, weapon_type, attacktype, weapon);
 }
 
+// this function deals damage in noncombat situations (falls, drowning,
+// etc.)
+// returns standard returnvals.h return codes
+int noncombat_damage(CHAR_DATA * ch, int dam, char *char_death_msg,
+                     char *room_death_msg, char *death_log_msg)
+{
+  GET_HIT(ch) -= dam;
+  update_pos(ch);
+  if(GET_POS(ch) == POSITION_DEAD) {
+     if (char_death_msg) {
+        send_to_char(char_death_msg, ch);
+        send_to_char("\n\rYou have been KILLED!\n\r", ch);
+     }
+     if (room_death_msg)
+        act(room_death_msg, ch, 0, 0, TO_ROOM, 0);
+     if (death_log_msg)
+        log(death_log_msg, IMMORTAL, LOG_MORTAL);
+     fight_kill(NULL, ch, TYPE_PKILL);
+     return eSUCCESS|eCH_DIED;
+  } else {
+     return eSUCCESS;
+  }
+}
+
+
 int is_pkill(CHAR_DATA *ch, CHAR_DATA *vict)
 {
   CHAR_DATA *tmp_ch;
@@ -1575,7 +1608,7 @@ int is_pkill(CHAR_DATA *ch, CHAR_DATA *vict)
         return TRUE;
   }
   
-  /* Still here?  It's an uncharmed mob fighting an uncharmed mob! */
+  /* Still here?  The killer is an uncharmed mob, definitely not a pkill! */
   return FALSE;
 }
 
@@ -2749,7 +2782,7 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
   }
 
   // register my death with this zone's counter
-  zone_table[world[ch->in_room].zone].died_this_tick++;
+  zone_table[world[victim->in_room].zone].died_this_tick++;
 
   GET_POS(victim) = POSITION_STANDING;  
   mprog_death_trigger(victim, ch);
@@ -2788,7 +2821,7 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
   
   if (GET_CLASS(victim) == CLASS_MONK)
     GET_AC(victim) -= (GET_LEVEL(victim) * 3);
-  if (IS_SET(ch->combat, COMBAT_BERSERK))
+  if (ch && IS_SET(ch->combat, COMBAT_BERSERK))
     GET_AC(victim) -= 80;
   
   save_char_obj(victim);
@@ -2817,49 +2850,54 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
     // update stats
     GET_RDEATHS(victim) += 1;
 
-    /* New death system... dying is a BITCH!  */
-    // thief + mob kill = stat loss
-    // or got a bad roll
-    if( ( is_thief && IS_MOB(ch) ) ||
-        ( GET_LEVEL(victim)>20 && number(1,101) <= GET_LEVEL(victim) ) 
-      )
+    /* gods don't suffer from stat loss */
+    if (GET_LEVEL(victim) < IMMORTAL)
     {
-      if(GET_LEVEL(ch) >= 50 || 0 == number(0, 2)) 
-      {
-         GET_CON(victim) -= 1;
-         victim->raw_con -= 1;
-         send_to_char("*** You lose one constitution point ***\n\r", victim);
-         if(!IS_NPC(victim)) 
+       /* New death system... dying is a BITCH!  */
+       // thief + mob kill = stat loss
+       // or got a bad roll
+       if( ( is_thief && ch && IS_MOB(ch) ) ||
+           ( GET_LEVEL(victim)>20 && number(1,101) <= GET_LEVEL(victim) ) 
+         )
+       {
+         if ((ch && GET_LEVEL(ch) >= 50) || 0 == number(0, 2))
          {
-           sprintf(log_buf, "%s lost a con. ouch.", GET_NAME(victim));
-           log(log_buf, SERAPH, LOG_MORTAL);
-           victim->pcdata->statmetas--;
+            GET_CON(victim) -= 1;
+            victim->raw_con -= 1;
+            send_to_char("*** You lose one constitution point ***\n\r", victim);
+            if(!IS_NPC(victim)) 
+            {
+              sprintf(log_buf, "%s lost a con. ouch.", GET_NAME(victim));
+              log(log_buf, SERAPH, LOG_MORTAL);
+              victim->pcdata->statmetas--;
+            }
          }
-      }
-      pir_stat_loss(victim);
-      if(GET_CON(victim) <= 4)
-      {
-        sprintf(buf1, "%s/%c/%s", SAVE_DIR, victim->name[0], victim->name);
-        send_to_char("Your Constitution has reached 4...you are permanently dead!\n\r", victim);
-        send_to_char("\r\n"
-          "         (buh bye, -pirahna)\r\n"
-          "        O  ,-----------,\r\n"
-          "       o  /             \\  /|\r\n"
-          "       . /  0            \\/ |\r\n"
-          "        |                   |\r\n"
-          "         \\               /\\ |\r\n"
-          "          \\             /  \\|\r\n"
-          "           `-----------`\r\n", victim);
-        do_quit(victim, "", 666);
-        unlink(buf1);
-        sprintf(buf2, "%s permanently dies.", buf1);
-        log(buf2, ANGEL, LOG_MORTAL);
-        return;
-      }
-    } // lose stats
+         pir_stat_loss(victim);
+         if(GET_CON(victim) <= 4)
+         {
+           sprintf(buf1, "%s/%c/%s", SAVE_DIR, victim->name[0], victim->name);
+           send_to_char("Your Constitution has reached 4...you are permanently dead!\n\r", victim);
+           send_to_char("\r\n"
+             "         (buh bye, -pirahna)\r\n"
+             "        O  ,-----------,\r\n"
+             "       o  /             \\  /|\r\n"
+             "       . /  0            \\/ |\r\n"
+             "        |                   |\r\n"
+             "         \\               /\\ |\r\n"
+             "          \\             /  \\|\r\n"
+             "           `-----------`\r\n", victim);
+           do_quit(victim, "", 666);
+           unlink(buf1);
+           sprintf(buf2, "%s permanently dies.", buf1);
+           log(buf2, ANGEL, LOG_MORTAL);
+           return;
+         }
+       } // lose stats
+    }
 
     float penalty = 1;
-    penalty += GET_LEVEL(ch) * .05;
+    if (ch)
+       penalty += GET_LEVEL(ch) * .05;
     penalty = MIN(penalty, 2);
     GET_EXP(victim) = (int) (GET_EXP(victim) / penalty);
   } // !IS_NPC
@@ -3300,7 +3338,7 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim)
        af->type != SKILL_HARM_TOUCH &&
        af->type != SKILL_BLOOD_FURY &&
        af->type != SKILL_QUIVERING_PALM)
-      affect_remove(victim, af);
+      affect_remove(victim, af, SUPPRESS_ALL);
   }
   
   GET_HIT(victim)  = 1;
@@ -3316,96 +3354,101 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim)
   save_char_obj(victim);
 
   // have to be level 10 and linkalive to count as a pkill and not yourself
-  if(GET_LEVEL(victim) < PKILL_COUNT_LIMIT || ch == victim)
-    sprintf(killer_message,"\n\r##%s just DIED!\n\r", GET_NAME(victim));
-  else if(IS_AFFECTED2(ch, AFF_FAMILIAR) && ch->master)
-    sprintf(killer_message,"\n\r##%s was just DEFEATED in battle by %s's familiar!\n\r",
-          GET_NAME(victim), GET_NAME(ch->master));
-  else if(IS_AFFECTED(ch, AFF_CHARM) && ch->master)
-    sprintf(killer_message,"\n\r##%s was just DEFEATED in battle by %s's charmie!\n\r",
-          GET_NAME(victim), GET_NAME(ch->master));
-  else if(IS_ANONYMOUS(ch))
-    sprintf(killer_message,"\n\r##%s was just DEFEATED in battle by %s!\n\r", 
-          GET_NAME(victim), GET_NAME(ch));
-  else if(ch->in_room == real_room(START_ROOM))
-    sprintf(killer_message,"\n\r##%s was just PINGED by %s!\n\r", 
-          GET_NAME(victim), GET_NAME(ch));
-  else if(ch->in_room == real_room(SECOND_START_ROOM))
-    sprintf(killer_message,"\n\r##%s was just PONGED by %s!\n\r", 
-          GET_NAME(victim), GET_NAME(ch));
-  else switch(GET_CLASS(ch))
-  {
-    case CLASS_MAGIC_USER:
-      sprintf(killer_message,"\n\r##%s was just FRIED by %s's magic!\n\r", 
-          GET_NAME(victim), GET_NAME(ch));
-      break;
-    case CLASS_CLERIC:
-      sprintf(killer_message,"\n\r##%s was just BANISHED by %s's holiness!\n\r", 
-          GET_NAME(victim), GET_NAME(ch));
-      break;
-    case CLASS_THIEF:
-      sprintf(killer_message,"\n\r##%s was just ASSASSINATED by %s!\n\r", 
-          GET_NAME(victim), GET_NAME(ch));
-      break;
-    case CLASS_WARRIOR:
-      sprintf(killer_message,"\n\r##%s was just SLAIN by %s's might!\n\r", 
-          GET_NAME(victim), GET_NAME(ch));
-      break;
-    case CLASS_ANTI_PAL:
-      sprintf(killer_message,"\n\r##%s was just CONSUMED by %s's darkness!\n\r", 
-          GET_NAME(victim), GET_NAME(ch));
-      break;
-    case CLASS_PALADIN:
-      sprintf(killer_message,"\n\r##%s was just VANQUISHED by %s's goodness!\n\r", 
-          GET_NAME(victim), GET_NAME(ch));
-      break;
-    case CLASS_BARBARIAN:
-      sprintf(killer_message,"\n\r##%s was just SHREDDED by %s's crazed fury!\n\r", 
-          GET_NAME(victim), GET_NAME(ch));
-      break;
-    case CLASS_MONK:
-      sprintf(killer_message,"\n\r##%s was just SHATTERED by %s's karma!\n\r", 
-          GET_NAME(victim), GET_NAME(ch));
-      break;
-    case CLASS_RANGER:
-      sprintf(killer_message,"\n\r##%s was just PENETRATED by %s's wood!\n\r", 
-          GET_NAME(victim), GET_NAME(ch));
-      break;
-    case CLASS_BARD:
-      sprintf(killer_message,"\n\r##%s was just MUTED by %s's snazzy rhythm!\n\r", 
-          GET_NAME(victim), GET_NAME(ch));
-      break;
-    case CLASS_DRUID:
-      sprintf(killer_message,"\n\r##%s was just VIOLATED by %s's woodland friends!\n\r", 
-          GET_NAME(victim), GET_NAME(ch));
-      break;
-    default:
+  if (ch != NULL) {
+    if(GET_LEVEL(victim) < PKILL_COUNT_LIMIT || ch == victim)
+      sprintf(killer_message,"\n\r##%s just DIED!\n\r", GET_NAME(victim));
+    else if(IS_AFFECTED2(ch, AFF_FAMILIAR) && ch->master)
+      sprintf(killer_message,"\n\r##%s was just DEFEATED in battle by %s's familiar!\n\r",
+            GET_NAME(victim), GET_NAME(ch->master));
+    else if(IS_AFFECTED(ch, AFF_CHARM) && ch->master)
+      sprintf(killer_message,"\n\r##%s was just DEFEATED in battle by %s's charmie!\n\r",
+            GET_NAME(victim), GET_NAME(ch->master));
+    else if(IS_ANONYMOUS(ch))
       sprintf(killer_message,"\n\r##%s was just DEFEATED in battle by %s!\n\r", 
-          GET_NAME(victim), GET_NAME(ch));
-      break;
+            GET_NAME(victim), GET_NAME(ch));
+    else if(ch->in_room == real_room(START_ROOM))
+      sprintf(killer_message,"\n\r##%s was just PINGED by %s!\n\r", 
+            GET_NAME(victim), GET_NAME(ch));
+    else if(ch->in_room == real_room(SECOND_START_ROOM))
+      sprintf(killer_message,"\n\r##%s was just PONGED by %s!\n\r", 
+            GET_NAME(victim), GET_NAME(ch));
+    else switch(GET_CLASS(ch))
+    {
+      case CLASS_MAGIC_USER:
+        sprintf(killer_message,"\n\r##%s was just FRIED by %s's magic!\n\r", 
+            GET_NAME(victim), GET_NAME(ch));
+        break;
+      case CLASS_CLERIC:
+        sprintf(killer_message,"\n\r##%s was just BANISHED by %s's holiness!\n\r", 
+            GET_NAME(victim), GET_NAME(ch));
+        break;
+      case CLASS_THIEF:
+        sprintf(killer_message,"\n\r##%s was just ASSASSINATED by %s!\n\r", 
+            GET_NAME(victim), GET_NAME(ch));
+        break;
+      case CLASS_WARRIOR:
+        sprintf(killer_message,"\n\r##%s was just SLAIN by %s's might!\n\r", 
+            GET_NAME(victim), GET_NAME(ch));
+        break;
+      case CLASS_ANTI_PAL:
+        sprintf(killer_message,"\n\r##%s was just CONSUMED by %s's darkness!\n\r", 
+            GET_NAME(victim), GET_NAME(ch));
+        break;
+      case CLASS_PALADIN:
+        sprintf(killer_message,"\n\r##%s was just VANQUISHED by %s's goodness!\n\r", 
+            GET_NAME(victim), GET_NAME(ch));
+        break;
+      case CLASS_BARBARIAN:
+        sprintf(killer_message,"\n\r##%s was just SHREDDED by %s's crazed fury!\n\r", 
+            GET_NAME(victim), GET_NAME(ch));
+        break;
+      case CLASS_MONK:
+        sprintf(killer_message,"\n\r##%s was just SHATTERED by %s's karma!\n\r", 
+            GET_NAME(victim), GET_NAME(ch));
+        break;
+      case CLASS_RANGER:
+        sprintf(killer_message,"\n\r##%s was just PENETRATED by %s's wood!\n\r", 
+            GET_NAME(victim), GET_NAME(ch));
+        break;
+      case CLASS_BARD:
+        sprintf(killer_message,"\n\r##%s was just MUTED by %s's snazzy rhythm!\n\r", 
+            GET_NAME(victim), GET_NAME(ch));
+        break;
+      case CLASS_DRUID:
+        sprintf(killer_message,"\n\r##%s was just VIOLATED by %s's woodland friends!\n\r", 
+            GET_NAME(victim), GET_NAME(ch));
+        break;
+      default:
+        sprintf(killer_message,"\n\r##%s was just DEFEATED in battle by %s!\n\r", 
+            GET_NAME(victim), GET_NAME(ch));
+        break;
+    }
+
+    // have to be level 10 and linkalive to count as a pkill and not yourself
+    // (we check earlier to make sure victim isn't a mob)
+    if(!IS_MOB(ch) && GET_LEVEL(victim) > PKILL_COUNT_LIMIT && victim->desc && ch != victim)
+    {
+      GET_PDEATHS(victim) += 1;
+      GET_PDEATHS_LOGIN(victim) += 1;
+
+      GET_PKILLS(ch)             += 1;
+      GET_PKILLS_LOGIN(ch)       += 1;
+      GET_PKILLS_TOTAL(ch)       += GET_LEVEL(victim);
+      GET_PKILLS_TOTAL_LOGIN(ch) += GET_LEVEL(victim);
+
+      if(IS_AFFECTED(ch, AFF_GROUP)) {
+          char_data * master   = ch->master ? ch->master : ch;
+          if(!IS_MOB(master)) {
+            master->pcdata->grplvl      += GET_LEVEL(victim);
+            master->pcdata->group_kills += 1;
+          }
+        }
+       } // if (ch && ch != victim)
+  } else {
+    // ch == NULL
+    sprintf(killer_message,"\n\r##%s just DIED!\n\r", GET_NAME(victim));
   }
 
-  // have to be level 10 and linkalive to count as a pkill and not yourself
-  // (we check earlier to make sure victim isn't a mob)
-  if(!IS_MOB(ch) && GET_LEVEL(victim) > PKILL_COUNT_LIMIT && victim->desc && ch != victim)
-  {
-    GET_PDEATHS(victim) += 1;
-    GET_PDEATHS_LOGIN(victim) += 1;
-
-    GET_PKILLS(ch)             += 1;
-    GET_PKILLS_LOGIN(ch)       += 1;
-    GET_PKILLS_TOTAL(ch)       += GET_LEVEL(victim);
-    GET_PKILLS_TOTAL_LOGIN(ch) += GET_LEVEL(victim);
-
-    if(IS_AFFECTED(ch, AFF_GROUP)) {
-        char_data * master   = ch->master ? ch->master : ch;
-        if(!IS_MOB(master)) {
-          master->pcdata->grplvl      += GET_LEVEL(victim);
-          master->pcdata->group_kills += 1;
-        }
-      }
-  } // if (ch && ch != victim)
-  
   send_info(killer_message);
 }
 
@@ -3445,7 +3488,7 @@ void arena_kill(CHAR_DATA *ch, CHAR_DATA *victim)
   move_player_home(victim);
   
   while(victim->affected)
-    affect_remove(victim, victim->affected);
+    affect_remove(victim, victim->affected, SUPPRESS_ALL);
   
   if(ch && arena[2] == -2)
   {

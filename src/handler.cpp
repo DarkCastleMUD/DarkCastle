@@ -5,14 +5,21 @@
  *                                                                         *
  *  Copyright (C) 1992, 1993 Michael Chastain, Michael Quan, Mitchell Tse  *
  *  Performance optimization and bug fixes by MERC Industries.             *
- *  You can use our stuff in any way you like whatsoever so long as ths   *
+ *  You can use our stuff in any way you like whatsoever so long as th s   *
  *  copyright notice remains intact.  If you like it please drop a line    *
  *  to mec@garnet.berkeley.edu.                                            *
  *                                                                         *
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
+ *                                                                         *
+ *  Revision History                                                       *
+ *  10/23/2003   Onager    Moved some spell effect wear-off code from      *
+ *                         update_handler() in spells.cpp to               *
+ *                         affect_remove()                                 *
+ *  11/8/2003    Onager    Added flags to affect_remove() to allow it to   *
+ *                         be called without penalties or wear-off messages*
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.23 2003/05/07 04:10:18 pirahna Exp $ */
+/* $Id: handler.cpp,v 1.24 2003/11/10 19:36:28 staylor Exp $ */
     
 extern "C"
 {
@@ -45,6 +52,8 @@ extern "C"
 #include <act.h>
 #include <isr.h>
 #include <race.h>
+#include <fight.h>
+#include <returnvals.h>
 
 extern CWorld world;
  
@@ -66,6 +75,11 @@ int strncasecmp(char *s1, const char *s2, int len);
 int str_cmp(char *arg1, char *arg2);
 void stop_fighting(CHAR_DATA *ch);
 void remove_follower(CHAR_DATA *ch);
+int do_fall(CHAR_DATA *ch, short dir);
+
+/* internal procedures */
+void remove_memory(CHAR_DATA *ch, char type);
+void add_memory(CHAR_DATA *ch, char *victim, char type);
 
 
 // This grabs the first "word" (defined as group of alphaBETIC chars)
@@ -815,10 +829,12 @@ void affect_to_char( CHAR_DATA *ch, struct affected_type *af )
 /* Remove an affected_type structure from a char (called when duration
    reaches zero). Pointer *af must never be NIL! Frees mem and calls 
    affect_location_apply                                                */
-void affect_remove( CHAR_DATA *ch, struct affected_type *af )
+void affect_remove( CHAR_DATA *ch, struct affected_type *af, int flags )
 {
     struct affected_type *hjp;
     char buf[200];
+    short dir;
+    bool char_died = FALSE;
 
 
    if (!ch->affected) return;
@@ -863,13 +879,84 @@ void affect_remove( CHAR_DATA *ch, struct affected_type *af )
       case SPELL_BARKSKIN: /* barkskin wears off */
          REMOVE_BIT(ch->resist, ISR_SLASH);
          break;
+      case SPELL_FLY:
+         /* Fly wears off...you fall :) */
+         if(((flags & SUPPRESS_CONSEQUENCES) == 0) &&
+           ((IS_SET(world[ch->in_room].room_flags, FALL_DOWN) && (dir = 5)) ||
+           (IS_SET(world[ch->in_room].room_flags, FALL_UP) && (dir = 4)) ||
+           (IS_SET(world[ch->in_room].room_flags, FALL_EAST) && (dir = 1)) ||
+           (IS_SET(world[ch->in_room].room_flags, FALL_WEST) && (dir = 3)) ||
+           (IS_SET(world[ch->in_room].room_flags, FALL_SOUTH) && (dir = 2))||
+           (IS_SET(world[ch->in_room].room_flags, FALL_NORTH) && (dir = 0))))
+         {
+            if (do_fall(ch, dir) & eCH_DIED)
+               char_died = TRUE;
+         }
+         break;
+      case SKILL_INSANE_CHANT:
+         if (!(flags & SUPPRESS_MESSAGES))
+            send_to_char("The insane chanting in your mind wears off.\r\n", ch);
+         break;
+      case SKILL_GLITTER_DUST:
+         if (!(flags & SUPPRESS_MESSAGES))
+            send_to_char("The dust around your body stops glowing.\r\n", ch);
+         break;
+      case SKILL_BLOOD_FURY:
+         if (!(flags & SUPPRESS_MESSAGES))
+            send_to_char("Your blood cools to normal levels.\r\n", ch);
+         break;
+      case SKILL_BLADESHIELD:
+         if (!(flags & SUPPRESS_MESSAGES))
+            send_to_char("The draining affect of the blade shield technique has worn off.\r\n", ch);
+         break;
+      case SKILL_FOCUSED_REPELANCE:
+         REMOVE_BIT(ch->combat, COMBAT_REPELANCE);
+         if (!(flags & SUPPRESS_MESSAGES))
+            send_to_char("Your mind recovers from the repelance.\n\r", ch);
+         break;
+      case SKILL_VITAL_STRIKE:
+         if (!(flags & SUPPRESS_MESSAGES))
+            send_to_char("The internal strength and speed from your vital strike has returned.\r\n", ch);
+         break;
+      case SPELL_WATER_BREATHING:
+         if(!(flags & SUPPRESS_CONSEQUENCES) && world[ch->in_room].sector_type == SECT_UNDERWATER) // uh oh
+         {
+#if 0
+            // you just drowned!
+            act("$n begins to choke on the water, a look of panic filling $s eyes as it fill $s lungs.\n\r"
+            "$n is DEAD!!", ch, 0, 0, TO_ROOM, 0);
+            send_to_char("The water rushes into your lungs and the light fades with your oxygen.\n\r"
+            "You have been KILLED!!!\n\r", ch);
+            fight_kill(NULL, ch, TYPE_RAW_KILL);
+            char_died = TRUE;
+#else
+            act("$n begins to choke on the water, a look of panic filling $s eyes as it fill $s lungs.\n\r", ch, 0, 0, TO_ROOM, 0);
+            send_to_char("The water rushes into your lungs and the light fades with your oxygen.\n\r", ch);
+#endif
+          }
+          break;
+      case KI_STANCE + KI_OFFSET:
+         if (!(flags & SUPPRESS_MESSAGES))
+            send_to_char("Your body finishes venting the energy absorbed from your last ki stance.\r\n", ch);
+         break;
+      case SPELL_CHARM_PERSON:   /* Charm Wears off */
+         remove_memory(ch, 'h');
+         if (ch->master)
+         {
+            if (!(flags & SUPPRESS_CONSEQUENCES))
+               add_memory(ch, GET_NAME(ch->master), 'h');
+            stop_follower(ch, BROKE_CHARM);
+         }
+         break;
       default:
-        break;
+         break;
    }
 
-   dc_free ( af );
-   affect_total( ch ); // this must be here to take care of anything we might
-                       // have just removed that is still given by equipment
+   if (!char_died) {
+      dc_free ( af );
+      affect_total( ch ); // this must be here to take care of anything we might
+                          // have just removed that is still given by equipment
+   }
 }
 
 
@@ -885,7 +972,7 @@ void affect_from_char( CHAR_DATA *ch, int skill)
     for(hjp = ch->affected; hjp; hjp = afc) {
         afc = hjp->next;
 	if (hjp->type == (unsigned)skill)
-	    affect_remove( ch, hjp );
+	    affect_remove( ch, hjp, 0 );
     }
 }
 
@@ -928,7 +1015,7 @@ void affect_join( CHAR_DATA *ch, struct affected_type *af,
 	    if (avg_mod)
 		af->modifier /= 2;
 
-	    affect_remove(ch, hjp);
+	    affect_remove(ch, hjp, SUPPRESS_ALL);
 	    affect_to_char(ch, af);
 	    found = TRUE;
 	}
@@ -2065,7 +2152,7 @@ void extract_char(CHAR_DATA *ch, bool pull)
 
     // remove any and all affects from the character
     while(ch->affected)
-      affect_remove(ch, ch->affected);
+      affect_remove(ch, ch->affected, SUPPRESS_ALL);
 
     /* Must remove from room before removing the equipment! */
     was_in = ch->in_room;

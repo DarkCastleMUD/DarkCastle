@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.10 2003/06/05 02:39:07 pirahna Exp $ */
+/* $Id: limits.cpp,v 1.11 2003/11/10 19:36:28 staylor Exp $ */
 
 extern "C"
 {
@@ -654,12 +654,14 @@ void update_corpses_and_portals(void)
 {
   struct obj_data *j, *next_thing;
   struct obj_data *jj, *next_thing2;
+  struct obj_data *last_thing;
 
   void extract_obj(struct obj_data *obj); /* handler.c */
 
   /* objects */
   for(j = object_list; j ; j = next_thing)
   {
+    last_thing = j;  // for debugging only TODO remove when fixed
     next_thing = j->next; /* Next in object list */
 
     /* Type 1 is a permanent game portal, and type 3 is a look_only

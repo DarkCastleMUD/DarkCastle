@@ -3,7 +3,7 @@
  *
  * -Sadus
  */
-/* $Id: arena.cpp,v 1.3 2002/08/02 19:27:46 dcastle Exp $ */
+/* $Id: arena.cpp,v 1.4 2003/11/10 19:36:28 staylor Exp $ */
 
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
@@ -139,7 +139,7 @@ int do_joinarena(CHAR_DATA *ch, char *arg, int cmd)
   for(af = ch->affected; af; af = next_af) {
      next_af = af->next;
      if(af->type != FUCK_CANTQUIT)
-       affect_remove(ch, af);
+       affect_remove(ch, af, SUPPRESS_ALL);
   }
   
   GET_MOVE(ch) = GET_MAX_MOVE(ch);

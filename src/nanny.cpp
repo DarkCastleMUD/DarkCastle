@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.34 2003/10/19 05:47:42 staylor Exp $ */
+/* $Id: nanny.cpp,v 1.35 2003/11/10 19:36:29 staylor Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -62,6 +62,7 @@ extern "C" {
 #include <clan.h>
 #include <spells.h>
 #include <fight.h>
+#include <handler.h>
 
 #include <Account.h>
 
@@ -103,6 +104,7 @@ extern char imotd[MAX_STRING_LENGTH];
 extern CHAR_DATA *character_list;
 extern struct descriptor_data *descriptor_list;
 extern char *nonew_new_list[30];
+extern CWorld world;
 
 
 #ifndef WIN32
@@ -1722,6 +1724,7 @@ void update_command_lag_and_poison()
 {
    CHAR_DATA *i, *next_dude;
    int tmp, retval;
+   char log_msg[MAX_STRING_LENGTH];
    
    for(i = character_list; i; i = next_dude) 
    {
@@ -1737,6 +1740,22 @@ void update_command_lag_and_poison()
         }
       }
 
+      // handle drowning
+      if (!IS_NPC(i) && world[i->in_room].sector_type == SECT_UNDERWATER && !affected_by_spell(i, SPELL_WATER_BREATHING)) {
+         tmp = GET_MAX_HIT(i) / 5;
+         sprintf(log_msg, "%s drowned in room %d.", GET_NAME(i), world[i->in_room].number);
+         retval = noncombat_damage(i, tmp,
+            "You gasp your last breath and everything goes dark...",
+            "$n stops struggling as $e runs out of oxygen.",
+            log_msg);
+         if (SOMEONE_DIED(retval))
+            continue;
+         else {
+            act("$n thrashes and gasps, struggling vainly for air.", i, 0, 0, TO_ROOM, 0);
+            act("You gasp and fight madly for air; you are drowning!", i, 0, 0, TO_CHAR, 0);
+         }
+      }
+        
       // handle command lag
       if(i->timer > 0)
       {

@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.87 2003/10/09 17:27:12 pirahna Exp $ */
+/* $Id: magic.cpp,v 1.88 2003/11/10 19:36:28 staylor Exp $ */
 
 extern "C"
 {
@@ -2790,7 +2790,7 @@ int spell_charm_person(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
   }
 
   if(victim->master)
-	 stop_follower(victim, 0);
+	 stop_follower(victim, STOP_FOLLOW);
 
   add_follower(victim, ch, 0);
 
@@ -3826,7 +3826,7 @@ int spell_dispel_magic(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
         case 4: 
            if (affected_by_spell(victim, SPELL_CHARM_PERSON) && !victim->fighting) 
            {
-              stop_follower(victim, 0);
+              stop_follower(victim, BROKE_CHARM);
               affect_from_char(victim, SPELL_CHARM_PERSON);
               send_to_char("You feel less enthused about your master.\n\r", victim);
               done = TRUE;
@@ -3956,7 +3956,7 @@ int spell_conjure_elemental(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct
 
     /* charm them for a while */
     if (victim->master)
-	stop_follower(victim, 0);
+	stop_follower(victim, STOP_FOLLOW);
 
 	 add_follower(victim, ch, 0);
 

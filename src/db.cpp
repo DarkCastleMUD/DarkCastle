@@ -11,8 +11,12 @@
  *                                                                         *
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
+ *                                                                         *
+ *  Revision History                                                       *
+ *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
+ *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.23 2003/02/17 21:51:04 pirahna Exp $ */
+/* $Id: db.cpp,v 1.24 2003/11/10 19:36:28 staylor Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -886,13 +890,10 @@ struct index_data *generate_mob_indices(int *top, struct index_data *index)
 
 void remove_all_mobs_from_world()
 {
-//  CHAR_DATA * next = NULL;
   CHAR_DATA * curr = NULL;
 
-//  for(curr = character_list; curr; curr = next)
   while((curr = character_list))
   {
-//    next = curr->next;
     if(IS_NPC(curr))
        extract_char(curr, TRUE);
     else do_quit(curr, "", 666);
@@ -901,14 +902,7 @@ void remove_all_mobs_from_world()
 
 void remove_all_objs_from_world()
 {
-//  obj_data * next = NULL;
   obj_data * curr = NULL;
-
-//  for(curr = object_list; curr; curr = next)
-//  {
-//    next = curr->next;
-//    extract_obj(curr);
-//  }
 
     while((curr = object_list))
       extract_obj(curr);
@@ -2293,8 +2287,6 @@ CHAR_DATA *read_mobile(int nr, FILE *fl)
 
         mob->c_class = 0;
 
-//        fread_new_newline (fl);
-
         do
         {
            letter = fread_char (fl);
@@ -2640,8 +2632,12 @@ CHAR_DATA *clone_mobile(int nr)
   mob->next_in_room = 0;
 
   // random money amounts
-  if(mob->gold > 1000)
-    mob->gold = number(1, mob->gold);
+  if (mob->gold > 0) {
+    if (mob->gold < (GET_LEVEL(mob) * 500))
+      mob->gold = number(mob->gold, GET_LEVEL(mob) * 500);
+    else 
+      mob->gold = number(GET_LEVEL(mob) * 500, mob->gold);
+  }
 
   handle_automatic_mob_settings(mob);
 
@@ -3758,14 +3754,9 @@ void free_char( CHAR_DATA *ch )
   while(ch->carrying)
     extract_obj( ch->carrying );
 
-// IDIOTS!  affect_remove delete's itself.....
-// that means we're using af->next from free'd memory -pir
-//  for(af = ch->affected; af; af = af->next)
-//     affect_remove( ch, af );
-
 // Since affect_remove updates the linked list itself, do it this way
    while(ch->affected)
-     affect_remove( ch, ch->affected );
+     affect_remove( ch, ch->affected, SUPPRESS_ALL );
 
   dc_free(ch);
 }

@@ -1,4 +1,10 @@
-/* $Id: clan.cpp,v 1.15 2003/07/22 04:07:25 pirahna Exp $ */
+/* $Id: clan.cpp,v 1.16 2003/11/10 19:36:28 staylor Exp $ */
+
+/***********************************************************************/
+/* Revision History                                                    */
+/* 11/10/2003    Onager     Removed clan size limit                    */
+/***********************************************************************/
+
 extern "C"
 {
   #include <string.h> // strcat
@@ -737,11 +743,6 @@ int do_accept(CHAR_DATA *ch, char *arg, int cmd)
     return eFAILURE;
   }
 
-  if(num_clan_members(clan) >= CLAN_MAX_MEMBERS) {
-    send_to_char("Your clan is already at the member maximum.\r\n", ch);
-    return eFAILURE;
-  }
-
   victim->clan = ch->clan;
   add_clan_member(clan, victim);
   save_clans();
@@ -1239,8 +1240,6 @@ void do_clan_list(CHAR_DATA *ch)
            clan->number);
      send_to_char(buf, ch);
   }
-
-  csendf(ch, "\r\nClans currently limited to %d members.\r\n", CLAN_MAX_MEMBERS);
 }
 
 void do_clan_member_list(CHAR_DATA *ch)
