@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.21 2003/01/30 05:32:30 pirahna Exp $
+| $Id: cl_thief.cpp,v 1.22 2003/03/21 19:48:20 pirahna Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -122,7 +122,10 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if(( (float)GET_HIT(ch) / (float)GET_MAX_HIT(ch) ) < .2 ) {
+  int min_hp = (int) (GET_MAX_HIT(ch) / 5);
+  min_hp = MIN( min_hp, 25 );
+
+  if( GET_HIT(ch) < min_hp ) {
     send_to_char("You are feeling too weak right now to attempt such a bold maneuver.\r\n", ch);
     return eFAILURE;
   }
@@ -257,7 +260,10 @@ int do_circle(CHAR_DATA *ch, char *argument, int cmd)
      return eFAILURE;
    }
 
-   if (GET_HIT(ch) == 1) {
+   int min_hp = (int) (GET_MAX_HIT(ch) / 5);
+   min_hp = MIN( min_hp, 25 );
+
+   if( GET_HIT(ch) < min_hp ) {
       send_to_char("You are feeling too weak right now to attempt such a bold maneuver.", ch);
       return eFAILURE;
    }
@@ -1419,7 +1425,7 @@ int do_vitalstrike(struct char_data *ch, char *argument, int cmd)
 
   skill_increase_check(ch, SKILL_VITAL_STRIKE, learned, SKILL_INCREASE_EASY);
   
-  if(percent < chance) {
+  if(percent > chance) {
     act("$n starts jabbing $s weapons around $mself and almost chops off $s pinkie finger."
          , ch, 0, 0, TO_ROOM, NOTVICT);
     send_to_char("You try to begin the vital strike technique and slice off your own pinkie finger!\r\n", ch);
@@ -1432,8 +1438,11 @@ int do_vitalstrike(struct char_data *ch, char *argument, int cmd)
   }   
    
   WAIT_STATE(ch, PULSE_VIOLENCE);
-   
-  int length = 100 - GET_LEVEL(ch) - GET_DEX(ch);
+
+  // learned should have max of 80 for mortal thieves
+  // this means you can use it once per tick
+
+  int length = 9 - learned / 10;
   if(length < 1)
     length = 1;
 
