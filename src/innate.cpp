@@ -274,7 +274,7 @@ int do_innate_bloodlust(CHAR_DATA *ch, char *arg, int cmd)
       return eSUCCESS;
    }
 
-   if(!ch->combat)
+   if(!ch->fighting)
    {
       send_to_char("You must be in combat to bring forth a bloodlust.\r\n", ch);
       return eSUCCESS;
