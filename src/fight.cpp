@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.157 2004/04/21 19:09:29 urizen Exp $ */
+/* $Id: fight.cpp,v 1.158 2004/04/21 19:28:05 urizen Exp $ */
 
 extern "C"
 {
@@ -3010,10 +3010,6 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
           }
         }
          pir_stat_loss(victim);
-         if (GET_DEX(victim) <= 4 && GET_RACE(victim) == RACE_TROLL)
-         {
-	   
-         }
          if(GET_CON(victim) <= 4 && GET_RACE(victim) != RACE_TROLL)
          {
            sprintf(buf1, "%s/%c/%s", SAVE_DIR, victim->name[0], victim->name);
@@ -3032,7 +3028,7 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
            sprintf(buf2, "%s permanently dies.", buf1);
            log(buf2, ANGEL, LOG_MORTAL);
            return;
-         } else if (GET_DEX(victim) <= 4 && GET_RACE(ch) == RACE_TROLL) {
+         } else if (GET_DEX(victim) <= 4 && GET_RACE(victim) == RACE_TROLL) {
             sprintf(buf1, "%s/%c/%s", SAVE_DIR, victim->name[0], victim->name);
             send_to_char("Your Dexterity has reached 4...you are permanently dead!\r\n",victim);
 		send_to_char("\r\n"
