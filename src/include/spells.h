@@ -14,11 +14,12 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.h,v 1.35 2004/04/13 11:38:38 urizen Exp $ */
+/* $Id: spells.h,v 1.36 2004/04/14 19:13:11 urizen Exp $ */
 #include <structs.h> // byte, sh_int
 
 #define MAX_BUF_LENGTH               240
 
+void extractFamiliar(CHAR_DATA *ch);
 /*
  * Spell numbers are well known.
  * They appear in tinyworld files attached to magical items.

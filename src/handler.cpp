@@ -21,7 +21,7 @@
  *  12/08/2003   Onager    Added check for charmies and !charmie eq to     *
  *                         equip_char()                                    *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.29 2004/04/14 18:06:29 urizen Exp $ */
+/* $Id: handler.cpp,v 1.30 2004/04/14 19:13:03 urizen Exp $ */
     
 extern "C"
 {
@@ -871,7 +871,7 @@ void affect_to_char( CHAR_DATA *ch, struct affected_type *af )
     ch->affected = affected_alloc;
 
     affect_modify(ch, af->location, af->modifier,
-		  af->bitvector, TRUE);
+		  af->bitvector, TRUE,secFix);
 }
 
 

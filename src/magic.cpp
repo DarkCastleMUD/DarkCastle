@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.93 2004/04/14 18:06:29 urizen Exp $ */
+/* $Id: magic.cpp,v 1.94 2004/04/14 19:13:03 urizen Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -6046,6 +6046,10 @@ int cast_mana( byte level, CHAR_DATA *ch, char *arg, int type,
 	 case SPELL_TYPE_SPELL:
 		 return spell_mana(level, ch, tar_ch, 0, skill);
 		 break;
+	 case SPELL_TYPE_SCROLL:
+	   if (!tar_ch) tar_ch = ch;
+	return spell_mana(level,ch,tar_ch,0,skill);
+	break;
 	 case SPELL_TYPE_POTION:
 	 return spell_mana(level, ch, ch, 0, skill);
 	 break;
@@ -6055,7 +6059,7 @@ int cast_mana( byte level, CHAR_DATA *ch, char *arg, int type,
 		 spell_mana(level,ch,tar_ch,0, skill);
 	 break;
 	 default :
-	 log("Serious screw-up in heal!", ANGEL, LOG_BUG);
+	 log("Serious screw-up in mana!", ANGEL, LOG_BUG);
 	 break;
 	 }
   return eFAILURE;

@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.18 2003/11/10 19:36:29 staylor Exp $ */
+/* $Id: utility.cpp,v 1.19 2004/04/14 19:13:04 urizen Exp $ */
 
 extern "C"
 {
@@ -1025,7 +1025,7 @@ int do_quit(struct char_data *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
-    if(GET_POS(ch) == POSITION_FIGHTING) {
+    if(GET_POS(ch) == POSITION_FIGHTING&&cmd!=666) {
       send_to_char( "No way! You are fighting.\n\r", ch );
       return eFAILURE;
     }
@@ -1035,12 +1035,12 @@ int do_quit(struct char_data *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
-    if(IS_AFFECTED(ch, AFF_CANTQUIT)) {
+    if(IS_AFFECTED(ch, AFF_CANTQUIT) && cmd!=666) {
       send_to_char("You can't quit, because you are still a pkiller!\n\r", ch);
       return eFAILURE;
     }
 
-    if (IS_SET(world[ch->in_room].room_flags, NO_QUIT))
+    if (IS_SET(world[ch->in_room].room_flags, NO_QUIT) && cmd!=666)
     {
       send_to_char("Something about this room makes it seem like a bad place to quit.\r\n", ch);
       return eFAILURE;
@@ -1052,7 +1052,7 @@ int do_quit(struct char_data *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
-    if(IS_SET(world[ch->in_room].room_flags, CLAN_ROOM)) 
+    if(IS_SET(world[ch->in_room].room_flags, CLAN_ROOM) && cmd!=666) 
     {
       if(!ch->clan || !(clan = get_clan(ch))) {
          send_to_char("This is a clan room dork.  Try joining one first.\r\n", ch);
@@ -1076,6 +1076,7 @@ int do_quit(struct char_data *ch, char *argument, int cmd)
   if(IS_SINGING(ch))
     do_sing(ch, "stop", 9);
 
+  extractFamiliar(ch);
   affect_from_char(ch, SPELL_IRON_ROOTS);
 
   if(ch->beacon)

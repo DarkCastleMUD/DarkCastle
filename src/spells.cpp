@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.53 2004/04/14 18:06:29 urizen Exp $ */
+/* $Id: spells.cpp,v 1.54 2004/04/14 19:13:03 urizen Exp $ */
 
 extern "C"
 {
@@ -993,7 +993,23 @@ bool many_charms(CHAR_DATA *ch)
 
   return FALSE;
 }
+/* Stop the familiar without a master floods*/
+void extractFamiliar(CHAR_DATA *ch)
+{
+    CHAR_DATA *victim;
+    for(struct follow_type *k = ch->followers; k; k = k->next)
+     if(IS_MOB(k->follower) && IS_AFFECTED2(k->follower, AFF_FAMILIAR))
+     {
+        victim = k->follower;
+        break;
+     }
 
+   if (NULL == victim)
+      return;
+
+   act("$n disappears in a flash of flame and shadow.", victim, 0, 0, TO_ROOM, 0);
+   extract_char(victim, TRUE);
+}
 
 bool any_charms(CHAR_DATA *ch)
 {
