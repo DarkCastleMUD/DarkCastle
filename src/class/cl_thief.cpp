@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.4 2002/06/29 18:16:22 pirahna Exp $
+| $Id: cl_thief.cpp,v 1.5 2002/07/16 21:24:21 pirahna Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -86,7 +86,7 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
 {
   CHAR_DATA *victim;
   char name[256];
-  byte percent;
+  int percent;
   int skill = 0;
   int was_in = 0;
   int retval;
@@ -113,13 +113,8 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if(GET_HIT(ch) == 1) {
+  if(( (float)GET_HIT(victim) / (float)GET_MAX_HIT(victim) ) < .2 ) {
     send_to_char("You are feeling too weak right now to attempt such a bold maneuver.\r\n", ch);
-    return eFAILURE;
-  }
-
-  if( ( (float)GET_HIT(victim) / (float)GET_MAX_HIT(victim) ) < .7) {
-    send_to_char("They are injured and far too suspicious right now for you to sneak up behind them.\r\n", ch);
     return eFAILURE;
   }
 
@@ -156,6 +151,10 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
 
   // record the room I'm in.  Used to make sure a dual can go off.
   was_in = ch->in_room;
+
+  // if they're hurt they are going to be suspicious of backstabs so half the chance
+  if( ( (float)GET_HIT(victim) / (float)GET_MAX_HIT(victim) ) < .7) 
+    skill /= 2;
 
   // failure
   if(AWAKE(victim) && (percent > skill))
