@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: save.cpp,v 1.18 2004/04/20 14:31:18 urizen Exp $ */
+/* $Id: save.cpp,v 1.19 2004/04/20 15:02:55 urizen Exp $ */
 
 extern "C"
 {
@@ -754,7 +754,7 @@ struct obj_data *  obj_store_to_char(CHAR_DATA *ch, FILE *fpsave, struct obj_dat
 
 #ifdef LEAK_CHECK
     obj->affected = (obj_affected_type *) calloc(obj->num_affects, sizeof(obj_affected_type));
-#e lse
+#else
     obj->affected = (obj_affected_type *) dc_alloc(obj->num_affects, sizeof(obj_affected_type));
 #endif
 
@@ -764,6 +764,28 @@ struct obj_data *  obj_store_to_char(CHAR_DATA *ch, FILE *fpsave, struct obj_dat
       fread(&obj->affected[j].modifier, sizeof(obj->affected[j].modifier), 1, fpsave);
     }
 
+    fread(&mod_type, sizeof(char), 3, fpsave);
+  }
+  if (!strcmp("RPR",mod_type))
+  {
+    struct obj_affected_type *a;
+    #ifdef LEAK_CHECK
+    a = (obj_affected_type *) calloc(obj->num_affects+1, sizeof(obj_affected_type))
+#else
+    a = (obj_affected_type *) dc_alloc(obj->num_affects+1, sizeof(obj_affected_type));
+#endif
+    int i;
+    for (i = 0; i < obj->num_affects;i++)
+    {
+        a[i].location = obj->affected[i].location;
+        a[i].modifier = obj->affected[i].modifier;
+    }
+    if(obj->affected)
+      dc_free(obj->affected);
+    a[i].location = APPLY_DAMAGED;
+    fread(&a[i].modifier, sizeof(a[i].modifier), 1, fpsave);
+    obj->affected = a;
+    obj->num_affects++;
     fread(&mod_type, sizeof(char), 3, fpsave);
   }
   if(!strcmp("NAM", mod_type))
@@ -967,6 +989,7 @@ bool put_obj_in_store (struct obj_data *obj, CHAR_DATA *ch, FILE *fpsave, int we
     fwrite(&tmp_weight, sizeof(tmp_weight), 1, fpsave);
   }
 
+
   change = (obj->num_affects != standard_obj->num_affects);
   // since they aren't always in the same order (builder might have swapped them in an
   // rsave or something) we have to search through for each one to see if they are there,
@@ -990,6 +1013,15 @@ bool put_obj_in_store (struct obj_data *obj, CHAR_DATA *ch, FILE *fpsave, int we
     }
   }
 */
+  int i;
+  for (i = 0; i < obj->num_affects; i++)
+  {
+    if (obj->affected[i].location == APPLY_DAMAGED)
+    {
+      fwrite("RPR", sizeof(char), 3, fpsave);
+      fwrite(&obj->affected[i].modifier,sizeof(obj->affected[i].modifier),1,fpsave);
+    }
+  }
   if(strcmp(obj->name, standard_obj->name))
   {
     fwrite("NAM", sizeof(char), 3, fpsave);
