@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.27 2002/09/28 23:54:47 pirahna Exp $ */
+/* $Id: spells.cpp,v 1.28 2002/10/01 03:31:32 dcastle Exp $ */
 
 extern "C"
 {
@@ -1415,6 +1415,8 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
           return eFAILURE;
         }
       }
+      else learned = 80;
+
       argument+=qend+1; /* Point to the last ' */
       for(;*argument == ' '; argument++);
       
