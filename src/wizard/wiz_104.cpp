@@ -814,8 +814,8 @@ obj_data *)(obj_index[nr].item))->obj_flags.eq_level,
           SET_BIT(more, 1<<i);
           continue;
         }*/
-       send_to_char("Unknown argument.\r\n",ch);
-       return eFAILURE;
+  //     send_to_char("Unknown argument.\r\n",ch);
+//       return eFAILURE;
      }
      int c,nr;
 //     csendf(ch,"%d %d %d %d %d", more, extra, wear, size, affect);

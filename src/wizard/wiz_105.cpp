@@ -281,11 +281,11 @@ int do_sqedit(struct char_data *ch, char *argument, int cmd)
 	send_to_char("Invalid class.\r\n",ch);
 	return eFAILURE;
       }
-      if (IS_SET(skill->clas, 1<<i))
-	REMOVE_BIT(skill->clas, 1<<i);
+      if (IS_SET(skill->clas, 1<<(i-1)))
+	REMOVE_BIT(skill->clas, 1<<(i-1));
         //skill->clas = i;
       else
-	SET_BIT(skill->clas,1<<i);
+	SET_BIT(skill->clas,1<<(i-1));
       send_to_char("Class modified.\r\n",ch);
       break;
     case 5:
@@ -299,7 +299,7 @@ int do_sqedit(struct char_data *ch, char *argument, int cmd)
         bool done = FALSE;
         for (curren = skill_list; curren; curren = curren->next)
         {
-	  if (!IS_SET(curren->clas, 1<<i))
+	  if (!IS_SET(curren->clas, 1<<(i-1)))
 	    continue;
 	  if (curren->clas == i) {
   	    csendf(ch, "$2%d$R. %s\r\n", curren->num, get_skill_name(curren->num));
