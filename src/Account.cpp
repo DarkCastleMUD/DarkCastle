@@ -32,12 +32,15 @@
 
    vector<string>       characternames;
    int                  soulgems; 
+   int                  bvOne;
+
 */
 
 CAccount::CAccount(string loginid)
 {
    login = loginid;
    soulgems = 0;
+   bvOne = 0;
 }
 
 // Write account to file.

@@ -11,7 +11,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.27 2003/04/23 00:04:27 pirahna Exp $ */
+/* $Id: nanny.cpp,v 1.28 2003/04/23 04:21:06 pirahna Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -1232,7 +1232,8 @@ void nanny(struct descriptor_data *d, char *arg)
        case '1':
           // List characters available to player
           SEND_TO_Q("Which of the following characters would you like to login?\n\r", d);
-          SEND_TO_Q("TODO - List player names\n\r", d);
+          d->account->charListToBuf(buf);
+          SEND_TO_Q(buf, d);
           SEND_TO_Q("\n\rName? ", d);
           STATE(d) = CON_ACCOUNT_LOGIN_CHAR;
           break;
