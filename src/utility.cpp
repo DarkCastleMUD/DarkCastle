@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.15 2003/05/12 02:29:18 pirahna Exp $ */
+/* $Id: utility.cpp,v 1.16 2003/06/22 23:08:29 pirahna Exp $ */
 
 extern "C"
 {
@@ -572,13 +572,15 @@ bool CAN_SEE( struct char_data *sub, struct char_data *obj )
       return FALSE;
       }	
 
-   if (!IS_MOB(obj)) {
+   if (!IS_MOB(obj)) 
+   {
       if(!obj->pcdata) // noncreated char
          return TRUE;
       if(GET_LEVEL(sub) < obj->pcdata->wizinvis) {
-         if (!IS_MOB(obj) && obj->pcdata->incognito == TRUE) {
+         if (obj->pcdata->incognito == TRUE) {
             if (sub->in_room != obj->in_room)
                return FALSE;
+            return TRUE;
          }
          else
             return FALSE;
