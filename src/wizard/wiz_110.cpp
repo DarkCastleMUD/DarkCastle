@@ -73,8 +73,7 @@ int do_maxes(struct char_data *ch, char *argument, int cmd)
 	        max += (get_max_stat(ch,classskill[i].attrs[1])-20);
 	  }
 
-	  csendf(ch, "%s: %d\n", classskill[i].skillname,
-		max);
+	  csendf(ch, "%s: %d\n", classskill[i].skillname, (int)max);
 	}
 	GET_RACE(ch) = orace;
 	return eSUCCESS;

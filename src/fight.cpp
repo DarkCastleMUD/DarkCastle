@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.220 2004/07/08 12:37:45 urizen Exp $ */
+/* $Id: fight.cpp,v 1.221 2004/07/13 03:12:24 urizen Exp $ */
 
 extern "C"
 {
@@ -1320,6 +1320,7 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
     if (l)
       dam = dam_percent(l, dam);
     dam = number(dam-(dam/10), dam+(dam/10)); // +- 10%
+    if (IS_NPC(ch)) dam *= 0.6;
   }
 
   if(typeofdamage == DAMAGE_TYPE_MAGIC)  
