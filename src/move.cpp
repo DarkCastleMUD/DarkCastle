@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.13 2002/08/13 17:09:38 pirahna Exp $
+| $Id: move.cpp,v 1.14 2002/08/20 00:23:42 pirahna Exp $
 | move.C
 | Movement commands and stuff.
 */
@@ -825,15 +825,15 @@ int do_climb(struct char_data *ch, char *argument, int cmd)
       return eFAILURE|eINTERNAL_ERROR;
    }
 
-   int retval = move_char(ch, real_room(dest));
-   
+   act("$n climbs $p.", ch, obj, 0, TO_ROOM, INVIS_NULL);
    sprintf(buf, "You climb %s.\r\n", obj->short_description);
    send_to_char(buf, ch);
-   act("$n climbs $p.", ch, obj, 0, TO_ROOM, INVIS_NULL);
-  
+   int retval = move_char(ch, real_room(dest));
+   
    if(SOMEONE_DIED(retval))
       return retval;
 
+   act("$n climbs $p.", ch, obj, 0, TO_ROOM, INVIS_NULL);  
    do_look(ch, "", 9);
    return eSUCCESS;
 }
