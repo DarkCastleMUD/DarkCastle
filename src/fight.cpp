@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.42 2002/08/14 22:24:18 dcastle Exp $ */
+/* $Id: fight.cpp,v 1.43 2002/08/16 18:02:44 dcastle Exp $ */
 
 extern "C"
 {
@@ -2563,60 +2563,56 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
 void group_gain(CHAR_DATA * ch, CHAR_DATA * victim)
 {
   char buf[256];
-  long no_members, share;
+  long no_members, share, tmp_share;
   long totallevels;
-  CHAR_DATA *k, *highest;
+  CHAR_DATA *k, *highest, *tmp_ch;
   struct follow_type *f;
   int grouplevel;
   
-  /* No exp for pkills (duh) */
-  if(is_pkill(ch, victim))
-    return;
+  if(is_pkill(ch, victim))        return;
+  if(ch == victim)                return;
+  if(!IS_NPC(victim))             return;
   
-  if(ch == victim)
-    return;
-  
-  if(!IS_NPC(victim))
-    return;
-  
-  if(!( IS_AFFECTED(ch, AFF_CHARM) || IS_AFFECTED2(ch, AFF_FAMILIAR))
-      && IS_NPC(ch))
+  if(IS_NPC(ch) && !( IS_AFFECTED(ch, AFF_CHARM) || IS_AFFECTED2(ch, AFF_FAMILIAR)))
     return; // non charmies/familiars get out
 
-  // if i'm not grouped, give my master the credit
-  if(IS_NPC(ch) && !IS_AFFECTED(ch, AFF_GROUP) && ch->master)
+  // if i'm charmie/familiar and not grouped, give my master the credit if he's in room
+  if(IS_NPC(ch) && !IS_AFFECTED(ch, AFF_GROUP) && ch->master 
+                && ch->in_room == ch->master->in_room)
     ch = ch->master;
 
-  if((k = ch->master) == NULL)
+  // Set k to group leader
+  if(!(k = ch->master))
     k = ch;
-  
-  if((highest = ch->master) == NULL)
-    highest = ch;
 
   no_members = 0;
   totallevels = 0;
-  grouplevel = GET_LEVEL(ch);
   
   if(IS_AFFECTED(k, AFF_GROUP) && k->in_room == ch->in_room) { 
+    highest = k; // set group leader as highest level to start
     no_members += 1;
     totallevels += GET_LEVEL(k);
   }
-  
-  for(f = k->followers; f; f = f->next) { 
-    if(IS_AFFECTED(f->follower, AFF_GROUP) &&  
-      f->follower->in_room == ch->in_room) { 
+  else highest = ch; // since group leader isn't here, set myself as highest in room
+
+  for(f = k->followers; f; f = f->next) 
+  {
+    if(IS_AFFECTED(f->follower, AFF_GROUP) &&    // if grouped
+      f->follower->in_room == ch->in_room)       // and in the room
+    {
       no_members += 1;
       totallevels += GET_LEVEL(f->follower);
       if(GET_LEVEL(f->follower) > GET_LEVEL(highest))
-        highest = f->follower;
+        highest = f->follower;                  // changest 'highest' if it's not me
     }
   }
+
+  grouplevel = GET_LEVEL(highest);
   
   if(no_members == 0) { 
     no_members = 1;
     totallevels = GET_LEVEL(ch);
   }
-  else grouplevel -= MIN(4, no_members);
 
   share = GET_EXP(victim);
 
@@ -2627,38 +2623,43 @@ void group_gain(CHAR_DATA * ch, CHAR_DATA * victim)
     default:  share = (int) (share * 1.8); break; 
   }
 
-  /* Kludgy loop to get k in at end. */
-  for(f = k->followers;; f = f->next) 
+  // loop with k first, then all the followers
+  tmp_ch = k;
+  f = k->followers;
+  do
   { 
-    CHAR_DATA *tmp_ch;
-    long tmp_share;
-    
-    tmp_ch = (f == NULL) ? k : f->follower;
-    
-    if(tmp_ch->in_room != ch->in_room)
-      goto LContinue;
-    
-    if((!IS_AFFECTED(tmp_ch, AFF_GROUP)) && (no_members > 1))
-      goto LContinue;
-    
-    if(!IS_AFFECTED(tmp_ch, AFF_GROUP) && tmp_ch != ch)
-      goto LContinue;
-    
-    if((tmp_ch != ch) && (!IS_AFFECTED(ch, AFF_GROUP)))
-      goto LContinue;
-    
-    if(GET_LEVEL(tmp_ch) - GET_LEVEL(highest) <= -20) {
-      act("You are too low for this group.  You gain no experience.",
-        tmp_ch, 0, 0, TO_CHAR, 0);
-      goto LContinue;
+    if(( tmp_ch->in_room != ch->in_room )                         ||
+       ( (!IS_AFFECTED(tmp_ch, AFF_GROUP)) && (no_members > 1) )  ||
+       ( !IS_AFFECTED(tmp_ch, AFF_GROUP) && tmp_ch != ch )        ||
+       ( (tmp_ch != ch) && (!IS_AFFECTED(ch, AFF_GROUP)) )
+      )
+    {
+       // this loops the followers (cut and pasted below)
+       if(f) {
+          tmp_ch = f->follower;
+          f = f->next;
+       }
+       else tmp_ch = NULL;
+       continue;
     }
     
+    if(GET_LEVEL(tmp_ch) - GET_LEVEL(highest) <= -20) {
+       act("You are too low for this group.  You gain no experience.", tmp_ch, 0, 0, TO_CHAR, 0);
+
+       // this loops the followers (cut and pasted above and below)
+       if(f) {
+          tmp_ch = f->follower;
+          f = f->next;
+       }
+       else tmp_ch = NULL;
+       continue;
+    }
     
-    if(GET_LEVEL(tmp_ch) == 0 || share == 0)
-      tmp_share = 0;
-    else if(no_members < 2)
-       tmp_share = (GET_LEVEL(tmp_ch) * share / totallevels);
-    else tmp_share = ((GET_LEVEL(tmp_ch)+6) * share / totallevels);  // small bonus for grouped lowbies
+    if(no_members < 2)
+       tmp_share = share;
+    else if(GET_LEVEL(ch) < 17)
+       tmp_share = (((GET_LEVEL(tmp_ch)+6) * share) / totallevels);  
+    else tmp_share = (((GET_LEVEL(tmp_ch)+2) * share) / totallevels);  
 
     // reduce xp if you are higher level than mob
     switch(GET_LEVEL(victim) - grouplevel) {
@@ -2694,30 +2695,27 @@ void group_gain(CHAR_DATA * ch, CHAR_DATA * victim)
         tmp_share = MIN((GET_LEVEL(tmp_ch) * 8000), tmp_share);
         break;
       default: 
-        tmp_share = MIN((GET_LEVEL(tmp_ch) * 9000), tmp_share);
+        tmp_share = MIN((GET_LEVEL(tmp_ch) * 8500), tmp_share);
         break;
     }
     
-    if(tmp_share > share)
-      tmp_share = share;
+    if(tmp_share > share)      tmp_share = share;
+    if(tmp_share < 0)          tmp_share = 0;
+    if(IS_NPC(tmp_ch))         tmp_share /= 2;
     
-    /* pir 3/12/1999 to get rid of -exp bug for mobs with too much xp */
-    if(tmp_share < 0)
-      tmp_share = 0;
-    
-    if(IS_NPC(tmp_ch))
-      tmp_share /= 2;
-    
-    sprintf(buf, "You receive %ld exps of %ld total.\n\r",
-      tmp_share, share);
+    sprintf(buf, "You receive %ld exps of %ld total.\n\r", tmp_share, share);
     send_to_char(buf, tmp_ch);
     gain_exp(tmp_ch, tmp_share);
     change_alignment(tmp_ch, victim);
-    
-LContinue:
-    if(f == NULL)
-      break;
+
+    // this loops the followers (cut and pasted above)
+    if(f) {
+       tmp_ch = f->follower;
+       f = f->next;
+    }
+    else tmp_ch = NULL;
   }
+  while(tmp_ch);
 }
 
 
