@@ -19,7 +19,7 @@
 /* 12/06/2003   Onager   Modified mobile_activity() to prevent charmie    */
 /*                       scavenging                                       */
 /**************************************************************************/
-/* $Id: mob_act.cpp,v 1.25 2004/07/03 11:44:13 urizen Exp $ */
+/* $Id: mob_act.cpp,v 1.26 2004/07/20 11:05:23 urizen Exp $ */
 
 extern "C"
 {
@@ -104,6 +104,7 @@ void mobile_activity(void)
   /* Examine all mobs. */
   for(ch = character_list; ch; ch = next_dude) 
   {
+    if (!ch) break;
     next_dude = ch->next;
     
     if(!IS_MOB(ch))

@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.30 2004/07/09 15:34:07 urizen Exp $ */
+/* $Id: clan.cpp,v 1.31 2004/07/20 11:05:23 urizen Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -124,8 +124,11 @@ void boot_clans(void)
 
 //    fgets(buf, 198, fl);
     char a;
+    
     while( (a = fread_char(fl)) != '~' )
     {
+	if (a != ' ' && a != '\n')
+	getc(fl);
       switch(a) {
 	case ' ':
 	case '\n':
@@ -896,8 +899,9 @@ int do_cpromote(CHAR_DATA *ch, char *arg, int cmd)
                  "clan.\n\r", ch);
     return eFAILURE;
   }
+  if (clan->leader) dc_free(clan->leader);
+  clan->leader = str_dup(GET_NAME(victim));
 
-  strcpy(clan->leader, GET_NAME(victim));
   save_clans();
   
   sprintf(buf, "You are now the leader of %s.\n\r", clan->name);
@@ -1253,7 +1257,7 @@ int do_ctell(CHAR_DATA *ch, char *arg, int cmd)
      if(pch == ch || pch->clan != ch->clan || 
         !IS_SET(pch->misc, CHANNEL_CLAN))
        continue;
-     if (!has_right(pch, CLAN_RIGHTS_CHANNEL) && ch->level < 51)
+     if (!has_right(pch, CLAN_RIGHTS_CHANNEL) && pch->level < 51)
        continue;
      ansi_color( GREEN, pch);
      send_to_char(buf, pch);
@@ -1463,9 +1467,9 @@ void do_god_clans(CHAR_DATA *ch, char *arg, int cmd)
 #else
       clan = (struct clan_data *)dc_alloc(1, sizeof(clan_data));
 #endif
-      strcpy(clan->leader, GET_NAME(ch));
-      strcpy(clan->founder, GET_NAME(ch));
-      strcpy(clan->name, text);
+      clan->leader = str_dup(GET_NAME(ch));
+      clan->founder = str_dup(GET_NAME(ch));
+      clan->name = str_dup(text);
       clan->number = x;
       clan->rooms = 0;
       clan->next = 0;

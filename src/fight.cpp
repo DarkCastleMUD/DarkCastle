@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.221 2004/07/13 03:12:24 urizen Exp $ */
+/* $Id: fight.cpp,v 1.222 2004/07/20 11:05:16 urizen Exp $ */
 
 extern "C"
 {
@@ -167,6 +167,7 @@ void perform_violence(void)
    if(IS_MOB(ch))
       last_virt  = mob_index[ch->mobdata->nr].virt;
 // DEBUG CODE
+   if (!ch->fighting) continue;
       
    if (ch->in_room != ch->fighting->in_room)
    { // Fix for the whacky fighting someone who's not here thing.
@@ -1388,7 +1389,7 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
    }
    if (number(1,100) < save) {
 	if (save > 50) save = 50;
-	dam -= (dam * (save/100)); // Save chance.
+	dam -= (dam * (double)(save/100)); // Save chance.
         act("$n resists $N's assault and sustains reduced damage.", victim, 0, ch, TO_ROOM, NOTVICT);
         act("$n resists your assault and sustains reduced damage.",victim,0,ch, TO_VICT,0);
         act("You resist $N's assault and sustains reduced damage.", victim, 0, ch, TO_CHAR, 0);

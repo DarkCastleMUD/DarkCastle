@@ -49,7 +49,6 @@ fast:
 darkcastle: $(OBJS)
 	$(CXX) $(CXXFLAGS) $(LIBDIRS) -o $(PROGNAME) $(OBJS) $(LDFLAGS)
 
-
 # Now for the library makefile calls
 #WizLib:
 #	@echo "Making libWiz.a.."

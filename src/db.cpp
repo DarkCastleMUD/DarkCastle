@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.72 2004/07/17 18:57:25 urizen Exp $ */
+/* $Id: db.cpp,v 1.73 2004/07/20 11:05:23 urizen Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -720,7 +720,7 @@ int do_wizlist(CHAR_DATA *ch, char *argument, int cmd)
        " -- Empty --",
        " -- Empty --",
        "(:) == Coders == (:)",
-       " -- Empty --",
+       "(:) == Mini-Implementors == (:)",
        "(:) == Implementors == (:)"
   };
 
