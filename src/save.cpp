@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: save.cpp,v 1.6 2002/08/02 02:30:35 pirahna Exp $ */
+/* $Id: save.cpp,v 1.7 2002/08/03 08:04:50 pirahna Exp $ */
 
 extern "C"
 {
@@ -371,6 +371,26 @@ int char_to_store_variable_data(CHAR_DATA * ch, FILE * fpsave)
     skill = skill->next;
   }
   fwrite("END", sizeof(char), 3, fpsave);
+
+  struct affected_type *af;
+  int16 aff_count = 0; // do not change from int16
+
+  for(af = ch->affected; af; af = af->next)
+    aff_count++;
+
+  if(aff_count)
+  {
+    fwrite("AFS", sizeof(char), 3, fpsave);
+    fwrite(&aff_count, sizeof(aff_count), 1, fpsave);
+    for(af = ch->affected; af; af = af->next)
+    {
+       fwrite(&(af->type),      sizeof(af->type),      1, fpsave);
+       fwrite(&(af->duration),  sizeof(af->duration),  1, fpsave);
+       fwrite(&(af->modifier),  sizeof(af->modifier),  1, fpsave);
+       fwrite(&(af->location),  sizeof(af->location),  1, fpsave);
+       fwrite(&(af->bitvector), sizeof(af->bitvector), 1, fpsave);
+    }
+  }
   
   // Any future additions to this save file will need to be placed LAST here with a 3 letter code
   // and appropriate strcmp statement in the read_mob_data object
@@ -423,6 +443,27 @@ int store_to_char_variable_data(CHAR_DATA * ch, FILE * fpsave)
   }
 
   fread(&typeflag, sizeof(char), 3, fpsave);
+
+  if(!strncmp(typeflag, "AFS", 3)) // affects
+  {
+    int16 aff_count; // do not change form int16
+    fread(&aff_count, sizeof(aff_count), 1, fpsave);
+    ch->affected = NULL;
+    for(int16 i = 0; i < aff_count; i++)
+    {
+       affected_type * af = (affected_type *)calloc(sizeof(affected_type), 1);
+       af->next = ch->affected;
+       ch->affected = af;
+
+       fread(&(af->type),      sizeof(af->type),      1, fpsave);
+       fread(&(af->duration),  sizeof(af->duration),  1, fpsave);
+       fread(&(af->modifier),  sizeof(af->modifier),  1, fpsave);
+       fread(&(af->location),  sizeof(af->location),  1, fpsave);
+       fread(&(af->bitvector), sizeof(af->bitvector), 1, fpsave);
+    }
+    fread(&typeflag, sizeof(char), 3, fpsave);
+  }
+
 
   // Add new items in this format
 //  if(!strcmp(typeflag, "XXX"))
