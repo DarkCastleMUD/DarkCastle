@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.39 2003/05/04 00:39:25 pirahna Exp $ */
+/* $Id: spells.cpp,v 1.40 2003/05/12 03:11:36 pirahna Exp $ */
 
 extern "C"
 {
@@ -1568,13 +1568,22 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
         // make sure we don't count any specialization in the casting:)
         learned = learned % 100;
 
-        if(IS_MOB(ch))
+        int chance;
+
+        if(IS_MOB(ch)) {
           learned = 50;
+          chance = 75;
+        }
+        else {
+          chance = 50;
+          chance += learned/10;
+          if(GET_CLASS(ch) == CLASS_MAGIC_USER || GET_CLASS(ch) == CLASS_ANTI_PAL)
+             chance += GET_INT(ch);
+          else chance += GET_WIS(ch);
+        }
 
         // TODO - make this use int for mages
-        if(GET_LEVEL(ch) < IMMORTAL && number(1,105) >
-           (80 - (20 - (GET_WIS(ch)==0 ? 20 : GET_WIS(ch))))
-          )
+        if(GET_LEVEL(ch) < IMMORTAL && number(1,101) > chance )
         {
           send_to_char("You lost your concentration!\n\r", ch);
           GET_MANA(ch) -= (use_mana(ch, spl) >> 1);
@@ -1588,9 +1597,6 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
         }
 
         send_to_char("Ok.\n\r", ch);
-
-// TODO - pass 'learned' to the spell so it can use it to determine spell effect
-//        (we could just call "has_skill" again, but that wouldn't be very smart)
 
         GET_MANA(ch) -= (use_mana(ch, spl));
         return ((*spell_info[spl].spell_pointer) (GET_LEVEL(ch), ch, argument, SPELL_TYPE_SPELL, tar_char, tar_obj, learned));
