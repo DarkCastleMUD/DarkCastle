@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.103 2004/04/19 16:48:28 urizen Exp $ */
+/* $Id: magic.cpp,v 1.104 2004/04/19 18:55:42 urizen Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -770,7 +770,30 @@ int spell_solar_gate(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
               if(GET_LEVEL(tmp_victim))
                 if(IS_NPC(tmp_victim))  {
                   add_memory(tmp_victim, GET_NAME(ch), 'h');
- 		  if(GET_POS(tmp_victim) != POSITION_STANDING)
+  if (!IS_NPC(ch) && IS_NPC(tmp_victim))
+     if (!IS_SET(tmp_victim->mobdata->actflags, ACT_STUPID))
+     {
+       if (GET_LEVEL(ch) - GET_LEVEL(tmp_victim)/2 <= 0)
+          {
+                add_memory(tmp_victim, GET_NAME(ch), 't');
+                struct timer_data *timer;
+                #ifdef LEAK_CHECK
+                  timer = (struct timer_data *)calloc(1, sizeof(struct timer_data));
+                #else
+                  timer = (struct timer_data *)dc_alloc(1, sizeof(struct timer_data));
+                #endif
+                timer->arg1 = (void*)tmp_victim->hunting;
+                timer->arg2 = (void*)tmp_victim;
+                timer->function = clear_hunt;
+               timer->next = timer_list;
+                timer_list = timer;
+                timer->timeleft = (ch->level==50?24 * 60:(ch->level/5 
+)*60);
+           }
+     }
+
+
+if(GET_POS(tmp_victim) != POSITION_STANDING)
                     GET_POS(tmp_victim) = POSITION_STANDING;
 		  if(!IS_AFFECTED(tmp_victim, AFF_BLIND) &&
                      !IS_SET(tmp_victim->mobdata->actflags, ACT_STUPID))
