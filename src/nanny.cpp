@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.42 2004/04/20 21:07:48 urizen Exp $ */
+/* $Id: nanny.cpp,v 1.43 2004/04/20 21:17:06 urizen Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -426,7 +426,7 @@ void roll_and_display_stats(CHAR_DATA * ch)
             ch->desc->stats->con[0], ch->desc->stats->con[1], ch->desc->stats->con[2],
             ch->desc->stats->con[3], ch->desc->stats->con[4]);
          SEND_TO_Q(buf, ch->desc);
-         SEND_TO_Q("Choose a group <1-5>, or press return to reroll --> ", ch->desc);
+         SEND_TO_Q("Choose a group <1-5>, or press return to reroll(Help <attribute> for more information) --> ", ch->desc);
 
 	WAIT_STATE(ch, PULSE_VIOLENCE);
 }
@@ -475,7 +475,7 @@ void nanny(struct descriptor_data *d, char *arg)
 
    ch  = d->character;
    if(arg) for ( ; isspace(*arg); arg++ );
-   if (!str_prefix("help",arg) && (STATE(d) == CON_GET_NEW_CLASS || STATE(d) == CON_GET_RACE) )
+   if (!str_prefix("help",arg) && (STATE(d) == CON_GET_NEW_CLASS || STATE(d) == CON_GET_RACE || STATE(d) == CON_CHOOSE_STATS) )
    {
      do_help(d->character, arg+4, 88);
      return;
@@ -1001,7 +1001,7 @@ void nanny(struct descriptor_data *d, char *arg)
             sprintf(buf, "   1: Human\n\r   2: Elf\n\r   3: Dwarf\n\r"
                "   4: Hobbit\n\r   5: Pixie\n\r   6: Giant\n\r"
                "   7: Gnome\r\n   8: Orc\r\n   9: Troll\r\n"
-               "\n\rSelect a race(You can use the helpfiles from here)-> ");
+               "\n\rSelect a race(Type help <race> for more information)-> ");
             SEND_TO_Q(buf, d);
             STATE(d) = CON_GET_RACE;
             break;
@@ -1169,7 +1169,7 @@ void nanny(struct descriptor_data *d, char *arg)
                       " %c 9: Ranger\n\r"
                       " %c 10: Bard\n\r"
                       " %c 11: Druid\n\r"
-                      "\n\rSelect a class(You can use the helpfiles from here)-> ", 
+                      "\n\rSelect a class(Type help <class> for more information) > ", 
             (is_clss_eligible(ch, CLASS_WARRIOR) ? '*' : ' '),
             (is_clss_eligible(ch, CLASS_CLERIC) ? '*' : ' '),
             (is_clss_eligible(ch, CLASS_MAGIC_USER) ? '*' : ' '),
