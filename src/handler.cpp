@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.18 2002/10/31 06:24:36 pirahna Exp $ */
+/* $Id: handler.cpp,v 1.19 2003/01/21 05:34:23 pirahna Exp $ */
     
 extern "C"
 {
@@ -277,9 +277,43 @@ bool still_affected_by_poison(CHAR_DATA * ch)
   return 0;
 }
 
+void check_weapon_weights(char_data * ch)
+{
+  struct obj_data * weapon;
+  extern struct str_app_type str_app[];
+
+  // make sure we're still strong enough to wield our weapons
+  if(!IS_MOB(ch) && ch->equipment[WIELD] &&
+       GET_OBJ_WEIGHT(ch->equipment[WIELD]) > str_app[STRENGTH_APPLY_INDEX(ch)].wield_w)
+  {
+    act("Being too heavy to wield, you move your $p to your inventory.",
+         ch, ch->equipment[WIELD], 0, TO_CHAR, 0);
+    act("$n stops using $p.", ch, ch->equipment[WIELD], 0, TO_ROOM, INVIS_NULL);
+    obj_to_char(unequip_char(ch, WIELD), ch);
+    if(ch->equipment[SECOND_WIELD] &&
+         GET_OBJ_WEIGHT(ch->equipment[SECOND_WIELD]) <= (str_app[STRENGTH_APPLY_INDEX(ch)].wield_w/2))
+    {
+      act("You move your $p to be your primary weapon.", ch, ch->equipment[SECOND_WIELD], 0, TO_CHAR, INVIS_NULL);
+      act("$n moves $s $p to be $s primary weapon.", ch, ch->equipment[SECOND_WIELD], 0, TO_ROOM, INVIS_NULL);
+      weapon = unequip_char(ch, SECOND_WIELD);
+      equip_char(ch, weapon, WIELD);
+    }
+  }
+
+  if(ch->equipment[SECOND_WIELD] &&
+       GET_OBJ_WEIGHT(ch->equipment[SECOND_WIELD]) > (str_app[STRENGTH_APPLY_INDEX(ch)].wield_w/2))
+  {
+    act("Being too heavy to wield, you move your $p to your inventory.",
+         ch, ch->equipment[SECOND_WIELD], 0, TO_CHAR, 0);
+    act("$n stops using $p.", ch, ch->equipment[SECOND_WIELD], 0, TO_ROOM, INVIS_NULL);
+    obj_to_char(unequip_char(ch, SECOND_WIELD), ch);
+  }
+}
+
 void affect_modify(CHAR_DATA *ch, int32 loc, int32 mod, long bitv, bool add)
 {
     char log_buf[256];
+    int i;
 
     if(add)
       SET_BIT(ch->affected_by, bitv);
@@ -294,24 +328,56 @@ void affect_modify(CHAR_DATA *ch, int32 loc, int32 mod, long bitv, bool add)
 	    break;
 
 	case APPLY_STR: {
-            GET_STR(ch) += mod;
-            }  break;
+            GET_STR_BONUS(ch) += mod;
+            GET_STR(ch) = GET_RAW_STR(ch) + GET_STR_BONUS(ch);
+            i = get_max_stat(ch, STRENGTH);
+            // can only be max naturally.  Eq only gets you to max - 2
+            if( GET_RAW_STR(ch) > i - 2 && GET_STR(ch) > i - 2 )
+               GET_STR(ch) = GET_RAW_STR(ch);
+            else GET_STR(ch) = MAX( 1, MIN( (int)GET_STR( ch ), ( i - 2 ) ) );
+            if(!IS_SET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
+               check_weapon_weights(ch);
+        }  break;
 
 	case APPLY_DEX: {
-	    GET_DEX(ch) += mod;
-	  }  break;
+            GET_DEX_BONUS(ch) += mod;
+            GET_DEX(ch) = GET_RAW_DEX(ch) + GET_DEX_BONUS(ch);
+            i = get_max_stat(ch, DEXTERITY);
+            // can only be max naturally.  Eq only gets you to max - 2
+            if( GET_RAW_DEX(ch) > i - 2 && GET_DEX(ch) > i - 2 )
+               GET_DEX(ch) = GET_RAW_DEX(ch);
+            else GET_DEX(ch) = MAX( 1, MIN( (int)GET_DEX( ch ), ( i - 2 ) ) );
+	}  break;
 
 	case APPLY_INT: {
-	    GET_INT(ch) += mod;
+            GET_INT_BONUS(ch) += mod;
+            GET_INT(ch) = GET_RAW_INT(ch) + GET_INT_BONUS(ch);
+            i = get_max_stat(ch, INTELLIGENCE);
+            // can only be max naturally.  Eq only gets you to max - 2
+            if( GET_RAW_INT(ch) > i - 2 && GET_INT(ch) > i - 2 )
+               GET_INT(ch) = GET_RAW_INT(ch);
+            else GET_INT(ch) = MAX( 1, MIN( (int)GET_INT( ch ), ( i - 2 ) ) );
         } break;
 
 	case APPLY_WIS: {
-	    GET_WIS(ch) += mod;
-       } break;
+            GET_WIS_BONUS(ch) += mod;
+            GET_WIS(ch) = GET_RAW_WIS(ch) + GET_WIS_BONUS(ch);
+            i = get_max_stat(ch, WISDOM);
+            // can only be max naturally.  Eq only gets you to max - 2
+            if( GET_RAW_WIS(ch) > i - 2 && GET_WIS(ch) > i - 2 )
+               GET_WIS(ch) = GET_RAW_WIS(ch);
+            else GET_WIS(ch) = MAX( 1, MIN( (int)GET_WIS( ch ), ( i - 2 ) ) );
+        } break;
 
 	case APPLY_CON: {
-	    GET_CON(ch) += mod;
-	 }   break;
+            GET_CON_BONUS(ch) += mod;
+            GET_CON(ch) = GET_RAW_CON(ch) + GET_CON_BONUS(ch);
+            i = get_max_stat(ch, CONSTITUTION);
+            // can only be max naturally.  Eq only gets you to max - 2
+            if( GET_RAW_CON(ch) > i - 2 && GET_CON(ch) > i - 2 )
+               GET_CON(ch) = GET_RAW_CON(ch);
+            else GET_CON(ch) = MAX( 1, MIN( (int)GET_CON( ch ), ( i - 2 ) ) );
+	}   break;
 
 	case APPLY_SEX: {
             switch(GET_SEX(ch)) {
@@ -681,97 +747,42 @@ void affect_modify(CHAR_DATA *ch, int32 loc, int32 mod, long bitv, bool add)
     } /* switch */
 }
 
+// This updates a character by subtracting everything he is affected by
+// then restoring it back.  It is used primarily for bitvector affects
+// that could be on both eq as well as on spells.
+// Stat (con, str, etc) stuff is handled in affect_modify
 
-
-/* This updates a character by subtracting everything he is affected by */
-/* restoring original , and then affecting all again           */
-// TODO - optimization - move the maximum values for stats stuff into affect_modify
-// so we only update it when we change it (pay special attention to removal when the +'s
-// were greater than the max.  Don't want to remove more than you should.)  Then yank
-// alot of these affect_totals so we don't have to do this ugly piece of code.
-//
 void affect_total(CHAR_DATA *ch)
 {
     struct affected_type *af;
     struct affected_type *tmp_af;
     int i,j;
-    struct obj_data * weapon;
-
-    extern struct str_app_type str_app[];
 
     // remove all affects from the player
     for(i=0; i<MAX_WEAR; i++) {
-	if (ch->equipment[i])
-	    for(j=0; j< ch->equipment[i]->num_affects; j++)
-		affect_modify(ch, ch->equipment[i]->affected[j].location,
-			      ch->equipment[i]->affected[j].modifier,
-			      0, FALSE);
+        if (ch->equipment[i])
+            for(j=0; j< ch->equipment[i]->num_affects; j++)
+                affect_modify(ch, ch->equipment[i]->affected[j].location,
+                              ch->equipment[i]->affected[j].modifier,
+                              0, FALSE);
     }
     for(af = ch->affected; af; af = tmp_af)
     {
-	tmp_af = af->next;
-	affect_modify(ch, af->location, af->modifier, af->bitvector, FALSE);
+        tmp_af = af->next;
+        affect_modify(ch, af->location, af->modifier, af->bitvector, FALSE);
     }
-
-    // if we did a 'remove' we need to make sure we didn't remove too much of
-    // someone's stats, so reset them.
-    GET_STR(ch) = GET_RAW_STR(ch);
-    GET_DEX(ch) = GET_RAW_DEX(ch);
-    GET_INT(ch) = GET_RAW_INT(ch);
-    GET_WIS(ch) = GET_RAW_WIS(ch);
-    GET_CON(ch) = GET_RAW_CON(ch);
-
+            
     // add everything back
     for(i=0; i<MAX_WEAR; i++) {
-	if (ch->equipment[i])
-	    for(j=0; j<ch->equipment[i]->num_affects; j++)
-		affect_modify(ch, ch->equipment[i]->affected[j].location,
-			      ch->equipment[i]->affected[j].modifier,
-			      0, TRUE);
+        if (ch->equipment[i])
+            for(j=0; j<ch->equipment[i]->num_affects; j++)
+                affect_modify(ch, ch->equipment[i]->affected[j].location,
+                              ch->equipment[i]->affected[j].modifier,
+                              0, TRUE);
     }
     for(af = ch->affected; af; af=af->next)
-	affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE);
-
-    // Eq can only boost you up to your racial max
-    i = get_max_stat(ch, DEXTERITY) -1;
-    GET_DEX(ch) = MAX(1, MIN((int)GET_DEX(ch), i));
-    i = get_max_stat(ch, INTELLIGENCE) -1;
-    GET_INT(ch) = MAX(1,MIN((int)GET_INT(ch), i));
-    i = get_max_stat(ch, WISDOM) -1;
-    GET_WIS(ch) = MAX(1,MIN((int)GET_WIS(ch), i));
-    i = get_max_stat(ch, CONSTITUTION) -1;
-    GET_CON(ch) = MAX(1,MIN((int)GET_CON(ch), i));
-    i = get_max_stat(ch, STRENGTH) -1;
-    GET_STR(ch) = MAX(1,MIN((int)GET_STR(ch), i));
-
-    // make sure we're still strong enough to wield our weapons
-    if(!IS_MOB(ch) && ch->equipment[WIELD] && 
-         GET_OBJ_WEIGHT(ch->equipment[WIELD]) > str_app[STRENGTH_APPLY_INDEX(ch)].wield_w)
-    {
-      act("Being too heavy to wield, you move your $p to your inventory.",
-           ch, ch->equipment[WIELD], 0, TO_CHAR, 0);
-      act("$n stops using $p.", ch, ch->equipment[WIELD], 0, TO_ROOM, INVIS_NULL);
-      obj_to_char(unequip_char(ch, WIELD), ch);
-      if(ch->equipment[SECOND_WIELD] && 
-           GET_OBJ_WEIGHT(ch->equipment[SECOND_WIELD]) <= (str_app[STRENGTH_APPLY_INDEX(ch)].wield_w/2))
-      {
-        act("You move your $p to be your primary weapon.", ch, ch->equipment[SECOND_WIELD], 0, TO_CHAR, INVIS_NULL);
-        act("$n moves $s $p to be $s primary weapon.", ch, ch->equipment[SECOND_WIELD], 0, TO_ROOM, INVIS_NULL);
-        weapon = unequip_char(ch, SECOND_WIELD);
-        equip_char(ch, weapon, WIELD);
-      }
-    }
-
-    if(ch->equipment[SECOND_WIELD] && 
-         GET_OBJ_WEIGHT(ch->equipment[SECOND_WIELD]) > (str_app[STRENGTH_APPLY_INDEX(ch)].wield_w/2))
-    {
-      act("Being too heavy to wield, you move your $p to your inventory.",
-           ch, ch->equipment[SECOND_WIELD], 0, TO_CHAR, 0);
-      act("$n stops using $p.", ch, ch->equipment[SECOND_WIELD], 0, TO_ROOM, INVIS_NULL);
-      obj_to_char(unequip_char(ch, SECOND_WIELD), ch);
-    }
+        affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE);
 }
-
 
 
 /* Insert an affect_type in a char_data structure
@@ -793,7 +804,6 @@ void affect_to_char( CHAR_DATA *ch, struct affected_type *af )
 
     affect_modify(ch, af->location, af->modifier,
 		  af->bitvector, TRUE);
-    affect_total(ch);
 }
 
 
@@ -836,7 +846,8 @@ void affect_remove( CHAR_DATA *ch, struct affected_type *af )
    }
 
    dc_free ( af );
-   affect_total(ch);
+   affect_total( ch ); // this must be here to take care of anything we might
+                       // have just removed that is still given by equipment
 }
 
 
@@ -1059,7 +1070,6 @@ int equip_char(CHAR_DATA *ch, struct obj_data *obj, int pos)
 	affect_modify(ch, obj->affected[j].location,
 	  obj->affected[j].modifier, 0, TRUE);
 
-    affect_total(ch);
     return 1;
 }
 
@@ -1099,10 +1109,6 @@ struct obj_data *unequip_char(CHAR_DATA *ch, int pos)
 
     for(j=0; j<obj->num_affects; j++)
 	affect_modify(ch, obj->affected[j].location, obj->affected[j].modifier, 0, FALSE);
-
-// TODO - make sure we actually need this affect_total.  It seems a little redundant for
-// me.  If we do need it, comment why.
-    affect_total(ch);
 
     return(obj);
 }

@@ -701,7 +701,6 @@ int pfe_word(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
       {
          affect_from_char(ch, SPELL_PROTECT_FROM_EVIL);      
          send_to_char("The power drains away.\r\n", ch);
-         affect_total(ch);
       }
       // This should remove the pfe unless he has it cast or on EQ
       // We will allow it to return FALSE do the do_remove goes through.

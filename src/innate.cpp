@@ -38,10 +38,12 @@ extern struct index_data *obj_index;
 int do_innate_pixie(CHAR_DATA *ch, char *arg, int cmd);
 int do_innate_hobbit(CHAR_DATA *ch, char *arg, int cmd);
 int do_innate_dwarf(CHAR_DATA *ch, char *arg, int cmd);
+int do_innate_orc(CHAR_DATA *ch, char *arg, int cmd);
 
 int do_innate_fly(CHAR_DATA *ch, char *arg, int cmd);
 int do_innate_sneak(CHAR_DATA *ch, char *arg, int cmd);
 int do_innate_infra(CHAR_DATA *ch, char *arg, int cmd);
+int do_innate_bloodlust(CHAR_DATA *ch, char *arg, int cmd);
 
 ////////////////////////////////////////////////////////////////////////////
 // local definitions
@@ -51,6 +53,7 @@ char * innate_skills[] =
    "innate fly timer",
    "innate sneak timer",
    "innate infra timer",
+   "innate blodlst timer",
    "\n"
 };
 
@@ -63,6 +66,7 @@ int do_innate(CHAR_DATA *ch, char *arg, int cmd)
       case RACE_PIXIE:    return do_innate_pixie(ch, arg, cmd);
       case RACE_HOBBIT:   return do_innate_hobbit(ch, arg, cmd);
       case RACE_DWARVEN:  return do_innate_dwarf(ch, arg, cmd);
+      case RACE_ORC:      return do_innate_orc(ch, arg, cmd);
       default:
          send_to_char("You do not have any innate powers!\r\n", ch);
          return eSUCCESS;
@@ -137,6 +141,31 @@ int do_innate_dwarf(CHAR_DATA *ch, char *arg, int cmd)
 
    if(!strcmp(buf, "infravision"))
       return do_innate_infra(ch, buf, cmd);
+   else
+   {
+      csendf(ch, "You do not know of any '%s' ability.\r\n", buf);
+      return eSUCCESS;
+   }
+}
+
+int do_innate_orc(CHAR_DATA *ch, char *arg, int cmd)
+{
+   char buf[MAX_INPUT_LENGTH];
+
+   one_argument(arg, buf);
+
+   if(!*buf)
+   {
+      send_to_char("As an orc, you have the following abilities:\r\n"
+                   "   bloodlust\r\n"
+                   "\r\n"
+                   "You can activate your innate ability with innate <skill>.\r\n"
+                   , ch);
+      return eSUCCESS;
+   }
+
+   if(!strcmp(buf, "bloodlust"))
+      return do_innate_bloodlust(ch, buf, cmd);
    else
    {
       csendf(ch, "You do not know of any '%s' ability.\r\n", buf);
@@ -230,5 +259,30 @@ int do_innate_sneak(CHAR_DATA *ch, char *arg, int cmd)
    affect_to_char(ch, &af);
 
    return eSUCCESS;   
+}
+
+int do_innate_bloodlust(CHAR_DATA *ch, char *arg, int cmd)
+{
+   if(affected_by_spell(ch, SKILL_INNATE_BLOODLUST))
+   {
+      send_to_char("It is still too soon for you to be able to call upon your ancestral powers again.\r\n", ch);
+      return eSUCCESS;
+   }
+
+   if(!ch->combat)
+   {
+      send_to_char("You must be in combat to bring forth a bloodlust.\r\n", ch);
+      return eSUCCESS;
+   }
+
+   struct affected_type af;
+   af.type = SKILL_INNATE_BLOODLUST;
+   af.duration = 40;
+   af.modifier = 0;
+   af.location = 0;
+   af.bitvector = 0;
+   affect_to_char(ch, &af);
+
+   return eSUCCESS;
 }
 

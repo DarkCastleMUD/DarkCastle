@@ -1,7 +1,7 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.7 2002/09/11 02:08:17 pirahna Exp $
+| $Id: character.h,v 1.8 2003/01/21 05:34:38 pirahna Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
@@ -234,16 +234,11 @@ struct char_data
     sbyte level;
     sbyte position;      // Standing, sitting, fighting
 
-    sbyte str; 
-    sbyte raw_str; 
-    sbyte intel;
-    sbyte raw_intel;
-    sbyte wis;
-    sbyte raw_wis;
-    sbyte dex;
-    sbyte raw_dex;
-    sbyte con;
-    sbyte raw_con;
+    sbyte str;         sbyte raw_str;        sbyte str_bonus;
+    sbyte intel;       sbyte raw_intel;      sbyte intel_bonus;
+    sbyte wis;         sbyte raw_wis;        sbyte wis_bonus;
+    sbyte dex;         sbyte raw_dex;        sbyte dex_bonus;
+    sbyte con;         sbyte raw_con;        sbyte con_bonus;
 
     sbyte conditions[3];      // Drunk full etc.                       
 

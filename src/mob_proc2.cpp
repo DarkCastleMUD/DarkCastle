@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.19 2002/12/26 19:45:30 pirahna Exp $ */
+/* $Id: mob_proc2.cpp,v 1.20 2003/01/21 05:34:23 pirahna Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -1309,7 +1309,13 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
       act("The Meta-physician touches $n.",  ch, 0, 0, TO_ROOM, 0);
       act("The Meta-physician touches you.",  ch, 0, 0, TO_CHAR, 0);
 
-      affect_total(ch);
+      // affect the stat by 0 to reflect the new raw stat
+      affect_modify(ch, APPLY_STR, 0, 0, TRUE);
+      affect_modify(ch, APPLY_DEX, 0, 0, TRUE);
+      affect_modify(ch, APPLY_INT, 0, 0, TRUE);
+      affect_modify(ch, APPLY_WIS, 0, 0, TRUE);
+      affect_modify(ch, APPLY_CON, 0, 0, TRUE);
+
       redo_hitpoints(ch);
       redo_mana(ch);
       return eSUCCESS;
@@ -1341,9 +1347,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
      GET_HP_METAS(ch) += 1;
      act("The Meta-physician touches $n.",  ch, 0, 0, TO_ROOM, 0);
      act("The Meta-physician touches you.",  ch, 0, 0, TO_CHAR, 0);
-     affect_total(ch);
      redo_hitpoints(ch);
-     redo_mana(ch);
      return eSUCCESS;
    }
 
@@ -1375,8 +1379,6 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
      GET_MANA_METAS(ch) += 1;
      act("The Meta-physician touches $n.",  ch, 0, 0, TO_ROOM, 0);
      act("The Meta-physician touches you.",  ch, 0, 0, TO_CHAR, 0);
-     affect_total(ch);
-     redo_hitpoints(ch);
      redo_mana(ch);
      return eSUCCESS;
    }
@@ -1399,7 +1401,6 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
      GET_MOVE_METAS(ch) += 1;
      act("The Meta-physician touches $n.",  ch, 0, 0, TO_ROOM, 0);
      act("The Meta-physician touches you.",  ch, 0, 0, TO_CHAR, 0);
-     affect_total(ch);
      redo_hitpoints(ch);
      redo_mana(ch);
      return eSUCCESS;
@@ -1434,9 +1435,6 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
      act("The Meta-physician touches $n.",  ch, 0, 0, TO_ROOM, 0);
      act("The Meta-physician touches you.",  ch, 0, 0, TO_CHAR, 0);
 
-     affect_total(ch);
-     redo_hitpoints(ch);
-     redo_mana(ch);
      return eSUCCESS;
    }
 
@@ -1581,9 +1579,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
      act("The Meta-physician touches $n.",  ch, 0, 0, TO_ROOM, 0);
      act("The Meta-physician touches you.",  ch, 0, 0, TO_CHAR, 0);
 
-     affect_total(ch);
      redo_hitpoints(ch);
-     redo_mana(ch);
      return eSUCCESS;
    }
 */

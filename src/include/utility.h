@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: utility.h,v 1.15 2002/11/01 16:14:53 dcastle Exp $ */
+/* $Id: utility.h,v 1.16 2003/01/21 05:34:38 pirahna Exp $ */
 
 #ifndef UTILITY_H_
 #define UTILITY_H_
@@ -161,6 +161,12 @@ bool IS_DARK( int room );
 #define GET_INT(ch)     ((ch)->intel)
 #define GET_WIS(ch)     ((ch)->wis)
 #define GET_CON(ch)     ((ch)->con)
+
+#define GET_STR_BONUS(ch)     ((ch)->str_bonus)
+#define GET_DEX_BONUS(ch)     ((ch)->dex_bonus)
+#define GET_INT_BONUS(ch)     ((ch)->intel_bonus)
+#define GET_WIS_BONUS(ch)     ((ch)->wis_bonus)
+#define GET_CON_BONUS(ch)     ((ch)->con_bonus)
 
 #define GET_RAW_STR(ch) ((ch)->raw_str)
 #define GET_RAW_DEX(ch) ((ch)->raw_dex)

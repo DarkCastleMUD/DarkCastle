@@ -2,7 +2,7 @@
 #define AFFECT_H_
 
 /************************************************************************
-| $Id: affect.h,v 1.4 2002/08/04 19:43:07 pirahna Exp $
+| $Id: affect.h,v 1.5 2003/01/21 05:34:38 pirahna Exp $
 | affect.h
 | This contains the bitvectors for affected_by
 */
@@ -29,7 +29,7 @@
 #define AFF_TRUE_SIGHT          1<<18
 #define AFF_SNEAK               1<<19 // 20
 #define AFF_HIDE                1<<20
-#define AFF_UNUSED              1<<21
+#define AFF_IGNORE_WEAPON_WEIGHT 1<<21
 #define AFF_CHARM               1<<22
 #define AFF_RAGE                1<<23
 #define AFF_SOLIDITY            1<<24

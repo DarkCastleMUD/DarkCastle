@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: save.cpp,v 1.13 2002/09/11 02:08:12 pirahna Exp $ */
+/* $Id: save.cpp,v 1.14 2003/01/21 05:34:24 pirahna Exp $ */
 
 extern "C"
 {
@@ -517,6 +517,8 @@ void save_char_obj (CHAR_DATA *ch)
     return;
   }
 
+  SET_BIT(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT); // so weapons stop falling off
+
   char_to_store (ch, &uchar, tmpage);
 
   // if they're in a safe room, save them there.
@@ -547,6 +549,8 @@ void save_char_obj (CHAR_DATA *ch)
     perror(log_buf);
     log(log_buf, ANGEL, LOG_BUG);
   }
+
+  REMOVE_BIT(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT);
 }
 
 // just error crap to avoid using "goto" like we were
@@ -1087,8 +1091,6 @@ void store_to_char(struct char_file_u *st, CHAR_DATA *ch)
         ch->in_room = real_room(17);
       else
         ch->in_room = real_room(START_ROOM);
-
-    affect_total(ch);
 }
 
 
@@ -1112,7 +1114,7 @@ void char_to_store(CHAR_DATA *ch, struct char_file_u *st, struct time_data & tmp
 
   // Unaffect everything a character can be affected by spell-wise
   for(af = ch->affected; af; af = af->next) {
-    affect_modify( ch, af->location, af->modifier, af->bitvector, FALSE);                         
+    affect_modify( ch, af->location, af->modifier, af->bitvector, FALSE);
   }
 
   st->sex      = GET_SEX(ch);
@@ -1189,7 +1191,5 @@ void char_to_store(CHAR_DATA *ch, struct char_file_u *st, struct time_data & tmp
     if (char_eq[i])
       equip_char(ch, char_eq[i], i);
   }
-
-  affect_total(ch);
 }
 

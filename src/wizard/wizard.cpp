@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.11 2002/10/16 23:43:30 pirahna Exp $
+| $Id: wizard.cpp,v 1.12 2003/01/21 05:34:38 pirahna Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -585,8 +585,13 @@ void mob_stat(struct char_data *ch, struct char_data *k)
     send_to_char(buf, ch);
   } else send_to_char("\n\r", ch);
    
-  sprintf(buf, "$3Str$R:[%d]  $3Int$R:[%d]  $3Wis$R:[%d]  $3Dex$R:[%d]  $3Con$R:[%d]\n\r",
-          GET_STR(k), GET_INT(k), GET_WIS(k), GET_DEX(k), GET_CON(k) );
+  sprintf(buf, "$3Str$R:[%2d]+[%2d]=%2d $3Int$R:[%2d]+[%2d]=%2d $3Wis$R:[%2d]+[%2d]=%2d\r\n"
+               "$3Dex$R:[%2d]+[%2d]=%2d $3Con$R:[%2d]+[%2d]=%2d\n\r",
+          GET_RAW_STR(k), GET_STR_BONUS(k), GET_STR(k),
+          GET_RAW_INT(k), GET_INT_BONUS(k), GET_INT(k),
+          GET_RAW_WIS(k), GET_WIS_BONUS(k), GET_WIS(k),
+          GET_RAW_DEX(k), GET_DEX_BONUS(k), GET_DEX(k),
+          GET_RAW_CON(k), GET_CON_BONUS(k), GET_CON(k) );
   send_to_char(buf,ch);
      
   sprintf(buf, "$3Mana$R:[%5d/%5d+%-4d]  $3Hit$R:[%5d/%5d+%-3d]  $3Move$R:[%5d/%5d+%-3d]  $3Ki$R:[%3d/%3d]\n\r",

@@ -2,7 +2,7 @@
 #define FIGHT_H_
 
 /************************************************************************
-| $Id: fight.h,v 1.6 2003/01/14 05:54:41 dcastle Exp $
+| $Id: fight.h,v 1.7 2003/01/21 05:34:38 pirahna Exp $
 | fight.h
 | This file defines the header information for fight.
 */
@@ -102,17 +102,10 @@ bool ArenaIsOpen();
 #define COMBAT_VITAL_STRIKE 1<<13
 #define COMBAT_MONK_STANCE  1<<14
 #define COMBAT_MISS_AN_ATTACK 1<<15
+#define COMBAT_ORC_BLOODLUST 1<<16
 
 #define DAMAGE_TYPE_PHYSICAL  0
 #define DAMAGE_TYPE_MAGIC     1
 #define DAMAGE_TYPE_SONG      2
-
-/* Note sure why this didn't work.
-enum {
-   DAMAGE_TYPE_PHYSICAL = 0,
-   DAMAGE_TYPE_MAGIC,
-   DAMAGE_TYPE_SONG
-};
-*/
 
 #endif
