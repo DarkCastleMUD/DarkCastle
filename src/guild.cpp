@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.69 2004/05/31 23:31:15 urizen Exp $
+| $Id: guild.cpp,v 1.70 2004/06/01 19:17:01 urizen Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -459,7 +459,7 @@ int skill_master(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     send_to_char("You practice for a while...\n\r", ch);
     ch->pcdata->practices--;
     
-    percent = (int)int_app[GET_INT(ch)].learn_bonus;
+    percent = 1+(int)int_app[GET_INT(ch)].learn_bonus;
 
     learn_skill(ch, g_skills[number].skillnum, percent, g_skills[number].maximum);
     learned = has_skill(ch, g_skills[number].skillnum);
