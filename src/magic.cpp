@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.25 2002/08/28 04:58:22 pirahna Exp $ */
+/* $Id: magic.cpp,v 1.26 2002/08/28 05:15:58 pirahna Exp $ */
 
 extern "C"
 {
@@ -1890,6 +1890,9 @@ int spell_locate_object(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
 
   for (i = object_list; i && (j>0); i = i->next)
   {
+    if (IS_OBJ_STAT(obj, ITEM_NOSEE))
+       continue;
+
     if(IS_SET(obj->obj_flags.more_flags, ITEM_NOLOCATE))
        continue;
 
