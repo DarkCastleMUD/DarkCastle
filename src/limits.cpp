@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.29 2004/05/20 21:46:16 urizen Exp $ */
+/* $Id: limits.cpp,v 1.30 2004/05/21 05:03:36 urizen Exp $ */
 
 extern "C"
 {
@@ -50,7 +50,7 @@ extern CHAR_DATA *character_list;
 extern struct obj_data *object_list;
 extern CWorld world;
 extern struct index_data *obj_index;
-
+extern struct index_data *mob_index;
 /* External procedures */
 
 void update_pos( CHAR_DATA *victim );                 /* in fight.c */
@@ -540,6 +540,9 @@ void gain_exp( CHAR_DATA *ch, int gain )
   GET_EXP(ch) += gain;
   if( GET_EXP(ch) < 0 )
     GET_EXP(ch) = 0;
+   void golem_gain_exp(CHAR_DATA *ch);
+  if (IS_NPC(ch) && mob_index[ch->mobdata->nr].virt == 8) // it's a golem
+    golem_gain_exp(ch);
 
   if(IS_NPC(ch))
     return;

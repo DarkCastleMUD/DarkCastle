@@ -23,6 +23,9 @@
 #include <dmalloc.h>
 #endif
 
+// Locals
+void advance_golem_level(CHAR_DATA *golem);
+
 // save.cpp
 int store_worn_eq(char_data * ch, FILE * fpsave);
 struct obj_data *  obj_store_to_char(CHAR_DATA *ch, FILE *fpsave, struct obj_data * last_cont );
@@ -39,17 +42,32 @@ struct golem_data
   int dam, hit; // bonus maxes
   int components[5]; // Components(vnums)
   int special_aff; // Special affect(s)
+  int ac; // armor
 };
 
 const struct golem_data golem_list[] = {
   {"iron", "iron golem", "an iron golem", "An iron golem stands here, awaiting its master's commands. ", 
     "The golem looks inanimate, except when it performs some task for its\nmaster. During those periods it moves with suprising speed.",
-    1000, 15, 5, 25, 0, {4, 2, 3, 5, 6}, AFF_LIGHTNINGSHIELD},
+    1000, 15, 5, 25, 50, {4, 2, 3, 5, 6}, AFF_LIGHTNINGSHIELD, -100},
  {  "stone","stone golem", "a stone golem", "A stone golem stands here, awaiting its master's commands.",
     "The golem looks inanimate, except when it performs some task for its\nmaster. During those periods it moves with suprising speed.",
-    2000, 5, 5, 25, 0, {4,2,3,5,6},0}
+    2000, 5, 5, 25, 50, {4,2,3,5,6},0, -100}
 };
 #define MAX_GOLEMS 2 // amount of golems above +1
+
+void golem_gain_exp(CHAR_DATA *ch)
+{
+  extern int exp_table[];
+  int level = 29 + ch->level;
+  if (ch->exp > exp_table[level])
+  {
+     ch->exp = 0;
+     ch->level++;
+     advance_golem_level(ch);
+     do_save(ch->master,"",666);
+     do_say(ch, "Errrrrhhgg...",0);     
+  }
+}
 
 void save_golem_data(CHAR_DATA *ch)
 {
@@ -80,6 +98,7 @@ void advance_golem_level(CHAR_DATA *golem)
   GET_HIT(golem) += golem_list[golemtype].max_hp/20;
   golem->hitroll += golem_list[golemtype].hit / 20;
   golem->damroll += golem_list[golemtype].dam / 20;
+  golem->armor += golem_list[golemtype].ac / 20;
 }
 
 void set_golem(CHAR_DATA *golem, int golemtype)
@@ -100,6 +119,7 @@ void set_golem(CHAR_DATA *golem, int golemtype)
         golem->level = 1;
         golem->hitroll = golem_list[golemtype].hit / 20;
         golem->damroll = golem_list[golemtype].dam / 20;
+	golem->armor = golem_list[golemtype].ac / 20;
         golem->raw_hit = golem->max_hit = golem->hit = golem_list[golemtype].max_hp / 20;
         golem->mobdata->damnodice = golem_list[golemtype].roll1;
         golem->mobdata->damsizedice = golem_list[golemtype].roll2;
