@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_barbarian.cpp,v 1.9 2002/09/13 17:51:02 pirahna Exp $
+| $Id: cl_barbarian.cpp,v 1.10 2003/01/08 05:02:34 dcastle Exp $
 | cl_barbarian.C
 | Description:  Commands for the barbarian class.
 */
@@ -462,7 +462,7 @@ int do_crazedassault(struct char_data *ch, char *argument, int cmd)
     send_to_char("Your mind focuses completely on hitting your opponent.\r\n", ch);
     af.type = SKILL_CRAZED_ASSAULT;
     af.duration  = 2;
-    af.modifier  = (learned / 5); 
+    af.modifier  = (learned / 5) + 7; 
     af.location  = APPLY_HITROLL;
     af.bitvector = 0;
     affect_to_char(ch, &af);
