@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.28 2004/05/30 18:59:04 urizen Exp $ */
+/* $Id: ki.cpp,v 1.29 2004/06/03 07:44:03 urizen Exp $ */
 
 extern "C"
 {
@@ -400,7 +400,7 @@ int ki_gain(CHAR_DATA *ch)
         else if (GET_CLASS(ch) == CLASS_BARD) gain += int_app[GET_INT(ch)].ki_regen;
         gain += age(ch).year / 25;
  
-	return MAX(gain, 0);
+	return MAX(gain, 1);
 }
 
 int ki_blast( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)

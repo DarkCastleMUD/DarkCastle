@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.48 2004/06/01 03:32:13 urizen Exp $ */
+/* $Id: limits.cpp,v 1.49 2004/06/03 07:45:02 urizen Exp $ */
 
 extern "C"
 {
@@ -184,7 +184,7 @@ int mana_gain(CHAR_DATA *ch)
   gain /= 4;
   gain /= divisor; 
   gain += MIN(age(ch).year,100) / 5;
-  return MAX(0,gain);
+  return MAX(1,gain);
 }
 
 const int hit_regens[] = {
@@ -241,7 +241,7 @@ int hit_gain(CHAR_DATA *ch)
   gain -= MIN(age(ch).year,100) / 10;
 
   gain /= divisor;
-  return MAX(0,gain);
+  return MAX(1,gain);
 }
 
 
@@ -298,7 +298,7 @@ int move_gain(CHAR_DATA *ch)
    gain -= MIN(100, age(ch).year) / 10;
  
     gain /= 2;
-    return MAX(0,gain);
+    return MAX(1,gain);
 }
 
 void redo_hitpoints( CHAR_DATA *ch)
