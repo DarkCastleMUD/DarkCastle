@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.79 2004/04/24 11:09:18 urizen Exp $ */
+/* $Id: const.cpp,v 1.80 2004/04/24 15:45:00 urizen Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1593,7 +1593,7 @@ char *action_bits[] =
     "SPEC",
     "SENTINEL",
     "SCAVENGER",
-    "UNUSED",
+    "NOTRACK",
     "NICE-THIEF",
     "AGGRESSIVE",
     "STAY_ZONE",
@@ -1613,6 +1613,7 @@ char *action_bits[] =
     "RACIST",
     "FRIENDLY",
     "STAY_NO_TOWN",
+    "NOMAGIC",
     "\n"
 };
 

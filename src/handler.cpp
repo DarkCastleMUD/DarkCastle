@@ -21,7 +21,7 @@
  *  12/08/2003   Onager    Added check for charmies and !charmie eq to     *
  *                         equip_char()                                    *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.38 2004/04/24 10:42:40 urizen Exp $ */
+/* $Id: handler.cpp,v 1.39 2004/04/24 15:45:01 urizen Exp $ */
     
 extern "C"
 {
@@ -1103,6 +1103,7 @@ void affect_join( CHAR_DATA *ch, struct affected_type *af,
 int char_from_room(CHAR_DATA *ch)
 {
   CHAR_DATA *i;
+  bool Other = FALSE,More = FALSE;
 
   if(ch->in_room == NOWHERE) {
     return(0); 
@@ -1118,12 +1119,29 @@ int char_from_room(CHAR_DATA *ch)
 
   /* locate the previous element */
   else
-    for(i = world[ch->in_room].people; i; i = i->next_in_room)
+    for(i = world[ch->in_room].people; i; i = i->next_in_room) {
        if(i->next_in_room == ch)
          i->next_in_room = ch->next_in_room;
+       if (i!=ch && IS_NPC(i) && IS_SET(i->mobdata->actflags, ACT_NOMAGIC))
+	 Other = TRUE;
+	if (i!=ch && IS_NPC(i) && IS_SET(i->mobdata->actflags, ACT_NOTRACK))
+	 More = TRUE;
+    }
 
   if(!IS_NPC(ch)) // player
     zone_table[world[ch->in_room].zone].players--;
+  if (IS_NPC(ch))
+     ch->mobdata->last_room = ch->in_room;
+  if (!Other && IS_SET(world[ch->in_room].iFlags, NO_TRACK))
+  {
+    REMOVE_BIT(world[ch->in_room].iFlags,NO_TRACK);
+    REMOVE_BIT(world[ch->in_room].room_flags, NO_TRACK);
+  }
+  if (!More && IS_SET(world[ch->in_room].iFlags, NO_MAGIC))
+  {
+    REMOVE_BIT(world[ch->in_room].iFlags,NO_MAGIC);
+    REMOVE_BIT(world[ch->in_room].room_flags, NO_MAGIC);
+  }
 
   ch->in_room = NOWHERE;
   ch->next_in_room = 0;
@@ -1150,7 +1168,18 @@ int char_to_room(CHAR_DATA *ch, int room)
 
     if(!IS_NPC(ch)) // player
       zone_table[world[room].zone].players++;
-
+  if (IS_NPC(ch)) { 
+    if (IS_SET(ch->mobdata->actflags, ACT_NOMAGIC) && !IS_SET(world[room].room_flags, NO_MAGIC))
+    {
+	SET_BIT(world[room].iFlags, NO_MAGIC);
+	SET_BIT(world[room].room_flags, NO_MAGIC);
+    }
+    if (IS_SET(ch->mobdata->actflags, ACT_NOTRACK) && !IS_SET(world[room].room_flags, NO_TRACK))
+    {
+	SET_BIT(world[room].iFlags, NO_TRACK);
+	SET_BIT(world[room].room_flags, NO_TRACK);
+    }
+  }
     return(1);
 }
 

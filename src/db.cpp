@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.42 2004/04/20 21:57:15 urizen Exp $ */
+/* $Id: db.cpp,v 1.43 2004/04/24 15:45:01 urizen Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -2318,7 +2318,7 @@ CHAR_DATA *read_mobile(int nr, FILE *fl)
         mob->mobdata->damnodice   = fread_int (fl, 0, 64000);
         mob->mobdata->damsizedice = fread_int (fl, 0, 64000);
         mob->damroll       = fread_int (fl, 0, 64000);
-
+	mob->mobdata->last_room = -1;
         mob->mana     = 100;
         mob->max_mana = 100;
     
@@ -2883,6 +2883,7 @@ int create_blank_mobile(int nr)
     mob->mobdata->damnodice = 1;
     mob->mobdata->damsizedice = 1;
     mob->mobdata->default_pos = 1;
+    mob->mobdata->last_room = -1;
     mob->mobdata->nr = cur_index;
     mob->misc = MISC_IS_MOB;
     // shift > items right

@@ -1,7 +1,7 @@
 #ifndef MOBILE_H_
 #define MOBILE_H_
 /************************************************************************
-| $Id: mobile.h,v 1.5 2004/04/19 17:09:55 urizen Exp $
+| $Id: mobile.h,v 1.6 2004/04/24 15:45:03 urizen Exp $
 | mobile.h
 | Description:  This file contains the header information for mobile
 |   control.
@@ -11,7 +11,7 @@ void rebuild_rnum_references(int startAt, int type);
 #define ACT_SPEC       1
 #define ACT_SENTINEL   1<<1
 #define ACT_SCAVENGER  1<<2
-#define ACT_UNUSED     1<<3
+#define ACT_NOTRACK    1<<3
 #define ACT_NICE_THIEF 1<<4
 #define ACT_AGGRESSIVE 1<<5
 #define ACT_STAY_ZONE  1<<6
@@ -39,6 +39,7 @@ void rebuild_rnum_references(int startAt, int type);
 #define ACT_RACIST          1<<20
 #define ACT_FRIENDLY        1<<21
 #define ACT_STAY_NO_TOWN    1<<22
+#define ACT_NOMAGIC 	    1<<23
 
 struct race_shit
 {
