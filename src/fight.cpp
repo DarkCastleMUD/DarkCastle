@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.231 2004/07/23 03:05:18 urizen Exp $ */
+/* $Id: fight.cpp,v 1.232 2004/07/23 22:47:31 rahz Exp $ */
 
 extern "C"
 {
@@ -3768,6 +3768,8 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim, int type)
     // ch == NULL
    if (type == KILL_DROWN)
       sprintf(killer_message,"\n\r##%s just DROWNED!\n\r", GET_NAME(victim));
+    else if (type == KILL_POTATO)
+      sprintf(killer_message,"\n\r##%s just got POTATOED!!\n\r", GET_NAME(victim));
     else if (type == KILL_POISON)
       sprintf(killer_message,"\n\r##%s has perished from POISON!\n\r", GET_NAME(victim));
     else if (type == KILL_FALL)
