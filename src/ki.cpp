@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.8 2002/08/16 19:40:06 pirahna Exp $ */
+/* $Id: ki.cpp,v 1.9 2003/06/12 23:15:31 pirahna Exp $ */
 
 extern "C"
 {
@@ -144,7 +144,7 @@ int do_ki(CHAR_DATA *ch, char *argument, int cmd)
   learned = has_skill(ch, (spl+KI_OFFSET));
   if(!learned)
   {
-     send_to_char("You do know know that ki power!\r\n", ch);
+     send_to_char("You do not know that ki power!\r\n", ch);
      return eFAILURE;
   }
 

@@ -205,14 +205,14 @@ char *songs[] = {
         "listsongs",
 	"whistle sharp",
         "stop", /* If you move stop, update do_sing */
-        "traveling march",
+        "travelling march",
         "bountiful sonnet",
         "insane chant",
         "glitter dust",
         "synchronous chord",
 	"healing melody",
         "sticky lullaby",
-	"revealing stacato",
+	"revealing staccato",
         "flight of the bumblebee",
         "jig of alacrity",
 	"note of knowledge",
@@ -796,7 +796,7 @@ int execute_song_revealing_stacato( byte level, CHAR_DATA *ch, char *arg, CHAR_D
               ch, 0, i, TO_CHAR, 0);
       }
    }
-   send_to_char("You tap your foot along to the revealing stacato.\r\n", ch);
+   send_to_char("You tap your foot along to the revealing staccato.\r\n", ch);
 
    int specialization = skill / 100;
    skill %= 100;
