@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.181 2004/05/14 00:10:20 urizen Exp $ */
+/* $Id: fight.cpp,v 1.182 2004/05/14 00:11:17 urizen Exp $ */
 
 extern "C"
 {
@@ -1950,7 +1950,7 @@ bool check_shieldblock(CHAR_DATA * ch, CHAR_DATA * victim, int attacktype)
   act("$n blocks your attack with $s shield.", victim, NULL, ch, TO_VICT, 0);
   act("You block $N's attack with your shield.", victim, NULL, ch, TO_CHAR, 0);
 
-  skill_increase_check(victim, SKILL_SHIELDBLOCK, learned, SKILL_INCREASE_HARD);
+  skill_increase_check(victim, SKILL_SHIELDBLOCK, has_skill(ch,SKILL_SHIELDBLOCK), SKILL_INCREASE_HARD);
 
   return TRUE;
 }
