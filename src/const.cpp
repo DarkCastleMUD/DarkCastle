@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: const.cpp,v 1.33 2002/08/25 18:59:08 pirahna Exp $ */
+/* $Id: const.cpp,v 1.34 2002/08/25 20:40:18 pirahna Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1483,6 +1483,8 @@ char *player_bits[] =
     "BEEP",
     "NO-SONG",
     "ANONYMOUS",
+    "AUTO-EAT",
+    "LFG",
     "\n"
 };
 

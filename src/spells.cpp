@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.21 2002/08/25 19:34:01 pirahna Exp $ */
+/* $Id: spells.cpp,v 1.22 2002/08/25 20:40:18 pirahna Exp $ */
 
 extern "C"
 {
@@ -993,14 +993,6 @@ void isr_set(CHAR_DATA *ch)
   for (afisr = ch->affected; afisr; afisr = afisr->next) {
     if (afisr->type == SPELL_STONE_SKIN)
       SET_BIT(ch->resist, ISR_PIERCE);
-    else if (afisr->type == SPELL_RESIST_FIRE)
-      SET_BIT(ch->resist,ISR_FIRE);
-    else if (afisr->type == SPELL_RESIST_COLD)
-      SET_BIT(ch->resist, ISR_COLD);
-    else if (afisr->type == SPELL_RESIST_ENERGY)
-      SET_BIT(ch->resist, ISR_ENERGY);
-    else if (afisr->type == SPELL_RESIST_ACID)
-      SET_BIT(ch->resist, ISR_ACID);
     else if (afisr->type == SPELL_BARKSKIN)
       SET_BIT(ch->resist, ISR_SLASH);
 
