@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.3 2002/07/31 18:41:12 pirahna Exp $
+| $Id: cl_warrior.cpp,v 1.4 2002/09/20 20:02:52 pirahna Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -313,7 +313,6 @@ int do_hitall(struct char_data *ch, char *argument, int cmd)
       act ("$n starts swinging like a madman, but trips over $s own feet!", ch, 0, 0, TO_ROOM, 0);
      
       GET_POS(ch) = POSITION_SITTING;
-      SET_BIT(ch->combat, COMBAT_BASH1);
 
       for (vict = character_list; vict; vict = temp) {
          temp = vict->next;
