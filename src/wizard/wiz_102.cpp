@@ -4333,7 +4333,7 @@ int do_sockets(struct char_data *ch, char *argument, int cmd)
 
       // TODO - determine if I need to leave this uncommented for some reason
       if (*name &&
-          !str_str(d->host, name) && !isname(name, GET_NAME(d->character)))
+          !str_str(d->host, name) && (!d->character || !isname(name, GET_NAME(d->character))))
             continue; 
       bool duplicate = FALSE;
       for (ad = descriptor_list; ad; ad = ad->next)
