@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_monk.cpp,v 1.7 2002/09/10 19:16:17 dcastle Exp $
+| $Id: cl_monk.cpp,v 1.8 2002/09/10 22:55:06 pirahna Exp $
 | cl_monk.C
 | Description:  Monk skills.
 */
@@ -227,6 +227,8 @@ int do_stun(struct char_data *ch, char *argument, int cmd)
     send_to_char("You cannot stun something that HUGE!\n\r", ch);
     return eFAILURE;
   }
+
+  skill_increase_check(ch, SKILL_STUN, learned, SKILL_INCREASE_MEDIUM);
 
   // 101% is a complete failure
   percent = number(1, 101);
