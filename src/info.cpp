@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.47 2004/05/25 01:04:49 urizen Exp $ */
+/* $Id: info.cpp,v 1.48 2004/05/30 23:07:18 urizen Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -1487,7 +1487,7 @@ int do_weather(struct char_data *ch, char *argument, int cmd)
          sky_look[weather_info.sky],
          (weather_info.change >=0 ? "you feel a warm wind from south" :
       "your foot tells you bad weather is due"));
-      send_to_char(buf,ch);
+      act(buf, ch, 0, 0, TO_CHAR,0);
    } else
       send_to_char("You have no feeling about the weather at all.\n\r", ch);
 
