@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.162 2004/07/03 11:44:13 urizen Exp $ */
+/* $Id: magic.cpp,v 1.163 2004/07/03 16:07:02 urizen Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -3501,8 +3501,10 @@ act("You resist $n's attempt to fear you!",ch,NULL,victim,TO_VICT,0);
 	 if((saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC) >= 0) || (!number(0, 5))) {
 		send_to_char("For a moment you feel compelled to run away, but you fight back the urge.\n\r", victim);
 		act("$N doesnt seem to be the yellow bellied slug you thought!", ch, NULL, victim, TO_CHAR, 0);
+		if (IS_NPC(victim)) {
 		retval = one_hit(victim, ch, TYPE_UNDEFINED, FIRST);
 		retval = SWAP_CH_VICT(retval);
+		} else retval = eFAILURE;
 		return retval;
 	 }
 	 send_to_char("You suddenly feel very frightened, and you attempt to flee!\n\r", victim);

@@ -21,7 +21,7 @@
  *  12/08/2003   Onager    Added check for charmies and !charmie eq to     *
  *                         equip_char()                                    *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.68 2004/07/03 11:44:13 urizen Exp $ */
+/* $Id: handler.cpp,v 1.69 2004/07/03 16:07:02 urizen Exp $ */
     
 extern "C"
 {
@@ -1186,15 +1186,15 @@ int char_from_room(CHAR_DATA *ch)
   if (IS_NPC(ch))
      ch->mobdata->last_room = ch->in_room;
   if (IS_NPC(ch))
-  if (IS_SET(ch->mobdata->actflags, ACT_NOMAGIC) && !Other && IS_SET(world[ch->in_room].iFlags, NO_TRACK))
+  if (IS_SET(ch->mobdata->actflags, ACT_NOTRACK) && !Other && IS_SET(world[ch->in_room].iFlags, NO_TRACK))
   {
     REMOVE_BIT(world[ch->in_room].iFlags,NO_TRACK);
     REMOVE_BIT(world[ch->in_room].room_flags, NO_TRACK);
   }
   
-  if (IS_NPC(ch) && IS_SET(ch->mobdata->actflags, ACT_NOTRACK) && !More && IS_SET(world[ch->in_room].iFlags, NO_MAGIC))
+  if (IS_NPC(ch) && IS_SET(ch->mobdata->actflags, ACT_NOMAGIC) && !More && IS_SET(world[ch->in_room].iFlags, NO_MAGIC))
   {
-    REMOVE_BIT(world[ch->in_room].iFlags,NO_MAGIC);
+    REMOVE_BIT(world[ch->in_room].iFlags, NO_MAGIC);
     REMOVE_BIT(world[ch->in_room].room_flags, NO_MAGIC);
   }
 
