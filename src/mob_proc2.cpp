@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.34 2004/07/03 18:56:46 urizen Exp $ */
+/* $Id: mob_proc2.cpp,v 1.35 2004/07/03 19:13:40 urizen Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -1476,7 +1476,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     ch->pcdata->practices += 1;
     return eSUCCESS;
   }
-  if(choice == -1) {
+  if(choice == 14) {
     if(IS_MOB(ch)) {
       send_to_char("Mobs cannot meta ki.\r\n", ch);
       return eSUCCESS;
@@ -1498,7 +1498,6 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     GET_PLATINUM(ch) -= ki_cost;
     
     ch->raw_ki += 1;
-    ch->max_ki += 1;
     GET_KI_METAS(ch) += 1;
     redo_ki(ch);
     act("The Meta-physician touches $n.",  ch, 0, 0, TO_ROOM, 0);

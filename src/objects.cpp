@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.41 2004/06/06 13:46:39 urizen Exp $
+| $Id: objects.cpp,v 1.42 2004/07/03 19:13:40 urizen Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -377,6 +377,9 @@ int do_recite(struct char_data *ch, char *argument, int cmd)
     }
     else
     {
+        if (victim && !AWAKE(victim) && number(1,5) < 3)
+            send_to_char("Your sleep is restless.\r\n",victim);
+
       // success
       for (i=1; i<4; i++)
       {
