@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: non_off.cpp,v 1.6 2002/08/03 15:29:28 pirahna Exp $
+| $Id: non_off.cpp,v 1.7 2002/08/04 21:13:15 pirahna Exp $
 | non_off.C
 | Description:  Implementation of generic, non-offensive commands.
 */
@@ -88,6 +88,26 @@ int do_tap(struct char_data *ch, char *argument, int cmd)
   act("You get one gold coin for your sacrifice.", ch, obj, 0, TO_CHAR , 0);
   GET_GOLD(ch) += 1;
   extract_obj(obj);
+  return eSUCCESS;
+}
+
+int do_visible(struct char_data *ch, char *argument, int cmd)
+{
+  if(affected_by_spell(ch, SPELL_INVISIBLE)) {
+    affect_from_char(ch, SPELL_INVISIBLE);
+    send_to_char("You drop your invisiblity spell.\r\n", ch);
+    if(!IS_AFFECTED(ch, AFF_INVISIBLE))
+      act("$n slowly fades into existence.", ch, 0, 0, TO_ROOM, 0);
+    else 
+      send_to_char("You must remove the equipment making you invis to become visible.\r\n", ch);
+    return eSUCCESS;
+  }
+
+  if(IS_AFFECTED(ch, AFF_INVISIBLE)) 
+    send_to_char("You must remove the equipment making you invis to become visible.\r\n", ch);
+  else
+    send_to_char("You aren't invisible.\r\n", ch);
+
   return eSUCCESS;
 }
 

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.14 2002/08/04 19:43:02 pirahna Exp $
+| $Id: guild.cpp,v 1.15 2002/08/04 21:13:15 pirahna Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -415,15 +415,15 @@ void skill_increase_check(char_data * ch, int skill, int learned, int difficulty
 
    switch(difficulty) {
      case SKILL_INCREASE_EASY:
-        if(chance < 86)
+        if(chance < 76)
            return;
         break;
      case SKILL_INCREASE_MEDIUM:
-        if(chance < 96)
+        if(chance < 93)
            return;
         break;
      case SKILL_INCREASE_HARD:
-        if(chance < 101)
+        if(chance < 100)
            return;
         break;
      default:

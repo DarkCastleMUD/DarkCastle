@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.h,v 1.3 2002/08/01 22:59:19 pirahna Exp $ */
+/* $Id: interp.h,v 1.4 2002/08/04 21:13:18 pirahna Exp $ */
 
 #ifndef INTERP_H_
 #define INTERP_H_
@@ -318,6 +318,7 @@ DO_FUN  do_typo;
 DO_FUN  do_unarchive;
 DO_FUN  do_unlock;
 DO_FUN  do_use;
+DO_FUN  do_visible;
 DO_FUN  do_vitalstrike;
 DO_FUN  do_vt100;
 DO_FUN  do_wake;
