@@ -229,7 +229,7 @@ char *songs[] = {
         "astral chanty",
         "disarming limerick",
         "shattering resonance",
-        "unresistable ditty",
+        "irresistable ditty",
 	"\n"
 };
 
@@ -1899,7 +1899,7 @@ void make_person_dance(char_data * ch)
 
 int song_unresistable_ditty( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
-   send_to_char("You begin to sing an unresistable little ditty...\n\r", ch);
+   send_to_char("You begin to sing an irresistable little ditty...\n\r", ch);
    act("$n begins to sing, 'du du dudu du du dudu du du dudu!'", ch, 0, 0, TO_ROOM, 0);
    ch->song_timer = song_info[ch->song_number].beats;
    return eSUCCESS;

@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.68 2004/04/24 20:36:29 urizen Exp $ */
+/* $Id: spells.cpp,v 1.69 2004/04/25 21:19:52 urizen Exp $ */
 
 extern "C"
 {
@@ -883,6 +883,18 @@ char *spells[]=
    "\n"
 };
 
+
+// Figures out how many % of max your damage does
+int dam_percent(int learned, int damage)
+{
+  float percent;
+  if (learned <= 50) percent = 50;
+  else if (learned <= 90) percent = learned;
+  else percent = 90 + ((learned - 90) *2);
+
+  return (int)((float)damage * (float)(percent/100.0));
+}
+
 int use_mana( CHAR_DATA *ch, int sn )
 {
     int base = spell_info[sn].min_usesmana;
@@ -1382,7 +1394,8 @@ int do_release(CHAR_DATA *ch, char *argument, int cmd)
             continue;
 	 if (str_prefix(argument,get_skill_name(aff->type)))
             continue;
-          if (!spell_info[aff->type].targets & TAR_SELF_DEFAULT)
+	if (aff->type > MAX_SPL_LIST) continue;
+          if (!IS_SET(spell_info[aff->type].targets, TAR_SELF_DEFAULT))
             continue;
          if ((aff->type > 0) && (aff->type <= MAX_SPL_LIST))
              if (*spell_wear_off_msg[aff->type]) {
@@ -1445,6 +1458,18 @@ int conc_bonus(int val)
 	return val-20;
  }
 }
+/*
+bool skill_success(CHAR_DATA *ch, CHAR_DATA *victim, int skillnum)
+{
+   int chance;
+          if (GET_CLASS(ch) == CLASS_MAGIC_USER || GET_CLASS(ch) == 
+CLASS_ANTI_PA$
+          chance += conc_bonus(GET_INT(ch));
+        else chance += conc_bonus(GET_WIS(ch));
+
+}
+*/
+
 int skill_value(CHAR_DATA *ch, int skillnum, int min)
 {
   struct char_skill_data * curr = ch->skills;

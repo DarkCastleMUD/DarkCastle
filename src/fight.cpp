@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.166 2004/04/25 21:21:23 urizen Exp $ */
+/* $Id: fight.cpp,v 1.165 2004/04/25 21:19:52 urizen Exp $ */
 
 extern "C"
 {
@@ -1297,7 +1297,7 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
   typeofdamage = damage_type(weapon_type);
 
   if(GET_POS(victim) == POSITION_DEAD)           return (eSUCCESS|eVICT_DIED);
-  if (ch->in_room != victim->in_room) return eSUCCESS;
+
 //  csendf(victim, "damage: dam = %d  type = %d\r\n", dam, weapon_type);
   if (dam!=0 && !IS_NPC(ch) && attacktype)
   { // Skill damages based on learned %

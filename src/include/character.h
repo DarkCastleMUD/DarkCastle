@@ -1,7 +1,7 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.16 2004/04/25 13:01:35 urizen Exp $
+| $Id: character.h,v 1.17 2004/04/25 21:19:56 urizen Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
@@ -51,6 +51,12 @@ typedef struct char_data CHAR_DATA;
 #define INTELLIGENCE         3
 #define WISDOM               4
 #define CONSTITUTION         5
+
+#define STR STRENGTH
+#define DEX DEXTERITY
+#define INT INTELLIGENCE
+#define WIS WISDOM
+#define CON CONSTITUTION // Gawddamn I'm lazy ;)
 
 // * ------- Begin MOBProg stuff ----------- *
 

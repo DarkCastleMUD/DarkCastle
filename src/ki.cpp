@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.16 2004/04/24 10:42:40 urizen Exp $ */
+/* $Id: ki.cpp,v 1.17 2004/04/25 21:19:52 urizen Exp $ */
 
 extern "C"
 {
@@ -569,6 +569,7 @@ int ki_storm( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
   if(number(1,3) == 3) {
     send_to_char("The flash of energy surges within you!\r\n", ch);
     GET_HIT(ch) += dam;
+    if (GET_HIT(ch) > GET_MAX_HIT(ch)) GET_HIT(ch) = GET_MAX_HIT(ch);
   }
   return eSUCCESS;
 }

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.48 2004/04/24 21:01:31 urizen Exp $
+| $Id: cl_thief.cpp,v 1.49 2004/04/25 21:19:54 urizen Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -262,8 +262,8 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
   else
     retval = attack(ch, victim, SKILL_BACKSTAB, FIRST);
 
-  if(!IS_SET(retval, eCH_DIED))
-    WAIT_STATE(ch, PULSE_VIOLENCE);
+//  if(!IS_SET(retval, eCH_DIED))
+  WAIT_STATE(ch, PULSE_VIOLENCE);
 
   if(SOMEONE_DIED(retval))
     return retval;
@@ -282,7 +282,7 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
 
         if(number(1, 100) <= learned)
         {
-           WAIT_STATE(ch, PULSE_VIOLENCE);
+//           WAIT_STATE(ch, PULSE_VIOLENCE);
            percent = number(1, 101);
            if (AWAKE(victim) &&
               (percent > skill))
