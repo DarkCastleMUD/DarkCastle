@@ -76,7 +76,7 @@ const struct golem_data golem_list[] = {
 void golem_gain_exp(CHAR_DATA *ch)
 {
   extern int exp_table[];
-  int level = 29 + ch->level;
+  int level = 19 + ch->level;
   if (ch->level >= 20) return;
   if (ch->exp > exp_table[level])
   {
