@@ -11,7 +11,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.14 2002/08/16 18:36:38 pirahna Exp $ */
+/* $Id: nanny.cpp,v 1.15 2002/08/26 05:46:46 pirahna Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -1153,7 +1153,10 @@ int _parse_name(char *arg, char *name)
       !str_cmp( name, "east")          || !str_cmp( name, "we") ||
       !str_cmp( name, "wes")           || !str_cmp( name, "west") ||
       !str_cmp( name, "up")            || !str_cmp( name, "do") ||
-      !str_cmp( name, "dow")           || !str_cmp( name, "down")
+      !str_cmp( name, "dow")           || !str_cmp( name, "down") ||
+      !str_cmp( name, "pcportal")      || !str_cmp( name, "portal") ||
+      !str_cmp( name, "only")          || !str_cmp( name, "piranha") ||
+      !str_cmp( name, "valkyre")       || !str_cmp( name, "it")
       )
       return 1;
    
