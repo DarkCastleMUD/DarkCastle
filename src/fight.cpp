@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.186 2004/05/14 10:35:33 urizen Exp $ */
+/* $Id: fight.cpp,v 1.187 2004/05/14 16:18:32 urizen Exp $ */
 
 extern "C"
 {
@@ -1942,12 +1942,15 @@ bool check_shieldblock(CHAR_DATA * ch, CHAR_DATA * victim, int attacktype)
     }
   } else if (!has_skill(ch,SKILL_SHIELDBLOCK))
      return eFAILURE;
+
   modifier += speciality_bonus(ch,attacktype);
+
   extern int stat_mod[];
-  modifier += stat_mod[GET_DEX(victim)];
+  modifier += stat_mod[GET_DEX(ch)];
 
   if (IS_NPC(victim)) modifier -= 50;
-  if (!skill_success(victim,ch, SKILL_SHIELDBLOCK,modifier))
+
+  if (!skill_success(victim, ch, SKILL_SHIELDBLOCK,modifier))
     return FALSE;
   
   act("$n blocks $N's attack with $s shield.", victim, NULL, ch, TO_ROOM, NOTVICT);
