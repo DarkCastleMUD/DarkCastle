@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: group.cpp,v 1.12 2004/07/11 02:10:00 urizen Exp $
+| $Id: group.cpp,v 1.13 2004/07/11 02:13:43 urizen Exp $
 | group.C
 | Description:  Group related commands; join, abandon, follow, etc..
 */
@@ -225,7 +225,7 @@ int do_split(CHAR_DATA *ch, char *argument, int cmd)
 
 void setup_group_buf(char * report, char_data * j, char_data *i)
 {
-  if(IS_NPC(j) || (IS_ANONYMOUS(j) && i != j && i->clan != j->clan))
+  if(IS_NPC(j) || (IS_ANONYMOUS(j) && (i->clan != j->clan || !i->clan)))
   {
     if(GET_CLASS(j) == CLASS_MONK || GET_CLASS(j) == CLASS_BARD)
       sprintf(report, "[-====-|      %3d%%    hp     %3d%%   k     %3d%%   mv]",
