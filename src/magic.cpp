@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.100 2004/04/17 14:10:23 urizen Exp $ */
+/* $Id: magic.cpp,v 1.101 2004/04/18 01:57:17 urizen Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -4684,6 +4684,8 @@ int cast_drown( byte level, CHAR_DATA *ch, char *arg, int type,
          else if (!tar_obj)
             return spell_drown(level, ch, ch, 0, skill);
          break;
+      case SPELL_TYPE_POTION:
+	 return spell_drown(level,ch, ch, 0, skill);
       case SPELL_TYPE_WAND:
          if (victim)
             return spell_drown(level, ch, victim, 0, skill);
