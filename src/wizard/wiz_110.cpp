@@ -366,11 +366,11 @@ int do_rename_char(struct char_data *ch, char *arg, int cmd)
                                         SAVE_DIR, targetname[0], targetname);
   system(name);
   // Golems
-  sprintf(name, "cp %s/%c/%s.1 %s/%c/%s.1, FAMILIAR_DIR, victim->name[0], GET_NAME(victim),
+  sprintf(name, "cp %s/%c/%s.1 %s/%c/%s.1", FAMILIAR_DIR, victim->name[0], GET_NAME(victim),
 					   FAMILIAR_DIR, targetname[0], targetname);
   system(name);
   // Golems
-  sprintf(name, "cp %s/%c/%s.0 %s/%c/%s.0, FAMILIAR_DIR, victim->name[0], GET_NAME(victim),
+  sprintf(name, "cp %s/%c/%s.0 %s/%c/%s.0", FAMILIAR_DIR, victim->name[0], GET_NAME(victim),
                                            FAMILIAR_DIR, targetname[0], targetname);
   system(name);
 
