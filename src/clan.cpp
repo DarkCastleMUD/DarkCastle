@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.28 2004/07/06 00:20:03 urizen Exp $ */
+/* $Id: clan.cpp,v 1.29 2004/07/06 01:09:34 urizen Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -1224,7 +1224,7 @@ int do_ctell(CHAR_DATA *ch, char *arg, int cmd)
 
   while(isspace(*arg))
     arg++;
-  if (!has_right(ch, CLAN_RIGHTS_CHANNEL))
+  if (!has_right(ch, CLAN_RIGHTS_CHANNEL) && ch->level < 51)
   {
      send_to_char("You don't have the right to talk to your clan.\r\n",ch);
      return eFAILURE;
@@ -1252,7 +1252,7 @@ int do_ctell(CHAR_DATA *ch, char *arg, int cmd)
      if(pch == ch || pch->clan != ch->clan || 
         !IS_SET(pch->misc, CHANNEL_CLAN))
        continue;
-     if (!has_right(pch, CLAN_RIGHTS_CHANNEL))
+     if (!has_right(pch, CLAN_RIGHTS_CHANNEL) && ch->level < 51)
        continue;
      ansi_color( GREEN, pch);
      send_to_char(buf, pch);
