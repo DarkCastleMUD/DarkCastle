@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.49 2004/05/20 06:55:01 pirahna Exp $ */
+/* $Id: mob_proc.cpp,v 1.50 2004/05/20 21:46:16 urizen Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -630,9 +630,9 @@ int active_magic_user(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
 	case 12:
 	case 13:
 	case 14:
-	    act("$n utters the words 'Pretty colours!'.", ch, 0, 0, TO_ROOM, 
+	    act("$n utters the words 'Your soul's mine!!'.", ch, 0, 0, TO_ROOM, 
 	      INVIS_NULL);
-	    retval = cast_colour_spray(
+	    retval = cast_souldrain(
 		GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
 	    break;
         case 15:

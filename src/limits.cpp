@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.28 2004/05/20 00:07:06 urizen Exp $ */
+/* $Id: limits.cpp,v 1.29 2004/05/20 21:46:16 urizen Exp $ */
 
 extern "C"
 {
@@ -268,7 +268,7 @@ int move_gain(CHAR_DATA *ch)
     } else {
 //	gain = graf(age(ch).year, 4,5,6,7,4,3,2);
 	gain = (int)(ch->max_move * 0.06);
-	gain /= 4;
+	gain /= 2;
 	switch (GET_POS(ch)) {
 	    case POSITION_SLEEPING: divisor = 1; break;
 	    case POSITION_RESTING:  divisor = 2; break;
