@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: board.cpp,v 1.5 2004/05/30 18:59:03 urizen Exp $
+| $Id: board.cpp,v 1.6 2004/05/30 23:49:06 urizen Exp $
 | board.C
 | Description:  This file contains the implementation for the board
 |   code.  It's old and should be rewritten --Morc XXX
@@ -289,7 +289,7 @@ int find_board(CHAR_DATA *ch)
        return(42);
      else if (!(strcmp(i->name, "board coding")))
        return(43);
-     else if (!strcmp(i->name, "board guild mage glyph glyphs colums"))
+     else if (!strcmp(i->name, "board guild mage glyph glyphs column"))
 	return 44;
      else if (!strcmp(i->name, "board guild cleric"))
         return 45;
