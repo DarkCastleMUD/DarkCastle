@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_ranger.cpp,v 1.3 2002/06/20 21:39:49 pirahna Exp $ | cl_ranger.C |
+| $Id: cl_ranger.cpp,v 1.4 2002/07/12 00:12:48 pirahna Exp $ | cl_ranger.C |
 Description: Ranger skills/spells */ extern "C"  {
   #include <string.h>
 }
@@ -180,6 +180,9 @@ int do_track(CHAR_DATA *ch, char *argument, int cmd)
       TO_ROOM, INVIS_NULL);
   send_to_char("You sniff the air...\n\r\n\r", ch);
 
+  // TODO - once we're sure that act_mob is properly checking for this,
+  // and that it isn't call from anywhere else, we can probably remove it.
+  // That way possessing imms can track.
   if(IS_MOB(ch) && IS_SET(ch->mobdata->actflags, ACT_STUPID)) {
     send_to_char("Being stupid, you cannot find any..\r\n", ch);
     return eFAILURE;
