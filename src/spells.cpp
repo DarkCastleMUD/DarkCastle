@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.8 2002/08/01 17:31:19 pirahna Exp $ */
+/* $Id: spells.cpp,v 1.9 2002/08/02 02:32:48 pirahna Exp $ */
 
 extern "C"
 {
@@ -684,7 +684,7 @@ char *spells[]=
    "create food",
    "create water",
    "cure blind",
-   "cure critic",
+   "cure critical",
    "cure light",
    "curse",
    "detect evil",
