@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.40 2003/05/12 03:11:36 pirahna Exp $ */
+/* $Id: spells.cpp,v 1.41 2003/06/13 00:20:57 pirahna Exp $ */
 
 extern "C"
 {
@@ -1582,11 +1582,11 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
           else chance += GET_WIS(ch);
         }
 
-        // TODO - make this use int for mages
         if(GET_LEVEL(ch) < IMMORTAL && number(1,101) > chance )
         {
-          send_to_char("You lost your concentration!\n\r", ch);
+          csendf(ch, "You lost your concentration and are unable to cast %s!\n\r", spells[spl-1]);
           GET_MANA(ch) -= (use_mana(ch, spl) >> 1);
+          act("$n loses $s concentration and is unable to complete $s spell.", ch, 0, 0, TO_ROOM, 0);
           return eSUCCESS;
         }
 
