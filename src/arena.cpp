@@ -3,7 +3,11 @@
  *
  * -Sadus
  */
-/* $Id: arena.cpp,v 1.4 2003/11/10 19:36:28 staylor Exp $ */
+/*****************************************************************************/
+/* Revision History                                                          */
+/* 12/09/2003   Onager   Tweaked do_join() to remove combat-related bits     */
+/*****************************************************************************/
+/* $Id: arena.cpp,v 1.5 2003/12/09 08:40:49 staylor Exp $ */
 
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
@@ -142,6 +146,9 @@ int do_joinarena(CHAR_DATA *ch, char *arg, int cmd)
        affect_remove(ch, af, SUPPRESS_ALL);
   }
   
+  /* remove combat-related bits */
+  ch->combat = 0;
+
   GET_MOVE(ch) = GET_MAX_MOVE(ch);
   GET_MANA(ch) = GET_MAX_MANA(ch);
   GET_HIT(ch)  = GET_MAX_HIT(ch);

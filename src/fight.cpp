@@ -14,9 +14,11 @@
 *                       and groups.                                          *
 *  12/01/2003  Onager   Re-revised group_gain() to divide up mob exp among   *
 *                       groupies                                             *
+*  12/08/2003  Onager   Changed change_alignment() to a simpler algorithm    *
+*                       with smaller changes in alignment                    *
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.131 2003/12/02 05:33:02 staylor Exp $ */
+/* $Id: fight.cpp,v 1.132 2003/12/09 08:40:49 staylor Exp $ */
 
 extern "C"
 {
@@ -2457,6 +2459,15 @@ void zap_eq_check(char_data * ch)
 // ch kills victim
 void change_alignment(CHAR_DATA *ch, CHAR_DATA *victim)
 {
+  int change;
+
+  change = GET_ALIGNMENT(victim) / 100;
+  if (IS_NEUTRAL(ch))
+    change /= 2;
+
+  GET_ALIGNMENT(ch) += change;
+  GET_ALIGNMENT(ch) = MIN(1000, MAX((-1000), GET_ALIGNMENT(ch)));  
+#if 0
   int change = alignment_value(GET_ALIGNMENT(ch));
   int x = (abs(GET_ALIGNMENT(victim)) + 1000) / 100;
       
@@ -2472,6 +2483,7 @@ void change_alignment(CHAR_DATA *ch, CHAR_DATA *victim)
   GET_ALIGNMENT(ch) += x;
   
   GET_ALIGNMENT(ch) = MIN(1000, MAX((-1000), GET_ALIGNMENT(ch)));  
+#endif
 
   if(change != alignment_value(GET_ALIGNMENT(ch)))
     zap_eq_check(ch);
