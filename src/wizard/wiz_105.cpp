@@ -128,6 +128,22 @@ int do_pardon(struct char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
+char *print_classes(int bitv)
+{
+  char buf[512];
+  int i = 0;
+  buf[0] = '\0';
+  extern char*pc_clss_types2[];
+ 
+  for (; *pc_clss_types2[i] != '\n'; i++)
+  {
+    if (IS_SET(bitv, 1 << (i-1)))
+	sprintf(buf,"%s %s",buf, pc_clss_types2[i]);
+  }
+
+  return buf;
+}
+
 // do_string is in modify.C
 
 struct skill_quest *find_sq(char *testa)
@@ -181,10 +197,11 @@ int do_sqedit(struct char_data *ch, char *argument, int cmd)
 
      send_to_char("$2Syntax:$R sqedit <message/level/class> <skill> <value> OR\r\n"
                   "$2Syntax:$R sqedit <show/new/delete> <skillname> OR\r\n",ch);
-     send_to_char("$2Syntax:$R sqedit list.\r\n",ch);
+     send_to_char("$2Syntax:$R sqedit list <class>.\r\n",ch);
     return eFAILURE;
   }
   char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH],arg3[MAX_INPUT_LENGTH*2];
+  bool done = FALSE;
   argument = one_argument(argument,arg1);
   struct skill_quest * skill=NULL;
   if (argument && *argument) {
@@ -298,27 +315,32 @@ int do_sqedit(struct char_data *ch, char *argument, int cmd)
 	SET_BIT(skill->clas,1<<(i-1));
       send_to_char("Class modified.\r\n",ch);
       break;
-    case 5:
-      csendf(ch,"$2Skill$R: %s\r\n$2Message$R: %s\r\n$2Class$R: %s\r\n$2Level$R: %d\r\n",             get_skill_name(skill->num), skill->message, pc_clss_types2[skill->clas],skill->level);
+    case 5: // show
+      csendf(ch,"$2Skill$R: %s\r\n$2Message$R: %s\r\n$2Class$R: %s\r\n$2Level$R: %d\r\n",             get_skill_name(skill->num), skill->message, print_classes(skill->clas),skill->level);
       break;
      case 6:
-      send_to_char("These are the current sqs:\r\n",ch);
-      for (i = 1; i < 12; i++)
+      int l;
+      for (l = 0; *pc_clss_types2[l] != '\n'; l++)
       {
-	csendf(ch, "$3%s skillquests.$R\r\n",pc_clss_types2[i]);
-        bool done = FALSE;
-        for (curren = skill_list; curren; curren = curren->next)
-        {
-	  if (!IS_SET(curren->clas, 1<<(i-1)))
-	    continue;
-//	  if (curren->clas == i) {
-  	    csendf(ch, "$2%d$R. %s\r\n", curren->num, get_skill_name(curren->num));
-	    done = TRUE;
-//	  }
-        }
-        if (!done)
-	  send_to_char("    No skill quests.\r\n",ch);
+        if (!str_cmp(pc_clss_types2[l],arg2))
+           break;
       }
+      if (*pc_clss_types2[l] == '\n')
+      {
+	send_to_char("Unkown class.",ch);
+	return eFAILURE;
+      }
+      send_to_char("These are the current sqs:\r\n",ch);
+      csendf(ch, "$3%s skillquests.$R\r\n",pc_clss_types2[l]);
+      for (curren = skill_list; curren; curren = curren->next)
+      {
+	if (!IS_SET(curren->clas, 1<<(l-1)))
+	  continue;
+  	csendf(ch, "$2%d$R. %s\r\n", curren->num, get_skill_name(curren->num));
+	done = TRUE;
+      }
+      if (!done)
+	send_to_char("    No skill quests.\r\n",ch);
       break;
     default:
       log("Incorrect -i- in do_sqedit", 0, LOG_WORLD);
