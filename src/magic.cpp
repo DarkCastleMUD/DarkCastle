@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.7 2002/08/01 08:52:37 pirahna Exp $ */
+/* $Id: magic.cpp,v 1.8 2002/08/01 21:03:04 pirahna Exp $ */
 
 extern "C"
 {
@@ -95,7 +95,7 @@ int spell_chill_touch(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 
   set_cantquit( ch, victim );
 
-  dam = dice(2,8) * level;
+  dam = dice(2,8) * level/2;
 
   save = saves_spell(ch, victim, (level/2), SAVE_TYPE_COLD);
 

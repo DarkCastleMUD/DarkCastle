@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.9 2002/08/01 17:56:39 pirahna Exp $
+| $Id: guild.cpp,v 1.10 2002/08/01 21:03:04 pirahna Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -179,9 +179,9 @@ int skills_guild(struct char_data *ch, char *arg, struct char_data *owner)
       sprintf(buf, " %-20s%14s   (Level %2d)", skilllist[i].skillname,
                    how_good(known), skilllist[i].levelavailable);
       send_to_char(buf, ch);
-      if(skilllist[i].skillnum <= MAX_SPL_LIST) 
+      if(skilllist[i].skillnum >= 1 && skilllist[i].skillnum <= MAX_SPL_LIST) 
       {
-        sprintf(buf," Mana: %4d ",use_mana(ch,i));
+        sprintf(buf," Mana: %4d ",use_mana(ch,skilllist[i].skillnum));
         send_to_char(buf, ch);
       }
       else send_to_char("            ", ch);
