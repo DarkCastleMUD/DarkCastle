@@ -1005,8 +1005,8 @@ int stupid_message(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
   if(!zone_table[world[obj->in_room].zone].players)
      return eFAILURE;
 
-   if(number(1, 4))
-      send_to_room("The shadows swirl to reveal a face before you.  "
+   if(number(1, 10) == 1)
+      send_to_room("The shadows swirl to reveal a face before you.\r\n"
                    "It speaks suddenly, 'Only with the key can you unlock the masters name' "
                    "and then fades away.\r\n", obj->in_room);
 
