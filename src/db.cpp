@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.68 2004/05/31 16:02:45 urizen Exp $ */
+/* $Id: db.cpp,v 1.69 2004/05/31 20:35:47 urizen Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -966,6 +966,7 @@ struct index_data *generate_mob_indices(int *top, struct index_data *index)
   for (i = 0; i <= top_of_mobt; i++)
   {
     CHAR_DATA *a = (CHAR_DATA *)mob_index[i].item;
+    MPROG_DATA *mprg;
     if (!a) continue;
     if (!a->c_class) continue;
     switch (a->c_class)
@@ -990,6 +991,9 @@ struct index_data *generate_mob_indices(int *top, struct index_data *index)
 	  break;
 	default: break;
     }
+    if (mob_index[i].mobspec)
+      for (mprg = mob_index[i].mobspec; mprg; mprg = mprg->next)
+        SET_BIT(mob_index[i].progtypes, mprg->type);
   }
   return(index);
 }
