@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.105 2004/04/19 19:22:50 urizen Exp $ */
+/* $Id: magic.cpp,v 1.106 2004/04/19 19:40:08 urizen Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -787,8 +787,7 @@ int spell_solar_gate(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
                 timer->function = clear_hunt;
                timer->next = timer_list;
                 timer_list = timer;
-                timer->timeleft = (ch->level==50?24 * 60:(ch->level/5 
-)*60);
+                timer->timeleft = (ch->level/4)*60;
            }
      }
 

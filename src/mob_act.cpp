@@ -19,7 +19,7 @@
 /* 12/06/2003   Onager   Modified mobile_activity() to prevent charmie    */
 /*                       scavenging                                       */
 /**************************************************************************/
-/* $Id: mob_act.cpp,v 1.17 2004/04/19 17:48:04 urizen Exp $ */
+/* $Id: mob_act.cpp,v 1.18 2004/04/19 19:40:08 urizen Exp $ */
 
 extern "C"
 {
@@ -362,27 +362,6 @@ void mobile_activity(void)
 
       if(!IS_SET(ch->mobdata->actflags, ACT_STUPID))
       {
-/*        if(!ch->hunting && temp)  {
-	  if (GET_LEVEL(temp) - GET_LEVEL(ch)/2 <= 0)
-          {  
-            add_memory(ch, GET_NAME(temp), 't');
-		struct timer_data *timer;
-		#ifdef LEAK_CHECK
-		  timer = (struct timer_data *)calloc(1, sizeof(struct timer_data));
-		#else
-		  timer = (struct timer_data *)dc_alloc(1, sizeof(struct timer_data));
-		#endif
-		timer->next = timer_list;
-		timer_list = timer;
-		timer->timeleft = (ch->level==50?24:ch->level/5);
-		timer->arg1 = (void*)ch->hunting;
-		timer->arg2 = (void*)ch;
-		timer->function =  clear_hunt;
-
-
-	  }
-        }
-*/
         if(!IS_AFFECTED(ch, AFF_BLIND) && ch->hunting) {
           retval = do_track(ch, ch->hunting, 9);
           if(SOMEONE_DIED(retval))

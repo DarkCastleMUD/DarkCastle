@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.150 2004/04/19 19:22:49 urizen Exp $ */
+/* $Id: fight.cpp,v 1.151 2004/04/19 19:40:08 urizen Exp $ */
 
 extern "C"
 {
@@ -2186,7 +2186,7 @@ void set_fighting(CHAR_DATA * ch, CHAR_DATA * vict)
                 timer->function = clear_hunt;
                 timer->next = timer_list;
                 timer_list = timer;
-                timer->timeleft = (ch->level==50?24 * 60:(ch->level/5 )*60);
+                timer->timeleft = (ch->level/4)*60;
            }
   if (!IS_NPC(vict) && IS_NPC(ch))
      if (!IS_SET(ch->mobdata->actflags, ACT_STUPID) && !ch->hunting)
@@ -2207,8 +2207,7 @@ timer_data));
                 timer->function = clear_hunt;
                timer->next = timer_list;
                 timer_list = timer;
-                timer->timeleft = (vict->level==50?24 * 60:(vict->level/5 
-)*60);
+                timer->timeleft = (vict->level/4)*60;
            }
      }
      }

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.23 2004/04/19 19:22:50 urizen Exp $
+| $Id: move.cpp,v 1.24 2004/04/19 19:40:08 urizen Exp $
 | move.C
 | Movement commands and stuff.
 *************************************************************************
@@ -468,7 +468,7 @@ int do_simple_move(CHAR_DATA *ch, int cmd, int following)
 		timer->function = clear_hunt;
                 timer->next = timer_list;
                 timer_list = timer;
-                timer->timeleft = (ch->level==50?24 * PULSE_TIME:ch->level/5 *PULSE_TIME);;
+                timer->timeleft = (ch->level/4)*60;
  	  }
 	}
 
