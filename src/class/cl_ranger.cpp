@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_ranger.cpp,v 1.22 2003/03/07 03:04:02 pirahna Exp $ | cl_ranger.C |
+| $Id: cl_ranger.cpp,v 1.23 2003/03/21 20:43:48 pirahna Exp $ | cl_ranger.C |
 Description: Ranger skills/spells */ extern "C"  {
   #include <string.h>
 }
@@ -416,6 +416,11 @@ int ambush(CHAR_DATA *ch)
          learned = 75;
        else if(!(learned = has_skill(i, SKILL_AMBUSH)))
          continue;
+
+       if(IS_AFFECTED2(ch, AFF_ALERT)) {
+          send_to_char("Your target is far too alert to accomplish an ambush!\r\n", i);
+          continue;
+       }
 
        specialization = learned / 100;
        learned %= 100;
