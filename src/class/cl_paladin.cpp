@@ -115,6 +115,7 @@ int do_harmtouch(struct char_data *ch, char *argument, int cmd)
    update_pos(victim);
    if (GET_POS(victim) == POSITION_DEAD) {
      act("$N's body begins to wither and decay in front of you until $E falls to the ground a festering corpse.", ch, 0, victim, TO_ROOM, NOTVICT);
+     group_gain(ch, victim);
      fight_kill(ch, victim, TYPE_CHOOSE);
      return eSUCCESS|eVICT_DIED;
    }
