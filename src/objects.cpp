@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.20 2002/12/27 02:20:48 pirahna Exp $
+| $Id: objects.cpp,v 1.21 2003/01/30 05:32:22 pirahna Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -110,6 +110,9 @@ int eq_max_damage(obj_data * obj)
          break;
       case ITEM_INSTRUMENT:
          amount = 3;
+         break;
+      case ITEM_KEY:
+         amount = 2;
          break;
       default:
          amount = 1;

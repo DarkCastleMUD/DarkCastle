@@ -684,7 +684,7 @@ int pfe_word(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
       act("$n mutters something into $s hands.", ch, 0, 0, TO_ROOM, 0);
       send_to_char("You quietly whisper 'aslexi' into your hands.\r\n", ch);
 
-      cast_protection_from_evil(GET_LEVEL(ch), ch, 0, SPELL_TYPE_SPELL, ch, 0, 0);
+      cast_protection_from_evil(GET_LEVEL(ch), ch, 0, SPELL_TYPE_SPELL, ch, 0, 50);
       act("A pulsing aura springs to life around $n!", ch, 0, 0, TO_ROOM, 0);
       return eSUCCESS;
    }
