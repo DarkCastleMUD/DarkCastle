@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.137 2004/04/13 21:43:04 urizen Exp $ */
+/* $Id: fight.cpp,v 1.138 2004/04/13 22:25:19 urizen Exp $ */
 
 extern "C"
 {
@@ -224,6 +224,8 @@ void perform_violence(void)
           }
         }
       }
+      if (SOMEONE_DIED(retval))
+          continue;    // Fix for procs beng called on dead chars. 
       // MOB Progs
       retval = mprog_hitprcnt_trigger( ch, ch->fighting );
       if(IS_SET(retval, eCH_DIED))
@@ -305,7 +307,7 @@ int attack(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
   
   set_cantquit(ch, vict);   // This sets the flag if necessary
   set_fighting(ch, vict);
-  
+  /*URIZENPOINT*/
   wielded = ch->equipment[WIELD];
 
   if(type != SKILL_BACKSTAB)

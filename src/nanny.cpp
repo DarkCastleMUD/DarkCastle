@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.35 2003/11/10 19:36:29 staylor Exp $ */
+/* $Id: nanny.cpp,v 1.36 2004/04/13 22:25:19 urizen Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -1539,7 +1539,7 @@ int _parse_name(char *arg, char *name)
          return 1;
    }
    
-   if ( i < 2 )
+   if ( i < 3 )
       return 1;
 
    if (on_forbidden_name_list(name))

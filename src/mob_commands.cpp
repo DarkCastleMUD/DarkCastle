@@ -1,3 +1,4 @@
+
 /***************************************************************************
  *  Original Diku Mud copyright (C) 1990, 1991 by Sebastian Hammer,        *
  *  Michael Seifert, Hans Henrik St{rfeldt, Tom Madsen, and Katja Nyboe.   *
@@ -304,13 +305,13 @@ int do_mpechoaround( CHAR_DATA *ch, char *argument, int cmd )
        return eFAILURE|eINTERNAL_ERROR;
     }
 
-    if ( !( victim=get_char_room_vis( ch, arg ) ) )
+    if ( !( victim=get_char_room( arg,ch->in_room ) ) )
     {
         logf( IMMORTAL, LOG_WORLD, "Mpechoaround - victim does not exist: vnum %d.",
 	    mob_index[ch->mobdata->nr].virt );
 	return eFAILURE|eINTERNAL_ERROR;
     }
-
+     if (CAN_SEE(ch,victim))
     act( argument+1, ch, NULL, victim, TO_ROOM, NOTVICT );
     return eSUCCESS;
 }
