@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.4 2002/09/20 20:02:52 pirahna Exp $
+| $Id: cl_warrior.cpp,v 1.5 2002/10/12 23:45:52 pirahna Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -768,12 +768,13 @@ int do_bladeshield(struct char_data *ch, char *argument, int cmd)
   specialization = learned / 100;
   learned = learned % 100;
   chance = 60;
+  chance += learned / 10;
 
   percent = number(1, 101);
 
   skill_increase_check(ch, SKILL_BLADESHIELD, learned, SKILL_INCREASE_EASY);
 
-  if(learned < chance) {
+  if(chance < percent) {
     act("$n starts swinging $s weapons around but stops before narrowly avoiding dismembering $mself."
          , ch, 0, 0, TO_ROOM, NOTVICT);
     send_to_char("You try to begin the bladeshield technique and almost chop off your own arm!\r\n", ch);
