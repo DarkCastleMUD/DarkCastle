@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.95 2004/04/14 21:45:04 urizen Exp $ */
+/* $Id: magic.cpp,v 1.96 2004/04/16 11:55:25 urizen Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -374,9 +374,9 @@ int spell_fireball(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data
 
    int retval = spell_damage(ch, victim, dam, TYPE_FIRE, SPELL_FIREBALL, 0);
 
-   if(SOMEONE_DIED(retval))
+   if(SOMEONE_DIED(retval) || ch->in_room != victim->in_room)
      return retval;
-
+   // Above: Fleeing now saves you from the second blast.
    if(number(0, 100) < ( skill / 5 ) ) {
      act("The expanding flames suddenly recombine and fly at $N again!", ch, 0, victim, TO_ROOM, 0);
      act("The expanding flames suddenly recombine and fly at $N again!", ch, 0, victim, TO_CHAR, 0);

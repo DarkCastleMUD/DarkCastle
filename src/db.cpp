@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.34 2004/04/16 02:40:37 urizen Exp $ */
+/* $Id: db.cpp,v 1.35 2004/04/16 11:55:25 urizen Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -2742,7 +2742,6 @@ int create_blank_item(int nr)
     extern world_file_list_item * obj_file_list;
  
     wcurr = obj_file_list;
-    bool done = FALSE;
     while(wcurr)
     {
       if(wcurr->firstnum >= cur_index)
@@ -2757,6 +2756,113 @@ int create_blank_item(int nr)
     rebuild_rnum_references(cur_index, 2);
     return cur_index;
 }
+
+// add a new mobile to the index.  To do this, we need to update ALL the
+// other mobiles in the game after the one being inserted.  Pain in the
+// ass but oh well.  it shouldn't hopefully happen that often.
+//
+// Args:  int nr = virtual number of object (what gods know it as)
+//
+// return index of item on success, -1 on failure
+//  Hack of create_blank_item.. Uriz
+int create_blank_mobile(int nr)
+{
+    CHAR_DATA *mob;
+    CHAR_DATA *curr;
+    int cur_index = 0;
+
+    // check if room available in index
+    if( (top_of_mobt + 1) >= MAX_INDEX )
+      return -1;
+
+    // find how where our index will be
+    // yes, i could check if the last mobile is smaller and then do a binary
+    // search to do this faster but if everything in life was optimized I wouldn't
+    // be playing solitaire at work on a windows machine. -pir
+    while(mob_index[cur_index].virt < nr && cur_index < top_of_mobt+1)
+      cur_index++;
+
+    if(mob_index[cur_index].virt == nr) // item already exists
+      return -1;
+
+    // theoretically if top_of_objt+1 wasn't initialized properly it could
+    // be junk data, which could be == nr, returning -1, but i'm not gonna worry
+
+    // create
+
+#ifdef LEAK_CHECK
+    mob = (struct char_data *)calloc(1, sizeof(struct char_data));
+#else
+    mob = (struct char_data *)dc_alloc(1, sizeof(struct char_data));
+#endif
+
+    clear_char(mob);
+    reset_char(mob);
+    mob->name         = str_hsh("insignificant archdemon demon");
+    mob->short_desc = str_hsh("a small insignificant arch-demon");
+    mob->long_desc = str_hsh("An giant, firespewing arch-demon stands here, lighting cigarettes.");
+    mob->description  = str_hsh("");
+    mob->fighting = 0;
+    mob->pcdata       = 0;
+    mob->desc       = 0;
+
+#ifdef LEAK_CHECK
+    mob->mobdata = (mob_data *) calloc(1, sizeof(mob_data));
+#else
+    mob->mobdata = (mob_data *) dc_alloc(1, sizeof(mob_data));
+#endif
+
+    mob->mobdata->actflags = 0;
+    mob->mobdata->damnodice = 1;
+    mob->mobdata->damsizedice = 1;
+    mob->mobdata->default_pos = 1;
+    mob->mobdata->nr = cur_index;
+
+    // shift > items right
+    memmove( &mob_index[cur_index+1], &mob_index[cur_index],
+              ( (top_of_mobt - cur_index + 1) * sizeof(index_data) )
+           );
+    top_of_mobt++;
+
+    // insert
+    mob_index[cur_index].virt = nr;
+    mob_index[cur_index].number = 0;
+    mob_index[cur_index].non_combat_func = 0;
+    mob_index[cur_index].combat_func = 0;
+    mob_index[cur_index].item = mob;
+
+    // update index of all mobiles in game
+    for(curr = character_list; curr; curr = curr->next)
+      if (IS_MOB(curr))
+        if(curr->mobdata->nr >= cur_index)
+           curr->mobdata->nr++;
+
+    // update index of all the mob prototypes
+    for(int i = cur_index+1; i <= top_of_mobt; i++)
+       ((char_data *)mob_index[i].item)->mobdata->nr++;
+
+    // update obj file indices
+    world_file_list_item * wcurr = NULL;
+
+    extern world_file_list_item * mob_file_list;
+
+    wcurr = mob_file_list;
+    while(wcurr)
+    {
+      if(wcurr->firstnum >= cur_index)
+        wcurr->firstnum++;
+
+      if(wcurr->lastnum >= cur_index-1)
+        wcurr->lastnum++;
+
+       wcurr = wcurr->next;
+    }
+
+    rebuild_rnum_references(cur_index, 1);
+    return cur_index;
+}
+
+
 
 // Delete an item from the index and update everything to continue working
 // without causing mass destruction and chaos.
