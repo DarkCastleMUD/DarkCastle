@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.8 2003/01/08 21:19:46 dcastle Exp $
+| $Id: cl_warrior.cpp,v 1.9 2003/01/16 03:59:18 dcastle Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -821,9 +821,11 @@ int handle_any_guard(char_data * ch)
    char_data * guard = NULL;
 
    // search the room for my guard
-   for(follow_type * curr = ch->guarded_by; curr;) {
-      for(char_data * vict = world[ch->in_room].people; vict; vict = vict->next)
-         if(vict == curr->follower) {
+   for(follow_type * curr = ch->guarded_by; curr;) 
+   {
+      for(char_data * vict = world[ch->in_room].people; vict; vict = vict->next_in_room)
+         if(vict == curr->follower) 
+         {
             curr = NULL;
             guard = vict;
             break;
@@ -939,6 +941,16 @@ int do_guard(struct char_data *ch, char *argument, int cmd)
       send_to_char("You stop guarding anyone.\n\r", ch);
       stop_guarding(ch);
       return eSUCCESS;
+   }
+
+   if(victim == ch->guarding) {
+      send_to_char("You are already guarding that person.\n\r", ch);
+      return eFAILURE;
+   }
+
+   if(ch->guarding) {
+      send_to_char("You are already guarding someone.\n\r", ch);
+      return eFAILURE;
    }
 
    start_guarding(ch, victim);
