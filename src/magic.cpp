@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.59 2003/02/13 22:36:32 pirahna Exp $ */
+/* $Id: magic.cpp,v 1.60 2003/02/17 21:08:54 pirahna Exp $ */
 
 extern "C"
 {
@@ -1926,12 +1926,13 @@ int spell_locate_object(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
   char name[256];
   char buf[MAX_STRING_LENGTH];
   int j;
+  int total;
 
   assert(ch);
 
   strcpy(name, fname(obj->name));
 
-  j= (int) (skill / 3.75);
+  total = j = (int) (skill / 3.75);
 
   for (i = object_list; i && (j>0); i = i->next)
   {
@@ -1957,13 +1958,14 @@ int spell_locate_object(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
     }
   }
 
-  if(j==level)
+  if(j==total)
 	 send_to_char("No such object.\n\r",ch);
-
-  skill_increase_check(ch, SPELL_LOCATE_OBJECT, skill, SKILL_INCREASE_EASY);
 
   if(j==0)
 	 send_to_char("You are very confused.\n\r",ch);
+
+  skill_increase_check(ch, SPELL_LOCATE_OBJECT, skill, SKILL_INCREASE_MEDIUM);
+
   return eSUCCESS;
 }
 
