@@ -2070,6 +2070,14 @@ int TOHS_locator(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
    return eSUCCESS;   
 }
 
+/*int no_magic_item(struct char_data *ch, struct obj_data *obj, cmd, char 
+*arg, CHAR_DATA *invoker)
+{ // mobdata last_direction
+   if (cmd)  // Not activated through commands..
+     return eFAILURE;
+//   if (   
+}
+*/
 int gotta_dance_boots(struct char_data*ch, struct obj_data *obj, int cmd, char*arg, 
                    CHAR_DATA *invoker)
 {

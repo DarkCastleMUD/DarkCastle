@@ -1,7 +1,7 @@
 #ifndef __ROOM_H__
 #define __ROOM_H__
 /************************************************************************
-| $Id: room.h,v 1.7 2003/05/12 02:29:22 pirahna Exp $
+| $Id: room.h,v 1.8 2004/04/17 18:36:54 urizen Exp $
 | room.h
 | Description:  This file contains all of the room header file/constant
 |   information.  It also contains information about the 'world' structs.
@@ -46,6 +46,10 @@
 #define NO_SCAN      1<<28
 #define NO_WHERE     1<<29
 #define LIGHT_ROOM   1<<30
+
+/* Internal flags */
+#define iNO_TRACK   1
+#define iNO_MAGIC   1<<1
 
 /* For 'dir_option' */
 
@@ -133,6 +137,7 @@ struct room_data
     void              AddTrackItem(room_track_data * newTrack);
     room_track_data * TrackItem(int nIndex);
     void              FreeTracks();
+    int 	      iFlags; // Internal flags. These do NOT save.
 };
 
 #endif // __ROOM_H__
