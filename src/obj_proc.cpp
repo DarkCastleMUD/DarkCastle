@@ -1008,6 +1008,8 @@ int weenie_weedy(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
          send_to_room("Someone's weenie weedy doll says, 'BLARG!'\r\n", obj->carried_by->in_room);
       else if(obj->in_room != NOWHERE)
          send_to_room("a weenie weedy doll says, 'BLARG!'\r\n", obj->in_room);
+      else if(obj->in_obj && obj->in_obj->carried_by)
+         send_to_room("a muffled 'BLARG!' comes from a weenie weedy doll somewhere nearby.\r\n", obj->in_obj->carried_by->in_room);
 
    return eSUCCESS;
 }
