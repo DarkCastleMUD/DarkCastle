@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.65 2004/05/31 17:09:42 urizen Exp $ */
+/* $Id: nanny.cpp,v 1.66 2004/06/01 02:19:51 urizen Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -405,7 +405,8 @@ void do_on_login_stuff(char_data * ch)
        GET_COND(ch, FULL) = -1;
     }
 
-    if(ch->in_room >= 2)                 char_to_room( ch, ch->in_room );
+    if (GET_LEVEL(ch) < 6) 	 char_to_room( ch, real_room(200));
+    else if(ch->in_room >= 2)                 char_to_room( ch, ch->in_room );
     else if(GET_LEVEL(ch) >=  IMMORTAL)  char_to_room( ch, real_room(17) );
     else                                 char_to_room( ch, real_room(START_ROOM) );
 }
