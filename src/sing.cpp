@@ -37,6 +37,7 @@ extern "C"
 #include <innate.h> // SKILL_INNATE_EVASION
 #include <returnvals.h>
 extern CWorld world;
+extern index_data *mob_index;
  
 extern pulse_data *bard_list;
 
@@ -1913,25 +1914,34 @@ int execute_song_dischordant_dirge( byte level, CHAR_DATA *ch, char *arg, CHAR_D
       send_to_char("You cannot break their bonds of loyalty.\r\n", ch);
       return eFAILURE;
    }
-   if (number(0,1))
-   {
-        send_to_char("Ooops, that didn't work out like you hoped.\r\n",ch);
-	act("$N charges at $n, for trying to break its bond with its master.\r\n",ch, 0, target, TO_ROOM,NOTVICT);
-	act("$N charges at you!",ch,0,target,TO_CHAR,0);
-	return attack(target, ch, TYPE_UNDEFINED);
-   }
    if (!affected_by_spell(target, SPELL_CHARM_PERSON) && !IS_AFFECTED2(target, AFF_FAMILIAR))
    {
 	send_to_char("As far as you can tell, they are not loyal to anyone.\r\n",ch);
 	return eFAILURE;
    }
+   int type = 0;
+   if (mob_index[target->mobdata->nr].virt == 8) type = 4;
+   else if (IS_AFFECTED2(target, AFF_FAMILIAR)) type = 3;
+   else if (mob_index[target->mobdata->nr].virt >= 22394 &&
+		mob_index[target->mobdata->nr].virt <= 22398) type = 2;
+   else type = 1;
+   if ((type == 4 && !number(0,9)) || (type == 2 && !number(0,4)) ||
+       (type == 1 && !number(0,1)))
+   {
+        send_to_char("Ooops, that didn't work out like you hoped.\r\n",ch);
+        act("$N charges at $n, for trying to break its bond with its master.\r\n",ch, 0, target, TO_ROOM,NOTVICT);
+        act("$N charges at you!",ch,0,target,TO_CHAR,0);
+        return attack(target, ch, TYPE_UNDEFINED);
+   }
+
+
    int i;
-   for (i = 22394; i < 22399; i++)
+/*   for (i = 22394; i < 22399; i++)
      if (real_mobile(i) == target->mobdata->nr)
      {
 	send_to_char("The undead being is unaffected by your song.\r\n",ch);
 	return eFAILURE;
-     }
+     }*/
    skill_increase_check(ch, SKILL_SONG_DISCHORDANT_DIRGE, skill, SKILL_INCREASE_MEDIUM);
    if (IS_AFFECTED2(target, AFF_FAMILIAR))
    {
@@ -1939,6 +1949,16 @@ int execute_song_dischordant_dirge( byte level, CHAR_DATA *ch, char *arg, CHAR_D
      act("At your dirge's completion, $N vanishes.", ch, 0, target, TO_CHAR,0);
      extract_char(target, TRUE);
      return eSUCCESS;
+   }
+   if (type == 4)
+   {
+      act("$n shatters!", target, 0, 0, TO_ROOM, 0);
+      extract_char(target, FALSE);
+      return eSUCCESS;
+   } else if (type == 2) {
+        act("$n's mind is set free, and the body falls onto the ground", target, 0, 0, TO_ROOM, 0);
+	extract_char(target, TRUE);
+	return eSUCCESS;
    }
    affect_from_char(target, SPELL_CHARM_PERSON);
    send_to_char("You shatter their magical chains.\r\n",ch);

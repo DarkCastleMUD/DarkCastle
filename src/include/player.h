@@ -1,7 +1,7 @@
 #ifndef PLAYER_H_
 #define PLAYER_H_
 /************************************************************************
-| $Id: player.h,v 1.13 2004/05/18 00:17:46 urizen Exp $
+| $Id: player.h,v 1.14 2004/05/24 18:16:23 urizen Exp $
 | player.h
 | Description: This file defines the player vectors..punishment, specials,
 |   etc...
@@ -243,6 +243,7 @@ struct wis_app_type
 		      /* practice pr. level                 */
     sh_int energy_resistance;
     sh_int conc_bonus;
+    sh_int mana_gain;
 };
 
 // Constructor commented out for const.C initialization purposes
@@ -256,6 +257,7 @@ struct int_app_type
     sh_int learn_bonus;
     sh_int magic_resistance;
     sh_int conc_bonus;
+    sh_int mana_gain;
 };
 
 // Constructor commented out for const.C initialization purposes

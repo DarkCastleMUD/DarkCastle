@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.31 2004/05/21 17:20:39 urizen Exp $ */
+/* $Id: limits.cpp,v 1.32 2004/05/24 18:16:21 urizen Exp $ */
 
 extern "C"
 {
@@ -464,14 +464,14 @@ void advance_level(CHAR_DATA *ch, int is_conversion)
        return;
     }
 
-  /*  if ((GET_CLASS(ch) == CLASS_MAGIC_USER) ||
+  if ((GET_CLASS(ch) == CLASS_MAGIC_USER) ||
         (GET_CLASS(ch) == CLASS_RANGER) ||
         (GET_CLASS(ch) == CLASS_ANTI_PAL))
        add_mana +=  int_app[GET_INT(ch)].mana_gain;
     else if (GET_CLASS(ch) == CLASS_CLERIC || GET_CLASS(ch) == CLASS_DRUID || 
 	     GET_CLASS(ch) == CLASS_PALADIN)
        add_mana += wis_app[GET_WIS(ch)].mana_gain;
-*/
+
     add_hp += con_app[GET_CON(ch)].hp_gain;
     add_moves += dex_app[GET_DEX(ch)].move_gain;
     add_hp			 = MAX( 1, add_hp);
