@@ -11,7 +11,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.7 2002/07/31 19:12:30 pirahna Exp $ */
+/* $Id: nanny.cpp,v 1.8 2002/08/01 07:41:18 pirahna Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -738,7 +738,7 @@ void nanny(struct descriptor_data *d, char *arg)
             
          case '3':
             ch->race = RACE_DWARVEN;
-            ch->height = number(51, 60);
+            ch->height = number(42, 54);
             ch->weight = number(80, 110);
             GET_RAW_STR(ch) += RACE_DWARVEN_STR_MOD;
             GET_RAW_INT(ch) += RACE_DWARVEN_INT_MOD;
@@ -749,7 +749,7 @@ void nanny(struct descriptor_data *d, char *arg)
             
          case '4':
             ch->race = RACE_HOBBIT;
-            ch->height = number(36, 48);
+            ch->height = number(36, 41);
             ch->weight = number(50, 80);
             GET_RAW_STR(ch) += RACE_HOBBIT_STR_MOD;
             GET_RAW_INT(ch) += RACE_HOBBIT_INT_MOD;
@@ -782,7 +782,7 @@ void nanny(struct descriptor_data *d, char *arg)
 
          case '7':
             ch->race = RACE_GNOME;
-            ch->height = number(36, 48);
+            ch->height = number(42, 54);
             ch->weight = number(50, 70);
             GET_RAW_STR(ch) += RACE_GNOME_STR_MOD;
             GET_RAW_INT(ch) += RACE_GNOME_INT_MOD;
