@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: const.cpp,v 1.27 2002/08/08 01:02:11 pirahna Exp $ */
+/* $Id: const.cpp,v 1.28 2002/08/08 01:13:57 pirahna Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1213,7 +1213,7 @@ struct class_skill_defines c_skills[] = { // cleric skills
 {    "true sight",	SPELL_TRUE_SIGHT,	35,	90,	-2, "As his name suggests, this is a bright and wise person." },
 {    "group recall",	SPELL_GROUP_RECALL,	38,	90,	3021,	NULL },
 {    "group fly",	SPELL_GROUP_FLY,	39,	90,	-2, "It’s a bird! It’s an air traffic controller! No, but whatever it is, its elementary :)." },
-{    "resist cold",	SPELL_RESIST_COLD,	39,	90,	3021,	NULL },
+{    "resist cold",	SPELL_RESIST_COLD,	39,	90,	-2, "This cold worm lies beneath the surface of the earth in a very cold place." },
 {    "heal spray",	SPELL_HEAL_SPRAY,	40,	90,	3021,	NULL },
 {    "resist fire",	SPELL_RESIST_FIRE,	41,	90,	3021,	NULL },
 {    "water breathing",	SPELL_WATER_BREATHING,	45,	90,	3021,	NULL },
@@ -1253,7 +1253,7 @@ struct class_skill_defines m_skills[] = { // mage skills
 {    "haste",		SPELL_HASTE,		14,	90,	3020,	NULL },
 {    "sleep",		SPELL_SLEEP,		14,	90,	3020,	NULL },
 {    "fireball",	SPELL_FIREBALL,		20,	90,	3020,	NULL },
-{    "teleport",	SPELL_TELEPORT,		21,	90,	3020,	NULL },
+{    "teleport",	SPELL_TELEPORT,		21,	90,	-2, "A mage of much knowledge, he is wise in the ways of the world." },
 {    "dispel magic",	SPELL_DISPEL_MAGIC,	22,	90,	-2, "Find a mage at the junction of three dreams." },
 {    "dispel minor",	SPELL_DISPEL_MINOR,	22,	90,	3020,	NULL },
 {    "mass invisibility", SPELL_MASS_INVISIBILITY,	24,	90,	3020,	NULL },
@@ -1263,8 +1263,8 @@ struct class_skill_defines m_skills[] = { // mage skills
 {    "stone skin",	SPELL_STONE_SKIN,	32,	90,	-2, "A woman strong in battle surrounded by heavy magical influences calls to you." },
 {    "group fly",	SPELL_GROUP_FLY,	34,	90, -2,	"It’s a bird! It’s an air traffic controller! No, but whatever it is, its elementary :)." },
 {    "life leech",	SPELL_LIFE_LEECH,	34,	90,	-2, "A statue with a cold heart could help you.  She is quite an artefact."},
-{    "portal",		SPELL_PORTAL,		35,	90,	3020,	NULL },
-{    "resist cold",	SPELL_RESIST_COLD,	36,	90,	3020,	NULL },
+{    "portal",		SPELL_PORTAL,		35,	90,	-2, "A mage of much knowledge, he is wise in the ways of the world." },
+{    "resist cold",	SPELL_RESIST_COLD,	36,	90,	-2, "This cold worm lies beneath the surface of the earth in a very cold place."},
 {    "true sight",	SPELL_TRUE_SIGHT,	37,	90,	-2, "As his name suggests, this is a bright and wise person." },
 {    "resist fire",	SPELL_RESIST_FIRE,	39,	90,	3020,	NULL },
 {    "firestorm",	SPELL_FIRESTORM,	40,	90,	3020,	NULL },
