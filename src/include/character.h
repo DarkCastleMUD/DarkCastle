@@ -1,7 +1,7 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.17 2004/04/25 21:19:56 urizen Exp $
+| $Id: character.h,v 1.18 2004/05/07 23:18:02 urizen Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
@@ -116,8 +116,6 @@ struct class_skill_defines
     int16  skillnum;          // ID # of skill
     int16  levelavailable;    // what level class can get it
     int16  maximum;           // maximum value PC can train it to (1-100)
-    int32  trainer;           // what mob trains them (only one currently) 0 = any
-    char * clue;              // what mob will say if he can't train them
     int attrs[2];		      // What attributes the skill is based on
 };
 

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.45 2004/05/07 22:55:05 urizen Exp $
+| $Id: guild.cpp,v 1.46 2004/05/07 23:18:00 urizen Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -236,9 +236,10 @@ int skills_guild(struct char_data *ch, char *arg, struct char_data *owner)
   known = has_skill(ch, x);
 
   // we can only train them if they already know it, or if we're the trainer for that skill
-  if(!known && skilllist[skillnumber].trainer && 
+/*  if(!known && skilllist[skillnumber].trainer && 
     ( !IS_MOB(owner) || (skilllist[skillnumber].trainer != mob_index[owner->mobdata->nr].virt)
-    )) 
+    )) */
+  if (!known)
   {
    if (default_master[GET_CLASS(ch)] != mob_index[owner->mobdata->nr].virt) {
 	do_say(owner, "I'm sorry, I can't teach you that.  You'll have to find another trainer.",9);
