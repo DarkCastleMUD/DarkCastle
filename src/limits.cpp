@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.39 2004/05/27 21:29:29 urizen Exp $ */
+/* $Id: limits.cpp,v 1.40 2004/05/27 22:05:36 urizen Exp $ */
 
 extern "C"
 {
@@ -144,7 +144,7 @@ const int mana_regens[] = {
 /* manapoint gain pr. game hour */
 int mana_gain(CHAR_DATA *ch)
 {
-  int gain;
+  int gain = 0;
   int divisor = 1;
   int modifier;
   
@@ -154,12 +154,11 @@ int mana_gain(CHAR_DATA *ch)
 //    gain = graf(age(ch).year, 2,3,4,6,7,8,9);
 
     gain = (int)(ch->max_mana * (float)mana_regens[GET_CLASS(ch)] / 100);
-
     switch (GET_POS(ch)) {
       case POSITION_SLEEPING: divisor = 1; break;
       case POSITION_RESTING:  divisor = 2; break;
       case POSITION_SITTING:  divisor = 2; break;
-      default:                divisor = 4; break;
+      default:                divisor = 3; break;
     }
 
     if(GET_CLASS(ch) == CLASS_MAGIC_USER ||
@@ -211,7 +210,7 @@ int hit_gain(CHAR_DATA *ch)
       case POSITION_SLEEPING: divisor = 1; break;
       case POSITION_RESTING:  divisor = 2; break;
       case POSITION_SITTING:  divisor = 2; break;
-      default:                divisor = 4; break;
+      default:                divisor = 3; break;
     }
     if(gain < 1) 
       gain = 1;
