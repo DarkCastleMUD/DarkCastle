@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.44 2004/04/22 16:28:58 urizen Exp $ */
+/* $Id: mob_proc.cpp,v 1.45 2004/04/22 16:40:03 urizen Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -2206,6 +2206,8 @@ int guild_guard(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     {
 	case 3017:
 	  dir = 1; clas = CLASS_MAGIC_USER; break;
+	case 3070:
+	  dir = 1; clas = CLASS_THIEF; break;
 	case 3004:
 	  dir = 1; clas = CLASS_CLERIC; break;
 	case 9921:
