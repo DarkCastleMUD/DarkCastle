@@ -1191,7 +1191,7 @@ char *mprog_process_if( char *ifchck, char *com_list, CHAR_DATA *mob,
 
  /* check for trueness of the ifcheck */
  if ( ( legal = mprog_do_ifchck( ifchck, mob, actor, obj, vo, rndm ) ) )
-   if ( legal == 1 )
+   if ( legal >= 1 )
      flag = TRUE;
    else
      return null;
