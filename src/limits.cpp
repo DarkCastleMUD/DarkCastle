@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.44 2004/05/30 18:59:04 urizen Exp $ */
+/* $Id: limits.cpp,v 1.45 2004/05/31 16:02:45 urizen Exp $ */
 
 extern "C"
 {
@@ -532,21 +532,21 @@ void advance_level(CHAR_DATA *ch, int is_conversion)
 void gain_exp( CHAR_DATA *ch, int gain )
 {
   int x = 0;
-  long y;
+  int64 y;
 
   if(!IS_NPC(ch) && GET_LEVEL(ch) >= IMMORTAL)  
     return;
 
   y = exp_table[GET_LEVEL(ch)+1];  
 
-  if(GET_EXP(ch) >= (int32)y)
+  if(GET_EXP(ch) >= y)
     x = 1; 
 
-  if(GET_EXP(ch) > 2000000000)
+/*  if(GET_EXP(ch) > 2000000000)
   {
     send_to_char("You have hit the 2 billion xp cap.  Convert or meta chode.\r\n", ch);
     return;
-  }
+  }*/
   GET_EXP(ch) += gain;
   if( GET_EXP(ch) < 0 )
     GET_EXP(ch) = 0;
@@ -562,7 +562,7 @@ void gain_exp( CHAR_DATA *ch, int gain )
   if(IS_NPC(ch))
     return;
 
-  if(!x && GET_EXP(ch) >= (int32)y)
+  if(!x && GET_EXP(ch) >= y)
      send_to_char("You now have enough experience to level!\n\r", ch);
 
   return;
@@ -571,7 +571,7 @@ void gain_exp( CHAR_DATA *ch, int gain )
 
 void gain_exp_regardless( CHAR_DATA *ch, int gain )
 {
-  GET_EXP(ch) += gain;
+  GET_EXP(ch) += (int64)gain;
 
   if(GET_EXP(ch) < 0)
     GET_EXP(ch) = 0;

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.67 2004/05/30 18:59:04 urizen Exp $
+| $Id: guild.cpp,v 1.68 2004/05/31 16:02:45 urizen Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -342,7 +342,7 @@ int skills_guild(struct char_data *ch, char *arg, struct char_data *owner)
 int guild(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,        
           struct char_data *owner)
 {
-  long exp_needed;
+  int64 exp_needed;
   int x = 0;
 
   if(cmd == 171 && !IS_MOB(ch)) {         /*   gain crap...  */
@@ -356,8 +356,8 @@ int guild(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 
     exp_needed = exp_table[(int)GET_LEVEL(ch) + 1];
 
-    if(exp_needed > (long)GET_EXP(ch)) {
-      x = (int)(exp_needed - (long)GET_EXP(ch));
+    if(exp_needed > GET_EXP(ch)) {
+      x = (int)(exp_needed - GET_EXP(ch));
 
       csendf(ch, "You need %d experience to level.\n\r", x);
       return eSUCCESS;

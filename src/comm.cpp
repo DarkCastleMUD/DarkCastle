@@ -1248,11 +1248,11 @@ void generate_prompt(CHAR_DATA *ch, char *prompt)
          sprintf(pro, "%d", (int) (100*((float)GET_KI(ch)/(float)GET_MAX_KI(ch))));
          break;
        case 'x':
-         sprintf(pro, "%d", GET_EXP(ch));
+         sprintf(pro, "%lld", GET_EXP(ch));
          break;
        case 'X':
-         sprintf(pro, "%d", (int32)(exp_table[(int)GET_LEVEL(ch) + 1] -
-                                  (long)GET_EXP(ch)));
+         sprintf(pro, "%lld", (int64)(exp_table[(int)GET_LEVEL(ch) + 1] -
+                                  (int64)GET_EXP(ch)));
          break;
        case '%':
          sprintf(pro, "%%");

@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.211 2004/05/30 22:47:09 urizen Exp $ */
+/* $Id: fight.cpp,v 1.212 2004/05/31 16:02:45 urizen Exp $ */
 
 extern "C"
 {
@@ -3155,7 +3155,7 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
     if (ch)
        penalty += GET_LEVEL(ch) * .05;
     penalty = MIN(penalty, 2);
-    GET_EXP(victim) = (int) (GET_EXP(victim) / penalty);
+    GET_EXP(victim) = (int64) (GET_EXP(victim) / penalty);
   } // !IS_NPC
 }
 
@@ -3165,7 +3165,7 @@ void group_gain(CHAR_DATA * ch, CHAR_DATA * victim)
 {
   char buf[256];
   long no_members = 0, total_levels = 0, share;
-  long base_xp = 0, bonus_xp = 0;
+  int64 base_xp = 0, bonus_xp = 0;
   CHAR_DATA *leader, *highest, *tmp_ch;
   struct follow_type *f;
   
@@ -3216,7 +3216,7 @@ void group_gain(CHAR_DATA * ch, CHAR_DATA * victim)
     /* calculate this character's share of the XP */
     else {share = scale_char_xp(tmp_ch, ch, victim, no_members, total_levels, GET_LEVEL(highest), base_xp, &bonus_xp); }
     
-    sprintf(buf, "You receive %ld exps of %ld total.\n\r", share, base_xp + bonus_xp);
+    sprintf(buf, "You receive %ld exps of %lld total.\n\r", share, base_xp + bonus_xp);
     send_to_char(buf, tmp_ch);
     gain_exp(tmp_ch, share);
     change_alignment(tmp_ch, victim);

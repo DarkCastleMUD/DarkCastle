@@ -1,7 +1,7 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.22 2004/05/31 11:57:18 urizen Exp $
+| $Id: character.h,v 1.23 2004/05/31 16:02:47 urizen Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
@@ -263,7 +263,8 @@ struct char_data
     int16 hometown;      /* PC/NPC home town */
     uint32 gold;           /* Money carried                           */
     uint32 plat;           /* Platinum                                */
-     int32 exp;            /* The experience of the player            */
+     int64 exp;            /* The experience of the player            */
+			/* Cahnged toa long long */
      int32 in_room;
 
     uint32 immune;         // Bitvector of damage types I'm immune to
@@ -380,7 +381,7 @@ struct char_file_u
     int16 hometown;
     uint32 gold;
     uint32 plat;
-    int32 exp;
+    int64 exp;
     uint32 immune;
     uint32 resist;
     uint32 suscept;

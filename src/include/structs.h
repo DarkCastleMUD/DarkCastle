@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: structs.h,v 1.4 2002/06/29 18:16:22 pirahna Exp $
+| $Id: structs.h,v 1.5 2004/05/31 16:02:47 urizen Exp $
 | structs.h
 | Description:  This file should go away someday - it's stuff that I
 |   wasn't sure how to break up.  --Morc XXX
@@ -26,8 +26,8 @@ typedef unsigned int            uint32;
 
 // Can't use these unfortunatly because long longs just don't work right
 // for some reason.
-//typedef signed long long         int64;
-//typedef unsigned long long      uint64;
+typedef signed long long         int64;
+typedef unsigned long long      uint64;
 
 // Try to avoid using these 3.  Here until we can phase them out
 // TODO - phase these out

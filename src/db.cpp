@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.67 2004/05/31 11:57:13 urizen Exp $ */
+/* $Id: db.cpp,v 1.68 2004/05/31 16:02:45 urizen Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -2380,7 +2380,7 @@ CHAR_DATA *read_mobile(int nr, FILE *fl)
     
         mob->gold = fread_int (fl, 0, LONG_MAX);
         mob->plat = 0;
-        GET_EXP(mob)     = fread_int (fl, LONG_MIN, LONG_MAX);
+        GET_EXP(mob)     = (int64)fread_int (fl, LONG_MIN, LONG_MAX);
     
         mob->position    = fread_int (fl, 0, 10);
         mob->mobdata->default_pos = fread_int (fl, 0, 10);
@@ -2505,7 +2505,7 @@ void write_mobile(char_data * mob, FILE *fl)
 
     fprintf(fl, "%d %d %d R %d\n"
             "%d %d %d %dd%d+%d %dd%d+%d\n"
-            "%d %d\n"
+            "%d %lld\n"
             "%d %d %d %d %d %d\n",
                          mob->mobdata->actflags,
                          mob->affected_by,

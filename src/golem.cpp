@@ -317,10 +317,10 @@ int do_golem_score(struct char_data *ch, char *argument, int cmd)
    extern char *apply_types[];
    extern char *pc_clss_types[];
 
-   int exp_needed;
+   int64 exp_needed;
 
    sprintf(race, "%s", race_info[(int)GET_RACE(ch)].singular_name);
-   exp_needed = (int)(exp_table[(int)GET_LEVEL(ch) + 19] - (long)GET_EXP(ch));
+   exp_needed = (int)(exp_table[(int)GET_LEVEL(ch) + 19] - (int64)GET_EXP(ch));
 
    to_hit = GET_REAL_HITROLL(ch);
    to_dam = GET_REAL_DAMROLL(ch);
@@ -354,8 +354,8 @@ int do_golem_score(struct char_data *ch, char *argument, int cmd)
       "|/|  $2Combat Statistics...$7           |\\|   $2Equipment and Valuables$7          |o|\n\r"
       "|o|   $3Armor$7:   %5d $3Pkills$7:  %5d |~|    $3Items Carried$7:  %-3d/(%-3d)       |/|\n\r"
       "|\\|   $3RDeaths$7: %5d $3PDeaths$7: %5d |/|    $3Weight Carried$7: %-3d/(%-4d)      |~|\n\r"
-      "|~|   $3BonusHit$7: %+4d $3BonusDam$7: %+4d |o|    $3Experience$7:     %-10d      |\\|\n\r"
-      "|/|   $B$4FIRE$R[%+3d] $BCOLD$R[%+3d] $B$5NRGY$R[%+3d] |\\|    $3ExpTillLevel$7:   %-10d      |o|\n\r"
+      "|~|   $3BonusHit$7: %+4d $3BonusDam$7: %+4d |o|    $3Experience$7:     %-10lld      |\\|\n\r"
+      "|/|   $B$4FIRE$R[%+3d] $BCOLD$R[%+3d] $B$5NRGY$R[%+3d] |\\|    $3ExpTillLevel$7:   %-10lld      |o|\n\r"
       "|o|   $B$2ACID$R[%+3d] $B$3MAGK$R[%+3d] $2POIS$7[%+3d] |~|    $3Gold$7: %-9d $3Platinum$7: %-5d |/|\n\r"
       "($5:$7)=================================($5:$7)====================================($5:$7)\n\r",
    GET_ARMOR(ch),         0,   IS_CARRYING_N(ch), CAN_CARRY_N(ch),
