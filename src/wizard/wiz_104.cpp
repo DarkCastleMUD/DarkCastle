@@ -1039,6 +1039,7 @@ char_data *)(mob_index[nr].item))->level,
     char arg1[MAX_STRING_LENGTH];
     int affect = 0, size =0, extra = 0, more = 0, wear = 0,type =0;
     int levlow = -555, levhigh = -555,dam = 0,lweight = -555, hweight = -555;
+    bool any = FALSE;
     extern char *wear_bits[];
     extern char *extra_bits[];
     extern char *more_obj_bits[];
@@ -1076,6 +1077,9 @@ char_data *)(mob_index[nr].item))->level,
        for (i = 0; *extra_bits[i] != '\n' ; i++)
         if (!str_cmp(str_nospace(extra_bits[i]),arg1))
         {
+	if (!str_cmp(extra_bits[i], "ANY_CLASS"))
+	  any = TRUE;
+	else
           SET_BIT(extra, 1<<i);
           goto endy;
         }
@@ -1257,9 +1261,10 @@ its = get_weapon_damage_type(((struct obj_data *)(obj_index[nr].item)));
   	  continue;
       if(extra)
         for (i = 0; i < 30; i++)
-	  if (IS_SET(extra,1<<i))
-      if (!IS_SET(((struct obj_data *)(obj_index[nr].item))->obj_flags.extra_flags, 1<<i))
+	  if (IS_SET(extra,1<<i) || (any && !str_cmp(extra_bits[i], "ANY_CLASS")))
+      if (!IS_SET(((struct obj_data *)(obj_index[nr].item))->obj_flags.extra_flags, 1<<i) )
 	goto endLoop;
+	
       if (more)
 	for (i = 0; i < 10; i++)
 	  if (IS_SET(more,1<<i))
