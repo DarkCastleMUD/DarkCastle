@@ -324,9 +324,6 @@ int goldenbatleth(CHAR_DATA *ch, struct obj_data *obj,  int cmd, char *arg,
    if(GET_HIT(vict) > 40)
      return eFAILURE;
 
-   if(number(0, 1))
-     return eFAILURE;
-
    switch(number(0, 1)) {
      case 0:
        act("$n's blow rips your leg from your body.  Extreme pain is your to know until you hit the ground mercifully dead.", ch, 0, vict, TO_VICT, 0);
