@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.10 2002/08/01 17:31:19 pirahna Exp $
+| $Id: move.cpp,v 1.11 2002/08/01 17:56:39 pirahna Exp $
 | move.C
 | Movement commands and stuff.
 */
@@ -602,7 +602,9 @@ int attempt_move(CHAR_DATA *ch, int cmd, int is_retreat = 0)
            strcpy(tmp, "You follow someone.\n\r\n\r");
          send_to_char(tmp, k->follower); 
          //do_move(k->follower, "", cmd + 1);
-         command_interpreter(k->follower, dirs[cmd]);
+         char tempcommand[32];
+         strcpy(tempcommand, dirs[cmd]);
+         command_interpreter(k->follower, tempcommand);
        }
     } 
 
