@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.82 2003/07/08 01:38:36 pirahna Exp $ */
+/* $Id: magic.cpp,v 1.83 2003/07/19 23:17:05 pirahna Exp $ */
 
 extern "C"
 {
@@ -2478,6 +2478,8 @@ int spell_sleep(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
 	 return retval;
   }
 
+  if(IS_MOB(victim) || number(1, 4) == 1)
+ {
   if(saves_spell(ch, victim, -10, SAVE_TYPE_MAGIC) < 0)
   {
 	af.type      = SPELL_SLEEP;
@@ -2496,6 +2498,9 @@ int spell_sleep(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
 	}
 	return eSUCCESS;
   }
+  else
+	 act("$N does not look sleepy!", ch, NULL, victim, TO_CHAR, 0);
+ }
   else
 	 act("$N does not look sleepy!", ch, NULL, victim, TO_CHAR, 0);
 
@@ -5053,6 +5058,9 @@ int cast_power_harm( byte level, CHAR_DATA *ch, char *arg, int type,
   case SPELL_TYPE_POTION:
     return spell_power_harm(level, ch, ch, 0, skill);
     break;
+  case SPELL_TYPE_WAND:
+    return spell_power_harm(level, ch, victim, 0, skill);
+    break;
   case SPELL_TYPE_STAFF:
     for (victim = world[ch->in_room].people ; victim ; victim = next_v )
     {
@@ -5559,6 +5567,9 @@ int cast_cure_light( byte level, CHAR_DATA *ch, char *arg, int type,
   case SPELL_TYPE_SPELL:
 	 return spell_cure_light(level,ch,tar_ch,0, skill);
 	 break;
+  case SPELL_TYPE_WAND:
+    return spell_cure_light(level, ch, tar_ch, 0, skill);
+    break;
   case SPELL_TYPE_POTION:
 	 return spell_cure_light(level,ch,ch,0, skill);
 	 break;
@@ -6176,27 +6187,28 @@ int cast_protection_from_evil( byte level, CHAR_DATA *ch, char *arg, int type,
   CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill )
 {
   switch (type) {
-	 case SPELL_TYPE_SPELL:
-		 return spell_protection_from_evil(level, ch, tar_ch, 0, skill);
-		 break;
-	 case SPELL_TYPE_POTION:
-	 return spell_protection_from_evil(level, ch, ch, 0, skill);
-	 break;
-	 case SPELL_TYPE_SCROLL:
-	 if(tar_obj) return eFAILURE;
-	 if(!tar_ch) tar_ch = ch;
-		 return spell_protection_from_evil(level, ch, tar_ch, 0, skill);
-		 break;
-	 case SPELL_TYPE_STAFF:
-	 for (tar_ch = world[ch->in_room].people ;
-			tar_ch ; tar_ch = tar_ch->next_in_room)
-
-		  spell_protection_from_evil(level,ch,tar_ch,0, skill);
-	 break;
-	 default :
-	 log("Serious screw-up in protection from evil!", ANGEL, LOG_BUG);
-	 break;
-	 }
+    case SPELL_TYPE_SPELL:
+      return spell_protection_from_evil(level, ch, tar_ch, 0, skill);
+      break;
+    case SPELL_TYPE_POTION:
+      return spell_protection_from_evil(level, ch, ch, 0, skill);
+      break;
+    case SPELL_TYPE_WAND:
+      if(tar_obj) return eFAILURE;
+      return spell_protection_from_evil(level, ch, tar_ch, 0, skill);
+    case SPELL_TYPE_SCROLL:
+      if(tar_obj) return eFAILURE;
+      if(!tar_ch) tar_ch = ch;
+        return spell_protection_from_evil(level, ch, tar_ch, 0, skill);
+      break;
+    case SPELL_TYPE_STAFF:
+      for (tar_ch = world[ch->in_room].people; tar_ch ; tar_ch = tar_ch->next_in_room)
+        spell_protection_from_evil(level,ch,tar_ch,0, skill);
+      break;
+    default :
+      log("Serious screw-up in protection from evil!", ANGEL, LOG_BUG);
+      break;
+  }
   return eFAILURE;
 }
 
@@ -7195,10 +7207,13 @@ int cast_shield( byte level, CHAR_DATA *ch, char *arg,
 	 return spell_shield(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_SCROLL:
-    if (tar_obj) return eFAILURE;
+	 if (tar_obj) return eFAILURE;
 	 if (!tar_ch) tar_ch = ch;
 	 return spell_shield(level, ch, tar_ch, 0, skill);
 	 break;
+  case SPELL_TYPE_POTION:
+    return spell_shield(level, ch, ch, 0, skill);
+    break;
   case SPELL_TYPE_WAND:
 	 if (tar_obj) return eFAILURE;
 	 if (!tar_ch) tar_ch = ch;

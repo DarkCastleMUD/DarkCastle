@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.123 2003/07/08 03:15:27 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.124 2003/07/19 23:17:04 pirahna Exp $ */
 
 extern "C"
 {
@@ -2755,7 +2755,9 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
   mprog_death_trigger(victim, ch);
   GET_POS(victim) = POSITION_DEAD;  
   
-  if(GET_RACE(victim) == RACE_UNDEAD)
+  if(GET_RACE(victim) == RACE_UNDEAD ||
+     GET_RACE(victim) == RACE_GHOST
+    )
     make_dust(victim);
   else make_corpse(victim);
   

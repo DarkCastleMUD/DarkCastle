@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.37 2003/06/22 23:37:48 pirahna Exp $ */
+/* $Id: mob_proc.cpp,v 1.38 2003/07/19 23:17:05 pirahna Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -2959,7 +2959,8 @@ static char *dethSayText [ ] =
   "How is it one careless match can start a forest fire, but it takes a whole box to start a campfire?",
   "Marriage is like taking a hot bath. After you've been in for a while...it isn't so hot.",
   "If you're playing a poker game and you look around the table and can't tell who the sucker is, guess what....it's you!",
-  "Whenever I feel blue, I start breathing again."
+  "Whenever I feel blue, I start breathing again.",
+  "Is it because light travels faster than sound that some people appear bright until you hear them speak?"
 };
 
 #define DETH_SAY_TEXT_SIZE    ( sizeof ( dethSayText )    / sizeof ( char * ) )
