@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.66 2002/09/11 02:08:11 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.67 2002/09/14 20:08:23 pirahna Exp $ */
 
 extern "C"
 {
@@ -750,16 +750,22 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
   
   // BACKSTAB GOES IN HERE!
   if(type == SKILL_BACKSTAB) { 
-    if(IS_SET(ch->combat, COMBAT_CIRCLE)) { 
-      dam *= ((backstab_mult[(int)GET_LEVEL(ch)]) / 2);
+    if(IS_SET(ch->combat, COMBAT_CIRCLE)) {
+      if(GET_LEVEL(ch) <= MORTAL)
+         dam *= ((backstab_mult[(int)GET_LEVEL(ch)]) / 2);
+      else dam *= 20;
       REMOVE_BIT(ch->combat, COMBAT_CIRCLE);
     }
     else if((GET_CLASS(ch) == CLASS_THIEF) ||
       (GET_CLASS(ch) == CLASS_ANTI_PAL) || IS_NPC(ch)) 
     {
-      if(GET_CLASS(ch) == CLASS_ANTI_PAL)
-        dam *= (backstab_mult[(int)GET_LEVEL(ch)]+1);
-      else dam *= backstab_mult[(int)GET_LEVEL(ch)];
+      if(GET_LEVEL(ch) <= MORTAL)
+      {
+         if(GET_CLASS(ch) == CLASS_ANTI_PAL)
+           dam *= (backstab_mult[(int)GET_LEVEL(ch)]+1);
+         else dam *= backstab_mult[(int)GET_LEVEL(ch)];
+      }
+      else dam *= 20;
     }
   }
   
