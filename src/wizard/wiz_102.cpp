@@ -972,7 +972,7 @@ int do_sedit(struct char_data *ch, char *argument, int cmd)
   sh_int learned;
   int i;
 
-  void learn_skill(char_data * ch, int skill, int amount, int maximum);
+  int learn_skill(char_data * ch, int skill, int amount, int maximum);
 
   char * sedit_values[] = {
     "add", 

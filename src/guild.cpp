@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.10 2002/08/01 21:03:04 pirahna Exp $
+| $Id: guild.cpp,v 1.11 2002/08/02 05:54:58 pirahna Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -72,7 +72,9 @@ char *how_good(int percent)
   return (" (Masterful)");
 }
 	
-void learn_skill(char_data * ch, int skill, int amount, int maximum)
+// return a 1 if I just learned skill for first time
+// else 0
+int learn_skill(char_data * ch, int skill, int amount, int maximum)
 {
   struct char_skill_data * curr = ch->skills;
 
@@ -98,7 +100,9 @@ void learn_skill(char_data * ch, int skill, int amount, int maximum)
     curr->learned = amount;
     curr->next = ch->skills;
     ch->skills = curr;
+    return 1;
   }
+  return 0;
 }
 
 int search_skills(char * arg, class_skill_defines * list_skills)

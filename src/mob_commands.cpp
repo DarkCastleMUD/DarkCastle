@@ -883,7 +883,7 @@ int do_mpteachskill( CHAR_DATA *ch, char *argument, int cmd )
     char arg[ MAX_INPUT_LENGTH ];
     char skill[ MAX_INPUT_LENGTH ];
 
-    void learn_skill(char_data * ch, int skill, int amount, int maximum);
+    int learn_skill(char_data * ch, int skill, int amount, int maximum);
 
     if ( !IS_NPC( ch ) )
     {
@@ -924,15 +924,15 @@ int do_mpteachskill( CHAR_DATA *ch, char *argument, int cmd )
        return eFAILURE|eINTERNAL_ERROR;
     }
 
-    learn_skill(victim, skillnum, 1, 1);
+    if(learn_skill(victim, skillnum, 1, 1)) {
+    // TEMP until borodin is happy
+        sprintf(skill, "borodin I just taught %s the basics of %s.", GET_NAME(victim), skillname);
+        do_tell(ch, skill, 9);
+    }
 
     act("$n takes some time to teach $N a new thing or two.", ch, 0, victim, TO_ROOM, NOTVICT);
 
     send_to_char(skill, victim);
-
-// TEMP until borodin is happy
-    sprintf(skill, "borodin I just taught %s the basics of %s.", GET_NAME(victim), skillname);
-    do_tell(ch, skill, 9);
 
     return eSUCCESS;
 }

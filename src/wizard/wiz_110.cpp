@@ -33,7 +33,7 @@ int do_bestow(struct char_data *ch, char *arg, int cmd)
    char command[MAX_INPUT_LENGTH];
    int i;
    extern bestowable_god_commands_type bestowable_god_commands[];
-   void learn_skill(char_data * ch, int skill, int amount, int maximum);
+   int learn_skill(char_data * ch, int skill, int amount, int maximum);
 
    half_chop(arg, arg, command);
 
