@@ -841,7 +841,7 @@ obj_data *)(obj_index[nr].item))->obj_flags.eq_level,
 	{
 	   o++;
 	   send_to_char(action_bits[z],ch);
-	   if (o%7)
+	   if (o%7==0)
 	     send_to_char("\r\n",ch);
 	   else
 	     send_to_char(" ", ch);
@@ -850,7 +850,7 @@ obj_data *)(obj_index[nr].item))->obj_flags.eq_level,
 	{
 	   o++;
 	   send_to_char(isr_bits[z],ch);
-	   if (o%7)
+	   if (o%7==0)
 	     send_to_char("\r\n",ch);
 	   else
 	     send_to_char(" ", ch);
@@ -859,7 +859,7 @@ obj_data *)(obj_index[nr].item))->obj_flags.eq_level,
 	{
 	   o++;
 	   send_to_char(affected_bits[z],ch);
-	   if (o%7)
+	   if (o%7==0)
 	     send_to_char("\r\n",ch);
 	   else
 	     send_to_char(" ", ch);
@@ -868,7 +868,7 @@ obj_data *)(obj_index[nr].item))->obj_flags.eq_level,
 	{
 	   o++;
 	   send_to_char(pc_clss_types2[z],ch);
-	   if (o%7)
+	   if (o%7==0)
 	     send_to_char("\r\n",ch);
 	   else
 	     send_to_char(" ", ch);
@@ -876,12 +876,28 @@ obj_data *)(obj_index[nr].item))->obj_flags.eq_level,
       for (i = 0; i <= MAX_RACE; i++)
 	{
 	   o++;
-	   send_to_char(race_info[z].singular_name,ch);
-	   if (o%7)
+	   send_to_char(race_info[i].singular_name,ch);
+	   if (o%7==0)
 	     send_to_char("\r\n",ch);
 	   else
 	     send_to_char(" ", ch);
 	}
+           send_to_char("good",ch);
+           if (o%7==0)
+             send_to_char("\r\n",ch);
+           else
+             send_to_char(" ", ch);
+            send_to_char("evil",ch);
+           if (o%7==0)
+             send_to_char("\r\n",ch);
+           else
+             send_to_char(" ", ch);
+            send_to_char("neutral",ch);
+           if (o%7==0)
+             send_to_char("\r\n",ch);
+           else
+             send_to_char(" ", ch);
+ 
 	return eSUCCESS;
      }
      int c,nr;
@@ -997,11 +1013,6 @@ char_data *)(mob_index[nr].item))->level,
      int c,nr,aff;
 //     csendf(ch,"%d %d %d %d %d", more, extra, wear, size, affect);
      bool found = FALSE;
-if (!affect && !size && !extra && !more && !wear)
-{
-   send_to_char("No valid search supplied.\r\n",ch);
-   return eFAILURE;
-}
     int o = 0, z;
     if (!fo)
     {
@@ -1009,7 +1020,7 @@ if (!affect && !size && !extra && !more && !wear)
 	{
 	   o++;
 	   send_to_char(wear_bits[z],ch);
-	   if (o%7)
+	   if (o%7==0)
 	     send_to_char("\r\n",ch);
 	   else
 	     send_to_char(" ", ch);
@@ -1018,7 +1029,7 @@ if (!affect && !size && !extra && !more && !wear)
 	{
 	   o++;
 	   send_to_char(extra_bits[z],ch);
-	   if (o%7)
+	   if (o%7==0)
 	     send_to_char("\r\n",ch);
 	   else
 	     send_to_char(" ", ch);
@@ -1027,7 +1038,7 @@ if (!affect && !size && !extra && !more && !wear)
 	{
 	   o++;
 	   send_to_char(more_obj_bits[z],ch);
-	   if (o%7)
+	   if (o%7==0)
 	     send_to_char("\r\n",ch);
 	   else
 	     send_to_char(" ", ch);
@@ -1036,7 +1047,7 @@ if (!affect && !size && !extra && !more && !wear)
 	{
 	   o++;
 	   send_to_char(size_bitfields[z],ch);
-	   if (o%7)
+	   if (o%7==0)
 	     send_to_char("\r\n",ch);
 	   else
 	     send_to_char(" ", ch);
@@ -1045,7 +1056,7 @@ if (!affect && !size && !extra && !more && !wear)
 	{
 	   o++;
 	   send_to_char(apply_types[z],ch);
-	   if (o%7)
+	   if (o%7==0)
 	     send_to_char("\r\n",ch);
 	   else
 	     send_to_char(" ", ch);
