@@ -974,11 +974,6 @@ int do_sedit(struct char_data *ch, char *argument, int cmd)
 
   void learn_skill(char_data * ch, int skill, int amount, int maximum);
 
-  extern char * skills[];
-  extern char * spells[];
-  extern char * ki[];
-  extern char * songs[];
-
   char * sedit_values[] = {
     "add", 
     "remove", 
@@ -1026,9 +1021,7 @@ int do_sedit(struct char_data *ch, char *argument, int cmd)
       if(!(*text))
       {
         send_to_char("$3Usage$R: sedit <character> add <skillname>\r\n"
-                     "This will give the skill to the character at learning 1.\r\n"
-                     "$3Available skills$R:\r\n", ch);
-        display_string_list(skills, ch);
+                     "This will give the skill to the character at learning 1.\r\n", ch);
         return eFAILURE;
       }
 
@@ -1130,14 +1123,10 @@ int do_sedit(struct char_data *ch, char *argument, int cmd)
       send_to_char(buf, ch);
       for(skill = vict->skills; skill; skill = skill->next)
       {
-        if(skill->skillnum < MAX_SPL_LIST)
-          sprintf(buf, "  %-15s%d\r\n", spells[(skill->skillnum)-1], skill->learned);
-        else if(skill->skillnum <= MAX_KI_LIST+KI_OFFSET && skill->skillnum >= KI_OFFSET)
-          sprintf(buf, "  %-15s%d\r\n", ki[skill->skillnum - KI_OFFSET], skill->learned);
-        else if(skill->skillnum <= SKILL_MAX && skill->skillnum >= SKILL_BASE)
-          sprintf(buf, "  %-15s%d\r\n", skills[(skill->skillnum)-SKILL_BASE], skill->learned);
-        else if(skill->skillnum <= SKILL_SONG_MAX && skill->skillnum >= SKILL_SONG_BASE)
-          sprintf(buf, "  %-15s%d\r\n", songs[(skill->skillnum)-SKILL_SONG_BASE], skill->learned);
+        char * skillname = get_skill_name(skill->skillnum);
+
+        if(skillname)
+          sprintf(buf, "  %-15s%d\r\n", skillname, skill->learned);
         else continue;
 
         send_to_char(buf, ch);
@@ -2262,7 +2251,7 @@ int do_mpedit(struct char_data *ch, char *argument, int cmd)
      // list
       case 5:
         mpstat(ch, (char_data *) mob_index[mob_num].item);
-        break;
+        return eFAILURE;
     }
     set_zone_modified_mob(mob_num);
     return eSUCCESS;
