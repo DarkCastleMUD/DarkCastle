@@ -24,6 +24,7 @@ typedef int socket_t;
 #define PASSES_PER_SEC          4
 #define HOST_LENGTH             30
 
+#define PULSE_TIMER	(1 * PASSES_PER_SEC)
 #define PULSE_MOBILE    (4 * PASSES_PER_SEC)
 #define PULSE_OBJECT    (4 * PASSES_PER_SEC)
 #define PULSE_VIOLENCE  (2 * PASSES_PER_SEC)

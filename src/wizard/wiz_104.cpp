@@ -467,6 +467,22 @@ int show_zone_commands(struct char_data *ch, int i, int start = 0)
   return eSUCCESS;
 }
 
+char *str_nospace(char *stri)
+{
+  static char test[512]; // Why not
+  int i = 0;
+  while (*(stri+i))
+  {
+     if (*(stri+i) == ' ')
+       test[i] = '_';
+     else
+       test[i] = *(stri+i);
+     i++;
+  }
+  test[i] = '\0';
+  return test;
+}
+
 int do_show(struct char_data *ch, char *argument, int cmd)
 {
   char name[MAX_INPUT_LENGTH], buf[200];
@@ -788,25 +804,25 @@ obj_data *)(obj_index[nr].item))->obj_flags.eq_level,
           goto thisLoop;
         }
        for (i = 0; *isr_bits[i] != '\n' ; i++)
-        if (!str_cmp(isr_bits[i],arg1))
+        if (!str_cmp(str_nospace(isr_bits[i]),arg1))
         {
           SET_BIT(immune, 1<<i);
           goto thisLoop;
         }
        for (i = 0; *action_bits[i] != '\n' ; i++)
-        if (!str_cmp(action_bits[i],arg1))
+        if (!str_cmp(str_nospace(action_bits[i]),arg1))
         {
           SET_BIT(act, 1<<i);
           goto thisLoop;
         }
        for (i = 0; *affected_bits[i] != '\n' ; i++)
-        if (!str_cmp(affected_bits[i],arg1))
+        if (!str_cmp(str_nospace(affected_bits[i]),arg1))
         {
           SET_BIT(affect, 1<<i);
           goto thisLoop;
         }
        for (i = 0; i <= MAX_RACE; i++)
-        if (!str_cmp(race_info[i].singular_name,arg1))
+        if (!str_cmp(str_nospace(race_info[i].singular_name),arg1))
         {
           race = i;
           goto thisLoop;
@@ -840,7 +856,7 @@ obj_data *)(obj_index[nr].item))->obj_flags.eq_level,
 	for (z = 0; *action_bits[z] != '\n';z++)
 	{
 	   o++;
-	   send_to_char(action_bits[z],ch);
+	   send_to_char(str_nospace(action_bits[z]),ch);
 	   if (o%7==0)
 	     send_to_char("\r\n",ch);
 	   else
@@ -849,7 +865,7 @@ obj_data *)(obj_index[nr].item))->obj_flags.eq_level,
 	for (z = 0; *isr_bits[z] != '\n';z++)
 	{
 	   o++;
-	   send_to_char(isr_bits[z],ch);
+	   send_to_char(str_nospace(isr_bits[z]),ch);
 	   if (o%7==0)
 	     send_to_char("\r\n",ch);
 	   else
@@ -858,7 +874,7 @@ obj_data *)(obj_index[nr].item))->obj_flags.eq_level,
 	for (z = 0; *affected_bits[z] != '\n';z++)
 	{
 	   o++;
-	   send_to_char(affected_bits[z],ch);
+	   send_to_char(str_nospace(affected_bits[z]),ch);
 	   if (o%7==0)
 	     send_to_char("\r\n",ch);
 	   else
@@ -876,12 +892,18 @@ obj_data *)(obj_index[nr].item))->obj_flags.eq_level,
       for (i = 0; i <= MAX_RACE; i++)
 	{
 	   o++;
-	   send_to_char(race_info[i].singular_name,ch);
+	   send_to_char(str_nospace(race_info[i].singular_name),ch);
 	   if (o%7==0)
 	     send_to_char("\r\n",ch);
 	   else
 	     send_to_char(" ", ch);
 	}
+           send_to_char("level",ch);
+           if (o%7==0)
+             send_to_char("\r\n",ch);
+           else
+             send_to_char(" ", ch);
+
            send_to_char("good",ch);
            if (o%7==0)
              send_to_char("\r\n",ch);
@@ -921,6 +943,9 @@ obj_data *)(obj_index[nr].item))->obj_flags.eq_level,
 	else if (align == 3 && ((struct char_data *)(mob_index[nr].item))->alignment > -350)
 	continue;
       }
+      if (immune)
+	if (!IS_SET(((struct char_data *)(mob_index[nr].item))->immune, immune))
+	 continue;
       if (clas)
         if (((struct char_data *)(mob_index[nr].item))->c_class != clas)
           continue;
@@ -958,6 +983,7 @@ char_data *)(mob_index[nr].item))->level,
   {  // Object search.
     char arg1[MAX_STRING_LENGTH];
     int affect = 0, size = 0, extra = 0, more = 0, wear = 0,type =0;
+    int levlow = 0, levhigh = 0;
     extern char *wear_bits[];
     extern char *extra_bits[];
     extern char *more_obj_bits[];
@@ -971,43 +997,58 @@ char_data *)(mob_index[nr].item))->level,
        if (strlen(arg1) < 2) break;
 	fo = TRUE;
        for (i = 0; *wear_bits[i] != '\n' ; i++)
-	if (!str_cmp(wear_bits[i],arg1))
+	if (!str_cmp(str_nospace(wear_bits[i]),arg1))
 	{
 	  SET_BIT(wear, 1<<i);
 	  continue;
 	}
 	for (i=0; *item_types[i] != '\n';i++)
 	{
-	  if (!str_cmp(item_types[i],arg1))
+	  if (!str_cmp(str_nospace(item_types[i]),arg1))
 	  {
 	     type = i;
 	  }
 	}
        for (i = 0; *extra_bits[i] != '\n' ; i++)
-        if (!str_cmp(extra_bits[i],arg1))
+        if (!str_cmp(str_nospace(extra_bits[i]),arg1))
         {
           SET_BIT(extra, 1<<i);
           continue;
         }
        for (i = 0; *more_obj_bits[i] != '\n' ; i++)
-        if (!str_cmp(more_obj_bits[i],arg1))
+        if (!str_cmp(str_nospace(more_obj_bits[i]),arg1))
         {
           SET_BIT(more, 1<<i);
           continue;
         }
        for (i = 0; *size_bitfields[i] != '\n' ; i++)
-        if (!str_cmp(size_bitfields[i],arg1))
+        if (!str_cmp(str_nospace(size_bitfields[i]),arg1))
         {
           SET_BIT(size, 1<<i);
           continue;
         }
        for (i = 0; *apply_types[i] != '\n' ; i++)
-        if (!str_cmp(apply_types[i],arg1))
+        if (!str_cmp(str_nospace(apply_types[i]),arg1))
         {
   	    affect = i;
 //          SET_BIT(affect, 1<<i);
           continue;
         }
+        if (!str_cmp(arg1,"level"))
+        {
+          argument = one_argument(argument,arg1);
+          if (is_number(arg1))
+            levlow = atoi(arg1);
+          argument = one_argument(argument,arg1);
+          if (is_number(arg1))
+            levhigh = atoi(arg1);
+          if (!levhigh || !levlow)
+          {
+            send_to_char("Incorrect level requirement.\r\n",ch);
+            return eFAILURE;
+          }
+        }
+
 /*
        for (i = 0; *pc_clss_types[i] != '\n' ; i++)
         if (!str_cmp(pc_clss_types[i],arg1))
@@ -1027,7 +1068,7 @@ char_data *)(mob_index[nr].item))->level,
 	for (z = 0; *wear_bits[z] != '\n';z++)
 	{
 	   o++;
-	   send_to_char(wear_bits[z],ch);
+	   send_to_char(str_nospace(wear_bits[z]),ch);
 	   if (o%7==0)
 	     send_to_char("\r\n",ch);
 	   else
@@ -1036,7 +1077,7 @@ char_data *)(mob_index[nr].item))->level,
 	for (z = 0; *extra_bits[z] != '\n';z++)
 	{
 	   o++;
-	   send_to_char(extra_bits[z],ch);
+	   send_to_char(str_nospace(extra_bits[z]),ch);
 	   if (o%7==0)
 	     send_to_char("\r\n",ch);
 	   else
@@ -1045,7 +1086,7 @@ char_data *)(mob_index[nr].item))->level,
         for (z = 0; *more_obj_bits[z] != '\n';z++)
         {
            o++;
-           send_to_char(more_obj_bits[z],ch);
+           send_to_char(str_nospace(more_obj_bits[z]),ch);
            if (o%7==0)
              send_to_char("\r\n",ch);
            else
@@ -1054,7 +1095,7 @@ char_data *)(mob_index[nr].item))->level,
 	for (z = 0; *item_types[z] != '\n';z++)
 	{
 	   o++;
-	   send_to_char(item_types[z],ch);
+	   send_to_char(str_nospace(item_types[z]),ch);
 	   if (o%7==0)
 	     send_to_char("\r\n",ch);
 	   else
@@ -1063,7 +1104,7 @@ char_data *)(mob_index[nr].item))->level,
 	for (z = 0; *size_bitfields[z] != '\n';z++)
 	{
 	   o++;
-	   send_to_char(size_bitfields[z],ch);
+	   send_to_char(str_nospace(size_bitfields[z]),ch);
 	   if (o%7==0)
 	     send_to_char("\r\n",ch);
 	   else
@@ -1072,13 +1113,19 @@ char_data *)(mob_index[nr].item))->level,
 	for (z = 0; *apply_types[z] != '\n';z++)
 	{
 	   o++;
-	   send_to_char(apply_types[z],ch);
+	   send_to_char(str_nospace(apply_types[z]),ch);
 	   if (o%7==0)
 	     send_to_char("\r\n",ch);
 	   else
 	     send_to_char(" ", ch);
 	}
+           send_to_char("level",ch);
+           if (o%7==0)
+             send_to_char("\r\n",ch);
+           else
+             send_to_char(" ", ch);
 
+	return eSUCCESS;
     }
 
      for (c=0;c < obj_index[top_of_objt].virt;c++)
@@ -1094,6 +1141,12 @@ char_data *)(mob_index[nr].item))->level,
 	if (type)
 	  if (((struct obj_data *)(obj_index[nr].item))->obj_flags.type_flag != type)
 	    continue;
+     if (levhigh)
+      if (((struct obj_data *)(obj_index[nr].item))->obj_flags.eq_level > levhigh) 
+         continue;
+     if (levlow)
+      if (((struct obj_data *)(obj_index[nr].item))->obj_flags.eq_level < levlow) 
+         continue;
       if (size)
        for (i = 0; i < 10; i++)
 	if (IS_SET(size, 1<<i))

@@ -16,7 +16,7 @@
  *  10/21/2003   Onager    Changed IS_ANONYMOUS() to handle mobs without   *
  *                         crashing                                        *
  ***************************************************************************/
-/* $Id: utility.h,v 1.20 2004/04/13 19:32:24 urizen Exp $ */
+/* $Id: utility.h,v 1.21 2004/04/19 16:48:47 urizen Exp $ */
 
 #ifndef UTILITY_H_
 #define UTILITY_H_
@@ -34,6 +34,8 @@ extern "C" {
 
 extern struct weather_data weather_info;
 extern char log_buf[MAX_STRING_LENGTH];
+
+void check_timer();
 
 #define TRUE  1
 #define FALSE 0
@@ -59,6 +61,7 @@ char *index(char *buf, char op);
 #define SKILL_INCREASE_EASY           100
 #define SKILL_INCREASE_MEDIUM         200
 #define SKILL_INCREASE_HARD           300
+void check_timer();
 
 void skill_increase_check(char_data * ch, int skill, int learned, int difficulty);
 

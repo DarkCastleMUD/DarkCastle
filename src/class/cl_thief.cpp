@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.33 2003/12/28 20:24:03 pirahna Exp $
+| $Id: cl_thief.cpp,v 1.34 2004/04/19 16:48:43 urizen Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -562,7 +562,11 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
 
   argument = one_argument(argument, obj_name);
   one_argument(argument, victim_name);
-
+  if (ch->c_class != CLASS_THIEF)
+  {
+	send_to_char("You are not experienced within that field.\r\n",ch);
+	return eFAILURE;
+  }
   pthiefaf.type = FUCK_PTHIEF;
   pthiefaf.duration = 10;
   pthiefaf.modifier = 0;
@@ -777,6 +781,41 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
 
     if(obj) 
     { // They're wearing it!
+     int wakey = 100;
+       switch (eq_pos)
+	{
+	  case WEAR_FINGER_R:
+	  case WEAR_FINGER_L:
+	  case WEAR_NECK_1:
+	  case WEAR_NECK_2:
+	  case WEAR_EAR_L:
+	  case WEAR_EAR_R:
+	  case WEAR_WRIST_R:
+	  case WEAR_WRIST_L:
+	     wakey = 30;
+	     break;
+	  case WEAR_HANDS:
+	  case WEAR_FEET:
+	  case WEAR_WAISTE:
+	  case WEAR_HEAD:
+	  case WIELD:
+	  case SECOND_WIELD:
+	  case WEAR_LIGHT:
+	  case HOLD:
+	     wakey = 60;
+	     break;
+	  case WEAR_BODY:
+	  case WEAR_LEGS:
+	  case WEAR_ABOUT:
+	  case WEAR_FACE:
+	  case WEAR_ARMS:
+	    wakey = 90;
+	    break;
+	  default:
+	    send_to_char("Something just screwed up. Tell an imm what you did.\r\n",ch);
+	    return eFAILURE;	  
+	};
+	wakey -= GET_DEX(ch) /2;
       if(IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL)) 
       {
         send_to_char("That item is protected by the gods.\n\r", ch);
@@ -818,7 +857,7 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
               paf->modifier = 0; // make sleep no longer work
             }
             // if i'm not a thief, or if I fail dex-roll wake up victim
-            if(GET_CLASS(ch) != CLASS_THIEF || number(1, 100) > GET_DEX(ch))
+            if(number(1,101) > wakey)
             {
               send_to_char("Oops...\r\n", ch);
               do_wake(ch, GET_NAME(victim), 9);
