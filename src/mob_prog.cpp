@@ -1746,6 +1746,7 @@ int mprog_wordlist_check( char *arg, CHAR_DATA *mob, CHAR_DATA *actor,
   char        temp2[ MAX_INPUT_LENGTH ];
   char        word[ MAX_INPUT_LENGTH ];
   MPROG_DATA *mprg;
+  MPROG_DATA *next;
   char       *list;
   char       *start;
   char       *dupl;
@@ -1753,7 +1754,9 @@ int mprog_wordlist_check( char *arg, CHAR_DATA *mob, CHAR_DATA *actor,
   int         i;
   int         retval = 0;
 
-  for ( mprg = mob_index[mob->mobdata->nr].mobprogs; mprg != NULL; mprg = mprg->next )
+  for ( mprg = mob_index[mob->mobdata->nr].mobprogs; mprg != NULL; mprg = next )
+  {
+    next = mprg->next;
     if ( mprg->type & type )
       {
 	strcpy( temp1, mprg->arglist );
@@ -1808,7 +1811,9 @@ int mprog_wordlist_check( char *arg, CHAR_DATA *mob, CHAR_DATA *actor,
 		  dupl = start+1;
 	  }
       }
-
+     if (next == NULL)
+       next = mob_index[mob->mobdata->nr].mobspec;
+    }
   return retval;
 
 }
@@ -1817,8 +1822,10 @@ void mprog_percent_check( CHAR_DATA *mob, CHAR_DATA *actor, OBJ_DATA *obj,
 			 void *vo, int type)
 {
  MPROG_DATA * mprg;
-
- for ( mprg = mob_index[mob->mobdata->nr].mobprogs; mprg != NULL; mprg = mprg->next )
+ MPROG_DATA *next;
+ for ( mprg = mob_index[mob->mobdata->nr].mobprogs; mprg != NULL; mprg = next )
+ {
+  next = mprg->next;
    if ( ( mprg->type & type )
        && ( number(0, 99) < atoi( mprg->arglist ) ) )
      {
@@ -1826,7 +1833,8 @@ void mprog_percent_check( CHAR_DATA *mob, CHAR_DATA *actor, OBJ_DATA *obj,
        if ( type != GREET_PROG && type != ALL_GREET_PROG )
 	 break;
      }
-
+   if (!next) next = mob_index[mob->mobdata->nr].mobspec;
+ }
  return;
 
 }
@@ -1891,6 +1899,7 @@ int mprog_bribe_trigger( CHAR_DATA *mob, CHAR_DATA *ch, int amount )
 {
 
   MPROG_DATA *mprg;
+  MPROG_DATA *next;
   OBJ_DATA   *obj;
 
   if ( IS_NPC( mob )
@@ -1898,13 +1907,16 @@ int mprog_bribe_trigger( CHAR_DATA *mob, CHAR_DATA *ch, int amount )
     {
       mob->gold -= amount;
 
-      for ( mprg = mob_index[mob->mobdata->nr].mobprogs; mprg != NULL; mprg = mprg->next )
+      for ( mprg = mob_index[mob->mobdata->nr].mobprogs; mprg != NULL; mprg = next )
+	{
 	if ( ( mprg->type & BRIBE_PROG )
 	    && ( amount >= atoi( mprg->arglist ) ) )
 	  {
 	    mprog_driver( mprg->comlist, mob, ch, obj, NULL );
 	    break;
 	  }
+	   if (!next) next = mob_index[mob->mobdata->nr].mobspec;
+	}
     }
   
   return mprog_cur_result;
@@ -1963,11 +1975,12 @@ int mprog_give_trigger( CHAR_DATA *mob, CHAR_DATA *ch, OBJ_DATA *obj )
 
  char        buf[MAX_INPUT_LENGTH];
  MPROG_DATA *mprg;
-
+ MPROG_DATA *next;
  if ( IS_NPC( mob )
      && ( mob_index[mob->mobdata->nr].progtypes & GIVE_PROG ) )
-   for ( mprg = mob_index[mob->mobdata->nr].mobprogs; mprg != NULL; mprg = mprg->next )
+   for ( mprg = mob_index[mob->mobdata->nr].mobprogs; mprg != NULL; mprg = next )
      {
+	next = mprg->next;
        one_argument( mprg->arglist, buf );
        if ( ( mprg->type & GIVE_PROG )
 	   && ( ( !str_cmp( obj->name, mprg->arglist ) )
@@ -1976,6 +1989,7 @@ int mprog_give_trigger( CHAR_DATA *mob, CHAR_DATA *ch, OBJ_DATA *obj )
 	   mprog_driver( mprg->comlist, mob, ch, obj, NULL );
 	   break;
 	 }
+     if (!next) next = mob_index[mob->mobdata->nr].mobspec;
      }
 
  return mprog_cur_result;
@@ -2013,17 +2027,21 @@ int mprog_hitprcnt_trigger( CHAR_DATA *mob, CHAR_DATA *ch)
 {
 
  MPROG_DATA *mprg;
-
+ MPROG_DATA *next;
  if ( IS_NPC( mob )
      && ( mob_index[mob->mobdata->nr].progtypes & HITPRCNT_PROG ) )
-   for ( mprg = mob_index[mob->mobdata->nr].mobprogs; mprg != NULL; mprg = mprg->next )
+   for ( mprg = mob_index[mob->mobdata->nr].mobprogs; mprg != NULL; mprg = next )
+   {
+     next = mprg->next;
      if ( ( mprg->type & HITPRCNT_PROG )
 	 && ( ( 100*mob->hit / mob->max_hit ) < atoi( mprg->arglist ) ) )
        {
 	 mprog_driver( mprg->comlist, mob, ch, NULL, NULL );
 	 break;
        }
- 
+    if (!next) next = mob_index[mob->mobdata->nr].mobspec;
+ }
+
  return mprog_cur_result;
 
 }
@@ -2069,14 +2087,16 @@ int mprog_speech_trigger( char *txt, CHAR_DATA *mob )
 int mprog_catch_trigger(char_data * mob, int catch_num)
 {
  MPROG_DATA *mprg;
+ MPROG_DATA *next;
  int curr_catch;
 
  mprog_cur_result = eFAILURE;
 
  if ( IS_NPC( mob )
      && ( mob_index[mob->mobdata->nr].progtypes & CATCH_PROG ) )
-   for ( mprg = mob_index[mob->mobdata->nr].mobprogs; mprg != NULL; mprg = mprg->next )
+   for ( mprg = mob_index[mob->mobdata->nr].mobprogs; mprg != NULL; mprg = next )
      {
+	next = mprg->next;
        if ( mprg->type & CATCH_PROG )
        {
          if(!check_range_valid_and_convert(curr_catch, mprg->arglist, MPROG_CATCH_MIN, MPROG_CATCH_MAX)) {
@@ -2089,6 +2109,8 @@ int mprog_catch_trigger(char_data * mob, int catch_num)
            break;
          }
        }
+	if (!next) next = mob_index[mob->mobdata->nr].mobspec;
+
      }
 
  return mprog_cur_result;

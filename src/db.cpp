@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.66 2004/05/29 21:20:01 urizen Exp $ */
+/* $Id: db.cpp,v 1.67 2004/05/31 11:57:13 urizen Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -929,6 +929,7 @@ struct index_data *generate_mob_indices(int *top, struct index_data *index)
          index[i].non_combat_func = 0;
          index[i].combat_func = 0;
          index[i].mobprogs = NULL;
+	 index[i].mobspec = NULL;
          index[i].progtypes = 0;
          curr_virtno = index[i].virt;
          if(!(index[i].item = (CHAR_DATA *)read_mobile(i, fl))) {
@@ -955,6 +956,41 @@ struct index_data *generate_mob_indices(int *top, struct index_data *index)
   }
   *top = i - 2;
   dc_fclose(flMobIndex);
+  /*
+    Here the index gets processed, and mob classes gets
+	assigned. (Not done in read_mobile 'cause of
+	the fact that all mob saren't read yet,
+	and an attempt to assign non-existant mob
+	procs would be bad).
+  */
+  for (i = 0; i <= top_of_mobt; i++)
+  {
+    CHAR_DATA *a = (CHAR_DATA *)mob_index[i].item;
+    if (!a) continue;
+    if (!a->c_class) continue;
+    switch (a->c_class)
+    {
+	case CLASS_MAGIC_USER:
+	  if (a->level < 21)
+		mob_index[i].mobspec = mob_index[real_mobile(101)].mobprogs;
+	  else if (a->level < 35)
+		mob_index[i].mobspec = mob_index[real_mobile(102)].mobprogs;
+	  else if (a->level < 51)
+		mob_index[i].mobspec = mob_index[real_mobile(103)].mobprogs;
+	  else mob_index[i].mobspec = mob_index[real_mobile(104)].mobprogs;
+	  break;
+        case CLASS_CLERIC:
+          if (a->level < 21)
+                mob_index[i].mobspec = mob_index[real_mobile(105)].mobprogs;
+          else if (a->level < 35)
+                mob_index[i].mobspec = mob_index[real_mobile(106)].mobprogs;
+          else if (a->level < 51)
+                mob_index[i].mobspec = mob_index[real_mobile(107)].mobprogs;
+          else mob_index[i].mobspec = mob_index[real_mobile(108)].mobprogs;
+	  break;
+	default: break;
+    }
+  }
   return(index);
 }
 
@@ -2911,7 +2947,6 @@ int create_blank_mobile(int nr)
 #else
     mob->mobdata = (mob_data *) dc_alloc(1, sizeof(mob_data));
 #endif
-    mob->mobdata->mpspec = 0;
     mob->mobdata->actflags = 0;
     mob->mobdata->damnodice = 1;
     mob->mobdata->damsizedice = 1;
