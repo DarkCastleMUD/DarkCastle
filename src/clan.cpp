@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.22 2004/04/23 12:42:55 urizen Exp $ */
+/* $Id: clan.cpp,v 1.23 2004/04/23 12:46:55 urizen Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -2278,6 +2278,12 @@ int do_cwithdraw(CHAR_DATA *ch, char *arg, int cmd)
      send_to_char("You don't have the right to withdraw gold from your clan's account.\r\n",ch);
      return eFAILURE;
   }
+  if (world[ch->in_room].number != 3005)
+  {
+    send_to_char("This can only be done at the Sorpigal bank.\r\n",ch);
+    return eFAILURE;
+  }
+
   arg = one_argument(arg,arg1);
   if (!is_number(arg1))
   {
@@ -2304,6 +2310,11 @@ int do_cbalance(CHAR_DATA *ch, char *arg, int cmd)
   {
      send_to_char("You not a member of a clan.\r\n",ch);
      return eFAILURE;
+  }
+  if (world[ch->in_room].number != 3005)
+  {
+    send_to_char("This can only be done at the Sorpigal bank.\r\n",ch);
+    return eFAILURE;
   }
   csendf(ch, "Your clan has %d gold coins in the bank.\r\n",get_clan(ch)->balance);
   return eSUCCESS;
