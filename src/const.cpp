@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: const.cpp,v 1.34 2002/08/25 20:40:18 pirahna Exp $ */
+/* $Id: const.cpp,v 1.35 2002/08/26 22:29:16 pirahna Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -856,6 +856,7 @@ char *apply_types[] =
     "KI REGEN",
     "CREATE FOOD",
     "DAMAGED",
+    "THIEF_POISON",
     "\n"
 };
 

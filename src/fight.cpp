@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.56 2002/08/26 21:14:43 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.57 2002/08/26 22:29:16 pirahna Exp $ */
 
 extern "C"
 {
@@ -994,6 +994,7 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
   int32 hit_limit(CHAR_DATA * ch);
   int retval;
   int modifier = 0;
+  int percent;
   int learned;
   
   if(!weapon)
@@ -1101,11 +1102,11 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
       dam = (int)(dam * 1.3);
     if (IS_SET(ch->combat, COMBAT_HITALL))
       dam = (int)(dam * 2);
-    if(( ( ( ((float)GET_HIT(ch)) / ((float)GET_MAX_HIT(ch)) ) *100 ) < 40 )   
-                                                      // less than  40% hps
-         && (learned = has_skill(ch, SKILL_FRENZY))) 
+    percent = (int) (( ((float)GET_HIT(ch)) / ((float)GET_MAX_HIT(ch)) ) * 100);
+    csendf(ch, "You should be at %d percent.\r\n", percent);
+    if( percent < 40 && (learned = has_skill(ch, SKILL_FRENZY))) 
     {
-      if(70 > number(1, 101)) {
+      if(learned > number(1, 101)) {
         dam = (int)(dam * 1.2);
         SET_BIT(modifier, COMBAT_MOD_FRENZY);
       }
