@@ -2419,7 +2419,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd)
       "intelligence",
       "wisdom",
       "constitution",
-//      "new"
+      "new"
       "\n"
     };
    
@@ -3046,7 +3046,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd)
       // constitution
       case 29: {
          if(!*buf4) {
-          send_to_char("$3Syntax$R: medit [mob_num] constituion <con>\n\r"
+          send_to_char("$3Syntax$R: medit [mob_num] constitution <con>\n\r"
                        "$3Current$R: ", ch);
           sprintf(buf, "%d\n", ((char_data *)mob_index[mob_num].item)->raw_con);
           send_to_char(buf, ch);
@@ -3061,9 +3061,29 @@ int do_medit(struct char_data *ch, char *argument, int cmd)
         sprintf(buf, "Mob raw constituion set to %d.\r\n", intval);
         send_to_char(buf, ch);
       } break;
-        
+      // New
+      case 30: {  
+        if (!*buf4) {
+           send_to_char("$3Syntax$R: oedit new [number]\r\n", ch);
+           return eFAILURE;
+        }
+        if(!check_range_valid_and_convert(intval, buf4, 0, 35000)) {
+          send_to_char("Please specifiy a valid number.\r\n", ch);
+          return eFAILURE;
+        }
+        if (!has_skill(ch,COMMAND_RANGE))
+        {
+          send_to_char("You cannot create items.\r\n",ch);
+          return eFAILURE;
+        }
+        x = create_blank_mobile(intval);
+        if(x < 0) {
+          csendf(ch, "Could not create mobile '%d'.  Max index hit or mob already exists.\r\n",intval);
+          return eFAILURE;
+        }
+        csendf(ch, "Item '%d' created successfully.\r\n", intval);
+      } break;
     }
-
     set_zone_modified_mob(mob_num);
     return eSUCCESS;
 }

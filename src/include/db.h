@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: db.h,v 1.6 2003/12/28 19:09:58 pirahna Exp $ */
+/* $Id: db.h,v 1.7 2004/04/16 11:55:33 urizen Exp $ */
 #ifndef DB_H_
 #define DB_H_
 
@@ -96,6 +96,7 @@ void free_char(CHAR_DATA *ch);
 int  real_room(int virt);
 char *fread_string(FILE *fl, int hasher);
 int create_blank_item(int nr);
+int create_blank_mobile(int nr);
 void delete_item_from_index(int nr);
 int  real_object(int virt);
 int  real_mobile(int virt);
