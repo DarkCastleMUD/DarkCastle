@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.48 2004/05/18 00:17:41 urizen Exp $ */
+/* $Id: mob_proc.cpp,v 1.49 2004/05/20 06:55:01 pirahna Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -2944,7 +2944,58 @@ static char *dethSayText [ ] =
   "If you're playing a poker game and you look around the table and can't tell who the sucker is, guess what....it's you!",
   "Whenever I feel blue, I start breathing again.",
   "Is it because light travels faster than sound that some people appear bright until you hear them speak?",
-  "Wtf...ever since I downloaded the 23k winXPfulleditioncrack.exe file my computer's been acting weird."
+  "Wtf...ever since I downloaded the 23k winXPfulleditioncrack.exe file my computer's been acting weird.",
+  "Random number generation is too important to be left to chance.",
+  "Why did Apoc get fired from the sperm bank?  He got caught drinking on the job.",
+  "Sex is alot like Tang.  Just not powdery.  Or orange.",
+  "MentalNote:  www.manpages.com is NOT an online reference for UNIX help files.",
+  "Tip:  If you're in another country just bite the bullet and pretend you're Canadian.  It'll be alot easier on you.",
+  "I swear.  Next time my mom approaches me about underage drinking I'm going to F'ing come out of the closet.",
+  "60% of girls first kiss is with another girl.",
+  "I think Dildo Daggins would be a great hobbit porno name.",
+  "mmMmmMmmm synthetic horse rectum.",
+  "I can't figure out how to login to the MUD.",
+  "I'm going to become rich and famous after I invent a device that allows you to stab people in the face over the internet.",
+  "I'm not saying there should be a capital punishment for stupidity, but why don't we just take the safety labels off everything and let the problem solve itself?",
+  "Whoa cool!  When you gossip your password, it auto-replaces it with ******.  ****** see?  Try it.",
+  "Girls are like internet domain names.  The ones I like are already taken.  But you can still get one like it from a strange country.",
+  "I beat the internet.  The end guy is hard.",
+  "What the fuck is wtf?",
+  "Guy:  67% of girls are stupid.   Blonde Girl:  I belong with the other 13%.",
+  "I hated weddings.  All the grandmas would poke me and go 'You're next.'  They stopped when I started doing it at funerals.",
+  "IRC is just multiplayer notepad.",
+  "Our f@th3r, wh0 0wnz heaven, j00 r0ck! May @11 0ur base som3day b310ng 2 u! 4m3n.",
+  "Trojan Condoms?  Wasn't the trojan horse just a trick to get men inside so they could burst out and go everywhere?",
+  "Roses are red, violets are blue.  All of my base, are belong to you.",
+  "The 'bishop' came to my church Sunday.  What am impostor.  He never once moved diagonally.",
+  "A turtles weakness is being on it's back.  So if you take 2 together they are unstoppable.",
+  "I tried to change my Hotmail password to 'penis' but it said my password was too small.",
+  "Real life needs a freaking search function.  I can never find my damn carkeys.",
+  "Tetris is so unrealistic.",
+  "Moo spelled backwards is moo.  no wait.",
+  "My granddad died in a concentration camp.  Fell out of a guard tower.  Broke his neck.",
+  "Make sure cat is not sleeping in bass drum before you begin playing them.",
+  "Warning:  Do not let Dr. Mario touch your genitals.  He is NOT a real doctor.",
+  "General rule about female mudders seems to be:  Attractive, Single, Mentally Stable.  Choose 2.",
+  "The most secure computer in the world is one not connected to the internet.  That's why I reccomend AOL Broadband.",
+  "In a perfect world spammers would be locked up with men that have enlarged their penis, taken Viagra, and are looking for new relationships.",
+  "I'm going to name my kids Control, Alt, and Delete so I can just hit them all at once to solve any acting up.",
+  "Does anyone here have a computer?",
+  "Girls always act all old and mature until you fuck them in the ass and they're like 'STOP IM THIRTEEN IM THIRTEEN'",
+  "Sorry Mario but the Princess is on another MUD.",
+  "I'm annoyed that they can get 11KBps from mars but can't get me a stable 5KBps over 17 miles.",
+  "If my calculations are correct SLINKY + ESCULATOR = EVERLASTING FUN!",
+  "Mark Duval of Belgium is an idiot.",
+  "Muhahaha!  I infected this guy at 127.0.0.1 with Sub7 and I'm messing with him now.",
+  "How many Vietnam Vets does it take to screw in a lightbult?  You don't KNOW MAN, cause you WEREN'T THERE.",
+  "This girl I know said she doesn't give head and I'm like...they still make those?",
+  "I'm not on 'AOL'. I'm on America Online.  Retard.",
+  "You know something's wrong when you have dreams about eating pudding and you wake up with a spoon in your ass.",
+  "What's the racial slur for pakistanis?  Cab Driver?",
+  "Guy1: So you're in MENSA huh?  That's only 2% of the population.  Guy2: Actually it's more like 1 in 50.",
+  "Hey Medicinae, do you know any girls whose names don't contain .jpeg, .mpg, or .avi?",
+  "Wouldn't it be great if they renamed Scotland - Scatland.",
+  "All these years I played sports before I realized you can just buy trophies at the store."
 };
 
 #define DETH_SAY_TEXT_SIZE    ( sizeof ( dethSayText )    / sizeof ( char * ) )
