@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.6 2002/07/10 17:16:01 pirahna Exp $
+| $Id: wizard.cpp,v 1.7 2002/07/12 17:59:00 pirahna Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -1033,12 +1033,13 @@ void obj_stat(struct char_data *ch, struct obj_data *j)
           sprintf(buf, "$3ToRoom (v1)$R : %d\n"
                        "$3Type   (v2)$R : ",  j->obj_flags.value[0]);
           switch(j->obj_flags.value[1]) {
-             case 0: strcat(buf, "Player-Portal");       break;
-             case 1: // no break on purpose
-             case 2: strcat(buf, "Game-portal");         break;
+             case 0: strcat(buf, "0-Player-Portal");         break;
+             case 1: strcat(buf, "1-Permanent-Game-Portal"); break;
+             case 2: strcat(buf, "2-Temp-Game-portal");      break;
+             case 3: strcat(buf, "3-Look-only-poral");       break;
              default: strcat(buf, "Unknown!!!");         break;
           }
-          sprintf(buf2, "(Should be 2 unless from spell)\n"
+          sprintf(buf2, "(can be 0-3)\n"
                       "$3Zone   (v3)$R : %d (can 'leave' anywhere from this zone (set to -1 otherwise))\n"
                       "$3Flags  (v4)$R : ", j->obj_flags.value[2] );
           strcat(buf, buf2);
