@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.42 2002/11/01 16:14:52 dcastle Exp $ */
+/* $Id: magic.cpp,v 1.43 2002/12/26 17:55:17 pirahna Exp $ */
 
 extern "C"
 {
@@ -8729,6 +8729,7 @@ int spell_debility(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data
   }
   else {
     act("$n just tried to cast something on you and you're sure it isn't good.", ch, 0, victim, TO_VICT, 0);
+    send_to_char("Your debility spell is resisted.\r\n", ch);
   }
 
   if(IS_NPC(victim)) 
@@ -8800,6 +8801,7 @@ int spell_attrition(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
   }
   else {
     act("$n just tried to cast something on you and you're sure it isn't good.", ch, 0, victim, TO_VICT, 0);
+    send_to_char("Your attrition spell is resisted.\r\n", ch);
   }
 
   if(IS_NPC(victim)) 
