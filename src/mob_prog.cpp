@@ -491,18 +491,18 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
      switch (arg[1]) 
      {
         case 'i': // mob
-		return (affected_by_spell(mob, find_skill_num(val));
+		return (int)(affected_by_spell(mob, find_skill_num(val)));
 	case 'n': // actor
 	 	if (actor)
-                return (affected_by_spell(actor, find_skill_num(val));
+                return (int)(affected_by_spell(actor, find_skill_num(val)));
 		else return -1;
 	case 't': // vict
 		if (vict)
-                return (affected_by_spell(vict, find_skill_num(val));
+                return (int)(affected_by_spell(vict, find_skill_num(val)));
 		else return -1;
 	case 'r': //rand
-		if (rand)
-                return (affected_by_spell(rand, find_skill_num(val));
+		if (rndm)
+                return (int)(affected_by_spell(rndm, find_skill_num(val)));
 		return -1;
      }
   }
