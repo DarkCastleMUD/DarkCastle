@@ -18,7 +18,7 @@
 *                       with smaller changes in alignment                    *
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.132 2003/12/09 08:40:49 staylor Exp $ */
+/* $Id: fight.cpp,v 1.133 2003/12/10 00:00:57 staylor Exp $ */
 
 extern "C"
 {
@@ -2461,11 +2461,11 @@ void change_alignment(CHAR_DATA *ch, CHAR_DATA *victim)
 {
   int change;
 
-  change = GET_ALIGNMENT(victim) / 100;
+  change = (GET_ALIGNMENT(victim) * 2) / 100;
   if (IS_NEUTRAL(ch))
     change /= 2;
 
-  GET_ALIGNMENT(ch) += change;
+  GET_ALIGNMENT(ch) -= change;
   GET_ALIGNMENT(ch) = MIN(1000, MAX((-1000), GET_ALIGNMENT(ch)));  
 #if 0
   int change = alignment_value(GET_ALIGNMENT(ch));
