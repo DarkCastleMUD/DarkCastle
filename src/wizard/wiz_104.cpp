@@ -790,6 +790,7 @@ obj_data *)(obj_index[nr].item))->obj_flags.eq_level,
     extern char *isr_bits[];
     extern char *affected_bits[];
     extern char *pc_clss_types2[];
+    //int its;
 //    if (
     bool fo = FALSE;
     while ( ( argument = one_argument(argument, arg1) ) )
@@ -992,6 +993,7 @@ char_data *)(mob_index[nr].item))->level,
     extern char *item_types[];
     extern char *strs_damage_types[];
     bool fo = FALSE;
+    int its;
     while ( ( argument = one_argument(argument, arg1) ) )
     {
        int i;
@@ -1169,9 +1171,10 @@ char_data *)(mob_index[nr].item))->level,
 	if (IS_SET(size, 1<<i))
       if (!IS_SET(((struct obj_data *)(obj_index[nr].item))->obj_flags.size, 1<<i))
 	goto endLoop;
-      if (dam)
-	if (((struct obj_data *)(obj_index[nr].item))->obj_flags.value[3] != dam)
-	continue;
+int get_weapon_damage_type(struct obj_data * wielded);
+its = get_weapon_damage_type(((struct obj_data *)(obj_index[nr].item)));
+     if (dam && dam != its)
+  	  continue;
       if(extra)
         for (i = 0; i < 30; i++)
 	  if (IS_SET(extra,1<<i))

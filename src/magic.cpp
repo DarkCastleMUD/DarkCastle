@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.106 2004/04/19 19:40:08 urizen Exp $ */
+/* $Id: magic.cpp,v 1.107 2004/04/19 21:41:39 urizen Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -1190,7 +1190,7 @@ int spell_paralyze(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data
       if(!IS_NPC(victim)) {
          act("$n tried to paralyze you!", ch, NULL, victim, TO_VICT, 0);
       }
-      if ((!victim->fighting) && (IS_NPC(victim))) {
+      if ((!victim->fighting)) {
          retval = attack(victim, ch, TYPE_UNDEFINED);
          retval = SWAP_CH_VICT(retval);
          return retval;
@@ -2524,7 +2524,7 @@ int spell_sleep(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
   }
 
   if (affected_by_spell(victim, SPELL_PARALYZE)) {
-	if (number(1,10) < 5)
+	if (number(1,7) < 5)
 	{
 	  switch (number(1,2))
 	  {
@@ -2549,9 +2549,9 @@ int spell_sleep(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
 	 return retval;
   }
 
-  if(IS_MOB(victim) || number(1, 3) == 1)
+  if(IS_MOB(victim) || number(1, 2) == 1)
  {
-  if(saves_spell(ch, victim, -3, SAVE_TYPE_MAGIC) < 0)
+  if(saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC) < 0)
   {
 	af.type      = SPELL_SLEEP;
 	af.duration  = (ch->level == 50?3:2);
