@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.cpp,v 1.18 2003/01/02 03:28:38 pirahna Exp $ */
+/* $Id: interp.cpp,v 1.19 2003/01/16 03:59:09 dcastle Exp $ */
 
 extern "C"
 {
@@ -433,6 +433,7 @@ struct command_info cmd_info[] =
     { "mpforce",    do_mpforce,     POSITION_DEAD,      0,  9,  0 },
     { "mpxpreward", do_mpxpreward,  POSITION_DEAD,      0,  9,  0 },
     { "mpteachskill", do_mpteachskill, POSITION_DEAD,   0,  9,  0 },
+    { "mpdamage",   do_mpdamage,    POSITION_DEAD,      0,  9,  0 },
 
 /* test commands */
     { "do_stromboli", do_stromboli, POSITION_DEAD, 0, 9,  0 },

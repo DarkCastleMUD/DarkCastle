@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: const.cpp,v 1.51 2003/01/08 21:19:28 dcastle Exp $ */
+/* $Id: const.cpp,v 1.52 2003/01/16 03:59:09 dcastle Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -341,6 +341,34 @@ char *where[] =
     "<in left ear>   ",
     "<in right ear>  ",
     "<on penis>      "
+};
+
+char *strs_damage_types[] = 
+{
+    "hit",
+    "bludgeon",
+    "pierce",
+    "slash",
+    "whip",
+    "claw",
+    "bite",
+    "sting",
+    "crush",
+    "suffering",
+    "magic",
+    "charm",
+    "fire",
+    "energy",
+    "acid",
+    "poison",
+    "sleep",
+    "cold",
+    "para",
+    "ki",
+    "song",
+    "physicalmagic",
+    "water",
+    "\n"
 };
 
 char *drinks[] =
@@ -975,7 +1003,7 @@ struct class_skill_defines t_skills[] = {
 {    "blindfighting",   SKILL_BLINDFIGHTING, 19, 60,     -2, "Only on the astral planes can you find what you seek."},
 {    "steal",		SKILL_STEAL,		20,	80,	-2, "There's a little thief around town named Caijin.  Annoying little bastard.  Ask him to please teach you." },
 {    "disarm",		SKILL_DISARM,		23,	60,	-2, "The duke of Marok is who you need to see."},
-{    "vitalstrike",     SKILL_VITAL_STRIKE,	25,	80,	-2,	NULL },
+{    "vitalstrike",     SKILL_VITAL_STRIKE,	25,	80,	-2,	"The individual you seek is skilled in the arts of legerdemain, both verbal and physical." },
 {    "circle",		SKILL_CIRCLE,		30,	75,	-2, "Seek the king of a long lost civilization.  I only hear that they are the last of the Jiran." },
 {    "bludgeoning",	SKILL_BLUDGEON_WEAPONS,	30,	80,	3022,	NULL },
 {    "piercing",	SKILL_PIERCEING_WEAPONS,30,	80,	3022,	NULL },
@@ -1197,14 +1225,15 @@ struct class_skill_defines u_skills[] = { // druid skills
 {    "attrition",	SPELL_ATTRITION,	19,	90,	-2, "Bring me a pair of indigo gloves if you wish to learn this." },
 {    "stone shield",	SPELL_STONE_SHIELD,	20,	90,	-2, "The druid of druids can help you learn this most quintisential skill."},
 {    "drown",		SPELL_DROWN,		22,	90,	3203,	NULL },
-{    "lightning shield",SPELL_LIGHTNING_SHIELD,	23,	90,	-2, "A near victim of infanticide the Lord of the Tallest mountain knows lightning shield."},
+{    "lightning shield",SPELL_LIGHTNING_SHIELD,	23,	90,	-2,	"A near victim of infanticide the Lord of the Tallest mountain knows lightning shield."},
 {    "power heal",	SPELL_POWER_HEAL,	26,	90,	-2,	"Only the most pure of beasts with horn atop head can help you.  Look in the mountains." },
 {    "camouflague",	SPELL_CAMOUFLAGUE,	28,	90,	3203,	NULL },
-{    "barkskin",	SPELL_BARKSKIN,		35,	90,-2, "Talk to Shargugh, he's the MAN! Baby! Just ask dinas ;)"},
-{    "iron roots",	SPELL_IRON_ROOTS,	36,	90,	-2, "A druid of old age and virulance is who you want. He will be in the company of other druids."},
-{    "resist energy",	SPELL_RESIST_ENERGY,	39,	90,	-2, "An electric individual who will surely light you up with his mastery of energetic discourse. (phew)" },
-{    "summon",		SPELL_SUMMON,		40,	90,	-2, "You seek out an individual of much control over the transcendental in a tower of pure energy." },
-{    "greater stone shield",SPELL_GREATER_STONE_SHIELD,	42,	90,-2, "He of an earthy personality who rules with a stone fist is who you want."},
+{    "barkskin",	SPELL_BARKSKIN,		35,	90,	-2,	"Talk to Shargugh, he's the MAN! Baby! Just ask dinas ;)"},
+{    "iron roots",	SPELL_IRON_ROOTS,	36,	90,	-2,	"A druid of old age and virulance is who you want. He will be in the company of other druids."},
+{    "resist acid",	SPELL_RESIST_ACID,	37,	90,	-2,	"You need to seek out Bill the pharmicist.  He knows about such things." },
+{    "resist energy",	SPELL_RESIST_ENERGY,	39,	90,	-2,	"An electric individual who will surely light you up with his mastery of energetic discourse. (phew)" },
+{    "summon",		SPELL_SUMMON,		40,	90,	-2,	"You seek out an individual of much control over the transcendental in a tower of pure energy." },
+{    "greater stone shield",SPELL_GREATER_STONE_SHIELD,	42,	90,-2,	"He of an earthy personality who rules with a stone fist is who you want."},
 {    "stone skin",	SPELL_STONE_SKIN,	45,	90,	-2,	"A woman strong in battle surrounded by heavy magical influences calls to you." },
 {    "\n",		0,			1,	0,	0, 	NULL}
 };

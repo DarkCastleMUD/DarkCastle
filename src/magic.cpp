@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.55 2003/01/14 05:54:38 dcastle Exp $ */
+/* $Id: magic.cpp,v 1.56 2003/01/16 03:59:09 dcastle Exp $ */
 
 extern "C"
 {
@@ -8398,12 +8398,13 @@ int spell_resist_acid(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
     struct affected_type af;
 
     if(!affected_by_spell(ch, SPELL_RESIST_ACID)) {
+       skill_increase_check(ch, SPELL_RESIST_ACID, skill, SKILL_INCREASE_MEDIUM);
        act("$n's skin turns green momentarily.", ch, 0, 0, TO_ROOM, INVIS_NULL);
        act("Your skin turns green momentarily.", ch, 0, 0, TO_CHAR, 0);
 
        af.type = SPELL_RESIST_ACID;
-       af.duration = level/5;
-       af.modifier = 25;
+       af.duration = 1 + skill / 10;
+       af.modifier = 10 + skill / 6;
        af.location = APPLY_SAVING_ACID;
        af.bitvector = 0;
        affect_to_char(ch, &af);

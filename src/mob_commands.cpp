@@ -959,3 +959,93 @@ int do_mpteachskill( CHAR_DATA *ch, char *argument, int cmd )
     return eSUCCESS;
 }
 
+int determine_attack_type(char * attacktype)
+{
+    extern char * strs_damage_types[];
+
+    for(int i = 10; *strs_damage_types[i] != '\n'; i++)
+       if(!strcmp(strs_damage_types[i], attacktype))
+          return (TYPE_HIT + i);
+
+    if(!strcmp("undefined", attacktype))
+        return TYPE_UNDEFINED;
+
+    return 0;
+}
+
+int do_mpdamage( CHAR_DATA *ch, char *argument, int cmd )
+{
+    char arg[ MAX_INPUT_LENGTH ];
+    char temp[ MAX_INPUT_LENGTH ];
+    char damroll[ MAX_INPUT_LENGTH ];
+    char attacktype[ MAX_INPUT_LENGTH ];
+
+    if ( !IS_NPC( ch ) )
+    {
+	send_to_char( "Huh?\n\r", ch );
+	return eSUCCESS;
+    }
+
+    half_chop(argument, arg, temp);
+    // arg = victim or 'all'
+    // attacktype contains rest of string
+
+    if ( arg[0] == '\0' )
+    {
+	logf( IMMORTAL, LOG_WORLD, "Mpdamage - Bad syntax: Missing victim - vnum %d.", mob_index[ch->mobdata->nr].virt );
+	return eFAILURE|eINTERNAL_ERROR;
+    }
+
+    CHAR_DATA *victim = NULL;
+
+    if(strcmp(arg, "all")) // if it's 'all' leave victim NULL and skip
+    {
+       victim = get_char_room( arg, ch->in_room );
+       if(victim && ( GET_LEVEL(victim) > MORTAL || IS_MOB(victim) ) ) // don't target immortals
+           victim = NULL;
+
+       if (!victim)
+           return eFAILURE;  // not an error, just couldn't get valid vict
+    }
+
+    // at this point, victim is either NULL (all) or pointing to valid vict
+    half_chop(temp, damroll, attacktype);
+
+    int numdice, sizedice;
+    numdice = sizedice = 0;
+    sscanf(damroll, "%dd%d", &numdice, &sizedice);
+
+    if(!numdice || !sizedice)
+    {
+        logf( IMMORTAL, LOG_WORLD, "Mpdamage - Invalid damroll: vnum %d", mob_index[ch->mobdata->nr].virt);
+        return eFAILURE|eINTERNAL_ERROR;
+    }
+
+    // figure out attack type
+    int damtype = determine_attack_type(attacktype);
+    if(!damtype)
+    {
+        logf( IMMORTAL, LOG_WORLD, "Mpdamage - Invalid damtype: vnum %d", mob_index[ch->mobdata->nr].virt);
+        return eFAILURE|eINTERNAL_ERROR;
+    }
+
+    // do the damage
+    if(victim)
+       return damage(ch, victim, dice(numdice, sizedice), damtype, TYPE_UNDEFINED, 0);
+
+    char_data * next_vict;
+    int retval;
+    for(victim = world[ch->in_room].people; victim; victim = next_vict)
+    {
+        next_vict = victim->next_in_room;
+        if(IS_MOB(victim) || GET_LEVEL(victim) > MORTAL)
+           continue;
+        retval = damage(ch, victim, dice(numdice, sizedice), damtype, TYPE_UNDEFINED, 0);
+        if(IS_SET(retval, eCH_DIED))
+           return retval;
+    }
+
+    return eSUCCESS;
+}
+
+
