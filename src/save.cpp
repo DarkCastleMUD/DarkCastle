@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: save.cpp,v 1.12 2002/08/16 18:03:26 pirahna Exp $ */
+/* $Id: save.cpp,v 1.13 2002/09/11 02:08:12 pirahna Exp $ */
 
 extern "C"
 {
@@ -241,6 +241,13 @@ void save_pc_data(struct pc_data * i, FILE * fpsave, struct time_data tmpage)
   fwrite("SPC", sizeof(char), 3, fpsave);
   fwrite(&(i->specializations), sizeof(i->specializations), 1, fpsave);
 
+  // Stat metas
+  if(i->statmetas) {
+    fwrite("STM", sizeof(char), 3, fpsave);
+    fwrite(&(i->statmetas), sizeof(i->statmetas), 1, fpsave);
+  }
+  else i->statmetas = 0;
+
   // Any future additions to this save file will need to be placed LAST here with a 3 letter code
   // and appropriate strcmp statement in the read_mob_data object
 
@@ -289,6 +296,12 @@ void read_pc_data(struct pc_data * i, FILE* fpsave)
   if(!strcmp("SPC", typeflag))
   {
     fread(&(i->specializations), sizeof(i->specializations), 1, fpsave);
+    fread(&typeflag, sizeof(char), 3, fpsave);
+  }
+
+  if(!strcmp("STM", typeflag))
+  {
+    fread(&i->statmetas, sizeof(i->statmetas), 1, fpsave);
     fread(&typeflag, sizeof(char), 3, fpsave);
   }
 

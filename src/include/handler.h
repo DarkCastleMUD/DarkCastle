@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.h,v 1.5 2002/08/13 21:54:27 pirahna Exp $ */
+/* $Id: handler.h,v 1.6 2002/09/11 02:08:17 pirahna Exp $ */
 
 #ifndef HANDLER_H_
 #define HANDLER_H_
@@ -41,6 +41,7 @@ void affect_join( CHAR_DATA *ch, struct affected_type *af,
 struct obj_data *create_money( int amount );
 int isname(char *str, char *namelist);
 char *fname(char *namelist);
+int get_max_stat(char_data * ch, byte stat);
 
 /* ******** objects *********** */
 

@@ -1579,7 +1579,7 @@ int intrp_jig_of_alacrity( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict
 
    if(!affected_by_spell(master, SPELL_HASTE))
       REMOVE_BIT(master->affected_by, AFF_HASTE);
-   send_to_char("Your libs slow back to normal.\r\n", master);
+   send_to_char("Your limbs slow back to normal.\r\n", master);
    return eSUCCESS;
 }
 

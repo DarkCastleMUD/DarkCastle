@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.12 2002/08/29 15:55:44 pirahna Exp $ */
+/* $Id: mob_proc2.cpp,v 1.13 2002/09/11 02:08:12 pirahna Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -972,6 +972,96 @@ int platmerchant(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 // TODO - make sure meta checks for get_stat_max to make sure you can't meta
 // past your racial maximum
 
+int meta_get_stat_exp_cost(char_data * ch, byte stat)
+{
+    int xp_price;
+
+    switch(stat) {
+      case CONSTITUTION:
+        xp_price = ((GET_LEVEL(ch)*4)*10000)+((ch->raw_con*8)*30000);
+        break;
+      default:
+        xp_price = 9999999;
+        break;
+    }
+    return xp_price;
+}
+
+int meta_get_stat_plat_cost(char_data * ch, byte stat)
+{
+  int plat_cost;
+
+  switch(stat) {
+    case CONSTITUTION:
+      if(ch->raw_con >= 18) {
+         plat_cost = 500;
+         if(ch->pcdata->statmetas > 0)
+            plat_cost += ch->pcdata->statmetas * 20;
+      } else {
+         plat_cost = 100;
+         if(ch->pcdata->statmetas > 0)
+            plat_cost += ch->pcdata->statmetas * 10;
+      }
+      // no class mods
+      break;
+    default:
+      plat_cost = 99999;
+      break;
+  }
+
+  return plat_cost;
+}
+
+void meta_list_stats(char_data * ch)
+{
+    int xp_price, plat_cost, max_stat;
+
+    xp_price = meta_get_stat_exp_cost(ch, STRENGTH);
+    plat_cost = meta_get_stat_plat_cost(ch, STRENGTH);
+    max_stat = get_max_stat(ch, STRENGTH);
+    if(ch->raw_str >= max_stat)
+      csendf(ch, "1) Str:       Your strength is already %d.\n\r", max_stat);
+    else
+      csendf(ch, "1) Str: %d        Cost: %d exp + %d Platinum coins. \n\r",
+              ( ch->raw_str + 1), xp_price, plat_cost);
+
+    xp_price = meta_get_stat_exp_cost(ch, INTELLIGENCE);
+    plat_cost = meta_get_stat_plat_cost(ch, INTELLIGENCE);
+    max_stat = get_max_stat(ch, INTELLIGENCE);
+    if(ch->raw_intel >= max_stat)
+      csendf(ch, "2) Int:       Your intelligence is already %d.\n\r", max_stat);
+    else
+      csendf(ch, "2) Int: %d        Cost: %d exp + %d Platinum coins.\n\r",
+              ( ch->raw_intel + 1 ), xp_price, plat_cost);
+
+    xp_price = meta_get_stat_exp_cost(ch, WISDOM);
+    plat_cost = meta_get_stat_plat_cost(ch, WISDOM);
+    max_stat = get_max_stat(ch, WISDOM);
+    if(ch->raw_wis >= max_stat)
+      csendf(ch, "3) Wis:       Your wisdom is already %d.\n\r", max_stat);
+    else
+      csendf(ch, "3) Wis: %d        Cost: %d exp + %d Platinum coins.\n\r",
+              ( ch->raw_wis + 1 ), xp_price, plat_cost);
+
+    xp_price = meta_get_stat_exp_cost(ch, DEXTERITY);
+    plat_cost = meta_get_stat_plat_cost(ch, DEXTERITY);
+    max_stat = get_max_stat(ch, DEXTERITY);
+    if(ch->raw_dex >= max_stat)
+      csendf(ch, "4) Dex:       Your dexterity is already %d.\n\r", max_stat);
+    else
+      csendf(ch, "4) Dex: %d        Cost: %d exp + %d Platinum coins.\n\r",
+              ( ch->raw_dex + 1 ), xp_price, plat_cost);
+
+    xp_price = meta_get_stat_exp_cost(ch, CONSTITUTION);
+    plat_cost = meta_get_stat_plat_cost(ch, CONSTITUTION);
+    max_stat = get_max_stat(ch, CONSTITUTION);
+    if(ch->raw_con >= max_stat)
+      csendf(ch, "5) Con:       Your constitution is already %d.\n\r", max_stat);
+    else
+      csendf(ch, "5) Con: %d        Cost: %d exp + %d Platinum coins.\n\r",
+              ( ch->raw_con + 1 ), xp_price, plat_cost);
+}
+
 int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,        
           struct char_data *owner)
 {
@@ -982,13 +1072,13 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
   int choice;
   int increase;
   int hit_cost, mana_cost, move_cost, hit_exp, move_exp, mana_exp;
-  int price, str_price, int_price, wis_price, dex_price, con_price;
+  int price, statplatprice, max_stat;
 
   long gold;
 
   struct obj_data *new_new_obj;
   sbyte *pstat; 
-  int *pprice;
+  int pprice;
 
   const double EXPCONV  = 400000000.0;
   const double GOLDCONV = 1000000.0;
@@ -1023,61 +1113,9 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
   move_cost = 100 + GET_MOVE_METAS(ch);
   mana_cost = 100 + GET_MANA_METAS(ch); 
 
-  stat = ch->raw_str;
-  str_price = 1000000+((GET_LEVEL(ch)*4)*10000)+((stat*8)*30000);
-  stat = ch->raw_intel;
-  int_price = 1000000+((GET_LEVEL(ch)*4)*10000)+((stat*8)*30000);
-  stat = ch->raw_wis;
-  wis_price = 1000000+((GET_LEVEL(ch)*4)*10000)+((stat*8)*30000);
-  stat = ch->raw_dex;
-  dex_price = 1000000+((GET_LEVEL(ch)*4)*10000)+((stat*8)*30000);
-  stat = ch->raw_con;
-//  con_price = 1000000+((GET_LEVEL(ch)*4)*10000)+((stat*8)*30000);
-  con_price = ((GET_LEVEL(ch)*4)*10000)+((stat*8)*30000);
-
   if(cmd == 59) {           /* List */
-    send_to_char("The Meta-physician tells you, 'This is what I can do "
-                 "for you... \n\r", ch);
-/*
-    stat = ch->raw_str;
-    if(stat == 25)
-      strcpy(buf, "1) Str:       Your strength is already 25.\n\r");
-    else
-      sprintf(buf, "1) Str: %d        Cost: %d exp + %d Platinum coins. \n\r",
-              stat + 1, str_price, stat < 18 ? 100 : 500);
-    send_to_char(buf, ch);
-
-    stat = ch->raw_intel;
-    if(stat == 25)
-      strcpy(buf, "2) Int:       Your intelligence is already 25.\n\r");
-    else
-      sprintf(buf, "2) Int: %d        Cost: %d exp + %d Platinum coins.\n\r",
-              stat+1, int_price, stat < 18 ? 100 : 500);
-    send_to_char(buf, ch);
-
-    stat = ch->raw_wis;
-    if(stat == 25)
-      strcpy(buf, "3) Wis:       Your wisdom is already 25.\n\r");
-    else
-      sprintf(buf, "3) Wis: %d        Cost: %d exp + %d Platinum coins.\n\r",
-              stat+1, wis_price, stat < 18 ? 100 : 500);
-    send_to_char(buf, ch);
-
-    stat = ch->raw_dex;
-    if(stat == 25)
-      strcpy(buf, "4) Dex:       Your dexterity is already 25.\n\r");
-    else
-      sprintf(buf, "4) Dex: %d        Cost: %d exp + %d Platinum coins.\n\r",
-              stat+1, dex_price, stat < 18 ? 100 : 500);
-    send_to_char(buf, ch);
-*/
-    stat = ch->raw_con;
-    if(stat >= 16)
-      strcpy(buf, "5) Con:       Your constitution is already 16+.\n\r");
-    else
-      sprintf(buf, "5) Con: %d        Cost: %d exp + %d Platinum coins.\n\r",
-              stat+1, con_price, stat < 16 ? 100 : 500);
-    send_to_char(buf, ch);
+    send_to_char("The Meta-physician tells you, 'This is what I can do for you... \n\r", ch);
+    meta_list_stats(ch);
 /*    
     csendf(ch, "6) Add to your hit points:   %d exp + %d "
             "Platinum coins.\n\r", hit_exp, hit_cost); 
@@ -1117,40 +1155,55 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     }
     switch(choice) {
       case 1: stat = ch->raw_str;
-             pstat = &(ch->raw_str); pprice = &str_price; break;
+             pstat = &(ch->raw_str); 
+             pprice = meta_get_stat_exp_cost(ch, STRENGTH);
+             statplatprice = meta_get_stat_plat_cost(ch, STRENGTH);
+             max_stat = get_max_stat(ch, STRENGTH);
+             break;
       case 2: stat = ch->raw_intel;
-             pstat = &(ch->raw_intel); pprice = &int_price; break;
+             pstat = &(ch->raw_intel); 
+             pprice = meta_get_stat_exp_cost(ch, INTELLIGENCE); 
+             statplatprice = meta_get_stat_plat_cost(ch, INTELLIGENCE);
+             max_stat = get_max_stat(ch, INTELLIGENCE);
+             break;
       case 3: stat = ch->raw_wis;
-             pstat = &(ch->raw_wis); pprice = &wis_price; break;
+             pstat = &(ch->raw_wis); 
+             pprice = meta_get_stat_exp_cost(ch, WISDOM); 
+             statplatprice = meta_get_stat_plat_cost(ch, WISDOM);
+             max_stat = get_max_stat(ch, WISDOM);
+             break;
       case 4: stat = ch->raw_dex;
-             pstat = &(ch->raw_dex); pprice = &dex_price; break;
+             pstat = &(ch->raw_dex); 
+             pprice =  meta_get_stat_exp_cost(ch, DEXTERITY); 
+             statplatprice = meta_get_stat_plat_cost(ch, DEXTERITY);
+             max_stat = get_max_stat(ch, DEXTERITY);
+             break;
       case 5: stat = ch->raw_con;
-             pstat = &(ch->raw_con); pprice = &con_price; break;
+             pstat = &(ch->raw_con); 
+             pprice = meta_get_stat_exp_cost(ch, CONSTITUTION); 
+             statplatprice = meta_get_stat_plat_cost(ch, CONSTITUTION);
+             max_stat = get_max_stat(ch, CONSTITUTION);
+             break;
       default: stat = 0;
     }
 
-//    if(choice < 6) {
-    if(choice == 5) {
-      if(GET_PLATINUM(ch) < 100 || 
-         (*pstat >= 18 && GET_PLATINUM(ch) < 500)) {
-        send_to_char("The Meta-physician tells you, 'You can't afford "
-                     "my services.  FUCK OFF!\n\r", ch);
+    if(choice < 6) {
+      
+      if(GET_PLATINUM(ch) < statplatprice) {
+        send_to_char("The Meta-physician tells you, 'You can't afford my services.  FUCK OFF!\n\r", ch);
         return eSUCCESS;
       }
-      if(stat >= 16) {
-        send_to_char("The Meta-physician tells you, 'I can't help you "
-                     "anymore with that!'\n\r", ch); 
+      if(GET_EXP(ch) < pprice) {
+        send_to_char("The Meta-physician tells you, 'You lack the experience.'\n\r", ch);
+        return eSUCCESS;
+      }
+      if(stat >= max_stat) {
+        send_to_char("The Meta-physician tells you, 'You're already as good at that as yer gonna get.'\n\r", ch);
         return eSUCCESS;
       }
 
-      if(GET_EXP(ch) < *pprice) {
-        send_to_char("The Meta-physician tells you, 'You "
-                     "lack the experience.'\n\r", ch);
-        return eSUCCESS;
-      }
-  
-      GET_EXP(ch) -= *pprice;
-      GET_PLATINUM(ch) -= (*pstat < 18 ? 100 : 500);
+      GET_EXP(ch) -= pprice;
+      GET_PLATINUM(ch) -= statplatprice;
 
       *pstat += 1;
 

@@ -1,7 +1,7 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.6 2002/08/01 15:13:32 dcastle Exp $
+| $Id: character.h,v 1.7 2002/09/11 02:08:17 pirahna Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
@@ -129,6 +129,8 @@ struct follow_type
     struct follow_type *next;
 };
 
+// DO NOT change most of these types without checking the save files
+// first, or you will probably end up corrupting all the pfiles
 struct pc_data
 {
     char pwd[PASSWORD_LEN+1];
@@ -152,6 +154,9 @@ struct pc_data
    
     uint32 bad_pw_tries;        // How many times people have entered bad pws
 
+     int16 statmetas;           // How many times I've metad a stat
+                                // This number could go negative from stat loss
+ 
     long wizinvis;
 
     uint16 practices;         // How many can you learn yet this level

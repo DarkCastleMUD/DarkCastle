@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.65 2002/09/10 01:45:32 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.66 2002/09/11 02:08:11 pirahna Exp $ */
 
 extern "C"
 {
@@ -929,6 +929,8 @@ void eq_damage(CHAR_DATA * ch, CHAR_DATA * victim,
 
 void pir_stat_loss(char_data * victim)
 {
+  int loss = 0;
+
   /* Pir's extra stat loss.  Bwahahah */
   if(number(1,100) <= GET_LEVEL(victim) && GET_LEVEL(victim) >= 50 && 
     !IS_NPC(victim)) 
@@ -941,6 +943,7 @@ void pir_stat_loss(char_data * victim)
               victim->raw_str -=1 ;
               send_to_char("*** You lose one strength point ***\r\n", victim);
               sprintf(log_buf, "%s lost a str too. ouch.", GET_NAME(victim));
+              loss = 1;
             }
       break;
     case 2: if(GET_WIS(victim) > 4) 
@@ -949,12 +952,14 @@ void pir_stat_loss(char_data * victim)
               victim->raw_wis -=1 ;
               send_to_char("*** You lose one wisdom point ***\r\n", victim);
               sprintf(log_buf, "%s lost a wis too. ouch.", GET_NAME(victim));
+              loss = 1;
             }
       break;
     case 3: GET_CON(victim) -= 1;
       victim->raw_con -=1 ;
       send_to_char("*** You lose another constitution point ***\r\n", victim);
       sprintf(log_buf, "%s lost a con too. ouch.", GET_NAME(victim));
+      loss = 1;
       break;
     case 4: if(GET_INT(victim) > 4) 
             {
@@ -962,6 +967,7 @@ void pir_stat_loss(char_data * victim)
               victim->raw_intel -=1 ;
               send_to_char("*** You lose one intelligence point ***\r\n", victim);
               sprintf(log_buf, "%s lost a int too. ouch.", GET_NAME(victim));
+              loss = 1;
             }
       break;
     case 5: if(GET_DEX(victim) > 4) 
@@ -970,10 +976,15 @@ void pir_stat_loss(char_data * victim)
               victim->raw_dex -=1 ;
               send_to_char("*** You lose one dexterity point ***\r\n", victim);
               sprintf(log_buf, "%s lost a dex too. ouch.", GET_NAME(victim));
+              loss = 1;
             }
       break;
     } // of switch
     log(log_buf, SERAPH, LOG_MORTAL);
+
+    if(loss)
+      victim->pcdata->statmetas--;   // we lost a stat, so don't charge extra meta
+
   } // of pir's extra stat loss
 }
 
@@ -1925,9 +1936,6 @@ void stop_fighting(CHAR_DATA * ch)
   GET_POS(ch) = POSITION_STANDING;
   update_pos(ch);
   
-  if (!ch->fighting)
-    return;
-  
   // Remove ch's lag if he wasn't using wimpy.
   if (!IS_NPC(ch) && ch->desc && !IS_SET(ch->pcdata->toggles, PLR_WIMPY))
     ch->desc->wait = 0;
@@ -2581,6 +2589,7 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
          {
            sprintf(log_buf, "%s lost a con. ouch.", GET_NAME(victim));
            log(log_buf, SERAPH, LOG_MORTAL);
+           victim->pcdata->statmetas--;
          }
       }
       pir_stat_loss(victim);

@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.24 2002/09/10 20:36:28 pirahna Exp $ */
+/* $Id: spells.cpp,v 1.25 2002/09/11 02:08:12 pirahna Exp $ */
 
 extern "C"
 {
@@ -956,7 +956,7 @@ void affect_update( void )
                       "$n is DEAD!!", i, 0, 0, TO_ROOM, 0);
                   send_to_char("The water rushes into your lungs and the light fades with your oxygen.\n\r"
                                "You have been KILLED!!!\n\r", i);
-                  raw_kill(NULL, i);
+                  fight_kill(NULL, i, TYPE_RAW_KILL);
                }
                break;
              case KI_STANCE + KI_OFFSET:

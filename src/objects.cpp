@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.17 2002/09/06 23:26:58 pirahna Exp $
+| $Id: objects.cpp,v 1.18 2002/09/11 02:08:12 pirahna Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -548,10 +548,10 @@ int do_use(struct char_data *ch, char *argument, int cmd)
     bits = generic_find(argument, FIND_CHAR_ROOM | FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP, ch, &tmp_char, &tmp_object);
     if (bits) {
       if (bits == FIND_CHAR_ROOM) {
-        act("$n point $p at $N.", ch, stick, tmp_char, TO_ROOM, INVIS_NULL);
+        act("$n points $p at $N.", ch, stick, tmp_char, TO_ROOM, INVIS_NULL);
         act("You point $p at $N.",ch, stick, tmp_char, TO_CHAR, 0);
       } else {
-        act("$n point $p at $P.", ch, stick, tmp_object, TO_ROOM, INVIS_NULL);
+        act("$n points $p at $P.", ch, stick, tmp_object, TO_ROOM, INVIS_NULL);
         act("You point $p at $P.",ch, stick, tmp_object, TO_CHAR, 0);
       }
 

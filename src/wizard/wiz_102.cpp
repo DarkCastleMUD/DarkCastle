@@ -2433,7 +2433,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd)
           send_to_char("$3Syntax$R: medit [mob_num] longdesc <desc>\n\r", ch);
           return eFAILURE;
         }
-        strcat(buf4, "\n");
+        strcat(buf4, "\r\n");
         ((char_data *)mob_index[mob_num].item)->long_desc = str_hsh(buf4);
         sprintf(buf, "Mob longdesc set to '%s'.\r\n", buf4);
         send_to_char(buf, ch);
