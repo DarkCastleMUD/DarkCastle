@@ -266,7 +266,6 @@ char *songs[] = {
 	"\n"
 };
 
-void set_cantquit(CHAR_DATA *ch, CHAR_DATA *victim, bool forced = FALSE);
 void update_pos(CHAR_DATA *victim);
 sh_int use_song(CHAR_DATA *ch, int kn);
 bool ARE_GROUPED(CHAR_DATA *sub, CHAR_DATA *obj);
@@ -922,7 +921,7 @@ int execute_song_terrible_clef( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA 
    get_instrument_bonus(ch, combat, non_combat);
 
 //   dam = GET_LEVEL(ch) * 4 + GET_WIS(ch) * 2 + combat*2;
-   dam = 250;
+   dam = 300;
    send_to_char("Your singing hurts your opponent!\r\n", ch);
    act("$n's singing causes pain in $N's ears!\r\n", ch, 0, victim, TO_ROOM, NOTVICT);
    send_to_char("The music!  It hurts!  It hurts!\r\n", victim);
@@ -1141,6 +1140,7 @@ void do_astral_chanty_movement(CHAR_DATA *victim, CHAR_DATA *target)
   {
     send_to_char("Mistic winds shock you back into your old reality.\r\n", victim);
     act("$n shudders as magical reality refuses to set in.", victim, 0, 0, TO_ROOM, 0);
+    WAIT_STATE(victim, PULSE_VIOLENCE * 3);
     return;
   }
   WAIT_STATE(victim, PULSE_VIOLENCE*2);

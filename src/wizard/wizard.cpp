@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.19 2004/05/31 16:11:37 urizen Exp $
+| $Id: wizard.cpp,v 1.20 2004/07/03 11:44:39 urizen Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -561,8 +561,12 @@ void mob_stat(struct char_data *ch, struct char_data *k)
           age(k).year, age(k).month, age(k).day, age(k).hours);
     send_to_char(buf,ch);
   }
- 
-  sprintf(buf, "$3Height$R:[%d]  $3Weight$R:[%d]  $3Sex$R:[", GET_HEIGHT(k), GET_WEIGHT(k));
+  if (IS_NPC(k))
+  {
+    sprintf(buf, "$3Mobspec$R: %d  $3Progtypes$R: %d\r\n", (mob_index[k->mobdata->nr].mobspec), mob_index[k->mobdata->nr].progtypes);
+    send_to_char(buf,ch);
+  }
+ sprintf(buf, "$3Height$R:[%d]  $3Weight$R:[%d]  $3Sex$R:[", GET_HEIGHT(k), GET_WEIGHT(k));
   send_to_char(buf,ch);
      
   switch(k->sex) {

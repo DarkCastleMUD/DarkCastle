@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.49 2004/05/31 16:02:45 urizen Exp $ */
+/* $Id: info.cpp,v 1.50 2004/07/03 11:44:13 urizen Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -467,6 +467,8 @@ void show_char_to_char(struct char_data *i, struct char_data *ch, int mode)
             strcat(buffer, "$R$4(Red Aura)");
          if (IS_AFFECTED(ch, AFF_DETECT_GOOD) && IS_GOOD(i)) 
             strcat(buffer, "$B$5(Halo) ");
+	 if (IS_AFFECTED(i, AFF_HIDE) && IS_AFFECTED(ch, AFF_TRUE_SIGHT) && has_skill(ch, SPELL_TRUE_SIGHT) > 80)
+            strcat(buffer, "$4 (hidden)");
          strcat(buffer,"\n\r");
          send_to_char(buffer, ch);
          
@@ -487,8 +489,10 @@ void show_char_to_char(struct char_data *i, struct char_data *ch, int mode)
            if (IS_GOOD(i))
               strcat(buffer, "$B$5(Halo)$3 ");
         }
-        
+        if (IS_AFFECTED(i, AFF_HIDE) && IS_AFFECTED(ch, AFF_TRUE_SIGHT) && has_skill(ch, SPELL_TRUE_SIGHT) > 80)
+           strcat(buffer, "$4(hidden) $3");
         strcat(buffer, i->long_desc);
+
         send_to_char(buffer, ch);
         
         show_spells(i, ch);

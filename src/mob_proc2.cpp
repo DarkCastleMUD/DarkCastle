@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.31 2004/06/01 02:24:55 urizen Exp $ */
+/* $Id: mob_proc2.cpp,v 1.32 2004/07/03 11:44:14 urizen Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -1031,9 +1031,7 @@ void meta_list_stats(char_data * ch)
 
 int meta_get_moves_exp_cost(char_data * ch)
 {
-   int cost = GET_MAX_MOVE(ch);
-   cost *= 8000 + GET_MOVE_METAS(ch);       // *= ...
-   return cost;
+   return 5000000 + (GET_RAW_MOVE(ch) * 2500);
 }
 
 int meta_get_moves_plat_cost(char_data * ch)
@@ -1044,8 +1042,24 @@ int meta_get_moves_plat_cost(char_data * ch)
 
 int meta_get_hps_exp_cost(char_data * ch)
 {
-   int cost = GET_MAX_HIT(ch);
-   cost *= 8000 + GET_HP_METAS(ch);       // *= ...
+   int cost;
+   switch (GET_CLASS(ch))
+   {
+      case CLASS_BARBARIAN: cost = 2000; break;
+      case CLASS_WARRIOR: cost = 2100; break;
+      case CLASS_PALADIN: cost = 2200; break;
+      case CLASS_MONK: cost = 2300; break;
+      case CLASS_RANGER: cost = 2500; break;
+      case CLASS_ANTI_PAL: cost = 2500; break;
+      case CLASS_THIEF: cost = 2600; break;
+      case CLASS_BARD: cost = 2600; break;
+      case CLASS_DRUID: cost = 2800; break;
+      case CLASS_CLERIC: cost = 2900; break; 
+      case CLASS_MAGIC_USER: cost = 3000; break;
+      default:
+	cost = 3000; break;
+   }
+   cost = 5000000 + (cost * GET_RAW_HIT(ch));
    return cost;
 }
 
@@ -1057,28 +1071,67 @@ int meta_get_hps_plat_cost(char_data * ch)
 
 int meta_get_mana_exp_cost(char_data * ch)
 {
-   int cost = GET_MAX_MANA(ch);
-   cost *= 8000 + GET_MANA_METAS(ch);       // *= ...
+   int cost;
+   switch (GET_CLASS(ch))
+   {
+      case CLASS_PALADIN: cost = 2800; break;
+      case CLASS_RANGER: cost = 2500; break;
+      case CLASS_ANTI_PAL: cost = 2500; break;
+      case CLASS_DRUID: cost = 2200; break;
+      case CLASS_CLERIC: cost = 2100; break;
+      case CLASS_MAGIC_USER: cost = 2000; break;
+      default:
+        return 0;
+   }
+   cost = 5000000 + (cost * GET_RAW_MANA(ch));
    return cost;
 }
 
 int meta_get_mana_plat_cost(char_data * ch)
 {
-   int cost = 100 + GET_MANA_METAS(ch);
-   return cost;
+   int cost;
+   switch (GET_CLASS(ch))
+   {
+      case CLASS_PALADIN: cost = 80; break;
+      case CLASS_RANGER: cost = 50; break;
+      case CLASS_ANTI_PAL: cost = 50; break;
+      case CLASS_DRUID: cost = 20; break;
+      case CLASS_CLERIC: cost = 10; break;
+      case CLASS_MAGIC_USER: cost = 0; break;
+      default:
+        return 0;
+   }
+  cost = 100 + cost + (0.025 * GET_RAW_MANA(ch) * (GET_RAW_MANA(ch)/1000 == 0 ? 1: GET_RAW_MANA(ch)/1000));
+  return cost;
 }
 
 int meta_get_ki_exp_cost(char_data * ch)
 {
-  int cost = GET_MAX_KI(ch);
-  cost *= 10000;  // approx 500k
-  cost += GET_KI_METAS(ch)*100000;
+  int cost;
+  switch (GET_CLASS(ch))
+  {
+    case CLASS_MONK:
+      cost = 7700; break;
+    case CLASS_BARD:
+      cost = 7400; break;
+    default: return 0;
+  }
+  cost = 10000000 + (GET_RAW_KI(ch) * cost);
   return cost;
 }
  
 int meta_get_ki_plat_cost(char_data * ch)
 {
-  int cost = 100 + 100 * GET_KI_METAS(ch);
+  int cost;
+  switch (GET_CLASS(ch))
+  {
+    case CLASS_MONK:
+      cost = 500; break;
+    case CLASS_BARD:
+      cost = 400; break;
+    default: return 0;
+  } 
+  cost = 500 + cost + ((GET_RAW_KI(ch)/2) * (GET_RAW_KI(ch)/10));
   return cost;
 }
 

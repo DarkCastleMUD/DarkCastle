@@ -21,7 +21,7 @@
  *  12/08/2003   Onager    Added check for charmies and !charmie eq to     *
  *                         equip_char()                                    *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.67 2004/06/24 00:10:30 urizen Exp $ */
+/* $Id: handler.cpp,v 1.68 2004/07/03 11:44:13 urizen Exp $ */
     
 extern "C"
 {
@@ -359,7 +359,7 @@ void check_weapon_weights(char_data * ch)
   }
 }
 
-void affect_modify(CHAR_DATA *ch, int32 loc, int32 mod, long bitv, bool add, bool aff2fix = FALSE)
+void affect_modify(CHAR_DATA *ch, int32 loc, int32 mod, long bitv, bool add, bool aff2fix )
 {
     char log_buf[256];
     int i;
@@ -881,7 +881,7 @@ void affect_to_char( CHAR_DATA *ch, struct affected_type *af )
 /* Remove an affected_type structure from a char (called when duration
    reaches zero). Pointer *af must never be NIL! Frees mem and calls 
    affect_location_apply                                                */
-void affect_remove( CHAR_DATA *ch, struct affected_type *af, int flags, bool aff2fix = FALSE )
+void affect_remove( CHAR_DATA *ch, struct affected_type *af, int flags, bool aff2fix )
 {
     struct affected_type *hjp;
     char buf[200];
@@ -1185,12 +1185,14 @@ int char_from_room(CHAR_DATA *ch)
     zone_table[world[ch->in_room].zone].players--;
   if (IS_NPC(ch))
      ch->mobdata->last_room = ch->in_room;
-  if (!Other && IS_SET(world[ch->in_room].iFlags, NO_TRACK))
+  if (IS_NPC(ch))
+  if (IS_SET(ch->mobdata->actflags, ACT_NOMAGIC) && !Other && IS_SET(world[ch->in_room].iFlags, NO_TRACK))
   {
     REMOVE_BIT(world[ch->in_room].iFlags,NO_TRACK);
     REMOVE_BIT(world[ch->in_room].room_flags, NO_TRACK);
   }
-  if (!More && IS_SET(world[ch->in_room].iFlags, NO_MAGIC))
+  
+  if (IS_NPC(ch) && IS_SET(ch->mobdata->actflags, ACT_NOTRACK) && !More && IS_SET(world[ch->in_room].iFlags, NO_MAGIC))
   {
     REMOVE_BIT(world[ch->in_room].iFlags,NO_MAGIC);
     REMOVE_BIT(world[ch->in_room].room_flags, NO_MAGIC);
@@ -1529,9 +1531,10 @@ CHAR_DATA *get_char_room(char *name, int room)
   if((number = get_number(&tmp)) < 0)
   return(0);
 
-  for(i = world[room].people, j = 1; i && (j <= number); i = i->next_in_room)
+  for(i = world[room].people, j = 0; i && (j <= number); i = i->next_in_room)
       {
-      if (number == 1)
+      if (number == 0 && IS_NPC(i)) continue;
+      if (number == 1 || number == 0)
          {
          if (isname(tmp, GET_NAME(i)))
             return(i);
@@ -1550,9 +1553,9 @@ CHAR_DATA *get_char_room(char *name, int room)
          {
          if(isname(tmp, GET_NAME(i)))
             {
+  	    j++;
             if(j == number)
                return(i);
-            j++;
             }
          }
       }
@@ -2326,6 +2329,7 @@ void extract_char(CHAR_DATA *ch, bool pull)
 	   ch->level--;
 	  ch->exp = 0; // Lower level, lose exp.
 	}
+	if (ch->master)
 	do_save(ch->master,"",666);
         if (mob_index[ch->mobdata->nr].virt == 8)
           if (ch->master)
@@ -2439,7 +2443,7 @@ CHAR_DATA *get_char_room_vis(CHAR_DATA *ch, char *name)
    if((number = get_number(&tmp))<0)
       return(0);
 
-   for (i = world[ch->in_room].people, j = 1; i && (j <= number); i = i->next_in_room)
+   for (i = world[ch->in_room].people, j = 0; i && (j <= number); i = i->next_in_room)
       {
       if (number == 0 && IS_NPC(i)) continue;
       if (number == 1 || number == 0)
@@ -2461,9 +2465,9 @@ CHAR_DATA *get_char_room_vis(CHAR_DATA *ch, char *name)
          {
          if(isname(tmp, GET_NAME(i)) && CAN_SEE(ch,i))
             {
+	    j++;
             if(j == number)
                return(i);
-            j++;
             }
          }
 	   }

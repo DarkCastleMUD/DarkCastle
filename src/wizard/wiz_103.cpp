@@ -223,7 +223,7 @@ int do_peace( struct char_data *ch, char *argument, int cmd )
             stop_fighting(rch);
     }
     act("$n makes a gesture and all fighting stops.", ch,0,0,TO_ROOM, 0);
-    send_to_char( "You stop all fighting in ths room.\n\r", ch );
+    send_to_char( "You stop all fighting in this room.\n\r", ch );
     return eSUCCESS;
 }
 

@@ -121,8 +121,6 @@ void assign_non_combat_procs() {
     SPEC_FUN    Thalos_citizen;
     SPEC_FUN    Executioner;
     SPEC_FUN    annoyingbirthdayshout;
-    SPEC_FUN    passive_grandmaster;
-    SPEC_FUN    passive_tarrasque;
     SPEC_FUN    platinumsmith;
     SPEC_FUN    platmerchant;
     SPEC_FUN    moritician;
@@ -165,7 +163,6 @@ void assign_non_combat_procs() {
     SPEC_FUN    pthief_hater;
 
     assign_one_mob_non(1,  deth);
-    assign_one_mob_non(2,  charon);
     assign_one_mob_non(3,  platmerchant);
     assign_one_mob_non(4,  mithaxequest);
     assign_one_mob_non(5,  mage_familiar_imp_non);
@@ -184,8 +181,6 @@ void assign_non_combat_procs() {
     assign_one_mob_non(503,  arena_only);
     assign_one_mob_non(1203,  Executioner);
     assign_one_mob_non(1334, generic_doorpick_blocker);
-    assign_one_mob_non(1364,  passive_grandmaster);
-    assign_one_mob_non(2828,  baby_troll);
     assign_one_mob_non(1932,  guild);
     assign_one_mob_non(1935,  guild);
     assign_one_mob_non(1937,  guild);
@@ -248,7 +243,6 @@ void assign_non_combat_procs() {
     assign_one_mob_non(27120,  backstabber);
     assign_one_mob_non(27860,  frosty);
     assign_one_mob_non(27871,  poet);
-    assign_one_mob_non(32044,  passive_tarrasque);
     assign_one_mob_non(32045,  repair_guy);
     assign_one_mob_non(32046,  super_repair_guy);
     assign_one_mob_non(32047,  repair_shop);
@@ -299,14 +293,8 @@ void assign_combat_procs() {
        zone they load up in.  - pir */
 
     assign_one_mob_com(5,  mage_familiar_imp);
-    assign_one_mob_com(906,  fighter);
-    assign_one_mob_com(910,  fighter);
-    assign_one_mob_com(914,  fighter);
-    assign_one_mob_com(917,  fighter);
-    assign_one_mob_com(918,  fighter);
     assign_one_mob_com(1364,  active_grandmaster);
     assign_one_mob_com(3059,  fighter);
-    assign_one_mob_com(3500,  snake);
     assign_one_mob_com(5005,  brass_dragon);
     assign_one_mob_com(5010,  red_dragon);
     assign_one_mob_com(5900,  turtle_green_combat);

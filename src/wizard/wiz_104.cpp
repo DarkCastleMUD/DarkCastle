@@ -503,7 +503,7 @@ int do_show(struct char_data *ch, char *argument, int cmd)
   extern int top_of_mobt;
   extern int top_of_objt;
   extern int top_of_world;
-
+ 
 //  half_chop(argument, type, name);
   argument = one_argument(argument,type);
 
@@ -526,7 +526,8 @@ int do_show(struct char_data *ch, char *argument, int cmd)
                    "  ofiles\r\n"
 		   "  search\r\n"
 		   " msearch\r\n"
-		   " rsearch\r\n", ch);
+		   " rsearch\r\n"
+		   " counts\r\n", ch);
     return eFAILURE;
   }
 
@@ -542,7 +543,8 @@ int do_show(struct char_data *ch, char *argument, int cmd)
 
     if(isdigit(*name)) {
 //       half_chop(name, beginrange, endrange);
-        beginrange = name;
+	strcpy(beginrange, name);
+//        beginrange = name;
         argument = one_argument(argument,endrange);
         if(!*endrange)
          strcpy(endrange, "-1");
@@ -613,6 +615,13 @@ int do_show(struct char_data *ch, char *argument, int cmd)
     if(!*buf)
       send_to_char("Couldn't find any MOBS by that NAME.\n\r", ch);
   } /* "mobile" */
+  else if (is_abbrev(type, "counts") && has_range)
+  {
+     extern int total_rooms;
+     csendf(ch, "$3Rooms$R: %d\r\n$3Mobiles$R: %d\r\n$3Objects$R: %d\r\n",
+	     total_rooms, top_of_mobt, top_of_objt);
+     return eSUCCESS;
+  }
   else if (is_abbrev(type,"object")) 
   {
     argument = one_argument(argument,name);
@@ -626,7 +635,8 @@ int do_show(struct char_data *ch, char *argument, int cmd)
     if(isdigit(*name)) {
  //      half_chop(name, beginrange, endrange);
     argument = one_argument(argument,endrange);
-	beginrange = name;
+	//beginrange = name;
+	strcpy(beginrange,name);
         if(!*endrange)
          strcpy(endrange, "-1");
 
@@ -707,7 +717,8 @@ int do_show(struct char_data *ch, char *argument, int cmd)
     if(isdigit(*name)) {
  //      half_chop(name, beginrange, endrange);
       argument = one_argument(argument,endrange);
-	beginrange = name;
+//	beginrange = name;
+	strcpy(beginrange, name);
         if(!*endrange)
          strcpy(endrange, "-1");
 
@@ -839,10 +850,12 @@ int do_show(struct char_data *ch, char *argument, int cmd)
   {  // Mobile search.
     char arg1[MAX_STRING_LENGTH];
     int act = 0, clas = 0, levlow = -555, levhigh = -555, affect = 0, immune = 0, race = -1, align = 0;
+    int affected2 = 0;
     extern char *action_bits[];
     extern struct race_shit race_info[];
     extern char *isr_bits[];
     extern char *affected_bits[];
+    extern char *affected_bits2[];
     extern char *pc_clss_types2[];
     //int its;
 //    if (
@@ -876,6 +889,12 @@ int do_show(struct char_data *ch, char *argument, int cmd)
           SET_BIT(affect, 1<<i);
           goto thisLoop;
         }
+       for (i = 0; *affected_bits2[i] != '\n'; i++)
+         if (!str_cmp(str_nospace(affected_bits2[i]), arg1))
+	{
+	  SET_BIT(affected2, 1<<i);
+	  goto thisLoop;
+	}
        for (i = 0; i <= MAX_RACE; i++)
         if (!str_cmp(str_nospace(race_info[i].singular_name),arg1))
         {
@@ -925,6 +944,15 @@ int do_show(struct char_data *ch, char *argument, int cmd)
 	     send_to_char("\r\n",ch);
 	   else
 	     send_to_char(" ", ch);
+	}
+	for (z = 0; *affected_bits2[z] != '\n'; z++)
+	{
+           send_to_char(str_nospace(affected_bits2[z]),ch);
+           if (++o%7==0)
+             send_to_char("\r\n",ch);
+           else
+             send_to_char(" ", ch);
+
 	}
 	for (z = 0; *affected_bits[z] != '\n';z++)
 	{
@@ -1015,6 +1043,11 @@ int do_show(struct char_data *ch, char *argument, int cmd)
            if (IS_SET(act,1<<i))
       if (!IS_SET(((struct char_data *)(mob_index[nr].item))->mobdata->actflags, 1<<i))
          goto eheh;
+      if (affected2)
+        for (i = 0; i < 31; i++)
+	  if (IS_SET(affected2, 1<<i))
+	    if (!IS_SET(((struct char_data *)(mob_index[nr].item))->affected_by2,1<<i))
+		goto eheh;
       if(affect)
 	for (i = 0; i < 31; i++)
            if (IS_SET(affect,1<<i))
@@ -1039,7 +1072,7 @@ char_data *)(mob_index[nr].item))->level,
     char arg1[MAX_STRING_LENGTH];
     int affect = 0, size =0, extra = 0, more = 0, wear = 0,type =0;
     int levlow = -555, levhigh = -555,dam = 0,lweight = -555, hweight = -555;
-    bool any = FALSE;
+    int any = 0;
     extern char *wear_bits[];
     extern char *extra_bits[];
     extern char *more_obj_bits[];
@@ -1078,7 +1111,7 @@ char_data *)(mob_index[nr].item))->level,
         if (!str_cmp(str_nospace(extra_bits[i]),arg1))
         {
 	if (!str_cmp(extra_bits[i], "ANY_CLASS"))
-	  any = TRUE;
+	  any = i;
 	else
           SET_BIT(extra, 1<<i);
           goto endy;
@@ -1261,10 +1294,11 @@ its = get_weapon_damage_type(((struct obj_data *)(obj_index[nr].item)));
   	  continue;
       if(extra)
         for (i = 0; i < 30; i++)
-	  if (IS_SET(extra,1<<i) || (any && !str_cmp(extra_bits[i], "ANY_CLASS")))
-      if (!IS_SET(((struct obj_data *)(obj_index[nr].item))->obj_flags.extra_flags, 1<<i) )
+	  if (IS_SET(extra,1<<i))
+      if (!IS_SET(((struct obj_data *)(obj_index[nr].item))->obj_flags.extra_flags, 1<<i)
+	&& !(any && IS_SET(((struct obj_data *)(obj_index[nr].item))->obj_flags.extra_flags, 1<<any)))
 	goto endLoop;
-	
+
       if (more)
 	for (i = 0; i < 10; i++)
 	  if (IS_SET(more,1<<i))

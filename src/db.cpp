@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.70 2004/06/09 22:06:30 urizen Exp $ */
+/* $Id: db.cpp,v 1.71 2004/07/03 11:44:12 urizen Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -143,6 +143,7 @@ struct help_index_element *help_index = 0;
 int top_of_mobt = 0;                  /* top of mobile index table       */
 int top_of_objt = 0;                  /* top of object index table       */
 int top_of_helpt = 0;                 /* top of help index table         */
+int total_rooms = 0; 		      /* total amount of rooms in memory */
 
 struct time_info_data time_info;    /* the infomation about the time   */
 struct weather_data weather_info;   /* the infomation about the weather */
@@ -959,13 +960,14 @@ struct index_data *generate_mob_indices(int *top, struct index_data *index)
   /*
     Here the index gets processed, and mob classes gets
 	assigned. (Not done in read_mobile 'cause of
-	the fact that all mob saren't read yet,
+	the fact that all mobs aren't read yet,
 	and an attempt to assign non-existant mob
 	procs would be bad).
   */
   for (i = 0; i <= top_of_mobt; i++)
   {
     CHAR_DATA *a = (CHAR_DATA *)mob_index[i].item;
+    int mob = 0;
     MPROG_DATA *mprg;
     if (!a) continue;
     if (!a->c_class) continue;
@@ -973,111 +975,123 @@ struct index_data *generate_mob_indices(int *top, struct index_data *index)
     {
 	case CLASS_MAGIC_USER:
 	  if (a->level < 21)
-		mob_index[i].mobspec = mob_index[real_mobile(101)].mobprogs;
+		mob = 101; 
 	  else if (a->level < 35)
-		mob_index[i].mobspec = mob_index[real_mobile(102)].mobprogs;
+		mob = 102;
 	  else if (a->level < 51)
-		mob_index[i].mobspec = mob_index[real_mobile(103)].mobprogs;
-	  else mob_index[i].mobspec = mob_index[real_mobile(104)].mobprogs;
+		mob = 103;
+	  else 
+		mob = 104;
 	  break;
         case CLASS_CLERIC:
           if (a->level < 21)
-                mob_index[i].mobspec = mob_index[real_mobile(105)].mobprogs;
+		mob = 105;
           else if (a->level < 35)
-                mob_index[i].mobspec = mob_index[real_mobile(106)].mobprogs;
+		mob = 106;
           else if (a->level < 51)
-                mob_index[i].mobspec = mob_index[real_mobile(107)].mobprogs;
-          else mob_index[i].mobspec = mob_index[real_mobile(108)].mobprogs;
+		mob = 107;
+          else 
+		mob = 108;
 	  break;
         case CLASS_WARRIOR:
           if (a->level < 21)
-                mob_index[i].mobspec = mob_index[real_mobile(109)].mobprogs;
+		mob = 109;
           else if (a->level < 35)
-                mob_index[i].mobspec = mob_index[real_mobile(110)].mobprogs;
+		mob = 110;
           else if (a->level < 51)
-                mob_index[i].mobspec = mob_index[real_mobile(111)].mobprogs;
-          else mob_index[i].mobspec = mob_index[real_mobile(112)].mobprogs;
+		mob = 111;
+          else 
+		mob = 112;
           break;
         case CLASS_BARBARIAN:
           if (a->level < 21)
-                mob_index[i].mobspec = mob_index[real_mobile(113)].mobprogs;
+		mob = 113;
           else if (a->level < 35)
-                mob_index[i].mobspec = mob_index[real_mobile(114)].mobprogs;
+		mob = 114;
           else if (a->level < 51)
-                mob_index[i].mobspec = mob_index[real_mobile(115)].mobprogs;
-          else mob_index[i].mobspec = mob_index[real_mobile(116)].mobprogs;
+		mob = 115;
+          else 
+		mob = 116;
           break;
         case CLASS_MONK:
           if (a->level < 21)
-                mob_index[i].mobspec = mob_index[real_mobile(117)].mobprogs;
+		mob = 117;
           else if (a->level < 35)
-                mob_index[i].mobspec = mob_index[real_mobile(118)].mobprogs;
+		mob = 118;
           else if (a->level < 51)
-                mob_index[i].mobspec = mob_index[real_mobile(119)].mobprogs;
-          else mob_index[i].mobspec = mob_index[real_mobile(120)].mobprogs;
+		mob = 119;
+          else 
+		mob = 120;
           break;
         case CLASS_THIEF:
           if (a->level < 21)
-                mob_index[i].mobspec = mob_index[real_mobile(121)].mobprogs;
+		mob = 121;
           else if (a->level < 35)
-                mob_index[i].mobspec = mob_index[real_mobile(122)].mobprogs;
+		mob = 122;
           else if (a->level < 51)
-                mob_index[i].mobspec = mob_index[real_mobile(123)].mobprogs;
-          else mob_index[i].mobspec = mob_index[real_mobile(124)].mobprogs;
+		mob = 123;
+          else 
+		mob = 124;
           break;
         case CLASS_PALADIN:
           if (a->level < 21)
-                mob_index[i].mobspec = mob_index[real_mobile(125)].mobprogs;
+		mob = 125;
           else if (a->level < 35)
-                mob_index[i].mobspec = mob_index[real_mobile(126)].mobprogs;
+		mob = 126;
           else if (a->level < 51)
-                mob_index[i].mobspec = mob_index[real_mobile(127)].mobprogs;
-          else mob_index[i].mobspec = mob_index[real_mobile(128)].mobprogs;
+		mob = 127;
+          else 
+		mob = 128;
           break;
         case CLASS_ANTI_PAL:
           if (a->level < 21)
-                mob_index[i].mobspec = mob_index[real_mobile(129)].mobprogs;
+		mob = 129;
           else if (a->level < 35)
-                mob_index[i].mobspec = mob_index[real_mobile(130)].mobprogs;
+		mob = 130;
           else if (a->level < 51)
-                mob_index[i].mobspec = mob_index[real_mobile(131)].mobprogs;
-          else mob_index[i].mobspec = mob_index[real_mobile(132)].mobprogs;
+		mob = 131;
+          else 
+		mob = 132;
           break;
         case CLASS_RANGER:
           if (a->level < 21)
-                mob_index[i].mobspec = mob_index[real_mobile(133)].mobprogs;
+		mob = 133;
           else if (a->level < 35)
-                mob_index[i].mobspec = mob_index[real_mobile(134)].mobprogs;
+		mob = 134;
           else if (a->level < 51)
-                mob_index[i].mobspec = mob_index[real_mobile(135)].mobprogs;
-          else mob_index[i].mobspec = mob_index[real_mobile(136)].mobprogs;
+		mob = 135;
+          else 
+		mob = 136;
           break;
         case CLASS_BARD:
           if (a->level < 21)
-                mob_index[i].mobspec = mob_index[real_mobile(137)].mobprogs;
+		mob = 137;
           else if (a->level < 35)
-                mob_index[i].mobspec = mob_index[real_mobile(138)].mobprogs;
+		mob = 138;
           else if (a->level < 51)
-                mob_index[i].mobspec = mob_index[real_mobile(139)].mobprogs;
-          else mob_index[i].mobspec = mob_index[real_mobile(140)].mobprogs;
+		mob = 139;
+          else 
+		mob = 140;
           break;
         case CLASS_DRUID:
           if (a->level < 21)
-                mob_index[i].mobspec = mob_index[real_mobile(141)].mobprogs;
+		mob = 141;
           else if (a->level < 35)
-                mob_index[i].mobspec = mob_index[real_mobile(142)].mobprogs;
+		mob = 142;
           else if (a->level < 51)
-                mob_index[i].mobspec = mob_index[real_mobile(143)].mobprogs;
-          else mob_index[i].mobspec = mob_index[real_mobile(144)].mobprogs;
+		mob = 143;
+          else 
+		mob = 144;
           break;
         case CLASS_NECROMANCER:
           if (a->level < 21)
-                mob_index[i].mobspec = mob_index[real_mobile(145)].mobprogs;
+		mob = 145;
           else if (a->level < 35)
-                mob_index[i].mobspec = mob_index[real_mobile(145)].mobprogs;
+		mob = 146;
           else if (a->level < 51)
-                mob_index[i].mobspec = mob_index[real_mobile(147)].mobprogs;
-          else mob_index[i].mobspec = mob_index[real_mobile(148)].mobprogs;
+		mob = 147;
+          else 
+		mob = 148;
           break;
         case CLASS_PSIONIC:
           if (a->level < 21)
@@ -1088,9 +1102,12 @@ struct index_data *generate_mob_indices(int *top, struct index_data *index)
                 mob_index[i].mobspec = mob_index[real_mobile(151)].mobprogs;
           else mob_index[i].mobspec = mob_index[real_mobile(152)].mobprogs;
           break;
-
-
 	default: break;
+    }
+    if (mob) {
+      mob_index[i].mobspec = mob_index[real_mobile(mob)].mobprogs;
+      SET_BIT( ((CHAR_DATA *)mob_index[i].item)->mobdata->actflags, ((CHAR_DATA *)mob_index[real_mobile(mob)].item)->mobdata->actflags);
+      SET_BIT( ((CHAR_DATA *)mob_index[i].item)->affected_by, ((CHAR_DATA *)mob_index[real_mobile(mob)].item)->affected_by);
     }
     if (mob_index[i].mobspec)
       for (mprg = mob_index[i].mobspec; mprg; mprg = mprg->next)
@@ -1311,6 +1328,7 @@ int read_one_room(FILE *fl, int & room_nr)
     world[room_nr].tracks      = 0;
     world[room_nr].last_track  = 0;
 
+    total_rooms++;
     if (top_of_zone_table >= 0) 
     {
       tmp = fread_int (fl, -1, 64000); // zone nr
@@ -2454,11 +2472,11 @@ CHAR_DATA *read_mobile(int nr, FILE *fl)
         tmp = fread_int (fl, 0, 32);
         GET_RACE(mob) = (char)tmp;
 
-        mob->raw_str   = mob->str   = 11;
-        mob->raw_intel = mob->intel = 11; 
-        mob->raw_wis   = mob->wis   = 11;
-        mob->raw_dex   = mob->dex   = 11;
-        mob->raw_con   = mob->con   = 11;
+        mob->raw_str   = mob->str   = 13;
+        mob->raw_intel = mob->intel = 13; 
+        mob->raw_wis   = mob->wis   = 13;
+        mob->raw_dex   = mob->dex   = 13;
+        mob->raw_con   = mob->con   = 13;
 
         GET_LEVEL(mob) = fread_int (fl, 0, IMP);
     
@@ -3571,6 +3589,7 @@ void reset_zone(int zone)
           zone_table[zone].num_mob_on_repop++;
           last_cmd = 1;
           last_mob = 1;
+	  mprog_load_trigger(mob);
         }
         else
         {
@@ -4557,7 +4576,7 @@ int mprog_name_to_type ( char *name )
    if ( !str_cmp( name, "bribe_prog"     ) )	return BRIBE_PROG;
    if ( !str_cmp( name, "catch_prog"     ) )	return CATCH_PROG;
    if ( !str_cmp( name, "attack_prog"    ) )    return ATTACK_PROG;
-
+   if ( !str_cmp( name, "load_prog"      ) )    return LOAD_PROG;
    return( ERROR_PROG );
 }
 

@@ -10,8 +10,6 @@
 //
 
 #include "Affect.h"
-
-
 // TODO - see notes in Affect.h
 
 

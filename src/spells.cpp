@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.101 2004/06/10 04:57:13 urizen Exp $ */
+/* $Id: spells.cpp,v 1.102 2004/07/03 11:44:14 urizen Exp $ */
 
 extern "C"
 {
@@ -647,7 +647,7 @@ char *spells[]=
    "howl",
    "souldrain",
    "sparks",     // 114
-   "camouflague",
+   "camouflage",
    "farsight",
    "freefloat",
    "insomnia",
@@ -1236,7 +1236,7 @@ int stat_mod [] = {
 
 int get_difficulty(int skillnum)
 {
-  extern struct skill_stuff skill_info[];
+//  extern struct skill_stuff skill_info[];
   extern struct ki_info_type ki_info [ ];
   extern struct song_info_type song_info[];
 
@@ -1251,7 +1251,7 @@ int get_difficulty(int skillnum)
 }
 
 
-bool skill_success(CHAR_DATA *ch, CHAR_DATA *victim, int skillnum, int mod = 0)
+bool skill_success(CHAR_DATA *ch, CHAR_DATA *victim, int skillnum, int mod )
 {
 //  extern int stat_mod[];
 //  int modifier = 0;

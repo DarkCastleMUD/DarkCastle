@@ -94,7 +94,7 @@ void release_message(CHAR_DATA *ch)
 
 void golem_gain_exp(CHAR_DATA *ch)
 {
-  extern int exp_table[];
+//  extern int exp_table[~];
   int level = 19 + ch->level;
   if (ch->level >= 20) return;
   if (ch->exp > exp_table[level])
@@ -236,11 +236,11 @@ void load_golem_data(CHAR_DATA *ch, int golemtype)
   set_golem(golem, golemtype); // Basics  
   ch->pcdata->golem = golem;
   fread(&(golem->level), sizeof(golem->level), 1, fpfile);
-  fread(&(golem->exp),   sizeof(golem->exp),  1, fpfile);
   int level = golem->level;
   for ( ; level > 1; level--)
      advance_golem_level(golem); // Level it up again.
-  struct obj_data *last_cont; // Last container.
+  fread(&(golem->exp),   sizeof(golem->exp),  1, fpfile);
+   struct obj_data *last_cont; // Last container.
   while(!feof(fpfile)) {
     last_cont = obj_store_to_char( golem, fpfile, last_cont );
   }

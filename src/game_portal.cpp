@@ -136,7 +136,7 @@ void free_game_portals_from_memory()
 void process_portals()
 {
   int i;
-  extern struct game_portal game_portals[];
+//  extern struct game_portal game_portals[];
 
   for(i = 0; i < MAX_GAME_PORTALS; i++)
   {

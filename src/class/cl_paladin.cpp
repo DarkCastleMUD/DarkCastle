@@ -83,16 +83,10 @@ int do_harmtouch(struct char_data *ch, char *argument, int cmd)
       send_to_char("You don't posess the energy to do it!\r\n", ch);
       return eFAILURE;
    }
-
-   af.type = SKILL_HARM_TOUCH;
-   af.duration  = 24;
-   af.modifier  = 0;
-   af.location  = APPLY_NONE;
-   af.bitvector = 0;
-   affect_to_char(ch, &af);
-
+   int duration = 24;
    if(!skill_success(ch,victim,SKILL_HARM_TOUCH)) {
      send_to_char("Your god refuses you.\r\n", ch);
+     duration = 12;
    }
    else {
      dam = 750;
@@ -106,6 +100,14 @@ int do_harmtouch(struct char_data *ch, char *argument, int cmd)
         GET_HIT(ch) = MIN(GET_HIT(ch), GET_MAX_HIT(ch));
      }
    }
+   af.type = SKILL_HARM_TOUCH;
+   af.duration  = duration;
+   af.modifier  = 0;
+   af.location  = APPLY_NONE;
+   af.bitvector = 0;
+   affect_to_char(ch, &af);
+
+
    return retval;
 }
 
@@ -123,7 +125,7 @@ int do_layhands(struct char_data *ch, char *argument, int cmd)
    // struct char_data *tmp_ch;
    char victim_name[240];
    struct affected_type af;
-
+   int duration = 72;
    one_argument(argument, victim_name);
 
    if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL )
@@ -167,6 +169,7 @@ int do_layhands(struct char_data *ch, char *argument, int cmd)
 
    if(!skill_success(ch,victim, SKILL_LAY_HANDS)) {
      send_to_char("Your god refuses you.\r\n", ch);
+     duration /= 2;
    }
    else {
      GET_HIT(victim) += 1000;
@@ -179,7 +182,7 @@ int do_layhands(struct char_data *ch, char *argument, int cmd)
    }
 
    af.type = SKILL_LAY_HANDS;
-   af.duration  = 72;
+   af.duration  = duration;
    af.modifier  = 0;
    af.location  = APPLY_NONE;
    af.bitvector = 0;

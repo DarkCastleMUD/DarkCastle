@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.120 2004/06/10 22:48:34 urizen Exp $ */
+/* $Id: const.cpp,v 1.121 2004/07/03 11:44:12 urizen Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -614,7 +614,7 @@ char *extra_bits[] =
     "LOCK",
     "ANY_CLASS",
     "INVISIBLE",
-    "MAGIC",
+    "MAGICAL",
     "NODROP",
     "BLESS",
     "ANTI-GOOD",
@@ -1378,7 +1378,7 @@ struct class_skill_defines u_skills[] = { // druid skills
 {    "forage",               SKILL_FORAGE,               43,     90,     {INT,CON} },  
 {    "stoneskin",           SPELL_STONE_SKIN,           44,     70,     {STR,CON} },  
 {    "power heal",           SPELL_POWER_HEAL,           45,     98,     {WIS,STR} },  
-{    "forest meld",          SPELL_FOREST_MELD,          45,     90,     {WIS,DEX} },  
+{    "forest meld",          SPELL_FOREST_MELD,          46,     90,     {WIS,DEX} },  
 {    "greater stoneshield", SPELL_GREATER_STONE_SHIELD, 47,     98,     {STR,WIS} },  
 {    "colour spray",         SPELL_COLOUR_SPRAY,         48,     98,     {WIS,INT} },  
 {    "summon",               SPELL_SUMMON,               49,     98,     {INT,STR} },  
@@ -1413,6 +1413,7 @@ struct class_skill_defines c_skills[] = { // cleric skills
 {    "sanctuary",            SPELL_SANCTUARY,         18,     90,     {WIS,INT} },     
 {    "remove curse",         SPELL_REMOVE_CURSE,      19,     98,     {INT,WIS} },     
 {    "cure critical",        SPELL_CURE_CRITIC,       20,     90,     {WIS,INT} },     
+{    "shield block",         SKILL_SHIELDBLOCK,      20,     35,     {STR,DEX} },
 {    "cause critical",       SPELL_CAUSE_CRITICAL,    21,     98,     {STR,WIS} },     
 {    "remove paralysis",     SPELL_REMOVE_PARALYSIS,  22,     98,     {INT,DEX} },     
 {    "locate object",        SPELL_LOCATE_OBJECT,     23,     80,     {INT,WIS} },     

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.71 2004/06/10 04:57:21 urizen Exp $
+| $Id: guild.cpp,v 1.72 2004/07/03 11:44:12 urizen Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -254,6 +254,7 @@ int skills_guild(struct char_data *ch, char *arg, struct char_data *owner)
 	return eSUCCESS;
      }
    }
+
 //    if(skilllist[skillnumber].clue && mob_index[owner->mobdata->nr].virt 
 //== default_master[GET_CLASS(ch)])
  //     do_say(owner, skilllist[skillnumber].clue, 9);
@@ -261,6 +262,12 @@ int skills_guild(struct char_data *ch, char *arg, struct char_data *owner)
 //to find another trainer.", 9);
 //    return eSUCCESS;
   }
+  if (ch->pcdata->practices <= 0) {
+    send_to_char("You do not seem to be able to practice now.\n\r", ch);
+    return eSUCCESS;
+  }
+
+
 
   if (known >= skilllist[skillnumber].maximum) {
     send_to_char("You are already learned in this area.\n\r", ch);
@@ -388,11 +395,6 @@ int guild(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
   }
   else
   {
-    if (ch->pcdata->practices <= 0) {
-      send_to_char("You do not seem to be able to practice now.\n\r", ch);
-      return eSUCCESS;
-    }
-
     if(IS_SET(skills_guild(ch, arg, owner), eSUCCESS))
       return eSUCCESS;
     send_to_char("You do not know of this ability...\n\r", ch);
@@ -564,15 +566,15 @@ void skill_increase_check(char_data * ch, int skill, int learned, int difficulty
    if (difficulty > 500) { oi = 101; difficulty -= 500; }
    switch(difficulty) {
      case SKILL_INCREASE_EASY:
-	 if (oi==100) oi = 95;
+	 if (oi==100) oi = 94;
 	 oi -= int_app[GET_INT(ch)].easy_bonus;
         break;
      case SKILL_INCREASE_MEDIUM:
-	if (oi==100)oi = 97;
+	if (oi==100)oi = 96;
 	oi -= int_app[GET_INT(ch)].medium_bonus;
         break;
      case SKILL_INCREASE_HARD:
-	if (oi==100)oi = 99;
+	if (oi==100)oi = 98;
 	oi -= int_app[GET_INT(ch)].hard_bonus;
         break;
      default:

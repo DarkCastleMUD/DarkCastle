@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.26 2004/04/24 10:42:39 urizen Exp $ */
+/* $Id: clan.cpp,v 1.27 2004/07/03 11:44:12 urizen Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -59,6 +59,7 @@ char * clan_rights[] = {
    "info",
    "tax",
    "withdraw",
+   "channel"
    "\n"
 };
 
@@ -72,7 +73,7 @@ void boot_clans(void)
   struct clan_member_data * new_new_member = NULL;
   int tempint;
 
-  if(!(fl = fopen("../lib/clan.txt", "r"))) {
+  if(!(fl = dc_fopen("../lib/clan.txt", "r"))) {
     fprintf(stderr, "Unable to open clan file...\n");
     fl = dc_fopen("../lib/clan.txt", "w");
     fprintf(fl, "~\n");
@@ -80,9 +81,9 @@ void boot_clans(void)
     abort();
   }
 
-  fgets(buf, 198, fl);  
-  
-  while(*buf != '~') {
+  char a;
+  while((a = fread_char(fl)) != '~') {
+   ungetc(a, fl);
 #ifdef LEAK_CHECK
     new_new_clan = (struct clan_data *)calloc(1, sizeof(struct clan_data));
 #else
@@ -99,12 +100,16 @@ void boot_clans(void)
     new_new_clan->rooms = NULL;
     new_new_clan->members = NULL;
 
-    sscanf(buf, "%s %s %s %hd", new_new_clan->leader, new_new_clan->founder,
-           new_new_clan->name, &new_new_clan->number);
+//    sscanf(buf, "%s %s %s %hd", new_new_clan->leader, new_new_clan->founder,
+//           new_new_clan->name, &new_new_clan->number);
 
+    new_new_clan->leader = fread_word(fl, 1);
+    new_new_clan->founder = fread_word(fl, 1);
+    new_new_clan->name = fread_word(fl, 1);
+    new_new_clan->number = fread_int(fl,0, LONG_MAX);
     // read in clan rooms
-    fgets(buf, 198, fl);
-    while(isdigit(*buf)) /* I see clan rooms! */
+//    fgets(buf, 198, fl);
+    while(fread_char(fl) != 'S') /* I see clan rooms! */
     {
 #ifdef LEAK_CHECK
       new_new_room = (struct clan_room_data *)calloc(1, sizeof(struct clan_room_data));
@@ -112,16 +117,19 @@ void boot_clans(void)
       new_new_room = (struct clan_room_data *)dc_alloc(1, sizeof(struct clan_room_data));
 #endif
       new_new_room->next = new_new_clan->rooms;
-      sscanf(buf, "%d", &tempint);
+      tempint = fread_int(fl, 0, 50000);
       new_new_room->room_number = (sh_int) tempint;
       new_new_clan->rooms = new_new_room;
-      fgets(buf, 198, fl); // will read the next item and/or the terminating S
     }
 
-    fgets(buf, 198, fl);
-    while( *buf != '~' )
+//    fgets(buf, 198, fl);
+    char a;
+    while( (a = fread_char(fl)) != '~' )
     {
-      switch(*buf) {
+      switch(a) {
+	case ' ':
+	case '\n':
+	  break;
         case 'E': {
           new_new_clan->email = fread_string(fl, 0);
           break;
@@ -161,11 +169,12 @@ void boot_clans(void)
           new_new_member = (struct clan_member_data *)dc_alloc(1, sizeof(struct clan_member_data));
 #endif
           new_new_member->member_name = fread_string(fl, 0);
-          fgets(buf, 198, fl);
-          sscanf(buf, "%d %d %d %d %d %d", 
-                      &new_new_member->member_rights, &new_new_member->member_rank,
-                      &new_new_member->unused1,       &new_new_member->unused2, 
-                      &new_new_member->unused3,       &new_new_member->time_joined);
+	  new_new_member->member_rights = fread_int(fl, 0, LONG_MAX);
+          new_new_member->member_rank = fread_int(fl, 0, LONG_MAX);
+          new_new_member->unused1 = fread_int(fl, 0, LONG_MAX);
+          new_new_member->unused2 = fread_int(fl, 0, LONG_MAX);
+          new_new_member->unused3 = fread_int(fl, 0, LONG_MAX);
+          new_new_member->time_joined = fread_int(fl, 0, LONG_MAX);
           new_new_member->unused4 = fread_string(fl, 0);
 
           // add it to the member linked list
@@ -176,10 +185,8 @@ void boot_clans(void)
                  log(buf, 0, LOG_MISC);
           break;
       }
-      fgets(buf, 198, fl);
     }
     add_clan(new_new_clan);
-    fgets(buf, 198, fl);
   }
 
   dc_fclose(fl);
@@ -1217,6 +1224,11 @@ int do_ctell(CHAR_DATA *ch, char *arg, int cmd)
 
   while(isspace(*arg))
     arg++;
+  if (!has_right(ch, CLAN_RIGHTS_CHANNEL))
+  {
+     send_to_char("You don't have the right to talk to your clan.\r\n",ch);
+     return eFAILURE;
+  }
 
   if(!(IS_SET(ch->misc, CHANNEL_CLAN))) {
     send_to_char("You have that channel off!!\n\r", ch);
@@ -1239,6 +1251,8 @@ int do_ctell(CHAR_DATA *ch, char *arg, int cmd)
        continue;
      if(pch == ch || pch->clan != ch->clan || 
         !IS_SET(pch->misc, CHANNEL_CLAN))
+       continue;
+     if (!has_right(pch, CLAN_RIGHTS_CHANNEL))
        continue;
      ansi_color( GREEN, pch);
      send_to_char(buf, pch);
@@ -1313,7 +1327,7 @@ void do_clan_rights(CHAR_DATA * ch, char * arg)
 {
   struct clan_member_data * pmember = NULL;
   struct char_data * victim = NULL;
-  extern char * clan_rights[];
+  //extern char * clan_rights[]~;
 
   char buf[MAX_STRING_LENGTH];
   char buf2[MAX_STRING_LENGTH];

@@ -2,7 +2,7 @@
 #define FIGHT_H_
 
 /************************************************************************
-| $Id: fight.h,v 1.14 2004/05/14 00:04:17 urizen Exp $
+| $Id: fight.h,v 1.15 2004/07/03 11:44:19 urizen Exp $
 | fight.h
 | This file defines the header information for fight.
 */
@@ -74,7 +74,7 @@ int second_attack(CHAR_DATA *ch);
 int third_attack(CHAR_DATA *ch);
 int fourth_attack(CHAR_DATA *ch);
 int second_wield(CHAR_DATA *ch);
-void set_cantquit(CHAR_DATA *ch, CHAR_DATA *vict, bool forced = FALSE);
+void set_cantquit(CHAR_DATA *, CHAR_DATA *, bool = FALSE);
 int is_pkill(CHAR_DATA *ch, CHAR_DATA *vict);
 void raw_kill(CHAR_DATA *ch, CHAR_DATA *victim);
 void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim);

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.31 2004/05/30 18:59:04 urizen Exp $
+| $Id: move.cpp,v 1.32 2004/07/03 11:44:14 urizen Exp $
 | move.C
 | Movement commands and stuff.
 *************************************************************************
@@ -211,8 +211,11 @@ int do_fall(CHAR_DATA *ch, short dir)
     for (k = world[target].people; k; k = k->next_in_room)
      if (!IS_NPC(k))
         ppl++;
-    if (ppl > 2) 
+    if (ppl > 2)
+    {
+      send_to_char("There isn't enough space for you to follow.\r\n",ch);
       return eFAILURE;
+    }
   }
   if (IS_SET(world[target].room_flags, PRIVATE))
   {
@@ -222,7 +225,10 @@ int do_fall(CHAR_DATA *ch, short dir)
      if (!IS_NPC(k))
       ppl++;
     if (ppl > 4)
+    {
+      send_to_char("There isn't enough space for you to follow.\r\n",ch);
       return eFAILURE;
+    }
   }
 
   sprintf(damage,"%s falls from %d and sustains %d damage.",
@@ -388,7 +394,10 @@ int do_simple_move(CHAR_DATA *ch, int cmd, int following)
      if (!IS_NPC(k))
         ppl++;
     if (ppl > 2)
+    {
+	send_to_char("There's no room.\r\n",ch);
       return eFAILURE;
+    }
   }
   if (IS_SET(rm->room_flags, PRIVATE))
   {
@@ -398,7 +407,10 @@ int do_simple_move(CHAR_DATA *ch, int cmd, int following)
      if (!IS_NPC(k))
       ppl++;
     if (ppl > 4)
+    {
+      send_to_char("There's no room.\r\n",ch);
       return eFAILURE;
+    }
   }
 
     if(!IS_NPC(ch) &&

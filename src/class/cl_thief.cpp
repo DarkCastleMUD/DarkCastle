@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.65 2004/06/02 20:43:19 urizen Exp $
+| $Id: cl_thief.cpp,v 1.66 2004/07/03 11:44:16 urizen Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -1398,11 +1398,11 @@ int do_vitalstrike(struct char_data *ch, char *argument, int cmd)
 
   // learned should have max of 80 for mortal thieves
   // this means you can use it once per tick
-
+  
   int length = 9 - has_skill(ch,SKILL_VITAL_STRIKE) / 10;
+  if (!IS_SET(ch->combat, COMBAT_VITAL_STRIKE)) length /= 2;
   if(length < 1)
     length = 1;
-
   af.type = SKILL_VITAL_STRIKE;
   af.duration  = length;
   af.modifier  = 0;

@@ -19,7 +19,7 @@
 /* 12/06/2003   Onager   Modified mobile_activity() to prevent charmie    */
 /*                       scavenging                                       */
 /**************************************************************************/
-/* $Id: mob_act.cpp,v 1.24 2004/05/20 22:05:21 urizen Exp $ */
+/* $Id: mob_act.cpp,v 1.25 2004/07/03 11:44:13 urizen Exp $ */
 
 extern "C"
 {
@@ -166,8 +166,8 @@ void mobile_activity(void)
               break;
             case CLASS_MAGIC_USER:
               retval = passive_magic_user(ch, NULL, 0, "", ch);
-              if(!IS_SET(retval, eFAILURE))
-                continue;
+//              if(!IS_SET(retval, eFAILURE))
+ //               continue;
               break;
             case CLASS_CLERIC:
               retval = passive_cleric(ch, NULL, 0, "", ch);
@@ -325,6 +325,7 @@ void mobile_activity(void)
     // check hatred 
     if((ch->mobdata->hatred != NULL))    //  && (!ch->fighting)) (we check fighting earlier)
     {
+      send_to_char("You're hating.\r\n",ch);
       CHAR_DATA *next_blah;
 //      CHAR_DATA *temp = get_char(get_random_hate(ch));    
       done = 0;
@@ -337,7 +338,7 @@ void mobile_activity(void)
           continue;
         if(!IS_MOB(tmp_ch) && IS_SET(tmp_ch->pcdata->toggles, PLR_NOHASSLE))
           continue;
-      
+        act("Checking $N", ch, 0, tmp_ch, TO_CHAR, 0);
         if(isname(GET_NAME(tmp_ch), ch->mobdata->hatred)) // use isname since hatred is a list
         {
           if(IS_SET(world[ch->in_room].room_flags, SAFE))  
@@ -512,7 +513,7 @@ void mobile_activity(void)
 	   }
 	   else {
 	    act("$n senses your evil intentions and attacks!", ch, 0,tmp_ch, TO_VICT,0);
-	    act("$n senses $t's evil intentions and attacks!", ch, 0,tmp_ch,TO_ROOM,NOTVICT);
+	    act("$n senses $N's evil intentions and attacks!", ch, 0,tmp_ch,TO_ROOM,NOTVICT);
  	   }
             retval = mprog_attack_trigger( ch, tmp_ch );
             if(SOMEONE_DIED(retval))
@@ -532,7 +533,7 @@ void mobile_activity(void)
 	   }
 	   else {
 	    act("$n is offended by your good nature and attacks!",ch,0, tmp_ch, TO_VICT,0);
-	    act("$n is offended by $t's good nature and attacks!", ch, 0,tmp_ch,  TO_ROOM,NOTVICT);
+	    act("$n is offended by $N's good nature and attacks!", ch, 0,tmp_ch,  TO_ROOM,NOTVICT);
 	   }
             retval = mprog_attack_trigger( ch, tmp_ch );
             if(SOMEONE_DIED(retval))
@@ -548,7 +549,7 @@ void mobile_activity(void)
 	   if (i==0)
             act("$n screams 'Pick a side, neutral dog!'", ch, 0, 0, TO_ROOM, 0);
 	   else {
-	    act("$n detects $t's neutrality and attacks!", ch, 0,tmp_ch, TO_ROOM,NOTVICT);
+	    act("$n detects $M's neutrality and attacks!", ch, 0,tmp_ch, TO_ROOM,NOTVICT);
 	    act("$n detects your neutrality and attacks!", ch, 0,tmp_ch, TO_VICT,0);
   	  }
 

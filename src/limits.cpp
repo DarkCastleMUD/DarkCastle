@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.49 2004/06/03 07:45:02 urizen Exp $ */
+/* $Id: limits.cpp,v 1.50 2004/07/03 11:44:13 urizen Exp $ */
 
 extern "C"
 {
@@ -176,8 +176,6 @@ int mana_gain(CHAR_DATA *ch)
 
   gain += ch->mana_regen;
 
-  if (IS_AFFECTED(ch, AFF_POISON))
-    gain >>= 2;
 
   if((GET_COND(ch,FULL)==0)||(GET_COND(ch,THIRST)==0))
     gain >>= 2;
@@ -197,7 +195,7 @@ int hit_gain(CHAR_DATA *ch)
   int gain = 1;
   struct affected_type * af;
   int divisor =1;
-  /* Neat and fast */
+ /* Neat and fast */
   if(IS_NPC(ch))
     gain = (GET_MAX_HIT(ch) / 30);
   
@@ -231,9 +229,6 @@ int hit_gain(CHAR_DATA *ch)
   gain += ch->hit_regen;
   if (ch->affected_by2 & AFF_REGENERATION)
     gain += (gain/2);
-
-  if(IS_AFFECTED(ch, AFF_POISON))
-    gain >>= 2;
 
   if((GET_COND(ch, FULL)==0) || (GET_COND(ch, THIRST)==0))
     gain >>= 2;
@@ -289,15 +284,12 @@ int move_gain(CHAR_DATA *ch)
 
     gain += ch->move_regen;
 
-    if (IS_AFFECTED(ch,AFF_POISON))
-	gain >>= 2;
 
     if((GET_COND(ch,FULL)==0)||(GET_COND(ch,THIRST)==0))
 	gain >>= 2;
    gain /= divisor;
    gain -= MIN(100, age(ch).year) / 10;
  
-    gain /= 2;
     return MAX(1,gain);
 }
 
@@ -683,6 +675,13 @@ void point_update( void )
   for(i = character_list; i; i = next_dude) 
   {
     next_dude = i->next;
+  if (affected_by_spell(i, SPELL_POISON))
+  {
+    send_to_char("You feel very sick.\r\n",i);
+    int dam = dam_percent(affected_by_spell(i, SPELL_POISON)->modifier, 50);
+    damage(i, i, dam, TYPE_POISON, SPELL_POISON, 0);
+    continue;
+  }
 
     // only heal linkalive's and mobs
     if(GET_POS(i) > POSITION_DEAD && (IS_NPC(i) || i->desc)) {

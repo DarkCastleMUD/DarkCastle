@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.216 2004/06/24 00:10:29 urizen Exp $ */
+/* $Id: fight.cpp,v 1.217 2004/07/03 11:44:12 urizen Exp $ */
 
 extern "C"
 {
@@ -126,11 +126,20 @@ void perform_violence(void)
       log("Error in perform_violence()!  Null ch->fighting!", IMMORTAL, LOG_BUG);
       return;
     }
-    
+    bool over = FALSE;
     // some spells remove a tick of duration each round of combat yer in
     for (af = ch->affected; af; af = next_af_dude) 
     {
         next_af_dude = af->next;
+	if (af->type == SPELL_POISON)
+        {
+	  send_to_char("You body shivers from the poison.\r\n",ch);
+	  int dam = dam_percent(affected_by_spell(ch, SPELL_POISON)->modifier, 50);
+	  int retval = damage(ch, ch, dam, TYPE_POISON, 0, 0);
+	  if (SOMEONE_DIED(retval))
+	  { over = TRUE; break; }
+	}
+        else
         if (af->type == SPELL_ATTRITION)
         {
            send_to_char("Your body aches at the effort of combat.\r\n", ch);
@@ -151,7 +160,7 @@ void perform_violence(void)
           }  
         }
     }
-
+   if (over) continue;
 // DEBUG CODE
    int last_virt = -1;;
    int last_class = GET_CLASS(ch);
@@ -316,7 +325,7 @@ int attack(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
 
   if (!vict->fighting && vict->in_room == ch->in_room)
     set_fighting(vict, ch); // So attacker starts round #2.
-  else
+  else if (vict->in_room == ch->in_room)
     set_fighting(ch, vict);
   wielded = ch->equipment[WIELD];
 
@@ -1299,15 +1308,18 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
 
   if(GET_POS(victim) == POSITION_DEAD)           return (eSUCCESS|eVICT_DIED);
   if (ch->in_room != victim->in_room && attacktype != SPELL_SOLAR_GATE) return eSUCCESS;
-//  csendf(victim, "damage: dam = %d  type = %d\r\n", dam, weapon_type);
+
   if (dam!=0 && attacktype && attacktype < TYPE_HIT)
   { // Skill damages based on learned %
     int l = has_skill(ch, attacktype);
     if (IS_NPC(ch)) l = 50;
+    if (IS_NPC(ch) && ch->master)
+       l *= (ch->master->level / 50);
     if (l)
       dam = dam_percent(l, dam);
     dam = number(dam-(dam/10), dam+(dam/10)); // +- 10%
   }
+
   if(typeofdamage == DAMAGE_TYPE_MAGIC)  
   {
     if(IS_AFFECTED(victim, AFF_REFLECT)  && 
@@ -1372,7 +1384,8 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
         act("You are susceptable to $N's assault and sustains additional damage.", victim, 0, ch, TO_CHAR, 0); 
    }
    if (number(1,100) < save) {
-	dam /= 2; // Save chance.
+	if (save > 50) save = 50;
+	dam -= (dam * (save/100)); // Save chance.
         act("$n resists $N's assault and sustains reduced damage.", victim, 0, ch, TO_ROOM, NOTVICT);
         act("$n resists your assault and sustains reduced damage.",victim,0,ch, TO_VICT,0);
         act("You resist $N's assault and sustains reduced damage.", victim, 0, ch, TO_CHAR, 0);
@@ -1394,7 +1407,7 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
   /* An eye for an eye, a tooth for a tooth, a life for a life. */
   if (GET_POS(victim) > POSITION_STUNNED && ch != victim)
   {
-    if(!victim->fighting)
+    if(!victim->fighting && ch->in_room == victim->in_room)
       set_fighting(victim, ch);
 
     if((!IS_SET(victim->combat, COMBAT_STUNNED)) &&
@@ -1422,7 +1435,7 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
   }
 
   if (GET_POS(ch) > POSITION_STUNNED && ch != victim) {
-    if (!ch->fighting)
+    if (!ch->fighting && ch->in_room == victim->in_room)
       set_fighting(ch, victim);
   }
 
@@ -1614,7 +1627,6 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
   
   if (dam < 0)
     dam = 0;
-  
   // Check for parry, mob disarm, and trip. Print a suitable damage message. 
   if (attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING)
   {
@@ -1802,7 +1814,7 @@ void do_dam_msgs(CHAR_DATA *ch, CHAR_DATA *victim, int dam, int attacktype, int 
   }
 }
 
-void set_cantquit(CHAR_DATA *ch, CHAR_DATA *vict, bool forced = FALSE)
+void set_cantquit(CHAR_DATA *ch, CHAR_DATA *vict, bool forced )
 {
   struct affected_type af, *paf;
   
@@ -2976,16 +2988,28 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
     )
     make_dust(victim);
   else make_corpse(victim);
+
+  if (IS_NPC(victim) && IS_AFFECTED(victim, AFF_FAMILIAR) && victim->master)
+  {
+    struct affected_type af;
+    af.type = SPELL_SUMMON_FAMILIAR;
+    af.duration = 12;
+    af.modifier = -2;
+    af.location = APPLY_CON;
+    af.bitvector = 0;
+    affect_to_char(victim->master, &af);
+  }
   
   if(IS_NPC(victim)) { 
     extract_char(victim, TRUE);
     return;
   }
   
-  if (ch->followers || ch->master)
+  if (victim->followers || victim->master)
   {
      stop_grouped_bards(ch);
   }
+
 
   if (victim->pcdata->golem)
   {

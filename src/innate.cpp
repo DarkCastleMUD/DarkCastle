@@ -107,7 +107,8 @@ int do_innate(CHAR_DATA *ch, char *arg, int cmd)
 	{
 	   struct affected_type af;
 	   af.type = SKILL_INNATE_TIMER;
-	   af.duration = 24;
+	   af.duration = !str_cmp(buf, "repair")?16:24;
+		// repair is every 16 ticks, 'cause Apoc's annoying.
 	   af.modifier = 0;
 	   af.location = 0;
 	   af.bitvector = 0;
@@ -214,9 +215,9 @@ int innate_repair(CHAR_DATA *ch, char *arg, int cmd)
     send_to_char("You are not carrying anything like that.\r\n",ch);
     return eFAILURE;
   }
-  if (GET_LEVEL(ch) < 10)
+  if (GET_LEVEL(ch) < obj->obj_flags.eq_level)
   {
-   send_to_char("You are not versed enough in the ways of your people to perform such an action.\r\n",ch);
+   send_to_char("This item is beyond your skill.\r\n",ch);
    return eFAILURE;
   }
   for (i = 0; i < obj->num_affects;i++)

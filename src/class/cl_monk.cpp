@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_monk.cpp,v 1.19 2004/05/30 18:59:06 urizen Exp $
+| $Id: cl_monk.cpp,v 1.20 2004/07/03 11:44:16 urizen Exp $
 | cl_monk.C
 | Description:  Monk skills.
 */
@@ -95,7 +95,7 @@ int do_quivering_palm(struct char_data *ch, char *argument, int cmd)
   struct char_data *victim;
   char name[256];
   int dam, retval;
-
+  int duration = 100;
   if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
     ;
   else if(!has_skill(ch, SKILL_QUIVERING_PALM)) {
@@ -147,22 +147,24 @@ int do_quivering_palm(struct char_data *ch, char *argument, int cmd)
 
   GET_KI(ch) -= 40;
 
-  WAIT_STATE(ch, PULSE_VIOLENCE*2);
-  af.type = SKILL_QUIVERING_PALM;
-  af.duration = 12;
-  af.modifier = 0;
-  af.location = APPLY_NONE;
-  af.bitvector = 0;
-  affect_to_char(ch, &af);
-
   if(!skill_success(ch,victim,SKILL_QUIVERING_PALM)) {
     retval = damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_QUIVERING_PALM, 0);
+    duration = 6;
   }
   else {
     dam = GET_MAX_HIT(victim) /2;
     if (dam > 2000) dam = 2000;
     retval = damage(ch, victim, dam, TYPE_UNDEFINED, SKILL_QUIVERING_PALM, 0);
+    duration = 12;
   }
+  WAIT_STATE(ch, PULSE_VIOLENCE*2);
+  af.type = SKILL_QUIVERING_PALM;
+  af.duration = duration;
+  af.modifier = 0;
+  af.location = APPLY_NONE;
+  af.bitvector = 0;
+  affect_to_char(ch, &af);
+  
   return retval;
 }
 

@@ -136,7 +136,7 @@ void update_command_lag_and_poison(void);
 void skip_spaces(char **string);
 char *any_one_arg(char *argument, char *first_arg);
 char * calc_color(int hit, int max_hit);
-char * calc_condition(CHAR_DATA *ch, bool colour = FALSE);
+char * calc_condition(CHAR_DATA , bool );
 void generate_prompt(CHAR_DATA *ch, char *prompt);
 int get_from_q(struct txt_q *queue, char *dest, int *aliased);
 void init_game(int port, int port2, int port3, int port4);
@@ -340,7 +340,7 @@ int write_hotboot_file()
 
   // note, for debug mode, you have to put the "-c", "6969", in there
 #ifndef WIN32
-  if(-1 == execl("/home/dcastle/dcastle/src/research1", "research1",(char*)NULL)) {
+  if(-1 == execl("../src/research1", "research1",(char*)NULL)) {
 #else
 	  if(-1 == _execl("../src/research1", "research1", (char*)NULL)) {
 #endif
@@ -1100,10 +1100,12 @@ char * calc_condition(CHAR_DATA *ch, bool colour = FALSE)
 {
   int percent;
   char *cond_txt[8];// = cond_txtz;
+
   if (colour)
    cond_txt = cond_txtc;
   else
    cond_txt = cond_txtz;
+
   if(GET_HIT(ch) == 0 || GET_MAX_HIT(ch) == 0)
     percent = 0;
   else

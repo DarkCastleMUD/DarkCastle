@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.62 2004/06/01 02:12:50 urizen Exp $ */
+/* $Id: mob_proc.cpp,v 1.63 2004/07/03 11:44:13 urizen Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -2987,10 +2987,10 @@ static char *dethSayText [ ] =
   "Girls always act all old and mature until you fuck them in the ass and they're like 'STOP IM THIRTEEN IM THIRTEEN'",
   "Sorry Mario but the Princess is on another MUD.",
   "I'm annoyed that they can get 11KBps from mars but can't get me a stable 5KBps over 17 miles.",
-  "If my calculations are correct SLINKY + ESCULATOR = EVERLASTING FUN!",
+  "If my calculations are correct SLINKY + ESCALATOR = EVERLASTING FUN!",
   "Mark Duval of Belgium is an idiot.",
   "Muhahaha!  I infected this guy at 127.0.0.1 with Sub7 and I'm messing with him now.",
-  "How many Vietnam Vets does it take to screw in a lightbult?  You don't KNOW MAN, cause you WEREN'T THERE.",
+  "How many Vietnam Vets does it take to screw in a lightbulb?  You don't KNOW MAN, cause you WEREN'T THERE.",
   "This girl I know said she doesn't give head and I'm like...they still make those?",
   "I'm not on 'AOL'. I'm on America Online.  Retard.",
   "You know something's wrong when you have dreams about eating pudding and you wake up with a spoon in your ass.",
@@ -3019,13 +3019,27 @@ static char *dethSayText [ ] =
   "Okay so this baby seal walks into a club....",
   "There's two types of women on the internet.  .jpg and .gif",
   "It's sad when Perl is the closest thing you have to a relationship with a woman.",
-  "Lucifer is sooo 20th centery.  The Devil should rename himself something like 1337Ki11@r.",
+  "Lucifer is sooo 20th century.  The Devil should rename himself something like 1337Ki11@r.",
   "What does God do when a kitten masturbates?",
   "This is great...some guy in Nigeria wants to transfer me a huge sum of money if I help him out!",
   "The truth, like my penis, sometimes slips out at inopportune times.",
   "I wonder if anyone ever calls Steve Jobs 'Mac Daddy'.",
   "Ever get the urge to call the operator and say 'I need an exit fast!'",
-  "The thing that attracts me to fat chicks the most is probably the gravitational pull."
+  "The thing that attracts me to fat chicks the most is probably the gravitational pull.",
+// Sneaky repeating of messages to make the fuckers vote.
+  "I've lost 3 girlfriends to voting for Dark Castle on Mudconnect(through www.dcastle.info), but it was worth it.",
+  "I've lost 3 girlfriends to voting for Dark Castle on Mudconnect(through www.dcastle.info), but it was worth it.",
+  "I've lost 3 girlfriends to voting for Dark Castle on Mudconnect(through www.dcastle.info), but it was worth it.",
+  "Good: Your wife meets you naked at the door. Bad: She's coming home.",
+  "Good: Your boyfriend's excercising. Bad: So he'll fit in your clothes.",
+  "What do you have when 100 lawyers are buried up to their neck in sand?  Not enough sand",
+  "When a girl says \"No\" she actually means \"Yes\", but not with you.",
+  "Quidquid latine dictum sit, altum viditur.",
+    // whatever is said in Latin sounds profound
+  "To be sure of hitting the target, shoot first and, whatever you hit, call it the target.",
+  "Your lucky numbers is 7399928377275452622483. Look for it everywhere!",
+  "Love is like a snowmobile racing across the tundra and then suddenly it flips over, pinning you underneath. At night, the ice weasels come.",
+  "Don't worry about people stealing your ideas. If your ideas are any good, you'll have to ram them down people's throats."
 };
 
 #define DETH_SAY_TEXT_SIZE    ( sizeof ( dethSayText )    / sizeof ( char * ) )

@@ -16,7 +16,7 @@
 /* 12/08/2003   Onager   Added chop_half() to work like half_chop() but    */
 /*                       chopping off the last word.                       */
 /***************************************************************************/
-/* $Id: interp.cpp,v 1.48 2004/06/09 22:06:31 urizen Exp $ */
+/* $Id: interp.cpp,v 1.49 2004/07/03 11:44:13 urizen Exp $ */
 
 extern "C"
 {
@@ -370,8 +370,8 @@ struct command_info cmd_info[] =
     { "load",       do_load,         POSITION_DEAD,      GIFTED_COMMAND, 9,  0 },
     { "shutdow",    do_shutdow,      POSITION_DEAD,      GIFTED_COMMAND, 9,  0 },
     { "shutdown",   do_shutdown,     POSITION_DEAD,      GIFTED_COMMAND, 9,  0 },
-    { "mpedit",     do_mpedit,       POSITION_DEAD,      GIFTED_COMMAND, 9,  0 },
-    { "mpstat",     do_mpstat,       POSITION_DEAD,      GIFTED_COMMAND, 9,  0 },
+    { "procedit",     do_mpedit,       POSITION_DEAD,      GIFTED_COMMAND, 9,  0 },
+    { "procstat",     do_mpstat,       POSITION_DEAD,      GIFTED_COMMAND, 9,  0 },
     { "range",      do_range,        POSITION_DEAD,      GIFTED_COMMAND, 9,  0 },
     { "pshopedit",  do_pshopedit,    POSITION_DEAD,      GIFTED_COMMAND, 9,  0 },
     { "sedit",      do_sedit,        POSITION_DEAD,      GIFTED_COMMAND, 9,  0 },
@@ -448,6 +448,7 @@ struct command_info cmd_info[] =
     { "mptransfer", do_mptransfer,  POSITION_DEAD,      0,  9,  0 },
     { "mpthrow",    do_mpthrow,     POSITION_DEAD,      0,  9,  0 },
     { "mpforce",    do_mpforce,     POSITION_DEAD,      0,  9,  0 },
+    { "mpsetalign", do_mpsetalign,  POSITION_DEAD,      0, 9, 0   },
     { "mpsettemp", do_mpsettemp, POSITION_DEAD, 0, 9, 0 },
     { "mpxpreward", do_mpxpreward,  POSITION_DEAD,      0,  9,  0 },
     { "mpteachskill", do_mpteachskill, POSITION_DEAD,   0,  9,  0 },
@@ -584,7 +585,7 @@ int do_imotd(CHAR_DATA *ch, char *arg, int cmd)
 }
 
 
-int command_interpreter( CHAR_DATA *ch, char *pcomm, bool procced = FALSE )
+int command_interpreter( CHAR_DATA *ch, char *pcomm, bool procced  )
 {
     int look_at;
     int retval;
@@ -623,7 +624,12 @@ int command_interpreter( CHAR_DATA *ch, char *pcomm, bool procced = FALSE )
     // Translate to lower case.  We need to translate tabs for the MOBProgs to work
     while ( *pcomm == ' ' || *pcomm == '\t')
 	pcomm++;
-    
+    if (*pcomm == 'm' && *(pcomm+1) == 'p')
+	if (ch->desc)
+	{
+	  send_to_char("Not gonna happen.\r\n",ch);
+	  return eSUCCESS;
+	}
     for ( look_at = 0; pcomm[look_at] > ' '; look_at++ )
 	pcomm[look_at]  = LOWER(pcomm[look_at]);
 

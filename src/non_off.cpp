@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: non_off.cpp,v 1.17 2004/04/23 12:11:00 urizen Exp $
+| $Id: non_off.cpp,v 1.18 2004/07/03 11:44:14 urizen Exp $
 | non_off.C
 | Description:  Implementation of generic, non-offensive commands.
 */
@@ -612,13 +612,14 @@ int do_anonymous(CHAR_DATA *ch, char *argument, int cmd)
     log("Null char in do_anonymous.", OVERSEER, LOG_BUG);
     return eFAILURE;
   }
-
   if(IS_SET(ch->pcdata->toggles, PLR_ANONYMOUS))
   {
     send_to_char("Your class and level information is now public.\n\r", ch);
   }
   else
   {
+  send_to_char("Disabled for the duration of the contest.\r\n",ch);
+  return eFAILURE;
     send_to_char("Your class and level information is now private.\n\r", ch);
   }
 

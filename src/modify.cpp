@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: modify.cpp,v 1.11 2004/06/01 01:33:38 urizen Exp $ */
+/* $Id: modify.cpp,v 1.12 2004/07/03 11:44:14 urizen Exp $ */
 
 extern "C"
 {
@@ -137,7 +137,7 @@ void string_add(struct descriptor_data *d, char *str)
     }
 
     if(terminator) {
-      if (*d->str && **d->str)
+      if (d->str && *d->str && **d->str)
         dc_free(*d->str);
       *d->str = d->astr;
       d->str = 0;
@@ -378,8 +378,7 @@ int do_string(CHAR_DATA *ch, char *arg, int cmd)
       case 1:
         if(IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL) && GET_LEVEL(ch)
            < 110) {
-          send_to_char("Auto-mailing Sadus from account to inform "
-                       "him that you tried to string gl name.\n\r", ch);
+	  send_to_char("The moose will get you if you do that.\r\n",ch);
           return 1;  
         } 
         ch->desc->hashstr = &obj->name; break;

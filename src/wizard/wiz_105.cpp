@@ -40,7 +40,7 @@ int do_log(struct char_data *ch, char *argument, int cmd)
         send_to_char("Couldn't find any such creature.\n\r", ch);
     else if (IS_NPC(vict))
         send_to_char("Can't do that to a beast.\n\r", ch);
-    else if (GET_LEVEL(vict) >= GET_LEVEL(ch))
+    else if (GET_LEVEL(vict) > GET_LEVEL(ch))
         act("$E might object to that.. better not.", ch, 0, vict, TO_CHAR, 0);
     else if (IS_SET(vict->pcdata->punish, PUNISH_LOG))
     {

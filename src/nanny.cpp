@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.66 2004/06/01 02:19:51 urizen Exp $ */
+/* $Id: nanny.cpp,v 1.67 2004/07/03 11:44:14 urizen Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -814,7 +814,7 @@ void nanny(struct descriptor_data *d, char *arg)
                GET_NAME(d->character), d->host);
             log(buf, ANGEL, LOG_SOCKET);
             SEND_TO_Q("Sorry, new chars are not allowed from your site.\n\r"
-               "Questions may be directed to Pirahna at pirahna@dcastle.ad1440.net\n\r",
+               "Questions may be directed to Pirahna at dc_apoc@hotmail.com\n\r",
                d);
             STATE(d) = CON_CLOSE;
             return;

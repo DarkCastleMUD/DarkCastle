@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_barbarian.cpp,v 1.23 2004/05/30 18:59:06 urizen Exp $
+| $Id: cl_barbarian.cpp,v 1.24 2004/07/03 11:44:16 urizen Exp $
 | cl_barbarian.C
 | Description:  Commands for the barbarian class.
 */
@@ -308,7 +308,7 @@ int do_bloodfury(struct char_data *ch, char *argument, int cmd)
 {
   struct affected_type af;
   float modifier;
-
+  int duration = 42;
   if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
     ;
   else if(!has_skill(ch, SKILL_BLOOD_FURY)) {
@@ -325,6 +325,7 @@ int do_bloodfury(struct char_data *ch, char *argument, int cmd)
   {
     act("$n starts breathing heavily, then chokes and tries to clear $s head.", ch, NULL, NULL, TO_ROOM, NOTVICT);
     send_to_char("You try to pysch yourself up and choke on the taste of blood.\r\n", ch);
+    duration = 21 - (GET_LEVEL(ch) / 2);
   }
   else 
   {
@@ -339,10 +340,11 @@ int do_bloodfury(struct char_data *ch, char *argument, int cmd)
     GET_HIT(ch) += (int)((float)GET_MAX_HIT(ch) * modifier);
     if(GET_HIT(ch) > GET_MAX_HIT(ch))
       GET_HIT(ch) = GET_MAX_HIT(ch);
+    duration = 42 - (GET_LEVEL(ch) / 4);
   }
 
   af.type      = SKILL_BLOOD_FURY;
-  af.duration  = 42 - (GET_LEVEL(ch)/4);
+  af.duration  = duration;
   af.modifier  = 0;
   af.location  = 0;
   af.bitvector = 0;
@@ -355,7 +357,7 @@ int do_bloodfury(struct char_data *ch, char *argument, int cmd)
 int do_crazedassault(struct char_data *ch, char *argument, int cmd)
 {
   struct affected_type af;
-
+  int duration = 20;
   if(affected_by_spell(ch, SKILL_CRAZED_ASSAULT) && GET_LEVEL(ch) < IMMORTAL) {
     send_to_char("Your body is still recovering from your last crazed assault technique.\r\n", ch);
     return eFAILURE; 
@@ -370,6 +372,7 @@ int do_crazedassault(struct char_data *ch, char *argument, int cmd)
           
   if(!skill_success(ch,NULL,SKILL_CRAZED_ASSAULT)) {
     send_to_char("You try to psyche yourself up for it but just can't muster the concentration.\r\n", ch);
+    duration = 8 - has_skill(ch, SKILL_CRAZED_ASSAULT) / 10;
   }
   else {
     send_to_char("Your mind focuses completely on hitting your opponent.\r\n", ch);
@@ -379,12 +382,13 @@ int do_crazedassault(struct char_data *ch, char *argument, int cmd)
     af.location  = APPLY_HITROLL;
     af.bitvector = 0;
     affect_to_char(ch, &af);
+    duration = 16 - has_skill(ch, SKILL_CRAZED_ASSAULT) / 10;
   }
   
   WAIT_STATE(ch, PULSE_VIOLENCE);
   
   af.type = SKILL_CRAZED_ASSAULT;
-  af.duration  = 16 - has_skill(ch,SKILL_CRAZED_ASSAULT) / 10;
+  af.duration  = duration;
   af.modifier  = 0; 
   af.location  = APPLY_NONE;
   af.bitvector = 0;

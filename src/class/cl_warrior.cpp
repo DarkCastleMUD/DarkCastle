@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.22 2004/05/30 18:59:06 urizen Exp $
+| $Id: cl_warrior.cpp,v 1.23 2004/07/03 11:44:16 urizen Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -667,7 +667,7 @@ int do_rescue(struct char_data *ch, char *argument, int cmd)
 int do_bladeshield(struct char_data *ch, char *argument, int cmd)
 {
   struct affected_type af;
-
+  int duration = 25;
   if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)   
     ;
   else if(!has_skill(ch, SKILL_BLADESHIELD)) {
@@ -689,6 +689,7 @@ int do_bladeshield(struct char_data *ch, char *argument, int cmd)
     act("$n starts swinging $s weapons around but stops before narrowly avoiding dismembering $mself."
          , ch, 0, 0, TO_ROOM, NOTVICT);
     send_to_char("You try to begin the bladeshield technique and almost chop off your own arm!\r\n", ch);
+    duration /= 2;
   }
   else {
     act("$n forms a defensive wall of swinging weapons around $mself.", ch, 0, 0, TO_ROOM, NOTVICT);
@@ -701,7 +702,7 @@ int do_bladeshield(struct char_data *ch, char *argument, int cmd)
   WAIT_STATE(ch, PULSE_VIOLENCE);
 
   af.type = SKILL_BLADESHIELD;
-  af.duration  = 25;
+  af.duration  = duration;
   af.modifier  = 0;
   af.location  = APPLY_NONE;
   af.bitvector = 0;

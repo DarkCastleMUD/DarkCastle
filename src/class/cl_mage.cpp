@@ -21,7 +21,7 @@ int do_focused_repelance(struct char_data *ch, char *argument, int cmd)
 {
   byte percent;
   struct affected_type af;
-
+  int duration = 40;
   if(IS_MOB(ch))
     ;
   else if(!has_skill(ch, SKILL_FOCUSED_REPELANCE)) {
@@ -40,6 +40,7 @@ int do_focused_repelance(struct char_data *ch, char *argument, int cmd)
          ch, NULL, NULL, TO_ROOM, NOTVICT);
     send_to_char("Your mind cannot handle the strain!\r\n", ch);
     WAIT_STATE(ch, PULSE_VIOLENCE*2);
+    duration = 20 - (has_skill(ch, SKILL_FOCUSED_REPELANCE) / 10);
   }
   else 
   {
@@ -48,10 +49,11 @@ int do_focused_repelance(struct char_data *ch, char *argument, int cmd)
     send_to_char("Your mystical vision is clear, your senses of the arcane sharpened.  " 
                  "No mortal can break through _your_ magical barrier.\r\n", ch);
     SET_BIT(ch->combat, COMBAT_REPELANCE);
+    duration = 40 - (has_skill(ch, SKILL_FOCUSED_REPELANCE)/10);
   }
 
   af.type      = SKILL_FOCUSED_REPELANCE;
-  af.duration  = 40 - (has_skill(ch,SKILL_FOCUSED_REPELANCE)/10);
+  af.duration  = duration;
   af.modifier  = 0;
   af.location  = 0;
   af.bitvector = 0;

@@ -92,6 +92,7 @@ char *mprog_type_to_name( int type )
     case BRIBE_PROG:            return "bribe_prog";
     case CATCH_PROG:		return "catch_prog";
     case ATTACK_PROG:		return "attack_prog";
+    case LOAD_PROG:		return "load_prog";
     default:                    return "ERROR_PROG";
     }
 }
@@ -989,6 +990,26 @@ int do_mpsettemp(CHAR_DATA *ch, char *argument, int cmd)
   if (victim->tempVariable) 
      dc_free(victim->tempVariable);
   victim->tempVariable = str_dup(temp);
+  return eSUCCESS;
+}
+
+int do_mpsetalign(CHAR_DATA *ch, char *argument, int cmd)
+{
+  CHAR_DATA *victim;
+  char arg[MAX_INPUT_LENGTH], align[MAX_INPUT_LENGTH];
+  if (!IS_NPC(ch))
+  {
+    send_to_char("Huh?\r\n",ch);
+    return eFAILURE;
+  }
+  if (!*argument || !ch->in_room)
+    return eFAILURE;
+  half_chop(argument, arg, align);
+  victim = get_char_room(arg, ch->in_room);
+  if (!victim || (!is_number(align) && (!is_number(align+1) || *align != '-'))) return eFAILURE;
+  if (atoi(align) > 1000 || atoi(align) < -1000)
+    return eFAILURE;
+  victim->alignment = atoi(align);
   return eSUCCESS;
 }
 
