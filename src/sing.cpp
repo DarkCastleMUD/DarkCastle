@@ -44,6 +44,7 @@ extern CHAR_DATA *character_list;
 void remove_memory(CHAR_DATA *ch, char type);
 void add_memory(CHAR_DATA *ch, char *victim, char type);
 extern bool check_social( CHAR_DATA *ch, char *pcomm, int length, char *arg );
+void check_eq(CHAR_DATA *ch);
 
 //        byte beats;     /* Waiting time after ki */
 //        byte minimum_position; /* min position for use */
@@ -232,6 +233,11 @@ NULL,    SKILL_INCREASE_HARD
         2, POSITION_FIGHTING, 8, SKILL_SONG_CRUSHING_CRESCENDO, 
         TAR_IGNORE, song_crushing_crescendo, execute_song_crushing_crescendo,
         NULL, NULL, SKILL_INCREASE_HARD
+}, 
+{
+         15, POSITION_STANDING, 20, SKILL_SONG_HYPNOTIC_HARMONY,
+	 TAR_CHAR_ROOM, song_hypnotic_harmony, 
+         execute_song_hypnotic_harmony, NULL, NULL, SKILL_INCREASE_HARD
 }
 
 };
@@ -263,6 +269,7 @@ char *songs[] = {
 	"fanatical fanfare",
         "dischordant dirge",
         "crushing crescendo",
+        "hypnotic harmony",
 	"\n"
 };
 
@@ -661,7 +668,92 @@ void update_bard_singing()
   }
 }
 
-int song_disrupt( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+int song_hypnotic_harmony(byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+{
+   if (!victim || !ch) {
+      log("Serious problem in song_hypnotic_harmony!", ANGEL, LOG_BUG);
+      return eFAILURE|eINTERNAL_ERROR;
+      }
+   act("$n sings an incredibly beautiful hymn, making you want to just give up your dayjob and follow $m around!",
+       ch, 0, victim, TO_VICT, 0);
+   act("$n sings an entrancing hymn to $N!",
+       ch, 0, victim, TO_ROOM, NOTVICT);
+   send_to_char("You sing your most enchanting hymn, hoping to make attract some fans.\r\n", ch);
+
+   ch->song_timer = (song_info[ch->song_number].beats -
+                              ( skill / 15 ) );
+
+   return eSUCCESS;
+}
+
+int execute_song_hypnotic_harmony(byte level, CHAR_DATA *ch, char *Arg,
+	CHAR_DATA *victim, int skill)
+{
+  struct affected_type af;
+ 
+  if (!victim || !ch) {
+      log("Serious problem in execute_song_hypnotic_harmony!", ANGEL, LOG_BUG);
+      return eFAILURE|eINTERNAL_ERROR;
+      }
+
+   WAIT_STATE(ch, PULSE_VIOLENCE);
+   if (!IS_NPC(victim) || !IS_SET(victim->mobdata->actflags, ACT_BARDCHARM))
+   {
+      send_to_char("They don't seem particularily interested.\r\n",ch);
+      send_to_char("You manage to resist the entrancing lyrics.\r\n",victim);
+      return eFAILURE;
+   }
+
+  if(circle_follow(victim, ch)) {
+    send_to_char("Sorry, following in circles can not be allowed.\n\r", ch);
+    return eFAILURE;
+  }
+bool any_charms(CHAR_DATA *ch);
+
+   if(any_charms(ch))  {
+   CHAR_DATA * vict = NULL;
+    for(struct follow_type *k = ch->followers; k; k = k->next)
+     if(IS_MOB(k->follower) && affected_by_spell(k->follower, SPELL_CHARM_PERSON))
+     {
+        vict = k->follower;
+        break;
+     }
+     if (vict) {
+        if (vict->in_room == ch->in_room && vict->position > POSITION_SLEEPING)
+          do_say(vict, "Hey... but what about ME!?", 9);
+         remove_memory(vict, 'h');
+        if (vict->master) {
+         stop_follower(vict, BROKE_CHARM);
+         add_memory(vict, GET_NAME(ch), 'h');
+        }
+     }
+   }   
+ if(victim->master)
+    stop_follower(victim, 0);
+
+  remove_memory(victim, 'h');
+
+  add_follower(victim, ch, 0);
+
+  af.type      = SPELL_CHARM_PERSON;
+  int i = has_skill(ch, SKILL_SONG_HYPNOTIC_HARMONY);
+  af.duration  = 24 + ((level > 40) * 6) + ((level > 60) * 6) + ((level > 80) * 12) ;
+
+ af.modifier  = 0;
+  af.location  = 0;
+  af.bitvector = AFF_CHARM;
+  affect_to_char(victim, &af);
+
+  /* remove any !charmie eq the charmie is wearing */
+  check_eq(victim);
+
+  act("You decide to follow $n's musical genius to the end.", ch , 0, victim, TO_VICT, 0);
+return eSUCCESS;
+
+}
+
+int song_disrupt( byte level, CHAR_DATA *ch, char 
+*arg, CHAR_DATA *victim, int skill)
 {
    if (!victim || !ch) {
       log("Serious problem in song_disrupt!", ANGEL, LOG_BUG);

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.33 2004/07/21 10:16:10 rahz Exp $
+| $Id: move.cpp,v 1.34 2004/07/25 20:55:25 urizen Exp $
 | move.C
 | Movement commands and stuff.
 *************************************************************************
@@ -635,6 +635,17 @@ int attempt_move(CHAR_DATA *ch, int cmd, int is_retreat = 0)
      (ch->in_room == ch->master->in_room)) {
     send_to_char("You are unable to abandon your master.\n\r", ch); 
     act("$n trembles as $s mind attempts to free itself from its magical bondage.", ch, 0, 0, TO_ROOM, 0);
+    if (!IS_NPC(ch->master) && GET_CLASS(ch->master) == CLASS_BARD)
+    {
+      send_to_char("You struggle to maintain control.\r\n", ch->master);
+      if (GET_KI(ch->master) < 5)
+      {
+         stop_follower(ch, BROKE_CHARM);
+         add_memory(ch, GET_NAME(ch->master), 'h');
+	 do_say(ch, "Hey! You tricked me!", 9);
+	 send_to_char("You lose control.\r\n",ch->master);
+      } else GET_KI(ch->master) -= 5;
+    }
     return eFAILURE;
   }
 
