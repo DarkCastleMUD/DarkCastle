@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.6 2002/08/01 08:12:03 pirahna Exp $ */
+/* $Id: magic.cpp,v 1.7 2002/08/01 08:52:37 pirahna Exp $ */
 
 extern "C"
 {
@@ -3339,8 +3339,9 @@ int spell_cont_light(byte level, CHAR_DATA *ch,
                                  "the ground here.");
 
   tmp_obj->obj_flags.type_flag = ITEM_LIGHT;
-  tmp_obj->obj_flags.wear_flags = (ITEM_TAKE | ITEM_HOLD);
+  tmp_obj->obj_flags.wear_flags = (ITEM_TAKE | ITEM_HOLD | ITEM_LIGHT_SOURCE);
   tmp_obj->obj_flags.size = SIZE_ANY;
+  tmp_obj->obj_flags.extra_flags = ITEM_ANY_CLASS;
   tmp_obj->obj_flags.value[2] = -1;
   tmp_obj->obj_flags.weight = 1;
   tmp_obj->obj_flags.cost = 0;

@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: obj.h,v 1.7 2002/07/16 20:52:01 pirahna Exp $ */
+/* $Id: obj.h,v 1.8 2002/08/01 08:52:44 pirahna Exp $ */
 #ifndef OBJ_H_
 #define OBJ_H_
 
@@ -77,10 +77,9 @@ int eq_current_damage(obj_data * obj);
 #define ITEM_WIELD           8192
 #define ITEM_HOLD           16384
 #define ITEM_THROW          32768
+#define ITEM_LIGHT_SOURCE   65536
 #define ITEM_WEAR_FACE     131072
 #define ITEM_WEAR_EAR      262144
-
-/* UNUSED, CHECKS ONLY FOR ITEM_LIGHT #define ITEM_LIGHT_SOURCE  65536 */
 
 /* Bitvector for 'extra_flags' */
 
