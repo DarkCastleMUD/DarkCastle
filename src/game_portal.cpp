@@ -259,6 +259,7 @@ int make_arbitrary_portal(int from_room, int to_room, int duplicate, int timer)
 void find_and_remove_player_portal(char_data * ch)
 {
   struct obj_data * k;
+  struct obj_data * next_k;
   char searchstr[180];
   extern struct obj_data  *object_list;
   extern int top_of_world;
@@ -268,7 +269,8 @@ void find_and_remove_player_portal(char_data * ch)
     sprintf(searchstr, "cleric %s", GET_NAME(ch));
   else sprintf(searchstr, "only %s", GET_NAME(ch));
 
-  for(k = object_list; k; k = k->next) {
+  for(k = object_list; k; k = next_k) {
+    next_k = k->next;
     if(GET_ITEM_TYPE(k) != ITEM_PORTAL ||
        !strstr(k->name, searchstr))
       continue;
