@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.39 2003/08/12 03:45:34 pirahna Exp $ */
+/* $Id: mob_proc.cpp,v 1.40 2003/09/07 00:25:30 pirahna Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -2571,7 +2571,7 @@ static char *dethSayText [ ] =
   "What WAS the best thing before sliced bread?",
   "What hair color do they put on the driver's licenses of bald men?",
   "If it's zero degrees outside today, and it's supposed to be twice as cold tomorrow, how cold is it going to be?",
-  "Since Americans throw rice at weddings, do Orientals throw hamburgers?",
+  "Since Americans throw rice at weddings, do Asians throw hamburgers?",
   "Why is a carrot more orange than an orange?",
   "That was Zen, this is Tao.",
   "I am on a thirty day diet.  So far, I have lost 15 days.",
