@@ -1689,7 +1689,7 @@ int execute_song_fanatical_fanfare(byte level, CHAR_DATA *ch, char *arg, CHAR_DA
          affect_from_char(fvictim->follower, SPELL_INSOMNIA);
          send_to_char("Your mind returns to its normal state.\n\r", fvictim->follower);
       }
-      SET_BIT(fvictim->follower->affected_by, AFF_INSOMNIA);
+      SET_BIT(fvictim->follower->affected_by2, AFF_INSOMNIA);
       send_to_char("Your mind races at a thousand miles an hour, to the beat of the song!\r\n", fvictim->follower);
    }
 
@@ -1779,11 +1779,11 @@ int intrp_song_fanatical_fanfare( byte level, CHAR_DATA *ch, char *arg, CHAR_DAT
       }
    }
 
-   if(IS_SET(master->affected_by, AFF_HASTE) &&
-      !affected_by_spell(master, SPELL_HASTE))
+   if(IS_SET(master->affected_by2, AFF_INSOMNIA) &&
+      !affected_by_spell(master, SPELL_INSOMNIA))
    {
-      REMOVE_BIT(master->affected_by, AFF_HASTE);
-      send_to_char("Your limbs slow back to normal.\r\n", master);
+      REMOVE_BIT(master->affected_by2, AFF_INSOMNIA);
+      send_to_char("Your mind returns to its normal state.\r\n", master);
    }
    return eSUCCESS;
 
