@@ -321,7 +321,7 @@ int do_sing(CHAR_DATA *ch, char *arg, int cmd)
   int learned;
   int specialization;
 
-   if (GET_CLASS(ch) != CLASS_BARD && GET_LEVEL(ch) < IMMORTAL) {
+   if (!IS_NPC(ch) && GET_CLASS(ch) != CLASS_BARD && GET_LEVEL(ch) < IMMORTAL) {
       check_social(ch, "sing", 0, arg); // do the social:)
       return eSUCCESS;
    }

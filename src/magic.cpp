@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.156 2004/06/02 20:43:03 urizen Exp $ */
+/* $Id: magic.cpp,v 1.157 2004/06/06 18:01:36 urizen Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -8151,6 +8151,7 @@ CHAR_DATA  *victim, struct obj_data * tar_obj, int skill)
         af.modifier             = 2;
         af.location             = APPLY_CON;
         affect_to_char(victim, &af);
+	redo_hitpoints(victim);
 	return eSUCCESS;
 }
 

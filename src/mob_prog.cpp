@@ -541,12 +541,12 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
     {
       switch ( arg[1] )  /* arg should be "$*" so just get the letter */
 	{
-	case 'i': lhsvl = mob->hit / mob->max_hit;
+	case 'i': lhsvl = (mob->hit*100)  / mob->max_hit;
 	          rhsvl = atoi( val );
          	  return mprog_veval( lhsvl, opr, rhsvl );
 	case 'n': if ( actor )
 	          {
-		    lhsvl = actor->hit / actor->max_hit;
+		    lhsvl = (actor->hit*100) / actor->max_hit;
 		    rhsvl = atoi( val );
 		    return mprog_veval( lhsvl, opr, rhsvl );
 		  }
@@ -554,7 +554,7 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
 		    return -1;
 	case 't': if ( vict )
 	          {
-		    lhsvl = vict->hit / vict->max_hit;
+		    lhsvl = (vict->hit*100) / vict->max_hit;
 		    rhsvl = atoi( val );
 		    return mprog_veval( lhsvl, opr, rhsvl );
 		  }
@@ -562,7 +562,7 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
 		    return -1;
 	case 'r': if ( rndm )
 	          {
-		    lhsvl = rndm->hit / rndm->max_hit;
+		    lhsvl = (rndm->hit*100) / rndm->max_hit;
 		    rhsvl = atoi( val );
 		    return mprog_veval( lhsvl, opr, rhsvl );
 		  }

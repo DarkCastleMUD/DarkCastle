@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.41 2004/05/28 16:13:54 urizen Exp $
+| $Id: inventory.cpp,v 1.42 2004/06/06 18:01:36 urizen Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -373,7 +373,7 @@ int do_get(struct char_data *ch, char *argument, int cmd)
 		    next_obj = obj_object->next_content;
 		if (GET_ITEM_TYPE(obj_object) == ITEM_CONTAINER && contains_no_trade_item(obj_object))
 		{
-                  csendf(ch, "%s : It seems magicallyattached to the corpse.\n\r", fname(obj_object->name));
+                  csendf(ch, "%s : It seems magically attached to the corpse.\n\r", fname(obj_object->name));
 		  continue;
 		}
 		    /* IF all.obj, only get those named "obj" */
