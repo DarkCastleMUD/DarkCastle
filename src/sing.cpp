@@ -108,7 +108,7 @@ struct song_info_type song_info [ ] = {
 },
 
 { /* 7 */
-        6, POSITION_FIGHTING, 8, SKILL_SONG_STICKY_LULL, 
+        3, POSITION_FIGHTING, 8, SKILL_SONG_STICKY_LULL, 
         TAR_CHAR_ROOM|TAR_FIGHT_VICT,
         song_sticky_lullaby, execute_song_sticky_lullaby, NULL, NULL
 }, 
