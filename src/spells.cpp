@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.102 2004/07/03 11:44:14 urizen Exp $ */
+/* $Id: spells.cpp,v 1.103 2004/07/03 18:00:42 urizen Exp $ */
 
 extern "C"
 {
@@ -1670,7 +1670,7 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
           return eSUCCESS;
         }
 
-        if (IS_AFFECTED(ch, AFF_INVISIBLE)) {
+        if (IS_AFFECTED(ch, AFF_INVISIBLE) && !IS_AFFECTED2(ch, AFF_ILLUSION)) {
            act("$n slowly fades into existence.", ch, 0, 0, TO_ROOM, 0);
            affect_from_char(ch, SPELL_INVISIBLE);
            REMOVE_BIT(ch->affected_by, AFF_INVISIBLE);
