@@ -202,13 +202,14 @@ int do_sqedit(struct char_data *ch, char *argument, int cmd)
 ///	int i;
         if (arg3[0] != '\0')
 	  i = find_skill_num(arg3);
-	else
+	if (i<=0)
 	  i = find_skill_num(arg1);
       #ifdef LEAK_CHECK
 	newOne = (struct skill_quest *) calloc(1, sizeof(struct skill_quest));
       #else
 	newOne = (struct skill_quest *) dc_alloc(1,sizeof(struct skill_quest));
       #endif
+	newOne->num = i;
 	newOne->level = 1;
         newOne->message = str_dup("New skillquest.");
         newOne->clas = 1;
