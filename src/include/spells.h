@@ -14,7 +14,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.h,v 1.34 2003/12/01 17:39:08 staylor Exp $ */
+/* $Id: spells.h,v 1.35 2004/04/13 11:38:38 urizen Exp $ */
 #include <structs.h> // byte, sh_int
 
 #define MAX_BUF_LENGTH               240
@@ -141,7 +141,7 @@
 #define SPELL_HOWL	            112
 #define SPELL_SOULDRAIN	            113
 #define SPELL_SPARKS	            114
-#define SPELL_CAMOUFLAGUE           115
+#define SPELL_CAMOUFLAGE            115
 #define SPELL_FARSIGHT              116
 #define SPELL_FREEFLOAT             117
 #define SPELL_INSOMNIA              118

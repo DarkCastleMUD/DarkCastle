@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: obj.h,v 1.11 2002/09/06 23:27:02 pirahna Exp $ */
+/* $Id: obj.h,v 1.12 2004/04/13 11:38:38 urizen Exp $ */
 #ifndef OBJ_H_
 #define OBJ_H_
 
@@ -26,6 +26,7 @@ void eq_remove_damage(obj_data * obj);
 void add_obj_affect(obj_data * obj, int loc, int mod);
 void remove_obj_affect_by_index(obj_data * obj, int index);
 void remove_obj_affect_by_type(obj_data * obj, int loc);
+int recheck_height_wears(char_data *ch);
 
 /* The following defs are for obj_data  */
 
