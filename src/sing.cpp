@@ -944,8 +944,7 @@ act("You resist $n's terrible clef!",ch,NULL,victim,TO_VICT,0);
 
    skill_increase_check(ch, SKILL_SONG_TERRIBLE_CLEF, skill, SKILL_INCREASE_EASY);
 
-  if(//number(1, 101) > ( 50 + skill/2 )
-        !skill_success(ch, victim, SKILL_SONG_TERRIBLE_CLEF)  ) {
+  if(!skill_success(ch, victim, SKILL_SONG_TERRIBLE_CLEF)  ) {
       send_to_char("You run out of lyrics and end the song.\r\n", ch);
       return eSUCCESS;
    }
@@ -2262,8 +2261,6 @@ int execute_song_crushing_crescendo( byte level, CHAR_DATA *ch, char *arg, CHAR_
    if ((int)ch->song_data < 3) // Doesn't help beyond that.
      ch->song_data = (char*)((int)ch->song_data + 1); // Add one round.
 		// Bleh, C allows easier pointer manipulation
-   send_to_char("Your singing hurts your opponent!\r\n", ch);
-   send_to_char("The music!  It hurts!  It hurts!\r\n", victim);
    if (number(1,101) < get_saves(victim, SAVE_TYPE_MAGIC))
    {
      act("$N resists your crushing crescendo!", ch, NULL, victim, TO_CHAR,0);
@@ -2298,7 +2295,7 @@ int execute_song_crushing_crescendo( byte level, CHAR_DATA *ch, char *arg, CHAR_
 
    skill_increase_check(ch, SKILL_SONG_CRUSHING_CRESCENDO, skill, SKILL_INCREASE_MEDIUM);
 
-   retval = damage(ch, victim, dam, TYPE_SONG,SKILL_SONG_TERRIBLE_CLEF, 0);
+   retval = damage(ch, victim, dam, TYPE_SONG,SKILL_SONG_CRUSHING_CRESCENDO, 0);
    if(IS_SET(retval, eCH_DIED))
      return retval;
    if(IS_SET(retval, eVICT_DIED))
@@ -2316,7 +2313,8 @@ int execute_song_crushing_crescendo( byte level, CHAR_DATA *ch, char *arg, CHAR_
 	return eSUCCESS;
   }
   GET_KI(ch) -= song_info[ch->song_number].min_useski;
-  if(!skill_success(ch, victim, SKILL_SONG_CRUSHING_CRESCENDO)  ) {
+  if((int)ch->song_data > has_skill(ch,SKILL_SONG_CRUSHING_CRESCENDO) /20) 
+{
       send_to_char("You run out of lyrics and end the song.\r\n", ch);
       return eSUCCESS;
    }
