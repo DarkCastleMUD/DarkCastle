@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: const.cpp,v 1.25 2002/08/06 21:09:20 pirahna Exp $ */
+/* $Id: const.cpp,v 1.26 2002/08/07 03:53:54 pirahna Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1243,6 +1243,7 @@ struct class_skill_defines m_skills[] = { // mage skills
 {    "strength",	SPELL_STRENGTH,		7,	90,	3020,	NULL },
 {    "weaken",		SPELL_WEAKEN,		7,	90,	-2, "A druid of old age and virulance is who you want. He will be in the company of other druids." },
 {    "blindness",	SPELL_BLINDNESS,	8,	90,	3020,	NULL },
+{    "identify",	SPELL_IDENTIFY,	9,	90,	3020,	NULL },
 {    "enchant weapon",	SPELL_ENCHANT_WEAPON,	10,	90,	3020,	NULL },
 {    "lightning bolt",	SPELL_LIGHTNING_BOLT,	10,	90,	3020,	NULL },
 {    "curse",		SPELL_CURSE,		12,	90,	3020,	NULL },

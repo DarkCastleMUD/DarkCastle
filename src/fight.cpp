@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.36 2002/08/06 21:39:17 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.37 2002/08/07 03:53:54 pirahna Exp $ */
 
 extern "C"
 {
@@ -3484,6 +3484,7 @@ int do_flee(struct char_data *ch, char *argument, int cmd)
           // The escape has succeded
           chTemp = ch->fighting;
           ch->fighting = NULL;
+          GET_POS(ch) = POSITION_STANDING;
 
           char tempcommand[32];
           extern char *dirs[];
@@ -3496,7 +3497,9 @@ int do_flee(struct char_data *ch, char *argument, int cmd)
           if (IS_SET(retval, eSUCCESS)) 
           {
             // set them back fighting to link it properly
+            GET_POS(ch) = POSITION_FIGHTING;
             ch->fighting = chTemp;
+            
             // They got away.  Stop fighting for everyone not in the new room from fighting
             for (chTemp = combat_list; chTemp; chTemp = chTemp->next_fighting) 
             {
@@ -3521,6 +3524,7 @@ int do_flee(struct char_data *ch, char *argument, int cmd)
           else {
             if (!IS_SET(retval, eCH_DIED)) 
               act("$n tries to flee, but is too exhausted!", ch, 0, 0, TO_ROOM, INVIS_NULL);
+            GET_POS(ch) = POSITION_FIGHTING;
             ch->fighting = chTemp; // set them back to fighting
             return retval;
           }
