@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.7 2002/08/03 01:34:40 pirahna Exp $ */
+/* $Id: ki.cpp,v 1.8 2002/08/16 19:40:06 pirahna Exp $ */
 
 extern "C"
 {
@@ -113,7 +113,7 @@ int do_ki(CHAR_DATA *ch, char *argument, int cmd)
   int learned;
 
    if (GET_LEVEL(ch) < ARCHANGEL && GET_CLASS(ch) != CLASS_MONK) {
-      send_to_char("You are unable to control your ki in ths way!\n\r", ch);
+      send_to_char("You are unable to control your ki in this way!\n\r", ch);
       return eFAILURE;
       }
 

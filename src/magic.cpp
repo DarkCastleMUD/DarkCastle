@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.19 2002/08/16 19:13:42 pirahna Exp $ */
+/* $Id: magic.cpp,v 1.20 2002/08/16 19:40:06 pirahna Exp $ */
 
 extern "C"
 {
@@ -2943,7 +2943,7 @@ int spell_identify(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data
 
 
 	 } else {
-		send_to_char("You learn nothing new_new.\n\r", ch);
+		send_to_char("You learn nothing new.\n\r", ch);
 	 }
   }
   return eSUCCESS;
@@ -5893,7 +5893,7 @@ int cast_invisibility( byte level, CHAR_DATA *ch, char *arg, int type,
   case SPELL_TYPE_SPELL:
 	 if (tar_obj) {
 		if ( IS_SET(tar_obj->obj_flags.extra_flags, ITEM_INVISIBLE) )
-	 send_to_char("Nothing new_new seems to happen.\n\r", ch);
+	 send_to_char("Nothing new seems to happen.\n\r", ch);
 		else
 	 return spell_invisibility(level, ch, 0, tar_obj, skill);
 	 } else { /* tar_ch */

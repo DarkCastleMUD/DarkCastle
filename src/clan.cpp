@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.4 2002/06/29 18:16:21 pirahna Exp $ */
+/* $Id: clan.cpp,v 1.5 2002/08/16 19:40:06 pirahna Exp $ */
 extern "C"
 {
   #include <string.h> // strcat
@@ -722,7 +722,7 @@ int do_accept(CHAR_DATA *ch, char *arg, int cmd)
   add_clan_member(clan, victim);
   save_clans();
   sprintf(buf, "You are now a member of %s.\n\r", clan->name);
-  send_to_char("Your clan now has a new_new member.\n\r", ch);
+  send_to_char("Your clan now has a new member.\n\r", ch);
   send_to_char(buf, victim); 
 
   sprintf(buf, "%s just joined clan [%s].", GET_NAME(victim), clan->name);
@@ -851,7 +851,7 @@ int do_cpromote(CHAR_DATA *ch, char *arg, int cmd)
   save_clans();
   
   sprintf(buf, "You are now the leader of %s.\n\r", clan->name);
-  send_to_char("Your clan now has a new_new leader.\n\r", ch);
+  send_to_char("Your clan now has a new leader.\n\r", ch);
   send_to_char(buf, victim); 
 
   sprintf(buf, "%s just cpromoted by %s as leader of clan [%s].", GET_NAME(victim), GET_NAME(ch), clan->name);
