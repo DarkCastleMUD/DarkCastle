@@ -584,8 +584,10 @@ void update_bard_singing()
           return;
         }
 
+      int learned = has_skill(i, ( i->song_number + SKILL_SONG_BASE ) );
+
       if((song_info[i->song_number].exec_pointer))
-        ((*song_info[i->song_number].exec_pointer) (GET_LEVEL(i), i, NULL, NULL, 0));
+        ((*song_info[i->song_number].exec_pointer) (GET_LEVEL(i), i, NULL, NULL, learned));
       else send_to_char("Bad exec pointer on the song you sang.  Tell a god.\r\n", i);
     }      
   }
@@ -655,10 +657,10 @@ int song_whistle_sharp( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim,
 
    skill_increase_check(ch, SKILL_SONG_WHISTLE_SHARP, skill, SKILL_INCREASE_HARD);
 
-//   WAIT_STATE(ch, song_info[ch->song_number].beats);
+   int wait = song_info[ch->song_number].beats - (skill / 10);
+   wait = MAX(wait, 2);
 
-   // temp one round of lag for now
-   WAIT_STATE(ch, 12);
+   WAIT_STATE(ch, wait);
    return eSUCCESS;
 }
 
@@ -667,7 +669,7 @@ int song_healing_melody( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim
    send_to_char("You begin to sing a song of healing...\n\r", ch);
    act("$n raises $s voice in a soothing melody...", ch, 0, 0, TO_ROOM, 0);
    ch->song_timer = (song_info[ch->song_number].beats -
-                              ( GET_LEVEL(ch) / 10 ) );
+                              ( skill / 15 ) );
 
    if(GET_LEVEL(ch) > MORTAL)
     ch->song_timer = 1;
@@ -714,13 +716,13 @@ int execute_song_healing_melody( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA
 
    skill_increase_check(ch, SKILL_SONG_HEALING_MELODY, skill, SKILL_INCREASE_EASY);
 
-   if(number(1, 101) > skill) {
+   if(number(1, 101) > ( 50 + skill/2 ) ) {
       send_to_char("You run out of lyrics and end the song.\r\n", ch);
       return eSUCCESS;
    }
 
    ch->song_timer = (song_info[ch->song_number].beats -
-                              ( GET_LEVEL(ch) / 10 ) );
+                              ( skill / 15 ) );
 
    if(GET_LEVEL(ch) > MORTAL)
     ch->song_timer = 1;
@@ -764,7 +766,7 @@ int execute_song_revealing_stacato( byte level, CHAR_DATA *ch, char *arg, CHAR_D
 
    skill_increase_check(ch, SKILL_SONG_REVEAL_STACATO, skill, SKILL_INCREASE_EASY);
 
-   if(number(1, 101) > skill) {
+   if(number(1, 101) > ( 50 + skill/ 2 )) {
       send_to_char("You run out of lyrics and end the song.\r\n", ch);
       return eSUCCESS;
    }
@@ -843,7 +845,7 @@ int execute_song_terrible_clef( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA 
 
    skill_increase_check(ch, SKILL_SONG_TERRIBLE_CLEF, skill, SKILL_INCREASE_EASY);
 
-   if(number(1, 101) > skill) {
+   if(number(1, 101) > ( 50 + skill/2 ) ) {
       send_to_char("You run out of lyrics and end the song.\r\n", ch);
       return eSUCCESS;
    }
@@ -872,7 +874,7 @@ int song_soothing_remembrance( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *
 {
    send_to_char("You begin to sing a song of remembrance...\n\r", ch);
    act("$n raises $s voice in a soothing ballad...", ch, 0, 0, TO_ROOM, 0);
-   ch->song_timer = song_info[ch->song_number].beats;
+   ch->song_timer = song_info[ch->song_number].beats - skill/18;
    return eSUCCESS;
 }
 
@@ -915,12 +917,12 @@ int execute_song_soothing_remembrance( byte level, CHAR_DATA *ch, char *arg, CHA
 
    skill_increase_check(ch, SKILL_SONG_SOOTHING_REMEM, skill, SKILL_INCREASE_MEDIUM);
 
-   if(number(1, 101) > skill) {
+   if(number(1, 101) > ( 50 + skill/2 ) ) {
       send_to_char("You run out of lyrics and end the song.\r\n", ch);
       return eSUCCESS;
    }
 
-   ch->song_timer = song_info[ch->song_number].beats;
+   ch->song_timer = song_info[ch->song_number].beats - skill/18;
    return eSUCCESS;
 }
 
@@ -929,7 +931,7 @@ int song_traveling_march( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victi
    send_to_char("You begin to sing a song of travel...\n\r", ch);
    act("$n raises $s voice in an uplifting march...", ch, 0, 0, TO_ROOM, 0);
    ch->song_timer = song_info[ch->song_number].beats -
-                             (GET_LEVEL(ch) / 15);
+                             (skill / 15);
 
    if(GET_LEVEL(ch) > MORTAL)
     ch->song_timer = 1;
@@ -975,13 +977,13 @@ int execute_song_traveling_march( byte level, CHAR_DATA *ch, char *arg, CHAR_DAT
 
    skill_increase_check(ch, SKILL_SONG_TRAVELING_MARCH, skill, SKILL_INCREASE_EASY);
 
-   if(number(1, 101) > skill) {
+   if(number(1, 101) > ( 50 + skill/2 )) {
       send_to_char("You run out of lyrics and end the song.\r\n", ch);
       return eSUCCESS;
    }
 
    ch->song_timer = song_info[ch->song_number].beats -
-                             (GET_LEVEL(ch) / 15);
+                             (skill / 15);
 
    if(GET_LEVEL(ch) > MORTAL)
     ch->song_timer = 1;

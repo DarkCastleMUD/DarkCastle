@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.44 2002/08/16 18:03:26 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.45 2002/08/19 15:42:34 pirahna Exp $ */
 
 extern "C"
 {
@@ -1418,15 +1418,23 @@ void fight_kill(CHAR_DATA *ch, CHAR_DATA *vict, int type)
     log("Null vict sent to fight_kill()!", -1, LOG_BUG);
     return;
   }
-  
+
   if (vict->fighting)
     stop_fighting(vict);
-  if (ch)
-    if (ch->fighting)
-      stop_fighting(ch);
-    
-    switch(type)
-    {
+  if (ch && ch->fighting)
+    stop_fighting(ch);
+
+  // loop through world and stop anyone else that was fighting vict from fighting    
+  char_data * ich, *next_ich;
+  for(ich = combat_list; ich; ich = next_ich) 
+  {
+     next_ich = ich->next_fighting;
+     if(ich->fighting == vict)
+        stop_fighting(ich);
+  }
+  
+  switch(type)
+  {
     case TYPE_CHOOSE:
       /* if it's a mob then it can't be pkilled */
       if(IS_NPC(vict))
@@ -1441,7 +1449,7 @@ void fight_kill(CHAR_DATA *ch, CHAR_DATA *vict, int type)
     case TYPE_PKILL: do_pkill(ch, vict); break;
     case TYPE_RAW_KILL: raw_kill(ch, vict); break;
     case TYPE_ARENA_KILL: arena_kill(ch, vict); break;
-    }
+  }
 }
 
 // check riposte never returns eSUCCESS because that would
@@ -2559,7 +2567,6 @@ void group_gain(CHAR_DATA * ch, CHAR_DATA * victim)
   long totallevels;
   CHAR_DATA *k, *highest, *tmp_ch;
   struct follow_type *f;
-  int grouplevel;
   
   if(is_pkill(ch, victim))        return;
   if(ch == victim)                return;
@@ -2599,8 +2606,6 @@ void group_gain(CHAR_DATA * ch, CHAR_DATA * victim)
     }
   }
 
-  grouplevel = GET_LEVEL(highest);
-  
   if(no_members == 0) { 
     no_members = 1;
     totallevels = GET_LEVEL(ch);
@@ -2654,7 +2659,7 @@ void group_gain(CHAR_DATA * ch, CHAR_DATA * victim)
     else tmp_share = (((GET_LEVEL(tmp_ch)+2) * share) / totallevels);  
 
     // reduce xp if you are higher level than mob
-    switch(GET_LEVEL(victim) - grouplevel) {
+    switch(GET_LEVEL(victim) - GET_LEVEL(ch)) {
       case -1:  break;
       case -2:  break;
       case -3:  break;
@@ -3451,7 +3456,7 @@ int is_fighting_mob(CHAR_DATA *ch)
 int do_flee(struct char_data *ch, char *argument, int cmd)
 {
   int i, attempt, retval;
-  struct char_data * chTemp, * loop_ch; /*, * next_fighting; */
+  struct char_data * chTemp, * loop_ch;
   
   if (is_stunned(ch))
     return eFAILURE;
@@ -3475,13 +3480,12 @@ int do_flee(struct char_data *ch, char *argument, int cmd)
     if(CAN_GO(ch, attempt))
       if(!IS_NPC(ch) || !IS_SET(world[EXIT(ch, attempt)->to_room].room_flags, NO_TRACK))
       {
-          act("$n panics, and attempts to flee.", ch, 0, 0, TO_ROOM,
-            INVIS_NULL);
+          act("$n panics, and attempts to flee.", ch, 0, 0, TO_ROOM, INVIS_NULL);
           act("You panic, and attempt to flee.", ch, 0, 0, TO_CHAR, 0);
 
           // The escape has succeded
-          chTemp = ch->fighting;
-          ch->fighting = NULL;
+//          chTemp = ch->fighting;
+//          ch->fighting = NULL;
           GET_POS(ch) = POSITION_STANDING;
 
           char tempcommand[32];
@@ -3495,17 +3499,14 @@ int do_flee(struct char_data *ch, char *argument, int cmd)
           if (IS_SET(retval, eSUCCESS)) 
           {
             // set them back fighting to link it properly
-            ch->fighting = chTemp;
+//            ch->fighting = chTemp;
             
             // They got away.  Stop fighting for everyone not in the new room from fighting
-            for (chTemp = combat_list; chTemp; chTemp = chTemp->next_fighting) 
+            for (chTemp = combat_list; chTemp; chTemp = loop_ch) 
             {
-              
-              if (chTemp->fighting == ch &&
-                chTemp->in_room != ch->in_room) 
-              {
+              loop_ch = chTemp->next_fighting;
+              if (chTemp->fighting == ch && chTemp->in_room != ch->in_room) 
                 stop_fighting(chTemp);
-              }
             } // for
             
             // If anyone in current room is fighting them, we're done otherwise keep going
@@ -3522,7 +3523,7 @@ int do_flee(struct char_data *ch, char *argument, int cmd)
             if (!IS_SET(retval, eCH_DIED)) 
               act("$n tries to flee, but is too exhausted!", ch, 0, 0, TO_ROOM, INVIS_NULL);
             GET_POS(ch) = POSITION_FIGHTING;
-            ch->fighting = chTemp; // set them back to fighting
+//            ch->fighting = chTemp; // set them back to fighting
             return retval;
           }
       } // if CAN_GO
