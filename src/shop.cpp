@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: shop.cpp,v 1.5 2003/01/22 16:12:19 pirahna Exp $ */
+/* $Id: shop.cpp,v 1.6 2003/04/17 22:50:12 pirahna Exp $ */
 
 extern "C"
 {
@@ -444,7 +444,6 @@ void shopping_list( char *arg, CHAR_DATA *ch,
      CHAR_DATA *keeper, int shop_nr )
 {
     char buf[MAX_STRING_LENGTH];
-    char buf2[MAX_INPUT_LENGTH];
     struct obj_data *obj;
     int cost;
     extern char *drinks[];
@@ -462,7 +461,7 @@ void shopping_list( char *arg, CHAR_DATA *ch,
         restock_keeper (keeper, shop_nr);
     }
 
-    strcpy( buf, "[ Price ] Item\n\r" );
+    send_to_char( "[ Price ] Item\n\r", ch );
     found = FALSE;
     for ( obj = keeper->carrying; obj; obj = obj->next_content )
     {
@@ -474,24 +473,20 @@ void shopping_list( char *arg, CHAR_DATA *ch,
         cost = (int) ( obj->obj_flags.cost * shop_index[shop_nr].profit_buy );
         if ( GET_ITEM_TYPE(obj) == ITEM_DRINKCON && obj->obj_flags.value[1] )
         {
-            sprintf( buf2, "[%7d] %s of %s.\n\r",
+            sprintf( buf, "[%7d] %s of %s.\n\r",
                 cost, obj->short_description,
                 drinks[obj->obj_flags.value[2]] );
         }
         else
         {
-            sprintf( buf2, "[%7d] %s.\n\r",
+            sprintf( buf, "[%7d] %s.\n\r",
                 cost, obj->short_description );
         }
-
-        buf2[8] = UPPER(buf2[8]);
-        strcat( buf, buf2 );
+        send_to_char(buf, ch);
     }
 
     if ( !found )
         send_to_char( "You can't buy anything here!\n\r", ch );
-    else
-        send_to_char( buf, ch );
 
     return;
 }
