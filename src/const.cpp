@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.89 2004/05/02 19:39:44 urizen Exp $ */
+/* $Id: const.cpp,v 1.90 2004/05/02 22:08:17 urizen Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1183,26 +1183,27 @@ struct class_skill_defines b_skills[] = {
 0,	0, 	NULL,{0,0}} };
 
 struct class_skill_defines k_skills[] = {
-{    "kick",		SKILL_KICK,		1,	90,	10008, 	"You have to go see Grox the monk guildmaster.",{0,0}},
-{    "dodge",		SKILL_DODGE,		2,	75,	-2, 	"Hop like a bunny, quick like a bee, this location is so funny, you'll go wee wee wee.  Don't forget to bring your scythe however." ,{0,0}},
-{    "redirect",	SKILL_REDIRECT,		3,	75,	-2, 	"Seek out Joshua, last I heard he was exploring somewhere north of the turning point.",{0,0} }, 
-{    "trip",		SKILL_TRIP,		5,	75,	10008, 	NULL,{0,0}},
-{    "shield block",    SKILL_SHIELDBLOCK,      7,      60,     -2, 	"To learn this skill you must seek its master, the God of War in his arena.  Ask him to please teach you.",{0,0}},
-{    "rescue",  	SKILL_RESCUE,		10,	70,	-2, 	"The chief of the gnomes is who you want, lad.",{0,0} },
-{    "eagleclaw",	SKILL_EAGLE_CLAW,	17,	75,	-2, 	"A hermit has the knowledge to this skill, but luckily for you this hermit is a nice one.",{0,0}},
-{    "dual wield",      SKILL_DUAL_WIELD,       20,     60,	-2,	"With whirling blades and rigid honor, only these masters of weaponry can teach you the skill you need.",{0,0} },
-{    "stun",		SKILL_STUN,		30,	60,	-2, 	"You must see a master shaolin monk.",{0,0}},
-{    "hand to hand",	SKILL_HAND_TO_HAND,	30,	90,	10008,	NULL,{0,0} },
-{    "quiver",		SKILL_QUIVERING_PALM,	40,	75,	-2, 	"A knight of a most dangerous and twisted place quite large holds the knowledge you seek.",{0,0}},
-{    "purify",		KI_PURIFY+KI_OFFSET,	5,	80,	-2, 	"A tower of water so pure, only he could know.",{0,0}},
-{    "punch",		KI_PUNCH+KI_OFFSET,	10,	80,	-2, 	"You seek a brother in a secret monastery.",{0,0}},
-{    "sense",		KI_SENSE+KI_OFFSET,	20,	80,	-2, 	"A creature who lives in the damp dark, and causes it, could know.",{0,0}},
-{    "stance",		KI_STANCE+KI_OFFSET,	24,	80,	-2, "A fair-skinned warrior of untold skill in weapons awaits your challenge in the thundering depths.",{0,0}},
-{    "speed",		KI_SPEED+KI_OFFSET,	27,	80,	-2, 	"Hmm, I do not know where the knowledge went, but I sense it on the east continent, moving around.",{0,0}},
-{    "agility",		KI_AGILITY+KI_OFFSET,	31,	90,	-2,	"The guardian of this guild has the knowledge you seek.  Speak the name of this spell in his presence.",{0,0} },
-{    "storm",		KI_STORM+KI_OFFSET,	35,	80,	-2, 	"See a purveyer of storms about this one",{0,0}},
-{    "disrupt",		KI_DISRUPT+KI_OFFSET,	41,	80,	10008, NULL,{0,0}},
-{    "blast",		KI_BLAST+KI_OFFSET,	45,	80,	-2, 	"The brother of a secret monastery who is constantly plagued by indegestion can help you out.",{0,0}}, {    "\n",		0,			1,	0,	0, 	NULL,{0,0}}
+{    "kick",		SKILL_KICK,		1,	85,	10008, 	"You have to go see Grox the monk guildmaster.",{DEX,0}},
+{    "dodge",		SKILL_DODGE,		2,	85,	-2, 	"Hop like a bunny, quick like a bee, this location is so funny, you'll go wee wee wee.  Don't forget to bring your scythe however." ,{DEX,0}},
+{    "redirect",	SKILL_REDIRECT,		3,	85,	-2, 	"Seek out Joshua, last I heard he was exploring somewhere north of the turning point.",{INT,0} }, 
+{    "trip",		SKILL_TRIP,		5,	70,	10008, 	NULL,{DEX,0}},
+{    "shield block",    SKILL_SHIELDBLOCK,      10,      80,     -2, 	"To learn this skill you must seek its master, the God of War in his arena.  Ask him to please teach you.",{STR,0}},
+{    "rescue",  	SKILL_RESCUE,		12,	70,	-2, 	"The chief of the gnomes is who you want, lad.",{WIS,0} },
+{    "eagleclaw",	SKILL_EAGLE_CLAW,	17,	95,	-2, 	"A hermit has the knowledge to this skill, but luckily for you this hermit is a nice one.",{STR,DEX}},
+{    "dual wield",      SKILL_DUAL_WIELD,       20,     55,	-2,	"With whirling blades and rigid honor, only these masters of weaponry can teach you the skill you need.",{DEX,0} },
+{    "stun",		SKILL_STUN,		33,	90,	-2, 	"You must see a master shaolin monk.",{DEX,0}},
+{    "hand to hand",	SKILL_HAND_TO_HAND,	30,	95,	10008,	NULL,{DEX,STR} },
+{    "quiver",		SKILL_QUIVERING_PALM,	40,	95,	-2, 	"A knight of a most dangerous and twisted place quite large holds the knowledge you seek.",{STR,INT}},
+{    "purify",		KI_PURIFY+KI_OFFSET,	8,	95,	-2, 	"A tower of water so pure, only he could know.",{CON,WIS}},
+{    "punch",		KI_PUNCH+KI_OFFSET,	15,	95,	-2, 	"You seek a brother in a secret monastery.",{STR,DEX}},
+{    "sense",		KI_SENSE+KI_OFFSET,	21,	95,	-2, 	"A creature who lives in the damp dark, and causes it, could know.",{INT,WIS}},
+{    "stance",		KI_STANCE+KI_OFFSET,	24,	95,	-2, "A fair-skinned warrior of untold skill in weapons awaits your challenge in the thundering depths.",{CON,DEX}},
+{    "speed",		KI_SPEED+KI_OFFSET,	27,	95,	-2, 	"Hmm, I do not know where the knowledge went, but I sense it on the east continent, moving around.",{DEX,INT}},
+{    "agility",		KI_AGILITY+KI_OFFSET,	31,	95,	-2,	"The guardian of this guild has the knowledge you seek.  Speak the name of this spell in his presence.",{DEX,CON} },
+{    "storm",		KI_STORM+KI_OFFSET,	35,	95,	-2, 	"See a purveyer of storms about this one",{CON,WIS}},
+{    "disrupt",		KI_DISRUPT+KI_OFFSET,	47,	95,	10008, NULL,{INT,DEX}},
+{    "blast",		KI_BLAST+KI_OFFSET,	45,	95,	-2, 	"The brother of a secret monastery who is constantly plagued by indegestion can help you out.",{WIS,STR}}, 
+{    "\n",		0,			1,	0,	0, 	NULL,{0,0}}
  };
 
 struct class_skill_defines r_skills[] = {
