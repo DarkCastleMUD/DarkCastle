@@ -3,7 +3,7 @@
  * ki powers, although the ki structure is in
  * spells.h, so that must be included
  */
-/* $Id: ki.h,v 1.3 2002/07/07 06:59:43 pirahna Exp $ */
+/* $Id: ki.h,v 1.4 2002/07/13 06:37:11 pirahna Exp $ */
 
 #ifndef KI_H_
 #define KI_H_
@@ -31,7 +31,6 @@ struct ki_info_type
 {
 	byte beats;	/* Waiting time after ki */
 	byte minimum_position; /* min position for use */
-	byte min_level_monk; /* Minimum monk level */
 	ubyte min_useski;	/* minimum ki used */
 	sh_int targets;		/* Legal targets */
 	KI_FUN *ki_pointer;	/* function to call */

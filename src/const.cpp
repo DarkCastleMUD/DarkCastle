@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: const.cpp,v 1.2 2002/06/13 04:41:07 dcastle Exp $ */
+/* $Id: const.cpp,v 1.3 2002/07/13 06:37:04 pirahna Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1057,6 +1057,14 @@ struct class_skill_defines k_skills[] = {
 {    "eagleclaw",	SKILL_EAGLE_CLAW,	17,	75,	10008, 	"You have to go see Grox the monk guildmaster."},
 {    "stun",		SKILL_STUN,		30,	60,	6902, 	"You must see a master shaolin monk."},
 {    "quiver",		SKILL_QUIVERING_PALM,	40,	75,	10008, 	"You have to go see Grox the monk guildmaster."},
+{    "purify",		KI_PURIFY+KI_OFFSET,	5,	80,	10008, 	NULL},
+{    "punch",		KI_PUNCH+KI_OFFSET,	10,	80,	10008, 	NULL},
+{    "sense",		KI_SENSE+KI_OFFSET,	20,	80,	10008, 	NULL},
+{    "stance",		KI_STANCE+KI_OFFSET,	24,	80,	10008, 	NULL},
+{    "speed",		KI_SPEED+KI_OFFSET,	27,	80,	10008, 	NULL},
+{    "storm",		KI_STORM+KI_OFFSET,	35,	80,	10008, 	NULL},
+{    "disrupt",		KI_DISRUPT+KI_OFFSET,	41,	80,	10008, 	NULL},
+{    "blast",		KI_BLAST+KI_OFFSET,	45,	80,	10008, 	NULL},
 {    "\n",		0,			1,	0,	0, 	NULL}
 };
     
@@ -1771,51 +1779,51 @@ struct con_app_type con_app[31] =
     { 6,100}  /* 30 */
 };
 
-// 
+// how many points you can learn a skill with 1 practice
 struct int_app_type int_app[31] =
 {
+    {  1 },
+    {  1 },    /* 1 */
+    {  1 },
+    {  1 },
+    {  1 },
+    {  1 },   /* 5 */
+    {  1 },
+    {  1 },
+    {  2 },
+    {  2 },
+    {  2 },   /* 10 */
+    {  2 },
+    {  2 },
+    {  2 },
     {  3 },
-    {  5 },    /* 1 */
-    {  7 },
-    {  8 },
-    {  9 },
-    { 10 },   /* 5 */
-    { 11 },
-    { 12 },
-    { 13 },
-    { 13 },
-    { 14 },   /* 10 */
-    { 15 },
-    { 16 },
-    { 17 },
-    { 18 },
-    { 18 },   /* 15 */
-    { 19 },
-    { 19 },
-    { 20 },
-    { 22 },
-    { 24 },   /* 20 */
-    { 26 },
-    { 28 },
-    { 30 },
-    { 32 },
-    { 34 },   /* 25 */
-    { 36 },
-    { 38 },
-    { 40 },
-    { 42 },
-    { 44 }
+    {  3 },   /* 15 */
+    {  3 },
+    {  3 },
+    {  3 },
+    {  3 },
+    {  4 },   /* 20 */
+    {  4 },
+    {  4 },
+    {  4 },
+    {  4 },
+    {  4 },   /* 25 */
+    {  4 },
+    {  5 },
+    {  5 },
+    {  5 },
+    {  5 }
 };
 
- 
-/* [wis] apply (all) */
+
+// how many practices you get each level 
 struct wis_app_type wis_app[31] =
 {
     { 0 },   /* 0 */
     { 0 },   /* 1 */
     { 0 },
-    { 0 },
-    { 0 },
+    { 1 },
+    { 1 },
     { 1 },   /* 5 */
     { 1 },
     { 1 },
@@ -1830,18 +1838,18 @@ struct wis_app_type wis_app[31] =
     { 4 },
     { 4 },
     { 5 },   /* 18 */
-    { 6 },
+    { 5 },
     { 6 },   /* 20 */
+    { 6 },
     { 7 },
     { 7 },
     { 8 },
-    { 8 },
-    { 9 },  /* 25 */
+    { 8 },  /* 25 */
+    { 9 },
     { 9 },
     { 10 },
     { 10 },
-    { 11 },
-    { 12 }
+    { 11 }
 };
 
 int mana_bonus[31] =

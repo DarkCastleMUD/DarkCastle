@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.3 2002/06/20 21:39:36 pirahna Exp $
+| $Id: guild.cpp,v 1.4 2002/07/13 06:37:04 pirahna Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -50,26 +50,26 @@ int do_practice(CHAR_DATA *ch, char *arg, int cmd)
 
 char *how_good(int percent)
 {
-    if (percent == 0)
-	return ( " (not learned)");
-    if (percent <= 10)
-	return ( " (shitty)");
-    if (percent <= 20)
-	return ( " (crappy)");
-    if (percent <= 40)
-	return ( " (poor)");
-    if (percent <= 55)
-	return ( " (average)");
-    if (percent <= 70)
-	return ( " (fair)");
-    if (percent <= 80)
-	return ( " (good)");
-    if (percent <= 85)
-	return ( " (very good)");
-	if(percent <= 90)
+  if (percent == 0)
+    return ( " (not learned)");
+  if (percent <= 10)
+    return ( " (shitty)");
+  if (percent <= 20)
+    return ( " (crappy)");
+  if (percent <= 40)
+    return ( " (poor)");
+  if (percent <= 55)
+    return ( " (average)");
+  if (percent <= 70)
+    return ( " (fair)");
+  if (percent <= 80)
+    return ( " (good)");
+  if (percent <= 85)
+    return ( " (very good)");
+  if(percent <= 90)
     return ( " (superb)");
 
-	return (" (Masterful)");
+  return (" (Masterful)");
 }
 	
 void learn_skill(char_data * ch, int skill, int amount, int maximum)
@@ -127,17 +127,8 @@ int default_master[] = {
    0         // CLASS_NECROMANCER 13
 };
 
-int skills_guild(struct char_data *ch, char *arg, struct char_data *owner)
+class_skill_defines * get_skill_list(char_data * ch)
 {
-  char buf[160];
-  int known, x;
-  int skillnumber;
-  int percent;
-  int specialization;
-  int loop;
-
-  extern struct int_app_type int_app[26];
-
   class_skill_defines * skilllist = NULL;
 
   switch(GET_CLASS(ch)) {
@@ -155,7 +146,21 @@ int skills_guild(struct char_data *ch, char *arg, struct char_data *owner)
     default:
       break;
   }
+  return skilllist;
+}
 
+int skills_guild(struct char_data *ch, char *arg, struct char_data *owner)
+{
+  char buf[160];
+  int known, x;
+  int skillnumber;
+  int percent;
+  int specialization;
+  int loop;
+
+  extern struct int_app_type int_app[26];
+
+  class_skill_defines * skilllist = get_skill_list(ch);
   if(!skilllist)
     return eFAILURE;  // no skills to train
 
@@ -231,66 +236,6 @@ int skills_guild(struct char_data *ch, char *arg, struct char_data *owner)
   return eSUCCESS;
 }
 
-int ki_guild(struct char_data *ch, char *arg, struct char_data *owner)
-{
-  extern char *ki[];
-  extern struct ki_info_type ki_info[];
-  char buf[160];
-  int i, x, known, percent, skillnumber;
-
-  extern struct int_app_type int_app[26];
-
-  if(GET_CLASS(ch) != CLASS_MONK)
-    return eFAILURE;
-
-  if (!*arg) // display skills that can be learned
-  {
-    send_to_char("\n\rAny of these ki powers are available to you.\n\r", ch);
-    for(i = 0; *ki[i] != '\n';i++)
-    {
-      sprintf(buf, "%20s %20s (Level %2d)\r\n", ki[i], 
-          how_good(has_skill(ch, (i+KI_OFFSET))), 
-          ki_info[i].min_level_monk);
-      send_to_char(buf, ch);
-    }
-    return eFAILURE; 
-  }
-
-  for(i = 0; *ki[i] != '\n'; i++)
-    if(isname(arg, ki[i]))
-      break;
-
-  if(*ki[i] == '\n')
-    skillnumber = -1;
-  else skillnumber = i;
-    
-  if (skillnumber == -1) {
-    return eFAILURE;
-  }
-
-  x = skillnumber + KI_OFFSET;
-  known = has_skill(ch, x);
-
-  if (known >= 80) {
-    send_to_char("You are already learned in this area.\n\r", ch);
-    return eSUCCESS;
-  }
-
-  send_to_char("You practice for a while...\n\r", ch);
-  ch->pcdata->practices--;
-
-  percent = (int)int_app[GET_INT(ch)].learn;
-
-  learn_skill(ch, x, percent, 80);
-    
-  if (known >= 80) {
-    send_to_char("You are now learned in this area.\n\r", ch);
-    return eSUCCESS;
-  }
-
-  return eSUCCESS;
-}
-
 int guild(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,        
           struct char_data *owner)
 {
@@ -335,7 +280,6 @@ int guild(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
   if(!*arg)
   {
     skills_guild(ch, arg, owner);
-    ki_guild(ch, arg, owner);
   }
   else
   {
@@ -346,9 +290,6 @@ int guild(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 
     if(IS_SET(skills_guild(ch, arg, owner), eSUCCESS))
       return eSUCCESS;
-    if(IS_SET(ki_guild(ch, arg, owner), eSUCCESS))
-      return eSUCCESS;
-
     send_to_char("You do not know of this ability...\n\r", ch);
   }
 
@@ -421,3 +362,4 @@ int skill_master(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     }
     return eSUCCESS;
 }
+

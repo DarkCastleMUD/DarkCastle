@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.3 2002/07/07 06:59:38 pirahna Exp $ */
+/* $Id: ki.cpp,v 1.4 2002/07/13 06:37:04 pirahna Exp $ */
 
 extern "C"
 {
@@ -41,42 +41,42 @@ void add_memory(CHAR_DATA *ch, char *victim, char type);
 
 struct ki_info_type ki_info [ ] = {
 { /* 0 */
-	12, POSITION_FIGHTING, 45, 10,
+	12, POSITION_FIGHTING, 10,
 	TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, ki_blast
 },
 
 { /* 1 */
-	12, POSITION_FIGHTING, 10, 15,
+	12, POSITION_FIGHTING, 15,
 	TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, ki_punch
 },
 
 { /* 2 */
-	12, POSITION_STANDING, 20, 2,
+	12, POSITION_STANDING, 2,
 	TAR_CHAR_ROOM|TAR_SELF_ONLY, ki_sense
 },
 
 { /* 3 */
-	12, POSITION_STANDING, 35, 5,
+	12, POSITION_STANDING, 5,
 	TAR_IGNORE, ki_storm
 },
 
 { /* 4 */
-        12, POSITION_STANDING, 27, 25,
+        12, POSITION_STANDING, 25,
         TAR_CHAR_ROOM|TAR_SELF_ONLY, ki_speed
 },
 
 { /* 5 */
-        12, POSITION_RESTING, 5, 4,
+        12, POSITION_RESTING, 4,
         TAR_CHAR_ROOM|TAR_SELF_ONLY, ki_purify
 },
 
 { /* 6 */
-	12, POSITION_FIGHTING, 41, 10,
+	12, POSITION_FIGHTING, 10,
         TAR_CHAR_ROOM|TAR_FIGHT_VICT, ki_disrupt
 },
 
 { /* 7 */
-	12, POSITION_FIGHTING, 24, 10,
+	12, POSITION_FIGHTING, 10,
         TAR_IGNORE, ki_stance
 }
 
@@ -110,6 +110,7 @@ int do_ki(CHAR_DATA *ch, char *argument, int cmd)
   char name[MAX_STRING_LENGTH];
   int qend, spl = -1;
   bool target_ok;
+  int learned;
 
    if (GET_LEVEL(ch) < ARCHANGEL && GET_CLASS(ch) != CLASS_MONK) {
       send_to_char("You are unable to control your ki in ths way!\n\r", ch);
@@ -139,7 +140,14 @@ int do_ki(CHAR_DATA *ch, char *argument, int cmd)
     send_to_char("You cannot harness that energy!\n\r", ch);
     return eFAILURE;
   }
-  
+
+  learned = has_skill(ch, (spl+KI_OFFSET));
+  if(!learned)
+  {
+     send_to_char("You do know know that ki power!\r\n", ch);
+     return eFAILURE;
+  }
+
   if(ki_info[spl].ki_pointer) {
     if(GET_POS(ch) < ki_info[spl].minimum_position) {
       switch(GET_POS(ch)) {
@@ -161,13 +169,6 @@ int do_ki(CHAR_DATA *ch, char *argument, int cmd)
           break;
       }
       return eFAILURE;
-    }
-    else {
-      if(GET_LEVEL(ch) < ARCHANGEL)
-        if(ki_info[spl].min_level_monk > GET_LEVEL(ch)) {
-          send_to_char("Your faculties are not yet developed enough!\n\r", ch);
-          return eFAILURE;
-        }
     }
     argument += qend; /* Point to the space after the last ' */
     for(; *argument == ' '; argument++); /* skip spaces */
@@ -263,7 +264,7 @@ int do_ki(CHAR_DATA *ch, char *argument, int cmd)
     if((ki_info[spl].ki_pointer == NULL) && spl > 0)
       send_to_char("Sorry, this power has not yet been implemented.\n\r", ch);
     else {
-      if(number(1, 101) > has_skill(ch, (spl+KI_OFFSET))) {
+      if(number(1, 101) > learned) {
         send_to_char("You lost your concentration!\n\r", ch);
         GET_KI(ch) -= use_ki(ch, spl)/2;
         return eSUCCESS;
