@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.57 2003/01/22 16:12:19 pirahna Exp $ */
+/* $Id: magic.cpp,v 1.58 2003/01/25 04:18:17 pirahna Exp $ */
 
 extern "C"
 {
@@ -1049,6 +1049,7 @@ int spell_teleport(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data
               IS_SET(world[to_room].room_flags, IMP_ONLY) ||
               IS_SET(world[to_room].room_flags, NO_TELEPORT) ||
               IS_SET(world[to_room].room_flags, ARENA) ||
+              world[to_room].sector_type == SECT_UNDERWATER ||
               IS_SET(zone_table[world[to_room].zone].zone_flags, ZONE_NO_TELEPORT) ||
               ( (IS_NPC(victim) && IS_SET(victim->mobdata->actflags, ACT_STAY_NO_TOWN)) ? 
                     (IS_SET(zone_table[world[to_room].zone].zone_flags, ZONE_IS_TOWN)) :

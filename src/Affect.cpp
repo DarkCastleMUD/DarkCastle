@@ -22,29 +22,38 @@
 ////////////////////////////////////////////////////////////////////////
 
 //private:
-//   uint32 type;       // type of affect
-//   int16  duration;   // how long it has left (-1 = infinate)
-//   int32  modifier;   // how much is added/subtracted
-//   int32  location;   // which ability to modify (APPLY_XXX)
+//   uint32 type;           // type of affect  
 
-//   obj_data * myobj;  // if this is given to me by an obj, which one?
+//   int16  spellid;        // if this is given to me by a spell/skill, which one?
+//   obj_data * myobj;      // if this is given to me by an obj, which one?
+//   int16  otherid;        // if this is given to me by something else
+
+//   int16  spellduration;  // how long it has left (-1 = infinate)
+//   int16  combatduration; // how long it has left (-1 = infinate) 
+   
+//   int32  modifier;       // how much is added/subtracted
+
 
 CAffect::CAffect()
 {
    type = 0;
-   duration = 0;
-   modifier = 0;
-   location = 0;
+   spellid = -1;
    myobj = NULL;
+   otherid = -1;
+   spellduration = -1;
+   combatduration = -1;
+   modifier = 0;
 }
 
 CAffect::CAffect(CAffect & rhs)
 {
    type = rhs.type;
-   duration = rhs.duration;
-   modifier = rhs.modifier;
-   location = rhs.location;
+   spellid = rhs.spellid;
    myobj = rhs.myobj;
+   otherid = rhs.spellid;
+   spellduration = rhs.spellduration;
+   combatduration = rhs.combatduration;
+   modifier = rhs.modifier;
 }
 
 void CAffect::setType(uint32 val)
@@ -52,9 +61,19 @@ void CAffect::setType(uint32 val)
    type = val;
 }
 
-void CAffect::setDuration(int16 val)
+void CAffect::setSpellId(int16 val)
 {
-   duration = val;
+   spellid = val;
+}
+
+void CAffect::setSpellDuration(int16 val)
+{
+   spellduration = val;
+}
+
+void CAffect::setCombatDuration(int16 val)
+{
+   combatduration = val;
 }
 
 void CAffect::setModifier(int16 val)
@@ -62,16 +81,42 @@ void CAffect::setModifier(int16 val)
    modifier = val;
 }
 
-void CAffect::setLocation(int16 val)
-{
-   location = val;
-}
-
 void CAffect::setObj(obj_data * val)
 {
    myobj = val;
 }
 
+bool operator< (CAffect& left, CAffect& right)
+{
+   if( left.getAffect() != right.getAffect() )
+      return ( left.getAffect() < right.getAffect() );
+   if( left.getSpellId() != right.getSpellId() )
+      return ( left.getSpellId() < right.getSpellId() );
+   if( left.getOtherId() != right.getOtherId() )
+      return ( left.getOtherId() < right.getOtherId() );
+
+   // TODO
+//   if(!left.getObj() || !right.getObj())
+//      logf( ERROR );
+
+   return ( left.getObj() < right.getObj() );
+}
+
+bool operator> (CAffect& left, CAffect& right)
+{
+   if( left.getAffect() != right.getAffect() )
+      return ( left.getAffect() > right.getAffect() );
+   if( left.getSpellId() != right.getSpellId() )
+      return ( left.getSpellId() > right.getSpellId() );
+   if( left.getOtherId() != right.getOtherId() )
+      return ( left.getOtherId() > right.getOtherId() );
+
+   // TODO
+//   if(!left.getObj() || !right.getObj())
+//      logf( ERROR );
+
+   return ( left.getObj() > right.getObj() );
+}
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -90,15 +135,15 @@ void CAffectList::insertSorted(CAffect affect)
 {
 }
 
-int CAffectList::findAffect(uint32 target)
+int CAffectList::findAffect(CAffect target)
 {
    int bottom = 0, middle, top = list.size( ) - 1;
-   uint32 current;
+   CAffect current;
 
    while( bottom <= top )
    {
       middle = ( top + bottom ) / 2;
-      current = ((CAffect) list[middle]).getType( );
+      current = ((CAffect) list[middle]);
       if( target > current  )
          bottom = middle + 1 ;
       else if( target < current )
@@ -109,15 +154,18 @@ int CAffectList::findAffect(uint32 target)
    return -1;
 }
 
-CAffect CAffectList::getAffect(uint32 affectnum)
+CAffect CAffectList::getAffect(CAffect affect)
 {
-   int i = findAffect(affectnum);
+   int i = findAffect(affect);
    return list[i];
 }
 
 int CAffectList::isAffectedBy(uint32 affect)
 {
-   int i = findAffect(affect);
+   CAffect findme;
+   findme.setType(affect);
+
+   int i = findAffect(findme);
 
    if(-1 == i)     return 0;
 
@@ -163,18 +211,8 @@ void CAffectList::affectWithJoin(CAffect affect)
 */
 }
 
-void CAffectList::removeAffect(uint32 affect)
-{
-/* TODO
-   int loc = findAffect( affect );
-
-   if(loc != -1)
-      list.erase( );
-*/
-}
-
 void CAffectList::removeAffect(CAffect affect)
 {
-   removeAffect( affect.getType() );
+   removeAffect( affect );
 }
 
