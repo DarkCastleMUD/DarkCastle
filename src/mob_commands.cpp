@@ -106,11 +106,11 @@ void mpstat( CHAR_DATA *ch, CHAR_DATA *victim)
     MPROG_DATA *mprg;
     int i;
 
-    sprintf( buf, "Name: %s.  Vnum: %d.\n\r",
+    sprintf( buf, "$3Name$R: %s  $3Vnum$R: %d.\n\r",
 	victim->name, mob_index[victim->mobdata->nr].virt );
     send_to_char( buf, ch );
 
-    sprintf( buf, "Short description: %s.\n\rLong  description: %s\r\n",
+    sprintf( buf, "$3Short description$R: %s\n\r$3Long  description$R: %s\r\n",
 	    victim->short_desc,
 	    victim->long_desc ? victim->long_desc : "(NULL)" );
     send_to_char( buf, ch );
@@ -128,7 +128,7 @@ void mpstat( CHAR_DATA *ch, CHAR_DATA *victim)
       send_to_char( buf, ch );
       send_to_char(mprog_type_to_name( mprg->type ), ch);
       send_to_char("$R ", ch);
-      sprintf( buf, "%s\n\r%s\n\r",
+      sprintf( buf, "$B$5%s$R\n\r%s\n\r",
 	      mprg->arglist,
 	      mprg->comlist );
       double_dollars(buf2, buf);
