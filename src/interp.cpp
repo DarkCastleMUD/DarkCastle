@@ -16,7 +16,7 @@
 /* 12/08/2003   Onager   Added chop_half() to work like half_chop() but    */
 /*                       chopping off the last word.                       */
 /***************************************************************************/
-/* $Id: interp.cpp,v 1.46 2004/05/25 01:20:25 urizen Exp $ */
+/* $Id: interp.cpp,v 1.47 2004/06/08 16:33:45 urizen Exp $ */
 
 extern "C"
 {
@@ -672,7 +672,7 @@ int command_interpreter( CHAR_DATA *ch, char *pcomm )
       }
 
       // charmies can only use charmie "ok" commands
-      if(IS_AFFECTED(ch, AFF_CHARM) && !IS_SET(found->flags, COM_CHARMIE_OK))
+      if((IS_AFFECTED2(ch, AFF_FAMILIAR) || IS_AFFECTED(ch, AFF_CHARM)) && !IS_SET(found->flags, COM_CHARMIE_OK))
           return do_say(ch, "I'm sorry master, I cannot do that.", 9);
 
 /*
