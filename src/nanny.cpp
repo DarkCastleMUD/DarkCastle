@@ -11,7 +11,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.10 2002/08/01 18:27:01 dcastle Exp $ */
+/* $Id: nanny.cpp,v 1.11 2002/08/04 15:31:38 dcastle Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -439,16 +439,16 @@ void nanny(struct descriptor_data *d, char *arg)
 
       // if it's not a webbrowser, display the entrance greeting
 
-      x = number(1, 100);
-    //  if(x < 25)
-      SEND_TO_Q(greetings1, d);
-/* TODO - remove this comment line when we're back up
-      else if(x < 50)
+      x = number(1, 75);
+      if(x < 50)
+        SEND_TO_Q(greetings1, d);
+      else if(x < 25)
         SEND_TO_Q(greetings2, d);
-      else if(x < 75)
-        SEND_TO_Q(greetings3, d);
       else
         SEND_TO_Q(greetings4, d);
+/*
+      else if(x < 75)
+        SEND_TO_Q(greetings3, d);  // greeting 3 is the dc++ one we don't use now
 */
 
       SEND_TO_Q("What name for the roster? ", d);
