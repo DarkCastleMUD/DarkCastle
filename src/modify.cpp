@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: modify.cpp,v 1.10 2004/05/14 15:51:48 urizen Exp $ */
+/* $Id: modify.cpp,v 1.11 2004/06/01 01:33:38 urizen Exp $ */
 
 extern "C"
 {
@@ -137,7 +137,7 @@ void string_add(struct descriptor_data *d, char *str)
     }
 
     if(terminator) {
-      if (*d->str)
+      if (*d->str && **d->str)
         dc_free(*d->str);
       *d->str = d->astr;
       d->str = 0;
