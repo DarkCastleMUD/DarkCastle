@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.24 2004/04/23 21:13:32 urizen Exp $ */
+/* $Id: clan.cpp,v 1.25 2004/04/23 21:23:25 urizen Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -2169,7 +2169,11 @@ int do_whoclan(CHAR_DATA *ch, char *arg, int cmd)
           sprintf(buf, "$3Clan %s$R:\n\r", clan->name);
           send_to_char(buf, ch);
         } 
-        sprintf(buf, "  %s %s\n\r", GET_SHORT(pch), (!strcmp(GET_NAME(pch), clan->leader) ? "$3($RLeader$3)$R" : ""));
+	if (clan->number == ch->clan && has_right(ch, CLAN_RIGHTS_MEMBER_LIST))
+          sprintf(buf, "  %s %s %s\n\r", GET_SHORT(pch), (!strcmp(GET_NAME(pch),clan->leader) ? "$3($RLeader$3)$R" : ""),IS_SET(GET_TOGGLES(pch),PLR_NOTAX) ? "(NT)":"(T)");
+	else
+          sprintf(buf, "  %s %s\n\r", GET_SHORT(pch), (!strcmp(GET_NAME(pch), 
+clan->leader) ? "$3($RLeader$3)$R" : ""));
         send_to_char(buf, ch);
         found++;
      }
