@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.142 2004/04/15 19:18:38 urizen Exp $ */
+/* $Id: fight.cpp,v 1.143 2004/04/16 01:24:02 urizen Exp $ */
 
 extern "C"
 {
@@ -1809,7 +1809,7 @@ int check_riposte(CHAR_DATA * ch, CHAR_DATA * victim)
   
   if(IS_SET(victim->combat, COMBAT_BLADESHIELD1) || IS_SET(victim->combat, COMBAT_BLADESHIELD2)) 
   {
-    if(chance < 75)
+    if(chance < 99)
       chance = 99;
     // this is so we don't get huge riposte chains
     if(IS_SET(ch->combat, COMBAT_BLADESHIELD1) || IS_SET(ch->combat, COMBAT_BLADESHIELD2))

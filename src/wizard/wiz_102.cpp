@@ -1962,7 +1962,7 @@ int do_oedit(struct char_data *ch, char *argument, int cmd)
           send_to_char("Please specifiy a valid number.\r\n", ch);
           return eFAILURE;
         }
-        if (real_object(intval))
+        if (real_object(intval) <= 0)
         {
 	  send_to_char("Object already exists.\r\n",ch);
 	  return eFAILURE;
