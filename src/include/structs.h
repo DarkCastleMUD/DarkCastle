@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: structs.h,v 1.2 2002/06/13 04:41:15 dcastle Exp $
+| $Id: structs.h,v 1.3 2002/06/19 19:06:20 pirahna Exp $
 | structs.h
 | Description:  This file should go away someday - it's stuff that I
 |   wasn't sure how to break up.  --Morc XXX
@@ -15,13 +15,23 @@ extern "C" {
 FILE * dc_fopen(const char *filename, const char *type);
 int dc_fclose(FILE * fl);
 
-typedef signed char		sbyte;
-typedef unsigned char		ubyte;
-typedef signed short int	sh_int;
-typedef unsigned short int	ush_int;
+typedef signed char		 sbyte;
+typedef unsigned char		 ubyte;
 
+typedef signed short int         int16;
+typedef unsigned short int      uint16;
 
-typedef unsigned char			byte;
+typedef signed int               int32;
+typedef unsigned int            uint32;
+
+typedef signed long long         int64;
+typedef unsigned long long      uint64;
+
+// Try to avoid using these 3.  Here until we can phase them out
+// TODO - phase these out
+typedef unsigned char             byte;
+typedef signed short int        sh_int;
+typedef unsigned short int     ush_int;
 
 typedef	struct char_data	CHAR_DATA;
 typedef	struct obj_data		OBJ_DATA;
