@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.27 2003/06/05 02:34:46 pirahna Exp $ */
+/* $Id: info.cpp,v 1.28 2003/06/22 23:22:22 pirahna Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -294,23 +294,31 @@ void show_spells(char_data * i, char_data * ch)
    else sprintf(send_buf, "$B$7-$1%s has: ", i->name);
          
    if (IS_AFFECTED(i,AFF_SANCTUARY)) {
-      sprintf(send_buf, "%s$7white aura! ", send_buf);
+      sprintf(send_buf, "%s$7aura! ", send_buf);
       has_spells = 1;
    }
    if (IS_AFFECTED(i,AFF_PROTECT_EVIL)) {
-      sprintf(send_buf, "%s$R$6pulsing aura! ", send_buf);
+      sprintf(send_buf, "%s$R$6pulsing! ", send_buf);
       has_spells = 1;
    }
    if (IS_AFFECTED(i,AFF_FIRESHIELD)) {
       sprintf(send_buf, "%s$B$4flames! ", send_buf);
       has_spells = 1;
    }
+   if (IS_AFFECTED(i,AFF_FROSTSHIELD)) {
+      sprintf(send_buf, "%s$B$3frost! ", send_buf);
+      has_spells = 1;
+   }
    if (affected_by_spell(i, SPELL_ACID_SHIELD)) {
       sprintf(send_buf, "%s$B$2acid! ", send_buf);
       has_spells = 1;
    }
+   if (affected_by_spell(i, SPELL_BARKSKIN)) {
+      sprintf(send_buf, "%s$R$5woody! ", send_buf);
+      has_spells = 1;
+   }
    if (IS_AFFECTED(i,AFF_LIGHTNINGSHIELD)) {
-      sprintf(send_buf, "%s$B$5electricity! ", send_buf);
+      sprintf(send_buf, "%s$B$5energy! ", send_buf);
       has_spells = 1;
    }
    if (IS_AFFECTED(i,AFF_PARALYSIS)) {
