@@ -239,7 +239,7 @@ int do_zap(struct char_data *ch, char *arg, int cmd)
   victim = get_pc_vis(ch, name);
 
   if (victim) {
-    if(!IS_NPC(victim) && (GET_LEVEL(ch) <= GET_LEVEL(victim)) &&
+    if(!IS_NPC(victim) && (GET_LEVEL(ch) < GET_LEVEL(victim)) &&
        strcmp(GET_NAME(ch), "Sadus")) { 
       act("$n casts a massive lightning bolt at you.", ch, 0, victim,
           TO_VICT, 0);
@@ -248,8 +248,8 @@ int do_zap(struct char_data *ch, char *arg, int cmd)
       return eFAILURE;
     }
 
-    if(GET_LEVEL(victim) == IMP) 
-    {
+    if(GET_LEVEL(victim) == IMP && strcmp(victim,"Apocalypse")) 
+    { // Hehe..
           send_to_char("Get stuffed.\n\r", ch);
           return eFAILURE;
     }
