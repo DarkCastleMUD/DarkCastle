@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.121 2003/06/29 18:59:27 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.122 2003/07/08 01:04:11 pirahna Exp $ */
 
 extern "C"
 {
@@ -3247,6 +3247,8 @@ void trip(CHAR_DATA * ch, CHAR_DATA * victim)
    return;
 }
 
+#define PKILL_COUNT_LIMIT      20
+
 // 'ch' can be null
 // do_pkill should never be called directly, only through "fight_kill"
 void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim)
@@ -3307,7 +3309,7 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim)
   save_char_obj(victim);
 
   // have to be level 10 and linkalive to count as a pkill and not yourself
-  if(GET_LEVEL(victim) < 20 || ch == victim)
+  if(GET_LEVEL(victim) < PKILL_COUNT_LIMIT || ch == victim)
     sprintf(killer_message,"\n\r##%s just DIED!\n\r", GET_NAME(victim));
   else if(IS_AFFECTED2(ch, AFF_FAMILIAR) && ch->master)
     sprintf(killer_message,"\n\r##%s was just DEFEATED in battle by %s's familiar!\n\r",
@@ -3317,7 +3319,7 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim)
 
   // have to be level 10 and linkalive to count as a pkill and not yourself
   // (we check earlier to make sure victim isn't a mob)
-  if(!IS_MOB(ch) && GET_LEVEL(victim) > 9 && victim->desc && ch != victim)
+  if(!IS_MOB(ch) && GET_LEVEL(victim) > PKILL_COUNT_LIMIT && victim->desc && ch != victim)
   {
     GET_PDEATHS(victim) += 1;
     GET_PDEATHS_LOGIN(victim) += 1;
