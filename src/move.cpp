@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.14 2002/08/20 00:23:42 pirahna Exp $
+| $Id: move.cpp,v 1.15 2002/10/03 00:43:13 pirahna Exp $
 | move.C
 | Movement commands and stuff.
 */
@@ -664,6 +664,13 @@ int do_enter(CHAR_DATA *ch, char *argument, int cmd)
      send_to_char("You can't enter that!\n\r", ch);
      return eFAILURE;
    }
+
+  if(world[real_room(portal->obj_flags.value[0])].sector_type == SECT_UNDERWATER &&
+     !affected_by_spell(ch, SPELL_WATER_BREATHING))
+  {
+     send_to_char("As you put your arm through it gets wet and you realize that might not be a good idea.\r\n", ch);
+     return eFAILURE;
+  }
 
    if(GET_LEVEL(ch) > IMMORTAL &&
       GET_LEVEL(ch) < DEITY    &&
