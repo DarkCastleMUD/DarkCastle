@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.148 2004/04/19 18:55:42 urizen Exp $ */
+/* $Id: fight.cpp,v 1.149 2004/04/19 19:02:43 urizen Exp $ */
 
 extern "C"
 {
@@ -2191,7 +2191,7 @@ void set_fighting(CHAR_DATA * ch, CHAR_DATA * vict)
      {
        if (GET_LEVEL(vict) - GET_LEVEL(ch)/2 <= 0)
           {
-                add_memory(ch, GET_NAME(ch), 't');
+                add_memory(ch, GET_NAME(vict), 't');
                 struct timer_data *timer;
                 #ifdef LEAK_CHECK
                   timer = (struct timer_data *)calloc(1, sizeof(struct 
