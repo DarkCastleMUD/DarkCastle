@@ -28,7 +28,7 @@ int do_clearaff(struct char_data *ch, char *argument, int cmd)
    one_argument(argument, buf);
 
     if (!*buf)
-        send_to_char("Log who?\n\r", ch);
+        send_to_char("Clearaff who?\n\r", ch);
 
     else if (!generic_find(argument, FIND_CHAR_WORLD, ch, &victim, &dummy))
         send_to_char("Couldn't find any such creature.\n\r", ch);
