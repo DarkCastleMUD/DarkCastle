@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.52 2004/05/27 20:25:58 urizen Exp $ */
+/* $Id: mob_proc.cpp,v 1.53 2004/05/27 20:40:15 urizen Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -3002,7 +3002,10 @@ static char *dethSayText [ ] =
   "My anus is itchy and I can't scratch it because then my hand would smell like ass.",
   "There's a difference between being grumpy and hating every little bastard in existence.",
   "Hello Kitty is one cat I'd like to violate.",
-  "Damn needy players. They should be happy with 2600 baud and dual wield."
+  "Damn needy players. They should be happy with 2600 baud and dual wield.",
+  "Philosophy SUCKS!",
+  "Dyslexics of the world, UNTIE",
+  "I love Swedes and Canadians...my puny American ways are insignificant when compared to the power of Moose and Meatballs!"
 };
 
 #define DETH_SAY_TEXT_SIZE    ( sizeof ( dethSayText )    / sizeof ( char * ) )
