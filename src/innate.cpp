@@ -133,7 +133,7 @@ int innate_regeneration(CHAR_DATA *ch, char *arg, int cmd)
    af.location = 0;
    af.bitvector = AFF_REGENERATION;
    affect_to_char(ch, &af);
-   send_to_char("Your wounds heal faster as you activate your trollish regeneration.\r\n",ch);
+   send_to_char("Your innate regenerative abilities allow you to heal quickly.\r\n",ch);
    return eSUCCESS;
 }
 
@@ -146,7 +146,8 @@ int innate_powerwield(CHAR_DATA *ch, char *arg, int cmd)
    af.location = 0;
    af.bitvector = AFF_POWERWIELD;
    affect_to_char(ch, &af);
-   send_to_char("Your body surges with energy. You can now wield two handed weapons with one hand.\r\n",ch);
+   send_to_char("You gather your energy in an effort to wield two mighty weapons.\r\n",ch);
+   act("$n gathers his strength in order to wield two mighty weapons.",ch, NULL,NULL,TO_ROOM,0);
    return eSUCCESS;
 }
 
@@ -158,7 +159,7 @@ int innate_sneak(CHAR_DATA *ch, char *arg, int cmd)
       return eFAILURE;
    }
 
-   send_to_char("You begin sneaking.\r\n", ch);
+   send_to_char("You slip quiety into the shadows to move about stealthily.\r\n", ch);
 
    struct affected_type af;
    af.type = SKILL_SNEAK;
@@ -180,7 +181,8 @@ int innate_farsight(CHAR_DATA *ch, char *arg, int cmd)
    af.location = 0;
    af.bitvector = AFF_FARSIGHT;
    affect_to_char(ch, &af);
-   send_to_char("Your eyes glow green from your innate racial sight.\r\n",ch);
+   send_to_char("Your vision sharpens and your ability to see your surroundings improves.\r\n",ch);
+   act("$n's eyes begin to glow brightly.", ch, NULL, NULL, TO_ROOM, 0);
    return eSUCCESS;
 }
 
@@ -192,7 +194,8 @@ int innate_bloodlust(CHAR_DATA *ch, char *arg, int cmd)
     return eFAILURE;
   }
   SET_BIT(ch->combat, COMBAT_ORC_BLOODLUST1);
-  send_to_char("You scream, raging in bloodlust.\r\n",ch);
+  send_to_char("Your blood boils as you drive yourself into a war-like state.\r\n",ch);
+  act("$n's blood boils has $e drives $mself into warlike rage.",ch,NULL,NULL, TO_ROOM, 0);
   return eSUCCESS;
 }
 
@@ -218,6 +221,7 @@ int innate_repair(CHAR_DATA *ch, char *arg, int cmd)
        if (number(1,101) < chance)
        {
 	  send_to_char("You failed to repair it!\r\n",ch);
+	  act("$n fails to repair their $p",ch,NULL,obj,TO_ROOM,0);
 	  return eSUCCESS;
        }
        found = TRUE;
@@ -226,7 +230,9 @@ int innate_repair(CHAR_DATA *ch, char *arg, int cmd)
        obj->affected[i-1] = obj->affected[i];
     }
   }
-  if (found) return eSUCCESS;
+  if (found) { act("Your knowledge of weapons and armour allow you 
+to quickly repair $p.",ch,NULL,obj,TO_CHAR, 0); act("$n quickly 
+repairs their $p.", ch, NULL, obj, TO_ROOM, 0); return eSUCCESS; }
   else { send_to_char("You don't have that item.\r\n",ch); return eFAILURE; }
   
 }
