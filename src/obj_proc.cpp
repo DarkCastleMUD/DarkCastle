@@ -2045,5 +2045,41 @@ int random_dir_boots(struct char_data*ch, struct obj_data *obj, int cmd, char*ar
    return command_interpreter(obj->equipped_by, dothis);
 }
 
+// WARNING - uses obj_flags.value[3] to store stuff
+
+int noremove_eq(struct char_data*ch, struct obj_data *obj, int cmd, char*arg, 
+                   CHAR_DATA *invoker)
+{
+   if(cmd && cmd != 69)
+      return eFAILURE;
+
+   if(!obj->equipped_by)
+      return eFAILURE;
+
+   if(!cmd && obj->obj_flags.value[3] > 0) {
+      obj->obj_flags.value[3]--;
+      if(!obj->obj_flags.value[3])
+         csendf(obj->equipped_by, "The %s loses it's grip on your body.\r\n", obj->short_description);
+      return eSUCCESS;
+   }
+
+   if(!cmd && obj->obj_flags.value[3] <= 0) {
+      if(number(0, 4))
+         return eSUCCESS;
+
+      csendf(obj->equipped_by, "The %s clamps down onto your body locking your equipment in place!\r\n", 
+             obj->short_description);
+      obj->obj_flags.value[3] = 5;
+      return eSUCCESS;
+   }
+ 
+   if(obj->obj_flags.value[3] > 0) {
+      csendf(obj->equipped_by, "The %s refuses to let you remove anything!\r\n", obj->short_description);
+      return eSUCCESS;
+   }
+
+   return eFAILURE;
+}
+
 
 
