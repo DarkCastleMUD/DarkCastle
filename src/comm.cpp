@@ -144,7 +144,6 @@ int init_socket(int port);
 int new_descriptor(int s);
 int process_output(struct descriptor_data *t);
 int process_input(struct descriptor_data *t);
-void close_socket(struct descriptor_data *d);
 void flush_queues(struct descriptor_data *d);
 int perform_subst(struct descriptor_data *t, char *orig, char *subst);
 int perform_alias(struct descriptor_data *d, char *orig);
@@ -1898,8 +1897,9 @@ int perform_subst(struct descriptor_data *t, char *orig, char *subst)
   return 0;
 }
 
-
-void close_socket(struct descriptor_data *d)
+// return 1 on success
+// return 0 if we quit everyone out at the bottom
+int close_socket(struct descriptor_data *d)
 {
   char buf[128], idiotbuf[128];
   struct descriptor_data *temp;
@@ -1983,7 +1983,9 @@ void close_socket(struct descriptor_data *d)
          continue;
        do_quit(i, "", 666);
     }
+    return 0;
   }
+  return 1;
 }
 
 

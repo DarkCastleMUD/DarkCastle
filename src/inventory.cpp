@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.12 2002/08/29 15:55:44 pirahna Exp $
+| $Id: inventory.cpp,v 1.13 2002/09/06 23:27:23 dcastle Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -353,7 +353,7 @@ int do_get(struct char_data *ch, char *argument, int cmd)
 		    }
 		    if (CAN_SEE_OBJ(ch,obj_object)) {
 		      if ((IS_CARRYING_N(ch) + 1 < CAN_CARRY_N(ch))) {
-		        if ((IS_CARRYING_W(ch) + obj_object->obj_flags.weight) < CAN_CARRY_W(ch)) {
+		        if ((IS_CARRYING_W(ch) + obj_object->obj_flags.weight) < CAN_CARRY_W(ch) || GET_LEVEL(ch) > IMMORTAL) {
                           if(has_consent && IS_SET(obj_object->obj_flags.more_flags, ITEM_NO_TRADE)) {
                             // if I have consent and i'm touching the corpse, then I shouldn't be able
                             // to pick up no_trade items because it is someone else's corpse.  If I am

@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.10 2002/08/25 16:13:46 pirahna Exp $ */
+/* $Id: utility.cpp,v 1.11 2002/09/06 23:27:23 dcastle Exp $ */
 
 extern "C"
 {
@@ -1089,7 +1089,8 @@ int do_quit(struct char_data *ch, char *argument, int cmd)
  
   if(ch->desc) {
     save_char_obj(ch);
-    close_socket(ch->desc);
+    if(!close_socket(ch->desc)) // if returns 0, then it already quit us out
+      return eFAILURE;
   } else {
     save_char_obj(ch);
   } 

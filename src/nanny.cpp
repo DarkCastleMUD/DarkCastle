@@ -11,7 +11,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.15 2002/08/26 05:46:46 pirahna Exp $ */
+/* $Id: nanny.cpp,v 1.16 2002/09/06 23:27:23 dcastle Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -1202,14 +1202,18 @@ bool check_reconnect( struct descriptor_data *d, char *name, bool fReconnect )
       if(GET_LEVEL(d->character) < 2)
          continue;
 
-      if(fReconnect == FALSE)
-      {
+//      if(fReconnect == FALSE)
+//      {
          // TODO - why are we doing this?  we load the password doing load_char_obj
          // unless someone changed their password and didn't save this doesn't seem useful
-         if(d->character->pcdata)
-           strncpy( d->character->pcdata->pwd, tmp_ch->pcdata->pwd, PASSWORD_LEN );
-      }
-      else {
+// removed 8/29/02..i think this might be related to the bug causing people
+// to morph into other people
+         //if(d->character->pcdata)
+         //  strncpy( d->character->pcdata->pwd, tmp_ch->pcdata->pwd, PASSWORD_LEN );
+//      }
+//      else {
+
+       if(fReconnect == TRUE) {
          free_char( d->character );
          d->character            = tmp_ch;
          tmp_ch->desc            = d;

@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: utility.h,v 1.10 2002/08/28 04:58:26 pirahna Exp $ */
+/* $Id: utility.h,v 1.11 2002/09/06 23:27:23 dcastle Exp $ */
 
 #ifndef UTILITY_H_
 #define UTILITY_H_
@@ -295,7 +295,7 @@ int	has_skill	(CHAR_DATA *ch, sh_int skill);
 char *  get_skill_name  (int skillnum);
 void	gain_exp_regardless	(CHAR_DATA *ch, int gain);
 void	advance_level	(CHAR_DATA *ch, int is_conversion);
-void	close_socket	(struct descriptor_data *d);
+int	close_socket	(struct descriptor_data *d);
 char *	one_argument	(char *argument, char *first_arg);
 int	isname		(char *arg, char *arg2);
 void	page_string	(struct descriptor_data *d, char *str,
