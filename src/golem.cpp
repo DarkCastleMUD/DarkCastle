@@ -65,11 +65,11 @@ void save_golem_data(CHAR_DATA *ch)
     return;
   }
   struct char_data *golem = ch->pcdata->golem; // Just to make the code below cleaner.
-  fprintf(fpfile, "#GOLEM\n"); // Just 'cause.
-  fprintf(fpfile, "%d %d\n", GET_LEVEL(golem), GET_EXP(golem));  // 
+  fwrite(&(golem->level), sizeof(golem->level), 1, fpfile);
+  fwrite(&(golem->exp),   sizeof(golem->exp), 1, fpfile);
   // Use previously defined functions after this.
-  obj_to_store(ch->carrying, ch, fpfile, -1);
-  store_worn_eq(ch, fpfile);
+  obj_to_store(golem->carrying, golem, fpfile, -1);
+  store_worn_eq(golem, fpfile);
   dc_fclose(fpfile);
 }
 
@@ -84,18 +84,12 @@ void advance_golem_level(CHAR_DATA *golem)
 
 void set_golem(CHAR_DATA *golem, int golemtype)
 { // Set the basics.
-        clear_char(golem);
         GET_RACE(golem) = RACE_GOLEM;
         golem->short_desc = str_hsh(golem_list[golemtype].short_desc);
         golem->name = str_hsh(golem_list[golemtype].name);
         golem->long_desc = str_hsh(golem_list[golemtype].long_desc);
 	golem->description = str_hsh(golem_list[golemtype].description);
         golem->title = 0;
-        #ifdef LEAK_CHECK
-           golem->mobdata = (mob_data *) calloc(1, sizeof(mob_data));
-        #else
-           golem->mobdata = (mob_data *) dc_alloc(1, sizeof(mob_data));
-        #endif
         golem->affected_by2 = 0;
         if (!golemtype)
           SET_BIT(golem->affected_by2, AFF_GOLEM);
@@ -137,14 +131,11 @@ void load_golem_data(CHAR_DATA *ch, int golemtype)
         return;
   }
   golem = clone_mobile(real_mobile(8));
-//  fread_newline(fpfile); // #GOLEM
-  while ((fread_char(fpfile))!='\n'); // read 'til EOL
   set_golem(golem, golemtype); // Basics  
   ch->pcdata->golem = golem;
-  int level = fread_int(fpfile, -1000, 40);
-  int exp = fread_int(fpfile, 1, LONG_MAX);
-  golem->level = level;
-  golem->exp = exp;
+  fread(&(golem->level), sizeof(golem->level), 1, fpfile);
+  fread(&(golem->exp),   sizeof(golem->exp),  1, fpfile);
+  int level = golem->level;
   for ( ; level > 0; level--)
      advance_golem_level(golem); // Level it up again.
   struct obj_data *last_cont; // Last container.
