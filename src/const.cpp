@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: const.cpp,v 1.58 2003/05/12 02:29:18 pirahna Exp $ */
+/* $Id: const.cpp,v 1.59 2003/06/23 01:10:42 pirahna Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1250,6 +1250,8 @@ struct class_skill_defines u_skills[] = { // druid skills
 {    "lightning shield",SPELL_LIGHTNING_SHIELD,	23,	90,	-2,	"A near victim of infanticide the Lord of the Tallest mountain knows lightning shield."},
 {    "power heal",	SPELL_POWER_HEAL,	26,	90,	-2,	"Only the most pure of beasts with horn atop head can help you.  Look in the mountains." },
 {    "camouflague",	SPELL_CAMOUFLAGUE,	28,	90,	3203,	NULL },
+{    "summon familiar", SPELL_SUMMON_FAMILIAR,	30,	90,	-2,	"To learn this skill you must bust a nut....err...bring me a nut."},
+{    "lighted path",    SPELL_LIGHTED_PATH,	33,	90,	-2,	"You must learn about tracking to accomplish this spell.  Go talk to the ranger Woody about lighted path."},
 {    "barkskin",	SPELL_BARKSKIN,		35,	90,	-2,	"Talk to Shargugh, he's the MAN! Baby! Just ask dinas ;)"},
 {    "iron roots",	SPELL_IRON_ROOTS,	36,	90,	-2,	"A druid of old age and virulance is who you want. He will be in the company of other druids."},
 {    "resist acid",	SPELL_RESIST_ACID,	37,	90,	-2,	"You need to seek out Bill the pharmicist.  He knows about such things." },
@@ -1259,6 +1261,7 @@ struct class_skill_defines u_skills[] = { // druid skills
 {    "stone skin",	SPELL_STONE_SKIN,	45,	90,	-2,	"A woman strong in battle surrounded by heavy magical influences calls to you." },
 {    "\n",		0,			1,	0,	0, 	NULL}
 };
+
 
 // cleric 3021 guildmaster
 struct class_skill_defines c_skills[] = { // cleric skills
