@@ -945,22 +945,22 @@ char_data *)(mob_index[nr].item))->level,
 	for (i = 0; i < 1 << 20; i++)
 	  if (IS_SET(wear, 1 << i))
       if (!IS_SET(((struct obj_data *)(obj_index[nr].item))->obj_flags.wear_flags, 1<<i))
-	continue;
+	goto endLoop;
       if (size)
        for (i = 0; i < 1 << 10; i++)
 	if (IS_SET(size, 1<<i))
       if (!IS_SET(((struct obj_data *)(obj_index[nr].item))->obj_flags.size, 1<<i))
-	continue;
+	goto endloop;
       if(extra)
         for (i = 0; i < 1 << 30; i++)
 	  if (IS_SET(extra,1<<i))
       if (!IS_SET(((struct obj_data *)(obj_index[nr].item))->obj_flags.extra_flags, 1<<i))
-	continue;
+	goto endLoop;
       if (more)
 	for (i = 0; i < 1 << 10; i++)
 	  if (IS_SET(more,1<<i))
       if (!IS_SET(((struct obj_data *)(obj_index[nr].item))->obj_flags.more_flags, 1<<i))
-	continue;
+	goto endLoop;
       int aff,total = 0;
       bool found = FALSE;
       for (aff = 0; aff < ((struct obj_data *)(obj_index[nr].item))->num_affects;aff++)
