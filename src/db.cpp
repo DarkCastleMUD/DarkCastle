@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.36 2004/04/16 12:13:58 urizen Exp $ */
+/* $Id: db.cpp,v 1.37 2004/04/16 12:20:24 urizen Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -2817,7 +2817,7 @@ int create_blank_mobile(int nr)
     mob->mobdata->damsizedice = 1;
     mob->mobdata->default_pos = 1;
     mob->mobdata->nr = cur_index;
-
+    mob->misc = MISC_IS_MOB;
     // shift > items right
     memmove( &mob_index[cur_index+1], &mob_index[cur_index],
               ( (top_of_mobt - cur_index + 1) * sizeof(index_data) )
