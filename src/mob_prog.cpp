@@ -843,6 +843,7 @@ mob_index[mob->mobdata->nr].virt );
        case 'r': // rndm
 	 if (!rndm) return -1;
 	  obj = search_char_for_item(rndm, real_object(atoi(valu)));
+	  take = rndm;
 	  break;
 	default:
           logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'carries'", mob_index[mob->mobdata->nr].virt );
@@ -2048,6 +2049,7 @@ int mprog_fight_trigger( CHAR_DATA *mob, CHAR_DATA *ch )
 {
 
  if ( IS_NPC( mob )
+ && MOB_WAIT_STATE(ch) <= 0
      && ( mob_index[mob->mobdata->nr].progtypes & FIGHT_PROG ) )
    mprog_percent_check( mob, ch, NULL, NULL, FIGHT_PROG );
 
