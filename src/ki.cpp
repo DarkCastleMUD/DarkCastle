@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.6 2002/07/31 18:41:09 pirahna Exp $ */
+/* $Id: ki.cpp,v 1.7 2002/08/03 01:34:40 pirahna Exp $ */
 
 extern "C"
 {
@@ -620,7 +620,7 @@ int ki_disrupt( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
        ch, 0, vict, TO_ROOM, 0);
    send_to_char("You focus your ki to disrupt the flow of magic around your opponent!\r\n", ch);
    
-   return spell_dispel_magic(GET_LEVEL(ch)+1, ch, vict, 0);
+   return spell_dispel_magic(GET_LEVEL(ch)+1, ch, vict, 0, 0);
 }
 
 int ki_stance( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)

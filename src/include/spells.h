@@ -14,7 +14,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.h,v 1.6 2002/08/02 20:59:15 pirahna Exp $ */
+/* $Id: spells.h,v 1.7 2002/08/03 01:34:46 pirahna Exp $ */
 #include <structs.h> // byte, sh_int
 
 #define MAX_BUF_LENGTH               240
@@ -360,7 +360,8 @@
 typedef	int	SPELL_FUN	( byte level, CHAR_DATA *ch,
 				  char *arg, int type,
 				  CHAR_DATA *tar_ch,
-				  struct obj_data *tar_obj );
+				  struct obj_data *tar_obj,
+                                  int skill );
 
 // NOTE:  If you change this structure, keep in mind how it is used in guild.C
 // The min_level_XXX stuff MUST be updated in guild.C if you change this.  It is

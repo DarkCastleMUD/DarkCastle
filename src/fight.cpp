@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.24 2002/08/02 05:05:48 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.25 2002/08/03 01:34:40 pirahna Exp $ */
 
 extern "C"
 {
@@ -3154,113 +3154,113 @@ int weapon_spells(CHAR_DATA *ch, CHAR_DATA *vict, int weapon)
     switch(current_affect)
     {
     case WEP_MAGIC_MISSILE:
-      retval = spell_magic_missile(GET_LEVEL(ch), ch, vict, 0);
+      retval = spell_magic_missile(GET_LEVEL(ch), ch, vict, 0, 0);
       break;
     case WEP_BLIND:
-      retval = spell_blindness(GET_LEVEL(ch), ch, vict, 0);
+      retval = spell_blindness(GET_LEVEL(ch), ch, vict, 0, 0);
       break;
     case WEP_EARTHQUAKE:
-      retval = spell_earthquake(GET_LEVEL(ch), ch, vict, 0);
+      retval = spell_earthquake(GET_LEVEL(ch), ch, vict, 0, 0);
       break;
     case WEP_CURSE:
-      retval = spell_curse(GET_LEVEL(ch), ch, vict, 0);
+      retval = spell_curse(GET_LEVEL(ch), ch, vict, 0, 0);
       break;
     case WEP_COLOUR_SPRAY:
-      retval = spell_colour_spray(GET_LEVEL(ch), ch, vict, 0);
+      retval = spell_colour_spray(GET_LEVEL(ch), ch, vict, 0, 0);
       break;
     case WEP_DISPEL_EVIL:
-      retval = spell_dispel_evil(GET_LEVEL(ch), ch, vict, 0);
+      retval = spell_dispel_evil(GET_LEVEL(ch), ch, vict, 0, 0);
       break;
     case WEP_ENERGY_DRAIN:
-      retval = spell_energy_drain(GET_LEVEL(ch), ch, vict, 0);
+      retval = spell_energy_drain(GET_LEVEL(ch), ch, vict, 0, 0);
       break;
     case WEP_FIREBALL:
-      retval = spell_fireball(GET_LEVEL(ch), ch, vict, 0);
+      retval = spell_fireball(GET_LEVEL(ch), ch, vict, 0, 0);
       break;
     case WEP_LIGHTNING_BOLT:
-      retval = spell_lightning_bolt(GET_LEVEL(ch), ch, vict, 0);
+      retval = spell_lightning_bolt(GET_LEVEL(ch), ch, vict, 0, 0);
       break;
     case WEP_HARM:
-      retval = spell_harm(GET_LEVEL(ch), ch, vict, 0);
+      retval = spell_harm(GET_LEVEL(ch), ch, vict, 0, 0);
       break;
     case WEP_POISON:
-      retval = spell_poison(GET_LEVEL(ch), ch, vict, 0);
+      retval = spell_poison(GET_LEVEL(ch), ch, vict, 0, 0);
       break;
     case WEP_SLEEP:
-      retval = spell_sleep(GET_LEVEL(ch), ch, vict, 0);
+      retval = spell_sleep(GET_LEVEL(ch), ch, vict, 0, 0);
       break;
     case WEP_FEAR:
-      retval = spell_fear(GET_LEVEL(ch), ch, vict, 0);
+      retval = spell_fear(GET_LEVEL(ch), ch, vict, 0, 0);
       break;
     case WEP_DISPEL_MAGIC:
-      retval = spell_dispel_magic(GET_LEVEL(ch), ch, vict, 0);
+      retval = spell_dispel_magic(GET_LEVEL(ch), ch, vict, 0, 0);
       break;
     case WEP_WEAKEN:
-      retval = spell_weaken(GET_LEVEL(ch), ch, vict, 0);
+      retval = spell_weaken(GET_LEVEL(ch), ch, vict, 0, 0);
       break;
     case WEP_CAUSE_LIGHT:
-      retval = spell_cause_light(GET_LEVEL(ch), ch, vict, 0);
+      retval = spell_cause_light(GET_LEVEL(ch), ch, vict, 0, 0);
       break;
     case WEP_CAUSE_CRITICAL:
-      retval = spell_cause_critical(GET_LEVEL(ch), ch, vict, 0);
+      retval = spell_cause_critical(GET_LEVEL(ch), ch, vict, 0, 0);
       break;
     case WEP_PARALYZE:
-      retval = spell_paralyze(GET_LEVEL(ch), ch, vict, 0);
+      retval = spell_paralyze(GET_LEVEL(ch), ch, vict, 0, 0);
       break;
     case WEP_ACID_BLAST:
-      retval = spell_acid_blast(GET_LEVEL(ch), ch, vict, 0);
+      retval = spell_acid_blast(GET_LEVEL(ch), ch, vict, 0, 0);
       break;
     case WEP_BEE_STING:
-      retval = spell_bee_sting(GET_LEVEL(ch), ch, vict, 0);
+      retval = spell_bee_sting(GET_LEVEL(ch), ch, vict, 0, 0);
       break;
     case WEP_CURE_LIGHT:
-      retval = spell_cure_light(GET_LEVEL(ch), ch, ch, 0);
+      retval = spell_cure_light(GET_LEVEL(ch), ch, ch, 0, 0);
       break;
     case WEP_FLAMESTRIKE:
-      retval = spell_flamestrike(GET_LEVEL(ch), ch, vict, 0);
+      retval = spell_flamestrike(GET_LEVEL(ch), ch, vict, 0, 0);
       break;
     case WEP_HEAL_SPRAY:
-      retval = spell_heal_spray(GET_LEVEL(ch), ch, ch, 0);
+      retval = spell_heal_spray(GET_LEVEL(ch), ch, ch, 0, 0);
       break;
     case WEP_DROWN:
-      retval = spell_drown(GET_LEVEL(ch), ch, vict, 0);
+      retval = spell_drown(GET_LEVEL(ch), ch, vict, 0, 0);
       break;
     case WEP_HOWL:
-      retval = spell_howl(GET_LEVEL(ch), ch, vict, 0);
+      retval = spell_howl(GET_LEVEL(ch), ch, vict, 0, 0);
       break;
     case WEP_SOULDRAIN:
-      retval = spell_souldrain(GET_LEVEL(ch), ch, vict, 0);
+      retval = spell_souldrain(GET_LEVEL(ch), ch, vict, 0, 0);
       break;
     case WEP_SPARKS:
-      retval = spell_sparks(GET_LEVEL(ch), ch, vict, 0);
+      retval = spell_sparks(GET_LEVEL(ch), ch, vict, 0, 0);
       break;
     case WEP_DISPEL_GOOD:
-      retval = spell_dispel_good(GET_LEVEL(ch), ch, vict, 0);
+      retval = spell_dispel_good(GET_LEVEL(ch), ch, vict, 0, 0);
       break;
     case WEP_TELEPORT:
-      retval = spell_teleport(GET_LEVEL(ch), ch, vict, 0);
+      retval = spell_teleport(GET_LEVEL(ch), ch, vict, 0, 0);
       break;
     case WEP_CHILL_TOUCH:
-      retval = spell_chill_touch(GET_LEVEL(ch), ch, vict, 0);
+      retval = spell_chill_touch(GET_LEVEL(ch), ch, vict, 0, 0);
       break;
     case WEP_POWER_HARM:
-      retval = spell_power_harm(GET_LEVEL(ch), ch, vict, 0);
+      retval = spell_power_harm(GET_LEVEL(ch), ch, vict, 0, 0);
       break;
     case WEP_VAMPIRIC_TOUCH:
-      retval = spell_vampiric_touch(GET_LEVEL(ch), ch, vict, 0);
+      retval = spell_vampiric_touch(GET_LEVEL(ch), ch, vict, 0, 0);
       break;
     case WEP_LIFE_LEECH:
-      retval = spell_life_leech(GET_LEVEL(ch), ch, vict, 0);
+      retval = spell_life_leech(GET_LEVEL(ch), ch, vict, 0, 0);
       break;
     case WEP_METEOR_SWARM:
-      retval = spell_meteor_swarm(GET_LEVEL(ch), ch, vict, 0);
+      retval = spell_meteor_swarm(GET_LEVEL(ch), ch, vict, 0, 0);
       break;
     case WEP_ENTANGLE:
       /* This is a hack since Morc did the spell wrong  - pir */
-      retval = cast_entangle(GET_LEVEL(ch), ch, "", 0, vict, 0);
+      retval = cast_entangle(GET_LEVEL(ch), ch, "", 0, vict, 0, 0);
       break;
     case WEP_CREATE_FOOD:
-      retval = cast_create_food(GET_LEVEL(ch), ch, "", 0, vict, 0);
+      retval = cast_create_food(GET_LEVEL(ch), ch, "", 0, vict, 0, 0);
       break;
 
     default:

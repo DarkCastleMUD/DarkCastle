@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.cpp,v 1.6 2002/08/02 19:27:03 pirahna Exp $ */
+/* $Id: interp.cpp,v 1.7 2002/08/03 01:34:40 pirahna Exp $ */
 
 extern "C"
 {
@@ -90,8 +90,8 @@ struct command_info cmd_info[] =
     { "look",       do_look,        POSITION_RESTING,   0,  12,  0 },
     { "glance",     do_look,        POSITION_RESTING,   0,  20,  0 },
     { "order",      do_order,       POSITION_RESTING,   0,  9,  0 },
-    { "rest",       do_rest,        POSITION_RESTING,   0,  9,  0 },
-    { "recite",     do_recite,      POSITION_RESTING,   0,  9,  COM_CHARMIE_OK },
+    { "rest",       do_rest,        POSITION_RESTING,   0,  9,  COM_CHARMIE_OK  },
+    { "recite",     do_recite,      POSITION_RESTING,   0,  9,  0 },
     { "recall",     do_recall,      POSITION_RESTING,   0,  9,  0 },
     { "score",      do_score,       POSITION_DEAD,      0,  9,  0 },
     { "scan",       do_scan,        POSITION_RESTING,   1,  9,  0 },

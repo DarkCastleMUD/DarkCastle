@@ -684,7 +684,7 @@ int pfe_word(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
       act("$n mutters something into $s hands.", ch, 0, 0, TO_ROOM, 0);
       send_to_char("You quietly whisper 'aslexi' into your hands.\r\n", ch);
 
-      cast_protection_from_evil(GET_LEVEL(ch), ch, 0, SPELL_TYPE_SPELL, ch, 0);
+      cast_protection_from_evil(GET_LEVEL(ch), ch, 0, SPELL_TYPE_SPELL, ch, 0, 0);
       act("A pulsing aura springs to life around $n!", ch, 0, 0, TO_ROOM, 0);
       return eSUCCESS;
    }
@@ -1195,7 +1195,7 @@ int portal_word(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
    if(!(victim = get_char_vis(ch, junk))) {
       send_to_char("The box somehow seems......confused.\r\n", ch);
    } else {
-      spell_portal(GET_LEVEL(ch), ch, victim, 0);
+      spell_portal(GET_LEVEL(ch), ch, victim, 0, 0);
       // set charge time
       ch->equipment[HOLD]->obj_flags.value[3] = 600;
    }
@@ -1245,9 +1245,9 @@ int full_heal_word(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
    if(!(victim = get_char_vis(ch, junk))) {
       send_to_char("The box somehow seems......confused.\r\n", ch);
    } else {
-      spell_full_heal(GET_LEVEL(ch), ch, victim, 0);
-      spell_full_heal(GET_LEVEL(ch), ch, victim, 0);
-      spell_full_heal(GET_LEVEL(ch), ch, victim, 0);
+      spell_full_heal(GET_LEVEL(ch), ch, victim, 0, 0);
+      spell_full_heal(GET_LEVEL(ch), ch, victim, 0, 0);
+      spell_full_heal(GET_LEVEL(ch), ch, victim, 0, 0);
       // set charge time
       ch->equipment[HOLD]->obj_flags.value[3] = 300;
    }
@@ -1310,7 +1310,7 @@ int fireshield_word(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
    act("$n mutters something into $s hands.", ch, 0, 0, TO_ROOM, 0);
    send_to_char("You quietly whisper 'feuerschild' into your hands.\r\n", ch);
 
-   spell_fireshield(GET_LEVEL(ch), ch, ch, 0);
+   spell_fireshield(GET_LEVEL(ch), ch, ch, 0, 0);
    // set charge time
    ch->equipment[HOLD]->obj_flags.value[3] = 900;
 
@@ -1365,7 +1365,7 @@ int teleport_word(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
    if(!(victim = get_char_room_vis(ch, junk))) {
       send_to_char("The box somehow seems......confused.\r\n", ch);
    } else {
-      spell_teleport(GET_LEVEL(ch), ch, victim, 0);
+      spell_teleport(GET_LEVEL(ch), ch, victim, 0, 0);
       // set charge time
       ch->equipment[HOLD]->obj_flags.value[3] = 1000;
    }
@@ -1463,14 +1463,14 @@ int protection_word(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
    act("$n mutters something into $s hands.", ch, 0, 0, TO_ROOM, 0);
    send_to_char("You quietly whisper 'protezione' into your hands.\r\n", ch);
 
-   spell_armor(GET_LEVEL(ch), ch, ch, 0);
-   spell_bless(GET_LEVEL(ch), ch, ch, 0);
-   spell_protection_from_evil(GET_LEVEL(ch), ch, ch, 0);
-   spell_invisibility(GET_LEVEL(ch), ch, ch, 0);
-   spell_stone_skin(GET_LEVEL(ch), ch, ch, 0);
-   spell_resist_fire(GET_LEVEL(ch), ch, ch, 0);
-   spell_resist_cold(GET_LEVEL(ch), ch, ch, 0);
-   cast_barkskin(GET_LEVEL(ch), ch, 0, SPELL_TYPE_SPELL, ch, 0);
+   spell_armor(GET_LEVEL(ch), ch, ch, 0, 0);
+   spell_bless(GET_LEVEL(ch), ch, ch, 0, 0);
+   spell_protection_from_evil(GET_LEVEL(ch), ch, ch, 0, 0);
+   spell_invisibility(GET_LEVEL(ch), ch, ch, 0, 0);
+   spell_stone_skin(GET_LEVEL(ch), ch, ch, 0, 0);
+   spell_resist_fire(GET_LEVEL(ch), ch, ch, 0, 0);
+   spell_resist_cold(GET_LEVEL(ch), ch, ch, 0, 0);
+   cast_barkskin(GET_LEVEL(ch), ch, 0, SPELL_TYPE_SPELL, ch, 0, 0);
 
    // set charge time
    ch->equipment[HOLD]->obj_flags.value[3] = 1000;
@@ -1843,7 +1843,7 @@ int gl_dragon_fire(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
    act("The head of the dragon staff in $n's hands animates and begins to breath fire!", 
               ch, obj, 0, TO_ROOM, 0);
 
-   return cast_fire_breath(10, ch, "", SPELL_TYPE_SPELL, ch->fighting, 0);
+   return cast_fire_breath(10, ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, 0);
 }
 
 int dk_rend(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, 
@@ -1881,7 +1881,7 @@ int magic_missile_boots(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
               ch, obj, ch->fighting, TO_ROOM, 0);
    send_to_char("Your boots glow briefly and release a magic missle spell!\r\n", ch);
 
-   return spell_magic_missile((GET_LEVEL(ch)/2), ch, ch->fighting, 0);
+   return spell_magic_missile((GET_LEVEL(ch)/2), ch, ch->fighting, 0, 0);
 }
 
 
@@ -1899,7 +1899,7 @@ int shield_combat_procs(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
 
        act("$n's $o glows yellow charging up with electrical energy.", ch, obj, ch->fighting, TO_ROOM, 0);
        send_to_char("Your shield glows yellow as it charges up with electrical energy.\r\n", ch);
-       return spell_lightning_bolt((GET_LEVEL(ch)/2), ch, ch->fighting, 0);
+       return spell_lightning_bolt((GET_LEVEL(ch)/2), ch, ch->fighting, 0, 0);
      break;
 
      case 5208: // thalos beholder shield
@@ -1909,7 +1909,7 @@ int shield_combat_procs(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
        act("$n's $o begins to tremble violently upon contact with $N.", ch, obj, ch->fighting, TO_ROOM, NOTVICT);
        act("$n's $o begins to tremble violently upon contact with you!", ch, obj, ch->fighting, TO_VICT, 0);
        send_to_char("Your shield begins to violently shake after the hit!\r\n", ch);
-       return spell_cause_serious((GET_LEVEL(ch)/2), ch, ch->fighting, 0);
+       return spell_cause_serious((GET_LEVEL(ch)/2), ch, ch->fighting, 0, 0);
      break;
 
      default:
@@ -1935,7 +1935,7 @@ int generic_weapon_combat(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *ar
        send_to_char("The hammer begins to hum and strikes out with the power of Thor!\r\n", ch);
        act("$n's hammer begins to hum and strikes out with the power of Thor!", 
               ch, obj, 0, TO_ROOM, 0);
-       return spell_lightning_bolt((GET_LEVEL(ch)/2), ch, ch->fighting, 0);
+       return spell_lightning_bolt((GET_LEVEL(ch)/2), ch, ch->fighting, 0, 0);
 
      case 19327:  // EC Icicle
        if(number(1, 100) < GET_DEX(ch)/4)
@@ -1943,7 +1943,7 @@ int generic_weapon_combat(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *ar
        send_to_char("The Icicle begins to pulse repidly...\r\n", ch);
        act("$n's $o begins to pulse rapidly...", 
               ch, obj, 0, TO_ROOM, 0);
-       return spell_ice_shards((GET_LEVEL(ch)/2), ch, ch->fighting, 0);
+       return spell_ice_shards((GET_LEVEL(ch)/2), ch, ch->fighting, 0, 0);
 
      default:
        send_to_char("Weapon with invalid generic_weapon_combat, tell pirahna.\r\n", ch);

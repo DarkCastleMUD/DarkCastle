@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.11 2002/08/02 05:05:48 pirahna Exp $ */
+/* $Id: mob_proc.cpp,v 1.12 2002/08/03 01:34:41 pirahna Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -469,7 +469,7 @@ int snake(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 	    act("You bite $N!",  ch, 0, ch->fighting, TO_CHAR, INVIS_NULL);
 	    act("$n bites $N!", ch, 0, ch->fighting, TO_ROOM, INVIS_NULL|NOTVICT);
 	    act("$n bites you!", ch, 0, ch->fighting, TO_VICT, 0);
-	    retval = cast_poison( GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0);
+	    retval = cast_poison( GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, GET_LEVEL(ch));
             if(SOMEONE_DIED(retval))
               return retval;
             return eSUCCESS;
@@ -510,25 +510,25 @@ int passive_magic_user(struct char_data *ch, struct obj_data *obj, int cmd, char
     if(IS_AFFECTED(ch, AFF_BLIND)) {
       act("$n utters the words 'Let there be light!'.", ch, 0, 0, TO_ROOM, 
 	INVIS_NULL);
-       cast_cure_blind(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0);
+       cast_cure_blind(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
           return eSUCCESS;
       }
 
     if(!affected_by_spell(ch, SPELL_SHIELD) && GET_LEVEL(ch) > 12) {
       act("$n utters the words 'pongun'.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-      cast_shield(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0);
+      cast_shield(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
       return eSUCCESS;
     }      
 
     if(!affected_by_spell(ch, SPELL_STONE_SKIN) && GET_LEVEL(ch) > 31) {
       act("$n utters the words 'teri hatcher'.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-      cast_stone_skin(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0);
+      cast_stone_skin(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
       return eSUCCESS;
     }      
 
     if(!IS_AFFECTED(ch, AFF_FIRESHIELD) && GET_LEVEL(ch) > 47) {
       act("$n utters the words 'puew mai'.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-      cast_fireshield(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0);
+      cast_fireshield(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
       return eSUCCESS;
     }      
 
@@ -557,7 +557,7 @@ int active_magic_user(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
     if(IS_AFFECTED(ch, AFF_BLIND)) {
       act("$n utters the words 'Let there be light!'.", ch, 0, 0, 
        TO_ROOM, INVIS_NULL);
-       cast_cure_blind(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0);
+       cast_cure_blind(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
           return eSUCCESS;
       }
    
@@ -570,7 +570,7 @@ int active_magic_user(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
    
   act("$n utters the words 'Instant Magic Remover(tm)'.", ch, 0, 0, TO_ROOM,
     INVIS_NULL);
-         cast_dispel_magic(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0);
+         cast_dispel_magic(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
            return eSUCCESS;
         }
       }
@@ -580,7 +580,7 @@ int active_magic_user(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
      {
      act("$n utters the words 'I wanna be FAST!'.", ch, 0, 0, TO_ROOM,
        INVIS_NULL);
-      cast_haste(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0);
+      cast_haste(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
            return eSUCCESS;
       }
 
@@ -589,7 +589,7 @@ int active_magic_user(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
     {
 	act("$n utters the words 'koholian dia'.", ch, 0, 0, TO_ROOM,
 	  INVIS_NULL);
-	retval = cast_blindness(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0);
+	retval = cast_blindness(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
 	return retval;
     }
 
@@ -597,7 +597,7 @@ int active_magic_user(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
     {
 	act("$n utters the words 'Slurp, Slurp!'.", ch, 0, 0, TO_ROOM,
 	  INVIS_NULL);
-	return cast_energy_drain(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0);
+	return cast_energy_drain(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
     }
 
     switch (GET_LEVEL(ch)) {
@@ -608,7 +608,7 @@ int active_magic_user(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
 	    act("$n utters the words 'hahili duvini'.", ch, 0, 0, TO_ROOM,
 	      INVIS_NULL);
 	    retval = cast_magic_missile(
-		GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0);
+		GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
 	    break;
 	case 5:
 	case 6:
@@ -617,14 +617,14 @@ int active_magic_user(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
 	    act("$n utters the words 'grynt oef'.", ch, 0, 0, TO_ROOM, 
 	      INVIS_NULL);
 	    retval = cast_burning_hands(
-		GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0);
+		GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
 	    break;
 	case 9:
 	case 10:
 	    act("$n utters the words 'ZZZZZZTTTTT!'.", ch, 0, 0, TO_ROOM,
 	      INVIS_NULL);
 	    retval = cast_lightning_bolt(
-		GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0);
+		GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
 	    break;
 	case 11:
 	case 12:
@@ -633,7 +633,7 @@ int active_magic_user(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
 	    act("$n utters the words 'Pretty colours!'.", ch, 0, 0, TO_ROOM, 
 	      INVIS_NULL);
 	    retval = cast_colour_spray(
-		GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0);
+		GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
 	    break;
         case 15:
         case 16:
@@ -652,7 +652,7 @@ int active_magic_user(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
 	  act("$n utters the words 'Burn Baby, Burn!'.", ch, 0, 0, TO_ROOM,
 	    INVIS_NULL);
 	    retval = cast_fireball(
-		GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0);
+		GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
            break;
         case 30:
         case 31:
@@ -667,13 +667,13 @@ int active_magic_user(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
 	  act("$n utters the words 'Duck for cover sucker'.", ch, 0, 0,
 	    TO_ROOM, INVIS_NULL);
 	    retval = cast_meteor_swarm(
-		GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0);
+		GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
 	    break;
         default:
             act("$n utters the words 'Burn in hell!'.", ch, 0, 0,
 	    TO_ROOM, INVIS_NULL);
               retval = cast_hellstream(
-                   GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0);
+                   GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
               break;
 
          
@@ -697,7 +697,7 @@ int passive_magic_user2(struct char_data *ch, struct obj_data *obj, int cmd, cha
     {
       act("$n utters the words 'Let there be light!'.", ch, 0, 0,
         TO_ROOM, INVIS_NULL);
-      cast_cure_blind(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0);
+      cast_cure_blind(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
       return eSUCCESS;
     }
 
@@ -707,7 +707,7 @@ int passive_magic_user2(struct char_data *ch, struct obj_data *obj, int cmd, cha
       {
         act("$n utters the words 'Let there be light!'.", ch, 0, 0,
           TO_ROOM, INVIS_NULL);
-        cast_cure_blind(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0);
+        cast_cure_blind(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
         return eSUCCESS;
       }
 
@@ -719,7 +719,7 @@ int passive_magic_user2(struct char_data *ch, struct obj_data *obj, int cmd, cha
         vict = get_pc_vis_exact(ch, get_random_hate(ch));
         if (vict && !ch->fighting) {
            act("$n utters the words 'Your ass is MINE'.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-           cast_summon(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0);
+           cast_summon(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
            return eSUCCESS;
         }
       }
@@ -747,7 +747,7 @@ int active_magic_user2(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
     if(IS_AFFECTED(ch, AFF_BLIND)) {
       act("$n utters the words 'Let there be light!'.", ch, 0, 0, TO_ROOM,
 	INVIS_NULL);
-       cast_cure_blind(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0);
+       cast_cure_blind(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
           return eSUCCESS;
       }
 
@@ -757,7 +757,7 @@ int active_magic_user2(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
 
      if (percent < 40) {
     act("$n utters the words 'Hasta la vista, Baby!'.", ch, 0, 0, TO_ROOM, 0);
-      cast_teleport(GET_LEVEL(ch), ch, "" ,SPELL_TELEPORT, ch, 0);
+      cast_teleport(GET_LEVEL(ch), ch, "" ,SPELL_TELEPORT, ch, 0, GET_LEVEL(ch));
           return eSUCCESS;
     }
   }
@@ -772,7 +772,7 @@ int active_magic_user2(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
    
   act("$n utters the words 'Instant Magic Remover(tm)'.", ch, 0, 0, TO_ROOM, 
     INVIS_NULL);
-         cast_dispel_magic(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0);
+         cast_dispel_magic(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
            return eSUCCESS;
         }
       }
@@ -782,7 +782,7 @@ int active_magic_user2(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
      {
      act("$n utters the words 'I wanna be FAST!'.", ch, 0, 0, TO_ROOM,
        INVIS_NULL);
-      cast_haste(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0);
+      cast_haste(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
            return eSUCCESS;
       }
 
@@ -791,7 +791,7 @@ int active_magic_user2(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
     {
 	act("$n utters the words 'Burn in hell'.", ch, 0, 0, 
 	  TO_ROOM, INVIS_NULL);
-	return cast_hellstream(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0);
+	return cast_hellstream(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
     }
 
 
@@ -799,14 +799,14 @@ int active_magic_user2(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
     {
 	act("$n utters the words 'koholian dia'.", ch, 0, 0,
 	  TO_ROOM, INVIS_NULL);
-	return cast_blindness(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0);
+	return cast_blindness(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
     }
 
     if( (GET_LEVEL(ch)>12) && (number(0,6)==0) && IS_EVIL(ch))
     {
 	act("$n utters the words 'Slurp, Slurp!'.", ch, 0, 0,
 	 TO_ROOM, INVIS_NULL);
-	return cast_energy_drain(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0);
+	return cast_energy_drain(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
     }
 
     switch (GET_LEVEL(ch)) {
@@ -817,7 +817,7 @@ int active_magic_user2(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
 	    act("$n utters the words 'hahili duvini'.", ch, 0, 0,
 	      TO_ROOM, INVIS_NULL);
 	    retval = cast_magic_missile(
-		GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0);
+		GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
 	    break;
 	case 5:
 	case 6:
@@ -826,14 +826,14 @@ int active_magic_user2(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
 	    act("$n utters the words 'grynt oef'.", ch, 0, 0, TO_ROOM,
 	      INVIS_NULL);
 	    retval = cast_burning_hands(
-		GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0);
+		GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
 	    break;
 	case 9:
 	case 10:
 	    act("$n utters the words 'ZZZZZZTTTTT!'.", ch, 0, 0, TO_ROOM,
 	      INVIS_NULL);
 	    retval = cast_lightning_bolt(
-		GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0);
+		GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
 	    break;
 	case 11:
 	case 12:
@@ -842,7 +842,7 @@ int active_magic_user2(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
 	    act("$n utters the words 'Pretty colours!'.", ch, 0, 0,
 	      TO_ROOM, INVIS_NULL);
 	    retval = cast_colour_spray(
-		GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0);
+		GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
 	    break;
         case 15:
         case 16:
@@ -861,7 +861,7 @@ int active_magic_user2(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
 	  act("$n utters the words 'Burn Baby, Burn!'.", ch, 0, 0, TO_ROOM,
 	    INVIS_NULL);
 	    retval = cast_fireball(
-		GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0);
+		GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
            break;
         case 30:
         case 31:
@@ -876,13 +876,13 @@ int active_magic_user2(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
 	  act("$n utters the words 'Duck for cover sucker'.", ch, 0, 0,
 	    TO_ROOM, INVIS_NULL);
 	    retval = cast_meteor_swarm(
-		GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0);
+		GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
 	    break;
         default:
             act("$n utters the words 'I love Acid!'.", ch, 0, 0,
 	      TO_ROOM, INVIS_NULL);
               retval = cast_acid_blast(
-                   GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0);
+                   GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
               break;
 
          
@@ -894,25 +894,25 @@ void cleric_healing(char_data * ch, char_data * vict)
 {
       if(GET_LEVEL(ch) > 25) {
          act("$n utters the words 'Royal Bigmac!'.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-         cast_full_heal(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0);
+         cast_full_heal(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
          return;
        }
 
       if(GET_LEVEL(ch) > 13) {
          act("$n utters the words 'Cheeseburger!'.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-         cast_heal(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0);
+         cast_heal(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
          return;
        }
 
       if(GET_LEVEL(ch) > 8) {
          act("$n utters the words 'Chicken Nuggets!'.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-         cast_cure_critic(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0);
+         cast_cure_critic(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
          return;
        }
 
       if(GET_LEVEL(ch) > 1) {
          act("$n utters the words 'Small Fries!'.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-         cast_cure_light(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0);
+         cast_cure_light(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
          return;
        }
 }
@@ -928,13 +928,13 @@ int passive_cleric(struct char_data *ch, struct obj_data *obj, int cmd, char *ar
 
     if(IS_AFFECTED(ch, AFF_BLIND)) {
       act("$n utters the words 'Let there be light!'.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-      cast_cure_blind(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0);
+      cast_cure_blind(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
       return eSUCCESS;
     }
 
     if((!IS_AFFECTED(ch, AFF_SANCTUARY) && GET_LEVEL(ch) > 17)) {
       act("$n utters the words 'Divine Protection!'.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-      cast_sanctuary(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0);
+      cast_sanctuary(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
       return eSUCCESS;
     }
 
@@ -961,7 +961,7 @@ int passive_cleric(struct char_data *ch, struct obj_data *obj, int cmd, char *ar
 
      if(!IS_AFFECTED(ch, AFF_SANCTUARY) && GET_LEVEL(ch) > 17) {
        act("$n utters the words 'Divine Protection!'.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-       cast_sanctuary(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0);
+       cast_sanctuary(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
        return eSUCCESS;
      }
 
@@ -992,7 +992,7 @@ int active_cleric(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
 
    if(IS_AFFECTED(ch, AFF_BLIND)) {
       act("$n utters the words 'Let there be light!'.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-      cast_cure_blind(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0);
+      cast_cure_blind(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
       return eSUCCESS;
    }
 
@@ -1012,7 +1012,7 @@ int active_cleric(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
           (IS_AFFECTED(vict, AFF_HASTE))) 
       {
          act("$n utters the words 'Instant Magic Remover(tm)'.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-         return cast_dispel_magic(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0);
+         return cast_dispel_magic(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
       }
    }
 
@@ -1021,19 +1021,19 @@ int active_cleric(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
       if (IS_GOOD(vict) && IS_EVIL(ch)) 
       {
          act("$n utters the words 'Suffer Sucker'.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-         return cast_dispel_good(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0);
+         return cast_dispel_good(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
       }
       if (IS_EVIL(vict) && IS_GOOD(ch)) 
       {
          act("$n utters the words 'Suffer Sucker'.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-         return cast_dispel_evil(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0);
+         return cast_dispel_evil(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
       }
    }
 
    if ( GET_LEVEL(ch) >= 15 && GET_LEVEL(ch) <= MAX_MORTAL )
    {
       act("$n utters the words 'Tongue of fire'.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-      return cast_flamestrike ( GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0 );
+      return cast_flamestrike ( GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch) );
    }
    return eFAILURE;
 }
@@ -1268,25 +1268,25 @@ int passive_necro(struct char_data *ch, struct obj_data *obj, int cmd, char *arg
 
     if(IS_AFFECTED(ch, AFF_BLIND)) {
       act("$n utters the words 'dead eye'.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-      cast_cure_blind(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0);
+      cast_cure_blind(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
       return eSUCCESS;
     }
 
     if(!affected_by_spell(ch, SPELL_SHIELD) && GET_LEVEL(ch) > 12) {
       act("$n utters the words 'pongun'.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-      cast_shield(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0);
+      cast_shield(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
       return eSUCCESS;
     }      
 
     if(!affected_by_spell(ch, SPELL_STONE_SKIN) && GET_LEVEL(ch) > 31) {
       act("$n utters the words 'beetle bailey'.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-      cast_stone_skin(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0);
+      cast_stone_skin(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
       return eSUCCESS;
     }      
 
     if(!affected_by_spell(ch, SPELL_ACID_SHIELD) && GET_LEVEL(ch) > 47) {
       act("$n utters the words 'deadtly aura'.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-      cast_acid_shield(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0);
+      cast_acid_shield(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
       return eSUCCESS;
     }      
 
@@ -1319,7 +1319,7 @@ int active_necro(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
            (IS_AFFECTED(vict, AFF_HASTE))) 
        {
           act("$n utters the words 'death stops all'.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-          cast_dispel_magic(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0);
+          cast_dispel_magic(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
           return eSUCCESS;
        }
     }
@@ -1327,19 +1327,19 @@ int active_necro(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
     if(GET_LEVEL(ch) > 18 && !IS_AFFECTED(ch, AFF_HASTE) && number(0, 2)==0 )
     {
        act("$n utters the words 'I wanna be FAST!'.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-       cast_haste(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0);
+       cast_haste(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
        return eSUCCESS;
     }
 
     if( (GET_LEVEL(ch)>12) && number(0,1))
     {
 	act("$n utters the words 'Slurp, Slurp!'.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-	return cast_vampiric_touch(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0);
+	return cast_vampiric_touch(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
     }
 
     if( !IS_AFFECTED(vict, AFF_BLIND) ) {
        act("$n utters the words 'koholian dia'.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-       return cast_blindness(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0);
+       return cast_blindness(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
     }
 
     return eFAILURE;
@@ -1364,7 +1364,7 @@ int passive_tarrasque(struct char_data *ch, struct obj_data *obj, int cmd, char 
         if(IS_AFFECTED(ch, AFF_BLIND)) {
             act("$n utters the words 'Let there be light!'.", ch, 0, 0, TO_ROOM,
          	INVIS_NULL);
-            cast_cure_blind(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0);
+            cast_cure_blind(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
             return eSUCCESS;
         }
     }
@@ -1408,7 +1408,7 @@ int passive_tarrasque(struct char_data *ch, struct obj_data *obj, int cmd, char 
       if ( vict && !ch->fighting) {
             act("$n utters the words 'Your ass is MINE'.",  ch, 0, 0, TO_ROOM, 
 	         INVIS_NULL);
-	    return cast_summon(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0);
+	    return cast_summon(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
       }
     }
 
@@ -1439,7 +1439,7 @@ int active_tarrasque(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
    
   act("$n utters the words 'Instant Magic Remover(tm)'.", ch, 0, 0, TO_ROOM,
     INVIS_NULL);
-         return cast_dispel_magic(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0);
+         return cast_dispel_magic(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
         }
       }
 
@@ -1449,21 +1449,21 @@ int active_tarrasque(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
     {
 	act("$n utters the words 'Burn in hell'.", ch, 0, 0, TO_ROOM,
 	  INVIS_NULL);
-	return cast_hellstream(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0);
+	return cast_hellstream(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
     }
 
     if(GET_LEVEL(ch)>40 && number(0,1)==0 )
     {
 	act("$n utters the words 'Go away pest'.", ch, 0, 0, TO_ROOM,
 	  INVIS_NULL);
-	return cast_teleport(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0);
+	return cast_teleport(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
     }
      
   
 
     act("$n utters the words 'I love Acid!'.", ch, 0, 0, TO_ROOM,
 	      INVIS_NULL);
-    return cast_acid_blast(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0);
+    return cast_acid_blast(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
 }
 
 int summonbash(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,        
@@ -1478,7 +1478,7 @@ int summonbash(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
    
   if(IS_AFFECTED(ch, AFF_BLIND)) {
      act("$n utters the words 'Let there be light!'.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-     cast_cure_blind(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0);
+     cast_cure_blind(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
      return eSUCCESS;
   }
 
@@ -1498,7 +1498,7 @@ int summonbash(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
           if (vict && !ch->fighting) {
            act("$n utters the words 'Your ass is MINE'.", ch, 0, 0, TO_ROOM,
             INVIS_NULL);
-            cast_summon(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0);
+            cast_summon(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
             return do_bash(ch, GET_NAME(vict), 9); 
           }
     }
@@ -1518,7 +1518,7 @@ int passive_grandmaster(struct char_data *ch, struct obj_data *obj, int cmd, cha
     if(IS_AFFECTED(ch, AFF_BLIND)) {
       act("$n utters the words 'Let there be light!'.", ch, 0, 0, TO_ROOM,
 	INVIS_NULL);
-       cast_cure_blind(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0);
+       cast_cure_blind(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
           return eSUCCESS;
       }
 
@@ -1532,7 +1532,7 @@ int passive_grandmaster(struct char_data *ch, struct obj_data *obj, int cmd, cha
       if (vict && !ch->fighting) {
            act("$n utters the words 'Your ass is MINE'.", ch, 0, 0, TO_ROOM,
 	    INVIS_NULL);
-	    return cast_summon(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0);
+	    return cast_summon(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
           }
     }
     return eFAILURE;
@@ -1562,7 +1562,7 @@ int active_grandmaster(CHAR_DATA *ch, struct obj_data *obj, int command, char *a
    
   act("$n utters the words 'Instant Magic Remover(tm)'.", ch, 0, 0,
    TO_ROOM, INVIS_NULL);
-         return cast_dispel_magic(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0);
+         return cast_dispel_magic(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
         }
       }
 
@@ -1571,14 +1571,14 @@ int active_grandmaster(CHAR_DATA *ch, struct obj_data *obj, int command, char *a
     {
 	act("$n utters the words 'Burn them suckers'.", ch, 0, 0, TO_ROOM,
 	  INVIS_NULL);
-	return cast_firestorm(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0);
+	return cast_firestorm(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
     }
 
     if(GET_LEVEL(ch)>40 && number(0,2)==0 )
     {
 	act("$n utters the words 'Burn in hell'.", ch, 0, 0, TO_ROOM, 
 	  INVIS_NULL);
-	return cast_hellstream(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0);
+	return cast_hellstream(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
     }
 
   if ( !IS_AFFECTED(vict, AFF_PARALYSIS) )
@@ -1586,13 +1586,13 @@ int active_grandmaster(CHAR_DATA *ch, struct obj_data *obj, int command, char *a
     {
 	act("$n utters the words 'Go away pest'.", ch, 0, 0, TO_ROOM,
 	  INVIS_NULL);
-	return cast_teleport(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0);
+	return cast_teleport(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
     }
 
             act("$n utters the words 'I love Acid!'.", ch, 0, 0, TO_ROOM,
 	      INVIS_NULL);
               return cast_acid_blast(
-                   GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0);
+                   GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
 }
 
 int baby_troll(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,        
@@ -2001,7 +2001,7 @@ int white_dragon(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
       return eFAILURE;
 
     act("$n breathes frost.",ch, 0, 0, TO_ROOM, 0);
-    cast_frost_breath(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0);
+    cast_frost_breath(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
 
     return eSUCCESS;
 }
@@ -2027,7 +2027,7 @@ int black_dragon(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
       return eFAILURE;
 
     act("$n breathes acid.", ch, 0, 0, TO_ROOM, 0);
-    return cast_acid_breath(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0);
+    return cast_acid_breath(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
 }
 
 int blue_dragon(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,        
@@ -2048,7 +2048,7 @@ int blue_dragon(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
       return eFAILURE;
 
     act("$n breathes lightning.", ch, 0, 0, TO_ROOM, 0);
-    return cast_lightning_breath(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0);
+    return cast_lightning_breath(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, GET_LEVEL(ch));
 }
 
 
@@ -2069,7 +2069,7 @@ int red_dragon(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
       return eFAILURE;
 
     act("$n breathes fire.", ch, 0, 0, TO_ROOM, 0);
-    return cast_fire_breath(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0);
+    return cast_fire_breath(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, GET_LEVEL(ch));
 }
 
 int green_dragon(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,        
@@ -2089,7 +2089,7 @@ int green_dragon(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
       return eFAILURE;
 
     act("$n breathes gas.", ch, 0, 0, TO_ROOM, 0);
-    return cast_gas_breath(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0);
+    return cast_gas_breath(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, GET_LEVEL(ch));
 }
 
 int brass_dragon(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,        
@@ -2115,7 +2115,7 @@ int brass_dragon(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     if (number(0,4)==0)
     {
 	act("$n breathes gas.",ch, 0, 0, TO_ROOM, 0);
-	return cast_gas_breath(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0);
+	return cast_gas_breath(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, GET_LEVEL(ch));
     }
 
     vict = ch->fighting;
@@ -2131,7 +2131,7 @@ int brass_dragon(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 	    return eFAILURE;
 
     act("$n breathes lightning.", ch, 0, 0, TO_ROOM, 0);
-    return cast_lightning_breath(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0);
+    return cast_lightning_breath(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
 }
   
 
@@ -3092,15 +3092,15 @@ int adept(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     {
     case 3 :
       act("$n utters the words 'garf'.", ch, 0, 0, TO_ROOM, 0);
-      cast_cure_light(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, tch, 0);
+      cast_cure_light(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, tch, 0, GET_LEVEL(ch));
       return eSUCCESS;
     case 7 :
       act("$n utters the words 'nahk'.",  ch, 0, 0, TO_ROOM, 0);
-      cast_bless(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, tch, 0);
+      cast_bless(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, tch, 0, GET_LEVEL(ch));
       return eSUCCESS;
     case 6 :
       act("$n utters the words 'tehctah'.",  ch, 0, 0, TO_ROOM, 0);
-      cast_armor(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, tch, 0);
+      cast_armor(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, tch, 0, GET_LEVEL(ch));
       return eSUCCESS;
     case 4 :
       do_say(ch,"Finish school.  Don't drop out.", 0);
@@ -3200,7 +3200,7 @@ int bee(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 	    act("$n sinks a barbed stinger into you!", ch, 0,
               ch->fighting, TO_VICT, 0);
 	    cast_poison( GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL,
-		 ch->fighting, 0);
+		 ch->fighting, 0, GET_LEVEL(ch));
 	    return eSUCCESS;
 	}
     return eFAILURE;
@@ -3583,7 +3583,7 @@ int hellstreamer(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
     if(IS_AFFECTED(ch, AFF_BLIND)) {
       act("$n utters the words 'I see said the blind!'.", ch, 0, 0, TO_ROOM,
 	INVIS_NULL);
-       cast_cure_blind(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0);
+       cast_cure_blind(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
           return eSUCCESS;
       }
 
@@ -3593,7 +3593,7 @@ int hellstreamer(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
     {
 	act("$n utters the words 'Burn motherfucker!'.", ch, 0, 0, 
 	  TO_ROOM, INVIS_NULL);
-	return cast_hellstream(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0);
+	return cast_hellstream(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
     }
 
     return eFAILURE;
@@ -3608,7 +3608,7 @@ int firestormer(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
 
     act("$n utters the words 'Fry bitch!'.", ch, 0, 0, 
 	  TO_ROOM, INVIS_NULL);
-    return cast_firestorm(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0);
+    return cast_firestorm(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
 }
 
 int humaneater(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,        
@@ -3740,7 +3740,7 @@ int ranger_combat(struct char_data *ch, struct obj_data *obj, int cmd, char *arg
    
    if(number(1, 5) == 1 && GET_LEVEL(ch) > 44) {
       act("$n utters the words 'Save this Dinas!'.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-      return cast_creeping_death(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0);
+      return cast_creeping_death(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
    }
    
    if(number(1, 5) == 1 && GET_LEVEL(ch) > 29) {
@@ -3763,7 +3763,7 @@ int ranger_combat(struct char_data *ch, struct obj_data *obj, int cmd, char *arg
 
    if(number(1, 2) == 1) {
      act("$n utters the words 'Get the point?'.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-     return cast_bee_sting(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0);
+     return cast_bee_sting(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
    }
 
    return eFAILURE;
@@ -3793,19 +3793,19 @@ int ranger_non_combat(struct char_data *ch, struct obj_data *obj, int cmd, char 
 
     if(GET_HIT(ch) < GET_MAX_HIT(ch) && number(1,3) == 1) {
       act("$n utters the words 'Herb Lore'.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-      cast_herb_lore(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0);
+      cast_herb_lore(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
       return eSUCCESS;
     }
 
     if(!IS_AFFECTED(ch,AFF_INFRARED)) {
       act("$n utters the words 'owl eyes'.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-      cast_eyes_of_the_owl(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0);
+      cast_eyes_of_the_owl(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
       return eSUCCESS;
     }      
 
     if(!affected_by_spell(ch, SPELL_BARKSKIN) && GET_LEVEL(ch) > 24) {
       act("$n utters the words 'iwannawoody'.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-      cast_barkskin(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0);
+      cast_barkskin(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
       return eSUCCESS;
     }      
 
@@ -3919,7 +3919,7 @@ int blindingparrot(struct char_data *ch, struct obj_data *obj, int cmd, char *ar
 	    act("$n pecks at you with it's beak!", ch, 0,
               ch->fighting, TO_VICT, 0);
 	    return cast_blindness( GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL,
-		 ch->fighting, 0);
+		 ch->fighting, 0, GET_LEVEL(ch));
 	}
     return eFAILURE;
 }
@@ -4030,14 +4030,14 @@ int bounder(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
     if(IS_AFFECTED(ch, AFF_BLIND)) {
       act("$n utters the words 'I see said the blind!'.", ch, 0, 0, TO_ROOM,
 	INVIS_NULL);
-       cast_cure_blind(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0);
+       cast_cure_blind(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
           return eSUCCESS;
       }
 
    do_say(ch, "I hope you land in enfan hell!", 9);
    act("$n recites a bound scroll.", ch, 0, vict, TO_ROOM,
 	  INVIS_NULL);
-   return cast_teleport(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0);
+   return cast_teleport(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
 }
 
 // I love to dispel stuff!
@@ -4058,7 +4058,7 @@ int dispelguy(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
     if(IS_AFFECTED(ch, AFF_BLIND)) {
       act("$n utters the words 'I see said the blind!'.", ch, 0, 0, TO_ROOM,
 	INVIS_NULL);
-       cast_cure_blind(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0);
+       cast_cure_blind(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
           return eSUCCESS;
       }
 
@@ -4068,13 +4068,13 @@ int dispelguy(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
       {
          act("$n utters the words 'fjern magi'.", ch, 0, 0,
             TO_ROOM, INVIS_NULL);
-         return cast_dispel_magic(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0);
+         return cast_dispel_magic(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
       }
       else
       {
          act("$n utters the words 'frys din nisse'.", ch, 0, 0,
             TO_ROOM, INVIS_NULL);
-         return cast_chill_touch(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0);
+         return cast_chill_touch(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
       }
     return eFAILURE;
 }
@@ -4142,7 +4142,7 @@ int acidhellstreamer(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
     if(IS_AFFECTED(ch, AFF_BLIND)) {
       act("$n utters the words 'I see said the blind!'.", ch, 0, 0, TO_ROOM,
 	INVIS_NULL);
-       cast_cure_blind(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0);
+       cast_cure_blind(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
           return eSUCCESS;
       }
 
@@ -4150,13 +4150,13 @@ int acidhellstreamer(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
     {
 	act("$n utters the words 'Haduken!'.", ch, 0, 0, 
 	  TO_ROOM, INVIS_NULL);
-	return cast_hellstream(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0);
+	return cast_hellstream(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
     }
     else 
     {
         act("$n utters the words 'Let's go girls! Feel the burn!'.", ch, 0, 0,
           TO_ROOM, INVIS_NULL);
-        return cast_acid_blast(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0);
+        return cast_acid_blast(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
     }
     return eFAILURE;
 }
@@ -4195,15 +4195,15 @@ int paladin(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
       return do_bash(ch, "", 9);
     }
     if(GET_LEVEL(ch) > 10 && enemycount > 1) {
-       return cast_earthquake(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0);
+       return cast_earthquake(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
     }
     if(GET_LEVEL(ch) > 47)
     {
-       return cast_power_harm(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0);
+       return cast_power_harm(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
     }
     else if(GET_LEVEL(ch) > 35)
     {
-       return cast_harm(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0);
+       return cast_harm(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
     }
     if(number(0,1)==0 )
     {
@@ -4225,19 +4225,19 @@ int paladin_non_combat(struct char_data *ch, struct obj_data *obj, int cmd, char
 
     if(GET_HIT(ch) < GET_MAX_HIT(ch) && number(1,3) == 1 && GET_LEVEL(ch) > 29) {
       act("$n utters the words 'power heal'.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-      cast_power_heal(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0);
+      cast_power_heal(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
       return eSUCCESS;
     }
 
     if(!IS_AFFECTED(ch,AFF_DETECT_INVISIBLE)) {
       act("$n utters the words 'ghost eye'.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-      cast_detect_invisibility(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0);
+      cast_detect_invisibility(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
       return eSUCCESS;
     }      
 
     if(!affected_by_spell(ch, SPELL_STRENGTH) && GET_LEVEL(ch) > 24) {
       act("$n utters the words 'sampson's gift'.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-      cast_strength(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0);
+      cast_strength(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
       return eSUCCESS;
     }      
 
@@ -4266,15 +4266,15 @@ int antipaladin(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     }
     if(GET_LEVEL(ch) > 47)
     {
-       return cast_acid_blast(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0);
+       return cast_acid_blast(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
     }
     if(GET_LEVEL(ch) > 27)
     {
-       return cast_fireball(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0);
+       return cast_fireball(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
     }
     if(GET_LEVEL(ch) > 14)
     {
-       return cast_vampiric_touch(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0);
+       return cast_vampiric_touch(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
     }
    return eFAILURE;
 }
@@ -4291,19 +4291,19 @@ int antipaladin_non_combat(struct char_data *ch, struct obj_data *obj, int cmd, 
 
     if(!IS_AFFECTED(ch,AFF_DETECT_INVISIBLE) && GET_LEVEL(ch) > 11) {
       act("$n utters the words 'ghost eye'.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-      cast_detect_invisibility(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0);
+      cast_detect_invisibility(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
       return eSUCCESS;
     }      
 
     if(!affected_by_spell(ch, SPELL_SHIELD) && GET_LEVEL(ch) > 19) {
       act("$n utters the words 'pongun'.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-      cast_shield(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0);
+      cast_shield(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
       return eSUCCESS;
     }      
 
     if(!affected_by_spell(ch, SPELL_STONE_SKIN) && GET_LEVEL(ch) > 46) {
       act("$n utters the words 'teri hatcher'.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-      cast_stone_skin(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0);
+      cast_stone_skin(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
       return eSUCCESS;
     }      
 
@@ -4554,7 +4554,7 @@ int turtle_green_combat(struct char_data *ch, struct obj_data *obj, int cmd, cha
     act("a small green turtle ears back its arm and throws a ball at you!",
             ch->fighting, 0, 0, TO_CHAR, 0);
     return cast_fire_breath(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL,
-            ch->fighting, 0);
+            ch->fighting, 0, GET_LEVEL(ch));
 }
 
 int foggy_combat(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,        
@@ -4690,7 +4690,7 @@ int koban_combat(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
       temp_chr = ch->fighting;
       stop_fighting(ch);
       act("$n utters the words, 'gao kimo nachi'", ch, 0, 0, TO_ROOM, INVIS_NULL);
-      cast_sanctuary(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, iasenko, 0);
+      cast_sanctuary(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, iasenko, 0, GET_LEVEL(ch));
       set_fighting(ch, temp_chr);
       return eSUCCESS;
     }
@@ -4699,13 +4699,13 @@ int koban_combat(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     if(iasenko && ((GET_HIT(iasenko)+5) < GET_MAX_HIT(iasenko)) && number(0, 1))
     {
       act("$n calls on the souls of his fallen ancestors!", ch, 0, 0, TO_ROOM, INVIS_NULL);
-      cast_full_heal(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, iasenko, 0);
+      cast_full_heal(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, iasenko, 0, GET_LEVEL(ch));
       return eSUCCESS;
     }
 
     // call lightning
     act("$n utters the words, 'kao naga chi'", ch, 0, 0, TO_ROOM, INVIS_NULL);
-    return cast_call_lightning(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0);
+    return cast_call_lightning(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, GET_LEVEL(ch));
 }
 
 int koban_non_combat(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,        
@@ -4725,7 +4725,7 @@ int koban_non_combat(struct char_data *ch, struct obj_data *obj, int cmd, char *
     if(iasenko && !IS_AFFECTED(iasenko, AFF_SANCTUARY))
     {
       act("$n utters the words, 'gao kimo nachi'", ch, 0, 0, TO_ROOM, INVIS_NULL);
-      cast_sanctuary(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, iasenko, 0);
+      cast_sanctuary(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, iasenko, 0, GET_LEVEL(ch));
       return eSUCCESS;
     }
 
@@ -4733,7 +4733,7 @@ int koban_non_combat(struct char_data *ch, struct obj_data *obj, int cmd, char *
     if(iasenko && ((GET_HIT(iasenko)+5) < GET_MAX_HIT(iasenko)))
     {
       act("$n calls on the souls of his fallen ancestors!", ch, 0, 0, TO_ROOM, INVIS_NULL);
-      cast_full_heal(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, iasenko, 0);
+      cast_full_heal(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, iasenko, 0, GET_LEVEL(ch));
       return eSUCCESS;
     }
 
@@ -4741,7 +4741,7 @@ int koban_non_combat(struct char_data *ch, struct obj_data *obj, int cmd, char *
     if(!IS_AFFECTED(ch, AFF_SANCTUARY))
     {
       act("$n utters the words, 'gao kimo nachi'", ch, 0, 0, TO_ROOM, INVIS_NULL);
-      cast_sanctuary(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0);
+      cast_sanctuary(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
       return eSUCCESS;
     }
 
@@ -4749,7 +4749,7 @@ int koban_non_combat(struct char_data *ch, struct obj_data *obj, int cmd, char *
     if((GET_HIT(ch) + 5) < GET_MAX_HIT(ch))
     {
       act("$n calls on the souls of his fallen ancestors!", ch, 0, 0, TO_ROOM, INVIS_NULL);
-      cast_full_heal(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0);
+      cast_full_heal(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
       return eSUCCESS;
     }
 
@@ -4812,19 +4812,19 @@ int takahashi_combat(struct char_data *ch, struct obj_data *obj, int cmd, char *
     case 1:
     // firestorm
      act("$n summons the power of the shadows to envelop you in fire!", ch, 0, 0, TO_ROOM, INVIS_NULL);
-     retval = cast_firestorm(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0);
+     retval = cast_firestorm(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, GET_LEVEL(ch));
      if(SOMEONE_DIED(retval))
        return retval;
-     return cast_firestorm(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0);
+     return cast_firestorm(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, GET_LEVEL(ch));
      break;
     
     case 2:
     // vampiric touch
      act("$n calls upon the arcane knowledge of his ancestors!", ch, 0, 0, TO_ROOM, INVIS_NULL);
-     retval = cast_vampiric_touch(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0);
+     retval = cast_vampiric_touch(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, GET_LEVEL(ch));
      if(SOMEONE_DIED(retval))
        return retval;
-     return cast_vampiric_touch(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0);
+     return cast_vampiric_touch(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, GET_LEVEL(ch));
      break;
     
     } // end of switch
@@ -4882,7 +4882,7 @@ int surimoto_combat(struct char_data *ch, struct obj_data *obj, int cmd, char *a
 
     case 1:
      act("$n utters the words, 'moshi-moshi'", ch, 0, 0, TO_ROOM, INVIS_NULL);
-     cast_teleport(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0);
+     cast_teleport(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, GET_LEVEL(ch));
     break;
 
     default:
@@ -4909,12 +4909,12 @@ int hiryushi_combat(struct char_data *ch, struct obj_data *obj, int cmd, char *a
 
     case 1:
      act("$n utters the words, 'solar flare'", ch, 0, 0, TO_ROOM, INVIS_NULL);
-     return cast_solar_gate(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0);
+     return cast_solar_gate(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, GET_LEVEL(ch));
     break;
 
     case 2:
      act("$n utters the words, 'gasa ni umi'", ch, 0, 0, TO_ROOM, INVIS_NULL);
-     return cast_hellstream(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0);
+     return cast_hellstream(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, GET_LEVEL(ch));
     break;
 
     case 3:
@@ -4924,7 +4924,7 @@ int hiryushi_combat(struct char_data *ch, struct obj_data *obj, int cmd, char *a
        if(IS_NPC(victim))
          continue;
        act("$n points a wand at $N.", ch, 0, victim, TO_ROOM, NOTVICT);
-       return cast_drown(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, victim, 0);
+       return cast_drown(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, victim, 0, GET_LEVEL(ch));
      }
     break;
 
@@ -4944,15 +4944,15 @@ int izumi_combat(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 
     case 1:
      act("$n utters the words, 'gasa ni umi'", ch, 0, 0, TO_ROOM, INVIS_NULL);
-     retval = cast_poison(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0);
+     retval = cast_poison(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, GET_LEVEL(ch));
      if(SOMEONE_DIED(retval))
        return retval;
-     cast_teleport(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0);
+     cast_teleport(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, GET_LEVEL(ch));
     break;
 
     default:
      act("$n utters the words, 'ga!'", ch, 0, 0, TO_ROOM, INVIS_NULL);
-     return cast_colour_spray(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0);
+     return cast_colour_spray(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, GET_LEVEL(ch));
     break;
 
     } // end of switch
@@ -5063,7 +5063,7 @@ int mage_familiar(struct char_data *ch, struct obj_data *obj, int cmd, char *arg
           struct char_data *owner)
 {
   if(number(0, 1))
-    return cast_fireball(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0);
+    return cast_fireball(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, GET_LEVEL(ch));
   
   return eFAILURE;  
 }

@@ -613,7 +613,7 @@ int song_disrupt( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim)
    
    WAIT_STATE(ch, PULSE_VIOLENCE);
 
-   return spell_dispel_magic(GET_LEVEL(ch)-1, ch, victim, 0);
+   return spell_dispel_magic(GET_LEVEL(ch)-1, ch, victim, 0, 0);
 }
 
 int song_whistle_sharp( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim)
@@ -785,7 +785,7 @@ int execute_song_note_of_knowledge( byte level, CHAR_DATA *ch, char *arg, CHAR_D
    dc_free(ch->song_data);
 
    if(obj)
-      spell_identify(GET_LEVEL(ch), ch, 0, obj);
+      spell_identify(GET_LEVEL(ch), ch, 0, obj, 0);
    else send_to_char("You don't seem to have that item.\r\n", ch);
    return eSUCCESS;
 }

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.10 2002/08/02 20:59:01 pirahna Exp $
+| $Id: objects.cpp,v 1.11 2002/08/03 01:34:41 pirahna Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -230,7 +230,7 @@ int do_quaff(struct char_data *ch, char *argument, int cmd)
      {
         if(spell_info[temp->obj_flags.value[i]].spell_pointer)
            retval = ((*spell_info[temp->obj_flags.value[i]].spell_pointer)
-              ((byte) temp->obj_flags.value[0], ch, "", SPELL_TYPE_POTION, ch, 0));
+              ((byte) temp->obj_flags.value[0], ch, "", SPELL_TYPE_POTION, ch, 0, 0));
      }
      if(IS_SET(retval, eCH_DIED))
         break;
@@ -301,7 +301,7 @@ int do_recite(struct char_data *ch, char *argument, int cmd)
       if (scroll->obj_flags.value[i] >= 1)
       {
         retval = ((*spell_info[scroll->obj_flags.value[i]].spell_pointer)
-          ((byte) scroll->obj_flags.value[0], ch, "", SPELL_TYPE_SCROLL, victim, obj));
+          ((byte) scroll->obj_flags.value[0], ch, "", SPELL_TYPE_SCROLL, victim, obj, 0));
         if(IS_SET(retval, eCH_DIED))
           break;
       }
@@ -494,7 +494,7 @@ int do_use(struct char_data *ch, char *argument, int cmd)
     if (stick->obj_flags.value[2] > 0) { /* Charges left? */
       stick->obj_flags.value[2]--;
       return ((*spell_info[stick->obj_flags.value[3]].spell_pointer)
-        ((byte) stick->obj_flags.value[0], ch, "", SPELL_TYPE_STAFF, 0, 0));
+        ((byte) stick->obj_flags.value[0], ch, "", SPELL_TYPE_STAFF, 0, 0, 0));
     } else {
       send_to_char("The staff seems powerless.\n\r", ch);
     }
@@ -513,7 +513,7 @@ int do_use(struct char_data *ch, char *argument, int cmd)
       if (stick->obj_flags.value[2] > 0) { // are there any charges left? 
         stick->obj_flags.value[2]--;
         return ((*spell_info[stick->obj_flags.value[3]].spell_pointer)
-          ((byte) stick->obj_flags.value[0], ch, "", SPELL_TYPE_WAND, tmp_char, tmp_object));
+          ((byte) stick->obj_flags.value[0], ch, "", SPELL_TYPE_WAND, tmp_char, tmp_object, 0));
       } else {
         send_to_char("The wand seems powerless.\n\r", ch);
       }

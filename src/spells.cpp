@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.11 2002/08/02 20:59:01 pirahna Exp $ */
+/* $Id: spells.cpp,v 1.12 2002/08/03 01:34:41 pirahna Exp $ */
 
 extern "C"
 {
@@ -1556,12 +1556,7 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
         learned = learned % 100;
 
         if(IS_MOB(ch))
-          learned = 80;
-
-// TODO - remove this later
-        // Small bonus for mages since we don't have skill increases for spells yet
-        if(GET_CLASS(ch) == CLASS_MAGIC_USER)
-           learned += 5;
+          learned = 50;
 
         // TODO - make this use int for mages
         if(GET_LEVEL(ch) < IMMORTAL && number(1,105) >
@@ -1578,7 +1573,7 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
 //        (we could just call "has_skill" again, but that wouldn't be very smart)
 
         GET_MANA(ch) -= (use_mana(ch, spl));
-        return ((*spell_info[spl].spell_pointer) (GET_LEVEL(ch), ch, argument, SPELL_TYPE_SPELL, tar_char, tar_obj));
+        return ((*spell_info[spl].spell_pointer) (GET_LEVEL(ch), ch, argument, SPELL_TYPE_SPELL, tar_char, tar_obj, learned));
       }
     }   /* if GET_POS < min_pos */
     return eFAILURE;
