@@ -21,7 +21,7 @@
  *  12/08/2003   Onager    Added check for charmies and !charmie eq to     *
  *                         equip_char()                                    *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.51 2004/05/21 04:37:49 urizen Exp $ */
+/* $Id: handler.cpp,v 1.52 2004/05/21 04:49:22 urizen Exp $ */
     
 extern "C"
 {
@@ -2148,7 +2148,8 @@ void extract_obj(struct obj_data *obj)
     struct active_object *active_obj = NULL,
                          *last_active = NULL;
 
-    if(obj_index[obj->item_number].non_combat_func) {
+    if(obj_index[obj->item_number].non_combat_func ||
+	obj->obj_flags.type_flag == ITEM_MEGAPHONE) {
        active_obj = &active_head;
        while(active_obj) {
            if((active_obj->obj == obj) && (last_active)) {
@@ -2290,10 +2291,10 @@ void extract_char(CHAR_DATA *ch, bool pull)
 
    if (IS_NPC(ch))
     {
+	do_save(ch->master,"",666);
         if (mob_index[ch->mobdata->nr].virt == 8)
           if (ch->master)
             ch->master->pcdata->golem = 0; // Reset the golem flag.
-        do_save(ch->master, "", 666);
     }
 
     if ( ch->followers || ch->master )
@@ -2304,6 +2305,7 @@ void extract_char(CHAR_DATA *ch, bool pull)
     {
       dc_free(ch->group_name);
       ch->group_name = NULL;
+      REMOVE_BIT(ch->affected_by,AFF_GROUP); // shrug
     }
 
     if ( ch->fighting )
