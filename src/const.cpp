@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: const.cpp,v 1.14 2002/08/01 19:14:33 pirahna Exp $ */
+/* $Id: const.cpp,v 1.15 2002/08/01 20:38:02 dcastle Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1185,7 +1185,7 @@ struct class_skill_defines c_skills[] = { // cleric skills
 {    "earthquake",	SPELL_EARTHQUAKE,	7,	90,	-1,	"You need to go see Minare.  He was last seen in the caves north east of town." }, 
 {    "poison",		SPELL_POISON,		8,	90,	3021,	NULL }, 
 {    "cause critical",	SPELL_CAUSE_CRITICAL,	9,	90,	3021,	NULL }, 
-{    "cause critic",	SPELL_CURE_CRITIC,	9,	90,	3021,	NULL }, 
+{    "cure critical",	SPELL_CURE_CRITIC,	9,	90,	3021,	NULL }, 
 {    "remove poison",	SPELL_REMOVE_POISON,	9,	90,	3021,	NULL }, 
 {    "dispel evil",	SPELL_DISPEL_EVIL,	10,	90,	3021,	NULL }, 
 {    "dispel good",	SPELL_DISPEL_GOOD,	10,	90,	3021,	NULL }, 
