@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: const.cpp,v 1.31 2002/08/14 19:11:45 dcastle Exp $ */
+/* $Id: const.cpp,v 1.32 2002/08/14 19:13:39 pirahna Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1275,8 +1275,8 @@ struct class_skill_defines m_skills[] = { // mage skills
 {    "paralyze",	SPELL_PARALYZE,		45,	90,	3020,	NULL },
 {    "word of recall",	SPELL_WORD_OF_RECALL,	45,	90,	3020,	NULL },
 {    "fireshield",	SPELL_FIRESHIELD,	48,	90,	3020,	NULL },
-{    "create golem",	SPELL_CREATE_GOLEM,	50,	90,	3020,	NULL },
-{    "release golem",	SPELL_RELEASE_GOLEM,	50,	90,	3020,	NULL },
+//{    "create golem",	SPELL_CREATE_GOLEM,	50,	90,	3020,	NULL },
+//{    "release golem",	SPELL_RELEASE_GOLEM,	50,	90,	3020,	NULL },
 {    "solar gate",	SPELL_SOLAR_GATE,	50,	90,	3020,	NULL },
 {    "\n",		0,			1,	0,	0, 	NULL}
 };
