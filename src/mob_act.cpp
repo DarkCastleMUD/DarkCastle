@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: mob_act.cpp,v 1.4 2002/07/28 02:04:15 pirahna Exp $ */
+/* $Id: mob_act.cpp,v 1.5 2002/09/05 03:02:21 pirahna Exp $ */
 
 extern "C"
 {
@@ -651,7 +651,9 @@ void mobile_activity(void)
             break;
           } 
           next_aggro = tmp_ch->next_in_room; 
-      
+
+          if(ch == tmp_ch)
+            continue;      
           if(!CAN_SEE(ch, tmp_ch))
             continue;
           if(IS_NPC(tmp_ch) && !IS_AFFECTED(tmp_ch, AFF_CHARM))
@@ -703,8 +705,11 @@ void mobile_activity(void)
       {
         pch = tmp_ch->next_in_room;
 
-        tmp_bitv = GET_BITV(tmp_ch);
+        if(ch == tmp_ch)
+           continue;
       
+        tmp_bitv = GET_BITV(tmp_ch);
+
         if(IS_SET(ch->mobdata->actflags, ACT_FRIENDLY) &&
            tmp_ch->fighting &&
            IS_SET(race_info[(int)GET_RACE(ch)].friendly, tmp_bitv) &&
