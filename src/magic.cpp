@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.136 2004/05/21 02:52:51 urizen Exp $ */
+/* $Id: magic.cpp,v 1.137 2004/05/21 04:37:49 urizen Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -8324,7 +8324,7 @@ int check_components(CHAR_DATA *ch, int destroy, int item_one = 0,
   if(!ch->carrying)                                                             
     return FALSE;                                                               
                                                                                 
-  ptr_one = get_obj_in_list_num(real_object(item_one), ch->carrying);                        
+  ptr_one = get_obj_in_list_num(real_object(item_one), ch->carrying);
   if(item_two)                                                                  
     ptr_two = get_obj_in_list_num(real_object(item_two), ch->carrying); 
   if(item_three)                                                                
@@ -8333,7 +8333,7 @@ int check_components(CHAR_DATA *ch, int destroy, int item_one = 0,
     ptr_four = get_obj_in_list_num(real_object(item_four),ch->carrying);                    
                                                                                 
 // Destroy the components if needed                                             
-                                                                                
+
   if(destroy)                                                                   
   {                                                                             
     int gone = FALSE;

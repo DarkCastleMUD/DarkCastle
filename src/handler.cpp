@@ -21,7 +21,7 @@
  *  12/08/2003   Onager    Added check for charmies and !charmie eq to     *
  *                         equip_char()                                    *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.50 2004/05/21 04:14:12 urizen Exp $ */
+/* $Id: handler.cpp,v 1.51 2004/05/21 04:37:49 urizen Exp $ */
     
 extern "C"
 {
@@ -2288,6 +2288,14 @@ void extract_char(CHAR_DATA *ch, bool pull)
         return;
     }
 
+   if (IS_NPC(ch))
+    {
+        if (mob_index[ch->mobdata->nr].virt == 8)
+          if (ch->master)
+            ch->master->pcdata->golem = 0; // Reset the golem flag.
+        do_save(ch->master, "", 666);
+    }
+
     if ( ch->followers || ch->master )
 	die_follower(ch);
 
@@ -2306,12 +2314,6 @@ void extract_char(CHAR_DATA *ch, bool pull)
 	next_char = k->next_fighting;
 	if ( k->fighting == ch )
 	    stop_fighting( k );
-    }
-    if (IS_NPC(ch))
-    {
-	if (mob_index[ch->mobdata->nr].virt == 8)
-	  if (ch->master)
-	    ch->master->pcdata->golem = 0; // Reset the golem flag.
     }
     // remove any and all affects from the character
     while(ch->affected)
