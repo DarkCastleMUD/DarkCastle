@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.215 2004/06/09 22:06:30 urizen Exp $ */
+/* $Id: fight.cpp,v 1.216 2004/06/24 00:10:29 urizen Exp $ */
 
 extern "C"
 {
@@ -1426,7 +1426,8 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
       set_fighting(ch, victim);
   }
 
-  if (IS_AFFECTED(ch, AFF_INVISIBLE)) {
+  if (IS_AFFECTED(ch, AFF_INVISIBLE)
+	&& !IS_AFFECTED2(ch, AFF_ILLUSION)) {
     act("$n slowly fades into existence.", ch, 0, 0, TO_ROOM, 0);
     //if (affected_by_spell(ch, SPELL_INVISIBLE))
     // no point it looping through the list twice...

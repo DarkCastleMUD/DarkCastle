@@ -40,7 +40,7 @@ extern struct index_data *obj_index;
 
 DO_FUN innate_powerwield;
 DO_FUN innate_regeneration;
-DO_FUN innate_farsight;
+DO_FUN innate_illusion;
 DO_FUN innate_repair;
 DO_FUN innate_focus;
 DO_FUN innate_evasion;
@@ -58,7 +58,7 @@ struct in_skills {
 const struct in_skills innates[] = {
   { "powerwield", RACE_GIANT, innate_powerwield },
   { "regeneration", RACE_TROLL, innate_regeneration },
-  { "farsight", RACE_GNOME, innate_farsight },
+  { "illusion", RACE_GNOME, innate_illusion },
   { "bloodlust", RACE_ORC, innate_bloodlust},
   { "repair", RACE_DWARVEN, innate_repair},
   { "focus", RACE_ELVEN, innate_focus},
@@ -73,7 +73,7 @@ char * innate_skills[] =
    "Focus",
    "Regeneration",
    "Bloodlust",
-   "Farsight",
+   "Illusion",
    "Evasion",
    "Shadowslip",
    "!repairr!",
@@ -172,17 +172,20 @@ int innate_focus(CHAR_DATA *ch, char *arg, int cmd)
    return eSUCCESS;   
 }
 
-int innate_farsight(CHAR_DATA *ch, char *arg, int cmd)
+int innate_illusion(CHAR_DATA *ch, char *arg, int cmd)
 {
    struct affected_type af;
-   af.type = SKILL_INNATE_FARSIGHT;
-   af.duration = 6;
+   af.type = SKILL_INNATE_ILLUSION;
+   af.duration = 4;
    af.modifier = 0;
    af.location = 0;
-   af.bitvector = AFF_FARSIGHT;
+   af.bitvector = AFF_ILLUSION;
    affect_to_char(ch, &af);
-   send_to_char("Your vision sharpens and your ability to see your surroundings improves.\r\n",ch);
-   act("$n's eyes begin to glow brightly.", ch, NULL, NULL, TO_ROOM, 0);
+   af.type = SPELL_INVISIBLE;
+   af.bitvector = AFF_INVISIBLE;
+   affect_to_char(ch, &af);
+   send_to_char("You use your race's innate illusion powers, and fade out of existance.\r\n",ch);
+   act("$n chants something incoherent and fades out of existance.", ch, NULL, NULL, TO_ROOM, 0);
    return eSUCCESS;
 }
 

@@ -21,7 +21,7 @@
  *  12/08/2003   Onager    Added check for charmies and !charmie eq to     *
  *                         equip_char()                                    *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.66 2004/06/06 12:07:29 urizen Exp $ */
+/* $Id: handler.cpp,v 1.67 2004/06/24 00:10:30 urizen Exp $ */
     
 extern "C"
 {
@@ -96,7 +96,7 @@ bool isaff2(int spellnum)
 		case SKILL_INNATE_POWERWIELD:
 		case SKILL_INNATE_REGENERATION:
 		case SKILL_INNATE_SHADOWSLIP:
-		case SKILL_INNATE_FARSIGHT:
+		case SKILL_INNATE_ILLUSION:
 		case SKILL_INNATE_FOCUS:
                   return TRUE;
                   break;
@@ -990,9 +990,9 @@ void affect_remove( CHAR_DATA *ch, struct affected_type *af, int flags, bool aff
          if (!(flags & SUPPRESS_MESSAGES))
  	 send_to_char("Your lust for battle has left you.\r\n",ch);
 	 break;
-      case SKILL_INNATE_FARSIGHT:
+      case SKILL_INNATE_ILLUSION:
          if (!(flags & SUPPRESS_MESSAGES))
- 	  send_to_char("Your vision returns to its normal state.\r\n",ch);
+ 	  send_to_char("You slowly fade into existance.\r\n",ch);
 	  break;
       case SKILL_INNATE_EVASION:
          if (!(flags & SUPPRESS_MESSAGES))
