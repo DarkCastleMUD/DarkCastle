@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.45 2004/04/21 19:40:12 urizen Exp $ */
+/* $Id: nanny.cpp,v 1.46 2004/04/22 08:24:39 urizen Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -574,7 +574,7 @@ void nanny(struct descriptor_data *d, char *arg)
 
 // Uncomment this if you think a playerfile may be crashing the mud. -pir
 //      sprintf(str_tmp, "Trying to login: %s", tmp_name);
-//      log(str_tmp, 0, LOG_MISC);
+  //    log(str_tmp, 0, LOG_MISC);
 
       // ch is allocated in load_char_obj
       fOld     = load_char_obj( d, tmp_name );
@@ -687,7 +687,7 @@ void nanny(struct descriptor_data *d, char *arg)
          }
          else {
             if(d->character->pcdata->bad_pw_tries > 100) {
-	      sprintf(log_buf, "%s has 100+ bad pw tries...", GET_NAME(ch));
+	      sprintf(log_buf, "%s has 100+ bad pw tries...", GET_NAME(d->character));
               log(log_buf, SERAPH, LOG_SOCKET);
             }
             else {
@@ -1022,9 +1022,9 @@ void nanny(struct descriptor_data *d, char *arg)
                "  %c4: Hobbit\n\r  %c5: Pixie\n\r  %c6: Giant\n\r"
                "  %c7: Gnome\r\n  %c8: Orc\r\n  %c9: Troll\r\n"
                "\n\rSelect a race(Type help <race> for more information)-> ",
-		is_race_eligible(ch,1),is_race_eligible(ch,2),is_race_eligible(ch,3),
-		is_race_eligible(ch,4),is_race_eligible(ch,5),is_race_eligible(ch,6),
-		is_race_eligible(ch,7),is_race_eligible(ch,8),is_race_eligible(ch,9));
+is_race_eligible(ch,1)?'*':' ',is_race_eligible(ch,2)?'*':' ',is_race_eligible(ch,3)?'*':' ',is_race_eligible(ch,4)?'*':' '
+,is_race_eligible(ch,5)?'*':' ',is_race_eligible(ch,6)?'*':' ',
+is_race_eligible(ch,7)?'*':' ',is_race_eligible(ch,8)?'*':' ',is_race_eligible(ch,9)?'*':' ');
 
             SEND_TO_Q(buf, d);
             STATE(d) = CON_GET_RACE;
