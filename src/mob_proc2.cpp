@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.26 2003/06/13 01:15:28 pirahna Exp $ */
+/* $Id: mob_proc2.cpp,v 1.27 2003/06/23 00:36:38 pirahna Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -372,11 +372,53 @@ int repair_shop(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
   }
 }
 
+int corpse_cost(char_data * ch)
+{
+   int cost = 0;
+   obj_data * curr_cont;
+
+   for(obj_data * obj2 = ch->carrying; obj2; obj2 = obj2->next_content) 
+   {
+      if(obj2->obj_flags.type_flag == ITEM_MONEY)
+        continue;
+      for(curr_cont = obj2->contains; curr_cont; curr_cont = curr_cont->next_content)
+        cost += curr_cont->obj_flags.cost; 
+      cost += obj2->obj_flags.cost;
+   }
+   for(int x = 0; x <= WEAR_MAX; x++) 
+   {
+      if(ch->equipment[x]) 
+      {
+        for(curr_cont = ch->equipment[x]->contains; 
+            curr_cont; 
+            curr_cont = curr_cont->next_content)
+          cost += curr_cont->obj_flags.cost; 
+
+        cost += ch->equipment[x]->obj_flags.cost;
+      }
+   }
+   return cost;
+}
+
+int corpse_cost(obj_data * obj)
+{
+   int cost = 0;
+   obj_data * curr_cont;
+
+   for(obj_data * obj2 = obj->contains; obj2; obj2 = obj2->next_content) 
+   {
+      if(obj2->obj_flags.type_flag == ITEM_MONEY)
+         continue;
+      for(curr_cont = obj2->contains; curr_cont; curr_cont = curr_cont->next_content)
+         cost += curr_cont->obj_flags.cost; 
+      cost += obj2->obj_flags.cost; 
+   }
+   return cost;
+}
+
 int mortician(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,        
           struct char_data *owner)
 {
-  struct obj_data *obj2;
-  struct obj_data *curr_cont;
   int x = 0, cost = 0, which;
   int count = 0;
   char buf[100];
@@ -405,19 +447,7 @@ int mortician(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
        if(!obj->contains)  // skip empty corpses
          continue;
 
-       cost = 0;
-       for(obj2 = obj->contains; obj2; obj2 = obj2->next_content) {
-          if(obj2->obj_flags.type_flag == ITEM_MONEY)
-            continue;
-          for(curr_cont = obj2->contains; curr_cont; curr_cont = curr_cont->next_content)
-            cost += curr_cont->obj_flags.cost; 
-          cost += obj2->obj_flags.cost; 
-       } 
-       for(x = 0; x <= WEAR_MAX; x++) {
-         if(ch->equipment[x]) {
-           cost += ch->equipment[x]->obj_flags.cost;
-         }
-       }
+       cost = corpse_cost(obj);
        cost /= 20000;
        cost = MAX(cost, 30); 
        sprintf(buf, "%d) %-21s %d Platinum coins.\n\r", ++count, obj->short_description,
@@ -434,19 +464,7 @@ int mortician(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 
   if(cmd == 58) // value
   {
-    for(obj2 = ch->carrying; obj2; obj2 = obj2->next_content) {
-      if(obj2->obj_flags.type_flag == ITEM_MONEY)
-        continue;
-      for(curr_cont = obj2->contains; curr_cont; curr_cont = curr_cont->next_content)
-        cost += curr_cont->obj_flags.cost; 
-      cost += obj2->obj_flags.cost;
-    }
-    for(x = 0; x <= WEAR_MAX; x++) {
-      if(ch->equipment[x]) {
-        cost += ch->equipment[x]->obj_flags.cost;
-      }
-    }
-
+    cost = corpse_cost(ch);
     cost /= 20000;
     cost = MAX(cost, 30);
     csendf(ch, "The Undertaker takes a look at you and estimates your corpse would cost around %d platinum coins.\n\r", cost);
@@ -479,18 +497,7 @@ int mortician(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
      if(isname(buf, obj->name))
        has_consent = TRUE;
 
-     for(obj2 = obj->contains; obj2; obj2 = obj2->next_content) {
-        if(obj2->obj_flags.type_flag == ITEM_MONEY)
-          continue;
-        for(curr_cont = obj2->contains; curr_cont; curr_cont = curr_cont->next_content)
-          cost += curr_cont->obj_flags.cost; 
-        cost += obj2->obj_flags.cost;
-     }
-     for(count = 0; count <= WEAR_MAX; count++) {
-       if(ch->equipment[count]) {
-         cost += ch->equipment[count]->obj_flags.cost;
-       }
-     }
+     cost = corpse_cost(obj);
      cost /= 20000;
      cost = MAX(cost, 30);
      if(GET_PLATINUM(ch) < (uint32)cost) {
