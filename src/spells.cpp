@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.103 2004/07/03 18:00:42 urizen Exp $ */
+/* $Id: spells.cpp,v 1.104 2004/07/03 19:09:18 urizen Exp $ */
 
 extern "C"
 {
@@ -1679,6 +1679,8 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
         send_to_char("Ok.\n\r", ch);
 
         GET_MANA(ch) -= (use_mana(ch, spl));
+        if (tar_char && !AWAKE(tar_char) && number(1,5) < 3)
+            send_to_char("Your sleep is restless.\r\n",tar_char);
         return ((*spell_info[spl].spell_pointer) (GET_LEVEL(ch), ch, argument, SPELL_TYPE_SPELL, tar_char, tar_obj, learned));
       }
     }   /* if GET_POS < min_pos */
