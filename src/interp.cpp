@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.cpp,v 1.16 2002/09/20 18:42:54 pirahna Exp $ */
+/* $Id: interp.cpp,v 1.17 2002/11/06 21:41:52 pirahna Exp $ */
 
 extern "C"
 {
@@ -78,7 +78,7 @@ struct command_info cmd_info[] =
      * Common other commands.
      * Placed here so one and two letter abbreviations work.
      */
-    { "faddle",     do_spam,        POSITION_DEAD,      0,  9,  0 },
+    { "nairb",      do_spam,        POSITION_DEAD,      0,  9,  0 },
     { "cast",       do_cast,        POSITION_SITTING,   0,  9,  0 },
     { "sing",       do_sing,        POSITION_RESTING,   0,  9,  0 },
     { "exits",      do_exits,       POSITION_RESTING,   0,  9,  0 },

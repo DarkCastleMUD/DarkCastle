@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.19 2002/10/26 01:48:55 pirahna Exp $ */
+/* $Id: info.cpp,v 1.20 2002/11/06 21:41:52 pirahna Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -1369,7 +1369,7 @@ int do_score(struct char_data *ch, char *argument, int cmd)
          if(++level == 4)
             level = 0;
       }
-      if(IS_SET(ch->pcdata->punish, PUNISH_THIEF)) 
+      if(!IS_MOB(ch) && IS_SET(ch->pcdata->punish, PUNISH_THIEF)) 
       {
          scratch = frills[level];
          sprintf(buf, "|%c| Affected by %-22s          Modifier %-16s  |%c|\n\r",						 
