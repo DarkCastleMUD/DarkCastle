@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: channel.cpp,v 1.6 2004/04/13 11:37:33 urizen Exp $
+| $Id: channel.cpp,v 1.7 2004/07/04 23:39:26 urizen Exp $
 | channel.C
 | Description:  All of the channel - type commands; do_say, gossip, etc..
 */
@@ -512,7 +512,8 @@ int do_tell(struct char_data *ch, char *argument, int cmd)
         // vict guarantted to be a PC
         // Re: Last comment. Switched immortals crash this.
 	
-    if( !IS_NPC(vict) && IS_SET(vict->pcdata->toggles, PLR_NOTELL) ) {
+    if( !IS_NPC(vict) && IS_SET(vict->pcdata->toggles, PLR_NOTELL) 
+	&& ch->level < 51) {
       send_to_char("The person is ignoring all tells right now.\r\n", ch);
       return eSUCCESS;
     }
