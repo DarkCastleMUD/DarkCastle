@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.29 2004/05/02 19:52:48 urizen Exp $
+| $Id: guild.cpp,v 1.30 2004/05/02 19:53:36 urizen Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -241,7 +241,7 @@ int skills_guild(struct char_data *ch, char *arg, struct char_data *owner)
 	do_say(owner, "I'm sorry, I can't teach you that.  You'll have to find another trainer.",9);
    else {
       struct skill_quest *sq;
-     if (IS_SET(classon, 1<<GET_CLASS(ch))
+     if (IS_SET(classon, 1<<GET_CLASS(ch)))
         send_to_char("debug",ch);
      if (IS_SET(classon, 1<<GET_CLASS(ch)) && (sq=find_sq(skillnumber)) != NULL && sq->message)
      {
