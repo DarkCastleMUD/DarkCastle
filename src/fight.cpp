@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.139 2004/04/13 22:45:15 urizen Exp $ */
+/* $Id: fight.cpp,v 1.140 2004/04/14 07:04:39 urizen Exp $ */
 
 extern "C"
 {
@@ -306,7 +306,8 @@ int attack(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
   }
   
   set_cantquit(ch, vict);   // This sets the flag if necessary
-  set_fighting(vict,ch); // So attacker starts round #2.
+  if (!vict->fighting)
+    set_fighting(vict, ch); // So attacker starts round #2.
   set_fighting(ch, vict);
 
   wielded = ch->equipment[WIELD];

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_barbarian.cpp,v 1.14 2004/04/13 12:59:09 urizen Exp $
+| $Id: cl_barbarian.cpp,v 1.15 2004/04/14 07:04:44 urizen Exp $
 | cl_barbarian.C
 | Description:  Commands for the barbarian class.
 */
@@ -453,14 +453,14 @@ int do_crazedassault(struct char_data *ch, char *argument, int cmd)
   specialization = learned / 100;
   learned %= 100;
       
-  chance = 70;
+  chance = 0;
   chance += learned / 10;
       
   percent = number(1, 101);
        
   skill_increase_check(ch, SKILL_CRAZED_ASSAULT, learned, SKILL_INCREASE_MEDIUM);
  
-  if(percent < chance) {
+  if(percent > chance) {
     send_to_char("You try to psyche yourself up for it but just can't muster the concentration.\r\n", ch);
   }
   else {
