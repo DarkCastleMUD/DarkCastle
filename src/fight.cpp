@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.10 2002/07/23 19:04:48 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.11 2002/07/23 20:03:27 pirahna Exp $ */
 
 extern "C"
 {
@@ -2327,6 +2327,9 @@ int do_skewer(CHAR_DATA *ch, CHAR_DATA *vict, int dam, int weapon)
 
   percent = number(1, 101); // 101 is complete failure
   if(percent > has_skill(ch, SKILL_SKEWER))                          return 0;
+
+  int type = ch->equipment[weapon]->obj_flags.value[3];
+  if( ! (type == TYPE_SLASH || type == TYPE_STING || type == TYPE_PIERCE) )  return 0;
   
   if (number(0, 100) < 5) {
     act("$n jams his weapon into $N!", ch, 0, vict, TO_ROOM, NOTVICT);
