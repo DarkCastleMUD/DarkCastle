@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: cl_ranger.cpp,v 1.36 2004/05/14 00:04:15 urizen Exp $ | cl_ranger.C  *
+ * $Id: cl_ranger.cpp,v 1.37 2004/05/16 00:37:19 urizen Exp $ | cl_ranger.C  *
  * Description: Ranger skills/spells                                          *
  *                                                                            *
  * Revision History                                                           *
@@ -765,9 +765,9 @@ void do_arrow_miss(struct char_data *ch, struct char_data *victim, int
       act(buf, victim, NULL, 0, TO_ROOM, 0);
       break;
     case 2:
-      sprintf(buf, "A quiet whistle sounds as %s flies over your head.\r\n", 
+      sprintf(buf, "A quiet whistle sounds as %s flies over your head.", 
                found->short_description);
-      send_to_char(buf, victim);
+     act(buf, victim,0,0,TO_CHAR,0);
       sprintf(buf, "A quiet whistle sounds as %s flies over your head.", 
                found->short_description);
       act(buf, victim, 0, 0, TO_ROOM, 0);
