@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_barbarian.cpp,v 1.16 2004/04/19 16:48:43 urizen Exp $
+| $Id: cl_barbarian.cpp,v 1.17 2004/04/24 21:01:31 urizen Exp $
 | cl_barbarian.C
 | Description:  Commands for the barbarian class.
 */
@@ -360,7 +360,7 @@ int do_headbutt(struct char_data *ch, char *argument, int cmd)
     WAIT_STATE(ch, PULSE_VIOLENCE*4);
     WAIT_STATE(victim, PULSE_VIOLENCE*2);
     SET_BIT(victim->combat, COMBAT_SHOCKED);
-    retval = damage (ch, victim, 0, TYPE_UNDEFINED, SKILL_SHOCK, 0);
+    retval = damage (ch, victim, 50, TYPE_UNDEFINED, SKILL_SHOCK, 0);
   }
 
   skill_increase_check(ch, SKILL_SHOCK, learned, SKILL_INCREASE_EASY);

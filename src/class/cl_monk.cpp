@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_monk.cpp,v 1.12 2003/06/23 02:28:04 pirahna Exp $
+| $Id: cl_monk.cpp,v 1.13 2004/04/24 21:01:31 urizen Exp $
 | cl_monk.C
 | Description:  Monk skills.
 */
@@ -94,13 +94,13 @@ int do_eagle_claw(struct char_data *ch, char *argument, int cmd)
    {
       dam = dice(GET_LEVEL(ch), 6);
 
-      if (dam > GET_HIT(victim)) {
+      if (245 > GET_HIT(victim)) {
          // TODO - have 'learned' effect how good the heart is that you grab out
          // for the later modifications to this.  Hearts regen ki, etc etc.
          make_heart(ch, victim);
          dam += 20;
       }
-      retval = damage(ch, victim, dam,TYPE_UNDEFINED, SKILL_EAGLE_CLAW, 0);
+      retval = damage(ch, victim, 250,TYPE_UNDEFINED, SKILL_EAGLE_CLAW, 0);
    }
    return retval;
 }

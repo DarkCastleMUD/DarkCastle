@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.16 2004/04/13 11:37:58 urizen Exp $
+| $Id: cl_warrior.cpp,v 1.17 2004/04/24 21:01:31 urizen Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -464,7 +464,7 @@ int do_bash(struct char_data *ch, char *argument, int cmd)
         act("Your bash at $N sends $M sprawling.", ch, NULL, victim, TO_CHAR , 0);
         act("$n sends you sprawling.", ch, NULL, victim, TO_VICT , 0);
         act("$n sends $N sprawling with a powerful bash.", ch, NULL, victim, TO_ROOM, NOTVICT);
-	retval = damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_BASH, 0);
+	retval = damage(ch, victim, 25, TYPE_UNDEFINED, SKILL_BASH, 0);
     }
 
     if(SOMEONE_DIED(retval))
