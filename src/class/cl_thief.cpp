@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.41 2004/04/22 18:32:23 urizen Exp $
+| $Id: cl_thief.cpp,v 1.42 2004/04/22 23:07:20 urizen Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -1086,7 +1086,7 @@ int do_pocket(CHAR_DATA *ch, char *argument, int cmd)
   {
     // Steal some gold coins
     percent = learned / 10 + number(-1,1);
-    gold = (int) (GET_GOLD(victim)*(percent/100));
+    gold = (int) ((float)GET_GOLD(victim)*(float)(percent/100));
 //    gold = MIN(10000, gold);
     if (gold > 0) {
       GET_GOLD(ch)     += gold;

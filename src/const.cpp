@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.77 2004/04/21 22:18:45 urizen Exp $ */
+/* $Id: const.cpp,v 1.78 2004/04/22 23:07:18 urizen Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1636,6 +1636,8 @@ char *player_bits[] =
     "ANONYMOUS",
     "AUTO-EAT",
     "LFG",
+    "NOTELL",
+    "NOTAX",
     "\n"
 };
 

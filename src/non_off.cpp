@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: non_off.cpp,v 1.15 2003/12/09 08:40:49 staylor Exp $
+| $Id: non_off.cpp,v 1.16 2004/04/22 23:07:18 urizen Exp $
 | non_off.C
 | Description:  Implementation of generic, non-offensive commands.
 */
@@ -264,6 +264,7 @@ char * toggle_txt[] = {
   "summonable",
   "lfg",
   "notell",
+  "notax",
   ""
 };
 
@@ -347,6 +348,11 @@ int do_toggle(struct char_data * ch, char * arg, int cmd)
 	 sprintf(buf + strlen(buf), "%s\n\r",
 	   IS_SET(ch->pcdata->toggles, PLR_NOTELL) ? "on" : "off");
 	 break;
+         case 13:
+         sprintf(buf + strlen(buf), "%s\n\r",
+           IS_SET(ch->pcdata->toggles, PLR_NOTAX) ? "on" : "off");
+         break;
+
 	 
          default:
 	 break;
@@ -418,6 +424,10 @@ int do_toggle(struct char_data * ch, char * arg, int cmd)
     
     case 12:
     do_notell_toggle(ch, "", 9);
+    break;
+
+    case 13:
+    do_notax_toggle(ch, "", 9);
     break;
     
     default:
@@ -534,6 +544,25 @@ int do_lfg_toggle(struct char_data *ch, char *argument, int cmd)
 	send_to_char( "You are now Looking For Group.\n\r", ch);
 	SET_BIT(ch->pcdata->toggles, PLR_LFG);
     }
+    return eSUCCESS;
+}
+
+int do_notax_toggle(struct char_data *ch, char *argument, int cmd)
+{
+    if (IS_NPC(ch))
+        return eFAILURE;
+
+    if (IS_SET(ch->pcdata->toggles, PLR_NOTAX))
+    {
+        send_to_char( "You will no longer be taxed.\n\r", ch);
+        REMOVE_BIT(ch->pcdata->toggles, PLR_NOTAX);
+    }
+    else
+    {
+        send_to_char( "You will now be taxed on all your loot.\n\r", ch);
+        SET_BIT(ch->pcdata->toggles, PLR_NOTAX);
+    }
+
     return eSUCCESS;
 }
 

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.26 2004/04/16 02:58:51 urizen Exp $
+| $Id: inventory.cpp,v 1.27 2004/04/22 23:07:18 urizen Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -32,7 +32,7 @@ extern "C"
 #include <string.h>
 #include <returnvals.h>
 #include <spells.h>
-
+#include <clan.h>
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -103,6 +103,12 @@ void get(struct char_data *ch, struct obj_data *obj_object,
 	sprintf(buffer,"There was %d coins.\n\r",
 		obj_object->obj_flags.value[0]);
 	send_to_char(buffer,ch);
+	if (ch->clan && get_clan(ch)->tax && !IS_SET(GET_TOGGLES(ch), PLR_NOTAX))
+	{
+	  int cgold = (int)((float)obj_object->obj_flags.value[0] * (float)(get_clan(ch)->tax/100));
+	  GET_GOLD(ch) += obj_object->obj_flags.value[0] - cgold;
+          get_clan(ch)->balance += cgold;
+	} else
 	GET_GOLD(ch) += obj_object->obj_flags.value[0];
 	extract_obj(obj_object);
     }

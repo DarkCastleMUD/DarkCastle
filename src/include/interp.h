@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.h,v 1.22 2004/04/21 22:18:52 urizen Exp $ */
+/* $Id: interp.h,v 1.23 2004/04/22 23:07:21 urizen Exp $ */
 
 #ifndef INTERP_H_
 #define INTERP_H_
@@ -98,6 +98,7 @@ DO_FUN  do_clear;
 DO_FUN  do_climb;
 DO_FUN  do_close;
 DO_FUN  do_cmotd;
+DO_FUN  do_ctax;
 DO_FUN  do_colors;
 DO_FUN  do_compact;
 DO_FUN  do_consent;
@@ -218,6 +219,7 @@ DO_FUN  do_noemote;
 DO_FUN  do_nohassle;
 DO_FUN  do_noname;
 DO_FUN  do_not_here;
+DO_FUN  do_notax_toggle;
 DO_FUN  do_notell_toggle;
 DO_FUN  do_oedit;
 DO_FUN  do_offer;

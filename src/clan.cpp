@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.18 2004/04/16 17:26:15 urizen Exp $ */
+/* $Id: clan.cpp,v 1.19 2004/04/22 23:07:17 urizen Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -56,6 +56,9 @@ char * clan_rights[] = {
    "rights",
    "messages",
    "info",
+   "tax",
+   "withdraw",
+   "deposit",
    "\n"
 };
 
@@ -86,6 +89,8 @@ void boot_clans(void)
     new_new_clan = (struct clan_data *)dc_alloc(1, sizeof(struct clan_data));
 #endif
     new_new_clan->next = 0;
+    new_new_clan->tax = 0;
+    new_new_clan->balance = 0;
     new_new_clan->email = NULL;
     new_new_clan->description = NULL;
     new_new_clan->login_message = NULL;
@@ -129,6 +134,13 @@ void boot_clans(void)
           new_new_clan->clanmotd = fread_string(fl, 0);
           break;
         }
+	case 'B': { // Account balance
+	   new_new_clan->balance = fread_int(fl,0,LONG_MAX);
+	   break;
+	}
+	case 'T': { // Tax
+	  new_new_clan->tax = fread_int(fl,0,50);
+	}
         case 'L': {
           new_new_clan->login_message = fread_string(fl, 0);
           break;
@@ -204,6 +216,12 @@ void save_clans(void)
      if(pclan->login_message)
        fprintf(fl, "L\n%s~\n", pclan->login_message);
      
+     if (pclan->tax)
+	fprintf(fl, "T\n%d\n", pclan->tax);
+
+     if (pclan->balance)
+	fprintf(fl, "B\n%ld\n", pclan->balance);
+
      if(pclan->death_message)
        fprintf(fl, "X\n%s~\n", pclan->death_message);
      
@@ -2170,3 +2188,34 @@ int do_cmotd(CHAR_DATA *ch, char *arg, int cmd)
   send_to_char(clan->clanmotd, ch);
   return eSUCCESS;
 }
+
+int do_ctax(CHAR_DATA *ch, char *arg, int cmd)
+{
+  char arg1[MAX_INPUT_LENGTH];
+  if (!ch->clan)
+  {
+     send_to_char("You not a member of a clan.\r\n",ch);
+     return eFAILURE;
+  }
+  if (!has_right(ch, CLAN_RIGHTS_TAX))
+  {
+     send_to_char("You don't have the right to modify taxes.\r\n",ch);
+     return eFAILURE;
+  }
+  arg = one_argument(arg,arg1);
+  if (!is_number(arg1))
+  {
+     send_to_char("Taxes need to be numeric.\r\n",ch);
+     return eFAILURE;
+  }
+  int tax = atoi(arg1);
+  if (tax < 0 || tax > 50)
+  {
+    send_to_char("You can have a maximum of 50% in taxes.\r\n",ch);
+    return eFAILURE;
+  }
+  get_clan(ch)->tax = tax;
+  send_to_char("Your clan's tax rate has been modified.\r\n",ch);
+  return eSUCCESS;
+}
+

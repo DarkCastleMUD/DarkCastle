@@ -143,7 +143,7 @@ int do_sqedit(struct char_data *ch, char *argument, int cmd)
   argument = one_argument(argument,command);
     int clas = 1;
        
-  extern char*pc_clss_types[];
+  extern char*pc_clss_types2[];
   const char *fields [] = {
     "new",
     "delete",
@@ -190,7 +190,7 @@ int do_sqedit(struct char_data *ch, char *argument, int cmd)
     strcpy(arg3,arg1);
     strcat(arg3, " ");
     strcat(arg3,arg2);
-    if ((skill = find_sq(arg3))!=NULL) ;
+    if ((skill = find_sq(arg3))!=NULL);
 //      argument = one_argument(argument,arg2);
   }
   if (skill==NULL && (skill = find_sq(arg1))==NULL && i!=0 && i!=6)
@@ -213,11 +213,11 @@ int do_sqedit(struct char_data *ch, char *argument, int cmd)
 	  send_to_char("Skill not found.\r\n",ch);
 	  return eFAILURE;
 	}
-	argument = one_argument(argument,arg3);
+//	argument = one_argument(argument,arg3);
         if (arg3[0] != '\0')
-          for (int x = 0; *pc_clss_types[x] != '\n'; x++)
+          for (int x = 0; *pc_clss_types2[x] != '\n'; x++)
           {
-             if (!str_cmp(pc_clss_types[x],arg3))
+             if (!str_cmp(pc_clss_types2[x],arg2))
                clas = x;
           }
 
@@ -229,7 +229,7 @@ int do_sqedit(struct char_data *ch, char *argument, int cmd)
 	newOne->num = i;
 	newOne->level = 1;
         newOne->message = str_dup("New skillquest.");
-        newOne->clas = 1<<(i-1);
+        newOne->clas = (1<<(clas-1));
         newOne->next = skill_list;
 	skill_list = newOne;
 	send_to_char("Skill quest added.\r\n",ch);
@@ -271,9 +271,9 @@ int do_sqedit(struct char_data *ch, char *argument, int cmd)
       int i;
       if (!is_number(arg2))
       {
-        for (i = 0; *pc_clss_types[i] != '\n'; i++)
+        for (i = 0; *pc_clss_types2[i] != '\n'; i++)
         {
-	  if (!str_cmp(pc_clss_types[i],arg2))
+	  if (!str_cmp(pc_clss_types2[i],arg2))
 	     break;
 	}
 /*	if (*pc_clss_types[i] == '\n')
@@ -297,13 +297,13 @@ int do_sqedit(struct char_data *ch, char *argument, int cmd)
       send_to_char("Class modified.\r\n",ch);
       break;
     case 5:
-      csendf(ch,"$2Skill$R: %s\r\n$2Message$R: %s\r\n$2Class$R: %s\r\n$2Level$R: %d\r\n",             get_skill_name(skill->num), skill->message, pc_clss_types[skill->clas],skill->level);
+      csendf(ch,"$2Skill$R: %s\r\n$2Message$R: %s\r\n$2Class$R: %s\r\n$2Level$R: %d\r\n",             get_skill_name(skill->num), skill->message, pc_clss_types2[skill->clas],skill->level);
       break;
      case 6:
       send_to_char("These are the current sqs:\r\n",ch);
       for (i = 1; i < 12; i++)
       {
-	csendf(ch, "$3%s skillquests.$R\r\n",pc_clss_types[i]);
+	csendf(ch, "$3%s skillquests.$R\r\n",pc_clss_types2[i]);
         bool done = FALSE;
         for (curren = skill_list; curren; curren = curren->next)
         {

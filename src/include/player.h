@@ -1,7 +1,7 @@
 #ifndef PLAYER_H_
 #define PLAYER_H_
 /************************************************************************
-| $Id: player.h,v 1.8 2003/12/01 17:39:08 staylor Exp $
+| $Id: player.h,v 1.9 2004/04/22 23:07:21 urizen Exp $
 | player.h
 | Description: This file defines the player vectors..punishment, specials,
 |   etc...
@@ -69,6 +69,7 @@
 #define PLR_AUTOEAT      1<<16
 #define PLR_LFG          1<<17
 #define PLR_NOTELL       1<<18
+#define PLR_NOTAX	 1<<19
 
 /************************************************************************
 | Class types for PCs
