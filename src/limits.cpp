@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.47 2004/05/31 20:44:05 urizen Exp $ */
+/* $Id: limits.cpp,v 1.48 2004/06/01 03:32:13 urizen Exp $ */
 
 extern "C"
 {
@@ -297,7 +297,7 @@ int move_gain(CHAR_DATA *ch)
    gain /= divisor;
    gain -= MIN(100, age(ch).year) / 10;
  
-    gain /= 4;
+    gain /= 2;
     return MAX(0,gain);
 }
 
