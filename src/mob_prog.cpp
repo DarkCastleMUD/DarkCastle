@@ -732,10 +732,12 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
   {
     struct obj_data *obj=0;
     CHAR_DATA *take;
+        extern void debug_here();
+        debug_here();
+      struct obj_data * search_char_for_item(char_data * ch, sh_int item_number);
+ 
     switch (arg[1] )
     {
-
-      struct obj_data * search_char_for_item(char_data * ch, sh_int item_number);
        case 'i': // mob
           obj = search_char_for_item(mob, real_object(atoi(val)));
 	  take = mob;
@@ -771,7 +773,6 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
 	 {
 	   obj_from_char(unequip_char(take, i));
 	 }
-
       extract_obj(obj);
       return 1;
     }

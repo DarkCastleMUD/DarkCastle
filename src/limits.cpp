@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.36 2004/05/25 16:38:57 urizen Exp $ */
+/* $Id: limits.cpp,v 1.37 2004/05/26 10:03:00 urizen Exp $ */
 
 extern "C"
 {
@@ -154,7 +154,7 @@ int mana_gain(CHAR_DATA *ch)
 //    gain = graf(age(ch).year, 2,3,4,6,7,8,9);
 
     gain = (int)(ch->max_mana * (float)mana_regens[GET_CLASS(ch)] / 100);
-    gain /= 4;
+    gain /= 3;
     switch (GET_POS(ch)) {
       case POSITION_SLEEPING: divisor = 1; break;
       case POSITION_RESTING:  divisor = 2; break;
@@ -199,7 +199,7 @@ int hit_gain(CHAR_DATA *ch)
   /* PC's */
   else {
     gain = (int)(ch->max_hit * (float)hit_regens[GET_CLASS(ch)] /100);
-    gain /= 4;
+    gain /= 3;
     /* Position calculations    */
     switch (GET_POS(ch)) {
       case POSITION_SLEEPING: divisor = 1; break;
@@ -234,7 +234,7 @@ int hit_gain(CHAR_DATA *ch)
 
   if((GET_COND(ch, FULL)==0) || (GET_COND(ch, THIRST)==0))
     gain >>= 2;
-    gain /= divisor;
+  gain /= divisor;
   return (gain);
 }
 
