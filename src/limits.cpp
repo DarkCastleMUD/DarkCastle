@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.40 2004/05/27 22:05:36 urizen Exp $ */
+/* $Id: limits.cpp,v 1.41 2004/05/28 16:13:54 urizen Exp $ */
 
 extern "C"
 {
@@ -754,10 +754,26 @@ void update_corpses_and_portals(void)
         {
           next_thing2 = jj->next_content; /* Next in inventory */
 
-          if (j->in_obj)
-            move_obj(jj, j->in_obj);
-          else if (j->carried_by)
-            move_obj(jj, j->carried_by);
+          if (j->in_obj) {
+            if(IS_SET(jj->obj_flags.more_flags, ITEM_NO_TRADE))
+            {
+             if (next_thing == jj)
+              next_thing = jj->next;
+             extract_obj(jj);
+            }
+            else
+              move_obj(jj, j->in_obj);
+          }
+          else if (j->carried_by) {
+            if(IS_SET(jj->obj_flags.more_flags, ITEM_NO_TRADE))
+            {
+             if (next_thing == jj)
+              next_thing = jj->next;
+             extract_obj(jj);
+            }
+            else
+              move_obj(jj, j->carried_by);
+          }
           else if (j->in_room != NOWHERE)
           {
             // no trade objects disappear when the corpse decays
@@ -765,7 +781,7 @@ void update_corpses_and_portals(void)
             if(IS_SET(jj->obj_flags.more_flags, ITEM_NO_TRADE))
             {
 	     if (next_thing == jj)
-	      next_thing = j->next;
+	      next_thing = jj->next;
 	     extract_obj(jj);
 	    }
 	    else

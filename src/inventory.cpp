@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.40 2004/05/25 01:04:49 urizen Exp $
+| $Id: inventory.cpp,v 1.41 2004/05/28 16:13:54 urizen Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -240,7 +240,7 @@ int do_get(struct char_data *ch, char *argument, int cmd)
                    }
                    if(has_consent && contains_no_trade_item(obj_object)) {
                      send_to_char("This item contains no_trade items that cannot be picked up.\n\r", ch);
-		     has_consent = FALSE; // bugfix, could loot without
+		     has_consent = FALSE; // bugfix, could loot without consent
                      continue;
                    }
                    has_consent = FALSE;  // reset it for the next item:P
@@ -371,7 +371,11 @@ int do_get(struct char_data *ch, char *argument, int cmd)
 		      obj_object;
 		      obj_object = next_obj) {
 		    next_obj = obj_object->next_content;
-
+		if (GET_ITEM_TYPE(obj_object) == ITEM_CONTAINER && contains_no_trade_item(obj_object))
+		{
+                  csendf(ch, "%s : It seems magicallyattached to the corpse.\n\r", fname(obj_object->name));
+		  continue;
+		}
 		    /* IF all.obj, only get those named "obj" */
 		    if (alldot && !isname(allbuf,obj_object->name)){
 		      continue;
