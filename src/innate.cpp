@@ -232,9 +232,7 @@ int innate_repair(CHAR_DATA *ch, char *arg, int cmd)
        obj->affected[i-1] = obj->affected[i];
     }
   }
-  if (found) { act("Your knowledge of weapons and armour allow you 
-to quickly repair $p.",ch,NULL,obj,TO_CHAR, 0); act("$n quickly 
-repairs their $p.", ch, NULL, obj, TO_ROOM, 0); return eSUCCESS; }
+  if (found) { act("Your knowledge of weapons and armour allow you to quickly repair $p.",ch,NULL,obj,TO_CHAR, 0); act("$n quickly repairs their $p.", ch, NULL, obj, TO_ROOM, 0); return eSUCCESS; }
   else { send_to_char("You don't have that item.\r\n",ch); return eFAILURE; }
   
 }

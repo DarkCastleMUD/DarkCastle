@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: save.cpp,v 1.20 2004/04/20 15:31:52 urizen Exp $ */
+/* $Id: save.cpp,v 1.21 2004/04/20 22:45:14 urizen Exp $ */
 
 extern "C"
 {
@@ -500,7 +500,8 @@ int store_to_char_variable_data(CHAR_DATA * ch, FILE * fpsave)
        fread(&(af->modifier),  sizeof(af->modifier),  1, fpsave);
        fread(&(af->location),  sizeof(af->location),  1, fpsave);
        fread(&(af->bitvector), sizeof(af->bitvector), 1, fpsave);
-       affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE); // re-affect the char
+   bool isaff2(int spellnum);
+       affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE,isaff2(af->type)); // re-affect the char
     }
     fread(&typeflag, sizeof(char), 3, fpsave);
   }
@@ -1171,9 +1172,11 @@ void char_to_store(CHAR_DATA *ch, struct char_file_u *st, struct time_data & tmp
       char_eq[i] = 0;
   }
 
+bool isaff2(int spellnum);
   // Unaffect everything a character can be affected by spell-wise
   for(af = ch->affected; af; af = af->next) {
-    affect_modify( ch, af->location, af->modifier, af->bitvector, FALSE);
+
+    affect_modify( ch, af->location, af->modifier, af->bitvector, FALSE,isaff2(af->type));
   }
 
   st->sex      = GET_SEX(ch);
@@ -1242,7 +1245,7 @@ void char_to_store(CHAR_DATA *ch, struct char_file_u *st, struct time_data & tmp
 
   // re-affect the character with spells
   for(af = ch->affected; af; af = af->next) {
-      affect_modify( ch, af->location, af->modifier, af->bitvector, TRUE);
+      affect_modify( ch, af->location, af->modifier, af->bitvector, TRUE,isaff2(af->type));
   }
 
   // re-equip the character with his eq

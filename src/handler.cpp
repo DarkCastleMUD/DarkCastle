@@ -21,7 +21,7 @@
  *  12/08/2003   Onager    Added check for charmies and !charmie eq to     *
  *                         equip_char()                                    *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.35 2004/04/20 21:57:16 urizen Exp $ */
+/* $Id: handler.cpp,v 1.36 2004/04/20 22:45:14 urizen Exp $ */
     
 extern "C"
 {
@@ -892,7 +892,7 @@ void affect_remove( CHAR_DATA *ch, struct affected_type *af, int flags, bool aff
     assert(ch->affected);
 
     affect_modify(ch, af->location, af->modifier,
-		  af->bitvector, FALSE, aff2fix);
+		  af->bitvector, FALSE, isaff2(af->type));
 
 
     /* remove structure *af from linked list */

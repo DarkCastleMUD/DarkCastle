@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.73 2004/04/20 19:42:42 urizen Exp $ */
+/* $Id: const.cpp,v 1.74 2004/04/20 22:45:13 urizen Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1162,7 +1162,9 @@ struct class_skill_defines b_skills[] = {
 {    "crazedassault",	SKILL_CRAZED_ASSAULT,	15,	80,	-2, 	"Speak with the guard of the monk guild.  He is skilled in matters of concentration such as this." },
 {    "frenzy",		SKILL_FRENZY,		18,	50,	-2,	"There is a highlander chief.  The chief of mountain trail guard.  You must locate him to learn this skill." },
 {    "rage",		SKILL_RAGE,		20,	80,	-2, 	"A fierceful force of elementals is who you seek." },
-{    "fireshield",      SPELL_FIRESHIELD,	22,	90,	-2,	"To do this, you must find the mythical beast known only as 'The Clitoris.'" },
+//{    "fireshield",      SPELL_FIRESHIELD,	22,	90,	-2,	
+//"To do this, you must find the mythical beast known only as 'The 
+//Clitoris.'" },
 {    "triple",		SKILL_THIRD_ATTACK,	25,	70,	-2, 	"Only a palace chef could move his blades so fast." },
 {    "battlecry",	SKILL_BATTLECRY,	27,	75,	-2, 	"Ahh! You must seek out the bravest barbarian of them all, a mortal god of the norse he is." },
 {    "blindfighting",   SKILL_BLINDFIGHTING,    28,     50,	-2,	"Only on the astral planes can you find what you seek."},
