@@ -14,7 +14,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.h,v 1.16 2002/09/20 18:42:58 pirahna Exp $ */
+/* $Id: spells.h,v 1.17 2002/09/28 23:54:53 pirahna Exp $ */
 #include <structs.h> // byte, sh_int
 
 #define MAX_BUF_LENGTH               240
@@ -244,7 +244,12 @@
 #define SKILL_VITAL_STRIKE           354
 #define SKILL_CRAZED_ASSAULT         355
 #define SKILL_DIVINE_PROTECTION      356
-#define SKILL_MAX                    356
+#define SKILL_POUNDING_WEAPONS       357
+#define SKILL_PIERCEING_WEAPONS      358
+#define SKILL_SLASHING_WEAPONS       359
+#define SKILL_WHIPPING_WEAPONS       360
+#define SKILL_CRUSHING_WEAPONS       361
+#define SKILL_MAX                    361
 
 // if you add a skill, make sure you update "skills[]" in spells.C
 // as well as SKILL_MAX

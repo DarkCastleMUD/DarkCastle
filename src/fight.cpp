@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.67 2002/09/14 20:08:23 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.68 2002/09/28 23:54:47 pirahna Exp $ */
 
 extern "C"
 {
@@ -71,6 +71,10 @@ int ranger_combat(struct char_data *ch, struct obj_data *obj, int cmd, char *arg
 int active_cleric(struct char_data *ch, struct obj_data *obj, int cmd, char *arg, struct char_data *invoker);
 void remove_memory(CHAR_DATA *ch, char type, CHAR_DATA *vict);
 void clan_death (char_data *ch, char_data *victim);
+
+
+// local
+void check_weapon_skill_bonus(char_data * ch, int type, int & weapon_skill_hit_bonus, int & weapon_skill_dam_bonus);
 
 void update_flags(CHAR_DATA *vict);
  
@@ -562,6 +566,43 @@ int do_acidshield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
   return eSUCCESS;
 }
 
+void check_weapon_skill_bonus(char_data * ch, int type, int & weapon_skill_hit_bonus, int & weapon_skill_dam_bonus)
+{
+   int learned;
+   int specialization;
+
+   switch(type) {
+      case TYPE_WHIP:
+         learned = has_skill(ch, SKILL_WHIPPING_WEAPONS);
+         break;
+      case TYPE_CRUSH:
+         learned = has_skill(ch, SKILL_CRUSHING_WEAPONS);
+         break;
+      case TYPE_SLASH:
+         learned = has_skill(ch, SKILL_SLASHING_WEAPONS);
+         break;
+      case TYPE_PIERCE:
+         learned = has_skill(ch, SKILL_PIERCEING_WEAPONS);
+         break;
+      default:
+         weapon_skill_hit_bonus = 0;
+         weapon_skill_dam_bonus = 0;
+         return;
+   }
+
+   specialization = learned / 100;
+   learned = learned % 100;
+
+   weapon_skill_hit_bonus = learned / 10;
+   weapon_skill_dam_bonus = number(1, learned / 10);
+
+   if(specialization)
+   {
+      weapon_skill_hit_bonus += 5;
+      weapon_skill_dam_bonus += number(1, 5);
+   }
+}
+
 int get_weapon_damage_type(struct obj_data * wielded) {
     char log_buf[256];
 
@@ -633,7 +674,9 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
 //  int diceroll;			/* ... */
   int retval = 0;
   int chance;
-  
+  int weapon_skill_hit_bonus;
+  int weapon_skill_dam_bonus;  
+
 //  extern int thaco[8][61];
   extern struct str_app_type str_app[];
   extern byte backstab_mult[];
@@ -669,6 +712,8 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
   w_type = TYPE_HIT;
   if(wielded && wielded->obj_flags.type_flag == ITEM_WEAPON) 
      w_type = get_weapon_damage_type(wielded);
+
+  check_weapon_skill_bonus(ch, w_type, weapon_skill_hit_bonus, weapon_skill_dam_bonus);
   
   weapon_type = w_type;
   if(type == SKILL_BACKSTAB)
@@ -716,6 +761,7 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
     chance += GET_HITROLL(ch);
     chance += str_app[STRENGTH_APPLY_INDEX(ch)].tohit;
     chance += ( GET_AC(vict) / 10 );  // (positive ac hurts you, negative helps)
+    chance += weapon_skill_hit_bonus;
 
     if(IS_NPC(ch))
       chance += 5;
@@ -743,6 +789,7 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
   /* Damage bonuses */
   dam += str_app[STRENGTH_APPLY_INDEX(ch)].todam;
   dam += GET_DAMROLL(ch);
+  dam += weapon_skill_dam_bonus;
   
   // Bonus for hitting weak opponents
   if(GET_POS(vict) < POSITION_FIGHTING)

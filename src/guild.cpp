@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.16 2002/08/10 05:10:38 pirahna Exp $
+| $Id: guild.cpp,v 1.17 2002/09/28 23:54:47 pirahna Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -237,6 +237,11 @@ int skills_guild(struct char_data *ch, char *arg, struct char_data *owner)
     return eSUCCESS;
   }
 
+  if (known >= ( GET_LEVEL(ch) * 3 ) ) {
+    send_to_char("You aren't experienced enough to practice that any further right now.\n\r", ch);
+    return eSUCCESS;
+  }
+
   send_to_char("You practice for a while...\n\r", ch);
   ch->pcdata->practices--;
 
@@ -366,6 +371,11 @@ int skill_master(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
       send_to_char("You are already learned in this area.\n\r", ch);
       return eSUCCESS;
     }
+    if (learned >= ( GET_LEVEL(ch) * 3 ) ) {
+      send_to_char("You aren't experienced enough to practice that any further right now.\n\r", ch);
+      return eSUCCESS;
+    }
+
     send_to_char("You practice for a while...\n\r", ch);
     ch->pcdata->practices--;
     
