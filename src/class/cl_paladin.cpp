@@ -106,7 +106,7 @@ int do_harmtouch(struct char_data *ch, char *argument, int cmd)
    }
 
    af.type = SKILL_HARM_TOUCH;
-   af.duration  = 180;
+   af.duration  = 24;
    af.modifier  = 0;
    af.location  = APPLY_NONE;
    af.bitvector = 0;
@@ -210,7 +210,7 @@ int do_layhands(struct char_data *ch, char *argument, int cmd)
    }
 
    af.type = SKILL_LAY_HANDS;
-   af.duration  = 180;
+   af.duration  = 72;
    af.modifier  = 0;
    af.location  = APPLY_NONE;
    af.bitvector = 0;
