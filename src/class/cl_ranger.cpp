@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_ranger.cpp,v 1.17 2002/09/17 19:51:30 pirahna Exp $ | cl_ranger.C |
+| $Id: cl_ranger.cpp,v 1.18 2002/09/21 23:50:55 pirahna Exp $ | cl_ranger.C |
 Description: Ranger skills/spells */ extern "C"  {
   #include <string.h>
 }
@@ -251,7 +251,8 @@ int do_track(CHAR_DATA *ch, char *argument, int cmd)
           ansi_color( NTEXT, ch); 
 
           if (IS_NPC(ch)) {
-             if ( (!IS_SET(ch->mobdata->actflags, ACT_STAY_NO_TOWN) ||
+                   // temp disable tracking mobs into town
+             if ( (/*!IS_SET(ch->mobdata->actflags, ACT_STAY_NO_TOWN) ||*/
 	           !IS_SET(zone_table[world[EXIT(ch, y)->to_room].zone].zone_flags, ZONE_IS_TOWN)
                   ) 
                  && !IS_SET(world[EXIT(ch, y)->to_room].room_flags,NO_TRACK)) 
