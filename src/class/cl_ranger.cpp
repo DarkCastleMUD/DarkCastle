@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: cl_ranger.cpp,v 1.30 2004/04/14 21:45:07 urizen Exp $ | cl_ranger.C  *
+ * $Id: cl_ranger.cpp,v 1.31 2004/04/19 20:53:37 urizen Exp $ | cl_ranger.C  *
  * Description: Ranger skills/spells                                          *
  *                                                                            *
  * Revision History                                                           *
@@ -191,14 +191,14 @@ int do_track(CHAR_DATA *ch, char *argument, int cmd)
       send_to_char("You have found your target!\n\r", ch);
       ansi_color( NTEXT, ch);
 
-      remove_memory(ch, 't');
+//      remove_memory(ch, 't');
       return eSUCCESS;
     } 
   }
   
   else if(quarry) {
     send_to_char("There's one right here ;)\n\r", ch);
-    remove_memory(ch, 't');
+  //  remove_memory(ch, 't');
     return eSUCCESS;
   }
 
@@ -228,7 +228,7 @@ int do_track(CHAR_DATA *ch, char *argument, int cmd)
       ansi_color( BOLD, ch);
       send_to_char("You have lost the trail.\n\r", ch);
       ansi_color( NTEXT, ch);
-      remove_memory(ch, 't');
+      //remove_memory(ch, 't');
     }
     else
       send_to_char("There are no distinct scents here.\n\r",ch);
@@ -254,7 +254,7 @@ int do_track(CHAR_DATA *ch, char *argument, int cmd)
          }
          else
             send_to_char("You can't find any traces of such a scent.\n\r",ch);
-         remove_memory(ch, 't');
+//         remove_memory(ch, 't');
          if(IS_NPC(ch))
            swap_hate_memory(ch);
          return eFAILURE;
@@ -299,7 +299,7 @@ int do_track(CHAR_DATA *ch, char *argument, int cmd)
 		    // The mob can't see him
                     act("$n says 'Damn, must have lost $m!'", ch, 0, 0,
 		        TO_ROOM, 0);
-                    remove_memory(ch, 't');
+//                    remove_memory(ch, 't');
 	            }
                  return eFAILURE; 
 	         }
@@ -327,7 +327,7 @@ int do_track(CHAR_DATA *ch, char *argument, int cmd)
     else 
        send_to_char("You can't find any traces of such a scent.\n\r", ch);
     
-    remove_memory(ch, 't');
+//    remove_memory(ch, 't');
     return eFAILURE; 
   } // if *victim
 
