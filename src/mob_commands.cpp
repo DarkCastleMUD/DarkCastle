@@ -935,6 +935,8 @@ int do_mpteachskill( CHAR_DATA *ch, char *argument, int cmd )
 
     learn_skill(victim, skillnum, 1, 1);
 
+    act("$n takes some time to teach $N a new thing or two.", ch, 0, victim, TO_ROOM, NOTVICT);
+
     send_to_char(skill, victim);
     return eSUCCESS;
 }
