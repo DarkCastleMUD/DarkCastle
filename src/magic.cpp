@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.18 2002/08/16 18:36:37 pirahna Exp $ */
+/* $Id: magic.cpp,v 1.19 2002/08/16 19:13:42 pirahna Exp $ */
 
 extern "C"
 {
@@ -5284,6 +5284,10 @@ int cast_remove_paralysis( byte level, CHAR_DATA *ch, char *arg, int type,
   case SPELL_TYPE_POTION:
 	 return spell_remove_paralysis(level,ch,ch,0, skill);
 	 break;
+  case SPELL_TYPE_WAND:
+         if(tar_obj) return eFAILURE;
+         return spell_remove_paralysis(level, ch, tar_ch, 0, skill);
+
   case SPELL_TYPE_SCROLL:
 	 if (tar_obj) return eFAILURE;
 	 if (!tar_ch) tar_ch = ch;

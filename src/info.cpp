@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.13 2002/08/11 14:53:56 pirahna Exp $ */
+/* $Id: info.cpp,v 1.14 2002/08/16 19:13:42 pirahna Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -1386,6 +1386,9 @@ int do_score(struct char_data *ch, char *argument, int cmd)
       if(GET_OBJ_RANGE(ch) && GET_LEVEL(ch) > IMMORTAL) {
          sprintf(buf, "O RANGE: %s\n\r", GET_OBJ_RANGE(ch));
          send_to_char(buf, ch);
+      }
+      if(IS_SET(ch->pcdata->punish, PUNISH_THIEF)) {
+         send_to_char("You are flagged a pthief.\r\n", ch);
       }
    }
    return eSUCCESS;
