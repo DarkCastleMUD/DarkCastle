@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.h,v 1.16 2003/08/12 03:45:37 pirahna Exp $ */
+/* $Id: interp.h,v 1.17 2003/12/09 01:32:07 staylor Exp $ */
 
 #ifndef INTERP_H_
 #define INTERP_H_
@@ -28,6 +28,7 @@ char *one_argument(char *argument,char *first_arg);
 char *one_argumentnolow(char *argument,char *first_arg);
 int fill_word(char *argument);
 void half_chop(char *string, char *arg1, char *arg2);
+void chop_half(char *string, char *arg1, char *arg2);
 void nanny(struct descriptor_data *d, char *arg);
 int is_abbrev(char *arg1, char *arg2);
 int len_cmp(char *s1, char *s2);
