@@ -691,11 +691,14 @@ int execute_song_hypnotic_harmony(byte level, CHAR_DATA *ch, char *Arg,
 {
   struct affected_type af;
  
-  if (!victim || !ch) {
+ 
+  if (!ch) {
       log("Serious problem in execute_song_hypnotic_harmony!", ANGEL, LOG_BUG);
       return eFAILURE|eINTERNAL_ERROR;
       }
-
+   if(!(victim = get_char_room_vis(ch, ch->song_data)))
+   { send_to_char("They seem to have left.\r\nIn the middle of your performance too!\r\n",ch); return eFAILURE;
+  }
    WAIT_STATE(ch, PULSE_VIOLENCE);
    if (!IS_NPC(victim) || !IS_SET(victim->mobdata->actflags, ACT_BARDCHARM))
    {

@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.123 2004/07/17 19:04:37 urizen Exp $ */
+/* $Id: const.cpp,v 1.124 2004/07/25 21:12:54 urizen Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1330,7 +1330,7 @@ struct class_skill_defines d_skills[] = { // bard skills
 { "astral chanty",         SKILL_SONG_ASTRAL_CHANTY,       45,     98,     {STR,DEX} },
 { "crushing crescendo", SKILL_SONG_CRUSHING_CRESCENDO,      46,     98,     {CON,STR} },
 { "shattering resonance",  SKILL_SONG_SHATTERING_RESO,     48,     98,     {STR,CON} },
-//{ "hypnotic harmony",    SKILL_HYPNOTIC_HARMONY,         50,     98,     {WIS,INT} },
+{ "hypnotic harmony",    SKILL_SONG_HYPNOTIC_HARMONY,         50,     98,     {WIS,INT} },
 { "\n",                    0,                              1,      0,      {0,0} }
 };
 
@@ -1692,6 +1692,7 @@ char *player_bits[] =
     "LFG",
     "NOTELL",
     "NOTAX",
+    "GUIDE"
     "\n"
 };
 
