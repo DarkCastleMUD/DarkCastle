@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.149 2004/05/28 19:20:51 urizen Exp $ */
+/* $Id: magic.cpp,v 1.150 2004/05/28 20:26:02 urizen Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -2592,7 +2592,11 @@ int spell_sanctuary(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
     act("$N is already sanctified.",ch,0,victim,TO_CHAR, 0);
 	 return eFAILURE;
   }
-
+  if (affected_by_spell(victim, SPELL_HOLY_AURA))
+  {
+    act("$N cannot be bestowed with that much power.", ch, 0, victim, TO_CHAR,0);
+    return eFAILURE;
+  }
   if (!affected_by_spell(victim, SPELL_SANCTUARY))
   {
          skill_increase_check(ch, SPELL_SANCTUARY, skill, SKILL_INCREASE_EASY);
