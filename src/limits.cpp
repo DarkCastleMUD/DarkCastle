@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.4 2002/06/29 18:16:22 pirahna Exp $ */
+/* $Id: limits.cpp,v 1.5 2002/07/13 21:11:06 pirahna Exp $ */
 
 extern "C"
 {
@@ -53,8 +53,6 @@ extern CWorld world;
 
 void update_pos( CHAR_DATA *victim );                 /* in fight.c */
 struct time_info_data age(CHAR_DATA *ch);
-void affect_modify(CHAR_DATA *ch, byte loc,
-		byte mod, long bitv, bool add);
 
 /* When age < 15 return the value p0 */
 /* When age in 15..29 calculate the line between p1 & p2 */

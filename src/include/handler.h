@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.h,v 1.2 2002/06/13 04:41:15 dcastle Exp $ */
+/* $Id: handler.h,v 1.3 2002/07/13 21:11:10 pirahna Exp $ */
 
 #ifndef HANDLER_H_
 #define HANDLER_H_
@@ -27,7 +27,7 @@
 
 /* handling the affected-structures */
 void affect_total(CHAR_DATA *ch);
-void affect_modify(CHAR_DATA *ch, byte loc, byte mod, long bitv,
+void affect_modify(CHAR_DATA *ch, int32 loc, int32 mod, long bitv,
 		   bool add);
 void affect_to_char( CHAR_DATA *ch, struct affected_type *af );
 void affect_remove( CHAR_DATA *ch, struct affected_type *af );

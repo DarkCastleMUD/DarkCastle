@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.4 2002/07/13 19:19:29 azrack Exp $ */
+/* $Id: handler.cpp,v 1.5 2002/07/13 21:11:06 pirahna Exp $ */
     
 extern "C"
 {
@@ -277,7 +277,7 @@ bool still_affected_by_poison(CHAR_DATA * ch)
   return 0;
 }
 
-void affect_modify(CHAR_DATA *ch, byte loc, byte mod, long bitv, bool add)
+void affect_modify(CHAR_DATA *ch, int32 loc, int32 mod, long bitv, bool add)
 {
     char log_buf[256];
 
