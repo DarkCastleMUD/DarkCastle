@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.44 2004/05/18 20:58:57 urizen Exp $ */
+/* $Id: info.cpp,v 1.45 2004/05/18 21:36:39 urizen Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -1277,6 +1277,13 @@ int do_score(struct char_data *ch, char *argument, int cmd)
       "=======================($5:$7)\n\r", GET_SHORT(ch));
    
    send_to_char(buf, ch);
+   int manareg = 0;
+    if(GET_CLASS(ch) == CLASS_MAGIC_USER ||
+       GET_CLASS(ch) == CLASS_ANTI_PAL || GET_CLASS(ch) == CLASS_RANGER)
+      manareg = int_app[GET_INT(ch)].mana_regen + ch->mana_regen;
+    else
+      manareg = wis_app[GET_WIS(ch)].mana_regen + ch->mana_regen;
+
    
    sprintf(buf,
       "|\\|  $4Strength$7:      %4d (%2d) |/|  $1Race$7:   %-10s $1HitPts$7:%5d$1/$7(%5d) |~|\n\r"
@@ -1290,7 +1297,9 @@ int do_score(struct char_data *ch, char *argument, int cmd)
       GET_CON(ch), GET_RAW_CON(ch), GET_LEVEL(ch), GET_MOVE(ch), GET_MAX_MOVE(ch),
       GET_INT(ch), GET_RAW_INT(ch), GET_HEIGHT(ch), GET_KI(ch),  GET_MAX_KI(ch), 
       GET_WIS(ch), GET_RAW_WIS(ch), GET_WEIGHT(ch), GET_ALIGNMENT(ch),
-      ch->hit_regen, ch->mana_regen, ch->move_regen, ch->ki_regen, GET_AGE(ch));
+      ch->hit_regen + con_app[GET_CON(ch)].hp_regen, manareg, ch->move_regen, 
+ch->ki_regen, 
+GET_AGE(ch));
    send_to_char(buf, ch);
 
    if(!IS_NPC(ch)) // mobs can't view this part

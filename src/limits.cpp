@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.21 2004/05/18 20:58:57 urizen Exp $ */
+/* $Id: limits.cpp,v 1.22 2004/05/18 21:36:39 urizen Exp $ */
 
 extern "C"
 {
@@ -149,8 +149,8 @@ int mana_gain(CHAR_DATA *ch)
   if(IS_NPC(ch))
     gain = GET_LEVEL(ch);
   else {
-    gain = graf(age(ch).year, 2,3,4,6,7,8,9);
-
+//    gain = graf(age(ch).year, 2,3,4,6,7,8,9);
+    gain = ch->max_mana / 12.5;
     switch (GET_POS(ch)) {
       case POSITION_SLEEPING: divisor = 1; break;
       case POSITION_RESTING:  divisor = 2; break;
@@ -292,10 +292,12 @@ int move_gain(CHAR_DATA *ch)
 void redo_hitpoints( CHAR_DATA *ch)
 {
   /*struct affected_type *af;*/
-  int i, j, bonus;
+  int i, j, bonus = 0;
 
   ch->max_hit = ch->raw_hit;
-   bonus = (GET_CON(ch) * GET_CON(ch)) / 30; 
+  for (i = 16; i < GET_CON(ch); i++)
+   bonus += (i * i) / 30;
+//  bonus = (GET_CON(ch) * GET_CON(ch)) / 30; 
 
   ch->max_hit += bonus;
 
@@ -317,15 +319,17 @@ void redo_mana ( CHAR_DATA *ch)
 
 {
    /*struct affected_type *af;*/
-   int i, j, bonus = 0;
+   int i, j, bonus = 0, stat = 0;
 
   ch->max_mana = ch->raw_mana;
 
   if (GET_CLASS(ch) == CLASS_MAGIC_USER || GET_CLASS(ch) == CLASS_ANTI_PAL || GET_CLASS(ch) == CLASS_RANGER)
-     bonus = (GET_INT(ch) * GET_INT(ch)) / 30;
+     stat = GET_INT(ch);
   else
-     bonus = (GET_WIS(ch) * GET_WIS(ch)) / 30;
-
+     stat = GET_WIS(ch);
+ 
+  for (i = 16; i < stat; i++)
+   bonus += (i * i) / 30;
 
   if ((GET_CLASS(ch) == CLASS_WARRIOR) || (GET_CLASS(ch) == CLASS_THIEF) ||
       (GET_CLASS(ch) == CLASS_BARBARIAN) || (GET_CLASS(ch) == CLASS_MONK))
