@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.5 2002/07/14 07:28:08 pirahna Exp $ */
+/* $Id: db.cpp,v 1.6 2002/07/14 17:50:07 pirahna Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -1957,6 +1957,7 @@ void read_one_zone(FILE * fl, int zon)
         reset_tab[reset_top].command == 'O' ||
         reset_tab[reset_top].command == 'E' ||
         reset_tab[reset_top].command == 'P' ||
+        reset_tab[reset_top].command == 'G' ||
         reset_tab[reset_top].command == 'D' ||
         reset_tab[reset_top].command == 'X' ||
         reset_tab[reset_top].command == 'K' ||
