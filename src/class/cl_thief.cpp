@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.64 2004/05/30 18:59:06 urizen Exp $
+| $Id: cl_thief.cpp,v 1.65 2004/06/02 20:43:19 urizen Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -1052,12 +1052,6 @@ int do_pick(CHAR_DATA *ch, char *argument, int cmd)
       return eFAILURE;
    }
 
-   if (!skill_success(ch,NULL,SKILL_PICK_LOCK)) {
-      send_to_char("You failed to pick the lock.\n\r", ch);
-      WAIT_STATE(ch, PULSE_VIOLENCE);
-      return eFAILURE;
-    }
-
    if (!*type)
       send_to_char("Pick what?\n\r", ch);
    else if (generic_find(argument, (FIND_OBJ_INV | FIND_OBJ_ROOM), ch, &victim, &obj))
@@ -1076,7 +1070,11 @@ int do_pick(CHAR_DATA *ch, char *argument, int cmd)
       send_to_char("It resists your attempts at picking it.\n\r", ch);
   else
   {
-//      skill_increase_check(ch, SKILL_PICK_LOCK, has_skill(ch,SKILL_PICK_LOCK), SKILL_INCREASE_MEDIUM);
+   if (!skill_success(ch,NULL,SKILL_PICK_LOCK)) {
+      send_to_char("You failed to pick the lock.\n\r", ch);
+      WAIT_STATE(ch, PULSE_VIOLENCE);
+      return eFAILURE;
+    }
 
       REMOVE_BIT(obj->obj_flags.value[1], CONT_LOCKED);
       send_to_char("*Click*\n\r", ch);
@@ -1096,6 +1094,11 @@ int do_pick(CHAR_DATA *ch, char *argument, int cmd)
   else
   {
       //skill_increase_check(ch, SKILL_PICK_LOCK, has_skill(ch,SKILL_PICK_LOCK), SKILL_INCREASE_MEDIUM);
+   if (!skill_success(ch,NULL,SKILL_PICK_LOCK)) {
+      send_to_char("You failed to pick the lock.\n\r", ch);
+      WAIT_STATE(ch, PULSE_VIOLENCE);
+      return eFAILURE;
+    }
 
       REMOVE_BIT(EXIT(ch, door)->exit_info, EX_LOCKED);
       if (EXIT(ch, door)->keyword)

@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.155 2004/06/02 20:36:41 urizen Exp $ */
+/* $Id: magic.cpp,v 1.156 2004/06/02 20:43:03 urizen Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -1912,7 +1912,7 @@ int spell_heal(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *ob
         return eFAILURE;
   }
 
-  if (!can_heal(ch,victim,SPELL_HEAL)) return eFAIILURE;
+  if (!can_heal(ch,victim,SPELL_HEAL)) return eFAILURE;
   spell_cure_blind(level, ch, victim, obj, skill);
   int healy = dam_percent(skill,250);
   GET_HIT(victim) += healy;

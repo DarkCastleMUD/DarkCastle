@@ -21,7 +21,7 @@
  *  12/08/2003   Onager    Added check for charmies and !charmie eq to     *
  *                         equip_char()                                    *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.63 2004/05/28 20:08:29 urizen Exp $ */
+/* $Id: handler.cpp,v 1.64 2004/06/02 20:43:03 urizen Exp $ */
     
 extern "C"
 {
@@ -1389,6 +1389,10 @@ struct obj_data *unequip_char(CHAR_DATA *ch, int pos)
 
     for(j=0; j<obj->num_affects; j++)
 	affect_modify(ch, obj->affected[j].location, obj->affected[j].modifier, 0, FALSE);
+   redo_hitpoints(ch);
+   redo_mana(ch);
+   redo_ki(ch);
+
 
     return(obj);
 }
