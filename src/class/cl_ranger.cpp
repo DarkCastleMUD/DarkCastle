@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_ranger.cpp,v 1.15 2002/09/08 15:14:02 pirahna Exp $ | cl_ranger.C |
+| $Id: cl_ranger.cpp,v 1.16 2002/09/10 22:49:23 pirahna Exp $ | cl_ranger.C |
 Description: Ranger skills/spells */ extern "C"  {
   #include <string.h>
 }
@@ -627,13 +627,19 @@ int do_forage(CHAR_DATA *ch, char *arg, int cmd)
     break;
   }
 
+  int recharge;
+
+  if(new_obj)
+     recharge = 5 - (learned / 30);
+  else recharge = 1;
+
   af.type = SKILL_FORAGE;
-  af.duration = 5 - (learned / 50);
+  af.duration = recharge;
   af.modifier = 0;
   af.location = APPLY_NONE;
   af.bitvector = 0;
   affect_to_char(ch, &af);
-
+  
   if(!new_obj) {
     act("$n forages around for some food, but turns up nothing.", ch, 0, 0, TO_ROOM, 0);
     act("You forage around for some food, but turn up nothing.", ch, 0, 0, TO_CHAR, 0);
