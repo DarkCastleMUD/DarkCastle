@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.119 2004/06/01 02:22:34 urizen Exp $ */
+/* $Id: const.cpp,v 1.120 2004/06/10 22:48:34 urizen Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1314,7 +1314,7 @@ struct class_skill_defines d_skills[] = { // bard skills
 { "fanatical fanfare",   SKILL_SONG_FANATICAL_FANFARE,         23,     98,     {CON,INT} },
 { "revealing staccato",     SKILL_SONG_REVEAL_STACATO,      25,     98,     {INT,DEX} },
 { "double",                SKILL_SECOND_ATTACK,            26,     80,     {DEX,INT} },
-{ "terrible clef",         SKILL_SONG_TERRIBLE_CLEF,       28,     98,     {STR,INT} },
+{ "terrible clef",         SKILL_SONG_TERRIBLE_CLEF,       28,     98,     {INT,STR} },
 { "piercing",              SKILL_PIERCEING_WEAPONS,        30,     70,     {DEX,STR} },
 { "slashing",              SKILL_SLASHING_WEAPONS,         30,     70,     {DEX,STR} },
 { "bludgeoning",           SKILL_BLUDGEON_WEAPONS,         30,     70,     {STR,DEX} },
