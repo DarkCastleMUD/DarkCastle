@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: save.cpp,v 1.17 2004/04/19 23:14:35 urizen Exp $ */
+/* $Id: save.cpp,v 1.18 2004/04/20 14:31:18 urizen Exp $ */
 
 extern "C"
 {
@@ -906,7 +906,7 @@ bool put_obj_in_store (struct obj_data *obj, CHAR_DATA *ch, FILE *fpsave, int we
   // If it has, we need to save that particular modification to the file
   // THESE MUST REMAIN IN PROPER ORDER
   // IF YOU HAVE ANYMORE TO ADD, ADD THEM BEFORE THE "STP" FLAG AT END
-  if(obj->obj_flags.eq_level    != standard_obj->obj_flags.eq_level) 
+/*  if(obj->obj_flags.eq_level    != standard_obj->obj_flags.eq_level) 
   {
     fwrite("EQL", sizeof(char), 3, fpsave);
     fwrite(&obj->obj_flags.eq_level, sizeof(obj->obj_flags.eq_level), 1, fpsave);
@@ -989,7 +989,7 @@ bool put_obj_in_store (struct obj_data *obj, CHAR_DATA *ch, FILE *fpsave, int we
       fwrite(&obj->affected[iAffect].modifier, sizeof(obj->affected[iAffect].modifier), 1, fpsave);
     }
   }
-
+*/
   if(strcmp(obj->name, standard_obj->name))
   {
     fwrite("NAM", sizeof(char), 3, fpsave);
