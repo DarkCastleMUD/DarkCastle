@@ -2156,7 +2156,9 @@ int do_mpedit(struct char_data *ch, char *argument, int cmd)
                        " 10 -      give_prog\r\n"
                        " 11 -     bribe_prog\r\n"
                        " 12 -     catch_prog\r\n"
-                       " 13 -    attack_prog\r\n", ch);
+                       " 13 -    attack_prog\r\n"
+		       " 14 -     arand_prog\r\n", ch);
+
           return eFAILURE;
         }
         if(!check_range_valid_and_convert(intval, buf2, 1, 999)) {
@@ -2174,7 +2176,7 @@ int do_mpedit(struct char_data *ch, char *argument, int cmd)
           return eFAILURE;
         }
 
-        if(!check_range_valid_and_convert(intval, buf3, 1, 13)) {
+        if(!check_range_valid_and_convert(intval, buf3, 1, 14)) {
           send_to_char("Invalid prog number.\r\n", ch);
           return eFAILURE;
         }
@@ -2193,7 +2195,9 @@ int do_mpedit(struct char_data *ch, char *argument, int cmd)
           case 11:  currprog->type = BRIBE_PROG;     break;
           case 12:  currprog->type = CATCH_PROG;     break;
           case 13:  currprog->type = ATTACK_PROG;    break;
+	  case 14:  currprog->type = ARAND_PROG; break;
         }
+
 
         update_mobprog_bits(mob_num);
 
