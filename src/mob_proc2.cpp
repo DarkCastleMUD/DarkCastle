@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.10 2002/08/23 16:30:36 pirahna Exp $ */
+/* $Id: mob_proc2.cpp,v 1.11 2002/08/26 06:21:30 pirahna Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -207,7 +207,9 @@ int super_repair_guy(struct char_data *ch, struct obj_data *obj, int cmd, char *
   act("\n\rThe Super Repair Guy examines $p...",ch,obj,0, TO_CHAR, 0);
   act("\n\rThe Super Repair Guy examines $p...",ch,obj,0, TO_ROOM, INVIS_NULL);
 
-  if (obj->obj_flags.type_flag == ITEM_ARMOR) {
+  if (obj->obj_flags.type_flag == ITEM_ARMOR ||
+      obj->obj_flags.type_flag == ITEM_CONTAINER)
+  {
 
     cost = obj->obj_flags.cost;
     value0 = eq_max_damage(obj);
@@ -427,7 +429,9 @@ act("Fingers gives you $p.", ch,obj,0, TO_CHAR, 0);
 act("Fingers gives $n $p.", ch,obj,0, TO_ROOM, INVIS_NULL);
     return eSUCCESS;
    }
-  } else if (obj->obj_flags.type_flag == ITEM_WEAPON) {
+  } else if (obj->obj_flags.type_flag == ITEM_WEAPON ||
+             obj->obj_flags.type_flag == ITEM_CONTAINER) 
+  {
 
       cost = obj->obj_flags.cost;
     value0 = eq_max_damage(obj);
