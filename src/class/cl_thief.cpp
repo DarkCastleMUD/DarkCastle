@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.14 2002/12/26 22:16:40 pirahna Exp $
+| $Id: cl_thief.cpp,v 1.15 2002/12/27 03:02:21 pirahna Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -216,12 +216,15 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
     return retval;
 
   // dual backstab
-  if((GET_LEVEL(ch) >= 40) &&
-    (was_in == ch->in_room) && 
-    ((GET_CLASS(ch) == CLASS_THIEF) || (GET_LEVEL(ch) >= ARCHANGEL)))
-    if(ch->equipment[SECOND_WIELD])
-      if((ch->equipment[SECOND_WIELD]->obj_flags.value[3] == 11) ||
-        (ch->equipment[SECOND_WIELD]->obj_flags.value[3] == 8)) {
+  if((GET_LEVEL(ch) >= 40)                                            &&
+     (was_in == ch->in_room)                                          && 
+     ((GET_CLASS(ch) == CLASS_THIEF) || (GET_LEVEL(ch) >= ARCHANGEL)) &&
+     (ch->equipment[SECOND_WIELD])                                    &&
+     ((ch->equipment[SECOND_WIELD]->obj_flags.value[3] == 11) ||
+       (ch->equipment[SECOND_WIELD]->obj_flags.value[3] == 8))        &&
+     (number(1, 100) <= has_skill(ch, SKILL_DUAL_BACKSTAB))
+    )
+  {
         WAIT_STATE(ch, PULSE_VIOLENCE);
         percent = number(1, 101);
         if (AWAKE(victim) &&
@@ -229,7 +232,7 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
            return damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_BACKSTAB, SECOND);
         else
            return attack(ch, victim, SKILL_BACKSTAB, SECOND);
-      }
+  }
   return eSUCCESS;
 }
 
