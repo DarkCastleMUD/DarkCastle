@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.10 2003/01/03 03:31:03 pirahna Exp $ */
+/* $Id: clan.cpp,v 1.11 2003/01/03 05:11:09 dcastle Exp $ */
 extern "C"
 {
   #include <string.h> // strcat
@@ -804,6 +804,7 @@ int do_outcast(CHAR_DATA *ch, char *arg, int cmd)
     send_to_char("You quit your clan.\n\r", ch);
     victim->clan = 0;
     remove_clan_member(clan, ch);
+    save_clans();
     return eSUCCESS;
   }
 
