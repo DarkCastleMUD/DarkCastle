@@ -68,6 +68,11 @@ struct trade_data_type poison_vial_data[] =
      10         // a small vial of low quality cyanide
    },
 
+   { { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },  // not makeable
+     694,
+     10         // a vial of crude strychnine
+   },
+
    // This must come last
    { { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
      -1,
@@ -87,6 +92,10 @@ struct thief_poison_data poison_vial_combat_data[] =
 
    {
       "low quality cyanide"
+   },
+
+   {
+      "crude strychnine"
    },
 
    {
@@ -268,6 +277,9 @@ int valid_trade_skill_combine(obj_data * container, trade_data_type * data, char
 
       sort(valid.begin(), valid.end());
 
+      if(!valid.size()) // empty recipe (unmakeable)
+        return -1;
+
       if(valid == current)  // if vectors match, then we have a valid combination
          return i;
    }
@@ -329,6 +341,16 @@ int handle_poisoned_weapon_attack(char_data * ch, char_data * vict, int type)
            dam = 35;
          else dam = 25;
          retval = damage(ch, vict, dam, TYPE_POISON, POISON_MESSAGE_BASE+type, 0);         
+         break;
+
+      case 2: // crude strychnine
+         if(saves_spell(ch, vict, 10, SAVE_TYPE_POISON) < 0)
+         {
+           SET_BIT(vict->combat, COMBAT_MISS_AN_ATTACK);
+           dam = 10;
+         }
+         else dam = 0;
+         retval = damage(ch, vict, dam, TYPE_POISON, POISON_MESSAGE_BASE+type, 0);
          break;
 
       default:

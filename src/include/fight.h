@@ -2,7 +2,7 @@
 #define FIGHT_H_
 
 /************************************************************************
-| $Id: fight.h,v 1.4 2002/07/17 15:44:06 pirahna Exp $
+| $Id: fight.h,v 1.5 2002/09/10 01:45:36 pirahna Exp $
 | fight.h
 | This file defines the header information for fight.
 */
@@ -31,8 +31,8 @@ extern CHAR_DATA *character_list;
 #define FIRST 	    WIELD
 #define SECOND 	    SECOND_WIELD
 
-#define COMBAT_MOD_FRENZY         1
-#define COMBAT_MOD_UNUSED         1<<1
+#define COMBAT_MOD_FRENZY            1
+#define COMBAT_MOD_UNUSED            1<<1
 
 void make_husk(CHAR_DATA *ch);
 void make_heart(CHAR_DATA *ch, CHAR_DATA *vict);
@@ -98,6 +98,7 @@ bool ArenaIsOpen();
 #define COMBAT_REPELANCE    1<<12
 #define COMBAT_VITAL_STRIKE 1<<13
 #define COMBAT_MONK_STANCE  1<<14
+#define COMBAT_MISS_AN_ATTACK 1<<15
 
 #define DAMAGE_TYPE_PHYSICAL  0
 #define DAMAGE_TYPE_MAGIC     1

@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.64 2002/09/05 02:58:20 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.65 2002/09/10 01:45:32 pirahna Exp $ */
 
 extern "C"
 {
@@ -306,9 +306,15 @@ int attack(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
       if(SOMEONE_DIED(result))       return result;
     }
 
-    result = one_hit(ch, vict, type, FIRST);
-    if(SOMEONE_DIED(result))       return result;
-
+    if(IS_SET(ch->combat, COMBAT_MISS_AN_ATTACK))
+    {
+      send_to_char("Your body refuses to work properly and you miss an attack.\r\n", ch);
+      REMOVE_BIT(ch->combat, COMBAT_MISS_AN_ATTACK);
+    }
+    else {
+      result = one_hit(ch, vict, type, FIRST);
+      if(SOMEONE_DIED(result))       return result;
+    }
   } // End of the monk attacks
   else // It's a normal attack
   {

@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.16 2002/08/16 18:36:37 pirahna Exp $ */
+/* $Id: mob_proc.cpp,v 1.17 2002/09/10 01:45:32 pirahna Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -2895,7 +2895,8 @@ static char *dethSayText [ ] =
   "The wind is like the air, only pushier.",
   "Nothing says 'I love you' like oral sex in the morning.",
   "The White Man?    No good.",
-  "There's 10 kinds of people in this world, those who understand binary and those who don't."
+  "There's 10 kinds of people in this world, those who understand binary and those who don't.",
+  "I think other prisoners' penises are a big pain in the ass."
 
 };
 
