@@ -11,7 +11,7 @@
 *                       damage (such as falls, drowning) that may kill       *
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.127 2003/11/10 19:36:28 staylor Exp $ */
+/* $Id: fight.cpp,v 1.128 2003/11/10 19:56:38 staylor Exp $ */
 
 extern "C"
 {
@@ -1342,7 +1342,10 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
     }
     if(IS_SET(ch->combat, COMBAT_VITAL_STRIKE))
       dam = (int)(dam * 2);
+    if (affected_by_spell(victim, SPELL_HOLY_AURA))
+      dam /= 2; // half damage against physical attacks
   }
+
   if (IS_AFFECTED(victim, AFF_EAS))
     dam /= 4;
 
