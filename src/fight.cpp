@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.49 2002/08/23 17:09:37 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.50 2002/08/25 16:31:52 pirahna Exp $ */
 
 extern "C"
 {
@@ -1461,6 +1461,7 @@ void fight_kill(CHAR_DATA *ch, CHAR_DATA *vict, int type)
 int check_riposte(CHAR_DATA * ch, CHAR_DATA * victim)
 {
   int percent;
+  int learned;
   int chance;
   int retval;
   int newretval;
@@ -1482,7 +1483,10 @@ int check_riposte(CHAR_DATA * ch, CHAR_DATA * victim)
     else return eFAILURE;
   }
   else if ((chance = has_skill(victim, SKILL_RIPOSTE)))
+  {
+    learned = chance;
     chance += GET_DEX(ch);
+  }
   else return eFAILURE;
   
   if(IS_SET(victim->combat, COMBAT_BLADESHIELD1) || IS_SET(victim->combat, COMBAT_BLADESHIELD2)) {
@@ -1491,8 +1495,6 @@ int check_riposte(CHAR_DATA * ch, CHAR_DATA * victim)
     if(IS_SET(ch->combat, COMBAT_BLADESHIELD1) || IS_SET(ch->combat, COMBAT_BLADESHIELD2))
       chance = 1;
   }
-
-  skill_increase_check(victim, SKILL_RIPOSTE, chance, SKILL_INCREASE_HARD);
 
   percent = (number(1, 101) - GET_LEVEL(victim)) + GET_LEVEL(ch);
   if (percent >= chance)
@@ -1503,6 +1505,8 @@ int check_riposte(CHAR_DATA * ch, CHAR_DATA * victim)
   act("$n turns your attack against you!", victim, NULL, ch, TO_VICT, 0);
   act("You turn $N's attack against $m.", victim, NULL, ch, TO_CHAR, 0);
   
+  skill_increase_check(victim, SKILL_RIPOSTE, learned, SKILL_INCREASE_HARD);
+
   retval = one_hit(victim, ch, TYPE_UNDEFINED, FIRST);
   retval = SWAP_CH_VICT(retval);
 
@@ -1516,6 +1520,7 @@ int check_riposte(CHAR_DATA * ch, CHAR_DATA * victim)
 bool check_shieldblock(CHAR_DATA * ch, CHAR_DATA * victim)
 {
   int percent;
+  int learned;
   int chance;
   
   if((IS_SET(victim->combat, COMBAT_STUNNED)) ||
@@ -1548,13 +1553,12 @@ bool check_shieldblock(CHAR_DATA * ch, CHAR_DATA * victim)
   else if (!(chance = has_skill(victim, SKILL_SHIELDBLOCK)))
     return FALSE;
 
+  learned = chance;
   chance /= 2;
   chance += (int)(GET_DEX(ch) / 2);
 
   if((GET_LEVEL(ch) - GET_LEVEL(victim)) < 0)
     chance += (int)((GET_LEVEL(ch) - GET_LEVEL(victim)));
-
-  skill_increase_check(victim, SKILL_SHIELDBLOCK, chance, SKILL_INCREASE_HARD);
 
   percent = number(1, 101);
   if (percent >= chance)
@@ -1563,6 +1567,9 @@ bool check_shieldblock(CHAR_DATA * ch, CHAR_DATA * victim)
   act("$n blocks $N's attack with $s shield.", victim, NULL, ch, TO_ROOM, NOTVICT);
   act("$n blocks your attack with $s shield.", victim, NULL, ch, TO_VICT, 0);
   act("You block $N's attack with your shield.", victim, NULL, ch, TO_CHAR, 0);
+
+  skill_increase_check(victim, SKILL_SHIELDBLOCK, learned, SKILL_INCREASE_HARD);
+
   return TRUE;
 }
 
@@ -1570,6 +1577,7 @@ bool check_parry(CHAR_DATA * ch, CHAR_DATA * victim)
 {
   int percent;
   int chance;
+  int learned;
   int specialization;
   
   if((IS_SET(victim->combat, COMBAT_STUNNED)) ||
@@ -1595,6 +1603,7 @@ bool check_parry(CHAR_DATA * ch, CHAR_DATA * victim)
 
   specialization = chance / 100;
   chance = chance % 100;
+  learned = chance;
 
   chance /= 2;
   chance += (3 * GET_DEX(ch)) / 4;
@@ -1611,8 +1620,6 @@ bool check_parry(CHAR_DATA * ch, CHAR_DATA * victim)
      IS_SET(victim->combat, COMBAT_BLADESHIELD2))
     chance = 100;
 
-  skill_increase_check(victim, SKILL_PARRY, chance, SKILL_INCREASE_HARD);
-  
   percent = number(1, 101);
   if (percent >= chance)
     return FALSE;
@@ -1620,6 +1627,9 @@ bool check_parry(CHAR_DATA * ch, CHAR_DATA * victim)
   act("$n parries $N's attack.", victim, NULL, ch, TO_ROOM, NOTVICT);
   act("$n parries your attack.", victim, NULL, ch, TO_VICT, 0);
   act("You parry $N's attack.", victim, NULL, ch, TO_CHAR, 0);
+
+  skill_increase_check(victim, SKILL_PARRY, learned, SKILL_INCREASE_HARD);
+  
   return TRUE;
 }
 
@@ -1630,6 +1640,7 @@ bool check_dodge(CHAR_DATA * ch, CHAR_DATA * victim)
 {
   int percent;
   int chance;
+  int learned;
   int specialization;
   
   // TODO - eventually have this check for mobs that have dodge SKILL
@@ -1653,6 +1664,7 @@ bool check_dodge(CHAR_DATA * ch, CHAR_DATA * victim)
 
   specialization = chance / 100;
   chance = chance % 100;
+  learned = chance;
 
   chance /= 2;
   chance += (3 * GET_DEX(ch)) / 5;    
@@ -1667,8 +1679,6 @@ bool check_dodge(CHAR_DATA * ch, CHAR_DATA * victim)
   if(chance > 100)
     chance = 100;
 
-  skill_increase_check(victim, SKILL_DODGE, chance, SKILL_INCREASE_HARD);
-
   percent = number(1, 101);
   if (percent >= chance)
     return FALSE;
@@ -1676,6 +1686,9 @@ bool check_dodge(CHAR_DATA * ch, CHAR_DATA * victim)
   act("$n dodges $N's attack.", victim, NULL, ch, TO_ROOM, NOTVICT);
   act("$n dodges your attack.", victim, NULL, ch, TO_VICT, 0);
   act("You dodge $N's attack.", victim, NULL, ch, TO_CHAR, 0);
+
+  skill_increase_check(victim, SKILL_DODGE, learned, SKILL_INCREASE_HARD);
+
   return TRUE;
 }
 

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.15 2002/08/10 05:10:38 pirahna Exp $
+| $Id: objects.cpp,v 1.16 2002/08/25 16:31:52 pirahna Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -1644,7 +1644,7 @@ void wear(struct char_data *ch, struct obj_data *obj_object, int keyword)
 
   case 16: {  /* LIGHT SOURCE */
     if(ch->equipment[WEAR_LIGHT]) {
-      act("You already holding $p as a light.", ch, ch->equipment[WEAR_LIGHT], 0, TO_CHAR, 0);
+      act("You are already holding $p as a light.", ch, ch->equipment[WEAR_LIGHT], 0, TO_CHAR, 0);
     }
     else if(!hands_are_free(ch, 1)) 
       send_to_char("Your hands are already full.\n\r", ch);
