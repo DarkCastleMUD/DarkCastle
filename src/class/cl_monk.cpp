@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_monk.cpp,v 1.10 2003/02/17 21:09:32 pirahna Exp $
+| $Id: cl_monk.cpp,v 1.11 2003/03/07 00:17:38 pirahna Exp $
 | cl_monk.C
 | Description:  Monk skills.
 */
@@ -35,8 +35,20 @@ int do_eagle_claw(struct char_data *ch, char *argument, int cmd)
      return eFAILURE;
    }
 
-   if (ch->equipment[WIELD] || ch->equipment[HOLD]) {
-     send_to_char ("You can't wield or hold anything to perform this!\n\r", ch);
+   int hands = 0;
+   if(ch->equipment[WIELD])          hands++;
+   if(ch->equipment[SECOND_WIELD])   hands++;
+   if(ch->equipment[HOLD])           hands++;
+   if(ch->equipment[WEAR_SHIELD])    hands++;
+   if(ch->equipment[WEAR_LIGHT])     hands++;
+
+   if(hands > 1) {
+     send_to_char ("You need at least one hand free to perform this!\n\r", ch);
+     return eFAILURE;
+   }
+
+   if (ch->equipment[HOLD]) {
+     send_to_char ("You can't hold anything while you perform this!\n\r", ch);
      return eFAILURE;
    }
 
@@ -114,8 +126,15 @@ int do_quivering_palm(struct char_data *ch, char *argument, int cmd)
      return eFAILURE;
   }
 
-  if(ch->equipment[WIELD] || ch->equipment[HOLD]) {
-    send_to_char ("You can't wield or hold anything to perform this!\n\r", ch);
+  int hands = 0;
+  if(ch->equipment[WIELD])          hands++;
+  if(ch->equipment[SECOND_WIELD])   hands++;
+  if(ch->equipment[HOLD])           hands++;
+  if(ch->equipment[WEAR_SHIELD])    hands++;
+  if(ch->equipment[WEAR_LIGHT])     hands++;
+
+  if(hands > 1) {
+    send_to_char ("You need at least one hand free to perform this!\n\r", ch);
     return eFAILURE;
   }
 
