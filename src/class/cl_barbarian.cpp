@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_barbarian.cpp,v 1.8 2002/09/12 00:00:52 pirahna Exp $
+| $Id: cl_barbarian.cpp,v 1.9 2002/09/13 17:51:02 pirahna Exp $
 | cl_barbarian.C
 | Description:  Commands for the barbarian class.
 */
@@ -339,8 +339,8 @@ int do_headbutt(struct char_data *ch, char *argument, int cmd)
        WAIT_STATE(ch, PULSE_VIOLENCE*2);
     }
     else WAIT_STATE(ch, PULSE_VIOLENCE*3);
-    //retval = damage (ch, victim, 0, TYPE_UNDEFINED, SKILL_SHOCK, 0);
-    // messages are taken care of here...no point in calling damage
+    retval = damage (ch, victim, 0, TYPE_UNDEFINED, SKILL_SHOCK, 0);
+    // the damage call here takes care of starting combat and such
     retval = eSUCCESS;
   }
   else {
