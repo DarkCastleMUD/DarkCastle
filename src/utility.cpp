@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.22 2004/05/20 00:07:06 urizen Exp $ */
+/* $Id: utility.cpp,v 1.23 2004/05/20 16:13:59 urizen Exp $ */
 
 extern "C"
 {
@@ -279,7 +279,8 @@ void sprintbit( long vektor, char *names[], char *result )
     {
 	if ( IS_SET(1, vektor) )
 	{
-	    if ( *names[nr] != '\n' )
+	    if (strcmp(names[nr], "unused")) continue;
+	    if ( *names[nr] != '\n')
 		strcat( result, names[nr] );
 	    else
 		strcat( result, "Undefined" );
@@ -1345,6 +1346,7 @@ void parse_bitstrings_into_int(char * bits[], char * strings, char_data * ch, ui
                        
     for(int x = 0 ;*bits[x] != '\n'; x++) 
     {
+      if (!strcmp("unused",bits[x])) continue;
       if(is_abbrev(buf, bits[x])) 
       {
         if(IS_SET(value, (1<<x))) {

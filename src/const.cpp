@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.111 2004/05/20 15:07:34 urizen Exp $ */
+/* $Id: const.cpp,v 1.112 2004/05/20 16:13:59 urizen Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -680,15 +680,15 @@ char *room_bits[] =
     "unused1",
     "no_mob",
     "indoors",
-    "lawful",
-    "neutral",
-    "chaotic",
+    "unused",
+    "unused",
+    "unused",
     "no_magic",
     "tunnel",
     "private",
     "safe",
     "no_summon",
-    "unused2",
+    "unused",
     "no_portal",
     "imp_only",
     "fall_down",
@@ -1642,7 +1642,7 @@ struct race_shit race_info[] =
   {"Animal",    "Animals",
    27,0,0,0,0,0,0,0},
   {"Plant",      "Plants",
-   2, 1,0,0,0,0,0,0},
+   63, 0,0,0,0,0,0,0},
   {"Enfan",     "Enfans",
    63,0,0,0,1,4194304,0,0},
   {"Undead",    "Undead",

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.29 2004/05/20 00:07:06 urizen Exp $
+| $Id: move.cpp,v 1.30 2004/05/20 16:13:59 urizen Exp $
 | move.C
 | Movement commands and stuff.
 *************************************************************************
@@ -204,6 +204,26 @@ int do_fall(CHAR_DATA *ch, short dir)
   target = world[ch->in_room].dir_option[dir]->to_room;
   if(IS_SET(world[target].room_flags, IMP_ONLY) && GET_LEVEL(ch) < IMP)
     return eFAILURE;  // not gonna do it
+  if (IS_SET(world[target].room_flags, TUNNEL))
+  {
+    int ppl = 0;
+    CHAR_DATA *k;
+    for (k = world[target].people; k; k = k->next_in_room)
+     if (!IS_NPC(k))
+        ppl++;
+    if (ppl > 2) 
+      return eFAILURE;
+  }
+  if (IS_SET(world[target].room_flags, PRIVATE))
+  {
+    int ppl = 0;
+    CHAR_DATA *k;
+    for (k = world[target].people; k; k = k->next_in_room)
+     if (!IS_NPC(k))
+      ppl++;
+    if (ppl > 4)
+      return eFAILURE;
+  }
 
   sprintf(damage,"%s falls from %d and sustains %d damage.",
           GET_NAME(ch), world[ch->in_room].number, dam); 
@@ -358,6 +378,28 @@ int do_simple_move(CHAR_DATA *ch, int cmd, int following)
       send_to_char("No.\n\r", ch);
       return eFAILURE;
     } 
+
+  struct room_data *rm = &(world[world[ch->in_room].dir_option[cmd]->to_room]);
+  if (IS_SET(rm->room_flags, TUNNEL))
+  {
+    int ppl = 0;
+    CHAR_DATA *k;
+    for (k = rm->people; k; k = k->next_in_room)
+     if (!IS_NPC(k))
+        ppl++;
+    if (ppl > 2)
+      return eFAILURE;
+  }
+  if (IS_SET(rm->room_flags, PRIVATE))
+  {
+    int ppl = 0;
+    CHAR_DATA *k;
+    for (k = rm->people; k; k = k->next_in_room)
+     if (!IS_NPC(k))
+      ppl++;
+    if (ppl > 4)
+      return eFAILURE;
+  }
 
     if(!IS_NPC(ch) &&
        world[world[ch->in_room].dir_option[cmd]->to_room].sector_type == SECT_UNDERWATER &&

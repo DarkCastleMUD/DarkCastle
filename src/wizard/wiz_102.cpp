@@ -3416,6 +3416,8 @@ int do_redit(struct char_data *ch, char *argument, int cmd)
           for(x = 0 ;; x++) {
             if(!strcmp(room_bits[x], "\n"))
               break;
+	    if (!strcmp(room_bits[x], "unused"))
+		continue;
             if((x+1)%4 == 0) {
               csendf(ch, "%-18s\n\r", room_bits[x]);
             } else {
