@@ -1353,7 +1353,8 @@ int execute_song_flight_of_bee( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA 
 
       if(ch->in_room != fvictim->follower->in_room)
       {
-         if(!affected_by_spell(fvictim->follower, SPELL_FLY))
+         if(IS_SET(fvictim->follower->affected_by, AFF_FLYING) &&
+            !affected_by_spell(fvictim->follower, SPELL_FLY))
          {
             REMOVE_BIT(fvictim->follower->affected_by, AFF_FLYING);
             send_to_char("Your musical flight ends.\n\r", fvictim->follower);
@@ -1375,7 +1376,8 @@ int execute_song_flight_of_bee( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA 
    }
    else
    {
-      if(!affected_by_spell(master, SPELL_FLY))
+      if(IS_SET(master->affected_by, AFF_FLYING) &&
+         !affected_by_spell(master, SPELL_FLY))
       {
          REMOVE_BIT(master->affected_by, AFF_FLYING);
          send_to_char("Your musical flight ends.\n\r", master);
@@ -1406,15 +1408,20 @@ int intrp_flight_of_bee( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim
 
    for(fvictim = master->followers; fvictim; fvictim = fvictim->next)
    {
-      if(!affected_by_spell(fvictim->follower, SPELL_FLY))
+      if(IS_SET(fvictim->follower->affected_by, AFF_FLYING) &&
+         !affected_by_spell(fvictim->follower, SPELL_FLY))
+      {
          REMOVE_BIT(fvictim->follower->affected_by, AFF_FLYING);
-
-      send_to_char("Your musical flight ends.\n\r", fvictim->follower);
+         send_to_char("Your musical flight ends.\n\r", fvictim->follower);
+      }
    }
 
-   if(!affected_by_spell(master, SPELL_FLY))
+   if(IS_SET(master->affected_by, AFF_FLYING) &&
+      !affected_by_spell(master, SPELL_FLY))
+   {
       REMOVE_BIT(master->affected_by, AFF_FLYING);
-   send_to_char("Your musical flight ends.\r\n", master);
+      send_to_char("Your musical flight ends.\r\n", master);
+   }
    return eSUCCESS;
 }
 
@@ -1512,7 +1519,8 @@ int execute_song_jig_of_alacrity( byte level, CHAR_DATA *ch, char *arg, CHAR_DAT
 
       if(ch->in_room != fvictim->follower->in_room)
       {
-         if(!affected_by_spell(fvictim->follower, SPELL_HASTE))
+         if(IS_SET(fvictim->follower->affected_by, AFF_HASTE) &&
+            !affected_by_spell(fvictim->follower, SPELL_HASTE))
          {
             REMOVE_BIT(fvictim->follower->affected_by, AFF_HASTE);
             send_to_char("Your limbs slow back to normal.\n\r", fvictim->follower);
@@ -1536,7 +1544,8 @@ int execute_song_jig_of_alacrity( byte level, CHAR_DATA *ch, char *arg, CHAR_DAT
    }
    else
    {
-      if(!affected_by_spell(master, SPELL_HASTE))
+      if(IS_SET(master->affected_by, AFF_HASTE) &&
+         !affected_by_spell(master, SPELL_HASTE))
       {
          REMOVE_BIT(master->affected_by, AFF_HASTE);
          send_to_char("Your limbs slow back to normal.\n\r", fvictim->follower);
@@ -1571,15 +1580,20 @@ int intrp_jig_of_alacrity( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict
 
    for(fvictim = master->followers; fvictim; fvictim = fvictim->next)
    {
-      if(!affected_by_spell(fvictim->follower, SPELL_HASTE))
+      if(IS_SET(fvictim->follower->affected_by, AFF_HASTE) &&
+         !affected_by_spell(fvictim->follower, SPELL_HASTE))
+      {
          REMOVE_BIT(fvictim->follower->affected_by, AFF_HASTE);
-
-      send_to_char("Your limbs slow back to normal.\n\r", fvictim->follower);
+         send_to_char("Your limbs slow back to normal.\n\r", fvictim->follower);
+      }
    }
 
-   if(!affected_by_spell(master, SPELL_HASTE))
+   if(IS_SET(master->affected_by, AFF_HASTE) &&
+      !affected_by_spell(master, SPELL_HASTE))
+   {
       REMOVE_BIT(master->affected_by, AFF_HASTE);
-   send_to_char("Your limbs slow back to normal.\r\n", master);
+      send_to_char("Your limbs slow back to normal.\r\n", master);
+   }
    return eSUCCESS;
 }
 
@@ -1772,7 +1786,8 @@ int execute_song_vigilant_siren( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA
       if(!IS_SET(fvictim->follower->affected_by, AFF_GROUP))
          continue;
 
-      if(ch->in_room != fvictim->follower->in_room)
+      if(ch->in_room != fvictim->follower->in_room &&
+         IS_SET(fvictim->follower->affected_by2, AFF_ALERT))
       {
          REMOVE_BIT(fvictim->follower->affected_by2, AFF_ALERT);
          send_to_char("You stop watching your back so closely.\r\n", fvictim->follower);
@@ -1787,7 +1802,7 @@ int execute_song_vigilant_siren( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA
       SET_BIT(master->affected_by2, AFF_ALERT);
       send_to_char("You nervously watch your surroundings with magical speed!\r\n", master);
    }
-   else
+   else if(IS_SET(master->affected_by2, AFF_ALERT))
    {
       REMOVE_BIT(master->affected_by2, AFF_ALERT);
       send_to_char("You stop watching your back so closely.\r\n", fvictim->follower);
@@ -1820,12 +1835,16 @@ int intrp_vigilant_siren( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victi
 
    for(fvictim = master->followers; fvictim; fvictim = fvictim->next)
    {
-      REMOVE_BIT(fvictim->follower->affected_by2, AFF_ALERT);
-      send_to_char("You stop watching your back so closely.", fvictim->follower);
+      if(IS_SET(fvictim->follower->affected_by2, AFF_ALERT)) {
+         REMOVE_BIT(fvictim->follower->affected_by2, AFF_ALERT);
+         send_to_char("You stop watching your back so closely.", fvictim->follower);
+      }
    }
 
-   REMOVE_BIT(master->affected_by2, AFF_ALERT);
-   send_to_char("You stop watching your back so closely.\r\n", master);
+   if(IS_SET(master->affected_by2, AFF_ALERT)) {
+      REMOVE_BIT(master->affected_by2, AFF_ALERT);
+      send_to_char("You stop watching your back so closely.\r\n", master);
+   }
    return eSUCCESS;
 }
 
