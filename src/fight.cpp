@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.177 2004/05/03 22:58:17 urizen Exp $ */
+/* $Id: fight.cpp,v 1.178 2004/05/08 11:49:11 urizen Exp $ */
 
 extern "C"
 {
@@ -569,7 +569,7 @@ int do_lightning_shield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
   if(GET_POS(vict) == POSITION_DEAD)            return eFAILURE;
   if(GET_LEVEL(ch) >= IMMORTAL)                 return eFAILURE;
   if(!IS_AFFECTED(vict, AFF_LIGHTNINGSHIELD))   return eFAILURE;
-
+  dam = 15;
   if (IS_SET(race_info[(int)GET_RACE(ch)].immune, ISR_ENERGY)) {
     dam = 0;
   } else {
@@ -579,7 +579,7 @@ int do_lightning_shield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
       dam /= 2;
   }
       
-  dam /= 5;
+//  dam /= 5;
   GET_HIT(ch) -= dam;
   if(dam > 0) {
     act("Sparks from $N's $B$5lightning$R shield sting you.", ch, 0, vict, TO_CHAR, 0);
@@ -686,7 +686,7 @@ int do_acidshield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
   if(GET_POS(vict) == POSITION_DEAD)            return eFAILURE;
   if(!IS_NPC(ch) && GET_LEVEL(ch) >= IMMORTAL)  return eFAILURE;
   if(!affected_by_spell(vict, SPELL_ACID_SHIELD)) return eFAILURE;
-
+  dam = 20;
   if (IS_SET(race_info[(int)GET_RACE(ch)].immune, ISR_ACID))
     dam = 0;
   else {
@@ -1307,7 +1307,7 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
   { // Skill damages based on learned %
     int l = has_skill(ch,attacktype);
     if (l)
-    dam = dam_percent(l, dam);
+      dam = dam_percent(l, dam);
     dam = number(dam-(dam/10), dam+(dam/10)); // +- 10%
   }
   if(typeofdamage == DAMAGE_TYPE_MAGIC)  

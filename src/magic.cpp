@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.123 2004/05/07 22:55:05 urizen Exp $ */
+/* $Id: magic.cpp,v 1.124 2004/05/08 11:49:11 urizen Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -101,7 +101,8 @@ int spell_magic_missile(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
   int retval = eSUCCESS;
 
   set_cantquit( ch, victim );
-  dam = level;
+//  dam = level;
+  dam = 50;
   count += (skill > 15) + (skill > 35) + (skill > 55) + (skill > 75); 
 
   skill_increase_check(ch, SPELL_MAGIC_MISSILE, skill, SKILL_INCREASE_MEDIUM);
@@ -120,9 +121,9 @@ int spell_chill_touch(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 
   set_cantquit( ch, victim );
 
-  dam = dice(2,8) * level/2;
-
-  save = saves_spell(ch, victim, (level/2), SAVE_TYPE_COLD);
+//  dam = dice(2,8) * level/2;
+  dam = 250;
+//  save = saves_spell(ch, victim, (level/2), SAVE_TYPE_COLD);
   
   skill_increase_check(ch, SPELL_CHILL_TOUCH, skill, SKILL_INCREASE_MEDIUM);
 
@@ -149,7 +150,8 @@ int spell_burning_hands(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
 
   set_cantquit( ch, victim );
 
-  dam = dice(3,8) + level / 2 + skill / 10;
+//  dam = dice(3,8) + level / 2 + skill / 10;
+  dam = 125;
 //  save = saves_spell(ch, victim, 3, SAVE_TYPE_FIRE);
 
   // modify the damage by how much they resisted
@@ -165,7 +167,7 @@ int spell_shocking_grasp(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct ob
   int dam;
   int save;
 
-  dam = dice(4,8) + level / 2 + skill / 10;
+  dam = 125;
 //  save = saves_spell(ch, victim, 5, SAVE_TYPE_ENERGY);
 
   // modify the damage by how much they resisted
@@ -183,7 +185,8 @@ int spell_lightning_bolt(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct ob
 
   set_cantquit( ch, victim );
 
-  dam = (level + GET_INT(ch) + skill / 10) * 3;
+//  dam = (level + GET_INT(ch) + skill / 10) * 3;
+  dam = 200;
 //  save = saves_spell(ch, victim, 10, SAVE_TYPE_ENERGY);
 
   // modify the damage by how much they resisted
@@ -199,8 +202,8 @@ int spell_colour_spray(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
    int dam;
 
    set_cantquit( ch, victim );
-   dam = level * 4;
-
+//   dam = level * 4;
+   dam = 350;
    skill_increase_check(ch, SPELL_COLOUR_SPRAY, skill, SKILL_INCREASE_MEDIUM);
 
    int retval = spell_damage(ch, victim, dam, TYPE_MAGIC, SPELL_COLOUR_SPRAY, 0);
@@ -233,8 +236,8 @@ int spell_drown(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
    }
 
    set_cantquit( ch, victim );
-   dam = level * 4 + skill/5;
-
+//   dam = level * 4 + skill/5;
+  dam = 250;
    skill_increase_check(ch, SPELL_DROWN, skill, SKILL_INCREASE_MEDIUM);
 
    return spell_damage(ch, victim, dam, TYPE_WATER, SPELL_DROWN, 0);
@@ -289,7 +292,7 @@ int spell_energy_drain(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
 int spell_souldrain(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
    int dam, xp, mana;
-   level *= 2;
+//   level *= 2;
    set_cantquit( ch, victim );
 
    if(saves_spell(ch, victim, 1, SAVE_TYPE_MAGIC) < 0) {
@@ -297,23 +300,24 @@ int spell_souldrain(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
          return spell_damage(ch, victim, 100, TYPE_MAGIC, SPELL_SOULDRAIN, 0);
 	 }
       else {
-         xp = number(level>>1, level)*1000;
-         gain_exp(victim, -xp);
+//         xp = number(level>>1, level)*1000;
+//         gain_exp(victim, -xp);
 
-         dam = dice(1, 10);
+//         dam = dam_percent(skill,125);
 
-         mana = number(1, level);
+         mana = dam_percent(skill,125);
          if(mana > GET_MANA(victim))
             mana = GET_MANA(victim);
-         GET_MOVE(victim) >>= 1;
+    //     GET_MOVE(victim) >>= 1;
          GET_MANA(victim) -= mana;
 
-         GET_MANA(ch) += mana/2;
-         GET_HIT(ch) += dam;
-
+         GET_MANA(ch) += mana;
+  //       GET_HIT(ch) += dam;
+	 send_to_char("You drain their very soul!\r\n",ch);
          send_to_char("You feel your very soul being drained!\n\r", victim);
 
-         return spell_damage(ch, victim, dam, TYPE_MAGIC, SPELL_SOULDRAIN, 0);
+         return eSUCCESS;//spell_damage(ch, victim, dam, TYPE_MAGIC, 
+//SPELL_SOULDRAIN, 0);
          }
       } // ! saves spell
       
@@ -329,15 +333,17 @@ int spell_vampiric_touch (byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct o
 
   set_cantquit( ch, victim );
 
-  dam = dice((level / 2) , 15);
+//  dam = dice((level / 2) , 15);
 
+  dam = 200;
+  int adam = dam_percent(skill, 200); // Actual dam, for drainy purposes.
   skill_increase_check(ch, SPELL_VAMPIRIC_TOUCH, skill, SKILL_INCREASE_HARD);
 
   if(saves_spell(ch, victim, ( skill / 3 ), SAVE_TYPE_MAGIC) < 0) 
   {
-    if (GET_HIT(victim) < dam)
+    if (GET_HIT(victim) < adam)
        GET_HIT(ch) += GET_HIT(victim);
-    else GET_HIT(ch) += dam;
+    else GET_HIT(ch) += adam;
 
     if (GET_HIT(ch) > GET_MAX_HIT(ch))
        GET_HIT(ch) = GET_MAX_HIT(ch);
@@ -345,9 +351,10 @@ int spell_vampiric_touch (byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct o
     return spell_damage (ch, victim, dam,TYPE_ENERGY, SPELL_VAMPIRIC_TOUCH, 0);
   } else {
     dam >>= 1;
-    if (GET_HIT(victim) < dam)
+    adam >>= 1;
+    if (GET_HIT(victim) < adam)
        GET_HIT(ch) += GET_HIT(victim);
-    else GET_HIT(ch) += dam;
+    else GET_HIT(ch) += adam;
 
     if (GET_HIT(ch) > GET_MAX_HIT(ch))
        GET_HIT(ch) = GET_MAX_HIT(ch);
@@ -362,8 +369,8 @@ int spell_meteor_swarm(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
   int dam;
 
   set_cantquit( ch, victim );
-  dam = ((level * 2) + (GET_INT(ch) * 3)) * 3 + skill / 2;
-
+//  dam = ((level * 2) + (GET_INT(ch) * 3)) * 3 + skill / 2;
+  dam = 500;
   skill_increase_check(ch, SPELL_METEOR_SWARM, skill, SKILL_INCREASE_MEDIUM);
 
 //  int save = saves_spell(ch, victim, 50, SAVE_TYPE_MAGIC);
@@ -379,8 +386,8 @@ int spell_fireball(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data
    int dam;
 
    set_cantquit( ch, victim );
-   dam = ((level * 2) + GET_INT(ch)) * 2;
-
+//   dam = ((level * 2) + GET_INT(ch)) * 2;
+  dam = 300;
 //   int save = saves_spell(ch, victim, 25, SAVE_TYPE_FIRE);
 
    skill_increase_check(ch, SPELL_FIREBALL, skill, SKILL_INCREASE_MEDIUM);
@@ -614,8 +621,8 @@ int spell_earthquake(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
 
   skill_increase_check(ch, SPELL_EARTHQUAKE, skill, SKILL_INCREASE_MEDIUM);
 
-  dam =  dice(level,5) + skill / 2;
-
+//  dam =  dice(level,5) + skill / 2;
+  dam = 150;
   send_to_char("The earth trembles beneath your feet!\n\r", ch);
   act("$n makes the earth tremble and shiver.\n\rYou fall, and hit yourself!\n\r",
 		ch, 0, 0, TO_ROOM, 0);
@@ -654,14 +661,15 @@ int spell_life_leech(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
 		(!ARE_GROUPED(ch,tmp_victim)))
 	{
 
-		 dam = dice(8, 6);
-
+	//	 dam = dice(8, 6);
+		dam = 75;
+		int adam = dam_percent(skill,75);
 //		 if(saves_spell(ch, tmp_victim, 10, SAVE_TYPE_MAGIC) >= 0)
 //		    dam >>= 1;
 
-		 if (GET_HIT(tmp_victim) < dam)
+		 if (GET_HIT(tmp_victim) < adam)
 			  GET_HIT(ch) += GET_HIT(tmp_victim);
-		 else GET_HIT(ch) += dam;
+		 else GET_HIT(ch) += adam;
 
 
 		skill_increase_check(ch, SPELL_LIFE_LEECH, skill, SKILL_INCREASE_MEDIUM);
@@ -749,8 +757,8 @@ int spell_solar_gate(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
      if((orig_room == tmp_victim->in_room) && (tmp_victim != ch) &&
         (!ARE_GROUPED(ch,tmp_victim)) && (can_be_attacked(ch, tmp_victim)))
      {
-       dam = dice(level, 20) + skill;
-
+//       dam = dice(level, 20) + skill;
+       dam = 600;
        retval = spell_damage(ch, tmp_victim, dam,TYPE_MAGIC, SPELL_SOLAR_GATE, 0);
        if(IS_SET(retval, eCH_DIED))
 	 return retval;
@@ -771,7 +779,7 @@ int spell_solar_gate(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
              (!ARE_GROUPED(ch, tmp_victim)) &&
 	     (can_be_attacked(tmp_victim, tmp_victim)))
           {
-            dam = dice(level, 10) + skill/2;
+            dam = 300; //dice(level, 10) + skill/2;
             csendf(tmp_victim,"You are ENVELOPED in a PAINFUL BRIGHT LIGHT "
 	            " pouring in %s.\n\r", dirs[i]);
 
@@ -965,7 +973,7 @@ int spell_firestorm(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
 	 if ( (ch->in_room == tmp_victim->in_room) && (ch != tmp_victim) &&
 		(!ARE_GROUPED(ch,tmp_victim) )){
 
-	  dam = dice(level, 8) + 5 + skill / 2;
+	  dam = 250;
 	  retval = spell_damage(ch, tmp_victim, dam,TYPE_FIRE, SPELL_FIRESTORM, 0);
           if(IS_SET(retval, eCH_DIED))
             return retval;
@@ -997,6 +1005,7 @@ int spell_dispel_evil(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
   skill_increase_check(ch, SPELL_DISPEL_EVIL, skill, SKILL_INCREASE_MEDIUM);
 
   dam = dice(skill, 4);
+  dam = 225;
 //  int save = saves_spell(ch, victim, 25, SAVE_TYPE_MAGIC);
   //dam += (int) (dam * (save/100));
 
@@ -1020,7 +1029,8 @@ int spell_dispel_good(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 
   skill_increase_check(ch, SPELL_DISPEL_GOOD, skill, SKILL_INCREASE_MEDIUM);
 
-  dam = dice(skill,4);
+//  dam = dice(skill,4);
+  dam = 225;
 //  int save = saves_spell(ch, victim, 25, SAVE_TYPE_MAGIC);
   //dam += (int) (dam * (save/100));
 
@@ -1051,7 +1061,7 @@ int spell_harm(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *ob
 
   set_cantquit( ch, victim );
 
-  dam = 100;
+  dam = 150;
   skill_increase_check(ch, SPELL_HARM, skill, SKILL_INCREASE_MEDIUM);
 //  int save = saves_spell(ch, victim, skill / 2, SAVE_TYPE_MAGIC);
   //dam += (int) (dam * (save/100));
@@ -1066,7 +1076,8 @@ int spell_power_harm(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
   set_cantquit( ch, victim );
 
   skill_increase_check(ch, SPELL_POWER_HARM, skill, SKILL_INCREASE_MEDIUM);
-  dam = 100 + 4 * ( skill / 2 );
+//  dam = 100 + 4 * ( skill / 2 );
+   dam = 300;
 //  int save = saves_spell(ch, victim, skill / 2, SAVE_TYPE_MAGIC);
   //dam += (int) (dam * (save/100));
 
@@ -1422,8 +1433,8 @@ int spell_cure_critic(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 
   skill_increase_check(ch, SPELL_CURE_CRITIC, skill, SKILL_INCREASE_MEDIUM);
 
-  healpoints = dice(3,8)-6+skill;
-
+//  healpoints = dice(3,8)-6+skill;
+  healpoints = dam_percent(skill, 100);
   if ( (healpoints + GET_HIT(victim)) > hit_limit(victim) )
 	 GET_HIT(victim) = hit_limit(victim);
   else
@@ -1451,8 +1462,8 @@ int spell_cure_light(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
   }
 
   skill_increase_check(ch, SPELL_CURE_LIGHT, skill, SKILL_INCREASE_MEDIUM);
-  healpoints = dice(1,8)+(skill/3);
-
+//  healpoints = dice(1,8)+(skill/3);
+  healpoints = dam_percent(skill, 25);
   if ( (healpoints+GET_HIT(victim)) > hit_limit(victim) )
 	 GET_HIT(victim) = hit_limit(victim);
   else
@@ -1886,8 +1897,8 @@ int spell_heal(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *ob
   skill_increase_check(ch, SPELL_HEAL, skill, SKILL_INCREASE_MEDIUM);
 
   spell_cure_blind(level, ch, victim, obj, skill);
-
-  GET_HIT(victim) += 100 + 3 * (skill/2 + 5);
+  int healy = dam_percent(skill,250);
+  GET_HIT(victim) += healy;
 
   if (GET_HIT(victim) >= hit_limit(victim))
 	 GET_HIT(victim) = hit_limit(victim)-dice(1,4);
@@ -1914,8 +1925,8 @@ int spell_power_heal(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
   skill_increase_check(ch, SPELL_POWER_HEAL, skill, SKILL_INCREASE_MEDIUM);
 
   spell_cure_blind(level, ch, victim, obj, skill);
-
-  GET_HIT(victim) += 30 + skill * 3;
+  int healy = dam_percent(skill, 300);
+  GET_HIT(victim) += healy;
 
   if (GET_HIT(victim) >= hit_limit(victim))
 	 GET_HIT(victim) = hit_limit(victim)-dice(1,4);
@@ -4118,8 +4129,8 @@ int spell_cure_serious(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
 
   skill_increase_check(ch, SPELL_CURE_SERIOUS, skill, SKILL_INCREASE_MEDIUM);
 
-  healpoints = dice(2, 8) +(skill/2);
-
+//  healpoints = dice(2, 8) +(skill/2);
+  healpoints = dam_percent(skill,50);
   if ((healpoints + GET_HIT(victim)) > hit_limit(victim))
     GET_HIT(victim) = hit_limit(victim);
   else
@@ -4195,8 +4206,8 @@ int spell_flamestrike(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
    skill_increase_check(ch, SPELL_FLAMESTRIKE, skill, SKILL_INCREASE_MEDIUM);
       
    set_cantquit (ch, victim);
-   dam = dice(skill/2, 10);
-
+//   dam = dice(skill/2, 10);
+   dam = 350;
 //   if (saves_spell(ch, victim, 0, SAVE_TYPE_FIRE) >= 0)
   //    dam >>= 1;
 
@@ -4437,7 +4448,8 @@ int spell_acid_blast(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
 
    set_cantquit (ch, victim);
    skill_increase_check(ch, SPELL_ACID_BLAST, skill, SKILL_INCREASE_MEDIUM);
-   dam = dice(5 + skill/2, 12) + 5 + skill / 2;
+//   dam = dice(5 + skill/2, 12) + 5 + skill / 2;
+   dam = 400;
    return spell_damage(ch, victim, dam,TYPE_ACID, SPELL_ACID_BLAST, 0);
 }
 
@@ -4448,7 +4460,8 @@ int spell_hellstream(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
 
    set_cantquit (ch, victim);
    skill_increase_check(ch, SPELL_HELLSTREAM, skill, SKILL_INCREASE_MEDIUM);
-   dam = (((skill/2 * 5)-200) + (GET_INT(ch) * 4)) * 6 + (skill / 2);
+//   dam = (((skill/2 * 5)-200) + (GET_INT(ch) * 4)) * 6 + (skill / 2);
+  dam = 800;
    return spell_damage(ch, victim, dam,TYPE_FIRE, SPELL_HELLSTREAM, 0);
 }
 
@@ -7694,8 +7707,8 @@ int spell_bee_sting(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
    affected_type af;
    int i;
    set_cantquit(ch, victim);
-   dam = dice(2, 8) + skill/2;
-   
+//   dam = dice(2, 8) + skill/2;
+   dam = 30; 
 //   if (saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC) >= 0)
   //    dam >>= 1;
 
@@ -7752,7 +7765,8 @@ int cast_bee_swarm(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *vi
    int retval;
    CHAR_DATA *tmp_victim, *temp;
 
-   dam = dice(6+skill/2, 5);
+//   dam = dice(6+skill/2, 5);
+   dam = 150;
    skill_increase_check(ch, SPELL_BEE_SWARM, skill, SKILL_INCREASE_MEDIUM);
 
    act("$n Calls upon the insect world!\n\r", ch, 0, 0, TO_ROOM, INVIS_NULL);
@@ -7780,8 +7794,8 @@ int cast_creeping_death(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DAT
    affected_type af;
 
    set_cantquit(ch, victim);
-   dam = dice(6+skill/2, 19);
-
+//   dam = dice(6+skill/2, 19);
+  dam = 250;
 //   if (saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC) >= 0)
   //    dam >>= 1;
    
@@ -7876,9 +7890,9 @@ int cast_herb_lore(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *vi
   send_to_char("These herbs really do the trick!\n\r", ch);
   send_to_char("You feel much better!\n\r", victim);
   if(OUTSIDE(ch))
-    GET_HIT(victim) += skill + 60;
+    GET_HIT(victim) += dam_percent(skill,80);
   else /* if not outside */
-    GET_HIT(victim) += 30 + skill/2;
+    GET_HIT(victim) += dam_percent(skill,180);
 
   if (GET_HIT(victim) >= hit_limit(victim))
     GET_HIT(victim) = hit_limit(victim)-dice(1,4);
@@ -8774,7 +8788,7 @@ int spell_sun_ray(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data 
 
   set_cantquit( ch, victim );
 
-  dam = MIN((int)GET_MANA(ch), 600);
+  dam = MIN((int)GET_MANA(ch), 750);
 
   if (OUTSIDE(ch) && (weather_info.sky <= SKY_CLOUDY)) {
 

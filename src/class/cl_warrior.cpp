@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.18 2004/04/28 22:05:47 urizen Exp $
+| $Id: cl_warrior.cpp,v 1.19 2004/05/08 11:49:14 urizen Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -78,7 +78,8 @@ int do_kick(struct char_data *ch, char *argument, int cmd)
         dam = 0;
 	retval = damage(ch, victim, 0,TYPE_UNDEFINED, SKILL_KICK, 0);
     } else {
-        dam = GET_LEVEL(ch) * 4;
+//        dam = GET_LEVEL(ch) * 4;
+	dam = 150;
         if(specialized)
           dam = (int)(dam*1.5);
 	retval = damage(ch, victim, dam, TYPE_UNDEFINED, SKILL_KICK, 0);

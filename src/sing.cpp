@@ -673,15 +673,15 @@ int song_whistle_sharp( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim,
    int combat, non_combat;
    get_instrument_bonus(ch, combat, non_combat);
 
-   dam = GET_LEVEL(ch) + GET_INT(ch) + combat;
-
+//   dam = GET_LEVEL(ch) + GET_INT(ch) + combat;
+   dam = 80;
    act("You send a sharp piercing whistle at $N.", ch, 0, victim, TO_CHAR, 0);
    act("$n whistles a sharp tune that ravages your ear drums and pierces you to the bone!", 
        ch, 0, victim, TO_VICT, 0);
    act("$n whistles a super-high note at $N and blood drips from $S ears!",
        ch, 0, victim, TO_ROOM, NOTVICT);
 
-   retval = damage(ch, victim, dam, 0, TYPE_SONG, 0);
+   retval = damage(ch, victim, dam, TYPE_SONG,SKILL_SONG_WHISTLE_SHARP, 0);
    if(IS_SET(retval, eCH_DIED))
       return retval;
 
@@ -874,13 +874,13 @@ int execute_song_terrible_clef( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA 
    int combat, non_combat;
    get_instrument_bonus(ch, combat, non_combat);
 
-   dam = GET_LEVEL(ch) * 4 + GET_WIS(ch) * 2 + combat*2;
-
+//   dam = GET_LEVEL(ch) * 4 + GET_WIS(ch) * 2 + combat*2;
+   dam = 250;
    send_to_char("Your singing hurts your opponent!\r\n", ch);
    act("$n's singing causes pain in $N's ears!\r\n", ch, 0, victim, TO_ROOM, NOTVICT);
    send_to_char("The music!  It hurts!  It hurts!\r\n", victim);
 
-   retval = damage(ch, victim, dam, 0, TYPE_SONG, 0);
+   retval = damage(ch, victim, dam, TYPE_SONG,SKILL_SONG_TERRIBLE_CLEF, 0);
    if(IS_SET(retval, eCH_DIED))
      return retval;
    if(IS_SET(retval, eVICT_DIED))

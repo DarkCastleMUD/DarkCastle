@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.19 2004/05/02 21:22:56 urizen Exp $ */
+/* $Id: ki.cpp,v 1.20 2004/05/08 11:49:11 urizen Exp $ */
 
 extern "C"
 {
@@ -462,7 +462,7 @@ int ki_blast( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
 		  TO_CHAR, 0);
 		act("$n blasts you across the room!", ch, 0, vict, TO_VICT, 0);
 //		GET_HIT(vict) -= number(1,4) * GET_LEVEL(ch);
-		damage(ch,vict,number(1,4) * GET_LEVEL(ch), TYPE_UNDEFINED,KI_OFFSET+KI_BLAST,0);
+		damage(ch,vict,100, TYPE_KI,KI_OFFSET+KI_BLAST,0);
 		if(!vict->fighting && IS_NPC(vict))
 			return attack(vict, ch, TYPE_UNDEFINED);
 		return 1;
@@ -549,7 +549,7 @@ int ki_storm( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
   int retval;
   CHAR_DATA *tmp_victim, *temp;
 
-  dam =  dice(level,3)+level;
+  dam =  150;//dice(level,3)+level;
 
   send_to_char("Your wholeness of spirit purges the souls of those around you!\n\r", ch);
   act("$n's eyes flash as $e pools the energy within $m!\n\rA burst of energy slams into you!\r\n",
@@ -561,8 +561,8 @@ int ki_storm( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
 	 if ( (ch->in_room == tmp_victim->in_room) && (ch != tmp_victim) &&
 		(!ARE_GROUPED(ch,tmp_victim))) 
          {
-                  retval = spell_damage(ch, tmp_victim, dam, TYPE_MAGIC,
-		              SPELL_EARTHQUAKE, 0);
+                  retval = spell_damage(ch, tmp_victim, dam, TYPE_KI,
+		              KI_OFFSET+KI_STORM, 0);
                   if(IS_SET(retval, eCH_DIED))
                     return retval;
 	 } else

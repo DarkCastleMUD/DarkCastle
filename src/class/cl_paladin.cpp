@@ -110,7 +110,7 @@ int do_harmtouch(struct char_data *ch, char *argument, int cmd)
      send_to_char("Your god refuses you.\r\n", ch);
    }
    else {
-     dam = 15 * GET_LEVEL(ch);
+     dam = 750;
      retval = damage(ch, victim, dam, TYPE_UNDEFINED, SKILL_HARM_TOUCH, 0);
    }
    if(IS_SET(retval, eVICT_DIED) && !IS_SET(retval, eCH_DIED)) {

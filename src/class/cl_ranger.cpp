@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: cl_ranger.cpp,v 1.34 2004/04/28 08:07:15 urizen Exp $ | cl_ranger.C  *
+ * $Id: cl_ranger.cpp,v 1.35 2004/05/08 11:49:14 urizen Exp $ | cl_ranger.C  *
  * Description: Ranger skills/spells                                          *
  *                                                                            *
  * Revision History                                                           *
@@ -470,7 +470,7 @@ int ambush(CHAR_DATA *ch)
          act("$n ambushes $N in a brilliant surprise attack!", i, 0, ch, TO_ROOM, NOTVICT);
          act("$n ambushes you as you enter the room!", i, 0, ch, TO_VICT, 0);
          act("You ambush $N with a brilliant surprise attack!", i, 0, ch, TO_CHAR, 0);
-         retval = damage(i, ch, GET_LEVEL(i) * 10, TYPE_UNDEFINED, TYPE_UNDEFINED, 0); 
+         retval = damage(i, ch, GET_LEVEL(i) * 10, TYPE_HIT, SKILL_AMBUSH, 0); 
          if(IS_SET(retval, eVICT_DIED))
            return (eSUCCESS|eCH_DIED);  // ch = damage vict
          if(IS_SET(retval, eCH_DIED))
