@@ -14,7 +14,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.h,v 1.10 2002/08/04 16:48:37 pirahna Exp $ */
+/* $Id: spells.h,v 1.11 2002/08/13 19:39:15 pirahna Exp $ */
 #include <structs.h> // byte, sh_int
 
 #define MAX_BUF_LENGTH               240
@@ -302,6 +302,11 @@
 // make sure up you update bestowable_god_commands_type bestowable_god_commands[]
 // if you modify this command list any
 
+
+#define SKILL_TRADE_BASE             700
+#define SKILL_TRADE_POISON           700
+#define SKILL_TRADE_MAX              700
+// make sure you update tradeskills[] in combinables.cpp if you add to this
 
 
 #define SKILL_RECALL                 800
