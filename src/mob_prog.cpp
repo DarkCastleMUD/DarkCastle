@@ -2049,7 +2049,7 @@ int mprog_fight_trigger( CHAR_DATA *mob, CHAR_DATA *ch )
 {
 
  if ( IS_NPC( mob )
- && MOB_WAIT_STATE(ch) <= 0
+ && MOB_WAIT_STATE(mob) <= 0
      && ( mob_index[mob->mobdata->nr].progtypes & FIGHT_PROG ) )
    mprog_percent_check( mob, ch, NULL, NULL, FIGHT_PROG );
 
@@ -2132,7 +2132,9 @@ int mprog_hitprcnt_trigger( CHAR_DATA *mob, CHAR_DATA *ch)
  MPROG_DATA *next;
   bool done = FALSE;
  if ( IS_NPC( mob )
-     && ( mob_index[mob->mobdata->nr].progtypes & HITPRCNT_PROG ) )
+ 	&& MOB_WAIT_STATE(mob) <= 0
+      && ( 
+mob_index[mob->mobdata->nr].progtypes & HITPRCNT_PROG ) )
   {
  mprg = mob_index[mob->mobdata->nr].mobprogs;
  if (!mprg) { done = TRUE; mprg = mob_index[mob->mobdata->nr].mobspec; }
