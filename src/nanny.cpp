@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.64 2004/05/31 00:25:02 urizen Exp $ */
+/* $Id: nanny.cpp,v 1.65 2004/05/31 17:09:42 urizen Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -565,7 +565,10 @@ void nanny(struct descriptor_data *d, char *arg)
 
       if(more_than_ten_people_from_this_ip(d))
         break;
-
+       if (wizlock)
+	{
+	 SEND_TO_Q("The game is current WIZLOCKED for maintenance(RAM upgrades!). It will open up again Midnight EST.\r\n",d);
+	}
       SEND_TO_Q("What name for the roster? ", d);
       STATE(d) = CON_GET_NAME;
 
