@@ -199,7 +199,7 @@ int do_sqedit(struct char_data *ch, char *argument, int cmd)
   {
     case 0:
        struct skill_quest *newOne;
-	int i;
+///	int i;
         if (arg3[0] != '\0')
 	  i = find_skill_num(arg3);
 	else
