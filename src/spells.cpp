@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.74 2004/05/12 18:21:42 urizen Exp $ */
+/* $Id: spells.cpp,v 1.75 2004/05/13 20:20:18 urizen Exp $ */
 
 extern "C"
 {
@@ -1482,46 +1482,102 @@ int skill_value(CHAR_DATA *ch, int skillnum, int min = 33)
   return 0;
 }
 
+int stat_mod [] = {
+0,-5,-5,-4,-4,-3,-3,-2,-2,-1,-1,
+0,0,0,1,1,2,2,3,3,4,4,5,5,6,6,7,
+7,8,9,10
+};
+
 int skill_success(CHAR_DATA *ch, CHAR_DATA *victim, int skillnum, int min = 33)
 {
+//  extern int stat_mod[];
   int modifier = 0;
   extern class_skill_defines *get_skill_list(char_data *ch);
   extern int get_stat(CHAR_DATA *ch, int stat);
   struct class_skill_defines *t;
+  int stat=0;
   switch (skillnum)
   {
      case SKILL_AMBUSH:
+       stat = INT;
+	break;
      case SKILL_KICK:
+	stat = DEX;
+	break;
      case SKILL_BASH:
+	stat = STR;
+	break;
      case SKILL_RAGE:
+	stat = CON;
+	break;
      case SKILL_BERSERK:
+	stat = STR;
+	break;
      case KI_OFFSET+KI_PUNCH:
+	stat = DEX;
+	break;
+     case KI_OFFSET+KI_DISRUPT:
+	stat = INT;
+	break;
+     case SKILL_DISARM:
+	stat = DEX;
+	break;
+     case SKILL_TRACK:
+	stat = WIS;
+	break;
+     case SKILL_BULLRUSH:
+	stat = STR;
+	break;
+     case SKILL_SHOCK:
+	stat = CON;
+	break;
+     case SKILL_HITALL:
+	stat = STR;
+	break;
+     case SKILL_STUN:
+	stat = DEX;
+	break;
+     case SKILL_DEATHSTROKE:
+	stat = STR;
+	break;
      case SKILL_QUIVERING_PALM:
+	stat = STR;
+	break;
      case SKILL_EAGLE_CLAW:
+	stat = STR;
+	break;
      case SKILL_BACKSTAB:
+	stat = DEX;
+	break;
      case SKILL_DUAL_BACKSTAB:
+	stat = DEX;
+	break;
      case SKILL_CIRCLE:
+	stat = DEX;
+	break;
      case SKILL_TRIP:
+	stat = DEX;
+	break;
      case SKILL_STEAL:
+	stat = DEX;
+	break;
      case SKILL_POCKET:
+	stat = INT;
+	break;
      case SKILL_STALK:
-     case SKILL_EYEGOUGE: // These are affected by other plrs stats.
+	stat = CON;
+	break;
+     case SKILL_EYEGOUGE: 
+	stat = CON;
+	break;
+       }
+  int i = has_skill(ch, skillnum);
+    if (stat && victim) {
        if (!victim) // Bail, skill would probably crash anyway
 		// 'cause it needs a victim.
 	 return FALSE; 
-       t = get_skill_list(ch);
-       if (!t) return FALSE; // wtf?
-       int i;
-       for (i = 0; *t[i].skillname != '\n'; i++)
-       {
-	 if (t[i].skillnum == skillnum)
-	  break;
-       }
-      if (t[i].skillnum != skillnum) break;
-      int stat = get_stat(victim, t[i].attrs[0]);
-      break; // NOTDONE
+	i -= stat_mod[get_stat(victim,stat)];
   }
-  int i = has_skill(ch, skillnum);
   if (i < number(1,101))
     return TRUE; // Success
   else
