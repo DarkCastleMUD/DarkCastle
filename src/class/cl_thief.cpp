@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.57 2004/05/22 20:00:55 urizen Exp $
+| $Id: cl_thief.cpp,v 1.58 2004/05/24 16:07:56 urizen Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -180,8 +180,9 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
   
   WAIT_STATE(ch, PULSE_VIOLENCE);
   
-  int itemp = number(1, MAX_MORTAL);
-
+  int itemp = number(1, 101);
+  if (GET_CLASS(ch) == CLASS_ANTI_PAL)
+    itemp++; // One extra %'s chance.
   if(has_skill(ch,SKILL_BACKSTAB)) 
   {
     skill_increase_check(ch, SKILL_BACKSTAB, skill, SKILL_INCREASE_MEDIUM);
@@ -204,7 +205,7 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
             || IS_NPC(victim)
           ) 
           && (GET_LEVEL(victim) <= GET_LEVEL(ch) + 5) 
-          && ((!IS_NPC(ch) && GET_LEVEL(ch) >= IMMORTAL) || itemp > 46 || 
+          && ((!IS_NPC(ch) && GET_LEVEL(ch) >= IMMORTAL) || itemp > 96 || 
                ( !IS_NPC(victim) && IS_SET(victim->pcdata->punish, PUNISH_UNLUCKY) )
              )
          ) 

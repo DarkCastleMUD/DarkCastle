@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.139 2004/05/21 18:31:45 urizen Exp $ */
+/* $Id: magic.cpp,v 1.140 2004/05/24 16:07:54 urizen Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -8565,7 +8565,7 @@ int cast_create_golem( byte level, CHAR_DATA *ch, char *arg, int type,
   return eFAILURE;
 }*/
 
-
+/*
 int spell_release_golem(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *victim, struct obj_data * tar_obj, int skill)
 {
    // CHAR_DATA *tmp_vict;
@@ -8593,7 +8593,7 @@ int spell_release_golem(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DAT
    fight_kill(ch, temp->follower, TYPE_RAW_KILL);   
    return eSUCCESS;
 }
-
+*/
 int spell_beacon(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *victim, struct obj_data * tar_obj, int skill)
 {
 //   extern int top_of_world;

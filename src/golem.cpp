@@ -28,6 +28,7 @@ void advance_golem_level(CHAR_DATA *golem);
 
 // db.cpp
 extern struct index_data *obj_index;
+extern struct index_data *mob_index;
 
 // save.cpp
 int store_worn_eq(char_data * ch, FILE * fpsave);
@@ -158,6 +159,7 @@ void advance_golem_level(CHAR_DATA *golem)
   golem->hitroll += golem_list[golemtype].hit / 20;
   golem->damroll += golem_list[golemtype].dam / 20;
   golem->armor += golem_list[golemtype].ac / 20;
+  golem->exp = 0;
 }
 
 void set_golem(CHAR_DATA *golem, int golemtype)
@@ -395,5 +397,19 @@ int do_golem_score(struct char_data *ch, char *argument, int cmd)
          "($5:$7)========================================================================($5:$7)\n\r", master);
    }
    return eSUCCESS;
+}
+
+int spell_release_golem(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill)
+{
+  struct follow_type *fol;
+  for (fol = ch->followers; fol; fol = fol->next)
+    if (IS_NPC(fol->follower) && mob_index[fol->follower->mobdata->nr].virt == 8)
+    {
+      act("$n shatters!", fol->follower, 0, 0, TO_ROOM, 0);
+      extract_char(fol->follower, FALSE);
+      return eSUCCESS;
+    }
+  send_to_char("You don't have a golem.\r\n",ch);
+  return eSUCCESS;
 }
 
