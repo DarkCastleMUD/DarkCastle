@@ -268,9 +268,7 @@ void assign_non_combat_procs() {
     assign_one_mob_non(10011,  skill_master);
     assign_one_mob_non(10012,  guild_guard);
     assign_one_mob_non(10013,  guild);
-    assign_one_mob_non(14517,  guild); // local warrior teaches 'bash'
     assign_one_mob_non(14537, apiary_worker);
-    assign_one_mob_non(16006,  guild);  // chief of mountain trail guard teaches 'frenzy'
     assign_one_mob_non(17604,  alakarbodyguard);
     assign_one_mob_non(17605,  alakarbodyguard);
     assign_one_mob_non(17606,  alakarbodyguard);

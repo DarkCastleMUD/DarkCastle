@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.11 2002/08/03 01:34:41 pirahna Exp $
+| $Id: objects.cpp,v 1.12 2002/08/03 07:30:29 pirahna Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -302,7 +302,7 @@ int do_recite(struct char_data *ch, char *argument, int cmd)
       {
         retval = ((*spell_info[scroll->obj_flags.value[i]].spell_pointer)
           ((byte) scroll->obj_flags.value[0], ch, "", SPELL_TYPE_SCROLL, victim, obj, 0));
-        if(IS_SET(retval, eCH_DIED))
+        if(SOMEONE_DIED(retval))
           break;
       }
 
