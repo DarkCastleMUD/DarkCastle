@@ -21,7 +21,7 @@
  *  12/08/2003   Onager    Added check for charmies and !charmie eq to     *
  *                         equip_char()                                    *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.36 2004/04/20 22:45:14 urizen Exp $ */
+/* $Id: handler.cpp,v 1.37 2004/04/22 18:32:20 urizen Exp $ */
     
 extern "C"
 {
@@ -330,14 +330,17 @@ void check_weapon_weights(char_data * ch)
 
   // make sure we're still strong enough to wield our weapons
   if(!IS_MOB(ch) && ch->equipment[WIELD] &&
-       GET_OBJ_WEIGHT(ch->equipment[WIELD]) > str_app[STRENGTH_APPLY_INDEX(ch)].wield_w)
+       GET_OBJ_WEIGHT(ch->equipment[WIELD]) > 
+str_app[STRENGTH_APPLY_INDEX(ch)].wield_w && !IS_SET(ch->affected_by2, AFF_POWERWIELD))
   {
     act("Being too heavy to wield, you move your $p to your inventory.",
          ch, ch->equipment[WIELD], 0, TO_CHAR, 0);
     act("$n stops using $p.", ch, ch->equipment[WIELD], 0, TO_ROOM, INVIS_NULL);
     obj_to_char(unequip_char(ch, WIELD), ch);
-    if(ch->equipment[SECOND_WIELD] &&
-         GET_OBJ_WEIGHT(ch->equipment[SECOND_WIELD]) <= (str_app[STRENGTH_APPLY_INDEX(ch)].wield_w/2))
+    if(ch->equipment[SECOND_WIELD] && (
+         GET_OBJ_WEIGHT(ch->equipment[SECOND_WIELD]) <= 
+(str_app[STRENGTH_APPLY_INDEX(ch)].wield_w/2 || !IS_SET(ch->affected_by2, 
+AFF_POWERWIELD))))
     {
       act("You move your $p to be your primary weapon.", ch, ch->equipment[SECOND_WIELD], 0, TO_CHAR, INVIS_NULL);
       act("$n moves $s $p to be $s primary weapon.", ch, ch->equipment[SECOND_WIELD], 0, TO_ROOM, INVIS_NULL);
@@ -347,7 +350,7 @@ void check_weapon_weights(char_data * ch)
   }
 
   if(ch->equipment[SECOND_WIELD] &&
-       GET_OBJ_WEIGHT(ch->equipment[SECOND_WIELD]) > (str_app[STRENGTH_APPLY_INDEX(ch)].wield_w/2))
+       GET_OBJ_WEIGHT(ch->equipment[SECOND_WIELD]) > (str_app[STRENGTH_APPLY_INDEX(ch)].wield_w/2) && !IS_SET(ch->affected_by2, AFF_POWERWIELD))
   {
     act("Being too heavy to wield, you move your $p to your inventory.",
          ch, ch->equipment[SECOND_WIELD], 0, TO_CHAR, 0);
@@ -1085,7 +1088,7 @@ void affect_join( CHAR_DATA *ch, struct affected_type *af,
 	    if (avg_mod)
 		af->modifier /= 2;
 
-	    affect_remove(ch, hjp, SUPPRESS_ALL);
+	    affect_remove(ch, hjp, SUPPRESS_ALL,isaff2(af->type));
 	    affect_to_char(ch, af);
 	    found = TRUE;
 	}
@@ -2233,7 +2236,7 @@ void extract_char(CHAR_DATA *ch, bool pull)
 
     // remove any and all affects from the character
     while(ch->affected)
-      affect_remove(ch, ch->affected, SUPPRESS_ALL);
+      affect_remove(ch, ch->affected, SUPPRESS_ALL,isaff2(ch->affected->type));
 
     /* Must remove from room before removing the equipment! */
     was_in = ch->in_room;

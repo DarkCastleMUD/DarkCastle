@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.13 2004/04/22 16:52:40 urizen Exp $ */
+/* $Id: ki.cpp,v 1.14 2004/04/22 18:32:20 urizen Exp $ */
 
 extern "C"
 {
@@ -52,7 +52,7 @@ struct ki_info_type ki_info [ ] = {
 
 { /* 2 */
 	12, POSITION_STANDING, 2,
-	TAR_CHAR_ROOM|TAR_SELF_ONLY, ki_sense
+	TAR_IGNORE|TAR_CHAR_ROOM|TAR_SELF_ONLY, ki_sense
 },
 
 { /* 3 */
@@ -62,12 +62,12 @@ struct ki_info_type ki_info [ ] = {
 
 { /* 4 */
         12, POSITION_STANDING, 25,
-        TAR_CHAR_ROOM|TAR_SELF_ONLY, ki_speed
+        TAR_IGNORE|TAR_CHAR_ROOM|TAR_SELF_ONLY, ki_speed
 },
 
 { /* 5 */
         12, POSITION_RESTING, 4,
-        TAR_CHAR_ROOM|TAR_SELF_ONLY, ki_purify
+        TAR_IGNORE|TAR_CHAR_ROOM|TAR_SELF_ONLY, ki_purify
 },
 
 { /* 6 */
@@ -147,7 +147,8 @@ int do_ki(CHAR_DATA *ch, char *argument, int cmd)
     return eFAILURE;
   }
   
-   if (((IS_SET(world[ch->in_room].room_flags, SAFE)) && (GET_LEVEL(ch) < IMP)) && !(spl == 3 || spl==5||spl==7||spl==9)) {
+   if (((IS_SET(world[ch->in_room].room_flags, SAFE)) && (GET_LEVEL(ch) < IMP)) 
+&& spl != 2 && spl!=4 && spl!=5 && spl!=7 && spl!=8) {
       send_to_char("You feel at peace, calm, relaxed, one with yourself and "
                    "the universe.\n\r", ch);
       return eFAILURE;

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.40 2004/04/22 08:24:41 urizen Exp $
+| $Id: cl_thief.cpp,v 1.41 2004/04/22 18:32:23 urizen Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -1067,7 +1067,7 @@ int do_pocket(CHAR_DATA *ch, char *argument, int cmd)
     percent = 101; /* Failure */
 
   if(learned)
-    chance = 75;
+    chance = learned;
   else chance = 0;
 
   if(learned)
