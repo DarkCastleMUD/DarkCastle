@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.119 2004/04/28 07:37:40 urizen Exp $ */
+/* $Id: magic.cpp,v 1.120 2004/04/29 22:44:02 urizen Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -1444,6 +1444,10 @@ int spell_cure_light(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
   update_pos( victim );
 
   send_to_char("You feel better!\n\r", victim);
+  if (ch!=victim)
+  {
+     send_to_char("They look healthier.\r\n",ch);
+  }
   return eSUCCESS;
 }
 

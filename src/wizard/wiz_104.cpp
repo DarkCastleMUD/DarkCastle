@@ -782,7 +782,7 @@ int do_show(struct char_data *ch, char *argument, int cmd)
   else if (is_abbrev(type, "msearch") && has_range)
   {  // Mobile search.
     char arg1[MAX_STRING_LENGTH];
-    int act = 0, clas = 0, levlow = 0, levhigh = 0, affect = 0, immune = 0, race = 0, align = 0;
+    int act = 0, clas = 0, levlow = -555, levhigh = -555, affect = 0, immune = 0, race = 0, align = 0;
     extern char *action_bits[];
     extern struct race_shit race_info[];
     extern char *isr_bits[];
@@ -840,7 +840,7 @@ int do_show(struct char_data *ch, char *argument, int cmd)
 	  argument = one_argument(argument,arg1);
 	  if (is_number(arg1))
 	    levhigh = atoi(arg1);
-	  if (!levhigh || !levlow)
+	  if (levhigh ==-555 || levlow==-555)
 	  {
 	    send_to_char("Incorrect level requirement.\r\n",ch);
 	    return eFAILURE;
@@ -948,10 +948,10 @@ int do_show(struct char_data *ch, char *argument, int cmd)
       if (clas)
         if (((struct char_data *)(mob_index[nr].item))->c_class != clas)
           continue;
-      if (levlow)
+      if (levlow!=-555)
 	if (((struct char_data *)(mob_index[nr].item))->level < levlow)
 	  continue;
-      if (levhigh)
+      if (levhigh!=-555)
 	if (((struct char_data *)(mob_index[nr].item))->level > levhigh)
 	  continue;
       if(act)
@@ -981,8 +981,8 @@ char_data *)(mob_index[nr].item))->level,
   else if (is_abbrev(type, "search") && has_range)
   {  // Object search.
     char arg1[MAX_STRING_LENGTH];
-    int affect = 0, size = 0, extra = 0, more = 0, wear = 0,type =0;
-    int levlow = 0, levhigh = 0,dam = 0,lweight = 0, hweight = 0;
+    int affect = -555, size =-555, extra = -555, more = -555, wear = -555,type =-555;
+    int levlow = -555, levhigh = -555,dam = -555,lweight = -555, hweight = -555;
     extern char *wear_bits[];
     extern char *extra_bits[];
     extern char *more_obj_bits[];
@@ -1051,7 +1051,7 @@ char_data *)(mob_index[nr].item))->level,
          if (is_number(arg1))
            levhigh = atoi(arg1);
 
-         if (!levhigh || !levlow)
+         if (levhigh == -555 || levlow == -555)
          {
            send_to_char("Incorrect level requirement.\r\n",ch);
            return eFAILURE;
@@ -1067,7 +1067,7 @@ char_data *)(mob_index[nr].item))->level,
          if (is_number(arg1))
            hweight = atoi(arg1);
 
-         if (!lweight || !hweight)
+         if (lweight == -555 || hweight == -555)
          {
            send_to_char("Incorrect weight requirement.\r\n",ch);
            return eFAILURE;
@@ -1167,42 +1167,42 @@ char_data *)(mob_index[nr].item))->level,
        found = FALSE;
       if ((nr = real_object(c)) < 0)
            continue;
-      if(wear)
+      if(wear!=-555)
 	for (i = 0; i < 20; i++)
 	  if (IS_SET(wear, 1 << i))
       if (!IS_SET(((struct obj_data *)(obj_index[nr].item))->obj_flags.wear_flags, 1<<i))
 	goto endLoop;
-	if (type)
+	if (type!=-555)
 	  if (((struct obj_data *)(obj_index[nr].item))->obj_flags.type_flag != type)
 	    continue;
-     if (lweight)
+     if (lweight!=-555)
       if (((struct obj_data *)(obj_index[nr].item))->obj_flags.weight < lweight)
          continue;
-     if (hweight)
+     if (hweight!=-555)
       if (((struct obj_data *)(obj_index[nr].item))->obj_flags.weight > hweight)
          continue;
 
-     if (levhigh)
+     if (levhigh!=-555)
       if (((struct obj_data *)(obj_index[nr].item))->obj_flags.eq_level > levhigh)
          continue;
-     if (levlow)
+     if (levlow!=-555)
       if (((struct obj_data *)(obj_index[nr].item))->obj_flags.eq_level < levlow)
          continue;
-      if (size)
+      if (size!=-555)
        for (i = 0; i < 10; i++)
 	if (IS_SET(size, 1<<i))
       if (!IS_SET(((struct obj_data *)(obj_index[nr].item))->obj_flags.size, 1<<i))
 	goto endLoop;
 int get_weapon_damage_type(struct obj_data * wielded);
 its = get_weapon_damage_type(((struct obj_data *)(obj_index[nr].item)));
-     if (dam && dam != (its-1000))
+     if (dam!=-555 && dam && dam != (its-1000))
   	  continue;
-      if(extra)
+      if(extra!=-555)
         for (i = 0; i < 30; i++)
 	  if (IS_SET(extra,1<<i))
       if (!IS_SET(((struct obj_data *)(obj_index[nr].item))->obj_flags.extra_flags, 1<<i))
 	goto endLoop;
-      if (more)
+      if (more!=-555)
 	for (i = 0; i < 10; i++)
 	  if (IS_SET(more,1<<i))
       if (!IS_SET(((struct obj_data *)(obj_index[nr].item))->obj_flags.more_flags, 1<<i))
@@ -1212,7 +1212,7 @@ its = get_weapon_damage_type(((struct obj_data *)(obj_index[nr].item)));
       for (aff = 0; aff < ((struct obj_data *)(obj_index[nr].item))->num_affects;aff++)
 	 if (affect== ((struct obj_data *)(obj_index[nr].item))->affected[aff].location)
 	   found = TRUE;
-     if (affect)
+     if (affect!=-555)
         if (!found)
           continue;
       count++;

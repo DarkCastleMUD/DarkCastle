@@ -14,7 +14,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.h,v 1.44 2004/04/25 21:19:56 urizen Exp $ */
+/* $Id: spells.h,v 1.45 2004/04/29 22:44:05 urizen Exp $ */
 #include <structs.h> // byte, sh_int
 
 #define MAX_BUF_LENGTH               240
@@ -33,6 +33,7 @@ struct skill_quest
 };
 
 int dam_percent(int learned, int damage);
+void check_maxes(CHAR_DATA *ch);
 /*
  * Spell numbers are well known.
  * They appear in tinyworld files attached to magical items.

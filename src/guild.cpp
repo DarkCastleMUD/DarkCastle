@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.24 2004/04/27 19:50:17 urizen Exp $
+| $Id: guild.cpp,v 1.25 2004/04/29 22:44:02 urizen Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -512,4 +512,74 @@ void skill_increase_check(char_data * ch, int skill, int learned, int difficulty
    // increase the skill by one
    learn_skill(ch, skill, 1, maximum);
    csendf(ch, "You feel more competent in your %s ability.\r\n", skillname);
+}
+
+int get_max(CHAR_DATA *ch, int skill)
+{
+   int maximum;
+   class_skill_defines * skilllist = get_skill_list(ch);
+   if(!skilllist)
+     return -1;  // class has no skills by default
+   maximum = 0;
+   int i;
+   for(i = 0; *skilllist[i].skillname != '\n'; i++)
+     if(skilllist[i].skillnum == skill)
+     {
+       maximum = skilllist[i].maximum;
+       break;
+     }
+   int percent = 75;
+   if (skilllist[i].attrs[0])
+   {
+        int thing = get_stat(ch,skilllist[i].attrs[0])-20;
+        if (thing > 0)
+        percent += (get_stat(ch,skilllist[i].attrs[0])-20)*2;
+   }
+   if (skilllist[i].attrs[1])
+   {
+        int thing = get_stat(ch,skilllist[i].attrs[1])-20;
+        if (thing > 0)
+        percent += (get_stat(ch,skilllist[i].attrs[1])-20);
+   }
+   int to = (int)((float)maximum*(float)((float)percent/100.0));
+   return to;
+}
+
+void check_maxes(CHAR_DATA *ch)
+{
+   int maximum;
+   class_skill_defines * skilllist = get_skill_list(ch);
+   if(!skilllist)
+     return;  // class has no skills by default
+   maximum = 0;
+   int i;
+   for(i = 0; *skilllist[i].skillname != '\n'; i++)
+     {
+       maximum = skilllist[i].maximum;
+       int percent = 75;
+       if (skilllist[i].attrs[0])
+       {
+            int thing = get_stat(ch,skilllist[i].attrs[0])-20;
+            if (thing > 0)
+            percent += (get_stat(ch,skilllist[i].attrs[0])-20)*2;
+       }
+       if (skilllist[i].attrs[1])
+       {
+            int thing = get_stat(ch,skilllist[i].attrs[1])-20;
+            if (thing > 0)
+            percent += (get_stat(ch,skilllist[i].attrs[1])-20);
+       }
+       int to = (int)((float)maximum*(float)((float)percent/100.0));
+       if (has_skill(ch,i) > to)
+       {
+	  struct char_skill_data * curr = ch->skills;
+
+  	  while(curr)
+    	  if(curr->skillnum == i)
+      	  break;
+    	  else curr = curr->next;
+
+	  if (curr) curr->learned = to;
+       }
+   }
 }

@@ -19,7 +19,7 @@
 /* 12/06/2003   Onager   Modified mobile_activity() to prevent charmie    */
 /*                       scavenging                                       */
 /**************************************************************************/
-/* $Id: mob_act.cpp,v 1.20 2004/04/20 15:12:47 urizen Exp $ */
+/* $Id: mob_act.cpp,v 1.21 2004/04/29 22:44:02 urizen Exp $ */
 
 extern "C"
 {
@@ -43,6 +43,7 @@ extern "C"
 #include <returnvals.h>
 #include <string.h>
 #include <spells.h>
+#include <race.h> // Race defines used in align-aggro messages.
 
 extern CHAR_DATA *character_list;
 extern struct index_data *mob_index;
@@ -478,11 +479,39 @@ void mobile_activity(void)
            !IS_SET(tmp_ch->pcdata->toggles, PLR_NOHASSLE) // this is safe, cause we checked !IS_NPC first
           )
         { 
+	int i=0;
+          switch(ch->race)
+           { // Messages for attackys
+                case RACE_HUMAN:
+		case RACE_ELVEN:
+		case RACE_DWARVEN:
+		case RACE_HOBBIT:
+		case RACE_PIXIE:
+		case RACE_GIANT:
+		case RACE_GNOME:
+		case RACE_ORC:
+		case RACE_TROLL:
+		case RACE_GOBLIN:
+		case RACE_DRAGON:
+		case RACE_ENFAN:
+		case RACE_DEMON:
+		case RACE_YRNALI:
+		  i = 1;
+		  break;
+		default:
+		  i = 0;
+		  break;
+           }
+
           if(IS_SET(ch->mobdata->actflags, ACT_AGGR_EVIL) &&
             GET_ALIGNMENT(tmp_ch) <= -350)
           {
+	   if (i==1)
             act("$n screams 'May truth and justice prevail!'", ch, 0, 0, TO_ROOM, 0);
-
+	   else {
+	    act("$n senses your evil intentions and attacks!", ch, 0,tmp_ch, TO_VICT,0);
+	    act("$n senses $t's evil intentions and attacks!", ch, 0,tmp_ch,TO_ROOM,NOTVICT);
+ 	   }
             retval = mprog_attack_trigger( ch, tmp_ch );
             if(SOMEONE_DIED(retval))
               break;
@@ -493,8 +522,12 @@ void mobile_activity(void)
           if(IS_SET(ch->mobdata->actflags, ACT_AGGR_GOOD) &&
             GET_ALIGNMENT(tmp_ch) >= 350)
           {
+	   if (i==1)
             act("$n screams 'The forces of evil shall crush your goodness!'", ch, 0, 0, TO_ROOM, 0);
-
+	   else {
+	    act("$n is offended by your good nature and attacks!",ch,0, tmp_ch, TO_VICT,0);
+	    act("$n is offended by $t's good nature and attacks!", ch, 0,tmp_ch,  TO_ROOM,NOTVICT);
+	   }
             retval = mprog_attack_trigger( ch, tmp_ch );
             if(SOMEONE_DIED(retval))
               break;
@@ -506,7 +539,12 @@ void mobile_activity(void)
             GET_ALIGNMENT(tmp_ch) > -350 &&
             GET_ALIGNMENT(tmp_ch) < 350)
           {
+	   if (i==0)
             act("$n screams 'Pick a side, neutral dog!'", ch, 0, 0, TO_ROOM, 0);
+	   else {
+	    act("$n detects $t's neutrality and attacks!", ch, 0,tmp_ch, TO_ROOM,NOTVICT);
+	    act("$n detects your neutrality and attacks!", ch, 0,tmp_ch, TO_VICT,0);
+  	  }
 
             retval = mprog_attack_trigger( ch, tmp_ch );
             if(SOMEONE_DIED(retval))

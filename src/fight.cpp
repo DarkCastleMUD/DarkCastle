@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.167 2004/04/28 22:05:45 urizen Exp $ */
+/* $Id: fight.cpp,v 1.168 2004/04/29 22:44:02 urizen Exp $ */
 
 extern "C"
 {
@@ -3054,6 +3054,8 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
           }
         }
          pir_stat_loss(victim);
+	 check_maxes(victim); // Check if any skills got lowered because of
+			      // stat loss. guild.cpp.
          if(GET_CON(victim) <= 4 && GET_RACE(victim) != RACE_TROLL)
          {
            sprintf(buf1, "%s/%c/%s", SAVE_DIR, victim->name[0], victim->name);
