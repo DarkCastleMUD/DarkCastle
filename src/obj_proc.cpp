@@ -2135,6 +2135,20 @@ int hot_potato(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
    if(!vict)
       return eFAILURE;
 
+   if(cmd == 185) { // push
+      if(!strstr(arg, "potatobutton"))
+         return eFAILURE;
+      if(obj->obj_flags.value[3] > 0) {
+         send_to_char("It's already been started!\n\r", vict);
+         return eSUCCESS;
+      }
+      send_to_char("The potato starts getting really really hot and burns your hands!!\n\r", vict);
+      obj->obj_flags.value[3] = number(1, 100);
+      return eSUCCESS;
+   }
+
+   if(obj->obj_flags.value[3] < 0) // not active yet:)
+      return eFAILURE;
 
    if(cmd == 89) {
       send_to_char("You can't drop anything when you have a hot potato!\n\r", vict);
@@ -2178,14 +2192,8 @@ int hot_potato(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
          send_to_room("You smell a delicious baked potato and hear a faint *beep*.\n\r", vict->in_room );
    }
    else {
-      if(GET_LEVEL(vict) > MORTAL) {
-         send_to_char("Hot potato timer set to 23.\n\r", vict);
-         obj->obj_flags.value[3] = 23;
-         return eFAILURE;
-      }
-
       for(descriptor_data * i = descriptor_list; i; i = i->next)
-         if(i->character->in_room != vict->in_room && !i->connected)
+         if(i->character && i->character->in_room != vict->in_room && !i->connected)
             send_to_char("You hear a large BOOM from somewhere in the distance.\n\r", i->character);
        act("The hot potato $n is carrying beeps one final time.\n\r"
            "\n\r$B"
