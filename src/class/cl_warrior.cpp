@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.15 2003/07/22 18:29:06 pirahna Exp $
+| $Id: cl_warrior.cpp,v 1.16 2004/04/13 11:37:58 urizen Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -605,7 +605,7 @@ int do_disarm( struct char_data *ch, char *argument, int cmd )
       }
 
       act( "$n disarms $mself!",  ch, NULL, victim, TO_ROOM, NOTVICT );
-      send_to_char( "You disarm yourself!  Congradulations!  Try using 'remove' next-time.\n\r", ch );
+      send_to_char( "You disarm yourself!  Congratulations!  Try using 'remove' next-time.\n\r", ch );
       obj = unequip_char( ch, WIELD );
       obj_to_char( obj, ch );
       if (ch->equipment[SECOND_WIELD]) {
