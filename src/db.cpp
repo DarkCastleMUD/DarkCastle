@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.4 2002/06/29 18:16:21 pirahna Exp $ */
+/* $Id: db.cpp,v 1.5 2002/07/14 07:28:08 pirahna Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -344,7 +344,20 @@ char * funnybootmessages[] =
   "Consulting Magic 8-ball...\r\n",
   "Connecting logical circuit...\r\n",
   "Binding proper ports....\r\n",
-  "Creating obj references...\r\n"
+  "Creating obj references...\r\n",
+  "Cacheing zone connection map...\r\n",
+  "Feeding mean llamas...\r\n",
+  "Breeding squirrels...\r\n",
+  "Graphing optimization lines...\r\n",
+  "Strict defining template arrays...\r\n",
+  "All your base are belong to us...\r\n",
+  "Importing external consts...\r\n",
+  "Configuring alt.binaries.erotica.asian.senior-citizen.sheep downloader...\r\n",
+  "Configuring configurator...\r\n",
+  "Planing valid edge queue...\r\n",
+  "Verifying void alignment...\r\n",
+  "Initializing BFS search parameters...\r\n",
+  "Shaving fuzzy logic...\r\n"
 };
 
 void funny_boot_message()
