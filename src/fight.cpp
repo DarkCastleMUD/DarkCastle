@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.54 2002/08/26 06:56:00 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.55 2002/08/26 20:50:31 dcastle Exp $ */
 
 extern "C"
 {
@@ -2627,7 +2627,8 @@ void group_gain(CHAR_DATA * ch, CHAR_DATA * victim)
   for(f = k->followers; f; f = f->next) 
   {
     if(IS_AFFECTED(f->follower, AFF_GROUP) &&    // if grouped
-      f->follower->in_room == ch->in_room)       // and in the room
+      f->follower->in_room == ch->in_room  &&    // and in the room
+      !IS_MOB(f->follower))
     {
       no_members += 1;
       totallevels += GET_LEVEL(f->follower);
@@ -2684,12 +2685,10 @@ void group_gain(CHAR_DATA * ch, CHAR_DATA * victim)
     
     if(no_members < 2)
        tmp_share = share;
-    else if(GET_LEVEL(ch) < 17)
-       tmp_share = (((GET_LEVEL(tmp_ch)+6) * share) / totallevels);  
     else tmp_share = (((GET_LEVEL(tmp_ch)+2) * share) / totallevels);  
 
     // reduce xp if you are higher level than mob
-    switch(GET_LEVEL(victim) - GET_LEVEL(ch)) {
+    switch(GET_LEVEL(victim) - GET_LEVEL(tmp_ch)) {
       case -1:  break;
       case -2:  break;
       case -3:  break;
@@ -2704,7 +2703,7 @@ void group_gain(CHAR_DATA * ch, CHAR_DATA * victim)
       case -12: tmp_share = (int) (tmp_share * 0.1); break;
       case -13: tmp_share = (int) (tmp_share * 0.1); break;
       case -14: tmp_share = (int) (tmp_share * 0.1); break;
-      default:  if(GET_LEVEL(victim) < GET_LEVEL(ch))
+      default:  if(GET_LEVEL(victim) < GET_LEVEL(tmp_ch))
                   tmp_share = 0;
                 else tmp_share = (int) (tmp_share * 1.1); break;
                break;
