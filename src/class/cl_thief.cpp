@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.22 2003/03/21 19:48:20 pirahna Exp $
+| $Id: cl_thief.cpp,v 1.23 2003/04/08 02:50:29 pirahna Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -643,115 +643,116 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
       send_to_char("That item is protected by the gods.\n\r", ch);
       return eFAILURE;
     }
+  
+    // obj found in inventory
+    percent += GET_OBJ_WEIGHT(obj); // Make heavy harder
+
+    if(learned)
+      skill_increase_check(ch, SKILL_STEAL, learned, SKILL_INCREASE_HARD);
+
+    if (percent > chance) 
+    {
+      ohoh = TRUE;
+      if(!number(0, 4)) {
+        send_to_char("Oops..", ch);
+        act("$n tried to steal something from you!", ch, 0, victim, TO_VICT, 0);
+        act("$n tries to steal something from $N.", ch, 0, victim, TO_ROOM, INVIS_NULL|NOTVICT);
+      }
+    } 
     else 
-    {  // obj found in inventory
-      percent += GET_OBJ_WEIGHT(obj); // Make heavy harder
-
-      if(learned)
-        skill_increase_check(ch, SKILL_STEAL, learned, SKILL_INCREASE_HARD);
-
-      if (percent > chance) 
+    { /* Steal the item */
+      if ((IS_CARRYING_N(ch) + 1 < CAN_CARRY_N(ch))) 
       {
-        ohoh = TRUE;
-        if(!number(0, 4)) {
-          act("Oops..",  ch,0,0,TO_CHAR, 0);
-          act("$n tried to steal something from you!", ch,0,victim,TO_VICT, 0);
-          act("$n tries to steal something from $N.", ch, 0, victim, TO_ROOM, INVIS_NULL|NOTVICT);
-        }
-      } 
-      else 
-      { /* Steal the item */
-        if ((IS_CARRYING_N(ch) + 1 < CAN_CARRY_N(ch))) 
+        if ((IS_CARRYING_W(ch) + GET_OBJ_WEIGHT(obj)) < CAN_CARRY_W(ch)) 
         {
-          if ((IS_CARRYING_W(ch) + GET_OBJ_WEIGHT(obj)) < CAN_CARRY_W(ch)) 
+          move_obj(obj, ch);
+
+          if(!IS_NPC(victim) || (IS_SET(victim->mobdata->actflags,ACT_NICE_THIEF)))
+            _exp = GET_OBJ_WEIGHT(obj);
+          else _exp = (GET_OBJ_WEIGHT(obj) * GET_LEVEL(victim));
+
+          if(GET_POS(victim) <= POSITION_SLEEPING)  
+            _exp = 0;
+
+          GET_EXP(ch) += _exp; /* exp for stealing :) */
+          sprintf(buf,"You receive %d exps.\n\r", _exp);
+          send_to_char("Got it!\n\r", ch);
+          send_to_char(buf, ch);
+          if(!IS_NPC(victim)) 
           {
-            move_obj(obj, ch);
-
-            if(!IS_NPC(victim) || (IS_SET(victim->mobdata->actflags,ACT_NICE_THIEF)))
-              _exp = GET_OBJ_WEIGHT(obj);
-            else _exp = (GET_OBJ_WEIGHT(obj) * GET_LEVEL(victim));
-
-            if(GET_POS(victim) <= POSITION_SLEEPING)  
-              _exp = 0;
-
-            GET_EXP(ch) += _exp; /* exp for stealing :) */
-            sprintf(buf,"You receive %d exps.\n\r", _exp);
-            send_to_char("Got it!\n\r", ch);
-            send_to_char(buf, ch);
-            if(!IS_NPC(victim)) 
+            do_save(victim, "", 666);
+            do_save(ch, "", 666);
+            if(!AWAKE(victim))
             {
-              do_save(victim, "", 666);
-              do_save(ch, "", 666);
-              if(!AWAKE(victim))
+              if(number(1, 3) == 1)
+                send_to_char("You dream of someone stealing your eq.\r\n", victim);
+              if((paf = affected_by_spell(victim, SPELL_SLEEP)) && paf->modifier == 1)
               {
-                if(number(1, 3) == 1)
-                  send_to_char("You dream of someone stealing your eq.\r\n", victim);
-                if((paf = affected_by_spell(victim, SPELL_SLEEP)) && paf->modifier == 1)
-                {
-                  paf->modifier = 0; // make sleep no longer work
-                }
-                // if i'm not a thief, or if I fail dex-roll wake up victim
-                if(GET_CLASS(ch) != CLASS_THIEF || number(1, 100) > GET_DEX(ch))
-                {
-                  send_to_char("Oops...\r\n", ch);
-                  do_wake(ch, GET_NAME(victim), 9);
-                }
+                paf->modifier = 0; // make sleep no longer work
               }
-              // if victim isn't a pthief
-              if(!affected_by_spell(victim, FUCK_PTHIEF) ) 
+              // if i'm not a thief, or if I fail dex-roll wake up victim
+              if(GET_CLASS(ch) != CLASS_THIEF || number(1, 100) > GET_DEX(ch))
               {
-                if(!IS_AFFECTED(ch, AFF_CANTQUIT))
-                  affect_to_char(ch, &af);
-                else 
-                {
-                  for(paf = ch->affected; paf; paf = paf->next) 
-                  {
-                     if(paf->type == FUCK_CANTQUIT)
-                       paf->duration = 5;
-                  }
-                }
-                if(affected_by_spell(ch, FUCK_PTHIEF))
-                {
-                  affect_from_char(ch, FUCK_PTHIEF);
-                  affect_to_char(ch, &pthiefaf);
-                }
-                else
-                  affect_to_char(ch, &pthiefaf);
+                send_to_char("Oops...\r\n", ch);
+                do_wake(ch, GET_NAME(victim), 9);
               }
             }
-            if(!IS_NPC(victim))
+            // if victim isn't a pthief
+            if(!affected_by_spell(victim, FUCK_PTHIEF) ) 
             {
-              sprintf(log_buf,"%s stole %s[%d] from %s",
+              if(!IS_AFFECTED(ch, AFF_CANTQUIT))
+                affect_to_char(ch, &af);
+              else 
+              {
+                for(paf = ch->affected; paf; paf = paf->next) 
+                {
+                   if(paf->type == FUCK_CANTQUIT)
+                     paf->duration = 5;
+                }
+              }
+              if(affected_by_spell(ch, FUCK_PTHIEF))
+              {
+                affect_from_char(ch, FUCK_PTHIEF);
+                affect_to_char(ch, &pthiefaf);
+              }
+              else
+                affect_to_char(ch, &pthiefaf);
+            }
+          }
+          if(!IS_NPC(victim))
+          {
+            sprintf(log_buf,"%s stole %s[%d] from %s",
                  GET_NAME(ch), obj->short_description,  
                  obj_index[obj->item_number].virt, GET_NAME(victim));
-              log(log_buf, ANGEL, LOG_MORTAL);
-              for(loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
-                logf(ANGEL, LOG_MORTAL, "The %s contained %s[%d]", 
+            log(log_buf, ANGEL, LOG_MORTAL);
+            for(loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
+              logf(ANGEL, LOG_MORTAL, "The %s contained %s[%d]", 
                           obj->short_description,
                           loop_obj->short_description,
                           obj_index[loop_obj->item_number].virt);
-            }
-            if(IS_SET(obj->obj_flags.more_flags, ITEM_NO_TRADE))
-            {
-              csendf(ch, "Whoa!  The %s poofed into thin air!\r\n", obj->short_description);
-              extract_obj(obj);
-            }
-            else for(loop_obj = obj->contains; loop_obj; loop_obj = next_obj)
-            {
-               // this is 'else' since if the container was no_trade everything in it
-               // has already been extracted
-               next_obj = loop_obj->next_content;
-
-               if(IS_SET(loop_obj->obj_flags.more_flags, ITEM_NO_TRADE)) {
-                  csendf(ch, "Whoa!  The %s inside the %s poofed into thin air!\r\n",
-                             loop_obj->short_description, obj->short_description);
-                  extract_obj(loop_obj);
-               }
-            }
           }
-        } else
-          send_to_char("You cannot carry that much.\n\r", ch);
-      }
+          if(IS_SET(obj->obj_flags.more_flags, ITEM_NO_TRADE))
+          {
+            csendf(ch, "Whoa!  The %s poofed into thin air!\r\n", obj->short_description);
+            extract_obj(obj);
+          }
+          else for(loop_obj = obj->contains; loop_obj; loop_obj = next_obj)
+          {
+             // this is 'else' since if the container was no_trade everything in it
+             // has already been extracted
+             next_obj = loop_obj->next_content;
+
+             if(IS_SET(loop_obj->obj_flags.more_flags, ITEM_NO_TRADE)) {
+                csendf(ch, "Whoa!  The %s inside the %s poofed into thin air!\r\n",
+                           loop_obj->short_description, obj->short_description);
+                extract_obj(loop_obj);
+             }
+          }
+        }
+        else
+          send_to_char("You cannot carry that much weight.\n\r", ch);
+      } else
+        send_to_char("You cannot carry that many items.\n\r", ch);
     }
   }
   else // not in inventory
