@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.2 2002/06/13 04:41:07 dcastle Exp $ */
+/* $Id: handler.cpp,v 1.3 2002/06/29 18:16:21 pirahna Exp $ */
     
 extern "C"
 {
@@ -821,7 +821,7 @@ void affect_remove( CHAR_DATA *ch, struct affected_type *af )
 
       if (hjp->next != af) {
          log("FATAL : Could not locate affected_type in ch->affected. (handler.c, affect_remove)", ANGEL, LOG_BUG);
-         sprintf(buf,"Problem With: %s    Affect type: %ld", ch->name, af->type);
+         sprintf(buf,"Problem With: %s    Affect type: %d", ch->name, af->type);
          log(buf, ANGEL, LOG_BUG);
          return;
       }
@@ -839,9 +839,12 @@ void affect_from_char( CHAR_DATA *ch, int skill)
 {
     struct affected_type *hjp, *afc;
 
+    if(skill < 0)  // affect types are unsigned, so no negatives are possible
+       return;
+
     for(hjp = ch->affected; hjp; hjp = afc) {
         afc = hjp->next;
-	if (hjp->type == skill)
+	if (hjp->type == (unsigned)skill)
 	    affect_remove( ch, hjp );
     }
 }
@@ -856,8 +859,11 @@ affected_type * affected_by_spell( CHAR_DATA *ch, int skill )
 {
   struct affected_type *curr;
 
+  if(skill < 0)  // all affect types are unsigned
+     return NULL;
+
   for(curr = ch->affected; curr; curr = curr->next)
-     if(curr->type == skill)
+     if(curr->type == (unsigned)skill)
        return curr;
 
   return NULL;

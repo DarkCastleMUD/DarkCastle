@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.3 2002/06/20 21:39:36 pirahna Exp $ */
+/* $Id: info.cpp,v 1.4 2002/06/29 18:16:21 pirahna Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -1317,10 +1317,10 @@ int do_score(struct char_data *ch, char *argument, int cmd)
    colorCharSend(buf, ch);
    
    sprintf(buf,
-      "|\\|  $4Strength$7:     %9d  |/|  $1Race$7:   %-10s $1HitPts$7:%5lld$1/$7(%5lld) |~|\n\r"
-      "|~|  $4Dexterity$7:    %9d  |o|  $1Class$7:  %-11s$1Mana$7:   %4lld$1/$7(%5lld) |\\|\n\r"
-      "|/|  $4Constitution$7: %9d  |\\|  $1Lvl$7:    %-8d   $1Fatigue$7:%4lld$1/$7(%5lld) |o|\n\r"
-      "|o|  $4Intelligence$7: %9d  |~|  $1Height$7: %3d        $1Ki$7:     %4lld$1/$7(%5lld) |/|\n\r"
+      "|\\|  $4Strength$7:     %9d  |/|  $1Race$7:   %-10s $1HitPts$7:%5d$1/$7(%5d) |~|\n\r"
+      "|~|  $4Dexterity$7:    %9d  |o|  $1Class$7:  %-11s$1Mana$7:   %4d$1/$7(%5d) |\\|\n\r"
+      "|/|  $4Constitution$7: %9d  |\\|  $1Lvl$7:    %-8d   $1Fatigue$7:%4d$1/$7(%5d) |o|\n\r"
+      "|o|  $4Intelligence$7: %9d  |~|  $1Height$7: %3d        $1Ki$7:     %4d$1/$7(%5d) |/|\n\r"
       "|\\|  $4Wisdom$7:       %9d  |/|  $1Weight$7: %3d        $1Alignment$7: %-9d |~|\n\r"
       "|~|                           |o|  $1Age$7:    %3d years                       |\\|\n\r",
       GET_STR(ch), race, GET_HIT(ch), GET_MAX_HIT(ch),
@@ -1336,9 +1336,9 @@ int do_score(struct char_data *ch, char *argument, int cmd)
      sprintf(buf,
       "($5:$7)===========================($5:$7)===($5:$7)====================================($5:$7)\n\r"
       "|/|  $2Combat Statistics...$7           |\\|   $2Equipment and Valuables$7          |o|\n\r"
-      "|o|   $3Armor$7:   %5d $3Pkills$7:  %5lld |~|    $3Items Carried$7:  %-3d/(%-3d)       |/|\n\r"
-      "|\\|   $3RDeaths$7: %5lld $3PDeaths$7: %5lld |/|    $3Weight Carried$7: %-3d/(%-4d)      |~|\n\r"
-      "|~|   $3BonusHit$7: %+4d $3BonusDam$7: %+4d |o|    $3Experience$7:     %-10lld      |\\|\n\r"
+      "|o|   $3Armor$7:   %5d $3Pkills$7:  %5d |~|    $3Items Carried$7:  %-3d/(%-3d)       |/|\n\r"
+      "|\\|   $3RDeaths$7: %5d $3PDeaths$7: %5d |/|    $3Weight Carried$7: %-3d/(%-4d)      |~|\n\r"
+      "|~|   $3BonusHit$7: %+4d $3BonusDam$7: %+4d |o|    $3Experience$7:     %-10d      |\\|\n\r"
       "|/|   $B$4FIRE$R[%+3d] $BCOLD$R[%+3d] $B$5NRGY$R[%+3d] |\\|    $3ExpTillLevel$7:   %-10d      |o|\n\r"
       "|o|   $B$2ACID$R[%+3d] $B$3MAGK$R[%+3d] $2POIS$7[%+3d] |~|    $3Gold$7: %-9d $3Platinum$7: %-5d |/|\n\r"
       "($5:$7)=================================($5:$7)====================================($5:$7)\n\r",

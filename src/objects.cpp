@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.2 2002/06/13 04:41:08 dcastle Exp $
+| $Id: objects.cpp,v 1.3 2002/06/29 18:16:22 pirahna Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -45,6 +45,25 @@ int FOUNTAINisPresent (CHAR_DATA *ch);
 int hands_are_free(CHAR_DATA *ch, int number);
 struct obj_data *get_object_in_equip_vis(struct char_data *ch,
     char *arg, struct obj_data *equipment[], int *j);
+
+// given an object, return the maximum points of damage the item
+// can take before being scrapped
+int get_max_damage(obj_data * obj)
+{
+   int amount = 0;
+
+   switch(GET_ITEM_TYPE(obj)) {
+      case ITEM_ARMOR:
+         amount = 3;
+         amount += ((obj->obj_flags.value[0]) / 2);  // + 1 hit per 2ac
+         return amount;
+      case ITEM_WEAPON:
+         amount = 5;
+         return amount;
+      default:
+         return 1;
+   }
+}
 
 void object_activity()
 {

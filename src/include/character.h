@@ -1,7 +1,7 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.3 2002/06/20 21:39:49 pirahna Exp $
+| $Id: character.h,v 1.4 2002/06/29 18:16:22 pirahna Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
@@ -95,9 +95,9 @@ struct  mob_prog_data
 
 struct char_skill_data
 {
-    sh_int skillnum;          // ID # of skill.
-    byte   learned;           // % chance for success must be > 0
-    long   unused[5];         // for future use
+    int16  skillnum;          // ID # of skill.
+    int16  learned;           // % chance for success must be > 0
+    int32  unused[5];         // for future use
 
     char_skill_data * next;   // Next skill in ch's skill list    
 };
@@ -105,21 +105,21 @@ struct char_skill_data
 struct class_skill_defines
 {
     char * skillname;         // name of skill
-    sh_int skillnum;          // ID # of skill
-    sh_int levelavailable;    // what level class can get it
-    sh_int maximum;           // maximum value PC can train it to (1-100)
-    long   trainer;           // what mob trains them (only one currently) 0 = any
+    int16  skillnum;          // ID # of skill
+    int16  levelavailable;    // what level class can get it
+    int16  maximum;           // maximum value PC can train it to (1-100)
+    int32  trainer;           // what mob trains them (only one currently) 0 = any
     char * clue;              // what mob will say if he can't train them
 };
 
 /* Used in CHAR_FILE_U *DO*NOT*CHANGE* */
 struct affected_type
 {
-    long type;           /* The type of spell that caused ths      */
-    sh_int duration;      /* For how long its effects will last      */
-    sbyte modifier;       /* This is added to apropriate ability     */
-    byte location;        /* Tells which ability to change(APPLY_XXX)*/
-    long bitvector;       /* Tells which bits to set (AFF_XXX)       */
+    uint32 type;           /* The type of spell that caused ths      */
+    int16  duration;      /* For how long its effects will last      */
+    int32  modifier;       /* This is added to apropriate ability     */
+    int16  location;        /* Tells which ability to change(APPLY_XXX)*/
+    uint32 bitvector;       /* Tells which bits to set (AFF_XXX)       */
 
     struct affected_type *next;
 };
@@ -139,15 +139,15 @@ struct pc_data
     struct char_player_alias * alias; /* Aliases */
 
     uint32 totalpkills;         // total number of pkills THIS LOGIN
-    uint64 totalpkillslv;       // sum of levels of pkills THIS LOGIN
+    uint32 totalpkillslv;       // sum of levels of pkills THIS LOGIN
     uint32 pdeathslogin;        // pdeaths THIS LOGIN
 
-    uint64 rdeaths;             // total number of real deaths
-    uint64 pdeaths;             // total number of times pkilled
-    uint64 pkills;              // # of pkills ever 
-    uint64 pklvl;               // # sum of levels of pk victims ever
-    uint64 group_kills;         // # of kills for group 
-    uint64 grplvl;              // sum of levels of group victims 
+    uint32 rdeaths;             // total number of real deaths
+    uint32 pdeaths;             // total number of times pkilled
+    uint32 pkills;              // # of pkills ever 
+    uint32 pklvl;               // # sum of levels of pk victims ever
+    uint32 group_kills;         // # of kills for group 
+    uint32 grplvl;              // sum of levels of group victims 
 
     char *last_site;                /* Last login from.. */
     struct time_data time;          // PC time data.  logon, played, birth
@@ -161,11 +161,11 @@ struct pc_data
 
      int16 saves_mods[SAVE_TYPE_MAX+1];  // Character dependant mods to saves (meta'able)
 
-    uint64 bank;           /* gold in bank                            */
+    uint32 bank;           /* gold in bank                            */
 
-    uint64 toggles;            // Bitvector for toggles.  (Was specials.act)
-    uint64 punish;             // flags for punishments
-    uint64 quest_bv1;          // 1st bitvector for quests
+    uint32 toggles;            // Bitvector for toggles.  (Was specials.act)
+    uint32 punish;             // flags for punishments
+    uint32 quest_bv1;          // 1st bitvector for quests
 
     char *poofin;       /* poofin message */
     char *poofout;      /* poofout message */    
@@ -194,8 +194,8 @@ struct mob_data
      int32 nr;
      sbyte default_pos;    // Default position for NPC
      sbyte last_direction; // Last direction the mobile went in
-    uint64 attack_type;    // Bitvector of damage type for bare-handed combat
-    uint64 actflags;       // flags for NPC behavior
+    uint32 attack_type;    // Bitvector of damage type for bare-handed combat
+    uint32 actflags;       // flags for NPC behavior
 
      int16 damnodice;         // The number of damage dice's           
      int16 damsizedice;       // The size of the damage dice's         
@@ -216,7 +216,6 @@ struct char_data
 {
     struct mob_data * mobdata;
     struct pc_data * pcdata;
-
     
     struct descriptor_data *desc;       // NULL normally for mobs 
 
@@ -249,28 +248,28 @@ struct char_data
     ubyte height;       /* PC/NPC's height */
 
     int16 hometown;      /* PC/NPC home town */
-    uint64 gold;           /* Money carried                           */
-    uint64 plat;           /* Platinum                                */
-     int64 exp;            /* The experience of the player            */
-     int64 in_room;
+    uint32 gold;           /* Money carried                           */
+    uint32 plat;           /* Platinum                                */
+     int32 exp;            /* The experience of the player            */
+     int32 in_room;
 
-    uint64 immune;         // Bitvector of damage types I'm immune to
-    uint64 resist;         // Bitvector of damage types I'm resistant to
-    uint64 suscept;        // Bitvector of damage types I'm susceptible to
+    uint32 immune;         // Bitvector of damage types I'm immune to
+    uint32 resist;         // Bitvector of damage types I'm resistant to
+    uint32 suscept;        // Bitvector of damage types I'm susceptible to
      int16 saves[SAVE_TYPE_MAX+1];  // Saving throw bonuses
 
-     int64 mana;         
-     int64 max_mana;     /* Not useable                             */
-     int64 raw_mana;     /* before int bonus                        */
-     int64 hit;   
-     int64 max_hit;      /* Max hit for NPC                         */
-     int64 raw_hit;      /* before con bonus                        */
-     int64 move;  
-     int64 raw_move;
-     int64 max_move;     /* Max move for NPC                        */
-     int64 ki;
-     int64 max_ki;
-     int64 raw_ki;
+     int32 mana;         
+     int32 max_mana;     /* Not useable                             */
+     int32 raw_mana;     /* before int bonus                        */
+     int32 hit;   
+     int32 max_hit;      /* Max hit for NPC                         */
+     int32 raw_hit;      /* before con bonus                        */
+     int32 move;  
+     int32 raw_move;
+     int32 max_move;     /* Max move for NPC                        */
+     int32 ki;
+     int32 max_ki;
+     int32 raw_ki;
 
      int16 alignment;          // +-1000 for alignments                 
 
@@ -314,10 +313,10 @@ struct char_data
     char_data * guarding;              // Pointer to who I am guarding
     follow_type * guarded_by;          // List of people guarding me
 
-    uint64 affected_by;                // Quick reference bitvector for spell affects
-    uint64 affected_by2;               // More quick reference bitvectors 
-    uint64 combat;                     // Bitvector for combat related flags (bash, stun, shock)
-    uint64 misc;                       // Bitvector for IS_MOB/logs/channels.  So possessed mobs can channel
+    uint32 affected_by;                // Quick reference bitvector for spell affects
+    uint32 affected_by2;               // More quick reference bitvectors 
+    uint32 combat;                     // Bitvector for combat related flags (bash, stun, shock)
+    uint32 misc;                       // Bitvector for IS_MOB/logs/channels.  So possessed mobs can channel
 
     CHAR_DATA *fighting;                 /* Opponent     */
     CHAR_DATA *next;                     /* Next anywhere in game */
@@ -348,10 +347,10 @@ struct char_data
 // are variable length, we can't do them with a single write
 struct char_file_u
 {
-    byte sex;         /* Sex */
-    byte c_class;     /* Class */
-    byte race;        /* Race */
-    byte level;       /* Level */
+    sbyte sex;         /* Sex */
+    sbyte c_class;     /* Class */
+    sbyte race;        /* Race */
+    sbyte level;       /* Level */
    
     sbyte raw_str;
     sbyte raw_intel;
@@ -363,45 +362,39 @@ struct char_file_u
     ubyte weight;
     ubyte height;
 
-    long hometown;
-    long gold;
-    long plat;
-    long exp;
-    long immune;
-    long resist;
-    long suscept;
+    int16 hometown;
+    uint32 gold;
+    uint32 plat;
+    int32 exp;
+    uint32 immune;
+    uint32 resist;
+    uint32 suscept;
 
-    sh_int mana;        // current
-    sh_int raw_mana;    // max without eq/stat bonuses
-    sh_int hit;
-    sh_int raw_hit;
-    sh_int move;
-    sh_int raw_move;
-    sh_int ki;
-    sh_int raw_ki;
+    int32 mana;        // current
+    int32 raw_mana;    // max without eq/stat bonuses
+    int32 hit;
+    int32 raw_hit;
+    int32 move;
+    int32 raw_move;
+    int32 ki;
+    int32 raw_ki;
 
-    sh_int alignment;
-    sh_int hpmetas;
-    sh_int manametas;
-    sh_int movemetas;
+    int16 alignment;
+   uint32 hpmetas;
+   uint32 manametas;
+   uint32 movemetas;
 
-    sh_int armor;       // have to save these since mobs have different bases
-    sh_int hitroll;
-    sh_int damroll;
+    int16 armor;       // have to save these since mobs have different bases
+    int16 hitroll;
+    int16 damroll;
     uint32 afected_by;  // SHOULD BE 64
     uint32 afected_by2; // SHOULD BE 64
+    uint32 misc;          // channel flags
 
-    sh_int apply_saving_throw[5]; // no longer used, but kept so I don't have to convert all the files
-                                  // right now.
-                                  // TODO - write a pfile convertor, so I can remove these extra 5 ints
-                                  // without pwiping everything all over again
+    int16 clan; 
+    int32 load_room;                  // Which room to place char in
 
-    long misc;          // channel flags
-
-    sh_int clan; 
-    sh_int load_room;                  // Which room to place char in
-
-    long   extra_ints[5];             // available just in case
+    int32 extra_ints[5];             // available just in case
 };
 
 #endif

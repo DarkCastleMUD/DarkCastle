@@ -439,7 +439,7 @@ int do_skilledit(struct char_data *ch, char *argument, int cmd)
     sprintf(buf, "Skills for %s:\r\n", GET_NAME(victim));
     send_to_char(buf, ch);
     while(curr) {
-      sprintf(buf, "  %d  -  %d  [%ld] [%ld] [%ld] [%ld] [%ld]\r\n", curr->skillnum, curr->learned,
+      sprintf(buf, "  %d  -  %d  [%d] [%d] [%d] [%d] [%d]\r\n", curr->skillnum, curr->learned,
                    curr->unused[0], curr->unused[1], curr->unused[2], curr->unused[3], curr->unused[4]);
       send_to_char(buf, ch);
       curr = curr->next;

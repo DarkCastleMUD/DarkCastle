@@ -1,7 +1,7 @@
 #ifndef __ROOM_H__
 #define __ROOM_H__
 /************************************************************************
-| $Id: room.h,v 1.3 2002/06/20 21:39:49 pirahna Exp $
+| $Id: room.h,v 1.4 2002/06/29 18:16:22 pirahna Exp $
 | room.h
 | Description:  This file contains all of the room header file/constant
 |   information.  It also contains information about the 'world' structs.
@@ -117,7 +117,7 @@ struct room_data
     char * description;                  // Shown when entered
     extra_descr_data * ex_description;   // for examine/look
     room_direction_data * dir_option[MAX_DIRS]; // Directions
-    uint64 room_flags;                     // DEATH, DARK ... etc
+    uint32 room_flags;                     // DEATH, DARK ... etc
     sh_int light;                        // Light factor of room
     
     int (*funct)(CHAR_DATA*, int, char*);  // special procedure

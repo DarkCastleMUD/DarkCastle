@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: save.cpp,v 1.3 2002/06/20 21:39:36 pirahna Exp $ */
+/* $Id: save.cpp,v 1.4 2002/06/29 18:16:22 pirahna Exp $ */
 
 extern "C"
 {
@@ -57,7 +57,7 @@ void char_to_store(CHAR_DATA *ch, struct char_file_u *st);
 // -pir
 int save_char_aliases(char_player_alias * alias, FILE * fpsave)
 {
-  sh_int tmp_size = 0;
+  uint32 tmp_size = 0;
   char_player_alias * curr;
 
   // count up the number of aliases
@@ -65,7 +65,7 @@ int save_char_aliases(char_player_alias * alias, FILE * fpsave)
     tmp_size++;
 
   // write out how many
-  fwrite(&tmp_size, sizeof(sh_int), 1, fpsave);
+  fwrite(&tmp_size, sizeof(tmp_size), 1, fpsave);
 
   // write the aliases out
   for(curr = alias; curr; curr = curr->next)
@@ -74,12 +74,12 @@ int save_char_aliases(char_player_alias * alias, FILE * fpsave)
     tmp_size = strlen(curr->keyword);
     if(tmp_size < 1)  // minimal error checking:)
       continue;
-    fwrite (&tmp_size, sizeof tmp_size, 1, fpsave);
+    fwrite (&tmp_size, sizeof(tmp_size), 1, fpsave);
     // but we actually write tmp_size +1 to get the trailing \0
     fwrite (curr->keyword, sizeof(char), (tmp_size+1), fpsave);
 
     tmp_size = strlen(curr->command);
-    fwrite (&tmp_size, sizeof tmp_size, 1, fpsave);
+    fwrite (&tmp_size, sizeof(tmp_size), 1, fpsave);
     fwrite (curr->command, sizeof(char), (tmp_size+1), fpsave);
   }
   return 1; 
@@ -88,12 +88,12 @@ int save_char_aliases(char_player_alias * alias, FILE * fpsave)
 // return pointer to aliases or NULL
 struct char_player_alias * read_char_aliases(FILE * fpsave)
 {
-  sh_int total, x;  
-  sh_int tmp_size;
+  uint32 total, x;  
+  uint32 tmp_size;
   struct char_player_alias * top = NULL;  
   struct char_player_alias * curr = NULL;  
 
-  fread(&total, sizeof(sh_int), 1, fpsave);
+  fread(&total, sizeof(total), 1, fpsave);
 
   if(total < 1)
     return NULL;
@@ -132,26 +132,26 @@ struct char_player_alias * read_char_aliases(FILE * fpsave)
 
 void fwrite_var_string(char * string, FILE * fpsave)
 {
-   sh_int tmp_size;
+   uint16 tmp_size;
 
    if(string) {
      tmp_size = strlen(string);
      tmp_size++; // count the null terminator
-     fwrite(&tmp_size, sizeof(sh_int), 1, fpsave);
+     fwrite(&tmp_size, sizeof(tmp_size), 1, fpsave);
      fwrite(string, sizeof(char), (tmp_size), fpsave);
    }
    else {
      tmp_size = 0;
-     fwrite(&tmp_size, sizeof(sh_int), 1, fpsave);
+     fwrite(&tmp_size, sizeof(tmp_size), 1, fpsave);
    }
 }
 
 char * fread_var_string(FILE * fpsave)
 {
-   sh_int tmp_size;
+   uint16 tmp_size;
    char * tmp_str = NULL;
 
-   fread(&tmp_size, sizeof (sh_int), 1, fpsave);
+   fread(&tmp_size, sizeof (tmp_size), 1, fpsave);
    if(tmp_size > 0) {
 #ifdef LEAK_CHECK
      tmp_str = (char *) calloc(tmp_size, sizeof(char));
@@ -166,12 +166,12 @@ char * fread_var_string(FILE * fpsave)
 
 void save_mob_data(struct mob_data * i, FILE * fpsave)
 {
-  fwrite(&(i->nr), sizeof(long), 1, fpsave);
-  fwrite(&(i->default_pos), sizeof(byte), 1, fpsave);
-  fwrite(&(i->attack_type), sizeof(long), 1, fpsave); 
-  fwrite(&(i->actflags),    sizeof(long), 1, fpsave);
-  fwrite(&(i->damnodice),   sizeof(sh_int), 1, fpsave);
-  fwrite(&(i->damsizedice), sizeof(sh_int), 1, fpsave);
+  fwrite(&(i->nr),          sizeof(i->nr),          1, fpsave);
+  fwrite(&(i->default_pos), sizeof(i->default_pos), 1, fpsave);
+  fwrite(&(i->attack_type), sizeof(i->attack_type), 1, fpsave); 
+  fwrite(&(i->actflags),    sizeof(i->actflags),    1, fpsave);
+  fwrite(&(i->damnodice),   sizeof(i->damnodice),   1, fpsave);
+  fwrite(&(i->damsizedice), sizeof(i->damsizedice), 1, fpsave);
 
   // Any future additions to this save file will need to be placed LAST here with a 3 letter code
   // and appropriate strcmp statement in the read_mob_data object
@@ -183,12 +183,12 @@ void read_mob_data(struct mob_data * i, FILE * fpsave)
 {
   char typeflag[4];
 
-  fread(&(i->nr), sizeof(long), 1, fpsave);
-  fread(&(i->default_pos), sizeof(byte), 1, fpsave);
-  fread(&(i->attack_type), sizeof(long), 1, fpsave); 
-  fread(&(i->actflags),    sizeof(long), 1, fpsave);
-  fread(&(i->damnodice),   sizeof(sh_int), 1, fpsave);
-  fread(&(i->damsizedice), sizeof(sh_int), 1, fpsave);
+  fread(&(i->nr),          sizeof(i->nr),          1, fpsave);
+  fread(&(i->default_pos), sizeof(i->default_pos), 1, fpsave);
+  fread(&(i->attack_type), sizeof(i->attack_type), 1, fpsave); 
+  fread(&(i->actflags),    sizeof(i->actflags),    1, fpsave);
+  fread(&(i->damnodice),   sizeof(i->damnodice),   1, fpsave);
+  fread(&(i->damsizedice), sizeof(i->damsizedice), 1, fpsave);
 
   typeflag[3] = '\0';
   fread(&typeflag, sizeof(char), 3, fpsave);
@@ -207,18 +207,18 @@ void read_mob_data(struct mob_data * i, FILE * fpsave)
 
 void save_pc_data(struct pc_data * i, FILE * fpsave)
 {
-  fwrite(i->pwd,         sizeof(char),       PASSWORD_LEN+1, fpsave);
+  fwrite(i->pwd,            sizeof(char),        PASSWORD_LEN+1, fpsave);
   save_char_aliases(i->alias, fpsave);
-  fwrite(&(i->rdeaths),     sizeof(long),        1, fpsave);
-  fwrite(&(i->pdeaths),     sizeof(long),        1, fpsave);
-  fwrite(&(i->pkills),      sizeof(long),        1, fpsave);
-  fwrite(&(i->pklvl),       sizeof(long),        1, fpsave);
+  fwrite(&(i->rdeaths),     sizeof(i->rdeaths),  1, fpsave);
+  fwrite(&(i->pdeaths),     sizeof(i->pdeaths),  1, fpsave);
+  fwrite(&(i->pkills),      sizeof(i->pkills),   1, fpsave);
+  fwrite(&(i->pklvl),       sizeof(i->pklvl),    1, fpsave);
   fwrite(&(i->time),        sizeof(time_data),   1, fpsave);
-  fwrite(&(i->bad_pw_tries),sizeof(long),        1, fpsave);
-  fwrite(&(i->practices),   sizeof(long),        1, fpsave);
-  fwrite(&(i->bank),        sizeof(long),        1, fpsave);
-  fwrite(&(i->toggles),     sizeof(long),        1, fpsave);
-  fwrite(&(i->punish),      sizeof(long),        1, fpsave);
+  fwrite(&(i->bad_pw_tries),sizeof(i->bad_pw_tries), 1, fpsave);
+  fwrite(&(i->practices),   sizeof(i->practices), 1, fpsave);
+  fwrite(&(i->bank),        sizeof(i->bank),     1, fpsave);
+  fwrite(&(i->toggles),     sizeof(i->toggles),  1, fpsave);
+  fwrite(&(i->punish),      sizeof(i->punish),   1, fpsave);
   fwrite_var_string(i->last_site, fpsave);
   fwrite_var_string(i->poofin, fpsave);
   fwrite_var_string(i->poofout, fpsave);
@@ -230,16 +230,16 @@ void save_pc_data(struct pc_data * i, FILE * fpsave)
   // Quest bitvector one
   if(i->quest_bv1) {
     fwrite("QS1", sizeof(char), 3, fpsave);
-    fwrite(&(i->quest_bv1), sizeof(long), 1, fpsave);
+    fwrite(&(i->quest_bv1), sizeof(i->quest_bv1), 1, fpsave);
   }
 
   // Saving throw mods
   fwrite("SVM", sizeof(char), 3, fpsave);
-  fwrite(&(i->saves_mods), sizeof(int), SAVE_TYPE_MAX+1, fpsave);  // Write the whole array
+  fwrite(&(i->saves_mods), sizeof(i->saves_mods[0]), SAVE_TYPE_MAX+1, fpsave);  // Write the whole array
 
   // Specializations
   fwrite("SPC", sizeof(char), 3, fpsave);
-  fwrite(&(i->specializations), sizeof(long), 1, fpsave);
+  fwrite(&(i->specializations), sizeof(i->specializations), 1, fpsave);
 
   // Any future additions to this save file will need to be placed LAST here with a 3 letter code
   // and appropriate strcmp statement in the read_mob_data object
@@ -251,18 +251,18 @@ void read_pc_data(struct pc_data * i, FILE* fpsave)
 {
   char typeflag[4];
 
-  fread(i->pwd,         sizeof(char),       PASSWORD_LEN+1, fpsave);
+  fread(i->pwd,            sizeof(char),       PASSWORD_LEN+1, fpsave);
   i->alias = read_char_aliases(fpsave);
-  fread(&(i->rdeaths),     sizeof(long),        1, fpsave);
-  fread(&(i->pdeaths),     sizeof(long),        1, fpsave);
-  fread(&(i->pkills),      sizeof(long),        1, fpsave);
-  fread(&(i->pklvl),       sizeof(long),        1, fpsave);
+  fread(&(i->rdeaths),     sizeof(i->rdeaths),  1, fpsave);
+  fread(&(i->pdeaths),     sizeof(i->pdeaths),  1, fpsave);
+  fread(&(i->pkills),      sizeof(i->pkills),   1, fpsave);
+  fread(&(i->pklvl),       sizeof(i->pklvl),    1, fpsave);
   fread(&(i->time),        sizeof(time_data),   1, fpsave);
-  fread(&(i->bad_pw_tries),sizeof(long),        1, fpsave);
-  fread(&(i->practices),   sizeof(long),        1, fpsave);
-  fread(&(i->bank),        sizeof(long),        1, fpsave);
-  fread(&(i->toggles),     sizeof(long),        1, fpsave);
-  fread(&(i->punish),      sizeof(long),        1, fpsave);
+  fread(&(i->bad_pw_tries),sizeof(i->bad_pw_tries), 1, fpsave);
+  fread(&(i->practices),   sizeof(i->practices), 1, fpsave);
+  fread(&(i->bank),        sizeof(i->bank),     1, fpsave);
+  fread(&(i->toggles),     sizeof(i->toggles),  1, fpsave);
+  fread(&(i->punish),      sizeof(i->punish),   1, fpsave);
   i->last_site = fread_var_string(fpsave);
   i->poofin    = fread_var_string(fpsave);
   i->poofout   = fread_var_string(fpsave);
@@ -276,19 +276,19 @@ void read_pc_data(struct pc_data * i, FILE* fpsave)
 
   if(!strcmp("QS1", typeflag))
   {
-    fread(&i->quest_bv1, sizeof(long), 1, fpsave);
+    fread(&i->quest_bv1, sizeof(i->quest_bv1), 1, fpsave);
     fread(&typeflag, sizeof(char), 3, fpsave);
   }
 
   if(!strcmp("SVM", typeflag))
   {
-    fread(&(i->saves_mods), sizeof(int),      SAVE_TYPE_MAX+1, fpsave); // read the whole array
+    fread(&(i->saves_mods), sizeof(i->saves_mods[0]), SAVE_TYPE_MAX+1, fpsave); // read the whole array
     fread(&typeflag, sizeof(char), 3, fpsave);
   }
 
   if(!strcmp("SPC", typeflag))
   {
-    fread(&(i->specializations), sizeof(long), 1, fpsave);
+    fread(&(i->specializations), sizeof(i->specializations), 1, fpsave);
     fread(&typeflag, sizeof(char), 3, fpsave);
   }
 
@@ -364,9 +364,9 @@ int char_to_store_variable_data(CHAR_DATA * ch, FILE * fpsave)
 
   while(skill) {
     fwrite("SKL", sizeof(char), 3, fpsave);
-    fwrite(&(skill->skillnum), sizeof(sh_int), 1, fpsave);
-    fwrite(&(skill->learned), sizeof(byte), 1, fpsave);
-    fwrite(&(skill->unused), sizeof(long), 5, fpsave);
+    fwrite(&(skill->skillnum), sizeof(skill->skillnum), 1, fpsave);
+    fwrite(&(skill->learned), sizeof(skill->learned), 1, fpsave);
+    fwrite(&(skill->unused), sizeof(skill->unused), 5, fpsave);
     skill = skill->next;
   }
   fwrite("END", sizeof(char), 3, fpsave);
@@ -389,9 +389,9 @@ void read_skill(CHAR_DATA * ch, FILE * fpsave)
   curr = (char_skill_data *) dc_alloc(1, sizeof(char_skill_data));
 #endif
 
-  fread(&(curr->skillnum), sizeof(sh_int), 1, fpsave);
-  fread(&(curr->learned), sizeof(byte), 1, fpsave);
-  fread(&(curr->unused), sizeof(long), 5, fpsave);
+  fread(&(curr->skillnum), sizeof(curr->skillnum), 1, fpsave);
+  fread(&(curr->learned), sizeof(curr->learned), 1, fpsave);
+  fread(&(curr->unused), sizeof(curr->unused), 5, fpsave);
 
   curr->next = ch->skills;
   ch->skills = curr;
@@ -565,7 +565,7 @@ struct obj_data *  obj_store_to_char(CHAR_DATA *ch, FILE *fpsave, struct obj_dat
 
   int j;
   int nr;
-  int length;
+  uint16 length;
   int wear_pos;
   char mod_type[4];
   char buf[MAX_STRING_LENGTH];
@@ -599,62 +599,62 @@ struct obj_data *  obj_store_to_char(CHAR_DATA *ch, FILE *fpsave, struct obj_dat
 
   if(!strcmp("EQL", mod_type))
   {
-    fread(&obj->obj_flags.eq_level, sizeof(int), 1, fpsave);
+    fread(&obj->obj_flags.eq_level, sizeof(obj->obj_flags.eq_level), 1, fpsave);
     fread(&mod_type, sizeof(char), 3, fpsave);
   }
   if(!strcmp("VA0", mod_type))
   {
-    fread(&obj->obj_flags.value[0], sizeof(int), 1, fpsave);
+    fread(&obj->obj_flags.value[0], sizeof(obj->obj_flags.value[0]), 1, fpsave);
     fread(&mod_type, sizeof(char), 3, fpsave);
   }
   if(!strcmp("VA1", mod_type))
   {
-    fread(&obj->obj_flags.value[1], sizeof(int), 1, fpsave);
+    fread(&obj->obj_flags.value[1], sizeof(obj->obj_flags.value[1]), 1, fpsave);
     fread(&mod_type, sizeof(char), 3, fpsave);
   }
   if(!strcmp("VA2", mod_type))
   {
-    fread(&obj->obj_flags.value[2], sizeof(int), 1, fpsave);
+    fread(&obj->obj_flags.value[2], sizeof(obj->obj_flags.value[2]), 1, fpsave);
     fread(&mod_type, sizeof(char), 3, fpsave);
   }
   if(!strcmp("VA3", mod_type))
   {
-    fread(&obj->obj_flags.value[3], sizeof(int), 1, fpsave);
+    fread(&obj->obj_flags.value[3], sizeof(obj->obj_flags.value[3]), 1, fpsave);
     fread(&mod_type, sizeof(char), 3, fpsave);
   }
   if(!strcmp("EXF", mod_type))
   {
-    fread(&obj->obj_flags.extra_flags, sizeof(int), 1, fpsave);
+    fread(&obj->obj_flags.extra_flags, sizeof(obj->obj_flags.extra_flags), 1, fpsave);
     fread(&mod_type, sizeof(char), 3, fpsave);
   }
   if(!strcmp("MOF", mod_type))
   {
-    fread(&obj->obj_flags.more_flags, sizeof(int), 1, fpsave);
+    fread(&obj->obj_flags.more_flags, sizeof(obj->obj_flags.more_flags), 1, fpsave);
     fread(&mod_type, sizeof(char), 3, fpsave);
   }
   if(!strcmp("TYF", mod_type))
   {
-    fread(&obj->obj_flags.type_flag, sizeof(int), 1, fpsave);
+    fread(&obj->obj_flags.type_flag, sizeof(obj->obj_flags.type_flag), 1, fpsave);
     fread(&mod_type, sizeof(char), 3, fpsave);
   }
   if(!strcmp("WEA", mod_type))
   {
-    fread(&obj->obj_flags.wear_flags, sizeof(int), 1, fpsave);
+    fread(&obj->obj_flags.wear_flags, sizeof(obj->obj_flags.wear_flags), 1, fpsave);
     fread(&mod_type, sizeof(char), 3, fpsave);
   }
   if(!strcmp("SZE", mod_type))
   {
-    fread(&obj->obj_flags.size, sizeof(int), 1, fpsave);
+    fread(&obj->obj_flags.size, sizeof(obj->obj_flags.size), 1, fpsave);
     fread(&mod_type, sizeof(char), 3, fpsave);
   }
   if(!strcmp("WEI", mod_type))
   {
-    fread(&obj->obj_flags.weight, sizeof(int), 1, fpsave);
+    fread(&obj->obj_flags.weight, sizeof(obj->obj_flags.weight), 1, fpsave);
     fread(&mod_type, sizeof(char), 3, fpsave);
   }
   if(!strcmp("AFF", mod_type))
   {
-    fread(&obj->num_affects, sizeof(sh_int), 1, fpsave);
+    fread(&obj->num_affects, sizeof(obj->num_affects), 1, fpsave);
     if(obj->affected)
       dc_free(obj->affected);
 
@@ -666,15 +666,15 @@ struct obj_data *  obj_store_to_char(CHAR_DATA *ch, FILE *fpsave, struct obj_dat
 
     for(j = 0; j < obj->num_affects; j++)
     {
-      fread(&obj->affected[j].location, sizeof(sh_int), 1, fpsave);
-      fread(&obj->affected[j].modifier, sizeof(sh_int), 1, fpsave);
+      fread(&obj->affected[j].location, sizeof(obj->affected[j].location), 1, fpsave);
+      fread(&obj->affected[j].modifier, sizeof(obj->affected[j].modifier), 1, fpsave);
     }
 
     fread(&mod_type, sizeof(char), 3, fpsave);
   }
   if(!strcmp("NAM", mod_type))
   {
-    fread(&length, sizeof(int), 1, fpsave);
+    fread(&length, sizeof(length), 1, fpsave);
     fread(&buf, sizeof(char), length, fpsave);
     buf[length] = '\0';
     obj->name = str_hsh(buf);
@@ -682,7 +682,7 @@ struct obj_data *  obj_store_to_char(CHAR_DATA *ch, FILE *fpsave, struct obj_dat
   }
   if(!strcmp("DES", mod_type))
   {
-    fread(&length, sizeof(int), 1, fpsave);
+    fread(&length, sizeof(length), 1, fpsave);
     fread(&buf, sizeof(char), length, fpsave);
     buf[length] = '\0';
     obj->description = str_hsh(buf);
@@ -690,7 +690,7 @@ struct obj_data *  obj_store_to_char(CHAR_DATA *ch, FILE *fpsave, struct obj_dat
   }
   if(!strcmp("SDE", mod_type))
   {
-    fread(&length, sizeof(int), 1, fpsave);
+    fread(&length, sizeof(length), 1, fpsave);
     fread(&buf, sizeof(char), length, fpsave);
     buf[length] = '\0';
     obj->short_description = str_hsh(buf);
@@ -698,7 +698,7 @@ struct obj_data *  obj_store_to_char(CHAR_DATA *ch, FILE *fpsave, struct obj_dat
   }
   if(!strcmp("ADE", mod_type))
   {
-    fread(&length, sizeof(int), 1, fpsave);
+    fread(&length, sizeof(length), 1, fpsave);
     fread(&buf, sizeof(char), length, fpsave);
     buf[length] = '\0';
     obj->action_description = str_hsh(buf);
@@ -778,7 +778,7 @@ bool put_obj_in_store (struct obj_data *obj, CHAR_DATA *ch, FILE *fpsave, int we
   int    change;
   int    length;
   struct obj_file_elem object;
-  sh_int tmp_weight = 0;
+  int16 tmp_weight = 0;
 
   if (GET_ITEM_TYPE(obj) == ITEM_KEY)
     return TRUE;
@@ -815,52 +815,52 @@ bool put_obj_in_store (struct obj_data *obj, CHAR_DATA *ch, FILE *fpsave, int we
   if(obj->obj_flags.eq_level    != standard_obj->obj_flags.eq_level) 
   {
     fwrite("EQL", sizeof(char), 3, fpsave);
-    fwrite(&obj->obj_flags.eq_level, sizeof(int), 1, fpsave);
+    fwrite(&obj->obj_flags.eq_level, sizeof(obj->obj_flags.eq_level), 1, fpsave);
   }
   if(obj->obj_flags.value[0]    != standard_obj->obj_flags.value[0])
   {
     fwrite("VA0", sizeof(char), 3, fpsave);
-    fwrite(&obj->obj_flags.value[0], sizeof(int), 1, fpsave);
+    fwrite(&obj->obj_flags.value[0], sizeof(obj->obj_flags.value[0]), 1, fpsave);
   }
   if(obj->obj_flags.value[1]    != standard_obj->obj_flags.value[1])
   {
     fwrite("VA1", sizeof(char), 3, fpsave);
-    fwrite(&obj->obj_flags.value[1], sizeof(int), 1, fpsave);
+    fwrite(&obj->obj_flags.value[1], sizeof(obj->obj_flags.value[1]), 1, fpsave);
   }
   if(obj->obj_flags.value[2]    != standard_obj->obj_flags.value[2])
   {
     fwrite("VA2", sizeof(char), 3, fpsave);
-    fwrite(&obj->obj_flags.value[2], sizeof(int), 1, fpsave);
+    fwrite(&obj->obj_flags.value[2], sizeof(obj->obj_flags.value[2]), 1, fpsave);
   }
   if(obj->obj_flags.value[3]    != standard_obj->obj_flags.value[3])
   {
     fwrite("VA3", sizeof(char), 3, fpsave);
-    fwrite(&obj->obj_flags.value[3], sizeof(int), 1, fpsave);
+    fwrite(&obj->obj_flags.value[3], sizeof(obj->obj_flags.value[3]), 1, fpsave);
   }
   if(obj->obj_flags.extra_flags != standard_obj->obj_flags.extra_flags)
   {
     fwrite("EXF", sizeof(char), 3, fpsave);
-    fwrite(&obj->obj_flags.extra_flags, sizeof(int), 1, fpsave);
+    fwrite(&obj->obj_flags.extra_flags, sizeof(obj->obj_flags.extra_flags), 1, fpsave);
   }
   if(obj->obj_flags.more_flags != standard_obj->obj_flags.more_flags)
   {
     fwrite("MOF", sizeof(char), 3, fpsave);
-    fwrite(&obj->obj_flags.more_flags, sizeof(int), 1, fpsave);
+    fwrite(&obj->obj_flags.more_flags, sizeof(obj->obj_flags.more_flags), 1, fpsave);
   }
   if(obj->obj_flags.type_flag != standard_obj->obj_flags.type_flag)
   {
     fwrite("TYF", sizeof(char), 3, fpsave);
-    fwrite(&obj->obj_flags.type_flag, sizeof(int), 1, fpsave);
+    fwrite(&obj->obj_flags.type_flag, sizeof(obj->obj_flags.type_flag), 1, fpsave);
   }
   if(obj->obj_flags.wear_flags != standard_obj->obj_flags.wear_flags)
   {
     fwrite("WEA", sizeof(char), 3, fpsave);
-    fwrite(&obj->obj_flags.wear_flags, sizeof(int), 1, fpsave);
+    fwrite(&obj->obj_flags.wear_flags, sizeof(obj->obj_flags.wear_flags), 1, fpsave);
   }
   if(obj->obj_flags.size != standard_obj->obj_flags.size)
   {
     fwrite("SZE", sizeof(char), 3, fpsave);
-    fwrite(&obj->obj_flags.size, sizeof(int), 1, fpsave);
+    fwrite(&obj->obj_flags.size, sizeof(obj->obj_flags.size), 1, fpsave);
   }
 
   tmp_weight = obj->obj_flags.weight;
@@ -870,7 +870,7 @@ bool put_obj_in_store (struct obj_data *obj, CHAR_DATA *ch, FILE *fpsave, int we
   if(tmp_weight      != standard_obj->obj_flags.weight)
   {
     fwrite("WEI", sizeof(char), 3, fpsave);
-    fwrite(&tmp_weight, sizeof(int), 1, fpsave);
+    fwrite(&tmp_weight, sizeof(tmp_weight), 1, fpsave);
   }
 
   change = (obj->num_affects != standard_obj->num_affects);
@@ -888,11 +888,11 @@ bool put_obj_in_store (struct obj_data *obj, CHAR_DATA *ch, FILE *fpsave, int we
   }
   if(change) {
     fwrite("AFF", sizeof(char), 3, fpsave);
-    fwrite(&obj->num_affects, sizeof(sh_int), 1, fpsave);
+    fwrite(&obj->num_affects, sizeof(obj->num_affects), 1, fpsave);
     for (iAffect = 0; iAffect < obj->num_affects; iAffect++)
     {
-      fwrite(&obj->affected[iAffect].location, sizeof(sh_int), 1, fpsave);
-      fwrite(&obj->affected[iAffect].modifier, sizeof(sh_int), 1, fpsave);
+      fwrite(&obj->affected[iAffect].location, sizeof(obj->affected[iAffect].location), 1, fpsave);
+      fwrite(&obj->affected[iAffect].modifier, sizeof(obj->affected[iAffect].modifier), 1, fpsave);
     }
   }
 
@@ -900,28 +900,28 @@ bool put_obj_in_store (struct obj_data *obj, CHAR_DATA *ch, FILE *fpsave, int we
   {
     fwrite("NAM", sizeof(char), 3, fpsave);
     length = strlen(obj->name);
-    fwrite(&length, sizeof(int), 1, fpsave);
+    fwrite(&length, sizeof(length), 1, fpsave);
     fwrite(obj->name, sizeof(char), length, fpsave);
   }
   if(strcmp(obj->description, standard_obj->description))
   {
     fwrite("DES", sizeof(char), 3, fpsave);
     length = strlen(obj->description);
-    fwrite(&length, sizeof(int), 1, fpsave);
+    fwrite(&length, sizeof(length), 1, fpsave);
     fwrite(obj->description, sizeof(char), length, fpsave);
   }
   if(strcmp(obj->short_description, standard_obj->short_description))
   {
     fwrite("SDE", sizeof(char), 3, fpsave);
     length = strlen(obj->short_description);
-    fwrite(&length, sizeof(int), 1, fpsave);
+    fwrite(&length, sizeof(length), 1, fpsave);
     fwrite(obj->short_description, sizeof(char), length, fpsave);
   }
   if(strcmp(obj->action_description, standard_obj->action_description))
   {
     fwrite("ADE", sizeof(char), 3, fpsave);
     length = strlen(obj->action_description);
-    fwrite(&length, sizeof(int), 1, fpsave);
+    fwrite(&length, sizeof(length), 1, fpsave);
     fwrite(obj->action_description, sizeof(char), length, fpsave);
   }
   // extra descs are a little strange...it's a pointer to a list of them
@@ -1012,11 +1012,6 @@ void store_to_char(struct char_file_u *st, CHAR_DATA *ch)
     ch->affected_by    = st->afected_by;
     ch->affected_by2   = st->afected_by2;
 
-//  Just throw away the apply_saving_throw data.  We don't use it anymore
-//  TODO - needs to be removed when we write a convertor
-//    for(i = 0; i <= 4; i++)
-//      ch->apply_saving_throw[i] = st->apply_saving_throw[i];
-
     for(i = 0; i <= 2; i++)
       GET_COND(ch, i) = st->conditions[i];
 
@@ -1078,14 +1073,13 @@ void char_to_store(CHAR_DATA *ch, struct char_file_u *st)
 
   st->weight    = GET_WEIGHT(ch);
   st->height    = GET_HEIGHT(ch);
-  for(i = 0; i <= 2; i++)
+  for(i = 0; i < 3; i++)
     st->conditions[i] = GET_COND(ch, i);
 
   st->hometown = ch->hometown;
-  if(GET_LEVEL(ch) < 11)
-    st->hometown = START_ROOM;
 
-  st->load_room = world[ch->in_room].number;
+//  gets set outside
+//  st->load_room = world[ch->in_room].number;
 
   st->gold      = GET_GOLD(ch);
   st->plat      = GET_PLATINUM(ch);
@@ -1119,11 +1113,6 @@ void char_to_store(CHAR_DATA *ch, struct char_file_u *st)
     st->afected_by = 0;
     st->afected_by2 = 0;
   }
-
-  // TODO - This needs to be remove when we write a pfile convertor to remove it
-  for(i = 0; i <= 4; i++)
-    st->apply_saving_throw[i] = 0;
-
 
   // re-affect the character with spells
   for(af = ch->affected; af; af = af->next) {

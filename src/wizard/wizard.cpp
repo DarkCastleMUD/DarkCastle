@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.3 2002/06/20 21:39:49 pirahna Exp $
+| $Id: wizard.cpp,v 1.4 2002/06/29 18:16:23 pirahna Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -562,19 +562,19 @@ void mob_stat(struct char_data *ch, struct char_data *k)
           GET_STR(k), GET_INT(k), GET_WIS(k), GET_DEX(k), GET_CON(k) );
   send_to_char(buf,ch);
      
-  sprintf(buf, "$3Mana$R:[%5lld/%5lld+%-4d]  $3Hit$R:[%5lld/%5lld+%-3d]  $3Move$R:[%5lld/%5lld+%-3d]  $3Ki$R:[%3lld/%3lld]\n\r",
+  sprintf(buf, "$3Mana$R:[%5d/%5d+%-4d]  $3Hit$R:[%5d/%5d+%-3d]  $3Move$R:[%5d/%5d+%-3d]  $3Ki$R:[%3d/%3d]\n\r",
           GET_MANA(k),mana_limit(k),mana_gain(k),
           GET_HIT(k),hit_limit(k),hit_gain(k),
           GET_MOVE(k),move_limit(k),move_gain(k),
           GET_KI(k), ki_limit(k));
   send_to_char(buf,ch);
      
-  sprintf(buf, "$3AC$R:[%d]  $3Exp$R:[%lld]  $3Hitroll$R:[%d]  $3Damroll$R:[%d]\n\r",
+  sprintf(buf, "$3AC$R:[%d]  $3Exp$R:[%d]  $3Hitroll$R:[%d]  $3Damroll$R:[%d]\n\r",
           GET_AC(k), GET_EXP(k), k->hitroll, k->damroll );
   send_to_char(buf, ch);
 
   if(!IS_MOB(k)) {
-    sprintf(buf, "$3Coins$R:[%lld]  $3Bank$R:[%lld]\n\r", 
+    sprintf(buf, "$3Coins$R:[%d]  $3Bank$R:[%d]\n\r", 
           GET_GOLD(k), k->pcdata->bank );
     send_to_char(buf, ch);
   }

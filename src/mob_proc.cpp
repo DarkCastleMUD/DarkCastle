@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.3 2002/06/20 21:39:36 pirahna Exp $ */
+/* $Id: mob_proc.cpp,v 1.4 2002/06/29 18:16:22 pirahna Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -2862,7 +2862,24 @@ static char *dethSayText [ ] =
   "A friend of mine confused her valium with her birth control pills. She had 14 kids, but she doesn't care.",
   "A polar bear is a rectangular bear after a coordinate transformation.",
   "Acting is all about honesty. If you can fake that, you've got it made. - George Burns",
-  "After four decimal places, nobody gives a damn."
+  "After four decimal places, nobody gives a damn.",
+  "How come light beer weighs the same as regular beer?",
+  "When people run around and around in circles we say they are crazy. When planets do it we say they are orbiting.",
+  "When they broke open molecules, they found they were only stuffed with atoms.  But when they broke open atoms, they found them stuffed with explosions.",
+  "A vibration is a motion that cannot make up its mind which way it wants to go.",
+  "Water freezes at 32 degrees and boils at 212 degrees. There are 180 degrees between freezing and boiling because there are 180 degrees between north and south.",
+  "Lime is a green-tasting rock.",
+  "Many dead animals of the past turned into fossils while others preferred to be oil.",
+  "Genetics explain why you look like your father and if you don't why you should.",
+  "To most people solutions mean finding the answers. But to chemists solutions are things that are still all mixed up.",
+  "Clouds just keep circling the Earth around and around. And around. There is not much else to do.",
+  "We keep track of the humidity in the air so we won't drown when we breathe.",
+  "Rain is often spoken of as soft water, oppositely known as hail.",
+  "In some rocks you can find the fossil footprints of fishes.",
+  "A blizzard is when it snows sideways.",
+  "It is so hot in some parts of the world that the people there have to live other places.",
+  "The wind is like the air, only pushier.",
+  "Nothing says 'I love you' like oral sex in the morning."
 };
 
 #define DETH_SAY_TEXT_SIZE    ( sizeof ( dethSayText )    / sizeof ( char * ) )
@@ -3347,7 +3364,7 @@ int pet_shops(struct char_data *ch, int cmd, char *arg)
     if (cmd==59) { /* List */
 	send_to_char("Available pets are:\n\r", ch);
 	for(pet = world[pet_room].people; pet; pet = pet->next_in_room) {
-	    sprintf(buf, "%8lld - %s\n\r",
+	    sprintf(buf, "%8d - %s\n\r",
 		3*GET_EXP(pet), pet->short_desc);
 	    send_to_char(buf, ch);
 	}
@@ -3362,7 +3379,7 @@ int pet_shops(struct char_data *ch, int cmd, char *arg)
 	    return eSUCCESS;
 	}
 
-	if (GET_GOLD(ch) < (uint64)(GET_EXP(pet)*3)) {
+	if (GET_GOLD(ch) < (uint32)(GET_EXP(pet)*3)) {
 	    send_to_char("You don't have enough gold!\n\r", ch);
 	    return eSUCCESS;
 	}
@@ -3508,7 +3525,7 @@ int charon(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
    }
    
    /* ch typed pay */
-   if(GET_GOLD(ch) < (uint64)x) {
+   if(GET_GOLD(ch) < (uint32)x) {
       send_to_char("Charon ignores those that cannot afford his services.", ch);
       return eSUCCESS;
    }

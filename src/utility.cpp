@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.3 2002/06/20 21:39:37 pirahna Exp $ */
+/* $Id: utility.cpp,v 1.4 2002/06/29 18:16:22 pirahna Exp $ */
 
 extern "C"
 {
@@ -915,7 +915,7 @@ int do_recall( CHAR_DATA *ch, char *argument, int cmd )
   {
     cf   = 1 + ((level - 11) * .347f);
     cost = (int)(3440 * cf);
-    if (GET_GOLD(ch) < (uint64)cost)
+    if (GET_GOLD(ch) < (uint32)cost)
     {
          csendf(ch, "You don't have %d gold!\n\r", cost);
          return eFAILURE;
@@ -1246,18 +1246,10 @@ bool check_valid_and_convert(int & value, char * buf)
    return TRUE;
 }
 
-// calls below uint64 version
-void parse_bitstrings_into_int(char * bits[], char * strings, char_data * ch, uint32 & value)
-{
-   uint64 temp = 0;
-   parse_bitstrings_into_int(bits, strings, ch, temp);
-   // this is dangerous...hopefully caller made sure their array is small enough
-   value = (uint32)temp;
-}
-// calls below uint64 version
+// calls below uint32 version
 void parse_bitstrings_into_int(char * bits[], char * strings, char_data * ch, uint16 & value)
 {
-   uint64 temp = 0;
+   uint32 temp = 0;
    parse_bitstrings_into_int(bits, strings, ch, temp);
    // this is dangerous...hopefully caller made sure their array is small enough
    value = (uint16)temp;
@@ -1267,7 +1259,7 @@ void parse_bitstrings_into_int(char * bits[], char * strings, char_data * ch, ui
 // Finds the bits[] strings listed in "strings" and toggles the bit in "value"
 // Informs 'ch' of what has happened
 //
-void parse_bitstrings_into_int(char * bits[], char * strings, char_data * ch, uint64 & value)
+void parse_bitstrings_into_int(char * bits[], char * strings, char_data * ch, uint32 & value)
 {
   char buf[MAX_INPUT_LENGTH];
   int  found = FALSE;

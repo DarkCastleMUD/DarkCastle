@@ -364,14 +364,14 @@ int bank(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
                    CHAR_DATA *invoker)
 {
   char buf[MAX_INPUT_LENGTH];
-  int64 x;
+  int32 x;
 
   if(cmd < 172 || cmd > 174)
     return eFAILURE;
 
   /* balance */
   if(cmd == 172) {
-    sprintf(buf, "You have %lld coins in the bank.\n\r", GET_BANK(ch));
+    sprintf(buf, "You have %d coins in the bank.\n\r", GET_BANK(ch));
     send_to_char(buf, ch);
     return eSUCCESS;
   }
@@ -383,13 +383,13 @@ int bank(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
       send_to_char("Deposit what?\n\r", ch);
       return eSUCCESS;
     }
-    if((uint64)x > GET_GOLD(ch)) {
+    if((uint32)x > GET_GOLD(ch)) {
       send_to_char("You don't have that much gold!\n\r", ch);
       return eSUCCESS;
     }
     GET_GOLD(ch) -= x;
     GET_BANK(ch) += x;
-    sprintf(buf, "You deposit %lld coins.\n\r", x);
+    sprintf(buf, "You deposit %d coins.\n\r", x);
     send_to_char(buf, ch);
     save_char_obj(ch);
     return eSUCCESS;
@@ -401,13 +401,13 @@ int bank(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     send_to_char("Withdraw what?\n\r", ch);
     return eSUCCESS;
   }
-  if((uint64)x > GET_BANK(ch)) {
+  if((uint32)x > GET_BANK(ch)) {
     send_to_char("You don't have that much gold in the bank!\n\r", ch);
     return eSUCCESS;
   }
   GET_GOLD(ch) += x;
   GET_BANK(ch) -= x;
-  sprintf(buf, "You withdraw %lld coins.\n\r", x);
+  sprintf(buf, "You withdraw %d coins.\n\r", x);
   send_to_char(buf, ch);
   save_char_obj(ch);
   return eSUCCESS;
@@ -950,7 +950,7 @@ int restring_machine(struct char_data *ch, struct obj_data *obj, int cmd, char *
     return eSUCCESS;
   }
 
-  if(GET_PLATINUM(ch) < (uint64)(GET_LEVEL(ch)) )
+  if(GET_PLATINUM(ch) < (uint32)(GET_LEVEL(ch)) )
   {
     send_to_char("'Not enough platinum.  *beep*'\n", ch);
     return eSUCCESS;

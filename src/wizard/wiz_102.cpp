@@ -86,11 +86,11 @@ int do_check(struct char_data *ch, char *arg, int cmd) {
           pc_clss_types[(int)(GET_CLASS(vict))], GET_LEVEL(vict),
           (connected ? world[vict->in_room].number : -1));
   send_to_char(buf, ch);  
-  sprintf(buf, "$3Exp$R: %-10lld $3Gold$R: %-10lld $3Bank$R: %-9lld $3Align$R: %d\n\r",
+  sprintf(buf, "$3Exp$R: %-10d $3Gold$R: %-10d $3Bank$R: %-9d $3Align$R: %d\n\r",
           GET_EXP(vict), GET_GOLD(vict), GET_BANK(vict), GET_ALIGNMENT(vict));
   send_to_char(buf, ch);
   if(GET_LEVEL(ch) >= SERAPH) {
-    sprintf(buf, "$3Load Rm$R: %-5d  $3Home Rm$R: %-5hd  $3Platinum$R: %lld\n\r",
+    sprintf(buf, "$3Load Rm$R: %-5d  $3Home Rm$R: %-5hd  $3Platinum$R: %d\n\r",
       world[vict->in_room].number, vict->hometown, GET_PLATINUM(vict));
     send_to_char(buf, ch);
   }
@@ -98,7 +98,7 @@ int do_check(struct char_data *ch, char *arg, int cmd) {
           GET_STR(vict), GET_WIS(vict), GET_INT(vict), GET_DEX(vict),
           GET_CON(vict));
   send_to_char(buf, ch);
-  sprintf(buf, "$3Hit Points$R: %lld/%lld $3Mana$R: %lld/%lld $3Move$R: %lld/%lld $3Ki$R: %lld/%lld\n\r",
+  sprintf(buf, "$3Hit Points$R: %d/%d $3Mana$R: %d/%d $3Move$R: %d/%d $3Ki$R: %d/%d\n\r",
           GET_HIT(vict), GET_MAX_HIT(vict), GET_MANA(vict),
           GET_MAX_MANA(vict), GET_MOVE(vict), GET_MAX_MOVE(vict),
           GET_KI(vict), GET_MAX_KI(vict));
@@ -2745,7 +2745,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd)
          if(!*buf4) {
           send_to_char("$3Syntax$R: medit [mob_num] hphitpoints <hp>\n\r"
                        "$3Current$R: ", ch);
-          sprintf(buf, "%lld\n", ((char_data *)mob_index[mob_num].item)->raw_hit);
+          sprintf(buf, "%d\n", ((char_data *)mob_index[mob_num].item)->raw_hit);
           send_to_char(buf, ch);
           send_to_char("$3Valid Range$R: 1 to 1000000\r\n", ch);
           return eFAILURE;
@@ -2765,7 +2765,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd)
          if(!*buf4) {
           send_to_char("$3Syntax$R: medit [mob_num] gold <goldamount>\n\r"
                        "$3Current$R: ", ch);
-          sprintf(buf, "%lld\n", ((char_data *)mob_index[mob_num].item)->gold);
+          sprintf(buf, "%d\n", ((char_data *)mob_index[mob_num].item)->gold);
           send_to_char(buf, ch);
           send_to_char("$3Valid Range$R: 0 to 50000\r\n", ch);
           return eFAILURE;
@@ -2784,7 +2784,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd)
          if(!*buf4) {
           send_to_char("$3Syntax$R: medit [mob_num] experiencepoints <xpamount>\n\r"
                        "$3Current$R: ", ch);
-          sprintf(buf, "%lld\n", ((char_data *)mob_index[mob_num].item)->exp);
+          sprintf(buf, "%d\n", ((char_data *)mob_index[mob_num].item)->exp);
           send_to_char(buf, ch);
           send_to_char("$3Valid Range$R: 0 to 50000\r\n", ch);
           return eFAILURE;
@@ -3822,7 +3822,7 @@ int do_rstat(struct char_data *ch, char *argument, int cmd)
             return eFAILURE;
          }
             sprintf(buf,
-            "Room name: %s, Of zone : %d. V-Number : %d, R-number : %lld\n\r",
+            "Room name: %s, Of zone : %d. V-Number : %d, R-number : %d\n\r",
                 rm->name, rm->zone, rm->number, ch->in_room);
             send_to_char(buf, ch);
 

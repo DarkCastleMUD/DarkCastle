@@ -8,7 +8,6 @@ SRCS = $(shell find $(SRC_DIR) -name "*.cpp" -maxdepth 2)
 
 OBJS = $(SRCS:.cpp=.o)
 
-DC2_FLAGS = -DDC2
 #FAST_FLAGS  = -02
 DEBUG_FLAGS = -ggdb
 PROF_FLAGS = $(DEBUG_FLAGS) -pg
@@ -33,7 +32,6 @@ default:
 	@echo "simple	Make with no libraries/flags"
 	@echo "fast	Make with optimization flags"
 	@echo "profile  Make with debug & profile libraries/flags"
-	@echo "dc2      Make post-wipe DC"
 	@echo ""
 
 profile:
@@ -47,9 +45,6 @@ simple:
 fast:
 	@$(MAKE) darkcastle PROGNAME=$(BASENAME).fast CXXFLAGS="$(IN_CXXFLAGS)"
 #	$(FAST_FLAGS)"
-
-dc2:
-	@$(MAKE) darkcastle PROGNAME=$(BASENAME).dc2 CXXFLAGS="$(IN_CXXFLAGS) $(DEBUG_FLAGS) $(DC2_FLAGS)"
 
 darkcastle: $(OBJS)
 	$(CXX) $(CXXFLAGS) $(LIBDIRS) -o $(PROGNAME) $(OBJS) $(LDFLAGS)

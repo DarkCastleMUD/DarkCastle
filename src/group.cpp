@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: group.cpp,v 1.3 2002/06/20 21:39:36 pirahna Exp $
+| $Id: group.cpp,v 1.4 2002/06/29 18:16:21 pirahna Exp $
 | group.C
 | Description:  Group related commands; join, abandon, follow, etc..
 */
@@ -125,7 +125,7 @@ int do_found(CHAR_DATA *ch, char *argument, int cmd)
 
 int do_split(CHAR_DATA *ch, char *argument, int cmd)
 {
-  int64 amount, share, extra;
+  int32 amount, share, extra;
   char buf[256], number[MAX_INPUT_LENGTH+1];
   int no_members;
   CHAR_DATA *k;
@@ -155,7 +155,7 @@ int do_split(CHAR_DATA *ch, char *argument, int cmd)
     return eSUCCESS;
   }
 
-  if (GET_GOLD(ch) < (uint64) amount) {
+  if (GET_GOLD(ch) < (uint32) amount) {
     send_to_char( "You don't have that much gold!\n\r", ch );
     return eFAILURE;
   }
@@ -185,13 +185,13 @@ int do_split(CHAR_DATA *ch, char *argument, int cmd)
   do_save(ch, "", 666);
 
   if ( k==ch ) {
-      sprintf( buf, "You split %lld gold coins.  ", amount );
+      sprintf( buf, "You split %d gold coins.  ", amount );
       extra = amount - ( no_members * share );
   } else {
-      sprintf( buf, "%s splits %lld gold coins.  ", GET_SHORT(ch), amount );
+      sprintf( buf, "%s splits %d gold coins.  ", GET_SHORT(ch), amount );
   }
   send_to_char( buf, k );
-  sprintf( buf, "Your share is %lld gold coins.\n\r", share + extra );
+  sprintf( buf, "Your share is %d gold coins.\n\r", share + extra );
   send_to_char( buf, k );
   GET_GOLD(k) += share + extra;
 
@@ -199,11 +199,11 @@ int do_split(CHAR_DATA *ch, char *argument, int cmd)
     if (IS_AFFECTED(f->follower, AFF_GROUP) &&
     (f->follower->in_room == ch->in_room)) {
       if (f->follower==ch)
-	sprintf( buf, "You split %lld gold coins.  ", amount );
+	sprintf( buf, "You split %d gold coins.  ", amount );
       else 
-	sprintf( buf, "%s splits %lld gold coins.  ", GET_SHORT(ch), amount );
+	sprintf( buf, "%s splits %d gold coins.  ", GET_SHORT(ch), amount );
       send_to_char( buf, f->follower );
-      sprintf( buf, "Your share is %lld gold coins.\n\r", share );
+      sprintf( buf, "Your share is %d gold coins.\n\r", share );
       send_to_char( buf, f->follower );
       GET_GOLD(f->follower) += share;
       } 
@@ -216,16 +216,16 @@ void setup_group_buf(char * report, char_data * j)
   if(IS_NPC(j) || IS_ANONYMOUS(j))
   {
     if(GET_CLASS(j) == CLASS_MONK || GET_CLASS(j) == CLASS_BARD)
-      sprintf(report, "[-====-|      %3lld%%    hp     %3lld%%   k     %3lld%%   mv]",
+      sprintf(report, "[-====-|      %3d%%    hp     %3d%%   k     %3d%%   mv]",
 	           MAX(1, GET_HIT(j))*100 / MAX(1, GET_MAX_HIT(j)),
 		   MAX(1, GET_KI(j))*100 / MAX(1, GET_MAX_KI(j)),
 		   MAX(1, GET_MOVE(j))*100 / MAX(1, GET_MAX_MOVE(j)));
     else if(GET_CLASS(j) == CLASS_WARRIOR || GET_CLASS(j) == CLASS_THIEF ||
             GET_CLASS(j) == CLASS_BARBARIAN) 
-      sprintf(report, "[-====-|      %3lld%%    hp    -====-        %3lld%%   mv]",
+      sprintf(report, "[-====-|      %3d%%    hp    -====-        %3d%%   mv]",
 	           MAX(1, GET_HIT(j))*100 / MAX(1, GET_MAX_HIT(j)),
 		   MAX(1, GET_MOVE(j))*100 / MAX(1, GET_MAX_MOVE(j)));
-    else sprintf(report, "[-====-|      %3lld%%    hp     %3lld%%   m     %3lld%%   mv]",
+    else sprintf(report, "[-====-|      %3d%%    hp     %3d%%   m     %3d%%   mv]",
 	           MAX(1, GET_HIT(j))*100 / MAX(1, GET_MAX_HIT(j)),
 		   MAX(1, GET_MANA(j))*100 / MAX(1, GET_MAX_MANA(j)),
 		   MAX(1, GET_MOVE(j))*100 / MAX(1, GET_MAX_MOVE(j)));
@@ -233,15 +233,15 @@ void setup_group_buf(char * report, char_data * j)
   else
   {
     if(GET_CLASS(j) == CLASS_MONK || GET_CLASS(j) == CLASS_BARD)
-      sprintf(report, "[Lv %3d| %6lld/%-6lldhp %5lld/%-5lldk %5lld/%-5lldmv]",
+      sprintf(report, "[Lv %3d| %6d/%-6dhp %5d/%-5dk %5d/%-5dmv]",
                    GET_LEVEL(j), GET_HIT(j), GET_MAX_HIT(j), GET_KI(j),
                    GET_MAX_KI(j), GET_MOVE(j), GET_MAX_MOVE(j));
     else if(GET_CLASS(j) == CLASS_WARRIOR || GET_CLASS(j) == CLASS_THIEF ||
                    GET_CLASS(j) == CLASS_BARBARIAN) 
-      sprintf(report, "[Lv %3d| %6lld/%-6lldhp    -====-    %5lld/%-5lldmv]",
+      sprintf(report, "[Lv %3d| %6d/%-6dhp    -====-    %5d/%-5dmv]",
                    GET_LEVEL(j), GET_HIT(j), GET_MAX_HIT(j), 
                    GET_MOVE(j), GET_MAX_MOVE(j));
-    else sprintf(report, "[Lv %3d| %6lld/%-6lldhp %5lld/%-5lldm %5lld/%-5lldmv]",
+    else sprintf(report, "[Lv %3d| %6d/%-6dhp %5d/%-5dm %5d/%-5dmv]",
                    GET_LEVEL(j), GET_HIT(j), GET_MAX_HIT(j), GET_MANA(j),
                    GET_MAX_MANA(j), GET_MOVE(j), GET_MAX_MOVE(j));
   }

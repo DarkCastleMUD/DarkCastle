@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.3 2002/06/20 21:39:36 pirahna Exp $
+| $Id: move.cpp,v 1.4 2002/06/29 18:16:22 pirahna Exp $
 | move.C
 | Movement commands and stuff.
 */
@@ -193,7 +193,7 @@ int do_fall(CHAR_DATA *ch, short dir)
   if(IS_SET(world[target].room_flags, IMP_ONLY) && GET_LEVEL(ch) < IMP)
     return eFAILURE;  // not gonna do it
 
-  sprintf(damage,"%s falls from %d and sustains %lld damage.",
+  sprintf(damage,"%s falls from %d and sustains %d damage.",
           GET_NAME(ch), world[ch->in_room].number, (GET_MAX_HIT(ch)/6)); 
   log(damage, IMMORTAL, LOG_MORTAL);
 

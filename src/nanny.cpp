@@ -11,7 +11,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.3 2002/06/20 21:39:36 pirahna Exp $ */
+/* $Id: nanny.cpp,v 1.4 2002/06/29 18:16:22 pirahna Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -495,6 +495,8 @@ void nanny(struct descriptor_data *d, char *arg)
       ch    = d->character;
       
       // This is needed for "check_reconnect"  we free it later during load_char_obj
+      // TODO - this is memoryleaking ch->name.  Check if ch->name is not there before
+      // doing it to fix it.  (No time to verify this now, so i'll do it later)
       GET_NAME(ch) = str_dup(tmp_name);
       
       if(check_reconnect(d, tmp_name, FALSE))
@@ -520,13 +522,6 @@ void nanny(struct descriptor_data *d, char *arg)
          /* New player */
          sprintf( buf, "Did I get that right, %s (Y/N)? ", tmp_name );
          SEND_TO_Q( buf, d );
-         // at this point, pcdata hasn't yet been created.  So we're going to go ahead and
-         // allocate it since a new character is obviously a PC
-#ifdef LEAK_CHECK
-         ch->pcdata = (pc_data *)calloc(1, sizeof(pc_data));
-#else
-         ch->pcdata = (pc_data *)dc_alloc(1, sizeof(pc_data));
-#endif
          STATE(d) = CON_CONFIRM_NEW_NAME;
          return;
       }
@@ -608,6 +603,13 @@ void nanny(struct descriptor_data *d, char *arg)
          SEND_TO_Q( buf, d );
          SEND_TO_Q( echo_off_str, d );
          STATE(d) = CON_GET_NEW_PASSWORD;
+         // at this point, pcdata hasn't yet been created.  So we're going to go ahead and
+         // allocate it since a new character is obviously a PC
+#ifdef LEAK_CHECK
+         ch->pcdata = (pc_data *)calloc(1, sizeof(pc_data));
+#else
+         ch->pcdata = (pc_data *)dc_alloc(1, sizeof(pc_data));
+#endif
          break;
          
       case 'n': case 'N':
@@ -1178,6 +1180,8 @@ bool check_reconnect( struct descriptor_data *d, char *name, bool fReconnect )
 
       if(fReconnect == FALSE)
       {
+         // TODO - why are we doing this?  we load the password doing load_char_obj
+         // unless someone changed their password and didn't save this doesn't seem useful
          if(d->character->pcdata)
            strncpy( d->character->pcdata->pwd, tmp_ch->pcdata->pwd, PASSWORD_LEN );
       }

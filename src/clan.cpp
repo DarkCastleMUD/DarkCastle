@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.3 2002/06/20 21:39:36 pirahna Exp $ */
+/* $Id: clan.cpp,v 1.4 2002/06/29 18:16:21 pirahna Exp $ */
 extern "C"
 {
   #include <string.h> // strcat
@@ -139,7 +139,7 @@ void boot_clans(void)
 #endif
           new_new_member->member_name = fread_string(fl, 0);
           fgets(buf, 198, fl);
-          sscanf(buf, "%lld %lld %lld %lld %lld %lld", 
+          sscanf(buf, "%d %d %d %d %d %d", 
                       &new_new_member->member_rights, &new_new_member->member_rank,
                       &new_new_member->unused1,       &new_new_member->unused2, 
                       &new_new_member->unused3,       &new_new_member->time_joined);
@@ -202,7 +202,7 @@ void save_clans(void)
 
      for(pmember = pclan->members; pmember; pmember = pmember->next) {
        fprintf(fl, "M\n%s~\n", pmember->member_name);
-       fprintf(fl, "%lld %lld %lld %lld %lld %lld\n",
+       fprintf(fl, "%d %d %d %d %d %d\n",
                       pmember->member_rights, pmember->member_rank,
                       pmember->unused1,       pmember->unused2, 
                       pmember->unused3,       pmember->time_joined);
@@ -501,7 +501,7 @@ void delete_clan(struct clan_data * dead_clan)
 }
 
 // see if ch has rights to 'bit' in his clan
-int has_right(struct char_data * ch, uint64 bit)
+int has_right(struct char_data * ch, uint32 bit)
 {
   struct clan_member_data * pmember = NULL;
   

@@ -12,11 +12,15 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: obj.h,v 1.3 2002/06/20 21:39:49 pirahna Exp $ */
+/* $Id: obj.h,v 1.4 2002/06/29 18:16:22 pirahna Exp $ */
 #ifndef OBJ_H_
 #define OBJ_H_
 
 #include <structs.h> // byte
+
+// functions from objects.cpp
+int get_max_damage(obj_data * obj);
+
 /* The following defs are for obj_data  */
 
 /* For 'type_flag' */
@@ -177,12 +181,12 @@ struct obj_flag_data
 {
     int16 value[4];       /* Values of the item (see list)    */
     ubyte type_flag;     /* Type of item                     */
-    uint64 wear_flags;     /* Where you can wear it            */
+    uint32 wear_flags;     /* Where you can wear it            */
     uint16 size;           /* Race restrictions                */
-    uint64 extra_flags;    /* If it hums, glows etc            */
+    uint32 extra_flags;    /* If it hums, glows etc            */
      int16 weight;         /* Weight what else                 */
      int32 cost;           /* Value when sold (gp.)            */
-    uint64 more_flags;     /* A second bitvector (extra_flags2)*/
+    uint32 more_flags;     /* A second bitvector (extra_flags2)*/
      int16 eq_level;	/* Min level to use it for eq       */
      int16 timer;          /* Timer for object                 */
 };
@@ -252,12 +256,12 @@ struct obj_data
 
 struct obj_file_elem 
 {
-    int version;
-    sh_int item_number;
-    sh_int timer;
-    int wear_pos;
-    int container_depth;
-    int other[5];        // unused
+    int16 version;
+    int32 item_number;
+    int16 timer;
+    int16 wear_pos;
+    int16 container_depth;
+    int32 other[5];        // unused
 };
 
 #endif
