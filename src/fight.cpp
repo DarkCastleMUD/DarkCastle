@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.88 2003/01/16 04:26:34 dcastle Exp $ */
+/* $Id: fight.cpp,v 1.89 2003/01/16 06:33:41 dcastle Exp $ */
 
 extern "C"
 {
@@ -1836,19 +1836,33 @@ bool check_dodge(CHAR_DATA * ch, CHAR_DATA * victim)
   int learned;
   int specialization;
   
-  // TODO - eventually have this check for mobs that have dodge SKILL
-
   if((IS_SET(victim->combat, COMBAT_STUNNED)) ||
-    (IS_NPC(victim) && (!IS_SET(victim->mobdata->actflags, ACT_DODGE))) ||
     (IS_SET(victim->combat, COMBAT_STUNNED2)) ||
     (IS_SET(victim->combat, COMBAT_BASH1)) ||
     (IS_SET(victim->combat, COMBAT_BASH2)) ||
     (IS_AFFECTED(victim, AFF_PARALYSIS)))
     return FALSE;
   chance = 0;
-  
-  if (IS_NPC(victim) && (IS_SET(victim->mobdata->actflags, ACT_DODGE)))
-    chance = MIN(20, 2 * GET_LEVEL(victim));
+
+  if (IS_NPC(victim))
+  {
+    switch(GET_CLASS(victim)) {
+      case CLASS_WARRIOR:       chance = MIN(GET_LEVEL(victim),             40);   break;
+      case CLASS_THIEF:         chance = MIN(GET_LEVEL(victim)*2,           90);   break;
+      case CLASS_MONK:          chance = MIN((int) (GET_LEVEL(victim)*1.5), 75);   break;
+      case CLASS_BARD:          chance = MIN(GET_LEVEL(victim)*2,           85);   break;
+      case CLASS_RANGER:        chance = MIN(GET_LEVEL(victim)*2,           70);   break;
+      case CLASS_PALADIN:       chance = MIN((int) (GET_LEVEL(victim)/2),   20);   break;
+      case CLASS_ANTI_PAL:      chance = MIN((int) (GET_LEVEL(victim)*1.5), 75);   break;
+      case CLASS_BARBARIAN:     chance = MIN((int) (GET_LEVEL(victim)/5),   10);   break;
+      case CLASS_MAGIC_USER:    chance = 5; break;
+      case CLASS_CLERIC:        chance = 5; break;
+      case CLASS_NECROMANCER:   chance = 5; break;
+      default:                  chance = 0; break;
+    }
+    if(0 == chance && IS_SET(victim->mobdata->actflags, ACT_DODGE))
+      chance = 20;
+  }
   else
     chance = has_skill(victim, SKILL_DODGE);
 

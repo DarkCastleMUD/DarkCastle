@@ -190,6 +190,13 @@ struct song_info_type song_info [ ] = {
         TAR_OBJ_ROOM, 
         song_shattering_resonance, execute_song_shattering_resonance,
 	NULL, NULL
+},
+
+{ /* 18 */
+	8, POSITION_FIGHTING, 5, SKILL_SONG_UNRESIST_DITTY, 
+        TAR_IGNORE, 
+        song_unresistable_ditty, execute_song_unresistable_ditty,
+	NULL, NULL
 }
 
 };
@@ -217,6 +224,7 @@ char *songs[] = {
         "astral chanty",
         "disarming limerick",
         "shattering resonance",
+        "unresistable ditty",
 	"\n"
 };
 
@@ -1882,5 +1890,39 @@ void make_person_dance(char_data * ch)
    strcpy(dothis, dances[number(0, numdances)]);
 
    command_interpreter(ch, dothis);
+}
+
+int song_unresistable_ditty( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+{
+   send_to_char("You begin to sing an unresistable little ditty...\n\r", ch);
+   act("$n begins to sing, 'du du dudu du du dudu du du dudu!'", ch, 0, 0, TO_ROOM, 0);
+   ch->song_timer = song_info[ch->song_number].beats;
+   return eSUCCESS;
+}
+
+int execute_song_unresistable_ditty( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+{
+   char_data * i;
+
+   act("$n finishs $s song, 'Ahhhhh!  Macarena!'", ch, 0, 0, TO_ROOM, 0);
+   send_to_char("Ahhh....such beautiful music.\r\n", ch);
+
+//   int specialization = skill / 100;
+   skill %= 100;
+
+   for (i = world[ch->in_room].people; i; i = i->next_in_room)
+   {
+      if(GET_LEVEL(i) <= GET_LEVEL(ch))
+      {
+         make_person_dance(i);
+         if(skill > 80)
+            WAIT_STATE(i, PULSE_VIOLENCE*2);
+      }
+   }
+
+
+   skill_increase_check(ch, SKILL_SONG_UNRESIST_DITTY, skill, SKILL_INCREASE_EASY);
+
+   return eSUCCESS;
 }
 

@@ -3,7 +3,7 @@
  * singing bard powers, although the sing structure is in
  * spells.h, so that must be included
  */
-/* $Id: sing.h,v 1.3 2002/08/05 20:37:25 pirahna Exp $ */
+/* $Id: sing.h,v 1.4 2003/01/16 06:33:45 dcastle Exp $ */
 
 #ifndef SING_H_
 #define SING_H_
@@ -79,5 +79,7 @@ SING_FUN(song_vigilant_siren);
 SING_FUN(execute_song_vigilant_siren);
 SING_FUN(pulse_vigilant_siren);
 SING_FUN(intrp_vigilant_siren);
+SING_FUN(song_unresistable_ditty);
+SING_FUN(execute_song_unresistable_ditty);
 
 #endif // SING_H_

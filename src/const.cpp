@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: const.cpp,v 1.52 2003/01/16 03:59:09 dcastle Exp $ */
+/* $Id: const.cpp,v 1.53 2003/01/16 06:33:41 dcastle Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1183,7 +1183,8 @@ struct class_skill_defines d_skills[] = { // bard skills
 {      "crushing",		SKILL_CRUSHING_WEAPONS,		30,	80,	3201,	NULL },
 {      "listsongs",		SKILL_SONG_LIST_SONGS,		1,	100,	3201, 	NULL},
 {      "whistle sharp",		SKILL_SONG_WHISTLE_SHARP, 	1,	90,	3201, 	NULL},
-{      "stop",			SKILL_SONG_STOP,		7,	90,	3201, 	NULL},
+{      "stop",			SKILL_SONG_STOP,		5,	90,	3201, 	NULL},
+{      "unresistable ditty",	SKILL_SONG_UNRESIST_DITTY,	5,	90,	3201, 	NULL},
 {      "traveling march",	SKILL_SONG_TRAVELING_MARCH,	7,	90,	3201, 	NULL},
 {      "bountiful sonnet",	SKILL_SONG_BOUNT_SONNET,	9,	90,	3201, 	NULL},
 {      "insane chant",		SKILL_SONG_INSANE_CHANT,	10,	90,	3201, 	NULL},
