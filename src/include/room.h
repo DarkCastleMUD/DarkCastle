@@ -1,7 +1,7 @@
 #ifndef __ROOM_H__
 #define __ROOM_H__
 /************************************************************************
-| $Id: room.h,v 1.5 2002/07/18 18:23:56 pirahna Exp $
+| $Id: room.h,v 1.6 2002/10/31 06:13:29 pirahna Exp $
 | room.h
 | Description:  This file contains all of the room header file/constant
 |   information.  It also contains information about the 'world' structs.
@@ -79,7 +79,9 @@
 #define SECT_UNDERWATER      11
 #define SECT_SWAMP           12
 #define SECT_AIR             13
-#define SECT_MAX_SECT        13 // update this if you add more
+#define SECT_FROZEN_TUNDRA   14
+#define SECT_ARCTIC          15
+#define SECT_MAX_SECT        15 // update this if you add more
                                 // and const.c stuff for sectors
 
 struct room_direction_data
