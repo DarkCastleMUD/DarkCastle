@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: who.cpp,v 1.2 2002/06/13 04:41:09 dcastle Exp $
+| $Id: who.cpp,v 1.3 2002/06/20 21:39:37 pirahna Exp $
 | who.C
 | Commands for who, maybe? :P
 */
@@ -99,8 +99,6 @@ int do_whogroup(struct char_data *ch, char *argument, int cmd)
 
    one_argument(argument, target);
       
-
-
    hasholylight = IS_MOB(ch) ? 0 : ch->pcdata->holyLite;
 
    colorCharSend(
@@ -135,7 +133,7 @@ int do_whogroup(struct char_data *ch, char *argument, int cmd)
          k = i;
          sprintf(tempbuffer, "\n\r"
                              "   $B$7[$4: $5%s $4:$7]$R\n\r"
-                             "   Number of PKs: %-3ld  Average level of victim: %ld\n\r", 
+                             "   Number of PKs: %-3lld  Average level of victim: %lld\n\r", 
                              k->group_name,
                              IS_MOB(k) ? 0 : k->pcdata->group_kills, 
                              IS_MOB(k) ? 0 : (k->pcdata->group_kills ?  
@@ -237,7 +235,7 @@ int do_whosolo(struct char_data *ch, char *argument, int cmd)
          if (!IS_AFFECTED(i, AFF_GROUP)) {
             if (!IS_ANONYMOUS(i))
                sprintf(tempbuffer,
-                 "   %-15s %-9s %-13s %2d     %-4ld%-7ld%ld\n\r",
+                 "   %-15s %-9s %-13s %2d     %-4d%-7d%lld\n\r",
                  i->name,
                  race_info[(int)GET_RACE(i)].singular_name,
                  pc_clss_types[(int)GET_CLASS(i)], GET_LEVEL(i),
@@ -248,7 +246,7 @@ int do_whosolo(struct char_data *ch, char *argument, int cmd)
                  );
             else
                sprintf(tempbuffer,
-                "   %-15s %-9s Anonymous            %-4ld%-7ld%ld\n\r",
+                "   %-15s %-9s Anonymous            %-4d%-7d%lld\n\r",
 	        i->name, 
                 race_info[(int)GET_RACE(i)].singular_name,
                  IS_MOB(i) ? 0 : i->pcdata->totalpkills, 

@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.2 2002/06/13 04:41:07 dcastle Exp $ */
+/* $Id: db.cpp,v 1.3 2002/06/20 21:39:36 pirahna Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -982,7 +982,7 @@ void write_one_room(FILE * f, int a)
   string_to_file(f, world[a].name);
   string_to_file(f, world[a].description);
 
-  fprintf(f, "%d %ld %d\n",
+  fprintf(f, "%d %lld %d\n",
              world[a].zone,
              world[a].room_flags,
              world[a].sector_type
@@ -1121,7 +1121,7 @@ int read_one_room(FILE *fl, int & room_nr)
 
     if (load_debug) 
     {
-      printf ("Flags are %d %ld %d\n", tmp, world[room_nr].room_flags,
+      printf ("Flags are %d %lld %d\n", tmp, world[room_nr].room_flags,
               world[room_nr].sector_type);
       fflush (stdout);
     }
@@ -2258,10 +2258,10 @@ void write_mobile(char_data * mob, FILE *fl)
     string_to_file( fl, mob->long_desc );
     string_to_file( fl, mob->description );
 
-    fprintf(fl, "%ld %ld %d R %d\n"
-            "%d %d %d %dd%d+%d %dd%d+%d\n"
-            "%ld %ld\n"
-            "%d %d %d %ld %ld %ld\n",
+    fprintf(fl, "%lld %lld %d R %d\n"
+            "%d %d %d %lldd%d+%d %dd%d+%d\n"
+            "%lld %lld\n"
+            "%d %d %d %lld %lld %lld\n",
                          mob->mobdata->actflags,
                          mob->affected_by,
                          mob->alignment,
@@ -2825,9 +2825,9 @@ void write_object(obj_data * obj, FILE *fl)
     string_to_file( fl, obj->description );
     string_to_file( fl, obj->action_description );
 
-    fprintf(fl, "%d %d %d %d\n"
+    fprintf(fl, "%d %lld %lld %d\n"
                 "%d %d %d %d %d\n"
-                "%d %d %d\n",
+                "%d %d %lld\n",
                           obj->obj_flags.type_flag,
                           obj->obj_flags.extra_flags,
                           obj->obj_flags.wear_flags,

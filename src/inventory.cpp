@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.2 2002/06/13 04:41:08 dcastle Exp $
+| $Id: inventory.cpp,v 1.3 2002/06/20 21:39:36 pirahna Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -571,7 +571,7 @@ int do_drop(struct char_data *ch, char *argument, int cmd)
       send_to_char("Sorry, you can't do that!\n\r",ch);
       return eFAILURE;
     }
-    if(GET_GOLD(ch) < amount) {
+    if(GET_GOLD(ch) < (uint64)amount) {
       send_to_char("You haven't got that many coins!\n\r",ch);
       return eFAILURE;
     }
@@ -869,7 +869,7 @@ int do_give(struct char_data *ch, char *argument, int cmd)
       send_to_char("Sorry, you can't do that!\n\r",ch);
       return eFAILURE;
     }
-    if(GET_GOLD(ch) < amount && GET_LEVEL(ch) < DEITY) 
+    if(GET_GOLD(ch) < (uint64)amount && GET_LEVEL(ch) < DEITY) 
     {
       send_to_char("You haven't got that many coins!\n\r",ch);
       return eFAILURE;

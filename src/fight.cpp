@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.2 2002/06/13 04:41:07 dcastle Exp $ */
+/* $Id: fight.cpp,v 1.3 2002/06/20 21:39:36 pirahna Exp $ */
 
 extern "C"
 {
@@ -1157,7 +1157,7 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
   int typeofdamage;
   int damage_type(int weapon_type);
   long int get_weapon_bit(int weapon_type);
-  int hit_limit(CHAR_DATA * ch);
+  int64 hit_limit(CHAR_DATA * ch);
   int retval;
   int modifier = 0;
   int learned;

@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.2 2002/06/13 04:41:08 dcastle Exp $ */
+/* $Id: mob_proc2.cpp,v 1.3 2002/06/20 21:39:36 pirahna Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -139,7 +139,7 @@ int repair_guy(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
   if (price < 100)
     price = 100;     // Welp.. Repair Guy needs to feed the kids somehow.. :)
   
-  if (GET_GOLD(ch) < price) {
+  if (GET_GOLD(ch) < (uint64)price) {
     act("The Repair Guy says 'Trying to sucker me for a free repair job?'",ch,0,0, TO_CHAR, 0);
     act("The Repair Guy says 'Trying to sucker me for a free repair job?'",ch,0,0, TO_ROOM, 0);
     sprintf(buf, "The Repair Guy says 'It would cost %d coins to repair %s, which you don't have!'",
@@ -240,7 +240,7 @@ int super_repair_guy(struct char_data *ch, struct obj_data *obj, int cmd, char *
     if (price < 1000)
       price = 1000;     /* Welp.. Repair Guy needs to feed the kids somehow.. :) */
   
-    if (GET_GOLD(ch) < price) {
+    if (GET_GOLD(ch) < (uint64)price) {
       act("The Super Repair Guy says 'Trying to sucker me for a free repair job?'",ch,0,0, TO_CHAR, 0);
       act("The Super Repair Guy says 'Trying to sucker me for a free repair job?'",ch,0,0, TO_ROOM, 0);
       sprintf(buf, "The Super Repair Guy says 'It would cost %d coins to repair %s, which you don't have!'",
@@ -301,7 +301,7 @@ int super_repair_guy(struct char_data *ch, struct obj_data *obj, int cmd, char *
     if (price < 1000)
       price = 1000;     /* Welp.. Repair Guy needs to feed the kids somehow.. :) */
   
-    if (GET_GOLD(ch) < price) {
+    if (GET_GOLD(ch) < (uint64)price) {
       act("The Super Repair Guy says 'Trying to sucker me for a free repair job?'",ch,0,0, TO_CHAR, 0);
       act("The Super Repair Guy says 'Trying to sucker me for a free repair job?'",ch,0,0, TO_ROOM, 0);
       sprintf(buf, "The Super Repair Guy says 'It would cost %d coins to repair %s, which you don't have!'",
@@ -397,7 +397,7 @@ if (eqdam <= 0)
  if (price < 5000)
    price = 5000;     /* Welp.. Repair Guy needs to feed the kids somehow.. :) */
   
-    if (GET_GOLD(ch) < price) {
+    if (GET_GOLD(ch) < (uint64)price) {
 act("Fingers says 'Trying to sucker me for a free repair job?'",ch,0,0, TO_CHAR, 0);
 act("Fingers says 'Trying to sucker me for a free repair job?'",ch,0,0, TO_ROOM, 0);
 sprintf(buf, "Fingers says 'It would cost %d coins to repair %s, which you don't have!'",
@@ -460,7 +460,7 @@ if (eqdam <= 0)
  if (price < 5000)
    price = 5000;     /* Welp.. Repair Guy needs to feed the kids somehow.. :) */
   
-    if (GET_GOLD(ch) < price) {
+    if (GET_GOLD(ch) < (uint64)price) {
 act("Fingers says 'Trying to sucker me for a free repair job?'",ch,0,0, TO_CHAR, 0);
 act("Fingers says 'Trying to sucker me for a free repair job?'",ch,0,0, TO_ROOM, 0);
 sprintf(buf, "Fingers says 'It would cost %d coins to repair %s, which you don't have!'",
@@ -583,7 +583,7 @@ int mortician(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
      }
      cost /= 20000;
      cost = MAX(cost, 30);
-     if(GET_PLATINUM(ch) < cost) {
+     if(GET_PLATINUM(ch) < (uint64)cost) {
        send_to_char("You can't afford that!\n\r", ch);
        return eSUCCESS;
      } 
@@ -743,7 +743,7 @@ int platinumsmith(struct char_data *ch, struct obj_data *obj, int cmd, char *arg
   } 
   x--; /* arrays start at 0 */
 
-  if(GET_PLATINUM(ch) < for_sale[x].price) {
+  if(GET_PLATINUM(ch) < (uint64)for_sale[x].price) {
     send_to_char("The Platinumsmith tells you 'You can't afford that!'\n\r",
                  ch);
     return eSUCCESS;
@@ -943,7 +943,7 @@ int platmerchant(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
   } 
   x--; // arrays start at 0
 
-  if(GET_PLATINUM(ch) < merchant_sale[x].price) {
+  if(GET_PLATINUM(ch) < (uint64)merchant_sale[x].price) {
     send_to_char("The Platinum Merchant tells you 'You can't afford that!'\n\r",
                  ch);
     return eSUCCESS;
@@ -1157,7 +1157,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
        return eSUCCESS;
      }
 
-     if(GET_PLATINUM(ch) < hit_cost) {
+     if(GET_PLATINUM(ch) < (uint64)hit_cost) {
        send_to_char("The Meta-physician tells you, 'You can't "
                     "afford my services!  SCRAM!'\n\r", ch);
        return eSUCCESS;
@@ -1195,7 +1195,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
        return eSUCCESS;
      }
 
-     if(GET_PLATINUM(ch) < mana_cost) {
+     if(GET_PLATINUM(ch) < (uint64)mana_cost) {
        send_to_char("The Meta-physician tells you, 'You can't afford my "
                     "services!  SCRAM!'\n\r", ch);
        return eSUCCESS;
@@ -1234,7 +1234,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
        return eSUCCESS;
      }
 
-     if(GET_PLATINUM(ch) < move_cost) {
+     if(GET_PLATINUM(ch) < (uint64)move_cost) {
        send_to_char("The Meta-physician tells you, 'You can't " 
                     "afford my services!  SCRAM!'\n\r", ch);
        return eSUCCESS;
@@ -1416,7 +1416,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
        return eSUCCESS;
      }
 
-     if(GET_PLATINUM(ch) < hit_cost/5) {
+     if(GET_PLATINUM(ch) < (uint64)(hit_cost/5)) {
        send_to_char("The Meta-physician tells you, 'You can't "
                     "afford my services!  SCRAM!'\n\r", ch);
        return eSUCCESS;

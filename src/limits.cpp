@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.2 2002/06/13 04:41:08 dcastle Exp $ */
+/* $Id: limits.cpp,v 1.3 2002/06/20 21:39:36 pirahna Exp $ */
 
 extern "C"
 {
@@ -81,7 +81,7 @@ int graf(int age, int p0, int p1, int p2, int p3, int p4, int p5, int p6)
 
 /* The three MAX functions define a characters Effective maximum */
 /* Which is NOT the same as the ch->max_xxxx !!!          */
-int mana_limit(CHAR_DATA *ch)
+int64 mana_limit(CHAR_DATA *ch)
 {
     int max;
 
@@ -93,7 +93,7 @@ int mana_limit(CHAR_DATA *ch)
     return(max);
 }
 
-int ki_limit(CHAR_DATA *ch)
+int64 ki_limit(CHAR_DATA *ch)
 {
 	if(!IS_NPC(ch))
 	    return(ch->max_ki);
@@ -101,7 +101,7 @@ int ki_limit(CHAR_DATA *ch)
 	    return(0);
 }
 
-int hit_limit(CHAR_DATA *ch)
+int64 hit_limit(CHAR_DATA *ch)
 {
     int max;
 
@@ -111,7 +111,6 @@ int hit_limit(CHAR_DATA *ch)
     else 
       max = (ch->max_hit);
 
-
 /* Class/Level calculations */
 
 /* Skill/Spell calculations */
@@ -120,7 +119,7 @@ int hit_limit(CHAR_DATA *ch)
 }
 
 
-int move_limit(CHAR_DATA *ch)
+int64 move_limit(CHAR_DATA *ch)
 {
     int max;
 
@@ -470,7 +469,7 @@ void advance_level(CHAR_DATA *ch, int is_conversion)
       ch->pcdata->practices	+= add_practices;
 
     sprintf( buf,
-	"Your gain is: %d/%d hp, %d/%d m, %d/%d mv, %d/%ld prac, %d/%d ki.\n\r",
+	"Your gain is: %d/%lld hp, %d/%lld m, %d/%lld mv, %d/%d prac, %d/%lld ki.\n\r",
 	add_hp,        GET_MAX_HIT(ch),
 	add_mana,      GET_MAX_MANA(ch),
 	add_moves,     GET_MAX_MOVE(ch),
@@ -499,7 +498,7 @@ void gain_exp( CHAR_DATA *ch, int gain )
 
   y = exp_table[GET_LEVEL(ch)+1];  
 
-  if(GET_EXP(ch) >= (int)y)
+  if(GET_EXP(ch) >= (int64)y)
     x = 1; 
 
   if(GET_EXP(ch) > 2000000000)
@@ -514,7 +513,7 @@ void gain_exp( CHAR_DATA *ch, int gain )
   if(IS_NPC(ch))
     return;
 
-  if(!x && GET_EXP(ch) >= (int)y)
+  if(!x && GET_EXP(ch) >= (int64)y)
      send_to_char("You now have enough experience to level!\n\r", ch);
 
   return;
@@ -531,7 +530,7 @@ void gain_exp_regardless( CHAR_DATA *ch, int gain )
   if(IS_NPC(ch))
     return;
 
-  while(GET_EXP(ch) >= exp_table[GET_LEVEL(ch) + 1]) {
+  while(GET_EXP(ch) >= (int64)exp_table[GET_LEVEL(ch) + 1]) {
     send_to_char( "You raise a level!!  ", ch );
     GET_LEVEL(ch) += 1;
     advance_level(ch, 0);

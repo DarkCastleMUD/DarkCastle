@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.2 2002/06/13 04:41:13 dcastle Exp $
+| $Id: cl_thief.cpp,v 1.3 2002/06/20 21:39:49 pirahna Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -1076,7 +1076,7 @@ int do_slip(struct char_data *ch, char *argument, int cmd)
          send_to_char("Sorry, you can't do that!\n\r",ch);
          return eFAILURE;
          }
-      if ((GET_GOLD(ch) < amount) && (GET_LEVEL(ch) < DEITY)) { 
+      if ((GET_GOLD(ch) < (uint64)amount) && (GET_LEVEL(ch) < DEITY)) { 
          send_to_char("You haven't got that many coins!\n\r",ch);
          return eFAILURE;
          }

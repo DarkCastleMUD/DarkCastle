@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.2 2002/06/13 04:41:07 dcastle Exp $
+| $Id: guild.cpp,v 1.3 2002/06/20 21:39:36 pirahna Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -161,7 +161,7 @@ int skills_guild(struct char_data *ch, char *arg, struct char_data *owner)
 
   if (!*arg) // display skills that can be learned
   {
-    sprintf(buf,"You have %ld practice sessions left.\n\r", ch->pcdata->practices);
+    sprintf(buf,"You have %d practice sessions left.\n\r", ch->pcdata->practices);
     send_to_char(buf, ch);
     send_to_char("You can practice any of these skills:\n\r", ch);
     for(int i=0; *skilllist[i].skillname != '\n';i++) 
@@ -376,8 +376,7 @@ int skill_master(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
   for(; *arg==' '; arg++);
 
   if (!*arg) {
-      sprintf(buf,"You have %ld practice sessions left.\n\r",
-      ch->pcdata->practices);
+      sprintf(buf,"You have %d practice sessions left.\n\r", ch->pcdata->practices);
       send_to_char(buf, ch);
       send_to_char("You can practice  any of these skills:\n\r", ch);
       for(i=0; *g_skills[i].skillname != '\n';i++) 

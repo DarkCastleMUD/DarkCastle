@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: obj.h,v 1.2 2002/06/13 04:41:15 dcastle Exp $ */
+/* $Id: obj.h,v 1.3 2002/06/20 21:39:49 pirahna Exp $ */
 #ifndef OBJ_H_
 #define OBJ_H_
 
@@ -175,32 +175,32 @@ struct extra_descr_data
 
 struct obj_flag_data
 {
-    int value[4];       /* Values of the item (see list)    */
-    byte type_flag;     /* Type of item                     */
-    int wear_flags;     /* Where you can wear it            */
-    int size;           /* Race restrictions                */
-    int extra_flags;    /* If it hums, glows etc            */
-    int weight;         /* Weight what else                 */
-    int cost;           /* Value when sold (gp.)            */
-    int more_flags;     /* A second bitvector (extra_flags2)*/
-    int eq_level;	/* Min level to use it for eq       */
-    int timer;          /* Timer for object                 */
+    int16 value[4];       /* Values of the item (see list)    */
+    ubyte type_flag;     /* Type of item                     */
+    uint64 wear_flags;     /* Where you can wear it            */
+    uint16 size;           /* Race restrictions                */
+    uint64 extra_flags;    /* If it hums, glows etc            */
+     int16 weight;         /* Weight what else                 */
+     int32 cost;           /* Value when sold (gp.)            */
+    uint64 more_flags;     /* A second bitvector (extra_flags2)*/
+     int16 eq_level;	/* Min level to use it for eq       */
+     int16 timer;          /* Timer for object                 */
 };
 
 /* Used in OBJ_FILE_ELEM *DO*NOT*CHANGE* */
 struct obj_affected_type
 {
-    byte location;      /* Which ability to change (APPLY_XXX) */
-    sbyte modifier;     /* How much it changes by              */
+     int32 location;      /* Which ability to change (APPLY_XXX) */
+     int16 modifier;     /* How much it changes by              */
 };
 
 /* ======================== Structure for object ========================= */
 struct obj_data
 {
-    sh_int item_number;            /* Where in data-base               */
-    sh_int in_room;                /* In what room -1 when conta/carr  */ 
+     int32 item_number;            /* Where in data-base               */
+     int32 in_room;                /* In what room -1 when conta/carr  */ 
     struct obj_flag_data obj_flags;/* Object information               */
-    sh_int num_affects;
+     int16 num_affects;
     struct obj_affected_type *affected; /* Which abilities in PC to change  */
 
     char *name;                    /* Title of object :get etc.        */

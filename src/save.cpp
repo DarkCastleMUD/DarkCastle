@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: save.cpp,v 1.2 2002/06/13 04:41:08 dcastle Exp $ */
+/* $Id: save.cpp,v 1.3 2002/06/20 21:39:36 pirahna Exp $ */
 
 extern "C"
 {
@@ -444,8 +444,6 @@ void save_char_obj (CHAR_DATA *ch)
   // TODO - figure out a way for mob's to save...maybe <mastername>.pet ?
 
   sprintf (name, "%s/%c/%s", SAVE_DIR, ch->name[0], ch->name);
-//  sprintf (strsave, "%s/%c/%s.back", SAVE_DIR, ch->name[0], ch->name);
-// think this is slightly more efficient -pir
   sprintf (strsave, "%s.back", name);
 
   if (!(fpsave = dc_fopen(strsave, "wb"))) {

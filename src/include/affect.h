@@ -2,11 +2,10 @@
 #define AFFECT_H_
 
 /************************************************************************
-| $Id: affect.h,v 1.2 2002/06/13 04:41:15 dcastle Exp $
+| $Id: affect.h,v 1.3 2002/06/20 21:39:49 pirahna Exp $
 | affect.h
 | This contains the bitvectors for affected_by
 */
-typedef unsigned long affect_type;
 
 /* Bitvector for 'affected_by' */
 #define AFF_BLIND               1     // 1

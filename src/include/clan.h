@@ -2,16 +2,14 @@
 #define CLAN_H_
 
 /************************************************************************
-| $Id: clan.h,v 1.2 2002/06/13 04:41:15 dcastle Exp $
+| $Id: clan.h,v 1.3 2002/06/20 21:39:49 pirahna Exp $
 | clan.h
 | Description:  Header information for clans.
 */
 
 void clan_login(char_data * ch);
 void clan_logout(char_data * ch);
-int has_right(char_data * ch, long bit);
-
-//void clan_death(char_data * ch);
+int has_right(char_data * ch, uint64 bit);
 
 #define CLAN_RIGHTS_ACCEPT       1
 #define CLAN_RIGHTS_OUTCAST      1<<1
@@ -27,23 +25,23 @@ int has_right(char_data * ch, long bit);
 
 struct clan_room_data
 {
-  sh_int room_number;
+   int32 room_number;
   struct clan_room_data * next;
 };
 
 struct clan_member_data
 {
   char * member_name;
-  long   member_rights;
-  long   member_rank;
+  uint64 member_rights;
+   int64 member_rank;
   
-  long   unused1;
-  long   unused2;
-  long   unused3;
+   int64 unused1;
+   int64 unused2;
+  uint64 unused3;
   char * unused4; // this is saved as a variable length string
   
   //  I'd like to put "time joined" here for CC purposes
-  long   time_joined;
+  uint64  time_joined;
 
   struct clan_member_data * next;
 };
@@ -59,7 +57,7 @@ struct clan_data
   char * death_message;
   char * logout_message;
 
-  int number;
+  uint16 number;
   clan_room_data * rooms;
   clan_member_data * members;
   struct clan_data * next;

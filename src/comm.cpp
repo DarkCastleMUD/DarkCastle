@@ -1143,52 +1143,52 @@ void generate_prompt(CHAR_DATA *ch, char *prompt)
          strcat(prompt, "There is a fucked up code in your prompt> ");
          return;
        case 'p':
-         sprintf(pro, "%ld", GET_PLATINUM(ch));
+         sprintf(pro, "%lld", GET_PLATINUM(ch));
          break;
        case 'g':
-         sprintf(pro, "%ld", GET_GOLD(ch));
+         sprintf(pro, "%lld", GET_GOLD(ch));
          break;
        case 'G':
-         sprintf(pro, "%ld", (long) (GET_GOLD(ch)/20000));
+         sprintf(pro, "%lld", (int64) (GET_GOLD(ch)/20000));
          break;
        case 'h':
-         sprintf(pro, "%d", GET_HIT(ch));
+         sprintf(pro, "%lld", GET_HIT(ch));
          break;
        case 'H':
-         sprintf(pro, "%d", GET_MAX_HIT(ch));
+         sprintf(pro, "%lld", GET_MAX_HIT(ch));
          break;
        case 'm':
-         sprintf(pro, "%d", GET_MANA(ch));
+         sprintf(pro, "%lld", GET_MANA(ch));
          break;
        case 'M':
-         sprintf(pro, "%d", GET_MAX_MANA(ch));
+         sprintf(pro, "%lld", GET_MAX_MANA(ch));
          break;
        case 'v':
-         sprintf(pro, "%d", GET_MOVE(ch));
+         sprintf(pro, "%lld", GET_MOVE(ch));
          break;
        case 'V':
-         sprintf(pro, "%d", GET_MAX_MOVE(ch));
+         sprintf(pro, "%lld", GET_MAX_MOVE(ch));
          break;
        case 'k':
-         sprintf(pro, "%d", GET_KI(ch));
+         sprintf(pro, "%lld", GET_KI(ch));
          break;
        case 'K':
-         sprintf(pro, "%d", GET_MAX_KI(ch));
+         sprintf(pro, "%lld", GET_MAX_KI(ch));
          break;
        case 'l':
-         sprintf(pro, "%s%d%s", calc_color(GET_KI(ch), GET_MAX_KI(ch)),
+         sprintf(pro, "%s%lld%s", calc_color(GET_KI(ch), GET_MAX_KI(ch)),
                  GET_KI(ch), NTEXT);
          break;
        case 'i':
-         sprintf(pro, "%s%d%s", calc_color(GET_HIT(ch), GET_MAX_HIT(ch)),
+         sprintf(pro, "%s%lld%s", calc_color(GET_HIT(ch), GET_MAX_HIT(ch)),
                  GET_HIT(ch), NTEXT);
          break;
        case 'n':
-         sprintf(pro, "%s%d%s", calc_color(GET_MANA(ch), GET_MAX_MANA(ch)),
+         sprintf(pro, "%s%lld%s", calc_color(GET_MANA(ch), GET_MAX_MANA(ch)),
                  GET_MANA(ch), NTEXT);
          break;
        case 'w':
-         sprintf(pro, "%s%d%s", calc_color(GET_MOVE(ch), GET_MAX_MOVE(ch)),
+         sprintf(pro, "%s%lld%s", calc_color(GET_MOVE(ch), GET_MAX_MOVE(ch)),
                  GET_MOVE(ch), NTEXT);
          break;
        case 'I':
@@ -1204,20 +1204,20 @@ void generate_prompt(CHAR_DATA *ch, char *prompt)
          sprintf(pro, "%d", (int) (100*((float)GET_KI(ch)/(float)GET_MAX_KI(ch))));
          break;
        case 'x':
-         sprintf(pro, "%ld", GET_EXP(ch));
+         sprintf(pro, "%lld", GET_EXP(ch));
          break;
        case 'X':
-         sprintf(pro, "%d", (int)(exp_table[(int)GET_LEVEL(ch) + 1] -
+         sprintf(pro, "%lld", (int64)(exp_table[(int)GET_LEVEL(ch) + 1] -
                                   (long)GET_EXP(ch)));
          break;
        case '%':
          sprintf(pro, "%%");
          break;
        case 'a':
-         sprintf(pro, "%d", GET_ALIGNMENT(ch));
+         sprintf(pro, "%hd", GET_ALIGNMENT(ch));
          break;
        case 'A':
-         sprintf(pro, "%s%d%s", calc_color_align(GET_ALIGNMENT(ch)), GET_ALIGNMENT(ch), NTEXT);
+         sprintf(pro, "%s%hd%s", calc_color_align(GET_ALIGNMENT(ch)), GET_ALIGNMENT(ch), NTEXT);
          break;
        case 'c':
          if(ch->fighting)

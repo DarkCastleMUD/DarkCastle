@@ -1,7 +1,7 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.2 2002/06/13 04:41:15 dcastle Exp $
+| $Id: character.h,v 1.3 2002/06/20 21:39:49 pirahna Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
@@ -138,33 +138,34 @@ struct pc_data
 
     struct char_player_alias * alias; /* Aliases */
 
-    long totalpkills;         // total number of pkills THIS LOGIN
-    long totalpkillslv;       // sum of levels of pkills THIS LOGIN
-    long pdeathslogin;        // pdeaths THIS LOGIN
+    uint32 totalpkills;         // total number of pkills THIS LOGIN
+    uint64 totalpkillslv;       // sum of levels of pkills THIS LOGIN
+    uint32 pdeathslogin;        // pdeaths THIS LOGIN
 
-    long rdeaths;             // total number of real deaths
-    long pdeaths;             // total number of times pkilled
-    long pkills;              // # of pkills ever 
-    long pklvl;               // # sum of levels of pk victims ever
-    long group_kills;         // # of kills for group 
-    long grplvl;              // sum of levels of group victims 
+    uint64 rdeaths;             // total number of real deaths
+    uint64 pdeaths;             // total number of times pkilled
+    uint64 pkills;              // # of pkills ever 
+    uint64 pklvl;               // # sum of levels of pk victims ever
+    uint64 group_kills;         // # of kills for group 
+    uint64 grplvl;              // sum of levels of group victims 
+
     char *last_site;                /* Last login from.. */
     struct time_data time;          // PC time data.  logon, played, birth
    
-    long bad_pw_tries; /* How many times people have entered bad pws */
+    uint32 bad_pw_tries;        // How many times people have entered bad pws
 
     long wizinvis;
 
-    long practices;         // How many can you learn yet this level
-    long specializations;   // How many specializations a player has left
+    uint16 practices;         // How many can you learn yet this level
+    uint16 specializations;   // How many specializations a player has left
 
-    int  saves_mods[SAVE_TYPE_MAX+1];  // Character dependant mods to saves (meta'able)
+     int16 saves_mods[SAVE_TYPE_MAX+1];  // Character dependant mods to saves (meta'able)
 
-    long bank;           /* gold in bank                            */
+    uint64 bank;           /* gold in bank                            */
 
-    long toggles;            // Bitvector for toggles.  (Was specials.act)
-    long punish;             // flags for punishments
-    long quest_bv1;          // 1st bitvector for quests
+    uint64 toggles;            // Bitvector for toggles.  (Was specials.act)
+    uint64 punish;             // flags for punishments
+    uint64 quest_bv1;          // 1st bitvector for quests
 
     char *poofin;       /* poofin message */
     char *poofout;      /* poofout message */    
@@ -174,13 +175,13 @@ struct pc_data
     char *mobiles;     /*  Builder Mobile Range */
     char *objects;     /*  Builder Object Range */
 
-    int  last_mob_edit;       // vnum of last mob edited
-    int  last_obj_edit;       // vnum of last obj edited
+     int32 last_mob_edit;       // vnum of last mob edited
+     int32 last_obj_edit;       // vnum of last obj edited
 
     char *last_tell;          /* last person who told           */
-    sh_int last_mess_read;     /* for reading messages */
+     int16 last_mess_read;     /* for reading messages */
 
-    // these 3 need to become PLR toggles
+    // TODO: these 3 need to become PLR toggles
     bool holyLite;          // Holy lite mode
     bool stealth;           // If on, you are more stealth then norm. (god)
     bool incognito;         // invis imms will be seen by people in same room
@@ -190,20 +191,20 @@ struct pc_data
 
 struct mob_data
 {
-    long nr;
-    byte default_pos;  /* Default position for NPC                */
-    byte last_direction; /* Last direction the mobile went in */
-    long attack_type;      // Bitvector of damage type for bare-handed combat
-    long actflags;       /* flags for NPC behavior                  */
+     int32 nr;
+     sbyte default_pos;    // Default position for NPC
+     sbyte last_direction; // Last direction the mobile went in
+    uint64 attack_type;    // Bitvector of damage type for bare-handed combat
+    uint64 actflags;       // flags for NPC behavior
 
-    sh_int damnodice;         // The number of damage dice's           
-    sh_int damsizedice;       // The size of the damage dice's         
+     int16 damnodice;         // The number of damage dice's           
+     int16 damsizedice;       // The size of the damage dice's         
 
     char *fears;       /* will flee from ths person on sight     */
     char *hatred;      /* List of PC's I hate */
 
     MPROG_ACT_LIST *    mpact; // list of MOBProgs
-    int                 mpactnum; // num
+     int16                 mpactnum; // num
 };
 
 
@@ -225,11 +226,11 @@ struct char_data
     char *description;  // For 'look mob'
     char *title;
 
-    byte sex;
-    byte c_class;
-    byte race;
-    byte level;
-    byte position;      // Standing, sitting, fighting
+    sbyte sex;
+    sbyte c_class;
+    sbyte race;
+    sbyte level;
+    sbyte position;      // Standing, sitting, fighting
 
     sbyte str; 
     sbyte raw_str; 
@@ -247,52 +248,53 @@ struct char_data
     ubyte weight;       /* PC/NPC's weight */
     ubyte height;       /* PC/NPC's height */
 
-    long hometown;      /* PC/NPC home town */
-    long gold;           /* Money carried                           */
-    long plat;           /* Platinum                                */
-    long exp;            /* The experience of the player            */
-    long in_room;
+    int16 hometown;      /* PC/NPC home town */
+    uint64 gold;           /* Money carried                           */
+    uint64 plat;           /* Platinum                                */
+     int64 exp;            /* The experience of the player            */
+     int64 in_room;
 
-    long immune;         // Bitvector of damage types I'm immune to
-    long resist;         // Bitvector of damage types I'm resistant to
-    long suscept;        // Bitvector of damage types I'm susceptible to
-    int  saves[SAVE_TYPE_MAX+1];  // Saving throw bonuses
+    uint64 immune;         // Bitvector of damage types I'm immune to
+    uint64 resist;         // Bitvector of damage types I'm resistant to
+    uint64 suscept;        // Bitvector of damage types I'm susceptible to
+     int16 saves[SAVE_TYPE_MAX+1];  // Saving throw bonuses
 
-    long mana;         
-    long max_mana;     /* Not useable                             */
-    long raw_mana;     /* before int bonus                        */
-    long hit;   
-    long max_hit;      /* Max hit for NPC                         */
-    long raw_hit;      /* before con bonus                        */
-    long move;  
-    long raw_move;
-    long max_move;     /* Max move for NPC                        */
-    long ki;
-    long max_ki;
-    long raw_ki;
-    sh_int alignment;          // +-1000 for alignments                 
+     int64 mana;         
+     int64 max_mana;     /* Not useable                             */
+     int64 raw_mana;     /* before int bonus                        */
+     int64 hit;   
+     int64 max_hit;      /* Max hit for NPC                         */
+     int64 raw_hit;      /* before con bonus                        */
+     int64 move;  
+     int64 raw_move;
+     int64 max_move;     /* Max move for NPC                        */
+     int64 ki;
+     int64 max_ki;
+     int64 raw_ki;
 
-    sh_int hpmetas;             // total number of times meta'd hps
-    sh_int manametas;           // total number of times meta'd mana
-    sh_int movemetas;           // total number of times meta'd moves
+     int16 alignment;          // +-1000 for alignments                 
 
-    sh_int hit_regen;           // modifier to hp regen
-    sh_int mana_regen;          // modifier to mana regen
-    sh_int move_regen;          // modifier to move regen
-    sh_int ki_regen;            // modifier to ki regen
+    uint32 hpmetas;             // total number of times meta'd hps
+    uint32 manametas;           // total number of times meta'd mana
+    uint32 movemetas;           // total number of times meta'd moves
 
-    sh_int clan;                       /* Clan the char is in */
+     int16 hit_regen;           // modifier to hp regen
+     int16 mana_regen;          // modifier to mana regen
+     int16 move_regen;          // modifier to move regen
+     int16 ki_regen;            // modifier to ki regen
 
-    sh_int armor;                 // Armor class
-    sh_int hitroll;               // Any bonus or penalty to the hit roll
-    sh_int damroll;               // Any bonus or penalty to the damage roll
+     int16 clan;                       /* Clan the char is in */
 
-    sh_int glow_factor;           // Amount that the character glows
+     int16 armor;                 // Armor class
+     int16 hitroll;               // Any bonus or penalty to the hit roll
+     int16 damroll;               // Any bonus or penalty to the damage roll
+
+     int16 glow_factor;           // Amount that the character glows
 
     obj_data * beacon;       /* pointer to my beacon */
 
-    sh_int song_timer;       /* status for songs being sung */
-    sh_int song_number;      /* number of song being sung */
+     int16 song_timer;       /* status for songs being sung */
+     int16 song_number;      /* number of song being sung */
     char * song_data;        /* args for the songs */
 
     struct obj_data *equipment[MAX_WEAR]; // Equipment List
@@ -301,10 +303,10 @@ struct char_data
     struct affected_type *affected;    // Affected by list
     struct obj_data *carrying;         // Inventory List
 
-    sh_int poison_amount;              // How much poison damage I'm taking every few seconds
+     int16 poison_amount;              // How much poison damage I'm taking every few seconds
 
-    sh_int carry_weight;               // Carried weight
-    sh_int carry_items;                // Number of items carried                
+     int16 carry_weight;               // Carried weight
+     int16 carry_items;                // Number of items carried                
 
     char *hunting;                     // Name of "track" target
     char *ambush;                      // Name of "ambush" target
@@ -312,10 +314,10 @@ struct char_data
     char_data * guarding;              // Pointer to who I am guarding
     follow_type * guarded_by;          // List of people guarding me
 
-    affect_type affected_by;           // Quick reference bitvector for spell affects
-    affect_type affected_by2;          // More quick reference bitvectors 
-    long combat;                       // Bitvector for combat related flags (bash, stun, shock)
-    long misc;                         // Bitvector for IS_MOB/logs/channels.  So possessed mobs can channel
+    uint64 affected_by;                // Quick reference bitvector for spell affects
+    uint64 affected_by2;               // More quick reference bitvectors 
+    uint64 combat;                     // Bitvector for combat related flags (bash, stun, shock)
+    uint64 misc;                       // Bitvector for IS_MOB/logs/channels.  So possessed mobs can channel
 
     CHAR_DATA *fighting;                 /* Opponent     */
     CHAR_DATA *next;                     /* Next anywhere in game */
@@ -326,11 +328,12 @@ struct char_data
     CHAR_DATA *master;              /* Who is char following? */
     char *group_name;                /* Name of group */
     
-    int timer;                         // Timer for update                       
+    int32 timer;                         // Timer for update                       
 
 // TODO - see if we can move the "wait" timer from desc to char
 // since we need something to lag mobs too
-    int deaths;                   /* deaths is reused for mobs as a
+
+    int32 deaths;                   /* deaths is reused for mobs as a
                                        timer to check for WAIT_STATE */
 
 };
@@ -385,8 +388,8 @@ struct char_file_u
     sh_int armor;       // have to save these since mobs have different bases
     sh_int hitroll;
     sh_int damroll;
-    affect_type afected_by;
-    affect_type afected_by2;
+    uint32 afected_by;  // SHOULD BE 64
+    uint32 afected_by2; // SHOULD BE 64
 
     sh_int apply_saving_throw[5]; // no longer used, but kept so I don't have to convert all the files
                                   // right now.

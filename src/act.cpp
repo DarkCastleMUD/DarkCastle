@@ -45,8 +45,8 @@ void act
   CHAR_DATA *ch,      // Character from
   OBJ_DATA *obj,      // Object
   void *vict_obj,     // Victim object
-  int destination,    // Destination flags
-  int flags           // Optional flags
+  int16 destination,    // Destination flags
+  int16 flags           // Optional flags
 )
 {
    struct descriptor_data *i;

@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: utility.h,v 1.2 2002/06/13 04:41:15 dcastle Exp $ */
+/* $Id: utility.h,v 1.3 2002/06/20 21:39:49 pirahna Exp $ */
 
 #ifndef UTILITY_H_
 #define UTILITY_H_
@@ -277,10 +277,10 @@ void	set_fighting	(CHAR_DATA *ch, CHAR_DATA *vict);
 void	stop_fighting	(CHAR_DATA *ch);
 int	do_simple_move	(CHAR_DATA *ch, int cmd, int following);
 // int	attempt_move	(CHAR_DATA *ch, int cmd, int is_retreat = 0);
-int	move_limit	(CHAR_DATA *ch);
-int	mana_limit	(CHAR_DATA *ch);
-int	ki_limit	(CHAR_DATA *ch);
-int	hit_limit	(CHAR_DATA *ch);
+int64	move_limit	(CHAR_DATA *ch);
+int64	mana_limit	(CHAR_DATA *ch);
+int64	ki_limit	(CHAR_DATA *ch);
+int64	hit_limit	(CHAR_DATA *ch);
 //int	guild		(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, CHAR_DATA *ch);
 int	has_skill	(CHAR_DATA *ch, sh_int skill);
 void	gain_exp_regardless	(CHAR_DATA *ch, int gain);
@@ -352,8 +352,9 @@ void send_to_char_regardless(char *messg, struct char_data *ch);
 int csendf(struct char_data *ch, char *arg, ...);
 bool check_range_valid_and_convert(int & value, char * buf, int begin, int end);
 bool check_valid_and_convert(int & value, char * buf);
-void parse_bitstrings_into_int(char * bits[], char * strings, char_data * ch, int & value);
-void parse_bitstrings_into_int(char * bits[], char * strings, char_data * ch, long & value);
+void parse_bitstrings_into_int(char * bits[], char * strings, char_data * ch, uint64 & value);
+void parse_bitstrings_into_int(char * bits[], char * strings, char_data * ch, uint32 & value);
+void parse_bitstrings_into_int(char * bits[], char * strings, char_data * ch, uint16 & value);
 void display_string_list(char * list[], char_data *ch);
 
 // MOBProgs prototypes

@@ -40,10 +40,10 @@ int do_plats (struct char_data *ch, char *argument, int cmd)
       else
          i = d->character;
 
-      if (GET_PLATINUM(i) < minamt)
+      if (GET_PLATINUM(i) < (uint64)minamt)
          continue;
 
-      sprintf(buf, "%15ld - %s\n\r", GET_PLATINUM(i), GET_NAME(i));
+      sprintf(buf, "%15lld - %s\n\r", GET_PLATINUM(i), GET_NAME(i));
       send_to_char (buf, ch);
       }
    return eSUCCESS;

@@ -14,7 +14,7 @@
 // Function interface
 //--
 void act(char *str, CHAR_DATA *ch, OBJ_DATA *obj, void *vict_obj,
-          int destination, int flags);
+          int16 destination, int16 flags);
 
 //--
 // Constants

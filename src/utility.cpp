@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.2 2002/06/13 04:41:09 dcastle Exp $ */
+/* $Id: utility.cpp,v 1.3 2002/06/20 21:39:37 pirahna Exp $ */
 
 extern "C"
 {
@@ -915,7 +915,7 @@ int do_recall( CHAR_DATA *ch, char *argument, int cmd )
   {
     cf   = 1 + ((level - 11) * .347f);
     cost = (int)(3440 * cf);
-    if (GET_GOLD(ch) < cost)
+    if (GET_GOLD(ch) < (uint64)cost)
     {
          csendf(ch, "You don't have %d gold!\n\r", cost);
          return eFAILURE;
@@ -1246,52 +1246,28 @@ bool check_valid_and_convert(int & value, char * buf)
    return TRUE;
 }
 
-// Assumes bits is array of strings, ending with a "\n" string
-// Finds the bits[] strings listed in "strings" and toggles the bit in "value"
-// Informs 'ch' of what has happened
-//
-void parse_bitstrings_into_int(char * bits[], char * strings, char_data * ch, int & value)
+// calls below uint64 version
+void parse_bitstrings_into_int(char * bits[], char * strings, char_data * ch, uint32 & value)
 {
-  char buf[MAX_INPUT_LENGTH];
-  int  found = FALSE;
-
-  if(!ch)
-    return;
-
-  for(;;) 
-  {
-    if(!*strings)
-      break;
-
-    half_chop(strings, buf, strings);
-                       
-    for(int x = 0 ;*bits[x] != '\n'; x++) 
-    {
-      if(is_abbrev(buf, bits[x])) 
-      {
-        if(IS_SET(value, (1<<x))) {
-          REMOVE_BIT(value, (1<<x));
-          csendf(ch, "%s flag $5REMOVED$R.\n\r", bits[x]);
-        }
-        else {
-          SET_BIT(value, (1<<x));
-          csendf(ch, "%s flag ADDED.\n\r", bits[x]);
-        }
-        found = TRUE;
-        break;
-      }
-    } 
-  }
-  if(!found)
-    send_to_char("No matching bits found.\r\n", ch);
+   uint64 temp = 0;
+   parse_bitstrings_into_int(bits, strings, ch, temp);
+   // this is dangerous...hopefully caller made sure their array is small enough
+   value = (uint32)temp;
+}
+// calls below uint64 version
+void parse_bitstrings_into_int(char * bits[], char * strings, char_data * ch, uint16 & value)
+{
+   uint64 temp = 0;
+   parse_bitstrings_into_int(bits, strings, ch, temp);
+   // this is dangerous...hopefully caller made sure their array is small enough
+   value = (uint16)temp;
 }
 
-
 // Assumes bits is array of strings, ending with a "\n" string
 // Finds the bits[] strings listed in "strings" and toggles the bit in "value"
 // Informs 'ch' of what has happened
 //
-void parse_bitstrings_into_int(char * bits[], char * strings, char_data * ch, long & value)
+void parse_bitstrings_into_int(char * bits[], char * strings, char_data * ch, uint64 & value)
 {
   char buf[MAX_INPUT_LENGTH];
   int  found = FALSE;

@@ -11,7 +11,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.2 2002/06/13 04:41:08 dcastle Exp $ */
+/* $Id: nanny.cpp,v 1.3 2002/06/20 21:39:36 pirahna Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -583,7 +583,7 @@ void nanny(struct descriptor_data *d, char *arg)
       
       if(d->character->pcdata->bad_pw_tries)
       {
-         sprintf(buf, "\r\n\r\n$4$BYou have had %ld wrong passwords entered since your last complete login.$R\r\n\r\n", d->character->pcdata->bad_pw_tries);
+         sprintf(buf, "\r\n\r\n$4$BYou have had %d wrong passwords entered since your last complete login.$R\r\n\r\n", d->character->pcdata->bad_pw_tries);
          SEND_TO_Q(buf, d);
       }
       STATE(d) = CON_READ_MOTD;
