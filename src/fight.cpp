@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.71 2002/10/23 04:02:55 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.72 2002/11/01 13:51:08 pirahna Exp $ */
 
 extern "C"
 {
@@ -581,25 +581,38 @@ void check_weapon_skill_bonus(char_data * ch, int type, int & weapon_skill_hit_b
 {
    int learned;
    int specialization;
+   int skill;
 
    switch(type) {
+      case TYPE_BLUDGEON:
+         learned = has_skill(ch, SKILL_BLUDGEON_WEAPONS);
+         skill = SKILL_BLUDGEON_WEAPONS;
+         break;
       case TYPE_WHIP:
          learned = has_skill(ch, SKILL_WHIPPING_WEAPONS);
+         skill = SKILL_WHIPPING_WEAPONS;
          break;
       case TYPE_CRUSH:
          learned = has_skill(ch, SKILL_CRUSHING_WEAPONS);
+         skill = SKILL_CRUSHING_WEAPONS;
          break;
       case TYPE_SLASH:
          learned = has_skill(ch, SKILL_SLASHING_WEAPONS);
+         skill = SKILL_SLASHING_WEAPONS;
          break;
       case TYPE_PIERCE:
          learned = has_skill(ch, SKILL_PIERCEING_WEAPONS);
+         skill = SKILL_PIERCEING_WEAPONS;
          break;
       default:
          weapon_skill_hit_bonus = 0;
          weapon_skill_dam_bonus = 0;
          return;
    }
+
+   // rare skill increases
+   if(0 == number(0, 5))
+      skill_increase_check(ch, skill, learned, SKILL_INCREASE_HARD);
 
    specialization = learned / 100;
    learned = learned % 100;
@@ -739,7 +752,7 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
      w_type = get_weapon_damage_type(wielded);
 
   check_weapon_skill_bonus(ch, w_type, weapon_skill_hit_bonus, weapon_skill_dam_bonus);
-  
+
   weapon_type = w_type;
   if(type == SKILL_BACKSTAB)
     w_type = SKILL_BACKSTAB;

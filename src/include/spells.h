@@ -14,7 +14,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.h,v 1.18 2002/10/13 15:35:46 pirahna Exp $ */
+/* $Id: spells.h,v 1.19 2002/11/01 13:51:12 pirahna Exp $ */
 #include <structs.h> // byte, sh_int
 
 #define MAX_BUF_LENGTH               240
@@ -246,7 +246,7 @@
 #define SKILL_VITAL_STRIKE           354
 #define SKILL_CRAZED_ASSAULT         355
 #define SKILL_DIVINE_PROTECTION      356
-#define SKILL_POUNDING_WEAPONS       357
+#define SKILL_BLUDGEON_WEAPONS       357
 #define SKILL_PIERCEING_WEAPONS      358
 #define SKILL_SLASHING_WEAPONS       359
 #define SKILL_WHIPPING_WEAPONS       360

@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: const.cpp,v 1.47 2002/10/31 06:13:26 pirahna Exp $ */
+/* $Id: const.cpp,v 1.48 2002/11/01 13:51:08 pirahna Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -944,6 +944,11 @@ struct class_skill_defines w_skills[] = {
 {    "hitall",		SKILL_HITALL,		25,	75,	-2, 	"Ask the son of the Sarina King to please teach you that." },
 {    "archery",		SKILL_ARCHERY,		27,	60,	-2, 	"Seek out the local fletcher." },
 {    "deathstroke",	SKILL_DEATHSTROKE,	30,	75,	-2, 	"Only he who helps you off this mortal coil can teach you this skill." },
+{    "bludgeoning",	SKILL_BLUDGEON_WEAPONS,	30,	90,	3023,	NULL },
+{    "piercing",	SKILL_PIERCEING_WEAPONS,30,	90,	3023,	NULL },
+{    "slashing",	SKILL_SLASHING_WEAPONS,	30,	90,	3023,	NULL },
+{    "whipping",	SKILL_WHIPPING_WEAPONS,	30,	90,	3023,	NULL },
+{    "crushing",	SKILL_CRUSHING_WEAPONS,	30,	90,	3023,	NULL },
 {    "shield block",    SKILL_SHIELDBLOCK,      33,     50,     -2, 	"To learn this skill you must seek its master, the God of War in his arena.  Ask him to please teach you." },
 {    "stun",		SKILL_STUN,		35,	50,	-2, 	"Go to see any master shaolin monk." },
 {    "guard",		SKILL_GUARD,		37,	75,	-2,	"A crabby old hermit who lives alone and failed college is who you want." },
@@ -971,6 +976,10 @@ struct class_skill_defines t_skills[] = {
 {    "disarm",		SKILL_DISARM,		23,	60,	-2, "The duke of Marok is who you need to see."},
 {    "vitalstrike",     SKILL_VITAL_STRIKE,	25,	80,	-2,	NULL },
 {    "circle",		SKILL_CIRCLE,		30,	75,	-2, "Seek the king of a long lost civilization.  I only hear that they are the last of the Jiran." },
+{    "bludgeoning",	SKILL_BLUDGEON_WEAPONS,	30,	80,	3022,	NULL },
+{    "piercing",	SKILL_PIERCEING_WEAPONS,30,	80,	3022,	NULL },
+{    "slashing",	SKILL_SLASHING_WEAPONS,	30,	80,	3022,	NULL },
+{    "crushing",	SKILL_CRUSHING_WEAPONS,	30,	80,	3022,	NULL },
 {    "dualbackstab",	SKILL_DUAL_BACKSTAB,	40,	80,	-2, 	"Look for a thief who travels in the most dangerous of places." },
 {    "\n",		0,			1,	0,	0,	NULL}
 };
@@ -987,6 +996,10 @@ struct class_skill_defines a_skills[] = {
 {    "dodge",   	SKILL_DODGE,		23,	75,	-2, 	"Hop like a bunny, quick like a bee, this location is so funny, you'll go wee wee wee.  Don't forget to bring your scythe however." },
 {    "trip",  		SKILL_TRIP,		25,	75,	-2, 	"The old goblin in the caves knows, but he will not be cooperative.  You might need to use violence." },
 {    "blindfighting",   SKILL_BLINDFIGHTING,    30,   50,-2, "Only on the astral planes can you find what you seek."},
+{    "bludgeoning",	SKILL_BLUDGEON_WEAPONS,	30,	60,	10005,	NULL },
+{    "piercing",	SKILL_PIERCEING_WEAPONS,30,	60,	10005,	NULL },
+{    "slashing",	SKILL_SLASHING_WEAPONS,	30,	60,	10005,	NULL },
+{    "crushing",	SKILL_CRUSHING_WEAPONS,	30,	60,	10005,	NULL },
 {    "detect good",	SPELL_DETECT_GOOD,	11,	90,	-2, "Seek out a Dark Priest in a church full of zombies." },
 {    "detect invisibility",SPELL_DETECT_INVISIBLE,	12,	90,	10005,	NULL },
 {    "curse",		SPELL_CURSE,		13,	90,	10005,	NULL },
@@ -1020,6 +1033,9 @@ struct class_skill_defines p_skills[] = {
 {    "double",		SKILL_SECOND_ATTACK,	20,	75,	-2, 	"Seek the Delcim Prince my child.  He shall train you." },
 {    "parry",		SKILL_PARRY,		25,	50,	-2, 	"You have to go see the constable of Newtonia to learn parry." },
 {    "triple",		SKILL_THIRD_ATTACK,	30,	70,	-2, 	"Only a palace chef could move his blades so fast." },
+{    "bludgeoning",	SKILL_BLUDGEON_WEAPONS,	30,	80,	10006,	NULL },
+{    "slashing",	SKILL_SLASHING_WEAPONS,	30,	80,	10006,	NULL },
+{    "crushing",	SKILL_CRUSHING_WEAPONS,	30,	80,	10006,	NULL },
 {    "bless",		SPELL_BLESS,		10,	90,	-2, "Go see the newt priest in Newtonia."},
 {    "cure light",	SPELL_CURE_LIGHT,	10,	90,	-2, "You need to go see Minare.   He was last seen in the caves north east of town."},
 {    "earthquake",	SPELL_EARTHQUAKE,	11,	90,	-2,	"You need to go see Minare.   He was last seen in the caves north east of town." },
@@ -1060,6 +1076,10 @@ struct class_skill_defines b_skills[] = {
 {    "battlecry",	SKILL_BATTLECRY,	27,	75,	-2, 	"Ahh! You must seek out the bravest barbarian of them all, a mortal god of the norse he is." },
 {    "blindfighting",   SKILL_BLINDFIGHTING,    28,     50,	-2,	"Only on the astral planes can you find what you seek."},
 {    "headbutt",	SKILL_SHOCK,		30,	75,	-2, 	"A queen of the light holds the knowledge within her tiny skull." },
+{    "bludgeoning",	SKILL_BLUDGEON_WEAPONS,	30,	90,	10007,	NULL },
+{    "piercing",	SKILL_PIERCEING_WEAPONS,30,	90,	10007,	NULL },
+{    "slashing",	SKILL_SLASHING_WEAPONS,	30,	90,	10007,	NULL },
+{    "crushing",	SKILL_CRUSHING_WEAPONS,	30,	90,	10007,	NULL },
 {    "berserk",		SKILL_BERSERK,		40,	90,	-2, 	"A being of pure rage who lives in a tower, he is a overgrown lizard with a forked tongue." },
 {    "\n",		0,			1,	0,	0, 	NULL}
 };
@@ -1104,6 +1124,9 @@ struct class_skill_defines r_skills[] = {
 {    "blindfighting",   SKILL_BLINDFIGHTING,    21,     60,	-2,	"Only on the astral planes can you find what you seek."},
 {    "rescue",		SKILL_RESCUE,		23,	75,	-2, 	"The chief of the gnomes is who you want, lad." },
 {    "stun",  		SKILL_STUN,		30,	60,	-2, 	"You must see a master shaolin monk." },
+{    "piercing",	SKILL_PIERCEING_WEAPONS,30,	50,	10013,	NULL },
+{    "slashing",	SKILL_SLASHING_WEAPONS,	30,	50,	10013,	NULL },
+{    "whipping",	SKILL_WHIPPING_WEAPONS,	30,	50,	10013,	NULL },
 {    "bee sting",	SPELL_BEE_STING,	1,	90,	10013,	NULL },
 {    "eyes of the owl",	SPELL_EYES_OF_THE_OWL,	5,	90,	-2, "Find and kill a weak goblin in the mushroom caverns." },
 {    "bee swarm",	SPELL_BEE_SWARM,	10,	90,	10013,	NULL },
@@ -1122,6 +1145,11 @@ struct class_skill_defines d_skills[] = { // bard skills
 {      "dodge",			SKILL_DODGE,			5,	85,	-2, 	"Hop like a bunny, quick like a bee, this location is so funny, you'll go wee wee wee.  Don't forget to bring your scythe however." },
 {      "dual wield",    	SKILL_DUAL_WIELD,       	10,     75, -2, "With whirling blades and rigid honor, only these masters of weaponry can teach you the skill you need." },
 {      "double",		SKILL_SECOND_ATTACK,		17,	85,	-2, 	"You must travel to the Prince of Delcim to recieve training."},
+{      "bludgeoning",		SKILL_BLUDGEON_WEAPONS,		30,	80,	3201,	NULL },
+{      "piercing",		SKILL_PIERCEING_WEAPONS,	30,	80,	3201,	NULL },
+{      "slashing",		SKILL_SLASHING_WEAPONS,		30,	80,	3201,	NULL },
+{      "whipping",		SKILL_WHIPPING_WEAPONS,		30,	80,	3201,	NULL },
+{      "crushing",		SKILL_CRUSHING_WEAPONS,		30,	80,	3201,	NULL },
 {      "listsongs",		SKILL_SONG_LIST_SONGS,		1,	100,	3201, 	NULL},
 {      "whistle sharp",		SKILL_SONG_WHISTLE_SHARP, 	1,	90,	3201, 	NULL},
 {      "stop",			SKILL_SONG_STOP,		7,	90,	3201, 	NULL},
@@ -1152,6 +1180,8 @@ struct class_skill_defines d_skills[] = { // bard skills
 struct class_skill_defines u_skills[] = { // druid skills
 {    "dodge",		SKILL_DODGE,		7,	5,	-2, 	NULL},
 {    "dual wield",      SKILL_DUAL_WIELD,       11,      40, -2, "With whirling blades and rigid honor, only these masters of weaponry can teach you the skill you need." },
+{    "bludgeoning",	SKILL_BLUDGEON_WEAPONS,	30,	40,	3203,	NULL },
+{    "piercing",	SKILL_PIERCEING_WEAPONS,30,	40,	3203,	NULL },
 {    "eyes of the owl",	SPELL_EYES_OF_THE_OWL,	1,	90,	-2,	"Find and kill a weak goblin in the mushroom caverns." },
 {    "blue bird",       SPELL_BLUE_BIRD,        2,      90,     3203,   NULL },
 {    "cure light",	SPELL_CURE_LIGHT,	3,	90,	3203,	NULL },
@@ -1179,7 +1209,9 @@ struct class_skill_defines u_skills[] = { // druid skills
 // cleric 3021 guildmaster
 struct class_skill_defines c_skills[] = { // cleric skills
 {    "dodge",		SKILL_DODGE,		7,	5,	-2, 	"Hop like a bunny, quick like a bee, this location is so funny, you'll go wee wee wee.  Don't forget to bring your scythe however." },
-{    "dual wield",      SKILL_DUAL_WIELD,       10,      40,-2, "With whirling blades and rigid honor, only these masters of weaponry can teach you the skill you need."  },
+{    "dual wield",      SKILL_DUAL_WIELD,       10,     40,-2, "With whirling blades and rigid honor, only these masters of weaponry can teach you the skill you need."  },
+{    "bludgeoning",	SKILL_BLUDGEON_WEAPONS,	30,	40,	3021,	NULL },
+{    "crushing",	SKILL_CRUSHING_WEAPONS,	30,	40,	3021,	NULL },
 {    "armor",		SPELL_ARMOR,		1,	90,	3021,	NULL },
 {    "cause light",	SPELL_CAUSE_LIGHT,	1,	90,	3021,	NULL },
 {    "cure light",	SPELL_CURE_LIGHT,	1,	90,	3021,	NULL },
@@ -1240,6 +1272,8 @@ struct class_skill_defines m_skills[] = { // mage skills
 {    "dodge",		SKILL_DODGE,		7,	5,	-2, 	"Hop like a bunny, quick like a bee, this location is so funny, you'll go wee wee wee.  Don't forget to bring our scythe however." },
 {    "dual wield",      SKILL_DUAL_WIELD,       10,      25, -2, "With whirling blades and rigid honor, only these masters of weaponry can teach you the skill you need." },
 {    "focused repelance",SKILL_FOCUSED_REPELANCE, 25,	80,	3020,	NULL },
+{    "bludgeoning",	SKILL_BLUDGEON_WEAPONS,	30,	40,	3020,	NULL },
+{    "piercing",	SKILL_PIERCEING_WEAPONS,30,	40,	3020,	NULL },
 {    "magic missile",	SPELL_MAGIC_MISSILE,	1,	90,	3020,	NULL },
 {    "ventriloquate",	SPELL_VENTRILOQUATE,	1,	90,	3020,	NULL },
 {    "detect invisibility", SPELL_DETECT_INVISIBLE,	2,	90,	3020,	NULL },
