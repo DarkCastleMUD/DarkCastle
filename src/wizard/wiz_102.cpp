@@ -2326,6 +2326,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd)
       "immune",
       "suscept",
       "resist",
+      "armorclass",
       "stat",
       "\n"
     };
@@ -2854,8 +2855,27 @@ int do_medit(struct char_data *ch, char *argument, int cmd)
                                      ((char_data *)mob_index[mob_num].item)->resist);
       } break;
 
-      // stat
+      // armorclass
       case 23: {
+         if(!*buf4) {
+          send_to_char("$3Syntax$R: medit [mob_num] armorclass <ac>\n\r"
+                       "$3Current$R: ", ch);
+          sprintf(buf, "%d\n", ((char_data *)mob_index[mob_num].item)->armor);
+          send_to_char(buf, ch);
+          send_to_char("$3Valid Range$R: 100 to $B-$R2000\r\n", ch);
+          return eFAILURE;
+        }
+        if(!check_range_valid_and_convert(intval, buf4, -2000, 100)) {
+          send_to_char("Value out of valid range.\r\n", ch);
+          return eFAILURE;
+        }
+        ((char_data *)mob_index[mob_num].item)->armor = intval;
+        sprintf(buf, "Mob armorclass(ac) set to %d.\r\n", intval);
+        send_to_char(buf, ch);
+      } break;
+
+      // stat
+      case 24: {
         mob_stat(ch, (char_data *) mob_index[mob_num].item);
         break;
       }
