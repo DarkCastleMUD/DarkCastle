@@ -176,8 +176,8 @@ int do_sqedit(struct char_data *ch, char *argument, int cmd)
   {
 
      send_to_char("$2Syntax:$R sqedit <message/level/class> <skill> <value> OR\r\n"
-                  "$2Syntax:$R sqedit <show/new/delete> <skillname> OR\r\n"
-		  "$2Syntax:$R sqedit list.\r\n",ch);
+                  "$2Syntax:$R sqedit <show/new/delete> <skillname> OR\r\n",ch);
+     send_to_char("$2Syntax:$R sqedit list.\r\n",ch);
     return eFAILURE;
   }
   char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH],arg3[MAX_INPUT_LENGTH*2];
@@ -187,9 +187,10 @@ int do_sqedit(struct char_data *ch, char *argument, int cmd)
     argument = one_argument(argument,arg2);
     strcpy(arg3,arg1);
     strcat(arg3,arg2);
-    skill = find_sq(arg3);
+    if ((skill = find_sq(arg3))!=NULL) 
+      argument = one_argument(argument,arg2);
   }
-  if (skill==NULL && (skill = find_sq(arg1))==NULL && i!=0)
+  if (skill==NULL && (skill = find_sq(arg1))==NULL && i!=0 && i!=6)
   {
     send_to_char("Unknown skill.",ch);
     return eFAILURE;
@@ -240,28 +241,31 @@ int do_sqedit(struct char_data *ch, char *argument, int cmd)
       ch->desc->max_str = MAX_MESSAGE_LENGTH;
       break;
     case 3:
-      if (!is_number(arg1))
+      if (is_number(arg2))
       {
-	skill->level = atoi(arg1);
+	skill->level = atoi(arg2);
 	send_to_char("Level modified.\r\n",ch);
+      } else {
+	 send_to_char("Invalid level.\r\n",ch);
+	 return eFAILURE;
       }
       break;
     case 4:
       int i;
-      if (!is_number(arg1))
+      if (!is_number(arg2))
       {
         for (i = 0; *pc_clss_types[i] != '\n'; i++)
         {
-	  if (!str_cmp(pc_clss_types[i],arg1))
+	  if (!str_cmp(pc_clss_types[i],arg2))
 	     break;
 	}
-	if (*pc_clss_types[i] == '\n')
+/*	if (*pc_clss_types[i] == '\n')
 	{
 	  send_to_char("Invalid class.\r\n",ch);
 	  return eFAILURE;
-	}
+	}*/
       } else {
-	i = atoi(arg1);
+	i = atoi(arg2);
       }    
       if (i < 1 || i > 11)
       {
