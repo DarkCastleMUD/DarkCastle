@@ -1,0 +1,45 @@
+#! /bin/csh -f
+# Written by Furey.
+# With additions from Tony.
+
+set port = 6666
+# Change to lib directory.
+cd ../lib
+unlimit
+
+while ( 1 )
+    # If you want to have logs in a different directory,
+    #   change the 'set logfile' line to reflect the directory name.
+    set index = 1000
+#    while ( 1 )
+# for now, we'll just hvae them ALL go to the same index, and see if
+# that fixes anything
+        set logfile = ../gdblog/$index.gdblog
+#        if ( ! -e $logfile ) break
+#        @ index++
+#    end
+
+    # Run Dark Castle.
+    # echo Restarting DarkCastle
+
+
+   #------------------------------------------------------------
+   # This line is to run under the debugger
+   # gdb -x ~dcastle/dcastle/src/.gdbinit ../src/research1 < ../src/runit >& $logfile
+
+   # This line is to run without the debugger
+   ~dcastle/dcastle/src/research1 >& $logfile
+   #------------------------------------------------------------
+
+    # Delete this out if no adb.
+    # if ( -e core ) then
+    #         echo '$c' | adb ../src/merc
+    # endif
+
+    # Restart, giving old connections a chance to die.
+    if ( -e shutdown.txt ) then
+        rm -f shutdown.txt
+        exit 0
+    endif
+    sleep 15 
+end

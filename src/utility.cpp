@@ -1,0 +1,1355 @@
+/***************************************************************************
+ *  file: utility.c, Utility module.                       Part of DIKUMUD *
+ *  Usage: Utility procedures                                              *
+ *  Copyright (C) 1990, 1991 - see 'license.doc' for complete information. *
+ *                                                                         *
+ *  Copyright (C) 1992, 1993 Michael Chastain, Michael Quan, Mitchell Tse  *
+ *  Performance optimization and bug fixes by MERC Industries.             *
+ *  You can use our stuff in any way you like whatsoever so long as ths   *
+ *  copyright notice remains intact.  If you like it please drop a line    *
+ *  to mec@garnet.berkeley.edu.                                            *
+ *                                                                         *
+ *  This is free software and you are benefitting.  We hope that you       *
+ *  share your changes too.  What goes around, comes around.               *
+ ***************************************************************************/
+/* $Id: utility.cpp,v 1.1 2002/06/13 04:32:19 dcastle Exp $ */
+
+extern "C"
+{
+#include <assert.h>
+#include <stdio.h>
+#include <string.h>
+#include <time.h>
+#include <unistd.h>
+#include <ctype.h>
+#include <stdlib.h>
+#ifndef LINUX
+#ifndef NeXT
+#include <malloc.h>
+#endif
+#endif
+}
+#ifdef LEAK_CHECK
+#include <dmalloc.h>
+#endif
+
+#include <structs.h>
+#include <levels.h>
+#include <player.h>
+#include <utility.h>
+#include <timeinfo.h>
+#include <character.h>
+#include <room.h>
+#include <obj.h>
+#include <interp.h>
+#include <fileinfo.h>
+#include <mobile.h>
+#include <handler.h>
+#include <db.h>
+#include <connect.h>
+#include <act.h>
+#include <spells.h>
+#include <clan.h>
+#include <fight.h>
+#include <returnvals.h>
+
+#ifndef GZIP
+  #define GZIP "gzip"
+#endif
+
+// extern vars
+extern struct time_data time_info;
+extern CWorld world;
+
+// extern funcs
+struct clan_data * get_clan(struct char_data *);
+
+// vars
+char    log_buf[MAX_STRING_LENGTH];
+
+// funcs
+void update_wizlist(CHAR_DATA *ch);
+
+
+// duplicate a string with it's own memory
+char *str_dup( const char *str )
+{
+    char *str_new = 0;
+
+#ifdef LEAK_CHECK
+    str_new = (char *)calloc(strlen(str) + 1, sizeof(char));
+#else
+    str_new = (char *)dc_alloc(strlen(str) + 1, sizeof(char));
+#endif
+
+    if(!str_new)
+    {
+      fprintf(stderr, "NO MEMORY DUPLICATING STRING!");
+      abort();
+    }
+    strcpy( str_new, str );
+    return str_new;
+}
+
+// generate a (relatively) random number.
+int number( int from, int to )
+{
+    if ( from >= to )
+	return from;
+
+    return (from + (random() % (to - from + 1)));
+}
+
+// simulates a dice roll
+// basically we assign the total to the number of dice (since you always
+// roll at least a one with each die) then add a random MOD of the die
+// size.  ie, 4d10 would be 4 + loop*4 (0-9)
+int dice( int num, int size )
+{
+   int r;
+   int sum = num; 
+
+   if(size < 1)
+      return 1;
+  
+   for(r = 1; r <= num; r++)
+      sum += random() % size;
+
+   return sum;
+}
+
+// compare strings but ignore case (unlike strcmp)
+int str_cmp( char *arg1, char *arg2 )
+{
+    int check, i;
+
+    assert(arg1 && arg2);
+
+    if(!arg1 || !arg2) {
+      log("NULL args sent to str_cmp in utility.c!", ANGEL, LOG_BUG);
+      return 0;
+    }
+
+    for ( i = 0; arg1[i] || arg2[i]; i++ )
+    {
+	check = LOWER(arg1[i]) - LOWER(arg2[i]);
+	if ( check < 0 )
+	    return -1;
+	if ( check > 0 )
+	    return 1;
+    }
+
+    return 0;
+}
+
+// TODO - Declare these in a more appropriate place
+FILE * bug_file = 0;
+FILE * god_file = 0;
+FILE * mortal_file = 0;
+FILE * socket_file = 0;
+FILE * player_file = 0;
+FILE * world_log   = 0;
+FILE * chaos_log   = 0;
+FILE * clan_log   = 0;
+
+// writes a string to the log 
+void log( char *str, int god_level, long type )
+{
+    long ct;
+    char *tmstr;
+    FILE **f = 0;
+    int stream = 1;
+    
+    switch(type) {
+      default:
+	stream = 0;
+	break;
+      case LOG_BUG:
+         f = &bug_file;
+         if(!(*f = dc_fopen(BUG_FILE, "a"))) {
+           fprintf(stderr, "Unable to open bug file.\n");
+           exit(1);
+         }
+
+        // TODO - need some sort of thing to automatically have bugs switch from file to 
+        //        to non-file when we're up in gdb
+
+	//stream = 0;
+	// I want bugs to be right in the gdblog.
+	// -Sadus
+
+	break;
+      case LOG_GOD:
+        f = &god_file;
+        if(!(*f = dc_fopen(GOD_FILE, "a"))) {
+          fprintf(stderr, "Unable to open god file.\n");
+          exit(1);
+        }
+	break;
+      case LOG_MORTAL:
+        f = &mortal_file;
+        if(!(*f = dc_fopen(MORTAL_FILE, "a"))) {
+          fprintf(stderr, "Unable to open mortal file.\n");
+          exit(1);
+        }
+ 	break;
+     case LOG_SOCKET:
+        f = &socket_file;
+        if(!(*f = dc_fopen(SOCKET_FILE, "a"))) {
+          fprintf(stderr, "Unable to open socket file.\n");
+          exit(1);
+        }
+	break;
+      case LOG_PLAYER:
+        f = &player_file;
+        if(!(*f = dc_fopen(PLAYER_FILE, "a"))) {
+          fprintf(stderr, "Unable to open player file.\n");
+          exit(1);
+        }
+	break;
+      case LOG_WORLD:
+        f = &world_log;
+        if(!(*f = dc_fopen(WORLD_LOG, "a"))) {
+          fprintf(stderr, "Unable to open world log.\n");
+          exit(1);
+        }
+        break;
+      case LOG_CHAOS:
+        f = &chaos_log;
+        if(!(*f = dc_fopen(CHAOS_LOG, "a"))) {
+          fprintf(stderr, "Unable to open chaos log.\n");
+          exit(1);
+        }
+        break;
+      case LOG_CLAN:
+        f = &clan_log;
+        if(!(*f = dc_fopen(CLAN_LOG, "a"))) {
+          fprintf(stderr, "Unable to open clan log.\n");
+          exit(1);
+        }
+        break;
+    }
+    
+    ct		= time(0);
+    tmstr	= asctime(localtime(&ct));
+    *(tmstr + strlen(tmstr) - 1) = '\0';
+
+    if(!stream)
+      fprintf(stderr, "%s :: %s\n", tmstr, str);
+    else {
+      fprintf(*f, "%s :: %s\n", tmstr, str);
+      dc_fclose(*f);
+    }
+
+    if(god_level >= IMMORTAL)
+      send_to_gods(str, god_level, type);
+}
+
+void sprintbit( long vektor, char *names[], char *result )
+{
+    long nr;
+
+    *result = '\0';
+
+    if(vektor < 0)
+    {
+      logf(IMMORTAL, LOG_WORLD, "Negative value sent to sprintbit");
+      return;
+    }
+
+    for ( nr=0; vektor; vektor>>=1 )
+    {
+	if ( IS_SET(1, vektor) )
+	{
+	    if ( *names[nr] != '\n' )
+		strcat( result, names[nr] );
+	    else
+		strcat( result, "Undefined" );
+	    strcat( result, " " );
+	}
+
+	if ( *names[nr] != '\n' )
+	  nr++;
+    }
+
+    if ( *result == '\0' )
+	strcat( result, "NoBits " );
+}
+
+
+void sprinttype( int type, char *names[], char *result )
+{
+    int nr;
+
+    for ( nr = 0; *names[nr] != '\n'; nr++ )
+	;
+    if ( type > -1 && type < nr )
+	strcpy( result, names[type] );
+    else
+	strcpy( result, "Undefined" );
+}
+
+int consttype( char * search_str, char *names[] )
+{
+    int nr;
+
+    for ( nr = 0; *names[nr] != '\n'; nr++ )
+        if ( is_abbrev(search_str, names[nr]) )
+	   return nr;
+
+    return -1;
+}
+
+char * constindex( int index, char *names[] )
+{
+    int nr;
+
+    for ( nr = 0; *names[nr] != '\n'; nr++ )
+        if (nr == index)
+           return names[nr];
+
+    return (char *)0;
+}
+
+
+// Calculate the MUD time passed over the last t2-t1 centuries (secs) 
+struct time_info_data mud_time_passed(time_t t2, time_t t1)
+{
+    long secs;
+    struct time_info_data now;
+
+    secs = (long) (t2 - t1);
+
+    now.hours = (secs/SECS_PER_MUD_HOUR) % 24;  /* 0..23 hours */
+    secs -= SECS_PER_MUD_HOUR*now.hours;
+
+    now.day = (secs/SECS_PER_MUD_DAY) % 35;     /* 0..34 days  */
+    secs -= SECS_PER_MUD_DAY*now.day;
+
+    now.month = (secs/SECS_PER_MUD_MONTH) % 17; /* 0..16 months */
+    secs -= SECS_PER_MUD_MONTH*now.month;
+
+    now.year = (secs/SECS_PER_MUD_YEAR);        /* 0..XX? years */
+
+    return now;
+}
+
+struct time_info_data age(CHAR_DATA *ch)
+{
+    struct time_info_data player_age;
+
+    // TODO - make this return some sensible value for mobs
+    if(IS_MOB(ch)) {
+      player_age.year = 5;
+      return player_age;
+    }
+
+    player_age = mud_time_passed(time(0),ch->pcdata->time.birth);
+
+    player_age.year += 17;   /* All players start at 17 */
+
+    return player_age;
+}
+
+bool file_exists(char *filename)
+{
+  FILE *fp;
+  bool r;
+
+  fp = dc_fopen(filename, "r");
+  r = (fp ? 1 : 0);
+  dc_fclose(fp);
+  return(r);
+}
+
+void util_archive(char *char_name, CHAR_DATA *caller)
+{
+  char buf[256];
+  char buf2[256];
+  int i;
+
+  // Ok, ok, we'll do some sanity checking on the
+  // string to make sure that it has no meta chars in
+  // it.  Grumble. -Morc 
+  for(i = 0; (unsigned) i < strlen(char_name); i++)  {
+    if(!isalpha(char_name[i])) {
+       if(caller) {
+        sprintf(buf, "Illegal archive attempt: %s by %s.",
+	  char_name, GET_NAME(caller));
+        log(buf, OVERSEER, LOG_GOD);
+	return;
+      }
+      else {
+	sprintf(buf, "Someone got a weird char name in there: %s.", char_name);
+	log(buf, OVERSEER, LOG_GOD);
+	return;
+      }
+    }
+  }
+	
+  sprintf(buf, "%s/%c/%s", SAVE_DIR, UPPER(char_name[0]), char_name);
+  sprintf(buf2, "%s/%s", ARCHIVE_DIR, char_name);
+  if(!file_exists(buf) || file_exists(buf2))
+  {
+    if(caller) send_to_char("That character does not exist.\n\r", caller);
+    else log("Attempt to archive a non-existent char.", IMMORTAL, LOG_BUG);
+    return;
+  }
+  sprintf(buf, "%s -9 %s/%c/%s", GZIP, SAVE_DIR, UPPER(char_name[0]), char_name);
+  if(system(buf))
+  {
+    sprintf(buf, "Unsuccessful archive: %s", char_name);
+    if(caller) csendf(caller, "%s\n\r", buf);
+    else log(buf, IMMORTAL, LOG_GOD);
+    return;
+  }
+  sprintf(buf, "%s/%c/%s.gz", SAVE_DIR, UPPER(char_name[0]), char_name);
+  sprintf(buf2, "%s/%s.gz", ARCHIVE_DIR, char_name);
+  rename(buf, buf2);
+  sprintf(buf, "Character archived: %s", char_name);
+  if(caller) csendf(caller, "%s\n\r", buf);
+  log(buf, IMMORTAL, LOG_GOD);
+}
+
+void util_unarchive(char *char_name, CHAR_DATA *caller)
+{
+  char buf[256];
+  char buf2[256];
+  int i;
+  
+  for(i = 0; (unsigned) i < strlen(char_name); i++) {
+    if(!isalpha(char_name[i]))  {
+        if(caller) {
+	  sprintf(buf, "Illegal unarchive attempt: %s by %s.", char_name,
+	          GET_NAME(caller));
+          log(buf, OVERSEER, LOG_GOD);
+	  return;
+        }
+        else {
+	  sprintf(buf, "Someone got a weird char name in there: %s.",
+	          char_name);
+          log(buf, OVERSEER, LOG_GOD);
+	  return;
+        }
+     }
+  }  
+  
+  sprintf(buf, "%s/%s.gz", ARCHIVE_DIR, char_name);
+
+  if(!file_exists(buf))
+  {
+    if(caller)
+      send_to_char("Character not archived or already deleted!\n\r", caller);
+    return;
+  }
+  sprintf(buf, "%s -d %s/%s.gz", GZIP, ARCHIVE_DIR, char_name);
+  if(system(buf))
+  {
+    sprintf(buf, "Unsuccessful unarchive: %s", char_name);
+    if(caller) csendf(caller, "%s\n\r", buf);
+    else log(buf, IMMORTAL, LOG_GOD);
+    return;
+  }
+  sprintf(buf, "%s/%s", ARCHIVE_DIR, char_name);
+  sprintf(buf2, "%s/%c/%s", SAVE_DIR, UPPER(char_name[0]), char_name);
+  rename(buf, buf2);
+  sprintf(buf, "Character unarchived: %s", char_name);
+  if(caller) csendf(caller, "%s\n\r", buf);
+  log(buf, IMMORTAL, LOG_GOD);
+}
+
+bool ARE_CLANNED( struct char_data *sub, struct char_data *obj)
+{
+   // make sure we're clanned, and the person we're looking at is in same clan
+   // (have to check if we're clanned, cause otherwise two non-clanned people
+   // would count as being in "same clan")
+   if (!sub->clan || sub->clan != obj->clan)
+      return FALSE;
+   
+   return TRUE;
+}
+
+int DARK_AMOUNT(int room)
+{
+   int glow = world[room].light;
+
+   // indoors and cities are always lit
+   if( world[room].sector_type == SECT_INSIDE ||
+       world[room].sector_type == SECT_CITY)
+     glow += 3;
+
+   if(IS_SET(world[room].room_flags, DARK))
+     glow -= 10;
+
+   if(weather_info.sunlight == SUN_DARK)
+     glow -= 1;
+
+   return glow;
+}
+
+// Room light. 
+// 0 to + is light
+// -1 to - is dark
+// SUN_DARK = -1
+bool IS_DARK( int room )
+{
+   int glow = DARK_AMOUNT(room);
+
+   if(glow < 0)
+     return TRUE;
+
+   return FALSE;
+}
+
+bool ARE_GROUPED( struct char_data *sub, struct char_data *obj)
+{
+   struct follow_type *f;
+   struct char_data *k;
+
+   if (obj == sub)
+      return TRUE;
+
+   if (!(k=sub->master))
+      k = sub;
+
+   if( (IS_AFFECTED(k, AFF_GROUP)) && (IS_AFFECTED(sub, AFF_GROUP)) ) {
+      if ((k == obj) && (IS_AFFECTED(obj, AFF_GROUP)) )
+         return TRUE;
+
+      for (f = k->followers; f; f = f->next) 
+      {
+         if ((f->follower == obj) && (IS_AFFECTED(obj, AFF_GROUP)) )
+            return TRUE;
+      }
+   }
+   return FALSE;
+}
+
+int SWAP_CH_VICT(int value)
+{
+  int newretval;
+
+  if(IS_SET(value, eCH_DIED))
+    SET_BIT(newretval, eVICT_DIED);
+  else REMOVE_BIT(newretval, eVICT_DIED);
+  if(IS_SET(value, eVICT_DIED)) 
+    SET_BIT(newretval, eCH_DIED);
+  else REMOVE_BIT(newretval, eCH_DIED);
+
+  return newretval;
+}
+
+bool SOMEONE_DIED(int value)
+{
+   if(IS_SET(value, eCH_DIED) || IS_SET(value, eVICT_DIED))
+     return TRUE;
+   return FALSE;
+}
+
+bool CAN_SEE( struct char_data *sub, struct char_data *obj )
+{
+   if (obj == sub)
+      return TRUE;
+    
+   if (!sub || !obj) {
+      log("Invalid pointer passed to CAN_SEE!", ANGEL, LOG_BUG);
+      return FALSE;
+      }	
+
+   if (!IS_MOB(obj) && (GET_LEVEL(sub) < obj->pcdata->wizinvis)) {
+      if (!IS_MOB(obj) && obj->pcdata->incognito == TRUE) {
+         if (sub->in_room != obj->in_room)
+            return FALSE;
+      }
+      else
+         return FALSE;
+   }
+
+   if ( !IS_MOB(sub) && sub->pcdata->holyLite )
+      return TRUE;
+
+   if ( IS_AFFECTED2(obj, AFF_GLITTER_DUST) && GET_LEVEL(obj) < IMMORTAL )
+      return TRUE;
+
+   if (world[obj->in_room].sector_type == SECT_FOREST &&
+       IS_AFFECTED2(obj, AFF_FOREST_MELD) &&
+       IS_AFFECTED(obj, AFF_HIDE))
+      return FALSE;
+
+   if ( IS_AFFECTED(sub, AFF_BLIND) )
+      return FALSE;
+
+   if ( !IS_LIGHT(sub->in_room) && !IS_AFFECTED(sub, AFF_INFRARED) )
+      return FALSE;
+
+   if (IS_AFFECTED(sub, AFF_TRUE_SIGHT))
+      return TRUE;
+
+   if (IS_AFFECTED(obj, AFF_HIDE))
+   {
+      int x;
+      if(IS_NPC(obj))
+         if(number(1, 101) < 90)
+           return FALSE;
+
+      x = number(1, 101);
+      if(x == 101)
+        return TRUE; // auto failure
+
+      if ( x < (has_skill(obj, SKILL_HIDE)))
+         return FALSE;
+   }
+
+   if ( !IS_AFFECTED( obj, AFF_INVISIBLE ) )
+      return TRUE;
+
+   if ( IS_AFFECTED( sub, AFF_DETECT_INVISIBLE ) )
+      return TRUE;
+
+   return FALSE;
+}
+
+bool CAN_SEE_OBJ( struct char_data *sub, struct obj_data *obj )
+{
+    if ( !IS_MOB(sub) && sub->pcdata->holyLite )
+	return TRUE;
+
+   if (IS_OBJ_STAT(obj, ITEM_NOSEE))
+      return FALSE;
+
+   if ( IS_AFFECTED( sub, AFF_BLIND ) )
+      return FALSE;
+
+   // only see beacons if you have detect magic up
+   if (GET_ITEM_TYPE(obj) == ITEM_BEACON && !IS_AFFECTED(sub, AFF_DETECT_MAGIC))
+      return FALSE;
+
+   if (IS_AFFECTED(sub, AFF_TRUE_SIGHT) )
+        return TRUE;
+
+   if(IS_OBJ_STAT(obj, ITEM_INVISIBLE) && !IS_AFFECTED(sub, AFF_DETECT_INVISIBLE))
+      return FALSE;
+
+   if ( !IS_LIGHT(sub->in_room) && 
+                 !IS_AFFECTED(sub, AFF_INFRARED))
+      return FALSE;
+
+    return TRUE;
+}
+
+bool check_blind( struct char_data *ch )
+{
+
+   if (IS_AFFECTED(ch, AFF_TRUE_SIGHT))
+      return FALSE;
+
+    if ( IS_AFFECTED(ch, AFF_BLIND) )
+    {
+	send_to_char( "You can't see a damn thing!\n\r", ch );
+	return TRUE;
+    }
+
+    return FALSE;
+}
+
+
+int do_order(struct char_data *ch, char *argument, int cmd)
+{
+    char name[MAX_INPUT_LENGTH], message[MAX_INPUT_LENGTH];
+    char buf[256];
+    bool found = FALSE;
+    int org_room;
+    int retval;
+    struct char_data *victim;
+    struct follow_type *k;
+
+    half_chop(argument, name, message);
+
+
+    if (IS_SET(world[ch->in_room].room_flags, QUIET))
+    {
+      send_to_char ("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
+      return eFAILURE;
+    }
+
+    if (!*name || !*message)
+	send_to_char("Order who to do what?\n\r", ch);
+    else if (!(victim = get_char_room_vis(ch, name)) &&
+	     str_cmp("follower", name) && str_cmp("followers", name))
+	    send_to_char("That person isn't here.\n\r", ch);
+    else if (ch == victim)
+	send_to_char("You obviously suffer from schitzophrenia.\n\r", ch);
+
+    else {
+       if (IS_AFFECTED(ch, AFF_CHARM)) {
+          send_to_char("Your superior would not aprove of you giving orders.\n\r",ch);
+          return eFAILURE;
+       }
+
+       if (victim) {
+          sprintf(buf, "$N orders you to '%s'", message);
+          act(buf,  victim, 0, ch, TO_CHAR, 0);
+          act("$n gives $N an order.", ch, 0, victim, TO_ROOM, 0);
+          if ( (victim->master!=ch) || 
+               !IS_AFFECTED(victim, AFF_CHARM) ||
+               IS_AFFECTED(victim, AFF_FAMILIAR))
+             act("$n has an indifferent look.", victim, 0, 0, TO_ROOM, 0);
+          else {
+             send_to_char("Ok.\n\r", ch);
+             command_interpreter(victim, message);
+          }
+       } else {  /* This is order "followers" */
+          sprintf(buf, "$n issues the order '%s'.", message);
+          act(buf,  ch, 0, victim, TO_ROOM, 0);
+
+          org_room = ch->in_room;
+
+          if(ch->followers)
+	    for (k = ch->followers; k; k = k->next) {
+		if (org_room == k->follower->in_room)
+		    if (IS_AFFECTED(k->follower, AFF_CHARM)) {
+			found = TRUE;
+			retval = command_interpreter(k->follower, message);
+                        if(IS_SET(retval, eCH_DIED)) 
+                          break;  // k is no longer valid if it was a mob(always), get out now
+		      }
+		  }
+
+	    if (found)
+		send_to_char("Ok.\n\r", ch);
+	    else
+		send_to_char(
+		    "Nobody here are loyal subjects of yours!\n\r", ch);
+	}
+    }
+    return eSUCCESS;
+}
+
+int do_idea(struct char_data *ch, char *argument, int cmd)
+{
+    FILE *fl;
+    char str[MAX_STRING_LENGTH];
+
+    if (IS_NPC(ch)) {
+	send_to_char("Monsters can't have ideas - Go away.\n\r", ch);
+	return eFAILURE;
+    }
+
+    /* skip whites */
+    for (; isspace(*argument); argument++);
+
+    if (!*argument) {
+	send_to_char("That doesn't sound like a good idea to me.  Sorry.\n\r", ch);
+	return eFAILURE;
+    }
+
+    if (!(fl = dc_fopen(IDEA_FILE, "a"))) {
+	perror ("do_idea");
+	send_to_char("Could not open the idea-file.\n\r", ch);
+	return eFAILURE;
+    }
+
+    sprintf(str, "**%s[%d]: %s\n", GET_NAME(ch), world[ch->in_room].number, argument);
+    fputs(str, fl);
+    dc_fclose(fl);
+    send_to_char("Ok.  Thanks.\n\r", ch);
+    return eSUCCESS;
+}
+
+int do_typo(struct char_data *ch, char *argument, int cmd)
+{
+    FILE *fl;
+    char str[MAX_STRING_LENGTH];
+
+    if (IS_NPC(ch)) {
+	send_to_char("Monsters can't spell - leave me alone.\n\r", ch);
+	return eFAILURE;
+    }
+
+    /* skip whites */
+    for (; isspace(*argument); argument++);
+
+    if (!*argument) {
+	send_to_char("I beg your pardon?\n\r", ch);
+	return eFAILURE;
+    }
+
+    if (!(fl = dc_fopen(TYPO_FILE, "a")))
+    {
+	perror ("do_typo");
+	send_to_char("Could not open the typo-file.\n\r", ch);
+	return eFAILURE;
+    }
+
+    sprintf(str, "**%s[%d]: %s\n",
+	GET_NAME(ch), world[ch->in_room].number, argument);
+    fputs(str, fl);
+    dc_fclose(fl);
+    send_to_char("Ok.  Thanks.\n\r", ch);
+    return eSUCCESS;
+}
+
+int do_bug(struct char_data *ch, char *argument, int cmd)
+{
+    FILE *fl;
+    char str[MAX_STRING_LENGTH];
+
+    if (IS_NPC(ch)) {
+	send_to_char("You are a monster! Bug off!\n\r", ch);
+	return eFAILURE;
+    }
+
+    /* skip whites */
+    for (; isspace(*argument); argument++);
+
+    if (!*argument) {
+	send_to_char("Pardon?\n\r", ch);
+	return eFAILURE;
+    }
+
+    if (!(fl = dc_fopen(BUG_FILE, "a"))) {
+	perror ("do_bug");
+	send_to_char("Could not open the bug-file.\n\r", ch);
+	return eFAILURE;
+    }
+
+    sprintf(str, "**%s[%d]: %s\n", GET_NAME(ch), world[ch->in_room].number, argument);
+    fputs(str, fl);
+    dc_fclose(fl);
+    send_to_char("Ok.\n\r", ch);
+    return eSUCCESS;
+}
+
+int do_recall( CHAR_DATA *ch, char *argument, int cmd )
+{
+  int location, percent, level, cost, x;
+  CHAR_DATA *victim;
+  CHAR_DATA *loop_ch;
+  float cf;
+  char name[256] = "";
+  struct clan_data * clan;
+  struct clan_room_data * room;
+  int found = 0;
+  int retval;
+  int is_mob;
+
+  act( "$n prays to $s God for transportation!", ch, 0, 0, TO_ROOM , INVIS_NULL);
+
+  if(!IS_NPC(ch))
+  {
+    x = GET_WIS(ch);
+    percent = number(1, 100);
+    if (percent > x) {
+      percent -= x;
+    }
+
+    if(percent > 50) {
+      send_to_char( "You failed in your recall!\n\r", ch );
+      return eFAILURE;
+    }
+  }
+
+  if(IS_AFFECTED(ch, AFF_CHARM))
+    return eFAILURE;
+
+  if(IS_SET(world[ch->in_room].room_flags, ARENA)) {
+    send_to_char("To the DEATH, you wimp.\n\r", ch);
+    return eFAILURE;
+  }
+
+  if(IS_SET(world[ch->in_room].room_flags, NO_MAGIC)) {
+    send_to_char("Your magic fizzles and dies.\n\r", ch);
+    return eFAILURE;
+  }
+
+  if(IS_SET(ch->combat, COMBAT_BASH1) ||
+     IS_SET(ch->combat, COMBAT_BASH2)) {
+     send_to_char("You can't, you're bashed!\r\n", ch);
+     return eFAILURE;
+  }
+ 
+  one_argument(argument, name);
+
+  if (!(*name))
+     victim = ch;
+  else if (!(victim = get_char_room_vis(ch, name)) ||
+           (!ARE_GROUPED(ch, victim) && !ARE_CLANNED(ch, victim))) {
+     send_to_char( "Whom do you want to recall?\n\r", ch );
+     return eFAILURE;
+  }
+
+  if (IS_NPC(ch))
+    location = real_room(GET_HOME(ch));
+  else
+  {
+    if( GET_HOME(victim) == 0 || GET_LEVEL(victim) < 11 ||
+        IS_AFFECTED(victim, AFF_CANTQUIT)
+      )
+      location = real_room(START_ROOM);
+    else
+      location = real_room(GET_HOME(victim));
+
+    // make sure they arne't recalling into someone's chall
+    if(IS_SET(world[location].room_flags, CLAN_ROOM)) 
+       if(!victim->clan || !(clan = get_clan(victim))) {
+         send_to_char("The gods frown on you, and reset your home.\r\n", ch);
+         location = real_room(START_ROOM);
+         GET_HOME(victim) = START_ROOM;
+       }
+       else {
+          for(room = clan->rooms; room; room = room->next)
+            if(room->room_number == GET_HOME(victim))
+               found = 1;
+
+          if(!found) {
+             send_to_char("The gods frown on you, and reset your home.\r\n", ch);
+             location = real_room(START_ROOM);
+             GET_HOME(victim) = START_ROOM;
+          }
+       }
+  }
+
+  if(location == -1) {
+    send_to_char("You are completely lost.\n\r", victim);
+    return eFAILURE|eINTERNAL_ERROR;
+  }
+
+  // calculate the gold needed
+  level = GET_LEVEL(victim);
+  if ((level > 10) && (level < 51))
+  {
+    cf   = 1 + ((level - 11) * .347);
+    cost = (int)(3440 * cf);
+    if (GET_GOLD(ch) < cost)
+    {
+         csendf(ch, "You don't have %d gold!\n\r", cost);
+         return eFAILURE;
+    }
+    GET_GOLD(ch) -= cost;
+  }
+
+    for(loop_ch = world[victim->in_room].people; loop_ch; loop_ch = loop_ch->next_in_room)
+       if(loop_ch == victim || loop_ch->fighting == victim)
+          stop_fighting(loop_ch);
+
+    act( "$n disappears.", victim, 0, 0, TO_ROOM , INVIS_NULL);
+    is_mob = IS_MOB(victim);    
+    retval = move_char(victim, location);
+
+    if(!is_mob && !IS_SET(retval, eCH_DIED)) { // if it was a mob, we might have died moving 
+       act( "$n appears out of nowhere.", victim, 0, 0, TO_ROOM , INVIS_NULL);
+       do_look( victim, "", 0 );
+    }
+    return retval;
+}
+
+int do_qui(struct char_data *ch, char *argument, int cmd)
+{
+    send_to_char("You have to write quit - no less, to quit!\n\r",ch);
+    return eSUCCESS;
+}
+
+int do_quit(struct char_data *ch, char *argument, int cmd)
+{
+  int iWear;
+  struct follow_type *k;
+   struct clan_data * clan;
+   struct clan_room_data * room;
+   int found = 0;
+
+  void find_and_remove_player_portal(char_data * ch);
+
+  /*
+  | Code inserted by Morc 9 Apr 1997 to fix crasher
+  */
+  if(ch == 0)
+  {
+    log("do_quit received null char - problem!", LOG_BUG, OVERSEER);
+    return eFAILURE|eINTERNAL_ERROR;
+  }
+
+  if(IS_NPC(ch))
+    return eFAILURE;
+   
+  if (!IS_SET(world[ch->in_room].room_flags, SAFE) && cmd != 666
+      && GET_LEVEL(ch) < IMMORTAL) 
+  {
+     send_to_char("This room doesn't feel...SAFE enough to do that.\n\r", ch);
+     return eFAILURE;
+  } 
+ 
+  // If ch has follower, cant quit
+  // NOTE: If we sent a 666 to do_quit, then it came from a zap or a boot
+  // at this point, we've set the char back to level 1 (if from a zap), so
+  // we'll end up with a fully equipped char with huge stats reset to level
+  // 1
+
+  if(cmd != 666) {
+    for(k = ch->followers; k; k = k->next) {   
+          if(IS_AFFECTED(k->follower, AFF_CHARM)) {
+          send_to_char ("But you wouldn't want to just abandon your followers!\r\n", ch);
+          return eFAILURE;
+       }
+    }
+
+    if (IS_SET(world[ch->in_room].room_flags, QUIET)) {
+      send_to_char ("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
+      return eFAILURE;
+    }
+
+    if(GET_POS(ch) == POSITION_FIGHTING) {
+      send_to_char( "No way! You are fighting.\n\r", ch );
+      return eFAILURE;
+    }
+
+    if(GET_POS(ch) < POSITION_STUNNED) {
+      send_to_char( "You're not DEAD yet.\n\r", ch );
+      return eFAILURE;
+    }
+
+    if(IS_AFFECTED(ch, AFF_CANTQUIT)) {
+      send_to_char("You can't quit, because you are still a pkiller!\n\r", ch);
+      return eFAILURE;
+    }
+
+    if (IS_SET(world[ch->in_room].room_flags, NO_QUIT))
+    {
+      send_to_char("Something about this room makes it seem like a bad place to quit.\r\n", ch);
+      return eFAILURE;
+    }
+
+    if (IS_SET(world[ch->in_room].room_flags, ARENA))
+    {
+      send_to_char("Don't make me zap you.....\r\n", ch);
+      return eFAILURE;
+    }
+
+    if(IS_SET(world[ch->in_room].room_flags, CLAN_ROOM)) 
+    {
+      if(!ch->clan || !(clan = get_clan(ch))) {
+         send_to_char("This is a clan room dork.  Try joining one first.\r\n", ch);
+         return eFAILURE;
+      }
+      
+      for(room = clan->rooms; room; room = room->next)
+         if(ch->in_room == real_room(room->room_number))
+            found = 1;
+
+      if(!found) {
+         send_to_char("Chode! You can't quit in another clan's hall!\r\n", ch);
+         return eFAILURE;
+      }
+    }
+    act( "$n has left the game.", ch, 0, 0, TO_ROOM , INVIS_NULL);
+    csendf(ch, "Deleting %s.\n\r", GET_NAME(ch));
+  }
+
+  // Finish off any performances
+  if(IS_SINGING(ch))
+    do_sing(ch, "stop", 9);
+
+  if(ch->beacon)
+    extract_obj(ch->beacon);
+
+  find_and_remove_player_portal(ch);
+
+  if(cmd != 666)
+     clan_logout(ch);
+
+  update_wizlist(ch);
+
+  if (!IS_MOB(ch) && ch->desc && ch->desc->host) {
+    if(ch->pcdata->last_site)
+      dc_free(ch->pcdata->last_site);
+#ifdef LEAK_CHECK
+    ch->pcdata->last_site = (char *)calloc(strlen(ch->desc->host) + 1, sizeof(char));
+#else
+    ch->pcdata->last_site = (char *)dc_alloc(strlen(ch->desc->host) + 1, sizeof(char));
+#endif
+    strcpy (ch->pcdata->last_site, ch->desc->host);
+    ch->pcdata->time.logon = time(0);
+  }
+ 
+  if(ch->desc) {
+    save_char_obj(ch);
+    close_socket(ch->desc);
+  } else {
+    save_char_obj(ch);
+  } 
+
+  for(iWear = 0; iWear < MAX_WEAR; iWear++) 
+     if(ch->equipment[iWear])
+       obj_to_char( unequip_char( ch, iWear ), ch );
+
+  while(ch->carrying)
+    extract_obj(ch->carrying);
+
+  extract_char( ch, TRUE );
+  return eSUCCESS;
+}
+
+// TODO - make some sort of auto-save, or "save" flag, so player's
+//        that save after every other kill don't actually do it, but it
+//        pretends that it does.  That way we can start reducing the amount
+//        of writing we're doing.
+int do_save(struct char_data *ch, char *argument, int cmd)
+{
+    char buf[100];
+
+    // With the cmd numbers
+    // 666 = save quietly
+    // 10 = save
+    // 9 = save with a round of lag
+    // -pir 3/15/1999
+
+    if(GET_LEVEL(ch) < 2 && cmd != 666) {
+      send_to_char("You must be at least level 2 to save.\n\r", ch);
+      return eFAILURE;
+    }
+
+    if (IS_NPC(ch) || GET_LEVEL(ch) > IMP)
+	return eFAILURE;
+
+    if(cmd != 666) {
+      sprintf(buf, "Saving %s.\n\r", GET_NAME(ch));
+      send_to_char(buf, ch);
+    }
+
+    save_char_obj(ch);
+
+    return eSUCCESS;
+}
+
+
+int do_home(struct char_data *ch, char *argument, int cmd)
+{
+   struct clan_data * clan;
+   struct clan_room_data * room;
+   int found = 0;
+   
+  if (!IS_SET(world[ch->in_room].room_flags, SAFE) ||
+      IS_SET(world[ch->in_room].room_flags, ARENA)) {
+     send_to_char("This place doesn't sit right with you...not enough "
+                  "security.\n\r", ch);
+     return eFAILURE;
+     }
+
+    if(GET_LEVEL(ch) < 11) {
+      send_to_char("You must grow a bit before you can leave the nursery.\n\r", ch);
+      GET_HOME(ch) = START_ROOM;
+      return eFAILURE;
+    }
+  
+   if(IS_SET(world[ch->in_room].room_flags, CLAN_ROOM)) {
+      if(!ch->clan || !(clan = get_clan(ch))) {
+         send_to_char("This is a clan room dork.  Try joining one first.\r\n", ch);
+         return eFAILURE;
+      }
+      
+      for(room = clan->rooms; room; room = room->next)
+         if(ch->in_room == real_room(room->room_number))
+            found = 1;
+
+      if(!found) {
+         send_to_char("Chode! You can't set home in another clan's hall!\r\n", ch);
+         return eFAILURE;
+      }
+   }
+
+   send_to_char("You now consider this place to be your home.\n\r", ch);
+   GET_HOME(ch) = world[ch->in_room].number;
+   return eSUCCESS;
+}
+
+int do_not_here(struct char_data *ch, char *argument, int cmd)
+{
+    send_to_char("Sorry, but you cannot do that here!\n\r",ch);
+    return eSUCCESS;
+}
+
+// Used for debugging with dmalloc
+int do_memoryleak(struct char_data *ch, char *argument, int cmd)
+{
+   if(GET_LEVEL(ch) < OVERSEER)
+   {
+      send_to_char("The 'leak' command is not available to you.\r\n", ch);
+      return eFAILURE;
+   }
+   malloc(10);
+
+   send_to_char("A memory leak was just caused.\r\n", ch);
+   return eSUCCESS;
+}
+
+// Used for debugging with dmalloc
+void cause_leak()
+{
+   malloc(10);
+}
+
+int do_beep(struct char_data *ch, char *argument, int cmd)
+{
+  send_to_char("Beep!\a\r\n", ch);
+  return eSUCCESS;
+}
+
+// search through a character's list to see if they have a particular skill
+// if so, return their level of knowledge
+// if not, return 0
+int has_skill (CHAR_DATA *ch, sh_int skill)
+{
+  struct char_skill_data * curr = ch->skills;
+
+  while(curr) {
+    if(curr->skillnum == skill)
+      return ((int)curr->learned);
+    curr = curr->next;
+  }
+
+  return 0;
+}
+
+void double_dollars(char * destination, char * source)
+{
+  while(*source != '\0')
+    if(*source == '$') {
+      *destination++ = '$';
+      *destination++ = '$';
+      source++;
+    }
+    else *destination++ = *source++;
+
+  *destination = '\0';
+}
+
+// convert char string to int
+// return true if successful, false if error
+// also check to make sure it's in the valid range
+bool check_range_valid_and_convert(int & value, char * buf, int begin, int end)
+{
+   value = atoi(buf);
+   if(value == 0 && strcmp(buf, "0"))
+     return FALSE; 
+
+   if(value < begin)
+     return FALSE;
+
+   if(value > end)
+     return FALSE;
+
+   return TRUE;
+}
+
+// convert char string to int
+// return true if successful, false if error
+bool check_valid_and_convert(int & value, char * buf)
+{
+   value = atoi(buf);
+   if(value == 0 && strcmp(buf, "0"))
+     return FALSE; 
+
+   return TRUE;
+}
+
+// Assumes bits is array of strings, ending with a "\n" string
+// Finds the bits[] strings listed in "strings" and toggles the bit in "value"
+// Informs 'ch' of what has happened
+//
+void parse_bitstrings_into_int(char * bits[], char * strings, char_data * ch, int & value)
+{
+  char buf[MAX_INPUT_LENGTH];
+  int  found = FALSE;
+
+  if(!ch)
+    return;
+
+  for(;;) 
+  {
+    if(!*strings)
+      break;
+
+    half_chop(strings, buf, strings);
+                       
+    for(int x = 0 ;*bits[x] != '\n'; x++) 
+    {
+      if(is_abbrev(buf, bits[x])) 
+      {
+        if(IS_SET(value, (1<<x))) {
+          REMOVE_BIT(value, (1<<x));
+          csendf(ch, "%s flag $5REMOVED$R.\n\r", bits[x]);
+        }
+        else {
+          SET_BIT(value, (1<<x));
+          csendf(ch, "%s flag ADDED.\n\r", bits[x]);
+        }
+        found = TRUE;
+        break;
+      }
+    } 
+  }
+  if(!found)
+    send_to_char("No matching bits found.\r\n", ch);
+}
+
+
+// Assumes bits is array of strings, ending with a "\n" string
+// Finds the bits[] strings listed in "strings" and toggles the bit in "value"
+// Informs 'ch' of what has happened
+//
+void parse_bitstrings_into_int(char * bits[], char * strings, char_data * ch, long & value)
+{
+  char buf[MAX_INPUT_LENGTH];
+  int  found = FALSE;
+
+  if(!ch)
+    return;
+
+  for(;;) 
+  {
+    if(!*strings)
+      break;
+
+    half_chop(strings, buf, strings);
+                       
+    for(int x = 0 ;*bits[x] != '\n'; x++) 
+    {
+      if(is_abbrev(buf, bits[x])) 
+      {
+        if(IS_SET(value, (1<<x))) {
+          REMOVE_BIT(value, (1<<x));
+          csendf(ch, "%s flag REMOVED.\n\r", bits[x]);
+        }
+        else {
+          SET_BIT(value, (1<<x));
+          csendf(ch, "%s flag ADDED.\n\r", bits[x]);
+        }
+        found = TRUE;
+        break;
+      }
+    } 
+  }
+  if(!found)
+    send_to_char("No matching bits found.\r\n", ch);
+}
+
+// Display a \n terminated list to the character
+//
+void display_string_list(char * list[], char_data *ch)
+{
+  char buf[MAX_STRING_LENGTH];
+  *buf = '\0';
+
+  for(int i = 1; *list[i-1] != '\n'; i++)        
+  {
+    sprintf(buf + strlen(buf), "%18s", list[i-1]);      
+    if (!(i % 4))
+    {
+      strcat(buf, "\r\n");  
+      send_to_char(buf, ch);
+      *buf = '\0';
+    }
+  }
+  if(*buf)
+      send_to_char(buf, ch);
+  send_to_char("\r\n", ch);
+}

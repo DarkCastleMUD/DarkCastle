@@ -1,0 +1,263 @@
+/***************************************************************************
+ *  file: obj.h , Structures                               Part of DIKUMUD *
+ *  Usage: Declarations of object data structures                          *
+ *  Copyright (C) 1990, 1991 - see 'license.doc' for complete information. *
+ *                                                                         *
+ *  Copyright (C) 1992, 1993 Michael Chastain, Michael Quan, Mitchell Tse  *
+ *  Performance optimization and bug fixes by MERC Industries.             *
+ *  You can use our stuff in any way you like whatsoever so long as ths   *
+ *  copyright notice remains intact.  If you like it please drop a line    *
+ *  to mec@garnet.berkeley.edu.                                            *
+ *                                                                         *
+ *  This is free software and you are benefitting.  We hope that you       *
+ *  share your changes too.  What goes around, comes around.               *
+ ***************************************************************************/
+/* $Id: obj.h,v 1.1 2002/06/13 04:32:22 dcastle Exp $ */
+#ifndef OBJ_H_
+#define OBJ_H_
+
+#include <structs.h> // byte
+/* The following defs are for obj_data  */
+
+/* For 'type_flag' */
+
+#define ITEM_LIGHT       1
+#define ITEM_SCROLL      2
+#define ITEM_WAND        3
+#define ITEM_STAFF       4
+#define ITEM_WEAPON      5
+#define ITEM_FIREWEAPON  6
+#define ITEM_MISSILE     7
+#define ITEM_TREASURE    8
+#define ITEM_ARMOR       9
+#define ITEM_POTION     10
+#define ITEM_WORN       11   // used, can change
+#define ITEM_OTHER      12
+#define ITEM_TRASH      13
+#define ITEM_TRAP       14 
+#define ITEM_CONTAINER  15
+#define ITEM_NOTE       16
+#define ITEM_DRINKCON   17
+#define ITEM_KEY        18
+#define ITEM_FOOD       19
+#define ITEM_MONEY      20
+#define ITEM_PEN        21
+#define ITEM_BOAT       22
+#define ITEM_BOARD      23
+#define ITEM_PORTAL     24
+#define ITEM_FOUNTAIN   25
+#define ITEM_INSTRUMENT 26
+#define ITEM_UTILITY    27
+#define ITEM_BEACON     28 
+#define ITEM_LOCKPICK   29
+#define ITEM_CLIMBABLE  30
+#define ITEM_TYPE_MAX   30
+
+/* Bitvector For 'wear_flags' */
+
+#define ITEM_TAKE               1
+#define ITEM_WEAR_FINGER        2
+#define ITEM_WEAR_NECK          4
+#define ITEM_WEAR_BODY          8
+#define ITEM_WEAR_HEAD         16
+#define ITEM_WEAR_LEGS         32
+#define ITEM_WEAR_FEET         64
+#define ITEM_WEAR_HANDS       128
+#define ITEM_WEAR_ARMS        256
+#define ITEM_WEAR_SHIELD      512
+#define ITEM_WEAR_ABOUT      1024
+#define ITEM_WEAR_WAISTE     2048
+#define ITEM_WEAR_WRIST      4096
+#define ITEM_WIELD           8192
+#define ITEM_HOLD           16384
+#define ITEM_THROW          32768
+#define ITEM_WEAR_FACE     131072
+#define ITEM_WEAR_EAR      262144
+
+/* UNUSED, CHECKS ONLY FOR ITEM_LIGHT #define ITEM_LIGHT_SOURCE  65536 */
+
+/* Bitvector for 'extra_flags' */
+
+#define ITEM_GLOW               1
+#define ITEM_HUM                1<<1
+#define ITEM_DARK               1<<2
+#define ITEM_LOCK               1<<3
+#define ITEM_ANY_CLASS          1<<4     // Any class can use
+#define ITEM_INVISIBLE          1<<5 
+#define ITEM_MAGIC              1<<6
+#define ITEM_NODROP             1<<7
+#define ITEM_BLESS              1<<8
+#define ITEM_ANTI_GOOD          1<<9
+#define ITEM_ANTI_EVIL          1<<10
+#define ITEM_ANTI_NEUTRAL       1<<11
+#define ITEM_WARRIOR            1<<12
+#define ITEM_MAGE               1<<13
+#define ITEM_THIEF              1<<14
+#define ITEM_CLERIC             1<<15
+#define ITEM_PAL                1<<16
+#define ITEM_ANTI               1<<17
+#define ITEM_BARB               1<<18
+#define ITEM_MONK               1<<19
+#define ITEM_RANGER             1<<20
+#define ITEM_DRUID              1<<21
+#define ITEM_BARD               1<<22
+#define ITEM_TWO_HANDED         1<<23
+#define ITEM_ENCHANTED          1<<24
+#define ITEM_SPECIAL            1<<25
+#define ITEM_NOSAVE             1<<26
+#define ITEM_NOSEE		1<<27 
+#define ITEM_NOREPAIR           1<<28
+#define ITEM_UNUSED2            1<<29    // not used
+
+/* Bitvector for 'more_flags' */
+
+#define ITEM_NO_RESTRING        1
+#define ITEM_UNUSED		1<<1
+#define ITEM_UNIQUE             1<<2
+#define ITEM_NO_TRADE           1<<3
+#define ITEM_NONOTICE           1<<4  // Item doesn't show up on 'look' but
+                                      // can still be accessed with 'get' etc FUTURE
+
+/* Bitvector for 'size' */
+#define SIZE_ANY		1
+#define SIZE_SMALL		1<<1
+#define SIZE_MEDIUM		1<<2
+#define SIZE_LARGE		1<<3
+#define SIZE_CHARMIE_OK		1<<4
+
+/* Different types of 'utility' items */
+
+#define UTILITY_CATSTINK        1
+#define UTILITY_EXIT_TRAP       2
+#define UTILITY_MOVEMENT_TRAP   3
+
+/* Some different kind of liquids */
+#define LIQ_WATER       0
+#define LIQ_BEER        1
+#define LIQ_WINE        2
+#define LIQ_ALE         3
+#define LIQ_DARKALE     4
+#define LIQ_WHISKY      5
+#define LIQ_LEMONADE    6
+#define LIQ_FIREBRT     7
+#define LIQ_LOCALSPC    8
+#define LIQ_SLIME       9
+#define LIQ_MILK        10
+#define LIQ_TEA         11
+#define LIQ_COFFEE      12
+#define LIQ_BLOOD       13
+#define LIQ_SALTWATER   14
+#define LIQ_COKE        15
+#define LIQ_GATORADE    16
+#define LIQ_HOLYWATER   17
+
+/* for containers  - value[1] */
+
+#define CONT_CLOSEABLE      1
+#define CONT_PICKPROOF      2
+#define CONT_CLOSED         4
+#define CONT_LOCKED         8
+
+struct active_object
+{
+    struct obj_data *obj;
+    struct active_object *next;
+};
+
+struct extra_descr_data
+{
+    char *keyword;                 /* Keyword in look/examine          */
+    char *description;             /* What to see                      */
+    struct extra_descr_data *next; /* Next in list                     */
+};
+
+#define OBJ_NOTIMER      -7000000
+
+struct obj_flag_data
+{
+    int value[4];       /* Values of the item (see list)    */
+    byte type_flag;     /* Type of item                     */
+    int wear_flags;     /* Where you can wear it            */
+    int size;           /* Race restrictions                */
+    int extra_flags;    /* If it hums, glows etc            */
+    int weight;         /* Weight what else                 */
+    int cost;           /* Value when sold (gp.)            */
+    int more_flags;     /* A second bitvector (extra_flags2)*/
+    int eq_level;	/* Min level to use it for eq       */
+    int timer;          /* Timer for object                 */
+};
+
+/* Used in OBJ_FILE_ELEM *DO*NOT*CHANGE* */
+struct obj_affected_type
+{
+    byte location;      /* Which ability to change (APPLY_XXX) */
+    sbyte modifier;     /* How much it changes by              */
+};
+
+/* ======================== Structure for object ========================= */
+struct obj_data
+{
+    sh_int item_number;            /* Where in data-base               */
+    sh_int in_room;                /* In what room -1 when conta/carr  */ 
+    struct obj_flag_data obj_flags;/* Object information               */
+    sh_int num_affects;
+    struct obj_affected_type *affected; /* Which abilities in PC to change  */
+
+    char *name;                    /* Title of object :get etc.        */
+    char *description ;            /* When in room                     */
+    char *short_description;       /* when worn/carry/in cont.         */
+    char *action_description;      /* What to write when used          */
+    struct extra_descr_data *ex_description; /* extra descriptions     */
+    CHAR_DATA *carried_by;         /* Carried by :NULL in room/conta   */
+    CHAR_DATA *equipped_by;        /* so I can access the player :)    */
+
+    struct obj_data *in_obj;       /* In what object NULL when none    */
+    struct obj_data *contains;     /* Contains objects                 */
+
+    struct obj_data *next_content; /* For 'contains' lists             */
+    struct obj_data *next;         /* For the object list              */
+};
+
+/* For 'equipment' */
+
+#define WEAR_LIGHT       0
+#define WEAR_FINGER_R    1
+#define WEAR_FINGER_L    2
+#define WEAR_NECK_1      3
+#define WEAR_NECK_2      4
+#define WEAR_BODY        5
+#define WEAR_HEAD        6
+#define WEAR_LEGS        7
+#define WEAR_FEET        8
+#define WEAR_HANDS       9
+#define WEAR_ARMS       10
+#define WEAR_SHIELD     11
+#define WEAR_ABOUT      12
+#define WEAR_WAISTE     13
+#define WEAR_WRIST_R    14
+#define WEAR_WRIST_L    15
+#define WIELD           16
+#define SECOND_WIELD    17
+#define HOLD            18
+#define WEAR_FACE       19
+#define WEAR_EAR_L      20
+#define WEAR_EAR_R      21
+#define WEAR_MAX        21
+
+/* ***********************************************************************
+*  file element for object file. BEWARE: Changing it will ruin the file  *
+*********************************************************************** */
+
+#define CURRENT_OBJ_VERSION        1
+
+struct obj_file_elem 
+{
+    int version;
+    sh_int item_number;
+    sh_int timer;
+    int wear_pos;
+    int container_depth;
+    int other[5];        // unused
+};
+
+#endif

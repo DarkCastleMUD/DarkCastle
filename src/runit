@@ -1,0 +1,12 @@
+run
+where
+p *obj
+p *obj->carried_by
+p *object
+p *object->carried_by
+p *ch
+p *vict
+p *victim
+quit
+y
+

@@ -1,0 +1,1939 @@
+// File: obj_proc.C
+// Usage: This file contains special procedures pertaining to objects, except 
+// for the boards which are in board.C
+
+#ifdef LEAK_CHECK
+#include <dmalloc.h>
+#endif
+#include <db.h>
+#include <fight.h>
+#include <room.h>
+#include <obj.h>
+#include <connect.h>
+#include <timeinfo.h>
+#include <utility.h>
+#include <character.h>
+#include <handler.h>
+#include <db.h>
+#include <player.h>
+#include <levels.h>
+#include <interp.h>
+#include <magic.h>
+#include <act.h>
+#include <mobile.h>
+#include <spells.h>
+#include <string.h> // strstr()
+#include <returnvals.h>
+
+#define EMOTING_FILE "emoting-objects.txt"
+
+extern CWorld world;
+extern struct index_data *obj_index; 
+extern struct index_data *mob_index; 
+extern struct str_app_type str_app[];
+extern struct obj_data *object_list;
+
+// TODO - go over emoting object stuff and make sure it's as effecient as we can get it
+ 
+struct obj_emote_data {
+    char *emote_text;
+    obj_emote_data *next;
+};
+
+struct obj_emote_index {
+    obj_emote_data *data;
+    obj_emote_index *next;
+    short room_number;
+    short emote_index_length;
+    short frequency;
+};
+struct obj_emote_index obj_emote_head = {
+    NULL,
+    NULL,
+    -1,
+    -1 
+    -1
+};
+
+void free_emoting_obj_data(obj_emote_index * myobj)
+{
+   obj_emote_data * curr_data = NULL;
+
+   while(myobj->data)
+   {
+     curr_data = myobj->data;
+     myobj->data = curr_data->next;
+
+     dc_free(curr_data->emote_text);
+     dc_free(curr_data);
+   }
+}
+
+void free_emoting_objects_from_memory()
+{
+  obj_emote_index * curr_index = NULL;
+
+  while(obj_emote_head.next)
+  {
+    curr_index = obj_emote_head.next;
+    obj_emote_head.next = curr_index->next;
+
+    free_emoting_obj_data(curr_index);
+    dc_free(curr_index);
+  }
+
+  free_emoting_obj_data(&obj_emote_head);  
+}
+
+void load_emoting_objects() 
+{
+    obj_emote_index *index_cursor = NULL;
+    obj_emote_data *data_cursor = NULL;
+    FILE *fl; 
+    // short i;
+    char fromfile;
+    bool done = false,
+         done2 = false;
+    short offset;
+
+    fl = dc_fopen(EMOTING_FILE, "r");
+#ifdef LEAK_CHECK
+    obj_emote_head.next = (struct obj_emote_index *)
+                          calloc(1, sizeof(struct obj_emote_index));
+#else
+    obj_emote_head.next = (struct obj_emote_index *)
+                          dc_alloc(1, sizeof(struct obj_emote_index));
+#endif
+    index_cursor = obj_emote_head.next;
+    index_cursor->next = NULL;
+    index_cursor->data = NULL;
+    index_cursor->room_number = -1;
+    index_cursor->emote_index_length = -1;
+    index_cursor->frequency = 0;
+#ifdef LEAK_CHECK
+    data_cursor =(struct obj_emote_data *)
+                 calloc(1, sizeof(struct obj_emote_index));
+#else
+    data_cursor =(struct obj_emote_data *)
+                 dc_alloc(1, sizeof(struct obj_emote_index));
+#endif
+    index_cursor->data = data_cursor;
+    data_cursor->next = NULL;
+    while(!done2) {
+        index_cursor->room_number = fread_int(fl, 0, 1000000);
+        index_cursor->frequency = fread_int(fl, 0, 1000000);
+        done = false;
+        while(!done) {
+            // Why are we dc_alloc'ing the space when fread_string is returning us
+            // a pointer to the space IT allocs?  Azrack you silly goose.  I fixed it.
+            // -pir 05/03/00
+            //data_cursor->emote_text = (char *)dc_alloc(100, sizeof(char));
+            data_cursor->emote_text = fread_string(fl, 0);
+            index_cursor->emote_index_length++;
+            if((offset = 1) && ((fromfile = fgetc(fl)) == 'S') && ((offset = 2) && (fromfile = fgetc(fl)) == '\n')) {
+                done = true;
+            } else {
+#ifdef LEAK_CHECK
+                data_cursor->next = (struct obj_emote_data *)
+                                    calloc(1, sizeof(struct obj_emote_data));
+#else
+                data_cursor->next = (struct obj_emote_data *)
+                                    dc_alloc(1, sizeof(struct obj_emote_data));
+#endif
+                data_cursor = data_cursor->next;
+                data_cursor->next = NULL;
+                fseek(fl, (-1 * offset * sizeof(char)), SEEK_CUR);
+            }
+        }
+        if((fromfile = fgetc(fl)) == '$') {
+            done2 = true;
+        } else {
+            fseek(fl, (-1 * sizeof(char)), SEEK_CUR);
+#ifdef LEAK_CHECK
+            index_cursor->next = (struct obj_emote_index *)
+                                 calloc(1, sizeof(struct obj_emote_index));
+#else
+            index_cursor->next = (struct obj_emote_index *)
+                                 dc_alloc(1, sizeof(struct obj_emote_index));
+#endif
+            index_cursor = index_cursor->next;
+            index_cursor->next = NULL;
+#ifdef LEAK_CHECK
+            index_cursor->data = (struct obj_emote_data *)
+                                 calloc(1, sizeof(struct obj_emote_data));
+#else
+            index_cursor->data = (struct obj_emote_data *)
+                                 dc_alloc(1, sizeof(struct obj_emote_data));
+#endif
+            index_cursor->room_number = -1;
+            index_cursor->emote_index_length = -1;
+            index_cursor->frequency = -1;
+            data_cursor = index_cursor->data;
+            data_cursor->next = NULL;
+        }
+    }
+    dc_fclose(fl);
+    return;
+}
+
+int emoting_object(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
+                   CHAR_DATA *invoker)
+{
+    obj_emote_index *index_cursor = NULL;
+    obj_emote_data  *data_cursor = NULL;
+    short i = 0;
+    if(cmd) {
+        return eFAILURE;
+    }
+    if(!obj) {
+        return eFAILURE;
+    }
+    if(-1 == obj->in_room) {
+         return eFAILURE;
+    }
+    if(!world[obj->in_room].people) {
+        return eFAILURE;
+    }
+    ch = world[obj->in_room].people;
+    for(index_cursor = &obj_emote_head; index_cursor; index_cursor = index_cursor->next) {
+        if(real_room(index_cursor->room_number) == obj->in_room) {
+            if(real_room(index_cursor->room_number) == NOWHERE) {
+                return eFAILURE;
+            }
+            i = number(0, (index_cursor->emote_index_length));
+            data_cursor = index_cursor->data; 
+            for(i = 0; i < number(0, index_cursor->emote_index_length); i++) {
+                data_cursor = data_cursor->next;
+            }
+            if(number(0, (index_cursor->frequency))  == 0) {
+                act(data_cursor->emote_text, ch, 0, 0, TO_ROOM, 0);
+                act(data_cursor->emote_text, ch, 0, 0, TO_CHAR, 0);
+            }
+        }
+    }
+    return eFAILURE;
+}
+
+int souldrainer(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, 
+                   CHAR_DATA *invoker) 
+{
+    // struct obj_data *wielded;
+    int percent, chance;
+    CHAR_DATA *vict;
+
+    if(!(vict = ch->fighting)) {
+	return eFAILURE;
+    }
+    if(GET_HIT(vict) < 3500) {
+        percent = (100 * GET_HIT(vict)) / GET_MAX_HIT(vict);
+	chance = number(0, 101);
+	if(chance > (1.3 * percent)) {
+	    chance = number(0, 101);
+	    if(chance > (2 * percent)) {
+		chance = number(0, 101);
+		if(chance > (2 * percent)) {
+		    chance = number(0, 101);
+		    if(chance > (2 * percent)) {
+                        // TODO - 6 act messages?  We can't combine these?
+			act("You feel your soul being drained as $n's magics swirl around you",
+			    ch, 0, vict, TO_VICT, 0);
+                        act("$N gasps in agony as $n's dark magics grasp at $S soul.", 
+			    ch, 0, vict, TO_ROOM, NOTVICT);
+                        act("Evil energy surges into you as you wrench at $N's soul.",
+			    ch, 0, vict, TO_CHAR, 0);
+                        act("The Darkness has triumphed! You drain away $N's esseence.", 
+			    ch, 0, vict, TO_CHAR, 0);
+                        act("Everything goes black as your soul is pulled into the abyss.", 
+			    ch, 0, vict, TO_VICT, 0);
+                        act("$N screams as his soul is destroyed by $n's dark magics",
+			    ch, 0, vict, TO_ROOM, NOTVICT);
+                        GET_HIT(vict) = -20; 
+			fight_kill(ch, vict, TYPE_CHOOSE);
+                        // TODO - double check this group_gain...we might not want to be calling
+                        // that...i'm not sure though.
+			group_gain(ch, vict);
+			return eSUCCESS;
+
+                   } else { // Missed the fucker
+		       act("You braveley resist as $n pulls at the very essence of your soul.", 
+			   ch, 0, vict, TO_VICT, 0);
+                       act("$N stands his ground as dark magic coils around $n",
+			   ch, 0, vict, TO_ROOM, NOTVICT);
+                       act("$N shudders but resists your grasp upon $S soul.",
+			   ch, 0, vict, TO_CHAR, 0);
+                   }
+               }
+	   }
+       }
+   }
+   return eFAILURE;
+}
+
+
+int holyavenger(CHAR_DATA *ch, struct obj_data *obj,  int cmd, char *arg, 
+                   CHAR_DATA *invoker)
+{
+   // struct obj_data *wielded;
+   int percent, chance;
+   CHAR_DATA *vict; 
+
+   if(!(vict = ch->fighting)) {
+       return eFAILURE;
+   }
+   if(GET_HIT(vict) < 3500) {
+       percent = (100 * GET_HIT(vict)) / GET_MAX_HIT(vict);
+       chance = number(0, 101);
+       if(chance > (1.3 * percent)) {
+           percent = (100 * GET_HIT(vict)) / GET_MAX_HIT(vict);
+           chance = number(0, 101);
+           if(chance > (2 * percent)) {
+               chance = number(0, 101);
+               if(chance > (2 * percent)) {
+                   chance = number(0, 101);
+                   if(chance > (2 * percent)) {
+                       act("You feel your life end as $n's sword SLICES YOUR HEAD OFF!",
+                           ch, 0, vict, TO_VICT, 0);
+                       act("You SLICE $N's head CLEAN OFF $S body!",
+                           ch, 0, vict, TO_CHAR, 0);
+                       act("$n cleanly slices $N's head off $S body!",
+                           ch, 0, vict, TO_ROOM, NOTVICT);
+                       GET_HIT(vict) = -20;
+                       make_head(vict);
+                       fight_kill(ch, vict, TYPE_CHOOSE);
+                       group_gain(ch, vict); 
+                       return eSUCCESS; /* Zero means kill it! */
+                   } else { /* You MISS the fucker! */
+                       act("You feel $n's sword slice by your head!",
+                           ch, 0, vict, TO_VICT, 0);
+                       act("You miss your attempt to behead $N.",
+                           ch, 0, vict, TO_CHAR, 0);
+                       act("$N jumps back as $n makes an attempt to BEHEAD $M!",
+                           ch, 0, vict, TO_ROOM, NOTVICT);
+                   }
+               }
+           }
+       }
+   }
+   return eFAILURE;  
+} 
+
+// TODO - I think we actually used this for a while but it was too powerful
+int drainingstaff(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, 
+                   CHAR_DATA *invoker) 
+{
+    CHAR_DATA *vict;
+    obj_data *staff;
+    int dam;
+
+    if(!(vict = ch->fighting)) {
+        return eFAILURE;
+    }
+    
+    staff = ch->equipment[WIELD + cmd];
+    dam = dice(staff->obj_flags.value[1], staff->obj_flags.value[2]);  
+    dam += GET_DAMROLL(ch);
+    dam += str_app[STRENGTH_APPLY_INDEX(ch)].todam;
+    dam = (dam * 2) / 10; // Mages usually have 2-3 attacks
+    if(IS_NPC(ch)) { // NPC'S have no mana, so we'll drain hp instead
+        if(dam >= GET_HIT(vict)) {
+            dam = GET_HIT(vict) - 1;
+        }
+        GET_HIT(vict) -= dam;
+        GET_MANA(ch) += dam;
+    } else { // We have a character... drain mana 
+        if(dam >= GET_MANA(vict)) {
+            dam = GET_MANA(vict);
+        }
+        GET_MANA(vict) -= dam;
+        GET_MANA(ch) += dam;
+    }
+    if(dam == 0) {
+        return eFAILURE;
+    }
+    if(GET_MANA(ch) > GET_MAX_MANA(ch)) {
+        GET_MANA(ch) = GET_MAX_MANA(ch); // can't go above the MAX_MANA
+    }
+    return eSUCCESS;
+}
+
+
+
+int bank(struct char_data *ch, struct obj_data *obj, int cmd, char *arg, 
+                   CHAR_DATA *invoker)
+{
+  char buf[MAX_INPUT_LENGTH];
+  int x;
+
+  if(cmd < 172 || cmd > 174)
+    return eFAILURE;
+
+  /* balance */
+  if(cmd == 172) {
+    sprintf(buf, "You have %ld coins in the bank.\n\r", GET_BANK(ch));
+    send_to_char(buf, ch);
+    return eSUCCESS;
+  }
+
+  /* deposit */
+  if(cmd == 173) {
+    one_argument(arg, buf);
+    if(!*buf || !(x = atoi(buf)) || x < 0) {
+      send_to_char("Deposit what?\n\r", ch);
+      return eSUCCESS;
+    }
+    if(x > GET_GOLD(ch)) {      send_to_char("You don't have that much gold!\n\r", ch);
+      return eSUCCESS;
+    }
+    GET_GOLD(ch) -= x;
+    GET_BANK(ch) += x;
+    sprintf(buf, "You deposit %d coins.\n\r", x);
+    send_to_char(buf, ch);
+    save_char_obj(ch);
+    return eSUCCESS;
+  }
+
+  /* withdraw */
+  one_argument(arg, buf);
+  if(!*buf || !(x = atoi(buf)) || x < 0) {
+    send_to_char("Withdraw what?\n\r", ch);
+    return eSUCCESS;
+  }
+  if(x > GET_BANK(ch)) {
+    send_to_char("You don't have that much gold in the bank!\n\r", ch);
+    return eSUCCESS;
+  }
+  GET_GOLD(ch) += x;
+  GET_BANK(ch) -= x;
+  sprintf(buf, "You withdraw %d coins.\n\r", x);
+  send_to_char(buf, ch);
+  save_char_obj(ch);
+  return eSUCCESS;
+}
+
+// if you are in the room with this obj, and you try to go in any
+// direction, and you don't have the correct obj in your inventory, it sends
+// you to a particular room 
+// TODO - get it so that it effects groups properly.  Right now, if a group
+// leader moves, he goes to the "bad" room, and the rest of the group goes to
+// where the exit is supposed to go
+// I should probably just change the exit temporarily to point to the "bad" room
+// and then change it back after the move.
+int returner(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, 
+                   CHAR_DATA *invoker) 
+{
+
+   if(cmd > 6 || cmd < 1)
+      return eFAILURE;
+
+   if(!obj)
+      return eFAILURE;
+
+   if(!obj->in_room)
+      return eFAILURE;
+
+   if(!CAN_GO(ch, cmd-1))
+      return eFAILURE;
+
+   if(ch->in_room != obj->in_room)
+      return eFAILURE;
+   
+   if(get_obj_in_list_num(real_object(2200), ch->carrying))
+      return eFAILURE;
+
+   if(move_char(ch, real_room(3001)) == 0)
+      return eFAILURE;
+
+   do_look(ch, "\0", 15);
+
+   return eSUCCESS;
+}
+
+#define MAX_GEM_ASSEMBLER_ITEM   11
+
+struct assembler_data {
+   char * finish_to_char;
+   char * finish_to_room;
+   char * missing_text;
+   int  pieces[MAX_GEM_ASSEMBLER_ITEM];
+};
+
+struct assembler_data gem_data[] = {
+   // Item 0, the crystalline tir stuff
+   { "A brilliant flash of colored light erupts from your hands as the gems\r\nmold themselves together, forming a cohesive and flawless gem.\r\n",
+     "A brilliant flash of colored light erupts from $n's hands as the\r\n gems $e holds mold themselves together, forming a new cohesive\r\nand flawless gem.",
+     "One of the gems seems to be missing.\r\n",
+     { 2714, 2602, 12607, -1, -1, -1, -1, -1, -1, -1, 1506 }
+   },
+
+   // Item 1, Etala the Shadowblade
+   { "Connecting the hilt and gem to the blade, you form a whole sword.\r\n",
+     "$n fiddles around with some stuff in $s inventory.",
+     "You seem to be missing a piece.\r\n",
+     { 181, 182, 183, -1, -1, -1, -1, -1, -1, -1, 184 }
+   },
+
+   // Item 2, Broadhead arrow from forage items
+   { "You carefully sand down the pointy stick, adding to its excellent form.  Splitting the feathers down, you carefully attach them to the pointy stick.  Finally, you shape the scorpion stringer into a deadly arrowhead and secure it to the front.\r\n",
+     "$n sits down with some junk and tries $s hand at fletching.",
+     "You don't have all the items required to fletch an arrow.\r\n",
+     { 2056, 2055, 2068, -1, -1, -1, -1, -1, -1, -1, 2069 }
+   },
+
+   // Item 2, Gaiot key in DK
+   { "The stone pieces join together to form a small statue of a dragon.",
+     "$n assembles some stones together to form a black statue.",
+     "The pieces click together but fall apart as if something is missing.",
+     { 9502, 9503, 9504, 9505, 9506, -1, -1, -1, -1, -1, 9501 }
+   },
+
+   // Junk Item.  THIS MUST BE LAST IN THE ARRAY
+   { "Capulet",
+     "is a fatt",
+     "butt.",
+     { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 }
+   }
+
+};
+
+int gem_assembler(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, 
+                   CHAR_DATA *invoker)
+{
+   obj_data * ptr_array[MAX_GEM_ASSEMBLER_ITEM - 1];
+   obj_data * reward = NULL;
+   int position, i, done;
+   char buf[200];
+   extern struct index_data *obj_index;
+
+   if(cmd != 182)
+      return eFAILURE;
+
+   done = 0;
+
+   // Find our position in the array
+   for(position = 0; gem_data[position].pieces[0] != -1 && !done; position++)
+   {
+      for(i = 0; i < MAX_GEM_ASSEMBLER_ITEM; i++)
+      {
+         if(gem_data[position].pieces[i] == obj_index[obj->item_number].virt)
+         { 
+            done = 1; 
+            break; 
+         }
+         if(-1 == gem_data[position].pieces[i])
+            break;
+      }
+      if(done)
+        break;
+   }
+
+   if(gem_data[position].pieces[0] == -1)
+   {
+      // Could not locate obj in data array
+      sprintf(buf, "Item %d has gem_assembler proc with invalid data.", obj_index[obj->item_number].virt);
+      log(buf, ANGEL, LOG_BUG); // 102
+      return eFAILURE;
+   }
+
+   done = 1;
+   // Make sure all our items exist in the world
+   for(i = 0; i < MAX_GEM_ASSEMBLER_ITEM; i++) 
+   {
+      if( -1 == gem_data[position].pieces[i] ) // last piece in list, skip to end
+      {
+        // if last piece doesn't exist, get out
+        if( -1 == real_object(gem_data[position].pieces[MAX_GEM_ASSEMBLER_ITEM - 1]) )
+          done = 0;
+        break;
+      } 
+
+      // if object doesn't exist, get out
+      if( -1 == real_object(gem_data[position].pieces[i] ) )
+        { done = 0; break; }
+   }
+
+   if(!done)
+   {
+      sprintf(buf, "Gem_assembler's objects not loading properly. Contact a god. (%d)\r\n", position);
+      send_to_char(buf, ch);
+      return eSUCCESS;
+   }
+
+   // make sure our ptr_array is clean
+   for(i = 0; i < (MAX_GEM_ASSEMBLER_ITEM - 1); i++)
+      ptr_array[i] = NULL;
+
+   // go through and find all our pointers
+   for(i = 0; i < (MAX_GEM_ASSEMBLER_ITEM - 1); i++)
+   {
+      if(-1 == gem_data[position].pieces[i]) // last item in list
+      {
+         i--; // Set i to the last valid position
+         break;
+      }
+      if(!(ptr_array[i] = get_obj_in_list_num(real_object(gem_data[position].pieces[i]), ch->carrying)))
+      {
+         // we didn't have a piece
+         send_to_char(gem_data[position].missing_text, ch);
+         return eSUCCESS;
+      }
+   }
+
+   // if we get here, ptr_array[0 through i] contain all our objs
+
+   // send out the messages
+   send_to_char(gem_data[position].finish_to_char, ch);
+   act(gem_data[position].finish_to_room, ch, 0, 0, TO_ROOM, 0);
+
+   // Remove the old items from the player's inventory
+   for(; -1 != i; i--)
+   {
+      obj_from_char(ptr_array[i]);
+      extract_obj(ptr_array[i]);
+   }
+
+   // make the new item
+   reward = clone_object(real_object(gem_data[position].pieces[MAX_GEM_ASSEMBLER_ITEM - 1]));
+
+   if(!reward)
+   {
+      send_to_char("Your assemble was unable to clone the new obj.  Please alert a god.\r\n", ch);
+      return eSUCCESS;
+   }
+   
+   obj_to_char(reward, ch);
+   return eSUCCESS;
+}
+
+int pfe_word(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, 
+                   CHAR_DATA *invoker)
+{
+   // char buf[MAX_INPUT_LENGTH];
+   char junk[MAX_INPUT_LENGTH];
+   char arg1[MAX_INPUT_LENGTH];
+   struct obj_data *obj_object;
+   int j;
+
+   struct obj_data *get_object_in_equip_vis(struct char_data *ch,
+         char *arg, struct obj_data *equipment[], int *j);
+
+   if(!cmd && obj) // This is where we recharge
+      if(obj->obj_flags.value[3])
+         obj->obj_flags.value[3]--;
+
+   // 11 = say 69 = remove
+   if(cmd != 11 && cmd != 69)
+      return eFAILURE;
+
+   if(!ch)
+      return eFAILURE;
+
+   if(!ch->equipment[HOLD])
+      return eFAILURE;
+
+   if(real_object(3611) != ch->equipment[HOLD]->item_number)
+   {
+      // send_to_char("Wrong hold item num\r\n", ch);
+      return eFAILURE;
+   }
+
+   half_chop(arg, arg1, junk);
+   if(*junk)
+      return eFAILURE;
+
+   if(cmd == 11)
+   {
+      if(str_cmp("aslexi",arg1))
+         return eFAILURE;
+
+      if(ch->equipment[HOLD]->obj_flags.value[3])
+      {
+         send_to_char("The item seems to be recharging.\r\n", ch);
+         return eSUCCESS;
+      }
+
+      ch->equipment[HOLD]->obj_flags.value[3] = 600;
+
+      act("$n mutters something into $s hands.", ch, 0, 0, TO_ROOM, 0);
+      send_to_char("You quietly whisper 'aslexi' into your hands.\r\n", ch);
+
+      cast_protection_from_evil(GET_LEVEL(ch), ch, 0, SPELL_TYPE_SPELL, ch, 0);
+      act("A pulsing aura springs to life around $n!", ch, 0, 0, TO_ROOM, 0);
+      return eSUCCESS;
+   }
+  else // cmd=69 (remove)
+   {
+      obj_object = get_object_in_equip_vis(ch, arg1, ch->equipment, &j);
+      if(!obj_object)
+         return eFAILURE;
+
+      if(obj_object != ch->equipment[HOLD])
+         return eFAILURE;
+
+      if(affected_by_spell(ch, SPELL_PROTECT_FROM_EVIL))
+      {
+         affect_from_char(ch, SPELL_PROTECT_FROM_EVIL);      
+         send_to_char("The power drains away.\r\n", ch);
+         affect_total(ch);
+      }
+      // This should remove the pfe unless he has it cast or on EQ
+      // We will allow it to return FALSE do the do_remove goes through.
+   }
+   return eFAILURE;
+}
+
+int devilsword(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, 
+                   CHAR_DATA *invoker)
+{
+   // char buf[MAX_INPUT_LENGTH];
+   char junk[MAX_INPUT_LENGTH];
+   char arg1[MAX_INPUT_LENGTH];
+   // struct obj_data *obj_object;
+   // int j;
+
+
+   if(cmd != 11)
+      return eFAILURE;
+
+   if(!ch || !ch->equipment || !ch->equipment[WIELD])
+      return eFAILURE;
+
+   if(real_object(185) != ch->equipment[WIELD]->item_number)
+      return eFAILURE;
+
+   half_chop(arg, arg1, junk);
+
+   if(*junk)
+      return eFAILURE;
+
+   if(!str_cmp("pierce",arg1))
+   {
+      act("$n mutters something into $s hands.", ch, 0, 0, TO_ROOM, 0);
+      if(ch->equipment[WIELD]->obj_flags.value[3] == 11)
+      {
+         send_to_char("Nothing happens.\r\n", ch);
+         return TRUE;
+      }
+
+      act("Venom-flecked fangs grow and bristle from the bedeviled Cestus!", ch, 0, 0, TO_ROOM, 0);
+      send_to_char("Huge fangs spring forth from your weapon!\r\n", ch);
+
+      ch->equipment[WIELD]->obj_flags.value[3] = 11;
+      return eSUCCESS;
+   }
+   if(!str_cmp("crush",arg1))
+   {
+      act("$n mutters something into $s hands.", ch, 0, 0, TO_ROOM, 0);
+      if(ch->equipment[WIELD]->obj_flags.value[3] == 6)
+      {
+         send_to_char("Nothing happens.\r\n", ch);
+         return eSUCCESS;
+      }
+
+      act("The fangs of $n's weapon retract magically into the metal.", ch, 0, 0, TO_ROOM, 0);
+      send_to_char("The fangs retract magically into the metal.\r\n", ch);
+
+      ch->equipment[WIELD]->obj_flags.value[3] = 6;
+      return eSUCCESS;
+   }
+   
+   return eFAILURE;
+}
+
+// If you have AFFsanct but not the spell, kill it
+// This works fine as long as they don't have perma-sanct eq
+void remove_eliara(CHAR_DATA *ch)
+{
+
+   if(!IS_AFFECTED(ch, AFF_SANCTUARY))
+      return;
+
+   if(affected_by_spell(ch, SPELL_SANCTUARY))
+      return;
+
+   act("Eliara's glow fades, as she falls dormant once again.", ch, 0, 0, TO_ROOM, 0);
+   send_to_char("Eliara's glow fades, as she falls dormant once again.\r\n\r\n", ch);
+   REMOVE_BIT(ch->affected_by, AFF_SANCTUARY);
+
+}
+
+// When fighting an evil opponent, sancts PC
+int eliara_combat(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, 
+                   CHAR_DATA *invoker)
+{
+
+   CHAR_DATA *vict = NULL;
+
+   if(cmd) return eFAILURE;
+
+   if(!ch || !ch->equipment || !ch->equipment[WIELD])
+      return eFAILURE;
+
+   if(real_object(30627) != ch->equipment[WIELD]->item_number)
+   {
+      remove_eliara(ch);
+      return eFAILURE;
+   }
+
+   if(!(vict=ch->fighting)) return eFAILURE;
+   if(!IS_EVIL(vict)) return eFAILURE;
+   if(IS_AFFECTED(ch, AFF_SANCTUARY)) return eSUCCESS;
+
+   act("Eliara glows brightly for a moment, its incandescent field of light surrounding $n in a glowing aura.", ch, 0, 0, TO_ROOM, 0);
+   send_to_char("Eliara glows brightly surrounding you in its protective aura!\r\n", ch);
+
+   SET_BIT(ch->affected_by, AFF_SANCTUARY);
+
+   return eSUCCESS;
+}
+
+int eliara_non_combat(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, 
+                   CHAR_DATA *invoker)
+{
+
+   if(!ch) return eFAILURE;
+
+   if(cmd == 69 && GET_POS(ch) == POSITION_FIGHTING && ch->equipment
+      && ch->equipment[WIELD] && ch->equipment[WIELD]->item_number 
+      == real_object(30627))
+   {
+      send_to_char("Eliara refuses to allow you to remove equipment during battle!\r\n", ch);
+      return eSUCCESS;
+   }
+
+   if(GET_POS(ch) < POSITION_STANDING)
+      return eFAILURE;
+
+   remove_eliara(ch);
+
+   return eFAILURE;
+}
+
+int carriage(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, 
+                   CHAR_DATA *invoker) 
+{
+  // this ain't done yet...it's natashas half written proc 
+
+   if(cmd > 6 || cmd < 1)
+      return eFAILURE;
+
+   if(!obj)
+      return eFAILURE;
+
+   if(!obj->in_room)
+      return eFAILURE;
+
+   if(ch->in_room != obj->in_room)
+      return eFAILURE;
+   
+   if(move_char(ch, real_room(3001)) == 0)
+      return eFAILURE;
+
+   do_look(ch, "\0", 15);
+
+   return eSUCCESS;
+}
+
+int arenaporter(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, 
+                   CHAR_DATA *invoker)
+{
+   // only go off when a player types a command
+   if(!cmd)
+      return eFAILURE;
+
+   // 20% of the time
+   if(number(1, 5) == 1)
+      return eFAILURE;
+
+   if(!obj || !obj->in_room || !ch)
+      return eFAILURE;
+
+   if(ch->in_room != obj->in_room)
+      return eFAILURE;
+
+   if(!move_char(ch, real_room(number(17800, 17949))) == 0)
+      return eFAILURE;
+
+   if(ch->fighting)
+   {
+      stop_fighting(ch->fighting);
+      stop_fighting(ch);
+   }
+
+   send_to_char("A dimensional hole swallows you.\r\nYou reappear elsewhere.\r\n", ch);
+   act("$n fades out of existance.", ch, 0,0,TO_ROOM, INVIS_NULL);
+
+   do_look(ch, "\0", 15);
+
+   // return false so their command goes off
+   return eFAILURE;
+}
+
+int movingarenaporter(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, 
+                   CHAR_DATA *invoker)
+{
+   long room = 17840;
+
+   if(!cmd)
+   {
+     // move myself 10% of time
+     if(number(1, 10) > 1)
+       return eFAILURE;
+     
+     while(room == 17840)
+       room = number(17800, 17849);
+
+     move_obj(obj, real_room(room));
+     return eSUCCESS;
+   }
+
+   if(!obj || !obj->in_room)
+      return eFAILURE;
+
+   if(ch->in_room != obj->in_room)
+      return eFAILURE;
+
+   if(!move_char(ch, real_room(number(17800, 17949))) == 0)
+      return eFAILURE;
+
+   send_to_char("A dimensional hole swallows you.\r\nYou reappear elsewhere.\r\n", ch);
+   act("$n fades out of existance.", ch, 0,0,TO_ROOM, INVIS_NULL);
+
+   if(ch->fighting)
+   {
+      stop_fighting(ch->fighting);
+      stop_fighting(ch);
+   }
+
+   do_look(ch, "\0", 15);
+
+   return eSUCCESS;
+}
+
+int restring_machine(struct char_data *ch, struct obj_data *obj, int cmd, char *arg, 
+                   CHAR_DATA *invoker)
+{
+  char name[MAX_INPUT_LENGTH];
+  char buf[MAX_INPUT_LENGTH];
+  struct obj_data * target_obj = NULL;
+
+  if(cmd != 184)
+    return eFAILURE;
+
+  act("The machine flashes and shoots sparks and smoke throughout the room.", ch, 0, 0, TO_ROOM, 0);
+  send_to_char("The machine beeps and emits a voice.\n", ch);
+
+  half_chop(arg, name, buf);
+
+  if(!*arg || !*name || !*buf )
+  {
+    send_to_char("'Restring Machine v1.2' *beep*'\r\n"
+                 "'restring <Item> <Description>' *beep*'\r\n"
+                 "'This requires up to 50 platinum.  *beep*'\r\n"
+                 "'Currently only works on godload. *beep*'\r\n"
+                 "'Careful to type correctly.  No refunds.'\r\n"
+                 , ch);
+    return eSUCCESS;
+  }
+
+  if(!(target_obj = get_obj_in_list_vis(ch, name, ch->carrying)))
+  {
+    send_to_char("'Cannot find item in your inventory.  *beep*'\n", ch);
+    return eSUCCESS;
+  }
+
+  if(!IS_SET(target_obj->obj_flags.extra_flags, ITEM_SPECIAL))
+  {
+    send_to_char("'Item must be godload.  *beep*'\n", ch);
+    return eSUCCESS;
+  }
+
+  if(GET_PLATINUM(ch) < (GET_LEVEL(ch)) )
+  {
+    send_to_char("'Not enough platinum.  *beep*'\n", ch);
+    return eSUCCESS;
+  }
+
+  GET_PLATINUM(ch) -= (GET_LEVEL(ch));
+
+//  dc_free(target_obj->short_description);
+//  target_obj->short_description = (char *) dc_alloc(strlen(buf)+1, sizeof(char));
+//  strcpy(target_obj->short_description, buf);
+  target_obj->short_description = str_hsh(buf);
+
+  send_to_char("\r\n'Beginning magical transformation process.'\r\n"
+               "You put your item into the machine and close the lid.\r\n"
+               "Smoke pours out of the machine and sparks fly out blackening the floor.\r\n"
+               "Your item looks new!\r\n\r\n"
+               , ch);
+
+  save_char_obj(ch);
+  return eSUCCESS;
+}
+
+int weenie_weedy(struct char_data*ch, struct obj_data *obj, int cmd, char*arg, 
+                   CHAR_DATA *invoker)
+{
+   if (cmd)
+     return eFAILURE;
+
+   if(number(1, 1000) > 990)
+      if(obj->carried_by)
+         send_to_room("Someone's weenie weedy doll says, 'BLARG!'\r\n", obj->carried_by->in_room);
+      else if(obj->in_room != NOWHERE)
+         send_to_room("a weenie weedy doll says, 'BLARG!'\r\n", obj->in_room);
+
+   return eSUCCESS;
+}
+
+// If there is a player in rooms 8695-8699 (the pillars), then they cause a
+// "balance" and we can remove the imp_only flag from the target room
+int pagoda_balance(struct char_data*ch, struct obj_data *obj, int cmd, char*arg, 
+                   CHAR_DATA *invoker)
+{
+   if(cmd)
+     return eFAILURE;
+
+   char_data * vict = NULL;
+   int found = 0;
+
+   for(int i = 8695; i < 8699; i++)
+   {
+      // TODO - should probably check to make sure these are valid rooms before we
+      // use them.  Proc isn't used yet though, so no biggy.
+      for(vict = world[real_room(i)].people; vict; vict = vict->next_in_room)
+         if(IS_NPC(vict))
+           found = 0;
+         else { found = 1; break; }
+
+      if(!found)
+         break;
+   }
+
+   // If we aren't true here, then one of the rooms didn't have a PC in it
+   if(!found)
+      return eFAILURE;
+
+   for(int j = 8695; j < 8699; j++)
+      send_to_room("The weight of your body helps shift the balances.\r\n"
+                   "You hear the poping of a magical barrier dissapating.\r\n\r\n", 
+                   real_room(j));
+
+   REMOVE_BIT(world[real_room(8699)].room_flags, IMP_ONLY);
+   return eFAILURE;
+}
+
+// If players enter the room, pop a "imp_only" flag back on the room.
+int pagoda_shield_restorer(struct char_data*ch, struct obj_data *obj, int cmd, char*arg, 
+                   CHAR_DATA *invoker)
+{
+   if(!cmd) return eFAILURE; // only restore if a player is in the room
+
+   if(!IS_SET(world[obj->in_room].room_flags, IMP_ONLY))
+   {
+      send_to_room("You hear the 'pop' of a magical barrier springing up.\r\n\r\n", obj->in_room);
+      SET_BIT(world[obj->in_room].room_flags, IMP_ONLY);
+   }
+
+   return eFAILURE;
+}
+
+// stupid little item I made for an ex-gf so she could find me when she logged in
+int phish_locator(struct char_data*ch, struct obj_data *obj, int cmd, char*arg, 
+                   CHAR_DATA *invoker)
+{
+   char_data * victim = NULL;
+
+   if(cmd != 185) // push
+      return eFAILURE;
+
+   if(!strstr(arg, "button"))
+      return eFAILURE;
+
+   if(strcmp(GET_NAME(ch), "Jeni")) {
+      send_to_char("Sorry, this device was made for one special girl.  And you are not her.\r\n", ch);
+      return eSUCCESS;
+   }
+
+   act("$n fiddles with a small fish-shaped device.", ch, 0,0,TO_ROOM, INVIS_NULL);
+
+   if(!(victim = get_char("Pirahna")))
+   {
+      send_to_char("The locator beeps angrily and smoke starts to come out.\r\nPirahna is unlocatable.\r\n", ch);
+      return eSUCCESS;
+   }
+
+   send_to_char("Found him!\r\n", ch);
+
+   do_trans(victim, GET_NAME(ch), 9);
+   return eSUCCESS;   
+}
+
+
+int generic_push_proc(struct char_data*ch, struct obj_data *obj, int cmd, char*arg, 
+                   CHAR_DATA *invoker)
+{
+   char_data * victim;
+   char_data * next_vict;
+
+   if (cmd != 185) // push
+      return eFAILURE;
+
+   int obj_vnum = obj_index[obj->item_number].virt;
+
+   switch(obj_vnum) {
+      case 26723: // transporter in star-trek
+        send_to_room("You hear a chiming electrical noise as the transporter hums to life.\n\r", obj->in_room);
+        for(victim = world[obj->in_room].people; victim; victim = next_vict)
+        {
+          next_vict = victim->next_in_room;
+          send_to_char("Your body is pulled apart and reassembled elsewhere!\r\n", victim);
+          act("$n slowly fades out of existence.", victim, 0, 0, TO_ROOM, 0);
+          move_char(victim, 26802);
+          act("$n slowly fades into existence.", victim, 0, 0, TO_ROOM, 0);
+          do_look(victim, "", 9);
+        }
+        break;
+
+      default:
+        send_to_char("Whatever you pushed doesn't have an entry in the button push table.  Tell a god.\r\n", ch);
+        logf(LOG_WORLD, IMMORTAL, "'Push' proc on obj %d without entry in proc table. (push_proc)\r\n", obj_vnum);
+        break;
+   }
+
+   return eSUCCESS;
+}
+
+int portal_word(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, 
+                   CHAR_DATA *invoker)
+{
+   char junk[MAX_INPUT_LENGTH];
+   char arg1[MAX_INPUT_LENGTH];
+   char_data * victim = NULL;
+
+   if(!cmd && obj) {  // This is where we recharge
+      if(obj->obj_flags.value[3]) {
+         obj->obj_flags.value[3]--;
+        if(0 == obj->obj_flags.value[3]) {
+          if(obj->carried_by)
+            send_to_char("Your enchanted box seems to be recharged.\n\r", obj->carried_by);
+          else if(obj->equipped_by)
+            send_to_char("Your enchanted box seems to be recharged.\n\r", obj->equipped_by);
+          else if(obj->in_obj && obj->in_obj->carried_by)
+            send_to_char("Your enchanted box seems to be recharged.\n\r", obj->in_obj->carried_by);
+          else if(obj->in_obj && obj->in_obj->equipped_by)
+            send_to_char("Your enchanted box seems to be recharged.\n\r", obj->in_obj->equipped_by);
+        }
+      }
+   }
+   // 11 = say
+   if(cmd != 11)                            return eFAILURE;
+   if(!ch)                                  return eFAILURE;
+   if(ch->equipment[HOLD] != obj)           return eFAILURE;
+
+   half_chop(arg, arg1, junk);
+
+   if(str_cmp("magiskhal", arg1))           return eFAILURE;
+
+   if(ch->equipment[HOLD]->obj_flags.value[3] && GET_LEVEL(ch) < IMMORTAL) {
+      send_to_char("The item seems to be recharging.\r\n", ch);
+      return eSUCCESS;
+   }
+   act("$n mutters something into $s hands.", ch, 0, 0, TO_ROOM, 0);
+   send_to_char("You quietly whisper 'magiskhal' into your hands.\r\n", ch);
+
+   if(!(victim = get_char_vis(ch, junk))) {
+      send_to_char("The box somehow seems......confused.\r\n", ch);
+   } else {
+      spell_portal(GET_LEVEL(ch), ch, victim, 0);
+      // set charge time
+      ch->equipment[HOLD]->obj_flags.value[3] = 600;
+   }
+   act("The $o in $n's hands glows brightly!", ch, obj, 0, TO_ROOM, 0);
+   return eSUCCESS;
+}
+
+int full_heal_word(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, 
+                   CHAR_DATA *invoker)
+{
+   char junk[MAX_INPUT_LENGTH];
+   char arg1[MAX_INPUT_LENGTH];
+   char_data * victim = NULL;
+
+   if(!cmd && obj) { // This is where we recharge
+      if(obj->obj_flags.value[3]) {
+         obj->obj_flags.value[3]--; 
+        if(0 == obj->obj_flags.value[3]) {
+          if(obj->carried_by)
+            send_to_char("Your enchanted box seems to be recharged.\n\r", obj->carried_by);
+          else if(obj->equipped_by)
+            send_to_char("Your enchanted box seems to be recharged.\n\r", obj->equipped_by);
+          else if(obj->in_obj && obj->in_obj->carried_by)
+            send_to_char("Your enchanted box seems to be recharged.\n\r", obj->in_obj->carried_by);
+          else if(obj->in_obj && obj->in_obj->equipped_by)
+            send_to_char("Your enchanted box seems to be recharged.\n\r", obj->in_obj->equipped_by);
+        }
+      }
+   }
+
+   // 11 = say
+   if(cmd != 11)                            return eFAILURE;
+   if(!ch)                                  return eFAILURE;
+   if(ch->equipment[HOLD] != obj)           return eFAILURE;
+
+   half_chop(arg, arg1, junk);
+
+   if(str_cmp("heltlaka", arg1))           return eFAILURE;
+
+   if(ch->equipment[HOLD]->obj_flags.value[3] && GET_LEVEL(ch) < IMMORTAL) {
+      send_to_char("The item seems to be recharging.\r\n", ch);
+      return eSUCCESS;
+   }
+   act("$n mutters something into $s hands.", ch, 0, 0, TO_ROOM, 0);
+   send_to_char("You quietly whisper 'heltlaka' into your hands.\r\n", ch);
+
+   if(!(victim = get_char_vis(ch, junk))) {
+      send_to_char("The box somehow seems......confused.\r\n", ch);
+   } else {
+      spell_full_heal(GET_LEVEL(ch), ch, victim, 0);
+      spell_full_heal(GET_LEVEL(ch), ch, victim, 0);
+      spell_full_heal(GET_LEVEL(ch), ch, victim, 0);
+      // set charge time
+      ch->equipment[HOLD]->obj_flags.value[3] = 300;
+   }
+   act("The $o in $n's hands glows brightly!", ch, obj, 0, TO_ROOM, 0);
+   return eSUCCESS;
+}
+
+int mana_box(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, 
+                   CHAR_DATA *invoker)
+{
+   if(cmd)                                  return eFAILURE;
+   ch = obj->equipped_by;
+   if(!ch)                                  return eFAILURE;
+   if(ch->equipment[HOLD] != obj)           return eFAILURE;
+
+   if((GET_MANA(ch)+8) < GET_MAX_MANA(ch))
+      GET_MANA(ch) += 8;
+
+   if(0 == number(0, 10))
+      send_to_char("The box's magical power eases your mind.\r\n", ch);
+
+   return eSUCCESS;
+}
+
+int fireshield_word(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, 
+                   CHAR_DATA *invoker)
+{
+   char junk[MAX_INPUT_LENGTH];
+   char arg1[MAX_INPUT_LENGTH];
+
+   if(!cmd && obj) { // This is where we recharge
+      if(obj->obj_flags.value[3]) {
+         obj->obj_flags.value[3]--; 
+        if(0 == obj->obj_flags.value[3]) {
+          if(obj->carried_by)
+            send_to_char("Your enchanted box seems to be recharged.\n\r", obj->carried_by);
+          else if(obj->equipped_by)
+            send_to_char("Your enchanted box seems to be recharged.\n\r", obj->equipped_by);
+          else if(obj->in_obj && obj->in_obj->carried_by)
+            send_to_char("Your enchanted box seems to be recharged.\n\r", obj->in_obj->carried_by);
+          else if(obj->in_obj && obj->in_obj->equipped_by)
+            send_to_char("Your enchanted box seems to be recharged.\n\r", obj->in_obj->equipped_by);
+        }
+     }
+   }
+
+   // 11 = say
+   if(cmd != 11)                            return eFAILURE;
+   if(!ch)                                  return eFAILURE;
+   if(ch->equipment[HOLD] != obj)           return eFAILURE;
+
+   half_chop(arg, arg1, junk);
+
+   if(str_cmp("feuerschild", arg1))           return eFAILURE;
+
+   if(ch->equipment[HOLD]->obj_flags.value[3] && GET_LEVEL(ch) < IMMORTAL) {
+      send_to_char("The item seems to be recharging.\r\n", ch);
+      return eSUCCESS;
+   }
+   act("$n mutters something into $s hands.", ch, 0, 0, TO_ROOM, 0);
+   send_to_char("You quietly whisper 'feuerschild' into your hands.\r\n", ch);
+
+   spell_fireshield(GET_LEVEL(ch), ch, ch, 0);
+   // set charge time
+   ch->equipment[HOLD]->obj_flags.value[3] = 900;
+
+   act("The $o in $n's hands glows brightly!", ch, obj, 0, TO_ROOM, 0);
+   return eSUCCESS;
+}
+
+int teleport_word(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, 
+                   CHAR_DATA *invoker)
+{
+   char junk[MAX_INPUT_LENGTH];
+   char arg1[MAX_INPUT_LENGTH];
+   char_data * victim = NULL;
+
+   if(!cmd && obj) { // This is where we recharge
+      if(obj->obj_flags.value[3]) {
+         obj->obj_flags.value[3]--; 
+        if(0 == obj->obj_flags.value[3]) {
+          if(obj->carried_by)
+            send_to_char("Your enchanted box seems to be recharged.\n\r", obj->carried_by);
+          else if(obj->equipped_by)
+            send_to_char("Your enchanted box seems to be recharged.\n\r", obj->equipped_by);
+          else if(obj->in_obj && obj->in_obj->carried_by)
+            send_to_char("Your enchanted box seems to be recharged.\n\r", obj->in_obj->carried_by);
+          else if(obj->in_obj && obj->in_obj->equipped_by)
+            send_to_char("Your enchanted box seems to be recharged.\n\r", obj->in_obj->equipped_by);
+        }
+     }
+   }
+
+   // 11 = say
+   if(cmd != 11)                            return eFAILURE;
+   if(!ch)                                  return eFAILURE;
+   if(ch->equipment[HOLD] != obj)           return eFAILURE;
+
+   half_chop(arg, arg1, junk);
+
+   if(str_cmp("sbiadirsivia", arg1))           return eFAILURE;
+
+   if(ch->equipment[HOLD]->obj_flags.value[3] && GET_LEVEL(ch) < IMMORTAL) {
+      send_to_char("The item seems to be recharging.\r\n", ch);
+      return eSUCCESS;
+   }
+   if(IS_SET(world[ch->in_room].room_flags, SAFE)) {
+      send_to_char("The box doesn't respond.\r\n", ch);
+      return eSUCCESS;
+   }
+
+   act("$n mutters something into $s hands.", ch, 0, 0, TO_ROOM, 0);
+   send_to_char("You quietly whisper 'sbiadirsivia' into your hands.\r\n", ch);
+
+   if(!(victim = get_char_room_vis(ch, junk))) {
+      send_to_char("The box somehow seems......confused.\r\n", ch);
+   } else {
+      spell_teleport(GET_LEVEL(ch), ch, victim, 0);
+      // set charge time
+      ch->equipment[HOLD]->obj_flags.value[3] = 1000;
+   }
+   act("The $o in $n's hands glows brightly!", ch, obj, 0, TO_ROOM, 0);
+   return eSUCCESS;
+}
+
+
+int alignment_word(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, 
+                   CHAR_DATA *invoker)
+{
+   char junk[MAX_INPUT_LENGTH];
+   char arg1[MAX_INPUT_LENGTH];
+
+   if(!cmd && obj) { // This is where we recharge
+      if(obj->obj_flags.value[3]) {
+         obj->obj_flags.value[3]--; 
+        if(0 == obj->obj_flags.value[3]) {
+          if(obj->carried_by)
+            send_to_char("Your enchanted box seems to be recharged.\n\r", obj->carried_by);
+          else if(obj->equipped_by)
+            send_to_char("Your enchanted box seems to be recharged.\n\r", obj->equipped_by);
+          else if(obj->in_obj && obj->in_obj->carried_by)
+            send_to_char("Your enchanted box seems to be recharged.\n\r", obj->in_obj->carried_by);
+          else if(obj->in_obj && obj->in_obj->equipped_by)
+            send_to_char("Your enchanted box seems to be recharged.\n\r", obj->in_obj->equipped_by);
+        }
+     }
+   }
+
+   // 11 = say
+   if(cmd != 11)                            return eFAILURE;
+   if(!ch)                                  return eFAILURE;
+   if(ch->equipment[HOLD] != obj)           return eFAILURE;
+
+   half_chop(arg, arg1, junk);
+
+   if(str_cmp("moralevalore", arg1))           return eFAILURE;
+
+   act("$n mutters something into $s hands.", ch, 0, 0, TO_ROOM, 0);
+   send_to_char("You quietly whisper 'moralevalore' into your hands.\r\n", ch);
+   if(ch->equipment[HOLD]->obj_flags.value[3] && GET_LEVEL(ch) < IMMORTAL) {
+      send_to_char("The item seems to be recharging.\r\n", ch);
+      return eSUCCESS;
+   }
+
+   if(!strcmp("good", junk))              GET_ALIGNMENT(ch) = 1000;
+   else if(!strcmp("evil", junk))         GET_ALIGNMENT(ch) = -1000;
+   else if(!strcmp("neutral", junk))      GET_ALIGNMENT(ch) = 0;
+   else
+      send_to_char("The box somehow seems......confused.\r\n", ch);
+
+   // set charge time
+   ch->equipment[HOLD]->obj_flags.value[3] = 500;
+
+   act("The $o in $n's hands glows brightly!", ch, obj, 0, TO_ROOM, 0);
+   return eSUCCESS;
+}
+
+int protection_word(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, 
+                   CHAR_DATA *invoker)
+{
+   char junk[MAX_INPUT_LENGTH];
+   char arg1[MAX_INPUT_LENGTH];
+
+   if(!cmd && obj) { // This is where we recharge
+      if(obj->obj_flags.value[3]) {
+         obj->obj_flags.value[3]--; 
+        if(0 == obj->obj_flags.value[3]) {
+          if(obj->carried_by)
+            send_to_char("Your enchanted box seems to be recharged.\n\r", obj->carried_by);
+          else if(obj->equipped_by)
+            send_to_char("Your enchanted box seems to be recharged.\n\r", obj->equipped_by);
+          else if(obj->in_obj && obj->in_obj->carried_by)
+            send_to_char("Your enchanted box seems to be recharged.\n\r", obj->in_obj->carried_by);
+          else if(obj->in_obj && obj->in_obj->equipped_by)
+            send_to_char("Your enchanted box seems to be recharged.\n\r", obj->in_obj->equipped_by);
+        }
+     }
+   }
+
+   // 11 = say
+   if(cmd != 11)                            return eFAILURE;
+   if(!ch)                                  return eFAILURE;
+   if(ch->equipment[HOLD] != obj)           return eFAILURE;
+
+   half_chop(arg, arg1, junk);
+
+   if(str_cmp("protezione", arg1))           return eFAILURE;
+
+   if(ch->equipment[HOLD]->obj_flags.value[3] && GET_LEVEL(ch) < IMMORTAL) {
+      send_to_char("The item seems to be recharging.\r\n", ch);
+      return TRUE;
+   }
+   act("$n mutters something into $s hands.", ch, 0, 0, TO_ROOM, 0);
+   send_to_char("You quietly whisper 'protezione' into your hands.\r\n", ch);
+
+   spell_armor(GET_LEVEL(ch), ch, ch, 0);
+   spell_bless(GET_LEVEL(ch), ch, ch, 0);
+   spell_protection_from_evil(GET_LEVEL(ch), ch, ch, 0);
+   spell_invisibility(GET_LEVEL(ch), ch, ch, 0);
+   spell_stone_skin(GET_LEVEL(ch), ch, ch, 0);
+   spell_resist_fire(GET_LEVEL(ch), ch, ch, 0);
+   spell_resist_cold(GET_LEVEL(ch), ch, ch, 0);
+   cast_barkskin(GET_LEVEL(ch), ch, 0, SPELL_TYPE_SPELL, ch, 0);
+
+   // set charge time
+   ch->equipment[HOLD]->obj_flags.value[3] = 1000;
+
+   act("The $o in $n's hands glows brightly!", ch, obj, 0, TO_ROOM, 0);
+   return eSUCCESS;
+}
+
+// Proc for handling any 'pull' actions.  Just put it on the object and put in an entry
+// Lots of things in here will crash if you remove the zone and stuff, but you just have
+// to assume some of these things will work.  If they don't, we got bigger problems anyway
+int pull_proc(struct char_data*ch, struct obj_data *obj, int cmd, char*arg, CHAR_DATA *invoker)
+{
+   if (cmd != 186) // pull
+      return eFAILURE;
+
+   int obj_vnum = obj_index[obj->item_number].virt;
+
+   switch(obj_vnum) {
+      case 9529: // DK lever in captain's room
+        // unlock the gate
+        REMOVE_BIT(world[9531].dir_option[1]->exit_info, EX_LOCKED);
+        REMOVE_BIT(world[9532].dir_option[3]->exit_info, EX_LOCKED);
+        send_to_room("You hear a large clicking noise.\n\r", 9531);
+        send_to_room("You hear a large clicking noise.\n\r", 9532);
+        send_to_room("You hear a large clicking noise.\n\r", ch->in_room);
+        break;
+
+      default:
+        send_to_char("Whatever you pulled doesn't have an entry in the lever pull table.  Tell a god.\r\n", ch);
+        logf(LOG_WORLD, IMMORTAL, "'Pull' proc on obj %d without entry in proc table. (pull_proc)\r\n", obj_vnum);
+        break;
+   }
+
+   return eSUCCESS;
+}
+
+// searches for if a certain mob is alive.  If so, you cannot use magic in this room.
+int no_magic_while_alive(struct char_data*ch, struct obj_data *obj, int cmd, char*arg, CHAR_DATA *invoker)
+{
+   if(cmd)
+      return eFAILURE;
+
+   if(obj->in_room < 0)
+      return eFAILURE;
+
+   char_data * vict = world[obj->in_room].people;
+
+   for(;vict;vict = vict->next_in_room) {
+      if(IS_NPC(vict) && (
+          mob_index[vict->mobdata->nr].virt == 9544
+            // to add a new mob to this list, just add || and the next check
+          )
+        )
+        break;
+   }
+
+   if(vict) {
+      if(!IS_SET(world[obj->in_room].room_flags, NO_MAGIC))
+         send_to_room("With an audible whoosh, the flow of magic is sucked from the room.\n\r", obj->in_room);
+      SET_BIT(world[obj->in_room].room_flags, NO_MAGIC);
+   }
+   else {
+      if(IS_SET(world[obj->in_room].room_flags, NO_MAGIC))
+         send_to_room("With a large popping noise, the flow of magic returns to the room.\n\r", obj->in_room);
+      REMOVE_BIT(world[obj->in_room].room_flags, NO_MAGIC);
+   }
+   return eSUCCESS;
+}
+
+// Send a message to all rooms on a boat
+void send_to_boat(int boat, char * message)
+{
+  switch(boat) {
+    case 9531: // dk boat
+       send_to_room(message, 9522);
+       send_to_room(message, 9523);
+       send_to_room(message, 9524);
+       send_to_room(message, 9525);
+       send_to_room(message, 9587);
+       break;
+    default:
+      break;
+  }
+}
+
+// How many stops, order of stops (will reverse order on way back)
+int dk_boat[] = 
+{ 8, 9593, 9510, 9509, 9508, 9521, 9507, 9506, 9505 };
+
+
+// boat values [pos in travel list] [timer] [boat-entry-room] [time-between-moves]
+// pos in travel list is NEGATIVE value on return trip
+
+// handles the movement of ocean-going boats or ferries
+// make sure you also look at "leave_boat_proc" if you use this
+
+// Also, make sure you update "send_to_boat" for the messages
+//
+int boat_proc(struct char_data*ch, struct obj_data *obj, int cmd, char*arg, CHAR_DATA *invoker)
+{
+   if(cmd && cmd != 60)
+      return eFAILURE;
+
+   if(obj->in_room < 0)
+      return eFAILURE;   // someone loaded me
+
+   // figure out which boat I am
+   int * boat_list = NULL;
+   switch(obj_index[obj->item_number].virt) {
+     case 9531:
+       boat_list = dk_boat;
+       break;
+     default: 
+       logf(LOG_BUG, IMMORTAL, "Illegal boat proc.  Item %d.", obj_index[obj->item_number].virt);
+       break;
+   }
+
+   if(cmd) {
+      // get on the boat
+      act("$n boldly boards $p.", ch, obj, 0, TO_ROOM, 0);
+      act("You board $p.", ch, obj, 0, TO_CHAR, 0);
+      move_char(ch, obj->obj_flags.value[2]);
+      act("$n climbs aboard.", ch, 0, 0, TO_ROOM, 0);
+      do_look(ch, "", 9);
+      return eSUCCESS;
+   }
+
+   // timer pulsed.  Update
+   obj->obj_flags.value[1]--;
+   
+   // boat pulsed.  Time to move
+   if(!obj->obj_flags.value[1]) {
+     int move_to;
+     // reset timer
+     obj->obj_flags.value[1] = obj->obj_flags.value[3];
+     if(obj->obj_flags.value[0] < 0) // on way back
+     {
+       obj->obj_flags.value[0]++;
+       move_to = boat_list[(obj->obj_flags.value[0] * -1)];
+       if(obj->obj_flags.value[0] == -1) // at beginning
+       {
+         obj->obj_flags.value[0] = 1;
+         send_to_boat(obj_index[obj->item_number].virt, "The ship docks at its destination.\n\r");
+       }
+     }
+     else 
+     {
+       obj->obj_flags.value[0]++;
+       move_to = boat_list[obj->obj_flags.value[0]];
+       if(obj->obj_flags.value[0] == boat_list[0]) // at beginning
+       {
+         obj->obj_flags.value[0] *= -1;
+         send_to_boat(obj_index[obj->item_number].virt, "The ship docks at its destination.\n\r");
+       }
+     }
+     send_to_room("The ship sails away.\n\r", obj->in_room);
+     send_to_boat(obj_index[obj->item_number].virt, "The ship sails onwards.\n\r");
+     obj_from_room(obj);
+     obj_to_room(obj, move_to);
+     send_to_room("A ship sails in.\n\r", obj->in_room);
+   }
+   return eSUCCESS;
+}
+
+// Depending on which boat we're on, exit the boat if we're not 'at sea'
+int leave_boat_proc(struct char_data*ch, struct obj_data *obj, int cmd, char*arg, CHAR_DATA *invoker)
+{
+   obj_data * obj2;
+   int i;
+
+   if(cmd != 187)  // leave
+      return eFAILURE;
+
+   if(obj->in_room < 0)
+      return eFAILURE;   // someone loaded me
+
+   // switch off depending on what item we are
+   switch(obj_index[obj->item_number].virt) {
+     case 9532: // dk boat ramp
+       // find the dk boat (9531)
+       i = real_object(9531);
+       for(obj2 = object_list; obj2; obj2 = obj2->next) 
+       {
+         if(obj2->item_number == i)
+           break;
+       }
+
+       if(obj2 == NULL) 
+       {
+         send_to_char("Cannot find your boat obj.  BUG.  Tell a god.\n\r", ch);
+         return eSUCCESS;
+       }
+
+       if(obj2->in_room == dk_boat[1]) {
+         act("$n disembarks from $p.", ch, obj2, 0, TO_ROOM, 0);
+         act("You disembark from $p.", ch, obj2, 0, TO_CHAR, 0);
+         move_char(ch, obj2->in_room);
+         act("$n disembarks from $p.", ch, obj2, 0, TO_ROOM, 0);
+         do_look(ch, "", 9);
+         return eSUCCESS;
+       }
+
+       if(obj2->in_room == dk_boat[dk_boat[0]]) {
+         act("$n disembarks from $p.", ch, obj2, 0, TO_ROOM, 0);
+         act("You disembark from $p.", ch, obj2, 0, TO_CHAR, 0);
+         move_char(ch, obj2->in_room);
+         act("$n disembarks from $p.", ch, obj2, 0, TO_ROOM, 0);
+         do_look(ch, "", 9);
+         return eSUCCESS;
+       }
+
+       send_to_char("You can't just leave the ship in the middle of the Blood Sea!\n\r", ch);
+       return eSUCCESS;
+       break;
+     default: 
+       logf(LOG_BUG, IMMORTAL, "Illegal boat proc.  Item %d.", obj_index[obj->item_number].virt);
+       break;
+   }
+
+   return eSUCCESS;
+}
+
+
+#define BONEWRACK_ROOM      9597
+#define GAIOT_AVATAR        9622
+
+// This proc waits for players to enter the room.  Once they do, it echos messages
+// and loads the mob into the room.  Can work for multiple messages with a 'wait' state
+// obj values:  [current pulse] [unused] [unused] [unused]
+//
+int mob_summoner(struct char_data*ch, struct obj_data *obj, int cmd, char*arg, CHAR_DATA *invoker)
+{
+   char_data * vict;
+
+   if(cmd)
+      return eFAILURE;
+
+   if(obj->in_room < 0)
+      return eFAILURE;   // someone loaded me
+
+   // see if we have any players in room
+   for(vict = world[obj->in_room].people; vict; vict = vict->next_in_room)
+     if(!IS_NPC(vict))
+       break;
+
+   // no?  reset pulse state and get out
+   if(!vict) {
+     obj->obj_flags.value[0] = 0;
+     return eSUCCESS;
+   }
+
+   switch(obj->in_room) {
+     case BONEWRACK_ROOM:
+       // find bonewrack
+       vict = get_mob_vnum(9535);
+       if(!vict || vict->in_room == BONEWRACK_ROOM)
+         return eSUCCESS;
+
+       switch(obj->obj_flags.value[0]) {
+         case 0:
+           send_to_room("The shadows in the room begin to shift and slide in tricks of the light.\n\r", BONEWRACK_ROOM);
+           break;
+         case 1:
+           send_to_zone("A loud roar echos audibly through the entire kingdom.\n\r", world[obj->in_room].zone);
+           break;
+         case 2:
+           send_to_room("The dragon $B$2Bonewrack$R flies in from above!\n\r", BONEWRACK_ROOM);
+           move_char(vict, BONEWRACK_ROOM);
+           obj->obj_flags.value[0] = 0;
+           break;
+         default:
+           break;
+       }
+       break;
+
+     case GAIOT_AVATAR:
+       // find avatar
+       vict = get_mob_vnum(9526);
+       if(!vict || vict->in_room == GAIOT_AVATAR)
+         return eSUCCESS;
+
+       switch(obj->obj_flags.value[0]) {
+         case 0:
+           send_to_room("In the distance a winged creature can be seen flying towards you.\n\r", GAIOT_AVATAR);
+           break;
+         case 1:
+           send_to_room("The winged creature flies closer and closer.\n\r", GAIOT_AVATAR);
+           break;
+         case 2:
+           send_to_room("The creature shatters in illusion!\n\r", GAIOT_AVATAR);
+           move_char(vict, GAIOT_AVATAR);
+           obj->obj_flags.value[0] = 0;
+           break;
+         default:
+           break;
+       }
+       break;
+
+     default:
+       break;
+   }
+
+   obj->obj_flags.value[0]++;
+
+   return eSUCCESS;
+}
+
+// Takes care of lighting back up a room when globe of darkness wears off
+// values:  [time left] [how dark] [unused] [unused]
+//
+int globe_of_darkness_proc(struct char_data*ch, struct obj_data *obj, int cmd, char*arg, CHAR_DATA *invoker)
+{
+   if(cmd)
+      return eFAILURE;
+
+   if(obj->in_room < 0)
+      return eFAILURE;   // someone loaded me
+
+   if(obj->obj_flags.value[0] < 1) {
+      // time to kill myself
+      world[obj->in_room].light += obj->obj_flags.value[1]; // light back up
+      send_to_room("The globe of darkness fades brightening the room some.\n\r", obj->in_room);
+      extract_obj(obj);
+   }
+   else obj->obj_flags.value[0]--;
+
+   return eSUCCESS;
+}
+
+
+
+int hornoplenty(struct char_data*ch, struct obj_data *obj, int cmd, char*arg, CHAR_DATA *invoker)
+{
+   if(cmd)
+      return eFAILURE;
+
+   if(!obj || obj->contains)
+      return eFAILURE;
+
+   if(number(0, 100))
+      return eFAILURE;
+
+   struct obj_data * newobj = NULL;
+   int objnum = real_object(3170); // chewy tuber
+   if(objnum < 0)
+   {
+      logf(LOG_BUG, IMMORTAL, "Horn o plenty load obj incorrent.");
+      return eFAILURE;
+   }
+
+   newobj = clone_object(objnum);
+
+   obj_to_obj(newobj, obj);
+   return eSUCCESS;
+}
+
+int gl_dragon_fire(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, 
+                   CHAR_DATA *invoker)
+{
+   if(cmd)                                  return eFAILURE;
+   if(!ch || !ch->fighting)                 return eFAILURE;
+   if(ch->equipment[WIELD] != obj &&
+      ch->equipment[SECOND_WIELD] != obj)   return eFAILURE;
+
+   if(number(1, 100) > 5)
+      return eFAILURE;
+
+   send_to_char("The head of your dragon staff animates and breathes $B$4fire$R all around you!\r\n", ch);
+   act("The head of the dragon staff in $n's hands animates and begins to breath fire!", 
+              ch, obj, 0, TO_ROOM, 0);
+
+   return cast_fire_breath(10, ch, "", SPELL_TYPE_SPELL, ch->fighting, 0);
+}
+
+int dk_rend(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, 
+                   CHAR_DATA *invoker)
+{
+   if(cmd)                                  return eFAILURE;
+   if(!ch || !ch->fighting)                 return eFAILURE;
+   if(ch->equipment[WIELD] != obj &&
+      ch->equipment[SECOND_WIELD] != obj)   return eFAILURE;
+
+   if(number(1, 100) > 5)
+      return eFAILURE;
+
+   act("The $o rips deeply into $N rending $S body painfully!", 
+              ch, obj, ch->fighting, TO_ROOM, 0);
+
+   GET_HIT(ch->fighting) /= 2;
+   if(GET_HIT(ch->fighting) < 1)
+     GET_HIT(ch->fighting) = 1;
+
+   return eSUCCESS;
+}
+
+int magic_missile_boots(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, 
+                   CHAR_DATA *invoker)
+{
+   if(cmd)                                  return eFAILURE;
+   if(!ch || !ch->fighting)                 return eFAILURE;
+   if(ch->equipment[WEAR_FEET] != obj)      return eFAILURE;
+
+   if(number(0, 1))
+      return eFAILURE;
+
+   act("The $o around $n's feet glows briefly and releases a magic missle spell!", 
+              ch, obj, ch->fighting, TO_ROOM, 0);
+   send_to_char("Your boots glow briefly and release a magic missle spell!\r\n", ch);
+
+   return spell_magic_missile((GET_LEVEL(ch)/2), ch, ch->fighting, 0);
+}
+
+
+int shield_combat_procs(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, 
+                   CHAR_DATA *invoker)
+{
+   if(cmd)                                  return eFAILURE;
+   if(!ch || !ch->fighting)                 return eFAILURE;
+   if(ch->equipment[WEAR_SHIELD] != obj)    return eFAILURE;
+
+   switch(obj_index[obj->item_number].virt) {
+     case 2715:  // shield of ares
+       if(number(0, 3))
+         return eFAILURE;
+
+       act("$n's $o glows yellow charging up with electrical energy.", ch, obj, ch->fighting, TO_ROOM, 0);
+       send_to_char("Your shield glows yellow as it charges up with electrical energy.\r\n", ch);
+       return spell_lightning_bolt((GET_LEVEL(ch)/2), ch, ch->fighting, 0);
+     break;
+
+     case 5208: // thalos beholder shield
+       if(number(0, 4))
+         return eFAILURE;
+
+       act("$n's $o begins to tremble violently upon contact with $N.", ch, obj, ch->fighting, TO_ROOM, NOTVICT);
+       act("$n's $o begins to tremble violently upon contact with you!", ch, obj, ch->fighting, TO_VICT, 0);
+       send_to_char("Your shield begins to violently shake after the hit!\r\n", ch);
+       return spell_cause_serious((GET_LEVEL(ch)/2), ch, ch->fighting, 0);
+     break;
+
+     default:
+       break; 
+   }
+
+   return eFAILURE;
+}
+
+int generic_weapon_combat(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, 
+                   CHAR_DATA *invoker)
+{
+   if(cmd)                                  return eFAILURE;
+   if(!ch || !ch->fighting)                 return eFAILURE;
+   if(!obj || (
+       ch->equipment[WIELD] != obj &&
+       ch->equipment[SECOND_WIELD] != obj))   return eFAILURE;
+
+   switch(obj->item_number) {
+     case 16903:  // valhalla hammer
+       if(number(1, 100) < GET_DEX(ch)/4)
+         break;
+       send_to_char("The hammer begins to hum and strikes out with the power of Thor!\r\n", ch);
+       act("$n's hammer begins to hum and strikes out with the power of Thor!", 
+              ch, obj, 0, TO_ROOM, 0);
+       return spell_lightning_bolt((GET_LEVEL(ch)/2), ch, ch->fighting, 0);
+
+     case 19327:  // EC Icicle
+       if(number(1, 100) < GET_DEX(ch)/4)
+         break;
+       send_to_char("The Icicle begins to pulse repidly...\r\n", ch);
+       act("$n's $o begins to pulse rapidly...", 
+              ch, obj, 0, TO_ROOM, 0);
+       return spell_ice_shards((GET_LEVEL(ch)/2), ch, ch->fighting, 0);
+
+     default:
+       send_to_char("Weapon with invalid generic_weapon_combat, tell pirahna.\r\n", ch);
+       break;
+   }
+   return eFAILURE;
+}
+
+// item players can buy to find the ToHS
+int TOHS_locator(struct char_data*ch, struct obj_data *obj, int cmd, char*arg, 
+                   CHAR_DATA *invoker)
+{
+   obj_data * victim = NULL;
+
+   if(cmd != 185) // push
+      return eFAILURE;
+
+   if(!strstr(arg, "button"))
+      return eFAILURE;
+
+   act("$n pushes a small button then holds a looking glass to $s face.", ch, 0,0,TO_ROOM, INVIS_NULL);
+   send_to_char("You push the small button and then hold the looking glass to your face peering through it.\r\n\r\n", ch);
+
+   // 1406 is the portal 'rock' you enter to get to Tohs
+   int searchnum = real_object(1406);
+
+   for(victim = object_list; victim; victim = victim->next)
+     if(victim->item_number == searchnum)
+       break;
+
+   if(!victim || victim->in_room < 0) // couldn't find it?!
+   {
+     send_to_char("The tower seems to not be there!?!!\r\n", ch);
+     return eSUCCESS;
+   }
+
+   searchnum = ch->in_room;
+   move_char(ch, victim->in_room);
+   do_look(ch, "", 9);
+   move_char(ch, searchnum);
+
+   return eSUCCESS;   
+}
+
