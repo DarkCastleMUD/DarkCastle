@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: save.cpp,v 1.19 2004/04/20 15:02:55 urizen Exp $ */
+/* $Id: save.cpp,v 1.20 2004/04/20 15:31:52 urizen Exp $ */
 
 extern "C"
 {
@@ -952,12 +952,12 @@ bool put_obj_in_store (struct obj_data *obj, CHAR_DATA *ch, FILE *fpsave, int we
   {
     fwrite("VA3", sizeof(char), 3, fpsave);
     fwrite(&obj->obj_flags.value[3], sizeof(obj->obj_flags.value[3]), 1, fpsave);
-  }
+  } */
   if(obj->obj_flags.extra_flags != standard_obj->obj_flags.extra_flags)
   {
     fwrite("EXF", sizeof(char), 3, fpsave);
     fwrite(&obj->obj_flags.extra_flags, sizeof(obj->obj_flags.extra_flags), 1, fpsave);
-  }
+  }/*
   if(obj->obj_flags.more_flags != standard_obj->obj_flags.more_flags)
   {
     fwrite("MOF", sizeof(char), 3, fpsave);
