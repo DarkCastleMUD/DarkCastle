@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.68 2003/12/09 09:11:25 staylor Exp $ */
+/* $Id: const.cpp,v 1.69 2004/04/13 12:59:00 urizen Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -775,7 +775,7 @@ char *affected_bits2[] =
     "INSOMNIA",
     "FREEFLOAT",
     "FARSIGHT",
-    "CAMOUFLAGUE",
+    "CAMOUFLAGE",
     "STABILITY",
     "NOT-USED",
     "GOLEM",
@@ -897,7 +897,7 @@ char *apply_types[] =
     "RESIST FIRE",
     "RESIST COLD",
     "KI",
-    "CAMOUFLAGUE",
+    "CAMOUFLAGE",
     "FARSIGHT",
     "FREEFLOAT",
     "FROSTSHIELD", // 70
@@ -1272,7 +1272,7 @@ struct class_skill_defines u_skills[] = { // druid skills
 {    "drown",		SPELL_DROWN,		22,	90,	3203,	NULL },
 {    "lightning shield",SPELL_LIGHTNING_SHIELD,	23,	90,	-2,	"A near victim of infanticide the Lord of the Tallest mountain knows lightning shield."},
 {    "power heal",	SPELL_POWER_HEAL,	26,	90,	-2,	"Only the most pure of beasts with horn atop head can help you.  Look in the mountains." },
-{    "camouflague",	SPELL_CAMOUFLAGUE,	28,	90,	3203,	NULL },
+{    "camouflage",	SPELL_CAMOUFLAGE,	28,	90,	3203,	NULL },
 {    "summon familiar", SPELL_SUMMON_FAMILIAR,	30,	90,	-2,	"To learn this skill you must bust a nut....err...bring me a nut."},
 {    "dismiss familiar",SPELL_DISMISS_FAMILIAR, 30,	90,	3203,	NULL },
 {    "lighted path",    SPELL_LIGHTED_PATH,	33,	90,	-2,	"You must learn about tracking to accomplish this spell.  Go talk to the ranger Woody about lighted path."},

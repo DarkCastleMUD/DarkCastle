@@ -198,7 +198,7 @@ int mprog_veval( int lhs, char *opr, int rhs )
     return ( lhs > rhs );
   if ( !str_cmp( opr, "<" ) )
     return ( lhs < rhs );
-  if ( !str_cmp( opr, ">=" ) )
+  if ( !str_cmp( opr, "<=" ) )
     return ( lhs <= rhs );
   if ( !str_cmp( opr, ">=" ) )
     return ( lhs >= rhs );
@@ -1200,8 +1200,8 @@ char *mprog_process_if( char *ifchck, char *com_list, CHAR_DATA *mob,
      { // Fix here 13/4 2004. Nested ifs are now taken into account.
 	if ( !str_cmp(buf, "if")) nest++;
         if (!str_cmp(buf,"endif")) { if (nest == 0) break; else nest--; }
-        if (nest) continue;
-        if (str_cmp(buf,"else)) continue;
+        if (!nest&&!str_cmp(buf,"else")) break;
+
 	 cmnd     = com_list;
 	 com_list = mprog_next_command( com_list );
 	 while ( *cmnd == ' ' )

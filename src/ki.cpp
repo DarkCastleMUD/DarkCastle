@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.10 2003/07/22 18:29:00 pirahna Exp $ */
+/* $Id: ki.cpp,v 1.11 2004/04/13 12:59:00 urizen Exp $ */
 
 extern "C"
 {
@@ -453,7 +453,8 @@ int ki_blast( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
 		act("$N is thrown to the ground by your blast!", ch, 0, vict,
 		  TO_CHAR, 0);
 		act("$n blasts you across the room!", ch, 0, vict, TO_VICT, 0);
-		GET_HIT(vict) -= number(1,4) * GET_LEVEL(ch);
+//		GET_HIT(vict) -= number(1,4) * GET_LEVEL(ch);
+		damage(ch,vict,number(1,4) * GET_LEVEL(ch), TYPE_UNDEFINED,KI_OFFSET+KI_BLAST,0);
 		if(!vict->fighting && IS_NPC(vict))
 			return attack(vict, ch, TYPE_UNDEFINED);
 		return 1;

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_barbarian.cpp,v 1.13 2003/08/12 03:45:37 pirahna Exp $
+| $Id: cl_barbarian.cpp,v 1.14 2004/04/13 12:59:09 urizen Exp $
 | cl_barbarian.C
 | Description:  Commands for the barbarian class.
 */
@@ -188,7 +188,7 @@ int do_berserk(struct char_data *ch, char *argument, int cmd)
   byte percent;
   int learned, chance, specialization;
   int bSuccess = 0;
-  int retval;
+  int retval = 0;
   
   if(IS_MOB(ch))
     learned = 75;

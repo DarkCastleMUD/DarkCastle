@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: offense.cpp,v 1.2 2002/06/13 04:41:08 dcastle Exp $
+| $Id: offense.cpp,v 1.3 2004/04/13 12:59:00 urizen Exp $
 | offense.C
 | Description:  Commands that are generically offensive - that is, the
 |   victim should retaliate.  The class-specific offensive commands are
@@ -166,7 +166,7 @@ int do_kill(struct char_data *ch, char *argument, int cmd)
     if (ch == victim)
       send_to_char("Your mother would be so sad.. :(\n\r", ch);
     else {
-      if (!strcmp(GET_NAME(victim), "Sadus") || !strcmp(GET_NAME(victim), "Morcallen") || !strcmp(GET_NAME(victim), "Kate") || !strcmp(GET_NAME(victim), "Llevity")) {
+      if (!strcmp(GET_NAME(victim), "Sadus")) {
 	send_to_char("Sadus tells you, 'Nice try.'\n\r", ch);
 	sprintf(buf,"%s just tried to SLAY YOU !!! \n\r", GET_SHORT(ch));
 	send_to_char(buf, victim);

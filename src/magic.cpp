@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.90 2003/12/09 01:31:44 staylor Exp $ */
+/* $Id: magic.cpp,v 1.91 2004/04/13 12:59:00 urizen Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -2352,11 +2352,11 @@ int spell_camouflague(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 {
   struct affected_type af;
 
-  if(!affected_by_spell(victim, SPELL_CAMOUFLAGUE)) {
+  if(!affected_by_spell(victim, SPELL_CAMOUFLAGE)) {
      act("$n fades into the plant life.", victim, 0, 0, TO_ROOM, INVIS_NULL);
      act("You fade into the plant life.", victim, 0, 0, TO_CHAR, 0);
      
-     af.type          = SPELL_CAMOUFLAGUE;
+     af.type          = SPELL_CAMOUFLAGE;
      af.duration      = 3;
      af.modifier      = 0;
      af.location      = APPLY_NONE;
@@ -3761,9 +3761,9 @@ int spell_dispel_minor(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
             break;
       
 	 case 12: 
-            if (affected_by_spell(victim, SPELL_CAMOUFLAGUE))
+            if (affected_by_spell(victim, SPELL_CAMOUFLAGE))
             {
-               affect_from_char(victim, SPELL_CAMOUFLAGUE);
+               affect_from_char(victim, SPELL_CAMOUFLAGE);
                send_to_char("You don't seem to be camouflaged anymore.\n\r", victim);
                done = TRUE;
             }

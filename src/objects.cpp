@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.25 2004/04/13 11:37:33 urizen Exp $
+| $Id: objects.cpp,v 1.26 2004/04/13 12:59:00 urizen Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -1347,14 +1347,14 @@ int recheck_height_wears(char_data * ch)
 {
   int j;
   struct obj_data *obj = NULL;
-  if (!ch || IS_NPC(ch)) return;  // NPCs get to wear the stuff. 
+  if (!ch || IS_NPC(ch)) return eSUCCESS;  // NPCs get to wear the stuff. 
 
   for(j = 0; j < MAX_WEAR; j++)
   {
     if(!ch->equipment[j]) continue;
 
     if(size_restricted(ch, ch->equipment[j])) {
-      obj = uneqeuip_char(ch,j);
+      obj = unequip_char(ch,j);
       obj_to_char(obj,ch);
       act("$n looks uncomfortable, and shifts $p into $s inventory.",ch, obj, NULL, TO_ROOM, 0);
       act("$p feels uncomfortable and you shift it into your inventory.",ch, obj, NULL, TO_CHAR, 0);
