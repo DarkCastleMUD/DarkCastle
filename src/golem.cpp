@@ -100,6 +100,7 @@ void set_golem(CHAR_DATA *golem, int golemtype)
         if (!golemtype)
           SET_BIT(golem->affected_by2, AFF_GOLEM);
         golem->mobdata->actflags = ACT_2ND_ATTACK;
+	golem->misc = MISC_IS_MOB;
         golem->affected_by = 0;
         golem->armor = 0;
         golem->level = 1;
