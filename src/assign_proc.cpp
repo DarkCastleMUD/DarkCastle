@@ -530,6 +530,14 @@ void assign_objects(void)
   SPEC_FUN glove_combat_procs;
   SPEC_FUN hot_potato;
   SPEC_FUN gazeofgaiot;
+  SPEC_FUN moving_portals;
+  assign_one_obj_non(11300, moving_portals);
+  assign_one_obj_non(11301, moving_portals);
+  assign_one_obj_non(11302, moving_portals);
+  assign_one_obj_non(11303, moving_portals);
+  assign_one_obj_non(11304, moving_portals);
+  assign_one_obj_non(11305, moving_portals);
+  assign_one_obj_non(5911, moving_portals);
 
   assign_one_obj_non(9,  phish_locator);	
   assign_one_obj_non(13,  board); /* Quest Board */
