@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.24 2002/11/01 16:20:56 pirahna Exp $ */
+/* $Id: mob_proc.cpp,v 1.25 2002/12/26 22:33:05 pirahna Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -4603,7 +4603,12 @@ int foggy_combat(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
              ch, 0, 0, TO_ROOM, INVIS_NULL );
 
     // create the mob
-    mob = clone_mobile(real_mobile( 3072 ));
+    mob = clone_mobile(real_mobile( 22026 ));
+    if(!mob)
+    {
+       log("Foggy combat mobile missing", ANGEL, LOG_BUG);
+       return eFAILURE;
+    }
     // put it in the room ch is in
     char_to_room(mob, ch->in_room);
 
