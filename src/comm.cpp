@@ -1946,8 +1946,10 @@ void close_socket(struct descriptor_data *d)
       log(buf, ANGEL, LOG_SOCKET);
       free_char(d->character);
     }
-  } else
-    log("Losing descriptor without char.", ANGEL, LOG_SOCKET);
+  }
+//   Removed this log caues it's so fricken annoying
+//   else
+//    log("Losing descriptor without char.", ANGEL, LOG_SOCKET);
 
   /* JE 2/22/95 -- part of my unending quest to make switch stable */
   if (d->original && d->original->desc)
