@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.13 2002/09/11 02:08:12 pirahna Exp $ */
+/* $Id: mob_proc2.cpp,v 1.14 2002/09/11 02:51:35 pirahna Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -980,33 +980,94 @@ int meta_get_stat_exp_cost(char_data * ch, byte stat)
       case CONSTITUTION:
         xp_price = ((GET_LEVEL(ch)*4)*10000)+((ch->raw_con*8)*30000);
         break;
+      case STRENGTH:
+        xp_price = ((GET_LEVEL(ch)*4)*10000)+((ch->raw_str*8)*30000);
+        break;
+      case DEXTERITY:
+        xp_price = ((GET_LEVEL(ch)*4)*10000)+((ch->raw_dex*8)*30000);
+        break;
+      case INTELLIGENCE:
+        xp_price = ((GET_LEVEL(ch)*4)*10000)+((ch->raw_intel*8)*30000);
+        break;
+      case WISDOM:
+        xp_price = ((GET_LEVEL(ch)*4)*10000)+((ch->raw_wis*8)*30000);
+        break;
       default:
         xp_price = 9999999;
         break;
     }
+    if(ch->pcdata->statmetas > 0)
+      xp_price += ch->pcdata->statmetas * 20000;
+
     return xp_price;
 }
 
-int meta_get_stat_plat_cost(char_data * ch, byte stat)
+int meta_get_stat_plat_cost(char_data * ch, byte targetstat)
 {
   int plat_cost;
+  int stat;
 
-  switch(stat) {
+  switch(targetstat) {
     case CONSTITUTION:
-      if(ch->raw_con >= 18) {
-         plat_cost = 500;
-         if(ch->pcdata->statmetas > 0)
-            plat_cost += ch->pcdata->statmetas * 20;
-      } else {
-         plat_cost = 100;
-         if(ch->pcdata->statmetas > 0)
-            plat_cost += ch->pcdata->statmetas * 10;
-      }
-      // no class mods
+      stat = ch->raw_con;
+      break;
+    case STRENGTH:
+      stat = ch->raw_str;
+      if(GET_CLASS(ch) == CLASS_MAGIC_USER ||
+         GET_CLASS(ch) == CLASS_CLERIC ||
+         GET_CLASS(ch) == CLASS_DRUID)
+       stat += 2;
+      if(GET_CLASS(ch) == CLASS_BARD ||
+         GET_CLASS(ch) == CLASS_THIEF ||
+         GET_CLASS(ch) == CLASS_MONK)
+       stat += 1;
+      break;
+    case DEXTERITY:
+      stat = ch->raw_dex;
+      if(GET_CLASS(ch) == CLASS_MAGIC_USER ||
+         GET_CLASS(ch) == CLASS_CLERIC ||
+         GET_CLASS(ch) == CLASS_DRUID)
+       stat += 2;
+      if(GET_CLASS(ch) == CLASS_WARRIOR ||
+         GET_CLASS(ch) == CLASS_BARBARIAN ||
+         GET_CLASS(ch) == CLASS_PALADIN)
+       stat += 1;
+      break;
+    case WISDOM:
+      stat = ch->raw_wis;
+      if(GET_CLASS(ch) == CLASS_WARRIOR ||
+         GET_CLASS(ch) == CLASS_PALADIN ||
+         GET_CLASS(ch) == CLASS_BARBARIAN)
+       stat += 2;
+      if(GET_CLASS(ch) == CLASS_MONK ||
+         GET_CLASS(ch) == CLASS_RANGER ||
+         GET_CLASS(ch) == CLASS_THIEF)
+       stat += 1;
+      break;
+    case INTELLIGENCE:
+      stat = ch->raw_intel;
+      if(GET_CLASS(ch) == CLASS_WARRIOR ||
+         GET_CLASS(ch) == CLASS_PALADIN ||
+         GET_CLASS(ch) == CLASS_BARBARIAN)
+       stat += 2;
+      if(GET_CLASS(ch) == CLASS_MONK ||
+         GET_CLASS(ch) == CLASS_RANGER ||
+         GET_CLASS(ch) == CLASS_THIEF)
+       stat += 1;
       break;
     default:
-      plat_cost = 99999;
+      stat = 99;
       break;
+  }
+
+  if(stat >= 18) {
+     plat_cost = 500;
+     if(ch->pcdata->statmetas > 0)
+        plat_cost += ch->pcdata->statmetas * 20;
+  } else {
+     plat_cost = 100;
+     if(ch->pcdata->statmetas > 0)
+        plat_cost += ch->pcdata->statmetas * 10;
   }
 
   return plat_cost;
@@ -1025,41 +1086,42 @@ void meta_list_stats(char_data * ch)
       csendf(ch, "1) Str: %d        Cost: %d exp + %d Platinum coins. \n\r",
               ( ch->raw_str + 1), xp_price, plat_cost);
 
-    xp_price = meta_get_stat_exp_cost(ch, INTELLIGENCE);
-    plat_cost = meta_get_stat_plat_cost(ch, INTELLIGENCE);
-    max_stat = get_max_stat(ch, INTELLIGENCE);
-    if(ch->raw_intel >= max_stat)
-      csendf(ch, "2) Int:       Your intelligence is already %d.\n\r", max_stat);
-    else
-      csendf(ch, "2) Int: %d        Cost: %d exp + %d Platinum coins.\n\r",
-              ( ch->raw_intel + 1 ), xp_price, plat_cost);
-
-    xp_price = meta_get_stat_exp_cost(ch, WISDOM);
-    plat_cost = meta_get_stat_plat_cost(ch, WISDOM);
-    max_stat = get_max_stat(ch, WISDOM);
-    if(ch->raw_wis >= max_stat)
-      csendf(ch, "3) Wis:       Your wisdom is already %d.\n\r", max_stat);
-    else
-      csendf(ch, "3) Wis: %d        Cost: %d exp + %d Platinum coins.\n\r",
-              ( ch->raw_wis + 1 ), xp_price, plat_cost);
-
     xp_price = meta_get_stat_exp_cost(ch, DEXTERITY);
     plat_cost = meta_get_stat_plat_cost(ch, DEXTERITY);
     max_stat = get_max_stat(ch, DEXTERITY);
     if(ch->raw_dex >= max_stat)
-      csendf(ch, "4) Dex:       Your dexterity is already %d.\n\r", max_stat);
+      csendf(ch, "2) Dex:       Your dexterity is already %d.\n\r", max_stat);
     else
-      csendf(ch, "4) Dex: %d        Cost: %d exp + %d Platinum coins.\n\r",
+      csendf(ch, "2) Dex: %d        Cost: %d exp + %d Platinum coins.\n\r",
               ( ch->raw_dex + 1 ), xp_price, plat_cost);
 
     xp_price = meta_get_stat_exp_cost(ch, CONSTITUTION);
     plat_cost = meta_get_stat_plat_cost(ch, CONSTITUTION);
     max_stat = get_max_stat(ch, CONSTITUTION);
     if(ch->raw_con >= max_stat)
-      csendf(ch, "5) Con:       Your constitution is already %d.\n\r", max_stat);
+      csendf(ch, "3) Con:       Your constitution is already %d.\n\r", max_stat);
     else
-      csendf(ch, "5) Con: %d        Cost: %d exp + %d Platinum coins.\n\r",
+      csendf(ch, "3) Con: %d        Cost: %d exp + %d Platinum coins.\n\r",
               ( ch->raw_con + 1 ), xp_price, plat_cost);
+
+    xp_price = meta_get_stat_exp_cost(ch, INTELLIGENCE);
+    plat_cost = meta_get_stat_plat_cost(ch, INTELLIGENCE);
+    max_stat = get_max_stat(ch, INTELLIGENCE);
+    if(ch->raw_intel >= max_stat)
+      csendf(ch, "4) Int:       Your intelligence is already %d.\n\r", max_stat);
+    else
+      csendf(ch, "4) Int: %d        Cost: %d exp + %d Platinum coins.\n\r",
+              ( ch->raw_intel + 1 ), xp_price, plat_cost);
+
+    xp_price = meta_get_stat_exp_cost(ch, WISDOM);
+    plat_cost = meta_get_stat_plat_cost(ch, WISDOM);
+    max_stat = get_max_stat(ch, WISDOM);
+    if(ch->raw_wis >= max_stat)
+      csendf(ch, "5) Wis:       Your wisdom is already %d.\n\r", max_stat);
+    else
+      csendf(ch, "5) Wis: %d        Cost: %d exp + %d Platinum coins.\n\r",
+              ( ch->raw_wis + 1 ), xp_price, plat_cost);
+
 }
 
 int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,        
@@ -1160,36 +1222,36 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
              statplatprice = meta_get_stat_plat_cost(ch, STRENGTH);
              max_stat = get_max_stat(ch, STRENGTH);
              break;
-      case 2: stat = ch->raw_intel;
-             pstat = &(ch->raw_intel); 
-             pprice = meta_get_stat_exp_cost(ch, INTELLIGENCE); 
-             statplatprice = meta_get_stat_plat_cost(ch, INTELLIGENCE);
-             max_stat = get_max_stat(ch, INTELLIGENCE);
-             break;
-      case 3: stat = ch->raw_wis;
-             pstat = &(ch->raw_wis); 
-             pprice = meta_get_stat_exp_cost(ch, WISDOM); 
-             statplatprice = meta_get_stat_plat_cost(ch, WISDOM);
-             max_stat = get_max_stat(ch, WISDOM);
-             break;
-      case 4: stat = ch->raw_dex;
+      case 2: stat = ch->raw_dex;
              pstat = &(ch->raw_dex); 
              pprice =  meta_get_stat_exp_cost(ch, DEXTERITY); 
              statplatprice = meta_get_stat_plat_cost(ch, DEXTERITY);
              max_stat = get_max_stat(ch, DEXTERITY);
              break;
-      case 5: stat = ch->raw_con;
+      case 3: stat = ch->raw_con;
              pstat = &(ch->raw_con); 
              pprice = meta_get_stat_exp_cost(ch, CONSTITUTION); 
              statplatprice = meta_get_stat_plat_cost(ch, CONSTITUTION);
              max_stat = get_max_stat(ch, CONSTITUTION);
+             break;
+      case 4: stat = ch->raw_intel;
+             pstat = &(ch->raw_intel); 
+             pprice = meta_get_stat_exp_cost(ch, INTELLIGENCE); 
+             statplatprice = meta_get_stat_plat_cost(ch, INTELLIGENCE);
+             max_stat = get_max_stat(ch, INTELLIGENCE);
+             break;
+      case 5: stat = ch->raw_wis;
+             pstat = &(ch->raw_wis); 
+             pprice = meta_get_stat_exp_cost(ch, WISDOM); 
+             statplatprice = meta_get_stat_plat_cost(ch, WISDOM);
+             max_stat = get_max_stat(ch, WISDOM);
              break;
       default: stat = 0;
     }
 
     if(choice < 6) {
       
-      if(GET_PLATINUM(ch) < statplatprice) {
+      if(GET_PLATINUM(ch) < (unsigned)statplatprice) {
         send_to_char("The Meta-physician tells you, 'You can't afford my services.  FUCK OFF!\n\r", ch);
         return eSUCCESS;
       }
@@ -1206,6 +1268,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
       GET_PLATINUM(ch) -= statplatprice;
 
       *pstat += 1;
+      ch->pcdata->statmetas++;
 
       act("The Meta-physician touches $n.",  ch, 0, 0, TO_ROOM, 0);
       act("The Meta-physician touches you.",  ch, 0, 0, TO_CHAR, 0);
