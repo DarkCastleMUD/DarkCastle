@@ -191,9 +191,9 @@ int do_sqedit(struct char_data *ch, char *argument, int cmd)
  //   argument = one_argument(argument, skill+strlen(skill));
 /*  if (!argument || !*argument)
   {
-     send_to_char("$2Syntax:$R sqedit <level/class> <skill> <value> OR\r\n"
-                  "$2Syntax:$R sqedit message/new/delete <skillname>\r\n",ch);
-     send_to_char("$2Syntax:$R sqedit list.\r\n",ch);
+     send_to_char("$3Syntax:$R sqedit <level/class> <skill> <value> OR\r\n"
+                  "$3Syntax:$R sqedit message/new/delete <skillname>\r\n",ch);
+     send_to_char("$3Syntax:$R sqedit list.\r\n",ch);
      return eFAILURE;
   }*/
   int i;
@@ -205,9 +205,9 @@ int do_sqedit(struct char_data *ch, char *argument, int cmd)
   if (fields[i] == "\n")
   {
 
-     send_to_char("$2Syntax:$R sqedit <message/level/class> <skill> <value> OR\r\n"
-                  "$2Syntax:$R sqedit <show/new/delete> <skillname> OR\r\n",ch);
-     send_to_char("$2Syntax:$R sqedit list <class>.\r\n",ch);
+     send_to_char("$3Syntax:$R sqedit <message/level/class> <skill> <value> OR\r\n"
+                  "$3Syntax:$R sqedit <show/new/delete> <skillname> OR\r\n",ch);
+     send_to_char("$3Syntax:$R sqedit list <class>.\r\n",ch);
     return eFAILURE;
   }
   char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH],arg3[MAX_INPUT_LENGTH*2];
@@ -331,7 +331,7 @@ int do_sqedit(struct char_data *ch, char *argument, int cmd)
       send_to_char("Class modified.\r\n",ch);
       break;
     case 5: // show
-      csendf(ch,"$2Skill$R: %s\r\n$2Message$R: %s\r\n$2Class$R: %s\r\n$2Level$R: %d\r\n",             get_skill_name(skill->num), skill->message, print_classes(skill->clas),skill->level);
+      csendf(ch,"$3Skill$R: %s\r\n$3Message$R: %s\r\n$3Class$R: %s\r\n$3Level$R: %d\r\n",             get_skill_name(skill->num), skill->message, print_classes(skill->clas),skill->level);
       break;
      case 6:
       int l;
@@ -351,7 +351,7 @@ int do_sqedit(struct char_data *ch, char *argument, int cmd)
       {
 	if (!IS_SET(curren->clas, 1<<(l-1)))
 	  continue;
-  	csendf(ch, "$2%d$R. %s\r\n", curren->num, get_skill_name(curren->num));
+  	csendf(ch, "$3%d$R. %s\r\n", curren->num, get_skill_name(curren->num));
 	done = TRUE;
       }
       if (!done)
