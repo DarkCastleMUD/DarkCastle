@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.21 2002/10/16 02:21:09 pirahna Exp $ */
+/* $Id: mob_proc.cpp,v 1.22 2002/10/22 04:53:35 pirahna Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -2948,7 +2948,7 @@ int fido(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 		next_obj = temp->next_content;
                 if(IS_SET(temp->obj_flags.more_flags, ITEM_NO_TRADE))
                 {
-                  extract_obj(obj);
+                  extract_obj(temp);
                   continue;
                 }
 		move_obj(temp, ch->in_room);
