@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.19 2003/01/21 05:34:23 pirahna Exp $ */
+/* $Id: handler.cpp,v 1.20 2003/01/21 06:58:17 pirahna Exp $ */
     
 extern "C"
 {
@@ -758,6 +758,8 @@ void affect_total(CHAR_DATA *ch)
     struct affected_type *tmp_af;
     int i,j;
 
+    SET_BIT(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT); // so weapons stop falling off
+
     // remove all affects from the player
     for(i=0; i<MAX_WEAR; i++) {
         if (ch->equipment[i])
@@ -782,6 +784,8 @@ void affect_total(CHAR_DATA *ch)
     }
     for(af = ch->affected; af; af=af->next)
         affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE);
+
+    REMOVE_BIT(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT); // so weapons stop fall off
 }
 
 
