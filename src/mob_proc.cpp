@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.45 2004/04/22 16:40:03 urizen Exp $ */
+/* $Id: mob_proc.cpp,v 1.46 2004/04/22 16:52:40 urizen Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -2199,7 +2199,7 @@ int guild_guard(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 {
     if (cmd>6 || cmd<1)
 	return eFAILURE;
-    int dir = 0,clas=0, align = 3, dir2 = 0;
+    int dir = 0,clas=0, align = 0, dir2 = 0;
     // TODO - go through these and remove all of the ones that are in
     // room that no longer exist on the mud
     switch (world[ch->in_room].number)

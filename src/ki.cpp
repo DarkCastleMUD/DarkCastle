@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.12 2004/04/19 19:22:50 urizen Exp $ */
+/* $Id: ki.cpp,v 1.13 2004/04/22 16:52:40 urizen Exp $ */
 
 extern "C"
 {
@@ -122,12 +122,12 @@ int do_ki(CHAR_DATA *ch, char *argument, int cmd)
       send_to_char("You are unable to control your ki in this way!\n\r", ch);
       return eFAILURE;
       }
-
+/*
    if ((IS_SET(world[ch->in_room].room_flags, SAFE)) && (GET_LEVEL(ch) < IMP)) {
       send_to_char("You feel at peace, calm, relaxed, one with yourself and "
                    "the universe.\n\r", ch);
       return eFAILURE;
-      }
+      }*/
 
   argument = skip_spaces(argument);
 
@@ -146,6 +146,13 @@ int do_ki(CHAR_DATA *ch, char *argument, int cmd)
     send_to_char("You cannot harness that energy!\n\r", ch);
     return eFAILURE;
   }
+  
+   if (((IS_SET(world[ch->in_room].room_flags, SAFE)) && (GET_LEVEL(ch) < IMP)) && !(spl == 3 || spl==5||spl==7||spl==9)) {
+      send_to_char("You feel at peace, calm, relaxed, one with yourself and "
+                   "the universe.\n\r", ch);
+      return eFAILURE;
+      }
+
 
   learned = has_skill(ch, (spl+KI_OFFSET));
   if(!learned)
