@@ -11,10 +11,12 @@
 *                       damage (such as falls, drowning) that may kill       *
 *  11/24/2003  Onager   Totally revamped group_gain(); subbed out a lot of   *
 *                       the code and revised exp calculations for soloers    *
- *                      and groups.                                          *
+*                       and groups.                                          *
+*  12/01/2003  Onager   Re-revised group_gain() to divide up mob exp among   *
+*                       groupies                                             *
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.129 2003/12/01 17:39:00 staylor Exp $ */
+/* $Id: fight.cpp,v 1.130 2003/12/02 00:29:53 staylor Exp $ */
 
 extern "C"
 {
@@ -93,10 +95,11 @@ void check_weapon_skill_bonus(char_data * ch, int type, obj_data *wielded,
 
 void update_flags(CHAR_DATA *vict);
 long scale_char_xp(CHAR_DATA *ch, CHAR_DATA *killer, CHAR_DATA *victim,
-                   long no_killers, long highest_level, long base_share);
+                   long no_killers, long total_levels, long highest_level,
+                   long base_xp, long *bonus_xp);
 CHAR_DATA *loop_followers(struct follow_type **f);
 long count_xp_eligibles(CHAR_DATA *leader, CHAR_DATA *killer,
-                        long highest_level);
+                        long highest_level, long *total_levels);
 CHAR_DATA *get_highest_level_killer(CHAR_DATA *leader, CHAR_DATA *killer);
  
 CHAR_DATA *combat_list = NULL, *combat_next_dude = NULL;
@@ -2920,8 +2923,8 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
 void group_gain(CHAR_DATA * ch, CHAR_DATA * victim)
 {
   char buf[256];
-  long no_members = 0, share, tmp_share;
-  long base_xp = 0;
+  long no_members = 0, total_levels = 0, share;
+  long base_xp = 0, bonus_xp = 0;
   CHAR_DATA *leader, *highest, *tmp_ch;
   struct follow_type *f;
   
@@ -2942,7 +2945,7 @@ void group_gain(CHAR_DATA * ch, CHAR_DATA * victim)
     leader = ch;
 
   highest = get_highest_level_killer(leader, ch);
-  no_members = count_xp_eligibles(leader, ch, GET_LEVEL(highest));
+  no_members = count_xp_eligibles(leader, ch, GET_LEVEL(highest), &total_levels);
 
   // loop with leader first, then all the followers
   tmp_ch = leader;
@@ -2967,19 +2970,14 @@ void group_gain(CHAR_DATA * ch, CHAR_DATA * victim)
     }
 
     /* calculate base XP value */
-    base_xp = GET_LEVEL(tmp_ch) * 8000;
-    if (base_xp > 400000)
-       base_xp = 400000;
-    if (base_xp > GET_EXP(victim))
-       base_xp = GET_EXP(victim);
-    share = base_xp;
+    base_xp = GET_EXP(victim);
     
     /* calculate this character's share of the XP */
-    tmp_share = scale_char_xp(tmp_ch, ch, victim, no_members, GET_LEVEL(highest), share);
+    share = scale_char_xp(tmp_ch, ch, victim, no_members, total_levels, GET_LEVEL(highest), base_xp, &bonus_xp);
     
-    sprintf(buf, "You receive %ld exps.\n\r", tmp_share);
+    sprintf(buf, "You receive %ld exps of %ld total.\n\r", share, base_xp + bonus_xp);
     send_to_char(buf, tmp_ch);
-    gain_exp(tmp_ch, tmp_share);
+    gain_exp(tmp_ch, share);
     change_alignment(tmp_ch, victim);
 
     // this loops the followers (cut and pasted above)
@@ -3015,15 +3013,19 @@ CHAR_DATA *get_highest_level_killer(CHAR_DATA *leader, CHAR_DATA *killer)
 
 /* count the number of group members eligible for XP from a kill */
 long count_xp_eligibles(CHAR_DATA *leader, CHAR_DATA *killer,
-                        long highest_level)
+                        long highest_level, long *total_levels)
 {
   struct follow_type *f;
   long num_eligibles = 0;
 
+  *total_levels = 0;
+
   /* check to see if the group leader was involved and eligible for XP */
   if (leader->in_room == killer->in_room
-      && highest_level - GET_LEVEL(leader) < 20)
+      && highest_level - GET_LEVEL(leader) < 20) {
       num_eligibles += 1;
+      *total_levels += GET_LEVEL(leader);
+  }
 
   /* loop through all the groupies */
   for(f = leader->followers; f; f = f->next) 
@@ -3034,6 +3036,7 @@ long count_xp_eligibles(CHAR_DATA *leader, CHAR_DATA *killer,
       (highest_level - GET_LEVEL(f->follower)) < 20)
     {
       num_eligibles += 1;
+      *total_levels += GET_LEVEL(f->follower);
     }
   }
   return(num_eligibles);
@@ -3041,37 +3044,42 @@ long count_xp_eligibles(CHAR_DATA *leader, CHAR_DATA *killer,
 
 /* scale character XP based on various factors */
 long scale_char_xp(CHAR_DATA *ch, CHAR_DATA *killer, CHAR_DATA *victim,
-                  long no_killers, long highest_level, long base_share)
+                  long no_killers, long total_levels, long highest_level,
+                  long base_xp, long *bonus_xp)
 {
     long scaled_share;
     long levelmod;
-    long bonus, bonus_multiplier;
+    long bonus_multiplier;
 
     if(no_killers < 2) {
        /* solo kill */
        levelmod = GET_LEVEL(ch) - GET_LEVEL(victim);
        if (levelmod <= 15)
-          scaled_share = base_share;
+          scaled_share = base_xp;
        else if (levelmod <= 25)
-          scaled_share = (base_share * 75) / 100;
+          scaled_share = (base_xp * 75) / 100;
        else
-          scaled_share = (base_share * 50) / 100;
+          scaled_share = (base_xp * 50) / 100;
+       *bonus_xp = 0;
     } else {
        /* group kill */
        if (no_killers > 6)
           /* limit max bonus to 30% (6 killers * 5%) */
           no_killers = 6;
        if (highest_level - GET_LEVEL(victim) <= 0)
-          bonus = (base_share * no_killers * 5) / 100;
+          *bonus_xp = (base_xp * no_killers * 5) / 100;
        else {
           bonus_multiplier = 5 - (highest_level - GET_LEVEL(victim)) / 3;
           if (bonus_multiplier < 0)
              bonus_multiplier = 0;
-          bonus = (base_share * no_killers * bonus_multiplier) / 100;
+          *bonus_xp = (base_xp * no_killers * bonus_multiplier) / 100;
        }
 
-       scaled_share = base_share + bonus;
+       scaled_share = ((base_xp * GET_LEVEL(ch)) / total_levels) + *bonus_xp;
     }
+
+    if (scaled_share > (GET_LEVEL(ch) * 8000))
+       scaled_share = GET_LEVEL(ch) * 8000;
 
     return(scaled_share);
 }
