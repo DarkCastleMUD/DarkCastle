@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.61 2003/02/17 21:09:26 pirahna Exp $ */
+/* $Id: magic.cpp,v 1.62 2003/02/17 21:48:43 pirahna Exp $ */
 
 extern "C"
 {
@@ -2478,6 +2478,7 @@ int spell_sleep(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
 	{
 	  act("You feel very sleepy ..... zzzzzz",victim,0,0,TO_CHAR,0);
 	  act("$n goes to sleep.",victim,0,0,TO_ROOM, INVIS_NULL);
+          stop_fighting(victim);
 	  GET_POS(victim)=POSITION_SLEEPING;
 	}
 	return eSUCCESS;
