@@ -2183,7 +2183,7 @@ void signal_setup(void)
   my_signal(SIGALRM, SIG_IGN);
   signal(SIGCHLD, sigchld); // hopefully kill zombies
 
-  my_signal(SIGSEGV, crashsig);  // catch null->blah
+//  my_signal(SIGSEGV, crashsig);  // catch null->blah
   my_signal(SIGFPE,  crashfpe);  // catch x / 0
   my_signal(SIGILL,  crashill);  // catch illegal instruction
 #endif

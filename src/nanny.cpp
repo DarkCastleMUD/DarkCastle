@@ -11,7 +11,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.18 2002/10/12 23:45:40 pirahna Exp $ */
+/* $Id: nanny.cpp,v 1.19 2002/11/09 04:33:15 waz Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -564,7 +564,7 @@ void nanny(struct descriptor_data *d, char *arg)
          SEND_TO_Q( "Wrong password.\n\r", d );
          sprintf(log_buf, "%s wrong password: %s", GET_NAME(ch), d->host);
          log( log_buf, SERAPH, LOG_SOCKET );
-         if((ch = get_pc(GET_NAME(d->character))))
+         if((ch == get_pc(GET_NAME(d->character))))
          {
             sprintf(log_buf, "$4$BWARNING: Someone just tried to log in as you with the wrong password.\r\n"
                "Attempt was from %s.$R\r\n"
@@ -573,7 +573,7 @@ void nanny(struct descriptor_data *d, char *arg)
          }
          else {
             if(d->character->pcdata->bad_pw_tries > 100) {
-              sprintf(log_buf, "%s has 100+ bad pw tries...", GET_NAME(ch));
+	      sprintf(log_buf, "%s has 100+ bad pw tries...", GET_NAME(ch));
               log(log_buf, SERAPH, LOG_SOCKET);
             }
             else {
