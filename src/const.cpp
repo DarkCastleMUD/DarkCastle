@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.100 2004/05/15 17:08:28 urizen Exp $ */
+/* $Id: const.cpp,v 1.101 2004/05/15 18:57:10 urizen Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1640,7 +1640,7 @@ struct race_shit race_info[] =
    2,3,0,0,0,0,0,0},
   {"Animal",    "Animals",
    27,0,0,0,0,0,0,0},
-  {"Tree",      "Trees",
+  {"Plant",      "Plants",
    2, 1,0,0,0,0,0,0},
   {"Enfan",     "Enfans",
    63,0,0,0,1,4194304,0,0},
