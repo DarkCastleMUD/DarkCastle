@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.32 2003/08/12 03:45:37 pirahna Exp $
+| $Id: cl_thief.cpp,v 1.33 2003/12/28 20:24:03 pirahna Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -547,7 +547,7 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
 {
   CHAR_DATA *victim;
   struct obj_data *obj, *loop_obj, *next_obj;
-  struct affected_type af, pthiefaf, *paf;
+  struct affected_type pthiefaf, *paf;
   char victim_name[240];
   char obj_name[240];
   char buf[240];
@@ -562,12 +562,6 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
 
   argument = one_argument(argument, obj_name);
   one_argument(argument, victim_name);
-
-  af.type = FUCK_CANTQUIT;
-  af.duration = 5;
-  af.modifier = 0;
-  af.location = APPLY_NONE;
-  af.bitvector = AFF_CANTQUIT;
 
   pthiefaf.type = FUCK_PTHIEF;
   pthiefaf.duration = 10;
@@ -664,9 +658,10 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
 
     if (percent > chance) 
     {
+      set_cantquit( ch, victim );
+      send_to_char("Oops..", ch);
       ohoh = TRUE;
       if(!number(0, 4)) {
-        send_to_char("Oops..", ch);
         act("$n tried to steal something from you!", ch, 0, victim, TO_VICT, 0);
         act("$n tries to steal something from $N.", ch, 0, victim, TO_ROOM, INVIS_NULL|NOTVICT);
       }
@@ -712,16 +707,7 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
             // if victim isn't a pthief
             if(!affected_by_spell(victim, FUCK_PTHIEF) ) 
             {
-              if(!IS_AFFECTED(ch, AFF_CANTQUIT))
-                affect_to_char(ch, &af);
-              else 
-              {
-                for(paf = ch->affected; paf; paf = paf->next) 
-                {
-                   if(paf->type == FUCK_CANTQUIT)
-                     paf->duration = 5;
-                }
-              }
+              set_cantquit( ch, victim );
               if(affected_by_spell(ch, FUCK_PTHIEF))
               {
                 affect_from_char(ch, FUCK_PTHIEF);
@@ -842,16 +828,7 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
           // You don't get a thief flag from stealing from a pthief
           if(!affected_by_spell(victim, FUCK_PTHIEF)) 
           {
-            if(!IS_AFFECTED(ch, AFF_CANTQUIT))
-              affect_to_char(ch, &af);
-            else 
-            {
-              for(paf = ch->affected; paf; paf = paf->next) 
-              {
-                 if(paf->type == FUCK_CANTQUIT)
-                   paf->duration = 5;
-              }
-            }
+            set_cantquit( ch, victim );
             if(affected_by_spell(ch, FUCK_PTHIEF))
             {
               affect_from_char(ch, FUCK_PTHIEF);
@@ -915,7 +892,7 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
 int do_pocket(CHAR_DATA *ch, char *argument, int cmd)
 {
   CHAR_DATA *victim;
-  struct affected_type af, pthiefaf, *paf;
+  struct affected_type pthiefaf;
   char victim_name[240];
   char buf[240];
   int percent, learned, chance, specialization;
@@ -925,12 +902,6 @@ int do_pocket(CHAR_DATA *ch, char *argument, int cmd)
   bool ohoh = FALSE;
 
   one_argument(argument, victim_name);
-
-  af.type = FUCK_CANTQUIT;
-  af.duration = 5;
-  af.modifier = 0;
-  af.location = APPLY_NONE;
-  af.bitvector = AFF_CANTQUIT;
 
   pthiefaf.type = FUCK_PTHIEF;
   pthiefaf.duration = 20;
@@ -1017,9 +988,10 @@ int do_pocket(CHAR_DATA *ch, char *argument, int cmd)
 
   if (percent > chance) 
   {
+    set_cantquit( ch, victim );
+    send_to_char("Oops..\r\n", ch);
     ohoh = TRUE;
     if(!number(0, 6)) {
-      act("Oops..", ch,0,0,TO_CHAR, 0);
       act("You discover that $n has $s hands in your wallet.", ch,0,victim,TO_VICT, 0);
       act("$n tries to steal gold from $N.", ch, 0, victim, TO_ROOM, NOTVICT|INVIS_NULL);
     }
@@ -1046,16 +1018,7 @@ int do_pocket(CHAR_DATA *ch, char *argument, int cmd)
         do_save(ch, "", 666);
         if(!affected_by_spell(victim, FUCK_PTHIEF) ) 
         {
-          if(!IS_AFFECTED(ch, AFF_CANTQUIT))
-            affect_to_char(ch, &af);
-          else 
-          {
-            for(paf = ch->affected; paf; paf = paf->next) 
-            {
-              if(paf->type == FUCK_CANTQUIT)
-                paf->duration = 5;
-            }
-          }
+          set_cantquit( ch, victim );
           if(affected_by_spell(ch, FUCK_PTHIEF))
           {
             affect_from_char(ch, FUCK_PTHIEF);
@@ -1064,12 +1027,6 @@ int do_pocket(CHAR_DATA *ch, char *argument, int cmd)
           else
             affect_to_char(ch, &pthiefaf);
         }
-        af.type = FUCK_PTHIEF;
-        af.duration = 20;
-        af.modifier = 0;
-        af.location = APPLY_NONE;
-        af.bitvector = AFF_CANTQUIT;
-        affect_to_char(ch, &af);
       }
       if ((GET_LEVEL(ch)<ANGEL) && (!IS_NPC(victim))) 
       {
