@@ -1,8 +1,13 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.21 2003/06/23 02:02:24 pirahna Exp $
+| $Id: inventory.cpp,v 1.22 2003/10/19 05:47:42 staylor Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
+|
+| Revision history
+| 10/17/2003   Onager   Changed do_consent() to fix buffer overflow crash bug
+|                       and to only add consented character's name to the
+|                       corpse name once (it was getting added on every consent)
 */
 extern "C"
 {
@@ -520,7 +525,7 @@ int do_get(struct char_data *ch, char *argument, int cmd)
 
 int do_consent(struct char_data *ch, char *arg, int cmd)
 {
-  char buf[MAX_INPUT_LENGTH+1], buf2[MAX_STRING_LENGTH];
+  char buf[MAX_INPUT_LENGTH+1], buf2[MAX_STRING_LENGTH+1];
   struct obj_data *obj;
   struct char_data *vict;
 
@@ -549,8 +554,21 @@ int do_consent(struct char_data *ch, char *arg, int cmd)
        continue;
      
      if(!isname(GET_NAME(ch), obj->name))
+       // corpse isn't owned by the consenting player
        continue;
        
+     // check to see if this player is already consented for the corpse
+     sprintf(buf2, "%s_consent", buf);
+     if (isname(buf2, obj->name))
+        // keep looking; there might be other corpses not yet consented
+        continue;
+
+     // check for buffer overflow before adding the new name to the list
+     if ((strlen(obj->name) + strlen(buf) + strlen(" _consent")) > MAX_STRING_LENGTH) {
+       send_to_char("Don't you think there are enough perverts molesting "
+                    "your\n\rmaggot-ridden corpse already?\n\r", ch);
+       return eFAILURE;
+     }
      sprintf(buf2, "%s %s_consent", obj->name, buf);
      obj->name = str_hsh(buf2);
   }

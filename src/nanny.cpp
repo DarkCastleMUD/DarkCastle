@@ -10,8 +10,13 @@
 *                                                                         *
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
+*                                                                         *
+* Revision History                                                        *
+* 10/16/2003   Onager    Added on_forbidden_name_list() to load           *
+*                        forbidden names from a file instead of a hard-   *
+*                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.33 2003/07/08 02:19:36 pirahna Exp $ */
+/* $Id: nanny.cpp,v 1.34 2003/10/19 05:47:42 staylor Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -122,6 +127,7 @@ void update_wizlist(CHAR_DATA *ch);
 void isr_set(CHAR_DATA *ch);
 bool check_reconnect( struct descriptor_data *d, char *name, bool fReconnect );
 bool check_playing( struct descriptor_data *d, char *name );
+bool on_forbidden_name_list(char *name);
 
 char *str_str(char *first, char *second);
 
@@ -1534,39 +1540,7 @@ int _parse_name(char *arg, char *name)
    if ( i < 2 )
       return 1;
 
-   // TODO - make this into a text file in the /lib dir
-   
-   if ( !str_cmp( name, "all" )        || !str_cmp( name, "local" ) ||
-      !str_cmp( name, "at" )           || !str_cmp( name, "out" )   ||
-      !str_cmp( name, "in" )           || !str_cmp( name, "someone") ||
-      !str_cmp( name, "warrior" )      || !str_cmp( name, "cleric") ||
-      !str_cmp( name, "bard" )         || !str_cmp( name, "barbarian") ||
-      !str_cmp( name, "monk" )         || !str_cmp( name, "druid") ||
-      !str_cmp( name, "ranger" )       || !str_cmp( name, "god") ||
-      !str_cmp( name, "antipaladin" )  || !str_cmp( name, "paladin") ||
-      !str_cmp( name, "only" )         || !str_cmp( name, "mage") ||
-      !str_cmp( name, "the")           || !str_cmp( name, "to") ||
-      !str_cmp( name, "someone")       || !str_cmp( name, "through") ||
-      !str_cmp( name, "pc")            || !str_cmp( name, "corpse") ||
-      !str_cmp( name, "you")           || !str_cmp( name, "on") ||
-      !str_cmp( name, "from")          || !str_cmp( name, "with") ||
-      !str_cmp( name, "chain")         || !str_cmp( name, "ou") || // ou is 'out'
-      !str_cmp( name, "th")            || !str_cmp( name, "thr") ||
-      !str_cmp( name, "thro")          || !str_cmp( name, "throu") ||
-      !str_cmp( name, "through")       || !str_cmp( name, "throug") ||
-      !str_cmp( name, "no")            || !str_cmp( name, "nor") ||
-      !str_cmp( name, "nort")          || !str_cmp( name, "north") ||
-      !str_cmp( name, "so")            || !str_cmp( name, "sou") ||
-      !str_cmp( name, "sout")          || !str_cmp( name, "south") ||
-      !str_cmp( name, "ea")            || !str_cmp( name, "eas") ||
-      !str_cmp( name, "east")          || !str_cmp( name, "we") ||
-      !str_cmp( name, "wes")           || !str_cmp( name, "west") ||
-      !str_cmp( name, "up")            || !str_cmp( name, "do") ||
-      !str_cmp( name, "dow")           || !str_cmp( name, "down") ||
-      !str_cmp( name, "pcportal")      || !str_cmp( name, "portal") ||
-      !str_cmp( name, "only")          || !str_cmp( name, "piranha") ||
-      !str_cmp( name, "valkyre")       || !str_cmp( name, "it")
-      )
+   if (on_forbidden_name_list(name))
       return 1;
    
    return 0;
@@ -1771,4 +1745,29 @@ void update_command_lag_and_poison()
         else i->timer = 0;
       }
    }
+}
+
+/* check name to see if it is listed in the file of forbidden player names */
+bool on_forbidden_name_list(char *name)
+{
+   FILE *nameList;
+   char buf[MAX_STRING_LENGTH+1];
+   bool found = FALSE;
+   int i;
+
+   nameList = dc_fopen(FORBIDDEN_NAME_FILE, "ro");
+   if (!nameList) {
+      log("Failed to open forbidden name file!", 0, LOG_MISC);
+      return FALSE;
+   } else {
+      while (fgets(buf, MAX_STRING_LENGTH, nameList) && !found) {
+         /* chop off trailing \n */
+         if ((i = strlen(buf)) > 0)
+            buf[i-1] = '\0';
+         if (!str_cmp(name, buf))
+            found = TRUE;
+      }
+      dc_fclose(nameList);
+   }
+   return found;
 }

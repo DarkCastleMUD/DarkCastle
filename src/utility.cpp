@@ -11,8 +11,12 @@
  *                                                                         *
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
+ *                                                                         *
+ * Revision History                                                        *
+ * 10/18/2003   Onager     Changed CAN_SEE() to hide Onager from everyone  *
+ *                         except Pir and Valk                             *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.16 2003/06/22 23:08:29 pirahna Exp $ */
+/* $Id: utility.cpp,v 1.17 2003/10/19 05:47:42 staylor Exp $ */
 
 extern "C"
 {
@@ -576,6 +580,11 @@ bool CAN_SEE( struct char_data *sub, struct char_data *obj )
    {
       if(!obj->pcdata) // noncreated char
          return TRUE;
+
+      // TODO - temporarily hide me from everyone 'cept Pir and Valk - Onager
+      if (!strcasecmp(GET_NAME(obj), "Onager") && (strcasecmp(GET_NAME(sub), "Pirahna") || strcasecmp(GET_NAME(sub), "Valkyrie")))
+         return FALSE;
+
       if(GET_LEVEL(sub) < obj->pcdata->wizinvis) {
          if (obj->pcdata->incognito == TRUE) {
             if (sub->in_room != obj->in_room)
