@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.58 2003/01/25 04:18:17 pirahna Exp $ */
+/* $Id: magic.cpp,v 1.59 2003/02/13 22:36:32 pirahna Exp $ */
 
 extern "C"
 {
@@ -1138,8 +1138,13 @@ int spell_paralyze(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data
 
   set_cantquit( ch, victim );
 
+  int spellret = saves_spell(ch, victim, -10, SAVE_TYPE_MAGIC);
+
+  logf(IMP, LOG_BUG, "%s para attempt on %s.  Result: %d",
+       GET_NAME(ch), GET_NAME(victim), spellret);
+
   /* ideally, we would do a dice roll to see if spell hits or not */
-  if(saves_spell(ch, victim, -10, SAVE_TYPE_MAGIC) >= 0 && (victim != ch)) {
+  if(spellret >= 0 && (victim != ch)) {
       act("$N seems to be unaffected!", ch, NULL, victim, TO_CHAR, 0);
       if(!IS_NPC(victim)) {
          act("$n tried to paralyze you!", ch, NULL, victim, TO_VICT, 0);
@@ -8509,17 +8514,21 @@ int spell_rapid_mend(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
 {
     struct affected_type af;
 
-    if(!affected_by_spell(ch, SPELL_RAPID_MEND)) {
+    if(!affected_by_spell(victim, SPELL_RAPID_MEND)) {
        act("$n's starts to heal quicker.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-       act("You feel your body begin to heal quicker.", ch, 0, 0, TO_CHAR, 0);
+       send_to_char("You feel your body begin to heal quicker.", victim);
+
+       skill_increase_check(ch, SPELL_RAPID_MEND, skill, SKILL_INCREASE_MEDIUM);
 
        af.type = SPELL_RAPID_MEND;
-       af.duration = 10 + level/8;
-       af.modifier = level/10;
+       af.duration = 5 + skill/8;
+       af.modifier = skill/10;
        af.location = APPLY_NONE;
        af.bitvector = 0;
-       affect_to_char(ch, &af);
+       affect_to_char(victim, &af);
     }
+    else send_to_char("They are already mending quickly.\r\n", ch);
+
   return eSUCCESS;
 }
 
@@ -8527,15 +8536,15 @@ int cast_rapid_mend(byte level, CHAR_DATA *ch, char *arg, int type,
                         CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill) {
   switch(type) {
     case SPELL_TYPE_SPELL:
-      return spell_rapid_mend(level, ch, 0, 0, skill);
+      return spell_rapid_mend(level, ch, tar_ch, 0, skill);
       break;
     case SPELL_TYPE_POTION:
-      return spell_rapid_mend(level, ch, 0, 0, skill);
+      return spell_rapid_mend(level, ch, tar_ch, 0, skill);
       break;
     case SPELL_TYPE_SCROLL:
       if (tar_obj) return eFAILURE;
       if (!tar_ch) tar_ch = ch;
-      return spell_rapid_mend(level, tar_ch, 0, 0, skill);
+      return spell_rapid_mend(level, ch, tar_ch, 0, skill);
       break;
     default:
       log("Serious screw-up in rapid_mend!", ANGEL, LOG_BUG);
