@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.86 2003/08/12 03:45:34 pirahna Exp $ */
+/* $Id: magic.cpp,v 1.87 2003/10/09 17:27:12 pirahna Exp $ */
 
 extern "C"
 {
@@ -9288,6 +9288,7 @@ int spell_holy_aura(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
 
   af.type      = SPELL_HOLY_AURA_TIMER;
   af.duration  = 20;
+  affect_to_char(victim, &af);
 
   return eSUCCESS;
 }
