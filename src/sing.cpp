@@ -204,7 +204,7 @@ struct song_info_type song_info [ ] = {
 	NULL, NULL
 },
 { /* 19 */
-        8, POSITION_STANDING, 4, SKILL_SONG_FANATICAL_FANFARE,
+        8, POSITION_FIGHTING, 4, SKILL_SONG_FANATICAL_FANFARE,
        TAR_IGNORE, song_fanatical_fanfare, execute_song_fanatical_fanfare,pulse_song_fanatical_fanfare,
        intrp_song_fanatical_fanfare
 
@@ -1668,8 +1668,8 @@ int execute_song_fanatical_fanfare(byte level, CHAR_DATA *ch, char *arg, CHAR_DA
 
    for(fvictim = master->followers; fvictim; fvictim = fvictim->next)
    {
-      if(ch == fvictim->follower)
-         continue;
+//      if(ch == fvictim->follower)
+//         continue;
 
       if(!IS_SET(fvictim->follower->affected_by, AFF_GROUP))
          continue;
@@ -1693,7 +1693,7 @@ int execute_song_fanatical_fanfare(byte level, CHAR_DATA *ch, char *arg, CHAR_DA
       send_to_char("Your mind races at a thousand miles an hour, following the beat of the song!\r\n", fvictim->follower);
    }
 
-  if(ch != master)
+  //if(ch != master)
    if(ch->in_room == master->in_room)
    {
       SET_BIT(master->affected_by2, AFF_INSOMNIA);

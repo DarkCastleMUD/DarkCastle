@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.15 2004/05/17 18:34:51 urizen Exp $
+| $Id: wizard.cpp,v 1.16 2004/05/17 19:43:38 urizen Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -942,7 +942,7 @@ extern char * strs_damage_types[];
 		  );
 	  break;
       case ITEM_MEGAPHONE:
-	 sprintf(buf,"Interval(v1): %d\r\n", j->obj_flags.value[0]);
+	 sprintf(buf,"Interval(v1): %d\r\nInterval, again(v2): %d", j->obj_flags.value[0],j->obj_flags.value[1]);
  	 break;
       case ITEM_FIREWEAPON : 
 	  sprintf(buf, "$3Tohit(v1)$R: %d\n\r$3Todam(v2)d<v3)$R: %dD%d\n\r$3Type(v4)$R: %d",
