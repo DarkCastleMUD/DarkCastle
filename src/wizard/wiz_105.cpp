@@ -164,6 +164,7 @@ int do_sqedit(struct char_data *ch, char *argument, int cmd)
   {
      send_to_char("$2Syntax:$R sqedit <level/class> <skill> <value> OR\r\n"
                   "$2Syntax:$R sqedit message/new/delete <skillname>\r\n",ch);
+     send_to_char("$2Syntax:$R sqedit list.\r\n",ch);
      return eFAILURE;
   }
   int i;
@@ -186,6 +187,7 @@ int do_sqedit(struct char_data *ch, char *argument, int cmd)
   if (argument && *argument) {
     argument = one_argument(argument,arg2);
     strcpy(arg3,arg1);
+    strcat(arg3, " ");
     strcat(arg3,arg2);
     if ((skill = find_sq(arg3))!=NULL) 
       argument = one_argument(argument,arg2);
@@ -205,6 +207,11 @@ int do_sqedit(struct char_data *ch, char *argument, int cmd)
 	  i = find_skill_num(arg3);
 	if (i<=0)
 	  i = find_skill_num(arg1);
+	if (i<=0)
+	{
+	  send_to_char("Skill not found.\r\n",ch);
+	  return eFAILURE;
+	}
       #ifdef LEAK_CHECK
 	newOne = (struct skill_quest *) calloc(1, sizeof(struct skill_quest));
       #else
@@ -235,7 +242,7 @@ int do_sqedit(struct char_data *ch, char *argument, int cmd)
         break;
       }
     case 2:
-      send_to_char("Enter new message. End with ~.",ch);
+      send_to_char("Enter new message. End with ~.\r\n",ch);
       ch->desc->connected = CON_EDITING;
       ch->desc->str = &(skill->message);
       ch->desc->max_str = MAX_MESSAGE_LENGTH;
