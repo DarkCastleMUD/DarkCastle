@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.134 2003/12/28 19:56:52 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.135 2004/02/19 04:26:33 pirahna Exp $ */
 
 extern "C"
 {
@@ -2148,8 +2148,10 @@ void set_fighting(CHAR_DATA * ch, CHAR_DATA * vict)
     if (k->fighting == vict)
       count++;
   }
-    
-  if (count >= 6) {
+
+  if( ( !IS_NPC(ch) || IS_AFFECTED(ch, AFF_CHARM) ) 
+      && count >= 6 ) 
+  {
     send_to_char("You can't get close enough to fight.",ch);
     return;
   }
