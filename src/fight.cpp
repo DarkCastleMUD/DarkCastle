@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.217 2004/07/03 11:44:12 urizen Exp $ */
+/* $Id: fight.cpp,v 1.218 2004/07/03 17:58:44 urizen Exp $ */
 
 extern "C"
 {
@@ -1773,6 +1773,7 @@ void do_dam_msgs(CHAR_DATA *ch, CHAR_DATA *victim, int dam, int attacktype, int 
     for (messages = fight_messages[i].msg; j < nr && messages; j++)
       messages = messages->next;
     
+    if (!messages) return;
     if (!IS_NPC(victim) && GET_LEVEL(victim) >= IMMORTAL)
     {
       act(messages->god_msg.attacker_msg,
