@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.61 2004/05/31 19:48:32 urizen Exp $ */
+/* $Id: mob_proc.cpp,v 1.62 2004/06/01 02:12:50 urizen Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -2200,6 +2200,9 @@ int guild_guard(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     int dir = 0,clas=0, align = 0, dir2 = 0;
     // TODO - go through these and remove all of the ones that are in
     // room that no longer exist on the mud
+    // 3 = south, 2 = east, 5 = up
+    // 1 = north, 4  = west, 6 = down
+
     switch (world[ch->in_room].number)
     {
 	case 1978:
@@ -2226,7 +2229,8 @@ int guild_guard(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 	  dir = 3; clas = CLASS_RANGER; break;
         default: return eFAILURE;
     }
-    cmd++;
+    dir++;
+//    cmd++;
     if ((cmd == dir || cmd == dir2) && (
         (!IS_MOB(ch) && affected_by_spell(ch, FUCK_PTHIEF)) || 
 GET_CLASS(ch) != clas || (align == 1 && !IS_EVIL(ch)) || (align == 3 && 
