@@ -4291,7 +4291,7 @@ int do_sockets(struct char_data *ch, char *argument, int cmd)
    char name[200];
    char buf[MAX_STRING_LENGTH];
 
-   descriptor_data * d = 0;
+   descriptor_data * d = 0, *ad = 0;
 
    extern char *connected_states[];
 
@@ -4322,23 +4322,31 @@ int do_sockets(struct char_data *ch, char *argument, int cmd)
       {
         if (!CAN_SEE(ch, d->character))
            continue;
+	if (GET_LEVEL(ch) < GET_LEVEL(d->character)) continue;
         if ((d->connected != CON_PLAYING) &&
             (GET_LEVEL(ch) < GET_LEVEL(d->character)))
            continue;
       }
 
-      if(!d->character)
-         continue;
+//      if(!d->character)
+//       continue;
 
       // TODO - determine if I need to leave this uncommented for some reason
       if (*name &&
           !str_str(d->host, name) && !isname(name, GET_NAME(d->character)))
             continue; 
-
+      bool duplicate = FALSE;
+      for (ad = descriptor_list; ad; ad = ad->next)
+	if (ad != d && !str_cmp(d->host, ad->host))
+	if (!ad->character ||
+	    GET_LEVEL(ad->character) <= GET_LEVEL(ch))	   
+	{
+	   duplicate = TRUE;
+ 	   break;
+	}
       num_can_see++;
       
-      sprintf(buf + strlen(buf), "%3d : %-30s | %-16s", d->descriptor, d->host,
-        (d->character ? (d->character->name ? d->character->name : "NONE") : "NONE"));
+      sprintf(buf + strlen(buf), "%s%3d : %-30s | %-16s$R", duplicate? "$B$4":"", d->descriptor, d->host, (d->character ? (d->character->name ? d->character->name : "NONE") : "NONE"));
 
       if ((pStr = constindex(d->connected, connected_states)))
          sprintf(buf + strlen(buf), "%s\n\r", pStr);
