@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.17 2002/10/13 01:56:35 pirahna Exp $ */
+/* $Id: handler.cpp,v 1.18 2002/10/31 06:24:36 pirahna Exp $ */
     
 extern "C"
 {
@@ -1017,6 +1017,7 @@ int equip_char(CHAR_DATA *ch, struct obj_data *obj, int pos)
     {
 	if(IS_SET(obj->obj_flags.more_flags, ITEM_NO_TRADE)) {
 	    act("You are zapped by $p but it stays with you.", ch, obj, 0, TO_CHAR, 0);
+            obj_to_char(obj, ch);
             return 1;
         }
 	if (ch->in_room != NOWHERE) {
