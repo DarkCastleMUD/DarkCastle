@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: offense.cpp,v 1.3 2004/04/13 12:59:00 urizen Exp $
+| $Id: offense.cpp,v 1.4 2004/05/21 01:57:38 urizen Exp $
 | offense.C
 | Description:  Commands that are generically offensive - that is, the
 |   victim should retaliate.  The class-specific offensive commands are
@@ -32,6 +32,7 @@ extern "C"
 
 
 extern CWorld world;
+extern struct index_data *mob_index;
 
 // TODO - check differences between hit, murder, and kill....I think we can
 // just pull out alot of the code into a function.
@@ -214,7 +215,7 @@ int do_join(struct char_data *ch, char *argument, int cmd)
     count = atoi(victim_name);
     victim = world[ch->in_room].people;
     for(; victim; victim = victim->next_in_room)
-      if(IS_MOB(victim) && victim->mobdata->nr == count)
+      if(IS_MOB(victim) && mob_index[victim->mobdata->nr].virt == count)
         break;
     if(!victim)
        return eFAILURE;

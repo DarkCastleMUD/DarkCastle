@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.38 2004/05/18 00:17:41 urizen Exp $
+| $Id: objects.cpp,v 1.39 2004/05/21 01:57:38 urizen Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -40,7 +40,7 @@ extern bool improve;
 extern struct spell_info_type spell_info[MAX_SPL_LIST];
 extern struct active_object active_head;
 extern struct index_data *obj_index;
- 
+extern struct index_data *mob_index; 
 int FOUNTAINisPresent (CHAR_DATA *ch);
 int hands_are_free(CHAR_DATA *ch, int number);
 struct obj_data *get_object_in_equip_vis(struct char_data *ch,
@@ -1416,6 +1416,14 @@ void wear(struct char_data *ch, struct obj_data *obj_object, int keyword)
     return;
   }
 
+  if (IS_NPC(ch) && mob_index[ch->mobdata->nr].virt == 8)
+  {  // Golems can't wear all kinds of equipment. Poor sods.
+     if (keyword != 2 && keyword != 3 && keyword != 4 && keyword != 7 && keyword != 9)
+     {
+        do_say(ch, "Eerrrmm..?",0);
+	return;
+     }
+  }
   switch(keyword) {
   case 0: {
     if(CAN_WEAR(obj_object,ITEM_WEAR_FINGER)) {

@@ -1,7 +1,7 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.18 2004/05/07 23:18:02 urizen Exp $
+| $Id: character.h,v 1.19 2004/05/21 01:57:40 urizen Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
@@ -200,6 +200,7 @@ struct pc_data
     bool incognito;         // invis imms will be seen by people in same room
 
     bool possesing; 	      /*  is the person possessing? */
+    struct char_data *golem; // CURRENT golem. Yes? Yes? No?
 };
 
 struct mob_data

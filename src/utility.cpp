@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.24 2004/05/20 16:18:12 urizen Exp $ */
+/* $Id: utility.cpp,v 1.25 2004/05/21 01:57:38 urizen Exp $ */
 
 extern "C"
 {
@@ -722,8 +722,8 @@ int do_order(struct char_data *ch, char *argument, int cmd)
           act(buf,  victim, 0, ch, TO_CHAR, 0);
           act("$n gives $N an order.", ch, 0, victim, TO_ROOM, NOTVICT);
           if ( (victim->master!=ch) || 
-               !IS_AFFECTED(victim, AFF_CHARM) ||
-               IS_AFFECTED2(victim, AFF_FAMILIAR))
+               !(IS_AFFECTED(victim, AFF_CHARM) ||
+               IS_AFFECTED2(victim, AFF_FAMILIAR)))
              act("$n has an indifferent look.", victim, 0, 0, TO_ROOM, 0);
           else {
              send_to_char("Ok.\n\r", ch);
@@ -1085,6 +1085,7 @@ int do_quit(struct char_data *ch, char *argument, int cmd)
     do_sing(ch, "stop", 9);
 
   extractFamiliar(ch);
+//  extractGolem(ch);
   affect_from_char(ch, SPELL_IRON_ROOTS);
 
   if(ch->beacon)
@@ -1158,7 +1159,8 @@ int do_save(struct char_data *ch, char *argument, int cmd)
     }
 
     save_char_obj(ch);
-
+	void save_golem_data(CHAR_DATA *ch);
+    if (ch->pcdata->golem) save_golem_data(ch); // Golem data, eh!
     return eSUCCESS;
 }
 

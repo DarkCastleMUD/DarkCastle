@@ -21,7 +21,7 @@
  *  12/08/2003   Onager    Added check for charmies and !charmie eq to     *
  *                         equip_char()                                    *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.48 2004/05/18 00:17:40 urizen Exp $ */
+/* $Id: handler.cpp,v 1.49 2004/05/21 01:57:37 urizen Exp $ */
     
 extern "C"
 {
@@ -1060,7 +1060,7 @@ void affect_remove( CHAR_DATA *ch, struct affected_type *af, int flags, bool aff
          remove_memory(ch, 'h');
          if (ch->master)
          {
-            if (!(flags & SUPPRESS_CONSEQUENCES))
+            if (!(flags & SUPPRESS_CONSEQUENCES) && GET_CLASS(ch->master) != CLASS_RANGER)
                add_memory(ch, GET_NAME(ch->master), 'h');
             stop_follower(ch, BROKE_CHARM);
          }

@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.86 2004/05/18 20:58:57 urizen Exp $ */
+/* $Id: spells.cpp,v 1.87 2004/05/21 01:57:38 urizen Exp $ */
 
 extern "C"
 {
@@ -427,7 +427,7 @@ cast_resist_energy },
  { /* 121 */ 12, POSITION_STANDING, 20, 
 TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_staunchblood },
 
- { /* 122 */ 24, POSITION_STANDING, 300, TAR_CHAR_ROOM, cast_create_golem 
+ { /* 122 */ 24, POSITION_STANDING, 300, TAR_IGNORE, cast_create_golem 
 },
 
  { /* 123 */ 12, POSITION_STANDING, 60, TAR_IGNORE, spell_reflect },
@@ -912,12 +912,19 @@ void stop_follower(CHAR_DATA *ch, int cmd)
 */
 //  if(IS_AFFECTED(ch, AFF_CHARM)) {
   if(cmd == BROKE_CHARM) {
+
+   if (GET_CLASS(ch->master) != CLASS_RANGER) {
     act("You realize that $N is a jerk!", ch, 0, ch->master, TO_CHAR, 0);
     act("$n is free from the bondage of the spell.", ch, 0, 0, TO_ROOM, 0);
     act("$n hates your guts!", ch, 0, ch->master, TO_VICT, 0);
+   } else {
+    act("You lose interest in $N.",ch,0,ch->master, TO_CHAR, 0);
+     act("$n loses interest in $N.",ch,0, ch->master, TO_ROOM, NOTVICT);
+     act("$n loses interest in you, and goes back to its business.",ch,0,ch->master,TO_VICT,0);
+  }
     if (ch->fighting && ch->fighting != ch->master)
     {
-      do_say(ch, "Screw this, I'm going home!",9);
+      do_say(ch, "Screw this, I'm going home!",0);
       stop_fighting(ch->fighting);
       stop_fighting(ch);
     }

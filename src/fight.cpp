@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.196 2004/05/20 15:07:34 urizen Exp $ */
+/* $Id: fight.cpp,v 1.197 2004/05/21 01:57:37 urizen Exp $ */
 
 extern "C"
 {
@@ -3821,6 +3821,7 @@ int can_attack(CHAR_DATA *ch)
     return FALSE;
   if(is_stunned(ch))
     return FALSE;
+
   return TRUE;
 }
 
@@ -3863,6 +3864,12 @@ int can_be_attacked(CHAR_DATA *ch, CHAR_DATA *vict)
     return FALSE;
   }
   
+  if (IS_NPC(ch) && !IS_NPC(vict) && IS_AFFECTED(ch, AFF_CHARM))
+  { // New charmie stuff. No attacking pcs unless yer master's a ranger. 
+    // Those guys are soo convincing.
+    if (!ch->master) return FALSE; // What the hell?
+    if (GET_CLASS(ch->master) != CLASS_RANGER) return FALSE;
+  }
   if(IS_SET(world[ch->in_room].room_flags, SAFE))
   {
     /* Allow the NPCs to continue fighting */
