@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.37 2004/04/14 21:45:04 urizen Exp $ */
+/* $Id: nanny.cpp,v 1.38 2004/04/17 14:34:40 urizen Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -566,7 +566,8 @@ void nanny(struct descriptor_data *d, char *arg)
       
       else if((wizlock) && strcmp(GET_NAME(ch),"Sadus") &&
          strcmp(GET_NAME(ch),"Pirahna") &&
-         strcmp(GET_NAME(ch),"Valkyrie"))
+         strcmp(GET_NAME(ch),"Valkyrie") &&  strcmp(GET_NAME(ch), "Apocalypse")
+         && strcmp(GET_NAME(ch), "Urizen"))
       {
          SEND_TO_Q( "The game is wizlocked.\n\r", d );
          close_socket( d );
