@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_ranger.cpp,v 1.4 2002/07/12 00:12:48 pirahna Exp $ | cl_ranger.C |
+| $Id: cl_ranger.cpp,v 1.5 2002/07/13 17:14:14 pirahna Exp $ | cl_ranger.C |
 Description: Ranger skills/spells */ extern "C"  {
   #include <string.h>
 }
@@ -662,19 +662,23 @@ int find_door(CHAR_DATA *ch, char *type, char *dir)
 
 int do_open(CHAR_DATA *ch, char *argument, int cmd)
 {
-    int door, other_room;
+    int door, other_room, retval;
     char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
     struct room_direction_data *back;
     struct obj_data *obj;
     CHAR_DATA *victim;
+    CHAR_DATA *next_vict;
+
+    int do_fall(CHAR_DATA *ch, short dir);
+
+    retval = 0;
 
     argument_interpreter(argument, type, dir);
 
     if (!*type)
 	send_to_char("Open what?\n\r", ch);
-    else if (generic_find(argument, FIND_OBJ_INV | FIND_OBJ_ROOM,
-	ch, &victim, &obj))
-
+    else if (generic_find(argument, FIND_OBJ_INV | FIND_OBJ_ROOM, ch, &victim, &obj))
+    {
 	// this is an object
 
 	if (obj->obj_flags.type_flag != ITEM_CONTAINER)
@@ -691,6 +695,7 @@ int do_open(CHAR_DATA *ch, char *argument, int cmd)
 	    send_to_char("Ok.\n\r", ch);
 	    act("$n opens $p.", ch, obj, 0, TO_ROOM, 0);
 	}
+    }
     else if ((door = find_door(ch, type, dir)) >= 0)
 
 	/* perhaps it is a door */
@@ -748,8 +753,36 @@ int do_open(CHAR_DATA *ch, char *argument, int cmd)
 			    send_to_room(
 			    "The door is opened from the other side.\n\r",
 			    EXIT(ch, door)->to_room);
-		    }                        
+		    }  
+                      
+	    if((IS_SET(world[ch->in_room].room_flags, FALL_DOWN) && (door = 5)) ||
+	       (IS_SET(world[ch->in_room].room_flags, FALL_UP) && (door = 4)) ||
+	       (IS_SET(world[ch->in_room].room_flags, FALL_EAST) && (door = 1)) ||
+	       (IS_SET(world[ch->in_room].room_flags, FALL_WEST) && (door = 3)) ||
+	       (IS_SET(world[ch->in_room].room_flags, FALL_SOUTH) && (door = 2)) ||
+	       (IS_SET(world[ch->in_room].room_flags, FALL_NORTH) && (door = 0))) 
+	    {
+                int success = 0;
+
+	        // opened the door that kept them from falling out
+	        for(victim = world[ch->in_room].people; victim; victim = next_vict)
+                {
+                   next_vict = victim->next_in_room;
+                   if(IS_NPC(victim) || IS_AFFECTED(victim, AFF_FLYING))
+                      continue;
+                   if(!success) {
+                      send_to_room("With the door no longer closed for support, this areas strange gravity takes over!\r\n", victim->in_room);
+                      success = 1;
+                   }
+                   if(victim == ch)
+                      retval = do_fall(victim, door);
+                   else do_fall(victim, door);
+                }
+	    }
 	}
+  // in case ch died or anything
+  if(retval)
+     return retval;
   return eSUCCESS;
 }
 
