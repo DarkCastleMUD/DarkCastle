@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.141 2004/04/15 08:20:38 urizen Exp $ */
+/* $Id: fight.cpp,v 1.142 2004/04/15 19:18:38 urizen Exp $ */
 
 extern "C"
 {
@@ -164,6 +164,7 @@ void perform_violence(void)
      stop_fighting(ch);
      continue;
    }
+
     if(can_attack(ch)) {
       is_mob = IS_MOB(ch);
       if(is_mob) {
