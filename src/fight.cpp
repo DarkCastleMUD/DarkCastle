@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.102 2003/03/17 03:38:45 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.103 2003/03/21 22:04:53 pirahna Exp $ */
 
 extern "C"
 {
@@ -1327,13 +1327,7 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
     if(check_parry(ch, victim)) {
       if(typeofdamage == DAMAGE_TYPE_PHYSICAL)
       {
-        int last_class = GET_CLASS(ch);
-        int retval = damage_retval(ch, victim, check_riposte(ch, victim));
-        if(GET_CLASS(ch) != last_class && !IS_SET(retval, eCH_DIED)) {
-           csendf(ch, "The mud just freaked out.  Contact Pir immediatly with a log of the last fight.\r\n");
-           return (retval | eCH_DIED);
-        }
-        return retval;
+        return damage_retval(ch, victim, check_riposte(ch, victim));
       }
     }
     if (check_dodge(ch, victim))
@@ -1692,7 +1686,6 @@ int check_riposte(CHAR_DATA * ch, CHAR_DATA * victim)
   int learned;
   int chance;
   int retval;
-  int newretval = 0;
   
   if((IS_SET(victim->combat, COMBAT_STUNNED)) ||
     (ch->equipment[WIELD] == NULL && number(1, 101) >= 50) ||
@@ -1740,10 +1733,10 @@ int check_riposte(CHAR_DATA * ch, CHAR_DATA * victim)
   retval = one_hit(victim, ch, TYPE_UNDEFINED, FIRST);
   retval = SWAP_CH_VICT(retval);
 
-  REMOVE_BIT(newretval, eSUCCESS);
-  SET_BIT(newretval, eFAILURE);
+  REMOVE_BIT(retval, eSUCCESS);
+  SET_BIT(retval, eFAILURE);
   
-  return newretval;  
+  return retval;  
 }
 
 

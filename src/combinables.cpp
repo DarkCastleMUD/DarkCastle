@@ -78,6 +78,11 @@ struct trade_data_type poison_vial_data[] =
      25         // a vial of vampire kiss
    },
 
+   { { 697, 1569, -1, -1, -1, -1, -1, -1, -1, -1 },  // vial, flaxen vine
+     692,
+     30         // a vial of flaxen veleno
+   },
+
    // This must come last
    { { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
      -1,
@@ -105,6 +110,10 @@ struct thief_poison_data poison_vial_combat_data[] =
 
    {
       "vampire kiss poison"
+   },
+
+   {
+      "flaxen valeno"
    },
 
    {
@@ -364,6 +373,13 @@ int handle_poisoned_weapon_attack(char_data * ch, char_data * vict, int type)
 
       case 3: // vampire kiss
          retval = cast_vampiric_touch(6, ch, "", SPELL_TYPE_SPELL, vict, 0, 35);
+         break;
+
+      case 4: // flaxen veleno
+         if(saves_spell(ch, vict, 1, SAVE_TYPE_POISON) < 0)
+           dam = 40;
+         else dam = 20;
+         retval = damage(ch, vict, dam, TYPE_POISON, POISON_MESSAGE_BASE+type, 0);         
          break;
 
       default:

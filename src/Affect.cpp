@@ -43,6 +43,8 @@ CAffect::CAffect()
    spellduration = -1;
    combatduration = -1;
    modifier = 0;
+
+   myownerlist = NULL;
 }
 
 CAffect::CAffect(CAffect & rhs)
@@ -54,6 +56,34 @@ CAffect::CAffect(CAffect & rhs)
    spellduration = rhs.spellduration;
    combatduration = rhs.combatduration;
    modifier = rhs.modifier;
+
+   myownerlist = NULL;
+}
+
+void CAffect::updateCombatTimer()
+{
+   if(-1 == combatduration)  // infinite
+      return;
+
+   combatduration--;   
+
+   assert(myownerlist);
+
+   if(combatduration < 1)
+      myownerlist->removeAffect(*this);
+}
+
+void CAffect::updateTickTimer()
+{
+   if(-1 == spellduration) // infinite
+      return;
+
+   spellduration--;
+
+   assert(myownerlist);
+
+   if(spellduration < 1)
+      myownerlist->removeAffect(*this);
 }
 
 void CAffect::setType(uint32 val)
