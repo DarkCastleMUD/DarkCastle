@@ -7,7 +7,7 @@
 /* Revision History                                                          */
 /* 12/09/2003   Onager   Tweaked do_join() to remove combat-related bits     */
 /*****************************************************************************/
-/* $Id: arena.cpp,v 1.7 2004/07/25 05:53:41 rahz Exp $ */
+/* $Id: arena.cpp,v 1.8 2004/07/25 07:32:52 rahz Exp $ */
 
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
@@ -36,6 +36,7 @@ THIS STUFF NOW DEFINED IN ARENA.H
 #define ARENA_LOW 14600
 #define ARENA_HI  14681
 */
+
 int arena[4] = { 0, 0, 0, 0 };
 
 /* External functions */
@@ -64,7 +65,7 @@ int do_arena(CHAR_DATA *ch, char *arg, int cmd)
                  "Do *NOT* leave the arena open, people will be stuck there"
                  " forever!\n\r"
                  "Also the arena can be opened without specifying the number"
-                 " of mortals allowed to join.", ch);
+                 " of mortals allowed to join.\n\r", ch);
     return eSUCCESS;
   }
 
@@ -102,7 +103,7 @@ int do_arena(CHAR_DATA *ch, char *arg, int cmd)
           logf(111, LOG_CHAOS, "%s started a CC.", GET_NAME(ch));
       }
       if(arena[2] == -3) {
-          sprintf(buf, "## Special POTATO Arena!!\r\n");
+          sprintf(buf, "##$4$B Special POTATO Arena!!$R\r\n");
           send_info(buf);
       }
   }
@@ -115,6 +116,9 @@ int do_joinarena(CHAR_DATA *ch, char *arg, int cmd)
   char buf[256];
   int send_to = NOWHERE;
   struct affected_type *af, *next_af;
+  int pot_low = 6362;
+  int pot_hi  = 6379;
+
   if(arena[0] > GET_LEVEL(ch) || arena[1] < GET_LEVEL(ch)) {
     send_to_char("The arena is not open for anyone your level.\n\r", ch);
     return eFAILURE;
@@ -170,7 +174,11 @@ int do_joinarena(CHAR_DATA *ch, char *arg, int cmd)
       TO_ROOM, 0);
   while(send_to == NOWHERE)
   {
-    send_to = real_room(number(ARENA_LOW, ARENA_HI));
+    if (arena[2] == -3) { // potato arena
+      send_to = real_room(number(pot_low, pot_hi));
+    } else {
+      send_to = real_room(number(ARENA_LOW, ARENA_HI));
+    }
   }
   if(move_char(ch, send_to) == 0) return eFAILURE;
   act("$n appears, preparing for battle.", ch, 0, 0, TO_ROOM, 0);

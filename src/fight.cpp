@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.235 2004/07/25 05:53:41 rahz Exp $ */
+/* $Id: fight.cpp,v 1.236 2004/07/25 07:32:52 rahz Exp $ */
 
 extern "C"
 {
@@ -3817,7 +3817,7 @@ void arena_kill(CHAR_DATA *ch, CHAR_DATA *victim, int type)
   // remove_nosave(victim);
   
   move_player_home(victim);
-bool isaff2(int spellnum);
+  bool isaff2(int spellnum);
   
   while(victim->affected)
     affect_remove(victim, victim->affected, SUPPRESS_ALL, isaff2(victim->affected->type));  
@@ -4433,6 +4433,30 @@ void remove_nosave(CHAR_DATA *vict)
     
   } // for
 }  
+
+void remove_active_potato(CHAR_DATA *vict)
+{
+  struct obj_data *obj, *next_obj;
+
+  if(!vict) {
+    log("Null victim sent to remove_active_potato!", OVERSEER, LOG_BUG);
+    return;
+  }
+
+  if((vict->in_room >= 0 && vict->in_room <= top_of_world) &&
+    IS_SET(world[vict->in_room].room_flags, ARENA)) {
+    ;
+  } else {
+    return;
+  }
+
+  for(obj = vict->carrying; obj; obj = next_obj) {
+    next_obj = obj->next_content;
+    if (obj_index[obj->item_number].virt == 383 && obj->obj_flags.value[3] > 0)
+      obj_from_char(obj);
+
+  }
+}
 
 int damage_type(int weapon_type)
 {
