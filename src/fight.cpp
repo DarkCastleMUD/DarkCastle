@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.124 2003/07/19 23:17:04 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.125 2003/07/22 03:10:45 pirahna Exp $ */
 
 extern "C"
 {
@@ -3321,8 +3321,63 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim)
   else if(IS_AFFECTED2(ch, AFF_FAMILIAR) && ch->master)
     sprintf(killer_message,"\n\r##%s was just DEFEATED in battle by %s's familiar!\n\r",
           GET_NAME(victim), GET_NAME(ch->master));
-  else sprintf(killer_message,"\n\r##%s was just DEFEATED in battle by %s!\n\r", 
+  else if(IS_AFFECTED(ch, AFF_CHARM) && ch->master)
+    sprintf(killer_message,"\n\r##%s was just DEFEATED in battle by %s's charmie!\n\r",
+          GET_NAME(victim), GET_NAME(ch->master));
+  else if(IS_ANONYMOUS(ch))
+    sprintf(killer_message,"\n\r##%s was just DEFEATED in battle by %s!\n\r", 
           GET_NAME(victim), GET_NAME(ch));
+  else switch(GET_CLASS(ch))
+  {
+    case CLASS_MAGIC_USER:
+      sprintf(killer_message,"\n\r##%s was just FRIED by %s's magic!\n\r", 
+          GET_NAME(victim), GET_NAME(ch));
+      break;
+    case CLASS_CLERIC:
+      sprintf(killer_message,"\n\r##%s was just BANISHED by %s's holiness!\n\r", 
+          GET_NAME(victim), GET_NAME(ch));
+      break;
+    case CLASS_THIEF:
+      sprintf(killer_message,"\n\r##%s was just ASSASSINATED by %s!\n\r", 
+          GET_NAME(victim), GET_NAME(ch));
+      break;
+    case CLASS_WARRIOR:
+      sprintf(killer_message,"\n\r##%s was just SLAIN by %s's might!\n\r", 
+          GET_NAME(victim), GET_NAME(ch));
+      break;
+    case CLASS_ANTI_PAL:
+      sprintf(killer_message,"\n\r##%s was just CONSUMED by %s's darkness!\n\r", 
+          GET_NAME(victim), GET_NAME(ch));
+      break;
+    case CLASS_PALADIN:
+      sprintf(killer_message,"\n\r##%s was just VANQUISHED by %s's goodness!\n\r", 
+          GET_NAME(victim), GET_NAME(ch));
+      break;
+    case CLASS_BARBARIAN:
+      sprintf(killer_message,"\n\r##%s was just SHREDDED by %s's crazed fury!\n\r", 
+          GET_NAME(victim), GET_NAME(ch));
+      break;
+    case CLASS_MONK:
+      sprintf(killer_message,"\n\r##%s was just SHATTERED by %s's karma!\n\r", 
+          GET_NAME(victim), GET_NAME(ch));
+      break;
+    case CLASS_RANGER:
+      sprintf(killer_message,"\n\r##%s was just PENETRATED by %s's wood!\n\r", 
+          GET_NAME(victim), GET_NAME(ch));
+      break;
+    case CLASS_BARD:
+      sprintf(killer_message,"\n\r##%s was just MUTED by %s's snazzy rhythm!\n\r", 
+          GET_NAME(victim), GET_NAME(ch));
+      break;
+    case CLASS_DRUID:
+      sprintf(killer_message,"\n\r##%s was just VIOLATED by %s's woodland friends!\n\r", 
+          GET_NAME(victim), GET_NAME(ch));
+      break;
+    default:
+      sprintf(killer_message,"\n\r##%s was just DEFEATED in battle by %s!\n\r", 
+          GET_NAME(victim), GET_NAME(ch));
+      break;
+  }
 
   // have to be level 10 and linkalive to count as a pkill and not yourself
   // (we check earlier to make sure victim isn't a mob)
