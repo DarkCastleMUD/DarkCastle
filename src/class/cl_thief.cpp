@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.56 2004/05/20 02:10:02 urizen Exp $
+| $Id: cl_thief.cpp,v 1.57 2004/05/22 20:00:55 urizen Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -232,7 +232,7 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
      ((GET_CLASS(ch) == CLASS_THIEF) || (GET_LEVEL(ch) >= ARCHANGEL)) &&
      (ch->equipment[SECOND_WIELD])                                    &&
      ((ch->equipment[SECOND_WIELD]->obj_flags.value[3] == 11) ||
-       (ch->equipment[SECOND_WIELD]->obj_flags.value[3] == 8))        &&
+       (ch->equipment[SECOND_WIELD]->obj_flags.value[3] == 9))        &&
      has_skill(ch, SKILL_DUAL_BACKSTAB)
     )
   {
@@ -333,7 +333,7 @@ int do_circle(CHAR_DATA *ch, char *argument, int cmd)
           ((GET_CLASS(ch) == CLASS_THIEF) || (GET_LEVEL(ch) >= ARCHANGEL)))
          if (ch->equipment[SECOND_WIELD])
             if ((ch->equipment[SECOND_WIELD]->obj_flags.value[3] == 11) ||
-                (ch->equipment[SECOND_WIELD]->obj_flags.value[3] == 8)) {
+                (ch->equipment[SECOND_WIELD]->obj_flags.value[3] == 9)) {
                WAIT_STATE(ch, PULSE_VIOLENCE);
 
                if (AWAKE(victim) && skill_success(ch,victim,SKILL_DUAL_BACKSTAB))
