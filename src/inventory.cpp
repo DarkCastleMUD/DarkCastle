@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.13 2002/09/06 23:27:23 dcastle Exp $
+| $Id: inventory.cpp,v 1.14 2002/09/12 00:00:40 pirahna Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -1129,8 +1129,17 @@ struct obj_data * search_char_for_item(char_data * ch, sh_int item_number)
   int k;
 
   for (k=0; k< MAX_WEAR; k++) {
-    if (ch->equipment[k] && ch->equipment[k]->item_number == item_number)
-      return ch->equipment[k];
+    if (ch->equipment[k])
+    {
+      if(ch->equipment[k]->item_number == item_number)
+        return ch->equipment[k];
+      if(GET_ITEM_TYPE(ch->equipment[k]) == ITEM_CONTAINER) { // search inside
+        for(j = ch->equipment[k]->contains; j ; j = j->next_content) {
+          if(j->item_number == item_number)
+            return j;
+        }
+      }
+    }
   }
       
   for(i = ch->carrying; i ; i = i->next_content) {
