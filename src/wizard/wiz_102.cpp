@@ -2419,7 +2419,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd)
       "intelligence",
       "wisdom",
       "constitution",
-      "new"
+      "new",
       "\n"
     };
    
