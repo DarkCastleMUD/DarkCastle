@@ -1,7 +1,7 @@
 #ifndef PLAYER_H_
 #define PLAYER_H_
 /************************************************************************
-| $Id: player.h,v 1.6 2003/03/04 05:19:14 pirahna Exp $
+| $Id: player.h,v 1.7 2003/06/05 00:54:54 pirahna Exp $
 | player.h
 | Description: This file defines the player vectors..punishment, specials,
 |   etc...
@@ -35,7 +35,9 @@
 #define LOG_WORLD          1<<15
 #define LOG_CHAOS          1<<16
 #define LOG_CLAN           1<<17
-#define MISC_IS_MOB        1<<18
+#define LOG_WARNINGS       1<<18
+// ...
+#define MISC_IS_MOB        1<<31
 
 /************************************************************************
 | Thirst, FULL, etc..
