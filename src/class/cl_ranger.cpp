@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_ranger.cpp,v 1.16 2002/09/10 22:49:23 pirahna Exp $ | cl_ranger.C |
+| $Id: cl_ranger.cpp,v 1.17 2002/09/17 19:51:30 pirahna Exp $ | cl_ranger.C |
 Description: Ranger skills/spells */ extern "C"  {
   #include <string.h>
 }
@@ -443,7 +443,7 @@ int ambush(CHAR_DATA *ch)
 
 int do_ambush(CHAR_DATA *ch, char *arg, int cmd)
 {
-  char buf[MAX_INPUT_LENGTH];
+  char buf[MAX_STRING_LENGTH];
   int learned;
 
   if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
@@ -477,6 +477,12 @@ int do_ambush(CHAR_DATA *ch, char *arg, int cmd)
   }
 
   sprintf(buf, "You will now ambush %s on sight.\n\r", arg);
+
+  // TODO - remove this later after I've watched for Bushmaster to do it a few times
+  if(strlen(buf) > MAX_INPUT_LENGTH)
+    logf(OVERSEER, LOG_BUG, "%s just tried to crash the mud with a huge ambush string (%s)",
+          GET_NAME(ch), arg);
+
   send_to_char(buf, ch);
   dc_free(ch->ambush);
   ch->ambush = str_dup(arg);
