@@ -2,7 +2,7 @@
 #define CLAN_H_
 
 /************************************************************************
-| $Id: clan.h,v 1.4 2002/06/29 18:16:22 pirahna Exp $
+| $Id: clan.h,v 1.5 2002/12/31 05:20:38 dcastle Exp $
 | clan.h
 | Description:  Header information for clans.
 */
@@ -10,6 +10,7 @@
 void clan_login(char_data * ch);
 void clan_logout(char_data * ch);
 int has_right(char_data * ch, uint32 bit);
+struct clan_data * get_clan(int nClan);
 
 #define CLAN_RIGHTS_ACCEPT       1
 #define CLAN_RIGHTS_OUTCAST      1<<1
@@ -21,6 +22,8 @@ int has_right(char_data * ch, uint32 bit);
 #define CLAN_RIGHTS_MESSAGES     1<<7
 #define CLAN_RIGHTS_INFO         1<<8
 // if you add to the clan rights, update clan_rights[] in clan.C
+
+#define CLAN_MAX_MEMBERS   5
 
 
 struct clan_room_data
@@ -56,6 +59,7 @@ struct clan_data
   char * login_message;
   char * death_message;
   char * logout_message;
+  char * clanmotd;
 
   uint16 number;
   clan_room_data * rooms;

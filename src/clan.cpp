@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.6 2002/12/26 21:47:16 pirahna Exp $ */
+/* $Id: clan.cpp,v 1.7 2002/12/31 05:20:33 dcastle Exp $ */
 extern "C"
 {
   #include <string.h> // strcat
@@ -38,7 +38,6 @@ void add_clan_member(struct clan_data * theClan, struct char_data * ch);
 void remove_clan_member(struct clan_data * theClan, struct char_data * ch);
 void remove_clan_member(int clannumber, struct char_data * ch);
 void free_member(struct clan_member_data * member);
-struct clan_data * get_clan(int nClan);
 struct clan_member_data * get_member(char * strName, int nClanId);
 
 char * clan_rights[] = {
@@ -117,6 +116,10 @@ void boot_clans(void)
         }
         case 'D': {
           new_new_clan->description = fread_string(fl, 0);
+          break;
+        }
+        case 'C': {
+          new_new_clan->clanmotd = fread_string(fl, 0);
           break;
         }
         case 'L': {
@@ -199,6 +202,9 @@ void save_clans(void)
      
      if(pclan->logout_message)
        fprintf(fl, "O\n%s~\n", pclan->logout_message);
+
+     if(pclan->clanmotd)
+       fprintf(fl, "C\n%s~\n", pclan->clanmotd);
 
      for(pmember = pclan->members; pmember; pmember = pmember->next) {
        fprintf(fl, "M\n%s~\n", pmember->member_name);
@@ -511,6 +517,17 @@ int has_right(struct char_data * ch, uint32 bit)
   return IS_SET(pmember->member_rights, bit);  
 }
 
+int num_clan_members(struct clan_data * clan)
+{
+  int i = 0;
+  for(struct clan_member_data * pmem = clan->members;
+      pmem;
+      pmem = pmem->next)
+    i++;
+
+  return i;
+}
+
 struct clan_data * get_clan(int nClan)
 {
   struct clan_data *clan = NULL;
@@ -718,6 +735,11 @@ int do_accept(CHAR_DATA *ch, char *arg, int cmd)
     return eFAILURE;
   }
 
+  if(num_clan_members(clan) >= CLAN_MAX_MEMBERS) {
+    send_to_char("Your clan is already at the member maximum.\r\n", ch);
+    return eFAILURE;
+  }
+
   victim->clan = ch->clan;
   add_clan_member(clan, victim);
   save_clans();
@@ -783,9 +805,6 @@ int do_outcast(CHAR_DATA *ch, char *arg, int cmd)
     return eSUCCESS;
   }
 
-/* fix by pirahna to keep people from outcasting people in other clans
-*  4/26/97
-*/
   if(victim->clan != ch->clan) {
     send_to_char("That person isn't in your clan!\r\n", ch);
     return eFAILURE;
@@ -895,6 +914,46 @@ int clan_desc(CHAR_DATA *ch, char *arg)
 
   ch->desc->connected = CON_EDITING;
   ch->desc->str = &clan->description;
+  ch->desc->max_str = MAX_CLAN_DESC_LENGTH;
+  return 1;
+}
+
+int clan_motd(CHAR_DATA *ch, char *arg)
+{
+  struct clan_data * clan = 0;
+
+  char buf[MAX_STRING_LENGTH];
+  char text[MAX_INPUT_LENGTH];
+
+  clan = get_clan(ch);
+  arg = one_argumentnolow(arg, text);
+
+  if(!strncmp(text, "delete", 6))
+  {
+    if(clan->clanmotd)
+      dc_free(clan->clanmotd);
+    clan->clanmotd = NULL;
+    send_to_char("Clan motd removed.\r\n", ch);
+    return 1;
+  }
+
+  if(strcmp(text, "change"))
+  {
+    sprintf(buf, "Syntax:  clans motd change\r\n\r\nCurrent motd: %s\r\n",
+            clan->clanmotd ? clan->clanmotd : "(No Motd)");
+    send_to_char(buf, ch);
+    send_to_char("To not have any motd use:  clans motd delete\r\n", ch);
+    return 0;
+  }
+
+  if(clan->clanmotd)
+    dc_free(clan->clanmotd);
+  clan->clanmotd = NULL;
+
+  send_to_char("Write new motd.  ~ to end.\r\n", ch);
+
+  ch->desc->connected = CON_EDITING;
+  ch->desc->str = &clan->clanmotd;
   ch->desc->max_str = MAX_CLAN_DESC_LENGTH;
   return 1;
 }
@@ -1172,6 +1231,8 @@ void do_clan_list(CHAR_DATA *ch)
            clan->number);
      send_to_char(buf, ch);
   }
+
+  csendf(ch, "\r\nClans currently limited to %d members.\r\n", CLAN_MAX_MEMBERS);
 }
 
 void do_clan_member_list(CHAR_DATA *ch)
@@ -1301,7 +1362,7 @@ void do_god_clans(CHAR_DATA *ch, char *arg, int cmd)
           "create", "rename", "leader", "delete", "addroom",
           "list", "save", "showrooms", "killroom", "email", 
           "description", "login", "logout", "death", "members", 
-          "rights", "\n"
+          "rights", "motd", "\n"
   };
 
   arg = one_argumentnolow(arg, select);
@@ -1740,6 +1801,32 @@ void do_god_clans(CHAR_DATA *ch, char *arg, int cmd)
       ch->clan = i;
       break;
     }
+    case 16: { // motd
+      
+      arg = one_argumentnolow(arg, text);
+      one_argumentnolow(arg, last);
+
+      if(!*text || !*last) {
+        send_to_char("Syntax: clans motd <clannumber> change\r\n", ch);
+        send_to_char("To not have any motd use:  clans motd <clannumber> delete\r\n", ch);
+        return;
+      }
+
+      x = atoi(text);
+      tarclan = get_clan(x);
+
+      if(!tarclan) {
+        send_to_char("Invalid clan number.\r\n", ch);
+        return;
+      }
+
+      i = ch->clan;
+      ch->clan = x;
+      clan_motd(ch, last);
+      ch->clan = i;
+      
+      break;
+    }
     default: {
       send_to_char("Default hit in clans switch statement.\r\n", ch);
       return;
@@ -1773,6 +1860,7 @@ void do_leader_clans(CHAR_DATA *ch, char *arg, int cmd)
           "death", 
           "members", 
           "rights",
+          "motd",
           "\n"
   };
 
@@ -1881,6 +1969,12 @@ void do_leader_clans(CHAR_DATA *ch, char *arg, int cmd)
     case 7: // rights
     {
       do_clan_rights(ch, arg);
+      break;
+    }
+    case 8: // motd
+    {
+      if(clan_motd(ch, arg))
+        save_clans();
       break;
     }
     default: {

@@ -11,7 +11,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.21 2002/12/26 22:07:48 dcastle Exp $ */
+/* $Id: nanny.cpp,v 1.22 2002/12/31 05:20:33 dcastle Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -603,6 +603,10 @@ void nanny(struct descriptor_data *d, char *arg)
         send_to_char(motd, d->character);
       else send_to_char(imotd, d->character);
 
+      struct clan_data * clan;
+      if((clan = get_clan(ch->clan)) && clan->clanmotd)
+         send_to_char(clan->clanmotd, ch);
+        
       sprintf(log_buf, "\n\rLast connected from:\n\r%s\n\r", ch->pcdata->last_site); 
       SEND_TO_Q(log_buf, d);
       
