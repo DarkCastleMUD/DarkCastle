@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.9 2002/08/11 15:29:32 pirahna Exp $ */
+/* $Id: mob_proc2.cpp,v 1.10 2002/08/23 16:30:36 pirahna Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -589,7 +589,7 @@ int mortician(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
        send_to_char("You can't afford that!\n\r", ch);
        return eSUCCESS;
      } 
-     obj->obj_flags.timer = 1;
+//     obj->obj_flags.timer = 1;
      if(has_consent) {
        move_obj(obj, ch->in_room);
        send_to_char("The mortician goes into his freezer and returns with a corpse, which he\n\r"
