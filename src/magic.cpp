@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.46 2002/12/27 01:45:08 pirahna Exp $ */
+/* $Id: magic.cpp,v 1.47 2002/12/27 02:03:52 pirahna Exp $ */
 
 extern "C"
 {
@@ -2571,7 +2571,7 @@ int spell_word_of_recall(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct ob
   skill_increase_check(ch, SPELL_WORD_OF_RECALL, skill, SKILL_INCREASE_MEDIUM);
 
   /* a location has been found. */
-  if( number(1, 100) > (skill / 10) )
+  if( number(1, 100) > (80 + skill / 10) )
   {
     send_to_char("Your recall magic sputters and fails.\r\n", ch);
     return eFAILURE;
