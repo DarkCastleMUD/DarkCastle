@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.2 2002/06/13 04:41:08 dcastle Exp $ */
+/* $Id: magic.cpp,v 1.3 2002/07/23 20:34:33 pirahna Exp $ */
 
 extern "C"
 {
@@ -8601,6 +8601,53 @@ int cast_ice_shards( byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *
        break;
     default :
        log("Serious screw-up in ice_shards!", ANGEL, LOG_BUG);
+       break;
+  }
+  return eFAILURE;
+}
+
+
+int spell_lightning_shield(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj)
+{
+  struct affected_type af;
+
+  if (!affected_by_spell(victim, SPELL_LIGHTNING_SHIELD))
+  {
+    act("$n is surrounded by a crackling shield of electrical energy.", victim, 0, 0, TO_ROOM, INVIS_NULL);
+    act("You are surrounded by a crackling shield of electrical energy.", victim, 0, 0, TO_CHAR, 0);
+
+    af.type      = SPELL_LIGHTNING_SHIELD;
+    af.duration  = 3;
+    af.modifier  = 0;
+    af.location  = APPLY_NONE;
+    af.bitvector = AFF_LIGHTNINGSHIELD;
+    affect_to_char(victim, &af);
+  }
+  return eSUCCESS;
+}
+
+int cast_lightning_shield( byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *tar_ch, struct obj_data *tar_obj )
+{
+  switch (type) 
+  {
+    case SPELL_TYPE_SPELL:
+       return spell_lightning_shield(level, ch, tar_ch, 0);
+       break;
+    case SPELL_TYPE_POTION:
+       return spell_lightning_shield(level, ch, ch, 0);
+       break;
+    case SPELL_TYPE_SCROLL:
+       if(tar_obj)
+          return eFAILURE;
+       if(!tar_ch) tar_ch = ch;
+          return spell_lightning_shield(level, ch, tar_ch, 0);
+       break;
+    case SPELL_TYPE_STAFF:
+       for (tar_ch = world[ch->in_room].people ; tar_ch ; tar_ch = tar_ch->next_in_room)
+          spell_lightning_shield(level,ch,tar_ch,0);
+       break;
+    default :
+       log("Serious screw-up in lightning shield!", ANGEL, LOG_BUG);
        break;
   }
   return eFAILURE;

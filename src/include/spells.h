@@ -14,7 +14,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.h,v 1.3 2002/07/07 06:59:43 pirahna Exp $ */
+/* $Id: spells.h,v 1.4 2002/07/23 20:34:37 pirahna Exp $ */
 #include <structs.h> // byte, sh_int
 
 #define MAX_BUF_LENGTH               240
@@ -159,7 +159,8 @@
 #define SPELL_EYES_OF_THE_EAGLE     130
 #define SPELL_HASTE_OTHER           131
 #define SPELL_ICE_SHARDS            132
-#define MAX_SPL_LIST                132
+#define SPELL_LIGHTNING_SHIELD      133
+#define MAX_SPL_LIST                133
 
 // if you add a spell, make sure you update "spells[]" in spells.C
 
