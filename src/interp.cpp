@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.cpp,v 1.5 2002/08/02 15:42:18 dcastle Exp $ */
+/* $Id: interp.cpp,v 1.6 2002/08/02 19:27:03 pirahna Exp $ */
 
 extern "C"
 {
@@ -228,7 +228,7 @@ struct command_info cmd_info[] =
     { "cinfo",      do_cinfo,       POSITION_SLEEPING,  0,  9,  0 },
     { "ambush",     do_ambush,      POSITION_RESTING,   0,  9,  0 },
     { "whoarena",   do_whoarena,    POSITION_SLEEPING,  0,  9,  0 },
-    { "joinarena",  do_joinarena,   POSITION_STANDING,  0,  9,  0 },
+    { "joinarena",  do_joinarena,   POSITION_SLEEPING,  0,  9,  0 },
     { "backstab",   do_backstab,    POSITION_STANDING,  0,  9,  0 },
     { "bs",         do_backstab,    POSITION_STANDING,  0,  9,  0 },
     { "boss",       do_boss,        POSITION_DEAD,      0,  9,  0 },
