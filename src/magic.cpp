@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.21 2002/08/17 20:26:09 dcastle Exp $ */
+/* $Id: magic.cpp,v 1.22 2002/08/23 17:27:44 pirahna Exp $ */
 
 extern "C"
 {
@@ -8203,7 +8203,7 @@ int spell_sun_ray(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data 
 
   dam = MIN((int)GET_MANA(ch), 600);
 
-  if (OUTSIDE(ch) && (weather_info.sky>=SKY_CLOUDLESS)) {
+  if (OUTSIDE(ch) && (weather_info.sky <= SKY_CLOUDY)) {
 
 	 if(saves_spell(ch, victim, 0, SAVE_TYPE_FIRE) >= 0)
 		dam >>= 1;
@@ -8221,24 +8221,24 @@ int cast_sun_ray( byte level, CHAR_DATA *ch, char *arg, int type,
 
   switch (type) {
     case SPELL_TYPE_SPELL:
-      if (OUTSIDE(ch) && (weather_info.sky>=SKY_CLOUDLESS))
+      if (OUTSIDE(ch) && (weather_info.sky <= SKY_CLOUDY))
         return spell_sun_ray(level, ch, victim, 0, skill);
       else 
-        send_to_char("You must be outdoors on a sunny day to do this!\n\r", ch);
+        send_to_char("You must be outdoors on a day that isn't raining!\n\r", ch);
       break;
     case SPELL_TYPE_POTION:
-      if (OUTSIDE(ch) && (weather_info.sky>=SKY_CLOUDLESS))
+      if (OUTSIDE(ch) && (weather_info.sky <= SKY_CLOUDY))
         return spell_sun_ray(level, ch, ch, 0, skill);
       break;
     case SPELL_TYPE_SCROLL:
-      if (OUTSIDE(ch) && (weather_info.sky>=SKY_CLOUDLESS)) {
+      if (OUTSIDE(ch) && (weather_info.sky <= SKY_CLOUDY)) {
         if(victim)
           return spell_sun_ray(level, ch, victim, 0, skill);
         else if(!tar_obj) spell_sun_ray(level, ch, ch, 0, skill);
       }
       break;
     case SPELL_TYPE_STAFF:
-      if (OUTSIDE(ch) && (weather_info.sky>=SKY_CLOUDLESS))
+      if (OUTSIDE(ch) && (weather_info.sky <= SKY_CLOUDY))
       {
         for (victim = world[ch->in_room].people ;victim ; victim = victim->next_in_room )
           if( IS_NPC(victim) )
