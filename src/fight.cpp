@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.223 2004/07/21 10:16:09 rahz Exp $ */
+/* $Id: fight.cpp,v 1.224 2004/07/21 17:25:12 urizen Exp $ */
 
 extern "C"
 {
@@ -220,7 +220,7 @@ void perform_violence(void)
 
       retval = attack(ch, ch->fighting, TYPE_UNDEFINED);
 
-      if(is_mob && IS_SET(retval, eCH_DIED)) // no point in going anymore
+      if(is_mob && SOMEONE_DIED(retval)) // no point in going anymore
         continue;
       else update_flags(ch);
 
@@ -244,10 +244,10 @@ void perform_violence(void)
           continue;    // Fix for procs beng called on dead chars. 
       // MOB Progs
       retval = mprog_hitprcnt_trigger( ch, ch->fighting );
-      if(IS_SET(retval, eCH_DIED))
+      if(SOMEONE_DIED(retval))
         continue;
       retval = mprog_fight_trigger( ch, ch->fighting );
-      if(IS_SET(retval, eCH_DIED))
+      if(SOMEONE_DIED(retval))
         continue;
 
     } // can_attack
