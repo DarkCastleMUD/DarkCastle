@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.43 2002/12/26 17:55:17 pirahna Exp $ */
+/* $Id: magic.cpp,v 1.44 2002/12/26 18:07:52 pirahna Exp $ */
 
 extern "C"
 {
@@ -7355,48 +7355,23 @@ int cast_barkskin(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *vic
 
 int cast_herb_lore(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *victim, struct obj_data * tar_obj, int skill)
 {
-	// CHAR_DATA *tmp_vict;
 
-/*  I removed the self/charmie only thing to encourage grouping.
-    All the code is still here, just commented out in case we change
-    our minds. - Pir
+  if(GET_RACE(victim) == RACE_UNDEAD) {
+    send_to_char("Heal spells seem to be useless on the undead.\n\r", ch);
+    return eFAILURE;
+  }
 
-	int valid = 0;
+  send_to_char("These herbs really do the trick!\n\r", ch);
+  send_to_char("You feel much better!\n\r", victim);
+  if(OUTSIDE(ch))
+    GET_HIT(victim) += 120;
+  else /* if not outside */
+    GET_HIT(victim) += 60;
+  if (GET_HIT(victim) >= hit_limit(victim))
+    GET_HIT(victim) = hit_limit(victim)-dice(1,4);
 
-	if(victim == ch)
-		valid = 1;
-	if(!valid)
-		for(tmp_vict = character_list; tmp_vict; tmp_vict = tmp_vict->next)
-			if(tmp_vict == victim && IS_NPC(victim) && victim->master == ch)
-				valid = 1;
-	if(!valid)
-*/
-	/* Then it is not a charmie or the character */
-/*
-	{
-		send_to_char("You can only cast this on yourself or your tame friends.\n\r", ch);
-		GET_MANA(ch) += 50; // Kludge cuz it takes away the mana
-		return eFAILURE;
-	}
-	else
-*/ 
-        /* It is a valid person to heal */
-/*
-	{
-*/
-		send_to_char("These herbs really do the trick!\n\r", ch);
-		send_to_char("You feel much better!\n\r", victim);
-		if(OUTSIDE(ch))
-			GET_HIT(victim) += 120;
-		else /* if not outside */
-			GET_HIT(victim) += 60;
-		if (GET_HIT(victim) >= hit_limit(victim))
-			GET_HIT(victim) = hit_limit(victim)-dice(1,4);
+  update_pos( victim );
 
-		update_pos( victim );
-/*
-	}
-*/
   return eSUCCESS;
 }
 
