@@ -220,9 +220,6 @@ void load_golem_data(CHAR_DATA *ch, int golemtype)
   dc_fclose(fpfile);
 }
 
-int check_components(CHAR_DATA *ch, int destroy, int item_one = 0,
-                     int item_two = 0, int item_three = 0, int item_four = 0, bool silent = FALSE); // magic.cpp
-
 int cast_create_golem(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill)
 {
   struct char_data *golem;
@@ -245,9 +242,7 @@ int cast_create_golem(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA 
     send_to_char("You cannot create any such golem.\r\n",ch);
     return eFAILURE;
   }
-  if (!check_components(ch, TRUE, golem_list[i].components[0], golem_list[i].components[1], 
-				golem_list[i].components[2], TRUE) ||
-	!check_components(ch, TRUE, golem_list[i].components[3],0,0, TRUE))
+  if (verify_existing_components(ch, i))
   {
       send_to_char("Since you do not have the require spell components, the magic fades into nothingness.\r\n",ch);
       return eFAILURE;
