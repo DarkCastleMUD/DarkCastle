@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.95 2003/01/29 03:12:08 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.96 2003/01/30 05:48:10 pirahna Exp $ */
 
 extern "C"
 {
@@ -127,8 +127,10 @@ void perform_violence(void)
     }
 
 // DEBUG CODE
+   int last_virt = -1;;
    int last_class = GET_CLASS(ch);
-   int last_virt  = mob_index[ch->mobdata->nr].virt;
+   if(IS_MOB(ch))
+      last_virt  = mob_index[ch->mobdata->nr].virt;
 // DEBUG CODE
       
     if(can_attack(ch)) {

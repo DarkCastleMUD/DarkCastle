@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.28 2003/01/22 16:12:19 pirahna Exp $ */
+/* $Id: mob_proc.cpp,v 1.29 2003/01/30 05:48:10 pirahna Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -3218,9 +3218,8 @@ int bee(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
               ch->fighting, TO_ROOM, INVIS_NULL|NOTVICT);
 	    act("$n sinks a barbed stinger into you!", ch, 0,
               ch->fighting, TO_VICT, 0);
-	    cast_poison( GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL,
+	    return cast_poison( GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL,
 		 ch->fighting, 0, GET_LEVEL(ch));
-	    return eSUCCESS;
 	}
     return eFAILURE;
 }
