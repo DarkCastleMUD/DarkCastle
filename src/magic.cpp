@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.72 2003/06/12 23:19:51 pirahna Exp $ */
+/* $Id: magic.cpp,v 1.73 2003/06/13 00:16:03 pirahna Exp $ */
 
 extern "C"
 {
@@ -8970,6 +8970,8 @@ int spell_debility(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data
      return eSUCCESS;
   }
 
+  set_cantquit( ch, victim );
+
   int save = saves_spell(ch, victim, 5, SAVE_TYPE_MAGIC);
 
   if(save < 0)
@@ -9059,6 +9061,8 @@ int spell_attrition(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
      send_to_char("Your victim is already affected by that spell.\r\n", ch);
      return eSUCCESS;
   }
+
+  set_cantquit( ch, victim );
 
   int save = saves_spell(ch, victim, 0, SAVE_TYPE_POISON);
 
