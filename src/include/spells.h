@@ -14,7 +14,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.h,v 1.25 2003/04/20 22:15:01 pirahna Exp $ */
+/* $Id: spells.h,v 1.26 2003/06/23 00:26:44 pirahna Exp $ */
 #include <structs.h> // byte, sh_int
 
 #define MAX_BUF_LENGTH               240
@@ -164,7 +164,8 @@
 #define SPELL_DEBILITY              135
 #define SPELL_ATTRITION             136
 #define SPELL_VAMPIRIC_AURA         137
-#define MAX_SPL_LIST                137
+#define SPELL_HOLY_AURA             138
+#define MAX_SPL_LIST                138
 
 // if you add a spell, make sure you update "spells[]" in spells.C
 
@@ -376,6 +377,12 @@
 // NOTE  "skill" numbers 2000-2199 are reserved for weapon poisoning damage message
 
 #define POISON_MESSAGE_BASE          2000
+
+
+
+// NOTE 'spell' wear off timers are here.  Reserved messages 4000-4999
+#define SPELL_HOLY_AURA_TIMER        4000
+
 
 
 

@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.28 2003/06/22 23:22:22 pirahna Exp $ */
+/* $Id: info.cpp,v 1.29 2003/06/23 00:26:39 pirahna Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -1311,6 +1311,9 @@ int do_score(struct char_data *ch, char *argument, int cmd)
              break;
            case SKILL_BLOOD_FURY:
              aff_name = "blood fury reuse timer";
+             break;
+           case SPELL_HOLY_AURA_TIMER:
+             aff_name = "holy aura timer";
              break;
            default: break;
          }

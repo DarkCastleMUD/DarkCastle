@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.77 2003/06/22 22:55:37 pirahna Exp $ */
+/* $Id: magic.cpp,v 1.78 2003/06/23 00:26:39 pirahna Exp $ */
 
 extern "C"
 {
@@ -9247,4 +9247,61 @@ int cast_vampiric_aura( byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DAT
   }
   return eFAILURE;
 }
+
+
+// TODO - make this use skill after skillups can be done for non-practicable skills
+
+int spell_holy_aura(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
+{
+  struct affected_type af;
+
+  if(affected_by_spell(ch, SPELL_HOLY_AURA_TIMER)) {
+     send_to_char("Your god is not so foolish as to grant that power to you so soon again.\r\n", ch);
+     return eFAILURE;
+  }
+
+  skill_increase_check(ch, SPELL_HOLY_AURA, skill, SKILL_INCREASE_HARD);
+  act("A serene calm comes over $n.", victim, 0, 0, TO_ROOM, INVIS_NULL);
+  act("A serene encompasses you.", victim, 0, 0, TO_CHAR, 0);
+
+  af.type      = SPELL_HOLY_AURA;
+  af.duration  = 8;
+  af.modifier  = 50;
+  af.location  = APPLY_NONE;
+  af.bitvector = 0;
+  affect_to_char(victim, &af);
+
+  af.type      = SPELL_HOLY_AURA_TIMER;
+  af.duration  = 40;
+
+  return eSUCCESS;
+}
+
+int cast_holy_aura( byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill )
+{
+  switch (type) 
+  {
+    case SPELL_TYPE_SPELL:
+       return spell_holy_aura(level, ch, tar_ch, 0, skill);
+       break;
+    case SPELL_TYPE_POTION:
+       return spell_holy_aura(level, ch, ch, 0, skill);
+       break;
+    case SPELL_TYPE_SCROLL:
+       if(tar_obj)
+          return eFAILURE;
+       if(!tar_ch) tar_ch = ch;
+          return spell_holy_aura(level, ch, tar_ch, 0, skill);
+       break;
+    case SPELL_TYPE_STAFF:
+       for (tar_ch = world[ch->in_room].people ; tar_ch ; tar_ch = tar_ch->next_in_room)
+          spell_holy_aura(level,ch,tar_ch,0, skill);
+       break;
+    default :
+       log("Serious screw-up in holy aura!", ANGEL, LOG_BUG);
+       break;
+  }
+  return eFAILURE;
+}
+
 
