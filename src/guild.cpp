@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.54 2004/05/16 12:22:07 urizen Exp $
+| $Id: guild.cpp,v 1.55 2004/05/17 19:20:44 urizen Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -314,7 +314,9 @@ int skills_guild(struct char_data *ch, char *arg, struct char_data *owner)
      case CLASS_PALADIN:
      do_say(owner,"This ability is one that I am capable of teaching you myself young novice.  Observe closely.",9);
 	break;
-//     case CLASS_BARD:
+     case CLASS_BARD:
+      do_say(owner, "Ahh young prodigy, that is a tune with which I myself am familiar! Allow me to show you...",9);
+	break;
      case CLASS_MAGIC_USER:
      do_say(owner,"Ahh young apprentice, this is a simple matter for me to teach you if you are capable of comprehending.",9);
 	break;
