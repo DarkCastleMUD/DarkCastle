@@ -1967,13 +1967,16 @@ int do_oedit(struct char_data *ch, char *argument, int cmd)
 	  send_to_char("Object already exists.\r\n",ch);
 	  return eFAILURE;
 	}
+        if (!has_skill(ch,COMMAND_RANGE))
+        {
+	  send_to_char("You cannot create items.\r\n",ch);
+	  return eFAILURE;
+        }
+/*
         if(!can_modify_object(ch, intval)) {
           send_to_char("You are unable to work creation outside of your range.\n\r", ch);
           return eFAILURE;   
         }
-/*        send_to_char("Command disabled until pirahna has it updating 
-zonefiles properly.\r\n", ch);
-        return eFAILURE;
 */
         x = create_blank_item(intval);
         if(x < 0) {
