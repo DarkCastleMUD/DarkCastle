@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.61 2004/05/27 21:07:20 urizen Exp $
+| $Id: cl_thief.cpp,v 1.62 2004/05/27 21:17:02 urizen Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -363,7 +363,14 @@ int do_trip(CHAR_DATA *ch, char *argument, int cmd)
   }
 
   one_argument(argument, name);
-
+  if (GET_CLASS(ch) == CLASS_BARD)
+  {
+    if (ch->song_number == 21) /* Crushing crescendo*/
+    {
+       send_to_char("You are too distracted by your song to do this.\r\n",ch);
+	return eFAILURE;
+    }
+  }
   if(!(victim = get_char_room_vis(ch, name))) {
     if(ch->fighting)
       victim = ch->fighting;
