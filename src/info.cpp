@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.20 2002/11/06 21:41:52 pirahna Exp $ */
+/* $Id: info.cpp,v 1.21 2002/12/26 21:47:16 pirahna Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -69,7 +69,6 @@ extern int max_who;
 
 /* extern functions */
 
-void colorCharSend(char* s, struct char_data* ch);
 struct char_data *get_pc_vis(struct char_data *ch, char *name);
 struct time_info_data age(struct char_data *ch);
 void page_string(struct descriptor_data *d, char *str, int keep_internal);
@@ -285,13 +284,52 @@ void list_obj_to_char(struct obj_data *list, struct char_data *ch, int mode,
       send_to_char("Nothing\n\r", ch);
 }
 
+void show_spells(char_data * i, char_data * ch)
+{
+   char send_buf[MAX_STRING_LENGTH];
 
+   sprintf(send_buf, "$B$7-$1%s has: ", i->name);
+   int has_spells = 0;
+         
+   if (IS_AFFECTED(i,AFF_SANCTUARY)) {
+      sprintf(send_buf, "%s$7white aura! ", send_buf);
+      has_spells = 1;
+   }
+   if (IS_AFFECTED(i,AFF_PROTECT_EVIL)) {
+      sprintf(send_buf, "%s$R$6pulsing aura! ", send_buf);
+      has_spells = 1;
+   }
+   if (IS_AFFECTED(i,AFF_FIRESHIELD)) {
+      sprintf(send_buf, "%s$B$4flames! ", send_buf);
+      has_spells = 1;
+   }
+   if (affected_by_spell(i, SPELL_ACID_SHIELD)) {
+      sprintf(send_buf, "%s$B$2acid! ", send_buf);
+      has_spells = 1;
+   }
+   if (IS_AFFECTED(i,AFF_LIGHTNINGSHIELD)) {
+      sprintf(send_buf, "%s$B$5electricity! ", send_buf);
+      has_spells = 1;
+   }
+   if (IS_AFFECTED(i,AFF_PARALYSIS)) {
+      sprintf(send_buf,"%s$R$2paralyze! ", send_buf);
+      has_spells = 1;
+   }
+   if (i->affected_by & AFF_FLYING) {
+      sprintf(send_buf, "%s$B$1flying!", send_buf);
+      has_spells = 1;
+   }
+         
+   if(has_spells) {
+      sprintf(send_buf, "%s$R\r\n", send_buf);
+      send_to_char(send_buf, ch);
+   }
+}
 
 void show_char_to_char(struct char_data *i, struct char_data *ch, int mode)
 {
    char buffer[MAX_STRING_LENGTH];
-   char send_buf[MAX_STRING_LENGTH];
-   int j, found, percent, has_spells;
+   int j, found, percent;
    struct obj_data *tmp_obj;
    char buf2[MAX_STRING_LENGTH];
    struct clan_data * clan;
@@ -301,10 +339,10 @@ void show_char_to_char(struct char_data *i, struct char_data *ch, int mode)
    {
       if (!CAN_SEE(ch,i)) {
          if (IS_AFFECTED(ch, AFF_SENSE_LIFE))
-            colorCharSend("$R$7You sense a hidden life form in the room.\n\r", ch);
+            send_to_char("$R$7You sense a hidden life form in the room.\n\r", ch);
          return;
       }
-      colorCharSend("$B$3", ch);
+      send_to_char("$B$3", ch);
       
       if (!(i->long_desc)||(IS_MOB(i) && (GET_POS(i) != i->mobdata->default_pos)))
       {
@@ -384,40 +422,9 @@ void show_char_to_char(struct char_data *i, struct char_data *ch, int mode)
          if (IS_AFFECTED(ch, AFF_DETECT_GOOD) && IS_GOOD(i)) 
             strcat(buffer, "$B$5(Halo) ");
          strcat(buffer,"\n\r");
-         colorCharSend(buffer, ch);
+         send_to_char(buffer, ch);
          
-         sprintf(send_buf, "$B$7-$1%s has: ", i->name);
-         has_spells = 0;
-         
-         if (IS_AFFECTED(i,AFF_SANCTUARY)) {
-            sprintf(send_buf, "%s$7white aura! ", send_buf);
-            has_spells = 1;
-         }
-         if (IS_AFFECTED(i,AFF_PROTECT_EVIL)) {
-            sprintf(send_buf, "%s$R$6pulsing aura! ", send_buf);
-            has_spells = 1;
-         }
-         if (IS_AFFECTED(i,AFF_FIRESHIELD)) {
-            sprintf(send_buf, "%s$B$4flames! ", send_buf);
-            has_spells = 1;
-         }
-         if (IS_AFFECTED(i,AFF_LIGHTNINGSHIELD)) {
-            sprintf(send_buf, "%s$B$5electricity! ", send_buf);
-            has_spells = 1;
-         }
-         if (IS_AFFECTED(i,AFF_PARALYSIS)) {
-            sprintf(send_buf,"%s$R$2paralyze! ", send_buf);
-            has_spells = 1;
-         }
-         if (i->affected_by & AFF_FLYING) {
-            sprintf(send_buf, "%s$B$1flying!", send_buf);
-            has_spells = 1;
-         }
-         
-         if(has_spells) {
-            sprintf(send_buf, "%s$R\r\n", send_buf);
-            colorCharSend(send_buf, ch);
-         }
+         show_spells(i, ch);
          
      } else  /* npc with long */ {
         if (IS_AFFECTED(i,AFF_INVISIBLE))
@@ -436,43 +443,10 @@ void show_char_to_char(struct char_data *i, struct char_data *ch, int mode)
         }
         
         strcat(buffer, i->long_desc);
-        colorCharSend(buffer, ch);
+        send_to_char(buffer, ch);
         
-        //Code changes to use one-line spells
-        
-        sprintf(send_buf, "$B$7-$1%s has: ", i->short_desc);
-        has_spells = 0;
-        
-        if (IS_AFFECTED(i,AFF_SANCTUARY)) {
-           sprintf(send_buf, "%s$B$7white aura! ", send_buf);
-           has_spells = 1;
-        }
-        if (IS_AFFECTED(i,AFF_PROTECT_EVIL)) {
-           sprintf(send_buf, "%s$B$6pulsing aura! ", send_buf);
-           has_spells = 1;
-        }
-        if (IS_AFFECTED(i,AFF_FIRESHIELD)) {
-           sprintf(send_buf, "%s$B$4flames! ", send_buf);
-           has_spells = 1;
-        }
-        if (IS_AFFECTED(i, AFF_LIGHTNINGSHIELD)) {
-           sprintf(send_buf, "%s$B$5electricity! ", send_buf);
-           has_spells = 1;
-        }
-        if (IS_AFFECTED(i,AFF_PARALYSIS)) {
-           sprintf(send_buf,"%s$R$2paralyze! ", send_buf);
-           has_spells = 1;
-        }
-        if (i->affected_by & AFF_FLYING) {
-           sprintf(send_buf, "%s$B$1flying!", send_buf);
-           has_spells = 1;
-        }
-        if(has_spells) {
-           sprintf(send_buf, "%s\r\n", send_buf);
-           colorCharSend(send_buf, ch);
-        }
-        colorCharSend("$R$7", ch);
-        
+        show_spells(i, ch);
+        send_to_char("$R$7", ch);
      }
      
    } else if ((mode == 1) || (mode == 3)) 
@@ -518,37 +492,7 @@ void show_char_to_char(struct char_data *i, struct char_data *ch, int mode)
 
        if(mode == 3) // If it was a glance, show spells then get out
        {
-          sprintf(send_buf, "-%s has: ", i->short_desc);
-          has_spells = 0;
-        
-          if (IS_AFFECTED(i,AFF_SANCTUARY)) {
-             sprintf(send_buf, "%s$B$7white aura! ", send_buf);
-             has_spells = 1;
-          }
-          if (IS_AFFECTED(i,AFF_PROTECT_EVIL)) {
-             sprintf(send_buf, "%s$6pulsing aura! ", send_buf);
-             has_spells = 1;
-          }
-          if (IS_AFFECTED(i,AFF_FIRESHIELD)) {
-             sprintf(send_buf, "%s$B$4flames! ", send_buf);
-             has_spells = 1;
-          }
-          if (IS_AFFECTED(i, AFF_LIGHTNINGSHIELD)) {
-             sprintf(send_buf, "%s$B$5electricity! ", send_buf);
-             has_spells = 1;
-          }
-          if (IS_AFFECTED(i,AFF_PARALYSIS)) {
-             sprintf(send_buf,"%s$R$2paralyze! ", send_buf);
-             has_spells = 1;
-          }
-          if (i->affected_by & AFF_FLYING) {
-             sprintf(send_buf, "%s$B$1flying!", send_buf);
-             has_spells = 1;
-          }
-          if(has_spells) {
-             sprintf(send_buf, "%s$R\r\n", send_buf);
-             colorCharSend(send_buf, ch);
-          }
+          show_spells(i, ch);
           return;
        }
 
@@ -1076,9 +1020,7 @@ int do_look(struct char_data *ch, char *argument, int cmd)
                
                ansi_color( GREY, ch );
                ansi_color( BOLD, ch );
-               //			send_to_char(world[ch->in_room].name, ch);
-               // allow the use of color
-               colorCharSend(world[ch->in_room].name, ch);
+               send_to_char(world[ch->in_room].name, ch);
                ansi_color( NTEXT, ch );
                ansi_color( GREY, ch );
                
@@ -1092,9 +1034,7 @@ int do_look(struct char_data *ch, char *argument, int cmd)
                send_to_char("\n\r", ch);
                
                if (!IS_MOB(ch) && !IS_SET(ch->pcdata->toggles, PLR_BRIEF))
-                  //		send_to_char(world[ch->in_room].description, ch);
-                  // allow room descs to have color
-                  colorCharSend(world[ch->in_room].description, ch);
+                  send_to_char(world[ch->in_room].description, ch);
                
                ansi_color( BLUE, ch );
                ansi_color( BOLD, ch );
@@ -1287,11 +1227,11 @@ int do_score(struct char_data *ch, char *argument, int cmd)
    sprintf(buf,
       "$7($5:$7)================================================="
       "=======================($5:$7)\n\r"
-      "|=|  %-28s -- Character Attributes (DarkCastleMUD)  |=|\n\r"
+      "|=|  %-29s -- Character Attributes (DarkCastleMUD) |=|\n\r"
       "($5:$7)===========================($5:$7)==================="
       "=======================($5:$7)\n\r", GET_SHORT(ch));
    
-   colorCharSend(buf, ch);
+   send_to_char(buf, ch);
    
    sprintf(buf,
       "|\\|  $4Strength$7:     %9d  |/|  $1Race$7:   %-10s $1HitPts$7:%5d$1/$7(%5d) |~|\n\r"
@@ -1306,7 +1246,7 @@ int do_score(struct char_data *ch, char *argument, int cmd)
       GET_INT(ch), GET_HEIGHT(ch), GET_KI(ch),  GET_MAX_KI(ch), 
       GET_WIS(ch), GET_WEIGHT(ch), GET_ALIGNMENT(ch),
       GET_AGE(ch));
-   colorCharSend(buf, ch);
+   send_to_char(buf, ch);
 
    if(!IS_NPC(ch)) // mobs can't view this part
    {
@@ -1325,7 +1265,7 @@ int do_score(struct char_data *ch, char *argument, int cmd)
    ch->saves[SAVE_TYPE_FIRE], ch->saves[SAVE_TYPE_COLD], ch->saves[SAVE_TYPE_ENERGY], GET_LEVEL(ch) == IMP ? 0 : exp_needed, 
    ch->saves[SAVE_TYPE_ACID], ch->saves[SAVE_TYPE_MAGIC], ch->saves[SAVE_TYPE_POISON], (int)GET_GOLD(ch), (int)GET_PLATINUM(ch));
    
-     colorCharSend(buf, ch);
+     send_to_char(buf, ch);
    }
    else send_to_char(
       "($5:$7)=================================($5:$7)===================================($5:$7)\n\r", ch);
@@ -1364,7 +1304,7 @@ int do_score(struct char_data *ch, char *argument, int cmd)
                ((IS_AFFECTED(ch, AFF_DETECT_MAGIC) && aff->duration < 3) ? 
                           "$2(fading)$7" : "        "),
                apply_types[(int)aff->location], scratch);
-         colorCharSend(buf, ch);
+         send_to_char(buf, ch);
          found = TRUE;
          if(++level == 4)
             level = 0;
@@ -1380,7 +1320,7 @@ int do_score(struct char_data *ch, char *argument, int cmd)
          found = TRUE;
       }
       if(found)
-        colorCharSend(
+        send_to_char(
          "($5:$7)========================================================================($5:$7)\n\r", ch);
    }
    if(!IS_NPC(ch)) // mob can't view this part

@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: modify.cpp,v 1.3 2002/09/08 15:13:59 pirahna Exp $ */
+/* $Id: modify.cpp,v 1.4 2002/12/26 21:47:16 pirahna Exp $ */
 
 extern "C"
 {
@@ -723,7 +723,7 @@ void page_string(struct descriptor_data *d, char *str, int keep_internal)
   // if they don't want things paginated
   if(!IS_MOB(d->character) && IS_SET(d->character->pcdata->toggles, PLR_PAGER))
   {
-     colorCharSend(str, d->character);
+     send_to_char(str, d->character);
      return;
   }
 
@@ -777,9 +777,8 @@ void show_string(struct descriptor_data *d, char *input)
    * then free up the space we used.
    */
   if (d->showstr_page + 1 >= d->showstr_count) {
-//    send_to_char(d->showstr_vector[d->showstr_page], d->character);
     // send them a carriage return first to make sure it looks right
-    colorCharSend(d->showstr_vector[d->showstr_page], d->character);
+    send_to_char(d->showstr_vector[d->showstr_page], d->character);
     dc_free(d->showstr_vector);
     d->showstr_vector = 0;
     d->showstr_count = 0;
@@ -794,8 +793,7 @@ void show_string(struct descriptor_data *d, char *input)
             diff = ((int) d->showstr_vector[d->showstr_page + 1])
             - ((int) d->showstr_vector[d->showstr_page]));
     buffer[diff] = '\0';
-//    send_to_char(buffer, d->character);
-    colorCharSend(buffer, d->character);
+    send_to_char(buffer, d->character);
     d->showstr_page++;
   }
 }

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: channel.cpp,v 1.2 2002/06/13 04:41:07 dcastle Exp $
+| $Id: channel.cpp,v 1.3 2002/12/26 21:47:15 pirahna Exp $
 | channel.C
 | Description:  All of the channel - type commands; do_say, gossip, etc..
 */
@@ -401,7 +401,7 @@ int do_dream(struct char_data *ch, char *argument, int cmd)
     else {
       sprintf(buf1, "$6%s dreams '$B$1%s$R$6'$R\n\r", GET_SHORT(ch), argument);
       sprintf(buf2, "$6You dream '$B$1%s$R$6'$R\n\r", argument);
-      colorCharSend(buf2, ch);
+      send_to_char(buf2, ch);
       for(i = descriptor_list; i; i = i->next)  {
 	  if((i->character != ch)  &&
 	     (!i->connected) &&
@@ -409,7 +409,7 @@ int do_dream(struct char_data *ch, char *argument, int cmd)
     	      (IS_SET(i->character->misc, CHANNEL_DREAM)) &&
 	        ((GET_POS(i->character) == POSITION_SLEEPING) ||
 	         (GET_LEVEL(i->character) >= MIN_GOD)))
-		   colorCharSend(buf1, i->character);
+		   send_to_char(buf1, i->character);
       }
     }
     return eSUCCESS;

@@ -60,7 +60,6 @@ int max_who = 0;
 
 /* extern functions */
 
-void colorCharSend(char* s, struct char_data* ch);
 struct char_data *get_pc_vis(struct char_data *ch, char *name);
 struct time_info_data age(struct char_data *ch);
 void page_string(struct descriptor_data *d, char *str, int keep_internal);

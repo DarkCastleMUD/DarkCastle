@@ -44,7 +44,7 @@ int do_thunder(struct char_data *ch, char *argument, int cmd)
     for (i = descriptor_list; i; i = i->next)
       if (i->character != ch && !i->connected)
         if(cmd == 9) 
-          colorCharSend(buf1, i->character);
+          send_to_char(buf1, i->character);
         else  
           act(buf1, ch, 0, i->character, TO_VICT, 0);
   } 

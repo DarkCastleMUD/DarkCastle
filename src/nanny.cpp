@@ -11,7 +11,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.19 2002/11/09 04:33:15 waz Exp $ */
+/* $Id: nanny.cpp,v 1.20 2002/12/26 21:47:16 pirahna Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -600,8 +600,8 @@ void nanny(struct descriptor_data *d, char *arg)
       
       //    SEND_TO_Q(motd, d);
       if(GET_LEVEL(ch) < IMMORTAL)
-        colorCharSend(motd, d->character);
-      else colorCharSend(imotd, d->character);
+        send_to_char(motd, d->character);
+      else send_to_char(imotd, d->character);
 
       sprintf(log_buf, "\n\rLast connected from:\n\r%s\n\r", ch->pcdata->last_site); 
       SEND_TO_Q(log_buf, d);

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: who.cpp,v 1.6 2002/08/25 17:36:32 pirahna Exp $
+| $Id: who.cpp,v 1.7 2002/12/26 21:47:16 pirahna Exp $
 | who.C
 | Commands for who, maybe? :P
 */
@@ -101,14 +101,14 @@ int do_whogroup(struct char_data *ch, char *argument, int cmd)
       
    hasholylight = IS_MOB(ch) ? 0 : ch->pcdata->holyLite;
 
-   colorCharSend(
+   send_to_char(
      "$B$7($4:$7)=======================================================================($4:$7)\n\r"
      "$7|$5/$7|                     $5Current Grouped Adventurers                       $7|$5/$7|\n\r"
      "$7($4:$7)=======================================================================($4:$7)$R\n\r", ch);
 
    if(*target) {
      sprintf(gWhoBuffer, "Searching for '$B%s$R'...\r\n", target);
-     colorCharSend(gWhoBuffer, ch);
+     send_to_char(gWhoBuffer, ch);
    }
      
    clear_who_buffer();
@@ -192,7 +192,7 @@ int do_whogroup(struct char_data *ch, char *argument, int cmd)
       }
       else if(*target && foundtarget)
       {
-         colorCharSend(gWhoBuffer, ch);
+         send_to_char(gWhoBuffer, ch);
          clear_who_buffer();
       }
    }    // End for(d).
@@ -216,7 +216,7 @@ int do_whosolo(struct char_data *ch, char *argument, int cmd)
 
    one_argument(argument, buf);
 
-   colorCharSend(
+   send_to_char(
     "$B$7($4:$7)=======================================================================($4:$7)\n\r"
     "$7|$5/$7|                      $5Current SOLO Adventurers                         $7|$5/$7|\n\r"
     "$7($4:$7)=======================================================================($4:$7)$R\n\r"
@@ -384,7 +384,7 @@ int do_who(struct char_data *ch, char *argument, int cmd)
     } // while strlen(oneword)
     
     // Display the actual stuff
-    colorCharSend(
+    send_to_char(
         "[$4:$R]===================================[$4:$R]\n\r"
         "|$5/$R|      $BDenizens of Dark Castle$R      |$5/$R|\n\r"
         "[$4:$R]===================================[$4:$R]\n\r\n\r", ch);

@@ -42,12 +42,10 @@ extern bool MOBtrigger;
 
 /* extern functions */
 int is_busy(struct char_data *ch);
-void colorCharSend(char* s, struct char_data* ch);
 struct char_data *get_pc_vis(struct char_data *ch, char *name);
 void send_to_char_regardless(char *messg, struct char_data *ch);
 int is_ignoring(struct char_data *ch, struct char_data *i);
 char *str_str(char *first, char *second);
-void colorCharSend(char *, struct char_data *ch);
 
 
 int do_report(struct char_data *ch, char *argument, int cmd)

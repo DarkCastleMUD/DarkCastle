@@ -1,4 +1,4 @@
-/* $Id: nlog.cpp,v 1.2 2002/06/13 04:41:08 dcastle Exp $ */
+/* $Id: nlog.cpp,v 1.3 2002/12/26 21:47:16 pirahna Exp $ */
 
 extern "C"
 {
@@ -23,7 +23,6 @@ extern "C"
 extern struct descriptor_data* descriptorList;
 void log( char *str, int god_level, long type );
 void send_to_char(char *messg, CHAR_DATA *ch);
-void colorCharSend(char* s, CHAR_DATA* ch);
 
 /*
  * logf, str_hsh, and csendf by Sadus, others by Ysafar.
@@ -208,9 +207,4 @@ char * handle_ansi(char * s, char_data * ch)
   return t;
 }
 
-// This just calls send_to_char now, which calls handle_ansi
-// TODO - remove all references to colorCharSend and replace them with send_to_char
-void colorCharSend(char* s, CHAR_DATA* ch) {
-   send_to_char(s, ch);
-}
 

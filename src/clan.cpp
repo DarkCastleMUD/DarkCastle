@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.5 2002/08/16 19:40:06 pirahna Exp $ */
+/* $Id: clan.cpp,v 1.6 2002/12/26 21:47:16 pirahna Exp $ */
 extern "C"
 {
   #include <string.h> // strcat
@@ -1954,7 +1954,7 @@ int do_cinfo(CHAR_DATA *ch, char *arg, int cmd)
                    clan->leader,
                    clan->email ? clan->email : "(No Email)",
                    clan->rooms ? "Yes" : "No");
-  colorCharSend(buf, ch);
+  send_to_char(buf, ch);
 
   // This has to be separate, or if the leader uses $'s, it comes out funky
   sprintf(buf, "%s\r\n",
@@ -1971,7 +1971,7 @@ int do_cinfo(CHAR_DATA *ch, char *arg, int cmd)
                     clan->login_message ? clan->login_message : "(No Message)",
                     clan->logout_message ? clan->logout_message : "(No Message)",
                     clan->death_message ? clan->death_message : "(No Message)");
-   colorCharSend(buf, ch);
+   send_to_char(buf, ch);
   }
   return eSUCCESS;
 }
