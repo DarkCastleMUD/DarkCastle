@@ -1,7 +1,7 @@
 #ifndef __ROOM_H__
 #define __ROOM_H__
 /************************************************************************
-| $Id: room.h,v 1.6 2002/10/31 06:13:29 pirahna Exp $
+| $Id: room.h,v 1.7 2003/05/12 02:29:22 pirahna Exp $
 | room.h
 | Description:  This file contains all of the room header file/constant
 |   information.  It also contains information about the 'world' structs.
@@ -45,6 +45,7 @@
 #define CLAN_ROOM    1<<27
 #define NO_SCAN      1<<28
 #define NO_WHERE     1<<29
+#define LIGHT_ROOM   1<<30
 
 /* For 'dir_option' */
 

@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: const.cpp,v 1.57 2003/04/23 00:01:24 pirahna Exp $ */
+/* $Id: const.cpp,v 1.58 2003/05/12 02:29:18 pirahna Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -692,6 +692,7 @@ char *room_bits[] =
     "clan_room",
     "no_scan",
     "no_where",
+    "light",
     "\n"
 };
 
