@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.224 2004/07/21 17:25:12 urizen Exp $ */
+/* $Id: fight.cpp,v 1.225 2004/07/21 18:07:49 urizen Exp $ */
 
 extern "C"
 {
@@ -3673,12 +3673,6 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim, int type)
   if (ch != NULL) {
     if (!str_cmp(GET_NAME(ch), GET_NAME(victim))) 
       sprintf(killer_message,"\n\r##%s just commited SUICIDE!\n\r", GET_NAME(victim));
-    else if (type == KILL_DROWN)
-      sprintf(killer_message,"\n\r##%s just DROWNED!\n\r", GET_NAME(victim));
-    else if (type == KILL_POISON)
-      sprintf(killer_message,"\n\r##%s has perished from POISON!\n\r", GET_NAME(victim));
-    else if (type == KILL_FALL)
-      sprintf(killer_message,"\n\r##%s has FALLEN to death!\n\r", GET_NAME(victim));
     else if(GET_LEVEL(victim) < PKILL_COUNT_LIMIT || ch == victim)
       sprintf(killer_message,"\n\r##%s just DIED!\n\r", GET_NAME(victim));
     else if(IS_AFFECTED2(ch, AFF_FAMILIAR) && ch->master)
@@ -3770,6 +3764,13 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim, int type)
        } // if (ch && ch != victim)
   } else {
     // ch == NULL
+   if (type == KILL_DROWN)
+      sprintf(killer_message,"\n\r##%s just DROWNED!\n\r", GET_NAME(victim));
+    else if (type == KILL_POISON)
+      sprintf(killer_message,"\n\r##%s has perished from POISON!\n\r", GET_NAME(victim));
+    else if (type == KILL_FALL)
+      sprintf(killer_message,"\n\r##%s has FALLEN to death!\n\r", GET_NAME(victim));
+    else
     sprintf(killer_message,"\n\r##%s just DIED!\n\r", GET_NAME(victim));
   }
 
