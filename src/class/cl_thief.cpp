@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.29 2003/05/12 02:53:09 pirahna Exp $
+| $Id: cl_thief.cpp,v 1.30 2003/06/13 00:32:42 pirahna Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -525,6 +525,16 @@ int do_stalk(CHAR_DATA *ch, char *argument, int cmd)
 
 int do_hide(CHAR_DATA *ch, char *argument, int cmd)
 {
+   for(char_data * curr = world[ch->in_room].people;
+       curr;
+       curr = curr->next_in_room)
+   {
+      if(curr->fighting == ch) {
+         send_to_char("In the middle of combat?!  Impossible!\r\n", ch);
+         return eFAILURE;
+      }
+   }
+
    send_to_char("You attempt to hide yourself.\n\r", ch);
 
    if ( ! IS_AFFECTED(ch, AFF_HIDE) )
