@@ -20,6 +20,7 @@
 #include <spells.h>
 #include <string.h> // strstr()
 #include <returnvals.h>
+#include <interp.h>
 
 #include <vector>
 #include <algorithm>
@@ -35,264 +36,213 @@ extern struct index_data *obj_index;
 
 ////////////////////////////////////////////////////////////////////////////
 // local function declarations
-int do_innate_pixie(CHAR_DATA *ch, char *arg, int cmd);
-int do_innate_hobbit(CHAR_DATA *ch, char *arg, int cmd);
-int do_innate_dwarf(CHAR_DATA *ch, char *arg, int cmd);
-int do_innate_orc(CHAR_DATA *ch, char *arg, int cmd);
 
-int do_innate_fly(CHAR_DATA *ch, char *arg, int cmd);
-int do_innate_sneak(CHAR_DATA *ch, char *arg, int cmd);
-int do_innate_infra(CHAR_DATA *ch, char *arg, int cmd);
-int do_innate_bloodlust(CHAR_DATA *ch, char *arg, int cmd);
+
+DO_FUN innate_powerwield;
+DO_FUN innate_regeneration;
+DO_FUN innate_farsight;
+DO_FUN innate_repair;
+DO_FUN innate_sneak;
+DO_FUN innate_evasion;
+DO_FUN innate_shadowslip;
+DO_FUN innate_bloodlust;
 
 ////////////////////////////////////////////////////////////////////////////
 // local definitions
+struct in_skills {
+  char *name;
+  int race;
+  DO_FUN *func;
+};
+
+const struct in_skills innates[] = {
+  { "powerwield", RACE_GIANT, innate_powerwield },
+  { "regeneration", RACE_TROLL, innate_regeneration },
+  { "farsight", RACE_ELVEN, innate_farsight },
+  { "bloodlust", RACE_ORC, innate_bloodlust},
+  { "repair", RACE_DWARVEN, innate_repair},
+  { "sneak", RACE_GNOME, innate_sneak},
+  { "evasion", RACE_PIXIE, innate_evasion},
+  { "shadowslip", RACE_HOBBIT, innate_shadowslip},
+  { "\n", 0, NULL}
+};
 
 char * innate_skills[] = 
 {
-   "innate fly timer",
+   "innate powerwield timer",
    "innate sneak timer",
-   "innate infra timer",
-   "innate blodlst timer",
+   "innate regeneration timer",
+   "innate bloodlust timer",
+   "innate farsight timer",
+   "innate evasion timer",
+   "innate shadowslip timer",
+   "innate repair timer",
    "\n"
 };
 
 ////////////////////////////////////////////////////////////////////////////
 // command functions
-
 int do_innate(CHAR_DATA *ch, char *arg, int cmd)
 {
-   switch(GET_RACE(ch)) {
-      case RACE_PIXIE:    return do_innate_pixie(ch, arg, cmd);
-      case RACE_HOBBIT:   return do_innate_hobbit(ch, arg, cmd);
-      case RACE_DWARVEN:  return do_innate_dwarf(ch, arg, cmd);
-      case RACE_ORC:      return do_innate_orc(ch, arg, cmd);
-      default:
-         send_to_char("You do not have any innate powers!\r\n", ch);
-         return eSUCCESS;
-   }
+  int i;
+  char buf[512];
+  arg = one_argument(arg,buf);
+  for (i = 0; *innates[i].name != '\n';i++)
+  {
+    if (innates[i].race == GET_RACE(ch))
+    {
+      if (!*arg)
+      {
+        csendf(ch, "Your race has access to the %s innate ability.\r\n",innates[i].name);
+	return eSUCCESS;
+      } else if (!str_cmp(innates[i].name,buf)) {
+	if (affected_by_spell(ch,SKILL_INNATE_TIMER))
+        {
+	  send_to_char("You cannot use that yet.\r\n",ch);
+	  return eFAILURE;
+	}
+	int retval = (*(innates[i].func))(ch,arg,cmd);
+	if (retval & eSUCCESS)
+	{
+	   struct affected_type af;
+	   af.type = SKILL_INNATE_TIMER;
+	   af.duration = 24;
+	   af.modifier = 0;
+	   af.location = 0;
+	   af.bitvector = 0;
+	   affect_to_char(ch, &af);
+	}
+	return retval;
+      } else {
+	send_to_char("You do not have access to any such ability.\r\n",ch);
+	return eFAILURE;
+      }
+    }
+  }
+  send_to_char("Your race has no innate abilities.\r\n",ch);
+  return eFAILURE;
 }
 
-int do_innate_pixie(CHAR_DATA *ch, char *arg, int cmd)
+int innate_regeneration(CHAR_DATA *ch, char *arg, int cmd)
 {
-   char buf[MAX_INPUT_LENGTH];
-
-   one_argument(arg, buf);
-
-   if(!*buf)
-   {
-      send_to_char("As a pixie, you have the following abilities:\r\n"
-                   "   fly\r\n"
-                   "\r\n"
-                   "You can activate your innate ability with innate <skill>.\r\n"
-                   , ch);
-      return eSUCCESS;
-   }
-
-   if(!strcmp(buf, "fly"))
-      return do_innate_fly(ch, buf, cmd);
-   else
-   {
-      csendf(ch, "You do not know of any '%s' ability.\r\n", buf);
-      return eSUCCESS;
-   }
-}
-
-int do_innate_hobbit(CHAR_DATA *ch, char *arg, int cmd)
-{
-   char buf[MAX_INPUT_LENGTH];
-
-   one_argument(arg, buf);
-
-   if(!*buf)
-   {
-      send_to_char("As a hobbit, you have the following abilities:\r\n"
-                   "   sneak\r\n"
-                   "\r\n"
-                   "You can activate your innate ability with innate <skill>.\r\n"
-                   , ch);
-      return eSUCCESS;
-   }
-
-   if(!strcmp(buf, "sneak"))
-      return do_innate_sneak(ch, buf, cmd);
-   else
-   {
-      csendf(ch, "You do not know of any '%s' ability.\r\n", buf);
-      return eSUCCESS;
-   }
-}
-
-int do_innate_dwarf(CHAR_DATA *ch, char *arg, int cmd)
-{
-   char buf[MAX_INPUT_LENGTH];
-
-   one_argument(arg, buf);
-
-   if(!*buf)
-   {
-      send_to_char("As a dwarf, you have the following abilities:\r\n"
-                   "   infravision\r\n"
-                   "\r\n"
-                   "You can activate your innate ability with innate <skill>.\r\n"
-                   , ch);
-      return eSUCCESS;
-   }
-
-   if(!strcmp(buf, "infravision"))
-      return do_innate_infra(ch, buf, cmd);
-   else
-   {
-      csendf(ch, "You do not know of any '%s' ability.\r\n", buf);
-      return eSUCCESS;
-   }
-}
-
-int do_innate_orc(CHAR_DATA *ch, char *arg, int cmd)
-{
-   char buf[MAX_INPUT_LENGTH];
-
-   one_argument(arg, buf);
-
-   if(!*buf)
-   {
-      send_to_char("As an orc, you have the following abilities:\r\n"
-                   "   bloodlust\r\n"
-                   "\r\n"
-                   "You can activate your innate ability with innate <skill>.\r\n"
-                   , ch);
-      return eSUCCESS;
-   }
-
-   if(!strcmp(buf, "bloodlust"))
-      return do_innate_bloodlust(ch, buf, cmd);
-   else
-   {
-      csendf(ch, "You do not know of any '%s' ability.\r\n", buf);
-      return eSUCCESS;
-   }
-}
-
-
-///////////////////////////////////////////////////////////////////////
-//  actual innate abilities
-
-int do_innate_fly(CHAR_DATA *ch, char *arg, int cmd)
-{
-   if(affected_by_spell(ch, SKILL_INNATE_FLY))
-   {
-      send_to_char("It is still too soon for you to be able to call upon your ancestral powers again.\r\n", ch);
-      return eSUCCESS;
-   }
-
-   if(IS_AFFECTED(ch, AFF_FLYING))
-   {
-      send_to_char("But you are already flying!  Why waste it?\r\n", ch);
-      return eSUCCESS;
-   }
-
-   act("Pixie wings magically sprout from $n's back and $e begins to hover.", ch, 0, 0, TO_ROOM, 0);
-   send_to_char("Small wings protrude from your back and you hover above the ground.\r\n", ch);
-
    struct affected_type af;
-   af.type = SKILL_INNATE_FLY;
-   af.duration = 24;
+   af.type = SKILL_INNATE_REGENERATION;
+   af.duration = 4;
    af.modifier = 0;
    af.location = 0;
-   af.bitvector = 0;
+   af.bitvector = AFF_REGENERATION;
    affect_to_char(ch, &af);
-
-   return spell_fly( ( GET_LEVEL(ch) / 2 ), ch, ch, 0, 5 );
+   send_to_char("Your wounds heal faster as you activate your trollish regeneration.\r\n",ch);
+   return eSUCCESS;
 }
 
-int do_innate_infra(CHAR_DATA *ch, char *arg, int cmd)
+int innate_powerwield(CHAR_DATA *ch, char *arg, int cmd)
 {
-   if(affected_by_spell(ch, SKILL_INNATE_INFRA))
-   {
-      send_to_char("It is still too soon for you to be able to call upon your ancestral powers again.\r\n", ch);
-      return eSUCCESS;
-   }
-
-   if(IS_AFFECTED(ch, AFF_INFRARED))
-   {
-      send_to_char("But you are already seeing in the dark!  Why waste it?\r\n", ch);
-      return eSUCCESS;
-   }
-
-   send_to_char("Your eyes shift spectrums allowing you better vision.\r\n", ch);
-
    struct affected_type af;
-   af.type = SKILL_INNATE_INFRA;
-   af.duration = 40;
+   af.type = SKILL_INNATE_POWERWIELD;
+   af.duration = 2;
    af.modifier = 0;
    af.location = 0;
-   af.bitvector = 0;
+   af.bitvector = AFF_POWERWIELD;
    affect_to_char(ch, &af);
-
-   return spell_infravision( 4, ch, ch, 0, GET_LEVEL(ch) );
+   send_to_char("Your body surges with energy. You can now wield two handed weapons with one hand.\r\n",ch);
+   return eSUCCESS;
 }
 
-int do_innate_sneak(CHAR_DATA *ch, char *arg, int cmd)
+int innate_sneak(CHAR_DATA *ch, char *arg, int cmd)
 {
-   if(affected_by_spell(ch, SKILL_INNATE_SNEAK))
-   {
-      send_to_char("It is still too soon for you to be able to call upon your ancestral powers again.\r\n", ch);
-      return eSUCCESS;
-   }
-
    if(IS_AFFECTED(ch, AFF_SNEAK))
    {
       send_to_char("But you are already sneaking!  Why waste it?\r\n", ch);
-      return eSUCCESS;
+      return eFAILURE;
    }
 
    send_to_char("You begin sneaking.\r\n", ch);
 
    struct affected_type af;
    af.type = SKILL_SNEAK;
-   af.duration = MAX(5, GET_LEVEL(ch) / 2);
+   af.duration = 4;
    af.modifier = 0;
    af.location = APPLY_NONE;
    af.bitvector = AFF_SNEAK;
    affect_to_char(ch, &af);
 
-   af.type = SKILL_INNATE_SNEAK;
-   af.duration = 40;
-   af.modifier = 0;
-   af.location = 0;   
-   af.bitvector = 0;
-   affect_to_char(ch, &af);
-
    return eSUCCESS;   
 }
 
-int do_innate_bloodlust(CHAR_DATA *ch, char *arg, int cmd)
+int innate_farsight(CHAR_DATA *ch, char *arg, int cmd)
 {
-   if(affected_by_spell(ch, SKILL_INNATE_BLOODLUST))
-   {
-      send_to_char("It is still too soon for you to be able to call upon your ancestral powers again.\r\n", ch);
-      return eSUCCESS;
-   }
-
-   if(!ch->fighting)
-   {
-      send_to_char("You must be in combat to bring forth a bloodlust.\r\n", ch);
-      return eSUCCESS;
-   }
-
-   act("$n mumbles an orcish chant and begins to pant with the heat of battle.\r\n", ch, 0, 0, TO_ROOM, 0);
-   send_to_char("You chant in orcish and begin to feel the heat of battle and lust for blood.\r\n", ch);
-
-   SET_BIT(ch->combat, COMBAT_ORC_BLOODLUST);
-
    struct affected_type af;
-   af.type = SKILL_INNATE_BLOODLUST;
-   af.duration = 40;
+   af.type = SKILL_INNATE_FARSIGHT;
+   af.duration = 6;
+   af.modifier = 0;
+   af.location = 0;
+   af.bitvector = AFF_FARSIGHT;
+   affect_to_char(ch, &af);
+   send_to_char("Your eyes glow green from your innate racial sight.\r\n",ch);
+   return eSUCCESS;
+}
+
+int innate_bloodlust(CHAR_DATA *ch, char *arg, int cmd)
+{
+  if (!ch->fighting)
+  {
+    send_to_char("You need to be fighting to use that.\r\n",ch);
+    return eFAILURE;
+  }
+  SET_BIT(ch->combat, COMBAT_ORC_BLOODLUST1);
+  send_to_char("You scream, raging in bloodlust.\r\n",ch);
+  return eSUCCESS;
+}
+
+int innate_repair(CHAR_DATA *ch, char *arg, int cmd)
+{
+  struct obj_data *obj;
+  int i;
+  bool found = FALSE;
+  if ( ( obj = get_obj_in_list_vis( ch, arg, ch->carrying ) ) == NULL )
+  {
+    send_to_char("You are not carrying anything like that.\r\n",ch);
+    return eFAILURE;
+  }
+  for (i = 0; i < obj->num_affects;i++)
+  {
+    if (obj->affected[i].location == APPLY_DAMAGED)
+    {
+       found = TRUE;
+       obj->num_affects--;
+    } else if (found) {
+       obj->affected[i-1] = obj->affected[i];
+    }
+  }
+  if (found) return eSUCCESS;
+  else { send_to_char("You don't have that item.\r\n",ch); return eFAILURE; }
+  
+}
+
+int innate_evasion(CHAR_DATA *ch, char *arg, int cmd)
+{
+   struct affected_type af;
+   af.type = SKILL_INNATE_EVASION;
+   af.duration = 2;
    af.modifier = 0;
    af.location = 0;
    af.bitvector = 0;
    affect_to_char(ch, &af);
+   send_to_char("You bring up an aura, blocking all forms of scrying your location.\r\n",ch);
+   return eSUCCESS;
+}
 
+int innate_shadowslip(CHAR_DATA *ch, char *arg, int cmd)
+{
+   struct affected_type af;
+   af.type = SKILL_INNATE_SHADOWSLIP;
+   af.duration = 3;
+   af.modifier = 0;
+   af.location = 0;
+   af.bitvector = AFF_SHADOWSLIP;
+   affect_to_char(ch, &af);
+   send_to_char("You bring up an aura, blocking all forms of scrying your location.\r\n",ch);
    return eSUCCESS;
 }
 

@@ -6,8 +6,13 @@
 // Innate skills can go from 1500 - 1599
 
 #define SKILL_INNATE_BASE               1500
-#define SKILL_INNATE_FLY                1500
+#define SKILL_INNATE_POWERWIELD         1500
 #define SKILL_INNATE_SNEAK              1501
-#define SKILL_INNATE_INFRA              1502
+#define SKILL_INNATE_REGENERATION       1502
 #define SKILL_INNATE_BLOODLUST          1503
-#define SKILL_INNATE_MAX                1503
+#define SKILL_INNATE_FARSIGHT		1504
+#define SKILL_INNATE_EVASION		1505
+#define SKILL_INNATE_SHADOWSLIP		1506
+#define SKILL_INNATE_REPAIR		1507
+#define SKILL_INNATE_TIMER		1508
+#define SKILL_INNATE_MAX                1508

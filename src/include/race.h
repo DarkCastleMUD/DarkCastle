@@ -1,7 +1,7 @@
 #ifndef RACE_H_
 #define RACE_H_
 /************************************************************************
-| $Id: race.h,v 1.3 2004/04/18 14:46:47 urizen Exp $
+| $Id: race.h,v 1.4 2004/04/20 19:42:49 urizen Exp $
 | race.h
 | This file defines racial information.
 */
@@ -89,83 +89,41 @@
 #endif
 #define RACE_ELVEN_CON_MOD         -1
 
-#ifdef COMPILE_WITH_CHANGES
   #define RACE_DWARVEN_STR_MOD 	2
   #define RACE_DWARVEN_DEX_MOD -2
   #define RACE_DWARVEN_WIS_MOD  1
   #define RACE_DWARVEN_INT_MOD -2
-#else
-  #define RACE_DWARVEN_STR_MOD        1
-  #define RACE_DWARVEN_DEX_MOD       -1
-  #define RACE_DWARVEN_INT_MOD       -1
-  #define RACE_DWARVEN_WIS_MOD        0
-#endif
 #define RACE_DWARVEN_CON_MOD        1
 
-#ifdef COMPILE_WITH_CHANGES
   #define RACE_HOBBIT_STR_MOD 	    -2
   #define RACE_HOBBIT_DEX_MOD	    3
   #define RACE_HOBBIT_CON_MOD	    -1
   #define RACE_HOBBIT_INT_MOD       0
   #define RACE_HOBBIT_WIS_MOD       0
-#else
-  #define RACE_HOBBIT_STR_MOD        -1
-  #define RACE_HOBBIT_DEX_MOD         2
-  #define RACE_HOBBIT_INT_MOD        -1
-  #define RACE_HOBBIT_WIS_MOD         1
-  #define RACE_HOBBIT_CON_MOD         0
-#endif
 
-#ifdef COMPILE_WITH_CHANGES
 #define RACE_PIXIE_STR_MOD	   -4
 #define RACE_PIXIE_CON_MOD	   -2
 #define RACE_PIXIE_WIS_MOD	    1
 #define RACE_PIXIE_INT_MOD	    3
-#else
-#define RACE_PIXIE_STR_MOD         -3
-#define RACE_PIXIE_CON_MOD         -1
-#define RACE_PIXIE_INT_MOD          2
-#define RACE_PIXIE_WIS_MOD          2
-#endif
 #define RACE_PIXIE_DEX_MOD         2
 
 #define RACE_GIANT_STR_MOD          3
-#ifdef COMPILE_WITH_CHANGES
   #define RACE_GIANT_DEX_MOD	    -2
   #define RACE_GIANT_CON_MOD	    1
   #define RACE_GIANT_WIS_MOD	    0
-#else
-  #define RACE_GIANT_DEX_MOD        -1
-  #define RACE_GIANT_CON_MOD	    3
-  #define RACE_GIANT_WIS_MOD	   -2
-#endif
 #define RACE_GIANT_INT_MOD         -2
 
-#ifdef COMPILE_WITH_CHANGES
  #define RACE_GNOME_STR_MOD         -2
  #define RACE_GNOME_DEX_MOD         -2
  #define RACE_GNOME_INT_MOD          1
  #define RACE_GNOME_WIS_MOD          3
  #define RACE_GNOME_CON_MOD          0
-#else
- #define RACE_GNOME_STR_MOD         -2
- #define RACE_GNOME_DEX_MOD          0
- #define RACE_GNOME_INT_MOD          2
- #define RACE_GNOME_WIS_MOD         -2
- #define RACE_GNOME_CON_MOD          2
-#endif
 
 #define RACE_ORC_STR_MOD            1
 #define RACE_ORC_DEX_MOD            0
-#ifdef COMPILE_WITH_CHANGES
-  #define RACE_ORC_CON_MOD	1
-  #define RACE_ORC_WIS_MOD	-2
-  #define RACE_ORC_INT_MOD	0
-#else
   #define RACE_ORC_INT_MOD           -2
   #define RACE_ORC_WIS_MOD           -1
   #define RACE_ORC_CON_MOD            2
-#endif
 
 #define RACE_TROLL_STR_MOD 2
 #define RACE_TROLL_DEX_MOD 0
@@ -181,53 +139,60 @@
 #define RACE_HUMAN_MAGIC_MOD        0
 #define RACE_HUMAN_POISON_MOD       0
 
-#define RACE_ELVEN_FIRE_MOD         -4
+#define RACE_TROLL_FIRE_MOD -6
+#define RACE_TROLL_COLD_MOD 0 
+#define RACE_TROLL_ENERGY_MOD 3
+#define RACE_TROLL_ACID_MOD -3
+#define RACE_TROLL_MAGIC_MOD 0
+#define RACE_TROLL_POISON_MOD 6
+
+#define RACE_ELVEN_FIRE_MOD         0
 #define RACE_ELVEN_COLD_MOD         0
 #define RACE_ELVEN_ENERGY_MOD       3
-#define RACE_ELVEN_ACID_MOD         0
-#define RACE_ELVEN_MAGIC_MOD        5
-#define RACE_ELVEN_POISON_MOD       -4
+#define RACE_ELVEN_ACID_MOD         -3
+#define RACE_ELVEN_MAGIC_MOD        3
+#define RACE_ELVEN_POISON_MOD       -3
 
-#define RACE_DWARVEN_FIRE_MOD       5
-#define RACE_DWARVEN_COLD_MOD       4
-#define RACE_DWARVEN_ENERGY_MOD     -5
-#define RACE_DWARVEN_ACID_MOD       -4
+#define RACE_DWARVEN_FIRE_MOD       -3
+#define RACE_DWARVEN_COLD_MOD       -3
+#define RACE_DWARVEN_ENERGY_MOD     0
+#define RACE_DWARVEN_ACID_MOD       3
 #define RACE_DWARVEN_MAGIC_MOD      0
-#define RACE_DWARVEN_POISON_MOD     0
+#define RACE_DWARVEN_POISON_MOD     3
 
-#define RACE_GIANT_FIRE_MOD         0
-#define RACE_GIANT_COLD_MOD         0
-#define RACE_GIANT_ENERGY_MOD       0
-#define RACE_GIANT_ACID_MOD         -3
-#define RACE_GIANT_MAGIC_MOD        -3
-#define RACE_GIANT_POISON_MOD       10
+#define RACE_GIANT_FIRE_MOD         3
+#define RACE_GIANT_COLD_MOD         6
+#define RACE_GIANT_ENERGY_MOD       -3
+#define RACE_GIANT_ACID_MOD         0
+#define RACE_GIANT_MAGIC_MOD        -6
+#define RACE_GIANT_POISON_MOD       0
 
-#define RACE_PIXIE_FIRE_MOD         0
+#define RACE_PIXIE_FIRE_MOD         -3
 #define RACE_PIXIE_COLD_MOD         0
-#define RACE_PIXIE_ENERGY_MOD       2
+#define RACE_PIXIE_ENERGY_MOD       3
 #define RACE_PIXIE_ACID_MOD         0
-#define RACE_PIXIE_MAGIC_MOD        2
-#define RACE_PIXIE_POISON_MOD       0
+#define RACE_PIXIE_MAGIC_MOD        6
+#define RACE_PIXIE_POISON_MOD       -6
 
-#define RACE_HOBBIT_FIRE_MOD        -1
-#define RACE_HOBBIT_COLD_MOD        2
+#define RACE_HOBBIT_FIRE_MOD        6
+#define RACE_HOBBIT_COLD_MOD        -6
 #define RACE_HOBBIT_ENERGY_MOD      0
-#define RACE_HOBBIT_ACID_MOD        1
-#define RACE_HOBBIT_MAGIC_MOD       0
-#define RACE_HOBBIT_POISON_MOD      -1
+#define RACE_HOBBIT_ACID_MOD        0
+#define RACE_HOBBIT_MAGIC_MOD       -3
+#define RACE_HOBBIT_POISON_MOD      3
 
-#define RACE_GNOME_FIRE_MOD         -2
-#define RACE_GNOME_COLD_MOD         -2
-#define RACE_GNOME_ENERGY_MOD       3
+#define RACE_GNOME_FIRE_MOD         0
+#define RACE_GNOME_COLD_MOD         0
+#define RACE_GNOME_ENERGY_MOD       -3
 #define RACE_GNOME_ACID_MOD         3
-#define RACE_GNOME_MAGIC_MOD        0
-#define RACE_GNOME_POISON_MOD       0
+#define RACE_GNOME_MAGIC_MOD        3
+#define RACE_GNOME_POISON_MOD       -3
 
-#define RACE_ORC_FIRE_MOD           6
-#define RACE_ORC_COLD_MOD           -1
-#define RACE_ORC_ENERGY_MOD         0
+#define RACE_ORC_FIRE_MOD           3
+#define RACE_ORC_COLD_MOD           3
+#define RACE_ORC_ENERGY_MOD         -3
 #define RACE_ORC_ACID_MOD           0
-#define RACE_ORC_MAGIC_MOD          -3
+#define RACE_ORC_MAGIC_MOD          -6
 #define RACE_ORC_POISON_MOD         0
 
 #endif

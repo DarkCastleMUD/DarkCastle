@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.27 2004/04/13 20:56:16 urizen Exp $
+| $Id: objects.cpp,v 1.28 2004/04/20 19:42:43 urizen Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -211,7 +211,11 @@ int do_switch(struct char_data *ch, char *arg, int cmd)
     act("You fail to switch your weapons.", ch, 0,0, TO_CHAR, 0);
     return eFAILURE;
   }
-
+  if (GET_OBJ_WEIGHT(ch->equipment[WIELD]) > str_app[STRENGTH_APPLY_INDEX(ch)].wield_w)
+  {
+     send_to_char("Your primary wield is too heavy to wield as secondary.\r\n",ch);
+      return eFAILURE;
+  }
   between = ch->equipment[WIELD];
   ch->equipment[WIELD] = ch->equipment[SECOND_WIELD];
   ch->equipment[SECOND_WIELD] = between;
@@ -1648,7 +1652,8 @@ void wear(struct char_data *ch, struct obj_data *obj_object, int keyword)
         send_to_char("It is too heavy for you to use as a secondary weapon.\n\r",ch);
 
       else if((!hands_are_free(ch, 2)) && 
-             (IS_SET(obj_object->obj_flags.extra_flags, ITEM_TWO_HANDED)))
+             (IS_SET(obj_object->obj_flags.extra_flags, ITEM_TWO_HANDED) && !
+	      ch->affected_by2 & AFF_POWERWIELD))
         send_to_char("You need both hands for this weapon.\n\r", ch);
 
       else if(!hands_are_free(ch, 1))
@@ -1948,7 +1953,7 @@ int hands_are_free(struct char_data *ch, int number)
    wielded = ch->equipment[WIELD];
 
   if(wielded)
-    if (IS_SET(wielded->obj_flags.extra_flags, ITEM_TWO_HANDED))
+    if (IS_SET(wielded->obj_flags.extra_flags, ITEM_TWO_HANDED) && !ch->affected_by2 & AFF_POWERWIELD)
        hands = 2;
 
   if(ch->equipment[WIELD]) hands++;

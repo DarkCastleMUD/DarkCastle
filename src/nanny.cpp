@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.38 2004/04/17 14:34:40 urizen Exp $ */
+/* $Id: nanny.cpp,v 1.39 2004/04/20 19:42:43 urizen Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -140,49 +140,49 @@ int is_clss_eligible(CHAR_DATA *ch, int clss)
    
    switch(clss) {
    case CLASS_MAGIC_USER:
-      if(GET_RAW_INT(ch) >= 12)
+      if(GET_RAW_INT(ch) >= 15)
          x = 1;;
       break; 
    case CLASS_CLERIC:
-      if(GET_RAW_WIS(ch) >= 13)
+      if(GET_RAW_WIS(ch) >= 15)
          x = 1;
       break; 
    case CLASS_THIEF:
-      if(GET_RAW_DEX(ch) >= 13)
+      if(GET_RAW_DEX(ch) >= 15 && GET_RACE(ch) != RACE_GIANT)
          x = 1;
       break; 
    case CLASS_WARRIOR:
-      if(GET_RAW_STR(ch) >= 13 && GET_RAW_CON(ch) >= 12)
+      if(GET_RAW_STR(ch) >= 15)
          x = 1;
       break; 
    case CLASS_ANTI_PAL:
-      if(GET_RAW_INT(ch) >= 16 && GET_RAW_CON(ch) >= 14 &&
+      if(GET_RAW_INT(ch) >= 14 && GET_RAW_DEX(ch) >= 14 &&
          (GET_RACE(ch) == RACE_HUMAN || GET_RACE(ch) == RACE_ORC))
          x = 1;
       break; 
    case CLASS_PALADIN:
-      if(GET_RAW_WIS(ch) >= 16 && GET_RAW_CON(ch) >= 14 && 
+      if(GET_RAW_WIS(ch) >= 14 && GET_RAW_STR(ch) >= 14 && 
          (GET_RACE(ch) == RACE_HUMAN || GET_RACE(ch) == RACE_ELVEN))
          x = 1;
       break; 
    case CLASS_BARBARIAN:
-      if(GET_RAW_STR(ch) >= 15 && GET_RAW_CON(ch) >= 15)
-         x = 1;
+      if(GET_RAW_STR(ch) >= 14 && GET_RAW_CON(ch) >= 14 && GET_RACE(ch) != RACE_PIXIE)
+        x = 1;
       break; 
    case CLASS_MONK:
-      if(GET_RAW_CON(ch) >= 14)
+      if(GET_RAW_CON(ch) >= 14 && GET_RAW_WIS(ch) >= 14)
          x = 1;
       break; 
    case CLASS_RANGER:
-      if(GET_RAW_WIS(ch) >= 13 && GET_RAW_DEX(ch) >= 13)
+      if(GET_RAW_WIS(ch) >= 14 && GET_RAW_DEX(ch) >= 14)
          x = 1;
       break;
    case CLASS_BARD:
-      if(GET_RAW_WIS(ch) >= 14 && GET_RAW_INT(ch) >= 14)
+      if(GET_RAW_CON(ch) >= 14 && GET_RAW_INT(ch) >= 14)
          x = 1;
       break;
    case CLASS_DRUID:
-      if(GET_RAW_WIS(ch) >= 15 &&
+      if(GET_RAW_WIS(ch) >= 15 && GET_RAW_WIS(ch) &&
           GET_RACE(ch) != RACE_GIANT && GET_RACE(ch) != RACE_ORC)
          x = 1;
       break; 
@@ -221,6 +221,14 @@ void do_inate_race_abilities(char_data * ch)
        ch->saves[SAVE_TYPE_MAGIC]  += RACE_DWARVEN_MAGIC_MOD;
        ch->saves[SAVE_TYPE_POISON] += RACE_DWARVEN_POISON_MOD;
        break;
+     case RACE_TROLL:
+       ch->saves[SAVE_TYPE_FIRE]   += RACE_TROLL_FIRE_MOD;
+       ch->saves[SAVE_TYPE_COLD]   += RACE_TROLL_COLD_MOD;
+       ch->saves[SAVE_TYPE_ENERGY] += RACE_TROLL_ENERGY_MOD;
+       ch->saves[SAVE_TYPE_ACID]   += RACE_TROLL_ACID_MOD;
+       ch->saves[SAVE_TYPE_MAGIC]  += RACE_TROLL_MAGIC_MOD;
+       ch->saves[SAVE_TYPE_POISON] += RACE_TROLL_POISON_MOD;
+       break;	 
      case RACE_GIANT:
        ch->saves[SAVE_TYPE_FIRE]   += RACE_GIANT_FIRE_MOD;
        ch->saves[SAVE_TYPE_COLD]   += RACE_GIANT_COLD_MOD;
@@ -319,7 +327,7 @@ void do_inate_race_abilities(char_data * ch)
       af.bitvector = AFF_INFRARED;
       affect_to_char(ch, &af);
       break;
-
+  
    case RACE_GIANT:
       af.type = SPELL_RESIST_COLD;
       af.duration = -1;
@@ -986,7 +994,7 @@ void nanny(struct descriptor_data *d, char *arg)
             SEND_TO_Q("\n\rChoose a race.\n\r", d );
             sprintf(buf, "   1: Human\n\r   2: Elf\n\r   3: Dwarf\n\r"
                "   4: Hobbit\n\r   5: Pixie\n\r   6: Giant\n\r"
-               "   7: Gnome\r\n   8: Orc\r\n"
+               "   7: Gnome\r\n   8: Orc\r\n   9: Troll\r\n"
                "\n\rSelect a race-> ");
             SEND_TO_Q(buf, d);
             STATE(d) = CON_GET_RACE;
@@ -1004,8 +1012,8 @@ void nanny(struct descriptor_data *d, char *arg)
             
          case '1':
             ch->race = RACE_HUMAN;
-            ch->height = number(48, 84);
-            ch->weight = number(100, 140);
+            ch->height = number(66, 77);
+            ch->weight = number(160, 200);
             GET_RAW_STR(ch) += RACE_HUMAN_STR_MOD;
             GET_RAW_INT(ch) += RACE_HUMAN_INT_MOD;
             GET_RAW_WIS(ch) += RACE_HUMAN_WIS_MOD;
@@ -1014,9 +1022,14 @@ void nanny(struct descriptor_data *d, char *arg)
             break;
             
          case '2':
+	    if (GET_RAW_DEX(ch) < 10 || GET_RAW_INT(ch) < 10)
+	    {
+		send_to_char("Your stats do not qualify for that race.\r\n",ch);
+		return;
+	    }
             ch->race = RACE_ELVEN;
-            ch->height = number(71, 84);
-            ch->weight = number(70, 90);
+            ch->height = number(78, 101);
+            ch->weight = number(120, 160);
             ch->alignment = 1000;
             GET_RAW_STR(ch) += RACE_ELVEN_STR_MOD;
             GET_RAW_INT(ch) += RACE_ELVEN_INT_MOD;
@@ -1026,9 +1039,14 @@ void nanny(struct descriptor_data *d, char *arg)
             break;
             
          case '3':
+            if (GET_RAW_CON(ch) < 10 || GET_RAW_WIS(ch) < 10)
+            {
+                send_to_char("Your stats do not qualify for that race.\r\n",ch);
+                return;
+            }
             ch->race = RACE_DWARVEN;
-            ch->height = number(42, 54);
-            ch->weight = number(80, 110);
+            ch->height = number(42, 65);
+            ch->weight = number(140, 180);
             GET_RAW_STR(ch) += RACE_DWARVEN_STR_MOD;
             GET_RAW_INT(ch) += RACE_DWARVEN_INT_MOD;
             GET_RAW_WIS(ch) += RACE_DWARVEN_WIS_MOD;
@@ -1037,9 +1055,14 @@ void nanny(struct descriptor_data *d, char *arg)
             break;
             
          case '4':
+            if (GET_RAW_DEX(ch) < 10)
+            {
+                send_to_char("Your stats do not qualify for that race.\r\n",ch);
+                return;
+            }
             ch->race = RACE_HOBBIT;
-            ch->height = number(36, 41);
-            ch->weight = number(50, 80);
+            ch->height = number(20, 41);
+            ch->weight = number(40, 80);
             GET_RAW_STR(ch) += RACE_HOBBIT_STR_MOD;
             GET_RAW_INT(ch) += RACE_HOBBIT_INT_MOD;
             GET_RAW_WIS(ch) += RACE_HOBBIT_WIS_MOD;
@@ -1048,9 +1071,14 @@ void nanny(struct descriptor_data *d, char *arg)
             break;
             
          case '5':
+            if (GET_RAW_INT(ch) < 12)
+            {
+                send_to_char("Your stats do not qualify for that race.\r\n",ch);
+                return;
+            }
             ch->race = RACE_PIXIE;
-            ch->height = number(24, 38);
-            ch->weight = number(20, 30);
+            ch->height = number(12, 33);
+            ch->weight = number(10, 40);
             GET_RAW_STR(ch) += RACE_PIXIE_STR_MOD;
             GET_RAW_INT(ch) += RACE_PIXIE_INT_MOD;
             GET_RAW_WIS(ch) += RACE_PIXIE_WIS_MOD;
@@ -1059,9 +1087,13 @@ void nanny(struct descriptor_data *d, char *arg)
             break;
             
          case '6':
-            ch->race = RACE_GIANT;
-            ch->height = number(85, 100);
-            ch->weight = number(150, 200);
+            if (GET_RAW_STR(ch) < 12)
+            {
+                send_to_char("Your stats do not qualify for that race.\r\n",ch);
+                return;
+            }            ch->race = RACE_GIANT;
+            ch->height = number(106, 131);
+            ch->weight = number(260, 300);
             GET_RAW_STR(ch) += RACE_GIANT_STR_MOD;
             GET_RAW_INT(ch) += RACE_GIANT_INT_MOD;
             GET_RAW_WIS(ch) += RACE_GIANT_WIS_MOD;
@@ -1070,9 +1102,14 @@ void nanny(struct descriptor_data *d, char *arg)
             break;
 
          case '7':
+            if (GET_RAW_WIS(ch) < 12)
+            {
+                send_to_char("Your stats do not qualify for that race.\r\n",ch);
+                return;
+            }
             ch->race = RACE_GNOME;
-            ch->height = number(42, 54);
-            ch->weight = number(50, 70);
+            ch->height = number(42, 65);
+            ch->weight = number(80, 120);
             GET_RAW_STR(ch) += RACE_GNOME_STR_MOD;
             GET_RAW_INT(ch) += RACE_GNOME_INT_MOD;
             GET_RAW_WIS(ch) += RACE_GNOME_WIS_MOD;
@@ -1081,9 +1118,15 @@ void nanny(struct descriptor_data *d, char *arg)
             break;
             
          case '8':
+            if (GET_RAW_CON(ch) < 10 || GET_RAW_STR(ch) < 10)
+            {
+                send_to_char("Your stats do not qualify for that race.\r\n",ch);
+                return;
+            }
+
             ch->race = RACE_ORC;
-            ch->height = number(71, 84);
-            ch->weight = number(130, 170);
+            ch->height = number(78, 101);
+            ch->weight = number(200, 240);
             ch->alignment = -1000;
             GET_RAW_STR(ch) += RACE_ORC_STR_MOD;
             GET_RAW_INT(ch) += RACE_ORC_INT_MOD;
@@ -1091,6 +1134,21 @@ void nanny(struct descriptor_data *d, char *arg)
             GET_RAW_DEX(ch) += RACE_ORC_DEX_MOD;
             GET_RAW_CON(ch) += RACE_ORC_CON_MOD;
             break;
+ 	  case '9':
+            if (GET_RAW_CON(ch) < 12)
+            {
+                send_to_char("Your stats do not qualify for that race.\r\n",ch);
+                return;
+            }
+	    ch->race = RACE_TROLL;
+            ch->height = number(102, 123);
+            ch->weight = number(240, 280);
+	    ch->alignment = 0;
+            GET_RAW_STR(ch) += RACE_TROLL_STR_MOD;
+            GET_RAW_INT(ch) += RACE_TROLL_INT_MOD;
+            GET_RAW_WIS(ch) += RACE_TROLL_WIS_MOD;
+            GET_RAW_DEX(ch) += RACE_TROLL_DEX_MOD;
+            GET_RAW_CON(ch) += RACE_TROLL_CON_MOD;
          }
          
          SEND_TO_Q("\n\rA '*' denotes a class that fits your chosen stats.\n\r", d );

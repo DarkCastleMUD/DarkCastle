@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.72 2004/04/18 14:46:45 urizen Exp $ */
+/* $Id: const.cpp,v 1.73 2004/04/20 19:42:42 urizen Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1469,6 +1469,7 @@ char *race_types[] =
     "Giant",
     "Gnome",
     "Orc",
+    "Troll",
     "\n"
 };
 

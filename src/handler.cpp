@@ -21,7 +21,7 @@
  *  12/08/2003   Onager    Added check for charmies and !charmie eq to     *
  *                         equip_char()                                    *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.32 2004/04/20 15:12:46 urizen Exp $ */
+/* $Id: handler.cpp,v 1.33 2004/04/20 19:42:43 urizen Exp $ */
     
 extern "C"
 {
@@ -56,6 +56,7 @@ extern "C"
 #include <race.h>
 #include <fight.h>
 #include <returnvals.h>
+#include <innate.h>
 
 extern CWorld world;
  
@@ -82,6 +83,26 @@ int do_fall(CHAR_DATA *ch, short dir);
 /* internal procedures */
 void remove_memory(CHAR_DATA *ch, char type);
 void add_memory(CHAR_DATA *ch, char *victim, char type);
+
+bool isaff2(int spellnum)
+{
+  switch (spellnum)
+  {
+                case SPELL_SHADOWSLIP:
+                case SPELL_CAMOUFLAGE:
+		case SPELL_FARSIGHT:
+                case SPELL_PROTECT_FROM_GOOD:
+		case SKILL_INNATE_POWERWIELD:
+		case SKILL_INNATE_REGENERATION:
+		case SKILL_INNATE_SHADOWSLIP:
+                  return TRUE;
+                  break;
+                default:
+                  return FALSE;
+                  break;
+
+  };
+}
 
 
 // This grabs the first "word" (defined as group of alphaBETIC chars)
@@ -221,7 +242,16 @@ int get_max_stat(char_data * ch, byte stat)
           case CONSTITUTION:  return (BASE_MAX_STAT + RACE_ELVEN_CON_MOD);
         }
 
-      case RACE_DWARVEN:
+    case RACE_TROLL:
+	switch(stat) {
+	  case STRENGTH:   return (BASE_MAX_STAT + RACE_TROLL_STR_MOD);
+	  case DEXTERITY:  return (BASE_MAX_STAT + RACE_TROLL_DEX_MOD);
+	  case INTELLIGENCE: return (BASE_MAX_STAT + RACE_TROLL_INT_MOD);
+	  case WISDOM: 	    return (BASE_MAX_STAT + RACE_TROLL_WIS_MOD);
+	  case CONSTITUTION: return (BASE_MAX_STAT + RACE_TROLL_CON_MOD);
+	}
+
+  case RACE_DWARVEN:
         switch(stat) {
           case STRENGTH:      return (BASE_MAX_STAT + RACE_DWARVEN_STR_MOD);
           case DEXTERITY:     return (BASE_MAX_STAT + RACE_DWARVEN_DEX_MOD);
@@ -802,19 +832,7 @@ void affect_total(CHAR_DATA *ch)
     {
         bool secFix = FALSE;
         tmp_af = af->next;
-           switch (af->type)
-	    { // Some spells use affected_by2 instead..
-	        case SPELL_SHADOWSLIP:
-	        case SPELL_CAMOUFLAGE:
-		case SPELL_PROTECT_FROM_GOOD:
-	          secFix = TRUE;
-	          break;
-	        default:
-	          secFix = FALSE;
-	          break;
-	    }
-
-        affect_modify(ch, af->location, af->modifier, af->bitvector, FALSE,secFix);
+        affect_modify(ch, af->location, af->modifier, af->bitvector, FALSE,isaff2(af->type));
     }
             
     // add everything back
@@ -828,18 +846,7 @@ void affect_total(CHAR_DATA *ch)
     for(af = ch->affected; af; af=af->next)
     {
       bool secFix = FALSE;
-	   switch (af->type)
-	    { // Some spells use affected_by2 instead..
-	        case SPELL_SHADOWSLIP:
-	        case SPELL_CAMOUFLAGE:
-		case SPELL_PROTECT_FROM_GOOD:
-	          secFix = TRUE;
-	          break;
-	        default:
-	          secFix = FALSE;
-	          break;
-	    }
-        affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE,secFix);
+        affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE,isaff2(af->type));
     }
 
     REMOVE_BIT(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT); // so weapons stop fall off
@@ -858,23 +865,12 @@ void affect_to_char( CHAR_DATA *ch, struct affected_type *af )
 #else
     affected_alloc = (struct affected_type *) dc_alloc(1, sizeof(struct affected_type));
 #endif
-    switch (af->type)
-    { // Some spells use affected_by2 instead..
-	case SPELL_SHADOWSLIP:
-	case SPELL_CAMOUFLAGE:
-	case SPELL_PROTECT_FROM_GOOD:
-	  secFix = TRUE;
-	  break;
-	default:
-	  secFix = FALSE;
-	  break;
-    }
     *affected_alloc = *af;
     affected_alloc->next = ch->affected;
     ch->affected = affected_alloc;
 
     affect_modify(ch, af->location, af->modifier,
-		  af->bitvector, TRUE,secFix);
+		  af->bitvector, TRUE,isaff2(af->type));
 }
 
 
@@ -958,6 +954,25 @@ void affect_remove( CHAR_DATA *ch, struct affected_type *af, int flags, bool aff
          if (!(flags & SUPPRESS_MESSAGES))
             send_to_char("Your blood cools to normal levels.\r\n", ch);
          break;
+      case SKILL_INNATE_REGENERATION:
+	 send_to_char("Your regeneration slows back to normal.\r\n",ch);
+	 break;
+      case SKILL_INNATE_POWERWIELD:
+        struct obj_data *obj;
+	   obj = ch->equipment[WIELD];
+	   if (obj->obj_flags.extra_flags & ITEM_TWO_HANDED)
+           {
+	     obj_to_char(unequip_char(ch, WIELD),ch);
+	     act("You shift $p into your inventory.",ch, obj, NULL, TO_CHAR, 0);
+  	   }
+           obj = ch->equipment[SECOND_WIELD];
+           if (obj->obj_flags.extra_flags & ITEM_TWO_HANDED)
+           {
+             obj_to_char(unequip_char(ch, SECOND_WIELD),ch);
+             act("You shift $p into your inventory.",ch, obj, NULL, TO_CHAR, 0);
+           }
+  	   send_to_char("You can no longer wield two handed weapons.\r\n",ch);
+	 break;
       case SKILL_BLADESHIELD:
          if (!(flags & SUPPRESS_MESSAGES))
             send_to_char("The draining affect of the blade shield technique has worn off.\r\n", ch);
@@ -1022,21 +1037,10 @@ void affect_from_char( CHAR_DATA *ch, int skill)
 
     if(skill < 0)  // affect types are unsigned, so no negatives are possible
        return;
-    switch (skill)
-    { // Hack for affected_by2
-        case SPELL_SHADOWSLIP:
-        case SPELL_CAMOUFLAGE:
-	case SPELL_PROTECT_FROM_GOOD:
-	  aff2Fix = TRUE;
-	  break;
-	default:
-	  aff2Fix = FALSE;
-	  break;
-    }
     for(hjp = ch->affected; hjp; hjp = afc) {
         afc = hjp->next;
 	if (hjp->type == (unsigned)skill)
-	    affect_remove( ch, hjp, 0, aff2Fix );
+	    affect_remove( ch, hjp, 0, isaff2(hjp->type));
     }
 }
 

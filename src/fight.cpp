@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.153 2004/04/20 00:03:53 urizen Exp $ */
+/* $Id: fight.cpp,v 1.154 2004/04/20 19:42:42 urizen Exp $ */
 
 extern "C"
 {
@@ -1370,8 +1370,16 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
       dam = (int)(dam * 1.3);
     if (IS_SET(ch->combat, COMBAT_HITALL))
       dam = (int)(dam * 2);
-    if (IS_SET(ch->combat, COMBAT_ORC_BLOODLUST))
-      dam = (int)(dam * 1.1);
+    if (IS_SET(ch->combat, COMBAT_ORC_BLOODLUST1)) {
+      dam = (int)(dam * 1.25); 
+//      REMOVE_BIT(ch->combat, COMBAT_ORC_BLOODLUST1);
+  //    SET_BIT(ch->combat, COMBAT_ORC_BLOODLUST2);
+    }
+    if (IS_SET(ch->combat, COMBAT_ORC_BLOODLUST2)) {
+      dam = (int)(dam * 1.25);
+    //  REMOVE_BIT(ch->combat, COMBAT_ORC_BLOODLUST2);
+    }
+
     percent = (int) (( ((float)GET_HIT(ch)) / ((float)GET_MAX_HIT(ch)) ) * 100);
     if( percent < 40 && (learned = has_skill(ch, SKILL_FRENZY))) 
     {
@@ -1819,8 +1827,8 @@ int check_riposte(CHAR_DATA * ch, CHAR_DATA * victim)
   
   if(IS_SET(victim->combat, COMBAT_BLADESHIELD1) || IS_SET(victim->combat, COMBAT_BLADESHIELD2)) 
   {
-    if(chance < 99)
-      chance = 99;
+    if(chance < 101)
+      chance = 101;
     // this is so we don't get huge riposte chains
     if(IS_SET(ch->combat, COMBAT_BLADESHIELD1) || IS_SET(ch->combat, COMBAT_BLADESHIELD2))
       chance = 1;
@@ -2284,8 +2292,12 @@ void stop_fighting(CHAR_DATA * ch)
   if(IS_SET(ch->combat, COMBAT_SHOCKED))
     REMOVE_BIT(ch->combat, COMBAT_SHOCKED);
 
-  if(IS_SET(ch->combat, COMBAT_ORC_BLOODLUST)) {
-    REMOVE_BIT(ch->combat, COMBAT_ORC_BLOODLUST);
+  if(IS_SET(ch->combat, COMBAT_ORC_BLOODLUST1)) {
+    REMOVE_BIT(ch->combat, COMBAT_ORC_BLOODLUST1);
+    SET_BIT(ch->combat, COMBAT_ORC_BLOODLUST2);
+  }
+  if(IS_SET(ch->combat, COMBAT_ORC_BLOODLUST2)) {
+     REMOVE_BIT(ch->combat, COMBAT_ORC_BLOODLUST2);
     send_to_char("Your bloodlust fades.\r\n", ch);
     act("$n's bloodlust fades.", ch, 0, 0, TO_ROOM, 0);
   }

@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.14 2004/04/19 22:23:36 urizen Exp $ */
+/* $Id: limits.cpp,v 1.15 2004/04/20 19:42:43 urizen Exp $ */
 
 extern "C"
 {
@@ -222,6 +222,8 @@ int hit_gain(CHAR_DATA *ch)
   }
 
   gain += ch->hit_regen;
+  if (ch->affected_by2 & AFF_REGENERATION)
+    gain += (gain/2);
 
   if(IS_AFFECTED(ch, AFF_POISON))
     gain >>= 2;
