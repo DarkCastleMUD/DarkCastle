@@ -1918,6 +1918,15 @@ int mprog_random_trigger( CHAR_DATA *mob )
 
 }
 
+int mprog_arandom_trigger( CHAR_DATA *mob)
+{
+  mprog_cur_result = eSUCCESS;
+  if (mob_index[mob->mobdata->nr].progtypes & ARAND_PROG)
+     mprog_percent_check(mob,NULL,NULL,NULL,ARAND_PROG);
+   return mprog_cur_result;
+}
+ 
+
 int mprog_speech_trigger( char *txt, CHAR_DATA *mob )
 {
 

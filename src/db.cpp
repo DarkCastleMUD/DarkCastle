@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.26 2004/02/19 03:48:32 pirahna Exp $ */
+/* $Id: db.cpp,v 1.27 2004/04/13 19:32:17 urizen Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -4093,6 +4093,7 @@ int mprog_name_to_type ( char *name )
    if ( !str_cmp( name, "act_prog"       ) )    return ACT_PROG;
    if ( !str_cmp( name, "speech_prog"    ) )	return SPEECH_PROG;
    if ( !str_cmp( name, "rand_prog"      ) ) 	return RAND_PROG;
+   if ( !str_cmp( name, "arand_prog"     ) )    return ARAND_PROG;
    if ( !str_cmp( name, "fight_prog"     ) )	return FIGHT_PROG;
    if ( !str_cmp( name, "hitprcnt_prog"  ) )	return HITPRCNT_PROG;
    if ( !str_cmp( name, "death_prog"     ) )	return DEATH_PROG;

@@ -19,7 +19,7 @@
 /* 12/06/2003   Onager   Modified mobile_activity() to prevent charmie    */
 /*                       scavenging                                       */
 /**************************************************************************/
-/* $Id: mob_act.cpp,v 1.11 2003/12/09 01:31:44 staylor Exp $ */
+/* $Id: mob_act.cpp,v 1.12 2004/04/13 19:32:17 urizen Exp $ */
 
 extern "C"
 {
@@ -220,10 +220,13 @@ void mobile_activity(void)
     // Only activate mprog random triggers if someone is in the zone
     if(zone_table[world[ch->in_room].zone].players)
       retval = mprog_random_trigger( ch );
-
+    
     if(IS_SET(retval, eCH_DIED))
       continue;
 
+     retval = mprog_arandom_trigger (ch);
+     if (IS_SET(retval, eCH_DIED))
+       continue;
     // activate mprog act triggers
     if ( ch->mobdata->mpactnum > 0 )  // we check to make sure ch is mob in very beginning, so safe
     {

@@ -80,6 +80,7 @@ char *mprog_type_to_name( int type )
     case ACT_PROG:              return "act_prog";
     case SPEECH_PROG:           return "speech_prog";
     case RAND_PROG:             return "rand_prog";
+    case ARAND_PROG:		return "arand_prog";
     case FIGHT_PROG:            return "fight_prog";
     case HITPRCNT_PROG:         return "hitprcnt_prog";
     case DEATH_PROG:            return "death_prog";

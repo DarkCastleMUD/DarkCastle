@@ -1,7 +1,7 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.9 2003/03/07 02:46:40 pirahna Exp $
+| $Id: character.h,v 1.10 2004/04/13 19:32:24 urizen Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
@@ -86,8 +86,9 @@ struct  mob_prog_data
 #define BRIBE_PROG      1024
 #define CATCH_PROG      2048
 #define ATTACK_PROG     4096
+#define ARAND_PROG      8192
 
-#define MPROG_MAX_TYPE_VALUE 8192  // this should be the next bitvector up from max
+#define MPROG_MAX_TYPE_VALUE 16384  // this should be the next bitvector up from max
 
 // * ------- End MOBProg stuff ----------- *
 
