@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.17 2002/08/01 06:51:34 dcastle Exp $ */
+/* $Id: fight.cpp,v 1.18 2002/08/01 15:57:53 pirahna Exp $ */
 
 extern "C"
 {
@@ -2787,7 +2787,7 @@ void dam_message(int dam, CHAR_DATA * ch, CHAR_DATA * victim,
    if (w_type == 0)
    {
      sprintf(buf1, "$n's %spunch %s $N%s%c", modstring, vp, vx, punct);
-     sprintf(buf2, "Your %spunch %s $N%s%c", modstring, vs, vx, punct);
+     sprintf(buf2, "Your %spunch %s $N%s%c", modstring, vp, vx, punct);
      sprintf(buf3, "$n's %spunch %s you%s%c", modstring, vp, vx, punct);
    }
    else

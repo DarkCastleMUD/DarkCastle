@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.6 2002/07/31 19:12:30 pirahna Exp $
+| $Id: guild.cpp,v 1.7 2002/08/01 15:57:53 pirahna Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -213,6 +213,11 @@ int skills_guild(struct char_data *ch, char *arg, struct char_data *owner)
     if(skilllist[skillnumber].clue && mob_index[owner->mobdata->nr].virt == default_master[GET_CLASS(ch)])
       do_say(owner, skilllist[skillnumber].clue, 9);
     else do_say(owner, "I'm sorry, I can't teach you that.  You'll have to find another trainer.", 9);
+    return eSUCCESS;
+  }
+
+  if(GET_LEVEL(ch) < skilllist[skillnumber].levelavailable) {
+    send_to_char("You aren't advanced enough for that yet.\r\n", ch);
     return eSUCCESS;
   }
 
