@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.10 2002/08/21 19:09:33 pirahna Exp $
+| $Id: inventory.cpp,v 1.11 2002/08/25 19:34:00 pirahna Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -921,8 +921,8 @@ int do_give(struct char_data *ch, char *argument, int cmd)
          return eFAILURE;
       }
 
-      csendf(ch, "You give %ld coins to %s.\n\r", (long) amount,
-             GET_SHORT(vict));
+      csendf(ch, "You give %ld coin%s to %s.\n\r", (long) amount,
+             amount == 1 ? "" : "s", GET_SHORT(vict));
 
       if(GET_LEVEL(ch) >= IMMORTAL || IS_NPC(ch)) { 
         sprintf(buf, "%s gives %d coins to %s", GET_NAME(ch), amount,

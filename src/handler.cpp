@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.14 2002/08/25 17:52:57 pirahna Exp $ */
+/* $Id: handler.cpp,v 1.15 2002/08/25 19:34:00 pirahna Exp $ */
     
 extern "C"
 {
@@ -1859,7 +1859,8 @@ void object_list_new_new_owner(struct obj_data *list, CHAR_DATA *ch)
 // Extract an object from the world
 void extract_obj(struct obj_data *obj)
 {
-    struct obj_data *temp1, *temp2;
+    struct obj_data *temp1;
+    //struct obj_data *temp2;
     struct active_object *active_obj = NULL,
                          *last_active = NULL;
 
@@ -1905,8 +1906,10 @@ void extract_obj(struct obj_data *obj)
 	obj_from_char(obj);
     else if(obj->in_obj)
     {
+        obj_from_obj(obj);
+     /*
 	temp1 = obj->in_obj;
-	if(temp1->contains == obj)   /* head of list */
+	if(temp1->contains == obj) 
 	    temp1->contains = obj->next_content;
 	else
 	{
@@ -1918,6 +1921,7 @@ void extract_obj(struct obj_data *obj)
 		temp2->next_content =
 		    obj->next_content; }
 	}
+     */
     }
 
     for( ; obj->contains; extract_obj(obj->contains))

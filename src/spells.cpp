@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.20 2002/08/21 18:30:41 pirahna Exp $ */
+/* $Id: spells.cpp,v 1.21 2002/08/25 19:34:01 pirahna Exp $ */
 
 extern "C"
 {
@@ -1581,6 +1581,13 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
           GET_MANA(ch) -= (use_mana(ch, spl) >> 1);
           return eSUCCESS;
         }
+
+        if (IS_AFFECTED(ch, AFF_INVISIBLE)) {
+           act("$n slowly fades into existence.", ch, 0, 0, TO_ROOM, 0);
+           affect_from_char(ch, SPELL_INVISIBLE);
+           REMOVE_BIT(ch->affected_by, AFF_INVISIBLE);
+        }
+
         send_to_char("Ok.\n\r", ch);
 
 // TODO - pass 'learned' to the spell so it can use it to determine spell effect

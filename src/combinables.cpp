@@ -61,7 +61,7 @@ struct trade_data_type poison_vial_data[] =
      15         // a vial of bee stinger poison
    },
 
-   { { 3175, -1, -1, -1, -1, -1, -1, -1, -1, -1 },  // foraged apple
+   { { 3175, 697, -1, -1, -1, -1, -1, -1, -1, -1 },  // foraged apple
      695,
      10         // a small vial of low quality cyanide
    },
@@ -159,7 +159,7 @@ int do_poisonmaking(struct char_data *ch, char *argument, int cmd)
   }
 
   obj_data * reward = clone_object(rewardnum);
-  obj_to_obj(reward, container);
+  obj_to_char(reward, ch);
   csendf(ch, "You succesfully make a %s!\r\n", reward->short_description);
 
   return eSUCCESS;

@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.52 2002/08/25 16:57:04 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.53 2002/08/25 19:34:00 pirahna Exp $ */
 
 extern "C"
 {
@@ -1068,8 +1068,9 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
 
   if (IS_AFFECTED(ch, AFF_INVISIBLE)) {
     act("$n slowly fades into existence.", ch, 0, 0, TO_ROOM, 0);
-    if (affected_by_spell(ch, SPELL_INVISIBLE))
-      affect_from_char(ch, SPELL_INVISIBLE);
+    //if (affected_by_spell(ch, SPELL_INVISIBLE))
+    // no point it looping through the list twice...
+    affect_from_char(ch, SPELL_INVISIBLE);
     REMOVE_BIT(ch->affected_by, AFF_INVISIBLE);
   }
 
