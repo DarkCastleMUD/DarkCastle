@@ -526,8 +526,10 @@ int do_wiz(struct char_data *ch, char *argument, int cmd)
         else
           sprintf(buf1, "%s> %s\n\r", GET_SHORT(ch), argument);
 
-        if(cmd == 9) 
-          ansi_color( GREEN, ch);
+        if(cmd == 9)  {
+          ansi_color( PURPLE, ch);
+	  ansi_color( BOLD, ch);
+	}
         else {
           ansi_color( GREY, ch);
           ansi_color( BOLD, ch); 
@@ -539,13 +541,14 @@ int do_wiz(struct char_data *ch, char *argument, int cmd)
         if (i->character != ch && !i->connected && 
                 GET_LEVEL(i->character) >= IMMORTAL)
                 if((cmd == 8) && has_skill(i->character, COMMAND_IMP_CHAN)) { 
-                  ansi_color( GREY, i->character);
-                  ansi_color( BOLD, i->character);
+                  ansi_color( PURPLE, i->character);
+		  ansi_color( BOLD, i->character);
                   send_to_char(buf1, i->character);
                   ansi_color( NTEXT, i->character);
                 }
                 else if (cmd != 8) { 
-                  ansi_color( GREEN, i->character);
+                  ansi_color( GREY, i->character);
+		  ansi_color( BOLD, i->character);
                   send_to_char(buf1, i->character);
                   ansi_color( NTEXT, i->character);
                 }

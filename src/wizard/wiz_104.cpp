@@ -16,6 +16,7 @@
 #include <interp.h>
 #include <returnvals.h>
 #include <spells.h>
+#include <race.h>
 
 extern struct room_data ** world_array;
 
@@ -764,6 +765,123 @@ obj_data *)(obj_index[nr].item))->obj_flags.eq_level,
 
     } // else was a digit
   } // zone
+  else if (is_abbrev(type, "msearch") && has_range)
+  {  // Mobile search.
+    char arg1[MAX_STRING_LENGTH];
+    int act = 0, clas = 0, levlow = 0, levhigh = 0, affect = 0, immune = 0, race = 0, align = 0;
+    extern char *action_bits[];
+    extern struct race_shit race_info[];
+    extern char *isr_bits[];
+    //extern char *size_bitfields[];
+    extern char *affected_bits[];
+    extern char *pc_clss_types[];
+    while ( ( argument = one_argument(argument, arg1) ) )
+    {
+       int i;
+       if (strlen(arg1) < 2) break;
+       for (i = 0; *pc_clss_types[i] != '\n' ; i++)
+        if (!str_cmp(pc_clss_types[i],arg1))
+        {
+          clas = i;
+          continue;
+        }
+       for (i = 0; *isr_bits[i] != '\n' ; i++)
+        if (!str_cmp(isr_bits[i],arg1))
+        {
+          SET_BIT(immune, 1<<i);
+          continue;
+        }
+       for (i = 0; *action_bits[i] != '\n' ; i++)
+        if (!str_cmp(action_bits[i],arg1))
+        {
+          SET_BIT(act, 1<<i);
+          continue;
+        }
+       for (i = 0; *affected_bits[i] != '\n' ; i++)
+        if (!str_cmp(affected_bits[i],arg1))
+        {
+          SET_BIT(affect, 1<<i);
+          continue;
+        }
+       for (i = 0; i <= MAX_RACE; i++)
+        if (!str_cmp(race_info[i].singular_name,arg1))
+        {
+          race = i;
+          continue;
+        }
+	if (!str_cmp(arg1,"evil"))
+	  align = 3;
+	else if (!str_cmp(arg1,"good"))
+	  align = 1;
+	else if (!str_cmp(arg1,"neutral"))
+	  align = 2;
+	if (!str_cmp(arg1,"level"))
+	{
+	  argument = one_argument(argument,arg1);
+	  if (is_number(arg1))
+	    levlow = atoi(arg1);
+	  argument = one_argument(argument,arg1);
+	  if (is_number(arg1))
+	    levhigh = atoi(arg1);
+	  if (!levhigh || !levlow)
+	  {
+	    send_to_char("Incorrect level requirement.\r\n",ch);
+	    return eFAILURE;
+	  }
+	  
+	}
+     }
+     int c,nr;
+     for (c=0;c < mob_index[top_of_mobt].virt;c++)
+     {
+      if ((nr = real_mobile(c)) < 0)	
+           continue;
+      if(race)
+       if (((struct char_data *)(mob_index[nr].item))->race == race)
+         continue;
+      if (align) {
+	if (align == 1 && ((struct char_data *)(mob_index[nr].item))->alignment < 350)
+	  continue;
+	else if (align == 2 && (((struct 
+char_data*)(mob_index[nr].item))->alignment < -350 || ((struct 
+char_data*)(mob_index[nr].item))->alignment > 350))
+	continue;
+	else if (align == 3 && ((struct char_data *)(mob_index[nr].item))->alignment > -350)
+	continue;
+      }
+      if (clas)
+        if (((struct char_data *)(mob_index[nr].item))->c_class == clas)
+          continue;
+      if (levlow)
+	if (((struct char_data *)(mob_index[nr].item))->level >= levlow)
+	  continue;
+      if (levhigh)
+	if (((struct char_data *)(mob_index[nr].item))->level <= levhigh)
+	  continue;
+      if(act)
+	for (i = 0; i < 1 << 31; i++)
+           if (IS_SET(act,1<<i))
+      if (!IS_SET(((struct char_data 
+*)(mob_index[nr].item))->mobdata->actflags, 1<<i))
+        continue;
+      if(affect)
+	for (i = 0; i < 1 << 31; i++)
+           if (IS_SET(affect,1<<i))
+      		if (!IS_SET(((struct char_data 
+*)(mob_index[nr].item))->affected_by, 1<<i))
+        		continue;
+      count++;
+      if (count > 200)
+      {
+        send_to_char("Limit reached.\r\n",ch);
+        break;
+      }
+           sprintf(buf, "[%3d] [%5d] [%2d] %s\n\r", count, c, ((struct 
+char_data *)(mob_index[nr].item))->level,
+              ((struct char_data *)(mob_index[nr].item))->short_desc);
+      send_to_char(buf,ch);
+     }
+  }
   else if (is_abbrev(type, "search") && has_range)
   {  // Object search.
     char arg1[MAX_STRING_LENGTH];
@@ -773,7 +891,6 @@ obj_data *)(obj_index[nr].item))->obj_flags.eq_level,
     extern char *more_obj_bits[];
     extern char *size_bitfields[];
     extern char *apply_types[];
-    extern char *pc_clss_types[];
     while ( ( argument = one_argument(argument, arg1) ) )
     {
        int i;
@@ -825,16 +942,24 @@ obj_data *)(obj_index[nr].item))->obj_flags.eq_level,
       if ((nr = real_object(c)) < 0)
            continue;
       if(wear)
-      if (!IS_SET(((struct obj_data *)(obj_index[nr].item))->obj_flags.wear_flags, wear))
+	for (i = 0; i < 1 << 20; i++)
+	  if (IS_SET(wear, 1 << i))
+      if (!IS_SET(((struct obj_data *)(obj_index[nr].item))->obj_flags.wear_flags, 1<<i))
 	continue;
       if (size)
-      if (!IS_SET(((struct obj_data *)(obj_index[nr].item))->obj_flags.size, size))
+       for (i = 0; i < 1 << 10; i++)
+	if (IS_SET(size, 1<<i))
+      if (!IS_SET(((struct obj_data *)(obj_index[nr].item))->obj_flags.size, 1<<i))
 	continue;
       if(extra)
-      if (!IS_SET(((struct obj_data *)(obj_index[nr].item))->obj_flags.extra_flags, extra))
+        for (i = 0; i < 1 << 30; i++)
+	  if (IS_SET(extra,1<<i))
+      if (!IS_SET(((struct obj_data *)(obj_index[nr].item))->obj_flags.extra_flags, 1<<i))
 	continue;
       if (more)
-      if (!IS_SET(((struct obj_data *)(obj_index[nr].item))->obj_flags.more_flags, more))
+	for (i = 0; i < 1 << 10; i++)
+	  if (IS_SET(more,1<<i))
+      if (!IS_SET(((struct obj_data *)(obj_index[nr].item))->obj_flags.more_flags, 1<<i))
 	continue;
       int aff,total = 0;
       bool found = FALSE;
