@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.43 2004/04/23 11:55:07 urizen Exp $
+| $Id: cl_thief.cpp,v 1.44 2004/04/23 11:58:54 urizen Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -230,7 +230,7 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
   was_in = ch->in_room;
 
   // if they're hurt they are going to be suspicious of backstabs so half the chance
-  if( ( (tfloat)GET_HIT(victim) / (float)GET_MAX_HIT(victim) ) < .7) 
+  if( ( (float)GET_HIT(victim) / (float)GET_MAX_HIT(victim) ) < .7) 
   {
     chance /= 2;
     chance += 5;

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.28 2004/04/23 11:55:00 urizen Exp $
+| $Id: inventory.cpp,v 1.29 2004/04/23 11:58:52 urizen Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -108,6 +108,7 @@ void get(struct char_data *ch, struct obj_data *obj_object,
 	  int cgold = (int)((float)obj_object->obj_flags.value[0] * (float)((float)get_clan(ch)->tax/100.0));
 	  GET_GOLD(ch) += obj_object->obj_flags.value[0] - cgold;
           get_clan(ch)->balance += cgold;
+	  save_clans();
 	} else
 	GET_GOLD(ch) += obj_object->obj_flags.value[0];
 	extract_obj(obj_object);

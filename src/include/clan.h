@@ -2,7 +2,7 @@
 #define CLAN_H_
 
 /************************************************************************
-| $Id: clan.h,v 1.9 2004/04/22 23:07:21 urizen Exp $
+| $Id: clan.h,v 1.10 2004/04/23 11:58:57 urizen Exp $
 | clan.h
 | Description:  Header information for clans.
 */
@@ -12,6 +12,7 @@ void clan_logout(char_data * ch);
 int has_right(char_data * ch, uint32 bit);
 struct clan_data * get_clan(int nClan);
 struct clan_data * get_clan(CHAR_DATA *ch);
+void save_clans();
 #define CLAN_RIGHTS_ACCEPT       1
 #define CLAN_RIGHTS_OUTCAST      1<<1
 #define CLAN_RIGHTS_B_READ       1<<2
