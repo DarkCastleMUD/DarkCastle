@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.25 2004/04/29 22:44:02 urizen Exp $
+| $Id: guild.cpp,v 1.26 2004/04/30 10:49:34 urizen Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -258,6 +258,16 @@ int skills_guild(struct char_data *ch, char *arg, struct char_data *owner)
     send_to_char("You cannot learn more here.. you need to go out into the world and use it.\r\n",ch);
     return eFAILURE;
   }
+  switch(skillnumber)
+  {
+      case SPELL_VAMPIRIC_AURA:
+      case SKILL_BULLRUSH:
+      case SPELL_HOLY_AURA:
+	do_say(owner, "I cannot teach you that. You need to learn it by yourself.\r\n",9);
+	return eFAILURE;
+      default: break;
+  }
+
 
   send_to_char("You practice for a while...\n\r", ch);
   ch->pcdata->practices--;
@@ -449,7 +459,6 @@ void skill_increase_check(char_data * ch, int skill, int learned, int difficulty
 
    if(IS_MOB(ch))
       return;
-
    class_skill_defines * skilllist = get_skill_list(ch);
    if(!skilllist)
      return;  // class has no skills by default

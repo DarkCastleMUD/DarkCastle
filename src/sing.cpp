@@ -34,6 +34,7 @@ extern "C"
 #include <act.h>
 #include <db.h>
 #include <magic.h> // dispel_magic
+#include <innate.h> // SKILL_INNATE_EVASION
 #include <returnvals.h>
 
 extern CWorld world;
@@ -1124,7 +1125,8 @@ int execute_song_astral_chanty( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA 
 
    if(IS_SET(world[victim->in_room].room_flags, NO_PORTAL) ||
            (IS_SET(world[victim->in_room].room_flags, ARENA) && !IS_SET(world[ch->in_room].room_flags, ARENA)) ||
-           (IS_SET(world[ch->in_room].room_flags, ARENA) && !IS_SET(world[victim->in_room].room_flags, ARENA)))
+           (IS_SET(world[ch->in_room].room_flags, ARENA) && !IS_SET(world[victim->in_room].room_flags, ARENA))
+           ||(IS_AFFECTED2(victim,AFF_SHADOWSLIP)))
       send_to_char("Something seems to be keeping you out.\r\n", ch);
    else 
    {
@@ -1483,7 +1485,11 @@ int execute_song_searching_song( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA
       send_to_char("Your song fades away, it's search unfinished.\r\n", ch);
       return eFAILURE;
    }
-
+   if (affected_by_spell(target, SKILL_INNATE_EVASION))
+   {
+	send_to_char("Something blocks your vision.\r\n",ch);
+	return eFAILURE;
+   }
    skill_increase_check(ch, SKILL_SONG_SEARCHING_SONG, skill, SKILL_INCREASE_MEDIUM);
 
    sprintf(buf, "Your song finds %s ", GET_SHORT(target));

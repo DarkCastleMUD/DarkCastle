@@ -21,7 +21,7 @@
  *  12/08/2003   Onager    Added check for charmies and !charmie eq to     *
  *                         equip_char()                                    *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.41 2004/04/28 07:37:40 urizen Exp $ */
+/* $Id: handler.cpp,v 1.42 2004/04/30 10:49:34 urizen Exp $ */
     
 extern "C"
 {
@@ -954,10 +954,54 @@ void affect_remove( CHAR_DATA *ch, struct affected_type *af, int flags, bool aff
          if (!(flags & SUPPRESS_MESSAGES))
             send_to_char("The dust around your body stops glowing.\r\n", ch);
          break;
+      case SKILL_INNATE_TIMER:
+	  switch(ch->race)
+	  { // Each race has its own wear off messages.
+	    case RACE_GIANT:
+	       send_to_char("You feel ready to wield mighty weapons again.\r\n",ch);
+		break;
+	    case RACE_TROLL:
+		send_to_char("Your regenerative abilitiy feels restored.\r\n",ch);
+		break;
+	    case RACE_ELVEN:
+		send_to_char("Your ability to improve your vision has returned.\r\n",ch);
+		break;
+	    case RACE_ORC:
+		send_to_char("Your lust for blood feels restored.\r\n",ch);
+		break;
+	    case RACE_DWARVEN:
+		send_to_char("You feel ready to attempt more repairs.\r\n",ch);
+		break;
+	    case RACE_GNOME:
+		send_to_char("Your ability to move stealthily has returned.\r\n",ch);
+		break;
+	    case RACE_PIXIE:
+		send_to_char("Your ability to avoid magical vision has returned.\r\n",ch);
+		break;
+	    case RACE_HOBBIT:
+		send_to_char("Your innate ability to avoid magical portals has returned.\r\n",ch);
+		break;
+	  }
+	break;
       case SKILL_BLOOD_FURY:
          if (!(flags & SUPPRESS_MESSAGES))
             send_to_char("Your blood cools to normal levels.\r\n", ch);
          break;
+      case SKILL_INNATE_BLOODLUST:
+	 send_to_char("Your lust for battle has left you.\r\n",ch);
+	 break;
+      case SKILL_INNATE_FARSIGHT:
+	  send_to_char("Your vision returns to its normal state.\r\n",ch);
+	  break;
+      case SKILL_INNATE_EVASION:
+	  send_to_char("Your magical obscurity has left you.\r\n",ch);
+	  break;
+      case SKILL_INNATE_SHADOWSLIP:
+	  send_to_char("The ability to avoid magical pathways has leftyou.\r\n",ch);
+	  break;
+      case SKILL_INNATE_SNEAK:
+	  send_to_char("Your ability to move stealthily leaves you.\r\n",ch);
+	  break;
       case SKILL_INNATE_REGENERATION:
 	 send_to_char("Your regeneration slows back to normal.\r\n",ch);
 	 break;
@@ -1238,7 +1282,7 @@ int equip_char(CHAR_DATA *ch, struct obj_data *obj, int pos)
 
     if ((IS_OBJ_STAT(obj, ITEM_ANTI_EVIL) && IS_EVIL(ch)) ||
 	(IS_OBJ_STAT(obj, ITEM_ANTI_GOOD) && IS_GOOD(ch)) ||
-	(IS_OBJ_STAT(obj, ITEM_ANTI_NEUTRAL) && IS_NEUTRAL(ch))) 
+	(IS_OBJ_STAT(obj, ITEM_ANTI_NEUTRAL) && IS_NEUTRAL(ch))&& !IS_NPC(ch)) 
     {
 	if(IS_SET(obj->obj_flags.more_flags, ITEM_NO_TRADE)) {
 	    act("You are zapped by $p but it stays with you.", ch, obj, 0, TO_CHAR, 0);
