@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: db.h,v 1.4 2003/06/13 00:44:37 pirahna Exp $ */
+/* $Id: db.h,v 1.5 2003/12/28 18:48:14 pirahna Exp $ */
 #ifndef DB_H_
 #define DB_H_
 
@@ -29,7 +29,7 @@ extern "C" {
                                      // creating it
 
 #define MAX_ZONE    165 
-#define MAX_INDEX   3500
+#define MAX_INDEX   3600
 #define MAX_RESET  16383
 #ifndef LONG_MAX
 #define LONG_MAX    2147483467
