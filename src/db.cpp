@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.54 2004/05/16 12:22:07 urizen Exp $ */
+/* $Id: db.cpp,v 1.55 2004/05/16 12:26:02 urizen Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -4248,7 +4248,9 @@ void init_char(CHAR_DATA *ch)
   ch->pcdata->time.birth  = time(0);
   ch->pcdata->time.played = 0;
   ch->pcdata->time.logon  = time(0);
-  ch->pcdata->toggles = PLR_ANSI & PLR_BARD_SONG;
+  ch->pcdata->toggles = 0;
+  SET_BIT(ch->pcdata->toggles, PLR_ANSI);
+  SET_BIT(ch->pcdata->toggles, PLR_BARD_SONG);
   ch->affected_by = 0;
 
   apply_initial_saves(ch);
