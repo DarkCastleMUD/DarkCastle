@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.78 2002/11/01 23:53:29 waz Exp $ */
+/* $Id: fight.cpp,v 1.79 2002/11/17 21:09:29 pirahna Exp $ */
 
 extern "C"
 {
@@ -1637,7 +1637,7 @@ int check_riposte(CHAR_DATA * ch, CHAR_DATA * victim)
   int learned;
   int chance;
   int retval;
-  int newretval;
+  int newretval = 0;
   
   if((IS_SET(victim->combat, COMBAT_STUNNED)) ||
     (ch->equipment[WIELD] == NULL && number(1, 101) >= 50) ||
@@ -1662,9 +1662,11 @@ int check_riposte(CHAR_DATA * ch, CHAR_DATA * victim)
   }
   else return eFAILURE;
   
-  if(IS_SET(victim->combat, COMBAT_BLADESHIELD1) || IS_SET(victim->combat, COMBAT_BLADESHIELD2)) {
+  if(IS_SET(victim->combat, COMBAT_BLADESHIELD1) || IS_SET(victim->combat, COMBAT_BLADESHIELD2)) 
+  {
     if(chance < 75)
-      chance = 75;
+      chance = 99;
+    // this is so we don't get huge riposte chains
     if(IS_SET(ch->combat, COMBAT_BLADESHIELD1) || IS_SET(ch->combat, COMBAT_BLADESHIELD2))
       chance = 1;
   }
