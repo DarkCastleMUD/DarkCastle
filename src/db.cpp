@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.17 2002/10/29 03:54:18 dcastle Exp $ */
+/* $Id: db.cpp,v 1.18 2002/11/17 19:17:47 pirahna Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -367,7 +367,9 @@ char * funnybootmessages[] =
   "Sneaking in random PokeMUD code...\r\n",
   "Defining mob track vectors...\r\n",
   "Locking doors...\r\n",
-  "Boosting random mob stats...\r\n"
+  "Boosting random mob stats...\r\n",
+  "Finding something fun in game to remove...\r\n",
+  "Determining array dope vectors...\r\n"
 };
 
 void funny_boot_message()

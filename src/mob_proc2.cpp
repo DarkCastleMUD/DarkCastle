@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.17 2002/10/13 02:16:56 pirahna Exp $ */
+/* $Id: mob_proc2.cpp,v 1.18 2002/11/17 19:17:47 pirahna Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -1131,18 +1131,39 @@ void meta_list_stats(char_data * ch)
 int meta_get_moves_exp_cost(char_data * ch)
 {
    int cost = GET_MAX_MOVE(ch);
-
    cost *= 8000 + GET_MOVE_METAS(ch);       // *= ...
-
    return cost;
 }
 
 int meta_get_moves_plat_cost(char_data * ch)
 {
-   int cost = 100;
+   int cost = 100 + GET_MOVE_METAS(ch);
+   return cost;
+}
 
-   cost += GET_MOVE_METAS(ch);
+int meta_get_hps_exp_cost(char_data * ch)
+{
+   int cost = GET_MAX_HIT(ch);
+   cost *= 8000 + GET_HP_METAS(ch);       // *= ...
+   return cost;
+}
 
+int meta_get_hps_plat_cost(char_data * ch)
+{
+   int cost = 100 + GET_HP_METAS(ch);
+   return cost;
+}
+
+int meta_get_mana_exp_cost(char_data * ch)
+{
+   int cost = GET_MAX_MANA(ch);
+   cost *= 8000 + GET_MANA_METAS(ch);       // *= ...
+   return cost;
+}
+
+int meta_get_mana_plat_cost(char_data * ch)
+{
+   int cost = 100 + GET_MANA_METAS(ch);
    return cost;
 }
 
@@ -1184,33 +1205,25 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     return eSUCCESS;
   }
 
-  // TODO - redo these more class specific and how we're sure we want them
-
-  hit_exp = (GET_MAX_HIT(ch) * 8000);
+  hit_exp = meta_get_hps_exp_cost(ch);
   move_exp = meta_get_moves_exp_cost(ch);
-  mana_exp = (GET_MAX_MANA(ch) * 8000);
+  mana_exp = meta_get_mana_exp_cost(ch);
 
-  if(hit_exp < 1) hit_exp = 1;
-  if(move_exp < 1) move_exp = 1;
-  if(mana_exp < 1) mana_exp = 1;
-
-  hit_cost = 100 + GET_HP_METAS(ch);
+  hit_cost = meta_get_hps_plat_cost(ch);
   move_cost = meta_get_moves_plat_cost(ch);
-  mana_cost = 100 + GET_MANA_METAS(ch); 
+  mana_cost = meta_get_mana_plat_cost(ch); 
 
   if(cmd == 59) {           /* List */
     send_to_char("The Meta-physician tells you, 'This is what I can do for you... \n\r", ch);
+
     meta_list_stats(ch);
-/*    
+
     csendf(ch, "6) Add to your hit points:   %d exp + %d "
             "Platinum coins.\n\r", hit_exp, hit_cost); 
 
-    if(GET_MAX_HIT(ch) > 29000)
-       csendf(ch, "   Note:  You've hit the Tyrre tax level.\n\r");
-    
     csendf(ch, "7) Add to your mana points:  %d exp + %d "
             "Platinum coins.\n\r", mana_exp, mana_cost);
-*/    
+
     csendf(ch, "8) Add to your movement points: %d exp + %d "
             "Platinum coins.\n\r", move_exp, move_cost);
 
@@ -1301,17 +1314,14 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
       redo_mana(ch);
       return eSUCCESS;
     }
-/*
+
    if(choice == 6) {
      if(GET_EXP(ch) < hit_exp) {
-       send_to_char("The Meta-physician tells you, 'You lack the "
-                    "experience.'\n\r", ch);
+       send_to_char("The Meta-physician tells you, 'You lack the experience.'\n\r", ch);
        return eSUCCESS;
      }
-
      if(GET_PLATINUM(ch) < (uint32)hit_cost) {
-       send_to_char("The Meta-physician tells you, 'You can't "
-                    "afford my services!  SCRAM!'\n\r", ch);
+       send_to_char("The Meta-physician tells you, 'You can't afford my services!  SCRAM!'\n\r", ch);
        return eSUCCESS;
      }
      GET_EXP(ch) -= hit_exp;
@@ -1329,10 +1339,8 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 
      ch->raw_hit += increase;
      GET_HP_METAS(ch) += 1;
-
      act("The Meta-physician touches $n.",  ch, 0, 0, TO_ROOM, 0);
      act("The Meta-physician touches you.",  ch, 0, 0, TO_CHAR, 0);
-
      affect_total(ch);
      redo_hitpoints(ch);
      redo_mana(ch);
@@ -1342,14 +1350,11 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
    if(choice == 7) {
 
      if(GET_EXP(ch) < mana_exp) {
-       send_to_char("The Meta-physician tells you, 'You lack the "
-                    "experience.'\n\r", ch);
+       send_to_char("The Meta-physician tells you, 'You lack the experience.'\n\r", ch);
        return eSUCCESS;
      }
-
      if(GET_PLATINUM(ch) < (uint32)mana_cost) {
-       send_to_char("The Meta-physician tells you, 'You can't afford my "
-                    "services!  SCRAM!'\n\r", ch);
+       send_to_char("The Meta-physician tells you, 'You can't afford my services!  SCRAM!'\n\r", ch);
        return eSUCCESS;
      }
 
@@ -1368,16 +1373,14 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 
      ch->raw_mana += increase;
      GET_MANA_METAS(ch) += 1;
-
      act("The Meta-physician touches $n.",  ch, 0, 0, TO_ROOM, 0);
      act("The Meta-physician touches you.",  ch, 0, 0, TO_CHAR, 0);
-
      affect_total(ch);
      redo_hitpoints(ch);
      redo_mana(ch);
      return eSUCCESS;
    }
-*/
+
    if(choice == 8) 
    {
      if(GET_EXP(ch) < move_exp) {
