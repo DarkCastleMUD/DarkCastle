@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.24 2004/05/18 22:42:04 urizen Exp $ */
+/* $Id: limits.cpp,v 1.25 2004/05/18 22:57:07 urizen Exp $ */
 
 extern "C"
 {
@@ -356,11 +356,24 @@ void redo_mana ( CHAR_DATA *ch)
 
 void redo_ki(CHAR_DATA *ch)
 {
+   int i,j;
    ch->max_ki = ch->raw_ki;
    if (GET_CLASS(ch) == CLASS_MONK) 
-     ch->max_ki += GET_WIS(ch) > 15?GET_WIS(ch)-15:0;
+     ch->max_ki += GET_WIS(ch) > 15 ? GET_WIS(ch) - 15:0;
    else if (GET_CLASS(ch) == CLASS_BARD)
-     ch->max_ki += GET_INT(ch) > 15?GET_INT(ch)-15:0;   
+     ch->max_ki += GET_INT(ch) > 15 ? GET_INT(ch)-15:0;   
+  for (i=0; i<MAX_WEAR; i++)
+  {
+    if (ch->equipment[i])
+      for (j=0; j<ch->equipment[i]->num_affects; j++)
+      {
+        if (ch->equipment[i]->affected[j].location == APPLY_KI)
+          affect_modify(ch, ch->equipment[i]->affected[j].location,
+                           ch->equipment[i]->affected[j].modifier,
+                           0, TRUE);
+      }
+  }
+
 }
 
 /* Gain maximum in various */
