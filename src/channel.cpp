@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: channel.cpp,v 1.3 2002/12/26 21:47:15 pirahna Exp $
+| $Id: channel.cpp,v 1.4 2003/01/22 05:26:49 pirahna Exp $
 | channel.C
 | Description:  All of the channel - type commands; do_say, gossip, etc..
 */
@@ -70,6 +70,63 @@ int do_say(struct char_data *ch, char *argument, int cmd)
           return SWAP_CH_VICT(retval);
       }
    }
+   return eSUCCESS;
+}
+
+// Psay works like 'say', just it's directed at a person
+// TODO - after this gets used alot, maybe switch speech triggers to it
+int do_psay(struct char_data *ch, char *argument, int cmd)
+{
+   char vict[MAX_INPUT_LENGTH];
+   char message[MAX_INPUT_LENGTH];
+   char buf[MAX_STRING_LENGTH];
+   char_data * victim;
+   extern bool MOBtrigger;
+
+   if (!IS_MOB(ch) && IS_SET(ch->pcdata->punish, PUNISH_STUPID)) {
+      send_to_char ("You try to speak but just look like an idiot!\r\n", ch);
+      return eSUCCESS;
+   }
+
+   if (IS_SET(world[ch->in_room].room_flags, QUIET)) {
+      send_to_char ("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
+      return eSUCCESS;
+   }
+
+   half_chop(argument, vict, message);
+
+   if(!*vict || !*message) {
+      send_to_char("Say what to whom?  psay <target> <message>\r\n", ch);
+      return eSUCCESS;
+   }
+
+   if (!(victim = get_char_room_vis(ch, vict))) {
+      csendf(ch, "You see noone that goes by '%s' here.\r\n", vict);
+      return eSUCCESS;
+   }
+
+   if(!IS_NPC(ch))
+     MOBtrigger = FALSE;
+   sprintf(buf,"$B$n says (to $N) '%s'$R", message);
+   act(buf, ch, 0, victim, TO_ROOM, NOTVICT);
+
+   if(!IS_NPC(ch))
+     MOBtrigger = FALSE;
+   sprintf(buf,"$B$n says (to $3you$7) '%s'$R", message);
+   act(buf, ch, 0, victim, TO_VICT, 0);
+
+   if(!IS_NPC(ch))
+     MOBtrigger = FALSE;
+   sprintf(buf,"$BYou say (to $N) '%s'$R", message);
+   act(buf, ch, 0, victim, TO_CHAR, 0);
+
+//   if(!IS_NPC(ch)) {
+//     retval = mprog_speech_trigger( message, ch );
+//     MOBtrigger = TRUE;
+//     if(SOMEONE_DIED(retval))
+//       return SWAP_CH_VICT(retval);
+//   }
+
    return eSUCCESS;
 }
 

@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.cpp,v 1.20 2003/01/16 05:27:44 dcastle Exp $ */
+/* $Id: interp.cpp,v 1.21 2003/01/22 05:26:49 pirahna Exp $ */
 
 extern "C"
 {
@@ -145,6 +145,7 @@ struct command_info cmd_info[] =
     { "reply",      do_reply,       POSITION_RESTING,   0,  9,  0 },
     { "report",     do_report,      POSITION_RESTING,   0,  9,  COM_CHARMIE_OK },
     { "say",        do_say,         POSITION_RESTING,   0, 11,  COM_CHARMIE_OK },
+    { "psay",       do_psay,        POSITION_RESTING,   0, 11,  COM_CHARMIE_OK },
     { "'",          do_say,         POSITION_RESTING,   0, 11,  COM_CHARMIE_OK },
     { "shout",      do_shout,       POSITION_RESTING,   0,  9,  0 },
     { "whisper",    do_whisper,     POSITION_RESTING,   0,  9,  0 },
