@@ -1,7 +1,7 @@
 #ifndef RACE_H_
 #define RACE_H_
 /************************************************************************
-| $Id: race.h,v 1.7 2004/04/30 17:03:55 urizen Exp $
+| $Id: race.h,v 1.8 2004/05/03 23:01:26 urizen Exp $
 | race.h
 | This file defines racial information.
 */
@@ -119,9 +119,9 @@
 
 #define RACE_ORC_STR_MOD            1
 #define RACE_ORC_DEX_MOD            0
-#define RACE_ORC_INT_MOD           -2
-#define RACE_ORC_WIS_MOD           -1
-#define RACE_ORC_CON_MOD            2
+#define RACE_ORC_INT_MOD            0
+#define RACE_ORC_WIS_MOD           -2
+#define RACE_ORC_CON_MOD            1
 
 #define RACE_TROLL_STR_MOD 2
 #define RACE_TROLL_DEX_MOD 0
