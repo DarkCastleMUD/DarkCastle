@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.87 2004/05/21 01:57:38 urizen Exp $ */
+/* $Id: spells.cpp,v 1.88 2004/05/21 16:43:31 urizen Exp $ */
 
 extern "C"
 {
@@ -427,7 +427,7 @@ cast_resist_energy },
  { /* 121 */ 12, POSITION_STANDING, 20, 
 TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_staunchblood },
 
- { /* 122 */ 24, POSITION_STANDING, 300, TAR_IGNORE, cast_create_golem 
+ { /* 122 */ 24, POSITION_STANDING, 500, TAR_IGNORE, cast_create_golem 
 },
 
  { /* 123 */ 12, POSITION_STANDING, 60, TAR_IGNORE, spell_reflect },
@@ -1214,7 +1214,7 @@ int do_release(CHAR_DATA *ch, char *argument, int cmd)
        }
        if (!skill_success(ch,NULL, SKILL_RELEASE))
        {
-         send_to_char("You failed to release the spell, and is left momentarily dazed.\r\n",ch);
+         send_to_char("You failed to release the spell, and are left momentarily dazed.\r\n",ch);
          WAIT_STATE(ch,PULSE_VIOLENCE/2);
 	 ch->mana -= 10;
          return eFAILURE;
