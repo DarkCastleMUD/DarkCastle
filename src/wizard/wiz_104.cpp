@@ -471,6 +471,7 @@ char *str_nospace(char *stri)
 {
   char test[512]; // Why not
   int i = 0;
+  if (!stri) return "";
   while (*(stri+i))
   {
      if (*(stri+i) == ' ')
