@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.cpp,v 1.17 2002/11/06 21:41:52 pirahna Exp $ */
+/* $Id: interp.cpp,v 1.18 2003/01/02 03:28:38 pirahna Exp $ */
 
 extern "C"
 {
@@ -272,6 +272,7 @@ struct command_info cmd_info[] =
     { "steal",      do_steal,       POSITION_STANDING,  1,  9,  0 },
     { "pocket",     do_pocket,      POSITION_STANDING,  1,  9,  0 },
     { "motd",       do_motd,        POSITION_DEAD,      0,  9,  0 },
+    { "cmotd",      do_cmotd,       POSITION_DEAD,      0,  9,  0 },
     { "where",      do_where,       POSITION_RESTING,   0,  9,  0 },
     { "write",      do_write,       POSITION_STANDING,  0,  128,  0 },
     { "beacon",     do_beacon,      POSITION_RESTING,   0,  9,  0 },

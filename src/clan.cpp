@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.7 2002/12/31 05:20:33 dcastle Exp $ */
+/* $Id: clan.cpp,v 1.8 2003/01/02 03:28:38 pirahna Exp $ */
 extern "C"
 {
   #include <string.h> // strcat
@@ -2111,11 +2111,20 @@ int do_whoclan(CHAR_DATA *ch, char *arg, int cmd)
 }
 
 
+int do_cmotd(CHAR_DATA *ch, char *arg, int cmd)
+{
+  struct clan_data *clan;
 
+  if(!ch->clan || !(clan = get_clan(ch))) {
+    send_to_char("You aren't the member of any clan!\n\r", ch);
+    return eFAILURE;
+  }
 
+  if(!clan->clanmotd) {
+    send_to_char("There is no motd for your clan currently.\r\n", ch);
+    return eSUCCESS;
+  }
 
-
-
-
-
-
+  send_to_char(clan->clanmotd, ch);
+  return eSUCCESS;
+}
