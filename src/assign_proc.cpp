@@ -158,7 +158,8 @@ void assign_non_combat_procs() {
     SPEC_FUN    iasenko_non_combat;
     SPEC_FUN    koban_non_combat;
     SPEC_FUN    arena_only;
-    SPEC_FUN    mage_familiar_non;
+    SPEC_FUN    mage_familiar_imp_non;
+    SPEC_FUN    druid_familiar_chipmunk_non;
     SPEC_FUN    bodyguard;
     SPEC_FUN    generic_blocker;
     SPEC_FUN    generic_doorpick_blocker;
@@ -170,7 +171,8 @@ void assign_non_combat_procs() {
     assign_one_mob_non(2,  charon);
     assign_one_mob_non(3,  platmerchant);
     assign_one_mob_non(4,  mithaxequest);
-    assign_one_mob_non(5,  mage_familiar_non);
+    assign_one_mob_non(5,  mage_familiar_imp_non);
+    assign_one_mob_non(6,  druid_familiar_chipmunk_non);
     //assign_one_mob_non(69,  areanotopen);
     assign_one_mob_non(70,  pir_slut);
     assign_one_mob_non(200,  mud_school_adept);
@@ -333,13 +335,13 @@ void assign_combat_procs() {
     SPEC_FUN    hiryushi_combat;
     SPEC_FUN    izumi_combat;
     SPEC_FUN    shogura_combat;
-    SPEC_FUN    mage_familiar;
+    SPEC_FUN    mage_familiar_imp;
 
     /* I spent forever putting these fuckers in numerical order,
        keep um that way.  It makes no sense dividing them by what
        zone they load up in.  - pir */
 
-    assign_one_mob_com(5,  mage_familiar);
+    assign_one_mob_com(5,  mage_familiar_imp);
     assign_one_mob_com(901,  active_magic_user2);
     assign_one_mob_com(903,  active_magic_user2);
     assign_one_mob_com(904,  active_magic_user2);

@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.75 2003/06/22 22:10:15 pirahna Exp $ */
+/* $Id: magic.cpp,v 1.76 2003/06/22 22:39:26 pirahna Exp $ */
 
 extern "C"
 {
@@ -8353,7 +8353,7 @@ int cast_summon_familiar( byte level, CHAR_DATA *ch, char *arg, int type,
 {
   switch (type) {
 	case SPELL_TYPE_SPELL:
-		 return spell_summon_familiar(level,ch, "", SPELL_TYPE_SPELL, tar_ch,0, skill);
+		 return spell_summon_familiar(level,ch, arg, SPELL_TYPE_SPELL, tar_ch,0, skill);
 		 break;
 	case SPELL_TYPE_POTION:
 		 log("Serious screw-up in summon_familiar(potion)!", ANGEL, LOG_BUG);
@@ -8391,7 +8391,7 @@ int spell_lighted_path( byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DAT
 
   send_to_char("Your magic pulls the essence of scent from around you straining\r\n"
                "knowledge from it to be displayed briefly in your mind.\r\n"
-               "You sense...\r\n", ch);
+               "$B$3You sense...$R\r\n", ch);
 
   while(ptrack) {
     sprintf(buf, "a %s called %s headed %s...\r\n",

@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.34 2003/04/22 23:36:37 pirahna Exp $ */
+/* $Id: mob_proc.cpp,v 1.35 2003/06/22 22:39:26 pirahna Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -5093,7 +5093,7 @@ int museum_guard(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
    return eFAILURE;
 }
 
-int mage_familiar(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,        
+int mage_familiar_imp(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,        
           struct char_data *owner)
 {
   if(number(0, 1))
@@ -5102,7 +5102,7 @@ int mage_familiar(struct char_data *ch, struct obj_data *obj, int cmd, char *arg
   return eFAILURE;  
 }
 
-int mage_familiar_non(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,        
+int mage_familiar_imp_non(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,        
           struct char_data *owner)
 {
   if(cmd)
@@ -5137,6 +5137,56 @@ int mage_familiar_non(struct char_data *ch, struct obj_data *obj, int cmd, char 
 
     if(number(1, 500) == 1) {
       do_emote(ch, "chitters about for a bit then settles down.", 9);
+      return eFAILURE;
+    }
+  }
+
+  return eFAILURE;
+}
+
+int druid_familiar_chipmunk_non(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
+          struct char_data *owner)
+{
+  if(cmd)
+    return eFAILURE;
+
+  if(ch->fighting)
+    return eFAILURE;
+
+  if(!ch->master) {
+    log("Familiar without a master.", IMMORTAL, LOG_BUG);
+    extract_char(ch, TRUE);
+    return (eCH_DIED | eSUCCESS);
+  }
+
+  // do nothing unless doing nothing :)
+  if( GET_POS(ch) < POSITION_STANDING )
+     return eFAILURE;
+
+  if(!ch->fighting) 
+  {
+    if(ch->in_room != ch->master->in_room) {
+      do_emote(ch, "looks around for its master than runs off.\r\n", 9);
+      move_char(ch, ch->master->in_room);
+      do_emote(ch, "runs in and drops by its masters feet, obviously tired.\r\n", 9);
+      return eFAILURE;
+    }
+
+    if(ch->master->fighting) { // help him!
+      do_join(ch, GET_NAME(ch->master), 9);
+      return eFAILURE;
+    }
+
+    if(number(1, 500) == 1) {
+      do_emote(ch, "sqeaks with delight at a found nut.", 9);
+      return eFAILURE;
+    }
+
+    if(number(1, 100) == 1) {
+      send_to_char("The presence of your chipmunk is soothing to your mind.\r\n", ch->master);
+      GET_MANA(ch->master) += 10;
+      if(GET_MANA(ch->master) > GET_MAX_MANA(ch->master))
+         GET_MANA(ch->master) = GET_MAX_MANA(ch->master);
       return eFAILURE;
     }
   }
