@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.37 2002/08/07 03:53:54 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.38 2002/08/07 06:14:20 dcastle Exp $ */
 
 extern "C"
 {
@@ -2522,7 +2522,8 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
     if((is_thief && ((ch && (IS_NPC(ch) || ch == victim || (ch->clan && ch->clan == victim->clan))))) ||
        (!is_thief && (GET_LEVEL(victim)>20 && number(1,101) <= GET_LEVEL(victim))) )
     {
-      if(GET_LEVEL(ch) >= 50 || number(0, 1)) {
+      if(GET_LEVEL(ch) >= 50 || number(0, 1)) 
+      {
          GET_CON(victim) -= 1;
          victim->raw_con -= 1;
          send_to_char("*** You lose one constitution point ***\n\r", victim);
@@ -3497,7 +3498,6 @@ int do_flee(struct char_data *ch, char *argument, int cmd)
           if (IS_SET(retval, eSUCCESS)) 
           {
             // set them back fighting to link it properly
-            GET_POS(ch) = POSITION_FIGHTING;
             ch->fighting = chTemp;
             
             // They got away.  Stop fighting for everyone not in the new room from fighting
