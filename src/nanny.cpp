@@ -11,7 +11,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.32 2003/06/22 23:47:34 pirahna Exp $ */
+/* $Id: nanny.cpp,v 1.33 2003/07/08 02:19:36 pirahna Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -365,7 +365,6 @@ void do_on_login_stuff(char_data * ch)
        GET_COND(ch, FULL) = -1;
     }
 
-    char_from_room(ch);
     if(ch->in_room >= 2)                 char_to_room( ch, ch->in_room );
     else if(GET_LEVEL(ch) >=  IMMORTAL)  char_to_room( ch, real_room(17) );
     else                                 char_to_room( ch, real_room(START_ROOM) );
