@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.91 2003/01/21 05:34:23 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.92 2003/01/21 07:02:56 dcastle Exp $ */
 
 extern "C"
 {
@@ -1080,7 +1080,7 @@ void pir_stat_loss(char_data * victim)
   int loss = 0;
 
   /* Pir's extra stat loss.  Bwahahah */
-  if(number(1,100) <= GET_LEVEL(victim) && GET_LEVEL(victim) >= 50 && 
+  if(number(1,100) <= GET_LEVEL(victim)/2 && GET_LEVEL(victim) >= 50 && 
     !IS_NPC(victim)) 
   {
     switch(number(1,5)) 
@@ -2761,7 +2761,7 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
     if((is_thief && ((ch && (IS_NPC(ch) || ch == victim || (ch->clan && ch->clan == victim->clan))))) ||
        (!is_thief && (GET_LEVEL(victim)>20 && number(1,101) <= GET_LEVEL(victim))) )
     {
-      if(GET_LEVEL(ch) >= 50 || number(0, 1)) 
+      if(GET_LEVEL(ch) >= 50 || 0 == number(0, 2)) 
       {
          GET_CON(victim) -= 1;
          victim->raw_con -= 1;
