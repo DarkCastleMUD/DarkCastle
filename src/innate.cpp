@@ -92,7 +92,7 @@ int do_innate(CHAR_DATA *ch, char *arg, int cmd)
   {
     if (innates[i].race == GET_RACE(ch))
     {
-      if (!*arg)
+      if (buf[0] == '\0')
       {
         csendf(ch, "Your race has access to the %s innate ability.\r\n",innates[i].name);
 	return eSUCCESS;

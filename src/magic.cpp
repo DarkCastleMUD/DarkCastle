@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.109 2004/04/20 15:12:47 urizen Exp $ */
+/* $Id: magic.cpp,v 1.110 2004/04/20 19:57:10 urizen Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -52,6 +52,7 @@ extern "C"
 #include <act.h>
 #include <clan.h>
 #include <arena.h>
+#include <innate.h>
 #include <returnvals.h>
 
 /* Extern structures */
@@ -2734,9 +2735,14 @@ int spell_wizard_eye(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
     send_to_char("Your target's location is hidden by the forests.\r\n", ch);
     return eFAILURE;
   }
+  if (affected_by_spell(victim, SKILL_INNATE_EVASION))
+  {
+    send_to_char("Your target evades your wiz-eye!\r\n",ch);
+    return eFAILURE;
+  }
 
   if(number(0, 100) > skill) {
-    send_to_char("Your spell fails to locate it's target.\r\n", ch);
+    send_to_char("Your spell fails to locate its target.\r\n", ch);
     return eFAILURE;
   }
 
