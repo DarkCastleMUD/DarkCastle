@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.169 2004/05/02 18:24:51 urizen Exp $ */
+/* $Id: fight.cpp,v 1.170 2004/05/02 18:38:07 urizen Exp $ */
 
 extern "C"
 {
@@ -1338,6 +1338,36 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
        REMOVE_BIT(victim->combat, COMBAT_REPELANCE);
     }
   }
+  int save = 0;
+    switch(weapon_type) {
+       case TYPE_FIRE:
+            save = victim->saves[SAVE_TYPE_FIRE];
+            break;
+      case TYPE_COLD:
+            save = victim->saves[SAVE_TYPE_COLD];
+            break;
+      case TYPE_ENERGY:
+            save = victim->saves[SAVE_TYPE_ENERGY];
+            break;
+    case TYPE_ACID:
+            save = victim->saves[SAVE_TYPE_ACID];
+            break;
+      case TYPE_MAGIC:
+            save = victim->saves[SAVE_TYPE_MAGIC];
+            if(IS_SET(victim->immune, ISR_MAGIC))       return(TRUE);
+            if(IS_SET(victim->suscept, ISR_MAGIC))      save = (int)(save *0.7);
+            if(IS_SET(victim->resist, ISR_MAGIC))       save = (int)(save *1.3);
+            break;
+      case TYPE_POISON:
+            save = victim->saves[SAVE_TYPE_POISON];
+            break;
+      default:
+        break;
+    }
+   if (number(1,100) < save)
+	dam /= 2; // Save chance.
+
+
   // Can't hurt god, but he likes to see the messages. 
   if (GET_LEVEL(victim) >= IMMORTAL && !IS_NPC(victim))
     dam = 0;
