@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.33 2004/04/25 02:38:25 urizen Exp $
+| $Id: inventory.cpp,v 1.34 2004/04/28 07:44:35 urizen Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -1154,16 +1154,20 @@ int do_give(struct char_data *ch, char *argument, int cmd)
 //    send_to_char("Ok.\n\r", ch);
     do_save(ch,"",10);
     do_save(vict,"",10);
+    // if I gave a no_trade item to a mob, the mob needs to destroy it
+    // otherwise it defeats the purpose of no_trade:)
+    if(IS_SET(obj->obj_flags.more_flags, ITEM_NO_TRADE) && IS_NPC(vict))
+    {
+       extract_obj(obj);
+	return eSUCCESS;
+    }
+
 
     retval = mprog_give_trigger( vict, ch, obj );
     if(SOMEONE_DIED(retval)) {
       retval = SWAP_CH_VICT(retval);
       return eSUCCESS|retval;
     }
-    // if I gave a no_trade item to a mob, the mob needs to destroy it
-    // otherwise it defeats the purpose of no_trade:)
-    if(IS_SET(obj->obj_flags.more_flags, ITEM_NO_TRADE) && IS_NPC(vict))
-       extract_obj(obj);
 
     return eSUCCESS;
 }
