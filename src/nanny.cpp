@@ -11,7 +11,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.9 2002/08/01 15:32:46 pirahna Exp $ */
+/* $Id: nanny.cpp,v 1.10 2002/08/01 18:27:01 dcastle Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -392,6 +392,8 @@ void roll_and_display_stats(CHAR_DATA * ch)
             ch->desc->stats->con[3], ch->desc->stats->con[4]);
          SEND_TO_Q(buf, ch->desc);
          SEND_TO_Q("Choose a group <1-5>, or press return to reroll --> ", ch->desc);
+
+	WAIT_STATE(ch, PULSE_VIOLENCE);
 }
 
 // Deal with sockets that haven't logged in yet.
