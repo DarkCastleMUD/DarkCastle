@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.40 2004/05/04 12:32:31 urizen Exp $
+| $Id: guild.cpp,v 1.41 2004/05/04 23:27:00 urizen Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -243,24 +243,30 @@ int skills_guild(struct char_data *ch, char *arg, struct char_data *owner)
     SET_BIT(classon, 1<<CLASS_THIEF);
     SET_BIT(classon, 1<<CLASS_BARBARIAN);
     SET_BIT(classon, 1<<CLASS_MONK);
-   if (default_master[GET_CLASS(ch)] != mob_index[owner->mobdata->nr].virt)
+    SET_BIT(classon, 1<<CLASS_DRUID);
+   if (default_master[GET_CLASS(ch)] != mob_index[owner->mobdata->nr].virt) {
 	do_say(owner, "I'm sorry, I can't teach you that.  You'll have to find another trainer.",9);
+       return eSUCCESS;
+   }
    else {
       struct skill_quest *sq;
      if (IS_SET(classon, 1<<GET_CLASS(ch))) {
      if ((sq=find_sq(skilllist[skillnumber].skillname)) != NULL && sq->message && IS_SET(sq->clas, 1<<(GET_CLASS(ch)-1)))
      {
 	mprog_driver(sq->message, owner, ch, NULL, NULL);
+	return eSUCCESS;
      }
-     } else if (skilllist[skillnumber].clue)
+     } else if (skilllist[skillnumber].clue) {
      do_say(owner, skilllist[skillnumber].clue,9);
+     return eSUCCESS;
+    }
    }
 //    if(skilllist[skillnumber].clue && mob_index[owner->mobdata->nr].virt 
 //== default_master[GET_CLASS(ch)])
  //     do_say(owner, skilllist[skillnumber].clue, 9);
    // else do_say(owner, "I'm sorry, I can't teach you that.  You'll have 
 //to find another trainer.", 9);
-    return eSUCCESS;
+//    return eSUCCESS;
   }
 
   if (known >= skilllist[skillnumber].maximum) {
