@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.117 2003/06/22 22:55:37 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.118 2003/06/22 23:03:25 pirahna Exp $ */
 
 extern "C"
 {
@@ -3364,7 +3364,8 @@ void arena_kill(CHAR_DATA *ch, CHAR_DATA *victim)
   // We keep objects with the ITEM_NOSAVE flag
   // Needs to be called BEFORE move_char so that the items
   // end up in the right room
-  remove_nosave(victim);
+  // why did we do this? -pir
+  // remove_nosave(victim);
   
   move_player_home(victim);
   
