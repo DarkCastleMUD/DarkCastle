@@ -522,6 +522,7 @@ void assign_objects(void)
   SPEC_FUN gotta_dance_boots;
   SPEC_FUN random_dir_boots;
   SPEC_FUN noremove_eq;
+  SPEC_FUN glove_combat_procs;
 
   assign_one_obj_non(9,  phish_locator);	
   assign_one_obj_non(13,  board); /* Quest Board */
@@ -584,11 +585,13 @@ void assign_objects(void)
   assign_one_obj_com(2715,   shield_combat_procs);
   assign_one_obj_com(8208,   shield_combat_procs);
   assign_one_obj_com(9520,   dk_rend);
-  assign_one_obj_com(30627,  eliara_combat);  
+  assign_one_obj_com(9806,   glove_combat_procs);
   assign_one_obj_com(10000,  holyavenger);
   assign_one_obj_com(10001,  holyavenger);
-  assign_one_obj_com(26807,  goldenbatleth);
   assign_one_obj_com(16903,  generic_weapon_combat);
+  assign_one_obj_com(19503,  glove_combat_procs);
+  assign_one_obj_com(26807,  goldenbatleth);
+  assign_one_obj_com(30627,  eliara_combat);  
 
 //  assign_one_obj_com(22732,  drainingstaff);
 //  assign_one_obj_com(22743,  bonusattack);
