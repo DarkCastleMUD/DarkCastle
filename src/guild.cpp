@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.7 2002/08/01 15:57:53 pirahna Exp $
+| $Id: guild.cpp,v 1.8 2002/08/01 17:17:28 pirahna Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -253,6 +253,8 @@ int guild(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
       send_to_char("Only a god can level you now.\n\r", ch);
       return eSUCCESS;
     }
+
+   // TODO - make it so you have to be at YOUR guildmaster to gain
 
     exp_needed = exp_table[(int)GET_LEVEL(ch) + 1];
 
