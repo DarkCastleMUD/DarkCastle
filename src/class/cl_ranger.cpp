@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_ranger.cpp,v 1.25 2003/06/13 00:02:37 pirahna Exp $ | cl_ranger.C |
+| $Id: cl_ranger.cpp,v 1.26 2003/06/13 00:40:06 pirahna Exp $ | cl_ranger.C |
 Description: Ranger skills/spells */ extern "C"  {
   #include <string.h>
 }
@@ -401,12 +401,14 @@ int ambush(CHAR_DATA *ch)
      if(i == ch || !i->ambush || !CAN_SEE(i, ch))
        continue;
 
-     if(  GET_POS(i) < POSITION_RESTING || 
+     if(  GET_POS(i) <= POSITION_RESTING || 
           GET_POS(i) == POSITION_FIGHTING ||
           IS_AFFECTED(i, AFF_PARALYSIS) ||
           ( IS_SET(world[i->in_room].room_flags, SAFE) &&
 	    !IS_AFFECTED(ch, AFF_CANTQUIT)
           ))
+       continue;
+     if(!IS_MOB(i) && !i->desc) // don't work if I'm linkdead
        continue;
      if(isname(i->ambush, GET_NAME(ch)))
      {
