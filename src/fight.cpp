@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.125 2003/07/22 03:10:45 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.126 2003/07/22 19:08:14 pirahna Exp $ */
 
 extern "C"
 {
@@ -3326,6 +3326,12 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim)
           GET_NAME(victim), GET_NAME(ch->master));
   else if(IS_ANONYMOUS(ch))
     sprintf(killer_message,"\n\r##%s was just DEFEATED in battle by %s!\n\r", 
+          GET_NAME(victim), GET_NAME(ch));
+  else if(ch->in_room == real_room(START_ROOM))
+    sprintf(killer_message,"\n\r##%s was just PINGED by %s!\n\r", 
+          GET_NAME(victim), GET_NAME(ch));
+  else if(ch->in_room == real_room(SECOND_START_ROOM))
+    sprintf(killer_message,"\n\r##%s was just PONGED by %s!\n\r", 
           GET_NAME(victim), GET_NAME(ch));
   else switch(GET_CLASS(ch))
   {
