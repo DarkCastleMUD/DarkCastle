@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: mob_act.cpp,v 1.8 2002/11/01 16:14:52 dcastle Exp $ */
+/* $Id: mob_act.cpp,v 1.9 2003/06/22 23:37:48 pirahna Exp $ */
 
 extern "C"
 {
@@ -71,6 +71,8 @@ int thief_non_combat(struct char_data *ch, struct obj_data *obj, int cmd, char *
 int barbarian_non_combat(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
           struct char_data *owner);
 int monk_non_combat(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,        
+          struct char_data *owner);
+int druid_non_combat(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,        
           struct char_data *owner);
 int passive_cleric(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,        
           struct char_data *owner);
@@ -176,6 +178,11 @@ void mobile_activity(void)
               break;
             case CLASS_BARBARIAN:
               retval = barbarian_non_combat(ch, NULL, 0, "", ch);
+              if(!IS_SET(retval, eFAILURE))
+                continue;
+              break;
+            case CLASS_DRUID:
+              retval = druid_non_combat(ch, NULL, 0, "", ch);
               if(!IS_SET(retval, eFAILURE))
                 continue;
               break;

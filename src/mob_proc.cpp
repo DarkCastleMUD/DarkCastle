@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.36 2003/06/22 22:55:37 pirahna Exp $ */
+/* $Id: mob_proc.cpp,v 1.37 2003/06/22 23:37:48 pirahna Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -1065,6 +1065,57 @@ int bard_combat(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 
   // whistle sharp every round
   return song_whistle_sharp(GET_LEVEL(ch), ch, "", vict, GET_LEVEL(ch));
+}
+
+int druid_combat(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,        
+          struct char_data *owner)
+{
+  struct char_data *vict;
+
+  if(cmd) return eFAILURE;
+
+  if(GET_POS(ch) != POSITION_FIGHTING)
+    return eFAILURE;
+  
+  if(!ch->fighting)
+    return eFAILURE;
+  
+  if(IS_AFFECTED(ch, AFF_PARALYSIS))
+    return eFAILURE;
+  
+  if(MOB_WAIT_STATE(ch))
+    return eFAILURE;
+
+  vict = ch->fighting;
+  
+  if(!vict)
+    return eFAILURE;
+
+  return spell_blue_bird(GET_LEVEL(ch), ch, vict, 0, 80);
+}
+
+int druid_non_combat(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,        
+          struct char_data *owner)
+{
+   if (cmd) return FALSE;
+   if (GET_POS(ch) <= POSITION_FIGHTING) return FALSE;
+   if (IS_AFFECTED(ch, AFF_PARALYSIS)) return FALSE;
+
+   if( !affected_by_spell(ch, SPELL_INFRAVISION))
+   {
+      return cast_eyes_of_the_owl(GET_LEVEL(ch), ch, "", 0, ch, 0, GET_LEVEL(ch));
+   }
+
+   if( !affected_by_spell(ch, SPELL_STONE_SHIELD) &&
+       GET_LEVEL(ch) > 19 &&
+       !ch->fighting )
+   {
+      return spell_stone_shield(GET_LEVEL(ch), ch, ch, 0, 50);
+   }
+
+   // TODO: heal myself eventually
+
+   return eFAILURE;
 }
 
 // combat proc for mob monks

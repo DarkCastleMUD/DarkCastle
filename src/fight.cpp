@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.118 2003/06/22 23:03:25 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.119 2003/06/22 23:37:48 pirahna Exp $ */
 
 extern "C"
 {
@@ -69,6 +69,7 @@ int thief(struct char_data *ch, struct obj_data *obj, int cmd, char *arg, struct
 int barbarian(struct char_data *ch, struct obj_data *obj, int cmd, char *arg, struct char_data *invoker);
 int monk(struct char_data *ch, struct obj_data *obj, int cmd, char *arg, struct char_data *invoker);
 int bard_combat(struct char_data *ch, struct obj_data *obj, int cmd, char *arg, struct char_data *invoker);
+int druid_combat(struct char_data *ch, struct obj_data *obj, int cmd, char *arg, struct char_data *invoker);
 int ranger_combat(struct char_data *ch, struct obj_data *obj, int cmd, char *arg, struct char_data *invoker);
 int active_cleric(struct char_data *ch, struct obj_data *obj, int cmd, char *arg, struct char_data *invoker);
 void remove_memory(CHAR_DATA *ch, char type, CHAR_DATA *vict);
@@ -159,6 +160,7 @@ void perform_violence(void)
            case CLASS_PALADIN:       retval = paladin(ch, NULL, 0, "", ch);           break;
            case CLASS_ANTI_PAL:      retval = antipaladin(ch, NULL, 0, "", ch);       break;
            case CLASS_BARBARIAN:     retval = barbarian(ch, NULL, 0, "", ch);         break;
+           case CLASS_DRUID:         retval = druid_combat(ch, NULL, 0, "", ch);      break;
            case CLASS_NECROMANCER:   retval = active_necro(ch, NULL, 0, "", ch);      break;
            default:                  break;
           }
