@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.25 2002/12/26 22:33:05 pirahna Exp $ */
+/* $Id: mob_proc.cpp,v 1.26 2002/12/26 22:33:29 pirahna Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -4599,7 +4599,7 @@ int foggy_combat(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     if(number(0, 1))
        return eFAILURE;
 
-    act("$n glows in power and summons a hoard of spirits to $s aid!",
+    act("$n glows in power and summons a horde of spirits to $s aid!",
              ch, 0, 0, TO_ROOM, INVIS_NULL );
 
     // create the mob
