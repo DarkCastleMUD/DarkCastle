@@ -2,7 +2,7 @@
 #define FIGHT_H_
 
 /************************************************************************
-| $Id: fight.h,v 1.7 2003/01/21 05:34:38 pirahna Exp $
+| $Id: fight.h,v 1.8 2003/11/10 19:37:44 staylor Exp $
 | fight.h
 | This file defines the header information for fight.
 */
@@ -23,6 +23,9 @@ int  damage(CHAR_DATA *ch, CHAR_DATA *victim, int dam,
             int weapon_type, int attacktype, int weapon); 
 int spell_damage(CHAR_DATA *ch, CHAR_DATA *victim, int dam, 
             int weapon_type, int attacktype, int weapon);
+int noncombat_damage(CHAR_DATA * ch, int dam, char *char_death_msg,
+                     char *room_death_msg, char *death_log_msg);
+
 
  
 extern CHAR_DATA *character_list;

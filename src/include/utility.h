@@ -11,8 +11,12 @@
  *                                                                         *
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
+ *                                                                         *
+ *  Revision History                                                       *
+ *  10/21/2003   Onager    Changed IS_ANONYMOUS() to handle mobs without   *
+ *                         crashing                                        *
  ***************************************************************************/
-/* $Id: utility.h,v 1.18 2003/08/12 03:45:37 pirahna Exp $ */
+/* $Id: utility.h,v 1.19 2003/11/10 19:37:45 staylor Exp $ */
 
 #ifndef UTILITY_H_
 #define UTILITY_H_
@@ -211,7 +215,13 @@ bool IS_DARK( int room );
 
 inline const short IS_ANONYMOUS(CHAR_DATA *ch)
 {
-  return((GET_LEVEL(ch) >= 101) ? 0 : IS_SET(ch->pcdata->toggles, PLR_ANONYMOUS) != 0);
+  if (IS_MOB(ch))
+     /* this should really never be called on mobs */
+     return 1;
+  else if (GET_LEVEL(ch) >= 101)
+     return 0;
+  else
+     return (IS_SET(ch->pcdata->toggles, PLR_ANONYMOUS) != 0);
 }
 
 /* Object And Carry related macros */

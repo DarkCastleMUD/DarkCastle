@@ -14,7 +14,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.h,v 1.32 2003/08/12 03:45:37 pirahna Exp $ */
+/* $Id: spells.h,v 1.33 2003/11/10 19:37:44 staylor Exp $ */
 #include <structs.h> // byte, sh_int
 
 #define MAX_BUF_LENGTH               240
@@ -445,4 +445,15 @@ struct attack_hit_type
   char *singular;
   char *plural;
 };
+
+
+/*
+ * reasons for stopping following
+ * passed as the cmd arg to stop_follow()
+ */
+#define STOP_FOLLOW	0
+#define END_STALK	1
+#define CHANGE_LEADER	2
+#define BROKE_CHARM	3
+
 #endif
