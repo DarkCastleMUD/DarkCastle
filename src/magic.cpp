@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.142 2004/05/25 01:04:49 urizen Exp $ */
+/* $Id: magic.cpp,v 1.143 2004/05/25 14:52:29 urizen Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -1500,11 +1500,10 @@ int spell_curse(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
           return eFAILURE;
 	int duration =0, chance = 10000, save = 0;
         set_cantquit(ch, victim);
-	if (skill < 41) { duration = 1; chance = 7; save = -1;}
-        else if (skill < 61) { duration = 2; chance = 5; save = -2;}
-        else if (skill < 81) { duration = 3; chance = 3; save = -3;}
-        else if (skill < 91) { duration = 3; chance = 2; save = -4;}
-	else { duration = 3; chance = 2; save = -5; }
+	if (skill < 34) { duration = 1; chance = 7; save = -3;}
+        else if (skill < 61) { duration = 2; chance = 5; save = -5;}
+        else if (skill < 81) { duration = 3; chance = 3; save = -7;}
+	else { duration = 3; chance = 2; save = -9; }
 
 	if (GET_LEVEL(victim) < 10)
 	{
@@ -1525,8 +1524,7 @@ int spell_curse(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
 	act("$N resists your attempt to curse $m!", ch, NULL, victim, TO_CHAR,0);
 	act("$N resists $n's attempt to curse $m!", ch, NULL, victim, TO_ROOM,NOTVICT);
 	act("You resist $n's attempt to curse you!",ch,NULL,victim,TO_VICT,0);
-        return eFAILURE;
-   }
+   } else {
 
 
 	 if (affected_by_spell(victim, SPELL_CURSE))
@@ -1554,6 +1552,7 @@ int spell_curse(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
          skill_increase_check(ch, SPELL_CURSE, skill, SKILL_INCREASE_MEDIUM);
 	 act("$n briefly reveals a red aura!", victim, 0, 0, TO_ROOM, 0);
 	 act("You feel very uncomfortable.",victim,0,0,TO_CHAR, 0);
+     }
 	if (IS_NPC(victim)) {
 	   retval = one_hit( victim, ch, TYPE_UNDEFINED, FIRST);
  	   retval = SWAP_CH_VICT(retval);
@@ -4494,11 +4493,10 @@ int spell_weaken(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *
         return eFAILURE;
     }
     int x = has_skill(ch, SPELL_WEAKEN);
-     if (x < 41) { duration = 1; chance = 7; str = -2; con = -1; }
-     else if (x < 61) { duration = 2; chance = 5; str = -3; con = -2; }
-     else if (x < 81) { duration = 2; chance = 3; str = -4; con = -2; }
-     else if (x < 91) { duration = 3; chance = 2; str = -5; con = -3; }
-     else {duration = 3; chance = 2; str = -6;  con = -3;}
+     if (x < 34) { duration = 1; chance = 7; str = -2; con = -1; }
+     else if (x < 61) { duration = 2; chance = 5; str = -4; con = -2; }
+     else if (x < 81) { duration = 2; chance = 3; str = -6; con = -3; }
+     else {duration = 3; chance = 2; str = -8;  con = -4;}
    
     set_cantquit (ch, victim);
    if (number(1,101) < get_saves(victim, SAVE_TYPE_MAGIC))
@@ -4506,8 +4504,7 @@ int spell_weaken(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *
 	act("$N resists your attempt to weaken $m!", ch, NULL, victim, TO_CHAR,0);
 	act("$N resists $n's attempt to weaken $m!", ch, NULL, victim, TO_ROOM,NOTVICT);
 	act("You resist $n's attempt to weaken you!",ch,NULL,victim,TO_VICT,0);
-        return eFAILURE;
-   }
+   } else {
 
     
 	 if (!affected_by_spell(victim, SPELL_WEAKEN))
@@ -4536,6 +4533,7 @@ void check_weapon_weights(char_data * ch);
 		ch, NULL, victim, TO_CHAR, 0);
 	  }
       }
+     }
 	if (IS_NPC(victim)) {
 	 retval = one_hit(victim, ch, TYPE_UNDEFINED, FIRST);
          retval = SWAP_CH_VICT(retval);
@@ -9462,42 +9460,42 @@ int spell_debility(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data
 
    if (number(1,101) < get_saves(victim, SAVE_TYPE_POISON))
    {
-act("$N resists your attempt to debilitize $m!", ch, NULL, victim, 
-TO_CHAR,0);
-act("$N resists $n's attempt to debilitize $m!", ch, NULL, victim, 
-TO_ROOM,
-NOTVICT);
+act("$N resists your attempt to debilitize $m!", ch, NULL, victim, TO_CHAR,0);
+act("$N resists $n's attempt to debilitize $m!", ch, NULL, victim, TO_ROOM,NOTVICT);
 act("You resist $n's attempt to debilitize you!",ch,NULL,victim,TO_VICT,0);
-     return eFAILURE;
-   }
+   } else {
 
 
 //  int save = saves_spell(ch, victim, 5, SAVE_TYPE_MAGIC);
-  int save = -1;
-  if(save < 0)
-  {
-    int hitmod = skill / 10;       hitmod = MAX(1, hitmod);      hitmod *= -1;
-    int  acmod = skill / 3;         acmod = MAX(1,  acmod);
+    double percent = 0;
+    if (skill < 34) { percent = 20; }
+    else if (skill < 61) { percent = 35; }
+    else if (skill < 81) { percent = 50;}
+    else { percent = 65; }
+    extern int hit_gain(CHAR_DATA *ch);
+    extern int mana_gain(CHAR_DATA*ch);
+    extern int ki_gain(CHAR_DATA *ch);
+    extern int move_gain(CHAR_DATA *ch);
 
     af.type      = SPELL_DEBILITY;
     af.duration  = 2;
-    af.modifier  = hitmod;
-    af.location  = APPLY_HITROLL;
+    af.modifier  = (int)((double)hit_gain(victim) * (percent / 100));
+    af.location  = APPLY_HP_REGEN;
     af.bitvector = 0;
     affect_to_char(victim, &af);
     
-    af.location = APPLY_AC;
-    af.modifier = acmod;  // ac penalty
+    af.location = APPLY_MOVE_REGEN;
+    af.modifier = (int)((double)move_gain(victim) * (percent / 100));  // ac penalty
     affect_to_char(victim, &af);
-
+    af.location = APPLY_KI_REGEN;
+    af.modifier = (int)((double)ki_gain(victim) * (percent / 100));
+    affect_to_char(victim, &af);
+    af.location = APPLY_MANA_REGEN;
+    af.modifier = (int)((double)mana_gain(victim) * (percent / 100));
+    affect_to_char(victim, &af);
     send_to_char("Your body becomes $6debilitized$R hurting your abilities.\r\n", victim);
     act("$N's body looks a little more frail.", ch, 0, victim, TO_ROOM, NOTVICT);
   }
-  else {
-    act("$n just tried to cast something on you and you're sure it isn't good.", ch, 0, victim, TO_VICT, 0);
-    send_to_char("Your debility spell is resisted.\r\n", ch);
-  }
-
   if(IS_NPC(victim)) 
   {
      skill_increase_check(ch, SPELL_DEBILITY, skill, SKILL_INCREASE_MEDIUM);
@@ -9572,12 +9570,13 @@ TO_CHAR,0);
 act("$N resists $n's attempt to attrition $m!", ch, NULL, victim, TO_ROOM,
 NOTVICT);
 act("You resist $n's attempt to attrition you!",ch,NULL,victim,TO_VICT,0);
-     return eFAILURE;
-   }
+   } else {
+  int acmod = 0, tohit = 0;
+        if (skill < 34) { acmod = 10; tohit = -4; }
+        else if (skill < 61) { acmod = 15; tohit = -6;}
+        else if (skill < 81) { acmod = 20; tohit = -8;}
+        else { acmod = 25; tohit = -10; }
 
-  if(save < 0)
-  {
-    int  acmod = (skill / 5) + 2;         acmod = MAX(1,  acmod);
 
     af.type      = SPELL_ATTRITION;
     af.duration  = 2;
@@ -9585,15 +9584,13 @@ act("You resist $n's attempt to attrition you!",ch,NULL,victim,TO_VICT,0);
     af.location  = APPLY_AC;
     af.bitvector = 0;
     affect_to_char(victim, &af);
-    
+    af.modifier = tohit;
+    af.location = APPLY_HITROLL;
+    affect_to_char(victim, &af);
+
     send_to_char("Your body's natural decay rate has been increased!\r\n", victim);
     act("$N's body takes on an unhealthy coloring.", ch, 0, victim, TO_ROOM, NOTVICT);
   }
-  else {
-    act("$n just tried to cast something on you and you're sure it isn't good.", ch, 0, victim, TO_VICT, 0);
-    send_to_char("Your attrition spell is resisted.\r\n", ch);
-  }
-
   if(IS_NPC(victim)) 
   {
      skill_increase_check(ch, SPELL_ATTRITION, skill, SKILL_INCREASE_MEDIUM);

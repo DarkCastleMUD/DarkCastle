@@ -728,6 +728,40 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
 	}
     }
 
+  if (!str_cmp(buf, "carries"))
+  {
+    struct obj_data *obj=0;
+    switch (arg[1] )
+    {
+
+      struct obj_data * search_char_for_item(char_data * ch, sh_int item_number);
+       case 'i': // mob
+          obj = search_char_for_item(mob, real_object(atoi(val)));
+	     break;
+       case 'n': // actor
+         obj = search_char_for_item(mob, real_object(atoi(val)));
+	     break;
+	case 't': // vict
+          obj = search_char_for_item(mob, real_object(atoi(val)));
+	  break;
+       case 'r': // rndm
+	  obj = search_char_for_item(mob, real_object(atoi(val)));
+	  break;
+	default:
+          logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'carries'", mob_index[mob->mobdata->nr].virt );
+	  return -1;
+    }
+    if (!obj) return -1;
+    if (!str_cmp(opr, "keep"))
+       return 1;
+    else if (!str_cmp(opr, "take"))
+    {
+      obj_from_char(obj);
+      extract_obj(obj);
+      return 1;
+    }
+    return -1;
+   }
   if ( !str_cmp( buf, "goldamt" ) )
     {
       switch ( arg[1] )  /* arg should be "$*" so just get the letter */

@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.34 2004/05/25 01:28:36 urizen Exp $ */
+/* $Id: limits.cpp,v 1.35 2004/05/25 14:52:28 urizen Exp $ */
 
 extern "C"
 {
@@ -154,7 +154,6 @@ int mana_gain(CHAR_DATA *ch)
 //    gain = graf(age(ch).year, 2,3,4,6,7,8,9);
 
     gain = (int)(ch->max_mana * (float)mana_regens[GET_CLASS(ch)] / 100);
-    csend(ch, "%d", gain);
     gain /= 4;
     switch (GET_POS(ch)) {
       case POSITION_SLEEPING: divisor = 1; break;
