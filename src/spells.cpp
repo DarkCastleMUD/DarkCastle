@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.43 2003/06/23 02:02:24 pirahna Exp $ */
+/* $Id: spells.cpp,v 1.44 2003/06/23 02:03:05 pirahna Exp $ */
 
 extern "C"
 {
@@ -491,7 +491,7 @@ struct spell_info_type spell_info [ ] =
     }, 
 
     { /* 105 */
-    	12, POSITION_STANDING, 75, TAR_CHAR_WORLD, cast_call_follower
+    	12, POSITION_STANDING, 75, TAR_IGNORE, cast_call_follower
     }, 
 
     { /* 106 */
