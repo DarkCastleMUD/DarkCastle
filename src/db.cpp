@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.16 2002/10/13 15:35:41 pirahna Exp $ */
+/* $Id: db.cpp,v 1.17 2002/10/29 03:54:18 dcastle Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -2351,8 +2351,12 @@ void write_mprog_recur(FILE *fl, MPROG_DATA *mprg)
         write_mprog_recur(fl, mprg->next);
 
       fprintf( fl, ">%s ", mprog_type_to_name( mprg->type ));
-      string_to_file( fl,  mprg->arglist );
-      string_to_file( fl, mprg->comlist );
+      if(mprg->arglist)
+        string_to_file( fl,  mprg->arglist );
+      else string_to_file( fl, "Saved During Edit");
+      if(mprg->comlist)
+        string_to_file( fl, mprg->comlist );
+      else string_to_file( fl, "Saved During Edit");
 }
 
 // Write a mob to file
