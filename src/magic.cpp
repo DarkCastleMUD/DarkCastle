@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.113 2004/04/24 10:42:40 urizen Exp $ */
+/* $Id: magic.cpp,v 1.114 2004/04/24 19:22:29 urizen Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -2068,7 +2068,7 @@ int spell_protection_from_evil(byte level, CHAR_DATA *ch, CHAR_DATA *victim, str
 	 assert(victim);
 
   /* keep spells from stacking/being cast on targets with built-in affect */
-  if (IS_AFFECTED(victim,AFF_PROTECT_EVIL) || IS_AFFECTED(victim, AFF_PROTECT_GOOD) || affected_by_spell(victim, SPELL_PROTECT_FROM_GOOD) || GET_CLASS(victim) == CLASS_ANTI_PAL)
+  if (IS_AFFECTED(victim,AFF_PROTECT_EVIL) || affected_by_spell(victim, SPELL_PROTECT_FROM_GOOD) || GET_CLASS(victim) == CLASS_ANTI_PAL)
 	 return eFAILURE;
 
   if (!affected_by_spell(victim, SPELL_PROTECT_FROM_EVIL) ) 

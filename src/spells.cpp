@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.66 2004/04/23 22:38:52 urizen Exp $ */
+/* $Id: spells.cpp,v 1.67 2004/04/24 19:22:30 urizen Exp $ */
 
 extern "C"
 {
@@ -1395,6 +1395,18 @@ bool isaff2(int spellnum);
     return eSUCCESS;
 }
 
+int skill_value(CHAR_DATA *ch, int skillnum, int min)
+{
+  struct char_skill_data * curr = ch->skills;
+
+  while(curr) {
+    if(curr->skillnum == skillnum)
+      return MAX(min,(int)curr->learned);
+    curr = curr->next;
+  }
+
+  return 0;
+}
 
 // Assumes that *argument does start with first letter of chopped string 
 int do_cast(CHAR_DATA *ch, char *argument, int cmd)
@@ -1669,14 +1681,14 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
           learned = 50;
           chance = 75;
         }
-        else {
+        else /*{
           chance = 50;
           chance += learned/10;
           if(GET_CLASS(ch) == CLASS_MAGIC_USER || GET_CLASS(ch) == CLASS_ANTI_PAL)
              chance += GET_INT(ch);
           else chance += GET_WIS(ch);
-        }
-
+        }*/
+	chance = skill_value(ch, spl, 33);
         if(GET_LEVEL(ch) < IMMORTAL && number(1,101) > chance )
         {
           csendf(ch, "You lost your concentration and are unable to cast %s!\n\r", spells[spl-1]);

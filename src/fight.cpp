@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.163 2004/04/24 10:42:39 urizen Exp $ */
+/* $Id: fight.cpp,v 1.164 2004/04/24 19:22:29 urizen Exp $ */
 
 extern "C"
 {
@@ -2423,7 +2423,7 @@ void make_scraps(CHAR_DATA *ch, struct obj_data *obj)
 
 
 #define MAX_NPC_CORPSE_TIME 3
-#define MAX_PC_CORPSE_TIME 15
+#define MAX_PC_CORPSE_TIME 12
 
 void make_corpse(CHAR_DATA * ch)
 {
