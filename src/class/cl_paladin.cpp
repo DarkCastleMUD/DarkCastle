@@ -36,7 +36,7 @@ int do_harmtouch(struct char_data *ch, char *argument, int cmd)
    // struct char_data *tmp_ch;
    char victim_name[MAX_INPUT_LENGTH];
    struct affected_type af;
-   int learned, specialization, chance, percent;
+   int learned, specialization, chance, percent, retval, dam;
 
    one_argument(argument, victim_name);
 
@@ -62,7 +62,7 @@ int do_harmtouch(struct char_data *ch, char *argument, int cmd)
      return eFAILURE;
    }
 
-   if (affected_by_spell(ch, SKILL_HARM_TOUCH)) {
+   if (affected_by_spell(ch, SKILL_HARM_TOUCH) && GET_LEVEL(ch) <= IMMORTAL) {
       send_to_char("You have not spend enough time in devotion to your god to warrant such a favor yet.\r\n", ch);
       return eFAILURE;
    }
@@ -94,17 +94,6 @@ int do_harmtouch(struct char_data *ch, char *argument, int cmd)
 
    percent = number(1, 101);
 
-   if(percent > chance) {
-     send_to_char("Your god refuses you.\r\n", ch);
-   }
-   else {
-     send_to_char("Praying fervently to your god, you direct the hate and despair from deep inside you at your victim.\r\n", ch);
-     act("Your body surges with holy wrath as $N's hate and despair pour into you!", victim, 0, ch, TO_CHAR, 0);
-     act("The surrounding light seems to dim as $n's life force pours from $s body into $N", ch, 0, victim, TO_ROOM, NOTVICT);
-
-     GET_HIT(victim) -= 15 * GET_LEVEL(ch);
-   }
-
    af.type = SKILL_HARM_TOUCH;
    af.duration  = 24;
    af.modifier  = 0;
@@ -112,14 +101,21 @@ int do_harmtouch(struct char_data *ch, char *argument, int cmd)
    af.bitvector = 0;
    affect_to_char(ch, &af);
 
-   update_pos(victim);
-   if (GET_POS(victim) == POSITION_DEAD) {
-     act("$N's body begins to wither and decay in front of you until $E falls to the ground a festering corpse.", ch, 0, victim, TO_ROOM, NOTVICT);
-     group_gain(ch, victim);
-     fight_kill(ch, victim, TYPE_CHOOSE);
-     return eSUCCESS|eVICT_DIED;
+   if(percent > chance) {
+     send_to_char("Your god refuses you.\r\n", ch);
    }
-   return eSUCCESS;
+   else {
+     dam = 15 * GET_LEVEL(ch);
+     retval = damage(ch, victim, dam, TYPE_UNDEFINED, SKILL_HARM_TOUCH, 0);
+   }
+   if(IS_SET(retval, eVICT_DIED) && !IS_SET(retval, eCH_DIED)) {
+     if(learned > 30 && number(1, 3) == 1) {
+        send_to_char("Your god basks in your worship of pain and infuses you with life.\r\n", ch);
+        GET_HIT(ch) += GET_LEVEL(ch) * 10;
+        GET_HIT(ch) = MIN(GET_HIT(ch), GET_MAX_HIT(ch));
+     }
+   }
+   return retval;
 }
 
 
