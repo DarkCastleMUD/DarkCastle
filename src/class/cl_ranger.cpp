@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_ranger.cpp,v 1.11 2002/08/10 05:23:44 pirahna Exp $ | cl_ranger.C |
+| $Id: cl_ranger.cpp,v 1.12 2002/08/13 17:09:47 pirahna Exp $ | cl_ranger.C |
 Description: Ranger skills/spells */ extern "C"  {
   #include <string.h>
 }
@@ -413,7 +413,7 @@ int ambush(CHAR_DATA *ch)
 
        if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
          learned = 75;
-       else if(!(learned = has_skill(ch, SKILL_AMBUSH)))
+       else if(!(learned = has_skill(i, SKILL_AMBUSH)))
          continue;
 
        specialization = learned / 100;
