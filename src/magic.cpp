@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.65 2003/03/04 06:45:28 pirahna Exp $ */
+/* $Id: magic.cpp,v 1.66 2003/03/17 03:39:07 pirahna Exp $ */
 
 extern "C"
 {
@@ -4053,6 +4053,8 @@ int spell_flamestrike(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
    if(skill > 60) {
       send_to_char("The fires burn into your soul tearing away at your magic being.\r\n", victim);
       GET_MANA(victim) -= 15;
+      if(GET_MANA(victim) < 0)
+         GET_MANA(victim) = 0;
    }
    return retval;
 }
