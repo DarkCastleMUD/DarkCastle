@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.153 2004/05/29 21:29:32 urizen Exp $ */
+/* $Id: magic.cpp,v 1.154 2004/05/30 19:21:08 urizen Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -648,7 +648,9 @@ void do_solar_blind(CHAR_DATA *ch, CHAR_DATA *tmp_victim)
     return;
   }
 //  if(saves_spell(ch, tmp_victim, -5, SAVE_TYPE_MAGIC) < 0)
-
+  if (tmp_victim->in_room != ch->in_room) return;
+  if (has_skill(ch, SPELL_SOLAR_GATE) < 81) return;
+   if (number(0,4)) return;
     if(!IS_AFFECTED(tmp_victim, AFF_BLIND)) 
     {
       act("$n seems to be blinded!", tmp_victim, 0, 0, TO_ROOM, INVIS_NULL);
@@ -658,7 +660,7 @@ void do_solar_blind(CHAR_DATA *ch, CHAR_DATA *tmp_victim)
       af.location  = APPLY_HITROLL;
       af.modifier  = has_skill(tmp_victim,SKILL_BLINDFIGHTING)?skill_success(tmp_victim,0,SKILL_BLINDFIGHTING)?-10:-20:-20;  
 // Make hitroll worse
-      af.duration  = 4;
+      af.duration  = 2;
       af.bitvector = AFF_BLIND;
       affect_to_char(tmp_victim, &af);
       af.location = APPLY_AC;
