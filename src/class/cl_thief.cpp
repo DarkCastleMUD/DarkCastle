@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.28 2003/04/23 02:50:39 pirahna Exp $
+| $Id: cl_thief.cpp,v 1.29 2003/05/12 02:53:09 pirahna Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -674,7 +674,7 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
           else _exp = (GET_OBJ_WEIGHT(obj) * GET_LEVEL(victim));
 
           if(GET_POS(victim) <= POSITION_SLEEPING)  
-            _exp = 0;
+            _exp = 1;
 
           GET_EXP(ch) += _exp; /* exp for stealing :) */
           sprintf(buf,"You receive %d exps.\n\r", _exp);
@@ -802,7 +802,7 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
           _exp = GET_OBJ_WEIGHT(obj);
         else
           _exp = (GET_OBJ_WEIGHT(obj) * GET_LEVEL(victim));
-        if(GET_POS(victim) <= POSITION_SLEEPING)    _exp = 0; 
+        if(GET_POS(victim) <= POSITION_SLEEPING)    _exp = 1; 
         GET_EXP(ch) += _exp;                   /* exp for stealing :) */ 
         sprintf(buf,"You receive %d exps.\n\r", _exp);
         send_to_char(buf, ch);
@@ -1021,9 +1021,9 @@ int do_pocket(CHAR_DATA *ch, char *argument, int cmd)
     if (gold > 0) {
       GET_GOLD(ch)     += gold;
       GET_GOLD(victim) -= gold;
-      if(GET_POS(victim) <= POSITION_SLEEPING) _exp = 0;
+      if(GET_POS(victim) <= POSITION_SLEEPING) _exp = 1;
       else if(!IS_NPC(victim)) _exp = 0;
-      else if(IS_SET(victim->mobdata->actflags, ACT_NICE_THIEF)) _exp = 0; 
+      else if(IS_SET(victim->mobdata->actflags, ACT_NICE_THIEF)) _exp = 1; 
       else _exp = gold;
       GET_EXP(ch)      += _exp;
       sprintf(buf, "Bingo! You got %d gold coins.\n\r", gold);
