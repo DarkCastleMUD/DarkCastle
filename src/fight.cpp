@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.107 2003/04/23 03:16:04 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.108 2003/05/03 23:48:03 pirahna Exp $ */
 
 extern "C"
 {
@@ -1050,7 +1050,7 @@ void eq_damage(CHAR_DATA * ch, CHAR_DATA * victim,
   if(!IS_NPC(victim) && !IS_NPC(ch))        // Don't damage eq on pc->pc fights
     return;
 
-  chance = GET_DEX(ch);
+  chance = 10 + GET_DEX(ch);
   if(dam < 40)                              // Under 40 damage decreases chance of damage
     chance += 40 - dam;                     // Helps out the lower level chars
     
