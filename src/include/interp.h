@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.h,v 1.29 2004/07/03 11:44:19 urizen Exp $ */
+/* $Id: interp.h,v 1.30 2004/07/12 20:21:18 urizen Exp $ */
 
 #ifndef INTERP_H_
 #define INTERP_H_
@@ -195,6 +195,7 @@ DO_FUN  do_mpstat;
 DO_FUN  do_lock;
 DO_FUN  do_log;
 DO_FUN  do_look;
+DO_FUN  do_maxes;
 DO_FUN  do_mlocate;
 DO_FUN  do_move;
 DO_FUN  do_motd;

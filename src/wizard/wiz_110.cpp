@@ -23,7 +23,66 @@ extern "C" {
 }
 #endif
 
+// List skill maxes.
+int do_maxes(struct char_data *ch, char *argument, int cmd)
+{
+  char arg[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+  class_skill_defines *classskill;
+  argument = one_argument(argument, arg);
+  one_argument(argument, arg2);
+  int oclass = GET_CLASS(ch); // old class.
+   // get_skill_list uses a char argument, and so to keep upkeep
+   // at a min I'm just modifying this here.
+  int i;
+  extern char* pc_clss_types2[];
+  extern class_skill_defines *get_skill_list(char_data *ch);
+  extern char* race_types[];
+  for (i=0; pc_clss_types2[i][0] != '\n';i++)
+    if (!str_cmp(pc_clss_types2[i], arg))
+       break;
+  if (pc_clss_types2[i][0] == '\n')
+  {
+    send_to_char("No such class.\r\n", ch);
+    return eFAILURE; 
+  }
+  GET_CLASS(ch) = i;
+  if ((classskill = get_skill_list(ch))==NULL) return eFAILURE;
+  GET_CLASS(ch) = oclass;
+  // Same problem with races... get_max_stat(ch, STRENGTH
+  for (i=1; race_types[i][0] != '\n'; i++)
+  {
+    if (!str_cmp(race_types[i], arg2))
+    {
+	int orace = GET_RACE(ch);
+	GET_RACE(ch) = i;
+	for (i = 0; *classskill[i].skillname != '\n'; i++)
+	{
+	  float max = classskill[i].maximum;
+	  max *= 0.75;
+	  if (classskill[i].attrs[0])
+	  {
+	       int thing = get_max_stat(ch,classskill[i].attrs[0])-20;
+	       if (thing > 0)
+	       max += (int)((get_max_stat(ch,classskill[i].attrs[0])-20)*2.5);
+	       if (max > 90) max = 90;
+	  }
+	  if (classskill[i].attrs[1])
+	  {
+	       int thing = get_max_stat(ch,classskill[i].attrs[1])-20;
+	       if (thing > 0)
+	        max += (get_max_stat(ch,classskill[i].attrs[1])-20);
+	  }
 
+	  csendf(ch, "%s: %d\n", classskill[i].skillname,
+		max);
+	}
+	GET_RACE(ch) = orace;
+	return eSUCCESS;
+    }
+  }
+  send_to_char("No such race.\r\n",ch);
+  return eFAILURE;
+}
 
 // give a command to a god
 int do_bestow(struct char_data *ch, char *arg, int cmd)
