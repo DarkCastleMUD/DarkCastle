@@ -1112,7 +1112,6 @@ int do_sedit(struct char_data *ch, char *argument, int cmd)
         return eFAILURE;
       }
       chop_half(text, select, target);
-fprintf(stderr, "do_select(): target=%s, select=%s\n", target, select);
       if((skillnum = find_skill_num(target)) < 0) {
         sprintf(buf, "Cannot find skill '%s' in master skill list.\r\n", text);
         send_to_char(buf, ch);
