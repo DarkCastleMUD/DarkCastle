@@ -7,7 +7,7 @@
 
 #define SKILL_INNATE_BASE               1500
 #define SKILL_INNATE_POWERWIELD         1500
-#define SKILL_INNATE_SNEAK              1501
+#define SKILL_INNATE_FOCUS              1501
 #define SKILL_INNATE_REGENERATION       1502
 #define SKILL_INNATE_BLOODLUST          1503
 #define SKILL_INNATE_FARSIGHT		1504

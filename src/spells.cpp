@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.79 2004/05/14 10:35:34 urizen Exp $ */
+/* $Id: spells.cpp,v 1.80 2004/05/14 13:32:57 urizen Exp $ */
 
 extern "C"
 {
@@ -1866,7 +1866,7 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
 	if (GET_CLASS(ch) == CLASS_MAGIC_USER || GET_CLASS(ch) == CLASS_ANTI_PAL)
 	  chance += conc_bonus(GET_INT(ch));
 	else chance += conc_bonus(GET_WIS(ch));
-        if(GET_LEVEL(ch) < IMMORTAL && number(1,101) > chance )
+        if(GET_LEVEL(ch) < IMMORTAL && number(1,101) > chance && !IS_AFFECTED2(ch,AFF_FOCUS))
         {
           csendf(ch, "You lost your concentration and are unable to cast %s!\n\r", spells[spl-1]);
           GET_MANA(ch) -= (use_mana(ch, spl) >> 1);

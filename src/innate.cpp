@@ -42,7 +42,7 @@ DO_FUN innate_powerwield;
 DO_FUN innate_regeneration;
 DO_FUN innate_farsight;
 DO_FUN innate_repair;
-DO_FUN innate_sneak;
+DO_FUN innate_focus;
 DO_FUN innate_evasion;
 DO_FUN innate_shadowslip;
 DO_FUN innate_bloodlust;
@@ -61,7 +61,7 @@ const struct in_skills innates[] = {
   { "farsight", RACE_ELVEN, innate_farsight },
   { "bloodlust", RACE_ORC, innate_bloodlust},
   { "repair", RACE_DWARVEN, innate_repair},
-  { "sneak", RACE_GNOME, innate_sneak},
+  { "focus", RACE_GNOME, innate_focus},
   { "evasion", RACE_PIXIE, innate_evasion},
   { "shadowslip", RACE_HOBBIT, innate_shadowslip},
   { "\n", 0, NULL}
@@ -70,7 +70,7 @@ const struct in_skills innates[] = {
 char * innate_skills[] = 
 {
    "Powerwield",
-   "Innate Sneak",
+   "Focus",
    "Regeneration",
    "Bloodlust",
    "Farsight",
@@ -151,22 +151,22 @@ int innate_powerwield(CHAR_DATA *ch, char *arg, int cmd)
    return eSUCCESS;
 }
 
-int innate_sneak(CHAR_DATA *ch, char *arg, int cmd)
+int innate_focus(CHAR_DATA *ch, char *arg, int cmd)
 {
-   if(IS_AFFECTED(ch, AFF_SNEAK))
+   if(IS_AFFECTED2(ch, AFF_FOCUS))
    {
-      send_to_char("But you are already sneaking!  Why waste it?\r\n", ch);
+      send_to_char("But you are already focusing!  Why waste it?\r\n", ch);
       return eFAILURE;
    }
 
-   send_to_char("You slip quiety into the shadows to move about stealthily.\r\n", ch);
+   send_to_char("You delve into a trance and find yourself able to concentrate alot better.\r\n",ch);
 
    struct affected_type af;
-   af.type = SKILL_SNEAK;
-   af.duration = 4;
+   af.type = SKILL_INNATE_FOCUS;
+   af.duration = 2;
    af.modifier = 0;
    af.location = APPLY_NONE;
-   af.bitvector = AFF_SNEAK;
+   af.bitvector = AFF_FOCUS;
    affect_to_char(ch, &af);
 
    return eSUCCESS;   

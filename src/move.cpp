@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.27 2004/04/24 11:09:18 urizen Exp $
+| $Id: move.cpp,v 1.28 2004/05/14 13:32:57 urizen Exp $
 | move.C
 | Movement commands and stuff.
 *************************************************************************
@@ -410,18 +410,18 @@ int do_simple_move(CHAR_DATA *ch, int cmd, int following)
     else if(IS_AFFECTED(ch, AFF_SNEAK)) 
     {
       char tmp[100];
-      int learned = has_skill(ch, SKILL_SNEAK);
-      int percent = number(1, 101); // 101% is a complete failure
-      if (affected_by_spell(ch,SKILL_INNATE_SNEAK))
-      {
+  //    int learned = has_skill(ch, SKILL_SNEAK);
+//      int percent = number(1, 101); // 101% is a complete failure
+/*      if (affected_by_spell(ch,SKILL_INNATE_SNEAK)) 
+      { REMOVED IN FAVOR OF INNATE FOCUS
 	learned = 30 + GET_LEVEL(ch);
       }
-
+*/
       // TODO - when mobs have skills, remove this
-      if(IS_MOB(ch))
-         learned = 80;
+//      if(IS_MOB(ch))
+  //       learned = 80;
       
-      if (percent > learned) {
+      if (!skill_success(ch, NULL, SKILL_SNEAK)) {
          sprintf(tmp, "$n leaves %s.", dirs[cmd]);
          act(tmp, ch, 0, 0, TO_ROOM, INVIS_NULL|STAYHIDE);
       }

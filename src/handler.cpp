@@ -21,7 +21,7 @@
  *  12/08/2003   Onager    Added check for charmies and !charmie eq to     *
  *                         equip_char()                                    *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.44 2004/05/03 22:58:17 urizen Exp $ */
+/* $Id: handler.cpp,v 1.45 2004/05/14 13:32:56 urizen Exp $ */
     
 extern "C"
 {
@@ -96,6 +96,7 @@ bool isaff2(int spellnum)
 		case SKILL_INNATE_REGENERATION:
 		case SKILL_INNATE_SHADOWSLIP:
 		case SKILL_INNATE_FARSIGHT:
+		case SKILL_INNATE_FOCUS:
                   return TRUE;
                   break;
                 default:
@@ -999,8 +1000,8 @@ void affect_remove( CHAR_DATA *ch, struct affected_type *af, int flags, bool aff
       case SKILL_INNATE_SHADOWSLIP:
 	  send_to_char("The ability to avoid magical pathways has leftyou.\r\n",ch);
 	  break;
-      case SKILL_INNATE_SNEAK:
-	  send_to_char("Your ability to move stealthily leaves you.\r\n",ch);
+      case SKILL_INNATE_FOCUS:
+	  send_to_char("Your concentration lessens to its regular amount.\r\n",ch);
 	  break;
       case SKILL_INNATE_REGENERATION:
 	 send_to_char("Your regeneration slows back to normal.\r\n",ch);
