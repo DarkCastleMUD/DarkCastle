@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_monk.cpp,v 1.6 2002/08/21 02:43:51 dcastle Exp $
+| $Id: cl_monk.cpp,v 1.7 2002/09/10 19:16:17 dcastle Exp $
 | cl_monk.C
 | Description:  Monk skills.
 */
@@ -240,6 +240,9 @@ int do_stun(struct char_data *ch, char *argument, int cmd)
       chance = 1;
     else chance -= GET_LEVEL(ch) + 5 - GET_LEVEL(victim);
   } 
+
+  if(!IS_MOB(ch) && !IS_MOB(victim))  // 5% penalty on PvP stunning
+    chance -= 5;
 
   if(percent > chance) {
     act("$n attempts to hit you in your solar plexus!  You block $s attempt.", ch, NULL, victim, TO_VICT , 0);
