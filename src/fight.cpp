@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.94 2003/01/22 16:12:18 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.95 2003/01/29 03:12:08 pirahna Exp $ */
 
 extern "C"
 {
@@ -128,6 +128,7 @@ void perform_violence(void)
 
 // DEBUG CODE
    int last_class = GET_CLASS(ch);
+   int last_virt  = mob_index[ch->mobdata->nr].virt;
 // DEBUG CODE
       
     if(can_attack(ch)) {
@@ -167,7 +168,7 @@ void perform_violence(void)
       if(last_class != GET_CLASS(ch)) {
          // if this happened, most likely the mob died somehow during the proc and didn't return eCH_DIED and is
          // now invalid memory.  report what class we were and return
-         logf(IMP, LOG_BUG, "Crash bug!!!!  fight.cpp last_class changed (%d)", last_class);
+         logf(IMP, LOG_BUG, "Crash bug!!!!  fight.cpp last_class changed (%d) Mob=%d", last_class, last_virt);
          break;
       }
 // DEBUG CODE
