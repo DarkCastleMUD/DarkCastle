@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: const.cpp,v 1.38 2002/09/06 23:27:23 dcastle Exp $ */
+/* $Id: const.cpp,v 1.39 2002/09/10 19:16:03 dcastle Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1038,7 +1038,7 @@ struct class_skill_defines p_skills[] = {
 
 
 struct class_skill_defines b_skills[] = {
-{    "dual wield",      SKILL_DUAL_WIELD,       1,      75,     10007, 	"You have to go see Mooral the barbarian guildmaster." },
+{    "dual wield",      SKILL_DUAL_WIELD,       1,      80,     10007, 	"You have to go see Mooral the barbarian guildmaster." },
 {    "kick",  		SKILL_KICK,		2,	75,	10007,	"Only the king of lobsters can teach you this."  },
 {    "bash",		SKILL_BASH,		3,	75,	-2, 	"You must find a local warrior.  He said something about a field filled with bees." },
 {    "parry",		SKILL_PARRY,		5,	40,	-2, 	"You must see the constable of Newtonia to learn parry." },
