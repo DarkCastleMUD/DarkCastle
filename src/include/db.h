@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: db.h,v 1.2 2002/06/13 04:41:15 dcastle Exp $ */
+/* $Id: db.h,v 1.3 2003/01/16 08:08:41 dcastle Exp $ */
 #ifndef DB_H_
 #define DB_H_
 
@@ -172,6 +172,12 @@ struct zone_data
     *  2: Just reset.                           *
     *  Update char * zone_modes[] (const.C) if you change this *
     */
+
+    int num_mob_first_repop; // number of mobs in this zone that were repoped in first repop
+    int num_mob_on_repop;    // number of mobs in this zone that were repoped in last repop
+    int death_counter;       // +- counter for how often mobs in zone are killed
+    int counter_mod;         // how quickly mobs are taken off the death_counter
+    int died_this_tick;      // number of mobs that have died in this zone this pop
 };
 
 

@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.89 2003/01/16 06:33:41 dcastle Exp $ */
+/* $Id: fight.cpp,v 1.90 2003/01/16 08:08:39 dcastle Exp $ */
 
 extern "C"
 {
@@ -46,6 +46,7 @@ extern struct descriptor_data *descriptor_list;
 extern CWorld world;
 extern struct index_data *mob_index;
 extern struct index_data *obj_index;
+extern struct zone_data *zone_table;
 
 struct clan_data * get_clan(struct char_data *);
 
@@ -2668,7 +2669,7 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
   int death_room = 0;
   
   if(!victim) {
-    log("Error in raw_kill()!  Null ch or victim!", IMMORTAL, LOG_BUG);
+    log("Error in raw_kill()!  Null victim!", IMMORTAL, LOG_BUG);
     return;
   }
   
@@ -2681,6 +2682,9 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
     sprintf(buf, "%s killed %s.", GET_NAME(ch), GET_NAME(victim));
     special_log(buf);
   }
+
+  // register my death with this zone's counter
+  zone_table[world[ch->in_room].zone].died_this_tick++;
 
   GET_POS(victim) = POSITION_STANDING;  
   mprog_death_trigger(victim, ch);

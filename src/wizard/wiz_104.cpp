@@ -269,9 +269,10 @@ int show_zone_commands(struct char_data *ch, int i, int start = 0)
     return eFAILURE;
   }
 
-  sprintf(buf, "$3Name$R: %s\r\n$3Starts$R:   %6d   $3Ends$R:  %6d\r\n"
-               "$3Lifetime$R: %6d   $3Age$R:   %6d   $3Left$R:   %6d\r\n" 
-               "$3PC'sInZone$R: %6d $3Mode$R: %-12s $3Flags$R: ", 
+  sprintf(buf, "$3Name$R: %s\r\n"
+               "$3Starts$R:   %6d $3Ends$R:  %13d\r\n"
+               "$3Lifetime$R: %6d $3Age$R:   %13d     $3Left$R:   %6d\r\n" 
+               "$3PC'sInZone$R: %4d $3Mode$R: %-18s $3Flags$R: ",
                     zone_table[i].name, 
                     (i ? (zone_table[i - 1].top + 1) : 0), 
                     zone_table[i].top,
@@ -283,7 +284,15 @@ int show_zone_commands(struct char_data *ch, int i, int start = 0)
   send_to_char(buf, ch);
   sprintbit(zone_table[i].zone_flags, zone_bits, buf);
   send_to_char(buf, ch);
-  send_to_char("\r\n\r\n", ch);
+  sprintf(buf,"\r\n"
+               "$3MobsLastPop$R: %3d $3DeathCounter$R: %6d     $3ReduceCounter$R: %d\r\n"
+               "$3DiedThisTick$R: %d\r\n",
+                    zone_table[i].num_mob_on_repop,
+                    zone_table[i].death_counter,
+                    zone_table[i].counter_mod,
+                    zone_table[i].died_this_tick);
+  send_to_char(buf, ch);
+  send_to_char("\r\n", ch);
 
   if(zone_table[i].cmd[0].command == 'S')
   {

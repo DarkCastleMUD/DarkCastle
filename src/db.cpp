@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.19 2003/01/02 03:13:25 pirahna Exp $ */
+/* $Id: db.cpp,v 1.20 2003/01/16 08:08:39 dcastle Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -3045,6 +3045,9 @@ void zone_update(void)
      if(zone_table[i].reset_mode == 1 && !is_empty(i))
        continue;
      reset_zone( i );
+     // update first repop numbers
+     if(zone_table[i].num_mob_first_repop == 0)
+        zone_table[i].num_mob_first_repop = zone_table[i].num_mob_on_repop;
   }
 }
 
@@ -3065,6 +3068,10 @@ void reset_zone(int zone)
     last_cmd = last_mob = last_obj = last_percent = -1;
 
     char buf[MAX_STRING_LENGTH];
+
+    // reset number of mobs that have died this tick to 0
+    zone_table[zone].died_this_tick = 0;
+    zone_table[zone].num_mob_on_repop = 0;
 
     // find last command in zone
     last_no = 0;
@@ -3103,6 +3110,7 @@ void reset_zone(int zone)
         { 
           char_to_room(mob, ZCMD.arg3);
           GET_HOME(mob) = world_array[ZCMD.arg3]->number;
+          zone_table[zone].num_mob_on_repop++;
           last_cmd = 1;
           last_mob = 1;
         }
