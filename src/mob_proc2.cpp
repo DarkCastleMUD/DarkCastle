@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.23 2003/03/07 02:46:34 pirahna Exp $ */
+/* $Id: mob_proc2.cpp,v 1.24 2003/03/07 03:08:54 pirahna Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -1145,7 +1145,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     if(!IS_MOB(ch)) {   // mobs can't meta ki
       if(GET_KI_METAS(ch) > 4)
 	send_to_char("19) Your ki is already meta'd fully.\n\r", ch);
-      else csendf(ch, "19) Add a point of ki:           %d exp + %d Platinum coins.\n\r", ki_exp, ki_cost);
+      else csendf(ch, "19) Add a point of ki:       %d exp + %d Platinum coins.\n\r", ki_exp, ki_cost);
     }
     return eSUCCESS;
   }
