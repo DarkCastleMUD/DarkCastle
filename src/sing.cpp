@@ -613,6 +613,8 @@ int song_disrupt( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int s
    
    WAIT_STATE(ch, PULSE_VIOLENCE);
 
+   skill_increase_check(victim, SKILL_SONG_DISARMING_LIMERICK, skill, SKILL_INCREASE_MEDIUM);
+
    return spell_dispel_magic(GET_LEVEL(ch)-1, ch, victim, 0, 0);
 }
 
@@ -651,6 +653,8 @@ int song_whistle_sharp( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim,
       return retval;
    }
 
+   skill_increase_check(victim, SKILL_SONG_WHISTLE_SHARP, skill, SKILL_INCREASE_HARD);
+
 //   WAIT_STATE(ch, song_info[ch->song_number].beats);
 
    // temp one round of lag for now
@@ -676,9 +680,8 @@ int execute_song_healing_melody( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA
    char_data * master = NULL;
    follow_type * fvictim = NULL;
 
-   int learned = has_skill(ch, song_info[ch->song_number].skill_num);
-   int specialization = learned / 100;
-   learned %= 100;
+   int specialization = skill / 100;
+   skill %= 100;
 
    heal = 3*(GET_LEVEL(ch)/5);
 
@@ -709,7 +712,9 @@ int execute_song_healing_melody( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA
          GET_HIT(master) = GET_MAX_HIT(master);
    }
 
-   if(number(1, 101) > learned) {
+   skill_increase_check(victim, SKILL_SONG_HEALING_MELODY, skill, SKILL_INCREASE_EASY);
+
+   if(number(1, 101) > skill) {
       send_to_char("You run out of lyrics and end the song.\r\n", ch);
       return eSUCCESS;
    }
@@ -754,11 +759,12 @@ int execute_song_revealing_stacato( byte level, CHAR_DATA *ch, char *arg, CHAR_D
    }
    send_to_char("You tap your foot along to the revealing stacato.\r\n", ch);
 
-   int learned = has_skill(ch, song_info[ch->song_number].skill_num);
-//   int specialization = learned / 100;
-   learned %= 100;
+   int specialization = skill / 100;
+   skill %= 100;
 
-   if(number(1, 101) > learned) {
+   skill_increase_check(victim, SKILL_SONG_REVEAL_STACATO, skill, SKILL_INCREASE_EASY);
+
+   if(number(1, 101) > skill) {
       send_to_char("You run out of lyrics and end the song.\r\n", ch);
       return eSUCCESS;
    }
@@ -787,8 +793,10 @@ int execute_song_note_of_knowledge( byte level, CHAR_DATA *ch, char *arg, CHAR_D
 
    dc_free(ch->song_data);
 
-   if(obj)
+   if(obj) {
       spell_identify(GET_LEVEL(ch), ch, 0, obj, 0);
+      skill_increase_check(victim, SKILL_SONG_NOTE_OF_KNOWLEDGE, skill, SKILL_INCREASE_EASY);
+   }
    else send_to_char("You don't seem to have that item.\r\n", ch);
    return eSUCCESS;
 }
@@ -806,9 +814,8 @@ int execute_song_terrible_clef( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA 
    int dam = 0;
    int retval;
 
-   int learned = has_skill(ch, song_info[ch->song_number].skill_num);
-//   int specialization = learned / 100;
-   learned %= 100;
+   int specialization = skill / 100;
+   skill %= 100;
 
    victim = ch->fighting;
 
@@ -834,7 +841,9 @@ int execute_song_terrible_clef( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA 
           ch, 0, victim, TO_ROOM, 0);
    }
 
-   if(number(1, 101) > learned) {
+   skill_increase_check(victim, SKILL_SONG_TERRIBLE_CLEF, skill, SKILL_INCREASE_EASY);
+
+   if(number(1, 101) > skill) {
       send_to_char("You run out of lyrics and end the song.\r\n", ch);
       return eSUCCESS;
    }
@@ -872,9 +881,8 @@ int execute_song_soothing_remembrance( byte level, CHAR_DATA *ch, char *arg, CHA
    int heal;
    char_data * master = NULL;
    follow_type * fvictim = NULL;
-   int learned = has_skill(ch, song_info[ch->song_number].skill_num);
-   int specialization = learned / 100;
-   learned %= 100;
+   int specialization = skill / 100;
+   skill %= 100;
 
    heal = GET_LEVEL(ch)/5;
 
@@ -905,7 +913,9 @@ int execute_song_soothing_remembrance( byte level, CHAR_DATA *ch, char *arg, CHA
          GET_MANA(master) = GET_MAX_MANA(master);
    }
 
-   if(number(1, 101) > learned) {
+   skill_increase_check(victim, SKILL_SONG_SOOTHING_REMEM, skill, SKILL_INCREASE_MEDIUM);
+
+   if(number(1, 101) > skill) {
       send_to_char("You run out of lyrics and end the song.\r\n", ch);
       return eSUCCESS;
    }
@@ -931,9 +941,8 @@ int execute_song_traveling_march( byte level, CHAR_DATA *ch, char *arg, CHAR_DAT
    int heal;
    char_data * master = NULL;
    follow_type * fvictim = NULL;
-   int learned = has_skill(ch, song_info[ch->song_number].skill_num);
-   int specialization = learned / 100;
-   learned %= 100;
+   int specialization = skill / 100;
+   skill %= 100;
 
    heal = ((GET_LEVEL(ch)/3)+1)*2;
 
@@ -964,7 +973,9 @@ int execute_song_traveling_march( byte level, CHAR_DATA *ch, char *arg, CHAR_DAT
          GET_MOVE(master) = GET_MAX_MOVE(master);
    }
 
-   if(number(1, 101) > learned) {
+   skill_increase_check(victim, SKILL_SONG_TRAVELING_MARCH, skill, SKILL_INCREASE_EASY);
+
+   if(number(1, 101) > skill) {
       send_to_char("You run out of lyrics and end the song.\r\n", ch);
       return eSUCCESS;
    }
@@ -1078,6 +1089,7 @@ int execute_song_astral_chanty( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA 
       {
         do_astral_chanty_movement(ch, victim);
       }
+      skill_increase_check(victim, SKILL_SONG_ASTRAL_CHANTY, skill, SKILL_INCREASE_EASY);   
    }
 
    // free our stored char name
@@ -1125,6 +1137,8 @@ int execute_song_forgetful_rhythm( byte level, CHAR_DATA *ch, char *arg, CHAR_DA
       send_to_char("You are sung to about butterflies and bullfrogs.\r\n", victim);
       return eSUCCESS;
    }
+
+   skill_increase_check(victim, SKILL_SONG_FORGETFUL_RHYTHM, skill, SKILL_INCREASE_EASY);
 
    if(number(0, 1))
    {
@@ -1190,6 +1204,7 @@ int execute_song_shattering_resonance( byte level, CHAR_DATA *ch, char *arg, CHA
          obj->equipped_by = NULL;
       }
       extract_obj(obj);
+      skill_increase_check(victim, SKILL_SONG_SHATTERING_RESO, skill, SKILL_INCREASE_MEDIUM);
       return eSUCCESS;
    }
 
@@ -1204,6 +1219,8 @@ int execute_song_shattering_resonance( byte level, CHAR_DATA *ch, char *arg, CHA
    }
 
    act("$n's song fades to an end.", ch, 0, 0, TO_ROOM, 0);
+
+   skill_increase_check(victim, SKILL_SONG_SHATTERING_RESO, skill, SKILL_INCREASE_EASY);
 
    // determine chance of destroying it
    if(number(0, 1)) // 50/50 for now
@@ -1252,6 +1269,8 @@ int execute_song_insane_chant( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *
 
    act("$n's singing starts to drive you INSANE!!!", ch, 0, 0, TO_ROOM, 0);
    send_to_char("Your singing drives you INSANE!!!\r\n", ch);
+
+   skill_increase_check(victim, SKILL_SONG_INSANE_CHANT, skill, SKILL_INCREASE_HARD);
 
    for(victim = world[ch->in_room].people; victim; victim = victim->next_in_room)
    {
@@ -1317,6 +1336,8 @@ int execute_song_flight_of_bee( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA 
       }
    }
 
+   skill_increase_check(victim, SKILL_SONG_FLIGHT_OF_BEE, skill, SKILL_INCREASE_MEDIUM);
+
    ch->song_timer = song_info[ch->song_number].beats;
    return eSUCCESS;
 }
@@ -1380,6 +1401,8 @@ int execute_song_searching_song( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA
       send_to_char("Your song fades away, it's search unfinished.\r\n", ch);
       return eFAILURE;
    }
+
+   skill_increase_check(victim, SKILL_SONG_SEARCHING_SONG, skill, SKILL_INCREASE_MEDIUM);
 
    sprintf(buf, "Your song finds %s ", GET_SHORT(target));
 
@@ -1475,6 +1498,8 @@ int execute_song_jig_of_alacrity( byte level, CHAR_DATA *ch, char *arg, CHAR_DAT
 
    GET_KI(ch) -= 2;
 
+   skill_increase_check(victim, SKILL_SONG_JIG_OF_ALACRITY, skill, SKILL_INCREASE_MEDIUM);
+
    ch->song_timer = song_info[ch->song_number].beats + 
                              (GET_LEVEL(ch) > 33) +
                              (GET_LEVEL(ch) > 43);
@@ -1532,6 +1557,8 @@ int execute_song_glitter_dust( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *
    act("The dust in the air clings to you, and begins to shine!", ch, 0, 0, TO_ROOM, 0);
    send_to_char("Your dust clings to everyone, showing where they are!\r\n", ch);
 
+   skill_increase_check(victim, SKILL_SONG_GLITTER_DUST, skill, SKILL_INCREASE_EASY);
+
    for(victim = world[ch->in_room].people; victim; victim = victim->next_in_room)
    {
      // don't effect gods unless it was a higher level god singing
@@ -1567,18 +1594,18 @@ int execute_song_bountiful_sonnet( byte level, CHAR_DATA *ch, char *arg, CHAR_DA
          continue;
 
       send_to_char("You feel like you've just eaten a huge meal!\r\n", fvictim->follower);
-      if(GET_COND(ch, FULL) != -1)
-         GET_COND(ch, FULL) = 20;
-      if(GET_COND(ch, THIRST) != -1)
-         GET_COND(ch, THIRST) = 20;
+      if(GET_COND(fvictim->follower, FULL) != -1)
+         GET_COND(fvictim->follower, FULL) = 20;
+      if(GET_COND(fvictim->follower, THIRST) != -1)
+         GET_COND(fvictim->follower, THIRST) = 20;
    }
    if(ch->in_room == master->in_room)
    {
       send_to_char("You feel like you've just eaten a huge meal!\r\n", master);
-      if(GET_COND(ch, FULL) != -1)
-         GET_COND(ch, FULL) = 20;
-      if(GET_COND(ch, THIRST) != -1)
-         GET_COND(ch, THIRST) = 20;
+      if(GET_COND(master, FULL) != -1)
+         GET_COND(master, FULL) = 20;
+      if(GET_COND(master, THIRST) != -1)
+         GET_COND(master, THIRST) = 20;
    }
    return eSUCCESS;
 }
@@ -1625,6 +1652,8 @@ int execute_song_synchronous_chord( byte level, CHAR_DATA *ch, char *arg, CHAR_D
       return eFAILURE;
    }
 
+   skill_increase_check(victim, SKILL_SONG_SYNC_CHORD, skill, SKILL_INCREASE_EASY);
+
    act("You enter $S mind...", ch, 0, target, TO_CHAR, INVIS_NULL);
    sprintf(buf, "%s seems to hate... %s.\r\n", GET_SHORT(target), 
             get_random_hate(target) ? get_random_hate(target) : "Noone!");
@@ -1655,6 +1684,8 @@ int execute_song_sticky_lullaby( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA
       return eFAILURE;
    }
    dc_free(ch->song_data);
+
+   skill_increase_check(victim, SKILL_SONG_STICKY_LULL, skill, SKILL_INCREASE_MEDIUM);
 
    act("$n lulls $N's feet into a numbing sleep.", ch, 0, victim, TO_ROOM, NOTVICT);
    act("$N's feet falls into a numbing sleep.", ch, 0, victim, TO_CHAR, 0);
@@ -1713,6 +1744,8 @@ int execute_song_vigilant_siren( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA
    }
 
    GET_KI(ch) -= 1;
+
+   skill_increase_check(victim, SKILL_SONG_VIGILANT_SIREN, skill, SKILL_INCREASE_HARD);
 
    ch->song_timer = song_info[ch->song_number].beats + 
                              (GET_LEVEL(ch) > 48);
