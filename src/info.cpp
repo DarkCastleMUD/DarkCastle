@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.7 2002/07/31 18:41:09 pirahna Exp $ */
+/* $Id: info.cpp,v 1.8 2002/08/01 08:04:56 pirahna Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -1084,9 +1084,16 @@ int do_look(struct char_data *ch, char *argument, int cmd)
                list_char_to_char(world[ch->in_room].people, ch, 0);
                
                strcpy(buffer, ""); *buffer = '\0';
-               for(door = 0; door <= 5; door++) {
+               for(int doorj = 0; doorj <= 5; doorj++) {
+
                   int is_closed;
                   int is_hidden;
+
+                  // cheesy way of making it list west before east in 'look'
+		  if(doorj == 1)           door = 3;
+                  else if(doorj == 3)      door = 1;
+                  else                     door = doorj;
+
                   if(!EXIT(ch, door) || EXIT(ch, door)->to_room == NOWHERE)
                      continue;
                   is_closed = IS_SET(EXIT(ch, door)->exit_info, EX_CLOSED);

@@ -223,6 +223,10 @@ void assign_non_combat_procs() {
     assign_one_mob_non(3062,  fido);
     assign_one_mob_non(3066,  fido);
     assign_one_mob_non(3072,  guild);
+    assign_one_mob_non(3200,  guild_guard);
+    assign_one_mob_non(3202,  guild_guard);
+    assign_one_mob_non(3201,  guild);
+    assign_one_mob_non(3203,  guild);
     assign_one_mob_non(3404, passive_magic_user);
     assign_one_mob_non(3709,  generic_doorpick_blocker);
     assign_one_mob_non(4103,  robber);

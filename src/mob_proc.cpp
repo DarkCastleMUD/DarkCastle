@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.9 2002/07/28 02:04:15 pirahna Exp $ */
+/* $Id: mob_proc.cpp,v 1.10 2002/08/01 08:04:57 pirahna Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -2136,6 +2136,9 @@ int guild_guard(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     if (cmd>6 || cmd<1)
 	return eFAILURE;
 
+    // TODO - go through these and remove all of the ones that are in
+    // room that no longer exist on the mud
+
     if ( ( GET_CLASS(ch) != CLASS_MAGIC_USER
 	&& ch->in_room == real_room(3017) && cmd == 1 )
     ||   ( GET_CLASS(ch) != CLASS_CLERIC
@@ -2144,6 +2147,10 @@ int guild_guard(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 	&& ch->in_room == real_room(3027) && cmd == 2 )
     ||   ( GET_CLASS(ch) != CLASS_WARRIOR
 	&& ch->in_room == real_room(3021) && cmd == 2 )
+    ||   ( GET_CLASS(ch) != CLASS_DRUID
+	&& ch->in_room == real_room(3216) && cmd == 2 )
+    ||   ( GET_CLASS(ch) != CLASS_BARD
+	&& ch->in_room == real_room(3213) && cmd == 4 )
     ||   ( GET_CLASS(ch) != CLASS_ANTI_PAL
         && ch->in_room == real_room(9910) && cmd == 4 )
     ||   ( GET_CLASS(ch) != CLASS_PALADIN

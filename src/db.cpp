@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.10 2002/07/30 21:35:22 pirahna Exp $ */
+/* $Id: db.cpp,v 1.11 2002/08/01 08:04:56 pirahna Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -357,7 +357,8 @@ char * funnybootmessages[] =
   "Planing valid edge queue...\r\n",
   "Verifying void alignment...\r\n",
   "Initializing BFS search parameters...\r\n",
-  "Shaving fuzzy logic...\r\n"
+  "Shaving fuzzy logic...\r\n",
+  "Upgrading RAM...\r\n"
 };
 
 void funny_boot_message()
