@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.18 2002/10/26 01:42:50 pirahna Exp $ */
+/* $Id: info.cpp,v 1.19 2002/10/26 01:48:55 pirahna Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -1944,7 +1944,7 @@ int do_consider(struct char_data *ch, char *argument, int cmd)
 
    Learned = has_skill(ch, SKILL_CONSIDER);
    
-   if (Learned > 0) {
+   if (Learned > 20) {
       /* ARMOR CLASS */
       x = GET_AC(victim)/20+5;
       if(x > 10) x = 10;
@@ -1969,7 +1969,7 @@ int do_consider(struct char_data *ch, char *argument, int cmd)
    
    /* HIT POINTS */
    
-   if (Learned > 0) {
+   if (Learned > 40) {
       
       if(!IS_NPC(victim) && GET_LEVEL(victim) > IMMORTAL) {
          csendf(ch, "Compared to your hps, %s can definitely take anything you can dish out.\n\r",
@@ -2015,7 +2015,7 @@ int do_consider(struct char_data *ch, char *argument, int cmd)
          }
       }
       
-      if (Learned > 0) {
+      if (Learned > 60) {
          
          /* Average Damage */
          
@@ -2064,7 +2064,7 @@ int do_consider(struct char_data *ch, char *argument, int cmd)
       }
    }
    
-   if (Learned > 0) {
+   if (Learned > 80) {
       /* CHANCES TO STEAL */
       if((GET_CLASS(ch) == CLASS_THIEF) || (GET_LEVEL(ch) > IMMORTAL)) {
          
