@@ -233,7 +233,7 @@ int innate_repair(CHAR_DATA *ch, char *arg, int cmd)
     }
   }
   if (found) { act("Your knowledge of weapons and armour allow you to quickly repair $p.",ch,obj,obj,TO_CHAR, 0); act("$n quickly repairs their $p.", ch, obj, obj, TO_ROOM, 0); return eSUCCESS; }
-  else { send_to_char("You don't have that item.\r\n",ch); return eFAILURE; }
+  else { send_to_char("That item is already in excellent condition!\r\n",ch); return eFAILURE; }
   
 }
 

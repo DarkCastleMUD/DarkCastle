@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.48 2004/04/25 02:38:26 urizen Exp $ */
+/* $Id: nanny.cpp,v 1.49 2004/05/01 11:05:45 urizen Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -527,11 +527,13 @@ void nanny(struct descriptor_data *d, char *arg)
 
       // if it's not a webbrowser, display the entrance greeting
 
-      x = number(1, 75);
-      if(x < 50)
+      x = number(1, 100);
+      if(x > 75)
         SEND_TO_Q(greetings1, d);
-      else if(x < 25)
+      else if(x > 50)
         SEND_TO_Q(greetings2, d);
+      else if (x > 25)
+	SEND_TO_Q(greetings3, d)
       else
         SEND_TO_Q(greetings4, d);
 /*

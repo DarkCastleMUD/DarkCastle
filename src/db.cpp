@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.47 2004/05/01 00:38:48 urizen Exp $ */
+/* $Id: db.cpp,v 1.48 2004/05/01 11:05:45 urizen Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -3011,6 +3011,17 @@ void delete_mob_from_index(int nr)
           }
        }
     }
+   /*
+        Shop fixes follow.
+    */
+    extern struct shop_data shop_index[MAX_SHOP];
+    int z;
+    for (z = 0; z < MAX_SHOP; z++)
+    {
+      if (shop_index[z].keeper >= nr)
+        shop_index[z].keeper--;
+    }
+
 }
 
 

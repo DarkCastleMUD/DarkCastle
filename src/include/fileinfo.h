@@ -1,7 +1,7 @@
 #ifndef FILEINFO_H_
 #define FILEINFO_H_
 /*
-| $Id: fileinfo.h,v 1.4 2004/04/16 16:57:21 urizen Exp $
+| $Id: fileinfo.h,v 1.5 2004/05/01 11:05:47 urizen Exp $
 | fileinfo.h
 | Description:  Contains information for loading files, ie "../lib", etc..
 */
@@ -39,9 +39,9 @@
 
 #define  WEBPAGE_FILE       "webresponse.txt"
 #define  GREETINGS1_FILE    "greetings1.txt"
-#define  GREETINGS2_FILE    "greetings2.txt"
-#define  GREETINGS3_FILE    "greetings3.txt"
-#define  GREETINGS4_FILE    "greetings4.txt"
+#define  GREETINGS2_FILE    "greetings3.txt"
+#define  GREETINGS3_FILE    "greetings4.txt"
+#define  GREETINGS4_FILE    "greetings5.txt"
 #define  CREDITS_FILE       "credits.txt"
 #define  NEWS_FILE          "news.txt"
 #define  MOTD_FILE          "motd.txt"

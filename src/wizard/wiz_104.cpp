@@ -782,7 +782,7 @@ int do_show(struct char_data *ch, char *argument, int cmd)
   else if (is_abbrev(type, "msearch") && has_range)
   {  // Mobile search.
     char arg1[MAX_STRING_LENGTH];
-    int act = 0, clas = 0, levlow = -555, levhigh = -555, affect = 0, immune = 0, race = 0, align = 0;
+    int act = 0, clas = 0, levlow = -555, levhigh = -555, affect = 0, immune = 0, race = -1, align = 0;
     extern char *action_bits[];
     extern struct race_shit race_info[];
     extern char *isr_bits[];
@@ -931,7 +931,7 @@ int do_show(struct char_data *ch, char *argument, int cmd)
      {
       if ((nr = real_mobile(c)) < 0)	
            continue;
-      if(race)
+      if(race > -1)
        if (((struct char_data *)(mob_index[nr].item))->race != race)
          continue;
       if (align) {
