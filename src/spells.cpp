@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.99 2004/05/31 11:57:14 urizen Exp $ */
+/* $Id: spells.cpp,v 1.100 2004/06/06 12:07:30 urizen Exp $ */
 
 extern "C"
 {
@@ -684,9 +684,10 @@ char *spells[]=
 int dam_percent(int learned, int damage)
 {
   float percent;
-  if (learned <= 50) percent = 50;
-  else if (learned <= 90) percent = learned;
-  else percent = 90 + ((learned - 90) *2);
+  percent = 50;
+
+  percent += learned/2;
+//  else percent = 90 + ((learned - 90) *2);
   
   return (int)((float)damage * (float)(percent/100.0));
 }
@@ -1650,7 +1651,11 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
           if(GET_CLASS(ch) == CLASS_MAGIC_USER || GET_CLASS(ch) == CLASS_ANTI_PAL)
              chance += GET_INT(ch);
           else chance += GET_WIS(ch);*/
-	chance = skill_value(ch, spl, 33);
+
+        chance = has_skill(ch, spl);
+        if (chance <= 33) chance = 33;
+        else chance = chance + ((chance-33)/1.5);
+
 	if (GET_CLASS(ch) == CLASS_MAGIC_USER || GET_CLASS(ch) == CLASS_ANTI_PAL)
 	  chance += int_app[GET_INT(ch)].conc_bonus;
 	else chance += wis_app[GET_WIS(ch)].conc_bonus;
