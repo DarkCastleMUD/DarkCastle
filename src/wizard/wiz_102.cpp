@@ -978,7 +978,7 @@ int do_sedit(struct char_data *ch, char *argument, int cmd)
 {
   char buf[MAX_STRING_LENGTH];
   char select[MAX_INPUT_LENGTH];
-  char target[MAX_INPUT_LENGTH];
+  char target[MAX_INPUT_LENGTH+1];
   char text[MAX_INPUT_LENGTH];
   char_data * vict;
   char_skill_data * skill;
@@ -1111,7 +1111,9 @@ int do_sedit(struct char_data *ch, char *argument, int cmd)
                      "This will set the character's skill to amount.\r\n", ch);
         return eFAILURE;
       }
-      chop_half(text, select, target);
+//      text = one_argument(text, target);
+      half_chop(text, target, select);
+//      chop_half(text, select, target);
       if((skillnum = find_skill_num(target)) < 0) {
         sprintf(buf, "Cannot find skill '%s' in master skill list.\r\n", text);
         send_to_char(buf, ch);
