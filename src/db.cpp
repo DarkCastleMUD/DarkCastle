@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.49 2004/05/04 23:27:00 urizen Exp $ */
+/* $Id: db.cpp,v 1.50 2004/05/05 23:53:32 urizen Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -2404,7 +2404,7 @@ CHAR_DATA *read_mobile(int nr, FILE *fl)
 // TODO - eventually have mob saving throws work by race too, but this should be good for now
 
         for (i = 0; i <= SAVE_TYPE_MAX; i++)
-           mob->saves[i] = GET_LEVEL(mob);
+           mob->saves[i] = GET_LEVEL(mob)/3;
     } 
     else {
       log("Mob without an 'R' flag?!", 0, LOG_BUG);
