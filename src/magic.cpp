@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.20 2002/08/16 19:40:06 pirahna Exp $ */
+/* $Id: magic.cpp,v 1.21 2002/08/17 20:26:09 dcastle Exp $ */
 
 extern "C"
 {
@@ -2429,14 +2429,27 @@ int spell_sleep(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
 int spell_strength(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
   struct affected_type af;
+  struct affected_type * cur_af;
 
   assert(victim);
+
+  int mod = 1 + (skill/20);
+
+  if((cur_af = affected_by_spell(victim, SPELL_STRENGTH)))
+  {
+    if(cur_af->modifier <= mod)
+       affect_from_char(victim, SPELL_STRENGTH);
+    else {
+       send_to_char("That person already has a stronger strength spell!\r\n", ch);
+       return eFAILURE;
+    }
+  }
 
   act("You feel stronger.", victim,0,0,TO_CHAR, 0);
 
   af.type      = SPELL_STRENGTH;
   af.duration  = level;
-  af.modifier  = 1 + (skill/20);
+  af.modifier  = mod;
 
   af.location  = APPLY_STR;
   af.bitvector = 0;
