@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.137 2004/05/21 04:37:49 urizen Exp $ */
+/* $Id: magic.cpp,v 1.138 2004/05/21 14:32:42 urizen Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -8306,7 +8306,7 @@ int cast_companion(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *vi
 // Returns TRUE for success and FALSE for failure                               
                                                                                 
 int check_components(CHAR_DATA *ch, int destroy, int item_one = 0, 
-                     int item_two = 0, int item_three = 0, int item_four = 0)
+                     int item_two = 0, int item_three = 0, int item_four = 0, bool silent = FALSE)
 {
   // We're going to assume you never have more than 4 items                       
   // for a spell, though you can easily change to take more                       
@@ -8345,7 +8345,7 @@ int check_components(CHAR_DATA *ch, int destroy, int item_one = 0,
       { obj_from_char(ptr_three); extract_obj(ptr_three); gone = TRUE;}                     
     if(ptr_four)                                                                
       { obj_from_char(ptr_four); extract_obj(ptr_four); gone = TRUE;}
-    if(gone)                       
+    if(gone && !silent)
       send_to_char("The spell components poof into smoke.\r\n", ch);              
   }                                                                             
                                                                                 
