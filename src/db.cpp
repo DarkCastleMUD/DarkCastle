@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.43 2004/04/24 15:45:01 urizen Exp $ */
+/* $Id: db.cpp,v 1.44 2004/04/24 15:48:56 urizen Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -396,9 +396,9 @@ void funny_boot_message()
 }
 
 /* Write skillquest file. 
-It checks if ch exists everywhere it is used,
-so this can be called from other places without
-a character attached. */
+ It checks if ch exists everywhere it is used,
+ so this can be called from other places without
+ a character attached. */
 int do_write_skillquest(struct char_data *ch, char *argument, int cmd)
 {
    struct skill_quest *curr;
@@ -1065,11 +1065,15 @@ void write_one_room(FILE * f, int a)
   string_to_file(f, world[a].name);
   string_to_file(f, world[a].description);
 
+  if (world[a].iFlags)
+   REMOVE_BIT(world[a].room_flags, world[a].iFlags);
   fprintf(f, "%d %d %d\n",
              world[a].zone,
              world[a].room_flags,
              world[a].sector_type
             );
+  if (world[a].iFlags)
+   SET_BIT(world[a].room_flags, world[a].iFlags);
 
   /* exits */
   for(int b = 0; b <= 5; b++) 
