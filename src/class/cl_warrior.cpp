@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.13 2003/06/05 00:54:46 pirahna Exp $
+| $Id: cl_warrior.cpp,v 1.14 2003/06/05 02:23:55 pirahna Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -368,30 +368,31 @@ int do_bash(struct char_data *ch, char *argument, int cmd)
 
     one_argument(argument, name);
 
-  if(IS_AFFECTED(ch, AFF_CHARM))
-    return eFAILURE;
+    if(IS_AFFECTED(ch, AFF_CHARM))
+      return eFAILURE;
 
-  if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)   
+    if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)   
       learned = 75;
-  else if(!(learned = has_skill(ch, SKILL_BASH))) {
+    else if(!(learned = has_skill(ch, SKILL_BASH))) {
       send_to_char("You don't know how to bash!\r\n", ch);
       return eFAILURE;
-  }
-
-  if (!IS_NPC(ch))
-    if (!ch->equipment[WIELD]) 
-    {
-        send_to_char("You need to wield a weapon, to make it a success.\n\r",ch);
-        return eFAILURE;
     }
 
-  if (!(victim = get_char_room_vis(ch, name))) {
-	if (ch->fighting) {
-	    victim = ch->fighting;
-	} else {
-	    send_to_char("Bash whom?\n\r", ch);
-	    return eFAILURE;
-	}
+    if (!IS_NPC(ch))
+      if (!ch->equipment[WIELD]) 
+      {
+          send_to_char("You need to wield a weapon, to make it a success.\n\r",ch);
+          return eFAILURE;
+      }
+
+    if( *name )
+       victim = get_char_room_vis(ch, name);
+    else 
+       victim = ch->fighting;
+
+    if( !victim ) {
+       send_to_char("Bash whom?\n\r", ch);
+       return eFAILURE;
     }
 
     if(!can_attack(ch) || !can_be_attacked(ch, victim))
