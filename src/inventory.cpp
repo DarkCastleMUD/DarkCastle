@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.45 2004/07/25 09:01:38 rahz Exp $
+| $Id: inventory.cpp,v 1.46 2004/07/25 10:20:35 rahz Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -231,7 +231,7 @@ int do_get(struct char_data *ch, char *argument, int cmd)
 		if(obj_object->obj_flags.value[3] == 1 && isname("pc", obj_object->name))
                 {
                    sprintf(buffer, "%s_consent", GET_NAME(ch));
-		   if(isname(GET_NAME(ch), obj_object->name))
+		   if(isname(GET_NAME(ch), obj_object->name) || GET_LEVEL(ch) >= 105)
                      has_consent = TRUE;
 
 		   if(!has_consent && !isname(GET_NAME(ch), obj_object->name)) {
@@ -239,9 +239,11 @@ int do_get(struct char_data *ch, char *argument, int cmd)
 		     continue;
                    }
                    if(has_consent && contains_no_trade_item(obj_object)) {
-                     send_to_char("This item contains no_trade items that cannot be picked up.\n\r", ch);
-		     has_consent = FALSE; // bugfix, could loot without consent
-                     continue;
+                     if (GET_LEVEL(ch) < 105) {
+                       send_to_char("This item contains no_trade items that cannot be picked up.\n\r", ch);
+		       has_consent = FALSE; // bugfix, could loot without consent
+                       continue;
+                     }
                    }
                    has_consent = FALSE;  // reset it for the next item:P
 		}
@@ -250,15 +252,14 @@ int do_get(struct char_data *ch, char *argument, int cmd)
 		{
                     // Don't bother checking this if item is gold coins.
 		    if ((IS_CARRYING_N(ch) + 1) > CAN_CARRY_N(ch) &&
-                        !( GET_ITEM_TYPE(obj_object) == ITEM_MONEY && obj_object->item_number == -1 )
+                        !( GET_ITEM_TYPE(obj_object) == ITEM_MONEY && obj_object->item_number == -1 && GET_LEVEL(ch) < IMMORTAL)
                        ) 
 		    {
 			sprintf(buffer, "%s : You can't carry that many items.\n\r", fname(obj_object->name));
 			send_to_char(buffer, ch);
 			fail = TRUE;
 		    } 
-                    else if ((IS_CARRYING_W(ch) + obj_object->obj_flags.weight)
-				> CAN_CARRY_W(ch)) 
+                    else if ((IS_CARRYING_W(ch) + obj_object->obj_flags.weight) > CAN_CARRY_W(ch) && GET_LEVEL(ch) < IMMORTAL) 
                     {
 			sprintf(buffer, "%s : You can't carry that much weight.\n\r", fname(obj_object->name));
 			send_to_char(buffer, ch);
@@ -305,7 +306,7 @@ int do_get(struct char_data *ch, char *argument, int cmd)
                    has_consent = FALSE;  // reset it
                 }
 		if( (IS_CARRYING_N(ch) + 1 > CAN_CARRY_N(ch)) &&
-                   !( GET_ITEM_TYPE(obj_object) == ITEM_MONEY && obj_object->item_number == -1 )
+                   !( GET_ITEM_TYPE(obj_object) == ITEM_MONEY && obj_object->item_number == -1 && GET_LEVEL(ch) < IMMORTAL)
                   )
                 {
 		    sprintf(buffer, "%s : You can't carry that many items.\n\r", fname(obj_object->name));
@@ -354,7 +355,7 @@ int do_get(struct char_data *ch, char *argument, int cmd)
 		   isname("pc", sub_object->name)) 
                 {
                    sprintf(buffer, "%s_consent", GET_NAME(ch));
-		   if(isname(buffer, sub_object->name))
+		   if(isname(buffer, sub_object->name) || GET_LEVEL(ch) > 105)
                      has_consent = TRUE;
 		   if(!has_consent && !isname(GET_NAME(ch), sub_object->name)) {
 		     send_to_char("You don't have consent to touch the corpse.\n\r", ch);
@@ -382,7 +383,7 @@ int do_get(struct char_data *ch, char *argument, int cmd)
 		    }
 
                     // Ignore NO_TRADE items on a 'get all'
-                    if(IS_SET(obj_object->obj_flags.more_flags, ITEM_NO_TRADE) && GET_LEVEL(ch) < 100) {
+                    if(IS_SET(obj_object->obj_flags.more_flags, ITEM_NO_TRADE) && GET_LEVEL(ch) < IMMORTAL) {
                       csendf(ch, "The %s appears to be NO_TRADE so you don't pick it up.\r\n", obj_object->short_description);
                       continue;
                     }
@@ -390,7 +391,7 @@ int do_get(struct char_data *ch, char *argument, int cmd)
 		    if (CAN_SEE_OBJ(ch,obj_object)) 
                     {
 		      if ((IS_CARRYING_N(ch) + 1 > CAN_CARRY_N(ch)) &&
-                           !( GET_ITEM_TYPE(obj_object) == ITEM_MONEY && obj_object->item_number == -1 )
+                           !( GET_ITEM_TYPE(obj_object) == ITEM_MONEY && obj_object->item_number == -1 && GET_LEVEL(ch) < IMMORTAL)
                          )
                       {
 		        sprintf(buffer,"%s : You can't carry that many items.\n\r", fname(obj_object->name));
@@ -484,7 +485,7 @@ int do_get(struct char_data *ch, char *argument, int cmd)
 	      if (obj_object) 
               {
 	        if ((IS_CARRYING_N(ch) + 1 > CAN_CARRY_N(ch)) &&
-                    !( GET_ITEM_TYPE(obj_object) == ITEM_MONEY && obj_object->item_number == -1 )
+                    !( GET_ITEM_TYPE(obj_object) == ITEM_MONEY && obj_object->item_number == -1 && GET_LEVEL(ch) < IMMORTAL)
                    )
                 { 
                   sprintf(buffer,"%s : You can't carry that many items.\n\r",fname(obj_object->name));

@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.74 2004/07/25 09:01:38 rahz Exp $ */
+/* $Id: db.cpp,v 1.75 2004/07/25 10:20:34 rahz Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 

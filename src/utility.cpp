@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.31 2004/07/25 09:01:39 rahz Exp $ */
+/* $Id: utility.cpp,v 1.32 2004/07/25 10:20:36 rahz Exp $ */
 
 extern "C"
 {

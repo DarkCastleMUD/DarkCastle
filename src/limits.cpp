@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.52 2004/07/25 09:01:38 rahz Exp $ */
+/* $Id: limits.cpp,v 1.53 2004/07/25 10:20:35 rahz Exp $ */
 
 extern "C"
 {

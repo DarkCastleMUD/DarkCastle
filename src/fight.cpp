@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.237 2004/07/25 09:01:38 rahz Exp $ */
+/* $Id: fight.cpp,v 1.238 2004/07/25 10:20:34 rahz Exp $ */
 
 extern "C"
 {
@@ -4439,24 +4439,18 @@ void remove_nosave(CHAR_DATA *vict)
 void remove_active_potato(CHAR_DATA *vict)
 {
   struct obj_data *obj, *next_obj;
+  char buf[256];
 
   if(!vict) {
     log("Null victim sent to remove_active_potato!", OVERSEER, LOG_BUG);
     return;
   }
 
-  if((vict->in_room >= 0 && vict->in_room <= top_of_world) &&
-    IS_SET(world[vict->in_room].room_flags, ARENA)) {
-    ;
-  } else {
-    return;
-  }
-
   for(obj = vict->carrying; obj; obj = next_obj) {
     next_obj = obj->next_content;
-    if (obj_index[obj->item_number].virt == 383 && obj->obj_flags.value[3] > 0)
+    if (obj_index[obj->item_number].virt == 393 && obj->obj_flags.value[3] > 0) {
       obj_from_char(obj);
-
+    } 
   }
 }
 
