@@ -141,7 +141,8 @@ int do_sqedit(struct char_data *ch, char *argument, int cmd)
 {
   char command[MAX_INPUT_LENGTH];
   argument = one_argument(argument,command);
-  
+    int clas = 1;
+       
   extern char*pc_clss_types[];
   const char *fields [] = {
     "new",
@@ -212,6 +213,14 @@ int do_sqedit(struct char_data *ch, char *argument, int cmd)
 	  send_to_char("Skill not found.\r\n",ch);
 	  return eFAILURE;
 	}
+	argument = one_argument(argument,arg3);
+        if (arg3[0] != '\0')
+           for (int i = 0; *pc_clss_types[i] != '\n'; i++)
+           {
+              if (!str_cmp(pc_clss_types[i],arg2))
+                clas = i;
+           }
+
       #ifdef LEAK_CHECK
 	newOne = (struct skill_quest *) calloc(1, sizeof(struct skill_quest));
       #else
@@ -220,7 +229,7 @@ int do_sqedit(struct char_data *ch, char *argument, int cmd)
 	newOne->num = i;
 	newOne->level = 1;
         newOne->message = str_dup("New skillquest.");
-        newOne->clas = 1;
+        newOne->clas = clas;
         newOne->next = skill_list;
 	skill_list = newOne;
 	send_to_char("Skill quest added.\r\n",ch);

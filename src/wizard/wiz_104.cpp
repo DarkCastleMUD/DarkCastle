@@ -982,7 +982,7 @@ char_data *)(mob_index[nr].item))->level,
   {  // Object search.
     char arg1[MAX_STRING_LENGTH];
     int affect = 0, size = 0, extra = 0, more = 0, wear = 0,type =0;
-    int levlow = 0, levhigh = 0,dam = 0;
+    int levlow = 0, levhigh = 0,dam = 0,lweight = 0, hweight = 0;
     extern char *wear_bits[];
     extern char *extra_bits[];
     extern char *more_obj_bits[];
@@ -1057,6 +1057,22 @@ char_data *)(mob_index[nr].item))->level,
            return eFAILURE;
          }
        }
+       if (!str_cmp(arg1,"oweight"))
+       {
+         argument = one_argument(argument,arg1);
+         if (is_number(arg1))
+           lweight = atoi(arg1);
+
+         argument = one_argument(argument,arg1);
+         if (is_number(arg1))
+           hweight = atoi(arg1);
+
+         if (!lweight || !hweight)
+         {
+           send_to_char("Incorrect weight requirement.\r\n",ch);
+           return eFAILURE;
+         }
+      }
        csendf(ch, "Unknown type: %s.\r\n", arg1);
        endy:
 	continue;
@@ -1131,6 +1147,12 @@ char_data *)(mob_index[nr].item))->level,
 	   else
 	     send_to_char(" ", ch);
 	}
+           send_to_char("oweight",ch);
+           if (o%7==0)
+             send_to_char("\r\n",ch);
+           else
+             send_to_char(" ", ch);
+
            send_to_char("olevel",ch);
            if (o%7==0)
              send_to_char("\r\n",ch);
@@ -1153,6 +1175,13 @@ char_data *)(mob_index[nr].item))->level,
 	if (type)
 	  if (((struct obj_data *)(obj_index[nr].item))->obj_flags.type_flag != type)
 	    continue;
+     if (lweight)
+      if (((struct obj_data *)(obj_index[nr].item))->obj_flags.weight < lweight)
+         continue;
+     if (hweight)
+      if (((struct obj_data *)(obj_index[nr].item))->obj_flags.weight > hweight)
+         continue;
+
      if (levhigh)
       if (((struct obj_data *)(obj_index[nr].item))->obj_flags.eq_level > levhigh)
          continue;

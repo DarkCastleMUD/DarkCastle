@@ -1582,6 +1582,59 @@ int pull_proc(struct char_data*ch, struct obj_data *obj, int cmd, char*arg, CHAR
 
    return eSUCCESS;
 }
+int moving_portals(struct char_data*ch, struct obj_data *obj, int cmd, 
+char*arg, CHAR_DATA *invoker)
+{
+   char msg1[MAX_STRING_LENGTH],msg2[MAX_STRING_LENGTH];
+   int low, high, room,time;
+   if (cmd) return eFAILURE;
+
+   switch (obj_index[obj->item_number].virt)
+   {
+      case 11300:
+      case 11301:
+      case 11302:
+      case 11303: // Sea of Dreams ships
+      case 11304:
+      case 11305:
+          low = 11300;
+	  high = 11599;
+	  time = 12;
+	  sprintf(msg1,"The ship sails off into the distance.");
+	  sprintf(msg2,"A ship sails in.");
+	  break;
+      case 5911: // Carnival gates
+	  low = 18100;
+	  high = 18213;
+	  time = 15;
+	  sprintf(msg1,"The carnival breaks off and moves off into the distance.");
+	  sprintf(msg2,"A band of wagons enter, and set up a carnival here.");
+          break;
+      default:
+          return eFAILURE;
+   }
+   obj->obj_flags.timer--;
+
+   if (obj->obj_flags.timer<=0)
+   {
+      obj->obj_flags.timer = time;
+      while ((room = number(low, high))) {
+          bool portal = FALSE;
+          if (real_room(room) < 0) continue;
+          struct obj_data *o;
+	  for (o = world[real_room(room)].contents; o; o = o->next_content)
+		if (o->obj_flags.type_flag == ITEM_PORTAL) portal = TRUE;
+        if (!portal) break;
+      } // Find a room
+      act(msg1,NULL,NULL,NULL,TO_ROOM,0);
+      obj_from_room(obj);
+      obj_to_room(obj, room);
+      act(msg2,NULL,NULL,NULL,TO_ROOM,0);
+      return eSUCCESS;
+   }
+   return eFAILURE;
+}
+
 
 // searches for if a certain mob is alive.  If so, you cannot use magic in this room.
 int no_magic_while_alive(struct char_data*ch, struct obj_data *obj, int cmd, char*arg, CHAR_DATA *invoker)

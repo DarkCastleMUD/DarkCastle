@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.14 2004/04/22 18:32:20 urizen Exp $ */
+/* $Id: ki.cpp,v 1.15 2004/04/22 20:33:49 urizen Exp $ */
 
 extern "C"
 {
@@ -112,7 +112,7 @@ sh_int use_ki(CHAR_DATA *ch, int kn)
 
 int do_ki(CHAR_DATA *ch, char *argument, int cmd)
 {
-  CHAR_DATA *tar_char = 0;
+  CHAR_DATA *tar_char = ch;
   char name[MAX_STRING_LENGTH];
   int qend, spl = -1;
   bool target_ok;

@@ -1606,6 +1606,7 @@ int do_oedit(struct char_data *ch, char *argument, int cmd)
       "new",
       "delete",
       "stat",
+      "timer",
       "\n"
     };
    
@@ -2020,7 +2021,20 @@ int do_oedit(struct char_data *ch, char *argument, int cmd)
         obj_stat(ch, (obj_data *) obj_index[item_num].item);
         break;
       }
-
+	case 21:
+	{
+        if(!*buf4) {
+          send_to_char("$3Syntax$R: oedit [item_num] 3value <num>\n\r", ch);
+          return eFAILURE;
+        }
+        if(!check_valid_and_convert(intval, buf4)) {
+          send_to_char("Please specifiy a valid number.\r\n", ch);
+          return eFAILURE;
+        }
+        ((obj_data *)obj_index[item_num].item)->obj_flags.timer = intval;
+        sprintf(buf, "Item timer to %d.\r\n", intval);
+        send_to_char(buf, ch);	
+	}break;
       default: send_to_char("Illegal value, tell pir.\r\n", ch);
         break;
     }
