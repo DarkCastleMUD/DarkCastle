@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.45 2004/05/31 16:02:45 urizen Exp $ */
+/* $Id: limits.cpp,v 1.46 2004/05/31 16:06:50 urizen Exp $ */
 
 extern "C"
 {
@@ -529,7 +529,7 @@ void advance_level(CHAR_DATA *ch, int is_conversion)
       send_to_char("It now costs you gold every time you recall.\r\n", ch);
 }   
 
-void gain_exp( CHAR_DATA *ch, int gain )
+void gain_exp( CHAR_DATA *ch, int64 gain )
 {
   int x = 0;
   int64 y;
