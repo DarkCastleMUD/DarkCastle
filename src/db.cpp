@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.29 2004/04/14 19:31:15 urizen Exp $ */
+/* $Id: db.cpp,v 1.30 2004/04/14 20:00:54 urizen Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -2653,7 +2653,7 @@ CHAR_DATA *clone_mobile(int nr)
   // random money amounts
   if (mob->gold > 0) {
     if (mob->gold < (GET_LEVEL(mob) * 500))
-      mob->gold = number(mob->gold, GET_LEVEL(mob) * 500);
+	      mob->gold = number(mob->gold, GET_LEVEL(mob) * 500);
     else 
       mob->gold = number(GET_LEVEL(mob) * 500, mob->gold);
   }

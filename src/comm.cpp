@@ -1538,6 +1538,8 @@ int new_descriptor(int s)
     CLOSE_SOCKET(desc);
     sprintf(buf, "Connection attempt denied from [%s]", newd->host);
     log(buf, ANGEL, LOG_SOCKET);
+    dc_free(newd->host);
+    dc_free(newd);
     return 0;
   }
 
