@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.97 2003/03/04 05:08:28 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.98 2003/03/04 05:18:50 pirahna Exp $ */
 
 extern "C"
 {
@@ -775,7 +775,7 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
     return eFAILURE;
   }
   
-  if(GET_POS(vict) == POSITION_DEAD)            return eSUCCESS|eVICT_DIED;
+  if(GET_POS(vict) == POSITION_DEAD)            return ( eSUCCESS|eVICT_DIED );
 
   // TODO - I'd like to remove these 3 cause they are checked in attack()
   /* This happens with multi-attacks */
@@ -787,7 +787,7 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
   wielded = ch->equipment[weapon];
   
   // Second got called without a secondary wield 
-  if(weapon == SECOND && wielded == FALSE)      return 0;
+  if(weapon == SECOND && wielded == FALSE)      return eFAILURE;
   
   set_cantquit(ch, vict); /* This sets the flag if necessary */
 
@@ -925,7 +925,7 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
   if(IS_SET(retval, eVICT_DIED)) { 
     group_gain(ch, vict);
     fight_kill(ch, vict, TYPE_CHOOSE);
-    return eSUCCESS|eVICT_DIED;
+    return ( eSUCCESS|eVICT_DIED );
   }
   
   retval = damage(ch, vict, dam, weapon_type, w_type, weapon);

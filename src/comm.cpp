@@ -306,6 +306,7 @@ int write_hotboot_file()
   extern char ** ext_argv;
 
   if ((fp=fopen("hotboot","w"))==NULL) {   
+    log("Hotboot failed, unable to open hotboot file.", 0, LOG_MISC);
     return 0; 
   }
   fprintf(fp, "%d\n%d\n%d\n", mother_desc, other_desc, third_desc);
@@ -330,6 +331,7 @@ int write_hotboot_file()
     }
   }
   fclose(fp);
+  log("Hotboot descriptor file successfully written.", 0, LOG_MISC);
 
   // note, for debug mode, you have to put the "-c", "6969", in there
 #ifndef WIN32
@@ -359,8 +361,10 @@ int load_hotboot_descs()
   extern int other_desc;
   extern int third_desc;
 */
-  if ((fp=fopen("hotboot","r"))==NULL)  // Checks if it actually *is* a hotboot
+  if ((fp=fopen("hotboot","r"))==NULL) { // Checks if it actually *is* a hotboot
+    log("Hotboot file missing/unopenable.", 0, LOG_MISC);
     return 0;
+  }
   log("Hotboot, reloading characters.", 0, LOG_MISC);
   unlink("hotboot"); // remove the file, it's in memory for reading anyways
 
@@ -416,6 +420,7 @@ int load_hotboot_descs()
   unlink("hotboot"); // if the above unlink failed somehow(?), 
                      // remove the hotboot file so that it dosen't think 
                      // next reboot is another hotboot
+  log("Successful hotboot file read.", 0, LOG_MISC);
   return 1;
 }
 

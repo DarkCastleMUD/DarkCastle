@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.25 2003/01/22 16:12:19 pirahna Exp $ */
+/* $Id: info.cpp,v 1.26 2003/03/04 05:18:50 pirahna Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -1437,6 +1437,13 @@ int do_weather(struct char_data *ch, char *argument, int cmd)
       send_to_char(buf,ch);
    } else
       send_to_char("You have no feeling about the weather at all.\n\r", ch);
+
+   if(GET_LEVEL(ch) >= IMMORTAL) {
+      csendf(ch, "Pressure: %4d  Change: %d (- = worse)\r\n", 
+             weather_info.pressure, weather_info.change );
+      csendf(ch, "Sky: %9s  Sunlight: %d\r\n", 
+             sky_look[weather_info.sky], weather_info.sunlight );
+   }
    return eSUCCESS;
 }
 
