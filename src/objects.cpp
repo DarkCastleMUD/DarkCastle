@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.26 2004/04/13 12:59:00 urizen Exp $
+| $Id: objects.cpp,v 1.27 2004/04/13 20:56:16 urizen Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -253,6 +253,7 @@ int do_quaff(struct char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
+  WAIT_STATE(ch,PULSE_VIOLENCE/2);
   if (ch->fighting && number(0,1) != 0) {
     act ("During combat, $n drops $p and it SMASHES!", ch, temp, 0, TO_ROOM, 0);
     act ("During combat, you drop $p which SMASHES!",  ch, temp, 0, TO_CHAR, 0);
@@ -357,6 +358,7 @@ int do_recite(struct char_data *ch, char *argument, int cmd)
         GET_CLASS(ch) == CLASS_DRUID
       )
       failmark -= 5;
+    WAIT_STATE(ch,PULSE_VIOLENCE);
 
     if( number(0, 100) < failmark )
     {
@@ -568,6 +570,7 @@ int do_use(struct char_data *ch, char *argument, int cmd)
     if (stick->obj_flags.value[2] > 0) { /* Charges left? */
       stick->obj_flags.value[2]--;
       lvl = (int) (1.5 * stick->obj_flags.value[0]); 
+      WAIT_STATE(ch,PULSE_VIOLENCE);
       return ((*spell_info[stick->obj_flags.value[3]].spell_pointer)
         ((byte) stick->obj_flags.value[0], ch, "", SPELL_TYPE_STAFF, 0, 0, lvl));
     } else {
@@ -588,6 +591,7 @@ int do_use(struct char_data *ch, char *argument, int cmd)
       if (stick->obj_flags.value[2] > 0) { // are there any charges left? 
         stick->obj_flags.value[2]--;
         lvl = (int) (1.5 * stick->obj_flags.value[0]); 
+	WAIT_STATE(ch,PULSE_VIOLENCE);
         return ((*spell_info[stick->obj_flags.value[3]].spell_pointer)
           ((byte) stick->obj_flags.value[0], ch, "", SPELL_TYPE_WAND, tmp_char, tmp_object, lvl));
       } else {
