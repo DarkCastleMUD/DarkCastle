@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.67 2004/07/03 11:44:14 urizen Exp $ */
+/* $Id: nanny.cpp,v 1.68 2004/07/09 19:10:25 urizen Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -390,7 +390,11 @@ void do_on_login_stuff(char_data * ch)
     {
        GET_AC(ch) -= (GET_LEVEL(ch) * 2);
     }
-
+    if (!str_cmp(GET_NAME(ch), "Apocalypse") && !IS_NPC(ch) && ch->pcdata)
+    {
+	send_to_char("You tosser. Here you go: one silence.\r\n",ch);
+	SET_BIT(ch->pcdata->punish, PUNISH_SILENCED);
+    }
     if (affected_by_spell(ch,INTERNAL_SLEEPING))
     {
       affect_from_char(ch,INTERNAL_SLEEPING);
