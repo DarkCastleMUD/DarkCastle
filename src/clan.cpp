@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.8 2003/01/02 03:28:38 pirahna Exp $ */
+/* $Id: clan.cpp,v 1.9 2003/01/02 06:16:04 pirahna Exp $ */
 extern "C"
 {
   #include <string.h> // strcat
@@ -1295,6 +1295,8 @@ void do_clan_rights(CHAR_DATA * ch, char * arg)
     send_to_char("Syntax:  clan rights <member> [right]\n\r", ch);
     return;
   }
+
+  *name = toupper(*name);
 
   if(!(pmember = get_member(name, ch->clan))) {
     sprintf(buf, "Could not find '%s' in your clan.\n\r", name);
