@@ -949,7 +949,7 @@ int do_mpteachskill( CHAR_DATA *ch, char *argument, int cmd )
     // TEMP until borodin is happy
         char_data * boro = get_char("Borodin");
         if(boro) {
-          sprintf(skill, "$B$2%s tells you, 'I just taught %s the basics of %s.'$R", GET_SHORT(ch), GET_NAME(victim), skillname);
+          sprintf(skill, "$B$2%s tells you, 'I just taught %s the basics of %s.'$R\n\r", GET_SHORT(ch), GET_NAME(victim), skillname);
           send_to_char(skill, boro);
         }
     }
