@@ -16,7 +16,7 @@
 /* 12/08/2003   Onager   Added chop_half() to work like half_chop() but    */
 /*                       chopping off the last word.                       */
 /***************************************************************************/
-/* $Id: interp.cpp,v 1.35 2004/04/16 16:57:17 urizen Exp $ */
+/* $Id: interp.cpp,v 1.36 2004/04/17 05:13:11 urizen Exp $ */
 
 extern "C"
 {
@@ -372,6 +372,7 @@ struct command_info cmd_info[] =
     { "sedit",      do_sedit,        POSITION_DEAD,      GIFTED_COMMAND, 9,  0 },
     { "sockets",    do_sockets,      POSITION_DEAD,      GIFTED_COMMAND, 9,  0 },
     { "punish",     do_punish,       POSITION_DEAD,      GIFTED_COMMAND, 9,  0 },
+    { "sqedit",     do_sqedit,       POSITION_DEAD,      GIFTED_COMMAND, 9, 0},
 
     { "bellow",     do_thunder,      POSITION_DEAD,      DEITY, 8,  0 },
     { "plats",      do_plats,        POSITION_DEAD,      DEITY, 9,  0 },

@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: db.h,v 1.7 2004/04/16 11:55:33 urizen Exp $ */
+/* $Id: db.h,v 1.8 2004/04/17 05:13:13 urizen Exp $ */
 #ifndef DB_H_
 #define DB_H_
 
@@ -102,7 +102,7 @@ int  real_object(int virt);
 int  real_mobile(int virt);
 int  fread_int(FILE *fl, long minval, long maxval);
 char fread_char (FILE *fl);
-
+extern struct skill_quest *skill_list; 
 #define REAL 0
 #define VIRTUAL 1
 

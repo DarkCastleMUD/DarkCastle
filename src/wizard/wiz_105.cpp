@@ -128,8 +128,155 @@ int do_pardon(struct char_data *ch, char *argument, int cmd)
 
 // do_string is in modify.C
 
+struct skill_quest *find_sq(char *testa)
+{
+   struct skill_quest *curr;
+   for (curr = skill_list; curr; curr = curr->next)
+     if (!str_cmp(get_skill_name(curr->num), testa))
+       return curr;
+   return NULL;
+}
+
 int do_sqedit(struct char_data *ch, char *argument, int cmd)
 {
+  char command[MAX_INPUT_LENGTH];
+  argument = one_argument(argument,command);
   
+  extern char*pc_clss_types[];
+  const char *fields [] = {
+    "new",
+    "delete",
+    "message",
+    "level",
+    "class",
+    "show",
+    "list",
+    "\n"
+  };
+  if (!has_skill(ch, COMMAND_SQEDIT))
+  {
+     send_to_char("You are unable to do so.\r\n",ch);
+     return eFAILURE;
+  }
+//  if (argument && *argument && !is_number(argument))
+ //   argument = one_argument(argument, skill+strlen(skill));
+  if (!argument || !*argument)
+  {
+     send_to_char("$2Syntax:$R sqedit <level/class> <skill> <value> OR\r\n"
+                  "$2Syntax:$R sqedit message/new/delete <skillname>\r\n",ch);
+     return eFAILURE;
+  }
+  int i;
+  for (i = 0; fields[i] != "\n"; i++)
+  {
+     if (!str_cmp((char*)fields[i], command))
+       break;
+  }
+  if (fields[i] == "\n")
+  {
 
+     send_to_char("$2Syntax:$R sqedit <message/level/class> <skill> <value> OR\r\n"
+                  "$2Syntax:$R sqedit <show/new/delete> <skillname> OR\r\n"
+		  "$2Syntax:$R sqedit list.\r\n",ch);
+    return eFAILURE;
+  }
+  char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH],arg3[MAX_INPUT_LENGTH*2];
+  argument = one_argument(argument,arg1);
+  struct skill_quest * skill=NULL;
+  if (argument && *argument) {
+    argument = one_argument(argument,arg2);
+    strcpy(arg3,arg1);
+    strcat(arg3,arg2);
+    skill = find_sq(arg3);
+  }
+  if (skill==NULL && (skill = find_sq(arg1))==NULL)
+  {
+    send_to_char("Unknown skill.",ch);
+    return eFAILURE;
+  }
+  struct skill_quest *curren,*last = NULL;
+  switch (i)
+  {
+    case 0:
+       struct skill_quest *newOne;
+      #ifdef LEAK_CHECK
+	newOne = (struct skill_quest *) calloc(1, sizeof(struct skill_quest));
+      #else
+	newOne = (struct skill_quest *) dc_alloc(1,sizeof(struct skill_quest));
+      #endif
+	newOne->level = 1;
+        newOne->message = str_dup("New skillquest.");
+        newOne->clas = 1;
+        newOne->next = skill_list;
+	skill_list = newOne;
+     break;
+    case 1:
+      for (curren = skill_list; curren; curren = curren->next)
+      {
+	if (curren == skill)
+        {
+          if (last)
+	    last->next = curren->next;
+	  else
+	    skill_list = curren->next;
+	  send_to_char("Deleted.\r\n",ch);
+	  dc_free(curren->message);
+	  dc_free(curren);
+	  break;
+	}
+	send_to_char("Error in sqedit. Tell Urizen.\r\n",ch);
+        break;
+      }
+    case 2:
+      send_to_char("Enter new message. End with ~.",ch);
+      ch->desc->connected = CON_EDITING;
+      ch->desc->str = &(skill->message);
+      ch->desc->max_str = MAX_MESSAGE_LENGTH;
+      break;
+    case 3:
+      if (!is_number(arg1))
+      {
+	skill->level = atoi(arg1);
+	send_to_char("Level modified.\r\n",ch);
+      }
+      break;
+    case 4:
+      int i;
+      if (!is_number(arg1))
+      {
+        for (i = 0; *pc_clss_types[i] != '\n'; i++)
+        {
+	  if (!str_cmp(pc_clss_types[i],arg1))
+	     break;
+	}
+	if (*pc_clss_types[i] == '\n')
+	{
+	  send_to_char("Invalid class.\r\n",ch);
+	  return eFAILURE;
+	}
+      } else {
+	i = atoi(arg1);
+      }    
+      if (i < 1 || i > 11)
+      {
+	send_to_char("Invalid class.\r\n",ch);
+	return eFAILURE;
+      }
+      skill->clas = i;
+      send_to_char("Class modified.\r\n",ch);
+      break;
+    case 5:
+      csendf(ch,"$2Skill$R: %s\r\n$2Message$R: %s\r\n$2Class$R: %s\r\n$2Level$R: %d\r\n",             get_skill_name(skill->num), skill->message, pc_clss_types[skill->clas],skill->level);
+      break;
+     case 6:
+      for (curren = skill_list; curren; curren = curren->next)
+      {
+	csendf(ch, "$2%d$R. %s\r\n", curren->num, get_skill_name(curren->num));
+      }
+      break;
+    default:
+      log("Incorrect -i- in do_sqedit", 0, LOG_WORLD);
+      return eFAILURE;
+  }
+  return eSUCCESS;
 }

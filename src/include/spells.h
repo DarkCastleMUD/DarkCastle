@@ -14,7 +14,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.h,v 1.39 2004/04/16 16:57:21 urizen Exp $ */
+/* $Id: spells.h,v 1.40 2004/04/17 05:13:14 urizen Exp $ */
 #include <structs.h> // byte, sh_int
 
 #define MAX_BUF_LENGTH               240
@@ -341,7 +341,7 @@ struct skill_quest
 #define COMMAND_SEDIT                621
 #define COMMAND_SOCKETS              622
 #define COMMAND_PUNISH               623
-
+#define COMMAND_SQEDIT		     624
 // make sure up you update bestowable_god_commands_type bestowable_god_commands[]
 // if you modify this command list any
 
