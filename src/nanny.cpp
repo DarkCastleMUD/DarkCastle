@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.44 2004/04/21 19:09:29 urizen Exp $ */
+/* $Id: nanny.cpp,v 1.45 2004/04/21 19:40:12 urizen Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -133,6 +133,26 @@ bool on_forbidden_name_list(char *name);
 
 char *str_str(char *first, char *second);
 
+int is_race_eligible(CHAR_DATA *ch, int race)
+{
+            if (race == 2 && (GET_RAW_DEX(ch) < 10 || GET_RAW_INT(ch) < 10))
+		return FALSE;
+	    if (race == 3 &&  (GET_RAW_CON(ch) < 10 || GET_RAW_WIS(ch) < 10))
+  		return FALSE;
+	    if (race == 4 &&  (GET_RAW_DEX(ch) < 10))
+  		return FALSE;
+  	    if (race == 5 &&  (GET_RAW_DEX(ch) < 12))
+  		return FALSE;
+	    if (race == 6 &&  (GET_RAW_STR(ch) < 12))
+  		return FALSE;
+	    if (race == 7 &&  (GET_RAW_WIS(ch) < 12))
+  		return FALSE;
+	    if (race == 8 &&  (GET_RAW_CON(ch) < 10 || GET_RAW_STR(ch) < 10))
+  		return FALSE;
+	    if (race == 9 &&  (GET_RAW_CON(ch) < 12))
+  		return FALSE;
+	 return TRUE;
+}
 
 int is_clss_eligible(CHAR_DATA *ch, int clss)
 {
@@ -396,11 +416,11 @@ void roll_and_display_stats(CHAR_DATA * ch)
   char buf[MAX_STRING_LENGTH];
 
          for(x = 0; x <= 4; x++) {
-            a=dice(3, 6); b=dice(3, 6); ch->desc->stats->str[x] = ((a > b) ? a : b);
-            a=dice(3, 6); b=dice(3, 6); ch->desc->stats->tel[x] = ((a > b) ? a : b);
-            a=dice(3, 6); b=dice(3, 6); ch->desc->stats->wis[x] = ((a > b) ? a : b);
-            a=dice(3, 6); b=dice(3, 6); ch->desc->stats->dex[x] = ((a > b) ? a : b);
-            a=dice(3, 6); b=dice(3, 6); ch->desc->stats->con[x] = ((a > b) ? a : b);
+            a=dice(3, 6); b=dice(6, 3); ch->desc->stats->str[x] = ((a > b) ? a : b);
+            a=dice(3, 6); b=dice(6, 3); ch->desc->stats->tel[x] = ((a > b) ? a : b);
+            a=dice(3, 6); b=dice(6, 3); ch->desc->stats->wis[x] = ((a > b) ? a : b);
+            a=dice(3, 6); b=dice(6, 3); ch->desc->stats->dex[x] = ((a > b) ? a : b);
+            a=dice(3, 6); b=dice(6, 3); ch->desc->stats->con[x] = ((a > b) ? a : b);
          }
 
          SEND_TO_Q("\n\r  Choose from any of the following groups of abilities...     \n\r", ch->desc);
@@ -997,11 +1017,15 @@ void nanny(struct descriptor_data *d, char *arg)
             GET_RAW_CON(ch) = ch->desc->stats->con[y-1];
             dc_free(ch->desc->stats);
             ch->desc->stats = NULL;
-            SEND_TO_Q("\n\rChoose a race.\n\r", d );
-            sprintf(buf, "   1: Human\n\r   2: Elf\n\r   3: Dwarf\n\r"
-               "   4: Hobbit\n\r   5: Pixie\n\r   6: Giant\n\r"
-               "   7: Gnome\r\n   8: Orc\r\n   9: Troll\r\n"
-               "\n\rSelect a race(Type help <race> for more information)-> ");
+            SEND_TO_Q("\n\rChoose a race(races you can select are marked with a *).\n\r", d );
+            sprintf(buf, "  %c1: Human\n\r  %c2: Elf\n\r  %c3: Dwarf\n\r"
+               "  %c4: Hobbit\n\r  %c5: Pixie\n\r  %c6: Giant\n\r"
+               "  %c7: Gnome\r\n  %c8: Orc\r\n  %c9: Troll\r\n"
+               "\n\rSelect a race(Type help <race> for more information)-> ",
+		is_race_eligible(ch,1),is_race_eligible(ch,2),is_race_eligible(ch,3),
+		is_race_eligible(ch,4),is_race_eligible(ch,5),is_race_eligible(ch,6),
+		is_race_eligible(ch,7),is_race_eligible(ch,8),is_race_eligible(ch,9));
+
             SEND_TO_Q(buf, d);
             STATE(d) = CON_GET_RACE;
             break;
