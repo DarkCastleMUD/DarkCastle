@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.49 2003/01/02 02:59:41 pirahna Exp $ */
+/* $Id: magic.cpp,v 1.50 2003/01/03 05:11:56 dcastle Exp $ */
 
 extern "C"
 {
@@ -1874,8 +1874,6 @@ int spell_full_heal(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
   return eSUCCESS;
 }
 
-// TODO - BLAH BLAH all spell below here have now yet had skill stuff done
-
 int spell_invisibility(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
   struct affected_type af;
@@ -1895,18 +1893,19 @@ int spell_invisibility(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
   }
   else {              /* Then it is a PC | NPC */
 
+        skill_increase_check(ch, SPELL_INVISIBLE, skill, SKILL_INCREASE_EASY);
+
 	 if (affected_by_spell(victim, SPELL_INVISIBLE))
 		affect_from_char(victim, SPELL_INVISIBLE);
 
 	if(IS_AFFECTED(victim, AFF_INVISIBLE))
 		return eFAILURE;
 
-	act("$n slowly fades out of existence.", 
-	  victim,0,0,TO_ROOM, INVIS_NULL);
+	act("$n slowly fades out of existence.", victim,0,0,TO_ROOM, INVIS_NULL);
 	send_to_char("You vanish.\n\r", victim);
 
 	af.type      = SPELL_INVISIBLE;
-	af.duration  = 24;
+	af.duration  = (int) ( skill / 3.75 );
 	af.modifier  = -40;
 	af.location  = APPLY_AC;
 	af.bitvector = AFF_INVISIBLE;
@@ -1926,7 +1925,7 @@ int spell_locate_object(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
 
   strcpy(name, fname(obj->name));
 
-  j=level/2;
+  j= (int) (skill / 3.75);
 
   for (i = object_list; i && (j>0); i = i->next)
   {
@@ -1952,13 +1951,17 @@ int spell_locate_object(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
     }
   }
 
-  if(j==0)
-	 send_to_char("You are very confused.\n\r",ch);
   if(j==level)
 	 send_to_char("No such object.\n\r",ch);
+
+  skill_increase_check(ch, SPELL_LOCATE_OBJECT, skill, SKILL_INCREASE_EASY);
+
+  if(j==0)
+	 send_to_char("You are very confused.\n\r",ch);
   return eSUCCESS;
 }
 
+// TODO - neesd to use spell increases and skill
 int spell_poison(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
   struct affected_type af;
@@ -2000,23 +2003,29 @@ int spell_protection_from_evil(byte level, CHAR_DATA *ch, CHAR_DATA *victim, str
   if ( IS_AFFECTED(victim,AFF_PROTECT_EVIL) )
 	 return eFAILURE;
 
-  if (!affected_by_spell(victim, SPELL_PROTECT_FROM_EVIL) ) {
+  if (!affected_by_spell(victim, SPELL_PROTECT_FROM_EVIL) ) 
+  {
+	 skill_increase_check(ch, SPELL_PROTECT_FROM_EVIL, skill, SKILL_INCREASE_MEDIUM);
+
 	 af.type      = SPELL_PROTECT_FROM_EVIL;
-	 af.duration  = 24;
+	 af.duration  = (int) (skill / 3.75);
 	 af.modifier  = 0;
 	 af.location  = APPLY_NONE;
 	 af.bitvector = AFF_PROTECT_EVIL;
 	 affect_to_char(victim, &af);
 	 send_to_char("You have a righteous, protected feeling!\n\r", victim);
-	 }
+  }
   return eSUCCESS;
 }
 
+// TODO - make this do something with higher skill
 int spell_remove_curse(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
   int j;
   
   assert(ch && (victim || obj));
+
+  skill_increase_check(ch, SPELL_REMOVE_CURSE, skill, SKILL_INCREASE_MEDIUM);
 
   if(obj) {
 	 if(IS_SET(obj->obj_flags.extra_flags, ITEM_NODROP)) {
@@ -2050,6 +2059,7 @@ int spell_remove_curse(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
   return eSUCCESS;
 }
 
+// TODO - make this use skill
 int spell_remove_poison(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
 
@@ -2085,15 +2095,17 @@ int spell_fireshield(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
 
   if (!affected_by_spell(victim, SPELL_FIRESHIELD))
   {
-	 act("$n is surrounded by flames.",victim,0,0,TO_ROOM, INVIS_NULL);
-	 act("You are surrounded by flames.",victim,0,0,TO_CHAR, 0);
+    skill_increase_check(ch, SPELL_FIRESHIELD, skill, SKILL_INCREASE_MEDIUM);
+
+    act("$n is surrounded by flames.",victim,0,0,TO_ROOM, INVIS_NULL);
+    act("You are surrounded by flames.",victim,0,0,TO_CHAR, 0);
 
     af.type      = SPELL_FIRESHIELD;
-	 af.duration  = (level < ANGEL) ? 3 : level;
-	 af.modifier  = 0;
+    af.duration  = 1 + skill / 30;
+    af.modifier  = 0;
     af.location  = APPLY_NONE;
-	 af.bitvector = AFF_FIRESHIELD;
-	 affect_to_char(victim, &af);
+    af.bitvector = AFF_FIRESHIELD;
+    affect_to_char(victim, &af);
   }
   return eSUCCESS;
 }
@@ -2287,6 +2299,7 @@ int cast_sanctuary( byte level, CHAR_DATA *ch, char *arg, int type,
   return eFAILURE;
 }
 
+// TODO - make this use skill
 int spell_camouflague(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill) 
 {
   struct affected_type af;
@@ -2305,6 +2318,7 @@ int spell_camouflague(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
   return eSUCCESS;
 }
 
+// TODO - make this use skill
 int spell_farsight(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *tar_obj, int skill) 
 {
   struct affected_type af;
@@ -2322,6 +2336,7 @@ int spell_farsight(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data
   return eSUCCESS;
 }
 
+// TODO - make this use skill
 int spell_freefloat(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *tar_obj, int skill) 
 {
    struct affected_type af;
@@ -2339,6 +2354,7 @@ int spell_freefloat(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
    return eSUCCESS;
 }
 
+// TODO - make this use skill
 int spell_insomnia(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *tar_obj, int skill) 
 {
    struct affected_type af;
@@ -2356,6 +2372,8 @@ int spell_insomnia(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data
    return eSUCCESS;
 }
 
+
+// TODO - make this use skill
 int spell_shadowslip(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *tar_obj, int skill) 
 {
    struct affected_type af;
@@ -2401,6 +2419,7 @@ int spell_sanctuary(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
 }
 
 
+// TODO - make this use skill
 int spell_sleep(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
   struct affected_type af;
@@ -2479,10 +2498,12 @@ int spell_strength(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data
     }
   }
 
+  skill_increase_check(ch, STRENGTH, skill, SKILL_INCREASE_MEDIUM);
+
   act("You feel stronger.", victim,0,0,TO_CHAR, 0);
 
   af.type      = SPELL_STRENGTH;
-  af.duration  = level;
+  af.duration  = level/2 + skill/3;
   af.modifier  = mod;
 
   af.location  = APPLY_STR;
@@ -2605,6 +2626,13 @@ int spell_wizard_eye(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
     return eFAILURE;
   }
 
+  if(number(0, 100) > skill) {
+    send_to_char("Your spell fails to locate it's target.\r\n", ch);
+    return eFAILURE;
+  }
+
+  skill_increase_check(ch, SPELL_WIZARD_EYE, skill, SKILL_INCREASE_MEDIUM);
+
   original_loc = ch->in_room;
   target        =  victim->in_room;
 
@@ -2652,7 +2680,13 @@ int spell_summon(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *
        send_to_char("You can't summon someone INTO an arena!\n\r", ch);
        return eFAILURE;
     }
+
+  if(number(1, 100) > 50 + skill/2) {
+    send_to_char("Your summoning fails.\r\n", ch);
+    return eFAILURE;
+  }
     
+  skill_increase_check(ch, SPELL_SUMMON, skill, SKILL_INCREASE_MEDIUM);
   
   act("$n disappears suddenly.",victim,0,0,TO_ROOM, INVIS_NULL);
 
@@ -2663,22 +2697,22 @@ int spell_summon(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *
   act("$n has summoned you!",ch,0,victim,TO_VICT, 0);
   do_look(victim,"",15);
 
-	 if (IS_NPC(victim) && GET_LEVEL(victim) >= GET_LEVEL(ch))  {
-	 act("$n growls.", victim, 0,0,TO_ROOM, 0);
-	 retval = one_hit(victim, ch,TYPE_UNDEFINED, FIRST);
-         retval = SWAP_CH_VICT(retval);
-         return retval;
-	 }
-
-	 else if (IS_NPC(victim))  {
-	   act("$n freaks shit.", victim, 0,0,TO_ROOM, 0);
-	   add_memory(victim, GET_NAME(ch), 'f');
-	   do_flee(victim, "", 0);
-	 }
+  if (IS_NPC(victim) && GET_LEVEL(victim) >= GET_LEVEL(ch))  {
+    act("$n growls.", victim, 0,0,TO_ROOM, 0);
+    retval = one_hit(victim, ch,TYPE_UNDEFINED, FIRST);
+    retval = SWAP_CH_VICT(retval);
+    return retval;
+  }
+  else if (IS_NPC(victim))  {
+    act("$n freaks shit.", victim, 0,0,TO_ROOM, 0);
+    add_memory(victim, GET_NAME(ch), 'f');
+    do_flee(victim, "", 0);
+  }
   return eSUCCESS;
 }
 
 
+// TODO - make this use skill
 int spell_charm_person(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
   struct affected_type af;
@@ -2761,19 +2795,21 @@ int spell_sense_life(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
 {
   struct affected_type af;
 
-	 assert(victim);
+  assert(victim);
 
   if(affected_by_spell(victim, SPELL_SENSE_LIFE))
     affect_from_char(victim, SPELL_SENSE_LIFE);
 
-	 send_to_char("Your feel your awareness improve.\n\r", ch);
+  skill_increase_check(ch, SPELL_SENSE_LIFE, skill, SKILL_INCREASE_MEDIUM);
 
-	 af.type      = SPELL_SENSE_LIFE;
-	 af.duration  = 5*level;
-	 af.modifier  = 0;
-	 af.location  = APPLY_NONE;
-	 af.bitvector = AFF_SENSE_LIFE;
-	 affect_to_char(victim, &af);
+  send_to_char("Your feel your awareness improve.\n\r", victim);
+
+  af.type      = SPELL_SENSE_LIFE;
+  af.duration  = skill * 2;
+  af.modifier  = 0;
+  af.location  = APPLY_NONE;
+  af.bitvector = AFF_SENSE_LIFE;
+  affect_to_char(victim, &af);
   return eSUCCESS;
 }
 
@@ -2787,6 +2823,7 @@ void show_obj_class_size_mini(obj_data * obj, char_data * ch)
          csendf(ch, " %s", extra_bits[i]);
 }
 
+// TODO - make this use skill
 int spell_identify(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
   char buf[MAX_STRING_LENGTH], buf2[256];
@@ -2796,7 +2833,7 @@ int spell_identify(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data
 
   struct time_info_data age(CHAR_DATA *ch);
 
- extern char *race_types[];
+  extern char *race_types[];
 
   /* Spell Names */
   extern char *spells[];
@@ -3200,6 +3237,7 @@ int spell_lightning_breath(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct 
 	 return spell_damage(ch, victim, dam,TYPE_ENERGY, SPELL_LIGHTNING_BREATH, 0);
 }
 
+// TODO - make this use skill
 int spell_fear(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
 	int retval;
@@ -3243,61 +3281,60 @@ int spell_fear(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *ob
 
 int spell_refresh(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
-	 int dam;
+  int dam;
 
-	 if(!ch || !victim)
-	 {
-	   log("NULL ch or victim sent to cause_serious!", ANGEL, LOG_BUG);
-           return eFAILURE;
-         }
+  if(!ch || !victim)
+  {
+    log("NULL ch or victim sent to spell_refresh!", ANGEL, LOG_BUG);
+    return eFAILURE;
+  }
 
-	 dam = dice(level, 4) + level;
-	 dam = MAX(dam, 20);
+  skill_increase_check(ch, SPELL_REFRESH, skill, SKILL_INCREASE_MEDIUM);
 
-	 if ((dam + GET_MOVE(victim)) > move_limit(victim))
-	GET_MOVE(victim) = move_limit(victim);
-	 else
-	GET_MOVE(victim) += dam;
+  dam = dice(skill/2, 4) + skill/2;
+  dam = MAX(dam, 20);
 
-	 send_to_char("You feel less tired.\n\r", victim);
+  if ((dam + GET_MOVE(victim)) > move_limit(victim))
+    GET_MOVE(victim) = move_limit(victim);
+  else
+    GET_MOVE(victim) += dam;
+
+  send_to_char("You feel less tired.\n\r", victim);
   return eSUCCESS;
 }
 
 int spell_fly(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
-	 struct affected_type af;
+  struct affected_type af;
 
-	 if(!ch || !victim)
-	 {
-	   log("NULL ch or victim sent to spell_fly!", ANGEL, LOG_BUG);
-           return eFAILURE;
-	 }
+  if(!ch || !victim)
+  {
+    log("NULL ch or victim sent to spell_fly!", ANGEL, LOG_BUG);
+    return eFAILURE;
+  }
 
-         if(affected_by_spell(victim, SPELL_FLY))
-           affect_from_char(victim, SPELL_FLY);
+  if(affected_by_spell(victim, SPELL_FLY))
+    affect_from_char(victim, SPELL_FLY);
 
-         if(IS_AFFECTED(victim, AFF_FLYING))
-           return eFAILURE;
+  if(IS_AFFECTED(victim, AFF_FLYING))
+    return eFAILURE;
 
-	 act("You start flapping and rise off the ground!", ch, 0, victim, TO_VICT, 0);
-	 if (victim != ch) {
-	act("$N's feet rise off the ground.", ch, 0, victim, TO_CHAR, 0);
-		} else {
-	send_to_char("Your feet rise up off the ground.\n\r", ch);
-		}
-	 act("$N's feet rise off the ground.", ch, 0, victim, TO_ROOM,
-	     INVIS_NULL|NOTVICT);
+  skill_increase_check(ch, SPELL_FLY, skill, SKILL_INCREASE_MEDIUM);
 
-	 af.type = SPELL_FLY;
-	 af.duration = level + 3;
-	 af.modifier = 0;
-	 af.location = 0;
-	 af.bitvector = AFF_FLYING;
-	 affect_to_char(victim, &af);
+  send_to_char("You start flapping and rise off the ground!", victim);
+  act("$N's feet rise off the ground.", ch, 0, victim, TO_ROOM, INVIS_NULL|NOTVICT);
+
+  af.type = SPELL_FLY;
+  af.duration = skill + 3;
+  af.modifier = 0;
+  af.location = 0;
+  af.bitvector = AFF_FLYING;
+  affect_to_char(victim, &af);
   return eSUCCESS;
 }
 
 // Creates a ball of light in the hands
+// TODO - make this use skill
 int spell_cont_light(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
   struct obj_data *tmp_obj;
@@ -3359,6 +3396,7 @@ int spell_cont_light(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
   return eSUCCESS;
 }
 
+// TODO - make this use skill
 int spell_animate_dead(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *corpse, int skill)
 {
   CHAR_DATA *mob;
@@ -3450,6 +3488,7 @@ int spell_animate_dead(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
 
 //  This should be checked out for real mob creating.
 
+// TODO - make this use skill
 int spell_know_alignment(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
   int ap;
@@ -3493,6 +3532,7 @@ int spell_know_alignment(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct ob
 }
 
 /* dispels detection spelsl and other small non-combat ones */
+// TODO - make this use skill
 int spell_dispel_minor(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
 	 int yes = 0;
@@ -3669,6 +3709,7 @@ int spell_dispel_minor(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
   return eSUCCESS;
 }
 
+// TODO - make this use skill
 int spell_dispel_magic(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
 	 int yes = 0;
@@ -3906,7 +3947,9 @@ int spell_cure_serious(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
     return eFAILURE;
   }
 
-  healpoints = dice(2, 8) +(level/2);
+  skill_increase_check(ch, SPELL_CURE_SERIOUS, skill, SKILL_INCREASE_MEDIUM);
+
+  healpoints = dice(2, 8) +(skill/2);
 
   if ((healpoints + GET_HIT(victim)) > hit_limit(victim))
     GET_HIT(victim) = hit_limit(victim);
@@ -3926,25 +3969,29 @@ int spell_cause_light(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
    if (!ch || !victim) {
       log("Null ch or victim sent to cause_light", ANGEL, LOG_BUG);
       return eFAILURE;
-      }
+   }
+
+   skill_increase_check(ch, SPELL_CAUSE_LIGHT, skill, SKILL_INCREASE_MEDIUM);
 
    set_cantquit(ch, victim);
-   dam = dice(1, 8) + (level/3);
+   dam = dice(1, 8) + (skill/3);
    return spell_damage(ch, victim, dam, TYPE_MAGIC, SPELL_CAUSE_LIGHT, 0);
 }
 
 int spell_cause_critical(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
-	 int dam;
+    int dam;
+
     if(!ch || !victim)
     {
       log("NULL ch or victim sent to cause_critical!", ANGEL, LOG_BUG);
       return eFAILURE;
     }
 
+    skill_increase_check(ch, SPELL_CAUSE_CRITICAL, skill, SKILL_INCREASE_MEDIUM);
     set_cantquit(ch, victim);
     
-    dam = dice(3,8)-6+level;
+    dam = dice(3,8)-6+skill/2;
 
     return spell_damage(ch, victim, dam, TYPE_MAGIC, SPELL_CAUSE_CRITICAL, 0);
 }
@@ -3958,30 +4005,42 @@ int spell_cause_serious(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
       return eFAILURE;
     }
 
+    skill_increase_check(ch, SPELL_CAUSE_SERIOUS, skill, SKILL_INCREASE_MEDIUM);
 
-	 set_cantquit(ch, victim);
+    set_cantquit(ch, victim);
 
-	 dam = dice(2, 8) + (level/2);
+    dam = dice(2, 8) + (skill/2);
 
-	return  spell_damage(ch, victim, dam,TYPE_MAGIC, SPELL_CAUSE_SERIOUS, 0);
+   return spell_damage(ch, victim, dam,TYPE_MAGIC, SPELL_CAUSE_SERIOUS, 0);
 }
 
 int spell_flamestrike(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
-   int dam;
+   int dam, retval;
 
    if (!ch || !victim) {
-      log("NULL ch or victim sent to cause_serious!", ANGEL, LOG_BUG);
+      log("NULL ch or victim sent to flamestrike!", ANGEL, LOG_BUG);
       return eFAILURE;
-      }
+   }
+
+   skill_increase_check(ch, SPELL_FLAMESTRIKE, skill, SKILL_INCREASE_MEDIUM);
       
    set_cantquit (ch, victim);
-   dam = dice(level, 10);
+   dam = dice(skill/2, 10);
 
    if (saves_spell(ch, victim, 0, SAVE_TYPE_FIRE) >= 0)
       dam >>= 1;
 
-   return spell_damage(ch, victim, dam, TYPE_FIRE, SPELL_FLAMESTRIKE, 0);
+   retval = spell_damage(ch, victim, dam, TYPE_FIRE, SPELL_FLAMESTRIKE, 0);
+
+   if(SOMEONE_DIED(retval))
+      return retval;
+
+   if(skill > 60) {
+      send_to_char("The fires burn into your soul tearing away at your magic being.\r\n", victim);
+      GET_MANA(victim) -= 15;
+   }
+   return retval;
 }
 
 /*
@@ -4000,12 +4059,13 @@ int spell_resist_cold(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 	  
 
    if (!affected_by_spell(ch, SPELL_RESIST_COLD)) {
+      skill_increase_check(ch, SPELL_RESIST_COLD, skill, SKILL_INCREASE_MEDIUM);
       act("$n's skin turns blue momentarily.", ch, 0, 0, TO_ROOM, INVIS_NULL);
       act("Your skin turns blue momentarily.", ch, 0, 0, TO_CHAR, 0);
 
       af.type = SPELL_RESIST_COLD;
-      af.duration = level/5;
-      af.modifier = 25;
+      af.duration = 1 + skill / 10;
+      af.modifier = 10 + skill / 6;
       af.location = APPLY_SAVING_COLD;
       af.bitvector = 0;
       affect_to_char(ch, &af);
@@ -4027,12 +4087,12 @@ int spell_resist_fire(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 
 
    if (!affected_by_spell(ch, SPELL_RESIST_FIRE)) {
+      skill_increase_check(ch, SPELL_RESIST_FIRE, skill, SKILL_INCREASE_MEDIUM);
       act("$n's skin turns red momentarily.", ch, 0, 0, TO_ROOM, INVIS_NULL);
       act("Your skin turns red momentarily.", ch, 0, 0, TO_CHAR, 0);
-
       af.type = SPELL_RESIST_FIRE;
-      af.duration = level/5;
-      af.modifier = 25;
+      af.duration = 1 + skill / 10;
+      af.modifier = 10 + skill / 6;
       af.location = APPLY_SAVING_FIRE;
       af.bitvector = 0;
       affect_to_char(ch, &af);
@@ -4040,6 +4100,7 @@ int spell_resist_fire(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
    return eSUCCESS;
 }
 
+// TODO - make this use skill
 int spell_staunchblood(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
     struct affected_type af;
@@ -4063,12 +4124,12 @@ int spell_resist_energy(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
    struct affected_type af;
 
    if(!affected_by_spell(ch, SPELL_RESIST_ENERGY)) {
+      skill_increase_check(ch, SPELL_RESIST_ENERGY, skill, SKILL_INCREASE_MEDIUM);
       act("$n's skin turns gold momentarily.", ch, 0, 0, TO_ROOM, INVIS_NULL);
       act("Your skin turns gold momentarily.", ch, 0, 0, TO_CHAR, 0);
-
       af.type = SPELL_RESIST_ENERGY;
-      af.duration = level/5;
-      af.modifier = 25;
+      af.duration = 1 + skill / 10;
+      af.modifier = 10 + skill / 6;
       af.location = APPLY_SAVING_ENERGY;
       af.bitvector = 0;
       affect_to_char(ch, &af);
@@ -4078,29 +4139,29 @@ int spell_resist_energy(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
 
 int spell_stone_skin(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
-	 struct affected_type af;
+    struct affected_type af;
 
     if(!ch)
     {
       log("NULL ch sent to cause_serious!", ANGEL, LOG_BUG);
         return eFAILURE;
-     }
+    }
 
 
     if (!affected_by_spell(ch, SPELL_STONE_SKIN)) {
-	act("$n's skin turns grey and granite-like.", ch, 0, 0, TO_ROOM,
-	  INVIS_NULL);
+	skill_increase_check(ch, SPELL_STONE_SKIN, skill, SKILL_INCREASE_MEDIUM);
+	act("$n's skin turns grey and granite-like.", ch, 0, 0, TO_ROOM, INVIS_NULL);
 	act("Your skin turns to a stone-like substance.", ch, 0, 0, TO_CHAR, 0);
 
 	af.type = SPELL_STONE_SKIN;
-	af.duration = level/4;
-	af.modifier = -40;
+	af.duration = 1 + skill/6;
+	af.modifier = -(10 + skill/3);
 	af.location = APPLY_AC;
 	af.bitvector = 0;
 	affect_to_char(ch, &af);
 
         SET_BIT(ch->resist, ISR_PIERCE);
-	}
+  }
   return eSUCCESS;
 }
 
@@ -4117,6 +4178,8 @@ int spell_shield(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *
   if(affected_by_spell(victim, SPELL_SHIELD))
     affect_from_char(victim, SPELL_SHIELD);
 
+  skill_increase_check(ch, SPELL_SHIELD, skill, SKILL_INCREASE_MEDIUM);
+
   act("$N is surrounded by a strong force shield.", ch, 0, victim, TO_ROOM, INVIS_NULL|NOTVICT);
   if (ch != victim) {
      act("$N is surrounded by a strong force shield.", ch, 0, victim, TO_CHAR, 0);
@@ -4126,8 +4189,8 @@ int spell_shield(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *
   }
 
   af.type = SPELL_SHIELD;
-  af.duration = 8 + level;
-  af.modifier = -10;
+  af.duration = 13 + skill / 2;
+  af.modifier = - ( 8 + skill / 30 );
   af.location = APPLY_AC;
   af.bitvector = 0;
   affect_to_char(victim, &af);
@@ -4135,6 +4198,7 @@ int spell_shield(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *
   return eSUCCESS;
 }
 
+// TODO - make this use skill        
 int spell_weaken(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
 	 struct affected_type af;
@@ -4177,6 +4241,7 @@ int spell_weaken(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *
          return retval;
 }
 
+// TODO - make this use skill        
 int spell_mass_invis(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
     CHAR_DATA *tmp_victim;
@@ -4211,11 +4276,11 @@ int spell_mass_invis(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
 
 int spell_acid_blast(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
-
    int dam;
 
    set_cantquit (ch, victim);
-   dam = dice(level, 12) + level;
+   skill_increase_check(ch, SPELL_ACID_BLAST, skill, SKILL_INCREASE_MEDIUM);
+   dam = dice(5 + skill/2, 12) + 5 + skill / 2;
    return spell_damage(ch, victim, dam,TYPE_ACID, SPELL_ACID_BLAST, 0);
 }
 
@@ -4225,7 +4290,8 @@ int spell_hellstream(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
    int dam;
 
    set_cantquit (ch, victim);
-   dam = (((level * 5)-200) + (GET_INT(ch) * 4)) * 6;
+   skill_increase_check(ch, SPELL_HELLSTREAM, skill, SKILL_INCREASE_MEDIUM);
+   dam = (((skill/2 * 5)-200) + (GET_INT(ch) * 4)) * 6 + (skill / 2);
    return spell_damage(ch, victim, dam,TYPE_FIRE, SPELL_HELLSTREAM, 0);
 }
 
@@ -4317,6 +4383,7 @@ void make_portal(CHAR_DATA * ch, CHAR_DATA * vict)
   return;
 }
 
+// TODO - make this use skill        
 int spell_portal(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
   struct obj_data *portal = 0;
@@ -7352,10 +7419,7 @@ int cast_animate_dead( byte level, CHAR_DATA *ch, char *arg, int type,
   return eFAILURE;
 }
 
-/* Ranger spells by PAC 11.19.94.  These spells are intended for rangers only,
-** although they will fit with druids if they ever show up.
-*/
-
+// BLAH BLAH spells below here don't use skill yet
 int spell_bee_sting(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
    int dam;
