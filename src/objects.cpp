@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.43 2004/07/20 01:44:05 urizen Exp $
+| $Id: objects.cpp,v 1.44 2004/07/22 02:57:00 rahz Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -1369,11 +1369,22 @@ void wear(struct char_data *ch, struct obj_data *obj_object, int keyword)
   char buffer[MAX_STRING_LENGTH];
   int do_say(struct char_data *ch, char *argument, int cmd);
 
-  if(GET_LEVEL(ch) < obj_object->obj_flags.eq_level) {
-    sprintf(buffer, "You must be level %d to use this object.\n\r",
-      obj_object->obj_flags.eq_level);
-    send_to_char(buffer, ch);
-    return;
+  if (!IS_NPC(ch) || !(mob_index[ch->mobdata->nr].virt == 8)) {
+    if(GET_LEVEL(ch) < obj_object->obj_flags.eq_level) {
+      sprintf(buffer, "You must be level %d to use this object.\n\r",
+        obj_object->obj_flags.eq_level);
+      send_to_char(buffer, ch);
+      return;
+    }
+  } else {
+    if (!IS_SET(obj_object->obj_flags.size, SIZE_CHARMIE_OK)) {
+      if(GET_LEVEL(ch) < obj_object->obj_flags.eq_level) {
+        sprintf(buffer, "You must be level %d to use this object.\n\r",
+          obj_object->obj_flags.eq_level);
+        send_to_char(buffer, ch);
+        return;
+      }
+    }
   }
   obj = obj_object;
 
