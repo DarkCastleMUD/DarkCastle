@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.43 2004/05/28 23:31:56 urizen Exp $ */
+/* $Id: limits.cpp,v 1.44 2004/05/30 18:59:04 urizen Exp $ */
 
 extern "C"
 {
@@ -759,6 +759,8 @@ void update_corpses_and_portals(void)
             {
              if (next_thing == jj)
                 next_thing = jj->next;
+             while (next_thing->in_obj == jj)
+                next_thing = next_thing->next;
              extract_obj(jj);
             }
             else
@@ -769,6 +771,8 @@ void update_corpses_and_portals(void)
             {
              if (next_thing == jj)
                next_thing = jj->next;
+             while (next_thing->in_obj == jj)
+                next_thing = next_thing->next;
              extract_obj(jj);
             }
             else
@@ -782,6 +786,8 @@ void update_corpses_and_portals(void)
             {
 	     if (next_thing == jj)
 	       next_thing = jj->next;
+	     while (next_thing->in_obj == jj)
+		next_thing = next_thing->next;
 	     extract_obj(jj);
 	    }
 	    else
@@ -792,6 +798,9 @@ void update_corpses_and_portals(void)
             return;
           }
         }
+	while (next_thing->in_obj == j) next_thing = next_thing->next;
+			// Is THIS what caused the crasher then?
+			// Wtf: damnit.
         extract_obj(j);
       }
       last_thing = j;

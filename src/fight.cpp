@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.208 2004/05/29 21:29:32 urizen Exp $ */
+/* $Id: fight.cpp,v 1.209 2004/05/30 18:59:03 urizen Exp $ */
 
 extern "C"
 {
@@ -267,9 +267,6 @@ bool gets_dual_wield_attack(char_data * ch)
 
   if(!skill_success(ch,NULL,SKILL_DUAL_WIELD))
     return FALSE;
-
-  skill_increase_check(ch, SKILL_DUAL_WIELD, 
-has_skill(ch,SKILL_DUAL_WIELD), SKILL_INCREASE_HARD);
 
   return TRUE;
 }
@@ -531,6 +528,11 @@ void update_stuns(CHAR_DATA *ch)
         act("$n regains conciousness...", ch, 0, 0, TO_ROOM, 0);
         act("You regain conciousness...", ch, 0, 0, TO_CHAR, 0);
         GET_POS(ch) = POSITION_SITTING;
+	if (IS_SET(ch->combat, COMBAT_BERSERK))
+	{
+	  send_to_char("After that period of unconciousness, you've forgotten what you were mad about.\r\n",ch);
+	  REMOVE_BIT(ch->combat, COMBAT_BERSERK);
+	}
       }
   } 
   struct affected_type *eh;
@@ -749,8 +751,6 @@ void check_weapon_skill_bonus(char_data * ch, int type, obj_data *wielded,
    if(skill_success(ch,NULL,skill))
    {
       // rare skill increases
-      skill_increase_check(ch, skill, learned, SKILL_INCREASE_HARD);
-
       specialization = learned / 100;
       learned = learned % 100;
 
@@ -1465,12 +1465,10 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
     percent = (int) (( ((float)GET_HIT(ch)) / ((float)GET_MAX_HIT(ch)) ) * 100);
     if( percent < 40 && (learned = has_skill(ch, SKILL_FRENZY))) 
     {
-      if(learned > number(1, 101)) {
+      if(skill_success(ch, victim, SKILL_FRENZY)) {
         dam = (int)(dam * 1.2);
         SET_BIT(modifier, COMBAT_MOD_FRENZY);
       }
-      else
-        skill_increase_check(ch, SKILL_FRENZY, learned, SKILL_INCREASE_HARD);
     }
     if(IS_SET(ch->combat, COMBAT_VITAL_STRIKE))
       dam = (int)(dam * 2);
@@ -1912,7 +1910,6 @@ int check_riposte(CHAR_DATA * ch, CHAR_DATA * victim)
   act("$n turns your attack against you!", victim, NULL, ch, TO_VICT, 0);
   act("You turn $N's attack against $m.", victim, NULL, ch, TO_CHAR, 0);
   
-  skill_increase_check(victim, SKILL_RIPOSTE, learned, SKILL_INCREASE_HARD);
 
   retval = one_hit(victim, ch, TYPE_UNDEFINED, FIRST);
   retval = SWAP_CH_VICT(retval);
@@ -1967,8 +1964,6 @@ bool check_shieldblock(CHAR_DATA * ch, CHAR_DATA * victim, int attacktype)
   act("$n blocks your attack with $s shield.", victim, NULL, ch, TO_VICT, 0);
   act("You block $N's attack with your shield.", victim, NULL, ch, TO_CHAR, 0);
 
-  skill_increase_check(victim, SKILL_SHIELDBLOCK, has_skill(ch,SKILL_SHIELDBLOCK), SKILL_INCREASE_HARD);
-
   return TRUE;
 }
 
@@ -2020,8 +2015,6 @@ bool check_parry(CHAR_DATA * ch, CHAR_DATA * victim, int attacktype)
   act("$n parries your attack.", victim, NULL, ch, TO_VICT, 0);
   act("You parry $N's attack.", victim, NULL, ch, TO_CHAR, 0);
 
-  skill_increase_check(victim, SKILL_PARRY, has_skill(victim,SKILL_PARRY), SKILL_INCREASE_HARD);
-  
   return TRUE;
 }
 
@@ -2107,8 +2100,6 @@ bool check_dodge(CHAR_DATA * ch, CHAR_DATA * victim, int attacktype)
   act("$n dodges $N's attack.", victim, NULL, ch, TO_ROOM, NOTVICT);
   act("$n dodges your attack.", victim, NULL, ch, TO_VICT, 0);
   act("You dodge $N's attack.", victim, NULL, ch, TO_CHAR, 0);
-
-  skill_increase_check(victim, SKILL_DODGE, has_skill(victim,SKILL_DODGE), SKILL_INCREASE_HARD);
 
   return TRUE;
 }
@@ -2922,11 +2913,10 @@ int do_skewer(CHAR_DATA *ch, CHAR_DATA *vict, int dam, int weapon)
   if(!ch->equipment[weapon])                                         return 0;
   if (!has_skill(ch, SKILL_SKEWER)) return 0;
   // TODO - need to make this take specialization into consideration
-  if(skill_success(ch,vict, SKILL_SKEWER))                          return 0;
+  if(!skill_success(ch,vict, SKILL_SKEWER))                          return 0;
 
   int type = get_weapon_damage_type(ch->equipment[weapon]);
   if( ! (type == TYPE_STING || type == TYPE_PIERCE || type == TYPE_SLASH ))  return 0;
-  skill_increase_check(ch, SKILL_SKEWER, has_skill(ch,SKILL_SKEWER), SKILL_INCREASE_MEDIUM);
   if (number(0, 100) < 25) {
     act("$n jams his weapon into $N!", ch, 0, vict, TO_ROOM, NOTVICT);
     act("You jam your weapon in $N's heart!", ch, 0, vict, TO_CHAR, 0);
@@ -3516,6 +3506,11 @@ void disarm(CHAR_DATA * ch, CHAR_DATA * victim)
       send_to_char("Their paralyzed fingers are gripping the weapon too tightly.\r\n",ch);
       return;
   }
+  if (IS_SET(victim->combat, COMBAT_BERSERK))
+  {
+     send_to_char("In their enraged state, there's no chance they'd let go of their weapon!\r\n",ch);
+     return;
+  }
   act("$B$n disarms you and sends your weapon flying!$R", ch, NULL, victim, TO_VICT, 0);
   act("You disarm $N and send $S weapon flying!", ch, NULL, victim, TO_CHAR, 0);
   act("$n disarms $N and sends $S weapon flying!", ch, NULL, victim, TO_ROOM, NOTVICT);
@@ -4092,7 +4087,6 @@ int second_attack(CHAR_DATA *ch)
     return TRUE;
   learned = has_skill(ch, SKILL_SECOND_ATTACK);
   if(learned && skill_success(ch,NULL, SKILL_SECOND_ATTACK)) {
-    skill_increase_check(ch, SKILL_SECOND_ATTACK, learned, SKILL_INCREASE_HARD);
     return TRUE;
   }
   return FALSE;
@@ -4106,7 +4100,6 @@ int third_attack(CHAR_DATA *ch)
     return TRUE;
   learned = has_skill(ch, SKILL_THIRD_ATTACK);
   if(learned && skill_success(ch,NULL,SKILL_THIRD_ATTACK)) {
-    skill_increase_check(ch, SKILL_THIRD_ATTACK, learned, SKILL_INCREASE_HARD);
     return TRUE;
   }
   return FALSE;

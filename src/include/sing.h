@@ -3,7 +3,7 @@
  * singing bard powers, although the sing structure is in
  * spells.h, so that must be included
  */
-/* $Id: sing.h,v 1.7 2004/05/20 15:07:36 urizen Exp $ */
+/* $Id: sing.h,v 1.8 2004/05/30 18:59:08 urizen Exp $ */
 
 #ifndef SING_H_
 #define SING_H_
@@ -23,6 +23,7 @@ struct song_info_type
         SING_FUN *exec_pointer; /* other function to call */
         SING_FUN *song_pulse;    /* other other function to call */
         SING_FUN *intrp_pointer; /* other other function to call */
+        int difficulty;
 };
 
 /************************************************************************

@@ -84,8 +84,6 @@ int do_harmtouch(struct char_data *ch, char *argument, int cmd)
       return eFAILURE;
    }
 
-   skill_increase_check(ch, SKILL_HARM_TOUCH, has_skill(ch,SKILL_HARM_TOUCH), SKILL_INCREASE_EASY);
-
    af.type = SKILL_HARM_TOUCH;
    af.duration  = 24;
    af.modifier  = 0;
@@ -166,8 +164,6 @@ int do_layhands(struct char_data *ch, char *argument, int cmd)
       send_to_char("You don't posess the energy to do it!\r\n", ch);
       return eFAILURE;
    }
-
-   skill_increase_check(ch, SKILL_LAY_HANDS, has_skill(ch,SKILL_LAY_HANDS), SKILL_INCREASE_EASY);
 
    if(!skill_success(ch,victim, SKILL_LAY_HANDS)) {
      send_to_char("Your god refuses you.\r\n", ch);

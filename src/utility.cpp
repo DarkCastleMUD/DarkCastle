@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.28 2004/05/27 20:25:58 urizen Exp $ */
+/* $Id: utility.cpp,v 1.29 2004/05/30 18:59:04 urizen Exp $ */
 
 extern "C"
 {
@@ -625,10 +625,8 @@ bool CAN_SEE( struct char_data *sub, struct char_data *obj )
       if(x == 101)
         return TRUE; // auto failure
 
-      if ( x < (has_skill(obj, SKILL_HIDE))) {
-	skill_increase_check(obj, SKILL_HIDE, has_skill(obj,SKILL_HIDE), SKILL_INCREASE_HARD);
+      if ( skill_success(obj, NULL, SKILL_HIDE))
          return FALSE;
-	}
    }
 
    if ( !IS_AFFECTED( obj, AFF_INVISIBLE ) )

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.66 2004/05/29 21:29:32 urizen Exp $
+| $Id: guild.cpp,v 1.67 2004/05/30 18:59:04 urizen Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -503,6 +503,11 @@ int get_stat(CHAR_DATA *ch, int stat)
 void skill_increase_check(char_data * ch, int skill, int learned, int difficulty)
 {
    int chance, maximum;
+   if (!difficulty) 
+   {
+     logf(IMMORTAL, LOG_BUG, "Illegal difficulty in skill %d. Tell someone.", skill);
+     return; // Skill w/out difficulty.
+   }
    if( ! ( learned = has_skill(ch, skill) ) )
       return; // get out if i don't have the skill
 

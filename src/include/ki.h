@@ -3,7 +3,7 @@
  * ki powers, although the ki structure is in
  * spells.h, so that must be included
  */
-/* $Id: ki.h,v 1.5 2003/07/22 18:29:06 pirahna Exp $ */
+/* $Id: ki.h,v 1.6 2004/05/30 18:59:08 urizen Exp $ */
 
 #ifndef KI_H_
 #define KI_H_
@@ -34,6 +34,7 @@ struct ki_info_type
 	ubyte min_useski;	/* minimum ki used */
 	sh_int targets;		/* Legal targets */
 	KI_FUN *ki_pointer;	/* function to call */
+        int difficulty;
 };
 
 /************************************************************************

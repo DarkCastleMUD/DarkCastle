@@ -474,7 +474,6 @@ void assign_combat_procs() {
     assign_one_mob_com(27133,  firestormer);
     assign_one_mob_com(27140,  hellstreamer);
     assign_one_mob_com(32044,  active_tarrasque);
-
     return;    
 }
 
@@ -613,6 +612,10 @@ void assign_objects(void)
 //  assign_one_obj_com(22732,  drainingstaff);
 //  assign_one_obj_com(22743,  bonusattack);
 //  assign_one_obj_com(22605,  souldrainer);
+
+    int i;
+    for (i = 1940; i <= 1950; i++) /* Guild boards.*/
+      assign_one_obj_non(i, board); 
 
 	return;
 }

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_barbarian.cpp,v 1.22 2004/05/16 12:22:09 urizen Exp $
+| $Id: cl_barbarian.cpp,v 1.23 2004/05/30 18:59:06 urizen Exp $
 | cl_barbarian.C
 | Description:  Commands for the barbarian class.
 */
@@ -86,8 +86,6 @@ int do_rage(struct char_data *ch, char *argument, int cmd)
     SET_BIT(ch->combat, COMBAT_RAGE1);
   }
 
-  skill_increase_check(ch, SKILL_RAGE, has_skill(ch,SKILL_RAGE), SKILL_INCREASE_EASY);
-
   WAIT_STATE(ch, PULSE_VIOLENCE * 3);
 
   if(!ch->fighting)
@@ -142,8 +140,6 @@ int do_battlecry(struct char_data *ch, char *argument, int cmd)
         SET_BIT(f->follower->combat, COMBAT_RAGE1);
 	}
      }
-
-  skill_increase_check(ch, SKILL_BATTLECRY, has_skill(ch,SKILL_BATTLECRY), SKILL_INCREASE_EASY);
 
    if(has_skill(ch,SKILL_BATTLECRY) > 40 && !number(0, 4))
       WAIT_STATE(ch, PULSE_VIOLENCE * 2);
@@ -216,8 +212,6 @@ int do_berserk(struct char_data *ch, char *argument, int cmd)
 
   if (bSuccess && !IS_SET(ch->combat, COMBAT_RAGE1))
      SET_BIT(ch->combat, COMBAT_RAGE1);
-
-  skill_increase_check(ch, SKILL_BERSERK, has_skill(ch,SKILL_BERSERK), SKILL_INCREASE_MEDIUM);
 
   if(!ch->fighting)
      retval = attack(ch, victim, TYPE_UNDEFINED);
@@ -307,8 +301,6 @@ int do_headbutt(struct char_data *ch, char *argument, int cmd)
     retval = damage (ch, victim, 50, TYPE_HIT, SKILL_SHOCK, 0);
   }
 
-  skill_increase_check(ch, SKILL_SHOCK, has_skill(ch,SKILL_SHOCK), SKILL_INCREASE_EASY);
-
   return retval;
 }
 
@@ -357,8 +349,6 @@ int do_bloodfury(struct char_data *ch, char *argument, int cmd)
 
   affect_to_char(ch, &af);
 
-  skill_increase_check(ch, SKILL_BLOOD_FURY, has_skill(ch,SKILL_BLOOD_FURY), SKILL_INCREASE_EASY);
-
   return eSUCCESS;
 }
 
@@ -378,8 +368,6 @@ int do_crazedassault(struct char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
           
-  skill_increase_check(ch, SKILL_CRAZED_ASSAULT, has_skill(ch,SKILL_CRAZED_ASSAULT), SKILL_INCREASE_MEDIUM);
- 
   if(!skill_success(ch,NULL,SKILL_CRAZED_ASSAULT)) {
     send_to_char("You try to psyche yourself up for it but just can't muster the concentration.\r\n", ch);
   }
@@ -469,8 +457,6 @@ int do_bullrush(struct char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  skill_increase_check(ch, SKILL_BULLRUSH, has_skill(ch,SKILL_BULLRUSH), SKILL_INCREASE_MEDIUM);
-
   if(!victim || victim == ch) {
     send_to_char("You successfully rush in and bushwack....the air.\r\n", ch);
     return eFAILURE;
@@ -528,7 +514,6 @@ int do_ferocity(struct char_data *ch, char *argument, int cmd)
     }
   }
 
-  skill_increase_check(ch, SKILL_FEROCITY, has_skill(ch,SKILL_FEROCITY), SKILL_INCREASE_EASY);
   WAIT_STATE(ch, PULSE_VIOLENCE * 2);
   GET_MOVE(ch) /= 2;
   return eSUCCESS;

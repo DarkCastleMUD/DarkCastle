@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: board.cpp,v 1.4 2004/05/17 07:11:21 urizen Exp $
+| $Id: board.cpp,v 1.5 2004/05/30 18:59:03 urizen Exp $
 | board.C
 | Description:  This file contains the implementation for the board
 |   code.  It's old and should be rewritten --Morc XXX
@@ -74,20 +74,25 @@ extern CWorld world;
 
 const int MAX_MSGS           = 99;       // Max number of messages.
 const int MAX_MESSAGE_LENGTH = 2048;     // that should be enough
-const int NUM_BOARDS         = 44; 
+const int NUM_BOARDS         = 55; 
 
 int min_read_level[]   = {  0, IMMORTAL, OVERSEER, IMMORTAL, 0, 0, 0, 0, 0, 0, 0, 0,
                      0, 0, 0, 0, 0, 0, 0, 0,  0, IMMORTAL, 0, 0, 0,//24
 		     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                     IMMORTAL, 0 , OVERSEER };
+                     IMMORTAL, 0 , OVERSEER,
+		     0,0,0,0,0,0,0,0,0,0,0 };
 int min_write_level[]  = {  1, IMMORTAL, OVERSEER, IMMORTAL, SERAPH , 1, 1, 1, 1, 1,
                      1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, IMMORTAL,1,1,1,//24
 		     1,1,1,1,1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-                     IMMORTAL, 0, OVERSEER };
+                     IMMORTAL, 0, OVERSEER,
+		     1,1,1,1,1,1,1,1,1,1,1 };
 
 int min_remove_level[] = { IMMORTAL, IMMORTAL, OVERSEER, IMMORTAL, SERAPH, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, IMMORTAL, 0, 0, 0,//24
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, IMMORTAL, 0, OVERSEER };
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, IMMORTAL, 0, OVERSEER,
+	IMMORTAL, IMMORTAL, IMMORTAL, IMMORTAL, IMMORTAL, IMMORTAL,
+        IMMORTAL, IMMORTAL, IMMORTAL, IMMORTAL, IMMORTAL
+ };
 	
 int board_clan[] = { -1,
                      -1, -1, -1, -1,  1,  2,  8, 34, 16, 21, // 1 through 10
@@ -96,6 +101,18 @@ int board_clan[] = { -1,
                      28, -1, 34, 12, -1, -1, 10, 26, 11, 15, // 31 - 40
                      -1, 21, -1
 		     };
+
+int board_class[] = {
+			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
+                        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+                        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+                        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+                        -1, -1, -1, -1, 1, 2, 3, 4, 5, 6, 7, 8,
+			9, 10, 11
+
+//			1947, 1946, 1940, 1944, 1941, 1950, 
+//			1942, 1945, 1943, 1949, 1948, -1, -1
+		    };
 
 char save_file[NUM_BOARDS][42] = { 
   "board/mortal",  // 0
@@ -141,7 +158,18 @@ char save_file[NUM_BOARDS][42] = {
   "board/overlords",
   "board/punishment",
   "board/anaphro",
-  "board/coder"
+  "board/coder",
+  "board/mage",
+  "board/cleric",
+  "board/thief",
+  "board/warrior",
+  "board/anti",
+  "board/pal",
+  "board/barb",
+  "board/monk",
+  "board/ranger",
+  "board/bard",
+  "board/druid"
 };
  
  static struct board_lock_struct {
@@ -261,6 +289,28 @@ int find_board(CHAR_DATA *ch)
        return(42);
      else if (!(strcmp(i->name, "board coding")))
        return(43);
+     else if (!strcmp(i->name, "board guild mage glyph glyphs colums"))
+	return 44;
+     else if (!strcmp(i->name, "board guild cleric"))
+        return 45;
+     else if (!strcmp(i->name, "board guild thief"))
+        return 46;
+     else if (!strcmp(i->name, "board guild warrior"))
+        return 47;
+     else if (!strcmp(i->name, "board guild anti journal"))
+        return 48;
+     else if (!strcmp(i->name, "board guild paladin register"))
+        return 49;
+     else if (!strcmp(i->name, "board guild barb"))
+        return 50;
+     else if (!strcmp(i->name, "board guild monk"))
+        return 51;
+     else if (!strcmp(i->name, "board guild ranger notes tree"))
+        return 52;
+     else if (!strcmp(i->name, "board guild bard bulletin"))
+        return 53;
+     else if (!strcmp(i->name, "board guild druid sheet papyrus"))
+        return 54;
      } 
 
 
@@ -370,6 +420,10 @@ void board_write_msg(CHAR_DATA *ch, char *arg, int bnum) {
       send_to_char("You don't have the right!  Talk to your clan leader.\n\r", ch);
       return;
     }
+  }
+  if (board_class[bnum] != -1 && GET_LEVEL(ch) < IMMORTAL && GET_CLASS(ch) != board_class[bnum]) {
+     send_to_char("You do not understand the writings written on this board.\r\n",ch);
+     return;
   }
 
   if ((GET_LEVEL(ch) < min_write_level[bnum])) {
@@ -517,7 +571,12 @@ int board_remove_msg(CHAR_DATA *ch, char *arg, int bnum) {
       return 1;
     }
   }
-  else if((GET_LEVEL(ch) < min_remove_level[bnum] && strcmp(GET_NAME(ch), curr_board->msg[ind].author)
+  else if (board_class[bnum] != -1 && GET_LEVEL(ch) < IMMORTAL && GET_CLASS(ch) != board_class[bnum]) {
+     send_to_char("You do not understand the writings written on this board.\r\n",ch);
+     return 1;
+  }
+  else if((GET_LEVEL(ch) < 
+min_remove_level[bnum] && strcmp(GET_NAME(ch), curr_board->msg[ind].author)
           ) &&
            GET_LEVEL(ch) < OVERSEER) 
   {
@@ -748,6 +807,10 @@ int board_display_msg(CHAR_DATA *ch, char *arg, int bnum)
       return 1;
     }
   }
+  if (board_class[bnum] != -1 && GET_LEVEL(ch) < IMMORTAL && GET_CLASS(ch) != board_class[bnum]) {
+     send_to_char("You do not understand the writings written on this board.\r\n",ch);
+     return 1;
+  }
 
   if ((GET_LEVEL(ch) < min_read_level[bnum]) &&
         (GET_LEVEL(ch) < OVERSEER)) 
@@ -810,6 +873,10 @@ int board_show_board(CHAR_DATA *ch, char *arg, int bnum)
       send_to_char("You don't have the right!  Talk to your clan leader.\n\r", ch);
       return eSUCCESS;
     }
+  }
+  if (board_class[bnum] != -1 && GET_LEVEL(ch) < IMMORTAL && GET_CLASS(ch) != board_class[bnum]) {
+     send_to_char("You do not understand the writings written on this board.\r\n",ch);
+     return eSUCCESS;
   }
 
   if ((GET_LEVEL(ch) < min_read_level[bnum]) &&

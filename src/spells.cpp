@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.96 2004/05/29 21:29:33 urizen Exp $ */
+/* $Id: spells.cpp,v 1.97 2004/05/30 18:59:04 urizen Exp $ */
 
 extern "C"
 {
@@ -50,6 +50,8 @@ extern "C"
 #include <interp.h>
 #include <act.h>
 #include <returnvals.h> 
+#include <ki.h>
+#include <sing.h>
 
 // Global data 
 
@@ -371,6 +373,85 @@ struct spell_info_type spell_info [ ] =
 
  { /* 144 */ 12, POSITION_STANDING, 24, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_oaken_fortitude, SKILL_INCREASE_MEDIUM },
 };
+
+
+struct skill_stuff skill_info[] =
+{
+/*  1 */                { "trip", SKILL_INCREASE_MEDIUM },
+/*  2 */               { "dodge", SKILL_INCREASE_HARD },
+/*  3 */       { "second_attack", SKILL_INCREASE_HARD },
+/*  4 */              { "disarm", SKILL_INCREASE_MEDIUM },
+/*  5 */        { "third_attack", SKILL_INCREASE_HARD },
+/*  6 */               { "parry", SKILL_INCREASE_HARD },
+/*  7 */         { "deathstroke", SKILL_INCREASE_EASY },
+/*  8 */              { "circle", SKILL_INCREASE_MEDIUM },
+/*  9 */             { "berserk", SKILL_INCREASE_HARD },
+/* 10 */            { "headbutt", SKILL_INCREASE_HARD },
+/* 11 */          { "eagle claw", SKILL_INCREASE_MEDIUM },
+/* 12 */      { "quivering palm", SKILL_INCREASE_EASY },
+/* 13 */                { "palm", SKILL_INCREASE_HARD },
+/* 14 */               { "stalk", SKILL_INCREASE_HARD },
+/* 15 */              { "UNUSED", 0 },
+/* 16 */       { "dual_backstab", SKILL_INCREASE_HARD },
+/* 17 */              { "hitall", SKILL_INCREASE_HARD },
+/* 18 */                { "stun", SKILL_INCREASE_HARD },
+/* 19 */                { "scan", SKILL_INCREASE_EASY },
+/* 20 */            { "consider", SKILL_INCREASE_EASY },
+/* 21 */              { "switch", SKILL_INCREASE_EASY },
+/* 22 */            { "redirect", SKILL_INCREASE_MEDIUM },
+/* 23 */              { "ambush", SKILL_INCREASE_MEDIUM },
+/* 24 */              { "forage", SKILL_INCREASE_HARD },
+/* 25 */                { "tame", SKILL_INCREASE_MEDIUM },
+/* 26 */               { "track", SKILL_INCREASE_HARD },
+/* 27 */              { "skewer", SKILL_INCREASE_HARD },
+/* 28 */                { "slip", SKILL_INCREASE_MEDIUM },
+/* 29 */             { "retreat", SKILL_INCREASE_HARD },
+/* 30 */                { "rage", SKILL_INCREASE_MEDIUM },
+/* 31 */           { "battlecry", SKILL_INCREASE_EASY },
+/* 32 */             { "archery", SKILL_INCREASE_MEDIUM },
+/* 33 */             { "riposte", SKILL_INCREASE_HARD },
+/* 34 */           { "lay hands", SKILL_INCREASE_EASY },
+/* 35 */        { "insane chant", 0 },
+/* 36 */        { "glitter dust", 0 },
+/* 37 */               { "sneak", SKILL_INCREASE_HARD },
+/* 38 */                { "hide", SKILL_INCREASE_HARD },
+/* 39 */               { "steal", SKILL_INCREASE_MEDIUM },
+/* 40 */            { "backstab", SKILL_INCREASE_MEDIUM },
+/* 41 */           { "pick_lock", SKILL_INCREASE_EASY },
+/* 42 */                { "kick", SKILL_INCREASE_MEDIUM },
+/* 43 */                { "bash", SKILL_INCREASE_HARD },
+/* 44 */              { "rescue", SKILL_INCREASE_MEDIUM },
+/* 45 */          { "blood_fury", SKILL_INCREASE_EASY },
+/* 46 */          { "dual_wield", SKILL_INCREASE_EASY },
+/* 47 */          { "harm_touch", SKILL_INCREASE_EASY },
+/* 48 */        { "shield_block", SKILL_INCREASE_HARD },
+/* 49 */        { "blade_shield", SKILL_INCREASE_EASY },
+/* 50 */              { "pocket", SKILL_INCREASE_MEDIUM },
+/* 51 */               { "guard", SKILL_INCREASE_MEDIUM },
+/* 52 */              { "frenzy", SKILL_INCREASE_HARD },
+/* 53 */       { "blindfighting", SKILL_INCREASE_HARD },
+/* 54 */   { "focused_repelance", SKILL_INCREASE_EASY },
+/* 55 */        { "vital_strike", SKILL_INCREASE_EASY },
+/* 56 */      { "crazed_assault", SKILL_INCREASE_HARD },
+/* 57 */   { "divine_protection", 0 },
+/* 58 */ { "bludgeoning_weapons", SKILL_INCREASE_MEDIUM },
+/* 59 */    { "piercing_weapons", SKILL_INCREASE_MEDIUM },
+/* 60 */    { "slashing_weapons", SKILL_INCREASE_MEDIUM },
+/* 61 */    { "whipping_weapons", SKILL_INCREASE_MEDIUM },
+/* 62 */    { "crushing_weapons", SKILL_INCREASE_MEDIUM },
+/* 63 */  { "two_handed_weapons", SKILL_INCREASE_MEDIUM },
+/* 64 */        { "hand_to_hand", SKILL_INCREASE_MEDIUM },
+/* 65 */            { "bullrush", SKILL_INCREASE_HARD },
+/* 66 */            { "ferocity", SKILL_INCREASE_MEDIUM },
+/* 67 */             { "tactics", SKILL_INCREASE_MEDIUM },
+/* 68 */              { "deceit", SKILL_INCREASE_MEDIUM },
+/* 69 */             { "release", SKILL_INCREASE_EASY },
+/* 70 */           { "fear gaze", 0 },
+/* 71 */            { "eyegouge", SKILL_INCREASE_HARD },
+/* 72 */         { "magic resist", SKILL_INCREASE_HARD },
+/*    */ { "\n", 0 },
+};
+
 
 
 char *skills[]=
@@ -1152,6 +1233,23 @@ int stat_mod [] = {
 7,8,9,10
 };
 
+int get_difficulty(int skillnum)
+{
+  extern struct skill_stuff skill_info[];
+  extern struct ki_info_type ki_info [ ];
+  extern struct song_info_type song_info[];
+
+  if (skillnum >= SKILL_BASE && skillnum <= SKILL_MAX) 
+    return skill_info[skillnum - SKILL_BASE].difficulty;
+  if (skillnum >= KI_OFFSET && skillnum <= KI_OFFSET+MAX_KI_LIST)
+     return ki_info[skillnum - KI_OFFSET].difficulty;
+  if (skillnum >= SKILL_SONG_BASE && skillnum <= SKILL_SONG_MAX)
+     return song_info[skillnum - SKILL_SONG_BASE].difficulty;
+
+  return 0;
+}
+
+
 bool skill_success(CHAR_DATA *ch, CHAR_DATA *victim, int skillnum, int mod = 0)
 {
 //  extern int stat_mod[];
@@ -1239,10 +1337,10 @@ bool skill_success(CHAR_DATA *ch, CHAR_DATA *victim, int skillnum, int mod = 0)
 	stat = CON;
 	break;
        }
-  int i = 0;
+  int i = 0,learned = 0;
 
   if (!IS_MOB(ch))
-    i = has_skill(ch, skillnum);
+    i = learned = has_skill(ch, skillnum);
   else
     i = GET_LEVEL(ch);
  
@@ -1260,11 +1358,17 @@ bool skill_success(CHAR_DATA *ch, CHAR_DATA *victim, int skillnum, int mod = 0)
   if (i < 33) i = 33;
   if (IS_AFFECTED2(ch, AFF_FOCUS) && ((skillnum >= SKILL_SONG_BASE && 
 skillnum <= SKILL_SONG_MAX) || (skillnum >= KI_OFFSET && skillnum <= (KI_OFFSET+MAX_KI_LIST))))
-   i = 101; // auto success on songs and ki
+   i = 101; // auto success on songs and ki with focus
+
+
   if (i > number(1,101))
     return TRUE; // Success
-  else
+  else {
+  /* Check for skill improvement anyway */
+   int i = get_difficulty(skillnum);
+   skill_increase_check(ch, skillnum, learned,i);
    return FALSE; // Failure  
+  }
 }
 
 // Assumes that *argument does start with first letter of chopped string 

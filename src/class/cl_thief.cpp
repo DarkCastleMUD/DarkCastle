@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.63 2004/05/27 21:36:15 urizen Exp $
+| $Id: cl_thief.cpp,v 1.64 2004/05/30 18:59:06 urizen Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -42,8 +42,6 @@ int palm(CHAR_DATA *ch, struct obj_data *obj_object,
        return eFAILURE;
     }
   }
-
-  skill_increase_check(ch, SKILL_PALM, has_skill(ch,SKILL_PALM), SKILL_INCREASE_EASY);
 
   move_obj(obj_object, ch);
   
@@ -115,7 +113,6 @@ int do_eyegouge(CHAR_DATA *ch, char *argument, int cmd)
      SET_BIT(victim->combat, COMBAT_THI_EYEGOUGE);
   }
   WAIT_STATE(ch, PULSE_VIOLENCE*3);
-   skill_increase_check(ch, SKILL_EYEGOUGE, has_skill(ch,SKILL_EYEGOUGE), SKILL_INCREASE_MEDIUM);
   return retval | eSUCCESS;
 }
 
@@ -185,7 +182,6 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
     itemp++; // One extra %'s chance.
   if(has_skill(ch,SKILL_BACKSTAB)) 
   {
-    skill_increase_check(ch, SKILL_BACKSTAB, skill, SKILL_INCREASE_MEDIUM);
   }
   else {
     send_to_char("You don't know how to backstab people!\r\n", ch);
@@ -237,8 +233,6 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
      has_skill(ch, SKILL_DUAL_BACKSTAB)
     )
   {
-        skill_increase_check(ch, SKILL_DUAL_BACKSTAB, has_skill(ch,SKILL_DUAL_BACKSTAB), SKILL_INCREASE_HARD);
-
         if(skill_success(ch,victim,SKILL_DUAL_BACKSTAB))
         {
 //           percent = number(1, 101);
@@ -312,8 +306,6 @@ int do_circle(CHAR_DATA *ch, char *argument, int cmd)
    }
       
 //   stop_fighting(ch);
-   skill_increase_check(ch, SKILL_CIRCLE, has_skill(ch,SKILL_CIRCLE), SKILL_INCREASE_MEDIUM);
-
    act ("You circle around your target...",  ch, 0, 0, TO_CHAR, 0);
    act ("$n circles around $s target...", ch, 0, 0, TO_ROOM, INVIS_NULL);
 
@@ -365,7 +357,7 @@ int do_trip(CHAR_DATA *ch, char *argument, int cmd)
   one_argument(argument, name);
   if (GET_CLASS(ch) == CLASS_BARD)
   {
-    if (ch->song_number == 21) /* Crushing crescendo*/
+    if (ch->song_timer && ch->song_number == 26) /* Crushing crescendo */
     {
        send_to_char("You are too distracted by your song to do this.\r\n",ch);
 	return eFAILURE;
@@ -392,8 +384,6 @@ int do_trip(CHAR_DATA *ch, char *argument, int cmd)
 
   if(!can_be_attacked(ch, victim) || !can_attack(ch))
     return eFAILURE;
-
-   skill_increase_check(ch, SKILL_TRIP, has_skill(ch,SKILL_TRIP), SKILL_INCREASE_MEDIUM);
 
   if(affected_by_spell(victim, SPELL_IRON_ROOTS)) {
     act("You try to trip $N but tree roots around $S legs keep him upright.", ch, 0, victim, TO_CHAR, 0);
@@ -493,8 +483,6 @@ int do_stalk(CHAR_DATA *ch, char *argument, int cmd)
     send_to_char("I bet you think you're a thief ;)\n\r", ch);
     return eFAILURE;
   } 
-
-  skill_increase_check(ch, SKILL_STALK, has_skill(ch,SKILL_STALK), SKILL_INCREASE_EASY);
 
   if(!skill_success(ch,leader,SKILL_STALK))
     do_follow(ch, argument, 9);
@@ -626,8 +614,8 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
 	return eFAILURE;
     }
 
-    if (has_skill(ch,SKILL_STEAL))
-      skill_increase_check(ch, SKILL_STEAL, has_skill(ch,SKILL_STEAL), SKILL_INCREASE_HARD);
+//    if (has_skill(ch,SKILL_STEAL))
+      //skill_increase_check(ch, SKILL_STEAL, has_skill(ch,SKILL_STEAL), SKILL_INCREASE_HARD);
 
     if (!skill_success(ch,victim,SKILL_STEAL)) 
     {
@@ -974,8 +962,8 @@ int do_pocket(CHAR_DATA *ch, char *argument, int cmd)
 */
   WAIT_STATE(ch, 10); /* It takes TIME to steal */
  
-  if(has_skill(ch,SKILL_POCKET))
-    skill_increase_check(ch, SKILL_POCKET, has_skill(ch,SKILL_POCKET),SKILL_INCREASE_MEDIUM);
+//  if(has_skill(ch,SKILL_POCKET))
+//    skill_increase_check(ch, SKILL_POCKET, has_skill(ch,SKILL_POCKET),SKILL_INCREASE_MEDIUM);
 
   if (!skill_success(ch, victim, SKILL_POCKET)) 
   {
@@ -1088,7 +1076,7 @@ int do_pick(CHAR_DATA *ch, char *argument, int cmd)
       send_to_char("It resists your attempts at picking it.\n\r", ch);
   else
   {
-      skill_increase_check(ch, SKILL_PICK_LOCK, has_skill(ch,SKILL_PICK_LOCK), SKILL_INCREASE_MEDIUM);
+//      skill_increase_check(ch, SKILL_PICK_LOCK, has_skill(ch,SKILL_PICK_LOCK), SKILL_INCREASE_MEDIUM);
 
       REMOVE_BIT(obj->obj_flags.value[1], CONT_LOCKED);
       send_to_char("*Click*\n\r", ch);
@@ -1107,7 +1095,7 @@ int do_pick(CHAR_DATA *ch, char *argument, int cmd)
       send_to_char("You seem to be unable to pick ths lock.\n\r", ch);
   else
   {
-      skill_increase_check(ch, SKILL_PICK_LOCK, has_skill(ch,SKILL_PICK_LOCK), SKILL_INCREASE_MEDIUM);
+      //skill_increase_check(ch, SKILL_PICK_LOCK, has_skill(ch,SKILL_PICK_LOCK), SKILL_INCREASE_MEDIUM);
 
       REMOVE_BIT(EXIT(ch, door)->exit_info, EX_LOCKED);
       if (EXIT(ch, door)->keyword)
@@ -1326,7 +1314,7 @@ int do_slip(struct char_data *ch, char *argument, int cmd)
      }
    }
 
-   skill_increase_check(ch, SKILL_SLIP, has_skill(ch,SKILL_SLIP), SKILL_INCREASE_EASY);
+   //skill_increase_check(ch, SKILL_SLIP, has_skill(ch,SKILL_SLIP), SKILL_INCREASE_EASY);
 
    if (!skill_success(ch,vict,SKILL_SLIP)) {
       if(obj_index[obj->item_number].virt == 393) {
@@ -1389,7 +1377,7 @@ int do_vitalstrike(struct char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  skill_increase_check(ch, SKILL_VITAL_STRIKE, has_skill(ch,SKILL_VITAL_STRIKE), SKILL_INCREASE_EASY);
+  //skill_increase_check(ch, SKILL_VITAL_STRIKE, has_skill(ch,SKILL_VITAL_STRIKE), SKILL_INCREASE_EASY);
   
   if(!skill_success(ch,NULL,SKILL_VITAL_STRIKE)) {
     act("$n starts jabbing $s weapons around $mself and almost chops off $s pinkie finger."
@@ -1469,7 +1457,7 @@ int do_deceit(struct char_data *ch, char *argument, int cmd)
     }   
   }
     
-  skill_increase_check(ch, SKILL_DECEIT, has_skill(ch,SKILL_DECEIT), SKILL_INCREASE_EASY);
+  //skill_increase_check(ch, SKILL_DECEIT, has_skill(ch,SKILL_DECEIT), SKILL_INCREASE_EASY);
   WAIT_STATE(ch, PULSE_VIOLENCE * 2);
   GET_MOVE(ch) /= 2;
   return eSUCCESS;

@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.27 2004/05/28 23:33:06 urizen Exp $ */
+/* $Id: ki.cpp,v 1.28 2004/05/30 18:59:04 urizen Exp $ */
 
 extern "C"
 {
@@ -42,47 +42,53 @@ void add_memory(CHAR_DATA *ch, char *victim, char type);
 struct ki_info_type ki_info [ ] = {
 { /* 0 */
 	12, POSITION_FIGHTING, 10,
-	TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, ki_blast
+	TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, ki_blast,
+	SKILL_INCREASE_HARD
 },
 
 { /* 1 */
 	12, POSITION_FIGHTING, 15,
-	TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, ki_punch
+	TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, ki_punch,
+	SKILL_INCREASE_HARD
 },
 
 { /* 2 */
 	12, POSITION_STANDING, 2,
-	TAR_IGNORE|TAR_CHAR_ROOM|TAR_SELF_ONLY, ki_sense
+	TAR_IGNORE|TAR_CHAR_ROOM|TAR_SELF_ONLY, ki_sense,
+	SKILL_INCREASE_MEDIUM
 },
 
 { /* 3 */
 	12, POSITION_STANDING, 5,
-	TAR_IGNORE, ki_storm
+	TAR_IGNORE, ki_storm, SKILL_INCREASE_HARD
 },
 
 { /* 4 */
         12, POSITION_STANDING, 25,
-        TAR_IGNORE|TAR_CHAR_ROOM|TAR_SELF_ONLY, ki_speed
+        TAR_IGNORE|TAR_CHAR_ROOM|TAR_SELF_ONLY, ki_speed,
+        SKILL_INCREASE_HARD
 },
 
 { /* 5 */
         12, POSITION_RESTING, 4,
-        TAR_IGNORE|TAR_CHAR_ROOM|TAR_SELF_ONLY, ki_purify
+        TAR_IGNORE|TAR_CHAR_ROOM|TAR_SELF_ONLY, ki_purify,
+	SKILL_INCREASE_MEDIUM
 },
 
 { /* 6 */
 	12, POSITION_FIGHTING, 10,
-        TAR_CHAR_ROOM|TAR_FIGHT_VICT, ki_disrupt
+        TAR_CHAR_ROOM|TAR_FIGHT_VICT, ki_disrupt,
+	SKILL_INCREASE_HARD
 },
 
 { /* 7 */
 	12, POSITION_FIGHTING, 10,
-        TAR_IGNORE, ki_stance
+        TAR_IGNORE, ki_stance, SKILL_INCREASE_EASY
 },
 
 { /* 8 */
 	12, POSITION_FIGHTING, 20,
-        TAR_IGNORE, ki_agility
+        TAR_IGNORE, ki_agility, SKILL_INCREASE_MEDIUM
 }
 
 };
@@ -737,7 +743,6 @@ int ki_agility( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
     }
   }
   
-  skill_increase_check(ch, KI_AGILITY+KI_OFFSET, learned, SKILL_INCREASE_EASY);
   WAIT_STATE(ch, PULSE_VIOLENCE * 2);
   return eSUCCESS;  
 }  

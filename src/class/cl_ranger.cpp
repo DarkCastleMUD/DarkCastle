@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: cl_ranger.cpp,v 1.40 2004/05/25 16:39:03 urizen Exp $ | cl_ranger.C  *
+ * $Id: cl_ranger.cpp,v 1.41 2004/05/30 18:59:06 urizen Exp $ | cl_ranger.C  *
  * Description: Ranger skills/spells                                          *
  *                                                                            *
  * Revision History                                                           *
@@ -127,8 +127,6 @@ int do_tame(CHAR_DATA *ch, char *arg, int cmd)
     act("$N is wilder than you thought.", ch, NULL, victim, TO_CHAR, 0);
     return eFAILURE;
   }
-
-  skill_increase_check(ch, SKILL_TAME, has_skill(ch,SKILL_TAME), SKILL_INCREASE_MEDIUM);
 
   if(!skill_success(ch,victim,SKILL_TAME) || saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC) >= 0) {
     act("$N is unreceptive to your attempts to tame $M.", ch, NULL, victim, TO_CHAR, 0);
@@ -442,8 +440,6 @@ int ambush(CHAR_DATA *ch)
           send_to_char("Your target is far too alert to accomplish an ambush!\r\n", i);
           continue;
        }
-
-       skill_increase_check(i, SKILL_AMBUSH, has_skill(ch,SKILL_AMBUSH), SKILL_INCREASE_MEDIUM);
 
        if(skill_success(i,ch, SKILL_AMBUSH)) 
        { 
@@ -1243,8 +1239,6 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
 
   if(prob < 10) prob = 10;
   if(prob > 100) prob = 100;
-
-  skill_increase_check(ch, SKILL_ARCHERY, has_skill(ch,SKILL_ARCHERY), SKILL_INCREASE_HARD);
 
   if(!skill_success(ch,victim, SKILL_ARCHERY))
   {

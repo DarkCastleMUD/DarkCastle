@@ -54,171 +54,184 @@ extern bool check_social( CHAR_DATA *ch, char *pcomm, int length, char *arg );
 //        SING_FUN *exec_pointer; /* other function to call */
 //        SING_FUN *song_pulse;    /* other other function to call */
 //        SING_FUN *intrp_pointer; /* other other function to call */
-
+//	  int difficulty
 struct song_info_type song_info [ ] = {
 
 { /* 0 */
         1, POSITION_RESTING, 0, SKILL_SONG_LIST_SONGS,
-        TAR_IGNORE, song_listsongs, NULL, NULL, NULL
+        TAR_IGNORE, song_listsongs, NULL, NULL, NULL,
+	SKILL_INCREASE_EASY
 },
 
 { /* 1 */
 	1, POSITION_FIGHTING, 1, SKILL_SONG_WHISTLE_SHARP, 
 	TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, 
-	song_whistle_sharp, NULL, NULL, NULL
+	song_whistle_sharp, NULL, NULL, NULL,
+	SKILL_INCREASE_MEDIUM
 },
 
 { /* 2 */
 	0, POSITION_RESTING, 0, SKILL_SONG_STOP, 
         TAR_IGNORE, 
-        song_stop, NULL, NULL, NULL
+        song_stop, NULL, NULL, NULL, SKILL_INCREASE_EASY
 },
 
 { /* 3 */
 	10, POSITION_RESTING, 2, SKILL_SONG_TRAVELING_MARCH, 
         TAR_IGNORE, 
-        song_traveling_march, execute_song_traveling_march, NULL, NULL
+        song_traveling_march, execute_song_traveling_march, NULL, NULL,
+        SKILL_INCREASE_EASY
 },
 
 { /* 4 */
 	10, POSITION_RESTING, 9, SKILL_SONG_BOUNT_SONNET, 
         TAR_IGNORE, 
         song_bountiful_sonnet, execute_song_bountiful_sonnet,
-	NULL, NULL
+	NULL, NULL, SKILL_INCREASE_EASY
 },
 
 { /* 5 */
 	5, POSITION_STANDING, 9, SKILL_SONG_INSANE_CHANT, 
         TAR_IGNORE, 
         song_insane_chant, execute_song_insane_chant,
-	NULL, NULL
+	NULL, NULL, SKILL_INCREASE_MEDIUM
 },
 
-{ /* 5 */
+{ /* 7 */
         4, POSITION_STANDING, 5, SKILL_SONG_GLITTER_DUST, 
         TAR_IGNORE,
         song_glitter_dust, execute_song_glitter_dust,
-        NULL, NULL
-},
-
-{ /* 18 */
-	6, POSITION_FIGHTING, 2, SKILL_SONG_SYNC_CHORD, 
-	TAR_CHAR_ROOM|TAR_FIGHT_VICT, 
-	song_synchronous_chord, execute_song_synchronous_chord, NULL, NULL
-},
-
-{ /* 6 */
-	10, POSITION_RESTING, 2, SKILL_SONG_HEALING_MELODY, 
-	TAR_IGNORE, 
-	song_healing_melody, execute_song_healing_melody, NULL, NULL
-},
-
-{ /* 7 */
-        3, POSITION_FIGHTING, 8, SKILL_SONG_STICKY_LULL, 
-        TAR_CHAR_ROOM|TAR_FIGHT_VICT,
-        song_sticky_lullaby, execute_song_sticky_lullaby, NULL, NULL
-}, 
-
-{ /* 7 */
-	1, POSITION_FIGHTING, 1, SKILL_SONG_REVEAL_STACATO, 
-	TAR_IGNORE, 
-	song_revealing_stacato, execute_song_revealing_stacato, NULL, NULL
+        NULL, NULL, SKILL_INCREASE_HARD
 },
 
 { /* 8 */
-	10, POSITION_RESTING, 3, SKILL_SONG_FLIGHT_OF_BEE, 
-        TAR_IGNORE, 
-        song_flight_of_bee, execute_song_flight_of_bee,
-        pulse_flight_of_bee, intrp_flight_of_bee
+	6, POSITION_FIGHTING, 2, SKILL_SONG_SYNC_CHORD, 
+	TAR_CHAR_ROOM|TAR_FIGHT_VICT, 
+	song_synchronous_chord, execute_song_synchronous_chord, NULL, 
+NULL,   SKILL_INCREASE_MEDIUM
 },
 
 { /* 9 */
-	5, POSITION_RESTING, 5, SKILL_SONG_JIG_OF_ALACRITY, 
-        TAR_IGNORE, 
-        song_jig_of_alacrity, execute_song_jig_of_alacrity,
-        pulse_jig_of_alacrity, intrp_jig_of_alacrity
+	10, POSITION_RESTING, 2, SKILL_SONG_HEALING_MELODY, 
+	TAR_IGNORE, 
+	song_healing_melody, execute_song_healing_melody, NULL, NULL,
+        SKILL_INCREASE_MEDIUM
 },
 
 { /* 10 */
-	7, POSITION_STANDING, 3, SKILL_SONG_NOTE_OF_KNOWLEDGE, 
-	TAR_OBJ_INV, song_note_of_knowledge,
-	execute_song_note_of_knowledge, NULL, NULL
-},
+        3, POSITION_FIGHTING, 8, SKILL_SONG_STICKY_LULL, 
+        TAR_CHAR_ROOM|TAR_FIGHT_VICT,
+        song_sticky_lullaby, execute_song_sticky_lullaby, NULL, NULL,
+        SKILL_INCREASE_HARD
+}, 
 
 { /* 11 */
-        2, POSITION_FIGHTING, 4, SKILL_SONG_TERRIBLE_CLEF, 
-        TAR_IGNORE, song_terrible_clef, execute_song_terrible_clef, NULL,
-        NULL
+	1, POSITION_FIGHTING, 1, SKILL_SONG_REVEAL_STACATO, 
+	TAR_IGNORE, 
+	song_revealing_stacato, execute_song_revealing_stacato, NULL, 
+NULL,   SKILL_INCREASE_HARD
 },
 
 { /* 12 */
-	10, POSITION_RESTING, 5, SKILL_SONG_SOOTHING_REMEM, 
+	10, POSITION_RESTING, 3, SKILL_SONG_FLIGHT_OF_BEE, 
         TAR_IGNORE, 
-        song_soothing_remembrance, execute_song_soothing_remembrance,
-        NULL, NULL
+        song_flight_of_bee, execute_song_flight_of_bee,
+        pulse_flight_of_bee, intrp_flight_of_bee,
+        SKILL_INCREASE_MEDIUM
 },
 
 { /* 13 */
-	15, POSITION_STANDING, 2, SKILL_SONG_FORGETFUL_RHYTHM, 
-        TAR_CHAR_ROOM, 
-        song_forgetful_rhythm, execute_song_forgetful_rhythm,
-	NULL, NULL
+	5, POSITION_RESTING, 5, SKILL_SONG_JIG_OF_ALACRITY, 
+        TAR_IGNORE, 
+        song_jig_of_alacrity, execute_song_jig_of_alacrity,
+        pulse_jig_of_alacrity, intrp_jig_of_alacrity,
+        SKILL_INCREASE_HARD
 },
 
 { /* 14 */
-	7, POSITION_STANDING, 4, SKILL_SONG_SEARCHING_SONG,
-	TAR_CHAR_WORLD, song_searching_song,
-	execute_song_searching_song, NULL, NULL
+	7, POSITION_STANDING, 3, SKILL_SONG_NOTE_OF_KNOWLEDGE, 
+	TAR_OBJ_INV, song_note_of_knowledge,
+	execute_song_note_of_knowledge, NULL, NULL,
+        SKILL_INCREASE_MEDIUM
 },
-
-{ /* 16 */
-        4, POSITION_FIGHTING, 10, SKILL_SONG_VIGILANT_SIREN, 
-        TAR_IGNORE, song_vigilant_siren, execute_song_vigilant_siren,
-        pulse_vigilant_siren, intrp_vigilant_siren
-}, 
 
 { /* 15 */
-	20, POSITION_FIGHTING, 10, SKILL_SONG_ASTRAL_CHANTY, 
-        TAR_CHAR_WORLD, 
-        song_astral_chanty, execute_song_astral_chanty,
-	pulse_song_astral_chanty, NULL
+        2, POSITION_FIGHTING, 4, SKILL_SONG_TERRIBLE_CLEF, 
+        TAR_IGNORE, song_terrible_clef, execute_song_terrible_clef, NULL,
+        NULL,
+        SKILL_INCREASE_MEDIUM
 },
 
 { /* 16 */
-	1, POSITION_FIGHTING, 10, SKILL_SONG_DISARMING_LIMERICK, 
-        TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, 
-        song_disrupt, NULL,
-	NULL, NULL
+	10, POSITION_RESTING, 5, SKILL_SONG_SOOTHING_REMEM, 
+        TAR_IGNORE, 
+        song_soothing_remembrance, execute_song_soothing_remembrance,
+        NULL, NULL, SKILL_INCREASE_MEDIUM
 },
 
 { /* 17 */
-	2, POSITION_FIGHTING, 2, SKILL_SONG_SHATTERING_RESO, 
-        TAR_OBJ_ROOM, 
-        song_shattering_resonance, execute_song_shattering_resonance,
-	NULL, NULL
+	15, POSITION_STANDING, 2, SKILL_SONG_FORGETFUL_RHYTHM, 
+        TAR_CHAR_ROOM, 
+        song_forgetful_rhythm, execute_song_forgetful_rhythm,
+	NULL, NULL, SKILL_INCREASE_HARD
 },
 
 { /* 18 */
+	7, POSITION_STANDING, 4, SKILL_SONG_SEARCHING_SONG,
+	TAR_CHAR_WORLD, song_searching_song,
+	execute_song_searching_song, NULL, NULL, SKILL_INCREASE_HARD
+},
+
+{ /* 19 */
+        4, POSITION_FIGHTING, 10, SKILL_SONG_VIGILANT_SIREN, 
+        TAR_IGNORE, song_vigilant_siren, execute_song_vigilant_siren,
+        pulse_vigilant_siren, intrp_vigilant_siren,
+        SKILL_INCREASE_HARD
+}, 
+
+{ /* 20 */
+	20, POSITION_FIGHTING, 10, SKILL_SONG_ASTRAL_CHANTY, 
+        TAR_CHAR_WORLD, 
+        song_astral_chanty, execute_song_astral_chanty,
+	pulse_song_astral_chanty, NULL, SKILL_INCREASE_HARD
+},
+
+{ /* 21 */
+	1, POSITION_FIGHTING, 10, SKILL_SONG_DISARMING_LIMERICK, 
+        TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, 
+        song_disrupt, NULL,
+	NULL, NULL, SKILL_INCREASE_HARD
+},
+
+{ /* 22 */
+	2, POSITION_FIGHTING, 2, SKILL_SONG_SHATTERING_RESO, 
+        TAR_OBJ_ROOM, 
+        song_shattering_resonance, execute_song_shattering_resonance,
+	NULL, NULL, SKILL_INCREASE_HARD
+},
+
+{ /* 23 */
 	8, POSITION_FIGHTING, 5, SKILL_SONG_UNRESIST_DITTY, 
         TAR_IGNORE, 
         song_unresistable_ditty, execute_song_unresistable_ditty,
-	NULL, NULL
+	NULL, NULL, SKILL_INCREASE_MEDIUM
 },
-{ /* 19 */
+{ /* 24 */
         8, POSITION_FIGHTING, 4, SKILL_SONG_FANATICAL_FANFARE,
        TAR_IGNORE, song_fanatical_fanfare, execute_song_fanatical_fanfare,pulse_song_fanatical_fanfare,
-       intrp_song_fanatical_fanfare
+       intrp_song_fanatical_fanfare, SKILL_INCREASE_MEDIUM
 
 },
-{ /* 20 */
+{ /* 25 */
         12, POSITION_FIGHTING, 7, SKILL_SONG_DISCHORDANT_DIRGE,
 	        TAR_CHAR_ROOM|TAR_FIGHT_VICT,
-        song_dischordant_dirge, execute_song_dischordant_dirge, NULL, NULL
+        song_dischordant_dirge, execute_song_dischordant_dirge, NULL, 
+NULL,    SKILL_INCREASE_HARD
 },
-{ /* 21 */
+{ /* 26 */
         2, POSITION_FIGHTING, 8, SKILL_SONG_CRUSHING_CRESCENDO, 
         TAR_IGNORE, song_crushing_crescendo, execute_song_crushing_crescendo,
-        NULL, NULL
+        NULL, NULL, SKILL_INCREASE_HARD
 }
 
 };
@@ -680,8 +693,6 @@ act("You resist $n's disarming limerick!",ch,NULL,victim,TO_VICT,0);
    }
 
 
-   skill_increase_check(ch, SKILL_SONG_DISARMING_LIMERICK, skill, SKILL_INCREASE_MEDIUM);
-
    return spell_dispel_magic(GET_LEVEL(ch)-1, ch, victim, 0, 0);
 }
 
@@ -733,8 +744,6 @@ act("You resist $n's whistle sharp!",ch,NULL,victim,TO_VICT,0);
           ch, 0, victim, TO_ROOM, 0);
       return retval;
    }
-
-   skill_increase_check(ch, SKILL_SONG_WHISTLE_SHARP, skill, SKILL_INCREASE_HARD);
 
    int wait = song_info[ch->song_number].beats - (skill / 10);
    wait = MAX(wait, 2);
@@ -798,8 +807,6 @@ int execute_song_healing_melody( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA
          GET_HIT(master) = GET_MAX_HIT(master);
    }
 
-   skill_increase_check(ch, SKILL_SONG_HEALING_MELODY, skill, SKILL_INCREASE_EASY);
-
    if(//number(1, 101) > ( 50 + skill/2 )
 	!skill_success(ch, NULL, SKILL_SONG_HEALING_MELODY)  ) {
       send_to_char("You run out of lyrics and end the song.\r\n", ch);
@@ -849,8 +856,6 @@ int execute_song_revealing_stacato( byte level, CHAR_DATA *ch, char *arg, CHAR_D
    int specialization = skill / 100;
    skill %= 100;
 
-   skill_increase_check(ch, SKILL_SONG_REVEAL_STACATO, skill, SKILL_INCREASE_EASY);
-
   if(//number(1, 101) > ( 50 + skill/2 )
         !skill_success(ch,NULL,  SKILL_SONG_REVEAL_STACATO)  ) {
       send_to_char("You run out of lyrics and end the song.\r\n", ch);
@@ -884,7 +889,6 @@ int execute_song_note_of_knowledge( byte level, CHAR_DATA *ch, char *arg, CHAR_D
 
    if(obj) {
       spell_identify(GET_LEVEL(ch), ch, 0, obj, 0);
-      skill_increase_check(ch, SKILL_SONG_NOTE_OF_KNOWLEDGE, skill, SKILL_INCREASE_EASY);
    }
    else send_to_char("You don't seem to have that item.\r\n", ch);
    return eSUCCESS;
@@ -943,8 +947,6 @@ act("You resist $n's terrible clef!",ch,NULL,victim,TO_VICT,0);
           ch, 0, victim, TO_ROOM, 0);
 	return retval;
    }
-
-   skill_increase_check(ch, SKILL_SONG_TERRIBLE_CLEF, skill, SKILL_INCREASE_EASY);
 
   if(!skill_success(ch, victim, SKILL_SONG_TERRIBLE_CLEF)  ) {
       send_to_char("You run out of lyrics and end the song.\r\n", ch);
@@ -1021,8 +1023,6 @@ int execute_song_soothing_remembrance( byte level, CHAR_DATA *ch, char *arg, CHA
          GET_MANA(master) = GET_MAX_MANA(master);
    }
 
-   skill_increase_check(ch, SKILL_SONG_SOOTHING_REMEM, skill, SKILL_INCREASE_MEDIUM);
-
   if(//number(1, 101) > ( 50 + skill/2 )
         !skill_success(ch, NULL, SKILL_SONG_SOOTHING_REMEM)  ) {
       send_to_char("You run out of lyrics and end the song.\r\n", ch);
@@ -1086,8 +1086,6 @@ int execute_song_traveling_march( byte level, CHAR_DATA *ch, char *arg, CHAR_DAT
       if(GET_MOVE(master) > GET_MAX_MOVE(master))
          GET_MOVE(master) = GET_MAX_MOVE(master);
    }
-
-   skill_increase_check(ch, SKILL_SONG_TRAVELING_MARCH, skill, SKILL_INCREASE_EASY);
 
   if(//number(1, 101) > ( 50 + skill/2 )
         !skill_success(ch, NULL, SKILL_SONG_TRAVELING_MARCH)  ) {
@@ -1217,7 +1215,6 @@ int execute_song_astral_chanty( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA 
       {
         do_astral_chanty_movement(ch, victim);
       }
-      skill_increase_check(ch, SKILL_SONG_ASTRAL_CHANTY, skill, SKILL_INCREASE_EASY);   
    }
 
    // free our stored char name
@@ -1268,8 +1265,6 @@ int execute_song_forgetful_rhythm( byte level, CHAR_DATA *ch, char *arg, CHAR_DA
       send_to_char("You are sung to about butterflies and bullfrogs.\r\n", victim);
       return eSUCCESS;
    }
-
-   skill_increase_check(ch, SKILL_SONG_FORGETFUL_RHYTHM, skill, SKILL_INCREASE_EASY);
 
    if(number(0, 1))
    {
@@ -1337,7 +1332,6 @@ int execute_song_shattering_resonance( byte level, CHAR_DATA *ch, char *arg, CHA
          obj->equipped_by = NULL;
       }
       extract_obj(obj);
-      skill_increase_check(ch, SKILL_SONG_SHATTERING_RESO, skill, SKILL_INCREASE_MEDIUM);
       return eSUCCESS;
    }
 
@@ -1352,8 +1346,6 @@ int execute_song_shattering_resonance( byte level, CHAR_DATA *ch, char *arg, CHA
    }
 
    act("$n's song fades to an end.", ch, 0, 0, TO_ROOM, 0);
-
-   skill_increase_check(ch, SKILL_SONG_SHATTERING_RESO, skill, SKILL_INCREASE_EASY);
 
    // determine chance of destroying it
    if(number(0, 1)) // 50/50 for now
@@ -1402,8 +1394,6 @@ int execute_song_insane_chant( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *
 
    act("$n's singing starts to drive you INSANE!!!", ch, 0, 0, TO_ROOM, 0);
    send_to_char("Your singing drives you INSANE!!!\r\n", ch);
-
-   skill_increase_check(ch, SKILL_SONG_INSANE_CHANT, skill, SKILL_INCREASE_HARD);
 
    for(victim = world[ch->in_room].people; victim; victim = victim->next_in_room)
    {
@@ -1481,8 +1471,6 @@ int execute_song_flight_of_bee( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA 
       }
    }
 
-   skill_increase_check(ch, SKILL_SONG_FLIGHT_OF_BEE, skill, SKILL_INCREASE_MEDIUM);
-
    ch->song_timer = song_info[ch->song_number].beats;
    return eSUCCESS;
 }
@@ -1557,7 +1545,6 @@ int execute_song_searching_song( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA
 	send_to_char("Something blocks your vision.\r\n",ch);
 	return eFAILURE;
    }
-   skill_increase_check(ch, SKILL_SONG_SEARCHING_SONG, skill, SKILL_INCREASE_MEDIUM);
 
    sprintf(buf, "Your song finds %s ", GET_SHORT(target));
 
@@ -1662,8 +1649,6 @@ int execute_song_jig_of_alacrity( byte level, CHAR_DATA *ch, char *arg, CHAR_DAT
 
    GET_KI(ch) -= 2;
 
-   skill_increase_check(ch, SKILL_SONG_JIG_OF_ALACRITY, skill, SKILL_INCREASE_MEDIUM);
-
    ch->song_timer = song_info[ch->song_number].beats + 
                              (GET_LEVEL(ch) > 33) +
                              (GET_LEVEL(ch) > 43);
@@ -1731,8 +1716,6 @@ int execute_song_fanatical_fanfare(byte level, CHAR_DATA *ch, char *arg, CHAR_DA
    }
 
    GET_KI(ch) -= (has_skill(ch,SKILL_SONG_FANATICAL_FANFARE) > 60?1:2);
-
-   skill_increase_check(ch, SKILL_SONG_FANATICAL_FANFARE, skill, SKILL_INCREASE_MEDIUM);
 
    if (!skill_success(ch, NULL, SKILL_SONG_FANATICAL_FANFARE))
    {
@@ -1836,8 +1819,6 @@ int execute_song_glitter_dust( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *
 
    act("The dust in the air clings to you, and begins to shine!", ch, 0, 0, TO_ROOM, 0);
    send_to_char("Your dust clings to everyone, showing where they are!\r\n", ch);
-
-   skill_increase_check(ch, SKILL_SONG_GLITTER_DUST, skill, SKILL_INCREASE_EASY);
 
    for(victim = world[ch->in_room].people; victim; victim = victim->next_in_room)
    {
@@ -1944,7 +1925,6 @@ int execute_song_dischordant_dirge( byte level, CHAR_DATA *ch, char *arg, CHAR_D
 	send_to_char("The undead being is unaffected by your song.\r\n",ch);
 	return eFAILURE;
      }*/
-   skill_increase_check(ch, SKILL_SONG_DISCHORDANT_DIRGE, skill, SKILL_INCREASE_MEDIUM);
    if (IS_AFFECTED2(target, AFF_FAMILIAR))
    {
      act("$n shatters $N's bond with this realm, and the creature vanishes.",ch, 0, target, TO_ROOM, NOTVICT);
@@ -2039,8 +2019,6 @@ int execute_song_synchronous_chord( byte level, CHAR_DATA *ch, char *arg, CHAR_D
       return eFAILURE;
    }
 
-   skill_increase_check(ch, SKILL_SONG_SYNC_CHORD, skill, SKILL_INCREASE_EASY);
-
    act("You enter $S mind...", ch, 0, target, TO_CHAR, INVIS_NULL);
    sprintf(buf, "%s seems to hate... %s.\r\n", GET_SHORT(target),
             get_random_hate(target) ? get_random_hate(target) : "Noone!");
@@ -2083,8 +2061,6 @@ NOTVICT);
 act("You resist $n's sticky lullaby!",ch,NULL,victim,TO_VICT,0);
      return eFAILURE;
    }
-
-   skill_increase_check(ch, SKILL_SONG_STICKY_LULL, skill, SKILL_INCREASE_MEDIUM);
 
    act("$n lulls $N's feet into a numbing sleep.", ch, 0, victim, TO_ROOM, NOTVICT);
    act("$N's feet falls into a numbing sleep.", ch, 0, victim, TO_CHAR, 0);
@@ -2144,8 +2120,6 @@ int execute_song_vigilant_siren( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA
    }
 
    GET_KI(ch) -= 1;
-
-   skill_increase_check(ch, SKILL_SONG_VIGILANT_SIREN, skill, SKILL_INCREASE_HARD);
 
    ch->song_timer = song_info[ch->song_number].beats + 
                              (GET_LEVEL(ch) > 48);
@@ -2242,8 +2216,6 @@ act("You resist $n's \"irresistible\" ditty!!",ch,NULL,i,TO_VICT,0);
    }
 
 
-   skill_increase_check(ch, SKILL_SONG_UNRESIST_DITTY, skill, SKILL_INCREASE_EASY);
-
    return eSUCCESS;
 }
 
@@ -2280,7 +2252,7 @@ int execute_song_crushing_crescendo( byte level, CHAR_DATA *ch, char *arg, CHAR_
    for (i = 0; i < (int)ch->song_data; i++)
       dam = dam * 2;
    dam += combat * 5; // Make it hurt some more.
-   if ((int)ch->song_data < 3) // Doesn't help beyond that.
+//   if ((int)ch->song_data < 3) // Doesn't help beyond that.
      ch->song_data = (char*)((int)ch->song_data + 1); // Add one round.
 		// Bleh, C allows easier pointer manipulation
    if (number(1,101) < get_saves(victim, SAVE_TYPE_MAGIC))
@@ -2315,8 +2287,6 @@ int execute_song_crushing_crescendo( byte level, CHAR_DATA *ch, char *arg, CHAR_
        break;     
    }
 
-   skill_increase_check(ch, SKILL_SONG_CRUSHING_CRESCENDO, skill, SKILL_INCREASE_MEDIUM);
-
    retval = damage(ch, victim, dam, TYPE_SONG,SKILL_SONG_CRUSHING_CRESCENDO, 0);
    if(IS_SET(retval, eCH_DIED))
      return retval;
@@ -2335,12 +2305,11 @@ int execute_song_crushing_crescendo( byte level, CHAR_DATA *ch, char *arg, CHAR_
 	return eSUCCESS;
   }
   GET_KI(ch) -= song_info[ch->song_number].min_useski;
-  if((int)ch->song_data > has_skill(ch,SKILL_SONG_CRUSHING_CRESCENDO) /20) 
-{
+  if((int)ch->song_data > has_skill(ch,SKILL_SONG_CRUSHING_CRESCENDO) /20 || (int)ch->song_data > 3) 
+  {
       send_to_char("You run out of lyrics and end the song.\r\n", ch);
       return eSUCCESS;
    }
-
    ch->song_timer = song_info[ch->song_number].beats;
    return eSUCCESS;
 }

@@ -14,7 +14,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.h,v 1.53 2004/05/29 21:20:03 urizen Exp $ */
+/* $Id: spells.h,v 1.54 2004/05/30 18:59:08 urizen Exp $ */
 #include <structs.h> // byte, sh_int
 
 #define MAX_BUF_LENGTH               240
@@ -31,6 +31,12 @@ struct skill_quest
   int num;
   int clas;
   int level;
+};
+
+struct skill_stuff
+{
+  char *name;
+  int difficulty;
 };
 
 void barb_magic_resist(char_data *ch, int old, int nw);

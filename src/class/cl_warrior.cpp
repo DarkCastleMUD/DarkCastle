@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.21 2004/05/18 00:17:44 urizen Exp $
+| $Id: cl_warrior.cpp,v 1.22 2004/05/30 18:59:06 urizen Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -77,8 +77,6 @@ int do_kick(struct char_data *ch, char *argument, int cmd)
     if(SOMEONE_DIED(retval))
       return retval;
 
-    skill_increase_check(ch, SKILL_KICK, has_skill(ch,SKILL_KICK), SKILL_INCREASE_MEDIUM);
-
     // if our boots have a combat proc, and we did damage, let'um have it!
     if(dam && ch->equipment[WEAR_FEET]) {
       if(obj_index[ch->equipment[WEAR_FEET]->item_number].combat_func) {
@@ -148,8 +146,6 @@ int do_deathstroke(struct char_data *ch, char *argument, int cmd)
 
     WAIT_STATE(ch, PULSE_VIOLENCE*3);
 
-    skill_increase_check(ch, SKILL_DEATHSTROKE, has_skill(ch,SKILL_DEATHSTROKE), SKILL_INCREASE_EASY);
-
     if (!skill_success(ch,victim,SKILL_DEATHSTROKE)) {
 	retval = damage(ch, victim, 0,TYPE_UNDEFINED, SKILL_DEATHSTROKE, 0);
         dam /= 4;
@@ -200,8 +196,6 @@ int do_retreat(struct char_data *ch, char *argument, int cmd)
 
    if (IS_AFFECTED(ch, AFF_SNEAK))
       affect_from_char(ch, SKILL_SNEAK);
-
-   skill_increase_check(ch, SKILL_RETREAT, has_skill(ch,SKILL_RETREAT), SKILL_INCREASE_EASY);
 
    // failure
    if (!skill_success(ch,NULL,SKILL_RETREAT))
@@ -275,9 +269,7 @@ int do_hitall(struct char_data *ch, char *argument, int cmd)
      return eFAILURE;
    }
 
-   skill_increase_check(ch, SKILL_HITALL, has_skill(ch,SKILL_HITALL), SKILL_INCREASE_MEDIUM);
-
-   if (skill_success(ch,NULL,SKILL_HITALL)) {
+   if (!skill_success(ch,NULL,SKILL_HITALL)) {
 
       act ("You start swinging like a madman, but trip over your own feet!", ch, 0, 0, TO_CHAR, 0);
       act ("$n starts swinging like a madman, but trips over $s own feet!", ch, 0, 0, TO_ROOM, 0);
@@ -382,8 +374,6 @@ int do_bash(struct char_data *ch, char *argument, int cmd)
         return eFAILURE;
     }
 
-    skill_increase_check(ch, SKILL_BASH, has_skill(ch,SKILL_BASH), SKILL_INCREASE_HARD);
-
     int modifier = 0;
     // half as accurate without a shield
     if(!ch->equipment[WEAR_SHIELD]) {
@@ -472,8 +462,6 @@ int do_redirect(struct char_data *ch, char *argument, int cmd)
     if(!can_be_attacked(ch, victim))
        return eFAILURE;
 
-    skill_increase_check(ch, SKILL_REDIRECT, has_skill(ch,SKILL_REDIRECT), SKILL_INCREASE_EASY);
-
     if (!skill_success(ch,victim,SKILL_REDIRECT) ) {
        act( "$n tries to redirect his attacks but $N won't allow it.", ch, NULL, ch->fighting, TO_VICT, 0 );
        act( "You try to redirect your attacks to $N but are blocked.", ch, NULL, victim, TO_CHAR, 0 );
@@ -557,7 +545,6 @@ int do_disarm( struct char_data *ch, char *argument, int cmd )
     wielded = victim->equipment[WIELD];
 
     int modifier = 0;
-    skill_increase_check(ch, SKILL_DISARM, has_skill(ch,SKILL_DISARM), SKILL_INCREASE_MEDIUM);
 
     if(GET_LEVEL(ch) < 50 && GET_LEVEL(ch) + 10 < GET_LEVEL(victim))  // keep lowbies from disarming big mobs
        modifier = -((GET_LEVEL(victim) - GET_LEVEL(ch)) * 2);
@@ -649,8 +636,6 @@ int do_rescue(struct char_data *ch, char *argument, int cmd)
 	return eFAILURE;
     }
 
-    skill_increase_check(ch, SKILL_RESCUE, has_skill(ch,SKILL_RESCUE), SKILL_INCREASE_EASY);
-
     if (!skill_success(ch,victim, SKILL_RESCUE)) {
         send_to_char("You fail the rescue.\n\r", ch);
         return eFAILURE;
@@ -699,8 +684,6 @@ int do_bladeshield(struct char_data *ch, char *argument, int cmd)
     send_to_char("But you aren't fighting anyone!\r\n", ch);
     return eFAILURE;
   }
-
-  skill_increase_check(ch, SKILL_BLADESHIELD, has_skill(ch,SKILL_BLADESHIELD), SKILL_INCREASE_EASY);
 
   if(!skill_success(ch,NULL,SKILL_BLADESHIELD)) {
     act("$n starts swinging $s weapons around but stops before narrowly avoiding dismembering $mself."
@@ -753,8 +736,6 @@ int handle_any_guard(char_data * ch)
 
    if(!guard) // my guard isn't here
       return FALSE;
-
-   skill_increase_check(guard, SKILL_GUARD, has_skill(guard,SKILL_GUARD), SKILL_INCREASE_MEDIUM);
 
    if(skill_success(guard,ch,SKILL_GUARD)) {
       do_rescue(guard, GET_NAME(ch), 9);
@@ -916,7 +897,6 @@ int do_tactics(struct char_data *ch, char *argument, int cmd)
     }   
   }
     
-  skill_increase_check(ch, SKILL_TACTICS,has_skill(ch,SKILL_TACTICS), SKILL_INCREASE_EASY);
   WAIT_STATE(ch, PULSE_VIOLENCE * 2);
   GET_MOVE(ch) /= 2;
   return eSUCCESS;

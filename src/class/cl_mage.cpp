@@ -58,7 +58,5 @@ int do_focused_repelance(struct char_data *ch, char *argument, int cmd)
 
   affect_to_char(ch, &af);
 
-  skill_increase_check(ch, SKILL_FOCUSED_REPELANCE, has_skill(ch, SKILL_FOCUSED_REPELANCE), SKILL_INCREASE_EASY);
-
   return eSUCCESS;
 }

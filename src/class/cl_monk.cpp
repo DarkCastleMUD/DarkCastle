@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_monk.cpp,v 1.18 2004/05/25 01:04:52 urizen Exp $
+| $Id: cl_monk.cpp,v 1.19 2004/05/30 18:59:06 urizen Exp $
 | cl_monk.C
 | Description:  Monk skills.
 */
@@ -68,8 +68,6 @@ int do_eagle_claw(struct char_data *ch, char *argument, int cmd)
 
    if(!can_attack(ch) || !can_be_attacked(ch, victim))
       return eFAILURE;
-
-   skill_increase_check(ch, SKILL_EAGLE_CLAW, has_skill(ch,SKILL_EAGLE_CLAW), SKILL_INCREASE_MEDIUM);
 
    WAIT_STATE(ch, PULSE_VIOLENCE*3);
 
@@ -149,8 +147,6 @@ int do_quivering_palm(struct char_data *ch, char *argument, int cmd)
 
   GET_KI(ch) -= 40;
 
-  skill_increase_check(ch, SKILL_QUIVERING_PALM, has_skill(ch,SKILL_QUIVERING_PALM), SKILL_INCREASE_EASY);
-
   WAIT_STATE(ch, PULSE_VIOLENCE*2);
   af.type = SKILL_QUIVERING_PALM;
   af.duration = 12;
@@ -159,7 +155,7 @@ int do_quivering_palm(struct char_data *ch, char *argument, int cmd)
   af.bitvector = 0;
   affect_to_char(ch, &af);
 
-  if(skill_success(ch,victim,SKILL_QUIVERING_PALM)) {
+  if(!skill_success(ch,victim,SKILL_QUIVERING_PALM)) {
     retval = damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_QUIVERING_PALM, 0);
   }
   else {
@@ -213,8 +209,6 @@ int do_stun(struct char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  skill_increase_check(ch, SKILL_STUN, has_skill(ch,SKILL_STUN), SKILL_INCREASE_MEDIUM);
-
   if(!skill_success(ch,victim, SKILL_STUN) ) {
     act("$n attempts to hit you in your solar plexus!  You block $s attempt.", ch, NULL, victim, TO_VICT , 0);
     act("You attempt to hit $N in $s solar plexus...   YOU MISS!", ch, NULL, victim, TO_CHAR , 0);
@@ -255,7 +249,7 @@ int do_stun(struct char_data *ch, char *argument, int cmd)
     if(GET_POS(victim) > POSITION_STUNNED)
       GET_POS(victim) = POSITION_STUNNED;
     SET_BIT(victim->combat, COMBAT_STUNNED);
-    retval = damage (ch, victim, 0,TYPE_UNDEFINED, SKILL_STUN, 0);
+    retval = damage (ch, victim, 0, TYPE_UNDEFINED, SKILL_STUN, 0);
   }
   return retval;
 }
