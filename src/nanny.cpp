@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.59 2004/05/27 20:25:58 urizen Exp $ */
+/* $Id: nanny.cpp,v 1.60 2004/05/30 21:06:44 urizen Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -476,6 +476,27 @@ int more_than_ten_people_from_this_ip(struct descriptor_data *new_conn)
    return 0;
 }
 
+const char *host_list[]
+{
+  "62.65.107.", // Urizen
+  "24.165.167.45.", // Dasein
+  "24.43.54.", // Apocalypse
+  "127.0.0.1", // localhost (duh)
+  "68.124.193.", // Valkyrie
+  "65.27.237.", //Moldovian
+  "68.32.21.", // Bob
+  "80.5.107." // Wynn
+};
+
+bool allowed_host(char *host)
+{ /* Wizlock uses hosts for wipe. */
+  int i;
+  for (i = 0; i < (sizeof(host_list) / sizeof(char*));i++)
+    if (!str_prefix(host_list[i], host))
+      return TRUE;
+  return FALSE;
+}
+
 // Deal with sockets that haven't logged in yet.
 void nanny(struct descriptor_data *d, char *arg)
 {
@@ -596,14 +617,17 @@ void nanny(struct descriptor_data *d, char *arg)
       // TODO - this is memoryleaking ch->name.  Check if ch->name is not there before
       // doing it to fix it.  (No time to verify this now, so i'll do it later)
       GET_NAME(ch) = str_dup(tmp_name);
-      
+
+      if (allowed_host(d->host))
+	SEND_TO_Q( "You are logging in from an ALLOWED host.\r\n",d);
+
       if(check_reconnect(d, tmp_name, FALSE))
          fOld = TRUE;
       
-      else if((wizlock) && strcmp(GET_NAME(ch),"Sadus") &&
+      else if((wizlock) && !allowed_host(d->host))/* && strcmp(GET_NAME(ch),"Sadus") &&
          strcmp(GET_NAME(ch),"Pirahna") &&
          strcmp(GET_NAME(ch),"Valkyrie") &&  strcmp(GET_NAME(ch), "Apocalypse")
-         && strcmp(GET_NAME(ch), "Urizen"))
+         && strcmp(GET_NAME(ch), "Urizen"))*/
       {
          SEND_TO_Q( "The game is wizlocked.\n\r", d );
          close_socket( d );
