@@ -40,7 +40,7 @@ extern CWorld world;
 extern index_data *mob_index;
  
 extern pulse_data *bard_list;
-
+extern CHAR_DATA *character_list;
 void remove_memory(CHAR_DATA *ch, char type);
 void add_memory(CHAR_DATA *ch, char *victim, char type);
 extern bool check_social( CHAR_DATA *ch, char *pcomm, int length, char *arg );
@@ -597,10 +597,10 @@ void update_bard_singing()
   CHAR_DATA *i;
   struct pulse_data * loop;
 
-  for(loop = bard_list; loop; loop = loop->next) 
+  for(i = character_list; i; i = i->next) 
   {
-    i = loop->thechar;
-
+//    i = loop->thechar;
+    if (!IS_NPC(i) && GET_CLASS(i) != CLASS_BARD && GET_LEVEL(i) < 100) continue;
     if(i->song_timer > 0) 
     {
       if(IS_SET(i->affected_by, AFF_HIDE))
