@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.39 2004/04/16 17:07:07 urizen Exp $ */
+/* $Id: db.cpp,v 1.40 2004/04/17 14:23:29 urizen Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -414,7 +414,7 @@ int do_write_skillquest(struct char_data *ch, char *argument, int cmd)
      fprintf(fl,"%d %s~\n",curr->num, curr->message);
      fprintf(fl,"%d %d\n",curr->clas,curr->level);
    }
-   fprintf(fl,"0");
+   fprintf(fl,"0\n");
    dc_fclose(fl);
    return eSUCCESS;	
 }
