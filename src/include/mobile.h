@@ -1,7 +1,7 @@
 #ifndef MOBILE_H_
 #define MOBILE_H_
 /************************************************************************
-| $Id: mobile.h,v 1.4 2004/04/19 16:48:47 urizen Exp $
+| $Id: mobile.h,v 1.5 2004/04/19 17:09:55 urizen Exp $
 | mobile.h
 | Description:  This file contains the header information for mobile
 |   control.
@@ -54,9 +54,6 @@ struct race_shit
   int  weight;      /* average weight of ths race    */
   int  height;      /* average height for ths race   */
 };
-
-void clear_hunt(void *arg1, void *arg2, void *arg3);
-void clear_hunt(char *arg1, CHAR_DATA *arg2, void *arg3);
 
 
 #endif

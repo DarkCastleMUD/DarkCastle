@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.19 2004/04/19 16:48:29 urizen Exp $
+| $Id: move.cpp,v 1.20 2004/04/19 17:09:52 urizen Exp $
 | move.C
 | Movement commands and stuff.
 *************************************************************************
@@ -466,6 +466,10 @@ int do_simple_move(CHAR_DATA *ch, int cmd, int following)
 		timer->arg1 = (void*)chaser->hunting;
 		timer->arg2 = (void*)chaser;
 		timer->function =  clear_hunt;
+                timer->next = timer_list;
+                timer_list = timer;
+                timer->timeleft = (ch->level==50?24:ch->level/5);
+;
  	  }
 	}
 

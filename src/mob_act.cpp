@@ -19,7 +19,7 @@
 /* 12/06/2003   Onager   Modified mobile_activity() to prevent charmie    */
 /*                       scavenging                                       */
 /**************************************************************************/
-/* $Id: mob_act.cpp,v 1.14 2004/04/19 16:48:28 urizen Exp $ */
+/* $Id: mob_act.cpp,v 1.15 2004/04/19 17:09:52 urizen Exp $ */
 
 extern "C"
 {
@@ -372,6 +372,9 @@ void mobile_activity(void)
 		#else
 		  timer = (struct timer_data *)dc_alloc(1, sizeof(struct timer_data));
 		#endif
+		timer->next = timer_list;
+		timer_list = timer;
+		timer->timeleft = (ch->level==50?24:ch->level/5);
 		timer->arg1 = (void*)ch->hunting;
 		timer->arg2 = (void*)ch;
 		timer->function =  clear_hunt;

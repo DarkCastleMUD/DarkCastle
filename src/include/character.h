@@ -1,7 +1,7 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.12 2004/04/19 16:48:47 urizen Exp $
+| $Id: character.h,v 1.13 2004/04/19 17:09:55 urizen Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
@@ -400,5 +400,8 @@ struct char_file_u
 
     int32 extra_ints[5];             // available just in case
 };
+
+void clear_hunt(void *arg1, void *arg2, void *arg3);
+void clear_hunt(char *arg1, CHAR_DATA *arg2, void *arg3);
 
 #endif
