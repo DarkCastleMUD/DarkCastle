@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.176 2004/05/02 23:17:15 urizen Exp $ */
+/* $Id: fight.cpp,v 1.177 2004/05/03 22:58:17 urizen Exp $ */
 
 extern "C"
 {
@@ -294,8 +294,12 @@ int attack(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
   }
 
   assert(GET_POS(ch) != POSITION_DEAD);
-  assert(GET_POS(vict) != POSITION_DEAD);
-
+  //assert(GET_POS(vict) != POSITION_DEAD);
+  if (GET_POS(vict) == POSITION_DEAD)
+  {
+    log("Dead victim sent to attack. Wtf ;)", -1, LOG_BUG);
+    return eINTERNAL_ERROR;
+  }
   if (!can_attack(ch))                          return eFAILURE;
   if (!can_be_attacked(ch, vict))               return eFAILURE;
 
@@ -1637,7 +1641,7 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
       eq_damage(ch, victim, dam, weapon_type, attacktype);
 
   inform_victim(ch, victim, dam);
-  if (ch->in_room != victim->in_room) // Wimpy
+  if (GET_POS(victim) != POSITION_DEAD &&ch->in_room != victim->in_room && attacktype != SPELL_SOLAR_GATE) // Wimpy
       return eSUCCESS;   
   if(typeofdamage == DAMAGE_TYPE_PHYSICAL && dam > 0 && ch != victim)
   {

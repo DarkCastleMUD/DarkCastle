@@ -21,7 +21,7 @@
  *  12/08/2003   Onager    Added check for charmies and !charmie eq to     *
  *                         equip_char()                                    *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.43 2004/04/30 17:03:53 urizen Exp $ */
+/* $Id: handler.cpp,v 1.44 2004/05/03 22:58:17 urizen Exp $ */
     
 extern "C"
 {
@@ -340,8 +340,8 @@ str_app[STRENGTH_APPLY_INDEX(ch)].wield_w && !IS_SET(ch->affected_by2, AFF_POWER
     obj_to_char(unequip_char(ch, WIELD), ch);
     if(ch->equipment[SECOND_WIELD] && (
          GET_OBJ_WEIGHT(ch->equipment[SECOND_WIELD]) <= 
-(str_app[STRENGTH_APPLY_INDEX(ch)].wield_w && !IS_SET(ch->affected_by2, 
-AFF_POWERWIELD))))
+str_app[STRENGTH_APPLY_INDEX(ch)].wield_w && !IS_SET(ch->affected_by2, 
+AFF_POWERWIELD)))
     {
       act("You move your $p to be your primary weapon.", ch, ch->equipment[SECOND_WIELD], 0, TO_CHAR, INVIS_NULL);
       act("$n moves $s $p to be $s primary weapon.", ch, ch->equipment[SECOND_WIELD], 0, TO_ROOM, INVIS_NULL);
@@ -351,7 +351,7 @@ AFF_POWERWIELD))))
   }
 
   if(ch->equipment[SECOND_WIELD] &&
-       GET_OBJ_WEIGHT(ch->equipment[SECOND_WIELD]) > (str_app[STRENGTH_APPLY_INDEX(ch)].wield_w/2) && !IS_SET(ch->affected_by2, AFF_POWERWIELD))
+       GET_OBJ_WEIGHT(ch->equipment[SECOND_WIELD]) > str_app[STRENGTH_APPLY_INDEX(ch)].wield_w/2 && !IS_SET(ch->affected_by2, AFF_POWERWIELD))
   {
     act("Being too heavy to wield, you move your $p to your inventory.",
          ch, ch->equipment[SECOND_WIELD], 0, TO_CHAR, 0);
