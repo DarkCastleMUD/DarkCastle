@@ -678,7 +678,8 @@ int song_hypnotic_harmony(byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victi
        ch, 0, victim, TO_VICT, 0);
    act("$n sings an entrancing hymn to $N!",
        ch, 0, victim, TO_ROOM, NOTVICT);
-   send_to_char("You sing your most enchanting hymn, hoping to make attract some fans.\r\n", ch);
+   send_to_char("You sing your most enchanting hymn, hoping to attract some fans.\r\n", ch);
+   ch->song_data = str_dup(arg);
 
    ch->song_timer = (song_info[ch->song_number].beats -
                               ( skill / 15 ) );
@@ -697,8 +698,15 @@ int execute_song_hypnotic_harmony(byte level, CHAR_DATA *ch, char *Arg,
       return eFAILURE|eINTERNAL_ERROR;
       }
    if(!(victim = get_char_room_vis(ch, ch->song_data)))
-   { send_to_char("They seem to have left.\r\nIn the middle of your performance too!\r\n",ch); return eFAILURE;
+   {
+   dc_free(ch->song_data);
+   ch->song_data = 0;
+ send_to_char("They seem to have left.\r\nIn the middle of your performance too!\r\n",ch); 
+return eFAILURE;
   }
+   dc_free(ch->song_data);
+   ch->song_data = 0;
+
    WAIT_STATE(ch, PULSE_VIOLENCE);
    if (!IS_NPC(victim) || !IS_SET(victim->mobdata->actflags, ACT_BARDCHARM))
    {
@@ -751,6 +759,7 @@ bool any_charms(CHAR_DATA *ch);
   check_eq(victim);
 
   act("You decide to follow $n's musical genius to the end.", ch , 0, victim, TO_VICT, 0);
+  send_to_char("You succeed, and you find yourself having a new fan.\r\n",ch);
 return eSUCCESS;
 
 }
