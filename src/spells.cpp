@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.7 2002/07/31 18:41:09 pirahna Exp $ */
+/* $Id: spells.cpp,v 1.8 2002/08/01 17:31:19 pirahna Exp $ */
 
 extern "C"
 {
@@ -1567,6 +1567,11 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
 
         if(IS_MOB(ch))
           learned = 80;
+
+// TODO - remove this later
+        // Small bonus for mages since we don't have skill increases for spells yet
+        if(GET_CLASS(ch) == CLASS_MAGIC_USER)
+           learned += 5;
 
         // TODO - make this use int for mages
         if(GET_LEVEL(ch) < IMMORTAL && number(1,105) >

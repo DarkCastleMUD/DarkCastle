@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.8 2002/08/01 08:04:56 pirahna Exp $ */
+/* $Id: info.cpp,v 1.9 2002/08/01 17:31:19 pirahna Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -1337,6 +1337,8 @@ int do_score(struct char_data *ch, char *argument, int cmd)
 
          // figure out the name of the affect (if any)
          char * aff_name = get_skill_name(aff->type);
+         if(aff->type == FUCK_CANTQUIT)
+           aff_name = "CANT_QUIT";
          if(!aff_name) // not one we want displayed
            continue;
 
