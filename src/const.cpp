@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.102 2004/05/16 02:12:42 urizen Exp $ */
+/* $Id: const.cpp,v 1.103 2004/05/16 12:22:07 urizen Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1027,7 +1027,7 @@ struct class_skill_defines w_skills[] = { // warrior skills
 {    "double",          SKILL_SECOND_ATTACK,      7,    90,     {DEX,INT} },
 {    "disarm",          SKILL_DISARM,             10,   70,     {DEX,WIS} },
 {    "headbutt",        SKILL_SHOCK,              12,   55,     {CON,WIS} },
-{    "shield block",    SKILL_SHIELDBLOCK,        15,   85,     {STR,DEX} },
+{    "shield block",    SKILL_SHIELDBLOCK,        15,   75,     {STR,DEX} },
 {    "retreat",         SKILL_RETREAT,            17,   98,     {WIS,INT} },
 {    "frenzy",          SKILL_FRENZY,             18,   80,     {CON,INT} },
 {    "parry",           SKILL_PARRY,              20,   90,     {DEX,WIS} },
@@ -1062,7 +1062,7 @@ struct class_skill_defines t_skills[] = { // thief skills
 //   ------------       ------------          -----   ---     ----------
 {    "sneak",           SKILL_SNEAK,            1,      90,   {DEX,INT} },  
 {    "backstab",        SKILL_BACKSTAB,         2,      90,   {STR,DEX} },  
-{    "shield block",    SKILL_SHIELDBLOCK,      4,      55,   {STR,DEX} },  
+{    "shield block",    SKILL_SHIELDBLOCK,      4,      45,   {STR,DEX} },  
 {    "pick",            SKILL_PICK_LOCK,        6,      98,   {WIS,DEX} },  
 {    "hide",            SKILL_HIDE,             7,      90,   {INT,WIS} },  
 {    "dual wield",      SKILL_DUAL_WIELD,       10,     90,   {DEX,CON} },  
@@ -1096,7 +1096,7 @@ struct class_skill_defines a_skills[] = { // anti-paladin skills
 {    "harmtouch",            SKILL_HARM_TOUCH,        1,      98,     {STR,CON} },
 {    "kick",                 SKILL_KICK,              2,      70,     {DEX,STR} },
 {    "sneak",                SKILL_SNEAK,             3,      85,     {DEX,INT} },
-{    "shield block",         SKILL_SHIELDBLOCK,       5,      70,     {STR,DEX} },
+{    "shield block",         SKILL_SHIELDBLOCK,       5,      65,     {STR,DEX} },
 {    "infravision",          SPELL_INFRAVISION,       7,      90,     {INT,DEX} },
 {    "detect good",          SPELL_DETECT_GOOD,       8,      98,     {WIS,INT} },
 {    "dual wield",           SKILL_DUAL_WIELD,        10,     85,     {DEX,CON} },
@@ -1154,7 +1154,7 @@ struct class_skill_defines p_skills[] = { // paladin skills
 {    "remove poison",        SPELL_REMOVE_POISON,      18,     90,     {CON,WIS} },
 {    "detect invisibility",  SPELL_DETECT_INVISIBLE,   20,     85,     {INT,DEX} },
 {    "cure critic",          SPELL_CURE_CRITIC,        22,     85,     {WIS,INT} },
-{    "parry",                SKILL_PARRY,              23,     80,     {DEX,WIS} },
+{    "parry",                SKILL_PARRY,              23,     70,     {DEX,WIS} },
 {    "bash",                 SKILL_BASH,               25,     85,     {STR,CON} },
 {    "sense life",           SPELL_SENSE_LIFE,         26,     85,     {CON,INT} },
 {    "strength",             SPELL_STRENGTH,           28,     70,     {STR,CON} },
@@ -1205,7 +1205,7 @@ struct class_skill_defines b_skills[] = { // barbarian skills
 {    "archery",         SKILL_ARCHERY,            38,   80,  {DEX,WIS} },
 {    "berserk",         SKILL_BERSERK,            40,   98,  {STR,CON} },
 {    "hitall",          SKILL_HITALL,             45,   90,  {STR,CON} },
-//{  "magic resistance" SKILL_MAGIC_RESISTANCE    47,   98,  {INT,CON} },
+{    "magic resistance", SKILL_MAGIC_RESIST,      47,   98,  {INT,CON} },
 {    "bullrush",        SKILL_BULLRUSH,           50,   98,  {STR,CON} },
 {    "\n",              0,                        1,    0,   {0,0} }
 };
@@ -1220,7 +1220,7 @@ struct class_skill_defines k_skills[] = { // monk skills
 {    "redirect",        SKILL_REDIRECT,         3,      85,     {INT,CON} },
 {    "trip",            SKILL_TRIP,             5,      70,     {DEX,STR} },
 {    "purify",          KI_PURIFY+KI_OFFSET,    8,      98,     {CON,WIS} },
-{    "shield block",    SKILL_SHIELDBLOCK,      10,     80,     {STR,DEX} },
+{    "shield block",    SKILL_SHIELDBLOCK,      10,     75,     {STR,DEX} },
 {    "rescue",          SKILL_RESCUE,           12,     75,     {WIS,INT} },
 {    "punch",           KI_PUNCH+KI_OFFSET,     15,     98,     {STR,DEX} },
 {    "eagleclaw",       SKILL_EAGLE_CLAW,       17,     98,     {STR,DEX} },
@@ -1252,7 +1252,7 @@ struct class_skill_defines r_skills[] = { // ranger skills
 {    "dual wield",      SKILL_DUAL_WIELD,        5,      90,     {DEX,CON} },
 {    "redirect",        SKILL_REDIRECT,          7,      80,     {INT,CON} },
 {    "eyes of the owl", SPELL_EYES_OF_THE_OWL,   8,      90,     {INT,DEX} },
-{    "shield block",    SKILL_SHIELDBLOCK,       10,     80,     {STR,DEX} },
+{    "shield block",    SKILL_SHIELDBLOCK,       10,     70,     {STR,DEX} },
 {    "tame",            SKILL_TAME,              11,     98,     {WIS,INT} },
 {    "double",          SKILL_SECOND_ATTACK,     12,     85,     {DEX,INT} },
 {    "feline agility",  SPELL_FELINE_AGILITY,    14,     98,     {DEX,INT} },
@@ -1657,7 +1657,9 @@ struct race_shit race_info[] =
   {"Demon",     "Demons",
    127, 528,  0,  0,  15, 0,  0,  0},
   {"Yrnali",    "Yrnali",
-   63, 10240, 0, 0, 1, 0, 0, 0}
+   63, 10240, 0, 0, 1, 0, 0, 0},
+  {"Immortal",  "Immortals",
+   127, 0, 0, 0, 0, 0, 0, 0}
 };
 
 

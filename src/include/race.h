@@ -1,7 +1,7 @@
 #ifndef RACE_H_
 #define RACE_H_
 /************************************************************************
-| $Id: race.h,v 1.8 2004/05/03 23:01:26 urizen Exp $
+| $Id: race.h,v 1.9 2004/05/16 12:22:11 urizen Exp $
 | race.h
 | This file defines racial information.
 */
@@ -37,7 +37,8 @@
 #define RACE_ASTRAL      28
 #define RACE_DEMON       29
 #define RACE_YRNALI      30
-#define MAX_RACE         30
+#define RACE_IMMORTAL    31
+#define MAX_RACE         31
 
 /* Bitvectors for racial shit */
 #define BITV_HUMAN       1
@@ -69,6 +70,7 @@
 #define BITV_ELEMENT     1<<26
 #define BITV_ASTRAL      1<<27
 #define BITV_DEMON       1<<28
+#define BITV_IMMORTAL    1<<29
 
 // Following are modifiers from the base maximum stat for a race
 #define BASE_MAX_STAT              27

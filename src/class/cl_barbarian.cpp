@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_barbarian.cpp,v 1.21 2004/05/14 00:04:15 urizen Exp $
+| $Id: cl_barbarian.cpp,v 1.22 2004/05/16 12:22:09 urizen Exp $
 | cl_barbarian.C
 | Description:  Commands for the barbarian class.
 */
@@ -532,4 +532,15 @@ int do_ferocity(struct char_data *ch, char *argument, int cmd)
   WAIT_STATE(ch, PULSE_VIOLENCE * 2);
   GET_MOVE(ch) /= 2;
   return eSUCCESS;
+}
+
+void barb_magic_resist(char_data *ch, int old, int nw)
+{
+  int bonus=0,i;
+  int oldbonus = (old / 10) +1;
+  bonus = (nw/10+1) - oldbonus;
+  if (bonus)
+    for (i = 0; i <= SAVE_TYPE_MAX; i++)
+      ch->saves[i] += bonus;
+
 }

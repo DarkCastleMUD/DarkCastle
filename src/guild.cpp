@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.53 2004/05/14 02:40:37 urizen Exp $
+| $Id: guild.cpp,v 1.54 2004/05/16 12:22:07 urizen Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -88,7 +88,7 @@ char *how_good(int percent)
 int learn_skill(char_data * ch, int skill, int amount, int maximum)
 {
   struct char_skill_data * curr = ch->skills;
-
+  int old;
   while(curr)
     if(curr->skillnum == skill)
       break;
@@ -96,7 +96,10 @@ int learn_skill(char_data * ch, int skill, int amount, int maximum)
 
   if(curr) 
   {
+    old = curr->learned;
     curr->learned += amount;
+    if (skill == SKILL_MAGIC_RESIST)
+      barb_magic_resist(ch, old, curr->learned);
     if(curr->learned > maximum)
       curr->learned = maximum;
   }
@@ -107,6 +110,8 @@ int learn_skill(char_data * ch, int skill, int amount, int maximum)
 #else
     curr = (char_skill_data *)dc_alloc(1, sizeof(char_skill_data));
 #endif
+    if (skill == SKILL_MAGIC_RESIST)
+      barb_magic_resist(ch, 0, amount);
     curr->skillnum = skill;
     curr->learned = amount;
     curr->next = ch->skills;
@@ -546,11 +551,11 @@ void skill_increase_check(char_data * ch, int skill, int learned, int difficulty
 
    switch(difficulty) {
      case SKILL_INCREASE_EASY:
-        if(chance < 76)
+        if(chance < 88)
            return;
         break;
      case SKILL_INCREASE_MEDIUM:
-        if(chance < 93)
+        if(chance < 97)
            return;
         break;
      case SKILL_INCREASE_HARD:

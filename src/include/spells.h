@@ -14,7 +14,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.h,v 1.48 2004/05/14 00:04:17 urizen Exp $ */
+/* $Id: spells.h,v 1.49 2004/05/16 12:22:11 urizen Exp $ */
 #include <structs.h> // byte, sh_int
 
 #define MAX_BUF_LENGTH               240
@@ -33,7 +33,7 @@ struct skill_quest
   int level;
 };
 
-
+void barb_magic_resist(char_data *ch, int old, int nw);
 struct skill_quest *find_sq(int sq);
 struct skill_quest *find_sq(char *);
 int dam_percent(int learned, int damage);
@@ -289,7 +289,8 @@ void check_maxes(CHAR_DATA *ch);
 #define SKILL_RELEASE		     368
 #define SKILL_FEARGAZE		     369
 #define SKILL_EYEGOUGE		     370
-#define SKILL_MAX                    370
+#define SKILL_MAGIC_RESIST	     371
+#define SKILL_MAX                    371
 
 // if you add a skill, make sure you update "skills[]" in spells.C
 // as well as SKILL_MAX

@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.53 2004/05/14 23:58:32 urizen Exp $ */
+/* $Id: db.cpp,v 1.54 2004/05/16 12:22:07 urizen Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -4172,7 +4172,8 @@ void reset_char(CHAR_DATA *ch)
   SET_BIT(ch->misc, LOG_SOCKET);
   SET_BIT(ch->misc, LOG_MISC);
   SET_BIT(ch->misc, LOG_PLAYER);
-  SET_BIT(ch->misc, CHANNEL_GOSSIP);
+//  SET_BIT(ch->misc, CHANNEL_GOSSIP);
+  SET_BIT(ch->misc, CHANNEL_DREAM);
   SET_BIT(ch->misc, CHANNEL_SHOUT);
   SET_BIT(ch->misc, CHANNEL_AUCTION);
   SET_BIT(ch->misc, CHANNEL_INFO);
@@ -4247,7 +4248,7 @@ void init_char(CHAR_DATA *ch)
   ch->pcdata->time.birth  = time(0);
   ch->pcdata->time.played = 0;
   ch->pcdata->time.logon  = time(0);
-  ch->pcdata->toggles = PLR_ANSI;
+  ch->pcdata->toggles = PLR_ANSI & PLR_BARD_SONG;
   ch->affected_by = 0;
 
   apply_initial_saves(ch);
