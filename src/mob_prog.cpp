@@ -485,6 +485,27 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
 	}
     }
 
+  if (!str_cmp(buf, "isspelled"))
+  {
+	int find_skill_num(char *name);
+     switch (arg[1]) 
+     {
+        case 'i': // mob
+		return (affected_by_spell(mob, find_skill_num(val));
+	case 'n': // actor
+	 	if (actor)
+                return (affected_by_spell(actor, find_skill_num(val));
+		else return -1;
+	case 't': // vict
+		if (vict)
+                return (affected_by_spell(vict, find_skill_num(val));
+		else return -1;
+	case 'r': //rand
+		if (rand)
+                return (affected_by_spell(rand, find_skill_num(val));
+		return -1;
+     }
+  }
   if ( !str_cmp( buf, "isaffected" ) )
     {
       switch ( arg[1] )  /* arg should be "$*" so just get the letter */
