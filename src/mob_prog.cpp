@@ -339,7 +339,17 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
     {
       return ( number(1, 100) <= atoi(arg) );
     }
+  if ( !str_cmp(buf, "numpcs"))
+  {
+     struct char_data *p;
+      int i =0;
+     for (p = world[mob->in_room].people;p;p=p->next_in_room)
+       if (!IS_NPC(p))
+	i++;
 
+           return mprog_veval( i, opr, atoi(val) );
+     
+  }
   if ( !str_cmp( buf, "ispc" ) )
     {
       switch ( arg[1] )  /* arg should be "$*" so just get the letter */
