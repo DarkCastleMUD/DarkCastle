@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.cpp,v 1.12 2002/08/13 21:54:23 pirahna Exp $ */
+/* $Id: interp.cpp,v 1.13 2002/08/25 16:13:46 pirahna Exp $ */
 
 extern "C"
 {
@@ -99,9 +99,12 @@ struct command_info cmd_info[] =
     { "switch",     do_switch,      POSITION_RESTING,   0,  9,  0 },
     { "tell",       do_tell,        POSITION_RESTING,   0,  9,  0 },
     { "wield",      do_wield,       POSITION_RESTING,   0,  9,  COM_CHARMIE_OK },
+    { "innate",     do_innate,      POSITION_RESTING,   0,  9,  0 },
+
     /*
      * Informational commands.
      */
+
     { "alias",      do_alias,       POSITION_DEAD,      0,  9,  0 },
     { "toggle",     do_toggle,      POSITION_DEAD,      0,  9,  0 },
 /*    { "bug",        do_bug,         POSITION_DEAD,      0,  9,  0 }, moved to end */

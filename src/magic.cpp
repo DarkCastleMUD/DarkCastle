@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.22 2002/08/23 17:27:44 pirahna Exp $ */
+/* $Id: magic.cpp,v 1.23 2002/08/25 16:13:46 pirahna Exp $ */
 
 extern "C"
 {
@@ -3227,7 +3227,7 @@ int spell_fly(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj
 
 	 if(!ch || !victim)
 	 {
-	   log("NULL ch or victim sent to cause_serious!", ANGEL, LOG_BUG);
+	   log("NULL ch or victim sent to spell_fly!", ANGEL, LOG_BUG);
            return eFAILURE;
 	 }
 

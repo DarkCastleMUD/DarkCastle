@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.9 2002/08/04 19:43:03 pirahna Exp $ */
+/* $Id: utility.cpp,v 1.10 2002/08/25 16:13:46 pirahna Exp $ */
 
 extern "C"
 {
@@ -28,6 +28,7 @@ extern "C"
 #include <dmalloc.h>
 #endif
 
+#include <innate.h>
 #include <structs.h>
 #include <levels.h>
 #include <player.h>
@@ -1230,8 +1231,9 @@ char * get_skill_name(int skillnum)
 {
     extern char *skills[];
     extern char *spells[];
-    extern char *ki[];
     extern char *songs[];
+    extern char *ki[];
+    extern char *innate_skills[];
 
     if(skillnum >= SKILL_SONG_BASE && skillnum <= SKILL_SONG_MAX)
        return songs[skillnum-SKILL_SONG_BASE];
@@ -1241,6 +1243,8 @@ char * get_skill_name(int skillnum)
        return ki[skillnum-KI_OFFSET];
     else if(skillnum >= 0 && skillnum <= MAX_SPL_LIST)
        return spells[skillnum-1];
+    else if(skillnum >= SKILL_INNATE_BASE && skillnum <= SKILL_INNATE_MAX)
+       return innate_skills[skillnum-SKILL_INNATE_BASE];
 
    return NULL;      
 }

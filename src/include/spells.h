@@ -14,7 +14,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.h,v 1.11 2002/08/13 19:39:15 pirahna Exp $ */
+/* $Id: spells.h,v 1.12 2002/08/25 16:13:49 pirahna Exp $ */
 #include <structs.h> // byte, sh_int
 
 #define MAX_BUF_LENGTH               240
@@ -350,6 +350,9 @@
 #define TYPE_SONG                    (TYPE_HIT + 20)
 #define TYPE_PHYSICAL_MAGIC          (TYPE_HIT + 21)
 #define TYPE_WATER                   (TYPE_HIT + 22)
+
+// NOTE  "skill" numbers 1500-1599 are reserved for innate skill abilities
+// These are in innate.h
 
 
 #define TAR_IGNORE         1
