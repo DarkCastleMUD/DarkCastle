@@ -230,18 +230,17 @@ int do_sqedit(struct char_data *ch, char *argument, int cmd)
       {
 	if (curren == skill)
         {
-          if (last)
-	    last->next = curren->next;
-	  else
-	    skill_list = curren->next;
+          if (last)   last->next = curren->next;
+	  else        skill_list = curren->next;
 	  send_to_char("Deleted.\r\n",ch);
 	  dc_free(curren->message);
 	  dc_free(curren);
-	  break;
+ 	  return eSUCCESS;
 	}
+	  last = curren;
+      }
 	send_to_char("Error in sqedit. Tell Urizen.\r\n",ch);
         break;
-      }
      break;
     case 2:
       send_to_char("Enter new message. End with ~.\r\n",ch);

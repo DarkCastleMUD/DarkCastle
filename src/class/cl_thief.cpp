@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.38 2004/04/21 22:18:47 urizen Exp $
+| $Id: cl_thief.cpp,v 1.39 2004/04/22 06:15:06 urizen Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -97,7 +97,7 @@ int do_eyegouge(CHAR_DATA *ch, char *argument, int cmd)
   int learned = has_skill(ch, SKILL_EYEGOUGE);
   argument = one_argument(argument,name);
 
-  if(!(victim = get_char_room_vis(ch, name))) {
+  if(!(victim = get_char_room_vis(ch, name)) && (victim = ch->fighting)==NULL) {
     send_to_char("There's noone like that here to eyegouge.\n\r", ch);
     return eFAILURE;
   }
