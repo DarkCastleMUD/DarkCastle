@@ -1038,7 +1038,6 @@ char_data *)(mob_index[nr].item))->level,
         if (!str_cmp(str_nospace(apply_types[i]),arg1))
         {
   	    affect = i;
-//          SET_BIT(affect, 1<<i);
           continue;
         }
         if (!str_cmp(arg1,"level"))
@@ -1055,16 +1054,7 @@ char_data *)(mob_index[nr].item))->level,
             return eFAILURE;
           }
         }
-
-/*
-       for (i = 0; *pc_clss_types[i] != '\n' ; i++)
-        if (!str_cmp(pc_clss_types[i],arg1))
-        {
-          SET_BIT(more, 1<<i);
-          continue;
-        }*/
-  //     send_to_char("Unknown argument.\r\n",ch);
-//       return eFAILURE;
+        csendf(ch, "Unknown type: %s.\r\n", arg1);
      }
      int c,nr,aff;
 //     csendf(ch,"%d %d %d %d %d", more, extra, wear, size, affect);
@@ -1159,10 +1149,10 @@ char_data *)(mob_index[nr].item))->level,
 	  if (((struct obj_data *)(obj_index[nr].item))->obj_flags.type_flag != type)
 	    continue;
      if (levhigh)
-      if (((struct obj_data *)(obj_index[nr].item))->obj_flags.eq_level > levhigh) 
+      if (((struct obj_data *)(obj_index[nr].item))->obj_flags.eq_level > levhigh)
          continue;
      if (levlow)
-      if (((struct obj_data *)(obj_index[nr].item))->obj_flags.eq_level < levlow) 
+      if (((struct obj_data *)(obj_index[nr].item))->obj_flags.eq_level < levlow)
          continue;
       if (size)
        for (i = 0; i < 10; i++)

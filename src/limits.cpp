@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.15 2004/04/20 19:42:43 urizen Exp $ */
+/* $Id: limits.cpp,v 1.16 2004/04/21 17:59:26 urizen Exp $ */
 
 extern "C"
 {
@@ -216,7 +216,7 @@ int hit_gain(CHAR_DATA *ch)
     // con multiplier modifier 15 = 1.0  30 = 1.45 (.03 increments)
     if(GET_CON(ch) > 15)
       gain = (int)(gain * ((float)1+ (.03 * (GET_CON(ch) - 15.0))));
-
+ 
     if(GET_CLASS(ch) == CLASS_MAGIC_USER || GET_CLASS(ch) == CLASS_CLERIC || GET_CLASS(ch) == CLASS_DRUID)
       gain = (int)((float)gain * 0.7);
   }
