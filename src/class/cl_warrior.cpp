@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.9 2003/01/16 03:59:18 dcastle Exp $
+| $Id: cl_warrior.cpp,v 1.10 2003/03/04 06:45:35 pirahna Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -68,10 +68,10 @@ int do_kick(struct char_data *ch, char *argument, int cmd)
     if(!can_attack(ch) || !can_be_attacked(ch, victim))
           return eFAILURE;
 
-    chance = 60;
+    chance = 60 + learned/10;
 	   
      /* 101% is a complete failure */
-    percent=((10-(GET_AC(victim)/10))<<1) + number(1,101);
+    percent = 10 - GET_AC(victim)/10 + number(1,101);
 
     WAIT_STATE(ch, PULSE_VIOLENCE*2);
     if (percent > chance) {
