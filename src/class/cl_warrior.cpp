@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.11 2003/03/07 01:29:37 pirahna Exp $
+| $Id: cl_warrior.cpp,v 1.12 2003/03/17 03:42:30 pirahna Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -145,7 +145,7 @@ int do_deathstroke(struct char_data *ch, char *argument, int cmd)
        return eFAILURE;
     }
 
-    if(GET_POS(victim) > POSITION_RESTING)
+    if(GET_POS(victim) > POSITION_SITTING)
     {
        send_to_char("Your opponent isn't in a vulnerable enough position!\r\n", ch);
        return eFAILURE;
