@@ -63,11 +63,11 @@ struct golem_data
 const struct golem_data golem_list[] = {
   {"iron", "iron golem", "an iron golem", "An iron golem stands here, awaiting its master's commands. ", 
     "The golem looks inanimate, except when it performs some task for its\nmaster. During those periods it moves with suprising speed.\r\n",
-    1000, 15, 5, 25, 50, {4, 2, 3, 5, 6}, AFF_LIGHTNINGSHIELD, 0, -100,
+    1000, 15, 5, 25, 50, {107, 108, 109, 0, 7004}, AFF_LIGHTNINGSHIELD, 0, -100,
     "Hey, you like.. made an iron golem.\r\n"},
  {  "stone","stone golem", "a stone golem", "A stone golem stands here, awaiting its master's commands.",
     "The golem looks inanimate, except when it performs some task for its\nmaster. During those periods it moves with suprising speed.\r\n",
-    2000, 5, 5, 25, 50, {4,2,3,5,6}, 0, ISR_PIERCE, -100, "Stone golem created.\r\n"}
+    2000, 5, 5, 25, 50, {104,105,106,0,7003}, 0, ISR_PIERCE, -100, "Stone golem created.\r\n"}
 };
 
 #define MAX_GOLEMS 2 // amount of golems above +1
@@ -76,7 +76,7 @@ void golem_gain_exp(CHAR_DATA *ch)
 {
   extern int exp_table[];
   int level = 29 + ch->level;
-  if (ch->level >= 50) return;
+  if (ch->level >= 20) return;
   if (ch->exp > exp_table[level])
   {
      ch->exp = 0;
