@@ -336,7 +336,7 @@ int do_mpechoat( CHAR_DATA *ch, char *argument, int cmd )
        return eFAILURE|eINTERNAL_ERROR;
     }
 
-    if ( !( victim = get_char_room( ch, arg ) ) )
+    if ( !( victim = get_char_room( arg, ch->in_room ) ) )
     {
         logf( IMMORTAL, LOG_WORLD, "Mpechoat - victim does not exist: vnum %d.",
 	    mob_index[ch->mobdata->nr].virt );
