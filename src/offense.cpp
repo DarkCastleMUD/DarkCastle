@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: offense.cpp,v 1.9 2004/07/22 07:17:33 rahz Exp $
+| $Id: offense.cpp,v 1.10 2004/07/22 16:34:20 urizen Exp $
 | offense.C
 | Description:  Commands that are generically offensive - that is, the
 |   victim should retaliate.  The class-specific offensive commands are
@@ -236,8 +236,8 @@ int do_join(struct char_data *ch, char *argument, int cmd)
   }
 
 
-  if (IS_AFFECTED(ch, AFF_CHARM) && !IS_NPC(ch->master) && GET_CLASS(ch->master) == CLASS_ANTI_PAL && !IS_NPC(victim)) {
-     act("I can't join the attack against$N master!", ch->master, 0, victim, TO_CHAR, 0);
+  if (IS_AFFECTED(ch, AFF_CHARM) && !IS_NPC(ch->master) && GET_CLASS(ch->master) == CLASS_ANTI_PAL && !IS_NPC(victim->fighting)) {
+     act("I can't join the attack against $N master!", ch->master, 0, victim->fighting, TO_CHAR, 0);
      return eFAILURE;
   }
 
