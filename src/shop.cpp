@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: shop.cpp,v 1.6 2003/04/17 22:50:12 pirahna Exp $ */
+/* $Id: shop.cpp,v 1.7 2004/04/16 12:13:58 urizen Exp $ */
 
 extern "C"
 {
@@ -40,30 +40,8 @@ extern "C"
 #include <shop.h>
 #include <spells.h>
 
-#define MAX_SHOP    64
-#define MAX_TRADE    5
-
 extern struct str_app_type str_app[];
 extern struct index_data *mob_index;
-
-struct shop_data
-{
-    int type[MAX_TRADE];    /* Types of things shop will buy.       */
-    float profit_buy;       /* Factor to multiply cost with.        */
-    float profit_sell;      /* Factor to multiply cost with.        */
-    char *no_such_item1;    /* Message if keeper hasn't got an item */
-    char *no_such_item2;    /* Message if player hasn't got an item */
-    char *missing_cash1;    /* Message if keeper hasn't got cash    */
-    char *missing_cash2;    /* Message if player hasn't got cash    */
-    char *do_not_buy;       /* If keeper doesn't buy such things.   */
-    char *message_buy;      /* Message when player buys item        */
-    char *message_sell;     /* Message when player sells item       */
-    int keeper;             /* The mob who owns the shop (virt)  */
-    int in_room;            /* Where is the shop?                   */
-    int open1, open2;       /* When does the shop open?             */
-    int close1, close2;     /* When does the shop close?            */
-    struct obj_data *inventory;  /* list of things shop never runs out of  */
-};
 
 struct player_shop * g_playershops;
 

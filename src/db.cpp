@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.35 2004/04/16 11:55:25 urizen Exp $ */
+/* $Id: db.cpp,v 1.36 2004/04/16 12:13:58 urizen Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -55,7 +55,7 @@ extern "C"
 #include <interp.h>
 #include <returnvals.h>
 #include <spells.h> // command_range
-
+#include <shop.h>
 extern int fflush(FILE *);
 extern int _filbuf(FILE *);
 
@@ -2859,6 +2859,17 @@ int create_blank_mobile(int nr)
     }
 
     rebuild_rnum_references(cur_index, 1);
+
+    /*
+        Shop fixes follow.
+    */
+    extern struct shop_data shop_index[MAX_SHOP];
+    int i;
+    for (i = 0; i < MAX_SHOP; i++)
+    {
+      if (shop_index[i].keeper >= cur_index)
+        shop_index[i].keeper++;
+    }
     return cur_index;
 }
 

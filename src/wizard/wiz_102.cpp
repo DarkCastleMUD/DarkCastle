@@ -3064,7 +3064,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd)
       // New
       case 30: {  
         if (!*buf4) {
-           send_to_char("$3Syntax$R: oedit new [number]\r\n", ch);
+           send_to_char("$3Syntax$R: medit new [number]\r\n", ch);
            return eFAILURE;
         }
         if(!check_range_valid_and_convert(intval, buf4, 0, 35000)) {
@@ -3073,7 +3073,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd)
         }
         if (!has_skill(ch,COMMAND_RANGE))
         {
-          send_to_char("You cannot create items.\r\n",ch);
+          send_to_char("You cannot create mobiles.\r\n",ch);
           return eFAILURE;
         }
         x = create_blank_mobile(intval);
@@ -3081,7 +3081,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd)
           csendf(ch, "Could not create mobile '%d'.  Max index hit or mob already exists.\r\n",intval);
           return eFAILURE;
         }
-        csendf(ch, "Item '%d' created successfully.\r\n", intval);
+        csendf(ch, "Mobile '%d' created successfully.\r\n", intval);
       } break;
     }
     set_zone_modified_mob(mob_num);
