@@ -14,7 +14,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.h,v 1.27 2003/06/23 02:02:29 pirahna Exp $ */
+/* $Id: spells.h,v 1.28 2003/07/08 01:46:00 pirahna Exp $ */
 #include <structs.h> // byte, sh_int
 
 #define MAX_BUF_LENGTH               240
@@ -316,6 +316,7 @@
 #define COMMAND_PSHOPEDIT            620
 #define COMMAND_SEDIT                621
 #define COMMAND_SOCKETS              622
+#define COMMAND_PUNISH               623
 
 // make sure up you update bestowable_god_commands_type bestowable_god_commands[]
 // if you modify this command list any

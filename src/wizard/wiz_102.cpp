@@ -4109,6 +4109,11 @@ int do_punish(struct char_data *ch, char *arg, int cmd)
 
    int i;
 
+   if(!has_skill(ch, COMMAND_PUNISH)) {
+      send_to_char("Huh?\r\n", ch);
+      return eFAILURE;
+   }
+
    if(IS_MOB(ch)) {
       send_to_char("Punish yourself!  Bad mob!\r\n", ch);
       return eFAILURE;
@@ -4145,7 +4150,8 @@ int do_punish(struct char_data *ch, char *arg, int cmd)
      act("$E might object to that.. better not.", ch, 0, vict, TO_CHAR, 0);
      return eFAILURE;
    }
-  if (!strncasecmp(name, "stupid", i) && GET_LEVEL(ch) >= G_POWER) {
+  if (!strncasecmp(name, "stupid", i)) 
+  {
     if (IS_SET(vict->pcdata->punish, PUNISH_STUPID)) {
         send_to_char("You feel a sudden onslaught of wisdom!\n\r", vict);
         send_to_char("STUPID removed.\n\r", ch);
@@ -4171,7 +4177,7 @@ int do_punish(struct char_data *ch, char *arg, int cmd)
         SET_BIT(vict->pcdata->punish, PUNISH_NOTITLE);
     }
   }
-  if (!strncasecmp(name, "silence", i) && GET_LEVEL(ch) >= PATRON) {
+  if (!strncasecmp(name, "silence", i)) {
     if (IS_SET(vict->pcdata->punish, PUNISH_SILENCED)) {
         send_to_char("The gods take pity on you and lift your silence.\n\r",
                      vict);
@@ -4187,7 +4193,7 @@ int do_punish(struct char_data *ch, char *arg, int cmd)
     }
     TOGGLE_BIT(vict->pcdata->punish, PUNISH_SILENCED);
   }
-  if (!strncasecmp(name, "freeze", i) && GET_LEVEL(ch) >= PATRON) {
+  if (!strncasecmp(name, "freeze", i)) {
     if (IS_SET(vict->pcdata->punish, PUNISH_FREEZE)) {
         send_to_char("You now can do things again.\n\r", vict);
         send_to_char("FREEZE removed.\n\r", ch);
@@ -4202,7 +4208,7 @@ int do_punish(struct char_data *ch, char *arg, int cmd)
     }
     TOGGLE_BIT(vict->pcdata->punish, PUNISH_FREEZE);
   }
-  if(!strncasecmp(name, "noarena", i) && GET_LEVEL(ch) >= PATRON) {
+  if(!strncasecmp(name, "noarena", i)) {
     if(IS_SET(vict->pcdata->punish, PUNISH_NOARENA)) {
         send_to_char("Some kind god has let you join arenas again.\n\r", vict);
         send_to_char("NOARENA removed.\n\r", ch);
@@ -4213,7 +4219,7 @@ int do_punish(struct char_data *ch, char *arg, int cmd)
     }
     TOGGLE_BIT(vict->pcdata->punish, PUNISH_NOARENA);
   }
-  if (!strncasecmp(name, "noemote", i) && GET_LEVEL(ch) >= PATRON) {
+  if (!strncasecmp(name, "noemote", i)) {
     if (IS_SET(vict->pcdata->punish, PUNISH_NOEMOTE)) {
         send_to_char("You can emote again.\n\r", vict);
         send_to_char("NOEMOTE removed.\n\r", ch);
@@ -4224,7 +4230,7 @@ int do_punish(struct char_data *ch, char *arg, int cmd)
     }
     TOGGLE_BIT(vict->pcdata->punish, PUNISH_NOEMOTE);
   }
-  if (!strncasecmp(name, "notell", i) && GET_LEVEL(ch) >= PATRON) {
+  if (!strncasecmp(name, "notell", i)) {
     if (IS_SET(vict->pcdata->punish, PUNISH_NOTELL)) {
         send_to_char("You can use telepatic communication again.\n\r", vict);
         send_to_char("NOTELL removed.\n\r", ch);
@@ -4235,7 +4241,7 @@ int do_punish(struct char_data *ch, char *arg, int cmd)
     }
     TOGGLE_BIT(vict->pcdata->punish, PUNISH_NOTELL);
   }
-  if (!strncasecmp(name, "noname", i) && GET_LEVEL(ch) >= PATRON) {
+  if (!strncasecmp(name, "noname", i)) {
     if(IS_SET(vict->pcdata->punish, PUNISH_NONAME)) {
       send_to_char("The gods grant you control over your name.\n\r", vict); 
       send_to_char("NONAME removed.\n\r", ch);
@@ -4248,7 +4254,7 @@ int do_punish(struct char_data *ch, char *arg, int cmd)
     TOGGLE_BIT(vict->pcdata->punish, PUNISH_NONAME);
   }
 
-  if (!strncasecmp(name, "notitle", i) && GET_LEVEL(ch) >= PATRON) {
+  if (!strncasecmp(name, "notitle", i)) {
     if(IS_SET(vict->pcdata->punish, PUNISH_NOTITLE)) {
       send_to_char("The gods grant you control over your title.\n\r", vict);  
       send_to_char("NOTITLE removed.\n\r", ch);
@@ -4261,7 +4267,7 @@ int do_punish(struct char_data *ch, char *arg, int cmd)
     TOGGLE_BIT(vict->pcdata->punish, PUNISH_NOTITLE);
   }
 
-  if (!strncasecmp(name, "unlucky", i) && GET_LEVEL(ch) >= OVERSEER) {
+  if (!strncasecmp(name, "unlucky", i)) {
     if(IS_SET(vict->pcdata->punish, PUNISH_UNLUCKY)) {
       if(!ch->pcdata->stealth)
         send_to_char("The gods remove your poor luck.\n\r", vict);  
