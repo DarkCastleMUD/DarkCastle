@@ -2316,6 +2316,8 @@ int perform_alias(struct descriptor_data *d, char *orig) {
      char first_arg[MAX_INPUT_LENGTH], new_buf[MAX_INPUT_LENGTH], *ptr;
      ptr = any_one_arg(orig, first_arg);
      struct char_player_alias * x;
+     int lengthpre;
+     int lengthpost;
      
      if(!*first_arg) {
          return(0);
@@ -2327,9 +2329,26 @@ int perform_alias(struct descriptor_data *d, char *orig) {
          if (x->keyword)
             if (!strcmp(x->keyword, first_arg)) {
                strcpy(new_buf, x->command);
-               strcat(new_buf, ptr);
-               strcat(new_buf, "\0");
-               strcpy(orig, new_buf);
+
+               // make sure the new command still fits in our buffers
+               lengthpre = strlen(new_buf);
+               lengthpost = strlen(ptr);
+               if(lengthpre + lengthpost > MAX_INPUT_LENGTH - 1)
+               {
+                  ptr[MAX_INPUT_LENGTH - lengthpre - 1] = '\0'; // truncate it to fit
+                  strcat(new_buf, ptr);
+                  strcat(new_buf, "\0");
+                  strcpy(orig, new_buf);
+                  SEND_TO_Q("Line too long.  Truncated to:\r\n", d);
+                  SEND_TO_Q(orig, d);
+                  SEND_TO_Q("\r\n", d);
+               }
+               else 
+               {
+                  strcat(new_buf, ptr);
+                  strcat(new_buf, "\0");
+                  strcpy(orig, new_buf);
+               }
             }
         }
     return(0);
