@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: non_off.cpp,v 1.8 2002/08/25 17:36:32 pirahna Exp $
+| $Id: non_off.cpp,v 1.9 2002/09/13 17:50:51 pirahna Exp $
 | non_off.C
 | Description:  Implementation of generic, non-offensive commands.
 */
@@ -855,3 +855,21 @@ int do_wake(CHAR_DATA *ch, char *argument, int cmd)
     return eSUCCESS;
 }
  
+// global tag var
+char_data * tagged_person;
+
+int do_tag(CHAR_DATA *ch, char *argument, int cmd)
+{
+   char name[MAX_INPUT_LENGTH];
+   char_data * victim;
+
+   one_argument(name, argument);
+
+   if(!*name || !(victim = get_char_room_vis(ch, name))) {
+     send_to_char("Tag who?\r\n", ch);
+     return eFAILURE;
+   }
+
+   return eSUCCESS;   
+}
+
