@@ -1572,7 +1572,8 @@ void mprog_driver ( char *com_list, CHAR_DATA *mob, CHAR_DATA *actor,
    if ( !IS_NPC( vch )  &&  vch->level < IMMORTAL  &&  CAN_SEE( mob, vch ) )
        count++;
 
- count = number( 0, count );
+ if(count)
+   count = number( 1, count );  // if we have valid victs, choose one
 
  if(count) 
  {
