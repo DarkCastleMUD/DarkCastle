@@ -881,7 +881,8 @@ void game_loop(unsigned mother_desc, unsigned other_desc, unsigned third_desc)
 	   Sleep(delay_time.tv_sec * 1000 + delay_time.tv_usec / 1000);
 #endif
     }
-    else logf(110, LOG_BUG, "0 delay on pulse");
+    // temp removing this since it's spamming the crap out of us
+    //else logf(110, LOG_BUG, "0 delay on pulse");
     gettimeofday(&last_time, NULL);
   }
 }
