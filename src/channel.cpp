@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: channel.cpp,v 1.4 2003/01/22 05:26:49 pirahna Exp $
+| $Id: channel.cpp,v 1.5 2003/03/04 05:16:02 pirahna Exp $
 | channel.C
 | Description:  All of the channel - type commands; do_say, gossip, etc..
 */
@@ -482,6 +482,11 @@ int do_tell(struct char_data *ch, char *argument, int cmd)
 	return eSUCCESS;
     }
 
+    if (!IS_MOB(ch) && IS_SET(ch->pcdata->toggles, PLR_NOTELL)) {
+	send_to_char("You have NOTELL toggled on!!\n\r", ch);
+	return eSUCCESS;
+    }
+
     half_chop(argument, name, message);
     // these don't do anything that i can see -pir
     name[199]     = '\0';
@@ -501,6 +506,11 @@ int do_tell(struct char_data *ch, char *argument, int cmd)
     }
     else if(!(vict = get_active_pc_vis(ch, name))) { 
       send_to_char("No-one by that name here.\n\r", ch);
+      return eSUCCESS;
+    }
+        // vict guarantted to be a PC
+    if( IS_SET(vict->pcdata->toggles, PLR_NOTELL) ) {
+      send_to_char("The person is ignoring all tells right now.\r\n", ch);
       return eSUCCESS;
     }
     

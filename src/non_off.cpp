@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: non_off.cpp,v 1.12 2003/02/17 21:09:26 pirahna Exp $
+| $Id: non_off.cpp,v 1.13 2003/03/04 05:16:02 pirahna Exp $
 | non_off.C
 | Description:  Implementation of generic, non-offensive commands.
 */
@@ -250,6 +250,7 @@ char * toggle_txt[] = {
   "auto-eat",
   "summonable",
   "lfg",
+  "notell",
   ""
 };
 
@@ -329,6 +330,11 @@ int do_toggle(struct char_data * ch, char * arg, int cmd)
 	   IS_SET(ch->pcdata->toggles, PLR_LFG) ? "on" : "off");
 	 break;
 	 
+         case 12:
+	 sprintf(buf + strlen(buf), "%s\n\r",
+	   IS_SET(ch->pcdata->toggles, PLR_NOTELL) ? "on" : "off");
+	 break;
+	 
          default:
 	 break;
        }
@@ -395,6 +401,10 @@ int do_toggle(struct char_data * ch, char * arg, int cmd)
     
     case 11:
     do_lfg_toggle(ch, "", 9);
+    break;
+    
+    case 11:
+    do_notell_toggle(ch, "", 9);
     break;
     
     default:
@@ -511,6 +521,27 @@ int do_lfg_toggle(struct char_data *ch, char *argument, int cmd)
 	send_to_char( "You are now Looking For Group.\n\r", ch);
 	SET_BIT(ch->pcdata->toggles, PLR_LFG);
     }
+    return eSUCCESS;
+}
+
+int do_notell_toggle(struct char_data *ch, char *argument, int cmd)
+{
+    if (IS_NPC(ch))
+	return eFAILURE;
+
+    if (IS_SET(ch->pcdata->toggles, PLR_NOTELL))
+    {
+	send_to_char( "You are able to send and recieve tells again.\n\r", ch);
+	REMOVE_BIT(ch->pcdata->toggles, PLR_NOTELL);
+    }
+    else
+    {
+	send_to_char( "You are no longer able to send or recieve tells.\n\r", ch);
+	SET_BIT(ch->pcdata->toggles, PLR_NOTELL);
+    }
+
+    WAIT_STATE(ch, PULSE_VIOLENCE*2); // lag so it's not abused as bad
+
     return eSUCCESS;
 }
 
