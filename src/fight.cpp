@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.168 2004/04/29 22:44:02 urizen Exp $ */
+/* $Id: fight.cpp,v 1.169 2004/05/02 18:24:51 urizen Exp $ */
 
 extern "C"
 {
@@ -1595,7 +1595,8 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
       eq_damage(ch, victim, dam, weapon_type, attacktype);
 
   inform_victim(ch, victim, dam);
-
+  if (ch->in_room != victim->in_room) // Wimpy
+      return eSUCCESS;   
   if(typeofdamage == DAMAGE_TYPE_PHYSICAL && dam > 0 && ch != victim)
   {
     retval = do_fireshield(ch, victim, dam);

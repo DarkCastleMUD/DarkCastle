@@ -19,7 +19,7 @@
 /* 12/06/2003   Onager   Modified mobile_activity() to prevent charmie    */
 /*                       scavenging                                       */
 /**************************************************************************/
-/* $Id: mob_act.cpp,v 1.21 2004/04/29 22:44:02 urizen Exp $ */
+/* $Id: mob_act.cpp,v 1.22 2004/05/02 18:24:51 urizen Exp $ */
 
 extern "C"
 {
@@ -418,7 +418,7 @@ void mobile_activity(void)
             retval = mprog_attack_trigger( ch, tmp_ch );
             if(SOMEONE_DIED(retval))
               break;
-            attack(ch, tmp_ch, 0);
+            attack(ch, tmp_ch, TYPE_UNDEFINED);
             break;
           }
           else 

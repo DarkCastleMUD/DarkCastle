@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.120 2004/04/29 22:44:02 urizen Exp $ */
+/* $Id: magic.cpp,v 1.121 2004/05/02 18:24:51 urizen Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -76,6 +76,21 @@ void update_pos( CHAR_DATA *victim );
 bool many_charms(CHAR_DATA *ch);
 bool ARE_GROUPED( CHAR_DATA *sub, CHAR_DATA *obj);
 void add_memory(CHAR_DATA *ch, char *victim, char type);
+
+bool resist_spell(int perc)
+{
+  if (number(1,101) > perc)
+    return TRUE;
+  return FALSE;
+}
+
+bool resist_spell(CHAR_DATA *ch, int skill)
+{
+  int perc = has_skill(ch,skill);
+  if (number(1,101) > perc)
+    return TRUE;
+  return FALSE;
+}
 
 /* Offensive Spells */
 

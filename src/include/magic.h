@@ -5,13 +5,15 @@
  *                                                                           *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-/* $Id: magic.h,v 1.13 2004/04/24 20:36:33 urizen Exp $ */
+/* $Id: magic.h,v 1.14 2004/05/02 18:24:55 urizen Exp $ */
 #ifndef MAGIC_H_
 #define MAGIC_H_
 
 #include <structs.h> // byte, etc..
 
 #define GLOBE_OF_DARKNESS_OBJECT      101
+bool resist_spell(int perc);
+bool resist_spell(CHAR_DATA *ch, int skill);
 
 int spell_resist_fire(byte level, CHAR_DATA * ch,
    CHAR_DATA * victim, struct obj_data * obj, int skill);

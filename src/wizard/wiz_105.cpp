@@ -322,12 +322,12 @@ int do_sqedit(struct char_data *ch, char *argument, int cmd)
       int l;
       for (l = 0; *pc_clss_types2[l] != '\n'; l++)
       {
-        if (!str_cmp(pc_clss_types2[l],arg2))
+        if (!str_cmp(pc_clss_types2[l],arg1))
            break;
       }
       if (*pc_clss_types2[l] == '\n')
       {
-	send_to_char("Unkown class.",ch);
+	send_to_char("Unknown class.",ch);
 	return eFAILURE;
       }
       send_to_char("These are the current sqs:\r\n",ch);
