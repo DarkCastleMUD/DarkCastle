@@ -3,7 +3,7 @@
  *
  * -Sadus
  */
-/* $Id: arena.cpp,v 1.2 2002/06/13 04:41:07 dcastle Exp $ */
+/* $Id: arena.cpp,v 1.3 2002/08/02 19:27:46 dcastle Exp $ */
 
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
@@ -125,6 +125,16 @@ int do_joinarena(CHAR_DATA *ch, char *arg, int cmd)
     send_to_char("The arena is already full!\n\r", ch);
     return eFAILURE;
   }
+  if(ch->fighting) {
+    send_to_char("You're ALREADY in a fight...isn't that kinda silly?\r\n", ch);
+    return eFAILURE;
+  }
+
+  if(GET_POS(ch) == POSITION_SLEEPING) {
+    affect_from_char(ch, INTERNAL_SLEEPING);
+    do_wake(ch, "", 9);
+  }
+
   arena[3]++;
   for(af = ch->affected; af; af = next_af) {
      next_af = af->next;
