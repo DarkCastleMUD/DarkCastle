@@ -76,8 +76,7 @@ const struct golem_data golem_list[] = {
     2000, 5, 5, 25, 50, {104,105,106,0,7003}, 0, ISR_PIERCE, -100, "There is a deep rumbling as a stone golem slowly rises from the ground.\n",
     "Unable to sustain further damage, the stone golem shaters to pieces.",
     "As the magic binding it is released, the golem crumbles to dust."
-}
-
+   }
 };
 
 #define MAX_GOLEMS 2 // amount of golems above +1
@@ -301,7 +300,7 @@ int cast_create_golem(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA 
 extern char frills[];
 
 int do_golem_score(struct char_data *ch, char *argument, int cmd)
-{ /* Pretty much a rip of score*/
+{ /* Pretty much a rip of score */
    char race[100];
    char buf[MAX_STRING_LENGTH], scratch;
    int  level = 0;

@@ -21,7 +21,7 @@
  *  12/08/2003   Onager    Added check for charmies and !charmie eq to     *
  *                         equip_char()                                    *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.62 2004/05/28 16:41:57 urizen Exp $ */
+/* $Id: handler.cpp,v 1.63 2004/05/28 20:08:29 urizen Exp $ */
     
 extern "C"
 {
@@ -1571,9 +1571,10 @@ CHAR_DATA *get_char(char *name)
    if((number = get_number(&tmp)) < 0)
       return(0);
 
-   for (i = character_list, j = 1; i && (j <= number); i = i->next)
+   for (i = character_list, j = 0; i && (j <= number); i = i->next)
       {
-      if (number == 1)
+      if (number == 0 && IS_NPC(i)) continue;
+      if (number == 1 || number == 0)
          {
          if (isname(tmp, GET_NAME(i)))
             return(i);
@@ -1592,9 +1593,9 @@ CHAR_DATA *get_char(char *name)
          {
          if(isname(tmp, GET_NAME(i)))
             {
+	    j++;
             if(j == number)
                return(i);
-            j++;
             }
          }
 	   }
@@ -2610,9 +2611,10 @@ CHAR_DATA *get_char_vis(CHAR_DATA *ch, char *name)
    if((number = get_number(&tmp))<0)
 	   return(0);
 
-   for(i = character_list, j = 1; i && (j <= number); i = i->next)
+   for(i = character_list, j = 0; i && (j <= number); i = i->next)
       {
-      if (number == 1)
+      if (number == 0 && IS_NPC(i)) continue;
+      if (number == 1 || number == 0)
          {
          if (isname(tmp, GET_NAME(i)) && CAN_SEE(ch,i))
             return(i);
@@ -2631,9 +2633,9 @@ CHAR_DATA *get_char_vis(CHAR_DATA *ch, char *name)
          {
          if(isname(tmp, GET_NAME(i)) && CAN_SEE(ch, i))
             {
+	    j++;
             if(j == number)
                return(i);
-            j++;
             }
          }
 	   }
