@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.15 2002/09/17 20:39:56 pirahna Exp $ */
+/* $Id: mob_proc2.cpp,v 1.16 2002/10/03 00:30:24 pirahna Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -520,6 +520,9 @@ int mortician(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
            (!isname(GET_NAME(ch), obj->name) && !isname(buf, obj->name)))
          continue; 
 
+       if(!obj->contains)  // skip empty corpses
+         continue;
+
        cost = 0;
        for(obj2 = obj->contains; obj2; obj2 = obj2->next_content) {
           if(obj2->obj_flags.type_flag == ITEM_MONEY)
@@ -575,6 +578,9 @@ int mortician(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
      if( !isname("pc", obj->name)         ||
          (!isname(GET_NAME(ch), obj->name) && !isname(buf, obj->name)) ||
         ++x < which)
+       continue;
+
+     if(!obj->contains)  // skip empty corpses
        continue;
 
      if(isname(buf, obj->name))
