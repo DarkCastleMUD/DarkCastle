@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.22 2003/01/30 05:32:22 pirahna Exp $ */
+/* $Id: db.cpp,v 1.23 2003/02/17 21:51:04 pirahna Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -370,7 +370,7 @@ char * funnybootmessages[] =
   "Boosting random mob stats...\r\n",
   "Finding something fun in game to remove...\r\n",
   "Determining array dope vectors...\r\n",
-  "Divide By Cucumber Error. Please Reinstall Universe And Reboot"
+  "Divide By Cucumber Error. Please Reinstall Universe And Reboot\r\n"
 };
 
 void funny_boot_message()
