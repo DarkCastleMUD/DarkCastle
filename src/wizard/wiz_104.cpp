@@ -935,8 +935,9 @@ char_data *)(mob_index[nr].item))->level,
   //     send_to_char("Unknown argument.\r\n",ch);
 //       return eFAILURE;
      }
-     int c,nr;
+     int c,nr,aff;
 //     csendf(ch,"%d %d %d %d %d", more, extra, wear, size, affect);
+     bool found = FALSE;
      for (c=0;c < obj_index[top_of_objt].virt;c++)
      {
       if ((nr = real_object(c)) < 0)
@@ -950,7 +951,7 @@ char_data *)(mob_index[nr].item))->level,
        for (i = 0; i < 1 << 10; i++)
 	if (IS_SET(size, 1<<i))
       if (!IS_SET(((struct obj_data *)(obj_index[nr].item))->obj_flags.size, 1<<i))
-	goto endloop;
+	goto endLoop;
       if(extra)
         for (i = 0; i < 1 << 30; i++)
 	  if (IS_SET(extra,1<<i))
@@ -961,8 +962,8 @@ char_data *)(mob_index[nr].item))->level,
 	  if (IS_SET(more,1<<i))
       if (!IS_SET(((struct obj_data *)(obj_index[nr].item))->obj_flags.more_flags, 1<<i))
 	goto endLoop;
-      int aff,total = 0;
-      bool found = FALSE;
+//      int aff,total = 0;
+  //    bool found = FALSE;
       for (aff = 0; aff < ((struct obj_data *)(obj_index[nr].item))->num_affects;aff++)
 	 if (affect== ((struct obj_data *)(obj_index[nr].item))->affected[aff].location)
 	   found = TRUE;
