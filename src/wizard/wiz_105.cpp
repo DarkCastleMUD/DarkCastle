@@ -215,10 +215,10 @@ int do_sqedit(struct char_data *ch, char *argument, int cmd)
 	}
 	argument = one_argument(argument,arg3);
         if (arg3[0] != '\0')
-          for (int i = 0; *pc_clss_types[i] != '\n'; i++)
+          for (int x = 0; *pc_clss_types[x] != '\n'; x++)
           {
-             if (!str_cmp(pc_clss_types[i],arg3))
-               clas = i;
+             if (!str_cmp(pc_clss_types[x],arg3))
+               clas = x;
           }
 
       #ifdef LEAK_CHECK
