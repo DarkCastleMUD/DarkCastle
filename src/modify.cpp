@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: modify.cpp,v 1.7 2004/04/16 17:26:15 urizen Exp $ */
+/* $Id: modify.cpp,v 1.8 2004/05/14 00:30:11 urizen Exp $ */
 
 extern "C"
 {
@@ -544,7 +544,7 @@ char *one_word(char *argument, char *first_arg )
     return(argument+begin);
 }
 
-#define MAX_HELP  1000
+#define MAX_HELP  1100
 
 void free_help_from_memory()
 {
