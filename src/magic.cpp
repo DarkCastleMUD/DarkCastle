@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.32 2002/09/28 23:27:42 pirahna Exp $ */
+/* $Id: magic.cpp,v 1.33 2002/09/29 02:24:25 pirahna Exp $ */
 
 extern "C"
 {
@@ -3278,7 +3278,8 @@ int spell_cont_light(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
     act("You twiddle your thumbs and the $p begins to glow.", ch, obj, 0, TO_CHAR, 0);
     return eSUCCESS;
   }
-  
+
+/*  
   tmp_obj = (struct obj_data *)dc_alloc(1, sizeof(struct obj_data));
   clear_object(tmp_obj);
 
@@ -3297,15 +3298,16 @@ int spell_cont_light(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
 
   tmp_obj->next = object_list;
   object_list = tmp_obj;
+*/
+
+  tmp_obj = clone_object(real_object(6));
 
   obj_to_char(tmp_obj, ch);
 
   tmp_obj->item_number = -1;
 
-  act("$n twiddles $s thumbs and $p suddenly appears.", ch, tmp_obj, 0,
-      TO_ROOM, INVIS_NULL);
-  act("You twiddle your thumbs and $p suddenly appears.", ch, tmp_obj, 0,
-      TO_CHAR, 0);
+  act("$n twiddles $s thumbs and $p suddenly appears.", ch, tmp_obj, 0, TO_ROOM, INVIS_NULL);
+  act("You twiddle your thumbs and $p suddenly appears.", ch, tmp_obj, 0, TO_CHAR, 0);
   return eSUCCESS;
 }
 
