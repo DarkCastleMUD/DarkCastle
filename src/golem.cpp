@@ -44,10 +44,10 @@ struct golem_data
 const struct golem_data golem_list[] = {
   {"iron", "iron golem", "an iron golem", "An iron golem stands here, awaiting its master's commands. ", 
     "The golem looks inanimate, except when it performs some task for its\nmaster. During those periods it moves with suprising speed.",
-    1000, 15, 5, 25, 0, {0, 0, 0, 0, 0}, AFF_LIGHTNINGSHIELD},
+    1000, 15, 5, 25, 0, {1, 1, 1, 1, 1}, AFF_LIGHTNINGSHIELD},
  {  "stone","stone golem", "a stone golem", "A stone golem stands here, awaiting its master's commands.",
     "The golem looks inanimate, except when it performs some task for its\nmaster. During those periods it moves with suprising speed.",
-    2000, 5, 5, 25, 0, {0,0,0,0,0},0}
+    2000, 5, 5, 25, 0, {1,1,1,1,1},0}
 };
 #define MAX_GOLEMS 2 // amount of golems above +1
 

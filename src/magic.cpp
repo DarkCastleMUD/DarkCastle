@@ -1,4 +1,5 @@
- /***************************************************************************
+ 
+/***************************************************************************
  *  file: magic.c , Implementation of spells.              Part of DIKUMUD *
  *  Usage : The actual effect of magic.                                    *
  *  Copyright (C) 1990, 1991 - see 'license.doc' for complete information. *
@@ -12,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.134 2004/05/21 01:57:37 urizen Exp $ */
+/* $Id: magic.cpp,v 1.135 2004/05/21 02:09:44 urizen Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -8319,7 +8320,7 @@ int check_components(CHAR_DATA *ch, int destroy, int item_one = 0,
 // Make sure we found everything before saying its OK                           
                                                                                 
   all_ok = ((item_one != 0) && (ptr_one != 0));                                 
-                                                                                
+
   if(all_ok && item_one)                                                        
      all_ok = (int) ptr_one;                                                    
   if(all_ok && item_two)                                                        
