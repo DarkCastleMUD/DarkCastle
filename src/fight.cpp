@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.57 2002/08/26 22:29:16 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.58 2002/08/28 04:18:45 dcastle Exp $ */
 
 extern "C"
 {
@@ -1103,7 +1103,6 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
     if (IS_SET(ch->combat, COMBAT_HITALL))
       dam = (int)(dam * 2);
     percent = (int) (( ((float)GET_HIT(ch)) / ((float)GET_MAX_HIT(ch)) ) * 100);
-    csendf(ch, "You should be at %d percent.\r\n", percent);
     if( percent < 40 && (learned = has_skill(ch, SKILL_FRENZY))) 
     {
       if(learned > number(1, 101)) {
