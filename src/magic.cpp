@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.54 2003/01/08 21:36:07 dcastle Exp $ */
+/* $Id: magic.cpp,v 1.55 2003/01/14 05:54:38 dcastle Exp $ */
 
 extern "C"
 {
@@ -6625,6 +6625,11 @@ int cast_fear( byte level, CHAR_DATA *ch, char *arg, int type,
 {
   int retval;
   char_data * next_v;
+
+  if (IS_SET(world[ch->in_room].room_flags, SAFE)){
+         send_to_char("You can not fear someone in a safe area!\n\r", ch);
+         return eFAILURE;
+  }
 
   switch (type) {
   case SPELL_TYPE_SPELL:

@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.85 2003/01/08 22:11:50 dcastle Exp $ */
+/* $Id: fight.cpp,v 1.86 2003/01/14 05:54:38 dcastle Exp $ */
 
 extern "C"
 {
@@ -1363,18 +1363,20 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
   {
     dam = 0;
     if (attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING) {
-      act("You ignore $n's puny weapon.", ch, 0, victim, TO_VICT, 0);
-      act("$N ignores your puny weapon.", ch, 0, victim, TO_CHAR, 0);
-      act("$N ignores $n's puny weapon.", ch, 0, victim, TO_ROOM, NOTVICT);
+//      act("You ignore $n's puny weapon.", ch, 0, victim, TO_VICT, 0);
+//      act("$N ignores your puny weapon.", ch, 0, victim, TO_CHAR, 0);
+//      act("$N ignores $n's puny weapon.", ch, 0, victim, TO_ROOM, NOTVICT);
+      SET_BIT(modifier, COMBAT_MOD_IGNORE);
     }
   } 
   else if (IS_SET(victim->suscept, weapon_bit)) 
   {
     dam = (int)(dam * 1.3);
     if (attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING) {
-      act("You shudder from the power of $n's weapon.", ch, 0, victim, TO_VICT, 0);
-      act("$N shudders from the power of your weapon.", ch, 0, victim, TO_CHAR, 0);
-      act("$N shudders from the power of $n's weapon.", ch, 0, victim, TO_ROOM, NOTVICT);
+//      act("You shudder from the power of $n's weapon.", ch, 0, victim, TO_VICT, 0);
+//      act("$N shudders from the power of your weapon.", ch, 0, victim, TO_CHAR, 0);
+//      act("$N shudders from the power of $n's weapon.", ch, 0, victim, TO_ROOM, NOTVICT);
+      SET_BIT(modifier, COMBAT_MOD_SUSCEPT);
     } else {
       act("You shudder from the power of $n's spell.", ch, 0, victim, TO_VICT, 0);
       act("$N shudders from the power of your spell.", ch, 0, victim, TO_CHAR, 0);
@@ -1385,9 +1387,10 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
   {
     dam = (int)(dam * 0.7);
     if (attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING)  {
-      act("You resist against the power of $n's weapon.", ch, 0, victim, TO_VICT, 0);
-      act("$N resists against the power of your weapon.", ch, 0, victim, TO_CHAR, 0);
-      act("$N resists against the power of $n's weapon.", ch, 0, victim, TO_ROOM, NOTVICT);
+//      act("You resist against the power of $n's weapon.", ch, 0, victim, TO_VICT, 0);
+//      act("$N resists against the power of your weapon.", ch, 0, victim, TO_CHAR, 0);
+//      act("$N resists against the power of $n's weapon.", ch, 0, victim, TO_ROOM, NOTVICT);
+        SET_BIT(modifier, COMBAT_MOD_RESIST);
     } 
     else {
       act("You resist against the power of $n's spell.", ch, 0, victim, TO_VICT, 0);
@@ -2940,7 +2943,19 @@ void dam_message(int dam, CHAR_DATA * ch, CHAR_DATA * victim,
   char *attack;
   char punct;
   char modstring[200];
-  
+  char endstring[200];
+
+  if( 0 == dam && IS_SET(modifier, COMBAT_MOD_IGNORE) ) 
+  {
+     sprintf(buf1, "$n's pitiful attack is ignored by $N!");
+     sprintf(buf2, "Your weak attack is completely ignored by $N!");
+     sprintf(buf3, "You ignore $n's pitiful attack.");
+     act(buf1, ch, NULL, victim, TO_ROOM, NOTVICT);
+     act(buf2, ch, NULL, victim, TO_CHAR, 0);
+     act(buf3, ch, NULL, victim, TO_VICT, 0);
+     return;
+  } 
+ 
   vx = "";
   
   if(dam == 0) { 
@@ -3019,23 +3034,32 @@ void dam_message(int dam, CHAR_DATA * ch, CHAR_DATA * victim,
    }
    punct = (dam <= 29) ? '.' : '!';
 
-   if(modifier) {
+   if(IS_SET(modifier, COMBAT_MOD_FRENZY)) {
      strcpy(modstring, "frenzied ");
    }
    else *modstring = '\0';
 
+   if(IS_SET(modifier, COMBAT_MOD_SUSCEPT)) {
+     strcpy(endstring, " doing extra damage");
+   }
+
+   if(IS_SET(modifier, COMBAT_MOD_RESIST)) {
+     strcpy(endstring, " but is resisted");
+   }
+   else *endstring = '\0';
+
    if (w_type == 0)
    {
-     sprintf(buf1, "$n's %spunch %s $N%s%c", modstring, vp, vx, punct);
-     sprintf(buf2, "Your %spunch %s $N%s%c", modstring, vp, vx, punct);
-     sprintf(buf3, "$n's %spunch %s you%s%c", modstring, vp, vx, punct);
+     sprintf(buf1, "$n's %spunch %s $N%s%s%c", modstring, vp, vx, endstring, punct);
+     sprintf(buf2, "Your %spunch %s $N%s%s%c", modstring, vp, vx, endstring, punct);
+     sprintf(buf3, "$n's %spunch %s you%s%s%c", modstring, vp, vx, endstring, punct);
    }
    else
    {
      attack = attack_table[w_type];
-     sprintf(buf1, "$n's %s%s %s $N%s%c", modstring, attack, vp, vx, punct);
-     sprintf(buf2, "Your %s%s %s $N%s%c", modstring, attack, vp, vx, punct);
-     sprintf(buf3, "$n's %s%s %s you%s%c", modstring, attack, vp, vx, punct);
+     sprintf(buf1, "$n's %s%s %s $N%s%s%c", modstring, attack, vp, vx, endstring, punct);
+     sprintf(buf2, "Your %s%s %s $N%s%s%c", modstring, attack, vp, vx, endstring, punct);
+     sprintf(buf3, "$n's %s%s %s you%s%s%c", modstring, attack, vp, vx, endstring, punct);
    }
    
    act(buf1, ch, NULL, victim, TO_ROOM, NOTVICT);
