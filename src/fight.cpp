@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.180 2004/05/14 00:04:12 urizen Exp $ */
+/* $Id: fight.cpp,v 1.181 2004/05/14 00:10:20 urizen Exp $ */
 
 extern "C"
 {
@@ -1914,10 +1914,7 @@ int check_riposte(CHAR_DATA * ch, CHAR_DATA * victim)
 
 bool check_shieldblock(CHAR_DATA * ch, CHAR_DATA * victim, int attacktype)
 {
-  int percent;
-  int learned;
-  int chance;
-  
+  int modifier = 0;  
   if((IS_SET(victim->combat, COMBAT_STUNNED)) ||
     (victim->equipment[WEAR_SHIELD] == NULL) ||
     (IS_NPC(victim) && (!IS_SET(victim->mobdata->actflags, ACT_PARRY))) ||
@@ -1927,8 +1924,6 @@ bool check_shieldblock(CHAR_DATA * ch, CHAR_DATA * victim, int attacktype)
     (IS_AFFECTED(victim, AFF_PARALYSIS)))
     return FALSE;
   
-  chance = 0;
-
   // TODO - remove this when mobs have "skills"
   if (IS_NPC(victim))
   {
@@ -1936,27 +1931,19 @@ bool check_shieldblock(CHAR_DATA * ch, CHAR_DATA * victim, int attacktype)
       case CLASS_MONK:
       case CLASS_ANTI_PAL:
       case CLASS_PALADIN:
-      case CLASS_WARRIOR:  chance = GET_LEVEL(victim); break;
+      case CLASS_WARRIOR:  modifier = 5; break;
       case CLASS_RANGER:
       case CLASS_BARBARIAN:
-      case CLASS_THIEF:    chance = GET_LEVEL(victim) - 10;
-                           if(chance < 10) chance = 1; break;
+      case CLASS_THIEF:    modifier = 0; break;
       default:
-         return FALSE;
+	modifier = -5;break;
     }
   }
-  else if (!(chance = has_skill(victim, SKILL_SHIELDBLOCK)))
-    return FALSE;
+  modifier += speciality_bonus(victim,attacktype);
+  extern int stat_mod[];
+  modifier -= stat_mod[GET_DEX(victim)];
 
-  learned = chance;
-  chance /= 2;
-  chance += (int)(GET_DEX(ch) / 2);
-
-  if((GET_LEVEL(ch) - GET_LEVEL(victim)) < 0)
-    chance += (int)((GET_LEVEL(ch) - GET_LEVEL(victim)));
-
-  percent = number(1, 101);
-  if (percent >= chance)
+  if (skill_success(victim,ch, SKILL_SHIELDBLOCK,modifier))
     return FALSE;
   
   act("$n blocks $N's attack with $s shield.", victim, NULL, ch, TO_ROOM, NOTVICT);
