@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.59 2004/04/18 14:46:45 urizen Exp $ */
+/* $Id: spells.cpp,v 1.60 2004/04/20 21:57:16 urizen Exp $ */
 
 extern "C"
 {
@@ -954,7 +954,8 @@ void affect_update( void )
 	        send_to_char(spell_wear_off_msg[af->type], i);
 	        send_to_char("\n\r", i);
 	     }
-	  affect_remove(i, af, 0);
+	bool isaff2(int spellnum);
+	  affect_remove(i, af, 0,isaff2(af->type));
 	}
       }
   }
@@ -1380,7 +1381,8 @@ int do_release(CHAR_DATA *ch, char *argument, int cmd)
                 send_to_char("\n\r", ch);
              }
 	  ch->mana -= 25;
-	  affect_remove(ch,aff,0);
+bool isaff2(int spellnum);
+	  affect_remove(ch,aff,0,isaff2(aff->type));
           return eSUCCESS;
        }
     }

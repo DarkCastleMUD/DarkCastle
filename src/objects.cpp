@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.28 2004/04/20 19:42:43 urizen Exp $
+| $Id: objects.cpp,v 1.29 2004/04/20 21:57:16 urizen Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -1348,30 +1348,6 @@ int will_screwup_worn_sizes(char_data * ch, obj_data * obj, int add)
   return FALSE;
 }
 
-// Urizen, hack of will_screwup_worn_sizes
-// Checks for, and removes items that are no longer
-// wear-able, because of disarm, scrap etc.
-int recheck_height_wears(char_data * ch)
-{
-  int j;
-  struct obj_data *obj = NULL;
-  if (!ch || IS_NPC(ch)) return eSUCCESS;  // NPCs get to wear the stuff. 
-
-  for(j = 0; j < MAX_WEAR; j++)
-  {
-    if(!ch->equipment[j]) continue;
-
-    if(size_restricted(ch, ch->equipment[j])) {
-      obj = unequip_char(ch,j);
-      obj_to_char(obj,ch);
-      act("$n looks uncomfortable, and shifts $p into $s inventory.",ch, obj, NULL, TO_ROOM, 0);
-      act("$p feels uncomfortable and you shift it into your inventory.",ch, obj, NULL, TO_CHAR, 0);
-    }
-  }
-  return eSUCCESS;
-}
-
-
 void wear(struct char_data *ch, struct obj_data *obj_object, int keyword)
 {
   struct obj_data *obj;
@@ -1646,9 +1622,10 @@ void wear(struct char_data *ch, struct obj_data *obj_object, int keyword)
   case 12:
     if(CAN_WEAR(obj_object,ITEM_WIELD)) {
 
-      if(!ch->equipment[WIELD] && GET_OBJ_WEIGHT(obj_object) > str_app[STRENGTH_APPLY_INDEX(ch)].wield_w)
+       
+      if(!ch->equipment[WIELD] && GET_OBJ_WEIGHT(obj_object) > str_app[STRENGTH_APPLY_INDEX(ch)].wield_w && !ch->affected_by2 & AFF_POWERWIELD)
         send_to_char("It is too heavy for you to use.\n\r",ch);
-      else if(ch->equipment[WIELD] && GET_OBJ_WEIGHT(obj_object) > (str_app[STRENGTH_APPLY_INDEX(ch)].wield_w/2))
+      else if(ch->equipment[WIELD] && GET_OBJ_WEIGHT(obj_object) > (str_app[STRENGTH_APPLY_INDEX(ch)].wield_w/2) && !ch->affected_by2 & AFF_POWERWIELD)
         send_to_char("It is too heavy for you to use as a secondary weapon.\n\r",ch);
 
       else if((!hands_are_free(ch, 2)) && 
@@ -2046,6 +2023,29 @@ int do_remove(struct char_data *ch, char *argument, int cmd)
     }
   } else {
     send_to_char("Remove what?\n\r", ch);
+  }
+  return eSUCCESS;
+}
+
+// Urizen, hack of will_screwup_worn_sizes
+// Checks for, and removes items that are no longer
+// wear-able, because of disarm, scrap etc.
+int recheck_height_wears(char_data * ch)
+{
+  int j;
+  struct obj_data *obj = NULL;
+  if (!ch || IS_NPC(ch)) return eFAILURE;  // NPCs get to wear the stuff.
+
+  for(j = 0; j < MAX_WEAR; j++)
+  {
+    if(!ch->equipment[j]) continue;
+
+    if(size_restricted(ch, ch->equipment[j])) {
+      obj = unequip_char(ch,j);
+      obj_to_char(obj,ch);
+      act("$n looks uncomfortable, and shifts $p into $s inventory.",ch, obj, NULL, TO_ROOM,0);
+      act("$p feels uncomfortable and you shift it into your inventory.",ch, obj,NULL,TO_CHAR,0);
+    }
   }
   return eSUCCESS;
 }

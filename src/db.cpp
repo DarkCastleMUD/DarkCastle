@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.41 2004/04/19 16:48:28 urizen Exp $ */
+/* $Id: db.cpp,v 1.42 2004/04/20 21:57:15 urizen Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -3963,8 +3963,9 @@ void free_char( CHAR_DATA *ch )
     extract_obj( ch->carrying );
 
 // Since affect_remove updates the linked list itself, do it this way
+   bool isaff2(int spellnum);
    while(ch->affected)
-     affect_remove( ch, ch->affected, SUPPRESS_ALL );
+     affect_remove( ch, ch->affected, SUPPRESS_ALL,isaff2(ch->affected->type) );
 
   dc_free(ch);
 }

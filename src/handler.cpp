@@ -21,7 +21,7 @@
  *  12/08/2003   Onager    Added check for charmies and !charmie eq to     *
  *                         equip_char()                                    *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.34 2004/04/20 20:47:48 urizen Exp $ */
+/* $Id: handler.cpp,v 1.35 2004/04/20 21:57:16 urizen Exp $ */
     
 extern "C"
 {
@@ -958,7 +958,7 @@ void affect_remove( CHAR_DATA *ch, struct affected_type *af, int flags, bool aff
 	 send_to_char("Your regeneration slows back to normal.\r\n",ch);
 	 break;
       case SKILL_INNATE_POWERWIELD:
-        struct obj_data *obj;
+           struct obj_data *obj;
 	   obj = ch->equipment[WIELD];
            if (obj)
 	   if (obj->obj_flags.extra_flags & ITEM_TWO_HANDED)

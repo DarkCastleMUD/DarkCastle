@@ -202,9 +202,11 @@ int innate_bloodlust(CHAR_DATA *ch, char *arg, int cmd)
 int innate_repair(CHAR_DATA *ch, char *arg, int cmd)
 {
   struct obj_data *obj;
+  char buf[MAX_STRING_LENGTH];
   int i, chance = 60-GET_LEVEL(ch);
   bool found = FALSE;
-  if ( ( obj = get_obj_in_list_vis( ch, arg, ch->carrying ) ) == NULL )
+  arg = one_argument(arg,buf);
+  if ( ( obj = get_obj_in_list_vis( ch, buf, ch->carrying ) ) == NULL )
   {
     send_to_char("You are not carrying anything like that.\r\n",ch);
     return eFAILURE;

@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.154 2004/04/20 19:42:42 urizen Exp $ */
+/* $Id: fight.cpp,v 1.155 2004/04/20 21:57:16 urizen Exp $ */
 
 extern "C"
 {
@@ -58,6 +58,7 @@ extern "C"
 #include <returnvals.h>
 #include <assert.h>
 #include <sing.h> // stop_grouped_bards
+#include <innate.h>
 extern int top_of_world;
 extern CHAR_DATA *character_list;
 extern struct descriptor_data *descriptor_list;
@@ -147,7 +148,8 @@ void perform_violence(void)
           if (*spell_wear_off_msg[af->type]) { 
             send_to_char(spell_wear_off_msg[af->type], ch);
             send_to_char("\n\r", ch);
-            affect_remove(ch, af, 0);
+	    bool isaff2(int spellnum);
+            affect_remove(ch, af, 0,isaff2(af->type));
           }  
         }
     }
@@ -3473,12 +3475,14 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim)
   
   for(af = victim->affected; af; af = afpk) {
     afpk = af->next;
+	bool isaff2(int spellnum);
     if(af->type != FUCK_CANTQUIT && 
        af->type != SKILL_LAY_HANDS &&
        af->type != SKILL_HARM_TOUCH &&
        af->type != SKILL_BLOOD_FURY &&
-       af->type != SKILL_QUIVERING_PALM)
-      affect_remove(victim, af, SUPPRESS_ALL);
+       af->type != SKILL_QUIVERING_PALM &&
+       af->type != SKILL_INNATE_TIMER)
+      affect_remove(victim, af, SUPPRESS_ALL,isaff2(af->type));
   }
   
   GET_HIT(victim)  = 1;
@@ -3626,10 +3630,11 @@ void arena_kill(CHAR_DATA *ch, CHAR_DATA *victim)
   // remove_nosave(victim);
   
   move_player_home(victim);
+bool isaff2(int spellnum);
   
   while(victim->affected)
-    affect_remove(victim, victim->affected, SUPPRESS_ALL);
-  
+    affect_remove(victim, victim->affected, SUPPRESS_ALL, isaff2(victim->affected->type));  
+
   if(ch && arena[2] == -2)
   {
     if(ch && ch->clan && GET_LEVEL(ch) < IMMORTAL)        clan  = get_clan(ch);
