@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.79 2002/11/17 21:09:29 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.80 2002/12/26 19:45:30 pirahna Exp $ */
 
 extern "C"
 {
@@ -1180,7 +1180,7 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
          send_to_char("Your mental shields cannot hold back the force of the spell!\r\n", victim);
        else {
         act("$n's spell is dissolved into nothingness by your will.", ch, 0, victim, TO_VICT, 0);
-        act("$N supreme will dissolves your spell into formless mana.", ch, 0, victim, TO_CHAR, 0);
+        act("$N's supreme will dissolves your spell into formless mana.", ch, 0, victim, TO_CHAR, 0);
         act("$n's spell streaks at $N and suddenly ceases to be.", ch, 0, victim, TO_ROOM, NOTVICT);
         REMOVE_BIT(victim->combat, COMBAT_REPELANCE);
         return eSUCCESS;

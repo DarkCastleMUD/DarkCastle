@@ -855,7 +855,7 @@ int execute_song_terrible_clef( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA 
    dam = GET_LEVEL(ch) * 4 + GET_WIS(ch) * 2 + combat*2;
 
    send_to_char("Your singing hurts your opponent!\r\n", ch);
-   act("$n's sings causes pain in $N's ears!\r\n", ch, 0, victim, TO_ROOM, NOTVICT);
+   act("$n's singing causes pain in $N's ears!\r\n", ch, 0, victim, TO_ROOM, NOTVICT);
    send_to_char("The music!  It hurts!  It hurts!\r\n", victim);
 
    retval = damage(ch, victim, dam, 0, TYPE_SONG, 0);

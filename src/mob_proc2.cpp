@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.18 2002/11/17 19:17:47 pirahna Exp $ */
+/* $Id: mob_proc2.cpp,v 1.19 2002/12/26 19:45:30 pirahna Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -1199,7 +1199,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     return eFAILURE;
 
   if(GET_LEVEL(ch) < 10) {
-    send_to_char("The Meta-physician tells you, 'You're to low level for "
+    send_to_char("The Meta-physician tells you, 'You're too low level for "
                  "me to waste my time on you.\n\r"
                  "Prove to me you are gonna stick around first!'.", ch);
     return eSUCCESS;
