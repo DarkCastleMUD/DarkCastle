@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.6 2002/10/17 02:07:35 pirahna Exp $
+| $Id: cl_warrior.cpp,v 1.7 2002/12/26 20:21:17 pirahna Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -397,9 +397,7 @@ int do_bash(struct char_data *ch, char *argument, int cmd)
 	return eFAILURE;
     }
 
-    skill_increase_check(ch, SKILL_BASH, learned, SKILL_INCREASE_HARD);
-
-    if(affected_by_spell(ch, SPELL_IRON_ROOTS)) {
+    if(affected_by_spell(victim, SPELL_IRON_ROOTS)) {
         act("You try to bash $N but tree roots around $S legs keep him upright.", ch, 0, victim, TO_CHAR, 0);
         act("$n bashes you but the roots around your legs keep you from falling.", ch, 0, victim, TO_VICT, 0);
         act("The tree roots support $N keeping $M from sprawling after $n's bash.", ch, 0, victim, TO_ROOM, NOTVICT);
@@ -417,6 +415,8 @@ int do_bash(struct char_data *ch, char *argument, int cmd)
 
     specialization = learned / 100;
     learned = learned % 100;
+
+    skill_increase_check(ch, SKILL_BASH, learned, SKILL_INCREASE_HARD);
 
     chance = 60;
 
