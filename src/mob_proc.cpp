@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.10 2002/08/01 08:04:57 pirahna Exp $ */
+/* $Id: mob_proc.cpp,v 1.11 2002/08/02 05:05:48 pirahna Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -1109,6 +1109,7 @@ int monk(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
   // only 1 in 100 chance of this happening - _very_ deadly
   if(GET_LEVEL(ch) > 39 && number(1, 100) == 1)
   {
+    MOB_WAIT_STATE(ch) = 2;
     if(number(0, 1))
     {
       dam = dice((GET_LEVEL(ch)), MORTAL) + (25 * (GET_LEVEL(ch)));
@@ -1121,6 +1122,7 @@ int monk(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
   // 25% chance of stun
   if(GET_LEVEL(ch) > 30 && number(1, 4) == 1 )
   {
+    MOB_WAIT_STATE(ch) = 4;
    if(number(0,1)) 
    {
      damage (ch, vict, 0,TYPE_UNDEFINED, SKILL_STUN, 0);
@@ -1155,7 +1157,7 @@ int monk(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 
   // If all else fails, kick
   if (GET_LEVEL(ch) > 2) {
-    MOB_WAIT_STATE(ch) = 1;
+    MOB_WAIT_STATE(ch) = 2;
     if(number(1, 4) == 1) // miss the kick 25%
       return damage (ch, vict, 0, TYPE_HIT, SKILL_KICK, 0);
     return damage (ch, vict, GET_LEVEL(ch)>>1, TYPE_HIT, SKILL_KICK, 0);
@@ -1198,6 +1200,9 @@ int fighter(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     if(cmd) return eFAILURE;
     if (GET_POS(ch) < POSITION_FIGHTING) return eFAILURE;
     if (IS_AFFECTED(ch, AFF_PARALYSIS)) return eFAILURE;
+    if(MOB_WAIT_STATE(ch)) {
+      return eFAILURE;
+    }
 
     vict = ch->fighting;
 
@@ -1207,6 +1212,7 @@ int fighter(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     // Deathstroke my opponent whenever possible
     if(GET_LEVEL(ch)>39 && GET_POS(vict) < POSITION_FIGHTING)
     {
+      MOB_WAIT_STATE(ch) = 2;
       return do_deathstroke(ch, "", 9);
     }
 
@@ -1218,6 +1224,7 @@ int fighter(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
             (GET_LEVEL(vict) <= MAX_MORTAL ))
           if( vict==ch->fighting && GET_LEVEL(ch)>9 && number(0,2)==0 )
           {
+             MOB_WAIT_STATE(ch) = 2;
              disarm(ch,vict);
              return eSUCCESS;
           }
@@ -1225,10 +1232,12 @@ int fighter(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 
     if( vict==ch->fighting && GET_LEVEL(ch)>3 && number(0,2)==0 )
     {
+       MOB_WAIT_STATE(ch) = 3;      
        return do_bash(ch, "", 9);
     }
     if (vict==ch->fighting && GET_LEVEL(ch)>2 && number(0,1)==0 )
     {
+       MOB_WAIT_STATE(ch) = 2;
        return do_kick(ch, "", 9);
     }
 
@@ -3733,9 +3742,11 @@ int ranger_combat(struct char_data *ch, struct obj_data *obj, int cmd, char *arg
       act("$n utters the words 'Save this Dinas!'.", ch, 0, 0, TO_ROOM, INVIS_NULL);
       return cast_creeping_death(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0);
    }
-
-   if(number(1, 5) == 1 && GET_LEVEL(ch) > 29)
+   
+   if(number(1, 5) == 1 && GET_LEVEL(ch) > 29) {
+     MOB_WAIT_STATE(ch) = 4;
      return do_stun(ch, "", 9);
+   }
 
    wielded = vict->equipment[WIELD];
 
@@ -3745,6 +3756,7 @@ int ranger_combat(struct char_data *ch, struct obj_data *obj, int cmd, char *arg
           (GET_LEVEL(vict) <= MAX_MORTAL ))
    if( vict==ch->fighting && GET_LEVEL(ch)>9 && number(0,2)==0 )
    {
+     MOB_WAIT_STATE(ch) = 2;
      disarm(ch,vict);
      return eSUCCESS;
    }
@@ -4179,6 +4191,7 @@ int paladin(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 
     if(number(0,2)==0 )
     {
+      MOB_WAIT_STATE(ch) = 3;
       return do_bash(ch, "", 9);
     }
     if(GET_LEVEL(ch) > 10 && enemycount > 1) {
@@ -4194,6 +4207,7 @@ int paladin(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     }
     if(number(0,1)==0 )
     {
+       MOB_WAIT_STATE(ch) = 2;
        return do_kick(ch, "", 9);
     }
    return eFAILURE;
@@ -4247,6 +4261,7 @@ int antipaladin(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 
     if (vict==ch->fighting && GET_LEVEL(ch)>2 && number(0,1)==0 )
     {
+       MOB_WAIT_STATE(ch) = 2;
        return damage (ch, vict, GET_LEVEL(ch)>>1, TYPE_HIT, SKILL_KICK, 0);
     }
     if(GET_LEVEL(ch) > 47)
@@ -4315,7 +4330,7 @@ int thief(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
    // TODO - trip
 
    if(number(0, 1)) {
-     MOB_WAIT_STATE(ch) = 1;
+     MOB_WAIT_STATE(ch) = 2;
      return do_trip(ch, "", 9);
    }
 

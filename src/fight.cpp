@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.23 2002/08/02 00:39:50 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.24 2002/08/02 05:05:48 pirahna Exp $ */
 
 extern "C"
 {
@@ -122,6 +122,9 @@ void perform_violence(void)
         }
         else if(!IS_AFFECTED(ch, AFF_CHARM)) 
         {
+          if(MOB_WAIT_STATE(ch) > 0)
+            MOB_WAIT_STATE(ch) -= 1;
+
           retval = 0;
           switch(GET_CLASS(ch)) {
            case CLASS_WARRIOR:       retval = fighter(ch, NULL, 0, "", ch);           break;
@@ -177,10 +180,6 @@ void perform_violence(void)
       update_stuns(ch);
     else
       stop_fighting(ch);
-      
-    if(IS_NPC(ch))
-      if(MOB_WAIT_STATE(ch))
-        MOB_WAIT_STATE(ch) -= 1;
         
     // This takes care of flee and stuff
     if(ch && ch->fighting)
@@ -1490,7 +1489,7 @@ int check_riposte(CHAR_DATA * ch, CHAR_DATA * victim)
       chance = 1;
   }
 
-  skill_increase_check(ch, SKILL_RIPOSTE, chance, SKILL_INCREASE_HARD);
+  skill_increase_check(victim, SKILL_RIPOSTE, chance, SKILL_INCREASE_HARD);
 
   percent = (number(1, 101) - GET_LEVEL(victim)) + GET_LEVEL(ch);
   if (percent >= chance)
@@ -1552,7 +1551,7 @@ bool check_shieldblock(CHAR_DATA * ch, CHAR_DATA * victim)
   if((GET_LEVEL(ch) - GET_LEVEL(victim)) < 0)
     chance += (int)((GET_LEVEL(ch) - GET_LEVEL(victim)));
 
-  skill_increase_check(ch, SKILL_SHIELDBLOCK, chance, SKILL_INCREASE_HARD);
+  skill_increase_check(victim, SKILL_SHIELDBLOCK, chance, SKILL_INCREASE_HARD);
 
   percent = number(1, 101);
   if (percent >= chance)
@@ -1609,7 +1608,7 @@ bool check_parry(CHAR_DATA * ch, CHAR_DATA * victim)
      IS_SET(victim->combat, COMBAT_BLADESHIELD2))
     chance = 100;
 
-  skill_increase_check(ch, SKILL_PARRY, chance, SKILL_INCREASE_HARD);
+  skill_increase_check(victim, SKILL_PARRY, chance, SKILL_INCREASE_HARD);
   
   percent = number(1, 101);
   if (percent >= chance)
