@@ -2740,10 +2740,10 @@ int do_medit(struct char_data *ch, char *argument, int cmd)
                        "$3Current$R: ", ch);
           sprintf(buf, "%d\n", ((char_data *)mob_index[mob_num].item)->raw_hit);
           send_to_char(buf, ch);
-          send_to_char("$3Valid Range$R: 1 to 1000000\r\n", ch);
+          send_to_char("$3Valid Range$R: 1 to 64000\r\n", ch);
           return eFAILURE;
         }
-        if(!check_range_valid_and_convert(intval, buf4, 1, 1000000)) {
+        if(!check_range_valid_and_convert(intval, buf4, 1, 64000)) {
           send_to_char("Value out of valid range.\r\n", ch);
           return eFAILURE;
         }
