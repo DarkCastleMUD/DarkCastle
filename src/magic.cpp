@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.52 2003/01/08 21:19:28 dcastle Exp $ */
+/* $Id: magic.cpp,v 1.53 2003/01/08 21:32:39 dcastle Exp $ */
 
 extern "C"
 {
@@ -1152,7 +1152,7 @@ int spell_paralyze(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data
   }
 
   /* if they are too big - do a dice roll to see if they backfire */
-  if(!IS_NPC(ch) && !IS_NPC(victim) && ((level - GET_LEVEL(victim)) > 20)) {
+  if(!IS_NPC(ch) && !IS_NPC(victim) && ((level - GET_LEVEL(victim)) > 10)) {
       act("$N seems to be unaffected!", ch, NULL, victim, TO_CHAR, 0);
       victim = ch;
       if(saves_spell(ch, ch, 0, SAVE_TYPE_MAGIC) >= 0) {
