@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.112 2003/05/12 02:50:14 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.113 2003/05/12 02:51:04 pirahna Exp $ */
 
 extern "C"
 {
@@ -1101,7 +1101,7 @@ void eq_damage(CHAR_DATA * ch, CHAR_DATA * victim,
       act("$p worn by $n is damaged.", victim, obj, 0, TO_ROOM, 0);
     }
   } // number(0, 3) == 0
-  else if(victim->carrying && (number(0, 6) == 0)) 
+  else if(victim->carrying && (number(0, 7) == 0)) 
   { 
     // let's scrap something in the inventory 
     for(count = 0, obj = victim->carrying; obj; obj = obj->next_content)
