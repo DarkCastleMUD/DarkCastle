@@ -16,7 +16,7 @@
 /* 12/08/2003   Onager   Added chop_half() to work like half_chop() but    */
 /*                       chopping off the last word.                       */
 /***************************************************************************/
-/* $Id: interp.cpp,v 1.42 2004/04/25 13:01:33 urizen Exp $ */
+/* $Id: interp.cpp,v 1.43 2004/04/28 22:05:45 urizen Exp $ */
 
 extern "C"
 {
@@ -609,7 +609,7 @@ int command_interpreter( CHAR_DATA *ch, char *pcomm )
        REMOVE_BIT(ch->combat, COMBAT_BERSERK);
        act("$n settles down.", ch, 0, 0, TO_ROOM, 0);
        act("You settle down.", ch, 0, 0, TO_CHAR, 0);
-       GET_AC(ch) -= 80;
+       GET_AC(ch) -= 30;
     }
 
     if (IS_AFFECTED(ch, AFF_PARALYSIS)) {

@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.165 2004/04/25 21:19:52 urizen Exp $ */
+/* $Id: fight.cpp,v 1.167 2004/04/28 22:05:45 urizen Exp $ */
 
 extern "C"
 {
@@ -321,7 +321,7 @@ int attack(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
   if (!vict->fighting && vict->in_room == ch->in_room)
     set_fighting(vict, ch); // So attacker starts round #2.
   else
-    set_fighting(ch,vict);
+    set_fighting(ch, vict);
   wielded = ch->equipment[WIELD];
 
   if(type != SKILL_BACKSTAB)
@@ -1297,7 +1297,7 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
   typeofdamage = damage_type(weapon_type);
 
   if(GET_POS(victim) == POSITION_DEAD)           return (eSUCCESS|eVICT_DIED);
-
+  if (ch->in_room != victim->in_room) return eSUCCESS;
 //  csendf(victim, "damage: dam = %d  type = %d\r\n", dam, weapon_type);
   if (dam!=0 && !IS_NPC(ch) && attacktype)
   { // Skill damages based on learned %
@@ -2983,9 +2983,12 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
     GET_MANA(victim) = 1;
   
   if (GET_CLASS(victim) == CLASS_MONK)
-    GET_AC(victim) -= (GET_LEVEL(victim) * 3);
-  if (ch && IS_SET(ch->combat, COMBAT_BERSERK))
-    GET_AC(victim) -= 80;
+    GET_AC(victim) -= (GET_LEVEL(victim) * 2);
+  if (victim && IS_SET(victim->combat, COMBAT_BERSERK))
+  {
+    GET_AC(victim) -= 30;
+    victim->combat = 0;
+  }
   
   save_char_obj(victim);
   
@@ -3557,7 +3560,7 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim)
   if (IS_SET(victim->combat, COMBAT_BERSERK)) 
   {
     REMOVE_BIT(victim->combat, COMBAT_BERSERK);
-    GET_AC(victim) -= 80;
+    GET_AC(victim) -= 30;
   }
   
   for(af = victim->affected; af; af = afpk) {

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.17 2004/04/24 21:01:31 urizen Exp $
+| $Id: cl_warrior.cpp,v 1.18 2004/04/28 22:05:47 urizen Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -538,8 +538,7 @@ int do_redirect(struct char_data *ch, char *argument, int cmd)
        act( "You try to redirect your attacks to $N but are blocked.", ch, NULL, victim, TO_CHAR, 0 );
        act( "$n tries to redirect his attacks elsewhere, but $N wont allow it.", ch, NULL, victim, TO_ROOM, NOTVICT );
        WAIT_STATE(ch, PULSE_VIOLENCE*3);
-    } else 
-    {
+    } else {
        act( "$n redirects his attacks at YOU!", ch, NULL, victim, TO_VICT , 0);
        act( "You redirect your at attacks at $N!", ch, NULL, victim, TO_CHAR , 0);
        act( "$n redirects his attacks at $N!", ch, NULL, victim, TO_ROOM, NOTVICT );

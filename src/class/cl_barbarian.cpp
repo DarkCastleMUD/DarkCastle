@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_barbarian.cpp,v 1.19 2004/04/24 22:01:34 urizen Exp $
+| $Id: cl_barbarian.cpp,v 1.20 2004/04/28 22:05:47 urizen Exp $
 | cl_barbarian.C
 | Description:  Commands for the barbarian class.
 */
@@ -274,7 +274,7 @@ int do_berserk(struct char_data *ch, char *argument, int cmd)
     if (bSuccess) {
        SET_BIT(ch->combat, COMBAT_BERSERK);
        if(!IS_NPC(ch))
-          GET_AC(ch) += 80; // we do this here, so we know if someone dies with COMBAT_BERSERK to 
+          GET_AC(ch) += 30; // we do this here, so we know if someone dies with COMBAT_BERSERK to 
                             // give them their AC back
     }
   }

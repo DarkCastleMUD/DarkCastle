@@ -1586,7 +1586,7 @@ int moving_portals(struct char_data*ch, struct obj_data *obj, int cmd,
 char*arg, CHAR_DATA *invoker)
 {
    char msg1[MAX_STRING_LENGTH],msg2[MAX_STRING_LENGTH];
-   int low, high, room,time;
+   int low, high, room,time,sector = 0;
    if (cmd) return eFAILURE;
 
    switch (obj_index[obj->item_number].virt)
@@ -1600,6 +1600,7 @@ char*arg, CHAR_DATA *invoker)
           low = 11300;
 	  high = 11599;
 	  time = 12;
+	  sector = SECT_WATER_NOSWIM;
 	  sprintf(msg1,"The ship sails off into the distance.");
 	  sprintf(msg2,"A ship sails in.");
 	  break;
@@ -1621,6 +1622,9 @@ char*arg, CHAR_DATA *invoker)
       while ((room = number(low, high))) {
           bool portal = FALSE;
           if (real_room(room) < 0) continue;
+	  if (sector)
+	    if (world[real_room(room)].sector_type != sector)
+		continue;
           struct obj_data *o;
 	  for (o = world[real_room(room)].contents; o; o = o->next_content)
 		if (o->obj_flags.type_flag == ITEM_PORTAL) portal = TRUE;

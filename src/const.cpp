@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.86 2004/04/28 07:37:39 urizen Exp $ */
+/* $Id: const.cpp,v 1.87 2004/04/28 22:05:45 urizen Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1007,6 +1007,7 @@ struct class_skill_defines g_skills[] = {
 {    "scan",		SKILL_SCAN,		1,	90,	10011,	NULL, {0, 0} },
 {    "consider",	SKILL_CONSIDER,		1,	90,	10011,	NULL,{0,0} },
 {    "switch",		SKILL_SWITCH,		1,	90,	10011,	NULL,{0,0} },
+{    "release",         SKILL_RELEASE,		1,	90,	10011, NULL, {0,0}},
 {    "\n",		0,			1,	0,	0,	NULL,{0,0} }
 };
 
