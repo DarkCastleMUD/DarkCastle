@@ -27,7 +27,8 @@
 void advance_golem_level(CHAR_DATA *golem);
 
 // db.cpp
-extern struct index_data obj_index[];
+extern struct index_data *obj_index;
+
 // save.cpp
 int store_worn_eq(char_data * ch, FILE * fpsave);
 struct obj_data *  obj_store_to_char(CHAR_DATA *ch, FILE *fpsave, struct obj_data * last_cont );
@@ -88,9 +89,11 @@ void golem_gain_exp(CHAR_DATA *ch)
 
 int  verify_existing_components(CHAR_DATA *ch, int golemtype)
 { // check_components didn't suit me.
-  int retval = eSUCCESS,i;
+  int i;
+  int retval = 0;
   struct obj_data *curr, *next_content;
   char buf[MAX_STRING_LENGTH];
+  SET_BIT(retval, eSUCCESS);
   for (i = 0; i < 5; i++)
   {
     if (golem_list[golemtype].components[i] == 0) continue;
@@ -98,31 +101,31 @@ int  verify_existing_components(CHAR_DATA *ch, int golemtype)
     for (curr = ch->carrying; curr; curr = next_content)
     {
        next_content = curr->next_content;
-       int vnum = obj_index[curr->item_number].virt,i;
+       int vnum = obj_index[curr->item_number].virt;
        if (vnum == golem_list[golemtype].components[i])
 	{
 	  found = TRUE;
 	  if (i == 4) SET_BIT(retval, eEXTRA_VALUE); // Special effect.
 	}
      }
-     if (!found && i != 4) { REMOVE_BIT(retval, eSUCCESS); SET_BIT(retval, eFAILURE); }
+     if (!found && i != 4) { return eFAILURE; }
   }
-  if (IS_SET(retval, eSUCCESS))
+  for (i = 0; i<5; i++)
   {
-    for (i = 0; i<5; i++)
     for (curr = ch->carrying; curr; curr = next_content)
     {
+      next_content = curr->next_content;
       if (golem_list[golemtype].components[i] == obj_index[curr->item_number].virt)
       {
-         sprintf(buf, "%s explodes, releasing a stream of magical energies!\r\n", curr->short_description);
+          sprintf(buf, "%s explodes, releasing a stream of magical energies!\r\n", curr->short_description);
           send_to_char(buf,ch);
           obj_from_char(curr);
           extract_obj(curr);
-	  break; // Only remove ONE of the components.
+	  break; // Only remove ONE of the components of that type.
       }
     }
   }
-  return retval;  
+  return retval;
 }
 
 void save_golem_data(CHAR_DATA *ch)
@@ -243,8 +246,8 @@ int cast_create_golem(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA 
     send_to_char("You cannot create any such golem.\r\n",ch);
     return eFAILURE;
   }
-  int retval;
-  if (IS_SET((retval = verify_existing_components(ch, i)), eFAILURE))
+  int retval = verify_existing_components(ch,i);
+  if (IS_SET(retval, eFAILURE))
   {
       send_to_char("Since you do not have the require spell components, the magic fades into nothingness.\r\n",ch);
       return eFAILURE;
