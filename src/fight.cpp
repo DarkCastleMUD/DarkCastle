@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.74 2002/11/01 13:59:56 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.75 2002/11/01 16:10:17 pirahna Exp $ */
 
 extern "C"
 {
@@ -577,7 +577,8 @@ int do_acidshield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
   return eSUCCESS;
 }
 
-void check_weapon_skill_bonus(char_data * ch, int type, int & weapon_skill_hit_bonus, int & weapon_skill_dam_bonus)
+void check_weapon_skill_bonus(char_data * ch, int type, obj_data *wielded, 
+                              int & weapon_skill_hit_bonus, int & weapon_skill_dam_bonus)
 {
    int learned;
    int specialization;
@@ -624,6 +625,24 @@ void check_weapon_skill_bonus(char_data * ch, int type, int & weapon_skill_hit_b
    {
       weapon_skill_hit_bonus += 5;
       weapon_skill_dam_bonus += number(1, 5);
+   }
+
+   // now check for two-handed weapons
+   if(wielded && IS_SET(wielded->obj_flags.extra_flags, ITEM_TWO_HANDED) &&
+      ( learned = has_skill(ch, SKILL_TWO_HANDED_WEAPONS) )
+     )
+   {
+      specialization = learned / 100;
+      learned = learned % 100;
+
+      weapon_skill_hit_bonus += learned / 10;
+      weapon_skill_dam_bonus += number(1, learned / 10);
+
+      if(specialization)
+      {
+         weapon_skill_hit_bonus += 5;
+         weapon_skill_dam_bonus += number(1, 5);
+      }
    }
 }
 
@@ -751,7 +770,7 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
   if(wielded && wielded->obj_flags.type_flag == ITEM_WEAPON) 
      w_type = get_weapon_damage_type(wielded);
 
-  check_weapon_skill_bonus(ch, w_type, weapon_skill_hit_bonus, weapon_skill_dam_bonus);
+  check_weapon_skill_bonus(ch, w_type, wielded, weapon_skill_hit_bonus, weapon_skill_dam_bonus);
 
   weapon_type = w_type;
   if(type == SKILL_BACKSTAB)
@@ -2842,7 +2861,7 @@ void group_gain(CHAR_DATA * ch, CHAR_DATA * victim)
       case -11: tmp_share = (int) (tmp_share * 0.3); break;
       case -12: tmp_share = (int) (tmp_share * 0.2); break;
       default:  if(GET_LEVEL(victim) < GET_LEVEL(tmp_ch))
-                  tmp_share = (int) (tmp_share * 0.1);;
+                  tmp_share = (int) (tmp_share * 0.1);
                 else tmp_share = (int) (tmp_share * 1.1); break;
                break;
     }

@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: const.cpp,v 1.48 2002/11/01 13:51:08 pirahna Exp $ */
+/* $Id: const.cpp,v 1.49 2002/11/01 16:10:16 pirahna Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -950,6 +950,7 @@ struct class_skill_defines w_skills[] = {
 {    "whipping",	SKILL_WHIPPING_WEAPONS,	30,	90,	3023,	NULL },
 {    "crushing",	SKILL_CRUSHING_WEAPONS,	30,	90,	3023,	NULL },
 {    "shield block",    SKILL_SHIELDBLOCK,      33,     50,     -2, 	"To learn this skill you must seek its master, the God of War in his arena.  Ask him to please teach you." },
+{    "two handers",     SKILL_TWO_HANDED_WEAPONS,34,	70,	3023,	NULL },
 {    "stun",		SKILL_STUN,		35,	50,	-2, 	"Go to see any master shaolin monk." },
 {    "guard",		SKILL_GUARD,		37,	75,	-2,	"A crabby old hermit who lives alone and failed college is who you want." },
 {    "riposte",		SKILL_RIPOSTE,		40,	75,	-2, 	"A race not entirely of thise world holds the knowledge, they special in weapons." },
@@ -1031,6 +1032,7 @@ struct class_skill_defines p_skills[] = {
 {    "dual wield",      SKILL_DUAL_WIELD,       10,     60,-2, "With whirling blades and rigid honor, only these masters of weaponry can teach you the skill you need."  },
 {    "dodge",		SKILL_DODGE,		13,	20,	-2, 	"Hop like a bunny, quick like a bee, this location is so funny, you'll go wee wee wee.  Don't forget to bring your scythe however." },
 {    "double",		SKILL_SECOND_ATTACK,	20,	75,	-2, 	"Seek the Delcim Prince my child.  He shall train you." },
+{    "two handers",     SKILL_TWO_HANDED_WEAPONS,23,	90,	3023,	NULL },
 {    "parry",		SKILL_PARRY,		25,	50,	-2, 	"You have to go see the constable of Newtonia to learn parry." },
 {    "triple",		SKILL_THIRD_ATTACK,	30,	70,	-2, 	"Only a palace chef could move his blades so fast." },
 {    "bludgeoning",	SKILL_BLUDGEON_WEAPONS,	30,	80,	10006,	NULL },
@@ -1080,6 +1082,7 @@ struct class_skill_defines b_skills[] = {
 {    "piercing",	SKILL_PIERCEING_WEAPONS,30,	90,	10007,	NULL },
 {    "slashing",	SKILL_SLASHING_WEAPONS,	30,	90,	10007,	NULL },
 {    "crushing",	SKILL_CRUSHING_WEAPONS,	30,	90,	10007,	NULL },
+{    "two handers",     SKILL_TWO_HANDED_WEAPONS,34,	50,	3023,	NULL },
 {    "berserk",		SKILL_BERSERK,		40,	90,	-2, 	"A being of pure rage who lives in a tower, he is a overgrown lizard with a forked tongue." },
 {    "\n",		0,			1,	0,	0, 	NULL}
 };
