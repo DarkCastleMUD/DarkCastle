@@ -1041,7 +1041,7 @@ char_data *)(mob_index[nr].item))->level,
   	    affect = i;
             goto endy;
         }
-       if (!str_cmp(arg1,"level"))
+       if (!str_cmp(arg1,"olevel"))
        {
          argument = one_argument(argument,arg1);
          if (is_number(arg1))
@@ -1131,7 +1131,7 @@ char_data *)(mob_index[nr].item))->level,
 	   else
 	     send_to_char(" ", ch);
 	}
-           send_to_char("level",ch);
+           send_to_char("olevel",ch);
            if (o%7==0)
              send_to_char("\r\n",ch);
            else
