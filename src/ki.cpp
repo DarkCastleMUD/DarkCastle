@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.2 2002/06/13 04:41:08 dcastle Exp $ */
+/* $Id: ki.cpp,v 1.3 2002/07/07 06:59:38 pirahna Exp $ */
 
 extern "C"
 {
@@ -73,7 +73,13 @@ struct ki_info_type ki_info [ ] = {
 { /* 6 */
 	12, POSITION_FIGHTING, 41, 10,
         TAR_CHAR_ROOM|TAR_FIGHT_VICT, ki_disrupt
+},
+
+{ /* 7 */
+	12, POSITION_FIGHTING, 24, 10,
+        TAR_IGNORE, ki_stance
 }
+
 };
 
 char *ki[] = {
@@ -84,6 +90,7 @@ char *ki[] = {
         "speed",
         "purify",
         "disrupt",
+        "stance",
 	"\n"
 };
 void set_cantquit(CHAR_DATA *ch, CHAR_DATA *victim);
@@ -618,3 +625,40 @@ int ki_disrupt( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
    return spell_dispel_magic(GET_LEVEL(ch)+1, ch, vict, 0);
 }
 
+int ki_stance( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
+{
+   struct affected_type af;
+   int modifier = 0;
+
+   if(affected_by_spell(ch, KI_STANCE+KI_OFFSET)) {
+      send_to_char("You cannot use such an ability so often...\r\n", ch);
+      return eFAILURE;
+   }
+
+   act("$n assumes a defensive stance and attempts to absorb the energies that surround $m.",
+       ch, 0, vict, TO_ROOM, 0);
+   send_to_char("You take a defensive stance and try to aborb the energies seeking to harm you.\r\n", ch);
+
+   // chance of failure - can be meta'd past that point though
+   if(number(1, 100) > ( GET_DEX(ch) * 4 ) )
+      return eSUCCESS;
+
+   // chance for bonus on wis
+   if(number(1, 100) < GET_WIS(ch)) {
+      send_to_char("With great wisdom comes great skill...\r\n", ch);
+      modifier++;
+   }
+
+   SET_BIT(ch->combat, COMBAT_MONK_STANCE);
+
+   af.modifier  = 1 + (GET_LEVEL(ch) > 29) + (GET_LEVEL(ch) > 38) + (GET_LEVEL(ch) > 48);
+
+   af.type      = KI_STANCE + KI_OFFSET;
+   af.duration  = 50 - ( ( GET_LEVEL(ch) / 5 ) * 2 );
+   af.modifier  = modifier;
+   af.location  = APPLY_NONE;
+   af.bitvector = 0;
+ 
+   affect_to_char(ch, &af);
+   return eSUCCESS;
+}

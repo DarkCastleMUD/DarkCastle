@@ -2,7 +2,7 @@
 #define FIGHT_H_
 
 /************************************************************************
-| $Id: fight.h,v 1.2 2002/06/13 04:41:15 dcastle Exp $
+| $Id: fight.h,v 1.3 2002/07/07 06:59:43 pirahna Exp $
 | fight.h
 | This file defines the header information for fight.
 */
@@ -95,6 +95,7 @@ bool ArenaIsOpen();
 #define COMBAT_BLADESHIELD2 1<<11
 #define COMBAT_REPELANCE    1<<12
 #define COMBAT_VITAL_STRIKE 1<<13
+#define COMBAT_MONK_STANCE  1<<14
 
 #define DAMAGE_TYPE_PHYSICAL  0
 #define DAMAGE_TYPE_MAGIC     1

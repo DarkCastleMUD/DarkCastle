@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.4 2002/06/29 18:16:21 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.5 2002/07/07 06:59:38 pirahna Exp $ */
 
 extern "C"
 {
@@ -357,6 +357,19 @@ void update_flags(CHAR_DATA *vict)
 
   if (IS_SET(vict->combat, COMBAT_VITAL_STRIKE))
     REMOVE_BIT(vict->combat, COMBAT_VITAL_STRIKE);
+
+  if(IS_SET(vict->combat, COMBAT_MONK_STANCE)) {
+     // stance lasts 'modifier' rounds.  Remove bit once used up
+     struct affected_type * pspell;
+     pspell = affected_by_spell(vict, KI_STANCE+KI_OFFSET);
+     pspell->modifier--;
+     if(pspell->modifier < 0)
+     {
+        REMOVE_BIT(vict->combat, COMBAT_MONK_STANCE);
+        send_to_char("Your stance ends.  You can absorb no more.\r\n", vict);
+     }
+     else send_to_char("Your stance weakens...\r\n", vict);
+  }
 }
 
 void update_stuns(CHAR_DATA *ch)

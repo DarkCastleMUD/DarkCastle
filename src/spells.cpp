@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.2 2002/06/13 04:41:08 dcastle Exp $ */
+/* $Id: spells.cpp,v 1.3 2002/07/07 06:59:38 pirahna Exp $ */
 
 extern "C"
 {
@@ -943,6 +943,9 @@ void affect_update( void )
                                "You have been KILLED!!!\n\r", i);
                   raw_kill(NULL, i);
                }
+               break;
+             case KI_STANCE + KI_OFFSET:
+               send_to_char("Your body finishes venting the energy absorbed from your last ki stance.\r\n", i);
                break;
              case 7: {   /* Charm Wears off */
                remove_memory(i, 'h');
