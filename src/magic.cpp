@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.111 2004/04/23 21:13:33 urizen Exp $ */
+/* $Id: magic.cpp,v 1.112 2004/04/23 22:38:52 urizen Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -1162,11 +1162,16 @@ int spell_paralyze(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data
          return eFAILURE;
 
   if(affected_by_spell(victim, SPELL_SLEEP)) {
-     if (number(1,5)<2)
+     if (number(1,6)<5)
      {
        int retval;
        if (number(0,1))
           send_to_char("The combined magics fizzle!\r\n",ch);
+	if (GET_POS(victim) == POSITION_SLEEPING) {
+	  send_to_char("You are awoken by a burst of energy!\r\n",victim);
+	  act("$n is awoken in a burst of energy!",victim,NULL,NULL, TO_ROOM,0);
+	  GET_POS(victim) = POSITION_SITTING;
+	}
        else {
           send_to_char("The combined magics cause an explosion!\r\n",ch);
 	  retval = damage(ch,ch,number(5,10), 0, TYPE_MAGIC, 0);
@@ -1187,8 +1192,10 @@ int spell_paralyze(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data
   }
 
   set_cantquit( ch, victim );
-
-  int spellret = saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC);
+  int save = 0;
+  if (affected_by_spell(victim,SPELL_SLEEP))
+    save = -15; // Above check takes care of sleep.
+  int spellret = saves_spell(ch, victim, save, SAVE_TYPE_MAGIC);
 
 ///  logf(IMP, LOG_BUG, "%s para attempt on %s.  Result: %d",
 ///       GET_NAME(ch), GET_NAME(victim), spellret);
@@ -2533,15 +2540,20 @@ int spell_sleep(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
   }
 
   if (affected_by_spell(victim, SPELL_PARALYZE)) {
-	if (number(1,7) < 5)
+	if (number(1,20) < 19)
 	{
-	  switch (number(1,2))
+	  switch (number(1,3))
 	  {
 	    case 1:
         act("$N does not look sleepy!", ch, NULL, victim, TO_CHAR, 0);
 		break;
 	     case 2:
-	      send_to_char("The combined magics fizzle!",ch);
+	     case 3:
+	      send_to_char("The combined magics fizzle, and cause an explosion!",ch);
+		{
+		  act("$n wakes up in a burst of magical energies!",victim, NULL, NULL, TO_ROOM,0);
+		  affect_from_char(victim, SPELL_PARALYZE);
+		}
 		break;
  	 }
 	 return eFAILURE;

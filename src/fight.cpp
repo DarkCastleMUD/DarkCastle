@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.161 2004/04/23 21:40:44 urizen Exp $ */
+/* $Id: fight.cpp,v 1.162 2004/04/23 22:38:52 urizen Exp $ */
 
 extern "C"
 {
@@ -618,6 +618,7 @@ int do_vampiric_aura(CHAR_DATA *ch, CHAR_DATA *vict)
   if( number(0, 101) < ( (af->modifier)/10 ) )
   {
     int level = MAX(1, af->modifier/6);
+    skill_increase_check(vict, SPELL_VAMPIRIC_AURA, af->modifier, SKILL_INCREASE_MEDIUM);
     int retval = spell_vampiric_touch(level, vict, ch, 0, af->modifier);
     retval = SWAP_CH_VICT( retval );
     return retval;

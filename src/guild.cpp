@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.22 2004/04/23 21:13:33 urizen Exp $
+| $Id: guild.cpp,v 1.23 2004/04/23 22:38:52 urizen Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -411,19 +411,19 @@ int get_stat(CHAR_DATA *ch, int stat)
       switch (stat)
       {
         case STRENGTH:
-          return GET_STR(ch);
+          return GET_RAW_STR(ch);
           break;
         case INTELLIGENCE:
-          return GET_INT(ch);
+          return GET_RAW_INT(ch);
           break;
         case WISDOM:
-          return GET_WIS(ch);
+          return GET_RAW_WIS(ch);
           break;
         case DEXTERITY:
-          return GET_DEX(ch);
+          return GET_RAW_DEX(ch);
           break;
         case CONSTITUTION:
-          return GET_CON(ch);
+          return GET_RAW_CON(ch);
           break;
       };
  return 0;

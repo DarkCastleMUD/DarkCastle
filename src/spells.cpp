@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.65 2004/04/23 21:40:44 urizen Exp $ */
+/* $Id: spells.cpp,v 1.66 2004/04/23 22:38:52 urizen Exp $ */
 
 extern "C"
 {
@@ -924,8 +924,9 @@ void affect_update( void )
 
     for (i = character_list; i; i = i_next) { 
       i_next = i->next;
-      if(!IS_NPC(i) ) // && !(i->desc)) Linkdeadness doens't save you now.
-        continue; 
+//      if(!IS_NPC(i) ) // && !(i->desc)) Linkdeadness doens't save you 
+//now.
+  //      continue; 
       for (af = i->affected; af; af = next_af_dude) {
 	next_af_dude = af->next;
 
@@ -1325,6 +1326,7 @@ int do_release(CHAR_DATA *ch, char *argument, int cmd)
   bool printed = FALSE;
   argument = skip_spaces(argument);
   extern bool str_prefix(const char *astr, const char *bstr);  
+
   int learned = has_skill(ch,SKILL_RELEASE);
 
   if (!learned)
@@ -1332,6 +1334,7 @@ int do_release(CHAR_DATA *ch, char *argument, int cmd)
      send_to_char("You don't know how!\r\n",ch);
      return eFAILURE;
   }
+
   if (!*argument)
   {
     send_to_char("Release what spell?\r\n",ch);
