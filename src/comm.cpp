@@ -1075,13 +1075,13 @@ char * cond_txtz[] = {
 };
 
 char * cond_txtc[] = {
-  "$B$2excellent condition$R",
-  "$2a few scratches$R",
-  "$B$5slightly hurt$R",
-  "$5fairly fucked up$R",
-  "$B$4bleeding freely$R",
-  "$4covered in blood$R",
-  "$B$7near death$R",
+  BOLD GREEN  "excellent condition"  NTEXT,
+  GREEN "a few scratches" NTEXT,
+  BOLD YELLOW "slightly hurt" NTEXT,
+  YELLOW "fairly fucked up" NTEXT,
+  BOLD RED "bleeding freely" NTEXT,
+  RED "covered in blood" NTEXT,
+  BOLD GREY "near death" NTEXT,
   "dead as a doornail"
 };
 
