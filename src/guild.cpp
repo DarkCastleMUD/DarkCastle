@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.28 2004/05/02 19:42:35 urizen Exp $
+| $Id: guild.cpp,v 1.29 2004/05/02 19:52:48 urizen Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -241,6 +241,8 @@ int skills_guild(struct char_data *ch, char *arg, struct char_data *owner)
 	do_say(owner, "I'm sorry, I can't teach you that.  You'll have to find another trainer.",9);
    else {
       struct skill_quest *sq;
+     if (IS_SET(classon, 1<<GET_CLASS(ch))
+        send_to_char("debug",ch);
      if (IS_SET(classon, 1<<GET_CLASS(ch)) && (sq=find_sq(skillnumber)) != NULL && sq->message)
      {
 	mprog_driver(sq->message, owner, ch, NULL, NULL);
@@ -280,8 +282,22 @@ int skills_guild(struct char_data *ch, char *arg, struct char_data *owner)
 	return eFAILURE;
       default: break;
   }
-
-
+   if (!known)
+  switch (GET_CLASS(ch))
+  {
+    case CLASS_WARRIOR:
+      do_say(owner, "Yar! I can be teachin' ye that skill myself! It should only take but a moment.",9);
+      break;
+    case CLASS_BARBARIAN:
+      do_say(owner,"Hah! That easy to learn! I teach you meself.",9);
+      break;
+    case CLASS_THIEF:
+      do_say(owner,"So young rogue, you wish to advance your skills.  I can teach you of this particular one myself.",9);
+	break;
+     case CLASS_MONK:
+      do_say(owner,"Ahh, well met grasshopper!  I can teach you of this from my own knowledge.",9);
+	break;
+  }
   send_to_char("You practice for a while...\n\r", ch);
   ch->pcdata->practices--;
 
