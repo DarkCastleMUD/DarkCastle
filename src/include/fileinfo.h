@@ -1,28 +1,34 @@
 #ifndef FILEINFO_H_
 #define FILEINFO_H_
 /*
-| $Id: fileinfo.h,v 1.2 2002/06/13 04:41:15 dcastle Exp $
+| $Id: fileinfo.h,v 1.3 2003/10/19 05:48:00 staylor Exp $
 | fileinfo.h
 | Description:  Contains information for loading files, ie "../lib", etc..
 */
+/*************************************************************************
+ * Revision History                                                      *
+ * 10/16/2003   Onager     Added FORBIDDEN_NAME_FILE                     *
+ *************************************************************************/
 #ifndef WIN32
-#define  DFLT_DIR           "../lib"
-#define  SAVE_DIR           "../save"
-#define  NEWSAVE_DIR        "../newsave"
-#define  ARCHIVE_DIR        "../archive"
-#define  MOB_DIR            "../MOBProgs/"
-#define  BAN_FILE           "banned.txt"
-#define  SHOP_DIR           "../lib/shops"
-#define  PLAYER_SHOP_DIR    "../lib/playershops"
+#define  DFLT_DIR            "../lib"
+#define  SAVE_DIR            "../save"
+#define  NEWSAVE_DIR         "../newsave"
+#define  ARCHIVE_DIR         "../archive"
+#define  MOB_DIR             "../MOBProgs/"
+#define  BAN_FILE            "banned.txt"
+#define  SHOP_DIR            "../lib/shops"
+#define  PLAYER_SHOP_DIR     "../lib/playershops"
+#define  FORBIDDEN_NAME_FILE "../lib/forbidden_names.txt"
 #else
-#define DFLT_DIR		"lib"
-#define  SAVE_DIR           "save"
-#define  NEWSAVE_DIR        "newsave"
-#define  ARCHIVE_DIR        "archive"
-#define  MOB_DIR            "MOBProgs/"
-#define  BAN_FILE           "banned.txt"
-#define  SHOP_DIR           "shops"
-#define  PLAYER_SHOP_DIR    "playershops"
+#define DFLT_DIR             "lib"
+#define  SAVE_DIR            "save"
+#define  NEWSAVE_DIR         "newsave"
+#define  ARCHIVE_DIR         "archive"
+#define  MOB_DIR             "MOBProgs/"
+#define  BAN_FILE            "banned.txt"
+#define  SHOP_DIR            "shops"
+#define  PLAYER_SHOP_DIR     "playershops"
+#define  FORBIDDEN_NAME_FILE "forbidden_names.txt"
 #endif
 
 // TODO - Remove tinyworld.shp and divide the stops up into some meaningful
