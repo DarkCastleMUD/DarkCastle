@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.61 2002/09/01 15:56:58 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.62 2002/09/03 19:14:41 pirahna Exp $ */
 
 extern "C"
 {
@@ -2441,7 +2441,6 @@ int do_skewer(CHAR_DATA *ch, CHAR_DATA *vict, int dam, int weapon)
   int percent, damadd = 0;
   
   if((GET_CLASS(ch) != CLASS_WARRIOR) && GET_LEVEL(ch) < ARCHANGEL)  return 0;  
-  if(GET_LEVEL(ch) < MAX_MORTAL)                                     return 0;
   if(!IS_NPC(vict) && GET_LEVEL(vict) >= IMMORTAL)                   return 0;	
   if(!ch->equipment[weapon])                                         return 0;
 

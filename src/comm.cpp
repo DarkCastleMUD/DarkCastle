@@ -1510,8 +1510,8 @@ int new_descriptor(int s)
   if (isbanned(newd->host) == BAN_ALL) {
     write_to_descriptor(desc, 
               "Your site has been banned from Dark Castle. If you have any\n\r"
-              "Questions, please email Pirahna or Valkyrie at:\n\r"
-              "pirahna@dcastle.org  or  valkyrie@dcastle.org\n\r");
+              "Questions, please email Pirahna at:\n\r"
+              "dcpirahna@hotmail.com\n\r");
                                                   
     CLOSE_SOCKET(desc);
     sprintf(buf, "Connection attempt denied from [%s]", newd->host);
