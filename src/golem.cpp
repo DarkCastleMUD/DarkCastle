@@ -30,6 +30,16 @@ void advance_golem_level(CHAR_DATA *golem);
 int store_worn_eq(char_data * ch, FILE * fpsave);
 struct obj_data *  obj_store_to_char(CHAR_DATA *ch, FILE *fpsave, struct obj_data * last_cont );
 
+// limits.cpp
+extern int hit_gain(CHAR_DATA *ch);
+extern int mana_gain(CHAR_DATA*ch);
+extern int ki_gain(CHAR_DATA *ch);
+extern int move_gain(CHAR_DATA *ch);
+
+// const.cpp
+extern struct race_shit race_info[];
+
+
 struct golem_data
 { // This is how a golem looks.
   char *keyword;
@@ -219,10 +229,12 @@ int cast_create_golem(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA 
   char_to_room(golem, ch->in_room);
   add_follower(golem, ch, 0);
   SET_BIT(golem->affected_by, AFF_CHARM);
-  struct affected_type af;
+//  struct affected_type af;
   send_to_char(golem_list[i].creation_message,ch);
   return eSUCCESS;
 }
+
+extern char frills[];
 
 int do_golem_score(struct char_data *ch, char *argument, int cmd)
 { /* Pretty much a rip of score*/
@@ -231,7 +243,7 @@ int do_golem_score(struct char_data *ch, char *argument, int cmd)
    int  level = 0;
    int to_dam, to_hit;
    struct char_data *master = ch;
-   if (IS_NPC(ch)) return;
+   if (IS_NPC(ch)) return eFAILURE;
    if (!ch->pcdata->golem) 
    {
       send_to_char("But you don't have a golem!",ch);
@@ -283,8 +295,8 @@ int do_golem_score(struct char_data *ch, char *argument, int cmd)
       "|/|   $B$4FIRE$R[%+3d] $BCOLD$R[%+3d] $B$5NRGY$R[%+3d] |\\|    $3ExpTillLevel$7:   %-10d      |o|\n\r"
       "|o|   $B$2ACID$R[%+3d] $B$3MAGK$R[%+3d] $2POIS$7[%+3d] |~|    $3Gold$7: %-9d $3Platinum$7: %-5d |/|\n\r"
       "($5:$7)=================================($5:$7)====================================($5:$7)\n\r",
-   GET_ARMOR(ch),         GET_PKILLS(ch),   IS_CARRYING_N(ch), CAN_CARRY_N(ch),
-   GET_RDEATHS(ch), GET_PDEATHS(ch),  IS_CARRYING_W(ch), CAN_CARRY_W(ch),
+   GET_ARMOR(ch),         0,   IS_CARRYING_N(ch), CAN_CARRY_N(ch),
+   0, 0, IS_CARRYING_W(ch), CAN_CARRY_W(ch),
    to_hit, to_dam, GET_EXP(ch),
    get_saves(ch,SAVE_TYPE_FIRE), get_saves(ch, SAVE_TYPE_COLD), get_saves(ch, SAVE_TYPE_ENERGY), GET_LEVEL(ch) == 50 ? 0 : exp_needed,
    get_saves(ch, SAVE_TYPE_ACID), get_saves(ch, SAVE_TYPE_MAGIC), get_saves(ch, SAVE_TYPE_POISON), (int)GET_GOLD(ch), 

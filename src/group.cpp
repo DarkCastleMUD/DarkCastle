@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: group.cpp,v 1.10 2003/11/10 19:36:28 staylor Exp $
+| $Id: group.cpp,v 1.11 2004/05/21 15:12:39 urizen Exp $
 | group.C
 | Description:  Group related commands; join, abandon, follow, etc..
 */
@@ -335,7 +335,7 @@ int do_group(struct char_data *ch, char *argument, int cmd)
         send_to_char("You must found a group, or Disband a group.\n\r",ch);
         return eFAILURE;
       }
-      if((abs(GET_LEVEL(ch) - GET_LEVEL(victim)) ) <= 99) {
+//      if((abs(GET_LEVEL(ch) - GET_LEVEL(victim)) ) <= 99) {
         if (IS_AFFECTED(victim, AFF_GROUP)) {
                 stop_grouped_bards(ch);
 		act("$n has been kicked out of the group!", victim, 0, ch, TO_ROOM, 0);
@@ -349,9 +349,9 @@ int do_group(struct char_data *ch, char *argument, int cmd)
                    REMOVE_BIT(victim->pcdata->toggles, PLR_LFG);
         }
         return eSUCCESS;
-      }
-      else
-	  act("$n is not of the right caliber to join this group.", victim, 0, 0, TO_ROOM, ASLEEP);
+  //    }
+    //  else
+//	  act("$n is not of the right caliber to join this group.", victim, 0, 0, TO_ROOM, ASLEEP);
     }
     else
       act("$N must follow you, to enter the group.", ch, 0, victim, TO_CHAR, ASLEEP);
@@ -590,16 +590,16 @@ int do_follow(CHAR_DATA *ch, char *argument, int cmd)
               else          stop_follower(ch, STOP_FOLLOW);  /* follow */ 
             }
 
-	    if((abs(GET_LEVEL(ch)-GET_LEVEL(leader))<60) || GET_LEVEL(ch)>=IMMORTAL) { 
+//	    if((abs(GET_LEVEL(ch)-GET_LEVEL(leader))<60) || GET_LEVEL(ch)>=IMMORTAL) { 
 	      if(cmd == 10) add_follower(ch, leader, 1); /* stalk  */
               else          add_follower(ch, leader, 0); /* follow */ 
-            }
-	    else
-	      {
-		act("Sorry, but you are not of the right caliber to follow.",
-		ch, 0, 0, TO_CHAR, 0);
-		return eFAILURE;
-	      }
+  //          }
+//	    else
+//	      {
+//		act("Sorry, but you are not of the right caliber to follow.",
+//		ch, 0, 0, TO_CHAR, 0);
+//		return eFAILURE;
+//	      }
 	  }
       }
   return eSUCCESS;
