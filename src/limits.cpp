@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.9 2003/06/04 23:58:36 pirahna Exp $ */
+/* $Id: limits.cpp,v 1.10 2003/06/05 02:39:07 pirahna Exp $ */
 
 extern "C"
 {
@@ -364,14 +364,14 @@ void advance_level(CHAR_DATA *ch, int is_conversion)
     case CLASS_MAGIC_USER:
 	add_ki	    += (GET_LEVEL(ch) % 2);
 	add_hp      += number(2, 6);
-	add_mana    += number(2, 5);
+	add_mana    += number(2, 7);
 	add_moves   += number(1, (GET_CON(ch) / 2));
 	break;
 
     case CLASS_CLERIC:
 	add_ki	    += (GET_LEVEL(ch) % 2);
 	add_hp      += number(3, 13);
-	add_mana    += number(2, 5);
+	add_mana    += number(2, 7);
 	add_moves   += number(1, (GET_CON(ch) / 2));
 	break;
 
@@ -431,7 +431,7 @@ void advance_level(CHAR_DATA *ch, int is_conversion)
      case CLASS_DRUID:
        add_ki       += (GET_LEVEL(ch) % 2);;
        add_hp       += number(3, 8);
-       add_mana     += number(2, 5);
+       add_mana     += number(2, 7);
        add_moves    += number(1, (GET_CON(ch) / 2)); 
        break;
 
