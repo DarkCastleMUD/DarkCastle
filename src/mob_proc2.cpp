@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.32 2004/07/03 11:44:14 urizen Exp $ */
+/* $Id: mob_proc2.cpp,v 1.33 2004/07/03 18:50:42 urizen Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -1036,13 +1036,15 @@ int meta_get_moves_exp_cost(char_data * ch)
 
 int meta_get_moves_plat_cost(char_data * ch)
 {
-   int cost = 100 + GET_MOVE_METAS(ch);
-   return cost;
+  return 125 + (0.025 * GET_RAW_MOVE(ch) *(GET_RAW_MOVE(ch)/1000 == 0 ? 1: GET_RAW_MOVE(ch)/1000));
 }
 
 int meta_get_hps_exp_cost(char_data * ch)
 {
    int cost;
+
+
+
    switch (GET_CLASS(ch))
    {
       case CLASS_BARBARIAN: cost = 2000; break;
@@ -1065,7 +1067,24 @@ int meta_get_hps_exp_cost(char_data * ch)
 
 int meta_get_hps_plat_cost(char_data * ch)
 {
-   int cost = 100 + GET_HP_METAS(ch);
+   int cost;
+   switch (GET_CLASS(ch))
+   {
+      case CLASS_BARBARIAN: cost = 0; break;
+      case CLASS_WARRIOR: cost = 10; break;
+      case CLASS_PALADIN: cost = 20; break;
+      case CLASS_MONK: cost = 30; break;
+      case CLASS_RANGER: cost = 50; break;
+      case CLASS_ANTI_PAL: cost = 50; break;
+      case CLASS_THIEF: cost = 60; break;
+      case CLASS_BARD: cost = 60; break;
+      case CLASS_DRUID: cost = 80; break;
+      case CLASS_CLERIC: cost = 90; break;
+      case CLASS_MAGIC_USER: cost = 100; break;
+      default:
+        cost = 100; break;
+   }
+   cost = 100 + cost + (0.025 * GET_RAW_HIT(ch) *(GET_RAW_HIT(ch)/1000 == 0 ? 1: GET_RAW_HIT(ch)/1000));
    return cost;
 }
 
@@ -1189,16 +1208,24 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     send_to_char("The Meta-physician tells you, 'This is what I can do for you... \n\r", ch);
 
     meta_list_stats(ch);
+     
+    if (hit_exp && hit_cost) 
+    csendf(ch, "6) Add to your hit points:   %d experience points and %d"
+            " Platinum coins.\n\r", hit_exp, hit_cost); 
+    else
+    csendf(ch, "6) Add to your hit points:   You cannot do this.\r\n");
 
-    csendf(ch, "6) Add to your hit points:   Currently out of stock\r\n");
-    //        "Platinum coins.\n\r", hit_exp, hit_cost); 
+    if (mana_exp && mana_cost)
+    csendf(ch, "7) Add to your mana points:  %d experience points and %d\r\n"
+            " Platinum coins.\n\r", mana_exp, mana_cost);
+    else
+    csendf(ch, "7) Add to your mana points:  You cannot do this.\r\n");
 
-    csendf(ch, "7) Add to your mana points:  Currently out of stock\r\n");
-  //          "Platinum coins.\n\r", mana_exp, mana_cost);
-
-    csendf(ch, "8) Add to your movement points: Currently out of stock\r\n");
-//            "Platinum coins.\n\r", move_exp, move_cost);
-
+    if (move_exp && move_cost)
+    csendf(ch, "8) Add to your movement points: %d experience points and %d\r\n"
+            " Platinum coins.\n\r", move_exp, move_cost);
+    else
+    csendf(ch, "8) Add to your movement points:  You cannot do this.\r\n");
     send_to_char(
     "9) Freedom from HUNGER and THIRST:  Currently out of stock.\n\r"
     "10) Five (5) Platinum coins   Cost: 100,000 Gold Coins.\n\r"
