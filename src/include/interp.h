@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.h,v 1.15 2003/07/22 18:29:06 pirahna Exp $ */
+/* $Id: interp.h,v 1.16 2003/08/12 03:45:37 pirahna Exp $ */
 
 #ifndef INTERP_H_
 #define INTERP_H_
@@ -56,7 +56,6 @@ DO_FUN  do_abandon;
 DO_FUN  do_accept;
 DO_FUN  do_action;
 DO_FUN  do_advance;
-DO_FUN  do_aggression;
 DO_FUN  do_alias;
 DO_FUN  do_archive;
 DO_FUN  do_autoeat;
@@ -123,6 +122,7 @@ DO_FUN  do_enter;
 DO_FUN  do_equipment;
 DO_FUN  do_examine;
 DO_FUN  do_exits;
+DO_FUN  do_ferocity;
 DO_FUN  do_fighting;
 DO_FUN  do_fill;
 DO_FUN  do_find;

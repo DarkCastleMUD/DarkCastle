@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: const.cpp,v 1.63 2003/07/22 18:29:00 pirahna Exp $ */
+/* $Id: const.cpp,v 1.64 2003/08/12 03:45:33 pirahna Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -199,7 +199,7 @@ char *spell_wear_off_msg[] =
   "With a rush of strength, the $6debility$R fades from your body.",
   "Your rapid decay ends and your health returns to normal.",
   "The shadow in your aura fades away into the ethereal.",
-  "!Holy Aura!",
+  "Your serene aura of holiness fades.",
   "!DismissFamiliar!",
   "!DismissCorpse!",
   "!UNUSED!"
@@ -1390,7 +1390,7 @@ struct class_skill_defines m_skills[] = { // mage skills
 {    "fireshield",	SPELL_FIRESHIELD,	48,	90,	3020,	NULL },
 //{    "create golem",	SPELL_CREATE_GOLEM,	50,	90,	3020,	NULL },
 //{    "release golem",	SPELL_RELEASE_GOLEM,	50,	90,	3020,	NULL },
-{    "solar gate",	SPELL_SOLAR_GATE,	50,	90,	3020,	NULL },
+{    "solar gate",	SPELL_SOLAR_GATE,	50,	90,	-2,	"To acquire this powerful spell you must defeat the sun itself, freeing it from its prison." },
 {    "\n",		0,			1,	0,	0, 	NULL}
 };
 

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.31 2003/07/22 18:29:06 pirahna Exp $
+| $Id: cl_thief.cpp,v 1.32 2003/08/12 03:45:37 pirahna Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -1547,6 +1547,8 @@ int do_deceit(struct char_data *ch, char *argument, int cmd)
       af.bitvector = 0;
       affect_to_char(tmp_char, &af);
       af.location  = APPLY_DAMROLL;
+      affect_to_char(tmp_char, &af);
+      af.location  = APPLY_HITROLL;
       affect_to_char(tmp_char, &af);
     }   
   }

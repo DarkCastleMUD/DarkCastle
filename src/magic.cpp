@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.85 2003/07/22 18:29:00 pirahna Exp $ */
+/* $Id: magic.cpp,v 1.86 2003/08/12 03:45:34 pirahna Exp $ */
 
 extern "C"
 {
@@ -5053,13 +5053,15 @@ int cast_power_harm( byte level, CHAR_DATA *ch, char *arg, int type,
 
   switch (type) {
   case SPELL_TYPE_SPELL:
-    return spell_power_harm(level, ch, victim, 0, skill);
+    if(victim)
+      return spell_power_harm(level, ch, victim, 0, skill);
     break;
   case SPELL_TYPE_POTION:
     return spell_power_harm(level, ch, ch, 0, skill);
     break;
   case SPELL_TYPE_WAND:
-    return spell_power_harm(level, ch, victim, 0, skill);
+    if(victim)
+      return spell_power_harm(level, ch, victim, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
     for (victim = world[ch->in_room].people ; victim ; victim = next_v )
@@ -5568,7 +5570,8 @@ int cast_cure_light( byte level, CHAR_DATA *ch, char *arg, int type,
 	 return spell_cure_light(level,ch,tar_ch,0, skill);
 	 break;
   case SPELL_TYPE_WAND:
-    return spell_cure_light(level, ch, tar_ch, 0, skill);
+    if(tar_ch)
+      return spell_cure_light(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_POTION:
 	 return spell_cure_light(level,ch,ch,0, skill);
@@ -9274,7 +9277,7 @@ int spell_holy_aura(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
 
   skill_increase_check(ch, SPELL_HOLY_AURA, skill, SKILL_INCREASE_HARD);
   act("A serene calm comes over $n.", victim, 0, 0, TO_ROOM, INVIS_NULL);
-  act("A serene encompasses you.", victim, 0, 0, TO_CHAR, 0);
+  act("A serene calm encompasses you.", victim, 0, 0, TO_CHAR, 0);
 
   af.type      = SPELL_HOLY_AURA;
   af.duration  = 8;

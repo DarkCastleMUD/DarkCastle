@@ -14,7 +14,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.h,v 1.31 2003/07/22 18:29:06 pirahna Exp $ */
+/* $Id: spells.h,v 1.32 2003/08/12 03:45:37 pirahna Exp $ */
 #include <structs.h> // byte, sh_int
 
 #define MAX_BUF_LENGTH               240
@@ -262,7 +262,7 @@
 #define SKILL_TWO_HANDED_WEAPONS     362
 #define SKILL_HAND_TO_HAND           363
 #define SKILL_BULLRUSH               364
-#define SKILL_AGGRESSION             365
+#define SKILL_FEROCITY               365
 #define SKILL_TACTICS                366
 #define SKILL_DECEIT                 367
 #define SKILL_MAX                    367

@@ -19,6 +19,7 @@ extern "C"
 #include <character.h>
 #include <spells.h> // tar_char..
 #include <levels.h>
+#include <race.h>
 #include <utility.h>
 #include <player.h>
 #include <interp.h>
@@ -727,15 +728,15 @@ int execute_song_healing_melody( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA
    if(specialization > 0)
      heal = (int)(heal * 1.5);
 
-   if(ch->master && ch->master->in_room == ch->in_room && 
-                    IS_SET(ch->affected_by, AFF_GROUP))
+   if(ch->master && IS_SET(ch->affected_by, AFF_GROUP))
       master = ch->master;
    else master = ch;
 
    for(fvictim = master->followers; fvictim; fvictim = fvictim->next)
    {
       if(!IS_SET(fvictim->follower->affected_by, AFF_GROUP) || 
-         fvictim->follower->in_room != ch->in_room)
+         fvictim->follower->in_room != ch->in_room ||
+         IS_UNDEAD(fvictim->follower))
          continue;
 
       send_to_char("You feel a little better.\r\n", fvictim->follower);
@@ -743,7 +744,7 @@ int execute_song_healing_melody( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA
       if(GET_HIT(fvictim->follower) > GET_MAX_HIT(fvictim->follower))
          GET_HIT(fvictim->follower) = GET_MAX_HIT(fvictim->follower);
    }
-   if(ch->in_room == master->in_room)
+   if(ch->in_room == master->in_room && !IS_UNDEAD(master))
    {
       send_to_char("You feel a little better.\r\n", master);
       GET_HIT(master) += number(1, heal);

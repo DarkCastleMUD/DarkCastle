@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.38 2003/07/19 23:17:05 pirahna Exp $ */
+/* $Id: mob_proc.cpp,v 1.39 2003/08/12 03:45:34 pirahna Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -2960,7 +2960,8 @@ static char *dethSayText [ ] =
   "Marriage is like taking a hot bath. After you've been in for a while...it isn't so hot.",
   "If you're playing a poker game and you look around the table and can't tell who the sucker is, guess what....it's you!",
   "Whenever I feel blue, I start breathing again.",
-  "Is it because light travels faster than sound that some people appear bright until you hear them speak?"
+  "Is it because light travels faster than sound that some people appear bright until you hear them speak?",
+  "Wtf...ever since I downloaded the 23k winXPfulleditioncrack.exe file my computer's been acting weird."
 };
 
 #define DETH_SAY_TEXT_SIZE    ( sizeof ( dethSayText )    / sizeof ( char * ) )

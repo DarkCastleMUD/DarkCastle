@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: utility.h,v 1.17 2003/03/07 02:46:40 pirahna Exp $ */
+/* $Id: utility.h,v 1.18 2003/08/12 03:45:37 pirahna Exp $ */
 
 #ifndef UTILITY_H_
 #define UTILITY_H_
@@ -205,6 +205,7 @@ bool IS_DARK( int room );
 
 #define GET_RACE(ch)     ((ch)->race)
 #define GET_BITV(ch)     ((ch)->race==1?1:(1<<(((ch)->race)-1)))
+#define IS_UNDEAD(ch)    ((GET_RACE(ch)==RACE_UNDEAD) || (GET_RACE(ch)==RACE_GHOST))
 
 #define AWAKE(ch) (GET_POS(ch)  != POSITION_SLEEPING)
 
