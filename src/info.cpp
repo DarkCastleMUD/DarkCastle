@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.12 2002/08/04 22:24:12 pirahna Exp $ */
+/* $Id: info.cpp,v 1.13 2002/08/11 14:53:56 pirahna Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -1255,21 +1255,6 @@ int do_exits(struct char_data *ch, char *argument, int cmd)
    return eSUCCESS;
 }
 
-
-int scoreAbilIndex(int score) 
-{
-   if(score < 5) return 0;
-   else if(score < 10) return 1;
-   else if(score < 15) return 2;
-   else if(score < 20) return 3;
-   else if(score < 25) return 4;
-   else return 5;
-}
-
-
-
-
-
 char frills[] = {
    '\\',
    'o',
@@ -1356,12 +1341,25 @@ int do_score(struct char_data *ch, char *argument, int cmd)
 
          // figure out the name of the affect (if any)
          char * aff_name = get_skill_name(aff->type);
-         if(aff->type == FUCK_CANTQUIT)
-           aff_name = "CANT_QUIT";
+         switch(aff->type) {
+           case FUCK_CANTQUIT:
+             aff_name = "CANT_QUIT";
+             break;
+           case SKILL_HARM_TOUCH:
+             aff_name = "harmtouch reuse timer";
+             break;
+           case SKILL_LAY_HANDS:
+             aff_name = "layhands reuse timer";
+             break;
+           case SKILL_BLOOD_FURY:
+             aff_name = "blood fury reuse timer";
+             break;
+           default: break;
+         }
          if(!aff_name) // not one we want displayed
            continue;
 
-         sprintf(buf, "|%c| Affected by %-21s %s  Modifier %-16s  |%c|\n\r",						 
+         sprintf(buf, "|%c| Affected by %-22s %s Modifier %-16s  |%c|\n\r",						 
                scratch, aff_name,
                ((IS_AFFECTED(ch, AFF_DETECT_MAGIC) && aff->duration < 3) ? 
                           "$2(fading)$7" : "        "),

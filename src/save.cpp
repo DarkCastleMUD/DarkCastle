@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: save.cpp,v 1.8 2002/08/05 20:37:22 pirahna Exp $ */
+/* $Id: save.cpp,v 1.9 2002/08/11 14:53:56 pirahna Exp $ */
 
 extern "C"
 {
@@ -614,7 +614,7 @@ struct obj_data *  obj_store_to_char(CHAR_DATA *ch, FILE *fpsave, struct obj_dat
 
   int j;
   int nr;
-  uint16 length;
+  uint16 length;  // do not change this type
   int wear_pos;
   char mod_type[4];
   char buf[MAX_STRING_LENGTH];
@@ -825,7 +825,7 @@ bool put_obj_in_store (struct obj_data *obj, CHAR_DATA *ch, FILE *fpsave, int we
   struct obj_data *loop_obj;
   int    iAffect, iAff2;
   int    change;
-  int    length;
+  uint16 length;  // do not change this type
   struct obj_file_elem object;
   int16 tmp_weight = 0;
 
