@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.66 2004/07/03 11:44:16 urizen Exp $
+| $Id: cl_thief.cpp,v 1.67 2004/07/04 21:18:25 urizen Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -619,7 +619,7 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
 
     if (!skill_success(ch,victim,SKILL_STEAL)) 
     {
-      set_cantquit( ch, victim, TRUE );
+      set_cantquit( ch, victim );
       send_to_char("Oops..", ch);
       ohoh = TRUE;
       if(!number(0, 4)) {
@@ -671,7 +671,7 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
             // if victim isn't a pthief
             if(!affected_by_spell(victim, FUCK_PTHIEF) ) 
             {
-              set_cantquit( ch, victim, TRUE );
+              set_cantquit( ch, victim );
               if(affected_by_spell(ch, FUCK_PTHIEF))
               {
                 affect_from_char(ch, FUCK_PTHIEF);
@@ -832,7 +832,7 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
           // You don't get a thief flag from stealing from a pthief
           if(!affected_by_spell(victim, FUCK_PTHIEF)) 
           {
-            set_cantquit( ch, victim, TRUE );
+            set_cantquit( ch, victim );
             if(affected_by_spell(ch, FUCK_PTHIEF))
             {
               affect_from_char(ch, FUCK_PTHIEF);
@@ -967,7 +967,7 @@ int do_pocket(CHAR_DATA *ch, char *argument, int cmd)
 
   if (!skill_success(ch, victim, SKILL_POCKET)) 
   {
-    set_cantquit( ch, victim, TRUE );
+    set_cantquit( ch, victim );
     send_to_char("Oops..\r\n", ch);
     ohoh = TRUE;
 	    if(!number(0, 6)) {
@@ -1000,7 +1000,7 @@ int do_pocket(CHAR_DATA *ch, char *argument, int cmd)
         do_save(ch, "", 666);
         if(!affected_by_spell(victim, FUCK_PTHIEF) ) 
         {
-          set_cantquit( ch, victim, TRUE );
+          set_cantquit( ch, victim );
           if(affected_by_spell(ch, FUCK_PTHIEF))
           {
             affect_from_char(ch, FUCK_PTHIEF);
