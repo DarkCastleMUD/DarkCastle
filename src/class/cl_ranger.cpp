@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_ranger.cpp,v 1.10 2002/08/04 19:43:07 pirahna Exp $ | cl_ranger.C |
+| $Id: cl_ranger.cpp,v 1.11 2002/08/10 05:23:44 pirahna Exp $ | cl_ranger.C |
 Description: Ranger skills/spells */ extern "C"  {
   #include <string.h>
 }
@@ -42,9 +42,6 @@ int do_tame(CHAR_DATA *ch, char *arg, int cmd)
 
   void add_follower(CHAR_DATA *ch, CHAR_DATA *leader, int cmd);
   void stop_follower(CHAR_DATA *ch, int cmd);
-
-  send_to_char("Disabled currently.\r\n", ch);
-  return eFAILURE;
 
   while(*arg == ' ')
     arg++;
