@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.16 2003/01/22 16:12:19 pirahna Exp $
+| $Id: inventory.cpp,v 1.17 2003/01/30 05:40:58 pirahna Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -205,6 +205,12 @@ int do_get(struct char_data *ch, char *argument, int cmd)
                 if(!alldot && IS_SET(obj_object->obj_flags.more_flags, ITEM_NONOTICE))
                   continue;
 
+                // Ignore NO_TRADE items on a 'get all'
+                if(IS_SET(obj_object->obj_flags.more_flags, ITEM_NO_TRADE)) {
+                  csendf(ch, "The %s appears to be NO_TRADE so you don't pick it up.\r\n", obj_object->short_description);
+                  continue;
+                }
+
                 // PC corpse
 		if(obj_object->obj_flags.value[3] == 1 && isname("pc", obj_object->name))
                 {
@@ -355,6 +361,13 @@ int do_get(struct char_data *ch, char *argument, int cmd)
 		    if (alldot && !isname(allbuf,obj_object->name)){
 		      continue;
 		    }
+
+                    // Ignore NO_TRADE items on a 'get all'
+                    if(IS_SET(obj_object->obj_flags.more_flags, ITEM_NO_TRADE)) {
+                      csendf(ch, "The %s appears to be NO_TRADE so you don't pick it up.\r\n", obj_object->short_description);
+                      continue;
+                    }
+
 		    if (CAN_SEE_OBJ(ch,obj_object)) {
 		      if ((IS_CARRYING_N(ch) + 1 < CAN_CARRY_N(ch))) {
 		        if (inventorycontainer || 
