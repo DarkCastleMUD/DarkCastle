@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.25 2003/06/12 23:57:28 pirahna Exp $ */
+/* $Id: mob_proc2.cpp,v 1.26 2003/06/13 01:15:28 pirahna Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -378,6 +378,7 @@ int mortician(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
   struct obj_data *obj2;
   struct obj_data *curr_cont;
   int x = 0, cost = 0, which;
+  int count = 0;
   char buf[100];
   bool has_consent = FALSE;
 
@@ -419,7 +420,7 @@ int mortician(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
        }
        cost /= 20000;
        cost = MAX(cost, 30); 
-       sprintf(buf, "%d) %-21s %d Platinum coins.\n\r", ++x, obj->short_description,
+       sprintf(buf, "%d) %-21s %d Platinum coins.\n\r", ++count, obj->short_description,
                cost);
        send_to_char(buf, ch); 
     }
@@ -485,9 +486,9 @@ int mortician(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
           cost += curr_cont->obj_flags.cost; 
         cost += obj2->obj_flags.cost;
      }
-     for(x = 0; x <= WEAR_MAX; x++) {
-       if(ch->equipment[x]) {
-         cost += ch->equipment[x]->obj_flags.cost;
+     for(count = 0; count <= WEAR_MAX; count++) {
+       if(ch->equipment[count]) {
+         cost += ch->equipment[count]->obj_flags.cost;
        }
      }
      cost /= 20000;
