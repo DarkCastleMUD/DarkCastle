@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.48 2002/08/21 03:19:18 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.49 2002/08/23 17:09:37 pirahna Exp $ */
 
 extern "C"
 {
@@ -191,6 +191,9 @@ void perform_violence(void)
 bool gets_dual_wield_attack(char_data * ch)
 {
   int learned;
+
+  if(!ch->equipment[SECOND_WIELD]) // only if we have a second wield:)
+    return FALSE;
 
   if(!(learned = has_skill(ch, SKILL_DUAL_WIELD)))
     return FALSE;
