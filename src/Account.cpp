@@ -43,6 +43,43 @@ CAccount::CAccount(string loginid)
    bvOne = 0;
 }
 
+bool CAccount::hasCharacter( string name )
+{
+   for(unsigned int i = 0; i < characternames.size(); i++)
+      if( 0 == characternames[i].compare( name ) )
+         return true;
+   return false;
+}
+
+void CAccount::charListToBuf( char buf[] )
+{
+   unsigned int size = sizeof(buf);
+   char temp[50];
+   string nextname;
+   unsigned int i;
+
+   assert( size > 40 );
+
+   *buf = '\0';  // clear buf
+
+   if( characternames.size() < 1 ) {
+      strcpy(buf, "NONE!");
+      return;
+   }
+
+   for(i = 0; i < characternames.size(); i++) {
+      nextname = characternames[i];
+      if( ( strlen(buf) + 34) >= size ) {
+         strcpy(buf, "Error:Acct:charListToBuf - too long");
+         return;
+      }
+      sprintf(temp, "%30s%s", nextname.c_str(), ((i+1) % 3 == 0) ? "\r\n" : "" );
+      strcat(buf, temp);
+   }
+   if( i % 3 != 0 )
+     strcat(buf, "\r\n");
+}
+
 // Write account to file.
 // 1 on success, 0 on failure
 int CAccount::WriteToFile()

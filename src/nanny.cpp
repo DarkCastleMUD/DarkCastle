@@ -11,7 +11,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.28 2003/04/23 04:21:06 pirahna Exp $ */
+/* $Id: nanny.cpp,v 1.29 2003/04/23 04:54:34 pirahna Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -1196,28 +1196,42 @@ void nanny(struct descriptor_data *d, char *arg)
     case CON_ACCOUNT_LOGIN_CHAR:
 
        // Verify char name entered is valid else back to menu
-       // copy name into tmp_name
-       // continue
+       arg[0] = UPPER(arg[0]);
+       for(y = 1; arg[y] != '\0'; y++)
+          arg[y] = LOWER(arg[y]);
+       stringtemp = arg;
+
+       if( ! d->account->hasCharacter( stringtemp ) ) {
+          SEND_TO_Q("\n\rYou do not have a character named '", d);
+          strcpy(buf, stringtemp.c_str());
+          SEND_TO_Q(buf, d);
+          SEND_TO_Q("'.\n\r\n\r", d);
+          SEND_TO_Q(accountmenu, d);
+          STATE(d) = CON_ACCOUNT_MENU;
+          return;
+       }
+
+       // At this point we know we have a valid character name for this account, load and go
+       // TODO - make this happen
+       assert(0);
 
        load_char_obj(d, tmp_name);
        ch = d->character;
-          
-       send_to_char("\n\rWelcome to Dark Castle Diku Mud.  May your visit here suck.\n\r", ch );
+
+       // TODO: remove these later after we're sure this doesn't happen
+       assert( GET_LEVEL(ch) > 0 );
+       assert( GET_SHORT_ONLY(ch) );
+
        ch->next            = character_list;
        character_list      = ch;
           
+       send_to_char("\n\rWelcome to Dark Castle Diku Mud.  May your visit here suck.\n\r", ch );
        do_on_login_stuff(ch);
-          
        if(GET_LEVEL(ch) < OVERSEER)
           clan_login(ch);
-          
        act( "$n has entered the game.", ch, 0, 0, TO_ROOM , INVIS_NULL);
-       if(!GET_SHORT_ONLY(ch)) GET_SHORT_ONLY(ch) = str_dup(GET_NAME(ch)); 
        update_wizlist(ch);
-          
        STATE(d) = CON_PLAYING;
-       if ( GET_LEVEL(ch) == 0 )
-          do_start( ch );
        do_look( ch, "", 8 );
        break;
        
@@ -1239,7 +1253,7 @@ void nanny(struct descriptor_data *d, char *arg)
           break;
           
        case '2':
-SEND_TO_Q("TODO\n\r", d);
+SEND_TO_Q("TODO-move description writing to inside game and remove this completely\n\r", d);
 break;
           SEND_TO_Q("Enter a text you'd like others to see when they look at you.\n\r"
                     "Terminate with an '~'\n\r", d);
