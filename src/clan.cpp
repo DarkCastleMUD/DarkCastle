@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.11 2003/01/03 05:11:09 dcastle Exp $ */
+/* $Id: clan.cpp,v 1.12 2003/01/16 04:26:34 dcastle Exp $ */
 extern "C"
 {
   #include <string.h> // strcat
@@ -1879,6 +1879,8 @@ void do_leader_clans(CHAR_DATA *ch, char *arg, int cmd)
           CLAN_RIGHTS_MESSAGES,
           CLAN_RIGHTS_MEMBER_LIST,
           CLAN_RIGHTS_RIGHTS,
+          CLAN_RIGHTS_INFO,
+          0,
           -1
   };
 

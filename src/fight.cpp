@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.87 2003/01/16 03:59:09 dcastle Exp $ */
+/* $Id: fight.cpp,v 1.88 2003/01/16 04:26:34 dcastle Exp $ */
 
 extern "C"
 {
@@ -125,6 +125,10 @@ void perform_violence(void)
           }  
         }
     }
+
+// DEBUG CODE
+   int last_class = GET_CLASS(ch);
+// DEBUG CODE
       
     if(can_attack(ch)) {
       is_mob = IS_MOB(ch);
@@ -158,6 +162,15 @@ void perform_violence(void)
             continue;
         }
       } // if is_mob
+
+// DEBUG CODE
+      if(last_class != GET_CLASS(ch)) {
+         // if this happened, most likely the mob died somehow during the proc and didn't return eCH_DIED and is
+         // now invalid memory.  report what class we were and return
+         logf(IMP, LOG_BUG, "Crash bug!!!!  fight.cpp last_class changed (%d)", last_class);
+         break;
+      }
+// DEBUG CODE
 
       retval = attack(ch, ch->fighting, TYPE_UNDEFINED);
 
@@ -1156,7 +1169,7 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
 
   if(GET_POS(victim) == POSITION_DEAD)           return (eSUCCESS|eVICT_DIED);
 
-  csendf(victim, "damage: dam = %d  type = %d\r\n", dam, weapon_type);
+//  csendf(victim, "damage: dam = %d  type = %d\r\n", dam, weapon_type);
 
   if(typeofdamage == DAMAGE_TYPE_MAGIC)  
   {
