@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.10 2002/08/02 16:19:14 pirahna Exp $ */
+/* $Id: spells.cpp,v 1.11 2002/08/02 20:59:01 pirahna Exp $ */
 
 extern "C"
 {
@@ -299,7 +299,7 @@ struct spell_info_type spell_info [ ] =
     },
 
     { /* 57 */
-	12, POSITION_STANDING, 7, TAR_IGNORE, cast_cont_light
+	12, POSITION_STANDING, 7, TAR_NONE_OK|TAR_OBJ_INV, cast_cont_light
     },
 
     { /* 58 */
@@ -1474,6 +1474,10 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
 
           if (!target_ok && IS_SET(spell_info[spl].targets, TAR_SELF_ONLY)) {
             tar_char = ch;
+            target_ok = TRUE;
+          }
+
+          if (!target_ok && IS_SET(spell_info[spl].targets, TAR_NONE_OK)) {
             target_ok = TRUE;
           }
         }

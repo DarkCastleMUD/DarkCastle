@@ -916,6 +916,11 @@ int do_mpteachskill( CHAR_DATA *ch, char *argument, int cmd )
 
     char * skillname = get_skill_name(skillnum);
 
+    if(has_skill(ch, skillnum)) {
+       csendf(ch, "You already know the basics of %s!\r\n", skillname ? skillname : "Unknown");
+       return eFAILURE;
+    }
+
     if(skillname)
        sprintf(skill, "$BYou have learned the basics of %s.$R\n\r", skillname);
     else {

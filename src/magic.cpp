@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.8 2002/08/01 21:03:04 pirahna Exp $ */
+/* $Id: magic.cpp,v 1.9 2002/08/02 20:59:00 pirahna Exp $ */
 
 extern "C"
 {
@@ -3329,6 +3329,25 @@ int spell_cont_light(byte level, CHAR_DATA *ch,
     log("NULL ch sent to cont_light!", ANGEL, LOG_BUG);
     return eFAILURE;
   }
+
+  if(obj) {
+    if(IS_SET(obj->obj_flags.extra_flags, ITEM_GLOW)) {
+       send_to_char("That item is already glowing with magical light.\r\n", ch);
+       return eFAILURE;
+    }
+    if(GET_ITEM_TYPE(obj) != ITEM_ARMOR) {
+       send_to_char("Only pieces of equipment may be magically lit in such a way.\r\n", ch);
+       return eFAILURE;
+    }
+    if(!CAN_WEAR(obj, ITEM_WEAR_EAR) && !CAN_WEAR(obj, ITEM_WEAR_EAR) && !CAN_WEAR(obj, ITEM_WEAR_EAR)) {
+       send_to_char("Only earrings, rings, and shields can be magically lit in such a way.\r\n", ch);
+       return eFAILURE;
+    }
+    SET_BIT(obj->obj_flags.extra_flags, ITEM_GLOW);
+    act("$n twiddles $s thumbs and the $p $e is carrying begins to glow.", ch, obj, 0, TO_ROOM, INVIS_NULL);
+    act("You twiddle your thumbs and the $p begins to glow.", ch, obj, 0, TO_CHAR, 0);
+    return eSUCCESS;
+  }
   
   tmp_obj = (struct obj_data *)dc_alloc(1, sizeof(struct obj_data));
   clear_object(tmp_obj);
@@ -6629,10 +6648,10 @@ int cast_cont_light( byte level, CHAR_DATA *ch, char *arg, int type,
 {
   switch (type) {
   case SPELL_TYPE_SPELL:
-    return spell_cont_light(level, ch, 0, 0);
+    return spell_cont_light(level, ch, 0, tar_obj);
     break;
   case SPELL_TYPE_SCROLL:
-	 return spell_cont_light(level, ch, 0, 0);
+	 return spell_cont_light(level, ch, 0, tar_obj);
 	 break;
   default:
 	 log("Serious screw-up in cont_light", ANGEL, LOG_BUG);

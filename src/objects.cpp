@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.9 2002/08/01 07:41:19 pirahna Exp $
+| $Id: objects.cpp,v 1.10 2002/08/02 20:59:01 pirahna Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -1237,7 +1237,7 @@ int will_screwup_worn_sizes(char_data * ch, obj_data * obj, int add)
   int problem = 0;
   for(j = 0; j < MAX_WEAR; j++)
   {
-    if(ch->equipment[j] == obj)
+    if(ch->equipment[j] == obj || !ch->equipment[j])
       continue;
 
     if(size_restricted(ch, ch->equipment[j])) {

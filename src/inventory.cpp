@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.5 2002/07/28 02:04:14 pirahna Exp $
+| $Id: inventory.cpp,v 1.6 2002/08/02 20:59:00 pirahna Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -986,12 +986,20 @@ int do_give(struct char_data *ch, char *argument, int cmd)
     if(!IS_NPC(vict) && IS_SET(obj->obj_flags.more_flags, ITEM_NO_TRADE) &&
        (!IS_NPC(ch) || IS_AFFECTED(ch, AFF_CHARM)))
     {
-      send_to_char("It seems magically attached to you.\r\n", ch);
-      return eFAILURE;
+      if(GET_LEVEL(ch) > IMMORTAL)
+         send_to_char("That was a NO_TRADE item btw....\r\n", ch);
+      else {
+        send_to_char("It seems magically attached to you.\r\n", ch);
+        return eFAILURE;
+      }
     }
     if(contains_no_trade_item(obj)) {
-      send_to_char("Something inside it seems magically attached to you.\r\n", ch);
-      return eFAILURE;
+      if(GET_LEVEL(ch) > IMMORTAL)
+         send_to_char("That was a NO_TRADE item btw....\r\n", ch);
+      else {
+        send_to_char("Something inside it seems magically attached to you.\r\n", ch);
+        return eFAILURE;
+      }
     }
 
     if (IS_NPC(vict) && mob_index[vict->mobdata->nr].non_combat_func == shop_keeper)
