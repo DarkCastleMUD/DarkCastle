@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.10 2002/08/06 21:09:23 pirahna Exp $
+| $Id: cl_thief.cpp,v 1.11 2002/08/06 21:27:28 pirahna Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -440,8 +440,7 @@ int do_sneak(CHAR_DATA *ch, char *argument, int cmd)
       }
    }
 
-   if (!IS_AFFECTED(ch, AFF_HIDE))
-      do_hide(ch, "", 9);
+   do_hide(ch, "", 9);
 
    send_to_char("You try to move silently for a while.\n\r", ch);
 
