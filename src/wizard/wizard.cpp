@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.4 2002/06/29 18:16:23 pirahna Exp $
+| $Id: wizard.cpp,v 1.5 2002/07/01 01:02:36 pirahna Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -18,6 +18,32 @@
 #include <interp.h>
 #include <returnvals.h>
 
+int number_or_name(char **name, int *num)
+{
+  int i;
+  char *ppos;
+  char number[MAX_INPUT_LENGTH];
+  
+  if((ppos = index(*name, '.')) != NULL) {
+    *ppos++ = '\0'; 
+    strcpy(number, *name);
+    strcpy(*name, ppos);
+       
+    for(i = 0; *(number + i); i++)
+       if(!isdigit(*(number + i)))
+         return(0);
+
+    return(atoi(number));
+  }
+
+  /* no dot */
+  if((*num = atoi(*name)) > 0)
+    return -1;
+  else
+    return 1;
+}
+
+#if(0)
 int number_or_name(char **name, int *num)
 {
   unsigned i;
@@ -51,6 +77,7 @@ int number_or_name(char **name, int *num)
   else
     return 1;
 }
+#endif
 
 void do_mload(struct char_data *ch, int rnum, int cnt)
 {      
