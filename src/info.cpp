@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.15 2002/08/21 14:51:53 pirahna Exp $ */
+/* $Id: info.cpp,v 1.16 2002/09/01 15:56:58 pirahna Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -1902,7 +1902,7 @@ int do_consider(struct char_data *ch, char *argument, int cmd)
    
    char *dam_messages[] = {
       "hits like my grandmother",
-         "will probably graze you preetty good",	
+         "will probably graze you pretty good",	
          "can hit pretty hard",	
          "can pack a pretty damn good punch",	
          "can massacre on a good day", 		  
@@ -2166,7 +2166,15 @@ int do_scan(struct char_data *ch, char *argument, int cmd)
                possibilities[i]);
          }
          else for(vict = room->people; vict; vict = vict->next_in_room) {
-            if(CAN_SEE(ch, vict)  && !IS_AFFECTED2(vict, AFF_CAMOUFLAGUE)) { 
+            if(CAN_SEE(ch, vict)) 
+            {
+               if(IS_AFFECTED2(vict, AFF_CAMOUFLAGUE) && 
+                  world[vict->in_room].sector_type != SECT_INSIDE &&
+                  world[vict->in_room].sector_type != SECT_CITY &&
+                  world[vict->in_room].sector_type != SECT_AIR
+                 )
+                  continue;
+
                percent = number(1,101);
                if(percent < 75) {
                   csendf(ch,"%35s -- a little bit %s\n\r", GET_SHORT(vict),
@@ -2188,7 +2196,15 @@ int do_scan(struct char_data *ch, char *argument, int cmd)
                   possibilities[i]);
             }
             else for(vict = room->people; vict; vict = vict->next_in_room) {
-               if(CAN_SEE(ch, vict) && !IS_AFFECTED2(vict, AFF_CAMOUFLAGUE)){ 
+               if(CAN_SEE(ch, vict)) 
+               {
+                  if(IS_AFFECTED2(vict, AFF_CAMOUFLAGUE) && 
+                     world[vict->in_room].sector_type != SECT_INSIDE &&
+                     world[vict->in_room].sector_type != SECT_CITY &&
+                     world[vict->in_room].sector_type != SECT_AIR
+                    )
+                     continue;
+
                   percent = number(1,101);
                   if(percent < 50) {
                      csendf(ch,"%35s -- a ways off %s\n\r",
@@ -2208,7 +2224,15 @@ int do_scan(struct char_data *ch, char *argument, int cmd)
                         possibilities[i]);
                   }
                   else for(vict = room->people; vict; vict = vict->next_in_room) {
-                     if(CAN_SEE(ch, vict) && !IS_AFFECTED2(vict, AFF_CAMOUFLAGUE)) {
+                     if(CAN_SEE(ch, vict)) 
+                     {
+                        if(IS_AFFECTED2(vict, AFF_CAMOUFLAGUE) && 
+                           world[vict->in_room].sector_type != SECT_INSIDE &&
+                           world[vict->in_room].sector_type != SECT_CITY &&
+                           world[vict->in_room].sector_type != SECT_AIR
+                          )
+                           continue;
+
                         percent = number(1,101);
                         if(percent < 40) {
                            csendf(ch, "%35s -- extremely far off %s\n\r",

@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: const.cpp,v 1.36 2002/08/28 04:58:22 pirahna Exp $ */
+/* $Id: const.cpp,v 1.37 2002/09/01 15:56:58 pirahna Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -173,7 +173,7 @@ char *spell_wear_off_msg[] =
   "!Howl!",
   "!Souldrain!",
   "!Sparks!",     // 114
-  "!Camoflague!",
+  "Your $2c$7a$0$Bmo$Ru$2fl$7a$0$Bg$R$2u$7e$R has worn off.",
   "!FarSight!",
   "!FreeFloat!",
   "!Insomnia!",

@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.26 2002/08/28 05:15:58 pirahna Exp $ */
+/* $Id: magic.cpp,v 1.27 2002/09/01 15:56:58 pirahna Exp $ */
 
 extern "C"
 {
@@ -3501,7 +3501,7 @@ int spell_dispel_minor(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
 
 // Input max number of spells in switch statement here
      while(!done && ((rots += 1) < 10))
-     switch(number(1, 11)) {
+     switch(number(1, 12)) {
 
 	case 1: if (affected_by_spell(victim, SPELL_INVISIBLE))
 	         if (yes || 0 > saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC)) {
@@ -3601,6 +3601,14 @@ int spell_dispel_minor(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
 		    if (yes || 0 > saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC)) {
 		     affect_from_char(victim, SPELL_DETECT_GOOD);
 		     send_to_char("You can't see the good in a person anymore.\n\r", victim);
+                 done = TRUE;
+	          }
+                break;
+      
+	 case 12: if (affected_by_spell(victim, SPELL_CAMOUFLAGUE))
+		    if (yes || 0 > saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC)) {
+		     affect_from_char(victim, SPELL_CAMOUFLAGUE);
+		     send_to_char("You don't seem to be camouflaged anymore.\n\r", victim);
                  done = TRUE;
 	          }
                 break;

@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.60 2002/08/29 15:01:16 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.61 2002/09/01 15:56:58 pirahna Exp $ */
 
 extern "C"
 {
@@ -996,6 +996,7 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
   int modifier = 0;
   int percent;
   int learned;
+  int ethereal = 0;
   
   if(!weapon)
     weapon = WIELD;
@@ -1157,8 +1158,7 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
     if(dam < 1)  dam = 1;
     pspell->duration--;
     if(0 == pspell->duration) {
-      send_to_char("The ethereal stones protecting you shatter and fade into nothing.\r\n", victim);
-      act("The ethereal stones surrounding $n shatter into nothingness.\r\n", victim, 0, 0, TO_ROOM, 0);
+      ethereal = 1;
       affect_from_char(victim, SPELL_STONE_SHIELD);
       affect_from_char(victim, SPELL_GREATER_STONE_SHIELD);
     }
@@ -1260,6 +1260,11 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
     GET_HIT(victim) -= dam;
     update_pos(victim);
     do_dam_msgs(ch, victim, dam, attacktype, weapon);
+  }
+
+  if(ethereal) {
+    send_to_char("The ethereal stones protecting you shatter and fade into nothing.\r\n", victim);
+    act("The ethereal stones surrounding $n shatter into nothingness.\r\n", victim, 0, 0, TO_ROOM, 0);
   }
   
   /*  Now for eq damage...   */
