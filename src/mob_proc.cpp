@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.33 2003/04/22 23:31:14 pirahna Exp $ */
+/* $Id: mob_proc.cpp,v 1.34 2003/04/22 23:36:37 pirahna Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -5116,6 +5116,10 @@ int mage_familiar_non(struct char_data *ch, struct obj_data *obj, int cmd, char 
     extract_char(ch, TRUE);
     return (eCH_DIED | eSUCCESS);
   }
+
+  // do nothing unless doing nothing :)
+  if( GET_POS(ch) < POSITION_STANDING )
+     return eFAILURE;
 
   if(!ch->fighting) 
   {
