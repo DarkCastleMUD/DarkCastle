@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.96 2004/05/13 20:20:18 urizen Exp $ */
+/* $Id: const.cpp,v 1.97 2004/05/14 00:04:12 urizen Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1260,7 +1260,7 @@ struct class_skill_defines r_skills[] = { // ranger skills
 {    "entangle",        SPELL_ENTANGLE,          18,     90,     {WIS,DEX} },
 {    "archery",         SKILL_ARCHERY,           20,     90,     {DEX,WIS} },
 {    "blindfighting",   SKILL_BLINDFIGHTING,     21,     90,     {INT,DEX} },
-{    "dodge",           SKILL_DODGE,             22,     80,     {DEX,INT} },
+{    "parry",           SKILL_PARRY,             22,     80,     {DEX,WIS} },
 {    "herb lore",       SPELL_HERB_LORE,         23,     90,     {INT,WIS} },
 {    "poison",          SPELL_POISON,            25,     85,     {CON,WIS} },
 //   "wind arrows"      SKILL_WIND_ARROW         26,     98,     {INT,DEX} },
@@ -1305,7 +1305,7 @@ struct class_skill_defines d_skills[] = { // bard skills
 { "flight of the bumblebee", SKILL_SONG_FLIGHT_OF_BEE,     20,     98,     {DEX,INT} },
 { "note of knowledge",     SKILL_SONG_NOTE_OF_KNOWLEDGE,   21,     98,     {INT,WIS} },
 //{ "fanatical fanfare",   SKILL_FANATICAL_FANFARE         23,     98,     {CON,INT} },
-{ "revealing stacato",     SKILL_SONG_REVEAL_STACATO,      25,     98,     {INT,DEX} },
+{ "revealing staccato",     SKILL_SONG_REVEAL_STACATO,      25,     98,     {INT,DEX} },
 { "double",                SKILL_SECOND_ATTACK,            26,     80,     {DEX,INT} },
 { "terrible clef",         SKILL_SONG_TERRIBLE_CLEF,       28,     98,     {STR,INT} },
 { "piercing",              SKILL_PIERCEING_WEAPONS,        30,     70,     {DEX,STR} },
@@ -1314,7 +1314,7 @@ struct class_skill_defines d_skills[] = { // bard skills
 { "crushing",              SKILL_CRUSHING_WEAPONS,         30,     70,     {STR,DEX} },
 { "soothing rememberance", SKILL_SONG_SOOTHING_REMEM,      31,     98,     {INT,WIS} },
 { "searching song",        SKILL_SONG_SEARCHING_SONG,      32,     98,     {INT,DEX} },
-//{ "dischordant dirge",   SKILL_DISCHORDANT_DIRGE,        34,     98,     {WIS,CON} },
+//{ "discordant dirge",   SKILL_DISCHORDANT_DIRGE,        34,     98,     {WIS,CON} },
 { "insane chant",          SKILL_SONG_INSANE_CHANT,        35,     98,     {WIS,INT} },
 { "jig of alacrity",       SKILL_SONG_JIG_OF_ALACRITY,     38,     98,     {DEX,CON} },
 { "vigilant siren",        SKILL_SONG_VIGILANT_SIREN,      40,     98,     {INT,CON} },

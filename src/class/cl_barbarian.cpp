@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_barbarian.cpp,v 1.20 2004/04/28 22:05:47 urizen Exp $
+| $Id: cl_barbarian.cpp,v 1.21 2004/05/14 00:04:15 urizen Exp $
 | cl_barbarian.C
 | Description:  Commands for the barbarian class.
 */
@@ -26,9 +26,6 @@ int do_rage(struct char_data *ch, char *argument, int cmd)
 {
   char_data *victim;
   char name[256];
-  byte percent;
-  int learned, chance;
-  int specialization;
 
   if(GET_HIT(ch) == 1) {
     send_to_char("You are feeling too weak right now to work yourself up into "
@@ -37,14 +34,11 @@ int do_rage(struct char_data *ch, char *argument, int cmd)
   }
 
   if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL )
-    learned = 75;
-  else if(!(learned = has_skill(ch, SKILL_RAGE))) {
+    ;
+  else if(!has_skill(ch, SKILL_RAGE)) {
     send_to_char("You should learn the skill before you try doing any raging in this machine...\r\n", ch);
     return eFAILURE;
   }
-
-  specialization = learned / 100;
-  learned = learned % 100;
 
   one_argument(argument, name);
 
@@ -70,18 +64,7 @@ int do_rage(struct char_data *ch, char *argument, int cmd)
   if(!can_attack(ch) || !can_be_attacked(ch, victim))
     return eFAILURE;
 
-  chance = 67;
-  chance += (GET_STR(ch) > 26);
-  chance += (GET_STR(ch) > 24);
-  chance += (GET_STR(ch) > 22);
-  chance += (GET_STR(ch) > 20);
-  chance += (GET_STR(ch) > 18);    // chance = 67-72
-  chance += learned / 10;          // chance = 67-80 (max of 80 learned for barb)
-
-  // 101% is a complete failure
-  percent = number(1, 101);
-
-  if (percent > chance) {
+  if (!skill_success(ch,victim,SKILL_RAGE)) {
     act ("You start advancing towards $N, but trip over your own feet!", 
          ch, 0, victim, TO_CHAR, 0);
     act ("$n starts advancing toward you, but trips over $s own feet!",
@@ -100,12 +83,10 @@ int do_rage(struct char_data *ch, char *argument, int cmd)
     act ("$n advances confidently towards $N, and flies into a rage!",
             ch, 0, victim, TO_ROOM, NOTVICT);
 
-    if(learned < 5)
-      SET_BIT(ch->combat, COMBAT_RAGE2);
-    else SET_BIT(ch->combat, COMBAT_RAGE1);
+    SET_BIT(ch->combat, COMBAT_RAGE1);
   }
 
-  skill_increase_check(ch, SKILL_RAGE, learned, SKILL_INCREASE_EASY);
+  skill_increase_check(ch, SKILL_RAGE, has_skill(ch,SKILL_RAGE), SKILL_INCREASE_EASY);
 
   WAIT_STATE(ch, PULSE_VIOLENCE * 3);
 
@@ -113,7 +94,7 @@ int do_rage(struct char_data *ch, char *argument, int cmd)
      return attack(ch, victim, TYPE_UNDEFINED);
 
   // chance of bonus round at high level of skill
-  if(learned > 75 && !number(0, 9))
+  if(has_skill(ch,SKILL_RAGE) > 75 && !number(0, 9))
      return attack(ch, victim, TYPE_UNDEFINED);
 
   return eSUCCESS;
@@ -121,30 +102,20 @@ int do_rage(struct char_data *ch, char *argument, int cmd)
 
 int do_battlecry(struct char_data *ch, char *argument, int cmd)
 {
-  int learned, chance, specialization, percent;
-  follow_type * f;
-
+  struct follow_type *f;
   if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
-    learned = 75;
-  else if(!(learned = has_skill(ch, SKILL_BATTLECRY))) {
+    ;
+  else if(!has_skill(ch, SKILL_BATTLECRY)) {
     send_to_char("Have to learn how to battlecry before you can run with the big boys...\r\n", ch);
     return eFAILURE;
   }
-
-  specialization = learned / 100;
-  learned = learned % 100;
 
   if (!ch->fighting) {
      send_to_char("You must be fighting already in order to battlecry.\n\r", ch);
      return eFAILURE;
   }
 
-  chance = 75;
-
-  // 101% is a complete failure
-  percent = number(1, 101);
-
-  if (percent > chance) {
+  if (!skill_success(ch,NULL,SKILL_BATTLECRY)) {
      act ("You give a cry of defiance, but trip over your own feet!", ch, 0, 0, TO_CHAR, 0);
      act ("$n gives a cry of defiance, but trips over $s own feet!", ch, 0, 0, TO_ROOM, 0);
      
@@ -172,9 +143,9 @@ int do_battlecry(struct char_data *ch, char *argument, int cmd)
 	}
      }
 
-  skill_increase_check(ch, SKILL_BATTLECRY, learned, SKILL_INCREASE_EASY);
+  skill_increase_check(ch, SKILL_BATTLECRY, has_skill(ch,SKILL_BATTLECRY), SKILL_INCREASE_EASY);
 
-   if(learned > 40 && !number(0, 4))
+   if(has_skill(ch,SKILL_BATTLECRY) > 40 && !number(0, 4))
       WAIT_STATE(ch, PULSE_VIOLENCE * 2);
    else WAIT_STATE(ch, PULSE_VIOLENCE * 3);
    return eSUCCESS;
@@ -185,20 +156,15 @@ int do_berserk(struct char_data *ch, char *argument, int cmd)
 {
   struct char_data *victim;
   char name[256];
-  byte percent;
-  int learned, chance, specialization;
   int bSuccess = 0;
   int retval = 0;
   
   if(IS_MOB(ch))
-    learned = 75;
-  else if(!(learned = has_skill(ch, SKILL_BERSERK))) {
-    send_to_char("You aren't crazy enough for that yet...try rage maybe...\r\n", ch);
+    ;
+  else if(!has_skill(ch, SKILL_BERSERK)) {
+    send_to_char("You aren't crazy enough for that yet... try rage maybe...\r\n", ch);
     return eFAILURE;
   }
-
-  specialization = learned / 100;
-  learned = learned % 100;
 
   if(GET_HIT(ch) == 1) {
     send_to_char("You are feeling too weak right now to work yourself up into "
@@ -230,19 +196,12 @@ int do_berserk(struct char_data *ch, char *argument, int cmd)
   if(!can_attack(ch) || !can_be_attacked(ch, victim))
     return eFAILURE;
 
-  chance = 60;
-  chance += learned / 10;    // 60 - 69
-  chance += GET_STR(ch) / 2; //    - 93  (28str = +14)
-
-  // 101% is a complete failure
-  percent = number(1, 101);
-
-  if (percent > chance) {
+  if (!skill_success(ch,victim,SKILL_BERSERK)) {
     act ("You start freaking out on $N, but trip over your own feet!", ch, 0, victim, TO_CHAR, 0);
     act ("$n starts freaking out on you, but trips over $s own feet!", ch, 0, victim, TO_VICT, 0);
     act ("$n starts freaking out on $N, but trips over $s own feet!", ch, 0, victim, TO_ROOM, NOTVICT);
     GET_POS(ch) = POSITION_SITTING;
-    if(learned > 50 && !number(0, 5)) {
+    if(has_skill(ch,SKILL_BERSERK) > 50 && !number(0, 5)) {
        SET_BIT(ch->combat, COMBAT_BASH2);
        send_to_char("Your advanced training in berserk allows you to roll with your fall and get up faster.\r\n", ch);
     }
@@ -258,7 +217,7 @@ int do_berserk(struct char_data *ch, char *argument, int cmd)
   if (bSuccess && !IS_SET(ch->combat, COMBAT_RAGE1))
      SET_BIT(ch->combat, COMBAT_RAGE1);
 
-  skill_increase_check(ch, SKILL_BERSERK, learned, SKILL_INCREASE_MEDIUM);
+  skill_increase_check(ch, SKILL_BERSERK, has_skill(ch,SKILL_BERSERK), SKILL_INCREASE_MEDIUM);
 
   if(!ch->fighting)
      retval = attack(ch, victim, TYPE_UNDEFINED);
@@ -286,19 +245,14 @@ int do_headbutt(struct char_data *ch, char *argument, int cmd)
 {
   struct char_data *victim;
   char name[256];
-  byte percent;
-  int learned, chance, specialization;
   int retval;
 
   if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
-    learned = 75;
-  else if(!(learned = has_skill(ch, SKILL_SHOCK))) {
+    ;
+  else if(!has_skill(ch, SKILL_SHOCK)) {
     send_to_char("You'd bonk yourself silly without proper training.\r\n", ch);
     return eFAILURE;
   }
-
-  specialization = learned / 100;
-  learned = learned % 100;
 
   one_argument(argument, name);
 
@@ -324,22 +278,12 @@ int do_headbutt(struct char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  chance = 53;
-  chance += learned / 10;   // 53 - 61  (75/10=8)
-  chance += GET_DEX(ch)/2;  //    - 75
-
-  // 101% is a complete failure
-  percent = number(1, 101) + (GET_LEVEL(victim) - GET_LEVEL(ch));
-
-  if (GET_LEVEL(victim) >= IMMORTAL)
-    percent = 101;
-
-  if (percent > chance ) 
+  if (!skill_success(ch,victim,SKILL_SHOCK) ) 
   {
     act( "$n tries to headbutt you but fails miserably.", ch, NULL, victim, TO_VICT , 0);
     act( "You try to headbutt $N, but fail miserably.", ch, NULL, victim, TO_CHAR , 0);
     act( "$n tries to headbutt $N, but fails miserably.", ch, NULL, victim, TO_ROOM, NOTVICT );
-    if(learned > 60 && !number(0, 3)) {
+    if(has_skill(ch,SKILL_SHOCK) > 60 && !number(0, 3)) {
        send_to_char("With your advanced knowledge of headbutt, you recover more quickly.\r\n", ch);
        WAIT_STATE(ch, PULSE_VIOLENCE*2);
     }
@@ -363,44 +307,29 @@ int do_headbutt(struct char_data *ch, char *argument, int cmd)
     retval = damage (ch, victim, 50, TYPE_HIT, SKILL_SHOCK, 0);
   }
 
-  skill_increase_check(ch, SKILL_SHOCK, learned, SKILL_INCREASE_EASY);
+  skill_increase_check(ch, SKILL_SHOCK, has_skill(ch,SKILL_SHOCK), SKILL_INCREASE_EASY);
 
   return retval;
 }
 
 int do_bloodfury(struct char_data *ch, char *argument, int cmd)
 {
-  byte percent;
-  int learned, chance, specialization;
   struct affected_type af;
   float modifier;
 
   if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
-    learned = 75;
-  else if(!(learned = has_skill(ch, SKILL_BLOOD_FURY))) {
+    ;
+  else if(!has_skill(ch, SKILL_BLOOD_FURY)) {
     send_to_char("You've no idea how to raise such bloodlust.\r\n", ch);
     return eFAILURE;
   }
-
-  specialization = learned / 100;
-  learned = learned % 100;
 
   if(affected_by_spell(ch, SKILL_BLOOD_FURY)) {
     send_to_char("Your body can not yet take the strain of another blood fury yet.\r\n", ch);
     return eFAILURE;
   }
 
-  chance = 50;
-  chance += GET_CON(ch)/2;   // 50-64
-  chance += learned / 10;    //   -72
-
-  // 101% is a complete failure
-  percent = number(1, 101);
-
-  if (GET_LEVEL(ch) >= IMMORTAL)
-    percent = 1;
-
-  if (percent > chance) 
+  if (!skill_success(ch,NULL,SKILL_BLOOD_FURY)) 
   {
     act("$n starts breathing heavily, then chokes and tries to clear $s head.", ch, NULL, NULL, TO_ROOM, NOTVICT);
     send_to_char("You try to pysch yourself up and choke on the taste of blood.\r\n", ch);
@@ -413,7 +342,7 @@ int do_bloodfury(struct char_data *ch, char *argument, int cmd)
                  "limbs feel strong with death and destruction deep within " 
                  "your bones.\r\n", ch);
 
-    modifier = .2 + (.00375 * learned);  // mod = .2 - .5
+    modifier = .2 + (.00375 * has_skill(ch,SKILL_BLOOD_FURY));  // mod = .2 - .5
 
     GET_HIT(ch) += (int)((float)GET_MAX_HIT(ch) * modifier);
     if(GET_HIT(ch) > GET_MAX_HIT(ch))
@@ -428,7 +357,7 @@ int do_bloodfury(struct char_data *ch, char *argument, int cmd)
 
   affect_to_char(ch, &af);
 
-  skill_increase_check(ch, SKILL_BLOOD_FURY, learned, SKILL_INCREASE_EASY);
+  skill_increase_check(ch, SKILL_BLOOD_FURY, has_skill(ch,SKILL_BLOOD_FURY), SKILL_INCREASE_EASY);
 
   return eSUCCESS;
 }
@@ -436,7 +365,6 @@ int do_bloodfury(struct char_data *ch, char *argument, int cmd)
 int do_crazedassault(struct char_data *ch, char *argument, int cmd)
 {
   struct affected_type af;
-  int learned, percent, specialization, chance;
 
   if(affected_by_spell(ch, SKILL_CRAZED_ASSAULT) && GET_LEVEL(ch) < IMMORTAL) {
     send_to_char("Your body is still recovering from your last crazed assault technique.\r\n", ch);
@@ -444,30 +372,22 @@ int do_crazedassault(struct char_data *ch, char *argument, int cmd)
   }
 
   if(IS_MOB(ch))
-    learned = 75;
-  else if(!(learned = has_skill(ch, SKILL_CRAZED_ASSAULT))) {
+    ;
+  else if(!has_skill(ch, SKILL_CRAZED_ASSAULT)) {
     send_to_char("You just aren't crazy enough...try assaulting old ladies.\r\n", ch);
     return eFAILURE;
   }
           
-  specialization = learned / 100;
-  learned %= 100;
-      
-  chance = 60;
-  chance += learned / 10;
-      
-  percent = number(1, 101);
-       
-  skill_increase_check(ch, SKILL_CRAZED_ASSAULT, learned, SKILL_INCREASE_MEDIUM);
+  skill_increase_check(ch, SKILL_CRAZED_ASSAULT, has_skill(ch,SKILL_CRAZED_ASSAULT), SKILL_INCREASE_MEDIUM);
  
-  if(percent > chance) {
+  if(!skill_success(ch,NULL,SKILL_CRAZED_ASSAULT)) {
     send_to_char("You try to psyche yourself up for it but just can't muster the concentration.\r\n", ch);
   }
   else {
     send_to_char("Your mind focuses completely on hitting your opponent.\r\n", ch);
     af.type = SKILL_CRAZED_ASSAULT;
     af.duration  = 2;
-    af.modifier  = (learned / 5) + 7; 
+    af.modifier  = (has_skill(ch,SKILL_CRAZED_ASSAULT) / 5) + 7; 
     af.location  = APPLY_HITROLL;
     af.bitvector = 0;
     affect_to_char(ch, &af);
@@ -476,7 +396,7 @@ int do_crazedassault(struct char_data *ch, char *argument, int cmd)
   WAIT_STATE(ch, PULSE_VIOLENCE);
   
   af.type = SKILL_CRAZED_ASSAULT;
-  af.duration  = 16 - learned / 10;
+  af.duration  = 16 - has_skill(ch,SKILL_CRAZED_ASSAULT) / 10;
   af.modifier  = 0; 
   af.location  = APPLY_NONE;
   af.bitvector = 0;
@@ -486,12 +406,11 @@ int do_crazedassault(struct char_data *ch, char *argument, int cmd)
 
 int do_bullrush(struct char_data *ch, char *argument, int cmd)
 {
-  int learned;
-  int specialization;
   char name[MAX_INPUT_LENGTH];
+  char who[MAX_INPUT_LENGTH];
   int dir = 0;
   int retval;
-
+  char_data *victim;
   extern char *dirs[];
 
   if(GET_HIT(ch) == 1) {
@@ -500,21 +419,21 @@ int do_bullrush(struct char_data *ch, char *argument, int cmd)
   }
  
   if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL )
-    learned = 75;
-  else if(!(learned = has_skill(ch, SKILL_BULLRUSH))) {
+    ;
+  else if(!has_skill(ch, SKILL_BULLRUSH)) {
     send_to_char("Closest yer gonna get to a bull right now is a Red one..and you have to drink it...\r\n", ch);          
     return eFAILURE;
   }   
     
-  specialization = learned / 100;
-  learned = learned % 100;
-  
-  // TODO - specialization allow "target" after direction
-   
-  one_argument(argument, name);
-
+  argument = one_argument(argument, name);
+  one_argument(argument, who);
   if(!*name) {
      send_to_char("Bullrush which direction?\r\n", ch);
+     return eFAILURE;
+  }
+  if (!*who)
+  {
+     send_to_char("Bullrush on.. who?\r\n",ch);
      return eFAILURE;
   }
 
@@ -534,12 +453,15 @@ int do_bullrush(struct char_data *ch, char *argument, int cmd)
   retval = attempt_move(ch, dir);
   if(SOMEONE_DIED(retval))
     return retval;
-
-  int chance = 50 + learned/4;
-
+  if (!(victim = get_char_room_vis(ch,who)))
+  {
+     send_to_char("You charge in, but is left confused by the complete lack of such a target!\r\n",ch);
+     WAIT_STATE(ch,PULSE_VIOLENCE/2);
+     return eFAILURE;
+  }
   WAIT_STATE(ch, PULSE_VIOLENCE);
 
-  if(number(1, 101) > chance )
+  if(!skill_success(ch,victim,SKILL_BULLRUSH) )
   {
     send_to_char("You rush in madly and fail to find your target!\r\n", ch);
     act( "$n rushes into the room with nostrils flaring then looks around sheepishly.",
@@ -547,14 +469,7 @@ int do_bullrush(struct char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  skill_increase_check(ch, SKILL_BULLRUSH, learned, SKILL_INCREASE_MEDIUM);
-
-  // set victim to person "after" me in room
-  char_data * victim = ch->next_in_room;
-
-  // loop to first person i can see after me
-  while(victim && !CAN_SEE(ch, victim))
-    victim = victim->next_in_room;
+  skill_increase_check(ch, SKILL_BULLRUSH, has_skill(ch,SKILL_BULLRUSH), SKILL_INCREASE_MEDIUM);
 
   if(!victim || victim == ch) {
     send_to_char("You successfully rush in and bushwack....the air.\r\n", ch);
@@ -568,12 +483,11 @@ int do_bullrush(struct char_data *ch, char *argument, int cmd)
 
 int do_ferocity(struct char_data *ch, char *argument, int cmd)
 {
-  int learned, chance, specialization, percent;
   struct affected_type af;
 
   if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
-    learned = 75;
-  else if(!(learned = has_skill(ch, SKILL_FEROCITY))) {
+    ;
+  else if(!has_skill(ch, SKILL_FEROCITY)) {
     send_to_char("You're just not angry enough!\r\n", ch);
     return eFAILURE;
   }
@@ -583,15 +497,7 @@ int do_ferocity(struct char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  specialization = learned / 100;
-  learned = learned % 100;
-
-  chance = 75;
-
-  // 101% is a complete failure
-  percent = number(1, 101);
-
-  if (percent > chance) {
+  if (skill_success(ch,NULL,SKILL_FEROCITY)) {
      send_to_char("Guess you just weren't that angry.\r\n", ch);
      act ("$n tries to rile you up but just seems to be pouty.", ch, 0, 0, TO_ROOM, 0);
   }
@@ -611,7 +517,7 @@ int do_ferocity(struct char_data *ch, char *argument, int cmd)
       act("$n's fierce roar gets your adrenaline pumping!", ch, 0, tmp_char, TO_VICT, 0);
 
       af.type      = SKILL_FEROCITY;
-      af.duration  = 1 + learned / 10;
+      af.duration  = 1 + has_skill(ch,SKILL_FEROCITY) / 10;
       af.modifier  = 50;
       af.location  = APPLY_HIT;
       af.bitvector = 0;
@@ -622,9 +528,8 @@ int do_ferocity(struct char_data *ch, char *argument, int cmd)
     }
   }
 
-  skill_increase_check(ch, SKILL_FEROCITY, learned, SKILL_INCREASE_EASY);
+  skill_increase_check(ch, SKILL_FEROCITY, has_skill(ch,SKILL_FEROCITY), SKILL_INCREASE_EASY);
   WAIT_STATE(ch, PULSE_VIOLENCE * 2);
   GET_MOVE(ch) /= 2;
   return eSUCCESS;
 }
-

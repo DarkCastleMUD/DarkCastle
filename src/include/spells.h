@@ -14,13 +14,14 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.h,v 1.47 2004/05/02 20:10:23 urizen Exp $ */
+/* $Id: spells.h,v 1.48 2004/05/14 00:04:17 urizen Exp $ */
 #include <structs.h> // byte, sh_int
 
 #define MAX_BUF_LENGTH               240
 
 void extractFamiliar(CHAR_DATA *ch);
 
+bool skill_success(CHAR_DATA *ch, CHAR_DATA *victim, int skillnum, int mod=0);
 
 /* New skill quest thingy. */
 struct skill_quest

@@ -36,13 +36,13 @@ int do_harmtouch(struct char_data *ch, char *argument, int cmd)
    // struct char_data *tmp_ch;
    char victim_name[MAX_INPUT_LENGTH];
    struct affected_type af;
-   int learned, specialization, chance, percent, retval, dam;
+   int retval, dam;
 
    one_argument(argument, victim_name);
 
    if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
-      learned = 75;
-   else if(!(learned = has_skill(ch, SKILL_HARM_TOUCH))) {
+      ;
+   else if(!has_skill(ch, SKILL_HARM_TOUCH)) {
       send_to_char("You dunno even HOW to harm touch.\r\n", ch);
       return eFAILURE;
    }
@@ -84,20 +84,7 @@ int do_harmtouch(struct char_data *ch, char *argument, int cmd)
       return eFAILURE;
    }
 
-   specialization = learned / 100;
-   learned = learned % 100;
-
-   chance = 67;
-   chance += (GET_WIS(ch) > 26);
-   chance += (GET_WIS(ch) > 24);
-   chance += (GET_WIS(ch) > 22);
-   chance += (GET_WIS(ch) > 20);
-   chance += (GET_WIS(ch) > 18);    // chance = 67-72
-   chance += learned / 10;          // chance = 67-80 (max of 75 learned for monk)
-
-   skill_increase_check(ch, SKILL_HARM_TOUCH, learned, SKILL_INCREASE_EASY);
-
-   percent = number(1, 101);
+   skill_increase_check(ch, SKILL_HARM_TOUCH, has_skill(ch,SKILL_HARM_TOUCH), SKILL_INCREASE_EASY);
 
    af.type = SKILL_HARM_TOUCH;
    af.duration  = 24;
@@ -106,7 +93,7 @@ int do_harmtouch(struct char_data *ch, char *argument, int cmd)
    af.bitvector = 0;
    affect_to_char(ch, &af);
 
-   if(percent > chance) {
+   if(!skill_success(ch,victim,SKILL_HARM_TOUCH)) {
      send_to_char("Your god refuses you.\r\n", ch);
    }
    else {
@@ -114,7 +101,7 @@ int do_harmtouch(struct char_data *ch, char *argument, int cmd)
      retval = damage(ch, victim, dam, TYPE_UNDEFINED, SKILL_HARM_TOUCH, 0);
    }
    if(IS_SET(retval, eVICT_DIED) && !IS_SET(retval, eCH_DIED)) {
-     if(learned > 30 && number(1, 3) == 1) {
+     if(has_skill(ch,SKILL_HARM_TOUCH) > 30 && number(1, 3) == 1) {
         send_to_char("Your god basks in your worship of pain and infuses you with life.\r\n", ch);
         GET_HIT(ch) += GET_LEVEL(ch) * 10;
         GET_HIT(ch) = MIN(GET_HIT(ch), GET_MAX_HIT(ch));
@@ -137,13 +124,12 @@ int do_layhands(struct char_data *ch, char *argument, int cmd)
    // struct char_data *tmp_ch;
    char victim_name[240];
    struct affected_type af;
-   int learned, specialization, chance, percent;
 
    one_argument(argument, victim_name);
 
    if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL )
-     learned = 75;
-   else if(!(learned = has_skill(ch, SKILL_LAY_HANDS))) {
+     ;
+   else if(!has_skill(ch, SKILL_LAY_HANDS)) {
      send_to_char("You aren't skilled enough to lay a two-dollar whore with three bucks.\r\n", ch);
      return eFAILURE;
    }
@@ -180,28 +166,13 @@ int do_layhands(struct char_data *ch, char *argument, int cmd)
       return eFAILURE;
    }
 
-   specialization = learned / 100;
-   learned = learned % 100;
+   skill_increase_check(ch, SKILL_LAY_HANDS, has_skill(ch,SKILL_LAY_HANDS), SKILL_INCREASE_EASY);
 
-   specialization++;  // Make sure it's 1-...
-
-   chance = 67;
-   chance += (GET_WIS(ch) > 26);
-   chance += (GET_WIS(ch) > 24);
-   chance += (GET_WIS(ch) > 22);
-   chance += (GET_WIS(ch) > 20);
-   chance += (GET_WIS(ch) > 18);    // chance = 67-72
-   chance += learned / 10;          // chance = 67-80 (max of 75 learned for monk)
-
-   percent = number(1, 101);
-
-   skill_increase_check(ch, SKILL_LAY_HANDS, learned, SKILL_INCREASE_EASY);
-
-   if(percent > chance) {
+   if(!skill_success(ch,victim, SKILL_LAY_HANDS)) {
      send_to_char("Your god refuses you.\r\n", ch);
    }
    else {
-     GET_HIT(victim) += specialization * 1000;
+     GET_HIT(victim) += 1000;
      if(GET_HIT(victim) > GET_MAX_HIT(victim))
        GET_HIT(victim) = GET_MAX_HIT(victim);
 

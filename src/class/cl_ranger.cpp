@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: cl_ranger.cpp,v 1.35 2004/05/08 11:49:14 urizen Exp $ | cl_ranger.C  *
+ * $Id: cl_ranger.cpp,v 1.36 2004/05/14 00:04:15 urizen Exp $ | cl_ranger.C  *
  * Description: Ranger skills/spells                                          *
  *                                                                            *
  * Revision History                                                           *
@@ -46,7 +46,6 @@ int do_tame(CHAR_DATA *ch, char *arg, int cmd)
 {
   struct affected_type af;
   CHAR_DATA *victim;
-  int percent, learned, specialization, chance;
   char buf[MAX_INPUT_LENGTH];
 
   void add_follower(CHAR_DATA *ch, CHAR_DATA *leader, int cmd);
@@ -63,8 +62,8 @@ int do_tame(CHAR_DATA *ch, char *arg, int cmd)
   }
 
   if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
-    learned = 75;
-  else if(!(learned = has_skill(ch, SKILL_TAME))) {
+     ;
+  else if(!has_skill(ch, SKILL_TAME)) {
     send_to_char("Try learning HOW to tame first.\r\n", ch);
     return eFAILURE;
   }
@@ -129,22 +128,9 @@ int do_tame(CHAR_DATA *ch, char *arg, int cmd)
     return eFAILURE;
   }
 
-  specialization = learned / 100;
-  learned = learned % 100;
+  skill_increase_check(ch, SKILL_TAME, has_skill(ch,SKILL_TAME), SKILL_INCREASE_MEDIUM);
 
-  chance = 67;
-  chance += (GET_WIS(ch) > 26);
-  chance += (GET_WIS(ch) > 24);
-  chance += (GET_WIS(ch) > 22);
-  chance += (GET_WIS(ch) > 20);
-  chance += (GET_WIS(ch) > 18);    // chance = 67-72
-  chance += learned / 10;          // chance = 67-80 
-
-  percent = number(1,101);
-
-  skill_increase_check(ch, SKILL_TAME, learned, SKILL_INCREASE_MEDIUM);
-
-  if(percent > chance || saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC) >= 0) {
+  if(!skill_success(ch,victim,SKILL_TAME) || saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC) >= 0) {
     act("$N is unreceptive to your attempts to tame $M.", ch, NULL, victim, TO_CHAR, 0);
     return eFAILURE;
   }
@@ -426,7 +412,7 @@ int do_track(CHAR_DATA *ch, char *argument, int cmd)
 int ambush(CHAR_DATA *ch)
 {
   CHAR_DATA *i, *next_i;
-  int retval, learned, specialization, chance;
+  int retval;
 
   for(i = world[ch->in_room].people; i; i = next_i) 
   {
@@ -448,8 +434,8 @@ int ambush(CHAR_DATA *ch)
      {
 
        if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
-         learned = 75;
-       else if(!(learned = has_skill(i, SKILL_AMBUSH)))
+        ;
+       else if(!has_skill(i, SKILL_AMBUSH))
          continue;
 
        if(IS_AFFECTED2(ch, AFF_ALERT)) {
@@ -457,15 +443,9 @@ int ambush(CHAR_DATA *ch)
           continue;
        }
 
-       specialization = learned / 100;
-       learned %= 100;
+       skill_increase_check(i, SKILL_AMBUSH, has_skill(ch,SKILL_AMBUSH), SKILL_INCREASE_MEDIUM);
 
-       chance = 65;
-       chance += learned / 10;
-
-       skill_increase_check(i, SKILL_AMBUSH, learned, SKILL_INCREASE_EASY);
-
-       if(number(1, 101) <= chance) 
+       if(skill_success(i,ch, SKILL_AMBUSH)) 
        { 
          act("$n ambushes $N in a brilliant surprise attack!", i, 0, ch, TO_ROOM, NOTVICT);
          act("$n ambushes you as you enter the room!", i, 0, ch, TO_VICT, 0);
@@ -489,11 +469,10 @@ int ambush(CHAR_DATA *ch)
 int do_ambush(CHAR_DATA *ch, char *arg, int cmd)
 {
   char buf[MAX_STRING_LENGTH];
-  int learned;
 
   if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
      ; // do nothing!
-  else if(!(learned = has_skill(ch, SKILL_AMBUSH))) {
+  else if(!has_skill(ch, SKILL_AMBUSH)) {
      send_to_char("You don't know how to ambush people!\r\n", ch);
      return eFAILURE;
   }
@@ -977,7 +956,7 @@ int do_arrow_damage(struct char_data *ch, struct char_data *victim,
 int do_fire(struct char_data *ch, char *arg, int cmd)
 {
   struct char_data *victim;
-  int percent, prob, dam, dir, artype, cost, retval, learned, specialization;
+  int prob, dam, dir, artype, cost, retval;
   struct obj_data *found;
   unsigned cur_room, new_room;
   char direct[MAX_STRING_LENGTH], arrow[MAX_STRING_LENGTH], 
@@ -995,13 +974,11 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
   *arrow = '\0';
 
   if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
-    learned = 75;
-  else if(!(learned = has_skill(ch, SKILL_ARCHERY))) {
+    ;
+  else if(!has_skill(ch, SKILL_ARCHERY)) {
     send_to_char("You've no idea how those pointy things with strings and feathers work.\r\n", ch);
     return eFAILURE;
   }
-  specialization = learned / 100;
-  learned = learned % 100;
 
   if (!ch->equipment[HOLD])
   {
@@ -1255,7 +1232,6 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
   }
 
 
-  percent = number(1, 101);
   prob = 65;
 
   GET_MANA(ch) -= cost;
@@ -1268,9 +1244,9 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
   if(prob < 10) prob = 10;
   if(prob > 100) prob = 100;
 
-  skill_increase_check(ch, SKILL_ARCHERY, learned, SKILL_INCREASE_HARD);
+  skill_increase_check(ch, SKILL_ARCHERY, has_skill(ch,SKILL_ARCHERY), SKILL_INCREASE_HARD);
 
-  if(percent > prob)
+  if(!skill_success(ch,victim, SKILL_ARCHERY))
   {
     retval = eSUCCESS;
     do_arrow_miss(ch, victim, dir, found);

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.32 2004/05/09 19:45:59 urizen Exp $
+| $Id: objects.cpp,v 1.33 2004/05/14 00:04:12 urizen Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -207,7 +207,7 @@ int do_switch(struct char_data *ch, char *arg, int cmd)
   percent = number(1,101);
   learned = has_skill(ch, SKILL_SWITCH);
 
-  if (percent > 60 || !learned) {
+  if (!learned || !skill_success(ch,NULL,SKILL_SWITCH)) {
     act("$n fails to switch $s weapons.", ch,0,0, TO_ROOM, 0);
     act("You fail to switch your weapons.", ch, 0,0, TO_CHAR, 0);
     return eFAILURE;

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.19 2004/05/08 11:49:14 urizen Exp $
+| $Id: cl_warrior.cpp,v 1.20 2004/05/14 00:04:15 urizen Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -35,19 +35,15 @@ int do_kick(struct char_data *ch, char *argument, int cmd)
 {
     struct char_data *victim;
     char name[256];
-    int percent, learned, specialized, chance;
     int dam;
     int retval;
 
    if(IS_MOB(ch) || GET_LEVEL(ch) > ARCHANGEL)   
-     learned = 75;
-   else if(!(learned = has_skill(ch, SKILL_KICK))) {
+     ;
+   else if(!has_skill(ch, SKILL_KICK)) {
      send_to_char("Go learn it from a master before you make a fool out of yourself.\r\n", ch);
      return eFAILURE;
    }
-
-    specialized = learned / 100;
-    learned = learned % 100;
 
     one_argument(argument, name);
 
@@ -68,27 +64,20 @@ int do_kick(struct char_data *ch, char *argument, int cmd)
     if(!can_attack(ch) || !can_be_attacked(ch, victim))
           return eFAILURE;
 
-    chance = 60 + learned/10;
-	   
-     /* 101% is a complete failure */
-    percent = 10 - GET_AC(victim)/10 + number(1,101);
-
     WAIT_STATE(ch, PULSE_VIOLENCE*2);
-    if (percent > chance) {
+    if (!skill_success(ch,victim,SKILL_KICK)) {
         dam = 0;
 	retval = damage(ch, victim, 0,TYPE_UNDEFINED, SKILL_KICK, 0);
     } else {
 //        dam = GET_LEVEL(ch) * 4;
 	dam = 150;
-        if(specialized)
-          dam = (int)(dam*1.5);
 	retval = damage(ch, victim, dam, TYPE_UNDEFINED, SKILL_KICK, 0);
     }
 
     if(SOMEONE_DIED(retval))
       return retval;
 
-    skill_increase_check(ch, SKILL_KICK, learned, SKILL_INCREASE_MEDIUM);
+    skill_increase_check(ch, SKILL_KICK, has_skill(ch,SKILL_KICK), SKILL_INCREASE_MEDIUM);
 
     // if our boots have a combat proc, and we did damage, let'um have it!
     if(dam && ch->equipment[WEAR_FEET]) {
@@ -107,16 +96,14 @@ int do_deathstroke(struct char_data *ch, char *argument, int cmd)
 {
     struct char_data *victim;
     char name[256];
-    byte percent;
-    int learned, specialization, chance;
     int dam;
     int retval;
 
     extern struct str_app_type str_app[];
 
     if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)   
-      learned = 75;
-    else if(!(learned = has_skill(ch, SKILL_DEATHSTROKE))) {
+      ;
+    else if(!has_skill(ch, SKILL_DEATHSTROKE)) {
       send_to_char("You have no idea how to deathstroke.\r\n", ch);
       return eFAILURE;
     }
@@ -152,11 +139,6 @@ int do_deathstroke(struct char_data *ch, char *argument, int cmd)
        return eFAILURE;
     }
 
-    specialization = learned / 100;
-    learned = learned % 100;
-
-    chance = 60;
-
     int to_dam = ( str_app[STRENGTH_APPLY_INDEX(ch)].todam ) + ( GET_DAMROLL(ch));
     if(IS_MOB(victim))
        to_dam = (int) ((float)to_dam * .8);
@@ -166,14 +148,11 @@ int do_deathstroke(struct char_data *ch, char *argument, int cmd)
     dam += to_dam;
     dam *= (GET_LEVEL(ch) / 5); // 10 at level 50
 
-     /* 101% is a complete failure */
-    percent= number(1,101);
-
     WAIT_STATE(ch, PULSE_VIOLENCE*3);
 
-    skill_increase_check(ch, SKILL_DEATHSTROKE, learned, SKILL_INCREASE_EASY);
+    skill_increase_check(ch, SKILL_DEATHSTROKE, has_skill(ch,SKILL_DEATHSTROKE), SKILL_INCREASE_EASY);
 
-    if (percent > chance) {
+    if (!skill_success(ch,victim,SKILL_DEATHSTROKE)) {
 	retval = damage(ch, victim, 0,TYPE_UNDEFINED, SKILL_DEATHSTROKE, 0);
         dam /= 4;
         if (IS_AFFECTED(ch, AFF_SANCTUARY))
@@ -194,8 +173,7 @@ int do_deathstroke(struct char_data *ch, char *argument, int cmd)
 
 int do_retreat(struct char_data *ch, char *argument, int cmd)
 {
-   int attempt, percent;
-   int learned, specialization, chance;
+   int attempt;
    char buf[MAX_INPUT_LENGTH];
    // Azrack -- retval should be initialized to something
    int retval = 0;
@@ -206,8 +184,8 @@ int do_retreat(struct char_data *ch, char *argument, int cmd)
       return eFAILURE;
 
    if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)   
-     learned = 75;
-   else if(!(learned = has_skill(ch, SKILL_RETREAT))) {
+       ;
+   else if(!has_skill(ch, SKILL_RETREAT)) {
      send_to_char("You dunno how...better flee instead.\r\n", ch);
      return eFAILURE;
    }
@@ -225,17 +203,10 @@ int do_retreat(struct char_data *ch, char *argument, int cmd)
    if (IS_AFFECTED(ch, AFF_SNEAK))
       affect_from_char(ch, SKILL_SNEAK);
 
-   specialization = learned / 100;
-   learned = learned % 100;
-
-   chance = 60;
-
-   percent = number(1, 101);
-
-   skill_increase_check(ch, SKILL_RETREAT, learned, SKILL_INCREASE_EASY);
+   skill_increase_check(ch, SKILL_RETREAT, has_skill(ch,SKILL_RETREAT), SKILL_INCREASE_EASY);
 
    // failure
-   if (percent > chance)
+   if (!skill_success(ch,NULL,SKILL_RETREAT))
    {
       act("$n tries to retreat, but pays a heavy price for $s hesitancy.\n\r"
           "$n falls to the ground!",
@@ -280,15 +251,13 @@ int do_retreat(struct char_data *ch, char *argument, int cmd)
 int do_hitall(struct char_data *ch, char *argument, int cmd)
 {
     struct char_data *vict, *temp;
-    byte percent;
-    int learned, specialization, chance;
     int retval;
 
     extern struct char_data *character_list;
 
    if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
-     learned = 75;
-   else if(!(learned = has_skill(ch, SKILL_HITALL))) {
+    ;
+   else if(!has_skill(ch, SKILL_HITALL)) {
      send_to_char("You better learn how to first...\r\n", ch);
      return eFAILURE;
    }
@@ -308,17 +277,9 @@ int do_hitall(struct char_data *ch, char *argument, int cmd)
      return eFAILURE;
    }
 
-   specialization = learned / 100;
-   learned = learned % 100;
+   skill_increase_check(ch, SKILL_HITALL, has_skill(ch,SKILL_HITALL), SKILL_INCREASE_MEDIUM);
 
-   chance = 60;
-
-   /* 101% is a complete failure */
-   percent= number(1,101);
-
-   skill_increase_check(ch, SKILL_HITALL, learned, SKILL_INCREASE_MEDIUM);
-
-   if (percent > chance) {
+   if (skill_success(ch,NULL,SKILL_HITALL)) {
 
       act ("You start swinging like a madman, but trip over your own feet!", ch, 0, 0, TO_CHAR, 0);
       act ("$n starts swinging like a madman, but trips over $s own feet!", ch, 0, 0, TO_ROOM, 0);
@@ -362,8 +323,6 @@ int do_bash(struct char_data *ch, char *argument, int cmd)
 {
     struct char_data *victim;
     char name[256];
-    byte percent;
-    int learned, specialization, chance;
     int retval;
     int hit = 0;
 
@@ -373,8 +332,8 @@ int do_bash(struct char_data *ch, char *argument, int cmd)
       return eFAILURE;
 
     if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)   
-      learned = 75;
-    else if(!(learned = has_skill(ch, SKILL_BASH))) {
+      ;
+    else if(!has_skill(ch, SKILL_BASH)) {
       send_to_char("You don't know how to bash!\r\n", ch);
       return eFAILURE;
     }
@@ -425,28 +384,21 @@ int do_bash(struct char_data *ch, char *argument, int cmd)
         return eFAILURE;
     }
 
-    specialization = learned / 100;
-    learned = learned % 100;
+    skill_increase_check(ch, SKILL_BASH, has_skill(ch,SKILL_BASH), SKILL_INCREASE_HARD);
 
-    skill_increase_check(ch, SKILL_BASH, learned, SKILL_INCREASE_HARD);
-
-    chance = 60;
-
+    int modifier = 0;
     // half as accurate without a shield
     if(!ch->equipment[WEAR_SHIELD]) {
-      chance /= 2;
+      modifier = -20;
       // but 3/4 as accurate with a 2hander
       if(ch->equipment[WIELD] && IS_SET(ch->equipment[WIELD]->obj_flags.extra_flags, ITEM_TWO_HANDED))
-        chance += (learned/2);
+        modifier += 10;
     }
- 
 
-    // 101% is a complete failure
-    percent = number(1, 101) + ((GET_DEX(victim) - GET_DEX(ch))*3);
 
     WAIT_STATE(ch, PULSE_VIOLENCE*3);
 
-    if (!IS_NPC(ch) && percent > chance) {
+    if (!skill_success(ch,victim,SKILL_BASH,modifier)) {
 	GET_POS(ch) = POSITION_SITTING;
         SET_BIT(ch->combat, COMBAT_BASH1);
         act("As $N avoids your bash, you topple over and fall to the ground.", ch, NULL, victim, TO_CHAR , 0);
@@ -486,12 +438,10 @@ int do_redirect(struct char_data *ch, char *argument, int cmd)
 {
     struct char_data *victim;
     char name[256];
-    byte percent;
-    int learned, specialization, chance;
 
     if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)   
-      learned = 75;
-    else if(!(learned = has_skill(ch, SKILL_REDIRECT))) {
+      ;
+    else if(!has_skill(ch, SKILL_REDIRECT)) {
       send_to_char("You aren't skilled enough to change opponents midfight!\r\n", ch);
       return eFAILURE;
     }
@@ -524,17 +474,9 @@ int do_redirect(struct char_data *ch, char *argument, int cmd)
     if(!can_be_attacked(ch, victim))
        return eFAILURE;
 
-    specialization = learned / 100;
-    learned = learned % 100;
+    skill_increase_check(ch, SKILL_REDIRECT, has_skill(ch,SKILL_REDIRECT), SKILL_INCREASE_EASY);
 
-    chance = 60;
-
-    skill_increase_check(ch, SKILL_REDIRECT, learned, SKILL_INCREASE_EASY);
-
-     /* 101% is a complete failure */
-    percent=number(1,101) + (GET_LEVEL(victim) - GET_LEVEL(ch));
-
-    if (percent > chance ) {
+    if (!skill_success(ch,victim,SKILL_REDIRECT) ) {
        act( "$n tries to redirect his attacks but $N won't allow it.", ch, NULL, ch->fighting, TO_VICT, 0 );
        act( "You try to redirect your attacks to $N but are blocked.", ch, NULL, victim, TO_CHAR, 0 );
        act( "$n tries to redirect his attacks elsewhere, but $N wont allow it.", ch, NULL, victim, TO_ROOM, NOTVICT );
@@ -556,16 +498,14 @@ int do_disarm( struct char_data *ch, char *argument, int cmd )
     struct obj_data *wielded;
 
     char name[256];
-    int percent;
-    int learned, specialization, chance;
     struct obj_data *obj;
     int retval;
 
     int is_fighting_mob(struct char_data *ch);
 
     if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)   
-      learned = 75;
-    else if(!(learned = has_skill(ch, SKILL_DISARM))) {
+     ;
+    else if(!has_skill(ch, SKILL_DISARM)) {
       send_to_char("You dunno how.\r\n", ch);
       return eFAILURE;
     }
@@ -618,23 +558,17 @@ int do_disarm( struct char_data *ch, char *argument, int cmd )
 
     wielded = victim->equipment[WIELD];
 
-    specialization = learned / 100;
-    learned = learned % 100;
-
-    chance = 60;
-
-    percent = number( 1, 100 ) + GET_LEVEL(victim) - GET_LEVEL(ch);
-
-    skill_increase_check(ch, SKILL_DISARM, learned, SKILL_INCREASE_MEDIUM);
+    int modifier = 0;
+    skill_increase_check(ch, SKILL_DISARM, has_skill(ch,SKILL_DISARM), SKILL_INCREASE_MEDIUM);
 
     if(GET_LEVEL(ch) < 50 && GET_LEVEL(ch) + 10 < GET_LEVEL(victim))  // keep lowbies from disarming big mobs
-       percent = 0;
+       modifier = -((GET_LEVEL(victim) - GET_LEVEL(ch)) * 2);
 
     // Two handed weapons are twice as hard to disarm
     if (IS_SET(wielded->obj_flags.extra_flags, ITEM_TWO_HANDED))
-       percent *= 2;
+       modifier -= 20;
 
-    if ( percent < chance )
+    if ( skill_success(ch,victim,SKILL_DISARM,modifier))
     {
         if ((IS_SET(wielded->obj_flags.extra_flags,ITEM_NODROP)) || 
             (GET_LEVEL(victim) >= IMMORTAL)) 
@@ -670,15 +604,13 @@ int do_disarm( struct char_data *ch, char *argument, int cmd )
 int do_rescue(struct char_data *ch, char *argument, int cmd)
 {
     struct char_data *victim, *tmp_ch;
-    int percent;
-    int learned, specialization, chance;
     char victim_name[240];
 
     one_argument(argument, victim_name);
 
     if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)   
-      learned = 75;
-    else if(!(learned = has_skill(ch, SKILL_RESCUE))) {
+      ;
+    else if(!has_skill(ch, SKILL_RESCUE)) {
       send_to_char("You've got alot to learn before you try to be a bodyguard.\r\n", ch);
       return eFAILURE;
     }
@@ -719,15 +651,9 @@ int do_rescue(struct char_data *ch, char *argument, int cmd)
 	return eFAILURE;
     }
 
-    specialization = learned / 100;
-    learned = learned % 100;
-    chance = 60;
+    skill_increase_check(ch, SKILL_RESCUE, has_skill(ch,SKILL_RESCUE), SKILL_INCREASE_EASY);
 
-    skill_increase_check(ch, SKILL_RESCUE, learned, SKILL_INCREASE_EASY);
-
-    percent=number(1,101); /* 101% is a complete failure */
-
-    if (percent > chance) {
+    if (!skill_success(ch,victim, SKILL_RESCUE)) {
         send_to_char("You fail the rescue.\n\r", ch);
         return eFAILURE;
     }
@@ -758,11 +684,10 @@ int do_rescue(struct char_data *ch, char *argument, int cmd)
 int do_bladeshield(struct char_data *ch, char *argument, int cmd)
 {
   struct affected_type af;
-  int learned, percent, specialization, chance;
 
   if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)   
-    learned = 75;
-  else if(!(learned = has_skill(ch, SKILL_BLADESHIELD))) {
+    ;
+  else if(!has_skill(ch, SKILL_BLADESHIELD)) {
     send_to_char("You'd cut yourself to ribbons just trying!\r\n", ch);
     return eFAILURE;
   }
@@ -777,16 +702,9 @@ int do_bladeshield(struct char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  specialization = learned / 100;
-  learned = learned % 100;
-  chance = 60;
-  chance += learned / 10;
+  skill_increase_check(ch, SKILL_BLADESHIELD, has_skill(ch,SKILL_BLADESHIELD), SKILL_INCREASE_EASY);
 
-  percent = number(1, 101);
-
-  skill_increase_check(ch, SKILL_BLADESHIELD, learned, SKILL_INCREASE_EASY);
-
-  if(chance < percent) {
+  if(!skill_success(ch,NULL,SKILL_BLADESHIELD)) {
     act("$n starts swinging $s weapons around but stops before narrowly avoiding dismembering $mself."
          , ch, 0, 0, TO_ROOM, NOTVICT);
     send_to_char("You try to begin the bladeshield technique and almost chop off your own arm!\r\n", ch);
@@ -819,8 +737,6 @@ int handle_any_guard(char_data * ch)
    if(!ch->guarded_by)
       return FALSE;
 
-   int specialized, chance;
-
    char_data * guard = NULL;
 
    // search the room for my guard
@@ -840,14 +756,9 @@ int handle_any_guard(char_data * ch)
    if(!guard) // my guard isn't here
       return FALSE;
 
-   int learned = has_skill(guard, SKILL_GUARD);
-   specialized = learned / 100;
-   learned = learned % 100;
-   chance = 30;
+   skill_increase_check(guard, SKILL_GUARD, has_skill(guard,SKILL_GUARD), SKILL_INCREASE_MEDIUM);
 
-   skill_increase_check(guard, SKILL_GUARD, learned, SKILL_INCREASE_MEDIUM);
-
-   if(number(1, 101) < chance) {
+   if(skill_success(guard,ch,SKILL_GUARD)) {
       do_rescue(guard, GET_NAME(ch), 9);
       return TRUE;
    }
@@ -964,12 +875,11 @@ int do_guard(struct char_data *ch, char *argument, int cmd)
 
 int do_tactics(struct char_data *ch, char *argument, int cmd)
 {
-  int learned, chance, specialization, percent;
   struct affected_type af;
   
   if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
-    learned = 75;
-  else if(!(learned = has_skill(ch, SKILL_TACTICS))) {
+    ;
+  else if(!has_skill(ch, SKILL_TACTICS)) {
     send_to_char("You just don't have the mind for strategic battle.\r\n", ch);
     return eFAILURE;
   }   
@@ -979,14 +889,7 @@ int do_tactics(struct char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }   
       
-  specialization = learned / 100;
-  learned = learned % 100;
-      
-  chance = 75;
-      
-  // 101% is a complete failure
-  percent = number(1, 101);
-  if (percent > chance) {
+  if (!skill_success(ch,NULL,SKILL_TACTICS)) {
      send_to_char("Guess you just weren't the Patton you thought you were.\r\n", ch);
      act ("$n goes on about team not being spelled with an 'I' or something.", ch, 0, 0, TO_ROOM, 0);
   }
@@ -1005,7 +908,7 @@ int do_tactics(struct char_data *ch, char *argument, int cmd)
   
       act("$n's leadership makes you feel more comfortable with battle.", ch, 0, tmp_char, TO_VICT, 0);
       af.type      = SKILL_TACTICS;
-      af.duration  = 1 + learned / 10;
+      af.duration  = 1 + has_skill(ch,SKILL_TACTICS) / 10;
       af.modifier  = 1;
       af.location  = APPLY_HITROLL;
       af.bitvector = 0;
@@ -1015,7 +918,7 @@ int do_tactics(struct char_data *ch, char *argument, int cmd)
     }   
   }
     
-  skill_increase_check(ch, SKILL_TACTICS, learned, SKILL_INCREASE_EASY);
+  skill_increase_check(ch, SKILL_TACTICS,has_skill(ch,SKILL_TACTICS), SKILL_INCREASE_EASY);
   WAIT_STATE(ch, PULSE_VIOLENCE * 2);
   GET_MOVE(ch) /= 2;
   return eSUCCESS;

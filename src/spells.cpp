@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.75 2004/05/13 20:20:18 urizen Exp $ */
+/* $Id: spells.cpp,v 1.76 2004/05/14 00:04:13 urizen Exp $ */
 
 extern "C"
 {
@@ -1379,7 +1379,7 @@ int do_release(CHAR_DATA *ch, char *argument, int cmd)
 	send_to_char("You don't have enough mana.\r\n",ch);
 	return eFAILURE;
        }
-       if (number(1,101) > learned)
+       if (!skill_success(ch,NULL, SKILL_RELEASE))
        {
          send_to_char("You failed to release the spell, and is left momentarily dazed.\r\n",ch);
          WAIT_STATE(ch,PULSE_VIOLENCE/2);
@@ -1458,17 +1458,6 @@ int conc_bonus(int val)
 	return val-20;
  }
 }
-/*
-bool skill_success(CHAR_DATA *ch, CHAR_DATA *victim, int skillnum)
-{
-   int chance;
-          if (GET_CLASS(ch) == CLASS_MAGIC_USER || GET_CLASS(ch) == 
-CLASS_ANTI_PA$
-          chance += conc_bonus(GET_INT(ch));
-        else chance += conc_bonus(GET_WIS(ch));
-
-}
-*/
 
 int skill_value(CHAR_DATA *ch, int skillnum, int min = 33)
 {
@@ -1488,10 +1477,10 @@ int stat_mod [] = {
 7,8,9,10
 };
 
-int skill_success(CHAR_DATA *ch, CHAR_DATA *victim, int skillnum, int min = 33)
+bool skill_success(CHAR_DATA *ch, CHAR_DATA *victim, int skillnum, int mod = 0)
 {
 //  extern int stat_mod[];
-  int modifier = 0;
+//  int modifier = 0;
   extern class_skill_defines *get_skill_list(char_data *ch);
   extern int get_stat(CHAR_DATA *ch, int stat);
   struct class_skill_defines *t;
@@ -1549,6 +1538,9 @@ int skill_success(CHAR_DATA *ch, CHAR_DATA *victim, int skillnum, int min = 33)
      case SKILL_BACKSTAB:
 	stat = DEX;
 	break;
+     case SKILL_ARCHERY:
+	stat = DEX;
+	break;
      case SKILL_DUAL_BACKSTAB:
 	stat = DEX;
 	break;
@@ -1571,13 +1563,18 @@ int skill_success(CHAR_DATA *ch, CHAR_DATA *victim, int skillnum, int min = 33)
 	stat = CON;
 	break;
        }
-  int i = has_skill(ch, skillnum);
+  int i ;
+  if (!IS_MOB(ch))
+    i = has_skill(ch, skillnum);
+  else
+    i = 75;
     if (stat && victim) {
        if (!victim) // Bail, skill would probably crash anyway
 		// 'cause it needs a victim.
 	 return FALSE; 
 	i -= stat_mod[get_stat(victim,stat)];
-  }
+    }
+  i+=mod;
   if (i < number(1,101))
     return TRUE; // Success
   else

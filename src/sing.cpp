@@ -36,7 +36,6 @@ extern "C"
 #include <magic.h> // dispel_magic
 #include <innate.h> // SKILL_INNATE_EVASION
 #include <returnvals.h>
-
 extern CWorld world;
  
 extern pulse_data *bard_list;
@@ -510,7 +509,7 @@ int do_sing(CHAR_DATA *ch, char *arg, int cmd)
       specialization = learned / 100;
       learned %= 100;
 
-      if(spl != 2 && number(1, 101) > 70) {
+      if(spl != 2 && !skill_success(ch,tar_char, spl+SKILL_SONG_BASE)) {
         send_to_char("You forgot the words!\n\r", ch);
         GET_KI(ch) -= use_song(ch, spl)/2;
         return eSUCCESS;

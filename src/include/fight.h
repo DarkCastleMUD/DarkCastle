@@ -2,7 +2,7 @@
 #define FIGHT_H_
 
 /************************************************************************
-| $Id: fight.h,v 1.13 2004/04/24 10:42:44 urizen Exp $
+| $Id: fight.h,v 1.14 2004/05/14 00:04:17 urizen Exp $
 | fight.h
 | This file defines the header information for fight.
 */
@@ -40,6 +40,7 @@ extern CHAR_DATA *character_list;
 #define COMBAT_MOD_IGNORE            1<<3
 #define COMBAT_MOD_UNUSED            1<<4
 
+int speciality_bonus(CHAR_DATA *ch, int attacktype);
 void make_husk(CHAR_DATA *ch);
 void make_heart(CHAR_DATA *ch, CHAR_DATA *vict);
 void make_head(CHAR_DATA *ch);
@@ -55,9 +56,9 @@ void perform_violence(void);
 void dam_message(int dam, CHAR_DATA *ch, CHAR_DATA *vict, int w_type, long modifier);
 void group_gain(CHAR_DATA *ch, CHAR_DATA *vict);
 int check_riposte(CHAR_DATA *ch, CHAR_DATA *vict);
-bool check_shieldblock(CHAR_DATA *ch, CHAR_DATA *vict);
-bool check_parry(CHAR_DATA *ch, CHAR_DATA *vict);
-bool check_dodge(CHAR_DATA *ch, CHAR_DATA *vict);
+bool check_shieldblock(CHAR_DATA *ch, CHAR_DATA *vict, int attacktype);
+bool check_parry(CHAR_DATA *ch, CHAR_DATA *vict, int attacktype);
+bool check_dodge(CHAR_DATA *ch, CHAR_DATA *vict, int attacktype);
 void disarm(CHAR_DATA *ch, CHAR_DATA *vict);
 void trip(CHAR_DATA *ch, CHAR_DATA *vict);
 

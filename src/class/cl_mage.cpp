@@ -20,12 +20,11 @@
 int do_focused_repelance(struct char_data *ch, char *argument, int cmd)
 {
   byte percent;
-  int learned, chance, specialization;
   struct affected_type af;
 
   if(IS_MOB(ch))
-    learned = 75;
-  else if(!(learned = has_skill(ch, SKILL_FOCUSED_REPELANCE))) {
+    ;
+  else if(!has_skill(ch, SKILL_FOCUSED_REPELANCE)) {
     send_to_char("You wish really really hard that magic couldn't hurt you....\r\n", ch);
     return eFAILURE;
   }
@@ -35,20 +34,7 @@ int do_focused_repelance(struct char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  specialization = learned / 100;
-  learned %= 100;
-
-  chance = 58;
-  chance += learned / 10;
-  chance += GET_INT(ch)/2;
-
-  // 101% is a complete failure
-  percent = number(1, 101);
-
-  if (GET_LEVEL(ch) >= IMMORTAL)
-    percent = 1;
-
-  if (percent > learned) 
+  if (skill_success(ch,NULL,SKILL_FOCUSED_REPELANCE)) 
   {
     act("$n closes $s eyes and chants quietly, $s head shakes suddenly in confusion.",
          ch, NULL, NULL, TO_ROOM, NOTVICT);
@@ -65,14 +51,14 @@ int do_focused_repelance(struct char_data *ch, char *argument, int cmd)
   }
 
   af.type      = SKILL_FOCUSED_REPELANCE;
-  af.duration  = 40 - (learned/10);
+  af.duration  = 40 - (has_skill(ch,SKILL_FOCUSED_REPELANCE)/10);
   af.modifier  = 0;
   af.location  = 0;
   af.bitvector = 0;
 
   affect_to_char(ch, &af);
 
-  skill_increase_check(ch, SKILL_FOCUSED_REPELANCE, learned, SKILL_INCREASE_EASY);
+  skill_increase_check(ch, SKILL_FOCUSED_REPELANCE, has_skill(ch, SKILL_FOCUSED_REPELANCE), SKILL_INCREASE_EASY);
 
   return eSUCCESS;
 }

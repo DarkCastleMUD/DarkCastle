@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.179 2004/05/09 19:45:58 urizen Exp $ */
+/* $Id: fight.cpp,v 1.180 2004/05/14 00:04:12 urizen Exp $ */
 
 extern "C"
 {
@@ -257,20 +257,17 @@ void perform_violence(void)
 
 bool gets_dual_wield_attack(char_data * ch)
 {
-  int learned;
-
   if(!ch->equipment[SECOND_WIELD]) // only if we have a second wield:)
     return FALSE;
 
-  if(!(learned = has_skill(ch, SKILL_DUAL_WIELD)))
+  if(!has_skill(ch, SKILL_DUAL_WIELD))
     return FALSE;
 
-  int percent = number(1, 101);
-
-  if(percent > learned)
+  if(!skill_success(ch,NULL,SKILL_DUAL_WIELD))
     return FALSE;
 
-  skill_increase_check(ch, SKILL_DUAL_WIELD, learned, SKILL_INCREASE_HARD);
+  skill_increase_check(ch, SKILL_DUAL_WIELD, 
+has_skill(ch,SKILL_DUAL_WIELD), SKILL_INCREASE_HARD);
 
   return TRUE;
 }
@@ -714,33 +711,26 @@ int do_acidshield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
 void check_weapon_skill_bonus(char_data * ch, int type, obj_data *wielded, 
                               int & weapon_skill_hit_bonus, int & weapon_skill_dam_bonus)
 {
-   int learned;
    int specialization;
-   int skill;
-         
+   int skill,learned;
    switch(type) {
       case TYPE_BLUDGEON:
-         learned = has_skill(ch, SKILL_BLUDGEON_WEAPONS);
+ 
          skill = SKILL_BLUDGEON_WEAPONS;
          break;
       case TYPE_WHIP:
-         learned = has_skill(ch, SKILL_WHIPPING_WEAPONS);
          skill = SKILL_WHIPPING_WEAPONS;
          break;
       case TYPE_CRUSH:
-         learned = has_skill(ch, SKILL_CRUSHING_WEAPONS);
          skill = SKILL_CRUSHING_WEAPONS;
          break;
       case TYPE_SLASH:
-         learned = has_skill(ch, SKILL_SLASHING_WEAPONS);
          skill = SKILL_SLASHING_WEAPONS;
          break;
       case TYPE_PIERCE:
-         learned = has_skill(ch, SKILL_PIERCEING_WEAPONS);
          skill = SKILL_PIERCEING_WEAPONS;
          break;
       case TYPE_HIT:
-         learned = has_skill(ch, SKILL_HAND_TO_HAND);
          skill = SKILL_HAND_TO_HAND;
          break;
       default:
@@ -748,12 +738,11 @@ void check_weapon_skill_bonus(char_data * ch, int type, obj_data *wielded,
          weapon_skill_dam_bonus = 0;
          return;
    }
-
-   if(learned)
+  learned = has_skill(ch,skill);
+   if(skill_success(ch,NULL,skill))
    {
       // rare skill increases
-      if(0 == number(0, 5))
-         skill_increase_check(ch, skill, learned, SKILL_INCREASE_HARD);
+      skill_increase_check(ch, skill, learned, SKILL_INCREASE_HARD);
 
       specialization = learned / 100;
       learned = learned % 100;
@@ -1494,25 +1483,25 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
 
   if (attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING)
   {
-    if(check_shieldblock(ch, victim))
+    if(check_shieldblock(ch, victim,attacktype))
       return eFAILURE;
 
-    if(check_parry(ch, victim)) {
+    if(check_parry(ch, victim,attacktype) && attacktype != TYPE_HIT) {
       if(typeofdamage == DAMAGE_TYPE_PHYSICAL)
       {
         return damage_retval(ch, victim, check_riposte(ch, victim));
       }
     }
-    if (check_dodge(ch, victim))
+    if (check_dodge(ch, victim, attacktype))
       return eFAILURE;
   }
 
   if (attacktype == TYPE_PHYSICAL_MAGIC)
   {
     // Physical Magic can be dodged or blocked with a shield, but not parried
-    if(check_shieldblock(ch, victim))
+    if(check_shieldblock(ch, victim,attacktype))
       return eFAILURE;
-    if (check_dodge(ch, victim))
+    if (check_dodge(ch, victim,attacktype))
       return eFAILURE;
   }
 
@@ -1897,32 +1886,13 @@ int check_riposte(CHAR_DATA * ch, CHAR_DATA * victim)
     (IS_AFFECTED(victim, AFF_PARALYSIS)))
     return eFAILURE;
   
-  chance = 0;
-
-  // TODO - eventually, when mobs have skills, remove this  
-  if(IS_NPC(victim)) {
-    if(GET_CLASS(victim) == CLASS_WARRIOR && GET_LEVEL(victim) > 40)
-      chance = 25;
-    else return eFAILURE;
-  }
-  else if ((chance = has_skill(victim, SKILL_RIPOSTE)))
-  {
-    learned = chance;
-    chance += GET_DEX(ch);
-  }
-  else return eFAILURE;
-  
   if(IS_SET(victim->combat, COMBAT_BLADESHIELD1) || IS_SET(victim->combat, COMBAT_BLADESHIELD2)) 
   {
-    if(chance < 101)
-      chance = 101;
-    // this is so we don't get huge riposte chains
     if(IS_SET(ch->combat, COMBAT_BLADESHIELD1) || IS_SET(ch->combat, COMBAT_BLADESHIELD2))
-      chance = 1;
+      return eFAILURE;
   }
 
-  percent = (number(1, 101) - GET_LEVEL(victim)) + GET_LEVEL(ch);
-  if (percent >= chance)
+  if (skill_success(victim, ch, SKILL_RIPOSTE))
     return eFAILURE;
   
   
@@ -1942,7 +1912,7 @@ int check_riposte(CHAR_DATA * ch, CHAR_DATA * victim)
 }
 
 
-bool check_shieldblock(CHAR_DATA * ch, CHAR_DATA * victim)
+bool check_shieldblock(CHAR_DATA * ch, CHAR_DATA * victim, int attacktype)
 {
   int percent;
   int learned;
@@ -1998,13 +1968,9 @@ bool check_shieldblock(CHAR_DATA * ch, CHAR_DATA * victim)
   return TRUE;
 }
 
-bool check_parry(CHAR_DATA * ch, CHAR_DATA * victim)
+bool check_parry(CHAR_DATA * ch, CHAR_DATA * victim, int attacktype)
 {
-  int percent;
-  int chance;
-  int learned;
-  int specialization;
-  
+  int modifier = 0;  
   if((IS_SET(victim->combat, COMBAT_STUNNED)) ||
     (victim->equipment[WIELD] == NULL) ||
     (ch->equipment[WIELD] == NULL && number(1, 101) >= 50) ||
@@ -2015,118 +1981,121 @@ bool check_parry(CHAR_DATA * ch, CHAR_DATA * victim)
     (IS_AFFECTED(victim, AFF_PARALYSIS)))
     return FALSE;
   
-  chance = 0;
-  
-  // TODO - when mobs have skills, remove this, and the act_parry flag
-  if (IS_NPC(victim) && (IS_SET(victim->mobdata->actflags, ACT_PARRY)))
-    chance = MIN(30, 2 * GET_LEVEL(victim));
-  else
-    chance = has_skill(victim, SKILL_PARRY);
+  if (IS_NPC(victim))
+  {
+    switch(GET_CLASS(victim)) {
+      case CLASS_WARRIOR:       modifier = 15;   break;
+      case CLASS_THIEF:         modifier = 1;   break;
+      case CLASS_MONK:          modifier = -5;   break;
+      case CLASS_BARD:          modifier = 1; break;
+      case CLASS_RANGER:        modifier = 5;   break;
+      case CLASS_PALADIN:       modifier = 10;   break;
+      case CLASS_ANTI_PAL:      modifier = 5;   break;
+      case CLASS_BARBARIAN:     modifier = 5;   break;
+      case CLASS_MAGIC_USER:    modifier = -5; break;
+      case CLASS_CLERIC:        modifier = -5; break;
+      case CLASS_NECROMANCER:   modifier = -5; break;
+      default:                  modifier = 0; break;
+  }
+  }
+  if (!modifier && IS_NPC(victim) && (IS_SET(victim->mobdata->actflags, ACT_PARRY)))
+    modifier = 10;
+  else if (!IS_NPC(victim))
+    modifier += speciality_bonus(ch,attacktype);
 
-  if (chance == 0)
-    return FALSE;
-
-  specialization = chance / 100;
-  chance = chance % 100;
-  learned = chance;
-
-  chance /= 2;
-  chance += (3 * GET_DEX(ch)) / 4;
-  chance += 10 * specialization;    
-  
-  if((GET_LEVEL(ch) - GET_LEVEL(victim)) < 0)
-    chance += (int)((GET_LEVEL(ch) - GET_LEVEL(victim)));
-
-  if(chance < 1)
-    chance = 1;
-
-  if(chance > 100 ||
-     IS_SET(victim->combat, COMBAT_BLADESHIELD1) || 
-     IS_SET(victim->combat, COMBAT_BLADESHIELD2))
-    chance = 100;
-
-  percent = number(1, 101);
-  if (percent >= chance)
-    return FALSE;
+  if(skill_success(victim,ch, SKILL_PARRY, modifier)&&
+     !IS_SET(victim->combat, COMBAT_BLADESHIELD1)&&
+     !IS_SET(victim->combat, COMBAT_BLADESHIELD2))
+     return FALSE;
 
   act("$n parries $N's attack.", victim, NULL, ch, TO_ROOM, NOTVICT);
   act("$n parries your attack.", victim, NULL, ch, TO_VICT, 0);
   act("You parry $N's attack.", victim, NULL, ch, TO_CHAR, 0);
 
-  skill_increase_check(victim, SKILL_PARRY, learned, SKILL_INCREASE_HARD);
+  skill_increase_check(victim, SKILL_PARRY, has_skill(victim,SKILL_PARRY), SKILL_INCREASE_HARD);
   
   return TRUE;
+}
+
+int speciality_bonus(CHAR_DATA *ch,int attacktype)
+{
+  int skill = 0;
+/*  int w_type = TYPE_HIT;
+  if(wielded && wielded->obj_flags.type_flag == ITEM_WEAPON)
+     w_type = get_weapon_damage_type(wielded);*/
+   switch(attacktype) {
+      case TYPE_BLUDGEON:
+         skill = SKILL_BLUDGEON_WEAPONS;
+         break;
+      case TYPE_WHIP:
+         skill = SKILL_WHIPPING_WEAPONS;
+         break;
+      case TYPE_CRUSH:
+         skill = SKILL_CRUSHING_WEAPONS;
+         break;
+     case TYPE_SLASH:
+         skill = SKILL_SLASHING_WEAPONS;
+         break;
+      case TYPE_PIERCE:
+         skill = SKILL_PIERCEING_WEAPONS;
+         break;
+      case TYPE_HIT:
+         skill = SKILL_HAND_TO_HAND;
+         break;
+      default:
+	break;
+   }
+   if (!skill) return 0;
+   int l = has_skill(ch,skill);
+   return 0 - l;   
 }
 
 /*
 * Check for dodge.
 */
-bool check_dodge(CHAR_DATA * ch, CHAR_DATA * victim)
+bool check_dodge(CHAR_DATA * ch, CHAR_DATA * victim, int attacktype)
 {
-  int percent;
-  int chance;
-  int learned;
-  int specialization;
-  
+//  int chance;
+   int modifier = 0;  
   if((IS_SET(victim->combat, COMBAT_STUNNED)) ||
     (IS_SET(victim->combat, COMBAT_STUNNED2)) ||
     (IS_SET(victim->combat, COMBAT_BASH1)) ||
     (IS_SET(victim->combat, COMBAT_BASH2)) ||
     (IS_AFFECTED(victim, AFF_PARALYSIS)))
     return FALSE;
-  chance = 0;
 
   if (IS_NPC(victim))
   {
     switch(GET_CLASS(victim)) {
-      case CLASS_WARRIOR:       chance = MIN(GET_LEVEL(victim),             40);   break;
-      case CLASS_THIEF:         chance = MIN(GET_LEVEL(victim)*2,           90);   break;
-      case CLASS_MONK:          chance = MIN((int) (GET_LEVEL(victim)*1.5), 75);   break;
-      case CLASS_BARD:          chance = MIN(GET_LEVEL(victim)*2,           85);   break;
-      case CLASS_RANGER:        chance = MIN(GET_LEVEL(victim)*2,           70);   break;
-      case CLASS_PALADIN:       chance = MIN((int) (GET_LEVEL(victim)/2),   20);   break;
-      case CLASS_ANTI_PAL:      chance = MIN((int) (GET_LEVEL(victim)*1.5), 75);   break;
-      case CLASS_BARBARIAN:     chance = MIN((int) (GET_LEVEL(victim)/5),   10);   break;
-      case CLASS_MAGIC_USER:    chance = 5; break;
-      case CLASS_CLERIC:        chance = 5; break;
-      case CLASS_NECROMANCER:   chance = 5; break;
-      default:                  chance = 0; break;
+      case CLASS_WARRIOR:       modifier = 10;   break;
+      case CLASS_THIEF:         modifier = 25;   break;
+      case CLASS_MONK:          modifier = 5;   break;
+      case CLASS_BARD:          modifier = 5 ; break;
+      case CLASS_RANGER:        modifier = 3;   break;
+      case CLASS_PALADIN:       modifier = 1;   break;
+      case CLASS_ANTI_PAL:      modifier = 5;   break;
+      case CLASS_BARBARIAN:     modifier = 1;   break;
+      case CLASS_MAGIC_USER:    modifier = -5;break;
+      case CLASS_CLERIC:        modifier = -5;; break;
+      case CLASS_NECROMANCER:   modifier = -5; break;
+      default:                  modifier = 0; break;
     }
-    if(0 == chance && IS_SET(victim->mobdata->actflags, ACT_DODGE))
-      chance = 20;
+    if(0 == modifier && IS_SET(victim->mobdata->actflags, ACT_DODGE))
+      modifier = 5;
   }
-  else
-    chance = has_skill(victim, SKILL_DODGE);
 
-  if (chance == 0)
+  if (modifier == 0 && (IS_NPC(victim) || !has_skill(victim,SKILL_DODGE)))
     return FALSE;
 
-  specialization = chance / 100;
-  chance = chance % 100;
-  learned = chance;
-
-  chance /= 2;
-  chance += (3 * GET_DEX(ch)) / 5;    
-  chance += 10 * specialization;     // specialization = 10% better chance
-
-  if((GET_LEVEL(ch) - GET_LEVEL(victim)) < 0)
-    chance += (int)((GET_LEVEL(ch) - GET_LEVEL(victim)));
-  
-  if(chance < 1)
-    chance = 1;
-
-  if(chance > 100)
-    chance = 100;
-
-  percent = number(1, 101);
-  if (percent >= chance)
+  modifier += speciality_bonus(ch, attacktype);
+  if (!skill_success(victim,ch,SKILL_DODGE, modifier))
     return FALSE;
   
   act("$n dodges $N's attack.", victim, NULL, ch, TO_ROOM, NOTVICT);
   act("$n dodges your attack.", victim, NULL, ch, TO_VICT, 0);
   act("You dodge $N's attack.", victim, NULL, ch, TO_CHAR, 0);
 
-  skill_increase_check(victim, SKILL_DODGE, learned, SKILL_INCREASE_HARD);
+  skill_increase_check(victim, SKILL_DODGE, has_skill(victim,SKILL_DODGE), SKILL_INCREASE_HARD);
 
   return TRUE;
 }
@@ -2933,15 +2902,14 @@ void death_cry(CHAR_DATA * ch)
 // Return TRUE if killed vict.  False otherwise
 int do_skewer(CHAR_DATA *ch, CHAR_DATA *vict, int dam, int weapon)
 {
-  int percent, damadd = 0;
+  int damadd = 0;
   
   if((GET_CLASS(ch) != CLASS_WARRIOR) && GET_LEVEL(ch) < ARCHANGEL)  return 0;  
   if(!IS_NPC(vict) && GET_LEVEL(vict) >= IMMORTAL)                   return 0;	
   if(!ch->equipment[weapon])                                         return 0;
 
-  percent = number(1, 101); // 101 is complete failure
   // TODO - need to make this take specialization into consideration
-  if(percent > has_skill(ch, SKILL_SKEWER))                          return 0;
+  if(skill_success(ch,vict, SKILL_SKEWER))                          return 0;
 
   int type = get_weapon_damage_type(ch->equipment[weapon]);
   if( ! (type == TYPE_STING || type == TYPE_PIERCE || type == TYPE_SLASH ))  return 0;
@@ -4090,7 +4058,7 @@ int second_attack(CHAR_DATA *ch)
   if((IS_NPC(ch)) && (IS_SET(ch->mobdata->actflags, ACT_2ND_ATTACK)))
     return TRUE;
   learned = has_skill(ch, SKILL_SECOND_ATTACK);
-  if(learned && number(1, 101) < MAX(25, learned)) {
+  if(learned && skill_success(ch,NULL, SKILL_SECOND_ATTACK)) {
     skill_increase_check(ch, SKILL_SECOND_ATTACK, learned, SKILL_INCREASE_HARD);
     return TRUE;
   }
@@ -4104,7 +4072,7 @@ int third_attack(CHAR_DATA *ch)
   if((IS_NPC(ch)) && (IS_SET(ch->mobdata->actflags, ACT_3RD_ATTACK)))
     return TRUE;
   learned = has_skill(ch, SKILL_THIRD_ATTACK);
-  if(learned && number(1, 101) < MAX(learned, 20)) {
+  if(learned && skill_success(ch,NULL,SKILL_THIRD_ATTACK)) {
     skill_increase_check(ch, SKILL_THIRD_ATTACK, learned, SKILL_INCREASE_HARD);
     return TRUE;
   }

@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.37 2004/04/20 15:31:52 urizen Exp $ */
+/* $Id: info.cpp,v 1.38 2004/05/14 00:04:12 urizen Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -583,7 +583,7 @@ void list_char_to_char(struct char_data *list, struct char_data *ch, int mode)
          show_char_to_char(i, ch, 0);
       else if (IS_DARK(ch->in_room))
       {
-         if(known && known > number(1, 101))
+         if(known && skill_success(ch,NULL,SKILL_BLINDFIGHTING))
             send_to_char("Your blindfighting awareness alerts you to a presense in the area.\n\r", ch);
          else if(number(1, 10) == 1)
             send_to_char("$B$4You see a pair of glowing red eyes looking your way.$R$7\n\r", ch);
@@ -2165,8 +2165,7 @@ int do_scan(struct char_data *ch, char *argument, int cmd)
                  )
                   continue;
 
-               percent = number(1,101);
-               if(percent < 75) {
+               if(skill_success(ch,NULL,SKILL_SCAN)) {
                   csendf(ch,"%35s -- a little bit %s\n\r", GET_SHORT(vict),
                      possibilities[i]);
                }
@@ -2195,8 +2194,7 @@ int do_scan(struct char_data *ch, char *argument, int cmd)
                     )
                      continue;
 
-                  percent = number(1,101);
-                  if(percent < 50) {
+                  if(skill_success(ch,NULL,SKILL_SCAN,-10)) {
                      csendf(ch,"%35s -- a ways off %s\n\r",
                         GET_SHORT(vict),
                         possibilities[i]);
@@ -2224,7 +2222,7 @@ int do_scan(struct char_data *ch, char *argument, int cmd)
                            continue;
 
                         percent = number(1,101);
-                        if(percent < 40) {
+                        if(skill_success(ch,NULL,SKILL_SCAN,-20)) {
                            csendf(ch, "%35s -- extremely far off %s\n\r",
                               GET_SHORT(vict),
                               possibilities[i]);

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_monk.cpp,v 1.15 2004/05/02 19:39:47 urizen Exp $
+| $Id: cl_monk.cpp,v 1.16 2004/05/14 00:04:15 urizen Exp $
 | cl_monk.C
 | Description:  Monk skills.
 */
@@ -23,14 +23,12 @@ int do_eagle_claw(struct char_data *ch, char *argument, int cmd)
 {
    struct char_data *victim;
    char name[MAX_INPUT_LENGTH];
-   byte percent;
-   int learned, specialization, chance;
    int dam;
    int retval;
 
    if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
-     learned = 75;
-   else if(!(learned = has_skill(ch, SKILL_EAGLE_CLAW))) {
+     ;
+   else if(!has_skill(ch, SKILL_EAGLE_CLAW)) {
      send_to_char("Eagle my ass...you're still just a pigeon boy.\r\n", ch);
      return eFAILURE;
    }
@@ -71,24 +69,11 @@ int do_eagle_claw(struct char_data *ch, char *argument, int cmd)
    if(!can_attack(ch) || !can_be_attacked(ch, victim))
       return eFAILURE;
 
-   specialization = learned / 100;
-   learned = learned % 100;
-
-   chance = 67;
-   chance += (GET_DEX(ch) > 26);
-   chance += (GET_DEX(ch) > 24);
-   chance += (GET_DEX(ch) > 22);
-   chance += (GET_DEX(ch) > 20);
-   chance += (GET_DEX(ch) > 18);    // chance = 67-72
-   chance += learned / 10;          // chance = 67-80 (max of 75 learned for monk)
-
-   skill_increase_check(ch, SKILL_EAGLE_CLAW, learned, SKILL_INCREASE_MEDIUM);
-
-   percent = number(1,101);
+   skill_increase_check(ch, SKILL_EAGLE_CLAW, has_skill(ch,SKILL_EAGLE_CLAW), SKILL_INCREASE_MEDIUM);
 
    WAIT_STATE(ch, PULSE_VIOLENCE*3);
 
-   if (percent > chance) 
+   if (!skill_success(ch,victim, SKILL_EAGLE_CLAW)) 
       retval = damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_EAGLE_CLAW, 0);
    else 
    {
@@ -111,11 +96,11 @@ int do_quivering_palm(struct char_data *ch, char *argument, int cmd)
   struct affected_type af;
   struct char_data *victim;
   char name[256];
-  int learned, specialization, chance, percent, dam, retval;
+  int dam, retval;
 
   if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
-    learned = 75;
-  else if(!(learned = has_skill(ch, SKILL_QUIVERING_PALM))) {
+    ;
+  else if(!has_skill(ch, SKILL_QUIVERING_PALM)) {
     send_to_char("Stick to palming yourself for now bucko.\r\n", ch);
     return eFAILURE;
   }
@@ -164,20 +149,7 @@ int do_quivering_palm(struct char_data *ch, char *argument, int cmd)
 
   GET_KI(ch) -= 40;
 
-  percent = number(1, 101);
-
-  specialization = learned / 100;
-  learned = learned % 100;
-
-  chance = 67;
-  chance += (GET_DEX(ch) > 26);
-  chance += (GET_DEX(ch) > 24);
-  chance += (GET_DEX(ch) > 22);
-  chance += (GET_DEX(ch) > 20);
-  chance += (GET_DEX(ch) > 18);    // chance = 67-72
-  chance += learned / 10;          // chance = 67-80 (max of 75 learned for monk)
-
-  skill_increase_check(ch, SKILL_QUIVERING_PALM, learned, SKILL_INCREASE_EASY);
+  skill_increase_check(ch, SKILL_QUIVERING_PALM, has_skill(ch,SKILL_QUIVERING_PALM), SKILL_INCREASE_EASY);
 
   WAIT_STATE(ch, PULSE_VIOLENCE*2);
   af.type = SKILL_QUIVERING_PALM;
@@ -187,7 +159,7 @@ int do_quivering_palm(struct char_data *ch, char *argument, int cmd)
   af.bitvector = 0;
   affect_to_char(ch, &af);
 
-  if(percent > chance) {
+  if(skill_success(ch,victim,SKILL_QUIVERING_PALM)) {
     retval = damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_QUIVERING_PALM, 0);
   }
   else {
@@ -202,21 +174,14 @@ int do_stun(struct char_data *ch, char *argument, int cmd)
 {
   struct char_data *victim;
   char name[256];
-  byte percent;
-  int learned;
-  int chance;
   int retval;
-  int specialization;
 
   if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
-    learned = 75;
-  else if(!(learned = has_skill(ch, SKILL_STUN))) {
+    ;
+  else if(!has_skill(ch, SKILL_STUN)) {
     send_to_char("Your lack of knowledge is stunning...\r\n", ch);
     return eFAILURE;
   }
-
-  specialization = learned/100;
-  learned = learned % 100;
 
   one_argument(argument, name);
 
@@ -242,36 +207,20 @@ int do_stun(struct char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if(specialization < 1 && IS_MOB(victim) && IS_SET(victim->mobdata->actflags, ACT_HUGE))
+  if(IS_MOB(victim) && IS_SET(victim->mobdata->actflags, ACT_HUGE))
   {
     send_to_char("You cannot stun something that HUGE!\n\r", ch);
     return eFAILURE;
   }
 
-  skill_increase_check(ch, SKILL_STUN, learned, SKILL_INCREASE_MEDIUM);
+  skill_increase_check(ch, SKILL_STUN, has_skill(ch,SKILL_STUN), SKILL_INCREASE_MEDIUM);
 
-  // 101% is a complete failure
-  percent = number(1, 101);
-
-  chance = 50;
-  if(learned > 50)
-    chance+= learned - 50;   // monks rangers get up to 60 skill
-  if( ( GET_LEVEL(ch) + 5 ) < GET_LEVEL(victim) )
-  {
-    if( ( chance - ( GET_LEVEL(ch) + 5 - GET_LEVEL(victim) ) ) < 1 )
-      chance = 1;
-    else chance -= GET_LEVEL(ch) + 5 - GET_LEVEL(victim);
-  } 
-
-  if(!IS_MOB(ch) && !IS_MOB(victim))  // 5% penalty on PvP stunning
-    chance -= 5;
-
-  if(percent > chance) {
+  if(skill_success(ch,victim, SKILL_STUN) ) {
     act("$n attempts to hit you in your solar plexus!  You block $s attempt.", ch, NULL, victim, TO_VICT , 0);
     act("You attempt to hit $N in $s solar plexus...   YOU MISS!", ch, NULL, victim, TO_CHAR , 0);
     act("$n attempts to hit $N in $S solar plexus...   $e MISSES!", ch, NULL, victim, TO_ROOM, NOTVICT );
 
-    if(learned > 25 && !number(0, 7)) {
+    if(has_skill(ch,SKILL_STUN) > 35 && !number(0, 7)) {
        send_to_char("Your advanced knowledge of stun helps you to recover faster.\r\n", ch);
        WAIT_STATE(ch, PULSE_VIOLENCE*3);
     }

@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.54 2004/05/12 18:57:04 urizen Exp $ */
+/* $Id: nanny.cpp,v 1.55 2004/05/14 00:04:12 urizen Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -715,11 +715,6 @@ void nanny(struct descriptor_data *d, char *arg)
          log( log_buf, GET_LEVEL(ch), LOG_SOCKET );
 
       warn_if_duplicate_ip(ch);
-      if  (GET_GOLD(ch) > 10000000)
-      {
-        sprintf(log_buf, "%s has more than 10 mil gold. Bugged?", GET_NAME(ch));
-	log( log_buf, 100, LOG_WARNINGS );
-      }
       //    SEND_TO_Q(motd, d);
       if(GET_LEVEL(ch) < IMMORTAL)
         send_to_char(motd, d->character);
@@ -1439,7 +1434,16 @@ break;
              load_char_obj(d, tmp_name);
              ch = d->character;
           }
-          
+	  if  (GET_GOLD(ch) > 10000000)
+          {
+             sprintf(log_buf, "%s has more than 10 mil gold. Bugged?", GET_NAME(ch));
+             log( log_buf, 100, LOG_WARNINGS );
+          }
+          if (GET_BANK(ch) > 80000000)
+	  {
+	     sprintf(log_buf,"%s has more than 80 mil gold in the bank. Rich fucker or bugged.",GET_NAME(ch));
+	     log( log_buf, 100, LOG_WARNINGS);
+	  }      
           send_to_char("\n\rWelcome to Dark Castle Diku Mud.  May your visit here suck.\n\r", ch );
           ch->next            = character_list;
           character_list      = ch;

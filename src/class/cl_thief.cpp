@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.51 2004/05/07 22:55:08 urizen Exp $
+| $Id: cl_thief.cpp,v 1.52 2004/05/14 00:04:15 urizen Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -36,24 +36,7 @@ int palm(CHAR_DATA *ch, struct obj_data *obj_object,
           struct obj_data *sub_object)
 {
   char buffer[MAX_STRING_LENGTH];
-  bool successful = 1;
-  byte percent;
-  int learned, specialization, chance;
   
-  percent = number(1,101);
-
-  learned = has_skill(ch, SKILL_PALM);
-  specialization = learned / 100;
-  learned = learned % 100;
-
-  chance = 50;
-  chance += GET_DEX(ch);
-  chance += learned / 10;
-
-  if(percent > chance)
-    successful = 0;  // if percent is too high, thief will fail the attempt
-  
-
   if(IS_SET(obj_object->obj_flags.more_flags, ITEM_UNIQUE)) {
     if(search_char_for_item(ch, obj_object->item_number)) {
        send_to_char("The item's uniqueness prevents it!\r\n", ch);
@@ -61,11 +44,11 @@ int palm(CHAR_DATA *ch, struct obj_data *obj_object,
     }
   }
 
-  skill_increase_check(ch, SKILL_PALM, learned, SKILL_INCREASE_EASY);
+  skill_increase_check(ch, SKILL_PALM, has_skill(ch,SKILL_PALM), SKILL_INCREASE_EASY);
 
   move_obj(obj_object, ch);
   
-  if(successful) {
+  if(skill_success(ch,NULL,SKILL_PALM)) {
     act("You successfully snag $p, no one saw you do it!",  ch, 
           obj_object, 0, TO_CHAR, 0);
     act("$n palms $p trying to hide it from your all knowing gaze.",
@@ -94,7 +77,6 @@ int do_eyegouge(CHAR_DATA *ch, char *argument, int cmd)
 {
   CHAR_DATA *victim;
   char name[256];
-  int learned = has_skill(ch, SKILL_EYEGOUGE);
   argument = one_argument(argument,name);
 
   if(!(victim = get_char_room_vis(ch, name)) && (victim = ch->fighting)==NULL) {
@@ -113,13 +95,13 @@ int do_eyegouge(CHAR_DATA *ch, char *argument, int cmd)
  if(!can_be_attacked(ch, victim) || !can_attack(ch))
     return eFAILURE;
 
-  if (!learned)
+  if (!has_skill(ch,SKILL_EYEGOUGE))
   {
     send_to_char("You would.. if you knew how.\r\n",ch);
     return eFAILURE;
   }
   int retval = 0;
-  if (learned < number(1,101))
+  if (skill_success(ch,victim, SKILL_EYEGOUGE))
   {
      act("You miss $N's eye.",ch, NULL, victim, TO_CHAR, 0);
      act("$n walks up to $N and tries to push $s thumb into $N's eye, but misses!",ch, NULL, victim, TO_ROOM, NOTVICT);
@@ -129,13 +111,12 @@ int do_eyegouge(CHAR_DATA *ch, char *argument, int cmd)
      act("You press your thumb into $N's eye.",ch, NULL, victim, TO_CHAR, 0);
      act("$n walks up to $N and pushes $s thumb into $N's eye!",ch, NULL, victim, TO_ROOM, NOTVICT);
      act("$n walks up to you and pushes $s thumb into your eye! Ow!",ch, NULL, victim, TO_VICT, 0);
-     int dam = (int)(150.0 * (float)((float)(learned>50?learned:50)/100.0));
-     retval = damage(ch, victim, dam, TYPE_UNDEFINED, SKILL_EYEGOUGE, 0);
+     retval = damage(ch, victim, 150, TYPE_UNDEFINED, SKILL_EYEGOUGE, 0);
      SET_BIT(victim->affected_by, AFF_BLIND);
      SET_BIT(victim->combat, COMBAT_THI_EYEGOUGE);
   }
   WAIT_STATE(ch, PULSE_VIOLENCE);
-   skill_increase_check(ch, SKILL_EYEGOUGE, learned, SKILL_INCREASE_MEDIUM);
+   skill_increase_check(ch, SKILL_EYEGOUGE, has_skill(ch,SKILL_EYEGOUGE), SKILL_INCREASE_MEDIUM);
   return retval | eSUCCESS;
 }
 
@@ -143,11 +124,9 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
 {
   CHAR_DATA *victim;
   char name[256];
-  int percent, specialization, chance;
   int skill = 0;
   int was_in = 0;
   int retval;
-  int learned;
 
   one_argument(argument, name);
 
@@ -200,25 +179,12 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
     return eFAILURE;
   }
   
-  percent = number(1, 101); // 101% is a complete failure
-
   WAIT_STATE(ch, PULSE_VIOLENCE);
   
   int itemp = number(1, MAX_MORTAL);
 
-  if(IS_NPC(ch) || GET_LEVEL(ch) > ARCHANGEL)
-    skill = 75;
-  else skill = has_skill(ch, SKILL_BACKSTAB);
-
-  specialization = skill / 100;
-  skill = skill % 100;
-
-  if(skill) 
+  if(has_skill(ch,SKILL_BACKSTAB)) 
   {
-    chance = 70;
-    chance += skill / 10;
-    chance += (GET_DEX(ch) - GET_DEX(victim)) / 2;
-    
     skill_increase_check(ch, SKILL_BACKSTAB, skill, SKILL_INCREASE_MEDIUM);
   }
   else {
@@ -229,15 +195,8 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
   // record the room I'm in.  Used to make sure a dual can go off.
   was_in = ch->in_room;
 
-  // if they're hurt they are going to be suspicious of backstabs so half the chance
-  if( ( (float)GET_HIT(victim) / (float)GET_MAX_HIT(victim) ) < .7) 
-  {
-    chance /= 2;
-    chance += 5;
-  }
-
   // failure
-  if(AWAKE(victim) && (percent > chance))
+  if(AWAKE(victim) && !skill_success(ch,victim,SKILL_BACKSTAB))
     retval = damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_BACKSTAB, 0);
 
   // success
@@ -275,17 +234,15 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
      (ch->equipment[SECOND_WIELD])                                    &&
      ((ch->equipment[SECOND_WIELD]->obj_flags.value[3] == 11) ||
        (ch->equipment[SECOND_WIELD]->obj_flags.value[3] == 8))        &&
-     (learned = has_skill(ch, SKILL_DUAL_BACKSTAB))
+     has_skill(ch, SKILL_DUAL_BACKSTAB)
     )
   {
-        skill_increase_check(ch, SKILL_DUAL_BACKSTAB, skill, SKILL_INCREASE_HARD);
+        skill_increase_check(ch, SKILL_DUAL_BACKSTAB, has_skill(ch,SKILL_DUAL_BACKSTAB), SKILL_INCREASE_HARD);
 
-        if(number(1, 100) <= learned)
+        if(skill_success(ch,victim,SKILL_DUAL_BACKSTAB))
         {
-//           WAIT_STATE(ch, PULSE_VIOLENCE);
-           percent = number(1, 101);
-           if (AWAKE(victim) &&
-              (percent > skill))
+//           percent = number(1, 101);
+           if (AWAKE(victim) && !skill_success(ch,victim, SKILL_BACKSTAB))
               return damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_BACKSTAB, SECOND);
            else
               return attack(ch, victim, SKILL_BACKSTAB, SECOND);
@@ -298,13 +255,11 @@ int do_circle(CHAR_DATA *ch, char *argument, int cmd)
 {
    CHAR_DATA * victim;
    // char name[256];
-   byte percent;
-   int learned, specialization, chance;
    int retval;
 
    if(IS_MOB(ch))
-     learned = 75;
-   else if(!(learned = has_skill(ch, SKILL_CIRCLE))) {
+     ;
+   else if(!has_skill(ch, SKILL_CIRCLE)) {
      send_to_char("You dunno how to circle!\r\n", ch);
      return eFAILURE;
    }
@@ -356,24 +311,15 @@ int do_circle(CHAR_DATA *ch, char *argument, int cmd)
       return eFAILURE;
    }
       
-   percent = number(1, 101); // 101% is a complete failure
-
-   specialization = learned / 100;
-   learned = learned % 100;
-
-   chance = 70;
-   chance += learned / 100;
-   chance += (GET_DEX(ch) - GET_DEX(victim)) / 2;
- 
 //   stop_fighting(ch);
-   skill_increase_check(ch, SKILL_CIRCLE, learned, SKILL_INCREASE_MEDIUM);
+   skill_increase_check(ch, SKILL_CIRCLE, has_skill(ch,SKILL_CIRCLE), SKILL_INCREASE_MEDIUM);
 
    act ("You circle around your target...",  ch, 0, 0, TO_CHAR, 0);
    act ("$n circles around $s target...", ch, 0, 0, TO_ROOM, INVIS_NULL);
 
    WAIT_STATE(ch, PULSE_VIOLENCE * 2);
    
-   if (AWAKE(victim) && (percent > chance))
+   if (AWAKE(victim) && !skill_success(ch,victim,SKILL_CIRCLE))
       return damage(ch, victim, 0,TYPE_UNDEFINED, SKILL_BACKSTAB, FIRST);
    else 
    {
@@ -390,9 +336,8 @@ int do_circle(CHAR_DATA *ch, char *argument, int cmd)
             if ((ch->equipment[SECOND_WIELD]->obj_flags.value[3] == 11) ||
                 (ch->equipment[SECOND_WIELD]->obj_flags.value[3] == 8)) {
                WAIT_STATE(ch, PULSE_VIOLENCE);
-               percent = number(1, 101);
-               if (AWAKE(victim) &&
-                   (percent > has_skill(ch, SKILL_DUAL_BACKSTAB)))
+
+               if (AWAKE(victim) && skill_success(ch,victim,SKILL_DUAL_BACKSTAB))
                   damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_BACKSTAB,
                          SECOND);
                else {
@@ -408,13 +353,11 @@ int do_trip(CHAR_DATA *ch, char *argument, int cmd)
 {
   CHAR_DATA *victim = 0;
   char name[256];
-  byte percent;
-  int learned, specialization, chance;
   int retval;
 
   if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
-    learned = 75;
-  else if(!(learned = has_skill(ch, SKILL_TRIP))) {
+    ;
+  else if(!has_skill(ch, SKILL_TRIP)) {
     send_to_char("You should learn how to trip first!\r\n", ch);
     return eFAILURE;
   }
@@ -443,14 +386,7 @@ int do_trip(CHAR_DATA *ch, char *argument, int cmd)
   if(!can_be_attacked(ch, victim) || !can_attack(ch))
     return eFAILURE;
 
-   specialization = learned / 100;
-   learned = learned % 100;
-
-   chance = 60;
-   chance += learned / 100;
-   chance += (GET_DEX(ch) - GET_DEX(victim)) / 2;
- 
-   skill_increase_check(ch, SKILL_TRIP, learned, SKILL_INCREASE_MEDIUM);
+   skill_increase_check(ch, SKILL_TRIP, has_skill(ch,SKILL_TRIP), SKILL_INCREASE_MEDIUM);
 
   if(affected_by_spell(victim, SPELL_IRON_ROOTS)) {
     act("You try to trip $N but tree roots around $S legs keep him upright.", ch, 0, victim, TO_CHAR, 0);
@@ -460,10 +396,7 @@ int do_trip(CHAR_DATA *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  // 101% is a complete failure
-  percent = number(1, 101);
-
-  if(percent > chance) {
+  if(skill_success(ch,victim,SKILL_TRIP)) {
     act("$n fumbles clumsily as $s attempts to trip you!", ch, NULL, victim, TO_VICT, 0 );
     act("You fumble the trip!", ch, NULL, victim, TO_CHAR , 0);
     act("$n fumbles as $s tries to trip $N!", ch, NULL, victim, TO_ROOM, NOTVICT );
@@ -487,11 +420,10 @@ int do_trip(CHAR_DATA *ch, char *argument, int cmd)
 int do_sneak(CHAR_DATA *ch, char *argument, int cmd)
 {
    affected_type af;
-   int learned;
 
    if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
-      learned = 75;
-   else if(!(learned = has_skill(ch, SKILL_SNEAK))) {
+      ;
+   else if(!has_skill(ch, SKILL_SNEAK)) {
       send_to_char("You just don't seem like the sneaky type.\r\n", ch);
       return eFAILURE;
    }
@@ -509,7 +441,7 @@ int do_sneak(CHAR_DATA *ch, char *argument, int cmd)
 
    send_to_char("You try to move silently for a while.\n\r", ch);
 
-   skill_increase_check(ch, SKILL_SNEAK, learned, SKILL_INCREASE_HARD);
+   skill_increase_check(ch, SKILL_SNEAK, has_skill(ch,SKILL_SNEAK), SKILL_INCREASE_HARD);
 
    af.type = SKILL_SNEAK;
    af.duration = MAX(5, GET_LEVEL(ch) / 2);
@@ -522,7 +454,6 @@ int do_sneak(CHAR_DATA *ch, char *argument, int cmd)
 
 int do_stalk(CHAR_DATA *ch, char *argument, int cmd)
 {
-  int percent, learned, chance;
   char name[MAX_STRING_LENGTH];
   CHAR_DATA *leader;
 
@@ -549,19 +480,15 @@ int do_stalk(CHAR_DATA *ch, char *argument, int cmd)
   }
 
   if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
-    learned = 75;
-  else if(!(learned = has_skill(ch, SKILL_STALK))) {
+    ;
+  else if(!has_skill(ch, SKILL_STALK)) {
     send_to_char("I bet you think you're a thief ;)\n\r", ch);
     return eFAILURE;
   } 
 
-  chance = 75;
+  skill_increase_check(ch, SKILL_STALK, has_skill(ch,SKILL_STALK), SKILL_INCREASE_EASY);
 
-  percent = number(1,101);
-
-  skill_increase_check(ch, SKILL_STALK, learned, SKILL_INCREASE_EASY);
-
-  if(percent > chance)
+  if(!skill_success(ch,leader,SKILL_STALK))
     do_follow(ch, argument, 9);
 
   else { 
@@ -599,7 +526,6 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
   char victim_name[240];
   char obj_name[240];
   char buf[240];
-  int percent, learned, specialization, chance;
   int eq_pos;
   int _exp;
   int retval;
@@ -629,13 +555,6 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
     send_to_char("Got it!\n\rYou receive 30000000000 exps.\n\r", ch);
     return eFAILURE;
   }
-
-  if(IS_MOB(ch))
-    learned = 75;
-  else learned = has_skill(ch, SKILL_STEAL);
-
-  specialization = learned / 100;
-  learned = learned % 100;
 
   if(GET_POS(victim) == POSITION_DEAD) {
      send_to_char("Don't steal from dead PC's\r\n", ch);
@@ -677,22 +596,9 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
 
   WAIT_STATE(ch, 10); /* It takes TIME to steal */
 
-  /* 101% is a complete failure */
-  percent = number(1,101);
-
-  percent += AWAKE(victim) ? 10 : -50;
-  percent += ((GET_LEVEL(victim)-GET_LEVEL(ch))/2); // take level into account
- 
-  if(GET_POS(victim) <= POSITION_SLEEPING &&
-     GET_POS(victim) != POSITION_STUNNED)
-    percent = -1; /* ALWAYS SUCCESS */
-
-  if(GET_LEVEL(victim) > IMMORTAL) /* NO NO With Imp's and Shopkeepers! */
-    percent = 101; /* Failure */
-
-  if(learned)
-    chance = 60;
-  else chance = 0;
+//  if(GET_POS(victim) <= POSITION_SLEEPING &&
+  //   GET_POS(victim) != POSITION_STUNNED)
+    //percent = -1; /* ALWAYS SUCCESS */
 
   if((obj = get_obj_in_list_vis(ch, obj_name, victim->carrying))) 
   {
@@ -706,13 +612,16 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
 	send_to_char("That piece of equipment is protected by the powerful magics of the MUD-school elders.\r\n",ch);
 	return eFAILURE;
     }
-    // obj found in inventory
-    percent += GET_OBJ_WEIGHT(obj); // Make heavy harder
+    if (GET_OBJ_WEIGHT(obj) > 40)
+    {
+	send_to_char("That item is too heavy to seal.\r\n",ch);
+	return eFAILURE;
+    }
 
-    if(learned)
-      skill_increase_check(ch, SKILL_STEAL, learned, SKILL_INCREASE_HARD);
+    if (has_skill(ch,SKILL_STEAL))
+      skill_increase_check(ch, SKILL_STEAL, has_skill(ch,SKILL_STEAL), SKILL_INCREASE_HARD);
 
-    if (percent > chance) 
+    if (skill_success(ch,victim,SKILL_STEAL)) 
     {
       set_cantquit( ch, victim, TRUE );
       send_to_char("Oops..", ch);
@@ -720,6 +629,8 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
       if(!number(0, 4)) {
         act("$n tried to steal something from you!", ch, 0, victim, TO_VICT, 0);
         act("$n tries to steal something from $N.", ch, 0, victim, TO_ROOM, INVIS_NULL|NOTVICT);
+      } else {
+	send_to_char("You managed to keep them unaware of your failed attempt.\r\n",ch);
       }
     } 
     else 
@@ -873,7 +784,7 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
         send_to_char("That item is protected by the gods.\n\r", ch);
         return eFAILURE;
       }
-      if (chance <= 0)
+      if (!has_skill(ch,SKILL_STEAL))
       {
 	send_to_char("You don't know how.\r\n",ch);
 	return eFAILURE;
@@ -991,7 +902,6 @@ int do_pocket(CHAR_DATA *ch, char *argument, int cmd)
   struct affected_type pthiefaf;
   char victim_name[240];
   char buf[240];
-  int percent, learned, chance, specialization;
   int gold;
   int _exp;
   int retval;
@@ -1013,13 +923,6 @@ int do_pocket(CHAR_DATA *ch, char *argument, int cmd)
     send_to_char("Got it!\n\rYou receive 30000000000 exps.\n\r", ch);
     return eFAILURE;
   }
-
-  if(IS_MOB(ch))
-    learned = 75;
-  else learned = has_skill(ch, SKILL_POCKET);
-
-  specialization = learned / 100;
-  learned = learned % 100;
 
   if(GET_POS(victim) == POSITION_DEAD) {
      send_to_char("Don't steal from dead PC's\r\n", ch);
@@ -1061,28 +964,11 @@ int do_pocket(CHAR_DATA *ch, char *argument, int cmd)
   }
 */
   WAIT_STATE(ch, 10); /* It takes TIME to steal */
-
-  /* 101% is a complete failure */
-  percent = number(1,101);
-
-  percent += AWAKE(victim) ? 10 : -50;
-  percent += ((GET_LEVEL(victim)-GET_LEVEL(ch))/2); // take level into account
  
-  if(GET_POS(victim) <= POSITION_SLEEPING &&
-     GET_POS(victim) != POSITION_STUNNED)
-    percent = -1; /* ALWAYS SUCCESS */
+  if(has_skill(ch,SKILL_POCKET))
+    skill_increase_check(ch, SKILL_POCKET, has_skill(ch,SKILL_POCKET),SKILL_INCREASE_MEDIUM);
 
-  if(GET_LEVEL(victim) > IMMORTAL) /* NO NO With Imp's and Shopkeepers! */
-    percent = 101; /* Failure */
-
-  if(learned)
-    chance = learned;
-  else chance = 0;
-
-  if(learned)
-    skill_increase_check(ch, SKILL_POCKET, learned, SKILL_INCREASE_MEDIUM);
-
-  if (percent > chance) 
+  if (!skill_success(ch, victim, SKILL_POCKET)) 
   {
     set_cantquit( ch, victim, TRUE );
     send_to_char("Oops..\r\n", ch);
@@ -1090,11 +976,13 @@ int do_pocket(CHAR_DATA *ch, char *argument, int cmd)
 	    if(!number(0, 6)) {
       act("You discover that $n has $s hands in your wallet.", ch,0,victim,TO_VICT, 0);
       act("$n tries to steal gold from $N.", ch, 0, victim, TO_ROOM, NOTVICT|INVIS_NULL);
+    } else {
+      send_to_char("You managed to keep the unaware of your botched attempt.\r\n",ch);
     }
   } else 
   {
+    int percent = has_skill(ch,SKILL_POCKET) / 10 + number(-1,1);
     // Steal some gold coins
-    percent = learned / 10 + number(-1,1);
     gold = (int) ((float)(GET_GOLD(victim))*(float)((float)percent/100.0));
 //    gold = MIN(10000, gold);
     if (gold > 0) {
@@ -1154,7 +1042,6 @@ int do_pocket(CHAR_DATA *ch, char *argument, int cmd)
 
 int do_pick(CHAR_DATA *ch, char *argument, int cmd)
 {
-   int percent, learned, specialization, chance;
    int door, other_room;
    char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH];
    struct room_direction_data *back;
@@ -1163,21 +1050,12 @@ int do_pick(CHAR_DATA *ch, char *argument, int cmd)
 
    argument_interpreter(argument, type, dir);
 
-   percent = number(1, 101); // 101% is a complete failure
-
-   learned = has_skill(ch, SKILL_PICK_LOCK);
-   if(!learned) {
+   if(!has_skill(ch,SKILL_PICK_LOCK)) {
       send_to_char("You don't know how to pick locks!\r\n", ch);
       return eFAILURE;
    }
-   specialization = learned / 100;
-   learned = learned % 100;
 
-   chance = 75;
-
-   // TODO - add lockpics and make things happen with this skill..
-
-   if (percent > chance) {
+   if (!skill_success(ch,NULL,SKILL_PICK_LOCK)) {
       send_to_char("You failed to pick the lock.\n\r", ch);
       WAIT_STATE(ch, PULSE_VIOLENCE);
       return eFAILURE;
@@ -1201,7 +1079,7 @@ int do_pick(CHAR_DATA *ch, char *argument, int cmd)
       send_to_char("It resists your attempts at picking it.\n\r", ch);
   else
   {
-      skill_increase_check(ch, SKILL_PICK_LOCK, learned, SKILL_INCREASE_MEDIUM);
+      skill_increase_check(ch, SKILL_PICK_LOCK, has_skill(ch,SKILL_PICK_LOCK), SKILL_INCREASE_MEDIUM);
 
       REMOVE_BIT(obj->obj_flags.value[1], CONT_LOCKED);
       send_to_char("*Click*\n\r", ch);
@@ -1220,7 +1098,7 @@ int do_pick(CHAR_DATA *ch, char *argument, int cmd)
       send_to_char("You seem to be unable to pick ths lock.\n\r", ch);
   else
   {
-      skill_increase_check(ch, SKILL_PICK_LOCK, learned, SKILL_INCREASE_MEDIUM);
+      skill_increase_check(ch, SKILL_PICK_LOCK, has_skill(ch,SKILL_PICK_LOCK), SKILL_INCREASE_MEDIUM);
 
       REMOVE_BIT(EXIT(ch, door)->exit_info, EX_LOCKED);
       if (EXIT(ch, door)->keyword)
@@ -1244,16 +1122,9 @@ int do_slip(struct char_data *ch, char *argument, int cmd)
 {
    char obj_name[200], vict_name[200], buf[200];
    char arg[MAX_INPUT_LENGTH];
-   int amount, percent;
-   byte learned;
+   int amount;
    struct char_data *vict;
    struct obj_data *obj, *tmp_object, *container;
-
-   percent = GET_LEVEL(ch) >= ARCHANGEL ? 0 : number(1, 101);
-
-   if(IS_MOB(ch))
-      learned = 75;
-   else learned = has_skill(ch, SKILL_SLIP);
 
     if(!IS_MOB(ch) && IS_AFFECTED(ch, AFF_CANTQUIT) && affected_by_spell(ch, FUCK_PTHIEF) ) { 
       send_to_char("Your criminal acts prohibit it.\n\r", ch);
@@ -1299,7 +1170,7 @@ int do_slip(struct char_data *ch, char *argument, int cmd)
          return eFAILURE;
       }    
       // Failure
-      if (percent > 60) {
+      if (!skill_success(ch,vict,SKILL_SLIP)) {
          send_to_char("Whoops!  You dropped them.\n\r", ch);
          if (GET_LEVEL(ch) >= IMMORTAL) { 
             sprintf(buf, "%s slips %d coins to %s and fumbles.", GET_NAME(ch),
@@ -1397,7 +1268,7 @@ int do_slip(struct char_data *ch, char *argument, int cmd)
          send_to_char("It won't fit........cheater.\r\n", ch);
          return eFAILURE;
       }
-      if (percent > learned) { // fail
+      if (!skill_success(ch,NULL,SKILL_SLIP)) { // fail
          act("$n tries to slip $p in $P, but you notice.", ch, obj,
              container, TO_ROOM, 0);
       }
@@ -1446,10 +1317,9 @@ int do_slip(struct char_data *ch, char *argument, int cmd)
      }
    }
 
-   skill_increase_check(ch, SKILL_SLIP, learned, SKILL_INCREASE_EASY);
+   skill_increase_check(ch, SKILL_SLIP, has_skill(ch,SKILL_SLIP), SKILL_INCREASE_EASY);
 
-   // Failure
-   if (percent > learned) {
+   if (!skill_success(ch,vict,SKILL_SLIP)) {
       if(obj_index[obj->item_number].virt == 393) {
          send_to_char("Whoa, you almost dropped your hot potato!\n\r", ch);
          return eFAILURE;
@@ -1492,7 +1362,6 @@ int do_slip(struct char_data *ch, char *argument, int cmd)
 int do_vitalstrike(struct char_data *ch, char *argument, int cmd)
 {
   struct affected_type af;
-  int learned, percent, specialization, chance; 
     
   if(affected_by_spell(ch, SKILL_VITAL_STRIKE) && GET_LEVEL(ch) < IMMORTAL) {
     send_to_char("Your body is still recovering from your last vital strike technique.\r\n", ch);
@@ -1500,8 +1369,8 @@ int do_vitalstrike(struct char_data *ch, char *argument, int cmd)
   }
     
   if(IS_MOB(ch))
-    learned = 75;
-  else if(!(learned = has_skill(ch, SKILL_VITAL_STRIKE))) {
+    ;
+  else if(!has_skill(ch, SKILL_VITAL_STRIKE)) {
     send_to_char("You'd cut yourself to ribbons just trying!\r\n", ch);
     return eFAILURE;
   }
@@ -1511,17 +1380,9 @@ int do_vitalstrike(struct char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  specialization = learned / 100;
-  learned %= 100;
-
-  chance = 70;
-  chance += learned / 10;
-
-  percent = number(1, 101);
-
-  skill_increase_check(ch, SKILL_VITAL_STRIKE, learned, SKILL_INCREASE_EASY);
+  skill_increase_check(ch, SKILL_VITAL_STRIKE, has_skill(ch,SKILL_VITAL_STRIKE), SKILL_INCREASE_EASY);
   
-  if(percent > chance) {
+  if(!skill_success(ch,NULL,SKILL_VITAL_STRIKE)) {
     act("$n starts jabbing $s weapons around $mself and almost chops off $s pinkie finger."
          , ch, 0, 0, TO_ROOM, NOTVICT);
     send_to_char("You try to begin the vital strike technique and slice off your own pinkie finger!\r\n", ch);
@@ -1538,7 +1399,7 @@ int do_vitalstrike(struct char_data *ch, char *argument, int cmd)
   // learned should have max of 80 for mortal thieves
   // this means you can use it once per tick
 
-  int length = 9 - learned / 10;
+  int length = 9 - has_skill(ch,SKILL_VITAL_STRIKE) / 10;
   if(length < 1)
     length = 1;
 
@@ -1554,12 +1415,11 @@ int do_vitalstrike(struct char_data *ch, char *argument, int cmd)
 
 int do_deceit(struct char_data *ch, char *argument, int cmd)
 {
-  int learned, chance, specialization, percent;
   struct affected_type af;
   
   if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
-    learned = 75;
-  else if(!(learned = has_skill(ch, SKILL_DECEIT))) {
+    ;
+  else if(!has_skill(ch, SKILL_DECEIT)) {
     send_to_char("You do not yet understand the workings of your marks.\r\n", ch);
     return eFAILURE;
   }   
@@ -1569,14 +1429,7 @@ int do_deceit(struct char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }   
       
-  specialization = learned / 100;
-  learned = learned % 100;
-      
-  chance = 75;
-      
-  // 101% is a complete failure
-  percent = number(1, 101);
-  if (percent > chance) {
+  if (!skill_success(ch,NULL,SKILL_DECEIT)) {
      send_to_char("Guess your class just isn't up to the task.\r\n", ch);
      act ("$n tried to explain the weaknesses of other but you do not understand.", ch, 0, 0, TO_ROOM, 0);
   }
@@ -1595,7 +1448,7 @@ int do_deceit(struct char_data *ch, char *argument, int cmd)
       act ("$n lures your mind into the thought patterns of the morally corrupt.", ch, 0, tmp_char, TO_VICT, 0);
   
       af.type      = SKILL_DECEIT;
-      af.duration  = 1 + learned / 10;
+      af.duration  = 1 + has_skill(ch,SKILL_DECEIT) / 10;
       af.modifier  = 1;
       af.location  = APPLY_MANA_REGEN;
       af.bitvector = 0;
@@ -1607,7 +1460,7 @@ int do_deceit(struct char_data *ch, char *argument, int cmd)
     }   
   }
     
-  skill_increase_check(ch, SKILL_DECEIT, learned, SKILL_INCREASE_EASY);
+  skill_increase_check(ch, SKILL_DECEIT, has_skill(ch,SKILL_DECEIT), SKILL_INCREASE_EASY);
   WAIT_STATE(ch, PULSE_VIOLENCE * 2);
   GET_MOVE(ch) /= 2;
   return eSUCCESS;
