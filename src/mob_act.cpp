@@ -19,7 +19,7 @@
 /* 12/06/2003   Onager   Modified mobile_activity() to prevent charmie    */
 /*                       scavenging                                       */
 /**************************************************************************/
-/* $Id: mob_act.cpp,v 1.13 2004/04/18 13:59:34 urizen Exp $ */
+/* $Id: mob_act.cpp,v 1.14 2004/04/19 16:48:28 urizen Exp $ */
 
 extern "C"
 {
@@ -326,7 +326,7 @@ void mobile_activity(void)
     if((ch->mobdata->hatred != NULL))    //  && (!ch->fighting)) (we check fighting earlier)
     {
       CHAR_DATA *next_blah;
-    
+       CHAR_DATA *temp = get_char(get_random_hate(ch));    
       done = 0;
     
       for(tmp_ch = world[ch->in_room].people; tmp_ch; tmp_ch = next_blah) 
@@ -362,8 +362,23 @@ void mobile_activity(void)
 
       if(!IS_SET(ch->mobdata->actflags, ACT_STUPID))
       {
-        if(!ch->hunting) 
-          add_memory(ch, get_random_hate(ch), 't');
+        if(!ch->hunting && temp)  {
+	  if (GET_LEVEL(temp) - GET_LEVEL(ch)/2 <= 0)
+          {  
+            add_memory(ch, GET_NAME(temp), 't');
+		struct timer_data *timer;
+		#ifdef LEAK_CHECK
+		  timer = (struct timer_data *)calloc(1, sizeof(struct timer_data));
+		#else
+		  timer = (struct timer_data *)dc_alloc(1, sizeof(struct timer_data));
+		#endif
+		timer->arg1 = (void*)ch->hunting;
+		timer->arg2 = (void*)ch;
+		timer->function =  clear_hunt;
+
+
+	  }
+        }
 
         if(!IS_AFFECTED(ch, AFF_BLIND)) {
           retval = do_track(ch, get_random_hate(ch), 9);
@@ -866,4 +881,22 @@ void scavenge(struct char_data *ch)
       } 
     } /* if keyword != -2 */ 
   } /* for obj */
+}
+
+void clear_hunt(void *arg1, void *arg2, void *arg3)
+{
+  clear_hunt((char*)arg1, (CHAR_DATA*)arg2,NULL);
+}
+
+void clear_hunt(char *arg1, CHAR_DATA *arg2, void *arg3)
+{
+  CHAR_DATA *curr;
+  for (curr = character_list;curr;curr = curr->next)
+  {
+    if (curr == arg2)
+    {
+	dc_free(arg1);
+	arg2->hunting = NULL;
+    }
+  }
 }

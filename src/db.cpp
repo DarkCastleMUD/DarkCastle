@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.40 2004/04/17 14:23:29 urizen Exp $ */
+/* $Id: db.cpp,v 1.41 2004/04/19 16:48:28 urizen Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -2771,6 +2771,7 @@ int create_blank_item(int nr)
     obj->name         = str_hsh("empty obj");
     obj->short_description = str_hsh("An empty obj");
     obj->description  = str_hsh("An empty obj sits here dejectedly.");
+    obj->action_description = str_hsh("Fixed.");
     obj->in_room      = NOWHERE;
     obj->next_content = 0;
     obj->carried_by   = 0;
@@ -2778,7 +2779,7 @@ int create_blank_item(int nr)
     obj->in_obj       = 0;
     obj->contains     = 0;
     obj->item_number  = cur_index;  
-
+    obj->ex_description = 0;
     // shift > items right
     memmove( &obj_index[cur_index+1], &obj_index[cur_index], 
               ( (top_of_objt - cur_index + 1) * sizeof(index_data) )
@@ -2866,11 +2867,12 @@ int create_blank_mobile(int nr)
     mob->name         = str_hsh("insignificant archdemon demon");
     mob->short_desc = str_hsh("a small insignificant arch-demon");
     mob->long_desc = str_hsh("An giant, firespewing arch-demon stands here, lighting cigarettes.");
-    mob->description  = str_hsh("");
+    mob->description  = str_hsh(".");
+    mob->title = str_hsh(".");
     mob->fighting = 0;
     mob->pcdata       = 0;
     mob->desc       = 0;
-
+   
 #ifdef LEAK_CHECK
     mob->mobdata = (mob_data *) calloc(1, sizeof(mob_data));
 #else

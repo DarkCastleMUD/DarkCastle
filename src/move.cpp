@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.18 2003/11/10 19:36:29 staylor Exp $
+| $Id: move.cpp,v 1.19 2004/04/19 16:48:29 urizen Exp $
 | move.C
 | Movement commands and stuff.
 *************************************************************************
@@ -453,8 +453,21 @@ int do_simple_move(CHAR_DATA *ch, int cmd, int following)
           add_memory(ch, GET_NAME(chaser), 'f');
           remove_memory(ch, 'h');
        }
-       if (IS_NPC(chaser))
+       if (IS_NPC(chaser)) {
+         if (GET_LEVEL(ch) - GET_LEVEL(chaser)/2 <= 0)
+          {
           add_memory(chaser, GET_NAME(ch), 't');
+		struct timer_data *timer;
+		#ifdef LEAK_CHECK
+		  timer = (struct timer_data *)calloc(1, sizeof(struct timer_data));
+		#else
+		  timer = (struct timer_data *)dc_alloc(1, sizeof(struct timer_data));
+		#endif
+		timer->arg1 = (void*)chaser->hunting;
+		timer->arg2 = (void*)chaser;
+		timer->function =  clear_hunt;
+ 	  }
+	}
 
        if (chaser->fighting == ch)  
           stop_fighting(chaser);

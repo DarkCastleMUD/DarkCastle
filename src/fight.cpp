@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.144 2004/04/16 16:57:17 urizen Exp $ */
+/* $Id: fight.cpp,v 1.145 2004/04/19 16:48:28 urizen Exp $ */
 
 extern "C"
 {
@@ -496,6 +496,13 @@ void update_stuns(CHAR_DATA *ch)
         act("You regain conciousness...", ch, 0, 0, TO_CHAR, 0);
         GET_POS(ch) = POSITION_SITTING;
       }
+  } 
+  struct affected_type *eh;
+  if ((eh = affected_by_spell(ch, SPELL_PARALYZE)) != NULL)
+  {
+    eh->duration -= 1;
+    if (eh->duration == 0)
+      affect_from_char(ch, SPELL_PARALYZE);
   }
 }
 
@@ -3302,6 +3309,11 @@ void disarm(CHAR_DATA * ch, CHAR_DATA * victim)
   if (victim->equipment[WIELD] == NULL)            return;
   if (ch->equipment[WIELD] == NULL)                return;
   
+  if (affected_by_spell(victim, SPELL_PARALYZE))
+  {
+      send_to_char("Their paralyzed fingers are gripping the weapon too tightly.\r\n",ch);
+      return;
+  }
   act("$B$n disarms you and sends your weapon flying!$R", ch, NULL, victim, TO_VICT, 0);
   act("You disarm $N and send $S weapon flying!", ch, NULL, victim, TO_CHAR, 0);
   act("$n disarms $N and sends $S weapon flying!", ch, NULL, victim, TO_ROOM, NOTVICT);

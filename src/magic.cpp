@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.102 2004/04/18 13:59:33 urizen Exp $ */
+/* $Id: magic.cpp,v 1.103 2004/04/19 16:48:28 urizen Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -1138,16 +1138,11 @@ int spell_paralyze(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data
   if (affected_by_spell(victim, SPELL_PARALYZE))
          return eFAILURE;
 
-/* removed till saving throws are fixed..-pir 
-  send_to_char("Temporily removed...again..sorry...\r\n", ch);
-  return eFAILURE;
-*/
-
-  if(affected_by_spell(victim, SPELL_SLEEP)) {
+/*  if(affected_by_spell(victim, SPELL_SLEEP)) {
      act("$N's mind still has the lingering effects of a past sleep spell active which interferes with the magic required to paralyze the body.",
          ch, NULL, victim, TO_CHAR, 0);
      return eFAILURE;
-  }
+  }*/
 
   /* save the newbies! */
   if(!IS_NPC(ch) && !IS_NPC(victim) && (GET_LEVEL(victim) < 10)) {
@@ -1162,7 +1157,7 @@ int spell_paralyze(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data
 
   set_cantquit( ch, victim );
 
-  int spellret = saves_spell(ch, victim, -10, SAVE_TYPE_MAGIC);
+  int spellret = saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC);
 
 ///  logf(IMP, LOG_BUG, "%s para attempt on %s.  Result: %d",
 ///       GET_NAME(ch), GET_NAME(victim), spellret);
@@ -1185,7 +1180,7 @@ int spell_paralyze(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data
   if(!IS_NPC(ch) && !IS_NPC(victim) && ((level - GET_LEVEL(victim)) > 10)) {
       act("$N seems to be unaffected!", ch, NULL, victim, TO_CHAR, 0);
       victim = ch;
-      if(saves_spell(ch, ch, 0, SAVE_TYPE_MAGIC) >= 0) {
+      if(saves_spell(ch, ch, -100, SAVE_TYPE_MAGIC) >= 0) {
         act("Your magic misfires but you are saved!", ch, NULL, victim, TO_CHAR,0);
         return eFAILURE;
       }
@@ -1208,7 +1203,7 @@ int spell_paralyze(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data
   af.type      = SPELL_PARALYZE;
   af.location  = APPLY_NONE;
   af.modifier  = 0;
-  af.duration  = level/10;
+  af.duration  = 2;
   af.bitvector = AFF_PARALYSIS;
   affect_to_char(victim, &af);
   return eSUCCESS;
@@ -2507,8 +2502,19 @@ int spell_sleep(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
   }
 
   if (affected_by_spell(victim, SPELL_PARALYZE)) {
-     send_to_char("That person is paralyzed and couldn't close their eyes if they tried.\r\n", ch);
-     return eFAILURE;
+	if (number(1,10) < 5)
+	{
+	  switch (number(1,2))
+	  {
+	    case 1:
+        act("$N does not look sleepy!", ch, NULL, victim, TO_CHAR, 0);
+		break;
+	     case 2:
+	      send_to_char("The combined magics fizzle!",ch);
+		break;
+ 	 }
+	 return eFAILURE;
+	}
   }
 
   if (level < GET_LEVEL(victim)){
@@ -2521,12 +2527,12 @@ int spell_sleep(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
 	 return retval;
   }
 
-  if(IS_MOB(victim) || number(1, 4) == 1)
+  if(IS_MOB(victim) || number(1, 3) == 1)
  {
-  if(saves_spell(ch, victim, -10, SAVE_TYPE_MAGIC) < 0)
+  if(saves_spell(ch, victim, -3, SAVE_TYPE_MAGIC) < 0)
   {
 	af.type      = SPELL_SLEEP;
-	af.duration  = 10;
+	af.duration  = (ch->level == 50?3:2);
 	af.modifier  = 1;
 	af.location  = APPLY_NONE;
 	af.bitvector = AFF_SLEEP;

@@ -120,6 +120,7 @@ time_t start_time;
 int port, port2, port3;
 
 // heartbeat globals
+int pulse_timer;
 int pulse_mobile;
 int pulse_bard;
 int pulse_violence;
@@ -904,6 +905,7 @@ void game_loop(unsigned mother_desc, unsigned other_desc, unsigned third_desc)
 void init_heartbeat()
 {
   pulse_mobile    = PULSE_MOBILE;
+  pulse_timer	  = PULSE_TIMER;
   pulse_bard      = PULSE_BARD;   
   pulse_violence  = PULSE_VIOLENCE;
   pulse_weather   = PULSE_WEATHER;
@@ -918,6 +920,11 @@ void heartbeat()
     pulse_mobile = PULSE_MOBILE;
     mobile_activity();
     object_activity();
+  }
+  if (--pulse_timer < 1)
+  {
+     pulse_timer = PULSE_TIMER;
+     check_timer();
   }
 
   // TODO - need to eventually modify this so it works for casters too so I can delay certain

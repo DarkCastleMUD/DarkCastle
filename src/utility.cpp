@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.19 2004/04/14 19:13:04 urizen Exp $ */
+/* $Id: utility.cpp,v 1.20 2004/04/19 16:48:29 urizen Exp $ */
 
 extern "C"
 {
@@ -67,7 +67,7 @@ struct clan_data * get_clan(struct char_data *);
 
 // vars
 char    log_buf[MAX_STRING_LENGTH];
-
+struct timer_data *timer_list = NULL;
 // funcs
 void update_wizlist(CHAR_DATA *ch);
 
@@ -1377,4 +1377,26 @@ void display_string_list(char * list[], char_data *ch)
   if(*buf)
       send_to_char(buf, ch);
   send_to_char("\r\n", ch);
+}
+
+void check_timer()
+{ // Called once/sec
+  struct timer_data *curr,*nex,*las;
+  las = NULL;
+  for (curr = timer_list; curr; curr = curr->next)
+  {
+    nex = curr->next;
+    if (--curr->timeleft <= 0)
+    {
+	(*(curr->function))(curr->arg1,curr->arg2,curr->arg3);	
+        if (las)
+	  las->next = curr->next;
+	else
+	  timer_list = curr->next;
+	dc_free(curr);
+	continue;
+    }
+    las = curr;
+  }
+ 
 }
