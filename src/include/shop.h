@@ -9,7 +9,7 @@
 
 struct player_shop_item {
    int item_vnum;               // id of item for sale
-   int price;                   // asking price of item
+   uint32 price;                   // asking price of item
    player_shop_item * next;     // next item in list
 };
 

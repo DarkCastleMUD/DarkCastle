@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: utility.h,v 1.4 2002/06/29 18:16:22 pirahna Exp $ */
+/* $Id: utility.h,v 1.5 2002/07/13 19:19:35 azrack Exp $ */
 
 #ifndef UTILITY_H_
 #define UTILITY_H_
@@ -36,6 +36,7 @@ extern char log_buf[MAX_STRING_LENGTH];
 
 #ifdef WIN32
 inline int random() { return(rand()); }
+char *index(char *buf, char op);
 #endif
 
 // TODO - FIX THESE

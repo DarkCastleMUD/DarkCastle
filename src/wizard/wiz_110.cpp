@@ -14,12 +14,15 @@
 #include <returnvals.h>
 #include <spells.h>
 
-#ifndef WIN32
+#ifdef WIN32
+char *crypt(const char *key, const char *salt);
+#else
 #include <unistd.h>
 extern "C" {
   char *crypt(const char *key, const char *salt);
 }
 #endif
+
 
 
 // give a command to a god

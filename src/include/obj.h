@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: obj.h,v 1.4 2002/06/29 18:16:22 pirahna Exp $ */
+/* $Id: obj.h,v 1.5 2002/07/13 19:19:35 azrack Exp $ */
 #ifndef OBJ_H_
 #define OBJ_H_
 
@@ -195,7 +195,7 @@ struct obj_flag_data
 struct obj_affected_type
 {
      int32 location;      /* Which ability to change (APPLY_XXX) */
-     int16 modifier;     /* How much it changes by              */
+     int32 modifier;     /* How much it changes by              */
 };
 
 /* ======================== Structure for object ========================= */

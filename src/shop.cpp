@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: shop.cpp,v 1.2 2002/06/13 04:41:08 dcastle Exp $ */
+/* $Id: shop.cpp,v 1.3 2002/07/13 19:19:29 azrack Exp $ */
 
 extern "C"
 {
@@ -197,7 +197,7 @@ void shopping_buy( char *arg, CHAR_DATA *ch,
     char buf[MAX_STRING_LENGTH];
     char argm[MAX_INPUT_LENGTH+1];
     struct obj_data *obj;
-    int cost;
+    uint32 cost;
 
     if ( !is_ok( keeper, ch, shop_nr ) )
         return;
@@ -304,7 +304,7 @@ void shopping_sell( char *arg, CHAR_DATA *ch,
     char buf[MAX_STRING_LENGTH];
     char argm[MAX_INPUT_LENGTH+1];
     struct obj_data *obj;
-    int cost;
+    uint32 cost;
 
     if ( !is_ok( keeper, ch, shop_nr ) )
         return;

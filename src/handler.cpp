@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.3 2002/06/29 18:16:21 pirahna Exp $ */
+/* $Id: handler.cpp,v 1.4 2002/07/13 19:19:29 azrack Exp $ */
     
 extern "C"
 {
@@ -1100,20 +1100,8 @@ int get_number(char **name)
   char *ppos = NULL;
   char number[MAX_INPUT_LENGTH];
 
-#ifdef WIN32
 
-  for(i = 0; i < strlen(*name); i++)
-  {
-	  if((char)*(name + i) == '.')
-	  {
-		  ppos = *name + i; 
-		  break;
-	  }
-  }
-  if(ppos) {
-#else
   if((ppos = index(*name, '.')) != NULL) {
-#endif
     *ppos++ = '\0';
     // at this point, ppos points to the name only, and there is a 
     // \0 between the number and the name as they appear in the string. 

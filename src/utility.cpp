@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.4 2002/06/29 18:16:22 pirahna Exp $ */
+/* $Id: utility.cpp,v 1.5 2002/07/13 19:19:30 azrack Exp $ */
 
 extern "C"
 {
@@ -85,6 +85,23 @@ char *str_dup( const char *str )
     strcpy( str_new, str );
     return str_new;
 }
+
+#ifdef WIN32
+char *index(char *buf, char op)
+{
+    int i = 0;
+    
+    while(buf[i] != 0)
+    {
+        if(buf[i] == op)
+        {
+            return(buf + i);
+        }
+        i++;
+    }
+    return(NULL);
+}
+#endif
 
 // generate a (relatively) random number.
 int number( int from, int to )
