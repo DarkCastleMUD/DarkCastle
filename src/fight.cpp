@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.53 2002/08/25 19:34:00 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.54 2002/08/26 06:56:00 pirahna Exp $ */
 
 extern "C"
 {
@@ -1088,8 +1088,10 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
       dam = (int)(dam * 1.3);
     if (IS_SET(ch->combat, COMBAT_HITALL))
       dam = (int)(dam * 2);
-    if(( ((GET_HIT(ch) / GET_MAX_HIT(ch))*100) < 40 )   // less than 40% hps
-         && (learned = has_skill(ch, SKILL_FRENZY))) {
+    if(( ( ( ((float)GET_HIT(ch)) / ((float)GET_MAX_HIT(ch)) ) *100 ) < 40 )   
+                                                      // less than  40% hps
+         && (learned = has_skill(ch, SKILL_FRENZY))) 
+    {
       if(70 > number(1, 101)) {
         dam = (int)(dam * 1.2);
         SET_BIT(modifier, COMBAT_MOD_FRENZY);
