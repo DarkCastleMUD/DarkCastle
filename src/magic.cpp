@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.144 2004/05/25 16:38:57 urizen Exp $ */
+/* $Id: magic.cpp,v 1.145 2004/05/27 20:25:58 urizen Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -1274,7 +1274,7 @@ int spell_blindness(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
       retval = SWAP_CH_VICT(retval);
       return retval;
   }*/
-   if (number(1,101) < get_saves(victim, SAVE_TYPE_MAGIC))
+   if (number(1,101) < (get_saves(victim, SAVE_TYPE_MAGIC) + 10 + (skill <40 ? 5 : 0) + (skill < 60 ? 5 : 0) + (skill < 80 ? 5 : 0)))
    {
 act("$N resists your attempt to blind $m!", ch, NULL, victim, TO_CHAR,0);
 act("$N resists $n's attempt to blind $m!", ch, NULL, victim, TO_ROOM,NOTVICT);
@@ -1514,32 +1514,21 @@ int spell_curse(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
           return eFAILURE;
 	int duration =0, chance = 10000, save = 0;
         set_cantquit(ch, victim);
-	if (skill < 34) { duration = 1; chance = 7; save = -3;}
-        else if (skill < 61) { duration = 2; chance = 5; save = -5;}
-        else if (skill < 81) { duration = 3; chance = 3; save = -7;}
-	else { duration = 3; chance = 2; save = -9; }
+	if (skill < 34) { duration = 1; save = -3;}
+        else if (skill < 61) { duration = 2; save = -5;}
+        else if (skill < 81) { duration = 3; save = -7;}
+	else { duration = 3; save = -9; }
 
 	if (GET_LEVEL(victim) < 10)
 	{
 	  send_to_char("The spell fizzles!\r\n",ch);
  	  return eSUCCESS;
 	}
-        if (skill < 81) { chance = 2; }
-        else { chance = 3; }
-	if (number(1,5) > chance)
-	{
-	  act("$n dodges the spell!", victim, 0, 0, TO_ROOM, INVIS_NULL);
-	  send_to_char("You dodge the spell!\n\r", victim);
-	  if (IS_NPC(victim)) {
-	    retval = one_hit(victim, ch, TYPE_UNDEFINED, FIRST);
-	    retval = SWAP_CH_VICT(retval);
-	    return retval;
-	  }
-	  return eFAILURE;
-	}
 
-   if (number(1,101) < get_saves(victim, SAVE_TYPE_MAGIC))
-   {
+
+   if (number(1,101) < (get_saves(victim, SAVE_TYPE_MAGIC) + 5 + (skill <
+40 ? 5 : 0) + (skill < 60 ? 5 : 0) + (skill < 80 ? 5 : 0)))
+{
 	act("$N resists your attempt to curse $m!", ch, NULL, victim, TO_CHAR,0);
 	act("$N resists $n's attempt to curse $m!", ch, NULL, victim, TO_ROOM,NOTVICT);
 	act("You resist $n's attempt to curse you!",ch,NULL,victim,TO_VICT,0);
@@ -2125,7 +2114,7 @@ int spell_poison(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *
   if (victim) 
   {
     set_cantquit(ch, victim);
-   if (number(1,101) < get_saves(victim, SAVE_TYPE_POISON))
+   if (number(1,101) < (get_saves(victim, SAVE_TYPE_POISON) + 5 + (skill < 40 ? 5 : 0) + (skill < 60 ? 5 : 0) + (skill < 80 ? 5 : 0)))
    {
 act("$N resists your attempt to poison $m!", ch, NULL, victim, 
 TO_CHAR,0);
@@ -2134,22 +2123,6 @@ NOTVICT);
 act("You resist $n's attempt to posion you!",ch,NULL,victim,TO_VICT,0);
      return eFAILURE;
    }
-
-        int chance;
-        if (skill < 81) { chance = 1; }
-        else { chance = 2; }
-	if (number(1,5) > chance)
-	{
-	  act("$n dodges the spell!", victim, 0, 0, TO_ROOM, INVIS_NULL);
-	  send_to_char("You dodge the spell!\n\r", victim);
-	  if (IS_NPC(victim)) {
-	    retval = one_hit(victim, ch, TYPE_UNDEFINED, FIRST);
-	    retval = SWAP_CH_VICT(retval);
-	    return retval;
-	  } else
-	return eFAILURE;
-	}
-
 
     if(!IS_SET(victim->immune, ISR_POISON))
       if(saves_spell(ch, victim, 0, SAVE_TYPE_POISON) < 0)
@@ -4531,28 +4504,12 @@ int spell_weaken(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *
      else {duration = 3; chance = 2; str = -8;  con = -4;}
    
     set_cantquit (ch, victim);
-   if (number(1,101) < get_saves(victim, SAVE_TYPE_MAGIC))
+   if (number(1,101) < (get_saves(victim, SAVE_TYPE_POISON) + 5 + (skill <40 ? 5 : 0) + (skill < 60 ? 5 : 0) + (skill < 80 ? 5 : 0)))
    {
 	act("$N resists your attempt to weaken $m!", ch, NULL, victim, TO_CHAR,0);
 	act("$N resists $n's attempt to weaken $m!", ch, NULL, victim, TO_ROOM,NOTVICT);
 	act("You resist $n's attempt to weaken you!",ch,NULL,victim,TO_VICT,0);
    } else {
-        int chance;
-        if (skill < 81) { chance = 1; }
-        else { chance = 2; }
-	if (number(1,5) > chance)
-	{
-	  act("$n dodges the spell!", victim, 0, 0, TO_ROOM, INVIS_NULL);
-	  send_to_char("You dodge the spell!\n\r", victim);
-	  if (IS_NPC(victim)) {
-	    retval = one_hit(victim, ch, TYPE_UNDEFINED, FIRST);
-	    retval = SWAP_CH_VICT(retval);
-	    return retval;
-	  } else
-	return eFAILURE;
-	}
-
-    
 	 if (!affected_by_spell(victim, SPELL_WEAKEN))
       {
 	if (!number(0,chance)) 
@@ -9504,28 +9461,12 @@ int spell_debility(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data
 
   set_cantquit( ch, victim );
 
-   if (number(1,101) < get_saves(victim, SAVE_TYPE_POISON))
+   if (number(1,101) < (get_saves(victim, SAVE_TYPE_POISON) + 5 + (skill <40 ? 5 : 0) + (skill < 60 ? 5 : 0) + (skill < 80 ? 5 : 0)))
    {
 act("$N resists your attempt to debilitize $m!", ch, NULL, victim, TO_CHAR,0);
 act("$N resists $n's attempt to debilitize $m!", ch, NULL, victim, TO_ROOM,NOTVICT);
 act("You resist $n's attempt to debilitize you!",ch,NULL,victim,TO_VICT,0);
    } else {
-
-        int chance;
-        if (skill < 81) { chance = 2; }
-        else { chance = 3; }
-	if (number(1,5) > chance)
-	{
-	  act("$n dodges the spell!", victim, 0, 0, TO_ROOM, INVIS_NULL);
-	  send_to_char("You dodge the spell!\n\r", victim);
-	  if (IS_NPC(victim)) {
-	    retval = one_hit(victim, ch, TYPE_UNDEFINED, FIRST);
-	    retval = SWAP_CH_VICT(retval);
-	    return retval;
-	  }
-	  return eFAILURE;
-	}
-
 //  int save = saves_spell(ch, victim, 5, SAVE_TYPE_MAGIC);
     double percent = 0;
     if (skill < 34) { percent = 20; }
@@ -9622,28 +9563,14 @@ int spell_attrition(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
 
   set_cantquit( ch, victim );
 
-   if (number(1,101) < get_saves(victim, SAVE_TYPE_POISON))
-   {
+   if (number(1,101) < (get_saves(victim, SAVE_TYPE_MAGIC) + 5 + (skill <40 ? 5 : 0) + (skill < 60 ? 5 : 0) + (skill < 80 ? 5 : 0)))
+{
 act("$N resists your attempt to attrition $m!", ch, NULL, victim, 
 TO_CHAR,0);
 act("$N resists $n's attempt to attrition $m!", ch, NULL, victim, TO_ROOM,
 NOTVICT);
 act("You resist $n's attempt to attrition you!",ch,NULL,victim,TO_VICT,0);
    } else {
-        int chance;
-        if (skill < 81) { chance = 2; }
-        else { chance = 3; }
-	if (number(1,5) > chance)
-	{
-	  act("$n dodges the spell!", victim, 0, 0, TO_ROOM, INVIS_NULL);
-	  send_to_char("You dodge the spell!\n\r", victim);
-	  if (IS_NPC(victim)) {
-	    retval = one_hit(victim, ch, TYPE_UNDEFINED, FIRST);
-	    retval = SWAP_CH_VICT(retval);
-	    return retval;
-	  }
-	  return eFAILURE;
-	}
 
         int acmod = 0, tohit = 0;
         if (skill < 34) { acmod = 10; tohit = -4; }

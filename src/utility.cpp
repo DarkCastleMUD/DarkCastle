@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.27 2004/05/25 16:38:57 urizen Exp $ */
+/* $Id: utility.cpp,v 1.28 2004/05/27 20:25:58 urizen Exp $ */
 
 extern "C"
 {
@@ -611,11 +611,11 @@ bool CAN_SEE( struct char_data *sub, struct char_data *obj )
    if ( !IS_LIGHT(sub->in_room) && !IS_AFFECTED(sub, AFF_INFRARED) )
       return FALSE;
 
-   if (IS_AFFECTED(sub, AFF_TRUE_SIGHT))
-      return TRUE;
-
    if (IS_AFFECTED(obj, AFF_HIDE))
    {
+	   if (IS_AFFECTED(sub, AFF_TRUE_SIGHT))
+      		return TRUE;
+
       int x;
       if(IS_NPC(obj))
          if(number(1, 101) < 90)
@@ -655,8 +655,8 @@ bool CAN_SEE_OBJ( struct char_data *sub, struct obj_data *obj )
    if (GET_ITEM_TYPE(obj) == ITEM_BEACON && !IS_AFFECTED(sub, AFF_DETECT_MAGIC))
       return FALSE;
 
-   if (IS_AFFECTED(sub, AFF_TRUE_SIGHT) )
-        return TRUE;
+//   if (IS_AFFECTED(sub, AFF_TRUE_SIGHT) )
+  //      return TRUE;
 
    if(IS_OBJ_STAT(obj, ITEM_INVISIBLE) && !IS_AFFECTED(sub, AFF_DETECT_INVISIBLE))
       return FALSE;
@@ -671,8 +671,8 @@ bool CAN_SEE_OBJ( struct char_data *sub, struct obj_data *obj )
 bool check_blind( struct char_data *ch )
 {
 
-   if (IS_AFFECTED(ch, AFF_TRUE_SIGHT))
-      return FALSE;
+//   if (IS_AFFECTED(ch, AFF_TRUE_SIGHT))
+  //    return FALSE;
 
     if ( IS_AFFECTED(ch, AFF_BLIND) && number(0,4)) // 20% chance of seeing
     {

@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.58 2004/05/18 00:17:41 urizen Exp $ */
+/* $Id: nanny.cpp,v 1.59 2004/05/27 20:25:58 urizen Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -202,7 +202,7 @@ int is_clss_eligible(CHAR_DATA *ch, int clss)
          x = 1;
       break;
    case CLASS_DRUID:
-      if(GET_RAW_WIS(ch) >= 15 && GET_RAW_WIS(ch) &&
+      if(GET_RAW_WIS(ch) >= 14 && GET_RAW_WIS(ch) >= 14 &&
           GET_RACE(ch) != RACE_GIANT && GET_RACE(ch) != RACE_ORC)
          x = 1;
       break; 

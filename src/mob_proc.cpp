@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.51 2004/05/21 04:00:47 pirahna Exp $ */
+/* $Id: mob_proc.cpp,v 1.52 2004/05/27 20:25:58 urizen Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -2968,7 +2968,7 @@ static char *dethSayText [ ] =
   "Trojan Condoms?  Wasn't the trojan horse just a trick to get men inside so they could burst out and go everywhere?",
   "Roses are red, violets are blue.  All of my base, are belong to you.",
   "The 'bishop' came to my church Sunday.  What am impostor.  He never once moved diagonally.",
-  "A turtles weakness is being on it's back.  So if you take 2 together they are unstoppable.",
+  "A turtle's weakness is being on its back.  So if you tape 2 together they are unstoppable.",
   "I tried to change my Hotmail password to 'penis' but it said my password was too small.",
   "Real life needs a freaking search function.  I can never find my damn carkeys.",
   "Tetris is so unrealistic.",
@@ -2991,7 +2991,6 @@ static char *dethSayText [ ] =
   "This girl I know said she doesn't give head and I'm like...they still make those?",
   "I'm not on 'AOL'. I'm on America Online.  Retard.",
   "You know something's wrong when you have dreams about eating pudding and you wake up with a spoon in your ass.",
-  "What's the racial slur for pakistanis?  Cab Driver?",
   "Guy1: So you're in MENSA huh?  That's only 2% of the population.  Guy2: Actually it's more like 1 in 50.",
   "Hey Medicinae, do you know any girls whose names don't contain .jpeg, .mpg, or .avi?",
   "Wouldn't it be great if they renamed Scotland - Scatland.",
@@ -3002,7 +3001,8 @@ static char *dethSayText [ ] =
   "Life really is like a box of chocolate.  A cheap meaningless gift that noone ever asks for.",
   "My anus is itchy and I can't scratch it because then my hand would smell like ass.",
   "There's a difference between being grumpy and hating every little bastard in existence.",
-  "Hello Kitty is one cat I'd like to violate."
+  "Hello Kitty is one cat I'd like to violate.",
+  "Damn needy players. They should be happy with 2600 baud and dual wield."
 };
 
 #define DETH_SAY_TEXT_SIZE    ( sizeof ( dethSayText )    / sizeof ( char * ) )

@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.37 2004/05/26 10:03:00 urizen Exp $ */
+/* $Id: limits.cpp,v 1.38 2004/05/27 20:25:58 urizen Exp $ */
 
 extern "C"
 {
@@ -138,7 +138,7 @@ int32 move_limit(CHAR_DATA *ch)
 }
 
 const int mana_regens[] = {
-  0, 8, 7, 1, 1, 4, 3, 1, 1, 4, 1, 7, 0, 0
+  0, 13, 13, 1, 1, 10, 9, 1, 1, 9, 1, 13, 0, 0
 };
 
 /* manapoint gain pr. game hour */
@@ -154,7 +154,7 @@ int mana_gain(CHAR_DATA *ch)
 //    gain = graf(age(ch).year, 2,3,4,6,7,8,9);
 
     gain = (int)(ch->max_mana * (float)mana_regens[GET_CLASS(ch)] / 100);
-    gain /= 3;
+
     switch (GET_POS(ch)) {
       case POSITION_SLEEPING: divisor = 1; break;
       case POSITION_RESTING:  divisor = 2; break;
@@ -164,12 +164,16 @@ int mana_gain(CHAR_DATA *ch)
 
     if(GET_CLASS(ch) == CLASS_MAGIC_USER ||
        GET_CLASS(ch) == CLASS_ANTI_PAL || GET_CLASS(ch) == CLASS_RANGER)
+    {
       modifier = int_app[GET_INT(ch)].mana_regen;
-    else
+      modifier += GET_INT(ch);
+    }
+    else {
       modifier = wis_app[GET_WIS(ch)].mana_regen;
+      modifier = GET_WIS(ch);
+    }
     gain += modifier;
-    gain += age(ch).year / 20;
- }
+  }
 
   gain += ch->mana_regen;
 
@@ -178,12 +182,14 @@ int mana_gain(CHAR_DATA *ch)
 
   if((GET_COND(ch,FULL)==0)||(GET_COND(ch,THIRST)==0))
     gain >>= 2;
+  gain /= 4;
   gain /= divisor; 
+  gain += MIN(age(ch).year,100) / 5;
   return (gain);
 }
 
 const int hit_regens[] = {
- 0, 2, 3, 3, 6, 8, 5, 6, 8, 6, 5, 5, 3, 0, 0
+ 0, 7, 7, 9, 10, 8, 9, 12, 9, 8, 8, 7, 0, 0
 };
 
 /* Hitpoint gain pr. game hour */
@@ -199,7 +205,7 @@ int hit_gain(CHAR_DATA *ch)
   /* PC's */
   else {
     gain = (int)(ch->max_hit * (float)hit_regens[GET_CLASS(ch)] /100);
-    gain /= 3;
+
     /* Position calculations    */
     switch (GET_POS(ch)) {
       case POSITION_SLEEPING: divisor = 1; break;
@@ -209,8 +215,6 @@ int hit_gain(CHAR_DATA *ch)
     }
     if(gain < 1) 
       gain = 1;
-
-    gain += (GET_CON(ch)/2);
 
     if((af = affected_by_spell(ch, SPELL_RAPID_MEND)))
       gain += af->modifier;
@@ -223,7 +227,7 @@ int hit_gain(CHAR_DATA *ch)
       gain = (int)((float)gain * 0.7);*/
 
      gain += con_app[GET_CON(ch)].hp_regen;
-     gain -= age(ch).year / 20;
+      gain += GET_CON(ch);
   }
   gain += ch->hit_regen;
   if (ch->affected_by2 & AFF_REGENERATION)
@@ -234,6 +238,9 @@ int hit_gain(CHAR_DATA *ch)
 
   if((GET_COND(ch, FULL)==0) || (GET_COND(ch, THIRST)==0))
     gain >>= 2;
+  gain /= 4;
+  gain -= MIN(age(ch).year,100) / 10;
+
   gain /= divisor;
   return (gain);
 }
@@ -267,14 +274,15 @@ int move_gain(CHAR_DATA *ch)
 	/* Neat and fast */
     } else {
 //	gain = graf(age(ch).year, 4,5,6,7,4,3,2);
-	gain = (int)(ch->max_move * 0.06);
+	gain = (int)(ch->max_move * 0.12);
 //	gain /= 2;
 	switch (GET_POS(ch)) {
 	    case POSITION_SLEEPING: divisor = 1; break;
 	    case POSITION_RESTING:  divisor = 2; break;
 	    default:                divisor = 3; break;
 	}
- 	gain += (GET_CON(ch) + GET_DEX(ch)) / divisor;
+	gain += GET_DEX(ch);
+	gain += con_app[GET_CON(ch)].move_regen;
 
         if((af = affected_by_spell(ch, SPELL_RAPID_MEND)))
           gain += (int)(af->modifier * 1.5);
@@ -288,6 +296,9 @@ int move_gain(CHAR_DATA *ch)
     if((GET_COND(ch,FULL)==0)||(GET_COND(ch,THIRST)==0))
 	gain >>= 2;
    gain /= divisor;
+  gain -= MIN(age(ch).year,100) / 10;
+ 
+   gain /= 4;
     return (gain);
 }
 

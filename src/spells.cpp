@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.89 2004/05/25 16:38:57 urizen Exp $ */
+/* $Id: spells.cpp,v 1.90 2004/05/27 20:25:58 urizen Exp $ */
 
 extern "C"
 {
@@ -127,7 +127,7 @@ cast_cure_critic },
 cast_cure_light },
 
  { /* 17 */ 12, POSITION_FIGHTING, 33, 
-TAR_CHAR_ROOM|TAR_OBJ_ROOM|TAR_OBJ_INV|TAR_OBJ_EQUIP, cast_curse },
+TAR_FIGHT_VICT|TAR_CHAR_ROOM|TAR_OBJ_ROOM|TAR_OBJ_INV|TAR_OBJ_EQUIP, cast_curse },
 
  { /* 18 */ 12, POSITION_STANDING,  5, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, 
 cast_detect_evil },
@@ -139,7 +139,7 @@ cast_detect_invisibility },
 cast_detect_magic },
 
  { /* 21 */ 12, POSITION_STANDING,  5, 
-TAR_CHAR_ROOM|TAR_OBJ_ROOM|TAR_OBJ_INV|TAR_OBJ_EQUIP, cast_detect_poison 
+TAR_FIGHT_VICT|TAR_CHAR_ROOM|TAR_OBJ_ROOM|TAR_OBJ_INV|TAR_OBJ_EQUIP, cast_detect_poison 
 },
 
  { /* 22 */ 12, POSITION_FIGHTING, 25, 
