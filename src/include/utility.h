@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: utility.h,v 1.6 2002/07/28 02:04:19 pirahna Exp $ */
+/* $Id: utility.h,v 1.7 2002/08/02 05:05:59 pirahna Exp $ */
 
 #ifndef UTILITY_H_
 #define UTILITY_H_
@@ -42,8 +42,10 @@ char *index(char *buf, char op);
 // TODO - FIX THESE
 
 #define MOB_WAIT_STATE(ch)  ((ch)->deaths)
-#define WAIT_STATE(ch, cycle)  (((ch)->desc) ? (ch)->desc->wait += (cycle) : \
-                                  (IS_MOB(ch) ? MOB_WAIT_STATE(ch) = cycle : 0))
+#define WAIT_STATE(ch, cycle)  (((ch)->desc) ? (ch)->desc->wait += (cycle) : 0 )
+
+//#define WAIT_STATE(ch, cycle)  (((ch)->desc) ? (ch)->desc->wait += (cycle) : 
+//                                  (IS_MOB(ch) ? MOB_WAIT_STATE(ch) = cycle : 0))
 
 // END TODO
 
