@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.19 2002/10/01 03:40:06 pirahna Exp $ */
+/* $Id: mob_proc.cpp,v 1.20 2002/10/03 00:24:12 pirahna Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -2930,7 +2930,6 @@ int deth (struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 int fido(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,        
           struct char_data *owner)
 {
-
     struct obj_data *i, *temp, *next_obj;
 
     if (cmd || !AWAKE(ch))
@@ -2939,12 +2938,19 @@ int fido(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     if(IS_AFFECTED(ch, AFF_CHARM))
         return eFAILURE;
 
-    for (i = world[ch->in_room].contents; i; i = i->next_content) {
-	if (GET_ITEM_TYPE(i)==ITEM_CONTAINER && i->obj_flags.value[3]) {
+    for (i = world[ch->in_room].contents; i; i = i->next_content) 
+    {
+	if (GET_ITEM_TYPE(i)==ITEM_CONTAINER && i->obj_flags.value[3]) 
+        {
 	    act("$n savagely devours a corpse.", ch, 0, 0, TO_ROOM, 0);
 	    for(temp = i->contains; temp; temp=next_obj)
 	    {
 		next_obj = temp->next_content;
+                if(IS_SET(temp->obj_flags.more_flags, ITEM_NO_TRADE))
+                {
+                  extract_obj(obj);
+                  continue;
+                }
 		move_obj(temp, ch->in_room);
 	    }
 	    extract_obj(i);
@@ -2962,13 +2968,17 @@ int janitor(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     if (cmd || !AWAKE(ch))
 	return eFAILURE;
 
-    for (i = world[ch->in_room].contents; i; i = i->next_content) {
-	if (IS_SET(i->obj_flags.wear_flags, ITEM_TAKE) && 
-      ((i->obj_flags.type_flag == ITEM_DRINKCON) ||
-	  (i->obj_flags.cost <= 10))) {
-	    act("$n picks up some trash.", ch, 0, 0, TO_ROOM, 0);
-	    move_obj(i, ch);
-	    return eSUCCESS;
+    if(IS_AFFECTED(ch, AFF_CHARM))
+        return eFAILURE;
+
+    for (i = world[ch->in_room].contents; i; i = i->next_content) 
+    {
+        if (IS_SET(i->obj_flags.wear_flags, ITEM_TAKE) &&
+            GET_OBJ_WEIGHT(obj) < 20)
+        {
+            act("$n picks up some trash.", ch, 0, 0, TO_ROOM, 0);
+            move_obj(i, ch);
+            return eSUCCESS;
 	}
     }
     return eFAILURE;

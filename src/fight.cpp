@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.68 2002/09/28 23:54:47 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.69 2002/10/03 00:24:12 pirahna Exp $ */
 
 extern "C"
 {
@@ -663,6 +663,20 @@ int get_monk_bare_damage(char_data * ch) {
     return dam;
 }
 
+int calculate_paladin_damage_bonus(char_data * ch, char_data * victim)
+{
+   if(GET_CLASS(ch) != CLASS_PALADIN)
+      return 0;
+
+   if(GET_ALIGNMENT(victim) > 350)
+      return (-(GET_LEVEL(ch) / 10));
+
+   if(GET_ALIGNMENT(victim) < -350)
+      return (GET_LEVEL(ch) / 10);
+
+   return 0;
+}
+
 // standard "returnvals.h" returns
 int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
 {
@@ -790,6 +804,7 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
   dam += str_app[STRENGTH_APPLY_INDEX(ch)].todam;
   dam += GET_DAMROLL(ch);
   dam += weapon_skill_dam_bonus;
+  dam += calculate_paladin_damage_bonus(ch, vict);
   
   // Bonus for hitting weak opponents
   if(GET_POS(vict) < POSITION_FIGHTING)
