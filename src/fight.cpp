@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.35 2002/08/06 21:27:13 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.36 2002/08/06 21:39:17 pirahna Exp $ */
 
 extern "C"
 {
@@ -3495,6 +3495,8 @@ int do_flee(struct char_data *ch, char *argument, int cmd)
 
           if (IS_SET(retval, eSUCCESS)) 
           {
+            // set them back fighting to link it properly
+            ch->fighting = chTemp;
             // They got away.  Stop fighting for everyone not in the new room from fighting
             for (chTemp = combat_list; chTemp; chTemp = chTemp->next_fighting) 
             {
