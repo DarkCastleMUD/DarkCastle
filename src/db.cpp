@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.52 2004/05/07 23:42:01 urizen Exp $ */
+/* $Id: db.cpp,v 1.53 2004/05/14 23:58:32 urizen Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -441,6 +441,11 @@ void load_skillquests()
      #endif
 
      newsq->num = i;
+     if (find_sq(i)) {
+	char buf[512];
+	sprintf(buf,"%d duplicate.",i);
+	log(buf,0,LOG_BUG);
+     }
      newsq->message = fread_string(fl,0);
      newsq->clas = fread_int(fl,0, INT_MAX);
      newsq->level = fread_int(fl,0,200);
@@ -1961,7 +1966,6 @@ void write_one_zone(FILE * fl, int zon)
     if(zone_table[zon].cmd[i].command == '*') 
       fprintf(fl, "* %s\n", zone_table[zon].cmd[i].comment ?
                              zone_table[zon].cmd[i].comment : "");
-
     else if(zone_table[zon].cmd[i].command == '%')
       fprintf(fl, "%% %2d %3d %3d %s\n", zone_table[zon].cmd[i].if_flag,
                                           zone_table[zon].cmd[i].arg1,
@@ -2105,7 +2109,7 @@ void read_one_zone(FILE * fl, int zon)
       // if any, keep anything left
       reset_tab[reset_top].comment = NULL;
       if(*skipper)
-         reset_tab[reset_top].comment = str_hsh(buf);
+         reset_tab[reset_top].comment = str_hsh(skipper);
       reset_top++;
       continue;
     }
@@ -2147,7 +2151,7 @@ void read_one_zone(FILE * fl, int zon)
     // if any, keep anything left
     reset_tab[reset_top].comment = NULL;
     if(*skipper)
-       reset_tab[reset_top].comment = str_hsh(buf);
+       reset_tab[reset_top].comment = str_hsh(skipper);
   
     reset_top++;
 

@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.98 2004/05/14 22:04:32 urizen Exp $ */
+/* $Id: const.cpp,v 1.99 2004/05/14 23:58:32 urizen Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1047,7 +1047,8 @@ struct class_skill_defines w_skills[] = { // warrior skills
 {    "guard",           SKILL_GUARD,              37,   98,     {STR,WIS} },
 {    "deathstroke",     SKILL_DEATHSTROKE,        39,   98,     {STR,INT} },
 {    "riposte",         SKILL_RIPOSTE,            40,   98,     {INT,DEX} },
-{    "dodge",           SKILL_DODGE,              42,   55,     {DEX,INT} },
+//{    "dodge",           SKILL_DODGE,              42,   55,     
+//{DEX,INT} },
 {    "skewer",          SKILL_SKEWER,             45,   98,     {STR,CON} },
 {    "blade shield",    SKILL_BLADESHIELD,        47,   98,     {CON,DEX} },
 //{  "combat mastery",  SKILL_COMBAT_MASTERY      50,   98,     {0,0} },
