@@ -229,7 +229,7 @@ int do_sqedit(struct char_data *ch, char *argument, int cmd)
 	newOne->num = i;
 	newOne->level = 1;
         newOne->message = str_dup("New skillquest.");
-        newOne->clas = clas;
+        newOne->clas = 1<<(i-1);
         newOne->next = skill_list;
 	skill_list = newOne;
 	send_to_char("Skill quest added.\r\n",ch);
