@@ -16,9 +16,11 @@
 *                       groupies                                             *
 *  12/08/2003  Onager   Changed change_alignment() to a simpler algorithm    *
 *                       with smaller changes in alignment                    *
+*  12/28/2003  Pirahna  Changed do_fireshield() to check ch->immune instead  *
+*                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.133 2003/12/10 00:00:57 staylor Exp $ */
+/* $Id: fight.cpp,v 1.134 2003/12/28 19:56:52 pirahna Exp $ */
 
 extern "C"
 {
@@ -590,7 +592,8 @@ int do_fireshield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
   if(!IS_NPC(ch) && GET_LEVEL(ch) >= IMMORTAL)  return eFAILURE;
   if(!IS_AFFECTED(vict, AFF_FIRESHIELD))        return eFAILURE;
 
-  if (IS_SET(race_info[(int)GET_RACE(ch)].immune, ISR_FIRE))
+  if (IS_SET(race_info[(int)GET_RACE(ch)].immune, ISR_FIRE) ||
+      IS_SET(ch->immune, ISR_FIRE))
     dam = 0;
   else {
     if (IS_AFFECTED(ch, AFF_EAS))
