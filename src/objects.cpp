@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.34 2004/05/15 17:08:28 urizen Exp $
+| $Id: objects.cpp,v 1.35 2004/05/17 18:34:45 urizen Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -168,7 +168,11 @@ void object_activity()
     for(active_obj = &active_head; active_obj; active_obj = next_obj) {
         next_obj = active_obj->next;
         if(active_obj->obj) { 
+	  if (obj_index[active_obj->obj->item_number].non_combat_func)  
             obj_index[active_obj->obj->item_number].non_combat_func(NULL, active_obj->obj, 0, "", NULL);
+	  else if (active_obj->obj->obj_flags.type_flag == ITEM_MEGAPHONE
+		   && active_obj->obj->ex_description)
+ 	    act(active_obj->obj->ex_description->description, 0, active_obj->obj,0, TO_ROOM,0);
         } 
         //else {
         //}

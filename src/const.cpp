@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.104 2004/05/17 07:11:21 urizen Exp $ */
+/* $Id: const.cpp,v 1.105 2004/05/17 18:34:45 urizen Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -561,6 +561,7 @@ char *item_types[] =
     "BEACON",
     "LOCKPICK",
     "CLIMBABLE",
+    "MEGAPHONE",
     "\n"
 };
 

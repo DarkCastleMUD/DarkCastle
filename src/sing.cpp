@@ -205,7 +205,8 @@ struct song_info_type song_info [ ] = {
 },
 { /* 19 */
         8, POSITION_STANDING, 4, SKILL_SONG_FANATICAL_FANFARE,
-       TAR_IGNORE,  NULL, NULL, NULL
+       TAR_IGNORE, song_fanatical_fanfare, execute_song_fanatical_fanfare,pulse_song_fanatical_fanfare,
+       intrp_song_fanatical_fanfare
 
 }
 };
@@ -1571,6 +1572,13 @@ int song_jig_of_alacrity( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victi
    return eSUCCESS;
 }
 
+int song_fanatical_fanfare(byte level, CHAR_DATA *ch, char *Aag, CHAR_DATA *victim, int skill)
+{
+   send_to_char("You begin to sing loudly, and poke everyone in your surroundings with a stick..\r\n",ch);
+   act("$n starts singing loudly, and begins to poke everyone around $m with a stick. Hey!", ch, 0, 0, TO_ROOM, 0);
+   ch->song_timer = song_info[ch->song_number].beats;
+  return eSUCCESS;
+}
 int execute_song_jig_of_alacrity( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    char_data * master = NULL;
@@ -1641,6 +1649,83 @@ int execute_song_jig_of_alacrity( byte level, CHAR_DATA *ch, char *arg, CHAR_DAT
    return eSUCCESS;
 }
 
+int execute_song_fanatical_fanfare(byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+{
+   char_data * master = NULL;
+   follow_type * fvictim = NULL;
+
+   // Note, the jig effects everyone in the group BUT the bard.
+
+   if(GET_KI(ch) < 2) // we don't have the ki to keep the song going
+   {
+     return intrp_jig_of_alacrity(level, ch, arg, victim, -1);
+   }
+
+   if(ch->master && ch->master->in_room == ch->in_room && 
+                    IS_SET(ch->affected_by, AFF_GROUP))
+      master = ch->master;
+   else master = ch;
+
+   for(fvictim = master->followers; fvictim; fvictim = fvictim->next)
+   {
+      if(ch == fvictim->follower)
+         continue;
+
+      if(!IS_SET(fvictim->follower->affected_by, AFF_GROUP))
+         continue;
+
+      if(ch->in_room != fvictim->follower->in_room)
+      {
+         if(IS_SET(fvictim->follower->affected_by2, AFF_INSOMNIA) &&
+            !affected_by_spell(fvictim->follower, SPELL_INSOMNIA))
+         {
+            REMOVE_BIT(fvictim->follower->affected_by2, AFF_INSOMNIA);
+            send_to_char("Your mind returns to its normal state.\n\r", fvictim->follower);
+         }
+         continue;
+      }
+      if(affected_by_spell(fvictim->follower, SPELL_INSOMNIA))
+      {
+         affect_from_char(fvictim->follower, SPELL_INSOMNIA);
+         send_to_char("Your mind returns to its normal state.\n\r", fvictim->follower);
+      }
+      SET_BIT(fvictim->follower->affected_by, AFF_INSOMNIA);
+      send_to_char("Your mind races at a thousand miles an hour, to the beat of the song!\r\n", fvictim->follower);
+   }
+
+  if(ch != master)
+   if(ch->in_room == master->in_room)
+   {
+      SET_BIT(master->affected_by2, AFF_INSOMNIA);
+      send_to_char("Your song causes your mind to race at a thousand miles an hour!\r\n", master);
+   }
+   else
+   {
+      if(IS_SET(master->affected_by2, AFF_INSOMNIA) &&
+         !affected_by_spell(master, SPELL_INSOMNIA))
+      {
+         REMOVE_BIT(master->affected_by2, AFF_INSOMNIA);
+         send_to_char("Your mind returns to its normal state.\n\r", fvictim->follower);
+      }
+   }
+
+   GET_KI(ch) -= (has_skill(ch,SKILL_SONG_FANATICAL_FANFARE) > 60?1:2);
+
+   skill_increase_check(ch, SKILL_SONG_FANATICAL_FANFARE, skill, SKILL_INCREASE_MEDIUM);
+
+   ch->song_timer = song_info[ch->song_number].beats + 
+                             (GET_LEVEL(ch) > 33) +
+                             (GET_LEVEL(ch) > 43);
+   return eSUCCESS;
+}
+
+int pulse_song_fanatical_fanfare(byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+{
+  if (number(1,5) == 2)
+      act("$n combines singing and poking the people with a stick, getting people worked up.", ch, 0, 0, TO_ROOM,0);
+  return eSUCCESS;
+}
+
 int pulse_jig_of_alacrity( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    if(number(1, 5) == 3)
@@ -1674,6 +1759,34 @@ int intrp_jig_of_alacrity( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict
       send_to_char("Your limbs slow back to normal.\r\n", master);
    }
    return eSUCCESS;
+}
+
+int intrp_song_fanatical_fanfare( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+{
+   char_data * master = NULL;
+   follow_type * fvictim = NULL;
+
+   if(ch->master && IS_SET(ch->affected_by, AFF_GROUP))
+      master = ch->master;
+   else master = ch;
+   for(fvictim = master->followers; fvictim; fvictim = fvictim->next)
+   {
+      if(IS_SET(fvictim->follower->affected_by2, AFF_INSOMNIA) &&
+         !affected_by_spell(fvictim->follower, SPELL_INSOMNIA))
+      {
+         REMOVE_BIT(fvictim->follower->affected_by2, AFF_INSOMNIA);
+         send_to_char("Your mind returns to its normal state.\n\r", fvictim->follower);
+      }
+   }
+
+   if(IS_SET(master->affected_by, AFF_HASTE) &&
+      !affected_by_spell(master, SPELL_HASTE))
+   {
+      REMOVE_BIT(master->affected_by, AFF_HASTE);
+      send_to_char("Your limbs slow back to normal.\r\n", master);
+   }
+   return eSUCCESS;
+
 }
 
 int song_glitter_dust( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)

@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: obj.h,v 1.15 2004/05/07 22:55:10 urizen Exp $ */
+/* $Id: obj.h,v 1.16 2004/05/17 18:34:47 urizen Exp $ */
 #ifndef OBJ_H_
 #define OBJ_H_
 
@@ -62,7 +62,8 @@ int recheck_height_wears(char_data *ch);
 #define ITEM_BEACON     28 
 #define ITEM_LOCKPICK   29
 #define ITEM_CLIMBABLE  30
-#define ITEM_TYPE_MAX   30
+#define ITEM_MEGAPHONE  31
+#define ITEM_TYPE_MAX   31
 
 /* Bitvector For 'wear_flags' */
 

@@ -21,7 +21,7 @@
  *  12/08/2003   Onager    Added check for charmies and !charmie eq to     *
  *                         equip_char()                                    *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.46 2004/05/14 22:04:32 urizen Exp $ */
+/* $Id: handler.cpp,v 1.47 2004/05/17 18:34:45 urizen Exp $ */
     
 extern "C"
 {
@@ -91,6 +91,7 @@ bool isaff2(int spellnum)
                 case SPELL_SHADOWSLIP:
                 case SPELL_CAMOUFLAGE:
 		case SPELL_FARSIGHT:
+		case SPELL_INSOMNIA:
                 case SPELL_PROTECT_FROM_GOOD:
 		case SKILL_INNATE_POWERWIELD:
 		case SKILL_INNATE_REGENERATION:

@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.56 2004/05/17 07:11:21 urizen Exp $ */
+/* $Id: db.cpp,v 1.57 2004/05/17 18:34:45 urizen Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -3316,7 +3316,8 @@ struct obj_data *clone_object(int nr)
   obj->next        = object_list;
   object_list        = obj;
   obj_index[nr].number++;
-  if(obj_index[obj->item_number].non_combat_func) {
+  if(obj_index[obj->item_number].non_combat_func ||
+      obj->obj_flags.type_flag == ITEM_MEGAPHONE) {
       active_obj2 = &active_head;
 #ifdef LEAK_CHECK
       active_obj = (struct active_object *)calloc(1, sizeof(struct active_object));

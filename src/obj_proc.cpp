@@ -1088,7 +1088,7 @@ int weenie_weedy(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
    return eSUCCESS;
 }
 
-// this hsould really be a azrack megaphone, but i'm too lazy to figure out how they
+// this should really be a azrack megaphone, but i'm too lazy to figure out how they
 // work right now
 // TODO - figure out how azrack's megaphone's work
 int stupid_message(struct char_data*ch, struct obj_data *obj, int cmd, char*arg, 
