@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.27 2003/04/23 01:00:18 pirahna Exp $
+| $Id: cl_thief.cpp,v 1.28 2003/04/23 02:50:39 pirahna Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -27,6 +27,7 @@ extern CWorld world;
  
 extern struct str_app_type str_app[];
 extern struct index_data *mob_index;
+extern struct index_data *obj_index;
 
 int find_door(CHAR_DATA *ch, char *type, char *dir);
 struct obj_data * search_char_for_item(char_data * ch, sh_int item_number);
@@ -1385,6 +1386,11 @@ int do_slip(struct char_data *ch, char *argument, int cmd)
 
    // Failure
    if (percent > learned) {
+      if(obj_index[obj->item_number].virt == 393) {
+         send_to_char("Whoa, you almost dropped your hot potato!\n\r", ch);
+         return eFAILURE;
+      }
+
       if (GET_LEVEL(ch) >= IMMORTAL  && GET_LEVEL(ch) <= DEITY ) {
          sprintf(buf, "%s slips %s to %s and fumbles it.", GET_NAME(ch),
                  obj->short_description, GET_NAME(vict));
