@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.46 2002/08/19 16:27:11 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.47 2002/08/19 16:42:19 pirahna Exp $ */
 
 extern "C"
 {
@@ -2004,16 +2004,6 @@ void make_corpse(CHAR_DATA * ch)
     (IS_NPC(ch) ? ch->short_desc : GET_NAME(ch)));
   corpse->short_description = str_hsh(buf);
   
-  for(i = 0; i < MAX_WEAR; i++)
-    if(ch->equipment[i])
-      obj_to_char(unequip_char(ch, i), ch);
-    
-  if(GET_GOLD(ch) > 0) {
-    money = create_money(GET_GOLD(ch));
-    GET_GOLD(ch) = 0;
-    obj_to_obj(money, corpse);
-  }
-  
   corpse->obj_flags.type_flag = ITEM_CONTAINER;
   corpse->obj_flags.wear_flags = ITEM_TAKE;
   corpse->obj_flags.value[0] = 0;	/* You can't store stuff in a corpse */
@@ -2029,27 +2019,44 @@ void make_corpse(CHAR_DATA * ch)
     corpse->obj_flags.more_flags = 0;
     corpse->obj_flags.timer = MAX_PC_CORPSE_TIME;
   }
-  
-  for(o = ch->carrying; o; o = next_obj) {
-    next_obj = o->next_content;
+
+  // level 1-9 PC's can keep their eq
+  if(IS_MOB(ch) || GET_LEVEL(ch) > 9)
+  {  
+    for(i = 0; i < MAX_WEAR; i++)
+      if(ch->equipment[i])
+        obj_to_char(unequip_char(ch, i), ch);
     
-    if(IS_SET(o->obj_flags.extra_flags, ITEM_SPECIAL) &&
-      (GET_ITEM_TYPE(o) == ITEM_CONTAINER))
-      for(tmp_o = o->contains; tmp_o; tmp_o = blah) {
-        blah = tmp_o->next_content;
-        if(!IS_SET(tmp_o->obj_flags.extra_flags, ITEM_SPECIAL)) {
-          move_obj(tmp_o, corpse);
-        }
-      } // if and for
+    if(GET_GOLD(ch) > 0) {
+      money = create_money(GET_GOLD(ch));
+      GET_GOLD(ch) = 0;
+      obj_to_obj(money, corpse);
+    }
+  
+    for(o = ch->carrying; o; o = next_obj) 
+    {
+      next_obj = o->next_content;
+    
+      if(IS_SET(o->obj_flags.extra_flags, ITEM_SPECIAL) &&
+        (GET_ITEM_TYPE(o) == ITEM_CONTAINER))
+        for(tmp_o = o->contains; tmp_o; tmp_o = blah) {
+          blah = tmp_o->next_content;
+          if(!IS_SET(tmp_o->obj_flags.extra_flags, ITEM_SPECIAL)) {
+            move_obj(tmp_o, corpse);
+          }
+        } // if and for
       
       if(!IS_SET(o->obj_flags.extra_flags, ITEM_SPECIAL))
         move_obj(o, corpse);
       
-  } // for
-  
+    } // for
+  }
+
   corpse->next = object_list;
   object_list = corpse;
-  
+
+  // TODO - i think this is taken care of in "obj_to_obj"...check it, and if so
+  // remove this line.  (It's updating in_obj pointer for everything in corpse)  
   for(o = corpse->contains; o; o->in_obj = corpse, o = o->next_content)
     ;
   
@@ -2554,7 +2561,11 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
         return;
       }
     } // lose stats
-    GET_EXP(victim) /= 2;
+
+    float penalty = 1;
+    penalty += GET_LEVEL(ch) * .05;
+    penalty = MIN(penalty, 2);
+    GET_EXP(victim) = (int) (GET_EXP(victim) / penalty);
   } // !IS_NPC
 }
 
