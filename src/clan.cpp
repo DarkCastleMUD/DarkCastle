@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.14 2003/01/22 04:01:54 dcastle Exp $ */
+/* $Id: clan.cpp,v 1.15 2003/07/22 04:07:25 pirahna Exp $ */
 extern "C"
 {
   #include <string.h> // strcat
@@ -2041,6 +2041,7 @@ int do_clans(CHAR_DATA *ch, char *arg, int cmd)
   struct clan_data * clan = 0;
 
   if(!strcmp("Pirahna", GET_NAME(ch)) || 
+     !strcmp("Apocalypse", GET_NAME(ch)) ||
      !strcmp("Valkyrie", GET_NAME(ch))
     ) 
   {
