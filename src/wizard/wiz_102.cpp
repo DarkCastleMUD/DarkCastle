@@ -769,10 +769,9 @@ int do_zedit(struct char_data *ch, char *argument, int cmd)
         return eFAILURE;
       }
       
-      if(!(i = atoi(text)) || i > j)
+      if(!(i = atoi(text)) || i > 3)
       {
-        sprintf(buf, "You much choose between 1 and %d.\r\n", j);
-        send_to_char(buf, ch);
+        send_to_char("You much choose between 1 and 3.\r\n", ch);
         return eFAILURE;
       }
  
