@@ -2203,7 +2203,7 @@ int hot_potato(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
            "B   B O   O O   O M   M \n\r"
            "BBBB   OOO   OOO  M   M !! !!\n\r"
            "\n\r$R"
-           "Small piece of $n and mashed potato splatter everywhere!!!\n\r"
+           "Small pieces of $n and mashed potato splatter everywhere!!!\n\r"
            "$n has been KILLED!!"
             , vict, 0, 0, TO_ROOM, 0);
 
