@@ -1761,13 +1761,21 @@ void mprog_act_trigger( char *buf, CHAR_DATA *mob, CHAR_DATA *ch,
 		       OBJ_DATA *obj, void *vo)
 {
 
-  MPROG_ACT_LIST * tmp_act;
-  MPROG_ACT_LIST * curr;
-
+//  MPROG_ACT_LIST * tmp_act;
+  //MPROG_ACT_LIST * curr;
+//  MPROG_DATA *mprg;
+ 
   if(!MOBtrigger)
     return;
 
   if ( IS_NPC( mob )
+      && ( mob_index[mob->mobdata->nr].progtypes & ACT_PROG ) )
+             mprog_wordlist_check( buf, mob, ch,
+                       obj, vo, ACT_PROG );
+
+/* Why oh why was it like this? They can add lag themselves if needed.
+  if 
+( IS_NPC( mob )
       && ( mob_index[mob->mobdata->nr].progtypes & ACT_PROG ) )
     {
 #ifdef LEAK_CHECK
@@ -1793,7 +1801,7 @@ void mprog_act_trigger( char *buf, CHAR_DATA *mob, CHAR_DATA *ch,
       mob->mobdata->mpactnum++;
 
     }
-  return;
+*/  return;
 
 }
 
