@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.9 2002/08/03 01:34:46 pirahna Exp $
+| $Id: cl_thief.cpp,v 1.10 2002/08/06 21:09:23 pirahna Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -611,7 +611,9 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
   if(GET_LEVEL(victim) > IMMORTAL) /* NO NO With Imp's and Shopkeepers! */
     percent = 101; /* Failure */
 
-  chance = 60;
+  if(learned)
+    chance = 60;
+  else chance = 0;
 
   if((obj = get_obj_in_list_vis(ch, obj_name, victim->carrying))) 
   {
@@ -624,7 +626,8 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
     {  // obj found in inventory
       percent += GET_OBJ_WEIGHT(obj); // Make heavy harder
 
-      skill_increase_check(ch, SKILL_STEAL, learned, SKILL_INCREASE_HARD);
+      if(learned)
+        skill_increase_check(ch, SKILL_STEAL, learned, SKILL_INCREASE_HARD);
 
       if (percent > chance) 
       {
@@ -909,7 +912,9 @@ int do_pocket(CHAR_DATA *ch, char *argument, int cmd)
   if(GET_LEVEL(victim) > IMMORTAL) /* NO NO With Imp's and Shopkeepers! */
     percent = 101; /* Failure */
 
-  chance = 75;
+  if(learned)
+    chance = 75;
+  else chance = 0;
 
   if(learned)
     skill_increase_check(ch, SKILL_POCKET, learned, SKILL_INCREASE_MEDIUM);

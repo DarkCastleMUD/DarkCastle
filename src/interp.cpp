@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.cpp,v 1.10 2002/08/05 00:55:53 pirahna Exp $ */
+/* $Id: interp.cpp,v 1.11 2002/08/06 21:09:20 pirahna Exp $ */
 
 extern "C"
 {
@@ -111,6 +111,7 @@ struct command_info cmd_info[] =
     { "idea",       do_idea,        POSITION_DEAD,      0,  9,  0 },
     { "info",       do_info,        POSITION_DEAD,      0,  9,  0 },
     { "news",       do_news,        POSITION_DEAD,      0,  9,  0 },
+    { "thenews",    do_news,        POSITION_DEAD,      0,  9,  0 },
     { "story",      do_story,       POSITION_DEAD,      0,  9,  0 },
     { "tick",       do_tick,        POSITION_DEAD,      0,  9,  0 },
     { "time",       do_time,        POSITION_DEAD,      0,  9,  0 },

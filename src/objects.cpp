@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.13 2002/08/04 23:00:51 pirahna Exp $
+| $Id: objects.cpp,v 1.14 2002/08/06 21:09:20 pirahna Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -1551,7 +1551,7 @@ void wear(struct char_data *ch, struct obj_data *obj_object, int keyword)
 
       if(!ch->equipment[WIELD] && GET_OBJ_WEIGHT(obj_object) > str_app[STRENGTH_APPLY_INDEX(ch)].wield_w)
         send_to_char("It is too heavy for you to use.\n\r",ch);
-      else if(ch->equipment[WIELD] && GET_OBJ_WEIGHT(obj_object) > (str_app[STRENGTH_APPLY_INDEX(ch)].wield_w/2))
+      else if(ch->equipment[WIELD] && GET_OBJ_WEIGHT(obj_object) >= (str_app[STRENGTH_APPLY_INDEX(ch)].wield_w/2))
         send_to_char("It is too heavy for you to use as a secondary weapon.\n\r",ch);
 
       else if((!hands_are_free(ch, 2)) && 

@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: const.cpp,v 1.24 2002/08/05 15:42:50 pirahna Exp $ */
+/* $Id: const.cpp,v 1.25 2002/08/06 21:09:20 pirahna Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -28,7 +28,6 @@ extern "C"
 #include <character.h>
 #include <spells.h>
 #include <levels.h>
-
 
 bestowable_god_commands_type bestowable_god_commands[] =
 {
@@ -53,7 +52,6 @@ bestowable_god_commands_type bestowable_god_commands[] =
 { "range",      COMMAND_RANGE },
 { "mpstat",     COMMAND_MPSTAT },
 { "pshopedit",  COMMAND_PSHOPEDIT },
-{ "sedit",	COMMAND_SEDIT },
 { "\n",		-1 }
 };
 
@@ -192,7 +190,7 @@ char *spell_wear_off_msg[] =
   "!Iron Roots!",
   "!Eyes of the Eagle!",
   "!Haste Other!",
-  "!Ice Shards!",
+  "!Ice Shards!",  
   "The lightning around you fades away leaving only static cling.",
   "!Blue bird!",
   "!UNUSED!"
@@ -443,7 +441,7 @@ char *fullness[] =
 
 int exp_table[ ] =
 {
-0,
+0,   
 1,          L(1 K),     L(3 K),     L(9 K),     L(15 K),   // level 5
 L(30 K),    L(50 K),    L(100 K),   L(200 K),   L(300 K),  // level 10
 L(400 K),   L(550 K),   L(850 K),   L(1.2 M),   L(1.4 M),  // level 15
@@ -453,8 +451,8 @@ L(13.5 M),  L(14.5 M),  L(16.5 M),  L(18 M),    L(21.5 M), // level 30
 L(22 M),    L(24 M),    L(26 M),    L(28 M),    L(31 M),   // level 35
 L(34 M),    L(37 M),    L(40 M),    L(45 M),    L(50 M),   // level 40
 L(60 M),    L(70 M),    L(80 M),    L(90 M),    L(100 M),  // level 45
-L(120 M),   L(140 M),   L(160 M),   L(180 M),   L(200 M),  // level50
-L(125 M),   L(2 M),     L(3 M),     L(4 M),     L(5 M),    // level 55
+L(120 M),   L(140 M),   L(160 M),   L(180 M),   L(200 M),  // level 50
+L(400 M),   L(2 M),     L(3 M),     L(4 M),     L(5 M),    // level 55
 L(6 M),     L(7 M),     L(8 M),     L(9 M),     L(10 M),   // level 60
 L(0x7FFFFFFF)
 };
@@ -718,7 +716,6 @@ char *affected_bits2[] =
     "UTILITY",
     "ALERT",
     "NO_FLEE",
-    "FAMILIAR",
     "\n"
 };
 
@@ -755,6 +752,7 @@ char *affected_bits[] =
     "FLYING",
     "LIGHTNING_SHIELD",
     "HASTE",
+    "FAMILIAR",
     "\n"
 };
 
@@ -906,9 +904,10 @@ char* pc_clss_abbrev[] =
 //    char * skillname;         // name of skill
 //    sh_int skillnum;          // ID # of skill
 //    sh_int levelavailable;    // what level class can get it
-//    byte   maximum;           // maximum value PC can train it to (1-100)
-//    long   trainer;           // what mob trains them (only one currently) 0 = any
+//    byte   maximum;           // maximum value PC can train it to (1-99)
+//    long   trainer;           // what mob trains them (only one currently) 
 //    char *                    // hint to who trains it
+
 
 struct class_skill_defines g_skills[] = {
 {    "scan",		SKILL_SCAN,		1,	90,	10011,	NULL },
@@ -926,11 +925,11 @@ struct class_skill_defines w_skills[] = {
 {    "double",		SKILL_SECOND_ATTACK,	8,	80,	-2, 	"I cannot teach you that. You must journey north to see the son of the Delcim king.  He will train you." },
 {    "headbutt",	SKILL_SHOCK,		10,	75,	-2, 	"A queen of the light holds the knowledge within her tiny skull." },
 {    "dodge",		SKILL_DODGE,		12,	40,	-2, 	"Hop like a bunny, quick like a bee, this location is so funny, you'll go wee wee wee.  Don't forget to bring your scythe however." },
-{    "dual wield",      SKILL_DUAL_WIELD,       15,     90, -2, "Dunna naanna nunna nanna BATMAN!!!" },
+{    "dual wield",      SKILL_DUAL_WIELD,       15,     90,	-2,	"Dunna naanna nunna nanna BATMAN!!!" },
 {    "retreat",		SKILL_RETREAT,		17,	75,	-2, 	"A warrior of diverse colors, including yellow, can teach you this one." },
 {    "frenzy",		SKILL_FRENZY,		18,	50,	-2,	"There is a highlander chief.  The chief of mountain trail guard.  You must locate him to learn this skill." },
 {    "parry",		SKILL_PARRY,		20,	50,	-2, 	"You must see the constable of Newtonia to learn parry." },
-{    "blindfighting",   SKILL_BLINDFIGHTING,    21,     80,     -2, "Only on the astral planes can you find what you seek."},
+{    "blindfighting",   SKILL_BLINDFIGHTING,    21,     80,     -2,	"Only on the astral planes can you find what you seek."},
 {    "triple",		SKILL_THIRD_ATTACK,	23,	75,	-2, 	"Only a palace chef could move his blades so fast." },
 {    "hitall",		SKILL_HITALL,		25,	75,	-2, 	"Ask the son of the Sarina King to please teach you that." },
 {    "archery",		SKILL_ARCHERY,		27,	60,	-2, 	"Seek out the local fletcher." },
@@ -973,21 +972,21 @@ struct class_skill_defines a_skills[] = {
 {    "shield block",    SKILL_SHIELDBLOCK, 5, 50, -2, "To learn this skill you must seek its master, the God of War in his arena.  Ask him to please teach you." },
 {    "dual wield",      SKILL_DUAL_WIELD, 10,	60, -2, "Dunna naanna nunna nanna BATMAN!!!" },
 {    "hide", 		SKILL_HIDE,		15,	60,	-2, "Seek out the Abbot of a hidden monastery off shore road." },
-{    "backstab",	SKILL_BACKSTAB,		17,	80, 1005, 	NULL},
+{    "backstab",	SKILL_BACKSTAB,		17,	80, 10005, 	NULL},
 {    "double",		SKILL_SECOND_ATTACK,	20,	75, -2, 	"Travel to Delcim and seek the prince.  He will teach you that." },
 {    "dodge",   	SKILL_DODGE,		23,	75,	-2, 	"Hop like a bunny, quick like a bee, this location is so funny, you'll go wee wee wee.  Don't forget to bring your scythe however." },
 {    "trip",  		SKILL_TRIP,		25,	75,	-2, 	"The old goblin in the caves knows, but he will not be cooperative.  You might need to use violence." },
 {    "blindfighting",   SKILL_BLINDFIGHTING,    30,   50,-2, "Only on the astral planes can you find what you seek."},
-{    "detect good",	SPELL_DETECT_GOOD,	11,	90,	10005,	NULL },
+{    "detect good",	SPELL_DETECT_GOOD,	11,	90,	-2, "Seek out a Dark Priest in a church full of zombies." },
 {    "detect invisibility",SPELL_DETECT_INVISIBLE,	12,	90,	10005,	NULL },
 {    "curse",		SPELL_CURSE,		13,	90,	10005,	NULL },
 {    "vampiric touch",	SPELL_VAMPIRIC_TOUCH,	15,	90,	10005,	NULL },
 {    "animate dead",	SPELL_ANIMATE_DEAD,	15,	90,	10005,	NULL },
 {    "invisibility",	SPELL_INVISIBLE,	16,	90,	10005,	NULL },
-{    "globe of darkness",SPELL_GLOBE_OF_DARKNESS, 17,	90, 10005,	NULL },
+{    "globe of darkness",SPELL_GLOBE_OF_DARKNESS, 17,	90, -2, "Find the Black King in the game of life." },
 {    "lightning bolt",	SPELL_LIGHTNING_BOLT,	18,	90,	10005,	NULL },
-{    "poison",		SPELL_POISON,		21,	90,	10005,	NULL },
-{    "weaken",		SPELL_WEAKEN,		23,	90,	10005,	NULL },
+{    "poison",		SPELL_POISON,		21,	90,	-2, "Find the spider with a red hourglass in the mushroom caverns." },
+{    "weaken",		SPELL_WEAKEN,		23,	90,	-2,	"What tangled web we weave, when we first deceive." },
 {    "enchant weapon",	SPELL_ENCHANT_WEAPON,	24,	90,10005,	NULL },
 {    "fireball",	SPELL_FIREBALL,		28,	90,	10005,	NULL },
 {    "beacon",		SPELL_BEACON,		33,	90,	10005,	NULL },
@@ -995,7 +994,7 @@ struct class_skill_defines a_skills[] = {
 {    "firestorm",	SPELL_FIRESTORM,	38,	90,	10005,	NULL },
 {    "acid shield",	SPELL_ACID_SHIELD,	40,	90,	10005,	NULL },
 {    "blindness",	SPELL_BLINDNESS,	42,	90,	10005,	NULL },
-{    "stone skin",	SPELL_STONE_SKIN,	46,	90,	10005,	NULL },
+{    "stone skin",	SPELL_STONE_SKIN,	46,	90,	-2, "A woman strong in battle surrounded by heavy magical influences calls to you." },
 {    "acid blast",	SPELL_ACID_BLAST,	48,	90,	10005,	NULL },
 {    "\n",		0,			1,	0,	0, 	NULL}
 };
@@ -1011,22 +1010,22 @@ struct class_skill_defines p_skills[] = {
 {    "double",		SKILL_SECOND_ATTACK,	20,	75,	-2, 	"Seek the Delcim Prince my child.  He shall train you." },
 {    "parry",		SKILL_PARRY,		25,	50,	-2, 	"You have to go see the constable of Newtonia to learn parry." },
 {    "triple",		SKILL_THIRD_ATTACK,	30,	70,	-2, 	"Only a palace chef could move his blades so fast." },
-{    "bless",		SPELL_BLESS,		10,	90,	10006,	NULL },
-{    "cure light",	SPELL_CURE_LIGHT,	10,	90,10006,	NULL },
+{    "bless",		SPELL_BLESS,		10,	90,	-2, "Go see the newt priest in Newtonia."},
+{    "cure light",	SPELL_CURE_LIGHT,	10,	90,	-2, "You need to go see Minare.   He was last seen in the caves north east of town."},
 {    "earthquake",	SPELL_EARTHQUAKE,	11,	90,	-2,	"You need to go see Minare.   He was last seen in the caves north east of town." },
 {    "create food",	SPELL_CREATE_FOOD,	12,	90,	10006,	NULL },
 {    "create water",	SPELL_CREATE_WATER,	13,	90,	10006,	NULL },
 {    "detect evil",	SPELL_DETECT_EVIL,	14,	90,	10006,	NULL },
-{    "cure serious",	SPELL_CURE_SERIOUS,	15,	90,	10006,	NULL },
+{    "cure serious",	SPELL_CURE_SERIOUS,	15,	90,	-2,	"Go see the newt priest in Newtonia."},
 {    "detect invisibility", SPELL_DETECT_INVISIBLE,	16,	90,	10006,	NULL },
 {    "detect poison",	SPELL_DETECT_POISON,	18,	90,	10006,	NULL },
 {    "remove poison",	SPELL_REMOVE_POISON,	19,	90,	10006,	NULL },
-{    "cure critic",	SPELL_CURE_CRITIC,	25,	90,	10006,	NULL },
-{    "sense life",	SPELL_SENSE_LIFE,	26,	90,	10006,	NULL },
+{    "cure critic",	SPELL_CURE_CRITIC,	25,	90,	-2,	"Find Aruncus the Druid in the fields north of town!" },
+{    "sense life",	SPELL_SENSE_LIFE,	26,	90,	-2,	"Find the Black Queen in the game of life." },
 {    "strength",	SPELL_STRENGTH,		27,	90,	10006,	NULL },
 {    "heal",		SPELL_HEAL,		30,	90,	10006,	NULL },
-{    "protection from evil", SPELL_PROTECT_FROM_EVIL,	33,	90,	10006,	NULL },
-{    "harm",		SPELL_HARM,		35,	90,	10006,	NULL },
+{    "protection from evil", SPELL_PROTECT_FROM_EVIL, 33, 90,	-2,	"A short rotund priest with a face you could cut diamonds with can help you."},
+{    "harm",		SPELL_HARM,		35,	90,	-2,	"You want an Abbot of mystical power who stands menancingly." },
 {    "dispel evil",	SPELL_DISPEL_EVIL,	40,	90,	10006,	NULL },
 {    "sanctuary",	SPELL_SANCTUARY,	45,	90,	10006,	NULL },
 {    "power harm",	SPELL_POWER_HARM,	48,	90,	10006,	NULL },
@@ -1061,7 +1060,7 @@ struct class_skill_defines k_skills[] = {
 {    "shield block",    SKILL_SHIELDBLOCK,      7,      60,     -2, 	"To learn this skill you must seek its master, the God of War in his arena.  Ask him to please teach you."},
 {    "rescue",  	SKILL_RESCUE,		10,	70,	-2, 	"The chief of the gnomes is who you want, lad." },
 {    "eagleclaw",	SKILL_EAGLE_CLAW,	17,	75,	-2, 	"A hermit has the knowledge to this skill, but luckily for you this hermit is a nice one."},
-{    "dual wield",      SKILL_DUAL_WIELD,       20,     60, -2, "Dunna naanna nunna nanna BATMAN!!!" },
+{    "dual wield",      SKILL_DUAL_WIELD,       20,     60,	-2,	"Dunna naanna nunna nanna BATMAN!!!" },
 {    "stun",		SKILL_STUN,		30,	60,	-2, 	"You must see a master shaolin monk."},
 {    "quiver",		SKILL_QUIVERING_PALM,	40,	75,	-2, 	"A knight of a most dangerous and twisted place quite large holds the knowledge you seek."},
 {    "purify",		KI_PURIFY+KI_OFFSET,	5,	80,	-2, 	"A tower of water so pure, only he could know."},
@@ -1080,23 +1079,23 @@ struct class_skill_defines r_skills[] = {
 {    "redirect",	SKILL_REDIRECT,		2,	75,	-2, 	"Seek out Joshua, last I heard he was exploring somewhere north of the turning point." },
 {    "tame",		SKILL_TAME,		3,	75,	10013, 	"You have to go see Hawk the ranger guildmaster." },
 {    "dodge",		SKILL_DODGE,		4,	70,	-2, 	"Hop like a bunny, quick like a bee, this location is so funny, you'll go wee wee wee.  Don't forget to bring your scythe however." },
-{    "dual wield",	SKILL_DUAL_WIELD,       5,      80, -2, "Dunna naanna nunna nanna BATMAN!!!" },
+{    "dual wield",	SKILL_DUAL_WIELD,       5,      80,	-2,	"Dunna naanna nunna nanna BATMAN!!!" },
 {    "trip",		SKILL_TRIP,		7,	75,	-2, 	"The old goblin in the caves knows, but he will not be cooperative.  You might need to use violence." },
-{    "shield block",    SKILL_SHIELDBLOCK,      9,      40,     -2, "To learn this skill you must seek its master, the God of War in his arena.  Ask him to please teach you." },
+{    "shield block",    SKILL_SHIELDBLOCK,      9,      40,     -2,	"To learn this skill you must seek its master, the God of War in his arena.  Ask him to please teach you." },
 {    "archery",		SKILL_ARCHERY,		12,	80,	-2, 	"Seek out the local fletcher." },
 {    "ambush",		SKILL_AMBUSH,		13,	75,	-2, 	"Seek out Samuel, one of the oldest rangers, for this skill.  He roams in a forest." },
 {    "double",		SKILL_SECOND_ATTACK,	14,	80,	-2, 	"See the King of Delcim's son." },
 {    "disarm",		SKILL_DISARM,		15,	50,	-2, 	"The duke of Marok is who you need to see."},
 {    "forage",		SKILL_FORAGE,		17,	75,	-2, 	"Seek out the swampy hermit." },
 {    "track",		SKILL_TRACK,		20,	80,	-2, 	"I am not too sure who knows of this one, he is but a shopkeeper now." },
-{    "blindfighting",   SKILL_BLINDFIGHTING,    21,     60,-2, "Only on the astral planes can you find what you seek."},
+{    "blindfighting",   SKILL_BLINDFIGHTING,    21,     60,	-2,	"Only on the astral planes can you find what you seek."},
 {    "rescue",		SKILL_RESCUE,		23,	75,	-2, 	"The chief of the gnomes is who you want, lad." },
 {    "stun",  		SKILL_STUN,		30,	60,	-2, 	"You must see a master shaolin monk." },
 {    "bee sting",	SPELL_BEE_STING,	1,	90,	10013,	NULL },
-{    "eyes of the owl",	SPELL_EYES_OF_THE_OWL,	5,	90,	10013,	NULL },
+{    "eyes of the owl",	SPELL_EYES_OF_THE_OWL,	5,	90,	-2, "Find and kill a weak goblin in the mushroom caverns." },
 {    "bee swarm",	SPELL_BEE_SWARM,	10,	90,	10013,	NULL },
 {    "entangle",	SPELL_ENTANGLE,		15,	90,	10013,	NULL },
-{    "barkskin",	SPELL_BARKSKIN,		25,	90,	10013,	NULL },
+{    "barkskin",	SPELL_BARKSKIN,		25,	90, -2, "Talk to Shargugh, he's the MAN! Baby! Just ask dinas ;)"},
 {    "feline agility",	SPELL_FELINE_AGILITY,	30,	90,	10013,	NULL },
 {    "herb lore",	SPELL_HERB_LORE,	35,	90,	10013,	NULL },
 {    "forest meld",	SPELL_FOREST_MELD,	37,	90,	10013,	NULL },
@@ -1110,7 +1109,9 @@ struct class_skill_defines d_skills[] = { // bard skills
 {      "dodge",			SKILL_DODGE,			5,	85,	-2, 	"Hop like a bunny, quick like a bee, this location is so funny, you'll go wee wee wee.  Don't forget to bring your scythe however." },
 {      "dual wield",    	SKILL_DUAL_WIELD,       	10,     75, -2, "Dunna naanna nunna nanna BATMAN!!!" },
 {      "double",		SKILL_SECOND_ATTACK,		17,	85,	-2, 	"You must travel to the Prince of Delcim to recieve training."},
+{      "listsongs",		SKILL_SONG_LIST_SONGS,		1,	100,	3201, 	NULL},
 {      "whistle sharp",		SKILL_SONG_WHISTLE_SHARP, 	1,	90,	3201, 	NULL},
+{      "stop",			SKILL_SONG_STOP,		7,	90,	3201, 	NULL},
 {      "traveling march",	SKILL_SONG_TRAVELING_MARCH,	7,	90,	3201, 	NULL},
 {      "bountiful sonnet",	SKILL_SONG_BOUNT_SONNET,	9,	90,	3201, 	NULL},
 {      "insane chant",		SKILL_SONG_INSANE_CHANT,	10,	90,	3201, 	NULL},
@@ -1138,29 +1139,29 @@ struct class_skill_defines d_skills[] = { // bard skills
 struct class_skill_defines u_skills[] = { // druid skills
 {    "dodge",		SKILL_DODGE,		7,	5,	-2, 	NULL},
 {    "dual wield",      SKILL_DUAL_WIELD,       11,      40, -2, "Dunna naanna nunna nanna BATMAN!!!" },
-{    "eyes of the owl",	SPELL_EYES_OF_THE_OWL,	1,	90,	3203,	NULL },
-{    "blue bird",	SPELL_BLUE_BIRD,	2,	90,	3203,	NULL },
+{    "eyes of the owl",	SPELL_EYES_OF_THE_OWL,	1,	90,	-2,	"Find and kill a weak goblin in the mushroom caverns." },
+{    "blue bird",       SPELL_BLUE_BIRD,        2,      90,     3203,   NULL },
 {    "cure light",	SPELL_CURE_LIGHT,	3,	90,	3203,	NULL },
-{    "cure serious",	SPELL_CURE_SERIOUS,	6,	90,	3203,	NULL },
-{    "remove poison",	SPELL_REMOVE_POISON,	9,	90,	3203,	NULL },
-{    "cure critic",	SPELL_CURE_CRITIC,	10,	90,	3203,	NULL },
-{    "control weather",	SPELL_CONTROL_WEATHER,	13,	90,	3203,	NULL },
+{    "cure serious",	SPELL_CURE_SERIOUS,	6,	90, -2, "Go see the newt priest in Newtonia."},
+{    "cure critic",	SPELL_CURE_CRITIC,	10,	90,	-2, "Find Aruncus the Druid in the fields north of town!" },
+{    "control weather",	SPELL_CONTROL_WEATHER,	13,	90, -2, "Only a wizard skilled in weather can teach you, Duhh!"},
 {    "sun ray",		SPELL_SUN_RAY,		14,	90,	3203,	NULL },
-{    "sense life",	SPELL_SENSE_LIFE,	15,	90,	3203,	NULL },
+{    "sense life",	SPELL_SENSE_LIFE,	15,	90,	-2, "Find the Black Queen in the game of life." },
 {    "water breathing",	SPELL_WATER_BREATHING,	17,	90,	3203,	NULL },
-{    "stone shield",	SPELL_STONE_SHIELD,	20,	90,	3203,	NULL },
+{    "stone shield",	SPELL_STONE_SHIELD,	20,	90,	-2, "The druid of druids can help you learn this most quintisential skill."},
 {    "drown",		SPELL_DROWN,		22,	90,	3203,	NULL },
-{    "lightning shield",SPELL_LIGHTNING_SHIELD,	23,	90,	3203,	NULL },
-{    "power heal",	SPELL_POWER_HEAL,	26,	90,	3203,	NULL },
+{    "lightning shield",SPELL_LIGHTNING_SHIELD,	23,	90,	-2, "An electric individual who will surely light you up with his mastery of energetic discourse. (phew)"},
+{    "power heal",	SPELL_POWER_HEAL,	26,	90,	-2,	"Only the most pure of beasts with horn atop head can help you.  Look in the mountains." },
 {    "camouflague",	SPELL_CAMOUFLAGUE,	28,	90,	3203,	NULL },
-{    "barkskin",	SPELL_BARKSKIN,		35,	90,	3203,	NULL },
-{    "iron roots",	SPELL_IRON_ROOTS,	36,	90,	3203,	NULL },
-{    "resist energy",	SPELL_RESIST_ENERGY,	39,	90,	3203,	NULL },
-{    "summon",		SPELL_SUMMON,		40,	90,	3203,	NULL },
-{    "greater stone shield",SPELL_GREATER_STONE_SHIELD,	42,	90,	3203,	NULL },
-{    "stone skin",	SPELL_STONE_SKIN,	45,	90,	3203,	NULL },
+{    "barkskin",	SPELL_BARKSKIN,		35,	90,-2, "Talk to Shargugh, he's the MAN! Baby! Just ask dinas ;)"},
+{    "iron roots",	SPELL_IRON_ROOTS,	36,	90,	-2, "A druid of old age and virulance is who you want. He will be in the company of other druids."},
+{    "resist energy",	SPELL_RESIST_ENERGY,	39,	90,	-2, "An electric individual who will surely light you up with his mastery of energetic discourse. (phew)" },
+{    "summon",		SPELL_SUMMON,		40,	90,	-2, "You seek out an individual of much control over the transcendental in a tower of pure energy." },
+{    "greater stone shield",SPELL_GREATER_STONE_SHIELD,	42,	90,-2, "He of an earthy personality who rules with a stone fist is who you want."},
+{    "stone skin",	SPELL_STONE_SKIN,	45,	90,	-2,	"A woman strong in battle surrounded by heavy magical influences calls to you." },
 {    "\n",		0,			1,	0,	0, 	NULL}
 };
+
 // cleric 3021 guildmaster
 struct class_skill_defines c_skills[] = { // cleric skills
 {    "dodge",		SKILL_DODGE,		7,	5,	-2, 	"Hop like a bunny, quick like a bee, this location is so funny, you'll go wee wee wee.  Don't forget to bring your scythe however." },
@@ -1176,42 +1177,42 @@ struct class_skill_defines c_skills[] = { // cleric skills
 {    "refresh",		SPELL_REFRESH,		3,	90,	3021,	NULL },
 {    "cure blind",	SPELL_CURE_BLIND,	4,	90,	3021,	NULL },
 {    "detect evil",	SPELL_DETECT_EVIL,	4,	90,	3021,	NULL },
-{    "detect good",	SPELL_DETECT_GOOD,	4,	90,	3021,	NULL },
-{    "bless",		SPELL_BLESS,		5,	90,	3021,	NULL },
-{    "cause serious",	SPELL_CAUSE_SERIOUS,	5,	90,	3021,	NULL },
-{    "cure serious",	SPELL_CURE_SERIOUS,	5,	90,	3021,	NULL },
+{    "detect good",	SPELL_DETECT_GOOD,	4,	90,	-2, "Seek out a Dark Priest in a church full of zombies." },
+{    "bless",		SPELL_BLESS,		5,	90,	-2, "Go see the newt priest in Newtonia." },
+{    "cause serious",	SPELL_CAUSE_SERIOUS,	5,	90,	-2, "You need to go see Minare.   He was last seen in the caves north east of town."},
+{    "cure serious",	SPELL_CURE_SERIOUS,	5,	90,-2, "Go see the newt priest in Newtonia."},
 {    "detect invisibility", SPELL_DETECT_INVISIBLE,	5,	90,	3021,	NULL },
 {    "know alignment",	SPELL_KNOW_ALIGNMENT,	5,	90,	3021,	NULL },
 {    "blindness",	SPELL_BLINDNESS,	6,	90,	3021,	NULL },
-{    "earthquake",	SPELL_EARTHQUAKE,	7,	90,	-1,	"You need to go see Minare.  He was last seen in the caves north east of town." },
-{    "poison",		SPELL_POISON,		8,	90,	3021,	NULL },
+{    "earthquake",	SPELL_EARTHQUAKE,	7,	90,	-2,	"You need to go see Minare.  He was last seen in the caves north east of town." },
+{    "poison",		SPELL_POISON,		8,	90,	-2, "Find the spider with a red hourglass in the mushroom caverns." },
 {    "cause critical",	SPELL_CAUSE_CRITICAL,	9,	90,	3021,	NULL },
 {    "cure critical",	SPELL_CURE_CRITIC,	9,	90,	3021,	NULL },
 {    "remove poison",	SPELL_REMOVE_POISON,	9,	90,	3021,	NULL },
 {    "dispel evil",	SPELL_DISPEL_EVIL,	10,	90,	3021,	NULL },
 {    "dispel good",	SPELL_DISPEL_GOOD,	10,	90,	3021,	NULL },
-{    "locate object",	SPELL_LOCATE_OBJECT,	10,	90,	3021,	NULL },
-{    "sense life",	SPELL_SENSE_LIFE,	10,	90,	3021,	NULL },
+{    "locate object",	SPELL_LOCATE_OBJECT,	10,	90,	-2, "A sanitation engineer works behind what people see, always knowing where everything is." },
+{    "sense life",	SPELL_SENSE_LIFE,	10,	90,-2, "Find the Black Queen in the game of life." },
 {    "word of recall",	SPELL_WORD_OF_RECALL,	11,	90,	3021,	NULL },
 {    "call lightning",	SPELL_CALL_LIGHTNING,	12,	90,	3021,	NULL },
-{    "harm",		SPELL_HARM,		12,	90,	3021,	NULL },
+{    "harm",		SPELL_HARM,		12,	90,	-2, "You want an Abbot of mystical power who stands menancingly." },
 {    "remove curse",	SPELL_REMOVE_CURSE,	12,	90,	3021,	NULL },
 {    "remove paralysis",SPELL_REMOVE_PARALYSIS,	12,	90,	3021,	NULL },
-{    "control weather",	SPELL_CONTROL_WEATHER,	13,	90,	3021,	NULL },
+{    "control weather",	SPELL_CONTROL_WEATHER,	13,	90, -2, "Only a wizard skilled in weather can teach you, Duhh!"},
 {    "flamestrike",	SPELL_FLAMESTRIKE,	13,	90,	3021,	NULL },
 {    "heal",		SPELL_HEAL,		14,	90,	3021,	NULL },
-{    "sanctuary",	SPELL_SANCTUARY,	18,	90,	3021,	NULL },
+{    "sanctuary",	SPELL_SANCTUARY,	18,	90,	-2, "A charmed woman taken with a man who stole her shoe."},
 {    "portal",		SPELL_PORTAL,		20,	90,	3021,	NULL },
-{    "full heal",	SPELL_FULL_HEAL,	25,	90,	3021,	NULL },
-{    "protection from evil", SPELL_PROTECT_FROM_EVIL,	26,	90,	3021,	NULL },
-{    "dispel magic",	SPELL_DISPEL_MAGIC,	28,	90,	3021,	NULL },
+{    "full heal",	SPELL_FULL_HEAL,	25,	90,	-2, "Seek out a druid who is charmed by all. His healing skills are second only to a Physician in Sorpigal." },
+{    "protection from evil", SPELL_PROTECT_FROM_EVIL,	26,	90,	-2, "A short rotund priest with a face you could cut diamonds with can help you." },
+{    "dispel magic",	SPELL_DISPEL_MAGIC,	28,	90,	-2, "Find a mage at the junction of three dreams."},
 {    "dispel minor",	SPELL_DISPEL_MINOR,	28,	90,	3021,	NULL },
 {    "power harm",	SPELL_POWER_HARM,	30,	90,	3021,	NULL },
-{    "heroes feast",	SPELL_HEROES_FEAST,	33,	90,	3021,	NULL },
+{    "heroes feast",	SPELL_HEROES_FEAST,	33,	90,	-2, "She has a story like no other, and the lives of her kinsmen are on display for you." },
 {    "animate dead",	SPELL_ANIMATE_DEAD,	35,	90,	3021,	NULL },
-{    "true sight",	SPELL_TRUE_SIGHT,	35,	90,	3021,	NULL },
+{    "true sight",	SPELL_TRUE_SIGHT,	35,	90,	-2, "As his name suggests, this is a bright and wise person." },
 {    "group recall",	SPELL_GROUP_RECALL,	38,	90,	3021,	NULL },
-{    "group fly",	SPELL_GROUP_FLY,	39,	90,	3021,	NULL },
+{    "group fly",	SPELL_GROUP_FLY,	39,	90,	-2, "It’s a bird! It’s an air traffic controller! No, but whatever it is, its elementary :)." },
 {    "resist cold",	SPELL_RESIST_COLD,	39,	90,	3021,	NULL },
 {    "heal spray",	SPELL_HEAL_SPRAY,	40,	90,	3021,	NULL },
 {    "resist fire",	SPELL_RESIST_FIRE,	41,	90,	3021,	NULL },
@@ -1222,8 +1223,8 @@ struct class_skill_defines c_skills[] = { // cleric skills
 
 // mage 3020 guildmaster
 struct class_skill_defines m_skills[] = { // mage skills 
-{    "dodge",		SKILL_DODGE,		7,	5,	-2, 	"Hop like a bunny, quick like a bee, this location is so funny, you'll go wee wee wee.  Don't forget to bring your scythe however." },
-{    "dual wield",      SKILL_DUAL_WIELD,       10,     15, -2, "Dunna naanna nunna nanna BATMAN!!!" },
+{    "dodge",		SKILL_DODGE,		7,	5,	-2, 	"Hop like a bunny, quick like a bee, this location is so funny, you'll go wee wee wee.  Don't forget to bring our scythe however." },
+{    "dual wield",      SKILL_DUAL_WIELD,       10,      25, -2, "Dunna naanna nunna nanna BATMAN!!!" },
 {    "focused repelance",SKILL_FOCUSED_REPELANCE, 25,	80,	3020,	NULL },
 {    "magic missile",	SPELL_MAGIC_MISSILE,	1,	90,	3020,	NULL },
 {    "ventriloquate",	SPELL_VENTRILOQUATE,	1,	90,	3020,	NULL },
@@ -1237,34 +1238,33 @@ struct class_skill_defines m_skills[] = { // mage skills
 {    "refresh",		SPELL_REFRESH,		5,	90,	3020,	NULL },
 {    "fear",		SPELL_FEAR,		6,	90,	3020,	NULL },
 {    "infravision",	SPELL_INFRAVISION,	6,	90,	3020,	NULL },
-{    "locate object",	SPELL_LOCATE_OBJECT,	6,	90,	3020,	NULL },
+{    "locate object",	SPELL_LOCATE_OBJECT,	6,	90,	-2, "A sanitation engineer works behind what people see, always knowing where everything is." },
 {    "fly",		SPELL_FLY,		7,	90,	3020,	NULL },
 {    "strength",	SPELL_STRENGTH,		7,	90,	3020,	NULL },
-{    "weaken",		SPELL_WEAKEN,		7,	90,	3020,	NULL },
+{    "weaken",		SPELL_WEAKEN,		7,	90,	-2, "A druid of old age and virulance is who you want. He will be in the company of other druids." },
 {    "blindness",	SPELL_BLINDNESS,	8,	90,	3020,	NULL },
-{    "identify",	SPELL_IDENTIFY,		9,	90,	3020,	NULL },
 {    "enchant weapon",	SPELL_ENCHANT_WEAPON,	10,	90,	3020,	NULL },
 {    "lightning bolt",	SPELL_LIGHTNING_BOLT,	10,	90,	3020,	NULL },
-{    "haste",		SPELL_HASTE,		11,	90,	3020,	NULL },
 {    "curse",		SPELL_CURSE,		12,	90,	3020,	NULL },
 {    "energy drain",	SPELL_ENERGY_DRAIN,	13,	90,	3020,	NULL },
 {    "shield",		SPELL_SHIELD,		13,	90,	3020,	NULL },
 {    "charm person",	SPELL_CHARM_PERSON,	14,	90,	3020,	NULL },
+{    "haste",		SPELL_HASTE,		14,	90,	3020,	NULL },
 {    "sleep",		SPELL_SLEEP,		14,	90,	3020,	NULL },
-{    "summon familiar", SPELL_SUMMON_FAMILIAR,	16,	90,	3020,	NULL },
 {    "fireball",	SPELL_FIREBALL,		20,	90,	3020,	NULL },
 {    "teleport",	SPELL_TELEPORT,		21,	90,	3020,	NULL },
-{    "dispel magic",	SPELL_DISPEL_MAGIC,	22,	90,	3020,	NULL },
+{    "dispel magic",	SPELL_DISPEL_MAGIC,	22,	90,	-2, "Find a mage at the junction of three dreams." },
 {    "dispel minor",	SPELL_DISPEL_MINOR,	22,	90,	3020,	NULL },
 {    "mass invisibility", SPELL_MASS_INVISIBILITY,	24,	90,	3020,	NULL },
 {    "wizard eye",	SPELL_WIZARD_EYE,	26,	90,	3020,	NULL },
+{    "haste other",	SPELL_HASTE_OTHER,	28,	90,	3020,	NULL },
 {    "meteor swarm",	SPELL_METEOR_SWARM,	30,	90,	3020,	NULL },
-{    "stone skin",	SPELL_STONE_SKIN,	32,	90,	3020,	NULL },
-{    "group fly",	SPELL_GROUP_FLY,	34,	90,	3020,	NULL },
-{    "life leech",	SPELL_LIFE_LEECH,	34,	90,	3020,	NULL },
+{    "stone skin",	SPELL_STONE_SKIN,	32,	90,	-2, "A woman strong in battle surrounded by heavy magical influences calls to you." },
+{    "group fly",	SPELL_GROUP_FLY,	34,	90, -2,	"It’s a bird! It’s an air traffic controller! No, but whatever it is, its elementary :)." },
+{    "life leech",	SPELL_LIFE_LEECH,	34,	90,	-2, "A statue with a cold heart could help you.  She is quite an artefact."},
 {    "portal",		SPELL_PORTAL,		35,	90,	3020,	NULL },
 {    "resist cold",	SPELL_RESIST_COLD,	36,	90,	3020,	NULL },
-{    "true sight",	SPELL_TRUE_SIGHT,	37,	90,	3020,	NULL },
+{    "true sight",	SPELL_TRUE_SIGHT,	37,	90,	-2, "As his name suggests, this is a bright and wise person." },
 {    "resist fire",	SPELL_RESIST_FIRE,	39,	90,	3020,	NULL },
 {    "firestorm",	SPELL_FIRESTORM,	40,	90,	3020,	NULL },
 {    "hellstream",	SPELL_HELLSTREAM,	40,	90,	3020,	NULL },
@@ -1897,7 +1897,4 @@ int mana_bonus[31] =
      150,
      160        /* 30 */
 };
-
-
-
 

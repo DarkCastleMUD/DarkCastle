@@ -918,8 +918,8 @@ int do_mpteachskill( CHAR_DATA *ch, char *argument, int cmd )
 
     char * skillname = get_skill_name(skillnum);
 
-    if(has_skill(ch, skillnum)) {
-       csendf(ch, "You already know the basics of %s!\r\n", skillname ? skillname : "Unknown");
+    if(has_skill(victim, skillnum)) {
+       csendf(victim, "You already know the basics of %s!\r\n", skillname ? skillname : "Unknown");
        return eFAILURE;
     }
 
@@ -929,9 +929,9 @@ int do_mpteachskill( CHAR_DATA *ch, char *argument, int cmd )
       return eFAILURE;  // no skills to train
     }
 
-    int index = search_skills(arg, skilllist);
-    if(GET_LEVEL(ch) < skilllist[index].levelavailable) {
-       csendf(ch, "You try to learn the basics of %s, but it is too advanced for you right now.\r\n", skillname);
+    int index = search_skills(skillname, skilllist);
+    if(GET_LEVEL(victim) < skilllist[index].levelavailable) {
+       csendf(victim, "You try to learn the basics of %s, but it is too advanced for you right now.\r\n", skillname);
        return eFAILURE;
     }
 
