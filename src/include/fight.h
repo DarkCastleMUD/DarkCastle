@@ -2,7 +2,7 @@
 #define FIGHT_H_
 
 /************************************************************************
-| $Id: fight.h,v 1.1 2002/06/13 04:32:22 dcastle Exp $
+| $Id: fight.h,v 1.2 2002/06/13 04:41:15 dcastle Exp $
 | fight.h
 | This file defines the header information for fight.
 */

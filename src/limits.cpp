@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.1 2002/06/13 04:32:18 dcastle Exp $ */
+/* $Id: limits.cpp,v 1.2 2002/06/13 04:41:08 dcastle Exp $ */
 
 extern "C"
 {
@@ -81,7 +81,7 @@ int graf(int age, int p0, int p1, int p2, int p3, int p4, int p5, int p6)
 
 /* The three MAX functions define a characters Effective maximum */
 /* Which is NOT the same as the ch->max_xxxx !!!          */
-long mana_limit(CHAR_DATA *ch)
+int mana_limit(CHAR_DATA *ch)
 {
     int max;
 
@@ -93,7 +93,7 @@ long mana_limit(CHAR_DATA *ch)
     return(max);
 }
 
-long ki_limit(CHAR_DATA *ch)
+int ki_limit(CHAR_DATA *ch)
 {
 	if(!IS_NPC(ch))
 	    return(ch->max_ki);
@@ -101,7 +101,7 @@ long ki_limit(CHAR_DATA *ch)
 	    return(0);
 }
 
-long hit_limit(CHAR_DATA *ch)
+int hit_limit(CHAR_DATA *ch)
 {
     int max;
 
@@ -120,7 +120,7 @@ long hit_limit(CHAR_DATA *ch)
 }
 
 
-long move_limit(CHAR_DATA *ch)
+int move_limit(CHAR_DATA *ch)
 {
     int max;
 
@@ -470,7 +470,7 @@ void advance_level(CHAR_DATA *ch, int is_conversion)
       ch->pcdata->practices	+= add_practices;
 
     sprintf( buf,
-	"Your gain is: %d/%ld hp, %d/%ld m, %d/%ld mv, %d/%ld prac, %d/%ld ki.\n\r",
+	"Your gain is: %d/%d hp, %d/%d m, %d/%d mv, %d/%ld prac, %d/%d ki.\n\r",
 	add_hp,        GET_MAX_HIT(ch),
 	add_mana,      GET_MAX_MANA(ch),
 	add_moves,     GET_MAX_MOVE(ch),
@@ -722,5 +722,5 @@ void update_corpses_and_portals(void)
     }
   }
   /* Now process the portals */
-  process_portals();
+ // process_portals();
 }

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: group.cpp,v 1.1 2002/06/13 04:32:18 dcastle Exp $
+| $Id: group.cpp,v 1.2 2002/06/13 04:41:07 dcastle Exp $
 | group.C
 | Description:  Group related commands; join, abandon, follow, etc..
 */

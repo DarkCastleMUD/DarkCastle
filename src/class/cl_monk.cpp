@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_monk.cpp,v 1.1 2002/06/13 04:32:20 dcastle Exp $
+| $Id: cl_monk.cpp,v 1.2 2002/06/13 04:41:13 dcastle Exp $
 | cl_monk.C
 | Description:  Monk skills.
 */

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: offense.cpp,v 1.1 2002/06/13 04:32:19 dcastle Exp $
+| $Id: offense.cpp,v 1.2 2002/06/13 04:41:08 dcastle Exp $
 | offense.C
 | Description:  Commands that are generically offensive - that is, the
 |   victim should retaliate.  The class-specific offensive commands are

@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.1 2002/06/13 04:32:18 dcastle Exp $ */
+/* $Id: db.cpp,v 1.2 2002/06/13 04:41:07 dcastle Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -27,11 +27,6 @@ extern "C"
 #include <ctype.h>
 #include <time.h>
 #include <stdlib.h>
-#ifndef LINUX
-#ifndef NeXT
-#include <malloc.h>
-#endif
-#endif
 }
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
@@ -160,25 +155,13 @@ void remove_memory(CHAR_DATA *ch, char type, CHAR_DATA *vict);
 world_file_list_item * new_mob_file_item(char * temp, long room_nr);
 world_file_list_item * new_obj_file_item(char * temp, long room_nr);
 
-#ifndef NeXT 
-#ifndef SGI
-#ifndef	LINUX
-#ifndef SUN
-#ifndef FreeBSD
-char *memset(char *s, int c, int n);
-#endif
-#endif
-#endif
-#endif
-#endif
-
 char * read_next_worldfile_name(FILE * flWorldIndex);
 int fread_int(FILE *fl, long minval, long maxval);
 int fread_bitvector(FILE *fl, long minval, long maxval);
 void fread_new_newline (FILE *fl) {}
 char fread_char (FILE *fl);
 int is_abbrev(char *arg1, char *arg2);
-int string_to_file(FILE *f, char *string);
+void string_to_file(FILE *f, char *string);
 int fwrite_string (char *buf, FILE *fl);
 int fgetc(FILE *stream);
 struct index_data *generate_mob_indices(int *top, struct index_data *index);
@@ -2138,7 +2121,7 @@ CHAR_DATA *read_mobile(int nr, FILE *fl)
         /*  Mobs with races... tell we setup stats.. we leave them at 11.. */
 
         tmp = fread_int (fl, 0, 32);
-        GET_RACE(mob) = tmp;
+        GET_RACE(mob) = (char)tmp;
 
         mob->raw_str   = mob->str   = 11;
         mob->raw_intel = mob->intel = 11; 
@@ -2155,7 +2138,7 @@ CHAR_DATA *read_mobile(int nr, FILE *fl)
         tmp2 = fread_int (fl, 0, 64000);
         tmp3 = fread_int (fl, 0, 64000);
 
-        mob->raw_hit = dice (tmp, tmp2) + tmp3;
+        mob->raw_hit = (short)(dice (tmp, tmp2) + tmp3);
         mob->max_hit = mob->raw_hit;
         mob->hit     = mob->max_hit;
 
@@ -2184,7 +2167,7 @@ CHAR_DATA *read_mobile(int nr, FILE *fl)
         if(tmp > 2)
            tmp -= 3;
 
-        mob->sex = tmp;
+        mob->sex = (char)tmp;
      
         mob->immune  = fread_bitvector (fl, 0, LONG_MAX);
         mob->suscept = fread_bitvector (fl, 0, LONG_MAX);
@@ -2276,7 +2259,7 @@ void write_mobile(char_data * mob, FILE *fl)
     string_to_file( fl, mob->description );
 
     fprintf(fl, "%ld %ld %d R %d\n"
-            "%d %d %d %ldd%d+%d %dd%d+%d\n"
+            "%d %d %d %dd%d+%d %dd%d+%d\n"
             "%ld %ld\n"
             "%d %d %d %ld %ld %ld\n",
                          mob->mobdata->actflags,
@@ -2658,6 +2641,7 @@ int create_blank_item(int nr)
 //
 void delete_item_from_index(int nr)
 {
+	int i = 0, j = 0;
     struct obj_data * curr;
 
     if(nr < 0 || nr > top_of_objt) // doesn't exist!
@@ -2677,7 +2661,7 @@ void delete_item_from_index(int nr)
          curr->item_number--;
 
     // update index of all the obj prototypes
-    for(int i = nr; i <= top_of_objt; i++)
+    for(i = nr; i <= top_of_objt; i++)
        ((obj_data *)obj_index[i].item)->item_number--;
 
     // update obj file indices - these store rnums
@@ -2698,9 +2682,9 @@ void delete_item_from_index(int nr)
     }
 
     // update zonefile commands - these store rnums
-    for(int i = 0; i <= top_of_zonet; i++)
+    for(i = 0; i <= top_of_zonet; i++)
     {
-       for(int j = 0; zone_table[i].cmd[j].command != 'S'; j++)
+       for(j = 0; zone_table[i].cmd[j].command != 'S'; j++)
        {
           switch( zone_table[i].cmd[j].command )
           {

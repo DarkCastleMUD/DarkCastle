@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: utility.h,v 1.1 2002/06/13 04:32:22 dcastle Exp $ */
+/* $Id: utility.h,v 1.2 2002/06/13 04:41:15 dcastle Exp $ */
 
 #ifndef UTILITY_H_
 #define UTILITY_H_
@@ -33,6 +33,10 @@ extern char log_buf[MAX_STRING_LENGTH];
 
 #define TRUE  1
 #define FALSE 0
+
+#ifdef WIN32
+inline int random() { return(rand()); }
+#endif
 
 // TODO - FIX THESE
 
@@ -101,8 +105,8 @@ bool IS_DARK( int room );
     (((ch)->sex == 1) ? "he" : "she") : "it")
 #define HMHR(ch) ((ch)->sex ?                    \
     (((ch)->sex == 1) ? "him" : "her") : "it")   
-#define ANA(obj) (index("aeiouyAEIOUY", *(obj)->name) ? "An" : "A")
-#define SANA(obj) (index("aeiouyAEIOUY", *(obj)->name) ? "an" : "a")
+//#define ANA(obj) (index("aeiouyAEIOUY", *(obj)->name) ? "An" : "A")
+//#define SANA(obj) (index("aeiouyAEIOUY", *(obj)->name) ? "an" : "a")
 
 #define IS_NPC(ch)  (IS_SET((ch)->misc, MISC_IS_MOB))
 #define IS_MOB(ch)  (IS_NPC(ch))
@@ -189,7 +193,7 @@ bool IS_DARK( int room );
 
 inline const short IS_ANONYMOUS(CHAR_DATA *ch)
 {
-  return((GET_LEVEL(ch) >= 101) ? 0 : IS_SET(ch->pcdata->toggles, PLR_ANONYMOUS));
+  return((GET_LEVEL(ch) >= 101) ? 0 : IS_SET(ch->pcdata->toggles, PLR_ANONYMOUS) != 0);
 }
 
 /* Object And Carry related macros */
@@ -273,11 +277,11 @@ void	set_fighting	(CHAR_DATA *ch, CHAR_DATA *vict);
 void	stop_fighting	(CHAR_DATA *ch);
 int	do_simple_move	(CHAR_DATA *ch, int cmd, int following);
 // int	attempt_move	(CHAR_DATA *ch, int cmd, int is_retreat = 0);
-long	move_limit	(CHAR_DATA *ch);
-long	mana_limit	(CHAR_DATA *ch);
-long	ki_limit	(CHAR_DATA *ch);
-long	hit_limit	(CHAR_DATA *ch);
-int	guild		(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, char_data*ch);
+int	move_limit	(CHAR_DATA *ch);
+int	mana_limit	(CHAR_DATA *ch);
+int	ki_limit	(CHAR_DATA *ch);
+int	hit_limit	(CHAR_DATA *ch);
+//int	guild		(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, CHAR_DATA *ch);
 int	has_skill	(CHAR_DATA *ch, sh_int skill);
 void	gain_exp_regardless	(CHAR_DATA *ch, int gain);
 void	advance_level	(CHAR_DATA *ch, int is_conversion);

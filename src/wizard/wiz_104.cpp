@@ -821,7 +821,7 @@ int do_trans(struct char_data *ch, char *argument, int cmd)
     struct descriptor_data *i;
     struct char_data *victim;
     char buf[100];
-    sh_int target;
+    int target;
 
     if (IS_NPC(ch))
         return eFAILURE;
@@ -873,7 +873,7 @@ int do_teleport(struct char_data *ch, char *argument, int cmd)
 {
    struct char_data *victim, *target_mob, *pers;
    char person[MAX_INPUT_LENGTH], room[MAX_INPUT_LENGTH];
-   sh_int target;
+   int target;
    int loop;
    extern int top_of_world;
 
@@ -963,7 +963,7 @@ int do_gtrans(struct char_data *ch, char *argument, int cmd)
     // struct descriptor_data *i;
     struct char_data *victim;
     char buf[100];
-    sh_int target;
+    int target;
     struct follow_type *k, *next_dude;
 
     if (IS_NPC(ch))

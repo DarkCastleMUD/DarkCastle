@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: alias.cpp,v 1.1 2002/06/13 04:32:17 dcastle Exp $
+| $Id: alias.cpp,v 1.2 2002/06/13 04:41:07 dcastle Exp $
 | alias.C
 | Description:  Commands for the alias processor.
 */

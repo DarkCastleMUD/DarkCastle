@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: shop.cpp,v 1.1 2002/06/13 04:32:19 dcastle Exp $ */
+/* $Id: shop.cpp,v 1.2 2002/06/13 04:41:08 dcastle Exp $ */
 
 extern "C"
 {
@@ -1072,7 +1072,6 @@ void player_shopping_withdraw(char * arg, char_data * ch, char_data * keeper)
 
 void player_shopping_design(char * arg, char_data * ch, char_data * keeper)
 {
-  char buf[MAX_STRING_LENGTH];
   char select[MAX_INPUT_LENGTH];
   char text[MAX_INPUT_LENGTH];
   sh_int skill;
@@ -1284,7 +1283,7 @@ int do_pshopedit(char_data * ch, char * arg, int cmd)
          return eFAILURE;
       }
       i = atoi(text);
-      if(i < 1 | i > top_of_world || !world_array[i]) {
+      if(i < 1 || i > top_of_world || !world_array[i]) {
          send_to_char("You must choose a valid room number.\r\n", ch);
          return eFAILURE;
       }

@@ -3,6 +3,13 @@
 /*-----------------------------------------------------------------------
 | Token section.  This section begins the Token class and methods.
 */
+
+const int ANSI    = 1<<0;   /* If it's an ansi code */
+const int VT100   = 1<<1;   /* If it's a vt100 code */
+const int CODE    = 1<<2;   /* If it should be interped */
+const int TEXT    = 1<<3;   /* If it's just text */
+const int _MAX_STR = 2048;
+
 class Token
 {
   public:
@@ -22,13 +29,6 @@ class Token
   void Next(Token *n) { next = n; }
 
   private:
-  //--
-  // Private constants
-  //--
-  static const int ANSI    = 1<<0;   /* If it's an ansi code */
-  static const int VT100   = 1<<1;   /* If it's a vt100 code */
-  static const int CODE    = 1<<2;   /* If it should be interped */
-  static const int TEXT    = 1<<3;   /* If it's just text */
 
   //--
   // Private variables
@@ -62,7 +62,7 @@ class TokenList
     //--
     // Private constants 
     //--
-    static const int _MAX_STR = 2048;
+
 
     //--
     // Private variables

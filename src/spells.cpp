@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.1 2002/06/13 04:32:19 dcastle Exp $ */
+/* $Id: spells.cpp,v 1.2 2002/06/13 04:41:08 dcastle Exp $ */
 
 extern "C"
 {
@@ -20,12 +20,6 @@ extern "C"
 #include <stdio.h>
 #include <assert.h>
 #include <stdlib.h>
-#include <math.h>
-#ifndef LINUX
-#ifndef NeXT
-  #include <malloc.h>
-#endif
-#endif
 }
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
@@ -565,7 +559,7 @@ struct spell_info_type spell_info [ ] =
     },
 
     { // 122
-	12, POSITION_STANDING, 300, TAR_CHAR_ROOM, cast_create_golem
+	12, POSITION_STANDING, 255, TAR_CHAR_ROOM, cast_create_golem
     },
 
     { // 123  this spell isn't castable but this has to be here.

@@ -1,8 +1,9 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.1 2002/06/13 04:32:24 dcastle Exp $
+| $Id: wizard.cpp,v 1.2 2002/06/13 04:41:17 dcastle Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
+#include "wizard.h"
 #include <character.h>
 #include <utility.h>
 #include <levels.h>
@@ -16,15 +17,23 @@
 #include <spells.h>
 #include <interp.h>
 #include <returnvals.h>
-#include "wizard.h"
 
 int number_or_name(char **name, int *num)
 {
-  int i;
-  char *ppos;
+  unsigned i;
+  char *ppos = NULL;
   char number[MAX_INPUT_LENGTH];
   
-  if((ppos = index(*name, '.')) != NULL) {
+  for(i = 0; i < strlen(*name); i++)
+  {
+	  if(*name[i] == '.')
+	  {
+		  ppos = *name + i;
+		  break;
+	  }
+  }
+  if(ppos)
+  {
     *ppos++ = '\0'; 
     strcpy(number, *name);
     strcpy(*name, ppos);

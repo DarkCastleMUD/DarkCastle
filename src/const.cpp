@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: const.cpp,v 1.1 2002/06/13 04:32:18 dcastle Exp $ */
+/* $Id: const.cpp,v 1.2 2002/06/13 04:41:07 dcastle Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -436,7 +436,7 @@ char *fullness[] =
 #define M    K K
 #define L  (long)
 
-long exp_table[ ] = 
+int exp_table[ ] = 
 {
  0,
  1,          L(1 K),     L(3 K),     L(9 K),     L(15 K),   // level 5 

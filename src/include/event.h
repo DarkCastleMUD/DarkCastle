@@ -9,7 +9,7 @@
  * timer%MAX_NUM_EVT == 0;
  *
  */
-/* $Id: event.h,v 1.1 2002/06/13 04:32:22 dcastle Exp $ */
+/* $Id: event.h,v 1.2 2002/06/13 04:41:15 dcastle Exp $ */
 
 #define MAX_NUM_EVT     1024
 

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: non_off.cpp,v 1.1 2002/06/13 04:32:18 dcastle Exp $
+| $Id: non_off.cpp,v 1.2 2002/06/13 04:41:08 dcastle Exp $
 | non_off.C
 | Description:  Implementation of generic, non-offensive commands.
 */

@@ -1,7 +1,7 @@
 #ifndef PUNISH_H_
 #define PUNISH_H_
 /************************************************************************
-| $Id: punish.h,v 1.1 2002/06/13 04:32:22 dcastle Exp $
+| $Id: punish.h,v 1.2 2002/06/13 04:41:15 dcastle Exp $
 | punish.h
 | Description: Contains punishment vectors
 */

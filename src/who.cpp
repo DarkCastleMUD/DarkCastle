@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: who.cpp,v 1.1 2002/06/13 04:32:19 dcastle Exp $
+| $Id: who.cpp,v 1.2 2002/06/13 04:41:09 dcastle Exp $
 | who.C
 | Commands for who, maybe? :P
 */
@@ -32,6 +32,9 @@ extern "C"
 extern struct char_data *character_list;
 extern struct descriptor_data *descriptor_list;
 extern struct race_shit race_info[30];
+extern char* pc_clss_abbrev[];
+extern char* race_abbrev[];
+extern char *pc_clss_types[];
 extern CWorld world;
  
 extern int max_who;
@@ -96,7 +99,7 @@ int do_whogroup(struct char_data *ch, char *argument, int cmd)
 
    one_argument(argument, target);
       
-   extern char *pc_clss_types[];
+
 
    hasholylight = IS_MOB(ch) ? 0 : ch->pcdata->holyLite;
 
@@ -211,7 +214,7 @@ int do_whosolo(struct char_data *ch, char *argument, int cmd)
    char tempbuffer[800];
    char buf[MAX_INPUT_LENGTH+1];
    
-   extern char *pc_clss_types[];
+
 
    one_argument(argument, buf);
 
@@ -288,8 +291,7 @@ int do_who(struct char_data *ch, char *argument, int cmd)
     int   currentmatch = 0;
     int   hasholylight = 0;
 
-    extern const char* pc_clss_abbrev[];
-    extern const char* race_abbrev[];
+
     char* immortFields[] = {
         "   Immortal  ",
         "  Architect  ",

@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.1 2002/06/13 04:32:18 dcastle Exp $ */
+/* $Id: info.cpp,v 1.2 2002/06/13 04:41:08 dcastle Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -1417,8 +1417,8 @@ int do_time(struct char_data *ch, char *argument, int cmd)
    long h,m;
    // long s;
    extern struct time_info_data time_info;
-   extern const char *weekdays[];
-   extern const char *month_name[];
+   extern char *weekdays[];
+   extern char *month_name[];
    struct tm *pTime = NULL;
    
    /* 35 days in a month */
@@ -2135,7 +2135,7 @@ int do_scan(struct char_data *ch, char *argument, int cmd)
    int i;
    struct char_data *vict;
    struct room_data *room;
-   sh_int was_in;
+   long was_in;
    int percent;
    int Learned;
    

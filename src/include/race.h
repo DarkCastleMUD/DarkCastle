@@ -1,7 +1,7 @@
 #ifndef RACE_H_
 #define RACE_H_
 /************************************************************************
-| $Id: race.h,v 1.1 2002/06/13 04:32:22 dcastle Exp $
+| $Id: race.h,v 1.2 2002/06/13 04:41:15 dcastle Exp $
 | race.h
 | This file defines racial information.
 */

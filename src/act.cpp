@@ -3,9 +3,10 @@
 | Description:  This file contains the classes and methods used to make
 |  the act() function work.
 */
-#include <iostream.h> 
-
-#undef DEBUG_ACT
+extern "C"
+{
+#include <ctype.h>
+};
 
 extern "C" {
 #include <string.h>
@@ -52,9 +53,6 @@ void act
 
    TokenList *tokens;
 
-#ifdef DEBUG_ACT
-   cerr << "Creating TokenList" << endl;
-#endif
    tokens = new TokenList(str);
 
    // This shouldn't happen

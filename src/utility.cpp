@@ -12,22 +12,17 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.1 2002/06/13 04:32:19 dcastle Exp $ */
+/* $Id: utility.cpp,v 1.2 2002/06/13 04:41:09 dcastle Exp $ */
 
 extern "C"
 {
 #include <assert.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <unistd.h>
 #include <ctype.h>
 #include <stdlib.h>
-#ifndef LINUX
-#ifndef NeXT
-#include <malloc.h>
-#endif
-#endif
 }
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
@@ -918,7 +913,7 @@ int do_recall( CHAR_DATA *ch, char *argument, int cmd )
   level = GET_LEVEL(victim);
   if ((level > 10) && (level < 51))
   {
-    cf   = 1 + ((level - 11) * .347);
+    cf   = 1 + ((level - 11) * .347f);
     cost = (int)(3440 * cf);
     if (GET_GOLD(ch) < cost)
     {

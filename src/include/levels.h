@@ -1,4 +1,4 @@
-/* $Id: levels.h,v 1.1 2002/06/13 04:32:22 dcastle Exp $ */
+/* $Id: levels.h,v 1.2 2002/06/13 04:41:15 dcastle Exp $ */
 /* This is purely to define god levels as #defines. */
 #ifndef LEVELS_H_
 #define LEVELS_H_

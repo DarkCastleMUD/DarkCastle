@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: obj.h,v 1.1 2002/06/13 04:32:22 dcastle Exp $ */
+/* $Id: obj.h,v 1.2 2002/06/13 04:41:15 dcastle Exp $ */
 #ifndef OBJ_H_
 #define OBJ_H_
 

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_ranger.cpp,v 1.1 2002/06/13 04:32:20 dcastle Exp $ | cl_ranger.C |
+| $Id: cl_ranger.cpp,v 1.2 2002/06/13 04:41:13 dcastle Exp $ | cl_ranger.C |
 Description: Ranger skills/spells */ extern "C"  {
   #include <string.h>
 }
@@ -22,7 +22,6 @@ Description: Ranger skills/spells */ extern "C"  {
 #include <db.h>
 #include <act.h>
 #include <fileinfo.h> // SAVE_DIR
-#include <unistd.h>   // unlink()
 #include <returnvals.h>
 
 extern CWorld world;
@@ -503,7 +502,8 @@ int do_forage(CHAR_DATA *ch, char *arg, int cmd)
   int foraged;
   int forage_cost;
   struct obj_data * new_obj = 0;
-  byte learned;
+  // Azrack -- learned should be initialized to something
+  byte learned = 0;
 
   int check_command_lag(CHAR_DATA * ch);
   void add_command_lag(CHAR_DATA * ch, int amount);
@@ -1010,7 +1010,7 @@ struct obj_data * find_arrow(struct obj_data *quiver)
 
   target = get_obj_in_list("arrow", quiver->contains);
   
-  if(!target->obj_flags.type_flag == ITEM_MISSILE)
+  if(!(target->obj_flags.type_flag == ITEM_MISSILE))
     target=NULL;
 
   if(!target)
@@ -1251,7 +1251,7 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
   struct char_data *victim;
   int percent, prob, dam, dir, artype, cost;
   struct obj_data *found;
-  sh_int cur_room, new_room;
+  unsigned cur_room, new_room;
   char direct[MAX_STRING_LENGTH], arrow[MAX_STRING_LENGTH], 
        target[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH], 
        buf2[MAX_STRING_LENGTH]; 
@@ -1388,7 +1388,7 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
   if(artype == 3) /* a wind arrow, so set new_room 2 rooms out */
   {
     if(!world[new_room].dir_option[dir] || 
-       !world[new_room].dir_option[dir]->to_room == NOWHERE ||
+       !(world[new_room].dir_option[dir]->to_room == NOWHERE) ||
        IS_SET(world[new_room].dir_option[dir]->exit_info, EX_CLOSED))
     {
       send_to_char("You can't seem to find your target2.\r\n", ch);

@@ -1,7 +1,7 @@
 #ifndef MACHINE_H_
 #define MACHINE_H_
 /************************************************************************
-| $Id: machine.h,v 1.1 2002/06/13 04:32:22 dcastle Exp $
+| $Id: machine.h,v 1.2 2002/06/13 04:41:15 dcastle Exp $
 | machine.h
 | Description:  This file contains all of the machine-specific information
 |   and prototypes.
@@ -15,9 +15,6 @@ extern "C"
  * Function prototypes.
  * 09 Nov 1992  Furey
  */
-#ifndef NeXT
-/* #include <malloc.h> */
-#endif
 
 #if    defined(linux)
 time_t time(time_t *t);

@@ -1,10 +1,11 @@
 #ifndef FILEINFO_H_
 #define FILEINFO_H_
 /*
-| $Id: fileinfo.h,v 1.1 2002/06/13 04:32:22 dcastle Exp $
+| $Id: fileinfo.h,v 1.2 2002/06/13 04:41:15 dcastle Exp $
 | fileinfo.h
 | Description:  Contains information for loading files, ie "../lib", etc..
 */
+#ifndef WIN32
 #define  DFLT_DIR           "../lib"
 #define  SAVE_DIR           "../save"
 #define  NEWSAVE_DIR        "../newsave"
@@ -13,6 +14,16 @@
 #define  BAN_FILE           "banned.txt"
 #define  SHOP_DIR           "../lib/shops"
 #define  PLAYER_SHOP_DIR    "../lib/playershops"
+#else
+#define DFLT_DIR		"lib"
+#define  SAVE_DIR           "save"
+#define  NEWSAVE_DIR        "newsave"
+#define  ARCHIVE_DIR        "archive"
+#define  MOB_DIR            "MOBProgs/"
+#define  BAN_FILE           "banned.txt"
+#define  SHOP_DIR           "shops"
+#define  PLAYER_SHOP_DIR    "playershops"
+#endif
 
 // TODO - Remove tinyworld.shp and divide the stops up into some meaningful
 //        format in their own directory like the world/mob/obj files
@@ -38,6 +49,7 @@
 #define  INFO_FILE          "info.txt"
 #define  WIZLIST_FILE       "wizlist.txt"
 
+#ifndef WIN32
 #define BUG_FILE            "../log/bug.log"
 #define GOD_FILE            "../log/god.log"
 #define MORTAL_FILE         "../log/mortal.log"
@@ -46,7 +58,16 @@
 #define WORLD_LOG           "../log/world.log"
 #define CHAOS_LOG           "../log/chaos.log"
 #define CLAN_LOG            "../log/clan.log" 
-
+#else
+#define BUG_FILE            "bug.log"
+#define GOD_FILE            "god.log"
+#define MORTAL_FILE         "mortal.log"
+#define SOCKET_FILE         "socket.log"
+#define PLAYER_FILE         "player.log"
+#define WORLD_LOG           "world.log"
+#define CHAOS_LOG           "chaos.log"
+#define CLAN_LOG            "clan.log" 
+#endif
 #define  WORLD_INDEX_FILE  "worldindex"
 #define  OBJECT_INDEX_FILE "objectindex"
 #define  MOB_INDEX_FILE    "mobindex"

@@ -1,7 +1,7 @@
 #ifndef PLAYER_H_
 #define PLAYER_H_
 /************************************************************************
-| $Id: player.h,v 1.1 2002/06/13 04:32:22 dcastle Exp $
+| $Id: player.h,v 1.2 2002/06/13 04:41:15 dcastle Exp $
 | player.h
 | Description: This file defines the player vectors..punishment, specials,
 |   etc...

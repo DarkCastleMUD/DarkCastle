@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.1 2002/06/13 04:32:20 dcastle Exp $
+| $Id: cl_warrior.cpp,v 1.2 2002/06/13 04:41:13 dcastle Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -210,7 +210,8 @@ int do_retreat(struct char_data *ch, char *argument, int cmd)
    int attempt, die, percent;
    byte learned;
    char buf[MAX_INPUT_LENGTH];
-   int retval;
+   // Azrack -- retval should be initialized to something
+   int retval = 0;
 
    int is_stunned(CHAR_DATA *ch);
 

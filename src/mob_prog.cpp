@@ -63,9 +63,9 @@ struct mprog_throw_type *g_mprog_throw_list = 0;   // holds all pending mprog th
  */
 
 char *	mprog_next_command	( char* clist );
-bool	mprog_seval		( char* lhs, char* opr, char* rhs );
-bool	mprog_veval		( int lhs, char* opr, int rhs );
-bool	mprog_do_ifchck		( char* ifchck, CHAR_DATA* mob,
+int	mprog_seval		( char* lhs, char* opr, char* rhs );
+int	mprog_veval		( int lhs, char* opr, int rhs );
+int	mprog_do_ifchck		( char* ifchck, CHAR_DATA* mob,
 				       CHAR_DATA* actor, OBJ_DATA* obj,
 				       void* vo, CHAR_DATA* rndm );
 char *	mprog_process_if	( char* ifchck, char* com_list, 
@@ -170,24 +170,24 @@ bool str_infix( const char *astr, const char *bstr
  *  still have trailing spaces so be careful when editing since:
  *  "guard" and "guard " are not equal.
  */
-bool mprog_seval( char *lhs, char *opr, char *rhs )
+int mprog_seval( char *lhs, char *opr, char *rhs )
 {
 
   if ( !str_cmp( opr, "==" ) )
-    return ( bool )( !str_cmp( lhs, rhs ) );
+    return ( !str_cmp( lhs, rhs ) );
   if ( !str_cmp( opr, "!=" ) )
-    return ( bool )( str_cmp( lhs, rhs ) );
+    return ( str_cmp( lhs, rhs ) );
   if ( !str_cmp( opr, "/" ) )
-    return ( bool )( !str_infix( rhs, lhs ) );
+    return ( !str_infix( rhs, lhs ) );
   if ( !str_cmp( opr, "!/" ) )
-    return ( bool )( str_infix( rhs, lhs ) );
+    return ( str_infix( rhs, lhs ) );
 
   logf( IMMORTAL, LOG_WORLD,  "Improper MOBprog operator\n\r", 0 );
   return 0;
 
 }
 
-bool mprog_veval( int lhs, char *opr, int rhs )
+int mprog_veval( int lhs, char *opr, int rhs )
 {
 
   if ( !str_cmp( opr, "==" ) )
@@ -222,7 +222,10 @@ bool mprog_veval( int lhs, char *opr, int rhs )
  * to reduce the redundancy of the mammoth if statement list.
  * If there are errors, then return -1 otherwise return boolean 1,0
  */
-bool mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
+
+// Azrack -- this was originally returning a bool, but its returning all sorts of values,
+// switched it to int 
+int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
 		     OBJ_DATA *obj, void *vo, CHAR_DATA *rndm)
 {
 

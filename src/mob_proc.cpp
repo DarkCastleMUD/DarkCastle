@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.1 2002/06/13 04:32:18 dcastle Exp $ */
+/* $Id: mob_proc.cpp,v 1.2 2002/06/13 04:41:08 dcastle Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -3569,7 +3569,7 @@ int hellstreamer(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
 int firestormer(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,        
           struct char_data *owner)
 {
-    CHAR_DATA *vict;
+    CHAR_DATA *vict = NULL;
     // int percent; 
 
     act("$n utters the words 'Fry bitch!'.", ch, 0, 0, 

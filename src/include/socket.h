@@ -1,4 +1,4 @@
-/* $Id: socket.h,v 1.1 2002/06/13 04:32:22 dcastle Exp $ */
+/* $Id: socket.h,v 1.2 2002/06/13 04:41:15 dcastle Exp $ */
 #ifndef __SYS_TPI_SOCKET_H__
 #ifndef __SYS_SOCKET_H__
 #define __SYS_SOCKET_H__

@@ -68,13 +68,13 @@ int do_report(struct char_data *ch, char *argument, int cmd)
   }
 
   if(IS_NPC(ch) || IS_ANONYMOUS(ch))
-    sprintf(report, "%ld%% hps, %ld%% mana, %ld%% movement, and %ld%% ki.",
+    sprintf(report, "%d%% hps, %d%% mana, %d%% movement, and %d%% ki.",
       MAX(1, GET_HIT(ch)*100)  / MAX(1, GET_MAX_HIT(ch)),
       MAX(1, GET_MANA(ch)*100) / MAX(1, GET_MAX_MANA(ch)),
       MAX(1, GET_MOVE(ch)*100) / MAX(1, GET_MAX_MOVE(ch)),
       MAX(1, GET_KI(ch)*100)   / MAX(1, GET_MAX_KI(ch)));
   else
-    sprintf(report, "%ld/%ld hps, %ld/%ld mana, %ld/%ld movement, and %ld/%ld ki.",
+    sprintf(report, "%d/%d hps, %d/%d mana, %d/%d movement, and %d/%d ki.",
       GET_HIT(ch) , GET_MAX_HIT(ch),
       GET_MANA(ch), GET_MAX_MANA(ch),
       GET_MOVE(ch), GET_MAX_MOVE(ch),

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: board.cpp,v 1.1 2002/06/13 04:32:17 dcastle Exp $
+| $Id: board.cpp,v 1.2 2002/06/13 04:41:07 dcastle Exp $
 | board.C
 | Description:  This file contains the implementation for the board
 |   code.  It's old and should be rewritten --Morc XXX

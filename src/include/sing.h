@@ -3,7 +3,7 @@
  * singing bard powers, although the sing structure is in
  * spells.h, so that must be included
  */
-/* $Id: sing.h,v 1.1 2002/06/13 04:32:22 dcastle Exp $ */
+/* $Id: sing.h,v 1.2 2002/06/13 04:41:15 dcastle Exp $ */
 
 #ifndef SING_H_
 #define SING_H_

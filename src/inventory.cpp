@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.1 2002/06/13 04:32:18 dcastle Exp $
+| $Id: inventory.cpp,v 1.2 2002/06/13 04:41:08 dcastle Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -44,7 +44,7 @@ extern struct obj_data *object_list;
 char *fname(char *namelist);
 int isname(char *arg, char *arg2);
 struct obj_data *create_money( int amount );
-void palm  (struct char_data *ch, struct obj_data *obj_object, struct obj_data *sub_object);
+int palm  (struct char_data *ch, struct obj_data *obj_object, struct obj_data *sub_object);
 void special_log(char *arg);
 struct obj_data * bring_type_to_front(char_data * ch, int item_type);
 struct obj_data * search_char_for_item(char_data * ch, sh_int item_number);

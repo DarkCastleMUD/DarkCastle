@@ -3,7 +3,7 @@
  * ki powers, although the ki structure is in
  * spells.h, so that must be included
  */
-/* $Id: ki.h,v 1.1 2002/06/13 04:32:22 dcastle Exp $ */
+/* $Id: ki.h,v 1.2 2002/06/13 04:41:15 dcastle Exp $ */
 
 #ifndef KI_H_
 #define KI_H_

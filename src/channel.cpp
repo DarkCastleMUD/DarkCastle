@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: channel.cpp,v 1.1 2002/06/13 04:32:17 dcastle Exp $
+| $Id: channel.cpp,v 1.2 2002/06/13 04:41:07 dcastle Exp $
 | channel.C
 | Description:  All of the channel - type commands; do_say, gossip, etc..
 */

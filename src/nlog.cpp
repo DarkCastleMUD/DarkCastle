@@ -1,4 +1,4 @@
-/* $Id: nlog.cpp,v 1.1 2002/06/13 04:32:18 dcastle Exp $ */
+/* $Id: nlog.cpp,v 1.2 2002/06/13 04:41:08 dcastle Exp $ */
 
 extern "C"
 {
@@ -6,15 +6,7 @@ extern "C"
 #include <time.h>
 #include <string.h>
 #include <stdlib.h>
-
-#ifndef LINUX
-#ifndef NeXT
-#ifndef FreeBSD
-#include <malloc.h>
-#endif
-#endif
-#endif
-
+#include <stdio.h>
 #include <stdarg.h>
 }
 
@@ -32,13 +24,6 @@ extern struct descriptor_data* descriptorList;
 void log( char *str, int god_level, long type );
 void send_to_char(char *messg, CHAR_DATA *ch);
 void colorCharSend(char* s, CHAR_DATA* ch);
-#ifndef LINUX
-#ifndef SUN
-#ifndef FreeBSD
-  void vsprintf(char *, char *, va_list);
-#endif
-#endif
-#endif
 
 /*
  * logf, str_hsh, and csendf by Sadus, others by Ysafar.

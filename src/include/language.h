@@ -1,7 +1,7 @@
 #ifndef LANGUAGE_H_
 #define LANGUAGE_H_
 /************************************************************************
-| $Id: language.h,v 1.1 2002/06/13 04:32:22 dcastle Exp $
+| $Id: language.h,v 1.2 2002/06/13 04:41:15 dcastle Exp $
 | language.h
 | Description:  This contains the header file for languages implementation.
 */

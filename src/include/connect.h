@@ -1,13 +1,13 @@
 #ifndef CONNECT_H_
 #define CONNECT_H_
 /************************************************************************
-| $Id: connect.h,v 1.1 2002/06/13 04:32:22 dcastle Exp $
+| $Id: connect.h,v 1.2 2002/06/13 04:41:15 dcastle Exp $
 | connect.h
 | Description: State of connectedness information.
 */
 #include <structs.h>  // MAX_INPUT_LENGTH
 #include <comm.h>
-#include <netinet/in.h>
+//#include <netinet/in.h>
  
 #ifdef NeXT
 #ifndef bool
@@ -54,7 +54,7 @@ struct stat_shit
 
 struct descriptor_data
 {
-    int		descriptor;		/* file descriptor for socket	*/
+    unsigned		descriptor;		/* file descriptor for socket	*/
     int         desc_num;    
     char *	name;			/* Copy of the player name	*/
     char	host[80];              	/* hostname			*/

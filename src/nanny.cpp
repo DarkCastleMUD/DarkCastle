@@ -11,14 +11,29 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.1 2002/06/13 04:32:18 dcastle Exp $ */
+/* $Id: nanny.cpp,v 1.2 2002/06/13 04:41:08 dcastle Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#ifndef WIN32
 #include <arpa/telnet.h>
 #include <unistd.h>
+
+#else
+		#include <winsock2.h>
+	#include <process.h>
+	#include <mmsystem.h>
+
+	// swipe some defined out of arpa telnet
+	#define	IAC				255		/* interpret as command: */
+	#define	WONT			252		/* I won't use option */
+	#define	WILL			251		/* I will use option */
+	#define TELOPT_NAOCRD	10	/* negotiate about CR disposition */
+	#define TELOPT_ECHO		1	/* echo */
+	#define TELOPT_NAOFFD	13	/* negotiate about formfeed disposition */
+#endif
 }
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
@@ -58,7 +73,7 @@ char menu[] = "\n\rWelcome to Dark Castle Mud\n\r\n\r"
               "5) Delete this character.\n\r\n\r"
               "   Make your choice: ";
 
-char wizlock = FALSE;
+bool wizlock = false;
 
 extern char greetings1[MAX_STRING_LENGTH];  
 extern char greetings2[MAX_STRING_LENGTH];
@@ -71,9 +86,19 @@ extern CHAR_DATA *character_list;
 extern struct descriptor_data *descriptor_list;
 extern char *nonew_new_list[30];
 
+
+#ifndef WIN32
 extern "C" {
   char *crypt(const char *key, const char *salt);
 }
+#else
+ 
+char *crypt(const char *key, const char *salt)
+{
+	return((char *)key);
+}
+#endif
+
 
 int isbanned(char *hostname);
 int _parse_name(char *arg, char *name);

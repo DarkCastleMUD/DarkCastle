@@ -14,7 +14,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.h,v 1.1 2002/06/13 04:32:22 dcastle Exp $ */
+/* $Id: spells.h,v 1.2 2002/06/13 04:41:15 dcastle Exp $ */
 #include <structs.h> // byte, sh_int
 
 #define MAX_BUF_LENGTH               240

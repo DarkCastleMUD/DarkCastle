@@ -505,7 +505,7 @@ int do_sing(CHAR_DATA *ch, char *arg, int cmd)
         send_to_char(".\r\n", ch);
         // If the song is a steady one, (like flight) than it needs to be
         // interrupted so we stop and remove the affects
-        if((*song_info[ch->song_number].intrp_pointer))
+        if((song_info[ch->song_number].intrp_pointer))
            ((*song_info[ch->song_number].intrp_pointer)(GET_LEVEL(ch),ch, NULL, NULL));
         if(spl != 2) // song 'stop'
            ch->song_timer = 0;
@@ -551,7 +551,7 @@ void update_bard_singing()
       {
         send_to_char("You can't keep singing in this position!\r\n", i); 
         i->song_timer = 0;
-        if((*song_info[i->song_number].intrp_pointer))
+        if((song_info[i->song_number].intrp_pointer))
           ((*song_info[i->song_number].intrp_pointer) (GET_LEVEL(i), i, NULL, NULL));
       }
     }
@@ -577,14 +577,14 @@ void update_bard_singing()
       if(GET_LEVEL(i) < IMMORTAL)
         if(IS_SET(world[i->in_room].room_flags, SAFE)) {
           send_to_char("No singing in safe rooms yet.\r\n", i);
-          if((*song_info[i->song_number].intrp_pointer))
+          if((song_info[i->song_number].intrp_pointer))
             ((*song_info[i->song_number].intrp_pointer) (GET_LEVEL(i), i, NULL, NULL));
           if(i->song_data)
             dc_free(i->song_data);
           return;
         }
 
-      if((*song_info[i->song_number].exec_pointer))
+      if((song_info[i->song_number].exec_pointer))
         ((*song_info[i->song_number].exec_pointer) (GET_LEVEL(i), i, NULL, NULL));
       else send_to_char("Bad exec pointer on the song you sang.  Tell a god.\r\n", i);
     }      

@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.1 2002/06/13 04:32:18 dcastle Exp $ */
+/* $Id: magic.cpp,v 1.2 2002/06/13 04:41:08 dcastle Exp $ */
 
 extern "C"
 {
@@ -20,11 +20,6 @@ extern "C"
 #include <stdio.h>
 #include <assert.h>
   #include <stdlib.h>
-#ifndef LINUX
-#ifndef NeXT
-  #include <malloc.h>
-#endif
-#endif
 }
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
@@ -655,7 +650,7 @@ int spell_solar_gate(byte level, CHAR_DATA *ch,
   int dam;
   int retval;
   CHAR_DATA *tmp_victim, *temp;
-  sh_int orig_room;
+  int orig_room;
 
   char *dirs[] = {
     "from the South.",
@@ -2632,7 +2627,7 @@ int spell_wizard_eye(byte level, CHAR_DATA *ch,
 int spell_summon(byte level, CHAR_DATA *ch,
   CHAR_DATA *victim, struct obj_data *obj)
 {
-  sh_int target;
+  unsigned target;
   int retval;
   
   assert(ch && victim);
@@ -4133,7 +4128,7 @@ int spell_weaken(byte level, CHAR_DATA *ch,
 	 if (!affected_by_spell(victim, SPELL_WEAKEN))
       {
 	if (saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC) < 0) {
-	  modifier = level / 10;
+	  modifier = level / 10.0f;
 	  act("You feel weaker.", ch, 0, victim, TO_VICT, 0);
 	  act("$n seems weaker.", victim, 0, 0, TO_ROOM, INVIS_NULL);
 
@@ -5179,7 +5174,7 @@ int cast_paralyze( byte level, CHAR_DATA *ch, char *arg, int type,
 	  if (!(IS_AFFECTED(tar_ch, AFF_PARALYSIS)))
           {
 	 	retval = spell_paralyze(level,ch,tar_ch,0);
-		if(IS_SET(retval, eCH_DIED));
+		if(IS_SET(retval, eCH_DIED))
 			return retval;
 	  }
 		return eSUCCESS;
@@ -7426,7 +7421,7 @@ int cast_call_follower(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA
 {
    CHAR_DATA *tmp_vict;
    int valid = 0;
-   sh_int target;
+   int target;
    
    if(IS_SET(world[ch->in_room].room_flags, CLAN_ROOM)) {
       send_to_char("I don't think your fellow clan members would appreciate the wildlife.\n\r", ch);

@@ -1,7 +1,7 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.1 2002/06/13 04:32:22 dcastle Exp $
+| $Id: character.h,v 1.2 2002/06/13 04:41:15 dcastle Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
@@ -258,18 +258,18 @@ struct char_data
     long suscept;        // Bitvector of damage types I'm susceptible to
     int  saves[SAVE_TYPE_MAX+1];  // Saving throw bonuses
 
-    long   mana;         
-    long   max_mana;     /* Not useable                             */
-    long   raw_mana;     /* before int bonus                        */
-    long   hit;   
-    long   max_hit;      /* Max hit for NPC                         */
-    long   raw_hit;      /* before con bonus                        */
-    long   move;  
-    long   raw_move;
-    long   max_move;     /* Max move for NPC                        */
-    long   ki;
-    long   max_ki;
-    long   raw_ki;
+    long mana;         
+    long max_mana;     /* Not useable                             */
+    long raw_mana;     /* before int bonus                        */
+    long hit;   
+    long max_hit;      /* Max hit for NPC                         */
+    long raw_hit;      /* before con bonus                        */
+    long move;  
+    long raw_move;
+    long max_move;     /* Max move for NPC                        */
+    long ki;
+    long max_ki;
+    long raw_ki;
     sh_int alignment;          // +-1000 for alignments                 
 
     sh_int hpmetas;             // total number of times meta'd hps

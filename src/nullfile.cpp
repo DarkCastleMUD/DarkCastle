@@ -7,7 +7,7 @@
  *
  * -Sadus
  */
-/* $Id: nullfile.cpp,v 1.1 2002/06/13 04:32:18 dcastle Exp $ */
+/* $Id: nullfile.cpp,v 1.2 2002/06/13 04:41:08 dcastle Exp $ */
 
 extern "C"
 {
@@ -24,13 +24,6 @@ extern "C"
 /* External functions */
 void    log             (char * str, int god_level, long type);
 int fclose(FILE *);
-#ifndef LINUX
-#ifndef SUN
-#ifndef FreeBSD
-  void perror(char *);
-#endif
-#endif
-#endif
 
 #ifndef LOG_BUG
 #define LOG_BUG           1
@@ -44,8 +37,21 @@ int fclose(FILE *);
 
 FILE * NULL_FILE;
 
-FILE * dc_fopen(const char *filename, const char *type)
+FILE * dc_fopen(const char *f, const char *type)
 {
+	char filename[1024];
+	strcpy(filename, f);
+
+#ifdef WIN32
+
+  for(unsigned i = 0; i < strlen(filename); i++)
+  {
+	  if(filename[i] == '/')
+	  {
+		  filename[i] = '\\';
+	  }
+  }
+#endif
   FILE *x;
 
   if(NULL_FILE) {
@@ -54,8 +60,12 @@ FILE * dc_fopen(const char *filename, const char *type)
   }
   
   if(!(x = fopen(filename, type)))
+#ifndef WIN32
     if(!(NULL_FILE = fopen("../lib/whassup", "w"))) {
-      log("Unable to open NULL_FILE in dc_fopen.", ANGEL, LOG_BUG);
+#else
+	if(!(NULL_FILE = fopen("..\\..\\lib\\whassup", "w"))) {
+#endif
+      //log("Unable to open NULL_FILE in dc_fopen.", ANGEL, LOG_BUG);
       perror("Unable to open NULL_FILE in dc_fopen.");
     }
     
@@ -71,8 +81,12 @@ int dc_fclose(FILE * fl)
   x = fclose(fl);
   
   if(!(NULL_FILE))
+#ifndef WIN32
     if(!(NULL_FILE = fopen("../lib/whassup", "w"))) {
-      log("Unable to open NULL_FILE in dc_fclose.", ANGEL, LOG_BUG);
+#else
+		if(!(NULL_FILE = fopen("..\\lib\\whassup", "w"))) {
+#endif
+      //log("Unable to open NULL_FILE in dc_fclose.", ANGEL, LOG_BUG);
       perror("Unable to open NULL_FILE in dc_fclose.");
     }
     

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.1 2002/06/13 04:32:18 dcastle Exp $
+| $Id: guild.cpp,v 1.2 2002/06/13 04:41:07 dcastle Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -33,6 +33,8 @@ extern struct class_skill_defines c_skills[];
 extern struct class_skill_defines m_skills[];
 extern struct index_data *mob_index;
 
+int guild(struct char_data *ch, struct obj_data *obj, int cmd, char *arg, struct char_data *owner);
+
 int do_practice(CHAR_DATA *ch, char *arg, int cmd)
 {
   /* Call "guild" with a null string for an argument.
@@ -41,7 +43,7 @@ int do_practice(CHAR_DATA *ch, char *arg, int cmd)
   if (arg[0] != '\0'){
     send_to_char("You can only practice in a guild.\n\r", ch);
   } else {
-    (void) guild (ch, 0, cmd, "", ch);
+    guild(ch, 0, cmd, "", ch);
   }
   return eSUCCESS;
 }

@@ -5,7 +5,7 @@
  *                                                                           *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-/* $Id: magic.h,v 1.1 2002/06/13 04:32:22 dcastle Exp $ */
+/* $Id: magic.h,v 1.2 2002/06/13 04:41:15 dcastle Exp $ */
 #ifndef MAGIC_H_
 #define MAGIC_H_
 

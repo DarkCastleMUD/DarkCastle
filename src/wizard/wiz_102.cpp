@@ -536,7 +536,7 @@ int do_zone_single_edit(struct char_data * ch, char * argument, int zone)
 
   send_to_char("$3Usage$R:  zedit edit <cmdnumber> <type|if|1|2|3|comment> <value>\r\n"
                "Valid types are:   'M', 'O', 'P', 'G', 'E', 'D', '*', 'X', 'K', and '%'.\r\n"
-               "Valid ifs are:     0 - 9  (intead of 0-9, type 'help' for details on them).\r\n"
+               "Valid ifs are:     0(always), 1(ontrue), 2(onfalse), 3(onboot).\r\n"
                "Valid args (123):  0-32000\r\n"
                "                   (for max-in-world, -1 represents 'always')\r\n", ch);
   return eFAILURE;
@@ -548,10 +548,10 @@ int do_zedit(struct char_data *ch, char *argument, int cmd)
   char select[MAX_INPUT_LENGTH];
   char text[MAX_INPUT_LENGTH];
   sh_int skill;
-  int i, j;
+  int i = 0, j = 0;
   int zone, last_cmd;
   int robj, rmob;
-  void show_zone_commands(struct char_data * ch, int i, int start = 0);
+  int show_zone_commands(struct char_data * ch, int i, int start = 0);
   extern char *zone_modes[];
   extern int top_of_zonet;
 
@@ -2660,8 +2660,10 @@ int do_medit(struct char_data *ch, char *argument, int cmd)
           }
           return eFAILURE;
         }
-        parse_bitstrings_into_int(affected_bits, buf4, ch, 
-                                     ((long)((char_data *)mob_index[mob_num].item)->affected_by));
+		long foo = ((char_data *)mob_index[mob_num].item)->affected_by;
+
+        parse_bitstrings_into_int(affected_bits, buf4, ch, foo);
+		//                             ((long)((char_data *)mob_index[mob_num].item)->affected_by));
       } break;
 
      /* edit numdamdice */
@@ -4062,6 +4064,18 @@ int do_sockets(struct char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
+#ifdef WIN32
+int strncasecmp(char *s1, const char *s2, int len)
+{
+	char buf[256];
+	strncpy(buf, s2, 255);
+	buf[255] = 0;
+	_strlwr(s1);
+	_strlwr(buf);
+	return(strncmp(s1, buf, len));
+}
+#endif
+	
 int do_punish(struct char_data *ch, char *arg, int cmd)
 {
    char name[100], buf[100];
@@ -4105,7 +4119,6 @@ int do_punish(struct char_data *ch, char *arg, int cmd)
      act("$E might object to that.. better not.", ch, 0, vict, TO_CHAR, 0);
      return eFAILURE;
    }
-
   if (!strncasecmp(name, "stupid", i) && GET_LEVEL(ch) >= G_POWER) {
     if (IS_SET(vict->pcdata->punish, PUNISH_STUPID)) {
         send_to_char("You feel a sudden onslaught of wisdom!\n\r", vict);
@@ -4132,7 +4145,6 @@ int do_punish(struct char_data *ch, char *arg, int cmd)
         SET_BIT(vict->pcdata->punish, PUNISH_NOTITLE);
     }
   }
-
   if (!strncasecmp(name, "silence", i) && GET_LEVEL(ch) >= PATRON) {
     if (IS_SET(vict->pcdata->punish, PUNISH_SILENCED)) {
         send_to_char("The gods take pity on you and lift your silence.\n\r",
@@ -4149,7 +4161,6 @@ int do_punish(struct char_data *ch, char *arg, int cmd)
     }
     TOGGLE_BIT(vict->pcdata->punish, PUNISH_SILENCED);
   }
-
   if (!strncasecmp(name, "freeze", i) && GET_LEVEL(ch) >= PATRON) {
     if (IS_SET(vict->pcdata->punish, PUNISH_FREEZE)) {
         send_to_char("You now can do things again.\n\r", vict);
@@ -4187,7 +4198,6 @@ int do_punish(struct char_data *ch, char *arg, int cmd)
     }
     TOGGLE_BIT(vict->pcdata->punish, PUNISH_NOEMOTE);
   }
-
   if (!strncasecmp(name, "notell", i) && GET_LEVEL(ch) >= PATRON) {
     if (IS_SET(vict->pcdata->punish, PUNISH_NOTELL)) {
         send_to_char("You can use telepatic communication again.\n\r", vict);
@@ -4199,7 +4209,6 @@ int do_punish(struct char_data *ch, char *arg, int cmd)
     }
     TOGGLE_BIT(vict->pcdata->punish, PUNISH_NOTELL);
   }
-
   if (!strncasecmp(name, "noname", i) && GET_LEVEL(ch) >= PATRON) {
     if(IS_SET(vict->pcdata->punish, PUNISH_NONAME)) {
       send_to_char("The gods grant you control over your name.\n\r", vict); 

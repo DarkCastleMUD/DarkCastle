@@ -16,15 +16,38 @@
 #include <errno.h>
 #include <terminal.h>
 #include <string.h>
-#include <unistd.h>
+
+#ifndef WIN32
+	#include <unistd.h>
+	#include <sys/wait.h>
+	#include <sys/socket.h>
+	#include <sys/resource.h>
+	#include <sys/time.h>
+	#include <netinet/in.h>
+	#include <netdb.h>
+	#include <arpa/telnet.h>
+	#include <arpa/inet.h>
+#else
+	#include <direct.h>
+	#include <winsock2.h>
+	#include <process.h>
+	#include <mmsystem.h>
+
+	// swipe some defined out of arpa telnet
+	#define	IAC				255		/* interpret as command: */
+	#define	WONT			252		/* I won't use option */
+	#define	WILL			251		/* I will use option */
+	#define TELOPT_NAOCRD	10	/* negotiate about CR disposition */
+	#define TELOPT_ECHO		1	/* echo */
+	#define TELOPT_NAOFFD	13	/* negotiate about formfeed disposition */
+
+#endif
 #include <fcntl.h>
-#include <sys/wait.h>
+
 #include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/resource.h>
-#include <sys/time.h>
-#include <netinet/in.h>
-#include <netdb.h>
+
+
+
 #include <signal.h>
 #include <ctype.h>
 
@@ -42,8 +65,6 @@
 #include <comm.h>
 #include <returnvals.h>
 
-#include <arpa/telnet.h>
-#include <arpa/inet.h>
 
 #ifndef INVALID_SOCKET
 #define INVALID_SOCKET -1
@@ -53,7 +74,7 @@
 short code_testing_mode = 0;
 short code_testing_mode_mob = 0;
 short code_testing_mode_world = 0;
-int mother_desc, other_desc, third_desc;
+unsigned mother_desc, other_desc, third_desc;
 
 // This is turned on right before we call game_loop
 int try_to_hotboot_on_crash = 0;
@@ -117,7 +138,7 @@ void generate_prompt(CHAR_DATA *ch, char *prompt);
 int get_from_q(struct txt_q *queue, char *dest, int *aliased);
 void init_game(int port, int port2, int port3);
 void signal_setup(void);
-void game_loop(int mother_desc, int other_desc, int third_desc);
+void game_loop(unsigned mother_desc, unsigned other_desc, unsigned third_desc);
 int init_socket(int port);
 int new_descriptor(int s);
 int process_output(struct descriptor_data *t);
@@ -155,6 +176,14 @@ void weather_update();
 //extern char greetings3[MAX_STRING_LENGTH];
 //extern char greetings4[MAX_STRING_LENGTH];
 
+#ifdef WIN32
+void gettimeofday(struct timeval *t, struct timezone *dummy)
+{
+  DWORD millisec = GetTickCount();
+  t->tv_sec = (int) (millisec / 1000);
+  t->tv_usec = (millisec % 1000) * 1000;
+}
+#endif
 /* *********************************************************************
 *  main game loop and related stuff                                    *
 ********************************************************************* */
@@ -163,8 +192,9 @@ int main(int argc, char **argv)
 {
   char buf[512];
   int pos = 1;
-  char *dir = (char *)DFLT_DIR;
-
+  char dir[256];
+  strcpy(dir, (char *)DFLT_DIR);
+  
   port = DFLT_PORT;
   port2 = DFLT_PORT2;
   port3 = DFLT_PORT3;
@@ -193,13 +223,18 @@ int main(int argc, char **argv)
                                                                     
     case 'd':
        if(argv[pos][2] != '\0')
-           dir = &argv[pos][2];
-       else if(++pos < argc)
-           dir = &argv[pos][0];
-       else {
+           strcpy(dir, &argv[pos][2]);
+	   else if(++pos < argc)
+           strcpy(dir, &argv[pos][0]);
+	   else {
            fprintf(stderr, "Directory arg expected after -d.\n\r");
            exit(1);
        }
+       break;
+    case 'p':
+       port = 1500;
+       port2 = 1501;
+       port3 = 1502;
        break;
     default:
       sprintf(buf, "SYSERR: Unknown option -%c in argument string.", *(argv[pos] + 1));
@@ -223,10 +258,24 @@ int main(int argc, char **argv)
      port2 = port + 1; 
      port3 = port + 2;
      }
+#ifndef WIN32
   if (chdir(dir) < 0) {
     perror("Fatal error changing to data directory");
     exit(1);
   }
+#else
+  for(unsigned i = 0; i < strlen(dir); i++)
+  {
+	  if(dir[i] == '/')
+	  {
+		  dir[i] = '\\';
+	  }
+  }
+  if(_chdir(dir) < 0) {
+	  perror("Fatal error changing to data directory");
+	  exit(1);
+  }
+#endif
   sprintf(buf, "Using %s as data directory.", dir);
   log(buf, 0, LOG_MISC);
 
@@ -249,9 +298,11 @@ int write_hotboot_file()
   FILE *fp;
   struct descriptor_data *d;
   struct descriptor_data *sd;
+  /* Azrack -- do these need to be here?
   extern int mother_desc;
   extern int other_desc;
   extern int third_desc;
+  */
   extern char ** ext_argv;
 
   if ((fp=fopen("hotboot","w"))==NULL) {   
@@ -281,7 +332,11 @@ int write_hotboot_file()
   fclose(fp);
 
   // note, for debug mode, you have to put the "-c", "6969", in there
+#ifndef WIN32
   if(-1 == execl("/home/dcastle/dcastle/src/research1", "research1",(char*)NULL)) {
+#else
+	  if(-1 == _execl("../src/research1", "research1", (char*)NULL)) {
+#endif
 //  if(-1 == execv(ext_argv[0], ext_argv)) {
     perror("Hotboot execv call failed.");
     perror(ext_argv[0]);
@@ -299,10 +354,11 @@ int load_hotboot_descs()
   char chr[MAX_INPUT_LENGTH], host[MAX_INPUT_LENGTH] ,buf[MAX_STRING_LENGTH];
   int desc;
   struct descriptor_data *d;
+  /* Azrack - do these need to be here
   extern int mother_desc;
   extern int other_desc;
   extern int third_desc;
-
+*/
   if ((fp=fopen("hotboot","r"))==NULL)  // Checks if it actually *is* a hotboot
     return 0;
   log("Hotboot, reloading characters.", 0, LOG_MISC);
@@ -399,11 +455,13 @@ void finish_hotboot()
 /* Init sockets, run game, and cleanup sockets */
 void init_game(int port, int port2, int port3)
 {
+	/* Azrack -- do these need to be here?
   extern int mother_desc;
   extern int other_desc;
   extern int third_desc;
   extern int was_hotboot;
   extern int try_to_hotboot_on_crash;
+  */
 
 #ifdef LEAK_CHECK
   void remove_all_mobs_from_world();
@@ -428,7 +486,11 @@ void init_game(int port, int port2, int port3)
   extern struct cmd_hash_info * cmd_radix;
 #endif
 
+#ifndef WIN32
   srandom(time(0));
+#else
+  srand(time(0));
+#endif
 
   // create boot'ing lockfile
   FILE * fp = fopen("died_in_bootup","w");
@@ -535,10 +597,27 @@ int init_socket(int port)
   int s, opt;
   struct sockaddr_in sa;
 
+#ifdef WIN32
+    WORD wVersionRequested;
+    WSADATA wsaData;
+
+    wVersionRequested = MAKEWORD(1, 1);
+
+    if (WSAStartup(wVersionRequested, &wsaData) != 0) {
+      perror("SYSERR: WinSock not available!");
+      exit(1);
+    }
+
+   if ((s = socket(PF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET) {
+      exit(1);
+   }
+#else
+
   if ((s = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
     perror("Error creating socket");
     exit(1);
   }
+#endif
   opt = LARGE_BUFSIZE + GARBAGE_SPACE;
   if (setsockopt(s, SOL_SOCKET, SO_SNDBUF, (char *) &opt, sizeof(opt)) < 0) {
     perror("setsockopt SNDBUF");
@@ -567,10 +646,19 @@ int init_socket(int port)
     CLOSE_SOCKET(s);
     exit(1);
   }
+#ifndef WIN32
   if(fcntl(s, F_SETFL, O_NONBLOCK) < 0) {
     perror("init_socket : fcntl : nonblock");
     exit(1);
   }
+#else
+  	unsigned long int nb = 1;
+	if(ioctlsocket(s, FIONBIO, &nb) < 0)
+	{
+		perror("init_socket : ioctl : nonblock");
+		exit(1);
+	}
+#endif
   if(listen(s, 5) < 0) {
     perror("init_socket : listen");
     exit(1);
@@ -590,8 +678,9 @@ struct descriptor_data * next_d;
  * new connections, polling existing connections for input, dequeueing
  * output and sending it out to players, and calling "heartbeat" function
  */
-void game_loop(int mother_desc, int other_desc, int third_desc)
+void game_loop(unsigned mother_desc, unsigned other_desc, unsigned third_desc)
 {
+ 
   fd_set input_set, output_set, exc_set, null_set;
   struct timeval last_time, delay_time, now_time;
   long secDelta, usecDelta;
@@ -602,7 +691,8 @@ void game_loop(int mother_desc, int other_desc, int third_desc)
   // otherwise an alias'd command could easily overrun the buffer
   char comm[MAX_STRING_LENGTH];
   struct descriptor_data *d;
-  int maxdesc, aliased;
+  unsigned maxdesc;
+  int aliased;
 
   null_time.tv_sec = 0;
   null_time.tv_usec = 0;
@@ -777,12 +867,15 @@ void game_loop(int mother_desc, int other_desc, int third_desc)
        delay_time.tv_usec = usecDelta;
        delay_time.tv_sec  = secDelta;
 //logf(110, LOG_BUG, "Pausing for  %dsec %dusec.", secDelta, usecDelta);
-
+#ifndef WIN32
        if ( select( 0, NULL, NULL, NULL, &delay_time ) < 0 && errno != EINTR)
        {
           perror( "game_loop: select: delay" );
           exit( 1 );
        }
+#else
+	   Sleep(delay_time.tv_sec * 1000 + delay_time.tv_usec / 1000);
+#endif
     }
     else logf(110, LOG_BUG, "0 delay on pulse");
     gettimeofday(&last_time, NULL);
@@ -1059,43 +1152,43 @@ void generate_prompt(CHAR_DATA *ch, char *prompt)
          sprintf(pro, "%ld", (long) (GET_GOLD(ch)/20000));
          break;
        case 'h':
-         sprintf(pro, "%ld", GET_HIT(ch));
+         sprintf(pro, "%d", GET_HIT(ch));
          break;
        case 'H':
-         sprintf(pro, "%ld", GET_MAX_HIT(ch));
+         sprintf(pro, "%d", GET_MAX_HIT(ch));
          break;
        case 'm':
-         sprintf(pro, "%ld", GET_MANA(ch));
+         sprintf(pro, "%d", GET_MANA(ch));
          break;
        case 'M':
-         sprintf(pro, "%ld", GET_MAX_MANA(ch));
+         sprintf(pro, "%d", GET_MAX_MANA(ch));
          break;
        case 'v':
-         sprintf(pro, "%ld", GET_MOVE(ch));
+         sprintf(pro, "%d", GET_MOVE(ch));
          break;
        case 'V':
-         sprintf(pro, "%ld", GET_MAX_MOVE(ch));
+         sprintf(pro, "%d", GET_MAX_MOVE(ch));
          break;
        case 'k':
-         sprintf(pro, "%ld", GET_KI(ch));
+         sprintf(pro, "%d", GET_KI(ch));
          break;
        case 'K':
-         sprintf(pro, "%ld", GET_MAX_KI(ch));
+         sprintf(pro, "%d", GET_MAX_KI(ch));
          break;
        case 'l':
-         sprintf(pro, "%s%ld%s", calc_color(GET_KI(ch), GET_MAX_KI(ch)),
+         sprintf(pro, "%s%d%s", calc_color(GET_KI(ch), GET_MAX_KI(ch)),
                  GET_KI(ch), NTEXT);
          break;
        case 'i':
-         sprintf(pro, "%s%ld%s", calc_color(GET_HIT(ch), GET_MAX_HIT(ch)),
+         sprintf(pro, "%s%d%s", calc_color(GET_HIT(ch), GET_MAX_HIT(ch)),
                  GET_HIT(ch), NTEXT);
          break;
        case 'n':
-         sprintf(pro, "%s%ld%s", calc_color(GET_MANA(ch), GET_MAX_MANA(ch)),
+         sprintf(pro, "%s%d%s", calc_color(GET_MANA(ch), GET_MAX_MANA(ch)),
                  GET_MANA(ch), NTEXT);
          break;
        case 'w':
-         sprintf(pro, "%s%ld%s", calc_color(GET_MOVE(ch), GET_MAX_MOVE(ch)),
+         sprintf(pro, "%s%d%s", calc_color(GET_MOVE(ch), GET_MAX_MOVE(ch)),
                  GET_MOVE(ch), NTEXT);
          break;
        case 'I':
@@ -1369,7 +1462,11 @@ void write_to_output(char *txt, struct descriptor_data *t)
 int new_descriptor(int s)
 {
   socket_t desc;
+#ifndef WIN32
   unsigned int i;
+#else
+  int i;
+#endif
   static int last_desc = 0;	/* last descriptor number */
   struct descriptor_data *newd;
   struct sockaddr_in peer;
@@ -1384,10 +1481,19 @@ int new_descriptor(int s)
   }
 
   // keep it from blocking 
+#ifndef WIN32
   if(fcntl(desc, F_SETFL, O_NONBLOCK) < 0) {
     perror("init_socket : fcntl : nonblock");
     exit(1);
   }
+#else
+  unsigned long int nb = 1;
+  if(ioctlsocket(desc, FIONBIO, &nb) < 0)
+  {
+	perror("init_socket : ioctl : nonblock");
+	exit(1);
+  }
+#endif
 
   /* create a new descriptor */
 #ifdef LEAK_CHECK
@@ -1493,7 +1599,11 @@ int write_to_descriptor(socket_t desc, char *txt)
   total = strlen(txt);
 
   do {
+#ifndef WIN32
     if ((bytes_written = write(desc, txt, total)) < 0) {
+#else
+	if ((bytes_written = send(desc, txt, total, 0)) < 0) {
+#endif
 #ifdef EWOULDBLOCK
       if (errno == EWOULDBLOCK)
 	errno = EAGAIN;
@@ -1545,7 +1655,16 @@ int process_input(struct descriptor_data *t)
            LOG_SOCKET);
       return -1;
     }
+#ifndef WIN32
     if ((bytes_read = read(t->descriptor, read_point, space_left)) < 0) {
+#else
+	if((bytes_read = recv(t->descriptor, read_point, space_left, 0)) < 0) {
+		if(WSAGetLastError() == WSAEWOULDBLOCK) {
+			return(0);
+		}
+#endif
+
+
 #ifdef EWOULDBLOCK
       if (errno == EWOULDBLOCK)
 	errno = EAGAIN;
@@ -1989,12 +2108,14 @@ void hupsig(int sig)
   exit(0);			/* perhaps something more elegant should
 				 * substituted */
 }
+
+#ifndef WIN32
 void sigchld(int sig)
 {
   struct rusage ru;
   wait3(NULL, WNOHANG, &ru);
 }
-
+#endif
 /*
  * This is an implementation of signal() using sigaction() for portability.
  * (sigaction() is POSIX; signal() is not.)  Taken from Stevens' _Advanced
@@ -2014,6 +2135,7 @@ void sigchld(int sig)
 
 void signal_setup(void)
 {
+#ifndef WIN32
   // struct timeval interval;
 
 
@@ -2039,6 +2161,7 @@ void signal_setup(void)
   my_signal(SIGSEGV, crashsig);  // catch null->blah
   my_signal(SIGFPE,  crashfpe);  // catch x / 0
   my_signal(SIGILL,  crashill);  // catch illegal instruction
+#endif
 }
 
 

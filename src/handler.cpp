@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.1 2002/06/13 04:32:18 dcastle Exp $ */
+/* $Id: handler.cpp,v 1.2 2002/06/13 04:41:07 dcastle Exp $ */
     
 extern "C"
 {
@@ -22,6 +22,7 @@ extern "C"
 #include <ctype.h>
 #include <assert.h>
 }
+
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -55,16 +56,17 @@ extern struct descriptor_data *descriptor_list;
 extern struct active_object active_head;
 extern struct zone_data *zone_table;
 
+
+#ifdef WIN32
+int strncasecmp(char *s1, const char *s2, int len);
+#endif
+
 /* External procedures */
 
 int str_cmp(char *arg1, char *arg2);
 void stop_fighting(CHAR_DATA *ch);
 void remove_follower(CHAR_DATA *ch);
-#ifndef LINUX
-#ifndef SUN
-  extern int strncasecmp(char *s1,char *s2,int n);
-#endif
-#endif
+
 
 // This grabs the first "word" (defined as group of alphaBETIC chars)
 // puts it in a static char buffer, and returns it.
@@ -1088,11 +1090,24 @@ struct obj_data *unequip_char(CHAR_DATA *ch, int pos)
 
 int get_number(char **name)
 {
-  int i;
-  char *ppos;
+  unsigned i;
+  char *ppos = NULL;
   char number[MAX_INPUT_LENGTH];
-    
+
+#ifdef WIN32
+
+  for(i = 0; i < strlen(*name); i++)
+  {
+	  if((char)*(name + i) == '.')
+	  {
+		  ppos = *name + i; 
+		  break;
+	  }
+  }
+  if(ppos) {
+#else
   if((ppos = index(*name, '.')) != NULL) {
+#endif
     *ppos++ = '\0';
     // at this point, ppos points to the name only, and there is a 
     // \0 between the number and the name as they appear in the string. 

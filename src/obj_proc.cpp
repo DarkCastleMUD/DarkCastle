@@ -142,13 +142,15 @@ void load_emoting_objects()
 #endif
                 data_cursor = data_cursor->next;
                 data_cursor->next = NULL;
+				// Azrack -- fseek had a -1 * offset * sizeof(char) which is going to send us to EOF immmediately
+				// because fseek takes an unsigned int.
                 fseek(fl, (-1 * offset * sizeof(char)), SEEK_CUR);
             }
         }
         if((fromfile = fgetc(fl)) == '$') {
             done2 = true;
         } else {
-            fseek(fl, (-1 * sizeof(char)), SEEK_CUR);
+            fseek(fl, (1 * sizeof(char)), SEEK_CUR);
 #ifdef LEAK_CHECK
             index_cursor->next = (struct obj_emote_index *)
                                  calloc(1, sizeof(struct obj_emote_index));

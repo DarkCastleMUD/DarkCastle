@@ -8,7 +8,11 @@
 typedef int socket_t;
 
 #define SEND_TO_Q(messg, desc)  write_to_output((messg), desc)
+#ifndef WIN32
 #define CLOSE_SOCKET(sock) close(sock)
+#else
+#define CLOSE_SOCKET(sock) closesocket(sock)
+#endif
 
 #define SMALL_BUFSIZE           1024
 #define LARGE_BUFSIZE           (12 * 1024)

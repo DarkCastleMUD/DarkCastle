@@ -2,19 +2,17 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.1 2002/06/13 04:32:18 dcastle Exp $ */
+/* $Id: fight.cpp,v 1.2 2002/06/13 04:41:07 dcastle Exp $ */
 
 extern "C"
 {
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h> /* malloc */
-#ifndef LINUX
-#ifndef NeXT
-#include <malloc.h> 
-#endif
-#endif
+
+#ifndef WIN32
 #include <unistd.h>
+#endif
 }
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
@@ -201,7 +199,7 @@ bool gets_dual_wield_attack(char_data * ch)
 
 // int attack(...) FUNCTION SHOULD BE CALLED *INSTEAD* OF HIT IN ALL CASES!
 // standard retvals
-int attack(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon = FIRST)
+int attack(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
 {
   int do_say(struct char_data *ch, char *argument, int cmd);
   int result = 0;  
@@ -1159,6 +1157,7 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
   int typeofdamage;
   int damage_type(int weapon_type);
   long int get_weapon_bit(int weapon_type);
+  int hit_limit(CHAR_DATA * ch);
   int retval;
   int modifier = 0;
   int learned;
@@ -1900,7 +1899,7 @@ void free_messages_from_memory()
       dc_free(fight_messages[i].msg->god_msg.attacker_msg);
       dc_free(fight_messages[i].msg->god_msg.victim_msg);
       dc_free(fight_messages[i].msg->god_msg.room_msg);
-      dc_free(fight_messages[i].msg)
+      dc_free(fight_messages[i].msg);
         fight_messages[i].msg = next_message;
     }
 }
@@ -2826,7 +2825,7 @@ void dam_message(int dam, CHAR_DATA * ch, CHAR_DATA * victim,
    if (w_type == 0)
    {
      sprintf(buf1, "$n's %spunch %s $N%s%c", modstring, vp, vx, punct);
-     sprintf(buf2, "Your %spunch %s $N%s%c", modstring, vp, vx, punct);
+     sprintf(buf2, "Your %spunch %s $N%s%c", modstring, vs, vx, punct);
      sprintf(buf3, "$n's %spunch %s you%s%c", modstring, vp, vx, punct);
    }
    else
@@ -3354,7 +3353,7 @@ int second_wield(CHAR_DATA *ch)
 
 void inform_victim(CHAR_DATA *ch, CHAR_DATA *victim, int dam)
 {
-  long max_hit;
+  int max_hit;
   
   switch (GET_POS(victim))
   {

@@ -1,7 +1,7 @@
 #ifndef TIMEINFO_H_
 #define TIMEINFO_H_
 /************************************************************************
-| $Id: timeinfo.h,v 1.1 2002/06/13 04:32:22 dcastle Exp $
+| $Id: timeinfo.h,v 1.2 2002/06/13 04:41:15 dcastle Exp $
 | timeinfo.h
 | Description:  Declares the information for handling time in the game.
 */

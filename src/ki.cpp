@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.1 2002/06/13 04:32:18 dcastle Exp $ */
+/* $Id: ki.cpp,v 1.2 2002/06/13 04:41:08 dcastle Exp $ */
 
 extern "C"
 {
@@ -307,9 +307,9 @@ int ki_check(CHAR_DATA *ch)
 
 	if(GET_KI(ch) >= MAXIMUM_KI)
 	{
-		if(random()%2) /* 50% of the time */
+		if(rand()%2) /* 50% of the time */
 		{
-			switch(random()%6)
+			switch(rand()%6)
 			{
 				case 0: return NO_EFFECT;
 				case 1: return NO_EFFECT;

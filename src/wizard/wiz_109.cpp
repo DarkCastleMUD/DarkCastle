@@ -85,16 +85,6 @@ int do_processes(struct char_data *ch, char *arg, int cmd)
   char *tmp;
   char buf[100]; 
 
-#ifndef SGI 
-#ifndef LINUX
-#ifndef SUN
-#ifndef FreeBSD
-  int system(char *);
-#endif
-#endif
-#endif
-#endif
-
   strcpy(buf, "ps -ux > ../lib/whassup.txt");
 
   system(buf);
@@ -233,7 +223,7 @@ int do_advance(struct char_data *ch, char *argument, int cmd)
 int do_zap(struct char_data *ch, char *arg, int cmd)
 {
   struct char_data *victim;
-  sh_int room;
+  int room;
   char name[100], buf[500], f[100];
 
   void remove_clan_member(int clannumber, struct char_data * ch);

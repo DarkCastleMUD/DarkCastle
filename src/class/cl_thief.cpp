@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.1 2002/06/13 04:32:20 dcastle Exp $
+| $Id: cl_thief.cpp,v 1.2 2002/06/13 04:41:13 dcastle Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.

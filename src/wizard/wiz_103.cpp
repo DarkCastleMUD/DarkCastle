@@ -17,7 +17,7 @@
 int do_boot(struct char_data *ch, char *arg, int cmd)
 {
   struct char_data *victim;
-  sh_int room;
+  int room;
   char name[100], buf[500];
 
   one_argument(arg,name);
@@ -86,7 +86,7 @@ int do_disconnect(struct char_data *ch,  char *argument, int cmd)
     char arg[MAX_STRING_LENGTH];
     char buf[MAX_STRING_LENGTH];
     struct descriptor_data *d;
-    int sdesc;
+    unsigned sdesc;
 
     if (IS_NPC(ch))
             return eFAILURE;

@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.1 2002/06/13 04:32:18 dcastle Exp $ */
+/* $Id: mob_proc2.cpp,v 1.2 2002/06/13 04:41:08 dcastle Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -55,8 +55,8 @@ float value_multiplier(struct obj_data *obj)
     return 1;
   }
 
-  float v0 = obj->obj_flags.value[0];
-  float v1= (obj->obj_flags.value[0]) - (obj->obj_flags.value[1]);
+  float v0 = (float)obj->obj_flags.value[0];
+  float v1= (float)((obj->obj_flags.value[0]) - (obj->obj_flags.value[1]));
 
   if(v0 == 0) 
     return 1;

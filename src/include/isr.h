@@ -1,7 +1,7 @@
 #ifndef ISR_H_
 #define ISR_H_
 /************************************************************************
-| $Id: isr.h,v 1.1 2002/06/13 04:32:22 dcastle Exp $
+| $Id: isr.h,v 1.2 2002/06/13 04:41:15 dcastle Exp $
 | isr.h
 | Description:  This file defines the isr (IMMUNE/SUSCEPTIBLE/RESIST)
 |   vectors for everything.

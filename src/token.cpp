@@ -7,12 +7,13 @@
 |   function to split up the input stream.
 */
 // Standard header files
-#include <iostream.h> 
 
 extern "C"
 {
   #include <string.h>
   #include <ctype.h>
+#include <stdlib.h>
+#include <stdio.h>
 }
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
@@ -319,8 +320,46 @@ char * TokenList::Interpret(CHAR_DATA *from, OBJ_DATA *obj,
 		    strcat(interp, ((OBJ_DATA *)vict_obj)->short_description);
 		  }
 		  break;
-        case 'a': strcat(interp, SANA(obj));                  break;
-        case 'A': strcat(interp, SANA((OBJ_DATA *)vict_obj)); break;
+        case 'a':
+			switch(*(obj)->name)
+			{
+			case 'a':
+			case 'A':
+			case 'e':
+			case 'E':
+			case 'i':
+			case 'I':
+			case 'o':
+			case 'O':
+			case 'u':
+			case 'U':
+			case 'y':
+			case 'Y':
+				strcat(interp, "an");
+			default:
+				strcat(interp, "a");
+			}
+			break;
+        case 'A':
+			switch(*((OBJ_DATA *)vict_obj)->name)
+			{
+			case 'a':
+			case 'A':
+			case 'e':
+			case 'E':
+			case 'i':
+			case 'I':
+			case 'o':
+			case 'O':
+			case 'u':
+			case 'U':
+			case 'y':
+			case 'Y':
+				strcat(interp, "an");
+			default:
+				strcat(interp, "a");
+			}
+			break;
         case 'T': strcat(interp, (char *)vict_obj);           break;
         case 'F': strcat(interp, fname((char *)vict_obj));    break;
 	default : // Illegal code - just output it
