@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.5 2002/07/13 21:11:06 pirahna Exp $ */
+/* $Id: limits.cpp,v 1.6 2002/08/14 22:24:18 dcastle Exp $ */
 
 extern "C"
 {
@@ -186,7 +186,6 @@ int mana_gain(CHAR_DATA *ch)
 int hit_gain(CHAR_DATA *ch)
 {
   int gain = 1;
-  int divisor = 8;
   struct affected_type * af;
 
   /* Neat and fast */
@@ -195,20 +194,19 @@ int hit_gain(CHAR_DATA *ch)
   
   /* PC's */
   else {
-    gain = GET_MAX_HIT(ch) / 160;
+    gain = 1;
 
     /* Position calculations    */
     switch (GET_POS(ch)) {
-      case POSITION_SLEEPING: divisor = 1; break;
-      case POSITION_RESTING:  divisor = 2; break;
-      case POSITION_SITTING:  divisor = 4; break;
-      default:                divisor = 16; break;
+      case POSITION_SLEEPING: gain += 10;  break;
+      case POSITION_RESTING:  gain += 5;   break;
+      case POSITION_SITTING:  gain += 1;   break;
+      default:                             break;
     }
 
     if(gain < 1) 
       gain = 1;
 
-    gain /= divisor;    
     gain += (GET_CON(ch)/2);
 
     if((af = affected_by_spell(ch, SPELL_RAPID_MEND)))

@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: save.cpp,v 1.10 2002/08/11 16:10:04 pirahna Exp $ */
+/* $Id: save.cpp,v 1.11 2002/08/14 22:24:18 dcastle Exp $ */
 
 extern "C"
 {
@@ -760,7 +760,7 @@ struct obj_data *  obj_store_to_char(CHAR_DATA *ch, FILE *fpsave, struct obj_dat
 
   if(nr == -1) {
     extract_obj(obj);
-    return NULL;
+    return last_cont;
   }
 
   // Handle worn EQ
@@ -782,7 +782,7 @@ struct obj_data *  obj_store_to_char(CHAR_DATA *ch, FILE *fpsave, struct obj_dat
     }
     else {
       obj_to_char(obj, ch); // just in case
-      return NULL;
+      return last_cont;
     }
   }
   // screw it, just put it in their inventory

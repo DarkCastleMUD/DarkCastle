@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.41 2002/08/14 19:11:45 dcastle Exp $ */
+/* $Id: fight.cpp,v 1.42 2002/08/14 22:24:18 dcastle Exp $ */
 
 extern "C"
 {
@@ -2567,14 +2567,12 @@ void group_gain(CHAR_DATA * ch, CHAR_DATA * victim)
   long totallevels;
   CHAR_DATA *k, *highest;
   struct follow_type *f;
+  int grouplevel;
   
   /* No exp for pkills (duh) */
   if(is_pkill(ch, victim))
     return;
   
-    /* Monsters don't get kill xp's. Dying of mortal wounds doesn't give xp
-    * to anyone!
-  */
   if(ch == victim)
     return;
   
@@ -2594,9 +2592,10 @@ void group_gain(CHAR_DATA * ch, CHAR_DATA * victim)
   
   if((highest = ch->master) == NULL)
     highest = ch;
-  
+
   no_members = 0;
   totallevels = 0;
+  grouplevel = GET_LEVEL(ch);
   
   if(IS_AFFECTED(k, AFF_GROUP) && k->in_room == ch->in_room) { 
     no_members += 1;
@@ -2617,6 +2616,7 @@ void group_gain(CHAR_DATA * ch, CHAR_DATA * victim)
     no_members = 1;
     totallevels = GET_LEVEL(ch);
   }
+  else grouplevel -= MIN(4, no_members);
 
   share = GET_EXP(victim);
 
@@ -2661,7 +2661,7 @@ void group_gain(CHAR_DATA * ch, CHAR_DATA * victim)
     else tmp_share = ((GET_LEVEL(tmp_ch)+6) * share / totallevels);  // small bonus for grouped lowbies
 
     // reduce xp if you are higher level than mob
-    switch(GET_LEVEL(victim) - GET_LEVEL(ch)) {
+    switch(GET_LEVEL(victim) - grouplevel) {
       case -1:  break;
       case -2:  break;
       case -3:  break;
