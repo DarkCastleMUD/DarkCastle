@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.146 2004/04/19 18:07:03 urizen Exp $ */
+/* $Id: fight.cpp,v 1.147 2004/04/19 18:24:21 urizen Exp $ */
 
 extern "C"
 {
@@ -2169,7 +2169,24 @@ void set_fighting(CHAR_DATA * ch, CHAR_DATA * vict)
       add_memory(vict, GET_NAME(ch->master), 'h');
   if (!IS_NPC(ch) && IS_NPC(vict))
      if (!IS_SET(vict->mobdata->actflags, ACT_STUPID))
-       add_memory(vict, GET_NAME(ch), 't');
+     {
+       if (GET_LEVEL(ch) - GET_LEVEL(vict)/2 <= 0)
+          {
+                add_memory(vict, GET_NAME(ch), 't');
+                struct timer_data *timer;
+                #ifdef LEAK_CHECK
+                  timer = (struct timer_data *)calloc(1, sizeof(struct timer_data));
+                #else
+                  timer = (struct timer_data *)dc_alloc(1, sizeof(struct timer_data));
+                #endif
+                timer->arg1 = (void*)vict->hunting;
+                timer->arg2 = (void*)vict;
+                timer->function = clear_hunt;
+                timer->next = timer_list;
+                timer_list = timer;
+                timer->timeleft = (ch->level==50?24 * 60:(ch->level/5 )*60);
+           }
+     }
   for (k = combat_list; k; k = next_char) {
     next_char = k->next_fighting;
     if (k->fighting == vict)
