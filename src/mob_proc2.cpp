@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.35 2004/07/03 19:13:40 urizen Exp $ */
+/* $Id: mob_proc2.cpp,v 1.36 2004/07/04 17:46:21 urizen Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -445,6 +445,7 @@ int mortician(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
            (!isname(GET_NAME(ch), obj->name) && !isname(buf, obj->name)))
          continue; 
 
+       if (obj->in_room == ch->in_room) continue;
        if(!obj->contains)  // skip empty corpses
          continue;
 
@@ -497,6 +498,7 @@ int mortician(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 
      if(isname(buf, obj->name))
        has_consent = TRUE;
+     if (obj->in_room == ch->in_room) continue; // Skip bought corpses
 
      cost = corpse_cost(obj);
      cost /= 20000;
@@ -1234,7 +1236,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     "13) Buy a practice session for 100 plats.\n\r"
                  , ch);
 
-    if(!IS_MOB(ch)) {   // mobs can't meta ki
+    if(!IS_MOB(ch) && ki_cost && ki_exp) {   // mobs can't meta ki
       if(GET_KI_METAS(ch) > 4)
 	send_to_char("14) Your ki is already meta'd fully.\n\r", ch);
       else csendf(ch, "14) Add a point of ki:       %d experience points and %d Platinum.\n\r", ki_exp, ki_cost);
@@ -1319,7 +1321,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
       return eSUCCESS;
     }
 
-   if(choice == 6) {
+   if(choice == 6 && hit_exp && hit_cost) {
      if(GET_EXP(ch) < hit_exp) {
        send_to_char("The Meta-physician tells you, 'You lack the experience.'\n\r", ch);
        return eSUCCESS;
@@ -1340,7 +1342,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
      return eSUCCESS;
    }
 
-   if(choice == 7) {
+   if(choice == 7 && mana_exp && mana_cost) {
 
      if(GET_EXP(ch) < mana_exp) {
        send_to_char("The Meta-physician tells you, 'You lack the experience.'\n\r", ch);
@@ -1363,7 +1365,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
      return eSUCCESS;
    }
 
-   if(choice == 8) 
+   if(choice == 8 && move_exp && move_cost) 
    {
      if(GET_EXP(ch) < move_exp) {
        send_to_char("The Meta-physician tells you, 'You lack the experience.'\n\r", ch);
@@ -1476,7 +1478,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     ch->pcdata->practices += 1;
     return eSUCCESS;
   }
-  if(choice == 14) {
+  if(choice == 14 && ki_exp && ki_cost) {
     if(IS_MOB(ch)) {
       send_to_char("Mobs cannot meta ki.\r\n", ch);
       return eSUCCESS;
