@@ -16,10 +16,74 @@
 #include <interp.h>
 #include <returnvals.h>
 
+int spellcraft(struct char_data *ch, int spell)
+{
+  int a = has_skill(ch, SKILL_SPELLCRAFT);
+  if (!a) return FALSE;
+  if (has_skill(ch, spell) < 80) return FALSE;
+  if (spell == SPELL_MAGIC_MISSILE)
+  {
+    if (a < 11) skill_increase_check(ch, SKILL_SPELLCRAFT, a, SKILL_INCREASE_MEDIUM);
+    return eSUCCESS;
+  }
+  if (spell == SPELL_BURNING_HANDS && a > 10)
+  {
+    if (a < 21) skill_increase_check(ch, SKILL_SPELLCRAFT, a,SKILL_INCREASE_MEDIUM);
+    return eSUCCESS;
+  }
+  if (spell == SPELL_LIGHTNING_BOLT && a > 20)
+  {
+    if (a < 31) skill_increase_check(ch, SKILL_SPELLCRAFT, a,
+SKILL_INCREASE_MEDIUM);
+    return eSUCCESS;
+  }
+  if (spell == SPELL_CHILL_TOUCH && a > 30)
+  {
+    if (a < 41) skill_increase_check(ch, SKILL_SPELLCRAFT, a,
+SKILL_INCREASE_MEDIUM);
+    return eSUCCESS;
+  }
+  if (spell == SPELL_FIREBALL && a> 40)
+  {
+    if (a < 51) skill_increase_check(ch, SKILL_SPELLCRAFT, a,
+SKILL_INCREASE_MEDIUM);
+    return eSUCCESS;
+  }
+  if (spell == SPELL_METEOR_SWARM && a > 50)
+  {
+    if (a < 61) skill_increase_check(ch, SKILL_SPELLCRAFT, a,
+SKILL_INCREASE_MEDIUM);
+    return eSUCCESS;
+  }
+  if (spell == SPELL_PARALYZE && a > 60)
+  {
+    if (a < 71) skill_increase_check(ch, SKILL_SPELLCRAFT, a,
+SKILL_INCREASE_MEDIUM);
+    return eSUCCESS;
+  }
+  if (spell == SPELL_CREATE_GOLEM && a > 70)
+  {
+    if (a < 81) skill_increase_check(ch, SKILL_SPELLCRAFT, a,
+SKILL_INCREASE_MEDIUM);
+    return eSUCCESS;
+  }
+  if (spell == SPELL_SOLAR_GATE && a > 80)
+  {
+    if (a < 91) skill_increase_check(ch, SKILL_SPELLCRAFT, a,
+SKILL_INCREASE_MEDIUM);
+    return eSUCCESS;
+  }
+  if (spell == SPELL_HELLSTREAM && a > 90)
+  {
+    skill_increase_check(ch, SKILL_SPELLCRAFT, a,SKILL_INCREASE_MEDIUM);
+    return eSUCCESS;
+  }
+  return FALSE;
+}
 
 int do_focused_repelance(struct char_data *ch, char *argument, int cmd)
 {
-  byte percent;
+  //byte percent;
   struct affected_type af;
   int duration = 40;
   if(IS_MOB(ch))
@@ -34,7 +98,7 @@ int do_focused_repelance(struct char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (skill_success(ch,NULL,SKILL_FOCUSED_REPELANCE)) 
+  if (!skill_success(ch,NULL,SKILL_FOCUSED_REPELANCE)) 
   {
     act("$n closes $s eyes and chants quietly, $s head shakes suddenly in confusion.",
          ch, NULL, NULL, TO_ROOM, NOTVICT);

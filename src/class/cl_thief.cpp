@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.69 2004/07/21 10:16:18 rahz Exp $
+| $Id: cl_thief.cpp,v 1.70 2004/11/16 00:51:57 Zaphod Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -27,6 +27,8 @@ extern CWorld world;
  
 extern struct index_data *mob_index;
 extern struct index_data *obj_index;
+extern int top_of_world;
+extern int arena[4];
 
 int find_door(CHAR_DATA *ch, char *type, char *dir);
 struct obj_data * search_char_for_item(char_data * ch, sh_int item_number);
@@ -99,18 +101,24 @@ int do_eyegouge(CHAR_DATA *ch, char *argument, int cmd)
   }
   int retval = 0;
   if (!skill_success(ch,victim, SKILL_EYEGOUGE))
-  {
-     act("You miss $N's eye.",ch, NULL, victim, TO_CHAR, 0);
-     act("$n walks up to $N and tries to push $s thumb into $N's eye, but misses!",ch, NULL, victim, TO_ROOM, NOTVICT);
-     act("$n walks up to you and tries to push $s thumb into your eye, but misses!",ch, NULL, victim, TO_VICT, 0);
+  {//
+    // act("You miss $N's eye.",ch, NULL, victim, TO_CHAR, 0);
+  //   act("$n walks up to $N and tries to push $s thumb into $N's eye, 
+//but misses!",ch, NULL, victim, TO_ROOM, NOTVICT);
+//     act("$n walks up to you and tries to push $s thumb into your eye, 
+//but misses!",ch, NULL, victim, TO_VICT, 0);
      retval = damage(ch,victim, 0, TYPE_UNDEFINED, SKILL_EYEGOUGE, 0);
   } else {
-     act("You press your thumb into $N's eye.",ch, NULL, victim, TO_CHAR, 0);
-     act("$n walks up to $N and pushes $s thumb into $N's eye!",ch, NULL, victim, TO_ROOM, NOTVICT);
-     act("$n walks up to you and pushes $s thumb into your eye! Ow!",ch, NULL, victim, TO_VICT, 0);
-     retval = damage(ch, victim, 150, TYPE_UNDEFINED, SKILL_EYEGOUGE, 0);
+  //   act("You press your thumb into $N's eye.",ch, NULL, victim, 
+//TO_CHAR, 0);
+  //   act("$n walks up to $N and pushes $s thumb into $N's eye!",ch, 
+//NULL, victim, TO_ROOM, NOTVICT);
+  //   act("$n walks up to you and pushes $s thumb into your eye! Ow!",ch, 
+
+//NULL, victim, TO_VICT, 0);
      SET_BIT(victim->affected_by, AFF_BLIND);
      SET_BIT(victim->combat, COMBAT_THI_EYEGOUGE);
+     retval = damage(ch, victim, 150, TYPE_UNDEFINED, SKILL_EYEGOUGE, 0);
   }
   WAIT_STATE(ch, PULSE_VIOLENCE*3);
   return retval | eSUCCESS;
@@ -120,7 +128,7 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
 {
   CHAR_DATA *victim;
   char name[256];
-  int skill = 0;
+  //int skill = 0;
   int was_in = 0;
   int retval;
 
@@ -175,15 +183,12 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
     return eFAILURE;
   }
   
-  WAIT_STATE(ch, PULSE_VIOLENCE);
-  
+ 
   int itemp = number(1, 101);
   if (GET_CLASS(ch) == CLASS_ANTI_PAL)
     itemp++; // One extra %'s chance.
-  if(has_skill(ch,SKILL_BACKSTAB)) 
+  if(!has_skill(ch,SKILL_BACKSTAB) && !IS_MOB(ch) ) 
   {
-  }
-  else {
     send_to_char("You don't know how to backstab people!\r\n", ch);
     return eFAILURE;
   }
@@ -218,7 +223,7 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
     retval = attack(ch, victim, SKILL_BACKSTAB, FIRST);
 
 //  if(!IS_SET(retval, eCH_DIED))
-  WAIT_STATE(ch, PULSE_VIOLENCE);
+  WAIT_STATE(ch, PULSE_VIOLENCE*2);
 
   if(SOMEONE_DIED(retval))
     return retval;
@@ -320,16 +325,16 @@ int do_circle(CHAR_DATA *ch, char *argument, int cmd)
 
       if(SOMEONE_DIED(retval))
         return retval;
-      
+    }
       // Now go for dual backstab
       if ((GET_LEVEL(ch) >= 40) &&
           ((GET_CLASS(ch) == CLASS_THIEF) || (GET_LEVEL(ch) >= ARCHANGEL)))
          if (ch->equipment[SECOND_WIELD])
             if ((ch->equipment[SECOND_WIELD]->obj_flags.value[3] == 11) ||
                 (ch->equipment[SECOND_WIELD]->obj_flags.value[3] == 9)) {
-               WAIT_STATE(ch, PULSE_VIOLENCE);
+	               WAIT_STATE(ch, PULSE_VIOLENCE);
 
-               if (AWAKE(victim) && skill_success(ch,victim,SKILL_DUAL_BACKSTAB))
+               if (AWAKE(victim) && !skill_success(ch,victim,SKILL_DUAL_BACKSTAB))
                   damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_BACKSTAB,
                          SECOND);
                else {
@@ -337,7 +342,7 @@ int do_circle(CHAR_DATA *ch, char *argument, int cmd)
                   return one_hit(ch, victim, SKILL_BACKSTAB, SECOND);
                   }
                } // end of if that checks weapon's validity
-   } // end of else
+   //} // end of else
    return eSUCCESS;
 }
 
@@ -418,6 +423,12 @@ int do_sneak(CHAR_DATA *ch, char *argument, int cmd)
 {
    affected_type af;
 
+   if((ch->in_room >= 0 && ch->in_room <= top_of_world) &&
+     IS_SET(world[ch->in_room].room_flags, ARENA) && arena[2] == -3) {
+       send_to_char("You can't do that in a potato arena ya sneaky bastard!\n\r", ch);
+       return eFAILURE;
+  }
+
    if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
       ;
    else if(!has_skill(ch, SKILL_SNEAK)) {
@@ -496,6 +507,13 @@ int do_stalk(CHAR_DATA *ch, char *argument, int cmd)
 
 int do_hide(CHAR_DATA *ch, char *argument, int cmd)
 {
+
+  if((ch->in_room >= 0 && ch->in_room <= top_of_world) &&
+     IS_SET(world[ch->in_room].room_flags, ARENA) && arena[2] == -3) {
+       send_to_char("You can't do that in a potato arena ya sneaky bastard!\n\r", ch);
+       return eFAILURE;
+  }
+
    for(char_data * curr = world[ch->in_room].people;
        curr;
        curr = curr->next_in_room)
@@ -510,6 +528,28 @@ int do_hide(CHAR_DATA *ch, char *argument, int cmd)
 
    if ( ! IS_AFFECTED(ch, AFF_HIDE) )
       SET_BIT(ch->affected_by, AFF_HIDE);
+  /* See how well it worked on those currently in the room. */
+    int a,i;
+    CHAR_DATA *temp;
+    if (!IS_NPC(ch) && (a = has_skill(ch, SKILL_HIDE)))
+    {
+        for (i = 0; i < MAX_HIDE;i++)
+          ch->pcdata->hiding_from[i] = NULL;
+        i = 0;
+        for (temp = world[ch->in_room].people; temp; temp = temp->next_in_room)
+        {
+	  if (ch == temp) continue;
+	  if (i >= MAX_HIDE) break;
+          if (number(1,101) > a) // Failed.
+          {
+            ch->pcdata->hiding_from[i] = temp;
+            ch->pcdata->hide[i++] = FALSE;
+          } else {
+            ch->pcdata->hiding_from[i] = temp;
+            ch->pcdata->hide[i++] = TRUE;
+          }
+        }
+   }
    return eSUCCESS;
 }
 
@@ -639,8 +679,8 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
           move_obj(obj, ch);
 
           if(!IS_NPC(victim) || (IS_SET(victim->mobdata->actflags,ACT_NICE_THIEF)))
-            _exp = GET_OBJ_WEIGHT(obj);
-          else _exp = (GET_OBJ_WEIGHT(obj) * GET_LEVEL(victim));
+            _exp = GET_OBJ_WEIGHT(obj) * 1000;
+          else _exp = (GET_OBJ_WEIGHT(obj) * 1000);
 
           if(GET_POS(victim) <= POSITION_SLEEPING)  
             _exp = 1;
@@ -962,7 +1002,11 @@ int do_pocket(CHAR_DATA *ch, char *argument, int cmd)
 */
   WAIT_STATE(ch, 10); /* It takes TIME to steal */
  
-//  if(has_skill(ch,SKILL_POCKET))
+  if(!has_skill(ch,SKILL_POCKET))
+  {
+   send_to_char("Well, you would, if you knew how.\r\n",ch);
+    return eFAILURE;
+  }
 //    skill_increase_check(ch, SKILL_POCKET, has_skill(ch,SKILL_POCKET),SKILL_INCREASE_MEDIUM);
 
   if (!skill_success(ch, victim, SKILL_POCKET)) 
@@ -979,15 +1023,17 @@ int do_pocket(CHAR_DATA *ch, char *argument, int cmd)
     }
   } else 
   {
-    int percent = has_skill(ch,SKILL_POCKET) / 10 + number(-1,1);
+    int learned = has_skill(ch, SKILL_POCKET);
+    int percent = 7 + (learned > 40) + (learned > 60) + (learned > 80);
+    
     // Steal some gold coins
     gold = (int) ((float)(GET_GOLD(victim))*(float)((float)percent/100.0));
 //    gold = MIN(10000, gold);
     if (gold > 0) {
       GET_GOLD(ch)     += gold;
       GET_GOLD(victim) -= gold;
-	_exp = gold / 1000;
-    if(IS_SET(victim->mobdata->actflags, ACT_NICE_THIEF)) _exp = 1; 
+	_exp = gold / 20;
+    if(IS_NPC(victim) && IS_SET(victim->mobdata->actflags, ACT_NICE_THIEF)) _exp = 1; 
 
       GET_EXP(ch)      += _exp;
       sprintf(buf, "Bingo! You got %d gold coins.\n\r", gold);
@@ -1039,16 +1085,30 @@ int do_pocket(CHAR_DATA *ch, char *argument, int cmd)
 
 int do_pick(CHAR_DATA *ch, char *argument, int cmd)
 {
-   int door, other_room;
+   int door, other_room, j;
    char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH];
    struct room_direction_data *back;
    struct obj_data *obj;
    CHAR_DATA *victim;
+   bool has_lockpicks = FALSE;
 
    argument_interpreter(argument, type, dir);
 
    if(!has_skill(ch,SKILL_PICK_LOCK)) {
       send_to_char("You don't know how to pick locks!\r\n", ch);
+      return eFAILURE;
+   }
+
+  // for (obj = ch->carrying; obj; obj = obj->next_content)
+  //    if (obj->obj_flags.type_flag == ITEM_LOCKPICK)
+  //      has_lockpicks = TRUE;
+
+   for (j=0; j<MAX_WEAR; j++)
+     if (ch->equipment[j] && ch->equipment[j]->obj_flags.type_flag == ITEM_LOCKPICK)
+       has_lockpicks = TRUE;
+
+   if (!has_lockpicks) {
+      send_to_char("But...you don't have a lockpick!\r\n", ch);
       return eFAILURE;
    }
 
@@ -1090,7 +1150,7 @@ int do_pick(CHAR_DATA *ch, char *argument, int cmd)
   else if (!IS_SET(EXIT(ch, door)->exit_info, EX_LOCKED))
       send_to_char("Oh.. it wasn't locked at all.\n\r", ch);
   else if (IS_SET(EXIT(ch, door)->exit_info, EX_PICKPROOF))
-      send_to_char("You seem to be unable to pick ths lock.\n\r", ch);
+      send_to_char("You seem to be unable to pick this lock.\n\r", ch);
   else
   {
       //skill_increase_check(ch, SKILL_PICK_LOCK, has_skill(ch,SKILL_PICK_LOCK), SKILL_INCREASE_MEDIUM);

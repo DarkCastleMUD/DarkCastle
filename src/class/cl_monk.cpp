@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_monk.cpp,v 1.20 2004/07/03 11:44:16 urizen Exp $
+| $Id: cl_monk.cpp,v 1.21 2004/11/16 00:51:57 Zaphod Exp $
 | cl_monk.C
 | Description:  Monk skills.
 */
@@ -15,6 +15,8 @@
 #include <mobile.h>
 #include <act.h>
 #include <returnvals.h>
+#include <db.h>
+#include <room.h>
 
 /************************************************************************
 | OFFENSIVE commands.
@@ -77,7 +79,7 @@ int do_eagle_claw(struct char_data *ch, char *argument, int cmd)
    {
       dam = dice(GET_LEVEL(ch), 6);
 
-      if (245 > GET_HIT(victim)) {
+      if (dam >= GET_HIT(victim)) {
          // TODO - have 'learned' effect how good the heart is that you grab out
          // for the later modifications to this.  Hearts regen ki, etc etc.
          make_heart(ch, victim);
@@ -91,6 +93,7 @@ int do_eagle_claw(struct char_data *ch, char *argument, int cmd)
 
 int do_quivering_palm(struct char_data *ch, char *argument, int cmd)
 {
+  extern CWorld world;
   struct affected_type af;
   struct char_data *victim;
   char name[256];
@@ -140,6 +143,11 @@ int do_quivering_palm(struct char_data *ch, char *argument, int cmd)
   if(!can_attack(ch) || !can_be_attacked(ch, victim))
      return eFAILURE;
 	   
+  if (IS_SET(world[ch->in_room].room_flags, NO_KI)) {
+    send_to_char("You find yourself unable to focus your energy here.\n\r", ch);
+    return eFAILURE;
+  }
+
   if(GET_KI(ch) < 40 && GET_LEVEL(ch) < ARCHANGEL) {
     send_to_char("You don't possess enough ki!\r\n", ch);
     return eFAILURE;
@@ -180,7 +188,11 @@ int do_stun(struct char_data *ch, char *argument, int cmd)
     send_to_char("Your lack of knowledge is stunning...\r\n", ch);
     return eFAILURE;
   }
-
+  if (GET_HIT(ch) < 25)
+  {
+    send_to_char("You can't muster the energy for such an attack.\r\n",ch);
+    return eFAILURE;
+  }
   one_argument(argument, name);
 
   victim = get_char_room_vis( ch, name );
@@ -211,7 +223,7 @@ int do_stun(struct char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if(!skill_success(ch,victim, SKILL_STUN) ) {
+  if(!skill_success(ch,victim, SKILL_STUN) && GET_POS(victim) != POSITION_SLEEPING) {
     act("$n attempts to hit you in your solar plexus!  You block $s attempt.", ch, NULL, victim, TO_VICT , 0);
     act("You attempt to hit $N in $s solar plexus...   YOU MISS!", ch, NULL, victim, TO_CHAR , 0);
     act("$n attempts to hit $N in $S solar plexus...   $e MISSES!", ch, NULL, victim, TO_ROOM, NOTVICT );

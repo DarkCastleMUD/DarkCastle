@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.25 2004/07/21 10:16:18 rahz Exp $
+| $Id: cl_warrior.cpp,v 1.26 2004/11/16 00:51:57 Zaphod Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -96,6 +96,7 @@ int do_deathstroke(struct char_data *ch, char *argument, int cmd)
     char name[256];
     int dam;
     int retval;
+    int failchance = 25;
 
     if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)   
       ;
@@ -134,6 +135,13 @@ int do_deathstroke(struct char_data *ch, char *argument, int cmd)
        send_to_char("Your opponent isn't in a vulnerable enough position!\r\n", ch);
        return eFAILURE;
     }
+    int i = has_skill(ch, SKILL_DEATHSTROKE);
+    if (i > 40) failchance -= 5;
+    if (i > 60) failchance -= 5;
+    if (i > 80) failchance -= 5;
+    if (i > 90) failchance -= 5;
+
+
 
     int to_dam = GET_DAMROLL(ch);
     if(IS_MOB(victim))
@@ -148,7 +156,12 @@ int do_deathstroke(struct char_data *ch, char *argument, int cmd)
 
     if (!skill_success(ch,victim,SKILL_DEATHSTROKE)) {
 	retval = damage(ch, victim, 0,TYPE_UNDEFINED, SKILL_DEATHSTROKE, 0);
-        dam /= 4;
+        if (number(1,101) > failchance)
+	{
+		send_to_char("You manage to retain your balance!\r\n",ch);
+		return eFAILURE;
+	}
+	dam /= 4;
         if (IS_AFFECTED(ch, AFF_SANCTUARY))
           dam /= 2;
         GET_HIT(ch) -= dam;
@@ -389,9 +402,12 @@ int do_bash(struct char_data *ch, char *argument, int cmd)
     if (!skill_success(ch,victim,SKILL_BASH,modifier)) {
 	GET_POS(ch) = POSITION_SITTING;
         SET_BIT(ch->combat, COMBAT_BASH1);
-        act("As $N avoids your bash, you topple over and fall to the ground.", ch, NULL, victim, TO_CHAR , 0);
-        act("You dodge a bash from $n who loses $s balance and falls.", ch, NULL, victim, TO_VICT , 0);
-        act("$N avoids being bashed by $n who loses $s balance and falls.", ch, NULL, victim, TO_ROOM, NOTVICT);
+//        act("As $N avoids your bash, you topple over and fall to the 
+//ground.", ch, NULL, victim, TO_CHAR , 0);
+ //       act("You dodge a bash from $n who loses $s balance and falls.", 
+//ch, NULL, victim, TO_VICT , 0);
+  //      act("$N avoids being bashed by $n who loses $s balance and 
+//falls.", ch, NULL, victim, TO_ROOM, NOTVICT);
 	retval = damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_BASH, 0);
     }
     else {
@@ -401,10 +417,12 @@ int do_bash(struct char_data *ch, char *argument, int cmd)
         // if they already have 2 rounds of wait, only tack on 1 instead of 2
         if(ch->desc && (ch->desc->wait > 1))
           WAIT_STATE(victim, PULSE_VIOLENCE);
-	else WAIT_STATE(victim, PULSE_VIOLENCE*2);
-        act("Your bash at $N sends $M sprawling.", ch, NULL, victim, TO_CHAR , 0);
-        act("$n sends you sprawling.", ch, NULL, victim, TO_VICT , 0);
-        act("$n sends $N sprawling with a powerful bash.", ch, NULL, victim, TO_ROOM, NOTVICT);
+	else WAIT_STATE(victim, PULSE_VIOLENCE * 2);
+ //       act("Your bash at $N sends $M sprawling.", ch, NULL, victim, 
+//TO_CHAR , 0);
+ //       act("$n sends you sprawling.", ch, NULL, victim, TO_VICT , 0);
+ //       act("$n sends $N sprawling with a powerful bash.", ch, NULL, 
+//victim, TO_ROOM, NOTVICT);
 	retval = damage(ch, victim, 25, TYPE_UNDEFINED, SKILL_BASH, 0);
     }
 
@@ -850,7 +868,7 @@ int do_guard(struct char_data *ch, char *argument, int cmd)
    }
 
    start_guarding(ch, victim);
-   sprintf(name, "You begin trying to guard %s.", GET_SHORT(victim));
+   sprintf(name, "You begin trying to guard %s.\r\n", GET_SHORT(victim));
    send_to_char(name, ch);
    return eSUCCESS;   
 }
