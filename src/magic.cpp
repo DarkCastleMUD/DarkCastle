@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.150 2004/05/28 20:26:02 urizen Exp $ */
+/* $Id: magic.cpp,v 1.151 2004/05/28 23:31:56 urizen Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -8011,7 +8011,7 @@ int cast_creeping_death(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DAT
        skill > 70 &&
        GET_LEVEL(victim) < IMMORTAL) 
    {
-      dam = GET_HIT(victim)*2 + 20;
+      dam = GET_HIT(victim)*5 + 20;
       send_to_char("The insects are crawling in your mouth, out of your eyes, "
                    "through your stomach!\n\r", victim);
       act("$N is completely consumed by insects!", ch, 0, victim, TO_ROOM, NOTVICT);
