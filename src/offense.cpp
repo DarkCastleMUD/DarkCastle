@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: offense.cpp,v 1.5 2004/05/25 01:04:49 urizen Exp $
+| $Id: offense.cpp,v 1.6 2004/06/05 03:08:31 urizen Exp $
 | offense.C
 | Description:  Commands that are generically offensive - that is, the
 |   victim should retaliate.  The class-specific offensive commands are
@@ -225,7 +225,7 @@ int do_join(struct char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if(ch->fighting == victim) {
+  if(vict->fighting == ch) {
     send_to_char( "But why join someone who is trying to kill YOU?\n\r",ch);
     return eFAILURE;
   }
