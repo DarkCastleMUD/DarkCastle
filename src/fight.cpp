@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.140 2004/04/14 07:04:39 urizen Exp $ */
+/* $Id: fight.cpp,v 1.141 2004/04/15 08:20:38 urizen Exp $ */
 
 extern "C"
 {
@@ -159,6 +159,11 @@ void perform_violence(void)
       last_virt  = mob_index[ch->mobdata->nr].virt;
 // DEBUG CODE
       
+   if (ch->in_room != ch->fighting->in_room)
+   { // Fix for the whacky fighting someone who's not here thing.
+     stop_fighting(ch);
+     continue;
+   }
     if(can_attack(ch)) {
       is_mob = IS_MOB(ch);
       if(is_mob) {
@@ -306,10 +311,11 @@ int attack(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
   }
   
   set_cantquit(ch, vict);   // This sets the flag if necessary
-  if (!vict->fighting)
-    set_fighting(vict, ch); // So attacker starts round #2.
-  set_fighting(ch, vict);
 
+  if (!vict->fighting && vict->in_room == ch->in_room)
+    set_fighting(vict, ch); // So attacker starts round #2.
+  else
+    set_fighting(ch,vict);
   wielded = ch->equipment[WIELD];
 
   if(type != SKILL_BACKSTAB)
