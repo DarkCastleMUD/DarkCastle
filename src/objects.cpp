@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.40 2004/05/29 21:29:33 urizen Exp $
+| $Id: objects.cpp,v 1.41 2004/06/06 13:46:39 urizen Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -1273,17 +1273,17 @@ int size_restricted(struct char_data *ch, struct obj_data *obj)
       return FALSE;
     else return TRUE;
 
-  if(GET_HEIGHT(ch) < 55)
+  if(GET_HEIGHT(ch) < 65)
     if(IS_SET(obj->obj_flags.size, SIZE_SMALL) || IS_SET(obj->obj_flags.size, SIZE_MEDIUM))
       return FALSE;
     else return TRUE;
 
-  if(GET_HEIGHT(ch) < 71)
+  if(GET_HEIGHT(ch) < 77)
     if(IS_SET(obj->obj_flags.size, SIZE_MEDIUM))
       return FALSE;
     else return TRUE;
 
-  if(GET_HEIGHT(ch) < 85)
+  if(GET_HEIGHT(ch) < 101)
     if(IS_SET(obj->obj_flags.size, SIZE_LARGE) || IS_SET(obj->obj_flags.size, SIZE_MEDIUM))
       return FALSE;
     else return TRUE;
