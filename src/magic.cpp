@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.48 2002/12/31 04:05:54 pirahna Exp $ */
+/* $Id: magic.cpp,v 1.49 2003/01/02 02:59:41 pirahna Exp $ */
 
 extern "C"
 {
@@ -1000,7 +1000,7 @@ int spell_harm(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *ob
   int save = saves_spell(ch, victim, skill / 2, SAVE_TYPE_MAGIC);
   dam += (int) (dam * (save/100));
 
-  return spell_damage(ch, victim, dam,TYPE_MAGIC, SPELL_HARM, 0);
+  return spell_damage(ch, victim, dam, TYPE_MAGIC, SPELL_HARM, 0);
 }
 
 int spell_power_harm(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
@@ -4412,43 +4412,49 @@ int cast_call_lightning( byte level, CHAR_DATA *ch, char *arg, int type,
 {
   extern struct weather_data weather_info;
   int retval;
+  char_data * next_v;
 
-	 switch (type) {
-	case SPELL_TYPE_SPELL:
-		 if (OUTSIDE(ch) && (weather_info.sky>=SKY_RAINING)) {
-		return spell_call_lightning(level, ch, victim, 0, skill);
-		 } else {
-		send_to_char("You fail to call upon the lightning from the sky!\n\r", ch);
-		 }
-		 break;
-		case SPELL_TYPE_POTION:
-		 if (OUTSIDE(ch) && (weather_info.sky>=SKY_RAINING)) {
-		return spell_call_lightning(level, ch, ch, 0, skill);
-		 }
-		 break;
-		case SPELL_TYPE_SCROLL:
-		 if (OUTSIDE(ch) && (weather_info.sky>=SKY_RAINING)) {
-		if(victim)
-			 return spell_call_lightning(level, ch, victim, 0, skill);
-		else if(!tar_obj) spell_call_lightning(level, ch, ch, 0, skill);
-		 }
-		 break;
-		case SPELL_TYPE_STAFF:
-		 if (OUTSIDE(ch) && (weather_info.sky>=SKY_RAINING))
-		 {
-		for (victim = world[ch->in_room].people ;victim ; victim = victim->next_in_room )
-			 if( IS_NPC(victim) )
-                         {
- 			    retval = spell_call_lightning(level, ch, victim, 0, skill);
-                            if(IS_SET(retval, eCH_DIED))
-                              return retval;
-                         }
-		 }
-		 break;
-		default :
-	 log("Serious screw-up in call lightning!", ANGEL, LOG_BUG);
-	 break;
-	 }
+  switch (type) {
+  case SPELL_TYPE_SPELL:
+    if (OUTSIDE(ch) && (weather_info.sky>=SKY_RAINING))
+      return spell_call_lightning(level, ch, victim, 0, skill);
+    else
+      send_to_char("You fail to call upon the lightning from the sky!\n\r", ch);
+    break;
+  case SPELL_TYPE_POTION:
+    if (OUTSIDE(ch) && (weather_info.sky>=SKY_RAINING))
+      return spell_call_lightning(level, ch, ch, 0, skill);
+    break;
+  case SPELL_TYPE_SCROLL:
+    if (OUTSIDE(ch) && (weather_info.sky>=SKY_RAINING)) 
+    {
+      if(victim)
+        return spell_call_lightning(level, ch, victim, 0, skill);
+      else if(!tar_obj) 
+        spell_call_lightning(level, ch, ch, 0, skill);
+    }
+    break;
+  case SPELL_TYPE_STAFF:
+    if (OUTSIDE(ch) && (weather_info.sky>=SKY_RAINING))
+    {
+      for (victim = world[ch->in_room].people ; victim ; victim = next_v )
+      {
+        next_v = victim->next_in_room;
+   
+        if ( !ARE_GROUPED(ch, victim) )
+        {
+          retval = spell_call_lightning(level, ch, victim, 0, skill);
+          if(IS_SET(retval, eCH_DIED))
+            return retval;
+        }
+      }
+      return eSUCCESS;
+    }
+    break;
+  default :
+    log("Serious screw-up in call lightning!", ANGEL, LOG_BUG);
+    break;
+  }
   return eFAILURE;
 }
 
@@ -4702,30 +4708,41 @@ int cast_solar_gate( byte level, CHAR_DATA *ch, char *arg, int type,
 int cast_energy_drain( byte level, CHAR_DATA *ch, char *arg, int type,
   CHAR_DATA *victim, struct obj_data *tar_obj, int skill )
 {
+  char_data * next_v;
+  int retval;
+
   switch (type) {
-	 case SPELL_TYPE_SPELL:
-		 return spell_energy_drain(level, ch, victim, 0, skill);
-		 break;
-	 case SPELL_TYPE_POTION:
+  case SPELL_TYPE_SPELL:
+    return spell_energy_drain(level, ch, victim, 0, skill);
+    break;
+  case SPELL_TYPE_POTION:
 	 return spell_energy_drain(level, ch, ch, 0, skill);
 	 break;
-	 case SPELL_TYPE_SCROLL:
+  case SPELL_TYPE_SCROLL:
 	 if(victim)
 		return spell_energy_drain(level, ch, victim, 0, skill);
 	 else if(!tar_obj)
 		 return spell_energy_drain(level, ch, ch, 0, skill);
 	 break;
-	 case SPELL_TYPE_WAND:
+  case SPELL_TYPE_WAND:
 	 if(victim)
 		return spell_energy_drain(level, ch, victim, 0, skill);
 	 break;
-	 case SPELL_TYPE_STAFF:
-	 for (victim = world[ch->in_room].people ;
-			victim ; victim = victim->next_in_room )
-		 if( IS_NPC(victim) )
-			 return spell_energy_drain(level, ch, victim, 0, skill);
-	 break;
-	 default :
+  case SPELL_TYPE_STAFF:
+    for (victim = world[ch->in_room].people ; victim ; victim = next_v )
+    {
+      next_v = victim->next_in_room;
+   
+      if ( !ARE_GROUPED(ch, victim) )
+      {
+        retval = spell_energy_drain(level, ch, victim, 0, skill);
+        if(IS_SET(retval, eCH_DIED))
+          return retval;
+      }
+    }
+    return eSUCCESS;
+    break;
+  default :
 	 log("Serious screw-up in energy drain!", ANGEL, LOG_BUG);
 	 break;
 	 }
@@ -4736,39 +4753,43 @@ int cast_souldrain( byte level, CHAR_DATA *ch, char *arg, int type,
   CHAR_DATA *victim, struct obj_data *tar_obj, int skill )
 {
   int retval;
+  char_data * next_v;
 
   switch (type) {
-	 case SPELL_TYPE_SPELL:
+  case SPELL_TYPE_SPELL:
 	    return spell_souldrain(level, ch, victim, 0, skill);
 	    break;
-	 case SPELL_TYPE_POTION:
+  case SPELL_TYPE_POTION:
 	    return spell_souldrain(level, ch, ch, 0, skill);
 	    break;
-	 case SPELL_TYPE_SCROLL:
+  case SPELL_TYPE_SCROLL:
 	    if(victim)
 		return spell_souldrain(level, ch, victim, 0, skill);
 	    else if(!tar_obj)
 		 return spell_souldrain(level, ch, ch, 0, skill);
 	    break;
-	 case SPELL_TYPE_WAND:
+  case SPELL_TYPE_WAND:
 	    if(victim)
 		return spell_souldrain(level, ch, victim, 0, skill);
 	    break;
-	 case SPELL_TYPE_STAFF:
-	    for (victim = world[ch->in_room].people ;
-			victim ; victim = victim->next_in_room )
-		 if( IS_NPC(victim) )
-                   {
-			 retval = spell_souldrain(level, ch, victim, 0, skill);
-			 if(IS_SET(retval, eCH_DIED))
-				return retval;
-                   }
-	    return eSUCCESS;
-	    break;
-	 default :
+  case SPELL_TYPE_STAFF:
+    for (victim = world[ch->in_room].people ; victim ; victim = next_v )
+    {
+      next_v = victim->next_in_room;
+  
+      if ( !ARE_GROUPED(ch, victim) )
+      {
+        retval = spell_souldrain(level, ch, victim, 0, skill);
+        if(IS_SET(retval, eCH_DIED))
+          return retval;
+      }
+    }
+    return eSUCCESS;
+    break;
+  default :
 	    log("Serious screw-up in souldrain!", ANGEL, LOG_BUG);
 	    break;
-	 }
+  }
   return eFAILURE;
 }
 
@@ -4899,30 +4920,33 @@ int cast_howl( byte level, CHAR_DATA *ch, char *arg, int type,
 int cast_harm( byte level, CHAR_DATA *ch, char *arg, int type,
   CHAR_DATA *victim, struct obj_data *tar_obj, int skill )
 {
-         int retval;
+  int retval;
+  char_data * next_v;
 
-	 switch (type) {
-	 case SPELL_TYPE_SPELL:
-	 return spell_harm(level, ch, victim, 0, skill);
-	 break;
-	 case SPELL_TYPE_POTION:
-	 return spell_harm(level, ch, ch, 0, skill);
-	 break;
-	 case SPELL_TYPE_STAFF:
-	 for (victim = world[ch->in_room].people ;
-			victim ; victim = victim->next_in_room )
-		 if ( IS_NPC(victim) )
-                 {
-			 retval = spell_harm(level, ch, victim, 0, skill);
-                         if(IS_SET(retval, eCH_DIED))
-                            return retval;
-                 }
-         return eSUCCESS;
-	 break;
-	 default :
-	 log("Serious screw-up in harm!", ANGEL, LOG_BUG);
-	 break;
+  switch (type) {
+  case SPELL_TYPE_SPELL:
+    return spell_harm(level, ch, victim, 0, skill);
+    break;
+  case SPELL_TYPE_POTION:
+    return spell_harm(level, ch, ch, 0, skill);
+    break;
+  case SPELL_TYPE_STAFF:
+    for (victim = world[ch->in_room].people ; victim ; victim = next_v )
+    {
+      next_v = victim->next_in_room;
 
+      if ( !ARE_GROUPED(ch, victim) )
+      {
+        retval = spell_harm(level, ch, victim, 0, skill);
+        if(IS_SET(retval, eCH_DIED))
+          return retval;
+      }
+    }
+    return eSUCCESS;
+    break;
+  default :
+    log("Serious screw-up in harm!", ANGEL, LOG_BUG);
+    break;
   }
   return eFAILURE;
 }
@@ -4931,56 +4955,57 @@ int cast_harm( byte level, CHAR_DATA *ch, char *arg, int type,
 int cast_power_harm( byte level, CHAR_DATA *ch, char *arg, int type,
   CHAR_DATA *victim, struct obj_data *tar_obj, int skill )
 {
-	int retval;
-	 switch (type) {
-	 case SPELL_TYPE_SPELL:
-	 return spell_power_harm(level, ch, victim, 0, skill);
-	 break;
-	 case SPELL_TYPE_POTION:
-	 return spell_power_harm(level, ch, ch, 0, skill);
-	 break;
-	 case SPELL_TYPE_STAFF:
-	 for (victim = world[ch->in_room].people ;
-			victim ; victim = victim->next_in_room )
-		 if ( IS_NPC(victim) )
-                 {
-			 retval = spell_power_harm(level, ch, victim, 0, skill);
-                         if(IS_SET(retval, eCH_DIED))
-				return retval;
-		  }
-	 break;
-	 default :
-	 log("Serious screw-up in power_harm!", ANGEL, LOG_BUG);
-	 break;
+  int retval;
+  char_data * next_v;
 
-  	}
+  switch (type) {
+  case SPELL_TYPE_SPELL:
+    return spell_power_harm(level, ch, victim, 0, skill);
+    break;
+  case SPELL_TYPE_POTION:
+    return spell_power_harm(level, ch, ch, 0, skill);
+    break;
+  case SPELL_TYPE_STAFF:
+    for (victim = world[ch->in_room].people ; victim ; victim = next_v )
+    {
+      next_v = victim->next_in_room;
+
+      if ( !ARE_GROUPED(ch, victim) )
+      {
+        retval = spell_power_harm(level, ch, victim, 0, skill);
+        if(IS_SET(retval, eCH_DIED))
+          return retval;
+      }
+    }
+    return eSUCCESS;
+    break;
+  default :
+    log("Serious screw-up in power_harm!", ANGEL, LOG_BUG);
+    break;
+  }
   return eFAILURE;
 }
-
-
-
 
 int cast_lightning_bolt( byte level, CHAR_DATA *ch, char *arg, int type,
   CHAR_DATA *victim, struct obj_data *tar_obj, int skill )
 {
   switch (type) {
-	 case SPELL_TYPE_SPELL:
-	 return spell_lightning_bolt(level, ch, victim, 0, skill);
-	 break;
-	 case SPELL_TYPE_SCROLL:
-	 if(victim)
-		return spell_lightning_bolt(level, ch, victim, 0, skill);
-	 else if(!tar_obj)
-		 return spell_lightning_bolt(level, ch, ch, 0, skill);
-	 break;
-	 case SPELL_TYPE_WAND:
-	 if(victim)
-		return spell_lightning_bolt(level, ch, victim, 0, skill);
-	 break;
-	 default :
-	 log("Serious screw-up in lightning bolt!", ANGEL, LOG_BUG);
-	 break;
-
+  case SPELL_TYPE_SPELL:
+    return spell_lightning_bolt(level, ch, victim, 0, skill);
+    break;
+  case SPELL_TYPE_SCROLL:
+    if(victim)
+      return spell_lightning_bolt(level, ch, victim, 0, skill);
+    else if(!tar_obj)
+      return spell_lightning_bolt(level, ch, ch, 0, skill);
+    break;
+  case SPELL_TYPE_WAND:
+    if(victim)
+     return spell_lightning_bolt(level, ch, victim, 0, skill);
+    break;
+  default :
+    log("Serious screw-up in lightning bolt!", ANGEL, LOG_BUG);
+    break;
   }
   return eFAILURE;
 }
@@ -5059,18 +5084,18 @@ int cast_teleport( byte level, CHAR_DATA *ch, char *arg, int type,
 	 return spell_teleport(level, ch, tar_ch, 0, skill);
 	 break;
 
-	 case SPELL_TYPE_STAFF:
-		for (tar_ch = world[ch->in_room].people ;
+  case SPELL_TYPE_STAFF:
+	for (tar_ch = world[ch->in_room].people ;
 		tar_ch ; tar_ch = tar_ch->next_in_room)
 	 if ( IS_NPC(tar_ch) )
 		spell_teleport(level, ch, tar_ch, 0, skill);
 	return eSUCCESS;
 		break;
 
-	 default :
+  default :
 		log("Serious screw-up in teleport!", ANGEL, LOG_BUG);
 		break;
-	 }
+  }
   return eFAILURE;
 }
 
@@ -5211,55 +5236,59 @@ int cast_paralyze( byte level, CHAR_DATA *ch, char *arg, int type,
 int cast_blindness( byte level, CHAR_DATA *ch, char *arg, int type,
   CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill )
 {
-	int retval;
+  int retval;
+  char_data * next_v;
 
-	 if (IS_SET(world[ch->in_room].room_flags,SAFE)){
-		send_to_char("You can not blind anyone in a safe area!\n\r", ch);
-		return eFAILURE;
-	 }
-	 switch (type) {
-	 case SPELL_TYPE_SPELL:
-		if ( IS_AFFECTED(tar_ch, AFF_BLIND) ){
-	send_to_char("Nothing seems to happen.\n\r", ch);
-	return eFAILURE;
-		}
-		return spell_blindness(level,ch,tar_ch,0, skill);
-		break;
-	 case SPELL_TYPE_POTION:
-		if ( IS_AFFECTED(ch, AFF_BLIND) )
-	return eFAILURE;
-		return spell_blindness(level,ch,ch,0, skill);
-		break;
-	 case SPELL_TYPE_SCROLL:
-		if (tar_obj) return eFAILURE;
-		if (!tar_ch) tar_ch = ch;
-		if ( IS_AFFECTED(tar_ch, AFF_BLIND) )
-	return eFAILURE;
-		return spell_blindness(level,ch,tar_ch,0, skill);
-		break;
-	 case SPELL_TYPE_WAND:
-		if (tar_obj) return eFAILURE;
-		if (!tar_ch) tar_ch = ch;
-		if ( IS_AFFECTED(tar_ch, AFF_BLIND) )
-	return eFAILURE;
-		return spell_blindness(level,ch,tar_ch,0, skill);
-		break;
-	 case SPELL_TYPE_STAFF:
-		for (tar_ch = world[ch->in_room].people ;
-		tar_ch ; tar_ch = tar_ch->next_in_room)
-		 if ( IS_NPC(tar_ch) )
-	  if (!(IS_AFFECTED(tar_ch, AFF_BLIND)))
-	{
-		retval = spell_blindness(level,ch,tar_ch,0, skill);
-		if(IS_SET(retval, eCH_DIED))
-			return retval;
-	}
-		return eSUCCESS;
-		break;
-		default :
-	log("Serious screw-up in blindness!", ANGEL, LOG_BUG);
-		break;
-	 }
+  if (IS_SET(world[ch->in_room].room_flags,SAFE)){
+     send_to_char("You can not blind anyone in a safe area!\n\r", ch);
+     return eFAILURE;
+  }
+
+  switch (type) {
+  case SPELL_TYPE_SPELL:
+    if ( IS_AFFECTED(tar_ch, AFF_BLIND) ){
+      send_to_char("Nothing seems to happen.\n\r", ch);
+      return eFAILURE;
+    }
+    return spell_blindness(level,ch,tar_ch,0, skill);
+    break;
+  case SPELL_TYPE_POTION:
+    if ( IS_AFFECTED(ch, AFF_BLIND) )
+      return eFAILURE;
+    return spell_blindness(level,ch,ch,0, skill);
+    break;
+  case SPELL_TYPE_SCROLL:
+    if (tar_obj)     return eFAILURE;
+    if (!tar_ch)     tar_ch = ch;
+    if ( IS_AFFECTED(tar_ch, AFF_BLIND) )
+      return eFAILURE;
+    return spell_blindness(level,ch,tar_ch,0, skill);
+    break;
+  case SPELL_TYPE_WAND:
+    if (tar_obj) return eFAILURE;
+    if (!tar_ch) tar_ch = ch;
+    if ( IS_AFFECTED(tar_ch, AFF_BLIND) )
+      return eFAILURE;
+    return spell_blindness(level,ch,tar_ch,0, skill);
+    break;
+  case SPELL_TYPE_STAFF:
+    for (tar_ch = world[ch->in_room].people ; tar_ch ; tar_ch = next_v )
+    {
+      next_v = tar_ch->next_in_room;
+
+      if ( !IS_AFFECTED(tar_ch, AFF_BLIND) )
+      {
+        retval = spell_blindness(level, ch, tar_ch, 0, skill);
+        if(IS_SET(retval, eCH_DIED))
+          return retval;
+      }
+    }
+    return eSUCCESS;
+    break;
+  default :
+    log("Serious screw-up in blindness!", ANGEL, LOG_BUG);
+    break;
+  }
   return eFAILURE;
 }
 
@@ -5717,6 +5746,7 @@ int cast_dispel_evil( byte level, CHAR_DATA *ch, char *arg, int type,
   CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill )
 {
   int retval;
+  char_data * next_v;
 
   switch (type) {
   case SPELL_TYPE_SPELL:
@@ -5735,18 +5765,23 @@ int cast_dispel_evil( byte level, CHAR_DATA *ch, char *arg, int type,
 	 return spell_dispel_evil(level, ch, tar_ch,0, skill);
 	 break;
   case SPELL_TYPE_STAFF:
-	 for (tar_ch = world[ch->in_room].people ;
-	  tar_ch ; tar_ch = tar_ch->next_in_room)
-		if ( IS_NPC(tar_ch) )
-		{
-		 	retval = spell_dispel_evil(level,ch,tar_ch,0, skill);
-			if(IS_SET(retval, eCH_DIED))
-				return retval;
-		}
-	 break;
-	 default :
-		log("Serious screw-up in dispel evil!", ANGEL, LOG_BUG);
-	 break;
+    for (tar_ch = world[ch->in_room].people ; tar_ch ; tar_ch = next_v )
+    {
+      next_v = tar_ch->next_in_room;
+   
+      if ( !ARE_GROUPED(ch, tar_ch) )
+      {
+        retval = spell_dispel_evil(level, ch, tar_ch, 0, skill);
+        if(IS_SET(retval, eCH_DIED))
+          return retval;
+      }
+    }
+    return eSUCCESS;
+    break;
+
+  default :
+    log("Serious screw-up in dispel evil!", ANGEL, LOG_BUG);
+    break;
   }
   return eFAILURE;
 }
@@ -5758,6 +5793,8 @@ int cast_dispel_good( byte level, CHAR_DATA *ch, char *arg, int type,
   CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill )
 {
   int retval;
+  char_data * next_v;
+
   switch (type) {
   case SPELL_TYPE_SPELL:
 	 return spell_dispel_good(level, ch, tar_ch,0, skill);
@@ -5775,16 +5812,20 @@ int cast_dispel_good( byte level, CHAR_DATA *ch, char *arg, int type,
 	 return spell_dispel_good(level, ch, tar_ch,0, skill);
 	 break;
   case SPELL_TYPE_STAFF:
-	 for (tar_ch = world[ch->in_room].people ;
-	  tar_ch ; tar_ch = tar_ch->next_in_room)
-		if ( IS_NPC(tar_ch) )
-		{
-		 retval = spell_dispel_good(level,ch,tar_ch,0, skill);
-		 if(IS_SET(retval, eCH_DIED))
-			return retval;
-		}
-	 break;
-	 default :
+    for (tar_ch = world[ch->in_room].people ; tar_ch ; tar_ch = next_v )
+    {
+      next_v = tar_ch->next_in_room;
+  
+      if ( !ARE_GROUPED(ch, tar_ch) )
+      {
+        retval = spell_dispel_good(level, ch, tar_ch, 0, skill);
+        if(IS_SET(retval, eCH_DIED))
+          return retval;
+      }
+    }
+    return eSUCCESS;
+    break;
+  default :
 		log("Serious screw-up in dispel good!", ANGEL, LOG_BUG);
 	 break;
   }
@@ -6006,33 +6047,39 @@ int cast_locate_object( byte level, CHAR_DATA *ch, char *arg, int type,
 int cast_poison( byte level, CHAR_DATA *ch, char *arg, int type,
   CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill )
 {
-	int retval;
+  int retval;
+  char_data * next_v;
 
   if (IS_SET(world[ch->in_room].room_flags, SAFE)){
 	 send_to_char("You can not poison someone in a safe area!\n\r",ch);
 	 return eFAILURE;
   }
   switch (type) {
-	 case SPELL_TYPE_SPELL:
+  case SPELL_TYPE_SPELL:
 		 return spell_poison(level, ch, tar_ch, tar_obj, skill);
 		 break;
-	 case SPELL_TYPE_POTION:
+  case SPELL_TYPE_POTION:
 		 return spell_poison(level, ch, ch, 0, skill);
 		 break;
-	 case SPELL_TYPE_STAFF:
-	 for (tar_ch = world[ch->in_room].people ;
-			tar_ch ; tar_ch = tar_ch->next_in_room)
-		 if ( IS_NPC(tar_ch) )
-		{
-		  retval = spell_poison(level,ch,tar_ch,0, skill);
-                  if(IS_SET(retval, eCH_DIED))
-			return retval;
-		}
-	 break;
-	 default :
+  case SPELL_TYPE_STAFF:
+    for (tar_ch = world[ch->in_room].people ; tar_ch ; tar_ch = next_v )
+    {    
+      next_v = tar_ch->next_in_room;
+         
+      if ( !ARE_GROUPED(ch, tar_ch) )
+      {  
+        retval = spell_poison(level, ch, tar_ch, 0, skill); 
+        if(IS_SET(retval, eCH_DIED))
+          return retval;
+      }  
+    }    
+    return eSUCCESS;
+    break;
+
+  default :
 	 log("Serious screw-up in poison!", ANGEL, LOG_BUG);
 	 break;
-	 }
+  }
   return eFAILURE;
 }
 
@@ -6157,41 +6204,46 @@ int cast_sleep( byte level, CHAR_DATA *ch, char *arg, int type,
   CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill )
 {
   int retval;
+  char_data * next_v;
 
   if (IS_SET(world[ch->in_room].room_flags, SAFE)){
 	 send_to_char("You can not sleep someone in a safe area!\n\r", ch);
 	 return eFAILURE;
   }
   switch (type) {
-	 case SPELL_TYPE_SPELL:
+  case SPELL_TYPE_SPELL:
 		 return spell_sleep(level, ch, tar_ch, 0, skill);
 		 break;
-	 case SPELL_TYPE_POTION:
+  case SPELL_TYPE_POTION:
 		 return spell_sleep(level, ch, ch, 0, skill);
 		 break;
-	 case SPELL_TYPE_SCROLL:
+  case SPELL_TYPE_SCROLL:
 	 if(tar_obj) return eFAILURE;
 	 if (!tar_ch) tar_ch = ch;
 	 return spell_sleep(level, ch, tar_ch, 0, skill);
 	 break;
-	 case SPELL_TYPE_WAND:
+  case SPELL_TYPE_WAND:
 	 if(tar_obj) return eFAILURE;
 	 return spell_sleep(level, ch, tar_ch, 0, skill);
 	 break;
-	 case SPELL_TYPE_STAFF:
-	 for (tar_ch = world[ch->in_room].people ;
-			tar_ch ; tar_ch = tar_ch->next_in_room)
-		 if ( IS_NPC(tar_ch) )
-		{
-		 retval =  spell_sleep(level,ch,tar_ch,0, skill);
-		 if(IS_SET(retval, eCH_DIED))
-			return retval;
-		}
-	 break;
-	 default :
+  case SPELL_TYPE_STAFF:
+    for (tar_ch = world[ch->in_room].people ; tar_ch ; tar_ch = next_v )
+    {    
+      next_v = tar_ch->next_in_room;
+         
+      if ( !ARE_GROUPED(ch, tar_ch) )
+      {  
+        retval = spell_sleep(level, ch, tar_ch, 0, skill); 
+        if(IS_SET(retval, eCH_DIED))
+          return retval;
+      }  
+    }    
+    return eSUCCESS;
+    break;
+  default :
 	 log("Serious screw-up in sleep!", ANGEL, LOG_BUG);
 	 break;
-	 }
+  }
   return eFAILURE;
 }
 
@@ -6341,24 +6393,36 @@ int cast_summon( byte level, CHAR_DATA *ch, char *arg, int type,
 int cast_charm_person( byte level, CHAR_DATA *ch, char *arg, int type,
   CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill )
 {
+  int retval;
+  char_data * next_v;
+
   switch (type) {
-	case SPELL_TYPE_SPELL:
+  case SPELL_TYPE_SPELL:
 		 return spell_charm_person(level, ch, tar_ch, 0, skill);
 		 break;
-		case SPELL_TYPE_SCROLL:
+  case SPELL_TYPE_SCROLL:
 	 if(!tar_ch) return eFAILURE;
 	 return spell_charm_person(level, ch, tar_ch, 0, skill);
 	 break;
-		case SPELL_TYPE_STAFF:
-	 for (tar_ch = world[ch->in_room].people ;
-			tar_ch ; tar_ch = tar_ch->next_in_room)
-		 if ( IS_NPC(tar_ch) )
-		  spell_charm_person(level,ch,tar_ch,0, skill);
-	 break;
-		default :
+  case SPELL_TYPE_STAFF:
+    for (tar_ch = world[ch->in_room].people ; tar_ch ; tar_ch = next_v )
+    {    
+      next_v = tar_ch->next_in_room;
+         
+      if ( !ARE_GROUPED(ch, tar_ch) )
+      {  
+        retval = spell_charm_person(level, ch, tar_ch, 0, skill); 
+        if(IS_SET(retval, eCH_DIED))
+          return retval;
+      }  
+    }    
+    return eSUCCESS;
+    break;
+
+  default :
 	 log("Serious screw-up in charm person!", ANGEL, LOG_BUG);
 	 break;
-	 }
+  }
   return eFAILURE;
 }
 
@@ -6488,6 +6552,8 @@ int cast_fear( byte level, CHAR_DATA *ch, char *arg, int type,
 		CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill)
 {
   int retval;
+  char_data * next_v;
+
   switch (type) {
   case SPELL_TYPE_SPELL:
     return spell_fear(level, ch, tar_ch, 0, skill);
@@ -6503,14 +6569,18 @@ int cast_fear( byte level, CHAR_DATA *ch, char *arg, int type,
 	 return spell_fear(level, ch, tar_ch, 0, skill);
 	 break;
   case SPELL_TYPE_STAFF:
-	 for (tar_ch = world[ch->in_room].people;
-	  tar_ch; tar_ch = tar_ch->next_in_room)
-		if (IS_NPC(tar_ch))
-		{
-	 		retval = spell_fear(level, ch, tar_ch, 0, skill);
-			if(IS_SET(retval, eCH_DIED))
-				return retval;
-		}
+    for (tar_ch = world[ch->in_room].people ; tar_ch ; tar_ch = next_v )
+    {    
+      next_v = tar_ch->next_in_room;
+         
+      if ( !ARE_GROUPED(ch, tar_ch) )
+      {  
+        retval = spell_fear(level, ch, tar_ch, 0, skill); 
+        if(IS_SET(retval, eCH_DIED))
+          return retval;
+      }  
+    }    
+    return eSUCCESS;
     break;
   default:
 	 log("Serious screw-up in fear!", ANGEL, LOG_BUG);
@@ -6736,6 +6806,9 @@ int cast_cure_serious( byte level, CHAR_DATA *ch, char *arg, int type,
 int cast_cause_light( byte level, CHAR_DATA *ch, char *arg, int type,
 			CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill)
 {
+  char_data * next_v;
+  int retval;
+
   switch (type) {
   case SPELL_TYPE_SPELL:
 	 return spell_cause_light(level, ch, tar_ch, 0, skill);
@@ -6753,11 +6826,20 @@ int cast_cause_light( byte level, CHAR_DATA *ch, char *arg, int type,
     return spell_cause_light(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-	 for (tar_ch = world[ch->in_room].people;
-	 tar_ch; tar_ch = tar_ch->next_in_room)
-		if (IS_NPC(tar_ch))
-	spell_cause_light(level, ch, tar_ch, 0, skill);
-	 break;
+    for (tar_ch = world[ch->in_room].people ; tar_ch ; tar_ch = next_v )
+    {    
+      next_v = tar_ch->next_in_room;
+         
+      if ( !ARE_GROUPED(ch, tar_ch) )
+      {  
+        retval = spell_cause_light(level, ch, tar_ch, 0, skill); 
+        if(IS_SET(retval, eCH_DIED))
+          return retval;
+      }  
+    }    
+    return eSUCCESS;
+    break;
+
   case SPELL_TYPE_POTION:
 	 return spell_cause_light(level, ch, tar_ch, 0, skill);
 	 break;
@@ -6772,6 +6854,9 @@ int cast_cause_critical( byte level, CHAR_DATA *ch, char *arg,
 		  int type, CHAR_DATA *tar_ch,
 	     struct obj_data *tar_obj, int skill)
 {
+  char_data * next_v;
+  int retval;
+
   switch (type) {
   case SPELL_TYPE_SPELL:
 	 return spell_cause_critical(level, ch, tar_ch, 0, skill);
@@ -6787,11 +6872,19 @@ int cast_cause_critical( byte level, CHAR_DATA *ch, char *arg,
     return spell_cause_critical(level, ch, tar_ch, 0, skill);
 	 break;
   case SPELL_TYPE_STAFF:
-	 for (tar_ch = world[ch->in_room].people;
-	 tar_ch; tar_ch = tar_ch->next_in_room)
-		if (IS_NPC(tar_ch))
-	spell_cause_critical(level, ch, tar_ch, 0, skill);
-	 break;
+    for (tar_ch = world[ch->in_room].people ; tar_ch ; tar_ch = next_v )
+    {    
+      next_v = tar_ch->next_in_room;
+         
+      if ( !ARE_GROUPED(ch, tar_ch) )
+      {  
+        retval = spell_cause_critical(level, ch, tar_ch, 0, skill); 
+        if(IS_SET(retval, eCH_DIED))
+          return retval;
+      }  
+    }    
+    return eSUCCESS;
+    break;
   case SPELL_TYPE_POTION:
      return spell_cause_critical(level, ch, tar_ch, 0, skill);
      break;
@@ -6806,6 +6899,9 @@ int cast_cause_serious( byte level, CHAR_DATA *ch, char *arg,
 	    int type, CHAR_DATA *tar_ch,
 		 struct obj_data *tar_obj, int skill)
 {
+  char_data * next_v;
+  int retval;
+
   switch (type) {
   case SPELL_TYPE_SPELL:
     return spell_cause_serious(level, ch, tar_ch, 0, skill);
@@ -6821,11 +6917,19 @@ int cast_cause_serious( byte level, CHAR_DATA *ch, char *arg,
 	 return spell_cause_serious(level, ch, tar_ch, 0, skill);
 	 break;
   case SPELL_TYPE_STAFF:
-	 for (tar_ch = world[ch->in_room].people;
-	 tar_ch; tar_ch = tar_ch->next_in_room)
-		if (IS_NPC(tar_ch))
-	spell_cause_serious(level, ch, tar_ch, 0, skill);
-	 break;
+    for (tar_ch = world[ch->in_room].people ; tar_ch ; tar_ch = next_v )
+    {    
+      next_v = tar_ch->next_in_room;
+         
+      if ( !ARE_GROUPED(ch, tar_ch) )
+      {  
+        retval = spell_cause_serious(level, ch, tar_ch, 0, skill); 
+        if(IS_SET(retval, eCH_DIED))
+          return retval;
+      }  
+    }    
+    return eSUCCESS;
+    break;
   case SPELL_TYPE_POTION:
     return spell_cause_serious(level, ch, tar_ch, 0, skill);
     break;
@@ -6840,6 +6944,9 @@ int cast_flamestrike( byte level, CHAR_DATA *ch, char *arg,
 			int type, CHAR_DATA *tar_ch,
 			struct obj_data *tar_obj, int skill)
 {
+  char_data * next_v;
+  int retval;
+
   switch (type) {
   case SPELL_TYPE_SPELL:
     return spell_flamestrike(level, ch, tar_ch, 0, skill);
@@ -6855,11 +6962,19 @@ int cast_flamestrike( byte level, CHAR_DATA *ch, char *arg,
 	 return spell_flamestrike(level, ch, tar_ch, 0, skill);
 	 break;
   case SPELL_TYPE_STAFF:
-	 for (tar_ch = world[ch->in_room].people;
-	 tar_ch; tar_ch = tar_ch->next_in_room)
-		if (IS_NPC(tar_ch))
-	spell_flamestrike(level, ch, tar_ch, 0, skill);
-	 break;
+    for (tar_ch = world[ch->in_room].people ; tar_ch ; tar_ch = next_v )
+    {    
+      next_v = tar_ch->next_in_room;
+         
+      if ( !ARE_GROUPED(ch, tar_ch) )
+      {  
+        retval = spell_flamestrike(level, ch, tar_ch, 0, skill); 
+        if(IS_SET(retval, eCH_DIED))
+          return retval;
+      }  
+    }    
+    return eSUCCESS;
+    break;
   default:
 	 log("Serious screw-up in flamestrike!", ANGEL, LOG_BUG);
 	 break;
@@ -7012,10 +7127,13 @@ int cast_weaken( byte level, CHAR_DATA *ch, char *arg,
 	 int type, CHAR_DATA *tar_ch,
 	 struct obj_data *tar_obj, int skill)
 {
-         if (IS_SET(world[ch->in_room].room_flags,SAFE)){
-                send_to_char("You can not weaken anyone in a safe area!\n\r", ch);
-                return eFAILURE;
-         } 
+  char_data * next_v;
+  int retval;
+
+  if (IS_SET(world[ch->in_room].room_flags,SAFE)){
+    send_to_char("You can not weaken anyone in a safe area!\n\r", ch);
+    return eFAILURE;
+  } 
 
   switch (type) {
   case SPELL_TYPE_SPELL:
@@ -7032,11 +7150,19 @@ int cast_weaken( byte level, CHAR_DATA *ch, char *arg,
 	 return spell_weaken(level, ch, tar_ch, 0, skill);
 	 break;
   case SPELL_TYPE_STAFF:
-	 for (tar_ch = world[ch->in_room].people;
-	 tar_ch; tar_ch = tar_ch->next_in_room)
-		if (IS_NPC(tar_ch))
-	spell_weaken(level, ch, tar_ch, 0, skill);
-	 break;
+    for (tar_ch = world[ch->in_room].people ; tar_ch ; tar_ch = next_v )
+    {    
+      next_v = tar_ch->next_in_room;
+         
+      if ( !ARE_GROUPED(ch, tar_ch) )
+      {  
+        retval = spell_weaken(level, ch, tar_ch, 0, skill); 
+        if(IS_SET(retval, eCH_DIED))
+          return retval;
+      }  
+    }    
+    return eSUCCESS;
+    break;
   default:
 	 log("Serious screw-up in weaken!", ANGEL, LOG_BUG);
 	 break;
@@ -7070,6 +7196,9 @@ int cast_acid_blast( byte level, CHAR_DATA *ch, char *arg,
 		  int type, CHAR_DATA *tar_ch,
 	     struct obj_data *tar_obj, int skill)
 {
+  char_data * next_v;
+  int retval;
+
   switch (type) {
   case SPELL_TYPE_SPELL:
 	 return spell_acid_blast(level, ch, tar_ch, 0, skill);
@@ -7085,11 +7214,19 @@ int cast_acid_blast( byte level, CHAR_DATA *ch, char *arg,
     return spell_acid_blast(level, ch, tar_ch, 0, skill);
 	 break;
   case SPELL_TYPE_STAFF:
-	 for (tar_ch = world[ch->in_room].people;
-	 tar_ch; tar_ch = tar_ch->next_in_room)
-		if (IS_NPC(tar_ch))
-	spell_acid_blast(level, ch, tar_ch, 0, skill);
-	 break;
+    for (tar_ch = world[ch->in_room].people ; tar_ch ; tar_ch = next_v )
+    {    
+      next_v = tar_ch->next_in_room;
+         
+      if ( !ARE_GROUPED(ch, tar_ch) )
+      {  
+        retval = spell_acid_blast(level, ch, tar_ch, 0, skill); 
+        if(IS_SET(retval, eCH_DIED))
+          return retval;
+      }  
+    }    
+    return eSUCCESS;
+    break;
   default:
 	 log("Serious screw-up in acid blast!", ANGEL, LOG_BUG);
 	 break;
@@ -7102,6 +7239,9 @@ int cast_hellstream( byte level, CHAR_DATA *ch, char *arg,
 		  int type, CHAR_DATA *tar_ch,
 		  struct obj_data *tar_obj, int skill)
 {
+  char_data * next_v;
+  int retval;
+
   switch (type) {
   case SPELL_TYPE_SPELL:
     return spell_hellstream(level, ch, tar_ch, 0, skill);
@@ -7119,11 +7259,19 @@ int cast_hellstream( byte level, CHAR_DATA *ch, char *arg,
 	 return spell_hellstream(level, ch, tar_ch, 0, skill);
 	 break;
   case SPELL_TYPE_STAFF:
-	 for (tar_ch = world[ch->in_room].people;
-	 tar_ch; tar_ch = tar_ch->next_in_room)
-		if (IS_NPC(tar_ch))
-	spell_hellstream(level, ch, tar_ch, 0, skill);
-	 break;
+    for (tar_ch = world[ch->in_room].people ; tar_ch ; tar_ch = next_v )
+    {    
+      next_v = tar_ch->next_in_room;
+         
+      if ( !ARE_GROUPED(ch, tar_ch) )
+      {  
+        retval = spell_hellstream(level, ch, tar_ch, 0, skill); 
+        if(IS_SET(retval, eCH_DIED))
+          return retval;
+      }  
+    }    
+    return eSUCCESS;
+    break;
   default:
 	 log("Serious screw-up in hell stream!", ANGEL, LOG_BUG);
 	 break;
@@ -8235,6 +8383,7 @@ int cast_sun_ray( byte level, CHAR_DATA *ch, char *arg, int type,
 {
   extern struct weather_data weather_info;
   int retval;
+  char_data * next_v;
 
   switch (type) {
     case SPELL_TYPE_SPELL:
@@ -8257,13 +8406,19 @@ int cast_sun_ray( byte level, CHAR_DATA *ch, char *arg, int type,
     case SPELL_TYPE_STAFF:
       if (OUTSIDE(ch) && (weather_info.sky <= SKY_CLOUDY))
       {
-        for (victim = world[ch->in_room].people ;victim ; victim = victim->next_in_room )
-          if( IS_NPC(victim) )
-          {
-            retval = spell_sun_ray(level, ch, victim, 0, skill);
+        for (victim = world[ch->in_room].people ; victim ; victim = next_v )
+        {    
+          next_v = victim->next_in_room;
+
+          if ( !ARE_GROUPED(ch, victim) )
+          {  
+            retval = spell_sun_ray(level, ch, victim, 0, skill); 
             if(IS_SET(retval, eCH_DIED))
               return retval;
-          }
+          }  
+        }    
+        return eSUCCESS;
+        break;
       }
       break;
     default :
@@ -8561,6 +8716,9 @@ int spell_ice_shards(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
 
 int cast_ice_shards( byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill )
 {
+  char_data * next_v;
+  int retval;
+
   switch (type) 
   {
     case SPELL_TYPE_SPELL:
@@ -8576,9 +8734,19 @@ int cast_ice_shards( byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *
           return spell_ice_shards(level, ch, tar_ch, 0, skill);
        break;
     case SPELL_TYPE_STAFF:
-       for (tar_ch = world[ch->in_room].people ; tar_ch ; tar_ch = tar_ch->next_in_room)
-          spell_ice_shards(level,ch,tar_ch,0, skill);
-       break;
+      for (tar_ch = world[ch->in_room].people ; tar_ch ; tar_ch = next_v )
+      {    
+        next_v = tar_ch->next_in_room;
+         
+        if ( !ARE_GROUPED(ch, tar_ch) )
+        {  
+          retval = spell_ice_shards(level, ch, tar_ch, 0, skill); 
+          if(IS_SET(retval, eCH_DIED))
+            return retval;
+        }  
+      }    
+      return eSUCCESS;
+      break;
     default :
        log("Serious screw-up in ice_shards!", ANGEL, LOG_BUG);
        break;
@@ -8670,6 +8838,9 @@ int spell_blue_bird(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
 
 int cast_blue_bird( byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill)
 {
+  char_data * next_v;
+  int retval;
+
   switch (type)
   {
     case SPELL_TYPE_SPELL:
@@ -8682,9 +8853,19 @@ int cast_blue_bird( byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *t
           return spell_blue_bird(level, ch, tar_ch, 0, skill);
        break;
     case SPELL_TYPE_STAFF:   
-       for (tar_ch = world[ch->in_room].people ; tar_ch ; tar_ch = tar_ch->next_in_room)
-          spell_blue_bird(level,ch,tar_ch,0, skill);
-       break;
+      for (tar_ch = world[ch->in_room].people ; tar_ch ; tar_ch = next_v )
+      {    
+        next_v = tar_ch->next_in_room;
+         
+        if ( !ARE_GROUPED(ch, tar_ch) )
+        {  
+          retval = spell_blue_bird(level, ch, tar_ch, 0, skill); 
+          if(IS_SET(retval, eCH_DIED))
+            return retval;
+        }  
+      }    
+      return eSUCCESS;
+      break;
     default :
        log("Serious screw-up in blue_bird!", ANGEL, LOG_BUG);
        break;
@@ -8747,6 +8928,9 @@ int spell_debility(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data
 
 int cast_debility( byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill)
 {
+  char_data * next_v;
+  int retval;
+
   switch (type)
   {
     case SPELL_TYPE_SPELL:
@@ -8759,9 +8943,19 @@ int cast_debility( byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *ta
           return spell_debility(level, ch, tar_ch, 0, skill);
        break;
     case SPELL_TYPE_STAFF:   
-       for (tar_ch = world[ch->in_room].people ; tar_ch ; tar_ch = tar_ch->next_in_room)
-          spell_debility(level,ch,tar_ch,0, skill);
-       break;
+      for (tar_ch = world[ch->in_room].people ; tar_ch ; tar_ch = next_v )
+      {    
+        next_v = tar_ch->next_in_room;
+         
+        if ( !ARE_GROUPED(ch, tar_ch) )
+        {  
+          retval = spell_debility(level, ch, tar_ch, 0, skill); 
+          if(IS_SET(retval, eCH_DIED))
+            return retval;
+        }  
+      }    
+      return eSUCCESS;
+      break;
     default :
        log("Serious screw-up in debility!", ANGEL, LOG_BUG);
        break;
@@ -8819,6 +9013,9 @@ int spell_attrition(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
 
 int cast_attrition( byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill)
 {
+  char_data * next_v;
+  int retval;
+
   switch (type)
   {
     case SPELL_TYPE_SPELL:
@@ -8831,9 +9028,19 @@ int cast_attrition( byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *t
           return spell_attrition(level, ch, tar_ch, 0, skill);
        break;
     case SPELL_TYPE_STAFF:   
-       for (tar_ch = world[ch->in_room].people ; tar_ch ; tar_ch = tar_ch->next_in_room)
-          spell_attrition(level,ch,tar_ch,0, skill);
-       break;
+      for (tar_ch = world[ch->in_room].people ; tar_ch ; tar_ch = next_v )
+      {    
+        next_v = tar_ch->next_in_room;
+         
+        if ( !ARE_GROUPED(ch, tar_ch) )
+        {  
+          retval = spell_attrition(level, ch, tar_ch, 0, skill); 
+          if(IS_SET(retval, eCH_DIED))
+            return retval;
+        }  
+      }    
+      return eSUCCESS;
+      break;
     default :
        log("Serious screw-up in attrition!", ANGEL, LOG_BUG);
        break;
