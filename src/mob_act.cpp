@@ -19,7 +19,7 @@
 /* 12/06/2003   Onager   Modified mobile_activity() to prevent charmie    */
 /*                       scavenging                                       */
 /**************************************************************************/
-/* $Id: mob_act.cpp,v 1.16 2004/04/19 17:34:37 urizen Exp $ */
+/* $Id: mob_act.cpp,v 1.17 2004/04/19 17:48:04 urizen Exp $ */
 
 extern "C"
 {
@@ -383,8 +383,8 @@ void mobile_activity(void)
 	  }
         }
 */
-        if(!IS_AFFECTED(ch, AFF_BLIND)) {
-          retval = do_track(ch, get_random_hate(ch), 9);
+        if(!IS_AFFECTED(ch, AFF_BLIND) && ch->hunting) {
+          retval = do_track(ch, ch->hunting, 9);
           if(SOMEONE_DIED(retval))
              continue;
         }
