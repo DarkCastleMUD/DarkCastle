@@ -648,6 +648,16 @@ int song_disrupt( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int s
    send_to_char("You sing your funniest limerick!\r\n", ch);
    
    WAIT_STATE(ch, PULSE_VIOLENCE);
+   if (number(1,101) < victim->saves[SAVE_TYPE_MAGIC])
+   {
+act("$N resists your disarming limerick!", ch, NULL, victim, 
+TO_CHAR,0);
+act("$N resists $n's disarming limerick!", ch, NULL, victim, TO_ROOM,
+NOTVICT);
+act("You resist $n's disarming limerick!",ch,NULL,victim,TO_VICT,0);
+     return eFAILURE;
+   }
+
 
    skill_increase_check(ch, SKILL_SONG_DISARMING_LIMERICK, skill, SKILL_INCREASE_MEDIUM);
 
@@ -679,6 +689,17 @@ int song_whistle_sharp( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim,
        ch, 0, victim, TO_VICT, 0);
    act("$n whistles a super-high note at $N and blood drips from $S ears!",
        ch, 0, victim, TO_ROOM, NOTVICT);
+
+   if (number(1,101) < victim->saves[SAVE_TYPE_MAGIC])
+   {
+act("$N resists your whistle sharp!", ch, NULL, victim, 
+TO_CHAR,0);
+act("$N resists $n's whistle sharp!", ch, NULL, victim, TO_ROOM,
+NOTVICT);
+act("You resist $n's whistle sharp!",ch,NULL,victim,TO_VICT,0);
+	   dam/=2;
+   }
+
 
    retval = damage(ch, victim, dam, TYPE_SONG,SKILL_SONG_WHISTLE_SHARP, 0);
    if(IS_SET(retval, eCH_DIED))
@@ -878,6 +899,16 @@ int execute_song_terrible_clef( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA 
    send_to_char("Your singing hurts your opponent!\r\n", ch);
    act("$n's singing causes pain in $N's ears!\r\n", ch, 0, victim, TO_ROOM, NOTVICT);
    send_to_char("The music!  It hurts!  It hurts!\r\n", victim);
+   if (number(1,101) < victim->saves[SAVE_TYPE_MAGIC])
+   {
+act("$N resists your terrible clef!", ch, NULL, victim, 
+TO_CHAR,0);
+act("$N resists $n's terrible clef!", ch, NULL, victim, TO_ROOM,
+NOTVICT);
+act("You resist $n's terrible clef!",ch,NULL,victim,TO_VICT,0);
+     return eFAILURE;
+   }
+
 
    retval = damage(ch, victim, dam, TYPE_SONG,SKILL_SONG_TERRIBLE_CLEF, 0);
    if(IS_SET(retval, eCH_DIED))
@@ -1352,6 +1383,16 @@ int execute_song_insane_chant( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *
      // don't effect gods unless it was a higher level god singing
      if(GET_LEVEL(victim) >= IMMORTAL && GET_LEVEL(ch) <= GET_LEVEL(victim))
        continue;
+   if (number(1,101) < victim->saves[SAVE_TYPE_POISON])
+   {
+act("$N resists your insane chant!", ch, NULL, victim, 
+TO_CHAR,0);
+act("$N resists $n's insane chant!", ch, NULL, victim, TO_ROOM,
+NOTVICT);
+act("You resist $n's insane chant!",ch,NULL,victim,TO_VICT,0);
+     return eFAILURE;
+   }
+
      affect_to_char(victim, &af);
    }
    return eSUCCESS;
@@ -1781,6 +1822,15 @@ int execute_song_sticky_lullaby( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA
    }
    dc_free(ch->song_data);
    ch->song_data = 0;
+   if (number(1,101) < victim->saves[SAVE_TYPE_POISON])
+   {
+act("$N resists your sticky lullaby!", ch, NULL, victim, 
+TO_CHAR,0);
+act("$N resists $n's sticky lullaby!", ch, NULL, victim, TO_ROOM,
+NOTVICT);
+act("You resist $n's sticky lullaby!",ch,NULL,victim,TO_VICT,0);
+     return eFAILURE;
+   }
 
    skill_increase_check(ch, SKILL_SONG_STICKY_LULL, skill, SKILL_INCREASE_MEDIUM);
 
@@ -1922,6 +1972,15 @@ int execute_song_unresistable_ditty( byte level, CHAR_DATA *ch, char *arg, CHAR_
 
    for (i = world[ch->in_room].people; i; i = i->next_in_room)
    {
+   if (number(1,101) < victim->saves[SAVE_TYPE_MAGIC])
+   {
+act("$N resists your irresistible ditty!", ch, NULL, victim, 
+TO_CHAR,0);
+act("$N resists $n's irresitble ditty! Not so irresistible, eh!", ch, NULL, victim, TO_ROOM,NOTVICT);
+act("You resist $n's \"irresistible\" ditty!!",ch,NULL,victim,TO_VICT,0);
+     continue;
+   }
+
       if(GET_LEVEL(i) <= GET_LEVEL(ch))
       {
          make_person_dance(i);
