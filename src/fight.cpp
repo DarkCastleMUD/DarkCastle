@@ -2,7 +2,7 @@
 *	This contains all the fight starting mechanisms as well
 *	as damage.
 */ 
-/* $Id: fight.cpp,v 1.16 2002/08/01 06:25:03 pirahna Exp $ */
+/* $Id: fight.cpp,v 1.17 2002/08/01 06:51:34 dcastle Exp $ */
 
 extern "C"
 {
@@ -190,7 +190,11 @@ void perform_violence(void)
 
 bool gets_dual_wield_attack(char_data * ch)
 {
-  int learned = has_skill(ch, SKILL_DUAL_WIELD);
+  int learned;
+
+  if(!(learned = has_skill(ch, SKILL_DUAL_WIELD)))
+    return FALSE;
+
   int percent = number(1, 101);
 
   if(percent > learned)
@@ -1580,7 +1584,7 @@ bool check_parry(CHAR_DATA * ch, CHAR_DATA * victim)
   if (IS_NPC(victim) && (IS_SET(victim->mobdata->actflags, ACT_PARRY)))
     chance = MIN(30, 2 * GET_LEVEL(victim));
   else
-    if ((chance = has_skill(victim, SKILL_PARRY)))
+    chance = has_skill(victim, SKILL_PARRY);
 
   if (chance == 0)
     return FALSE;
@@ -3283,7 +3287,7 @@ int second_attack(CHAR_DATA *ch)
   if((IS_NPC(ch)) && (IS_SET(ch->mobdata->actflags, ACT_2ND_ATTACK)))
     return TRUE;
   learned = has_skill(ch, SKILL_SECOND_ATTACK);
-  if(number(1, 101) < MAX(25, learned)) {
+  if(learned && number(1, 101) < MAX(25, learned)) {
     skill_increase_check(ch, SKILL_SECOND_ATTACK, learned, SKILL_INCREASE_HARD);
     return TRUE;
   }
@@ -3297,7 +3301,7 @@ int third_attack(CHAR_DATA *ch)
   if((IS_NPC(ch)) && (IS_SET(ch->mobdata->actflags, ACT_3RD_ATTACK)))
     return TRUE;
   learned = has_skill(ch, SKILL_THIRD_ATTACK);
-  if(number(1, 101) < MAX(learned, 20)) {
+  if(learned && number(1, 101) < MAX(learned, 20)) {
     skill_increase_check(ch, SKILL_THIRD_ATTACK, learned, SKILL_INCREASE_HARD);
     return TRUE;
   }
