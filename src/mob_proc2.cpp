@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.11 2002/08/26 06:21:30 pirahna Exp $ */
+/* $Id: mob_proc2.cpp,v 1.12 2002/08/29 15:55:44 pirahna Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -594,15 +594,17 @@ int mortician(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
        return eSUCCESS;
      } 
 //     obj->obj_flags.timer = 1;
-     if(has_consent) {
+//     if(has_consent) {
        move_obj(obj, ch->in_room);
        send_to_char("The mortician goes into his freezer and returns with a corpse, which he\n\r"
                     "places at your feet.\n\r", ch);
-     } else {
-       move_obj(obj, ch);
-       send_to_char("The mortician goes into his freezer and returns with a corpse, which he\n\r"
-                    "places in your arms.\n\r", ch);
-     }
+//     } else {
+//       move_obj(obj, ch);
+//       send_to_char("The mortician goes into his freezer and returns with a corpse, which 
+//he\n\r"
+//                    "places in your arms.\n\r", ch);
+//     }
+
      GET_PLATINUM(ch) -= cost;
      do_save(ch, "", 10);
      return eSUCCESS; 

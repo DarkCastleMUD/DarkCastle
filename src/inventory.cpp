@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.11 2002/08/25 19:34:00 pirahna Exp $
+| $Id: inventory.cpp,v 1.12 2002/08/29 15:55:44 pirahna Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -224,7 +224,8 @@ int do_get(struct char_data *ch, char *argument, int cmd)
 		if (CAN_SEE_OBJ(ch, obj_object)) {
 		    if ((IS_CARRYING_N(ch) + 1) <= CAN_CARRY_N(ch)) {
 			if ((IS_CARRYING_W(ch) + obj_object->obj_flags.weight)
-				<= CAN_CARRY_W(ch)) {
+				<= CAN_CARRY_W(ch)) 
+                        {
 			    if (CAN_WEAR(obj_object,ITEM_TAKE)) {
 				get(ch,obj_object,sub_object);
 				found = TRUE;
@@ -279,7 +280,7 @@ int do_get(struct char_data *ch, char *argument, int cmd)
                 }
 		if((IS_CARRYING_N(ch) + 1 < CAN_CARRY_N(ch))) {
 		    if((IS_CARRYING_W(ch) + obj_object->obj_flags.weight) < 
-			CAN_CARRY_W(ch)) {
+			CAN_CARRY_W(ch) || GET_LEVEL(ch) > IMMORTAL) {
 			if (CAN_WEAR(obj_object,ITEM_TAKE)) {
                             if(cmd == 10) palm(ch, obj_object, sub_object);
 			    else          get (ch, obj_object, sub_object);
