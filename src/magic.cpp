@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.126 2004/05/09 19:45:58 urizen Exp $ */
+/* $Id: magic.cpp,v 1.127 2004/05/11 08:46:53 urizen Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -124,7 +124,7 @@ int spell_chill_touch(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 
 //  dam = dice(2,8) * level/2;
   dam = 250;
-//  save = saves_spell(ch, victim, (level/2), SAVE_TYPE_COLD);
+  save = saves_spell(ch, victim, (level/2), SAVE_TYPE_COLD);
   
   skill_increase_check(ch, SPELL_CHILL_TOUCH, skill, SKILL_INCREASE_MEDIUM);
 
@@ -138,9 +138,6 @@ int spell_chill_touch(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
     affect_join(victim, &af, TRUE, FALSE);
   } 
 
-  // modify the damage by how much they resisted
-  dam += (int) (dam * (save/100));
-  
   return spell_damage(ch, victim, dam, TYPE_COLD, SPELL_CHILL_TOUCH, 0);
 }
 
@@ -255,9 +252,9 @@ int spell_energy_drain(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
 
    if(saves_spell(ch, victim, 1, SAVE_TYPE_ENERGY) > 0) 
       mult = 10000;
-   // Here's the spell..
 
    gain_exp(victim, GET_LEVEL(victim)*mult);
+
    send_to_char("Your life energy is drained!\n\r", victim);
    return eSUCCESS;
 }
@@ -274,25 +271,23 @@ int spell_souldrain(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
          return spell_damage(ch, victim, 100, TYPE_MAGIC, SPELL_SOULDRAIN, 0);
 	 }
       else {
-//         xp = number(level>>1, level)*1000;
-//         gain_exp(victim, -xp);
-
-//         dam = dam_percent(skill,125);
-
          mana = dam_percent(skill,125);
          if(mana > GET_MANA(victim))
             mana = GET_MANA(victim);
-    //     GET_MOVE(victim) >>= 1;
          GET_MANA(victim) -= mana;
 
          GET_MANA(ch) += mana;
-  //       GET_HIT(ch) += dam;
 	 send_to_char("You drain their very soul!\r\n",ch);
          send_to_char("You feel your very soul being drained!\n\r", victim);
 
    skill_increase_check(ch, SPELL_SOULDRAIN, skill, SKILL_INCREASE_MEDIUM);
-
-         return eSUCCESS;//spell_damage(ch, victim, dam, TYPE_MAGIC, 
+	int retval;
+	if (IS_MOB(victim) && !victim->fighting) {
+          retval = attack(victim, ch, TYPE_UNDEFINED, FIRST);
+	  retval = SWAP_CH_VICT(retval);
+	}
+        else retval = eSUCCESS;
+         return retval;//spell_damage(ch, victim, dam, TYPE_MAGIC, 
 //SPELL_SOULDRAIN, 0);
          }
       } // ! saves spell
