@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.52 2004/05/07 07:04:37 urizen Exp $ */
+/* $Id: nanny.cpp,v 1.53 2004/05/09 00:20:25 urizen Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -715,7 +715,11 @@ void nanny(struct descriptor_data *d, char *arg)
          log( log_buf, GET_LEVEL(ch), LOG_SOCKET );
 
       warn_if_duplicate_ip(ch);
-      
+      if  (GET_GOLD(ch) > 10000000)
+      {
+        sprintf(log_buf, "%s has more than 10 mil gold. Bugged?", GET_NAME(ch));
+	log( log_buf, 100, LOG_WARNINGS );
+      }
       //    SEND_TO_Q(motd, d);
       if(GET_LEVEL(ch) < IMMORTAL)
         send_to_char(motd, d->character);
