@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.35 2004/05/25 14:52:28 urizen Exp $ */
+/* $Id: limits.cpp,v 1.36 2004/05/25 16:38:57 urizen Exp $ */
 
 extern "C"
 {
@@ -88,7 +88,7 @@ int32 mana_limit(CHAR_DATA *ch)
     if (!IS_NPC(ch))
       max = (ch->max_mana);
     else
-      max = 100;
+      max = (ch->max_mana);
     
     return(max);
 }

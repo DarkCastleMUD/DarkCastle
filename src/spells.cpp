@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.88 2004/05/21 16:43:31 urizen Exp $ */
+/* $Id: spells.cpp,v 1.89 2004/05/25 16:38:57 urizen Exp $ */
 
 extern "C"
 {
@@ -175,7 +175,7 @@ TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_lightning_bolt },
  { /* 32 */ 12, POSITION_FIGHTING, 10, 
 TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_magic_missile },
 
- { /* 33 */ 12, POSITION_STANDING, 15, 
+ { /* 33 */ 12, POSITION_FIGHTING, 15, 
 TAR_CHAR_ROOM|TAR_SELF_NONO|TAR_OBJ_INV|TAR_OBJ_ROOM, cast_poison },
 
  { /* 34 */ 12, POSITION_STANDING, 50, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, 

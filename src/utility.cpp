@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.26 2004/05/25 01:04:50 urizen Exp $ */
+/* $Id: utility.cpp,v 1.27 2004/05/25 16:38:57 urizen Exp $ */
 
 extern "C"
 {
@@ -674,7 +674,7 @@ bool check_blind( struct char_data *ch )
    if (IS_AFFECTED(ch, AFF_TRUE_SIGHT))
       return FALSE;
 
-    if ( IS_AFFECTED(ch, AFF_BLIND) )
+    if ( IS_AFFECTED(ch, AFF_BLIND) && number(0,4)) // 20% chance of seeing
     {
 	send_to_char( "You can't see a damn thing!\n\r", ch );
 	return TRUE;

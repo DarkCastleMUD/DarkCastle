@@ -731,21 +731,28 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
   if (!str_cmp(buf, "carries"))
   {
     struct obj_data *obj=0;
+    CHAR_DATA *take;
     switch (arg[1] )
     {
 
       struct obj_data * search_char_for_item(char_data * ch, sh_int item_number);
        case 'i': // mob
           obj = search_char_for_item(mob, real_object(atoi(val)));
+	  take = mob;
 	     break;
        case 'n': // actor
-         obj = search_char_for_item(mob, real_object(atoi(val)));
+	 if (!actor) return -1;
+         obj = search_char_for_item(actor, real_object(atoi(val)));
+	 take = actor;
 	     break;
 	case 't': // vict
-          obj = search_char_for_item(mob, real_object(atoi(val)));
+	  if (!vict) return -1;
+          obj = search_char_for_item(vict, real_object(atoi(val)));
+	  take = vict;
 	  break;
        case 'r': // rndm
-	  obj = search_char_for_item(mob, real_object(atoi(val)));
+	 if (!rndm) return -1;
+	  obj = search_char_for_item(rndm, real_object(atoi(val)));
 	  break;
 	default:
           logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'carries'", mob_index[mob->mobdata->nr].virt );
@@ -756,7 +763,15 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
        return 1;
     else if (!str_cmp(opr, "take"))
     {
-      obj_from_char(obj);
+	int location = 0,i;
+       if (obj->carried_by)
+	  obj_from_char(obj);
+      for (i=0; i < MAX_WEAR; i++)
+	 if (obj == take->equipment[i])
+	 {
+	   obj_from_char(unequip_char(take, i));
+	 }
+
       extract_obj(obj);
       return 1;
     }

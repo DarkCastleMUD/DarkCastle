@@ -1,4 +1,3 @@
- 
 /***************************************************************************
  *  file: magic.c , Implementation of spells.              Part of DIKUMUD *
  *  Usage : The actual effect of magic.                                    *
@@ -13,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.143 2004/05/25 14:52:29 urizen Exp $ */
+/* $Id: magic.cpp,v 1.144 2004/05/25 16:38:57 urizen Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -663,7 +662,8 @@ void do_solar_blind(CHAR_DATA *ch, CHAR_DATA *tmp_victim)
     log("Null ch or vict in solar_blind", IMMORTAL, LOG_BUG);
     return;
   }
-  if(saves_spell(ch, tmp_victim, -5, SAVE_TYPE_MAGIC) < 0)
+//  if(saves_spell(ch, tmp_victim, -5, SAVE_TYPE_MAGIC) < 0)
+
     if(!IS_AFFECTED(tmp_victim, AFF_BLIND)) 
     {
       act("$n seems to be blinded!", tmp_victim, 0, 0, TO_ROOM, INVIS_NULL);
@@ -671,12 +671,13 @@ void do_solar_blind(CHAR_DATA *ch, CHAR_DATA *tmp_victim)
 
       af.type      = SPELL_BLINDNESS;
       af.location  = APPLY_HITROLL;
-      af.modifier  = -30;  // Make hitroll worse
+      af.modifier  = has_skill(tmp_victim,SKILL_BLINDFIGHTING)?skill_success(tmp_victim,0,SKILL_BLINDFIGHTING)?-10:-20:-20;  
+// Make hitroll worse
       af.duration  = 4;
       af.bitvector = AFF_BLIND;
       affect_to_char(tmp_victim, &af);
       af.location = APPLY_AC;
-      af.modifier = +90; // Make AC Worse!
+      af.modifier  = has_skill(tmp_victim,SKILL_BLINDFIGHTING)?skill_success(tmp_victim,0,SKILL_BLINDFIGHTING)?+45:90:90;
       affect_to_char(tmp_victim, &af);
     } // if affect by blind
 }
@@ -1265,14 +1266,14 @@ int spell_blindness(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
 
   set_cantquit( ch, victim );
 
-  if(saves_spell(ch, victim, -10, SAVE_TYPE_MAGIC)) {
+/*  if(saves_spell(ch, victim, -10, SAVE_TYPE_MAGIC)) {
     act("$N seems to be unaffected!", ch, NULL, victim, TO_CHAR, 0);
     act("$n tried to blind you!", ch, NULL, victim, TO_VICT, 0);
     if ((!victim->fighting) && (IS_NPC(victim)) && number(0, 1))
       retval = attack(victim, ch, TYPE_UNDEFINED, FIRST);
       retval = SWAP_CH_VICT(retval);
       return retval;
-  }
+  }*/
    if (number(1,101) < get_saves(victim, SAVE_TYPE_MAGIC))
    {
 act("$N resists your attempt to blind $m!", ch, NULL, victim, TO_CHAR,0);
@@ -1284,19 +1285,32 @@ act("You resist $n's attempt to blind you!",ch,NULL,victim,TO_VICT,0);
   if (affected_by_spell(victim, SPELL_BLINDNESS) || IS_AFFECTED(victim, AFF_BLIND))
     return eFAILURE;
 
+        int chance = skill > 80 ? 6 : 8;
+	if (number(0,chance))
+	{
+	  act("$n dodges the spell!", victim, 0, 0, TO_ROOM, INVIS_NULL);
+	  send_to_char("You dodge the spell!\n\r", victim);
+	  if (IS_NPC(victim)) {
+	    retval = one_hit(victim, ch, TYPE_UNDEFINED, FIRST);
+	    retval = SWAP_CH_VICT(retval);
+	    return retval;
+	  } else
+	return eFAILURE;
+	}
   act("$n seems to be blinded!", victim, 0, 0, TO_ROOM, INVIS_NULL);
   send_to_char("You have been blinded!\n\r", victim);
 
   af.type      = SPELL_BLINDNESS;
   af.location  = APPLY_HITROLL;
-  af.modifier  = -4;  /* Make hitroll worse */
-  af.duration  = 3+(level/5);
+  af.modifier  = has_skill(victim,SKILL_BLINDFIGHTING)?skill_success(victim,0,SKILL_BLINDFIGHTING)?-10:-20:-20;
+
+  af.duration  = 1 + (skill > 33) + (skill > 60);
   af.bitvector = AFF_BLIND;
   affect_to_char(victim, &af);
 
 
   af.location = APPLY_AC;
-  af.modifier = +40; /* Make AC Worse! */
+  af.modifier  = has_skill(victim,SKILL_BLINDFIGHTING)?skill_success(victim,0,SKILL_BLINDFIGHTING)?+25:50:50;
   affect_to_char(victim, &af);
   return eSUCCESS;
 }
@@ -1510,15 +1524,20 @@ int spell_curse(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
 	  send_to_char("The spell fizzles!\r\n",ch);
  	  return eSUCCESS;
 	}
-	 if(number(0,chance))
-		{
-	act("$N seems to be unaffected!", ch, NULL, victim, TO_CHAR, 0);
-	if (IS_NPC(victim)) {
-	retval = one_hit( victim, ch, TYPE_UNDEFINED, FIRST);
-	retval = SWAP_CH_VICT(retval);
-	return retval; }
-	else return eFAILURE;
-		}
+        if (skill < 81) { chance = 2; }
+        else { chance = 3; }
+	if (number(1,5) > chance)
+	{
+	  act("$n dodges the spell!", victim, 0, 0, TO_ROOM, INVIS_NULL);
+	  send_to_char("You dodge the spell!\n\r", victim);
+	  if (IS_NPC(victim)) {
+	    retval = one_hit(victim, ch, TYPE_UNDEFINED, FIRST);
+	    retval = SWAP_CH_VICT(retval);
+	    return retval;
+	  }
+	  return eFAILURE;
+	}
+
    if (number(1,101) < get_saves(victim, SAVE_TYPE_MAGIC))
    {
 	act("$N resists your attempt to curse $m!", ch, NULL, victim, TO_CHAR,0);
@@ -1536,13 +1555,10 @@ int spell_curse(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
 	 af.location  = APPLY_SAVING_MAGIC;
 	 af.bitvector = AFF_CURSE;
 	 affect_to_char(victim, &af);
-
 	 af.location = APPLY_SAVING_FIRE;
 	 affect_to_char(victim, &af);
-
 	 af.location = APPLY_SAVING_COLD;
 	 affect_to_char(victim, &af);
-
 	 af.location = APPLY_SAVING_ENERGY;
 	 affect_to_char(victim, &af);
 	 af.location = APPLY_SAVING_ACID;
@@ -2119,11 +2135,27 @@ act("You resist $n's attempt to posion you!",ch,NULL,victim,TO_VICT,0);
      return eFAILURE;
    }
 
+        int chance;
+        if (skill < 81) { chance = 1; }
+        else { chance = 2; }
+	if (number(1,5) > chance)
+	{
+	  act("$n dodges the spell!", victim, 0, 0, TO_ROOM, INVIS_NULL);
+	  send_to_char("You dodge the spell!\n\r", victim);
+	  if (IS_NPC(victim)) {
+	    retval = one_hit(victim, ch, TYPE_UNDEFINED, FIRST);
+	    retval = SWAP_CH_VICT(retval);
+	    return retval;
+	  } else
+	return eFAILURE;
+	}
+
+
     if(!IS_SET(victim->immune, ISR_POISON))
       if(saves_spell(ch, victim, 0, SAVE_TYPE_POISON) < 0)
       {
         af.type = SPELL_POISON;
-        af.duration = level*2;
+        af.duration = 1 + (skill > 80);
         af.modifier = -5;
         af.location = APPLY_STR;
         af.bitvector = AFF_POISON;
@@ -4505,6 +4537,20 @@ int spell_weaken(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *
 	act("$N resists $n's attempt to weaken $m!", ch, NULL, victim, TO_ROOM,NOTVICT);
 	act("You resist $n's attempt to weaken you!",ch,NULL,victim,TO_VICT,0);
    } else {
+        int chance;
+        if (skill < 81) { chance = 1; }
+        else { chance = 2; }
+	if (number(1,5) > chance)
+	{
+	  act("$n dodges the spell!", victim, 0, 0, TO_ROOM, INVIS_NULL);
+	  send_to_char("You dodge the spell!\n\r", victim);
+	  if (IS_NPC(victim)) {
+	    retval = one_hit(victim, ch, TYPE_UNDEFINED, FIRST);
+	    retval = SWAP_CH_VICT(retval);
+	    return retval;
+	  } else
+	return eFAILURE;
+	}
 
     
 	 if (!affected_by_spell(victim, SPELL_WEAKEN))
@@ -9465,6 +9511,20 @@ act("$N resists $n's attempt to debilitize $m!", ch, NULL, victim, TO_ROOM,NOTVI
 act("You resist $n's attempt to debilitize you!",ch,NULL,victim,TO_VICT,0);
    } else {
 
+        int chance;
+        if (skill < 81) { chance = 2; }
+        else { chance = 3; }
+	if (number(1,5) > chance)
+	{
+	  act("$n dodges the spell!", victim, 0, 0, TO_ROOM, INVIS_NULL);
+	  send_to_char("You dodge the spell!\n\r", victim);
+	  if (IS_NPC(victim)) {
+	    retval = one_hit(victim, ch, TYPE_UNDEFINED, FIRST);
+	    retval = SWAP_CH_VICT(retval);
+	    return retval;
+	  }
+	  return eFAILURE;
+	}
 
 //  int save = saves_spell(ch, victim, 5, SAVE_TYPE_MAGIC);
     double percent = 0;
@@ -9562,7 +9622,6 @@ int spell_attrition(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
 
   set_cantquit( ch, victim );
 
-  int save = -1;//saves_spell(ch, victim, 0, SAVE_TYPE_POISON);
    if (number(1,101) < get_saves(victim, SAVE_TYPE_POISON))
    {
 act("$N resists your attempt to attrition $m!", ch, NULL, victim, 
@@ -9571,11 +9630,27 @@ act("$N resists $n's attempt to attrition $m!", ch, NULL, victim, TO_ROOM,
 NOTVICT);
 act("You resist $n's attempt to attrition you!",ch,NULL,victim,TO_VICT,0);
    } else {
-  int acmod = 0, tohit = 0;
+        int chance;
+        if (skill < 81) { chance = 2; }
+        else { chance = 3; }
+	if (number(1,5) > chance)
+	{
+	  act("$n dodges the spell!", victim, 0, 0, TO_ROOM, INVIS_NULL);
+	  send_to_char("You dodge the spell!\n\r", victim);
+	  if (IS_NPC(victim)) {
+	    retval = one_hit(victim, ch, TYPE_UNDEFINED, FIRST);
+	    retval = SWAP_CH_VICT(retval);
+	    return retval;
+	  }
+	  return eFAILURE;
+	}
+
+        int acmod = 0, tohit = 0;
         if (skill < 34) { acmod = 10; tohit = -4; }
         else if (skill < 61) { acmod = 15; tohit = -6;}
         else if (skill < 81) { acmod = 20; tohit = -8;}
         else { acmod = 25; tohit = -10; }
+
 
 
     af.type      = SPELL_ATTRITION;

@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.63 2004/05/25 00:39:38 urizen Exp $ */
+/* $Id: db.cpp,v 1.64 2004/05/25 16:38:56 urizen Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -2339,8 +2339,8 @@ CHAR_DATA *read_mobile(int nr, FILE *fl)
         mob->mana     = 100 + (mob->level * 10);
         mob->max_mana = 100 + (mob->level * 10);
     
-        mob->move     = 82;
-        mob->max_move = 82;
+        mob->move     = 100 + (mob->level * 10);
+        mob->max_move = 100 + (mob->level * 10);
     
         mob->gold = fread_int (fl, 0, LONG_MAX);
         mob->plat = 0;
