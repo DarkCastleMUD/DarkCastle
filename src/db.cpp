@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.64 2004/05/25 16:38:56 urizen Exp $ */
+/* $Id: db.cpp,v 1.65 2004/05/27 21:12:54 urizen Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -2395,6 +2395,10 @@ CHAR_DATA *read_mobile(int nr, FILE *fl)
                  fread_int (fl, 0, 100); // junk var in case we add another stat
                  fread_new_newline (fl);
                  break;
+	      case 'A': // more Affects
+	         mob->affected_by2 = fread_int(fl, LONG_MIN, LONG_MAX);
+		 fread_new_newline(fl);
+		 break;
               case '>':
                  ungetc( letter, fl );
                  mprog_read_programs( fl, nr );
@@ -2495,6 +2499,8 @@ void write_mobile(char_data * mob, FILE *fl)
 
     if(mob->c_class) 
       fprintf(fl, "C %d\n", mob->c_class);
+    if (mob->affected_by2)
+      fprintf(fl, "A %d\n", mob->affected_by2);
 
     if(mob->raw_str != 11 || mob->raw_intel != 11 || mob->raw_wis != 11 ||
        mob->raw_dex != 11 || mob->raw_con != 11) {
