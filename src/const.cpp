@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: const.cpp,v 1.45 2002/10/13 15:35:41 pirahna Exp $ */
+/* $Id: const.cpp,v 1.46 2002/10/13 16:16:23 pirahna Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1157,6 +1157,7 @@ struct class_skill_defines u_skills[] = { // druid skills
 {    "sun ray",		SPELL_SUN_RAY,		14,	90,	3203,	NULL },
 {    "sense life",	SPELL_SENSE_LIFE,	15,	90,	-2, "Find the Black Queen in the game of life." },
 {    "water breathing",	SPELL_WATER_BREATHING,	17,	90,	3203,	NULL },
+{    "attrition",	SPELL_ATTRITION,	19,	90,	-2, "Bring me a pair of indigo gloves if you wish to learn this." },
 {    "stone shield",	SPELL_STONE_SHIELD,	20,	90,	-2, "The druid of druids can help you learn this most quintisential skill."},
 {    "drown",		SPELL_DROWN,		22,	90,	3203,	NULL },
 {    "lightning shield",SPELL_LIGHTNING_SHIELD,	23,	90,	-2, "A near victim of infanticide the Lord of the Tallest mountain knows lightning shield."},
@@ -1268,6 +1269,7 @@ struct class_skill_defines m_skills[] = { // mage skills
 {    "dispel minor",	SPELL_DISPEL_MINOR,	22,	90,	3020,	NULL },
 {    "mass invisibility", SPELL_MASS_INVISIBILITY,	24,	90,	3020,	NULL },
 {    "wizard eye",	SPELL_WIZARD_EYE,	26,	90,	3020,	NULL },
+{    "debility",	SPELL_DEBILITY,		28,	90,	-2,	"Bring me a glass earring and I will teach this to you." },
 {    "meteor swarm",	SPELL_METEOR_SWARM,	30,	90,	3020,	NULL },
 {    "stone skin",	SPELL_STONE_SKIN,	32,	90,	-2, "A woman strong in battle surrounded by heavy magical influences calls to you." },
 {    "group fly",	SPELL_GROUP_FLY,	34,	90, -2,	"It’s a bird! It’s an air traffic controller! No, but whatever it is, its elementary :)." },
