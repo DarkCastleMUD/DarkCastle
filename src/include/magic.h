@@ -5,7 +5,7 @@
  *                                                                           *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-/* $Id: magic.h,v 1.6 2002/10/13 15:35:46 pirahna Exp $ */
+/* $Id: magic.h,v 1.7 2002/12/27 01:45:12 pirahna Exp $ */
 #ifndef MAGIC_H_
 #define MAGIC_H_
 
@@ -532,11 +532,6 @@ int cast_globe_of_darkness(byte level, CHAR_DATA * ch, char *arg, int type,
 int spell_eyes_of_the_eagle(byte level, CHAR_DATA * ch,
    CHAR_DATA * victim, struct obj_data * obj, int skill);
 int cast_eyes_of_the_eagle(byte level, CHAR_DATA * ch, char *arg, int type,
-   CHAR_DATA * victim, struct obj_data * tar_obj, int skill);
-
-int spell_haste_other(byte level, CHAR_DATA * ch,
-   CHAR_DATA * victim, struct obj_data * obj, int skill);
-int cast_haste_other(byte level, CHAR_DATA * ch, char *arg, int type,
    CHAR_DATA * victim, struct obj_data * tar_obj, int skill);
 
 int spell_ice_shards(byte level, CHAR_DATA * ch,

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.17 2002/09/28 23:54:47 pirahna Exp $
+| $Id: guild.cpp,v 1.18 2002/12/27 01:45:08 pirahna Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -391,12 +391,17 @@ int skill_master(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     return eSUCCESS;
 }
 
-// we could always look up learned in here, but it's better if it's passed in
-// most skills already have the learned looked up, and there's no point in traversing
-// the skill list once again just to find out
+// TODO - go ahead and remove 'learned' from everywhere to use it.
+// We can't always pass it in, since in 'group' type spells or
+// object affects someone that doesn't have the skill is getting a
+// valid amount passed in.
+
 void skill_increase_check(char_data * ch, int skill, int learned, int difficulty)
 {
    int chance, maximum;
+
+   if( ! ( learned = has_skill(ch, skill) ) )
+      return; // get out if i don't have the skill
 
    if(learned > ( GET_LEVEL(ch) * 2 ))
       return;
