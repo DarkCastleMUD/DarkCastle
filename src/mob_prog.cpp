@@ -215,6 +215,8 @@ int mprog_veval( int lhs, char *opr, int rhs )
 
 }
 
+
+void debugpoint(){}
 /* This function performs the evaluation of the if checks.  It is
  * here that you can add any ifchecks which you so desire. Hopefully
  * it is clear from what follows how one would go about adding your
@@ -288,7 +290,7 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
   point++;
 
   /* check to see if there is an operator */
-  while ( *point == ' ' )
+  while ( *point == ' ' || *point == '\r')
     point++;
   if ( *point == '\0' ) 
     {
@@ -355,6 +357,9 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
       switch ( arg[1] )  /* arg should be "$*" so just get the letter */
 	{
 	case 'i': return 0;
+	case 'z': if (mob->beacon)
+             return ( IS_NPC((CHAR_DATA*)mob->beacon));
+           else return -1;
 	case 'n': if ( actor )
  	             return ( !IS_NPC( actor ) );
 	          else return 0;
@@ -375,6 +380,10 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
       switch ( arg[1] )  /* arg should be "$*" so just get the letter */
         {
         case 'i': return (mob->equipment[WIELD] )?1:0;
+	case 'z': if (mob->beacon)
+             return ((CHAR_DATA*)mob->beacon)->equipment[WIELD]?1:0;
+           else return -1;
+
         case 'n': if ( actor )
                      return ( actor->equipment[WIELD] ) ? 1:0;
                   else return 0;
@@ -394,6 +403,10 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
       switch ( arg[1] )  /* arg should be "$*" so just get the letter */
 	{
 	case 'i': return 1;
+	case 'z': if (mob->beacon)
+             return IS_NPC(((CHAR_DATA*)mob->beacon));
+           else return -1;
+
 	case 'n': if ( actor )
 	             return IS_NPC( actor );
 	          else return -1;
@@ -414,6 +427,9 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
       switch ( arg[1] )  /* arg should be "$*" so just get the letter */
 	{
 	case 'i': return IS_GOOD( mob );
+	case 'z': if (mob->beacon)
+             return IS_GOOD(((CHAR_DATA*)mob->beacon));
+           else return -1;
 	case 'n': if ( actor )
 	             return IS_GOOD( actor );
 	          else return -1;
@@ -433,6 +449,10 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
     {
       switch ( arg[1] )  /* arg should be "$*" so just get the letter */
 	{
+	case 'z': if (mob->beacon)
+             return ((CHAR_DATA*)mob->beacon)->fighting ? 1:0;
+           else return -1;
+
 	case 'i': return ( mob->fighting ) ? 1 : 0;
 	case 'n': if ( actor )
 	             return ( actor->fighting ) ? 1 : 0;
@@ -454,6 +474,10 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
       switch ( arg[1] )  /* arg should be "$*" so just get the letter */
 	{
 	case 'i': return ( GET_LEVEL( mob ) > IMMORTAL );
+	case 'z': if (mob->beacon)
+             return ( GET_LEVEL(((CHAR_DATA*)mob->beacon)) > IMMORTAL);
+           else return -1;
+
 	case 'n': if ( actor )
 	             return ( GET_LEVEL( actor ) > IMMORTAL );
   	          else return -1;
@@ -474,6 +498,10 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
       switch ( arg[1] )  /* arg should be "$*" so just get the letter */
 	{
 	case 'i': return IS_AFFECTED( mob, AFF_CHARM );
+	case 'z': if (mob->beacon)
+             return IS_AFFECTED(((CHAR_DATA*)mob->beacon), AFF_CHARM);
+           else return -1;
+
 	case 'n': if ( actor )
 	             return IS_AFFECTED( actor, AFF_CHARM );
 	          else return -1;
@@ -496,6 +524,10 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
 	{
 	case 'i': return ( mob->master != NULL
 			  && mob->master->in_room == mob->in_room );
+	case 'z': if (mob->beacon)
+             return ((CHAR_DATA*)mob->beacon)->master && ((CHAR_DATA*)mob->beacon)->master->in_room
+			== ((CHAR_DATA*)mob->beacon)->in_room;
+           else return -1;
 	case 'n': if ( actor )
 	             return ( actor->master != NULL
 			     && actor->master->in_room == actor->in_room );
@@ -521,6 +553,10 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
      {
         case 'i': // mob
 		return (int)(affected_by_spell(mob, find_skill_num(val)));
+	case 'z': if (mob->beacon)
+             return (int)(affected_by_spell(((CHAR_DATA*)mob->beacon), find_skill_num(val)));
+           else return -1;
+
 	case 'n': // actor
 	 	if (actor)
                 return (int)(affected_by_spell(actor, find_skill_num(val)));
@@ -540,6 +576,10 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
       switch ( arg[1] )  /* arg should be "$*" so just get the letter */
 	{
 	case 'i': return ( mob->affected_by & atoi( val ) );
+	case 'z': if (mob->beacon)
+             return ( ((CHAR_DATA*)mob->beacon)->affected_by & atoi(val));
+           else return -1;
+
 	case 'n': if ( actor )
 	             return ( actor->affected_by & atoi( val ) );
 	          else return -1;
@@ -563,6 +603,13 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
 	case 'i': lhsvl = (mob->hit*100)  / mob->max_hit;
 	          rhsvl = atoi( val );
          	  return mprog_veval( lhsvl, opr, rhsvl );
+	case 'z': if (mob->beacon) {
+		lhsvl = (((CHAR_DATA*)mob->beacon)->hit*100)/((CHAR_DATA*)mob->beacon)->max_hit;
+		rhsvl = atoi(val);
+             return mprog_veval(lhsvl, opr, rhsvl);
+	  }
+           else return -1;
+
 	case 'n': if ( actor )
 	          {
 		    lhsvl = (actor->hit*100) / actor->max_hit;
@@ -600,6 +647,13 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
 	case 'i': lhsvl = world[mob->in_room].number;
 	          rhsvl = atoi(val);
 	          return mprog_veval( lhsvl, opr, rhsvl );
+	case 'z': if (mob->beacon) {
+		lhsvl = world[((CHAR_DATA*)mob->beacon)->in_room].number;
+	        rhsvl = atoi(val);
+             return mprog_veval(lhsvl, opr, rhsvl);;
+	}
+           else return -1;
+
 	case 'n': if ( actor )
 	          {
 		    lhsvl = world[actor->in_room].number;
@@ -634,6 +688,13 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
     {
       switch ( arg[1] )  /* arg should be "$*" so just get the letter */
 	{
+	case 'z': if (mob->beacon) {
+		lhsvl = ((CHAR_DATA*)mob->beacon)->sex;
+	      rhsvl = atoi(val);
+             return mprog_veval(lhsvl, opr, rhsvl);
+	}
+           else return -1;
+
 	case 'i': lhsvl = mob->sex;
 	          rhsvl = atoi( val );
 	          return mprog_veval( lhsvl, opr, rhsvl );
@@ -674,6 +735,13 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
 	case 'i': lhsvl = mob->position;
 	          rhsvl = atoi( val );
 	          return mprog_veval( lhsvl, opr, rhsvl );
+	case 'z': if (mob->beacon) {
+		lhsvl = ((CHAR_DATA*)mob->beacon)->position;
+		rhsvl = atoi(val);
+             return mprog_veval(lhsvl, opr, rhsvl);
+	}
+           else return -1;
+
 	case 'n': if ( actor )
 	          {
 		    lhsvl = actor->position;
@@ -708,6 +776,13 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
     {
       switch ( arg[1] )  /* arg should be "$*" so just get the letter */
 	{
+	case 'z': if (mob->beacon) {
+		lhsvl = GET_LEVEL(((CHAR_DATA*)mob->beacon));
+		rhsvl = atoi(val);
+             return mprog_veval(lhsvl, opr, rhsvl);
+		}
+           else return -1;
+
 	case 'i': lhsvl = GET_LEVEL( mob );
 	          rhsvl = atoi( val );
 	          return mprog_veval( lhsvl, opr, rhsvl );
@@ -747,6 +822,14 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
         case 'i': lhsvl = GET_RACE(mob);
                   rhsvl = atoi( val );
                   return mprog_veval( lhsvl, opr, rhsvl );
+	case 'z': if (mob->beacon)
+	  {
+	      lhsvl = GET_RACE(((CHAR_DATA*)mob->beacon));
+	     rhsvl = atoi(val);
+             return mprog_veval(lhsvl, opr, rhsvl);
+	  }
+           else return -1;
+
         case 'n': if ( actor )
                   {
                     lhsvl = GET_RACE(actor);
@@ -781,6 +864,14 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
     {
       switch ( arg[1] )  /* arg should be "$*" so just get the letter */
 	{
+	case 'z': if (mob->beacon)
+	  {
+	      lhsvl = GET_CLASS(((CHAR_DATA*)mob->beacon));
+	     rhsvl = atoi(val);
+             return mprog_veval(lhsvl, opr, rhsvl);
+	  }
+           else return -1;
+
 	case 'i': lhsvl = GET_CLASS(mob);
 	          rhsvl = atoi( val );
                   return mprog_veval( lhsvl, opr, rhsvl );
@@ -826,6 +917,10 @@ mob_index[mob->mobdata->nr].virt );
     char *valu = one_argument(val, bufeh);
     switch (arg[1] )
     {
+	case 'z': if (!mob->beacon) return -1;
+		obj = search_char_for_item(((CHAR_DATA*)mob->beacon), real_object(atoi(valu)));
+	      take = ((CHAR_DATA*)mob->beacon);
+
        case 'i': // mob
           obj = search_char_for_item(mob, real_object(atoi(valu)));
 	  take = mob;
@@ -854,7 +949,7 @@ mob_index[mob->mobdata->nr].virt );
        return 1;
     else if (!str_cmp(bufeh, "take"))
     {
-	int location = 0,i;
+	int i;
        if (obj->carried_by)
 	  obj_from_char(obj);
       for (i=0; i < MAX_WEAR; i++)
@@ -871,6 +966,14 @@ mob_index[mob->mobdata->nr].virt );
     {
       switch ( arg[1] )  /* arg should be "$*" so just get the letter */
 	{
+	case 'z': if (mob->beacon)
+	  {
+	      lhsvl = ((CHAR_DATA*)mob->beacon)->gold;
+	     rhsvl = atoi(val);
+             return mprog_veval(lhsvl, opr, rhsvl);
+	  }
+           else return -1;
+
 	case 'i': lhsvl = mob->gold;
                   rhsvl = atoi( val );
                   return mprog_veval( lhsvl, opr, rhsvl );
@@ -1041,6 +1144,18 @@ mob_index[mob->mobdata->nr].virt );
 	case 'i': lhsvl = mob_index[mob->mobdata->nr].virt;
 	          rhsvl = atoi( val );
 	          return mprog_veval( lhsvl, opr, rhsvl );
+	case 'z': if (mob->beacon)
+	  {
+		if (IS_NPC(((CHAR_DATA*)mob->beacon)))
+		{
+	      lhsvl = mob_index[((CHAR_DATA*)mob->beacon)->mobdata->nr].virt;
+	     rhsvl = atoi(val);
+             return mprog_veval(lhsvl, opr, rhsvl);
+		} else
+		return 0;
+	  }
+           else return 0;
+
 	case 'n': if ( actor )
 	          {
 		    if IS_NPC( actor )
@@ -1097,21 +1212,46 @@ mob_index[mob->mobdata->nr].virt );
 
   if ( !str_cmp( buf, "tempvar" ) )
     {
+      char buf4[MAX_STRING_LENGTH], *buf4pt;
+      if (arg[2] != '[')
+      {
+          logf( IMMORTAL, LOG_WORLD,  "Mob: %d badtarget  to 'tempvar'",mob_index[mob->mobdata->nr].virt );
+	  return -1;
+      }	
+      buf4pt = &arg[3];
+      strcpy(buf4, buf4pt);
+      buf4pt = &buf4[0];
+      while (*buf4pt != ']' && *buf4pt != '\0')
+	buf4pt++;
+      if (*buf4pt == '\0')
+      {
+          logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad target to 'tempvar'",mob_index[mob->mobdata->nr].virt );
+          return -1;
+      }
+      *buf4pt = '\0';
+      debugpoint();
       if (val[0] == '$' && val[1])
         mprog_translate(val[1], val, mob, actor, obj, vo, rndm);
+	char *getTemp(CHAR_DATA *ch, char *name);
+
       switch ( arg[1] )  /* arg should be "$*" so just get the letter */
         {
-        case 'i': return mprog_seval( mob->tempVariable, opr, val );
+	case 'z': if (mob->beacon)
+	  {
+             return mprog_seval( getTemp(((CHAR_DATA*)mob->beacon), buf4), opr, val);
+	  }
+           else return -1;
+        case 'i': return mprog_seval( getTemp(mob, buf4), opr, val );
         case 'n': if ( actor )
-                    return mprog_seval( actor->tempVariable, opr, val );
+                    return mprog_seval( getTemp(actor, buf4), opr, val );
                   else
                     return -1;
         case 't': if ( vict )
-                    return mprog_seval( vict->tempVariable, opr, val );
+                    return mprog_seval( getTemp(vict, buf4), opr, val );
                   else
                     return -1;
         case 'r': if ( rndm )
-                    return mprog_seval( rndm->tempVariable, opr, val );
+                    return mprog_seval( getTemp(rndm, buf4), opr, val );
                   else
                     return -1;
         case 'o': 
@@ -1131,6 +1271,12 @@ mob_index[mob->mobdata->nr].virt );
         mprog_translate(val[1], val, mob, actor, obj, vo, rndm);
        switch ( arg[1] )  /* arg should be "$*" so just get the letter */
 	{
+	case 'z': if (mob->beacon)
+	  {
+             return mprog_seval(((CHAR_DATA*)mob->beacon)->name, opr, val);
+	  }
+           else return -1;
+
 	case 'i': return mprog_seval( mob->name, opr, val );
 	case 'n': if ( actor )
 	            return mprog_seval( actor->name, opr, val );
@@ -1194,6 +1340,7 @@ mob_index[mob->mobdata->nr].virt );
     {
       switch ( arg[1] )  /* arg should be "$*" so just get the letter */
 	{
+	case 'z': return 1; // can always see holder
 	case 'i': return 1;
 	case 'n': if ( actor )
 	             return CAN_SEE(mob, actor );
@@ -1221,6 +1368,9 @@ mob_index[mob->mobdata->nr].virt );
 
       switch ( arg[1] )  /* arg should be "$*" so just get the letter */
 	{
+	case 'z': if (mob->beacon && !IS_NPC(((CHAR_DATA*)mob->beacon)))
+		   return IS_SET(((CHAR_DATA*)mob->beacon)->pcdata->quest_bv1, (1<<(target)));
+		else return -1;
 	case 'n': if ( actor && !IS_NPC(actor) )
 	            return IS_SET( actor->pcdata->quest_bv1, (1<<(target)));
 	          else
@@ -1475,11 +1625,19 @@ void mprog_translate( char ch, char *t, CHAR_DATA *mob, CHAR_DATA *actor,
      case 'i':
          one_argument( mob->name, t );
       break;
-
+     case 'z':
+	   if (mob->beacon){ one_argument(((CHAR_DATA*)mob->beacon)->name, t);
+	break;}
+	 strcpy(t,"error");
+	break;
+     case 'Z':
+	  if (mob->beacon) strcpy(t, ((CHAR_DATA*)mob->beacon)->short_desc);
+	  else strcpy(t,"error");
+	break;	   
      case 'I':
          strcpy( t, mob->short_desc );
       break;
-     case 'v':
+/*     case 'v':
 	if (mob->tempVariable)
   	  strcpy(t, mob->tempVariable);
 	else
@@ -1503,7 +1661,7 @@ void mprog_translate( char ch, char *t, CHAR_DATA *mob, CHAR_DATA *actor,
           {  strcpy(t,rndm->tempVariable); break; }
         strcpy(t,"error");
         break;
-
+*/
      case 'n':
          if ( actor ) {
 // Mobs can see them no matter what.  Use "cansee()" if you don't want that
@@ -1706,6 +1864,8 @@ void mprog_translate( char ch, char *t, CHAR_DATA *mob, CHAR_DATA *actor,
 
 }
 
+
+
 /* This procedure simply copies the cmnd to a buffer while expanding
  * any variables by calling the translate procedure.  The observant
  * code scrutinizer will notice that this is taken from act()
@@ -1730,6 +1890,34 @@ int mprog_process_cmnd( char *cmnd, CHAR_DATA *mob, CHAR_DATA *actor,
       continue;
     }
     str++;
+    if (LOWER(*str) == 'v' || LOWER(*str) == 'w')
+    {
+      char a = *str;
+      str++;
+      if (*str == '[') 
+      {
+	debugpoint();
+
+	char *tmp1 = &tmp[0];
+	str++;
+	while (*str != ']' && *str!='\0')
+	  *tmp1++ = *str++;
+        *tmp1 = '\0';
+        CHAR_DATA *who;
+	if (a == 'v') who = mob;
+	else if (a == 'V') who = actor;
+	else if (a == 'w') who = (CHAR_DATA*)vo;
+	else if (a == 'W') who = rndm;
+        if (who) {
+	  struct tempvariable *eh = who->tempVariable;
+	  for (; eh; eh = eh->next)
+            if (!str_cmp(tmp, eh->name))
+  	      break;
+	 if (eh) strcpy(tmp, eh->data);
+	 else continue; // Doesn't have the variable.
+        }
+      }
+    } else
     mprog_translate( *str, tmp, mob, actor, obj, vo, rndm );
     i = tmp;
     ++str;
@@ -1760,8 +1948,9 @@ void mprog_driver ( char *com_list, CHAR_DATA *mob, CHAR_DATA *actor,
  char *cmnd;
  CHAR_DATA *rndm  = NULL;
  CHAR_DATA *vch   = NULL;
+  CHAR_DATA *amob = NULL;
  int        count = 0;
-
+ bool fake =FALSE;
  if (IS_AFFECTED( mob, AFF_CHARM ))
    return;
 
@@ -1810,7 +1999,6 @@ void mprog_driver ( char *com_list, CHAR_DATA *mob, CHAR_DATA *actor,
      cmnd         = command_list;
      command_list = mprog_next_command( command_list );
    }
-
  return;
 
 }
@@ -2020,7 +2208,7 @@ int mprog_bribe_trigger( CHAR_DATA *mob, CHAR_DATA *ch, int amount )
 
 }
 
-void mprog_death_trigger( CHAR_DATA *mob, CHAR_DATA *killer )
+int mprog_death_trigger( CHAR_DATA *mob, CHAR_DATA *killer )
 {
 
  if ( IS_NPC( mob )
@@ -2028,9 +2216,9 @@ void mprog_death_trigger( CHAR_DATA *mob, CHAR_DATA *killer )
    {
      mprog_percent_check( mob, killer, NULL, NULL, DEATH_PROG );
    }
-
- death_cry( mob );
- return;
+ if (!SOMEONE_DIED(mprog_cur_result))
+  death_cry( mob );
+ return mprog_cur_result;
 
 }
 
@@ -2200,7 +2388,7 @@ int mprog_speech_trigger( char *txt, CHAR_DATA *mob )
 
 }
 
-int mprog_catch_trigger(char_data * mob, int catch_num)
+int mprog_catch_trigger(char_data * mob, int catch_num, char *var)
 {
  MPROG_DATA *mprg;
  MPROG_DATA *next;
@@ -2224,6 +2412,31 @@ int mprog_catch_trigger(char_data * mob, int catch_num)
            return eFAILURE;
          }
          if(curr_catch == catch_num) {
+	  if (var) {
+		struct tempvariable *eh;
+		for (eh = mob->tempVariable; eh; eh = eh->next)
+		{
+		  if (!str_cmp(eh->name, "throw")) break;
+		}
+		if (eh) {
+		  dc_free(eh->data);
+		  eh->data = var;
+		} else {
+#ifdef LEAK_CHECK
+        	eh = (struct tempvariable *)
+                        calloc(1, sizeof(struct tempvariable));
+#else
+	       eh = (struct tempvariable *)
+                        dc_alloc(1, sizeof(struct tempvariable));
+#endif
+
+	     eh->data = var;
+	     eh->name = str_dup("throw");
+	   	  eh->next = mob->tempVariable;
+    		 mob->tempVariable = eh;
+
+		}
+	  }
            mprog_driver( mprg->comlist, mob, NULL, NULL, NULL );
            break;
          }
@@ -2241,7 +2454,7 @@ void update_mprog_throws()
    struct mprog_throw_type * action;
    struct mprog_throw_type * last = NULL;
    char_data * vict;
-
+   obj_data *vobj;
    for(curr = g_mprog_throw_list; curr; )
    {
       // update
@@ -2251,8 +2464,9 @@ void update_mprog_throws()
         curr = curr->next;
         continue;
       }
-
+	vobj = NULL;
       vict = NULL;
+	if (curr->mob) {
       // find target
       if(*curr->target_mob_name) { // find me by name
         vict = get_mob(curr->target_mob_name);
@@ -2260,7 +2474,11 @@ void update_mprog_throws()
       else {                 // find me by num
         vict = get_mob_vnum(curr->target_mob_num);
       }
-
+	} else {
+	if (*curr->target_mob_name)
+	vobj = get_obj(curr->target_mob_name);
+	else vobj = get_obj_vnum(curr->target_mob_num);
+       }
       // remove from list
       if(last) {
         last->next = curr->next;
@@ -2278,8 +2496,346 @@ void update_mprog_throws()
 
       // if !vict, oh well....remove it anyway.  Someone killed him.
       if(vict)  // activate
-        mprog_catch_trigger(vict, action->data_num);
-
+        mprog_catch_trigger(vict, action->data_num, action->var);
+      else if (vobj)
+	oprog_catch_trigger(vobj, action->data_num, action->var);
       dc_free(action);
    }
 };
+
+CHAR_DATA *initiate_oproc(CHAR_DATA *ch, OBJ_DATA *obj)
+{ // Sneakiness.
+  CHAR_DATA *temp;
+  temp = clone_mobile(real_mobile(12));
+  mob_index[real_mobile(12)].mobprogs = obj_index[obj->item_number].mobprogs;
+  mob_index[real_mobile(12)].progtypes = obj_index[obj->item_number].progtypes;
+
+  if (ch)    char_to_room(temp, ch->in_room);
+  else       char_to_room(temp,obj->in_room);
+  if (ch) temp->beacon = (OBJ_DATA*) ch;
+//  temp->master = ch;
+ // dc_free(temp->short_desc);
+  temp->short_desc = str_hsh(obj->short_description);
+  //dc_free(temp->name);
+  temp->name = str_hsh(obj->name);
+  return temp;
+}
+
+void end_oproc(CHAR_DATA *ch)
+{
+  extract_char(ch, TRUE);
+  mob_index[real_mobile(12)].progtypes = 0;
+  mob_index[real_mobile(12)].mobprogs = 0;
+}
+
+
+int oprog_speech_trigger( char *txt, CHAR_DATA *ch )
+{
+  CHAR_DATA *vmob = NULL;
+  OBJ_DATA *item;
+
+  mprog_cur_result = eSUCCESS;
+
+
+  for (item = world[ch->in_room].contents; item; item = item->next_content)
+     if (obj_index[item->item_number].progtypes & SPEECH_PROG)
+     {
+	vmob = initiate_oproc(ch, item);
+	if (mprog_wordlist_check(txt, vmob, ch, NULL, NULL, SPEECH_PROG))
+        {
+ 	  end_oproc(vmob);
+	  return mprog_cur_result;
+        }
+	end_oproc(vmob);
+     }
+  for (item = ch->carrying; item; item = item->next_content)
+     if (obj_index[item->item_number].progtypes & SPEECH_PROG)
+     {
+	vmob = initiate_oproc(ch, item);
+	if (mprog_wordlist_check(txt, vmob, ch, NULL, NULL, SPEECH_PROG))
+        {
+ 	  end_oproc(vmob);
+	  return mprog_cur_result;
+        }
+	end_oproc(vmob);
+     }
+
+  for (int i = 0; i < MAX_WEAR; i++)
+  if (ch->equipment[i])
+     if (obj_index[ch->equipment[i]->item_number].progtypes & SPEECH_PROG)
+     {
+	vmob = initiate_oproc(ch, ch->equipment[i]);
+	if (mprog_wordlist_check(txt, vmob,ch,  NULL, NULL, SPEECH_PROG))
+        {
+ 	  end_oproc(vmob);
+	  return mprog_cur_result;
+        }
+	end_oproc(vmob);
+     }
+  return mprog_cur_result;
+}
+
+
+int oprog_catch_trigger(obj_data *obj, int catch_num, char *var)
+{
+ MPROG_DATA *mprg;
+ MPROG_DATA *next;
+ int curr_catch;
+ mprog_cur_result = eFAILURE;
+ CHAR_DATA *vmob;
+ if ( obj_index[obj->item_number].progtypes & CATCH_PROG ) 
+ {
+    mprg = obj_index[obj->item_number].mobprogs;
+    for ( ; mprg != NULL; mprg = mprg->next )
+     {
+       if ( mprg->type & CATCH_PROG )
+       {
+         if(!check_range_valid_and_convert(curr_catch, mprg->arglist, MPROG_CATCH_MIN, MPROG_CATCH_MAX)) {
+           logf( IMMORTAL, LOG_WORLD, "Invalid catch argument: vnum %d",
+             obj_index[obj->item_number].virt);
+           return eFAILURE;
+         }
+         if(curr_catch == catch_num) {
+	   vmob = initiate_oproc(NULL, obj);
+           if (var) {
+	     struct tempvariable *eh;
+	     
+#ifdef LEAK_CHECK
+     		eh = (struct tempvariable *)
+                        calloc(1, sizeof(struct tempvariable));
+#else
+	       eh = (struct tempvariable *)
+                        dc_alloc(1, sizeof(struct tempvariable));
+#endif
+
+	     eh->data = var;
+	     eh->name = str_dup("throw");
+	     eh->next = vmob->tempVariable;
+	     vmob->tempVariable = eh;
+           }
+
+           mprog_driver( mprg->comlist, vmob, NULL, NULL, NULL );
+	   end_oproc(vmob);
+	   break;
+         }
+       }
+
+     }
+}
+ return mprog_cur_result;
+}
+
+
+int oprog_act_trigger( char *txt, CHAR_DATA *ch )
+{
+
+  CHAR_DATA *vmob;
+  OBJ_DATA *item;
+
+  mprog_cur_result = eSUCCESS;
+
+
+  for (item = world[ch->in_room].contents; item; item = 
+item->next_content)
+     if (obj_index[item->item_number].progtypes & ACT_PROG)
+     {
+	vmob = initiate_oproc(ch, item);
+	if (mprog_wordlist_check(txt, vmob, ch, NULL, NULL, ACT_PROG))
+        {
+ 	  end_oproc(vmob);
+	  return mprog_cur_result;
+        }
+	end_oproc(vmob);
+     }
+  for (item = ch->carrying; item; item = item->next_content)
+     if (obj_index[item->item_number].progtypes & ACT_PROG)
+     {
+	vmob = initiate_oproc(ch, item);
+	if (mprog_wordlist_check(txt, vmob, ch, NULL, NULL, ACT_PROG))
+        {
+ 	  end_oproc(vmob);
+	  return mprog_cur_result;
+        }
+	end_oproc(vmob);
+     }
+
+  for (int i = 0; i < MAX_WEAR; i++)
+  if (ch->equipment[i])
+     if (obj_index[ch->equipment[i]->item_number].progtypes & ACT_PROG)
+     {
+	vmob = initiate_oproc(ch, ch->equipment[i]);
+	if (mprog_wordlist_check(txt, vmob,ch,  NULL, NULL, ACT_PROG))
+        {
+ 	  end_oproc(vmob);
+	  return mprog_cur_result;
+        }
+	end_oproc(vmob);
+     }
+  return mprog_cur_result;
+}
+
+int oprog_greet_trigger( CHAR_DATA *ch )
+{
+
+  CHAR_DATA *vmob;
+  OBJ_DATA *item;
+
+  mprog_cur_result = eSUCCESS;
+
+
+  for (item = world[ch->in_room].contents; item; item = 
+item->next_content)
+     if (obj_index[item->item_number].progtypes & ALL_GREET_PROG)
+     {
+	vmob = initiate_oproc(ch, item);
+	mprog_percent_check(vmob, ch, item, NULL, ALL_GREET_PROG);
+	end_oproc(vmob);
+        return mprog_cur_result;
+     }
+  return mprog_cur_result;
+}
+
+int oprog_rand_trigger( OBJ_DATA *item )
+{
+
+  CHAR_DATA *vmob;
+//  OBJ_DATA *item;
+  CHAR_DATA *ch;
+  mprog_cur_result = eSUCCESS;
+  if (item->carried_by) ch=item->carried_by;
+  else ch = NULL;
+    if (obj_index[item->item_number].progtypes & RAND_PROG)
+     {
+        vmob = initiate_oproc(ch, item);
+        mprog_percent_check(vmob, ch, item, NULL, RAND_PROG);
+        end_oproc(vmob);
+        return mprog_cur_result;
+     }
+ return mprog_cur_result;
+}
+
+int oprog_load_trigger( CHAR_DATA *ch )
+{
+
+  CHAR_DATA *vmob;
+  OBJ_DATA *item;
+
+  mprog_cur_result = eSUCCESS;
+
+
+  for (item = world[ch->in_room].contents; item; item = 
+item->next_content)
+     if (obj_index[item->item_number].progtypes & LOAD_PROG)
+     {
+	vmob = initiate_oproc(ch, item);
+	mprog_percent_check(vmob, ch, item, NULL, LOAD_PROG);
+	end_oproc(vmob);
+        return mprog_cur_result;
+     }
+  for (item = ch->carrying; item; item = item->next_content)
+     if (obj_index[item->item_number].progtypes & LOAD_PROG)
+     {
+	vmob = initiate_oproc(ch, item);
+	mprog_percent_check(vmob, ch, item, NULL, LOAD_PROG);
+	end_oproc(vmob);
+        return mprog_cur_result;
+     }
+
+  for (int i = 0; i < MAX_WEAR; i++)
+  if (ch->equipment[i])
+     if (obj_index[ch->equipment[i]->item_number].progtypes & LOAD_PROG)
+     {
+	vmob = initiate_oproc(ch, item);
+	mprog_percent_check(vmob, ch, item, NULL, LOAD_PROG);
+	end_oproc(vmob);
+        return mprog_cur_result;
+     }
+  return mprog_cur_result;
+}
+
+
+int oprog_weapon_trigger( CHAR_DATA *ch, OBJ_DATA *item )
+{
+
+  CHAR_DATA *vmob;
+
+  mprog_cur_result = eSUCCESS;
+
+     if (obj_index[item->item_number].progtypes & WEAPON_PROG)
+     {
+	vmob = initiate_oproc(ch, item);
+	mprog_percent_check(vmob, ch, item, NULL, WEAPON_PROG);
+	end_oproc(vmob);
+        return mprog_cur_result;
+     }
+
+   return mprog_cur_result;
+}
+
+int oprog_armour_trigger( CHAR_DATA *ch, OBJ_DATA *item )
+{
+
+  CHAR_DATA *vmob;
+
+  mprog_cur_result = eSUCCESS;
+
+     if (obj_index[item->item_number].progtypes & ARMOUR_PROG)
+     {
+	vmob = initiate_oproc(ch, item);
+	mprog_percent_check(vmob, ch, item, NULL, ARMOUR_PROG);
+	end_oproc(vmob);
+        return mprog_cur_result;
+     }
+
+   return mprog_cur_result;
+}
+
+int oprog_command_trigger( char *txt, CHAR_DATA *ch )
+{
+
+  CHAR_DATA *vmob;
+  OBJ_DATA *item;
+
+  mprog_cur_result = eSUCCESS;
+
+
+  for (item = world[ch->in_room].contents; item; item = 
+item->next_content)
+     if (obj_index[item->item_number].progtypes & COMMAND_PROG)
+     {
+	vmob = initiate_oproc(ch, item);
+	if (mprog_wordlist_check(txt, ch, vmob, NULL, NULL, COMMAND_PROG))
+        {
+ 	  end_oproc(vmob);
+	  return mprog_cur_result;
+        }
+	end_oproc(vmob);
+     }
+  for (item = ch->carrying; item; item = item->next_content)
+     if (obj_index[item->item_number].progtypes & COMMAND_PROG)
+     {
+	vmob = initiate_oproc(ch, item);
+	if (mprog_wordlist_check(txt, ch, vmob, NULL, NULL, COMMAND_PROG))
+        {
+ 	  end_oproc(vmob);
+	  return mprog_cur_result;
+        }
+	end_oproc(vmob);
+     }
+
+  for (int i = 0; i < MAX_WEAR; i++)
+  if (ch->equipment[i])
+     if (obj_index[ch->equipment[i]->item_number].progtypes & 
+COMMAND_PROG)
+     {
+	vmob = initiate_oproc(ch, ch->equipment[i]);
+	if (mprog_wordlist_check(txt, ch, vmob, NULL, NULL, COMMAND_PROG))
+        {
+ 	  end_oproc(vmob);
+	  return mprog_cur_result;
+        }
+	end_oproc(vmob);
+     }
+  return mprog_cur_result;
+}
+

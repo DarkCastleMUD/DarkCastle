@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.75 2004/07/25 10:20:34 rahz Exp $ */
+/* $Id: db.cpp,v 1.76 2004/11/16 00:51:34 Zaphod Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -56,8 +56,13 @@ extern "C"
 #include <returnvals.h>
 #include <spells.h> // command_range
 #include <shop.h>
+#include <help.h>
+
+int load_new_help(FILE *fl, int reload, struct char_data *ch);
+void load_corpses(void);
 extern int fflush(FILE *);
 extern int _filbuf(FILE *);
+int count_hash_records(FILE * fl);
 
 /* load stuff */
 char* curr_type;
@@ -125,11 +130,14 @@ char motd[MAX_STRING_LENGTH];         /* the messages of today         */
 char imotd[MAX_STRING_LENGTH];        /* the immortal messages of today*/
 char story[MAX_STRING_LENGTH];        /* the game story                */
 char help[MAX_STRING_LENGTH];         /* the main help page            */
+char new_help[MAX_STRING_LENGTH];     /* the main new help page            */
+char new_ihelp[MAX_STRING_LENGTH];    /* the main immortal help page            */
 char info[MAX_STRING_LENGTH];         /* the info text                 */
 struct wizlist_info wizlist[100];     /* the actual wizlist            */
 
 
 FILE *help_fl;                        /* file for help texts (HELP <kwd>)*/
+FILE *new_help_fl;                        /* file for help texts (HELP <kwd>)*/
 
 struct index_data mob_index_array[MAX_INDEX];
 struct index_data *mob_index = mob_index_array;
@@ -141,10 +149,12 @@ struct index_data *obj_index = obj_index_array;
 #define obj_index   obj_index_array
 
 struct help_index_element *help_index = 0;
-
+struct help_index_element_new *new_help_table = 0;
+ 
 int top_of_mobt = 0;                  /* top of mobile index table       */
 int top_of_objt = 0;                  /* top of object index table       */
 int top_of_helpt = 0;                 /* top of help index table         */
+int new_top_of_helpt = 0;                 /* top of help index table         */
 int total_rooms = 0; 		      /* total amount of rooms in memory */
 
 struct time_info_data time_info;    /* the infomation about the time   */
@@ -368,6 +378,7 @@ char * funnybootmessages[] =
   "Initializing BFS search parameters...\r\n",
   "Shaving fuzzy logic...\r\n",
   "Upgrading RAM...\r\n",
+  "Good eq-load detected..\r\nPuring world..\r\nAll mobs repopped with moss eq..\r\n",
   "Checking code for tpyos...\r\n",
   "Generating loot tables..\r\n",
   "Giving barbarians fireshield...\r\n",
@@ -379,6 +390,14 @@ char * funnybootmessages[] =
   "Finding something fun in game to remove...\r\n",
   "Determining array dope vectors...\r\n",
   "Divide By Cucumber Error. Please Reinstall Universe And Reboot\r\n"
+  "Removing Apocalypse's genital warts....ERROR: Unable to remove warts!\r\n"
+  "Removing crash bugs...\r\n"
+  "Making Rahz's virtual penis grow...\r\n"
+  "Cooking Swedish meatballs...\r\n"
+  "Brewing Canadian beer...\r\n"
+  "Searching for intelligent players....searching....searching....searching\n\r"
+  "Coding bug...\r\n"
+  "Uploading Urizen's ABBA mp3s...\r\n"
 };
 
 void funny_boot_message()
@@ -406,6 +425,12 @@ int do_write_skillquest(struct char_data *ch, char *argument, int cmd)
 {
    struct skill_quest *curr;
    FILE *fl;
+  if (ch)
+  if(!has_skill(ch, COMMAND_SQSAVE)) {
+        send_to_char("Huh?\r\n", ch);
+        return eFAILURE;
+  }
+
    if (!(fl = dc_fopen(SKILL_QUEST_FILE,"w")))
    {
       if (ch)
@@ -472,6 +497,7 @@ void load_skillquests()
 void boot_db(void)
 {
     int i;
+    int help_rec_count = 0;
 
 #ifdef LEAK_CHECK
     void cause_leak();
@@ -499,6 +525,8 @@ void boot_db(void)
     file_to_string(STORY_FILE, story);
     file_to_string(HELP_PAGE_FILE, help);
     file_to_string(INFO_FILE, info);
+    file_to_string(NEW_HELP_PAGE_FILE, new_help);
+    file_to_string(NEW_IHELP_PAGE_FILE, new_ihelp);
  
     funny_boot_message();
 
@@ -516,6 +544,25 @@ void boot_db(void)
 
     boot_clans();
 
+    log("Loading new help file.", 0, LOG_MISC);
+
+    // new help file stuff
+    if(!(new_help_fl = dc_fopen(NEW_HELP_FILE, "r"))) {
+      perror( NEW_HELP_FILE );
+      abort();
+    }
+    help_rec_count = count_hash_records(new_help_fl);
+    dc_fclose(new_help_fl);
+
+    if(!(new_help_fl = dc_fopen(NEW_HELP_FILE, "r"))) {
+      perror( NEW_HELP_FILE );
+      abort();
+    }
+    CREATE(new_help_table, struct help_index_element_new, help_rec_count);
+    load_new_help(new_help_fl, 0, 0);
+    dc_fclose(new_help_fl);
+    // end new help files
+  
     log("Opening help file.", 0, LOG_MISC);
 
     if(!(help_fl = dc_fopen(HELP_KWRD_FILE, "r"))) {
@@ -524,7 +571,6 @@ void boot_db(void)
     }
 
     help_index = build_help_index(help_fl, &top_of_helpt);
-
 
     log( "Loading the zones", 0, LOG_MISC );
     boot_zones();
@@ -557,6 +603,9 @@ void boot_db(void)
     log("renumbering zone table", 0, LOG_MISC);
     renum_zone_table();
 
+    log("Loading Corpses.", 0, LOG_MISC);
+    load_corpses();
+    
     log("Loading messages.", 0, LOG_MISC);
     load_messages();
 
@@ -719,7 +768,7 @@ int do_wizlist(CHAR_DATA *ch, char *argument, int cmd)
        "(:) == Overseers == (:)",
        " -- Empty --",
        " -- Empty --",
-       "(:) == Coders == (:)",
+       "(:) == Divinities == (:)",
        "(:) == Mini-Implementors == (:)",
        "(:) == Implementors == (:)"
   };
@@ -1374,10 +1423,6 @@ int read_one_room(FILE *fl, int & room_nr)
       REMOVE_BIT(world[room_nr].room_flags,DEATH);
     if (IS_SET(world[room_nr].room_flags,NO_ASTRAL))
       REMOVE_BIT(world[room_nr].room_flags,NO_ASTRAL);
-    if (IS_SET(world[room_nr].room_flags, LAWFULL))
-      REMOVE_BIT(world[room_nr].room_flags, LAWFULL);
-    if (IS_SET(world[room_nr].room_flags, NEUTRAL))
-      REMOVE_BIT(world[room_nr].room_flags, NEUTRAL);
     if (IS_SET(world[room_nr].room_flags, CHAOTIC))
       REMOVE_BIT(world[room_nr].room_flags, CHAOTIC);
     if (IS_SET(world[room_nr].room_flags,NO_ASTRAL))
@@ -2305,8 +2350,11 @@ void read_one_zone(FILE * fl, int zon)
     tmp = fread_int (fl, 0, 9);
     reset_tab[reset_top].if_flag = tmp;
 
-    reset_tab[reset_top].arg1 = fread_int (fl, -64000, 64000);
-    reset_tab[reset_top].arg2 = fread_int (fl, -64000, 64000);
+    reset_tab[reset_top].arg1 = fread_int (fl, -64000, INT_MAX);
+    reset_tab[reset_top].arg2 = fread_int (fl, -64000, INT_MAX);
+    if (reset_tab[reset_top].arg1 > 64000) reset_tab[reset_top].arg1 = 2;
+
+    if (reset_tab[reset_top].arg2 > 64000) reset_tab[reset_top].arg2 = 1;
 
     if (reset_tab[reset_top].command == 'M' ||
         reset_tab[reset_top].command == 'O' ||
@@ -2319,8 +2367,10 @@ void read_one_zone(FILE * fl, int zon)
         reset_tab[reset_top].command == 'J'
         // % only has 2 args
        )
-      reset_tab[reset_top].arg3 = fread_int (fl, -64000, 64000);
+      reset_tab[reset_top].arg3 = fread_int (fl, -64000, INT_MAX);
     else reset_tab[reset_top].arg3 = 0;
+
+    if (reset_tab[reset_top].arg3 > 64000) reset_tab[reset_top].arg1 = 1;
 
     /* tjs hack - ugly tmp bug fix */
     // this just moves our cursor back 1 position
@@ -2620,14 +2670,16 @@ CHAR_DATA *read_mobile(int nr, FILE *fl)
 }
 
 // we write them recursively so they read in properly
-void write_mprog_recur(FILE *fl, MPROG_DATA *mprg)
+void write_mprog_recur(FILE *fl, MPROG_DATA *mprg, bool mob)
 {
       char *mprog_type_to_name( int type );
 
       if(mprg->next)
-        write_mprog_recur(fl, mprg->next);
-
+        write_mprog_recur(fl, mprg->next,mob);
+    if (mob)
       fprintf( fl, ">%s ", mprog_type_to_name( mprg->type ));
+    else
+      fprintf( fl, "\\%s ", mprog_type_to_name(mprg->type));
       if(mprg->arglist)
         string_to_file( fl,  mprg->arglist );
       else string_to_file( fl, "Saved During Edit");
@@ -2688,7 +2740,7 @@ void write_mobile(char_data * mob, FILE *fl)
     }
 
     if(mob_index[mob->mobdata->nr].mobprogs) {
-      write_mprog_recur(fl, mob_index[mob->mobdata->nr].mobprogs);
+      write_mprog_recur(fl, mob_index[mob->mobdata->nr].mobprogs,TRUE);
       fprintf(fl, "|\n");
     }
 
@@ -2867,21 +2919,76 @@ void handle_automatic_mob_hitdamroll(char_data * mob)
 
 void handle_automatic_mob_settings(char_data * mob)
 {
-   // handle mob damage dice settings
-   if(0 == mob->mobdata->damnodice && 
-      0 == mob->mobdata->damsizedice)
-       handle_automatic_mob_damdice(mob);
+  extern struct mob_matrix_data mob_matrix[];
+  // New matrix is handled here.
+  if (IS_SET(mob->mobdata->actflags, ACT_NOMATRIX)) return;
+  if (mob->level > 110) return;
+  int baselevel = mob->level;
+  float alevel = (float)mob->level;
 
-   // handle mob hit points
-   if(0 == mob->raw_hit)
-       handle_automatic_mob_hitpoints(mob);
+  int percent = number(-3,3);
 
-   // handle mob hit/dam roll
-   if(-1 == mob->hitroll && -1 == mob->damroll)
-       handle_automatic_mob_hitdamroll(mob);
+  if (mob->c_class != 0) alevel -= mob->level > 20 ? 3.0: 2.0;
+  bool c = (mob->c_class);
+  if (IS_SET(mob->mobdata->actflags, ACT_AGGRESSIVE)) alevel -= 1.5;
+  if (!c&& IS_SET(mob->mobdata->actflags, ACT_AGGR_EVIL)) alevel -= 0.5;
+  if (!c&& IS_SET(mob->mobdata->actflags, ACT_AGGR_GOOD)) alevel -= 0.5;
+  if (!c&& IS_SET(mob->mobdata->actflags, ACT_AGGR_NEUT)) alevel -= 0.5;
+  if (IS_SET(mob->mobdata->actflags, ACT_RACIST)) alevel -= 0.5;
+  if (IS_SET(mob->mobdata->actflags, ACT_FRIENDLY)) alevel -= 1.0;
+  
+  if (!c&& IS_SET(mob->mobdata->actflags, ACT_3RD_ATTACK)) alevel -= 0.5;
+  if (!c&& IS_SET(mob->mobdata->actflags, ACT_4TH_ATTACK)) alevel -= 1.0;
+  if (!c&& IS_SET(mob->mobdata->actflags, ACT_PARRY)) alevel -= 0.5;
+  if (!c&& IS_SET(mob->mobdata->actflags, ACT_DODGE)) alevel -= 0.5;
+  if (IS_SET(mob->mobdata->actflags, ACT_WIMPY)) alevel -= 1.0;
+  if (IS_SET(mob->mobdata->actflags, ACT_STUPID)) alevel += 3.0;
+  if (IS_SET(mob->mobdata->actflags, ACT_HUGE)) alevel -= 1.5;
+  if (IS_SET(mob->mobdata->actflags, ACT_DRAINY)) alevel -= 0.5;
 
-   // handle act_flags
+  if (!c&& IS_AFFECTED(mob,AFF_SANCTUARY)) alevel -= 0.5;
+  if (!c&& IS_AFFECTED(mob,AFF_FIRESHIELD)) alevel -= 0.5;
+  if (!c&& IS_AFFECTED(mob,AFF_LIGHTNINGSHIELD)) alevel -= 0.5;
+  if (!c&& IS_AFFECTED(mob,AFF_FROSTSHIELD)) alevel -= 0.5;
+  if (IS_AFFECTED(mob,AFF_EAS)) alevel -= 2.0;
+  if (!c&& IS_AFFECTED(mob,AFF_HASTE)) alevel -= 0.5;
+  if (!c&& IS_AFFECTED(mob,AFF_REFLECT)) alevel -= 0.5;
+  if (!c&& IS_AFFECTED(mob,AFF_INVISIBLE)) alevel -= 0.5;
+  if (!c&& IS_AFFECTED(mob,AFF_SNEAK)) alevel -= 0.5;
+//  if (!c&& IS_AFFECTED(mob,AFF_HIDE)) alevel -= 1.0;
+  if (!c&& IS_AFFECTED(mob,AFF_RAGE)) alevel -= 1.0;
+  if (!c&& IS_AFFECTED(mob,AFF_DETECT_INVISIBLE)) alevel -= 0.5;
+  if (!c&& IS_AFFECTED(mob,AFF_SENSE_LIFE)) alevel -= 0.5;
+  if (!c&& IS_AFFECTED(mob,AFF_INFRARED)) alevel -= 0.5;
+  if (!c&& IS_AFFECTED(mob,AFF_TRUE_SIGHT)) alevel -= 1.0;
+  if (IS_AFFECTED(mob,AFF_BLIND)) alevel += 2.0;
+  if (IS_AFFECTED(mob,AFF_CURSE)) alevel += 1.0;
+  if (IS_AFFECTED(mob,AFF_POISON)) alevel += 2.0;
+  if (IS_AFFECTED(mob,AFF_PARALYSIS)) alevel += 5.0;
+  if (IS_AFFECTED(mob,AFF_SLEEP)) alevel += 1.0;
 
+  if (mob->gold != 0)
+  mob->gold = mob_matrix[baselevel].gold + number(0-(mob_matrix[baselevel].gold/10), mob_matrix[baselevel].gold/10);
+  mob->exp = mob_matrix[baselevel].experience+ ((mob_matrix[baselevel].experience/100)*percent) ;
+
+
+  int temp = mob->immune;
+  for (; temp; temp <<= 1)
+    if (temp & 1)
+      alevel -= 0.5;
+
+  temp = mob->suscept;
+  for (; temp; temp <<= 1)
+    if (temp & 1)
+      alevel += 0.5;
+ 
+  baselevel = MAX(alevel > 0? (int)alevel:1, baselevel - 4);
+  
+  mob->hitroll = mob_matrix[baselevel].tohit;
+  mob->damroll = mob_matrix[baselevel].todam;
+  mob->armor = mob_matrix[baselevel].armor;
+  mob->max_hit = mob->raw_hit = mob->hit = mob_matrix[baselevel].hitpoints 
++ ((mob_matrix[baselevel].hitpoints/100)*percent) ;
 }
 
 CHAR_DATA *clone_mobile(int nr)
@@ -2921,14 +3028,6 @@ CHAR_DATA *clone_mobile(int nr)
   character_list = mob;
   mob_index[nr].number++;
   mob->next_in_room = 0;
-
-  // random money amounts
-  if (mob->gold > 0) {
-    if (mob->gold < (GET_LEVEL(mob) * 500))
-	      mob->gold = number(mob->gold, GET_LEVEL(mob) * 500);
-    else 
-      mob->gold = number(GET_LEVEL(mob) * 500, mob->gold);
-  }
 
   handle_automatic_mob_settings(mob);
 
@@ -2981,6 +3080,7 @@ int create_blank_item(int nr)
     obj->action_description = str_hsh("Fixed.");
     obj->in_room      = NOWHERE;
     obj->next_content = 0;
+    obj->next_skill = 0;
     obj->carried_by   = 0;
     obj->equipped_by  = 0;
     obj->in_obj       = 0;
@@ -3078,7 +3178,8 @@ int create_blank_mobile(int nr)
     mob->title = str_hsh("");
     mob->fighting = 0;
     mob->pcdata       = 0;
-    mob->desc       = 0;
+  mob->altar = 0; 
+   mob->desc       = 0;
     GET_RAW_DEX(mob) = 11;
     GET_RAW_STR(mob) = 11;
     GET_RAW_INT(mob) = 11;
@@ -3387,9 +3488,14 @@ struct obj_data *read_object(int nr, FILE *fl)
           obj->ex_description        = new_new_descr;
           break;
 
+        case '\\':
+            ungetc( '\\', fl );
+            mprog_read_programs( fl, nr );
+             break;
+
         case 'A':
           // these are only two members of obj_affected_type, so nothing else needs initializing
-          loc = fread_int (fl, -1000, 1000);
+          loc = fread_int (fl, -1000, INT_MAX);
           mod = fread_int (fl, -1000, 1000);
           add_obj_affect(obj, loc, mod);
           break;
@@ -3404,6 +3510,7 @@ struct obj_data *read_object(int nr, FILE *fl)
     }
 
     obj->in_room      = NOWHERE;
+    obj->next_skill  = 0;
     obj->next_content = 0;
     obj->carried_by   = 0;
     obj->equipped_by  = 0;
@@ -3459,7 +3566,16 @@ void write_object(obj_data * obj, FILE *fl)
                           obj->affected[i].location, 
                           obj->affected[i].modifier);
 
+    if(obj_index[obj->item_number].mobprogs) {
+      write_mprog_recur(fl, obj_index[obj->item_number].mobprogs,FALSE);
+      fprintf(fl, "|\n");
+    }
+
     fprintf(fl, "S\n");
+}
+bool has_random(OBJ_DATA *obj)
+{
+      return (obj_index[obj->item_number].progtypes & RAND_PROG);
 }
 
 
@@ -3506,13 +3622,14 @@ struct obj_data *clone_object(int nr)
     obj->affected[i].location = old->affected[i].location;
     obj->affected[i].modifier = old->affected[i].modifier;
   }
-
+  obj->next_skill = 0;
   obj->next_content        = 0;
   obj->next        = object_list;
   object_list        = obj;
   obj_index[nr].number++;
   if(obj_index[obj->item_number].non_combat_func ||
-      obj->obj_flags.type_flag == ITEM_MEGAPHONE) {
+      obj->obj_flags.type_flag == ITEM_MEGAPHONE ||
+	has_random(obj)) {
       active_obj2 = &active_head;
 #ifdef LEAK_CHECK
       active_obj = (struct active_object *)calloc(1, sizeof(struct active_object));
@@ -3596,6 +3713,7 @@ void reset_zone(int zone)
          (last_percent==1 && ZCMD.if_flag == 8) ||       // if-last-percent-true
          (last_percent==0 && ZCMD.if_flag == 9)          // if-last-percent-false
        )
+    {
         switch(ZCMD.command)
     {
 
@@ -3721,6 +3839,19 @@ void reset_zone(int zone)
              sprintf(buf, "Bad equip_char zone %d cmd %d", zone, cmd_no);
              log(buf, IMMORTAL, LOG_WORLD);
           }
+	  if (IS_SET(mob->mobdata->actflags, ACT_BOSS))
+	  {
+//	    mob->level += (obj->obj_flags.eq_level)/10;
+//	    handle_automatic_mob_settings(mob);
+	    mob->max_hit *= (1+obj->obj_flags.eq_level/500);
+            mob->damroll *= (1+obj->obj_flags.eq_level/500);
+            mob->hitroll *= (1+obj->obj_flags.eq_level/500);
+	if (mob->armor > 0)
+            mob->armor *= (1-obj->obj_flags.eq_level/500);
+	else
+             mob->armor *= (1+obj->obj_flags.eq_level/500);
+
+	  }
           last_obj = 1;
           last_cmd = 1;
         }
@@ -3830,8 +3961,30 @@ void reset_zone(int zone)
         return;
         break;
     }
-    else
-        last_cmd = 0;
+    } 
+    else {
+      switch(ZCMD.command)
+      {
+
+        case 'M':
+	  last_mob = 0; last_cmd = 0; break;
+
+        case 'O':
+        case 'G':
+        case 'P':
+        case 'E':
+	  last_obj = 0; last_cmd = 0;  break;
+        case '%':
+	  last_percent = 0; last_cmd = 0;  break;
+        case 'D':
+	   last_cmd = 0;break;
+        case 'X':
+	case 'K':
+	    last_cmd = 0;break;
+	default:
+		break;
+	}
+     }
 
     }
 
@@ -4128,6 +4281,7 @@ int fread_int(FILE *fl, long beg_range, long end_range)
                    }
                 else
                    {
+                   printf ("Buffer: '%s'\n", buf);
                    printf ("Reading %s: %s, %d\n", curr_type, curr_name, curr_virtno);
                    printf ("fread_int: Bad value for range %ld - %ld: %ld\n" , beg_range, end_range, i);
                    perror ("fread_int: Value range error");
@@ -4179,9 +4333,27 @@ void free_char( CHAR_DATA *ch )
   struct char_player_alias * x;
   struct char_player_alias * next;
   MPROG_ACT_LIST * currmprog;
+  CHAR_DATA *tmp,*tmp2 = NULL;
+  for (tmp = character_list; tmp; tmp = tmp->next)
+  {
+    if (tmp == ch) {
+	if (tmp2) tmp2->next = tmp->next;
+	else	character_list = tmp->next;
+    }
+   tmp2 = tmp;
+  }
 
   if (ch->tempVariable)
-    dc_free(ch->tempVariable);
+  {
+    struct tempvariable *temp,*tmp;
+     for (temp = ch->tempVariable; temp; temp = tmp)
+     {
+	tmp = temp->next;
+	dc_free(temp->name);
+	dc_free(temp->data);
+	dc_free(temp);
+     }
+  }
   if(!IS_NPC(ch)) {
     if(ch->name)
       dc_free(ch->name);
@@ -4194,6 +4366,7 @@ void free_char( CHAR_DATA *ch )
     if(ch->pcdata)
     {
       // these won't be here if you free an unloaded char
+      ch->pcdata->skillchange = 0;
       if(ch->pcdata->last_site)
         dc_free(ch->pcdata->last_site);
       if(ch->pcdata->rooms)
@@ -4250,7 +4423,7 @@ void free_char( CHAR_DATA *ch )
 
   for(iWear = 0; iWear < MAX_WEAR; iWear++) {
      if(ch->equipment[iWear])
-       obj_to_char( unequip_char( ch, iWear ), ch );
+       obj_to_char( unequip_char( ch, iWear,1 ), ch );
   }
 
   while(ch->carrying)
@@ -4280,8 +4453,6 @@ void free_obj(struct obj_data *obj)
 
   dc_free(obj);
 }
-
-
 
 /* read contents of a text file, and place in buf */
 int file_to_string(const char *name, char *buf)
@@ -4441,8 +4612,9 @@ void init_char(CHAR_DATA *ch)
   ch->move  = GET_MAX_MOVE(ch);
 
   ch->armor = 100;
-
+  ch->altar = NULL;
   GET_PROMPT(ch)          = 0;
+  ch->pcdata->skillchange = 0;
   ch->pcdata->practices   = 0;
   ch->pcdata->time.birth  = time(0);
   ch->pcdata->time.played = 0;
@@ -4595,6 +4767,9 @@ int mprog_name_to_type ( char *name )
    if ( !str_cmp( name, "catch_prog"     ) )	return CATCH_PROG;
    if ( !str_cmp( name, "attack_prog"    ) )    return ATTACK_PROG;
    if ( !str_cmp( name, "load_prog"      ) )    return LOAD_PROG;
+   if ( !str_cmp( name, "command_prog" )) return COMMAND_PROG;
+   if ( !str_cmp( name, "weapon_prog")) return WEAPON_PROG;
+   if ( !str_cmp(name, "armour_prog")) return ARMOUR_PROG;
    return( ERROR_PROG );
 }
 
@@ -4686,7 +4861,7 @@ void mprog_read_programs( FILE *fp, long i )
   {
     if ( (letter = fread_char(fp)) == '|' )
       break;
-    else if ( letter != '>' )
+    else if ( letter != '>' && letter != '\\')
     {
       logf( IMMORTAL, LOG_WORLD, "Load_mobiles: vnum %d MOBPROG char", i );
       ungetc(letter, fp);
@@ -4702,7 +4877,10 @@ void mprog_read_programs( FILE *fp, long i )
       mprog_file_read(fread_string(fp, 1), i);
       break;
     default:
-      SET_BIT(mob_index[i].progtypes, type);
+      if (letter == '>')
+        SET_BIT(mob_index[i].progtypes, type);
+      else
+	SET_BIT(obj_index[i].progtypes, type);
 #ifdef LEAK_CHECK
       mprog = (MPROG_DATA *) calloc(1, sizeof(MPROG_DATA));
 #else
@@ -4711,9 +4889,13 @@ void mprog_read_programs( FILE *fp, long i )
       mprog->type = type;
       mprog->arglist = fread_string(fp, 0);
       mprog->comlist = fread_string(fp, 0);
+    if (letter == '>') {
       mprog->next = mob_index[i].mobprogs;   // when we write them, we write last first
       mob_index[i].mobprogs = mprog;         // so reading them this way keeps them in order
-
+    } else {
+	mprog->next = obj_index[i].mobprogs;
+	obj_index[i].mobprogs = mprog;
+   }
       break;
     }
   }

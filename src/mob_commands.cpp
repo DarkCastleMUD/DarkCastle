@@ -1,4 +1,3 @@
-
 /***************************************************************************
  *  Original Diku Mud copyright (C) 1990, 1991 by Sebastian Hammer,        *
  *  Michael Seifert, Hans Henrik St{rfeldt, Tom Madsen, and Katja Nyboe.   *
@@ -51,6 +50,7 @@ extern "C"
 #include <db.h>
 #include <comm.h>
 #include <returnvals.h>
+#include <innate.h>
 
 // external vars
 
@@ -411,6 +411,8 @@ int do_mpoload( CHAR_DATA *ch, char *argument, int cmd )
     char arg1[ MAX_INPUT_LENGTH ];
     OBJ_DATA       *obj;
     int             realnum;
+    extern int arena[4];
+    extern struct index_data *obj_index;
 
     if ( !IS_NPC( ch ) )
     {
@@ -432,8 +434,13 @@ int do_mpoload( CHAR_DATA *ch, char *argument, int cmd )
 	logf( IMMORTAL, LOG_WORLD, "Mpoload - Bad vnum arg: vnum %d.", mob_index[ch->mobdata->nr].virt );
 	return eFAILURE|eINTERNAL_ERROR;
     }
-
     obj = clone_object( realnum );
+
+    if (obj_index[obj->item_number].virt == 393 && IS_SET(world[ch->in_room].room_flags, ARENA) && 
+        arena[2] == -3 && ArenaIsOpen()) {
+	return eFAILURE;
+    }
+
     if ( CAN_WEAR(obj, ITEM_TAKE) )
     {
 	obj_to_char( obj, ch );
@@ -832,10 +839,14 @@ int do_mpthrow( CHAR_DATA *ch, char *argument, int cmd )
   char buf[MAX_INPUT_LENGTH];
   char second[MAX_INPUT_LENGTH];
   char third[MAX_INPUT_LENGTH];
-
+  char fourth[MAX_INPUT_LENGTH];	
   // locate and validate argument to find target
-  half_chop(argument, first, buf);
-  half_chop(buf, second, third);
+  argument = one_argument(argument, first);
+  argument = one_argument(argument, second);
+  argument = one_argument(argument, third);
+  argument = one_argument(argument, fourth);
+//  half_chop(argument, first, buf);
+ // half_chop(buf, second, third);
 
   if(isdigit(*first)) {
     if(!check_valid_and_convert(mob_num, first) || (real_mobile(mob_num) < 0)) {
@@ -871,6 +882,11 @@ int do_mpthrow( CHAR_DATA *ch, char *argument, int cmd )
   strcpy(throwitem->target_mob_name, first);
   throwitem->data_num = catch_num;
   throwitem->delay = delay;
+  throwitem->mob = TRUE; // This is, suprisingly, a mob
+  if (fourth[0] !='\0')
+   throwitem->var = str_dup(fourth);
+  else
+   throwitem->var = NULL;
 
   // add to delay list
   throwitem->next = g_mprog_throw_list;
@@ -975,21 +991,60 @@ int determine_attack_type(char * attacktype)
     return 0;
 }
 
+char *getTemp(CHAR_DATA *ch, char *name)
+{
+  struct tempvariable *eh;
+  for (eh = ch->tempVariable; eh; eh = eh->next)
+    if (!str_cmp(eh->name, name)) 
+	return eh->data;
+  return NULL;
+}
+
 int do_mpsettemp(CHAR_DATA *ch, char *argument, int cmd)
 {
   char arg[MAX_INPUT_LENGTH];
   char temp[MAX_INPUT_LENGTH];
+  char arg2[MAX_INPUT_LENGTH];
   CHAR_DATA *victim;
   if (!IS_NPC(ch)) {
     send_to_char("Huh?\r\n",ch);
     return eFAILURE;
   }
-  half_chop(argument, arg, temp);
+  argument = one_argument(argument, arg);
+  argument = one_argument(argument, temp);
+  argument = one_argument(argument, arg2);
+  if (arg[0] == '\0' || temp[0] == '\0' || arg2[0] == '\0')
+  {
+    int num = mob_index[ch->mobdata->nr].virt;
+    sprintf(arg, "Mob %d lacking argument for mpsettemp.", num);
+    log(arg, 104, LOG_BUG);
+  }
   victim = get_char_room( arg, ch->in_room );
   if (!victim) return eFAILURE;
-  if (victim->tempVariable) 
-     dc_free(victim->tempVariable);
-  victim->tempVariable = str_dup(temp);
+  struct tempvariable *eh;
+  for (eh = victim->tempVariable; eh; eh = eh->next)
+  {
+    if (!str_cmp(eh->name, temp))
+      break;
+  }
+  if (eh)
+  {
+    dc_free(eh->data);
+    eh->data = str_dup(arg2);
+  } else {
+#ifdef LEAK_CHECK
+        eh = (struct tempvariable *)
+                        calloc(1, sizeof(struct tempvariable));
+#else
+       eh = (struct tempvariable *)
+                        dc_alloc(1, sizeof(struct tempvariable));
+#endif
+
+     eh->data = str_dup(arg2);
+     eh->name = str_dup(temp);
+     eh->next = victim->tempVariable;
+     victim->tempVariable = eh;
+  }
   return eSUCCESS;
 }
 
@@ -1089,3 +1144,158 @@ int do_mpdamage( CHAR_DATA *ch, char *argument, int cmd )
 }
 
 
+int do_mpothrow( CHAR_DATA *ch, char *argument, int cmd )
+{
+  struct mprog_throw_type * throwitem = NULL;
+  int mob_num;
+  int catch_num;
+  int delay;
+
+  char first[MAX_INPUT_LENGTH];
+  char buf[MAX_INPUT_LENGTH];
+  char second[MAX_INPUT_LENGTH];
+  char third[MAX_INPUT_LENGTH];
+  char fourth[MAX_INPUT_LENGTH];
+  // locate and validate argument to find target
+  argument = one_argument(argument, first);
+  argument = one_argument(argument, second);
+  argument = one_argument(argument, third);
+  argument = one_argument(argument, fourth);
+//  half_chop(argument, first, buf);
+ // half_chop(buf, second, third);
+
+
+
+
+
+  if(isdigit(*first)) {
+    if(!check_valid_and_convert(mob_num, first) ||
+(real_object(mob_num) < 0)) {
+      logf( IMMORTAL, LOG_WORLD, "Mpothrow - Invalid objnum: vnum %d.",
+                mob_index[ch->mobdata->nr].virt );
+      return eFAILURE;
+    }
+    *first = '\0';
+  }
+  else {
+    if(strlen(first) >= MAX_THROW_NAME) {
+      logf( IMMORTAL, LOG_WORLD, "Mpthrow - Name too long: vnum %d.",
+                mob_index[ch->mobdata->nr].virt );
+      return eFAILURE;
+    }
+  }
+
+  if(!check_range_valid_and_convert(catch_num, second, MPROG_CATCH_MIN,
+MPROG_CATCH_MAX)) {
+    logf( IMMORTAL, LOG_WORLD, "Mpthrow - Invalid catch_num: vnum %d.",
+                mob_index[ch->mobdata->nr].virt );
+    return eFAILURE;
+  }
+
+  if(!check_range_valid_and_convert(delay, third, 0, 500)) {
+    logf( IMMORTAL, LOG_WORLD, "Mpthrow - Invalid delay: vnum %d.",
+                mob_index[ch->mobdata->nr].virt );
+    return eFAILURE;
+  }
+
+  // create struct
+  throwitem = (struct mprog_throw_type *)dc_alloc(1, sizeof(struct
+mprog_throw_type));
+  throwitem->target_mob_num = mob_num;
+  strcpy(throwitem->target_mob_name, first);
+  throwitem->data_num = catch_num;
+  throwitem->delay = delay;
+  throwitem->mob = FALSE;
+  if (fourth[0] != '\0')
+    throwitem->var = str_dup(fourth);
+  else throwitem->var = NULL;
+
+  // add to delay list
+  throwitem->next = g_mprog_throw_list;
+  g_mprog_throw_list = throwitem;
+
+  return eSUCCESS;
+}
+
+int skill_aff[] = 
+{
+  4, 29, 18, 19, 20, 44,
+  123, 36, 0, 0, 17, 0, 
+  33, 34, 84, 81, 86, 38,
+  89, 0, 0, 0, 0, 0, 72,
+  0, 0, 56, 133, 74, 0,
+  143
+};
+
+int skill_aff2[] =
+{
+  SPELL_SHADOWSLIP, SPELL_INSOMNIA, SPELL_FREEFLOAT,
+  SPELL_FARSIGHT, SPELL_CAMOUFLAGE, 0,
+  0, 0, SPELL_FOREST_MELD, SKILL_SONG_INSANE_CHANT,
+  SKILL_SONG_GLITTER_DUST, SKILL_SONG_STICKY_LULL,
+  0, SPELL_PROTECT_FROM_GOOD, SKILL_INNATE_POWERWIELD,
+  SKILL_INNATE_REGENERATION, SKILL_INNATE_FOCUS,
+  SPELL_KNOW_ALIGNMENT
+};
+
+int do_mpbestow(CHAR_DATA *ch, char *argument, int cmd)
+{
+   char arg[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH],
+     arg2[MAX_INPUT_LENGTH];
+  CHAR_DATA *victim;
+  if (!IS_NPC(ch)) return eFAILURE;
+  argument = one_argument(argument, arg);
+  argument = one_argument(argument, arg1);
+  argument = one_argument(argument, arg2);
+
+  if (arg[0] == '\0' || arg1[0] == '\0' || arg2[0] == '\0') return eFAILURE;
+    if ( ( victim = get_char_room(arg,ch->in_room ) ) == NULL && 
+str_cmp(arg, "all")
+	&& str_cmp(arg,"allpc"))
+    {
+        logf( IMMORTAL, LOG_WORLD, "Mpbestow - No such person: vnum %d.",
+            mob_index[ch->mobdata->nr].virt );
+        return eFAILURE|eINTERNAL_ERROR;
+    }
+   int i;
+  if (!check_range_valid_and_convert(i, arg2,0, 100)) return eFAILURE|eINTERNAL_ERROR;
+  int a = 0;
+  extern char *affected_bits[];
+  if (!victim) victim = world[ch->in_room].people;
+  for (;victim;) {
+  for ( ; affected_bits[a][0] != '\n'; a++) 
+  {
+    if (!str_cmp(affected_bits[a], arg1) && skill_aff[a] != 0)
+    {
+	struct affected_type af;
+        af.type = skill_aff[a];
+	af.duration = i;
+	af.bitvector = 1<<a;
+	af.location = 0;
+	af.modifier = 0;
+	affect_join(victim, &af, TRUE, FALSE);
+    }
+  } 
+extern char *affected_bits2[];
+  for ( ; affected_bits2[a][0] != '\n'; a++)
+  {
+    if (!str_cmp(affected_bits2[a], arg1) && skill_aff2[a] != 0)
+    {
+        struct affected_type af;
+        af.type = skill_aff2[a];
+        af.duration = i;
+        af.bitvector = 1<<a;
+        af.location = 0;
+        af.modifier = 0;
+        affect_join(victim, &af, TRUE, FALSE);
+    }
+  }
+   if (!str_cmp(arg, "all")) victim = victim->next_in_room;
+    else if (!str_cmp(arg, "allpc")) {
+      while ((victim = victim->next_in_room)) {
+	  if (!IS_NPC(victim)) break;	
+	}
+  } else break;
+ }
+  return eSUCCESS;
+}

@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: db.h,v 1.11 2004/07/03 11:44:19 urizen Exp $ */
+/* $Id: db.h,v 1.12 2004/11/16 00:52:09 Zaphod Exp $ */
 #ifndef DB_H_
 #define DB_H_
 
@@ -29,7 +29,7 @@ extern "C" {
                                      // creating it
 
 #define MAX_ZONE    165 
-#define MAX_INDEX   4000
+#define MAX_INDEX   6000
 #define MAX_RESET  16383
 #ifndef LONG_MAX
 #define LONG_MAX    2147483467
@@ -196,7 +196,6 @@ struct index_data
     int (*combat_func)(CHAR_DATA*, struct obj_data *, int, char*, CHAR_DATA*); // combat special proc
     void *item;     /* the mobile/object itself                 */
 
-    // TODO - clean this up so it's only in the MOB index data instead of both
     MPROG_DATA *        mobprogs;
     MPROG_DATA *	mobspec;
     int			progtypes;

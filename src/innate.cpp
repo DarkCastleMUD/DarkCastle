@@ -22,9 +22,6 @@
 #include <returnvals.h>
 #include <interp.h>
 
-#include <vector>
-#include <algorithm>
-using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////
 // external vars

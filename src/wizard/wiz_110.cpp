@@ -31,7 +31,12 @@ int do_maxes(struct char_data *ch, char *argument, int cmd)
   argument = one_argument(argument, arg);
   one_argument(argument, arg2);
   int oclass = GET_CLASS(ch); // old class.
-   // get_skill_list uses a char argument, and so to keep upkeep
+  if(!has_skill(ch, COMMAND_WHATTONERF)) {
+        send_to_char("Huh?\r\n", ch);
+        return eFAILURE;
+  }
+ 
+  // get_skill_list uses a char argument, and so to keep upkeep
    // at a min I'm just modifying this here.
   int i;
   extern char* pc_clss_types2[];
@@ -73,7 +78,7 @@ int do_maxes(struct char_data *ch, char *argument, int cmd)
 	        max += (get_max_stat(ch,classskill[i].attrs[1])-20);
 	  }
 
-	  csendf(ch, "%s: %d\n", classskill[i].skillname, (int)max);
+	  csendf(ch, "%s: %d\n\r", classskill[i].skillname, (int)max);
 	}
 	GET_RACE(ch) = orace;
 	return eSUCCESS;
@@ -312,11 +317,6 @@ int do_fakelog(struct char_data *ch, char *argument, int cmd)
    if (IS_NPC(ch))
            return eFAILURE;
 
-    if(!has_skill(ch, COMMAND_FAKELOG)) {
-        send_to_char("Huh?\r\n", ch);
-        return eFAILURE;
-    }
-
    half_chop(argument, lev_str, command);
  
    if (!*lev_str)
@@ -451,6 +451,80 @@ int do_rename_char(struct char_data *ch, char *arg, int cmd)
   send_to_char("Character now name %'d.\r\n", ch);
   return eSUCCESS;
 }
+int do_install(struct char_data *ch, char *arg, int cmd)
+{
+  char buf[256], type[256], arg1[256], err[256];
+  int range = 0, type_ok = 0;
+  int ret;
+  
+  if(!has_skill(ch, COMMAND_INSTALL)) {
+        send_to_char("Huh?\r\n", ch);
+        return eFAILURE;
+  }
+
+  half_chop(arg, arg1, type);
+
+  if (!*arg1 || !*type) {
+    sprintf(err, "Usage: install <range #> <world|obj|mob|zone|all>\n\r"
+                 "  ie.. install 291 m = installs mob range 29100-29199.\n\r");
+    send_to_char(err, ch);
+    return eFAILURE;
+  }
+
+  if (!(range = atoi(arg1))) {
+    sprintf(err, "Usage: install <range #> <world|obj|mob|zone|all>\n\r"
+                 "  ie.. install 291 m = installs mob range 29100-29199.\n\r");
+    send_to_char(err, ch);
+    return eFAILURE;
+  }
+
+  if (range <= 0 || range > 319) {
+    send_to_char("Range number must be between 1 and 319\r\n", ch);
+    return eFAILURE;
+  }
+
+  switch (*type) {
+    case 'W':
+    case 'w':
+    case 'O':
+    case 'o':
+    case 'M':
+    case 'm':
+    case 'z':
+    case 'Z':
+    case 'a':
+    case 'A':
+      type_ok = 1;
+      break;
+    default:
+      type_ok = 0;
+      break;
+  }
+
+  if (type_ok != 1) {
+    sprintf(err, "Usage: install <range #> <world|obj|mob|zone|all>\n\r"
+                 "  ie.. install 291 m = installs mob range 29100-29199.\n\r");
+    send_to_char(err, ch);
+    return eFAILURE;
+  }
+  
+  sprintf(buf, "./new_zone %d %c true", range, *type);
+  ret = system(buf);
+  // ret = bits, but I didn't use bits because I'm lazy and it only returns 2 values I gives a flyging fuck about!
+  // if you change the script, you gotta change this too. - Rahz
+
+  if (ret == 0) {
+    sprintf(err, "Range %d Installed!  These changes will not take effect until the next reboot!\r\n", range);
+  } else if (ret == 256) {
+    sprintf(err, "That range would overlap another range!\r\n");
+  } else {
+    sprintf(err, "Error Code: %d\r\n"
+                 "Usage: install <range #> <world|obj|mob|zone|all>\n\r"
+                 "  ie.. install 291 m = installs mob range 29100-29199.\n\r", ret);
+  }
+  send_to_char(err, ch);
+  return eSUCCESS;
+}
 
 int do_range(struct char_data *ch, char *arg, int cmd)
 {
@@ -522,7 +596,7 @@ int do_range(struct char_data *ch, char *arg, int cmd)
     ;
 
   if(!curr) {
-    send_to_char("Number too high.  Use 'show wfiles/mfiles/ofiles' to see valid zones.\r\n", ch);
+    send_to_char("Number too high.  Use 'show rfiles/mfiles/ofiles' to see valid zones.\r\n", ch);
     return eFAILURE;
   }
 

@@ -323,9 +323,9 @@ int hooktippedsteelhalberd(CHAR_DATA *ch, struct obj_data *obj, int cmd,
    if (number(1,101) > 5) return eFAILURE;
    int which = number(0, MAX_WEAR);
    if (!victim->equipment[which])
-     return eFAILURE;
+     return eFAILURE; // Lucky
    int i = damage_eq_once(victim->equipment[which]);
-   if (i > eq_max_damage(victim->equipment[which]))
+   if (i >= eq_max_damage(victim->equipment[which]))
      eq_destroyed(victim, victim->equipment[which], which);
    else {
       act("$n's hook-tipped steel halberd tears your $p!", ch, victim->equipment[which], victim, TO_VICT, 0 );
@@ -508,8 +508,8 @@ struct assembler_data {
 
 struct assembler_data gem_data[] = {
    // Item 0, the crystalline tir stuff
-   { "A brilliant flash of colored light erupts from your hands as the gems\r\nmold themselves together, forming a cohesive and flawless gem.\r\n",
-     "A brilliant flash of colored light erupts from $n's hands as the\r\n gems $e holds mold themselves together, forming a new cohesive\r\nand flawless gem.",
+   { "A brilliant flash of colored light erupts from your hands as the gems mold themselves together, forming a cohesive and flawless gem.\r\n",
+     "A brilliant flash of colored light erupts from $n's hands as the gems $e holds mold themselves together, forming a new cohesive nand flawless gem.",
      "One of the gems seems to be missing.\r\n",
      { 2714, 2602, 12607, -1, -1, -1, -1, -1, -1, -1, 1506 }
    },
@@ -529,10 +529,17 @@ struct assembler_data gem_data[] = {
    },
 
    // Item 2, Gaiot key in DK
-   { "The stone pieces join together to form a small statue of a dragon.",
-     "$n assembles some stones together to form a black statue.",
-     "The pieces click together but fall apart as if something is missing.",
+   { "The stone pieces join together to form a small statue of a dragon.\r\n",
+     "$n assembles some stones together to form a black statue.\r\n",
+     "The pieces click together but fall apart as if something is missing.\r\n",
      { 9502, 9503, 9504, 9505, 9506, -1, -1, -1, -1, -1, 9501 }
+   },
+
+   // Item 3, ventriloquate dummy - rahz
+   { "You are able to put the parts together, and create a ventriloquist's dummy.\r\n",
+     "$n manages to the parts together, creating a ventriloquist's dummy.\r\n",
+     "The pieces don't seem to fit together quite right.\r\n",
+     { 17349, 17350, 17351, 17352, 17353, 17354, -1, -1, -1, -1, 17348 }
    },
 
    // Junk Item.  THIS MUST BE LAST IN THE ARRAY
@@ -756,7 +763,28 @@ int pfe_word(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
       act("$n mutters something into $s hands.", ch, 0, 0, TO_ROOM, 0);
       send_to_char("You quietly whisper 'aslexi' into your hands.\r\n", ch);
 
-      cast_protection_from_evil(GET_LEVEL(ch), ch, 0, SPELL_TYPE_SPELL, ch, 0, 50);
+     // cast_protection_from_evil(GET_LEVEL(ch), ch, 0, SPELL_TYPE_SPELL, ch, 0, 50);
+     // changed to spell_type_potion so that the align check doesn't happen for this item
+//      cast_protection_from_evil(GET_LEVEL(ch), ch, 0, SPELL_TYPE_POTION, ch, 0, 
+//50);
+  if (IS_AFFECTED(ch,AFF_PROTECT_EVIL) || affected_by_spell(ch, SPELL_PROTECT_FROM_GOOD))
+   {
+	send_to_char("You already have alignment protection.\r\n",ch);
+         return eFAILURE;
+   }
+
+  struct affected_type af;
+  if (!affected_by_spell(ch, SPELL_PROTECT_FROM_EVIL) )
+  {
+         af.type      = SPELL_PROTECT_FROM_EVIL;
+         af.duration  = 5;
+         af.modifier  = GET_LEVEL(ch);
+         af.location  = APPLY_NONE;
+         af.bitvector = AFF_PROTECT_EVIL;
+         affect_to_char(ch, &af);
+         send_to_char("You have a righteous, protected feeling!\n\r", ch);
+  }
+
       act("A pulsing aura springs to life around $n!", ch, 0, 0, TO_ROOM, 0);
       return eSUCCESS;
    }
@@ -2257,7 +2285,8 @@ int glove_combat_procs(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
 int hot_potato(struct char_data*ch, struct obj_data *obj, int cmd, char*arg, 
                    CHAR_DATA *invoker)
 {
-   
+   extern int top_of_world;
+   extern int arena[4];
    int dropped = 0;
    char_data * vict = NULL;
 
@@ -2278,6 +2307,11 @@ int hot_potato(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
       if(obj->obj_flags.value[3] > 0) {
          send_to_char("It's already been started!\n\r", vict);
          return eSUCCESS;
+      }
+      if((vict->in_room >= 0 && vict->in_room <= top_of_world) &&
+        IS_SET(world[vict->in_room].room_flags, ARENA) && arena[2] == -3 && ArenaIsOpen()) {
+          send_to_char("Wait until the potato arena is open before you try blowing yourself up!\n\r", vict);
+          return eSUCCESS;
       }
       send_to_char("The potato starts getting really really hot and burns your hands!!\n\r", vict);
       obj->obj_flags.value[3] = number(1, 100);
@@ -2324,10 +2358,16 @@ int hot_potato(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
          send_to_char("You can only give things to other players when you have a hot potato!\n\r", vict);
          return eSUCCESS;
       }
+      if((vict->in_room >= 0 && vict->in_room <= top_of_world) &&
+        IS_SET(world[vict->in_room].room_flags, ARENA) && arena[2] == -3 && ArenaIsOpen() && GET_LEVEL(vict) < IMMORTAL) {
+          send_to_char("Wait until the potato arena is open before you start passing out the potatos!\n\r", vict);
+          return eSUCCESS;
+      }
+
       // if it's a player, go ahead
       if (number(1, 100) > 90 && GET_LEVEL(vict) < 100) 
         dropped = 1;
-      else
+      else 
         return eFAILURE;
    }
 
@@ -2343,13 +2383,14 @@ int hot_potato(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
    }
    else {
       if (dropped == 1) {
-        send_to_char("OOPS!!! The hot potato burned you and you dropped it!!!", vict);
+        send_to_char("OOPS!!! The hot potato burned you and you dropped it!!!\r\n", vict);
         act("$n screams in agony as they are burned by the potato and DROPS it!", vict, 0, 0, TO_ROOM, 0);
       }
 
-      for(descriptor_data * i = descriptor_list; i; i = i->next)
-         if(i->character && i->character->in_room != vict->in_room && !i->connected)
-            send_to_char("You hear a large BOOM from somewhere in the distance.\n\r", i->character);
+      if (!IS_NPC(vict))
+        for(descriptor_data * i = descriptor_list; i; i = i->next)
+           if(i->character && i->character->in_room != vict->in_room && !i->connected)
+              send_to_char("You hear a large BOOM from somewhere in the distance.\n\r", i->character);
 
        act("The hot potato $n is carrying beeps one final time.\n\r"
            "\n\r$B"
@@ -2382,14 +2423,20 @@ int hot_potato(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
            , vict );
        send_to_char("The baked potato you are carrying EXPLODES!!!\n\r"
                     "You have been KILLED!\n\r", vict);
-       if(!IS_SET(world[vict->in_room].room_flags, ARENA))
-         fight_kill(vict, vict, TYPE_PKILL, KILL_POTATO);
-       else 
-         fight_kill(vict, vict, TYPE_ARENA_KILL, KILL_POTATO);
        extract_obj(obj);      
+       if(!IS_SET(world[vict->in_room].room_flags, ARENA))
+           fight_kill(vict, vict, TYPE_PKILL, KILL_POTATO);
+       else 
+         if (arena[2] == -3) 
+           fight_kill(vict, vict, TYPE_ARENA_KILL, KILL_MASHED);
+         else 
+           fight_kill(vict, vict, TYPE_ARENA_KILL, KILL_POTATO);
        return eSUCCESS|eCH_DIED;
    }
 
+   if (dropped == 1)
+     return eSUCCESS;
+   else
    return eFAILURE;
 }
 

@@ -41,8 +41,11 @@ int do_wizhelp(struct char_data *ch, char *argument, int cmd_arg)
 
   send_to_char("Here are your godly powers:\n\r\n\r", ch);
 
+  int v;
+  for (v = GET_LEVEL(ch); v > 100; v--)
   for(cmd = 0; cmd_info[cmd].command_name[0] != '\0'; cmd++) {
-     if(cmd_info[cmd].minimum_level == GIFTED_COMMAND)
+     if(cmd_info[cmd].minimum_level == GIFTED_COMMAND &&
+	v == GET_LEVEL(ch))
      {
        for(i = 0; *bestowable_god_commands[i].name != '\n'; i++)
          if(!strcmp(bestowable_god_commands[i].name, cmd_info[cmd].command_name))
@@ -61,10 +64,7 @@ int do_wizhelp(struct char_data *ch, char *argument, int cmd_arg)
        no2++;
        continue;
      }
-     if(cmd_info[cmd].minimum_level < IMMORTAL)
-       continue;
-     if(cmd_info[cmd].minimum_level > GET_LEVEL(ch))
-       continue;
+     if (cmd_info[cmd].minimum_level != v || cmd_info[cmd].minimum_level == GIFTED_COMMAND) continue;
 
      sprintf(buf + strlen(buf), "[%2d]%-11s",
              cmd_info[cmd].minimum_level,
@@ -97,10 +97,6 @@ int do_goto(struct char_data *ch, char *argument, int cmd)
     if (IS_NPC(ch))
         return eFAILURE;
 
-    if(!has_skill(ch, COMMAND_GOTO)) {
-        send_to_char("Huh?\r\n", ch);
-        return eFAILURE;
-    }
     
     one_argument(argument, buf);
     if (!*buf)
@@ -335,7 +331,7 @@ int do_at(struct char_data *ch, char *argument, int cmd)
     int loc_nr, location, original_loc;
     struct char_data *target_mob;
     struct obj_data *target_obj;
-    extern int top_of_world;
+    //extern int top_of_world;
     
     if (IS_NPC(ch))
         return eFAILURE;

@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.238 2004/07/25 10:20:34 rahz Exp $ */
+/* $Id: fight.cpp,v 1.239 2004/11/16 00:51:34 Zaphod Exp $ */
 
 extern "C"
 {
@@ -70,6 +70,7 @@ extern struct zone_data *zone_table;
 struct clan_data * get_clan(struct char_data *);
 
 /* functions that nobody else should be calling */
+void save_corpses(void); 
 int is_stunned(CHAR_DATA *ch);
 int do_lightning_shield(CHAR_DATA *ch, CHAR_DATA *vict, int dam);
 bool do_frostshield(CHAR_DATA *ch, CHAR_DATA *vict);
@@ -110,6 +111,7 @@ CHAR_DATA *combat_list = NULL, *combat_next_dude = NULL;
 
 void perform_violence(void)
 {
+  //char debug[256];
   CHAR_DATA *ch;
   int is_mob = 0;
   int retval;
@@ -129,8 +131,9 @@ void perform_violence(void)
     }
     bool over = FALSE;
     // some spells remove a tick of duration each round of combat yer in
-    for (af = ch->affected; af; af = next_af_dude) 
+    for (af = ch->affected; af;af = next_af_dude) 
     {
+	if (af == (affected_type*)0x95959595) {over =TRUE; break;}
         next_af_dude = af->next;
 	if (af->type == SPELL_POISON)
         {
@@ -157,7 +160,8 @@ void perform_violence(void)
             send_to_char(spell_wear_off_msg[af->type], ch);
             send_to_char("\n\r", ch);
 	    bool isaff2(int spellnum);
-            affect_remove(ch, af, 0,isaff2(af->type));
+        while (next_af_dude&&af->type == next_af_dude->type) next_af_dude = next_af_dude->next;
+             affect_remove(ch, af, 0,isaff2(af->type));
           }  
         }
     }
@@ -187,9 +191,11 @@ void perform_violence(void)
         else if(!IS_AFFECTED(ch, AFF_CHARM)) 
         {
           if(MOB_WAIT_STATE(ch) > 0) {
-            MOB_WAIT_STATE(ch) -= 1;
+           // sprintf(debug, "DEBUG: Mob: %s (Lag: %d)", GET_SHORT(ch), MOB_WAIT_STATE(ch));
+//            MOB_WAIT_STATE(ch) -= PULSE_VIOLENCE; // MIKE
+           // log(debug, OVERSEER, LOG_BUG);
 	  } else {
-
+            ;
 /*          retval = 0;
           switch(GET_CLASS(ch)) {
            case CLASS_WARRIOR:       retval = fighter(ch, NULL, 0, "", ch);           break;
@@ -256,10 +262,10 @@ void perform_violence(void)
       update_stuns(ch);
     else
       stop_fighting(ch);
-        
+
     // This takes care of flee and stuff
     if(ch && ch->fighting)
-      if(ch->in_room != (ch->fighting)->in_room)
+      if(ch->fighting != (CHAR_DATA*)0x95959595 && ch->in_room != (ch->fighting)->in_room)
         stop_fighting(ch);
   } // for
 }
@@ -575,6 +581,8 @@ bool do_frostshield(CHAR_DATA *ch, CHAR_DATA *vict)
 int do_lightning_shield(CHAR_DATA *ch, CHAR_DATA *vict, int dam) 
 {
   extern struct race_shit race_info[];
+  struct affected_type * cur_af;
+  int learned = 0;
   
   if(!ch || !vict) {
     log("Null ch or vict sent to do_lightning_shield", IMP, LOG_BUG);
@@ -584,10 +592,26 @@ int do_lightning_shield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
   if(GET_POS(vict) == POSITION_DEAD)            return eFAILURE;
   if(GET_LEVEL(ch) >= IMMORTAL)                 return eFAILURE;
   if(!IS_AFFECTED(vict, AFF_LIGHTNINGSHIELD))   return eFAILURE;
-  dam = 15;
   if (IS_SET(race_info[(int)GET_RACE(ch)].immune, ISR_ENERGY)) {
     dam = 0;
   } else {
+    dam = 15;
+   if ((cur_af = affected_by_spell(ch, SPELL_LIGHTNING_SHIELD)))
+     learned = (int)cur_af->modifier;
+
+    if (learned == 0) // mob
+      learned = 81;
+
+    dam = learned / 4;
+
+    if (dam < 10)
+      dam = 10;
+    else if (dam > 25)
+      dam = 25;
+
+    if (learned > 80)
+      dam = 25;
+
     if (IS_AFFECTED(ch, AFF_EAS))
       dam /= 4;
     if (IS_AFFECTED(ch, AFF_SANCTUARY))
@@ -651,7 +675,10 @@ int do_fireshield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
   // ch is the person who just hit the victim
   // so ch takes the damage from this spell 
   extern struct race_shit race_info[];
-  
+  struct affected_type * cur_af;
+  int learned = 0;
+
+
   if (!ch || !vict || ch == vict) {
     log("Null ch or vict, or ch==vict sent to do_fireshield!", IMP, LOG_BUG);
     abort();
@@ -665,12 +692,28 @@ int do_fireshield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
       IS_SET(ch->immune, ISR_FIRE))
     dam = 0;
   else {
+    dam = 50;
+
+   if ((cur_af = affected_by_spell(ch, SPELL_FIRESHIELD)))
+     learned = (int)cur_af->modifier;
+
+    if (learned == 0) // mob
+      learned = 81;
+
+    dam = learned / 2;
+
+    if (dam < 20)
+      dam = 20;
+    else if (dam > 50) 
+      dam = 50;
+        
+    if (learned > 80)
+      dam = 50;
+
     if (IS_AFFECTED(ch, AFF_EAS))
       dam /= 4;
     if (IS_AFFECTED(ch, AFF_SANCTUARY))
       dam /= 2;
-      
-    dam = 50;
   }
     
   GET_HIT(ch) -= dam;
@@ -692,7 +735,9 @@ int do_acidshield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
   // ch is the person who just hit the victim
   // so ch takes the damage from this spell 
   extern struct race_shit race_info[];
-  
+  struct affected_type * cur_af;
+  int learned = 0;  
+
   if (!ch || !vict || ch == vict) {
     log("Null ch or vict, or ch==vict sent to do_acidshield!", IMP, LOG_BUG);
     abort();
@@ -701,16 +746,31 @@ int do_acidshield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
   if(GET_POS(vict) == POSITION_DEAD)            return eFAILURE;
   if(!IS_NPC(ch) && GET_LEVEL(ch) >= IMMORTAL)  return eFAILURE;
   if(!affected_by_spell(vict, SPELL_ACID_SHIELD)) return eFAILURE;
-  dam = 20;
+
   if (IS_SET(race_info[(int)GET_RACE(ch)].immune, ISR_ACID))
     dam = 0;
   else {
+    dam = 20;
+   if ((cur_af = affected_by_spell(ch, SPELL_ACID_SHIELD)))
+     learned = (int)cur_af->modifier;
+
+    if (learned == 0) // mob
+      learned = 81;
+
+    dam = learned / 3;
+
+    if (dam < 10)
+      dam = 10;
+    else if (dam > 40)
+      dam = 40;
+
+    if (learned > 80)
+      dam = 40;
+
     if (IS_AFFECTED(ch, AFF_EAS))
       dam /= 4;
     if (IS_AFFECTED(ch, AFF_SANCTUARY))
       dam /= 2;
-      
-    dam /= 4;
   }
     
   GET_HIT(ch) -= dam;
@@ -763,12 +823,12 @@ void check_weapon_skill_bonus(char_data * ch, int type, obj_data *wielded,
       specialization = learned / 100;
       learned = learned % 100;
 
-      weapon_skill_hit_bonus = learned / 6;
+      weapon_skill_hit_bonus = learned / 5;
       weapon_skill_dam_bonus = number(1, learned / 10);
 
       if(specialization)
       {
-         weapon_skill_hit_bonus += 5;
+         weapon_skill_hit_bonus += 4;
          weapon_skill_dam_bonus += number(1, 5);
       }
    }
@@ -785,7 +845,7 @@ void check_weapon_skill_bonus(char_data * ch, int type, obj_data *wielded,
       specialization = learned / 100;
       learned = learned % 100;
 
-      weapon_skill_hit_bonus += learned / 8;
+      weapon_skill_hit_bonus += learned / 6;
       weapon_skill_dam_bonus += number(1, learned / 10);
 
       if(specialization)
@@ -824,28 +884,18 @@ int get_weapon_damage_type(struct obj_data * wielded) {
 int get_monk_bare_damage(char_data * ch) {
     int dam = 0;
 
-    if(GET_LEVEL(ch) < 5)
-      dam = dice(1, 3);
-    else if(GET_LEVEL(ch) < 10)
-      dam = dice(1, 4);
-    else if(GET_LEVEL(ch) < 15)
-      dam = dice(2, 3);
-    else if(GET_LEVEL(ch) < 20)
-      dam = dice(2, 4);
-    else if(GET_LEVEL(ch) < 25)
-      dam = dice(3, 3);
-    else if(GET_LEVEL(ch) < 30)
-      dam = dice(3, 4);
-    else if(GET_LEVEL(ch) < 35)
+    if(GET_LEVEL(ch) < 11)
+      dam = dice(4, 1);
+    else if(GET_LEVEL(ch) < 21)
+      dam = dice(4, 2);
+    else if(GET_LEVEL(ch) < 31)
       dam = dice(4, 3);
-    else if(GET_LEVEL(ch) < 40)
+    else if(GET_LEVEL(ch) < 41)
       dam = dice(4, 4);
-    else if(GET_LEVEL(ch) < 45)
-      dam = dice(5, 3);
     else if(GET_LEVEL(ch) < 50)
+      dam = dice(4, 5);
+    else if(GET_LEVEL(ch) < 51)
       dam = dice(5, 4);
-    else if(GET_LEVEL(ch) < 55)
-      dam = dice(5, 5);
     else if(GET_LEVEL(ch) < IMMORTAL)
       dam = dice(10, 6);
     else if(GET_LEVEL(ch) < IMP)
@@ -955,10 +1005,9 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
 //    return damage(ch, vict, 0, w_type, w_type, weapon);
 //  }
 
-  if(IS_AFFECTED(vict, AFF_PARALYSIS) || !AWAKE(vict))
+  if(IS_AFFECTED(vict, AFF_PARALYSIS) || !AWAKE(vict) || is_stunned(vict))
     chance = 102; // can't miss
-  else
-  {
+  else {
     chance = 25;
     if (IS_NPC(vict)) chance += 25;
     chance += GET_LEVEL(ch) - GET_LEVEL(vict);
@@ -1192,6 +1241,8 @@ void eq_damage(CHAR_DATA * ch, CHAR_DATA * victim,
     // add a point
     eqdam = damage_eq_once(obj);
 
+    if (obj_index[obj->item_number].progtypes & ARMOUR_PROG)
+      oprog_armour_trigger(victim, obj);
     // determine if time to scrap it              
     if(eqdam >= eq_max_damage(obj))
       eq_destroyed(victim, obj, pos);
@@ -1214,6 +1265,10 @@ void eq_damage(CHAR_DATA * ch, CHAR_DATA * victim,
        
     // add a point
     eqdam = damage_eq_once(obj);
+ 
+   if (obj_index[obj->item_number].progtypes & ARMOUR_PROG)
+      oprog_armour_trigger(victim, obj);
+ 
 
     // determine if time to scrap it              
     if(eqdam >= eq_max_damage(obj))
@@ -1294,6 +1349,7 @@ int damage_retval(CHAR_DATA * ch, CHAR_DATA * vict, int value)
 int damage(CHAR_DATA * ch, CHAR_DATA * victim,
            int dam, int weapon_type, int attacktype, int weapon)
 {
+  int can_miss = 1;
   long weapon_bit;
   struct obj_data *wielded;
   int typeofdamage;
@@ -1312,17 +1368,17 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
 
   if(GET_POS(victim) == POSITION_DEAD)           return (eSUCCESS|eVICT_DIED);
   if (ch->in_room != victim->in_room && attacktype != SPELL_SOLAR_GATE) return eSUCCESS;
-
+  int l=0;
   if (dam!=0 && attacktype && attacktype < TYPE_HIT)
   { // Skill damages based on learned %
-    int l = has_skill(ch, attacktype);
+    l = has_skill(ch, attacktype);
     if (IS_NPC(ch)) l = 50;
     if (IS_NPC(ch) && ch->master)
        l *= (ch->master->level / 50);
-    if (l)
-      dam = dam_percent(l, dam);
+ //   if (l || !IS_NPC(ch))
+    dam = dam_percent(l, dam);
     dam = number(dam-(dam/10), dam+(dam/10)); // +- 10%
-    if (IS_NPC(ch)) dam *= 0.6;
+    if (IS_NPC(ch)) dam =  (int)(dam * 0.6);
   }
 
   if(typeofdamage == DAMAGE_TYPE_MAGIC)  
@@ -1380,9 +1436,26 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
       default:
         break;
     }
+  int v = 0;
+  if (GET_CLASS(ch) == CLASS_MAGIC_USER) {
+  //spellcraft
+    v = has_skill(ch, SKILL_SPELLCRAFT);
+     if (v) {
+        if (save && dam!=0 && attacktype && attacktype < TYPE_HIT)
+          save -= GET_INT(ch) / 3;
+     }
+     if (attacktype == SPELL_HELLSTREAM) {
+	if (spellcraft(ch, SPELL_HELLSTREAM))
+	{
+	  double mult = (double)number(1,5);
+	  mult = 1.0 + (double)mult/100;
+	  dam = (int)(dam * mult);
+	}
+     }
+   }
    if (save < 0)
    { double mult = 0 - save; // Turns positive.
-     mult = 1 + (mult/100);
+     mult = 1.0 + (double)mult/100;
      dam = (int)(dam * mult);
         act("$n is susceptable against $N's assault and sustains additional damage.", victim, 0, ch, TO_ROOM, NOTVICT);
         act("$n is susceptable against your assault and sustains additional damage.",victim,0,ch, TO_VICT, 0);
@@ -1390,15 +1463,28 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
    }
    if (number(1,100) < save) {
 	if (save > 50) save = 50;
-	dam -= (dam * (double)(save/100)); // Save chance.
+	dam -= (int)(dam * (double)save/100); // Save chance.
         act("$n resists $N's assault and sustains reduced damage.", victim, 0, ch, TO_ROOM, NOTVICT);
-        act("$n resists your assault and sustains reduced damage.",victim,0,ch, TO_VICT,0);
+        act("$n resists your assault and sustains reduced damage.", victim,0,ch, TO_VICT,0);
         act("You resist $N's assault and sustains reduced damage.", victim, 0, ch, TO_CHAR, 0);
 	if (has_skill(victim, SKILL_MAGIC_RESIST))
 	  skill_increase_check(victim, SKILL_MAGIC_RESIST, has_skill(victim,SKILL_MAGIC_RESIST), SKILL_INCREASE_HARD);
    }
 
-
+  if (v) { // spellcraft damage bonus
+	int o = 0;
+     switch (attacktype)
+     {
+	case SPELL_BURNING_HANDS: o = 10; break;
+	case SPELL_LIGHTNING_BOLT: o = 20; break;
+	case SPELL_CHILL_TOUCH: o = 30; break;
+	case SPELL_FIREBALL: o = 40; break;
+	case SPELL_METEOR_SWARM: o = 50; break;
+	case SPELL_HELLSTREAM: o = 90; break;
+	default: break;
+     }
+     if (v > o && has_skill(ch, attacktype) > o) dam += v;
+  }
   // Can't hurt god, but he likes to see the messages. 
   if (GET_LEVEL(victim) >= IMMORTAL && !IS_NPC(victim))
     dam = 0;
@@ -1487,12 +1573,21 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
     }
     if(IS_SET(ch->combat, COMBAT_VITAL_STRIKE))
       dam = (int)(dam * 2);
+
+    // we do this AFTER all the multipliers but BEFORE all the reducers
+    // to make it cause the smallest impact
+    dam += victim->melee_mitigation;
+
     if (affected_by_spell(victim, SPELL_HOLY_AURA) && affected_by_spell(victim, SPELL_HOLY_AURA)->modifier == 50)
       dam /= 2; // half damage against physical attacks
   } else {
     if (affected_by_spell(victim, SPELL_HOLY_AURA) && affected_by_spell(victim, SPELL_HOLY_AURA)->modifier == 25)
 	dam /= 2;
   }
+  if(typeofdamage == DAMAGE_TYPE_MAGIC)
+    dam += victim->spell_mitigation;
+  else if(typeofdamage == DAMAGE_TYPE_SONG)
+    dam += victim->song_mitigation;
 
   if (IS_AFFECTED(victim, AFF_EAS))
     dam /= 4;
@@ -1504,6 +1599,7 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
   if(IS_SET(victim->combat, COMBAT_MONK_STANCE))  // half damage
       dam /= 2;
 
+  if (can_miss == 1) {
   if (attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING)
   {
     if(check_shieldblock(ch, victim,attacktype))
@@ -1527,7 +1623,7 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
     if (check_dodge(ch, victim,attacktype))
       return eFAILURE;
   }
-
+  }
   struct affected_type * pspell = NULL;
   if(GET_LEVEL(victim) < IMMORTAL && 
      dam > 0 &&
@@ -1632,6 +1728,7 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
   
   if (dam < 0)
     dam = 0;
+
   // Check for parry, mob disarm, and trip. Print a suitable damage message. 
   if (attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING)
   {
@@ -1826,8 +1923,12 @@ void do_dam_msgs(CHAR_DATA *ch, CHAR_DATA *victim, int dam, int attacktype, int 
 void set_cantquit(CHAR_DATA *ch, CHAR_DATA *vict, bool forced )
 {
   struct affected_type af, *paf;
-  
-  if(!ch) return;  /* This will happen if the char was in a fall room */
+  CHAR_DATA *realch;
+  CHAR_DATA *realvict;
+  int ch_vnum = -1;
+  int vict_vnum = -1;
+
+  if(!ch || !vict) return;  /* This will happen if the char was in a fall room */
   
   if(ch == vict)
     return;
@@ -1835,18 +1936,38 @@ void set_cantquit(CHAR_DATA *ch, CHAR_DATA *vict, bool forced )
   /* can't get pkill flag in the arena! */
   if(IS_ARENA(ch->in_room))
     return;
-  
-  if(is_pkill(ch, vict) && !IS_SET(vict->affected_by, AFF_CANTQUIT) || forced) { 
+ 
+  if (IS_NPC(ch)) 
+    ch_vnum = mob_index[ch->mobdata->nr].virt;
+
+  if (IS_NPC(vict)) 
+    vict_vnum = mob_index[vict->mobdata->nr].virt;
+
+
+  if (IS_NPC(ch) && (IS_AFFECTED(ch, AFF_CHARM) || IS_AFFECTED(ch, AFF_FAMILIAR) || ch_vnum == 8) && ch->master)
+    realch = ch->master;
+  else
+    realch = ch;
+
+  if (IS_NPC(vict) && (IS_AFFECTED(vict, AFF_CHARM) || IS_AFFECTED(vict, AFF_FAMILIAR) || vict_vnum == 8) && vict->master)
+    realvict = vict->master;
+  else 
+    realvict = vict;
+
+  if (realvict == realch)  // killing your own pet was giving you a CQ
+    return;
+
+  if(is_pkill(realch, realvict) && !IS_SET(realvict->affected_by, AFF_CANTQUIT) || forced) { 
     af.type = FUCK_CANTQUIT;
     af.duration = 5;
     af.modifier = 0;
     af.location = APPLY_NONE;
     af.bitvector = AFF_CANTQUIT;
     
-    if(!IS_SET(ch->affected_by, AFF_CANTQUIT))
-      affect_to_char(ch, &af);
+    if(!IS_SET(realch->affected_by, AFF_CANTQUIT))
+      affect_to_char(realch, &af);
     else {
-      for(paf = ch->affected; paf; paf = paf->next) {
+      for(paf = realch->affected; paf; paf = paf->next) {
         if(paf->type == FUCK_CANTQUIT)
           paf->duration = 5;
       }
@@ -1874,6 +1995,7 @@ void fight_kill(CHAR_DATA *ch, CHAR_DATA *vict, int type, int spec_type)
      if(ich->fighting == vict)
         stop_fighting(ich);
   }
+  if (vict->master || vict->followers) stop_grouped_bards(vict);
   
   switch(type)
   {
@@ -1899,9 +2021,9 @@ void fight_kill(CHAR_DATA *ch, CHAR_DATA *vict, int type, int spec_type)
 // not.
 int check_riposte(CHAR_DATA * ch, CHAR_DATA * victim)
 {
-  int percent;
-  int learned;
-  int chance;
+  //int percent;
+ // int learned;
+ // int chance;
   int retval;
   
   if((IS_SET(victim->combat, COMBAT_STUNNED)) ||
@@ -1948,6 +2070,7 @@ bool check_shieldblock(CHAR_DATA * ch, CHAR_DATA * victim, int attacktype)
     (IS_SET(victim->combat, COMBAT_STUNNED2)) ||
     (IS_SET(victim->combat, COMBAT_BASH1)) ||
     (IS_SET(victim->combat, COMBAT_BASH2)) ||
+    (IS_SET(victim->combat, COMBAT_SHOCKED)) ||
     (IS_AFFECTED(victim, AFF_PARALYSIS)))
     return FALSE;
   
@@ -1971,10 +2094,10 @@ bool check_shieldblock(CHAR_DATA * ch, CHAR_DATA * victim, int attacktype)
   modifier += speciality_bonus(ch,attacktype);
 
   extern int stat_mod[];
-  modifier += stat_mod[GET_DEX(ch)];
+  modifier -= stat_mod[GET_DEX(ch)];
 
-  if (IS_NPC(victim)) modifier -= 50;
-  modifier -= GET_DEX(victim)/2;
+//  if (IS_NPC(victim)) modifier -= 50;
+  modifier += GET_DEX(victim)/2;
   if (!skill_success(victim, ch, SKILL_SHIELDBLOCK,modifier))
     return FALSE;
  
@@ -1998,6 +2121,7 @@ bool check_parry(CHAR_DATA * ch, CHAR_DATA * victim, int attacktype)
     (IS_SET(victim->combat, COMBAT_STUNNED2)) ||
     (IS_SET(victim->combat, COMBAT_BASH1)) ||
     (IS_SET(victim->combat, COMBAT_BASH2)) ||
+    (IS_SET(victim->combat, COMBAT_SHOCKED)) ||
     (IS_AFFECTED(victim, AFF_PARALYSIS)))
     return FALSE;
   
@@ -2023,10 +2147,10 @@ bool check_parry(CHAR_DATA * ch, CHAR_DATA * victim, int attacktype)
     modifier = 10;
 
   modifier += speciality_bonus(ch,attacktype);
-  if (IS_NPC(victim)) modifier -= 50;
-  if (attacktype==TYPE_HIT) modifier -= 30; // Harder to parry unarmed attacks
-  else modifier -= 22;
-  modifier -= GET_DEX(victim)  / 2;
+//  if (IS_NPC(victim)) modifier -= 50;
+  if (attacktype==TYPE_HIT) modifier += 30; // Harder to parry unarmed attacks
+  else modifier += 22;
+  modifier += GET_DEX(victim)  / 2;
   if(!skill_success(victim,ch, SKILL_PARRY, modifier)&&
      !IS_SET(victim->combat, COMBAT_BLADESHIELD1)&&
      !IS_SET(victim->combat, COMBAT_BLADESHIELD2))
@@ -2084,6 +2208,7 @@ bool check_dodge(CHAR_DATA * ch, CHAR_DATA * victim, int attacktype)
     (IS_SET(victim->combat, COMBAT_STUNNED2)) ||
     (IS_SET(victim->combat, COMBAT_BASH1)) ||
     (IS_SET(victim->combat, COMBAT_BASH2)) ||
+    (IS_SET(victim->combat, COMBAT_SHOCKED)) ||
     (IS_AFFECTED(victim, AFF_PARALYSIS)))
     return FALSE;
 
@@ -2112,9 +2237,10 @@ bool check_dodge(CHAR_DATA * ch, CHAR_DATA * victim, int attacktype)
     return FALSE;
 
   modifier += speciality_bonus(ch, attacktype);
-  if (IS_NPC(victim)) modifier -= 50; // 75 is base, and it's calculated around here
+//  if (IS_NPC(victim)) modifier = 50; // 75 is base, and it's calculated 
+//around here
 
-  modifier -= GET_DEX(victim) / 2;
+  modifier += GET_DEX(victim) / 2;
   if (!skill_success(victim,ch,SKILL_DODGE, modifier))
     return FALSE;
   
@@ -2261,7 +2387,8 @@ void set_fighting(CHAR_DATA * ch, CHAR_DATA * vict)
   if (!IS_NPC(ch) && IS_NPC(vict))
      if (!IS_SET(vict->mobdata->actflags, ACT_STUPID) && !vict->hunting)
      {
-       if (GET_LEVEL(ch) - GET_LEVEL(vict)/2 > 0)
+       if (GET_LEVEL(ch) - (GET_LEVEL(vict)/2) > 0
+	|| GET_LEVEL(ch) == 50)
           {
                 add_memory(vict, GET_NAME(ch), 't');
                 struct timer_data *timer;
@@ -2280,7 +2407,8 @@ void set_fighting(CHAR_DATA * ch, CHAR_DATA * vict)
   if (!IS_NPC(vict) && IS_NPC(ch))
      if (!IS_SET(ch->mobdata->actflags, ACT_STUPID) && !ch->hunting)
      {
-       if (GET_LEVEL(vict) - GET_LEVEL(ch)/2 > 0)
+       if (GET_LEVEL(vict) - (GET_LEVEL(ch)/2) > 0 || 
+		GET_LEVEL(vict) == 50)
           {
                 add_memory(ch, GET_NAME(vict), 't');
                 struct timer_data *timer;
@@ -2311,7 +2439,7 @@ timer_data));
   if( ( !IS_NPC(ch) || IS_AFFECTED(ch, AFF_CHARM) ) 
       && count >= 6 ) 
   {
-    send_to_char("You can't get close enough to fight.",ch);
+    send_to_char("You can't get close enough to fight.\r\n",ch);
     return;
   }
     
@@ -2523,13 +2651,18 @@ void make_corpse(CHAR_DATA * ch)
   corpse->obj_flags.weight = GET_WEIGHT(ch) + IS_CARRYING_W(ch);
   corpse->obj_flags.eq_level = 0;
   
+
+  SET_BIT(GET_OBJ_EXTRA(corpse), ITEM_UNIQUE_SAVE);
   if(IS_NPC(ch)) {
-    corpse->obj_flags.timer        = MAX_NPC_CORPSE_TIME;
+    corpse->obj_flags.timer  = MAX_NPC_CORPSE_TIME;
     corpse->obj_flags.more_flags = 0;
-  }
-  else {
+    SET_BIT(corpse->obj_flags.more_flags, ITEM_NPC_CORPSE);
+    GET_OBJ_VROOM(corpse) = NOWHERE;
+  } else {
     corpse->obj_flags.more_flags = 0;
     corpse->obj_flags.timer = MAX_PC_CORPSE_TIME;
+    SET_BIT(GET_OBJ_EXTRA(corpse), ITEM_PC_CORPSE);
+    GET_OBJ_VROOM(corpse) = GET_ROOM_VNUM(ch->in_room);
   }
 
   // level 1-9 PC's can keep their eq
@@ -2574,7 +2707,8 @@ void make_corpse(CHAR_DATA * ch)
   
   object_list_new_new_owner(corpse, 0);
   obj_to_room(corpse, ch->in_room);
-  
+ 
+  save_corpses(); 
   return;
 }
 
@@ -2629,7 +2763,7 @@ void zap_eq_check(char_data * ch)
 {
   for(int i = 0; i < MAX_WEAR; i++)
     if(ch->equipment[i])
-      equip_char(ch, unequip_char(ch, i), i);
+      equip_char(ch, unequip_char(ch, i,1), i,1);
 }
 
 // ch kills victim
@@ -2928,31 +3062,50 @@ void death_cry(CHAR_DATA * ch)
 int do_skewer(CHAR_DATA *ch, CHAR_DATA *vict, int dam, int weapon)
 {
   int damadd = 0;
-  
+
   if((GET_CLASS(ch) != CLASS_WARRIOR) && GET_LEVEL(ch) < ARCHANGEL)  return 0;  
   if(!IS_NPC(vict) && GET_LEVEL(vict) >= IMMORTAL)                   return 0;	
   if(!ch->equipment[weapon])                                         return 0;
   if (!has_skill(ch, SKILL_SKEWER)) return 0;
   // TODO - need to make this take specialization into consideration
+  if (ch->in_room != vict->in_room) return 0;
   if(!skill_success(ch,vict, SKILL_SKEWER))                          return 0;
 
   int type = get_weapon_damage_type(ch->equipment[weapon]);
   if( ! (type == TYPE_STING || type == TYPE_PIERCE || type == TYPE_SLASH ))  return 0;
   if (number(0, 100) < 25) {
-    act("$n jams his weapon into $N!", ch, 0, vict, TO_ROOM, NOTVICT);
+    if (check_dodge(ch, vict, type)) {
+      //act("$2$n dodges $N's skewer!!$R", ch, 0, vict, TO_ROOM, NOTVICT);
+      return 0;
+    }
+    if(check_parry(ch, vict,type)) {
+     // act("$2$n parries the $N's skewer!!$R", ch, 0, vict, TO_ROOM, NOTVICT);
+      return 0;
+    }
+    if(check_shieldblock(ch, vict,type)) {
+     // act("$2$n shield blocks $N's skewer!!$R", ch, 0, vict, TO_ROOM, NOTVICT);
+      return 0;
+    }
+
+    act("$n jams his weapon into $N!!", ch, 0, vict, TO_ROOM, NOTVICT);
     act("You jam your weapon in $N's heart!", ch, 0, vict, TO_CHAR, 0);
     act("$n's weapon is speared into you! Ouch!", ch, 0, vict, TO_VICT, 0);
     damadd = dam * 2; // doubles original damage
     if (GET_LEVEL(vict) > GET_LEVEL(ch))
       damadd /= GET_LEVEL(vict) - GET_LEVEL(ch);
+    //retval = damage(ch, vict, dam, weapon_type, w_type, weapon);
     GET_HIT(vict) -= damadd;
     update_pos(vict);
+    inform_victim(ch, vict, damadd); 
+
     if (GET_HIT(vict) <= 0) return eSUCCESS|eVICT_DIED;
     if(number(0, 4999) == 1) { /* tiny chance of instakill */
       GET_HIT(vict) = -1;
       send_to_char("You impale your weapon through your opponent's chest!\r\n", ch);
       act("$n's weapon blows through your chest sending your entrails flying for yards behind you.  Everything goes black...", ch, 0, vict, TO_VICT, 0);
       act("$n's weapon rips through $N's chest sending gore and entrails flying for yards!\r\n", ch, 0, vict, NOTVICT, 0);
+      act("$n is DEAD!!", vict, 0, 0, TO_ROOM, INVIS_NULL);
+      send_to_char("You have been SKEWERED!!\n\r\n\r", vict);
       update_pos(vict);
       return eSUCCESS|eVICT_DIED;
     }
@@ -2988,7 +3141,8 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
   zone_table[world[victim->in_room].zone].died_this_tick++;
 
   GET_POS(victim) = POSITION_STANDING;  
-  mprog_death_trigger(victim, ch);
+  int retval = mprog_death_trigger(victim, ch);
+   if (SOMEONE_DIED(retval)) return;
   GET_POS(victim) = POSITION_DEAD;  
   
   if(GET_RACE(victim) == RACE_UNDEAD ||
@@ -3019,7 +3173,7 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
   
   if (victim->followers || victim->master)
   {
-     stop_grouped_bards(ch);
+     stop_grouped_bards(victim);
   }
 
 
@@ -3028,8 +3182,11 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
     void release_message(CHAR_DATA *ch);
     void shatter_message(CHAR_DATA *ch);
 
-    if (number(0,1))
+    if (number(0, 100) < victim->pcdata->golem->level + 10)
     { /* rk */
+      char buf[MAX_STRING_LENGTH];
+      sprintf(buf, "%s's golem lost a level!", GET_NAME(victim));
+      log(buf, ANGEL, LOG_MORTAL);
       shatter_message(victim->pcdata->golem);
       extract_char(victim->pcdata->golem, TRUE);
     } else { /* release */
@@ -3695,6 +3852,8 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim, int type)
     else if(ch->in_room == real_room(SECOND_START_ROOM))
       sprintf(killer_message,"\n\r##%s was just PONGED by %s!\n\r", 
             GET_NAME(victim), GET_NAME(ch));
+    else if( GET_LEVEL(ch) > MORTAL )
+      sprintf(killer_message,"\n\r##%s was just SMITED...er..SMOTED..err PKILLED by %s!\n\r", GET_NAME(victim), GET_NAME(ch));
     else switch(GET_CLASS(ch))
     {
       case CLASS_MAGIC_USER:
@@ -3805,7 +3964,7 @@ void arena_kill(CHAR_DATA *ch, CHAR_DATA *victim, int type)
 
   // Kill mobs outright
   if (IS_NPC(victim)) {
-    mprog_death_trigger(victim, ch);
+    int retval = mprog_death_trigger(victim, ch);
     remove_nosave(victim);
     extract_char(victim, TRUE);
     return;
@@ -3816,7 +3975,6 @@ void arena_kill(CHAR_DATA *ch, CHAR_DATA *victim, int type)
   // end up in the right room
   // why did we do this? -pir
   // remove_nosave(victim);
-  remove_active_potato(victim);
 
   move_player_home(victim);
   bool isaff2(int spellnum);
@@ -3829,7 +3987,7 @@ void arena_kill(CHAR_DATA *ch, CHAR_DATA *victim, int type)
     if(ch && ch->clan && GET_LEVEL(ch) < IMMORTAL)        clan  = get_clan(ch);
     if(victim->clan && GET_LEVEL(victim) < IMMORTAL)      clan2 = get_clan(victim);  
     sprintf(killer_message, "\n\r## %s [%s] just SLAUGHTERED %s [%s] in the arena!\n\r", 
-         GET_NAME(ch), clan ? clan->name : "no clan", 
+         ((IS_NPC(ch) && ch->master) ? GET_NAME(ch->master) : GET_NAME(ch)), clan ? clan->name : "no clan", 
          GET_NAME(victim), clan2 ? clan2->name : "no clan");
     logf(105, LOG_CHAOS, "%s [%s] killed %s [%s]", GET_NAME(ch),
          clan ? clan->name : "no clan", GET_NAME(victim), 
@@ -3838,11 +3996,15 @@ void arena_kill(CHAR_DATA *ch, CHAR_DATA *victim, int type)
   else if(ch)
     if (type == KILL_POTATO) 
       sprintf(killer_message, "\n\r## %s just got POTATOED in the arena!\n\r", GET_SHORT(victim));
+    else if (type == KILL_MASHED) 
+      sprintf(killer_message, "\n\r## %s just got MASHED in the potato arena!\n\r", GET_SHORT(victim));
     else 
-      sprintf(killer_message, "\n\r## %s just SLAUGHTERED %s in the arena!\n\r", GET_SHORT(ch), GET_SHORT(victim));
+      sprintf(killer_message, "\n\r## %s just SLAUGHTERED %s in the arena!\n\r", (IS_NPC(ch) && (ch->master) ? GET_SHORT(ch->master) : GET_SHORT(ch)), GET_SHORT(victim));
   else
     if (type == KILL_POTATO) 
       sprintf(killer_message, "\n\r## %s just got POTATOED in the arena!\n\r", GET_SHORT(victim));
+    else if (type == KILL_MASHED) 
+      sprintf(killer_message, "\n\r## %s just got MASHED in the potato arena!\n\r", GET_SHORT(victim));
     else
       sprintf(killer_message, "\n\r## %s just DIED in the arena!\n\r", GET_SHORT(victim));
   
@@ -3871,6 +4033,7 @@ void arena_kill(CHAR_DATA *ch, CHAR_DATA *victim, int type)
 
   ch->combat = 0;  // remove all combat effects
 
+  remove_active_potato(victim);
   save_char_obj(victim);
 }
 
@@ -3953,8 +4116,11 @@ int can_be_attacked(CHAR_DATA *ch, CHAR_DATA *vict)
   { // New charmie stuff. No attacking pcs unless yer master's a ranger/cleric. 
     // Those guys are soo convincing.
     if (!ch->master) return FALSE; // What the hell?
-    if (GET_CLASS(ch->master) != CLASS_RANGER && GET_CLASS(ch->master) != CLASS_CLERIC) return FALSE;
+    if (GET_CLASS(ch->master) != CLASS_ANTI_PAL && GET_CLASS(ch->master) != CLASS_RANGER && GET_CLASS(ch->master) != CLASS_CLERIC) 
+        return FALSE;
+    if (vict == ch->master) return FALSE;
   }
+
   if(IS_SET(world[ch->in_room].room_flags, SAFE))
   {
     /* Allow the NPCs to continue fighting */
@@ -4002,7 +4168,7 @@ int weapon_spells(CHAR_DATA *ch, CHAR_DATA *vict, int weapon)
     return eFAILURE;
   
   int wep_skill = 40;
-
+    
   for(i = 0; i < ch->equipment[weapon]->num_affects; i++)
   {
     /* It's possible the victim has fled or died */
@@ -4140,7 +4306,12 @@ int weapon_spells(CHAR_DATA *ch, CHAR_DATA *vict, int weapon)
     } /* switch statement */
     if(SOMEONE_DIED(retval))
       return retval;      
+   
   } /* for loop */
+
+  if (obj_index[ch->equipment[weapon]->item_number].progtypes & WEAPON_PROG)
+     oprog_weapon_trigger(vict, ch->equipment[weapon]);
+
   return eSUCCESS;    
 }  /* spell effects */
 
@@ -4439,7 +4610,7 @@ void remove_nosave(CHAR_DATA *vict)
 void remove_active_potato(CHAR_DATA *vict)
 {
   struct obj_data *obj, *next_obj;
-  char buf[256];
+  //char buf[256];
 
   if(!vict) {
     log("Null victim sent to remove_active_potato!", OVERSEER, LOG_BUG);
@@ -4449,7 +4620,7 @@ void remove_active_potato(CHAR_DATA *vict)
   for(obj = vict->carrying; obj; obj = next_obj) {
     next_obj = obj->next_content;
     if (obj_index[obj->item_number].virt == 393 && obj->obj_flags.value[3] > 0) {
-      obj_from_char(obj);
+      extract_obj(obj);
     } 
   }
 }

@@ -107,7 +107,7 @@ int do_check(struct char_data *ch, char *arg, int cmd) {
   }
 
   one_argument(arg, buf);
-
+  buf[0] = UPPER(buf[0]);
   if(!(vict = get_pc_vis_exact(ch, buf))) {
     connected = 0;
 
@@ -218,6 +218,10 @@ int do_find(struct char_data *ch, char *arg, int cmd)
 
   if(IS_NPC(ch))
     return eFAILURE;
+  if(!has_skill(ch, COMMAND_FIND)) {
+        send_to_char("Huh?\r\n", ch);
+        return eFAILURE;
+  }
 
   half_chop(arg, type, name);
 
@@ -277,6 +281,10 @@ int do_stat(struct char_data *ch, char *arg, int cmd)
     "object",
     "character"
   };
+  if(!has_skill(ch, COMMAND_STAT)) {
+        send_to_char("Huh?\r\n", ch);
+        return eFAILURE;
+  }
 
   if(IS_NPC(ch))
     return eFAILURE;
@@ -427,8 +435,8 @@ int do_zone_single_edit(struct char_data * ch, char * argument, int zone)
 
   argument = one_argument(argument, cmdnum);  
   half_chop(argument, select, last);
-
-  if(*cmdnum && !check_range_valid_and_convert(cmd, cmdnum, 1, zone_table[zone].reset_total-1)) {
+  int max_res(int zone);
+  if(*cmdnum && !check_range_valid_and_convert(cmd, cmdnum, 1, max_res(zone))) {
     send_to_char("That is not a valid command number.\r\n", ch);
     return eFAILURE;
   }
@@ -604,6 +612,17 @@ int do_zone_single_edit(struct char_data * ch, char * argument, int zone)
                "Valid args (123):  0-32000\r\n"
                "                   (for max-in-world, -1 represents 'always')\r\n", ch);
   return eFAILURE;
+}
+int max_res(int zone)
+{
+ int i;
+  for(i = 0 ;
+      zone_table[zone].cmd[i].command != 'S' && i < (zone_table[zone].reset_total-1) ;
+      i++)
+  ;
+ return i;
+
+
 }
 
 int do_zedit(struct char_data *ch, char *argument, int cmd)
@@ -1372,19 +1391,20 @@ int oedit_exdesc(char_data * ch, int item_num, char * buf)
           send_to_char("There is no desc for that number.\n\r", ch);
           return eFAILURE;
         }
+        send_to_char("        Write your obj's description.  (/s saves /h for help)\r\n",ch);
 
-        send_to_char("Enter your obj's description below."
-                     " Terminate with '~' on a new line.\n\r\n\r", ch);
+//        send_to_char("Enter your obj's description below."
+  //                   " Terminate with '~' on a new line.\n\r\n\r", ch);
 //        curr->description = 0;
 	
         ch->desc->connected = CON_EDITING;
-        ch->desc->str = &(curr->description);
+        ch->desc->strnew = &(curr->description);
         ch->desc->max_str = MAX_MESSAGE_LENGTH;
         
         break;
       }
 
-      default: send_to_char("Illegal value, tell pir.\r\n", ch);
+      default: send_to_char("Illegal value, tell someone.\r\n", ch);
         break;
     } // switch(x)
 
@@ -1412,6 +1432,7 @@ int oedit_affects(char_data * ch, int item_num, char * buf)
       "list",
       "1spell",
       "2amount",
+      "3skill",
       "\n"
     };
 
@@ -1486,7 +1507,13 @@ int oedit_affects(char_data * ch, int item_num, char * buf)
         send_to_char("$3Character Affects$R:\r\n"
                      "------------------\r\n", ch);
         for(x = 0; x < obj->num_affects; x++) {
-          sprinttype(obj->affected[x].location, apply_types, buf2);
+//          sprinttype(obj->affected[x].location, apply_types, buf2);
+
+                if (obj->affected[x].location < 1000)
+                 sprinttype(obj->affected[x].location,apply_types,buf2);
+                else if (get_skill_name(obj->affected[x].location/1000))
+                  strcpy(buf2, get_skill_name(obj->affected[x].location/1000));
+
           sprintf(buf, "%2d$3)$R %s$3($R%d$3)$R by %d.\r\n", x+1, buf2, 
                      obj->affected[x].location, obj->affected[x].modifier);
           send_to_char(buf, ch);
@@ -1539,12 +1566,14 @@ int oedit_affects(char_data * ch, int item_num, char * buf)
           return eFAILURE;
         }
         if(!obj->affected) {
-          sprintf(buf, "Object %d has no affects to modify.\r\n", obj_index[item_num].virt);
+          sprintf(buf, "Object %d has no affects to modify.\r\n",
+ obj_index[item_num].virt);
           send_to_char(buf, ch);
           return eFAILURE;
         }
         if(!check_range_valid_and_convert(num, select, 1, obj->num_affects)) {
-          sprintf(buf, "You must select between 1 and %d.\r\n", obj->num_affects);
+          sprintf(buf, "You must select between 1 and %d.\r\n", 
+obj->num_affects);
           send_to_char(buf, ch);
           return eFAILURE;
         }
@@ -1554,12 +1583,41 @@ int oedit_affects(char_data * ch, int item_num, char * buf)
         }
         num -= 1; // since arrays start at 0
         obj->affected[num].modifier = modifier;
-        sprintf(buf, "Affect %d changed to %s by %d.\r\n", num+1, 
+	if (obj->affected[num].location >=1000)
+	sprintf(buf,"Affect %d changed to %s by %d.\r\n",num+1,
+		get_skill_name(obj->affected[num].location/1000),
+		obj->affected[num].modifier);
+       else sprintf(buf, "Affect %d changed to %s by %d.\r\n", num+1, 
              apply_types[obj->affected[num].location], obj->affected[num].modifier);
         send_to_char(buf, ch);
         break;
       }
-
+      case 5:
+        if(!*select) {
+          send_to_char("$3Syntax$R: oedit [item_num] affects 3spell <number> <skill>\r\n"
+                       "This sets the affect as affecting skills by 2amount\r\n", ch);
+          return eFAILURE;
+        }
+        if(!obj->affected) {
+          sprintf(buf, "Object %d has no affects to modify.\r\n",
+ obj_index[item_num].virt);
+          send_to_char(buf, ch);
+          return eFAILURE;
+        }
+        if(!check_range_valid_and_convert(num, select, 1, 
+obj->num_affects)) {
+          sprintf(buf, "You must select between 1 and %d.\r\n",
+obj->num_affects);
+          send_to_char(buf, ch);
+          return eFAILURE;
+        }
+	modifier = atoi(value);
+	num -= 1;
+        obj->affected[num].location = modifier*1000;
+        sprintf(buf, "Affect %d changed to %s by %d.\r\n", num+1,
+             get_skill_name(obj->affected[num].location/1000), obj->affected[num].modifier);
+        send_to_char(buf, ch);
+        break;
       default: send_to_char("Illegal value, tell pir.\r\n", ch);
         break;
     } // switch(x)
@@ -2062,7 +2120,7 @@ int do_mpedit(struct char_data *ch, char *argument, int cmd)
 {
     char buf[MAX_INPUT_LENGTH];
     char buf2[MAX_INPUT_LENGTH];
-    char buf3[MAX_INPUT_LENGTH];
+    char buf3[MAX_STRING_LENGTH];
     char buf4[MAX_INPUT_LENGTH];
     int  mob_num = -1;
     int  intval = 0;
@@ -2099,7 +2157,7 @@ int do_mpedit(struct char_data *ch, char *argument, int cmd)
     // buf3 = args[0]
     // buf4 = args[1-+]
     if(!*buf) {
-      send_to_char("$3Syntax$R:  mpedit [mob_num] [field] [arg]\r\n"
+      send_to_char("$3Syntax$R:  procedit [mob_num] [field] [arg]\r\n"
                    "  Edit a field with no args for help on that field.\r\n\r\n"
                    "  The field must be one of the following:\n\r", ch);
       display_string_list(fields, ch);
@@ -2163,7 +2221,7 @@ int do_mpedit(struct char_data *ch, char *argument, int cmd)
      /* add */
       case 0 : {
         if(!*buf4) {
-          send_to_char("$3Syntax$R: mpedit [mob_num] add new\n\r"
+          send_to_char("$3Syntax$R: procedit [mob_num] add new\n\r"
                        "This creates a new mob prog and tacks it on the end.\r\n", ch);
           return eFAILURE;
         }
@@ -2193,7 +2251,7 @@ int do_mpedit(struct char_data *ch, char *argument, int cmd)
      /* remove */
       case 1 : {
         if(!*buf4) {
-          send_to_char("$3Syntax$R: mpedit [mob_num] remove <prog>\n\r", ch);
+          send_to_char("$3Syntax$R: procedit [mob_num] remove <prog>\n\r", ch);
           return eFAILURE;
         }
         if(!check_range_valid_and_convert(intval, buf4, 1, 999)) {
@@ -2216,6 +2274,7 @@ int do_mpedit(struct char_data *ch, char *argument, int cmd)
           prog->next = currprog->next;
         else mob_index[mob_num].mobprogs = currprog->next;
 
+        currprog->type = 0;
         dc_free(currprog->arglist);
         dc_free(currprog->comlist);
         dc_free(currprog);
@@ -2229,7 +2288,7 @@ int do_mpedit(struct char_data *ch, char *argument, int cmd)
       case 2 : {
         half_chop(buf4, buf2, buf3);
         if(!*buf2 || !*buf3) {
-          send_to_char("$3Syntax$R: mpedit [mob_num] type <prog> <newtype>\n\r"
+          send_to_char("$3Syntax$R: procedit [mob_num] type <prog> <newtype>\n\r"
                        "$3Valid types$R:\r\n"
                        "  1 -       act_prog\r\n"
                        "  2 -    speech_prog\r\n"
@@ -2297,7 +2356,7 @@ int do_mpedit(struct char_data *ch, char *argument, int cmd)
       case 3 : {
         half_chop(buf4, buf2, buf3);
         if(!*buf2 || !*buf3) {
-          send_to_char("$3Syntax$R: mpedit [mob_num] arglist <prog> <new arglist>\n\r", ch);
+          send_to_char("$3Syntax$R: procedit [mob_num] arglist <prog> <new arglist>\n\r", ch);
           return eFAILURE;
         }
         if(!check_range_valid_and_convert(intval, buf2, 1, 999)) {
@@ -2324,7 +2383,7 @@ int do_mpedit(struct char_data *ch, char *argument, int cmd)
      /* command */
       case 4 : {
         if(!*buf4) {
-          send_to_char("$3Syntax$R: mpedit [mob_num] command <prog>\n\r"
+          send_to_char("$3Syntax$R: procedit [mob_num] command <prog>\n\r"
                        "This will put you into the editor which will replace the current\r\n"
                        "command for program number <prog>.\r\n", ch);
           return eFAILURE;
@@ -2347,12 +2406,24 @@ int do_mpedit(struct char_data *ch, char *argument, int cmd)
 //        dc_free(currprog->comlist);
   //      currprog->comlist = NULL;
 
-        send_to_char("Enter the new command response now."
-                     " Terminate with '~' on a new line.\n\r\n\r", ch);
+        ch->desc->backstr = NULL;
+        send_to_char("        Write your help entry and stay within the line.  (/s saves /h for help)\r\n"
+                     "   |--------------------------------------------------------------------------------|\r\n", ch);
+        //send_to_char("Enter the new command response now."
+        //             " Terminate with '~' on a new line.\n\r\n\r", ch);
+        if (currprog->comlist) {
+          ch->desc->backstr = str_dup(currprog->comlist);
+          double_dollars(buf3, ch->desc->backstr);
+          send_to_char(buf3, ch);
+        }
 
         ch->desc->connected = CON_EDIT_MPROG;
-        ch->desc->str = &(currprog->comlist);
+        ch->desc->strnew = &(currprog->comlist);
         ch->desc->max_str = MAX_MESSAGE_LENGTH;
+
+ //       ch->desc->connected = CON_EDIT_MPROG;
+ //       ch->desc->str = &(currprog->comlist);
+ //       ch->desc->max_str = MAX_MESSAGE_LENGTH;
       } break;
 
      // list
@@ -2574,7 +2645,7 @@ mob_index[mob_num].virt);
 // TODO - this causes a memory leak if you edit the desc twice (first one is hsh'd)
 //        ((char_data *)mob_index[mob_num].item)->description = NULL;
         ch->desc->connected = CON_EDITING;
-        ch->desc->str = &(((char_data *)mob_index[mob_num].item)->description);
+        ch->desc->strnew = &(((char_data *)mob_index[mob_num].item)->description);
         ch->desc->max_str = MAX_MESSAGE_LENGTH;
       } break;
 
@@ -2903,7 +2974,7 @@ mob_index[mob_num].virt);
          if(!*buf4) {
           send_to_char("$3Syntax$R: medit [mob_num] experiencepoints <xpamount>\n\r"
                        "$3Current$R: ", ch);
-          sprintf(buf, "%d\n", ((char_data *)mob_index[mob_num].item)->exp);
+          sprintf(buf, "%d\n", (int)((char_data *)mob_index[mob_num].item)->exp);
           send_to_char(buf, ch);
           send_to_char("$3Valid Range$R: 0 to 5000000\r\n", ch);
           return eFAILURE;
@@ -3244,13 +3315,15 @@ int do_redit(struct char_data *ch, char *argument, int cmd)
           send_to_char("Ok.\n\r", ch);
           return eFAILURE;
         }
-        send_to_char("Enter your room's description below."
-                     " Terminate with '~' on a new line.\n\r\n\r", ch);
+//        send_to_char("Enter your room's description below."
+  //                   " Terminate with '~' on a new line.\n\r\n\r", ch);
+	        send_to_char("        Write your room's description.  (/s saves /h for help)\r\n",ch);
+
 //        FREE(world[ch->in_room].description);
   //      world[ch->in_room].description = 0;
 	
         ch->desc->connected = CON_EDITING;
-        ch->desc->str = &(world[ch->in_room].description);
+        ch->desc->strnew = &(world[ch->in_room].description);
         ch->desc->max_str = MAX_MESSAGE_LENGTH;
       } break;
 
@@ -3315,6 +3388,11 @@ int do_redit(struct char_data *ch, char *argument, int cmd)
             csendf(ch, "Creating room %d.\n\r", d); 
           }
         } 
+        
+        if (c == (-1)) {
+          csendf(ch, "Error creating exit to room %d.\r\n", d);
+          return eFAILURE;
+        }
 
         if(world[ch->in_room].dir_option[x])
           send_to_char("Modifying exit.\n\r", ch);
@@ -3392,12 +3470,14 @@ int do_redit(struct char_data *ch, char *argument, int cmd)
 
         FREE(extra->keyword);
         extra->keyword = str_dup(buf2);
+        send_to_char("        Write your extra description.  (/s saves /h for help)\r\n",ch);
 
-        send_to_char("Enter your extra description below. Terminate with "
-                     "'~' on a new line.\n\r\n\r", ch);
+//        send_to_char("Enter your extra description below. Terminate with 
+//"
+  //                   "'~' on a new line.\n\r\n\r", ch);
 //        FREE(extra->description);
   //      extra->description = 0;
-        ch->desc->str = &extra->description;
+        ch->desc->strnew = &extra->description;
         ch->desc->max_str = MAX_MESSAGE_LENGTH;
         ch->desc->connected = CON_EDITING;
       } break;
@@ -3430,7 +3510,7 @@ int do_redit(struct char_data *ch, char *argument, int cmd)
           dc_free(world[ch->in_room].dir_option[x]->general_description);
           world[ch->in_room].dir_option[x]->general_description = 0;
         }
-   */     ch->desc->str = &world[ch->in_room].dir_option[x]->general_description;
+   */     ch->desc->strnew = &world[ch->in_room].dir_option[x]->general_description;
         ch->desc->max_str = MAX_MESSAGE_LENGTH;
         ch->desc->connected = CON_EDITING;
       } break;
@@ -4300,10 +4380,6 @@ int do_sockets(struct char_data *ch, char *argument, int cmd)
       return eFAILURE;
       }
 
-   if(!has_skill(ch, COMMAND_SOCKETS)) {
-        send_to_char("Huh?\r\n", ch);
-        return eFAILURE;
-   }
 
    buf[0]  = '\0';
    name[0] = '\0';

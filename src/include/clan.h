@@ -2,7 +2,7 @@
 #define CLAN_H_
 
 /************************************************************************
-| $Id: clan.h,v 1.12 2004/07/03 11:44:19 urizen Exp $
+| $Id: clan.h,v 1.13 2004/11/16 00:52:09 Zaphod Exp $
 | clan.h
 | Description:  Header information for clans.
 */
@@ -70,5 +70,10 @@ struct clan_data
   clan_member_data * members;
   struct clan_data * next;
 };
+
+void add_totem(OBJ_DATA *altar, OBJ_DATA *totem);
+void remove_totem(OBJ_DATA *altar, OBJ_DATA *totem);
+void add_totem_stats(CHAR_DATA *ch);
+void remove_totem_stats(CHAR_DATA *ch);
 
 #endif /* CLAN_H_ */

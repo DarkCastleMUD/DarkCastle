@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: obj.h,v 1.16 2004/05/17 18:34:47 urizen Exp $ */
+/* $Id: obj.h,v 1.17 2004/11/16 00:52:09 Zaphod Exp $ */
 #ifndef OBJ_H_
 #define OBJ_H_
 
@@ -63,7 +63,9 @@ int recheck_height_wears(char_data *ch);
 #define ITEM_LOCKPICK   29
 #define ITEM_CLIMBABLE  30
 #define ITEM_MEGAPHONE  31
-#define ITEM_TYPE_MAX   31
+#define ITEM_ALTAR	32
+#define ITEM_TOTEM	33
+#define ITEM_TYPE_MAX   33
 
 /* Bitvector For 'wear_flags' */
 
@@ -118,7 +120,8 @@ int recheck_height_wears(char_data *ch);
 #define ITEM_NOSAVE             1<<26
 #define ITEM_NOSEE		1<<27 
 #define ITEM_NOREPAIR           1<<28
-#define ITEM_NEWBIE            1<<29 // Newbie flagged.
+#define ITEM_NEWBIE             1<<29 // Newbie flagged.
+#define ITEM_PC_CORPSE		1<<30
 
 /* Bitvector for 'more_flags' */
 
@@ -129,6 +132,10 @@ int recheck_height_wears(char_data *ch);
 #define ITEM_NONOTICE           1<<4  // Item doesn't show up on 'look' but
                                       // can still be accessed with 'get' etc FUTURE
 #define ITEM_NOLOCATE           1<<5 
+#define ITEM_UNIQUE_SAVE	1<<6 // for corpse saving, didn't want to affect other unique flag so made a new one
+
+#define ITEM_NPC_CORPSE		1<<7
+
 
 /* Bitvector for 'size' */
 #define SIZE_ANY		1
@@ -210,6 +217,7 @@ struct obj_data
 {
      int32 item_number;            /* Where in data-base               */
      int32 in_room;                /* In what room -1 when conta/carr  */ 
+     int vroom;                   /* for corpse saving */
     struct obj_flag_data obj_flags;/* Object information               */
      int16 num_affects;
     struct obj_affected_type *affected; /* Which abilities in PC to change  */
@@ -227,6 +235,7 @@ struct obj_data
 
     struct obj_data *next_content; /* For 'contains' lists             */
     struct obj_data *next;         /* For the object list              */
+    struct obj_data *next_skill; 
 };
 
 /* For 'equipment' */

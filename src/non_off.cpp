@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: non_off.cpp,v 1.19 2004/07/06 00:20:03 urizen Exp $
+| $Id: non_off.cpp,v 1.20 2004/11/16 00:51:35 Zaphod Exp $
 | non_off.C
 | Description:  Implementation of generic, non-offensive commands.
 */
@@ -265,6 +265,7 @@ char * toggle_txt[] = {
   "lfg",
   "notell",
   "notax",
+  "guide",
   ""
 };
 
@@ -352,6 +353,11 @@ int do_toggle(struct char_data * ch, char * arg, int cmd)
          sprintf(buf + strlen(buf), "%s\n\r",
            IS_SET(ch->pcdata->toggles, PLR_NOTAX) ? "on" : "off");
          break;
+         case 14:
+         sprintf(buf + strlen(buf), "%s\n\r",
+           IS_SET(ch->pcdata->toggles, PLR_GUIDE_TOG) ? "on" : "off");
+         break;
+
 
 	 
          default:
@@ -430,6 +436,10 @@ int do_toggle(struct char_data * ch, char * arg, int cmd)
     do_notax_toggle(ch, "", 9);
     break;
     
+    case 14:
+    do_guide_toggle(ch, "", 9);
+    break;
+
     default:
     send_to_char("A bad thing just happened.  Tell the gods.\n\r", ch);
     break;
@@ -546,6 +556,30 @@ int do_lfg_toggle(struct char_data *ch, char *argument, int cmd)
     }
     return eSUCCESS;
 }
+
+int do_guide_toggle(struct char_data *ch, char *argument, int cmd)
+{
+    if (IS_NPC(ch))
+        return eFAILURE; 
+    
+    if (!IS_SET(ch->pcdata->toggles, PLR_GUIDE)) {
+      send_to_char("You must be assigned as a guide by the gods before you can toggle it.\r\n", ch);
+      return eFAILURE; 
+    }
+
+    if (IS_SET(ch->pcdata->toggles, PLR_GUIDE_TOG))
+    {
+        send_to_char("You have hidden your guide tag.\n\r", ch);
+        REMOVE_BIT(ch->pcdata->toggles, PLR_GUIDE_TOG);
+    }
+    else 
+    {
+        send_to_char("You will now show your guide tag.\n\r", ch);
+        SET_BIT(ch->pcdata->toggles, PLR_GUIDE_TOG);
+    }
+    
+    return eSUCCESS;
+} 
 
 int do_notax_toggle(struct char_data *ch, char *argument, int cmd)
 {

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: offense.cpp,v 1.11 2004/07/23 22:40:20 urizen Exp $
+| $Id: offense.cpp,v 1.12 2004/11/16 00:51:35 Zaphod Exp $
 | offense.C
 | Description:  Commands that are generically offensive - that is, the
 |   victim should retaliate.  The class-specific offensive commands are
@@ -158,8 +158,13 @@ int do_kill(struct char_data *ch, char *argument, int cmd)
   }
   
 
-  if (IS_AFFECTED(ch, AFF_CHARM) && !IS_NPC(ch->master) && GET_CLASS(ch->master) == CLASS_ANTI_PAL && !IS_NPC(victim)) {
-     act("I can't attack $N master!", ch->master, 0, victim, TO_CHAR, 0);
+//  if (IS_AFFECTED(ch, AFF_CHARM) && !IS_NPC(ch->master) && GET_CLASS(ch->master) == CLASS_ANTI_PAL && !IS_NPC(victim)) {
+//     act("I can't attack $N master!", ch->master, 0, victim, TO_CHAR, 0);
+//     return eFAILURE;
+//  }
+
+  if (IS_AFFECTED2(ch, AFF_FAMILIAR) && !IS_NPC(ch->master)) {
+     act("But $N scares me!!", ch->master, 0, victim, TO_CHAR, 0);
      return eFAILURE;
   }
 
@@ -240,10 +245,10 @@ int do_join(struct char_data *ch, char *argument, int cmd)
   }
 
 
-  if (IS_AFFECTED(ch, AFF_CHARM) && !IS_NPC(ch->master) && GET_CLASS(ch->master) == CLASS_ANTI_PAL && !IS_NPC(victim->fighting)) {
-     act("I can't join the attack against $N master!", ch->master, 0, victim->fighting, TO_CHAR, 0);
-     return eFAILURE;
-  }
+ // if (IS_AFFECTED(ch, AFF_CHARM) && !IS_NPC(ch->master) && GET_CLASS(ch->master) == CLASS_ANTI_PAL && !IS_NPC(victim->fighting)) {
+ //    act("I can't join the attack against $N master!", ch->master, 0, victim->fighting, TO_CHAR, 0);
+ //    return eFAILURE;
+ // }
 
   tmp_ch = victim->fighting;
 

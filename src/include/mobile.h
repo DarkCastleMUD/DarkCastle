@@ -1,7 +1,7 @@
 #ifndef MOBILE_H_
 #define MOBILE_H_
 /************************************************************************
-| $Id: mobile.h,v 1.10 2004/07/17 19:04:39 urizen Exp $
+| $Id: mobile.h,v 1.11 2004/11/16 00:52:09 Zaphod Exp $
 | mobile.h
 | Description:  This file contains the header information for mobile
 |   control.
@@ -46,7 +46,9 @@ void    mprog_driver            ( char* com_list, CHAR_DATA* mob,
 #define ACT_NOMAGIC 	    1<<23
 #define ACT_DRAINY          1<<24
 #define ACT_BARDCHARM	    1<<25
-
+#define ACT_NOKI	    1<<26
+#define ACT_NOMATRIX	    1<<27
+#define ACT_BOSS 	    1<<28
 struct race_shit
 {
   char *singular_name;  /* dwarf, elf, etc.     */
@@ -63,5 +65,24 @@ struct race_shit
   int affects;      /* automatically added affects   */
 };
 
+int oprog_act_trigger( char *txt, CHAR_DATA *ch );
+int oprog_speech_trigger( char *txt, CHAR_DATA *ch );
+int oprog_command_trigger( char *txt, CHAR_DATA *ch );
+int oprog_weapon_trigger( CHAR_DATA *ch, OBJ_DATA *item );
+int oprog_armour_trigger( CHAR_DATA *ch, OBJ_DATA *item );
+int oprog_rand_trigger( OBJ_DATA *item);
+int oprog_arand_trigger( OBJ_DATA *item);
+int oprog_greet_trigger( CHAR_DATA *ch);
+int oprog_load_trigger( OBJ_DATA *item);
+
+struct mob_matrix_data
+{
+  long long experience;
+  int hitpoints;
+  int tohit;
+  int todam;
+  int armor;
+  int gold;
+};
 
 #endif

@@ -1,7 +1,7 @@
 #ifndef CONNECT_H_
 #define CONNECT_H_
 /************************************************************************
-| $Id: connect.h,v 1.6 2004/04/16 16:57:21 urizen Exp $
+| $Id: connect.h,v 1.7 2004/11/16 00:52:09 Zaphod Exp $
 | connect.h
 | Description: State of connectedness information.
 */
@@ -106,6 +106,9 @@ struct descriptor_data
     struct stat_shit * stats;            // for rolling up a char 
 
     CAccount  * account;                 // Account attached to this desc
+
+    char	**strnew;			/* for the modify-str system	*/
+    char        *backstr;
 };
 
 #endif

@@ -2,7 +2,7 @@
 #define AFFECT_H_
 
 /************************************************************************
-| $Id: affect.h,v 1.11 2004/06/24 00:10:31 urizen Exp $
+| $Id: affect.h,v 1.12 2004/11/16 00:52:09 Zaphod Exp $
 | affect.h
 | This contains the bitvectors for affected_by
 */
@@ -47,7 +47,7 @@
 #define AFF_FARSIGHT            1<<3
 #define AFF_CAMOUFLAGUE         1<<4
 #define AFF_STABILITY           1<<5
-#define AFF_NOT_USED            1<<6
+#define AFF_NEWSAVE            1<<6 // Newsave
 #define AFF_GOLEM               1<<7 // This is used for IRON golem, not stone. 
 				     // It differs the two.
 #define AFF_FOREST_MELD         1<<8
@@ -62,4 +62,5 @@
 #define AFF_REGENERATION	1<<17 // Innate Regeneration
 #define AFF_FOCUS		1<<18 // Innate focus
 #define AFF_ILLUSION		1<<19 // Innate illusion
+#define AFF_KNOW_ALIGN		1<<20
 #endif

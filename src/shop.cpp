@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: shop.cpp,v 1.11 2004/05/25 01:04:49 urizen Exp $ */
+/* $Id: shop.cpp,v 1.12 2004/11/16 00:51:35 Zaphod Exp $ */
 
 extern "C"
 {
@@ -456,7 +456,9 @@ void shopping_list( char *arg, CHAR_DATA *ch,
            if (done[a] == vnum)
               loop = TRUE;
         if (loop) continue;
+	if (i < 40) 
 	done[i++] = obj_index[obj->item_number].virt;
+	else break;
         a = 0;
 	for (tobj = keeper->carrying; tobj; tobj = tobj->next_content)
           if (obj_index[tobj->item_number].virt == obj_index[obj->item_number].virt)

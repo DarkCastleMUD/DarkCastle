@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: board.cpp,v 1.7 2004/05/31 00:16:49 urizen Exp $
+| $Id: board.cpp,v 1.8 2004/11/16 00:51:34 Zaphod Exp $
 | board.C
 | Description:  This file contains the implementation for the board
 |   code.  It's old and should be rewritten --Morc XXX
@@ -68,6 +68,7 @@ void board_load_board();
 int board_show_board(CHAR_DATA *ch, char *arg, int bnum);
 int fwrite_string(char *buf, FILE *fl);
 void board_unlock_board(CHAR_DATA *ch);
+void new_edit_board_unlock_board(CHAR_DATA *ch, int abort);
 
 extern CHAR_DATA *character_list;
 extern CWorld world;
@@ -81,7 +82,7 @@ int min_read_level[]   = {  0, IMMORTAL, OVERSEER, IMMORTAL, 0, 0, 0, 0, 0, 0, 0
 		     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                      IMMORTAL, 0 , OVERSEER,
 		     0,0,0,0,0,0,0,0,0,0,0 };
-int min_write_level[]  = {  1, IMMORTAL, OVERSEER, IMMORTAL, SERAPH , 1, 1, 1, 1, 1,
+int min_write_level[]  = {  5, IMMORTAL, OVERSEER, IMMORTAL, SERAPH , 1, 1, 1, 1, 1,
                      1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, IMMORTAL,1,1,1,//24
 		     1,1,1,1,1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
                      IMMORTAL, 0, OVERSEER,
@@ -383,6 +384,40 @@ int board(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, CHAR_DATA* in
   }
 }
 
+void new_edit_board_unlock_board(CHAR_DATA *ch, int abort)
+{
+  int x, ind;
+
+  for(x = 0; x < NUM_BOARDS; x++) {
+    if(board_lock[x].locked_for == ch) {
+      if (!abort) {
+        board_lock[x].lock = 0;
+        board_lock[x].locked_for = NULL;
+        csendf(ch, "Your message is number %d.\n\r", boards[x].number);
+      } else {
+        ind = boards[x].number;
+        curr_board = &boards[x];
+        dc_free(curr_board->msg[ind].text);
+        dc_free(curr_board->msg[ind].date);
+        dc_free(curr_board->msg[ind].author);
+        dc_free(curr_board->msg[ind].title);
+        curr_board->msg[ind].text = NULL;
+        curr_board->msg[ind].date = NULL;
+        curr_board->msg[ind].author = NULL;
+        curr_board->msg[ind].title = NULL;
+        for ( ; ind < (curr_board->number) ; ind++ )
+          curr_board->msg[ind] = curr_board->msg[ind+1];
+        curr_board->msg[curr_board->number].text = NULL;
+        curr_board->msg[curr_board->number].date = NULL; 
+        curr_board->msg[curr_board->number].author = NULL;
+        curr_board->msg[curr_board->number].title = NULL;
+        curr_board->number--;
+      }
+      board_save_board(x);
+    }
+  }
+}
+
 void board_unlock_board(CHAR_DATA *ch)
 {
   int x;
@@ -501,7 +536,9 @@ void board_write_msg(CHAR_DATA *ch, char *arg, int bnum) {
   curr_msg->date = (char *)dc_alloc(strlen(buf) + 1, sizeof(char));
 #endif
   strcpy(curr_msg->date, buf);
-  send_to_char("Write your message. Terminate with a '~'.\n\r\n\r", ch);
+  send_to_char("        Write your message and stay within the line.  (/s saves /h for help)\r\n"
+               "   |--------------------------------------------------------------------------------|\r\n", ch);
+ // send_to_char("Write your message. Terminate with a '~'.\n\r\n\r", ch);
   act("$n starts to write a message.", ch, 0, 0, TO_ROOM, INVIS_NULL);
 
   // Take care of free-ing and zeroing if the message text is already
@@ -513,9 +550,12 @@ void board_write_msg(CHAR_DATA *ch, char *arg, int bnum) {
 
   // Initiate the string_add procedures from comm.c
 
-  ch->desc->connected = CON_WRITE_BOARD;
-  ch->desc->str = &curr_msg->text;
-  ch->desc->max_str = MAX_MESSAGE_LENGTH;
+//  ch->desc->connected = CON_WRITE_BOARD;
+//  ch->desc->str = &curr_msg->text;
+//  ch->desc->max_str = MAX_MESSAGE_LENGTH;
+    ch->desc->connected = CON_WRITE_BOARD;
+    ch->desc->strnew = &curr_msg->text;
+    ch->desc->max_str = MAX_MESSAGE_LENGTH;
 
   (boards[bnum].number)++;
   
@@ -586,6 +626,8 @@ min_remove_level[bnum] && strcmp(GET_NAME(ch), curr_board->msg[ind].author)
                  "alone.\n\r",ch);
     return 1;
   }
+
+ /* If you change any of this remove stuff you also need to change new_edit_board_unlock_board - Rahz */
 
   dc_free(curr_board->msg[ind].text);
   dc_free(curr_board->msg[ind].date);

@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.h,v 1.31 2004/07/13 16:50:47 urizen Exp $ */
+/* $Id: interp.h,v 1.32 2004/11/16 00:52:09 Zaphod Exp $ */
 
 #ifndef INTERP_H_
 #define INTERP_H_
@@ -53,10 +53,12 @@ struct command_info
 
 DO_FUN  do_boro;
 
+DO_FUN  do_reload;
 DO_FUN  do_abandon;
 DO_FUN  do_accept;
 DO_FUN  do_action;
 DO_FUN  do_advance;
+DO_FUN  do_guide;
 DO_FUN  do_alias;
 DO_FUN  do_archive;
 DO_FUN  do_autoeat;
@@ -150,6 +152,10 @@ DO_FUN  do_global;
 DO_FUN  do_gossip; 
 DO_FUN  do_golem_score;
 DO_FUN  do_goto;
+DO_FUN  do_install;
+DO_FUN  do_reload_help;
+DO_FUN  do_hindex;
+DO_FUN  do_hedit;
 DO_FUN  do_grab;
 DO_FUN  do_group;
 DO_FUN  do_grouptell;
@@ -157,6 +163,8 @@ DO_FUN  do_gtrans;
 DO_FUN  do_guard;
 DO_FUN  do_harmtouch;
 DO_FUN  do_help;
+DO_FUN  do_mortal_help;
+DO_FUN  do_new_help;
 DO_FUN  do_hide;
 DO_FUN  do_highfive;
 DO_FUN  do_hit;
@@ -185,6 +193,7 @@ DO_FUN  do_levels;
 DO_FUN  do_lfg_toggle;
 DO_FUN  do_linkdead;
 DO_FUN  do_linkload;
+DO_FUN do_listproc;
 DO_FUN  do_load;
 DO_FUN  do_medit;
 DO_FUN  do_memoryleak;
@@ -192,7 +201,11 @@ DO_FUN  do_mortal_set;
 DO_FUN  do_motdload;
 DO_FUN  do_msave;
 DO_FUN  do_mpedit;
+DO_FUN do_mpbestow;
 DO_FUN  do_mpstat;
+DO_FUN  do_opedit;
+DO_FUN do_eqmax;
+DO_FUN do_opstat;
 DO_FUN  do_lock;
 DO_FUN  do_log;
 DO_FUN  do_look;
@@ -217,6 +230,7 @@ DO_FUN( do_mpteachskill );
 DO_FUN( do_mpsetalign   );
 DO_FUN( do_mpsettemp);
 DO_FUN( do_mpthrow      );
+DO_FUN( do_mpothrow	);
 DO_FUN( do_mptransfer   );
 DO_FUN( do_mpxpreward   );
 DO_FUN  do_murder;
@@ -228,6 +242,7 @@ DO_FUN  do_nohassle;
 DO_FUN  do_noname;
 DO_FUN  do_not_here;
 DO_FUN  do_notax_toggle;
+DO_FUN  do_guide_toggle;
 DO_FUN  do_notell_toggle;
 DO_FUN  do_oedit;
 DO_FUN  do_offer;

@@ -18,6 +18,7 @@
 #include <mobile.h>
 #include <race.h>
 #include <act.h>
+#include <magic.h>
 #include <affect.h>
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
@@ -64,16 +65,16 @@ struct golem_data
 };
 
 const struct golem_data golem_list[] = {
-  {"iron", "iron golem enchanted", "an enchanted iron golem", "A powerfully enchanted iron golem stands here, guarding its master.\n", 
-    "The iron golem is bound by its master's magics.  A mindless automaton,\nthe iron golem is one of the most powerful forces available in a\nwizard's aresenal.  Nearly a full 8 feet tall and weighing several\ntons, this behemoth of pure iron is absolutely loyal to its master and\nsilently follows commands without fail.\n",
+  {"iron", "iron golem enchanted", "an enchanted iron golem", "A powerfully enchanted iron golem stands here, guarding its master.\r\n", 
+    "The iron golem is bound by its master's magics.  A mindless automaton,\r\nthe iron golem is one of the most powerful forces available in \r\nwizard's aresenal.  Nearly a full 8 feet tall and weighing several\r\ntons, this behemoth of pure iron is absolutely loyal to its master and\r\nsilently follows commands without fail.\r\n",
     1000, 15, 5, 25, 50, {107, 108, 109, 0, 7004}, AFF_LIGHTNINGSHIELD, 0, -100,
-    "There is a grinding and shrieking of metal as an iron golem is slowly formed.\n",
+    "There is a grinding and shrieking of metal as an iron golem is slowly formed.\r\n",
     "Unable to sustain further damage, the iron golem falls into unrecoverable scrap.",
     "As the magic binding it is released, the iron golem rusts to pieces."
 },
- {  "stone","stone enchanted golem", "a enchanted stone golem", "A powerfully enchanted stone golem stands here, guarding its master.\n",
-    "The stone golem is bound by its caster's magics.  A mindless automaton,\nthe stone golem is one of the sturdiest and most resilliant creatures\nknown in the realms.  Nearly a full 8 feet tall and weighing several\ntons, this mountain of rock is absolutely loyal to its master and\nsilently follows orders without fail.\n",
-    2000, 5, 5, 25, 50, {104,105,106,0,7003}, 0, ISR_PIERCE, -100, "There is a deep rumbling as a stone golem slowly rises from the ground.\n",
+ {  "stone","stone enchanted golem", "a enchanted stone golem", "A powerfully enchanted stone golem stands here, guarding its master.\r\n",
+    "The stone golem is bound by its caster's magics.  A mindless automaton,\r\nthe stone golem is one of the sturdiest and most resilliant creatures\r\nknown in the realms.  Nearly a full 8 feet tall and weighing several\r\ntons, this mountain of rock is absolutely loyal to its master and\r\nsilently follows orders without fail.\r\n",
+    2000, 5, 5, 25, 50, {104,105,106,0,7003}, 0, ISR_PIERCE, -100, "There is a deep rumbling as a stone golem slowly rises from the ground.\r\n",
     "Unable to sustain further damage, the stone golem shaters to pieces.",
     "As the magic binding it is released, the golem crumbles to dust."
    }
@@ -137,11 +138,17 @@ int  verify_existing_components(CHAR_DATA *ch, int golemtype)
       next_content = curr->next_content;
       if (golem_list[golemtype].components[i] == obj_index[curr->item_number].virt)
       {
+	if (number(0,2) || !spellcraft(ch, SPELL_CREATE_GOLEM)) {
           sprintf(buf, "%s explodes, releasing a stream of magical energies!\r\n", curr->short_description);
           send_to_char(buf,ch);
           obj_from_char(curr);
           extract_obj(curr);
 	  break; // Only remove ONE of the components of that type.
+	} else {
+	  sprintf(buf, "%s glows bright red, but you manage to retain it by only extracting part of its magic.\r\n", curr->short_description);
+	  send_to_char(buf,ch);
+  	  break;
+	}
       }
     }
   }

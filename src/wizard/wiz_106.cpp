@@ -4,6 +4,7 @@
 **********************/
 #include "wizard.h"
 #include <handler.h>
+#include <spells.h>
 #include <utility.h>
 #include <connect.h>
 #include <levels.h>
@@ -58,6 +59,11 @@ int do_force(struct char_data *ch, char *argument, int cmd)
 
   if(IS_NPC(ch))
     return eFAILURE;
+  if(!has_skill(ch, COMMAND_FORCE)) {
+        send_to_char("Huh?\r\n", ch);
+        return eFAILURE;
+  }
+
 
   half_chop(argument, name, to_force);
 

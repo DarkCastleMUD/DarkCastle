@@ -77,6 +77,7 @@ short code_testing_mode_world = 0;
 unsigned mother_desc, other_desc, third_desc, fourth_desc;
 
 // This is turned on right before we call game_loop
+int do_not_save_corpses = 1;
 int try_to_hotboot_on_crash = 0;
 int was_hotboot = 0;
 int died_from_sigsegv = 0;
@@ -166,6 +167,7 @@ void mobile_activity(void);
 void object_activity(void);
 void update_corpses_and_portals(void);
 void string_add(struct descriptor_data *d, char *str);
+void new_string_add(struct descriptor_data *d, char *str);
 void string_hash_add(struct descriptor_data *d, char *str);
 void perform_violence(void);
 void show_string(struct descriptor_data *d, char *input);
@@ -541,7 +543,9 @@ void init_game(int port, int port2, int port3, int port4)
 
   unlink("died_in_bootup");
 
+  do_not_save_corpses = 0;
   game_loop(mother_desc, other_desc, third_desc, fourth_desc);
+  do_not_save_corpses = 1;
 
   log("Closing all sockets.", 0, LOG_MISC);
   while (descriptor_list)
@@ -776,13 +780,9 @@ void game_loop(unsigned mother_desc, unsigned other_desc, unsigned third_desc, u
       next_d = d->next;
       if (FD_ISSET(d->descriptor, &input_set))
 	if (process_input(d) < 0) {
-	  //	  if (d->character && GET_LEVEL(d->character) == 1) {
     sprintf(buf, "Connection attempt bailed from %s", d->host);
-	  //  sprintf(buf, "Level 1, %s, dropping link. Byebye!", GET_NAME(d->character));
     printf(buf);
 	   log(buf, ANGEL, LOG_SOCKET);
-	    //	    free_char(d->character);
-	  //}
 	  close_socket(d);
 	}
     }
@@ -790,21 +790,21 @@ void game_loop(unsigned mother_desc, unsigned other_desc, unsigned third_desc, u
     /* process commands we just read from process_input */
     for (d = descriptor_list; d; d = next_d) {
       next_d = d->next;
-
-      // TODO - move wait to the character so we can use it for both
-      //        mobs and PC's.
+      d->wait = MAX(d->wait, 1);
 
       if ((--(d->wait) <= 0) && get_from_q(&d->input, comm, &aliased)) {
 	  /* reset the idle timer & pull char back from void if necessary */
 	d->wait = 1;
 	d->prompt_mode = 1;
 
-	if (d->str)		/* writing boards, mail, etc.     */
+	if (d->showstr_count)	/* reading something w/ pager     */
+	  show_string(d, comm);
+	else if (d->str)		/* writing boards, mail, etc.     */
 	  string_add(d, comm);
         else if(d->hashstr)
           string_hash_add(d, comm);
-	else if (d->showstr_count)	/* reading something w/ pager     */
-	  show_string(d, comm);
+        else if(d->strnew)
+          new_string_add(d, comm);
 	else if (d->connected != CON_PLAYING)	/* in menus, etc. */
 	  nanny(d, comm);
 	else {			/* else: we're playing normally */
@@ -1101,10 +1101,14 @@ char * calc_condition(CHAR_DATA *ch, bool colour = FALSE)
   int percent;
   char *cond_txt[8];// = cond_txtz;
 
+ // if (colour)
+ //  cond_txt = cond_txtc;
+ // else
+ //  cond_txt = cond_txtz;
   if (colour)
-   cond_txt = cond_txtc;
+   memcpy(cond_txt, cond_txtc, sizeof(cond_txtc));
   else
-   cond_txt = cond_txtz;
+   memcpy(cond_txt, cond_txtz, sizeof(cond_txtz));
 
   if(GET_HIT(ch) == 0 || GET_MAX_HIT(ch) == 0)
     percent = 0;
@@ -1136,13 +1140,15 @@ void make_prompt(struct descriptor_data *d, char *prompt)
      if(!d->character) {
          return;
      }
-     if(d->str || d->hashstr)
-         strcat(prompt, "] ");
-     else if (d->showstr_count) {
+     if (d->showstr_count) {
      sprintf(buf,
              "\r[ Return to continue, (q)uit, (r)efresh, (b)ack, or page number (%d %d) ]",
               d->showstr_page, d->showstr_count);
      strcat(prompt, buf);
+     } else if(d->strnew) {
+         strcat(prompt, "*] ");
+     } else if(d->str || d->hashstr) {
+         strcat(prompt, "] ");
      } else if(STATE(d) != CON_PLAYING) {
          return;
      } else if(IS_MOB(d->character)) {
@@ -1160,9 +1166,8 @@ void make_prompt(struct descriptor_data *d, char *prompt)
         struct room_data *rm = &world[d->character->in_room];
         sprintf(buf,
                 IS_SET(GET_TOGGLES(d->character), PLR_ANSI) ?
-                "Z:"RED"%d "NTEXT"R:"GREEN"%d "NTEXT"I:"
-                YELLOW"%d"NTEXT"> " :
-                "Z:%d R:%d I:%d> ",
+                "Z:"RED"%d "NTEXT"R:"GREEN"%d "NTEXT"I:"YELLOW"%ld"NTEXT"> " :
+                "Z:%d R:%d I:%ld> ",
                 rm->zone, rm->number, d->character->pcdata->wizinvis);
         strcat(prompt, buf);
     }
@@ -1468,8 +1473,10 @@ void write_to_output(char *txt, struct descriptor_data *t)
   if (t->bufptr < 0)
     return;
 
-  temp = handle_ansi(txt, t->character);
-  txt = temp;
+  if (t->connected != CON_EDITING && t->connected != CON_WRITE_BOARD && t->connected != CON_EDIT_MPROG) {
+    temp = handle_ansi(txt, t->character);
+    txt = temp;
+  }
 
   size = strlen(txt);
 
@@ -1590,8 +1597,8 @@ int new_descriptor(int s)
   if (isbanned(newd->host) == BAN_ALL) {
     write_to_descriptor(desc, 
               "Your site has been banned from Dark Castle. If you have any\n\r"
-              "Questions, please email Pirahna at:\n\r"
-              "dcpirahna@hotmail.com\n\r");
+              "Questions, please email Apocalypse at:\n\r"
+              "dc_apoc@hotmail.com\n\r");
                                                   
     CLOSE_SOCKET(desc);
     sprintf(buf, "Connection attempt denied from [%s]", newd->host);
@@ -1639,6 +1646,8 @@ int process_output(struct descriptor_data *t)
   if (t->bufptr < 0)
     strcat(i, "**OVERFLOW**");
 
+  if (t->character && t->character->name && !str_cmp(t->character->name, "Apocalypse"))
+    write_to_descriptor(t->descriptor, FLASH);
   /*
    * now, send the output.  If this is an 'interruption', use the prepended
    * CRLF, otherwise send the straight output sans CRLF.
@@ -1770,7 +1779,7 @@ int process_input(struct descriptor_data *t)
 
     /* search for a newline in the data we just read */
     for (ptr = read_point; *ptr && !nl_pos; ptr++)
-      if (ISNEWL(*ptr))
+      if (ISNEWL(*ptr) || (t->connected != CON_WRITE_BOARD && t->connected != CON_EDITING && t->connected != CON_EDIT_MPROG && *ptr == '|'))
 	nl_pos = ptr;
 
     read_point += bytes_read;
@@ -1832,7 +1841,7 @@ int process_input(struct descriptor_data *t)
           // tmp_ptr is just so I don't have to put ptr+1 7 times....
           tmp_ptr = (ptr+1);
           if(isdigit(*tmp_ptr) || *tmp_ptr == 'I' || *tmp_ptr == 'L' ||
-                                  *tmp_ptr == '*' || *tmp_ptr == 'R' || 
+                                  *tmp_ptr == '*' || *tmp_ptr == 'R' ||
                                   *tmp_ptr == 'B' || t->connected == CON_EDIT_MPROG
             )
           { // write it like normal
@@ -1906,14 +1915,16 @@ END OLD HERE */
       write_to_q(tmp, &t->input, 0);
     
     /* find the end of this line */
-    while (ISNEWL(*nl_pos))
+    //while (ISNEWL(*nl_pos))
+    while (ISNEWL(*nl_pos) || (t->connected != CON_WRITE_BOARD && t->connected != CON_EDITING && t->connected != CON_EDIT_MPROG && *nl_pos == '|'))
       nl_pos++;
 
     /* see if there's another newline in the input buffer */
     read_point = ptr = nl_pos;
     for (nl_pos = NULL; *ptr && !nl_pos; ptr++)
-      if (ISNEWL(*ptr))
+      if (ISNEWL(*ptr) || (t->connected != CON_WRITE_BOARD && t->connected != CON_EDITING && t->connected != CON_EDIT_MPROG && *ptr == '|'))
 	nl_pos = ptr;
+      //if (ISNEWL(*ptr))
   }
 
   /* now move the rest of the buffer up to the beginning for the next pass */
@@ -1987,6 +1998,7 @@ int close_socket(struct descriptor_data *d)
   char buf[128], idiotbuf[128];
   struct descriptor_data *temp;
   // long target_idnum = -1;
+  if (!d) return 0;
   flush_queues(d);
   CLOSE_SOCKET(d->descriptor);
 
@@ -2057,7 +2069,7 @@ int close_socket(struct descriptor_data *d)
   dc_free(d);
   d = NULL;
 
-  if(descriptor_list == NULL) 
+/*  if(descriptor_list == NULL) 
   {
     // if there is NOONE on (everyone got disconnected) loop through and
     // boot all of the linkdeads.  That way if the mud's link is cut, the
@@ -2070,7 +2082,7 @@ int close_socket(struct descriptor_data *d)
        do_quit(i, "", 666);
     }
     return 0;
-  }
+  }*/
   return 1;
 }
 
@@ -2213,7 +2225,7 @@ void hupsig(int sig)
 {
   sig = sig;
   log("Received SIGHUP, SIGINT, or SIGTERM.  Shutting down...", 0, LOG_MISC);
-  exit(0);			/* perhaps something more elegant should
+  abort();			/* perhaps something more elegant should
 				 * substituted */
 }
 
@@ -2469,7 +2481,11 @@ void warn_if_duplicate_ip(char_data * ch)
       {
 	highlev = MAX(GET_LEVEL(d->character), GET_LEVEL(ch));
 	highlev = MAX(highlev, IMMORTAL);
-        sprintf(buf, "MultipleIP: %s -> %s / %s", d->host, GET_NAME(ch), GET_NAME(d->character));
+       // sprintf(buf, "MultipleIP: %s -> %s (%d)/ %s (%d)", d->host, GET_NAME(ch), 
+      //                  (world[ch->in_room].number ? world[ch->in_room].number : -1), GET_NAME(d->character),
+      //                  (world[d->character->in_room].number ? world[d->character->in_room].number : -1));
+
+        sprintf(buf, "MultipleIP: %s -> %s / %s ", d->host, GET_NAME(ch), GET_NAME(d->character));
         log(buf, highlev, LOG_WARNINGS );
       }
    }

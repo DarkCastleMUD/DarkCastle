@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: group.cpp,v 1.13 2004/07/11 02:13:43 urizen Exp $
+| $Id: group.cpp,v 1.14 2004/11/16 00:51:34 Zaphod Exp $
 | group.C
 | Description:  Group related commands; join, abandon, follow, etc..
 */
@@ -18,6 +18,7 @@ extern "C"
 #include <mobile.h>
 #include <interp.h>
 #include <handler.h>
+#include <clan.h>
 #include <levels.h>
 #include <act.h>
 #include <db.h>
@@ -208,7 +209,7 @@ int do_split(CHAR_DATA *ch, char *argument, int cmd)
     send_to_char(buf, k);
     GET_GOLD(k) += share;
   }
-
+  char buf2[MAX_STRING_LENGTH];
   for (f=k->followers; f; f=f->next) 
   {
     if (IS_AFFECTED(f->follower, AFF_GROUP) &&
@@ -217,7 +218,17 @@ int do_split(CHAR_DATA *ch, char *argument, int cmd)
         !IS_MOB(f->follower)) 
     {
       send_to_char( buf, f->follower );
-      GET_GOLD(f->follower) += share;
+      int lost = 0;
+      if (f->follower->clan && get_clan(f->follower)->tax && 
+           !IS_SET(GET_TOGGLES(f->follower), PLR_NOTAX))
+      {
+	lost = (int)((float)share*(float)((float)get_clan(f->follower)->tax/100));
+	sprintf(buf2,"Your clan taxes %d gold of your share.\r\n",lost);
+	get_clan(f->follower)->balance += lost;
+	save_clans();
+      send_to_char(buf2, f->follower);
+      }
+      GET_GOLD(f->follower) += (share - lost);
     } 
   }
   return eSUCCESS;

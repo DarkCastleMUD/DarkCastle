@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: who.cpp,v 1.14 2004/07/11 02:13:43 urizen Exp $
+| $Id: who.cpp,v 1.15 2004/11/16 00:51:35 Zaphod Exp $
 | who.C
 | Commands for who, maybe? :P
 */
@@ -274,6 +274,7 @@ int do_who(struct char_data *ch, char *argument, int cmd)
     char  infoBuf[64];
     char  extraBuf[128];
     char  tailBuf[64];
+    char  preBuf[64];
     char  arg[MAX_INPUT_LENGTH];
     char  oneword[MAX_INPUT_LENGTH];
     char  buf[MAX_STRING_LENGTH];
@@ -289,6 +290,7 @@ int do_who(struct char_data *ch, char *argument, int cmd)
     int   currentmatch = 0;
     int   hasholylight = 0;
     int   lfgcheck = 0;
+    int   guidecheck = 0;
 
     char* immortFields[] = {
         "   Immortal  ",
@@ -297,7 +299,7 @@ int do_who(struct char_data *ch, char *argument, int cmd)
         "   Overseer  ",
         "   --------  ",
         "   --------  ",
-        "    Coder    ",
+        "   Divinity  ",
         "PirsLoveSlave",
         " Implementor "
     };
@@ -337,6 +339,10 @@ int do_who(struct char_data *ch, char *argument, int cmd)
         else if(is_abbrev(oneword, "penis")) {
             sexcheck = 1;
             sextype = SEX_MALE;
+            currentmatch = 1;
+        }
+        else if(is_abbrev(oneword, "guide")) {
+            guidecheck = 1;
             currentmatch = 1;
         }
         else if(is_abbrev(oneword, "vagina")) {
@@ -421,7 +427,8 @@ int do_who(struct char_data *ch, char *argument, int cmd)
                        ) && !charmatchistrue
           )                                                                     continue;
         if(levelarg > 0 && IS_ANONYMOUS(i) && !hasholylight)                    continue;
-        if(lfgcheck && !IS_SET(i->pcdata->toggles, PLR_LFG))                   continue;
+        if(lfgcheck && !IS_SET(i->pcdata->toggles, PLR_LFG))                    continue;
+        if(guidecheck && !IS_SET(i->pcdata->toggles, PLR_GUIDE_TOG))            continue;
         
         infoField = infoBuf;
         extraBuf[0] = '\0';
@@ -433,6 +440,14 @@ int do_who(struct char_data *ch, char *argument, int cmd)
 	  	infoField = infoBuf;
 		sprintf(infoBuf,"    $B$5O$6.$5W$6.$5L$R    ");
 	    }*/
+	     if (!str_cmp(GET_NAME(i), "Urizen")) {
+		infoField = infoBuf;
+		sprintf(infoBuf, "    Coder    "); // No imagination today.
+	     }
+            if(!strcmp(GET_NAME(i), "Rahz")) {
+                infoField = infoBuf;
+                sprintf(infoBuf, "   Crasher   ");
+            }
             if(!strcmp(GET_NAME(i), "Pirahna")) {
                 infoField = infoBuf;
                 sprintf(infoBuf, "   $B$4>$5<$1($2($1($5:$4>$R   ");
@@ -470,16 +485,20 @@ int do_who(struct char_data *ch, char *argument, int cmd)
         }
         else *tailBuf = '\0'; // clear it
 
+        if(IS_SET(i->pcdata->toggles, PLR_GUIDE_TOG))
+           strcpy(preBuf, "$7$B(Guide)$R ");
+        else *preBuf = '\0';
+        
         if(IS_SET(i->pcdata->toggles, PLR_LFG))
            strcat(tailBuf, "$3(LFG)");
 
         if(i->clan && (clan = get_clan(i)) && GET_LEVEL(i) < OVERSEER) 
-           sprintf(buf,"[%s] $3%s %s %s $2[%s$R$2] %s$R\n\r",
-                infoField,   GET_SHORT(i),   i->title,
+           sprintf(buf,"[%s] %s$3%s %s %s $2[%s$R$2] %s$R\n\r",
+                infoField,   preBuf,   GET_SHORT(i),   i->title,
                 extraBuf,    clan->name,     tailBuf);
         else
-            sprintf(buf,"[%s] $3%s %s %s %s$R\n\r",
-                infoField,   GET_SHORT(i),   i->title,
+            sprintf(buf,"[%s] %s$3%s %s %s %s$R\n\r",
+                infoField,   preBuf, GET_SHORT(i),   i->title,
                 extraBuf,    tailBuf);
         
         add_to_who(buf);
@@ -556,45 +575,51 @@ int do_where(struct char_data *ch, char *argument, int cmd)
 
   one_argument(argument, buf);
 
-  if (GET_LEVEL(ch) < IMMORTAL || !*buf) {
-     zonenumber = ((world[ch->in_room].number) / 100);
-     send_to_char("Players in your vicinity:\n\r-------------------------\n\r",
-                  ch);
-     if(IS_SET(world[ch->in_room].room_flags, NO_WHERE))
-        return eFAILURE;
-     for(d = descriptor_list; d; d = d->next) {
-        if (d->character && (d->connected == CON_PLAYING) &&
-            (d->character->in_room != NOWHERE) &&
-            !IS_SET(world[d->character->in_room].room_flags, NO_WHERE) &&
- 	    CAN_SEE(ch, d->character) &&
-            !IS_MOB(d->character) /*Don't show snooped mobs*/) 
-           {
- 	   if (((world[d->character->in_room].number) / 100) == zonenumber)
-              csendf(ch, "%-20s - %s$R\n\r", d->character->name,
-	             world[d->character->in_room].name);
-           }
+  if (GET_LEVEL(ch) >= IMMORTAL && *buf && !strcmp(buf, "all")) { //  immortal noly, shows all
+    send_to_char("All Players:\n\r--------\n\r", ch);
+    for (d = descriptor_list; d; d = d->next) {
+      if (d->character && (d->connected == CON_PLAYING) && (CAN_SEE(ch, d->character)) && (d->character->in_room != NOWHERE)) {
+        if (d->original) {  // If switched
+          csendf(ch, "%-20s - %s$R [%d] In body of %s\n\r", d->original->name, world[d->character->in_room].name,
+                 world[d->character->in_room].number, fname(d->character->name));
+        } else {
+          csendf(ch, "%-20s - %s$R [%d]\n\r", 
+                      d->character->name, world[d->character->in_room].name, world[d->character->in_room].number);
         }
-     return eSUCCESS;
-     }
+      }
+    } // for
+  } else if (GET_LEVEL(ch) >= IMMORTAL && *buf) { // immortal only, shows ONE person
+    send_to_char("Search of Players:\n\r--------\n\r", ch);
+    for (d = descriptor_list; d; d = d->next) {
+      if (d->character && (d->connected == CON_PLAYING) && (CAN_SEE(ch, d->character)) && (d->character->in_room != NOWHERE)) {
+        if (d->original) {  // If switched
+          if (is_abbrev(buf, d->original->name)) {
+            csendf(ch, "%-20s - %s$R [%d] In body of %s\n\r", d->original->name, world[d->character->in_room].name,
+                   world[d->character->in_room].number, fname(d->character->name));
+          }
+        } else {
+          if (is_abbrev(buf, d->character->name)) {
+            csendf(ch, "%-20s - %s$R [%d]\n\r", 
+                        d->character->name, world[d->character->in_room].name, world[d->character->in_room].number);
+          }
+        }
+      }
+    } // for
+  } else {  // normal, mortal where
+    zonenumber = ((world[ch->in_room].number) / 100);
+    send_to_char("Players in your vicinity:\n\r-------------------------\n\r", ch);
+    if (IS_SET(world[ch->in_room].room_flags, NO_WHERE))
+       return eFAILURE;
+    for (d = descriptor_list; d; d = d->next) {
+      if (d->character && (d->connected == CON_PLAYING) && (d->character->in_room != NOWHERE) &&
+          !IS_SET(world[d->character->in_room].room_flags, NO_WHERE) &&
+ 	  CAN_SEE(ch, d->character) && !IS_MOB(d->character) /*Don't show snooped mobs*/)  {
+          if (((world[d->character->in_room].number) / 100) == zonenumber)
+            csendf(ch, "%-20s - %s$R\n\r", d->character->name,
+          world[d->character->in_room].name);
+       }
+    }
+  }
 
-  send_to_char("Players:\n\r--------\n\r", ch);
-  
-  for(d = descriptor_list; d; d = d->next) {
-     if (d->character && (d->connected == CON_PLAYING) &&
-         (CAN_SEE(ch, d->character)) &&
-         (d->character->in_room != NOWHERE)) {
-        if (d->original)   // If switched
-           csendf(ch, "%-20s - %s$R [%d] In body of %s\n\r",
-                  d->original->name,
-                  world[d->character->in_room].name,
-                  world[d->character->in_room].number,
-                  fname(d->character->name));
-        else
-           csendf(ch, "%-20s - %s$R [%d]\n\r",
-                  d->character->name,
-                  world[d->character->in_room].name,
-                  world[d->character->in_room].number);
-        }
-     } // for
   return eSUCCESS;
 }

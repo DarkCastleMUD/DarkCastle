@@ -153,6 +153,7 @@ void assign_non_combat_procs() {
     SPEC_FUN    iasenko_non_combat;
     SPEC_FUN    koban_non_combat;
     SPEC_FUN    arena_only;
+    SPEC_FUN mage_golem;
     SPEC_FUN    mage_familiar_imp_non;
     SPEC_FUN    druid_familiar_chipmunk_non;
     SPEC_FUN    bodyguard;
@@ -161,7 +162,7 @@ void assign_non_combat_procs() {
     SPEC_FUN    startrek_miles;
     SPEC_FUN    generic_area_guard;
     SPEC_FUN    pthief_hater;
-
+    assign_one_mob_non(8, mage_golem);
     assign_one_mob_non(1,  deth);
     assign_one_mob_non(3,  platmerchant);
     assign_one_mob_non(4,  mithaxequest);
@@ -496,6 +497,14 @@ void assign_objects(void)
   assign_one_obj_non(9504,  gem_assembler);  
   assign_one_obj_non(9505,  gem_assembler);  
   assign_one_obj_non(9506,  gem_assembler);  
+
+  // ventriloqute dummy
+  assign_one_obj_non(17349,  gem_assembler);  
+  assign_one_obj_non(17350,  gem_assembler);  
+  assign_one_obj_non(17351,  gem_assembler);  
+  assign_one_obj_non(17352,  gem_assembler);  
+  assign_one_obj_non(17353,  gem_assembler);  
+  assign_one_obj_non(17354,  gem_assembler);  
 
   assign_one_obj_non(22399,  board);  // quests2do Board
 

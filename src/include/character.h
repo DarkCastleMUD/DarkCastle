@@ -1,7 +1,7 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.24 2004/07/03 11:44:19 urizen Exp $
+| $Id: character.h,v 1.25 2004/11/16 00:52:09 Zaphod Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
@@ -58,10 +58,19 @@ typedef struct char_data CHAR_DATA;
 #define WIS WISDOM
 #define CON CONSTITUTION // Gawddamn I'm lazy ;)
 
+#define MAX_HIDE 10
+
 // * ------- Begin MOBProg stuff ----------- *
 
 typedef struct  mob_prog_data           MPROG_DATA;
 typedef struct  mob_prog_act_list       MPROG_ACT_LIST;
+
+struct tempvariable
+{
+  struct tempvariable *next;
+  char *name;
+  char *data;
+};
 
 struct  mob_prog_act_list
 {
@@ -97,10 +106,14 @@ struct  mob_prog_data
 #define ATTACK_PROG     4096
 #define ARAND_PROG      8192
 #define LOAD_PROG      16384
+#define COMMAND_PROG   16384 <<1
+#define WEAPON_PROG    16384 <<2
+#define ARMOUR_PROG    16384 <<3
 
-#define MPROG_MAX_TYPE_VALUE (16384 << 1)
+#define MPROG_MAX_TYPE_VALUE (16384 << 4)
 
 // * ------- End MOBProg stuff ----------- *
+
 
 struct char_skill_data
 {
@@ -124,10 +137,10 @@ struct class_skill_defines
 struct affected_type
 {
     uint32 type;           /* The type of spell that caused ths      */
-    int16  duration;      /* For how long its effects will last      */
+    int16  duration;       /* For how long its effects will last      */
     int32  modifier;       /* This is added to apropriate ability     */
-    int32  location;        /* Tells which ability to change(APPLY_XXX)*/
-    uint32 bitvector;       /* Tells which bits to set (AFF_XXX)       */
+    int32  location;       /* Tells which ability to change(APPLY_XXX)*/
+    uint32 bitvector;      /* Tells which bits to set (AFF_XXX)       */
 
     struct affected_type *next;
 };
@@ -188,6 +201,7 @@ struct pc_data
     char *rooms;       /*  Builder Room Range   */
     char *mobiles;     /*  Builder Mobile Range */
     char *objects;     /*  Builder Object Range */
+    obj_data *skillchange; /* Skill changing equipment. */
 
      int32 last_mob_edit;       // vnum of last mob edited
      int32 last_obj_edit;       // vnum of last obj edited
@@ -201,7 +215,9 @@ struct pc_data
     bool incognito;         // invis imms will be seen by people in same room
 
     bool possesing; 	      /*  is the person possessing? */
-    struct char_data *golem; // CURRENT golem. Yes? Yes? No?
+    struct char_data *golem; // CURRENT golem. 
+    bool hide[MAX_HIDE];
+    CHAR_DATA *hiding_from[MAX_HIDE];
 };
 
 struct mob_data
@@ -297,6 +313,10 @@ struct char_data
      int16 move_regen;          // modifier to move regen
      int16 ki_regen;            // modifier to ki regen
 
+     int16 melee_mitigation;    // modifies melee damage
+     int16 spell_mitigation;    // modified spell damage
+     int16 song_mitigation;     // modifies song damage
+
      int16 clan;                       /* Clan the char is in */
 
      int16 armor;                 // Armor class
@@ -337,7 +357,7 @@ struct char_data
     CHAR_DATA *next;                     /* Next anywhere in game */
     CHAR_DATA *next_in_room;             /* Next in room */
     CHAR_DATA *next_fighting;            /* Next fighting */
-
+    OBJ_DATA *altar;
     struct follow_type *followers;  /* List of followers */
     CHAR_DATA *master;              /* Who is char following? */
     char *group_name;                /* Name of group */
@@ -351,7 +371,7 @@ struct char_data
                                        timer to check for WAIT_STATE */
 
     struct timer_data *timerAttached;
-    char *tempVariable; // Mprogs get one now.
+    struct tempvariable *tempVariable;
 };
 
 

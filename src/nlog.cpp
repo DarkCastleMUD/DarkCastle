@@ -1,4 +1,4 @@
-/* $Id: nlog.cpp,v 1.3 2002/12/26 21:47:16 pirahna Exp $ */
+/* $Id: nlog.cpp,v 1.4 2004/11/16 00:51:35 Zaphod Exp $ */
 
 extern "C"
 {
@@ -56,6 +56,16 @@ void free_hsh_tree_from_memory( )
      kill_hsh_tree_func( tree.left );
    if(tree.right)
      kill_hsh_tree_func( tree.right );
+}
+
+bool ishashed(char *arg)
+{
+  struct hash_info *current = &tree;
+  for(; current; current = current->right) {
+   if (current->name == arg)
+     return TRUE;
+  }
+  return FALSE;
 }
 
 char *str_hsh(char *arg)
@@ -183,7 +193,7 @@ char * handle_ansi(char * s, char_data * ch)
              case '7':  i = GREY; break;
              case 'B':  i = BOLD; break;
              case 'R':  i = NTEXT; break;
-             case 'L':  i = FLASH; break;
+	     case 'L':  i = FLASH;break;
              case 'I':  i = INVERSE; break;
              case '$':  i = dollarstring; break;
              case '\0': // this happens if we end a line with $

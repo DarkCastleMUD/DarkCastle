@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.31 2004/07/21 10:16:09 rahz Exp $ */
+/* $Id: ki.cpp,v 1.32 2004/11/16 00:51:35 Zaphod Exp $ */
 
 extern "C"
 {
@@ -268,6 +268,10 @@ int do_ki(CHAR_DATA *ch, char *argument, int cmd)
     }
 
     /* crasher right here */
+    if (IS_SET(world[ch->in_room].room_flags, NO_KI)) {
+      send_to_char("You find yourself unable to focus your energy here.\n\r", ch);
+      return eFAILURE;
+    }
     
     if(!IS_SET(ki_info[spl].targets, TAR_IGNORE)) 
       if(!can_attack(ch) || !can_be_attacked(ch, tar_char))
@@ -423,7 +427,7 @@ int ki_blast( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
       success += 20;
    else if (vict->weight < 200)
       ; /* No effect */
-   else if (vict->weight < 300)
+   else if (vict->weight < 255)
       success -= 10;
    else
       success -= 20; /* more than 300 pounds?! */
@@ -486,9 +490,10 @@ int ki_punch( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
       }
 
    set_cantquit(ch, vict);
-   int dam = GET_HIT(vict) / 4;
+   int dam = GET_HIT(vict) / 4, manadam = GET_MANA(vict) / 4;
    if (dam > 1000)
      dam = 1000;
+   if (manadam > 1000) manadam = 1000;
    if (GET_HIT(vict) < 500000) {
       if (number(1, 101) <
           (GET_LEVEL(ch) / 2) + GET_LEVEL(ch) - GET_LEVEL(vict))
@@ -499,6 +504,7 @@ int ki_punch( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
              ch, 0, vict, TO_CHAR, 0);
          act("$n shoves $s hand into your chest, and your lifeblood "
 	     "ebbs away.", ch, 0, vict, TO_VICT, INVIS_VISIBLE);
+ 	 GET_MANA(vict) -= manadam;
 	 int retval = damage(ch,vict,dam, TYPE_UNDEFINED, KI_OFFSET+KI_PUNCH,0);
 //         group_gain(ch, vict);
 //         fight_kill(ch, vict, TYPE_CHOOSE, 0);

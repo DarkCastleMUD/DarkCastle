@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.34 2004/07/25 20:55:25 urizen Exp $
+| $Id: move.cpp,v 1.35 2004/11/16 00:51:35 Zaphod Exp $
 | move.C
 | Movement commands and stuff.
 *************************************************************************
@@ -515,7 +515,8 @@ int do_simple_move(CHAR_DATA *ch, int cmd, int following)
           remove_memory(ch, 'h');
        }
        if (IS_NPC(chaser) && chaser->hunting == 0) {
-         if (GET_LEVEL(ch) - GET_LEVEL(chaser)/2 <= 0)
+         if (GET_LEVEL(ch) - GET_LEVEL(chaser)/2 >= 0
+		|| GET_LEVEL(ch) >= 50)
           {
                 add_memory(chaser, GET_NAME(ch), 't');
 		struct timer_data *timer;
@@ -581,6 +582,9 @@ int do_simple_move(CHAR_DATA *ch, int cmd, int following)
     retval = mprog_greet_trigger( ch );
     if(SOMEONE_DIED(retval))
       return retval|eSUCCESS;
+    retval = oprog_greet_trigger( ch );
+    if(SOMEONE_DIED(retval))
+      return retval|eSUCCESS;
 
     return eSUCCESS;
 }
@@ -627,7 +631,7 @@ int attempt_move(CHAR_DATA *ch, int cmd, int is_retreat = 0)
         //IS_SET(return_val, eSUCCESS) &&
        //!IS_SET(return_val, eCH_DIED))
        // Don't need to check success or ch_died since they are checked on the line before
-      return ambush(ch);
+    return ambush(ch);
     return return_val;
   }
 
@@ -638,13 +642,14 @@ int attempt_move(CHAR_DATA *ch, int cmd, int is_retreat = 0)
     if (!IS_NPC(ch->master) && GET_CLASS(ch->master) == CLASS_BARD)
     {
       send_to_char("You struggle to maintain control.\r\n", ch->master);
-      if (GET_KI(ch->master) < 5)
+/*      if (GET_KI(ch->master) < 5)
       {
+	add_memory(ch, GET_NAME(ch->master), 'h');
          stop_follower(ch, BROKE_CHARM);
-         add_memory(ch, GET_NAME(ch->master), 'h');
+//         add_memory(ch, GET_NAME(ch->master), 'h');
 	 do_say(ch, "Hey! You tricked me!", 9);
 	 send_to_char("You lose control.\r\n",ch->master);
-      } else GET_KI(ch->master) -= 5;
+      } else GET_KI(ch->master) -= 5;*/
     }
     return eFAILURE;
   }
@@ -653,27 +658,32 @@ int attempt_move(CHAR_DATA *ch, int cmd, int is_retreat = 0)
 
   // this may cause problems with leader being ambushed, dying, and group not moving
   // but we have to be careful in case leader was a mob (no longer valid memory)
-  if(SOMEONE_DIED(return_val) || !IS_SET(return_val, eSUCCESS))
+  if(SOMEONE_DIED(return_val) || !IS_SET(return_val, eSUCCESS)) {
+   // sprintf(tmp, "%s group failed to follow. (died: %d ret: %d)", GET_NAME(ch), SOMEONE_DIED(return_val), return_val);
+   // log(tmp, OVERSEER, LOG_BUG);
     return return_val; 
+  }
 
-  if(ch->followers)
+  if(ch->followers) {
     for(k = ch->followers; k; k = next_dude) {
-       next_dude = k->next;
-       if((was_in == k->follower->in_room) &&
-          ((is_retreat && GET_POS(k->follower) > POSITION_RESTING) || 
-          (GET_POS(k->follower) >= POSITION_STANDING))
-	  ) {
-         if(CAN_SEE(k->follower, ch))
-           sprintf(tmp, "You follow %s.\n\r\n\r", GET_SHORT(ch));
-         else
-           strcpy(tmp, "You follow someone.\n\r\n\r");
-         send_to_char(tmp, k->follower); 
-         //do_move(k->follower, "", cmd + 1);
-         char tempcommand[32];
-         strcpy(tempcommand, dirs[cmd]);
-         command_interpreter(k->follower, tempcommand);
-       }
+      next_dude = k->next;
+      if((was_in == k->follower->in_room) && 
+        ((is_retreat && GET_POS(k->follower) > POSITION_RESTING) || (GET_POS(k->follower) >= POSITION_STANDING))) {
+        if(CAN_SEE(k->follower, ch))
+          sprintf(tmp, "You follow %s.\n\r\n\r", GET_SHORT(ch));
+        else
+          strcpy(tmp, "You follow someone.\n\r\n\r");
+        send_to_char(tmp, k->follower); 
+        //do_move(k->follower, "", cmd + 1);
+        char tempcommand[32];
+        strcpy(tempcommand, dirs[cmd]);
+        command_interpreter(k->follower, tempcommand);
+      } else {
+       // sprintf(tmp, "%s attempted to follow %s but failed. (was_in:%d fol->in_room:%d pos: %d ret: %d", GET_NAME(k->follower), GET_NAME(ch), was_in, k->follower->in_room, GET_POS(k->follower), is_retreat);
+       // log(tmp, OVERSEER, LOG_BUG);
+      }
     } 
+  }
 
   if(was_in != ch->in_room && !IS_AFFECTED(ch, AFF_SNEAK))
     return_val = ambush(ch);
@@ -751,6 +761,11 @@ int do_enter(CHAR_DATA *ch, char *argument, int cmd)
   if(portal->obj_flags.type_flag != ITEM_PORTAL) {
      send_to_char("You can't enter that!\n\r", ch);
      return eFAILURE;
+   }
+   if (!real_room(portal->obj_flags.value[0]))
+   {
+      send_to_char("Report this object to an immortal.\r\n", ch);
+      return eFAILURE;
    }
 
   if(world[real_room(portal->obj_flags.value[0])].sector_type == SECT_UNDERWATER &&

@@ -21,7 +21,7 @@
  *  12/08/2003   Onager    Added check for charmies and !charmie eq to     *
  *                         equip_char()                                    *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.75 2004/07/23 00:22:54 rahz Exp $ */
+/* $Id: handler.cpp,v 1.76 2004/11/16 00:51:34 Zaphod Exp $ */
     
 extern "C"
 {
@@ -44,6 +44,7 @@ extern "C"
 #include <character.h>
 #include <player.h> // APPLY
 #include <utility.h> // LOWER
+#include <clan.h>
 #include <levels.h>
 #include <db.h>
 #include <mobile.h>
@@ -57,6 +58,7 @@ extern "C"
 #include <fight.h>
 #include <returnvals.h>
 #include <innate.h>
+#include <set.h>
 
 extern CWorld world;
  
@@ -74,7 +76,7 @@ int strncasecmp(char *s1, const char *s2, int len);
 #endif
 
 /* External procedures */
-
+void save_corpses(void);
 int str_cmp(char *arg1, char *arg2);
 void stop_fighting(CHAR_DATA *ch);
 void remove_follower(CHAR_DATA *ch);
@@ -98,6 +100,7 @@ bool isaff2(int spellnum)
 		case SKILL_INNATE_SHADOWSLIP:
 		case SKILL_INNATE_ILLUSION:
 		case SKILL_INNATE_FOCUS:
+                case SPELL_KNOW_ALIGNMENT:
                   return TRUE;
                   break;
                 default:
@@ -326,9 +329,145 @@ bool still_affected_by_poison(CHAR_DATA * ch)
   return 0;
 }
 
+const struct set_data set_list[] = {
+  { "Ascetic's Focus", { 2700, 6904, 8301, 8301, 9567, 9567, 12108, 14805, 15621, 
+	21718, 22302, 22314, 22600, 22601, 22602, 24815, 24815, 24816, 26237 },
+	"You attach your penis mightier.\r\n",
+	"You remove your penis mightier.\r\n"},
+  { "Warlock's Vestments", {17334,17335,17336,17337,17338,17339,17340,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+	"You feel an increase in energy coursing through your body.\r\n",
+	"Your magical energy returns to its normal state.\r\n"},
+  { "Hunter's Arsenal", {17327,17328,17329,17330,17331,17332,17333,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+        "You sense your accuracy and endurance have undergone a magical improvement.\r\n",
+	"Your accuracy and endurance return to their normal levels.\r\n"},
+  { "Captain's Regalia", {17341,17342,17343,17344,17345,17346,17347,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+        "You feel an increased vigor surge throughout your body.\n",
+	"Your vigor is reduced to its normal state.\n"},
+  { "Celebrant's Defenses", {17319,17320,17321,17322,17323,17324,17325,17326,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+        "Your inner focus feels as though it is more powerful.\r\n",
+	"Your inner focus has reverted to its original form.\r\n"},
+  { "\n", {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+	"\n","\n"}
+};
+
+void add_set_stats(char_data *ch, obj_data *obj, int flag)
+{
+  // obj has just been worn
+  int obj_vnum = obj_index[obj->item_number].virt;
+  int i;
+  int z = 0, y;
+  // Quadruply nested for. Annoying, but it's gotta be done.
+  // I'm sure "quadruply" is a word.
+  for (; *(set_list[z].SetName) != '\n'; z++)
+   for (y = 0; y < 19 && set_list[z].vnum[y] != -1; y++)
+    if (set_list[z].vnum[y] == obj_vnum)
+    {  // Aye, 'tis part of a set.
+	for (y = 0; y < 19 && set_list[z].vnum[y] != -1;y++)
+	{
+	  if (set_list[z].vnum[y] == 17326 && GET_CLASS(ch) != CLASS_BARD) continue;
+	  if (set_list[z].vnum[y] == 17325 && GET_CLASS(ch) != CLASS_MONK) continue;
+	  bool found = FALSE,doublea = FALSE;
+	  for (i = 0; i < MAX_WEAR; i++)
+   	  {
+            if (ch->equipment[i] && obj_index[ch->equipment[i]->item_number].virt == set_list[z].vnum[y])
+		{
+		  if (y>0 && !doublea && set_list[z].vnum[y] == set_list[z].vnum[y-1])
+		  { 
+			doublea = TRUE; continue;
+		  }
+		found = TRUE; break; 
+		}
+          }
+	  if (!found){ return; }// Nope.
+        }
+	struct affected_type af;
+	af.duration = -1;
+	af.bitvector = 0;
+	af.type = BASE_SETS + z;
+	af.location = APPLY_NONE;
+	af.modifier = 0;
+        // By gawd, they just completed the set.
+	if (!flag)
+	send_to_char(set_list[z].Set_Wear_Message, ch);
+	switch (z)
+	{
+	  case SET_SAIYAN: // Saiyan set makes me all hard.
+	    af.bitvector = AFF_HASTE;
+	    affect_to_char(ch,&af);
+  	    break;
+	  case SET_VESTMENTS:
+	    af.location = APPLY_MANA;
+	    af.modifier = 50;
+	    affect_to_char(ch, &af);
+	    break;
+	  case SET_HUNTERS:
+	    af.location = APPLY_HITROLL;
+	    af.modifier = 5;
+	    affect_to_char(ch, &af);
+	    af.location = APPLY_MOVE;
+	    af.modifier = 25;
+	    affect_to_char(ch, &af);
+	    break;
+	  case SET_CAPTAINS:
+	    af.location = APPLY_HIT;
+	    af.modifier = 50;
+	    affect_to_char(ch,&af);
+	    break;
+	  case SET_CELEBRANTS:
+	    af.location = APPLY_KI;
+	    af.modifier = 5;
+	    affect_to_char(ch, &af);
+	    break;
+	  default: 
+		send_to_char("Tough luck, you completed an unimplemented set. Report what you just wore, eh?\r\n",ch);
+		break;
+	}
+	break;
+    }
+}
+
+void remove_set_stats(char_data *ch, obj_data *obj, int flag)
+{
+  // obj has just been removed
+  int obj_vnum = obj_index[obj->item_number].virt;
+  int i;
+  int z = 0, y;
+  // Quadruply nested for. Annoying, but it's gotta be done.
+  // I'm sure "quadruply" is a word.
+  for (; *(set_list[z].SetName) != '\n'; z++)
+   for (y = 0; y < 17 && set_list[z].vnum[y] != -1; y++)
+    if (set_list[z].vnum[y] == obj_vnum)
+    {  // Aye, 'tis part of a set.
+        for (y= 0; y < 19 && set_list[z].vnum[y] != -1;y++)
+         {
+         if (set_list[z].vnum[y] == 17326 && GET_CLASS(ch) != CLASS_BARD) continue;
+          if (set_list[z].vnum[y] == 17325 && GET_CLASS(ch) != CLASS_MONK) continue;
+           bool found = FALSE,doublea = FALSE;
+          for (i = 0; i < MAX_WEAR; i++)
+          {
+            if (ch->equipment[i] && obj_index[ch->equipment[i]->item_number].virt == set_list[z].vnum[y])
+                {
+                  if (y>0 && !doublea && set_list[z].vnum[y] == set_list[z].vnum[y-1])
+                  {
+                        doublea = TRUE; continue;
+                  }
+                found = TRUE; break;
+                }
+          }
+          if (!found) return; // Nope.
+        }
+        //Remove it
+	affect_from_char(ch, BASE_SETS+z);
+	if (!flag)
+        send_to_char(set_list[z].Set_Remove_Message, ch);
+        break;
+    }
+}
+
 void check_weapon_weights(char_data * ch)
 {
   struct obj_data * weapon;
+  
 
   // make sure we're still strong enough to wield our weapons
   if(!IS_MOB(ch) && ch->equipment[WIELD] &&
@@ -363,7 +502,9 @@ void affect_modify(CHAR_DATA *ch, int32 loc, int32 mod, long bitv, bool add, boo
 {
     char log_buf[256];
     int i;
-    if (!aff2fix) {
+    
+if (loc >= 1000) return;
+if (!aff2fix) {
       if(add)
         SET_BIT(ch->affected_by, bitv);
       else {
@@ -800,6 +941,18 @@ void affect_modify(CHAR_DATA *ch, int32 loc, int32 mod, long bitv, bool add, boo
               REMOVE_BIT(ch->affected_by2, AFF_PROTECT_GOOD);
            break;
 
+ 	case APPLY_MELEE_DAMAGE:
+	   ch->melee_mitigation += mod;
+ 	   break;
+
+ 	case APPLY_SPELL_DAMAGE:
+	   ch->spell_mitigation += mod;
+ 	   break;
+
+ 	case APPLY_SONG_DAMAGE:
+	   ch->song_mitigation += mod;
+ 	   break;
+
 	default:
           sprintf(log_buf, "Unknown apply adjust attempt: %d. (handler.c, "
                   "affect_modify.)", loc);
@@ -831,6 +984,7 @@ void affect_total(CHAR_DATA *ch)
                               ch->equipment[i]->affected[j].modifier,
                               0, FALSE);
     }
+    remove_totem_stats(ch);
     for(af = ch->affected; af; af = tmp_af)
     {
 //        bool secFix = FALSE;
@@ -851,7 +1005,7 @@ void affect_total(CHAR_DATA *ch)
 //      bool secFix = FALSE;
         affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE,isaff2(af->type));
     }
-
+    add_totem_stats(ch);
     REMOVE_BIT(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT); // so weapons stop fall off
 }
 
@@ -862,7 +1016,7 @@ void affect_to_char( CHAR_DATA *ch, struct affected_type *af )
 {
 //    bool secFix;
     struct affected_type *affected_alloc;
-
+    if (af->location >= 1000) return; // Skill aff;
 #ifdef LEAK_CHECK
     affected_alloc = (struct affected_type *) calloc(1, sizeof(struct affected_type));
 #else
@@ -954,6 +1108,7 @@ void affect_remove( CHAR_DATA *ch, struct affected_type *af, int flags, bool aff
             send_to_char("The dust around your body stops glowing.\r\n", ch);
          break;
       case SKILL_INNATE_TIMER:
+	  if (!(flags & SUPPRESS_MESSAGES))
 	  switch(ch->race)
 	  { // Each race has its own wear off messages.
 	    case RACE_GIANT:
@@ -1004,7 +1159,7 @@ void affect_remove( CHAR_DATA *ch, struct affected_type *af, int flags, bool aff
 	  break;
       case SKILL_INNATE_SHADOWSLIP:
          if (!(flags & SUPPRESS_MESSAGES))
-	  send_to_char("The ability to avoid magical pathways has leftyou.\r\n",ch);
+	  send_to_char("The ability to avoid magical pathways has left you.\r\n",ch);
 	  break;
       case SKILL_INNATE_FOCUS:
          if (!(flags & SUPPRESS_MESSAGES))
@@ -1020,16 +1175,15 @@ void affect_remove( CHAR_DATA *ch, struct affected_type *af, int flags, bool aff
            if (obj)
 	   if (obj->obj_flags.extra_flags & ITEM_TWO_HANDED)
            {
-	     obj_to_char(unequip_char(ch, WIELD),ch);
+	     obj_to_char(unequip_char(ch, WIELD, (flags & SUPPRESS_MESSAGES)),ch);
 	         if (!(flags & SUPPRESS_MESSAGES))
- 
-	     act("You shift $p into your inventory.",ch, obj, NULL, TO_CHAR, 0);
+ 	     act("You shift $p into your inventory.",ch, obj, NULL, TO_CHAR, 0);
   	   }
            obj = ch->equipment[SECOND_WIELD];
  	   if (obj)
            if (obj->obj_flags.extra_flags & ITEM_TWO_HANDED)
            {
-             obj_to_char(unequip_char(ch, SECOND_WIELD),ch);
+             obj_to_char(unequip_char(ch, SECOND_WIELD, (flags & SUPPRESS_MESSAGES)),ch);
 	         if (!(flags & SUPPRESS_MESSAGES))
              act("You shift $p into your inventory.",ch, obj, NULL, TO_CHAR, 0);
            }
@@ -1160,7 +1314,7 @@ void affect_join( CHAR_DATA *ch, struct affected_type *af,
 int char_from_room(CHAR_DATA *ch)
 {
   CHAR_DATA *i;
-  bool Other = FALSE,More = FALSE;
+  bool Other = FALSE,More = FALSE, kimore = FALSE;
 
   if(ch->in_room == NOWHERE) {
     return(0); 
@@ -1183,6 +1337,8 @@ int char_from_room(CHAR_DATA *ch)
 	 Other = TRUE;
 	if (i!=ch && IS_NPC(i) && IS_SET(i->mobdata->actflags, ACT_NOTRACK))
 	 More = TRUE;
+	if (i!= ch && IS_NPC(i) && IS_SET(i->mobdata->actflags, ACT_NOKI))
+	  kimore = TRUE;
     }
 
   if(!IS_NPC(ch)) // player
@@ -1195,7 +1351,12 @@ int char_from_room(CHAR_DATA *ch)
     REMOVE_BIT(world[ch->in_room].iFlags,NO_TRACK);
     REMOVE_BIT(world[ch->in_room].room_flags, NO_TRACK);
   }
-  
+  if (IS_NPC(ch))
+  if (IS_SET(ch->mobdata->actflags, ACT_NOKI) && !kimore && IS_SET(world[ch->in_room].iFlags, NO_TRACK))
+  {
+     REMOVE_BIT(world[ch->in_room].iFlags, NO_TRACK);
+     REMOVE_BIT(world[ch->in_room].room_flags, NO_TRACK);
+  }
   if (IS_NPC(ch) && IS_SET(ch->mobdata->actflags, ACT_NOMAGIC) && !More && IS_SET(world[ch->in_room].iFlags, NO_MAGIC))
   {
     REMOVE_BIT(world[ch->in_room].iFlags, NO_MAGIC);
@@ -1209,11 +1370,27 @@ int char_from_room(CHAR_DATA *ch)
   return(1);
 }
 
+bool is_hiding(CHAR_DATA *ch, CHAR_DATA *vict)
+{
+  if (IS_NPC(ch)) return (number(1,101) > 70);
+
+  if (!has_skill(ch, SKILL_HIDE)) return FALSE;
+  if (ch->in_room != vict->in_room)
+    return skill_success(ch, vict, SKILL_HIDE);
+
+  int i;
+  for (i = 0; i < MAX_HIDE; i++)
+   if (ch->pcdata->hiding_from[i] == vict && 
+	ch->pcdata->hide[i])
+      return TRUE;
+  return skill_success(ch, vict, SKILL_HIDE);
+}
 
 /* place a character in a room */
 /* Returns zero on failure, and one on success */
 int char_to_room(CHAR_DATA *ch, int room)
 {
+    CHAR_DATA *temp;
     if (room == NOWHERE)
       return(0);
 
@@ -1224,7 +1401,45 @@ int char_to_room(CHAR_DATA *ch, int room)
     ch->in_room = room;
 
     world[room].light += ch->glow_factor;
-
+    int a,i;
+    if (!IS_NPC(ch) && 
+	IS_SET(ch->affected_by, AFF_HIDE) && (a = has_skill(ch, SKILL_HIDE)))
+    {
+	for (i = 0; i < MAX_HIDE;i++)
+	  ch->pcdata->hiding_from[i] = NULL;
+	i = 0;
+	for (temp = ch->next_in_room; temp; temp = temp->next_in_room)
+	{
+	  if (i >= MAX_HIDE) break;
+	  if (number(1,101) > a) // Failed.
+	  {
+	    ch->pcdata->hiding_from[i] = temp;
+	    ch->pcdata->hide[i++] = FALSE;
+	  } else {
+	    ch->pcdata->hiding_from[i] = temp;
+	    ch->pcdata->hide[i++] = TRUE;
+	  }
+	}
+    }
+    for (temp = ch->next_in_room; temp; temp = temp->next_in_room)
+    {
+      if (IS_SET(temp->affected_by, AFF_HIDE) && !IS_NPC(temp))
+        for (i = 0; i < MAX_HIDE; i++)
+	{
+	  if (temp->pcdata->hiding_from[i] == NULL
+		|| temp->pcdata->hiding_from[i] == ch)
+	  {
+	    if (number(1,101) > has_skill(temp, SKILL_HIDE))
+	    {
+		temp->pcdata->hiding_from[i] = ch;
+		temp->pcdata->hide[i] = FALSE;
+	    } else {
+		temp->pcdata->hiding_from[i] = ch;
+		temp->pcdata->hide[i] = TRUE;
+	    }
+	  }
+	}
+    }
     if(!IS_NPC(ch)) // player
       zone_table[world[room].zone].players++;
   if (IS_NPC(ch)) { 
@@ -1232,6 +1447,11 @@ int char_to_room(CHAR_DATA *ch, int room)
     {
 	SET_BIT(world[room].iFlags, NO_MAGIC);
 	SET_BIT(world[room].room_flags, NO_MAGIC);
+    }
+    if (IS_SET(ch->mobdata->actflags, ACT_NOKI) && !IS_SET(world[room].room_flags, NO_KI))
+    {
+	SET_BIT(world[room].iFlags, NO_KI);
+	SET_BIT(world[room].room_flags, NO_KI);
     }
     if (IS_SET(ch->mobdata->actflags, ACT_NOTRACK) && !IS_SET(world[room].room_flags, NO_TRACK))
     {
@@ -1265,7 +1485,7 @@ int apply_ac(CHAR_DATA *ch, int eq_pos)
 
 // return 0 on failure
 // 1 on success
-int equip_char(CHAR_DATA *ch, struct obj_data *obj, int pos)
+int equip_char(CHAR_DATA *ch, struct obj_data *obj, int pos, int flag)
 {
     int j;
 
@@ -1301,7 +1521,7 @@ int equip_char(CHAR_DATA *ch, struct obj_data *obj, int pos)
 	(IS_OBJ_STAT(obj, ITEM_ANTI_NEUTRAL) && IS_NEUTRAL(ch))&& !IS_NPC(ch)) 
     {
 	if(IS_SET(obj->obj_flags.more_flags, ITEM_NO_TRADE) ||
-	   affected_by_spell(ch, FUCK_PTHIEF)) {
+	   affected_by_spell(ch, FUCK_PTHIEF) || contains_no_trade_item(obj)) {
 	    act("You are zapped by $p but it stays with you.", ch, obj, 0, TO_CHAR, 0);
 	    recheck_height_wears(ch);
             obj_to_char(obj, ch);
@@ -1329,6 +1549,16 @@ int equip_char(CHAR_DATA *ch, struct obj_data *obj, int pos)
 
     ch->equipment[pos] = obj;
     obj->equipped_by   = ch;
+	if (!IS_NPC(ch))
+       for (int a =0; a < obj->num_affects; a++)
+       {
+         if (obj->affected[a].location >= 1000)
+         {
+                obj->next_skill = ch->pcdata->skillchange;
+                ch->pcdata->skillchange = obj;
+		break;
+          }
+       }
 
     if(IS_SET(obj->obj_flags.extra_flags, ITEM_GLOW)) {
       ch->glow_factor++;
@@ -1356,6 +1586,8 @@ int equip_char(CHAR_DATA *ch, struct obj_data *obj, int pos)
 	affect_modify(ch, obj->affected[j].location,
 	  obj->affected[j].modifier, 0, TRUE);
 
+   add_set_stats(ch, obj, flag);
+
    redo_hitpoints(ch);
    redo_mana(ch);
    redo_ki(ch);
@@ -1366,7 +1598,7 @@ int equip_char(CHAR_DATA *ch, struct obj_data *obj, int pos)
 
 
 
-struct obj_data *unequip_char(CHAR_DATA *ch, int pos)
+struct obj_data *unequip_char(CHAR_DATA *ch, int pos, int flag)
 {
     int j;
     struct obj_data *obj;
@@ -1377,6 +1609,42 @@ struct obj_data *unequip_char(CHAR_DATA *ch, int pos)
     obj = ch->equipment[pos];
     if (GET_ITEM_TYPE(obj) == ITEM_ARMOR)
 	GET_AC(ch) += apply_ac(ch, pos);
+
+    remove_set_stats(ch, obj,flag);
+    struct obj_data *a,*b = NULL;
+	b: // ew
+     if (!IS_NPC(ch))
+    for (a = ch->pcdata->skillchange; a; a = a->next_skill)
+    {
+	if (a == (obj_data*)0x95959595)
+	{
+	  int i;
+	  ch->pcdata->skillchange = NULL;
+	for (i = 0; i < MAX_WEAR;i++)
+	{
+	   int j;
+	   if (!ch->equipment[i]) continue;
+           for (j = 0; j < ch->equipment[i]->num_affects; j++)
+	   {
+		if (ch->equipment[i]->affected[j].location > 1000)
+		{
+		  ch->equipment[i]->next_skill = ch->pcdata->skillchange;
+		  ch->pcdata->skillchange = ch->equipment[i];
+		  break;
+		}
+	   }
+	   
+	}
+	  goto b;
+	}
+        if (a == obj)
+	{
+	  if (b) b->next_skill = a->next_skill;
+	  else ch->pcdata->skillchange = a->next_skill;
+	   break;
+	}
+	b = a;
+    }
 
     ch->equipment[pos] = 0; 
     obj->equipped_by   = 0;
@@ -1403,7 +1671,6 @@ struct obj_data *unequip_char(CHAR_DATA *ch, int pos)
    redo_hitpoints(ch);
    redo_mana(ch);
    redo_ki(ch);
-
 
     return(obj);
 }
@@ -1793,7 +2060,7 @@ int move_obj(obj_data *obj, obj_data * dest_obj)
          obj->name, dest_obj->name);
     return 0;
   }
-  
+  add_totem(dest_obj, obj);  
   // At this point, the object is happily in the new room
   return 1;
 }
@@ -1839,6 +2106,10 @@ int move_obj(obj_data *obj, char_data * ch)
   }
   
   if((contained_by = obj->in_obj)) {
+   if (obj->obj_flags.type_flag == ITEM_TOTEM &&
+        contained_by->obj_flags.type_flag == ITEM_ALTAR)
+         remove_totem(contained_by, obj);
+
     if(obj_from_obj(obj) == 0) {
     // Couldn't move obj from its container
       logf(OVERSEER, LOG_BUG, "%s was in container %s, and I couldn't "
@@ -2067,6 +2338,7 @@ int obj_from_room(struct obj_data *object)
   object->in_room = NOWHERE;
   object->next_content = 0;
   
+  save_corpses();
   return 1;
 }
 
@@ -2176,8 +2448,11 @@ void extract_obj(struct obj_data *obj)
     struct active_object *active_obj = NULL,
                          *last_active = NULL;
 
+bool has_random(OBJ_DATA *obj);
+
     if(obj_index[obj->item_number].non_combat_func ||
-	obj->obj_flags.type_flag == ITEM_MEGAPHONE) {
+	obj->obj_flags.type_flag == ITEM_MEGAPHONE ||
+	has_random(obj)) {
        active_obj = &active_head;
        while(active_obj) {
            if((active_obj->obj == obj) && (last_active)) {
@@ -2208,7 +2483,7 @@ void extract_obj(struct obj_data *obj)
             for (iEq = 0; iEq < MAX_WEAR; iEq++) 
                 if (vict->equipment[iEq] == obj) 
                 {
-                   obj_to_char(unequip_char(vict, iEq), vict);
+                   obj_to_char(unequip_char(vict, iEq,1), vict);
                    break;
                 }
      }
@@ -2307,7 +2582,7 @@ void extract_char(CHAR_DATA *ch, bool pull)
     void stop_guarding_me(char_data * victim);
     void stop_guarding(char_data * guard);
     struct obj_data *i;
-
+    CHAR_DATA *omast = NULL;
     if ( !IS_NPC(ch) && !ch->desc )
        for ( t_desc = descriptor_list; t_desc; t_desc = t_desc->next )
 	   if ( t_desc->original == ch )
@@ -2317,6 +2592,7 @@ void extract_char(CHAR_DATA *ch, bool pull)
 	log( "Extract_char: NOWHERE", ANGEL, LOG_BUG );
         return;
     }
+   remove_totem_stats(ch);
    if (!IS_NPC(ch)) {
 	void shatter_message(CHAR_DATA *ch);
         void release_message(CHAR_DATA *ch);
@@ -2335,11 +2611,7 @@ void extract_char(CHAR_DATA *ch, bool pull)
 	   ch->level--;
 	  ch->exp = 0; // Lower level, lose exp.
 	}
-	if (ch->master)
-	do_save(ch->master,"",666);
-        if (mob_index[ch->mobdata->nr].virt == 8)
-          if (ch->master)
-            ch->master->pcdata->golem = 0; // Reset the golem flag.
+	omast = ch->master;
     }
 
     if ( ch->followers || ch->master )
@@ -2398,12 +2670,20 @@ void extract_char(CHAR_DATA *ch, bool pull)
 	  }
        }
        if (ch->carrying) {
-         for(i = ch->carrying ; i ; i = i->next_content)  {
+	struct obj_data *inext;
+         for(i = ch->carrying ; i ; i = inext)  {
+	    inext = i->next_content;
 	    obj_from_char(i);
             obj_to_room(i, was_in);
          }
        }
     }
+    if (isGolem && omast)
+    {
+        do_save(omast,"",666);
+        omast->pcdata->golem = 0; // Reset the golem flag.
+    }
+
 
     GET_AC(ch) = 100;
 
@@ -2601,6 +2881,15 @@ CHAR_DATA *get_mob_vis(CHAR_DATA *ch, char *name)
    return(partial_match);
 }
 
+OBJ_DATA *get_obj_vnum(int vnum)
+{
+  OBJ_DATA *i;
+  int num = real_object(vnum);
+  for (i = object_list; i; i = i->next)
+    if (i->item_number == num)
+      return i;
+  return NULL;
+}
 
 CHAR_DATA *get_mob_vnum(int vnum)
 {
@@ -2747,7 +3036,7 @@ CHAR_DATA *get_pc_vis_exact(CHAR_DATA *ch, char *name)
       {
       if(!IS_NPC(i) && CAN_SEE(ch, i))
          {
-         if (isname(name, GET_NAME(i)))
+         if (!strcmp(name, GET_NAME(i)))
             return(i);
          }
       }

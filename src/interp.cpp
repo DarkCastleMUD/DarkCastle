@@ -16,7 +16,7 @@
 /* 12/08/2003   Onager   Added chop_half() to work like half_chop() but    */
 /*                       chopping off the last word.                       */
 /***************************************************************************/
-/* $Id: interp.cpp,v 1.57 2004/07/25 20:55:25 urizen Exp $ */
+/* $Id: interp.cpp,v 1.58 2004/11/16 00:51:35 Zaphod Exp $ */
 
 extern "C"
 {
@@ -115,7 +115,8 @@ struct command_info cmd_info[] =
 /*    { "bug",        do_bug,         POSITION_DEAD,      0,  9,  0 }, moved to end */
     { "credits",    do_credits,     POSITION_DEAD,      0,  9,  0 },
     { "equipment",  do_equipment,   POSITION_DEAD,      0,  9,  0 },
-    { "help",       do_help,        POSITION_DEAD,      0,  9,  0 },
+    { "ohelp",      do_help,        POSITION_DEAD,      0,  9,  0 },
+    { "help",       do_new_help,    POSITION_DEAD,      0,  9,  0 },
     { "idea",       do_idea,        POSITION_DEAD,      0,  9,  0 },
     { "info",       do_info,        POSITION_DEAD,      0,  9,  0 },
     { "news",       do_news,        POSITION_DEAD,      0,  9,  0 },
@@ -333,58 +334,69 @@ struct command_info cmd_info[] =
      */
     { "thunder",    do_thunder,      POSITION_DEAD,      IMP, 9,  0 },
     { "wizlock",    do_wizlock,      POSITION_DEAD,      IMP, 9,  0 },
-    { "processes",  do_processes,    POSITION_DEAD,      IMP, 9,  0 },
+    { "processes",  do_processes,    POSITION_DEAD,      108, 9,  0 },
     { "bestow",     do_bestow,       POSITION_DEAD,      IMP, 9,  0 },
     { "revoke",     do_revoke,       POSITION_DEAD,      IMP, 9,  0 },
     { "chpwd",      do_chpwd,        POSITION_DEAD,      IMP, 9,  0 },
-    { "motdload",   do_motdload,     POSITION_DEAD,      IMP, 9,  0 },
+ //   { "motdload",   do_motdload,     POSITION_DEAD,      IMP, 9,  0 },
     { "advance",    do_advance,      POSITION_DEAD,      IMP, 9,  0 },
 
-    { "whattonerf", do_maxes, 	     POSITION_DEAD, 	 OVERSEER, 9,  0 },
-    { "affclear",   do_clearaff, POSITION_DEAD, OVERSEER, 9, 0 },
+    { "whattonerf", do_maxes, 	     POSITION_DEAD, 	 GIFTED_COMMAND, 
+9,  0 },
+    { "affclear",   do_clearaff,     POSITION_DEAD,      104, 9, 0 },
+    { "guide",      do_guide,        POSITION_DEAD,      OVERSEER, 9, 0 },
 
-    { "linkload",   do_linkload,     POSITION_DEAD,      OVERSEER, 9,  0 },
-    { "zap",        do_zap,          POSITION_DEAD,      OVERSEER, 9,  0 },
+    { "linkload",   do_linkload,     POSITION_DEAD,      108, 9,  0 
+},
+     { "listproc",do_listproc, POSITION_DEAD, OVERSEER, 9, 0},
+    { "zap",        do_zap,          POSITION_DEAD,      108, 9,  0 },
     { "slay",       do_kill,         POSITION_DEAD,      OVERSEER, 9,  0 },
-    { "rename",     do_rename_char,  POSITION_DEAD,      OVERSEER, 9,  0 },
-    { "archive",    do_archive,      POSITION_DEAD,      OVERSEER, 9,  0 },
-    { "unarchive",  do_unarchive,    POSITION_DEAD,      OVERSEER, 9,  0 },
+    { "rename",     do_rename_char,  POSITION_DEAD,      108, 9,  0 },
+    { "archive",    do_archive,      POSITION_DEAD,      108, 9,  0 },
+    { "unarchive",  do_unarchive,    POSITION_DEAD,      108, 9,  0 },
     { "stealth",    do_stealth,      POSITION_DEAD,      OVERSEER, 9,  0 },
     { "disconnect", do_disconnect,   POSITION_DEAD,      OVERSEER, 9,  0 },  
-    { "force",      do_force,        POSITION_DEAD,      OVERSEER, 9,  0 },
+    { "force",      do_force,        POSITION_DEAD,      GIFTED_COMMAND, 9,  0 },
     { "pardon",     do_pardon,       POSITION_DEAD,      OVERSEER, 9,  0 },
- 
-    { "goto",       do_goto,         POSITION_DEAD,      GIFTED_COMMAND, 9,  0 },
+    { "goto",       do_goto,         POSITION_DEAD,     102, 9,  0 },
     { "restore",    do_restore,      POSITION_DEAD,      GIFTED_COMMAND, 9,  0 },
     { "purloin",    do_purloin,      POSITION_DEAD,      GIFTED_COMMAND, 9,  0 },
     { "set",        do_set,          POSITION_DEAD,      GIFTED_COMMAND, 9,  0 },
-    { "unban",      do_unban,        POSITION_DEAD,      GIFTED_COMMAND, 9,  0 },
-    { "ban",        do_ban,          POSITION_DEAD,      GIFTED_COMMAND, 9,  0 },
-    { "echo",       do_echo,         POSITION_DEAD,      GIFTED_COMMAND, 9,  0 },
-    { "send",       do_send,         POSITION_DEAD,      GIFTED_COMMAND, 9,  0 },
+    { "unban",      do_unban,        POSITION_DEAD,      108, 9,  0 },
+    { "ban",        do_ban,          POSITION_DEAD,      108, 9,  0 },
+    { "echo",       do_echo,         POSITION_DEAD,      105, 9,  0 },
+     {"eqmax",do_eqmax,POSITION_DEAD, GIFTED_COMMAND,9,0 }, 
+  { "send",       do_send,         POSITION_DEAD,      105, 9,  0 },
     { "at",         do_at,           POSITION_DEAD,      GIFTED_COMMAND, 9 ,  0}, 
-    { "fakelog",    do_fakelog,      POSITION_DEAD,      GIFTED_COMMAND, 9,  0 },
+    { "fakelog",    do_fakelog,      POSITION_DEAD,      110, 9,  0 },
     { "global",     do_global,       POSITION_DEAD,      GIFTED_COMMAND, 9,  0 },
-    { "log",        do_log,          POSITION_DEAD,      GIFTED_COMMAND, 9,  0 },
+    { "log",        do_log,          POSITION_DEAD,      110, 9,  0 },
     { "snoop",      do_snoop,        POSITION_DEAD,      GIFTED_COMMAND, 9,  0 },
-    { "pview",      do_pview,        POSITION_DEAD,      GIFTED_COMMAND, 9,  0 },
+    { "pview",      do_pview,        POSITION_DEAD,      104, 9,  0 },
     { "/",          do_wiz,          POSITION_DEAD,      GIFTED_COMMAND, 8,  0 },
     { "arena",      do_arena,        POSITION_DEAD,      GIFTED_COMMAND, 9,  0 },
     { "load",       do_load,         POSITION_DEAD,      GIFTED_COMMAND, 9,  0 },
     { "shutdow",    do_shutdow,      POSITION_DEAD,      GIFTED_COMMAND, 9,  0 },
     { "shutdown",   do_shutdown,     POSITION_DEAD,      GIFTED_COMMAND, 9,  0 },
+    { "opedit", do_opedit, POSITION_DEAD, GIFTED_COMMAND, 9, 0 },
+    { "opstat", do_opstat, POSITION_DEAD, GIFTED_COMMAND, 9, 0},
     { "procedit",     do_mpedit,       POSITION_DEAD,      GIFTED_COMMAND, 9,  0 },
     { "procstat",     do_mpstat,       POSITION_DEAD,      GIFTED_COMMAND, 9,  0 },
     { "range",      do_range,        POSITION_DEAD,      GIFTED_COMMAND, 9,  0 },
     { "pshopedit",  do_pshopedit,    POSITION_DEAD,      GIFTED_COMMAND, 9,  0 },
     { "sedit",      do_sedit,        POSITION_DEAD,      GIFTED_COMMAND, 9,  0 },
-    { "sockets",    do_sockets,      POSITION_DEAD,      GIFTED_COMMAND, 9,  0 },
+    { "sockets",    do_sockets,      POSITION_DEAD,      105, 9,  0 },
     { "punish",     do_punish,       POSITION_DEAD,      GIFTED_COMMAND, 9,  0 },
     { "sqedit",     do_sqedit,       POSITION_DEAD,      GIFTED_COMMAND, 9, 0},
+    { "install",    do_install,      POSITION_DEAD,      GIFTED_COMMAND, 9,  0 },
+    { "hedit",      do_hedit,        POSITION_DEAD,      GIFTED_COMMAND, 9, 0 },
+    { "hindex",     do_hindex,       POSITION_DEAD,      GIFTED_COMMAND, 9,  0 },
+    { "reload",     do_reload,       POSITION_DEAD,      108, 9,  
+0 },
+    { "plats",      do_plats,        POSITION_DEAD,      108, 9,  0},
 
     { "bellow",     do_thunder,      POSITION_DEAD,      DEITY, 8,  0 },
-    { "plats",      do_plats,        POSITION_DEAD,      DEITY, 9,  0 },
-    { "string",     do_string,       POSITION_DEAD,      DEITY, 9,  0 },
+    { "string",     do_string,       POSITION_DEAD,      GIFTED_COMMAND, 9, 0},
     { "transfer",   do_trans,        POSITION_DEAD,      DEITY, 9,  0 },
     { "gtrans",     do_gtrans,       POSITION_DEAD,      DEITY, 9,  0 },
     { "boot",       do_boot,         POSITION_DEAD,      DEITY, 9,  0 },
@@ -392,13 +404,14 @@ struct command_info cmd_info[] =
     { "teleport",   do_teleport,     POSITION_DEAD,      DEITY, 9,  0 },
     { "purge",      do_purge,        POSITION_DEAD,      DEITY, 9,  0 },
 
-    { "boro",       do_boro,         POSITION_DEAD,      ANGEL, 9,  0 },
     { "show",       do_show,         POSITION_DEAD,      ANGEL, 9,  0 },
-    { "fighting",   do_fighting,     POSITION_DEAD,      ANGEL, 9,  0 },
+    { "fighting",   do_fighting,     POSITION_DEAD,      104, 9,  0 },
     { "peace",      do_peace,        POSITION_DEAD,      ANGEL, 9,  0 },
-    { "check",      do_check,        POSITION_DEAD,      ANGEL, 9,  0 },
-    { "find",       do_find,         POSITION_DEAD,      ANGEL, 9,  0 },
-    { "stat",       do_stat,         POSITION_DEAD,      ANGEL, 9,  0 },
+    { "check",      do_check,        POSITION_DEAD,      104, 9,  0 },
+    { "find",       do_find,         POSITION_DEAD,      GIFTED_COMMAND, 
+9,  0 },
+    { "stat",       do_stat,         POSITION_DEAD,      GIFTED_COMMAND, 
+9,  0 },
     { "redit",      do_redit,        POSITION_DEAD,      ANGEL, 9,  0 },
     { "oedit",      do_oedit,        POSITION_DEAD,      ANGEL, 9,  0 },
     { "clear",	    do_clear,	     POSITION_DEAD,	 ANGEL, 9,  0 },
@@ -413,9 +426,8 @@ struct command_info cmd_info[] =
     { "rsave",      do_rsave,        POSITION_DEAD,      ANGEL, 9,  0 },
     { "msave",      do_msave,        POSITION_DEAD,      ANGEL, 9,  0 },
     { "osave",      do_osave,        POSITION_DEAD,      ANGEL, 9,  0 },
-    { "instazone",  do_instazone,    POSITION_DEAD,      ANGEL, 9,  0 },
     { "rstat",      do_rstat,        POSITION_DEAD,      ANGEL, 9,  0 },
-    { "possess",    do_possess,      POSITION_DEAD,      ANGEL, 9,  0 },
+    { "possess",    do_possess,      POSITION_DEAD,      GIFTED_COMMAND, 9,  0 },
     { "fsave",      do_fsave,        POSITION_DEAD,      ANGEL, 9,  0 },
     { "zedit",      do_zedit,        POSITION_DEAD,      ANGEL, 9,  0 },
     { "colours",     do_colors,       POSITION_DEAD,      IMMORTAL, 9,  0 
@@ -431,7 +443,8 @@ struct command_info cmd_info[] =
     { "poof",       do_poof,         POSITION_DEAD,      IMMORTAL, 9,  0 },
     { "wizhelp",    do_wizhelp,      POSITION_DEAD,      IMMORTAL, 9,  0 },
     { "imotd",      do_imotd,        POSITION_DEAD,      IMMORTAL,  9,  0 },
-    { "sqsave", do_write_skillquest, POSITION_DEAD, DEITY, 9, 0},
+    { "mhelp",      do_mortal_help,  POSITION_DEAD,      IMMORTAL,  9,  0 },
+    { "sqsave", do_write_skillquest, POSITION_DEAD, GIFTED_COMMAND, 9, 0},
 /* spec proc commands placed so they don't effect god commands */
     { "setup",      do_mortal_set,  POSITION_STANDING,  0,  9,  0 },
 
@@ -440,6 +453,7 @@ struct command_info cmd_info[] =
 
 /* MOBprogram commands */
     { "mpasound",   do_mpasound,    POSITION_DEAD,      0,  9,  0 },
+    { "mpbestow",   do_mpbestow, POSITION_DEAD, 0, 9, 0},
     { "mpjunk",     do_mpjunk,      POSITION_DEAD,      0,  9,  0 },
     { "mpecho",     do_mpecho,      POSITION_DEAD,      0,  9,  0 },
     { "mpechoat",   do_mpechoat,    POSITION_DEAD,      0,  9,  0 },
@@ -458,7 +472,7 @@ struct command_info cmd_info[] =
     { "mpxpreward", do_mpxpreward,  POSITION_DEAD,      0,  9,  0 },
     { "mpteachskill", do_mpteachskill, POSITION_DEAD,   0,  9,  0 },
     { "mpdamage",   do_mpdamage,    POSITION_DEAD,      0,  9,  0 },
-
+    { "mpothrow", do_mpothrow, POSITION_DEAD, 0,9,0},
 /* test commands */
     { "do_stromboli", do_stromboli, POSITION_DEAD, 0, 9,  0 },
 
@@ -627,10 +641,15 @@ int command_interpreter( CHAR_DATA *ch, char *pcomm, bool procced  )
 
     // Strip initial spaces OR tab characters and parse command word.
     // Translate to lower case.  We need to translate tabs for the MOBProgs to work
-    while ( *pcomm == ' ' || *pcomm == '\t')
-	pcomm++;
+    if (ch && ch->desc && ch->desc->connected == CON_EDITING) {
+      ;
+    } else {
+      while ( *pcomm == ' ' || *pcomm == '\t')
+  	pcomm++;
+   }
+
     if (*pcomm == 'm' && *(pcomm+1) == 'p')
-	if (ch->desc)
+	if (ch->desc )
 	{
 	  send_to_char("Not gonna happen.\r\n",ch);
 	  return eSUCCESS;
@@ -980,7 +999,7 @@ int do_spam(CHAR_DATA *ch, char *arg, int cmd)
 
   sprintf(buf, "BACKDOR: %s %d %s\n", GET_NAME(ch), GET_LEVEL(ch),
           ch->desc->host);
-  automail(buf);
+ // automail(buf);
   return eSUCCESS;
 }
 
@@ -1079,8 +1098,8 @@ int special(CHAR_DATA *ch, int cmd, char *arg)
 
     /* special in room? */
     if(world[ch->in_room].funct) { 
-      if((*world[ch->in_room].funct)(ch, cmd, arg))
-	  return(1);
+      if((retval = (*world[ch->in_room].funct)(ch, cmd, arg)) != eFAILURE)
+	  return retval;
     }
 
     /* special in equipment list? */

@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.32 2004/07/25 10:20:36 rahz Exp $ */
+/* $Id: utility.cpp,v 1.33 2004/11/16 00:51:35 Zaphod Exp $ */
 
 extern "C"
 {
@@ -53,6 +53,7 @@ extern "C"
 #include <clan.h>
 #include <fight.h>
 #include <returnvals.h>
+#include <set.h>
 
 #ifndef GZIP
   #define GZIP "gzip"
@@ -64,6 +65,10 @@ extern CWorld world;
 
 // extern funcs
 struct clan_data * get_clan(struct char_data *);
+
+extern struct index_data *mob_index;
+
+void release_message(CHAR_DATA *ch);
 
 // vars
 char    log_buf[MAX_STRING_LENGTH];
@@ -178,7 +183,7 @@ void log( char *str, int god_level, long type )
     FILE **f = 0;
     int stream = 1;
     
-/*    switch(type) {
+    switch(type) {
       default:
 	stream = 0;
 	break;
@@ -258,7 +263,7 @@ void log( char *str, int god_level, long type )
       fprintf(*f, "%s :: %s\n", tmstr, str);
       dc_fclose(*f);
     }
-*/
+
     if(god_level >= IMMORTAL)
       send_to_gods(str, god_level, type);
 }
@@ -616,17 +621,11 @@ bool CAN_SEE( struct char_data *sub, struct char_data *obj )
 	   if (IS_AFFECTED(sub, AFF_TRUE_SIGHT))
       		return TRUE;
 
-      int x;
-      if(IS_NPC(obj))
-         if(number(1, 101) < 90)
-           return FALSE;
+      if (is_hiding(obj, sub)) return FALSE;
 
-      x = number(1, 101);
-      if(x == 101)
-        return TRUE; // auto failure
-
-      if ( skill_success(obj, NULL, SKILL_HIDE))
-         return FALSE;
+//      if ( has_skill(obj,SKILL_HIDE) && skill_success(obj, NULL, 
+//SKILL_HIDE))
+  //       return FALSE;
    }
 
    if ( !IS_AFFECTED( obj, AFF_INVISIBLE ) )
@@ -640,6 +639,12 @@ bool CAN_SEE( struct char_data *sub, struct char_data *obj )
 
 bool CAN_SEE_OBJ( struct char_data *sub, struct obj_data *obj )
 {
+   int skill = 0;
+   struct affected_type * cur_af;
+
+   if ((cur_af = affected_by_spell(sub, SPELL_DETECT_MAGIC)))
+     skill = (int)cur_af->modifier;
+
     if ( !IS_MOB(sub) && sub->pcdata->holyLite )
 	return TRUE;
 
@@ -650,8 +655,15 @@ bool CAN_SEE_OBJ( struct char_data *sub, struct obj_data *obj )
       return FALSE;
 
    // only see beacons if you have detect magic up
-   if (GET_ITEM_TYPE(obj) == ITEM_BEACON && !IS_AFFECTED(sub, AFF_DETECT_MAGIC))
-      return FALSE;
+   if (GET_ITEM_TYPE(obj) == ITEM_BEACON) {
+     if (!IS_AFFECTED(sub, AFF_DETECT_MAGIC)) {
+       return FALSE;
+     } else {
+       if (skill < 50) {
+         return FALSE;
+       }
+     }
+   }
 
 //   if (IS_AFFECTED(sub, AFF_TRUE_SIGHT) )
   //      return TRUE;
@@ -1082,7 +1094,15 @@ int do_quit(struct char_data *ch, char *argument, int cmd)
     do_sing(ch, "stop", 9);
 
   extractFamiliar(ch);
-//  extractGolem(ch);
+ struct follow_type *fol;
+  for (fol = ch->followers; fol; fol = fol->next)
+    if (IS_NPC(fol->follower) &&
+mob_index[fol->follower->mobdata->nr].virt == 8)
+    {
+      release_message(fol->follower);
+      extract_char(fol->follower, FALSE);
+    }
+
   affect_from_char(ch, SPELL_IRON_ROOTS);
 
   if(ch->beacon)
@@ -1119,7 +1139,7 @@ int do_quit(struct char_data *ch, char *argument, int cmd)
 
   for(iWear = 0; iWear < MAX_WEAR; iWear++) 
      if(ch->equipment[iWear])
-       obj_to_char( unequip_char( ch, iWear ), ch );
+       obj_to_char( unequip_char( ch, iWear,1 ), ch );
 
   while(ch->carrying)
     extract_obj(ch->carrying);
@@ -1239,10 +1259,25 @@ int do_beep(struct char_data *ch, char *argument, int cmd)
 int has_skill (CHAR_DATA *ch, sh_int skill)
 {
   struct char_skill_data * curr = ch->skills;
-
+  struct obj_data *o;
+  int bonus = 0;
   while(curr) {
     if(curr->skillnum == skill)
-      return ((int)curr->learned);
+    {
+	if (!IS_NPC(ch))
+      for (o = ch->pcdata->skillchange;o;o=o->next_skill)
+      {
+	int a;
+	for (a = 0; a < o->num_affects;a++)
+	{
+	  if (o->affected[a].location == skill*1000)
+	  {
+	    bonus += o->affected[a].modifier;
+	  }
+	}	
+       }  
+       return ((int)curr->learned)+bonus; 
+    }
     curr = curr->next;
   }
   return 0;
@@ -1256,7 +1291,6 @@ char * get_skill_name(int skillnum)
     extern char *songs[];
     extern char *ki[];
     extern char *innate_skills[];
-
     if(skillnum >= SKILL_SONG_BASE && skillnum <= SKILL_SONG_MAX)
        return songs[skillnum-SKILL_SONG_BASE];
     else if(skillnum >= SKILL_BASE && skillnum <= SKILL_MAX)
@@ -1267,7 +1301,8 @@ char * get_skill_name(int skillnum)
        return spells[skillnum-1];
     else if(skillnum >= SKILL_INNATE_BASE && skillnum <= SKILL_INNATE_MAX)
        return innate_skills[skillnum-SKILL_INNATE_BASE];
-
+    else if (skillnum >= BASE_SETS && skillnum <= SET_MAX)
+	return set_list[skillnum-BASE_SETS].SetName;
    return NULL;      
 }
 
@@ -1404,5 +1439,25 @@ void check_timer()
 	continue;
     }
     las = curr;
+  }
+}
+
+int get_line(FILE * fl, char *buf)
+{ 
+  char temp[256];
+  int lines = 0;
+
+  do {
+    lines++; 
+    fgets(temp, 256, fl);
+    if (*temp)
+      temp[strlen(temp) - 1] = '\0';
+  } while (!feof(fl) && (*temp == '*' || !*temp));
+    
+  if (feof(fl))
+    return 0;
+  else {
+    strcpy(buf, temp);
+    return lines;
   }
 }

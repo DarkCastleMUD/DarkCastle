@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.46 2004/07/25 10:20:35 rahz Exp $
+| $Id: inventory.cpp,v 1.47 2004/11/16 00:51:35 Zaphod Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -49,6 +49,7 @@ extern struct obj_data *object_list;
 extern int rev_dir[];
 
 /* extern functions */
+void save_corpses(void);
 char *fname(char *namelist);
 int isname(char *arg, char *arg2);
 struct obj_data *create_money( int amount );
@@ -59,11 +60,10 @@ struct obj_data * search_char_for_item(char_data * ch, sh_int item_number);
 
 
 /* procedures related to get */
-void get(struct char_data *ch, struct obj_data *obj_object, 
-    struct obj_data *sub_object)
+void get(struct char_data *ch, struct obj_data *obj_object, struct obj_data *sub_object)
 {
     char buffer[MAX_STRING_LENGTH];
-
+   
     if(!sub_object || sub_object->carried_by != ch) 
     {
       // we only have to check for uniqueness if the container is not on the character
@@ -102,9 +102,12 @@ void get(struct char_data *ch, struct obj_data *obj_object,
 	sprintf(buffer,"There was %d coins.\n\r",
 		obj_object->obj_flags.value[0]);
 	send_to_char(buffer,ch);
-	if (sub_object && sub_object->obj_flags.value[3] == 1 && 
-!isname("pc",sub_object->name) && ch->clan 
-&& get_clan(ch)->tax && !IS_SET(GET_TOGGLES(ch), PLR_NOTAX))
+//	if (sub_object && sub_object->obj_flags.value[3] == 1 && 
+//           !isname("pc",sub_object->name) && ch->clan 
+//            && get_clan(ch)->tax && !IS_SET(GET_TOGGLES(ch), PLR_NOTAX))
+	if (((sub_object && sub_object->obj_flags.value[3] == 1 && 
+           !isname("pc",sub_object->name)) || !sub_object) && ch->clan 
+            && get_clan(ch)->tax && !IS_SET(GET_TOGGLES(ch), PLR_NOTAX))
 	{
 	  int cgold = (int)((float)(obj_object->obj_flags.value[0]) * (float)((float)(get_clan(ch)->tax)/100.0));
 	  GET_GOLD(ch) += obj_object->obj_flags.value[0] - cgold;
@@ -115,6 +118,8 @@ void get(struct char_data *ch, struct obj_data *obj_object,
 	GET_GOLD(ch) += obj_object->obj_flags.value[0];
 	extract_obj(obj_object);
     }
+
+    save_corpses();
 }
 
 // return eSUCCESS if item was picked up
@@ -218,37 +223,55 @@ int do_get(struct char_data *ch, char *argument, int cmd)
 		  continue;
 
                 // Can't pick up NO_NOTICE items with 'get all'  only 'all.X' or 'X'
-                if(!alldot && IS_SET(obj_object->obj_flags.more_flags, ITEM_NONOTICE))
+                if(!alldot && IS_SET(obj_object->obj_flags.more_flags, ITEM_NONOTICE) && GET_LEVEL(ch) < IMMORTAL)
                   continue;
 
                 // Ignore NO_TRADE items on a 'get all'
-                if(IS_SET(obj_object->obj_flags.more_flags, ITEM_NO_TRADE) && GET_LEVEL(ch) < 100) {
+                if(IS_SET(obj_object->obj_flags.more_flags, ITEM_NO_TRADE) && GET_LEVEL(ch) < IMMORTAL) {
                   csendf(ch, "The %s appears to be NO_TRADE so you don't pick it up.\r\n", obj_object->short_description);
                   continue;
                 }
+		if (GET_ITEM_TYPE(obj_object) == ITEM_MONEY &&
+			obj_object->obj_flags.value[0] > 10000 &&
+			GET_LEVEL(ch) < 5)
+		{
+		  send_to_char("You cannot pick up that much money!\r\n",ch);
+		  continue;
+		}
+
+		if (obj_object->obj_flags.eq_level > 9 && GET_LEVEL(ch) < 5)
+		{
+		  csendf(ch, "The %s is too powerful for you to possess.\r\n", obj_object->short_description);
+		  continue;	
+		}
 
                 // PC corpse
 		if(obj_object->obj_flags.value[3] == 1 && isname("pc", obj_object->name))
                 {
                    sprintf(buffer, "%s_consent", GET_NAME(ch));
-		   if(isname(GET_NAME(ch), obj_object->name) || GET_LEVEL(ch) >= 105)
+		   if(isname(GET_NAME(ch), obj_object->name) || GET_LEVEL(ch) >= OVERSEER)
                      has_consent = TRUE;
 
 		   if(!has_consent && !isname(GET_NAME(ch), obj_object->name)) {
-		     send_to_char("You don't have consent to take the corpse.\n\r", ch);
-		     continue;
+                     if (GET_LEVEL(ch) < OVERSEER) {
+		       send_to_char("You don't have consent to take the corpse.\n\r", ch);
+		       continue;
+                     }
                    }
                    if(has_consent && contains_no_trade_item(obj_object)) {
-                     if (GET_LEVEL(ch) < 105) {
+                     if (GET_LEVEL(ch) < OVERSEER) {
                        send_to_char("This item contains no_trade items that cannot be picked up.\n\r", ch);
 		       has_consent = FALSE; // bugfix, could loot without consent
                        continue;
                      }
                    }
-                   has_consent = FALSE;  // reset it for the next item:P
+                   if (GET_LEVEL(ch) < OVERSEER)
+                     has_consent = FALSE;  // reset it for the next item:P
+                   else
+                     has_consent = TRUE;  // reset it for the next item:P
 		}
 		
-		if (CAN_SEE_OBJ(ch, obj_object)) 
+		if (CAN_SEE_OBJ(ch, obj_object) && GET_LEVEL(ch) < IMMORTAL) 
 		{
                     // Don't bother checking this if item is gold coins.
 		    if ((IS_CARRYING_N(ch) + 1) > CAN_CARRY_N(ch) &&
@@ -274,7 +297,10 @@ int do_get(struct char_data *ch, char *argument, int cmd)
 			send_to_char("You can't take that.\n\r", ch);
 			fail = TRUE;
 		    }
-		}
+		} else if (CAN_SEE_OBJ(ch, obj_object) && GET_LEVEL(ch) >= IMMORTAL && CAN_WEAR(obj_object,ITEM_TAKE)) {
+		    get(ch,obj_object,sub_object);
+                    found = TRUE;
+                }
 	    } // of for loop
 	    if (found) {
 		send_to_char("OK.\n\r", ch);
@@ -318,6 +344,19 @@ int do_get(struct char_data *ch, char *argument, int cmd)
 		    sprintf(buffer,"%s : You can't carry that much weight.\n\r", fname(obj_object->name));
 		    send_to_char(buffer, ch);
 		    fail = TRUE;
+		}
+                else if (GET_ITEM_TYPE(obj_object) == ITEM_MONEY &&
+                        obj_object->obj_flags.value[0] > 10000 &&
+			GET_LEVEL(ch) < 5)
+                {
+                  send_to_char("You cannot pick up that much money!\r\n",ch);
+		fail = TRUE;
+                }
+
+		else if (obj_object->obj_flags.eq_level > 9 && GET_LEVEL(ch) < 5)
+		{
+		  csendf(ch, "The %s is too powerful for you to possess.\r\n", obj_object->short_description);
+		  fail = TRUE;	
 		} else if (CAN_WEAR(obj_object,ITEM_TAKE)) 
                 {
                     if(cmd == 10) palm(ch, obj_object, sub_object);
@@ -362,7 +401,8 @@ int do_get(struct char_data *ch, char *argument, int cmd)
 		     return eFAILURE;
                    }
                 }
-		if (GET_ITEM_TYPE(sub_object) == ITEM_CONTAINER) {
+		if (GET_ITEM_TYPE(sub_object) == ITEM_CONTAINER
+		|| GET_ITEM_TYPE(sub_object) == ITEM_ALTAR) {
 		  if (IS_SET(sub_object->obj_flags.value[1], CONT_CLOSED)){
 		    sprintf(buffer, "The %s is closed.\n\r",fname(sub_object->name));
 		    send_to_char(buffer, ch);
@@ -383,7 +423,7 @@ int do_get(struct char_data *ch, char *argument, int cmd)
 		    }
 
                     // Ignore NO_TRADE items on a 'get all'
-                    if(IS_SET(obj_object->obj_flags.more_flags, ITEM_NO_TRADE) && GET_LEVEL(ch) < IMMORTAL) {
+                    if(IS_SET(obj_object->obj_flags.more_flags, ITEM_NO_TRADE) && GET_LEVEL(ch) < 100) {
                       csendf(ch, "The %s appears to be NO_TRADE so you don't pick it up.\r\n", obj_object->short_description);
                       continue;
                     }
@@ -412,6 +452,20 @@ int do_get(struct char_data *ch, char *argument, int cmd)
                               continue;
                             }
                           }
+               if (GET_ITEM_TYPE(obj_object) == ITEM_MONEY &&
+                        obj_object->obj_flags.value[0] > 10000 &&
+                        GET_LEVEL(ch) < 5)
+                {
+                  send_to_char("You cannot pick up that much money!\r\n",ch);
+                  continue;
+                }
+
+			if (obj_object->obj_flags.eq_level > 9 && GET_LEVEL(ch) < 5)
+ 			{
+			  csendf(ch, "The %s is too powerful for you to possess.\r\n", obj_object->short_description);
+			  continue;	
+			}
+
 		          if (CAN_WEAR(obj_object,ITEM_TAKE)) {
 			    get(ch,obj_object,sub_object);
 			    found = TRUE;
@@ -474,7 +528,8 @@ int do_get(struct char_data *ch, char *argument, int cmd)
 	         return eFAILURE;
                }
             }
-	    if (GET_ITEM_TYPE(sub_object) == ITEM_CONTAINER) 
+	    if (GET_ITEM_TYPE(sub_object) == ITEM_CONTAINER ||
+		GET_ITEM_TYPE(sub_object) == ITEM_ALTAR) 
             {
 	      if (IS_SET(sub_object->obj_flags.value[1], CONT_CLOSED)){
 	        sprintf(buffer,"The %s is closed.\n\r", fname(sub_object->name));
@@ -484,7 +539,21 @@ int do_get(struct char_data *ch, char *argument, int cmd)
 	      obj_object = get_obj_in_list_vis(ch, arg1, sub_object->contains);
 	      if (obj_object) 
               {
-	        if ((IS_CARRYING_N(ch) + 1 > CAN_CARRY_N(ch)) &&
+                if (GET_ITEM_TYPE(obj_object) == ITEM_MONEY &&
+                        obj_object->obj_flags.value[0] > 10000 &&
+                        GET_LEVEL(ch) < 5)
+                {
+                  send_to_char("You cannot pick up that much money!\r\n",ch);
+                  fail = TRUE;
+                }
+
+		else if (obj_object->obj_flags.eq_level > 9 && GET_LEVEL(ch) < 5)
+		{
+		  csendf(ch, "The %s is too powerful for you to possess.\r\n", obj_object->short_description);
+		 fail = TRUE;	
+		}
+
+	        else if ((IS_CARRYING_N(ch) + 1 > CAN_CARRY_N(ch)) &&
                     !( GET_ITEM_TYPE(obj_object) == ITEM_MONEY && obj_object->item_number == -1 && GET_LEVEL(ch) < IMMORTAL)
                    )
                 { 
@@ -752,7 +821,7 @@ int do_drop(struct char_data *ch, char *argument, int cmd)
         send_to_char("Your criminal acts prohibit it.\n\r", ch);
         return eFAILURE;
       }
-      if(IS_SET(tmp_object->obj_flags.more_flags, ITEM_NO_TRADE)) {
+      if(IS_SET(tmp_object->obj_flags.more_flags, ITEM_NO_TRADE) && GET_LEVEL(ch) < IMMORTAL) {
         send_to_char("It seems magically attached to you.\r\n", ch);
         return eFAILURE;
       }
@@ -841,7 +910,8 @@ int do_put(struct char_data *ch, char *argument, int cmd)
 
   if(*arg1) {
     if(*arg2) {
-      if(!(get_obj_in_list_vis(ch, arg2, ch->carrying))) {
+      if(!(get_obj_in_list_vis(ch, arg2, ch->carrying))
+	&& !(get_obj_in_list_vis(ch, arg2, world[ch->in_room].contents))) {
         sprintf(buffer, "You don't have a %s.\n\r", arg2);
         send_to_char(buffer, ch);
         return 1;
@@ -880,7 +950,13 @@ int do_put(struct char_data *ch, char *argument, int cmd)
         bits = generic_find(arg2, FIND_OBJ_INV | FIND_OBJ_ROOM,
                             ch, &tmp_char, &sub_object);
         if(sub_object) {
-          if(GET_ITEM_TYPE(sub_object) == ITEM_CONTAINER) {
+          if(GET_ITEM_TYPE(sub_object) == ITEM_CONTAINER ||
+		GET_ITEM_TYPE(sub_object) == ITEM_ALTAR) {
+	    if (GET_ITEM_TYPE(sub_object) == ITEM_ALTAR &&
+	 	GET_ITEM_TYPE(obj_object) != ITEM_TOTEM) {
+		send_to_char("You cannot put that in an altar.\r\n",ch);
+		return eFAILURE;
+	}
 	    if(!IS_SET(sub_object->obj_flags.value[1], CONT_CLOSED)) {
 	      if(obj_object == sub_object) {
 		send_to_char(
@@ -1075,6 +1151,7 @@ int do_give(struct char_data *ch, char *argument, int cmd)
       send_to_char("Your criminal acts prohibit it.\n\r", ch);
       return eFAILURE;
     }
+
     if (IS_SET(obj->obj_flags.extra_flags, ITEM_NODROP))
     {
       if(GET_LEVEL(ch) < DEITY)
@@ -1187,6 +1264,12 @@ int do_give(struct char_data *ch, char *argument, int cmd)
     act("$n gives you $p.", ch, obj, vict, TO_VICT, 0);
     act("You give $p to $N.", ch, obj, vict, TO_CHAR, 0);
 
+    if((vict->in_room >= 0 && vict->in_room <= top_of_world) && GET_LEVEL(vict) < IMMORTAL && 
+      IS_SET(world[vict->in_room].room_flags, ARENA) && arena[2] == -3 && obj_index[obj->item_number].virt == 393) {
+      send_to_char("Here, have some for some potato lag!!\n\r", vict);
+      WAIT_STATE(vict, PULSE_VIOLENCE *2);
+    }
+
 //    send_to_char("Ok.\n\r", ch);
     do_save(ch,"",10);
     do_save(vict,"",10);
@@ -1218,7 +1301,8 @@ struct obj_data * bring_type_to_front(char_data * ch, int item_type)
   for(i = ch->carrying; i ; i = i->next_content) {
     if(GET_ITEM_TYPE(i) == item_type)
       return i;
-    if(GET_ITEM_TYPE(i) == ITEM_CONTAINER) { // search inside
+    if(GET_ITEM_TYPE(i) == ITEM_CONTAINER && !IS_SET(i->obj_flags.value[1], CONT_CLOSED)) { // search inside if open
+  //  if(GET_ITEM_TYPE(i) == ITEM_CONTAINER) { // search inside if open
       for(j = i->contains; j ; j = j->next_content) {
         if(GET_ITEM_TYPE(j) == item_type) {
           get(ch, j, i);

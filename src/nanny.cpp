@@ -1,3 +1,4 @@
+
 /***************************************************************************
 *  File: nanny.c, for people who haven't logged in        Part of DIKUMUD *
 *  Copyright (C) 1990, 1991 - see 'license.doc' for complete information. *
@@ -16,7 +17,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.70 2004/07/21 22:49:13 rahz Exp $ */
+/* $Id: nanny.cpp,v 1.71 2004/11/16 00:51:35 Zaphod Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -53,6 +54,7 @@ extern "C" {
 #include <utility.h>
 #include <levels.h>
 #include <ki.h>
+#include <clan.h>
 #include <fileinfo.h> // SAVE_DIR
 #include <db.h> // init_char..
 #include <mobile.h>
@@ -363,6 +365,30 @@ void do_inate_race_abilities(char_data * ch)
 */
 }
 
+OBJ_DATA *clan_altar(char_data *ch)
+{
+  struct clan_data *clan;
+  struct clan_room_data *room;
+   extern clan_data *clan_list;
+
+  if (ch->clan)
+  for (clan = clan_list; clan ; clan = clan->next)
+    if (clan->number == ch->clan)
+    {
+	for (room = clan->rooms; room; room = room->next)
+        {
+	  if (real_room(room->room_number) == -1) continue;
+	  OBJ_DATA *t = world[real_room(room->room_number)].contents;
+	  for ( ; t; t = t->next_content)
+	  {
+	    if (t->obj_flags.type_flag == ITEM_ALTAR)
+	      return t;
+	  }
+	}
+    }
+  return NULL;
+}
+
 // stuff that has to be done on both a normal login, as well as on 
 // a hotboot login
 void do_on_login_stuff(char_data * ch)
@@ -375,7 +401,20 @@ void do_on_login_stuff(char_data * ch)
     redo_mana (ch);
     redo_ki(ch);
     do_inate_race_abilities(ch);
-
+    /* Add a character's skill item's to the list. */
+    ch->pcdata->skillchange = NULL;
+    for (int i = 0;i < MAX_WEAR;i++)
+    {
+       if (!ch->equipment[i]) continue;
+       for (int a =0; a < ch->equipment[i]->num_affects; a++)
+       {
+	 if (ch->equipment[i]->affected[a].location >= 1000)
+	 {
+		ch->equipment[i]->next_skill = ch->pcdata->skillchange;
+		ch->pcdata->skillchange = ch->equipment[i];
+	  }
+       }
+    }
     // add character base saves to saving throws
     for(int i = 0; i <= SAVE_TYPE_MAX; i++) {
       ch->saves[i] += GET_LEVEL(ch)/2;
@@ -390,29 +429,79 @@ void do_on_login_stuff(char_data * ch)
     {
        GET_AC(ch) -= (GET_LEVEL(ch) * 2);
     }
-    if (!str_cmp(GET_NAME(ch), "Apocalypse") && !IS_NPC(ch) && ch->pcdata)
+/*    if (!str_cmp(GET_NAME(ch), "Apocalypse") && !IS_NPC(ch) && ch->pcdata)
     {
 	send_to_char("You tosser. Here you go: one silence.\r\n",ch);
 	SET_BIT(ch->pcdata->punish, PUNISH_SILENCED);
-    }
+    } */
     if (affected_by_spell(ch,INTERNAL_SLEEPING))
     {
       affect_from_char(ch,INTERNAL_SLEEPING);
     }
     /* Set ISR's cause they're not saved...   */
     isr_set(ch);
-    
+    ch->altar = clan_altar(ch);    
     if(!IS_MOB(ch) && GET_LEVEL(ch) >= IMMORTAL) {
        ch->pcdata->holyLite   = TRUE;
        ch->pcdata->wizinvis = GET_LEVEL(ch);
        GET_COND(ch, THIRST) = -1;
        GET_COND(ch, FULL) = -1;
     }
-
-    if (GET_LEVEL(ch) < 6) 	 char_to_room( ch, real_room(200));
+    add_totem_stats(ch);
+    if (GET_LEVEL(ch) < 5) 	 char_to_room( ch, real_room(200));
     else if(ch->in_room >= 2)                 char_to_room( ch, ch->in_room );
     else if(GET_LEVEL(ch) >=  IMMORTAL)  char_to_room( ch, real_room(17) );
     else                                 char_to_room( ch, real_room(START_ROOM) );
+
+
+    // Remove pick if they're no longer allowed to have it.
+     if (GET_CLASS(ch) == CLASS_THIEF && GET_LEVEL(ch) < 22 &&
+		has_skill(ch, SKILL_PICK_LOCK))
+     {
+	  struct char_skill_data * curr = ch->skills, *prev = NULL;
+	  while(curr)
+	    if(curr->skillnum == SKILL_PICK_LOCK)
+    	    {
+		if (prev) prev->next = curr->next;
+		else ch->skills = curr->next;
+		FREE(curr);
+		break;
+	    }
+	    else { prev = curr; curr = curr->next; }
+	
+     }
+    // Remove ventriloquate
+     if (GET_CLASS(ch) == CLASS_MAGIC_USER && has_skill(ch, SPELL_VENTRILOQUATE)) {
+          struct char_skill_data * curr = ch->skills, *prev = NULL;
+          while(curr)
+            if(curr->skillnum == SPELL_VENTRILOQUATE) {
+                if (prev) prev->next = curr->next;
+                else ch->skills = curr->next;
+                FREE(curr);
+                break;
+            } else { prev = curr; curr = curr->next; }
+      }
+          struct char_skill_data *  curr = ch->skills; 
+	  struct char_skill_data *  prev = NULL;
+	  int search_skills2(int arg, class_skill_defines * list_skills);
+	  struct class_skill_defines * get_skill_list(char_data * ch);
+ 	  struct class_skill_defines *a = get_skill_list(ch);
+ 	  extern struct class_skill_defines g_skills[];
+
+          while(curr)
+            if(curr->skillnum < 600 && search_skills2(curr->skillnum,a)==-1
+		&& search_skills2(curr->skillnum, g_skills) == -1)
+	    {
+	    struct char_skill_data *a = curr->next;
+                if (prev) prev->next = curr->next;
+                else ch->skills = curr->next;
+                FREE(curr);
+		curr = a;
+           } else { prev = curr; curr = curr->next; }
+
+
+
+
 }
 
 void roll_and_display_stats(CHAR_DATA * ch)
@@ -497,7 +586,7 @@ bool allowed_host(char *host)
 { /* Wizlock uses hosts for wipe. */
   int i;
   extern bool str_prefix(const char *astr, const char *bstr);
-  for (i = 0; i < (sizeof(host_list) / sizeof(char*));i++)
+  for (i = 0; i < (int)((sizeof(host_list) / sizeof(char*)));i++)
     if (!str_prefix(host_list[i], host))
       return TRUE;
   return FALSE;
@@ -1517,15 +1606,15 @@ break;
              dc_free(ch->description);
           }
 #ifdef LEAK_CHECK
-          ch->description = (char *)calloc(240, sizeof(char));
+          ch->description = (char *)calloc(540, sizeof(char));
 #else
-          ch->description = (char *)dc_alloc(240, sizeof(char));
+          ch->description = (char *)dc_alloc(540, sizeof(char));
 #endif
 
  // TODO - what happens if I get to this point, then disconnect, and reconnect?  memory leak?
 
           d->str     = &ch->description;
-          d->max_str = 239;
+          d->max_str = 539;
           STATE(d)   = CON_EXDSCR;
           break;
       

@@ -64,10 +64,6 @@ int do_pview(struct char_data *ch, char *argument, int cmd)
 
   void make_prompt(struct descriptor_data *point, char *prompt);
 
-  if(!has_skill(ch, COMMAND_PROMPT_VIEW)) {
-        send_to_char("Huh?\r\n", ch);
-        return eFAILURE;
-  }
 
   argument = one_argument(argument, name);
 
@@ -200,10 +196,6 @@ int do_send(struct char_data *ch, char *argument, int cmd)
     name[99]     = '\0';
     message[199] = '\0';
 
-    if(!has_skill(ch, COMMAND_SEND)) {
-        send_to_char("Huh?\r\n", ch);
-        return eFAILURE;
-    }
 
     if(!*name || !*message) {
        send_to_char("Send what to who?\r\n", ch);

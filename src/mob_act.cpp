@@ -19,7 +19,7 @@
 /* 12/06/2003   Onager   Modified mobile_activity() to prevent charmie    */
 /*                       scavenging                                       */
 /**************************************************************************/
-/* $Id: mob_act.cpp,v 1.26 2004/07/20 11:05:23 urizen Exp $ */
+/* $Id: mob_act.cpp,v 1.27 2004/11/16 00:51:35 Zaphod Exp $ */
 
 extern "C"
 {
@@ -44,6 +44,7 @@ extern "C"
 #include <string.h>
 #include <spells.h>
 #include <race.h> // Race defines used in align-aggro messages.
+#include <comm.h>
 
 extern CHAR_DATA *character_list;
 extern struct index_data *mob_index;
@@ -110,6 +111,7 @@ void mobile_activity(void)
     if(!IS_MOB(ch))
       continue;
     
+    if (MOB_WAIT_STATE(ch) > 0) MOB_WAIT_STATE(ch) -= PULSE_MOBILE;
     if(IS_AFFECTED(ch, AFF_PARALYSIS))
       continue;
     
@@ -615,19 +617,40 @@ void mob_suprised_sayings(char_data * ch, char_data * aggressor)
 }
 
 /* check to see if the player is protected from the mob */
+// PROTECTION_FROM_EVIL and GOOD modifier contains the level
+// protected from.  PAL's ANTI's take spell/level whichever higher
 bool is_protected(struct char_data *vict, struct char_data *ch)
 {
+   struct affected_type *aff = affected_by_spell(vict, SPELL_PROTECT_FROM_EVIL);
+   int level_protected = aff?aff->modifier:0;
+   if(GET_CLASS(vict) == CLASS_ANTI_PAL && IS_EVIL(vict) && GET_LEVEL(vict) > level_protected)
+      level_protected = GET_LEVEL(vict);
+
+   if(IS_EVIL(ch) && GET_LEVEL(ch) < level_protected)
+      return(true);
+      
+   aff = affected_by_spell(vict, SPELL_PROTECT_FROM_GOOD);
+   level_protected = aff?aff->modifier:0;
+   if(GET_CLASS(vict) == CLASS_PALADIN && IS_GOOD(vict) && GET_LEVEL(vict) > level_protected)
+      level_protected = GET_LEVEL(vict);
+
+   if(IS_GOOD(ch) && GET_LEVEL(ch) < level_protected)
+      return(true);
+
+/* old version
    if(IS_EVIL(ch) && GET_LEVEL(ch) <= (GET_LEVEL(vict))) {
       if((IS_AFFECTED(vict, AFF_PROTECT_EVIL)) ||
         (GET_CLASS(vict) == CLASS_ANTI_PAL && IS_EVIL(vict)))
            return(true);
    }
-      
+
    if(IS_GOOD(ch) && GET_LEVEL(ch) <= (GET_LEVEL(vict))) {
       if((affected_by_spell(vict, SPELL_PROTECT_FROM_GOOD)) ||
         (GET_CLASS(vict) == CLASS_PALADIN && IS_GOOD(vict)))
            return(true);
    }
+*/
+
    return(false);
 }
 

@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.53 2004/07/25 10:20:35 rahz Exp $ */
+/* $Id: limits.cpp,v 1.54 2004/11/16 00:51:35 Zaphod Exp $ */
 
 extern "C"
 {
@@ -53,6 +53,7 @@ extern struct index_data *obj_index;
 extern struct index_data *mob_index;
 /* External procedures */
 
+void save_corpses(void);
 void update_pos( CHAR_DATA *victim );                 /* in fight.c */
 struct time_info_data age(CHAR_DATA *ch);
 
@@ -174,14 +175,15 @@ int mana_gain(CHAR_DATA *ch)
     gain += modifier;
   }
 
-  gain += ch->mana_regen;
-
 
   if((GET_COND(ch,FULL)==0)||(GET_COND(ch,THIRST)==0))
     gain >>= 2;
   gain /= 4;
   gain /= divisor; 
   gain += MIN(age(ch).year,100) / 5;
+
+  gain += ch->mana_regen;
+
   return MAX(1,gain);
 }
 
@@ -192,6 +194,7 @@ const int hit_regens[] = {
 /* Hitpoint gain pr. game hour */
 int hit_gain(CHAR_DATA *ch)
 {
+
   int gain = 1;
   struct affected_type * af;
   int divisor =1;
@@ -226,7 +229,6 @@ int hit_gain(CHAR_DATA *ch)
      gain += con_app[GET_CON(ch)].hp_regen;
       gain += GET_CON(ch);
   }
-  gain += ch->hit_regen;
   if (ch->affected_by2 & AFF_REGENERATION)
     gain += (gain/2);
 
@@ -236,6 +238,8 @@ int hit_gain(CHAR_DATA *ch)
   gain -= MIN(age(ch).year,100) / 10;
 
   gain /= divisor;
+  gain += ch->hit_regen;
+ 
   return MAX(1,gain);
 }
 
@@ -282,14 +286,15 @@ int move_gain(CHAR_DATA *ch)
           gain += (int)(af->modifier * 1.5);
     }
 
-    gain += ch->move_regen;
-
 
     if((GET_COND(ch,FULL)==0)||(GET_COND(ch,THIRST)==0))
 	gain >>= 2;
    gain /= divisor;
    gain -= MIN(100, age(ch).year) / 10;
  
+   gain += ch->move_regen;
+
+
     return MAX(1,gain);
 }
 
@@ -304,6 +309,14 @@ void redo_hitpoints( CHAR_DATA *ch)
 //  bonus = (GET_CON(ch) * GET_CON(ch)) / 30; 
 
   ch->max_hit += bonus;
+  struct affected_type * af = ch->affected;
+
+  while(af) {
+    if(af->location == APPLY_HIT)
+	ch->max_hit += af->modifier;
+    af = af->next;
+  }
+
 
   for (i=0; i<MAX_WEAR; i++) 
   {
@@ -341,7 +354,14 @@ void redo_mana ( CHAR_DATA *ch)
 
   ch->max_mana += bonus;
 
-  for (i=0; i<MAX_WEAR; i++) 
+  struct affected_type *af;
+  af = ch->affected;
+  while(af) {
+    if(af->location == APPLY_MANA)
+        ch->max_mana += af->modifier;
+    af = af->next;
+  }
+ for (i=0; i<MAX_WEAR; i++) 
   {
     if (ch->equipment[i])
       for (j=0; j<ch->equipment[i]->num_affects; j++) 
@@ -362,6 +382,15 @@ void redo_ki(CHAR_DATA *ch)
      ch->max_ki += GET_WIS(ch) > 15 ? GET_WIS(ch) - 15:0;
    else if (GET_CLASS(ch) == CLASS_BARD)
      ch->max_ki += GET_INT(ch) > 15 ? GET_INT(ch)-15:0;   
+
+  struct affected_type *af;
+  af = ch->affected;
+  while(af) {
+    if(af->location == APPLY_KI)
+        ch->max_ki += af->modifier;
+    af = af->next;
+  }
+
   for (i=0; i<MAX_WEAR; i++)
   {
     if (ch->equipment[i])
@@ -683,6 +712,32 @@ void point_update( void )
     continue;
   }
 
+    int a;
+     CHAR_DATA *temp;
+    if (!IS_NPC(i) && IS_SET(i->affected_by, AFF_HIDE) && (a = 
+has_skill(i, SKILL_HIDE)))
+    {
+	int o;
+        for (o = 0; o < MAX_HIDE;o++)
+          i->pcdata->hiding_from[o] = NULL;
+        o = 0;
+        for (temp = world[i->in_room].people; temp; temp = 
+temp->next_in_room)
+        {
+          if (i == temp) continue;
+          if (o >= MAX_HIDE) break;
+          if (number(1,101) > a) // Failed.
+          {
+            i->pcdata->hiding_from[o] = temp;
+            i->pcdata->hide[o++] = FALSE;
+          } else {
+            i->pcdata->hiding_from[o] = temp;
+            i->pcdata->hide[o++] = TRUE;
+          }
+        }
+   }
+
+
     // only heal linkalive's and mobs
     if(GET_POS(i) > POSITION_DEAD && (IS_NPC(i) || i->desc)) {
       GET_HIT(i)  = MIN(GET_HIT(i)  + hit_gain(i),  hit_limit(i));
@@ -699,25 +754,29 @@ void point_update( void )
 
 void update_corpses_and_portals(void)
 {
-  char buf[256];
+  //char buf[256];
   struct obj_data *j, *next_thing;
   struct obj_data *jj, *next_thing2;
   struct obj_data *last_thing;
+   char last_name[256];
   int proc = 0; // Processed items. Debugging.
   void extract_obj(struct obj_data *obj); /* handler.c */
   int last_vnum = 0, last_type = 0;
   /* objects */
   for(j = object_list; j ; j = next_thing,proc++)
   {
+   if (j == (struct obj_data *)0x95959595) break;
     next_thing = j->next; /* Next in object list */
     /* Type 1 is a permanent game portal, and type 3 is a look_only
     |  object.  Type 0 is the spell portal and type 2 is a game_portal
     */
-  //  if (!j || !j->item_number || !obj_index[j->item_number].virt)
-  //    continue;
 
-    last_vnum = obj_index[j->item_number].virt;
-    last_type = GET_ITEM_TYPE(j);
+    //last_vnum = obj_index[j->item_number].virt;
+    //strcpy(last_name, j->name);
+    //last_type = GET_ITEM_TYPE(j);
+    // What exactly do these do?  the variables it creates aren't used anywhere
+    // and creating last_name crashes us because gold doesn't have a obj->name -Rahz
+
     if((GET_ITEM_TYPE(j) == ITEM_PORTAL) && (j->obj_flags.value[1] == 0
         || j->obj_flags.value[1] == 2)) 
     {
@@ -741,7 +800,7 @@ void update_corpses_and_portals(void)
             // TODO ^^^ - makes value[3] for containers a bitvector instead of a boolean
 
       /* timer count down */
-      if (j->obj_flags.timer > 0) j->obj_flags.timer--;
+      if (j->obj_flags.timer > 0) { j->obj_flags.timer--; save_corpses(); }
 
       if (!j->obj_flags.timer) 
       {
@@ -762,7 +821,7 @@ void update_corpses_and_portals(void)
             {
              if (next_thing == jj)
                 next_thing = jj->next;
-             while (next_thing->in_obj == jj)
+             while (next_thing && next_thing->in_obj == jj)
                 next_thing = next_thing->next;
              extract_obj(jj);
             }
@@ -801,10 +860,11 @@ void update_corpses_and_portals(void)
             return;
           }
         }
-	while (next_thing->in_obj == j) next_thing = next_thing->next;
+	while (next_thing && next_thing->in_obj == j) next_thing = next_thing->next;
 			// Is THIS what caused the crasher then?
 			// Wtf: damnit.
         extract_obj(j);
+        save_corpses();
       }
       last_thing = j;
     }

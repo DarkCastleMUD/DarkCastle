@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.55 2004/07/24 02:49:34 rahz Exp $ */
+/* $Id: info.cpp,v 1.56 2004/11/16 00:51:34 Zaphod Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -293,7 +293,8 @@ void list_obj_to_char(struct obj_data *list, struct char_data *ch, int mode,
    
    for(i = list ; i ; i = i->next_content) { 
       if((can_see = CAN_SEE_OBJ(ch, i)) && i->next_content && 
-         i->next_content->item_number == i->item_number && i->item_number != -1) {
+         i->next_content->item_number == i->item_number && i->item_number != -1 
+         && !IS_SET(i->obj_flags.more_flags, ITEM_NONOTICE)) {
          number++;
          continue;
       }
@@ -380,6 +381,11 @@ void show_char_to_char(struct char_data *i, struct char_data *ch, int mode)
    char buf2[MAX_STRING_LENGTH];
    struct clan_data * clan;
    char buf[200];
+   int know_align = -1;
+   struct affected_type * cur_af;
+
+   if ((cur_af = affected_by_spell(ch, SPELL_KNOW_ALIGNMENT)))
+     know_align = (int)cur_af->modifier;
    
    if(mode == 0) 
    {
@@ -397,6 +403,16 @@ void show_char_to_char(struct char_data *i, struct char_data *ch, int mode)
             *buffer = '\0';
             if(!i->desc)
                strcpy(buffer, "*linkdead*  ");
+            if (know_align > 80) {
+              if ((IS_AFFECTED(ch, AFF_DETECT_EVIL) || IS_AFFECTED2(ch, AFF_KNOW_ALIGN)) && IS_EVIL(i)) 
+                strcat(buffer, "$B$4(Red Halo)$B$3 ");
+              if ((IS_AFFECTED(ch, AFF_DETECT_GOOD) || IS_AFFECTED2(ch, AFF_KNOW_ALIGN)) && IS_GOOD(i)) 
+                strcat(buffer, "$B$1(Blue Halo)$B$3 ");
+              if (IS_AFFECTED2(ch, AFF_KNOW_ALIGN) && !IS_GOOD(i) && !IS_EVIL(i)) 
+                strcat(buffer, "$B$5(Yellow Halo)$B$3 ");
+            }
+            if (IS_SET(i->pcdata->toggles, PLR_GUIDE_TOG))
+              strcat(buffer, "$B$7(Guide)$B$3 ");
             strcat(buffer, GET_SHORT(i));
             if((GET_LEVEL(i) < OVERSEER) && i->clan && (clan = get_clan(i))) { 
                if(!IS_MOB(ch) && !IS_SET(ch->pcdata->toggles, PLR_BRIEF)) { 
@@ -463,13 +479,15 @@ void show_char_to_char(struct char_data *i, struct char_data *ch, int mode)
          }
          if ( IS_AFFECTED(i,AFF_INVISIBLE))
             strcat(buffer," $1(invisible)");
-         if (IS_AFFECTED(ch, AFF_DETECT_EVIL) && IS_EVIL(i)) 
-            strcat(buffer, "$R$4(Red Aura)");
-         if (IS_AFFECTED(ch, AFF_DETECT_GOOD) && IS_GOOD(i)) 
-            strcat(buffer, "$B$5(Halo) ");
 	 if (IS_AFFECTED(i, AFF_HIDE) && IS_AFFECTED(ch, AFF_TRUE_SIGHT) && has_skill(ch, SPELL_TRUE_SIGHT) > 80)
             strcat(buffer, "$4 (hidden)");
-         strcat(buffer,"\n\r");
+         if ((IS_AFFECTED(ch, AFF_DETECT_EVIL) || IS_AFFECTED2(ch, AFF_KNOW_ALIGN)) && IS_EVIL(i)) 
+            strcat(buffer, "$B$4(Red Halo) ");
+         if ((IS_AFFECTED(ch, AFF_DETECT_GOOD) || IS_AFFECTED2(ch, AFF_KNOW_ALIGN)) && IS_GOOD(i)) 
+            strcat(buffer, "$B$1(Blue Halo) ");
+         if (IS_AFFECTED2(ch, AFF_KNOW_ALIGN) && !IS_GOOD(i) && !IS_EVIL(i)) 
+            strcat(buffer, "$B$5(Yellow Halo) ");
+         strcat(buffer,"$R\n\r");
          send_to_char(buffer, ch);
          
          show_spells(i, ch);
@@ -480,17 +498,14 @@ void show_char_to_char(struct char_data *i, struct char_data *ch, int mode)
         else
            *buffer = '\0';
         
-        if (IS_AFFECTED(ch, AFF_DETECT_EVIL)) {
-           if (IS_EVIL(i))
-              strcat(buffer, "$R$4(Red Aura)$B$3 ");
-        }
-        
-        if (IS_AFFECTED(ch, AFF_DETECT_GOOD)) {
-           if (IS_GOOD(i))
-              strcat(buffer, "$B$5(Halo)$3 ");
-        }
         if (IS_AFFECTED(i, AFF_HIDE) && IS_AFFECTED(ch, AFF_TRUE_SIGHT) && has_skill(ch, SPELL_TRUE_SIGHT) > 80)
            strcat(buffer, "$4(hidden) $3");
+        if ((IS_AFFECTED(ch, AFF_DETECT_EVIL) || IS_AFFECTED2(ch, AFF_KNOW_ALIGN)) && IS_EVIL(i)) 
+           strcat(buffer, "$B$4(Red Halo)$3 ");
+        if ((IS_AFFECTED(ch, AFF_DETECT_GOOD) || IS_AFFECTED2(ch, AFF_KNOW_ALIGN)) && IS_GOOD(i)) 
+           strcat(buffer, "$B$1(Blue Halo)$3 ");
+        if (IS_AFFECTED2(ch, AFF_KNOW_ALIGN) && !IS_GOOD(i) && !IS_EVIL(i)) 
+           strcat(buffer, "$B$5(Yellow Halo)$3 ");
         strcat(buffer, i->long_desc);
 
         send_to_char(buffer, ch);
@@ -1262,6 +1277,7 @@ int do_score(struct char_data *ch, char *argument, int cmd)
    char buf[MAX_STRING_LENGTH], scratch;
    int  level = 0;
    int to_dam, to_hit;
+   int flying = 0;
    
    struct affected_type *aff;
    extern char *apply_types[];
@@ -1323,10 +1339,10 @@ GET_AGE(ch));
    }
    else send_to_char(
       "($5:$7)=================================($5:$7)===================================($5:$7)\n\r", ch);
+   int found = FALSE;
 
    if((aff = ch->affected))
    {
-      int found = FALSE;
 
       for( ; aff; aff = aff->next) {
          if(aff->type == SKILL_SNEAK)
@@ -1335,6 +1351,8 @@ GET_AGE(ch));
 
          // figure out the name of the affect (if any)
          char * aff_name = get_skill_name(aff->type);
+	 if (aff_name)
+         if (*aff_name && !str_cmp(aff_name, "fly")) flying = 1; 
          switch(aff->type) {
            case FUCK_CANTQUIT:
              aff_name = "CANT_QUIT";
@@ -1376,10 +1394,18 @@ GET_AGE(ch));
          if(++level == 4)
             level = 0;
       }
-      if(found)
-        send_to_char(
-         "($5:$7)========================================================================($5:$7)\n\r", ch);
    }
+   if (flying == 0 && IS_AFFECTED(ch, AFF_FLYING)) {
+     scratch = frills[level];
+     sprintf(buf, "|%c| Affected by fly                             Modifier NONE              |%c|\n\r",
+             scratch, scratch);
+     send_to_char(buf, ch);
+     found = TRUE;
+   }
+   if(found)
+     send_to_char("($5:$7)========================================================================($5:$7)\n\r", ch);
+
+
    if(!IS_NPC(ch)) // mob can't view this part
    {
       if(GET_RANGE(ch) && GET_LEVEL(ch) > IMMORTAL) {

@@ -14,7 +14,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.h,v 1.55 2004/07/25 20:55:30 urizen Exp $ */
+/* $Id: spells.h,v 1.56 2004/11/16 00:52:09 Zaphod Exp $ */
 #include <structs.h> // byte, sh_int
 
 #define MAX_BUF_LENGTH               240
@@ -296,7 +296,9 @@ void check_maxes(CHAR_DATA *ch);
 #define SKILL_FEARGAZE		     369
 #define SKILL_EYEGOUGE		     370
 #define SKILL_MAGIC_RESIST	     371
-#define SKILL_MAX                    371
+#define NEW_SAVE		     372 // Savefix.
+#define SKILL_SPELLCRAFT	     373
+#define SKILL_MAX                    373
 
 // if you add a skill, make sure you update "skills[]" in spells.C
 // as well as SKILL_MAX
@@ -336,20 +338,20 @@ void check_maxes(CHAR_DATA *ch);
 
 // God commands that are "bestow"/"revoke"able
 #define COMMAND_BASE                 600
-#define COMMAND_GOTO                 600
+#define COMMAND_STRING                 600
 #define COMMAND_IMP_CHAN             601
-#define COMMAND_FAKELOG              602
+#define COMMAND_STAT              602
 #define COMMAND_SNOOP                603
-#define COMMAND_LOG                  604
+#define COMMAND_FIND                  604
 #define COMMAND_GLOBAL               605
-#define COMMAND_PROMPT_VIEW          606
+#define COMMAND_POSSESS          606
 #define COMMAND_RESTORE              607
 #define COMMAND_PURLOIN              608
 #define COMMAND_ARENA                609
 #define COMMAND_SET                  610
-#define COMMAND_UNBAN                611
-#define COMMAND_BAN                  612
-#define COMMAND_ECHO                 613
+#define COMMAND_SQSAVE                611
+#define COMMAND_WHATTONERF                  612
+#define COMMAND_FORCE                 613
 #define COMMAND_SEND                 614
 #define COMMAND_LOAD                 615
 #define COMMAND_SHUTDOWN             616
@@ -361,6 +363,13 @@ void check_maxes(CHAR_DATA *ch);
 #define COMMAND_SOCKETS              622
 #define COMMAND_PUNISH               623
 #define COMMAND_SQEDIT		     624
+#define COMMAND_INSTALL		     625
+#define COMMAND_RELOAD 		     626
+#define COMMAND_HEDIT		     627
+#define COMMAND_HINDEX		     628
+#define COMMAND_OPSTAT			629
+#define COMMAND_OPEDIT			630
+#define COMMAND_EQMAX			631
 // make sure up you update bestowable_god_commands_type bestowable_god_commands[]
 // if you modify this command list any
 

@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.111 2004/07/23 02:51:05 urizen Exp $ */
+/* $Id: spells.cpp,v 1.112 2004/11/16 00:51:35 Zaphod Exp $ */
 
 extern "C"
 {
@@ -198,7 +198,7 @@ struct spell_info_type spell_info [ ] =
 
  { /* 57 */ 12, POSITION_STANDING,  7, TAR_NONE_OK|TAR_OBJ_INV|TAR_OBJ_ROOM, cast_cont_light, SKILL_INCREASE_EASY },
 
- { /* 58 */ 12, POSITION_STANDING,  5, TAR_CHAR_ROOM, cast_know_alignment, SKILL_INCREASE_EASY },
+ { /* 58 */ 12, POSITION_STANDING,  5, TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_know_alignment, SKILL_INCREASE_EASY },
 
  { /* 59 */ 12, POSITION_FIGHTING, 28, TAR_CHAR_ROOM|TAR_FIGHT_VICT, cast_dispel_magic, SKILL_INCREASE_HARD },
 
@@ -449,6 +449,8 @@ struct skill_stuff skill_info[] =
 /* 70 */           { "fear gaze", 0 },
 /* 71 */            { "eyegouge", SKILL_INCREASE_HARD },
 /* 72 */         { "magic resist", SKILL_INCREASE_HARD },
+/* 73 */         { "ignorethis", 0},
+/* 74 */	{ "spellcraft", SKILL_INCREASE_MEDIUM},
 /*    */ { "\n", 0 },
 };
 
@@ -528,6 +530,8 @@ char *skills[]=
   "fear gaze",
   "eyegouge",
   "magic resist",
+  "ignorethis",
+  "spellcraft",
   "\n"
 };
 
@@ -685,11 +689,11 @@ int dam_percent(int learned, int damage)
 {
   float percent;
   percent = 50;
-
+  if (!learned) percent /= 2;
   percent += learned/2;
 //  else percent = 90 + ((learned - 90) *2);
   
-  return (int)((float)damage * (float)(percent/100.0));
+  return (int)((float)damage * (float)percent/100.0);
 }
 
 int use_mana( CHAR_DATA *ch, int sn )
@@ -1212,7 +1216,7 @@ bool isaff2(int spellnum);
           return eSUCCESS;
        }
     }
-    send_to_char("No such spell to release.",ch);
+    send_to_char("No such spell to release.\r\n",ch);
     return eSUCCESS;
 }
 
@@ -1257,7 +1261,7 @@ bool skill_success(CHAR_DATA *ch, CHAR_DATA *victim, int skillnum, int mod )
 //  int modifier = 0;
   extern class_skill_defines *get_skill_list(char_data *ch);
   extern int get_stat(CHAR_DATA *ch, int stat);
-  struct class_skill_defines *t;
+  //struct class_skill_defines *t;
   int stat=0;
   switch (skillnum)
   {
@@ -1354,11 +1358,13 @@ bool skill_success(CHAR_DATA *ch, CHAR_DATA *victim, int skillnum, int mod )
 	i -= stat_mod[get_stat(victim,stat)];
     }
   i += mod;
-  if (GET_CLASS(ch) == CLASS_MAGIC_USER || GET_CLASS(ch) == CLASS_ANTI_PAL || GET_CLASS(ch) == CLASS_THIEF)
+  if (i < 40) i = 40;
+
+  if (GET_CLASS(ch) == CLASS_MAGIC_USER || GET_CLASS(ch) == CLASS_ANTI_PAL || 
+GET_CLASS(ch) == CLASS_THIEF)
        i += int_app[GET_INT(ch)].conc_bonus;
   else i += wis_app[GET_WIS(ch)].conc_bonus;
   
-  if (i < 33) i = 33;
   if (IS_AFFECTED2(ch, AFF_FOCUS) && ((skillnum >= SKILL_SONG_BASE && 
 skillnum <= SKILL_SONG_MAX) || (skillnum >= KI_OFFSET && skillnum <= (KI_OFFSET+MAX_KI_LIST))))
    i = 101; // auto success on songs and ki with focus
@@ -1494,7 +1500,57 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
       tar_char = 0;
       tar_obj = 0;
       
-      if (!IS_SET(spell_info[spl].targets, TAR_IGNORE)) 
+      if (spl == SPELL_LIGHTNING_BOLT && has_skill(ch, SKILL_SPELLCRAFT))
+      { // Oh the special cases of spellcraft.
+	 if (argument && *argument)
+	 {
+  	  int dir = -1;
+	   *argument = LOWER(*argument);
+ 	   if(*argument == 'n') dir = 0;
+	   else if(*argument == 'e') dir = 1;
+ 	   else if (*argument == 's') dir = 2;
+	   else if(*argument == 'w') dir = 3;
+	   else if(*argument == 'u') dir = 4;
+	   else if(*argument == 'd') dir = 5;
+	   if (dir == -1)
+	   {
+		send_to_char("Fire a lightning bolt where?\r\n",ch);
+		return eFAILURE;
+	   }
+	   if (!world[ch->in_room].dir_option[dir])
+	   {
+		send_to_char("The wall blocks your attempt.\r\n",ch);
+		return eFAILURE;
+	   }
+	   int new_room = world[ch->in_room].dir_option[dir]->to_room;
+	   if(IS_SET(world[new_room].room_flags, SAFE))
+	   {
+   	     send_to_char("That room is protected from this harfum magic\r\n", ch);
+	     return eFAILURE;
+	   }
+	   int oldroom = ch->in_room;
+	   char_from_room(ch);
+	   if (!char_to_room(ch, new_room)) {
+	     char_to_room(ch, oldroom);
+	    send_to_char("Error code: 57A. Report this to an immortal, along with what you typed.\r\n",ch);
+	    return eFAILURE;
+	   }
+	   if (!(tar_char = get_char_room_vis(ch, name)))
+	   {
+		   char_from_room(ch); 
+		char_to_room(ch, oldroom);
+	        send_to_char("You don't see anyone like that there.\r\n",ch);
+		return eFAILURE;
+	   }
+	  if (spellcraft(ch, SPELL_LIGHTNING_BOLT))
+	  {
+		send_to_char("You don't know how.\r\n",ch);
+		return eFAILURE;
+           }
+	   target_ok = TRUE;
+	 }
+      }
+      if (!target_ok && !IS_SET(spell_info[spl].targets, TAR_IGNORE)) 
       {
         argument = one_argument(argument, name);
 
@@ -1621,8 +1677,11 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
 
       if (spl != SPELL_VENTRILOQUATE)  /* :-) */
         say_spell(ch, spl);
-
+	if ((spl != SPELL_MAGIC_MISSILE && spl != SPELL_FIREBALL) ||
+	  !spellcraft(ch,spl))
       WAIT_STATE(ch, spell_info[spl].beats);
+	else 
+	WAIT_STATE(ch, spell_info[spl].beats/1.5);
       
       if ((spell_info[spl].spell_pointer == 0) && spl>0)
         send_to_char("Sorry, this magic has not yet been implemented :(\n\r", ch);
@@ -1657,16 +1716,18 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
           else chance += GET_WIS(ch);*/
         chance = has_skill(ch, spl);
 
-
-        if (chance <= 40) chance = 40;
-        else chance = chance + (int)((float)(chance)/1.75);
+        if (chance <= 40) 
+          chance = 40;
+        else 
+          chance = chance + (int)((float)(chance) / 1.75);
 
 	if (GET_CLASS(ch) == CLASS_MAGIC_USER || GET_CLASS(ch) == CLASS_ANTI_PAL)
 	  chance += int_app[GET_INT(ch)].conc_bonus;
-	else chance += wis_app[GET_WIS(ch)].conc_bonus;
-	chance = MIN(96, chance);
+	else 
+          chance += wis_app[GET_WIS(ch)].conc_bonus;
+	chance = MIN(93, chance);
 
-        if(GET_LEVEL(ch) < IMMORTAL && number(1,101) > chance && !IS_AFFECTED2(ch,AFF_FOCUS))
+        if(GET_LEVEL(ch) < IMMORTAL && number(1,100) > chance && !IS_AFFECTED2(ch,AFF_FOCUS))
         {
           csendf(ch, "You lost your concentration and are unable to cast %s!\n\r", spells[spl-1]);
           GET_MANA(ch) -= (use_mana(ch, spl) >> 1);
@@ -1684,8 +1745,10 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
         send_to_char("Ok.\n\r", ch);
 
         GET_MANA(ch) -= (use_mana(ch, spl));
-        if (tar_char && !AWAKE(tar_char) && number(1,5) < 3)
+        if (tar_char && !AWAKE(tar_char) && ch->in_room == tar_char->in_room && number(1,5) < 3)
             send_to_char("Your sleep is restless.\r\n",tar_char);
+	 skill_increase_check(ch, spl, learned,500+ spell_info[spl].difficulty);
+
         return ((*spell_info[spl].spell_pointer) (GET_LEVEL(ch), ch, argument, SPELL_TYPE_SPELL, tar_char, tar_obj, learned));
       }
     }   /* if GET_POS < min_pos */

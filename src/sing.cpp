@@ -234,6 +234,7 @@ NULL,    SKILL_INCREASE_HARD
         TAR_IGNORE, song_crushing_crescendo, execute_song_crushing_crescendo,
         NULL, NULL, SKILL_INCREASE_HARD
 }, 
+ /* 27 */
 {
          15, POSITION_STANDING, 20, SKILL_SONG_HYPNOTIC_HARMONY,
 	 TAR_CHAR_ROOM, song_hypnotic_harmony, 
@@ -524,6 +525,11 @@ int do_sing(CHAR_DATA *ch, char *arg, int cmd)
        return eFAILURE|eINTERNAL_ERROR;
      }
 
+    if (IS_SET(world[ch->in_room].room_flags, NO_KI)) {
+      send_to_char("You find yourself unable to use energy based chants here.\n\r", ch);
+      return eFAILURE;
+    }
+
     if(GET_LEVEL(ch) < ARCHANGEL        &&
        !IS_MOB(ch)                      && 
        GET_KI(ch) < use_song(ch, spl)) 
@@ -601,7 +607,7 @@ int do_sing(CHAR_DATA *ch, char *arg, int cmd)
 void update_bard_singing()
 {
   CHAR_DATA *i;
-  struct pulse_data * loop;
+  //struct pulse_data * loop;
 
   for(i = character_list; i; i = i->next) 
   {
@@ -747,7 +753,7 @@ bool any_charms(CHAR_DATA *ch);
   add_follower(victim, ch, 0);
 
   af.type      = SPELL_CHARM_PERSON;
-  int i = has_skill(ch, SKILL_SONG_HYPNOTIC_HARMONY);
+  //int i = has_skill(ch, SKILL_SONG_HYPNOTIC_HARMONY);
   af.duration  = 24 + ((level > 40) * 6) + ((level > 60) * 6) + ((level > 80) * 12) ;
 
  af.modifier  = 0;
@@ -851,7 +857,7 @@ act("You resist $n's whistle sharp!",ch,NULL,victim,TO_VICT,0);
       act(buf2, ch, NULL, victim, TO_ROOM, NOTVICT);
       if (ispc)
         act("$n's whistle goes off the scale and your head explodes!", ch, NULL, victim, TO_VICT, 0);
-      sprintf(buf2, "%s's head expldoes as your whistle goes off the scale!", buf);
+      sprintf(buf2, "%s's head explodes as your whistle goes off the scale!", buf);
       act(buf2, ch, NULL, victim, TO_CHAR, 0);
 
       send_to_char("You dance a small jig on the corpse.\r\n", ch);
@@ -968,7 +974,7 @@ int execute_song_revealing_stacato( byte level, CHAR_DATA *ch, char *arg, CHAR_D
    }
    send_to_char("You tap your foot along to the revealing staccato.\r\n", ch);
 
-   int specialization = skill / 100;
+   //int specialization = skill / 100;
    skill %= 100;
 
   if(//number(1, 101) > ( 50 + skill/2 )
@@ -1022,7 +1028,7 @@ int execute_song_terrible_clef( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA 
    int dam = 0;
    int retval;
 
-   int specialization = skill / 100;
+   //int specialization = skill / 100;
    skill %= 100;
 
    victim = ch->fighting;
@@ -1268,8 +1274,8 @@ void do_astral_chanty_movement(CHAR_DATA *victim, CHAR_DATA *target)
     WAIT_STATE(victim, PULSE_VIOLENCE * 3);
     return;
   }
-  WAIT_STATE(victim, PULSE_VIOLENCE*2);
   do_look(victim, "", 9);
+  WAIT_STATE(victim, PULSE_VIOLENCE*2);
   act("$n appears out of nowhere in a chorus of light and song.", victim, 0, 0, TO_ROOM, 0);
 }
 
@@ -1595,7 +1601,7 @@ int execute_song_flight_of_bee( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA 
          send_to_char("Your musical flight ends.\n\r", master);
       }
    }
-   if (skill_success(ch, 0, SKILL_SONG_FLIGHT_OF_BEE))
+//   if (skill_success(ch, 0, SKILL_SONG_FLIGHT_OF_BEE))
    ch->song_timer = song_info[ch->song_number].beats;
    return eSUCCESS;
 }
@@ -1692,6 +1698,9 @@ int execute_song_searching_song( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA
             sprintf(buf, "%s%s at ", buf, "masturbating"); break;
    }
 
+ if (affected_by_spell(target, SPELL_DETECT_MAGIC) && affected_by_spell(target, SPELL_DETECT_MAGIC)->modifier > 80)
+    send_to_char("You sense you are the target of scrying.\r\n", target);
+
    sprintf(buf, "%s%s.\r\n", buf, world[target->in_room].name);
    send_to_char(buf, ch);
    return eSUCCESS;
@@ -1718,6 +1727,11 @@ int execute_song_jig_of_alacrity( byte level, CHAR_DATA *ch, char *arg, CHAR_DAT
    follow_type * fvictim = NULL;
 
    // Note, the jig effects everyone in the group BUT the bard.
+
+   if (IS_SET(world[ch->in_room].room_flags, NO_KI)) {
+     send_to_char("You find yourself unable to use energy based chants here.\n\r", ch);
+     return intrp_jig_of_alacrity(level, ch, arg, victim, -1);
+   }
 
    if(GET_KI(ch) < 2) // we don't have the ki to keep the song going
    {
@@ -1786,6 +1800,11 @@ int execute_song_fanatical_fanfare(byte level, CHAR_DATA *ch, char *arg, CHAR_DA
    follow_type * fvictim = NULL;
 
    // Note, the jig effects everyone in the group BUT the bard.
+
+   if (IS_SET(world[ch->in_room].room_flags, NO_KI)) {
+     send_to_char("You find yourself unable to use energy based chants here.\n\r", ch);
+     return intrp_song_fanatical_fanfare(level, ch, arg, victim, -1);
+   }
 
    if(GET_KI(ch) < 2) // we don't have the ki to keep the song going
    {
@@ -1999,7 +2018,7 @@ int execute_song_bountiful_sonnet( byte level, CHAR_DATA *ch, char *arg, CHAR_DA
 int execute_song_dischordant_dirge( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    char_data * target = NULL;
-   char buf[400];
+   //char buf[400];
 
    target = get_char_room_vis(ch, ch->song_data);
 
@@ -2043,7 +2062,7 @@ int execute_song_dischordant_dirge( byte level, CHAR_DATA *ch, char *arg, CHAR_D
    }
 
 
-   int i;
+   //int i;
 /*   for (i = 22394; i < 22399; i++)
      if (real_mobile(i) == target->mobdata->nr)
      {
@@ -2207,6 +2226,11 @@ int execute_song_vigilant_siren( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA
    char_data * master = NULL;
    follow_type * fvictim = NULL;
 
+   if (IS_SET(world[ch->in_room].room_flags, NO_KI)) {
+     send_to_char("You find yourself unable to use energy based chants here.\n\r", ch);
+     return intrp_vigilant_siren(level, ch, arg, victim, -1);
+   }
+
    if(GET_KI(ch) < 2) // we don't have the ki to keep the song going
    {
      return intrp_vigilant_siren(level, ch, arg, victim, -1);
@@ -2359,10 +2383,15 @@ int execute_song_crushing_crescendo( byte level, CHAR_DATA *ch, char *arg, CHAR_
    int dam = 0;
    int retval;
 
-   int specialization = skill / 100;
+   //int specialization = skill / 100;
    skill %= 100;
 
    victim = ch->fighting;
+
+   if (IS_SET(world[ch->in_room].room_flags, NO_KI)) {
+     send_to_char("You find yourself unable to use energy based chants here.\n\r", ch);
+     return eSUCCESS;
+   } 
 
    if(!victim)
    {

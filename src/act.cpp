@@ -30,6 +30,7 @@ extern "C" {
 #include <machine.h>
 #include <connect.h>
 #include <act.h>
+#include <mobile.h>
 #include <token.h>
 
 extern CWorld world;
@@ -66,7 +67,8 @@ void act
       REMOVE_BIT(ch->affected_by, AFF_HIDE);
       // Surprise!
       // -Sadus
-      // send_to_char("You come out of hiding.\n\r", ch);
+//     if (!str_cmp(GET_NAME(ch),"Jesus")) was for testing 
+  //    send_to_char("You come out of hiding.\n\r", ch);
       }
 
    if (destination == TO_VICT) {
@@ -134,5 +136,7 @@ void send_message(TokenList * tokens, CHAR_DATA *ch, OBJ_DATA * obj, void * vict
   send_message(buf, to);
   if (MOBtrigger && buf)
     mprog_act_trigger( buf, to, ch, obj, vict_obj );
+  if (MOBtrigger && buf)
+    oprog_act_trigger( buf, ch);
   MOBtrigger = TRUE;
 }

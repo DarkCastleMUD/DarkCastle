@@ -16,7 +16,7 @@
  *  10/21/2003   Onager    Changed IS_ANONYMOUS() to handle mobs without   *
  *                         crashing                                        *
  ***************************************************************************/
-/* $Id: utility.h,v 1.26 2004/07/03 11:44:19 urizen Exp $ */
+/* $Id: utility.h,v 1.27 2004/11/16 00:52:09 Zaphod Exp $ */
 
 #ifndef UTILITY_H_
 #define UTILITY_H_
@@ -51,8 +51,10 @@ char *index(char *buf, char op);
 //#define WAIT_STATE(ch, cycle)  (((ch)->desc) ? (ch)->desc->wait += 
 //(cycle) : 0 )
 
-#define WAIT_STATE(ch, cycle)  (((ch)->desc) ? (ch)->desc->wait += (cycle) :  \
-                                  (IS_MOB((ch)) ? MOB_WAIT_STATE((ch)) += (cycle) : 0))
+#define GET_WAIT(ch)  (IS_MOB((ch)) ? (ch)->deaths : ((ch)->desc ? (ch)->desc->wait : 0))
+
+#define WAIT_STATE(czh, cycle)  (((czh)->desc) ? (czh)->desc->wait > (cycle) ? 0 : (czh)->desc->wait = (cycle) :  \
+                                  (IS_MOB((czh)) ? MOB_WAIT_STATE((czh)) = (cycle) : 0))
 
 // END TODO
 
@@ -65,6 +67,7 @@ char *index(char *buf, char op);
 void check_timer();
 
 void skill_increase_check(char_data * ch, int skill, int learned, int difficulty);
+bool is_hiding(CHAR_DATA *ch, CHAR_DATA *vict);
 
 // End defines for gradual skill increase code
 
@@ -87,7 +90,9 @@ void skill_increase_check(char_data * ch, int skill, int learned, int difficulty
 #define LOWER(c) (((c)>='A'  && (c) <= 'Z') ? ((c)+('a'-'A')) : (c))
 #define UPPER(c) (((c)>='a'  && (c) <= 'z') ? ((c)+('A'-'a')) : (c))
 
-#define ISNEWL(ch) ((ch) == '\n' || (ch) == '\r' || (ch) == '|') 
+//#define ISNEWL(ch) ((ch) == '\n' || (ch) == '\r' || (ch) == '|') 
+#define ISNEWL(ch) ((ch) == '\n' || (ch) == '\r')  // replaced to leave off the pipe and put it eclusively in comm.c
+                                                   // where we could check to see if we were in an editor first.
 
 #define CAP(st)  (*(st) = UPPER(*(st)), st)
 
@@ -100,6 +105,10 @@ void skill_increase_check(char_data * ch, int skill, int learned, int difficulty
     if (!((result) = (type *) dc_alloc ((number), sizeof(type))))\
 	{ perror("calloc failure in CREATE: "); abort(); } } while(0)
 #endif
+
+#define RECREATE(result,type,number) do {\
+  if (!((result) = (type *) dc_realloc ((result), sizeof(type) * (number))))\
+                { perror("realloc failure in RECREATE"); abort(); } } while(0)
 
 #define FREE(p) do { if((p) != NULL) { dc_free((p)); (p) = 0; } } while (0) 
 
@@ -128,6 +137,7 @@ bool IS_DARK( int room );
 
 #define IS_NPC(ch)  (IS_SET((ch)->misc, MISC_IS_MOB))
 #define IS_MOB(ch)  (IS_NPC(ch))
+#define IS_FAMILIAR(ch)	(IS_AFFECTED2(ch, AFF_FAMILIAR))
 
 #define GET_RDEATHS(ch)      ((ch)->pcdata->rdeaths)
 #define GET_PDEATHS(ch)      ((ch)->pcdata->pdeaths)
@@ -157,6 +167,23 @@ bool IS_DARK( int room );
 #define GET_RANGE(ch)     ((ch)->pcdata->rooms)
 #define GET_MOB_RANGE(ch) ((ch)->pcdata->mobiles)
 #define GET_OBJ_RANGE(ch) ((ch)->pcdata->objects)
+
+/* mike stuff */
+#define GET_OBJ_RNUM(obj)       ((obj)->item_number)
+#define GET_OBJ_VAL(obj, val)   ((obj)->obj_flags.value[(val)])
+#define GET_OBJ_VROOM(obj)      ((obj)->vroom)
+#define GET_OBJ_EXTRA(obj)      ((obj)->obj_flags.extra_flags)
+#define GET_OBJ_TIMER(obj)      ((obj)->obj_flags.timer)
+#define GET_OBJ_TYPE(obj)       ((obj)->obj_flags.type_flag)
+#define GET_OBJ_WEAR(obj)       ((obj)->obj_flags.wear_flags)
+#define GET_OBJ_COST(obj)       ((obj)->obj_flags.cost)
+#define GET_OBJ_RENT(obj)       ((obj)->obj_flags.cost_per_day)
+#define GET_OBJ_VNUM(obj)       (GET_OBJ_RNUM(obj) >= 0 ? \
+                                 obj_index[GET_OBJ_RNUM(obj)].virt : -1)
+#define VALID_ROOM_RNUM(rnum)   ((rnum) != NOWHERE && (rnum) <= top_of_world)
+#define GET_ROOM_VNUM(rnum) \
+        ((long)(VALID_ROOM_RNUM(rnum) ? world[(rnum)].number : NOWHERE))
+/* end mike */
 
 #define GET_PROMPT(ch)  ((ch)->pcdata->prompt)
 #define GET_TOGGLES(ch) ((ch)->pcdata->toggles)
@@ -415,13 +442,14 @@ int     mprog_give_trigger      ( CHAR_DATA* mob, CHAR_DATA* ch,
 int     mprog_greet_trigger     ( CHAR_DATA* mob );
 int     mprog_fight_trigger     ( CHAR_DATA* mob, CHAR_DATA* ch );
 int     mprog_hitprcnt_trigger  ( CHAR_DATA* mob, CHAR_DATA* ch );
-void    mprog_death_trigger     ( CHAR_DATA* mob, CHAR_DATA* killer );
+int    mprog_death_trigger     ( CHAR_DATA* mob, CHAR_DATA* killer );
 int     mprog_random_trigger    ( CHAR_DATA* mob );
 int     mprog_arandom_trigger   ( CHAR_DATA *mob);
 int     mprog_speech_trigger    ( char* txt, CHAR_DATA* mob );
 int 	mprog_catch_trigger	(char_data * mob, int catch_num);
 int 	mprog_attack_trigger	(char_data * mob, CHAR_DATA* ch);
 int     mprog_load_trigger      (CHAR_DATA *mob);
+int oprog_catch_trigger(obj_data *obj, int catch_num, char *var);
 
 #define MAX_THROW_NAME     60
 #define MPROG_CATCH_MIN    1
@@ -437,6 +465,8 @@ struct mprog_throw_type {
    int pitcher;                // vnum of mob that threw the call
 
    mprog_throw_type * next;
+   bool mob;			// Mob or object.
+   char *var;			// temporary variable
 };
 
 

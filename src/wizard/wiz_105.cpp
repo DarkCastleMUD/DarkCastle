@@ -13,6 +13,7 @@
 #include <interp.h>
 #include <returnvals.h>
 #include <innate.h>
+#include <fileinfo.h>
 
 char *str_nospace(char *stri);
 
@@ -49,6 +50,25 @@ int do_clearaff(struct char_data *ch, char *argument, int cmd)
   send_to_char("Your affects have been cleared.\r\n",victim);
   return eSUCCESS;
   }
+  return eFAILURE;
+}
+
+int do_reloadhelp(struct char_data *ch, char *argument, int cmd)
+{
+  extern FILE* help_fl;
+  extern struct help_index_element *help_index ;
+  extern int top_of_helpt;
+  extern struct help_index_element *build_help_index(FILE *fl, int *num);
+  extern void free_help_from_memory();
+  free_help_from_memory();
+  dc_fclose(help_fl);
+  if(!(help_fl = dc_fopen(HELP_KWRD_FILE, "r"))) {
+    perror( HELP_KWRD_FILE );
+    abort();
+  }
+  help_index = build_help_index(help_fl, &top_of_helpt);
+  send_to_char("Reloaded.\r\n",ch);
+  return eSUCCESS;
 }
 
 int do_log(struct char_data *ch, char *argument, int cmd)
@@ -61,10 +81,6 @@ int do_log(struct char_data *ch, char *argument, int cmd)
     if (IS_NPC(ch))
         return eFAILURE;
 
-    if(!has_skill(ch, COMMAND_LOG)) {
-        send_to_char("Huh?\r\n", ch);
-        return eFAILURE;
-    }
 
     one_argument(argument, buf);
 
@@ -396,5 +412,216 @@ int do_sqedit(struct char_data *ch, char *argument, int cmd)
       log("Incorrect -i- in do_sqedit", 0, LOG_WORLD);
       return eFAILURE;
   }
+  return eSUCCESS;
+}
+int max_aff(struct obj_data *obj, int type)
+{
+   int a,b=-1;
+   for (a = 0; a< obj->num_affects; a++)
+   {
+   if (obj->affected[a].location > 30) continue;
+     if (type & (1<<obj->affected[a].location))
+	b = b > obj->affected[a].modifier? b:obj->affected[a].modifier;
+   }
+  return b;
+}
+
+int maxcheck(int &check,  int max)
+{
+  if (check < max)
+  {
+    check = max;
+    return 1;
+  } else if (check == max) return 2;
+  return 0;
+}
+
+int wear_bitv[WEAR_MAX+1] = {
+ 65535, 2, 2, 4, 4, 8, 16, 32, 64, 128, 256, 512,
+ 1024, 2048, 4096, 4096, 8192, 8192, 16384, 131072, 
+  262144, 262144
+};
+
+int do_eqmax(struct char_data *ch, char *argument, int cmd)
+{
+  CHAR_DATA *vict;
+  char arg[MAX_INPUT_LENGTH];
+  int a,o;
+  argument = one_argument(argument, arg);
+extern struct obj_data  *object_list;
+extern int class_restricted(struct char_data *ch, struct obj_data *obj);
+extern  int size_restricted(struct char_data *ch, struct obj_data *obj);
+
+  if ((vict =  get_pc_vis(ch, arg)) == NULL)
+  {
+	send_to_char("Who?\r\n", ch);
+	return eFAILURE;
+  }
+  argument = one_argument(argument, arg);
+  int type;
+  int last_max[MAX_WEAR] = 
+{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
+  int last_vnum[5][MAX_WEAR] = {
+{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1}};
+
+  if (!str_cmp(arg, "damage")) type = (1<<APPLY_DAMROLL)|(1<<APPLY_HIT_N_DAM);
+  else if (!str_cmp(arg,"hp")) type = 1<<APPLY_HIT;
+  else if (!str_cmp(arg,"mana")) type = 1<<APPLY_MANA;
+  else {
+    send_to_char("$3Syntax$R: eqmax <character> <damage/hp/mana>\r\n",ch);
+    return eFAILURE;
+  }
+  int i = 1;
+  struct obj_data *obj;
+  for (i = 1; i < 32000; i++)
+  {
+    if (real_object(i) < 0) continue;
+    obj = (obj_data *)obj_index[real_object(i)].item;
+    if (!class_restricted(vict, obj) &&
+	!size_restricted(vict, obj) &&
+	CAN_WEAR(obj, ITEM_TAKE) &&
+	!IS_SET(obj->obj_flags.extra_flags, ITEM_NOSAVE) &&
+       obj->obj_flags.eq_level <= GET_LEVEL(vict) &&
+     !IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL))
+    {
+    for (o = 0; o < MAX_WEAR;o++)
+	if (CAN_WEAR(obj, wear_bitv[o]))
+	{
+	int dam = max_aff(obj,type);
+          if ((a = maxcheck(last_max[o], dam)))
+          {
+		if (a == 1) { 
+			last_vnum[0][o] = obj_index[obj->item_number].virt;
+			last_vnum[1][o] = -1;
+			last_vnum[2][o] = -1;
+			last_vnum[3][o] = -1;
+			last_vnum[4][o] = -1;
+		} else {
+			int v;
+			for (v = 0; v < 5; v++)
+			 if (last_vnum[v][o] == -1)
+			   {last_vnum[v][o] = obj_index[obj->item_number].virt; break; }
+		}
+          }
+       }
+    }
+  }
+  char buf1[MAX_STRING_LENGTH];
+  int tot = 0;
+  for (i = 1;i < MAX_WEAR;i++)
+  {
+  buf1[0] = '\0';
+  sprintf(buf1,"%d. ",i);
+  if (last_vnum[a][0] != -1) tot += last_max[a];
+  if (last_vnum[a][i] == -1) sprintf(buf1,"%s Nothing\r\n",buf1);
+  else
+   for (a=0;a<5;a++)
+  {
+    if (last_vnum[a][i] == -1) continue;
+    sprintf(buf1,"%s %s(%d)   ",buf1,((obj_data 
+*)obj_index[real_object(last_vnum[a][i])].item)->short_description,last_vnum[a][i]);
+//    else sprintf(buf1,"%s%d. %d\r\n",buf1,i,last_vnum[i]); 
+  }
+  sprintf(buf1, "%s\n",buf1);
+  send_to_char(buf1,ch);
+  }
+   sprintf(buf1,"Total %s: %d\r\n",arg,tot);
+  send_to_char(buf1,ch);
+  return eSUCCESS;
+}
+
+int do_reload(struct char_data *ch, char *argument, int cmd)
+{
+  int do_reload_help(struct char_data *ch, char *argument, int cmd);
+  extern char news[MAX_STRING_LENGTH];
+  extern char motd[MAX_STRING_LENGTH];
+  extern char imotd[MAX_STRING_LENGTH];
+  extern char new_help[MAX_STRING_LENGTH];
+  extern char new_ihelp[MAX_STRING_LENGTH];
+  extern char credits[MAX_STRING_LENGTH];
+  extern char story[MAX_STRING_LENGTH];
+  extern char webpage[MAX_STRING_LENGTH];
+  extern char info[MAX_STRING_LENGTH];
+  char arg[256];
+
+  one_argument(argument, arg);
+
+  if (!str_cmp(arg, "all")) {
+    file_to_string(NEWS_FILE, news);
+    file_to_string(MOTD_FILE, motd);
+    file_to_string(IMOTD_FILE, imotd);
+    file_to_string(NEW_HELP_PAGE_FILE, new_help);
+    file_to_string(NEW_IHELP_PAGE_FILE, new_ihelp);
+    file_to_string(CREDITS_FILE, credits);
+    file_to_string(STORY_FILE, story);
+    file_to_string(WEBPAGE_FILE, webpage);
+    file_to_string(INFO_FILE, info);
+  } else if (!str_cmp(arg, "credits"))
+    file_to_string(CREDITS_FILE, credits);
+  else if (!str_cmp(arg, "story"))
+    file_to_string(STORY_FILE, story);
+  else if (!str_cmp(arg, "webpage"))
+    file_to_string(WEBPAGE_FILE, webpage);
+  else if (!str_cmp(arg, "INFO"))
+    file_to_string(INFO_FILE, info);
+  else if (!str_cmp(arg, "news"))
+    file_to_string(NEWS_FILE, news);
+  else if (!str_cmp(arg, "motd"))
+    file_to_string(MOTD_FILE, motd);
+  else if (!str_cmp(arg, "imotd"))
+    file_to_string(IMOTD_FILE, imotd);
+  else if (!str_cmp(arg, "help"))
+    file_to_string(NEW_HELP_PAGE_FILE, new_help);
+  else if (!str_cmp(arg, "ihelp"))
+    file_to_string(NEW_IHELP_PAGE_FILE, new_ihelp);
+  else if (!str_cmp(arg, "xhelp"))
+    do_reload_help(ch, 0, 0);
+  else {
+    send_to_char("Unknown reload option. Try 'help reload'.\r\n", ch);
+    return eFAILURE;
+  }
+
+  if (str_cmp(arg, "xhelp"))
+    send_to_char("Done!\r\n", ch);
+  return eSUCCESS;
+}
+
+int do_listproc(CHAR_DATA *ch, char *argument, int a)
+{
+  char arg[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+  int start,i,end, tot;
+  argument = one_argument(argument, arg);
+  argument = one_argument(argument, arg1);
+  argument = one_argument(argument, arg2);
+  bool mob;
+  if (arg[0] == '\0' || arg1[0] == '\0' || arg2[0] == '\0' ||
+       !check_range_valid_and_convert(start, arg1, 0, 100000) ||
+       !check_range_valid_and_convert(end, arg2, 0, 100000) ||
+       start > end)
+   {
+      send_to_char("$3Syntax:$n listproc <obj/mob> <low vnum> <high vnum>\r\n",ch);
+      return eFAILURE;
+   }
+   mob = !str_cmp(arg,"mob"); // typoed mob means obj. who cares.
+   char buf[MAX_STRING_LENGTH];
+   buf[0] = '\0';
+   for (i = start, tot = 1; i <= end; i++)
+   {
+      if (mob && (real_mobile(i) < 0 || !mob_index[real_mobile(i)].mobprogs)) continue;
+      else if (!mob && (real_object(i) < 0 || !obj_index[real_object(i)].mobprogs)) continue;
+      if (tot++ > 100) break;
+      if (mob)
+      {
+        sprintf(buf,"%s[%-3d] [%-3d] %s\r\n", buf,tot, 
+i,((char_data*)mob_index[real_mobile(i)].item)->name);
+      } else {
+        sprintf(buf,"%s[%-3d] [%-3d] %s\r\n", buf,tot,i,((obj_data*)obj_index[real_object(i)].item)->name);
+      }
+   }
+  send_to_char(buf,ch);
   return eSUCCESS;
 }

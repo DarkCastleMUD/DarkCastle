@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: modify.cpp,v 1.12 2004/07/03 11:44:14 urizen Exp $ */
+/* $Id: modify.cpp,v 1.13 2004/11/16 00:51:35 Zaphod Exp $ */
 
 extern "C"
 {
@@ -35,6 +35,7 @@ extern "C"
 #include <levels.h>
 #include <player.h>
 #include <obj.h>
+#include <spells.h>
 #include <handler.h>
 #include <db.h>
 
@@ -276,6 +277,10 @@ int do_string(CHAR_DATA *ch, char *arg, int cmd)
   CHAR_DATA *mob;
   struct obj_data *obj;
   struct extra_descr_data *ed, *tmp;
+  if(!has_skill(ch, COMMAND_STRING)) {
+        send_to_char("Huh?\r\n", ch);
+        return 1;
+  }
 
   if(IS_NPC(ch))
     return 1;

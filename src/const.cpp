@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.124 2004/07/25 21:12:54 urizen Exp $ */
+/* $Id: const.cpp,v 1.125 2004/11/16 00:51:34 Zaphod Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -35,32 +35,51 @@ extern "C"
 #include <mobile.h>
 bestowable_god_commands_type bestowable_god_commands[] =
 {
-{ "goto",	COMMAND_GOTO },
-{ "/",		COMMAND_IMP_CHAN },
-{ "fakelog", 	COMMAND_FAKELOG },
+{ "impchan",		COMMAND_IMP_CHAN },
 { "snoop",	COMMAND_SNOOP },
-{ "log",	COMMAND_LOG },
 { "global",	COMMAND_GLOBAL },
-{ "pview",	COMMAND_PROMPT_VIEW },
 { "restore",	COMMAND_RESTORE },
 { "purloin",	COMMAND_PURLOIN },
+{ "possess",   COMMAND_POSSESS},
 { "arena",	COMMAND_ARENA },
 { "set",	COMMAND_SET },
-{ "unban",	COMMAND_UNBAN },
-{ "ban",	COMMAND_BAN },
-{ "echo",	COMMAND_ECHO },
-{ "send",	COMMAND_SEND },
 { "load",	COMMAND_LOAD },
 { "shutdown",   COMMAND_SHUTDOWN },
-{ "mpedit",     COMMAND_MP_EDIT },
+{ "procedit",     COMMAND_MP_EDIT },
 { "range",      COMMAND_RANGE },
-{ "mpstat",     COMMAND_MPSTAT },
+{ "procstat",     COMMAND_MPSTAT },
 { "pshopedit",  COMMAND_PSHOPEDIT },
-{ "sockets",    COMMAND_SOCKETS },
 { "sedit",      COMMAND_SEDIT },
 { "punish",     COMMAND_PUNISH },
 { "sqedit",     COMMAND_SQEDIT },
+{ "install",    COMMAND_INSTALL },
+{ "hedit",      COMMAND_HEDIT },
+{ "hindex",     COMMAND_HINDEX },
+{ "opstat",	COMMAND_OPSTAT },
+{ "opedit",	COMMAND_OPEDIT },
+{ "eqmax",COMMAND_EQMAX},
+{"force",COMMAND_FORCE},
+{"string",COMMAND_STRING},
+{"stat",COMMAND_STAT},
+{"sqsave",COMMAND_SQSAVE},
+{"whattonerf",COMMAND_WHATTONERF},
+{"find",COMMAND_FIND},
 { "\n",		-1 }
+};
+
+// Obj proc types
+char *obj_types[] = {
+ "act_prog",
+ "speech_prog",
+ "rand_prog",
+ "all_greet_prog",
+ "catch_prog",
+ "arand_prog",
+ "load_prog",
+ "command_prog",
+ "weapon_prog",
+ "armour_prog",
+ "\n"
 };
 
 // every spell needs an entry in here
@@ -562,6 +581,8 @@ char *item_types[] =
     "LOCKPICK",
     "CLIMBABLE",
     "MEGAPHONE",
+    "ALTAR",
+    "TOTEM",
     "\n"
 };
 
@@ -638,6 +659,8 @@ char *extra_bits[] =
     "NO_SEE",
     "NO_REPAIR",
     "NEWBIE_ITEM",
+    "PC_CORPSE",
+   // "NPC_CORPSE",
     "\n"
 };
 
@@ -651,6 +674,8 @@ char *more_obj_bits[] =
     "NO_TRADE",
     "NO_NOTICE",
     "NO_LOCATE",
+    "UNIQUE_SAVE",
+    "NPC_CORPSE",
     "\n"
 };
 
@@ -680,8 +705,8 @@ char *room_bits[] =
     "unused1",
     "no_mob",
     "indoors",
-    "unused",
-    "unused",
+    "teleport_block",
+    "noki",
     "unused",
     "no_magic",
     "tunnel",
@@ -707,6 +732,7 @@ char *room_bits[] =
     "no_scan",
     "no_where",
     "light",
+    "unused",
     "\n"
 };
 
@@ -772,7 +798,7 @@ char *equipment_types[] =
 
 /* Should be in exact correlation as the AFF types -Kahn */
 char *affected_bits2[] =
-{
+{ // When you modify this, modify skill_aff2 in mob_commands
     "SHADOWSLIP",
     "INSOMNIA",
     "FREEFLOAT",
@@ -792,11 +818,13 @@ char *affected_bits2[] =
     "POWERWIELD",
     "REGENERATION",
     "FOCUS",
+    "ILLUSION",
+    "KNOW_ALIGN",
     "\n"
 };
 
 char *affected_bits[] =
-{
+{ // When you modify this, modify skill_aff in mob_commands
     "BLIND",
     "INVISIBLE",
     "DETECT-EVIL",
@@ -935,6 +963,9 @@ char *apply_types[] =
     "DAMAGED",
     "THIEF_POISON",
     "PROTECTION FROM GOOD",
+    "MELEE MITIGATION",
+    "SPELL MITIGATION",
+    "SONG MITIGATION",
     "\n"
 };
 
@@ -1030,15 +1061,17 @@ struct class_skill_defines w_skills[] = { // warrior skills
 {    "bash",            SKILL_BASH,               2,    80,     {STR,CON} },
 {    "redirect",        SKILL_REDIRECT,           4,    90,     {INT,CON} },
 {    "rescue",          SKILL_RESCUE,             5,    70,     {WIS,INT} },
-{    "double",          SKILL_SECOND_ATTACK,      7,    90,     {DEX,INT} },
+{    "double",          SKILL_SECOND_ATTACK,      7,    90,     
+{STR,DEX} },
 {    "disarm",          SKILL_DISARM,             10,   70,     {DEX,WIS} },
 {    "headbutt",        SKILL_SHOCK,              12,   55,     {CON,WIS} },
-{    "shield block",    SKILL_SHIELDBLOCK,        15,   75,     {STR,DEX} },
+{    "shield block",    SKILL_SHIELDBLOCK,        15,   85,     {STR,DEX} },
 {    "retreat",         SKILL_RETREAT,            17,   98,     {WIS,INT} },
 {    "frenzy",          SKILL_FRENZY,             18,   80,     {CON,INT} },
 {    "parry",           SKILL_PARRY,              20,   90,     {DEX,WIS} },
 {    "blindfighting",   SKILL_BLINDFIGHTING,      21,   80,     {INT,DEX} },
-{    "triple",          SKILL_THIRD_ATTACK,       23,   90,     {DEX,INT} },
+{    "triple",          SKILL_THIRD_ATTACK,       23,   90,     {STR,DEX} 
+},
 {    "hitall",          SKILL_HITALL,             25,   80,     {STR,CON} },
 {    "dual wield",      SKILL_DUAL_WIELD,         28,   90,     {DEX,CON} },
 {    "bludgeoning",     SKILL_BLUDGEON_WEAPONS,   30,   90,     {STR,DEX} },
@@ -1067,9 +1100,9 @@ struct class_skill_defines t_skills[] = { // thief skills
 //   Ability Name       Ability File          Level   Max     Requisites
 //   ------------       ------------          -----   ---     ----------
 {    "sneak",           SKILL_SNEAK,            1,      90,   {DEX,INT} },  
-{    "backstab",        SKILL_BACKSTAB,         2,      90,   {STR,DEX} },  
-{    "shield block",    SKILL_SHIELDBLOCK,      4,      45,   {STR,DEX} },  
-{    "pick",            SKILL_PICK_LOCK,        6,      98,   {WIS,DEX} },  
+{    "backstab",        SKILL_BACKSTAB,         2,      90,   {DEX,STR} },  
+{    "shield block",    SKILL_SHIELDBLOCK,      4,      40,   {STR,DEX} },  
+{    "stalk",           SKILL_STALK,            6,      98,   {CON,DEX} },
 {    "hide",            SKILL_HIDE,             7,      90,   {INT,WIS} },  
 {    "dual wield",      SKILL_DUAL_WIELD,       10,     90,   {DEX,CON} },  
 {    "palm",            SKILL_PALM,             12,     98,   {DEX,INT} },  
@@ -1077,7 +1110,7 @@ struct class_skill_defines t_skills[] = { // thief skills
 {    "dodge",           SKILL_DODGE,            15,     90,   {DEX,INT} },
 {    "trip",            SKILL_TRIP,             17,     85,   {DEX,STR} },
 {    "pocket",          SKILL_POCKET,           20,     98,   {INT,DEX} },
-{    "stalk",           SKILL_STALK,            22,     98,   {CON,DEX} },
+{    "pick",            SKILL_PICK_LOCK,        22,     98,   {WIS,DEX} },  
 {    "steal",           SKILL_STEAL,            25,     98,   {DEX,WIS} },
 {    "blindfighting",   SKILL_BLINDFIGHTING,    28,     80,   {INT,DEX} },
 {    "piercing",        SKILL_PIERCEING_WEAPONS,30,     90,   {DEX,STR} },
@@ -1102,18 +1135,18 @@ struct class_skill_defines a_skills[] = { // anti-paladin skills
 {    "harmtouch",            SKILL_HARM_TOUCH,        1,      98,     {STR,CON} },
 {    "kick",                 SKILL_KICK,              2,      70,     {DEX,STR} },
 {    "sneak",                SKILL_SNEAK,             3,      85,     {DEX,INT} },
-{    "shield block",         SKILL_SHIELDBLOCK,       5,      65,     {STR,DEX} },
+{    "shield block",         SKILL_SHIELDBLOCK,       5,      60,     {STR,DEX} },
 {    "infravision",          SPELL_INFRAVISION,       7,      90,     {INT,DEX} },
 {    "detect good",          SPELL_DETECT_GOOD,       8,      98,     {WIS,INT} },
 {    "dual wield",           SKILL_DUAL_WIELD,        10,     85,     {DEX,CON} },
 {    "shocking grasp",       SPELL_SHOCKING_GRASP,    11,     98,     {INT,DEX} },
 {    "detect invisibility",  SPELL_DETECT_INVISIBLE,  12,     85,     {INT,DEX} },
 {    "invisibility",         SPELL_INVISIBLE,         13,     90,     {INT,DEX} },
-{    "backstab",             SKILL_BACKSTAB,          15,     90,     {STR,DEX} },
+{    "backstab",             SKILL_BACKSTAB,          15,     90,     {DEX,STR} },
 {    "hide",                 SKILL_HIDE,              17,     85,     {INT,WIS} },
 {    "trip",                 SKILL_TRIP,              19,     85,     {DEX,STR} },
 {    "chill touch",          SPELL_CHILL_TOUCH,       20,     85,     {CON,WIS} },
-{    "double",               SKILL_SECOND_ATTACK,     22,     85,     {DEX,INT} },
+{    "double",               SKILL_SECOND_ATTACK,     22,     85,     {STR,DEX} },
 {    "dodge",                SKILL_DODGE,             23,     80,     {DEX,INT} },
 {    "vampiric touch",       SPELL_VAMPIRIC_TOUCH,    25,     98,     {CON,INT} },
 {    "poison",               SPELL_POISON,            27,     70,     {CON,WIS} },
@@ -1147,7 +1180,8 @@ struct class_skill_defines p_skills[] = { // paladin skills
 {    "layhands",             SKILL_LAY_HANDS,          1,      98,     {CON,WIS} },
 {    "kick",                 SKILL_KICK,               2,      70,     {DEX,STR} },
 {    "bless",                SPELL_BLESS,              3,      90,     {WIS,CON} },
-{    "double",               SKILL_SECOND_ATTACK,      5,      85,     {DEX,INT} },
+{    "double",               SKILL_SECOND_ATTACK,      5,      85,     
+{STR,DEX} },
 {    "shield block",         SKILL_SHIELDBLOCK,        7,      90,     {STR,DEX} },
 {    "rescue",               SKILL_RESCUE,             8,      85,     {WIS,INT} },
 {    "cure light",           SPELL_CURE_LIGHT,         9,      85,     {WIS,INT} },
@@ -1169,7 +1203,8 @@ struct class_skill_defines p_skills[] = { // paladin skills
 {    "slashing",             SKILL_SLASHING_WEAPONS,   30,     85,     {DEX,STR} },
 {    "crushing",             SKILL_CRUSHING_WEAPONS,   30,     85,     {STR,DEX} },
 {    "blessed halo",         SPELL_BLESSED_HALO,       31,     98,     {WIS,INT} },
-{    "triple",               SKILL_THIRD_ATTACK,       33,     80,     {DEX,INT} },
+{    "triple",               SKILL_THIRD_ATTACK,       33,     80,     
+{STR,DEX} },
 {    "two handers",          SKILL_TWO_HANDED_WEAPONS, 35,     85,     {STR,CON} },
 {    "heal",                 SPELL_HEAL,               37,     85,     {WIS,INT} },
 {    "harm",                 SPELL_HARM,               38,     85,     {WIS,CON} },
@@ -1191,13 +1226,13 @@ struct class_skill_defines b_skills[] = { // barbarian skills
 {    "bash",            SKILL_BASH,               2,    90,  {STR,CON} },
 {    "kick",            SKILL_KICK,               3,    80,  {DEX,STR} },
 {    "parry",           SKILL_PARRY,              5,    70,  {DEX,WIS} },
-{    "double",          SKILL_SECOND_ATTACK,      8,    85,  {DEX,INT} },
+{    "double",          SKILL_SECOND_ATTACK,      8,    85,  {STR,DEX} },
 {    "shield block",    SKILL_SHIELDBLOCK,        10,   70,  {STR,DEX} },
 {    "blood fury",      SKILL_BLOOD_FURY,         12,   98,  {CON,WIS} },
 {    "crazedassault",   SKILL_CRAZED_ASSAULT,     15,   98,  {WIS,STR} },
 {    "frenzy",          SKILL_FRENZY,             18,   90,  {CON,INT} },
 {    "rage",            SKILL_RAGE,               20,   98,  {CON,STR} },
-{    "triple",          SKILL_THIRD_ATTACK,       25,   85,  {DEX,INT} },
+{    "triple",          SKILL_THIRD_ATTACK,       25,   85,  {STR,DEX} },
 {    "battlecry",       SKILL_BATTLECRY,          27,   98,  {WIS,INT} },
 {    "blindfighting",   SKILL_BLINDFIGHTING,      28,   65,  {INT,DEX} },
 {    "whipping",        SKILL_WHIPPING_WEAPONS,   30,   85,  {DEX,STR} },
@@ -1226,7 +1261,7 @@ struct class_skill_defines k_skills[] = { // monk skills
 {    "redirect",        SKILL_REDIRECT,         3,      85,     {INT,CON} },
 {    "trip",            SKILL_TRIP,             5,      70,     {DEX,STR} },
 {    "purify",          KI_PURIFY+KI_OFFSET,    8,      98,     {CON,WIS} },
-{    "shield block",    SKILL_SHIELDBLOCK,      10,     75,     {STR,DEX} },
+{    "shield block",    SKILL_SHIELDBLOCK,      10,     80,     {STR,DEX} }, //aaa
 {    "rescue",          SKILL_RESCUE,           12,     75,     {WIS,INT} },
 {    "punch",           KI_PUNCH+KI_OFFSET,     15,     98,     {STR,DEX} },
 {    "eagleclaw",       SKILL_EAGLE_CLAW,       17,     98,     {STR,DEX} },
@@ -1258,9 +1293,10 @@ struct class_skill_defines r_skills[] = { // ranger skills
 {    "dual wield",      SKILL_DUAL_WIELD,        5,      90,     {DEX,CON} },
 {    "redirect",        SKILL_REDIRECT,          7,      80,     {INT,CON} },
 {    "eyes of the owl", SPELL_EYES_OF_THE_OWL,   8,      90,     {INT,DEX} },
-{    "shield block",    SKILL_SHIELDBLOCK,       10,     70,     {STR,DEX} },
+{    "shield block",    SKILL_SHIELDBLOCK,       10,     60,     {STR,DEX} },
 {    "tame",            SKILL_TAME,              11,     98,     {WIS,INT} },
-{    "double",          SKILL_SECOND_ATTACK,     12,     85,     {DEX,INT} },
+{    "double",          SKILL_SECOND_ATTACK,     12,     85,     {STR,DEX} 
+},
 {    "feline agility",  SPELL_FELINE_AGILITY,    14,     98,     {DEX,INT} },
 {    "bee swarm",       SPELL_BEE_SWARM,         15,     98,     {CON,WIS} },
 {    "forage",          SKILL_FORAGE,            16,     90,     {INT,CON} },
@@ -1313,7 +1349,8 @@ struct class_skill_defines d_skills[] = { // bard skills
 { "note of knowledge",     SKILL_SONG_NOTE_OF_KNOWLEDGE,   21,     98,     {INT,WIS} },
 { "fanatical fanfare",   SKILL_SONG_FANATICAL_FANFARE,         23,     98,     {CON,INT} },
 { "revealing staccato",     SKILL_SONG_REVEAL_STACATO,      25,     98,     {INT,DEX} },
-{ "double",                SKILL_SECOND_ATTACK,            26,     80,     {DEX,INT} },
+{ "double",                SKILL_SECOND_ATTACK,            26,     80,     
+{STR,DEX} },
 { "terrible clef",         SKILL_SONG_TERRIBLE_CLEF,       28,     98,     {INT,STR} },
 { "piercing",              SKILL_PIERCEING_WEAPONS,        30,     70,     {DEX,STR} },
 { "slashing",              SKILL_SLASHING_WEAPONS,         30,     70,     {DEX,STR} },
@@ -1330,7 +1367,7 @@ struct class_skill_defines d_skills[] = { // bard skills
 { "astral chanty",         SKILL_SONG_ASTRAL_CHANTY,       45,     98,     {STR,DEX} },
 { "crushing crescendo", SKILL_SONG_CRUSHING_CRESCENDO,      46,     98,     {CON,STR} },
 { "shattering resonance",  SKILL_SONG_SHATTERING_RESO,     48,     98,     {STR,CON} },
-{ "hypnotic harmony",    SKILL_SONG_HYPNOTIC_HARMONY,         50,     98,     {WIS,INT} },
+{ "hypnotic harmony",    SKILL_SONG_HYPNOTIC_HARMONY,         50,     98,{WIS,INT} },
 { "\n",                    0,                              1,      0,      {0,0} }
 };
 
@@ -1413,7 +1450,7 @@ struct class_skill_defines c_skills[] = { // cleric skills
 {    "sanctuary",            SPELL_SANCTUARY,         18,     90,     {WIS,INT} },     
 {    "remove curse",         SPELL_REMOVE_CURSE,      19,     98,     {INT,WIS} },     
 {    "cure critical",        SPELL_CURE_CRITIC,       20,     90,     {WIS,INT} },     
-{    "shield block",         SKILL_SHIELDBLOCK,      20,     35,     {STR,DEX} },
+//{    "shield block",         SKILL_SHIELDBLOCK,      20,     35,     {STR,DEX} },
 {    "cause critical",       SPELL_CAUSE_CRITICAL,    21,     98,     {STR,WIS} },     
 {    "remove paralysis",     SPELL_REMOVE_PARALYSIS,  22,     98,     {INT,DEX} },     
 {    "locate object",        SPELL_LOCATE_OBJECT,     23,     80,     {INT,WIS} },     
@@ -1502,7 +1539,7 @@ struct class_skill_defines m_skills[] = { // mage skills
 {    "create golem",        SPELL_CREATE_GOLEM,      48,     90,     {WIS,STR} },
 {    "release golem",       SPELL_RELEASE_GOLEM,     48,     90,     {WIS,INT} },
 {    "solar gate",          SPELL_SOLAR_GATE,        49,     98,     {WIS,INT} },
-//{    "mana shield",       SPELL_MANA_SHIELD,       50,     98,     {0,0} },
+{    "spellcraft",          SKILL_SPELLCRAFT,        50,     98,     {WIS,INT}},
 {    "\n",                  0,                       1,      0,      {0,0} }
 };
 
@@ -1666,6 +1703,9 @@ char
     "NOMAGIC",
     "DRAINY",
     "BARDCHARM",
+    "NOKI",
+    "NOMATRIX",
+    "BOSS",
     "\n"
 };
 
@@ -1692,7 +1732,8 @@ char *player_bits[] =
     "LFG",
     "NOTELL",
     "NOTAX",
-    "GUIDE"
+    "GUIDE",
+    "GUIDE_TOG",
     "\n"
 };
 
@@ -2157,3 +2198,117 @@ int mana_bonus[31] =
      160        /* 30 */
 };
 
+struct mob_matrix_data mob_matrix[] = 
+{
+/* 0 */{5,5,1,1,100,0},
+/* 1 */{500,5,1,1,100,250},
+/* 2 */{750,10,2,1,100,500},
+/* 3 */{1000,20,3,2,95,750},
+/* 4 */{2000,30,4,2,95,1000},
+/* 5 */{3000,40,5,3,90,1250},
+/* 6 */{4000,50,6,3,90,1500},
+/* 7 */{5000,50,6,3,90,1750},
+/* 8 */{6500,80,8,4,85,2000},
+/* 9 */{8000,95,9,5,80,2250},
+/* 10 */{11000,110,10,5,80,2500},
+/* 11 */{14000,125,11,6,75,3000},
+/* 12 */{17000,150,12,7,70,3500},
+/* 13 */{20000,175,13,8,65,4000},
+/* 14 */{30000,200,14,9,60,4500},
+/* 15 */{40000,225,15,10,55,5000},
+/* 16 */{50000,250,16,11,50,5500},
+/* 17 */{60000,275,17,12,45,6000},
+/* 18 */{70000,300,18,13,40,6500},
+/* 19 */{80000,325,19,14,35,7000},
+/* 20 */{90000,350,20,15,30,7500},
+/* 21 */{100000,375,21,16,25,8000},
+/* 22 */{110000,400,22,17,20,8750},
+/* 23 */{120000,430,23,18,15,9500},
+/* 24 */{130000,460,24,19,10,10250},
+/* 25 */{140000,490,25,20,5,11000},
+/* 26 */{150000,520,26,20,0,11750},
+/* 27 */{160000,550,27,21,-5,12500},
+/* 28 */{170000,580,28,21,-10,13250},
+/* 29 */{180000,610,29,22,-15,14000},
+/* 30 */{190000,640,30,22,-20,15000},
+/* 31 */{200000,670,31,23,-30,16000},
+/* 32 */{220000,700,32,23,-35,17000},
+/* 33 */{240000,740,33,24,-40,18000},
+/* 34 */{260000,780,34,24,-45,19000},
+/* 35 */{280000,820,35,25,-50,20000},
+/* 36 */{300000,860,36,26,-60,21500},
+/* 37 */{325000,900,37,27,-70,23000},
+/* 38 */{350000,935,38,28,-80,24500},
+/* 39 */{375000,970,39,29,-90,26000},
+/* 40 */{400000,1000,40,20,-100,27500},
+/* 41 */{425000,1050,41,31,-115,30000},
+/* 42 */{450000,1100,42,32,-130,32500},
+/* 43 */{475000,1150,43,33,-145,35000},
+/* 44 */{500000,1200,44,34,-160,37500},
+/* 45 */{550000,1250,45,35,-175,40000},
+/* 46 */{600000,1300,46,36,-190,42500},
+/* 47 */{650000,1350,47,37,-205,45000},
+/* 48 */{700000,1400,48,38,-220,47500},
+/* 49 */{750000,1450,49,39,-235,50000},
+/* 50 */{800000,1500,50,40,-250,55000},
+/* 51 */{1000000,1600,51,41,-260,60000},
+/* 52 */{1050000,1700,52,42,-270,65000},
+/* 53 */{1100000,1800,53,43,-280,70000},
+/* 54 */{1150000,1900,54,44,-290,75000},
+/* 55 */{1200000,2000,55,45,-300,80000},
+/* 56 */{1250000,2100,56,46,-310,85000},
+/* 57 */{1300000,2200,57,47,-320,90000},
+/* 58 */{1350000,2300,58,48,-330,95000},
+/* 59 */{1400000,2400,59,49,-340,100000},
+/* 60 */{1500000,2500,60,50,-350,105000},
+/* 61 */{1600000,2600,61,51,-360,110000},
+/* 62 */{1700000,2700,62,52,-270,115000},
+/* 63 */{1800000,2800,63,53,-380,120000},
+/* 64 */{1900000,2900,64,54,-390,130000},
+/* 65 */{2000000,3000,65,55,-400,140000},
+/* 66 */{2100000,3200,66,56,-410,150000},
+/* 67 */{2200000,3400,67,57,-420,175000},
+/* 68 */{2300000,3600,68,58,-430,200000},
+/* 69 */{2400000,3800,69,59,-440,225000},
+/* 70 */{2500000,4000,70,60,-450,250000},
+/* 71 */{2600000,4250,72,62,-460,275000},
+/* 72 */{2700000,4500,72,62,-470,300000},
+/* 73 */{2800000,4750,73,63,-480,325000},
+/* 74 */{2900000,5000,74,64,-490,350000},
+/* 75 */{5000000,6000,75,65,-500,375000},
+/* 76 */{5100000,6250,76,66,-510,400000},
+/* 77 */{5200000,6500,77,67,-520,425000},
+/* 78 */{5300000,6750,78,68,-530,450000},
+/* 79 */{5400000,7000,79,69,-540,475000},
+/* 80 */{5500000,7250,80,70,-550,500000},
+/* 81 */{5600000,7500,81,71,-560,525000},
+/* 82 */{5700000,8000,82,72,-570,550000},
+/* 83 */{5800000,8500,83,73,-580,575000},
+/* 84 */{5900000,9000,84,74,-590,600000},
+/* 85 */{6000000,9500,85,75,-600,625000},
+/* 86 */{6100000,10000,86,76,-610,650000},
+/* 87 */{6200000,10500,87,77,-620,675000},
+/* 88 */{6300000,11000,88,78,-630,700000},
+/* 89 */{6400000,11500,89,79,-640,800000},
+/* 90 */{6500000,12000,90,80,-650,900000},
+/* 91 */{6600000,12500,91,81,-660,1000000},
+/* 92 */{6700000,13000,92,82,-670,1200000},
+/* 93 */{6800000,13500,93,83,-680,1400000},
+/* 94 */{7000000,14000,94,84,-690,1600000},
+/* 95 */{7250000,15000,95,85,-700,1800000},
+/* 96 */{7500000,16000,96,86,-710,2000000},
+/* 97 */{7750000,17000,97,87,-720,2200000},
+/* 98 */{8000000,18000,98,88,-730,2400000},
+/* 99 */{8250000,19000,99,89,-740,2600000},
+/* 100 */{8500000,20000,100,90,-750,2800000},
+/* 101 */{8750000,21000,101,91,-775,3000000},
+/* 102 */{9000000,22000,102,92,-800,3200000},
+/* 103 */{9250000,23000,103,93,-825,3400000},
+/* 104 */{9500000,24000,104,94,-850,3600000},
+/* 105 */{9750000,25000,105,95,-875,3800000},
+/* 106 */{10000000,26000,106,96,-900,4000000},
+/* 107 */{10250000,2700,107,97,-925,4250000},
+/* 108 */{10500000,28000,108,98,-950,4500000},
+/* 109 */{10750000,29000,109,99,-975,4750000},
+/* 110 */{11000000,30000,110,100,-1000,5000000}
+};

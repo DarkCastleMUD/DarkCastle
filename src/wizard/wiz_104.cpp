@@ -19,35 +19,47 @@
 #include <race.h>
 
 extern struct room_data ** world_array;
+void save_corpses(void);
+extern char *obj_types[];
 
 int do_thunder(struct char_data *ch, char *argument, int cmd)
 {
   char buf1[MAX_STRING_LENGTH];
   char buf2[MAX_STRING_LENGTH];
   struct descriptor_data *i;
+  char buf3[MAX_INPUT_LENGTH];
+
+  if (!IS_NPC(ch) && ch->pcdata->wizinvis)
+     sprintf(buf3, "someone");
+  else
+     sprintf(buf3, GET_SHORT(ch));
 
   for (; *argument == ' '; argument++);
 
   if(!(*argument))
     send_to_char("It's not gonna look that impressive...\n\r", ch);
   else {
-    if(cmd == 9) {
-      sprintf(buf1, "$B$4%s thunders '%s'$R\n\r",GET_SHORT(ch), argument);
+    if (cmd == 9) 
       sprintf(buf2, "$4$BYou thunder '%s'$R", argument);
-    }
-    else { 
-      sprintf(buf1, "$7$B$n bellows '%s'$R", argument);
+    else 
       sprintf(buf2, "$7$BYou bellow '%s'$R", argument);
-    }
-
     act(buf2, ch, 0, 0, TO_CHAR, 0);
 
     for (i = descriptor_list; i; i = i->next)
-      if (i->character != ch && !i->connected)
-        if(cmd == 9) 
-          send_to_char(buf1, i->character);
-        else  
-          act(buf1, ch, 0, i->character, TO_VICT, 0);
+      if (i->character != ch && !i->connected) {
+        if (!IS_NPC(ch) && ch->pcdata->wizinvis && i->character->level < ch->pcdata->wizinvis)
+          sprintf(buf3, "Someone");
+        else
+           sprintf(buf3, GET_SHORT(ch));
+
+        if (cmd == 9) {
+           sprintf(buf1, "$B$4%s thunders '%s'$R\n\r",buf3, argument);
+        } else {
+           sprintf(buf1, "$7$B%s bellows '%s'$R\r\n", buf3, argument);
+        }
+
+        send_to_char(buf1, i->character);
+     }
   } 
   return eSUCCESS; 
 }
@@ -251,6 +263,7 @@ int do_purge(struct char_data *ch, char *argument, int cmd)
        extract_obj(obj);
     }
   }
+  save_corpses();
   return eSUCCESS;
 }
 
@@ -1464,7 +1477,7 @@ int do_teleport(struct char_data *ch, char *argument, int cmd)
    char person[MAX_INPUT_LENGTH], room[MAX_INPUT_LENGTH];
    int target;
    int loop;
-   extern int top_of_world;
+   //extern int top_of_world;
 
    if (IS_NPC(ch)) return eFAILURE;
 
@@ -1604,4 +1617,294 @@ int do_gtrans(struct char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
+char *oprog_type_to_name(int type)
+{
+  switch (type)
+  {
+     case ALL_GREET_PROG: return "all_greet_prog";
+     case WEAPON_PROG: return "weapon_prog";
+     case ARMOUR_PROG: return "armour_prog";
+     case LOAD_PROG: return "load_prog";
+     case COMMAND_PROG: return "command_prog";
+     case ACT_PROG: return "act_prog";
+     case ARAND_PROG: return "arand_prog";
+     case CATCH_PROG: return "catch_prog";
+     case SPEECH_PROG: return "speech_prog";
+     case RAND_PROG: return "rand_prog";
+     default: return "ERROR_PROG";
+  }
+}
 
+void opstat(char_data *ch, int vnum)
+{
+  int num = real_object(vnum);
+  OBJ_DATA *obj;
+  char buf[MAX_STRING_LENGTH];
+  if (num < 0)
+  {
+    send_to_char("Error, non-existant object.\r\n",ch);
+    return;
+  }
+  obj = (OBJ_DATA*)obj_index[num].item;
+  sprintf(buf,"$3Object$R: %s   $3Vnum$R: %d.\r\n",
+	 obj->name, vnum);
+  send_to_char(buf,ch);
+  if ( obj_index[num].progtypes == 0)
+  {
+     send_to_char("This object has no special procedures.\r\n",ch);
+     return;
+  }
+  send_to_char("\r\n",ch);
+  MPROG_DATA *mprg;
+   int i;
+   char buf2[MAX_STRING_LENGTH];
+    for ( mprg = obj_index[num].mobprogs, i = 1; mprg != NULL;
+         i++, mprg = mprg->next )
+    {
+      sprintf( buf, "$3%d$R>$3$B", i);
+      send_to_char( buf, ch );
+      send_to_char(oprog_type_to_name( mprg->type ), ch);
+      send_to_char("$R ", ch);
+      sprintf( buf, "$B$5%s$R\n\r", mprg->arglist);
+      send_to_char(buf, ch);
+      sprintf( buf, "%s\n\r", mprg->comlist );
+      double_dollars(buf2, buf);
+      send_to_char( buf2, ch );
+    }
+}
+
+int do_opstat(char_data *ch, char *argument, int cmd)
+{
+  int vnum = -1;
+  if(!has_skill(ch, COMMAND_OPSTAT)) {
+        send_to_char("Huh?\r\n", ch);
+        return eFAILURE;
+  }
+  if (isdigit(*argument))
+  {
+     vnum = atoi(argument);
+  } else vnum = ch->pcdata->last_obj_edit;
+  opstat(ch,vnum);
+  return eSUCCESS;
+}
+
+void update_objprog_bits(int num)
+{
+    MPROG_DATA * prog = obj_index[num].mobprogs;
+    obj_index[num].progtypes = 0;
+
+    while(prog) {
+      SET_BIT(obj_index[num].progtypes, prog->type);
+      prog = prog->next;
+    }
+}
+
+
+int do_opedit(char_data *ch, char *argument, int cmd)
+{
+  int num = -1,vnum = -1,i=-1,a=-1;
+  char arg[MAX_INPUT_LENGTH];
+  argument = one_argument(argument, arg);
+  if (IS_NPC(ch)) return eFAILURE;
+  if (isdigit(*arg))
+  {
+    vnum = atoi(arg);
+    argument = one_argument(argument, arg);
+  } else {
+    vnum = obj_index[ch->pcdata->last_obj_edit].virt;
+
+  }
+
+  if ((num = real_object(vnum)) < 0)
+  {
+      send_to_char("No such object.\r\n",ch);
+      return eFAILURE;
+  }
+  if (!can_modify_object(ch, vnum))
+  {
+     send_to_char("You are unable to work creation outside your range.\r\n",ch);
+     return eFAILURE;
+  }
+  ch->pcdata->last_obj_edit = num;
+/*  if (!*arg)
+  {
+    opstat(ch, vnum);
+    return eSUCCESS;
+  }*/
+  MPROG_DATA *prog, *currprog;
+  if (!str_cmp(arg, "add"))
+  {
+     argument = one_argument(argument, arg);
+     if (!*arg)
+     {
+	send_to_char("$3Syntax$R: opedit [num] add new\r\n"
+		     "This creates a new object proc.\r\n",ch);
+	return eFAILURE;
+     }
+#ifdef LEAK_CHECK
+        prog = (MPROG_DATA *) calloc(1, sizeof(MPROG_DATA));
+#else
+        prog = (MPROG_DATA *) dc_alloc(1, sizeof(MPROG_DATA));
+#endif
+        prog->type = ALL_GREET_PROG;
+        prog->arglist = strdup("80");
+        prog->comlist = strdup("say This is my new obj prog!\n\r");
+        prog->next = NULL;
+
+        if((currprog = obj_index[num].mobprogs)) {
+          while(currprog->next)
+            currprog = currprog->next;
+          currprog->next = prog;
+        }
+        else
+          obj_index[num].mobprogs = prog;
+	update_objprog_bits(num);
+	send_to_char("New obj proc created.\r\n",ch);
+	return eSUCCESS;
+  } else if (!str_cmp(arg, "remove"))
+  {
+    argument = one_argument(argument,arg);
+    int a = -1;
+    if (!*arg || !isdigit(*arg))
+    {
+	send_to_char("$3Syntax$R: opedit [obj_num] remove <prog>\r\n"
+			"This removes an object procedure completly\r\n",ch);
+	return eFAILURE;
+    }
+    a = atoi(arg);
+    prog = NULL;
+    for(i = 1, currprog = obj_index[num].mobprogs;
+          currprog && i != a;
+          i++, prog = currprog, currprog = currprog->next)
+        ;
+    if (!currprog)
+    {
+      send_to_char("Invalid proc number.\r\n",ch);
+	return eFAILURE;
+    }
+    if(prog)
+      prog->next = currprog->next;
+    else obj_index[num].mobprogs = currprog->next;
+
+        currprog->type = 0;
+        dc_free(currprog->arglist);
+        dc_free(currprog->comlist);
+        dc_free(currprog);
+
+        update_objprog_bits(num);
+
+        send_to_char("Program deleted.\r\n", ch);
+	return eSUCCESS;
+  } else if (!str_cmp(arg, "type"))
+  {
+     argument = one_argument(argument, arg);
+     if (!*arg || !argument || !*argument || !isdigit(*arg) || !isdigit(*(1+argument)))
+     {
+	send_to_char("$3Syntax$R: opedit [obj_num] type <prog> <type>\r\n",ch);
+	send_to_char("$3Valid types are$R:\r\n",ch);
+	char buf[MAX_STRING_LENGTH];
+	for (i = 0; *obj_types[i] != '\n'; i++)
+	{
+	  sprintf(buf, " %2d - %15s\r\n",
+		i+1, obj_types[i]);
+	  send_to_char(buf,ch);
+	}
+	return eFAILURE;
+     }
+     int a = atoi(arg);
+     for(i = 1, currprog = obj_index[num].mobprogs;
+       currprog && i != a;
+       i++, currprog = currprog->next)
+        ;
+
+     if(!currprog) {
+       send_to_char("Invalid prog number.\r\n", ch);
+       return eFAILURE;
+     }
+    switch (atoi(argument+1))
+    {
+	case 1: a = ACT_PROG; break;
+	case 2: a = SPEECH_PROG; break;
+	case 3: a = RAND_PROG; break;
+	case 4: a = ALL_GREET_PROG; break;
+	case 5: a = CATCH_PROG; break;
+	case 6: a = ARAND_PROG; break;
+	case 7: a = LOAD_PROG; break;
+	case 8: a = COMMAND_PROG; break;
+	case 9: a = WEAPON_PROG; break;
+	case 10: a = ARMOUR_PROG; break;
+	default: send_to_char("Invalid progtype.\r\n",ch); return eFAILURE;
+    }
+    currprog->type = a;
+    update_objprog_bits(num);
+    send_to_char("Proc type changed.\r\n",ch);
+    return eSUCCESS;
+  } else if (!str_cmp(arg, "arglist"))
+  {
+//    char arg1[MAX_INPUT_LENGTH];
+    argument = one_argument(argument, arg);
+//    argument = one_argument(argument, arg1);
+    if (!*arg || !argument || !*argument || !isdigit(*arg))
+    {
+	send_to_char("$3Syntax$R: opedit [obj_num] arglist <prog> <new arglist>\r\n",ch);
+	return eFAILURE;
+    }
+    a = atoi(arg);
+        for(i = 1, currprog = obj_index[num].mobprogs;
+            currprog && i != a;
+            i++, currprog = currprog->next)
+          ;
+
+        if(!currprog) {
+          send_to_char("Invalid prog number.\r\n", ch);
+          return eFAILURE;
+        }
+        dc_free(currprog->arglist);
+        currprog->arglist = strdup(argument+1);
+
+        send_to_char("Arglist changed.\r\n", ch);
+ 	return eSUCCESS;
+  } else if (!str_cmp(arg,"command"))
+  {
+    argument = one_argument(argument, arg);
+    if (!*arg || !isdigit(*arg))
+    {
+	send_to_char("$3Syntax$R: opedit [obj_num] command <prog>\r\n",ch);
+	return eFAILURE;
+    }
+     a = atoi(arg);
+        for(i = 1, currprog = obj_index[num].mobprogs;
+            currprog && i != a;
+            i++, currprog = currprog->next)
+          ;
+
+        if(!currprog) { // intval was too high
+          send_to_char("Invalid prog number.\r\n", ch);
+          return eFAILURE;
+        }
+        ch->desc->backstr = NULL;
+     send_to_char("        Write your help entry and stay within the line.(/s saves /h for help)\r\n"
+                     "|--------------------------------------------------------------------------------|\r\n", ch);
+
+        if (currprog->comlist) {
+          ch->desc->backstr = str_dup(currprog->comlist);
+          send_to_char(ch->desc->backstr, ch);
+        }
+        ch->desc->connected = CON_EDIT_MPROG;
+        ch->desc->strnew = &(currprog->comlist);
+        ch->desc->max_str = MAX_MESSAGE_LENGTH;
+    	return eSUCCESS;
+  } else if (!str_cmp(arg, "list"))
+  {
+   opstat(ch, vnum);
+   return eSUCCESS;
+  }
+  send_to_char("$3Syntax$R: opedit [obj_num] [field] [arg]\r\n"
+		"Edit a field with no args for help on that field.\r\n\r\n"
+		"The field must be one of the following:\r\n"
+		"\tadd\tremove\ttype\targlist\r\n\tcommand\tlist\r\n\r\n",ch);
+ char buf[MAX_STRING_LENGTH];
+  sprintf(buf,"$3Current object set to: %d\r\n",ch->pcdata->last_obj_edit);
+  send_to_char(buf,ch);
+  return eSUCCESS;
+}

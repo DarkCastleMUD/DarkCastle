@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.46 2004/07/24 02:49:34 rahz Exp $
+| $Id: objects.cpp,v 1.47 2004/11/16 00:51:35 Zaphod Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -173,7 +173,8 @@ void object_activity()
 	    {
   	      active_obj->obj->obj_flags.value[0] = ((obj_data *) obj_index[active_obj->obj->item_number].item)->obj_flags.value[1];
  	      send_to_room(active_obj->obj->ex_description->description, active_obj->obj->in_room);
-	    }
+	    } else 
+		oprog_rand_trigger(active_obj->obj);
         } 
         //else {
         //}
@@ -224,7 +225,8 @@ int do_switch(struct char_data *ch, char *arg, int cmd)
     act("You fail to switch your weapons.", ch, 0,0, TO_CHAR, 0);
     return eFAILURE;
   }
-  if (GET_OBJ_WEIGHT(ch->equipment[WIELD]) > GET_STR(ch)       && !IS_AFFECTED2(ch, AFF_POWERWIELD))
+  if (GET_OBJ_WEIGHT(ch->equipment[WIELD]) > GET_STR(ch)    /2
+&& !IS_AFFECTED2(ch, AFF_POWERWIELD))
   {
      send_to_char("Your primary wield is too heavy to wield as secondary.\r\n",ch);
       return eFAILURE;
@@ -308,7 +310,7 @@ int do_quaff(struct char_data *ch, char *argument, int cmd)
   if(!is_mob || !IS_SET(retval, eCH_DIED)) // it's already been free'd when mob died
   {     
     if (equipped)
-      unequip_char(ch, HOLD);
+      unequip_char(ch, HOLD,1);
     extract_obj(temp);
   }
   return retval;
@@ -403,7 +405,7 @@ int do_recite(struct char_data *ch, char *argument, int cmd)
     if(!is_mob || !IS_SET(retval, eCH_DIED)) // it's already been free'd when mob died
     {
       if (equipped)
-        unequip_char(ch, HOLD);
+        unequip_char(ch, HOLD,1);
       extract_obj(scroll);
     }
     return eSUCCESS;
@@ -1290,17 +1292,17 @@ int size_restricted(struct char_data *ch, struct obj_data *obj)
       return FALSE;
     else return TRUE;
 
-  if(GET_HEIGHT(ch) < 65)
+  if(GET_HEIGHT(ch) < 66)
     if(IS_SET(obj->obj_flags.size, SIZE_SMALL) || IS_SET(obj->obj_flags.size, SIZE_MEDIUM))
       return FALSE;
     else return TRUE;
 
-  if(GET_HEIGHT(ch) < 77)
+  if(GET_HEIGHT(ch) < 78)
     if(IS_SET(obj->obj_flags.size, SIZE_MEDIUM))
       return FALSE;
     else return TRUE;
 
-  if(GET_HEIGHT(ch) < 101)
+  if(GET_HEIGHT(ch) < 102)
     if(IS_SET(obj->obj_flags.size, SIZE_LARGE) || IS_SET(obj->obj_flags.size, SIZE_MEDIUM))
       return FALSE;
     else return TRUE;
@@ -1413,26 +1415,27 @@ void wear(struct char_data *ch, struct obj_data *obj_object, int keyword)
     return;
   }
 
-/* No longer used.
-  if((GET_CLASS(ch) == CLASS_MONK) && 
-    (obj_object->obj_flags.type_flag == ITEM_ARMOR)) {
-    if(obj_object->obj_flags.value[0] > 4) {
-      send_to_char("You can't wear such restrictive armor.\n\r", ch);
-      return;
-    }
-  }
-*/ 
-        
   if(IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL) &&
      !isname(GET_NAME(ch), obj->name) && GET_LEVEL(ch) < IMP) {
     send_to_char("This item will only work on its rightful owner.\n\r", ch);
     return;
   }
 
+  if(IS_FAMILIAR(ch)) {
+    send_to_char("Familiar's cannot wear eq!\n\r", ch);
+    return;
+  }        
   if(!IS_SET(obj->obj_flags.size, SIZE_CHARMIE_OK) &&
      IS_AFFECTED(ch, AFF_CHARM) ) 
   {
     do_say(ch, "It does not fit Master.", 0);
+    return;
+  }
+  // if they are charmed, and race > reptile (non player races)
+  // then they can only wear eq on ear, neck, or wrist
+  if( IS_AFFECTED(ch, AFF_CHARM) && keyword != 1 && keyword != 10 && keyword != 15 
+&& (!IS_NPC(ch) || mob_index[ch->mobdata->nr].virt != 8)) {
+    do_emote(ch, "does not seem to know where to wear it...",9);
     return;
   }
 

@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.h,v 1.9 2004/04/17 13:13:39 urizen Exp $ */
+/* $Id: handler.h,v 1.10 2004/11/16 00:52:09 Zaphod Exp $ */
 
 #ifndef HANDLER_H_
 #define HANDLER_H_
@@ -65,8 +65,8 @@ int obj_from_room(struct obj_data *object);
 int obj_to_obj(struct obj_data *obj, struct obj_data *obj_to);
 int obj_from_obj(struct obj_data *obj);
 
-int equip_char(CHAR_DATA *ch, struct obj_data *obj, int pos);
-struct obj_data *unequip_char(CHAR_DATA *ch, int pos);
+int equip_char(CHAR_DATA *ch, struct obj_data *obj, int pos, int flag =0);
+struct obj_data *unequip_char(CHAR_DATA *ch, int pos, int flag = 0);
 
 struct obj_data *get_obj_in_list(char *name, struct obj_data *list);
 struct obj_data *get_obj_in_list_num(int num, struct obj_data *list);
@@ -94,6 +94,7 @@ CHAR_DATA *get_char_room_vis(CHAR_DATA *ch, char *name);
 CHAR_DATA *get_char_vis(CHAR_DATA *ch, char *name);
 CHAR_DATA *get_mob_vis(CHAR_DATA *ch, char *name);
 CHAR_DATA *get_mob_vnum(int vnum);
+OBJ_DATA *get_obj_vnum(int vnum);
 struct obj_data *get_obj_in_list_vis(CHAR_DATA *ch, char *name, 
 		struct obj_data *list);
 struct obj_data *get_obj_in_list_vis(CHAR_DATA *ch, int item_num, 

@@ -227,8 +227,8 @@ char * TokenList::Interpret(CHAR_DATA *from, OBJ_DATA *obj,
           case '7': strcat(interp, GREY);    break;
           case '0': strcat(interp, BLACK);   break;
           case 'B': strcat(interp, BOLD);    break;
+	  case 'L': strcat(interp, FLASH);   break;
           case 'I': strcat(interp, INVERSE); break;
-          case 'L': strcat(interp, FLASH);   break;
           case 'R': strcat(interp, NTEXT);   break;
           case '*': strcat(interp, EEEE);    break;
           default:                           break;

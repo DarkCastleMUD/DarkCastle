@@ -115,6 +115,45 @@ int do_processes(struct char_data *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
+int do_guide(struct char_data *ch, char *argument, int cmd)
+{
+    struct char_data *victim;
+    char name[100], buf[256];
+
+    one_argument(argument,name);
+
+    if(*name) {
+        if(!(victim = get_char_vis(ch, name))) {
+            send_to_char("That player is not here.\n\r", ch);
+            return eFAILURE;
+        }
+    } else {
+        send_to_char("Who exactly would you like to be a guide?\n\r", ch);
+        return eFAILURE;
+    }
+
+    if (IS_NPC(victim)) {
+      send_to_char("Hmm, mobs wouldn't make very good guides now would they?\r\n", ch);
+      return eFAILURE;
+    }
+
+    if (!IS_SET(victim->pcdata->toggles, PLR_GUIDE)) {
+        sprintf(buf, "%s is now a guide.\r\n", GET_NAME(victim));
+        send_to_char(buf, ch);
+        send_to_char("You have been selected to be a DC Guide!\r\n", victim);
+	SET_BIT(victim->pcdata->toggles, PLR_GUIDE);
+	SET_BIT(victim->pcdata->toggles, PLR_GUIDE_TOG);
+    } else {
+        sprintf(buf, "%s is no longer a guide.\r\n", GET_NAME(victim));
+        send_to_char(buf, ch);
+        send_to_char("You have been removed as a DC guide.\r\n", victim);
+        REMOVE_BIT(victim->pcdata->toggles, PLR_GUIDE);
+	REMOVE_BIT(victim->pcdata->toggles, PLR_GUIDE_TOG);
+    }
+
+  return eSUCCESS;
+}
+
 int do_advance(struct char_data *ch, char *argument, int cmd)
 {
     struct char_data *victim;
@@ -327,6 +366,7 @@ int do_shutdown(struct char_data *ch, char *argument, int cmd)
     int write_hotboot_file();
     extern int _shutdown;
     extern int try_to_hotboot_on_crash;
+    extern int do_not_save_corpses;
 
     if (IS_NPC(ch))
         return eFAILURE;
@@ -355,6 +395,7 @@ int do_shutdown(struct char_data *ch, char *argument, int cmd)
         _shutdown = 1;
     }
     else if(!strcmp(arg, "hot")) {
+        do_not_save_corpses = 1;
         sprintf(buf, "Hot reboot by %s.\n\r", GET_SHORT(ch) );
         send_to_all(buf);
         log(buf, ANGEL, LOG_GOD);

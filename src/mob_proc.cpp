@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.65 2004/07/21 10:16:10 rahz Exp $ */
+/* $Id: mob_proc.cpp,v 1.66 2004/11/16 00:51:35 Zaphod Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -965,10 +965,10 @@ int passive_cleric(struct char_data *ch, struct obj_data *obj, int cmd, char *ar
        return eSUCCESS;
      }
 
-     if((GET_HIT(vict) + 5) < GET_MAX_HIT(vict)) {
-       cleric_healing(ch, vict);
-       return eSUCCESS;
-     }
+//     if((GET_HIT(vict) + 5) < GET_MAX_HIT(vict)) {
+//       cleric_healing(ch, vict);
+//       return eSUCCESS;
+//     }
    }
    
   return eFAILURE;
@@ -5221,11 +5221,23 @@ int museum_guard(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
    return eFAILURE;
 }
 
+int mage_golem(struct char_data *ch, struct obj_data *obj, int cmd,
+	char *arg, struct char_data *owner)
+{
+  if (cmd || !ch->master || ch->fighting || ch->in_room != ch->master->in_room) return eFAILURE;
+
+   if(ch->master->fighting && IS_NPC(ch->master->fighting))
+      do_join(ch, GET_NAME(ch->master), 9);
+
+   return eFAILURE;
+}
+
 int mage_familiar_imp(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,        
           struct char_data *owner)
 {
   if(number(0, 1))
     return cast_fireball(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, GET_LEVEL(ch));
+
   
   return eFAILURE;  
 }
@@ -5270,6 +5282,33 @@ int mage_familiar_imp_non(struct char_data *ch, struct obj_data *obj, int cmd, c
   }
 
   return eFAILURE;
+}
+
+int mage_familiar_gremlin_non(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
+   struct char_data *owner)
+{
+  if (cmd) return eFAILURE;
+  if (!ch->master)
+  {
+   log("Familiar without a master.", IMMORTAL, LOG_BUG);
+    extract_char(ch, TRUE);
+    return (eCH_DIED | eSUCCESS);
+ }
+ switch (number(0,5))
+ {
+   case 0:
+	act("$n chatters incessantly while magically fusing two small rocks together.",     ch, 0, 0, TO_ROOM, 0);
+	break;
+  case 1: break;
+   case 2: break;
+   case 3: break;
+   case 4: break;
+   case 5: break;
+ }
+ if (!IS_NPC(ch->master) && ch->master->pcdata->golem->in_room == ch->in_room)
+ { // Get repairy
+ }
+ return eSUCCESS;
 }
 
 int druid_familiar_chipmunk_non(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,

@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: save.cpp,v 1.27 2004/05/21 02:04:18 urizen Exp $ */
+/* $Id: save.cpp,v 1.28 2004/11/16 00:51:35 Zaphod Exp $ */
 
 extern "C"
 {
@@ -33,6 +33,7 @@ extern "C"
 #include <character.h>
 #include <mobile.h>
 #include <utility.h>
+#include <spells.h>
 #include <fileinfo.h> // SAVE_DIR
 #include <player.h>
 #include <levels.h>
@@ -219,10 +220,18 @@ void read_mob_data(struct mob_data * i, FILE * fpsave)
 // TODO - make sure I go back and update the time_data structs everywhere when 
 // we lose link, or logout, etc so that the 'played' variable is correct
 
+void fwrite_string_tilde(FILE *fpsave)
+{
+  char buf[40];
+  strcpy(buf,"Bugfixbugfixbugfixbugfixbugfixbugfix~");
+  fwrite(&buf, 37, 1, fpsave); 
+}
 void save_pc_data(struct pc_data * i, FILE * fpsave, struct time_data tmpage)
 {
   fwrite(i->pwd,            sizeof(char),        PASSWORD_LEN+1, fpsave);
   save_char_aliases(i->alias, fpsave);
+
+  fwrite_string_tilde(fpsave);
   fwrite(&(i->rdeaths),     sizeof(i->rdeaths),  1, fpsave);
   fwrite(&(i->pdeaths),     sizeof(i->pdeaths),  1, fpsave);
   fwrite(&(i->pkills),      sizeof(i->pkills),   1, fpsave);
@@ -275,12 +284,26 @@ void save_pc_data(struct pc_data * i, FILE * fpsave, struct time_data tmpage)
   fwrite("STP", sizeof(char), 3, fpsave);
 }
 
-void read_pc_data(struct pc_data * i, FILE* fpsave)
+void fread_to_tilde(FILE *fpsave)
+{
+  char a;
+  while (TRUE)
+  {
+    fread(&a, 1, 1, fpsave);
+    if (a == '~') break; 
+  }
+}
+
+void read_pc_data(struct char_data *ch, FILE* fpsave)
 {
   char typeflag[4];
-  i->golem = 0;
+  char *tmpbuf;
+ struct pc_data * i = ch->pcdata;
+   i->golem = 0;
   fread(i->pwd,            sizeof(char),       PASSWORD_LEN+1, fpsave);
   i->alias = read_char_aliases(fpsave);
+  if (has_skill(ch, NEW_SAVE))
+    fread_to_tilde(fpsave);
   fread(&(i->rdeaths),     sizeof(i->rdeaths),  1, fpsave);
   fread(&(i->pdeaths),     sizeof(i->pdeaths),  1, fpsave);
   fread(&(i->pkills),      sizeof(i->pkills),   1, fpsave);
@@ -331,7 +354,7 @@ void read_pc_data(struct pc_data * i, FILE* fpsave)
     fread(&i->kimetas, sizeof(i->kimetas), 1, fpsave);
     fread(&typeflag, sizeof(char), 3, fpsave);
   }
-
+  i->skillchange = 0;
   // Add new items in this format
 //  if(!strcmp(typeflag, "XXX"))
 //    do_something
@@ -368,7 +391,7 @@ int read_pc_or_mob_data(CHAR_DATA *ch, FILE *fpsave)
 #else
     ch->pcdata = (pc_data *)dc_alloc(1, sizeof(pc_data));
 #endif
-    read_pc_data(ch->pcdata, fpsave);
+    read_pc_data(ch, fpsave);
   }
   return 1;
 }
@@ -391,16 +414,21 @@ int store_worn_eq(char_data * ch, FILE * fpsave)
   }
   return 1;
 }
+extern int learn_skill(char_data * ch, int skill, int amount, int maximum);
 
 int char_to_store_variable_data(CHAR_DATA * ch, FILE * fpsave)
 {
-  char_skill_data * skill = ch->skills;
 
   fwrite_var_string(ch->name, fpsave);
   fwrite_var_string(ch->short_desc, fpsave);
   fwrite_var_string(ch->long_desc, fpsave);
   fwrite_var_string(ch->description, fpsave);
   fwrite_var_string(ch->title, fpsave);
+
+  if (!has_skill(ch, NEW_SAVE)) // New save.
+     learn_skill(ch, NEW_SAVE, 1, 100);    
+
+  char_skill_data * skill = ch->skills;
 
   while(skill) {
     fwrite("SKL", sizeof(char), 3, fpsave);
@@ -833,7 +861,7 @@ struct obj_data *  obj_store_to_char(CHAR_DATA *ch, FILE *fpsave, struct obj_dat
   // Handle worn EQ
   if ( (wear_pos > -1) && (wear_pos < MAX_WEAR) && (!ch->equipment[wear_pos]))
   {
-    equip_char (ch, obj, wear_pos);
+    equip_char (ch, obj, wear_pos, 1);
     return obj;
   }
   else if(object.container_depth == 1 && last_cont)
@@ -890,12 +918,12 @@ bool obj_to_store (struct obj_data *obj, CHAR_DATA *ch, FILE *fpsave, int wear_p
 bool put_obj_in_store (struct obj_data *obj, CHAR_DATA *ch, FILE *fpsave, int wear_pos)
 {
   struct obj_data *standard_obj;
-  struct obj_data *loop_obj;
-  int    iAffect, iAff2;
-  int    change;
+  //struct obj_data *loop_obj;
+  //int    iAffect, iAff2;
+  //int    change;
   uint16 length;  // do not change this type
   struct obj_file_elem object;
-  int16 tmp_weight = 0; // do not change this type
+  //int16 tmp_weight = 0; // do not change this type
 
   if (GET_ITEM_TYPE(obj) == ITEM_KEY)
     return TRUE;
@@ -1172,15 +1200,15 @@ void char_to_store(CHAR_DATA *ch, struct char_file_u *st, struct time_data & tmp
   // Remove all the eq and store it in temp storage
   for(i=0; i<MAX_WEAR; i++) {
     if (ch->equipment[i])
-      char_eq[i] = unequip_char(ch, i);
+      char_eq[i] = unequip_char(ch, i,1);
     else
       char_eq[i] = 0;
   }
 
 bool isaff2(int spellnum);
   // Unaffect everything a character can be affected by spell-wise
-  for(af = ch->affected; af; af = af->next) {
-
+  for(af = ch->affected; af; af = af->next) 
+  {
     affect_modify( ch, af->location, af->modifier, af->bitvector, FALSE,isaff2(af->type));
   }
 
@@ -1256,7 +1284,7 @@ bool isaff2(int spellnum);
   // re-equip the character with his eq
   for(i=0; i<MAX_WEAR; i++) {
     if (char_eq[i])
-      equip_char(ch, char_eq[i], i);
+      equip_char(ch, char_eq[i], i,1);
   }
 }
 

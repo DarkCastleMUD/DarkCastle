@@ -1,7 +1,7 @@
 #ifndef FILEINFO_H_
 #define FILEINFO_H_
 /*
-| $Id: fileinfo.h,v 1.6 2004/05/20 15:51:12 urizen Exp $
+| $Id: fileinfo.h,v 1.7 2004/11/16 00:52:09 Zaphod Exp $
 | fileinfo.h
 | Description:  Contains information for loading files, ie "../lib", etc..
 */
@@ -58,6 +58,10 @@
 #define  HELP_PAGE_FILE     "help.txt"
 #define  INFO_FILE          "info.txt"
 #define  WIZLIST_FILE       "wizlist.txt"
+
+#define  NEW_HELP_FILE	     "new_help.txt"
+#define  NEW_HELP_PAGE_FILE  "new_help_screen.txt"
+#define  NEW_IHELP_PAGE_FILE "new_ihelp_screen.txt"
 
 #ifndef WIN32
 #define BUG_FILE            "../log/bug.log"

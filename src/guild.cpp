@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.72 2004/07/03 11:44:12 urizen Exp $
+| $Id: guild.cpp,v 1.73 2004/11/16 00:51:34 Zaphod Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -120,6 +120,7 @@ int learn_skill(char_data * ch, int skill, int amount, int maximum)
   }
   return 0;
 }
+
 int search_skills2(int arg, class_skill_defines * list_skills)
 {
   for(int i = 0; *list_skills[i].skillname != '\n'; i++)
@@ -179,6 +180,19 @@ class_skill_defines * get_skill_list(char_data * ch)
 void debug_here()
 {}
 
+char *attrname(int attr)
+{
+  switch (attr)
+  {
+    case STR: return "Str";
+    case INT: return "Int";
+    case WIS: return "Wis";
+    case DEX: return "Dex";
+    case CON: return "Con";
+    default: return "Err";
+  }
+}
+
 int skills_guild(struct char_data *ch, char *arg, struct char_data *owner)
 {
   char buf[160];
@@ -209,10 +223,23 @@ int skills_guild(struct char_data *ch, char *arg, struct char_data *owner)
       send_to_char(buf, ch);
       if(skilllist[i].skillnum >= 1 && skilllist[i].skillnum <= MAX_SPL_LIST) 
       {
+	if (skilllist[i].skillnum == SPELL_PORTAL && GET_CLASS(ch) == CLASS_CLERIC)
+	sprintf(buf," Mana: %4d ", 150);
+	else
         sprintf(buf," Mana: %4d ",use_mana(ch,skilllist[i].skillnum));
         send_to_char(buf, ch);
       }
       else send_to_char("            ", ch);
+      if (skilllist[i].attrs[0])
+      {
+	sprintf(buf, " %s ",attrname(skilllist[i].attrs[0]));
+	send_to_char(buf, ch);
+      }
+      if (skilllist[i].attrs[1])
+      {
+        sprintf(buf, " (%s) ",attrname(skilllist[i].attrs[1]));
+        send_to_char(buf, ch);
+      }
       if(specialization) 
       {
         for(loop = 0; loop < specialization; loop++)
@@ -290,6 +317,7 @@ int skills_guild(struct char_data *ch, char *arg, struct char_data *owner)
       case SPELL_VAMPIRIC_AURA:
       case SKILL_BULLRUSH:
       case SPELL_HOLY_AURA:
+      case SKILL_SPELLCRAFT:
 	do_say(owner, "I cannot teach you that. You need to learn it by yourself.\r\n",9);
 	return eFAILURE;
       default: break;
@@ -562,19 +590,19 @@ void skill_increase_check(char_data * ch, int skill, int learned, int difficulty
    chance = number(1, 101);
    if(learned < 15)
       chance += 5;
-   int oi = 100;
-   if (difficulty > 500) { oi = 101; difficulty -= 500; }
+   int oi = 101;
+   if (difficulty > 500) { oi = 100; difficulty -= 500; }
    switch(difficulty) {
      case SKILL_INCREASE_EASY:
-	 if (oi==100) oi = 94;
+	 if (oi==101) oi = 94;
 	 oi -= int_app[GET_INT(ch)].easy_bonus;
         break;
      case SKILL_INCREASE_MEDIUM:
-	if (oi==100)oi = 96;
+	if (oi==101)oi = 96;
 	oi -= int_app[GET_INT(ch)].medium_bonus;
         break;
      case SKILL_INCREASE_HARD:
-	if (oi==100)oi = 98;
+	if (oi==101)oi = 98;
 	oi -= int_app[GET_INT(ch)].hard_bonus;
         break;
      default:

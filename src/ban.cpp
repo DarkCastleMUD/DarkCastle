@@ -125,11 +125,6 @@ int do_ban(CHAR_DATA *ch, char *argument, int cmd)
   char buf[MAX_STRING_LENGTH];  
   struct ban_list_element *ban_node;
 
-  if(!has_skill(ch, COMMAND_BAN)) {
-        send_to_char("Huh?\r\n", ch);
-        return eFAILURE;
-  }
-
   *buf = '\0';
 
   if (!*argument) {
@@ -210,10 +205,6 @@ int do_unban(CHAR_DATA *ch, char *argument, int cmd) {
   int found = 0;
   char buf[MAX_STRING_LENGTH];
 
-  if(!has_skill(ch, COMMAND_UNBAN)) {
-        send_to_char("Huh?\r\n", ch);
-        return eFAILURE;
-  }
 
   one_argument(argument, site);
   if (!*site) {

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.20 2004/07/03 11:44:39 urizen Exp $
+| $Id: wizard.cpp,v 1.21 2004/11/16 00:52:17 Zaphod Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -192,7 +192,7 @@ void boro_mob_stat(struct char_data *ch, struct char_data *k)
 	extern char *pc_clss_types[];
 	// extern char *punish_bits[];
 	extern char *action_bits[];
-	extern char *player_bits[];
+	//extern char *player_bits[];
 	extern char *combat_bits[];
 	extern char *position_types[];
 	extern char *connected_types[];
@@ -216,7 +216,7 @@ void boro_mob_stat(struct char_data *ch, struct char_data *k)
 	/* end of first line */
 	
 	(k->short_desc ? k->short_desc : "None"),
-	(IS_NPC(k) ? k->mobdata->nr : 0),
+	(long)(IS_NPC(k) ? k->mobdata->nr : 0),
 	/* end of second line */
 	
 	(k->long_desc ? k->long_desc : "None"),
@@ -275,7 +275,7 @@ void boro_mob_stat(struct char_data *ch, struct char_data *k)
 	}
 	
 	sprintf(buf,
-		"|~|  $2Timer$R: %-11d |o|  $1Town$R:   %-5ld      $1Sex$R:         %-14s|\\|\r\n"
+		"|~|  $2Timer$R: %-11d |o|  $1Town$R:   %-5d     $1Sex$R:         %-14s|\\|\r\n"
 		"(:)====================(:)==========(:)====================================(:)\r\n",
 		k->timer,
 		(!IS_NPC(ch) ? k->hometown : -1),
@@ -412,8 +412,8 @@ void boro_mob_stat(struct char_data *ch, struct char_data *k)
 	}
 
 	if(!IS_MOB(k)) {
-		sprintf(buf, "$3Coins$R:[%ld]  $3Bank$R:[%ld]\n\r", GET_GOLD(k),
-		k->pcdata->bank );
+		sprintf(buf, "$3Coins$R:[%ld]  $3Bank$R:[%ld]\n\r", (long)GET_GOLD(k),
+		(long)k->pcdata->bank );
 		send_to_char(buf, ch);
 	}
 
@@ -489,10 +489,10 @@ void mob_stat(struct char_data *ch, struct char_data *k)
   int i2;
   char buf2[MAX_STRING_LENGTH];
   struct obj_data  *j=0;
-  extern char *skills[];
-  extern char *spells[];
-  extern char *ki[];
-  extern char *songs[];
+  //extern char *skills[];
+ // extern char *spells[];
+ // extern char *ki[];
+ // extern char *songs[];
   struct affected_type *aff;  
 
   // for chars
@@ -563,7 +563,7 @@ void mob_stat(struct char_data *ch, struct char_data *k)
   }
   if (IS_NPC(k))
   {
-    sprintf(buf, "$3Mobspec$R: %d  $3Progtypes$R: %d\r\n", (mob_index[k->mobdata->nr].mobspec), mob_index[k->mobdata->nr].progtypes);
+    sprintf(buf, "$3Mobspec$R: %d  $3Progtypes$R: %d\r\n", (int)(mob_index[k->mobdata->nr].mobspec), mob_index[k->mobdata->nr].progtypes);
     send_to_char(buf,ch);
   }
  sprintf(buf, "$3Height$R:[%d]  $3Weight$R:[%d]  $3Sex$R:[", GET_HEIGHT(k), GET_WEIGHT(k));
@@ -762,6 +762,8 @@ void mob_stat(struct char_data *ch, struct char_data *k)
     sprintf(buf, "$3MRange$R: %s\n\r", GET_MOB_RANGE(k) ? GET_MOB_RANGE(k) : "None");
     send_to_char(buf, ch);
   }  
+
+  csendf(ch, "$3Lag Left$R:  %d\r\n", (GET_WAIT(k) ? GET_WAIT(k) : 0));
 
   if(k->affected) {
     send_to_char("\n\r$3Affecting Spells$R:\n\r--------------\n\r", ch);
@@ -1120,7 +1122,13 @@ extern char * strs_damage_types[];
     send_to_char("$3Can affect char$R :\n\r", ch);
     for (i=0;i<j->num_affects;i++) 
     {
-      sprinttype(j->affected[i].location,apply_types,buf2);
+//      sprinttype(j->affected[i].location,apply_types,buf2);
+                if (j->affected[i].location < 1000)
+                 sprinttype(j->affected[i].location,apply_types,buf2);
+                else if (get_skill_name(j->affected[i].location/1000))
+                  strcpy(buf2, get_skill_name(j->affected[i].location/1000));
+		else strcpy(buf2, "Invalid");
+	
       sprintf(buf,"    $3Affects$R : %s By %d\n\r", buf2,j->affected[i].modifier);
       send_to_char(buf, ch);
     }           
@@ -1278,11 +1286,6 @@ int do_echo(struct char_data *ch, char *argument, int cmd)
     if(IS_NPC(ch))
       return eFAILURE;
     
-    if(!has_skill(ch, COMMAND_ECHO)) {
-        send_to_char("Huh?\r\n", ch);
-        return eFAILURE;
-    }
-
     for (i = 0; *(argument + i) == ' '; i++);
 
     if(!*(argument + i))
@@ -1365,6 +1368,7 @@ int do_restore(struct char_data *ch, char *argument, int cmd)
             GET_MANA(victim) = GET_MAX_MANA(victim);
             GET_HIT(victim) = GET_MAX_HIT(victim);
             GET_MOVE(victim) = GET_MAX_MOVE(victim);
+            GET_KI(victim) = GET_MAX_KI(victim);
 
             if(GET_LEVEL(victim) >= IMMORTAL) {
               GET_COND(victim, FULL)   = -1;
@@ -1405,5 +1409,3 @@ void special_log(char *arg)
   fprintf(fl, "%s\n", arg);
   dc_fclose(fl);
 }
-
-

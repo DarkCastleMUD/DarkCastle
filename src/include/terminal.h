@@ -1,7 +1,7 @@
 #ifndef TERMINAL_H_
 #define TERMINAL_H_
 /************************************************************************
-| $Id: terminal.h,v 1.2 2002/06/13 04:41:15 dcastle Exp $
+| $Id: terminal.h,v 1.3 2004/11/16 00:52:09 Zaphod Exp $
 | Terminal.h
 | Description: This file defines all of the terminal constants and
 |   header information.
@@ -36,8 +36,8 @@
 #define LEFTARR  "[D"
 #define HOMEPOS  "[H"
 
+#define FLASH     "[4m"
 #define BOLD     "[1m"
-#define FLASH    "[5m"
 #define INVERSE  "[7m"
 #define NTEXT    "[0m[37m"      /* Makes it normal */
 

@@ -1,7 +1,7 @@
 #ifndef PLAYER_H_
 #define PLAYER_H_
 /************************************************************************
-| $Id: player.h,v 1.15 2004/05/27 20:45:12 urizen Exp $
+| $Id: player.h,v 1.16 2004/11/16 00:52:09 Zaphod Exp $
 | player.h
 | Description: This file defines the player vectors..punishment, specials,
 |   etc...
@@ -36,6 +36,7 @@
 #define LOG_CHAOS          1<<16
 #define LOG_CLAN           1<<17
 #define LOG_WARNINGS       1<<18
+#define LOG_HELP	   1<<19
 // ...
 #define MISC_IS_MOB        1<<31
 
@@ -70,6 +71,8 @@
 #define PLR_LFG          1<<17
 #define PLR_NOTELL       1<<18
 #define PLR_NOTAX	 1<<19
+#define PLR_GUIDE	 1<<20
+#define PLR_GUIDE_TOG	 1<<21
 
 /************************************************************************
 | Class types for PCs
@@ -213,8 +216,15 @@
 #define APPLY_DAMAGED          95
 #define WEP_THIEF_POISON       96
 #define APPLY_PROTECT_GOOD     97
-#define APPLY_MAXIMUM_VALUE    97
+#define APPLY_MELEE_DAMAGE     98
+#define APPLY_SPELL_DAMAGE     99
+#define APPLY_SONG_DAMAGE      100
+#define APPLY_MAXIMUM_VALUE    100
 
+/*
+ 1000+ are reserved, so if you were thinking about using, think
+ again.
+*/
 /* RESERVED: 100-150 for more weapon affects */
 /* Morc XXX */
 

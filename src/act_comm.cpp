@@ -98,6 +98,7 @@ int send_to_gods(char *str, int god_level, long type)
 {
   char buf1[MAX_STRING_LENGTH];
   char buf[MAX_STRING_LENGTH];
+  char typestr[30];
   struct descriptor_data *i;
 
   if(str == 0) {
@@ -109,9 +110,51 @@ int send_to_gods(char *str, int god_level, long type)
     return(0);
   }
 
-  sprintf(buf, "// %s\n\r", str);
-  sprintf(buf1, "%s%s// %s%s %s%s%s\n\r",
-          BOLD, RED, YELLOW, str, RED, NTEXT, GREY);
+  switch (type) {
+    case LOG_BUG:
+      sprintf(typestr, "bug");
+      break;
+    case LOG_PRAYER:
+      sprintf(typestr, "pray");
+      break;
+    case LOG_GOD:
+      sprintf(typestr, "god");
+      break;
+    case LOG_MORTAL:
+      sprintf(typestr, "mortal");
+      break;
+    case LOG_SOCKET:
+      sprintf(typestr, "socket");
+      break;
+    case LOG_MISC:
+      sprintf(typestr, "misc");
+      break;
+    case LOG_PLAYER:
+      sprintf(typestr, "player");
+      break;
+    case LOG_WORLD:
+      sprintf(typestr, "world");
+      break;
+    case LOG_CHAOS:
+      sprintf(typestr, "chaos");
+      break;
+    case LOG_CLAN:
+      sprintf(typestr, "logclan");
+      break;
+    case LOG_WARNINGS:
+      sprintf(typestr, "warnings");
+      break;
+    case LOG_HELP:
+      sprintf(typestr, "help");
+      break;
+    default:
+      sprintf(typestr, "unknown");
+      break;
+  }
+
+  sprintf(buf, "//(%s) %s\n\r", typestr, str);
+  sprintf(buf1, "%s%s//%s(%s)%s %s%s %s%s%s\n\r",
+          BOLD, RED, NTEXT, typestr, BOLD, YELLOW, str, RED, NTEXT, GREY);
 
   for(i = descriptor_list; i; i = i->next) {
     if((i->character == NULL) || (GET_LEVEL(i->character) <= MORTAL))
@@ -163,6 +206,7 @@ int do_channel(struct char_data *ch, char *arg, int cmd)
     "chaos",
     "logclan",
     "warnings",
+    "help",
     "\\@"
   };
 
@@ -186,7 +230,7 @@ int do_channel(struct char_data *ch, char *arg, int cmd)
       }
     }
     else {
-      for(x = 0; x <= 18; x++) {
+      for(x = 0; x <= 19; x++) {
          if(IS_SET(ch->misc, (1<<x)))
            y = 1;
          else
@@ -198,8 +242,8 @@ int do_channel(struct char_data *ch, char *arg, int cmd)
     return eSUCCESS;
   }
 
-  for(x = 0; x <= 19; x++) {
-     if(x == 19) {
+  for(x = 0; x <= 20; x++) {
+     if(x == 20) {
        send_to_char("That type was not found.\n\r", ch);
        return eSUCCESS;
      }

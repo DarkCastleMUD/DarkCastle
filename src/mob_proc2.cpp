@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.39 2004/07/24 01:53:54 urizen Exp $ */
+/* $Id: mob_proc2.cpp,v 1.40 2004/11/16 00:51:35 Zaphod Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -46,6 +46,7 @@ extern struct time_info_data time_info;
 
 /* extern procedures */
 
+void save_corpses(void);
 void hit(struct char_data *ch, struct char_data *victim, int type);
 void gain_exp(struct char_data *ch, int gain);
 
@@ -513,6 +514,7 @@ int mortician(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
                   "places at your feet.\n\r", ch);
      GET_PLATINUM(ch) -= cost;
      do_save(ch, "", 10);
+     save_corpses();
      return eSUCCESS; 
   }
   
@@ -965,7 +967,8 @@ int meta_get_stat_plat_cost(char_data * ch, byte targetstat)
 
   if (stat < 5) plat_cost = 100;
   else if (stat < 13) plat_cost = 250;
-  else if (stat < 29) plat_cost = 250 + ((stat-12) *50);
+  else if (stat < 28) plat_cost = 250 + ((stat-12) *50);
+  else if (stat == 28) plat_cost = 1250;
   else plat_cost = 1500;
 /*  if(stat >= 18) {
      plat_cost = 500;
@@ -1033,12 +1036,13 @@ void meta_list_stats(char_data * ch)
 
 int meta_get_moves_exp_cost(char_data * ch)
 {
-   return 5000000 + (GET_RAW_MOVE(ch) * 2500);
+   return (5000000 + (GET_RAW_MOVE(ch) * 2500))*1.2;
 }
 
 int meta_get_moves_plat_cost(char_data * ch)
 {
-  return 125 + (0.025 * GET_RAW_MOVE(ch) *(GET_RAW_MOVE(ch)/1000 == 0 ? 1: GET_RAW_MOVE(ch)/1000));
+  return (int)(125 + (int)((0.025 * GET_RAW_MOVE(ch) * 
+(GET_RAW_MOVE(ch)/1000 == 0 ? 1: GET_RAW_MOVE(ch)/1000))))*0.9;
 }
 
 int meta_get_hps_exp_cost(char_data * ch)
@@ -1064,7 +1068,7 @@ int meta_get_hps_exp_cost(char_data * ch)
 	cost = 3000; break;
    }
    cost = 5000000 + (cost * GET_RAW_HIT(ch));
-   return cost;
+   return cost*1.2;
 }
 
 int meta_get_hps_plat_cost(char_data * ch)
@@ -1086,8 +1090,8 @@ int meta_get_hps_plat_cost(char_data * ch)
       default:
         cost = 100; break;
    }
-   cost = 100 + cost + (0.025 * GET_RAW_HIT(ch) *(GET_RAW_HIT(ch)/1000 == 0 ? 1: GET_RAW_HIT(ch)/1000));
-   return cost;
+   cost = 100 + cost + (int)(0.025 * GET_RAW_HIT(ch) *(GET_RAW_HIT(ch)/1000 == 0 ? 1: GET_RAW_HIT(ch)/1000));
+   return cost*0.9;
 }
 
 int meta_get_mana_exp_cost(char_data * ch)
@@ -1105,7 +1109,7 @@ int meta_get_mana_exp_cost(char_data * ch)
         return 0;
    }
    cost = 5000000 + (cost * GET_RAW_MANA(ch));
-   return cost;
+   return cost*1.2;
 }
 
 int meta_get_mana_plat_cost(char_data * ch)
@@ -1122,8 +1126,8 @@ int meta_get_mana_plat_cost(char_data * ch)
       default:
         return 0;
    }
-  cost = 100 + cost + (0.025 * GET_RAW_MANA(ch) * (GET_RAW_MANA(ch)/1000 == 0 ? 1: GET_RAW_MANA(ch)/1000));
-  return cost;
+  cost = 100 + cost + (int)(0.025 * GET_RAW_MANA(ch) * (GET_RAW_MANA(ch)/1000 == 0 ? 1: GET_RAW_MANA(ch)/1000));
+  return cost*0.9;
 }
 
 int meta_get_ki_exp_cost(char_data * ch)
@@ -1138,7 +1142,7 @@ int meta_get_ki_exp_cost(char_data * ch)
     default: return 0;
   }
   cost = 10000000 + (GET_RAW_KI(ch) * cost);
-  return cost;
+  return cost*1.2;
 }
  
 int meta_get_ki_plat_cost(char_data * ch)
@@ -1153,29 +1157,29 @@ int meta_get_ki_plat_cost(char_data * ch)
     default: return 0;
   } 
   cost = 500 + cost + ((GET_RAW_KI(ch)/2) * (GET_RAW_KI(ch)/10));
-  return cost;
+  return cost*0.9;
 }
 
 int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,        
           struct char_data *owner)
 {
-  char buf[256];
+  //char buf[256];
   char argument[256];
 
   int stat;
   int choice;
   int increase;
   int hit_cost, mana_cost, move_cost, ki_cost, hit_exp, move_exp, mana_exp, ki_exp;
-  int price, statplatprice, max_stat;
+  int statplatprice, max_stat;
 
-  long gold;
+  //long gold;
 
-  struct obj_data *new_new_obj;
+  //truct obj_data *new_new_obj;
   sbyte *pstat; 
   int pprice;
 
-  const double EXPCONV  = 400000000.0;
-  const double GOLDCONV = 1000000.0;
+  //const double EXPCONV  = 400000000.0;
+  //const double GOLDCONV = 1000000.0;
 
   if((cmd != 59) && (cmd != 56))
     return eFAILURE;
@@ -1243,7 +1247,9 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     "12) 250 Platinum coins        Cost: 5,000,000 Gold Coins.\n\r"
     "13) Buy a practice session for 100 plats.\n\r"
     "14) Freedom from HUNGER and THIRST:  Currently out of stock.\n\r"
-    "15) Convert experience to gold. (1mil Gold = 400mil Exp.)\n\r"
+    "15) Convert experience to gold. (100mil Exp. = 500000 Gold.)\n\r"
+    "16) A deep blue potion of healing. Cost: 30 Platinum coins.\r\n"
+    "17) A deep red vial of mana. Cost: 60 Platinum coins.\r\n"
                  , ch);
 
     return eSUCCESS;
@@ -1424,6 +1430,34 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
      return eSUCCESS;
    }
 */
+  if (choice == 16 || choice == 17)
+  {
+   int vnum = choice == 16 ? 27903: 27904;
+   int cost = choice == 16 ? 30:60;
+   if (GET_PLATINUM(ch) < cost)
+   {
+      send_to_char("The Meta-physician tells you, 'You can't afford that!'\r\n",ch);
+      return eSUCCESS;
+   }
+   GET_PLATINUM(ch) -= cost;
+   struct obj_data *obj = clone_object(real_object(vnum));
+   if ( IS_CARRYING_N(ch) + 1 > CAN_CARRY_N(ch) )
+    {
+        send_to_char( "You can't carry that many items.\n\r", ch );
+	extract_obj(obj);
+        return eSUCCESS;
+    }
+
+    if ( IS_CARRYING_W(ch) + obj->obj_flags.weight > CAN_CARRY_W(ch) )
+    {
+        send_to_char( "You can't carry that much weight.\n\r", ch );
+	extract_obj(obj);
+        return eSUCCESS;
+   }
+   obj_to_char(obj,ch);
+   send_to_char("The Meta-physician tells you, 'Here is your potion.'\r\n",ch);
+   return eSUCCESS;
+  }
    if(choice == 11) {
      if (affected_by_spell(ch, FUCK_PTHIEF))
      {
@@ -1512,7 +1546,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     return eSUCCESS;
   }
   if (choice == 15) {
-    if (GET_EXP(ch) < 400000000) {
+    if (GET_EXP(ch) < 100000000) {
       send_to_char("The Meta-physician tells you, 'You lack the experience.'\n\r", ch);
       return eSUCCESS;
     }
@@ -1521,8 +1555,8 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
        return eSUCCESS;
     }
     
-    GET_EXP(ch) -= 400000000;
-    GET_GOLD(ch) += 1000000;
+    GET_EXP(ch) -= 100000000;
+    GET_GOLD(ch) += 500000;
 
     act("The Meta-physician touches $n.",  ch, 0, 0, TO_ROOM, 0);
     act("The Meta-physician touches you.",  ch, 0, 0, TO_CHAR, 0);

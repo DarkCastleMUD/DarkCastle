@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.31 2004/07/20 11:05:23 urizen Exp $ */
+/* $Id: clan.cpp,v 1.32 2004/11/16 00:51:34 Zaphod Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -109,8 +109,12 @@ void boot_clans(void)
     new_new_clan->number = fread_int(fl,0, LONG_MAX);
     // read in clan rooms
 //    fgets(buf, 198, fl);
-    while(fread_char(fl) != 'S') /* I see clan rooms! */
+     char b;
+    while(TRUE) /* I see clan rooms! */
     {
+	b = fread_char(fl);
+      if (b == 'S') break;
+      if (b != 'R') continue;
 #ifdef LEAK_CHECK
       new_new_room = (struct clan_room_data *)calloc(1, sizeof(struct clan_room_data));
 #else
@@ -201,6 +205,9 @@ void save_clans(void)
   struct clan_data * pclan = NULL;
   struct clan_room_data * proom = NULL;
   struct clan_member_data * pmember = NULL;
+  char buf[MAX_STRING_LENGTH];
+  char * x;
+  char * targ;
 
   if(!(fl = dc_fopen("../lib/clan.txt", "w"))) {
     fprintf(stderr, "Unable to open clan.txt for writing.\n");
@@ -213,34 +220,88 @@ void save_clans(void)
              pclan->name, pclan->number);
      // print rooms
      for(proom = pclan->rooms; proom; proom = proom->next)
-        fprintf(fl, "%d\n", proom->room_number);
+        fprintf(fl, "R %d\n", proom->room_number);
      fprintf(fl, "S\n");
 
+     // BLAH TEMP CODE HERE
+     targ = buf;
+     for(x = pclan->email; x && *x != '\0'; x++)
+        if( *x != '\r' )
+           *targ++ = *x;
+     *targ = '\0';
      // handle email
      if(pclan->email)
-       fprintf(fl, "E\n%s~\n", pclan->email);
+       fprintf(fl, "E\n%s~\n", buf);
+     //  fprintf(fl, "E\n%s~\n", pclan->email);
 
+     // BLAH TEMP CODE THIS BLOWS
+     // What's happening is apparently fedora's fprintf doesn't strip out
+     // \r's like Redhat's does.  So we're writing \n\r to files.  This is
+     // bad because when we read it in, fread_string replaces \n with a
+     // \n\r.  So we get \n\r\r.   After a while, this is really bad.
+     // So this is some crap code to strip out \r's before we save
+     // I just did this REALLY fast so please rewrite this
+     // Does it for L X O too but C and D were the hardcore ones so i temp 
+     // fixed those since those are the ones that got long enough to crash us
+     targ = buf;
+     for(x = pclan->description; x && *x != '\0'; x++)
+        if( *x != '\r' ) 
+           *targ++ = *x;
+     *targ = '\0';
+     
      // handle description
      if(pclan->description)
-       fprintf(fl, "D\n%s~\n", pclan->description);
+       fprintf(fl, "D\n%s~\n", buf);
+//       fprintf(fl, "D\n%s~\n", pclan->description);
+
+
+     // BLAH TEMP CODE HERE
+     targ = buf;
+     for(x = pclan->login_message; x && *x != '\0'; x++)
+        if( *x != '\r' )
+           *targ++ = *x;
+     *targ = '\0';
 
      if(pclan->login_message)
-       fprintf(fl, "L\n%s~\n", pclan->login_message);
-     
+       fprintf(fl, "L\n%s~\n", buf);
+     //  fprintf(fl, "L\n%s~\n", pclan->login_message);
+
      if (pclan->tax)
 	fprintf(fl, "T\n%d\n", pclan->tax);
 
      if (pclan->balance)
 	fprintf(fl, "B\n%ld\n", pclan->balance);
 
+     // BLAH TEMP CODE HERE
+     targ = buf;
+     for(x = pclan->death_message; x && *x != '\0'; x++)
+        if( *x != '\r' )
+           *targ++ = *x;
+     *targ = '\0';
      if(pclan->death_message)
-       fprintf(fl, "X\n%s~\n", pclan->death_message);
+       fprintf(fl, "X\n%s~\n", buf);
+      // fprintf(fl, "X\n%s~\n", pclan->death_message);
      
+     // BLAH TEMP CODE HERE
+     targ = buf;
+     for(x = pclan->logout_message; x && *x != '\0'; x++)
+        if( *x != '\r' )
+           *targ++ = *x;
+     *targ = '\0';
      if(pclan->logout_message)
-       fprintf(fl, "O\n%s~\n", pclan->logout_message);
+      fprintf(fl, "O\n%s~\n", buf);
+      // fprintf(fl, "O\n%s~\n", pclan->logout_message);
+
+     // BLAH TEMP CODE HERE
+     targ = buf;
+     for(x = pclan->clanmotd; x && *x != '\0'; x++)
+        if( *x != '\r' ) 
+           *targ++ = *x;
+     *targ = '\0';
 
      if(pclan->clanmotd)
-       fprintf(fl, "C\n%s~\n", pclan->clanmotd);
+       fprintf(fl, "C\n%s~\n", buf);
+//       fprintf(fl, "C\n%s~\n", pclan->clanmotd);
 
      for(pmember = pclan->members; pmember; pmember = pmember->next) {
        fprintf(fl, "M\n%s~\n", pmember->member_name);
@@ -945,11 +1006,22 @@ int clan_desc(CHAR_DATA *ch, char *arg)
     dc_free(clan->description);
   clan->description = NULL;
 */
-  send_to_char("Write new description.  ~ to end.\r\n", ch);
+ // send_to_char("Write new description.  ~ to end.\r\n", ch);
 
-  ch->desc->connected = CON_EDITING;
-  ch->desc->str = &clan->description;
-  ch->desc->max_str = MAX_CLAN_DESC_LENGTH;
+//  ch->desc->connected = CON_EDITING;
+//  ch->desc->str = &clan->description;
+//  ch->desc->max_str = MAX_CLAN_DESC_LENGTH;
+    ch->desc->backstr = NULL;
+    send_to_char("        Write your description and stay within the line.  (/s saves /h for help)\r\n"
+                 "   |--------------------------------------------------------------------------------|\r\n", ch);
+    if (clan->description) {
+       ch->desc->backstr = str_dup(clan->description);
+       send_to_char(ch->desc->backstr, ch);
+    }
+
+    ch->desc->connected = CON_EDITING;
+    ch->desc->strnew = &(clan->description);
+    ch->desc->max_str = MAX_CLAN_DESC_LENGTH;
   return 1;
 }
 
@@ -985,11 +1057,23 @@ int clan_motd(CHAR_DATA *ch, char *arg)
     dc_free(clan->clanmotd);
   clan->clanmotd = NULL;
 */
-  send_to_char("Write new motd.  ~ to end.\r\n", ch);
+ // send_to_char("Write new motd.  ~ to end.\r\n", ch);
 
-  ch->desc->connected = CON_EDITING;
-  ch->desc->str = &clan->clanmotd;
-  ch->desc->max_str = MAX_CLAN_DESC_LENGTH;
+ // ch->desc->connected = CON_EDITING;
+ // ch->desc->str = &clan->clanmotd;
+ // ch->desc->max_str = MAX_CLAN_DESC_LENGTH;
+
+    ch->desc->backstr = NULL;
+    send_to_char("        Write your motd and stay within the line.  (/s saves /h for help)\r\n"
+                 "   |--------------------------------------------------------------------------------|\r\n", ch);
+    if (clan->clanmotd) {
+       ch->desc->backstr = str_dup(clan->clanmotd);
+       send_to_char(ch->desc->backstr, ch);
+    }
+
+    ch->desc->connected = CON_EDITING;
+    ch->desc->strnew = &(clan->clanmotd);
+    ch->desc->max_str = MAX_CLAN_DESC_LENGTH;
   return 1;
 }
 
@@ -2086,6 +2170,7 @@ int do_clans(CHAR_DATA *ch, char *arg, int cmd)
   if(!strcmp("Pirahna", GET_NAME(ch)) || 
      !strcmp("Apocalypse", GET_NAME(ch)) ||
      !strcmp("Urizen", GET_NAME(ch)) ||
+     !strcmp("Dasein", GET_NAME(ch)) ||
      !strcmp("Valkyrie", GET_NAME(ch))
     ) 
   {
@@ -2292,6 +2377,7 @@ int do_cdeposit(CHAR_DATA *ch, char *arg, int cmd)
   get_clan(ch)->balance += dep;
   csendf(ch,"You deposit %d gold coins into your clan's account.\r\n",dep);
   save_clans();
+  do_save(ch,"",666);
   return eSUCCESS;
 }
 
@@ -2355,3 +2441,67 @@ int do_cbalance(CHAR_DATA *ch, char *arg, int cmd)
   csendf(ch, "Your clan has %d gold coins in the bank.\r\n",get_clan(ch)->balance);
   return eSUCCESS;
 }
+
+void remove_totem(OBJ_DATA *altar, OBJ_DATA *totem)
+{
+  CHAR_DATA *t;
+  for (t = character_list;t ;t = t->next)
+   if (!IS_NPC(t) && t->altar == altar)
+   {
+     int j;
+     for(j=0; j<totem->num_affects; j++)
+        affect_modify(t, totem->affected[j].location,
+          totem->affected[j].modifier, 0, FALSE);
+     redo_hitpoints(t);
+     redo_mana(t);
+     redo_ki(t);
+   }
+}
+
+void add_totem(OBJ_DATA *altar, OBJ_DATA *totem)
+{
+  CHAR_DATA *t;
+  for (t = character_list;t ;t = t->next)
+   if (!IS_NPC(t) && t->altar == altar)
+   {
+     int j;
+     for(j=0; j<totem->num_affects; j++)
+        affect_modify(t, totem->affected[j].location,
+          totem->affected[j].modifier, 0, TRUE);
+   }
+}
+
+void remove_totem_stats(CHAR_DATA *ch)
+{
+  OBJ_DATA *a;
+  if (!ch->altar) return;
+  for (a = ch->altar->contains; a ; a = a->next_content)
+  {
+    int j;
+    if (a->obj_flags.type_flag != ITEM_TOTEM) continue;
+     for(j=0; j<a->num_affects; j++)
+        affect_modify(ch, a->affected[j].location,
+          a->affected[j].modifier, 0, FALSE);
+     redo_hitpoints(ch);
+     redo_mana(ch);
+     redo_ki(ch);
+  }  
+}
+
+void add_totem_stats(CHAR_DATA *ch)
+{
+  OBJ_DATA *a;
+  if (!ch->altar) return;
+  for (a = ch->altar->contains; a ; a = a->next_content)
+  {
+     int j;
+    if (a->obj_flags.type_flag != ITEM_TOTEM) continue;
+     for(j=0; j<a->num_affects; j++)
+        affect_modify(ch, a->affected[j].location,
+          a->affected[j].modifier, 0, TRUE);
+     redo_hitpoints(ch);
+     redo_mana(ch);
+     redo_ki(ch);
+  }
+}
+

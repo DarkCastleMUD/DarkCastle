@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: channel.cpp,v 1.7 2004/07/04 23:39:26 urizen Exp $
+| $Id: channel.cpp,v 1.8 2004/11/16 00:51:34 Zaphod Exp $
 | channel.C
 | Description:  All of the channel - type commands; do_say, gossip, etc..
 */
@@ -69,6 +69,13 @@ int do_say(struct char_data *ch, char *argument, int cmd)
         if(SOMEONE_DIED(retval))
           return SWAP_CH_VICT(retval);
       }
+       if(!IS_NPC(ch)) {
+        retval = oprog_speech_trigger( argument, ch );
+        MOBtrigger = TRUE;
+        if(SOMEONE_DIED(retval))
+          return SWAP_CH_VICT(retval);
+      }
+
    }
    return eSUCCESS;
 }
@@ -157,7 +164,7 @@ int do_pray(struct char_data *ch, char *arg, int cmd)
     return eSUCCESS;
     }
 
-  sprintf(buf1, "\a** %s prays: %s **\n\r", GET_NAME(ch), arg);
+  sprintf(buf1, "\a$4$B**$R$5 %s prays: %s $4$B**$R\n\r", GET_NAME(ch), arg);
 
   for(i = descriptor_list; i; i = i->next) {
     if((i->character == NULL) || (GET_LEVEL(i->character) <= MORTAL))
@@ -520,8 +527,7 @@ int do_tell(struct char_data *ch, char *argument, int cmd)
     
     if(ch == vict)
       send_to_char("You try to tell yourself something.\n\r", ch);
-    else if((GET_POS(vict) == POSITION_SLEEPING  && GET_LEVEL(ch) <= MORTAL) ||
-            (IS_SET(world[vict->in_room].room_flags, QUIET))) 
+    else if((GET_POS(vict) == POSITION_SLEEPING || IS_SET(world[vict->in_room].room_flags, QUIET)) && GET_LEVEL(ch) < IMMORTAL) 
       act("Sorry, $E can't hear you.", ch, 0, vict, TO_CHAR, STAYHIDE);
     else {
       if(is_ignoring(vict, ch)) { 
