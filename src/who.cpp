@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: who.cpp,v 1.7 2002/12/26 21:47:16 pirahna Exp $
+| $Id: who.cpp,v 1.8 2003/02/18 22:04:58 pirahna Exp $
 | who.C
 | Commands for who, maybe? :P
 */
@@ -60,7 +60,7 @@ void add_to_who(char * strAdd)
    if(!strAdd)                                    return;
    if(!(strLength = strlen(strAdd)))              return;
 
-   if((strLength + gWhoBufferCurSize) > gWhoBufferMaxSize)  {  // expand the buffer
+   if((strLength + gWhoBufferCurSize) >= gWhoBufferMaxSize)  { // expand the buffer
      gWhoBufferMaxSize += (strLength + 500);                   // expand by the size + 500
 #ifdef LEAK_CHECK
      gWhoBuffer = (char *) realloc(gWhoBuffer, gWhoBufferMaxSize);
