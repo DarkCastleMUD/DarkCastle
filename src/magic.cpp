@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.99 2004/04/17 13:09:34 urizen Exp $ */
+/* $Id: magic.cpp,v 1.100 2004/04/17 14:10:23 urizen Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -625,7 +625,7 @@ int spell_earthquake(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
 
 int spell_life_leech(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
-  int dam;
+  int dam,retval = eSUCCESS;
   CHAR_DATA *tmp_victim, *temp;
 
   if(IS_SET(world[ch->in_room].room_flags, SAFE)) 
@@ -652,10 +652,10 @@ int spell_life_leech(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
 
 		 if (GET_HIT(ch) > GET_MAX_HIT(ch))
 			GET_HIT(ch) = GET_MAX_HIT(ch);
-		 return spell_damage (ch, tmp_victim, dam,TYPE_ENERGY, SPELL_LIFE_LEECH, 0);
+		 retval &= spell_damage (ch, tmp_victim, dam,TYPE_ENERGY, SPELL_LIFE_LEECH, 0);
 	}
   }
-  return eSUCCESS;
+  return retval;
 }
 
 void do_solar_blind(CHAR_DATA *ch, CHAR_DATA *tmp_victim)

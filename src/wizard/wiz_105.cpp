@@ -289,14 +289,19 @@ int do_sqedit(struct char_data *ch, char *argument, int cmd)
       break;
      case 6:
       send_to_char("These are the current sqs:\r\n",ch);
-      for (i = 0; i < 12; i++)
+      for (i = 1; i < 12; i++)
       {
-	csendf(ch, "%s skillquests.\r\n",pc_clss_types[i]);
+	csendf(ch, "$3%s skillquests.$R\r\n",pc_clss_types[i]);
+        bool done = FALSE;
         for (curren = skill_list; curren; curren = curren->next)
         {
-	  if (curren->clas == i)
+	  if (curren->clas == i) {
   	    csendf(ch, "$2%d$R. %s\r\n", curren->num, get_skill_name(curren->num));
+	    done = TRUE;
+	  }
         }
+        if (!done)
+	  send_to_char("    No skill quests.\r\n",ch);
       }
       break;
     default:
