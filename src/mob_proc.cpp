@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.5 2002/07/14 17:45:25 pirahna Exp $ */
+/* $Id: mob_proc.cpp,v 1.6 2002/07/21 08:23:24 azrack Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -5172,5 +5172,5 @@ int generic_area_guard(struct char_data *ch, struct obj_data *obj, int cmd, char
             if(vict->fighting)
               return attempt_move( ch, ++i );
 
-   return eSUCCESS;
+   return eFAILURE;
 }
