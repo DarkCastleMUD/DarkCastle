@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.110 2004/05/19 20:38:55 urizen Exp $ */
+/* $Id: const.cpp,v 1.111 2004/05/20 15:07:34 urizen Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1298,7 +1298,7 @@ struct class_skill_defines d_skills[] = { // bard skills
 { "dodge",                 SKILL_DODGE,                    5,      60,     {DEX,INT} },
 { "hide",                  SKILL_HIDE,                     7,      70,     {INT,WIS} },
 { "travelling march",       SKILL_SONG_TRAVELING_MARCH,     9,      98,     {DEX,CON} },
-{ "dual wield",            SKILL_DUAL_WIELD,               10,     60,     {DEX,CON} },
+{ "trip",            SKILL_TRIP,               10,     70,     {DEX,STR} },
 { "bountiful sonnet",      SKILL_SONG_BOUNT_SONNET,        12,     98,     {CON,WIS} },
 { "healing melody",        SKILL_SONG_HEALING_MELODY,      13,     98,     {WIS,CON} },
 { "glitter dust",          SKILL_SONG_GLITTER_DUST,        15,     98,     {INT,DEX} },
@@ -1323,7 +1323,7 @@ struct class_skill_defines d_skills[] = { // bard skills
 { "forgetful rhythm",      SKILL_SONG_FORGETFUL_RHYTHM,    42,     98,     {INT,STR} },
 { "disarming limerick",    SKILL_SONG_DISARMING_LIMERICK,  43,     98,     {CON,INT} },
 { "astral chanty",         SKILL_SONG_ASTRAL_CHANTY,       45,     98,     {STR,DEX} },
-//{ "lyrical enchantment", SKILL_LYRICAL_ENCHANTMENT,      46,     98,     {INT,DEX} },
+{ "crushing crescendo", SKILL_SONG_CRUSHING_CRESCENDO,      46,     98,     {INT,DEX} },
 { "shattering resonance",  SKILL_SONG_SHATTERING_RESO,     48,     98,     {STR,CON} },
 //{ "hypnotic harmony",    SKILL_HYPNOTIC_HARMONY,         50,     98,     {WIS,INT} },
 { "\n",                    0,                              1,      0,      {0,0} }

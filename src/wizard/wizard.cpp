@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.17 2004/05/18 20:59:02 urizen Exp $
+| $Id: wizard.cpp,v 1.18 2004/05/20 15:07:38 urizen Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -1338,7 +1338,7 @@ int do_restore(struct char_data *ch, char *argument, int cmd)
             update_pos( victim );
             redo_hitpoints(victim);
             redo_mana(victim);
-     
+	    redo_ki(victim);     
             send_to_char("Done.\n\r", ch);
             if (!IS_AFFECTED(ch, AFF_BLIND))
             act("You have been fully healed by $N!",
@@ -1374,6 +1374,7 @@ int do_restore(struct char_data *ch, char *argument, int cmd)
             }
      
             update_pos( victim );
+	    redo_ki(victim);
             redo_hitpoints(victim);
             redo_mana(victim);
      

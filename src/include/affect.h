@@ -2,7 +2,7 @@
 #define AFFECT_H_
 
 /************************************************************************
-| $Id: affect.h,v 1.8 2004/05/14 13:33:00 urizen Exp $
+| $Id: affect.h,v 1.9 2004/05/20 15:07:36 urizen Exp $
 | affect.h
 | This contains the bitvectors for affected_by
 */
@@ -57,7 +57,8 @@
 #define AFF_NO_FLEE             1<<13
 #define AFF_FAMILIAR            1<<14
 #define AFF_PROTECT_GOOD        1<<15
-#define AFF_POWERWIELD		1<<16
-#define AFF_REGENERATION	1<<17
-#define AFF_FOCUS		1<<18
+#define AFF_POWERWIELD		1<<16 // Innate Powerwield
+#define AFF_REGENERATION	1<<17 // Innate Regeneration
+#define AFF_FOCUS		1<<18 // Innate focus
+#define AFF_CONJURED		1<<19 // Conjure elemental/create golem'd
 #endif

@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.195 2004/05/20 00:07:05 urizen Exp $ */
+/* $Id: fight.cpp,v 1.196 2004/05/20 15:07:34 urizen Exp $ */
 
 extern "C"
 {
@@ -2925,18 +2925,19 @@ int do_skewer(CHAR_DATA *ch, CHAR_DATA *vict, int dam, int weapon)
     if (GET_LEVEL(vict) > GET_LEVEL(ch))
       damadd /= GET_LEVEL(vict) - GET_LEVEL(ch);
     GET_HIT(vict) -= damadd;
-    
+    update_pos(vict);
+    if (GET_HIT(vict) <= 0) return eSUCCESS|eVICT_DIED;
     if(number(0, 4999) == 1) { /* tiny chance of instakill */
       GET_HIT(vict) = -1;
       send_to_char("You impale your weapon through your opponent's chest!\r\n", ch);
       act("$n's weapon blows through your chest sending your entrails flying for yards behind you.  Everything goes black...", ch, 0, vict, TO_VICT, 0);
       act("$n's weapon rips through $N's chest sending gore and entrails flying for yards!\r\n", ch, 0, vict, NOTVICT, 0);
       update_pos(vict);
-      return 1;
+      return eSUCCESS|eVICT_DIED;
     }
   }
   // if they're still here the skewer missed
-  return 0;
+  return eSUCCESS;
 }
 
 void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)

@@ -810,11 +810,16 @@ int do_show(struct char_data *ch, char *argument, int cmd)
 	    }
 	   send_to_char("Unknown room-flag or sector type.\r\n",ch);
        }
-       if (zon > top_of_zone_table)
-       {
-	send_to_char("Unknown zone.\r\n",ch);
-	return eFAILURE;
-       }
+	if (!bits && !sector)
+	{
+	  send_to_char("Syntax: show rsearch <zone number> <flags/sector type\r\n",ch);
+	  return eSUCCESS;
+	}
+        if (zon > top_of_zone_table)
+        {
+	  send_to_char("Unknown zone.\r\n",ch);
+ 	  return eFAILURE;
+         }
 	char buf[MAX_INPUT_LENGTH];
        for (i = zone_table[zon].bottom_rnum; i < zone_table[zon].top_rnum;i++)
        {

@@ -213,7 +213,13 @@ struct song_info_type song_info [ ] = {
         12, POSITION_FIGHTING, 7, SKILL_SONG_DISCHORDANT_DIRGE,
 	        TAR_CHAR_ROOM|TAR_FIGHT_VICT,
         song_dischordant_dirge, execute_song_dischordant_dirge, NULL, NULL
+},
+{ /* 21 */
+        2, POSITION_FIGHTING, 8, SKILL_SONG_CRUSHING_CRESCENDO, 
+        TAR_IGNORE, song_crushing_crescendo, execute_song_crushing_crescendo,
+        NULL, NULL
 }
+
 };
 
 char *songs[] = {
@@ -242,6 +248,7 @@ char *songs[] = {
         "irresistable ditty",
 	"fanatical fanfare",
         "dischordant dirge",
+        "crushing crescendo",
 	"\n"
 };
 
@@ -920,7 +927,7 @@ TO_CHAR,0);
 act("$N resists $n's terrible clef!", ch, NULL, victim, TO_ROOM,
 NOTVICT);
 act("You resist $n's terrible clef!",ch,NULL,victim,TO_VICT,0);
-     return eFAILURE;
+    dam /= 2;
    }
 
 
@@ -2219,3 +2226,101 @@ act("You resist $n's \"irresistible\" ditty!!",ch,NULL,victim,TO_VICT,0);
    return eSUCCESS;
 }
 
+int song_crushing_crescendo( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+{
+   send_to_char("You begin to sing, approaching crescendo!\n\r", ch);
+   act("$n begins to sing, raising the volume to deafening levels!", ch, 0, 0, TO_ROOM, 0);
+   ch->song_timer = song_info[ch->song_number].beats;
+   ch->song_data = 0; // first round.
+   return eSUCCESS;
+}
+
+int execute_song_crushing_crescendo( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+{
+   int dam = 0;
+   int retval;
+
+   int specialization = skill / 100;
+   skill %= 100;
+
+   victim = ch->fighting;
+
+   if(!victim)
+   {
+      send_to_char("With the battle broken you end your crescendo.\r\n", ch);
+      return eSUCCESS;
+   }
+
+   int combat, non_combat;
+   get_instrument_bonus(ch, combat, non_combat);
+
+   int i;
+   dam = 75;
+   for (i = 0; i < (int)ch->song_data; i--)
+      dam = dam * 2;
+   dam += combat * 5; // Make it hurt some more.
+   if ((int)ch->song_data < 3) // Doesn't help beyond that.
+     ch->song_data = (char*)((int)ch->song_data + 1); // Add one round.
+		// Bleh, C allows easier pointer manipulation
+   send_to_char("Your singing hurts your opponent!\r\n", ch);
+   send_to_char("The music!  It hurts!  It hurts!\r\n", victim);
+   if (number(1,101) < get_saves(victim, SAVE_TYPE_MAGIC))
+   {
+     act("$N resists your crushing crescendo!", ch, NULL, victim, TO_CHAR,0);
+     act("$N resists $n's crushing crescendo!", ch, NULL, victim, TO_ROOM,NOTVICT);
+     act("You resist $n's crushing crescendo!",ch,NULL,victim,TO_VICT,0);
+     dam /= 2;
+   }
+
+   switch ((int)ch->song_data)
+   {
+     case 1:
+       act("$N is injured by the strength of your music!", ch, NULL, victim, TO_CHAR,0);
+       act("The strength of $n's music injures $N!", ch, NULL, victim, TO_ROOM,NOTVICT);
+       act("The strength of $n's crushing crescendo injures you!",ch,NULL,victim,TO_VICT,0);
+       break;     
+     case 2:
+       act("$N is injured further by the intensity of your music!", ch, NULL, victim, TO_CHAR,0);
+       act("The strength of $n's music increases, and causes further injury to $N!", ch, NULL, victim, TO_ROOM,NOTVICT);
+       act("The strength of $n's crushing crescendo increasing, and hurts even more!",ch,NULL,victim,TO_VICT,0);
+       break;     
+     case 3:
+       act("The force of your song powerfully crushes the life out of $N!", ch, NULL, victim, TO_CHAR,0);
+       act("The force of $n's crushes the life out of $N!", ch, NULL, victim, TO_ROOM,NOTVICT);
+       act("The force of $n's crushes the life out of you!",ch,NULL,victim,TO_VICT,0);
+       break;     
+     default:
+       act("$N is injured by the strength of your music!", ch, NULL, victim, TO_CHAR,0);
+       act("The strength of $n's music injures $N!", ch, NULL, victim, TO_ROOM,NOTVICT);
+       act("The strength of $n's crushing crescendo injures you!",ch,NULL,victim,TO_VICT,0);
+       break;     
+   }
+
+   skill_increase_check(ch, SKILL_SONG_CRUSHING_CRESCENDO, skill, SKILL_INCREASE_MEDIUM);
+
+   retval = damage(ch, victim, dam, TYPE_SONG,SKILL_SONG_TERRIBLE_CLEF, 0);
+   if(IS_SET(retval, eCH_DIED))
+     return retval;
+   if(IS_SET(retval, eVICT_DIED))
+   {
+      send_to_char("You dance a small jig on the corpse.\r\n", ch);
+      act("$n dances a little jig on the fallen corpse.",
+          ch, 0, victim, TO_ROOM, 0);
+	return retval;
+  }
+
+  if (GET_KI(ch) < song_info[ch->song_number].min_useski)
+  {
+	send_to_char("Having run out of ki, your song ends abruptly.\r\n",ch);
+	ch->song_data = 0; // Reset, just in case.
+	return eSUCCESS;
+  }
+  GET_KI(ch) -= song_info[ch->song_number].min_useski;
+  if(!skill_success(ch, victim, SKILL_SONG_CRUSHING_CRESCENDO)  ) {
+      send_to_char("You run out of lyrics and end the song.\r\n", ch);
+      return eSUCCESS;
+   }
+
+   ch->song_timer = song_info[ch->song_number].beats;
+   return eSUCCESS;
+}
