@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.32 2003/04/20 22:14:54 pirahna Exp $ */
+/* $Id: mob_proc.cpp,v 1.33 2003/04/22 23:31:14 pirahna Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -5119,15 +5119,15 @@ int mage_familiar_non(struct char_data *ch, struct obj_data *obj, int cmd, char 
 
   if(!ch->fighting) 
   {
-    if(ch->master && ch->master->fighting) { // help him!
-      do_join(ch, GET_NAME(ch->master), 9);
-      return eFAILURE;
-    }
-
     if(ch->in_room != ch->master->in_room) {
       do_emote(ch, "looks around for it's master than *eep*'s and dissolves into a shadow.\r\n", 9);
       move_char(ch, ch->master->in_room);
       do_emote(ch, "steps out of a nearby shadow relieved to be back in it's master's presence.\r\n", 9);
+      return eFAILURE;
+    }
+
+    if(ch->master->fighting) { // help him!
+      do_join(ch, GET_NAME(ch->master), 9);
       return eFAILURE;
     }
 
