@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.46 2004/04/22 08:24:39 urizen Exp $ */
+/* $Id: nanny.cpp,v 1.47 2004/04/23 21:13:33 urizen Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -1194,7 +1194,8 @@ is_race_eligible(ch,7)?'*':' ',is_race_eligible(ch,8)?'*':' ',is_race_eligible(c
                       " %c 10: Bard\n\r"
                       " %c 11: Druid\n\r"
                       "\n\rSelect a class(Type help <class> for more information) > ", 
-            (is_clss_eligible(ch, CLASS_WARRIOR) ? '*' : ' '),
+ //           (is_clss_eligible(ch, CLASS_WARRIOR) ? '*' : ' '),
+	   '*',
             (is_clss_eligible(ch, CLASS_CLERIC) ? '*' : ' '),
             (is_clss_eligible(ch, CLASS_MAGIC_USER) ? '*' : ' '),
             (is_clss_eligible(ch, CLASS_THIEF) ? '*' : ' '),
@@ -1202,9 +1203,8 @@ is_race_eligible(ch,7)?'*':' ',is_race_eligible(ch,8)?'*':' ',is_race_eligible(c
             (is_clss_eligible(ch, CLASS_PALADIN) ? '*' : ' '),
             (is_clss_eligible(ch, CLASS_BARBARIAN) ? '*' : ' '),
             (is_clss_eligible(ch, CLASS_MONK) ? '*' : ' '),
-//            (is_clss_eligible(ch, CLASS_RANGER) ? '*' : ' '),
-// Rangers are always eligible
-            '*',
+            (is_clss_eligible(ch, CLASS_RANGER) ? '*' : ' '),
+//            '*',
             (is_clss_eligible(ch, CLASS_BARD) ? '*' : ' '), 
             (is_clss_eligible(ch, CLASS_DRUID) ? '*' : ' ') 
             );
@@ -1220,8 +1220,8 @@ is_race_eligible(ch,7)?'*':' ',is_race_eligible(ch,8)?'*':' ',is_race_eligible(c
           return;
 
        case 1:
-          if(!is_clss_eligible(ch, CLASS_WARRIOR)) 
-           { SEND_TO_Q(badclssmsg, d);  return; }
+//          if(!is_clss_eligible(ch, CLASS_WARRIOR)) 
+  //         { SEND_TO_Q(badclssmsg, d);  return; }
           GET_CLASS(ch) = CLASS_WARRIOR;
           break;
        case 2:
@@ -1264,10 +1264,8 @@ is_race_eligible(ch,7)?'*':' ',is_race_eligible(ch,8)?'*':' ',is_race_eligible(c
           GET_CLASS(ch) = CLASS_MONK;
           break;
        case 9:
-// TODO - Eventually, we should put in something to make sure that you always get at least one
-//   class that you can be.  Until then we'll just make ranger's always choosable.
-//          if(!is_clss_eligible(ch, CLASS_RANGER)) 
-//           { SEND_TO_Q(badclssmsg, d);  return; }
+          if(!is_clss_eligible(ch, CLASS_RANGER)) 
+           { SEND_TO_Q(badclssmsg, d);  return; }
           GET_CLASS(ch) = CLASS_RANGER;
           break;
        case 10:

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.44 2004/04/23 11:58:54 urizen Exp $
+| $Id: cl_thief.cpp,v 1.45 2004/04/23 21:13:35 urizen Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -669,11 +669,11 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
      return eFAILURE;
   }
 
-  if(!IS_NPC(victim) &&
+/*  if(!IS_NPC(victim) &&
     !(victim->desc) && !affected_by_spell(victim, FUCK_PTHIEF) ) {
     send_to_char("That person isn't really there.\n\r", ch);
     return eFAILURE;
-  }
+  }*/
 
   WAIT_STATE(ch, 10); /* It takes TIME to steal */
 
@@ -1045,12 +1045,12 @@ int do_pocket(CHAR_DATA *ch, char *argument, int cmd)
   }
 
 
-  if(!IS_NPC(victim) &&
+  /*if(!IS_NPC(victim) &&
     !(victim->desc) && !affected_by_spell(victim, FUCK_PTHIEF) ) {
     send_to_char("That person isn't really there.\n\r", ch);
     return eFAILURE;
   }
-
+*/
   WAIT_STATE(ch, 10); /* It takes TIME to steal */
 
   /* 101% is a complete failure */

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.30 2004/04/23 12:40:10 urizen Exp $
+| $Id: inventory.cpp,v 1.31 2004/04/23 21:13:33 urizen Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -103,11 +103,14 @@ void get(struct char_data *ch, struct obj_data *obj_object,
 	sprintf(buffer,"There was %d coins.\n\r",
 		obj_object->obj_flags.value[0]);
 	send_to_char(buffer,ch);
-	if (ch->clan && get_clan(ch)->tax && !IS_SET(GET_TOGGLES(ch), PLR_NOTAX))
+	if (sub_object && sub_object->obj_flags.value[3] == 1 && 
+!isname("pc",sub_object->name) && ch->clan 
+&& get_clan(ch)->tax && !IS_SET(GET_TOGGLES(ch), PLR_NOTAX))
 	{
 	  int cgold = (int)((float)(obj_object->obj_flags.value[0]) * (float)((float)(get_clan(ch)->tax)/100.0));
 	  GET_GOLD(ch) += obj_object->obj_flags.value[0] - cgold;
           get_clan(ch)->balance += cgold;
+	  csendf(ch,"Your clan taxese you %d of it.\r\n",cgold);
 	  save_clans();
 	} else
 	GET_GOLD(ch) += obj_object->obj_flags.value[0];

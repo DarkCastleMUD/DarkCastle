@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.63 2004/04/23 11:55:00 urizen Exp $ */
+/* $Id: spells.cpp,v 1.64 2004/04/23 21:13:33 urizen Exp $ */
 
 extern "C"
 {
@@ -924,7 +924,7 @@ void affect_update( void )
 
     for (i = character_list; i; i = i_next) { 
       i_next = i->next;
-      if(!IS_NPC(i) && !(i->desc))
+      if(!IS_NPC(i) ) // && !(i->desc)) Linkdeadness doens't save you now.
         continue; 
       for (af = i->affected; af; af = next_af_dude) {
 	next_af_dude = af->next;
@@ -933,7 +933,8 @@ void affect_update( void )
         // That way we don't have to traverse the entire list all over again
         if(!IS_NPC(i))
           update_char_objects(i);
-
+	if (af->type == FUCK_PTHIEF || af->type == FUCK_CANTQUIT)
+	  continue;
 	if (af->duration > 1)
 	  af->duration--;
 	else if(af->duration == 1) {
@@ -1629,6 +1630,11 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
           return eFAILURE;
         }
       }
+     if (IS_SET(spell_info[spl].targets, TAR_FIGHT_VICT))
+     {
+	  if (!can_attack(ch) || !can_be_attacked(ch, tar_char))
+	    return eFAILURE;
+     }
 
       if (spl != SPELL_VENTRILOQUATE)  /* :-) */
         say_spell(ch, spl);

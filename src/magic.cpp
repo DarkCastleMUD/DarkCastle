@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.110 2004/04/20 19:57:10 urizen Exp $ */
+/* $Id: magic.cpp,v 1.111 2004/04/23 21:13:33 urizen Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -2563,7 +2563,7 @@ int spell_sleep(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
   if(saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC) < 0)
   {
 	af.type      = SPELL_SLEEP;
-	af.duration  = 2;//(ch->level == 50?3:2);
+	af.duration  = 5;//(ch->level == 50?3:2);
 	af.modifier  = 1;
 	af.location  = APPLY_NONE;
 	af.bitvector = AFF_SLEEP;
@@ -9402,13 +9402,13 @@ int cast_attrition( byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *t
 int spell_vampiric_aura(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
   struct affected_type af;
-
+/*
   if (affected_by_spell(victim, SPELL_ACID_SHIELD)) {
      act("A film of shadow begins to rise around $n but fades around $s ankles.", victim, 0, 0, TO_ROOM, INVIS_NULL);
      send_to_char("A film of shadow tries to rise around you but dissolves in your acid shield.\n\r", ch);
      return eFAILURE;
   }
-
+*/
   if (!affected_by_spell(victim, SPELL_VAMPIRIC_AURA))
   {
     skill_increase_check(ch, SPELL_VAMPIRIC_AURA, skill, SKILL_INCREASE_HARD);

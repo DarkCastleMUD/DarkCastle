@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.23 2004/04/23 12:46:55 urizen Exp $ */
+/* $Id: clan.cpp,v 1.24 2004/04/23 21:13:32 urizen Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -28,6 +28,7 @@ extern "C"
 #include <terminal.h> // get_char_room_vis
 #include <room.h> // CLAN_ROOM flag
 #include <returnvals.h>
+#include <spells.h>
 
 extern CHAR_DATA *character_list;
 extern struct descriptor_data *descriptor_list;
@@ -2203,17 +2204,18 @@ int do_ctax(CHAR_DATA *ch, char *arg, int cmd)
      send_to_char("You not a member of a clan.\r\n",ch);
      return eFAILURE;
   }
-  if (!has_right(ch, CLAN_RIGHTS_TAX))
-  {
-     send_to_char("You don't have the right to modify taxes.\r\n",ch);
-     return eFAILURE;
-  }
   arg = one_argument(arg,arg1);
   if (!is_number(arg1))
   {
      csendf(ch,"Your clan's current tax rate is %d.\r\n",get_clan(ch)->tax);
      return eFAILURE;
   }
+  if (!has_right(ch, CLAN_RIGHTS_TAX))
+  {
+     send_to_char("You don't have the right to modify taxes.\r\n",ch);
+     return eFAILURE;
+  }
+
   int tax = atoi(arg1);
   if (tax < 0 || tax > 50)
   {
@@ -2240,6 +2242,11 @@ int do_cdeposit(CHAR_DATA *ch, char *arg, int cmd)
      send_to_char("You don't have the right to .\r\n",ch);
      return eFAILURE;
   }*/
+  if (affected_by_spell(ch,FUCK_PTHIEF))
+  {
+    send_to_char("Your criminal actions prohibit it.\r\n",ch);
+    return eFAILURE;
+  }
   if (world[ch->in_room].number != 3005)
   {
     send_to_char("This can only be done at the Sorpigal bank.\r\n",ch);
@@ -2316,6 +2323,13 @@ int do_cbalance(CHAR_DATA *ch, char *arg, int cmd)
     send_to_char("This can only be done at the Sorpigal bank.\r\n",ch);
     return eFAILURE;
   }
+
+  if (!has_right(ch, CLAN_RIGHTS_MEMBER_LIST))
+  {
+     send_to_char("You don't have the right to see your clan's account.\r\n",ch);
+     return eFAILURE;
+  }
+
   csendf(ch, "Your clan has %d gold coins in the bank.\r\n",get_clan(ch)->balance);
   return eSUCCESS;
 }
