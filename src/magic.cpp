@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.138 2004/05/21 14:32:42 urizen Exp $ */
+/* $Id: magic.cpp,v 1.139 2004/05/21 18:31:45 urizen Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -2811,6 +2811,22 @@ int spell_word_of_recall(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct ob
 
   skill_increase_check(ch, SPELL_WORD_OF_RECALL, skill, SKILL_INCREASE_MEDIUM);
 
+  if (!IS_NPC(victim) && victim->pcdata->golem && victim->pcdata->golem->in_room == victim->in_room)
+  {
+	if (victim->mana < 50)
+	{
+	    send_to_char("You don't possses the energy to bring your golem along.\r\n",victim);
+	} else {
+	    if (victim->pcdata->golem->fighting)
+	    {
+		send_to_char("Your golem is too distracted by something to follow.\r\n",victim);
+	    } else {
+		act("$n disappears.", victim->pcdata->golem, 0, 0, TO_ROOM, INVIS_NULL);
+		move_char(victim->pcdata->golem, location);
+		act("$n appears out of nowhere.",victim->pcdata->golem, 0, 0, TO_ROOM, INVIS_NULL);
+	    }
+	}
+  }
   /* a location has been found. */
   if( number(1, 100) > (80 + skill / 10) )
   {
