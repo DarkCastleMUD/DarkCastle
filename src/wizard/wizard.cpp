@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.9 2002/07/28 02:04:19 pirahna Exp $
+| $Id: wizard.cpp,v 1.10 2002/08/21 02:44:22 pirahna Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -596,8 +596,8 @@ void mob_stat(struct char_data *ch, struct char_data *k)
           GET_KI(k), ki_limit(k));
   send_to_char(buf,ch);
      
-  sprintf(buf, "$3AC$R:[%d]  $3Exp$R:[%d]  $3Hitroll$R:[%d]  $3Damroll$R:[%d]\n\r",
-          GET_AC(k), GET_EXP(k), k->hitroll, k->damroll );
+  sprintf(buf, "$3AC$R:[%d]  $3Exp$R:[%d]  $3Hitroll$R:[%d]  $3Damroll$R:[%d]  $3Gold$R: [$B$5%d$R]\n\r",
+          GET_AC(k), GET_EXP(k), k->hitroll, k->damroll, k->gold );
   send_to_char(buf, ch);
 
   if(!IS_MOB(k)) {
