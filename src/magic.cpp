@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.101 2004/04/18 01:57:17 urizen Exp $ */
+/* $Id: magic.cpp,v 1.102 2004/04/18 13:59:33 urizen Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -3831,7 +3831,7 @@ int spell_dispel_magic(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
 // Number of spells in the switch statement goes here
    while(!done && ((rots += 1) < 10))
    {
-     switch(number(1, 10)) 
+     switch(number(1, 11)) 
      {
         case 1: 
            if (affected_by_spell(victim, SPELL_SANCTUARY))
@@ -3947,6 +3947,14 @@ int spell_dispel_magic(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
            {
               REMOVE_BIT(victim->affected_by, AFF_HASTE);
               send_to_char("You don't feel so fast anymore.\n\r", victim);
+              done = TRUE;
+           }
+           break;
+        case 11:
+           if (affected_by_spell(victim, SPELL_PROTECT_FROM_GOOD))
+           {
+              affect_from_char(victim, SPELL_PROTECT_FROM_GOOD);
+              send_to_char("You feel less morally protected.\n\r", victim);
               done = TRUE;
            }
            break;

@@ -21,7 +21,7 @@
  *  12/08/2003   Onager    Added check for charmies and !charmie eq to     *
  *                         equip_char()                                    *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.30 2004/04/14 19:13:03 urizen Exp $ */
+/* $Id: handler.cpp,v 1.31 2004/04/18 13:59:33 urizen Exp $ */
     
 extern "C"
 {
@@ -806,6 +806,7 @@ void affect_total(CHAR_DATA *ch)
 	    { // Some spells use affected_by2 instead..
 	        case SPELL_SHADOWSLIP:
 	        case SPELL_CAMOUFLAGE:
+		case SPELL_PROTECT_FROM_GOOD:
 	          secFix = TRUE;
 	          break;
 	        default:
@@ -831,6 +832,7 @@ void affect_total(CHAR_DATA *ch)
 	    { // Some spells use affected_by2 instead..
 	        case SPELL_SHADOWSLIP:
 	        case SPELL_CAMOUFLAGE:
+		case SPELL_PROTECT_FROM_GOOD:
 	          secFix = TRUE;
 	          break;
 	        default:
@@ -860,6 +862,7 @@ void affect_to_char( CHAR_DATA *ch, struct affected_type *af )
     { // Some spells use affected_by2 instead..
 	case SPELL_SHADOWSLIP:
 	case SPELL_CAMOUFLAGE:
+	case SPELL_PROTECT_FROM_GOOD:
 	  secFix = TRUE;
 	  break;
 	default:
@@ -1023,6 +1026,7 @@ void affect_from_char( CHAR_DATA *ch, int skill)
     { // Hack for affected_by2
         case SPELL_SHADOWSLIP:
         case SPELL_CAMOUFLAGE:
+	case SPELL_PROTECT_FROM_GOOD:
 	  aff2Fix = TRUE;
 	  break;
 	default:

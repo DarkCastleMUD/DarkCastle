@@ -19,7 +19,7 @@
 /* 12/06/2003   Onager   Modified mobile_activity() to prevent charmie    */
 /*                       scavenging                                       */
 /**************************************************************************/
-/* $Id: mob_act.cpp,v 1.12 2004/04/13 19:32:17 urizen Exp $ */
+/* $Id: mob_act.cpp,v 1.13 2004/04/18 13:59:34 urizen Exp $ */
 
 extern "C"
 {
@@ -411,8 +411,8 @@ void mobile_activity(void)
             continue;
       
           /* check for PFG/PFE, (anti)pal perma-protections, etc. */
-          if (is_protected(tmp_ch, ch))
-            continue;
+//          if (is_protected(tmp_ch, ch))
+  //          continue;
 
           if(number(0, 1)) {
             done = 1;
