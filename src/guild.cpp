@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.51 2004/05/14 00:54:01 urizen Exp $
+| $Id: guild.cpp,v 1.52 2004/05/14 02:17:14 urizen Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -618,7 +618,6 @@ void check_maxes(CHAR_DATA *ch)
      {
        maximum = skilllist[i].maximum;
 	int to = (int)((float)maximum*0.75);
-       int percent = 75;
        if (skilllist[i].attrs[0])
        {
             int thing = get_stat(ch,skilllist[i].attrs[0])-20;
@@ -638,7 +637,7 @@ void check_maxes(CHAR_DATA *ch)
 	  struct char_skill_data * curr = ch->skills;
 
   	  while(curr)
-    	  if(curr->skillnum == i)
+    	  if(curr->skillnum == skilllist[i].skillnum)
       	  break;
     	  else curr = curr->next;
 
