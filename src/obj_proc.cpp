@@ -330,7 +330,8 @@ int hooktippedsteelhalberd(CHAR_DATA *ch, struct obj_data *obj, int cmd,
      eq_destroyed(victim, victim->equipment[which], which);
    else {
       act("$n's hook-tipped steel halberd tears your $p!", ch, victim->equipment[which], victim, TO_VICT, 0 );
-      act("$n latches $m hook-tipped steel halberd into $N's $p and tears it!",ch,victim->equipment[which],victim, TO_ROOM, 0);
+      act("$n latches $m hook-tipped steel halberd into $N's $p and tears it!",ch,victim->equipment[which],victim, TO_ROOM, NOTVICT);
+      act("You latch your halberd into $N's $p, and manage to tear it!",ch,victim->equipment[which],victim,TO_CHAR,0);
     }
    return eSUCCESS;
 }
@@ -667,7 +668,7 @@ int gazeofgaiot(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
 
    if (affected_by_spell(ch,SKILL_FEARGAZE)) {
       send_to_char("You need to build up more hatred before you can unleash it again.\r\n",ch);
-      return eFAILURE;
+      return eSUCCESS;
    }
 
    if (!(victim = get_char_room_vis(ch, vict))) {
@@ -675,20 +676,20 @@ int gazeofgaiot(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
          victim = ch->fighting;
       } else {
          send_to_char("Gaze on whom?\n\r", ch);
-         return eFAILURE;
+         return eSUCCESS;
       }
     }
     if(!can_attack(ch) || !can_be_attacked(ch, victim))
-          return eFAILURE;
+          return eSUCCESS;
     if (IS_SET(world[ch->in_room].room_flags, NO_MAGIC))
     {
 	send_to_char("That action is impossible to perform in these restrictive confinements.\r\n",ch);
-	return eFAILURE;
+	return eSUCCESS;
     }
     if (GET_LEVEL(victim) > 70) 
     {
         send_to_char("Some great force prevents you.\r\n",ch);
-	return eFAILURE;
+	return eSUCCESS;
     }
     // All is good, set timer and perform it.
     struct affected_type af;
