@@ -732,7 +732,7 @@ act("You resist $n's whistle sharp!",ch,NULL,victim,TO_VICT,0);
    }
 
   char buf[MAX_STRING_LENGTH];
-   strcpy(buf, victim->short_desc);
+  strcpy(buf, victim->short_desc);
     bool ispc = !IS_NPC(victim);
 
    retval = damage(ch, victim, dam, TYPE_SONG,SKILL_SONG_WHISTLE_SHARP, 0);
@@ -748,7 +748,7 @@ act("You resist $n's whistle sharp!",ch,NULL,victim,TO_VICT,0);
       if (ispc)
         act("$n's whistle goes off the scale and your head explodes!", ch, NULL, victim, TO_VICT, 0);
       sprintf(buf2, "%s's head expldoes as your whistle goes off the scale!", buf);
-      act(buf, ch, NULL, victim, TO_CHAR, 0);
+      act(buf2, ch, NULL, victim, TO_CHAR, 0);
 
       send_to_char("You dance a small jig on the corpse.\r\n", ch);
       act("$n dances a little jig on the fallen corpse.",
@@ -960,7 +960,7 @@ act("You resist $n's terrible clef!",ch,NULL,victim,TO_VICT,0);
       if (ispc)
         act("$n's terrible clef has beaten you to a pulp!", ch, NULL, victim, TO_VICT, 0);
       sprintf(buf2, "The terrible clef has left %s broken, bloody and dead!", buf);
-      act(buf, ch, NULL, victim, TO_CHAR, 0);
+      act(buf2, ch, NULL, victim, TO_CHAR, 0);
 
       send_to_char("You dance a small jig on the corpse.\r\n", ch);
       act("$n dances a little jig on the fallen corpse.",
