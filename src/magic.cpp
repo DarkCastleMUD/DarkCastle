@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.127 2004/05/11 08:46:53 urizen Exp $ */
+/* $Id: magic.cpp,v 1.128 2004/05/12 18:57:04 urizen Exp $ */
 /***************************************************************************/
 /* Revision History                                                        */
 /* 11/24/2003   Onager   Changed spell_fly() and spell_water_breathing() to*/
@@ -9527,9 +9527,12 @@ int spell_holy_aura(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
   skill_increase_check(ch, SPELL_HOLY_AURA, skill, SKILL_INCREASE_HARD);
   act("A serene calm comes over $n.", victim, 0, 0, TO_ROOM, INVIS_NULL);
   act("A serene calm encompasses you.", victim, 0, 0, TO_CHAR, 0);
-
+  GET_ALIGNMENT(ch) -= 250;
+  GET_ALIGNMENT(ch) = MIN(1000, MAX((-1000), GET_ALIGNMENT(ch)));
+  extern void zap_eq_check(char_data *ch);
+  zap_eq_check(ch);
   af.type      = SPELL_HOLY_AURA;
-  af.duration  = 8;
+  af.duration  = 4;
   af.modifier  = 50;
   af.location  = APPLY_NONE;
   af.bitvector = 0;

@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.53 2004/05/09 00:20:25 urizen Exp $ */
+/* $Id: nanny.cpp,v 1.54 2004/05/12 18:57:04 urizen Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -1459,6 +1459,7 @@ break;
           act( "$n has entered the game.", ch, 0, 0, TO_ROOM , INVIS_NULL);
           if(!GET_SHORT_ONLY(ch)) GET_SHORT_ONLY(ch) = str_dup(GET_NAME(ch)); 
           update_wizlist(ch);
+	  check_maxes(ch); // Check skill maxes.
           
           STATE(d) = CON_PLAYING;
           if ( GET_LEVEL(ch) == 0 ) {
