@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: magic.cpp,v 1.44 2002/12/26 18:07:52 pirahna Exp $ */
+/* $Id: magic.cpp,v 1.45 2002/12/26 18:34:14 pirahna Exp $ */
 
 extern "C"
 {
@@ -8369,7 +8369,6 @@ int cast_acid_shield( byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA 
              GET_MANA(ch) += 150; 
              return eFAILURE;
           }
-          GET_MANA(ch) = 150;
        } 
        return spell_acid_shield(level, ch, tar_ch, 0, skill);
        break;
