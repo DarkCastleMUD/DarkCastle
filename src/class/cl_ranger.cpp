@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: cl_ranger.cpp,v 1.33 2004/04/28 07:57:26 urizen Exp $ | cl_ranger.C  *
+ * $Id: cl_ranger.cpp,v 1.34 2004/04/28 08:07:15 urizen Exp $ | cl_ranger.C  *
  * Description: Ranger skills/spells                                          *
  *                                                                            *
  * Revision History                                                           *
@@ -114,7 +114,7 @@ int do_tame(CHAR_DATA *ch, char *arg, int cmd)
          remove_memory(vict, 'h');
 	if (vict->master) { 
          stop_follower(vict, BROKE_CHARM);	
-         add_memory(vict, GET_NAME(vict->master), 'h');
+         add_memory(vict, GET_NAME(ch), 'h');
  	}
      }
    }
