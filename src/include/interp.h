@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.h,v 1.12 2003/01/22 05:26:52 pirahna Exp $ */
+/* $Id: interp.h,v 1.13 2003/03/04 06:45:42 pirahna Exp $ */
 
 #ifndef INTERP_H_
 #define INTERP_H_
@@ -212,7 +212,7 @@ DO_FUN  do_noemote;
 DO_FUN  do_nohassle;
 DO_FUN  do_noname;
 DO_FUN  do_not_here;
-DO_FUN  do_notell;
+DO_FUN  do_notell_toggle;
 DO_FUN  do_oedit;
 DO_FUN  do_offer;
 DO_FUN  do_olocate;
