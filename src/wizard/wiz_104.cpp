@@ -491,7 +491,7 @@ int do_show(struct char_data *ch, char *argument, int cmd)
                  "  zone\r\n"
                  "  zone all\r\n",ch); 
     if(has_range)
-      send_to_char("  wfiles\r\n"
+      send_to_char("  rfiles\r\n"
                    "  mfiles\r\n"
                    "  ofiles\r\n", ch);
     return eFAILURE;
@@ -738,7 +738,7 @@ int do_show(struct char_data *ch, char *argument, int cmd)
 
     } // else was a digit
   } // zone
-  else if (is_abbrev(type, "wfiles") && has_range)
+  else if (is_abbrev(type, "rfiles") && has_range)
   {
     curr = world_file_list;
     i = 0;
