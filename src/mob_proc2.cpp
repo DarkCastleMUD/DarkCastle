@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.8 2002/08/05 23:46:47 pirahna Exp $ */
+/* $Id: mob_proc2.cpp,v 1.9 2002/08/11 15:29:32 pirahna Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -499,14 +499,23 @@ int mortician(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
   if(cmd != 56 && cmd != 59 && cmd != 58)
     return eFAILURE;
 
-  if(cmd == 59) {  /* list */ 
+  // TODO - don't think undertaker takes into consideration stuff inside
+  // containers when deciding price....probably should change that
+
+  if(cmd == 59)  // list 
+  {
     sprintf(buf, "%s_consent", GET_NAME(ch));
-    send_to_char("Available corpses (freshest first):\n\r", ch);
-    for(obj = object_list; obj; obj = obj->next) {
-       if(!isname("pc", obj->name)     ||
-          !isname("corpse", obj->name) ||
-          (!isname(GET_NAME(ch), obj->name) || !isname(buf, obj->name)))
+    send_to_char("Available corpses (freshest first):\n\r$B", ch);
+    for(obj = object_list; obj; obj = obj->next) 
+    {
+       if( GET_ITEM_TYPE(obj) != ITEM_CONTAINER ||
+           obj->obj_flags.value[3] != 1)  // only look at corpses
+          continue;
+
+       if( !isname("pc", obj->name)     ||
+           (!isname(GET_NAME(ch), obj->name) && !isname(buf, obj->name)))
          continue; 
+
        cost = 0;
        for(obj2 = obj->contains; obj2; obj2 = obj2->next_content) {
           if(obj2->obj_flags.type_flag == ITEM_MONEY)
@@ -515,16 +524,15 @@ int mortician(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
        } 
        cost /= 20000;
        cost = MAX(cost, 30); 
-       sprintf(buf, "%d) %-21s %d Platinum coins.\n\r", ++x, obj->name,
+       sprintf(buf, "%d) %-21s %d Platinum coins.\n\r", ++x, obj->short_description,
                cost);
        send_to_char(buf, ch); 
     }
-    send_to_char(
-"If any corpses were listed, they are still where you left them.  This\n\r"
-"list is therefore always changing.  If you purchase one, it will be\n\r"
-"transferred to your inventory instantly if it is your corpse.  If it is\n\r"
-"someone else's corpse you have consent for, it will be placed at your feet.\n\r"
-"Use \"buy <number>\" to purchase a corpse.\n\r", ch);
+    send_to_char("$RIf any corpses were listed, they are still where you left them.  This\n\r"
+                 "list is therefore always changing.  If you purchase one, it will be\n\r"
+                 "transferred to your inventory instantly if it is your corpse.  If it is\n\r"
+                 "someone else's corpse you have consent for, it will be placed at your feet.\n\r"
+                 "Use \"buy <number>\" to purchase a corpse.\n\r", ch);
     return eSUCCESS;
   }
 
@@ -554,13 +562,16 @@ int mortician(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     return eSUCCESS;
   }
 
-  for(obj = object_list; obj; obj = obj->next) {
+  for(obj = object_list; obj; obj = obj->next) 
+  {
      sprintf(buf, "%s_consent", GET_NAME(ch));
 
-     if(obj->obj_flags.type_flag != ITEM_CONTAINER ||
-        !isname("pc", obj->name)         ||
-        !isname("corpse", obj->name)     ||
-        (!isname(GET_NAME(ch), obj->name) || !isname(buf, obj->name)) ||   // name, or consented name
+     if( GET_ITEM_TYPE(obj) != ITEM_CONTAINER ||
+         obj->obj_flags.value[3] != 1)  // only look at corpses
+        continue;
+
+     if( !isname("pc", obj->name)         ||
+         (!isname(GET_NAME(ch), obj->name) && !isname(buf, obj->name)) ||
         ++x < which)
        continue;
 
