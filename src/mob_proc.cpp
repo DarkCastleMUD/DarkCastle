@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.58 2004/05/31 16:02:45 urizen Exp $ */
+/* $Id: mob_proc.cpp,v 1.59 2004/05/31 16:11:34 urizen Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -3524,7 +3524,7 @@ int pet_shops(struct char_data *ch, int cmd, char *arg)
     if (cmd==59) { /* List */
 	send_to_char("Available pets are:\n\r", ch);
 	for(pet = world[pet_room].people; pet; pet = pet->next_in_room) {
-	    sprintf(buf, "%8d - %s\n\r",
+	    sprintf(buf, "%8lld - %s\n\r",
 		3*GET_EXP(pet), pet->short_desc);
 	    send_to_char(buf, ch);
 	}
@@ -3539,7 +3539,7 @@ int pet_shops(struct char_data *ch, int cmd, char *arg)
 	    return eSUCCESS;
 	}
 
-	if (GET_GOLD(ch) < (int32)(GET_EXP(pet)*3)) {
+	if (GET_GOLD(ch) < (uint32)(GET_EXP(pet)*3)) {
 	    send_to_char("You don't have enough gold!\n\r", ch);
 	    return eSUCCESS;
 	}

@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.212 2004/05/31 16:02:45 urizen Exp $ */
+/* $Id: fight.cpp,v 1.213 2004/05/31 16:11:34 urizen Exp $ */
 
 extern "C"
 {
@@ -99,9 +99,9 @@ void check_weapon_skill_bonus(char_data * ch, int type, obj_data *wielded,
                               int & weapon_skill_hit_bonus, int & weapon_skill_dam_bonus);
 
 void update_flags(CHAR_DATA *vict);
-long scale_char_xp(CHAR_DATA *ch, CHAR_DATA *killer, CHAR_DATA *victim,
+int64 scale_char_xp(CHAR_DATA *ch, CHAR_DATA *killer, CHAR_DATA *victim,
                    long no_killers, long total_levels, long highest_level,
-                   long base_xp, long *bonus_xp);
+                   int64 base_xp, int64 *bonus_xp);
 CHAR_DATA *loop_followers(struct follow_type **f);
 long count_xp_eligibles(CHAR_DATA *leader, CHAR_DATA *killer,
                         long highest_level, long *total_levels);
@@ -3164,7 +3164,8 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
 void group_gain(CHAR_DATA * ch, CHAR_DATA * victim)
 {
   char buf[256];
-  long no_members = 0, total_levels = 0, share;
+  long no_members = 0, total_levels = 0;
+  int64 share;
   int64 base_xp = 0, bonus_xp = 0;
   CHAR_DATA *leader, *highest, *tmp_ch;
   struct follow_type *f;
@@ -3216,7 +3217,7 @@ void group_gain(CHAR_DATA * ch, CHAR_DATA * victim)
     /* calculate this character's share of the XP */
     else {share = scale_char_xp(tmp_ch, ch, victim, no_members, total_levels, GET_LEVEL(highest), base_xp, &bonus_xp); }
     
-    sprintf(buf, "You receive %ld exps of %lld total.\n\r", share, base_xp + bonus_xp);
+    sprintf(buf, "You receive %lld exps of %lld total.\n\r", share, base_xp + bonus_xp);
     send_to_char(buf, tmp_ch);
     gain_exp(tmp_ch, share);
     change_alignment(tmp_ch, victim);
@@ -3284,9 +3285,9 @@ long count_xp_eligibles(CHAR_DATA *leader, CHAR_DATA *killer,
 }
 
 /* scale character XP based on various factors */
-long scale_char_xp(CHAR_DATA *ch, CHAR_DATA *killer, CHAR_DATA *victim,
+int64 scale_char_xp(CHAR_DATA *ch, CHAR_DATA *killer, CHAR_DATA *victim,
                   long no_killers, long total_levels, long highest_level,
-                  long base_xp, long *bonus_xp)
+                  int64 base_xp, int64 *bonus_xp)
 {
     long scaled_share;
     long levelmod;

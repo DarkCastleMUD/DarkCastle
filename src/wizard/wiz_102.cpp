@@ -149,7 +149,7 @@ int do_check(struct char_data *ch, char *arg, int cmd) {
           pc_clss_types[(int)(GET_CLASS(vict))], GET_LEVEL(vict),
           (connected ? world[vict->in_room].number : -1));
   send_to_char(buf, ch);  
-  sprintf(buf, "$3Exp$R: %-10d $3Gold$R: %-10d $3Bank$R: %-9d $3Align$R: %d\n\r",
+  sprintf(buf, "$3Exp$R: %-10lld $3Gold$R: %-10d $3Bank$R: %-9d $3Align$R: %d\n\r",
           GET_EXP(vict), GET_GOLD(vict), GET_BANK(vict), GET_ALIGNMENT(vict));
   send_to_char(buf, ch);
   if(GET_LEVEL(ch) >= SERAPH) {

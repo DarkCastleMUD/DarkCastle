@@ -389,10 +389,12 @@ int do_set(struct char_data *ch, char *argument, int cmd)
             break;
             case 13: /* exp */
             {
-                value = atoi(buf);
+		int64 val;
+//                value = atoi(buf);
+		val = atoll(buf);
                 log(buf2, IMP, LOG_GOD);
                 /* set original exp of victim */
-                vict->exp = value;
+                vict->exp = val;
             }
             break;
             case 14: /* mana */
