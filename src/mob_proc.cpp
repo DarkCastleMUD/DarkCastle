@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.18 2002/09/17 21:46:31 pirahna Exp $ */
+/* $Id: mob_proc.cpp,v 1.19 2002/10/01 03:40:06 pirahna Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -505,7 +505,7 @@ int passive_magic_user(struct char_data *ch, struct obj_data *obj, int cmd, char
     // struct char_data *vict;
     // int percent;
     if(cmd) return eFAILURE;
-    if (GET_POS(ch) < POSITION_FIGHTING) return FALSE;
+    if (GET_POS(ch) <= POSITION_FIGHTING) return FALSE;
 
     if(IS_AFFECTED(ch, AFF_BLIND)) {
       act("$n utters the words 'Let there be light!'.", ch, 0, 0, TO_ROOM, 
@@ -691,7 +691,7 @@ int passive_magic_user2(struct char_data *ch, struct obj_data *obj, int cmd, cha
 
     if(cmd) return eFAILURE;
     if (IS_AFFECTED(ch, AFF_PARALYSIS)) return eFAILURE;
-    if (GET_POS(ch) < POSITION_FIGHTING) return eFAILURE;
+    if (GET_POS(ch) <= POSITION_FIGHTING) return eFAILURE;
 
     if(IS_AFFECTED(ch, AFF_BLIND)) 
     {
@@ -924,7 +924,7 @@ int passive_cleric(struct char_data *ch, struct obj_data *obj, int cmd, char *ar
     struct char_data *vict;
 
     if(cmd) return eFAILURE;
-    if (GET_POS(ch) < POSITION_FIGHTING) return eFAILURE;
+    if (GET_POS(ch) <= POSITION_FIGHTING) return eFAILURE;
 
     if(IS_AFFECTED(ch, AFF_BLIND)) {
       act("$n utters the words 'Let there be light!'.", ch, 0, 0, TO_ROOM, INVIS_NULL);
@@ -1168,7 +1168,7 @@ int monk_non_combat(struct char_data *ch, struct obj_data *obj, int cmd, char *a
           struct char_data *owner)
 {
    if (cmd) return FALSE;
-   if (GET_POS(ch) < POSITION_FIGHTING) return FALSE;
+   if (GET_POS(ch) <= POSITION_FIGHTING) return FALSE;
    if (IS_AFFECTED(ch, AFF_PARALYSIS)) return FALSE;
 
    if( (  affected_by_spell(ch, SPELL_BLINDNESS)
@@ -1246,7 +1246,7 @@ int fighter_non_combat(struct char_data *ch, struct obj_data *obj, int cmd, char
           struct char_data *owner)
 {
    if (cmd)                             return eFAILURE;
-   if (GET_POS(ch) < POSITION_FIGHTING) return eFAILURE;
+   if (GET_POS(ch) <= POSITION_FIGHTING) return eFAILURE;
    if (IS_AFFECTED(ch, AFF_PARALYSIS))  return eFAILURE;
 
    // TODO - If I have sense life, and i see a hidden, and i'm aggro/hate someone
@@ -1262,7 +1262,7 @@ int passive_necro(struct char_data *ch, struct obj_data *obj, int cmd, char *arg
     // struct char_data *vict;
     // int percent;
     if(cmd) return eFAILURE;
-    if (GET_POS(ch) < POSITION_FIGHTING) return FALSE;
+    if (GET_POS(ch) <= POSITION_FIGHTING) return FALSE;
 
     if(IS_AFFECTED(ch, AFF_BLIND)) {
       act("$n utters the words 'dead eye'.", ch, 0, 0, TO_ROOM, INVIS_NULL);
@@ -3781,7 +3781,7 @@ int ranger_non_combat(struct char_data *ch, struct obj_data *obj, int cmd, char 
     // int percent;
     if(cmd) return eFAILURE;
  
-    if (GET_POS(ch) < POSITION_FIGHTING) 
+    if (GET_POS(ch) <= POSITION_FIGHTING) 
       return eFAILURE;
 
     if(ch->mobdata->hatred) 
@@ -4225,7 +4225,7 @@ int paladin_non_combat(struct char_data *ch, struct obj_data *obj, int cmd, char
     // int percent;
     if(cmd) return eFAILURE;
  
-    if (GET_POS(ch) < POSITION_FIGHTING) 
+    if (GET_POS(ch) <= POSITION_FIGHTING) 
       return eFAILURE;
 
     if(GET_HIT(ch) < GET_MAX_HIT(ch) && number(1,3) == 1 && GET_LEVEL(ch) > 29) {
@@ -4291,7 +4291,7 @@ int antipaladin_non_combat(struct char_data *ch, struct obj_data *obj, int cmd, 
     // int percent;
     if(cmd) return eFAILURE;
  
-    if (GET_POS(ch) < POSITION_FIGHTING) 
+    if (GET_POS(ch) <= POSITION_FIGHTING) 
       return eFAILURE;
 
     if(!IS_AFFECTED(ch,AFF_DETECT_INVISIBLE) && GET_LEVEL(ch) > 11) {
@@ -4348,7 +4348,7 @@ int thief_non_combat(struct char_data *ch, struct obj_data *obj, int cmd, char *
    char_data * vict = NULL;
 
    if (cmd) return eFAILURE;
-   if (GET_POS(ch) < POSITION_FIGHTING) return eFAILURE;
+   if (GET_POS(ch) <= POSITION_FIGHTING) return eFAILURE;
    if (IS_AFFECTED(ch, AFF_PARALYSIS)) return eFAILURE;
 
    if(ch->mobdata->hatred && (vict = get_char_room_vis(ch, get_random_hate(ch)))
