@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.26 2004/11/16 00:51:57 Zaphod Exp $
+| $Id: cl_warrior.cpp,v 1.27 2005/04/09 21:15:31 urizen Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -207,6 +207,11 @@ int do_retreat(struct char_data *ch, char *argument, int cmd)
      return eFAILURE;
    }
 
+   if (!CAN_GO(ch, attempt))
+   {
+	send_to_char("You cannot retreat in that direction.\r\n",ch);
+	return eFAILURE;
+   }
    if (IS_AFFECTED(ch, AFF_SNEAK))
       affect_from_char(ch, SKILL_SNEAK);
 
@@ -224,7 +229,7 @@ int do_retreat(struct char_data *ch, char *argument, int cmd)
       return eFAILURE;
    }
 
-   if (CAN_GO(ch, attempt))
+//   if (CAN_GO(ch, attempt))
    {
       act("$n tries to beat a hasty retreat.", ch, 0, 0, TO_ROOM,
          INVIS_NULL);
@@ -248,7 +253,7 @@ int do_retreat(struct char_data *ch, char *argument, int cmd)
    }
 
    // No exits were found
-   send_to_char("PANIC! You couldn't escape!\n\r", ch);
+   send_to_char("You cannot retreat in that direction.!\n\r", ch);
    return eFAILURE;
 }
 
@@ -362,7 +367,7 @@ int do_bash(struct char_data *ch, char *argument, int cmd)
       return eFAILURE;
 
     if (IS_MOB(victim) && IS_SET(victim->mobdata->actflags, ACT_HUGE)) {
-      send_to_char("You can't bash something that HUGE!", ch);
+      send_to_char("You can't bash something that HUGE!\n\r", ch);
          return eFAILURE;
     }
 
@@ -415,7 +420,7 @@ int do_bash(struct char_data *ch, char *argument, int cmd)
 	GET_POS(victim) = POSITION_SITTING;
         SET_BIT(victim->combat, COMBAT_BASH1);
         // if they already have 2 rounds of wait, only tack on 1 instead of 2
-        if(ch->desc && (ch->desc->wait > 1))
+        if(victim->desc && (victim->desc->wait > 5))
           WAIT_STATE(victim, PULSE_VIOLENCE);
 	else WAIT_STATE(victim, PULSE_VIOLENCE * 2);
  //       act("Your bash at $N sends $M sprawling.", ch, NULL, victim, 
@@ -476,7 +481,11 @@ int do_redirect(struct char_data *ch, char *argument, int cmd)
       send_to_char("He isn't bothering anyone, you have enough problems as it is anyways!\n\r", ch);
       return eFAILURE;
     }
-
+    if(ch->fighting == victim)
+    {
+       act("You are already fighting $N.",ch,0,victim, TO_CHAR,0);
+	return eFAILURE;
+    }
     if(!can_be_attacked(ch, victim))
        return eFAILURE;
 
@@ -634,7 +643,7 @@ int do_rescue(struct char_data *ch, char *argument, int cmd)
        return eFAILURE;
     }
 
-    if ( !IS_NPC(ch) && IS_NPC(victim) )
+    if ( !IS_NPC(ch) && (IS_NPC(victim) && !IS_AFFECTED(victim, AFF_CHARM)))
     {
 	send_to_char( "Doesn't need your help!\n\r", ch );
 	return eFAILURE;
@@ -863,8 +872,9 @@ int do_guard(struct char_data *ch, char *argument, int cmd)
    }
 
    if(ch->guarding) {
-      send_to_char("You are already guarding someone.\n\r", ch);
-      return eFAILURE;
+      stop_guarding(ch);
+      send_to_char("You stop guarding anyone.\n\r", ch);
+//      return eFAILURE;
    }
 
    start_guarding(ch, victim);

@@ -144,6 +144,9 @@ int send_to_gods(char *str, int god_level, long type)
     case LOG_WARNINGS:
       sprintf(typestr, "warnings");
       break;
+     case LOG_DATABASE:
+	sprintf(typestr, "database");
+	break;
     case LOG_HELP:
       sprintf(typestr, "help");
       break;
@@ -207,7 +210,8 @@ int do_channel(struct char_data *ch, char *arg, int cmd)
     "logclan",
     "warnings",
     "help",
-    "\\@"
+    "database",   
+ "\\@"
   };
 
   if(IS_NPC(ch))
@@ -217,7 +221,7 @@ int do_channel(struct char_data *ch, char *arg, int cmd)
     one_argument(arg, buf);
 
   else { 
-    send_to_char("\n\r", ch);
+//    send_to_char("\n\r", ch);
 
     if(GET_LEVEL(ch) < IMMORTAL) {
       for(x = 7; x <= 14; x++) {

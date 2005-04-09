@@ -2,7 +2,7 @@
 #define AFFECT_H_
 
 /************************************************************************
-| $Id: affect.h,v 1.12 2004/11/16 00:52:09 Zaphod Exp $
+| $Id: affect.h,v 1.13 2005/04/09 21:15:35 urizen Exp $
 | affect.h
 | This contains the bitvectors for affected_by
 */

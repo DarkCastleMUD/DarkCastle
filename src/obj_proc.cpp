@@ -17,6 +17,7 @@
 #include <db.h>
 #include <player.h>
 #include <levels.h>
+#include <sing.h>
 #include <interp.h>
 #include <magic.h>
 #include <act.h>
@@ -24,7 +25,7 @@
 #include <spells.h>
 #include <string.h> // strstr()
 #include <returnvals.h>
-
+#include <set.h>
 #define EMOTING_FILE "emoting-objects.txt"
 
 extern CWorld world;
@@ -219,6 +220,25 @@ int emoting_object(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
     return eFAILURE;
 }
 
+int barbweap(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
+		CHAR_DATA *invoker)
+{ // Cestus
+  if (cmd != 185) return eFAILURE;
+  if (str_cmp(arg," cestus")) return eFAILURE;
+  switch (obj->obj_flags.value[3])
+  {
+    case 4:
+    case 5:
+	send_to_char("You twist your wrists quickly causing sharp spikes to spring forth from your weapon!\r\n",ch);
+	obj->obj_flags.value[3] = 10;
+	return eSUCCESS;
+    case 10:
+	send_to_char("You twist your wrists quickly, retracting the spikes from your weapon.\r\n",ch);
+	obj->obj_flags.value[3] = 5;
+	return eSUCCESS;
+  }
+ return eFAILURE;
+}
 int souldrainer(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, 
                    CHAR_DATA *invoker) 
 {
@@ -273,6 +293,50 @@ int souldrainer(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
 }
 
 
+int pushwand(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
+		CHAR_DATA *invoker)
+{
+   if (cmd != 11 && cmd != 185)
+     return eFAILURE;
+   if (cmd == 185)
+   {
+     if (str_cmp(arg, " wand") && str_cmp(arg, " ivory") && str_cmp(arg, " ebony"))
+       return eFAILURE;
+     if (GET_STR(ch) < 20)
+     {
+	 send_to_char("You try to separate the wand pieces, but you find yourself too weak to do so.\r\n",ch);
+         return eSUCCESS;
+     }
+     int newspell;
+     switch (obj->obj_flags.value[3])
+     {
+	case 17: newspell = 28; break;
+	case 28: newspell = 59; break;
+	case 59: newspell = 113; break;
+	case 113: newspell = 17; break;
+	default: newspell = 17;break;
+     }
+     obj->obj_flags.value[3] = newspell;
+     send_to_char("You push the ivory so that the ivory and ebony separate.\r\nReassembling them, you hear a \"click\" as they snap back into place.\r\n",ch);
+     return eSUCCESS;
+   } else if (cmd == 11) {
+     if (str_cmp(arg, " recharge")) return eFAILURE;
+     struct obj_data *curr;
+     for (curr = ch->carrying; curr; curr = curr->next_content)
+     {
+       if (obj_index[curr->item_number].virt == 22427) // red dragon snout
+       {
+	 obj->obj_flags.value[2] = 5;
+	 send_to_char("The wand absorbs the dragon snout and pulses with energy.\r\n",ch);
+	 obj_from_char(curr);
+	 extract_obj(curr);
+	 return eSUCCESS;
+       }       
+     }
+     return eFAILURE;
+   }
+}
+
 int holyavenger(CHAR_DATA *ch, struct obj_data *obj,  int cmd, char *arg, 
                    CHAR_DATA *invoker)
 {
@@ -282,6 +346,14 @@ int holyavenger(CHAR_DATA *ch, struct obj_data *obj,  int cmd, char *arg,
 
    if(!(vict = ch->fighting)) {
        return eFAILURE;
+   }
+   if ((vict->equipment[WEAR_NECK_1] && obj_index[vict->equipment[WEAR_NECK_1]->item_number].virt == 518) ||
+(vict->equipment[WEAR_NECK_2] && obj_index[vict->equipment[WEAR_NECK_2]->item_number].virt == 518))
+   { // tarrasque's leash..
+	act("You attempt to behead $N, but your sword bounces of their neckwear.",ch, 0, vict, TO_CHAR, 0);
+	act("$n attempts to behead $N, but fails.", ch, 0, vict, TO_ROOM, NOTVICT);
+	act("$n attempts to behead you, but TODO",ch,0,vict,TO_VICT,0);
+	return eSUCCESS;
    }
    if(GET_HIT(vict) < 3500) {
        percent = (100 * GET_HIT(vict)) / GET_MAX_HIT(vict);
@@ -301,7 +373,8 @@ int holyavenger(CHAR_DATA *ch, struct obj_data *obj,  int cmd, char *arg,
                        make_head(vict);
                        group_gain(ch, vict); 
                        fight_kill(ch, vict, TYPE_CHOOSE, 0);
-                       return eSUCCESS; /* Zero means kill it! */
+                       return eSUCCESS|eVICT_DIED; /* Zero means kill it! */
+			// it died..
                    } else { /* You MISS the fucker! */
                        act("You feel $n's sword slice by your head!", ch, 0, vict, TO_VICT, 0);
                        act("You miss your attempt to behead $N.", ch, 0, vict, TO_CHAR, 0);
@@ -432,6 +505,11 @@ int bank(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     if((uint32)x > GET_GOLD(ch)) {
       send_to_char("You don't have that much gold!\n\r", ch);
       return eSUCCESS;
+    }
+    if ((uint32)x + GET_BANK(ch) > 2000000000)
+    {
+	send_to_char("That would bring you over your account maximum!\r\n",ch);
+	return eSUCCESS;
     }
     GET_GOLD(ch) -= x;
     GET_BANK(ch) += x;
@@ -733,14 +811,12 @@ int pfe_word(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
 
    if(!ch)
       return eFAILURE;
-
-   if(!ch->equipment[HOLD])
-      return eFAILURE;
-
-   if(real_object(3611) != ch->equipment[HOLD]->item_number)
+   int pos = HOLD;
+   if(!ch->equipment[pos] || real_object(3611) != ch->equipment[pos]->item_number)
    {
-      // send_to_char("Wrong hold item num\r\n", ch);
-      return eFAILURE;
+	pos = HOLD2;
+        if(!ch->equipment[pos] || real_object(3611) != ch->equipment[pos]->item_number)
+	 return eFAILURE;
    }
 
    half_chop(arg, arg1, junk);
@@ -752,13 +828,13 @@ int pfe_word(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
       if(str_cmp("aslexi",arg1))
          return eFAILURE;
 
-      if(ch->equipment[HOLD]->obj_flags.value[3])
+      if(ch->equipment[pos]->obj_flags.value[3])
       {
          send_to_char("The item seems to be recharging.\r\n", ch);
          return eSUCCESS;
       }
 
-      ch->equipment[HOLD]->obj_flags.value[3] = 600;
+      ch->equipment[pos]->obj_flags.value[3] = 600;
 
       act("$n mutters something into $s hands.", ch, 0, 0, TO_ROOM, 0);
       send_to_char("You quietly whisper 'aslexi' into your hands.\r\n", ch);
@@ -794,8 +870,11 @@ int pfe_word(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
       if(!obj_object)
          return eFAILURE;
 
-      if(obj_object != ch->equipment[HOLD])
+      if(obj_object != ch->equipment[HOLD] &&
+	  obj_object != ch->equipment[HOLD2])
          return eFAILURE;
+      if (obj_object->item_number != real_object(3611))
+	return eFAILURE;
 
       if(affected_by_spell(ch, SPELL_PROTECT_FROM_EVIL))
       {
@@ -2059,7 +2138,13 @@ int shield_combat_procs(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
        send_to_char("Your shield glows yellow as it charges up with electrical energy.\r\n", ch);
        return spell_lightning_bolt((GET_LEVEL(ch)/2), ch, ch->fighting, 0, 0);
      break;
-
+     case 555: // wicked boneshield
+	if (number(0,9))
+	  return eFAILURE;
+	act("The spikes $n's $o glimmer brightly.",ch, obj,ch->fighting,TO_ROOM,0);
+	send_to_char("The spikes on your shield glimmer brightly.\r\n",ch);
+	return spell_cause_critical(GET_LEVEL(ch), ch, ch->fighting, 0, 0);
+	break;
      case 5208: // thalos beholder shield
        if(number(0, 4))
          return eFAILURE;
@@ -2264,6 +2349,13 @@ int glove_combat_procs(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
        return spell_damage(ch, ch->fighting, dam, TYPE_MAGIC, TYPE_UNDEFINED, 0);
      break;
 
+     case 21718:
+      if (affected_by_spell(ch, BASE_SETS+SET_SAIYAN))
+      {
+        if (number(0,19)) return eFAILURE;
+        return spell_sparks(ch->level, ch, ch->fighting, NULL, 0);
+      }
+      break;
      case 19503: // Gloves of the Dreamer
        if(number(0, 17))
          return eFAILURE;
@@ -2272,7 +2364,12 @@ int glove_combat_procs(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
        send_to_char("Your gloves begin to pulse with a white light for a moment.\r\n", ch);
        return spell_cure_serious(30, ch, ch, 0, 50);
      break;
-
+      case 506:
+	if (number(0,33) || !ch->fighting)
+	  return eFAILURE;
+       act("$n's $o begin pulse with a blinding white light for a moment.", ch, obj, 0, TO_ROOM, 0);
+       send_to_char("Your gloves begin to pulse with a blinding white light for a moment.\r\n", ch);
+       return spell_souldrain(60, ch, ch->fighting, 0, 100);
      default:
        break; 
    }
@@ -2438,5 +2535,373 @@ int hot_potato(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
      return eSUCCESS;
    else
    return eFAILURE;
+}
+//565
+int godload_banshee(struct char_data *ch, struct obj_data *obj, int cmd, 
+      char *arg, CHAR_DATA *invoker)
+{
+   CHAR_DATA *vict;
+   if (cmd) return eFAILURE;
+   if (!(vict = ch->fighting)) return eFAILURE;
+   if (number(1,101) > 12) return eFAILURE;
+   act("$n's instrument takes on a life on it's own, sending out a piercing wail.",ch,0,vict, TO_ROOM,0);  
+   send_to_char("Your instrument sends out a piercing wail.\r\n",ch);
+   return song_whistle_sharp(51,ch,"",vict, 50); 
+}
+//511
+int godload_claws(struct char_data *ch, struct obj_data *obj, int cmd,
+   char *arg, CHAR_DATA *invoker)
+{
+   CHAR_DATA *vict;
+   if (cmd) return eFAILURE;
+   if (!(vict = ch->fighting)) return eFAILURE;
+   if (number(1,101) > 5) return eFAILURE;
+   act("$n's claws glow icy blue.",ch,0,vict, TO_ROOM,0);  
+   send_to_char("Your claws glow icy blue.\r\n",ch);
+   return spell_chill_touch(51,ch,vict,0, 50); 
+
+}
+
+//556
+int godload_defender(struct char_data*ch, struct obj_data *obj, int cmd, 
+char*arg,
+                   CHAR_DATA *invoker)
+{
+  char arg1[MAX_INPUT_LENGTH],arg2[MAX_INPUT_LENGTH];
+  if (cmd != 11|| !is_wearing(ch, obj))
+    return eFAILURE;
+  arg = one_argument(arg, arg1);
+  arg = one_argument(arg, arg2);
+  if (str_cmp(arg1, "arad") || str_cmp(arg2,"tor")) return eFAILURE;
+  if (isTimer(ch, SPELL_PROTECT_FROM_EVIL)) 
+  {  
+     send_to_char("The defender flickers, but nothing happens.\r\n",ch);
+     return eSUCCESS;
+  }
+  addTimer(ch, SPELL_PROTECT_FROM_EVIL, 24);
+  return spell_protection_from_evil(50,ch, ch, 0, 150);
+}
+
+//500
+int godload_stargazer(struct char_data*ch, struct obj_data *obj, int cmd, 
+char*arg,
+                   CHAR_DATA *invoker)
+{
+  char arg1[MAX_INPUT_LENGTH];
+  if (cmd != 11|| !is_wearing(ch, obj))
+    return eFAILURE;
+  arg = one_argument(arg, arg1);
+//  arg = one_argument(arg, arg2);
+ // arg = one_argument(arg, arg3);
+  if (str_cmp(arg1, "cabed")) return eFAILURE;
+  if (isTimer(ch, SPELL_MANA)) 
+  {  
+     send_to_char("The robe glows, but nothing happens.\r\n",ch);
+     return eSUCCESS;
+  }
+  addTimer(ch, SPELL_MANA, 24);
+  send_to_char("Your robes glow brightly!\r\n",ch);
+  return spell_mana(50, ch, ch, 0, 100);
+}
+
+//534
+int godload_cassock(struct char_data*ch, struct obj_data *obj, int cmd, 
+char*arg,
+                   CHAR_DATA *invoker)
+{
+  char arg1[MAX_INPUT_LENGTH];
+  if (cmd != 11|| !is_wearing(ch, obj))
+    return eFAILURE;
+  arg = one_argument(arg, arg1);
+//  arg = one_argument(arg, arg2);
+ // arg = one_argument(arg, arg3);
+  if (str_cmp(arg1, "alata")) return eFAILURE;
+  if (isTimer(ch, SPELL_GROUP_SANC))
+  {  
+     send_to_char("The cassock hums, but ends soon after it starts.\r\n",ch);
+     return eSUCCESS;
+  }
+  addTimer(ch, SPELL_GROUP_SANC, 36);
+  send_to_char("Your cassocks begin to hum loudly!\r\n",ch);
+  return spell_group_sanc((byte)50, ch, ch, 0, 100);
+}
+
+
+//526
+int godload_armbands(struct char_data*ch, struct obj_data *obj, int cmd, 
+char*arg, CHAR_DATA *invoker)
+{
+  char arg1[MAX_INPUT_LENGTH];
+  if (cmd != 11|| !is_wearing(ch, obj))
+    return eFAILURE;
+  arg = one_argument(arg, arg1);
+  if (str_cmp(arg1, "vanesco")) return eFAILURE;
+  if (isTimer(ch, SPELL_TELEPORT)) 
+  {  
+     send_to_char("The armbands crackle, but nothing happens.\r\n",ch);
+     return eSUCCESS;
+  }
+  addTimer(ch, SPELL_TELEPORT, 24);
+  send_to_char("Your armbands crackle, and you phase out of existence",ch);
+  act("$n phases out of existance.",ch, 0, 0, TO_ROOM,0);
+  return spell_teleport(50,ch, ch, 0, 100);
+}
+
+//548
+int godload_gaze(struct char_data*ch, struct obj_data *obj, int cmd, 
+char*arg,
+                   CHAR_DATA *invoker)
+{
+  char arg1[MAX_INPUT_LENGTH];
+  if (cmd != 11|| !is_wearing(ch, obj))
+    return eFAILURE;
+  arg = one_argument(arg, arg1);
+  if (str_cmp(arg1, "iudicium")) return eFAILURE;
+  if (isTimer(ch, SPELL_KNOW_ALIGNMENT)) 
+  {  
+     send_to_char("The gaze gazes stoically, but nothing happens.\r\n",ch);
+     return eSUCCESS;
+  }
+  addTimer(ch, SPELL_KNOW_ALIGNMENT, 24);
+  send_to_char("The gaze reacts to your words, and you feel ready to judge.\r\n",ch);
+  return spell_know_alignment(50,ch, ch, 0, 150);
+}
+
+//514
+int godload_wailka(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
+                   CHAR_DATA *invoker)
+{
+  char arg1[MAX_INPUT_LENGTH],arg2[MAX_INPUT_LENGTH];
+  if (cmd != 11|| !is_wearing(ch, obj))
+    return eFAILURE;
+  arg = one_argument(arg, arg1);
+  arg = one_argument(arg, arg2);
+
+  if (str_cmp(arg1, "suloaki")) return eFAILURE;
+  if (isTimer(ch, SPELL_PARALYZE)) 
+  {  
+     send_to_char("The ring hums, but nothing happens.\r\n",ch);
+     return eSUCCESS;
+  }
+  CHAR_DATA *vict; 
+  if ((vict = get_char_room_vis(ch, arg2)) == NULL)
+  {
+     send_to_char("You need to tell the item who.\r\n",ch);
+     return eSUCCESS;
+  }
+  addTimer(ch, SPELL_PARALYZE, 12);
+  send_to_char("Your ring radiates evil, and does your bidding.\r\n",ch);
+  return spell_paralyze(50, ch, vict, 0, 50);
+}
+
+//517
+int godload_choker(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
+                   CHAR_DATA *invoker)
+{
+  char arg1[MAX_INPUT_LENGTH];
+  if (cmd != 11|| !is_wearing(ch, obj))
+    return eFAILURE;
+  arg = one_argument(arg, arg1);
+
+  if (str_cmp(arg1, "burzum")) return eFAILURE;
+  if (isTimer(ch, SPELL_GLOBE_OF_DARKNESS)) 
+  {  
+     send_to_char("The choker glows black for a moment, but nothing happens.\r\n",ch);
+     return eSUCCESS;
+  }
+  addTimer(ch, SPELL_GLOBE_OF_DARKNESS, 12);
+  send_to_char("Your choker glows black, and dampens all light in the room.\r\n",ch);
+  return spell_globe_of_darkness(50, ch, ch, 0, 150);
+}
+
+//519
+int godload_lorne(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
+                   CHAR_DATA *invoker)
+{
+  char arg1[MAX_INPUT_LENGTH];
+  if (cmd != 11|| !is_wearing(ch, obj))
+    return eFAILURE;
+  arg = one_argument(arg, arg1);
+
+  if (str_cmp(arg1, "incende")) return eFAILURE;
+  if (isTimer(ch, SPELL_CONT_LIGHT)) 
+  {  
+     send_to_char("The necklace shines, but nothing happens.\r\n",ch);
+     return eSUCCESS;
+  }
+  addTimer(ch, SPELL_CONT_LIGHT, 12);
+  send_to_char("The necklace shines brightly.\r\n",ch);
+  return spell_cont_light(50, ch, ch, 0, 150);
+}
+
+//528
+int godload_leprosy(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
+                   CHAR_DATA *invoker)
+{
+   if(cmd)                                  return eFAILURE;
+   if(!ch || !ch->fighting)                 return eFAILURE;
+   if(ch->equipment[WEAR_FEET] != obj)      return eFAILURE;
+
+   if(number(0, 1))
+      return eFAILURE;
+
+   act("$n's $o release a cloud of disease!",
+              ch, obj, ch->fighting, TO_ROOM, 0);
+   send_to_char("Your feet releases a cloud of disease!\r\n", ch);
+
+   return spell_harm(GET_LEVEL(ch), ch, ch->fighting, 0, 150);
+}
+
+
+//540
+int godload_quiver(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
+                   CHAR_DATA *invoker)
+{
+  char arg1[MAX_INPUT_LENGTH];
+  if (cmd != 11|| !is_wearing(ch, obj))
+    return eFAILURE;
+  arg = one_argument(arg, arg1);
+
+  if (str_cmp(arg1, "quant'naith")) return eFAILURE;
+  if (isTimer(ch, SPELL_MISANRA_QUIVER)) 
+  {  
+     send_to_char("The quiver glitters, but nothing happens.\r\n",ch);
+     return eSUCCESS;
+  }
+  addTimer(ch, SPELL_MISANRA_QUIVER, 24);
+  struct obj_data *obj2;
+  int i;
+  send_to_char("The quiver glitters, and hums.\r\n",ch);
+  for (i = 0; i < 25; i++)
+  {
+     if((obj->obj_flags.weight + 1) < obj->obj_flags.value[0]) 
+     {
+	obj2 = clone_object(real_object(597));
+	if (!obj_to_obj(obj2, obj)) {
+	  send_to_char("Some arrows appear in your quiver.\r\n",ch);
+	  send_to_char("The quiver flickers brightly, and ends unfinished.\r\n",ch);
+	  return eSUCCESS;
+	}
+     } else {
+	  send_to_char("Some arrows appear in your quiver.\r\n",ch);
+	  send_to_char("The quiver flickers brightly, and ends unfinished.\r\n",ch);
+	return eSUCCESS;
+     }
+  } 
+  send_to_char("Some arrows appear in your quiver.\r\n",ch);
+  return eSUCCESS;
+}
+
+int godload_aligngood(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
+                   CHAR_DATA *invoker)
+{
+  char arg1[MAX_INPUT_LENGTH];
+  if (cmd != 11|| !is_wearing(ch, obj))
+    return eFAILURE;
+  arg = one_argument(arg, arg1);
+
+  if (str_cmp(arg1, "aglar")) return eFAILURE;
+  if (isTimer(ch, SPELL_ALIGN_GOOD)) 
+  {  
+     send_to_char("The fire burns, but nothing happens.\r\n",ch);
+     return eSUCCESS;
+  }
+  addTimer(ch, SPELL_ALIGN_GOOD, 48);
+  GET_ALIGNMENT(ch) += 100;
+  if (GET_ALIGNMENT(ch) > 1000) GET_ALIGNMENT(ch) = 1000;
+  send_to_char("You are purified by the light of the fire.\r\n",ch);
+  return eSUCCESS;  
+}
+
+int godload_alignevil(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
+                   CHAR_DATA *invoker)
+{
+  char arg1[MAX_INPUT_LENGTH];
+  if (cmd != 11|| !is_wearing(ch, obj))
+    return eFAILURE;
+  arg = one_argument(arg, arg1);
+
+  if (str_cmp(arg1, "dagnir")) return eFAILURE;
+  if (isTimer(ch, SPELL_ALIGN_EVIL)) 
+  {  
+     send_to_char("The blackened heart croaks, but nothing happens.\r\n",ch);
+     return eSUCCESS;
+  }
+  addTimer(ch, SPELL_ALIGN_EVIL, 48);
+  GET_ALIGNMENT(ch) -= 100;
+  if (GET_ALIGNMENT(ch) < -1000) GET_ALIGNMENT(ch) = -1000;
+  send_to_char("You are burnt by the heart's darkness.\r\n",ch);
+  return eSUCCESS;
+}
+
+int godload_tovmier(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
+                   CHAR_DATA *invoker)
+{
+  char arg1[MAX_INPUT_LENGTH];
+  if (cmd != 186||!is_wearing(ch,obj))
+    return eFAILURE;
+  arg = one_argument(arg, arg1);
+
+  if (str_cmp(arg1, "staff") && str_cmp(arg1, "tovmier")) return eFAILURE;
+
+  send_to_char("You twist the handle of the staff.\r\n",ch);
+  for(int i = 0; i < obj->num_affects; i++)
+    if (obj->affected[i].location == WEP_DISPEL_EVIL)
+    {
+       obj->affected[i].location = WEP_DISPEL_GOOD;
+       return eSUCCESS;
+    } else if (obj->affected[i].location == WEP_DISPEL_GOOD)
+    {
+       obj->affected[i].location = WEP_DISPEL_EVIL;
+       return eSUCCESS;
+    }
+  send_to_char("Something's bugged with this staff. Report it.\r\n",ch);
+  return eSUCCESS;
+}
+
+int godload_hammer(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
+                   CHAR_DATA *invoker)
+{
+  if (cmd != 188 && is_wearing(ch,obj))
+    return eFAILURE;
+
+  if (isTimer(ch, SPELL_EARTHQUAKE)) 
+  {  
+     send_to_char("The hammer glows, but nothing happens.\r\n",ch);
+     return eSUCCESS;
+  }
+  act("$n smashes $s hammer into the ground causing a tectonic blast.", ch, 0, 0, TO_ROOM, 0);
+  send_to_char("You smash your hammer into the ground, causing it to shake violently.\r\n",ch);
+  addTimer(ch, SPELL_EARTHQUAKE, 24);
+  int retval = spell_earthquake(50, ch, ch, 0, 100);
+  if (!SOMEONE_DIED(retval)) 
+      retval |= spell_earthquake(50, ch, ch, 0, 100);
+  return retval;
+}
+
+int godload_phyraz(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
+                   CHAR_DATA *invoker)
+{
+  char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+  if (cmd != 11 || !is_wearing(ch,obj))
+    return eFAILURE;
+  arg = one_argument(arg, arg1);
+  arg = one_argument(arg, arg2);
+
+  if (str_cmp(arg1, "katascopse")) return eFAILURE;
+  if (isTimer(ch, SPELL_WIZARD_EYE)) 
+  {  
+     send_to_char("The ball stays murky.\r\n",ch);
+     return eSUCCESS;
+  }
+  addTimer(ch, SPELL_WIZARD_EYE, 24);
+  CHAR_DATA *vict = get_char_vis(ch, arg2);
+  if (!vict)
+  {
+    send_to_char("The scrying ball stays murky.\r\n",ch);
+   return eSUCCESS;
+  }
+  send_to_char("You tell the scrying ball your bidding, and an image appears.\r\n",ch);
+  return spell_wizard_eye(100, ch, vict, 0, 100);
 }
 

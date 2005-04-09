@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.54 2004/11/16 00:51:35 Zaphod Exp $ */
+/* $Id: limits.cpp,v 1.55 2005/04/09 21:15:27 urizen Exp $ */
 
 extern "C"
 {
@@ -67,7 +67,7 @@ int graf(int age, int p0, int p1, int p2, int p3, int p4, int p5, int p6)
 {
 
     if (age < 15)
-	return(p0);                               /* < 15   */
+	return(p0);                                 /* < 15   */
     else if (age <= 29) 
 	return (int) (p1+(((age-15)*(p2-p1))/15));  /* 15..29 */
     else if (age <= 44)
@@ -77,7 +77,7 @@ int graf(int age, int p0, int p1, int p2, int p3, int p4, int p5, int p6)
     else if (age <= 79)
 	return (int) (p4+(((age-60)*(p5-p4))/20));  /* 60..79 */
     else
-	return(p6);                               /* >= 80 */
+	return(p6);                                 /* >= 80 */
 }
 
 /* The three MAX functions define a characters Effective maximum */
@@ -170,7 +170,7 @@ int mana_gain(CHAR_DATA *ch)
     }
     else {
       modifier = wis_app[GET_WIS(ch)].mana_regen;
-      modifier = GET_WIS(ch);
+      modifier += GET_WIS(ch);
     }
     gain += modifier;
   }
@@ -200,8 +200,10 @@ int hit_gain(CHAR_DATA *ch)
   int divisor =1;
  /* Neat and fast */
   if(IS_NPC(ch))
-    gain = (GET_MAX_HIT(ch) / 30);
-  
+  {
+   if (ch->fighting) gain = (GET_MAX_HIT(ch) / 24);
+   else gain = (GET_MAX_HIT(ch) / 6);
+  }
   /* PC's */
   else {
     gain = (int)(ch->max_hit * (float)hit_regens[GET_CLASS(ch)] /100);
@@ -667,7 +669,11 @@ void food_update( void )
     next_dude = i->next;
     if (affected_by_spell(i,SPELL_PARALYZE))
       continue;
-    gain_condition(i,FULL,-1);
+    int amt = -1;
+    if (i->equipment[WEAR_FACE] && 
+	obj_index[i->equipment[WEAR_FACE]->item_number].virt == 536)
+		amt = -3;
+    gain_condition(i,FULL,amt);
     if(!GET_COND(i, FULL)) { // i'm hungry
       if(!IS_MOB(i) && IS_SET(i->pcdata->toggles, PLR_AUTOEAT) && (GET_POS(i) > POSITION_SLEEPING)) {
         if(FOUNTAINisPresent(i)) {
@@ -677,9 +683,9 @@ void food_update( void )
           do_eat(i, food->name, 9);
         else send_to_char("You are out of food.\n\r", i);
       }
-    }          
+    }
     gain_condition(i,DRUNK,-1);
-    gain_condition(i,THIRST,-1);
+    gain_condition(i,THIRST,amt);
     if(!GET_COND(i, THIRST)) { // i'm thirsty
       if(!IS_MOB(i) && IS_SET(i->pcdata->toggles, PLR_AUTOEAT) && (GET_POS(i) > POSITION_SLEEPING)) {
         if(FOUNTAINisPresent(i)) {

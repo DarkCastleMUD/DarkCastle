@@ -199,6 +199,9 @@ int main(int argc, char **argv)
   char dir[256];
   strcpy(dir, (char *)DFLT_DIR);
   
+  extern void init_random();
+  init_random();
+
   port = DFLT_PORT;
   port2 = DFLT_PORT2;
   port3 = DFLT_PORT3;
@@ -384,7 +387,7 @@ int load_hotboot_descs()
     fscanf(fp, "%d\n%s\n%s\n", &desc, chr, host);
     d = (struct descriptor_data *)dc_alloc(1, sizeof(struct descriptor_data));
     memset((char *) d, 0, sizeof(struct descriptor_data));
-
+    d->idle_time = 0;
     d->idle_tics               = 0;
     d->wait                    = 1;
     d->bufptr                  = 0;
@@ -791,7 +794,10 @@ void game_loop(unsigned mother_desc, unsigned other_desc, unsigned third_desc, u
     for (d = descriptor_list; d; d = next_d) {
       next_d = d->next;
       d->wait = MAX(d->wait, 1);
-
+	if (d->connected == CON_CLOSE)
+	{  close_socket(d); // So they don't have to type a command.
+		continue; }
+	//debugpoint();
       if ((--(d->wait) <= 0) && get_from_q(&d->input, comm, &aliased)) {
 	  /* reset the idle timer & pull char back from void if necessary */
 	d->wait = 1;
@@ -833,6 +839,7 @@ void game_loop(unsigned mother_desc, unsigned other_desc, unsigned third_desc, u
       // this line allows the mud to skip this descriptor until next pulse
       else if (d->connected == CON_PRE_DISPLAY_ENTRANCE)
         d->connected = CON_DISPLAY_ENTRANCE;
+      else d->idle_time++;
     } // for
 
 //gettimeofday(&debugtimer2, NULL);
@@ -865,14 +872,15 @@ void game_loop(unsigned mother_desc, unsigned other_desc, unsigned third_desc, u
 //       (((int) debugtimer2.tv_sec) - ((int) debugtimer1.tv_sec)),
 //       (((int) debugtimer2.tv_usec) - ((int) debugtimer1.tv_usec)));
 //gettimeofday(&debugtimer1, NULL);
-
+//    debugpoint();
     // we're done with this pulse.  Now calculate the time until the next pulse and sleep until then
     // we want to pulse PASSES_PER_SEC times a second (duh).  This is currently 4.
 
     gettimeofday( &now_time, NULL );
     usecDelta   = ((int) last_time.tv_usec) - ((int) now_time.tv_usec);
     secDelta    = ((int) last_time.tv_sec ) - ((int) now_time.tv_sec );
-
+//    usecDelta = ((int) now_time.tv_usec) - ((int) last_time.tv_usec);
+//    secDelta = ((int) now_time.tv_sec) - ((int) last_time.tv_sec);
 //logf(110, LOG_BUG, "Time since last pulse: %dsec %dusec.", 
 //       (((int) now_time.tv_sec) - ((int) now_time.tv_sec)),
 //       (((int) last_time.tv_usec) - ((int) last_time.tv_usec)));
@@ -1611,6 +1619,7 @@ int new_descriptor(int s)
   /* initialize descriptor data */
   newd->descriptor = desc;
   newd->idle_tics = 0;
+  newd->idle_time = 0;
   newd->wait = 1;
   newd->output = newd->small_outbuf;
   newd->bufspace = SMALL_BUFSIZE - 1;
@@ -1736,7 +1745,7 @@ int process_input(struct descriptor_data *t)
 
   /* initialize doublesign */
   doublesign = 0;
-
+  t->idle_time = 0;
   /* first, find the point where we left off reading data */
   buf_length = strlen(t->inbuf);
   read_point = t->inbuf + buf_length;

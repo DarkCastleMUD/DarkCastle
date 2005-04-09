@@ -4422,12 +4422,14 @@ int do_sockets(struct char_data *ch, char *argument, int cmd)
 	}
       num_can_see++;
       
-      sprintf(buf + strlen(buf), "%s%3d : %-30s | %-16s$R", duplicate? "$B$4":"", d->descriptor, d->host, (d->character ? (d->character->name ? d->character->name : "NONE") : "NONE"));
+      sprintf(buf + strlen(buf), "%s%3d : %-30s | %-16s$R |", duplicate? 
+"$B$4":"", d->descriptor, d->host, (d->character ? (d->character->name ? d->character->name : "NONE") : "NONE"));
 
       if ((pStr = constindex(d->connected, connected_states)))
-         sprintf(buf + strlen(buf), "%s\n\r", pStr);
+         sprintf(buf + strlen(buf), "%-20s |", pStr);
       else
-         sprintf(buf + strlen(buf), "***UNKNOWN***\n\r");
+         sprintf(buf + strlen(buf), "***UNKNOWN*** | ");
+       sprintf(buf+strlen(buf), "%d\r\n",d->idle_time/PASSES_PER_SEC);
       
   } // for
 

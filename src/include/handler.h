@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.h,v 1.10 2004/11/16 00:52:09 Zaphod Exp $ */
+/* $Id: handler.h,v 1.11 2005/04/09 21:15:35 urizen Exp $ */
 
 #ifndef HANDLER_H_
 #define HANDLER_H_
@@ -49,7 +49,10 @@ struct obj_data *create_money( int amount );
 int isname(char *str, char *namelist);
 char *fname(char *namelist);
 int get_max_stat(char_data * ch, byte stat);
-
+//TIMERS
+bool isTimer(CHAR_DATA *ch, int spell);
+void addTimer(CHAR_DATA *ch, int spell, int ticks);
+//END TIMERS
 /* ******** objects *********** */
 
 int move_obj(obj_data * obj, int dest);
@@ -79,7 +82,7 @@ void extract_obj(struct obj_data *obj);
 
 /* ******* characters ********* */
 
-CHAR_DATA *get_char_room(char *name, int room);
+CHAR_DATA *get_char_room(char *name, int room, bool careful = FALSE);
 CHAR_DATA *get_char_num(int nr);
 CHAR_DATA *get_char(char *name);
 CHAR_DATA *get_mob(char *name);
@@ -117,4 +120,5 @@ int generic_find(char *arg, int bitvector, CHAR_DATA *ch,
 #define FIND_OBJ_WORLD     16
 #define FIND_OBJ_EQUIP     32
 
+bool is_wearing(CHAR_DATA *ch, OBJ_DATA *item);
 #endif

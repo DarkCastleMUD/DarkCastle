@@ -1,7 +1,7 @@
 #ifndef FILEINFO_H_
 #define FILEINFO_H_
 /*
-| $Id: fileinfo.h,v 1.7 2004/11/16 00:52:09 Zaphod Exp $
+| $Id: fileinfo.h,v 1.8 2005/04/09 21:15:35 urizen Exp $
 | fileinfo.h
 | Description:  Contains information for loading files, ie "../lib", etc..
 */

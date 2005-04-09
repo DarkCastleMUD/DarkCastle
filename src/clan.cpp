@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.32 2004/11/16 00:51:34 Zaphod Exp $ */
+/* $Id: clan.cpp,v 1.33 2005/04/09 21:15:27 urizen Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -154,7 +154,7 @@ void boot_clans(void)
 	   break;
 	}
 	case 'T': { // Tax
-	  new_new_clan->tax = fread_int(fl,0,50);
+	  new_new_clan->tax = fread_int(fl,0,99);
 	  break;
 	}
         case 'L': {
@@ -2325,9 +2325,9 @@ int do_ctax(CHAR_DATA *ch, char *arg, int cmd)
   }
 
   int tax = atoi(arg1);
-  if (tax < 0 || tax > 50)
+  if (tax < 0 || tax > 99)
   {
-    send_to_char("You can have a maximum of 50% in taxes.\r\n",ch);
+    send_to_char("You can have a maximum of 99% in taxes.\r\n",ch);
     return eFAILURE;
   }
   get_clan(ch)->tax = tax;

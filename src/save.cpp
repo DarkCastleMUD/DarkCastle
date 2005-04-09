@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: save.cpp,v 1.28 2004/11/16 00:51:35 Zaphod Exp $ */
+/* $Id: save.cpp,v 1.29 2005/04/09 21:15:27 urizen Exp $ */
 
 extern "C"
 {
@@ -857,12 +857,19 @@ struct obj_data *  obj_store_to_char(CHAR_DATA *ch, FILE *fpsave, struct obj_dat
     extract_obj(obj);
     return last_cont;
   }
-
+  extern int wear_corr[];
   // Handle worn EQ
-  if ( (wear_pos > -1) && (wear_pos < MAX_WEAR) && (!ch->equipment[wear_pos]))
+  if ( (wear_pos > -1) && (wear_pos < MAX_WEAR) && (!ch->equipment[wear_pos])
+	&&CAN_WEAR(obj, wear_corr[wear_pos]))
   {
     equip_char (ch, obj, wear_pos, 1);
     return obj;
+  }
+  else if ( (wear_pos > -1) && (wear_pos < MAX_WEAR) && (!ch->equipment[wear_pos+1])
+      && CAN_WEAR(obj, wear_corr[wear_pos+1]))
+  {
+     equip_char(ch, obj, wear_pos+1, 1);
+	return obj;
   }
   else if(object.container_depth == 1 && last_cont)
   {
@@ -872,7 +879,7 @@ struct obj_data *  obj_store_to_char(CHAR_DATA *ch, FILE *fpsave, struct obj_dat
     {
       obj_to_obj(obj, last_cont);
       // we don't add weight to the character for containers that are worn
-      if(!last_cont->equipped_by)
+      if(!last_cont->equipped_by && obj_index[last_cont->item_number].virt != 536)
           IS_CARRYING_W(ch) += GET_OBJ_WEIGHT(obj);
     }
     else {
@@ -1014,7 +1021,8 @@ obj->obj_flags.value[2]    != standard_obj->obj_flags.value[2])
   }
 
   tmp_weight = obj->obj_flags.weight;
-  if(GET_ITEM_TYPE(obj) == ITEM_CONTAINER && (loop_obj = obj->contains))
+  if(GET_ITEM_TYPE(obj) == ITEM_CONTAINER && (loop_obj = obj->contains)
+	&& obj_index[obj->item->number].virt != 536)
     for (; loop_obj; loop_obj = loop_obj->next_content)
       tmp_weight -= GET_OBJ_WEIGHT(loop_obj);
   if(tmp_weight      != standard_obj->obj_flags.weight)
@@ -1110,7 +1118,7 @@ void restore_weight(struct obj_data *obj)
 
     if ( obj == NULL )
       return;
-
+    if (obj_index[obj->item_number].virt == 536) return;
     restore_weight( obj->contains );
     restore_weight( obj->next_content );
     for ( tmp = obj->in_obj; tmp; tmp = tmp->in_obj )

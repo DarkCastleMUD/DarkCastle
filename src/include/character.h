@@ -1,7 +1,7 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.25 2004/11/16 00:52:09 Zaphod Exp $
+| $Id: character.h,v 1.26 2005/04/09 21:15:35 urizen Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
@@ -26,7 +26,7 @@
 /************************************************************************
 | max stuff - this is needed almost everywhere
 */
-#define MAX_WEAR     22
+#define MAX_WEAR     23
 #define MAX_AFFECT   25
 
 struct char_data;
@@ -109,8 +109,8 @@ struct  mob_prog_data
 #define COMMAND_PROG   16384 <<1
 #define WEAPON_PROG    16384 <<2
 #define ARMOUR_PROG    16384 <<3
-
-#define MPROG_MAX_TYPE_VALUE (16384 << 4)
+#define GREET_ALL_PROG 16384 <<4
+#define MPROG_MAX_TYPE_VALUE (16384 << 5)
 
 // * ------- End MOBProg stuff ----------- *
 
@@ -362,7 +362,7 @@ struct char_data
     CHAR_DATA *master;              /* Who is char following? */
     char *group_name;                /* Name of group */
     
-    int32 timer;                         // Timer for update                       
+    int32 timer;                         // Timer for update
 
 // TODO - see if we can move the "wait" timer from desc to char
 // since we need something to lag mobs too

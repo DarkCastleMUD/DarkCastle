@@ -264,7 +264,7 @@ int do_mpjunk( CHAR_DATA *ch, char *argument, int cmd )
 	extract_obj( unequip_char( ch, location ) );
 	return eSUCCESS;
       }
-      if ((obj = get_obj_in_list_vis(ch, arg, ch->carrying)))
+      if ((obj = get_obj_in_list(arg, ch->carrying)))
       {
         extract_obj( obj );
         return eSUCCESS;
@@ -306,7 +306,7 @@ int do_mpechoaround( CHAR_DATA *ch, char *argument, int cmd )
        return eFAILURE|eINTERNAL_ERROR;
     }
 
-    if ( !( victim=get_char_room( arg,ch->in_room ) ) )
+    if ( !( victim=get_char_room( arg,ch->in_room, TRUE ) ) )
     {
         logf( IMMORTAL, LOG_WORLD, "Mpechoaround - victim does not exist: vnum %d.",
 	    mob_index[ch->mobdata->nr].virt );
@@ -316,6 +316,44 @@ int do_mpechoaround( CHAR_DATA *ch, char *argument, int cmd )
     act( argument+1, ch, NULL, victim, TO_ROOM, NOTVICT );
     return eSUCCESS;
 }
+
+int do_mpechoaroundnotbad( CHAR_DATA *ch, char *argument, int cmd )
+{
+  char       arg[ MAX_INPUT_LENGTH ], arg1[MAX_INPUT_LENGTH];
+  CHAR_DATA *victim, *victim2;
+
+    if ( !IS_NPC( ch ) )
+    {
+       send_to_char( "Huh?\n\r", ch );
+       return eSUCCESS;
+    }
+
+    argument = one_argument( argument, arg );
+    argument = one_argument(argument,arg1);
+    if ( arg[0] == '\0' || arg1[0] == '\0')
+    {
+       logf( IMMORTAL, LOG_WORLD, "Mpechoaroundnotbad - No argument:  vnum %d.", mob_index[ch->mobdata->nr].virt );
+       return eFAILURE|eINTERNAL_ERROR;
+    }
+  
+    if ( !( victim=get_char_room( arg,ch->in_room ) ) )
+    {
+        logf( IMMORTAL, LOG_WORLD, "Mpechoaroundnotbad - victim does not exist: vnum %d.",
+	    mob_index[ch->mobdata->nr].virt );
+	return eFAILURE|eINTERNAL_ERROR;
+    }
+    if ( !( victim2=get_char_room( arg1,ch->in_room ) ) )
+    {
+        logf( IMMORTAL, LOG_WORLD, "Mpechoaroundnotbad - victim does not exist: vnum %d.",
+	    mob_index[ch->mobdata->nr].virt );
+	return eFAILURE|eINTERNAL_ERROR;
+    }
+
+//     if (CAN_SEE(ch,victim))
+    act( argument+1, victim, NULL, victim2, TO_ROOM, NOTVICT );
+    return eSUCCESS;
+}
+
 
 /* prints the message to only the victim */
 
@@ -339,7 +377,7 @@ int do_mpechoat( CHAR_DATA *ch, char *argument, int cmd )
        return eFAILURE|eINTERNAL_ERROR;
     }
 
-    if ( !( victim = get_char_room( arg, ch->in_room ) ) )
+    if ( !( victim = get_char_room( arg, ch->in_room, TRUE ) ) )
     {
         logf( IMMORTAL, LOG_WORLD, "Mpechoat - victim does not exist: vnum %d.",
 	    mob_index[ch->mobdata->nr].virt );
@@ -494,10 +532,10 @@ int do_mppurge( CHAR_DATA *ch, char *argument, int cmd )
 	return eSUCCESS;
     }
 
-    if ( !( victim = get_char_room_vis( ch, arg )))
+    if ( !( victim = get_char_room( arg , ch->in_room)))
     {
-	if ( ( obj = get_obj_in_list_vis( ch, arg, world[ch->in_room].contents ) ) ||
-             ( obj = get_obj_in_list_vis( ch, arg, ch->carrying ) ) )
+	if ( ( obj = get_obj_in_list( arg, world[ch->in_room].contents ) ) ||
+             ( obj = get_obj_in_list( arg, ch->carrying ) ) )
 	{
 	    extract_obj( obj );
 	}
@@ -840,11 +878,13 @@ int do_mpthrow( CHAR_DATA *ch, char *argument, int cmd )
   char second[MAX_INPUT_LENGTH];
   char third[MAX_INPUT_LENGTH];
   char fourth[MAX_INPUT_LENGTH];	
+  char fifth[MAX_INPUT_LENGTH];
   // locate and validate argument to find target
   argument = one_argument(argument, first);
   argument = one_argument(argument, second);
   argument = one_argument(argument, third);
   argument = one_argument(argument, fourth);
+  argument = one_argument(argument, fifth);
 //  half_chop(argument, first, buf);
  // half_chop(buf, second, third);
 
@@ -876,6 +916,10 @@ int do_mpthrow( CHAR_DATA *ch, char *argument, int cmd )
     return eFAILURE;
   }
 
+  int opt = 0;
+  if(!check_range_valid_and_convert(opt, fifth, 0, 50000))
+     opt = 0;
+
   // create struct
   throwitem = (struct mprog_throw_type *)dc_alloc(1, sizeof(struct mprog_throw_type));
   throwitem->target_mob_num = mob_num;
@@ -883,11 +927,12 @@ int do_mpthrow( CHAR_DATA *ch, char *argument, int cmd )
   throwitem->data_num = catch_num;
   throwitem->delay = delay;
   throwitem->mob = TRUE; // This is, suprisingly, a mob
+  
   if (fourth[0] !='\0')
    throwitem->var = str_dup(fourth);
   else
    throwitem->var = NULL;
-
+  throwitem->opt = opt;
   // add to delay list
   throwitem->next = g_mprog_throw_list;
   g_mprog_throw_list = throwitem;
@@ -1220,17 +1265,17 @@ mprog_throw_type));
 int skill_aff[] = 
 {
   4, 29, 18, 19, 20, 44,
-  123, 36, 0, 0, 17, 0, 
+  123, 36, 0, SPELL_EAS, 17, 145, 
   33, 34, 84, 81, 86, 38,
-  89, 0, 0, 0, 0, 0, 72,
-  0, 0, 56, 133, 74, 0,
+  89, 0, 0, 0, 0, 0, SPELL_SOLIDITY, 72,
+  SPELL_CANTQUIT, SPELL_KILLER, 56, 133, 74, 0,
   143
 };
 
 int skill_aff2[] =
 {
   SPELL_SHADOWSLIP, SPELL_INSOMNIA, SPELL_FREEFLOAT,
-  SPELL_FARSIGHT, SPELL_CAMOUFLAGE, 0,
+  SPELL_FARSIGHT, SPELL_CAMOUFLAGE, SPELL_STABILITY,
   0, 0, SPELL_FOREST_MELD, SKILL_SONG_INSANE_CHANT,
   SKILL_SONG_GLITTER_DUST, SKILL_SONG_STICKY_LULL,
   0, SPELL_PROTECT_FROM_GOOD, SKILL_INNATE_POWERWIELD,
@@ -1241,53 +1286,87 @@ int skill_aff2[] =
 int do_mpbestow(CHAR_DATA *ch, char *argument, int cmd)
 {
    char arg[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH],
-     arg2[MAX_INPUT_LENGTH];
-  CHAR_DATA *victim;
+     arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
+  CHAR_DATA *victim, *owner = NULL;
   if (!IS_NPC(ch)) return eFAILURE;
   argument = one_argument(argument, arg);
   argument = one_argument(argument, arg1);
   argument = one_argument(argument, arg2);
+  argument = one_argument(argument, arg3);
 
   if (arg[0] == '\0' || arg1[0] == '\0' || arg2[0] == '\0') return eFAILURE;
-    if ( ( victim = get_char_room(arg,ch->in_room ) ) == NULL && 
-str_cmp(arg, "all")
-	&& str_cmp(arg,"allpc"))
+    if ( ( victim = get_char_room(arg,ch->in_room,TRUE ) ) == NULL && 
+      str_cmp(arg, "all") && str_cmp(arg,"allpc"))
     {
         logf( IMMORTAL, LOG_WORLD, "Mpbestow - No such person: vnum %d.",
             mob_index[ch->mobdata->nr].virt );
         return eFAILURE|eINTERNAL_ERROR;
     }
-   int i;
+  int i,o=0;
   if (!check_range_valid_and_convert(i, arg2,0, 100)) return eFAILURE|eINTERNAL_ERROR;
+  if (!check_range_valid_and_convert(o, arg3,0, 10000));
   int a = 0;
+  if (ch->beacon) owner = (CHAR_DATA*)ch->beacon;
   extern char *affected_bits[];
   if (!victim) victim = world[ch->in_room].people;
+  int z=0;
   for (;victim;) {
   for ( ; affected_bits[a][0] != '\n'; a++) 
   {
-    if (!str_cmp(affected_bits[a], arg1) && skill_aff[a] != 0)
+    if (!str_cmp(affected_bits[a], arg1))
     {
+	debugpoint();
 	struct affected_type af;
-        af.type = skill_aff[a];
+        af.type = z = skill_aff[a];
+	if (affected_by_spell(victim, z+BASE_TIMERS))
+        {
+//		send_to_char("A s.\r\n",victim);
+		return eFAILURE;
+        }
 	af.duration = i;
 	af.bitvector = 1<<a;
 	af.location = 0;
-	af.modifier = 0;
+	af.modifier = 987; // Notifies that it's timered. 
 	affect_join(victim, &af, TRUE, FALSE);
+        if (z && o) // Timer on it
+        {
+          af.type = BASE_TIMERS + z;
+          af.duration = o;
+          af.bitvector = 0;
+          af.location = 0;
+          af.modifier = 0;
+          affect_join(victim, &af, TRUE, FALSE);
+         }
+
     }
   } 
-extern char *affected_bits2[];
+  a = 0;
+  extern char *affected_bits2[];
   for ( ; affected_bits2[a][0] != '\n'; a++)
   {
-    if (!str_cmp(affected_bits2[a], arg1) && skill_aff2[a] != 0)
+    if (!str_cmp(affected_bits2[a], arg1))
     {
+	debugpoint();
         struct affected_type af;
-        af.type = skill_aff2[a];
+        af.type =z= skill_aff2[a];
+	if (affected_by_spell(victim, z+BASE_TIMERS))
+        {
+		return eFAILURE;
+        }
         af.duration = i;
         af.bitvector = 1<<a;
         af.location = 0;
         af.modifier = 0;
         affect_join(victim, &af, TRUE, FALSE);
+        if (z && o) // Timer on it
+        {
+          af.type = BASE_TIMERS + z;
+          af.duration = o;
+          af.bitvector = 0;
+          af.location = 0;
+          af.modifier = 0;
+          affect_join(victim, &af, TRUE, FALSE);
+        }
     }
   }
    if (!str_cmp(arg, "all")) victim = victim->next_in_room;
@@ -1297,5 +1376,15 @@ extern char *affected_bits2[];
 	}
   } else break;
  }
+  if (z && o && owner) // Timer on it
+  {
+        struct affected_type af;
+    af.type = BASE_TIMERS + z;
+    af.duration = o;
+    af.bitvector = 0;
+    af.location = 0;
+    af.modifier = 0;
+    affect_join(owner, &af, TRUE, FALSE);
+  }
   return eSUCCESS;
 }

@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.76 2004/11/16 00:51:34 Zaphod Exp $ */
+/* $Id: db.cpp,v 1.77 2005/04/09 21:15:27 urizen Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -378,7 +378,7 @@ char * funnybootmessages[] =
   "Initializing BFS search parameters...\r\n",
   "Shaving fuzzy logic...\r\n",
   "Upgrading RAM...\r\n",
-  "Good eq-load detected..\r\nPuring world..\r\nAll mobs repopped with moss eq..\r\n",
+  "Good eq-load detected..\r\nPurging world..\r\nAll mobs repopped with moss eq..\r\n",
   "Checking code for tpyos...\r\n",
   "Generating loot tables..\r\n",
   "Giving barbarians fireshield...\r\n",
@@ -1423,8 +1423,6 @@ int read_one_room(FILE *fl, int & room_nr)
       REMOVE_BIT(world[room_nr].room_flags,DEATH);
     if (IS_SET(world[room_nr].room_flags,NO_ASTRAL))
       REMOVE_BIT(world[room_nr].room_flags,NO_ASTRAL);
-    if (IS_SET(world[room_nr].room_flags, CHAOTIC))
-      REMOVE_BIT(world[room_nr].room_flags, CHAOTIC);
     if (IS_SET(world[room_nr].room_flags,NO_ASTRAL))
       REMOVE_BIT(world[room_nr].room_flags,NO_ASTRAL);
 
@@ -2558,7 +2556,7 @@ CHAR_DATA *read_mobile(int nr, FILE *fl)
         tmp2 = fread_int (fl, 0, 64000);
         tmp3 = fread_int (fl, 0, 64000);
 
-        mob->raw_hit = (short)(dice (tmp, tmp2) + tmp3);
+        mob->raw_hit = dice (tmp, tmp2) + tmp3;
         mob->max_hit = mob->raw_hit;
         mob->hit     = mob->max_hit;
 
@@ -3680,6 +3678,8 @@ void reset_zone(int zone)
     struct obj_data *obj, *obj_to;
 
     last_cmd = last_mob = last_obj = last_percent = -1;
+    int i;
+    float z;
 
     char buf[MAX_STRING_LENGTH];
     // reset number of mobs that have died this tick to 0
@@ -3812,7 +3812,11 @@ void reset_zone(int zone)
         break;
 
         case '%': /* percent chance of next command happening */
-        if( number(0, ZCMD.arg2) <= ZCMD.arg1 )
+	z = ZCMD.arg1 / ZCMD.arg2;
+	if (z > 0.2 || mud_is_booting) i = ZCMD.arg1;
+	else i = (int)((float)ZCMD.arg1 * 1.5);
+
+        if( number(0, ZCMD.arg2) <= i )
         {
            last_percent = 1;
            last_cmd = 1;
@@ -4770,6 +4774,7 @@ int mprog_name_to_type ( char *name )
    if ( !str_cmp( name, "command_prog" )) return COMMAND_PROG;
    if ( !str_cmp( name, "weapon_prog")) return WEAPON_PROG;
    if ( !str_cmp(name, "armour_prog")) return ARMOUR_PROG;
+    if (!str_cmp(name, "greet_all_prog")) return GREET_ALL_PROG;
    return( ERROR_PROG );
 }
 

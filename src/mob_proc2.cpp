@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.40 2004/11/16 00:51:35 Zaphod Exp $ */
+/* $Id: mob_proc2.cpp,v 1.41 2005/04/09 21:15:27 urizen Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -37,11 +37,15 @@
 /*   external vars  */
 
 extern CWorld world;
+extern struct obj_data * search_char_for_item(char_data * ch, sh_int 
+item_number);
  
 extern struct obj_data *object_list;
 extern struct descriptor_data *descriptor_list;
 extern struct index_data *obj_index;
 extern struct time_info_data time_info;
+ extern int class_restricted(char_data *ch, struct obj_data *obj);
+ extern int size_restricted(char_data *ch, struct obj_data *obj);
 
 
 /* extern procedures */
@@ -147,7 +151,8 @@ int repair_guy(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 
   if(IS_OBJ_STAT(obj, ITEM_NOREPAIR)                     ||
      IS_SET(obj->obj_flags.extra_flags, ITEM_ENCHANTED)  ||
-     obj->obj_flags.type_flag != ITEM_ARMOR
+     obj->obj_flags.type_flag != ITEM_ARMOR || 
+     IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL)
     ) 
   {
     do_say(owner, "I can't repair this.", 9);
@@ -235,7 +240,8 @@ int super_repair_guy(struct char_data *ch, struct obj_data *obj, int cmd, char *
   value0 = eq_max_damage(obj);
 
   if (obj->obj_flags.type_flag == ITEM_ARMOR ||
-      obj->obj_flags.type_flag == ITEM_CONTAINER)
+      obj->obj_flags.type_flag == ITEM_CONTAINER ||
+		obj->obj_flags.type_flag == ITEM_LIGHT && !IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL))
   {
     percent = ((100* eqdam) / value0);
     x = (100 - percent);               /* now we know what percent to repair ..  */
@@ -243,7 +249,11 @@ int super_repair_guy(struct char_data *ch, struct obj_data *obj, int cmd, char *
     price *= 2;                        /* he likes to charge more..  */
                                        /*  for armor... cuz he can.. */
   } 
-  else if (obj->obj_flags.type_flag == ITEM_WEAPON) 
+  else if (obj->obj_flags.type_flag == ITEM_WEAPON ||
+		obj->obj_flags.type_flag == ITEM_INSTRUMENT ||
+		obj->obj_flags.type_flag == ITEM_STAFF ||
+		obj->obj_flags.type_flag == ITEM_WAND &&
+     !IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL)) 
   {
     percent = ((100* eqdam) / (value0 + value2));
     x = (100 - percent);               /* now we know what percent to repair ..  */
@@ -254,6 +264,7 @@ int super_repair_guy(struct char_data *ch, struct obj_data *obj, int cmd, char *
     do_say(owner, "I can't repair this.", 9);
     act("$N gives you $p.", ch, obj, owner, TO_CHAR, 0);
     act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
+	return eSUCCESS;
   }
 
   if (IS_SET(obj->obj_flags.extra_flags, ITEM_ENCHANTED))
@@ -325,7 +336,9 @@ int repair_shop(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
   cost = obj->obj_flags.cost;
   value0 = eq_max_damage(obj);
 
-  if (obj->obj_flags.type_flag == ITEM_ARMOR) 
+  if (obj->obj_flags.type_flag == ITEM_ARMOR ||
+	obj->obj_flags.type_flag == ITEM_LIGHT &&
+     !IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL)) 
   {
 
     percent = ((100* eqdam) / value0);
@@ -334,7 +347,11 @@ int repair_shop(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     price *= 4;                   /* he likes to charge more..  */
                                   /*  for armor... cuz he's a crook..  */
   } else if (obj->obj_flags.type_flag == ITEM_WEAPON ||
-             obj->obj_flags.type_flag == ITEM_CONTAINER) 
+             obj->obj_flags.type_flag == ITEM_CONTAINER ||
+		obj->obj_flags.type_flag == ITEM_STAFF ||
+		obj->obj_flags.type_flag == ITEM_WAND &&
+     !IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL)) 
+
   {
 
     percent = ((100* eqdam) / (value0 + value2));
@@ -384,18 +401,24 @@ int corpse_cost(char_data * ch)
       if(obj2->obj_flags.type_flag == ITEM_MONEY)
         continue;
       for(curr_cont = obj2->contains; curr_cont; curr_cont = curr_cont->next_content)
+      {
+	if (!IS_SET(curr_cont->obj_flags.extra_flags, ITEM_SPECIAL))
         cost += curr_cont->obj_flags.cost; 
+	}
+	if (!IS_SET(obj2->obj_flags.extra_flags, ITEM_SPECIAL))
       cost += obj2->obj_flags.cost;
    }
-   for(int x = 0; x <= WEAR_MAX; x++) 
+   for(int x = 0; x < MAX_WEAR; x++) 
    {
       if(ch->equipment[x]) 
       {
         for(curr_cont = ch->equipment[x]->contains; 
             curr_cont; 
             curr_cont = curr_cont->next_content)
+	if (!IS_SET(curr_cont->obj_flags.extra_flags, ITEM_SPECIAL))
           cost += curr_cont->obj_flags.cost; 
 
+	if (!IS_SET(ch->equipment[x]->obj_flags.extra_flags, ITEM_SPECIAL))
         cost += ch->equipment[x]->obj_flags.cost;
       }
    }
@@ -526,20 +549,10 @@ int mortician(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 struct platinumsmith_data {
   char *name;
   char *attributes;
-  int  price;
+   int price;
   int  vnum;
 };
 
-// TODO - rewrite this more modular, so we can spread lots of plat guys all around
-// the world that sell different pieces of godload
-int platinumsmith(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,        
-          struct char_data *owner)
-{
-  int x = 0, y;
-  struct obj_data *new_new_obj;
-  char buf[200];
-  char buf2[200];
-  
   struct platinumsmith_data for_sale[] = {
    { "an Arch-Angel's Staff", "5d8 +6+6 20-harm 20-dispel evil", 2500, 10008 },
    { "A Flickering Poinard", "5d7 +7+5 10-colour spray 30-sparks", 3000, 10009 },
@@ -553,6 +566,17 @@ int platinumsmith(struct char_data *ch, struct obj_data *obj, int cmd, char *arg
    { "Blah Blah", "burp", -1, -1 } 
   };
  
+
+// TODO - rewrite this more modular, so we can spread lots of plat guys all around
+// the world that sell different pieces of godload
+int platinumsmith(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,        
+          struct char_data *owner)
+{
+  int x = 0, y;
+  struct obj_data *new_new_obj;
+  char buf[200];
+  char buf2[200];
+  struct platinumsmith_data *selling;
 
   if(cmd < 56 || cmd > 59) 
     return eFAILURE;
@@ -1245,11 +1269,11 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     "10) One (1) Platinum coin     Cost: 20,000 Gold Coins.\n\r"
     "11) Five (5) Platinum coins   Cost: 100,000 Gold Coins.\n\r"
     "12) 250 Platinum coins        Cost: 5,000,000 Gold Coins.\n\r"
-    "13) Buy a practice session for 100 plats.\n\r"
+    "13) Buy a practice session for 50 plats.\n\r"
     "14) Freedom from HUNGER and THIRST:  Currently out of stock.\n\r"
     "15) Convert experience to gold. (100mil Exp. = 500000 Gold.)\n\r"
-    "16) A deep blue potion of healing. Cost: 30 Platinum coins.\r\n"
-    "17) A deep red vial of mana. Cost: 60 Platinum coins.\r\n"
+    "16) A deep blue potion of healing. Cost: 25 Platinum coins.\r\n"
+    "17) A deep red vial of mana. Cost: 50 Platinum coins.\r\n"
                  , ch);
 
     return eSUCCESS;
@@ -1433,13 +1457,12 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
   if (choice == 16 || choice == 17)
   {
    int vnum = choice == 16 ? 27903: 27904;
-   int cost = choice == 16 ? 30:60;
+   int cost = choice == 16 ? 25:50;
    if (GET_PLATINUM(ch) < cost)
    {
       send_to_char("The Meta-physician tells you, 'You can't afford that!'\r\n",ch);
       return eSUCCESS;
    }
-   GET_PLATINUM(ch) -= cost;
    struct obj_data *obj = clone_object(real_object(vnum));
    if ( IS_CARRYING_N(ch) + 1 > CAN_CARRY_N(ch) )
     {
@@ -1454,6 +1477,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 	extract_obj(obj);
         return eSUCCESS;
    }
+   GET_PLATINUM(ch) -= cost;
    obj_to_char(obj,ch);
    send_to_char("The Meta-physician tells you, 'Here is your potion.'\r\n",ch);
    return eSUCCESS;
@@ -1503,8 +1527,8 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
   }
 
   if(choice == 13) {
-    if (GET_PLATINUM(ch) < 100) {
-       send_to_char ("Costs 100 plats...which you don't have.\n\r", ch);
+    if (GET_PLATINUM(ch) < 50) {
+       send_to_char ("Costs 50 plats...which you don't have.\n\r", ch);
        return eSUCCESS;
     }
     if (IS_MOB(ch)) {
@@ -1513,7 +1537,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     }
     send_to_char("The Meta-Physician gives you a practice session.\n\r", ch);
  
-    GET_PLATINUM(ch) -= 100;
+    GET_PLATINUM(ch) -= 50;
     ch->pcdata->practices += 1;
     return eSUCCESS;
   }
@@ -1565,5 +1589,303 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
  }
   send_to_char("The Meta-physician tells you, 'Buy what?!'\n\r", ch);
   return eSUCCESS;
+}
+
+
+char *gl_item(OBJ_DATA *obj, int number, CHAR_DATA *ch)
+{
+  char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH],buf3[MAX_STRING_LENGTH];
+  int length,i = 0;
+  sprintf(buf,"$B$7%-2d$R) %s ", number+1, obj->short_description);
+  length = strlen(buf);
+  extern char* apply_types[];
+
+  for (;i<obj->num_affects;i++)
+    if ((obj->affected[i].location != APPLY_NONE) &&
+          (obj->affected[i].modifier != 0))
+    {
+      if (obj->affected[i].location < 1000)
+         sprinttype(obj->affected[i].location,apply_types,buf2);
+      else if (get_skill_name(obj->affected[i].location/1000))
+         strcpy(buf2, get_skill_name(obj->affected[i].location/1000));
+      else strcpy(buf2, "Invalid");
+
+      sprintf(buf3,"%s by %d, ", buf2, obj->affected[i].modifier);
+
+      for (unsigned int a = 0; a < strlen(buf3);a++)
+	buf3[a] = LOWER(buf3[a]); // these affects are all lowercase
+      if (length + strlen(buf3) > 90)
+      {
+	length = 0;
+	sprintf(buf, "%s\r\n     %s",buf,buf3);
+      } else {
+	length += strlen(buf3);
+	sprintf(buf, "%s%s",buf,buf3);
+      }
+      
+    }
+    if (class_restricted(ch, obj) || size_restricted(ch, obj))
+    {
+      sprintf(buf2,"$4[restricted]$R, ");
+      if (length + strlen(buf2) > 90)
+      {
+	length = 0;
+	sprintf(buf, "%s\r\n     %s",buf,buf2);
+      } else {
+  	length += strlen(buf2);
+  	sprintf(buf, "%s%s",buf,buf2);
+      }
+
+    }
+    sprintf(buf2,"costing %d coins.\r\n",obj->obj_flags.cost/10);
+    if (length + strlen(buf2) > 90)
+    {
+	length = 0;
+	sprintf(buf, "%s\r\n     %s",buf,buf2);
+    } else {
+	length += strlen(buf2);
+	sprintf(buf, "%s%s",buf,buf2);
+    }
+  return buf;
+}
+
+struct platsmith
+{
+  int vnum;
+  int sales[13];
+};
+
+const struct platsmith platsmith_list[]=
+{
+ {10019, {512,513,514,515,537,538,539,540,541,0,0,0,0}},
+ {10020, {554, 555, 556, 557, 524, 525, 526, 527, 504, 505, 506, 511,0}},
+ {10021, {516, 517, 518, 519, 507, 508, 509, 510, 546, 547, 548, 549, 0}},
+ {10022, {500, 501, 502, 503, 520, 521, 522, 523, 528, 529, 530, 531, 0}},
+ {10023, {542, 543, 544, 545, 532, 533, 534, 535, 536, 550, 551, 552, 553}},
+ {10026, {558, 559, 560, 561, 562, 563, 564, 565, 566, 0, 0, 0, 0}}, 
+ {0, {0,0,0,0,0,0,0,0,0,0,0,0,0}}
+};
+
+//Apoc enjoys the dirty mooselove. Honest.
+int godload_sales(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,        
+          struct char_data *owner)
+{
+  extern struct index_data *mob_index;
+  int mobvnum = mob_index[owner->mobdata->nr].virt;
+  int o;
+  char buf[MAX_STRING_LENGTH];
+//  return eFAILURE; //disabled for now
+ if (cmd == 59) {
+  if (!CAN_SEE(owner, ch))
+  {
+     do_say(owner, "I don't trade with people I can't see!",0);
+	return eSUCCESS;
+  }
+
+  for (o = 0; platsmith_list[o].vnum != 0; o++)
+    if (mobvnum == platsmith_list[o].vnum) break;
+  if (platsmith_list[o].vnum == 0)
+  {
+    sprintf(buf, "%s Sorry, I don't seem to be working correctly. Do tell someone.",GET_NAME(ch));
+    do_tell(owner, buf, 0); 
+    return eSUCCESS;
+  }
+  extern char* pc_clss_types3[];
+  sprintf(buf, "%s Here's what I can do for you, %s.",GET_NAME(ch),pc_clss_types3[GET_CLASS(ch)]);
+  do_tell(owner, buf, 0); 
+  for (int z = 0; z < 13 && platsmith_list[o].sales[z] != 0; z++)
+  send_to_char(gl_item((OBJ_DATA*)obj_index[real_object(platsmith_list[o].sales[z])].item,z,ch),ch);
+  return eSUCCESS; 
+ } else if (cmd == 56) {
+  if (!CAN_SEE(owner, ch))
+  {
+     do_say(owner, "I don't trade with people I can't see!",0);
+	return eSUCCESS;
+  }
+
+  for (o = 0; platsmith_list[o].vnum != 0; o++)
+    if (mobvnum == platsmith_list[o].vnum) break;
+  char buf[MAX_STRING_LENGTH],arg2[MAX_INPUT_LENGTH];
+  one_argument(arg,arg2);
+  if (platsmith_list[o].vnum == 0)
+  {
+    sprintf(buf, "%s Sorry, I don't seem to be working correctly. Do tell someone.",GET_NAME(ch));
+    do_tell(owner, buf, 0); 
+    return eSUCCESS;
+  }
+  if (!is_number(arg2))
+  {
+    sprintf(buf, "%s Sorry, mate. You type buy <number> to specify what you want..",GET_NAME(ch));
+    do_tell(owner, buf, 0); 
+    return eSUCCESS;
+  }
+  int k = atoi(arg2)-1;
+  if (k >= 13 || k < 0 || platsmith_list[o].sales[k] == 0)
+  {
+    sprintf(buf, "%s Don't have that I'm afraid. Type \"list\" to see my wares.",GET_NAME(ch));
+    do_tell(owner, buf, 0); 
+    return eSUCCESS;
+  }
+   struct obj_data *obj;
+   obj = clone_object(real_object(platsmith_list[o].sales[k]));
+   if (class_restricted(ch, obj) || size_restricted(ch, obj) ||search_char_for_item(ch, obj->item_number) )
+   {
+    sprintf(buf, "%s That item is not available to you.",GET_NAME(ch));
+    do_tell(owner, buf, 0); 
+    extract_obj(obj);
+    return eSUCCESS;
+   }
+   if (GET_PLATINUM(ch) < obj->obj_flags.cost/10)
+   {
+    sprintf(buf, "%s Come back when you've got the platinum.",GET_NAME(ch));
+    do_tell(owner, buf, 0); 
+    extract_obj(obj);
+    return eSUCCESS;
+   }
+   GET_PLATINUM(ch) -= obj->obj_flags.cost/10;
+   sprintf(buf, "%s %s", obj->name, GET_NAME(ch));
+   obj->name = str_hsh(buf);
+   obj_to_char(obj, ch);
+   sprintf(buf, "%s Here's your %s$B$2. Have a nice time with it.",GET_NAME(ch),obj->short_description);
+   do_tell(owner, buf, 0); 
+    return eSUCCESS;
+  } else if (cmd == 57) {
+    OBJ_DATA *obj;
+    char arg2[MAX_INPUT_LENGTH];
+    one_argument(arg,arg2);
+    obj = get_obj_in_list_vis(ch, arg2, ch->carrying);
+    if (!CAN_SEE(owner, ch))
+    {
+      do_say(owner, "I don't trade with people I can't see!",0);
+      return eSUCCESS;
+    }
+    if (!obj)
+    {
+      sprintf(buf, "%s Try that on the cooky meta-physician..",GET_NAME(ch));
+      do_tell(owner, buf, 0); 
+      return eSUCCESS;
+    }
+    if (!IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL))
+    {
+        sprintf(buf, "%s I don't deal in worthless junk.",GET_NAME(ch));
+        do_tell(owner, buf, 0); 
+        return eSUCCESS;
+    }
+    float percent = (float)(0.5 * ((float)eq_current_damage(obj) / (float)eq_max_damage(obj)));
+    percent = 1 - percent;
+    int cost = obj->obj_flags.cost;
+    cost =(int)(cost*percent*0.1);
+    sprintf(buf, "%s I'll give you %d plats for that. Thanks for shoppin'.",GET_NAME(ch),cost);
+    do_tell(owner, buf, 0);
+    extract_obj(obj);
+    GET_PLATINUM(ch) += cost;
+    return eSUCCESS;
+  }
+ return eFAILURE;
+}
+
+//gl_repair_guy
+int gl_repair_shop(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,        
+          struct char_data *owner)
+{
+  char item[256];
+  int value0, value2, cost, price, x;
+  int percent, eqdam;
+
+  if ((cmd != 66) && (cmd != 65)) return eFAILURE;
+
+  one_argument(arg, item);
+
+  if (!*item) {
+    send_to_char("What item?\n\r", ch);
+    return eSUCCESS;
+  }
+
+  obj = get_obj_in_list_vis(ch, item, ch->carrying);
+
+  if (obj == NULL) {
+    send_to_char("You don't have that item.\n\r", ch);
+    return eSUCCESS;
+  }
+
+  if(IS_OBJ_STAT(obj, ITEM_NOREPAIR)) {
+    do_say(owner, "I can't repair this.", 9);
+    return eSUCCESS;
+  }
+
+  act("You give $N $p.", ch, obj, owner, TO_CHAR, 0);
+  act("$n gives $p to $N.", ch, obj, owner, TO_ROOM, INVIS_NULL);
+  act("\n\r$N examines $p...", ch, obj, owner, TO_CHAR, 0);
+  act("\n\r$N examines $p...", ch, obj, owner, TO_ROOM, INVIS_NULL);
+
+  eqdam = eq_current_damage(obj);
+
+  if (eqdam <= 0) {
+    do_say(owner, "Looks fine to me.", 9);
+    act("$N gives you $p.", ch, obj, owner, TO_CHAR, 0);
+    act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
+    return eSUCCESS;
+  }
+
+  cost = obj->obj_flags.cost;
+  value0 = eq_max_damage(obj);
+  
+  if (!IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL))
+  {
+      do_say(owner,"I don't repair this kind of junk.",9);
+      act("$N gives you $p.", ch, obj, owner, TO_CHAR, 0);
+      act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
+      return eSUCCESS;
+  }
+  if (obj->obj_flags.type_flag == ITEM_ARMOR ||
+	obj->obj_flags.type_flag == ITEM_LIGHT)
+  {
+
+    percent = ((100* eqdam) / value0);
+    x = (100 - percent);          /* now we know what percent to repair ..  */
+    price = ((cost * x) / 100);   /* now we know what to charge them fuckers! */
+    price *= 4;                   /* he likes to charge more..  */
+                                  /*  for armor... cuz he's a crook..  */
+  } else if (obj->obj_flags.type_flag == ITEM_WEAPON ||
+             obj->obj_flags.type_flag == ITEM_CONTAINER ||
+		obj->obj_flags.type_flag == ITEM_STAFF ||
+		obj->obj_flags.type_flag == ITEM_WAND)
+  {
+
+    percent = ((100* eqdam) / (value0 + value2));
+    x = (100 - percent);          /* now we know what percent to repair ..  */
+    price = ((cost * x) / 100);   /* now we know what to charge them fuckers! */
+    price *= 5;
+  }
+  else
+  {
+    // Dunno how to repair non-weapons/armor
+    do_say(owner, "I can't repair this.", 9);
+    act("$N gives you $p.", ch, obj, owner, TO_CHAR, 0);
+    act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
+    return eSUCCESS;
+  }
+
+  if (IS_SET(obj->obj_flags.extra_flags, ITEM_ENCHANTED))
+    price *= 2;
+
+  if (price < 50000)
+    price = 50000;     /* Welp.. Repair Guy needs to feed the kids somehow.. :) */
+  
+  if (cmd == 65) 
+  {
+    repair_shop_price_check(ch, owner, price, obj);
+    return eSUCCESS;
+  }
+
+  if (GET_GOLD(ch) < (uint32)price) {
+    repair_shop_complain_no_cash(ch, owner, price, obj);
+    return eSUCCESS;
+  } 
+  else 
+  {
+    repair_shop_fix_eq(ch, owner, price, obj);
+    return eSUCCESS;
+  }
 }
 

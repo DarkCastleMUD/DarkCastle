@@ -1,4 +1,4 @@
-/* $Id: nlog.cpp,v 1.4 2004/11/16 00:51:35 Zaphod Exp $ */
+/* $Id: nlog.cpp,v 1.5 2005/04/09 21:15:27 urizen Exp $ */
 
 extern "C"
 {
@@ -78,6 +78,7 @@ char *str_hsh(char *arg)
   // Second spot for "" args so we don't leak them all over the place
   //if(*arg == '\0')
   //  return(nulltree.name);
+  if (!arg) return NULL;
 
   for(; current; current = next) {
      if((scratch = strcmp(arg, current->name)) == 0)

@@ -7,7 +7,7 @@
 /* Revision History                                                          */
 /* 12/09/2003   Onager   Tweaked do_join() to remove combat-related bits     */
 /*****************************************************************************/
-/* $Id: arena.cpp,v 1.9 2004/11/16 00:51:34 Zaphod Exp $ */
+/* $Id: arena.cpp,v 1.10 2005/04/09 21:15:27 urizen Exp $ */
 
 #ifdef LEAK_CHECK
 #include <dmalloc.h>

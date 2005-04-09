@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: db.h,v 1.12 2004/11/16 00:52:09 Zaphod Exp $ */
+/* $Id: db.h,v 1.13 2005/04/09 21:15:35 urizen Exp $ */
 #ifndef DB_H_
 #define DB_H_
 

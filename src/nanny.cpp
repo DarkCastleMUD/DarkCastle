@@ -1,4 +1,3 @@
-
 /***************************************************************************
 *  File: nanny.c, for people who haven't logged in        Part of DIKUMUD *
 *  Copyright (C) 1990, 1991 - see 'license.doc' for complete information. *
@@ -17,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.71 2004/11/16 00:51:35 Zaphod Exp $ */
+/* $Id: nanny.cpp,v 1.72 2005/04/09 21:15:27 urizen Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -204,8 +203,7 @@ int is_clss_eligible(CHAR_DATA *ch, int clss)
          x = 1;
       break;
    case CLASS_DRUID:
-      if(GET_RAW_WIS(ch) >= 14 && GET_RAW_WIS(ch) >= 14 &&
-          GET_RACE(ch) != RACE_GIANT && GET_RACE(ch) != RACE_ORC)
+      if(GET_RAW_WIS(ch) >= 14 && GET_RAW_WIS(ch) >= 14)
          x = 1;
       break; 
    }
@@ -295,7 +293,7 @@ void do_inate_race_abilities(char_data * ch)
        break;
    }
 
-// TODO - Add in realistic race abilities
+// TODO - Add in realistic race abilities (already done - innates finished)
 /*
    struct affected_type af;
 
@@ -412,12 +410,13 @@ void do_on_login_stuff(char_data * ch)
 	 {
 		ch->equipment[i]->next_skill = ch->pcdata->skillchange;
 		ch->pcdata->skillchange = ch->equipment[i];
+		ch->equipment[i]->next_skill = NULL;
 	  }
        }
     }
     // add character base saves to saving throws
     for(int i = 0; i <= SAVE_TYPE_MAX; i++) {
-      ch->saves[i] += GET_LEVEL(ch)/2;
+      ch->saves[i] += GET_LEVEL(ch)/4;
       ch->saves[i] += ch->pcdata->saves_mods[i];
     }
 
@@ -448,12 +447,21 @@ void do_on_login_stuff(char_data * ch)
        GET_COND(ch, FULL) = -1;
     }
     add_totem_stats(ch);
-    if (GET_LEVEL(ch) < 5) 	 char_to_room( ch, real_room(200));
+    if (GET_LEVEL(ch) < 5 && GET_AGE(ch) < 21) 	 char_to_room( ch, real_room(200));
     else if(ch->in_room >= 2)                 char_to_room( ch, ch->in_room );
     else if(GET_LEVEL(ch) >=  IMMORTAL)  char_to_room( ch, real_room(17) );
     else                                 char_to_room( ch, real_room(START_ROOM) );
 
 
+    if (GET_CLASS(ch) == CLASS_MONK && GET_LEVEL(ch) > 10)
+    {
+	  struct char_skill_data * curr = ch->skills, *prev = NULL;
+	  while(curr) {
+	   if (curr->skillnum == SKILL_SHIELDBLOCK)
+		curr->skillnum = SKILL_DEFENSE;
+	   curr = curr->next;
+          }
+    }
     // Remove pick if they're no longer allowed to have it.
      if (GET_CLASS(ch) == CLASS_THIEF && GET_LEVEL(ch) < 22 &&
 		has_skill(ch, SKILL_PICK_LOCK))
@@ -481,6 +489,16 @@ void do_on_login_stuff(char_data * ch)
                 break;
             } else { prev = curr; curr = curr->next; }
       }
+    // Remove ventriloquate
+     if (GET_CLASS(ch) == CLASS_BARBARIAN && has_skill(ch, SKILL_SHIELDBLOCK)) {
+          struct char_skill_data * curr = ch->skills;
+          while(curr)
+            if(curr->skillnum == SKILL_SHIELDBLOCK) {
+		curr->skillnum = SKILL_DODGE;
+                break;
+            } else { curr = curr->next; }
+      }
+
           struct char_skill_data *  curr = ch->skills; 
 	  struct char_skill_data *  prev = NULL;
 	  int search_skills2(int arg, class_skill_defines * list_skills);
@@ -556,12 +574,12 @@ int more_than_ten_people_from_this_ip(struct descriptor_data *new_conn)
          count++;
    }
 
-   if(count > 12)
+   if(count > 6 )
    {
-      SEND_TO_Q("Sorry, there are more than 12 connections from this IP address\r\n"
+      SEND_TO_Q("Sorry, there are more than 6 connections from this IP address\r\n"
                 "already logged into Dark Castle.  If you have a valid reason\r\n"
-                "for having this many connections from one IP please let Pirahna\r\n"
-                "know and he will make an exception for you. (dcpirahna@hotmail.com)\r\n",
+                "for having this many connections from one IP please let Apocalypse\r\n"
+                "know and he will speak with you. (dc_apoc@hotmail.com)\r\n",
                 new_conn);
       close_socket( new_conn );
       return 1;
@@ -574,11 +592,9 @@ const char *host_list[]=
 {
   "62.65.107.", // Urizen
   "24.165.167.", // Dasein
-  "24.43.54.", // Apocalypse
+  "24.112.103.", // Apocalypse
   "127.0.0.1", // localhost (duh)
   "68.124.193.", // Valkyrie
-  "65.27.237.", //Moldovian
-  "68.32.21.", // Bob
   "80.5.107." // Wynn
 };
 
@@ -805,8 +821,8 @@ void nanny(struct descriptor_data *d, char *arg)
          if((ch = get_pc(GET_NAME(d->character))))
          {
             sprintf(log_buf, "$4$BWARNING: Someone just tried to log in as you with the wrong password.\r\n"
-               "Attempt was from %s.$R\r\n"
-               "(If it's only once or twice, you can ignore it.  If it's several dozen tries, let a god know.)\r\n", d->host);
+   //           "Attempt was from %s.$R\r\n"
+		"(If it's only once or twice, you can ignore it.  If it's several dozen tries, let a god know.)\r\n");
             send_to_char(log_buf, ch);
          }
          else {
@@ -907,7 +923,7 @@ void nanny(struct descriptor_data *d, char *arg)
                GET_NAME(d->character), d->host);
             log(buf, ANGEL, LOG_SOCKET);
             SEND_TO_Q("Sorry, new chars are not allowed from your site.\n\r"
-               "Questions may be directed to Pirahna at dc_apoc@hotmail.com\n\r",
+                      "Questions may be directed to Apocalypse at dc_apoc@hotmail.com\n\r",
                d);
             STATE(d) = CON_CLOSE;
             return;
@@ -1409,6 +1425,8 @@ is_race_eligible(ch,7)?'*':' ',is_race_eligible(ch,8)?'*':' ',is_race_eligible(c
        log( log_buf, ANGEL, LOG_SOCKET );
        SEND_TO_Q( "\n\r", d );
        SEND_TO_Q( motd, d );
+       SEND_TO_Q("\n\rIf you have read this motd, press Return.", d);
+
        STATE(d) = CON_READ_MOTD;
        break;
        
@@ -1556,14 +1574,14 @@ break;
              load_char_obj(d, tmp_name);
              ch = d->character;
           }
-	  if  (GET_GOLD(ch) > 10000000)
+	  if  (GET_GOLD(ch) > 1000000000)
           {
-             sprintf(log_buf, "%s has more than 10 mil gold. Bugged?", GET_NAME(ch));
+             sprintf(log_buf, "%s has more than a billion gold. Bugged?", GET_NAME(ch));
              log( log_buf, 100, LOG_WARNINGS );
           }
-          if (GET_BANK(ch) > 80000000)
+          if (GET_BANK(ch) > 1000000000)
 	  {
-	     sprintf(log_buf,"%s has more than 80 mil gold in the bank. Rich fucker or bugged.",GET_NAME(ch));
+	     sprintf(log_buf,"%s has more than a billion gold in the bank. Rich fucker or bugged.",GET_NAME(ch));
 	     log( log_buf, 100, LOG_WARNINGS);
 	  }      
           send_to_char("\n\rWelcome to Dark Castle Diku Mud.  May your visit here suck.\n\r", ch );
@@ -1658,7 +1676,7 @@ break;
        
     case CON_DELETE_CHAR:
        if(!strcmp(arg, "ERASE ME")) {
-          sprintf(buf, "%s just deleted themself.", d->character->name);
+          sprintf(buf, "%s just deleted themself.  Their visit here must have sucked.", d->character->name);
           log(buf, IMMORTAL, LOG_MORTAL);
           if(d->character->clan)
              remove_clan_member(d->character->clan, d->character);
@@ -1842,8 +1860,8 @@ bool check_reconnect( struct descriptor_data *d, char *name, bool fReconnect )
 //      {
          // TODO - why are we doing this?  we load the password doing load_char_obj
          // unless someone changed their password and didn't save this doesn't seem useful
-// removed 8/29/02..i think this might be related to the bug causing people
-// to morph into other people
+	 // removed 8/29/02..i think this might be related to the bug causing people
+	 // to morph into other people
          //if(d->character->pcdata)
          //  strncpy( d->character->pcdata->pwd, tmp_ch->pcdata->pwd, PASSWORD_LEN );
 //      }

@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.h,v 1.32 2004/11/16 00:52:09 Zaphod Exp $ */
+/* $Id: interp.h,v 1.33 2005/04/09 21:15:35 urizen Exp $ */
 
 #ifndef INTERP_H_
 #define INTERP_H_
@@ -218,6 +218,7 @@ DO_FUN( do_mpat         );
 DO_FUN( do_mpdamage     );
 DO_FUN( do_mpecho       );
 DO_FUN( do_mpechoaround );
+DO_FUN(do_mpechoaroundnotbad);
 DO_FUN( do_mpechoat     );
 DO_FUN( do_mpforce      );
 DO_FUN( do_mpgoto       );

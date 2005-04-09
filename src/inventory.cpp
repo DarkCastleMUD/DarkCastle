@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.47 2004/11/16 00:51:35 Zaphod Exp $
+| $Id: inventory.cpp,v 1.48 2005/04/09 21:15:27 urizen Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -241,17 +241,17 @@ int do_get(struct char_data *ch, char *argument, int cmd)
 
 		if (obj_object->obj_flags.eq_level > 9 && GET_LEVEL(ch) < 5)
 		{
-		  csendf(ch, "The %s is too powerful for you to possess.\r\n", obj_object->short_description);
+		  csendf(ch, "%s is too powerful for you to possess.\r\n", obj_object->short_description);
 		  continue;	
 		}
 
                 // PC corpse
-		if(obj_object->obj_flags.value[3] == 1 && isname("pc", obj_object->name))
+		if ((obj_object->obj_flags.value[3] == 1 && isname("pc", obj_object->name)) || isname("thiefcorpse", obj_object->name))
                 {
                    sprintf(buffer, "%s_consent", GET_NAME(ch));
-		   if(isname(GET_NAME(ch), obj_object->name) || GET_LEVEL(ch) >= OVERSEER)
+		   if( (isname("thiefcorpse", obj_object->name) &&
+			!isname(GET_NAME(ch), obj_object->name)) || isname(GET_NAME(ch), obj_object->name) || GET_LEVEL(ch) >= OVERSEER)
                      has_consent = TRUE;
-
 		   if(!has_consent && !isname(GET_NAME(ch), obj_object->name)) {
                      if (GET_LEVEL(ch) < OVERSEER) {
 		       send_to_char("You don't have consent to take the corpse.\n\r", ch);
@@ -355,7 +355,7 @@ int do_get(struct char_data *ch, char *argument, int cmd)
 
 		else if (obj_object->obj_flags.eq_level > 9 && GET_LEVEL(ch) < 5)
 		{
-		  csendf(ch, "The %s is too powerful for you to possess.\r\n", obj_object->short_description);
+		  csendf(ch, "%s is too powerful for you to possess.\r\n", obj_object->short_description);
 		  fail = TRUE;	
 		} else if (CAN_WEAR(obj_object,ITEM_TAKE)) 
                 {
@@ -390,11 +390,11 @@ int do_get(struct char_data *ch, char *argument, int cmd)
 
 	    if (sub_object) {
 	        if(sub_object->obj_flags.type_flag == ITEM_CONTAINER && 
-                   sub_object->obj_flags.value[3] == 1 &&
-		   isname("pc", sub_object->name)) 
+                   ((sub_object->obj_flags.value[3] == 1 &&
+		   isname("pc", sub_object->name))||isname("thiefcorpse",sub_object->name))) 
                 {
                    sprintf(buffer, "%s_consent", GET_NAME(ch));
-		   if(isname(buffer, sub_object->name) || GET_LEVEL(ch) > 105)
+		   if((isname("thiefcorpse", sub_object->name) && !isname(GET_NAME(ch), sub_object->name) ) || isname(buffer, sub_object->name) || GET_LEVEL(ch) > 105)
                      has_consent = TRUE;
 		   if(!has_consent && !isname(GET_NAME(ch), sub_object->name)) {
 		     send_to_char("You don't have consent to touch the corpse.\n\r", ch);
@@ -460,9 +460,9 @@ int do_get(struct char_data *ch, char *argument, int cmd)
                   continue;
                 }
 
-			if (obj_object->obj_flags.eq_level > 9 && GET_LEVEL(ch) < 5)
+			if (sub_object->carried_by != ch &&obj_object->obj_flags.eq_level > 9 && GET_LEVEL(ch) < 5)
  			{
-			  csendf(ch, "The %s is too powerful for you to possess.\r\n", obj_object->short_description);
+			  csendf(ch, "%s is too powerful for you to possess.\r\n", obj_object->short_description);
 			  continue;	
 			}
 
@@ -516,11 +516,11 @@ int do_get(struct char_data *ch, char *argument, int cmd)
 	  }
 	  if(sub_object) {
 	    if(sub_object->obj_flags.type_flag == ITEM_CONTAINER && 
-               sub_object->obj_flags.value[3] == 1 &&
-	       isname("pc", sub_object->name)) 
+               ((sub_object->obj_flags.value[3] == 1 &&
+	       isname("pc", sub_object->name)) || isname("thiefcorpse",sub_object->name))) 
             {
                sprintf(buffer, "%s_consent", GET_NAME(ch));
-	       if(isname(buffer, sub_object->name))
+	       if((isname("thiefcorpse", sub_object->name) && !isname(GET_NAME(ch), sub_object->name)) || isname(buffer, sub_object->name))
                  has_consent = TRUE;
 	       if(!has_consent && !isname(GET_NAME(ch), sub_object->name)) {
 		 send_to_char("You don't have consent to touch the "
@@ -547,9 +547,10 @@ int do_get(struct char_data *ch, char *argument, int cmd)
                   fail = TRUE;
                 }
 
-		else if (obj_object->obj_flags.eq_level > 9 && GET_LEVEL(ch) < 5)
+		else if (sub_object->carried_by != ch && obj_object->obj_flags.eq_level 
+> 9 && GET_LEVEL(ch) < 5)
 		{
-		  csendf(ch, "The %s is too powerful for you to possess.\r\n", obj_object->short_description);
+		  csendf(ch, "%s is too powerful for you to possess.\r\n", obj_object->short_description);
 		 fail = TRUE;	
 		}
 
@@ -775,7 +776,7 @@ int do_drop(struct char_data *ch, char *argument, int cmd)
          if(IS_SET(tmp_object->obj_flags.extra_flags, ITEM_SPECIAL))
            continue;
 
-      if(!IS_MOB(ch) && IS_AFFECTED(ch, AFF_CANTQUIT) && affected_by_spell(ch, FUCK_PTHIEF)) {
+      if(!IS_MOB(ch) && affected_by_spell(ch, FUCK_PTHIEF)) {
         send_to_char("Your criminal acts prohibit it.\n\r", ch);
         return eFAILURE;
       }
@@ -817,7 +818,7 @@ int do_drop(struct char_data *ch, char *argument, int cmd)
       tmp_object = get_obj_in_list_vis(ch, arg, ch->carrying);
       if(tmp_object) {
 
-      if(!IS_MOB(ch) && IS_AFFECTED(ch, AFF_CANTQUIT) && affected_by_spell(ch, FUCK_PTHIEF)) {
+      if(!IS_MOB(ch) && affected_by_spell(ch, FUCK_PTHIEF)) {
         send_to_char("Your criminal acts prohibit it.\n\r", ch);
         return eFAILURE;
       }
@@ -888,6 +889,15 @@ void do_putalldot(struct char_data *ch, char *name, char *target, int cmd)
 
   if(!found)
     send_to_char("You don't have one.\n\r", ch);
+}
+
+int weight_in(struct obj_data *obj)
+{// Sheldon backpack. Damn procs. 
+  int w = 0;
+  struct obj_data *obj2;
+  for (obj2 = obj->contains; obj2; obj2 = obj2->next_content)
+     w += obj2->obj_flags.weight;
+  return w;
 }
 
 int do_put(struct char_data *ch, char *argument, int cmd)
@@ -972,14 +982,16 @@ int do_put(struct char_data *ch, char *argument, int cmd)
                 return eFAILURE;
               }
 
-	      if(((sub_object->obj_flags.weight) + 
+	      if (((sub_object->obj_flags.weight) + 
 		  (obj_object->obj_flags.weight)) <
-		  (sub_object->obj_flags.value[0])) {
+		  (sub_object->obj_flags.value[0]) &&
+	(obj_index[sub_object->item_number].virt != 536 || weight_in(sub_object) + obj_object->obj_flags.weight < 200)) {
 		send_to_char("Ok.\n\r", ch);
 		if(bits == FIND_OBJ_INV) {
 		  obj_from_char(obj_object);
 		  /* make up for above line */
-		  IS_CARRYING_W(ch) += GET_OBJ_WEIGHT(obj_object);
+		  if (obj_index[sub_object->item_number].virt != 536)
+  		     IS_CARRYING_W(ch) += GET_OBJ_WEIGHT(obj_object);
 		  obj_to_obj(obj_object, sub_object);
 		}
                 else
@@ -1039,7 +1051,7 @@ int do_give(struct char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (affected_by_spell(ch, FUCK_PTHIEF) && affected_by_spell(ch,FUCK_CANTQUIT))
+  if (affected_by_spell(ch, FUCK_PTHIEF))
   {
     send_to_char("Your criminal actions prohibit it.\r\n",ch);
     return eFAILURE;
@@ -1093,7 +1105,7 @@ int do_give(struct char_data *ch, char *argument, int cmd)
       if(GET_LEVEL(ch) >= IMMORTAL || IS_NPC(ch)) { 
         sprintf(buf, "%s gives %d coins to %s", GET_NAME(ch), amount,
                 GET_NAME(vict));
-        log(buf, 110, LOG_GOD);
+        log(buf, 110, LOG_PLAYER);
       }
       
       sprintf(buf, "%s gives you %d gold coin%s.\n\r", PERS(ch, vict), amount,
@@ -1147,7 +1159,7 @@ int do_give(struct char_data *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
-    if(!IS_MOB(ch) && IS_AFFECTED(ch, AFF_CANTQUIT) && affected_by_spell(ch, FUCK_PTHIEF)) {
+    if(!IS_MOB(ch) && affected_by_spell(ch, FUCK_PTHIEF)) {
       send_to_char("Your criminal acts prohibit it.\n\r", ch);
       return eFAILURE;
     }

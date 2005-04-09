@@ -166,7 +166,7 @@ int do_load(struct char_data *ch, char *arg, int cmd)
           send_to_char("No such object.\n\r", ch);
           return eFAILURE;
         }
-        if((GET_LEVEL(ch) < IMP) && 
+        if((GET_LEVEL(ch) < 108) && 
            IS_SET(((struct obj_data *)(obj_index[number].item))->obj_flags.extra_flags, ITEM_SPECIAL)) 
         {
           send_to_char("Why would you want to load that?\n\r", ch);
@@ -384,7 +384,7 @@ int show_zone_commands(struct char_data *ch, int i, int start = 0)
       if(zone_table[i].cmd[j].arg2 == -1)
         strcat(buf, "(  always ) on last mob on ");
       else sprintf(buf, "%s(if< [%3d]) on last mob on ", buf, zone_table[i].cmd[j].arg2);
-      if(zone_table[i].cmd[j].arg3 > WEAR_MAX ||
+      if(zone_table[i].cmd[j].arg3 > MAX_WEAR-1 ||
          zone_table[i].cmd[j].arg3 < 0)
          sprintf(buf, "%s[%d](InvalidArg3).$R\r\n", buf, zone_table[i].cmd[j].arg3);
       else sprintf(buf, "%s[%d](%s).$R\r\n", buf, zone_table[i].cmd[j].arg3,

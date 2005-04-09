@@ -73,7 +73,7 @@ char * innate_skills[] =
    "Illusion",
    "Evasion",
    "Shadowslip",
-   "!repairr!",
+   "!repair!",
    "innate skill timer",
    "\n"
 };
@@ -157,11 +157,11 @@ int innate_focus(CHAR_DATA *ch, char *arg, int cmd)
       return eFAILURE;
    }
 
-   send_to_char("You delve into a trance and find yourself able to concentrate alot better.\r\n",ch);
+   send_to_char("You enter a trance and find yourself able to concentrate much better.\r\n",ch);
 
    struct affected_type af;
    af.type = SKILL_INNATE_FOCUS;
-   af.duration = 1;
+   af.duration = 2;
    af.modifier = 0;
    af.location = APPLY_NONE;
    af.bitvector = AFF_FOCUS;
@@ -222,6 +222,11 @@ int innate_repair(CHAR_DATA *ch, char *arg, int cmd)
    send_to_char("This item is beyond your skill.\r\n",ch);
    return eFAILURE;
   }
+  if (IS_OBJ_STAT(obj, ITEM_NOREPAIR))
+  {
+    send_to_char("This item is unrepairable.\r\n",ch);
+    return eFAILURE;
+  }
   for (i = 0; i < obj->num_affects;i++)
   {
     if (obj->affected[i].location == APPLY_DAMAGED)
@@ -229,7 +234,7 @@ int innate_repair(CHAR_DATA *ch, char *arg, int cmd)
        if (number(1,101) < chance)
        {
 	  send_to_char("You failed to repair it!\r\n",ch);
-	  act("$n fails to repair their $p.",ch,obj,obj,TO_ROOM,0);
+	  act("$n fails to repair $p.",ch,obj,obj,TO_ROOM,0);
 	  return eSUCCESS;
        }
        found = TRUE;
@@ -265,7 +270,6 @@ int innate_shadowslip(CHAR_DATA *ch, char *arg, int cmd)
    af.location = 0;
    af.bitvector = AFF_SHADOWSLIP;
    affect_to_char(ch, &af);
-   send_to_char("You bring up an aura, blocking all forms of scrying your location.\r\n",ch);
+   send_to_char("You blend with the shadows, preventing people from reaching you magically.\r\n",ch);
    return eSUCCESS;
 }
-

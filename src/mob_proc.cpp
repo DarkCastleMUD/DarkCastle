@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.66 2004/11/16 00:51:35 Zaphod Exp $ */
+/* $Id: mob_proc.cpp,v 1.67 2005/04/09 21:15:27 urizen Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -50,7 +50,9 @@ extern struct index_data *obj_index;
 extern struct index_data *mob_index;
 extern struct time_info_data time_info;
 
-
+int check_components(CHAR_DATA *ch, int destroy, int item_one = 0,
+	int item_two = 0, int item_three = 0, int item_four = 0,
+	bool silent = FALSE);
 /* extern procedures */
 
 int saves_spell(CHAR_DATA *ch, CHAR_DATA *vict, int spell_base, sh_int save_type);
@@ -1334,7 +1336,7 @@ int passive_necro(struct char_data *ch, struct obj_data *obj, int cmd, char *arg
     }      
 
     if(!affected_by_spell(ch, SPELL_ACID_SHIELD) && GET_LEVEL(ch) > 47) {
-      act("$n utters the words 'deadtly aura'.", ch, 0, 0, TO_ROOM, INVIS_NULL);
+      act("$n utters the words 'deadly aura'.", ch, 0, 0, TO_ROOM, INVIS_NULL);
       cast_acid_shield(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
       return eSUCCESS;
     }      
@@ -1601,7 +1603,7 @@ int active_grandmaster(CHAR_DATA *ch, struct obj_data *obj, int command, char *a
 
    
  if (!IS_AFFECTED(vict, AFF_PARALYSIS))
-    if(GET_LEVEL(ch)>30 && number(0,2)==0 )
+    if(GET_LEVEL(ch)>30 && number(0,4)==0 )
        {
          if ((IS_AFFECTED(vict, AFF_SANCTUARY))  ||
              (IS_AFFECTED(vict, AFF_FIRESHIELD))  ||
@@ -1613,8 +1615,7 @@ int active_grandmaster(CHAR_DATA *ch, struct obj_data *obj, int command, char *a
         }
       }
 
-
-    if(GET_LEVEL(ch)>40 && number(0,3)==0 )
+    if(GET_LEVEL(ch)>40 && number(0,2)==0 )
     {
 	act("$n utters the words 'Burn them suckers'.", ch, 0, 0, TO_ROOM,
 	  INVIS_NULL);
@@ -2272,7 +2273,20 @@ int clan_guard(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 
     if (cmd>6 || cmd<1)
 	return eFAILURE;
+    // 3 = south, 2 = east, 5 = up
+    // 1 = north, 4  = west, 6 = down
 
+    if ((in_room == real_room(2300) && cmd != 5) ||
+	(in_room == real_room(2310) && cmd != 2) ||
+	(in_room == real_room(2320) && cmd != 3) ||
+	(in_room == real_room(2390) && cmd != 3) ||
+	(in_room == real_room(2330) && cmd != 3) ||
+	(in_room == real_room(2340) && cmd != 1) ||
+	(in_room == real_room(2350) && cmd != 3) ||
+	(in_room == real_room(2360) && cmd != 5))
+	return eFAILURE;
+
+/* Old Clan Halls
     if ( (in_room == real_room(161) && cmd != 2 )
     ||   (in_room == real_room(158) && cmd != 4 )
     ||   (in_room == real_room(2426) && cmd != 2 ) // anaphrodesia, east
@@ -2288,7 +2302,7 @@ int clan_guard(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     ||	 (in_room == real_room(2344) && cmd != 1 )   // north
     ||	 (in_room == real_room(187) && cmd != 1 )   // sng, north
     ||	 (in_room == real_room(2315) && cmd != 1 )  // ferach, north
-    ||	 (in_room == real_room(2411) && cmd != 1 )  // suindicate north
+    ||	 (in_room == real_room(2411) && cmd != 1 )  // sindicate north
     ||	 (in_room == real_room(2305) && cmd != 2 )  // arcana, east
     ||   (in_room == real_room(181) && cmd != 2 )   // dark_tide, east
     ||	 (in_room == real_room(2300) && cmd != 1 )  // bandaleros, north
@@ -2302,42 +2316,23 @@ int clan_guard(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     ||   (in_room == real_room(9344) && cmd != 1 )  // overlords, north 
 	)
       return eFAILURE;
+*/	
 	
-	
-    if ( (ch->clan != 1 && in_room == real_room(167))   // ulnhyrr
-    ||   (ch->clan != 2 && in_room == real_room(127))   // tengu
-    ||   (ch->clan != 3 && in_room == real_room(2305))  // arcana
-    ||   (ch->clan != 5 && in_room == real_room(144))   // darkened
-    ||   (ch->clan != 7 && in_room == real_room(158))   // studs
-    ||   (ch->clan != 8 && in_room == real_room(124))   // vampyre
-    ||   (ch->clan != 9 && in_room == real_room(187))   // sng
-    ||   (ch->clan != 10 && in_room == real_room(2370)) // Tayledras
-    ||   (ch->clan != 12 && in_room == real_room(6010)) // slackers
-    ||   (ch->clan != 13 && in_room == real_room(2315)) // ferach
-    ||   (ch->clan != 34 && in_room == real_room(138))  // nazgul
-    ||   (ch->clan != 16 && in_room == real_room(2350))  // eclipse
-    ||   (ch->clan != 17 && in_room == real_room(2339))  // epoch
-    ||   (ch->clan != 18 && in_room == real_room(2321)) // anarchist
-    ||	 (ch->clan != 19 && in_room == real_room(2344))  // ViG
-    ||   (ch->clan != 21 && in_room == real_room(2426))  // dc_guard
-    ||   (ch->clan != 22 && in_room == real_room(141))  // co.rpse
-    ||   (ch->clan != 24 && in_room == real_room(161))  // smoke_jaguars
-    ||   (ch->clan != 26 && in_room == real_room(2411)) // sindicate
-    ||   (ch->clan != 28 && in_room == real_room(181))  // dark_tide 
-    ||   (ch->clan != 29 && in_room == real_room(2300)) // bandaleros
-    ||   (ch->clan != 5 && in_room == real_room(2329)) // darkened2
-    ||   (ch->clan != 4 && in_room == real_room(2325)) // blackaxe
-    ||   (ch->clan != 6 && in_room == real_room(2336)) // timewarp
-    ||   (ch->clan != 11 && in_room == real_room(2374)) // solaris
-    ||   (ch->clan != 15 && in_room == real_room(2380)) // overlords
-    ||   (ch->clan != 15 && in_room == real_room(9344)) // overlords
+    if ( (ch->clan != 14 && in_room == real_room(2300))  // black axe
+    ||   (ch->clan != 4 && in_room ==  real_room(2310))  // dc_guard
+    ||   (ch->clan != 18 && in_room == real_room(2320))  // anarchist
+    ||   (ch->clan != 20 && in_room == real_room(2390))  // sindicate
+    ||   (ch->clan != 1 && in_room ==  real_room(2330))  // uln'hyrr
+    ||   (ch->clan != 10 && in_room == real_room(2340))  // moor
+    ||   (ch->clan != 11 && in_room == real_room(2350))  // eclipse
+    ||   (ch->clan != 3 && in_room == real_room(2360)) //arcana
 	)
     {
 	act( "$n is turned away from the clan hall.", ch, 0, 0, TO_ROOM , 0);
 	send_to_char("The clan guard throws you out on your ass.\n\r", ch );
 	return eSUCCESS;
     }
-    else if(IS_AFFECTED(ch, AFF_CANTQUIT) && affected_by_spell(ch, FUCK_PTHIEF)) { 
+    else if(affected_by_spell(ch, FUCK_PTHIEF)) { 
 	act( "$n is turned away from the clan hall.", ch, 0, 0, TO_ROOM , 0);
 	send_to_char("The clan guard says 'Hey don't be bringing trouble around here!'\n\r", ch );
 	return eSUCCESS;
@@ -3028,8 +3023,6 @@ static char *dethSayText [ ] =
   "The thing that attracts me to fat chicks the most is probably the gravitational pull.",
 // Sneaky repeating of messages to make the fuckers vote.
   "I've lost 3 girlfriends to voting for Dark Castle on Mudconnect(through www.dcastle.info), but it was worth it.",
-  "I've lost 3 girlfriends to voting for Dark Castle on Mudconnect(through www.dcastle.info), but it was worth it.",
-  "I've lost 3 girlfriends to voting for Dark Castle on Mudconnect(through www.dcastle.info), but it was worth it.",
   "Good: Your wife meets you naked at the door. Bad: She's coming home.",
   "Good: Your boyfriend's excercising. Bad: So he'll fit in your clothes.",
   "What do you have when 100 lawyers are buried up to their neck in sand?  Not enough sand",
@@ -3037,9 +3030,10 @@ static char *dethSayText [ ] =
   "Quidquid latine dictum sit, altum viditur.",
     // whatever is said in Latin sounds profound
   "To be sure of hitting the target, shoot first and, whatever you hit, call it the target.",
-  "Your lucky numbers is 7399928377275452622483. Look for it everywhere!",
+  "Your lucky number is 7399928377275452622483. Look for it everywhere!",
   "Love is like a snowmobile racing across the tundra and then suddenly it flips over, pinning you underneath. At night, the ice weasels come.",
-  "Don't worry about people stealing your ideas. If your ideas are any good, you'll have to ram them down people's throats."
+  "Don't worry about people stealing your ideas. If your ideas are any good, you'll have to ram them down people's throats.",
+  "Avoid hangovers. Stay drunk"
 };
 
 #define DETH_SAY_TEXT_SIZE    ( sizeof ( dethSayText )    / sizeof ( char * ) )
@@ -5232,6 +5226,72 @@ int mage_golem(struct char_data *ch, struct obj_data *obj, int cmd,
    return eFAILURE;
 }
 
+
+int gremlinthing(struct char_data *ch)
+{
+  if( GET_POS(ch) < POSITION_STANDING )
+     return eFAILURE;
+
+  if (ch->master && !IS_NPC(ch->master) && ch->master->pcdata->golem && 
+ch->master->pcdata->golem->in_room
+	== ch->in_room)
+  {
+     struct char_data *gol = ch->master->pcdata->golem;
+    if (gol->hit < gol->max_hit)
+    {
+	  do_emote(ch, "climbs up its master's golem, hammering, tweaking and repairing.\r\n", 9);
+	  gol->hit += number(40,60);
+	  if (gol->hit > gol->max_hit) gol->hit = gol->max_hit;
+    }
+  }
+  return eFAILURE;
+}
+
+int mage_familiar_gremlin(struct char_data *ch, struct obj_data *obj, int
+  cmd, char *arg, struct char_data *owner)
+{
+ if (number(0,1)) return eFAILURE;
+ return gremlinthing(ch);
+}
+
+int mage_familiar_gremlin_non(struct char_data *ch, struct obj_data *obj,
+ int cmd, char *arg, struct char_data *owner)
+{
+  if (cmd) return eFAILURE;
+  if(!ch->master) {
+    log("Familiar without a master.", IMMORTAL, LOG_BUG);
+    extract_char(ch, TRUE);
+    return (eCH_DIED | eSUCCESS);
+  }
+  if( GET_POS(ch) < POSITION_STANDING )
+     return eFAILURE;
+  if(!ch->fighting) 
+  {
+    if(ch->in_room != ch->master->in_room) {
+      do_emote(ch, "looks around, glances at its watch then skitters out of the room.\r\n", 9);
+      move_char(ch, ch->master->in_room);
+      do_emote(ch, "skitters into the room, anxiously looking for its master.\r\n", 9);
+      return eFAILURE;
+    }
+
+    if(ch->master->fighting) { // help him!
+       do_join(ch, GET_NAME(ch->master), 9);
+      return eFAILURE;
+    }
+
+    if(number(1, 500) == 1) {
+	act("$n chatters incessantly while magically fusing two small rocks together.",     ch, 0, 0, TO_ROOM, 0);
+      return eFAILURE;
+    }
+  }
+
+  if (number(0,4)) return eFAILURE;
+
+  return gremlinthing(ch);
+}
+
+
+
 int mage_familiar_imp(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,        
           struct char_data *owner)
 {
@@ -5284,31 +5344,84 @@ int mage_familiar_imp_non(struct char_data *ch, struct obj_data *obj, int cmd, c
   return eFAILURE;
 }
 
-int mage_familiar_gremlin_non(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
-   struct char_data *owner)
+int druid_familiar_owl_non(struct char_data *ch, struct obj_data *obj, int cmd, char *arg, struct char_data *owner)
 {
-  if (cmd) return eFAILURE;
-  if (!ch->master)
-  {
-   log("Familiar without a master.", IMMORTAL, LOG_BUG);
+   if(ch->fighting)
+    return eFAILURE;
+
+   if (cmd == 155 && !owner->fighting && !ch->fighting && owner->master == ch)
+   {
+     char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+     arg = one_argument(arg, arg1);
+     arg = one_argument(arg, arg2);
+     if (str_cmp(arg1, "far") && str_cmp(arg1,"near"))
+     {
+       send_to_char("$BDo you want to spy $3far$7 or $3near$7?$R\r\n",ch);
+	return eSUCCESS;
+     }
+     int dir;
+     extern char *dirs[];
+     for (dir = 0; *dirs[dir] != '\n'; dir++)
+       if (!str_cmp(dirs[dir], arg2))
+         break;
+     if (*dirs[dir] == '\n' || !world[ch->in_room].dir_option[dir])
+     {
+       send_to_char("In what direction did you say?\r\n",ch);
+       return eSUCCESS;
+     }
+     int to_room = 0;
+     bool ts = IS_AFFECTED(ch, AFF_TRUE_SIGHT);
+     if (!str_cmp(arg1,"far") && world[world[ch->in_room].dir_option[dir]->to_room].dir_option[dir])
+       to_room = world[world[ch->in_room].dir_option[dir]->to_room].dir_option[dir]->to_room;
+     if (!to_room) to_room = world[ch->in_room].dir_option[dir]->to_room;
+     if (!check_components(ch, 1, 44, 0, 0, 0, TRUE))
+     {
+	send_to_char("The owl requires a feeding to do this for you.\r\n",ch);
+        return eSUCCESS;
+     }
+     send_to_char("The owl accepts your mouse greedily.\r\n",ch);
+     send_to_char("You see through the eyes of your familiar, looking into the distant room...\r\n",ch);
+     int oldroom = ch->in_room;
+     char_from_room(ch);
+     char_to_room(ch, to_room);
+     SET_BIT(ch->affected_by, AFF_TRUE_SIGHT);
+     do_look(ch, "", 9);
+     if (!ts) REMOVE_BIT(ch->affected_by, AFF_TRUE_SIGHT);
+     char_from_room(ch);
+     char_to_room(ch, oldroom);
+     return eSUCCESS;
+   } else if (!cmd) {
+  if(!ch->master) {
+    log("Familiar without a master.", IMMORTAL, LOG_BUG);
     extract_char(ch, TRUE);
     return (eCH_DIED | eSUCCESS);
- }
- switch (number(0,5))
- {
-   case 0:
-	act("$n chatters incessantly while magically fusing two small rocks together.",     ch, 0, 0, TO_ROOM, 0);
-	break;
-  case 1: break;
-   case 2: break;
-   case 3: break;
-   case 4: break;
-   case 5: break;
- }
- if (!IS_NPC(ch->master) && ch->master->pcdata->golem->in_room == ch->in_room)
- { // Get repairy
- }
- return eSUCCESS;
+  }
+
+  // do nothing unless doing nothing :)
+  if( GET_POS(ch) < POSITION_STANDING )
+     return eFAILURE;
+
+  if(!ch->fighting) 
+  {
+    if(ch->in_room != ch->master->in_room) {
+      do_emote(ch, "lifts from its perch and flies out of the room.\r\n", 9);
+      move_char(ch, ch->master->in_room);
+      do_emote(ch, "swoops into the room perching itself high up, watching its master.\r\n", 9);
+      return eFAILURE;
+    }
+
+    if(ch->master->fighting) { // help him!
+      do_join(ch, GET_NAME(ch->master), 9);
+      return eFAILURE;
+    }
+
+    if(number(1, 500) == 1) {
+      do_emote(ch, "circles above, looking for mice.", 9);
+      return eFAILURE;
+    }
+  }
+  }
+ return eFAILURE;
 }
 
 int druid_familiar_chipmunk_non(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
@@ -5357,6 +5470,7 @@ int druid_familiar_chipmunk_non(struct char_data *ch, struct obj_data *obj, int 
       return eFAILURE;
     }
   }
+
 
   return eFAILURE;
 }

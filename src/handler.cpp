@@ -21,7 +21,7 @@
  *  12/08/2003   Onager    Added check for charmies and !charmie eq to     *
  *                         equip_char()                                    *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.76 2004/11/16 00:51:34 Zaphod Exp $ */
+/* $Id: handler.cpp,v 1.77 2005/04/09 21:15:27 urizen Exp $ */
     
 extern "C"
 {
@@ -90,6 +90,8 @@ bool isaff2(int spellnum)
 {
   switch (spellnum)
   {
+		case SPELL_FOREST_MELD:
+		case BASE_SETS+SET_RAGER: // = stability
                 case SPELL_SHADOWSLIP:
                 case SPELL_CAMOUFLAGE:
 		case SPELL_FARSIGHT:
@@ -108,6 +110,34 @@ bool isaff2(int spellnum)
                   break;
 
   };
+}
+
+//TIMERS
+
+bool isTimer(CHAR_DATA *ch, int spell)
+{
+  return affected_by_spell(ch, BASE_TIMERS+spell);
+}
+void addTimer(CHAR_DATA *ch, int spell, int ticks)
+{
+
+  struct affected_type af;
+  af.duration = ticks;
+  af.type = spell+BASE_TIMERS;
+  af.location = 0;
+  af.bitvector = 0;
+  af.modifier = 0;
+  affect_join(ch, &af, TRUE, FALSE);
+  return;
+}
+//END TIMERS
+
+bool is_wearing(CHAR_DATA *ch, OBJ_DATA *item)
+{
+  int i;
+  for (i = 0; i < MAX_WEAR; i++)
+     if (ch->equipment[i] == item) return TRUE;
+  return FALSE;
 }
 
 
@@ -250,10 +280,10 @@ int get_max_stat(char_data * ch, byte stat)
 
     case RACE_TROLL:
 	switch(stat) {
-	  case STRENGTH:   return 28;
-	  case DEXTERITY:  return 25;
+	  case STRENGTH:     return 28;
+	  case DEXTERITY:    return 25;
 	  case INTELLIGENCE: return 20;
-	  case WISDOM: 	    return 22;
+	  case WISDOM: 	     return 22;
 	  case CONSTITUTION: return 30;
 	}
 
@@ -346,6 +376,10 @@ const struct set_data set_list[] = {
   { "Celebrant's Defenses", {17319,17320,17321,17322,17323,17324,17325,17326,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
         "Your inner focus feels as though it is more powerful.\r\n",
 	"Your inner focus has reverted to its original form.\r\n"},
+  { "Battlerager's Fury", {352, 353, 354, 355, 356, 357, 358, 359, 359,
+	360, 361, 362, 362, 9702, 9808, 9808, 27114, 27114, -1},
+	"You feel your stance harden and blood boil as you strap on your battlerager's gear.",
+	"Your blood returns to its normal temperature as you remove your battlerager's gear."},
   { "\n", {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
 	"\n","\n"}
 };
@@ -418,6 +452,16 @@ void add_set_stats(char_data *ch, obj_data *obj, int flag)
 	    af.modifier = 5;
 	    affect_to_char(ch, &af);
 	    break;
+	  case SET_RAGER:
+	    af.location = 0;
+	    af.modifier = 0;
+	    af.bitvector = AFF_STABILITY;
+	    affect_to_char(ch, &af);
+	    af.location = SKILL_BLOOD_FURY *1000;
+	    af.modifier = 5;
+	    af.bitvector = 0;
+	    affect_to_char(ch, &af);
+	    break;
 	  default: 
 		send_to_char("Tough luck, you completed an unimplemented set. Report what you just wore, eh?\r\n",ch);
 		break;
@@ -468,7 +512,7 @@ void check_weapon_weights(char_data * ch)
 {
   struct obj_data * weapon;
   
-
+  if (IS_SET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT)) return;
   // make sure we're still strong enough to wield our weapons
   if(!IS_MOB(ch) && ch->equipment[WIELD] &&
        GET_OBJ_WEIGHT(ch->equipment[WIELD]) > GET_STR(ch) && !IS_SET(ch->affected_by2, AFF_POWERWIELD))
@@ -528,10 +572,11 @@ if (!aff2fix) {
             GET_STR_BONUS(ch) += mod;
             GET_STR(ch) = GET_RAW_STR(ch) + GET_STR_BONUS(ch);
             i = get_max_stat(ch, STRENGTH);
-            // can only be max naturally.  Eq only gets you to max - 2
-            if( GET_RAW_STR(ch) > i - 2 && GET_STR(ch) > i - 2 )
-               GET_STR(ch) = GET_RAW_STR(ch);
-            else GET_STR(ch) = MAX( 1, MIN( (int)GET_STR( ch ), ( i - 2 ) ) );
+	   GET_STR(ch) = MIN(i, GET_STR(ch));
+      //      // can only be max naturally.  Eq only gets you to max - 2
+        //    if( GET_RAW_STR(ch) > i - 2 && GET_STR(ch) > i - 2 )
+          //     GET_STR(ch) = GET_RAW_STR(ch);
+//            GET_STR(ch) = MAX( 1, MIN( (int)GET_STR( ch ), i) ) );
             if(!IS_SET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
                check_weapon_weights(ch);
         }  break;
@@ -540,40 +585,48 @@ if (!aff2fix) {
             GET_DEX_BONUS(ch) += mod;
             GET_DEX(ch) = GET_RAW_DEX(ch) + GET_DEX_BONUS(ch);
             i = get_max_stat(ch, DEXTERITY);
-            // can only be max naturally.  Eq only gets you to max - 2
-            if( GET_RAW_DEX(ch) > i - 2 && GET_DEX(ch) > i - 2 )
-               GET_DEX(ch) = GET_RAW_DEX(ch);
-            else GET_DEX(ch) = MAX( 1, MIN( (int)GET_DEX( ch ), ( i - 2 ) ) );
+		GET_DEX(ch) = MIN(i, GET_DEX(ch));
+  //          // can only be max naturally.  Eq only gets you to max - 2
+    //        if( GET_RAW_DEX(ch) > i - 2 && GET_DEX(ch) > i - 2 )
+      //         GET_DEX(ch) = GET_RAW_DEX(ch);
+        //    else GET_DEX(ch) = MAX( 1, MIN( (int)GET_DEX( ch ), ( i - 2 
+//) ) );
 	}  break;
 
 	case APPLY_INT: {
             GET_INT_BONUS(ch) += mod;
             GET_INT(ch) = GET_RAW_INT(ch) + GET_INT_BONUS(ch);
             i = get_max_stat(ch, INTELLIGENCE);
+	    GET_INT(ch) = MIN(i, GET_INT(ch));
             // can only be max naturally.  Eq only gets you to max - 2
-            if( GET_RAW_INT(ch) > i - 2 && GET_INT(ch) > i - 2 )
-               GET_INT(ch) = GET_RAW_INT(ch);
-            else GET_INT(ch) = MAX( 1, MIN( (int)GET_INT( ch ), ( i - 2 ) ) );
+           // if( GET_RAW_INT(ch) > i - 2 && GET_INT(ch) > i - 2 )
+            //   GET_INT(ch) = GET_RAW_INT(ch);
+           // else GET_INT(ch) = MAX( 1, MIN( (int)GET_INT( ch ), ( i - 2 
+//) ) );
         } break;
 
 	case APPLY_WIS: {
             GET_WIS_BONUS(ch) += mod;
             GET_WIS(ch) = GET_RAW_WIS(ch) + GET_WIS_BONUS(ch);
             i = get_max_stat(ch, WISDOM);
-            // can only be max naturally.  Eq only gets you to max - 2
-            if( GET_RAW_WIS(ch) > i - 2 && GET_WIS(ch) > i - 2 )
-               GET_WIS(ch) = GET_RAW_WIS(ch);
-            else GET_WIS(ch) = MAX( 1, MIN( (int)GET_WIS( ch ), ( i - 2 ) ) );
+	GET_WIS(ch) = MIN(i, GET_WIS(ch));
+  //          // can only be max naturally.  Eq only gets you to max - 2
+    //        if( GET_RAW_WIS(ch) > i - 2 && GET_WIS(ch) > i - 2 )
+      //         GET_WIS(ch) = GET_RAW_WIS(ch);
+        //    else GET_WIS(ch) = MAX( 1, MIN( (int)GET_WIS( ch ), ( i - 2 
+//) ) );
         } break;
 
 	case APPLY_CON: {
             GET_CON_BONUS(ch) += mod;
             GET_CON(ch) = GET_RAW_CON(ch) + GET_CON_BONUS(ch);
             i = get_max_stat(ch, CONSTITUTION);
+	    GET_CON(ch) = MIN(i, GET_CON(ch));
             // can only be max naturally.  Eq only gets you to max - 2
-            if( GET_RAW_CON(ch) > i - 2 && GET_CON(ch) > i - 2 )
-               GET_CON(ch) = GET_RAW_CON(ch);
-            else GET_CON(ch) = MAX( 1, MIN( (int)GET_CON( ch ), ( i - 2 ) ) );
+    //        if( GET_RAW_CON(ch) > i - 2 && GET_CON(ch) > i - 2 )
+      //         GET_CON(ch) = GET_RAW_CON(ch);
+        //    else GET_CON(ch) = MAX( 1, MIN( (int)GET_CON( ch ), ( i - 2 
+//) ) );
 	}   break;
 
 	case APPLY_SEX: {
@@ -1151,7 +1204,7 @@ void affect_remove( CHAR_DATA *ch, struct affected_type *af, int flags, bool aff
 	 break;
       case SKILL_INNATE_ILLUSION:
          if (!(flags & SUPPRESS_MESSAGES))
- 	  send_to_char("You slowly fade into existance.\r\n",ch);
+ 	  send_to_char("You slowly fade into existence.\r\n",ch);
 	  break;
       case SKILL_INNATE_EVASION:
          if (!(flags & SUPPRESS_MESSAGES))
@@ -1314,7 +1367,7 @@ void affect_join( CHAR_DATA *ch, struct affected_type *af,
 int char_from_room(CHAR_DATA *ch)
 {
   CHAR_DATA *i;
-  bool Other = FALSE,More = FALSE, kimore = FALSE;
+  bool Other = FALSE, More = FALSE, kimore = FALSE;
 
   if(ch->in_room == NOWHERE) {
     return(0); 
@@ -1333,20 +1386,23 @@ int char_from_room(CHAR_DATA *ch)
     for(i = world[ch->in_room].people; i; i = i->next_in_room) {
        if(i->next_in_room == ch)
          i->next_in_room = ch->next_in_room;
-       if (i!=ch && IS_NPC(i) && IS_SET(i->mobdata->actflags, ACT_NOMAGIC))
-	 Other = TRUE;
-	if (i!=ch && IS_NPC(i) && IS_SET(i->mobdata->actflags, ACT_NOTRACK))
-	 More = TRUE;
-	if (i!= ch && IS_NPC(i) && IS_SET(i->mobdata->actflags, ACT_NOKI))
-	  kimore = TRUE;
     }
-
+  if (IS_NPC(ch) && IS_SET(ch->mobdata->actflags, ACT_NOMAGIC))
+	debugpoint();
+  for(i = world[ch->in_room].people; i; i = i->next_in_room) {
+     if (IS_NPC(i) && IS_SET(i->mobdata->actflags, ACT_NOMAGIC))
+	Other = TRUE;
+     if (IS_NPC(i) && IS_SET(i->mobdata->actflags, ACT_NOTRACK))
+	 More = TRUE;
+     if (IS_NPC(i) && IS_SET(i->mobdata->actflags, ACT_NOKI))
+         kimore = TRUE;
+     }
   if(!IS_NPC(ch)) // player
     zone_table[world[ch->in_room].zone].players--;
   if (IS_NPC(ch))
      ch->mobdata->last_room = ch->in_room;
   if (IS_NPC(ch))
-  if (IS_SET(ch->mobdata->actflags, ACT_NOTRACK) && !Other && IS_SET(world[ch->in_room].iFlags, NO_TRACK))
+  if (IS_SET(ch->mobdata->actflags, ACT_NOTRACK) && !More && IS_SET(world[ch->in_room].iFlags, NO_TRACK))
   {
     REMOVE_BIT(world[ch->in_room].iFlags,NO_TRACK);
     REMOVE_BIT(world[ch->in_room].room_flags, NO_TRACK);
@@ -1357,7 +1413,7 @@ int char_from_room(CHAR_DATA *ch)
      REMOVE_BIT(world[ch->in_room].iFlags, NO_TRACK);
      REMOVE_BIT(world[ch->in_room].room_flags, NO_TRACK);
   }
-  if (IS_NPC(ch) && IS_SET(ch->mobdata->actflags, ACT_NOMAGIC) && !More && IS_SET(world[ch->in_room].iFlags, NO_MAGIC))
+  if (IS_NPC(ch) && IS_SET(ch->mobdata->actflags, ACT_NOMAGIC) && !Other && IS_SET(world[ch->in_room].iFlags, NO_MAGIC))
   {
     REMOVE_BIT(world[ch->in_room].iFlags, NO_MAGIC);
     REMOVE_BIT(world[ch->in_room].room_flags, NO_MAGIC);
@@ -1787,7 +1843,7 @@ struct obj_data *get_obj_num(int nr)
 
 
 /* search a room for a char, and return a pointer if found..  */
-CHAR_DATA *get_char_room(char *name, int room)
+CHAR_DATA *get_char_room(char *name, int room, bool careful)
 {
   CHAR_DATA *i;
   CHAR_DATA *partial_match;
@@ -1807,7 +1863,7 @@ CHAR_DATA *get_char_room(char *name, int room)
       if (number == 0 && IS_NPC(i)) continue;
       if (number == 1 || number == 0)
          {
-         if (isname(tmp, GET_NAME(i)))
+         if (isname(tmp, GET_NAME(i)) && !(careful && IS_NPC(i) && mob_index[i->mobdata->nr].virt == 12))
             return(i);
          else if (isname2(tmp, GET_NAME(i)))
             {
@@ -2371,11 +2427,12 @@ int obj_to_obj(struct obj_data *obj, struct obj_data *obj_to)
 
   // recursively upwards add the weight.  Since we only have 1 layer of containers,
   // this loop only happens once, but it's good to leave later in case we change our mind
+  if (obj_index[obj_to->item_number].virt != 536) {
   for(tobj = obj->in_obj; tobj;
       GET_OBJ_WEIGHT(tobj) += GET_OBJ_WEIGHT(obj),
       tobj = tobj->in_obj)
     ;
-
+  }
   return 1;
 }
 
@@ -2413,6 +2470,8 @@ int obj_from_obj(struct obj_data *obj)
 
 
   // Subtract weight from containers container
+  
+  if (!obj_from || obj_index[obj_from->item_number].virt != 536) {
   for(tmp = obj->in_obj; tmp->in_obj; tmp = tmp->in_obj)
     GET_OBJ_WEIGHT(tmp) -= GET_OBJ_WEIGHT(obj);
 
@@ -2421,6 +2480,7 @@ int obj_from_obj(struct obj_data *obj)
   // Subtract weight from char that carries the object
   if (tmp->carried_by)
     IS_CARRYING_W(tmp->carried_by) -= GET_OBJ_WEIGHT(obj);
+  }
 
   obj->in_obj = 0;
   obj->next_content = 0;
@@ -3239,10 +3299,8 @@ int generic_find(char *arg, int bitvector, CHAR_DATA *ch,
     static char *ignore[] = {
 	"the",
 	"in",
-	"on",
-	"at",
 	"\n" };
-
+    
     int i;
     char name[256];
     bool found;
@@ -3258,7 +3316,7 @@ int generic_find(char *arg, int bitvector, CHAR_DATA *ch,
 	for(i=0; (name[i] = *(arg+i)) && (name[i]!=' '); i++)   ;
 	name[i] = 0;
 	arg+=i;
-	if (search_block(name, ignore, TRUE) > -1)
+	if (search_block(name, ignore, TRUE) > -1 || !IS_SET(bitvector, FIND_CHAR_ROOM))
 	    found = TRUE;
 
     }

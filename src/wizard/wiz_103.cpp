@@ -41,7 +41,6 @@ int do_boot(struct char_data *ch, char *arg, int cmd)
        send_to_char ("Oops! They ain't linkdead! Just possessing.", ch);
        return eFAILURE;
     }
-    send_to_char("You have been disconnected.\r\n", victim);
     if(IS_AFFECTED(victim, AFF_CANTQUIT))
     {
       if(affected_by_spell(victim, FUCK_PTHIEF))
@@ -52,8 +51,9 @@ int do_boot(struct char_data *ch, char *arg, int cmd)
       act("$N is a pkiller.  Don't boot $M.", ch, 0, victim, TO_CHAR, 0);
       return eFAILURE;
     }
- 
+
     /* Still here? Ok, the boot continues */
+    send_to_char("You have been disconnected.\r\n", victim);
     send_to_char("Ok.\n\r", ch);
     if (!IS_NPC(victim)) {
       sprintf(buf, "A stream of fire arcs down from the heavens, striking "

@@ -1,7 +1,7 @@
 #ifndef MOBILE_H_
 #define MOBILE_H_
 /************************************************************************
-| $Id: mobile.h,v 1.11 2004/11/16 00:52:09 Zaphod Exp $
+| $Id: mobile.h,v 1.12 2005/04/09 21:15:35 urizen Exp $
 | mobile.h
 | Description:  This file contains the header information for mobile
 |   control.

@@ -125,6 +125,8 @@ void assign_non_combat_procs() {
     SPEC_FUN    platmerchant;
     SPEC_FUN    moritician;
     SPEC_FUN    meta_dude;
+     SPEC_FUN gl_repair_shop;
+    SPEC_FUN    godload_sales;
     SPEC_FUN    skill_master;
     SPEC_FUN    repair_guy;
     SPEC_FUN    super_repair_guy;
@@ -154,6 +156,8 @@ void assign_non_combat_procs() {
     SPEC_FUN    koban_non_combat;
     SPEC_FUN    arena_only;
     SPEC_FUN mage_golem;
+    SPEC_FUN druid_familiar_owl_non;
+    SPEC_FUN mage_familiar_gremlin_non;
     SPEC_FUN    mage_familiar_imp_non;
     SPEC_FUN    druid_familiar_chipmunk_non;
     SPEC_FUN    bodyguard;
@@ -165,9 +169,10 @@ void assign_non_combat_procs() {
     assign_one_mob_non(8, mage_golem);
     assign_one_mob_non(1,  deth);
     assign_one_mob_non(3,  platmerchant);
-    assign_one_mob_non(4,  mithaxequest);
     assign_one_mob_non(5,  mage_familiar_imp_non);
+   assign_one_mob_non(4, mage_familiar_gremlin_non);
     assign_one_mob_non(6,  druid_familiar_chipmunk_non);
+   assign_one_mob_non(7, druid_familiar_owl_non);
     //assign_one_mob_non(69,  areanotopen);
     assign_one_mob_non(70,  pir_slut);
     assign_one_mob_non(200,  mud_school_adept);
@@ -185,6 +190,13 @@ void assign_non_combat_procs() {
     assign_one_mob_non(1932,  guild);
     assign_one_mob_non(1935,  guild);
     assign_one_mob_non(1937,  guild);
+    assign_one_mob_non(10018, gl_repair_shop);
+    assign_one_mob_non(10019, godload_sales);
+    assign_one_mob_non(10020, godload_sales);
+    assign_one_mob_non(10021, godload_sales);
+    assign_one_mob_non(10022, godload_sales);
+    assign_one_mob_non(10023, godload_sales);
+    assign_one_mob_non(10026, godload_sales);
     assign_one_mob_non(1939,  guild);
     assign_one_mob_non(1929,  guild_guard);
     assign_one_mob_non(1931,  guild_guard);
@@ -208,7 +220,14 @@ void assign_non_combat_procs() {
     assign_one_mob_non(8542,  iasenko_non_combat);
     assign_one_mob_non(8543,  koban_non_combat);
     assign_one_mob_non(9042,  robber);
-    assign_one_mob_non(9344,  clan_guard);
+    assign_one_mob_non(2306, clan_guard);
+    assign_one_mob_non(2300,  clan_guard);
+    assign_one_mob_non(2301,  clan_guard);
+    assign_one_mob_non(2302,  clan_guard);
+    assign_one_mob_non(2303,  clan_guard);
+    assign_one_mob_non(2304,  clan_guard);
+    assign_one_mob_non(2305,  clan_guard);
+    assign_one_mob_non(2399,  clan_guard);
     assign_one_mob_non(9511,  bodyguard);
     assign_one_mob_non(9531,  bodyguard);
     assign_one_mob_non(9532,  bodyguard);
@@ -221,6 +240,7 @@ void assign_non_combat_procs() {
     assign_one_mob_non(1929,  guild_guard);
     assign_one_mob_non(1920,  guild);
     assign_one_mob_non(1922,  guild);
+    assign_one_mob_non(5431,  guild);
     assign_one_mob_non(1924,  guild);
     assign_one_mob_non(1926,  guild);
     assign_one_mob_non(10011,  skill_master);
@@ -263,6 +283,7 @@ void assign_combat_procs() {
     SPEC_FUN	white_dragon;
     SPEC_FUN	brass_dragon;
     SPEC_FUN    fighter;
+    SPEC_FUN mage_familiar_gremlin;
     SPEC_FUN    active_grandmaster;
     SPEC_FUN    active_tarrasque;
     SPEC_FUN	cry_dragon;
@@ -280,6 +301,7 @@ void assign_combat_procs() {
     SPEC_FUN    foggy_combat;
     SPEC_FUN    iasenko_combat;
     SPEC_FUN    koban_combat;
+    SPEC_FUN    druid_familiar_owl;
     SPEC_FUN    kogiro_combat;
     SPEC_FUN    takahashi_combat;
     SPEC_FUN    askari_combat;
@@ -292,8 +314,9 @@ void assign_combat_procs() {
     /* I spent forever putting these fuckers in numerical order,
        keep um that way.  It makes no sense dividing them by what
        zone they load up in.  - pir */
-
+   assign_one_mob_com(4, mage_familiar_gremlin);
     assign_one_mob_com(5,  mage_familiar_imp);
+//   assign_one_mob_com(7, druid_familiar_owl);
     assign_one_mob_com(1364,  active_grandmaster);
     assign_one_mob_com(3059,  fighter);
     assign_one_mob_com(5005,  brass_dragon);
@@ -391,6 +414,8 @@ void assign_objects(void)
   SPEC_FUN souldrainer;
   SPEC_FUN emoting_object;
   SPEC_FUN returner;
+  SPEC_FUN pushwand;
+  SPEC_FUN barbweap;
   SPEC_FUN gem_assembler;
   SPEC_FUN pfe_word;
   SPEC_FUN devilsword;
@@ -417,7 +442,6 @@ void assign_objects(void)
   SPEC_FUN mob_summoner;
   SPEC_FUN globe_of_darkness_proc;
   SPEC_FUN hornoplenty;
-  SPEC_FUN gl_dragon_fire;
   SPEC_FUN dk_rend;
   SPEC_FUN magic_missile_boots;
   SPEC_FUN shield_combat_procs;
@@ -434,6 +458,47 @@ void assign_objects(void)
   SPEC_FUN hot_potato;
   SPEC_FUN gazeofgaiot;
   SPEC_FUN moving_portals;
+
+  SPEC_FUN godload_cassock;
+  SPEC_FUN godload_phyraz;
+  SPEC_FUN godload_leprosy;
+  SPEC_FUN godload_stargazer;
+  SPEC_FUN godload_armbands;
+  SPEC_FUN godload_gaze;
+  SPEC_FUN godload_defender;
+  SPEC_FUN godload_tovmier;
+  SPEC_FUN godload_wailka;
+  SPEC_FUN godload_choker;
+  SPEC_FUN godload_lorne;
+  SPEC_FUN godload_quiver;
+  SPEC_FUN godload_aligngood;
+  SPEC_FUN godload_alignevil;
+  SPEC_FUN godload_hammer;
+ // combvat procs
+  SPEC_FUN godload_banshee;
+  SPEC_FUN godload_claws;
+  //Godload procs follow.
+    assign_one_obj_com(565,   godload_banshee);
+    assign_one_obj_com(511,   godload_claws);
+    assign_one_obj_com(506,  glove_combat_procs);
+    assign_one_obj_com(528, godload_leprosy);
+
+    assign_one_obj_non(534, godload_cassock);
+    assign_one_obj_non(500, godload_stargazer);
+    assign_one_obj_non(526, godload_armbands);
+    assign_one_obj_non(548, godload_gaze);
+    assign_one_obj_non(561, godload_phyraz);
+    assign_one_obj_non(556, godload_defender);
+    assign_one_obj_non(578, godload_tovmier);
+    assign_one_obj_non(514, godload_wailka);
+    assign_one_obj_non(517, godload_choker);
+    assign_one_obj_non(519, godload_lorne);
+    assign_one_obj_non(540, godload_quiver);
+    assign_one_obj_non(558, godload_aligngood);
+    assign_one_obj_non(559, godload_alignevil);
+    assign_one_obj_non(594, godload_hammer);
+
+  assign_one_obj_non(16225, pushwand);
   assign_one_obj_non(11300, moving_portals);
   assign_one_obj_non(11301, moving_portals);
   assign_one_obj_non(11302, moving_portals);
@@ -441,9 +506,15 @@ void assign_objects(void)
   assign_one_obj_non(11304, moving_portals);
   assign_one_obj_non(11305, moving_portals);
   assign_one_obj_non(5911, moving_portals);
-
+  assign_one_obj_non(358, barbweap);
   assign_one_obj_non(9,  phish_locator);	
   assign_one_obj_non(13,  board); /* Quest Board */
+  assign_one_obj_non(2313, board);
+  assign_one_obj_non(2303, board);
+  assign_one_obj_non(2308, board);
+  assign_one_obj_non(2390, board);
+  assign_one_obj_non(2328, board);
+  assign_one_obj_non(2360, board);
   assign_one_obj_non(25,  mob_summoner);
   assign_one_obj_non(41,  restring_machine);
   assign_one_obj_non(40,  emoting_object);
@@ -472,7 +543,8 @@ void assign_objects(void)
 //  assign_one_obj_non(17800,  arenaporter);
   assign_one_obj_non(26723,  generic_push_proc);
   assign_one_obj_non(30627,  eliara_non_combat);  
-
+  
+    
 
   // assembled items
   // forage arrow
@@ -508,12 +580,13 @@ void assign_objects(void)
 
   assign_one_obj_non(22399,  board);  // quests2do Board
 
-  assign_one_obj_com(542,    gl_dragon_fire);
   assign_one_obj_com(740,    magic_missile_boots);
   assign_one_obj_com(2715,   shield_combat_procs);
+  assign_one_obj_com(555, shield_combat_procs);
   assign_one_obj_com(8208,   shield_combat_procs);
   assign_one_obj_com(9520,   dk_rend);
   assign_one_obj_com(9565, hooktippedsteelhalberd);
+  assign_one_obj_com(21718, glove_combat_procs);
   assign_one_obj_com(9806,   glove_combat_procs);
   assign_one_obj_com(10000,  holyavenger);
   assign_one_obj_com(10001,  holyavenger);

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.47 2004/11/16 00:51:35 Zaphod Exp $
+| $Id: objects.cpp,v 1.48 2005/04/09 21:15:27 urizen Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -110,6 +110,13 @@ int eq_max_damage(obj_data * obj)
       case ITEM_INSTRUMENT:
          amount = 3;
          break;
+      case ITEM_WAND:
+      case ITEM_STAFF:
+	amount = 3;
+	break;
+      case ITEM_LIGHT:
+	amount = 3;
+	break;
       case ITEM_KEY:
          amount = 2;
          break;
@@ -249,15 +256,22 @@ int do_quaff(struct char_data *ch, char *argument, int cmd)
   int lvl;
 
   equipped = FALSE;
-
+  int pos = -1;
   one_argument(argument,buf);
 
   if (!(temp = get_obj_in_list_vis(ch,buf,ch->carrying))) {
     temp = ch->equipment[HOLD];
     equipped = TRUE;
-    if ((temp==0) || !isname(buf, temp->name)) {
-      act("You do not have that item.",ch,0,0,TO_CHAR, 0);
-      return eFAILURE;
+	pos = HOLD;
+    if ((temp==0) || !isname(buf, temp->name))
+    {
+      temp = ch->equipment[HOLD2];
+	pos = HOLD2;
+      if ((temp==0) || !isname(buf, temp->name))
+      {
+        act("You do not have that item.",ch,0,0,TO_CHAR, 0);
+        return eFAILURE;
+      }
     }
   }
 
@@ -277,7 +291,7 @@ int do_quaff(struct char_data *ch, char *argument, int cmd)
     act ("During combat, $n drops $p and it SMASHES!", ch, temp, 0, TO_ROOM, 0);
     act ("During combat, you drop $p which SMASHES!",  ch, temp, 0, TO_CHAR, 0);
     if (equipped)
-      unequip_char(ch, HOLD);
+      unequip_char(ch, pos);
     extract_obj(temp);
     return eSUCCESS;
   }
@@ -310,7 +324,7 @@ int do_quaff(struct char_data *ch, char *argument, int cmd)
   if(!is_mob || !IS_SET(retval, eCH_DIED)) // it's already been free'd when mob died
   {     
     if (equipped)
-      unequip_char(ch, HOLD,1);
+      unequip_char(ch, pos,1);
     extract_obj(temp);
   }
   return retval;
@@ -329,23 +343,30 @@ int do_recite(struct char_data *ch, char *argument, int cmd)
     int lvl;
     
     if(IS_SET(world[ch->in_room].room_flags, NO_MAGIC)) {
-       send_to_char("Your magic is muffled by greater beings...\n\r", ch);
+       send_to_char("Your magic is muffled by greater beings.\n\r", ch);
        return eFAILURE; 
     }
     equipped = FALSE;
     obj = 0;
     victim = 0;
-
+  int pos = -1;
     argument = one_argument(argument,buf);
 
-    if (!(scroll = get_obj_in_list_vis(ch,buf,ch->carrying))) {
-      scroll = ch->equipment[HOLD];
-      equipped = TRUE;
-      if ((scroll==0) || !isname(buf, scroll->name)) {
+  if (!(scroll = get_obj_in_list_vis(ch,buf,ch->carrying))) {
+    scroll = ch->equipment[HOLD];
+    equipped = TRUE;
+	pos = HOLD;
+    if ((scroll==0) || !isname(buf, scroll->name))
+    {
+      scroll = ch->equipment[HOLD2];
+	pos = HOLD2;
+      if ((scroll==0) || !isname(buf, scroll->name))
+      {
         act("You do not have that item.",ch,0,0,TO_CHAR, 0);
         return eFAILURE;
       }
     }
+  }
     if (IS_SET(world[ch->in_room].room_flags, NO_MAGIC)) {
        act("Your magic is muffled by greater beings.",ch,0,0,TO_CHAR, 0);
        return eFAILURE;
@@ -405,7 +426,7 @@ int do_recite(struct char_data *ch, char *argument, int cmd)
     if(!is_mob || !IS_SET(retval, eCH_DIED)) // it's already been free'd when mob died
     {
       if (equipped)
-        unequip_char(ch, HOLD,1);
+        unequip_char(ch, pos,1);
       extract_obj(scroll);
     }
     return eSUCCESS;
@@ -575,12 +596,15 @@ int do_use(struct char_data *ch, char *argument, int cmd)
 
   argument = one_argument(argument,buf);
 
-  if (ch->equipment[HOLD] == 0 || !isname(buf, ch->equipment[HOLD]->name)) {
+  if ((ch->equipment[HOLD] == 0 || !isname(buf, ch->equipment[HOLD]->name)) &&
+	(ch->equipment[HOLD2] == 0 || !isname(buf, ch->equipment[HOLD2]->name)))
+	 {
     act("You do not hold that item in your hand.",ch,0,0,TO_CHAR, 0);
     return eFAILURE;
   }
-
-  stick = ch->equipment[HOLD];
+  if (ch->equipment[HOLD] && isname(buf, ch->equipment[HOLD]->name))
+   stick = ch->equipment[HOLD];
+  else stick = ch->equipment[HOLD2];
 
   if (stick->obj_flags.type_flag == ITEM_STAFF)
   {
@@ -629,7 +653,7 @@ int do_use(struct char_data *ch, char *argument, int cmd)
       send_to_char("What should the wand be pointed at?\n\r", ch);
     }
   } else {
-    send_to_char("Use is normally only for wand's and staff's.\n\r", ch);
+    send_to_char("Use is normally only for wands and staves.\n\r", ch);
   }
   return eFAILURE;
 }
@@ -647,7 +671,11 @@ int do_name(struct char_data *ch, char *arg, int cmd)
     send_to_char("You can't do that.  You must have been naughty.\n\r", ch);
     return eFAILURE;
   }
-
+  if (GET_LEVEL(ch) < 5)
+  {
+    send_to_char("You cannot use the \"name\" command until you have reached level 5.\r\n",ch);
+    return eFAILURE;
+  }
   while(*arg == ' ')  /* get rid of white space */
     arg++;
 
@@ -1173,7 +1201,7 @@ int do_taste(struct char_data *ch, char *argument, int cmd)
     if(temp->obj_flags.value[3]&&!IS_AFFECTED(ch,AFF_POISON)
     && GET_LEVEL(ch) <IMMORTAL) /* The shit was poisoned ! */
     {
-        act("Ooups, it did not taste good at all!",ch,0,0,TO_CHAR, 0);
+        act("Oops, it did not taste good at all!",ch,0,0,TO_CHAR, 0);
 
         af.type = SPELL_POISON;
         af.duration = 2;
@@ -1670,8 +1698,7 @@ void wear(struct char_data *ch, struct obj_data *obj_object, int keyword)
       else if(ch->equipment[WIELD] && GET_OBJ_WEIGHT(obj_object) > GET_STR(ch)/2 && !IS_SET(ch->affected_by2, AFF_POWERWIELD))
         send_to_char("It is too heavy for you to use as a secondary weapon.\n\r",ch);
       else if((!hands_are_free(ch, 2)) && 
-             (IS_SET(obj_object->obj_flags.extra_flags, ITEM_TWO_HANDED) 
-&& !IS_SET(ch->affected_by2, AFF_POWERWIELD)))
+             (IS_SET(obj_object->obj_flags.extra_flags, ITEM_TWO_HANDED) && !IS_SET(ch->affected_by2, AFF_POWERWIELD)))
         send_to_char("You need both hands for this weapon.\n\r", ch);
       else if(!hands_are_free(ch, 1))
         send_to_char("Your hands are already full.\n\r", ch);
@@ -1699,6 +1726,11 @@ void wear(struct char_data *ch, struct obj_data *obj_object, int keyword)
       if(ch->equipment[WEAR_SHIELD]) {
         act("You already using $p as a shield.", ch, ch->equipment[WEAR_SHIELD], 0, TO_CHAR, 0);
       }
+      else if((!hands_are_free(ch, 2)) && 
+             (IS_SET(obj_object->obj_flags.extra_flags, ITEM_TWO_HANDED) && !IS_SET(ch->affected_by2, AFF_POWERWIELD)))
+      {
+	send_to_char("You need both hands for this shield.\r\n",ch);
+      }
       else if(!hands_are_free(ch, 1))
         send_to_char("Your hands are already full.\n\r", ch);
 
@@ -1716,17 +1748,24 @@ void wear(struct char_data *ch, struct obj_data *obj_object, int keyword)
 
   case 14:
     if(CAN_WEAR(obj_object, ITEM_HOLD)) {
-      if(ch->equipment[HOLD]) {
-        act("You already holding $p.", ch, ch->equipment[HOLD], 0, TO_CHAR, 0);
-      }
-      else if(!hands_are_free(ch, 1))
+      if(!hands_are_free(ch, 1))
         send_to_char("Your hands are already full.\n\r", ch);
-
+      else if((!hands_are_free(ch, 2)) && 
+             (IS_SET(obj_object->obj_flags.extra_flags, ITEM_TWO_HANDED) && !IS_SET(ch->affected_by2, AFF_POWERWIELD)))
+      {
+	send_to_char("You need both hands for this item.\r\n",ch);
+      }
+      else if (obj_object->obj_flags.extra_flags == ITEM_INSTRUMENT && ((ch->equipment[HOLD] && ch->equipment[HOLD]->obj_flags.type_flag == ITEM_INSTRUMENT) ||	(ch->equipment[HOLD2] && ch->equipment[HOLD2]->obj_flags.type_flag == ITEM_INSTRUMENT)))
+	{
+	  send_to_char("You're busy enough playing the instrument you're already using.\r\n",ch);
+	}
       else {
         send_to_char("OK.\n\r", ch);
         perform_wear(ch,obj_object,keyword);
         obj_from_char(obj_object);
-        equip_char(ch, obj_object, HOLD);
+	if (ch->equipment[HOLD])
+	equip_char(ch, obj_object, HOLD2);
+      else  equip_char(ch, obj_object, HOLD);
       }
     }
     else
@@ -1761,6 +1800,11 @@ void wear(struct char_data *ch, struct obj_data *obj_object, int keyword)
     if(ch->equipment[WEAR_LIGHT]) {
       act("You are already holding $p as a light.", ch, ch->equipment[WEAR_LIGHT], 0, TO_CHAR, 0);
     }
+      else if((!hands_are_free(ch, 2)) && 
+             (IS_SET(obj_object->obj_flags.extra_flags, ITEM_TWO_HANDED) && !IS_SET(ch->affected_by2, AFF_POWERWIELD)))
+      {
+	send_to_char("You need both hands for this light.\r\n",ch);
+      }
     else if(!hands_are_free(ch, 1)) 
       send_to_char("Your hands are already full.\n\r", ch);
     else if(obj_object->obj_flags.type_flag != ITEM_LIGHT)
@@ -1797,22 +1841,22 @@ int keywordfind(struct obj_data *obj_object)
     int keyword;
 
     keyword = -2;
-    if (CAN_WEAR(obj_object,ITEM_WEAR_FINGER)) keyword = 0;
-    if (CAN_WEAR(obj_object,ITEM_WEAR_NECK)) keyword = 1;
-    if (CAN_WEAR(obj_object,ITEM_WEAR_BODY)) keyword = 2;
-    if (CAN_WEAR(obj_object,ITEM_WEAR_HEAD)) keyword = 3;
-    if (CAN_WEAR(obj_object,ITEM_WEAR_LEGS)) keyword = 4;
-    if (CAN_WEAR(obj_object,ITEM_WEAR_FEET)) keyword = 5;
-    if (CAN_WEAR(obj_object,ITEM_WEAR_HANDS)) keyword = 6;
-    if (CAN_WEAR(obj_object,ITEM_WEAR_ARMS)) keyword = 7;
-    if (CAN_WEAR(obj_object,ITEM_WEAR_ABOUT)) keyword = 8;
-    if (CAN_WEAR(obj_object,ITEM_WEAR_WAISTE)) keyword = 9;
-    if (CAN_WEAR(obj_object,ITEM_WEAR_WRIST)) keyword = 10;
-    if (CAN_WEAR(obj_object,ITEM_WEAR_FACE)) keyword = 11;
-    if (CAN_WEAR(obj_object,ITEM_WIELD)) keyword = 12;
-    if (CAN_WEAR(obj_object,ITEM_WEAR_SHIELD)) keyword = 13;
-    if (CAN_WEAR(obj_object,ITEM_HOLD)) keyword = 14;
-    if (CAN_WEAR(obj_object,ITEM_WEAR_EAR)) keyword = 15;
+    if (CAN_WEAR(obj_object,ITEM_WEAR_FINGER))      keyword = 0;
+    else if (CAN_WEAR(obj_object,ITEM_WEAR_NECK))   keyword = 1;
+    else if (CAN_WEAR(obj_object,ITEM_WEAR_BODY))   keyword = 2;
+    else if (CAN_WEAR(obj_object,ITEM_WEAR_HEAD))   keyword = 3;
+    else if (CAN_WEAR(obj_object,ITEM_WEAR_LEGS))   keyword = 4;
+    else if (CAN_WEAR(obj_object,ITEM_WEAR_FEET))   keyword = 5;
+    else if (CAN_WEAR(obj_object,ITEM_WEAR_HANDS))  keyword = 6;
+    else if (CAN_WEAR(obj_object,ITEM_WEAR_ARMS))   keyword = 7;
+    else if (CAN_WEAR(obj_object,ITEM_WEAR_ABOUT))  keyword = 8;
+    else if (CAN_WEAR(obj_object,ITEM_WEAR_WAISTE)) keyword = 9;
+    else if (CAN_WEAR(obj_object,ITEM_WEAR_WRIST))  keyword = 10;
+    else if (CAN_WEAR(obj_object,ITEM_WEAR_FACE))   keyword = 11;
+    else if (CAN_WEAR(obj_object,ITEM_WIELD))       keyword = 12;
+    else if (CAN_WEAR(obj_object,ITEM_WEAR_SHIELD)) keyword = 13;
+    else if (CAN_WEAR(obj_object,ITEM_HOLD))        keyword = 14;
+    else if (CAN_WEAR(obj_object,ITEM_WEAR_EAR))    keyword = 15;
     return keyword;
 }
 
@@ -1976,9 +2020,26 @@ int hands_are_free(struct char_data *ch, int number)
 
   if(ch->equipment[WIELD]) hands++;
   if(ch->equipment[SECOND_WIELD]) hands++;
-  if(ch->equipment[WEAR_SHIELD]) hands++;
-  if(ch->equipment[HOLD]) hands++;
-  if(ch->equipment[WEAR_LIGHT]) hands++;
+
+  if(ch->equipment[WEAR_SHIELD]) {
+         if (IS_SET(ch->equipment[WEAR_SHIELD]->obj_flags.extra_flags, ITEM_TWO_HANDED) &&
+		!IS_SET(ch->affected_by2, AFF_POWERWIELD))
+	hands++;
+	hands++;
+  } 
+ if(ch->equipment[HOLD]) {
+         if (IS_SET(ch->equipment[HOLD]->obj_flags.extra_flags, ITEM_TWO_HANDED) &&
+		!IS_SET(ch->affected_by2, AFF_POWERWIELD))
+	hands++;
+  hands++;
+  }
+  if(ch->equipment[WEAR_LIGHT]) { 
+         if (IS_SET(ch->equipment[WEAR_LIGHT]->obj_flags.extra_flags, ITEM_TWO_HANDED) &&
+		!IS_SET(ch->affected_by2, AFF_POWERWIELD))
+	hands++;
+  hands++;
+  }
+  if (ch->equipment[HOLD2]) hands++;
 
        if(number == 1 && hands < 2) return(1);   
   else if(number == 2 && hands < 1) return(1);

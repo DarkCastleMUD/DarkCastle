@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.125 2004/11/16 00:51:34 Zaphod Exp $ */
+/* $Id: const.cpp,v 1.126 2005/04/09 21:15:27 urizen Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -28,6 +28,7 @@ extern "C"
 #include <dmalloc.h>
 #endif
 
+#include <obj.h>
 #include <player.h> // *app_type
 #include <character.h>
 #include <spells.h>
@@ -64,7 +65,37 @@ bestowable_god_commands_type bestowable_god_commands[] =
 {"sqsave",COMMAND_SQSAVE},
 {"whattonerf",COMMAND_WHATTONERF},
 {"find",COMMAND_FIND},
+{"log",COMMAND_LOG},
 { "\n",		-1 }
+};
+
+// WEAR, ITEM_WEAR correspondances
+int wear_corr[] =
+{
+  ITEM_LIGHT_SOURCE, //0
+  ITEM_WEAR_FINGER,
+  ITEM_WEAR_FINGER,
+  ITEM_WEAR_NECK,
+  ITEM_WEAR_NECK,
+  ITEM_WEAR_BODY, // 5
+  ITEM_WEAR_HEAD,
+  ITEM_WEAR_LEGS,
+  ITEM_WEAR_FEET,
+  ITEM_WEAR_HANDS, 
+  ITEM_WEAR_ARMS, // 10
+  ITEM_WEAR_SHIELD,
+  ITEM_WEAR_ABOUT,
+  ITEM_WEAR_WAISTE,
+  ITEM_WEAR_WRIST,
+  ITEM_WEAR_WRIST, //15
+  ITEM_WIELD,
+  ITEM_WIELD,
+  ITEM_HOLD,
+  ITEM_HOLD,
+  ITEM_WEAR_FACE,//20
+  ITEM_WEAR_EAR, 
+  ITEM_WEAR_EAR,
+  0
 };
 
 // Obj proc types
@@ -86,14 +117,14 @@ char *obj_types[] = {
 char *spell_wear_off_msg[] =
 {
   "RESERVED DB.C",                                             /* 0 */
-  "You feel less protected.",
+  "Your magical armour fades to nothing.",
   "!Teleport!",
-  "You feel less righteous.",
-  "You feel a cloak of blindness dissolve.",
+  "Your blessing has expired.",
+  "Your blinding affliction dissolves.",
   "!Burning Hands!",                                           /* 5 */
   "!Call Lightning",
-  "You feel more self-confident.",
-  "A warmth returns to your bones dispelling the deep chill.",
+  "You feel the affects of the charm end.",
+  "A warmth returns to your bones, dispelling the deep $B$3chill$R.",
   "!Clone!",
   "!Color Spray!",                                             /* 10 */
   "!Control Weather!",
@@ -102,11 +133,11 @@ char *spell_wear_off_msg[] =
   "!Cure Blind!",
   "!Cure Critic!",                                             /* 15 */
   "!Cure Light!",
-  "You feel better.",
-  "You sense the red in your vision disappear.",
-  "The detect invisible wears off.",
-  "The detect magic wears off.",                               /* 20 */
-  "The detect poison wears off.",
+  "The curse upon you has ended.",
+  "Your ability to sense evil has expired.",
+  "Your ability to detect invisibility has expired.",
+  "Your ability to detect magic has expired.",                               /* 20 */
+  "Your ability to detect poison has expired.",
   "!Dispel Evil!",
   "!Earthquake!",
   "!Enchant Weapon!",
@@ -114,17 +145,17 @@ char *spell_wear_off_msg[] =
   "!Fireball!",
   "!Harm!",
   "!Heal",
-  "You feel yourself exposed.",
+  "You feel your invisibility dissapate.",
   "!Lightning Bolt!",                                          /* 30 */
   "!Locate object!",
   "!Magic Missile!",
-  "You feel less sick.",
+  "The $2poison$R in your blood has dissolved.",
   "You feel your moral vulnerability.",
   "!Remove Curse!",                                            /* 35 */
-  "The white aura around your body fades.",
+  "The $B$7white aura$R around your body fades.",
   "!Shocking Grasp!",
-  "You feel less tired.",
-  "You feel weaker.",
+  "You feel less exhausted as the magical sleep expires.",
+  "Your magically enhanced strength has worn off.",
   "!Summon!",                                                  /* 40 */
   "!Ventriloquate!",
   "!Word of Recall!",
@@ -132,18 +163,18 @@ char *spell_wear_off_msg[] =
   "You feel less aware of your surroundings.",
   "!Call Familiar!",                                         /* 45 */
   "!Lighted Path!",
-  "The green in your skin fades.",
+  "The $2green$R in your skin fades.",
   "!Sun ray!",
-  "Your body's healing process slows down to normal.",
-  "The shield of $B$2acid$R around you dissapates into the air.", /* 50 */
-  "The gills fade from your neck.",
+  "Your body's healing process slows to normal.",
+  "The shield of $2acid$R around you dissapates into the air.", /* 50 */
+  "The gills on your neck shrink to nothing.",
   "!Globe Of Darkness!",
   "!Identify!",
   "!Animate Dead!",
-  "You are not as fearful now.",                               /* 55 */
+  "!Fear!.",                                                   /* 55 */
   "You slowly float to the ground.",
   "Your light slowly fizzes into nothing.",
-  "You can no longer see into a person's aura.",
+  "You can no longer sense the auras of others.",
   "!Dispel Magic!",
   "!Conjure Elemental!",                                       /* 60 */
   "!Cure Serious!",
@@ -153,29 +184,29 @@ char *spell_wear_off_msg[] =
   "!Flamestrike!",                                             /* 65 */
   "Your skin does not feel as hard as it used to.",
   "Your force shield shimmers then fades away.",
-  "You feel stronger.",
+  "You feel your strength return as the magical weakness fades.",
   "!Mass Invisibility!",  /* Uses the invisibility message */
   "!Acid Blast!",                                              /* 70 */
   "!Gate!",
   "You can no longer see in the dark.",
-  "You feel better now.",
+  "You feel your endurance restored.",
   "You don't feel as fast anymore.",
-  "!Dispel Good!", /* 75 */
+  "!Dispel Good!",                                             /* 75 */
   "!Hellstream!",
   "!Power Heal!",
   "!Full Heal!",
   "!Firestorm!",
-  "!Power Harm!",             /* 80  */
-  "You can no longer see the good in a person.",
+  "!Power Harm!",                                              /* 80  */
+  "Your ability to sense good has expired.",
   "!Vampiric Touch!",
   "!Life Leech!",
-  "You can move again.",
+  "The paralysis fades and you can move again.",
   "!Remove Paralysis!", /* 85 */
-  "The flames surrounding you fade away.",
+  "The $B$4flames$R surrounding you fade away.",
   "!Meteor Swarm!",
   "!Wizard's Eye!",
   "You don't seem to be able to see everything as clearly anymore.",
-  "!Mana!", /* 90 */
+  "!Mana!",                                                    /* 90 */
   "!Solar Gate!",
   "!Heroes Feast!",
   "!Heal Spray!",
@@ -183,30 +214,30 @@ char *spell_wear_off_msg[] =
   "!Group Recall!",
   "!Group Fly!",
   "!Enchant Armor!",
-  "The red in your skin fades.",
-  "The blue in your skin fades.", /* 99 */
+  "The $4red$R in your skin fades.",
+  "The $3blue$R in your skin fades.",                          /* 99 */
   "!Bee Sting!",
   "!Bee Swarm!",
   "!Creeping Death!",
-  "Your skin returns to its normal consistency.",
+  "You feel less woody as your skin returns to its normal consistency.",
   "!Herb Lore!",
   "!Call Follower!",
   "!Entangle!",
   "Your vision is not so acute anymore.",
-  "You no longer feel like a giant pussy.",
+  "You no longer feel like such a big pussy.",
   "The forest kicks you out!",
   "!Companion!",	/* 110 */
   "!Drown!",
   "!Howl!",
   "!Souldrain!",
   "!Sparks!",     // 114
-  "Your $2c$7a$0$Bmo$Ru$2fl$7a$0$Bg$R$2u$7e$R has worn off.",
+  "Your $2c$7a$0$Bmo$Ru$2fl$7a$0$Bg$R$7e$R has worn off.",
   "!FarSight!",
   "!FreeFloat!",
   "!Insomnia!",
   "!ShadowSlip!",
-  "The yellow in your skin fades.",  // 120
-  "!StaunchBlood!",
+  "The $5yellow$R in your skin fades.",  // 120
+  "You no longer feel immune to the affects of poisons.",
   "!CreateGolem!",  // 122
   "!Reflect!",
   "!DispelMinor!",
@@ -218,18 +249,26 @@ char *spell_wear_off_msg[] =
   "!Eyes of the Eagle!",
   "!Haste Other!",
   "!Ice Shards!",  
-  "The lightning around you fades away leaving only static cling.",
+  "The $B$5lightning$R around you fades away leaving only static cling.",
   "!Blue bird!",
   "With a rush of strength, the $6debility$R fades from your body.",
   "Your rapid decay ends and your health returns to normal.",
-  "The shadow in your aura fades away into the ethereal.",
+  "The $B$0shadow$R in your aura fades away into the ethereal.",
   "Your serene aura of holiness fades.",
   "!DismissFamiliar!",
   "!DismissCorpse!",
   "Your blessed halo fades.",
-  "You don't feel quite so angry anymore.",
-  "The foul mantle surrounding you dissipates.",
-  "Your Oaken Fortitude fades.",
+  "You don't feel quite so hateful anymore.",
+  "The foul mantle surrounding you dissipates to nothing.",
+  "Your oaken fortitude fades, returning your constitution to normal.",
+  "The $B$2icy$R shield of frost around you fades away.",
+  "Your ability to stand firm ends as the magical stability fades.",
+  "You are no longer flagged as a thief.",
+  "You are no longer CANTQUIT flagged.",
+  "You are again susceptible to magical transport as your solidity fades.",
+  "You feel more susceptable to damage.",
+  "!ALIGN_GOOD!",
+  "!ALIGN_EVIL!",
   "!UNUSED!"
 };
 
@@ -296,7 +335,7 @@ char *connected_states[] =
 int movement_loss[]=
 {
     1,  /* Inside     */
-    2,  /* City       */
+    1,  /* City       */
     2,  /* Field      */
     3,  /* Forest     */
     4,  /* Hills      */
@@ -387,6 +426,7 @@ char *where[] =
     "<around wrist>  ",
     "<wielded>       ",
     "<second wield>  ",
+    "<held>          ",
     "<held>          ",
     "<on face>       ",
     "<in left ear>   ",
@@ -707,7 +747,7 @@ char *room_bits[] =
     "indoors",
     "teleport_block",
     "noki",
-    "unused",
+    "nolearn",
     "no_magic",
     "tunnel",
     "private",
@@ -1005,6 +1045,24 @@ char *pc_clss_types2[] =
     "Necromancer",
     "\n"
 };
+char *pc_clss_types3[] =
+{
+    "UNDEFINED",
+    "mage",
+    "cleric",
+    "rogue",
+    "warrior",
+    "anti-paladin",
+    "paladin",
+    "barbarian",
+    "monk",
+    "ranger",
+    "bard",
+    "druid",
+    "psionic",
+    "necromancer",
+    "\n"
+};
 
 
 
@@ -1061,8 +1119,7 @@ struct class_skill_defines w_skills[] = { // warrior skills
 {    "bash",            SKILL_BASH,               2,    80,     {STR,CON} },
 {    "redirect",        SKILL_REDIRECT,           4,    90,     {INT,CON} },
 {    "rescue",          SKILL_RESCUE,             5,    70,     {WIS,INT} },
-{    "double",          SKILL_SECOND_ATTACK,      7,    90,     
-{STR,DEX} },
+{    "double",          SKILL_SECOND_ATTACK,      7,    90,     {STR,DEX} },
 {    "disarm",          SKILL_DISARM,             10,   70,     {DEX,WIS} },
 {    "headbutt",        SKILL_SHOCK,              12,   55,     {CON,WIS} },
 {    "shield block",    SKILL_SHIELDBLOCK,        15,   85,     {STR,DEX} },
@@ -1070,8 +1127,7 @@ struct class_skill_defines w_skills[] = { // warrior skills
 {    "frenzy",          SKILL_FRENZY,             18,   80,     {CON,INT} },
 {    "parry",           SKILL_PARRY,              20,   90,     {DEX,WIS} },
 {    "blindfighting",   SKILL_BLINDFIGHTING,      21,   80,     {INT,DEX} },
-{    "triple",          SKILL_THIRD_ATTACK,       23,   90,     {STR,DEX} 
-},
+{    "triple",          SKILL_THIRD_ATTACK,       23,   90,     {STR,DEX} },
 {    "hitall",          SKILL_HITALL,             25,   80,     {STR,CON} },
 {    "dual wield",      SKILL_DUAL_WIELD,         28,   90,     {DEX,CON} },
 {    "bludgeoning",     SKILL_BLUDGEON_WEAPONS,   30,   90,     {STR,DEX} },
@@ -1081,12 +1137,10 @@ struct class_skill_defines w_skills[] = { // warrior skills
 {    "whipping",        SKILL_WHIPPING_WEAPONS,   30,   90,     {DEX,STR} },
 {    "tactics",         SKILL_TACTICS,            31,   98,     {INT,WIS} },
 {    "archery",         SKILL_ARCHERY,            32,   55,     {DEX,WIS} },
-{    "stun",            SKILL_STUN,               35,   75,     {DEX,STR} },
+{    "stun",            SKILL_STUN,               35,   75,     {DEX,INT} },
 {    "guard",           SKILL_GUARD,              37,   98,     {STR,WIS} },
 {    "deathstroke",     SKILL_DEATHSTROKE,        39,   98,     {STR,INT} },
 {    "riposte",         SKILL_RIPOSTE,            40,   98,     {INT,DEX} },
-//{    "dodge",           SKILL_DODGE,              42,   55,     
-//{DEX,INT} },
 {    "two handers",     SKILL_TWO_HANDED_WEAPONS, 42,   85,     {STR,CON} },
 {    "skewer",          SKILL_SKEWER,             45,   98,     {STR,CON} },
 {    "blade shield",    SKILL_BLADESHIELD,        47,   98,     {CON,DEX} },
@@ -1120,7 +1174,7 @@ struct class_skill_defines t_skills[] = { // thief skills
 {    "deceit",          SKILL_DECEIT,           31,     98,   {WIS,INT} },  
 {    "circle",          SKILL_CIRCLE,           35,     98,   {STR,DEX} },  
 {    "disarm",          SKILL_DISARM,           38,     85,   {DEX,WIS} },  
-{    "dualbackstab",    SKILL_DUAL_BACKSTAB,    40,     98,   {DEX,INT} },  
+{    "dual backstab",   SKILL_DUAL_BACKSTAB,    40,     98,   {DEX,INT} },  
 {    "eyegouge",        SKILL_EYEGOUGE,         42,     98,   {STR,CON} },  
 {    "vitalstrike",     SKILL_VITAL_STRIKE,     45,     98,   {CON,DEX} },  
 //{  "diguise",         SKILL_DISGUISE          50,     98,   {0,0} },
@@ -1163,9 +1217,9 @@ struct class_skill_defines a_skills[] = { // anti-paladin skills
 {    "fear",                 SPELL_FEAR,              37,     90,     {WIS,INT} },
 {    "dispel good",          SPELL_DISPEL_GOOD,       38,     90,     {WIS,STR} },
 {    "acid shield",          SPELL_ACID_SHIELD,       40,     98,     {INT,STR} },
-{    "curse",                SPELL_CURSE,             41,     70,     {WIS,CON} },
+{    "curse",                SPELL_CURSE,             41,     70,     {WIS,INT} },
 {    "firestorm",            SPELL_FIRESTORM,         42,     85,     {INT,STR} },
-{    "stoneskin",           SPELL_STONE_SKIN,        44,     85,     {STR,CON} },
+{    "stoneskin",            SPELL_STONE_SKIN,        44,     85,     {STR,CON} },
 {    "protection from good", SPELL_PROTECT_FROM_GOOD, 45,     90,     {WIS,DEX} },
 {    "acid blast",           SPELL_ACID_BLAST,        48,     98,     {STR,INT} },
 {    "vampiric aura",        SPELL_VAMPIRIC_AURA,     50,     98,     {INT,CON} },
@@ -1180,8 +1234,7 @@ struct class_skill_defines p_skills[] = { // paladin skills
 {    "layhands",             SKILL_LAY_HANDS,          1,      98,     {CON,WIS} },
 {    "kick",                 SKILL_KICK,               2,      70,     {DEX,STR} },
 {    "bless",                SPELL_BLESS,              3,      90,     {WIS,CON} },
-{    "double",               SKILL_SECOND_ATTACK,      5,      85,     
-{STR,DEX} },
+{    "double",               SKILL_SECOND_ATTACK,      5,      85,     {STR,DEX} },
 {    "shield block",         SKILL_SHIELDBLOCK,        7,      90,     {STR,DEX} },
 {    "rescue",               SKILL_RESCUE,             8,      85,     {WIS,INT} },
 {    "cure light",           SPELL_CURE_LIGHT,         9,      85,     {WIS,INT} },
@@ -1203,9 +1256,8 @@ struct class_skill_defines p_skills[] = { // paladin skills
 {    "slashing",             SKILL_SLASHING_WEAPONS,   30,     85,     {DEX,STR} },
 {    "crushing",             SKILL_CRUSHING_WEAPONS,   30,     85,     {STR,DEX} },
 {    "blessed halo",         SPELL_BLESSED_HALO,       31,     98,     {WIS,INT} },
-{    "triple",               SKILL_THIRD_ATTACK,       33,     80,     
-{STR,DEX} },
-{    "two handers",          SKILL_TWO_HANDED_WEAPONS, 35,     85,     {STR,CON} },
+{    "triple",               SKILL_THIRD_ATTACK,       33,     80,     {STR,DEX} },
+{    "two handers",          SKILL_TWO_HANDED_WEAPONS, 35,     75,     {STR,CON} },
 {    "heal",                 SPELL_HEAL,               37,     85,     {WIS,INT} },
 {    "harm",                 SPELL_HARM,               38,     85,     {WIS,CON} },
 {    "sanctuary",            SPELL_SANCTUARY,          40,     90,     {WIS,INT} },
@@ -1227,7 +1279,7 @@ struct class_skill_defines b_skills[] = { // barbarian skills
 {    "kick",            SKILL_KICK,               3,    80,  {DEX,STR} },
 {    "parry",           SKILL_PARRY,              5,    70,  {DEX,WIS} },
 {    "double",          SKILL_SECOND_ATTACK,      8,    85,  {STR,DEX} },
-{    "shield block",    SKILL_SHIELDBLOCK,        10,   70,  {STR,DEX} },
+{    "dodge",           SKILL_DODGE,  	          10,   70,  {DEX,INT} },
 {    "blood fury",      SKILL_BLOOD_FURY,         12,   98,  {CON,WIS} },
 {    "crazedassault",   SKILL_CRAZED_ASSAULT,     15,   98,  {WIS,STR} },
 {    "frenzy",          SKILL_FRENZY,             18,   90,  {CON,INT} },
@@ -1261,7 +1313,7 @@ struct class_skill_defines k_skills[] = { // monk skills
 {    "redirect",        SKILL_REDIRECT,         3,      85,     {INT,CON} },
 {    "trip",            SKILL_TRIP,             5,      70,     {DEX,STR} },
 {    "purify",          KI_PURIFY+KI_OFFSET,    8,      98,     {CON,WIS} },
-{    "shield block",    SKILL_SHIELDBLOCK,      10,     80,     {STR,DEX} }, //aaa
+{    "martial defense", SKILL_DEFENSE,          10,     80,     {STR,DEX} },
 {    "rescue",          SKILL_RESCUE,           12,     75,     {WIS,INT} },
 {    "punch",           KI_PUNCH+KI_OFFSET,     15,     98,     {STR,DEX} },
 {    "eagleclaw",       SKILL_EAGLE_CLAW,       17,     98,     {STR,DEX} },
@@ -1272,7 +1324,7 @@ struct class_skill_defines k_skills[] = { // monk skills
 {    "whipping",        SKILL_WHIPPING_WEAPONS, 30,     60,     {DEX,STR} },
 {    "hand to hand",    SKILL_HAND_TO_HAND,     30,     98,     {DEX,STR} },
 {    "agility",         KI_AGILITY+KI_OFFSET,   31,     98,     {DEX,CON} },
-{    "stun",            SKILL_STUN,             33,     90,     {DEX,STR} },
+{    "stun",            SKILL_STUN,             33,     90,     {DEX,INT} },
 {    "storm",           KI_STORM+KI_OFFSET,     35,     98,     {CON,WIS} },
 {    "blindfighting",   SKILL_BLINDFIGHTING,    38,     85,     {INT,DEX} },
 {    "quiver",          SKILL_QUIVERING_PALM,   40,     98,     {STR,INT} },
@@ -1295,8 +1347,7 @@ struct class_skill_defines r_skills[] = { // ranger skills
 {    "eyes of the owl", SPELL_EYES_OF_THE_OWL,   8,      90,     {INT,DEX} },
 {    "shield block",    SKILL_SHIELDBLOCK,       10,     60,     {STR,DEX} },
 {    "tame",            SKILL_TAME,              11,     98,     {WIS,INT} },
-{    "double",          SKILL_SECOND_ATTACK,     12,     85,     {STR,DEX} 
-},
+{    "double",          SKILL_SECOND_ATTACK,     12,     85,     {STR,DEX} },
 {    "feline agility",  SPELL_FELINE_AGILITY,    14,     98,     {DEX,INT} },
 {    "bee swarm",       SPELL_BEE_SWARM,         15,     98,     {CON,WIS} },
 {    "forage",          SKILL_FORAGE,            16,     90,     {INT,CON} },
@@ -1317,13 +1368,12 @@ struct class_skill_defines r_skills[] = { // ranger skills
 {    "ambush",          SKILL_AMBUSH,            35,     98,     {INT,DEX} },
 //   "fire arrows"      SKILL_FIRE_ARROW         36,     98,     {WIS,DEX} },
 {    "call follower",   SPELL_CALL_FOLLOWER,     38,     98,     {CON,STR} },
-{    "stun",            SKILL_STUN,              40,     70,     {DEX,STR} },
+{    "stun",            SKILL_STUN,              40,     70,     {DEX,INT} },
 //   "stone arrows"     SKILL_STONE_ARROW        41,     98,     {STR,DEX} },
 {    "disarm",          SKILL_DISARM,            42,     70,     {DEX,WIS} },
 {    "forest meld",     SPELL_FOREST_MELD,       45,     90,     {WIS,DEX} },
 {    "camouflage",      SPELL_CAMOUFLAGE,        46,     90,     {INT,DEX} },
 {    "creeping death",  SPELL_CREEPING_DEATH,    48,     98,     {WIS,STR} },
-//{  "frostshield",     SPELL_FROSTSHIELD,       50,     98,     {0,0} },
 {      "\n",            0,                       1,      0,      {0,0} }
 };
 
@@ -1338,8 +1388,8 @@ struct class_skill_defines d_skills[] = { // bard skills
 { "irresistable ditty",    SKILL_SONG_UNRESIST_DITTY,      3,      98,     {DEX,WIS} },
 { "dodge",                 SKILL_DODGE,                    5,      60,     {DEX,INT} },
 { "hide",                  SKILL_HIDE,                     7,      70,     {INT,WIS} },
-{ "travelling march",       SKILL_SONG_TRAVELING_MARCH,     9,      98,     {DEX,CON} },
-{ "trip",            SKILL_TRIP,               10,     70,     {DEX,STR} },
+{ "travelling march",      SKILL_SONG_TRAVELING_MARCH,     9,      98,     {DEX,CON} },
+{ "trip",                  SKILL_TRIP,                     10,     70,     {DEX,STR} },
 { "bountiful sonnet",      SKILL_SONG_BOUNT_SONNET,        12,     98,     {CON,WIS} },
 { "healing melody",        SKILL_SONG_HEALING_MELODY,      13,     98,     {WIS,CON} },
 { "glitter dust",          SKILL_SONG_GLITTER_DUST,        15,     98,     {INT,DEX} },
@@ -1347,10 +1397,9 @@ struct class_skill_defines d_skills[] = { // bard skills
 { "sticky lullaby",        SKILL_SONG_STICKY_LULL,         18,     98,     {STR,WIS} },
 { "flight of the bumblebee", SKILL_SONG_FLIGHT_OF_BEE,     20,     98,     {DEX,INT} },
 { "note of knowledge",     SKILL_SONG_NOTE_OF_KNOWLEDGE,   21,     98,     {INT,WIS} },
-{ "fanatical fanfare",   SKILL_SONG_FANATICAL_FANFARE,         23,     98,     {CON,INT} },
-{ "revealing staccato",     SKILL_SONG_REVEAL_STACATO,      25,     98,     {INT,DEX} },
-{ "double",                SKILL_SECOND_ATTACK,            26,     80,     
-{STR,DEX} },
+{ "fanatical fanfare",     SKILL_SONG_FANATICAL_FANFARE,   23,     98,     {CON,INT} },
+{ "revealing staccato",    SKILL_SONG_REVEAL_STACATO,      25,     98,     {INT,DEX} },
+{ "double",                SKILL_SECOND_ATTACK,            26,     80,     {STR,DEX} },
 { "terrible clef",         SKILL_SONG_TERRIBLE_CLEF,       28,     98,     {INT,STR} },
 { "piercing",              SKILL_PIERCEING_WEAPONS,        30,     70,     {DEX,STR} },
 { "slashing",              SKILL_SLASHING_WEAPONS,         30,     70,     {DEX,STR} },
@@ -1358,16 +1407,16 @@ struct class_skill_defines d_skills[] = { // bard skills
 { "crushing",              SKILL_CRUSHING_WEAPONS,         30,     70,     {STR,DEX} },
 { "soothing rememberance", SKILL_SONG_SOOTHING_REMEM,      31,     98,     {INT,WIS} },
 { "searching song",        SKILL_SONG_SEARCHING_SONG,      32,     98,     {INT,DEX} },
-{ "dischordant dirge",   SKILL_SONG_DISCHORDANT_DIRGE,        34,     98,     {WIS,CON} },
+{ "dischordant dirge",     SKILL_SONG_DISCHORDANT_DIRGE,   34,     98,     {WIS,CON} },
 { "insane chant",          SKILL_SONG_INSANE_CHANT,        35,     98,     {WIS,INT} },
 { "jig of alacrity",       SKILL_SONG_JIG_OF_ALACRITY,     38,     98,     {DEX,CON} },
 { "vigilant siren",        SKILL_SONG_VIGILANT_SIREN,      40,     98,     {INT,CON} },
 { "forgetful rhythm",      SKILL_SONG_FORGETFUL_RHYTHM,    42,     98,     {INT,STR} },
 { "disarming limerick",    SKILL_SONG_DISARMING_LIMERICK,  43,     98,     {CON,INT} },
 { "astral chanty",         SKILL_SONG_ASTRAL_CHANTY,       45,     98,     {STR,DEX} },
-{ "crushing crescendo", SKILL_SONG_CRUSHING_CRESCENDO,      46,     98,     {CON,STR} },
+{ "crushing crescendo",    SKILL_SONG_CRUSHING_CRESCENDO,  46,     98,     {CON,STR} },
 { "shattering resonance",  SKILL_SONG_SHATTERING_RESO,     48,     98,     {STR,CON} },
-{ "hypnotic harmony",    SKILL_SONG_HYPNOTIC_HARMONY,         50,     98,{WIS,INT} },
+{ "hypnotic harmony",      SKILL_SONG_HYPNOTIC_HARMONY,    50,     98,     {WIS,INT} },
 { "\n",                    0,                              1,      0,      {0,0} }
 };
 
@@ -1390,10 +1439,10 @@ struct class_skill_defines u_skills[] = { // druid skills
 {    "oaken fortitude",      SPELL_OAKEN_FORTITUDE,      15,     98,     {CON,STR} },
 {    "water breathing",      SPELL_WATER_BREATHING,      17,     98,     {DEX,INT} },
 {    "resist acid",          SPELL_RESIST_ACID,          18,     98,     {CON,WIS} },
-{    "stoneshield",         SPELL_STONE_SHIELD,         20,     98,     {STR,WIS} },
+{    "stoneshield",          SPELL_STONE_SHIELD,         20,     98,     {STR,WIS} },
 {    "poison",               SPELL_POISON,               21,     90,     {CON,WIS} },
 {    "cure critic",          SPELL_CURE_CRITIC,          23,     85,     {WIS,INT} },
-{    "call familiar",      SPELL_SUMMON_FAMILIAR,      25,     90,     {INT,STR} },
+{    "call familiar",        SPELL_SUMMON_FAMILIAR,      25,     90,     {INT,STR} },
 {    "dismiss familiar",     SPELL_DISMISS_FAMILIAR,     26,     90,     {WIS,CON} },  
 {    "debility",             SPELL_DEBILITY,             27,     98,     {DEX,CON} },  
 {    "drown",                SPELL_DROWN,                28,     98,     {INT,CON} },  
@@ -1404,8 +1453,8 @@ struct class_skill_defines u_skills[] = { // druid skills
 {    "rapid mend",           SPELL_RAPID_MEND,           31,     98,     {WIS,INT} },  
 {    "herb lore",            SPELL_HERB_LORE,            32,     90,     {INT,WIS} },
 {    "lighted path",         SPELL_LIGHTED_PATH,         33,     98,     {WIS,DEX} },
-{    "curse",                SPELL_CURSE,                34,     90,     {WIS,CON} },
-{    "sun ray",              SPELL_SUN_RAY,              35,     98,     {INT,WIS} },
+{    "curse",                SPELL_CURSE,                34,     90,     {WIS,INT} },
+{    "sun ray",              SPELL_SUN_RAY,              35,     98,     {INT,CON} },
 {    "control weather",      SPELL_CONTROL_WEATHER,      36,     90,     {CON,WIS} },
 {    "barkskin",             SPELL_BARKSKIN,             37,     85,     {CON,DEX} },
 {    "iron roots",           SPELL_IRON_ROOTS,           38,     98,     {STR,DEX} },
@@ -1413,10 +1462,10 @@ struct class_skill_defines u_skills[] = { // druid skills
 {    "lightning shield",     SPELL_LIGHTNING_SHIELD,     41,     98,     {WIS,INT} },
 {    "blindness",            SPELL_BLINDNESS,            42,     98,     {CON,WIS} },  
 {    "forage",               SKILL_FORAGE,               43,     90,     {INT,CON} },  
-{    "stoneskin",           SPELL_STONE_SKIN,           44,     70,     {STR,CON} },  
+{    "stoneskin",            SPELL_STONE_SKIN,           44,     70,     {STR,CON} },  
 {    "power heal",           SPELL_POWER_HEAL,           45,     98,     {WIS,STR} },  
 {    "forest meld",          SPELL_FOREST_MELD,          46,     90,     {WIS,DEX} },  
-{    "greater stoneshield", SPELL_GREATER_STONE_SHIELD, 47,     98,     {STR,WIS} },  
+{    "greater stoneshield",  SPELL_GREATER_STONE_SHIELD, 47,     98,     {STR,WIS} },  
 {    "colour spray",         SPELL_COLOUR_SPRAY,         48,     98,     {WIS,INT} },  
 {    "summon",               SPELL_SUMMON,               49,     98,     {INT,STR} },  
 //{ "conjure elemental",     SPELL_CONJURE_ELEMENTAL,    50,     98,     {0,0} },
@@ -1434,6 +1483,7 @@ struct class_skill_defines c_skills[] = { // cleric skills
 {    "armor",                SPELL_ARMOR,             3,      90,     {STR,INT} },     
 {    "continual light",      SPELL_CONT_LIGHT,        4,      85,     {INT,WIS} },     
 {    "detect poison",        SPELL_DETECT_POISON,     5,      90,     {INT,WIS} },     
+{    "know alignment",       SPELL_KNOW_ALIGNMENT,    5,      90,     {WIS,INT} },
 {    "detect magic",         SPELL_DETECT_MAGIC,      6,      85,     {INT,WIS} },     
 {    "refresh",              SPELL_REFRESH,           7,      85,     {DEX,CON} },     
 {    "bless",                SPELL_BLESS,             8,      90,     {WIS,CON} },
@@ -1450,7 +1500,6 @@ struct class_skill_defines c_skills[] = { // cleric skills
 {    "sanctuary",            SPELL_SANCTUARY,         18,     90,     {WIS,INT} },     
 {    "remove curse",         SPELL_REMOVE_CURSE,      19,     98,     {INT,WIS} },     
 {    "cure critical",        SPELL_CURE_CRITIC,       20,     90,     {WIS,INT} },     
-//{    "shield block",         SKILL_SHIELDBLOCK,      20,     35,     {STR,DEX} },
 {    "cause critical",       SPELL_CAUSE_CRITICAL,    21,     98,     {STR,WIS} },     
 {    "remove paralysis",     SPELL_REMOVE_PARALYSIS,  22,     98,     {INT,DEX} },     
 {    "locate object",        SPELL_LOCATE_OBJECT,     23,     80,     {INT,WIS} },     
@@ -1503,11 +1552,11 @@ struct class_skill_defines m_skills[] = { // mage skills
 {    "infravision",         SPELL_INFRAVISION,       11,     90,     {INT,DEX} },
 {    "fly",                 SPELL_FLY,               12,     98,     {DEX,CON} },
 {    "strength",            SPELL_STRENGTH,          13,     85,     {STR,CON} },
-{    "know alignment",      SPELL_KNOW_ALIGNMENT,    14,     98,     {INT,WIS} },
+{    "know alignment",      SPELL_KNOW_ALIGNMENT,    14,     90,     {WIS,INT} },
 {    "fear",                SPELL_FEAR,              15,     90,     {WIS,INT} },
 {    "identify",            SPELL_IDENTIFY,          16,     98,     {INT,WIS} }, 
 {    "locate object",       SPELL_LOCATE_OBJECT,     17,     90,     {INT,WIS} }, 
-{    "call familiar",     SPELL_SUMMON_FAMILIAR,   18,     90,     {INT,STR} }, 
+{    "call familiar",       SPELL_SUMMON_FAMILIAR,   18,     90,     {INT,STR} }, 
 {    "dismiss familiar",    SPELL_DISMISS_FAMILIAR,  18,     90,     {WIS,CON} }, 
 {    "chill touch",         SPELL_CHILL_TOUCH,       20,     90,     {CON,WIS} }, 
 {    "shield",              SPELL_SHIELD,            21,     98,     {WIS,STR} }, 
@@ -1528,7 +1577,7 @@ struct class_skill_defines m_skills[] = { // mage skills
 {    "resist fire",         SPELL_RESIST_FIRE,       36,     70,     {INT,CON} }, 
 {    "wizard eye",          SPELL_WIZARD_EYE,        37,     98,     {INT,WIS} }, 
 {    "teleport",            SPELL_TELEPORT,          38,     98,     {CON,INT} }, 
-{    "stoneskin",          SPELL_STONE_SKIN,        39,     70,     {STR,CON} }, 
+{    "stoneskin",           SPELL_STONE_SKIN,        39,     70,     {STR,CON} }, 
 {    "meteor swarm",        SPELL_METEOR_SWARM,      40,     98,     {STR,INT} }, 
 {    "word of recall",      SPELL_WORD_OF_RECALL,    42,     85,     {STR,WIS} }, 
 {    "firestorm",           SPELL_FIRESTORM,         43,     90,     {INT,STR} }, 
@@ -2264,18 +2313,18 @@ struct mob_matrix_data mob_matrix[] =
 /* 61 */{1600000,2600,61,51,-360,110000},
 /* 62 */{1700000,2700,62,52,-270,115000},
 /* 63 */{1800000,2800,63,53,-380,120000},
-/* 64 */{1900000,2900,64,54,-390,130000},
-/* 65 */{2000000,3000,65,55,-400,140000},
-/* 66 */{2100000,3200,66,56,-410,150000},
-/* 67 */{2200000,3400,67,57,-420,175000},
-/* 68 */{2300000,3600,68,58,-430,200000},
-/* 69 */{2400000,3800,69,59,-440,225000},
-/* 70 */{2500000,4000,70,60,-450,250000},
-/* 71 */{2600000,4250,72,62,-460,275000},
-/* 72 */{2700000,4500,72,62,-470,300000},
-/* 73 */{2800000,4750,73,63,-480,325000},
-/* 74 */{2900000,5000,74,64,-490,350000},
-/* 75 */{5000000,6000,75,65,-500,375000},
+/* 64 */{1900000,2900,64,54,-390,125000},
+/* 65 */{2000000,3000,65,55,-400,130000},
+/* 66 */{2100000,3200,66,56,-410,135000},
+/* 67 */{2200000,3400,67,57,-420,140000},
+/* 68 */{2300000,3600,68,58,-430,145000},
+/* 69 */{2400000,3800,69,59,-440,150000},
+/* 70 */{2500000,4000,70,60,-450,155000},
+/* 71 */{2600000,4250,72,62,-460,160000},
+/* 72 */{2700000,4500,72,62,-470,165000},
+/* 73 */{2800000,4750,73,63,-480,170000},
+/* 74 */{2900000,5000,74,64,-490,175000},
+/* 75 */{5000000,6000,75,65,-500,350000},
 /* 76 */{5100000,6250,76,66,-510,400000},
 /* 77 */{5200000,6500,77,67,-520,425000},
 /* 78 */{5300000,6750,78,68,-530,450000},

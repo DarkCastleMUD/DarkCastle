@@ -52,6 +52,7 @@
 extern CWorld world;
 extern struct index_data *mob_index;
 extern struct index_data *obj_index;
+CHAR_DATA *rndm2;
 
 // Global defined here
 
@@ -445,6 +446,32 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
 	}
     }
 
+  if ( !str_cmp( buf, "isworn" ) )
+    {
+	debug_point();
+        OBJ_DATA *o;
+	if (mob->mobdata->last_room > 50000) // an object
+	 o = (OBJ_DATA*) mob->mobdata->last_room;
+      switch ( arg[1] )  /* arg should be "$*" so just get the letter */
+	{
+	case 'z': if (mob->beacon)
+             return is_wearing(((CHAR_DATA*)mob->beacon), o);
+           else return -1;
+	case 'i': return -1;
+	case 'n': if ( actor )
+	             return is_wearing(actor,o);
+	          else return -1;
+	case 't': if ( vict )
+	             return is_wearing(actor,o);
+	          else return -1;
+	case 'r': if ( rndm )
+	             return is_wearing(rndm, o);
+	          else return -1;
+	default:
+	  logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'isworn'", mob_index[mob->mobdata->nr].virt ); 
+	  return -1;
+	}
+    }
   if ( !str_cmp( buf, "isfight" ) )
     {
       switch ( arg[1] )  /* arg should be "$*" so just get the letter */
@@ -1229,7 +1256,6 @@ mob_index[mob->mobdata->nr].virt );
           return -1;
       }
       *buf4pt = '\0';
-      debugpoint();
       if (val[0] == '$' && val[1])
         mprog_translate(val[1], val, mob, actor, obj, vo, rndm);
 	char *getTemp(CHAR_DATA *ch, char *name);
@@ -1637,6 +1663,12 @@ void mprog_translate( char ch, char *t, CHAR_DATA *mob, CHAR_DATA *actor,
      case 'I':
          strcpy( t, mob->short_desc );
       break;
+     case 'x':
+          if (mob->beacon && ((CHAR_DATA*)mob->beacon)->fighting) one_argument(((CHAR_DATA*)mob->beacon)->fighting->name,t);
+	  else
+	  strcpy(t,"error");
+	*t = UPPER(*t);
+	break;
 /*     case 'v':
 	if (mob->tempVariable)
   	  strcpy(t, mob->tempVariable);
@@ -1647,6 +1679,7 @@ void mprog_translate( char ch, char *t, CHAR_DATA *mob, CHAR_DATA *actor,
 	if (actor)
 	  if (actor->tempVariable)
 	  {  strcpy(t,actor->tempVariable); break; }
+	if (t && *t) *t = UPPER(*t);
 	strcpy(t,"error");
 	break;
      case 'w':
@@ -1774,7 +1807,11 @@ void mprog_translate( char ch, char *t, CHAR_DATA *mob, CHAR_DATA *actor,
 	   CAN_SEE( mob, vict ) ? strcpy( t, his_her[ vict->sex ] )
                                 : strcpy( t, "someone's" ); 
 	 break;
-
+     case 'q':
+	char buf[15];
+	sprintf(buf, "%d", mob_index[mob->mobdata->nr].virt);
+	strcpy(t, buf);
+	break;
      case 'j':
 	 strcpy( t, he_she[ mob->sex ] );
 	 break;
@@ -1896,8 +1933,6 @@ int mprog_process_cmnd( char *cmnd, CHAR_DATA *mob, CHAR_DATA *actor,
       str++;
       if (*str == '[') 
       {
-	debugpoint();
-
 	char *tmp1 = &tmp[0];
 	str++;
 	while (*str != ']' && *str!='\0')
@@ -1913,7 +1948,10 @@ int mprog_process_cmnd( char *cmnd, CHAR_DATA *mob, CHAR_DATA *actor,
 	  for (; eh; eh = eh->next)
             if (!str_cmp(tmp, eh->name))
   	      break;
-	 if (eh) strcpy(tmp, eh->data);
+	 if (eh) {
+	strcpy(tmp, eh->data);
+	if (eh->data && *eh->data) *eh->data = UPPER(*eh->data);
+	}
 	 else continue; // Doesn't have the variable.
         }
       }
@@ -1958,20 +1996,32 @@ void mprog_driver ( char *com_list, CHAR_DATA *mob, CHAR_DATA *actor,
 
  if(!com_list) // this can happen when someone is editing
    return;
-
+// int count2 = 0;
  // count valid random victs in room
  for ( vch = world[mob->in_room].people; vch; vch = vch->next_in_room )
-   if ( !IS_NPC( vch )  &&  CAN_SEE( mob, vch ) )
+   if (  CAN_SEE( mob, vch ) )
        count++;
-
+  // else if (CAN_SEE(mob,vch))
+   //    count2++;
+ // count2 += count;
  if(count)
    count = number( 1, count );  // if we have valid victs, choose one
-
+  /*if (count2) count2 = number(1,count2);
+ if (count2)
+  {
+    for (vch = world[mob->in_room].people; vch && count2;)
+    {
+    if (CAN_SEE(mob,vch))
+	count2--;
+	if (count2) vch = vch->next_in_room;
+    }
+    //rndm2 = vch;
+  }*/  
  if(count) 
  {
    for ( vch = world[mob->in_room].people; vch && count; )
    {
-     if ( !IS_NPC( vch )  &&  CAN_SEE( mob, vch ) )
+     if ( CAN_SEE( mob, vch ) )
        count--;
      if (count) vch = vch->next_in_room;
   }
@@ -2388,7 +2438,7 @@ int mprog_speech_trigger( char *txt, CHAR_DATA *mob )
 
 }
 
-int mprog_catch_trigger(char_data * mob, int catch_num, char *var)
+int mprog_catch_trigger(char_data * mob, int catch_num, char *var, int opt)
 {
  MPROG_DATA *mprg;
  MPROG_DATA *next;
@@ -2400,7 +2450,8 @@ int mprog_catch_trigger(char_data * mob, int catch_num, char *var)
      && ( mob_index[mob->mobdata->nr].progtypes & CATCH_PROG ) )
  {
  mprg = mob_index[mob->mobdata->nr].mobprogs;
- if (!mprg) { done = TRUE; mprg = mob_index[mob->mobdata->nr].mobspec; }
+ if (!mprg || opt & 1) { done = TRUE; mprg = mob_index[mob->mobdata->nr].mobspec; }
+
  for ( ; mprg != NULL; mprg = next )
      {
 	next = mprg->next;
@@ -2496,9 +2547,9 @@ void update_mprog_throws()
 
       // if !vict, oh well....remove it anyway.  Someone killed him.
       if(vict)  // activate
-        mprog_catch_trigger(vict, action->data_num, action->var);
+        mprog_catch_trigger(vict, action->data_num, action->var,action->opt);
       else if (vobj)
-	oprog_catch_trigger(vobj, action->data_num, action->var);
+	oprog_catch_trigger(vobj, action->data_num, action->var,action->opt);
       dc_free(action);
    }
 };
@@ -2513,6 +2564,7 @@ CHAR_DATA *initiate_oproc(CHAR_DATA *ch, OBJ_DATA *obj)
   if (ch)    char_to_room(temp, ch->in_room);
   else       char_to_room(temp,obj->in_room);
   if (ch) temp->beacon = (OBJ_DATA*) ch;
+  temp->mobdata->last_room = (int)obj;
 //  temp->master = ch;
  // dc_free(temp->short_desc);
   temp->short_desc = str_hsh(obj->short_description);
@@ -2565,7 +2617,7 @@ int oprog_speech_trigger( char *txt, CHAR_DATA *ch )
      if (obj_index[ch->equipment[i]->item_number].progtypes & SPEECH_PROG)
      {
 	vmob = initiate_oproc(ch, ch->equipment[i]);
-	if (mprog_wordlist_check(txt, vmob,ch,  NULL, NULL, SPEECH_PROG))
+	if (mprog_wordlist_check(txt, vmob, ch,  NULL, NULL, SPEECH_PROG))
         {
  	  end_oproc(vmob);
 	  return mprog_cur_result;
@@ -2576,7 +2628,7 @@ int oprog_speech_trigger( char *txt, CHAR_DATA *ch )
 }
 
 
-int oprog_catch_trigger(obj_data *obj, int catch_num, char *var)
+int oprog_catch_trigger(obj_data *obj, int catch_num, char *var, int opt)
 {
  MPROG_DATA *mprg;
  MPROG_DATA *next;

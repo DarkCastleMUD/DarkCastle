@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: cl_ranger.cpp,v 1.44 2004/11/16 00:51:57 Zaphod Exp $ | cl_ranger.C  *
+ * $Id: cl_ranger.cpp,v 1.45 2005/04/09 21:15:31 urizen Exp $ | cl_ranger.C  *
  * Description: Ranger skills/spells                                          *
  *                                                                            *
  * Revision History                                                           *
@@ -41,6 +41,8 @@ extern int rev_dir[];
 int saves_spell(CHAR_DATA *ch, CHAR_DATA *vict, int spell_base, sh_int save_type);
 bool any_charms(CHAR_DATA *ch);
 void check_eq(CHAR_DATA *ch);
+extern struct index_data *mob_index;
+
 
 int do_tame(CHAR_DATA *ch, char *arg, int cmd)
 {
@@ -382,12 +384,12 @@ int do_track(CHAR_DATA *ch, char *argument, int cmd)
      if (pScent->race >=1 && pScent->race <= 30) 
         sprintf(race, " %s", race_info[pScent->race].singular_name);
      else
-        strcpy(race," of a nondescript race");
+        strcpy(race," non-descript race");
 
     if (number(1, 101) >= (how_deep * 10))
        strcpy(weight,"");
     if (number(1, 101) >= (how_deep * 10))
-       strcpy(race," of a nondescript race");
+       strcpy(race," non-descript race");
     if (number(1, 101) >= (how_deep * 10))
        strcpy(condition,"");
     if (number(1, 101) >= (how_deep * 10))
@@ -416,7 +418,7 @@ int ambush(CHAR_DATA *ch)
   {
      next_i = i->next_in_room;
   
-     if(i == ch || !i->ambush || !CAN_SEE(i, ch))
+     if(i == ch || !i->ambush || !CAN_SEE(i, ch) || i->fighting)
        continue;
 
      if(  GET_POS(i) <= POSITION_RESTING || 
@@ -1149,7 +1151,6 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
     send_to_char("Don't shoot at a poor level 1! :(\r\n", ch);
     return eFAILURE;
   }
-
 /* check if target is fighting */
   if(victim->fighting)
   {
@@ -1179,6 +1180,14 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
      send_to_char("You aren't wearing any quivers with arrows!\r\n", ch);
      return eFAILURE;
    }
+
+  if (IS_NPC(victim) && mob_index[victim->mobdata->nr].virt >= 2300 &&
+        mob_index[victim->mobdata->nr].virt <= 2399)
+  {
+      send_to_char("Your arrow is disintegrated by the fortress' enchantments.\r\n", ch);
+      extract_obj(found);
+      return eFAILURE;
+  }
 
 /* figure out the damage, we'll do more on this later */
 

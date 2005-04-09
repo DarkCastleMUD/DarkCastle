@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.32 2004/11/16 00:51:35 Zaphod Exp $ */
+/* $Id: ki.cpp,v 1.33 2005/04/09 21:15:27 urizen Exp $ */
 
 extern "C"
 {
@@ -41,7 +41,7 @@ void add_memory(CHAR_DATA *ch, char *victim, char type);
 
 struct ki_info_type ki_info [ ] = {
 { /* 0 */
-	12, POSITION_FIGHTING, 10,
+	12, POSITION_FIGHTING, 12,
 	TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, ki_blast,
 	SKILL_INCREASE_HARD
 },
@@ -53,13 +53,13 @@ struct ki_info_type ki_info [ ] = {
 },
 
 { /* 2 */
-	12, POSITION_STANDING, 2,
+	12, POSITION_STANDING, 5,
 	TAR_IGNORE|TAR_CHAR_ROOM|TAR_SELF_ONLY, ki_sense,
 	SKILL_INCREASE_MEDIUM
 },
 
 { /* 3 */
-	12, POSITION_STANDING, 5,
+	12, POSITION_STANDING, 8,
 	TAR_IGNORE, ki_storm, SKILL_INCREASE_HARD
 },
 
@@ -70,7 +70,7 @@ struct ki_info_type ki_info [ ] = {
 },
 
 { /* 5 */
-        12, POSITION_RESTING, 4,
+        12, POSITION_RESTING, 8,
         TAR_IGNORE|TAR_CHAR_ROOM|TAR_SELF_ONLY, ki_purify,
 	SKILL_INCREASE_MEDIUM
 },
@@ -82,7 +82,7 @@ struct ki_info_type ki_info [ ] = {
 },
 
 { /* 7 */
-	12, POSITION_FIGHTING, 10,
+	12, POSITION_FIGHTING, 12,
         TAR_IGNORE, ki_stance, SKILL_INCREASE_EASY
 },
 
@@ -562,15 +562,14 @@ int ki_storm( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
   int retval;
   CHAR_DATA *tmp_victim, *temp;
 
-  dam =  150;//dice(level,3)+level;
-
+  dam = number(135,165);
   send_to_char("Your wholeness of spirit purges the souls of those around you!\n\r", ch);
   act("$n's eyes flash as $e pools the energy within $m!\n\rA burst of energy slams into you!\r\n",
 		ch, 0, 0, TO_ROOM, 0);
-
-  for(tmp_victim = character_list; tmp_victim; tmp_victim = temp)
+  int32 room = ch->in_room;
+  for(tmp_victim = world[ch->in_room].people; tmp_victim; tmp_victim = temp)
   {
-	 temp = tmp_victim->next;
+	 temp = tmp_victim->next_in_room;
 	 if ( (ch->in_room == tmp_victim->in_room) && (ch != tmp_victim) &&
 		(!ARE_GROUPED(ch,tmp_victim))) 
          {
@@ -578,12 +577,22 @@ int ki_storm( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
 		              KI_OFFSET+KI_STORM, 0);
                   if(IS_SET(retval, eCH_DIED))
                     return retval;
-	 } else
-		if (world[ch->in_room].zone == world[tmp_victim->in_room].zone)
-	send_to_char("A crackle of energy echos past you.\n\r", tmp_victim);
+	 } //else
+//		if (world[ch->in_room].zone == world[tmp_victim->in_room].zone)
+//	send_to_char("A crackle of energy echos past you.\n\r", tmp_victim);
   }
-
-  if(number(1,3) == 3) {
+  int dir = number(0,5), distance = number(1,3),i;
+  if (room > 0)
+  for (i=0; i < distance;i++)
+  {
+     if (!IS_EXIT(room, dir) || !IS_OPEN(room, dir))
+       break;
+     room = EXIT_TO(room, dir);
+     if (room < 0) break;
+     for (tmp_victim = world[room].people;tmp_victim;tmp_victim = tmp_victim->next_in_room)
+        send_to_char("A crackle of energy echoes past you.\r\n",tmp_victim);
+  }
+  if(number(1,4) == 4) {
     send_to_char("The flash of energy surges within you!\r\n", ch);
     GET_HIT(ch) += dam;
     if (GET_HIT(ch) > GET_MAX_HIT(ch)) GET_HIT(ch) = GET_MAX_HIT(ch);

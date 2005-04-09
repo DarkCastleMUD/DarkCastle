@@ -20,62 +20,62 @@ int spellcraft(struct char_data *ch, int spell)
 {
   int a = has_skill(ch, SKILL_SPELLCRAFT);
   if (!a) return FALSE;
-  if (has_skill(ch, spell) < 80) return FALSE;
+  if (has_skill(ch, spell) < 70) return FALSE;
   if (spell == SPELL_MAGIC_MISSILE)
   {
-    if (a < 11) skill_increase_check(ch, SKILL_SPELLCRAFT, a, SKILL_INCREASE_MEDIUM);
+    if (a < 11) skill_increase_check(ch, SKILL_SPELLCRAFT, a, SKILL_INCREASE_HARD);
     return eSUCCESS;
   }
   if (spell == SPELL_BURNING_HANDS && a > 10)
   {
-    if (a < 21) skill_increase_check(ch, SKILL_SPELLCRAFT, a,SKILL_INCREASE_MEDIUM);
+    if (a < 21) skill_increase_check(ch, SKILL_SPELLCRAFT, a,SKILL_INCREASE_HARD);
     return eSUCCESS;
   }
   if (spell == SPELL_LIGHTNING_BOLT && a > 20)
   {
     if (a < 31) skill_increase_check(ch, SKILL_SPELLCRAFT, a,
-SKILL_INCREASE_MEDIUM);
+SKILL_INCREASE_HARD);
     return eSUCCESS;
   }
   if (spell == SPELL_CHILL_TOUCH && a > 30)
   {
     if (a < 41) skill_increase_check(ch, SKILL_SPELLCRAFT, a,
-SKILL_INCREASE_MEDIUM);
+SKILL_INCREASE_HARD);
     return eSUCCESS;
   }
   if (spell == SPELL_FIREBALL && a> 40)
   {
     if (a < 51) skill_increase_check(ch, SKILL_SPELLCRAFT, a,
-SKILL_INCREASE_MEDIUM);
+SKILL_INCREASE_HARD);
     return eSUCCESS;
   }
   if (spell == SPELL_METEOR_SWARM && a > 50)
   {
     if (a < 61) skill_increase_check(ch, SKILL_SPELLCRAFT, a,
-SKILL_INCREASE_MEDIUM);
+SKILL_INCREASE_HARD);
     return eSUCCESS;
   }
   if (spell == SPELL_PARALYZE && a > 60)
   {
     if (a < 71) skill_increase_check(ch, SKILL_SPELLCRAFT, a,
-SKILL_INCREASE_MEDIUM);
+SKILL_INCREASE_HARD);
     return eSUCCESS;
   }
   if (spell == SPELL_CREATE_GOLEM && a > 70)
   {
     if (a < 81) skill_increase_check(ch, SKILL_SPELLCRAFT, a,
-SKILL_INCREASE_MEDIUM);
+SKILL_INCREASE_HARD);
     return eSUCCESS;
   }
-  if (spell == SPELL_SOLAR_GATE && a > 80)
+  if (spell == SPELL_SOLAR_GATE && a > 90)
   {
     if (a < 91) skill_increase_check(ch, SKILL_SPELLCRAFT, a,
-SKILL_INCREASE_MEDIUM);
+SKILL_INCREASE_HARD);
     return eSUCCESS;
   }
-  if (spell == SPELL_HELLSTREAM && a > 90)
+  if (spell == SPELL_HELLSTREAM && a > 80)
   {
-    skill_increase_check(ch, SKILL_SPELLCRAFT, a,SKILL_INCREASE_MEDIUM);
+    skill_increase_check(ch, SKILL_SPELLCRAFT, a,SKILL_INCREASE_HARD);
     return eSUCCESS;
   }
   return FALSE;

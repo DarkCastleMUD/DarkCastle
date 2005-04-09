@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: group.cpp,v 1.14 2004/11/16 00:51:34 Zaphod Exp $
+| $Id: group.cpp,v 1.15 2005/04/09 21:15:27 urizen Exp $
 | group.C
 | Description:  Group related commands; join, abandon, follow, etc..
 */
@@ -49,7 +49,7 @@ int do_abandon(CHAR_DATA *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if ( (!ch->master) && (!IS_AFFECTED(ch, AFF_GROUP)) ) {
+  if ( (!ch->master) || (!IS_AFFECTED(ch, AFF_GROUP)) ) {
      send_to_char("Who you gonna abandon?!\n\r",ch);
      return eFAILURE;
   }
@@ -451,7 +451,8 @@ int do_promote(CHAR_DATA *ch, char *argument, int cmd)
        k = f->follower;
        stop_follower(k, CHANGE_LEADER);
        add_follower(k, new_new_leader, 2);
-     }
+     } else
+        REMOVE_BIT(f->follower->affected_by, AFF_GROUP);
   }
 
   add_follower(ch, new_new_leader, 2);

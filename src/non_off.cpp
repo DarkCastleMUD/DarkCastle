@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: non_off.cpp,v 1.20 2004/11/16 00:51:35 Zaphod Exp $
+| $Id: non_off.cpp,v 1.21 2005/04/09 21:15:27 urizen Exp $
 | non_off.C
 | Description:  Implementation of generic, non-offensive commands.
 */
@@ -61,7 +61,7 @@ int do_tap(struct char_data *ch, char *argument, int cmd)
   /* Ok, lets see if it's a corpse on the ground then */
  if(obj == NULL) {
    obj = get_obj_in_list_vis(ch, name, world[ch->in_room].contents);
-   if(obj == NULL || !isname("corpse", obj->name) || isname("pc", obj->name)) {
+   if(obj == NULL || GET_ITEM_TYPE(obj) != ITEM_CONTAINER || !isname("corpse", obj->name) || isname("pc", obj->name)) {
      act("You don't seem to be holding that object.", ch, 0, 0, TO_CHAR, 0);
      return eFAILURE;
    }
@@ -615,8 +615,6 @@ int do_notell_toggle(struct char_data *ch, char *argument, int cmd)
 	send_to_char( "You are no longer able to send or recieve tells.\n\r", ch);
 	SET_BIT(ch->pcdata->toggles, PLR_NOTELL);
     }
-
-    WAIT_STATE(ch, PULSE_VIOLENCE*2); // lag so it's not abused as bad
 
     return eSUCCESS;
 }

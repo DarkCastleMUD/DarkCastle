@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.35 2004/11/16 00:51:35 Zaphod Exp $
+| $Id: move.cpp,v 1.36 2005/04/09 21:15:27 urizen Exp $
 | move.C
 | Movement commands and stuff.
 *************************************************************************
@@ -664,8 +664,8 @@ int attempt_move(CHAR_DATA *ch, int cmd, int is_retreat = 0)
     return return_val; 
   }
 
-  if(ch->followers) {
-    for(k = ch->followers; k; k = next_dude) {
+  if(ch->followers && !IS_SET(ch->combat, COMBAT_FLEEING)) {
+    for(k = ch->followers; k; k = next_dude) { // no following a fler
       next_dude = k->next;
       if((was_in == k->follower->in_room) && 
         ((is_retreat && GET_POS(k->follower) > POSITION_RESTING) || (GET_POS(k->follower) >= POSITION_STANDING))) {

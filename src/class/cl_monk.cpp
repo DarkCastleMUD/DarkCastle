@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_monk.cpp,v 1.21 2004/11/16 00:51:57 Zaphod Exp $
+| $Id: cl_monk.cpp,v 1.22 2005/04/09 21:15:31 urizen Exp $
 | cl_monk.C
 | Description:  Monk skills.
 */
@@ -194,10 +194,11 @@ int do_stun(struct char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
   one_argument(argument, name);
-
-  victim = get_char_room_vis( ch, name );
-  if(victim == NULL )
-    victim = ch->fighting;
+  
+  if (name[0] != '\0')
+    victim = get_char_room_vis( ch, name );
+  else
+     victim = ch->fighting;
 
   if(victim == NULL) { 
     send_to_char( "Stun whom?\n\r", ch );
@@ -223,6 +224,14 @@ int do_stun(struct char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
+  if (IS_SET(victim->combat, COMBAT_BERSERK) && (IS_NPC(victim) || has_skill(victim, SKILL_BERSERK) > 80))
+  {
+     act("In your enraged state, you shake off $n's attempt to immobilize you.", ch, NULL, victim, TO_VICT, 0);
+     act("$N shakes off $n's attempt to immobilize them.",ch, NULL, victim, TO_ROOM, NOTVICT);
+     act("$N shakes off your attempt to immobilize them.",ch, NULL, victim, TO_CHAR, 0);
+     WAIT_STATE(ch, PULSE_VIOLENCE*4);
+	return eSUCCESS;     
+  }
   if(!skill_success(ch,victim, SKILL_STUN) && GET_POS(victim) != POSITION_SLEEPING) {
     act("$n attempts to hit you in your solar plexus!  You block $s attempt.", ch, NULL, victim, TO_VICT , 0);
     act("You attempt to hit $N in $s solar plexus...   YOU MISS!", ch, NULL, victim, TO_CHAR , 0);

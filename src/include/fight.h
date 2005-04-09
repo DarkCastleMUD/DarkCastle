@@ -2,7 +2,7 @@
 #define FIGHT_H_
 
 /************************************************************************
-| $Id: fight.h,v 1.19 2004/11/16 00:52:09 Zaphod Exp $
+| $Id: fight.h,v 1.20 2005/04/09 21:15:35 urizen Exp $
 | fight.h
 | This file defines the header information for fight.
 */
@@ -17,6 +17,7 @@
 
 /* External prototype */
 void special_log(char *arg);
+void debug_point();
 
 /* Here are our function prototypes */
 int  damage(CHAR_DATA *ch, CHAR_DATA *victim, int dam, 
@@ -38,8 +39,7 @@ extern CHAR_DATA *character_list;
 #define COMBAT_MOD_RESIST            1<<1
 #define COMBAT_MOD_SUSCEPT           1<<2
 #define COMBAT_MOD_IGNORE            1<<3
-#define COMBAT_MOD_UNUSED            1<<4
-
+#define COMBAT_MOD_REDUCED            1<<4
 int speciality_bonus(CHAR_DATA *ch, int attacktype);
 void make_husk(CHAR_DATA *ch);
 void make_heart(CHAR_DATA *ch, CHAR_DATA *vict);
@@ -55,15 +55,16 @@ void send_info(char *messg);
 void perform_violence(void);
 void dam_message(int dam, CHAR_DATA *ch, CHAR_DATA *vict, int w_type, long modifier);
 void group_gain(CHAR_DATA *ch, CHAR_DATA *vict);
+int check_magic_block(CHAR_DATA *ch, CHAR_DATA *victim, int attacktype);
 int check_riposte(CHAR_DATA *ch, CHAR_DATA *vict);
-bool check_shieldblock(CHAR_DATA *ch, CHAR_DATA *vict, int attacktype);
+int check_shieldblock(CHAR_DATA *ch, CHAR_DATA *vict, int attacktype);
 bool check_parry(CHAR_DATA *ch, CHAR_DATA *vict, int attacktype);
 bool check_dodge(CHAR_DATA *ch, CHAR_DATA *vict, int attacktype);
 void disarm(CHAR_DATA *ch, CHAR_DATA *vict);
 void trip(CHAR_DATA *ch, CHAR_DATA *vict);
 
 int one_hit(CHAR_DATA*ch, CHAR_DATA *vict, int type, int weapon);
-int do_skewer(CHAR_DATA *ch, CHAR_DATA *vict, int dam, int weapon);
+int do_skewer(CHAR_DATA *ch, CHAR_DATA *vict, int dam, int wt, int wt2, int weapon);
 int do_behead(CHAR_DATA *ch, CHAR_DATA *victim, int dam, int weapon);
 int weapon_spells(CHAR_DATA *ch, CHAR_DATA *vict, int weapon);
 void eq_damage(CHAR_DATA *ch, CHAR_DATA *vict, int dam, int weapon_type, int attacktype);
@@ -119,6 +120,7 @@ void eq_destroyed(char_data * ch, obj_data * obj, int pos);
 #define COMBAT_ORC_BLOODLUST2 1<<17
 #define COMBAT_THI_EYEGOUGE 1<<18
 #define COMBAT_THI_EYEGOUGE2 1<<19
+#define COMBAT_FLEEING 1<<20
 
 #define DAMAGE_TYPE_PHYSICAL  0
 #define DAMAGE_TYPE_MAGIC     1

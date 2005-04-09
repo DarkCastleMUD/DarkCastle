@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.112 2004/11/16 00:51:35 Zaphod Exp $ */
+/* $Id: spells.cpp,v 1.113 2005/04/09 21:15:27 urizen Exp $ */
 
 extern "C"
 {
@@ -68,6 +68,7 @@ int do_fall(CHAR_DATA *ch, short dir);
 void remove_memory(CHAR_DATA *ch, char type);
 void add_memory(CHAR_DATA *ch, char *victim, char type);
 void make_dust(CHAR_DATA * ch);
+extern struct index_data *mob_index;
 
 #if(0)
     byte        beats;                  /* Waiting time after spell     */
@@ -125,13 +126,13 @@ struct spell_info_type spell_info [ ] =
 
  { /* 21 */ 12, POSITION_STANDING,  5, TAR_FIGHT_VICT|TAR_CHAR_ROOM|TAR_OBJ_ROOM|TAR_OBJ_INV|TAR_OBJ_EQUIP, cast_detect_poison, SKILL_INCREASE_EASY },
 
- { /* 22 */ 12, POSITION_FIGHTING, 25, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_dispel_evil, SKILL_INCREASE_MEDIUM },
+ { /* 22 */ 12, POSITION_FIGHTING, 20, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_dispel_evil, SKILL_INCREASE_MEDIUM },
 
  { /* 23 */ 12, POSITION_FIGHTING, 25, TAR_IGNORE, cast_earthquake, SKILL_INCREASE_HARD },
 
  { /* 24 */ 24, POSITION_STANDING, 50, TAR_OBJ_INV|TAR_OBJ_EQUIP, cast_enchant_weapon, SKILL_INCREASE_MEDIUM },
 
- { /* 25 */ 12, POSITION_FIGHTING, 20, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_energy_drain, SKILL_INCREASE_HARD },
+ { /* 25 */ 12, POSITION_FIGHTING, 33, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_energy_drain, SKILL_INCREASE_HARD },
 
  { /* 26 */ 12, POSITION_FIGHTING, 25, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_fireball, SKILL_INCREASE_HARD },
 
@@ -151,13 +152,13 @@ struct spell_info_type spell_info [ ] =
 
  { /* 34 */ 12, POSITION_STANDING, 50, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_protection_from_evil, SKILL_INCREASE_MEDIUM },
 
- { /* 35 */ 12, POSITION_STANDING, 18, TAR_CHAR_ROOM|TAR_OBJ_INV|TAR_OBJ_EQUIP|TAR_OBJ_ROOM, cast_remove_curse, SKILL_INCREASE_MEDIUM },
+ { /* 35 */ 12, POSITION_STANDING, 18, TAR_CHAR_ROOM|TAR_OBJ_INV|TAR_OBJ_EQUIP|TAR_OBJ_ROOM|TAR_SELF_DEFAULT, cast_remove_curse, SKILL_INCREASE_MEDIUM },
 
  { /* 36 */ 12, POSITION_STANDING, 60, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_sanctuary, SKILL_INCREASE_HARD },
 
  { /* 37 */ 12, POSITION_FIGHTING, 15, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_shocking_grasp, SKILL_INCREASE_MEDIUM },
 
- { /* 38 */ 12, POSITION_STANDING, 33, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_sleep, SKILL_INCREASE_HARD },
+ { /* 38 */ 18, POSITION_STANDING, 33, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_sleep, SKILL_INCREASE_HARD },
 
  { /* 39 */ 12, POSITION_STANDING, 20, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_strength, SKILL_INCREASE_MEDIUM },
 
@@ -165,13 +166,13 @@ struct spell_info_type spell_info [ ] =
 
  { /* 41 */ 12, POSITION_FIGHTING,  5, TAR_CHAR_ROOM|TAR_OBJ_ROOM|TAR_SELF_NONO, cast_ventriloquate, SKILL_INCREASE_EASY },
 
- { /* 42 */ 12, POSITION_FIGHTING, 50, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_word_of_recall, SKILL_INCREASE_MEDIUM },
+ { /* 42 */ 12, POSITION_FIGHTING, 40, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_word_of_recall, SKILL_INCREASE_MEDIUM },
 
  { /* 43 */ 12, POSITION_STANDING, 12, TAR_CHAR_ROOM|TAR_OBJ_INV|TAR_OBJ_ROOM|TAR_SELF_DEFAULT, cast_remove_poison, SKILL_INCREASE_MEDIUM },
 
  { /* 44 */ 12, POSITION_STANDING, 15, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_sense_life, SKILL_INCREASE_EASY },
 
- { /* 45 */ 12, POSITION_STANDING, 45, TAR_IGNORE, cast_summon_familiar, SKILL_INCREASE_MEDIUM },
+ { /* 45 */ 18, POSITION_STANDING, 45, TAR_IGNORE, cast_summon_familiar, SKILL_INCREASE_MEDIUM },
 
  { /* 46 */ 12, POSITION_STANDING, 30, TAR_IGNORE, cast_lighted_path, SKILL_INCREASE_HARD },
 
@@ -181,8 +182,7 @@ struct spell_info_type spell_info [ ] =
 
  { /* 49 */ 12, POSITION_STANDING, 30, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_rapid_mend, SKILL_INCREASE_HARD },
 
- { /* 50 */ 18, POSITION_STANDING, 120, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_acid_shield, SKILL_INCREASE_HARD 
-},
+ { /* 50 */ 18, POSITION_STANDING, 120, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_acid_shield, SKILL_INCREASE_HARD },
 
  { /* 51 */ 12, POSITION_STANDING, 22, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_water_breathing, SKILL_INCREASE_EASY },
 
@@ -200,7 +200,7 @@ struct spell_info_type spell_info [ ] =
 
  { /* 58 */ 12, POSITION_STANDING,  5, TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_know_alignment, SKILL_INCREASE_EASY },
 
- { /* 59 */ 12, POSITION_FIGHTING, 28, TAR_CHAR_ROOM|TAR_FIGHT_VICT, cast_dispel_magic, SKILL_INCREASE_HARD },
+ { /* 59 */ 12, POSITION_FIGHTING, 30, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_OBJ_ROOM|TAR_OBJ_INV|TAR_SELF_NONO, cast_dispel_magic, SKILL_INCREASE_HARD },
 
  { /* 60 */ /* 24, POSITION_STANDING, 150, TAR_NONE_OK, cast_conjure_elemental */ 0, 0, 0, 0, 0, 0 },
 
@@ -220,7 +220,7 @@ struct spell_info_type spell_info [ ] =
 
  { /* 68 */ 12, POSITION_FIGHTING, 20, TAR_CHAR_ROOM|TAR_FIGHT_VICT, cast_weaken, SKILL_INCREASE_HARD },
 
- { /* 69 */ 24, POSITION_STANDING, 33, TAR_IGNORE, cast_mass_invis, SKILL_INCREASE_MEDIUM },
+ { /* 69 */ 18, POSITION_STANDING, 33, TAR_IGNORE, cast_mass_invis, SKILL_INCREASE_MEDIUM },
 
  { /* 70 */ 12, POSITION_FIGHTING, 45, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_acid_blast, SKILL_INCREASE_HARD },
 
@@ -232,7 +232,7 @@ struct spell_info_type spell_info [ ] =
 
  { /* 74 */ 12, POSITION_STANDING, 33, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_haste, SKILL_INCREASE_MEDIUM },
 
- { /* 75 */ 12, POSITION_FIGHTING, 25, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_dispel_good, SKILL_INCREASE_MEDIUM },
+ { /* 75 */ 12, POSITION_FIGHTING, 20, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_dispel_good, SKILL_INCREASE_MEDIUM },
 
  { /* 76 */ 12, POSITION_FIGHTING, 80, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_hellstream, SKILL_INCREASE_HARD },
 
@@ -248,7 +248,7 @@ struct spell_info_type spell_info [ ] =
 
  { /* 82 */ 12, POSITION_FIGHTING, 33, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_vampiric_touch, SKILL_INCREASE_HARD },
 
- { /* 83 */ 12, POSITION_FIGHTING, 40, TAR_IGNORE, cast_life_leech, SKILL_INCREASE_MEDIUM },
+ { /* 83 */ 18, POSITION_FIGHTING, 40, TAR_IGNORE, cast_life_leech, SKILL_INCREASE_MEDIUM },
 
  { /* 84 */ 12, POSITION_FIGHTING, 33, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_paralyze, SKILL_INCREASE_HARD },
 
@@ -268,11 +268,11 @@ struct spell_info_type spell_info [ ] =
 
  { /* 92 */ 12, POSITION_STANDING, 30, TAR_IGNORE, cast_heroes_feast, SKILL_INCREASE_EASY },
 
- { /* 93 */ 12, POSITION_STANDING, 100, TAR_IGNORE, cast_heal_spray, SKILL_INCREASE_MEDIUM },
+ { /* 93 */ 12, POSITION_FIGHTING, 100, TAR_IGNORE, cast_heal_spray, SKILL_INCREASE_MEDIUM },
 
  { /* 94 */ 12, POSITION_STANDING, 180, TAR_IGNORE, cast_group_sanc, SKILL_INCREASE_HARD },
 
- { /* 95 */ 12, POSITION_STANDING, 100, TAR_IGNORE, cast_group_recall, SKILL_INCREASE_MEDIUM },
+ { /* 95 */ 12, POSITION_STANDING, 80, TAR_IGNORE, cast_group_recall, SKILL_INCREASE_MEDIUM },
 
  { /* 96 */ 12, POSITION_STANDING, 40, TAR_IGNORE, cast_group_fly, SKILL_INCREASE_MEDIUM },
 
@@ -308,7 +308,7 @@ struct spell_info_type spell_info [ ] =
 
  { /* 112 */ 12, POSITION_FIGHTING, 25, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_howl, 0 },
 
- { /* 113 */ 12, POSITION_FIGHTING, 25, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_souldrain, SKILL_INCREASE_MEDIUM },
+ { /* 113 */ 12, POSITION_FIGHTING, 33, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_souldrain, SKILL_INCREASE_MEDIUM },
 
  { /* 114 */ 12, POSITION_FIGHTING, 18, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_sparks, 0 },
 
@@ -330,7 +330,7 @@ struct spell_info_type spell_info [ ] =
 
  { /* 123 */ 12, POSITION_STANDING, 60, TAR_IGNORE, spell_reflect, SKILL_INCREASE_HARD },
 
- { /* 124 */ 12, POSITION_FIGHTING, 22, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_OBJ_ROOM, cast_dispel_minor, SKILL_INCREASE_MEDIUM },
+ { /* 124 */ 12, POSITION_FIGHTING, 22, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_OBJ_ROOM|TAR_OBJ_INV|TAR_SELF_NONO, cast_dispel_minor, SKILL_INCREASE_MEDIUM },
 
  { /* 125 */ 12, POSITION_STANDING, 25, TAR_IGNORE, spell_release_golem, SKILL_INCREASE_MEDIUM },
 
@@ -358,8 +358,7 @@ struct spell_info_type spell_info [ ] =
 
  { /* 137 */ 18, POSITION_FIGHTING, 120, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_vampiric_aura, SKILL_INCREASE_EASY },
 
- { /* 138 */ 18, POSITION_FIGHTING, 200, TAR_IGNORE, cast_holy_aura, SKILL_INCREASE_EASY 
-},
+ { /* 138 */ 18, POSITION_FIGHTING, 200, TAR_IGNORE, cast_holy_aura, SKILL_INCREASE_EASY },
 
  { /* 139 */ 12, POSITION_STANDING,  5, TAR_IGNORE, cast_dismiss_familiar, SKILL_INCREASE_MEDIUM },
 
@@ -372,6 +371,23 @@ struct spell_info_type spell_info [ ] =
  { /* 143 */ 12, POSITION_STANDING, 50, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_protection_from_good, SKILL_INCREASE_MEDIUM },
 
  { /* 144 */ 12, POSITION_STANDING, 24, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_oaken_fortitude, SKILL_INCREASE_MEDIUM },
+
+ { /* 145 */ 12, POSITION_STANDING, 24, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, NULL, SKILL_INCREASE_MEDIUM },
+
+ { /* 146 */ 12, POSITION_STANDING, 24, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, NULL, SKILL_INCREASE_MEDIUM },
+
+ { /* 147 */ 12, POSITION_STANDING, 24, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, NULL, SKILL_INCREASE_MEDIUM },
+
+ { /* 148*/ 12, POSITION_STANDING, 24, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, NULL, SKILL_INCREASE_MEDIUM },
+
+ { /* 149*/ 12, POSITION_STANDING, 24, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, NULL, SKILL_INCREASE_MEDIUM },
+
+ { /* 150*/ 12, POSITION_STANDING, 24, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, NULL, SKILL_INCREASE_MEDIUM },
+
+ { /* 151*/ 12, POSITION_STANDING, 24, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, NULL, SKILL_INCREASE_MEDIUM },
+
+ { /* 152*/ 12, POSITION_STANDING, 24, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, NULL, SKILL_INCREASE_MEDIUM }
+
 };
 
 
@@ -379,9 +395,9 @@ struct skill_stuff skill_info[] =
 {
 /*  1 */                { "trip", SKILL_INCREASE_MEDIUM },
 /*  2 */               { "dodge", SKILL_INCREASE_HARD },
-/*  3 */       { "double", SKILL_INCREASE_HARD },
+/*  3 */              { "double", SKILL_INCREASE_HARD },
 /*  4 */              { "disarm", SKILL_INCREASE_MEDIUM },
-/*  5 */        { "triple", SKILL_INCREASE_HARD },
+/*  5 */              { "triple", SKILL_INCREASE_HARD },
 /*  6 */               { "parry", SKILL_INCREASE_HARD },
 /*  7 */         { "deathstroke", SKILL_INCREASE_EASY },
 /*  8 */              { "circle", SKILL_INCREASE_MEDIUM },
@@ -448,10 +464,11 @@ struct skill_stuff skill_info[] =
 /* 69 */             { "release", SKILL_INCREASE_EASY },
 /* 70 */           { "fear gaze", 0 },
 /* 71 */            { "eyegouge", SKILL_INCREASE_HARD },
-/* 72 */         { "magic resist", SKILL_INCREASE_HARD },
-/* 73 */         { "ignorethis", 0},
-/* 74 */	{ "spellcraft", SKILL_INCREASE_MEDIUM},
-/*    */ { "\n", 0 },
+/* 72 */        { "magic resist", SKILL_INCREASE_HARD },
+/* 73 */          { "ignorethis", 0},
+/* 74 */	  { "spellcraft", SKILL_INCREASE_HARD},
+/* 75 */     { "martial defense", SKILL_INCREASE_HARD},
+/*    */                  { "\n", 0 },
 };
 
 
@@ -532,6 +549,7 @@ char *skills[]=
   "magic resist",
   "ignorethis",
   "spellcraft",
+  "martial defense",
   "\n"
 };
 
@@ -681,6 +699,12 @@ char *spells[]=
    "visage of hate",
    "protection from good",
    "oaken fortitude",
+   "frostshield",
+   "stability",
+   "killer",
+   "cantquit",
+   "solidity",   
+   "eas",
    "\n"
 };
 
@@ -1150,7 +1174,7 @@ int do_release(CHAR_DATA *ch, char *argument, int cmd)
   bool printed = FALSE;
   argument = skip_spaces(argument);
   extern bool str_prefix(const char *astr, const char *bstr);  
-
+  bool done = FALSE;
   int learned = has_skill(ch,SKILL_RELEASE);
 
   if (!learned)
@@ -1187,13 +1211,6 @@ int do_release(CHAR_DATA *ch, char *argument, int cmd)
 	send_to_char("You don't have enough moves.\r\n",ch);
 	return eFAILURE;
        }
-       if (!skill_success(ch,NULL, SKILL_RELEASE))
-       {
-         send_to_char("You failed to release the spell, and are left momentarily dazed.\r\n",ch);
-         WAIT_STATE(ch,PULSE_VIOLENCE/2);
-	 ch->move -= 10;
-         return eFAILURE;
-       }
 
        for (aff = ch->affected; aff; aff = aff_next)
        {
@@ -1206,16 +1223,28 @@ int do_release(CHAR_DATA *ch, char *argument, int cmd)
           if (!IS_SET(spell_info[aff->type].targets, TAR_SELF_DEFAULT))
             continue;
          if ((aff->type > 0) && (aff->type <= MAX_SPL_LIST))
+	       if (!done && !skill_success(ch,NULL, SKILL_RELEASE))
+       {
+         send_to_char("You failed to release the spell, and are left momentarily dazed.\r\n",ch);
+         WAIT_STATE(ch,PULSE_VIOLENCE/2);
+	 ch->move -= 10;
+         return eFAILURE;
+       }
+	  ch->move -= 25;
+
+	  bool isaff2(int spellnum);
+	if (!done)
+	send_to_char("You release the spell.\r\n",ch);
              if (*spell_wear_off_msg[aff->type]) {
                 send_to_char(spell_wear_off_msg[aff->type], ch);
                 send_to_char("\n\r", ch);
              }
-	  ch->move -= 25;
-bool isaff2(int spellnum);
+
 	  affect_remove(ch,aff,0,isaff2(aff->type));
-          return eSUCCESS;
+	 done = TRUE;
        }
     }
+    if (!done)
     send_to_char("No such spell to release.\r\n",ch);
     return eSUCCESS;
 }
@@ -1237,6 +1266,7 @@ int stat_mod [] = {
 0,0,0,1,1,2,2,3,3,4,4,5,5,6,6,7,
 7,8,9,10
 };
+extern int skillmax(struct char_data *ch, int skill, int eh);
 
 int get_difficulty(int skillnum)
 {
@@ -1346,30 +1376,28 @@ bool skill_success(CHAR_DATA *ch, CHAR_DATA *victim, int skillnum, int mod )
        }
   int i = 0,learned = 0;
 
-  if (!IS_MOB(ch))
-    i = learned = has_skill(ch, skillnum);
-  else
-    i = GET_LEVEL(ch);
+    if (!IS_MOB(ch))      i = learned = has_skill(ch, skillnum);
+    else    		i = GET_LEVEL(ch);
  
-    if (stat && victim) {
-       if (!victim) // Bail, skill would probably crash anyway
-		// 'cause it needs a victim.
-	 return FALSE; 
+    if (stat && victim)
 	i -= stat_mod[get_stat(victim,stat)];
-    }
   i += mod;
   if (i < 40) i = 40;
 
-  if (GET_CLASS(ch) == CLASS_MAGIC_USER || GET_CLASS(ch) == CLASS_ANTI_PAL || 
-GET_CLASS(ch) == CLASS_THIEF)
+  if (GET_CLASS(ch) == CLASS_MAGIC_USER || GET_CLASS(ch) == CLASS_ANTI_PAL 
+	|| GET_CLASS(ch) == CLASS_THIEF )
        i += int_app[GET_INT(ch)].conc_bonus;
   else i += wis_app[GET_WIS(ch)].conc_bonus;
   
-  if (IS_AFFECTED2(ch, AFF_FOCUS) && ((skillnum >= SKILL_SONG_BASE && 
+  i = MIN(95, i);
+  i = skillmax(ch, skillnum, i);
+  if (IS_AFFECTED2(ch, AFF_FOCUS) && 
+((skillnum >= SKILL_SONG_BASE && 
 skillnum <= SKILL_SONG_MAX) || (skillnum >= KI_OFFSET && skillnum <= (KI_OFFSET+MAX_KI_LIST))))
    i = 101; // auto success on songs and ki with focus
 
   int a = get_difficulty(skillnum);
+
   if (i > number(1,101))
   {
     skill_increase_check(ch,skillnum,learned,a+500);
@@ -1499,13 +1527,15 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
       target_ok = FALSE;
       tar_char = 0;
       tar_obj = 0;
-      
+      bool ok_self = FALSE;
       if (spl == SPELL_LIGHTNING_BOLT && has_skill(ch, SKILL_SPELLCRAFT))
       { // Oh the special cases of spellcraft.
-	 if (argument && *argument)
+	 name[0] = '\0';
+         one_argument(argument, name);
+	 if (argument && strlen(argument) > strlen(name))
 	 {
   	  int dir = -1;
-	   *argument = LOWER(*argument);
+	   *argument = LOWER(*(argument + strlen(name) +1));
  	   if(*argument == 'n') dir = 0;
 	   else if(*argument == 'e') dir = 1;
  	   else if (*argument == 's') dir = 2;
@@ -1532,7 +1562,7 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
 	   char_from_room(ch);
 	   if (!char_to_room(ch, new_room)) {
 	     char_to_room(ch, oldroom);
-	    send_to_char("Error code: 57A. Report this to an immortal, along with what you typed.\r\n",ch);
+	    send_to_char("Error code: 57A. Report this to an immortal, along with what you typed and where.\r\n",ch);
 	    return eFAILURE;
 	   }
 	   if (!(tar_char = get_char_room_vis(ch, name)))
@@ -1547,6 +1577,14 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
 		send_to_char("You don't know how.\r\n",ch);
 		return eFAILURE;
            }
+	   if (IS_NPC(tar_char) && mob_index[tar_char->mobdata->nr].virt >= 2300 &&
+		mob_index[tar_char->mobdata->nr].virt <= 2399)
+	   {
+	   
+		tar_char = ch;
+		send_to_char("Your spell bounces off the fortress' enchantments, and the lightning bolt comes flying back towards you!\r\n",ch);
+	 	ok_self = TRUE;
+	   }
 	   target_ok = TRUE;
 	 }
       }
@@ -1650,7 +1688,7 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
         }
         return eFAILURE;
       } else { /* TARGET IS OK */
-        if ((tar_char == ch) && IS_SET(spell_info[spl].targets, TAR_SELF_NONO)) {
+        if ((tar_char == ch) && !ok_self && IS_SET(spell_info[spl].targets, TAR_SELF_NONO)) {
           send_to_char("You can not cast this spell upon yourself.\n\r", ch);
           return eFAILURE;
         }
@@ -1725,7 +1763,7 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
 	  chance += int_app[GET_INT(ch)].conc_bonus;
 	else 
           chance += wis_app[GET_WIS(ch)].conc_bonus;
-	chance = MIN(93, chance);
+	chance = MIN(95, chance);
 
         if(GET_LEVEL(ch) < IMMORTAL && number(1,100) > chance && !IS_AFFECTED2(ch,AFF_FOCUS))
         {
@@ -1764,7 +1802,7 @@ int do_spells(CHAR_DATA *ch, char *argument, int cmd_arg)
 
 // TODO - fix spells command to show a PC his spells data
 // or...if a god, all the spells
-    send_to_char("The spells command is disabled.  Pirahna will fix it later.\n\r", ch);
+    send_to_char("The spells command is currently disabled.\n\r", ch);
     return eSUCCESS;
 
 /*

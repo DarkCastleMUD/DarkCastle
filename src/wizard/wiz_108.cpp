@@ -304,7 +304,7 @@ int do_set(struct char_data *ch, char *argument, int cmd)
             case 6: /* str */
             {
                 value = atoi(buf);
-                if ((value <= 0) || (value > 25))
+                if ((value <= 0) || (value > 30))
                 {
                     send_to_char("Strength must be more than 0\n\r", ch);
                     send_to_char("and less than 26.\n\r", ch);
@@ -323,7 +323,7 @@ int do_set(struct char_data *ch, char *argument, int cmd)
             case 8: /* int */
             {
                 value = atoi(buf);
-                if ((value <= 0) || (value > 25))
+                if ((value <= 0) || (value > 30))
                 {
                     send_to_char("Intelligence must be more than 0\n\r", ch);
                     send_to_char("and less than 26.\n\r", ch);
@@ -339,7 +339,7 @@ int do_set(struct char_data *ch, char *argument, int cmd)
             case 9: /* wis */
             {
                 value = atoi(buf);
-                if ((value <= 0) || (value > 25))
+                if ((value <= 0) || (value > 30))
                 {
                     send_to_char("Wisdom must be more than 0\n\r", ch);
                     send_to_char("and less than 26.\n\r", ch);
@@ -353,7 +353,7 @@ int do_set(struct char_data *ch, char *argument, int cmd)
             case 10: /* dex */
             {
                 value = atoi(buf);
-                if ((value <= 0) || (value > 25))
+                if ((value <= 0) || (value > 30))
                 {
                     send_to_char("Dexterity must be more than 0\n\r", ch);
                     send_to_char("and less than 26.\n\r", ch);
@@ -367,7 +367,7 @@ int do_set(struct char_data *ch, char *argument, int cmd)
             case 11: /* con */
             {
                 value = atoi(buf);
-                if ((value <= 0) || (value > 25))
+                if ((value <= 0) || (value > 30))
                 {
                     send_to_char("Constitution must be more than 0\n\r", ch);
                     send_to_char("and less than 26.\n\r", ch);

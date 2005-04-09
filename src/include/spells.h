@@ -14,7 +14,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.h,v 1.56 2004/11/16 00:52:09 Zaphod Exp $ */
+/* $Id: spells.h,v 1.57 2005/04/09 21:15:35 urizen Exp $ */
 #include <structs.h> // byte, sh_int
 
 #define MAX_BUF_LENGTH               240
@@ -182,7 +182,7 @@ void check_maxes(CHAR_DATA *ch);
 #define SPELL_GREATER_STONE_SHIELD  128
 #define SPELL_IRON_ROOTS            129
 #define SPELL_EYES_OF_THE_EAGLE     130
-#define SPELL_HASTE_OTHER           131 // unused
+#define SPELL_MISANRA_QUIVER           131
 #define SPELL_ICE_SHARDS            132
 #define SPELL_LIGHTNING_SHIELD      133
 #define SPELL_BLUE_BIRD             134
@@ -196,7 +196,15 @@ void check_maxes(CHAR_DATA *ch);
 #define SPELL_VISAGE_OF_HATE        142
 #define SPELL_PROTECT_FROM_GOOD     143
 #define SPELL_OAKEN_FORTITUDE	    144
-#define MAX_SPL_LIST                144
+#define SPELL_FROSTSHIELD	    145
+#define SPELL_STABILITY		    146
+#define SPELL_KILLER 		    147
+#define SPELL_CANTQUIT 		    148
+#define SPELL_SOLIDITY 		    149
+#define SPELL_EAS 		    150
+#define SPELL_ALIGN_GOOD 	    151 // uriel's fire of redemption
+#define SPELL_ALIGN_EVIL 	    152 // Moruk's heart
+#define MAX_SPL_LIST                152
 
 // if you add a spell, make sure you update "spells[]" in spells.C
 
@@ -298,7 +306,8 @@ void check_maxes(CHAR_DATA *ch);
 #define SKILL_MAGIC_RESIST	     371
 #define NEW_SAVE		     372 // Savefix.
 #define SKILL_SPELLCRAFT	     373
-#define SKILL_MAX                    373
+#define SKILL_DEFENSE 		     374 // MArtial defense
+#define SKILL_MAX                    374
 
 // if you add a skill, make sure you update "skills[]" in spells.C
 // as well as SKILL_MAX
@@ -338,20 +347,20 @@ void check_maxes(CHAR_DATA *ch);
 
 // God commands that are "bestow"/"revoke"able
 #define COMMAND_BASE                 600
-#define COMMAND_STRING                 600
+#define COMMAND_STRING               600
 #define COMMAND_IMP_CHAN             601
-#define COMMAND_STAT              602
+#define COMMAND_STAT                 602
 #define COMMAND_SNOOP                603
-#define COMMAND_FIND                  604
+#define COMMAND_FIND                 604
 #define COMMAND_GLOBAL               605
-#define COMMAND_POSSESS          606
+#define COMMAND_POSSESS              606
 #define COMMAND_RESTORE              607
 #define COMMAND_PURLOIN              608
 #define COMMAND_ARENA                609
 #define COMMAND_SET                  610
-#define COMMAND_SQSAVE                611
-#define COMMAND_WHATTONERF                  612
-#define COMMAND_FORCE                 613
+#define COMMAND_SQSAVE               611
+#define COMMAND_WHATTONERF           612
+#define COMMAND_FORCE                613
 #define COMMAND_SEND                 614
 #define COMMAND_LOAD                 615
 #define COMMAND_SHUTDOWN             616
@@ -367,9 +376,10 @@ void check_maxes(CHAR_DATA *ch);
 #define COMMAND_RELOAD 		     626
 #define COMMAND_HEDIT		     627
 #define COMMAND_HINDEX		     628
-#define COMMAND_OPSTAT			629
-#define COMMAND_OPEDIT			630
-#define COMMAND_EQMAX			631
+#define COMMAND_OPSTAT		     629
+#define COMMAND_OPEDIT		     630
+#define COMMAND_EQMAX		     631
+#define COMMAND_LOG 		     632
 // make sure up you update bestowable_god_commands_type bestowable_god_commands[]
 // if you modify this command list any
 
@@ -425,6 +435,7 @@ void check_maxes(CHAR_DATA *ch);
 // If you change this, update strs_damage_types[] in const.cpp
 ////////////////////////////////////////////////////////////////
 
+#define BASE_TIMERS 1100
 
 // NOTE  "skill" numbers 1500-1599 are reserved for innate skill abilities
 // These are in innate.h

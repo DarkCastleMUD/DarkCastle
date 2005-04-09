@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_barbarian.cpp,v 1.25 2004/11/16 00:51:57 Zaphod Exp $
+| $Id: cl_barbarian.cpp,v 1.26 2005/04/09 21:15:31 urizen Exp $
 | cl_barbarian.C
 | Description:  Commands for the barbarian class.
 */
@@ -11,6 +11,7 @@
 #include <utility.h>
 #include <fight.h>
 #include <mobile.h>
+#include <magic.h>
 #include <connect.h>
 #include <handler.h>
 #include <act.h>
@@ -19,6 +20,8 @@
 #include <room.h>
 #include <db.h>
 
+extern struct index_data *obj_index;
+extern bool str_prefix(const char *astr, const char *bstr);
 extern CWorld world;
 int attempt_move(CHAR_DATA *ch, int cmd, int is_retreat = 0);
 
@@ -272,6 +275,16 @@ int do_headbutt(struct char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
+  if (IS_SET(victim->combat, COMBAT_BERSERK) && (IS_NPC(victim) || has_skill(victim, SKILL_BERSERK) > 80))
+  {
+     act("In your enraged state, you shake off $n's attempt to immobilize you.", ch, NULL, victim, TO_VICT, 
+0);
+     act("$N shakes off $n's attempt to immobilize them.",ch, NULL, victim, TO_ROOM, NOTVICT);
+     act("$N shakes off your attempt to immobilize them.",ch, NULL, victim, TO_ROOM, NOTVICT);
+     WAIT_STATE(ch, PULSE_VIOLENCE*4);
+        return eSUCCESS;
+  }
+  
   if (!skill_success(ch,victim,SKILL_SHOCK) ) 
   {
 //    act( "$n tries to headbutt you but fails miserably.", ch, NULL, 
@@ -305,6 +318,16 @@ int do_headbutt(struct char_data *ch, char *argument, int cmd)
     WAIT_STATE(victim, PULSE_VIOLENCE*2);
     SET_BIT(victim->combat, COMBAT_SHOCKED);
     retval = damage (ch, victim, 50, TYPE_HIT, SKILL_SHOCK, 0);
+    if (!SOMEONE_DIED(retval) && !number(0,9) &&
+	  ch->equipment[WEAR_HEAD] && obj_index[ch->equipment[WEAR_HEAD]->item_number].virt == 508)
+    {
+	act("$n's spiked helmet crackles as it strikes $N's face!", ch, NULL, victim, TO_ROOM,NOTVICT);
+	act("$n's spiked helmet crackles as it strikes your face!", ch, NULL, victim, TO_VICT, 0);
+	act("Your spiked helmet crackles as it strikes $N's face!", ch, NULL, victim, TO_CHAR, 0);
+//	retval = damage(ch, victim, 50, TYPE_PIERCE, TYPE_UNDEFINED, 0);
+	retval = spell_shocking_grasp(50,ch,victim,0,60);
+	// TWEAKME
+    }
   }
 
   return retval;
@@ -331,7 +354,7 @@ int do_bloodfury(struct char_data *ch, char *argument, int cmd)
   {
     act("$n starts breathing heavily, then chokes and tries to clear $s head.", ch, NULL, NULL, TO_ROOM, NOTVICT);
     send_to_char("You try to pysch yourself up and choke on the taste of blood.\r\n", ch);
-    duration = 21 - (GET_LEVEL(ch) / 2);
+    duration = 42 - (GET_LEVEL(ch) / 2);
   }
   else 
   {
@@ -436,7 +459,7 @@ int do_bullrush(struct char_data *ch, char *argument, int cmd)
   }
 
   for(int i = 0; i < 6; i++) {
-    if(strstr(dirs[i], name))
+    if(!str_prefix(name,dirs[i]))
     {
       dir = i + 1;
       break;

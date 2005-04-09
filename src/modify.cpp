@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: modify.cpp,v 1.13 2004/11/16 00:51:35 Zaphod Exp $ */
+/* $Id: modify.cpp,v 1.14 2005/04/09 21:15:27 urizen Exp $ */
 
 extern "C"
 {

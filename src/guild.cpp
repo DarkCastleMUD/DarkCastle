@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.73 2004/11/16 00:51:34 Zaphod Exp $
+| $Id: guild.cpp,v 1.74 2005/04/09 21:15:27 urizen Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -145,11 +145,11 @@ int default_master[] = {
    1930,     // CLASS_CLERIC       2   
    1928,     // CLASS_THIEF        3   
    1926,     // CLASS_WARRIOR      4   
-   1920,    // CLASS_ANTI_PAL     5   
-   1935,    // CLASS_PALADIN      6   
-   1922,    // CLASS_BARBARIAN    7   
-   1932,    // CLASS_MONK         8   
-   1924,    // CLASS_RANGER       9   
+   1920,     // CLASS_ANTI_PAL     5   
+   1935,     // CLASS_PALADIN      6   
+   1922,     // CLASS_BARBARIAN    7   
+   1932,     // CLASS_MONK         8   
+   1924,     // CLASS_RANGER       9   
    1939,     // CLASS_BARD        10   
    1941,     // CLASS_DRUID       11
    0,        // CLASS_PSIONIC     12
@@ -191,6 +191,18 @@ char *attrname(int attr)
     case CON: return "Con";
     default: return "Err";
   }
+}
+int skillmax(struct char_data *ch, int skill, int eh)
+{
+  class_skill_defines * skilllist = get_skill_list(ch);
+  if (IS_NPC(ch)) return eh;
+  if(!skilllist)
+    return eh; // scan etc
+  int i = search_skills2(skill, skilllist);
+  if (i==-1) return eh; // imm trying it out, doesn't have the skill
+  if (skilllist[i].maximum < eh)
+	return skilllist[i].maximum;
+  return eh;
 }
 
 int skills_guild(struct char_data *ch, char *arg, struct char_data *owner)
@@ -251,7 +263,10 @@ int skills_guild(struct char_data *ch, char *arg, struct char_data *owner)
     send_to_char("\n\r* denotes a point of specialization.\n\r", ch);
     return eSUCCESS;
   }
-
+  if (GET_POS(ch) == POSITION_SLEEPING) {
+   send_to_char("You can't practice in your sleep.\r\n",ch);
+   return eSUCCESS;
+  }
   skillnumber = search_skills(arg, skilllist);
     
   if (skillnumber == -1) {
@@ -533,6 +548,9 @@ int get_stat(CHAR_DATA *ch, int stat)
 void skill_increase_check(char_data * ch, int skill, int learned, int difficulty)
 {
    int chance, maximum;
+   if (ch->in_room && IS_SET(world[ch->in_room].room_flags, NOLEARN))
+	return;
+
    if (!difficulty) 
    {
      logf(IMMORTAL, LOG_BUG, "Illegal difficulty in skill %d. Tell someone.", skill);

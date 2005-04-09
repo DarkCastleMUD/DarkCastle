@@ -16,7 +16,7 @@
 /* 12/08/2003   Onager   Added chop_half() to work like half_chop() but    */
 /*                       chopping off the last word.                       */
 /***************************************************************************/
-/* $Id: interp.cpp,v 1.58 2004/11/16 00:51:35 Zaphod Exp $ */
+/* $Id: interp.cpp,v 1.59 2005/04/09 21:15:27 urizen Exp $ */
 
 extern "C"
 {
@@ -43,6 +43,7 @@ extern "C"
 #include <db.h>
 #include <act.h>
 #include <returnvals.h>
+#include <terminal.h>
 
 extern bool check_social( CHAR_DATA *ch, char *pcomm,
     int length, char *arg );
@@ -255,7 +256,7 @@ struct command_info cmd_info[] =
     { "climb",      do_climb,       POSITION_STANDING,  0,  60,  COM_CHARMIE_OK },
     { "examine",    do_examine,     POSITION_RESTING,   0,  9,  0 },
     { "follow",     do_follow,      POSITION_RESTING,   0,  9,  0 },
-    { "stalk",      do_stalk,       POSITION_STANDING,  10, 9,  0 },
+    { "stalk",      do_stalk,       POSITION_STANDING,  6, 9,  0 },
     { "group",      do_group,       POSITION_SLEEPING,  0,  9,  0 },
     { "found",      do_found,       POSITION_RESTING,   0,  9,  0 },
     { "disband",    do_disband,     POSITION_RESTING,   0,  9,  0 },
@@ -267,7 +268,7 @@ struct command_info cmd_info[] =
     { "count",      do_count,       POSITION_SLEEPING,  0,  9,  0 },
     { "hide",       do_hide,        POSITION_RESTING,   0,  9,  0 },
     { "leave",      do_leave,       POSITION_STANDING,  0,  187,  COM_CHARMIE_OK },
-    { "name",       do_name,        POSITION_DEAD,      5,  9,  0 },
+    { "name",       do_name,        POSITION_DEAD,      1,  9,  0 },
     { "pick",       do_pick,        POSITION_STANDING,  0,  35,  0 },
     { "qui",        do_qui,         POSITION_DEAD,      0,  9,  0 },
     { "levels",     do_levels,      POSITION_DEAD,      0,  9,  0 },
@@ -299,16 +300,18 @@ struct command_info cmd_info[] =
     /*
      * Special procedure commands.
      */
-    { "meta",       do_not_here,    POSITION_RESTING,   0,  80,  0 },
+//    { "meta",       do_not_here,    POSITION_RESTING,   0,  80,  0 },
     { "design",     do_not_here,    POSITION_STANDING,  0,  62,  0 },
     { "stock",      do_not_here,    POSITION_STANDING,  0,  61,  0 },
     { "buy",        do_not_here,    POSITION_STANDING,  0,  56,  0 },
     { "sell",       do_not_here,    POSITION_STANDING,  0,  57,  0 },
     { "value",      do_not_here,    POSITION_STANDING,  0,  58,  0 },
+
+    { "watch",   do_not_here, POSITION_STANDING, 0, 155, 0},
     { "list",       do_not_here,    POSITION_STANDING,  0,  59,  0 },
     { "repair",     do_not_here,    POSITION_STANDING,  0,  66,  0 },
-    { "practice",   do_practice,    POSITION_RESTING,   1,  164,  0 },
-    { "practise",   do_practice,    POSITION_RESTING,   1,  164,  0 },
+    { "practice",   do_practice,    POSITION_SLEEPING,   1,  164,  0 },
+    { "practise",   do_practice,    POSITION_SLEEPING,   1,  164,  0 },
     { "pray",       do_pray,        POSITION_RESTING,   0,  9,  0 },
     { "promote",    do_promote,     POSITION_STANDING,  1,  9,  0 },
     { "price",      do_not_here,    POSITION_RESTING,   1,  65,  0 },
@@ -328,7 +331,7 @@ struct command_info cmd_info[] =
     { "push",       do_not_here,    POSITION_STANDING, 0, 185,  0 },
     { "pull",       do_not_here,    POSITION_STANDING, 0, 186,  0 },
     { "gaze",       do_not_here,    POSITION_STANDING, 0, 187,  0},
-       
+    { "tremor", do_not_here,     POSITION_FIGHTING, 0, 188, 0},
     /*
      * Immortal commands.
      */
@@ -370,7 +373,7 @@ struct command_info cmd_info[] =
     { "at",         do_at,           POSITION_DEAD,      GIFTED_COMMAND, 9 ,  0}, 
     { "fakelog",    do_fakelog,      POSITION_DEAD,      110, 9,  0 },
     { "global",     do_global,       POSITION_DEAD,      GIFTED_COMMAND, 9,  0 },
-    { "log",        do_log,          POSITION_DEAD,      110, 9,  0 },
+    { "log",        do_log,          POSITION_DEAD,      GIFTED_COMMAND, 9,  0 },
     { "snoop",      do_snoop,        POSITION_DEAD,      GIFTED_COMMAND, 9,  0 },
     { "pview",      do_pview,        POSITION_DEAD,      104, 9,  0 },
     { "/",          do_wiz,          POSITION_DEAD,      GIFTED_COMMAND, 8,  0 },
@@ -458,7 +461,8 @@ struct command_info cmd_info[] =
     { "mpecho",     do_mpecho,      POSITION_DEAD,      0,  9,  0 },
     { "mpechoat",   do_mpechoat,    POSITION_DEAD,      0,  9,  0 },
     { "mpechoaround", do_mpechoaround, POSITION_DEAD,   0,  9,  0 },
-    { "mpkill",     do_mpkill,      POSITION_DEAD,      0,  9,  0 },
+   {"mpechoaroundnotbad",do_mpechoaroundnotbad, POSITION_DEAD, 0, 9, 0},
+     { "mpkill",     do_mpkill,      POSITION_DEAD,      0,  9,  0 },
     { "mpmload",    do_mpmload,     POSITION_DEAD,      0,  9,  0 },
     { "mpoload",    do_mpoload,     POSITION_DEAD,      0,  9,  0 },
     { "mppurge",    do_mppurge,     POSITION_DEAD,      0,  9,  0 },
@@ -613,7 +617,7 @@ int command_interpreter( CHAR_DATA *ch, char *pcomm, bool procced  )
     // Handle logged players.
     if(!IS_NPC(ch) && IS_SET(ch->pcdata->punish, PUNISH_LOG)) {
       sprintf( log_buf, "Log %s: %s", GET_NAME(ch), pcomm );
-      log( log_buf, IMP, LOG_PLAYER );
+      log( log_buf, 108, LOG_PLAYER );
     }
 
     // Implement freeze command.
@@ -726,7 +730,12 @@ int command_interpreter( CHAR_DATA *ch, char *pcomm, bool procced  )
        */
       retval = (*(found->command_pointer))
 	  (ch, &pcomm[look_at], found->command_number);
-  
+	char buf[100];
+
+ // Next bit for the DUI client, they needed it.
+	if (!SOMEONE_DIED(retval)) {
+      sprintf(buf, "%s%s",BOLD,NTEXT);
+       send_to_char(buf,ch); }
       /*
        * This call is here to prevent gcc from tail-chaining the
        * previous call, which screws up the debugger call stack.

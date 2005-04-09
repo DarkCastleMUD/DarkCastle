@@ -869,6 +869,7 @@ act("You resist $n's whistle sharp!",ch,NULL,victim,TO_VICT,0);
    int wait = song_info[ch->song_number].beats - (skill / 10);
    wait = MAX(wait, 2);
 
+   if (level != 51)
    WAIT_STATE(ch, wait);
    return eSUCCESS;
 }
@@ -956,9 +957,11 @@ int execute_song_revealing_stacato( byte level, CHAR_DATA *ch, char *arg, CHAR_D
 
    for (i = world[ch->in_room].people; i; i = i->next_in_room)
    {
-      if(!IS_SET(i->affected_by, AFF_HIDE))
+      if(!IS_SET(i->affected_by, AFF_HIDE) && !IS_SET(i->affected_by2, AFF_FOREST_MELD))
          continue;
       REMOVE_BIT(i->affected_by, AFF_HIDE);
+	affect_from_char(i,AFF_FOREST_MELD);
+//      REMOVE_BIT(i->affected_by2, AFF_FOREST_MELD);
       if(i == ch)
       {
          act("$n continues $s singing...", ch, 0, 0, TO_ROOM, 0);
@@ -1069,7 +1072,7 @@ act("You resist $n's terrible clef!",ch,NULL,victim,TO_VICT,0);
       act(buf2, ch, NULL, NULL, TO_ROOM, NOTVICT);
       if (ispc)
         act("$n's terrible clef has beaten you to a pulp!", ch, NULL, victim, TO_VICT, 0);
-      sprintf(buf2, "The terrible clef has left %s broken, bloody and dead!", buf);
+      sprintf(buf2, "The terrible clef has left %s broken, bloody, and dead!", buf);
       act(buf2, ch, NULL, victim, TO_CHAR, 0);
 
       send_to_char("You dance a small jig on the corpse.\r\n", ch);
@@ -1105,7 +1108,7 @@ int song_listsongs( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int
 
 int song_soothing_remembrance( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
-   send_to_char("You begin to sing a song of remembrance...\n\r", ch);
+   send_to_char("You begin to sing a song of rememberance...\n\r", ch);
    act("$n raises $s voice in a soothing ballad...", ch, 0, 0, TO_ROOM, 0);
    ch->song_timer = song_info[ch->song_number].beats - skill/18;
    return eSUCCESS;
@@ -1668,10 +1671,11 @@ int execute_song_searching_song( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA
 
    if(!target || GET_LEVEL(ch) < GET_LEVEL(target))
    {
-      send_to_char("Your song fades away, it's search unfinished.\r\n", ch);
+      send_to_char("Your song fades away, its search unfinished.\r\n", ch);
       return eFAILURE;
    }
-   if (affected_by_spell(target, SKILL_INNATE_EVASION))
+   if (affected_by_spell(target, SKILL_INNATE_EVASION) 
+		|| IS_SET(world[target->in_room].room_flags, NO_KI))
    {
 	send_to_char("Something blocks your vision.\r\n",ch);
 	return eFAILURE;
@@ -1806,10 +1810,13 @@ int execute_song_fanatical_fanfare(byte level, CHAR_DATA *ch, char *arg, CHAR_DA
      return intrp_song_fanatical_fanfare(level, ch, arg, victim, -1);
    }
 
+   bool ended = FALSE;
    if(GET_KI(ch) < 2) // we don't have the ki to keep the song going
    {
      return intrp_song_fanatical_fanfare(level, ch, arg, victim, -1);
    }
+   if (!skill_success(ch, NULL, SKILL_SONG_FANATICAL_FANFARE))
+	ended = TRUE;
 
    if(ch->master && ch->master->in_room == ch->in_room && 
                     IS_SET(ch->affected_by, AFF_GROUP))
@@ -1824,11 +1831,10 @@ int execute_song_fanatical_fanfare(byte level, CHAR_DATA *ch, char *arg, CHAR_DA
       if(!IS_SET(fvictim->follower->affected_by, AFF_GROUP))
          continue;
 
-      if(ch->in_room != fvictim->follower->in_room)
+      if(ch->in_room != fvictim->follower->in_room || ended)
       {
          if(IS_SET(fvictim->follower->affected_by2, AFF_INSOMNIA) &&
-            !affected_by_spell(fvictim->follower, SPELL_INSOMNIA))
-         {
+            !affected_by_spell(fvictim->follower, SPELL_INSOMNIA))         {
             REMOVE_BIT(fvictim->follower->affected_by2, AFF_INSOMNIA);
             send_to_char("Your mind returns to its normal state.\n\r", fvictim->follower);
          }
@@ -1844,7 +1850,7 @@ int execute_song_fanatical_fanfare(byte level, CHAR_DATA *ch, char *arg, CHAR_DA
    }
 
   //if(ch != master)
-   if(ch->in_room == master->in_room)
+   if(ch->in_room == master->in_room &&!ended) 
    {
       SET_BIT(master->affected_by2, AFF_INSOMNIA);
       send_to_char("Your song causes your mind to race at a thousand miles an hour!\r\n", master);
@@ -1855,13 +1861,13 @@ int execute_song_fanatical_fanfare(byte level, CHAR_DATA *ch, char *arg, CHAR_DA
          !affected_by_spell(master, SPELL_INSOMNIA))
       {
          REMOVE_BIT(master->affected_by2, AFF_INSOMNIA);
-         send_to_char("Your mind returns to its normal state.\n\r", fvictim->follower);
+         send_to_char("Your mind returns to its normal state.\n\r", master);
       }
    }
 
    GET_KI(ch) -= (has_skill(ch,SKILL_SONG_FANATICAL_FANFARE) > 60?1:2);
 
-   if (!skill_success(ch, NULL, SKILL_SONG_FANATICAL_FANFARE))
+   if (ended)
    {
 	send_to_char("You run out of lyrics and end the song.\r\n",ch);
 	return eSUCCESS;
@@ -2028,7 +2034,7 @@ int execute_song_dischordant_dirge( byte level, CHAR_DATA *ch, char *arg, CHAR_D
 
    if(!target || GET_LEVEL(ch) < GET_LEVEL(target))
    {
-      send_to_char("Your dirge fades, it's effect neutralized.\r\n", ch);
+      send_to_char("Your dirge fades, its effect neutralized.\r\n", ch);
       return eFAILURE;
    }
 
@@ -2092,7 +2098,7 @@ int execute_song_dischordant_dirge( byte level, CHAR_DATA *ch, char *arg, CHAR_D
    
    act("$N blinks and shakes its head, clearing its thoughts.",
         ch, 0, target, TO_CHAR, 0);
-   act("$N blinks and shakes its head, clearing its thoughts.\n\r",
+   act("$N blinks and shakes its head, clearing its thoughts.",
           ch, 0, target, TO_ROOM, NOTVICT);
    if (target->fighting)
    {
@@ -2149,7 +2155,7 @@ int execute_song_synchronous_chord( byte level, CHAR_DATA *ch, char *arg, CHAR_D
 
    if(!target || GET_LEVEL(ch) < GET_LEVEL(target))
    {
-      send_to_char("Your song fades away, it's target unknown.\r\n", ch);
+      send_to_char("Your song fades away, its target unknown.\r\n", ch);
       return eFAILURE;
    }
 
@@ -2177,7 +2183,7 @@ int song_sticky_lullaby( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim
    // and B, there's no place to save it before we execute
    ch->song_data = str_dup(arg);
 
-   send_to_char("You begins a slow numbing lullaby...\n\r", ch);
+   send_to_char("You begin a slow numbing lullaby...\n\r", ch);
    act("$n starts a eye-drooping lullaby.", ch, 0, 0, TO_ROOM, 0);
    ch->song_timer = song_info[ch->song_number].beats;
    if(GET_LEVEL(ch) < 40)
@@ -2457,7 +2463,7 @@ int execute_song_crushing_crescendo( byte level, CHAR_DATA *ch, char *arg, CHAR_
       act(buf2, ch, NULL, victim, TO_ROOM, NOTVICT);
 	if (ispc)
       act("$n's song has completely crushed you!", ch, NULL, victim, TO_VICT, 0);
-      sprintf(buf2, "The power of your song has completly crushed %s!", buf);
+      sprintf(buf2, "The power of your song has completely crushed %s!", buf);
       act(buf2, ch, NULL, victim, TO_CHAR, 0);
 
       send_to_char("You dance a small jig on the corpse.\r\n", ch);
@@ -2466,6 +2472,7 @@ int execute_song_crushing_crescendo( byte level, CHAR_DATA *ch, char *arg, CHAR_
 	return retval;
   }
 
+  if (((int)ch->song_data) != 3) {
   if (GET_KI(ch) < song_info[ch->song_number].min_useski)
   {
 	send_to_char("Having run out of ki, your song ends abruptly.\r\n",ch);
@@ -2473,6 +2480,7 @@ int execute_song_crushing_crescendo( byte level, CHAR_DATA *ch, char *arg, CHAR_
 	return eSUCCESS;
   }
   GET_KI(ch) -= song_info[ch->song_number].min_useski;
+  }
   if((int)ch->song_data > has_skill(ch,SKILL_SONG_CRUSHING_CRESCENDO) /20 || (int)ch->song_data > 3) 
   {
       send_to_char("You run out of lyrics and end the song.\r\n", ch);

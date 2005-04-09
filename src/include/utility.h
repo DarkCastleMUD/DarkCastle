@@ -16,7 +16,7 @@
  *  10/21/2003   Onager    Changed IS_ANONYMOUS() to handle mobs without   *
  *                         crashing                                        *
  ***************************************************************************/
-/* $Id: utility.h,v 1.27 2004/11/16 00:52:09 Zaphod Exp $ */
+/* $Id: utility.h,v 1.28 2005/04/09 21:15:35 urizen Exp $ */
 
 #ifndef UTILITY_H_
 #define UTILITY_H_
@@ -296,6 +296,10 @@ inline const short IS_ANONYMOUS(CHAR_DATA *ch)
 #define OBJN(obj, vict) (CAN_SEE_OBJ((vict), (obj)) ? \
     fname((obj)->name) : "something")
 
+#define IS_EXIT(room, door) (world[(room)].dir_option[(door)])
+#define EXIT_TO(room, door) (world[(room)].dir_option[(door)]->to_room)
+#define IS_OPEN(room, door) (!IS_SET(world[(room)].dir_option[(door)]->exit_info, EX_CLOSED))
+
 #define OUTSIDE(ch) (!IS_SET(world[(ch)->in_room].room_flags,INDOORS))
 #define EXIT(ch, door)  (world[(ch)->in_room].dir_option[door])
 #define CAN_GO(ch, door) (EXIT(ch,door) \
@@ -446,10 +450,11 @@ int    mprog_death_trigger     ( CHAR_DATA* mob, CHAR_DATA* killer );
 int     mprog_random_trigger    ( CHAR_DATA* mob );
 int     mprog_arandom_trigger   ( CHAR_DATA *mob);
 int     mprog_speech_trigger    ( char* txt, CHAR_DATA* mob );
-int 	mprog_catch_trigger	(char_data * mob, int catch_num);
+int 	mprog_catch_trigger	(char_data * mob, int catch_num, char 
+*var, int opt);
 int 	mprog_attack_trigger	(char_data * mob, CHAR_DATA* ch);
 int     mprog_load_trigger      (CHAR_DATA *mob);
-int oprog_catch_trigger(obj_data *obj, int catch_num, char *var);
+int oprog_catch_trigger(obj_data *obj, int catch_num, char *var, int opt);
 
 #define MAX_THROW_NAME     60
 #define MPROG_CATCH_MIN    1
@@ -463,7 +468,7 @@ struct mprog_throw_type {
    int delay;                  // how long until the mob gets it
 
    int pitcher;                // vnum of mob that threw the call
-
+   int opt;
    mprog_throw_type * next;
    bool mob;			// Mob or object.
    char *var;			// temporary variable

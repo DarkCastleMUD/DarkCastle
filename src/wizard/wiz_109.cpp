@@ -287,7 +287,7 @@ int do_zap(struct char_data *ch, char *arg, int cmd)
       return eFAILURE;
     }
 
-    if(GET_LEVEL(victim) == IMP && strcmp(GET_NAME(victim),"Apocalypse")) 
+    if(GET_LEVEL(victim) == IMP) 
     { // Hehe..
           send_to_char("Get stuffed.\n\r", ch);
           return eFAILURE;

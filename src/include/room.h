@@ -1,7 +1,7 @@
 #ifndef __ROOM_H__
 #define __ROOM_H__
 /************************************************************************
-| $Id: room.h,v 1.9 2004/11/16 00:52:09 Zaphod Exp $
+| $Id: room.h,v 1.10 2005/04/09 21:15:35 urizen Exp $
 | room.h
 | Description:  This file contains all of the room header file/constant
 |   information.  It also contains information about the 'world' structs.
@@ -21,7 +21,7 @@
 #define INDOORS      1<<3
 #define TELEPORT_BLOCK  1<<4
 #define NO_KI      1<<5
-#define CHAOTIC      1<<6
+#define NOLEARN      1<<6
 #define NO_MAGIC     1<<7
 #define TUNNEL       1<<8
 #define PRIVATE      1<<9

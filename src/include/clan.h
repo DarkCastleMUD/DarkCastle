@@ -2,7 +2,7 @@
 #define CLAN_H_
 
 /************************************************************************
-| $Id: clan.h,v 1.13 2004/11/16 00:52:09 Zaphod Exp $
+| $Id: clan.h,v 1.14 2005/04/09 21:15:35 urizen Exp $
 | clan.h
 | Description:  Header information for clans.
 */

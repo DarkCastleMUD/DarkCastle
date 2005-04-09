@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.70 2004/11/16 00:51:57 Zaphod Exp $
+| $Id: cl_thief.cpp,v 1.71 2005/04/09 21:15:31 urizen Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -79,16 +79,16 @@ int do_eyegouge(CHAR_DATA *ch, char *argument, int cmd)
   argument = one_argument(argument,name);
 
   if(!(victim = get_char_room_vis(ch, name)) && (victim = ch->fighting)==NULL) {
-    send_to_char("There's noone like that here to eyegouge.\n\r", ch);
+    send_to_char("There is no one like that here to gouge.\n\r", ch);
 	    return eFAILURE;
   }
   if (IS_AFFECTED(victim, AFF_BLIND))
   {
-    send_to_char("They're already blinded!\r\n",ch);
+    send_to_char("They are already blinded!\r\n",ch);
     return eFAILURE;
   }
   if(victim == ch) {
-    send_to_char("That sounds... stupid.\n\r", ch);
+    send_to_char("That sounds...stupid.\n\r", ch);
     return eFAILURE;
   }
  if(!can_be_attacked(ch, victim) || !can_attack(ch))
@@ -96,7 +96,7 @@ int do_eyegouge(CHAR_DATA *ch, char *argument, int cmd)
 
   if (!has_skill(ch,SKILL_EYEGOUGE))
   {
-    send_to_char("You would.. if you knew how.\r\n",ch);
+    send_to_char("You would...if you knew how.\r\n",ch);
     return eFAILURE;
   }
   int retval = 0;
@@ -150,7 +150,7 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
   }
 
   if(IS_AFFECTED2(victim, AFF_ALERT)) {
-    send_to_char("They're too alert and nervous looking around.  You can't sneak behind!\r\n", ch);
+    act("$E is too alert and nervous looking and you are unable to sneak behind!", ch,0,victim, TO_CHAR, 0);
     return eFAILURE;
   }
 
@@ -174,12 +174,12 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
   }
 
   if(ch->equipment[WIELD]->obj_flags.value[3] != 11 && ch->equipment[WIELD]->obj_flags.value[3] != 9) {
-    send_to_char("You can't stab without a stabby weapon...\n\r", ch);
+    send_to_char("You can't stab without a stabbing weapon...\n\r", ch);
     return eFAILURE;
   }
 
   if(victim->fighting) {
-    send_to_char("You can't backstab a fighting person, too alert!\n\r", ch);
+    send_to_char("You can't backstab a fighting person, they are too alert!\n\r", ch);
     return eFAILURE;
   }
   
@@ -211,13 +211,13 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
              )
          ) 
   { 
-    act("$N crumples to the ground, $S body still quivering from\n\r"
+    act("$N crumples to the ground, $S body still quivering from "
         "$n's brutal assassination.", ch, 0, victim, TO_ROOM, NOTVICT);
     act("You feel $n's blade slip into your heart, and all goes black.",
         ch, 0, victim, TO_VICT, 0);
-    act("BINGO! You brutally assassinate $N, and $S body crumples\n\r"
+    act("BINGO! You brutally assassinate $N, and $S body crumples "
         "before you.", ch, 0, victim, TO_CHAR, 0);
-    return damage(ch, victim, 9999999, TYPE_UNDEFINED, TYPE_UNDEFINED, 0); 
+    return damage(ch, victim, 9999999, TYPE_UNDEFINED, SKILL_BACKSTAB, 0); 
   }
   else
     retval = attack(ch, victim, SKILL_BACKSTAB, FIRST);
@@ -259,7 +259,7 @@ int do_circle(CHAR_DATA *ch, char *argument, int cmd)
    if(IS_MOB(ch))
      ;
    else if(!has_skill(ch, SKILL_CIRCLE)) {
-     send_to_char("You dunno how to circle!\r\n", ch);
+     send_to_char("You do not know how to circle!\r\n", ch);
      return eFAILURE;
    }
 
@@ -274,12 +274,12 @@ int do_circle(CHAR_DATA *ch, char *argument, int cmd)
    if (ch->fighting)
       victim = ch->fighting;
    else {
-      send_to_char("You have to already be in combat to do this.  Try using 'backstab'.\r\n", ch);
+      send_to_char("You have be in combat to perform this action.  Try using 'backstab' instead.\r\n", ch);
       return eFAILURE;
    }
 
    if (IS_MOB(victim) && IS_SET(victim->mobdata->actflags, ACT_HUGE)) {
-      send_to_char("You can't backstab someone that HUGE!\n\r", ch);
+      send_to_char("You cannot circle behind someone that HUGE!\n\r", ch);
       return eFAILURE;
    }
        
@@ -295,13 +295,13 @@ int do_circle(CHAR_DATA *ch, char *argument, int cmd)
       }
 
    if (!ch->equipment[WIELD]) {
-      send_to_char("You need to wield a weapon, to make it a success.\n\r", ch);
+      send_to_char("You need to wield a weapon to make it a success.\n\r", ch);
       return eFAILURE;
    }
 
    if((ch->equipment[WIELD]->obj_flags.value[3] != 11) &&
      (ch->equipment[WIELD]->obj_flags.value[3] != 9)) {
-        send_to_char("Only piercing weapons can be used for backstabbing.\n\r", ch);
+        send_to_char("Only certain weapons can be used for backstabbing, this isn't one of them.\n\r", ch);
         return eFAILURE;
    }
 
@@ -383,7 +383,7 @@ int do_trip(CHAR_DATA *ch, char *argument, int cmd)
   }
   
   if(victim == ch) {
-    send_to_char("(I could let you trip yourself if I wanted to.)\n\r", ch);
+    send_to_char("(You would look pretty silly trying to trip yourself.)\n\r", ch);
     return eFAILURE;
   }
 
@@ -391,7 +391,7 @@ int do_trip(CHAR_DATA *ch, char *argument, int cmd)
     return eFAILURE;
 
   if(affected_by_spell(victim, SPELL_IRON_ROOTS)) {
-    act("You try to trip $N but tree roots around $S legs keep him upright.", ch, 0, victim, TO_CHAR, 0);
+    act("You try to trip $N but tree roots around $S legs keep $M upright.", ch, 0, victim, TO_CHAR, 0);
     act("$n trips you but the roots around your legs keep you from falling.", ch, 0, victim, TO_VICT, 0);
     act("The tree roots support $N keeping $M from falling after $n's trip.", ch, 0, victim, TO_ROOM, NOTVICT);
     WAIT_STATE(ch, 2 * PULSE_VIOLENCE);
@@ -399,9 +399,9 @@ int do_trip(CHAR_DATA *ch, char *argument, int cmd)
   }
 
   if(!skill_success(ch,victim,SKILL_TRIP)) {
-    act("$n fumbles clumsily as $s attempts to trip you!", ch, NULL, victim, TO_VICT, 0 );
+    act("$n fumbles clumsily as $e attempts to trip you!", ch, NULL, victim, TO_VICT, 0 );
     act("You fumble the trip!", ch, NULL, victim, TO_CHAR , 0);
-    act("$n fumbles as $s tries to trip $N!", ch, NULL, victim, TO_ROOM, NOTVICT );
+    act("$n fumbles as $e tries to trip $N!", ch, NULL, victim, TO_ROOM, NOTVICT );
     WAIT_STATE(ch, PULSE_VIOLENCE*1);
     retval = damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_TRIP, 0);
   }
@@ -491,7 +491,7 @@ int do_stalk(CHAR_DATA *ch, char *argument, int cmd)
   if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
     ;
   else if(!has_skill(ch, SKILL_STALK)) {
-    send_to_char("I bet you think you're a thief ;)\n\r", ch);
+    send_to_char("I bet you think you're a thief. ;)\n\r", ch);
     return eFAILURE;
   } 
 
@@ -553,6 +553,20 @@ int do_hide(CHAR_DATA *ch, char *argument, int cmd)
    return eSUCCESS;
 }
 
+int max_level(CHAR_DATA *ch)
+{
+  int i = 0,lvl = 0;
+  for (; i < MAX_WEAR; i++)
+    if (ch->equipment[i] && (GET_ITEM_TYPE(ch->equipment[i]) == ITEM_ARMOR ||
+GET_ITEM_TYPE(ch->equipment[i]) == ITEM_WEAPON || GET_ITEM_TYPE(ch->equipment[i]) == 
+ITEM_INSTRUMENT ||GET_ITEM_TYPE(ch->equipment[i]) == ITEM_FIREWEAPON ||
+GET_ITEM_TYPE(ch->equipment[i]) == ITEM_LIGHT || GET_ITEM_TYPE(ch->equipment[i]) == ITEM_CONTAINER) && 
+!IS_SET(ch->equipment[i]->obj_flags.extra_flags, ITEM_SPECIAL))
+        lvl = MAX(lvl, ch->equipment[i]->obj_flags.eq_level);
+  if (lvl < 20) lvl = 20;
+  return lvl;
+}
+
 // steal an ITEM... not gold
 int do_steal(CHAR_DATA *ch, char *argument, int cmd)
 {
@@ -572,7 +586,7 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
 
   argument = one_argument(argument, obj_name);
   one_argument(argument, victim_name);
-  if (ch->c_class != CLASS_THIEF)
+  if (ch->c_class != CLASS_THIEF || !has_skill(ch, SKILL_STEAL))
   {
 	send_to_char("You are not experienced within that field.\r\n",ch);
 	return eFAILURE;
@@ -588,12 +602,12 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
     return eFAILURE;
   }
   else if (victim == ch) {
-    send_to_char("Got it!\n\rYou receive 30000000000 exps.\n\r", ch);
+    send_to_char("Got it!\n\rYou receive 30000000000 experience.\n\r", ch);
     return eFAILURE;
   }
 
   if(GET_POS(victim) == POSITION_DEAD) {
-     send_to_char("Don't steal from dead PC's\r\n", ch);
+     send_to_char("Don't steal from dead people!\r\n", ch);
      return eFAILURE;
   }
 
@@ -616,7 +630,7 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
   }
 
   if(IS_AFFECTED(ch, AFF_CHARM)) {
-     return do_say(ch, "Nice try.", 9);
+     return do_say(ch, "Nice try, silly thief.", 9);
   }
 
   if(victim->fighting) {
@@ -626,11 +640,11 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
 
 /*  if(!IS_NPC(victim) &&
     !(victim->desc) && !affected_by_spell(victim, FUCK_PTHIEF) ) {
-    send_to_char("That person isn't really there.\n\r", ch);
+    send_to_char("That person is not really there.\n\r", ch);
     return eFAILURE;
   }*/
 
-  WAIT_STATE(ch, 10); /* It takes TIME to steal */
+  WAIT_STATE(ch, 12); /* It takes TIME to steal */
 
 //  if(GET_POS(victim) <= POSITION_SLEEPING &&
   //   GET_POS(victim) != POSITION_STUNNED)
@@ -648,7 +662,7 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
 	send_to_char("That piece of equipment is protected by the powerful magics of the MUD-school elders.\r\n",ch);
 	return eFAILURE;
     }
-    if (GET_OBJ_WEIGHT(obj) > 40)
+    if (GET_OBJ_WEIGHT(obj) > 50)
     {
 	send_to_char("That item is too heavy to steal.\r\n",ch);
 	return eFAILURE;
@@ -660,13 +674,13 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
     if (!skill_success(ch,victim,SKILL_STEAL)) 
     {
       set_cantquit( ch, victim );
-      send_to_char("Oops..", ch);
+      send_to_char("Oops, that was clumsy...\n\r", ch);
       ohoh = TRUE;
       if(!number(0, 4)) {
         act("$n tried to steal something from you!", ch, 0, victim, TO_VICT, 0);
         act("$n tries to steal something from $N.", ch, 0, victim, TO_ROOM, INVIS_NULL|NOTVICT);
       } else {
-	send_to_char("You managed to keep them unaware of your failed attempt.\r\n",ch);
+	act("You managed to keep $N unaware of your failed attempt.", ch, 0, victim, TO_CHAR, 0);
 	return eFAILURE;
       }
     } 
@@ -686,7 +700,7 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
             _exp = 1;
 
           GET_EXP(ch) += _exp; /* exp for stealing :) */
-          sprintf(buf,"You receive %d exps.\n\r", _exp);
+          sprintf(buf,"You receive %d experience.\n\r", _exp);
           send_to_char("Got it!\n\r", ch);
           send_to_char(buf, ch);
           if(!IS_NPC(victim)) 
@@ -696,7 +710,7 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
             if(!AWAKE(victim))
             {
               if(number(1, 3) == 1)
-                send_to_char("You dream of someone stealing your eq.\r\n", victim);
+                send_to_char("You dream of someone stealing your equipment...\r\n", victim);
               if((paf = affected_by_spell(victim, SPELL_SLEEP)) && paf->modifier == 1)
               {
                 paf->modifier = 0; // make sleep no longer work
@@ -709,7 +723,7 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
               }
             }
             // if victim isn't a pthief
-            if(!affected_by_spell(victim, FUCK_PTHIEF) ) 
+//            if(!affected_by_spell(victim, FUCK_PTHIEF) ) 
             {
               set_cantquit( ch, victim );
               if(affected_by_spell(ch, FUCK_PTHIEF))
@@ -781,6 +795,18 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
 
     if(obj) 
     { // They're wearing it!
+    if (max_level(ch) < obj->obj_flags.eq_level)
+    {
+	send_to_char("You find yourself unable to steal that.\r\n",ch);
+	return eFAILURE;
+    }
+
+    if (GET_OBJ_WEIGHT(obj) > 50)
+    {
+	send_to_char("That item is too heavy to steal.\r\n",ch);
+	return eFAILURE;
+    }
+
      int wakey = 100;
        switch (eq_pos)
 	{
@@ -802,6 +828,7 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
 	  case SECOND_WIELD:
 	  case WEAR_LIGHT:
 	  case HOLD:
+	  case HOLD2:
 	     wakey = 60;
 	     break;
 	  case WEAR_BODY:
@@ -823,7 +850,7 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
       }
       if (!has_skill(ch,SKILL_STEAL))
       {
-	send_to_char("You don't know how.\r\n",ch);
+	send_to_char("You don't know how to steal.\r\n",ch);
 	return eFAILURE;
       }
 
@@ -833,9 +860,20 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
         send_to_char("Steal the equipment now? Impossible!\n\r", ch);
         return eFAILURE;
       }
+      else if (!number(1,4))
+      {
+        act("You remove $p and attempt to steal it.", ch, obj ,0, TO_CHAR, 0);
+	send_to_char("Your victim wakes up before you can complete the theft!\r\n",ch);
+        act("$n tries to steal $p from $N, but fails.",ch,obj,victim,TO_ROOM, NOTVICT);
+        obj_to_char(unequip_char(victim, eq_pos), victim);
+        act("You awake to find $n removing some of your equipment.",ch,obj,victim,TO_VICT, 0);
+	do_save(victim,"",666);
+	set_cantquit(ch,victim);
+
+      }
       else 
       {
-        act("You unequip $p and steal it.", ch, obj ,0, TO_CHAR, 0);
+        act("You remove $p and steal it.", ch, obj ,0, TO_CHAR, 0);
         act("$n steals $p from $N.",ch,obj,victim,TO_ROOM, NOTVICT);
         obj_to_char(unequip_char(victim, eq_pos), ch);
         if(!IS_NPC(victim) || (IS_SET(victim->mobdata->actflags,ACT_NICE_THIEF)))
@@ -846,8 +884,8 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
         GET_EXP(ch) += _exp;                   /* exp for stealing :) */ 
         sprintf(buf,"You receive %d exps.\n\r", _exp);
         send_to_char(buf, ch);
-        sprintf(buf,"%s stole from %s while victim was asleep",
-                GET_NAME(ch), GET_NAME(victim));
+        sprintf(buf,"%s stole %s from %s while victim was asleep",
+                GET_NAME(ch), obj->short_description, GET_NAME(victim));
         log(buf, ANGEL, LOG_MORTAL);
         if(!IS_MOB(victim)) 
         {
@@ -856,7 +894,7 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
           if(!AWAKE(victim))
           {
             if(number(1, 3) == 1)
-              send_to_char("You dream of someone stealing your eq.\r\n", victim);
+              send_to_char("You dream of someone stealing your equipment...\r\n", victim);
             if((paf = affected_by_spell(victim, SPELL_SLEEP)) && paf->modifier == 1)
             {
               paf->modifier = 0; // make sleep no longer work
@@ -864,15 +902,14 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
             // if i'm not a thief, or if I fail dex-roll wake up victim
             if(number(1,101) > wakey)
             {
-              send_to_char("Oops...\r\n", ch);
+              send_to_char("Oops, that was clumsy...\r\n", ch);
               do_wake(ch, GET_NAME(victim), 9);
             }
           }
 
           // You don't get a thief flag from stealing from a pthief
-          if(!affected_by_spell(victim, FUCK_PTHIEF)) 
+//          if(!affected_by_spell(victim, FUCK_PTHIEF)) 
           {
-            set_cantquit( ch, victim );
             if(affected_by_spell(ch, FUCK_PTHIEF))
             {
               affect_from_char(ch, FUCK_PTHIEF);
@@ -889,7 +926,7 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
             ( IS_SET(obj->obj_flags.more_flags, ITEM_UNIQUE) && has_item )
           )
         {
-          send_to_char("Whoa!  If poofed into thin air!\r\n", ch);
+          send_to_char("Whoa! It poofed into thin air!\r\n", ch);
           extract_obj(obj);
         }
         else for(loop_obj = obj->contains; loop_obj; loop_obj = next_obj)
@@ -902,7 +939,7 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
                ( IS_SET(obj->obj_flags.more_flags, ITEM_UNIQUE) && has_item )
              ) 
            {
-              csendf(ch, "Whoa!  The %s inside the %s poofed into thin air!\r\n",
+              csendf(ch, "Whoa! The %s inside the %s poofed into thin air!\r\n",
                          loop_obj->short_description, obj->short_description);
               extract_obj(loop_obj);
            }
@@ -911,7 +948,7 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
     } // if(obj)
     else
     { // they don't got it
-      act("$E has not got that item.",ch,0,victim,TO_CHAR, 0);
+      act("They do not have that item.",ch,0,victim,TO_CHAR, 0);
       return eFAILURE;
     }
   } // of else, not in inventory
@@ -947,7 +984,7 @@ int do_pocket(CHAR_DATA *ch, char *argument, int cmd)
   one_argument(argument, victim_name);
 
   pthiefaf.type = FUCK_PTHIEF;
-  pthiefaf.duration = 20;
+  pthiefaf.duration = 10;
   pthiefaf.modifier = 0;
   pthiefaf.location = APPLY_NONE;
   pthiefaf.bitvector = 0;
@@ -957,12 +994,12 @@ int do_pocket(CHAR_DATA *ch, char *argument, int cmd)
     return eFAILURE;
   }
   else if (victim == ch) {
-    send_to_char("Got it!\n\rYou receive 30000000000 exps.\n\r", ch);
+    send_to_char("Got it!\n\rYou receive 30000000000 experience.\n\r", ch);
     return eFAILURE;
   }
 
   if(GET_POS(victim) == POSITION_DEAD) {
-     send_to_char("Don't steal from dead PC's\r\n", ch);
+     send_to_char("Don't steal from dead people.\r\n", ch);
      return eFAILURE;
   }
 
@@ -996,7 +1033,7 @@ int do_pocket(CHAR_DATA *ch, char *argument, int cmd)
 
   /*if(!IS_NPC(victim) &&
     !(victim->desc) && !affected_by_spell(victim, FUCK_PTHIEF) ) {
-    send_to_char("That person isn't really there.\n\r", ch);
+    send_to_char("That person is not really there.\n\r", ch);
     return eFAILURE;
   }
 */
@@ -1012,13 +1049,13 @@ int do_pocket(CHAR_DATA *ch, char *argument, int cmd)
   if (!skill_success(ch, victim, SKILL_POCKET)) 
   {
     set_cantquit( ch, victim );
-    send_to_char("Oops..\r\n", ch);
+    send_to_char("Oops, that was clumsy...\r\n", ch);
     ohoh = TRUE;
 	    if(!number(0, 6)) {
       act("You discover that $n has $s hands in your wallet.", ch,0,victim,TO_VICT, 0);
       act("$n tries to steal gold from $N.", ch, 0, victim, TO_ROOM, NOTVICT|INVIS_NULL);
     } else {
-      send_to_char("You managed to keep them unaware of your botched attempt.\r\n",ch);
+      act("You manage to keep $N unaware of your botched attempt.", ch, 0, victim, TO_CHAR, 0);
       return eFAILURE;
     }
   } else 
@@ -1036,9 +1073,9 @@ int do_pocket(CHAR_DATA *ch, char *argument, int cmd)
     if(IS_NPC(victim) && IS_SET(victim->mobdata->actflags, ACT_NICE_THIEF)) _exp = 1; 
 
       GET_EXP(ch)      += _exp;
-      sprintf(buf, "Bingo! You got %d gold coins.\n\r", gold);
+      sprintf(buf, "Nice work! You pilfered %d gold coins.\n\r", gold);
       send_to_char(buf, ch);
-      sprintf(buf,"You receive %d exps.\n\r", _exp);
+      sprintf(buf,"You receive %d experience.\n\r", _exp);
       send_to_char(buf, ch);
       if(!IS_NPC(victim)) 
       {
@@ -1104,7 +1141,8 @@ int do_pick(CHAR_DATA *ch, char *argument, int cmd)
   //      has_lockpicks = TRUE;
 
    for (j=0; j<MAX_WEAR; j++)
-     if (ch->equipment[j] && ch->equipment[j]->obj_flags.type_flag == ITEM_LOCKPICK)
+     if (ch->equipment[j] && (ch->equipment[j]->obj_flags.type_flag == ITEM_LOCKPICK
+	|| obj_index[ch->equipment[j]->item_number].virt == 504))
        has_lockpicks = TRUE;
 
    if (!has_lockpicks) {
@@ -1121,13 +1159,13 @@ int do_pick(CHAR_DATA *ch, char *argument, int cmd)
   if (obj->obj_flags.type_flag != ITEM_CONTAINER)
       send_to_char("That's not a container.\n\r", ch);
   else if (!IS_SET(obj->obj_flags.value[1], CONT_CLOSED))
-      send_to_char("Silly - it ain't even closed!\n\r", ch);
+      send_to_char("Silly, it's not even closed!\n\r", ch);
   else if (obj->obj_flags.value[2] < 0)
-      send_to_char("Odd - you can't seem to find a keyhole.\n\r", ch);
+      send_to_char("Odd, you can't seem to find a keyhole.\n\r", ch);
   else if (!IS_SET(obj->obj_flags.value[1], CONT_LOCKED))
-      send_to_char("Oho! This thing is NOT locked!\n\r", ch);
+      send_to_char("Oh-ho! This thing is not even locked!\n\r", ch);
   else if (IS_SET(obj->obj_flags.value[1], CONT_PICKPROOF))
-      send_to_char("It resists your attempts at picking it.\n\r", ch);
+      send_to_char("The lock resists even your best attempts to pick it.\n\r", ch);
   else
   {
    if (!skill_success(ch,NULL,SKILL_PICK_LOCK)) {
@@ -1144,11 +1182,11 @@ int do_pick(CHAR_DATA *ch, char *argument, int cmd)
   if (!IS_SET(EXIT(ch, door)->exit_info, EX_ISDOOR))
       send_to_char("That's absurd.\n\r", ch);
   else if (!IS_SET(EXIT(ch, door)->exit_info, EX_CLOSED))
-      send_to_char("You realize that the door is already open.\n\r", ch);
+      send_to_char("You realize that the door is already open!\n\r", ch);
   else if (EXIT(ch, door)->key < 0)
       send_to_char("You can't seem to spot any lock to pick.\n\r", ch);
   else if (!IS_SET(EXIT(ch, door)->exit_info, EX_LOCKED))
-      send_to_char("Oh.. it wasn't locked at all.\n\r", ch);
+      send_to_char("Oh...it wasn't locked at all.\n\r", ch);
   else if (IS_SET(EXIT(ch, door)->exit_info, EX_PICKPROOF))
       send_to_char("You seem to be unable to pick this lock.\n\r", ch);
   else
@@ -1186,16 +1224,20 @@ int do_slip(struct char_data *ch, char *argument, int cmd)
    struct char_data *vict;
    struct obj_data *obj, *tmp_object, *container;
 
-    if(!IS_MOB(ch) && IS_AFFECTED(ch, AFF_CANTQUIT) && affected_by_spell(ch, FUCK_PTHIEF) ) { 
-      send_to_char("Your criminal acts prohibit it.\n\r", ch);
+    if(!IS_MOB(ch) && affected_by_spell(ch, FUCK_PTHIEF) ) { 
+      send_to_char("Your criminal acts prohibit this action.\n\r", ch);
       return eFAILURE;
     }
-
+   if (!has_skill(ch, SKILL_SLIP))
+   {
+      send_to_char("You don't know how to slip.\r\n",ch);
+      return eFAILURE;
+   }
    argument = one_argument(argument, obj_name);
 
    if (is_number(obj_name)) { 
       if (strlen(obj_name) > 7) {
-         send_to_char("Number field too large.\n\r", ch);
+         send_to_char("Number field too large.  Try something smaller.\n\r", ch);
          return eFAILURE;
          }
    
@@ -1231,9 +1273,9 @@ int do_slip(struct char_data *ch, char *argument, int cmd)
       }    
       // Failure
       if (!skill_success(ch,vict,SKILL_SLIP)) {
-         send_to_char("Whoops!  You dropped them.\n\r", ch);
+         send_to_char("Whoops!  You dropped the coins!\n\r", ch);
          if (GET_LEVEL(ch) >= IMMORTAL) { 
-            sprintf(buf, "%s slips %d coins to %s and fumbles.", GET_NAME(ch),
+            sprintf(buf, "%s tries to slip %d coins to %s and drops them!", GET_NAME(ch),
               amount, GET_NAME(vict));
             special_log(buf);
             }
@@ -1255,7 +1297,7 @@ int do_slip(struct char_data *ch, char *argument, int cmd)
       else {
          send_to_char("Ok.\n\r", ch);
          if (GET_LEVEL(ch) >= IMMORTAL) { 
-            sprintf(buf, "%s gives %d coins to %s", GET_NAME(ch), amount,
+            sprintf(buf, "%s slips %d coins to %s", GET_NAME(ch), amount,
                     GET_NAME(vict));
             special_log(buf);
             } 
@@ -1289,7 +1331,7 @@ int do_slip(struct char_data *ch, char *argument, int cmd)
       }
       
    if (IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL)) {
-      send_to_char("That sure would be a fucking stupid thing to do.\n\r", ch);
+      send_to_char("That sure would be a stupid thing to do.\n\r", ch);
       return eFAILURE;
       }
      
@@ -1308,7 +1350,7 @@ int do_slip(struct char_data *ch, char *argument, int cmd)
 
    if(GET_ITEM_TYPE(obj) == ITEM_CONTAINER)
    {
-     send_to_char("You would ruin it!\n\r", ch);
+     send_to_char("That would ruin it!\n\r", ch);
      return eFAILURE;
    }
 
@@ -1325,11 +1367,11 @@ int do_slip(struct char_data *ch, char *argument, int cmd)
       }
       if((container->obj_flags.weight + obj->obj_flags.weight) >=
           container->obj_flags.value[0]) {
-         send_to_char("It won't fit........cheater.\r\n", ch);
+         send_to_char("It won't fit...cheater.\r\n", ch);
          return eFAILURE;
       }
       if (!skill_success(ch,NULL,SKILL_SLIP)) { // fail
-         act("$n tries to slip $p in $P, but you notice.", ch, obj,
+         act("$n tries to stealthily slip $p in $P, but you notice $s motions.", ch, obj,
              container, TO_ROOM, 0);
       }
       else act("$n slips $p in $P.", ch, obj, container, TO_ROOM, GODS);
@@ -1356,7 +1398,7 @@ int do_slip(struct char_data *ch, char *argument, int cmd)
 
    if(affected_by_spell(ch, FUCK_PTHIEF) && !vict->desc) {
       send_to_char("Now WHY would a thief slip something to a "
-             "linkdead char..?\n\r", ch);
+             "linkdead character?\n\r", ch);
       return eFAILURE;
       }
 
@@ -1424,7 +1466,7 @@ int do_vitalstrike(struct char_data *ch, char *argument, int cmd)
   struct affected_type af;
     
   if(affected_by_spell(ch, SKILL_VITAL_STRIKE) && GET_LEVEL(ch) < IMMORTAL) {
-    send_to_char("Your body is still recovering from your last vital strike technique.\r\n", ch);
+    send_to_char("Your body is still recovering from your last vitalstrike technique.\r\n", ch);
     return eFAILURE;
   }
     
@@ -1445,7 +1487,7 @@ int do_vitalstrike(struct char_data *ch, char *argument, int cmd)
   if(!skill_success(ch,NULL,SKILL_VITAL_STRIKE)) {
     act("$n starts jabbing $s weapons around $mself and almost chops off $s pinkie finger."
          , ch, 0, 0, TO_ROOM, NOTVICT);
-    send_to_char("You try to begin the vital strike technique and slice off your own pinkie finger!\r\n", ch);
+    send_to_char("You try to begin the vital strike technique and nearly slice off your own pinkie finger!\r\n", ch);
   } 
   else {
     act("$n begins jabbing $s weapons with lethal accuracy and strength.", ch, 0, 0, TO_ROOM, NOTVICT);
@@ -1480,18 +1522,18 @@ int do_deceit(struct char_data *ch, char *argument, int cmd)
   if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
     ;
   else if(!has_skill(ch, SKILL_DECEIT)) {
-    send_to_char("You do not yet understand the workings of your marks.\r\n", ch);
+    send_to_char("You do not yet understand enough of the workings of your marks.\r\n", ch);
     return eFAILURE;
   }   
       
   if(!IS_AFFECTED(ch, AFF_GROUP)) {
-    send_to_char("You have no group to instruct.\r\n", ch);
+    send_to_char("You have no group to instruct!\r\n", ch);
     return eFAILURE;
   }   
       
   if (!skill_success(ch,NULL,SKILL_DECEIT)) {
-     send_to_char("Guess your class just isn't up to the task.\r\n", ch);
-     act ("$n tried to explain the weaknesses of other but you do not understand.", ch, 0, 0, TO_ROOM, 0);
+     send_to_char("Your class just isn't up to the task.\r\n", ch);
+     act ("$n tries to explain to you the weaknesses of others, but you do not understand.", ch, 0, 0, TO_ROOM, 0);
   }
   else {
     act ("$n instructs $s group on the virtues of deceit.", ch, 0, 0, TO_ROOM, 0);
@@ -1509,7 +1551,7 @@ int do_deceit(struct char_data *ch, char *argument, int cmd)
   
       af.type      = SKILL_DECEIT;
       af.duration  = 1 + has_skill(ch,SKILL_DECEIT) / 10;
-      af.modifier  = 1;
+      af.modifier  = 1 + (has_skill(ch, SKILL_DECEIT) /20);
       af.location  = APPLY_MANA_REGEN;
       af.bitvector = 0;
       affect_to_char(tmp_char, &af);

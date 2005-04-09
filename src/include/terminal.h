@@ -1,7 +1,7 @@
 #ifndef TERMINAL_H_
 #define TERMINAL_H_
 /************************************************************************
-| $Id: terminal.h,v 1.3 2004/11/16 00:52:09 Zaphod Exp $
+| $Id: terminal.h,v 1.4 2005/04/09 21:15:35 urizen Exp $
 | Terminal.h
 | Description: This file defines all of the terminal constants and
 |   header information.

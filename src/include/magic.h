@@ -5,7 +5,7 @@
  *                                                                           *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-/* $Id: magic.h,v 1.15 2004/11/16 00:52:09 Zaphod Exp $ */
+/* $Id: magic.h,v 1.16 2005/04/09 21:15:35 urizen Exp $ */
 #ifndef MAGIC_H_
 #define MAGIC_H_
 
@@ -227,6 +227,8 @@ int spell_mass_invis(byte level, CHAR_DATA * ch,
    CHAR_DATA * victim, struct obj_data * obj, int skill);
 int spell_hellstream(byte level, CHAR_DATA * ch,
    CHAR_DATA * victim, struct obj_data * obj, int skill);
+int spell_group_sanc(byte level, CHAR_DATA *ch, CHAR_DATA *victim, 
+	struct obj_data *obj, int skill);
 
 int cast_camouflague(byte level, CHAR_DATA * ch, char *arg, int type,
    CHAR_DATA * victim, struct obj_data * tar_obj, int skill);
@@ -600,5 +602,8 @@ int spell_blessed_halo(byte level, CHAR_DATA * ch,
    CHAR_DATA * victim, struct obj_data * obj, int skill);
 int cast_blessed_halo(byte level, CHAR_DATA * ch, char *arg, int type,
    CHAR_DATA * victim, struct obj_data * tar_obj, int skill);
+
+int spell_mana(byte level, CHAR_DATA * ch,
+   CHAR_DATA * victim, struct obj_data * obj, int skill);
 
 #endif

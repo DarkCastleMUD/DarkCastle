@@ -19,7 +19,7 @@
 /* 12/06/2003   Onager   Modified mobile_activity() to prevent charmie    */
 /*                       scavenging                                       */
 /**************************************************************************/
-/* $Id: mob_act.cpp,v 1.27 2004/11/16 00:51:35 Zaphod Exp $ */
+/* $Id: mob_act.cpp,v 1.28 2005/04/09 21:15:27 urizen Exp $ */
 
 extern "C"
 {
@@ -144,76 +144,10 @@ void mobile_activity(void)
     if(ch->fighting) // that's it for monsters busy fighting
       continue;
 
-    // if the non_combat_proc returns eFAILURE, go ahead and try to use class non_combat stuff
-    switch(GET_CLASS(ch)) 
-    {
-            case CLASS_WARRIOR:
-              retval = fighter_non_combat(ch, NULL, 0, "", ch);
-              if(!IS_SET(retval, eFAILURE))
-                continue;
-              break;
-            case CLASS_THIEF:
-              retval = thief_non_combat(ch, NULL, 0, "", ch);
-              if(!IS_SET(retval, eFAILURE))
-                continue;
-              break;
-            case CLASS_MONK:
-              retval = monk_non_combat(ch, NULL, 0, "", ch);
-              if(!IS_SET(retval, eFAILURE))
-                continue;
-              break;
-            case CLASS_RANGER:
-              retval = ranger_non_combat(ch, NULL, 0, "", ch);
-              if(!IS_SET(retval, eFAILURE))
-                continue;
-              break;
-            case CLASS_MAGIC_USER:
-              retval = passive_magic_user(ch, NULL, 0, "", ch);
-//              if(!IS_SET(retval, eFAILURE))
- //               continue;
-              break;
-            case CLASS_CLERIC:
-              retval = passive_cleric(ch, NULL, 0, "", ch);
-              if(!IS_SET(retval, eFAILURE))
-                continue;
-              break;
-            case CLASS_PALADIN:
-              retval = paladin_non_combat(ch, NULL, 0, "", ch);
-              if(!IS_SET(retval, eFAILURE))
-                continue;
-              break;
-            case CLASS_ANTI_PAL:
-              retval = antipaladin_non_combat(ch, NULL, 0, "", ch);
-              if(!IS_SET(retval, eFAILURE))
-                continue;
-              break;
-            case CLASS_BARBARIAN:
-              retval = barbarian_non_combat(ch, NULL, 0, "", ch);
-              if(!IS_SET(retval, eFAILURE))
-                continue;
-              break;
-            case CLASS_DRUID:
-              retval = druid_non_combat(ch, NULL, 0, "", ch);
-              if(!IS_SET(retval, eFAILURE))
-                continue;
-              break;
-            case CLASS_NECROMANCER:
-              retval = passive_necro(ch, NULL, 0, "", ch);
-              if(!IS_SET(retval, eFAILURE))
-                continue;
-              break;
-            default:
-              break;
-    }      
-    if(SOMEONE_DIED(retval))  // paranoia check in case someone screwed up
-       continue;              // and returned CH_DIED along with FAILURE
-
-// TODO - we might want to think about doing some spec procs that are called
-//     for certain races.  Ie, "snakes" all try to "bite" you, or horses kick, etc.    
 
     if(!AWAKE(ch))
       continue;
-        if(IS_AFFECTED(ch, AFF_PARALYSIS))
+    if(IS_AFFECTED(ch, AFF_PARALYSIS))
       continue;
     
     done = 0;
@@ -459,8 +393,9 @@ void mobile_activity(void)
 
         if(IS_SET(ch->mobdata->actflags, ACT_FRIENDLY) &&
            tmp_ch->fighting &&
-           IS_SET(race_info[(int)GET_RACE(ch)].friendly, tmp_bitv) &&
-           !IS_NPC(tmp_ch->fighting))
+           (IS_SET(race_info[(int)GET_RACE(ch)].friendly, tmp_bitv) ||
+	     (int)GET_RACE(ch) == (int)GET_RACE(tmp_ch)) &&
+           !(IS_NPC(tmp_ch->fighting) && !IS_AFFECTED(tmp_ch->fighting, AFF_CHARM)))
         {
           tmp_race = GET_RACE(tmp_ch);
           if(GET_RACE(ch) == tmp_race)
@@ -552,7 +487,7 @@ void mobile_activity(void)
 	   if (i==0)
             act("$n screams 'Pick a side, neutral dog!'", ch, 0, 0, TO_ROOM, 0);
 	   else {
-	    act("$n detects $M's neutrality and attacks!", ch, 0,tmp_ch, TO_ROOM,NOTVICT);
+	    act("$n detects $N's neutrality and attacks!", ch, 0,tmp_ch, TO_ROOM,NOTVICT);
 	    act("$n detects your neutrality and attacks!", ch, 0,tmp_ch, TO_VICT,0);
   	  }
 
@@ -671,7 +606,8 @@ void scavenge(struct char_data *ch)
     keyword = keywordfind(obj);
     
     if(keyword != -2) {
-      if((hands_are_free(ch, 1)) && (CAN_WEAR(obj, WIELD))) 
+      if (hands_are_free(ch, 1))
+       if (CAN_WEAR(obj, ITEM_WIELD))
       {
         if(GET_OBJ_WEIGHT(obj) < GET_STR(ch)) 
         {
@@ -695,8 +631,7 @@ void scavenge(struct char_data *ch)
             break;
           }
         } // GET_OBJ_WEIGHT()
-        else
-          continue;
+       continue;
       } /* if hands are free and can wear */            
       else 
       {

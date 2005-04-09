@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: obj.h,v 1.17 2004/11/16 00:52:09 Zaphod Exp $ */
+/* $Id: obj.h,v 1.18 2005/04/09 21:15:35 urizen Exp $ */
 #ifndef OBJ_H_
 #define OBJ_H_
 
@@ -259,10 +259,11 @@ struct obj_data
 #define WIELD           16
 #define SECOND_WIELD    17
 #define HOLD            18
-#define WEAR_FACE       19
-#define WEAR_EAR_L      20
-#define WEAR_EAR_R      21
-#define WEAR_MAX        21
+#define HOLD2		19
+#define WEAR_FACE       20
+#define WEAR_EAR_L      21
+#define WEAR_EAR_R      22
+//#define WEAR_MAX        22
 
 /* ***********************************************************************
 *  file element for object file. BEWARE: Changing it will ruin the file  *

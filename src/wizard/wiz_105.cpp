@@ -436,9 +436,9 @@ int maxcheck(int &check,  int max)
   return 0;
 }
 
-int wear_bitv[WEAR_MAX+1] = {
+int wear_bitv[MAX_WEAR] = {
  65535, 2, 2, 4, 4, 8, 16, 32, 64, 128, 256, 512,
- 1024, 2048, 4096, 4096, 8192, 8192, 16384, 131072, 
+ 1024, 2048, 4096, 4096, 8192, 8192, 16384, 16384, 131072, 
   262144, 262144
 };
 
@@ -460,21 +460,31 @@ extern  int size_restricted(struct char_data *ch, struct obj_data *obj);
   argument = one_argument(argument, arg);
   int type;
   int last_max[MAX_WEAR] = 
-{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
+{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
   int last_vnum[5][MAX_WEAR] = {
-{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
-{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
-{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
-{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
-{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1}};
+{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1}};
+/*    bool last_unique[5][MAX_WEAR] = {
+{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1}};
+*/
 
   if (!str_cmp(arg, "damage")) type = (1<<APPLY_DAMROLL)|(1<<APPLY_HIT_N_DAM);
   else if (!str_cmp(arg,"hp")) type = 1<<APPLY_HIT;
   else if (!str_cmp(arg,"mana")) type = 1<<APPLY_MANA;
   else {
-    send_to_char("$3Syntax$R: eqmax <character> <damage/hp/mana>\r\n",ch);
+    send_to_char("$3Syntax$R: eqmax <character> <damage/hp/mana> <optional: nodouble>\r\n",ch);
     return eFAILURE;
   }
+  argument = one_argument(argument,arg);
+  bool nodouble = FALSE;
+  if (!str_cmp(arg, "nodouble")) nodouble = TRUE;
   int i = 1;
   struct obj_data *obj;
   for (i = 1; i < 32000; i++)
@@ -500,11 +510,14 @@ extern  int size_restricted(struct char_data *ch, struct obj_data *obj);
 			last_vnum[2][o] = -1;
 			last_vnum[3][o] = -1;
 			last_vnum[4][o] = -1;
+			if (nodouble)
+				break;
 		} else {
 			int v;
 			for (v = 0; v < 5; v++)
 			 if (last_vnum[v][o] == -1)
-			   {last_vnum[v][o] = obj_index[obj->item_number].virt; break; }
+			   {last_vnum[v][o] = obj_index[obj->item_number].virt; 
+			 break; }
 		}
           }
        }

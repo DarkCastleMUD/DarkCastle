@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: board.cpp,v 1.8 2004/11/16 00:51:34 Zaphod Exp $
+| $Id: board.cpp,v 1.9 2005/04/09 21:15:27 urizen Exp $
 | board.C
 | Description:  This file contains the implementation for the board
 |   code.  It's old and should be rewritten --Morc XXX
@@ -96,10 +96,10 @@ int min_remove_level[] = { IMMORTAL, IMMORTAL, OVERSEER, IMMORTAL, SERAPH, 0,
  };
 	
 int board_clan[] = { -1,
-                     -1, -1, -1, -1,  1,  2,  8, 34, 16, 21, // 1 through 10
-                     22,  5, 17,  7, 24,  9, 19, -1, 29, 11, // 11 through 20
-                     -1,  3, 26, 13, 27, 18,  5,  4, 6,  17, // 21 - 30
-                     28, -1, 34, 12, -1, -1, 10, 26, 11, 15, // 31 - 40
+                     -1, -1, -1, -1,  1,  2,  8, 9, 11, 4, // 1 through 10
+                     15,  5, 10,  7, 24,  9, 17, -1, 19, 11, // 11 through 20
+                     -1,  3, 20, 13, 27, 18,  5,  14, 6,  7, // 21 - 30
+                     16, -1, 9, 12, -1, -1, 10, 26, 11, 15, // 31 - 40
                      -1, 21, -1, -1, -1, -1, -1, -1, -1, -1,
 		     -1, -1, -1, -1, -1
 		     };
@@ -221,15 +221,15 @@ int find_board(CHAR_DATA *ch)
        return(7);
      else if (!(strcmp(i->name, "board clan nazgul")))
        return(8);   
-     else if (!(strcmp(i->name, "board clan journal eclipse")))
+     else if (!(strcmp(i->name, "board clan eclipse")))
        return(9);  
-     else if (!(strcmp(i->name, "board clan doomguard")))
+     else if (!(strcmp(i->name, "board clan clanboard dcguard")))
        return(10);
      else if (!(strcmp(i->name, "board clan co.rpse")))
        return(11); 
-     else if (!(strcmp(i->name, "board clan wolverines")))
+     else if (!(strcmp(i->name, "board clan darkened")))
        return(12);
-     else if (!(strcmp(i->name, "board clan askani")))
+     else if (!(strcmp(i->name, "board clan moor")))
        return(13); 
      else if (!(strcmp(i->name, "board clan studs")))
        return(14); 
@@ -247,19 +247,19 @@ int find_board(CHAR_DATA *ch)
        return(20);
      else if (!(strcmp(i->name, "board quests2do")))
        return(21);
-     else if (!(strcmp(i->name, "board clan arcana beam")))
+     else if (!(strcmp(i->name, "board arcana")))
        return(22);
-     else if (!(strcmp(i->name, "board clan sindicate")))
+     else if (!(strcmp(i->name, "board clan clanboard sindicate")))
        return(23);
      else if (!(strcmp(i->name, "board clan ferach")))
        return(24);
      else if (!(strcmp(i->name, "board clan kindred")))
        return(25);
-     else if (!(strcmp(i->name, "board clan anarchist screen")))
+     else if (!(strcmp(i->name, "screen window board clan anarchist")))
        return(26);
      else if (!(strcmp(i->name, "board clan ban'kuul globe")))
        return(27);
-     else if (!(strcmp(i->name, "board clan black_axe")))
+     else if (!(strcmp(i->name, "tablet board clanboard black axe")))
        return(28);
      else if (!(strcmp(i->name, "board clan timewarp")))
        return(29);

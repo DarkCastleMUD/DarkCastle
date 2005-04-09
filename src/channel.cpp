@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: channel.cpp,v 1.8 2004/11/16 00:51:34 Zaphod Exp $
+| $Id: channel.cpp,v 1.9 2005/04/09 21:15:27 urizen Exp $
 | channel.C
 | Description:  All of the channel - type commands; do_say, gossip, etc..
 */
@@ -524,7 +524,10 @@ int do_tell(struct char_data *ch, char *argument, int cmd)
       send_to_char("The person is ignoring all tells right now.\r\n", ch);
       return eSUCCESS;
     }
-    
+   else if( !IS_NPC(vict) && IS_SET(vict->pcdata->toggles, PLR_NOTELL)) {
+     // Immortal sent a tell to a player with NOTELL.  Allow the tell butnotify the imm.
+     send_to_char("That player has NOTELL btw...\r\n", ch);
+   }    
     if(ch == vict)
       send_to_char("You try to tell yourself something.\n\r", ch);
     else if((GET_POS(vict) == POSITION_SLEEPING || IS_SET(world[vict->in_room].room_flags, QUIET)) && GET_LEVEL(ch) < IMMORTAL) 

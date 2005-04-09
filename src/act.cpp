@@ -32,6 +32,7 @@ extern "C" {
 #include <act.h>
 #include <mobile.h>
 #include <token.h>
+#include <spells.h>
 
 extern CWorld world;
 extern struct descriptor_data *descriptor_list;
@@ -62,13 +63,16 @@ void act
       return;
    }
 
-   if (IS_AFFECTED(ch, AFF_HIDE) && (destination != TO_CHAR) &&
+   if ((IS_AFFECTED(ch, AFF_HIDE) ||IS_SET(ch->affected_by2, AFF_FOREST_MELD))&& (destination != TO_CHAR) &&
        !(flags & GODS) && !(flags & STAYHIDE)) {
       REMOVE_BIT(ch->affected_by, AFF_HIDE);
+//	REMOVE_BIT(ch->affected_by2, AFF_FOREST_MELD);
+	affect_from_char(ch, SPELL_FOREST_MELD);
       // Surprise!
       // -Sadus
 //     if (!str_cmp(GET_NAME(ch),"Jesus")) was for testing 
   //    send_to_char("You come out of hiding.\n\r", ch);
+ // testing above
       }
 
    if (destination == TO_VICT) {
@@ -85,6 +89,7 @@ void act
          // If they're not really playing, and no force flag, don't send
          if (tmp_char == ch)
             continue;
+	if (tmp_char->position > POSITION_SLEEPING || IS_SET(flags, ASLEEP))
          send_message(tokens, ch, obj, vict_obj, flags, tmp_char);
          }
       }

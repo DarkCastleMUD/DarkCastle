@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: structs.h,v 1.5 2004/05/31 16:02:47 urizen Exp $
+| $Id: structs.h,v 1.6 2005/04/09 21:15:35 urizen Exp $
 | structs.h
 | Description:  This file should go away someday - it's stuff that I
 |   wasn't sure how to break up.  --Morc XXX
@@ -102,5 +102,5 @@ struct message_list
 #define TO_GODS    4
 */
 
-
+extern void debugpoint();
 #endif

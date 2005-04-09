@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.56 2004/11/16 00:51:34 Zaphod Exp $ */
+/* $Id: info.cpp,v 1.57 2005/04/09 21:15:27 urizen Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -38,6 +38,7 @@ extern "C"
 #include <connect.h>
 #include <spells.h>
 #include <act.h>
+#include <set.h>
 #include <returnvals.h>
 
 
@@ -254,7 +255,10 @@ void show_obj_to_char(struct obj_data *object, struct char_data *ch, int mode)
           object->obj_flags.type_flag == ITEM_WEAPON ||
           object->obj_flags.type_flag == ITEM_FIREWEAPON ||
           object->obj_flags.type_flag == ITEM_CONTAINER ||
-          object->obj_flags.type_flag == ITEM_INSTRUMENT
+          object->obj_flags.type_flag == ITEM_INSTRUMENT ||
+	   object->obj_flags.type_flag == ITEM_WAND ||
+	  object->obj_flags.type_flag == ITEM_STAFF ||
+	  object->obj_flags.type_flag == ITEM_LIGHT
          )
       {
          percent = 100 - (int)(100 * ((float)eq_current_damage(object) / (float)eq_max_damage(object)));
@@ -1354,11 +1358,15 @@ GET_AGE(ch));
 	 if (aff_name)
          if (*aff_name && !str_cmp(aff_name, "fly")) flying = 1; 
          switch(aff->type) {
+	   case BASE_SETS+SET_RAGER:
+	     if (aff->location == 0)
+		aff_name = "Battlerager's Fury";
+		break;	     
            case FUCK_CANTQUIT:
              aff_name = "CANT_QUIT";
              break;
            case FUCK_PTHIEF:
-             aff_name = "DIRTY_DIRTY_THIEF";
+             aff_name = "DIRTY_THIEF/CANT_QUIT";
              break;
            case SKILL_HARM_TOUCH:
              aff_name = "harmtouch reuse timer";

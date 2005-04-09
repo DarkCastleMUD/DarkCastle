@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.33 2004/11/16 00:51:35 Zaphod Exp $ */
+/* $Id: utility.cpp,v 1.34 2005/04/09 21:15:27 urizen Exp $ */
 
 extern "C"
 {
@@ -28,6 +28,7 @@ extern "C"
 #include <time.h>
 #include <ctype.h>
 #include <stdlib.h>
+#include <sys/time.h>
 }
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
@@ -115,7 +116,7 @@ char *index(char *buf, char op)
 #endif
 
 // generate a (relatively) random number.
-int number( int from, int to )
+int number_old( int from, int to )
 {
     if ( from >= to )
 	return from;
@@ -130,13 +131,13 @@ int number( int from, int to )
 int dice( int num, int size )
 {
    int r;
-   int sum = num; 
+   int sum = 0; 
 
    if(size < 1)
       return 1;
   
    for(r = 1; r <= num; r++)
-      sum += random() % size;
+      sum += number(1,size);
 
    return sum;
 }
@@ -923,7 +924,8 @@ int do_recall( CHAR_DATA *ch, char *argument, int cmd )
   else
   {
     if( GET_HOME(victim) == 0 || GET_LEVEL(victim) < 11 ||
-        IS_AFFECTED(victim, AFF_CANTQUIT)
+        IS_AFFECTED(victim, AFF_CANTQUIT) ||
+	affected_by_spell(victim, FUCK_PTHIEF)
       )
       location = real_room(START_ROOM);
     else
@@ -1052,8 +1054,10 @@ int do_quit(struct char_data *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
-    if(IS_AFFECTED(ch, AFF_CANTQUIT) && cmd!=666) {
-      send_to_char("You can't quit, because you are still a pkiller!\n\r", ch);
+    if(IS_AFFECTED(ch, AFF_CANTQUIT) && cmd!=666 ||
+	affected_by_spell(ch, FUCK_PTHIEF)) {
+      send_to_char("You can't quit, because you are still wanted!\n\r", 
+ch);
       return eFAILURE;
     }
 
@@ -1094,15 +1098,18 @@ int do_quit(struct char_data *ch, char *argument, int cmd)
     do_sing(ch, "stop", 9);
 
   extractFamiliar(ch);
- struct follow_type *fol;
-  for (fol = ch->followers; fol; fol = fol->next)
-    if (IS_NPC(fol->follower) &&
+  struct follow_type *fol, *fol_next;
+
+  for (fol = ch->followers; fol; fol = fol_next)
+  {
+    fol_next = fol->next; 
+   if (IS_NPC(fol->follower) &&
 mob_index[fol->follower->mobdata->nr].virt == 8)
     {
       release_message(fol->follower);
       extract_char(fol->follower, FALSE);
     }
-
+  }
   affect_from_char(ch, SPELL_IRON_ROOTS);
 
   if(ch->beacon)
@@ -1130,7 +1137,7 @@ mob_index[fol->follower->mobdata->nr].virt == 8)
   if(ch->desc) {
     save_char_obj(ch);
     if(!close_socket(ch->desc)) // if returns 0, then it already quit us out
-      return eFAILURE;
+      return eFAILURE|eCH_DIED;
   } else {
     save_char_obj(ch);
   } 
@@ -1145,7 +1152,7 @@ mob_index[fol->follower->mobdata->nr].virt == 8)
     extract_obj(ch->carrying);
 
   extract_char( ch, TRUE );
-  return eSUCCESS;
+  return eSUCCESS|eCH_DIED;
 }
 
 // TODO - make some sort of auto-save, or "save" flag, so player's
@@ -1461,3 +1468,55 @@ int get_line(FILE * fl, char *buf)
     return lines;
   }
 }
+
+
+
+int mmstate[55],j,k;
+time_t current_time;
+
+void init_random()
+{ // Initial values.
+  int i;
+  struct timeval time_;
+  time_t now_;
+  gettimeofday(&time_, NULL);
+  now_ = (time_t) time_.tv_sec;
+  mmstate[0] = now_ &((1<<30)-1);
+ mmstate[1] = 1;
+  for (i = 2; i < 55; i++)
+    mmstate[i] = (((mmstate[i-1] + mmstate[i-2])) )&((1<<30)-1);
+  j = 24;
+  k = 54;
+  return;
+}
+
+int mm_rand()
+{
+  mmstate[k] = (mmstate[j] + mmstate[k]) & ((1<<30)-1);
+  k--;
+  j--;
+  if (k == 0) k = 54;
+  if (j == 0) j = 54;
+  return mmstate[k] >> 4; // Modulus'ing it didn't make it random,
+                          // had to look at another implementation
+                          // don't have time to figure out why
+}
+
+int number( int from, int to )
+{
+    int power;
+    int number;
+
+    if ( ( to = to - from + 1 ) <= 1 )
+        return from;
+
+    for ( power = 2; power < to; power <<= 1 )
+        ;
+
+    while ( ( number = mm_rand( ) & (power - 1) ) >= to )
+        ;
+
+    return from + number;
+}
+
+
