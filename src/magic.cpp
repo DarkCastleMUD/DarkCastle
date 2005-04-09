@@ -6196,7 +6196,7 @@ int cast_create_water( byte level, CHAR_DATA *ch, char *arg, int type,
 }
 
 
-/* REMOVE PARALYSIS (potion, wand, scroll, staff)
+/* REMOVE PARALYSIS (potion, wand, scroll, staff) */
 
 int cast_remove_paralysis( byte level, CHAR_DATA *ch, char *arg, int type,
   CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill )
