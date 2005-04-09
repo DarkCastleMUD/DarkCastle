@@ -5121,7 +5121,7 @@ int cast_burning_hands( byte level, CHAR_DATA *ch, char *arg, int type,
 }
 
 
-/* CALL LIGHTNING (potion, scroll, staff)
+/* CALL LIGHTNING (potion, scroll, staff) */
 
 int cast_call_lightning( byte level, CHAR_DATA *ch, char *arg, int type,
   CHAR_DATA *victim, struct obj_data *tar_obj, int skill )
