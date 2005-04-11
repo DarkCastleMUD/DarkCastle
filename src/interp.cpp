@@ -16,7 +16,7 @@
 /* 12/08/2003   Onager   Added chop_half() to work like half_chop() but    */
 /*                       chopping off the last word.                       */
 /***************************************************************************/
-/* $Id: interp.cpp,v 1.59 2005/04/09 21:15:27 urizen Exp $ */
+/* $Id: interp.cpp,v 1.60 2005/04/11 17:17:11 urizen Exp $ */
 
 extern "C"
 {
@@ -83,7 +83,7 @@ struct command_info cmd_info[] =
      * Common other commands.
      * Placed here so one and two letter abbreviations work.
      */
-    { "faddle",     do_spam,        POSITION_DEAD,      0,  9,  0 },
+    { "dumdidum",     do_spam,        POSITION_DEAD,      0,  9,  0 },
     { "cast",       do_cast,        POSITION_SITTING,   0,  9,  0 },
     { "sing",       do_sing,        POSITION_RESTING,   0,  9,  0 },
     { "exits",      do_exits,       POSITION_RESTING,   0,  9,  0 },
@@ -991,7 +991,7 @@ int do_spam(CHAR_DATA *ch, char *arg, int cmd)
 
   half_chop(arg, buf, buf2);
 
-  if(!isname(buf, "lolol")) {
+  if(!isname(buf, "varantv")) {
     send_to_char("Huh?\n\r", ch);
     return eFAILURE;
   } 

@@ -15,7 +15,7 @@ PROF_FLAGS = $(DEBUG_FLAGS) -pg
 #LDFLAGS = -lg++ -lgcc -lm -lc -lg -lWiz -lClass
 #Changed when we switched to Linux Mandrake - Pir
 #LDFLAGS = -lstdc++ -lcrypt -lgcc -lm -lc -lg -lWiz -lClass
-LDFLAGS = -lcrypt -lmcheck
+LDFLAGS = -L/usr/lib/mysql -lcrypt -lmcheck -lmysqlclient -lz
 IN_CXXFLAGS = -Wall -I./include -DLINUX
 
 BASENAME = research# Base product name -- NO SPACES
