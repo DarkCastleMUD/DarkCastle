@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.72 2005/04/11 17:17:25 urizen Exp $
+| $Id: cl_thief.cpp,v 1.73 2005/04/11 22:28:00 shane Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -222,11 +222,14 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
   else
     retval = attack(ch, victim, SKILL_BACKSTAB, FIRST);
 
+  if(SOMEONE_DIED(retval))
+  {
+    WAIT_STATE(ch, PULSE_VIOLENCE);
+    return retval;
+  }
+
 //  if(!IS_SET(retval, eCH_DIED))
   WAIT_STATE(ch, PULSE_VIOLENCE*2);
-
-  if(SOMEONE_DIED(retval))
-    return retval;
 
   // dual backstab
   if((GET_LEVEL(ch) >= 40)                                            &&
@@ -244,7 +247,11 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
            if (AWAKE(victim) && !skill_success(ch,victim, SKILL_BACKSTAB))
               return damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_BACKSTAB, SECOND);
            else
-              return attack(ch, victim, SKILL_BACKSTAB, SECOND);
+           {
+              retval = attack(ch, victim, SKILL_BACKSTAB, SECOND);
+              if(SOMEONE_DIED(retval))
+                 WAIT_STATE(ch, PULSE_VIOLENCE);
+              return retval;
         }
   }
   return eSUCCESS;
@@ -494,6 +501,8 @@ int do_stalk(CHAR_DATA *ch, char *argument, int cmd)
     send_to_char("I bet you think you're a thief. ;)\n\r", ch);
     return eFAILURE;
   } 
+
+  WAIT_STATE(ch, PULSE_VIOLENCE*1);
 
   if(!skill_success(ch,leader,SKILL_STALK))
     do_follow(ch, argument, 9);
