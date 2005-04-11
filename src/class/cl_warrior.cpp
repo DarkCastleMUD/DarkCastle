@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.27 2005/04/09 21:15:31 urizen Exp $
+| $Id: cl_warrior.cpp,v 1.28 2005/04/11 20:27:14 shane Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -543,13 +543,13 @@ int do_disarm( struct char_data *ch, char *argument, int cmd )
     if(!can_attack(ch) || !can_be_attacked(ch, victim))
           return eFAILURE;
 
-    set_cantquit(ch, victim);
-
     if ( victim->equipment[WIELD] == NULL )
     {
 	send_to_char( "Your opponent is not wielding a weapon!\n\r", ch );
 	return eFAILURE;
     }
+
+    set_cantquit(ch, victim);
 
     if ( victim == ch ) {
       if (GET_LEVEL(victim) >= IMMORTAL) {
