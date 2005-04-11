@@ -4624,7 +4624,7 @@ int spell_flamestrike(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 
    if(skill > 70) {
       send_to_char("The fires $4burn$R into your soul tearing away at your being.\r\n", victim);
-      act("Your fires $4burn$R into $t's soul, tearing away at $s being.\r\n",ch,0,victim,TO_CHAR, 0);
+      act("Your fires $4burn$R into $N's soul, tearing away at $s being.\r\n",ch,0,victim,TO_CHAR, 0);
          GET_MANA(victim) -= 40;
       if(GET_MANA(victim) < 0)
          GET_MANA(victim) = 0;
