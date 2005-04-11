@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.71 2005/04/09 21:15:31 urizen Exp $
+| $Id: cl_thief.cpp,v 1.72 2005/04/11 17:17:25 urizen Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -829,6 +829,7 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
 	  case WEAR_LIGHT:
 	  case HOLD:
 	  case HOLD2:
+	  case WEAR_SHIELD:
 	     wakey = 60;
 	     break;
 	  case WEAR_BODY:

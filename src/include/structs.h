@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: structs.h,v 1.6 2005/04/09 21:15:35 urizen Exp $
+| $Id: structs.h,v 1.7 2005/04/11 17:17:28 urizen Exp $
 | structs.h
 | Description:  This file should go away someday - it's stuff that I
 |   wasn't sure how to break up.  --Morc XXX
@@ -103,4 +103,13 @@ struct message_list
 */
 
 extern void debugpoint();
+
+struct mirror_data // structure used for mirroring data
+{
+  char *name;
+  size_t offset;
+  int type;
+  bool procable;
+};
+
 #endif
