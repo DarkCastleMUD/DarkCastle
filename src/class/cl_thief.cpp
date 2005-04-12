@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.74 2005/04/11 23:07:11 shane Exp $
+| $Id: cl_thief.cpp,v 1.75 2005/04/12 01:31:03 shane Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -427,7 +427,7 @@ int do_trip(CHAR_DATA *ch, char *argument, int cmd)
     if(GET_POS(victim) > POSITION_SITTING)
        GET_POS(victim) = POSITION_SITTING;
     SET_BIT(victim->combat, COMBAT_BASH2);
-    WAIT_STATE(ch, PULSE_VIOLENCE*3);
+    WAIT_STATE(ch, PULSE_VIOLENCE*2);
     WAIT_STATE(victim, PULSE_VIOLENCE*2);
     retval = damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_TRIP, 0);
   }

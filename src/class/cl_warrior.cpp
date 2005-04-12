@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.28 2005/04/11 20:27:14 shane Exp $
+| $Id: cl_warrior.cpp,v 1.29 2005/04/12 01:31:04 shane Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -64,7 +64,7 @@ int do_kick(struct char_data *ch, char *argument, int cmd)
     if(!can_attack(ch) || !can_be_attacked(ch, victim))
           return eFAILURE;
 
-    WAIT_STATE(ch, PULSE_VIOLENCE*2);
+    WAIT_STATE(ch, PULSE_VIOLENCE*1.5);
     if (!skill_success(ch,victim,SKILL_KICK)) {
         dam = 0;
 	retval = damage(ch, victim, 0,TYPE_UNDEFINED, SKILL_KICK, 0);
@@ -392,14 +392,21 @@ int do_bash(struct char_data *ch, char *argument, int cmd)
         return eFAILURE;
     }
 
-    int modifier = 0;
+    int modifier = 0;    
     // half as accurate without a shield
     if(!ch->equipment[WEAR_SHIELD]) {
       modifier = -20;
       // but 3/4 as accurate with a 2hander
       if(ch->equipment[WIELD] && IS_SET(ch->equipment[WIELD]->obj_flags.extra_flags, ITEM_TWO_HANDED))
+      {
         modifier += 10;
+        // if the basher is a barb though, give them the full effect
+        if(GET_RACE(ch) == RACE_DWARVEN)
+           modifier += 10;
+      }
     }
+    // if it's a barb
+    if(ch->equipment[WIELD] && IS_SET(ch->equipment[WIELD]->obj_flags.extra_flags, ITEM_TWO_HANDED)
 
 
     WAIT_STATE(ch, PULSE_VIOLENCE*3);
@@ -421,8 +428,8 @@ int do_bash(struct char_data *ch, char *argument, int cmd)
         SET_BIT(victim->combat, COMBAT_BASH1);
         // if they already have 2 rounds of wait, only tack on 1 instead of 2
         if(victim->desc && (victim->desc->wait > 5))
-          WAIT_STATE(victim, PULSE_VIOLENCE);
-	else WAIT_STATE(victim, PULSE_VIOLENCE * 2);
+          WAIT_STATE(victim, PULSE_VIOLENCE * 2);
+	else WAIT_STATE(victim, PULSE_VIOLENCE * 3);
  //       act("Your bash at $N sends $M sprawling.", ch, NULL, victim, 
 //TO_CHAR , 0);
  //       act("$n sends you sprawling.", ch, NULL, victim, TO_VICT , 0);
