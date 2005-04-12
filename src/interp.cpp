@@ -16,7 +16,7 @@
 /* 12/08/2003   Onager   Added chop_half() to work like half_chop() but    */
 /*                       chopping off the last word.                       */
 /***************************************************************************/
-/* $Id: interp.cpp,v 1.60 2005/04/11 17:17:11 urizen Exp $ */
+/* $Id: interp.cpp,v 1.61 2005/04/12 09:51:31 shane Exp $ */
 
 extern "C"
 {
@@ -83,6 +83,8 @@ struct command_info cmd_info[] =
      * Common other commands.
      * Placed here so one and two letter abbreviations work.
      */
+    // moved newbie here to beat news for abbreviations
+    { "newbie",     do_newbie,      POSITION_DEAD,      0,  9,  0 },    
     { "dumdidum",     do_spam,        POSITION_DEAD,      0,  9,  0 },
     { "cast",       do_cast,        POSITION_SITTING,   0,  9,  0 },
     { "sing",       do_sing,        POSITION_RESTING,   0,  9,  0 },
@@ -142,7 +144,7 @@ struct command_info cmd_info[] =
     { "emote",      do_emote,       POSITION_RESTING,   0,  9,  COM_CHARMIE_OK },
     { ":",          do_emote,       POSITION_RESTING,   0,  9,  COM_CHARMIE_OK },    
     { "gossip",     do_gossip,      POSITION_DEAD,      0,  9,  0},    
-    { "newbie",     do_newbie,      POSITION_DEAD,      0,  9,  0 },    
+//    { "newbie",     do_newbie,      POSITION_DEAD,      0,  9,  0 },    
     { "trivia",	    do_trivia,	    POSITION_DEAD,      0,  9,  0 },
     { "gtell",      do_grouptell,   POSITION_DEAD,      0,  9,  0 },
     { ".",          do_grouptell,   POSITION_DEAD,      0,  9,  0 },
