@@ -1599,7 +1599,7 @@ int spell_curse(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
         else if (skill < 81) { duration = 5; save = -25;}
 	else                 { duration = 6; save = -30;}
 
-	if (GET_LEVEL(victim) < 11)
+	if (!IS_NPC(victim) && GET_LEVEL(victim) < 11)
 	{
 	  send_to_char("The curse fizzles!\r\n",ch);
  	  return eSUCCESS;
@@ -1622,8 +1622,8 @@ int spell_curse(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
 	 af.type      = SPELL_CURSE;
 	 af.duration  = duration;
 	 af.modifier  = save;
-	 af.location  = APPLY_SAVING_MAGIC;
-	 af.bitvector = AFF_CURSE;
+	 af.location  = APPLY_SAVING_MAGIC
+         af.bitvector = AFF_CURSE;
 	 affect_to_char(victim, &af);
 	 af.location = APPLY_SAVING_FIRE;
 	 affect_to_char(victim, &af);
@@ -1638,7 +1638,7 @@ int spell_curse(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
 	 act("$n briefly reveals a $4red$R aura!", victim, 0, 0, TO_ROOM, 0);
 	 act("You feel very uncomfortable as a curse takes hold of you.",victim,0,0,TO_CHAR, 0);
      }
-	if (IS_NPC(victim)) {
+	if (IS_NPC(victim) && !(victim->fighting)) {
 	   retval = one_hit( victim, ch, TYPE_UNDEFINED, FIRST);
  	   retval = SWAP_CH_VICT(retval);
          return retval;

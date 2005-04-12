@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.75 2005/04/12 01:31:03 shane Exp $
+| $Id: cl_thief.cpp,v 1.76 2005/04/12 05:20:41 shane Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -224,10 +224,8 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
 
   if(SOMEONE_DIED(retval))
   {
-    if(!IS_SET(ch->pcdata->toggles, PLR_WIPMY))
+    if(IS_SET(ch->pcdata->toggles, PLR_WIPMY))
        WAIT_STATE(ch, PULSE_VIOLENCE);
-    else
-       WAIT_STATE(ch, PULSE_VIOLENCE*2);
     return retval;
   }
 
@@ -250,16 +248,7 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
            if (AWAKE(victim) && !skill_success(ch,victim, SKILL_BACKSTAB))
               return damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_BACKSTAB, SECOND);
            else
-           {
-              retval = attack(ch, victim, SKILL_BACKSTAB, SECOND);
-              if(SOMEONE_DIED(retval))
-              {
-                 if(!IS_SET(ch->pcdata->toggles, PLR_WIPMY))              
-                    WAIT_STATE(ch, PULSE_VIOLENCE);
-                 else
-                    WAIT_STATE(ch, PULSE_VIOLENCE*2);
-              }
-              return retval;
+              return attack(ch, victim, SKILL_BACKSTAB, SECOND);
         }
   }
   return eSUCCESS;
