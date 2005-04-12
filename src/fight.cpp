@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.241 2005/04/12 00:10:35 shane Exp $ */
+/* $Id: fight.cpp,v 1.242 2005/04/12 22:12:10 shane Exp $ */
 
 extern "C"
 {
@@ -4175,7 +4175,8 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim, int type)
 
     // have to be level 10 and linkalive to count as a pkill and not yourself
     // (we check earlier to make sure victim isn't a mob)
-    if(!IS_MOB(ch) && GET_LEVEL(victim) > PKILL_COUNT_LIMIT && victim->desc && ch != victim)
+    // now with tav/meta pkilling not adding to your score
+    if(!IS_MOB(ch) && GET_LEVEL(victim) > PKILL_COUNT_LIMIT && victim->desc && ch != victim && ch->in_room != real_room(START_ROOM) && ch->in_room != real_room(SECOND_START_ROOM))
     {
       GET_PDEATHS(victim) += 1;
       GET_PDEATHS_LOGIN(victim) += 1;
