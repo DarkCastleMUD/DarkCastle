@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.76 2005/04/12 05:20:41 shane Exp $
+| $Id: cl_thief.cpp,v 1.77 2005/04/12 08:41:32 shane Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -331,7 +331,7 @@ int do_circle(CHAR_DATA *ch, char *argument, int cmd)
         return retval;
     }
       // Now go for dual backstab
-      if ((GET_LEVEL(ch) >= 40) &&
+      if (has_skill(ch, SKILL_DUAL_BACKSTAB) &&
           ((GET_CLASS(ch) == CLASS_THIEF) || (GET_LEVEL(ch) >= ARCHANGEL)))
          if (ch->equipment[SECOND_WIELD])
             if ((ch->equipment[SECOND_WIELD]->obj_flags.value[3] == 11) ||
