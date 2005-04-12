@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: non_off.cpp,v 1.21 2005/04/09 21:15:27 urizen Exp $
+| $Id: non_off.cpp,v 1.22 2005/04/12 09:11:37 shane Exp $
 | non_off.C
 | Description:  Implementation of generic, non-offensive commands.
 */
@@ -643,6 +643,11 @@ int do_anonymous(CHAR_DATA *ch, char *argument, int cmd)
   {
     log("Null char in do_anonymous.", OVERSEER, LOG_BUG);
     return eFAILURE;
+  }
+  if(GET_LEVEL(ch) < 20)
+  {
+    send_to_char("You are too inexperienced to disguise your profession.\n\r", ch);
+    return eSUCCESS;
   }
   if(IS_SET(ch->pcdata->toggles, PLR_ANONYMOUS))
   {
