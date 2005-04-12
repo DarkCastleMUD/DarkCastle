@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.73 2005/04/12 22:27:42 apocalypse Exp $ */
+/* $Id: nanny.cpp,v 1.74 2005/04/12 22:49:31 apocalypse Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -462,7 +462,7 @@ void roll_and_display_stats(CHAR_DATA * ch)
             a=dice(3, 6); b=dice(6, 3); ch->desc->stats->str[x] = ((a > b) ? a : b);
             a=dice(3, 6); b=dice(6, 3); ch->desc->stats->dex[x] = ((a > b) ? a : b);
             a=dice(3, 6); b=dice(6, 3); ch->desc->stats->con[x] = ((a > b) ? a : b);
-            a=dice(3, 6); b=dice(6, 3); ch->desc->stats->int[x] = ((a > b) ? a : b);
+            a=dice(3, 6); b=dice(6, 3); ch->desc->stats->tel[x] = ((a > b) ? a : b);
             a=dice(3, 6); b=dice(6, 3); ch->desc->stats->wis[x] = ((a > b) ? a : b);
          }
 
