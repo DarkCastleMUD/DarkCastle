@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.72 2005/04/09 21:15:27 urizen Exp $ */
+/* $Id: nanny.cpp,v 1.73 2005/04/12 22:27:42 apocalypse Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -292,75 +292,6 @@ void do_inate_race_abilities(char_data * ch)
      default: 
        break;
    }
-
-// TODO - Add in realistic race abilities (already done - innates finished)
-/*
-   struct affected_type af;
-
-   switch(GET_RACE(ch)) {
-   case RACE_PIXIE:
-      af.type = SPELL_FLY;
-      af.duration = -1;
-      af.modifier = 0;
-      af.location = 0;
-      af.bitvector = AFF_FLYING;
-      affect_to_char(ch, &af);
-      break;
-
-   case RACE_HOBBIT:
-      af.type = SPELL_DETECT_MAGIC;
-      af.duration = -1;
-      af.modifier = 0;
-      af.location = APPLY_NONE;
-      af.bitvector = AFF_DETECT_MAGIC;
-      affect_to_char(ch, &af);
-
-      af.type = SPELL_DETECT_EVIL;
-      af.duration = -1;
-      af.modifier = 0;
-      af.location = APPLY_NONE;
-      af.bitvector = AFF_DETECT_MAGIC;
-      affect_to_char(ch, &af);
-
-      af.type = SPELL_DETECT_GOOD;
-      af.duration = -1;
-      af.modifier = 0;
-      af.location = APPLY_NONE;
-      af.bitvector = AFF_DETECT_GOOD;
-      affect_to_char(ch, &af);
-      break;
-
-   case RACE_ELVEN:
-      af.type = SPELL_DETECT_INVISIBLE;
-      af.duration = -1;
-      af.modifier = 0;
-      af.location = APPLY_NONE;
-      af.bitvector = AFF_DETECT_INVISIBLE;
-      affect_to_char(ch, &af);
-      break;
-
-   case RACE_DWARVEN:
-      af.type = SPELL_INFRAVISION;
-      af.duration = -1;
-      af.modifier = 0;
-      af.location = APPLY_NONE;
-      af.bitvector = AFF_INFRARED;
-      affect_to_char(ch, &af);
-      break;
-  
-   case RACE_GIANT:
-      af.type = SPELL_RESIST_COLD;
-      af.duration = -1;
-      af.modifier = 0;
-      af.location = APPLY_NONE;
-      af.bitvector = 0;
-      affect_to_char(ch, &af);
-      break;
-
-   default:
-      break;
-   }
-*/
 }
 
 OBJ_DATA *clan_altar(char_data *ch)
@@ -529,10 +460,10 @@ void roll_and_display_stats(CHAR_DATA * ch)
 
          for(x = 0; x <= 4; x++) {
             a=dice(3, 6); b=dice(6, 3); ch->desc->stats->str[x] = ((a > b) ? a : b);
-            a=dice(3, 6); b=dice(6, 3); ch->desc->stats->tel[x] = ((a > b) ? a : b);
-            a=dice(3, 6); b=dice(6, 3); ch->desc->stats->wis[x] = ((a > b) ? a : b);
             a=dice(3, 6); b=dice(6, 3); ch->desc->stats->dex[x] = ((a > b) ? a : b);
             a=dice(3, 6); b=dice(6, 3); ch->desc->stats->con[x] = ((a > b) ? a : b);
+            a=dice(3, 6); b=dice(6, 3); ch->desc->stats->int[x] = ((a > b) ? a : b);
+            a=dice(3, 6); b=dice(6, 3); ch->desc->stats->wis[x] = ((a > b) ? a : b);
          }
 
          SEND_TO_Q("\n\r  Choose from any of the following groups of abilities...     \n\r", ch->desc);
@@ -542,14 +473,6 @@ void roll_and_display_stats(CHAR_DATA * ch)
             ch->desc->stats->str[0], ch->desc->stats->str[1], ch->desc->stats->str[2],
             ch->desc->stats->str[3], ch->desc->stats->str[4]);
          SEND_TO_Q(buf, ch->desc);
-         sprintf(buf,"Int:   %-2d    %-2d    %-2d    %-2d    %-2d\n\r",
-            ch->desc->stats->tel[0], ch->desc->stats->tel[1], ch->desc->stats->tel[2],
-            ch->desc->stats->tel[3], ch->desc->stats->tel[4]);
-         SEND_TO_Q(buf, ch->desc);
-         sprintf(buf,"Wis:   %-2d    %-2d    %-2d    %-2d    %-2d\n\r",
-            ch->desc->stats->wis[0], ch->desc->stats->wis[1], ch->desc->stats->wis[2],
-            ch->desc->stats->wis[3], ch->desc->stats->wis[4]);
-         SEND_TO_Q(buf, ch->desc);
          sprintf(buf,"Dex:   %-2d    %-2d    %-2d    %-2d    %-2d\n\r",
             ch->desc->stats->dex[0], ch->desc->stats->dex[1], ch->desc->stats->dex[2],
             ch->desc->stats->dex[3], ch->desc->stats->dex[4]);
@@ -557,6 +480,14 @@ void roll_and_display_stats(CHAR_DATA * ch)
          sprintf(buf,"Con:   %-2d    %-2d    %-2d    %-2d    %-2d\n\r",
             ch->desc->stats->con[0], ch->desc->stats->con[1], ch->desc->stats->con[2],
             ch->desc->stats->con[3], ch->desc->stats->con[4]);
+         SEND_TO_Q(buf, ch->desc);
+         sprintf(buf,"Int:   %-2d    %-2d    %-2d    %-2d    %-2d\n\r",
+            ch->desc->stats->tel[0], ch->desc->stats->tel[1], ch->desc->stats->tel[2],
+            ch->desc->stats->tel[3], ch->desc->stats->tel[4]);
+         SEND_TO_Q(buf, ch->desc);
+         sprintf(buf,"Wis:   %-2d    %-2d    %-2d    %-2d    %-2d\n\r",
+            ch->desc->stats->wis[0], ch->desc->stats->wis[1], ch->desc->stats->wis[2],
+            ch->desc->stats->wis[3], ch->desc->stats->wis[4]);
          SEND_TO_Q(buf, ch->desc);
          SEND_TO_Q("Choose a group <1-5>, or press return to reroll(Help <attribute> for more information) --> ", ch->desc);
 
@@ -593,9 +524,9 @@ const char *host_list[]=
   "62.65.107.", // Urizen
   "24.165.167.", // Dasein
   "24.112.103.", // Apocalypse
+  "68.167.255.", // Scyld
   "127.0.0.1", // localhost (duh)
   "68.124.193.", // Valkyrie
-  "80.5.107." // Wynn
 };
 
 bool allowed_host(char *host)
