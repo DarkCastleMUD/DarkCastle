@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.77 2005/04/12 08:41:32 shane Exp $
+| $Id: cl_thief.cpp,v 1.78 2005/04/12 22:07:18 shane Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -499,6 +499,12 @@ int do_stalk(CHAR_DATA *ch, char *argument, int cmd)
     return eFAILURE;
   } 
 
+  if(GET_MOVE(ch) < 10) {
+    send_to_char("You are too tired to stealthily follow somebody.\n\r", ch);
+    return eFAILURE;
+  }
+  GET_MOVE(ch) -= 10;
+
   WAIT_STATE(ch, PULSE_VIOLENCE*1);
 
   if(!skill_success(ch,leader,SKILL_STALK))
@@ -507,7 +513,7 @@ int do_stalk(CHAR_DATA *ch, char *argument, int cmd)
   else { 
     do_follow(ch, argument, 10);
     do_sneak(ch, argument, 10);
-  } 
+  }
   return eSUCCESS;
 }
 
@@ -649,6 +655,12 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
     send_to_char("That person is not really there.\n\r", ch);
     return eFAILURE;
   }*/
+
+  if(GET_MOVE(ch) < 6) {
+    send_to_char("You are too tired to sneak up on anybody.\n\r", ch);
+    return eFAILURE;
+  }
+  GET_MOVE(ch) -= 6;
 
   WAIT_STATE(ch, 12); /* It takes TIME to steal */
 
@@ -1044,13 +1056,21 @@ int do_pocket(CHAR_DATA *ch, char *argument, int cmd)
     return eFAILURE;
   }
 */
-  WAIT_STATE(ch, 10); /* It takes TIME to steal */
- 
   if(!has_skill(ch,SKILL_POCKET))
   {
    send_to_char("Well, you would, if you knew how.\r\n",ch);
     return eFAILURE;
   }
+ 
+  if(GET_MOVE(ch) < 6) {
+    send_to_char("You are too tired to rob gold right now.\n\r", ch);
+    return eFAILURE;
+  }
+  GET_MOVE(ch) -= 6;
+
+  WAIT_STATE(ch, 10); /* It takes TIME to steal */
+
+
 //    skill_increase_check(ch, SKILL_POCKET, has_skill(ch,SKILL_POCKET),SKILL_INCREASE_MEDIUM);
 
   if (!skill_success(ch, victim, SKILL_POCKET)) 
