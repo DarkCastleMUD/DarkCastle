@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.240 2005/04/09 21:15:27 urizen Exp $ */
+/* $Id: fight.cpp,v 1.241 2005/04/12 00:10:35 shane Exp $ */
 
 extern "C"
 {
@@ -4075,7 +4075,8 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim, int type)
        af->type != SKILL_QUIVERING_PALM &&
        af->type != SKILL_INNATE_TIMER &&
        af->type != SPELL_HOLY_AURA_TIMER &&
-       af->type != SKILL_CRAZED_ASSAULT && !(
+       af->type != SKILL_CRAZED_ASSAULT &&
+       af->type != SKILL_FOCUSED_REPELANCE && !(
 	af->type >= 1100 && af->type <= 1300))
       affect_remove(victim, af, SUPPRESS_ALL,isaff2(af->type));
   }
