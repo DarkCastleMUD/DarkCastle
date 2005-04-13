@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.67 2005/04/09 21:15:27 urizen Exp $ */
+/* $Id: mob_proc.cpp,v 1.68 2005/04/13 18:26:48 shane Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -2726,7 +2726,7 @@ static char *dethSayText [ ] =
   "You are validating my inherent mistrust of strangers.",
   "What am I? Flypaper for freaks!?",
   "I'm not being rude. You're just insignificant.",
-  "Avoid parking tickets by leaving your windshield wipers turne to fast wipe whenever you leave your car parked illegally.",
+  "Avoid parking tickets by leaving your windshield wipers turned to fast wipe whenever you leave your car parked illegally.",
   "Old telephone books make ideal personal address books.  Simply cross out the names and addresses of people you don't know.",
   "As I said before, I never repeat myself",
   "Drink until she's cute, but stop before the wedding",
