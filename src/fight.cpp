@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.242 2005/04/12 22:12:10 shane Exp $ */
+/* $Id: fight.cpp,v 1.243 2005/04/13 06:00:16 shane Exp $ */
 
 extern "C"
 {
@@ -3230,7 +3230,7 @@ int do_skewer(CHAR_DATA *ch, CHAR_DATA *vict, int dam, int wt, int wt2, int weap
       send_to_char("You impale your weapon through your opponent's chest!\r\n", ch);
       act("$n's weapon blows through your chest sending your entrails flying for yards behind you.  Everything goes black...", ch, 0, vict, TO_VICT, 0);
       act("$n's weapon rips through $N's chest sending gore and entrails flying for yards!\r\n", ch, 0, vict, NOTVICT, 0);
-      act("$n is DEAD!!", vict, 0, 0, TO_ROOM, INVIS_NULL);
+   //duplicate message   act("$n is DEAD!!", vict, 0, 0, TO_ROOM, INVIS_NULL);
       send_to_char("You have been SKEWERED!!\n\r\n\r", vict);
       int retval = damage(ch, vict, 1, wt, wt2, weapon);
       update_pos(vict);
