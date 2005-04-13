@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.243 2005/04/13 06:00:16 shane Exp $ */
+/* $Id: fight.cpp,v 1.244 2005/04/13 17:49:19 urizen Exp $ */
 
 extern "C"
 {
@@ -4013,11 +4013,11 @@ void trip(CHAR_DATA * ch, CHAR_DATA * victim)
   act("$n trips $N and $N goes down!",
     ch, NULL, victim, TO_ROOM, NOTVICT);
   
-	 WAIT_STATE(ch, PULSE_VIOLENCE * 2);
+	 WAIT_STATE(ch, PULSE_VIOLENCE * 3);
    if(damage(ch, victim, 1,TYPE_HIT, SKILL_TRIP, 0) == (-1))
      return;
    
-   WAIT_STATE(victim, PULSE_VIOLENCE * 3);
+   WAIT_STATE(victim, PULSE_VIOLENCE * 2);
    GET_POS(victim) = POSITION_SITTING;
    
    return;
