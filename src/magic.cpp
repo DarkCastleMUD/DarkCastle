@@ -1263,6 +1263,14 @@ int spell_paralyze(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data
      }
   }
 
+  if(IS_SET(victim->immune, ISR_PARA)) {
+     act("$N absorbs your puny spell and seems no different!", ch, NULL, victim, TO_CHAR, 0);
+     act("$N absorbs $n's puny spell and seems no different!", ch, NULL, victim, TO_ROOM, NOTVICT);
+     if(!IS_NPC(victim))
+        act("You absorb $n's puny spell and are no different!", ch, NULL, victim, TO_VICT, 0);
+     return eSUCCESS;
+  }
+
 	/* save the newbies! */
   if(!IS_NPC(ch) && !IS_NPC(victim) && (GET_LEVEL(victim) < 10)) {
     send_to_char("Your cold-blooded act causes your magic to misfire!\n\r", ch);
