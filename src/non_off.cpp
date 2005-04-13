@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: non_off.cpp,v 1.22 2005/04/12 09:11:37 shane Exp $
+| $Id: non_off.cpp,v 1.23 2005/04/13 05:48:05 shane Exp $
 | non_off.C
 | Description:  Implementation of generic, non-offensive commands.
 */
@@ -919,7 +919,7 @@ int do_wake(CHAR_DATA *ch, char *argument, int cmd)
                                 act("You can not wake $M up!", ch, 0, tmp_char, TO_CHAR, 0);
                             } else {
                                 act("You manage to give $M a swift kick in the ribs.", ch, 0, tmp_char, TO_CHAR, 0);
-                                GET_POS(tmp_char) = POSITION_STANDING;
+                                GET_POS(tmp_char) = POSITION_SITTING;
                                 act("$n awakens $N.", ch, 0, tmp_char, TO_ROOM, NOTVICT);
                                 act("$n wakes you up with a sharp kick to the ribs.  The sounds of battle ring in your ears.", ch, 0, tmp_char, TO_VICT, 0);
                                 affect_from_char(tmp_char, INTERNAL_SLEEPING);
@@ -935,7 +935,7 @@ int do_wake(CHAR_DATA *ch, char *argument, int cmd)
                             } else {
                                 act("You wake $M up.", ch, 0, tmp_char, TO_CHAR, 0);
                                 act("$n awakens $N.", ch, 0, tmp_char, TO_ROOM, NOTVICT);
-                                GET_POS(tmp_char) = POSITION_STANDING;
+                                GET_POS(tmp_char) = POSITION_SITTING;
                                 act("You are awakened by $n.", ch, 0, tmp_char, TO_VICT, 0);
                                 affect_from_char(tmp_char, INTERNAL_SLEEPING);
                             }
