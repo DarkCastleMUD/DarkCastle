@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.31 2005/04/13 17:38:21 urizen Exp $
+| $Id: cl_warrior.cpp,v 1.32 2005/04/13 20:51:00 shane Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -402,7 +402,7 @@ int do_bash(struct char_data *ch, char *argument, int cmd)
       {
         modifier += 10;
         // if the basher is a barb though, give them the full effect
-        if(GET_RACE(ch) == RACE_DWARVEN)
+        if(GET_CLASS(ch) == CLASS_BARBARIAN)
            modifier += 10;
       }
     }
