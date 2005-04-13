@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_barbarian.cpp,v 1.29 2005/04/13 18:31:10 urizen Exp $
+| $Id: cl_barbarian.cpp,v 1.30 2005/04/13 21:37:02 shane Exp $
 | cl_barbarian.C
 | Description:  Commands for the barbarian class.
 */
@@ -203,14 +203,19 @@ int do_berserk(struct char_data *ch, char *argument, int cmd)
     if(has_skill(ch,SKILL_BERSERK) > 50 && !number(0, 5)) {
        SET_BIT(ch->combat, COMBAT_BASH2);
        send_to_char("Your advanced training in berserk allows you to roll with your fall and get up faster.\r\n", ch);
+       WAIT_STATE(ch, PULSE_VIOLENCE * 2);
     }
-    else SET_BIT(ch->combat, COMBAT_BASH1);     
-    WAIT_STATE(ch, PULSE_VIOLENCE*3);
+    else {
+       SET_BIT(ch->combat, COMBAT_BASH1);     
+       WAIT_STATE(ch, PULSE_VIOLENCE * 3);
+    }
   }
   else {
     act ("You start FOAMING at the mouth, and you go BERSERK on $N!", ch, 0, victim, TO_CHAR, 0);
     act ("$n starts FOAMING at the mouth, and goes BERSERK on you!", ch, 0, victim, TO_VICT, 0);
     act ("$n starts FOAMING at the mouth, as $e goes BERSERK on $N!", ch, 0, victim, TO_ROOM, NOTVICT);
+    if(!IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_WIMPY))
+       WAIT_STATE(ch, PULSE_VIOLENCE * 3);
     bSuccess = 1;
   }
 
@@ -222,7 +227,7 @@ int do_berserk(struct char_data *ch, char *argument, int cmd)
 
   if(!IS_SET(retval, eCH_DIED)) {
 //   if (!IS_SET(retval, eVICT_DIED))
-   // WAIT_STATE(ch, PULSE_VIOLENCE * 3);
+//     WAIT_STATE(ch, PULSE_VIOLENCE * 3);
   
     REMOVE_BIT(ch->combat, COMBAT_RAGE1);
     REMOVE_BIT(ch->combat, COMBAT_RAGE2);
