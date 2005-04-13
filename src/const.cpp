@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.127 2005/04/12 05:20:29 shane Exp $ */
+/* $Id: const.cpp,v 1.128 2005/04/13 17:38:19 urizen Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1217,7 +1217,7 @@ struct class_skill_defines a_skills[] = { // anti-paladin skills
 {    "fear",                 SPELL_FEAR,              37,     90,     {WIS,INT} },
 {    "dispel good",          SPELL_DISPEL_GOOD,       38,     90,     {WIS,STR} },
 {    "acid shield",          SPELL_ACID_SHIELD,       40,     98,     {INT,STR} },
-{    "curse",                SPELL_CURSE,             41,     80,     {WIS,INT} },
+{    "curse",                SPELL_CURSE,             41,     70,     {WIS,INT} },
 {    "firestorm",            SPELL_FIRESTORM,         42,     85,     {INT,STR} },
 {    "stoneskin",            SPELL_STONE_SKIN,        44,     85,     {STR,CON} },
 {    "protection from good", SPELL_PROTECT_FROM_GOOD, 45,     90,     {WIS,DEX} },

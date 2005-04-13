@@ -1623,7 +1623,9 @@ int spell_curse(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
 	 af.duration  = duration;
 	 af.modifier  = save;
 	 af.location  = APPLY_SAVING_MAGIC;
+	if (skill > 70)
          af.bitvector = AFF_CURSE;
+	else af.bitvector = 0;
 	 affect_to_char(victim, &af);
 	 af.location = APPLY_SAVING_FIRE;
 	 affect_to_char(victim, &af);

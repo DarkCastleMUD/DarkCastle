@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.30 2005/04/13 17:32:26 urizen Exp $
+| $Id: cl_warrior.cpp,v 1.31 2005/04/13 17:38:21 urizen Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -429,9 +429,9 @@ int do_bash(struct char_data *ch, char *argument, int cmd)
 	GET_POS(victim) = POSITION_SITTING;
         SET_BIT(victim->combat, COMBAT_BASH1);
         // if they already have 2 rounds of wait, only tack on 1 instead of 2
-        if(victim->desc && (victim->desc->wait > 5))
+        if(victim->desc)
           WAIT_STATE(victim, PULSE_VIOLENCE * 2);
-	else WAIT_STATE(victim, PULSE_VIOLENCE * 3);
+//	else WAIT_STATE(victim, PULSE_VIOLENCE * 3);
  //       act("Your bash at $N sends $M sprawling.", ch, NULL, victim, 
 //TO_CHAR , 0);
  //       act("$n sends you sprawling.", ch, NULL, victim, TO_VICT , 0);
