@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_barbarian.cpp,v 1.27 2005/04/13 17:49:21 urizen Exp $
+| $Id: cl_barbarian.cpp,v 1.29 2005/04/13 18:31:10 urizen Exp $
 | cl_barbarian.C
 | Description:  Commands for the barbarian class.
 */
@@ -205,6 +205,7 @@ int do_berserk(struct char_data *ch, char *argument, int cmd)
        send_to_char("Your advanced training in berserk allows you to roll with your fall and get up faster.\r\n", ch);
     }
     else SET_BIT(ch->combat, COMBAT_BASH1);     
+    WAIT_STATE(ch, PULSE_VIOLENCE*3);
   }
   else {
     act ("You start FOAMING at the mouth, and you go BERSERK on $N!", ch, 0, victim, TO_CHAR, 0);
@@ -221,7 +222,7 @@ int do_berserk(struct char_data *ch, char *argument, int cmd)
 
   if(!IS_SET(retval, eCH_DIED)) {
 //   if (!IS_SET(retval, eVICT_DIED))
- //   WAIT_STATE(ch, PULSE_VIOLENCE * 3);
+   // WAIT_STATE(ch, PULSE_VIOLENCE * 3);
   
     REMOVE_BIT(ch->combat, COMBAT_RAGE1);
     REMOVE_BIT(ch->combat, COMBAT_RAGE2);
