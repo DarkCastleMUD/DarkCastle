@@ -1072,13 +1072,31 @@ char * calc_color_align(int align)
 
 char * calc_color(int hit, int max_hit)
 {
+  int percentage = hit * 100 / max_hit;
+
+  if(percentage >= 100)
+    return BOLD GREEN;
+  else if(percentage >= 90)
+    return GREEN;
+  else if(percentage >= 75)
+    return BOLD YELLOW;
+  else if(percentage >= 50)
+    return YELLOW;
+  else if(percentage >= 30)
+    return RED;
+  else if(percentage >= 15)
+    return BOLD RED;
+  else return BOLD GREY;
+
+/*
   if(hit <= (max_hit / 3))
     return BOLD RED;
 
   if(hit <= (max_hit / 3) * 2)
-    return BOLD YELLOW;
+    return BOLD YELLOW; 
 
-  return GREEN;
+  return BOLD GREEN;
+*/
 }
 
 char * cond_txtz[] = {
@@ -1309,7 +1327,7 @@ void generate_prompt(CHAR_DATA *ch, char *prompt)
          break;
 	case 'F':
          if(ch->fighting)
-           sprintf(pro, "<%s>", calc_condition(ch->fighting,TRUE));
+           sprintf(pro, "(%s)", calc_condition(ch->fighting,TRUE));
 /* added by pir to stop "prompt %c" crash bug */
          else sprintf(pro, " ");
          break;
@@ -1323,7 +1341,7 @@ void generate_prompt(CHAR_DATA *ch, char *prompt)
          break;
         case 'T':
          if(ch->fighting && ch->fighting->fighting)
-           sprintf(pro, "<%s>", calc_condition(ch->fighting->fighting,TRUE));
+           sprintf(pro, "[%s]", calc_condition(ch->fighting->fighting,TRUE));
 /* added by pir to stop "prompt %c" crash bug */
          else sprintf(pro, " ");
          break;
