@@ -21,7 +21,7 @@
  *  12/08/2003   Onager    Added check for charmies and !charmie eq to     *
  *                         equip_char()                                    *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.77 2005/04/09 21:15:27 urizen Exp $ */
+/* $Id: handler.cpp,v 1.78 2005/04/13 22:00:56 apocalypse Exp $ */
     
 extern "C"
 {
@@ -380,6 +380,10 @@ const struct set_data set_list[] = {
 	360, 361, 362, 362, 9702, 9808, 9808, 27114, 27114, -1},
 	"You feel your stance harden and blood boil as you strap on your battlerager's gear.",
 	"Your blood returns to its normal temperature as you remove your battlerager's gear."},
+  { "Veteran's Field Plate Armour", (21719, 21720, 21721, 21722, 21723, 21724, 21725, 21726, 21727,
+	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1),
+ 	"There is an audible *click* as the field plate locks into its optimal assembly.",
+	"There is a soft *click* as you remove the field plate from its optimal positioning."),
   { "\n", {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
 	"\n","\n"}
 };
@@ -425,7 +429,7 @@ void add_set_stats(char_data *ch, obj_data *obj, int flag)
 	send_to_char(set_list[z].Set_Wear_Message, ch);
 	switch (z)
 	{
-	  case SET_SAIYAN: // Saiyan set makes me all hard.
+	  case SET_SAIYAN: // (aka Ascetic's Focus)
 	    af.bitvector = AFF_HASTE;
 	    affect_to_char(ch,&af);
   	    break;
@@ -460,6 +464,17 @@ void add_set_stats(char_data *ch, obj_data *obj, int flag)
 	    af.location = SKILL_BLOOD_FURY *1000;
 	    af.modifier = 5;
 	    af.bitvector = 0;
+	    affect_to_char(ch, &af);
+	    break;
+	  case SET_FIELDPLATE:
+            af.location = APPLY_HIT;
+	    af.modifier = 100;
+	    affect_to_char(ch, &af);
+            af.location = APPLY_HIT_N_DAM;
+	    af.modifier = 6;
+	    affect_to_char(ch, &af);
+	    af.location = APPLY_AC;
+	    af.modifier = -40;
 	    affect_to_char(ch, &af);
 	    break;
 	  default: 
