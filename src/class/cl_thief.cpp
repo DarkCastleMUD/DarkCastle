@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.78 2005/04/12 22:07:18 shane Exp $
+| $Id: cl_thief.cpp,v 1.79 2005/04/13 17:32:26 urizen Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -195,6 +195,7 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
 
   // record the room I'm in.  Used to make sure a dual can go off.
   was_in = ch->in_room;
+  bool bingo = FALSE;
 
   // failure
   if(AWAKE(victim) && !skill_success(ch,victim,SKILL_BACKSTAB))
@@ -211,6 +212,7 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
              )
          ) 
   { 
+    bingo = TRUE;
     act("$N crumples to the ground, $S body still quivering from "
         "$n's brutal assassination.", ch, 0, victim, TO_ROOM, NOTVICT);
     act("You feel $n's blade slip into your heart, and all goes black.",
@@ -222,9 +224,11 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
   else
     retval = attack(ch, victim, SKILL_BACKSTAB, FIRST);
 
-  if(SOMEONE_DIED(retval))
+  if (retval & eVICT_DIED && !retval & eCH_DIED)
   {
-    if(IS_SET(ch->pcdata->toggles, PLR_WIPMY))
+    if(!IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_WIMPY) && !bingo)
+        WAIT_STATE(ch, PULSE_VIOLENCE *2);
+     else if (!bingo)
        WAIT_STATE(ch, PULSE_VIOLENCE);
     return retval;
   }
@@ -246,9 +250,18 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
         {
 //           percent = number(1, 101);
            if (AWAKE(victim) && !skill_success(ch,victim, SKILL_BACKSTAB))
-              return damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_BACKSTAB, SECOND);
+              retval = damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_BACKSTAB, SECOND);
            else
-              return attack(ch, victim, SKILL_BACKSTAB, SECOND);
+              retval = attack(ch, victim, SKILL_BACKSTAB, SECOND);
+
+	 if (retval & eVICT_DIED && !retval & eCH_DIED) 
+	{
+	    if(!IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_WIMPY))
+	        WAIT_STATE(ch, PULSE_VIOLENCE * 2);
+	     else
+	       WAIT_STATE(ch, PULSE_VIOLENCE);
+	}
+
         }
   }
   return eSUCCESS;

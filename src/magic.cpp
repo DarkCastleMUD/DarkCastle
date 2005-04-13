@@ -1622,7 +1622,7 @@ int spell_curse(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
 	 af.type      = SPELL_CURSE;
 	 af.duration  = duration;
 	 af.modifier  = save;
-	 af.location  = APPLY_SAVING_MAGIC
+	 af.location  = APPLY_SAVING_MAGIC;
          af.bitvector = AFF_CURSE;
 	 affect_to_char(victim, &af);
 	 af.location = APPLY_SAVING_FIRE;
@@ -8625,6 +8625,7 @@ int cast_entangle(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *vic
 
 
 	spell_blindness(level, ch, victim, 0, 0);       /* The plants blind the victim . . */
+	if (GET_POS(victim) > POSITION_SITTING)
 	GET_POS(victim) = POSITION_SITTING;		/* And pull the victim down to the ground */
 	update_pos(victim);
 	return eSUCCESS;

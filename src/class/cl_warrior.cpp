@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.29 2005/04/12 01:31:04 shane Exp $
+| $Id: cl_warrior.cpp,v 1.30 2005/04/13 17:32:26 urizen Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -18,6 +18,7 @@
 #include <act.h>
 #include <db.h>
 #include <returnvals.h>
+#include <race.h>
 
 extern CWorld world;
 extern struct index_data *obj_index;
@@ -406,7 +407,8 @@ int do_bash(struct char_data *ch, char *argument, int cmd)
       }
     }
     // if it's a barb
-    if(ch->equipment[WIELD] && IS_SET(ch->equipment[WIELD]->obj_flags.extra_flags, ITEM_TWO_HANDED)
+//    if(ch->equipment[WIELD] && 
+//IS_SET(ch->equipment[WIELD]->obj_flags.extra_flags, ITEM_TWO_HANDED)
 
 
     WAIT_STATE(ch, PULSE_VIOLENCE*3);

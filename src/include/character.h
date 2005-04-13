@@ -1,7 +1,7 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.26 2005/04/09 21:15:35 urizen Exp $
+| $Id: character.h,v 1.27 2005/04/13 17:32:33 urizen Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
@@ -369,6 +369,8 @@ struct char_data
 
     int32 deaths;                   /* deaths is reused for mobs as a
                                        timer to check for WAIT_STATE */
+
+    int cID; // character ID
 
     struct timer_data *timerAttached;
     struct tempvariable *tempVariable;
