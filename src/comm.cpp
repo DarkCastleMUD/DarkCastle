@@ -1072,6 +1072,7 @@ char * calc_color_align(int align)
 
 char * calc_color(int hit, int max_hit)
 {
+/* damn whiney players
   int percentage = hit * 100 / max_hit;
 
   if(percentage >= 100)
@@ -1087,8 +1088,8 @@ char * calc_color(int hit, int max_hit)
   else if(percentage >= 15)
     return BOLD RED;
   else return BOLD GREY;
+*/
 
-/*
   if(hit <= (max_hit / 3))
     return BOLD RED;
 
@@ -1096,7 +1097,7 @@ char * calc_color(int hit, int max_hit)
     return BOLD YELLOW; 
 
   return BOLD GREEN;
-*/
+
 }
 
 char * cond_txtz[] = {
