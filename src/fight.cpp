@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.244 2005/04/13 17:49:19 urizen Exp $ */
+/* $Id: fight.cpp,v 1.246 2005/04/13 20:28:53 shane Exp $ */
 
 extern "C"
 {
@@ -4093,7 +4093,7 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim, int type)
   
   save_char_obj(victim);
 
-  // have to be level 10 and linkalive to count as a pkill and not yourself
+  // have to be level 20 and linkalive to count as a pkill and not yourself
   if (ch != NULL) {
     if (type == KILL_POTATO)
       sprintf(killer_message,"\n\r##%s just got POTATOED!!\n\r", GET_NAME(victim));
@@ -4173,7 +4173,7 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim, int type)
         break;
     }
 
-    // have to be level 10 and linkalive to count as a pkill and not yourself
+    // have to be level 20 and linkalive to count as a pkill and not yourself
     // (we check earlier to make sure victim isn't a mob)
     // now with tav/meta pkilling not adding to your score
     if(!IS_MOB(ch) && GET_LEVEL(victim) > PKILL_COUNT_LIMIT && victim->desc && ch != victim && ch->in_room != real_room(START_ROOM) && ch->in_room != real_room(SECOND_START_ROOM))
@@ -4192,8 +4192,45 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim, int type)
             master->pcdata->grplvl      += GET_LEVEL(victim);
             master->pcdata->group_kills += 1;
           }
+       }
+    }
+    if(IS_AFFECTED(ch, AFF_CHARM) && ch->master && GET_LEVEL(victim) > PKILL_COUNT_LIMIT && victim->desc && ch->master != victim && ch->in_room != real_room(START_ROOM) && ch->in_room != real_room(SECOND_START_ROOM)) {
+       GET_PDEATHS(victim) += 1;
+       GET_PDEATHS_LOGIN(victim) += 1;
+
+       GET_PKILLS(ch->master)             += 1;
+       GET_PKILLS_LOGIN(ch->master)       += 1;
+       GET_PKILLS_TOTAL(ch->master)       += GET_LEVEL(victim);
+       GET_PKILLS_TOTAL_LOGIN(ch->master) += GET_LEVEL(victim);
+
+       if(ch->master->master)
+        if(IS_AFFECTED(ch->master->master, AFF_GROUP)) {
+          char_data * master   = ch->master->master ? ch->master->master : ch->master;
+          if(!IS_MOB(master)) {
+            master->pcdata->grplvl      += GET_LEVEL(victim);
+            master->pcdata->group_kills += 1;
+          }
         }
-       } // if (ch && ch != victim)
+    }
+    if(IS_AFFECTED2(ch, AFF_FAMILIAR) && ch->master && GET_LEVEL(victim) > PKILL_COUNT_LIMIT && victim->desc && ch->master != victim && ch->in_room != real_room(START_ROOM) && ch->in_room != real_room(SECOND_START_ROOM)) {
+       GET_PDEATHS(victim) += 1;
+       GET_PDEATHS_LOGIN(victim) += 1;
+
+       GET_PKILLS(ch->master)             += 1;
+       GET_PKILLS_LOGIN(ch->master)       += 1;
+       GET_PKILLS_TOTAL(ch->master)       += GET_LEVEL(victim);
+       GET_PKILLS_TOTAL_LOGIN(ch->master) += GET_LEVEL(victim);
+
+       if(ch->master->master)
+        if(IS_AFFECTED(ch->master->master, AFF_GROUP)) {
+          char_data * master   = ch->master->master ? ch->master->master : ch->master;
+          if(!IS_MOB(master)) {
+             master->pcdata->grplvl      += GET_LEVEL(victim);
+             master->pcdata->group_kills += 1;
+          }
+        }
+    }
+ // if (ch && ch != victim)
   } else {
     // ch == NULL
    if (type == KILL_DROWN)
