@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.55 2005/04/09 21:15:27 urizen Exp $ */
+/* $Id: limits.cpp,v 1.56 2005/04/13 07:39:37 shane Exp $ */
 
 extern "C"
 {
@@ -676,9 +676,10 @@ void food_update( void )
     gain_condition(i,FULL,amt);
     if(!GET_COND(i, FULL)) { // i'm hungry
       if(!IS_MOB(i) && IS_SET(i->pcdata->toggles, PLR_AUTOEAT) && (GET_POS(i) > POSITION_SLEEPING)) {
-        if(FOUNTAINisPresent(i)) {
+        if(IS_DARK(i->in_room) && (!IS_MOB(i) && !i->pcdata->holyLite))
+          send_to_char("It's too dark to see what's safe to eat!\n\r", i);
+        else if(FOUNTAINisPresent(i))
           do_drink(i, "fountain", 9);
-        }
         else if((food =  bring_type_to_front(i, ITEM_FOOD)))
           do_eat(i, food->name, 9);
         else send_to_char("You are out of food.\n\r", i);
@@ -688,9 +689,10 @@ void food_update( void )
     gain_condition(i,THIRST,amt);
     if(!GET_COND(i, THIRST)) { // i'm thirsty
       if(!IS_MOB(i) && IS_SET(i->pcdata->toggles, PLR_AUTOEAT) && (GET_POS(i) > POSITION_SLEEPING)) {
-        if(FOUNTAINisPresent(i)) {
+        if(IS_DARK(i->in_room) && (!IS_MOB(i) && !i->pcdata->holyLite))
+          send_to_char("It's too dark to see if there's any potable liquid around!\n\r", i);
+        else if(FOUNTAINisPresent(i))
           do_drink(i, "fountain", 9);
-        }
         else if((food =  bring_type_to_front(i, ITEM_DRINKCON)))
           do_drink(i, food->name, 9);
         else send_to_char("You are out of drink.\n\r", i);
