@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_barbarian.cpp,v 1.26 2005/04/09 21:15:31 urizen Exp $
+| $Id: cl_barbarian.cpp,v 1.28 2005/04/13 00:40:38 shane Exp $
 | cl_barbarian.C
 | Description:  Commands for the barbarian class.
 */
@@ -220,6 +220,7 @@ int do_berserk(struct char_data *ch, char *argument, int cmd)
      retval = attack(ch, victim, TYPE_UNDEFINED);
 
   if(!IS_SET(retval, eCH_DIED)) {
+//   if (!IS_SET(retval, eVICT_DIED))
     WAIT_STATE(ch, PULSE_VIOLENCE * 3);
   
     REMOVE_BIT(ch->combat, COMBAT_RAGE1);
