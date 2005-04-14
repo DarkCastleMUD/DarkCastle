@@ -19,6 +19,7 @@ struct set_data
 #define SET_CAPTAINS 3
 #define SET_CELEBRANTS 4
 #define SET_RAGER 5
+#define SET_FIELDPLATE 6
 
 extern const struct set_data set_list[];
  
