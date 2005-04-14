@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.80 2005/04/14 11:08:12 shane Exp $
+| $Id: cl_thief.cpp,v 1.81 2005/04/14 20:27:07 shane Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -38,7 +38,7 @@ int palm(CHAR_DATA *ch, struct obj_data *obj_object,
 {
   char buffer[MAX_STRING_LENGTH];
     
-  if(!has_skill(ch, SKILL_PALM)) {
+  if(!has_skill(ch, SKILL_PALM) && !IS_NPC(ch)) {
     send_to_char("You aren't THAT slick there, pal.\r\n", ch);
     return eFAILURE;
   }
@@ -139,6 +139,12 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
 
   one_argument(argument, name);
 
+  if(!has_skill(ch,SKILL_BACKSTAB) && !IS_MOB(ch) ) 
+  {
+    send_to_char("You don't know how to backstab people!\r\n", ch);
+    return eFAILURE;
+  }
+
   if(!(victim = get_char_room_vis(ch, name))) {
     send_to_char("Backstab whom?\n\r", ch);
     return eFAILURE;
@@ -192,11 +198,6 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
   int itemp = number(1, 101);
   if (GET_CLASS(ch) == CLASS_ANTI_PAL)
     itemp++; // One extra %'s chance.
-  if(!has_skill(ch,SKILL_BACKSTAB) && !IS_MOB(ch) ) 
-  {
-    send_to_char("You don't know how to backstab people!\r\n", ch);
-    return eFAILURE;
-  }
 
   // record the room I'm in.  Used to make sure a dual can go off.
   was_in = ch->in_room;
@@ -488,6 +489,14 @@ int do_stalk(CHAR_DATA *ch, char *argument, int cmd)
   char name[MAX_STRING_LENGTH];
   CHAR_DATA *leader;
 
+
+  if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
+    ;
+  else if(!has_skill(ch, SKILL_STALK)) {
+    send_to_char("I bet you think you're a thief. ;)\n\r", ch);
+    return eFAILURE;
+  } 
+
   if(!(*argument)) {
     send_to_char("Pick a name, any name.\n\r", ch);
     return eFAILURE;
@@ -510,13 +519,6 @@ int do_stalk(CHAR_DATA *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
-    ;
-  else if(!has_skill(ch, SKILL_STALK)) {
-    send_to_char("I bet you think you're a thief. ;)\n\r", ch);
-    return eFAILURE;
-  } 
-
   if(GET_MOVE(ch) < 10) {
     send_to_char("You are too tired to stealthily follow somebody.\n\r", ch);
     return eFAILURE;
@@ -537,6 +539,13 @@ int do_stalk(CHAR_DATA *ch, char *argument, int cmd)
 
 int do_hide(CHAR_DATA *ch, char *argument, int cmd)
 {
+
+  if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
+    ;
+  else if(!has_skill(ch, SKILL_HIDE)) {
+    send_to_char("I bet you think you're a thief. ;)\n\r", ch);
+    return eFAILURE;
+  } 
 
   if((ch->in_room >= 0 && ch->in_room <= top_of_world) &&
      IS_SET(world[ch->in_room].room_flags, ARENA) && arena[2] == -3) {
