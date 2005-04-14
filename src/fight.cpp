@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.245 2005/04/13 22:32:37 shane Exp $ */
+/* $Id: fight.cpp,v 1.247 2005/04/14 11:08:48 shane Exp $ */
 
 extern "C"
 {
@@ -651,6 +651,9 @@ int do_lightning_shield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
   if (GET_POS(ch) == POSITION_DEAD) {
       group_gain(vict, ch);
       fight_kill(vict, ch, TYPE_CHOOSE, 0);
+      act("$n is DEAD!!", ch, 0, 0, to_ROOM, INVIS_NULL);
+      if(!IS_NPC(ch))
+         send_to_char("You have been KILLED!!\n\r\n\r", ch);
       return eSUCCESS|eCH_DIED;
   }
 
@@ -740,6 +743,9 @@ int do_fireshield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
   if (GET_POS(ch) == POSITION_DEAD) {
       group_gain(vict, ch);
       fight_kill(vict, ch, TYPE_CHOOSE, 0);
+      act("$n is DEAD!!", ch, 0, 0, to_ROOM, INVIS_NULL);
+      if(!IS_NPC(ch))
+         send_to_char("You have been KILLED!!\n\r\n\r", ch);
       return eSUCCESS|eCH_DIED;
   }
 
@@ -797,6 +803,9 @@ int do_acidshield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
   if (GET_POS(ch) == POSITION_DEAD) {
       group_gain(vict, ch);
       fight_kill(vict, ch, TYPE_CHOOSE, 0);
+      act("$n is DEAD!!", ch, 0, 0, to_ROOM, INVIS_NULL);
+      if(!IS_NPC(ch))
+         send_to_char("You have been KILLED!!\n\r\n\r", ch);
       return eSUCCESS|eCH_DIED;
   }
 
@@ -4194,7 +4203,7 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim, int type)
           }
        }
     }
-    if(IS_AFFECTED(ch, AFF_CHARM) && ch->master && GET_LEVEL(victim) > PKILL_COUNT_LIMIT && ictim->desc && ch->master != victim && ch->in_room != real_room(START_ROOM) && ch->in_room != real_room(SECOND_START_ROOM)) {
+    if(IS_AFFECTED(ch, AFF_CHARM) && ch->master && GET_LEVEL(victim) > PKILL_COUNT_LIMIT && victim->desc && ch->master != victim && ch->in_room != real_room(START_ROOM) && ch->in_room != real_room(SECOND_START_ROOM)) {
        GET_PDEATHS(victim) += 1;
        GET_PDEATHS_LOGIN(victim) += 1;
 
@@ -4203,15 +4212,16 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim, int type)
        GET_PKILLS_TOTAL(ch->master)       += GET_LEVEL(victim);
        GET_PKILLS_TOTAL_LOGIN(ch->master) += GET_LEVEL(victim);
 
-       if(IS_AFFECTED(ch->master->master, AFF_GROUP)) {
+       if(ch->master->master)
+        if(IS_AFFECTED(ch->master->master, AFF_GROUP)) {
           char_data * master   = ch->master->master ? ch->master->master : ch->master;
           if(!IS_MOB(master)) {
-             master->pcdata->grplvl      += GET_LEVEL(victim);
-             master->pcdata->group_kills += 1;
+            master->pcdata->grplvl      += GET_LEVEL(victim);
+            master->pcdata->group_kills += 1;
           }
-       }
+        }
     }
-    if(IS_AFFECTED2(ch, AFF_FAMILIAR) && ch->master && GET_LEVEL(victim) > PKILL_COUNT_LIMIT && ictim->desc && ch->master != victim && ch->in_room != real_room(START_ROOM) && ch->in_room != real_room(SECOND_START_ROOM)) {
+    if(IS_AFFECTED2(ch, AFF_FAMILIAR) && ch->master && GET_LEVEL(victim) > PKILL_COUNT_LIMIT && victim->desc && ch->master != victim && ch->in_room != real_room(START_ROOM) && ch->in_room != real_room(SECOND_START_ROOM)) {
        GET_PDEATHS(victim) += 1;
        GET_PDEATHS_LOGIN(victim) += 1;
 
@@ -4220,13 +4230,14 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim, int type)
        GET_PKILLS_TOTAL(ch->master)       += GET_LEVEL(victim);
        GET_PKILLS_TOTAL_LOGIN(ch->master) += GET_LEVEL(victim);
 
-       if(IS_AFFECTED(ch->master->master, AFF_GROUP)) {
+       if(ch->master->master)
+        if(IS_AFFECTED(ch->master->master, AFF_GROUP)) {
           char_data * master   = ch->master->master ? ch->master->master : ch->master;
           if(!IS_MOB(master)) {
              master->pcdata->grplvl      += GET_LEVEL(victim);
              master->pcdata->group_kills += 1;
           }
-       }
+        }
     }
  // if (ch && ch != victim)
   } else {
