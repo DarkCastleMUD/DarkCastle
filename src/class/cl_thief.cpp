@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.79 2005/04/13 17:32:26 urizen Exp $
+| $Id: cl_thief.cpp,v 1.80 2005/04/14 11:08:12 shane Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -37,7 +37,12 @@ int palm(CHAR_DATA *ch, struct obj_data *obj_object,
           struct obj_data *sub_object)
 {
   char buffer[MAX_STRING_LENGTH];
-  
+    
+  if(!has_skill(ch, SKILL_PALM)) {
+    send_to_char("You aren't THAT slick there, pal.\r\n", ch);
+    return eFAILURE;
+  }
+
   if(IS_SET(obj_object->obj_flags.more_flags, ITEM_UNIQUE)) {
     if(search_char_for_item(ch, obj_object->item_number)) {
        send_to_char("The item's uniqueness prevents it!\r\n", ch);
