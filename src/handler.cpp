@@ -21,7 +21,7 @@
  *  12/08/2003   Onager    Added check for charmies and !charmie eq to     *
  *                         equip_char()                                    *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.79 2005/04/14 11:41:32 shane Exp $ */
+/* $Id: handler.cpp,v 1.80 2005/04/14 11:49:11 shane Exp $ */
     
 extern "C"
 {
@@ -383,7 +383,7 @@ const struct set_data set_list[] = {
   { "Veteran's Field Plate Armour", {21719, 21720, 21721, 21722, 21723, 21724, 21725, 21726, 21727,
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
  	"There is an audible *click* as the field plate locks into its optimal assembly.\r\n",
-	"There is a soft *click* as you remove the field plate from its optimal positioning.\r\n"),
+	"There is a soft *click* as you remove the field plate from its optimal positioning.\r\n"},
   { "\n", {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
 	"\n","\n"}
 };
