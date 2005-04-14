@@ -21,7 +21,7 @@
  *  12/08/2003   Onager    Added check for charmies and !charmie eq to     *
  *                         equip_char()                                    *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.78 2005/04/13 22:00:56 apocalypse Exp $ */
+/* $Id: handler.cpp,v 1.79 2005/04/14 11:41:32 shane Exp $ */
     
 extern "C"
 {
@@ -378,12 +378,12 @@ const struct set_data set_list[] = {
 	"Your inner focus has reverted to its original form.\r\n"},
   { "Battlerager's Fury", {352, 353, 354, 355, 356, 357, 358, 359, 359,
 	360, 361, 362, 362, 9702, 9808, 9808, 27114, 27114, -1},
-	"You feel your stance harden and blood boil as you strap on your battlerager's gear.",
-	"Your blood returns to its normal temperature as you remove your battlerager's gear."},
-  { "Veteran's Field Plate Armour", (21719, 21720, 21721, 21722, 21723, 21724, 21725, 21726, 21727,
-	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1),
- 	"There is an audible *click* as the field plate locks into its optimal assembly.",
-	"There is a soft *click* as you remove the field plate from its optimal positioning."),
+	"You feel your stance harden and blood boil as you strap on your battlerager's gear.\r\n",
+	"Your blood returns to its normal temperature as you remove your battlerager's gear.\r\n"},
+  { "Veteran's Field Plate Armour", {21719, 21720, 21721, 21722, 21723, 21724, 21725, 21726, 21727,
+	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+ 	"There is an audible *click* as the field plate locks into its optimal assembly.\r\n",
+	"There is a soft *click* as you remove the field plate from its optimal positioning.\r\n"),
   { "\n", {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
 	"\n","\n"}
 };
