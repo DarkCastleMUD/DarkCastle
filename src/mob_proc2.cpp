@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.42 2005/04/14 11:37:08 shane Exp $ */
+/* $Id: mob_proc2.cpp,v 1.43 2005/04/15 11:22:01 shane Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -1269,11 +1269,13 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     "10) One (1) Platinum coin     Cost: 20,000 Gold Coins.\n\r"
     "11) Five (5) Platinum coins   Cost: 100,000 Gold Coins.\n\r"
     "12) 250 Platinum coins        Cost: 5,000,000 Gold Coins.\n\r"
-    "13) Buy a practice session for 25 plats.\n\r"
-    "14) Freedom from HUNGER and THIRST:  Currently out of stock.\n\r"
+    "13) 90,000 Gold Coins         Cost: Five (5) Platinum coins.\n\r"
+    "14) 4,500,000 Gold Coins      Cost: 250 Platinum coins.\n\r"
     "15) Convert experience to gold. (100mil Exp. = 500000 Gold.)\n\r"
     "16) A deep blue potion of healing. Cost: 25 Platinum coins.\r\n"
     "17) A deep red vial of mana. Cost: 50 Platinum coins.\r\n"
+    "18) Buy a practice session for 25 plats.\n\r"
+    "19) Freedom from HUNGER and THIRST:  Currently out of stock.\n\r"
                  , ch);
 
     return eSUCCESS;
@@ -1422,7 +1424,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
      redo_mana(ch);
      return eSUCCESS;
    }
-/*   if(choice == 14) {
+/*   if(choice == 19) {
      price = 100000000;
      if(GET_COND(ch, FULL) == -1) {
        send_to_char("The Meta-physician tells you, 'You already have "
@@ -1525,8 +1527,30 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     send_to_char("Ok.\n\r", ch);
     return eSUCCESS;
   }
-
   if(choice == 13) {
+    if(GET_PLATINUM(ch) < 5) {
+      send_to_char("The Meta-physician tells you, 'You can't afford that!\n\r", ch);
+      return eSUCCESS;
+    }
+    GET_PLATINUM(ch) -= 5;
+    GET_GOLD(ch) += 90000;
+    send_to_char("Ok.\n\r", ch);
+    return eSUCCESS;
+  }
+
+  if(choice == 14) {
+    if(GET_PLATINUM(ch) < 250) {
+      send_to_char("The Meta-physician tells you, 'You can't afford that!\n\r", ch);
+      return eSUCCESS;
+    }
+    GET_PLATINUM(ch) -= 250;
+    GET_GOLD(ch) += 4500000;
+    send_to_char("Ok.\n\r", ch);
+    return eSUCCESS;
+  }
+
+
+  if(choice == 18) {
     if (GET_PLATINUM(ch) < 25) {
        send_to_char ("Costs 25 plats...which you don't have.\n\r", ch);
        return eSUCCESS;
