@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: who.cpp,v 1.16 2005/04/09 21:15:27 urizen Exp $
+| $Id: who.cpp,v 1.17 2005/04/15 16:56:46 urizen Exp $
 | who.C
 | Commands for who, maybe? :P
 */
@@ -443,6 +443,10 @@ int do_who(struct char_data *ch, char *argument, int cmd)
 	     if (!str_cmp(GET_NAME(i), "Urizen")) {
 		infoField = infoBuf;
 		sprintf(infoBuf, "    Coder    "); // No imagination today.
+	     }
+	     if (!str_cmp(GET_NAME(i), "Dasein")) {
+		infoField = infoBuf;
+		sprintf(infoBuf, "    Logos    ");
 	     }
             if(!strcmp(GET_NAME(i), "Rahz")) {
                 infoField = infoBuf;
