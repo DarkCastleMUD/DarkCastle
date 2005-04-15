@@ -1096,7 +1096,7 @@ char * calc_color(int hit, int max_hit)
   if(hit <= (max_hit / 3) * 2)
     return BOLD YELLOW; 
 
-  return BOLD GREEN;
+  return GREEN;
 
 }
 
