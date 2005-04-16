@@ -11,17 +11,8 @@
  *                                                                         *
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
- *                                                                         *
- *  Revision History                                                       *
- *  10/23/2003   Onager    Moved some spell effect wear-off code from      *
- *                         update_handler() in spells.cpp to               *
- *                         affect_remove()                                 *
- *  11/8/2003    Onager    Added flags to affect_remove() to allow it to   *
- *                         be called without penalties or wear-off messages*
- *  12/08/2003   Onager    Added check for charmies and !charmie eq to     *
- *                         equip_char()                                    *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.80 2005/04/14 11:49:11 shane Exp $ */
+/* $Id: handler.cpp,v 1.81 2005/04/16 22:01:54 apocalypse Exp $ */
     
 extern "C"
 {
@@ -384,6 +375,10 @@ const struct set_data set_list[] = {
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
  	"There is an audible *click* as the field plate locks into its optimal assembly.\r\n",
 	"There is a soft *click* as you remove the field plate from its optimal positioning.\r\n"},
+  { "Mother of All Dragons' Trophies", {22320, 22321, 22322, 22323, 22324, 22325, 22326, -1, -1, -1,
+	-1, -1, -1, -1, -1, -1, -1, -1, -1},
+	"You feel the might of the ancient dragonkind surge through your body.\r\n",
+	"The might of the ancient dragonkind has left you.\r\n"},
   { "\n", {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
 	"\n","\n"}
 };
@@ -475,6 +470,20 @@ void add_set_stats(char_data *ch, obj_data *obj, int flag)
 	    affect_to_char(ch, &af);
 	    af.location = APPLY_AC;
 	    af.modifier = -40;
+	    affect_to_char(ch, &af);
+	    break;
+	  case SET_MOAD:
+	    af.location = APPLY_HIT_N_DAM;
+	    af.modifier = 4;
+	    affect_to_char(ch, &af);
+	    af.location = APPLY_SAVING_FIRE;
+	    af.modifier = 15;
+	    affect_to_char(ch, &af);
+	    af.location = APPLY_MELEE_DAMAGE;
+	    af.modifier = -5;
+	    affect_to_char(ch, &af);
+	    af.location = APPLY_SONG_DAMAGE;
+	    af.modifier = -5;
 	    affect_to_char(ch, &af);
 	    break;
 	  default: 
