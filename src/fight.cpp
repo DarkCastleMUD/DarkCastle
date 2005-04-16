@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.249 2005/04/15 21:13:41 shane Exp $ */
+/* $Id: fight.cpp,v 1.250 2005/04/16 22:21:13 shane Exp $ */
 
 extern "C"
 {
@@ -1377,6 +1377,7 @@ int damage_retval(CHAR_DATA * ch, CHAR_DATA * vict, int value)
 int damage(CHAR_DATA * ch, CHAR_DATA * victim,
            int dam, int weapon_type, int attacktype, int weapon)
 {
+  struct char_data *tempcharacter;
   int can_miss = 1;
   long weapon_bit;
   struct obj_data *wielded;
@@ -1389,7 +1390,9 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
   int percent;
   int learned;
   int ethereal = 0;
-  
+  bool reflected = FALSE;  
+  char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH], buf3[MAX_STRING_LENGTH];
+
   if(!weapon)
     weapon = WIELD;
   typeofdamage = damage_type(weapon_type);
@@ -1422,7 +1425,9 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
         act("$n's spell bounces back at him.", ch, 0, victim, TO_VICT, 0);
         act("Oh SHIT! Your spell bounces off of $N and heads right back at you.", ch, 0, victim, TO_CHAR, 0);
         act("$n's spell reflects off of $N's magical aura", ch, 0, victim, TO_ROOM, NOTVICT);
+        tempcharacter = victim;
         victim = ch;
+        ch = tempcharacter;
       }
     }
     if(IS_SET(victim->combat, COMBAT_REPELANCE))
@@ -1448,21 +1453,27 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
     switch(weapon_type) {
        case TYPE_FIRE:
             save = get_saves(victim, SAVE_TYPE_FIRE);
+            sprintf(buf, "$B$4fire$R and sustain");
             break;
       case TYPE_COLD:
             save = get_saves(victim, SAVE_TYPE_COLD);
+            sprintf(buf, "$B$3cold$R and sustain");
             break;
       case TYPE_ENERGY:
             save = get_saves(victim, SAVE_TYPE_ENERGY);
+            sprintf(buf, "$B$5energy$R and sustain");
             break;
     case TYPE_ACID:
             save = get_saves(victim, SAVE_TYPE_ACID);
+            sprintf(buf, "$B$2acid$R and sustain");
             break;
       case TYPE_MAGIC:
             save = get_saves(victim,SAVE_TYPE_MAGIC);
+            sprintf(buf, "$B$7magic$R and sustain");
             break;
       case TYPE_POISON:
             save = get_saves(victim,SAVE_TYPE_POISON);
+            sprintf(buf, "$2poison$R and sustain");
             break;
       default:
         break;
@@ -1489,16 +1500,44 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
    { double mult = 0 - save; // Turns positive.
      mult = 1.0 + (double)mult/100;
      dam = (int)(dam * mult);
-        act("$n is susceptable to $N's assault and sustains additional damage.", victim, 0, ch, TO_ROOM, NOTVICT);
-        act("$n is susceptable to your assault and sustains additional damage.",victim,0,ch, TO_VICT, 0);
-        act("You are susceptable to $N's assault and sustains additional damage.", victim, 0, ch, TO_CHAR, 0); 
+        strcpy(buf3, buf);
+        sprintf(buf2, "s additional damage.");
+        strcat(buf, buf2);
+        sprintf(buf2, " additional damage.");
+        strcat(buf3, buf2);
+        sprintf(buf2, "%s is susceptable to %s's ", victim->name, ch->name);
+        strcat(buf2, buf);
+        act(buf2, victim, 0, ch, TO_ROOM, NOTVICT);
+        sprintf(buf2, "%s is susceptable to your ", victim->name);
+        strcat(buf2, buf);
+        act(buf2, victim, 0, ch, TO_VICT, 0);
+        sprintf(buf2, "You are susceptable to %s's ", ch->name);
+        strcat(buf2, buf3);
+        act(buf2, victim, 0, ch, TO_CHAR, 0);
+//        act("$n is susceptable to $N's assault and sustains additional damage.", victim, 0, ch, TO_ROOM, NOTVICT);
+//        act("$n is susceptable to your assault and sustains additional damage.",victim,0,ch, TO_VICT, 0);
+//        act("You are susceptable to $N's assault and sustain additional damage.", victim, 0, ch, TO_CHAR, 0); 
    }
    else if (number(1,100) < save) {
 	if (save > 50) save = 50;
 	dam -= (int)(dam * (double)save/100); // Save chance.
-        act("$n resists $N's assault and sustains reduced damage.", victim, 0, ch, TO_ROOM, NOTVICT);
-        act("$n resists your assault and sustains reduced damage.", victim,0,ch, TO_VICT,0);
-        act("You resist $N's assault and sustain reduced damage.", victim, 0, ch, TO_CHAR, 0);
+        strcpy(buf3, buf);
+        sprintf(buf2, "s reduced damage.");
+        strcat(buf, buf2);
+        sprintf(buf2, " reduced damage.");
+        strcat(buf3, buf2);
+        sprintf(buf2, "%s resists %s's ", victim->name, ch->name);
+        strcat(buf2, buf);
+        act(buf2, victim, 0, ch, TO_ROOM, NOTVICT);
+        sprintf(buf2, "%s resists your ", victim->name);
+        strcat(buf2, buf);
+        act(buf2, victim, 0, ch, TO_VICT, 0);
+        sprintf(buf2, "You resist %s's ", ch->name);
+        strcat(buf2, buf3);
+        act(buf2, victim, 0, ch, TO_CHAR, 0);
+//        act("$n resists $N's assault and sustains reduced damage.", victim, 0, ch, TO_ROOM, NOTVICT);
+//        act("$n resists your assault and sustains reduced damage.", victim,0,ch, TO_VICT,0);
+//        act("You resist $N's assault and sustain reduced damage.", victim, 0, ch, TO_CHAR, 0);
    }
 
   if (v) { // spellcraft damage bonus
