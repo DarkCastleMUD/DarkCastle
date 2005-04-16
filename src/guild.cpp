@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.75 2005/04/16 07:47:20 shane Exp $
+| $Id: guild.cpp,v 1.76 2005/04/16 09:07:11 urizen Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -327,7 +327,7 @@ int skills_guild(struct char_data *ch, char *arg, struct char_data *owner)
     send_to_char("You aren't experienced enough to practice that any further right now.\n\r", ch);
     return eSUCCESS;
   }
-  if (known >= maxlearn / 2)
+  if (known >= maxlearn)
   {
     send_to_char("You cannot learn more here.. you need to go out into the world and use it.\r\n",ch);
     return eSUCCESS;
