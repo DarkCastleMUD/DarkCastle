@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.59 2005/04/16 09:09:43 urizen Exp $ */
+/* $Id: info.cpp,v 1.60 2005/04/16 09:16:07 shane Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -1331,7 +1331,7 @@ int do_score(struct char_data *ch, char *argument, int cmd)
       "|~|   $3BonusDam$7: %+4d $3RDeaths$7: %5d |o|    $3Experience$7:     %-10lld      |\\|\n\r"
       "|/|   $B$4FIRE$R[%+3d] $BCOLD$R[%+3d] $B$5NRGY$R[%+3d] |\\|    $3ExpTillLevel$7:   %-10lld      |o|\n\r"
       "|o|   $B$2ACID$R[%+3d] $B$3MAGK$R[%+3d] $2POIS$7[%+3d] |~|    $3Gold$7: %-9d $3Platinum$7: %-5d |/|\n\r"
-      "|\\|   $B$3MELE$R[%+3d] $B$3SPEL$R[%+3d] $B$3SONG$R[%+3d] |/|    $3Bank$7: %-10d                 |-|\n\r"
+      "|\\|   $B$3MELE$R[%+3d] $B$3SPEL$R[%+3d] $B$3SONG$R[%+3d] |/|    $3Bank$7: %-10d                |-|\n\r"
       "($5:$7)=================================($5:$7)====================================($5:$7)\n\r",
    GET_ARMOR(ch), GET_PKILLS(ch),   IS_CARRYING_N(ch), CAN_CARRY_N(ch),
    to_hit, GET_PDEATHS(ch),  IS_CARRYING_W(ch), CAN_CARRY_W(ch),
