@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.84 2005/04/16 03:41:20 shane Exp $
+| $Id: cl_thief.cpp,v 1.85 2005/04/16 19:43:48 shane Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -744,12 +744,15 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
           else _exp = (GET_OBJ_WEIGHT(obj) * 1000);
 
           if(GET_POS(victim) <= POSITION_SLEEPING || IS_AFFECTED(victim, AFF_PARALYSIS))  
-            _exp = 1;
+            _exp = 0;
 
-          GET_EXP(ch) += _exp; /* exp for stealing :) */
-          sprintf(buf,"You receive %d experience.\n\r", _exp);
           send_to_char("Got it!\n\r", ch);
-          send_to_char(buf, ch);
+          if(_exp) {
+             GET_EXP(ch) += _exp; /* exp for stealing :) */
+             sprintf(buf,"You receive %d experience.\n\r", _exp);
+             send_to_char(buf, ch);
+          }
+
           if(!IS_NPC(victim)) 
           {
             do_save(victim, "", 666);
@@ -1126,13 +1129,17 @@ int do_pocket(CHAR_DATA *ch, char *argument, int cmd)
       GET_GOLD(ch)     += gold;
       GET_GOLD(victim) -= gold;
 	_exp = gold / 20;
-    if(IS_NPC(victim) && IS_SET(victim->mobdata->actflags, ACT_NICE_THIEF)) _exp = 1; 
-      if(GET_POS(victim) <= POSITION_SLEEPING || IS_AFFECTED(victim, AFF_PARALYSIS)) _exp = 1;
-      GET_EXP(ch)      += _exp;
+      if(IS_NPC(victim) && IS_SET(victim->mobdata->actflags, ACT_NICE_THIEF)) _exp = 1; 
+      if(GET_POS(victim) <= POSITION_SLEEPING || IS_AFFECTED(victim, AFF_PARALYSIS)) _exp = 0;
+
       sprintf(buf, "Nice work! You pilfered %d gold coins.\n\r", gold);
       send_to_char(buf, ch);
-      sprintf(buf,"You receive %d experience.\n\r", _exp);
-      send_to_char(buf, ch);
+      if(_exp) {
+         GET_EXP(ch) += _exp; /* exp for stealing :) */
+         sprintf(buf,"You receive %d experience.\n\r", _exp);
+         send_to_char(buf, ch);
+      }
+
       if(!IS_NPC(victim)) 
       {
         do_save(victim, "", 666);
