@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.74 2005/04/09 21:15:27 urizen Exp $
+| $Id: guild.cpp,v 1.75 2005/04/16 07:47:20 shane Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -309,7 +309,12 @@ int skills_guild(struct char_data *ch, char *arg, struct char_data *owner)
     return eSUCCESS;
   }
 
-
+  if(known >= get_max(ch, x)) {
+     do_emote(owner, "eyes you up and down.", 9);
+     do_say(owner, "Taking into account your current attributes, your",9);
+     do_say(owner, "maximum proficiency in this ability has been reached.", 9);
+     return eSUCCESS;
+  }
 
   if (known >= skilllist[skillnumber].maximum) {
     send_to_char("You are already learned in this area.\n\r", ch);
@@ -322,7 +327,7 @@ int skills_guild(struct char_data *ch, char *arg, struct char_data *owner)
     send_to_char("You aren't experienced enough to practice that any further right now.\n\r", ch);
     return eSUCCESS;
   }
-  if (known >= maxlearn)
+  if (known >= maxlearn / 2)
   {
     send_to_char("You cannot learn more here.. you need to go out into the world and use it.\r\n",ch);
     return eSUCCESS;
@@ -423,7 +428,7 @@ int guild(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
   }
   
   if((cmd != 164)) 
-    return eFAILURE;
+   return eFAILURE;
   
   if(IS_MOB(ch)) {
     send_to_char("Why practice?  You're just going to die anyway...\r\n", ch);
@@ -660,7 +665,8 @@ int get_max(CHAR_DATA *ch, int skill)
    {
         int thing = get_stat(ch,skilllist[i].attrs[0])-20;
         if (thing > 0)
-        percent += (get_stat(ch,skilllist[i].attrs[0])-20)*2;
+          percent += (get_stat(ch,skilllist[i].attrs[0])-20)*2.5;
+        if(percent > 90) percent = 90;
    }
    if (skilllist[i].attrs[1])
    {
