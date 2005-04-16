@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: shop.cpp,v 1.13 2005/04/09 21:15:27 urizen Exp $ */
+/* $Id: shop.cpp,v 1.14 2005/04/16 20:18:02 shane Exp $ */
 
 extern "C"
 {
@@ -374,10 +374,13 @@ void shopping_sell( char *arg, CHAR_DATA *ch,
 void shopping_value( char *arg, CHAR_DATA *ch, 
     CHAR_DATA *keeper, int shop_nr )
 {
-    char buf[MAX_STRING_LENGTH];
+    char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
     char argm[MAX_INPUT_LENGTH+1];
     struct obj_data *obj;
     int cost;
+    extern char *extra_bits[];
+    extern char *size_bits[];
+    extern char *spells[];
 
     if ( !is_ok( keeper, ch, shop_nr ) )
         return;
@@ -397,7 +400,110 @@ void shopping_value( char *arg, CHAR_DATA *ch,
         do_tell( keeper, buf, 0 );
         return;
     }
-
+///////////////////////
+    if(mob_index[keeper->mobdata->nr].virt == 3003) { //if the weaponsmith in town
+       act("You hold up $p for the Weaponsmith to examine.", ch, obj, 0, TO_CHAR, 0);
+       act("$n holds up $p for the Weaponsmith to examine..", ch, obj, 0, TO_ROOM, 0);
+       do_emote(keeper, "looks carefully at the item.", 9);
+       if(GET_ITEM_TYPE(obj) == ITEM_WEAPON) {
+          if(obj->obj_flags.eq_level < 20) {
+             sprintf(buf, "Well, %s is able to be used by ", obj->name);
+             sprintbit(obj->obj_flags.size, size_bits, buf2);
+             strcat(buf, buf2);
+             do_say(keeper, buf, 9);
+             sprintf(buf, "and it is ");
+             sprintbit(obj->obj_flags.extra_flags, extra_bits, buf2);
+             strcat(buf, buf2);
+             do_say(keeper, buf, 9); 
+             sprintf(buf, "The damage dice are '%dD%d'", obj->obj_flags.value[1], obj->obj_flags.value[2]);
+             do_say(keeper, buf, 9);
+             for(int i=0;i<obj->num_affects;i++) {
+                if(obj->affected[i].location == APPLY_HITROLL && obj->affected[i].modifier != 0) {
+                   sprintf(buf, "It increases your hit roll by %d.", obj->affected[i].modifier);
+                   do_say(keeper, buf, 9);
+                }
+                if(obj->affected[i].location == APPLY_DAMROLL && obj->affected[i].modifier != 0) {
+                   sprintf(buf, "It increases your damage by %d.", obj->affected[i].modifier);
+                   do_say(keeper, buf, 9);
+                }
+             }
+          }
+          else
+             do_say(keeper, "This weapon is unknown to me.", 9); 
+       }
+       else
+          do_say(keeper, "I'm a weapons expert, that is all.", 9);
+    }
+    if(mob_index[keeper->mobdata->nr].virt == 3004) { //if the armourer in town
+       act("You hold up $p for the Armourer to examine.", ch, obj, 0, TO_CHAR, 0);
+       act("$n holds up $p to the Armourer to examine.", ch, obj, 0, TO_ROOM, 0);
+       do_emote(keeper, "looks carefully at the item.", 9);
+       if(GET_ITEM_TYPE(obj) == ITEM_ARMOR) {
+          if(obj->obj_flags.eq_level < 20) {
+             sprintf(buf, "Ah yes, %s can be worn by ", obj->name);
+             sprintbit(obj->obj_flags.size, size_bits, buf2);
+             strcat(buf, buf2);
+             do_say(keeper, buf, 9);
+             sprintf(buf, "and it is ");
+             sprintbit(obj->obj_flags.extra_flags, extra_bits, buf2);
+             strcat(buf, buf2);
+             do_say(keeper, buf, 9); 
+             for(int i=0;i<obj->num_affects;i++) {
+                if(obj->affected[i].location == APPLY_AC && obj->affected[i].modifier != 0) {
+                   sprintf(buf, "Your armor class will change by %d.", obj->affected[i].modifier);
+                   do_say(keeper, buf, 9);
+                   if(obj->affected[i].modifier < 0)
+                      do_say(keeper, "Don't worry, this is a good thing.", 9);
+                }
+             }
+          }
+          else
+             do_say(keeper, "This armor is crafted using too advanced techniques for me.", 9); 
+       }
+       else
+          do_say(keeper, "I deal with armor exclusively.", 9);
+    }
+    if(mob_index[keeper->mobdata->nr].virt == 3000) { //if the wizard in town
+       act("You hold up $p for the Wizard to examine.", ch, obj, 0, TO_CHAR, 0);
+       act("$n holds up $p for the Wizard to examine..", ch, obj, 0, TO_ROOM, 0);
+       do_emote(keeper, "looks carefully at the item.", 9);
+       if(GET_ITEM_TYPE(obj) == ITEM_SCROLL || GET_ITEM_TYPE(obj) == ITEM_WAND || GET_ITEM_TYPE(obj) == ITEM_POTION || GET_ITEM_TYPE(obj) == ITEM_STAFF) {
+          if(obj->obj_flags.value[0] < 20) {
+             sprintf(buf, "Excellent, %s has been imbued with energies of the %dth level.", obj->name, obj->obj_flags.value[0]);
+             do_say(keeper, buf, 9);
+             if(GET_ITEM_TYPE(obj) == ITEM_WAND || GET_ITEM_TYPE(obj) == ITEM_STAFF) {
+                if(obj->obj_flags.value[3] >= 1) {
+                   sprintf(buf, "It is eminating the aura of ");
+                   sprinttype(obj->obj_flags.value[3]-1, spells, buf2);
+                   strcat(buf, buf2);
+                   do_say(keeper, buf, 9);
+                }
+                if(obj->obj_flags.value[1] == obj->obj_flags.value[2])
+                   do_say(keeper, "It's fully charged as well.", 9);
+                else if(obj->obj_flags.value[2] == 0)
+                   do_say(keeper, "Though unfortunately, there are no more charges left.", 9);
+                else
+                   do_say(keeper, "It looks like it's been used some.", 9);
+             }
+             else {
+                if(obj->obj_flags.value[1] >= 1) {
+                   sprintf(buf, "I can easily identify the signatures of ");
+                   sprinttype(obj->obj_flags.value[1]-1, spells, buf2);
+                   strcat(buf, buf2);
+                   do_say(keeper, buf, 9);
+                }
+                if(obj->obj_flags.value[2] >= 1) {
+                   do_say(keeper, "There are more enchantments held within, but I'm rather busy.", 9);
+                }
+             }
+          }
+          else
+             do_say(keeper, "This item contains magics too powerful for me to discern.", 9); 
+       }
+       else
+          do_say(keeper, "I only know the properties of scrolls, potions, staves, and wands.", 9);
+    }
+///////////////////////
     if ( !trade_with( obj, shop_nr ) || obj->obj_flags.cost < 1 )
     {
         sprintf( buf, shop_index[shop_nr].do_not_buy, GET_NAME(ch) );
