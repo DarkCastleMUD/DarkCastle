@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.48 2005/04/09 21:15:27 urizen Exp $
+| $Id: inventory.cpp,v 1.49 2005/04/16 12:54:13 shane Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -1036,7 +1036,7 @@ int do_put(struct char_data *ch, char *argument, int cmd)
 
 int do_give(struct char_data *ch, char *argument, int cmd)
 {
-  char obj_name[MAX_INPUT_LENGTH+1], vict_name[MAX_INPUT_LENGTH+1], buf[200];
+  char obj_name[MAX_INPUT_LENGTH+1], vict_name[MAX_INPUT_LENGTH+1], buf[200], buf2[200];
   char arg[80];
   int amount;
   int retval;
@@ -1044,6 +1044,9 @@ int do_give(struct char_data *ch, char *argument, int cmd)
   extern int top_of_world;
   struct char_data *vict;
   struct obj_data *obj;
+  extern char *extra_bits[];
+  extern char *size_bits[];
+  extern char *spells[];
 
   if(IS_SET(world[ch->in_room].room_flags, QUIET)) {
     send_to_char ("SHHHHHH!! Can't you see people are trying to read?\r\n",
@@ -1209,7 +1212,116 @@ int do_give(struct char_data *ch, char *argument, int cmd)
 
     if (IS_NPC(vict) && mob_index[vict->mobdata->nr].non_combat_func == shop_keeper)
     {
-       act("$N graciously refuses your gift.", ch, 0, vict, TO_CHAR, 0);
+       if(mob_index[vict->mobdata->nr].virt == 3003) { //if the weaponsmith in town
+          act("You give $p to the Weaponsmith.", ch, obj, 0, TO_CHAR, 0);
+          act("$n gives $p to the Weaponsmith.", ch, obj, 0, TO_ROOM, 0);
+          do_emote(vict, "looks carefully at the item.", 9);
+          if(GET_ITEM_TYPE(obj) == ITEM_WEAPON) {
+             if(obj->obj_flags.eq_level < 20) {
+                sprintf(buf, "Well, %s is able to be used by ", obj->name);
+                sprintbit(obj->obj_flags.size, size_bits, buf2);
+                strcat(buf, buf2);
+                do_say(vict, buf, 9);
+                sprintf(buf, "and it is ");
+                sprintbit(obj->obj_flags.extra_flags, extra_bits, buf2);
+                strcat(buf, buf2);
+                do_say(vict, buf, 9); 
+                sprintf(buf, "The damage dice are '%dD%d'", obj->obj_flags.value[1], obj->obj_flags.value[2]);
+                do_say(vict, buf, 9);
+                for(int i=0;i<obj->num_affects;i++) {
+                   if(obj->affected[i].location == APPLY_HITROLL && obj->affected[i].modifier != 0) {
+                      sprintf(buf, "It increases your hit roll by %d.", obj->affected[i].modifier);
+                      do_say(vict, buf, 9);
+                   }
+                   if(obj->affected[i].location == APPLY_DAMROLL && obj->affected[i].modifier != 0) {
+                      sprintf(buf, "It increases your damage by %d.", obj->affected[i].modifier);
+                      do_say(vict, buf, 9);
+                   }
+                }
+             }
+             else
+                do_say(vict, "This weapon is unknown to me.", 9); 
+          }
+          else
+             do_say(vict, "I'm a weapons expert, that is all.", 9);
+          act("The Weaponsmith gives you $p back.", ch, obj, 0, TO_CHAR, 0);
+          act("The Weaponsmith gives $p back to $n.", ch, obj, 0, TO_ROOM, 0);
+       }
+       if(mob_index[vict->mobdata->nr].virt == 3004) { //if the armourer in town
+          act("You give $p to the Armourer.", ch, obj, 0, TO_CHAR, 0);
+          act("$n gives $p to the Armourer.", ch, obj, 0, TO_ROOM, 0);
+          do_emote(vict, "looks carefully at the item.", 9);
+          if(GET_ITEM_TYPE(obj) == ITEM_ARMOR) {
+             if(obj->obj_flags.eq_level < 20) {
+                sprintf(buf, "Ah yes, %s can be worn by ", obj->name);
+                sprintbit(obj->obj_flags.size, size_bits, buf2);
+                strcat(buf, buf2);
+                do_say(vict, buf, 9);
+                sprintf(buf, "and it is ");
+                sprintbit(obj->obj_flags.extra_flags, extra_bits, buf2);
+                strcat(buf, buf2);
+                do_say(vict, buf, 9); 
+                for(int i=0;i<obj->num_affects;i++) {
+                   if(obj->affected[i].location == APPLY_AC && obj->affected[i].modifier != 0) {
+                      sprintf(buf, "Your armor class will change by %d.", obj->affected[i].modifier);
+                      do_say(vict, buf, 9);
+                      if(obj->affected[i].modifier < 0)
+                         do_say(vict, "Don't worry, this is a good thing.", 9);
+                   }
+                }
+             }
+             else
+                do_say(vict, "This armor is crafted using too advanced techniques for me.", 9); 
+          }
+          else
+             do_say(vict, "I deal with armor exclusively.", 9);
+          act("The Armourer gives you $p back.", ch, obj, 0, TO_CHAR, 0);
+          act("The Armourer gives $p back to $n.", ch, obj, 0, TO_ROOM, 0);
+       }
+       if(mob_index[vict->mobdata->nr].virt == 3000) { //if the wizard in town
+          act("You give $p to the Wizard.", ch, obj, 0, TO_CHAR, 0);
+          act("$n gives $p to the Wizard.", ch, obj, 0, TO_ROOM, 0);
+          do_emote(vict, "looks carefully at the item.", 9);
+          if(GET_ITEM_TYPE(obj) == ITEM_SCROLL || GET_ITEM_TYPE(obj) == ITEM_WAND || GET_ITEM_TYPE(obj) == ITEM_POTION || GET_ITEM_TYPE(obj) == ITEM_STAFF) {
+             if(obj->obj_flags.value[0] < 20) {
+                sprintf(buf, "Excellent, %s has been imbued with energies of the %dth level.", obj->name, obj->obj_flags.value[0]);
+                do_say(vict, buf, 9);
+                if(GET_ITEM_TYPE(obj) == ITEM_WAND || GET_ITEM_TYPE(obj) == ITEM_STAFF) {
+                   if(obj->obj_flags.value[3] >= 1) {
+                      sprintf(buf, "It is eminating the aura of ");
+                      sprinttype(obj->obj_flags.value[3]-1, spells, buf2);
+                      strcat(buf, buf2);
+                      do_say(vict, buf, 9);
+                   }
+                   if(obj->obj_flags.value[1] == obj->obj_flags.value[2])
+                      do_say(vict, "It's fully charged as well.", 9);
+                   else if(obj->obj_flags.value[2] == 0)
+                      do_say(vict, "Though unfortunately, there are no more charges left.", 9);
+                   else
+                      do_say(vict, "It looks like it's been used some.", 9);
+                }
+                else {
+                   if(obj->obj_flags.value[1] >= 1) {
+                      sprintf(buf, "I can easily identify the signatures of ");
+                      sprinttype(obj->obj_flags.value[1]-1, spells, buf2);
+                      strcat(buf, buf2);
+                      do_say(vict, buf, 9);
+                   }
+                   if(obj->obj_flags.value[2] >= 1) {
+                      do_say(vict, "There are more enchantments held within, but I'm rather busy.", 9);
+                   }
+                }
+             }
+             else
+                do_say(vict, "This item contains magics too powerful for me to discern.", 9); 
+          }
+          else
+             do_say(vict, "I only know the properties of scrolls, potions, staves, and wands.", 9);
+          act("The Wizard gives you $p back.", ch, obj, 0, TO_CHAR, 0);
+          act("The Wizard gives $p back to $n.", ch, obj, 0, TO_ROOM, 0);
+       }
+       else
+          act("$N graciously refuses your gift.", ch, 0, vict, TO_CHAR, 0);
        return eFAILURE;
     }
     if (IS_NPC(vict) && IS_AFFECTED(vict, AFF_CHARM) && (IS_SET(obj->obj_flags.more_flags, ITEM_NO_TRADE)  || contains_no_trade_item(obj)))
