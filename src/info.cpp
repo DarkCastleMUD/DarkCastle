@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.58 2005/04/15 22:43:49 shane Exp $ */
+/* $Id: info.cpp,v 1.59 2005/04/16 09:09:43 urizen Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -1335,10 +1335,10 @@ int do_score(struct char_data *ch, char *argument, int cmd)
       "($5:$7)=================================($5:$7)====================================($5:$7)\n\r",
    GET_ARMOR(ch), GET_PKILLS(ch),   IS_CARRYING_N(ch), CAN_CARRY_N(ch),
    to_hit, GET_PDEATHS(ch),  IS_CARRYING_W(ch), CAN_CARRY_W(ch),
-   to_dam, get_RDEATHS(ch), GET_EXP(ch),
+   to_dam, GET_RDEATHS(ch), GET_EXP(ch),
    get_saves(ch,SAVE_TYPE_FIRE), get_saves(ch, SAVE_TYPE_COLD), get_saves(ch, SAVE_TYPE_ENERGY), GET_LEVEL(ch) == IMP ? 0 
 : exp_needed, 
-   get_saves(ch, SAVE_TYPE_ACID), get_saves(ch, SAVE_TYPE_MAGIC), get_saves(ch, SAVE_TYPE_POISON), (int)GET_GOLD(ch), (int)GET_PLATINUM(ch)
+   get_saves(ch, SAVE_TYPE_ACID), get_saves(ch, SAVE_TYPE_MAGIC), get_saves(ch, SAVE_TYPE_POISON), (int)GET_GOLD(ch), (int)GET_PLATINUM(ch),
    ch->melee_mitigation, ch->spell_mitigation, ch->song_mitigation, (int)GET_BANK(ch));
 
      send_to_char(buf, ch);

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.76 2005/04/16 09:07:11 urizen Exp $
+| $Id: guild.cpp,v 1.77 2005/04/16 09:09:43 urizen Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -35,6 +35,7 @@ extern struct class_skill_defines m_skills[];
 extern struct index_data *mob_index;
 
 char *str_nospace(char *stri);
+int get_max(CHAR_DATA *ch, int skill);
 
 int guild(struct char_data *ch, struct obj_data *obj, int cmd, char *arg, struct char_data *owner);
 
