@@ -5,7 +5,7 @@
  *                                                                           *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-/* $Id: magic.h,v 1.16 2005/04/09 21:15:35 urizen Exp $ */
+/* $Id: magic.h,v 1.17 2005/04/17 12:05:03 shane Exp $ */
 #ifndef MAGIC_H_
 #define MAGIC_H_
 
@@ -70,7 +70,7 @@ int spell_create_food(byte level, CHAR_DATA * ch,
    CHAR_DATA * victim, struct obj_data * obj, int skill);
 int spell_create_water(byte level, CHAR_DATA * ch,
    CHAR_DATA * victim, struct obj_data * obj, int skill);
-int spell_cure_blind(byte level, CHAR_DATA * ch,
+int spell_remove_blind(byte level, CHAR_DATA * ch,
    CHAR_DATA * victim, struct obj_data * obj, int skill);
 int spell_cure_critic(byte level, CHAR_DATA * ch,
    CHAR_DATA * victim, struct obj_data * obj, int skill);
@@ -300,7 +300,7 @@ int cast_create_water(byte level, CHAR_DATA * ch, char *arg, int type,
    CHAR_DATA * tar_ch, struct obj_data * tar_obj, int skill);
 int cast_remove_paralysis(byte level, CHAR_DATA * ch, char *arg, int type,
    CHAR_DATA * tar_ch, struct obj_data * tar_obj, int skill);
-int cast_cure_blind(byte level, CHAR_DATA * ch, char *arg, int type,
+int cast_remove_blind(byte level, CHAR_DATA * ch, char *arg, int type,
    CHAR_DATA * tar_ch, struct obj_data * tar_obj, int skill);
 int cast_cure_critic(byte level, CHAR_DATA * ch, char *arg, int type,
    CHAR_DATA * tar_ch, struct obj_data * tar_obj, int skill);

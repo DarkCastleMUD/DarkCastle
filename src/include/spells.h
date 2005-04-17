@@ -14,7 +14,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.h,v 1.57 2005/04/09 21:15:35 urizen Exp $ */
+/* $Id: spells.h,v 1.58 2005/04/17 12:05:03 shane Exp $ */
 #include <structs.h> // byte, sh_int
 
 #define MAX_BUF_LENGTH               240
@@ -65,7 +65,7 @@ void check_maxes(CHAR_DATA *ch);
 #define SPELL_CONTROL_WEATHER        11
 #define SPELL_CREATE_FOOD            12
 #define SPELL_CREATE_WATER           13
-#define SPELL_CURE_BLIND             14
+#define SPELL_REMOVE_BLIND           14
 #define SPELL_CURE_CRITIC            15
 #define SPELL_CURE_LIGHT             16
 #define SPELL_CURSE                  17
