@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.250 2005/04/16 22:21:13 shane Exp $ */
+/* $Id: fight.cpp,v 1.251 2005/04/17 00:16:51 shane Exp $ */
 
 extern "C"
 {
@@ -1377,7 +1377,6 @@ int damage_retval(CHAR_DATA * ch, CHAR_DATA * vict, int value)
 int damage(CHAR_DATA * ch, CHAR_DATA * victim,
            int dam, int weapon_type, int attacktype, int weapon)
 {
-  struct char_data *tempcharacter;
   int can_miss = 1;
   long weapon_bit;
   struct obj_data *wielded;
@@ -1425,9 +1424,8 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
         act("$n's spell bounces back at him.", ch, 0, victim, TO_VICT, 0);
         act("Oh SHIT! Your spell bounces off of $N and heads right back at you.", ch, 0, victim, TO_CHAR, 0);
         act("$n's spell reflects off of $N's magical aura", ch, 0, victim, TO_ROOM, NOTVICT);
-        tempcharacter = victim;
         victim = ch;
-        ch = tempcharacter;
+        reflected = TRUE;
       }
     }
     if(IS_SET(victim->combat, COMBAT_REPELANCE))
@@ -1437,18 +1435,24 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
        else if(!(number(0, 9)))
          send_to_char("Your mental shields cannot hold back the force of the spell!\r\n", victim);
        else {
-        act("$n's spell is dissolved into nothingness by your will.", ch, 0, victim, TO_VICT, 0);
-        act("$N's supreme will dissolves your spell into formless mana.", ch, 0, victim, TO_CHAR, 0);
-        act("$n's spell streaks at $N and suddenly ceases to be.", ch, 0, victim, TO_ROOM, NOTVICT);
+        if(reflected) {
+         act("You dissolve the reflected spell into nothingness by your will.", ch, 0, victim, TO_VICT, 0);
+         act("$n's reacts quickly and dissolves the reflected spell into formless mana.", ch, 0, victim, TO_ROOM, NOTVICT);
+        }
+        else {
+         act("$n's spell is dissolved into nothingness by your will.", ch, 0, victim, TO_VICT, 0);
+         act("$N's supreme will dissolves your spell into formless mana.", ch, 0, victim, TO_CHAR, 0);
+         act("$n's spell streaks at $N and suddenly ceases to be.", ch, 0, victim, TO_ROOM, NOTVICT);
+        }
         REMOVE_BIT(victim->combat, COMBAT_REPELANCE);
         return eSUCCESS;
        }
        REMOVE_BIT(victim->combat, COMBAT_REPELANCE);
     }
+  }
   if (has_skill(victim, SKILL_MAGIC_RESIST))
     skill_increase_check(victim, SKILL_MAGIC_RESIST, has_skill(victim,SKILL_MAGIC_RESIST), SKILL_INCREASE_HARD);
 
-  }
   int save = 0;
     switch(weapon_type) {
        case TYPE_FIRE:
@@ -1500,6 +1504,20 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
    { double mult = 0 - save; // Turns positive.
      mult = 1.0 + (double)mult/100;
      dam = (int)(dam * mult);
+     if(reflected) {
+         strcpy(buf3, buf);
+         sprintf(buf2, "s additional damage.");
+         strcat(buf, buf2);
+         sprintf(buf2, "%s is susceptible to the reflected ", ch->name);
+         strcat(buf2, buf);
+         act(buf2, ch, 0, victim, TO_ROOM, NOTVICT);
+         sprintf(buf2, " additional damage.");
+         strcat(buf3, buf2);
+         sprintf(buf2, "You are susceptible to the reflected ");
+         strcat(buf2, buf3);
+         act(buf2, ch, 0, victim, TO_CHAR, 0);
+     }
+     else {
         strcpy(buf3, buf);
         sprintf(buf2, "s additional damage.");
         strcat(buf, buf2);
@@ -1514,13 +1532,28 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
         sprintf(buf2, "You are susceptable to %s's ", ch->name);
         strcat(buf2, buf3);
         act(buf2, victim, 0, ch, TO_CHAR, 0);
+     }
 //        act("$n is susceptable to $N's assault and sustains additional damage.", victim, 0, ch, TO_ROOM, NOTVICT);
 //        act("$n is susceptable to your assault and sustains additional damage.",victim,0,ch, TO_VICT, 0);
 //        act("You are susceptable to $N's assault and sustain additional damage.", victim, 0, ch, TO_CHAR, 0); 
    }
    else if (number(1,100) < save) {
-	if (save > 50) save = 50;
-	dam -= (int)(dam * (double)save/100); // Save chance.
+      if (save > 50) save = 50;
+      dam -= (int)(dam * (double)save/100); // Save chance.
+      if(reflected) {
+         strcpy(buf3, buf);
+         sprintf(buf2, "s reduced damage.");
+         strcat(buf, buf2);
+         sprintf(buf2, "%s resists the reflected ", ch->name);
+         strcat(buf2, buf);
+         act(buf2, ch, 0, victim, TO_ROOM, NOTVICT);
+         sprintf(buf2, " reduced damage.");
+         strcat(buf3, buf2);
+         sprintf(buf2, "You resist the reflected ");
+         strcat(buf2, buf3);
+         act(buf2, ch, 0, victim, TO_CHAR, 0);
+      }
+      else {
         strcpy(buf3, buf);
         sprintf(buf2, "s reduced damage.");
         strcat(buf, buf2);
@@ -1535,6 +1568,7 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
         sprintf(buf2, "You resist %s's ", ch->name);
         strcat(buf2, buf3);
         act(buf2, victim, 0, ch, TO_CHAR, 0);
+      }
 //        act("$n resists $N's assault and sustains reduced damage.", victim, 0, ch, TO_ROOM, NOTVICT);
 //        act("$n resists your assault and sustains reduced damage.", victim,0,ch, TO_VICT,0);
 //        act("You resist $N's assault and sustain reduced damage.", victim, 0, ch, TO_CHAR, 0);
