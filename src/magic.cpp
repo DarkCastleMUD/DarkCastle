@@ -1468,12 +1468,12 @@ int spell_remove_paralysis(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct 
 }
 
 
-/* CURE BLIND */
+/* REMOVE BLIND */
 
-int spell_cure_blind(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
+int spell_remove_blind(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
   if (!victim) {
-    log("Null victim in cure_blind!", ANGEL, LOG_BUG);
+    log("Null victim in remove_blind!", ANGEL, LOG_BUG);
     return eFAILURE;
   }
 
@@ -6245,31 +6245,31 @@ int cast_remove_paralysis( byte level, CHAR_DATA *ch, char *arg, int type,
 }
 
 
-/* CURE BLIND (potion, scroll, staff) */
+/* REMOVE BLIND (potion, scroll, staff) */
 
-int cast_cure_blind( byte level, CHAR_DATA *ch, char *arg, int type,
+int cast_remove_blind( byte level, CHAR_DATA *ch, char *arg, int type,
   CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill )
 {
   switch (type) {
   case SPELL_TYPE_SPELL:
-	 return spell_cure_blind(level,ch,tar_ch,0, skill);
+	 return spell_remove_blind(level,ch,tar_ch,0, skill);
 	 break;
   case SPELL_TYPE_POTION:
-	 return spell_cure_blind(level,ch,ch,0, skill);
+	 return spell_remove_blind(level,ch,ch,0, skill);
 	 break;
   case SPELL_TYPE_SCROLL:
 	 if (tar_obj) return eFAILURE;
 	 if (!tar_ch) tar_ch = ch;
-	 return spell_cure_blind(level, ch, tar_ch, 0, skill);
+	 return spell_remove_blind(level, ch, tar_ch, 0, skill);
 	 break;
   case SPELL_TYPE_STAFF:
 	 for (tar_ch = world[ch->in_room].people ;
 	  tar_ch ; tar_ch = tar_ch->next_in_room)
 
-	 spell_cure_blind(level,ch,tar_ch,0, skill);
+	 spell_remove_blind(level,ch,tar_ch,0, skill);
 	 break;
 	 default :
-		log("Serious screw up in cure blind!", ANGEL, LOG_BUG);
+		log("Serious screw up in remove blind!", ANGEL, LOG_BUG);
 	 break;
   }
   return eFAILURE;
@@ -8633,8 +8633,10 @@ int cast_entangle(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *vic
 	act("$n raises the plants which attack $N!", ch, 0, victim,
 		TO_ROOM, NOTVICT);
 
-
-	spell_blindness(level, ch, victim, 0, 0);       /* The plants blind the victim . . */
+        int learned = has_skill(ch, SPELL_ENTANGLE);
+        learned = 800 / learned - 1; // get the number for percentage
+        if(!number(0, learned))
+           spell_blindness(level, ch, victim, 0, 0);       /* The plants blind the victim . . */
 	if (GET_POS(victim) > POSITION_SITTING)
 	GET_POS(victim) = POSITION_SITTING;		/* And pull the victim down to the ground */
 	update_pos(victim);

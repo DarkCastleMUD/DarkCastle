@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.128 2005/04/13 17:38:19 urizen Exp $ */
+/* $Id: const.cpp,v 1.129 2005/04/17 12:04:36 shane Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -130,7 +130,7 @@ char *spell_wear_off_msg[] =
   "!Control Weather!",
   "!Create Food!",
   "!Create Water!",
-  "!Cure Blind!",
+  "!Remove Blind!",
   "!Cure Critic!",                                             /* 15 */
   "!Cure Light!",
   "The curse upon you has ended.",
@@ -1495,7 +1495,7 @@ struct class_skill_defines c_skills[] = { // cleric skills
 {    "remove poison",        SPELL_REMOVE_POISON,     13,     90,     {CON,WIS} },
 {    "dispel minor",         SPELL_DISPEL_MINOR,      14,     85,     {INT,CON} },
 {    "dual wield",           SKILL_DUAL_WIELD,        15,     55,     {DEX,CON} },
-{    "cure blind",           SPELL_CURE_BLIND,        16,     98,     {INT,WIS} },
+{    "remove blind",         SPELL_REMOVE_BLIND,      16,     98,     {INT,WIS} },
 {    "sense life",           SPELL_SENSE_LIFE,        17,     85,     {CON,INT} },     
 {    "sanctuary",            SPELL_SANCTUARY,         18,     90,     {WIS,INT} },     
 {    "remove curse",         SPELL_REMOVE_CURSE,      19,     98,     {INT,WIS} },     

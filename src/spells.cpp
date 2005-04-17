@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.114 2005/04/11 20:44:12 dcastle Exp $ */
+/* $Id: spells.cpp,v 1.115 2005/04/17 12:04:36 shane Exp $ */
 
 extern "C"
 {
@@ -110,7 +110,7 @@ struct spell_info_type spell_info [ ] =
 
  { /* 13 */ 18, POSITION_STANDING,  5, TAR_OBJ_INV|TAR_OBJ_EQUIP, cast_create_water, SKILL_INCREASE_MEDIUM },
 
- { /* 14 */ 12, POSITION_STANDING, 15, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_cure_blind, SKILL_INCREASE_MEDIUM },
+ { /* 14 */ 12, POSITION_STANDING, 15, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_remove_blind, SKILL_INCREASE_MEDIUM },
 
  { /* 15 */ 12, POSITION_FIGHTING, 20, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_cure_critic, SKILL_INCREASE_MEDIUM },
 
@@ -568,7 +568,7 @@ char *spells[]=
    "control weather",     /* 11 */
    "create food",
    "create water",
-   "cure blind",
+   "remove blind",
    "cure critical",
    "cure light",
    "curse",

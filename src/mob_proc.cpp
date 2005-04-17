@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.68 2005/04/13 18:26:48 shane Exp $ */
+/* $Id: mob_proc.cpp,v 1.69 2005/04/17 12:04:36 shane Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -512,7 +512,7 @@ int passive_magic_user(struct char_data *ch, struct obj_data *obj, int cmd, char
     if(IS_AFFECTED(ch, AFF_BLIND)) {
       act("$n utters the words 'Let there be light!'.", ch, 0, 0, TO_ROOM, 
 	INVIS_NULL);
-       cast_cure_blind(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
+       cast_remove_blind(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
           return eSUCCESS;
       }
 
@@ -559,7 +559,7 @@ int active_magic_user(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
     if(IS_AFFECTED(ch, AFF_BLIND)) {
       act("$n utters the words 'Let there be light!'.", ch, 0, 0, 
        TO_ROOM, INVIS_NULL);
-       cast_cure_blind(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
+       cast_remove_blind(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
           return eSUCCESS;
       }
    
@@ -699,7 +699,7 @@ int passive_magic_user2(struct char_data *ch, struct obj_data *obj, int cmd, cha
     {
       act("$n utters the words 'Let there be light!'.", ch, 0, 0,
         TO_ROOM, INVIS_NULL);
-      cast_cure_blind(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
+      cast_remove_blind(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
       return eSUCCESS;
     }
 
@@ -709,7 +709,7 @@ int passive_magic_user2(struct char_data *ch, struct obj_data *obj, int cmd, cha
       {
         act("$n utters the words 'Let there be light!'.", ch, 0, 0,
           TO_ROOM, INVIS_NULL);
-        cast_cure_blind(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
+        cast_remove_blind(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
         return eSUCCESS;
       }
 
@@ -749,7 +749,7 @@ int active_magic_user2(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
     if(IS_AFFECTED(ch, AFF_BLIND)) {
       act("$n utters the words 'Let there be light!'.", ch, 0, 0, TO_ROOM,
 	INVIS_NULL);
-       cast_cure_blind(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
+       cast_remove_blind(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
           return eSUCCESS;
       }
 
@@ -930,7 +930,7 @@ int passive_cleric(struct char_data *ch, struct obj_data *obj, int cmd, char *ar
 
     if(IS_AFFECTED(ch, AFF_BLIND)) {
       act("$n utters the words 'Let there be light!'.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-      cast_cure_blind(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
+      cast_remove_blind(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
       return eSUCCESS;
     }
 
@@ -994,7 +994,7 @@ int active_cleric(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
 
    if(IS_AFFECTED(ch, AFF_BLIND)) {
       act("$n utters the words 'Let there be light!'.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-      cast_cure_blind(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
+      cast_remove_blind(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
       return eSUCCESS;
    }
 
@@ -1319,7 +1319,7 @@ int passive_necro(struct char_data *ch, struct obj_data *obj, int cmd, char *arg
 
     if(IS_AFFECTED(ch, AFF_BLIND)) {
       act("$n utters the words 'dead eye'.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-      cast_cure_blind(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
+      cast_remove_blind(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
       return eSUCCESS;
     }
 
@@ -1413,7 +1413,7 @@ int passive_tarrasque(struct char_data *ch, struct obj_data *obj, int cmd, char 
         if(IS_AFFECTED(ch, AFF_BLIND)) {
             act("$n utters the words 'Let there be light!'.", ch, 0, 0, TO_ROOM,
          	INVIS_NULL);
-            cast_cure_blind(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
+            cast_remove_blind(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
             return eSUCCESS;
         }
     }
@@ -1527,7 +1527,7 @@ int summonbash(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
    
   if(IS_AFFECTED(ch, AFF_BLIND)) {
      act("$n utters the words 'Let there be light!'.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-     cast_cure_blind(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
+     cast_remove_blind(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
      return eSUCCESS;
   }
 
@@ -1567,7 +1567,7 @@ int passive_grandmaster(struct char_data *ch, struct obj_data *obj, int cmd, cha
     if(IS_AFFECTED(ch, AFF_BLIND)) {
       act("$n utters the words 'Let there be light!'.", ch, 0, 0, TO_ROOM,
 	INVIS_NULL);
-       cast_cure_blind(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
+       cast_remove_blind(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
           return eSUCCESS;
       }
 
@@ -3737,7 +3737,7 @@ int hellstreamer(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
     if(IS_AFFECTED(ch, AFF_BLIND)) {
       act("$n utters the words 'I see said the blind!'.", ch, 0, 0, TO_ROOM,
 	INVIS_NULL);
-       cast_cure_blind(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
+       cast_remove_blind(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
           return eSUCCESS;
       }
 
@@ -4187,7 +4187,7 @@ int bounder(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
     if(IS_AFFECTED(ch, AFF_BLIND)) {
       act("$n utters the words 'I see said the blind!'.", ch, 0, 0, TO_ROOM,
 	INVIS_NULL);
-       cast_cure_blind(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
+       cast_remove_blind(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
           return eSUCCESS;
       }
 
@@ -4215,7 +4215,7 @@ int dispelguy(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
     if(IS_AFFECTED(ch, AFF_BLIND)) {
       act("$n utters the words 'I see said the blind!'.", ch, 0, 0, TO_ROOM,
 	INVIS_NULL);
-       cast_cure_blind(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
+       cast_remove_blind(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
           return eSUCCESS;
       }
 
@@ -4299,7 +4299,7 @@ int acidhellstreamer(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
     if(IS_AFFECTED(ch, AFF_BLIND)) {
       act("$n utters the words 'I see said the blind!'.", ch, 0, 0, TO_ROOM,
 	INVIS_NULL);
-       cast_cure_blind(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
+       cast_remove_blind(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));
           return eSUCCESS;
       }
 
