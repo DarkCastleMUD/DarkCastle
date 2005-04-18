@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.115 2005/04/17 12:04:36 shane Exp $ */
+/* $Id: spells.cpp,v 1.116 2005/04/18 11:09:41 shane Exp $ */
 
 extern "C"
 {
@@ -775,7 +775,7 @@ void affect_update( void )
         // That way we don't have to traverse the entire list all over again
         if(!IS_NPC(i))
           update_char_objects(i);
-	if ((af->type == FUCK_PTHIEF || af->type == FUCK_CANTQUIT) && !i->desc)
+	if ((af->type == FUCK_PTHIEF || af->type == FUCK_CANTQUIT || af->type == FUCK_GTHIEF) && !i->desc)
 	  continue;
 	if (af->duration > 1)
 	  af->duration--;

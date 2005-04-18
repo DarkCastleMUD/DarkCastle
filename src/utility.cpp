@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.34 2005/04/09 21:15:27 urizen Exp $ */
+/* $Id: utility.cpp,v 1.35 2005/04/18 11:06:48 shane Exp $ */
 
 extern "C"
 {
@@ -925,7 +925,8 @@ int do_recall( CHAR_DATA *ch, char *argument, int cmd )
   {
     if( GET_HOME(victim) == 0 || GET_LEVEL(victim) < 11 ||
         IS_AFFECTED(victim, AFF_CANTQUIT) ||
-	affected_by_spell(victim, FUCK_PTHIEF)
+	affected_by_spell(victim, FUCK_PTHIEF) || 
+	affected_by_spell(victim, FUCK_GTHIEF)
       )
       location = real_room(START_ROOM);
     else
@@ -1055,9 +1056,9 @@ int do_quit(struct char_data *ch, char *argument, int cmd)
     }
 
     if(IS_AFFECTED(ch, AFF_CANTQUIT) && cmd!=666 ||
-	affected_by_spell(ch, FUCK_PTHIEF)) {
-      send_to_char("You can't quit, because you are still wanted!\n\r", 
-ch);
+	affected_by_spell(ch, FUCK_PTHIEF) ||
+	affected_by_spell(ch, FUCK_GTHIEF)) {
+      send_to_char("You can't quit, because you are still wanted!\n\r", ch);
       return eFAILURE;
     }
 
