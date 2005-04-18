@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.33 2005/04/09 21:15:27 urizen Exp $ */
+/* $Id: clan.cpp,v 1.34 2005/04/18 11:01:31 shane Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -2350,9 +2350,9 @@ int do_cdeposit(CHAR_DATA *ch, char *arg, int cmd)
      send_to_char("You don't have the right to .\r\n",ch);
      return eFAILURE;
   }*/
-  if (affected_by_spell(ch,FUCK_PTHIEF))
+  if (affected_by_spell(ch,FUCK_GTHIEF))
   {
-    send_to_char("Your criminal actions prohibit it.\r\n",ch);
+    send_to_char("Launder your money elsewhere, thief!\r\n",ch);
     return eFAILURE;
   }
   if (world[ch->in_room].number != 3005)
