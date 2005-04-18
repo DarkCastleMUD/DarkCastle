@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.85 2005/04/16 19:43:48 shane Exp $
+| $Id: cl_thief.cpp,v 1.86 2005/04/18 12:51:56 shane Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -1034,8 +1034,8 @@ int do_pocket(CHAR_DATA *ch, char *argument, int cmd)
 
   one_argument(argument, victim_name);
 
-  pthiefaf.type = FUCK_PTHIEF;
-  pthiefaf.duration = 10;
+  pthiefaf.type = FUCK_GTHIEF;
+  pthiefaf.duration = 6;
   pthiefaf.modifier = 0;
   pthiefaf.location = APPLY_NONE;
   pthiefaf.bitvector = 0;
@@ -1144,12 +1144,12 @@ int do_pocket(CHAR_DATA *ch, char *argument, int cmd)
       {
         do_save(victim, "", 666);
         do_save(ch, "", 666);
-        if(!affected_by_spell(victim, FUCK_PTHIEF) ) 
+        if(!affected_by_spell(victim, FUCK_GTHIEF) ) 
         {
           set_cantquit( ch, victim );
-          if(affected_by_spell(ch, FUCK_PTHIEF))
+          if(affected_by_spell(ch, FUCK_GTHIEF))
           {
-            affect_from_char(ch, FUCK_PTHIEF);
+            affect_from_char(ch, FUCK_GTHIEF);
             affect_to_char(ch, &pthiefaf);
           }
           else
@@ -1299,6 +1299,10 @@ int do_slip(struct char_data *ch, char *argument, int cmd)
    argument = one_argument(argument, obj_name);
 
    if (is_number(obj_name)) { 
+      if(!IS_MOB(ch) && affected_by_spell(ch, FUCK_GTHIEF)) {
+         send_to_char("Your criminal acts prohibit this action.\n\r", ch);
+         return eFAILURE;
+      }
       if (strlen(obj_name) > 7) {
          send_to_char("Number field too large.  Try something smaller.\n\r", ch);
          return eFAILURE;
