@@ -16,7 +16,7 @@
  *  10/21/2003   Onager    Changed IS_ANONYMOUS() to handle mobs without   *
  *                         crashing                                        *
  ***************************************************************************/
-/* $Id: utility.h,v 1.28 2005/04/09 21:15:35 urizen Exp $ */
+/* $Id: utility.h,v 1.29 2005/04/18 19:07:21 urizen Exp $ */
 
 #ifndef UTILITY_H_
 #define UTILITY_H_
@@ -310,8 +310,6 @@ inline const short IS_ANONYMOUS(CHAR_DATA *ch)
 #define IS_GOOD(ch)    (GET_ALIGNMENT(ch) >= 350)
 #define IS_EVIL(ch)    (GET_ALIGNMENT(ch) <= -350)
 #define IS_NEUTRAL(ch) (!IS_GOOD(ch) && !IS_EVIL(ch))
-#define IS_THIEF(ch)   (ISMOB(ch) ? 0 : IS_SET((ch)->pcdata->toggles, PLR_ISTHIEF))
-#define IS_KILLER(ch)  (ISMOB(ch) ? 0 : IS_SET((ch)->pcdata->toggles, PLR_ISKILLER))
 #define IS_SINGING(ch) (ch->song_timer > 0)
 
 char *str_hsh(char *);

@@ -371,7 +371,7 @@ int do_golem_score(struct char_data *ch, char *argument, int cmd)
    to_dam, 0, GET_EXP(ch),
    get_saves(ch,SAVE_TYPE_FIRE), get_saves(ch, SAVE_TYPE_COLD), get_saves(ch, SAVE_TYPE_ENERGY), GET_LEVEL(ch) == 50 ? 0 : exp_needed,
    get_saves(ch, SAVE_TYPE_ACID), get_saves(ch, SAVE_TYPE_MAGIC), get_saves(ch, SAVE_TYPE_POISON), (int)GET_GOLD(ch), (int)GET_PLATINUM(ch),
-   ch->melee_mitigation, ch->spell_mitigation, ch->song_mitigation, (int)GET_BANK(ch));
+   ch->melee_mitigation, ch->spell_mitigation, ch->song_mitigation, 0);
      send_to_char(buf, master);
 
    if((aff = ch->affected))
