@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.43 2005/04/15 11:22:01 shane Exp $ */
+/* $Id: mob_proc2.cpp,v 1.44 2005/04/18 11:44:57 shane Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -130,6 +130,12 @@ int repair_guy(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 
   if ((cmd != 66) && (cmd != 65)) return eFAILURE;
 
+  if(!IS_MOB(ch) && affected_by_spell(ch, FUCK_GTHIEF)) 
+    {
+      send_to_char("Your criminal acts prohibit it.\n\r", ch);
+      return;
+    }
+
   one_argument(arg, item);
 
   if (!*item) {
@@ -202,6 +208,12 @@ int super_repair_guy(struct char_data *ch, struct obj_data *obj, int cmd, char *
   int percent, eqdam;
 
   if ((cmd != 66) && (cmd != 65)) return eFAILURE;
+
+  if(!IS_MOB(ch) && affected_by_spell(ch, FUCK_GTHIEF)) 
+    {
+      send_to_char("Your criminal acts prohibit it.\n\r", ch);
+      return eSUCCESS;
+    }
 
   one_argument(arg, item);
 
@@ -299,6 +311,12 @@ int repair_shop(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
   int percent, eqdam;
 
   if ((cmd != 66) && (cmd != 65)) return eFAILURE;
+
+  if(!IS_MOB(ch) && affected_by_spell(ch, FUCK_GTHIEF)) 
+  {
+      send_to_char("Your criminal acts prohibit it.\n\r", ch);
+      return eSUCCESS;
+  }
 
   one_argument(arg, item);
 
@@ -1485,7 +1503,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
    return eSUCCESS;
   }
    if(choice == 11) {
-     if (affected_by_spell(ch, FUCK_PTHIEF))
+     if (affected_by_spell(ch, FUCK_GTHIEF))
      {
 	send_to_char("The Meta-physician tells you, 'You cannot do this because of your criminal actions!'\r\n",ch);
 	return eSUCCESS;
@@ -1501,7 +1519,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
      return eSUCCESS;
    }
    if(choice == 10) {
-     if (affected_by_spell(ch, FUCK_PTHIEF))
+     if (affected_by_spell(ch, FUCK_GTHIEF))
      {
         send_to_char("The Meta-physician tells you, 'You cannot do this because of your criminal actions!'\r\n",ch);
         return eSUCCESS;
@@ -1517,6 +1535,12 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
      return eSUCCESS;
    }
   if(choice == 12) {
+    if(!IS_MOB(ch) && affected_by_spell(ch, FUCK_GTHIEF)) 
+    {
+      send_to_char("Your criminal acts prohibit it.\n\r", ch);
+      return eSUCCESS;
+    }
+
     if(GET_GOLD(ch) < 5000000) {
       send_to_char("The Meta-physician tells you, 'You can't afford "
                    "that!'\n\r", ch);
@@ -1817,6 +1841,13 @@ int gl_repair_shop(struct char_data *ch, struct obj_data *obj, int cmd, char *ar
   int percent, eqdam;
 
   if ((cmd != 66) && (cmd != 65)) return eFAILURE;
+
+  if(!IS_MOB(ch) && affected_by_spell(ch, FUCK_GTHIEF)) 
+    {
+      send_to_char("Your criminal acts prohibit it.\n\r", ch);
+      return eSUCCESS;
+    }
+
 
   one_argument(arg, item);
 
