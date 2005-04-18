@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.254 2005/04/18 13:33:38 shane Exp $ */
+/* $Id: fight.cpp,v 1.255 2005/04/18 13:53:07 urizen Exp $ */
 
 extern "C"
 {
@@ -3407,6 +3407,7 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
       act("$N drops $S stolen booty!", ch, 0, victim, TO_ROOM, NOTVICT);
       obj_to_room(create_money(GET_GOLD(victim)), victim->in_room);
       GET_GOLD(victim) = 0;
+      save_char_obj(victim);
     }
   }
 
