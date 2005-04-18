@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.253 2005/04/18 12:57:33 shane Exp $ */
+/* $Id: fight.cpp,v 1.254 2005/04/18 13:33:38 shane Exp $ */
 
 extern "C"
 {
@@ -3402,6 +3402,13 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
     is_thief = 1;
     affect_from_char(victim, FUCK_PTHIEF);
   }
+  if(affected_by_spell(victim, FUCK_GTHIEF)) {
+    if(GET_GOLD(victim) > 0) {
+      act("$N drops $S stolen booty!", ch, 0, victim, TO_ROOM, NOTVICT);
+      obj_to_room(create_money(GET_GOLD(victim)), victim->in_room);
+      GET_GOLD(victim) = 0;
+    }
+  }
 
   GET_POS(victim) = POSITION_RESTING;
   death_room = victim->in_room;
@@ -4141,10 +4148,12 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim, int type)
   }
 
   if(affected_by_spell(victim, FUCK_GTHIEF)) {
+    GET_MOVE(victim) = 2;
     if(GET_GOLD(victim) > 0) {
       act("$N drops $S stolen booty!", ch, 0, victim, TO_ROOM, NOTVICT);
       obj_to_room(create_money(GET_GOLD(victim)), victim->in_room);
       GET_GOLD(victim) = 0;
+      save_char_obj(victim);
     }
   }
 
