@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.69 2005/04/17 12:04:36 shane Exp $ */
+/* $Id: mob_proc.cpp,v 1.70 2005/04/18 11:52:33 shane Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -2233,7 +2233,8 @@ int guild_guard(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     dir++;
 //    cmd++;
     if ((cmd == dir || cmd == dir2) && (
-        (!IS_MOB(ch) && affected_by_spell(ch, FUCK_PTHIEF)) || 
+        (!IS_MOB(ch) && (affected_by_spell(ch, FUCK_PTHIEF) || 
+affected_by_spell(ch, FUCK_GTHIEF)))
 GET_CLASS(ch) != clas || (align == 1 && !IS_EVIL(ch)) || (align == 3 && 
 !IS_GOOD(ch)))) {
 	act( "The guard humiliates $n, and blocks $s way.",
@@ -2332,7 +2333,7 @@ int clan_guard(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 	send_to_char("The clan guard throws you out on your ass.\n\r", ch );
 	return eSUCCESS;
     }
-    else if(affected_by_spell(ch, FUCK_PTHIEF)) { 
+    else if(affected_by_spell(ch, FUCK_PTHIEF) || affected_by_spell(ch, FUCK_GTHIEF)) { 
 	act( "$n is turned away from the clan hall.", ch, 0, 0, TO_ROOM , 0);
 	send_to_char("The clan guard says 'Hey don't be bringing trouble around here!'\n\r", ch );
 	return eSUCCESS;
@@ -5597,7 +5598,7 @@ int pthief_hater(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 
    char_data * vict;
    for(vict = world[ch->in_room].people; vict; vict = vict->next_in_room)
-      if(affected_by_spell(vict, FUCK_PTHIEF))
+      if(affected_by_spell(vict, FUCK_PTHIEF) || affected_by_spell(vict, FUCK_GTHIEF))
       {
          switch(ch->mobdata->nr) {
             case 6500: // Chandos
