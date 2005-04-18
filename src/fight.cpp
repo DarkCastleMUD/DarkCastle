@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.252 2005/04/18 12:51:20 shane Exp $ */
+/* $Id: fight.cpp,v 1.253 2005/04/18 12:57:33 shane Exp $ */
 
 extern "C"
 {
@@ -4143,7 +4143,7 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim, int type)
   if(affected_by_spell(victim, FUCK_GTHIEF)) {
     if(GET_GOLD(victim) > 0) {
       act("$N drops $S stolen booty!", ch, 0, victim, TO_ROOM, NOTVICT);
-      obj_to_room(GET_GOLD(victim), GET_ROOM(victim));
+      obj_to_room(create_money(GET_GOLD(victim)), victim->in_room);
       GET_GOLD(victim) = 0;
     }
   }
