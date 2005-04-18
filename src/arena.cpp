@@ -7,7 +7,7 @@
 /* Revision History                                                          */
 /* 12/09/2003   Onager   Tweaked do_join() to remove combat-related bits     */
 /*****************************************************************************/
-/* $Id: arena.cpp,v 1.10 2005/04/09 21:15:27 urizen Exp $ */
+/* $Id: arena.cpp,v 1.11 2005/04/18 10:56:28 shane Exp $ */
 
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
@@ -127,7 +127,7 @@ int do_joinarena(CHAR_DATA *ch, char *arg, int cmd)
     send_to_char("You have been banned from arenas.\n\r", ch);
     return eFAILURE;
   }
-  if (affected_by_spell(ch,FUCK_PTHIEF))
+  if (affected_by_spell(ch,FUCK_PTHIEF) || affected_by_spell(ch,FUCK_GTHIEF))
   {
     send_to_char("They don't allow criminals in the arena.\r\n",ch);
     return eFAILURE;
