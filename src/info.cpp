@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.61 2005/04/16 21:27:18 shane Exp $ */
+/* $Id: info.cpp,v 1.62 2005/04/18 12:21:17 shane Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -1369,6 +1369,9 @@ int do_score(struct char_data *ch, char *argument, int cmd)
              break;
            case FUCK_PTHIEF:
              aff_name = "DIRTY_THIEF/CANT_QUIT";
+             break;
+           case FUCK_GTHIEF:
+             aff_name = "GOLD_THIEF/CANT_QUIT";
              break;
            case SKILL_HARM_TOUCH:
              aff_name = "harmtouch reuse timer";
