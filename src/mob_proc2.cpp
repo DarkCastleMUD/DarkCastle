@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.44 2005/04/18 11:44:57 shane Exp $ */
+/* $Id: mob_proc2.cpp,v 1.45 2005/04/18 12:01:36 shane Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -133,7 +133,7 @@ int repair_guy(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
   if(!IS_MOB(ch) && affected_by_spell(ch, FUCK_GTHIEF)) 
     {
       send_to_char("Your criminal acts prohibit it.\n\r", ch);
-      return;
+      return eSUCCESS;
     }
 
   one_argument(arg, item);
