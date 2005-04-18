@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.50 2005/04/16 20:18:02 shane Exp $
+| $Id: inventory.cpp,v 1.51 2005/04/18 11:26:53 shane Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -732,6 +732,12 @@ int do_drop(struct char_data *ch, char *argument, int cmd)
   argument = one_argument(argument, arg);
 
   if(is_number(arg)) {
+    if(!IS_MOB(ch) && affected_by_spell(ch, FUCK_GTHIEF)) 
+    {
+      send_to_char("Your criminal acts prohibit it.\n\r", ch);
+      return eFAILURE;
+    }
+
     if(strlen(arg) > 7) {
       send_to_char("Number field too big.\n\r", ch);
       return eFAILURE;
@@ -1059,6 +1065,12 @@ int do_give(struct char_data *ch, char *argument, int cmd)
   argument = one_argument(argument, obj_name);
 
   if(is_number(obj_name)) { 
+    if(!IS_MOB(ch) && affected_by_spell(ch, FUCK_GTHIEF)) 
+    {
+      send_to_char("Your criminal acts prohibit it.\n\r", ch);
+      return;
+    }
+
     if(strlen(obj_name) > 7) {
       send_to_char("Number field too large.\n\r", ch);
       return eFAILURE;
