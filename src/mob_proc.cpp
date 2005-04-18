@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.70 2005/04/18 11:52:33 shane Exp $ */
+/* $Id: mob_proc.cpp,v 1.71 2005/04/18 11:59:53 shane Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -2234,7 +2234,7 @@ int guild_guard(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 //    cmd++;
     if ((cmd == dir || cmd == dir2) && (
         (!IS_MOB(ch) && (affected_by_spell(ch, FUCK_PTHIEF) || 
-affected_by_spell(ch, FUCK_GTHIEF)))
+affected_by_spell(ch, FUCK_GTHIEF))) ||
 GET_CLASS(ch) != clas || (align == 1 && !IS_EVIL(ch)) || (align == 3 && 
 !IS_GOOD(ch)))) {
 	act( "The guard humiliates $n, and blocks $s way.",
