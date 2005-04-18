@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.251 2005/04/17 00:16:51 shane Exp $ */
+/* $Id: fight.cpp,v 1.252 2005/04/18 12:51:20 shane Exp $ */
 
 extern "C"
 {
@@ -1508,7 +1508,7 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
          strcpy(buf3, buf);
          sprintf(buf2, "s additional damage.");
          strcat(buf, buf2);
-         sprintf(buf2, "%s is susceptible to the reflected ", ch->name);
+         sprintf(buf2, "%s is susceptible to the reflected ", GET_NAME(ch));
          strcat(buf2, buf);
          act(buf2, ch, 0, victim, TO_ROOM, NOTVICT);
          sprintf(buf2, " additional damage.");
@@ -1523,13 +1523,13 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
         strcat(buf, buf2);
         sprintf(buf2, " additional damage.");
         strcat(buf3, buf2);
-        sprintf(buf2, "%s is susceptable to %s's ", victim->name, ch->name);
+        sprintf(buf2, "%s is susceptable to %s's ", GET_NAME(victim), GET_NAME(ch));
         strcat(buf2, buf);
         act(buf2, victim, 0, ch, TO_ROOM, NOTVICT);
-        sprintf(buf2, "%s is susceptable to your ", victim->name);
+        sprintf(buf2, "%s is susceptable to your ", GET_NAME(victim));
         strcat(buf2, buf);
         act(buf2, victim, 0, ch, TO_VICT, 0);
-        sprintf(buf2, "You are susceptable to %s's ", ch->name);
+        sprintf(buf2, "You are susceptable to %s's ", GET_NAME(ch));
         strcat(buf2, buf3);
         act(buf2, victim, 0, ch, TO_CHAR, 0);
      }
@@ -1544,7 +1544,7 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
          strcpy(buf3, buf);
          sprintf(buf2, "s reduced damage.");
          strcat(buf, buf2);
-         sprintf(buf2, "%s resists the reflected ", ch->name);
+         sprintf(buf2, "%s resists the reflected ", GET_NAME(ch));
          strcat(buf2, buf);
          act(buf2, ch, 0, victim, TO_ROOM, NOTVICT);
          sprintf(buf2, " reduced damage.");
@@ -1559,13 +1559,13 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
         strcat(buf, buf2);
         sprintf(buf2, " reduced damage.");
         strcat(buf3, buf2);
-        sprintf(buf2, "%s resists %s's ", victim->name, ch->name);
+        sprintf(buf2, "%s resists %s's ", GET_NAME(victim), GET_NAME(ch));
         strcat(buf2, buf);
         act(buf2, victim, 0, ch, TO_ROOM, NOTVICT);
-        sprintf(buf2, "%s resists your ", victim->name);
+        sprintf(buf2, "%s resists your ", GET_NAME(victim));
         strcat(buf2, buf);
         act(buf2, victim, 0, ch, TO_VICT, 0);
-        sprintf(buf2, "You resist %s's ", ch->name);
+        sprintf(buf2, "You resist %s's ", GET_NAME(ch));
         strcat(buf2, buf3);
         act(buf2, victim, 0, ch, TO_CHAR, 0);
       }
@@ -4139,7 +4139,15 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim, int type)
     fight_kill(ch, victim, TYPE_RAW_KILL, 0);
     return;
   }
-  
+
+  if(affected_by_spell(victim, FUCK_GTHIEF)) {
+    if(GET_GOLD(victim) > 0) {
+      act("$N drops $S stolen booty!", ch, 0, victim, TO_ROOM, NOTVICT);
+      obj_to_room(GET_GOLD(victim), GET_ROOM(victim));
+      GET_GOLD(victim) = 0;
+    }
+  }
+
   // Make sure barbs get their ac back
   if (IS_SET(victim->combat, COMBAT_BERSERK)) 
   {
@@ -4491,7 +4499,7 @@ int can_be_attacked(CHAR_DATA *ch, CHAR_DATA *vict)
     return FALSE;
   }
 
-  if(IS_AFFECTED(vict, AFF_CANTQUIT) || affected_by_spell(vict, FUCK_PTHIEF) )
+  if(IS_AFFECTED(vict, AFF_CANTQUIT) || affected_by_spell(vict, FUCK_PTHIEF) || affected_by_spell(vict, FUCK_GTHIEF))
     return TRUE;
   
   if(!IS_NPC(ch) && GET_LEVEL(vict) < 5)  {
