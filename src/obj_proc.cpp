@@ -497,6 +497,12 @@ int bank(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 
   /* deposit */
   if(cmd == 173) {
+    if(!IS_MOB(ch) && affected_by_spell(ch, FUCK_GTHIEF)) 
+    {
+      send_to_char("Your criminal acts prohibit it.\n\r", ch);
+      return eFAILURE;
+    }
+
     one_argument(arg, buf);
     if(!*buf || !(x = atoi(buf)) || x < 0) {
       send_to_char("Deposit what?\n\r", ch);
