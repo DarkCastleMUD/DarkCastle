@@ -3011,7 +3011,7 @@ int spell_word_of_recall(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct ob
     location = real_room(GET_HOME(victim));
   else
   {
-    if(affected_by_spell(victim, FUCK_PTHIEF))
+    if(affected_by_spell(victim, FUCK_PTHIEF) || affected_by_spell(victim, FUCK_GTHIEF))
       location = real_room(START_ROOM);
     else
       location = real_room(GET_HOME(victim));
@@ -3166,7 +3166,7 @@ int spell_summon(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *
     }
 
   if(number(1, 100) > 50 + skill/2 ||
-	affected_by_spell(victim, FUCK_PTHIEF)) {
+	affected_by_spell(victim, FUCK_PTHIEF) || affected_by_spell(victim, FUCK_GTHIEF)) {
     send_to_char("Your attempted summoning fails.\r\n", ch);
     return eFAILURE;
   }
@@ -8749,7 +8749,7 @@ int cast_forest_meld(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *
 //you?\n\r", ch);
 //		return eFAILURE;
 //	}
-       if (affected_by_spell(ch, FUCK_PTHIEF))
+       if (affected_by_spell(ch, FUCK_PTHIEF) || affected_by_spell(ch, FUCK_GTHIEF))
 	{
 		send_to_char("The forests reject your naughty, thieving self.\r\n",ch);
 		return eFAILURE;
