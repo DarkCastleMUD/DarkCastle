@@ -8634,9 +8634,12 @@ int cast_entangle(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *vic
 		TO_ROOM, NOTVICT);
 
         int learned = has_skill(ch, SPELL_ENTANGLE);
+	if (learned)
+        {
         learned = 800 / learned - 1; // get the number for percentage
         if(!number(0, learned))
            spell_blindness(level, ch, victim, 0, 0);       /* The plants blind the victim . . */
+	}
 	if (GET_POS(victim) > POSITION_SITTING)
 	GET_POS(victim) = POSITION_SITTING;		/* And pull the victim down to the ground */
 	update_pos(victim);
