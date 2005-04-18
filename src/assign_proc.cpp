@@ -526,7 +526,7 @@ void assign_objects(void)
   assign_one_obj_non(396,  noremove_eq);
   assign_one_obj_non(397,  random_dir_boots);
   assign_one_obj_non(398,  gotta_dance_boots);
-  assign_one_obj_non(557,  hornoplenty);
+//  assign_one_obj_non(557,  hornoplenty);
   assign_one_obj_non(3090,  TOHS_locator);
   assign_one_obj_non(3099,  board); /* Mortal Board */ 
   assign_one_obj_non(3611,  pfe_word);
