@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: shop.cpp,v 1.14 2005/04/16 20:18:02 shane Exp $ */
+/* $Id: shop.cpp,v 1.15 2005/04/18 11:13:26 shane Exp $ */
 
 extern "C"
 {
@@ -187,6 +187,13 @@ void shopping_buy( char *arg, CHAR_DATA *ch,
         do_tell( keeper, buf, 0 );
         return;
     }
+
+    if(!IS_MOB(ch) && affected_by_spell(ch, FUCK_GTHIEF)) 
+    {
+      send_to_char("Your criminal acts prohibit it.\n\r", ch);
+      return;
+    }
+
 
     if ( ( obj = get_obj_in_list_vis( ch, argm, keeper->carrying ) ) == NULL )
     {
