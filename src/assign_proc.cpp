@@ -497,6 +497,7 @@ void assign_objects(void)
     assign_one_obj_non(558, godload_aligngood);
     assign_one_obj_non(559, godload_alignevil);
     assign_one_obj_non(594, godload_hammer);
+  assign_one_obj_com(555, shield_combat_procs); // GL shield
 
   assign_one_obj_non(16225, pushwand);
   assign_one_obj_non(11300, moving_portals);
@@ -531,7 +532,7 @@ void assign_objects(void)
   assign_one_obj_non(3099,  board); /* Mortal Board */ 
   assign_one_obj_non(3611,  pfe_word);
   assign_one_obj_non(9529,  pull_proc);
-  assign_one_obj_non(9530,  no_magic_while_alive);
+ // assign_one_obj_non(9530,  no_magic_while_alive);
   assign_one_obj_non(9531,  boat_proc);
   assign_one_obj_non(9532,  leave_boat_proc);
   assign_one_obj_non(9603, gazeofgaiot);
@@ -582,7 +583,6 @@ void assign_objects(void)
 
   assign_one_obj_com(740,    magic_missile_boots);
   assign_one_obj_com(2715,   shield_combat_procs);
-  assign_one_obj_com(555, shield_combat_procs);
   assign_one_obj_com(8208,   shield_combat_procs);
   assign_one_obj_com(9520,   dk_rend);
   assign_one_obj_com(9565, hooktippedsteelhalberd);
