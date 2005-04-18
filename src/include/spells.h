@@ -14,7 +14,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.h,v 1.58 2005/04/17 12:05:03 shane Exp $ */
+/* $Id: spells.h,v 1.59 2005/04/18 12:52:24 shane Exp $ */
 #include <structs.h> // byte, sh_int
 
 #define MAX_BUF_LENGTH               240
@@ -226,9 +226,10 @@ void check_maxes(CHAR_DATA *ch);
 #define KI_AGILITY    8
 #define MAX_KI_LIST   8 
 #define KI_OFFSET     250     // why this is done differently than the rest, I have no
-                              // idea....ki skills are 250-297.  -pir
+                              // idea....ki skills are 250-296.  -pir
 
-#define FUCK_PTHIEF                  298
+#define FUCK_PTHIEF                  297
+#define FUCK_GTHIEF                  298
 #define FUCK_CANTQUIT                299
 
 #define SKILL_BASE                   300
