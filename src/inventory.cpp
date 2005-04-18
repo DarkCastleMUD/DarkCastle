@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.51 2005/04/18 11:26:53 shane Exp $
+| $Id: inventory.cpp,v 1.52 2005/04/18 11:31:13 shane Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -1068,7 +1068,7 @@ int do_give(struct char_data *ch, char *argument, int cmd)
     if(!IS_MOB(ch) && affected_by_spell(ch, FUCK_GTHIEF)) 
     {
       send_to_char("Your criminal acts prohibit it.\n\r", ch);
-      return;
+      return eFAILURE;
     }
 
     if(strlen(obj_name) > 7) {
