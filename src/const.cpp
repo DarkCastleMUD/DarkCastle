@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.129 2005/04/17 12:04:36 shane Exp $ */
+/* $Id: const.cpp,v 1.130 2005/04/19 18:32:47 apocalypse Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1438,7 +1438,7 @@ struct class_skill_defines u_skills[] = { // druid skills
 {    "camouflage",           SPELL_CAMOUFLAGE,           14,     85,     {INT,DEX} },
 {    "oaken fortitude",      SPELL_OAKEN_FORTITUDE,      15,     98,     {CON,STR} },
 {    "water breathing",      SPELL_WATER_BREATHING,      17,     98,     {DEX,INT} },
-{    "resist acid",          SPELL_RESIST_ACID,          18,     98,     {CON,WIS} },
+{    "resist acid",          SPELL_RESIST_ACID,          18,     90,     {CON,INT} },
 {    "stoneshield",          SPELL_STONE_SHIELD,         20,     98,     {STR,WIS} },
 {    "poison",               SPELL_POISON,               21,     90,     {CON,WIS} },
 {    "cure critic",          SPELL_CURE_CRITIC,          23,     85,     {WIS,INT} },
