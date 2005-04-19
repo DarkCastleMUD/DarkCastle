@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.131 2005/04/19 18:34:14 urizen Exp $ */
+/* $Id: const.cpp,v 1.132 2005/04/19 18:57:47 apocalypse Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1146,7 +1146,6 @@ struct class_skill_defines w_skills[] = { // warrior skills
 {    "two handers",     SKILL_TWO_HANDED_WEAPONS, 42,   85,     {STR,CON} },
 {    "skewer",          SKILL_SKEWER,             45,   98,     {STR,CON} },
 {    "blade shield",    SKILL_BLADESHIELD,        47,   98,     {CON,DEX} },
-//{  "combat mastery",  SKILL_COMBAT_MASTERY      50,   98,     {0,0} },
 {    "\n",              0,                        1,    0,      {0,0} }
 };
 
@@ -1179,7 +1178,6 @@ struct class_skill_defines t_skills[] = { // thief skills
 {    "dual backstab",   SKILL_DUAL_BACKSTAB,    40,     98,   {DEX,INT} },  
 {    "eyegouge",        SKILL_EYEGOUGE,         42,     98,   {STR,CON} },  
 {    "vitalstrike",     SKILL_VITAL_STRIKE,     45,     98,   {CON,DEX} },  
-//{  "diguise",         SKILL_DISGUISE          50,     98,   {0,0} },
 {    "\n",              0,                      1,      0,    {0,0} }
 };
 
@@ -1200,7 +1198,6 @@ struct class_skill_defines a_skills[] = { // anti-paladin skills
 {    "invisibility",         SPELL_INVISIBLE,         13,     90,     {INT,DEX} },
 {    "backstab",             SKILL_BACKSTAB,          15,     90,     {DEX,STR} },
 {    "hide",                 SKILL_HIDE,              17,     85,     {INT,WIS} },
-{    "resist acid",          SPELL_RESIST_ACID,          18,     80,     {CON,WIS} },
 {    "trip",                 SKILL_TRIP,              19,     85,     {DEX,STR} },
 {    "chill touch",          SPELL_CHILL_TOUCH,       20,     85,     {CON,WIS} },
 {    "double",               SKILL_SECOND_ATTACK,     22,     85,     {STR,DEX} },
@@ -1222,9 +1219,9 @@ struct class_skill_defines a_skills[] = { // anti-paladin skills
 {    "acid shield",          SPELL_ACID_SHIELD,       40,     98,     {INT,STR} },
 {    "curse",                SPELL_CURSE,             41,     70,     {WIS,INT} },
 {    "firestorm",            SPELL_FIRESTORM,         42,     85,     {INT,STR} },
-//{    "stoneskin",            SPELL_STONE_SKIN,        44,     85,     {STR,CON} },
-{    "unholy aegis",         SPELL_U_AEGIS, 44, 85, {STR,CON}},
+{    "unholy aegis",         SPELL_U_AEGIS,           44,     90,     {WIS,INT} },
 {    "protection from good", SPELL_PROTECT_FROM_GOOD, 45,     90,     {WIS,DEX} },
+{    "resist acid",          SPELL_RESIST_ACID,       46,     70,     {CON,INT} },
 {    "acid blast",           SPELL_ACID_BLAST,        48,     98,     {STR,INT} },
 {    "vampiric aura",        SPELL_VAMPIRIC_AURA,     50,     98,     {INT,CON} },
 {    "\n",                   0,                       1,      0,      {0,0} }
@@ -1265,11 +1262,10 @@ struct class_skill_defines p_skills[] = { // paladin skills
 {    "heal",                 SPELL_HEAL,               37,     85,     {WIS,INT} },
 {    "harm",                 SPELL_HARM,               38,     85,     {WIS,CON} },
 {    "sanctuary",            SPELL_SANCTUARY,          40,     90,     {WIS,INT} },
-//{    "armor",                SPELL_ARMOR,              41,     80,     {STR,INT} },
-{ "holy aegis",              SPELL_AEGIS,  41, 80, {STR, INT}},
+{    "holy aegis",           SPELL_AEGIS,              41,     90,     {WIS,INT} },
 {    "dispel evil",          SPELL_DISPEL_EVIL,        42,     90,     {WIS,STR} },
-{    "resist cold",          SPELL_RESIST_COLD,       42,     90,     {CON,STR} },
 {    "protection from evil", SPELL_PROTECT_FROM_EVIL,  45,     90,     {WIS,DEX} },
+{    "resist cold",          SPELL_RESIST_COLD,        46,     70,     {CON,STR} },
 {    "power harm",           SPELL_POWER_HARM,         48,     90,     {WIS,CON} },
 {    "holy aura",            SPELL_HOLY_AURA,          50,     98,     {WIS,STR} },
 {    "\n",                   0,                        1,      0,      {0,0} }
@@ -1336,7 +1332,6 @@ struct class_skill_defines k_skills[] = { // monk skills
 {    "quiver",          SKILL_QUIVERING_PALM,   40,     98,     {STR,INT} },
 {    "blast",           KI_BLAST+KI_OFFSET,     45,     98,     {WIS,STR} },
 {    "disrupt",         KI_DISRUPT+KI_OFFSET,   47,     98,     {INT,DEX} },
-//   "quest skill",     MONKQUESTSKILL          50,     98,     {0,0} },
 {    "\n",              0,                      1,      0,      {0,0} }
 };
 
@@ -1536,7 +1531,6 @@ struct class_skill_defines c_skills[] = { // cleric skills
 {    "group recall",         SPELL_GROUP_RECALL,      47,     98,     {DEX,STR} },
 {    "heal spray",           SPELL_HEAL_SPRAY,        48,     98,     {WIS,CON} },
 {    "group sanctuary",      SPELL_GROUP_SANC,        49,     98,     {STR,WIS} },
-//{    "turn undead",        SPELL_TURN_UNDEAD,       50,     98,     {0,0} },
 {    "\n",                         0,                         1,      0,      {0,0} }  
 };
 
@@ -1594,7 +1588,7 @@ struct class_skill_defines m_skills[] = { // mage skills
 {    "create golem",        SPELL_CREATE_GOLEM,      48,     90,     {WIS,STR} },
 {    "release golem",       SPELL_RELEASE_GOLEM,     48,     90,     {WIS,INT} },
 {    "solar gate",          SPELL_SOLAR_GATE,        49,     98,     {WIS,INT} },
-{    "spellcraft",          SKILL_SPELLCRAFT,        50,     98,     {WIS,INT}},
+{    "spellcraft",          SKILL_SPELLCRAFT,        50,     98,     {WIS,INT} },
 {    "\n",                  0,                       1,      0,      {0,0} }
 };
 
