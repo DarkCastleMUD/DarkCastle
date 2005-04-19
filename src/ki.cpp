@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.33 2005/04/09 21:15:27 urizen Exp $ */
+/* $Id: ki.cpp,v 1.34 2005/04/19 18:34:14 urizen Exp $ */
 
 extern "C"
 {
@@ -630,22 +630,49 @@ int ki_purify( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
     log("Null victim sent to ki purify", ANGEL, LOG_BUG); 
     return eINTERNAL_ERROR;
   }
+  if (!arg)
+  {
+    send_to_char("You can only purify poison, blindness, alcohol or weaken.",ch);
+	return eFAILURE;
+  }
+  if (!str_cmp(arg, "poison"))
+  {
+     if(affected_by_spell(vict,SPELL_POISON))
+       affect_from_char(vict,SPELL_POISON);
+     else {
+	send_to_char("That taint is not present.\r\n",ch);
+	return eFAILURE;
+     }
+     send_to_char("You purge the poison.\r\n",ch);
+  } else if (!str_cmp(arg, "blindness")) {
+   if(affected_by_spell(vict,SPELL_BLINDNESS))
+      affect_from_char(vict,SPELL_BLINDNESS);
+     else {
+	send_to_char("That taint is not present.\r\n",ch);
+	return eFAILURE;
+     }
+     send_to_char("You purge the blindness.\r\n",ch);
 
-  if(affected_by_spell(vict,SPELL_POISON))
-    affect_from_char(vict,SPELL_POISON);
-
-  if(affected_by_spell(vict,SPELL_BLINDNESS))
-    affect_from_char(vict,SPELL_BLINDNESS);
-
-  if(affected_by_spell(vict,SPELL_WEAKEN))
-    affect_from_char(vict,SPELL_WEAKEN);
-
-  if(GET_COND(ch, DRUNK) > 0)
-    gain_condition(vict, DRUNK, -GET_COND(ch, DRUNK));
-
-  act("$n focuses $s mind to purge $s body of impurities.",
-       ch, 0, 0, TO_ROOM, 0);
-  send_to_char("You purge your body of impurities.\r\n", vict);
+  } else if (!str_cmp(arg, "weaken"))
+  {
+    if(affected_by_spell(vict,SPELL_WEAKEN))
+      affect_from_char(vict,SPELL_WEAKEN);
+     else {
+	send_to_char("That taint is not present.\r\n",ch);
+	return eFAILURE;
+     }
+     send_to_char("You purge the poison.\r\n",ch);
+  } else if (!str_cmp(arg, "alcohol")) {
+    if(GET_COND(ch, DRUNK) > 0)
+      gain_condition(vict, DRUNK, -GET_COND(ch, DRUNK));
+    else {
+	send_to_char("That taint is not present.\r\n",ch);
+	return eFAILURE;
+    }
+    send_to_char("You purge the alcohol.\r\n",ch);
+  } else {
+   send_to_char("You cannot purge that.\r\n",ch);
+  }
   return eSUCCESS;
 }
 

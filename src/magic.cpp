@@ -511,6 +511,33 @@ int spell_howl(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *ob
 }
 
 
+/*Aegis/Unholy Aegis*/
+int spell_aegis(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
+{
+  struct affected_type af;
+  if(affected_by_spell(victim, SPELL_AEGIS))
+    affect_from_char(victim, SPELL_AEGIS);
+  if(affected_by_spell(victim, SPELL_ARMOR))
+  {
+    act("$n is already protected by magical armour.", victim, 0, ch, TO_VICT, 0);
+    return eFAILURE;
+  }
+
+
+  af.type      = SPELL_AEGIS;
+  af.duration  =  10 + skill / 3;
+  af.modifier  = -10 - skill / 3;
+  af.location  = APPLY_AC;
+  af.bitvector = 0;
+
+  affect_to_char(victim, &af);
+  if (GET_CLASS(ch) == CLASS_PALADIN)
+    send_to_char("You invoke your protective aegis.\n\r", victim);
+  else
+    send_to_char("You invoke your unholy aegis.\r\n",victim);
+  return eSUCCESS;
+}
+
 /* ARMOUR */
 
 int spell_armor(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
@@ -518,6 +545,11 @@ int spell_armor(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
   struct affected_type af;
   if(affected_by_spell(victim, SPELL_ARMOR))
     affect_from_char(victim, SPELL_ARMOR);
+  if(affected_by_spell(victim, SPELL_AEGIS))
+  {
+    act("$n is already protected by magical armour.",victim, 0, ch, TO_VICT, 0);
+    return eFAILURE;
+  }
 
   af.type      = SPELL_ARMOR;
   af.duration  =  10 + skill / 3;
@@ -5861,6 +5893,37 @@ int cast_armor( byte level, CHAR_DATA *ch, char *arg, int type,
 		 break;
 		default :
 	 log("Serious screw-up in armor!", ANGEL, LOG_BUG);
+	 break;
+	 }
+  return eFAILURE;
+}
+
+int cast_aegis( byte level, CHAR_DATA *ch, char *arg, int type,
+	 CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill )
+{
+  switch (type) {
+	case SPELL_TYPE_SPELL:
+		 if (ch != tar_ch)
+			act("$N is protected by mystical armour.", ch, 0, tar_ch, TO_CHAR,0);
+		 return spell_aegis(level,ch,tar_ch,0, skill);
+		 break;
+	case SPELL_TYPE_POTION:
+		 return spell_armor(level,ch,ch,0, skill);
+		 break;
+	case SPELL_TYPE_SCROLL:
+		 if (tar_obj) return eFAILURE;
+		 if (!tar_ch) tar_ch = ch;
+		 return spell_aegis(level,ch,ch,0, skill);
+		 break;
+	case SPELL_TYPE_WAND:
+		 if (tar_obj) return eFAILURE;
+		 if (!tar_ch) tar_ch = ch;
+		 if ( affected_by_spell(tar_ch, SPELL_AEGIS) )
+		return eFAILURE;
+		 return spell_aegis(level,ch,tar_ch,0, skill);
+		 break;
+		default :
+	 log("Serious screw-up in aegis!", ANGEL, LOG_BUG);
 	 break;
 	 }
   return eFAILURE;

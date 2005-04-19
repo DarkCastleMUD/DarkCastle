@@ -5,7 +5,7 @@
  *                                                                           *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-/* $Id: magic.h,v 1.17 2005/04/17 12:05:03 shane Exp $ */
+/* $Id: magic.h,v 1.18 2005/04/19 18:34:17 urizen Exp $ */
 #ifndef MAGIC_H_
 #define MAGIC_H_
 
@@ -27,6 +27,8 @@ int spell_acid_breath(byte level, CHAR_DATA * ch,
 int spell_animate_dead(byte level, CHAR_DATA * ch,
    CHAR_DATA * victim, struct obj_data * corpse, int skill);
 int spell_armor(byte level, CHAR_DATA * ch,
+   CHAR_DATA * victim, struct obj_data * obj, int skill);
+int spell_aegis(byte level, CHAR_DATA * ch,
    CHAR_DATA * victim, struct obj_data * obj, int skill);
 int spell_portal(byte level, CHAR_DATA * ch,
    CHAR_DATA * victim, struct obj_data * obj, int skill);
@@ -283,6 +285,8 @@ int cast_lightning_bolt(byte level, CHAR_DATA * ch, char *arg, int type,
 int cast_magic_missile(byte level, CHAR_DATA * ch, char *arg, int type,
    CHAR_DATA * victim, struct obj_data * tar_obj, int skill);
 int cast_armor(byte level, CHAR_DATA * ch, char *arg, int type,
+   CHAR_DATA * tar_ch, struct obj_data * tar_obj, int skill);
+int cast_aegis(byte level, CHAR_DATA * ch, char *arg, int type,
    CHAR_DATA * tar_ch, struct obj_data * tar_obj, int skill);
 int cast_teleport(byte level, CHAR_DATA * ch, char *arg, int type,
    CHAR_DATA * tar_ch, struct obj_data * tar_obj, int skill);

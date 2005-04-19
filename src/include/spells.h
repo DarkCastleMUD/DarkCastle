@@ -14,7 +14,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.h,v 1.59 2005/04/18 12:52:24 shane Exp $ */
+/* $Id: spells.h,v 1.60 2005/04/19 18:34:17 urizen Exp $ */
 #include <structs.h> // byte, sh_int
 
 #define MAX_BUF_LENGTH               240
@@ -204,7 +204,9 @@ void check_maxes(CHAR_DATA *ch);
 #define SPELL_EAS 		    150
 #define SPELL_ALIGN_GOOD 	    151 // uriel's fire of redemption
 #define SPELL_ALIGN_EVIL 	    152 // Moruk's heart
-#define MAX_SPL_LIST                152
+#define SPELL_AEGIS 		    153
+#define SPELL_U_AEGIS 154
+#define MAX_SPL_LIST                154
 
 // if you add a spell, make sure you update "spells[]" in spells.C
 

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_barbarian.cpp,v 1.32 2005/04/15 21:22:40 urizen Exp $
+| $Id: cl_barbarian.cpp,v 1.33 2005/04/19 18:34:15 urizen Exp $
 | cl_barbarian.C
 | Description:  Commands for the barbarian class.
 */
@@ -128,8 +128,18 @@ int do_battlecry(struct char_data *ch, char *argument, int cmd)
      act ("$n yells 'They can take our lives, but they'll never take OUR FREEDOM!'", ch, 0, 0, TO_ROOM, 0);
 
      SET_BIT(ch->combat, COMBAT_RAGE1);
+     if (ch->followers) f = ch->followers;
+     else if (ch->master) 
+     {
+	f = ch->master->followers;
+        act ("You give a battlecry, sounding your defiance!", ch->master, 0, 0, TO_CHAR, 0);
+        act ("$n gives a loud cry of agreement!", ch->master, 0, 0, TO_ROOM, 0);
+        SET_BIT(f->follower->combat, COMBAT_RAGE1);
 
-     for(f = ch->followers; f; f = f->next) {
+     }
+     else f = NULL;
+
+     for(; f; f = f->next) {
         if (!IS_AFFECTED(f->follower, AFF_GROUP) ||
 	    (IS_SET(f->follower->combat, COMBAT_RAGE1)) ||
 	    (IS_SET(f->follower->combat, COMBAT_RAGE2)) ||
@@ -137,7 +147,7 @@ int do_battlecry(struct char_data *ch, char *argument, int cmd)
 	    (f->follower->in_room != ch->in_room) ||
             (!f->follower->fighting))
            continue;
-
+	if (f->follower == ch) continue;
         act ("You give a battlecry, sounding your defiance!", f->follower, 0, 0, TO_CHAR, 0);
         act ("$n gives a loud cry of agreement!", f->follower, 0, 0, TO_ROOM, 0);
         SET_BIT(f->follower->combat, COMBAT_RAGE1);

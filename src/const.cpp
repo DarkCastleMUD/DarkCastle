@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.130 2005/04/19 18:32:47 apocalypse Exp $ */
+/* $Id: const.cpp,v 1.131 2005/04/19 18:34:14 urizen Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -269,6 +269,8 @@ char *spell_wear_off_msg[] =
   "You feel more susceptable to damage.",
   "!ALIGN_GOOD!",
   "!ALIGN_EVIL!",
+  "Your protective aegis dissipates.",
+  "Your unholy aegis dissipates.",
   "!UNUSED!"
 };
 
@@ -1198,6 +1200,7 @@ struct class_skill_defines a_skills[] = { // anti-paladin skills
 {    "invisibility",         SPELL_INVISIBLE,         13,     90,     {INT,DEX} },
 {    "backstab",             SKILL_BACKSTAB,          15,     90,     {DEX,STR} },
 {    "hide",                 SKILL_HIDE,              17,     85,     {INT,WIS} },
+{    "resist acid",          SPELL_RESIST_ACID,          18,     80,     {CON,WIS} },
 {    "trip",                 SKILL_TRIP,              19,     85,     {DEX,STR} },
 {    "chill touch",          SPELL_CHILL_TOUCH,       20,     85,     {CON,WIS} },
 {    "double",               SKILL_SECOND_ATTACK,     22,     85,     {STR,DEX} },
@@ -1219,7 +1222,8 @@ struct class_skill_defines a_skills[] = { // anti-paladin skills
 {    "acid shield",          SPELL_ACID_SHIELD,       40,     98,     {INT,STR} },
 {    "curse",                SPELL_CURSE,             41,     70,     {WIS,INT} },
 {    "firestorm",            SPELL_FIRESTORM,         42,     85,     {INT,STR} },
-{    "stoneskin",            SPELL_STONE_SKIN,        44,     85,     {STR,CON} },
+//{    "stoneskin",            SPELL_STONE_SKIN,        44,     85,     {STR,CON} },
+{    "unholy aegis",         SPELL_U_AEGIS, 44, 85, {STR,CON}},
 {    "protection from good", SPELL_PROTECT_FROM_GOOD, 45,     90,     {WIS,DEX} },
 {    "acid blast",           SPELL_ACID_BLAST,        48,     98,     {STR,INT} },
 {    "vampiric aura",        SPELL_VAMPIRIC_AURA,     50,     98,     {INT,CON} },
@@ -1261,8 +1265,10 @@ struct class_skill_defines p_skills[] = { // paladin skills
 {    "heal",                 SPELL_HEAL,               37,     85,     {WIS,INT} },
 {    "harm",                 SPELL_HARM,               38,     85,     {WIS,CON} },
 {    "sanctuary",            SPELL_SANCTUARY,          40,     90,     {WIS,INT} },
-{    "armor",                SPELL_ARMOR,              41,     80,     {STR,INT} },
+//{    "armor",                SPELL_ARMOR,              41,     80,     {STR,INT} },
+{ "holy aegis",              SPELL_AEGIS,  41, 80, {STR, INT}},
 {    "dispel evil",          SPELL_DISPEL_EVIL,        42,     90,     {WIS,STR} },
+{    "resist cold",          SPELL_RESIST_COLD,       42,     90,     {CON,STR} },
 {    "protection from evil", SPELL_PROTECT_FROM_EVIL,  45,     90,     {WIS,DEX} },
 {    "power harm",           SPELL_POWER_HARM,         48,     90,     {WIS,CON} },
 {    "holy aura",            SPELL_HOLY_AURA,          50,     98,     {WIS,STR} },

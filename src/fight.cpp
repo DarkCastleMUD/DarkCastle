@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.255 2005/04/18 13:53:07 urizen Exp $ */
+/* $Id: fight.cpp,v 1.256 2005/04/19 18:34:14 urizen Exp $ */
 
 extern "C"
 {
@@ -3298,9 +3298,9 @@ int do_skewer(CHAR_DATA *ch, CHAR_DATA *vict, int dam, int wt, int wt2, int weap
   //  act("$n jams $s weapon into $N!!", ch, 0, vict, TO_ROOM, NOTVICT);
   //  act("You jam your weapon in $N's heart!", ch, 0, vict, TO_CHAR, 0);
   //  act("$n's weapon is speared into you! Ouch!", ch, 0, vict, TO_VICT, 0);
-    damadd = dam * 2; // doubles original damage
-    if (GET_LEVEL(vict) > GET_LEVEL(ch))
-      damadd /= GET_LEVEL(vict) - GET_LEVEL(ch);
+    damadd = dam * 1.5; 
+//    if (GET_LEVEL(vict) > GET_LEVEL(ch))
+  //    damadd /= GET_LEVEL(vict) - GET_LEVEL(ch);
     int retval = damage(ch, vict, damadd, wt, SKILL_SKEWER, weapon);
     if (SOMEONE_DIED(retval)) return retval;
     //GET_HIT(vict) -= damadd;

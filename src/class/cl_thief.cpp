@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.86 2005/04/18 12:51:56 shane Exp $
+| $Id: cl_thief.cpp,v 1.87 2005/04/19 18:34:16 urizen Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -775,7 +775,7 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
             // if victim isn't a pthief
 //            if(!affected_by_spell(victim, FUCK_PTHIEF) ) 
             {
-              set_cantquit( ch, victim );
+              //set_cantquit( ch, victim );
               if(affected_by_spell(ch, FUCK_PTHIEF))
               {
                 affect_from_char(ch, FUCK_PTHIEF);
@@ -1146,7 +1146,7 @@ int do_pocket(CHAR_DATA *ch, char *argument, int cmd)
         do_save(ch, "", 666);
         if(!affected_by_spell(victim, FUCK_GTHIEF) ) 
         {
-          set_cantquit( ch, victim );
+          //set_cantquit( ch, victim );
           if(affected_by_spell(ch, FUCK_GTHIEF))
           {
             affect_from_char(ch, FUCK_GTHIEF);
