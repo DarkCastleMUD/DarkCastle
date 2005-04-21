@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.133 2005/04/21 09:16:50 shane Exp $ */
+/* $Id: const.cpp,v 1.134 2005/04/21 11:06:46 shane Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1347,6 +1347,7 @@ struct class_skill_defines r_skills[] = { // ranger skills
 {    "dual wield",      SKILL_DUAL_WIELD,        5,      90,     {DEX,CON} },
 {    "redirect",        SKILL_REDIRECT,          7,      80,     {INT,CON} },
 {    "eyes of the owl", SPELL_EYES_OF_THE_OWL,   8,      90,     {INT,DEX} },
+{    "sense life",      SPELL_SENSE_LIFE,        9,      90,     {CON,INT} },
 {    "shield block",    SKILL_SHIELDBLOCK,       10,     60,     {STR,DEX} },
 {    "tame",            SKILL_TAME,              11,     98,     {WIS,INT} },
 {    "double",          SKILL_SECOND_ATTACK,     12,     85,     {STR,DEX} },
@@ -1524,8 +1525,7 @@ struct class_skill_defines c_skills[] = { // cleric skills
 {    "true sight",           SPELL_TRUE_SIGHT,        39,     90,     {WIS,INT} },     
 {    "full heal",            SPELL_FULL_HEAL,         40,     98,     {WIS,INT} },
 {    "power harm",           SPELL_POWER_HARM,        41,     85,     {WIS,CON} },
-{    "resist cold",          SPELL_RESIST_COLD,       42,     90,     {CON,STR} },
-{    "resist fire",          SPELL_RESIST_FIRE,       43,     90,     {INT,CON} },
+{    "resist magic",         SPELL_RESIST_MAGIC,      43,     90,     {INT,WIS} },
 {    "resist energy",        SPELL_RESIST_ENERGY,     44,     98,     {CON,DEX} },
 {    "dispel magic",         SPELL_DISPEL_MAGIC,      45,     85,     {INT,CON} },
 {    "flamestrike",          SPELL_FLAMESTRIKE,       46,     98,     {INT,WIS} },

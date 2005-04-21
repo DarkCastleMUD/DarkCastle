@@ -2827,12 +2827,11 @@ int spell_sanctuary(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
 	 af.duration  = 3 + skill / 18;
 	 af.modifier  = 25;
 
-	if (GET_CLASS(ch) == CLASS_CLERIC)
-	{
-	  if (GET_ALIGNMENT(ch) > -350) af.modifier += 5;
-	  if (GET_ALIGNMENT(ch) > 350) af.modifier += 5;
-	 
-	}
+	if (GET_CLASS(ch) == CLASS_CLERIC) af.modifier += 10;
+//	{
+//	  if (GET_ALIGNMENT(ch) > -350) af.modifier += 5;
+//	  if (GET_ALIGNMENT(ch) > 350) af.modifier += 5;	 
+//	}
 	 af.location  = APPLY_NONE;
 	 af.bitvector = AFF_SANCTUARY;
 	 affect_to_char(victim, &af);
@@ -4130,7 +4129,7 @@ int spell_dispel_minor(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
    // Input max number of spells in switch statement here
    while(!done && ((rots += 1) < 10))
    {
-      int x = spell != 0 ? spell: number(1,14);
+      int x = spell != 0 ? spell: number(1,15);
       switch(x) 
       {
          case 1: 
@@ -4284,6 +4283,17 @@ int spell_dispel_minor(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
 		act("$n's force shield shimmers and fades away.",ch,0,victim, TO_CHAR, 0);
 	   }
 	   break;
+
+	 case 15: 
+            if (affected_by_spell(victim, SPELL_RESIST_MAGIC))
+            {
+               affect_from_char(victim, SPELL_RESIST_MAGIC);
+               send_to_char("The $B$7white$R in your skin is dispelled!\n\r", victim);
+               act("$n's skin loses its $B$7white$R hue.", ch,0,victim, TO_CHAR, 0);
+               done = TRUE;
+            }
+            break;
+
          default: send_to_char("Illegal Value send to switch in dispel_minor, tell a god.\r\n", ch);
             done = TRUE;
             break;
@@ -4716,6 +4726,26 @@ int spell_resist_fire(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
       af.duration = 1 + skill / 10;
       af.modifier = 10 + skill / 6;
       af.location = APPLY_SAVING_FIRE;
+      af.bitvector = 0;
+      affect_to_char(victim, &af);
+   }
+   return eSUCCESS;
+}
+
+
+/* RESIST MAGIC */
+
+int spell_resist_magic(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
+{
+   struct affected_type af;
+
+   if (!affected_by_spell(victim, SPELL_RESIST_MAGIC)) {
+      act("$n's skin turns $B$7white$R momentarily.", victim, 0, 0, TO_ROOM, INVIS_NULL);
+      act("Your skin turns $B$7white$R momentarily.", victim, 0, 0, TO_CHAR, 0);
+      af.type = SPELL_RESIST_MAGIC;
+      af.duration = 1 + skill / 10;
+      af.modifier = 10 + skill / 6;
+      af.location = APPLY_SAVING_MAGIC;
       af.bitvector = 0;
       affect_to_char(victim, &af);
    }
@@ -7774,7 +7804,7 @@ char *dispel_minor_spells[] =
   "", "invisibility", "detect_invisibility", "camouflage", "resist_acid",
   "resist_cold", "resist_fire", "resist_energy", "barkskin",
   "stoneskin", "fly", "true_sight", "water_breath", "armor",
-  "shield", "\n"
+  "shield", "resist_magic", "\n"
 
 };
 
@@ -8124,6 +8154,30 @@ int cast_resist_fire( byte level, CHAR_DATA *ch, char *arg,
     break;
   default:
 	 log("Serious screw-up in resist_fire!", ANGEL, LOG_BUG);
+	 break;
+  }
+  return eFAILURE;
+}
+
+
+int cast_resist_magic( byte level, CHAR_DATA *ch, char *arg,
+		  int type, CHAR_DATA *tar_ch,
+		  struct obj_data *tar_obj, int skill)
+{
+  switch (type) {
+  case SPELL_TYPE_SPELL:
+	 return spell_resist_magic(level, ch, tar_ch, 0, skill);
+    break;
+  case SPELL_TYPE_POTION:
+	 return spell_resist_magic(level, ch, tar_ch, 0, skill);
+	 break;
+  case SPELL_TYPE_SCROLL:
+      if (tar_obj) return eFAILURE;
+      if (!tar_ch) tar_ch = ch;
+    return spell_resist_magic(level, ch, tar_ch, 0, skill);
+    break;
+  default:
+	 log("Serious screw-up in resist_magic!", ANGEL, LOG_BUG);
 	 break;
   }
   return eFAILURE;

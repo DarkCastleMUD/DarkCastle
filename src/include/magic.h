@@ -5,7 +5,7 @@
  *                                                                           *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-/* $Id: magic.h,v 1.18 2005/04/19 18:34:17 urizen Exp $ */
+/* $Id: magic.h,v 1.19 2005/04/21 11:06:53 shane Exp $ */
 #ifndef MAGIC_H_
 #define MAGIC_H_
 
@@ -31,6 +31,8 @@ int spell_armor(byte level, CHAR_DATA * ch,
 int spell_aegis(byte level, CHAR_DATA * ch,
    CHAR_DATA * victim, struct obj_data * obj, int skill);
 int spell_portal(byte level, CHAR_DATA * ch,
+   CHAR_DATA * victim, struct obj_data * obj, int skill);
+int spell_resist_magic(byte level, CHAR_DATA * ch,
    CHAR_DATA * victim, struct obj_data * obj, int skill);
 
 int spell_bee_sting(byte level, CHAR_DATA *ch,
@@ -455,6 +457,8 @@ int cast_group_fly(byte level, CHAR_DATA * ch, char *arg, int type,
 int cast_enchant_armor(byte level, CHAR_DATA * ch, char *arg, int type,
    CHAR_DATA * tar_ch, struct obj_data * tar_obj, int skill);
 int cast_resist_fire(byte level, CHAR_DATA * ch, char *arg, int type,
+   CHAR_DATA * tar_ch, struct obj_data * tar_obj, int skill);
+int cast_resist_magic(byte level, CHAR_DATA * ch, char *arg, int type,
    CHAR_DATA * tar_ch, struct obj_data * tar_obj, int skill);
 int cast_resist_cold(byte level, CHAR_DATA * ch, char *arg, int type,
    CHAR_DATA * tar_ch, struct obj_data * tar_obj, int skill);

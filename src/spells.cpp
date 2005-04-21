@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.121 2005/04/21 10:41:24 shane Exp $ */
+/* $Id: spells.cpp,v 1.122 2005/04/21 11:06:46 shane Exp $ */
 
 extern "C"
 {
@@ -391,6 +391,8 @@ struct spell_info_type spell_info [ ] =
  { /* 153*/ 12, POSITION_STANDING, 50, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_aegis, SKILL_INCREASE_HARD },
 
  { /* 154*/ 12, POSITION_STANDING, 50, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_aegis, SKILL_INCREASE_HARD }
+
+ { /* 155 */ 12, POSITION_STANDING, 33, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_resist_magic, SKILL_INCREASE_HARD },
  
 };
 
@@ -717,6 +719,7 @@ char *spells[]=
    "align-evil",
    "holy aegis",
    "unholy aegis",
+   "resist magic",
    "\n"
 };
 

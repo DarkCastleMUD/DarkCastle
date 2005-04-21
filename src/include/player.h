@@ -1,7 +1,7 @@
 #ifndef PLAYER_H_
 #define PLAYER_H_
 /************************************************************************
-| $Id: player.h,v 1.17 2005/04/09 21:15:35 urizen Exp $
+| $Id: player.h,v 1.18 2005/04/21 11:06:53 shane Exp $
 | player.h
 | Description: This file defines the player vectors..punishment, specials,
 |   etc...
@@ -221,7 +221,8 @@
 #define APPLY_MELEE_DAMAGE     98
 #define APPLY_SPELL_DAMAGE     99
 #define APPLY_SONG_DAMAGE      100
-#define APPLY_MAXIMUM_VALUE    100
+#define APPLY_RESIST_MAGIC     101
+#define APPLY_MAXIMUM_VALUE    101
 
 /*
  1000+ are reserved, so if you were thinking about using, think
