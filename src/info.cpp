@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.62 2005/04/18 12:21:17 shane Exp $ */
+/* $Id: info.cpp,v 1.63 2005/04/21 22:00:01 shane Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -629,8 +629,9 @@ void list_char_to_char(struct char_data *list, struct char_data *ch, int mode)
       if (ch == i)
          continue;
       if(!IS_MOB(i) && (i->pcdata->wizinvis > GET_LEVEL(ch)))
-         continue;
-      if ( IS_AFFECTED(ch, AFF_SENSE_LIFE) || CAN_SEE(ch, i) )
+         if(!i->pcdata->incognito || !( ch->in_room == i->in_room))
+            continue;
+      if ( IS_AFFECTED(ch, AFF_SENSE_LIFE) || CAN_SEE(ch, i))
          show_char_to_char(i, ch, 0);
       else if (IS_DARK(ch->in_room))
       {
