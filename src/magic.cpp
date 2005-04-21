@@ -524,8 +524,8 @@ int spell_aegis(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
   }
 
   af.type      = SPELL_AEGIS;
-  af.duration  =  10 + skill / 3;
-  af.modifier  = -10 - skill / 3;
+  af.duration  =  10 + skill / 4;
+  af.modifier  = -10 - skill / 4;
   af.location  = APPLY_AC;
   af.bitvector = 0;
 
@@ -5907,10 +5907,10 @@ int cast_aegis( byte level, CHAR_DATA *ch, char *arg, int type,
 {
   switch (type) {
 	case SPELL_TYPE_SPELL:
-		 return spell_aegis(level,ch,tar_ch,0, skill);
+		 return spell_aegis(level,ch,ch,0, skill);
 		 break;
 	case SPELL_TYPE_POTION:
-		 return spell_armor(level,ch,ch,0, skill);
+		 return spell_aegis(level,ch,ch,0, skill);
 		 break;
 	case SPELL_TYPE_SCROLL:
 		 if (tar_obj) return eFAILURE;
@@ -5924,7 +5924,7 @@ int cast_aegis( byte level, CHAR_DATA *ch, char *arg, int type,
 		return eFAILURE;
 		 return spell_aegis(level,ch,tar_ch,0, skill);
 		 break;
-		default :
+	default :
 	 log("Serious screw-up in aegis!", ANGEL, LOG_BUG);
 	 break;
 	 }

@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.117 2005/04/19 18:34:14 urizen Exp $ */
+/* $Id: spells.cpp,v 1.118 2005/04/21 09:13:46 urizen Exp $ */
 
 extern "C"
 {
@@ -709,6 +709,8 @@ char *spells[]=
    "cantquit",
    "solidity",   
    "eas",
+   "align-good",
+   "align-evil",
    "holy aegis",
    "unholy aegis",
    "\n"
