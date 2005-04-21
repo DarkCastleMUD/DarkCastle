@@ -4683,6 +4683,11 @@ int spell_flamestrike(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 int spell_resist_cold(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
    struct affected_type af;
+   if (GET_CLASS(ch) == CLASS_PALADIN && ch != victim)
+   {
+	send_to_char("You can only cast this on yourself.\r\n",ch);
+	return eFAILURE;
+   }
 
    if (!affected_by_spell(victim, SPELL_RESIST_COLD)) {
       act("$n's skin turns $3blue$R momentarily.", victim, 0, 0, TO_ROOM, INVIS_NULL);
@@ -9530,6 +9535,11 @@ int cast_lighted_path( byte level, CHAR_DATA *ch, char *arg, int type,
 int spell_resist_acid(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
     struct affected_type af;
+    if (GET_CLASS(ch) == CLASS_ANTI_PAL && ch != victim)
+    {
+	send_to_char("You can only cast this on yourself.\r\n",ch);
+	return eFAILURE;
+    }
 
     if(!affected_by_spell(victim, SPELL_RESIST_ACID)) {
        act("$n's skin turns $2green$R momentarily.", victim, 0, 0, TO_ROOM, INVIS_NULL);
