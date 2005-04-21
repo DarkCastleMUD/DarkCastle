@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.52 2005/04/18 11:31:13 shane Exp $
+| $Id: inventory.cpp,v 1.53 2005/04/21 20:32:56 shane Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -353,10 +353,17 @@ int do_get(struct char_data *ch, char *argument, int cmd)
 		fail = TRUE;
                 }
 
-		else if (obj_object->obj_flags.eq_level > 9 && GET_LEVEL(ch) < 5)
+		else if (obj_object->obj_flags.eq_level > 19 && GET_LEVEL(ch) < 5)
 		{
-		  csendf(ch, "%s is too powerful for you to possess.\r\n", obj_object->short_description);
-		  fail = TRUE;	
+                  if(ch->in_room != real_room(3099)) {
+		     csendf(ch, "%s is too powerful for you to possess.\r\n", obj_object->short_description);
+		     fail = TRUE;	
+                  } else {
+                     csendf(ch, "The aura of the donation room allows you to pick up %s.\n\r", obj_object->short_description);
+                     get (ch, obj_object, sub_object);
+                     do_save(ch,"", 666);
+                     found = TRUE;
+                  }
 		} else if (CAN_WEAR(obj_object,ITEM_TAKE)) 
                 {
                     if(cmd == 10) palm(ch, obj_object, sub_object);
