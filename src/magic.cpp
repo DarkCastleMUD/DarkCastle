@@ -515,14 +515,13 @@ int spell_howl(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *ob
 int spell_aegis(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
   struct affected_type af;
-  if(affected_by_spell(victim, SPELL_AEGIS))
-    affect_from_char(victim, SPELL_AEGIS);
-  if(affected_by_spell(victim, SPELL_ARMOR))
+  if(affected_by_spell(ch, SPELL_AEGIS))
+    affect_from_char(ch, SPELL_AEGIS);
+  if(affected_by_spell(ch, SPELL_ARMOR))
   {
-    act("$n is already protected by magical armour.", victim, 0, ch, TO_VICT, 0);
+    act("$n is already protected by magical armour.", ch, 0, 0, TO_CHAR, 0);
     return eFAILURE;
   }
-
 
   af.type      = SPELL_AEGIS;
   af.duration  =  10 + skill / 3;
@@ -530,11 +529,11 @@ int spell_aegis(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
   af.location  = APPLY_AC;
   af.bitvector = 0;
 
-  affect_to_char(victim, &af);
+  affect_to_char(ch, &af);
   if (GET_CLASS(ch) == CLASS_PALADIN)
-    send_to_char("You invoke your protective aegis.\n\r", victim);
+    send_to_char("You invoke your protective aegis.\n\r", ch);
   else
-    send_to_char("You invoke your unholy aegis.\r\n",victim);
+    send_to_char("You invoke your unholy aegis.\r\n",ch);
   return eSUCCESS;
 }
 
@@ -5908,8 +5907,6 @@ int cast_aegis( byte level, CHAR_DATA *ch, char *arg, int type,
 {
   switch (type) {
 	case SPELL_TYPE_SPELL:
-		 if (ch != tar_ch)
-			act("$N is protected by mystical armour.", ch, 0, tar_ch, TO_CHAR,0);
 		 return spell_aegis(level,ch,tar_ch,0, skill);
 		 break;
 	case SPELL_TYPE_POTION:
