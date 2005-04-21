@@ -425,18 +425,18 @@ int do_golem_score(struct char_data *ch, char *argument, int cmd)
          if(++level == 4)
             level = 0;
       }
-       sprintf(buf, "|%c| Affected by %-22s  Modifier %-16s  |%c|\n\r",
+       sprintf(buf, "|%c| Affected by %-22s          Modifier %-16s  |%c|\n\r",
                frills[level],"STABILITY","NONE",frills[level]);
 	send_to_char(buf,master);
-       sprintf(buf, "|%c| Affected by %-22s  Modifier %-16s  |%c|\n\r",
+       sprintf(buf, "|%c| Affected by %-22s          Modifier %-16s  |%c|\n\r",
                frills[level],"INFRARED","NONE",frills[level]);
         send_to_char(buf,master);
        if (IS_SET(ch->affected_by, AFF_LIGHTNINGSHIELD))
-       sprintf(buf, "|%c| Affected by %-22s  Modifier %-16s  |%c|\n\r",
+       sprintf(buf, "|%c| Affected by %-22s          Modifier %-16s  |%c|\n\r",
                frills[level],"LIGHTNING SHIELD","NONE",frills[level]);
         send_to_char(buf,master);
 	if (IS_SET(ch->resist, ISR_PIERCE))
-       sprintf(buf, "|%c| Affected by %-22s  Modifier %-16s  |%c|\n\r",
+       sprintf(buf, "|%c| Affected by %-22s          Modifier %-16s  |%c|\n\r",
                frills[level],"STONE SKIN","NONE",frills[level]);
         found = TRUE;
      if(found)
