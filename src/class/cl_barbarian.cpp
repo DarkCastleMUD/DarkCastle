@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_barbarian.cpp,v 1.34 2005/04/21 09:16:56 shane Exp $
+| $Id: cl_barbarian.cpp,v 1.35 2005/04/21 09:20:30 urizen Exp $
 | cl_barbarian.C
 | Description:  Commands for the barbarian class.
 */
@@ -649,7 +649,7 @@ int do_knockback(struct char_data *ch, char *argument, int cmd)
       }
       learned -= 20;
     }
-  }
+//  }
 
   if(!dir)
     dir = number(0,5);
