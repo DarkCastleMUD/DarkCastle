@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.118 2005/04/21 09:13:46 urizen Exp $ */
+/* $Id: spells.cpp,v 1.119 2005/04/21 09:16:50 shane Exp $ */
 
 extern "C"
 {
@@ -459,19 +459,21 @@ struct skill_stuff skill_info[] =
 /* 60 */    { "slashing_weapons", SKILL_INCREASE_MEDIUM },
 /* 61 */    { "whipping_weapons", SKILL_INCREASE_MEDIUM },
 /* 62 */    { "crushing_weapons", SKILL_INCREASE_MEDIUM },
-/* 63 */  { "two_handed_weapons", SKILL_INCREASE_MEDIUM },
-/* 64 */        { "hand_to_hand", SKILL_INCREASE_MEDIUM },
-/* 65 */            { "bullrush", SKILL_INCREASE_HARD },
-/* 66 */            { "ferocity", SKILL_INCREASE_MEDIUM },
-/* 67 */             { "tactics", SKILL_INCREASE_MEDIUM },
-/* 68 */              { "deceit", SKILL_INCREASE_MEDIUM },
-/* 69 */             { "release", SKILL_INCREASE_EASY },
-/* 70 */           { "fear gaze", 0 },
-/* 71 */            { "eyegouge", SKILL_INCREASE_HARD },
-/* 72 */        { "magic resist", SKILL_INCREASE_HARD },
-/* 73 */          { "ignorethis", 0},
-/* 74 */	  { "spellcraft", SKILL_INCREASE_HARD},
-/* 75 */     { "martial defense", SKILL_INCREASE_HARD},
+/* 63 */    { "stinging_weapons", SKILL_INCREASE_MEDIUM },
+/* 64 */  { "two_handed_weapons", SKILL_INCREASE_MEDIUM },
+/* 65 */        { "hand_to_hand", SKILL_INCREASE_MEDIUM },
+/* 66 */            { "bullrush", SKILL_INCREASE_HARD },
+/* 67 */            { "ferocity", SKILL_INCREASE_MEDIUM },
+/* 68 */             { "tactics", SKILL_INCREASE_MEDIUM },
+/* 69 */              { "deceit", SKILL_INCREASE_MEDIUM },
+/* 70 */             { "release", SKILL_INCREASE_EASY },
+/* 71 */           { "fear gaze", 0 },
+/* 72 */            { "eyegouge", SKILL_INCREASE_HARD },
+/* 73 */        { "magic resist", SKILL_INCREASE_HARD },
+/* 74 */          { "ignorethis", 0},
+/* 75 */	  { "spellcraft", SKILL_INCREASE_HARD},
+/* 76 */     { "martial defense", SKILL_INCREASE_HARD},
+/* 77 */           { "knockback", SKILL_INCREASE_HARD},
 /*    */                  { "\n", 0 },
 };
 
@@ -541,6 +543,7 @@ char *skills[]=
   "slashing_weapons",
   "whipping_weapons",
   "crushing_weapons",
+  "stinging_weapons",
   "two_handed_weapons",
   "hand_to_hand",
   "bullrush",

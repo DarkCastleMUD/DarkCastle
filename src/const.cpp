@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.132 2005/04/19 18:57:47 apocalypse Exp $ */
+/* $Id: const.cpp,v 1.133 2005/04/21 09:16:50 shane Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1144,6 +1144,7 @@ struct class_skill_defines w_skills[] = { // warrior skills
 {    "deathstroke",     SKILL_DEATHSTROKE,        39,   98,     {STR,INT} },
 {    "riposte",         SKILL_RIPOSTE,            40,   98,     {INT,DEX} },
 {    "two handers",     SKILL_TWO_HANDED_WEAPONS, 42,   85,     {STR,CON} },
+{    "stinging",        SKILL_STINGING_WEAPONS,   43,   90,     {DEX,INT} },
 {    "skewer",          SKILL_SKEWER,             45,   98,     {STR,CON} },
 {    "blade shield",    SKILL_BLADESHIELD,        47,   98,     {CON,DEX} },
 {    "\n",              0,                        1,    0,      {0,0} }
@@ -1171,7 +1172,7 @@ struct class_skill_defines t_skills[] = { // thief skills
 {    "piercing",        SKILL_PIERCEING_WEAPONS,30,     90,   {DEX,STR} },
 {    "slashing",        SKILL_SLASHING_WEAPONS, 30,     55,   {DEX,STR} },
 {    "bludgeoning",     SKILL_BLUDGEON_WEAPONS, 30,     70,   {STR,DEX} },
-{    "crushing",        SKILL_CRUSHING_WEAPONS, 30,     55,   {STR,DEX} },  
+{    "stinging",        SKILL_STINGING_WEAPONS, 30,     85,   {DEX,INT} },  
 {    "deceit",          SKILL_DECEIT,           31,     98,   {WIS,INT} },  
 {    "circle",          SKILL_CIRCLE,           35,     98,   {STR,DEX} },  
 {    "disarm",          SKILL_DISARM,           38,     85,   {DEX,WIS} },  

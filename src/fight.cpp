@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.256 2005/04/19 18:34:14 urizen Exp $ */
+/* $Id: fight.cpp,v 1.257 2005/04/21 09:16:50 shane Exp $ */
 
 extern "C"
 {
@@ -833,6 +833,9 @@ void check_weapon_skill_bonus(char_data * ch, int type, obj_data *wielded,
          break;
       case TYPE_PIERCE:
          skill = SKILL_PIERCEING_WEAPONS;
+         break;
+      case TYPE_STING:
+         skill = SKILL_STINGING_WEAPONS;
          break;
       case TYPE_HIT:
          skill = SKILL_HAND_TO_HAND;
@@ -2381,6 +2384,9 @@ int speciality_bonus(CHAR_DATA *ch,int attacktype)
          break;
       case TYPE_PIERCE:
          skill = SKILL_PIERCEING_WEAPONS;
+         break;
+      case TYPE_STING:
+         skill = SKILL_STINGING_WEAPONS;
          break;
       case TYPE_HIT:
          skill = SKILL_HAND_TO_HAND;
