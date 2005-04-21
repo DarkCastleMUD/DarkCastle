@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_barbarian.cpp,v 1.36 2005/04/21 09:22:23 urizen Exp $
+| $Id: cl_barbarian.cpp,v 1.37 2005/04/21 10:30:49 shane Exp $
 | cl_barbarian.C
 | Description:  Commands for the barbarian class.
 */
@@ -583,14 +583,14 @@ void barb_magic_resist(char_data *ch, int old, int nw)
       ch->saves[i] += bonus;
 
 }
-/*
+
 int do_knockback(struct char_data *ch, char *argument, int cmd)
 {
   struct char_data *victim;
   char buf[MAX_STRING_LENGTH], name[MAX_STRING_LENGTH], who[MAX_STRING_LENGTH];
   int dir = 0;
-  int retval, exit, dam, dampercent;
-  extern char * dirswards[];
+  int retval, exit, dam, dampercent, learned;
+  extern char * dirs[];
 
   if(GET_HIT(ch) == 1) {
     send_to_char("You are feeling too weak right now to smash into anybody.\n\r", ch);
@@ -636,6 +636,8 @@ int do_knockback(struct char_data *ch, char *argument, int cmd)
 
   learned = has_skill(ch, SKILL_KNOCKBACK);
 
+  dam = learned / 2 + 50;
+
   if(*name) {
     if(learned < 80)
       send_to_char("You're not good enough to direct your smashes.\n\r", ch);
@@ -649,34 +651,33 @@ int do_knockback(struct char_data *ch, char *argument, int cmd)
       }
       learned -= 20;
     }
-//  }
+  }
 
   if(!dir)
     dir = number(0,5);
 
-  dam = 100;
-  if(ch->height > 102 ) dampercent += 15;
-  else if(ch->height > 42 ) dampercent += 7;
-  if(victim->height < 42 ) dampercent += 7;
-  else if(victim->height < 102 ) dampercent += 15;
+  if(ch->height > 102) dampercent += 15;
+  else if(ch->height > 42) dampercent += 7;
+  if(victim->height < 42) dampercent += 7;
+  else if(victim->height < 102) dampercent += 15;
 
   dam *= (1.0 + dampercent / 100.0);
 
-  if(!skill_success(ch, victim, SKILL_KNOCKBACK, 0-(learned/4 * 3)) {
+  if(!skill_success(ch, victim, SKILL_KNOCKBACK, 0-(learned/4 * 3))) {
     act("You lunge forward in an attempt to smash $N but fall, missing $S completely.", ch, 0, victim, TO_CHAR, 0);
     act("$n lunges forward in an attempt to smash into you but falls flat on $s face, missing completely.", ch, 0, victim, TO_VICT, 0);
     act("$n lunges forward in an attempt to smash into $N but falls flat on $s face.", ch, 0, victim, TO_ROOM, NOTVICT);
-    GET_POS(ch, POSITION_SITTING);
+    GET_POS(ch) = POSITION_SITTING;
     WAIT_STATE(ch, PULSE_VIOLENCE);
     return eFAILURE;
   } else if(CAN_GO(victim, dir) &&
-       !IS_SET(world[EXIT(vict, exit)->to_room].room_flags, IMP_ONLY) &&
-       !IS_SET(world[EXIT(vict, exit)->to_room].room_flags, NO_TRACK)){
-    sprintf(buf, "Your smash sends %c reeling %c.", GET_NAME(victim), dirswards[dir]);
+       !IS_SET(world[EXIT(victim, exit)->to_room].room_flags, IMP_ONLY) &&
+       !IS_SET(world[EXIT(victim, exit)->to_room].room_flags, NO_TRACK)){
+    sprintf(buf, "Your smash sends %s reeling %s.", GET_NAME(victim), dirs[dir]);
     act(buf, ch, 0, victim, TO_CHAR, 0);
-    sprintf(buf, "%c smashes into you, sending you reeling %s.", GET_NAME(ch), dirswards[dir]);
+    sprintf(buf, "%s smashes into you, sending you reeling %s.", GET_NAME(ch), dirs[dir]);
     act(buf, ch, 0, victim, TO_VICT, 0);
-    sprintf(buf, "%c smashes into %c and sends %c reeling to the %s.", GET_NAME(ch), GET_NAME(victim), GET_PRONOUN(ch), dirswards[dir]);
+    sprintf(buf, "%s smashes into %s and sends $S reeling to the %s.", GET_NAME(ch), GET_NAME(victim), dirs[dir]);
     act(buf, ch, 0, victim, TO_ROOM, NOTVICT);
     if(victim->fighting) {
        if(IS_NPC(victim)) {
@@ -687,8 +688,9 @@ int do_knockback(struct char_data *ch, char *argument, int cmd)
           stop_fighting(ch);
     }
     WAIT_STATE(ch, PULSE_VIOLENCE);
+    damage(ch, victim, dam, TYPE_HIT, SKILL_KNOCKBACK, 0);
     move_char(victim, (world[(ch)->in_room].dir_option[dir])->to_room);
-    return damage(ch, victim, dam, TYPE_HIT, SKILL_KNOCKBACK, 0);
+    return eSUCCESS;
   } else {
     act("$N backpeddles across the room due to $n's smash.", ch, 0, victim, TO_ROOM, NOTVICT);
     act("$N barely keeps $S footing, stumbling backwards after your smash.", ch, 0, victim, TO_CHAR, 0);
@@ -696,7 +698,8 @@ int do_knockback(struct char_data *ch, char *argument, int cmd)
     WAIT_STATE(ch, PULSE_VIOLENCE);
     damage(ch, victim, dam, TYPE_HIT, SKILL_KNOCKBACK ,0);
     if(!victim->fighting && IS_NPC(victim))
-       return attack(vict, ch, TYPE_UNDEFINED);
+       return attack(victim, ch, TYPE_UNDEFINED);
   }
+  return eSUCCESS;
 }
-*/
+
