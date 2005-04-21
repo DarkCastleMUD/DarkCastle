@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_barbarian.cpp,v 1.37 2005/04/21 10:30:49 shane Exp $
+| $Id: cl_barbarian.cpp,v 1.38 2005/04/21 11:42:05 shane Exp $
 | cl_barbarian.C
 | Description:  Commands for the barbarian class.
 */
@@ -442,7 +442,7 @@ int do_crazedassault(struct char_data *ch, char *argument, int cmd)
 
 int do_bullrush(struct char_data *ch, char *argument, int cmd)
 {
-  char name[MAX_INPUT_LENGTH];
+  char direction[MAX_INPUT_LENGTH];
   char who[MAX_INPUT_LENGTH];
   int dir = 0;
   int retval;
@@ -461,9 +461,9 @@ int do_bullrush(struct char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }   
     
-  argument = one_argument(argument, name);
-  one_argument(argument, who);
-  if(!*name) {
+  argument = one_argument(argument, who);
+  one_argument(argument, direction);
+  if(!*direction) {
      send_to_char("Bullrush which direction?\r\n", ch);
      return eFAILURE;
   }
@@ -474,7 +474,7 @@ int do_bullrush(struct char_data *ch, char *argument, int cmd)
   }
 
   for(int i = 0; i < 6; i++) {
-    if(!str_prefix(name,dirs[i]))
+    if(!str_prefix(direction,dirs[i]))
     {
       dir = i + 1;
       break;
@@ -673,6 +673,8 @@ int do_knockback(struct char_data *ch, char *argument, int cmd)
   } else if(CAN_GO(victim, dir) &&
        !IS_SET(world[EXIT(victim, exit)->to_room].room_flags, IMP_ONLY) &&
        !IS_SET(world[EXIT(victim, exit)->to_room].room_flags, NO_TRACK)){
+//need to do more checks on if the victim can actually be knocked into 
+//the room?
     sprintf(buf, "Your smash sends %s reeling %s.", GET_NAME(victim), dirs[dir]);
     act(buf, ch, 0, victim, TO_CHAR, 0);
     sprintf(buf, "%s smashes into you, sending you reeling %s.", GET_NAME(ch), dirs[dir]);
