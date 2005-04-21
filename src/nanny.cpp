@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.75 2005/04/21 08:52:29 urizen Exp $ */
+/* $Id: nanny.cpp,v 1.76 2005/04/21 09:12:53 shane Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -438,7 +438,7 @@ void do_on_login_stuff(char_data * ch)
                 break;
             } else { prev = curr; curr = curr->next; }
       }
-    // Remove ventriloquate
+    // Replace shieldblock on barbs
      if (GET_CLASS(ch) == CLASS_BARBARIAN && has_skill(ch, SKILL_SHIELDBLOCK)) {
           struct char_skill_data * curr = ch->skills;
           while(curr)
@@ -447,6 +447,17 @@ void do_on_login_stuff(char_data * ch)
                 break;
             } else { curr = curr->next; }
       }
+    // Replace crushing on thieves
+     if (GET_CLASS(ch) == CLASS_THIEF && has_skill(ch, SKILL_CRUSHING_WEAPONS)) {
+          struct char_skill_data * curr = ch->skills;
+          while(curr)
+            if(curr->skillnum == SKILL_CRUSHING_WEAPONS) {
+		curr->skillnum = SKILL_STINGING_WEAPONS;
+                break;
+            } else { curr = curr->next; }
+      }
+
+      
 
           struct char_skill_data *  curr = ch->skills; 
 	  struct char_skill_data *  prev = NULL;
@@ -466,7 +477,7 @@ void do_on_login_stuff(char_data * ch)
 		curr = a;
            } else { prev = curr; curr = curr->next; }
 
-
+   
 
 
 }
