@@ -14,7 +14,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.h,v 1.61 2005/04/21 09:16:59 shane Exp $ */
+/* $Id: spells.h,v 1.62 2005/04/21 10:37:10 urizen Exp $ */
 #include <structs.h> // byte, sh_int
 
 #define MAX_BUF_LENGTH               240
@@ -297,21 +297,21 @@ void check_maxes(CHAR_DATA *ch);
 #define SKILL_SLASHING_WEAPONS       359
 #define SKILL_WHIPPING_WEAPONS       360
 #define SKILL_CRUSHING_WEAPONS       361
-#define SKILL_STINGING_WEAPONS       362
-#define SKILL_TWO_HANDED_WEAPONS     363
-#define SKILL_HAND_TO_HAND           364
-#define SKILL_BULLRUSH               365
-#define SKILL_FEROCITY               366
-#define SKILL_TACTICS                367
-#define SKILL_DECEIT                 368
-#define SKILL_RELEASE		     369
-#define SKILL_FEARGAZE		     370
-#define SKILL_EYEGOUGE		     371
-#define SKILL_MAGIC_RESIST	     372
-#define NEW_SAVE		     373 // Savefix.
-#define SKILL_SPELLCRAFT	     374
-#define SKILL_DEFENSE 		     375 // MArtial defense
-#define SKILL_KNOCKBACK              376
+#define SKILL_TWO_HANDED_WEAPONS     362
+#define SKILL_HAND_TO_HAND           363
+#define SKILL_BULLRUSH               364
+#define SKILL_FEROCITY               365
+#define SKILL_TACTICS                366
+#define SKILL_DECEIT                 367
+#define SKILL_RELEASE		     368
+#define SKILL_FEARGAZE		     369
+#define SKILL_EYEGOUGE		     370
+#define SKILL_MAGIC_RESIST	     371
+#define NEW_SAVE		     372 // Savefix.
+#define SKILL_SPELLCRAFT	     373
+#define SKILL_DEFENSE 		     374 // MArtial defense
+#define SKILL_KNOCKBACK              375
+#define SKILL_STINGING_WEAPONS       376
 #define SKILL_MAX                    376
 
 // if you add a skill, make sure you update "skills[]" in spells.C
