@@ -4764,8 +4764,8 @@ int spell_staunchblood(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
        act("You feel supremely healthy and resistant to $2poison$R!", ch, 0, 0, TO_CHAR, 0);
        act("$n looks supremely healthy and begins looking for snakes and spiders to fight.", victim, 0, 0, TO_ROOM, INVIS_NULL);
        af.type = SPELL_STAUNCHBLOOD;
-       af.duration = level;
-       af.modifier = level;
+       af.duration = 1 + skill / 10;
+       af.modifier = 10 + skill / 6;
        af.location = APPLY_SAVING_POISON;
        af.bitvector = 0;
        affect_to_char(ch, &af);
@@ -8098,15 +8098,15 @@ int cast_staunchblood(byte level, CHAR_DATA *ch, char *arg, int type,
                        CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill) {
   switch(type) {
     case SPELL_TYPE_SPELL:
-      return spell_staunchblood(level, ch, 0, 0, skill);
+      return spell_staunchblood(level, ch, tar_ch, 0, skill);
       break;
     case SPELL_TYPE_POTION:
-      return spell_staunchblood(level, ch, 0, 0, skill);
+      return spell_staunchblood(level, ch, tar_ch, 0, skill);
       break;
     case SPELL_TYPE_SCROLL:
       if (tar_obj) return eFAILURE;
       if (!tar_ch) tar_ch = ch;
-      return spell_staunchblood(level, tar_ch, 0, 0, skill);
+      return spell_staunchblood(level, ch, tar_ch, 0, skill);
       break;
     default:
       log("Serious screw-up in cast_staunchblood!", ANGEL, LOG_BUG);

@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.134 2005/04/21 11:06:46 shane Exp $ */
+/* $Id: const.cpp,v 1.135 2005/04/22 11:33:25 shane Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1374,6 +1374,7 @@ struct class_skill_defines r_skills[] = { // ranger skills
 {    "stun",            SKILL_STUN,              40,     70,     {DEX,INT} },
 //   "stone arrows"     SKILL_STONE_ARROW        41,     98,     {STR,DEX} },
 {    "disarm",          SKILL_DISARM,            42,     70,     {DEX,WIS} },
+{    "staunchblood",    SPELL_STAUNCHBLOOD,      44,     70,     {CON,WIS} },
 {    "forest meld",     SPELL_FOREST_MELD,       45,     90,     {WIS,DEX} },
 {    "camouflage",      SPELL_CAMOUFLAGE,        46,     90,     {INT,DEX} },
 {    "creeping death",  SPELL_CREEPING_DEATH,    48,     98,     {WIS,STR} },
