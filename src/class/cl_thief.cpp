@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.93 2005/04/23 02:59:43 urizen Exp $
+| $Id: cl_thief.cpp,v 1.95 2005/04/23 09:21:13 urizen Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -772,6 +772,10 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
               {
                 paf->modifier = 0; // make sleep no longer work
               }
+              if((paf = affected_by_spell(victim, SKILL_BLACKJACK))&& paf->modifier == 1)
+              {
+                paf->modifier = 0; // make sleep no longer work
+              }
                 do_wake(ch, GET_NAME(victim), 9);
               }
             }
@@ -925,6 +929,11 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
       {
         paf->modifier = 0; // make sleep no longer work
       }
+              if((paf = affected_by_spell(victim, SKILL_BLACKJACK))&& paf->modifier == 1)
+              {
+                paf->modifier = 0; // make sleep no longer work
+              }
+
       do_wake(ch, GET_NAME(victim), 9);
       act("$n tried to steal something from you, waking you up in the prrocess.!", ch, 0, victim, TO_VICT, 0);
       act("$n fails stealing something from $N, waking $N up in the process.", ch, 0, victim, TO_ROOM, INVIS_NULL|NOTVICT);
@@ -1792,7 +1801,7 @@ int do_blackjack(struct char_data *ch, char *argument, int cmd)
      affect_join(victim, &af, FALSE, FALSE);
      af.type      = SKILL_BLACKJACK;
      af.duration  = 2;
-     af.modifier  = 1;
+     af.modifier  = 0;
      af.location  = APPLY_NONE;
      af.bitvector = AFF_SLEEP;
      affect_join(ch, &af, FALSE, FALSE);
