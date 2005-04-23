@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.95 2005/04/23 09:21:13 urizen Exp $
+| $Id: cl_thief.cpp,v 1.94 2005/04/23 09:20:28 urizen Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -1801,7 +1801,7 @@ int do_blackjack(struct char_data *ch, char *argument, int cmd)
      affect_join(victim, &af, FALSE, FALSE);
      af.type      = SKILL_BLACKJACK;
      af.duration  = 2;
-     af.modifier  = 0;
+     af.modifier  = 1;
      af.location  = APPLY_NONE;
      af.bitvector = AFF_SLEEP;
      affect_join(ch, &af, FALSE, FALSE);
