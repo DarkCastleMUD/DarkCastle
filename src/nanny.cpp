@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.77 2005/04/21 11:06:46 shane Exp $ */
+/* $Id: nanny.cpp,v 1.78 2005/04/23 01:15:22 urizen Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -383,7 +383,7 @@ void do_on_login_stuff(char_data * ch)
     else if(GET_LEVEL(ch) >=  IMMORTAL)  char_to_room( ch, real_room(17) );
     else                                 char_to_room( ch, real_room(START_ROOM) );
 
-
+    REMOVE_BIT(ch->affected_by2, AFF_BLACKJACK_ALERT);
     if (GET_CLASS(ch) == CLASS_MONK && GET_LEVEL(ch) > 10)
     {
 	  struct char_skill_data * curr = ch->skills, *prev = NULL;
@@ -417,6 +417,22 @@ void do_on_login_stuff(char_data * ch)
 	  while(curr) {
 	   if (curr->skillnum == SPELL_RESIST_FIRE)
 		curr->skillnum = SPELL_RESIST_MAGIC;
+	   curr = curr->next;
+          }
+    }
+    if (GET_CLASS(ch) == CLASS_MAGIC_USER && GET_LEVEL(ch) >= 31)
+    {
+	  struct char_skill_data * curr = ch->skills, *prev = NULL;
+	  while(curr) {
+	   if (curr->skillnum == SPELL_SLEEP) {
+  	     if (prev) prev->next = curr->next;
+	     else ch->skills = curr->next;
+	     struct char_skill_data *o = curr;
+	     curr = curr->next;
+	     dc_free(o); // so little memory, why do I even bother.
+	     continue;
+	   }
+	   prev = curr;
 	   curr = curr->next;
           }
     }

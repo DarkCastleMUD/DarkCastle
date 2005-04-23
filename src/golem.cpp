@@ -388,6 +388,9 @@ int do_golem_score(struct char_data *ch, char *argument, int cmd)
            case FUCK_CANTQUIT:
              aff_name = "CANT_QUIT";
              break;
+           case SKILL_BLACKJACK:
+             aff_name = "blackjack wait timer";
+             break;
            case FUCK_PTHIEF:
              aff_name = "DIRTY_DIRTY_THIEF";
              break;

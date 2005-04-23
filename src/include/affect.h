@@ -2,7 +2,7 @@
 #define AFFECT_H_
 
 /************************************************************************
-| $Id: affect.h,v 1.13 2005/04/09 21:15:35 urizen Exp $
+| $Id: affect.h,v 1.14 2005/04/23 01:15:32 urizen Exp $
 | affect.h
 | This contains the bitvectors for affected_by
 */
@@ -63,4 +63,5 @@
 #define AFF_FOCUS		1<<18 // Innate focus
 #define AFF_ILLUSION		1<<19 // Innate illusion
 #define AFF_KNOW_ALIGN		1<<20
+#define AFF_BLACKJACK_ALERT 	1<<21 // cannot be blackjacked, or blackjack
 #endif

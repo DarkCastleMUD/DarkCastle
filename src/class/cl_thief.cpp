@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.88 2005/04/21 08:41:17 urizen Exp $
+| $Id: cl_thief.cpp,v 1.89 2005/04/23 01:15:25 urizen Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -32,6 +32,8 @@ extern int arena[4];
 
 int find_door(CHAR_DATA *ch, char *type, char *dir);
 struct obj_data * search_char_for_item(char_data * ch, sh_int item_number);
+
+int get_weapon_damage_type(struct obj_data * wielded);
 
 int palm(CHAR_DATA *ch, struct obj_data *obj_object,
           struct obj_data *sub_object)
@@ -622,7 +624,7 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
   int retval;
   obj_data * has_item = NULL;
   bool ohoh = FALSE;
-
+  int chance = GET_HITROLL(ch) + has_skill(ch, SKILL_STEAL) / 4;
   extern struct index_data *obj_index;
 
   argument = one_argument(argument, obj_name);
@@ -699,6 +701,7 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
 
   if((obj = get_obj_in_list_vis(ch, obj_name, victim->carrying))) 
   {
+   chance -= GET_OBJ_WEIGHT(obj);
     if(IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL)) 
     {
       send_to_char("That item is protected by the gods.\n\r", ch);
@@ -715,10 +718,8 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
 	return eFAILURE;
     }
 
-//    if (has_skill(ch,SKILL_STEAL))
-      //skill_increase_check(ch, SKILL_STEAL, has_skill(ch,SKILL_STEAL), SKILL_INCREASE_HARD);
-
-    if (!skill_success(ch,victim,SKILL_STEAL)) 
+    int mod = has_skill(ch, SKILL_STEAL) - chance; 
+    if (!skill_success(ch,victim,SKILL_STEAL, 0-mod)) 
     {
       set_cantquit( ch, victim );
       send_to_char("Oops, that was clumsy...\n\r", ch);
@@ -761,14 +762,15 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
             {
               if(number(1, 3) == 1)
                 send_to_char("You dream of someone stealing your equipment...\r\n", victim);
-              if((paf = affected_by_spell(victim, SPELL_SLEEP)) && paf->modifier == 1)
-              {
-                paf->modifier = 0; // make sleep no longer work
-              }
+
               // if i'm not a thief, or if I fail dex-roll wake up victim
               if(GET_CLASS(ch) != CLASS_THIEF || number(1, 100) > GET_DEX(ch))
               {
                 send_to_char("Oops...\r\n", ch);
+              if((paf = affected_by_spell(victim, SPELL_SLEEP))&& paf->modifier == 1)
+              {
+                paf->modifier = 0; // make sleep no longer work
+              }
                 do_wake(ch, GET_NAME(victim), 9);
               }
             }
@@ -845,12 +847,13 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
 
     if(obj) 
     { // They're wearing it!
-    if (max_level(ch) < obj->obj_flags.eq_level)
+/*    if (max_level(ch) < obj->obj_flags.eq_level)
     {
 	send_to_char("You find yourself unable to steal that.\r\n",ch);
 	return eFAILURE;
-    }
+    }*/
 
+    chance -= GET_OBJ_WEIGHT(obj);
     if (GET_OBJ_WEIGHT(obj) > 50)
     {
 	send_to_char("That item is too heavy to steal.\r\n",ch);
@@ -904,6 +907,7 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
 	send_to_char("You don't know how to steal.\r\n",ch);
 	return eFAILURE;
       }
+    int mod = has_skill(ch, SKILL_STEAL) - chance; 
 
       if(GET_POS(victim) > POSITION_SLEEPING ||
          GET_POS(victim) == POSITION_STUNNED) 
@@ -911,8 +915,21 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
         send_to_char("Steal the equipment now? Impossible!\n\r", ch);
         return eFAILURE;
       }
-      else if (!number(1,4))
+    else if (!skill_success(ch,victim,SKILL_STEAL, 0-mod)) 
+    {
+      set_cantquit( ch, victim );
+      ohoh = TRUE;
+      send_to_char("Oops, that was clumsy...\r\n", ch);
+      if((paf = affected_by_spell(victim, SPELL_SLEEP))&& paf->modifier == 1)
       {
+        paf->modifier = 0; // make sleep no longer work
+      }
+      do_wake(ch, GET_NAME(victim), 9);
+      act("$n tried to steal something from you, waking you up in the prrocess.!", ch, 0, victim, TO_VICT, 0);
+      act("$n fails stealing something from $N, waking $N up in the process.", ch, 0, victim, TO_ROOM, INVIS_NULL|NOTVICT);
+    } 
+    else if (!number(1,4))
+    {
         act("You remove $p and attempt to steal it.", ch, obj ,0, TO_CHAR, 0);
 	send_to_char("Your victim wakes up before you can complete the theft!\r\n",ch);
         act("$n tries to steal $p from $N, but fails.",ch,obj,victim,TO_ROOM, NOTVICT);
@@ -946,10 +963,7 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
           {
             if(number(1, 3) == 1)
               send_to_char("You dream of someone stealing your equipment...\r\n", victim);
-            if((paf = affected_by_spell(victim, SPELL_SLEEP)) && paf->modifier == 1)
-            {
-              paf->modifier = 0; // make sleep no longer work
-            }
+
             // if i'm not a thief, or if I fail dex-roll wake up victim
             if(number(1,101) > wakey)
             {
@@ -1110,7 +1124,7 @@ int do_pocket(CHAR_DATA *ch, char *argument, int cmd)
     set_cantquit( ch, victim );
     send_to_char("Oops, that was clumsy...\r\n", ch);
     ohoh = TRUE;
-	    if(!number(0, 6)) {
+	    if(number(0, 6)) {
       act("You discover that $n has $s hands in your wallet.", ch,0,victim,TO_VICT, 0);
       act("$n tries to steal gold from $N.", ch, 0, victim, TO_ROOM, NOTVICT|INVIS_NULL);
     } else {
@@ -1634,4 +1648,159 @@ int do_deceit(struct char_data *ch, char *argument, int cmd)
   WAIT_STATE(ch, PULSE_VIOLENCE * 2);
   GET_MOVE(ch) /= 2;
   return eSUCCESS;
+}
+
+void blackjack_clear(void *arg1, void *arg2, void *arg3)
+{
+  struct char_data *ch = (struct char_data *) arg1;
+  struct char_data *curr;
+  for (curr = character_list;curr;curr = curr->next)
+  {
+    if (curr == ch)
+    {
+	REMOVE_BIT(ch->affected_by2, AFF_BLACKJACK_ALERT);
+    }
+  }
+}
+
+int do_blackjack(struct char_data *ch, char *argument, int cmd)
+{
+  bool wpnok = FALSE;
+  if (!has_skill(ch, SKILL_BLACKJACK))
+  {
+    send_to_char("You wouldn't know how.\r\n",ch);
+    return eFAILURE;
+  }
+
+  { //weaponchecks
+    if (ch->equipment[WIELD])
+    {
+      int w_type = get_weapon_damage_type(ch->equipment[WIELD]);
+      if (w_type == TYPE_BLUDGEON)
+        wpnok = TRUE;
+    }
+    if (!wpnok && ch->equipment[SECOND_WIELD])
+    {
+      int w_type = get_weapon_damage_type(ch->equipment[SECOND_WIELD]);
+      if (w_type == TYPE_BLUDGEON)
+        wpnok = TRUE;
+    } 
+  }
+
+  if (!wpnok)
+  {
+    send_to_char("You need to wield a bludgeoning weapon to make it a success.\r\n",ch);
+    return eFAILURE;
+  }
+  char arg[MAX_INPUT_LENGTH];
+  one_argument(argument,arg);
+  struct char_data *victim;
+  if (!(victim = get_char_room_vis(ch, arg)))
+  {
+    send_to_char("Blackjack who?",ch);
+    return eFAILURE;
+  }
+  if (victim == ch)
+  {
+    send_to_char("That would look pretty amusing.\r\n",ch);
+    return eFAILURE;
+  }
+  
+  if((GET_LEVEL(ch) < G_POWER) || IS_NPC(ch)) {
+      if(!can_attack(ch) || !can_be_attacked(ch, victim))
+      return eFAILURE;
+  }
+  if (victim->fighting)
+  {
+    act("$E is in combat, and you can't sneak up.",ch, 0, victim, TO_CHAR, 0);
+    send_to_char("They're in combat, and you can't sneak up.\r\n",ch);
+    return eFAILURE;
+  }
+  if (affected_by_spell(victim, SPELL_PARALYZE))
+  {
+    act("$E is paralyzed, and cannot be blackjacked.",ch, 0, victim, TO_CHAR, 0);
+    return eFAILURE;
+  }
+  if (affected_by_spell(victim, SKILL_BLACKJACK)
+	|| IS_SET(victim->affected_by2, AFF_BLACKJACK_ALERT))
+  {
+    act("$E is too alert to be blackjacked right now.",ch, 0, victim, TO_CHAR, 0);
+    return eFAILURE;
+  }
+  if (affected_by_spell(ch, SKILL_BLACKJACK)
+	|| IS_SET(ch->affected_by2, AFF_BLACKJACK_ALERT))
+  {
+    act("You cannot blackjack yet.",ch, 0, victim, TO_CHAR, 0);
+    return eFAILURE;
+  }
+  bool autofail = FALSE;
+  int i = GET_LEVEL(ch) - GET_LEVEL(victim);
+  if (IS_NPC(victim) && i <= -10)
+     autofail = TRUE;
+  if (!IS_NPC(victim) && (i > 10 || i < -10))
+     autofail = TRUE;
+  
+  int chance = GET_HITROLL(ch) / 3 + has_skill(ch,SKILL_BLACKJACK) / 15;
+    // skill doesn't have as much of an impact as hitroll
+ // let's say 65 hit max = max 21 chance, skill 95 -> max 6 additional
+   // 27 max. to an approx max of 7% equals the following
+  chance *= 100; chance /= 27;
+  chance *= 700; chance /= 10000; // could shorten it down, and did it with the big numbers
+  // to remove the needs of using floats.
+  if (number(1,101) > chance)
+  { // failure!
+     act("$N notices $n approaching and thwarts $s attempted blackjack.", ch, 0, victim, TO_ROOM, NOTVICT);
+     act("You notice $n approaching from the shadows with a club in hand, and you thwart $s to blackjack you.", ch, 0, victim, TO_VICT, 0 );
+     act("You approach $N from the shadows, but $E notices you and thwarts your attempt.", ch, 0, victim, TO_CHAR, 0 );
+     SET_BIT(ch->affected_by2, AFF_BLACKJACK_ALERT);
+     SET_BIT(victim->affected_by2, AFF_BLACKJACK_ALERT);
+     struct timer_data *timer;
+     #ifdef LEAK_CHECK
+       timer = (struct timer_data *)calloc(1, sizeof(struct timer_data));
+     #else
+       timer = (struct timer_data *)dc_alloc(1, sizeof(struct timer_data));
+     #endif
+     timer->arg1 = (void*)ch;
+     timer->function = blackjack_clear;
+     timer->next = timer_list;
+     timer_list = timer;
+     timer->timeleft = number(30,35);
+     #ifdef LEAK_CHECK
+       timer = (struct timer_data *)calloc(1, sizeof(struct timer_data));
+     #else
+       timer = (struct timer_data *)dc_alloc(1, sizeof(struct timer_data));
+     #endif
+     timer->arg1 = (void*)victim;
+     timer->function = blackjack_clear;
+     timer->next = timer_list;
+     timer_list = timer;
+     timer->timeleft = number(30,35);
+
+     int retval;
+     if (!(victim->fighting)) {
+         retval = one_hit( victim, ch, TYPE_UNDEFINED, FIRST);
+         retval = SWAP_CH_VICT(retval);
+         return retval;
+      }
+     return eFAILURE;
+  } else {
+     struct affected_type af;
+     af.type      = SKILL_BLACKJACK;
+     af.duration  = 2;
+     af.modifier  = 1;
+     af.location  = APPLY_NONE;
+     af.bitvector = AFF_SLEEP;
+     affect_join(victim, &af, FALSE, FALSE);
+     af.type      = SKILL_BLACKJACK;
+     af.duration  = 2;
+     af.modifier  = 1;
+     af.location  = APPLY_NONE;
+     af.bitvector = AFF_SLEEP;
+     affect_join(ch, &af, FALSE, FALSE);
+     act("You notice $N approach from the shadows, but don't have time to react before you are knocked unconsciouss.",victim,0,ch,TO_CHAR,0);
+     act("$n sneaks up on $N and knocks $M unconsciouss with a blow to the head.",ch,0,victim,TO_ROOM, INVIS_NULL);
+     act("You sneak up on $M and knocks $M unconsciouss with a blow to the head.",ch,0,victim,TO_CHAR, 0);
+     GET_POS(victim)=POSITION_SLEEPING;
+     return eSUCCESS;
+  }
 }

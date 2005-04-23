@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.135 2005/04/22 11:33:25 shane Exp $ */
+/* $Id: const.cpp,v 1.136 2005/04/23 01:15:22 urizen Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1008,6 +1008,7 @@ char *apply_types[] =
     "MELEE MITIGATION",
     "SPELL MITIGATION",
     "SONG MITIGATION",
+    "RESIST MAGIC",
     "\n"
 };
 
@@ -1161,6 +1162,7 @@ struct class_skill_defines t_skills[] = { // thief skills
 {    "stalk",           SKILL_STALK,            6,      98,   {CON,DEX} },
 {    "hide",            SKILL_HIDE,             7,      90,   {INT,WIS} },  
 {    "dual wield",      SKILL_DUAL_WIELD,       10,     90,   {DEX,CON} },  
+{    "blackjack",	SKILL_BLACKJACK, 	11, 	98,   {WIS,STR} },
 {    "palm",            SKILL_PALM,             12,     98,   {DEX,INT} },  
 {    "slip",            SKILL_SLIP,             13,     98,   {DEX,INT} },  
 {    "dodge",           SKILL_DODGE,            15,     90,   {DEX,INT} },
@@ -1572,7 +1574,7 @@ struct class_skill_defines m_skills[] = { // mage skills
 {    "focused repelance",   SKILL_FOCUSED_REPELANCE, 30,     98,     {DEX,INT} },
 {    "piercing",            SKILL_PIERCEING_WEAPONS, 30,     55,     {DEX,STR} },
 {    "bludgeoning",         SKILL_BLUDGEON_WEAPONS,  30,     55,     {STR,DEX} },
-{    "sleep",               SPELL_SLEEP,             31,     98,     {INT,WIS} },
+//{    "sleep",               SPELL_SLEEP,             31,     98,     {INT,WIS} },
 {    "haste",               SPELL_HASTE,             33,     98,     {DEX,INT} }, 
 {    "true sight",          SPELL_TRUE_SIGHT,        34,     85,     {WIS,INT} }, 
 {    "dispel magic",        SPELL_DISPEL_MAGIC,      35,     90,     {INT,CON} }, 
