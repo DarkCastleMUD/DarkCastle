@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.90 2005/04/23 01:25:09 urizen Exp $
+| $Id: cl_thief.cpp,v 1.91 2005/04/23 01:37:02 urizen Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -1656,12 +1656,8 @@ void blackjack_clear(void *arg1, void *arg2, void *arg3)
   struct char_data *ch = (struct char_data *) arg1;
   struct char_data *curr;
   for (curr = character_list;curr;curr = curr->next)
-  {
     if (curr == ch)
-    {
 	REMOVE_BIT(ch->affected_by2, AFF_BLACKJACK_ALERT);
-    }
-  }
 }
 
 int do_blackjack(struct char_data *ch, char *argument, int cmd)
@@ -1713,19 +1709,19 @@ int do_blackjack(struct char_data *ch, char *argument, int cmd)
   }
   if (victim->fighting)
   {
-    act("$E is in combat, and you can't sneak up.",ch, 0, victim, TO_CHAR, 0);
-    send_to_char("They're in combat, and you can't sneak up.\r\n",ch);
+    act("$N is in combat, and you can't sneak up.",ch, 0, victim, TO_CHAR, 0);
+//    send_to_char("They're in combat, and you can't sneak up.\r\n",ch);
     return eFAILURE;
   }
   if (affected_by_spell(victim, SPELL_PARALYZE))
   {
-    act("$E is paralyzed, and cannot be blackjacked.",ch, 0, victim, TO_CHAR, 0);
+    act("$N is paralyzed, and cannot be blackjacked.",ch, 0, victim, TO_CHAR, 0);
     return eFAILURE;
   }
   if (affected_by_spell(victim, SKILL_BLACKJACK)
 	|| IS_SET(victim->affected_by2, AFF_BLACKJACK_ALERT))
   {
-    act("$E is too alert to be blackjacked right now.",ch, 0, victim, TO_CHAR, 0);
+    act("$N is too alert to be blackjacked right now.",ch, 0, victim, TO_CHAR, 0);
     return eFAILURE;
   }
   if (affected_by_spell(ch, SKILL_BLACKJACK)
