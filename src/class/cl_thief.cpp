@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.91 2005/04/23 01:37:02 urizen Exp $
+| $Id: cl_thief.cpp,v 1.92 2005/04/23 01:56:20 urizen Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -1744,6 +1744,8 @@ int do_blackjack(struct char_data *ch, char *argument, int cmd)
   chance *= 100; chance /= 27;
   chance *= 700; chance /= 10000; // could shorten it down, and did it with the big numbers
   // to remove the needs of using floats.
+  skill_increase_check(ch, SKILL_BLACKJACK, has_skill(ch,SKILL_BLACKJACK), SKILL_INCREASE_HARD);
+
   if (number(1,101) > chance)
   { // failure!
      act("$N notices $n approaching and thwarts $s attempted blackjack.", ch, 0, victim, TO_ROOM, NOTVICT);
