@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.79 2005/04/23 01:48:03 urizen Exp $ */
+/* $Id: nanny.cpp,v 1.80 2005/04/23 01:48:49 urizen Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -432,7 +432,7 @@ void do_on_login_stuff(char_data * ch)
 	     dc_free(o); // so little memory, why do I even bother.
 	     continue;
 	   }
-	   if (curr->skillnum == SPELL_RESIST_COLDP) {
+	   if (curr->skillnum == SPELL_RESIST_COLD) {
   	     if (prev) prev->next = curr->next;
 	     else ch->skills = curr->next;
 	     struct char_skill_data *o = curr;
