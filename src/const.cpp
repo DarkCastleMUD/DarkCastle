@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.139 2005/04/23 02:27:34 urizen Exp $ */
+/* $Id: const.cpp,v 1.140 2005/04/23 17:36:49 apocalypse Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1530,7 +1530,7 @@ struct class_skill_defines c_skills[] = { // cleric skills
 {    "full heal",            SPELL_FULL_HEAL,         40,     98,     {WIS,INT} },
 {    "power harm",           SPELL_POWER_HARM,        41,     85,     {WIS,CON} },
 {    "resist magic",         SPELL_RESIST_MAGIC,      43,     90,     {INT,WIS} },
-{    "resist energy",        SPELL_RESIST_ENERGY,     44,     98,     {CON,DEX} },
+{    "resist energy",        SPELL_RESIST_ENERGY,     44,     85,     {CON,DEX} },
 {    "dispel magic",         SPELL_DISPEL_MAGIC,      45,     85,     {INT,CON} },
 {    "flamestrike",          SPELL_FLAMESTRIKE,       46,     98,     {INT,WIS} },
 {    "group recall",         SPELL_GROUP_RECALL,      47,     98,     {DEX,STR} },
@@ -1557,7 +1557,6 @@ struct class_skill_defines m_skills[] = { // mage skills
 {    "infravision",         SPELL_INFRAVISION,       11,     90,     {INT,DEX} },
 {    "fly",                 SPELL_FLY,               12,     98,     {DEX,CON} },
 {    "strength",            SPELL_STRENGTH,          13,     85,     {STR,CON} },
-//{    "know alignment",      SPELL_KNOW_ALIGNMENT,    14,     90,     {WIS,INT} },
 {    "fear",                SPELL_FEAR,              15,     90,     {WIS,INT} },
 {    "identify",            SPELL_IDENTIFY,          16,     98,     {INT,WIS} }, 
 {    "locate object",       SPELL_LOCATE_OBJECT,     17,     90,     {INT,WIS} }, 
@@ -1566,7 +1565,6 @@ struct class_skill_defines m_skills[] = { // mage skills
 {    "chill touch",         SPELL_CHILL_TOUCH,       20,     90,     {CON,WIS} }, 
 {    "shield",              SPELL_SHIELD,            21,     98,     {WIS,STR} }, 
 {    "souldrain",           SPELL_SOULDRAIN,         22,     98,     {WIS,CON} }, 
-{    "enchant weapon",      SPELL_ENCHANT_WEAPON,    24,     98,     {WIS,DEX} }, 
 {    "dispel minor",        SPELL_DISPEL_MINOR,      25,     90,     {WIS,CON} }, 
 {    "mass invisibility",   SPELL_MASS_INVISIBILITY, 26,     98,     {DEX,INT} }, 
 {    "life leech",          SPELL_LIFE_LEECH,        27,     98,     {CON,STR} },
@@ -1575,11 +1573,10 @@ struct class_skill_defines m_skills[] = { // mage skills
 {    "focused repelance",   SKILL_FOCUSED_REPELANCE, 30,     98,     {DEX,INT} },
 {    "piercing",            SKILL_PIERCEING_WEAPONS, 30,     55,     {DEX,STR} },
 {    "bludgeoning",         SKILL_BLUDGEON_WEAPONS,  30,     55,     {STR,DEX} },
-//{    "sleep",               SPELL_SLEEP,             31,     98,     {INT,WIS} },
+{    "resist magic",        SKILL_RESIST_MAGIC,      31,     90,     {INT,WIS} },
 {    "haste",               SPELL_HASTE,             33,     98,     {DEX,INT} }, 
 {    "true sight",          SPELL_TRUE_SIGHT,        34,     85,     {WIS,INT} }, 
-{    "dispel magic",        SPELL_DISPEL_MAGIC,      35,     90,     {INT,CON} },
-{    "resist magic", 	    SPELL_RESIST_MAGIC,      36,     85,    {INT, WIS}},
+{    "dispel magic",        SPELL_DISPEL_MAGIC,      35,     85,     {INT,CON} },
 {    "resist fire",         SPELL_RESIST_FIRE,       36,     70,     {INT,CON} }, 
 {    "wizard eye",          SPELL_WIZARD_EYE,        37,     98,     {INT,WIS} }, 
 {    "teleport",            SPELL_TELEPORT,          38,     98,     {CON,INT} }, 
@@ -1589,7 +1586,6 @@ struct class_skill_defines m_skills[] = { // mage skills
 {    "firestorm",           SPELL_FIRESTORM,         43,     90,     {INT,STR} }, 
 {    "paralyze",            SPELL_PARALYZE,          44,     98,     {INT,DEX} },
 {    "hellstream",          SPELL_HELLSTREAM,        45,     98,     {INT,STR} },
-//{    "resist cold",         SPELL_RESIST_COLD,       46,     90,     {CON,STR} },
 {    "fireshield",          SPELL_FIRESHIELD,        47,     98,     {CON,INT} },
 {    "create golem",        SPELL_CREATE_GOLEM,      48,     90,     {WIS,STR} },
 {    "release golem",       SPELL_RELEASE_GOLEM,     48,     90,     {WIS,INT} },
