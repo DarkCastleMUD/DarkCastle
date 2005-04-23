@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.94 2005/04/23 09:20:28 urizen Exp $
+| $Id: cl_thief.cpp,v 1.96 2005/04/23 22:04:27 urizen Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -1801,13 +1801,13 @@ int do_blackjack(struct char_data *ch, char *argument, int cmd)
      affect_join(victim, &af, FALSE, FALSE);
      af.type      = SKILL_BLACKJACK;
      af.duration  = 2;
-     af.modifier  = 1;
+     af.modifier  = 0;
      af.location  = APPLY_NONE;
      af.bitvector = AFF_SLEEP;
      affect_join(ch, &af, FALSE, FALSE);
-     act("You notice $N approach from the shadows, but don't have time to react before you are knocked unconsciouss.",victim,0,ch,TO_CHAR,0);
-     act("$n sneaks up on $N and knocks $M unconsciouss with a blow to the head.",ch,0,victim,TO_ROOM, INVIS_NULL);
-     act("You sneak up on $M and knocks $M unconsciouss with a blow to the head.",ch,0,victim,TO_CHAR, 0);
+     act("You notice $N approach from the shadows, but don't have time to react before you are knocked unconscious.",victim,0,ch,TO_CHAR,0);
+     act("$n sneaks up on $N and knock $M unconscious with a blow to the head.",ch,0,victim,TO_ROOM, INVIS_NULL);
+     act("You sneak up on $M and knock $M unconscious with a blow to the head.",ch,0,victim,TO_CHAR, 0);
      GET_POS(victim)=POSITION_SLEEPING;
      return eSUCCESS;
   }
