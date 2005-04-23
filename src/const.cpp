@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.136 2005/04/23 01:15:22 urizen Exp $ */
+/* $Id: const.cpp,v 1.137 2005/04/23 01:25:06 urizen Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1587,7 +1587,7 @@ struct class_skill_defines m_skills[] = { // mage skills
 {    "firestorm",           SPELL_FIRESTORM,         43,     90,     {INT,STR} }, 
 {    "paralyze",            SPELL_PARALYZE,          44,     98,     {INT,DEX} },
 {    "hellstream",          SPELL_HELLSTREAM,        45,     98,     {INT,STR} },
-{    "resist cold",         SPELL_RESIST_COLD,       46,     90,     {CON,STR} },
+//{    "resist cold",         SPELL_RESIST_COLD,       46,     90,     {CON,STR} },
 {    "fireshield",          SPELL_FIRESHIELD,        47,     98,     {CON,INT} },
 {    "create golem",        SPELL_CREATE_GOLEM,      48,     90,     {WIS,STR} },
 {    "release golem",       SPELL_RELEASE_GOLEM,     48,     90,     {WIS,INT} },

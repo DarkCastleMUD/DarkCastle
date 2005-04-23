@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.89 2005/04/23 01:15:25 urizen Exp $
+| $Id: cl_thief.cpp,v 1.90 2005/04/23 01:25:09 urizen Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -472,7 +472,7 @@ int do_sneak(CHAR_DATA *ch, char *argument, int cmd)
       }
    }
 
-   do_hide(ch, "", 9);
+   do_hide(ch, "", 12);
 
    send_to_char("You try to move silently for a while.\n\r", ch);
 
@@ -547,7 +547,8 @@ int do_hide(CHAR_DATA *ch, char *argument, int cmd)
   if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
     ;
   else if(!has_skill(ch, SKILL_HIDE)) {
-    send_to_char("I bet you think you're a thief. ;)\n\r", ch);
+    if (cmd != 12)
+      send_to_char("I bet you think you're a thief. ;)\n\r", ch);
     return eFAILURE;
   } 
 
