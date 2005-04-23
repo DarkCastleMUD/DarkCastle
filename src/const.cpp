@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.140 2005/04/23 17:36:49 apocalypse Exp $ */
+/* $Id: const.cpp,v 1.141 2005/04/23 22:07:48 urizen Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1573,7 +1573,7 @@ struct class_skill_defines m_skills[] = { // mage skills
 {    "focused repelance",   SKILL_FOCUSED_REPELANCE, 30,     98,     {DEX,INT} },
 {    "piercing",            SKILL_PIERCEING_WEAPONS, 30,     55,     {DEX,STR} },
 {    "bludgeoning",         SKILL_BLUDGEON_WEAPONS,  30,     55,     {STR,DEX} },
-{    "resist magic",        SKILL_RESIST_MAGIC,      31,     90,     {INT,WIS} },
+{    "resist magic",        SPELL_RESIST_MAGIC,      31,     90,     {INT,WIS} },
 {    "haste",               SPELL_HASTE,             33,     98,     {DEX,INT} }, 
 {    "true sight",          SPELL_TRUE_SIGHT,        34,     85,     {WIS,INT} }, 
 {    "dispel magic",        SPELL_DISPEL_MAGIC,      35,     85,     {INT,CON} },
