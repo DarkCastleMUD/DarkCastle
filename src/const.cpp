@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.137 2005/04/23 01:25:06 urizen Exp $ */
+/* $Id: const.cpp,v 1.138 2005/04/23 02:16:30 urizen Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1556,7 +1556,7 @@ struct class_skill_defines m_skills[] = { // mage skills
 {    "infravision",         SPELL_INFRAVISION,       11,     90,     {INT,DEX} },
 {    "fly",                 SPELL_FLY,               12,     98,     {DEX,CON} },
 {    "strength",            SPELL_STRENGTH,          13,     85,     {STR,CON} },
-{    "know alignment",      SPELL_KNOW_ALIGNMENT,    14,     90,     {WIS,INT} },
+//{    "know alignment",      SPELL_KNOW_ALIGNMENT,    14,     90,     {WIS,INT} },
 {    "fear",                SPELL_FEAR,              15,     90,     {WIS,INT} },
 {    "identify",            SPELL_IDENTIFY,          16,     98,     {INT,WIS} }, 
 {    "locate object",       SPELL_LOCATE_OBJECT,     17,     90,     {INT,WIS} }, 
@@ -1577,7 +1577,8 @@ struct class_skill_defines m_skills[] = { // mage skills
 //{    "sleep",               SPELL_SLEEP,             31,     98,     {INT,WIS} },
 {    "haste",               SPELL_HASTE,             33,     98,     {DEX,INT} }, 
 {    "true sight",          SPELL_TRUE_SIGHT,        34,     85,     {WIS,INT} }, 
-{    "dispel magic",        SPELL_DISPEL_MAGIC,      35,     90,     {INT,CON} }, 
+{    "dispel magic",        SPELL_DISPEL_MAGIC,      35,     90,     {INT,CON} },
+{    "resist magic", 	    SPELL_RESIST_MAGIC,      36,     85,    {INT, WIS}},
 {    "resist fire",         SPELL_RESIST_FIRE,       36,     70,     {INT,CON} }, 
 {    "wizard eye",          SPELL_WIZARD_EYE,        37,     98,     {INT,WIS} }, 
 {    "teleport",            SPELL_TELEPORT,          38,     98,     {CON,INT} }, 
