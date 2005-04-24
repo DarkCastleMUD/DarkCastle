@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.97 2005/04/23 22:05:20 urizen Exp $
+| $Id: cl_thief.cpp,v 1.98 2005/04/24 04:34:16 apocalypse Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -1718,13 +1718,13 @@ int do_blackjack(struct char_data *ch, char *argument, int cmd)
   }
   if (victim->fighting)
   {
-    act("$N is in combat, and you can't sneak up.",ch, 0, victim, TO_CHAR, 0);
+    act("$N is in combat and is too alert for you to knock out.",ch, 0, victim, TO_CHAR, 0);
 //    send_to_char("They're in combat, and you can't sneak up.\r\n",ch);
     return eFAILURE;
   }
   if (affected_by_spell(victim, SPELL_PARALYZE))
   {
-    act("$N is paralyzed, and cannot be blackjacked.",ch, 0, victim, TO_CHAR, 0);
+    act("$N is magically frozen in place by paralysis and cannot be blackjacked.",ch, 0, victim, TO_CHAR, 0);
     return eFAILURE;
   }
   if (affected_by_spell(victim, SKILL_BLACKJACK)
@@ -1758,8 +1758,8 @@ int do_blackjack(struct char_data *ch, char *argument, int cmd)
   if (number(1,101) > chance)
   { // failure!
      act("$N notices $n approaching and thwarts $s attempted blackjack.", ch, 0, victim, TO_ROOM, NOTVICT);
-     act("You notice $n approaching from the shadows with a club in hand, and you thwart $s to blackjack you.", ch, 0, victim, TO_VICT, 0 );
-     act("You approach $N from the shadows, but $E notices you and thwarts your attempt.", ch, 0, victim, TO_CHAR, 0 );
+     act("You notice $n approaching from the shadows with a club in hand, thwarting $s chance to blackjack you.", ch, 0, victim, TO_VICT, 0 );
+     act("You approach $N from the shadows, but $E spots you and thwarts your attempted mugging.", ch, 0, victim, TO_CHAR, 0 );
      SET_BIT(ch->affected_by2, AFF_BLACKJACK_ALERT);
      SET_BIT(victim->affected_by2, AFF_BLACKJACK_ALERT);
      struct timer_data *timer;
@@ -1805,9 +1805,9 @@ int do_blackjack(struct char_data *ch, char *argument, int cmd)
      af.location  = APPLY_NONE;
      af.bitvector = AFF_SLEEP;
      affect_join(ch, &af, FALSE, FALSE);
-     act("You notice $N approach from the shadows, but don't have time to react before you are knocked unconscious.",victim,0,ch,TO_CHAR,0);
-     act("$n sneaks up on $N and knocks $M unconscious with a blow to the head.",ch,0,victim,TO_ROOM, INVIS_NULL);
-     act("You sneak up on $M and knock $M unconscious with a blow to the head.",ch,0,victim,TO_CHAR, 0);
+     act("$N leaps from the shadows and strikes a sharp blow to the back of your head, knocking you unconscious...",victim,0,ch,TO_CHAR,0);
+     act("$n sneaks behind $N and knocks $M unconscious with a sharp blow to the head.",ch,0,victim,TO_ROOM, INVIS_NULL);
+     act("You sneak behind $N and knock $M unconscious with a sharp rap to the head.",ch,0,victim,TO_CHAR, 0);
      GET_POS(victim)=POSITION_SLEEPING;
      return eSUCCESS;
   }
