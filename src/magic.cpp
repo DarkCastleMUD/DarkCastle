@@ -515,15 +515,16 @@ int spell_howl(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *ob
 int spell_aegis(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
   struct affected_type af;
-  if(affected_by_spell(ch, SPELL_AEGIS))
-    affect_from_char(ch, SPELL_AEGIS);
+  int spl = GET_CLASS(ch) == CLASS_ANTI_PAL ? SPELL_U_AEGIS:SPELL_AEGIS;
+  if(affected_by_spell(ch, spl))
+    affect_from_char(ch, spl);
   if(affected_by_spell(ch, SPELL_ARMOR))
   {
     act("$n is already protected by magical armour.", ch, 0, 0, TO_CHAR, 0);
     return eFAILURE;
   }
 
-  af.type      = SPELL_AEGIS;
+  af.type      = spl;
   af.duration  =  10 + skill / 4;
   af.modifier  = -10 - skill / 4;
   af.location  = APPLY_AC;

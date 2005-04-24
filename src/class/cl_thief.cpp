@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.98 2005/04/24 04:34:16 apocalypse Exp $
+| $Id: cl_thief.cpp,v 1.99 2005/04/24 08:53:38 urizen Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -1722,11 +1722,17 @@ int do_blackjack(struct char_data *ch, char *argument, int cmd)
 //    send_to_char("They're in combat, and you can't sneak up.\r\n",ch);
     return eFAILURE;
   }
+  if (GET_POS(victim) == POSITION_SLEEPING)
+  {
+    act("$N is already asleep.",ch,0,victim,TO_CHAR,0);
+	return eFAILURE;
+  }
   if (affected_by_spell(victim, SPELL_PARALYZE))
   {
     act("$N is magically frozen in place by paralysis and cannot be blackjacked.",ch, 0, victim, TO_CHAR, 0);
     return eFAILURE;
   }
+  
   if (affected_by_spell(victim, SKILL_BLACKJACK)
 	|| IS_SET(victim->affected_by2, AFF_BLACKJACK_ALERT))
   {
@@ -1755,6 +1761,7 @@ int do_blackjack(struct char_data *ch, char *argument, int cmd)
   // to remove the needs of using floats.
   skill_increase_check(ch, SKILL_BLACKJACK, has_skill(ch,SKILL_BLACKJACK), SKILL_INCREASE_HARD);
   set_cantquit(ch, victim);
+  WAIT_STATE(ch, PULSE_VIOLENCE*3);
   if (number(1,101) > chance)
   { // failure!
      act("$N notices $n approaching and thwarts $s attempted blackjack.", ch, 0, victim, TO_ROOM, NOTVICT);
