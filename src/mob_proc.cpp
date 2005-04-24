@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.71 2005/04/18 11:59:53 shane Exp $ */
+/* $Id: mob_proc.cpp,v 1.72 2005/04/24 11:32:08 shane Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -2773,7 +2773,7 @@ static char *dethSayText [ ] =
   "The dumber people think you are, the more surprised they're going to be when you kill them. -William Clayton",
   "I'm no glass of milk but i can still do your body good.",
   "If you drink, don't park. Accidents cause people.",
-  "Don't worry. It's only seems kinky the first time.",
+  "Don't worry. It only seems kinky the first time.",
   "Don't squat with spurs on.",
   "Anything worth taking seriously is worth making fun of.",
   "Before you criticize someone, you should walk a mile in their shoes. That way, when you criticize them, you're a mile away and you have their shoes.",
