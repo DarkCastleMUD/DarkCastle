@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: non_off.cpp,v 1.24 2005/04/23 09:20:26 urizen Exp $
+| $Id: non_off.cpp,v 1.25 2005/04/24 09:04:28 urizen Exp $
 | non_off.C
 | Description:  Implementation of generic, non-offensive commands.
 */
@@ -840,6 +840,7 @@ int do_rest(CHAR_DATA *ch, char *argument, int cmd)
  
 int do_sleep(CHAR_DATA *ch, char *argument, int cmd)
 {
+   struct affected_type *paf;
     if (IS_SET(world[ch->in_room].room_flags, QUIET)) {
       send_to_char ("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
       return eFAILURE;
@@ -851,6 +852,13 @@ int do_sleep(CHAR_DATA *ch, char *argument, int cmd)
     if (!IS_SET(world[ch->in_room].room_flags, SAFE))
       send_to_char ("Be careful sleeping out here!  This isn't a safe room, so people can steal your equipment while you sleep!\r\n", ch);
 
+    if ((paf = affected_by_spell(ch, SKILL_BLACKJACK)) && 
+		paf->modifier == 1 && GET_POS(ch) != POSITION_SLEEPING)
+ 	paf->modifier = 0;
+    if ((paf = affected_by_spell(ch, SPELL_SLEEP)) && 
+		paf->modifier == 1 && GET_POS(ch) != POSITION_SLEEPING)
+ 	paf->modifier = 0;
+         
     switch(GET_POS(ch)) {
         case POSITION_STANDING :
             send_to_char("You lie down and go to sleep.\n\r", ch);
@@ -953,20 +961,20 @@ int do_wake(CHAR_DATA *ch, char *argument, int cmd)
             }
         }
     } else {
-        if ((af = affected_by_spell(ch, SPELL_SLEEP)) && af->modifier == 1) {
+        if (GET_POS(ch) > POSITION_SLEEPING)
+           send_to_char("You are already awake...\n\r", ch);
+        else if ((af = affected_by_spell(ch, SPELL_SLEEP)) && af->modifier == 1) {
             send_to_char("You can't wake up!\n\r", ch);
         }else if ((af = affected_by_spell(ch, SKILL_BLACKJACK)) && af->modifier == 1) {
             send_to_char("You can't wake up!\n\r", ch);
         } else if ((af = affected_by_spell(ch, INTERNAL_SLEEPING))) {
             send_to_char("You just went to sleep!  Your body is still too tired.  Your dreaming continues...\r\n", ch);
         } else {
-            if (GET_POS(ch) > POSITION_SLEEPING)
-                send_to_char("You are already awake...\n\r", ch);
-            else {
+//            else {
                 send_to_char("You wake, and stand up.\n\r", ch);
                 act("$n awakens.", ch, 0, 0, TO_ROOM, 0);
                 GET_POS(ch) = POSITION_STANDING;
-            }
+  //          }
         }
     }
     return eSUCCESS;
