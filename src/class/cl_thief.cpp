@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.99 2005/04/24 08:53:38 urizen Exp $
+| $Id: cl_thief.cpp,v 1.100 2005/04/26 21:14:39 shane Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -1818,4 +1818,106 @@ int do_blackjack(struct char_data *ch, char *argument, int cmd)
      GET_POS(victim)=POSITION_SLEEPING;
      return eSUCCESS;
   }
+}
+
+int do_appraise(CHAR_DATA *ch, char *argument, int cmd)
+{
+   CHAR_DATA *victim;
+   OBJ_DATA *obj;
+   char name[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH];
+   char item[MAX_STRING_LENGTH];
+   int appraised, bits, learned;
+   bool found = FALSE, weight = FALSE;
+
+   argument = one_argument(argument,name);
+   one_argument(argument, item);
+
+   if(!(learned = has_skill(ch, SKILL_APPRAISE))) {
+      send_to_char("Your estimate would be baseless.\n\r", ch);
+      return eFAILURE;
+   }
+
+   bits = generic_find(name, FIND_OBJ_INV | FIND_OBJ_ROOM |
+                  FIND_OBJ_EQUIP | FIND_CHAR_ROOM,
+                  ch, &victim, &obj);
+
+   if(!bits) {
+     send_to_char("Appraise whom?\n\r", ch);
+     return eFAILURE;
+   }
+
+   if(GET_MOVE(ch) < 25) {
+      send_to_char("You're too tired to make a valid assessment.\n\r", ch);
+      return eFAILURE;
+   }
+   GET_MOVE(ch) -=25;
+
+   if(obj) {
+      appraised = obj->obj_flags.cost;
+      found = TRUE;
+   }
+
+   if(victim == ch && !*item) {
+      send_to_char("You're worth a million bucks, baby.\n\r", ch);
+      return eFAILURE;
+   }
+
+   if(*item) {
+      if(victim == ch) {
+         obj = get_obj_in_list_vis(ch, item, ch->carrying);
+         appraised = GET_OBJ_WEIGHT(obj);
+         found = TRUE;
+         weight = TRUE;
+      } else {
+         obj = get_obj_in_list_vis(ch, item, victim->carrying);
+         if(number(0,2) || !obj) {
+            act("$N doesn't seem to be carrying anything like that.", ch, 0, victim, TO_CHAR, 0);
+            return eSUCCESS;
+         } else {
+            appraised = GET_OBJ_WEIGHT(obj);
+            found = TRUE;
+            weight = TRUE;
+         }
+      }
+      if(number(0,1))
+         appraised += 10 - learned / 10;
+      appraised -= 10 - learned / 10;
+   }
+
+   if(!found)
+      appraised = GET_GOLD(victim);
+
+   if(!weight) {
+      if(!number(0,1))
+         appraised *= 1 + (100 - learned) / 100;
+      else 
+         appraised *= 1 - (100 - learned) / 100;
+
+      if(appraised < 1000) {
+         appraised /= 100;
+         appraised *= 100;
+      } else if(appraised < 10000) {
+         appraised /= 1000;
+         appraised *= 1000;
+      } else {
+         appraised /= 10000;
+         appraised *= 10000;
+      }
+   }
+
+   if(appraised < 0)
+      appraised = 1;
+
+   if(!skill_success(ch, victim, SKILL_APPRAISE)) {
+      send_to_char("You estimate a worth of 30000000000?!?\n\r", ch);
+      WAIT_STATE(ch, PULSE_VIOLENCE);
+   } else {
+      if(weight)
+         sprintf(buf, "After some consideration, you estimate the weight of %s to be %d.\n\r", GET_NAME(victim), appraised);
+      sprintf(buf, "After some consideration, you estimate the value of %s to be %d.\n\r", GET_NAME(victim), appraised);
+      send_to_char(buf, ch);
+      WAIT_STATE(ch, PULSE_VIOLENCE * 1.5);
+   }
+
+   return eSUCCESS;
 }
