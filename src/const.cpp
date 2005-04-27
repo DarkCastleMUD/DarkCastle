@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.142 2005/04/26 20:32:14 shane Exp $ */
+/* $Id: const.cpp,v 1.143 2005/04/27 10:13:17 shane Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1443,12 +1443,14 @@ struct class_skill_defines u_skills[] = { // druid skills
 {    "sense life",           SPELL_SENSE_LIFE,           10,     85,     {CON,INT} },  
 {    "weaken",               SPELL_WEAKEN,               11,     98,     {STR,CON} },  
 {    "cure serious",         SPELL_CURE_SERIOUS,         12,     85,     {WIS,INT} },
+{    "resist cold",          SPELL_RESIST_COLD,          13,     90,     {CON,STR} },
 {    "camouflage",           SPELL_CAMOUFLAGE,           14,     85,     {INT,DEX} },
 {    "oaken fortitude",      SPELL_OAKEN_FORTITUDE,      15,     98,     {CON,STR} },
 {    "water breathing",      SPELL_WATER_BREATHING,      17,     98,     {DEX,INT} },
 {    "resist acid",          SPELL_RESIST_ACID,          18,     90,     {CON,INT} },
 {    "stoneshield",          SPELL_STONE_SHIELD,         20,     98,     {STR,WIS} },
 {    "poison",               SPELL_POISON,               21,     90,     {CON,WIS} },
+{    "staunchblood",         SPELL_STAUNCHBLOOD,         22,     90,     {CON,WIS} },
 {    "cure critic",          SPELL_CURE_CRITIC,          23,     85,     {WIS,INT} },
 {    "call familiar",        SPELL_SUMMON_FAMILIAR,      25,     90,     {INT,STR} },
 {    "dismiss familiar",     SPELL_DISMISS_FAMILIAR,     26,     90,     {WIS,CON} },  
@@ -1458,6 +1460,7 @@ struct class_skill_defines u_skills[] = { // druid skills
 {    "whipping",             SKILL_WHIPPING_WEAPONS,     30,     70,     {DEX,STR} },  
 {    "crushing",             SKILL_CRUSHING_WEAPONS,     30,     70,     {STR,DEX} },  
 {    "bludgeoning",          SKILL_BLUDGEON_WEAPONS,     30,     70,     {STR,DEX} },  
+{    "resist energy",        SKILL_RESIST_ENERGY,        30,     90,     {CON,DEX} },
 {    "rapid mend",           SPELL_RAPID_MEND,           31,     98,     {WIS,INT} },  
 {    "herb lore",            SPELL_HERB_LORE,            32,     90,     {INT,WIS} },
 {    "lighted path",         SPELL_LIGHTED_PATH,         33,     98,     {WIS,DEX} },
@@ -1466,6 +1469,7 @@ struct class_skill_defines u_skills[] = { // druid skills
 {    "control weather",      SPELL_CONTROL_WEATHER,      36,     90,     {CON,WIS} },
 {    "barkskin",             SPELL_BARKSKIN,             37,     85,     {CON,DEX} },
 {    "iron roots",           SPELL_IRON_ROOTS,           38,     98,     {STR,DEX} },
+{    "resist fire",          SPELL_RESIST_FIRE,          39,     90,     {INT,CON} },
 {    "earthquake",           SPELL_EARTHQUAKE,           40,     90,     {DEX,WIS} },
 {    "lightning shield",     SPELL_LIGHTNING_SHIELD,     41,     98,     {WIS,INT} },
 {    "blindness",            SPELL_BLINDNESS,            42,     98,     {CON,WIS} },  

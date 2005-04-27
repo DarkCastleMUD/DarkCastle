@@ -4723,6 +4723,12 @@ int spell_resist_fire(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 {
    struct affected_type af;
 
+   if (GET_CLASS(ch) == CLASS_MAGE && ch != victim)
+   {
+	send_to_char("You can only cast this on yourself.\r\n",ch);
+	return eFAILURE;
+   }
+
    if (!affected_by_spell(victim, SPELL_RESIST_FIRE)) {
       act("$n's skin turns $4red$R momentarily.", victim, 0, 0, TO_ROOM, INVIS_NULL);
       act("Your skin turns $4red$R momentarily.", victim, 0, 0, TO_CHAR, 0);
@@ -4742,6 +4748,13 @@ int spell_resist_fire(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 int spell_resist_magic(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
    struct affected_type af;
+
+   if (GET_CLASS(ch) == CLASS_MAGE && ch != victim)
+   {
+	send_to_char("You can only cast this on yourself.\r\n",ch);
+	return eFAILURE;
+   }
+
 
    if (!affected_by_spell(victim, SPELL_RESIST_MAGIC)) {
       act("$n's skin turns $B$7white$R momentarily.", victim, 0, 0, TO_ROOM, INVIS_NULL);
@@ -4763,6 +4776,12 @@ int spell_resist_magic(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
 int spell_staunchblood(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
     struct affected_type af;
+
+   if (GET_CLASS(ch) == CLASS_RANGER && ch != victim)
+   {
+	send_to_char("You can only cast this on yourself.\r\n",ch);
+	return eFAILURE;
+   }
 
     if(!affected_by_spell(ch, SPELL_STAUNCHBLOOD)) {
        act("You feel supremely healthy and resistant to $2poison$R!", ch, 0, 0, TO_CHAR, 0);
