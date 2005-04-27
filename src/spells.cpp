@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.125 2005/04/26 20:34:12 shane Exp $ */
+/* $Id: spells.cpp,v 1.126 2005/04/27 11:30:57 shane Exp $ */
 
 extern "C"
 {
@@ -392,8 +392,10 @@ struct spell_info_type spell_info [ ] =
 
  { /* 154*/ 12, POSITION_STANDING, 50, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_aegis, SKILL_INCREASE_HARD },
 
- { /* 155 */ 12, POSITION_STANDING, 33, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_resist_magic, SKILL_INCREASE_HARD }
+ { /* 155 */ 12, POSITION_STANDING, 33, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_resist_magic, SKILL_INCREASE_HARD },
  
+ { /* 156 */ 12, POSITION_STANDING, 30, TAR_CHAR_WORLD, cast_eagle_eye, SKILL_INCREASE_HARD }
+
 };
 
 
@@ -478,6 +480,7 @@ struct skill_stuff skill_info[] =
 /* 77 */    { "stinging_weapons", SKILL_INCREASE_MEDIUM },
 /* 78 */           { "blackjack", SKILL_INCREASE_HARD},
 /* 79 */            { "appraise", SKILL_INCREASE_MEDIUM},
+/* 80 */        { "natures lore", SKILL_INCREASE_MEDIUM},
 /*    */                  { "\n", 0 },
 };
 
@@ -564,6 +567,7 @@ char *skills[]=
   "stinging_weapons",
   "blackjack",
   "appraise",
+  "natures lore",
   "\n"
 };
 
@@ -724,6 +728,7 @@ char *spells[]=
    "holy aegis",
    "unholy aegis",
    "resist magic",
+   "eagle eye",
    "\n"
 };
 

@@ -3160,6 +3160,48 @@ int spell_wizard_eye(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
 }
 
 
+/* EAGLE EYE */
+
+int spell_eagle_eye(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
+{
+  int target;
+  int original_loc;
+  assert(ch && victim);
+
+  if(!OUTSIDE(victim) ||
+     GET_LEVEL(victim) >= IMMORTAL && GET_LEVEL(ch) < IMMORTAL)
+  {
+    send_to_char("Your eagle cannot scan the area.\n\r", ch);
+    return eFAILURE;
+  }
+
+  if(IS_AFFECTED(victim, AFF_INVISIBLE)) {
+    send_to_char("Your eagle can't find the target.\r\n", ch);
+    return eFAILURE;
+  }
+
+  if (affected_by_spell(victim, SKILL_INNATE_EVASION))
+  {
+    send_to_char("Your target evades the eagle's eyes!\r\n",ch);
+    return eFAILURE;
+  }
+
+  if(number(0, 100) > skill) {
+    send_to_char("Your eagle fails to locate its target.\r\n", ch);
+    return eFAILURE;
+  }
+
+  original_loc = ch->in_room;
+  target        =  victim->in_room;
+
+  move_char(ch, target);
+  send_to_char("You summon a large eagle to scan the area.\n\rThrough the eagle's eyes you see...\n\r", ch);
+  do_look(ch,"",15);
+  move_char(ch, original_loc);
+  return eSUCCESS;
+}
+
+
 /* SUMMON */
 
 int spell_summon(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
@@ -4723,7 +4765,7 @@ int spell_resist_fire(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 {
    struct affected_type af;
 
-   if (GET_CLASS(ch) == CLASS_MAGE && ch != victim)
+   if (GET_CLASS(ch) == CLASS_MAGIC_USER && ch != victim)
    {
 	send_to_char("You can only cast this on yourself.\r\n",ch);
 	return eFAILURE;
@@ -4749,7 +4791,7 @@ int spell_resist_magic(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
 {
    struct affected_type af;
 
-   if (GET_CLASS(ch) == CLASS_MAGE && ch != victim)
+   if (GET_CLASS(ch) == CLASS_MAGIC_USER && ch != victim)
    {
 	send_to_char("You can only cast this on yourself.\r\n",ch);
 	return eFAILURE;
@@ -7431,6 +7473,20 @@ int cast_wizard_eye( byte level, CHAR_DATA *ch, char *arg, int type,
   return eFAILURE;
 }
 
+int cast_eagle_eye( byte level, CHAR_DATA *ch, char *arg, int type,
+  CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill )
+{
+  switch (type) {
+	 case SPELL_TYPE_SPELL:
+		 return spell_eagle_eye(level, ch, tar_ch, 0, skill);
+		 break;
+		default :
+				log("Serious screw-up in eagle eye!", 
+ANGEL, LOG_BUG);
+	 break;
+	 }
+  return eFAILURE;
+}
 
 int cast_summon( byte level, CHAR_DATA *ch, char *arg, int type,
   CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill )

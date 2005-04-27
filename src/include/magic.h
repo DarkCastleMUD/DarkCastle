@@ -5,7 +5,7 @@
  *                                                                           *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-/* $Id: magic.h,v 1.19 2005/04/21 11:06:53 shane Exp $ */
+/* $Id: magic.h,v 1.20 2005/04/27 11:31:02 shane Exp $ */
 #ifndef MAGIC_H_
 #define MAGIC_H_
 
@@ -195,6 +195,8 @@ int spell_word_of_recall(byte level, CHAR_DATA * ch,
    CHAR_DATA * victim, struct obj_data * obj, int skill);
 int spell_wizard_eye(byte level, CHAR_DATA * ch,
    CHAR_DATA * victim, struct obj_data * obj, int skill);
+int spell_eagle_eye(byte level, CHAR_DATA * ch,
+   CHAR_DATA * victim, struct obj_data * obj, int skill);
 int spell_summon(byte level, CHAR_DATA * ch,
    CHAR_DATA * victim, struct obj_data * obj, int skill);
 int spell_sense_life(byte level, CHAR_DATA * ch,
@@ -367,6 +369,8 @@ int cast_ventriloquate(byte level, CHAR_DATA * ch, char *arg, int type,
 int cast_word_of_recall(byte level, CHAR_DATA * ch, char *arg, int type,
    CHAR_DATA * tar_ch, struct obj_data * tar_obj, int skill);
 int cast_wizard_eye(byte level, CHAR_DATA * ch, char *arg, int type,
+   CHAR_DATA * tar_ch, struct obj_data * tar_obj, int skill);
+int cast_eagle_eye(byte level, CHAR_DATA * ch, char *arg, int type,
    CHAR_DATA * tar_ch, struct obj_data * tar_obj, int skill);
 int cast_summon(byte level, CHAR_DATA * ch, char *arg, int type,
    CHAR_DATA * tar_ch, struct obj_data * tar_obj, int skill);

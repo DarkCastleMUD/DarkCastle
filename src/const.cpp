@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.143 2005/04/27 10:13:17 shane Exp $ */
+/* $Id: const.cpp,v 1.144 2005/04/27 11:30:57 shane Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -272,6 +272,7 @@ char *spell_wear_off_msg[] =
   "Your protective aegis dissipates.",
   "Your unholy aegis dissipates.",
   "Your natural resistance to magic fades.",
+  "!EAGLE_EYE!",
   "!UNUSED!"
 };
 
@@ -1439,6 +1440,7 @@ struct class_skill_defines u_skills[] = { // druid skills
 {    "cure light",           SPELL_CURE_LIGHT,           3,      85,     {WIS,INT} },  
 {    "create water",         SPELL_CREATE_WATER,         5,      90,     {INT,CON} },  
 {    "attrition",            SPELL_ATTRITION,            6,      98,     {CON,DEX} },  
+{    "natures lore",         SKILL_NATURES_LORE,         7,      98,     {DEX,WIS} },
 {    "create food",          SPELL_CREATE_FOOD,          8,      90,     {INT,CON} },  
 {    "sense life",           SPELL_SENSE_LIFE,           10,     85,     {CON,INT} },  
 {    "weaken",               SPELL_WEAKEN,               11,     98,     {STR,CON} },  
@@ -1460,7 +1462,7 @@ struct class_skill_defines u_skills[] = { // druid skills
 {    "whipping",             SKILL_WHIPPING_WEAPONS,     30,     70,     {DEX,STR} },  
 {    "crushing",             SKILL_CRUSHING_WEAPONS,     30,     70,     {STR,DEX} },  
 {    "bludgeoning",          SKILL_BLUDGEON_WEAPONS,     30,     70,     {STR,DEX} },  
-{    "resist energy",        SKILL_RESIST_ENERGY,        30,     90,     {CON,DEX} },
+{    "resist energy",        SPELL_RESIST_ENERGY,        30,     90,     {CON,DEX} },
 {    "rapid mend",           SPELL_RAPID_MEND,           31,     98,     {WIS,INT} },  
 {    "herb lore",            SPELL_HERB_LORE,            32,     90,     {INT,WIS} },
 {    "lighted path",         SPELL_LIGHTED_PATH,         33,     98,     {WIS,DEX} },
@@ -1474,6 +1476,7 @@ struct class_skill_defines u_skills[] = { // druid skills
 {    "lightning shield",     SPELL_LIGHTNING_SHIELD,     41,     98,     {WIS,INT} },
 {    "blindness",            SPELL_BLINDNESS,            42,     98,     {CON,WIS} },  
 {    "forage",               SKILL_FORAGE,               43,     90,     {INT,CON} },  
+{    "eagle eye",            SPELL_EAGLE_EYE,            43,     98,     {WIS,INT} },
 {    "stoneskin",            SPELL_STONE_SKIN,           44,     70,     {STR,CON} },  
 {    "power heal",           SPELL_POWER_HEAL,           45,     98,     {WIS,STR} },  
 {    "forest meld",          SPELL_FOREST_MELD,          46,     90,     {WIS,DEX} },  
