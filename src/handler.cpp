@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.82 2005/04/27 09:51:16 shane Exp $ */
+/* $Id: handler.cpp,v 1.83 2005/04/27 17:54:43 shane Exp $ */
     
 extern "C"
 {
@@ -596,7 +596,7 @@ if (!aff2fix) {
             GET_STR_BONUS(ch) += mod;
             GET_STR(ch) = GET_RAW_STR(ch) + GET_STR_BONUS(ch);
             i = get_max_stat(ch, STRENGTH);
-            if(i >= GET_RAW_STR(ch))
+            if(i <= GET_RAW_STR(ch))
                GET_STR(ch) = MIN(30, GET_STR(ch));
             else
                GET_STR(ch) = MIN(i, GET_STR(ch));
@@ -613,7 +613,7 @@ if (!aff2fix) {
             GET_DEX_BONUS(ch) += mod;
             GET_DEX(ch) = GET_RAW_DEX(ch) + GET_DEX_BONUS(ch);
             i = get_max_stat(ch, DEXTERITY);
-            if(i >= GET_RAW_DEX(ch))
+            if(i <= GET_RAW_DEX(ch))
                GET_DEX(ch) = MIN(30, GET_DEX(ch));
             else
 		GET_DEX(ch) = MIN(i, GET_DEX(ch));
@@ -628,7 +628,7 @@ if (!aff2fix) {
             GET_INT_BONUS(ch) += mod;
             GET_INT(ch) = GET_RAW_INT(ch) + GET_INT_BONUS(ch);
             i = get_max_stat(ch, INTELLIGENCE);
-            if(i >= GET_RAW_INT(ch))
+            if(i <= GET_RAW_INT(ch))
                GET_INT(ch) = MIN(30, GET_INT(ch));
             else
 	       GET_INT(ch) = MIN(i, GET_INT(ch));
@@ -643,7 +643,7 @@ if (!aff2fix) {
             GET_WIS_BONUS(ch) += mod;
             GET_WIS(ch) = GET_RAW_WIS(ch) + GET_WIS_BONUS(ch);
             i = get_max_stat(ch, WISDOM);
-            if(i >= GET_RAW_WIS(ch))
+            if(i <= GET_RAW_WIS(ch))
                GET_WIS(ch) = MIN(30, GET_WIS(ch));
             else
 	       GET_WIS(ch) = MIN(i, GET_WIS(ch));
@@ -658,7 +658,7 @@ if (!aff2fix) {
             GET_CON_BONUS(ch) += mod;
             GET_CON(ch) = GET_RAW_CON(ch) + GET_CON_BONUS(ch);
             i = get_max_stat(ch, CONSTITUTION);
-            if(i >= GET_RAW_CON(ch))
+            if(i <= GET_RAW_CON(ch))
                GET_CON(ch) = MIN(30, GET_CON(ch));
             else
 	       GET_CON(ch) = MIN(i, GET_CON(ch));
