@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.83 2005/04/27 17:54:43 shane Exp $ */
+/* $Id: handler.cpp,v 1.84 2005/04/28 18:39:56 shane Exp $ */
     
 extern "C"
 {
@@ -539,7 +539,8 @@ void check_weapon_weights(char_data * ch)
   if (IS_SET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT)) return;
   // make sure we're still strong enough to wield our weapons
   if(!IS_MOB(ch) && ch->equipment[WIELD] &&
-       GET_OBJ_WEIGHT(ch->equipment[WIELD]) > GET_STR(ch) && !IS_SET(ch->affected_by2, AFF_POWERWIELD))
+       GET_OBJ_WEIGHT(ch->equipment[WIELD]) > MIN(GET_STR(ch), 
+get_max_stat(ch, STRENGTH)) && !IS_SET(ch->affected_by2, AFF_POWERWIELD))
   {
     act("Being too heavy to wield, you move your $p to your inventory.",
          ch, ch->equipment[WIELD], 0, TO_CHAR, 0);
@@ -557,7 +558,9 @@ void check_weapon_weights(char_data * ch)
   }
 
   if(ch->equipment[SECOND_WIELD] &&
-       GET_OBJ_WEIGHT(ch->equipment[SECOND_WIELD]) > GET_STR(ch)/2 && !IS_SET(ch->affected_by2, AFF_POWERWIELD))
+       GET_OBJ_WEIGHT(ch->equipment[SECOND_WIELD]) > MIN(GET_STR(ch)/2, 
+get_max_stat(ch, STRENGTH)/2) && !IS_SET(ch->affected_by2, 
+AFF_POWERWIELD))
   {
     act("Being too heavy to wield, you move your $p to your inventory.",
          ch, ch->equipment[SECOND_WIELD], 0, TO_CHAR, 0);
