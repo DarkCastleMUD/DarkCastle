@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.40 2005/04/27 17:54:43 shane Exp $
+| $Id: move.cpp,v 1.41 2005/04/28 19:12:54 urizen Exp $
 | move.C
 | Movement commands and stuff.
 *************************************************************************
@@ -320,7 +320,7 @@ int do_simple_move(CHAR_DATA *ch, int cmd, int following)
        need_movement = 1;
     
     else   {
-      if(learned = has_skill(ch, SKILL_NATURES_LORE)) {
+      if((learned = has_skill(ch, SKILL_NATURES_LORE))) {
          if(learned > 90) {
             if(world[ch->in_room].sector_type == SECT_UNDERWATER) {
                mvinroom = movement_loss[world[ch->in_room].sector_type] / 2;
