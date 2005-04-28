@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.102 2005/04/28 19:23:18 shane Exp $
+| $Id: cl_thief.cpp,v 1.103 2005/04/28 19:47:03 shane Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -1865,9 +1865,11 @@ int do_appraise(CHAR_DATA *ch, char *argument, int cmd)
       if(*item) {
          if(victim == ch) {
             obj = get_obj_in_list_vis(ch, item, ch->carrying);
-            appraised = GET_OBJ_WEIGHT(obj);
-            found = TRUE;
-            weight = TRUE;
+            if(obj) {
+               appraised = GET_OBJ_WEIGHT(obj);
+               found = TRUE;
+               weight = TRUE;
+            } else send_to_char("You don't seem to be carrying anything like that.\n\r", ch);
          } else {
             obj = get_obj_in_list_vis(ch, item, victim->carrying);
             if(number(0,2) || !obj) {
