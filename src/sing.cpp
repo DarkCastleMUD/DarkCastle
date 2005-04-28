@@ -2302,7 +2302,7 @@ int intrp_vigilant_siren( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victi
    {
       if(IS_SET(fvictim->follower->affected_by2, AFF_ALERT)) {
          REMOVE_BIT(fvictim->follower->affected_by2, AFF_ALERT);
-         send_to_char("You stop watching your back so closely.", fvictim->follower);
+         send_to_char("You stop watching your back so closely.\r\n", fvictim->follower);
       }
    }
 
