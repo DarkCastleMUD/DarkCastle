@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.145 2005/04/28 19:33:50 shane Exp $ */
+/* $Id: const.cpp,v 1.146 2005/04/28 20:10:22 apocalypse Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -145,7 +145,7 @@ char *spell_wear_off_msg[] =
   "!Fireball!",
   "!Harm!",
   "!Heal",
-  "You feel your invisibility dissapate.",
+  "You feel your invisibility dissipate.",
   "!Lightning Bolt!",                                          /* 30 */
   "!Locate object!",
   "!Magic Missile!",
