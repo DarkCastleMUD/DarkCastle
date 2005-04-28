@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_barbarian.cpp,v 1.38 2005/04/21 11:42:05 shane Exp $
+| $Id: cl_barbarian.cpp,v 1.39 2005/04/28 19:55:54 shane Exp $
 | cl_barbarian.C
 | Description:  Commands for the barbarian class.
 */
@@ -587,7 +587,7 @@ void barb_magic_resist(char_data *ch, int old, int nw)
 int do_knockback(struct char_data *ch, char *argument, int cmd)
 {
   struct char_data *victim;
-  char buf[MAX_STRING_LENGTH], name[MAX_STRING_LENGTH], who[MAX_STRING_LENGTH];
+  char buf[MAX_STRING_LENGTH], where[MAX_STRING_LENGTH], who[MAX_STRING_LENGTH];
   int dir = 0;
   int retval, exit, dam, dampercent, learned;
   extern char * dirs[];
@@ -605,14 +605,14 @@ int do_knockback(struct char_data *ch, char *argument, int cmd)
   }
 
   argument = one_argument(argument, who);
-  one_argument(argument, name);
+  one_argument(argument, where);
 
   if(!*who) {
      send_to_char("Knockback whom?\n\r", ch);
      return eFAILURE;
   }
 
-  victim = get_char_room_vis( ch, name );
+  victim = get_char_room_vis( ch, who );
   if ( victim == NULL )
     victim = ch->fighting;
 
@@ -638,12 +638,12 @@ int do_knockback(struct char_data *ch, char *argument, int cmd)
 
   dam = learned / 2 + 50;
 
-  if(*name) {
+  if(*where) {
     if(learned < 80)
       send_to_char("You're not good enough to direct your smashes.\n\r", ch);
     else {
       for(int i = 0; i < 6; i++) {
-        if(!str_prefix(name,dirs[i]))
+        if(!str_prefix(where,dirs[i]))
         {
           dir = i + 1;
           break;
