@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.144 2005/04/27 11:30:57 shane Exp $ */
+/* $Id: const.cpp,v 1.145 2005/04/28 19:33:50 shane Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1307,6 +1307,7 @@ struct class_skill_defines b_skills[] = { // barbarian skills
 {    "berserk",         SKILL_BERSERK,            40,   98,  {STR,CON} },
 {    "hitall",          SKILL_HITALL,             45,   90,  {STR,CON} },
 {    "magic resistance", SKILL_MAGIC_RESIST,      47,   98,  {INT,CON} },
+{    "knockback",       SKILL_KNOCKBACK,          48,   98,  {STR,DEX} },
 {    "bullrush",        SKILL_BULLRUSH,           50,   98,  {STR,CON} },
 {    "\n",              0,                        1,    0,   {0,0} }
 };
