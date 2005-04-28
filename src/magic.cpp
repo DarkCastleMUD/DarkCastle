@@ -3231,7 +3231,7 @@ int spell_summon(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *
   if ((IS_NPC(victim) && GET_LEVEL(ch) < IMP) ||
 		IS_SET(world[victim->in_room].room_flags,PRIVATE)  ||
 		IS_SET(world[victim->in_room].room_flags,NO_SUMMON) ) {
-	 send_to_char("You failed.\n\r", ch);
+	 send_to_char("You have failed to summon your target!\n\r", ch);
 	 return eFAILURE;
   }
 
