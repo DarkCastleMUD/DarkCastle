@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.84 2005/04/28 18:39:56 shane Exp $ */
+/* $Id: handler.cpp,v 1.85 2005/04/28 21:14:34 shane Exp $ */
     
 extern "C"
 {
@@ -1285,6 +1285,7 @@ void affect_remove( CHAR_DATA *ch, struct affected_type *af, int flags, bool aff
            }
          if (!(flags & SUPPRESS_MESSAGES))
    	   send_to_char("You can no longer wield two handed weapons.\r\n",ch);
+         check_weapon_weights(ch);
 	 break;
       case SKILL_BLADESHIELD:
          if (!(flags & SUPPRESS_MESSAGES))
