@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_barbarian.cpp,v 1.40 2005/04/28 20:07:12 shane Exp $
+| $Id: cl_barbarian.cpp,v 1.41 2005/04/28 20:27:45 shane Exp $
 | cl_barbarian.C
 | Description:  Commands for the barbarian class.
 */
@@ -640,7 +640,7 @@ int do_knockback(struct char_data *ch, char *argument, int cmd)
 
   if(*where) {
     if(learned < 80)
-      send_to_char("You're not good enough to direct your smashes.\n\r", ch);
+      send_to_char("You're not good enough to direct your smashes, so you just let it fly!\n\r", ch);
     else {
       for(int i = 0; i < 6; i++) {
         if(!str_prefix(where,dirs[i]))
@@ -675,12 +675,20 @@ int do_knockback(struct char_data *ch, char *argument, int cmd)
        !IS_SET(world[EXIT(victim, exit)->to_room].room_flags, NO_TRACK)){
 //need to do more checks on if the victim can actually be knocked into 
 //the room?
-    sprintf(buf, "Your smash sends %s reeling %s.", GET_NAME(victim), dirs[dir]);
-    act(buf, ch, 0, victim, TO_CHAR, 0);
-    sprintf(buf, "%s smashes into you, sending you reeling %s.", GET_NAME(ch), dirs[dir]);
-    act(buf, ch, 0, victim, TO_VICT, 0);
-    sprintf(buf, "%s smashes into %s and sends $S reeling to the %s.", GET_NAME(ch), GET_NAME(victim), dirs[dir]);
-    act(buf, ch, 0, victim, TO_ROOM, NOTVICT);
+    retval = damage(ch, victim, dam, TYPE_HIT, SKILL_KNOCKBACK, 0);
+    if(SOMEONE_DIED(retval)) {
+       act("You smash $N apart!", ch, 0, victim, TO_CHAR, 0);
+       act("$n smashes you to pieces!", ch, 0, victim, TO_VICT, 0);
+       act("$n smashes $N to pieces!", ch, 0, victim, TO_ROOM, NOTVICT);
+    } else {
+       sprintf(buf, "Your smash sends %s reeling %s.", GET_NAME(victim), dirs[dir]);
+       act(buf, ch, 0, victim, TO_CHAR, 0);
+       sprintf(buf, "%s smashes into you, sending you reeling %s.", GET_NAME(ch), dirs[dir]);
+       act(buf, ch, 0, victim, TO_VICT, 0);
+       sprintf(buf, "%s smashes into %s and sends $S reeling to the %s.", GET_NAME(ch), GET_NAME(victim), dirs[dir]);
+       act(buf, ch, 0, victim, TO_ROOM, NOTVICT);
+       move_char(victim, (world[(ch)->in_room].dir_option[dir])->to_room);
+    }
     if(victim->fighting) {
        if(IS_NPC(victim)) {
           add_memory(victim, GET_NAME(ch), 'h');
@@ -690,9 +698,6 @@ int do_knockback(struct char_data *ch, char *argument, int cmd)
           stop_fighting(ch);
     }
     WAIT_STATE(ch, PULSE_VIOLENCE);
-    retval = damage(ch, victim, dam, TYPE_HIT, SKILL_KNOCKBACK, 0);
-    if(!SOMEONE_DIED(retval))
-       move_char(victim, (world[(ch)->in_room].dir_option[dir])->to_room);
     return eSUCCESS;
   } else {
     act("$N backpeddles across the room due to $n's smash.", ch, 0, victim, TO_ROOM, NOTVICT);
