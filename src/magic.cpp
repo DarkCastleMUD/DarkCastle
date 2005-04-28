@@ -2219,7 +2219,7 @@ int spell_locate_object(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
         send_to_char(buf,ch);
       } else {
         sprintf(buf,"%s is in %s.\n\r",i->short_description,
-           (i->in_room == NOWHERE ? "is in use in an unknown location" : world[i->in_room].name));
+           (i->in_room == NOWHERE ? "use in an unknown location" : world[i->in_room].name));
         send_to_char(buf,ch);
         j--;
       }
