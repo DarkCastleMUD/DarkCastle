@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.101 2005/04/28 18:49:41 shane Exp $
+| $Id: cl_thief.cpp,v 1.102 2005/04/28 19:23:18 shane Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -1856,35 +1856,37 @@ int do_appraise(CHAR_DATA *ch, char *argument, int cmd)
       found = TRUE;
    }
 
-   if(victim == ch && !*item) {
-      send_to_char("You're worth a million bucks, baby.\n\r", ch);
-      return eFAILURE;
-   }
+   if(victim) {
+      if(victim == ch && !*item) {
+         send_to_char("You're worth a million bucks, baby.\n\r", ch);
+         return eFAILURE;
+      }
 
-   if(*item) {
-      if(victim == ch) {
-         obj = get_obj_in_list_vis(ch, item, ch->carrying);
-         appraised = GET_OBJ_WEIGHT(obj);
-         found = TRUE;
-         weight = TRUE;
-      } else {
-         obj = get_obj_in_list_vis(ch, item, victim->carrying);
-         if(number(0,2) || !obj) {
-            act("$N doesn't seem to be carrying anything like that.", ch, 0, victim, TO_CHAR, 0);
-            return eSUCCESS;
-         } else {
+      if(*item) {
+         if(victim == ch) {
+            obj = get_obj_in_list_vis(ch, item, ch->carrying);
             appraised = GET_OBJ_WEIGHT(obj);
             found = TRUE;
             weight = TRUE;
+         } else {
+            obj = get_obj_in_list_vis(ch, item, victim->carrying);
+            if(number(0,2) || !obj) {
+               act("$N doesn't seem to be carrying anything like that.", ch, 0, victim, TO_CHAR, 0);
+               return eSUCCESS;
+            } else {
+               appraised = GET_OBJ_WEIGHT(obj);
+               found = TRUE;
+               weight = TRUE;
+            }
          }
+         if(number(0,1))
+            appraised += 10 - learned / 10;
+         appraised -= 10 - learned / 10;
       }
-      if(number(0,1))
-         appraised += 10 - learned / 10;
-      appraised -= 10 - learned / 10;
-   }
 
-   if(!found)
-      appraised = GET_GOLD(victim);
+      if(!found)
+         appraised = GET_GOLD(victim);
+   }
 
    if(!weight) {
       if(!number(0,1))
@@ -1912,8 +1914,9 @@ int do_appraise(CHAR_DATA *ch, char *argument, int cmd)
       WAIT_STATE(ch, PULSE_VIOLENCE);
    } else {
       if(weight)
-         sprintf(buf, "After some consideration, you estimate the weight of %s to be %d.\n\r", GET_NAME(victim), appraised);
-      sprintf(buf, "After some consideration, you estimate the value of %s to be %d.\n\r", GET_NAME(victim), appraised);
+         sprintf(buf, "After some consideration, you estimate the weight of %s to be %d.\n\r", obj->name, appraised);
+      else if(found) sprintf(buf, "After some consideration, you estimate the value of %s to be %d.\n\r", obj->name, appraised);
+      else sprintf(buf, "After some consideration, you estimate the amount of gold %s is carrying to be %d.\n\r", GET_NAME(victim), appraised);
       send_to_char(buf, ch);
       WAIT_STATE(ch, PULSE_VIOLENCE * 1.5);
    }
