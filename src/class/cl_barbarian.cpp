@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_barbarian.cpp,v 1.39 2005/04/28 19:55:54 shane Exp $
+| $Id: cl_barbarian.cpp,v 1.40 2005/04/28 20:07:12 shane Exp $
 | cl_barbarian.C
 | Description:  Commands for the barbarian class.
 */
@@ -690,16 +690,17 @@ int do_knockback(struct char_data *ch, char *argument, int cmd)
           stop_fighting(ch);
     }
     WAIT_STATE(ch, PULSE_VIOLENCE);
-    damage(ch, victim, dam, TYPE_HIT, SKILL_KNOCKBACK, 0);
-    move_char(victim, (world[(ch)->in_room].dir_option[dir])->to_room);
+    retval = damage(ch, victim, dam, TYPE_HIT, SKILL_KNOCKBACK, 0);
+    if(!SOMEONE_DIED(retval))
+       move_char(victim, (world[(ch)->in_room].dir_option[dir])->to_room);
     return eSUCCESS;
   } else {
     act("$N backpeddles across the room due to $n's smash.", ch, 0, victim, TO_ROOM, NOTVICT);
     act("$N barely keeps $S footing, stumbling backwards after your smash.", ch, 0, victim, TO_CHAR, 0);
     act("$n knocks you back across the room.", ch, 0, victim, TO_VICT, 0);
     WAIT_STATE(ch, PULSE_VIOLENCE);
-    damage(ch, victim, dam, TYPE_HIT, SKILL_KNOCKBACK ,0);
-    if(!victim->fighting && IS_NPC(victim))
+    retval = damage(ch, victim, dam, TYPE_HIT, SKILL_KNOCKBACK ,0);
+    if(!SOMEONE_DIED(retval))
        return attack(victim, ch, TYPE_UNDEFINED);
   }
   return eSUCCESS;
