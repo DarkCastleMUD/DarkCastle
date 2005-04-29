@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_barbarian.cpp,v 1.44 2005/04/29 21:27:53 urizen Exp $
+| $Id: cl_barbarian.cpp,v 1.45 2005/04/29 21:43:22 shane Exp $
 | cl_barbarian.C
 | Description:  Commands for the barbarian class.
 */
@@ -636,7 +636,7 @@ int do_knockback(struct char_data *ch, char *argument, int cmd)
 
   learned = has_skill(ch, SKILL_KNOCKBACK);
 
-  dam = learned / 2 + 50;
+  dam = 100;
 
   if(*where) {
     if(learned < 80)
