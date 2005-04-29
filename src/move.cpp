@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.41 2005/04/28 19:12:54 urizen Exp $
+| $Id: move.cpp,v 1.42 2005/04/29 19:27:35 shane Exp $
 | move.C
 | Movement commands and stuff.
 *************************************************************************
@@ -305,7 +305,7 @@ int do_simple_move(CHAR_DATA *ch, int cmd, int following)
     char tmp[80];
     int dir;
     int was_in;
-    int need_movement, learned, mvinroom, mvtoroom;
+    int need_movement, learned, mvinroom = 0, mvtoroom = 0;
     int retval;
     struct obj_data *obj;
     bool has_boat;
@@ -411,7 +411,10 @@ int do_simple_move(CHAR_DATA *ch, int cmd, int following)
                mvtoroom = movement_loss[world[world[ch->in_room].dir_option[cmd]->to_room].sector_type] / 4;
             }
          }
-         
+         if(!mvinroom)
+            mvinroom = movement_loss[world[ch->in_room].sector_type];
+         if(!mvtoroom)         
+            mvtoroom = movement_loss[world[world[ch->in_room].dir_option[cmd]->to_room].sector_type];
          need_movement = mvinroom + mvtoroom;            
       } else {
          need_movement = (movement_loss[world[ch->in_room].sector_type] +
