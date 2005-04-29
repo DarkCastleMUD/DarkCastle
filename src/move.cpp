@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.43 2005/04/29 20:16:22 shane Exp $
+| $Id: move.cpp,v 1.44 2005/04/29 22:19:48 shane Exp $
 | move.C
 | Movement commands and stuff.
 *************************************************************************
@@ -333,7 +333,8 @@ int do_simple_move(CHAR_DATA *ch, int cmd, int following)
          if(learned > 80) {
             if(world[ch->in_room].sector_type == SECT_MOUNTAIN) {
                mvinroom = movement_loss[world[ch->in_room].sector_type] / 2;
-               skill_increase_check(ch, SKILL_NATURES_LORE, learned, SKILL_INCREASE_MEDIUM);
+               if(learned < 91)
+                  skill_increase_check(ch, SKILL_NATURES_LORE, learned, SKILL_INCREASE_MEDIUM);
             }
             if(world[world[ch->in_room].dir_option[cmd]->to_room].sector_type == SECT_MOUNTAIN) {
                mvtoroom = movement_loss[world[world[ch->in_room].dir_option[cmd]->to_room].sector_type] / 2;
@@ -342,7 +343,8 @@ int do_simple_move(CHAR_DATA *ch, int cmd, int following)
          if(learned > 70) {
             if(world[ch->in_room].sector_type == SECT_ARCTIC) {
                mvinroom = movement_loss[world[ch->in_room].sector_type] / 2;
-               skill_increase_check(ch, SKILL_NATURES_LORE, learned, SKILL_INCREASE_MEDIUM);
+               if(learned < 81)
+                  skill_increase_check(ch, SKILL_NATURES_LORE, learned, SKILL_INCREASE_MEDIUM);
             }
             if(world[world[ch->in_room].dir_option[cmd]->to_room].sector_type == SECT_ARCTIC) {
                mvtoroom = movement_loss[world[world[ch->in_room].dir_option[cmd]->to_room].sector_type] / 2;
@@ -351,7 +353,8 @@ int do_simple_move(CHAR_DATA *ch, int cmd, int following)
          if(learned > 60) {
             if(world[ch->in_room].sector_type == SECT_HILLS) {
                mvinroom = movement_loss[world[ch->in_room].sector_type] / 2;
-               skill_increase_check(ch, SKILL_NATURES_LORE, learned, SKILL_INCREASE_MEDIUM);
+               if(learned < 71)
+                  skill_increase_check(ch, SKILL_NATURES_LORE, learned, SKILL_INCREASE_MEDIUM);
             }
             if(world[world[ch->in_room].dir_option[cmd]->to_room].sector_type == SECT_HILLS) {
                mvtoroom = movement_loss[world[world[ch->in_room].dir_option[cmd]->to_room].sector_type] / 2;
@@ -360,7 +363,8 @@ int do_simple_move(CHAR_DATA *ch, int cmd, int following)
          if(learned > 50) {
             if(world[ch->in_room].sector_type == SECT_WATER_SWIM) {
                mvinroom = movement_loss[world[ch->in_room].sector_type] / 2;
-               skill_increase_check(ch, SKILL_NATURES_LORE, learned, SKILL_INCREASE_MEDIUM);
+               if(learned < 61)
+                  skill_increase_check(ch, SKILL_NATURES_LORE, learned, SKILL_INCREASE_MEDIUM);
             }
             if(world[world[ch->in_room].dir_option[cmd]->to_room].sector_type == SECT_WATER_SWIM) {
                mvtoroom = movement_loss[world[world[ch->in_room].dir_option[cmd]->to_room].sector_type] / 2;
@@ -369,7 +373,8 @@ int do_simple_move(CHAR_DATA *ch, int cmd, int following)
          if(learned > 40) {
             if(world[ch->in_room].sector_type == SECT_FROZEN_TUNDRA) {
                mvinroom = movement_loss[world[ch->in_room].sector_type] / 2;
-               skill_increase_check(ch, SKILL_NATURES_LORE, learned, SKILL_INCREASE_MEDIUM);
+               if(learned < 51)
+                  skill_increase_check(ch, SKILL_NATURES_LORE, learned, SKILL_INCREASE_MEDIUM);
             }
             if(world[world[ch->in_room].dir_option[cmd]->to_room].sector_type == SECT_FROZEN_TUNDRA) {
                mvtoroom = movement_loss[world[world[ch->in_room].dir_option[cmd]->to_room].sector_type] / 2;
@@ -378,7 +383,8 @@ int do_simple_move(CHAR_DATA *ch, int cmd, int following)
          if(learned > 30) {
             if(world[ch->in_room].sector_type == SECT_DESERT) {
                mvinroom = movement_loss[world[ch->in_room].sector_type] / 2;
-               skill_increase_check(ch, SKILL_NATURES_LORE, learned, SKILL_INCREASE_MEDIUM);
+               if(learned < 41)
+                  skill_increase_check(ch, SKILL_NATURES_LORE, learned, SKILL_INCREASE_MEDIUM);
             }
             if(world[world[ch->in_room].dir_option[cmd]->to_room].sector_type == SECT_DESERT) {
                mvtoroom = movement_loss[world[world[ch->in_room].dir_option[cmd]->to_room].sector_type] / 2;
@@ -387,7 +393,8 @@ int do_simple_move(CHAR_DATA *ch, int cmd, int following)
          if(learned > 20) {
             if(world[ch->in_room].sector_type == SECT_BEACH) {
                mvinroom = movement_loss[world[ch->in_room].sector_type] / 2;
-               skill_increase_check(ch, SKILL_NATURES_LORE, learned, SKILL_INCREASE_MEDIUM);
+               if(learned < 31)
+                  skill_increase_check(ch, SKILL_NATURES_LORE, learned, SKILL_INCREASE_MEDIUM);
             }
             if(world[world[ch->in_room].dir_option[cmd]->to_room].sector_type == SECT_BEACH) {
                mvtoroom = movement_loss[world[world[ch->in_room].dir_option[cmd]->to_room].sector_type] / 2;
@@ -396,7 +403,8 @@ int do_simple_move(CHAR_DATA *ch, int cmd, int following)
          if(learned > 10) {
             if(world[ch->in_room].sector_type == SECT_FOREST) {
                mvinroom = movement_loss[world[ch->in_room].sector_type] / 2;
-               skill_increase_check(ch, SKILL_NATURES_LORE, learned, SKILL_INCREASE_MEDIUM);
+               if(learned < 21)
+                  skill_increase_check(ch, SKILL_NATURES_LORE, learned, SKILL_INCREASE_MEDIUM);
             }
             if(world[world[ch->in_room].dir_option[cmd]->to_room].sector_type == SECT_FIELD) {
                mvtoroom = movement_loss[world[world[ch->in_room].dir_option[cmd]->to_room].sector_type] / 2;
@@ -405,7 +413,8 @@ int do_simple_move(CHAR_DATA *ch, int cmd, int following)
          if(learned > 0) {
             if(world[ch->in_room].sector_type == SECT_FIELD) {
                mvinroom = movement_loss[world[ch->in_room].sector_type] / 2;
-               skill_increase_check(ch, SKILL_NATURES_LORE, learned, SKILL_INCREASE_MEDIUM);
+               if(learned < 11)
+                  skill_increase_check(ch, SKILL_NATURES_LORE, learned, SKILL_INCREASE_MEDIUM);
             }
             if(world[world[ch->in_room].dir_option[cmd]->to_room].sector_type == SECT_FOREST) {
                mvtoroom = movement_loss[world[world[ch->in_room].dir_option[cmd]->to_room].sector_type] / 2;
