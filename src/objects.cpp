@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.50 2005/04/29 19:32:25 urizen Exp $
+| $Id: objects.cpp,v 1.51 2005/04/29 20:28:20 urizen Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -1287,6 +1287,7 @@ void perform_wear(struct char_data *ch, struct obj_data *obj_object,
 
 int class_restricted(struct char_data *ch, struct obj_data *obj)
 {
+if (IS_NPC(ch)) return FALSE;
 if (IS_OBJ_STAT(obj, ITEM_ANY_CLASS))
     return FALSE;
 
