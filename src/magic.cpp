@@ -3168,6 +3168,11 @@ int spell_eagle_eye(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
   int original_loc;
   assert(ch && victim);
 
+  if(!OUTSIDE(ch)) {
+     send_to_char("Your eagle cannot find its way outside!\n\r", ch);
+     return eFAILURE;
+  }
+
   if(!OUTSIDE(victim) ||
      (GET_LEVEL(victim) >= IMMORTAL && GET_LEVEL(ch) < IMMORTAL))
   {
