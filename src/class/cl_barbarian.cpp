@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_barbarian.cpp,v 1.43 2005/04/29 21:06:56 urizen Exp $
+| $Id: cl_barbarian.cpp,v 1.44 2005/04/29 21:27:53 urizen Exp $
 | cl_barbarian.C
 | Description:  Commands for the barbarian class.
 */
@@ -671,15 +671,19 @@ int do_knockback(struct char_data *ch, char *argument, int cmd)
     WAIT_STATE(ch, PULSE_VIOLENCE);
     return eFAILURE;
   } else if(CAN_GO(victim, dir) &&
-       !IS_SET(world[EXIT(victim, exit)->to_room].room_flags, IMP_ONLY) &&
-       !IS_SET(world[EXIT(victim, exit)->to_room].room_flags, NO_TRACK)){
+       !IS_SET(world[EXIT(victim, dir)->to_room].room_flags, IMP_ONLY) &&
+       !IS_SET(world[EXIT(victim, dir)->to_room].room_flags, NO_TRACK)){
 //need to do more checks on if the victim can actually be knocked into 
 //the room?
+    char temp[256],buf[MAX_STRING_LENGTH];
+    sprintf(temp, "%s", GET_SHORT(victim));
     retval = damage(ch, victim, dam, TYPE_HIT, SKILL_KNOCKBACK, 0);
     if(SOMEONE_DIED(retval)) {
-       act("You smash $N apart!", ch, 0, victim, TO_CHAR, 0);
-       act("$n smashes you to pieces!", ch, 0, victim, TO_VICT, 0);
-       act("$n smashes $N to pieces!", ch, 0, victim, TO_ROOM, NOTVICT);
+       sprintf(buf, "You smash %s apart!",temp);
+       act(buf, ch, 0, 0, TO_CHAR, 0);
+//       act("$n smashes you to pieces!", ch, 0, victim, TO_VICT, 0);
+       sprintf(buf, "$n smashes %s to pieces!",temp);
+       act(buf, ch, 0, 0, TO_ROOM, 0);
     } else {
        sprintf(buf, "Your smash sends %s reeling %s.", GET_NAME(victim), dirs[dir]);
        act(buf, ch, 0, victim, TO_CHAR, 0);
