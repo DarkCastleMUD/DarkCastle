@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.257 2005/04/21 09:16:50 shane Exp $ */
+/* $Id: fight.cpp,v 1.258 2005/04/29 16:14:53 urizen Exp $ */
 
 extern "C"
 {
@@ -1044,12 +1044,6 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
   //  chance += dex_app[GET_DEX(ch)].tohit;
     chance += ( GET_ARMOR(vict) / 10 );  // (positive ac hurts you, negative helps)
     chance += weapon_skill_hit_bonus;
-
-    if(IS_SET(vict->combat, COMBAT_STUNNED) ||
-       IS_SET(vict->combat, COMBAT_STUNNED2))// ||
-	chance += 20;
-       if (IS_SET(vict->combat, COMBAT_SHOCKED))
-      chance += 15;
 
     if(IS_SET(vict->combat, COMBAT_BASH1) ||
        IS_SET(vict->combat, COMBAT_BASH2))
