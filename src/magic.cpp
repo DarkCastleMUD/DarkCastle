@@ -8624,8 +8624,7 @@ int cast_bee_swarm(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *vi
    int retval;
    CHAR_DATA *tmp_victim, *temp;
 
-//   dam = dice(6+skill/2, 5);
-   dam = 150;
+   dam = 175;
 
    act("$n Calls upon the insect world!\n\r", ch, 0, 0, TO_ROOM, INVIS_NULL);
 
@@ -8653,7 +8652,7 @@ int cast_creeping_death(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DAT
    int bingo = 0, poison = 0;
 
    set_cantquit(ch, victim);
-   dam = 250;
+   dam = 375;
    
    if (!OUTSIDE(ch)) {
       send_to_char("Your spell is more draining because you are indoors!\n\r", ch);
