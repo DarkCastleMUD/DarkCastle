@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.49 2005/04/28 18:39:56 shane Exp $
+| $Id: objects.cpp,v 1.50 2005/04/29 19:32:25 urizen Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -1407,7 +1407,7 @@ void wear(struct char_data *ch, struct obj_data *obj_object, int keyword)
   char buffer[MAX_STRING_LENGTH];
   int do_say(struct char_data *ch, char *argument, int cmd);
 
-  if (!IS_NPC(ch) || !(mob_index[ch->mobdata->nr].virt == 8)) {
+  if (!IS_NPC(ch)) {
     if(GET_LEVEL(ch) < obj_object->obj_flags.eq_level) {
       sprintf(buffer, "You must be level %d to use this object.\n\r",
         obj_object->obj_flags.eq_level);
@@ -1415,14 +1415,13 @@ void wear(struct char_data *ch, struct obj_data *obj_object, int keyword)
       return;
     }
   } else {
-    if (!IS_SET(obj_object->obj_flags.size, SIZE_CHARMIE_OK)) {
+  if (mob_index[ch->mobdata->nr].virt != 8)
       if(GET_LEVEL(ch) < obj_object->obj_flags.eq_level) {
         sprintf(buffer, "You must be level %d to use this object.\n\r",
           obj_object->obj_flags.eq_level);
         send_to_char(buffer, ch);
         return;
       }
-    }
   }
   obj = obj_object;
 
@@ -1453,30 +1452,8 @@ void wear(struct char_data *ch, struct obj_data *obj_object, int keyword)
   if(IS_FAMILIAR(ch)) {
     send_to_char("Familiar's cannot wear eq!\n\r", ch);
     return;
-  }        
-  if(!IS_SET(obj->obj_flags.size, SIZE_CHARMIE_OK) &&
-     IS_AFFECTED(ch, AFF_CHARM) ) 
-  {
-    do_say(ch, "It does not fit Master.", 0);
-    return;
-  }
-  // if they are charmed, and race > reptile (non player races)
-  // then they can only wear eq on ear, neck, or wrist
-  if( IS_AFFECTED(ch, AFF_CHARM) && keyword != 1 && keyword != 10 && keyword != 15 
-&& (!IS_NPC(ch) || mob_index[ch->mobdata->nr].virt != 8)) {
-    do_emote(ch, "does not seem to know where to wear it...",9);
-    return;
-  }
-
-  if (IS_NPC(ch) && mob_index[ch->mobdata->nr].virt == 8)
-  {  // Golems can't wear all kinds of equipment. Poor sods.
-     if (keyword != 2 && keyword != 3 && keyword != 4 && keyword != 7 && keyword != 9)
-     {
-        do_say(ch, "Eerrrmm..?",0);
-	return;
-     }
-  }
-  switch(keyword) {
+  } 
+  switch (keyword) {
   case 0: {
     if(CAN_WEAR(obj_object,ITEM_WEAR_FINGER)) {
       if((ch->equipment[WEAR_FINGER_L])
