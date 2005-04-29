@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_barbarian.cpp,v 1.42 2005/04/28 20:35:11 shane Exp $
+| $Id: cl_barbarian.cpp,v 1.43 2005/04/29 21:06:56 urizen Exp $
 | cl_barbarian.C
 | Description:  Commands for the barbarian class.
 */
@@ -655,7 +655,7 @@ int do_knockback(struct char_data *ch, char *argument, int cmd)
 
   if(!dir)
     dir = number(0,5);
-
+  dampercent = 0;
   if(ch->height > 102) dampercent += 15;
   else if(ch->height > 42) dampercent += 7;
   if(victim->height < 42) dampercent += 7;
