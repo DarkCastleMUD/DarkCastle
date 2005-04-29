@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.85 2005/04/28 21:14:34 shane Exp $ */
+/* $Id: handler.cpp,v 1.86 2005/04/29 20:27:36 urizen Exp $ */
     
 extern "C"
 {
@@ -1636,15 +1636,6 @@ int equip_char(CHAR_DATA *ch, struct obj_data *obj, int pos, int flag)
 	} else {
 	    log("ch->in_room = NOWHERE when equipping char.", 0, LOG_BUG);
 	}
-    }
-
-    /* zap charmie wearing !charmie eq */
-    if (!IS_SET(obj->obj_flags.size, SIZE_CHARMIE_OK) && IS_AFFECTED(ch, AFF_CHARM)) {
-       act("$n says 'This doesn't seem to fit so well.'", ch, 0, 0, TO_ROOM, INVIS_NULL);
-       act("$n stops using $p.", ch, obj, 0, TO_ROOM, INVIS_NULL);
-       act("You find your $p to be too uncomfortable to wear.", ch, obj, 0, TO_CHAR, 0);
-       obj_to_char(obj, ch);
-       return 1;
     }
 
     ch->equipment[pos] = obj;
