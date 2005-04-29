@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.258 2005/04/29 16:14:53 urizen Exp $ */
+/* $Id: fight.cpp,v 1.259 2005/04/29 21:44:02 urizen Exp $ */
 
 extern "C"
 {
@@ -1445,7 +1445,7 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
         return eSUCCESS;
        }
        REMOVE_BIT(victim->combat, COMBAT_REPELANCE);
-    }
+  //  }
   }
   if (has_skill(victim, SKILL_MAGIC_RESIST))
     skill_increase_check(victim, SKILL_MAGIC_RESIST, has_skill(victim,SKILL_MAGIC_RESIST), SKILL_INCREASE_HARD);
@@ -1570,7 +1570,7 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
 //        act("$n resists your assault and sustains reduced damage.", victim,0,ch, TO_VICT,0);
 //        act("You resist $N's assault and sustain reduced damage.", victim, 0, ch, TO_CHAR, 0);
    }
-
+  
   if (v) { // spellcraft damage bonus
 	int o = 0;
      switch (attacktype)
@@ -1584,6 +1584,7 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
 	default: break;
      }
      if (v > o && has_skill(ch, attacktype) > o) dam += v;
+  }
   }
   // Can't hurt god, but he likes to see the messages. 
   if (GET_LEVEL(victim) >= IMMORTAL && !IS_NPC(victim))
