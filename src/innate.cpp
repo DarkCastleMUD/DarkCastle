@@ -126,7 +126,7 @@ int innate_regeneration(CHAR_DATA *ch, char *arg, int cmd)
 {
    struct affected_type af;
    af.type = SKILL_INNATE_REGENERATION;
-   af.duration = 4;
+   af.duration = 6;
    af.modifier = 0;
    af.location = 0;
    af.bitvector = AFF_REGENERATION;
@@ -139,7 +139,7 @@ int innate_powerwield(CHAR_DATA *ch, char *arg, int cmd)
 {
    struct affected_type af;
    af.type = SKILL_INNATE_POWERWIELD;
-   af.duration = 2;
+   af.duration = 3;
    af.modifier = 0;
    af.location = 0;
    af.bitvector = AFF_POWERWIELD;
@@ -161,7 +161,7 @@ int innate_focus(CHAR_DATA *ch, char *arg, int cmd)
 
    struct affected_type af;
    af.type = SKILL_INNATE_FOCUS;
-   af.duration = 2;
+   af.duration = 3;
    af.modifier = 0;
    af.location = APPLY_NONE;
    af.bitvector = AFF_FOCUS;
