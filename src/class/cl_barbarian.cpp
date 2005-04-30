@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_barbarian.cpp,v 1.45 2005/04/29 21:43:22 shane Exp $
+| $Id: cl_barbarian.cpp,v 1.46 2005/04/30 09:48:20 shane Exp $
 | cl_barbarian.C
 | Description:  Commands for the barbarian class.
 */
@@ -589,7 +589,7 @@ int do_knockback(struct char_data *ch, char *argument, int cmd)
   struct char_data *victim;
   char buf[MAX_STRING_LENGTH], where[MAX_STRING_LENGTH], who[MAX_STRING_LENGTH];
   int dir = 0;
-  int retval, exit, dam, dampercent, learned;
+  int retval, dam, dampercent, learned;
   extern char * dirs[];
 
   if(GET_HIT(ch) == 1) {
@@ -675,21 +675,19 @@ int do_knockback(struct char_data *ch, char *argument, int cmd)
        !IS_SET(world[EXIT(victim, dir)->to_room].room_flags, NO_TRACK)){
 //need to do more checks on if the victim can actually be knocked into 
 //the room?
-    char temp[256],buf[MAX_STRING_LENGTH];
-    sprintf(temp, "%s", GET_SHORT(victim));
     retval = damage(ch, victim, dam, TYPE_HIT, SKILL_KNOCKBACK, 0);
     if(SOMEONE_DIED(retval)) {
-       sprintf(buf, "You smash %s apart!",temp);
+       sprintf(buf, "You smash %s apart!", GET_SHORT(victim));
        act(buf, ch, 0, 0, TO_CHAR, 0);
 //       act("$n smashes you to pieces!", ch, 0, victim, TO_VICT, 0);
-       sprintf(buf, "$n smashes %s to pieces!",temp);
+       sprintf(buf, "$n smashes %s to pieces!", GET_SHORT(victim));
        act(buf, ch, 0, 0, TO_ROOM, 0);
     } else {
-       sprintf(buf, "Your smash sends %s reeling %s.", GET_NAME(victim), dirs[dir]);
+       sprintf(buf, "Your smash sends %s reeling %s.", GET_SHORT(victim), dirs[dir]);
        act(buf, ch, 0, victim, TO_CHAR, 0);
        sprintf(buf, "%s smashes into you, sending you reeling %s.", GET_NAME(ch), dirs[dir]);
        act(buf, ch, 0, victim, TO_VICT, 0);
-       sprintf(buf, "%s smashes into %s and sends $S reeling to the %s.", GET_NAME(ch), GET_NAME(victim), dirs[dir]);
+       sprintf(buf, "%s smashes into %s and sends $S reeling to the %s.", GET_NAME(ch), GET_SHORT(victim), dirs[dir]);
        act(buf, ch, 0, victim, TO_ROOM, NOTVICT);
        if(victim->fighting) {
           if(IS_NPC(victim)) {
