@@ -1514,17 +1514,27 @@ int spell_remove_blind(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
 
   if(number(1, 100) < ( 80 + skill/6 ) )
   {
+    if(!affected_by_spell(victim, SPELL_BLINDNESS) && !IS_AFFECTED(victim, AFF_BLIND)) {
+       if(victim == ch) send_to_char("Seems you weren't blind after all.\n\r", ch);
+       else act("Seems $N wasn't blind after all.", ch, 0, victim, TO_CHAR, 0);
+    }
     if (affected_by_spell(victim, SPELL_BLINDNESS)) 
     {
       affect_from_char(victim, SPELL_BLINDNESS);
       send_to_char("Your vision returns!\n\r", victim);
+      if(victim != ch)
+         act("$N can see again!", ch, 0, victim, TO_CHAR, 0);         
     }
     if (IS_AFFECTED(victim, AFF_BLIND)) {
       REMOVE_BIT(victim->affected_by, AFF_BLIND);
       send_to_char("Your vision returns!\n\r", victim);
+      if(victim != ch)
+         act("$N can see again!", ch, 0, victim, TO_CHAR, 0);
     }
   }
-  else send_to_char("Your spell fails to return the victim's vision!\r\n", ch);
+  else (ch==victim) ? send_to_char("Your spell fails to return your 
+vision!\r\n", ch) : act("Your spell fails to return $N's vision!", ch, 
+0, victim, TO_CHAR, 0);
 
   return eSUCCESS;
 }
