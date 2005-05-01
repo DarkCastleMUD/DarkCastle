@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: shop.cpp,v 1.15 2005/04/18 11:13:26 shane Exp $ */
+/* $Id: shop.cpp,v 1.16 2005/05/01 11:54:01 shane Exp $ */
 
 extern "C"
 {
@@ -407,18 +407,18 @@ void shopping_value( char *arg, CHAR_DATA *ch,
         do_tell( keeper, buf, 0 );
         return;
     }
-///////////////////////
+
     if(mob_index[keeper->mobdata->nr].virt == 3003) { //if the weaponsmith in town
        act("You hold up $p for the Weaponsmith to examine.", ch, obj, 0, TO_CHAR, 0);
        act("$n holds up $p for the Weaponsmith to examine..", ch, obj, 0, TO_ROOM, 0);
        do_emote(keeper, "looks carefully at the item.", 9);
        if(GET_ITEM_TYPE(obj) == ITEM_WEAPON) {
           if(obj->obj_flags.eq_level < 20) {
-             sprintf(buf, "Well, %s is able to be used by ", obj->name);
+             sprintf(buf, "Well, %s is able to be used by ", obj->short_description);
              sprintbit(obj->obj_flags.size, size_bits, buf2);
              strcat(buf, buf2);
              do_say(keeper, buf, 9);
-             sprintf(buf, "and it is ");
+             sprintf(buf, "and it can be wielded by these classes: ");
              sprintbit(obj->obj_flags.extra_flags, extra_bits, buf2);
              strcat(buf, buf2);
              do_say(keeper, buf, 9); 
@@ -447,11 +447,11 @@ void shopping_value( char *arg, CHAR_DATA *ch,
        do_emote(keeper, "looks carefully at the item.", 9);
        if(GET_ITEM_TYPE(obj) == ITEM_ARMOR) {
           if(obj->obj_flags.eq_level < 20) {
-             sprintf(buf, "Ah yes, %s can be worn by ", obj->name);
+             sprintf(buf, "Ah yes, %s can be worn by ", obj->short_description);
              sprintbit(obj->obj_flags.size, size_bits, buf2);
              strcat(buf, buf2);
              do_say(keeper, buf, 9);
-             sprintf(buf, "and it is ");
+             sprintf(buf, "and it can be worn by these classes: ");
              sprintbit(obj->obj_flags.extra_flags, extra_bits, buf2);
              strcat(buf, buf2);
              do_say(keeper, buf, 9); 
@@ -476,7 +476,7 @@ void shopping_value( char *arg, CHAR_DATA *ch,
        do_emote(keeper, "looks carefully at the item.", 9);
        if(GET_ITEM_TYPE(obj) == ITEM_SCROLL || GET_ITEM_TYPE(obj) == ITEM_WAND || GET_ITEM_TYPE(obj) == ITEM_POTION || GET_ITEM_TYPE(obj) == ITEM_STAFF) {
           if(obj->obj_flags.value[0] < 20) {
-             sprintf(buf, "Excellent, %s has been imbued with energies of the %dth level.", obj->name, obj->obj_flags.value[0]);
+             sprintf(buf, "Excellent, %s has been imbued with energies of the %dth level.", obj->short_description, obj->obj_flags.value[0]);
              do_say(keeper, buf, 9);
              if(GET_ITEM_TYPE(obj) == ITEM_WAND || GET_ITEM_TYPE(obj) == ITEM_STAFF) {
                 if(obj->obj_flags.value[3] >= 1) {
@@ -510,7 +510,7 @@ void shopping_value( char *arg, CHAR_DATA *ch,
        else
           do_say(keeper, "I only know the properties of scrolls, potions, staves, and wands.", 9);
     }
-///////////////////////
+
     if ( !trade_with( obj, shop_nr ) || obj->obj_flags.cost < 1 )
     {
         sprintf( buf, shop_index[shop_nr].do_not_buy, GET_NAME(ch) );
