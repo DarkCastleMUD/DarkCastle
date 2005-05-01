@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_barbarian.cpp,v 1.46 2005/04/30 09:48:20 shane Exp $
+| $Id: cl_barbarian.cpp,v 1.47 2005/05/01 14:02:44 urizen Exp $
 | cl_barbarian.C
 | Description:  Commands for the barbarian class.
 */
@@ -675,13 +675,17 @@ int do_knockback(struct char_data *ch, char *argument, int cmd)
        !IS_SET(world[EXIT(victim, dir)->to_room].room_flags, NO_TRACK)){
 //need to do more checks on if the victim can actually be knocked into 
 //the room?
+    char temp[256];  // what did my innocent bugfix ever do to you?
+    sprintf(temp,"%s",GET_SHORT(victim));
     retval = damage(ch, victim, dam, TYPE_HIT, SKILL_KNOCKBACK, 0);
     if(SOMEONE_DIED(retval)) {
-       sprintf(buf, "You smash %s apart!", GET_SHORT(victim));
+      sprintf(buf, "You smash %s apart!",temp);
        act(buf, ch, 0, 0, TO_CHAR, 0);
 //       act("$n smashes you to pieces!", ch, 0, victim, TO_VICT, 0);
-       sprintf(buf, "$n smashes %s to pieces!", GET_SHORT(victim));
+       sprintf(buf, "$n smashes %s to pieces!", temp);
        act(buf, ch, 0, 0, TO_ROOM, 0);
+       return retval; // this too, just in case it gets called from  a
+		      // proc later on, it returns correct stuff
     } else {
        sprintf(buf, "Your smash sends %s reeling %s.", GET_SHORT(victim), dirs[dir]);
        act(buf, ch, 0, victim, TO_CHAR, 0);
