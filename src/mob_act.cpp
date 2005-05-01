@@ -19,7 +19,7 @@
 /* 12/06/2003   Onager   Modified mobile_activity() to prevent charmie    */
 /*                       scavenging                                       */
 /**************************************************************************/
-/* $Id: mob_act.cpp,v 1.28 2005/04/09 21:15:27 urizen Exp $ */
+/* $Id: mob_act.cpp,v 1.29 2005/05/01 14:02:09 urizen Exp $ */
 
 extern "C"
 {
@@ -309,6 +309,7 @@ void mobile_activity(void)
     }  //  end FIRST hatred IF statement 
   
     /* Aggress */
+    if (!ch->fighting) // don't aggro more than one person
     if(IS_SET(ch->mobdata->actflags, ACT_AGGRESSIVE) &&
       !IS_SET(world[ch->in_room].room_flags, SAFE)) 
     {
@@ -366,6 +367,7 @@ void mobile_activity(void)
         continue;
     } // if aggressive
   
+    if (!ch->fighting)
     if(ch->mobdata->fears)
       if(get_char_room_vis(ch, ch->mobdata->fears)) 
       {
@@ -376,6 +378,7 @@ void mobile_activity(void)
         continue;
       }
     
+    if (!ch->fighting)
     if(IS_SET(ch->mobdata->actflags,
       ACT_RACIST|ACT_FRIENDLY|ACT_AGGR_EVIL|ACT_AGGR_NEUT|ACT_AGGR_GOOD))
       for(tmp_ch = world[ch->in_room].people; tmp_ch; tmp_ch = pch) 
