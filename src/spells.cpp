@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.127 2005/04/27 18:10:09 shane Exp $ */
+/* $Id: spells.cpp,v 1.128 2005/05/02 19:35:37 shane Exp $ */
 
 extern "C"
 {
@@ -432,7 +432,7 @@ struct skill_stuff skill_info[] =
 /* 29 */             { "retreat", SKILL_INCREASE_HARD },
 /* 30 */                { "rage", SKILL_INCREASE_MEDIUM },
 /* 31 */           { "battlecry", SKILL_INCREASE_EASY },
-/* 32 */             { "archery", SKILL_INCREASE_MEDIUM },
+/* 32 */             { "archery", SKILL_INCREASE_HARD },
 /* 33 */             { "riposte", SKILL_INCREASE_HARD },
 /* 34 */           { "lay hands", SKILL_INCREASE_EASY },
 /* 35 */        { "insane chant", 0 },
@@ -481,6 +481,10 @@ struct skill_stuff skill_info[] =
 /* 78 */           { "blackjack", SKILL_INCREASE_HARD},
 /* 79 */            { "appraise", SKILL_INCREASE_MEDIUM},
 /* 80 */        { "natures lore", SKILL_INCREASE_MEDIUM},
+/* 81 */         { "fire arrows", SKILL_INCREASE_HARD},
+/* 82 */          { "ice arrows", SKILL_INCREASE_MEDIUM},
+/* 83 */         { "wind arrows", SKILL_INCREASE_EASY},
+/* 84 */        { "stone arrows", SKILL_INCREASE_HARD),
 /*    */                  { "\n", 0 },
 };
 
@@ -568,6 +572,10 @@ char *skills[]=
   "blackjack",
   "appraise",
   "natures lore",
+  "fire arrows",
+  "ice arrows",
+  "wind arrows",
+  "stone arrows",
   "\n"
 };
 
