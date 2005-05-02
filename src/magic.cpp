@@ -4535,8 +4535,8 @@ int spell_dispel_magic(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
            if (affected_by_spell(victim, SPELL_ACID_SHIELD))
            {
               affect_from_char(victim, SPELL_ACID_SHIELD);
-              act("Your shield of $2acid$R dissolves to nothing!", ch, 0,victim, TO_VICT, 0);
-              act("The $2acid$R swirling about $n's body dissolves to nothing!", victim, 0, 0, TO_ROOM, 0);
+              act("Your shield of $B$2acid$R dissolves to nothing!", ch, 0,victim, TO_VICT, 0);
+              act("The $B$2acid$R swirling about $n's body dissolves to nothing!", victim, 0, 0, TO_ROOM, 0);
               done = TRUE;
            }
            break;
@@ -9898,7 +9898,9 @@ int cast_iron_roots(byte level, CHAR_DATA *ch, char *arg, int type,
   return eFAILURE;
 }
 
-// TODO - make this use and increase in skill
+
+/* ACID SHIELD */
+
 int spell_acid_shield(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
   struct affected_type af;
@@ -9906,8 +9908,8 @@ int spell_acid_shield(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 
   if (!affected_by_spell(victim, SPELL_ACID_SHIELD))
   {
-    act("$n is surrounded by a gaseous shield of $2acid$R.", victim, 0, 0, TO_ROOM, INVIS_NULL);
-    act("You are surrounded by a gaseous shield of $2acid$R.", victim, 0, 0, TO_CHAR, 0);
+    act("$n is surrounded by a gaseous shield of $B$2acid$R.", victim, 0, 0, TO_ROOM, INVIS_NULL);
+    act("You are surrounded by a gaseous shield of $B$2acid$R.", victim, 0, 0, TO_CHAR, 0);
 
     af.type      = SPELL_ACID_SHIELD;
     af.duration  = 2 + (skill / 23);
