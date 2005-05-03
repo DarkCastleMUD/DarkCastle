@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.53 2005/04/21 20:32:56 shane Exp $
+| $Id: inventory.cpp,v 1.54 2005/05/03 22:37:52 shane Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -877,7 +877,7 @@ void do_putalldot(struct char_data *ch, char *name, char *target, int cmd)
 {
   struct obj_data *tmp_object;
   struct obj_data *next_object;
-  char buf[200], namebuf[200];
+  char buf[200];
   bool found = FALSE;
 
  /* If "put all.object bag", get all carried items
@@ -887,7 +887,7 @@ void do_putalldot(struct char_data *ch, char *name, char *target, int cmd)
   for(tmp_object = ch->carrying; tmp_object; tmp_object = next_object) {
      next_object = tmp_object->next_content;
      if(!name) {
-       sprintf(buf, "%s %s", one_argument(tmp_object->name, namebuf), target);
+       sprintf(buf, "%s %s", fname(tmp_object->name), target);
        buf[99] = 0;
        found = TRUE;
        do_put(ch, buf, cmd);
@@ -953,8 +953,7 @@ int do_put(struct char_data *ch, char *argument, int cmd)
       if(obj_object) {
         if(IS_SET(obj_object->obj_flags.extra_flags, ITEM_NODROP)) {
           if(GET_LEVEL(ch) < IMMORTAL) {
-            send_to_char("You are unable to! That item must be CURSED!\n\r",
-                         ch);
+            send_to_char("You are unable to! That item must be CURSED!\n\r", ch);
             return eFAILURE;
           }
           else
@@ -964,8 +963,7 @@ int do_put(struct char_data *ch, char *argument, int cmd)
 	  send_to_char("The protective enchantment this item holds cannot be held within this container.\r\n",ch);
 	  return eFAILURE;
 	}
-	if(GET_ITEM_TYPE(obj_object) == ITEM_CONTAINER)
-	{
+	if(GET_ITEM_TYPE(obj_object) == ITEM_CONTAINER) {
 	  send_to_char("You would ruin it!\n\r", ch);
 	  return eFAILURE;
 	}
@@ -973,32 +971,28 @@ int do_put(struct char_data *ch, char *argument, int cmd)
         bits = generic_find(arg2, FIND_OBJ_INV | FIND_OBJ_ROOM,
                             ch, &tmp_char, &sub_object);
         if(sub_object) {
-          if(GET_ITEM_TYPE(sub_object) == ITEM_CONTAINER ||
-		GET_ITEM_TYPE(sub_object) == ITEM_ALTAR) {
-	    if (GET_ITEM_TYPE(sub_object) == ITEM_ALTAR &&
-	 	GET_ITEM_TYPE(obj_object) != ITEM_TOTEM) {
-		send_to_char("You cannot put that in an altar.\r\n",ch);
-		return eFAILURE;
-	}
+          if(GET_ITEM_TYPE(sub_object) == ITEM_CONTAINER || GET_ITEM_TYPE(sub_object) == ITEM_ALTAR) {
+	    if (GET_ITEM_TYPE(sub_object) == ITEM_ALTAR && GET_ITEM_TYPE(obj_object) != ITEM_TOTEM) {
+               send_to_char("You cannot put that in an altar.\r\n",ch);
+               return eFAILURE;
+            }
 	    if(!IS_SET(sub_object->obj_flags.value[1], CONT_CLOSED)) {
 	      if(obj_object == sub_object) {
-		send_to_char(
-			"You attempt to fold it into itself, but fail.\n\r",
-			ch);
+		send_to_char("You attempt to fold it into itself, but fail.\n\r", ch);
 		return eFAILURE;
 	      }
-
               if(IS_SET(obj_object->obj_flags.extra_flags, ITEM_SPECIAL) &&
-              !IS_SET(sub_object->obj_flags.extra_flags, ITEM_SPECIAL))
+               !IS_SET(sub_object->obj_flags.extra_flags, ITEM_SPECIAL))
               {
                 send_to_char("Are you crazy?!  Someone could steal it!\r\n", ch);
                 return eFAILURE;
               }
-
 	      if (((sub_object->obj_flags.weight) + 
-		  (obj_object->obj_flags.weight)) <
-		  (sub_object->obj_flags.value[0]) &&
-	(obj_index[sub_object->item_number].virt != 536 || weight_in(sub_object) + obj_object->obj_flags.weight < 200)) {
+               (obj_object->obj_flags.weight)) <
+               (sub_object->obj_flags.value[0]) &&
+               (obj_index[sub_object->item_number].virt != 536 || 
+               weight_in(sub_object) + obj_object->obj_flags.weight < 200))
+              {
 		send_to_char("Ok.\n\r", ch);
 		if(bits == FIND_OBJ_INV) {
 		  obj_from_char(obj_object);
@@ -1019,31 +1013,27 @@ int do_put(struct char_data *ch, char *argument, int cmd)
 	    }
             else
 	      send_to_char("It seems to be closed.\n\r", ch);
-	    }
-            else {
-	      sprintf(buffer, "The %s is not a container.\n\r",
-		      fname(sub_object->name));
-	      send_to_char(buffer, ch);
-	    }
+          } else {
+	     sprintf(buffer, "The %s is not a container.\n\r", fname(sub_object->name));
+	     send_to_char(buffer, ch);
 	  }
-          else {
-            sprintf(buffer, "You dont have the %s.\n\r", arg2);
-            send_to_char(buffer, ch);
-          }
-	}
-        else {
-          sprintf(buffer, "You dont have the %s.\n\r", arg1);
-          send_to_char(buffer, ch);
+        } else {
+           sprintf(buffer, "You dont have the %s.\n\r", arg2);
+           send_to_char(buffer, ch);
         }
-      } /* if arg2 */
-      else {
-        sprintf(buffer, "Put %s in what?\n\r", arg1);
+      } else {
+        sprintf(buffer, "You dont have the %s.\n\r", arg1);
         send_to_char(buffer, ch);
       }
-    } /* if arg1 */
+    } /* if arg2 */
     else {
-      send_to_char("Put what in what?\n\r",ch);
+       sprintf(buffer, "Put %s in what?\n\r", arg1);
+       send_to_char(buffer, ch);
     }
+  } /* if arg1 */
+  else {
+     send_to_char("Put what in what?\n\r",ch);
+  }
   return eFAILURE;
 }
 
