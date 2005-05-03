@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: cl_ranger.cpp,v 1.47 2005/05/03 10:41:23 shane Exp $ | cl_ranger.C  *
+ * $Id: cl_ranger.cpp,v 1.48 2005/05/03 19:38:01 shane Exp $ | cl_ranger.C  *
  * Description: Ranger skills/spells                                          *
  *                                                                            *
  * Revision History                                                           *
@@ -958,11 +958,11 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
   unsigned cur_room, new_room;
   char direct[MAX_STRING_LENGTH], arrow[MAX_STRING_LENGTH], 
        target[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH], 
-       buf2[MAX_STRING_LENGTH], victname[MAX_STRING_LENGTH]; 
+       buf2[MAX_STRING_LENGTH], victname[MAX_STRING_LENGTH],
+       victhshr[MAX_STRING_LENGTH]; 
   bool enchantmentused = FALSE;
   extern char * dirs[];
   extern struct spell_info_type spell_info [ ];
-  sbyte        * tempbyte;
 
   void get(struct char_data *, struct obj_data *, struct obj_data *);
   int check_command_lag(CHAR_DATA *);
@@ -1218,10 +1218,11 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
      set_cantquit(ch, victim);
      sprintf(victname, "%s", GET_SHORT(victim));
      victroom = victim->in_room;
+     strcpy(victhshr, HSHR(victim));
 
      act("An arrow flies into the room with incredible speed!", victim, 0, 0, TO_ROOM, 0);
 
-     retval = damage(ch, victim, dam, TYPE_HIT, 0, 0);
+     retval = damage(ch, victim, dam, TYPE_PIERCE, SKILL_ARCHERY, 0);
 
      if(IS_SET(retval, eVICT_DIED))  {
         switch(number(1,2)) {
@@ -1234,7 +1235,7 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
            case 2:
               sprintf(buf, "Your %s drives through the eye of %s ending their life.\r\n", found->short_description, victname);
               send_to_char(buf, ch);
-              sprintf(buf, "%s from the %s lands with a solid 'thunk.'\r\n$n falls to the ground, an arrow sticking from $s left eye.", found->short_description, dirs[rev_dir[dir]]);
+              sprintf(buf, "%s from the %s lands with a solid 'thunk.'\r\n%s falls to the ground, an arrow sticking from %s left eye.", found->short_description, dirs[rev_dir[dir]], victname, victhshr);
               send_to_room(buf, victroom);
               break;
         }
@@ -1246,12 +1247,14 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
         sprintf(buf, "%s from the %s hits $n!", found->short_description, dirs[rev_dir[dir]]);
         act(buf, victim, 0, 0, TO_ROOM, 0);
         GET_POS(victim) = POSITION_STANDING;
-     }
 
-    if(IS_NPC(victim)) 
-      retval = mob_arrow_response(ch, victim, dir);
-      if(SOMEONE_DIED(retval)) // mob died somehow while moving
-         return retval;
+        if(IS_NPC(victim)) 
+           retval = mob_arrow_response(ch, victim, dir);
+           if(SOMEONE_DIED(retval)) { // mob died somehow while moving
+              extract_obj(found);
+              return retval;
+           }
+     }
 
 //     retval = weapon_spells(ch, victim, );
 
@@ -1272,7 +1275,7 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
               if(number(1, 100) < has_skill(ch, SKILL_ICE_ARROW) / 4 ) {
                  act("You seem frozen in place!", ch, 0, victim, TO_VICT, 0);
                  act("$n seems frozen in place!", victim, 0, 0, TO_ROOM, 0);
-                 SET_BIT(victim->combat, COMBAT_STUNNED2);
+                 SET_BIT(victim->combat, COMBAT_SHOCKED);
               }
               retval = damage(ch, victim, dam, TYPE_COLD, SKILL_ICE_ARROW, 0);
               skill_increase_check(ch, SKILL_ICE_ARROW, has_skill(ch, SKILL_ICE_ARROW), spell_info[SKILL_ICE_ARROW].difficulty);
@@ -1305,19 +1308,16 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
      }
   }
 
-
-
   extract_obj(found);
 
   if(has_skill(ch, SKILL_ARCHERY) < 51 || enchantmentused)
      add_command_lag(ch, 1);
   else if(has_skill(ch, SKILL_ARCHERY) < 86)
-     if(++ch->shotsthisround > 2)
+     if(++ch->shotsthisround > 1)
         add_command_lag(ch, 1);
   else
-     if(++ch->shotsthisround > 3)
+     if(++ch->shotsthisround > 2)
         add_command_lag(ch, 1);
-
 
   return retval;
 }
