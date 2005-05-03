@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.81 2005/04/23 02:01:23 urizen Exp $ */
+/* $Id: nanny.cpp,v 1.82 2005/05/03 08:50:46 shane Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -2023,6 +2023,7 @@ void update_command_lag_and_poison()
           i->timer--;
         else i->timer = 0;
       }
+      i->shotsthisround = 0;
    }
 }
 

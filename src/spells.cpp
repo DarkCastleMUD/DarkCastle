@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.128 2005/05/02 19:35:37 shane Exp $ */
+/* $Id: spells.cpp,v 1.129 2005/05/03 08:50:46 shane Exp $ */
 
 extern "C"
 {
@@ -484,7 +484,7 @@ struct skill_stuff skill_info[] =
 /* 81 */         { "fire arrows", SKILL_INCREASE_HARD},
 /* 82 */          { "ice arrows", SKILL_INCREASE_MEDIUM},
 /* 83 */         { "wind arrows", SKILL_INCREASE_EASY},
-/* 84 */        { "stone arrows", SKILL_INCREASE_HARD),
+/* 84 */        { "stone arrows", SKILL_INCREASE_HARD},
 /*    */                  { "\n", 0 },
 };
 

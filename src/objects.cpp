@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.52 2005/05/01 20:24:26 shane Exp $
+| $Id: objects.cpp,v 1.53 2005/05/03 08:50:46 shane Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -630,7 +630,7 @@ int do_use(struct char_data *ch, char *argument, int cmd)
     if (bits) {
       if (bits == FIND_CHAR_ROOM) {
         act("$n points $p at you.", ch, stick, tmp_char, TO_VICT, INVIS_NULL);
-        act("$n points $p at $N.", ch, stick, tmp_char, TO_ROOM, NOT_VICT|INVIS_NULL);
+        act("$n points $p at $N.", ch, stick, tmp_char, TO_ROOM, NOTVICT|INVIS_NULL);
         act("You point $p at $N.",ch, stick, tmp_char, TO_CHAR, 0);
       } else {
         act("$n points $p at $P.", ch, stick, tmp_object, TO_ROOM, INVIS_NULL);

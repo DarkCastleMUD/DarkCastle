@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: cl_ranger.cpp,v 1.45 2005/04/09 21:15:31 urizen Exp $ | cl_ranger.C  *
+ * $Id: cl_ranger.cpp,v 1.46 2005/05/03 08:50:51 shane Exp $ | cl_ranger.C  *
  * Description: Ranger skills/spells                                          *
  *                                                                            *
  * Revision History                                                           *
@@ -695,16 +695,14 @@ int parse_arrow(struct char_data * ch, char * arrow)
   while(*arrow == ' ')
     arrow++;
 
-  if((arrow[0] == 'f') && (GET_LEVEL(ch) >= 25))
+  if((arrow[0] == 'f') && has_skill(ch, SKILL_FIRE_ARROW))
     return 1;
-  else if((arrow[0] == 'c') && (GET_LEVEL(ch) >= 25))
+  else if((arrow[0] == 'i') && has_skill(ch, SKILL_ICE_ARROW))
     return 2;
-  else if((arrow[0] == 'w') && (GET_LEVEL(ch) >= 15))
+  else if((arrow[0] == 'w') && has_skill(ch, SKILL_WIND_ARROW))
     return 3;
-  else if((arrow[0] == 'p') && (GET_LEVEL(ch) >= 35))
+  else if((arrow[0] == 's') && has_skill(ch, SKILL_STONE_ARROW))
     return 4;
-  else if((arrow[0] == 'e') && (GET_LEVEL(ch) >= 45))
-    return 5;
 
 return 0;
 }
@@ -954,13 +952,15 @@ int do_arrow_damage(struct char_data *ch, struct char_data *victim,
 int do_fire(struct char_data *ch, char *arg, int cmd)
 {
   struct char_data *victim;
-  int prob, dam, dir, artype, cost, retval;
+  int dam, dir, artype, cost, retval;
   struct obj_data *found;
   unsigned cur_room, new_room;
   char direct[MAX_STRING_LENGTH], arrow[MAX_STRING_LENGTH], 
        target[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH], 
-       buf2[MAX_STRING_LENGTH]; 
+       buf2[MAX_STRING_LENGTH], victname[MAX_STRING_LENGTH]; 
+  bool enchantmentused = FALSE;
   extern char * dirs[];
+  extern struct spell_info_type spell_info [ ];
   sbyte        * tempbyte;
 
   void get(struct char_data *, struct obj_data *, struct obj_data *);
@@ -996,12 +996,12 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
     return eFAILURE;
   }
 
-/*  if(check_command_lag(ch))
+  if(check_command_lag(ch))
   {
     send_to_char("Slow down there tiger, you can't fire them that fast!\r\n", ch);
     return eFAILURE;
   }
-*/
+
 
 /*  Command syntax is: fire <dir> [arrowtype] [target] 
     if there is !arrowtype, then choose standard arrow
@@ -1067,11 +1067,10 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
 
     switch(artype)
     {
-      case 1:  cost = 20; break;
+      case 1:  cost = 30; break;
       case 2:  cost = 20; break;
       case 3:  cost = 10; break;
-      case 4:  cost = 30; break;
-      case 5:  cost = 40; break;
+      case 4:  cost = 40; break;
     }
   }
   else 
@@ -1189,36 +1188,6 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
       return eFAILURE;
   }
 
-/* figure out the damage, we'll do more on this later */
-
-  dam = dice(found->obj_flags.value[0], found->obj_flags.value[1]);
-  switch(artype)
-  {
-    case 1: dam += number(1, GET_LEVEL(ch)) + GET_LEVEL(ch); break;
-    case 2: dam += number(1, GET_LEVEL(ch)) + GET_LEVEL(ch); break;
-    case 3: dam += number(1, GET_LEVEL(ch)); break;
-    case 4: dam += number(10, (GET_LEVEL(ch) - 10)); break;
-    case 5: dam += number(50, GET_LEVEL(ch))+100; break;
-    default: break;
-  }
-
-  dam += ch->equipment[HOLD]->obj_flags.value[1];
-  dam += found->obj_flags.value[3];
-
-  if (IS_AFFECTED(victim, AFF_SANCTUARY))
-    dam /= 2;
-  if (affected_by_spell(victim, SPELL_RESIST_FIRE) && (artype == 1))
-    dam /= 2;
-  if (affected_by_spell(victim, SPELL_RESIST_COLD) && (artype == 2))
-    dam /= 2; 
-  
-/* put damage checks for mobs that are immune to fire/cold here */
-
-  if(IS_SET(race_info[(int)GET_RACE(ch)].immune, ISR_FIRE) && artype == 1)
-    dam = 0;
-  if(IS_SET(race_info[(int)GET_RACE(ch)].immune, ISR_COLD) && artype == 2)
-    dam = 0;
-
 /* go ahead and shoot */
 
   switch(number(1,2))
@@ -1231,29 +1200,97 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
             break;
   }
 
-
-  prob = 65;
-
   GET_MANA(ch) -= cost;
-
-  prob += ch->equipment[HOLD]->obj_flags.value[0];
-  prob += found->obj_flags.value[2];
-
-  prob += -10 - (GET_AC(victim)/10);
-
-  if(prob < 10) prob = 10;
-  if(prob > 100) prob = 100;
 
   if(!skill_success(ch,victim, SKILL_ARCHERY))
   {
-    retval = eSUCCESS;
-    do_arrow_miss(ch, victim, dir, found);
+     retval = eSUCCESS;
+     do_arrow_miss(ch, victim, dir, found);
   }
-  else 
-    retval = do_arrow_damage(ch, victim, dir, dam, artype, found);
+  else {
+     dam = dice(found->obj_flags.value[1], found->obj_flags.value[2]);
+     dam += dice(ch->equipment[HOLD]->obj_flags.value[1], ch->equipment[HOLD]->obj_flags.value[2]);
+     for(int i=0;found->num_affects;i++)
+        if(found->affected[i].location == APPLY_DAMROLL && found->affected[i].modifier != 0)
+           dam += found->affected[i].modifier;
 
-  add_command_lag(ch, 1);
+     set_cantquit(ch, victim);
+     sprintf(victname, "%s", GET_SHORT(victim));
+
+     retval = damage(ch, victim, dam, TYPE_HIT, 0, 0);
+
+     if(!SOMEONE_DIED(retval)) {
+//        retval = weapon_spells(ch, victim, weapon);
+     }
+
+     if(!SOMEONE_DIED(retval)) {
+        switch(artype)
+        {
+           case 1:
+              dam = 90;
+              act("The flames surrounding the arrow burns your wound!", ch, 0, victim, TO_VICT, 0);
+              act("The flames surrounding the arrow burns $N's wound!", ch, 0, victim, TO_ROOM, NOTVICT);
+              retval = damage(ch, victim, dam, TYPE_FIRE, SKILL_FIRE_ARROW, 0);
+              skill_increase_check(ch, SKILL_FIRE_ARROW, has_skill(ch, SKILL_FIRE_ARROW), spell_info[SKILL_FIRE_ARROW].difficulty);
+              enchantmentused = TRUE;
+              break;
+           case 2:
+              dam = 50;
+              act("The stray ice shards impale you!", ch, 0, victim, TO_VICT, 0);
+              act("The stray ice shards impale $N!", ch, 0, victim, TO_ROOM, NOTVICT);
+              if(number(1, 100) < has_skill(ch, SKILL_ICE_ARROW) / 4 ) {
+/*                 act("You seem frozen in place!")
+                 af.type      = SPELL_PARALYZE;
+                 af.location  = APPLY_NONE;
+                 af.modifier  = 0;
+//1 tick is too long
+                 af.duration  = 1;
+                 af.bitvector = AFF_PARALYSIS;
+                 affect_to_char(victim, &af);
+*/
+              }
+              retval = damage(ch, victim, dam, TYPE_COLD, SKILL_ICE_ARROW, 0);
+              skill_increase_check(ch, SKILL_ICE_ARROW, has_skill(ch, SKILL_ICE_ARROW), spell_info[SKILL_ICE_ARROW].difficulty);
+              enchantmentused = TRUE;
+              break;
+           case 3:
+              dam = 30;
+              act("The storm cloud enveloping the arrow shocks you!", ch, 0, victim, TO_VICT, 0);
+              act("The storm cloud enveloping the arrow shocks $N!", ch, 0, victim, TO_ROOM, NOTVICT);
+              retval = damage(ch, victim, dam, TYPE_ENERGY, SKILL_WIND_ARROW, 0);
+              skill_increase_check(ch, SKILL_WIND_ARROW, has_skill(ch, SKILL_WIND_ARROW), spell_info[SKILL_WIND_ARROW].difficulty);
+              enchantmentused = TRUE;
+              break;
+           case 4:
+              dam = 70;
+              act("The magical stones surrounding the arrow smack into you, hard.", ch, 0, victim, TO_VICT, 0);
+              act("The magical stones surrounding the arrow smack hard into $N.", ch, 0, victim, TO_ROOM, NOTVICT);
+              if(number(1, 100) < has_skill(ch, SKILL_STONE_ARROW) / 4) {
+                 act("The stones knock you flat on your ass!", ch, 0, victim, TO_VICT, 0);
+                 act("The stones knock $N flat on $S ass!", ch, 0, victim, TO_ROOM, NOTVICT);
+                 GET_POS(victim) = POSITION_SITTING;
+                 WAIT_STATE(victim, PULSE_VIOLENCE);
+              }
+              retval = damage(ch, victim, dam, TYPE_HIT, SKILL_STONE_ARROW, 0);
+              skill_increase_check(ch, SKILL_STONE_ARROW, has_skill(ch, SKILL_STONE_ARROW), spell_info[SKILL_STONE_ARROW].difficulty);
+              enchantmentused = TRUE;
+              break;
+           default: break;
+        }
+     }
+  }
+
   extract_obj(found);
+
+  if(has_skill(ch, SKILL_ARCHERY) < 51 || enchantmentused)
+     add_command_lag(ch, 1);
+  else if(has_skill(ch, SKILL_ARCHERY) < 86)
+     if(++ch->shotsthisround > 2)
+        add_command_lag(ch, 1);
+  else
+     if(++ch->shotsthisround > 3)
+        add_command_lag(ch, 1);
+
 
   return retval;
 }

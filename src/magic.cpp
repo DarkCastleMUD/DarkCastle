@@ -1532,9 +1532,7 @@ int spell_remove_blind(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
          act("$N can see again!", ch, 0, victim, TO_CHAR, 0);
     }
   }
-  else (ch==victim) ? send_to_char("Your spell fails to return your 
-vision!\r\n", ch) : act("Your spell fails to return $N's vision!", ch, 
-0, victim, TO_CHAR, 0);
+  else (ch==victim) ? send_to_char("Your spell fails to return your vision!\r\n", ch) : act("Your spell fails to return $N's vision!", ch, 0, victim, TO_CHAR, 0);
 
   return eSUCCESS;
 }

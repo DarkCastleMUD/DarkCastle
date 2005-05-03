@@ -1,7 +1,7 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.27 2005/04/13 17:32:33 urizen Exp $
+| $Id: character.h,v 1.28 2005/05/03 08:50:54 shane Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
@@ -363,6 +363,7 @@ struct char_data
     char *group_name;                /* Name of group */
     
     int32 timer;                         // Timer for update
+    int32 shotsthisround;                // Arrows fired this round
 
 // TODO - see if we can move the "wait" timer from desc to char
 // since we need something to lag mobs too

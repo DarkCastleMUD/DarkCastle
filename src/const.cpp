@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.146 2005/04/28 20:10:22 apocalypse Exp $ */
+/* $Id: const.cpp,v 1.147 2005/05/03 08:50:46 shane Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1372,7 +1372,7 @@ struct class_skill_defines r_skills[] = { // ranger skills
 {    "piercing",        SKILL_PIERCEING_WEAPONS, 30,     85,     {DEX,STR} },
 {    "slashing",        SKILL_SLASHING_WEAPONS,  30,     85,     {DEX,STR} },
 {    "whipping",        SKILL_WHIPPING_WEAPONS,  30,     85,     {DEX,STR} },
-//   "frost arrows"     SKILL_FROST_ARROW        31,     98,     {CON,DEX} },
+//   "ice arrows"       SKILL_ICE_ARROW          31,     98,     {CON,DEX} },
 {    "rescue",          SKILL_RESCUE,            32,     80,     {WIS,INT} },
 {    "ambush",          SKILL_AMBUSH,            35,     98,     {INT,DEX} },
 //   "fire arrows"      SKILL_FIRE_ARROW         36,     98,     {WIS,DEX} },
