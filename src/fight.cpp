@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.259 2005/04/29 21:44:02 urizen Exp $ */
+/* $Id: fight.cpp,v 1.260 2005/05/03 14:32:47 urizen Exp $ */
 
 extern "C"
 {
@@ -1394,7 +1394,7 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
   typeofdamage = damage_type(weapon_type);
 
   if(GET_POS(victim) == POSITION_DEAD)           return (eSUCCESS|eVICT_DIED);
-  if (ch->in_room != victim->in_room && attacktype != SPELL_SOLAR_GATE) return eSUCCESS;
+  if (ch->in_room != victim->in_room && !(attacktype == SPELL_SOLAR_GATE || attacktype == SKILL_ARCHERY ||attacktype == SPELL_LIGHTNING_BOLT)) return eSUCCESS;
   int l=0;
   if (dam!=0 && attacktype && attacktype < TYPE_HIT)
   { // Skill damages based on learned %
