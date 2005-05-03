@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: cl_ranger.cpp,v 1.46 2005/05/03 08:50:51 shane Exp $ | cl_ranger.C  *
+ * $Id: cl_ranger.cpp,v 1.47 2005/05/03 10:41:23 shane Exp $ | cl_ranger.C  *
  * Description: Ranger skills/spells                                          *
  *                                                                            *
  * Revision History                                                           *
@@ -860,6 +860,7 @@ int mob_arrow_response(struct char_data *ch, struct char_data *victim,
   return eSUCCESS;
 }
 
+/* no need anymore 
 int do_arrow_damage(struct char_data *ch, struct char_data *victim, 
                      int dir, int dam, int artype,
                      struct obj_data *found)
@@ -870,12 +871,12 @@ int do_arrow_damage(struct char_data *ch, struct char_data *victim,
   extern char * dirs[];
   void inform_victim(CHAR_DATA *, CHAR_DATA *, int);
 
-  buf[199] = '\0'; /* just cause I'm paranoid */
+  buf[199] = '\0'; // just cause I'm paranoid
 
   set_cantquit(ch, victim);
  
   if(0 > (GET_HIT(victim) - dam))
-  { /* they aren't going to survive..life sucks */
+  { // they aren't going to survive..life sucks
    switch(number(1,2)) 
    {
     case 1:
@@ -900,9 +901,9 @@ int do_arrow_damage(struct char_data *ch, struct char_data *victim,
        found->short_description, dirs[rev_dir[dir]]);
     act(buf, victim, NULL, 0, TO_ROOM, 0);
     break;
-   } /* of switch */
+   } // of switch
   }
-  else  /* they have enough to survive the arrow..lucky bastard */
+  else  // they have enough to survive the arrow..lucky bastard
   {
     sprintf(buf, "You hit %s with %s!\r\n", GET_SHORT(victim),
        found->short_description);
@@ -935,24 +936,24 @@ int do_arrow_damage(struct char_data *ch, struct char_data *victim,
   if(GET_HIT(victim) > 0)
      GET_POS(victim) = POSITION_STANDING;
 
-/* This is a cut & paste from fight.C cause I can't think of a better way to do it */
+// This is a cut & paste from fight.C cause I can't think of a better way to do it
 
-  /* Payoff for killing things. */
+  // Payoff for killing things.
   if(GET_HIT(victim) < 0)
   {
     group_gain(ch, victim);
     fight_kill(ch, victim, TYPE_CHOOSE, 0);
     return (eSUCCESS | eVICT_DIED);
-  } /* End of Hit < 0 */
+  } // End of Hit < 0
 
   return eSUCCESS;
 }
-
+*/
 
 int do_fire(struct char_data *ch, char *arg, int cmd)
 {
   struct char_data *victim;
-  int dam, dir, artype, cost, retval;
+  int dam, dir, artype, cost, retval, victroom;
   struct obj_data *found;
   unsigned cur_room, new_room;
   char direct[MAX_STRING_LENGTH], arrow[MAX_STRING_LENGTH], 
@@ -1145,7 +1146,7 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
   }
 
 /* Protect the newbies! */
-  if(GET_LEVEL(victim) < 2)
+  if(!IS_NPC(victim) && GET_LEVEL(victim) < 2)
   {
     send_to_char("Don't shoot at a poor level 1! :(\r\n", ch);
     return eFAILURE;
@@ -1216,20 +1217,50 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
 
      set_cantquit(ch, victim);
      sprintf(victname, "%s", GET_SHORT(victim));
+     victroom = victim->in_room;
+
+     act("An arrow flies into the room with incredible speed!", victim, 0, 0, TO_ROOM, 0);
 
      retval = damage(ch, victim, dam, TYPE_HIT, 0, 0);
 
-     if(!SOMEONE_DIED(retval)) {
-//        retval = weapon_spells(ch, victim, weapon);
+     if(IS_SET(retval, eVICT_DIED))  {
+        switch(number(1,2)) {
+           case 1:
+              sprintf(buf, "Your shot impales %s through the heart!\r\n", victname);
+              send_to_char(buf, ch);
+              sprintf(buf, "%s from the %s impales %s through the chest!", found->short_description, dirs[rev_dir[dir]], victname);
+              send_to_room(buf, victroom);
+              break;
+           case 2:
+              sprintf(buf, "Your %s drives through the eye of %s ending their life.\r\n", found->short_description, victname);
+              send_to_char(buf, ch);
+              sprintf(buf, "%s from the %s lands with a solid 'thunk.'\r\n$n falls to the ground, an arrow sticking from $s left eye.", found->short_description, dirs[rev_dir[dir]]);
+              send_to_room(buf, victroom);
+              break;
+        }
+     } else {
+        sprintf(buf, "You hit %s with %s!\r\n", GET_SHORT(victim), found->short_description);
+        send_to_char(buf, ch);
+        sprintf(buf, "You get shot with %s from the %s.  Ouch.", found->short_description, dirs[rev_dir[dir]]);
+        act(buf, victim, 0, 0, TO_CHAR, 0);
+        sprintf(buf, "%s from the %s hits $n!", found->short_description, dirs[rev_dir[dir]]);
+        act(buf, victim, 0, 0, TO_ROOM, 0);
+        GET_POS(victim) = POSITION_STANDING;
      }
 
+    if(IS_NPC(victim)) 
+      retval = mob_arrow_response(ch, victim, dir);
+      if(SOMEONE_DIED(retval)) // mob died somehow while moving
+         return retval;
+
+//     retval = weapon_spells(ch, victim, );
+
      if(!SOMEONE_DIED(retval)) {
-        switch(artype)
-        {
+        switch(artype) {
            case 1:
               dam = 90;
               act("The flames surrounding the arrow burns your wound!", ch, 0, victim, TO_VICT, 0);
-              act("The flames surrounding the arrow burns $N's wound!", ch, 0, victim, TO_ROOM, NOTVICT);
+              act("The flames surrounding the arrow burns $n's wound!", victim, 0, 0, TO_ROOM, 0);
               retval = damage(ch, victim, dam, TYPE_FIRE, SKILL_FIRE_ARROW, 0);
               skill_increase_check(ch, SKILL_FIRE_ARROW, has_skill(ch, SKILL_FIRE_ARROW), spell_info[SKILL_FIRE_ARROW].difficulty);
               enchantmentused = TRUE;
@@ -1237,17 +1268,11 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
            case 2:
               dam = 50;
               act("The stray ice shards impale you!", ch, 0, victim, TO_VICT, 0);
-              act("The stray ice shards impale $N!", ch, 0, victim, TO_ROOM, NOTVICT);
+              act("The stray ice shards impale $n!", victim, 0, 0, TO_ROOM, 0);
               if(number(1, 100) < has_skill(ch, SKILL_ICE_ARROW) / 4 ) {
-/*                 act("You seem frozen in place!")
-                 af.type      = SPELL_PARALYZE;
-                 af.location  = APPLY_NONE;
-                 af.modifier  = 0;
-//1 tick is too long
-                 af.duration  = 1;
-                 af.bitvector = AFF_PARALYSIS;
-                 affect_to_char(victim, &af);
-*/
+                 act("You seem frozen in place!", ch, 0, victim, TO_VICT, 0);
+                 act("$n seems frozen in place!", victim, 0, 0, TO_ROOM, 0);
+                 SET_BIT(victim->combat, COMBAT_STUNNED2);
               }
               retval = damage(ch, victim, dam, TYPE_COLD, SKILL_ICE_ARROW, 0);
               skill_increase_check(ch, SKILL_ICE_ARROW, has_skill(ch, SKILL_ICE_ARROW), spell_info[SKILL_ICE_ARROW].difficulty);
@@ -1256,7 +1281,7 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
            case 3:
               dam = 30;
               act("The storm cloud enveloping the arrow shocks you!", ch, 0, victim, TO_VICT, 0);
-              act("The storm cloud enveloping the arrow shocks $N!", ch, 0, victim, TO_ROOM, NOTVICT);
+              act("The storm cloud enveloping the arrow shocks $n!", victim, 0, ch, TO_ROOM, 0);
               retval = damage(ch, victim, dam, TYPE_ENERGY, SKILL_WIND_ARROW, 0);
               skill_increase_check(ch, SKILL_WIND_ARROW, has_skill(ch, SKILL_WIND_ARROW), spell_info[SKILL_WIND_ARROW].difficulty);
               enchantmentused = TRUE;
@@ -1264,10 +1289,10 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
            case 4:
               dam = 70;
               act("The magical stones surrounding the arrow smack into you, hard.", ch, 0, victim, TO_VICT, 0);
-              act("The magical stones surrounding the arrow smack hard into $N.", ch, 0, victim, TO_ROOM, NOTVICT);
+              act("The magical stones surrounding the arrow smack hard into $n.", victim, 0, 0, TO_ROOM, 0);
               if(number(1, 100) < has_skill(ch, SKILL_STONE_ARROW) / 4) {
                  act("The stones knock you flat on your ass!", ch, 0, victim, TO_VICT, 0);
-                 act("The stones knock $N flat on $S ass!", ch, 0, victim, TO_ROOM, NOTVICT);
+                 act("The stones knock $n flat on $s ass!", victim, 0, 0, TO_ROOM, 0);
                  GET_POS(victim) = POSITION_SITTING;
                  WAIT_STATE(victim, PULSE_VIOLENCE);
               }
@@ -1279,6 +1304,8 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
         }
      }
   }
+
+
 
   extract_obj(found);
 
