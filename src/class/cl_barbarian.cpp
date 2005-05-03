@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_barbarian.cpp,v 1.47 2005/05/01 14:02:44 urizen Exp $
+| $Id: cl_barbarian.cpp,v 1.48 2005/05/03 18:27:41 urizen Exp $
 | cl_barbarian.C
 | Description:  Commands for the barbarian class.
 */
@@ -581,7 +581,6 @@ void barb_magic_resist(char_data *ch, int old, int nw)
   if (bonus)
     for (i = 0; i <= SAVE_TYPE_MAX; i++)
       ch->saves[i] += bonus;
-
 }
 
 int do_knockback(struct char_data *ch, char *argument, int cmd)

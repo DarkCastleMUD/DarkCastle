@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.82 2005/05/03 08:50:46 shane Exp $ */
+/* $Id: nanny.cpp,v 1.83 2005/05/03 18:26:49 urizen Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -528,7 +528,7 @@ void do_on_login_stuff(char_data * ch)
            } else { prev = curr; curr = curr->next; }
 
    
-
+   barb_magic_resist(ch, 0, has_skill(ch, SKILL_MAGIC_RESIST));
 
 }
 
