@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.148 2005/05/03 10:44:00 shane Exp $ */
+/* $Id: const.cpp,v 1.149 2005/05/03 18:42:15 shane Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1366,19 +1366,19 @@ struct class_skill_defines r_skills[] = { // ranger skills
 {    "parry",           SKILL_PARRY,             22,     80,     {DEX,WIS} },
 {    "herb lore",       SPELL_HERB_LORE,         23,     90,     {INT,WIS} },
 {    "poison",          SPELL_POISON,            25,     85,     {CON,WIS} },
-{    "wind arrows"      SKILL_WIND_ARROW         26,     98,     {INT,DEX} },
+{    "wind arrows",     SKILL_WIND_ARROW,        26,     98,     {INT,DEX} },
 {    "track",           SKILL_TRACK,             28,     98,     {WIS,INT} },
 {    "barkskin",        SPELL_BARKSKIN,          29,     90,     {CON,DEX} },
 {    "piercing",        SKILL_PIERCEING_WEAPONS, 30,     85,     {DEX,STR} },
 {    "slashing",        SKILL_SLASHING_WEAPONS,  30,     85,     {DEX,STR} },
 {    "whipping",        SKILL_WHIPPING_WEAPONS,  30,     85,     {DEX,STR} },
-{    "ice arrows"       SKILL_ICE_ARROW          31,     98,     {CON,DEX} },
+{    "ice arrows",      SKILL_ICE_ARROW,         31,     98,     {CON,DEX} },
 {    "rescue",          SKILL_RESCUE,            32,     80,     {WIS,INT} },
 {    "ambush",          SKILL_AMBUSH,            35,     98,     {INT,DEX} },
-{    "fire arrows"      SKILL_FIRE_ARROW         36,     98,     {WIS,DEX} },
+{    "fire arrows",     SKILL_FIRE_ARROW,        36,     98,     {WIS,DEX} },
 {    "call follower",   SPELL_CALL_FOLLOWER,     38,     98,     {CON,STR} },
 {    "stun",            SKILL_STUN,              40,     70,     {DEX,INT} },
-{    "stone arrows"     SKILL_STONE_ARROW        41,     98,     {STR,DEX} },
+{    "stone arrows",    SKILL_STONE_ARROW,       41,     98,     {STR,DEX} },
 {    "disarm",          SKILL_DISARM,            42,     70,     {DEX,WIS} },
 {    "staunchblood",    SPELL_STAUNCHBLOOD,      44,     70,     {CON,WIS} },
 {    "forest meld",     SPELL_FOREST_MELD,       45,     90,     {WIS,DEX} },
