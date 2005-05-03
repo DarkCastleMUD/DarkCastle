@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.262 2005/05/03 18:30:27 urizen Exp $ */
+/* $Id: fight.cpp,v 1.263 2005/05/03 19:37:40 shane Exp $ */
 
 extern "C"
 {
@@ -2092,8 +2092,8 @@ void set_cantquit(CHAR_DATA *ch, CHAR_DATA *vict, bool forced )
     return;
 
   if(is_pkill(realch, realvict) && !IS_SET(realvict->affected_by, AFF_CANTQUIT) &&
-              !affected_by_spell(realvict->affected_by, FUCK_GTHIEF) && 
-	      !affected_by_spell(realvict->affected_by, FUCK_PTHIEF) && !forced) { 
+              !affected_by_spell(realvict, FUCK_GTHIEF) && 
+	      !affected_by_spell(realvict, FUCK_PTHIEF) && !forced) { 
     af.type = FUCK_CANTQUIT;
     af.duration = 5;
     af.modifier = 0;
