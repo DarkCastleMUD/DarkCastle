@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.260 2005/05/03 14:32:47 urizen Exp $ */
+/* $Id: fight.cpp,v 1.261 2005/05/03 14:34:10 urizen Exp $ */
 
 extern "C"
 {
@@ -1888,7 +1888,7 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
       eq_damage(ch, victim, dam, weapon_type, attacktype);
 
   inform_victim(ch, victim, dam);
-  if (GET_POS(victim) != POSITION_DEAD &&ch->in_room != victim->in_room && attacktype != SPELL_SOLAR_GATE) // Wimpy
+  if (GET_POS(victim) != POSITION_DEAD &&ch->in_room != victim->in_room && !(attacktype == SPELL_SOLAR_GATE|| attacktype == SKILL_ARCHERY || attacktype == SPELL_LIGHTNING_BOLT)) // Wimpy
       return eSUCCESS;   
   if(typeofdamage == DAMAGE_TYPE_PHYSICAL && dam > 0 && ch != victim)
   {
