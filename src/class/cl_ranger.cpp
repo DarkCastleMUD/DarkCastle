@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: cl_ranger.cpp,v 1.48 2005/05/03 19:38:01 shane Exp $ | cl_ranger.C  *
+ * $Id: cl_ranger.cpp,v 1.49 2005/05/05 02:40:56 shane Exp $ | cl_ranger.C  *
  * Description: Ranger skills/spells                                          *
  *                                                                            *
  * Revision History                                                           *
@@ -1046,13 +1046,6 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
     send_to_char("You can't shoot arrows if yer in a safe room silly.\r\n", ch);
     return eFAILURE;
   }
-  new_room = world[ch->in_room].dir_option[dir]->to_room;
-
-  if(IS_SET(world[new_room].room_flags, SAFE))
-  {
-    send_to_char("Don't shoot into a safe room!  You might hit someone!\r\n", ch);
-    return eFAILURE;
-  }
 
 /* if !target, then switch arrow and target and use no magic on arrow
    if target, then use magic on arrow */
@@ -1090,38 +1083,78 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
 /* put ch in the targets room to check if they are visible */
 /* new_room is assigned earlier on in the check for safe flags */
   cur_room = ch->in_room;
-  char_from_room(ch);
-
-  if(artype == 3) /* a wind arrow, so set new_room 2 rooms out */
-  {
-    if(!world[new_room].dir_option[dir] || 
-       !(world[new_room].dir_option[dir]->to_room == NOWHERE) ||
-       IS_SET(world[new_room].dir_option[dir]->exit_info, EX_CLOSED))
-    {
-      send_to_char("You can't seem to find your target2.\r\n", ch);
-      char_to_room(ch, cur_room);
-      return eFAILURE;
-    }
-    new_room = world[new_room].dir_option[dir]->to_room;
-  }
+  new_room = cur_room;
 
   if(target) {
-    if(!char_to_room(ch, new_room))
-    {
-      /* put ch into a room before we exit */
-      char_to_room(ch, cur_room);
-      send_to_char("Error moving you to room in do_fire\r\n", ch);
-      return eFAILURE;
-    }
-
-    if (!(victim = get_char_room_vis(ch, target)))
-    {
-      send_to_char("You can't seem to locate your target.\r\n", ch);
-      /* put char back */
-      char_from_room(ch);
-      char_to_room(ch, cur_room);
-      return eFAILURE;
-    }
+     if(has_skill(ch, SKILL_ARCHERY) > 80)
+        victim = get_char_room_vis(ch, target);
+     if(!victim) {
+        if(world[cur_room].dir_option[dir] && 
+         !(world[cur_room].dir_option[dir]->to_room == NOWHERE) && 
+         !IS_SET(world[cur_room].dir_option[dir]->exit_info, EX_CLOSED))
+        {
+           new_room = world[cur_room].dir_option[dir]->to_room;
+           if(IS_SET(world[new_room].room_flags, SAFE)) {
+              send_to_char("Don't shoot into a safe room!  You might hit someone!\r\n", ch);
+              return eFAILURE;
+           }
+           char_from_room(ch);
+           if(!char_to_room(ch, new_room)) {
+              /* put ch into a room before we exit */
+              char_to_room(ch, cur_room);
+              send_to_char("Error moving you to room in do_fire\r\n", ch);
+              return eFAILURE;
+           }
+           victim = get_char_room_vis(ch, target);
+        }
+     }
+     if(!victim && artype == 3) {
+        if(world[new_room].dir_option[dir] && 
+         !(world[new_room].dir_option[dir]->to_room == NOWHERE) && 
+         !IS_SET(world[new_room].dir_option[dir]->exit_info, EX_CLOSED))
+        {
+           new_room = world[new_room].dir_option[dir]->to_room;
+           if(IS_SET(world[new_room].room_flags, SAFE)) {
+              send_to_char("Don't shoot into a safe room!  You might hit someone!\r\n", ch);
+              return eFAILURE;
+           }
+           char_from_room(ch);
+           if(!char_to_room(ch, new_room)) {
+              /* put ch into a room before we exit */
+              char_to_room(ch, cur_room);
+              send_to_char("Error moving you to room in do_fire\r\n", ch);
+              return eFAILURE;
+           }
+           victim = get_char_room_vis(ch, target);
+        }
+     }
+     if(!victim && artype == 3 && affected_by_spell(ch, SPELL_FARSIGHT)) {
+        if(world[new_room].dir_option[dir] && 
+         !(world[new_room].dir_option[dir]->to_room == NOWHERE) && 
+         !IS_SET(world[new_room].dir_option[dir]->exit_info, EX_CLOSED))
+        {
+           new_room = world[new_room].dir_option[dir]->to_room;
+           if(IS_SET(world[new_room].room_flags, SAFE)) {
+              send_to_char("Don't shoot into a safe room!  You might hit someone!\r\n", ch);
+              return eFAILURE;
+           }
+           char_from_room(ch);
+           if(!char_to_room(ch, new_room)) {
+              /* put ch into a room before we exit */
+              char_to_room(ch, cur_room);
+              send_to_char("Error moving you to room in do_fire\r\n", ch);
+              return eFAILURE;
+           }
+           victim = get_char_room_vis(ch, target);
+        }        
+     }
+     if(!victim) {
+        send_to_char("You can't seem to locate your target.\r\n", ch);
+        /* put char back */
+        char_from_room(ch);
+        char_to_room(ch, cur_room);
+        return eFAILURE;
+     }
   }
   else
   { /* choose random target */
@@ -1129,9 +1162,6 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
     TODO: PUT RANDOM STUFF HERE */
     /* NOTE:  it _should_ be impossible to get here with current code */
     send_to_char("Sorry, you must specify a target.\r\n", ch);
-    /* put ch back before we exit */
-    char_from_room(ch);
-    char_to_room(ch, cur_room);
     return eFAILURE;
   }
   /* put ch back in original room after successful targeting */
@@ -1273,9 +1303,9 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
               act("The stray ice shards impale you!", ch, 0, victim, TO_VICT, 0);
               act("The stray ice shards impale $n!", victim, 0, 0, TO_ROOM, 0);
               if(number(1, 100) < has_skill(ch, SKILL_ICE_ARROW) / 4 ) {
-                 act("You seem frozen in place!", ch, 0, victim, TO_VICT, 0);
-                 act("$n seems frozen in place!", victim, 0, 0, TO_ROOM, 0);
-                 SET_BIT(victim->combat, COMBAT_SHOCKED);
+                 act("Your body slows down for a second!", ch, 0, victim, TO_VICT, 0);
+                 act("$n's body seems a bit slower!", victim, 0, 0, TO_ROOM, 0);
+                 WAIT_STATE(victim, PULSE_VIOLENCE);
               }
               retval = damage(ch, victim, dam, TYPE_COLD, SKILL_ICE_ARROW, 0);
               skill_increase_check(ch, SKILL_ICE_ARROW, has_skill(ch, SKILL_ICE_ARROW), spell_info[SKILL_ICE_ARROW].difficulty);
