@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: cl_ranger.cpp,v 1.49 2005/05/05 02:40:56 shane Exp $ | cl_ranger.C  *
+ * $Id: cl_ranger.cpp,v 1.50 2005/05/05 20:07:56 shane Exp $ | cl_ranger.C  *
  * Description: Ranger skills/spells                                          *
  *                                                                            *
  * Revision History                                                           *
@@ -1004,41 +1004,24 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
   }
 
 
-/*  Command syntax is: fire <dir> [arrowtype] [target] 
-    if there is !arrowtype, then choose standard arrow
-    if there is !target, then choose a random target in room */
+/*  Command syntax is: fire [target] <dir> [arrowtype] 
+    if there is !dir, then check skill level
+    if there is !arrow, then choose standard arrowtype */
 
   while(*arg == ' ')
     arg++;
 
   if(!*arg)
   {
-    send_to_char("Shoot in which direction?\r\n", ch);
+    send_to_char("Shoot at whom?\r\n", ch);
     return eFAILURE;
   }
-  half_chop(arg, direct, buf2);
-  half_chop(buf2, arrow, target);
+  half_chop(arg, target, buf2);
+  half_chop(buf2, direct, arrow);
 
   direct[MAX_STRING_LENGTH-1] = '\0';
   arrow[MAX_STRING_LENGTH-1] = '\0';
   target[MAX_STRING_LENGTH-1] = '\0';
-
-  if(direct[0] == 'n') dir = 0;
-  else if(direct[0] == 'e') dir = 1;
-  else if(direct[0] == 's') dir = 2;
-  else if(direct[0] == 'w') dir = 3;
-  else if(direct[0] == 'u') dir = 4;
-  else if(direct[0] == 'd') dir = 5;
-  else {
-    send_to_char("Shoot in which direction?\r\n", ch);
-    return eFAILURE;
-  } 
-
-  if(!CAN_GO(ch, dir))
-  {
-    send_to_char("There is nothing to shoot in that direction.\r\n", ch);
-    return eFAILURE;
-  }
 
 /* make safe rooms checks */
   if(IS_SET(world[ch->in_room].room_flags, SAFE))
@@ -1047,31 +1030,24 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
     return eFAILURE;
   }
 
-/* if !target, then switch arrow and target and use no magic on arrow
-   if target, then use magic on arrow */
+  if(*arrow) {
+     artype = parse_arrow(ch, arrow);
+     if(!artype)
+     {
+        send_to_char("You don't know of that type of arrow.\r\n", ch);
+        return eFAILURE;
+     }
 
-  if(*target)
-  {
-    artype = parse_arrow(ch, arrow);
-    if(!artype)
-    {
-      send_to_char("You don't know of that type of arrow.\r\n", ch);
-      return eFAILURE;
-    }
-
-    switch(artype)
-    {
-      case 1:  cost = 30; break;
-      case 2:  cost = 20; break;
-      case 3:  cost = 10; break;
-      case 4:  cost = 40; break;
-    }
+     switch(artype)
+     {
+        case 1:  cost = 30; break;
+        case 2:  cost = 20; break;
+        case 3:  cost = 10; break;
+        case 4:  cost = 40; break;
+     }
   }
   else 
-  {
     cost = 0;
-    strcpy(target, arrow);
-  }
 
   if((GET_MANA(ch) < cost) && (GET_LEVEL(ch) < ANGEL))
   {
@@ -1081,14 +1057,28 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
 
 /* check if you can see your target */
 /* put ch in the targets room to check if they are visible */
-/* new_room is assigned earlier on in the check for safe flags */
   cur_room = ch->in_room;
-  new_room = cur_room;
 
   if(target) {
      if(has_skill(ch, SKILL_ARCHERY) > 80)
         victim = get_char_room_vis(ch, target);
      if(!victim) {
+        if(direct[0] == 'n') dir = 0;
+        else if(direct[0] == 'e') dir = 1;
+        else if(direct[0] == 's') dir = 2;
+        else if(direct[0] == 'w') dir = 3;
+        else if(direct[0] == 'u') dir = 4;
+        else if(direct[0] == 'd') dir = 5;
+        else {
+           send_to_char("Shoot in which direction?\r\n", ch);
+           return eFAILURE;
+        }
+
+        if(!CAN_GO(ch, dir)) {
+           send_to_char("There is nothing to shoot in that direction.\r\n", ch);
+           return eFAILURE;
+        }
+
         if(world[cur_room].dir_option[dir] && 
          !(world[cur_room].dir_option[dir]->to_room == NOWHERE) && 
          !IS_SET(world[cur_room].dir_option[dir]->exit_info, EX_CLOSED))
@@ -1156,11 +1146,7 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
         return eFAILURE;
      }
   }
-  else
-  { /* choose random target */
-    /* for now, just say illegal...
-    TODO: PUT RANDOM STUFF HERE */
-    /* NOTE:  it _should_ be impossible to get here with current code */
+  else {
     send_to_char("Sorry, you must specify a target.\r\n", ch);
     return eFAILURE;
   }
@@ -1250,7 +1236,7 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
      victroom = victim->in_room;
      strcpy(victhshr, HSHR(victim));
 
-     act("An arrow flies into the room with incredible speed!", victim, 0, 0, TO_ROOM, 0);
+     send_to_room("An arrow flies into the room with incredible speed!", victroom);
 
      retval = damage(ch, victim, dam, TYPE_PIERCE, SKILL_ARCHERY, 0);
 
