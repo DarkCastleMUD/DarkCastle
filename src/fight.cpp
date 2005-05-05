@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.263 2005/05/03 19:37:40 shane Exp $ */
+/* $Id: fight.cpp,v 1.264 2005/05/05 12:12:44 shane Exp $ */
 
 extern "C"
 {
@@ -649,8 +649,8 @@ int do_lightning_shield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
   update_pos(ch);
     
   if (GET_POS(ch) == POSITION_DEAD) {
-      group_gain(vict, ch);
       act("$n is DEAD!!", ch, 0, 0, TO_ROOM, INVIS_NULL);
+      group_gain(vict, ch);
       if(!IS_NPC(ch))
          send_to_char("You have been KILLED!!\n\r\n\r", ch);
       fight_kill(vict, ch, TYPE_CHOOSE, 0);
@@ -741,8 +741,8 @@ int do_fireshield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
   update_pos(ch);
     
   if (GET_POS(ch) == POSITION_DEAD) {
-      group_gain(vict, ch);
       act("$n is DEAD!!", ch, 0, 0, TO_ROOM, INVIS_NULL);
+      group_gain(vict, ch);
       if(!IS_NPC(ch))
          send_to_char("You have been KILLED!!\n\r\n\r", ch);
       fight_kill(vict, ch, TYPE_CHOOSE, 0);
@@ -801,8 +801,8 @@ int do_acidshield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
   update_pos(ch);
     
   if (GET_POS(ch) == POSITION_DEAD) {
-      group_gain(vict, ch);
       act("$n is DEAD!!", ch, 0, 0, TO_ROOM, INVIS_NULL);
+      group_gain(vict, ch);
       if(!IS_NPC(ch))
          send_to_char("You have been KILLED!!\n\r\n\r", ch);
       fight_kill(vict, ch, TYPE_CHOOSE, 0);
