@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.264 2005/05/05 12:12:44 shane Exp $ */
+/* $Id: fight.cpp,v 1.265 2005/05/05 12:18:31 shane Exp $ */
 
 extern "C"
 {
@@ -1505,7 +1505,7 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
          strcpy(buf3, buf);
          sprintf(buf2, "s additional damage.");
          strcat(buf, buf2);
-         sprintf(buf2, "%s is susceptible to the reflected ", GET_NAME(ch));
+         sprintf(buf2, "%s is susceptible to the reflected ", GET_SHORT(ch));
          strcat(buf2, buf);
          act(buf2, ch, 0, victim, TO_ROOM, NOTVICT);
          sprintf(buf2, " additional damage.");
@@ -1520,13 +1520,13 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
         strcat(buf, buf2);
         sprintf(buf2, " additional damage.");
         strcat(buf3, buf2);
-        sprintf(buf2, "%s is susceptable to %s's ", GET_NAME(victim), GET_NAME(ch));
+        sprintf(buf2, "%s is susceptable to %s's ", GET_SHORT(victim), GET_SHORT(ch));
         strcat(buf2, buf);
         act(buf2, victim, 0, ch, TO_ROOM, NOTVICT);
-        sprintf(buf2, "%s is susceptable to your ", GET_NAME(victim));
+        sprintf(buf2, "%s is susceptable to your ", GET_SHORT(victim));
         strcat(buf2, buf);
         act(buf2, victim, 0, ch, TO_VICT, 0);
-        sprintf(buf2, "You are susceptable to %s's ", GET_NAME(ch));
+        sprintf(buf2, "You are susceptable to %s's ", GET_SHORT(ch));
         strcat(buf2, buf3);
         act(buf2, victim, 0, ch, TO_CHAR, 0);
      }
@@ -1541,7 +1541,7 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
          strcpy(buf3, buf);
          sprintf(buf2, "s reduced damage.");
          strcat(buf, buf2);
-         sprintf(buf2, "%s resists the reflected ", GET_NAME(ch));
+         sprintf(buf2, "%s resists the reflected ", GET_SHORT(ch));
          strcat(buf2, buf);
          act(buf2, ch, 0, victim, TO_ROOM, NOTVICT);
          sprintf(buf2, " reduced damage.");
@@ -1556,13 +1556,13 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
         strcat(buf, buf2);
         sprintf(buf2, " reduced damage.");
         strcat(buf3, buf2);
-        sprintf(buf2, "%s resists %s's ", GET_NAME(victim), GET_NAME(ch));
+        sprintf(buf2, "%s resists %s's ", GET_SHORT(victim), GET_SHORT(ch));
         strcat(buf2, buf);
         act(buf2, victim, 0, ch, TO_ROOM, NOTVICT);
-        sprintf(buf2, "%s resists your ", GET_NAME(victim));
+        sprintf(buf2, "%s resists your ", GET_SHORT(victim));
         strcat(buf2, buf);
         act(buf2, victim, 0, ch, TO_VICT, 0);
-        sprintf(buf2, "You resist %s's ", GET_NAME(ch));
+        sprintf(buf2, "You resist %s's ", GET_SHORT(ch));
         strcat(buf2, buf3);
         act(buf2, victim, 0, ch, TO_CHAR, 0);
       }
