@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: who.cpp,v 1.17 2005/04/15 16:56:46 urizen Exp $
+| $Id: who.cpp,v 1.18 2005/05/05 04:31:05 shane Exp $
 | who.C
 | Commands for who, maybe? :P
 */
@@ -469,6 +469,10 @@ int do_who(struct char_data *ch, char *argument, int cmd)
             if(!strcmp(GET_NAME(i), "Wynn")) {
                 infoField = infoBuf;
                 sprintf(infoBuf, "  $1$B//\\$4o.o$1/\\\\$R  ");
+            }
+            if(!strcmp(GET_NAME(i), "Scyld")) {
+                infoField = infoBuf;
+                sprintf(infoBuf, "   Lackey    ");
             }
             
             if(GET_LEVEL(ch) >= IMMORTAL && !IS_MOB(i) && i->pcdata->wizinvis > 0) {
