@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: cl_ranger.cpp,v 1.50 2005/05/05 20:07:56 shane Exp $ | cl_ranger.C  *
+ * $Id: cl_ranger.cpp,v 1.51 2005/05/06 11:24:27 shane Exp $ | cl_ranger.C  *
  * Description: Ranger skills/spells                                          *
  *                                                                            *
  * Revision History                                                           *
@@ -42,6 +42,7 @@ int saves_spell(CHAR_DATA *ch, CHAR_DATA *vict, int spell_base, sh_int save_type
 bool any_charms(CHAR_DATA *ch);
 void check_eq(CHAR_DATA *ch);
 extern struct index_data *mob_index;
+int get_difficulty(int);
 
 
 int do_tame(CHAR_DATA *ch, char *arg, int cmd)
@@ -699,9 +700,9 @@ int parse_arrow(struct char_data * ch, char * arrow)
     return 1;
   else if((arrow[0] == 'i') && has_skill(ch, SKILL_ICE_ARROW))
     return 2;
-  else if((arrow[0] == 'w') && has_skill(ch, SKILL_WIND_ARROW))
+  else if((arrow[0] == 't') && has_skill(ch, SKILL_TEMPEST_ARROW))
     return 3;
-  else if((arrow[0] == 's') && has_skill(ch, SKILL_STONE_ARROW))
+  else if((arrow[0] == 'g') && has_skill(ch, SKILL_GRANITE_ARROW))
     return 4;
 
 return 0;
@@ -753,28 +754,41 @@ void do_arrow_miss(struct char_data *ch, struct char_data *victim, int
   switch(number(1,3))
   {
     case 1:
-      sprintf(buf, "%s wizzes by from the %s.\r\n",
+      if(dir < 0) {
+         sprintf(buf, "%s wizzes by.\n\r", found->short_description);
+         send_to_char(buf, victim);
+         sprintf(buf, "%s wizzes by.", found->short_description);
+         act(buf, victim, NULL, ch, TO_ROOM, NOTVICT);
+      } else {
+         sprintf(buf, "%s wizzes by from the %s.\r\n", found->short_description, dirs[rev_dir[dir]]);
+         send_to_char(buf, victim);
+         sprintf(buf, "%s wizzes by from the %s.",
                found->short_description, dirs[rev_dir[dir]]);
-      send_to_char(buf, victim);
-      sprintf(buf, "%s wizzes by from the %s.",
-               found->short_description, dirs[rev_dir[dir]]);
-      act(buf, victim, NULL, 0, TO_ROOM, 0);
+         act(buf, victim, NULL, 0, TO_ROOM, 0);
+      }
       break;
     case 2:
       sprintf(buf, "A quiet whistle sounds as %s flies over your head.", 
                found->short_description);
-     act(buf, victim,0,0,TO_CHAR,0);
+      act(buf, victim,0,0,TO_CHAR,0);
       sprintf(buf, "A quiet whistle sounds as %s flies over your head.", 
                found->short_description);
-      act(buf, victim, 0, 0, TO_ROOM, 0);
+      act(buf, victim, 0, ch, TO_ROOM, NOTVICT);
       break;
     case 3:
-      sprintf(buf, "%s from the %s narrowly misses your head.\r\n",
+      if(dir < 0) {
+         sprintf(buf, "%s narrowly misses your head.\r\n", found->short_description);
+         send_to_char(buf, victim);
+         sprintf(buf, "%s narrowly misses $n.", found->short_description);
+         act(buf, victim, NULL, ch, TO_ROOM, NOTVICT);
+      } else {
+         sprintf(buf, "%s from the %s narrowly misses your head.\r\n",
                found->short_description, dirs[rev_dir[dir]]);
-      send_to_char(buf, victim);
-      sprintf(buf, "%s from the %s narrowly misses $n.",
+         send_to_char(buf, victim);
+         sprintf(buf, "%s from the %s narrowly misses $n.",
                 found->short_description, dirs[rev_dir[dir]]);
-      act(buf, victim, NULL, 0, TO_ROOM, 0);
+         act(buf, victim, NULL, 0, TO_ROOM, 0);
+      }
       break;
   }
 }
@@ -808,6 +822,9 @@ int mob_arrow_response(struct char_data *ch, struct char_data *victim,
 
   /* don't want the mob leaving a fight its already in */
   if(victim->fighting)
+     return eSUCCESS;
+
+  if(dir < 0) // in the same room
      return eSUCCESS;
 
   if(number(0,1))
@@ -962,14 +979,13 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
        victhshr[MAX_STRING_LENGTH]; 
   bool enchantmentused = FALSE;
   extern char * dirs[];
-  extern struct spell_info_type spell_info [ ];
 
   void get(struct char_data *, struct obj_data *, struct obj_data *);
   int check_command_lag(CHAR_DATA *);
   void add_command_lag(CHAR_DATA *, int);
   
   victim = NULL;
-  *target = '\0';
+  *direct = '\0';
   *arrow = '\0';
 
   if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
@@ -1030,14 +1046,33 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
     return eFAILURE;
   }
 
+  cost = 0;
+  dir = -1;
+  artype = 0;
+
   if(*arrow) {
+     if(direct[0] == 'n') dir = 0;
+     else if(direct[0] == 'e') dir = 1;
+     else if(direct[0] == 's') dir = 2;
+     else if(direct[0] == 'w') dir = 3;
+     else if(direct[0] == 'u') dir = 4;
+     else if(direct[0] == 'd') dir = 5;
+     else {
+        send_to_char("Shoot in which direction?\r\n", ch);
+        return eFAILURE;
+     }
+
+     if(!CAN_GO(ch, dir)) {
+        send_to_char("There is nothing to shoot in that direction.\r\n", ch);
+        return eFAILURE;
+     }
+
      artype = parse_arrow(ch, arrow);
      if(!artype)
      {
         send_to_char("You don't know of that type of arrow.\r\n", ch);
         return eFAILURE;
      }
-
      switch(artype)
      {
         case 1:  cost = 30; break;
@@ -1045,9 +1080,31 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
         case 3:  cost = 10; break;
         case 4:  cost = 40; break;
      }
-  }
-  else 
-    cost = 0;
+  } else if(*direct) {
+     if(direct[0] == 'n') dir = 0;
+     else if(direct[0] == 'e') dir = 1;
+     else if(direct[0] == 's') dir = 2;
+     else if(direct[0] == 'w') dir = 3;
+     else if(direct[0] == 'u') dir = 4;
+     else if(direct[0] == 'd') dir = 5;
+     else if(direct[0] == 'f' || direct[0] == 't' || direct[0] == 'g' || direct[0] == 'i') artype = parse_arrow(ch, direct);
+     else {
+        send_to_char("Shoot in which direction?\n\r", ch);
+        return eFAILURE;
+     }
+
+     if(dir >= 0 && !CAN_GO(ch, dir)) {
+        send_to_char("There is nothing to shoot in that direction.\r\n", ch);
+        return eFAILURE;
+     } else if(artype) {
+        switch(artype) {
+           case 1:  cost = 30; break;
+           case 2:  cost = 20; break;
+           case 3:  cost = 10; break;
+           case 4:  cost = 40; break;
+        }
+     }
+  }     
 
   if((GET_MANA(ch) < cost) && (GET_LEVEL(ch) < ANGEL))
   {
@@ -1062,23 +1119,11 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
   if(target) {
      if(has_skill(ch, SKILL_ARCHERY) > 80)
         victim = get_char_room_vis(ch, target);
-     if(!victim) {
-        if(direct[0] == 'n') dir = 0;
-        else if(direct[0] == 'e') dir = 1;
-        else if(direct[0] == 's') dir = 2;
-        else if(direct[0] == 'w') dir = 3;
-        else if(direct[0] == 'u') dir = 4;
-        else if(direct[0] == 'd') dir = 5;
-        else {
-           send_to_char("Shoot in which direction?\r\n", ch);
-           return eFAILURE;
-        }
-
-        if(!CAN_GO(ch, dir)) {
-           send_to_char("There is nothing to shoot in that direction.\r\n", ch);
-           return eFAILURE;
-        }
-
+     else if(dir < 0) {
+        send_to_char("You aren't skilled enough to fire at a target this close.\n\r", ch);
+        return eFAILURE;
+     }
+     if(!victim && dir >= 0) {
         if(world[cur_room].dir_option[dir] && 
          !(world[cur_room].dir_option[dir]->to_room == NOWHERE) && 
          !IS_SET(world[cur_room].dir_option[dir]->exit_info, EX_CLOSED))
@@ -1098,7 +1143,7 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
            victim = get_char_room_vis(ch, target);
         }
      }
-     if(!victim && artype == 3) {
+     if(!victim && artype == 3 && dir >= 0) {
         if(world[new_room].dir_option[dir] && 
          !(world[new_room].dir_option[dir]->to_room == NOWHERE) && 
          !IS_SET(world[new_room].dir_option[dir]->exit_info, EX_CLOSED))
@@ -1118,7 +1163,7 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
            victim = get_char_room_vis(ch, target);
         }
      }
-     if(!victim && artype == 3 && affected_by_spell(ch, SPELL_FARSIGHT)) {
+     if(!victim && artype == 3 && affected_by_spell(ch, SPELL_FARSIGHT) && dir >= 0) {
         if(world[new_room].dir_option[dir] && 
          !(world[new_room].dir_option[dir]->to_room == NOWHERE) && 
          !IS_SET(world[new_room].dir_option[dir]->exit_info, EX_CLOSED))
@@ -1209,10 +1254,16 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
 
   switch(number(1,2))
   {
-    case 1: sprintf(buf,"$n fires an arrow %sward.", dirs[dir]);
+    case 1: if(dir >= 0)
+               sprintf(buf,"$n fires an arrow %sward.", dirs[dir]);
+            else
+               sprintf(buf, "$n fires an arrow.");
             act(buf, ch, 0, 0, TO_ROOM, 0);
             break;
-    case 2: sprintf(buf,"$n lets off an arrow to the %s.", dirs[dir]);
+    case 2: if(dir >= 0)
+               sprintf(buf,"$n lets off an arrow to the %s.", dirs[dir]);
+            else
+               sprintf(buf, "$n lets off an arrow.");
             act(buf, ch, 0, 0, TO_ROOM, 0);
             break;
   }
@@ -1236,23 +1287,34 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
      victroom = victim->in_room;
      strcpy(victhshr, HSHR(victim));
 
-     send_to_room("An arrow flies into the room with incredible speed!", victroom);
+     if(dir >= 0)
+        send_to_room("An arrow flies into the room with incredible speed!\n\r", victroom);
 
      retval = damage(ch, victim, dam, TYPE_PIERCE, SKILL_ARCHERY, 0);
 
      if(IS_SET(retval, eVICT_DIED))  {
         switch(number(1,2)) {
            case 1:
-              sprintf(buf, "Your shot impales %s through the heart!\r\n", victname);
-              send_to_char(buf, ch);
-              sprintf(buf, "%s from the %s impales %s through the chest!", found->short_description, dirs[rev_dir[dir]], victname);
-              send_to_room(buf, victroom);
+              if(dir < 0) {
+                 sprintf(buf, "The %s impales %s through the heart!", found->short_description, victname);
+                 send_to_room(buf, victroom);
+              } else {
+                 sprintf(buf, "Your shot impales %s through the heart!\r\n", victname);
+                 send_to_char(buf, ch);
+                 sprintf(buf, "%s from the %s impales %s through the chest!", found->short_description, dirs[rev_dir[dir]], victname);
+                 send_to_room(buf, victroom);
+              }
               break;
            case 2:
-              sprintf(buf, "Your %s drives through the eye of %s ending their life.\r\n", found->short_description, victname);
-              send_to_char(buf, ch);
-              sprintf(buf, "%s from the %s lands with a solid 'thunk.'\r\n%s falls to the ground, an arrow sticking from %s left eye.", found->short_description, dirs[rev_dir[dir]], victname, victhshr);
-              send_to_room(buf, victroom);
+              if(dir < 0) {
+                 sprintf(buf, "%s drives through the eye of %s, ending %s life.", found->short_description, victname, victhshr);
+                 send_to_room(buf, victroom);
+              } else {
+                 sprintf(buf, "Your %s drives through the eye of %s ending %s life.\r\n", found->short_description, victname, victhshr);
+                 send_to_char(buf, ch);
+                 sprintf(buf, "%s from the %s lands with a solid 'thunk.'\r\n%s falls to the ground, an arrow sticking from %s left eye.", found->short_description, dirs[rev_dir[dir]], victname, victhshr);
+                 send_to_room(buf, victroom);
+              }
               break;
         }
      } else {
@@ -1261,7 +1323,8 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
         sprintf(buf, "You get shot with %s from the %s.  Ouch.", found->short_description, dirs[rev_dir[dir]]);
         act(buf, victim, 0, 0, TO_CHAR, 0);
         sprintf(buf, "%s from the %s hits $n!", found->short_description, dirs[rev_dir[dir]]);
-        act(buf, victim, 0, 0, TO_ROOM, 0);
+        act(buf, victim, 0, ch, TO_ROOM, NOTVICT);
+
         GET_POS(victim) = POSITION_STANDING;
 
         if(IS_NPC(victim)) 
@@ -1281,7 +1344,7 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
               act("The flames surrounding the arrow burns your wound!", ch, 0, victim, TO_VICT, 0);
               act("The flames surrounding the arrow burns $n's wound!", victim, 0, 0, TO_ROOM, 0);
               retval = damage(ch, victim, dam, TYPE_FIRE, SKILL_FIRE_ARROW, 0);
-              skill_increase_check(ch, SKILL_FIRE_ARROW, has_skill(ch, SKILL_FIRE_ARROW), spell_info[SKILL_FIRE_ARROW].difficulty);
+              skill_increase_check(ch, SKILL_FIRE_ARROW, has_skill(ch, SKILL_FIRE_ARROW), get_difficulty(SKILL_FIRE_ARROW));
               enchantmentused = TRUE;
               break;
            case 2:
@@ -1294,29 +1357,29 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
                  WAIT_STATE(victim, PULSE_VIOLENCE);
               }
               retval = damage(ch, victim, dam, TYPE_COLD, SKILL_ICE_ARROW, 0);
-              skill_increase_check(ch, SKILL_ICE_ARROW, has_skill(ch, SKILL_ICE_ARROW), spell_info[SKILL_ICE_ARROW].difficulty);
+              skill_increase_check(ch, SKILL_ICE_ARROW, has_skill(ch, SKILL_ICE_ARROW), get_difficulty(SKILL_ICE_ARROW));
               enchantmentused = TRUE;
               break;
            case 3:
               dam = 30;
               act("The storm cloud enveloping the arrow shocks you!", ch, 0, victim, TO_VICT, 0);
               act("The storm cloud enveloping the arrow shocks $n!", victim, 0, ch, TO_ROOM, 0);
-              retval = damage(ch, victim, dam, TYPE_ENERGY, SKILL_WIND_ARROW, 0);
-              skill_increase_check(ch, SKILL_WIND_ARROW, has_skill(ch, SKILL_WIND_ARROW), spell_info[SKILL_WIND_ARROW].difficulty);
+              retval = damage(ch, victim, dam, TYPE_ENERGY, SKILL_TEMPEST_ARROW, 0);
+              skill_increase_check(ch, SKILL_TEMPEST_ARROW, has_skill(ch, SKILL_TEMPEST_ARROW), get_difficulty(SKILL_TEMPEST_ARROW));
               enchantmentused = TRUE;
               break;
            case 4:
               dam = 70;
               act("The magical stones surrounding the arrow smack into you, hard.", ch, 0, victim, TO_VICT, 0);
               act("The magical stones surrounding the arrow smack hard into $n.", victim, 0, 0, TO_ROOM, 0);
-              if(number(1, 100) < has_skill(ch, SKILL_STONE_ARROW) / 4) {
+              if(number(1, 100) < has_skill(ch, SKILL_GRANITE_ARROW) / 4) {
                  act("The stones knock you flat on your ass!", ch, 0, victim, TO_VICT, 0);
                  act("The stones knock $n flat on $s ass!", victim, 0, 0, TO_ROOM, 0);
                  GET_POS(victim) = POSITION_SITTING;
                  WAIT_STATE(victim, PULSE_VIOLENCE);
               }
-              retval = damage(ch, victim, dam, TYPE_HIT, SKILL_STONE_ARROW, 0);
-              skill_increase_check(ch, SKILL_STONE_ARROW, has_skill(ch, SKILL_STONE_ARROW), spell_info[SKILL_STONE_ARROW].difficulty);
+              retval = damage(ch, victim, dam, TYPE_HIT, SKILL_GRANITE_ARROW, 0);
+              skill_increase_check(ch, SKILL_GRANITE_ARROW, has_skill(ch, SKILL_GRANITE_ARROW), get_difficulty(SKILL_GRANITE_ARROW));
               enchantmentused = TRUE;
               break;
            default: break;
