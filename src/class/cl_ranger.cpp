@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: cl_ranger.cpp,v 1.51 2005/05/06 11:24:27 shane Exp $ | cl_ranger.C  *
+ * $Id: cl_ranger.cpp,v 1.52 2005/05/06 11:48:46 shane Exp $ | cl_ranger.C  *
  * Description: Ranger skills/spells                                          *
  *                                                                            *
  * Revision History                                                           *
@@ -1318,12 +1318,18 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
               break;
         }
      } else {
-        sprintf(buf, "You hit %s with %s!\r\n", GET_SHORT(victim), found->short_description);
-        send_to_char(buf, ch);
-        sprintf(buf, "You get shot with %s from the %s.  Ouch.", found->short_description, dirs[rev_dir[dir]]);
-        act(buf, victim, 0, 0, TO_CHAR, 0);
-        sprintf(buf, "%s from the %s hits $n!", found->short_description, dirs[rev_dir[dir]]);
-        act(buf, victim, 0, ch, TO_ROOM, NOTVICT);
+        if(dir < 0) {
+           sprintf(buf, "You get shot with %s.  Ouch.", found->short_description);
+           act(buf, victim, 0, 0, TO_CHAR, 0);
+           sprintf(buf, "%s hits $n!", found->short_description);
+           act(buf, victim, 0, ch, TO_ROOM, NOTVICT);           
+        } else {
+           sprintf(buf, "You hit %s with %s!\r\n", GET_SHORT(victim), found->short_description);
+           send_to_char(buf, ch);
+           sprintf(buf, "You get shot with %s from the %s.  Ouch.", found->short_description, dirs[rev_dir[dir]]);
+           act(buf, victim, 0, 0, TO_CHAR, 0);
+           sprintf(buf, "%s from the %s hits $n!", found->short_description, dirs[rev_dir[dir]]);
+           act(buf, victim, 0, 0, TO_ROOM, 0);
 
         GET_POS(victim) = POSITION_STANDING;
 
