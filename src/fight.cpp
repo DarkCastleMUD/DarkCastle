@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.265 2005/05/05 12:18:31 shane Exp $ */
+/* $Id: fight.cpp,v 1.266 2005/05/06 19:32:02 shane Exp $ */
 
 extern "C"
 {
@@ -1394,7 +1394,11 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
   typeofdamage = damage_type(weapon_type);
 
   if(GET_POS(victim) == POSITION_DEAD)           return (eSUCCESS|eVICT_DIED);
-  if (ch->in_room != victim->in_room && !(attacktype == SPELL_SOLAR_GATE || attacktype == SKILL_ARCHERY ||attacktype == SPELL_LIGHTNING_BOLT)) return eSUCCESS;
+  if (ch->in_room != victim->in_room && !(attacktype == SPELL_SOLAR_GATE ||
+   attacktype == SKILL_ARCHERY ||attacktype == SPELL_LIGHTNING_BOLT || 
+   attacktype == SKILL_FIRE_ARROW || attacktype == SKILL_TEMPEST_ARROW || 
+   attacktype == SKILL_GRANITE_ARROW || attacktype == SKILL_ICE_ARROW)) 
+     return eSUCCESS;
   int l=0;
   if (dam!=0 && attacktype && attacktype < TYPE_HIT)
   { // Skill damages based on learned %
@@ -1888,7 +1892,11 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
       eq_damage(ch, victim, dam, weapon_type, attacktype);
 
   inform_victim(ch, victim, dam);
-  if (GET_POS(victim) != POSITION_DEAD &&ch->in_room != victim->in_room && !(attacktype == SPELL_SOLAR_GATE|| attacktype == SKILL_ARCHERY || attacktype == SPELL_LIGHTNING_BOLT)) // Wimpy
+  if (GET_POS(victim) != POSITION_DEAD &&ch->in_room != victim->in_room && 
+   !(attacktype == SPELL_SOLAR_GATE|| attacktype == SKILL_ARCHERY || 
+   attacktype == SPELL_LIGHTNING_BOLT || attacktype == SKILL_FIRE_ARROW ||
+   attacktype == SKILL_ICE_ARROW || attacktype == SKILL_TEMPEST_ARROW ||
+   attacktype == SKILL_GRANITE_ARROW)) // Wimpy
       return eSUCCESS;   
   if(typeofdamage == DAMAGE_TYPE_PHYSICAL && dam > 0 && ch != victim)
   {
