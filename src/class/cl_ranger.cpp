@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: cl_ranger.cpp,v 1.54 2005/05/06 12:19:35 urizen Exp $ | cl_ranger.C  *
+ * $Id: cl_ranger.cpp,v 1.55 2005/05/06 12:23:02 urizen Exp $ | cl_ranger.C  *
  * Description: Ranger skills/spells                                          *
  *                                                                            *
  * Revision History                                                           *
@@ -1276,8 +1276,10 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
   else {
      dam = dice(found->obj_flags.value[1], found->obj_flags.value[2]);
      dam += dice(ch->equipment[HOLD]->obj_flags.value[1], ch->equipment[HOLD]->obj_flags.value[2]);
-     for(int i=0;found->num_affects;i++)
+     for(int i=0;i < found->num_affects;i++)
         if(found->affected[i].location == APPLY_DAMROLL && found->affected[i].modifier != 0)
+           dam += found->affected[i].modifier;
+        else if(found->affected[i].location == APPLY_HIT_N_DAM && found->affected[i].modifier != 0)
            dam += found->affected[i].modifier;
 
      set_cantquit(ch, victim);
