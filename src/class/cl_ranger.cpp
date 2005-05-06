@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: cl_ranger.cpp,v 1.53 2005/05/06 12:15:39 urizen Exp $ | cl_ranger.C  *
+ * $Id: cl_ranger.cpp,v 1.54 2005/05/06 12:19:35 urizen Exp $ | cl_ranger.C  *
  * Description: Ranger skills/spells                                          *
  *                                                                            *
  * Revision History                                                           *
@@ -1328,7 +1328,7 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
            act(buf, victim, 0, 0, TO_CHAR, 0);
            sprintf(buf, "%s from the %s hits $n!", found->short_description, dirs[rev_dir[dir]]);
            act(buf, victim, 0, 0, TO_ROOM, 0);
-
+         }
         GET_POS(victim) = POSITION_STANDING;
 
         if(IS_NPC(victim)) 
