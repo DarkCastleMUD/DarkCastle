@@ -14,7 +14,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.h,v 1.67 2005/05/02 19:35:19 shane Exp $ */
+/* $Id: spells.h,v 1.68 2005/05/06 11:24:41 shane Exp $ */
 #include <structs.h> // byte, sh_int
 
 #define MAX_BUF_LENGTH               240
@@ -319,8 +319,8 @@ void check_maxes(CHAR_DATA *ch);
 #define SKILL_NATURES_LORE           379
 #define SKILL_FIRE_ARROW             380
 #define SKILL_ICE_ARROW              381
-#define SKILL_WIND_ARROW             382
-#define SKILL_STONE_ARROW            383
+#define SKILL_TEMPEST_ARROW          382
+#define SKILL_GRANITE_ARROW          383
 #define SKILL_MAX                    383
 
 // if you add a skill, make sure you update "skills[]" in spells.C
