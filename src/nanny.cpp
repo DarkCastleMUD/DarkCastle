@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.85 2005/05/05 19:09:02 shane Exp $ */
+/* $Id: nanny.cpp,v 1.86 2005/05/06 12:15:37 urizen Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -1958,8 +1958,19 @@ char *str_str(char *first, char *second)
    return pstr;
 }
 
+void short_activity()
+{ // handles short activity. at the moment, only archery.
+  CHAR_DATA *ch;
+  for(ch = character_list; ch; ch = ch->next) 
+  { // NOTE: no error handling if character gets removed
+    // at present, no need. Add if need arises.
+    if (ch->shotsthisround) ch->shotsthisround--;
+  }
+  
+}
+
 // these are for my special lag that only keeps you from doing certain
-// commands, while still allowing other.  (shooting arrows for example) 
+// commands, while still allowing other. 
 void add_command_lag(CHAR_DATA * ch, int amount)
 {
    if(GET_LEVEL(ch) < IMMORTAL)

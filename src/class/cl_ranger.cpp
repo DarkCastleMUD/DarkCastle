@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: cl_ranger.cpp,v 1.52 2005/05/06 11:48:46 shane Exp $ | cl_ranger.C  *
+ * $Id: cl_ranger.cpp,v 1.53 2005/05/06 12:15:39 urizen Exp $ | cl_ranger.C  *
  * Description: Ranger skills/spells                                          *
  *                                                                            *
  * Revision History                                                           *
@@ -981,8 +981,6 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
   extern char * dirs[];
 
   void get(struct char_data *, struct obj_data *, struct obj_data *);
-  int check_command_lag(CHAR_DATA *);
-  void add_command_lag(CHAR_DATA *, int);
   
   victim = NULL;
   *direct = '\0';
@@ -1013,7 +1011,7 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
     return eFAILURE;
   }
 
-  if(check_command_lag(ch))
+  if(ch->shotsthisround > 0)
   {
     send_to_char("Slow down there tiger, you can't fire them that fast!\r\n", ch);
     return eFAILURE;
@@ -1395,14 +1393,9 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
 
   extract_obj(found);
 
-  if(has_skill(ch, SKILL_ARCHERY) < 51 || enchantmentused)
-     add_command_lag(ch, 1);
-  else if(has_skill(ch, SKILL_ARCHERY) < 86)
-     if(++ch->shotsthisround > 1)
-        add_command_lag(ch, 1);
-  else
-     if(++ch->shotsthisround > 2)
-        add_command_lag(ch, 1);
+  if (has_skill(ch, SKILL_ARCHERY) < 51 || enchantmentused) ch->shotsthisround += PULSE_VIOLENCE;
+  else if (has_skill(ch, SKILL_ARCHERY) < 86)               ch->shotsthisround += PULSE_VIOLENCE / 2;
+  else                                                      ch->shotsthisround += 3;
 
   return retval;
 }

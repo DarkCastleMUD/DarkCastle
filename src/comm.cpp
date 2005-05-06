@@ -129,11 +129,13 @@ int pulse_violence;
 int pulse_weather;
 int pulse_regen;
 int pulse_time;
+int pulse_short; // short timer, for archery
 
 /* functions in this file */
 void update_mprog_throws(void);
 void update_bard_singing(void);
 void update_command_lag_and_poison(void);
+void short_activity();
 void skip_spaces(char **string);
 char *any_one_arg(char *argument, char *first_arg);
 char * calc_color(int hit, int max_hit);
@@ -929,6 +931,7 @@ void init_heartbeat()
   pulse_weather   = PULSE_WEATHER;
   pulse_regen     = PULSE_REGEN;
   pulse_time      = PULSE_TIME;
+  pulse_short     = PULSE_SHORT;
 }
 
 void heartbeat()
@@ -944,7 +947,11 @@ void heartbeat()
      pulse_timer = PULSE_TIMER;
      check_timer();
   }
-
+  if (--pulse_short < 1)
+  {
+     pulse_short = PULSE_SHORT;
+     short_activity();
+  }
   // TODO - need to eventually modify this so it works for casters too so I can delay certain
   if (--pulse_bard < 1) 
   {

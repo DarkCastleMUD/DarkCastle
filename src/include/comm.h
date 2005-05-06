@@ -32,6 +32,7 @@ typedef int socket_t;
 #define PULSE_WEATHER   (45 * PASSES_PER_SEC)
 #define PULSE_TIME      (60 * PASSES_PER_SEC)
 #define PULSE_REGEN     (15 * PASSES_PER_SEC)
+#define PULSE_SHORT     1 // Pulses all the time. 
 
 #define BAN_NOT         0
 #define BAN_NEW         1
