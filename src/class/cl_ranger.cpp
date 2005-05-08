@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: cl_ranger.cpp,v 1.55 2005/05/06 12:23:02 urizen Exp $ | cl_ranger.C  *
+ * $Id: cl_ranger.cpp,v 1.56 2005/05/08 21:43:06 shane Exp $ | cl_ranger.C  *
  * Description: Ranger skills/spells                                          *
  *                                                                            *
  * Revision History                                                           *
@@ -1115,13 +1115,7 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
   cur_room = ch->in_room;
 
   if(target) {
-     if(has_skill(ch, SKILL_ARCHERY) > 80)
-        victim = get_char_room_vis(ch, target);
-     else if(dir < 0) {
-        send_to_char("You aren't skilled enough to fire at a target this close.\n\r", ch);
-        return eFAILURE;
-     }
-     if(!victim && dir >= 0) {
+     if(dir >= 0) {
         if(world[cur_room].dir_option[dir] && 
          !(world[cur_room].dir_option[dir]->to_room == NOWHERE) && 
          !IS_SET(world[cur_room].dir_option[dir]->exit_info, EX_CLOSED))
@@ -1180,6 +1174,17 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
            }
            victim = get_char_room_vis(ch, target);
         }        
+     }
+     if(!victim && has_skill(ch, SKILL_ARCHERY) > 80) {
+        char_from_room(ch);
+        char_to_room(ch, cur_room);
+        victim = get_char_room_vis(ch, target);
+     }
+     else if(dir < 0) {
+        send_to_char("You aren't skilled enough to fire at a target this close.\n\r", ch);
+        char_from_room(ch);
+        char_to_room(ch, cur_room);
+        return eFAILURE;
      }
      if(!victim) {
         send_to_char("You can't seem to locate your target.\r\n", ch);
