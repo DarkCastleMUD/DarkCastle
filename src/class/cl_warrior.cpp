@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.32 2005/04/13 20:51:00 shane Exp $
+| $Id: cl_warrior.cpp,v 1.33 2005/05/09 19:14:19 shane Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -502,14 +502,14 @@ int do_redirect(struct char_data *ch, char *argument, int cmd)
        act( "$n tries to redirect his attacks but $N won't allow it.", ch, NULL, ch->fighting, TO_VICT, 0 );
        act( "You try to redirect your attacks to $N but are blocked.", ch, NULL, victim, TO_CHAR, 0 );
        act( "$n tries to redirect his attacks elsewhere, but $N wont allow it.", ch, NULL, victim, TO_ROOM, NOTVICT );
-       WAIT_STATE(ch, PULSE_VIOLENCE*3);
+       WAIT_STATE(ch, PULSE_VIOLENCE);
     } else {
        act( "$n redirects his attacks at YOU!", ch, NULL, victim, TO_VICT , 0);
        act( "You redirect your at attacks at $N!", ch, NULL, victim, TO_CHAR , 0);
        act( "$n redirects his attacks at $N!", ch, NULL, victim, TO_ROOM, NOTVICT );
        stop_fighting(ch);
        set_fighting(ch, victim);
-       WAIT_STATE(ch, PULSE_VIOLENCE*3);
+       WAIT_STATE(ch, PULSE_VIOLENCE);
     }
   return eSUCCESS;
 }
@@ -681,6 +681,9 @@ int do_rescue(struct char_data *ch, char *argument, int cmd)
     act("You are rescued by $N, you are confused!", victim, 0, ch, TO_CHAR, 0);
     act("$n heroically rescues $N.", ch, 0, victim, TO_ROOM, NOTVICT);
 
+    int tempwait = ch->desc->wait;
+    int tempvictwait = victim->desc->wait;
+
     if (victim->fighting == tmp_ch)
        stop_fighting(victim);
     if (tmp_ch->fighting)
@@ -695,7 +698,8 @@ int do_rescue(struct char_data *ch, char *argument, int cmd)
     set_fighting(ch, tmp_ch);
     set_fighting(tmp_ch, ch);
 
-    WAIT_STATE(victim, 2*PULSE_VIOLENCE);
+    WAIT_STATE(ch, MAX(PULSE_VIOLENCE*2, tempwait));
+    WAIT_STATE(victim, MAX(PULSE_VIOLENCE*2, tempvictwait));
     return eSUCCESS;
 }
 
