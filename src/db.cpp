@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.77 2005/04/09 21:15:27 urizen Exp $ */
+/* $Id: db.cpp,v 1.78 2005/05/09 05:08:34 shane Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -48,6 +48,7 @@ extern "C"
 #include <character.h>
 #include <mobile.h> 
 #include <room.h>
+#include <race.h>
 #include <obj.h> // extra_descr_data
 #include <handler.h> // get_obj_num
 #include <connect.h> // descriptor_data
@@ -2491,6 +2492,7 @@ CHAR_DATA *read_mobile(int nr, FILE *fl)
     char letter;
 
     extern struct race_shit race_info[];
+    extern int mob_race_mod[][5];
 
     i = nr;
 
@@ -2546,6 +2548,245 @@ CHAR_DATA *read_mobile(int nr, FILE *fl)
         mob->raw_wis   = mob->wis   = 13;
         mob->raw_dex   = mob->dex   = 13;
         mob->raw_con   = mob->con   = 13;
+
+        switch(GET_RACE(mob)) {
+           case RACE_NONE:
+              mob->raw_str   = mob->str   += mob_race_mod[GET_RACE(mob)][0];
+              mob->raw_dex   = mob->dex   += mob_race_mod[GET_RACE(mob)][1];
+              mob->raw_con   = mob->con   += mob_race_mod[GET_RACE(mob)][2];
+              mob->raw_intel = mob->intel += mob_race_mod[GET_RACE(mob)][3];
+              mob->raw_wis   = mob->wis   += mob_race_mod[GET_RACE(mob)][4];
+              break;             
+           case RACE_HUMAN:
+              mob->raw_str   = mob->str   += mob_race_mod[GET_RACE(mob)][0];
+              mob->raw_dex   = mob->dex   += mob_race_mod[GET_RACE(mob)][1];
+              mob->raw_con   = mob->con   += mob_race_mod[GET_RACE(mob)][2];
+              mob->raw_intel = mob->intel += mob_race_mod[GET_RACE(mob)][3];
+              mob->raw_wis   = mob->wis   += mob_race_mod[GET_RACE(mob)][4];
+              break;
+           case RACE_ELVEN:
+              mob->raw_str   = mob->str   += mob_race_mod[GET_RACE(mob)][0];
+              mob->raw_dex   = mob->dex   += mob_race_mod[GET_RACE(mob)][1];
+              mob->raw_con   = mob->con   += mob_race_mod[GET_RACE(mob)][2];
+              mob->raw_intel = mob->intel += mob_race_mod[GET_RACE(mob)][3];
+              mob->raw_wis   = mob->wis   += mob_race_mod[GET_RACE(mob)][4];
+              break;
+           case RACE_DWARVEN:
+              mob->raw_str   = mob->str   += mob_race_mod[GET_RACE(mob)][0];
+              mob->raw_dex   = mob->dex   += mob_race_mod[GET_RACE(mob)][1];
+              mob->raw_con   = mob->con   += mob_race_mod[GET_RACE(mob)][2];
+              mob->raw_intel = mob->intel += mob_race_mod[GET_RACE(mob)][3];
+              mob->raw_wis   = mob->wis   += mob_race_mod[GET_RACE(mob)][4];
+              break;
+           case RACE_HOBBIT:
+              mob->raw_str   = mob->str   += mob_race_mod[GET_RACE(mob)][0];
+              mob->raw_dex   = mob->dex   += mob_race_mod[GET_RACE(mob)][1];
+              mob->raw_con   = mob->con   += mob_race_mod[GET_RACE(mob)][2];
+              mob->raw_intel = mob->intel += mob_race_mod[GET_RACE(mob)][3];
+              mob->raw_wis   = mob->wis   += mob_race_mod[GET_RACE(mob)][4];
+              break;
+           case RACE_PIXIE:
+              mob->raw_str   = mob->str   += mob_race_mod[GET_RACE(mob)][0];
+              mob->raw_dex   = mob->dex   += mob_race_mod[GET_RACE(mob)][1];
+              mob->raw_con   = mob->con   += mob_race_mod[GET_RACE(mob)][2];
+              mob->raw_intel = mob->intel += mob_race_mod[GET_RACE(mob)][3];
+              mob->raw_wis   = mob->wis   += mob_race_mod[GET_RACE(mob)][4];
+              break;
+           case RACE_GIANT:
+              mob->raw_str   = mob->str   += mob_race_mod[GET_RACE(mob)][0];
+              mob->raw_dex   = mob->dex   += mob_race_mod[GET_RACE(mob)][1];
+              mob->raw_con   = mob->con   += mob_race_mod[GET_RACE(mob)][2];
+              mob->raw_intel = mob->intel += mob_race_mod[GET_RACE(mob)][3];
+              mob->raw_wis   = mob->wis   += mob_race_mod[GET_RACE(mob)][4];
+              break;
+           case RACE_GNOME:
+              mob->raw_str   = mob->str   += mob_race_mod[GET_RACE(mob)][0];
+              mob->raw_dex   = mob->dex   += mob_race_mod[GET_RACE(mob)][1];
+              mob->raw_con   = mob->con   += mob_race_mod[GET_RACE(mob)][2];
+              mob->raw_intel = mob->intel += mob_race_mod[GET_RACE(mob)][3];
+              mob->raw_wis   = mob->wis   += mob_race_mod[GET_RACE(mob)][4];
+              break;
+           case RACE_ORC:
+              mob->raw_str   = mob->str   += mob_race_mod[GET_RACE(mob)][0];
+              mob->raw_dex   = mob->dex   += mob_race_mod[GET_RACE(mob)][1];
+              mob->raw_con   = mob->con   += mob_race_mod[GET_RACE(mob)][2];
+              mob->raw_intel = mob->intel += mob_race_mod[GET_RACE(mob)][3];
+              mob->raw_wis   = mob->wis   += mob_race_mod[GET_RACE(mob)][4];
+              break;
+           case RACE_TROLL:
+              mob->raw_str   = mob->str   += mob_race_mod[GET_RACE(mob)][0];
+              mob->raw_dex   = mob->dex   += mob_race_mod[GET_RACE(mob)][1];
+              mob->raw_con   = mob->con   += mob_race_mod[GET_RACE(mob)][2];
+              mob->raw_intel = mob->intel += mob_race_mod[GET_RACE(mob)][3];
+              mob->raw_wis   = mob->wis   += mob_race_mod[GET_RACE(mob)][4];
+              break;
+           case RACE_GOBLIN:
+              mob->raw_str   = mob->str   += mob_race_mod[GET_RACE(mob)][0];
+              mob->raw_dex   = mob->dex   += mob_race_mod[GET_RACE(mob)][1];
+              mob->raw_con   = mob->con   += mob_race_mod[GET_RACE(mob)][2];
+              mob->raw_intel = mob->intel += mob_race_mod[GET_RACE(mob)][3];
+              mob->raw_wis   = mob->wis   += mob_race_mod[GET_RACE(mob)][4];
+              break;
+           case RACE_REPTILE:
+              mob->raw_str   = mob->str   += mob_race_mod[GET_RACE(mob)][0];
+              mob->raw_dex   = mob->dex   += mob_race_mod[GET_RACE(mob)][1];
+              mob->raw_con   = mob->con   += mob_race_mod[GET_RACE(mob)][2];
+              mob->raw_intel = mob->intel += mob_race_mod[GET_RACE(mob)][3];
+              mob->raw_wis   = mob->wis   += mob_race_mod[GET_RACE(mob)][4];
+              break;
+           case RACE_DRAGON:
+              mob->raw_str   = mob->str   += mob_race_mod[GET_RACE(mob)][0];
+              mob->raw_dex   = mob->dex   += mob_race_mod[GET_RACE(mob)][1];
+              mob->raw_con   = mob->con   += mob_race_mod[GET_RACE(mob)][2];
+              mob->raw_intel = mob->intel += mob_race_mod[GET_RACE(mob)][3];
+              mob->raw_wis   = mob->wis   += mob_race_mod[GET_RACE(mob)][4];
+              break;
+           case RACE_SNAKE:
+              mob->raw_str   = mob->str   += mob_race_mod[GET_RACE(mob)][0];
+              mob->raw_dex   = mob->dex   += mob_race_mod[GET_RACE(mob)][1];
+              mob->raw_con   = mob->con   += mob_race_mod[GET_RACE(mob)][2];
+              mob->raw_intel = mob->intel += mob_race_mod[GET_RACE(mob)][3];
+              mob->raw_wis   = mob->wis   += mob_race_mod[GET_RACE(mob)][4];
+              break;
+           case RACE_HORSE:
+              mob->raw_str   = mob->str   += mob_race_mod[GET_RACE(mob)][0];
+              mob->raw_dex   = mob->dex   += mob_race_mod[GET_RACE(mob)][1];
+              mob->raw_con   = mob->con   += mob_race_mod[GET_RACE(mob)][2];
+              mob->raw_intel = mob->intel += mob_race_mod[GET_RACE(mob)][3];
+              mob->raw_wis   = mob->wis   += mob_race_mod[GET_RACE(mob)][4];
+              break;
+           case RACE_BIRD:
+              mob->raw_str   = mob->str   += mob_race_mod[GET_RACE(mob)][0];
+              mob->raw_dex   = mob->dex   += mob_race_mod[GET_RACE(mob)][1];
+              mob->raw_con   = mob->con   += mob_race_mod[GET_RACE(mob)][2];
+              mob->raw_intel = mob->intel += mob_race_mod[GET_RACE(mob)][3];
+              mob->raw_wis   = mob->wis   += mob_race_mod[GET_RACE(mob)][4];
+              break;
+           case RACE_RODENT:
+              mob->raw_str   = mob->str   += mob_race_mod[GET_RACE(mob)][0];
+              mob->raw_dex   = mob->dex   += mob_race_mod[GET_RACE(mob)][1];
+              mob->raw_con   = mob->con   += mob_race_mod[GET_RACE(mob)][2];
+              mob->raw_intel = mob->intel += mob_race_mod[GET_RACE(mob)][3];
+              mob->raw_wis   = mob->wis   += mob_race_mod[GET_RACE(mob)][4];
+              break;
+           case RACE_FISH:
+              mob->raw_str   = mob->str   += mob_race_mod[GET_RACE(mob)][0];
+              mob->raw_dex   = mob->dex   += mob_race_mod[GET_RACE(mob)][1];
+              mob->raw_con   = mob->con   += mob_race_mod[GET_RACE(mob)][2];
+              mob->raw_intel = mob->intel += mob_race_mod[GET_RACE(mob)][3];
+              mob->raw_wis   = mob->wis   += mob_race_mod[GET_RACE(mob)][4];
+              break;
+           case RACE_ARACHNID:
+              mob->raw_str   = mob->str   += mob_race_mod[GET_RACE(mob)][0];
+              mob->raw_dex   = mob->dex   += mob_race_mod[GET_RACE(mob)][1];
+              mob->raw_con   = mob->con   += mob_race_mod[GET_RACE(mob)][2];
+              mob->raw_intel = mob->intel += mob_race_mod[GET_RACE(mob)][3];
+              mob->raw_wis   = mob->wis   += mob_race_mod[GET_RACE(mob)][4];
+              break;
+           case RACE_INSECT:
+              mob->raw_str   = mob->str   += mob_race_mod[GET_RACE(mob)][0];
+              mob->raw_dex   = mob->dex   += mob_race_mod[GET_RACE(mob)][1];
+              mob->raw_con   = mob->con   += mob_race_mod[GET_RACE(mob)][2];
+              mob->raw_intel = mob->intel += mob_race_mod[GET_RACE(mob)][3];
+              mob->raw_wis   = mob->wis   += mob_race_mod[GET_RACE(mob)][4];
+              break;
+           case RACE_SLIME:
+              mob->raw_str   = mob->str   += mob_race_mod[GET_RACE(mob)][0];
+              mob->raw_dex   = mob->dex   += mob_race_mod[GET_RACE(mob)][1];
+              mob->raw_con   = mob->con   += mob_race_mod[GET_RACE(mob)][2];
+              mob->raw_intel = mob->intel += mob_race_mod[GET_RACE(mob)][3];
+              mob->raw_wis   = mob->wis   += mob_race_mod[GET_RACE(mob)][4];
+              break;
+           case RACE_ANIMAL:
+              mob->raw_str   = mob->str   += mob_race_mod[GET_RACE(mob)][0];
+              mob->raw_dex   = mob->dex   += mob_race_mod[GET_RACE(mob)][1];
+              mob->raw_con   = mob->con   += mob_race_mod[GET_RACE(mob)][2];
+              mob->raw_intel = mob->intel += mob_race_mod[GET_RACE(mob)][3];
+              mob->raw_wis   = mob->wis   += mob_race_mod[GET_RACE(mob)][4];
+              break;
+           case RACE_TREE:
+              mob->raw_str   = mob->str   += mob_race_mod[GET_RACE(mob)][0];
+              mob->raw_dex   = mob->dex   += mob_race_mod[GET_RACE(mob)][1];
+              mob->raw_con   = mob->con   += mob_race_mod[GET_RACE(mob)][2];
+              mob->raw_intel = mob->intel += mob_race_mod[GET_RACE(mob)][3];
+              mob->raw_wis   = mob->wis   += mob_race_mod[GET_RACE(mob)][4];
+              break;
+           case RACE_ENFAN:
+              mob->raw_str   = mob->str   += mob_race_mod[GET_RACE(mob)][0];
+              mob->raw_dex   = mob->dex   += mob_race_mod[GET_RACE(mob)][1];
+              mob->raw_con   = mob->con   += mob_race_mod[GET_RACE(mob)][2];
+              mob->raw_intel = mob->intel += mob_race_mod[GET_RACE(mob)][3];
+              mob->raw_wis   = mob->wis   += mob_race_mod[GET_RACE(mob)][4];
+              break;
+           case RACE_UNDEAD:
+              mob->raw_str   = mob->str   += mob_race_mod[GET_RACE(mob)][0];
+              mob->raw_dex   = mob->dex   += mob_race_mod[GET_RACE(mob)][1];
+              mob->raw_con   = mob->con   += mob_race_mod[GET_RACE(mob)][2];
+              mob->raw_intel = mob->intel += mob_race_mod[GET_RACE(mob)][3];
+              mob->raw_wis   = mob->wis   += mob_race_mod[GET_RACE(mob)][4];
+              break;
+           case RACE_GHOST:
+              mob->raw_str   = mob->str   += mob_race_mod[GET_RACE(mob)][0];
+              mob->raw_dex   = mob->dex   += mob_race_mod[GET_RACE(mob)][1];
+              mob->raw_con   = mob->con   += mob_race_mod[GET_RACE(mob)][2];
+              mob->raw_intel = mob->intel += mob_race_mod[GET_RACE(mob)][3];
+              mob->raw_wis   = mob->wis   += mob_race_mod[GET_RACE(mob)][4];
+              break;
+           case RACE_GOLEM:
+              mob->raw_str   = mob->str   += mob_race_mod[GET_RACE(mob)][0];
+              mob->raw_dex   = mob->dex   += mob_race_mod[GET_RACE(mob)][1];
+              mob->raw_con   = mob->con   += mob_race_mod[GET_RACE(mob)][2];
+              mob->raw_intel = mob->intel += mob_race_mod[GET_RACE(mob)][3];
+              mob->raw_wis   = mob->wis   += mob_race_mod[GET_RACE(mob)][4];
+              break;
+           case RACE_ELEMENT:
+              mob->raw_str   = mob->str   += mob_race_mod[GET_RACE(mob)][0];
+              mob->raw_dex   = mob->dex   += mob_race_mod[GET_RACE(mob)][1];
+              mob->raw_con   = mob->con   += mob_race_mod[GET_RACE(mob)][2];
+              mob->raw_intel = mob->intel += mob_race_mod[GET_RACE(mob)][3];
+              mob->raw_wis   = mob->wis   += mob_race_mod[GET_RACE(mob)][4];
+              break;
+           case RACE_ASTRAL:
+              mob->raw_str   = mob->str   += mob_race_mod[GET_RACE(mob)][0];
+              mob->raw_dex   = mob->dex   += mob_race_mod[GET_RACE(mob)][1];
+              mob->raw_con   = mob->con   += mob_race_mod[GET_RACE(mob)][2];
+              mob->raw_intel = mob->intel += mob_race_mod[GET_RACE(mob)][3];
+              mob->raw_wis   = mob->wis   += mob_race_mod[GET_RACE(mob)][4];
+              break;
+           case RACE_DEMON:
+              mob->raw_str   = mob->str   += mob_race_mod[GET_RACE(mob)][0];
+              mob->raw_dex   = mob->dex   += mob_race_mod[GET_RACE(mob)][1];
+              mob->raw_con   = mob->con   += mob_race_mod[GET_RACE(mob)][2];
+              mob->raw_intel = mob->intel += mob_race_mod[GET_RACE(mob)][3];
+              mob->raw_wis   = mob->wis   += mob_race_mod[GET_RACE(mob)][4];
+              break;
+           case RACE_YRNALI:
+              mob->raw_str   = mob->str   += mob_race_mod[GET_RACE(mob)][0];
+              mob->raw_dex   = mob->dex   += mob_race_mod[GET_RACE(mob)][1];
+              mob->raw_con   = mob->con   += mob_race_mod[GET_RACE(mob)][2];
+              mob->raw_intel = mob->intel += mob_race_mod[GET_RACE(mob)][3];
+              mob->raw_wis   = mob->wis   += mob_race_mod[GET_RACE(mob)][4];
+              break;
+           case RACE_IMMORTAL:
+              mob->raw_str   = mob->str   += mob_race_mod[GET_RACE(mob)][0];
+              mob->raw_dex   = mob->dex   += mob_race_mod[GET_RACE(mob)][1];
+              mob->raw_con   = mob->con   += mob_race_mod[GET_RACE(mob)][2];
+              mob->raw_intel = mob->intel += mob_race_mod[GET_RACE(mob)][3];
+              mob->raw_wis   = mob->wis   += mob_race_mod[GET_RACE(mob)][4];
+              break;
+           case RACE_FELINE:
+              mob->raw_str   = mob->str   += mob_race_mod[GET_RACE(mob)][0];
+              mob->raw_dex   = mob->dex   += mob_race_mod[GET_RACE(mob)][1];
+              mob->raw_con   = mob->con   += mob_race_mod[GET_RACE(mob)][2];
+              mob->raw_intel = mob->intel += mob_race_mod[GET_RACE(mob)][3];
+              mob->raw_wis   = mob->wis   += mob_race_mod[GET_RACE(mob)][4];
+              break;
+           default:
+              log("Mob without a race flag defined in db.cpp or race.h?!", 0, LOG_BUG);
+              sprintf(buf, "Mob %s", mob->short_desc);
+              log(buf, 0, LOG_BUG);
+        }
+
 
         GET_LEVEL(mob) = fread_int (fl, 0, IMP);
     

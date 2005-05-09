@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.150 2005/05/06 11:24:11 shane Exp $ */
+/* $Id: const.cpp,v 1.151 2005/05/09 05:08:34 shane Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1734,6 +1734,43 @@ struct race_shit race_info[] =
 {  "Immortal",  "Immortals",  127,      1288,   1048576,       0,          0,         0,       0,      0,    AFF_IGNORE_WEAPON_WEIGHT|AFF_INFRARED|AFF_SENSE_LIFE|AFF_DETECT_INVISIBLE|AFF_FLYING|AFF_TRUE_SIGHT|AFF_SOLIDITY|AFF_SANCTUARY },
 {  "Feline",    "Felines",     27,         0,         0,     128,    8388608,         0,       0,      0,    AFF_IGNORE_WEAPON_WEIGHT|AFF_INFRARED|AFF_SENSE_LIFE|AFF_SNEAK }
 }; 
+
+int mob_race_mod[][5] =
+{
+{0, 0, 0, 0, 0},
+{0, 0, 0, 0, 0},
+{0, 0, 0, 0, 0},
+{0, 0, 0, 0, 0},
+{0, 0, 0, 0, 0},
+{0, 0, 0, 0, 0},
+{0, 0, 0, 0, 0},
+{0, 0, 0, 0, 0},
+{0, 0, 0, 0, 0},
+{0, 0, 0, 0, 0},
+{0, 0, 0, 0, 0},
+{0, 0, 0, 0, 0},
+{0, 0, 0, 0, 0},
+{0, 0, 0, 0, 0},
+{0, 0, 0, 0, 0},
+{0, 0, 0, 0, 0},
+{0, 0, 0, 0, 0},
+{0, 0, 0, 0, 0},
+{0, 0, 0, 0, 0},
+{0, 0, 0, 0, 0},
+{0, 0, 0, 0, 0},
+{0, 0, 0, 0, 0},
+{0, 0, 0, 0, 0},
+{0, 0, 0, 0, 0},
+{0, 0, 0, 0, 0},
+{0, 0, 0, 0, 0},
+{0, 0, 0, 0, 0},
+{0, 0, 0, 0, 0},
+{0, 0, 0, 0, 0},
+{0, 0, 0, 0, 0},
+{0, 0, 0, 0, 0},
+{0, 0, 0, 0, 0},
+{0, 0, 0, 0, 0}
+};
 
 char 
 *action_bits[] = {

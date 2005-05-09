@@ -6320,28 +6320,32 @@ int cast_create_food( byte level, CHAR_DATA *ch, char *arg, int type,
 
   switch (type) {
 	 case SPELL_TYPE_SPELL:
-		 act("$n magically creates a mushroom.",ch, 0, 0, TO_ROOM,
-		   0);
-	 return spell_create_food(level,ch,0,0, skill);
-		 break;
+	    act("$n magically creates a mushroom.",ch, 0, 0, TO_ROOM, 0);
+	    return spell_create_food(level,ch,0,0, skill);
+	    break;
          case SPELL_TYPE_WAND:
-         if(tar_obj) return eFAILURE;
-         if(tar_ch) return eFAILURE;
-         return spell_create_food(level,ch,0,0, skill);
-                 break;
+            if(tar_obj) return eFAILURE;
+            if(tar_ch) return eFAILURE;
+            return spell_create_food(level,ch,0,0, skill);
+            break;
+         case SPELL_TYPE_POTION:
+            if(tar_obj) return eFAILURE;
+            if(tar_ch) return eFAILURE;
+            return spell_create_food(level,ch,0,0, skill);
+            break;
          case SPELL_TYPE_STAFF:
-         if(tar_obj) return eFAILURE;
-         if(tar_ch) return eFAILURE;
-         return spell_create_food(level,ch,0,0, skill);
-                 break;
+            if(tar_obj) return eFAILURE;
+            if(tar_ch) return eFAILURE;
+            return spell_create_food(level,ch,0,0, skill);
+            break;
 	 case SPELL_TYPE_SCROLL:
-	 if(tar_obj) return eFAILURE;
-	 if(tar_ch) return eFAILURE;
-	 return spell_create_food(level,ch,0,0, skill);
-		 break;
+	    if(tar_obj) return eFAILURE;
+	    if(tar_ch) return eFAILURE;
+	    return spell_create_food(level,ch,0,0, skill);
+	    break;
 	 default :
-	 log("Serious screw-up in create food!", ANGEL, LOG_BUG);
-	 break;
+	    log("Serious screw-up in create food!", ANGEL, LOG_BUG);
+	    break;
 	 }
   return eFAILURE;
 }

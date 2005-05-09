@@ -1,7 +1,7 @@
 #ifndef RACE_H_
 #define RACE_H_
 /************************************************************************
-| $Id: race.h,v 1.10 2004/05/25 01:04:53 urizen Exp $
+| $Id: race.h,v 1.11 2005/05/09 05:08:44 shane Exp $
 | race.h
 | This file defines racial information.
 */
@@ -38,7 +38,8 @@
 #define RACE_DEMON       29
 #define RACE_YRNALI      30
 #define RACE_IMMORTAL    31
-#define MAX_RACE         31
+#define RACE_FELINE      32
+#define MAX_RACE         32
 
 /* Bitvectors for racial shit */
 #define BITV_HUMAN       1
