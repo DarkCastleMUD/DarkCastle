@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.267 2005/05/09 05:08:34 shane Exp $ */
+/* $Id: fight.cpp,v 1.268 2005/05/09 17:49:27 urizen Exp $ */
 
 extern "C"
 {
@@ -3686,7 +3686,7 @@ void group_gain(CHAR_DATA * ch, CHAR_DATA * victim)
     ch = ch->master;
 
   // Set group leader
-  if(!(leader = ch->master))
+  if(!(leader = ch->master) || !IS_AFFECTED(ch, AFF_GROUP))
     leader = ch;
 
   highest = get_highest_level_killer(leader, ch);
