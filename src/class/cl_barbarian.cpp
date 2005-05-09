@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_barbarian.cpp,v 1.49 2005/05/09 04:14:56 shane Exp $
+| $Id: cl_barbarian.cpp,v 1.50 2005/05/09 15:35:38 urizen Exp $
 | cl_barbarian.C
 | Description:  Commands for the barbarian class.
 */
@@ -476,7 +476,7 @@ int do_bullrush(struct char_data *ch, char *argument, int cmd)
   for(int i = 0; i < 6; i++) {
     if(!str_prefix(direction,dirs[i]))
     {
-      dir = i + 1;
+      dir = i;
       break;
     }
   }
