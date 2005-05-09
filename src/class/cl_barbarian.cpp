@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_barbarian.cpp,v 1.48 2005/05/03 18:27:41 urizen Exp $
+| $Id: cl_barbarian.cpp,v 1.49 2005/05/09 04:14:56 shane Exp $
 | cl_barbarian.C
 | Description:  Commands for the barbarian class.
 */
@@ -612,6 +612,7 @@ int do_knockback(struct char_data *ch, char *argument, int cmd)
   }
 
   victim = get_char_room_vis( ch, who );
+
   if ( victim == NULL )
     victim = ch->fighting;
 
@@ -644,7 +645,7 @@ int do_knockback(struct char_data *ch, char *argument, int cmd)
       for(int i = 0; i < 6; i++) {
         if(!str_prefix(where,dirs[i]))
         {
-          dir = i + 1;
+          dir = i;
           break;
         }
       }
