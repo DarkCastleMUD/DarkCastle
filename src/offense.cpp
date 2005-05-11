@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: offense.cpp,v 1.14 2005/05/11 10:44:24 shane Exp $
+| $Id: offense.cpp,v 1.15 2005/05/11 10:52:44 shane Exp $
 | offense.C
 | Description:  Commands that are generically offensive - that is, the
 |   victim should retaliate.  The class-specific offensive commands are
@@ -204,6 +204,7 @@ int do_kill(struct char_data *ch, char *argument, int cmd)
 int do_join(struct char_data *ch, char *argument, int cmd)
 {
   struct char_data *victim, *tmp_ch, *next_char, *k;
+  struct follow_type *j;
   extern struct char_data *combat_list;
   int count = 0;
   char victim_name[240];
@@ -233,11 +234,11 @@ int do_join(struct char_data *ch, char *argument, int cmd)
 
   if(!victim) {
      if(ch->followers)
-        for (k = ch->followers; k; k = k->next) {
-           if (ch->in_room == k->follower->in_room && k->follower->fighting)
-              if (IS_AFFECTED(k->follower, AFF_CHARM)) {
+        for (j = ch->followers; j; j = j->next) {
+           if (ch->in_room == j->follower->in_room && j->follower->fighting)
+              if (IS_AFFECTED(j->follower, AFF_CHARM)) {
                  found = TRUE;
-                 victim = k->follower;
+                 victim = j->follower;
               }
 	}
 
