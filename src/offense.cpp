@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: offense.cpp,v 1.13 2005/04/09 21:15:27 urizen Exp $
+| $Id: offense.cpp,v 1.14 2005/05/11 10:44:24 shane Exp $
 | offense.C
 | Description:  Commands that are generically offensive - that is, the
 |   victim should retaliate.  The class-specific offensive commands are
@@ -207,6 +207,7 @@ int do_join(struct char_data *ch, char *argument, int cmd)
   extern struct char_data *combat_list;
   int count = 0;
   char victim_name[240];
+  bool found = FALSE;
 
   one_argument(argument, victim_name);
 
@@ -225,10 +226,28 @@ int do_join(struct char_data *ch, char *argument, int cmd)
        return eFAILURE;
     count = 0;
   }
-  else if(!(victim = get_char_room_vis(ch, victim_name))) { 
+  else if(!(victim = get_char_room_vis(ch, victim_name)) && str_cmp("follower", victim_name)) { 
     send_to_char("Join whom?\n\r", ch);
     return eFAILURE;
   }
+
+  if(!victim) {
+     if(ch->followers)
+        for (k = ch->followers; k; k = k->next) {
+           if (ch->in_room == k->follower->in_room && k->follower->fighting)
+              if (IS_AFFECTED(k->follower, AFF_CHARM)) {
+                 found = TRUE;
+                 victim = k->follower;
+              }
+	}
+
+	if (!found) {
+	   send_to_char("You have no loyal subjects engaged in combat!\n\r", ch);
+           return eFAILURE;
+        }
+  }
+
+
   if (!victim->fighting)
   {
     send_to_char("But they're not fighting anyone.\r\n", ch);
