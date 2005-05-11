@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.33 2005/05/09 19:14:19 shane Exp $
+| $Id: cl_warrior.cpp,v 1.34 2005/05/11 11:07:11 shane Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -347,7 +347,7 @@ int do_bash(struct char_data *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
-    if (!IS_NPC(ch))
+//    if (!IS_NPC(ch))
       if (!ch->equipment[WIELD]) 
       {
           send_to_char("You need to wield a weapon, to make it a success.\n\r",ch);
