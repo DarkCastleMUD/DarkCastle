@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: shop.cpp,v 1.16 2005/05/01 11:54:01 shane Exp $ */
+/* $Id: shop.cpp,v 1.17 2005/05/12 21:14:55 shane Exp $ */
 
 extern "C"
 {
@@ -538,7 +538,7 @@ void shopping_list( char *arg, CHAR_DATA *ch,
     int cost;
     extern char *drinks[];
     int found;
-    int done[40]; // To show 'em numbered instead of a long list of duplicates
+    int done[100]; // To show 'em numbered instead of a long list of duplicates
     int i,a;
     if ( !is_ok( keeper, ch, shop_nr ) )
         return;
@@ -569,7 +569,7 @@ void shopping_list( char *arg, CHAR_DATA *ch,
            if (done[a] == vnum)
               loop = TRUE;
         if (loop) continue;
-	if (i < 40) 
+	if (i < 100) 
 	done[i++] = obj_index[obj->item_number].virt;
 	else break;
         a = 0;
