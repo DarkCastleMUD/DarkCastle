@@ -2208,7 +2208,7 @@ int spell_locate_object(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
   assert(ch);
   strcpy(name, fname(obj->name));
 
-  total = j = (int) (skill / 3.75);
+  total = j = (int) (skill / 1.5);
 
   for (i = object_list; i && (j>0); i = i->next)
   {
@@ -2222,10 +2222,12 @@ int spell_locate_object(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
       if(i->carried_by) {
         sprintf(buf,"%s carried by %s.\n\r", i->short_description,PERS(i->carried_by,ch));
         send_to_char(buf,ch);
+	j--;
       } else if (i->in_obj) {
         sprintf(buf,"%s is in %s.\n\r",i->short_description, i->in_obj->short_description);
         send_to_char(buf,ch);
-      } else {
+	j--;
+      } else if (i->in_room != NOWHERE || i->equipped_by != NULL) {
         sprintf(buf,"%s is in %s.\n\r",i->short_description,
            (i->in_room == NOWHERE ? "use in an unknown location" : world[i->in_room].name));
         send_to_char(buf,ch);
