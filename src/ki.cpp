@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.34 2005/04/19 18:34:14 urizen Exp $ */
+/* $Id: ki.cpp,v 1.35 2005/05/12 20:35:47 shane Exp $ */
 
 extern "C"
 {
@@ -695,10 +695,9 @@ int ki_disrupt( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
 int ki_stance( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
 {
    struct affected_type af;
-   int modifier = 0;
 
    if(affected_by_spell(ch, KI_STANCE+KI_OFFSET)) {
-      send_to_char("You cannot use such an ability so often...\r\n", ch);
+      send_to_char("You focus your ki to harden your stance, but your body is still recovering from last time...\r\n", ch);
       return eFAILURE;
    }
 
@@ -710,19 +709,11 @@ int ki_stance( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
    if(number(1, 100) > ( GET_DEX(ch) * 4 ) )
       return eSUCCESS;
 
-   // chance for bonus on wis
-   if(number(1, 100) < GET_WIS(ch)) {
-      send_to_char("With great wisdom comes great skill...\r\n", ch);
-      modifier++;
-   }
-
    SET_BIT(ch->combat, COMBAT_MONK_STANCE);
-
-   af.modifier  = 1 + (GET_LEVEL(ch) > 29) + (GET_LEVEL(ch) > 38) + (GET_LEVEL(ch) > 48);
 
    af.type      = KI_STANCE + KI_OFFSET;
    af.duration  = 50 - ( ( GET_LEVEL(ch) / 5 ) * 2 );
-   af.modifier  = modifier;
+   af.modifier  = 1;
    af.location  = APPLY_NONE;
    af.bitvector = 0;
  
