@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.56 2005/04/13 07:39:37 shane Exp $ */
+/* $Id: limits.cpp,v 1.57 2005/05/12 20:40:23 shane Exp $ */
 
 extern "C"
 {
@@ -676,7 +676,7 @@ void food_update( void )
     gain_condition(i,FULL,amt);
     if(!GET_COND(i, FULL)) { // i'm hungry
       if(!IS_MOB(i) && IS_SET(i->pcdata->toggles, PLR_AUTOEAT) && (GET_POS(i) > POSITION_SLEEPING)) {
-        if(IS_DARK(i->in_room) && (!IS_MOB(i) && !i->pcdata->holyLite))
+        if(IS_DARK(i->in_room) && !IS_MOB(i) && !i->pcdata->holyLite && !affected_by_spell(i, SPELL_INFRAVISION))
           send_to_char("It's too dark to see what's safe to eat!\n\r", i);
         else if(FOUNTAINisPresent(i))
           do_drink(i, "fountain", 9);
@@ -689,7 +689,7 @@ void food_update( void )
     gain_condition(i,THIRST,amt);
     if(!GET_COND(i, THIRST)) { // i'm thirsty
       if(!IS_MOB(i) && IS_SET(i->pcdata->toggles, PLR_AUTOEAT) && (GET_POS(i) > POSITION_SLEEPING)) {
-        if(IS_DARK(i->in_room) && (!IS_MOB(i) && !i->pcdata->holyLite))
+        if(IS_DARK(i->in_room) && !IS_MOB(i) && !i->pcdata->holyLite && !affected_by_spell(i, SPELL_INFRAVISION))
           send_to_char("It's too dark to see if there's any potable liquid around!\n\r", i);
         else if(FOUNTAINisPresent(i))
           do_drink(i, "fountain", 9);
