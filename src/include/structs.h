@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: structs.h,v 1.7 2005/04/11 17:17:28 urizen Exp $
+| $Id: structs.h,v 1.8 2005/05/13 13:29:56 urizen Exp $
 | structs.h
 | Description:  This file should go away someday - it's stuff that I
 |   wasn't sure how to break up.  --Morc XXX
@@ -110,6 +110,21 @@ struct mirror_data // structure used for mirroring data
   size_t offset;
   int type;
   bool procable;
+};
+
+struct active_vote_data
+{
+  struct active_vote_data *next;
+  char *ip;
+  char *name;
+  int vote;
+};
+
+struct passive_vote_data
+{
+  struct passive_vote_data *next;
+  char *vote;
+  int number;  
 };
 
 #endif

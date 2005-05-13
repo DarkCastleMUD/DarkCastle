@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.34 2005/04/18 11:01:31 shane Exp $ */
+/* $Id: clan.cpp,v 1.35 2005/05/13 13:29:54 urizen Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -2494,7 +2494,7 @@ void add_totem_stats(CHAR_DATA *ch)
   if (!ch->altar) return;
   for (a = ch->altar->contains; a ; a = a->next_content)
   {
-     int j;
+    int j;
     if (a->obj_flags.type_flag != ITEM_TOTEM) continue;
      for(j=0; j<a->num_affects; j++)
         affect_modify(ch, a->affected[j].location,

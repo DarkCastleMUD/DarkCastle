@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.80 2005/05/12 19:25:38 shane Exp $ */
+/* $Id: db.cpp,v 1.81 2005/05/13 13:29:54 urizen Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -3652,7 +3652,7 @@ void zone_update(void)
   for(i = 0; i <= top_of_zone_table; i++) {
      if(zone_table[i].reset_mode == 0)
        continue;
-     if(zone_table[i].age < zone_table[i].lifespan &&  (!zone_table[i].reset_mode == 1 || is_empty(i))) {
+     if(zone_table[i].age < zone_table[i].lifespan && !(zone_table[i].reset_mode == 1 && !is_empty(i))) {
        zone_table[i].age++;
        continue;
      }
