@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: non_off.cpp,v 1.26 2005/05/13 13:29:54 urizen Exp $
+| $Id: non_off.cpp,v 1.27 2005/05/13 13:30:55 urizen Exp $
 | non_off.C
 | Description:  Implementation of generic, non-offensive commands.
 */
@@ -997,7 +997,7 @@ int do_tag(CHAR_DATA *ch, char *argument, int cmd)
 
    return eSUCCESS;   
 }
-
+/*
 int write_vote_data(struct char_data *ch)
 {
   FILE *fp;
@@ -1017,3 +1017,4 @@ void do_vote(struct char_data *ch, char *arg, int cmd)
 {
   
 }
+*/
