@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.h,v 1.11 2005/04/09 21:15:35 urizen Exp $ */
+/* $Id: handler.h,v 1.12 2005/05/14 11:00:23 urizen Exp $ */
 
 #ifndef HANDLER_H_
 #define HANDLER_H_
@@ -102,7 +102,7 @@ struct obj_data *get_obj_in_list_vis(CHAR_DATA *ch, char *name,
 		struct obj_data *list);
 struct obj_data *get_obj_in_list_vis(CHAR_DATA *ch, int item_num, 
 		struct obj_data *list);
-struct obj_data *get_obj_vis(CHAR_DATA *ch, char *name);
+struct obj_data *get_obj_vis(CHAR_DATA *ch, char *name, bool loc = FALSE);
 
 void extract_char(CHAR_DATA *ch, bool pull);
 /* wiz_102.cpp */

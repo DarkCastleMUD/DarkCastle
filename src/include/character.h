@@ -1,7 +1,7 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.28 2005/05/03 08:50:54 shane Exp $
+| $Id: character.h,v 1.29 2005/05/14 11:00:23 urizen Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
@@ -281,7 +281,7 @@ struct char_data
     uint32 gold;           /* Money carried                           */
     uint32 plat;           /* Platinum                                */
      int64 exp;            /* The experience of the player            */
-			/* Cahnged toa long long */
+			   /* Changed to a long long */
      int32 in_room;
 
     uint32 immune;         // Bitvector of damage types I'm immune to

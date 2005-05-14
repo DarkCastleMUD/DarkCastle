@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.86 2005/04/29 20:27:36 urizen Exp $ */
+/* $Id: handler.cpp,v 1.87 2005/05/14 11:00:22 urizen Exp $ */
     
 extern "C"
 {
@@ -3222,7 +3222,7 @@ struct obj_data *get_obj_in_list_vis(CHAR_DATA *ch, char *name,
 
 
 /*search the entire world for an object, and return a pointer  */
-struct obj_data *get_obj_vis(CHAR_DATA *ch, char *name)
+struct obj_data *get_obj_vis(CHAR_DATA *ch, char *name, bool loc)
 {
     struct obj_data *i;
     int j, number;
@@ -3245,12 +3245,17 @@ struct obj_data *get_obj_vis(CHAR_DATA *ch, char *name)
 
     /* ok.. no luck yet. scan the entire obj list   */
     for (i = object_list, j = 1; i && (j <= number); i = i->next)
+    {
+	if (loc && IS_SET(i->obj_flags.more_flags, ITEM_NOLOCATE) &&
+		GET_LEVEL(ch) < 101) 
+		continue;
 	if (isname(tmp, i->name))
 	    if (CAN_SEE_OBJ(ch, i)) {
 		if (j == number)
 		    return(i);
 		j++;
 	    }
+    }
     return(0);
 }
 
