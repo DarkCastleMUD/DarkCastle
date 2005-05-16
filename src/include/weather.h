@@ -1,7 +1,7 @@
 #ifndef WEATHER_H_
 #define WEATHER_H_
 /************************************************************************
-| $Id: weather.h,v 1.2 2002/06/13 04:41:15 dcastle Exp $
+| $Id: weather.h,v 1.3 2005/05/16 09:54:50 shane Exp $
 | weather.h
 | Description:  Header information for weather interaction/info.
 */
@@ -18,9 +18,10 @@
 #define SKY_CLOUDLESS    0
 #define SKY_CLOUDY       1
 #define SKY_RAINING      2
-#define SKY_LIGHTNING    3
-
-#define SKY_SNOWING      4   // unused
+#define SKY_HEAVY_RAIN   3
+#define SKY_LIGHTNING    4
+#define SKY_HEAVY_LIGHTNING 5
+#define SKY_SNOWING      6   // unused
 
 struct weather_data
 {

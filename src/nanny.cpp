@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.86 2005/05/06 12:15:37 urizen Exp $ */
+/* $Id: nanny.cpp,v 1.87 2005/05/16 09:54:45 shane Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -332,6 +332,7 @@ void do_on_login_stuff(char_data * ch)
     do_inate_race_abilities(ch);
     /* Add a character's skill item's to the list. */
     ch->pcdata->skillchange = NULL;
+    ch->spellcraftglyph = 0;
     for (int i = 0;i < MAX_WEAR;i++)
     {
        if (!ch->equipment[i]) continue;

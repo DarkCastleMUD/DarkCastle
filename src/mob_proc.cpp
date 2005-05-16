@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.72 2005/04/24 11:32:08 shane Exp $ */
+/* $Id: mob_proc.cpp,v 1.73 2005/05/16 09:54:45 shane Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -2850,7 +2850,7 @@ static char *dethSayText [ ] =
   "Honk if you love peace and quiet.",
   "Energizer Bunny Arrested! Charged with battery.",
   "I bet you I could stop gambling.",
-  "A Unix user once said, 'rm -rf /*'  And since then everything has null and void.",
+  "A Unix user once said, 'rm -rf /*'  And since then everything has been null and void.",
   "All your base are belong to us.",
   "You have no chance to survive make your time.",
   "Someone set up us the bomb.",

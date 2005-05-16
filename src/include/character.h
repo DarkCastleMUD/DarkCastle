@@ -1,7 +1,7 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.29 2005/05/14 11:00:23 urizen Exp $
+| $Id: character.h,v 1.30 2005/05/16 09:54:50 shane Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
@@ -364,6 +364,7 @@ struct char_data
     
     int32 timer;                         // Timer for update
     int32 shotsthisround;                // Arrows fired this round
+    int32 spellcraftglyph;               // Used for spellcraft glyphs
 
 // TODO - see if we can move the "wait" timer from desc to char
 // since we need something to lag mobs too

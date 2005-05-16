@@ -458,6 +458,7 @@ void assign_objects(void)
   SPEC_FUN hot_potato;
   SPEC_FUN gazeofgaiot;
   SPEC_FUN moving_portals;
+  SPEC_FUN spellcraft_glyphs;
 
   SPEC_FUN godload_cassock;
   SPEC_FUN godload_phyraz;
@@ -544,9 +545,13 @@ void assign_objects(void)
 //  assign_one_obj_non(17800,  arenaporter);
   assign_one_obj_non(26723,  generic_push_proc);
   assign_one_obj_non(30627,  eliara_non_combat);  
-  
-    
 
+
+  //spellcraft glyphs
+  assign_one_obj_non(6351, spellcraft_glyphs);
+  assign_one_obj_non(6352, spellcraft_glyphs);
+  assign_one_obj_non(6353, spellcraft_glyphs);  
+    
   // assembled items
   // forage arrow
 //  assign_one_obj_non(2055,  gem_assembler);  
@@ -593,7 +598,7 @@ void assign_objects(void)
   assign_one_obj_com(16903,  generic_weapon_combat);
   assign_one_obj_com(19503,  glove_combat_procs);
   assign_one_obj_com(26807,  goldenbatleth);
-  assign_one_obj_com(30627,  eliara_combat);  
+  assign_one_obj_com(30627,  eliara_combat);
 //  assign_one_obj_com(22732,  drainingstaff);
 //  assign_one_obj_com(22743,  bonusattack);
 //  assign_one_obj_com(22605,  souldrainer);
