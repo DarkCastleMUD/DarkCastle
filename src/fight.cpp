@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.268 2005/05/09 17:49:27 urizen Exp $ */
+/* $Id: fight.cpp,v 1.269 2005/05/16 11:04:51 shane Exp $ */
 
 extern "C"
 {
@@ -2207,7 +2207,6 @@ int check_riposte(CHAR_DATA * ch, CHAR_DATA * victim)
 
 int check_magic_block(CHAR_DATA *ch, CHAR_DATA *victim, int attacktype)
 {
-  int modifier = 0;  
   int reduce = 0;
   if (victim->equipment[WEAR_SHIELD] == NULL &&	GET_CLASS(victim) != CLASS_MONK)
     return 0;
@@ -2226,9 +2225,6 @@ int check_magic_block(CHAR_DATA *ch, CHAR_DATA *victim, int attacktype)
    else if (!((reduce = has_skill(victim, SKILL_DEFENSE)) && GET_CLASS(victim)== CLASS_MONK))
      return 0;
 
-  extern int stat_mod[];
-
-//  if (IS_NPC(victim)) modifier -= 50;
   int skill = reduce /10; 
   reduce = (int)((float)reduce*0.75);
 
@@ -2243,7 +2239,7 @@ int check_magic_block(CHAR_DATA *ch, CHAR_DATA *victim, int attacktype)
     act("$n manages to avoid taking a direct hit from $N's spell!", victim, NULL, ch, TO_ROOM, NOTVICT);
     act("$n avoids part of your spell!",victim, NULL, ch, TO_VICT,0);
     act("Your martial defense allows you to avoid a direct hit from $N's spell!",victim, NULL, ch, TO_CHAR, 0);
-    reduce /= 1.25;
+    reduce = (int)((float)reduce / 1.25);
   }
   return reduce; 
 }
@@ -3309,7 +3305,7 @@ int do_skewer(CHAR_DATA *ch, CHAR_DATA *vict, int dam, int wt, int wt2, int weap
   //  act("$n jams $s weapon into $N!!", ch, 0, vict, TO_ROOM, NOTVICT);
   //  act("You jam your weapon in $N's heart!", ch, 0, vict, TO_CHAR, 0);
   //  act("$n's weapon is speared into you! Ouch!", ch, 0, vict, TO_VICT, 0);
-    damadd = dam * 1.5; 
+    damadd = (int)(dam * 1.5);
 //    if (GET_LEVEL(vict) > GET_LEVEL(ch))
   //    damadd /= GET_LEVEL(vict) - GET_LEVEL(ch);
     int retval = damage(ch, vict, damadd, wt, SKILL_SKEWER, weapon);
@@ -3325,7 +3321,7 @@ int do_skewer(CHAR_DATA *ch, CHAR_DATA *vict, int dam, int wt, int wt2, int weap
       act("$n's weapon rips through $N's chest sending gore and entrails flying for yards!\r\n", ch, 0, vict, NOTVICT, 0);
    //duplicate message   act("$n is DEAD!!", vict, 0, 0, TO_ROOM, INVIS_NULL);
       send_to_char("You have been SKEWERED!!\n\r\n\r", vict);
-      int retval = damage(ch, vict, 1, wt, wt2, weapon);
+      damage(ch, vict, 1, wt, wt2, weapon);
       update_pos(vict);
       return eSUCCESS|eVICT_DIED;
     }
@@ -3483,7 +3479,7 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
 	int chance = GET_LEVEL(ch) /10;
 	chance += GET_LEVEL(victim) /2;
 	if (GET_LEVEL(victim) == 50)
-	  chance += 25.0*(float)((float)GET_LEVEL(ch)/100.0)*(float)((float)GET_LEVEL(ch)/100.0);
+	  chance += (int)(25.0*(float)((float)GET_LEVEL(ch)/100.0)*(float)((float)GET_LEVEL(ch)/100.0));
 //	if (chance < 0) chance = 0 - chance; // turn it positive, eh.
 //	float a = (float)GET_LEVEL(victim),b;
 //	// many casts are such a bother
@@ -4380,7 +4376,7 @@ void arena_kill(CHAR_DATA *ch, CHAR_DATA *victim, int type)
 
   // Kill mobs outright
   if (IS_NPC(victim)) {
-    int retval = mprog_death_trigger(victim, ch);
+    mprog_death_trigger(victim, ch);
     remove_nosave(victim);
     extract_char(victim, TRUE);
     return;

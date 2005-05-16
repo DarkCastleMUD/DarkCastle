@@ -448,7 +448,6 @@ int do_eqmax(struct char_data *ch, char *argument, int cmd)
   char arg[MAX_INPUT_LENGTH];
   int a,o;
   argument = one_argument(argument, arg);
-extern struct obj_data  *object_list;
 extern int class_restricted(struct char_data *ch, struct obj_data *obj);
 extern  int size_restricted(struct char_data *ch, struct obj_data *obj);
 

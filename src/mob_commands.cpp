@@ -874,7 +874,6 @@ int do_mpthrow( CHAR_DATA *ch, char *argument, int cmd )
   int delay;
 
   char first[MAX_INPUT_LENGTH];
-  char buf[MAX_INPUT_LENGTH];
   char second[MAX_INPUT_LENGTH];
   char third[MAX_INPUT_LENGTH];
   char fourth[MAX_INPUT_LENGTH];	
@@ -885,8 +884,6 @@ int do_mpthrow( CHAR_DATA *ch, char *argument, int cmd )
   argument = one_argument(argument, third);
   argument = one_argument(argument, fourth);
   argument = one_argument(argument, fifth);
-//  half_chop(argument, first, buf);
- // half_chop(buf, second, third);
 
   if(isdigit(*first)) {
     if(!check_valid_and_convert(mob_num, first) || (real_mobile(mob_num) < 0)) {
@@ -1197,7 +1194,6 @@ int do_mpothrow( CHAR_DATA *ch, char *argument, int cmd )
   int delay;
 
   char first[MAX_INPUT_LENGTH];
-  char buf[MAX_INPUT_LENGTH];
   char second[MAX_INPUT_LENGTH];
   char third[MAX_INPUT_LENGTH];
   char fourth[MAX_INPUT_LENGTH];
@@ -1206,11 +1202,6 @@ int do_mpothrow( CHAR_DATA *ch, char *argument, int cmd )
   argument = one_argument(argument, second);
   argument = one_argument(argument, third);
   argument = one_argument(argument, fourth);
-//  half_chop(argument, first, buf);
- // half_chop(buf, second, third);
-
-
-
 
 
   if(isdigit(*first)) {

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_barbarian.cpp,v 1.50 2005/05/09 15:35:38 urizen Exp $
+| $Id: cl_barbarian.cpp,v 1.51 2005/05/16 11:04:55 shane Exp $
 | cl_barbarian.C
 | Description:  Commands for the barbarian class.
 */
@@ -661,7 +661,7 @@ int do_knockback(struct char_data *ch, char *argument, int cmd)
   if(victim->height < 42) dampercent += 7;
   else if(victim->height < 102) dampercent += 15;
 
-  dam *= (1.0 + dampercent / 100.0);
+  dam = (int)(dam * (1.0 + dampercent / 100.0));
 
   if(!skill_success(ch, victim, SKILL_KNOCKBACK, 0-(learned/4 * 3))) {
     act("You lunge forward in an attempt to smash $N but fall, missing $S completely.", ch, 0, victim, TO_CHAR, 0);

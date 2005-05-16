@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: save.cpp,v 1.29 2005/04/09 21:15:27 urizen Exp $ */
+/* $Id: save.cpp,v 1.30 2005/05/16 11:04:51 shane Exp $ */
 
 extern "C"
 {
@@ -297,13 +297,13 @@ void fread_to_tilde(FILE *fpsave)
 void read_pc_data(struct char_data *ch, FILE* fpsave)
 {
   char typeflag[4];
-  char *tmpbuf;
- struct pc_data * i = ch->pcdata;
-   i->golem = 0;
+  struct pc_data * i = ch->pcdata;
+
+  i->golem = 0;
   fread(i->pwd,            sizeof(char),       PASSWORD_LEN+1, fpsave);
   i->alias = read_char_aliases(fpsave);
   if (has_skill(ch, NEW_SAVE))
-    fread_to_tilde(fpsave);
+     fread_to_tilde(fpsave);
   fread(&(i->rdeaths),     sizeof(i->rdeaths),  1, fpsave);
   fread(&(i->pdeaths),     sizeof(i->pdeaths),  1, fpsave);
   fread(&(i->pkills),      sizeof(i->pkills),   1, fpsave);

@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.87 2005/05/16 09:54:45 shane Exp $ */
+/* $Id: nanny.cpp,v 1.88 2005/05/16 11:04:51 shane Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -387,7 +387,7 @@ void do_on_login_stuff(char_data * ch)
     REMOVE_BIT(ch->affected_by2, AFF_BLACKJACK_ALERT);
     if (GET_CLASS(ch) == CLASS_MONK && GET_LEVEL(ch) > 10)
     {
-	  struct char_skill_data * curr = ch->skills, *prev = NULL;
+	  struct char_skill_data * curr = ch->skills;
 	  while(curr) {
 	   if (curr->skillnum == SKILL_SHIELDBLOCK)
 		curr->skillnum = SKILL_DEFENSE;
@@ -396,7 +396,7 @@ void do_on_login_stuff(char_data * ch)
     }
     if (GET_CLASS(ch) == CLASS_PALADIN && GET_LEVEL(ch) >= 41)
     {
-	  struct char_skill_data * curr = ch->skills, *prev = NULL;
+	  struct char_skill_data * curr = ch->skills;
 	  while(curr) {
 	   if (curr->skillnum == SPELL_ARMOR)
 		curr->skillnum = SPELL_AEGIS;
@@ -405,7 +405,7 @@ void do_on_login_stuff(char_data * ch)
     }
     if (GET_CLASS(ch) == CLASS_ANTI_PAL && GET_LEVEL(ch) >= 44)
     {
-	  struct char_skill_data * curr = ch->skills, *prev = NULL;
+	  struct char_skill_data * curr = ch->skills;
 	  while(curr) {
 	   if (curr->skillnum == SPELL_STONE_SKIN)
 		curr->skillnum = SPELL_U_AEGIS;

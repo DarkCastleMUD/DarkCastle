@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.131 2005/05/14 11:00:22 urizen Exp $ */
+/* $Id: spells.cpp,v 1.132 2005/05/16 11:04:51 shane Exp $ */
 
 extern "C"
 {
@@ -1752,7 +1752,7 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
 	  !spellcraft(ch,spl))
       WAIT_STATE(ch, spell_info[spl].beats);
 	else 
-	WAIT_STATE(ch, spell_info[spl].beats/1.5);
+	WAIT_STATE(ch, (int)(spell_info[spl].beats/1.5));
       
       if ((spell_info[spl].spell_pointer == 0) && spl>0)
         send_to_char("Sorry, this magic has not yet been implemented :(\n\r", ch);

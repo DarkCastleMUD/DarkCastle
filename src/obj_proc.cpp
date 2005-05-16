@@ -334,7 +334,7 @@ int pushwand(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
        }       
      }
      return eFAILURE;
-   }
+   } else return eFAILURE;
 }
 
 int holyavenger(CHAR_DATA *ch, struct obj_data *obj,  int cmd, char *arg, 

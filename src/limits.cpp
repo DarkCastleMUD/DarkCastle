@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.57 2005/05/12 20:40:23 shane Exp $ */
+/* $Id: limits.cpp,v 1.58 2005/05/16 11:04:51 shane Exp $ */
 
 extern "C"
 {
@@ -766,10 +766,8 @@ void update_corpses_and_portals(void)
   struct obj_data *j, *next_thing;
   struct obj_data *jj, *next_thing2;
   struct obj_data *last_thing;
-   char last_name[256];
   int proc = 0; // Processed items. Debugging.
   void extract_obj(struct obj_data *obj); /* handler.c */
-  int last_vnum = 0, last_type = 0;
   /* objects */
   for(j = object_list; j ; j = next_thing,proc++)
   {
@@ -778,12 +776,6 @@ void update_corpses_and_portals(void)
     /* Type 1 is a permanent game portal, and type 3 is a look_only
     |  object.  Type 0 is the spell portal and type 2 is a game_portal
     */
-
-    //last_vnum = obj_index[j->item_number].virt;
-    //strcpy(last_name, j->name);
-    //last_type = GET_ITEM_TYPE(j);
-    // What exactly do these do?  the variables it creates aren't used anywhere
-    // and creating last_name crashes us because gold doesn't have a obj->name -Rahz
 
     if((GET_ITEM_TYPE(j) == ITEM_PORTAL) && (j->obj_flags.value[1] == 0
         || j->obj_flags.value[1] == 2)) 

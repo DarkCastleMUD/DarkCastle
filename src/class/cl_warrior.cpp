@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.34 2005/05/11 11:07:11 shane Exp $
+| $Id: cl_warrior.cpp,v 1.35 2005/05/16 11:04:55 shane Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -65,7 +65,7 @@ int do_kick(struct char_data *ch, char *argument, int cmd)
     if(!can_attack(ch) || !can_be_attacked(ch, victim))
           return eFAILURE;
 
-    WAIT_STATE(ch, PULSE_VIOLENCE*1.5);
+    WAIT_STATE(ch, (int)(PULSE_VIOLENCE*1.5));
     if (!skill_success(ch,victim,SKILL_KICK)) {
         dam = 0;
 	retval = damage(ch, victim, 0,TYPE_UNDEFINED, SKILL_KICK, 0);

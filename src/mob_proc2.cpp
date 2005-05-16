@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.46 2005/04/29 16:14:53 urizen Exp $ */
+/* $Id: mob_proc2.cpp,v 1.47 2005/05/16 11:04:51 shane Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -594,7 +594,6 @@ int platinumsmith(struct char_data *ch, struct obj_data *obj, int cmd, char *arg
   struct obj_data *new_new_obj;
   char buf[200];
   char buf2[200];
-  struct platinumsmith_data *selling;
 
   if(cmd < 56 || cmd > 59) 
     return eFAILURE;
@@ -1078,20 +1077,18 @@ void meta_list_stats(char_data * ch)
 
 int meta_get_moves_exp_cost(char_data * ch)
 {
-   return (5000000 + (GET_RAW_MOVE(ch) * 2500))*1.2;
+   return (int)((5000000 + (GET_RAW_MOVE(ch) * 2500))*1.2);
 }
 
 int meta_get_moves_plat_cost(char_data * ch)
 {
-  return (int)(125 + (int)((0.025 * GET_RAW_MOVE(ch) * 
-(GET_RAW_MOVE(ch)/1000 == 0 ? 1: GET_RAW_MOVE(ch)/1000))))*0.9;
+  return (int)((int)(125 + (int)((0.025 * GET_RAW_MOVE(ch) * 
+(GET_RAW_MOVE(ch)/1000 == 0 ? 1: GET_RAW_MOVE(ch)/1000))))*0.9);
 }
 
 int meta_get_hps_exp_cost(char_data * ch)
 {
    int cost;
-
-
 
    switch (GET_CLASS(ch))
    {
@@ -1110,7 +1107,7 @@ int meta_get_hps_exp_cost(char_data * ch)
 	cost = 3000; break;
    }
    cost = 5000000 + (cost * GET_RAW_HIT(ch));
-   return cost*1.2;
+   return (int)(cost*1.2);
 }
 
 int meta_get_hps_plat_cost(char_data * ch)
@@ -1133,7 +1130,7 @@ int meta_get_hps_plat_cost(char_data * ch)
         cost = 100; break;
    }
    cost = 100 + cost + (int)(0.025 * GET_RAW_HIT(ch) *(GET_RAW_HIT(ch)/1000 == 0 ? 1: GET_RAW_HIT(ch)/1000));
-   return cost*0.9;
+   return (int)(cost*0.9);
 }
 
 int meta_get_mana_exp_cost(char_data * ch)
@@ -1151,7 +1148,7 @@ int meta_get_mana_exp_cost(char_data * ch)
         return 0;
    }
    cost = 5000000 + (cost * GET_RAW_MANA(ch));
-   return cost*1.2;
+   return (int)(cost*1.2);
 }
 
 int meta_get_mana_plat_cost(char_data * ch)
@@ -1169,7 +1166,7 @@ int meta_get_mana_plat_cost(char_data * ch)
         return 0;
    }
   cost = 100 + cost + (int)(0.025 * GET_RAW_MANA(ch) * (GET_RAW_MANA(ch)/1000 == 0 ? 1: GET_RAW_MANA(ch)/1000));
-  return cost*0.9;
+  return (int)(cost*0.9);
 }
 
 int meta_get_ki_exp_cost(char_data * ch)
@@ -1184,7 +1181,7 @@ int meta_get_ki_exp_cost(char_data * ch)
     default: return 0;
   }
   cost = 10000000 + (GET_RAW_KI(ch) * cost);
-  return cost*1.2;
+  return (int)(cost*1.2);
 }
  
 int meta_get_ki_plat_cost(char_data * ch)
@@ -1199,7 +1196,7 @@ int meta_get_ki_plat_cost(char_data * ch)
     default: return 0;
   } 
   cost = 500 + cost + ((GET_RAW_KI(ch)/2) * (GET_RAW_KI(ch)/10));
-  return cost*0.9;
+  return (int)(cost*0.9);
 }
 
 int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,        
@@ -1477,7 +1474,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
   if (choice == 16 || choice == 17)
   {
    int vnum = choice == 16 ? 27903: 27904;
-   int cost = choice == 16 ? 25:50;
+   unsigned int cost = choice == 16 ? 25:50;
    if (GET_PLATINUM(ch) < cost)
    {
       send_to_char("The Meta-physician tells you, 'You can't afford that!'\r\n",ch);
@@ -1783,7 +1780,7 @@ int godload_sales(struct char_data *ch, struct obj_data *obj, int cmd, char *arg
     extract_obj(obj);
     return eSUCCESS;
    }
-   if (GET_PLATINUM(ch) < obj->obj_flags.cost/10)
+   if (GET_PLATINUM(ch) < (unsigned int)(obj->obj_flags.cost/10))
    {
     sprintf(buf, "%s Come back when you've got the platinum.",GET_NAME(ch));
     do_tell(owner, buf, 0); 

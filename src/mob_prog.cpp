@@ -1986,9 +1986,7 @@ void mprog_driver ( char *com_list, CHAR_DATA *mob, CHAR_DATA *actor,
  char *cmnd;
  CHAR_DATA *rndm  = NULL;
  CHAR_DATA *vch   = NULL;
-  CHAR_DATA *amob = NULL;
  int        count = 0;
- bool fake =FALSE;
  if (IS_AFFECTED( mob, AFF_CHARM ))
    return;
 
@@ -2631,7 +2629,6 @@ int oprog_speech_trigger( char *txt, CHAR_DATA *ch )
 int oprog_catch_trigger(obj_data *obj, int catch_num, char *var, int opt)
 {
  MPROG_DATA *mprg;
- MPROG_DATA *next;
  int curr_catch;
  mprog_cur_result = eFAILURE;
  CHAR_DATA *vmob;

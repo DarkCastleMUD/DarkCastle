@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.103 2005/04/28 19:47:03 shane Exp $
+| $Id: cl_thief.cpp,v 1.104 2005/05/16 11:04:55 shane Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -1920,7 +1920,7 @@ int do_appraise(CHAR_DATA *ch, char *argument, int cmd)
       else if(found) sprintf(buf, "After some consideration, you estimate the value of %s to be %d.\n\r", obj->name, appraised);
       else sprintf(buf, "After some consideration, you estimate the amount of gold %s is carrying to be %d.\n\r", GET_NAME(victim), appraised);
       send_to_char(buf, ch);
-      WAIT_STATE(ch, PULSE_VIOLENCE * 1.5);
+      WAIT_STATE(ch, (int)(PULSE_VIOLENCE * 1.5));
    }
 
    return eSUCCESS;
