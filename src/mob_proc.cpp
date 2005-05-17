@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.73 2005/05/16 09:54:45 shane Exp $ */
+/* $Id: mob_proc.cpp,v 1.74 2005/05/17 14:45:11 apocalypse Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -2284,7 +2284,9 @@ int clan_guard(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 	(in_room == real_room(2330) && cmd != 3) ||
 	(in_room == real_room(2340) && cmd != 1) ||
 	(in_room == real_room(2350) && cmd != 3) ||
-	(in_room == real_room(2360) && cmd != 5))
+	(in_room == real_room(2360) && cmd != 5) ||
+        (in_room == real_room(2370) && cmd != 6) ||
+        (in_room == real_room(2380) && cmd != 1))
 	return eFAILURE;
 
 /* Old Clan Halls
@@ -2299,8 +2301,8 @@ int clan_guard(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     ||   (in_room == real_room(2339) && cmd != 1 )  // askani, north
     ||   (in_room == real_room(6010) && cmd != 6 )
     ||   (in_room == real_room(167) && cmd != 1 )
-    ||   (in_room == real_room(2350) && cmd != 3 )   // elcipse, south
-    ||	 (in_room == real_room(2344) && cmd != 1 )   // north
+    ||   (in_room == real_room(2350) && cmd != 3 )  // eclipse, south
+    ||	 (in_room == real_room(2344) && cmd != 1 )  // north
     ||	 (in_room == real_room(187) && cmd != 1 )   // sng, north
     ||	 (in_room == real_room(2315) && cmd != 1 )  // ferach, north
     ||	 (in_room == real_room(2411) && cmd != 1 )  // sindicate north
@@ -2319,14 +2321,16 @@ int clan_guard(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
       return eFAILURE;
 */	
 	
-    if ( (ch->clan != 14 && in_room == real_room(2300))  // black axe
+    if ( (ch->clan != 14 && in_room == real_room(2300))  // black_axe
     ||   (ch->clan != 4 && in_room ==  real_room(2310))  // dc_guard
     ||   (ch->clan != 18 && in_room == real_room(2320))  // anarchist
     ||   (ch->clan != 20 && in_room == real_room(2390))  // sindicate
     ||   (ch->clan != 1 && in_room ==  real_room(2330))  // uln'hyrr
     ||   (ch->clan != 10 && in_room == real_room(2340))  // moor
     ||   (ch->clan != 11 && in_room == real_room(2350))  // eclipse
-    ||   (ch->clan != 3 && in_room == real_room(2360)) //arcana
+    ||   (ch->clan != 3 && in_room ==  real_room(2360))  // arcana
+    ||   (ch->clan != 17 && in_room == real_room(2370))  // voodoo
+    ||   (ch->clan != 13 && in_room == real_room(2380))  // slackers
 	)
     {
 	act( "$n is turned away from the clan hall.", ch, 0, 0, TO_ROOM , 0);
@@ -3148,7 +3152,7 @@ int cityguard(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
       if(GET_POS(vict) == POSITION_FIGHTING)
         return eFAILURE;
         
-      if(GET_ALIGNMENT(vict) <= -300)
+      if(GET_ALIGNMENT(vict) <= -351)
          {
          sprintf(buf, "%s grips his sword tighter as he sees you approach\n\r",
                  GET_SHORT(ch));
@@ -3158,7 +3162,7 @@ int cityguard(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
          act(buf, ch, 0, vict, TO_ROOM, NOTVICT);
          return eSUCCESS;
          }
-      if((GET_ALIGNMENT(vict) > -300) && (GET_ALIGNMENT(vict) < 300))
+      if((GET_ALIGNMENT(vict) > -350) && (GET_ALIGNMENT(vict) < 350))
          {
          sprintf(buf, "%s eyes you suspiciously.\n\r", GET_SHORT(ch));
          send_to_char(buf, vict);
@@ -3166,7 +3170,7 @@ int cityguard(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
          act(buf, ch, 0, vict, TO_ROOM, NOTVICT);
          return eSUCCESS;
          }  
-       if(GET_ALIGNMENT(vict) >= 300)
+       if(GET_ALIGNMENT(vict) >= 351)
          {
          sprintf(buf, "%s bows before you and says, 'Good Day'\n\r", 
                  GET_SHORT(ch));
