@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.104 2005/05/16 11:04:55 shane Exp $
+| $Id: cl_thief.cpp,v 1.105 2005/05/17 22:41:20 shane Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -45,11 +45,16 @@ int palm(CHAR_DATA *ch, struct obj_data *obj_object,
     return eFAILURE;
   }
 
-  if(IS_SET(obj_object->obj_flags.more_flags, ITEM_UNIQUE)) {
-    if(search_char_for_item(ch, obj_object->item_number)) {
-       send_to_char("The item's uniqueness prevents it!\r\n", ch);
-       return eFAILURE;
-    }
+  if(!sub_object || sub_object->carried_by != ch) {
+     if(IS_SET(obj_object->obj_flags.more_flags, ITEM_UNIQUE))
+        if(search_char_for_item(ch, obj_object->item_number)) {
+           send_to_char("The item's uniqueness prevents it!\r\n", ch);
+           return eFAILURE;
+        }
+     if(contents_cause_unique_problem(obj_object, ch)) {
+        send_to_char("Something inside the item is unique and prevents it!\n\r", ch);
+        return eFAILURE;
+     }
   }
 
   move_obj(obj_object, ch);
