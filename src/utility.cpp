@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.35 2005/04/18 11:06:48 shane Exp $ */
+/* $Id: utility.cpp,v 1.36 2005/05/17 22:40:28 shane Exp $ */
 
 extern "C"
 {
@@ -673,7 +673,7 @@ bool CAN_SEE_OBJ( struct char_data *sub, struct obj_data *obj )
       return FALSE;
 
    if ( !IS_LIGHT(sub->in_room) && 
-                 !IS_AFFECTED(sub, AFF_INFRARED))
+    !IS_AFFECTED(sub, AFF_INFRARED) && !IS_OBJ_STAT(obj, ITEM_GLOW) )
       return FALSE;
 
     return TRUE;
