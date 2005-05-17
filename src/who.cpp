@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: who.cpp,v 1.18 2005/05/05 04:31:05 shane Exp $
+| $Id: who.cpp,v 1.19 2005/05/17 09:36:43 shane Exp $
 | who.C
 | Commands for who, maybe? :P
 */
@@ -211,8 +211,7 @@ int do_whosolo(struct char_data *ch, char *argument, int cmd)
    char_data *i;
    char tempbuffer[800];
    char buf[MAX_INPUT_LENGTH+1];
-   
-
+   bool foundtarget;
 
    one_argument(argument, buf);
 
@@ -225,10 +224,15 @@ int do_whosolo(struct char_data *ch, char *argument, int cmd)
    clear_who_buffer();
 
    for(d = descriptor_list; d; d = d->next) {
+      foundtarget = FALSE;
+
       if ((d->connected) || !(i = d->character) || (!CAN_SEE(ch, i)))
          continue;
 
-      if (*buf && !isname(buf, GET_NAME(i)))
+      if (is_abbrev(buf, GET_NAME(i)))
+         foundtarget = TRUE;
+
+      if (*buf && !foundtarget)
          continue;
 
       if (GET_LEVEL(i) <= MORTAL)
@@ -291,6 +295,7 @@ int do_who(struct char_data *ch, char *argument, int cmd)
     int   hasholylight = 0;
     int   lfgcheck = 0;
     int   guidecheck = 0;
+    int   race = 0;
 
     char* immortFields[] = {
         "   Immortal  ",
@@ -316,6 +321,18 @@ int do_who(struct char_data *ch, char *argument, int cmd)
         "bard",
         "druid",
         "psionicist",
+        "\n"
+    };
+    char *race_types[] = {
+        "human",
+        "elf",
+        "dwarf",
+        "hobbit",
+        "pixie",
+        "giant",
+        "gnome",
+        "orc",
+        "troll",
         "\n"
     };
     
@@ -359,7 +376,8 @@ int do_who(struct char_data *ch, char *argument, int cmd)
             lfgcheck = 1;
             currentmatch = 1;
         }
-        else for(clss = 0; clss <= 12; clss++)  {
+        else {
+           for(clss = 0; clss <= 12; clss++)  {
             if(clss == 12) {
                 clss = 0;
                 break;
@@ -369,6 +387,17 @@ int do_who(struct char_data *ch, char *argument, int cmd)
                 currentmatch = 1;
                 break;
             }
+           }
+           for(race = 0; race <= 9; race++)  {
+            if(race == 9) {
+               race = 0;
+               break;
+            } else if(is_abbrev(oneword, race_types[race])) {
+               race++;
+               currentmatch = 1;
+               break;
+            }
+           }
         }
 
         if(get_pc_vis(ch, oneword)) {
@@ -429,6 +458,7 @@ int do_who(struct char_data *ch, char *argument, int cmd)
         if(levelarg > 0 && IS_ANONYMOUS(i) && !hasholylight)                    continue;
         if(lfgcheck && !IS_SET(i->pcdata->toggles, PLR_LFG))                    continue;
         if(guidecheck && !IS_SET(i->pcdata->toggles, PLR_GUIDE_TOG))            continue;
+        if(race && GET_RACE(i) != race && !charmatchistrue) continue;
         
         infoField = infoBuf;
         extraBuf[0] = '\0';
