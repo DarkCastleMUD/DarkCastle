@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.64 2005/04/23 01:15:22 urizen Exp $ */
+/* $Id: info.cpp,v 1.65 2005/05/17 09:45:46 shane Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -1621,6 +1621,7 @@ int do_count(struct char_data *ch, char *arg, int cmd)
    struct descriptor_data *d;
    struct char_data *i;
    int clss[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+   int race[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
    int immortal = 0;
    int total = 0;
    
@@ -1637,6 +1638,7 @@ int do_count(struct char_data *ch, char *arg, int cmd)
          continue;
       }
       clss[(int)GET_CLASS(i)]++;
+      race[(int)GET_RACE(i)]++;
       total++;
    }
    
@@ -1647,6 +1649,8 @@ int do_count(struct char_data *ch, char *arg, int cmd)
    csendf(ch, "%d warriors, %d clerics, %d mages, %d thieves, %d barbarians, %d monks,\n\r", clss[CLASS_WARRIOR], clss[CLASS_CLERIC], clss[CLASS_MAGIC_USER], clss[CLASS_THIEF], clss[CLASS_BARBARIAN], clss[CLASS_MONK]);
    csendf(ch, "%d paladins, %d antipaladins, %d bards, %d druids, and %d rangers.\n\r",
       clss[CLASS_PALADIN], clss[CLASS_ANTI_PAL], clss[CLASS_BARD], clss[CLASS_DRUID], clss[CLASS_RANGER]);
+   csendf(ch, "%d humans, %d elves, %d dwarves, %d hobbits, %d pixies,\n\r" race[RACE_HUMAN], race[RACE_ELVEN], race[RACE_DWARVEN], race[RACE_HOBBIT], race[RACE_PIXIE]);
+   csendf(ch, "%d giants, %d gnomes, %d orcs, %d trolls.\n\r", race[RACE_GIANT], race[RACE_GNOME], race[RACE_ORC], race[RACE_TROLL]);
    csendf(ch, "The maximum number of players since "
       "last reboot was %d.\n\r", max_who); 
    return eSUCCESS;
