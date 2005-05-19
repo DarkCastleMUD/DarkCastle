@@ -220,13 +220,15 @@ void assign_non_combat_procs() {
     assign_one_mob_non(8542,  iasenko_non_combat);
     assign_one_mob_non(8543,  koban_non_combat);
     assign_one_mob_non(9042,  robber);
-    assign_one_mob_non(2306, clan_guard);
     assign_one_mob_non(2300,  clan_guard);
     assign_one_mob_non(2301,  clan_guard);
     assign_one_mob_non(2302,  clan_guard);
     assign_one_mob_non(2303,  clan_guard);
     assign_one_mob_non(2304,  clan_guard);
     assign_one_mob_non(2305,  clan_guard);
+    assign_one_mob_non(2306,  clan_guard);
+    assign_one_mob_non(2307,  clan_guard);
+    assign_one_mob_non(2308,  clan_guard);
     assign_one_mob_non(2399,  clan_guard);
     assign_one_mob_non(9511,  bodyguard);
     assign_one_mob_non(9531,  bodyguard);
