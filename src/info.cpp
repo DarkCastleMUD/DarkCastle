@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.66 2005/05/17 20:35:25 shane Exp $ */
+/* $Id: info.cpp,v 1.67 2005/05/19 19:25:20 shane Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -1531,7 +1531,9 @@ int do_weather(struct char_data *ch, char *argument, int cmd)
       "cloudless",
       "cloudy",
       "rainy",
-      "lit by flashes of lightning"};
+      "pouring rain",
+      "lit by flashes of lightning",
+      "sending lightning bolts crashing down"};
       
    if (OUTSIDE(ch)) {
       sprintf(buf, 
