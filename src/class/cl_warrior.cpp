@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.35 2005/05/16 11:04:55 shane Exp $
+| $Id: cl_warrior.cpp,v 1.36 2005/05/22 16:30:10 urizen Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -682,7 +682,7 @@ int do_rescue(struct char_data *ch, char *argument, int cmd)
     act("$n heroically rescues $N.", ch, 0, victim, TO_ROOM, NOTVICT);
 
     int tempwait = ch->desc->wait;
-    int tempvictwait = victim->desc->wait;
+    int tempvictwait = GET_WAIT(victim);
 
     if (victim->fighting == tmp_ch)
        stop_fighting(victim);
