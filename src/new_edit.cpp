@@ -690,7 +690,8 @@ bool ishashed(char *arg);
        if (d->backstr) {
          *d->strnew = d->backstr;
        } else {
-         *d->strnew = NULL;
+//         *d->strnew = NULL;
+	  *d->strnew = strdup("");
        }
        d->backstr = NULL;
        d->strnew = NULL;
