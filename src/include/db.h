@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: db.h,v 1.13 2005/04/09 21:15:35 urizen Exp $ */
+/* $Id: db.h,v 1.14 2005/05/24 16:55:24 urizen Exp $ */
 #ifndef DB_H_
 #define DB_H_
 
@@ -42,6 +42,7 @@ extern "C" {
 #define ZONE_IS_TOWN       1<<1  // Keep out the really bad baddies that are STAY_NO_TOWN
 #define ZONE_MODIFIED      1<<2
 #define ZONE_UNUSED        1<<3
+#define ZONE_BPORT	   1<<4
 // Remember to update const.C  zone_bits[] if you change this
 
 
