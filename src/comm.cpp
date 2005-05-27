@@ -74,6 +74,7 @@
 short code_testing_mode = 0;
 short code_testing_mode_mob = 0;
 short code_testing_mode_world = 0;
+short bport = 0;
 unsigned mother_desc, other_desc, third_desc, fourth_desc;
 
 // This is turned on right before we call game_loop
@@ -230,7 +231,13 @@ int main(int argc, char **argv)
        code_testing_mode_mob = 1;
        log("Mud in testing mode. TinyTinyworld being used. (MOB,OBJ)", 0, LOG_MISC);
        break;
-                                                                    
+    case 'b': // Buildin' port.
+	bport = 0;
+	port = 7000;
+	port2 = 7001;
+	port3 = 7002;
+	port4 = 7003;
+	break;                                                             
     case 'd':
        if(argv[pos][2] != '\0')
            strcpy(dir, &argv[pos][2]);

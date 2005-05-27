@@ -22,6 +22,7 @@ extern "C" {
   char *crypt(const char *key, const char *salt);
 }
 #endif
+extern int bport;
 
 // List skill maxes.
 int do_maxes(struct char_data *ch, char *argument, int cmd)
@@ -508,7 +509,7 @@ int do_install(struct char_data *ch, char *arg, int cmd)
     return eFAILURE;
   }
   
-  sprintf(buf, "./new_zone %d %c true", range, *type);
+  sprintf(buf, "./new_zone %d %c true %s", range, *type,bport == 1 ? "b":"n");
   ret = system(buf);
   // ret = bits, but I didn't use bits because I'm lazy and it only returns 2 values I gives a flyging fuck about!
   // if you change the script, you gotta change this too. - Rahz

@@ -1,7 +1,7 @@
 #ifndef __ROOM_H__
 #define __ROOM_H__
 /************************************************************************
-| $Id: room.h,v 1.10 2005/04/09 21:15:35 urizen Exp $
+| $Id: room.h,v 1.11 2005/05/27 15:28:08 urizen Exp $
 | room.h
 | Description:  This file contains all of the room header file/constant
 |   information.  It also contains information about the 'world' structs.
@@ -112,6 +112,11 @@ struct room_track_data
     room_track_data * previous;
 }; 
 
+struct deny_data
+{
+  struct deny_data *next;
+  int vnum;
+};
 
 // ========================= Structure for room ==========================
 struct room_data
@@ -119,6 +124,7 @@ struct room_data
     sh_int number;                       // Rooms number
     sh_int zone;                         // Room zone (for resetting)
     int sector_type;                     // sector type (move/hide)
+    struct deny_data *denied;
     char * name;                         // Rooms name 'You are ...'
     char * description;                  // Shown when entered
     extra_descr_data * ex_description;   // for examine/look

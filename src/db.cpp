@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.81 2005/05/13 13:29:54 urizen Exp $ */
+/* $Id: db.cpp,v 1.82 2005/05/27 15:28:05 urizen Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -89,6 +89,7 @@ int top_of_world_alloc = 0;           // index of last alloc'd memory in world
 int top_of_zonet = 0;                 // index of last valid zonefile
 
 struct obj_data  *object_list = 0;    /* the global linked list of obj's */
+extern int bport;
 
 CHAR_DATA *character_list = 0; /* global l-list of chars          */
 pulse_data *bard_list = 0;      /* global l-list of bards          */
@@ -937,7 +938,7 @@ struct index_data *generate_mob_indices(int *top, struct index_data *index)
   extern short code_testing_mode_mob;
   
   log("Opening mobile file index.", 0, LOG_MISC);
-  if(!code_testing_mode || code_testing_mode_mob) {
+  if((!code_testing_mode || code_testing_mode_mob) && !bport) {
     if(!(flMobIndex = dc_fopen(MOB_INDEX_FILE, "r"))) {
       log("Could not open index file.", 0, LOG_MISC);
       abort();
@@ -1201,9 +1202,15 @@ struct index_data *generate_obj_indices(int *top,
   char endfile[180];
   struct world_file_list_item * pItem = NULL;
 
+  if (!bport) {
   if(!(flObjIndex = dc_fopen(OBJECT_INDEX_FILE, "r"))) {
     log("Cannot open object file index.", 0, LOG_MISC);
     abort();
+  } } else {
+    if (!(flObjIndex = dc_fopen(OBJECT_INDEX_FILE_TINY,"r"))) {
+     log("Cannot open object file index.(tiny).",0,LOG_MISC);
+     abort();
+    }
   }
 
   log("Opening object files.", 0, LOG_MISC);
@@ -1323,6 +1330,9 @@ void write_one_room(FILE * f, int a)
     else fprintf(f, "~\n");  // print blank
   }  /* extra descriptions */
 
+  struct deny_data *deni;
+  for (deni = world[a].denied;deni;deni = deni->next)
+    fprintf(f,"B\n%d\n",deni->vnum);
   fprintf(f, "S\n");
 }
 
@@ -1379,7 +1389,7 @@ int read_one_room(FILE *fl, int & room_nr)
     world[room_nr].nTracks     = 0;
     world[room_nr].tracks      = 0;
     world[room_nr].last_track  = 0;
-
+    world[room_nr].denied = 0;
     total_rooms++;
     if (top_of_zone_table >= 0) 
     {
@@ -1471,6 +1481,18 @@ int read_one_room(FILE *fl, int & room_nr)
         new_new_descr->description = fread_string(fl, 0);
         new_new_descr->next        = world[room_nr].ex_description;
         world[room_nr].ex_description = new_new_descr;
+      }
+      else if (ch == 'B')
+      {
+	struct deny_data *deni;
+	#ifdef LEAK_CHECK
+	  deni = (struct deny_data *)calloc(1,sizeof(struct deny_data));
+	#else
+          deni = (struct deny_data *)dc_alloc(1,sizeof(struct deny_data));
+	#endif
+	deni->vnum = fread_int(fl, -1,LONG_MAX);
+	deni->next = world[room_nr].denied;
+	world[room_nr].denied = deni;
       }
       else if (ch == 'S')   /* end of current room */
         break;
@@ -1917,7 +1939,7 @@ void boot_world(void)
   character_list = 0;
   object_list    = 0;
 
-  if(!code_testing_mode || code_testing_mode_world) 
+  if((!code_testing_mode || code_testing_mode_world) && !bport)
   {
     if(!(flWorldIndex = dc_fopen(WORLD_INDEX_FILE, "r"))) 
     {
@@ -2426,7 +2448,7 @@ void boot_zones(void)
   char endfile[200]; // hopefully noone is stupid and makes a 180 char filename
 
 
-  if(!code_testing_mode) 
+  if(!code_testing_mode && !bport) 
   {
     if (!(flZoneIndex = dc_fopen(ZONE_INDEX_FILE, "r")))
     {

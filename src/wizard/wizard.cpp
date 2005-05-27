@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.22 2005/04/09 21:15:37 urizen Exp $
+| $Id: wizard.cpp,v 1.23 2005/05/27 15:28:09 urizen Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -767,6 +767,11 @@ void mob_stat(struct char_data *ch, struct char_data *k)
   }  
 
   csendf(ch, "$3Lag Left$R:  %d\r\n", (GET_WAIT(k) ? GET_WAIT(k) : 0));
+
+
+  if (!IS_NPC(k)) {
+     csendf(ch, "$3Hp metas$R: %d, $3Mana metas$R: %d, $3Move metas$R: %d, $3Ki metas$R: %d\r\n",GET_HP_METAS(k), GET_MANA_METAS(k), GET_MOVE_METAS(k), GET_KI_METAS(k));
+  }
 
   if(k->affected) {
     send_to_char("\n\r$3Affecting Spells$R:\n\r--------------\n\r", ch);

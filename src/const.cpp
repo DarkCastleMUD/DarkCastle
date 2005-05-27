@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.151 2005/05/09 05:08:34 shane Exp $ */
+/* $Id: const.cpp,v 1.152 2005/05/27 15:28:05 urizen Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -667,6 +667,7 @@ char *zone_bits[] =
     "NO_TELEPORT",
     "IS_TOWN(keep out STAY_NO_TOWN mobs)",
     "MODIFIED",
+    "BPORT",
     ""
 };
 

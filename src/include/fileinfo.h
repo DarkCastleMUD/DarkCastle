@@ -1,7 +1,7 @@
 #ifndef FILEINFO_H_
 #define FILEINFO_H_
 /*
-| $Id: fileinfo.h,v 1.8 2005/04/09 21:15:35 urizen Exp $
+| $Id: fileinfo.h,v 1.9 2005/05/27 15:28:08 urizen Exp $
 | fileinfo.h
 | Description:  Contains information for loading files, ie "../lib", etc..
 */
@@ -88,8 +88,7 @@
 #define  ZONE_INDEX_FILE   "zoneindex"
 #define  PLAYER_SHOP_INDEX "playershopindex"
 
-// We can't have a tiny_file for objects or morts that login would lose all their eq
-//#define  OBJECT_INDEX_FILE_TINY "objectindex.tiny"
+#define  OBJECT_INDEX_FILE_TINY "objectindex.tiny"
 #define  WORLD_INDEX_FILE_TINY   "worldindex.tiny"
 #define  MOB_INDEX_FILE_TINY "mobindex.tiny"
 #define  ZONE_INDEX_FILE_TINY "zoneindex.tiny"
