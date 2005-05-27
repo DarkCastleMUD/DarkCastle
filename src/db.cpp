@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.82 2005/05/27 15:28:05 urizen Exp $ */
+/* $Id: db.cpp,v 1.83 2005/05/27 15:58:40 urizen Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -89,7 +89,7 @@ int top_of_world_alloc = 0;           // index of last alloc'd memory in world
 int top_of_zonet = 0;                 // index of last valid zonefile
 
 struct obj_data  *object_list = 0;    /* the global linked list of obj's */
-extern int bport;
+extern short bport;
 
 CHAR_DATA *character_list = 0; /* global l-list of chars          */
 pulse_data *bard_list = 0;      /* global l-list of bards          */
@@ -938,7 +938,7 @@ struct index_data *generate_mob_indices(int *top, struct index_data *index)
   extern short code_testing_mode_mob;
   
   log("Opening mobile file index.", 0, LOG_MISC);
-  if((!code_testing_mode || code_testing_mode_mob) && !bport) {
+  if (!code_testing_mode_mob && !bport) {
     if(!(flMobIndex = dc_fopen(MOB_INDEX_FILE, "r"))) {
       log("Could not open index file.", 0, LOG_MISC);
       abort();
@@ -1203,10 +1203,13 @@ struct index_data *generate_obj_indices(int *top,
   struct world_file_list_item * pItem = NULL;
 
   if (!bport) {
-  if(!(flObjIndex = dc_fopen(OBJECT_INDEX_FILE, "r"))) {
-    log("Cannot open object file index.", 0, LOG_MISC);
-    abort();
-  } } else {
+
+    if(!(flObjIndex = dc_fopen(OBJECT_INDEX_FILE, "r"))) {
+      log("Cannot open object file index.", 0, LOG_MISC);
+      abort();
+   }
+
+  } else {
     if (!(flObjIndex = dc_fopen(OBJECT_INDEX_FILE_TINY,"r"))) {
      log("Cannot open object file index.(tiny).",0,LOG_MISC);
      abort();
@@ -1948,14 +1951,12 @@ void boot_world(void)
       abort();
     }
   }
-  else 
-    if(!(flWorldIndex = dc_fopen(WORLD_INDEX_FILE_TINY, "r"))) 
-    {
+    else if(!(flWorldIndex = dc_fopen(WORLD_INDEX_FILE_TINY, "r"))) 
+     {
       perror ("dc_fopen");
       log ("boot_world: could not open world index file tiny.", 0, LOG_BUG);
       abort();
     }
-
   log("Booting individual world files", 0, LOG_MISC);
 
   // note, we don't worry about free'ing temp, cause it's held in the "world_file_list"  
@@ -2456,14 +2457,12 @@ void boot_zones(void)
       log ("boot_world: could not open world index file.", 0, LOG_BUG);
       abort();
     }
-  }
-  else if (!(flZoneIndex = dc_fopen(ZONE_INDEX_FILE_TINY, "r")))
-  {
-    perror( "dc_fopen" );
-    log ("boot_world: could not open world index file tiny.", 0, LOG_BUG);
-    abort();
-  }
-
+  } else if (!(flZoneIndex = dc_fopen(ZONE_INDEX_FILE_TINY, "r")))
+    {
+      perror( "dc_fopen" );
+      log ("boot_world: could not open world index file tiny.", 0, LOG_BUG);
+      abort();
+    }
   log("Booting individual zone files", 0, LOG_MISC);
 
   for(temp = read_next_worldfile_name(flZoneIndex);
