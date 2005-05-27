@@ -3254,6 +3254,7 @@ int do_redit(struct char_data *ch, char *argument, int cmd)
       "exdesc",
       "rflag",
       "sector",
+      "denymob",
       ""
     };
    
@@ -3567,6 +3568,38 @@ int do_redit(struct char_data *ch, char *argument, int cmd)
           }
         }
       } break;
+       case 7: // denymob
+	if (!*buf2 || !is_number(buf2))
+	{
+	  send_to_char("Syntax: redit denymob <vnum>\r\nDoing this on an already denied mob will allow it once more.\r\n",ch);
+	  return eFAILURE;
+	}
+	bool done = FALSE;
+	int mob = atoi(buf2);
+	struct deny_data *nd,*pd = NULL;
+	for (nd = world[ch->in_room].denied;nd;nd = nd->next)
+	{
+	  if (nd->vnum == mob){
+		if (pd) pd->next = nd->next;
+		else world[ch->in_room].denied = nd->next;
+		dc_free(nd);
+		csendf(ch, "Mobile %d ALLOWED entrance.\r\n", mob);
+		done = TRUE;
+		break;
+	  }
+	  pd = nd;
+	}
+	if (done) break;
+	#ifdef LEAK_CHECK
+		nd = (struct deny_data *)calloc(1, sizeof(struct deny_data));
+	#else
+		nd = (struct deny_data *)dc_alloc(1, sizeof(struct deny_data));
+	#endif
+	nd->next = world[ch->in_room].denied;
+	nd->vnum = atoi(buf2);
+	world[ch->in_room].denied = nd;
+	csendf(ch, "Mobile %d DENIED entrance.\r\n",mob);
+	break;
     }
     set_zone_modified_world(ch->in_room);
     return eSUCCESS;
@@ -4220,7 +4253,13 @@ int do_rstat(struct char_data *ch, char *argument, int cmd)
                 strcat(buf, "None\n\r");
                 send_to_char(buf, ch);
             }
-
+ 	    struct deny_data *d;
+	    int a = 0,l=0;
+	    for (d = rm->denied;d;d=d->next)
+	    {
+	      if (a == 0) send_to_char("Mobiles Denied: ",ch);
+  	      csendf(ch, "%d %c",a%8==0? l > 0 ? a%16==0? "\n": ",":"\n":",");
+	    }
             strcpy(buf, "------- Chars present -------\n\r");
             for (k = rm->people; k; k = k->next_in_room)
             {

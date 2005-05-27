@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.83 2005/05/27 15:58:40 urizen Exp $ */
+/* $Id: db.cpp,v 1.84 2005/05/27 21:07:56 urizen Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -934,7 +934,7 @@ struct index_data *generate_mob_indices(int *top, struct index_data *index)
   char * temp;
   char endfile[180];
   struct world_file_list_item * pItem = NULL;
-  extern short code_testing_mode;
+//  extern short code_testing_mode;
   extern short code_testing_mode_mob;
   
   log("Opening mobile file index.", 0, LOG_MISC);

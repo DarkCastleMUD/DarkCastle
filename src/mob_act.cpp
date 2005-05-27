@@ -19,7 +19,7 @@
 /* 12/06/2003   Onager   Modified mobile_activity() to prevent charmie    */
 /*                       scavenging                                       */
 /**************************************************************************/
-/* $Id: mob_act.cpp,v 1.29 2005/05/01 14:02:09 urizen Exp $ */
+/* $Id: mob_act.cpp,v 1.30 2005/05/27 21:07:56 urizen Exp $ */
 
 extern "C"
 {
@@ -88,6 +88,15 @@ int passive_cleric(struct char_data *ch, struct obj_data *obj, int cmd, char *ar
 bool is_protected(struct char_data *vict, struct char_data *ch);
 void scavenge(struct char_data *ch);
 
+bool is_r_denied(CHAR_DATA *ch, int room)
+{
+  struct deny_data *d;
+  if (!IS_NPC(ch)) return FALSE;
+  for (d = world[room].denied;d;d=d->next)
+    if (mob_index[ch->mobdata->nr].virt == d->vnum)
+	return TRUE;
+  return FALSE;
+}
 void mobile_activity(void)
 {
   CHAR_DATA *ch;
@@ -247,6 +256,8 @@ void mobile_activity(void)
          )
       ) 
     {
+      if (is_r_denied(ch, EXIT(ch,door)->to_room))
+	; // DENIED
       if(ch->mobdata->last_direction == door)
         ch->mobdata->last_direction = -1;
       else if(!IS_SET(ch->mobdata->actflags, ACT_STAY_NO_TOWN) ||
