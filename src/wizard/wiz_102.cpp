@@ -4258,7 +4258,7 @@ int do_rstat(struct char_data *ch, char *argument, int cmd)
 	    for (d = rm->denied;d;d=d->next)
 	    {
 	      if (a == 0) send_to_char("Mobiles Denied: ",ch);
-  	      csendf(ch, "%d %c",d->vnum,a%8==0? l > 0 ? a%16==0? "\n": ",":"\n":",");
+  	      csendf(ch, "%d %s",d->vnum,a%8==0? l > 0 ? a%16==0? "\n": ",":"\n":",");
 	    }
             strcpy(buf, "------- Chars present -------\n\r");
             for (k = rm->people; k; k = k->next_in_room)
