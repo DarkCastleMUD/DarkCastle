@@ -232,7 +232,7 @@ int main(int argc, char **argv)
        log("Mud in testing mode. TinyTinyworld being used. (MOB,OBJ)", 0, LOG_MISC);
        break;
     case 'b': // Buildin' port.
-	bport = 0;
+	bport = 1;
 	port = 7000;
 	port2 = 7001;
 	port3 = 7002;
