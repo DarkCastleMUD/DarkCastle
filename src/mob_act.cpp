@@ -19,7 +19,7 @@
 /* 12/06/2003   Onager   Modified mobile_activity() to prevent charmie    */
 /*                       scavenging                                       */
 /**************************************************************************/
-/* $Id: mob_act.cpp,v 1.31 2005/05/27 21:24:46 urizen Exp $ */
+/* $Id: mob_act.cpp,v 1.32 2005/05/27 21:25:19 urizen Exp $ */
 
 extern "C"
 {
@@ -87,7 +87,6 @@ int passive_cleric(struct char_data *ch, struct obj_data *obj, int cmd, char *ar
           struct char_data *owner);
 bool is_protected(struct char_data *vict, struct char_data *ch);
 void scavenge(struct char_data *ch);
-
 bool is_r_denied(CHAR_DATA *ch, int room)
 {
   struct deny_data *d;
