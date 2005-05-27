@@ -19,7 +19,7 @@
 /* 12/06/2003   Onager   Modified mobile_activity() to prevent charmie    */
 /*                       scavenging                                       */
 /**************************************************************************/
-/* $Id: mob_act.cpp,v 1.30 2005/05/27 21:07:56 urizen Exp $ */
+/* $Id: mob_act.cpp,v 1.31 2005/05/27 21:24:46 urizen Exp $ */
 
 extern "C"
 {
@@ -258,7 +258,7 @@ void mobile_activity(void)
     {
       if (is_r_denied(ch, EXIT(ch,door)->to_room))
 	; // DENIED
-      if(ch->mobdata->last_direction == door)
+      else if(ch->mobdata->last_direction == door)
         ch->mobdata->last_direction = -1;
       else if(!IS_SET(ch->mobdata->actflags, ACT_STAY_NO_TOWN) ||
               !IS_SET(zone_table[world[EXIT(ch, door)->to_room].zone].zone_flags, ZONE_IS_TOWN))

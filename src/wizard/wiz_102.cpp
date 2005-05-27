@@ -4257,13 +4257,14 @@ int do_rstat(struct char_data *ch, char *argument, int cmd)
 	    int a = 0,l=0;
 	    for (d = rm->denied;d;d=d->next)
 	    {
-	      if (a == 0) send_to_char("Mobiles Denied: ",ch);
-  	      csendf(ch, "%d",d->vnum);
 	      if (++a%10==0) send_to_char("\r\n",ch);
 	       else send_to_char(",",ch); // goddamnit :P it didn't like 
 			// my nested stuff
+	      if (a == 0) send_to_char("Mobiles Denied: ",ch);
+  	      csendf(ch, "%d",d->vnum);
 		
 	    }
+	send_to_char("\r\n",ch);	
             strcpy(buf, "------- Chars present -------\n\r");
             for (k = rm->people; k; k = k->next_in_room)
             {
