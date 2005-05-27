@@ -4257,12 +4257,11 @@ int do_rstat(struct char_data *ch, char *argument, int cmd)
 	    int a = 0,l=0;
 	    for (d = rm->denied;d;d=d->next)
 	    {
-	      if (++a%10==0) send_to_char("\r\n",ch);
-	       else send_to_char(",",ch); // goddamnit :P it didn't like 
-			// my nested stuff
 	      if (a == 0) send_to_char("Mobiles Denied: ",ch);
-  	      csendf(ch, "%d",d->vnum);
-		
+	      if (real_mobile(d->vnum) == -1)
+		csendf(ch, "UNKNOWN(%d)\r\n",d->vnum);
+		else
+  	      csendf(ch, "%s(%d)",((CHAR_DATA*)mob_index[real_mobile(d->vnum)].item)->short_desc,d->vnum);
 	    }
 	send_to_char("\r\n",ch);	
             strcpy(buf, "------- Chars present -------\n\r");
