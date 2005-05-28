@@ -964,7 +964,7 @@ void remove_eliara(CHAR_DATA *ch)
 
    act("Eliara's glow fades, as she falls dormant once again.", ch, 0, 0, TO_ROOM, 0);
    send_to_char("Eliara's glow fades, as she falls dormant once again.\r\n\r\n", ch);
-   REMOVE_BIT(ch->affected_by, AFF_SANCTUARY);
+   REMBIT(ch->affected_by, AFF_SANCTUARY);
 
 }
 
@@ -993,7 +993,7 @@ int eliara_combat(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
    act("Eliara glows brightly for a moment, its incandescent field of light surrounding $n in a glowing aura.", ch, 0, 0, TO_ROOM, 0);
    send_to_char("Eliara glows brightly surrounding you in its protective aura!\r\n", ch);
 
-   SET_BIT(ch->affected_by, AFF_SANCTUARY);
+   SETBIT(ch->affected_by, AFF_SANCTUARY);
 
    return eSUCCESS;
 }

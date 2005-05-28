@@ -602,19 +602,19 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
     {
       switch ( arg[1] )  /* arg should be "$*" so just get the letter */
 	{
-	case 'i': return ( mob->affected_by & atoi( val ) );
+	case 'i': return ( ISSET(mob->affected_by, atoi( val )) );
 	case 'z': if (mob->beacon)
-             return ( ((CHAR_DATA*)mob->beacon)->affected_by & atoi(val));
-           else return -1;
+             return ( ISSET(((CHAR_DATA*)mob->beacon)->affected_by, atoi(val)) );
+             else return -1;
 
 	case 'n': if ( actor )
-	             return ( actor->affected_by & atoi( val ) );
+	             return ( ISSET(actor->affected_by, atoi( val )) );
 	          else return -1;
 	case 't': if ( vict )
-	             return ( vict->affected_by & atoi( val ) );
+	             return ( ISSET(vict->affected_by, atoi( val )) );
 	          else return -1;
 	case 'r': if ( rndm )
-	             return ( rndm->affected_by & atoi( val ) );
+	             return ( ISSET(rndm->affected_by, atoi( val )) );
 	          else return -1;
 	default:
 	  logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'isaffected'",

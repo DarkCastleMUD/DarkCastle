@@ -1260,18 +1260,13 @@ int skill_aff[] =
   33, 34, 84, 81, 86, 38,
   89, 0, 0, 0, 0, 0, SPELL_SOLIDITY, 72,
   SPELL_CANTQUIT, SPELL_KILLER, 56, 133, 74, 0,
-  143
-};
-
-int skill_aff2[] =
-{
-  SPELL_SHADOWSLIP, SPELL_INSOMNIA, SPELL_FREEFLOAT,
+  143, SPELL_SHADOWSLIP, SPELL_INSOMNIA, SPELL_FREEFLOAT,
   SPELL_FARSIGHT, SPELL_CAMOUFLAGE, SPELL_STABILITY,
   0, 0, SPELL_FOREST_MELD, SKILL_SONG_INSANE_CHANT,
   SKILL_SONG_GLITTER_DUST, SKILL_SONG_STICKY_LULL,
   0, SPELL_PROTECT_FROM_GOOD, SKILL_INNATE_POWERWIELD,
   SKILL_INNATE_REGENERATION, SKILL_INNATE_FOCUS,
-  SPELL_KNOW_ALIGNMENT
+  SPELL_KNOW_ALIGNMENT, 0, SPELL_WATER_BREATHING
 };
 
 int do_mpbestow(CHAR_DATA *ch, char *argument, int cmd)
@@ -1302,8 +1297,8 @@ int do_mpbestow(CHAR_DATA *ch, char *argument, int cmd)
   if (!victim) victim = world[ch->in_room].people;
   int z=0;
   for (;victim;) {
-  for ( ; affected_bits[a][0] != '\n'; a++) 
-  {
+   for ( ; affected_bits[a][0] != '\n'; a++) 
+   {
     if (!str_cmp(affected_bits[a], arg1))
     {
 	debugpoint();
@@ -1330,43 +1325,14 @@ int do_mpbestow(CHAR_DATA *ch, char *argument, int cmd)
          }
 
     }
-  } 
-  a = 0;
-  extern char *affected_bits2[];
-  for ( ; affected_bits2[a][0] != '\n'; a++)
-  {
-    if (!str_cmp(affected_bits2[a], arg1))
-    {
-	debugpoint();
-        struct affected_type af;
-        af.type =z= skill_aff2[a];
-	if (affected_by_spell(victim, z+BASE_TIMERS))
-        {
-		return eFAILURE;
-        }
-        af.duration = i;
-        af.bitvector = 1<<a;
-        af.location = 0;
-        af.modifier = 0;
-        affect_join(victim, &af, TRUE, FALSE);
-        if (z && o) // Timer on it
-        {
-          af.type = BASE_TIMERS + z;
-          af.duration = o;
-          af.bitvector = 0;
-          af.location = 0;
-          af.modifier = 0;
-          affect_join(victim, &af, TRUE, FALSE);
-        }
-    }
-  }
+   } 
    if (!str_cmp(arg, "all")) victim = victim->next_in_room;
-    else if (!str_cmp(arg, "allpc")) {
+   else if (!str_cmp(arg, "allpc")) {
       while ((victim = victim->next_in_room)) {
 	  if (!IS_NPC(victim)) break;	
-	}
-  } else break;
- }
+      }
+   } else break;
+  }
   if (z && o && owner) // Timer on it
   {
         struct affected_type af;

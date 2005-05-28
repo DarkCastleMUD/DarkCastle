@@ -63,10 +63,10 @@ void act
       return;
    }
 
-   if ((IS_AFFECTED(ch, AFF_HIDE) ||IS_SET(ch->affected_by2, AFF_FOREST_MELD))&& (destination != TO_CHAR) &&
+   if ((IS_AFFECTED(ch, AFF_HIDE) ||ISSET(ch->affected_by, AFF_FOREST_MELD))&& (destination != TO_CHAR) &&
        !(flags & GODS) && !(flags & STAYHIDE)) {
-      REMOVE_BIT(ch->affected_by, AFF_HIDE);
-//	REMOVE_BIT(ch->affected_by2, AFF_FOREST_MELD);
+      REMBIT(ch->affected_by, AFF_HIDE);
+//	REMBIT(ch->affected_by, AFF_FOREST_MELD);
 	affect_from_char(ch, SPELL_FOREST_MELD);
       // Surprise!
       // -Sadus

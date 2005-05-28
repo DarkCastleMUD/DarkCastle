@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.269 2005/05/16 11:04:51 shane Exp $ */
+/* $Id: fight.cpp,v 1.270 2005/05/28 18:56:09 shane Exp $ */
 
 extern "C"
 {
@@ -40,9 +40,9 @@ extern "C"
 #include <levels.h>
 #include <race.h>
 #include <player.h> // log
+#include <character.h>
 #include <utility.h> // log
 #include <connect.h>
-#include <character.h>
 #include <spells.h> // weapon_spells
 #include <isr.h>
 #include <mobile.h>
@@ -271,9 +271,8 @@ void perform_violence(void)
         if (*spell_wear_off_msg[af->type]) {
           send_to_char(spell_wear_off_msg[af->type], ch);
           send_to_char("\n\r", ch);
-          bool isaff2(int spellnum);
           while (next_af_dude&&af->type == next_af_dude->type) next_af_dude = next_af_dude->next;
-          affect_remove(ch, af, 0,isaff2(af->type));
+          affect_remove(ch, af, 0);
         }
       }
     }
@@ -329,8 +328,8 @@ int attack(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
   // TODO - until I can make sure that area effects don't attack other mobs
   // when cast by mobs, I need to make sure mobs aren't killing each other  
   if (IS_NPC(ch) && IS_NPC(vict) && 
-      !IS_AFFECTED(ch, AFF_CHARM) &&   !IS_AFFECTED2(ch, AFF_FAMILIAR) &&
-      !IS_AFFECTED(vict, AFF_CHARM) && !IS_AFFECTED2(vict, AFF_FAMILIAR)) 
+      !IS_AFFECTED(ch, AFF_CHARM) &&   !IS_AFFECTED(ch, AFF_FAMILIAR) &&
+      !IS_AFFECTED(vict, AFF_CHARM) && !IS_AFFECTED(vict, AFF_FAMILIAR)) 
   {
    if (ch->fighting == vict) {
     stop_fighting(ch);
@@ -514,7 +513,7 @@ void update_flags(CHAR_DATA *vict)
    if (IS_SET(vict->combat, COMBAT_THI_EYEGOUGE2))
    {
       REMOVE_BIT(vict->combat, COMBAT_THI_EYEGOUGE2);
-      REMOVE_BIT(vict->affected_by,AFF_BLIND);
+      REMBIT(vict->affected_by,AFF_BLIND);
       act("$n clears the blood from $s eyes.\r\n",vict, NULL, NULL, TO_ROOM,0);
       send_to_char("You clear the blood out of your eyes.\r\n",vict);
    }
@@ -1148,7 +1147,7 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
                        (ch, ch->equipment[HOLD2], 0, "", ch));
   }
   if (!SOMEONE_DIED(retval))
-    if (IS_MOB(ch) && IS_SET(ch->mobdata->actflags, ACT_DRAINY))
+    if (IS_MOB(ch) && ISSET(ch->mobdata->actflags, ACT_DRAINY))
        if (number(1,101) <= 10)
           SET_BIT(retval, spell_energy_drain(1,ch,vict,0,0));
 
@@ -1636,14 +1635,14 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
   }
 
   if (IS_AFFECTED(ch, AFF_INVISIBLE)
-	&& (!IS_AFFECTED2(ch, AFF_ILLUSION) || !(affected_by_spell(ch, 
+	&& (!IS_AFFECTED(ch, AFF_ILLUSION) || !(affected_by_spell(ch, 
 BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE) 
 && affected_by_spell(ch, SPELL_INVISIBLE)->modifier == 987) )) {
     act("$n slowly fades into existence.", ch, 0, 0, TO_ROOM, 0);
     //if (affected_by_spell(ch, SPELL_INVISIBLE))
     // no point it looping through the list twice...
     affect_from_char(ch, SPELL_INVISIBLE);
-    REMOVE_BIT(ch->affected_by, AFF_INVISIBLE);
+    REMBIT(ch->affected_by, AFF_INVISIBLE);
   }
 
   // Frost Shield won't effect a backstab -pir
@@ -2099,7 +2098,7 @@ void set_cantquit(CHAR_DATA *ch, CHAR_DATA *vict, bool forced )
   if (realvict == realch)  // killing your own pet was giving you a CQ
     return;
 
-  if(is_pkill(realch, realvict) && !IS_SET(realvict->affected_by, AFF_CANTQUIT) &&
+  if(is_pkill(realch, realvict) && !ISSET(realvict->affected_by, AFF_CANTQUIT) &&
               !affected_by_spell(realvict, FUCK_GTHIEF) && 
 	      !affected_by_spell(realvict, FUCK_PTHIEF) && !forced) { 
     af.type = FUCK_CANTQUIT;
@@ -2108,7 +2107,7 @@ void set_cantquit(CHAR_DATA *ch, CHAR_DATA *vict, bool forced )
     af.location = APPLY_NONE;
     af.bitvector = AFF_CANTQUIT;
     
-    if(!IS_SET(realch->affected_by, AFF_CANTQUIT))
+    if(!ISSET(realch->affected_by, AFF_CANTQUIT))
       affect_to_char(realch, &af);
     else {
       for(paf = realch->affected; paf; paf = paf->next) {
@@ -2212,7 +2211,7 @@ int check_magic_block(CHAR_DATA *ch, CHAR_DATA *victim, int attacktype)
     return 0;
   if((IS_SET(victim->combat, COMBAT_STUNNED)) ||
 //    (victim->equipment[WEAR_SHIELD] == NULL) ||
-    (IS_NPC(victim) && (!IS_SET(victim->mobdata->actflags, ACT_PARRY))) ||
+    (IS_NPC(victim) && (!ISSET(victim->mobdata->actflags, ACT_PARRY))) ||
     (IS_SET(victim->combat, COMBAT_STUNNED2)) ||
     (IS_SET(victim->combat, COMBAT_BASH1)) ||
     (IS_SET(victim->combat, COMBAT_BASH2)) ||
@@ -2252,7 +2251,7 @@ int check_shieldblock(CHAR_DATA * ch, CHAR_DATA * victim, int attacktype)
     return 0;
   if((IS_SET(victim->combat, COMBAT_STUNNED)) ||
 //    (victim->equipment[WEAR_SHIELD] == NULL) ||
-    (IS_NPC(victim) && (!IS_SET(victim->mobdata->actflags, ACT_PARRY))) ||
+    (IS_NPC(victim) && (!ISSET(victim->mobdata->actflags, ACT_PARRY))) ||
     (IS_SET(victim->combat, COMBAT_STUNNED2)) ||
     (IS_SET(victim->combat, COMBAT_BASH1)) ||
     (IS_SET(victim->combat, COMBAT_BASH2)) ||
@@ -2317,7 +2316,7 @@ bool check_parry(CHAR_DATA * ch, CHAR_DATA * victim, int attacktype)
   if((IS_SET(victim->combat, COMBAT_STUNNED)) ||
     (victim->equipment[WIELD] == NULL) ||
     (ch->equipment[WIELD] == NULL && number(1, 101) >= 50) ||
-    (IS_NPC(victim) && (!IS_SET(victim->mobdata->actflags, ACT_PARRY))) ||
+    (IS_NPC(victim) && (!ISSET(victim->mobdata->actflags, ACT_PARRY))) ||
     (IS_SET(victim->combat, COMBAT_STUNNED2)) ||
     (IS_SET(victim->combat, COMBAT_BASH1)) ||
     (IS_SET(victim->combat, COMBAT_BASH2)) ||
@@ -2343,7 +2342,7 @@ bool check_parry(CHAR_DATA * ch, CHAR_DATA * victim, int attacktype)
   }
   } else if (!has_skill(victim, SKILL_PARRY))
      return FALSE;
-  if (!modifier && IS_NPC(victim) && (IS_SET(victim->mobdata->actflags, ACT_PARRY)))
+  if (!modifier && IS_NPC(victim) && (ISSET(victim->mobdata->actflags, ACT_PARRY)))
     modifier = 10;
 
   modifier += speciality_bonus(ch,attacktype);
@@ -2432,7 +2431,7 @@ bool check_dodge(CHAR_DATA * ch, CHAR_DATA * victim, int attacktype)
       case CLASS_NECROMANCER:   modifier = -5; break;
       default:                  modifier = 0; break;
     }
-    if(0 == modifier && IS_SET(victim->mobdata->actflags, ACT_DODGE))
+    if(0 == modifier && ISSET(victim->mobdata->actflags, ACT_DODGE))
       modifier = 5;
   } else if (!has_skill(victim, SKILL_DODGE))
       return FALSE;
@@ -2579,17 +2578,17 @@ void set_fighting(CHAR_DATA * ch, CHAR_DATA * vict)
     return;
   
   if(!IS_NPC(ch) && IS_NPC(vict))
-    if(!IS_SET(vict->mobdata->actflags, ACT_STUPID))
+    if(!ISSET(vict->mobdata->actflags, ACT_STUPID))
       add_memory(vict, GET_NAME(ch), 'h');
  
   if(IS_NPC(ch) && IS_NPC(vict) && IS_AFFECTED(ch, AFF_CHARM) && 
      ch->master && !IS_NPC(ch->master))
-    if(!IS_SET(vict->mobdata->actflags, ACT_STUPID))
+    if(!ISSET(vict->mobdata->actflags, ACT_STUPID))
       add_memory(vict, GET_NAME(ch->master), 'h');
 
 
   if (!IS_NPC(ch) && IS_NPC(vict))
-     if (!IS_SET(vict->mobdata->actflags, ACT_STUPID) && !vict->hunting)
+     if (!ISSET(vict->mobdata->actflags, ACT_STUPID) && !vict->hunting)
      {
        if (GET_LEVEL(ch) - (GET_LEVEL(vict)/2) > 0
 	|| GET_LEVEL(ch) == 50)
@@ -2609,7 +2608,7 @@ void set_fighting(CHAR_DATA * ch, CHAR_DATA * vict)
                 timer->timeleft = (ch->level / 4) * 60;
            }
   if (!IS_NPC(vict) && IS_NPC(ch))
-     if (!IS_SET(ch->mobdata->actflags, ACT_STUPID) && !ch->hunting)
+     if (!ISSET(ch->mobdata->actflags, ACT_STUPID) && !ch->hunting)
      {
        if (GET_LEVEL(vict) - (GET_LEVEL(ch)/2) > 0 || 
 		GET_LEVEL(vict) == 50)
@@ -2720,12 +2719,12 @@ void stop_fighting(CHAR_DATA * ch)
   if (IS_SET(ch->combat, COMBAT_THI_EYEGOUGE))
   {
     REMOVE_BIT(ch->combat, COMBAT_THI_EYEGOUGE);
-    REMOVE_BIT(ch->affected_by, AFF_BLIND);
+    REMBIT(ch->affected_by, AFF_BLIND);
   }  
   if (IS_SET(ch->combat, COMBAT_THI_EYEGOUGE2))
   {
     REMOVE_BIT(ch->combat, COMBAT_THI_EYEGOUGE2);
-    REMOVE_BIT(ch->affected_by, AFF_BLIND);
+    REMBIT(ch->affected_by, AFF_BLIND);
   }
   GET_POS(ch) = POSITION_STANDING;
   update_pos(ch);
@@ -2973,11 +2972,11 @@ int alignment_value(int val)
 // run through eq removing and rewearing is
 void zap_eq_check(char_data * ch)
 {
-  SET_BIT(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT);
+  SETBIT(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT);
   for(int i = 0; i < MAX_WEAR; i++)
     if(ch->equipment[i])
       equip_char(ch, unequip_char(ch, i,1), i,1);
-  REMOVE_BIT(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT);
+  REMBIT(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT);
 }
 
 // ch kills victim
@@ -3673,7 +3672,7 @@ void group_gain(CHAR_DATA * ch, CHAR_DATA * victim)
   if(ch == victim)                return;
   if(!IS_NPC(victim))             return;
   
-  if(IS_NPC(ch) && !( IS_AFFECTED(ch, AFF_CHARM) || IS_AFFECTED2(ch, AFF_FAMILIAR)))
+  if(IS_NPC(ch) && !( IS_AFFECTED(ch, AFF_CHARM) || IS_AFFECTED(ch, AFF_FAMILIAR)))
     return; // non charmies/familiars get out
 
   // if i'm charmie/familiar and not grouped, give my master the credit if he's in room
@@ -4174,7 +4173,6 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim, int type)
   
   for(af = victim->affected; af; af = afpk) {
     afpk = af->next;
-	bool isaff2(int spellnum);
     if(af->type != FUCK_CANTQUIT && 
        af->type != SKILL_LAY_HANDS &&
        af->type != SKILL_HARM_TOUCH &&
@@ -4185,7 +4183,7 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim, int type)
        af->type != SKILL_CRAZED_ASSAULT &&
        af->type != SKILL_FOCUSED_REPELANCE && !(
 	af->type >= 1100 && af->type <= 1300))
-      affect_remove(victim, af, SUPPRESS_ALL,isaff2(af->type));
+      affect_remove(victim, af, SUPPRESS_ALL);
   }
   
   GET_HIT(victim)  = 1;
@@ -4211,7 +4209,7 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim, int type)
       sprintf(killer_message,"\n\r##%s was just introduced to the warm hospitality of Dark Castle!!\n\r", GET_NAME(victim));
     else if ( num == 1000 ) 
       sprintf(killer_message,"\n\r##%s was just ANALLY PROBED by %s!\n\r", GET_NAME(victim), GET_NAME(ch));
-    else if(IS_AFFECTED2(ch, AFF_FAMILIAR) && ch->master)
+    else if(IS_AFFECTED(ch, AFF_FAMILIAR) && ch->master)
       sprintf(killer_message,"\n\r##%s was just DEFEATED in battle by %s's familiar!\n\r",
             GET_NAME(victim), GET_NAME(ch->master));
     else if(IS_AFFECTED(ch, AFF_CHARM) && ch->master)
@@ -4319,7 +4317,7 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim, int type)
           }
         }
     }
-    if(IS_AFFECTED2(ch, AFF_FAMILIAR) && ch->master && GET_LEVEL(victim) > PKILL_COUNT_LIMIT && victim->desc && ch->master != victim && ch->in_room != real_room(START_ROOM) && ch->in_room != real_room(SECOND_START_ROOM)) {
+    if(IS_AFFECTED(ch, AFF_FAMILIAR) && ch->master && GET_LEVEL(victim) > PKILL_COUNT_LIMIT && victim->desc && ch->master != victim && ch->in_room != real_room(START_ROOM) && ch->in_room != real_room(SECOND_START_ROOM)) {
        GET_PDEATHS(victim) += 1;
        GET_PDEATHS_LOGIN(victim) += 1;
 
@@ -4389,11 +4387,9 @@ void arena_kill(CHAR_DATA *ch, CHAR_DATA *victim, int type)
   // remove_nosave(victim);
 
   move_player_home(victim);
-  bool isaff2(int spellnum);
   
   while(victim->affected)
-    affect_remove(victim, victim->affected, SUPPRESS_ALL, isaff2(victim->affected->type));  
-  victim->affected_by2 = 0;
+    affect_remove(victim, victim->affected, SUPPRESS_ALL);  
   if(ch && arena[2] == -2)
   {
     if(ch && ch->clan && GET_LEVEL(ch) < IMMORTAL)        clan  = get_clan(ch);
@@ -4496,7 +4492,7 @@ int can_be_attacked(CHAR_DATA *ch, CHAR_DATA *vict)
   
   if(IS_NPC(vict))
   {
-    if((IS_AFFECTED2(vict, AFF_FAMILIAR) || mob_index[vict->mobdata->nr].virt == 8
+    if((IS_AFFECTED(vict, AFF_FAMILIAR) || mob_index[vict->mobdata->nr].virt == 8
 	|| affected_by_spell(vict, SPELL_CHARM_PERSON)) && 
        vict->master && 
        vict->fighting != ch && 
@@ -4731,7 +4727,7 @@ int second_attack(CHAR_DATA *ch)
 {
   int learned;
 
-  if((IS_NPC(ch)) && (IS_SET(ch->mobdata->actflags, ACT_2ND_ATTACK)))
+  if((IS_NPC(ch)) && (ISSET(ch->mobdata->actflags, ACT_2ND_ATTACK)))
     return TRUE;
   learned = has_skill(ch, SKILL_SECOND_ATTACK);
   if(learned && skill_success(ch,NULL, SKILL_SECOND_ATTACK)) {
@@ -4744,7 +4740,7 @@ int third_attack(CHAR_DATA *ch)
 {
   int learned;
 
-  if((IS_NPC(ch)) && (IS_SET(ch->mobdata->actflags, ACT_3RD_ATTACK)))
+  if((IS_NPC(ch)) && (ISSET(ch->mobdata->actflags, ACT_3RD_ATTACK)))
     return TRUE;
   learned = has_skill(ch, SKILL_THIRD_ATTACK);
   if(learned && skill_success(ch,NULL,SKILL_THIRD_ATTACK)) {
@@ -4755,7 +4751,7 @@ int third_attack(CHAR_DATA *ch)
 
 int fourth_attack(CHAR_DATA *ch)
 {
-  if((IS_NPC(ch)) && (IS_SET(ch->mobdata->actflags, ACT_4TH_ATTACK)))
+  if((IS_NPC(ch)) && (ISSET(ch->mobdata->actflags, ACT_4TH_ATTACK)))
     return TRUE;
   return FALSE;
 }
@@ -4807,7 +4803,7 @@ void inform_victim(CHAR_DATA *ch, CHAR_DATA *victim, int dam)
         victim);
 			   
       if (IS_NPC(victim)) {
-        if (IS_SET(victim->mobdata->actflags, ACT_WIMPY))
+        if (ISSET(victim->mobdata->actflags, ACT_WIMPY))
         {
           remove_memory(victim, 't');
           remove_memory(victim, 'h', victim);
@@ -4875,7 +4871,7 @@ int do_flee(struct char_data *ch, char *argument, int cmd)
   if(GET_CLASS(ch) == CLASS_BARD && IS_SINGING(ch))
      do_sing(ch, "stop", 9);
 
-  if(IS_AFFECTED2(ch, AFF_NO_FLEE)) {
+  if(IS_AFFECTED(ch, AFF_NO_FLEE)) {
      if(affected_by_spell(ch, SPELL_IRON_ROOTS))
        send_to_char("The roots bracing your legs make it impossible to run!\r\n", ch);
      else send_to_char("Your legs are too tired for running away!\r\n", ch);

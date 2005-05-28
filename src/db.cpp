@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.84 2005/05/27 21:07:56 urizen Exp $ */
+/* $Id: db.cpp,v 1.85 2005/05/28 18:56:09 shane Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -36,6 +36,7 @@ extern "C"
 #include <dmalloc.h>
 #endif
 
+#include <affect.h>
 #include <db.h>
 #include <memory.h>
 #include <structs.h> // MAX_STRING_LENGTH
@@ -926,7 +927,7 @@ void reset_time(void)
 /* generate index table for monster file */
 struct index_data *generate_mob_indices(int *top, struct index_data *index)
 {
-  int i = 0;
+  int i = 0, j;
   char buf[82];
   char log_buf[256];
   FILE * flMobIndex;
@@ -1159,8 +1160,18 @@ struct index_data *generate_mob_indices(int *top, struct index_data *index)
     }
     if (mob) {
       mob_index[i].mobspec = mob_index[real_mobile(mob)].mobprogs;
-      SET_BIT( ((CHAR_DATA *)mob_index[i].item)->mobdata->actflags, ((CHAR_DATA *)mob_index[real_mobile(mob)].item)->mobdata->actflags);
-      SET_BIT( ((CHAR_DATA *)mob_index[i].item)->affected_by, ((CHAR_DATA *)mob_index[real_mobile(mob)].item)->affected_by);
+      j = 0;
+      while( ((CHAR_DATA *)mob_index[real_mobile(mob)].item)->mobdata->actflags[j] != 1) {
+         ((CHAR_DATA *)mob_index[i].item)->mobdata->actflags[j] = ((CHAR_DATA *)mob_index[real_mobile(mob)].item)->mobdata->actflags[j];
+         j++;
+      }
+      ((CHAR_DATA *)mob_index[i].item)->mobdata->actflags[j] = -1;
+      j = 0;
+      while( ((CHAR_DATA *)mob_index[real_mobile(mob)].item)->affected_by[j] != -1) {
+         ((CHAR_DATA *)mob_index[i].item)->affected_by[j] = ((CHAR_DATA *)mob_index[real_mobile(mob)].item)->affected_by[j];
+         j++;
+      }
+      ((CHAR_DATA *)mob_index[i].item)->affected_by[j] = -1;
     }
     if (mob_index[i].mobspec)
       for (mprg = mob_index[i].mobspec; mprg; mprg = mprg->next)
@@ -2507,7 +2518,7 @@ void boot_zones(void)
 CHAR_DATA *read_mobile(int nr, FILE *fl)
     {
     char buf[200];
-    int i;
+    int i, j;
     long tmp, tmp2, tmp3;
     CHAR_DATA *mob;
     char letter;
@@ -2546,143 +2557,133 @@ CHAR_DATA *read_mobile(int nr, FILE *fl)
 #endif
 
     /* *** Numeric data *** */
-    mob->mobdata->actflags = fread_bitvector (fl, LONG_MIN, LONG_MAX);
-    if (IS_SET(mob->mobdata->actflags, ACT_NOTRACK))
-       REMOVE_BIT(mob->mobdata->actflags, ACT_NOTRACK);
+    j = 0;
+    while((tmp = fread_int(fl, LONG_MIN, LONG_MAX)) != -1) {
+       mob->mobdata->actflags[j] = tmp;
+       j++;
+    }
+    mob->mobdata->actflags[j] = -1;
+    if (ISSET(mob->mobdata->actflags, ACT_NOTRACK))
+       REMBIT(mob->mobdata->actflags, ACT_NOTRACK);
     SET_BIT(mob->misc, MISC_IS_MOB);
 
-    mob->affected_by = fread_bitvector (fl, LONG_MIN, LONG_MAX);
+    j = 0;
+    while((tmp = fread_int(fl, LONG_MIN, LONG_MAX)) != -1) {
+       mob->affected_by[j] = tmp;
+       j++;
+    }
+    mob->affected_by[j] = -1;
+
     mob->alignment   = fread_int (fl, LONG_MIN, LONG_MAX);
-    letter = fread_char (fl);
 
-    // We don't really have to check the R, but we'll leave it in
-    // until I remove it from the files.
-    if (letter == 'R') 
-    {
-        /*  Mobs with races... tell we setup stats.. we leave them at 11.. */
+    tmp = fread_int (fl, 0, MAX_RACE);
+    GET_RACE(mob) = (char)tmp;
 
-        tmp = fread_int (fl, 0, 32);
-        GET_RACE(mob) = (char)tmp;
+    mob->raw_str   = mob->str   = BASE_STAT + mob_race_mod[GET_RACE(mob)][0];
+    mob->raw_dex   = mob->dex   = BASE_STAT + mob_race_mod[GET_RACE(mob)][1];
+    mob->raw_con   = mob->con   = BASE_STAT + mob_race_mod[GET_RACE(mob)][2];
+    mob->raw_intel = mob->intel = BASE_STAT + mob_race_mod[GET_RACE(mob)][3];
+    mob->raw_wis   = mob->wis   = BASE_STAT + mob_race_mod[GET_RACE(mob)][4];
 
-        mob->raw_str   = mob->str   = 13 + mob_race_mod[GET_RACE(mob)][0];
-        mob->raw_intel = mob->intel = 13 + mob_race_mod[GET_RACE(mob)][1];
-        mob->raw_wis   = mob->wis   = 13 + mob_race_mod[GET_RACE(mob)][2];
-        mob->raw_dex   = mob->dex   = 13 + mob_race_mod[GET_RACE(mob)][3];
-        mob->raw_con   = mob->con   = 13 + mob_race_mod[GET_RACE(mob)][4];
-
-        GET_LEVEL(mob) = fread_int (fl, 0, IMP);
+    GET_LEVEL(mob) = fread_int (fl, 0, IMP);
     
-        mob->hitroll = 20 - fread_int (fl, -64000, 64000);
-        mob->armor   = 10 * fread_int (fl, -64000, 64000);
+    mob->hitroll = 20 - fread_int (fl, -64000, 64000);
+    mob->armor   = 10 * fread_int (fl, -64000, 64000);
 
-        tmp = fread_int (fl, 0, 64000);
-        tmp2 = fread_int (fl, 0, 64000);
-        tmp3 = fread_int (fl, 0, 64000);
+    tmp = fread_int (fl, 0, 64000);
+    tmp2 = fread_int (fl, 0, 64000);
+    tmp3 = fread_int (fl, 0, 64000);
 
-        mob->raw_hit = dice (tmp, tmp2) + tmp3;
-        mob->max_hit = mob->raw_hit;
-        mob->hit     = mob->max_hit;
+    mob->raw_hit = dice (tmp, tmp2) + tmp3;
+    mob->max_hit = mob->raw_hit;
+    mob->hit     = mob->max_hit;
 
-        mob->mobdata->damnodice   = fread_int (fl, 0, 64000);
-        mob->mobdata->damsizedice = fread_int (fl, 0, 64000);
-        mob->damroll       = fread_int (fl, 0, 64000);
-	mob->mobdata->last_room = -1;
-        mob->mana     = 100 + (mob->level * 10);
-        mob->max_mana = 100 + (mob->level * 10);
+    mob->mobdata->damnodice   = fread_int (fl, 0, 64000);
+    mob->mobdata->damsizedice = fread_int (fl, 0, 64000);
+    mob->damroll       = fread_int (fl, 0, 64000);
+    mob->mobdata->last_room = -1;
+    mob->mana     = 100 + (mob->level * 10);
+    mob->max_mana = 100 + (mob->level * 10);
     
-        mob->move     = 100 + (mob->level * 10);
-        mob->max_move = 100 + (mob->level * 10);
+    mob->move     = 100 + (mob->level * 10);
+    mob->max_move = 100 + (mob->level * 10);
     
-        mob->gold = fread_int (fl, 0, LONG_MAX);
-        mob->plat = 0;
-        GET_EXP(mob)     = (int64)fread_int (fl, LONG_MIN, LONG_MAX);
+    mob->gold = fread_int (fl, 0, LONG_MAX);
+    mob->plat = 0;
+    GET_EXP(mob)     = (int64)fread_int (fl, LONG_MIN, LONG_MAX);
     
-        mob->position    = fread_int (fl, 0, 10);
-        mob->mobdata->default_pos = fread_int (fl, 0, 10);
+    mob->position    = fread_int (fl, 0, 10);
+    mob->mobdata->default_pos = fread_int (fl, 0, 10);
     
-        tmp = fread_int (fl, 0, 12);
+    tmp = fread_int (fl, 0, 12);
  
-        /* Read in ISR vlues...  (sex +3) */
-        // Eventually I can remove this "if" but not until I fix them
-        // all.
-        if(tmp > 2)
-           tmp -= 3;
+    /* Read in ISR vlues...  (sex +3) */
+    // Eventually I can remove this "if" but not until I fix them all.
+    if(tmp > 2)
+       tmp -= 3;
 
-        mob->sex = (char)tmp;
+    mob->sex = (char)tmp;
      
-        mob->immune  = fread_bitvector (fl, 0, LONG_MAX);
-        mob->suscept = fread_bitvector (fl, 0, LONG_MAX);
-        mob->resist  = fread_bitvector (fl, 0, LONG_MAX);
+    mob->immune  = fread_bitvector (fl, 0, LONG_MAX);
+    mob->suscept = fread_bitvector (fl, 0, LONG_MAX);
+    mob->resist  = fread_bitvector (fl, 0, LONG_MAX);
 
-        // if all three are 0, then chances are someone just didn't set them, so go with
-        // the race defaults.
-//        if(mob->immune == 0 && mob->suscept == 0 && mob->resist == 0)
-  //      {
-	   SET_BIT(mob->immune, race_info[(int)GET_RACE(mob)].immune);
-	   SET_BIT(mob->suscept, race_info[(int)GET_RACE(mob)].suscept);
- 	   SET_BIT(mob->resist, race_info[(int)GET_RACE(mob)].resist);
-	   SET_BIT(mob->affected_by, race_info[(int)GET_RACE(mob)].affects);
-      //      mob->immune  = race_info[(int)GET_RACE(mob)].immune;
-        //    mob->suscept = race_info[(int)GET_RACE(mob)].suscept;
-          //  mob->resist  = race_info[(int)GET_RACE(mob)].resist;
-    //    }
+    // if all three are 0, then chances are someone just didn't set them, so go with
+    // the race defaults.
+//    if(mob->immune == 0 && mob->suscept == 0 && mob->resist == 0)
+  //  {
+         SET_BIT(mob->immune, race_info[(int)GET_RACE(mob)].immune);
+         SET_BIT(mob->suscept, race_info[(int)GET_RACE(mob)].suscept);
+         SET_BIT(mob->resist, race_info[(int)GET_RACE(mob)].resist);
+         SETBIT(mob->affected_by, race_info[(int)GET_RACE(mob)].affects);
+  //      mob->immune  = race_info[(int)GET_RACE(mob)].immune;
+    //    mob->suscept = race_info[(int)GET_RACE(mob)].suscept;
+      //  mob->resist  = race_info[(int)GET_RACE(mob)].resist;
+//    }
 
-        mob->c_class = 0;
+    mob->c_class = 0;
 
-        do
-        {
-           letter = fread_char (fl);
-           switch(letter) {
-              case 'C':
-                 mob->c_class = fread_int (fl, 0, LONG_MAX);
-                 fread_new_newline (fl);
-                 break;
-              case 'T': // sTats
-                 mob->raw_str   = mob->str   = fread_int (fl, 0, 100);
-                 mob->raw_intel = mob->intel = fread_int (fl, 0, 100); 
-                 mob->raw_wis   = mob->wis   = fread_int (fl, 0, 100);
-                 mob->raw_dex   = mob->dex   = fread_int (fl, 0, 100);
-                 mob->raw_con   = mob->con   = fread_int (fl, 0, 100);
-                 fread_int (fl, 0, 100); // junk var in case we add another stat
-                 fread_new_newline (fl);
-                 break;
-	      case 'A': // more Affects
-	         mob->affected_by2 = fread_int(fl, LONG_MIN, LONG_MAX);
-		 fread_new_newline(fl);
-		 break;
-              case '>':
-                 ungetc( letter, fl );
-                 mprog_read_programs( fl, nr );
-                 break;
-              case 'S':
-                 break;
-              default: 
-                 sprintf(buf, "Mob %s: Invalid additional flag.  (Class, S, etc)", mob->short_desc);
-                 log(buf, 0, LOG_BUG);
-                 break;
-           }
-        }
-        while( letter != 'S' );
+    do {
+       letter = fread_char (fl);
+       switch(letter) {
+          case 'C':
+             mob->c_class = fread_int (fl, 0, LONG_MAX);
+             fread_new_newline (fl);
+             break;
+          case 'T': // sTats
+             mob->raw_str   = mob->str   = fread_int (fl, 0, 100);
+             mob->raw_intel = mob->intel = fread_int (fl, 0, 100); 
+             mob->raw_wis   = mob->wis   = fread_int (fl, 0, 100);
+             mob->raw_dex   = mob->dex   = fread_int (fl, 0, 100);
+             mob->raw_con   = mob->con   = fread_int (fl, 0, 100);
+             fread_int (fl, 0, 100); // junk var in case we add another stat
+             fread_new_newline (fl);
+             break;
+          case '>':
+             ungetc( letter, fl );
+             mprog_read_programs( fl, nr );
+             break;
+          case 'S':
+             break;
+          default: 
+             sprintf(buf, "Mob %s: Invalid additional flag.  (Class, S, etc)", mob->short_desc);
+             log(buf, 0, LOG_BUG);
+             break;
+       }
+    } while( letter != 'S' );
 
-        fread_new_newline (fl);
+    fread_new_newline (fl);
 
-        mob->weight = 200;
-        mob->height = 198;
+    mob->weight = 200;
+    mob->height = 198;
 
-        for (i = 0; i < 3; i++)
-            GET_COND(mob, i) = -1;
+    for (i = 0; i < 3; i++)
+        GET_COND(mob, i) = -1;
 
 // TODO - eventually have mob saving throws work by race too, but this should be good for now
 
-        for (i = 0; i <= SAVE_TYPE_MAX; i++)
-           mob->saves[i] = GET_LEVEL(mob)/3;
-    } 
-    else {
-      log("Mob without an 'R' flag?!", 0, LOG_BUG);
-      sprintf(buf, "Mob %s", mob->short_desc);
-      log(buf, 0, LOG_BUG);
-      abort();
-    }
+    for (i = 0; i <= SAVE_TYPE_MAX; i++)
+       mob->saves[i] = GET_LEVEL(mob)/3;
 
     mob->mobdata->nr = nr;
     mob->desc = 0;
@@ -2714,22 +2715,35 @@ void write_mprog_recur(FILE *fl, MPROG_DATA *mprg, bool mob)
 //
 void write_mobile(char_data * mob, FILE *fl)
 {
+    int i = 0;
+    extern int mob_race_mod[][5];
+
     fprintf(fl, "#%d\n", mob_index[mob->mobdata->nr].virt);
     string_to_file( fl, mob->name );
     string_to_file( fl, mob->short_desc );
     string_to_file( fl, mob->long_desc );
     string_to_file( fl, mob->description );
 
-    fprintf(fl, "%d %d %d R %d\n"
-            "%d %d %d %dd%d+%d %dd%d+%d\n"
+    while(i < ACT_MAX/ASIZE + 1) {
+       fprintf(fl, "%d", mob->mobdata->actflags[i]);
+       i++;
+    }
+    i = 0;
+
+    while(i < AFF_MAX/ASIZE + 1) {
+       fprintf(fl, "%d", mob->affected_by[i]);
+       i++;
+    }
+    fprintf(fl, "\n");
+
+    fprintf(fl, "%d %d %d\n"
+            "%d %d %dd%d+%d %dd%d+%d\n"
             "%d %lld\n"
             "%d %d %d %d %d %d\n",
-                         mob->mobdata->actflags,
-                         mob->affected_by,
                          mob->alignment,
                          GET_RACE(mob),
-
                          GET_LEVEL(mob),
+
                          (20 - mob->hitroll),
                          (int)(mob->armor / 10),
                          GET_MAX_HIT(mob),
@@ -2752,11 +2766,12 @@ void write_mobile(char_data * mob, FILE *fl)
 
     if(mob->c_class) 
       fprintf(fl, "C %d\n", mob->c_class);
-    if (mob->affected_by2)
-      fprintf(fl, "A %d\n", mob->affected_by2);
 
-    if(mob->raw_str != 11 || mob->raw_intel != 11 || mob->raw_wis != 11 ||
-       mob->raw_dex != 11 || mob->raw_con != 11) {
+    if(mob->raw_str != BASE_STAT + mob_race_mod[GET_RACE(mob)][0] || 
+     mob->raw_dex != BASE_STAT + mob_race_mod[GET_RACE(mob)][1] || 
+     mob->raw_con != BASE_STAT + mob_race_mod[GET_RACE(mob)][2] ||
+     mob->raw_intel != BASE_STAT + mob_race_mod[GET_RACE(mob)][3] || 
+     mob->raw_wis != BASE_STAT + mob_race_mod[GET_RACE(mob)][4] ) { 
        fprintf(fl, "T %d %d %d %d %d 0\n", mob->raw_str, mob->raw_intel, mob->raw_wis, mob->raw_dex, mob->raw_con);
     }
 
@@ -2942,7 +2957,7 @@ void handle_automatic_mob_settings(char_data * mob)
 {
   extern struct mob_matrix_data mob_matrix[];
   // New matrix is handled here.
-  if (IS_SET(mob->mobdata->actflags, ACT_NOMATRIX)) return;
+  if (ISSET(mob->mobdata->actflags, ACT_NOMATRIX)) return;
   if (mob->level > 110) return;
   int baselevel = mob->level;
   float alevel = (float)mob->level;
@@ -2951,21 +2966,21 @@ void handle_automatic_mob_settings(char_data * mob)
 
   if (mob->c_class != 0) alevel -= mob->level > 20 ? 3.0: 2.0;
   bool c = (mob->c_class);
-  if (IS_SET(mob->mobdata->actflags, ACT_AGGRESSIVE)) alevel -= 1.5;
-  if (!c&& IS_SET(mob->mobdata->actflags, ACT_AGGR_EVIL)) alevel -= 0.5;
-  if (!c&& IS_SET(mob->mobdata->actflags, ACT_AGGR_GOOD)) alevel -= 0.5;
-  if (!c&& IS_SET(mob->mobdata->actflags, ACT_AGGR_NEUT)) alevel -= 0.5;
-  if (IS_SET(mob->mobdata->actflags, ACT_RACIST)) alevel -= 0.5;
-  if (IS_SET(mob->mobdata->actflags, ACT_FRIENDLY)) alevel -= 1.0;
+  if (ISSET(mob->mobdata->actflags, ACT_AGGRESSIVE)) alevel -= 1.5;
+  if (!c&& ISSET(mob->mobdata->actflags, ACT_AGGR_EVIL)) alevel -= 0.5;
+  if (!c&& ISSET(mob->mobdata->actflags, ACT_AGGR_GOOD)) alevel -= 0.5;
+  if (!c&& ISSET(mob->mobdata->actflags, ACT_AGGR_NEUT)) alevel -= 0.5;
+  if (ISSET(mob->mobdata->actflags, ACT_RACIST)) alevel -= 0.5;
+  if (ISSET(mob->mobdata->actflags, ACT_FRIENDLY)) alevel -= 1.0;
   
-  if (!c&& IS_SET(mob->mobdata->actflags, ACT_3RD_ATTACK)) alevel -= 0.5;
-  if (!c&& IS_SET(mob->mobdata->actflags, ACT_4TH_ATTACK)) alevel -= 1.0;
-  if (!c&& IS_SET(mob->mobdata->actflags, ACT_PARRY)) alevel -= 0.5;
-  if (!c&& IS_SET(mob->mobdata->actflags, ACT_DODGE)) alevel -= 0.5;
-  if (IS_SET(mob->mobdata->actflags, ACT_WIMPY)) alevel -= 1.0;
-  if (IS_SET(mob->mobdata->actflags, ACT_STUPID)) alevel += 3.0;
-  if (IS_SET(mob->mobdata->actflags, ACT_HUGE)) alevel -= 1.5;
-  if (IS_SET(mob->mobdata->actflags, ACT_DRAINY)) alevel -= 0.5;
+  if (!c&& ISSET(mob->mobdata->actflags, ACT_3RD_ATTACK)) alevel -= 0.5;
+  if (!c&& ISSET(mob->mobdata->actflags, ACT_4TH_ATTACK)) alevel -= 1.0;
+  if (!c&& ISSET(mob->mobdata->actflags, ACT_PARRY)) alevel -= 0.5;
+  if (!c&& ISSET(mob->mobdata->actflags, ACT_DODGE)) alevel -= 0.5;
+  if (ISSET(mob->mobdata->actflags, ACT_WIMPY)) alevel -= 1.0;
+  if (ISSET(mob->mobdata->actflags, ACT_STUPID)) alevel += 3.0;
+  if (ISSET(mob->mobdata->actflags, ACT_HUGE)) alevel -= 1.5;
+  if (ISSET(mob->mobdata->actflags, ACT_DRAINY)) alevel -= 0.5;
 
   if (!c&& IS_AFFECTED(mob,AFF_SANCTUARY)) alevel -= 0.5;
   if (!c&& IS_AFFECTED(mob,AFF_FIRESHIELD)) alevel -= 0.5;
@@ -3213,7 +3228,7 @@ int create_blank_mobile(int nr)
 #else
     mob->mobdata = (mob_data *) dc_alloc(1, sizeof(mob_data));
 #endif
-    mob->mobdata->actflags = 0;
+    mob->mobdata->actflags[0] = -1;
     mob->mobdata->damnodice = 1;
     mob->mobdata->damsizedice = 1;
     mob->mobdata->default_pos = POSITION_STANDING;
@@ -3866,7 +3881,7 @@ void reset_zone(int zone)
              sprintf(buf, "Bad equip_char zone %d cmd %d", zone, cmd_no);
              log(buf, IMMORTAL, LOG_WORLD);
           }
-	  if (IS_SET(mob->mobdata->actflags, ACT_BOSS))
+	  if (ISSET(mob->mobdata->actflags, ACT_BOSS))
 	  {
 //	    mob->level += (obj->obj_flags.eq_level)/10;
 //	    handle_automatic_mob_settings(mob);
@@ -4446,7 +4461,7 @@ void free_char( CHAR_DATA *ch )
 
   remove_memory(ch, 't');
 
-  SET_BIT(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT); // so weapons stop falling off
+  SETBIT(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT); // so weapons stop falling off
 
   for(iWear = 0; iWear < MAX_WEAR; iWear++) {
      if(ch->equipment[iWear])
@@ -4457,9 +4472,8 @@ void free_char( CHAR_DATA *ch )
     extract_obj( ch->carrying );
 
 // Since affect_remove updates the linked list itself, do it this way
-   bool isaff2(int spellnum);
    while(ch->affected)
-     affect_remove( ch, ch->affected, SUPPRESS_ALL,isaff2(ch->affected->type) );
+     affect_remove( ch, ch->affected, SUPPRESS_ALL );
 
   dc_free(ch);
 }
@@ -4650,7 +4664,7 @@ void init_char(CHAR_DATA *ch)
   ch->pcdata->golem = 0;
   SET_BIT(ch->pcdata->toggles, PLR_ANSI);
   SET_BIT(ch->pcdata->toggles, PLR_BARD_SONG);
-  ch->affected_by = 0;
+  ch->affected_by[0] = -1;
 
   apply_initial_saves(ch);
 

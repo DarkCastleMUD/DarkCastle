@@ -12,8 +12,8 @@ extern "C"
 #endif
 
 #include <connect.h> // descriptor_data
-#include <utility.h>
 #include <character.h>
+#include <utility.h>
 #include <mobile.h>
 #include <interp.h>
 #include <levels.h>

@@ -16,7 +16,7 @@
 /* 12/08/2003   Onager   Added chop_half() to work like half_chop() but    */
 /*                       chopping off the last word.                       */
 /***************************************************************************/
-/* $Id: interp.cpp,v 1.65 2005/05/12 20:49:41 shane Exp $ */
+/* $Id: interp.cpp,v 1.66 2005/05/28 18:56:10 shane Exp $ */
 
 extern "C"
 {
@@ -712,7 +712,7 @@ int command_interpreter( CHAR_DATA *ch, char *pcomm, bool procced  )
 
       // charmies can only use charmie "ok" commands
 	if (!procced) // Charmed mobs can still use their procs.
-      if((IS_AFFECTED2(ch, AFF_FAMILIAR) || IS_AFFECTED(ch, AFF_CHARM)) && !IS_SET(found->flags, COM_CHARMIE_OK))
+      if((IS_AFFECTED(ch, AFF_FAMILIAR) || IS_AFFECTED(ch, AFF_CHARM)) && !IS_SET(found->flags, COM_CHARMIE_OK))
           return do_say(ch, "I'm sorry master, I cannot do that.", 9);
 
 /*

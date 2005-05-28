@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.23 2005/05/27 15:28:09 urizen Exp $
+| $Id: wizard.cpp,v 1.24 2005/05/28 18:56:26 shane Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -186,7 +186,6 @@ void boro_mob_stat(struct char_data *ch, struct char_data *k)
 	extern char *skills[];
 	extern char *spells[];
 	// for chars
-	extern char *affected_bits2[];
 	extern char *affected_bits[];
 	extern char *apply_types[];
 	extern char *pc_clss_types[];
@@ -357,11 +356,8 @@ void boro_mob_stat(struct char_data *ch, struct char_data *k)
 	send_to_char(buf,ch);
 
 	sprintbit(k->affected_by, affected_bits, buf2);
-	sprintbit(k->affected_by2, affected_bits2, buf3);
 	sprintf(buf,
-		"|\\| $7Affected By$R: %-58s|~|\r\n"
-		"|\\| $7Affected By$R: %-58s|~|\r\n",
-		buf2, buf3); // affected bits.
+		"|\\| $7Affected By$R: %-58s|~|\r\n", buf2); // affected bits.
 	send_to_char(buf,ch);
 
 	if(IS_MOB(k))
@@ -496,7 +492,6 @@ void mob_stat(struct char_data *ch, struct char_data *k)
   struct affected_type *aff;  
 
   // for chars
-  extern char *affected_bits2[];
   extern char *affected_bits[];
   extern char *apply_types[];
   extern char *pc_clss_types[];
@@ -739,8 +734,6 @@ void mob_stat(struct char_data *ch, struct char_data *k)
     
   sprintbit(k->affected_by, affected_bits, buf);
   csendf(ch, "$3Affected by$R: %s", buf);
-  sprintbit(k->affected_by2, affected_bits2, buf);
-  csendf(ch, "%s\n\r", buf);
 
   sprintbit(k->immune, isr_bits, buf);
   csendf(ch, "$3Immune$R: %s\n\r", buf);

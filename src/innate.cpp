@@ -151,7 +151,7 @@ int innate_powerwield(CHAR_DATA *ch, char *arg, int cmd)
 
 int innate_focus(CHAR_DATA *ch, char *arg, int cmd)
 {
-   if(IS_AFFECTED2(ch, AFF_FOCUS))
+   if(IS_AFFECTED(ch, AFF_FOCUS))
    {
       send_to_char("But you are already focusing!  Why waste it?\r\n", ch);
       return eFAILURE;

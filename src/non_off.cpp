@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: non_off.cpp,v 1.29 2005/05/27 21:07:56 urizen Exp $
+| $Id: non_off.cpp,v 1.30 2005/05/28 18:56:10 shane Exp $
 | non_off.C
 | Description:  Implementation of generic, non-offensive commands.
 */
@@ -845,7 +845,7 @@ int do_sleep(CHAR_DATA *ch, char *argument, int cmd)
       send_to_char ("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
       return eFAILURE;
     }
-    if(IS_AFFECTED2(ch, AFF_INSOMNIA)) {
+    if(IS_AFFECTED(ch, AFF_INSOMNIA)) {
        send_to_char("You are far too alert for that.\n\r", ch);
        return eFAILURE;
     }

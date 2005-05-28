@@ -1,7 +1,7 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.30 2005/05/16 09:54:50 shane Exp $
+| $Id: character.h,v 1.31 2005/05/28 18:56:22 shane Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
@@ -14,6 +14,8 @@
 #include <timeinfo.h> // time data, etc..
 #include <event.h> // eventBrief
 #include <isr.h>   // SAVE_TYPE_MAX
+#include <utility.h>
+#include <mobile.h>
 
 #define START_ROOM        3001 // Where you login
 #define SECOND_START_ROOM 3059 // Where you go if killed in start room
@@ -27,7 +29,6 @@
 | max stuff - this is needed almost everywhere
 */
 #define MAX_WEAR     23
-#define MAX_AFFECT   25
 
 struct char_data;
 typedef struct char_data CHAR_DATA;
@@ -222,14 +223,14 @@ struct pc_data
 
 struct mob_data
 {
-     int32 nr;
-     sbyte default_pos;    // Default position for NPC
-     sbyte last_direction; // Last direction the mobile went in
+    int32 nr;
+    sbyte default_pos;    // Default position for NPC
+    sbyte last_direction; // Last direction the mobile went in
     uint32 attack_type;    // Bitvector of damage type for bare-handed combat
-    uint32 actflags;       // flags for NPC behavior
+    int32 actflags[ACT_MAX/ASIZE+1]; // flags for NPC behavior
 
-     int16 damnodice;         // The number of damage dice's           
-     int16 damsizedice;       // The size of the damage dice's         
+    int16 damnodice;         // The number of damage dice's           
+    int16 damsizedice;       // The size of the damage dice's         
 
     char *fears;       /* will flee from ths person on sight     */
     char *hatred;      /* List of PC's I hate */
@@ -348,8 +349,7 @@ struct char_data
     char_data * guarding;              // Pointer to who I am guarding
     follow_type * guarded_by;          // List of people guarding me
 
-    uint32 affected_by;                // Quick reference bitvector for spell affects
-    uint32 affected_by2;               // More quick reference bitvectors 
+    int32 affected_by[AFF_MAX/ASIZE+1]; // Quick reference bitvector for spell affects
     uint32 combat;                     // Bitvector for combat related flags (bash, stun, shock)
     uint32 misc;                       // Bitvector for IS_MOB/logs/channels.  So possessed mobs can channel
 
@@ -428,8 +428,7 @@ struct char_file_u
     int16 armor;       // have to save these since mobs have different bases
     int16 hitroll;
     int16 damroll;
-    uint32 afected_by;  // SHOULD BE 64
-    uint32 afected_by2; // SHOULD BE 64
+    int32 afected_by[AFF_MAX/ASIZE+1];
     uint32 misc;          // channel flags
 
     int16 clan; 

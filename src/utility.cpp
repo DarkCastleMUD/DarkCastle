@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.36 2005/05/17 22:40:28 shane Exp $ */
+/* $Id: utility.cpp,v 1.37 2005/05/28 18:56:10 shane Exp $ */
 
 extern "C"
 {
@@ -38,9 +38,9 @@ extern "C"
 #include <structs.h>
 #include <levels.h>
 #include <player.h>
-#include <utility.h>
 #include <timeinfo.h>
 #include <character.h>
+#include <utility.h>
 #include <room.h>
 #include <obj.h>
 #include <interp.h>
@@ -267,6 +267,36 @@ void log( char *str, int god_level, long type )
 
     if(god_level >= IMMORTAL)
       send_to_gods(str, god_level, type);
+}
+
+// function for new SETBIT et al. commands
+void sprintbit( int value[], char *names[], char *result )
+{
+   long nr, vektor;
+   int i=0;
+   *result = '\0';
+
+   while(value[i] != -1) {
+      vektor = value[i];
+      for ( nr=0; vektor; vektor>>=1 )
+      {
+         if ( IS_SET(1, vektor) ) {
+            if (!strcmp(names[nr+i*ASIZE], "unused")) continue;
+            if ( *names[nr+i*ASIZE] != '\n')
+               strcat( result, names[nr+i*ASIZE] );
+            else
+               strcat( result, "Undefined" );
+            strcat( result, " " );
+         }
+
+         if ( *names[nr+i*ASIZE] != '\n' )
+            nr++;
+      }
+      i++;
+   }
+
+   if ( *result == '\0' )
+      strcat( result, "NoBits " );
 }
 
 void sprintbit( long vektor, char *names[], char *result )
@@ -603,11 +633,11 @@ bool CAN_SEE( struct char_data *sub, struct char_data *obj )
    if ( !IS_MOB(sub) && sub->pcdata->holyLite )
       return TRUE;
 
-   if ( IS_AFFECTED2(obj, AFF_GLITTER_DUST) && GET_LEVEL(obj) < IMMORTAL )
+   if ( IS_AFFECTED(obj, AFF_GLITTER_DUST) && GET_LEVEL(obj) < IMMORTAL )
       return TRUE;
 
    if (world[obj->in_room].sector_type == SECT_FOREST &&
-       IS_AFFECTED2(obj, AFF_FOREST_MELD) &&
+       IS_AFFECTED(obj, AFF_FOREST_MELD) &&
        IS_AFFECTED(obj, AFF_HIDE))
       return FALSE;
 
@@ -685,6 +715,9 @@ bool check_blind( struct char_data *ch )
 //   if (IS_AFFECTED(ch, AFF_TRUE_SIGHT))
   //    return FALSE;
 
+    if ( !IS_NPC(ch) && ch->pcdata->holyLite )
+       return FALSE;
+
     if ( IS_AFFECTED(ch, AFF_BLIND) && number(0,4)) // 20% chance of seeing
     {
 	send_to_char( "You can't see a damn thing!\n\r", ch );
@@ -733,7 +766,7 @@ int do_order(struct char_data *ch, char *argument, int cmd)
           act("$n gives $N an order.", ch, 0, victim, TO_ROOM, NOTVICT);
           if ( (victim->master!=ch) || 
                !(IS_AFFECTED(victim, AFF_CHARM) ||
-               IS_AFFECTED2(victim, AFF_FAMILIAR)))
+               IS_AFFECTED(victim, AFF_FAMILIAR)))
              act("$n has an indifferent look.", victim, 0, 0, TO_ROOM, 0);
           else {
              send_to_char("Ok.\n\r", ch);
@@ -1143,7 +1176,7 @@ mob_index[fol->follower->mobdata->nr].virt == 8)
     save_char_obj(ch);
   } 
 
-  SET_BIT(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT); // so weapons stop falling off
+  SETBIT(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT); // so weapons stop falling off
 
   for(iWear = 0; iWear < MAX_WEAR; iWear++) 
      if(ch->equipment[iWear])
@@ -1354,6 +1387,44 @@ bool check_valid_and_convert(int & value, char * buf)
      return FALSE; 
 
    return TRUE;
+}
+
+// modified for new SETBIT et al. commands
+void parse_bitstrings_into_int(char * bits[], char * strings, char_data *ch, int value[])
+{
+  char buf[MAX_INPUT_LENGTH];
+  bool found = FALSE;
+
+  if(!ch)
+    return;
+
+  for(;;) 
+  {
+    if(!*strings)
+      break;
+
+    half_chop(strings, buf, strings);
+                       
+    for(int x = 0 ;*bits[x] != '\n'; x++) 
+    {
+      if (!strcmp("unused",bits[x])) continue;
+      if(is_abbrev(buf, bits[x])) 
+      {
+        if(ISSET(value, (1<<x))) {
+          REMBIT(value, (1<<x));
+          csendf(ch, "%s flag REMOVED.\n\r", bits[x]);
+        }
+        else {
+          SETBIT(value, (1<<x));
+          csendf(ch, "%s flag ADDED.\n\r", bits[x]);
+        }
+        found = TRUE;
+        break;
+      }
+    } 
+  }
+  if(!found)
+    send_to_char("No matching bits found.\r\n", ch);
 }
 
 // calls below uint32 version

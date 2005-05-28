@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: weather.cpp,v 1.4 2005/04/09 21:15:27 urizen Exp $ */
+/* $Id: weather.cpp,v 1.5 2005/05/28 18:56:10 shane Exp $ */
 
 extern "C"
 {
@@ -25,6 +25,7 @@ extern "C"
 
 #include <timeinfo.h>
 #include <weather.h>
+#include <character.h>
 #include <utility.h>
 
 // TODO - Either rip out the pressure stuff, or make it easier to understand.
@@ -165,6 +166,8 @@ void weather_change(void)
          if (weather_info.pressure<970) {
             if(dice(1,4)==1)
                change = 4;
+            else if(dice(1,4)==1)
+               change = 7;
             else
                change = 0;
          }
@@ -175,13 +178,35 @@ void weather_change(void)
                change = 5;
          }
          break;
+      case SKY_HEAVY_RAIN:
+         if (weather_info.pressure<960) {
+            if(dice(1,3) == 1) change = 8;
+            else if(dice(1,3) == 1) change = 11;
+            else change = 0;
+         }
+         else if (weather_info.pressure>1030)
+            change = 5;
+         else if (weather_info.pressure>1010)
+            if(dice(1,4)==1)
+               change = 5;
+         break;            
       case SKY_LIGHTNING :
          if (weather_info.pressure>1010)
             change = 6;
-         else if (weather_info.pressure>990) {
+         else if (weather_info.pressure>990)
             if(dice(1,4)==1)
                change = 6;
-         }
+         else if(dice(1,4)==1)
+            change = 9;
+         break;
+      case SKY_HEAVY_LIGHTNING:
+         if (weather_info.pressure>1000)
+            change = 6;
+         else if (weather_info.pressure > 990)
+            if(dice(1,3)==1)
+               change = 6;
+         else if(dice(1,2)==1)
+            change = 10;
          break;
       default : 
          change = 0;
@@ -235,6 +260,41 @@ void weather_change(void)
          case 2:  send_to_outdoor("The rain begins to lessen and the rumble of thunder moves off to the distance.\n\r"); break;
          }
          weather_info.sky=SKY_RAINING;
+         break;
+      case 7:
+         switch(number(1,2)) {
+         case 1: send_to_outdoor("The clouds open up and send a torrent of rain to the planet.\n\r"); break;
+         case 2: send_to_outdoor("The rain drops begin slamming down heavily.\n\r"); break;
+         }
+         weather_info.sky=SKY_HEAVY_RAIN;
+         break;
+      case 8:
+         switch(number(1,2)) {
+         case 1: send_to_outdoor("The rain eases slightly, assailing the ground with less force.\n\r"); break;
+         case 2: send_to_outdoor("The clouds overhead become a few shades lighter, lessening the downpour.\n\r"); break;
+         }
+         weather_info.sky=SKY_RAINING;
+         break;
+      case 9:
+         switch(number(1,2)) {
+         case 1: send_to_outdoor("The electrical activity within the clouds rises noticeably.\n\r"); break;
+         case 2: send_to_outdoor("Cracks of thunder sound all around you as the lightning strikes increase.\n\r"); break;
+         }
+         weather_info.sky=SKY_HEAVY_LIGHTNING;
+         break;
+      case 10:
+         switch(number(1,2)) {
+         case 1: send_to_outdoor("Losing some of its energy, the rumbles from the sky soften.\n\r"); break;
+         case 2: send_to_outdoor("The center of the storm moves off, reducing the fierceness of the strikes near you.\n\r"); break;
+         }
+         weather_info.sky=SKY_LIGHTNING;
+         break;
+      case 11:
+         switch(number(1,2)) {
+         case 1: send_to_outdoor("The energy of the clouds increases as lightning bolts rain down.\n\r"); break;
+         case 2: send_to_outdoor("Occasional sounds of thunder are heard over the deluge.\n\r"); break;
+         }
+         weather_info.sky=SKY_LIGHTNING;
          break;
       default : break;
    }

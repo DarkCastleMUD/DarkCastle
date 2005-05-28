@@ -7,17 +7,17 @@
 /* Revision History                                                          */
 /* 12/09/2003   Onager   Tweaked do_join() to remove combat-related bits     */
 /*****************************************************************************/
-/* $Id: arena.cpp,v 1.11 2005/04/18 10:56:28 shane Exp $ */
+/* $Id: arena.cpp,v 1.12 2005/05/28 18:56:09 shane Exp $ */
 
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
 
 #include <room.h>  // room_data
-#include <utility.h> // send_to_char, etc.. 
 #include <db.h>      // real_room()
 #include <interp.h> // do_look()
 #include <character.h>
+#include <utility.h> // send_to_char, etc.. 
 #include <spells.h> 
 #include <handler.h>
 #include <act.h>

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.105 2005/05/17 22:41:20 shane Exp $
+| $Id: cl_thief.cpp,v 1.106 2005/05/28 18:56:17 shane Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -128,7 +128,7 @@ int do_eyegouge(CHAR_DATA *ch, char *argument, int cmd)
   //   act("$n walks up to you and pushes $s thumb into your eye! Ow!",ch, 
 
 //NULL, victim, TO_VICT, 0);
-     SET_BIT(victim->affected_by, AFF_BLIND);
+     SETBIT(victim->affected_by, AFF_BLIND);
      SET_BIT(victim->combat, COMBAT_THI_EYEGOUGE);
      retval = damage(ch, victim, 150, TYPE_UNDEFINED, SKILL_EYEGOUGE, 0);
   }
@@ -164,12 +164,12 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if(IS_MOB(victim) && IS_SET(victim->mobdata->actflags, ACT_HUGE)) {
+  if(IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE)) {
     send_to_char("You can't backstab someone that HUGE!\r\n", ch);
     return eFAILURE;
   }
 
-  if(IS_AFFECTED2(victim, AFF_ALERT)) {
+  if(IS_AFFECTED(victim, AFF_ALERT)) {
     act("$E is too alert and nervous looking and you are unable to sneak behind!", ch,0,victim, TO_CHAR, 0);
     return eFAILURE;
   }
@@ -310,7 +310,7 @@ int do_circle(CHAR_DATA *ch, char *argument, int cmd)
       return eFAILURE;
    }
 
-   if (IS_MOB(victim) && IS_SET(victim->mobdata->actflags, ACT_HUGE)) {
+   if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE)) {
       send_to_char("You cannot circle behind someone that HUGE!\n\r", ch);
       return eFAILURE;
    }
@@ -576,7 +576,7 @@ int do_hide(CHAR_DATA *ch, char *argument, int cmd)
    send_to_char("You attempt to hide yourself.\n\r", ch);
 
    if ( ! IS_AFFECTED(ch, AFF_HIDE) )
-      SET_BIT(ch->affected_by, AFF_HIDE);
+      SETBIT(ch->affected_by, AFF_HIDE);
   /* See how well it worked on those currently in the room. */
     int a,i;
     CHAR_DATA *temp;
@@ -746,7 +746,7 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
         {
           move_obj(obj, ch);
 
-          if(!IS_NPC(victim) || (IS_SET(victim->mobdata->actflags,ACT_NICE_THIEF)))
+          if(!IS_NPC(victim) || (ISSET(victim->mobdata->actflags,ACT_NICE_THIEF)))
             _exp = GET_OBJ_WEIGHT(obj) * 1000;
           else _exp = (GET_OBJ_WEIGHT(obj) * 1000);
 
@@ -959,7 +959,7 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
         act("You remove $p and steal it.", ch, obj ,0, TO_CHAR, 0);
         act("$n steals $p from $N.",ch,obj,victim,TO_ROOM, NOTVICT);
         obj_to_char(unequip_char(victim, eq_pos), ch);
-        if(!IS_NPC(victim) || (IS_SET(victim->mobdata->actflags,ACT_NICE_THIEF)))
+        if(!IS_NPC(victim) || (ISSET(victim->mobdata->actflags,ACT_NICE_THIEF)))
           _exp = GET_OBJ_WEIGHT(obj);
         else
           _exp = (GET_OBJ_WEIGHT(obj) * GET_LEVEL(victim));
@@ -1035,7 +1035,7 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
 
   if (ohoh && IS_NPC(victim) && AWAKE(victim) && GET_LEVEL(ch)<ANGEL)
   {
-    if (IS_SET(victim->mobdata->actflags, ACT_NICE_THIEF)) 
+    if (ISSET(victim->mobdata->actflags, ACT_NICE_THIEF)) 
     {
       sprintf(buf, "%s is a bloody thief.", GET_SHORT(ch));
       do_shout(victim, buf, 0);
@@ -1158,7 +1158,7 @@ int do_pocket(CHAR_DATA *ch, char *argument, int cmd)
       GET_GOLD(ch)     += gold;
       GET_GOLD(victim) -= gold;
       _exp = gold / 10000;
-      if(IS_NPC(victim) && IS_SET(victim->mobdata->actflags, ACT_NICE_THIEF)) _exp = 1; 
+      if(IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_NICE_THIEF)) _exp = 1; 
       if(GET_POS(victim) <= POSITION_SLEEPING || IS_AFFECTED(victim, AFF_PARALYSIS)) _exp = 0;
 
       sprintf(buf, "Nice work! You pilfered %d gold coins.\n\r", gold);
@@ -1198,7 +1198,7 @@ int do_pocket(CHAR_DATA *ch, char *argument, int cmd)
 
   if (ohoh && IS_NPC(victim) && AWAKE(victim) && GET_LEVEL(ch)<ANGEL)
   {
-    if (IS_SET(victim->mobdata->actflags, ACT_NICE_THIEF)) 
+    if (ISSET(victim->mobdata->actflags, ACT_NICE_THIEF)) 
     {
       sprintf(buf, "%s is a bloody thief.", GET_SHORT(ch));
       do_shout(victim, buf, 0);
@@ -1670,7 +1670,7 @@ void blackjack_clear(void *arg1, void *arg2, void *arg3)
   struct char_data *curr;
   for (curr = character_list;curr;curr = curr->next)
     if (curr == ch)
-	REMOVE_BIT(ch->affected_by2, AFF_BLACKJACK_ALERT);
+	REMBIT(ch->affected_by, AFF_BLACKJACK_ALERT);
 }
 
 int do_blackjack(struct char_data *ch, char *argument, int cmd)
@@ -1738,13 +1738,13 @@ int do_blackjack(struct char_data *ch, char *argument, int cmd)
   }
   
   if (affected_by_spell(victim, SKILL_BLACKJACK)
-	|| IS_SET(victim->affected_by2, AFF_BLACKJACK_ALERT))
+	|| ISSET(victim->affected_by, AFF_BLACKJACK_ALERT))
   {
     act("$N is too alert to be blackjacked right now.",ch, 0, victim, TO_CHAR, 0);
     return eFAILURE;
   }
   if (affected_by_spell(ch, SKILL_BLACKJACK)
-	|| IS_SET(ch->affected_by2, AFF_BLACKJACK_ALERT))
+	|| ISSET(ch->affected_by, AFF_BLACKJACK_ALERT))
   {
     act("You cannot blackjack yet.",ch, 0, victim, TO_CHAR, 0);
     return eFAILURE;
@@ -1771,8 +1771,8 @@ int do_blackjack(struct char_data *ch, char *argument, int cmd)
      act("$N notices $n approaching and thwarts $s attempted blackjack.", ch, 0, victim, TO_ROOM, NOTVICT);
      act("You notice $n approaching from the shadows with a club in hand, thwarting $s chance to blackjack you.", ch, 0, victim, TO_VICT, 0 );
      act("You approach $N from the shadows, but $E spots you and thwarts your attempted mugging.", ch, 0, victim, TO_CHAR, 0 );
-     SET_BIT(ch->affected_by2, AFF_BLACKJACK_ALERT);
-     SET_BIT(victim->affected_by2, AFF_BLACKJACK_ALERT);
+     SETBIT(ch->affected_by, AFF_BLACKJACK_ALERT);
+     SETBIT(victim->affected_by, AFF_BLACKJACK_ALERT);
      struct timer_data *timer;
      #ifdef LEAK_CHECK
        timer = (struct timer_data *)calloc(1, sizeof(struct timer_data));

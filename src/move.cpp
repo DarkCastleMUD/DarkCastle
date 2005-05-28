@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.45 2005/05/05 19:05:49 shane Exp $
+| $Id: move.cpp,v 1.46 2005/05/28 18:56:10 shane Exp $
 | move.C
 | Movement commands and stuff.
 *************************************************************************
@@ -115,8 +115,8 @@ void record_track_data(CHAR_DATA *ch, int cmd)
     
   // If we just used a scent killer like catstink, don't leave tracks
   // on our next move
-  if(IS_SET(ch->affected_by2, AFF_UTILITY)) {
-    REMOVE_BIT(ch->affected_by2, AFF_UTILITY);
+  if(ISSET(ch->affected_by, AFF_UTILITY)) {
+    REMBIT(ch->affected_by, AFF_UTILITY);
     return;
   }
 
@@ -536,7 +536,7 @@ int do_simple_move(CHAR_DATA *ch, int cmd, int following)
 
     // if I'm STAY_NO_TOWN, don't enter a ZONE_IS_TOWN zone no matter what
     if(IS_NPC(ch) && 
-       IS_SET(ch->mobdata->actflags, ACT_STAY_NO_TOWN) && 
+       ISSET(ch->mobdata->actflags, ACT_STAY_NO_TOWN) && 
        IS_SET(zone_table[world[world[ch->in_room].dir_option[cmd]->to_room].zone].zone_flags, ZONE_IS_TOWN))
       return eFAILURE;
 
@@ -550,14 +550,14 @@ int do_simple_move(CHAR_DATA *ch, int cmd, int following)
     }
 
     // If they were hit with a lullaby, go ahead and clear it out
-    if(IS_SET(ch->affected_by2, AFF_NO_FLEE)) 
+    if(ISSET(ch->affected_by, AFF_NO_FLEE)) 
     {
       if(affected_by_spell(ch, SPELL_IRON_ROOTS)) {
         send_to_char("The roots bracing your legs keep you from moving!\r\n", ch);
         return eFAILURE;
       }
       else {
-        REMOVE_BIT(ch->affected_by2, AFF_NO_FLEE);
+        REMBIT(ch->affected_by, AFF_NO_FLEE);
         send_to_char("The travel wakes you up some, and clears the drowsiness from your legs.\r\n", ch);
       }
     }
@@ -565,7 +565,7 @@ int do_simple_move(CHAR_DATA *ch, int cmd, int following)
     if(GET_LEVEL(ch) < IMMORTAL && !IS_NPC(ch))
 	GET_MOVE(ch) -= need_movement;
 
-    if(!IS_AFFECTED(ch, AFF_SNEAK) && !IS_AFFECTED2(ch, AFF_FOREST_MELD)) 
+    if(!IS_AFFECTED(ch, AFF_SNEAK) && !IS_AFFECTED(ch, AFF_FOREST_MELD)) 
     {
       sprintf(tmp, "$n leaves %s.", dirs[cmd]);
       act(tmp, ch, 0, 0, TO_ROOM, INVIS_NULL);
@@ -601,7 +601,7 @@ int do_simple_move(CHAR_DATA *ch, int cmd, int following)
          SECT_FOREST)
       {
         sprintf(tmp, "$n leaves %s.", dirs[cmd]);
-        REMOVE_BIT(ch->affected_by2, AFF_FOREST_MELD);
+        REMBIT(ch->affected_by, AFF_FOREST_MELD);
         send_to_char("You detach yourself from the forest.\r\n", ch);
         act(tmp, ch, 0, 0, TO_ROOM, INVIS_NULL);
       } 
@@ -659,7 +659,7 @@ int do_simple_move(CHAR_DATA *ch, int cmd, int following)
        }         
     }
     if (IS_AFFECTED(ch, AFF_SNEAK) ||
-        (IS_AFFECTED2(ch, AFF_FOREST_MELD) &&
+        (IS_AFFECTED(ch, AFF_FOREST_MELD) &&
          world[ch->in_room].sector_type == SECT_FOREST)
        )
       act("$n sneaks into the room.", ch, 0, 0, TO_ROOM, GODS);

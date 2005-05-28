@@ -13,11 +13,11 @@ extern "C"
 #include <fileinfo.h> // SOCIAL_FILE
 #include <structs.h> // MAX_INPUT_LENGTH
 #include <room.h>
+#include <character.h>
 #include <utility.h>
 #include <mobile.h>
 #include <connect.h>
 #include <levels.h>
-#include <character.h>
 #include <player.h>
 #include <social.h>
 #include <handler.h>

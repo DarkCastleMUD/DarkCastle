@@ -126,7 +126,7 @@ int do_set(struct char_data *ch, char *argument, int cmd)
         "age","sex","class","level","height","weight","str","stradd",
         "int","wis","dex","con","gold","exp","mana","hit","move",
         "sessions","alignment","thirst","drunk","full","race",
-        "bank", "platinum", "ki", "clan", "saves_base", "aff2", "\n"
+        "bank", "platinum", "ki", "clan", "saves_base", "\n"
     };
     struct char_data *vict;
     char name[100], buf2[100], buf[100], help[MAX_STRING_LENGTH];
@@ -146,7 +146,8 @@ int do_set(struct char_data *ch, char *argument, int cmd)
         "Usage:\n\rset <name> <field> <value>\n\r", ch);
 
         strcpy(help, "\n\rField being one of the following:\n\r");
-        for (i = 1; *values[i] != '\n'; i++)
+        display_string_list(values, ch);
+/*        for (i = 1; *values[i] != '\n'; i++)
         {
             sprintf(help + strlen(help), "%18s", values[i]);
             if (!(i % 4))
@@ -158,7 +159,7 @@ int do_set(struct char_data *ch, char *argument, int cmd)
         }
         if (*help)
             send_to_char(help, ch);
-        send_to_char("\n\r", ch);
+        send_to_char("\n\r", ch);*/
         return eFAILURE;
     }
     if (!(vict = get_char_vis(ch, name)))
@@ -537,11 +538,6 @@ int do_set(struct char_data *ch, char *argument, int cmd)
               log(buf2, GET_LEVEL(ch), LOG_BUG);
             } 
             break;
-            case 28:
-	    if (!*buf || !is_number(buf))
-	    { send_to_char("No.\r\n",ch); return eFAILURE; }
-            vict->affected_by2 = atoi(buf);
-	    break;
             case 27: // saves 
             {
               one_argument(argument, buf2);

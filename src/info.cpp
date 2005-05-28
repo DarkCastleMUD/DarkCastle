@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.68 2005/05/19 19:26:07 shane Exp $ */
+/* $Id: info.cpp,v 1.69 2005/05/28 18:56:10 shane Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -367,7 +367,7 @@ void show_spells(char_data * i, char_data * ch)
       sprintf(send_buf, "%s$B$0stones! ", send_buf);
       has_spells = 1;
    }
-   if (i->affected_by & AFF_FLYING) {
+   if (IS_AFFECTED(i, AFF_FLYING)) {
       sprintf(send_buf, "%s$B$1flying!", send_buf);
       has_spells = 1;
    }
@@ -409,11 +409,11 @@ void show_char_to_char(struct char_data *i, struct char_data *ch, int mode)
             if(!i->desc)
                strcpy(buffer, "*linkdead*  ");
             if (know_align > 80) {
-              if ((IS_AFFECTED(ch, AFF_DETECT_EVIL) || IS_AFFECTED2(ch, AFF_KNOW_ALIGN)) && IS_EVIL(i)) 
+              if ((IS_AFFECTED(ch, AFF_DETECT_EVIL) || IS_AFFECTED(ch, AFF_KNOW_ALIGN)) && IS_EVIL(i)) 
                 strcat(buffer, "$B$4(Red Halo)$B$3 ");
-              if ((IS_AFFECTED(ch, AFF_DETECT_GOOD) || IS_AFFECTED2(ch, AFF_KNOW_ALIGN)) && IS_GOOD(i)) 
+              if ((IS_AFFECTED(ch, AFF_DETECT_GOOD) || IS_AFFECTED(ch, AFF_KNOW_ALIGN)) && IS_GOOD(i)) 
                 strcat(buffer, "$B$1(Blue Halo)$B$3 ");
-              if (IS_AFFECTED2(ch, AFF_KNOW_ALIGN) && !IS_GOOD(i) && !IS_EVIL(i)) 
+              if (IS_AFFECTED(ch, AFF_KNOW_ALIGN) && !IS_GOOD(i) && !IS_EVIL(i)) 
                 strcat(buffer, "$B$5(Yellow Halo)$B$3 ");
             }
             if (IS_SET(i->pcdata->toggles, PLR_GUIDE_TOG))
@@ -486,11 +486,11 @@ void show_char_to_char(struct char_data *i, struct char_data *ch, int mode)
             strcat(buffer," $1(invisible)");
 	 if (IS_AFFECTED(i, AFF_HIDE) && IS_AFFECTED(ch, AFF_TRUE_SIGHT) && has_skill(ch, SPELL_TRUE_SIGHT) > 80)
             strcat(buffer, "$4 (hidden)");
-         if ((IS_AFFECTED(ch, AFF_DETECT_EVIL) || IS_AFFECTED2(ch, AFF_KNOW_ALIGN)) && IS_EVIL(i)) 
+         if ((IS_AFFECTED(ch, AFF_DETECT_EVIL) || IS_AFFECTED(ch, AFF_KNOW_ALIGN)) && IS_EVIL(i)) 
             strcat(buffer, "$B$4(Red Halo) ");
-         if ((IS_AFFECTED(ch, AFF_DETECT_GOOD) || IS_AFFECTED2(ch, AFF_KNOW_ALIGN)) && IS_GOOD(i)) 
+         if ((IS_AFFECTED(ch, AFF_DETECT_GOOD) || IS_AFFECTED(ch, AFF_KNOW_ALIGN)) && IS_GOOD(i)) 
             strcat(buffer, "$B$1(Blue Halo) ");
-         if (IS_AFFECTED2(ch, AFF_KNOW_ALIGN) && !IS_GOOD(i) && !IS_EVIL(i)) 
+         if (IS_AFFECTED(ch, AFF_KNOW_ALIGN) && !IS_GOOD(i) && !IS_EVIL(i)) 
             strcat(buffer, "$B$5(Yellow Halo) ");
          strcat(buffer,"$R\n\r");
          send_to_char(buffer, ch);
@@ -505,11 +505,11 @@ void show_char_to_char(struct char_data *i, struct char_data *ch, int mode)
         
         if (IS_AFFECTED(i, AFF_HIDE) && IS_AFFECTED(ch, AFF_TRUE_SIGHT) && has_skill(ch, SPELL_TRUE_SIGHT) > 80)
            strcat(buffer, "$4(hidden) $3");
-        if ((IS_AFFECTED(ch, AFF_DETECT_EVIL) || IS_AFFECTED2(ch, AFF_KNOW_ALIGN)) && IS_EVIL(i)) 
+        if ((IS_AFFECTED(ch, AFF_DETECT_EVIL) || IS_AFFECTED(ch, AFF_KNOW_ALIGN)) && IS_EVIL(i)) 
            strcat(buffer, "$B$4(Red Halo)$3 ");
-        if ((IS_AFFECTED(ch, AFF_DETECT_GOOD) || IS_AFFECTED2(ch, AFF_KNOW_ALIGN)) && IS_GOOD(i)) 
+        if ((IS_AFFECTED(ch, AFF_DETECT_GOOD) || IS_AFFECTED(ch, AFF_KNOW_ALIGN)) && IS_GOOD(i)) 
            strcat(buffer, "$B$1(Blue Halo)$3 ");
-        if (IS_AFFECTED2(ch, AFF_KNOW_ALIGN) && !IS_GOOD(i) && !IS_EVIL(i)) 
+        if (IS_AFFECTED(ch, AFF_KNOW_ALIGN) && !IS_GOOD(i) && !IS_EVIL(i)) 
            strcat(buffer, "$B$5(Yellow Halo)$3 ");
         strcat(buffer, i->long_desc);
 
@@ -2261,7 +2261,7 @@ int do_scan(struct char_data *ch, char *argument, int cmd)
          else for(vict = room->people; vict; vict = vict->next_in_room) {
             if(CAN_SEE(ch, vict)) 
             {
-               if(IS_AFFECTED2(vict, AFF_CAMOUFLAGUE) && 
+               if(IS_AFFECTED(vict, AFF_CAMOUFLAGUE) && 
                   world[vict->in_room].sector_type != SECT_INSIDE &&
                   world[vict->in_room].sector_type != SECT_CITY &&
                   world[vict->in_room].sector_type != SECT_AIR
@@ -2290,7 +2290,7 @@ int do_scan(struct char_data *ch, char *argument, int cmd)
             else for(vict = room->people; vict; vict = vict->next_in_room) {
                if(CAN_SEE(ch, vict)) 
                {
-                  if(IS_AFFECTED2(vict, AFF_CAMOUFLAGUE) && 
+                  if(IS_AFFECTED(vict, AFF_CAMOUFLAGUE) && 
                      world[vict->in_room].sector_type != SECT_INSIDE &&
                      world[vict->in_room].sector_type != SECT_CITY &&
                      world[vict->in_room].sector_type != SECT_AIR
@@ -2305,7 +2305,7 @@ int do_scan(struct char_data *ch, char *argument, int cmd)
                }
             }
             // Now if we have the farsight spell we go another room out
-            if(IS_AFFECTED2(ch, AFF_FARSIGHT)) {
+            if(IS_AFFECTED(ch, AFF_FARSIGHT)) {
                ch->in_room = world[ch->in_room].dir_option[i]->to_room;
                if(CAN_GO(ch, i)) {
                   room = &world[world[ch->in_room].dir_option[i]->to_room];
@@ -2317,7 +2317,7 @@ int do_scan(struct char_data *ch, char *argument, int cmd)
                   else for(vict = room->people; vict; vict = vict->next_in_room) {
                      if(CAN_SEE(ch, vict)) 
                      {
-                        if(IS_AFFECTED2(vict, AFF_CAMOUFLAGUE) && 
+                        if(IS_AFFECTED(vict, AFF_CAMOUFLAGUE) && 
                            world[vict->in_room].sector_type != SECT_INSIDE &&
                            world[vict->in_room].sector_type != SECT_CITY &&
                            world[vict->in_room].sector_type != SECT_AIR

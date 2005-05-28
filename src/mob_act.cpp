@@ -19,7 +19,7 @@
 /* 12/06/2003   Onager   Modified mobile_activity() to prevent charmie    */
 /*                       scavenging                                       */
 /**************************************************************************/
-/* $Id: mob_act.cpp,v 1.32 2005/05/27 21:25:19 urizen Exp $ */
+/* $Id: mob_act.cpp,v 1.33 2005/05/28 18:56:10 shane Exp $ */
 
 extern "C"
 {
@@ -201,7 +201,7 @@ void mobile_activity(void)
 //    see what I mean.
 
     if (world[ch->in_room].contents &&
-      IS_SET(ch->mobdata->actflags, ACT_SCAVENGER) &&
+      ISSET(ch->mobdata->actflags, ACT_SCAVENGER) &&
       !IS_AFFECTED(ch, AFF_CHARM) &&
       number(0, 2) == 0) 
     {
@@ -215,7 +215,7 @@ void mobile_activity(void)
     // into the above SCAVENGER if statement, and streamline them both to be more effecient
 
     // Scavenge 
-    if(IS_SET(ch->mobdata->actflags, ACT_SCAVENGER)
+    if(ISSET(ch->mobdata->actflags, ACT_SCAVENGER)
       && !IS_AFFECTED(ch, AFF_CHARM)
       && world[ch->in_room].contents && number(0,4) == 0) 
     {
@@ -241,7 +241,7 @@ void mobile_activity(void)
     }
   
     /* Wander */
-    if(!IS_SET(ch->mobdata->actflags, ACT_SENTINEL)
+    if(!ISSET(ch->mobdata->actflags, ACT_SENTINEL)
       && GET_POS(ch) == POSITION_STANDING
       && (door = number(0,30)) <= 5
       && CAN_GO(ch, door)
@@ -250,7 +250,7 @@ void mobile_activity(void)
            !IS_SET(world[EXIT(ch,door)->to_room].room_flags, 
                    (FALL_UP | FALL_SOUTH | FALL_NORTH | FALL_EAST | FALL_WEST | FALL_DOWN))
          )
-      && ( !IS_SET(ch->mobdata->actflags, ACT_STAY_ZONE) ||
+      && ( !ISSET(ch->mobdata->actflags, ACT_STAY_ZONE) ||
            world[EXIT(ch, door)->to_room].zone == world[ch->in_room].zone
          )
       ) 
@@ -259,7 +259,7 @@ void mobile_activity(void)
 	; // DENIED
       else if(ch->mobdata->last_direction == door)
         ch->mobdata->last_direction = -1;
-      else if(!IS_SET(ch->mobdata->actflags, ACT_STAY_NO_TOWN) ||
+      else if(!ISSET(ch->mobdata->actflags, ACT_STAY_NO_TOWN) ||
               !IS_SET(zone_table[world[EXIT(ch, door)->to_room].zone].zone_flags, ZONE_IS_TOWN))
       {
         ch->mobdata->last_direction = door;
@@ -308,7 +308,7 @@ void mobile_activity(void)
       if(done)
         continue;
 
-      if(!IS_SET(ch->mobdata->actflags, ACT_STUPID))
+      if(!ISSET(ch->mobdata->actflags, ACT_STUPID))
       {
         if(!IS_AFFECTED(ch, AFF_BLIND) && ch->hunting) {
           retval = do_track(ch, ch->hunting, 9);
@@ -320,7 +320,7 @@ void mobile_activity(void)
   
     /* Aggress */
     if (!ch->fighting) // don't aggro more than one person
-    if(IS_SET(ch->mobdata->actflags, ACT_AGGRESSIVE) &&
+    if(ISSET(ch->mobdata->actflags, ACT_AGGRESSIVE) &&
       !IS_SET(world[ch->in_room].room_flags, SAFE)) 
     {
       CHAR_DATA * next_aggro; 
@@ -351,7 +351,7 @@ void mobile_activity(void)
             continue;
           if(IS_NPC(tmp_ch) && !IS_AFFECTED(tmp_ch, AFF_CHARM))
             continue;
-          if(IS_SET(ch->mobdata->actflags, ACT_WIMPY) && AWAKE(tmp_ch) )
+          if(ISSET(ch->mobdata->actflags, ACT_WIMPY) && AWAKE(tmp_ch) )
             continue;
           if(!IS_MOB(tmp_ch) && IS_SET(tmp_ch->pcdata->toggles, PLR_NOHASSLE) )
             continue;
@@ -389,7 +389,7 @@ void mobile_activity(void)
       }
     
     if (!ch->fighting)
-    if(IS_SET(ch->mobdata->actflags,
+    if(ISSET(ch->mobdata->actflags,
       ACT_RACIST|ACT_FRIENDLY|ACT_AGGR_EVIL|ACT_AGGR_NEUT|ACT_AGGR_GOOD))
       for(tmp_ch = world[ch->in_room].people; tmp_ch; tmp_ch = pch) 
       {
@@ -404,7 +404,7 @@ void mobile_activity(void)
 
         tmp_bitv = GET_BITV(tmp_ch);
 
-        if(IS_SET(ch->mobdata->actflags, ACT_FRIENDLY) &&
+        if(ISSET(ch->mobdata->actflags, ACT_FRIENDLY) &&
            tmp_ch->fighting &&
            (IS_SET(race_info[(int)GET_RACE(ch)].friendly, tmp_bitv) ||
 	     (int)GET_RACE(ch) == (int)GET_RACE(tmp_ch)) &&
@@ -453,7 +453,7 @@ void mobile_activity(void)
 		  break;
            }
 
-          if(IS_SET(ch->mobdata->actflags, ACT_AGGR_EVIL) &&
+          if(ISSET(ch->mobdata->actflags, ACT_AGGR_EVIL) &&
             GET_ALIGNMENT(tmp_ch) <= -350)
           {
 	   if (i==1) {
@@ -473,7 +473,7 @@ void mobile_activity(void)
             break;
           }
         
-          if(IS_SET(ch->mobdata->actflags, ACT_AGGR_GOOD) &&
+          if(ISSET(ch->mobdata->actflags, ACT_AGGR_GOOD) &&
             GET_ALIGNMENT(tmp_ch) >= 350)
           {
 	   if (i==1) {
@@ -493,7 +493,7 @@ void mobile_activity(void)
             break;
           }
         
-          if(IS_SET(ch->mobdata->actflags, ACT_AGGR_NEUT) &&
+          if(ISSET(ch->mobdata->actflags, ACT_AGGR_NEUT) &&
             GET_ALIGNMENT(tmp_ch) > -350 &&
             GET_ALIGNMENT(tmp_ch) < 350)
           {
@@ -511,7 +511,7 @@ void mobile_activity(void)
             break;
           }
       
-          if(IS_SET(ch->mobdata->actflags, ACT_RACIST) &&
+          if(ISSET(ch->mobdata->actflags, ACT_RACIST) &&
             IS_SET(race_info[(int)GET_RACE(ch)].hate_fear, tmp_bitv))
           {
             tmp_race = GET_RACE(tmp_ch);

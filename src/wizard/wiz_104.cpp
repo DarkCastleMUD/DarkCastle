@@ -863,12 +863,10 @@ int do_show(struct char_data *ch, char *argument, int cmd)
   {  // Mobile search.
     char arg1[MAX_STRING_LENGTH];
     int act = 0, clas = 0, levlow = -555, levhigh = -555, affect = 0, immune = 0, race = -1, align = 0;
-    int affected2 = 0;
     extern char *action_bits[];
     extern struct race_shit race_info[];
     extern char *isr_bits[];
     extern char *affected_bits[];
-    extern char *affected_bits2[];
     extern char *pc_clss_types2[];
     //int its;
 //    if (
@@ -902,12 +900,6 @@ int do_show(struct char_data *ch, char *argument, int cmd)
           SET_BIT(affect, 1<<i);
           goto thisLoop;
         }
-       for (i = 0; *affected_bits2[i] != '\n'; i++)
-         if (!str_cmp(str_nospace(affected_bits2[i]), arg1))
-	{
-	  SET_BIT(affected2, 1<<i);
-	  goto thisLoop;
-	}
        for (i = 0; i <= MAX_RACE; i++)
         if (!str_cmp(str_nospace(race_info[i].singular_name),arg1))
         {
@@ -957,15 +949,6 @@ int do_show(struct char_data *ch, char *argument, int cmd)
 	     send_to_char("\r\n",ch);
 	   else
 	     send_to_char(" ", ch);
-	}
-	for (z = 0; *affected_bits2[z] != '\n'; z++)
-	{
-           send_to_char(str_nospace(affected_bits2[z]),ch);
-           if (++o%7==0)
-             send_to_char("\r\n",ch);
-           else
-             send_to_char(" ", ch);
-
 	}
 	for (z = 0; *affected_bits[z] != '\n';z++)
 	{
@@ -1054,17 +1037,12 @@ int do_show(struct char_data *ch, char *argument, int cmd)
       if(act)
 	for (i = 0; i < 31; i++)
            if (IS_SET(act,1<<i))
-      if (!IS_SET(((struct char_data *)(mob_index[nr].item))->mobdata->actflags, 1<<i))
+      if (!ISSET(((struct char_data *)(mob_index[nr].item))->mobdata->actflags, 1<<i))
          goto eheh;
-      if (affected2)
-        for (i = 0; i < 31; i++)
-	  if (IS_SET(affected2, 1<<i))
-	    if (!IS_SET(((struct char_data *)(mob_index[nr].item))->affected_by2,1<<i))
-		goto eheh;
       if(affect)
 	for (i = 0; i < 31; i++)
            if (IS_SET(affect,1<<i))
-      		if (!IS_SET(((struct char_data *)(mob_index[nr].item))->affected_by, 1<<i))
+      		if (!ISSET(((struct char_data *)(mob_index[nr].item))->affected_by, 1<<i))
         		goto eheh;
       count++;
       if (count > 200)

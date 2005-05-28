@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.53 2005/05/03 08:50:46 shane Exp $
+| $Id: objects.cpp,v 1.54 2005/05/28 18:56:10 shane Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -234,7 +234,7 @@ int do_switch(struct char_data *ch, char *arg, int cmd)
   }
   if (GET_OBJ_WEIGHT(ch->equipment[WIELD]) > MIN(GET_STR(ch)/2, 
 get_max_stat(ch, STRENGTH)/2)
-&& !IS_AFFECTED2(ch, AFF_POWERWIELD))
+&& !IS_AFFECTED(ch, AFF_POWERWIELD))
   {
      send_to_char("Your primary wield is too heavy to wield as secondary.\r\n",ch);
       return eFAILURE;
@@ -452,7 +452,7 @@ void set_movement_trap(struct char_data *ch, struct obj_data *obj)
     trap_obj->obj_flags.value[i] = obj->obj_flags.value[i];
 
   // set it up in the room
-  SET_BIT(ch->affected_by2, AFF_UTILITY);
+  SETBIT(ch->affected_by, AFF_UTILITY);
   obj_to_room(trap_obj, ch->in_room);
 }
 
@@ -473,7 +473,7 @@ void set_exit_trap(struct char_data *ch, struct obj_data *obj, char * arg)
     trap_obj->obj_flags.value[i] = obj->obj_flags.value[i];
 
   // set it up in the room
-  SET_BIT(ch->affected_by2, AFF_UTILITY);
+  SETBIT(ch->affected_by, AFF_UTILITY);
   obj_to_room(trap_obj, ch->in_room);
 }
 
@@ -508,7 +508,7 @@ void set_catstink(struct char_data *ch, struct obj_data *obj)
        return;
   }  
 
-  SET_BIT(ch->affected_by2, AFF_UTILITY);
+  SETBIT(ch->affected_by, AFF_UTILITY);
   world[ch->in_room].FreeTracks();
 }
 
@@ -1675,14 +1675,14 @@ void wear(struct char_data *ch, struct obj_data *obj_object, int keyword)
     if(CAN_WEAR(obj_object,ITEM_WIELD)) {
       if(!ch->equipment[WIELD] && GET_OBJ_WEIGHT(obj_object) > 
 MIN(GET_STR(ch), get_max_stat(ch, STRENGTH)) && 
-!IS_SET(ch->affected_by2,AFF_POWERWIELD))
+!ISSET(ch->affected_by,AFF_POWERWIELD))
         send_to_char("It is too heavy for you to use.\n\r",ch);
       else if(ch->equipment[WIELD] && GET_OBJ_WEIGHT(obj_object) > 
 MIN(GET_STR(ch)/2, get_max_stat(ch, STRENGTH)/2) && 
-!IS_SET(ch->affected_by2, AFF_POWERWIELD))
+!ISSET(ch->affected_by, AFF_POWERWIELD))
         send_to_char("It is too heavy for you to use as a secondary weapon.\n\r",ch);
       else if((!hands_are_free(ch, 2)) && 
-             (IS_SET(obj_object->obj_flags.extra_flags, ITEM_TWO_HANDED) && !IS_SET(ch->affected_by2, AFF_POWERWIELD)))
+             (IS_SET(obj_object->obj_flags.extra_flags, ITEM_TWO_HANDED) && !ISSET(ch->affected_by, AFF_POWERWIELD)))
         send_to_char("You need both hands for this weapon.\n\r", ch);
       else if(!hands_are_free(ch, 1))
         send_to_char("Your hands are already full.\n\r", ch);
@@ -1711,7 +1711,7 @@ MIN(GET_STR(ch)/2, get_max_stat(ch, STRENGTH)/2) &&
         act("You already using $p as a shield.", ch, ch->equipment[WEAR_SHIELD], 0, TO_CHAR, 0);
       }
       else if((!hands_are_free(ch, 2)) && 
-             (IS_SET(obj_object->obj_flags.extra_flags, ITEM_TWO_HANDED) && !IS_SET(ch->affected_by2, AFF_POWERWIELD)))
+             (IS_SET(obj_object->obj_flags.extra_flags, ITEM_TWO_HANDED) && !ISSET(ch->affected_by, AFF_POWERWIELD)))
       {
 	send_to_char("You need both hands for this shield.\r\n",ch);
       }
@@ -1735,7 +1735,7 @@ MIN(GET_STR(ch)/2, get_max_stat(ch, STRENGTH)/2) &&
       if(!hands_are_free(ch, 1))
         send_to_char("Your hands are already full.\n\r", ch);
       else if((!hands_are_free(ch, 2)) && 
-             (IS_SET(obj_object->obj_flags.extra_flags, ITEM_TWO_HANDED) && !IS_SET(ch->affected_by2, AFF_POWERWIELD)))
+             (IS_SET(obj_object->obj_flags.extra_flags, ITEM_TWO_HANDED) && !ISSET(ch->affected_by, AFF_POWERWIELD)))
       {
 	send_to_char("You need both hands for this item.\r\n",ch);
       }
@@ -1785,7 +1785,7 @@ MIN(GET_STR(ch)/2, get_max_stat(ch, STRENGTH)/2) &&
       act("You are already holding $p as a light.", ch, ch->equipment[WEAR_LIGHT], 0, TO_CHAR, 0);
     }
       else if((!hands_are_free(ch, 2)) && 
-             (IS_SET(obj_object->obj_flags.extra_flags, ITEM_TWO_HANDED) && !IS_SET(ch->affected_by2, AFF_POWERWIELD)))
+             (IS_SET(obj_object->obj_flags.extra_flags, ITEM_TWO_HANDED) && !ISSET(ch->affected_by, AFF_POWERWIELD)))
       {
 	send_to_char("You need both hands for this light.\r\n",ch);
       }
@@ -1999,7 +1999,7 @@ int hands_are_free(struct char_data *ch, int number)
    wielded = ch->equipment[WIELD];
 
   if(wielded)
-    if (IS_SET(wielded->obj_flags.extra_flags, ITEM_TWO_HANDED) && !IS_SET(ch->affected_by2, AFF_POWERWIELD))
+    if (IS_SET(wielded->obj_flags.extra_flags, ITEM_TWO_HANDED) && !ISSET(ch->affected_by, AFF_POWERWIELD))
        hands = 2;
 
   if(ch->equipment[WIELD]) hands++;
@@ -2007,19 +2007,19 @@ int hands_are_free(struct char_data *ch, int number)
 
   if(ch->equipment[WEAR_SHIELD]) {
          if (IS_SET(ch->equipment[WEAR_SHIELD]->obj_flags.extra_flags, ITEM_TWO_HANDED) &&
-		!IS_SET(ch->affected_by2, AFF_POWERWIELD))
+		!ISSET(ch->affected_by, AFF_POWERWIELD))
 	hands++;
 	hands++;
   } 
  if(ch->equipment[HOLD]) {
          if (IS_SET(ch->equipment[HOLD]->obj_flags.extra_flags, ITEM_TWO_HANDED) &&
-		!IS_SET(ch->affected_by2, AFF_POWERWIELD))
+		!ISSET(ch->affected_by, AFF_POWERWIELD))
 	hands++;
   hands++;
   }
   if(ch->equipment[WEAR_LIGHT]) { 
          if (IS_SET(ch->equipment[WEAR_LIGHT]->obj_flags.extra_flags, ITEM_TWO_HANDED) &&
-		!IS_SET(ch->affected_by2, AFF_POWERWIELD))
+		!ISSET(ch->affected_by, AFF_POWERWIELD))
 	hands++;
   hands++;
   }

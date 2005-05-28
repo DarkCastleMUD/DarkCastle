@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.88 2005/05/16 11:04:51 shane Exp $ */
+/* $Id: nanny.cpp,v 1.89 2005/05/28 18:56:10 shane Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -384,7 +384,7 @@ void do_on_login_stuff(char_data * ch)
     else if(GET_LEVEL(ch) >=  IMMORTAL)  char_to_room( ch, real_room(17) );
     else                                 char_to_room( ch, real_room(START_ROOM) );
 
-    REMOVE_BIT(ch->affected_by2, AFF_BLACKJACK_ALERT);
+    REMBIT(ch->affected_by, AFF_BLACKJACK_ALERT);
     if (GET_CLASS(ch) == CLASS_MONK && GET_LEVEL(ch) > 10)
     {
 	  struct char_skill_data * curr = ch->skills;

@@ -16,7 +16,7 @@
  *  10/21/2003   Onager    Changed IS_ANONYMOUS() to handle mobs without   *
  *                         crashing                                        *
  ***************************************************************************/
-/* $Id: utility.h,v 1.29 2005/04/18 19:07:21 urizen Exp $ */
+/* $Id: utility.h,v 1.30 2005/05/28 18:56:22 shane Exp $ */
 
 #ifndef UTILITY_H_
 #define UTILITY_H_
@@ -34,6 +34,9 @@ extern "C" {
 
 extern struct weather_data weather_info;
 extern char log_buf[MAX_STRING_LENGTH];
+
+//extern struct char_data;
+//typedef struct char_data CHAR_DATA;
 
 void check_timer();
 
@@ -112,13 +115,22 @@ bool is_hiding(CHAR_DATA *ch, CHAR_DATA *vict);
 
 #define FREE(p) do { if((p) != NULL) { dc_free((p)); (p) = 0; } } while (0) 
 
+#define ASIZE 31
+#define SETBIT(var,bit) ((var)[(bit)/ASIZE] |= (1 << ((bit)-(((bit)/ASIZE)*ASIZE))))
+// setting with an OR
+#define REMBIT(var,bit) ((var)[(bit)/ASIZE] &= ~(1 << ((bit)-(((bit)/ASIZE)*ASIZE))))
+// setting with an AND
+#define TOGBIT(var,bit) ((var)[(bit)/ASIZE] ^= (1 << ((bit)-(((bit)/ASIZE)*ASIZE))))
+// setting with an XOR
+#define ISSET(var,bit) ((var)[(bit)/ASIZE] & (1 << ((bit)-(((bit)/ASIZE)*ASIZE))))
+// using an AND
+
 #define IS_SET(flag,bit)  ((flag) & (bit))
 #define SET_BIT(var,bit)  ((var) = (var) | (bit))
 #define REMOVE_BIT(var,bit)  ((var) = (var) & ~(bit) )
 #define TOGGLE_BIT(var, bit) ((var) = (var) ^ (bit))
 
-#define IS_AFFECTED(ch,skill) ( IS_SET((ch)->affected_by, (skill)) )
-#define IS_AFFECTED2(ch,skill) (IS_SET((ch)->affected_by2, (skill)))
+#define IS_AFFECTED(ch,skill) ( ISSET((ch)->affected_by, (skill)) )
 
 int  DARK_AMOUNT( int room );
 bool IS_DARK( int room );
@@ -137,7 +149,7 @@ bool IS_DARK( int room );
 
 #define IS_NPC(ch)  (IS_SET((ch)->misc, MISC_IS_MOB))
 #define IS_MOB(ch)  (IS_NPC(ch))
-#define IS_FAMILIAR(ch)	(IS_AFFECTED2(ch, AFF_FAMILIAR))
+#define IS_FAMILIAR(ch)	(IS_AFFECTED(ch, AFF_FAMILIAR))
 
 #define GET_RDEATHS(ch)      ((ch)->pcdata->rdeaths)
 #define GET_PDEATHS(ch)      ((ch)->pcdata->pdeaths)
@@ -248,17 +260,19 @@ bool IS_DARK( int room );
 
 #define AWAKE(ch) (GET_POS(ch)  != POSITION_SLEEPING)
 
+#define IS_ANONYMOUS(ch) (IS_MOB(ch) ? 1 : ( (GET_LEVEL(ch) >= 101) ? 0 : IS_SET((ch)->pcdata->toggles, PLR_ANONYMOUS)))
+/*
 inline const short IS_ANONYMOUS(CHAR_DATA *ch)
 {
   if (IS_MOB(ch))
-     /* this should really never be called on mobs */
+     // this should really never be called on mobs
      return 1;
   else if (GET_LEVEL(ch) >= 101)
      return 0;
   else
      return (IS_SET(ch->pcdata->toggles, PLR_ANONYMOUS) != 0);
 }
-
+*/
 /* Object And Carry related macros */
 
 #define GET_ITEM_TYPE(obj) ((obj)->obj_flags.type_flag)
@@ -325,6 +339,7 @@ char *	str_dup		(const char *str);
 void    log		(char * str, int god_level, long type);
 void    logf            (int level, long type, char *arg, ...);
 int     send_to_gods    (char * str, int god_level, long type);
+void	sprintbit	(int value[], char *names[], char *result);
 void    sprintbit	(long vektor, char *names[], char *result);
 void    sprinttype	(int type, char *names[], char *result);
 int     consttype       (char * search_str, char *names[]);
@@ -418,6 +433,7 @@ void send_to_char_regardless(char *messg, struct char_data *ch);
 int csendf(struct char_data *ch, char *arg, ...);
 bool check_range_valid_and_convert(int & value, char * buf, int begin, int end);
 bool check_valid_and_convert(int & value, char * buf);
+void parse_bitstrings_into_int(char * bits[], char * strings, char_data * ch, int32 value[]);
 void parse_bitstrings_into_int(char * bits[], char * strings, char_data * ch, uint32 & value);
 void parse_bitstrings_into_int(char * bits[], char * strings, char_data * ch, uint16 & value);
 void display_string_list(char * list[], char_data *ch);

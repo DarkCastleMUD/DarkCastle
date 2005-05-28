@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: save.cpp,v 1.30 2005/05/16 11:04:51 shane Exp $ */
+/* $Id: save.cpp,v 1.31 2005/05/28 18:56:10 shane Exp $ */
 
 extern "C"
 {
@@ -528,8 +528,7 @@ int store_to_char_variable_data(CHAR_DATA * ch, FILE * fpsave)
        fread(&(af->modifier),  sizeof(af->modifier),  1, fpsave);
        fread(&(af->location),  sizeof(af->location),  1, fpsave);
        fread(&(af->bitvector), sizeof(af->bitvector), 1, fpsave);
-      bool isaff2(int spellnum);
-       affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE,isaff2(af->type)); // re-affect the char
+       affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE); // re-affect the char
     }
     fread(&typeflag, sizeof(char), 3, fpsave);
   }
@@ -573,7 +572,7 @@ void save_char_obj (CHAR_DATA *ch)
     return;
   }
 
-  SET_BIT(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT); // so weapons stop falling off
+  SETBIT(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT); // so weapons stop falling off
 
   char_to_store (ch, &uchar, tmpage);
 
@@ -606,7 +605,7 @@ void save_char_obj (CHAR_DATA *ch)
     log(log_buf, ANGEL, LOG_BUG);
   }
 
-  REMOVE_BIT(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT);
+  REMBIT(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT);
 }
 
 // just error crap to avoid using "goto" like we were
@@ -1177,8 +1176,13 @@ void store_to_char(struct char_file_u *st, CHAR_DATA *ch)
     ch->armor          = st->armor;
     ch->hitroll        = st->hitroll;
     ch->damroll        = st->damroll;
-    ch->affected_by    = st->afected_by;
-    ch->affected_by2   = st->afected_by2;
+
+    i = 0;
+    while(ch->affected_by[i] != -1) {
+       ch->affected_by[i] = st->afected_by[i];
+       i++;
+    }
+    st->afected_by[i] = -1;
 
     for(i = 0; i <= 2; i++)
       GET_COND(ch, i) = st->conditions[i];
@@ -1213,11 +1217,10 @@ void char_to_store(CHAR_DATA *ch, struct char_file_u *st, struct time_data & tmp
       char_eq[i] = 0;
   }
 
-bool isaff2(int spellnum);
   // Unaffect everything a character can be affected by spell-wise
   for(af = ch->affected; af; af = af->next) 
   {
-    affect_modify( ch, af->location, af->modifier, af->bitvector, FALSE,isaff2(af->type));
+    affect_modify( ch, af->location, af->modifier, af->bitvector, FALSE);
   }
 
   st->sex      = GET_SEX(ch);
@@ -1272,21 +1275,24 @@ bool isaff2(int spellnum);
     st->armor = ch->armor;
     st->hitroll =  ch->hitroll;
     st->damroll =  ch->damroll;
-    st->afected_by = ch->affected_by;
-    st->afected_by2 = ch->affected_by2;
+    x=0;
+    while(st->afected_by[x] != -1) {
+       st->afected_by[x] = ch->affected_by[x];
+       x++;
+    }
+    st->afected_by[x] = -1;
   }
   else { 
     st->armor   = 100;
     st->hitroll =  0;
     st->damroll =  0;
-    st->afected_by = 0;
-    st->afected_by2 = 0;
+    st->afected_by[0] = -1;
     tmpage = ch->pcdata->time;
   }
 
   // re-affect the character with spells
   for(af = ch->affected; af; af = af->next) {
-      affect_modify( ch, af->location, af->modifier, af->bitvector, TRUE,isaff2(af->type));
+      affect_modify( ch, af->location, af->modifier, af->bitvector, TRUE);
   }
 
   // re-equip the character with his eq

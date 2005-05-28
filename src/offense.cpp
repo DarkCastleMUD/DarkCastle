@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: offense.cpp,v 1.15 2005/05/11 10:52:44 shane Exp $
+| $Id: offense.cpp,v 1.16 2005/05/28 18:56:10 shane Exp $
 | offense.C
 | Description:  Commands that are generically offensive - that is, the
 |   victim should retaliate.  The class-specific offensive commands are
@@ -12,8 +12,8 @@ extern "C"
 }
 
 #include <structs.h>
-#include <utility.h>
 #include <character.h>
+#include <utility.h>
 #include <handler.h>
 #include <spells.h>
 #include <fight.h>
@@ -163,7 +163,7 @@ int do_kill(struct char_data *ch, char *argument, int cmd)
 //     return eFAILURE;
 //  }
 
-  if (IS_AFFECTED2(ch, AFF_FAMILIAR) && !IS_NPC(ch->master)) {
+  if (IS_AFFECTED(ch, AFF_FAMILIAR) && !IS_NPC(ch->master)) {
      act("But $N scares me!!", ch->master, 0, victim, TO_CHAR, 0);
      return eFAILURE;
   }

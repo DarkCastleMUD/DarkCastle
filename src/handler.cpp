@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.87 2005/05/14 11:00:22 urizen Exp $ */
+/* $Id: handler.cpp,v 1.88 2005/05/28 18:56:10 shane Exp $ */
     
 extern "C"
 {
@@ -76,32 +76,6 @@ int do_fall(CHAR_DATA *ch, short dir);
 /* internal procedures */
 void remove_memory(CHAR_DATA *ch, char type);
 void add_memory(CHAR_DATA *ch, char *victim, char type);
-
-bool isaff2(int spellnum)
-{
-  switch (spellnum)
-  {
-		case SPELL_FOREST_MELD:
-		case BASE_SETS+SET_RAGER: // = stability
-                case SPELL_SHADOWSLIP:
-                case SPELL_CAMOUFLAGE:
-		case SPELL_FARSIGHT:
-		case SPELL_INSOMNIA:
-                case SPELL_PROTECT_FROM_GOOD:
-		case SKILL_INNATE_POWERWIELD:
-		case SKILL_INNATE_REGENERATION:
-		case SKILL_INNATE_SHADOWSLIP:
-		case SKILL_INNATE_ILLUSION:
-		case SKILL_INNATE_FOCUS:
-                case SPELL_KNOW_ALIGNMENT:
-                  return TRUE;
-                  break;
-                default:
-                  return FALSE;
-                  break;
-
-  };
-}
 
 //TIMERS
 
@@ -536,11 +510,11 @@ void check_weapon_weights(char_data * ch)
 {
   struct obj_data * weapon;
   
-  if (IS_SET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT)) return;
+  if (ISSET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT)) return;
   // make sure we're still strong enough to wield our weapons
   if(!IS_MOB(ch) && ch->equipment[WIELD] &&
        GET_OBJ_WEIGHT(ch->equipment[WIELD]) > MIN(GET_STR(ch), 
-get_max_stat(ch, STRENGTH)) && !IS_SET(ch->affected_by2, AFF_POWERWIELD))
+get_max_stat(ch, STRENGTH)) && !ISSET(ch->affected_by, AFF_POWERWIELD))
   {
     act("Being too heavy to wield, you move your $p to your inventory.",
          ch, ch->equipment[WIELD], 0, TO_CHAR, 0);
@@ -559,7 +533,7 @@ get_max_stat(ch, STRENGTH)) && !IS_SET(ch->affected_by2, AFF_POWERWIELD))
 
   if(ch->equipment[SECOND_WIELD] &&
        GET_OBJ_WEIGHT(ch->equipment[SECOND_WIELD]) > MIN(GET_STR(ch)/2, 
-get_max_stat(ch, STRENGTH)/2) && !IS_SET(ch->affected_by2, 
+get_max_stat(ch, STRENGTH)/2) && !ISSET(ch->affected_by, 
 AFF_POWERWIELD))
   {
     act("Being too heavy to wield, you move your $p to your inventory.",
@@ -569,33 +543,25 @@ AFF_POWERWIELD))
   }
 }
 
-void affect_modify(CHAR_DATA *ch, int32 loc, int32 mod, long bitv, bool add, bool aff2fix )
+void affect_modify(CHAR_DATA *ch, int32 loc, int32 mod, long bitv, bool add)
 {
-    char log_buf[256];
-    int i;
+   char log_buf[256];
+   int i;
     
-if (loc >= 1000) return;
-if (!aff2fix) {
-      if(add)
-        SET_BIT(ch->affected_by, bitv);
-      else {
-        REMOVE_BIT(ch->affected_by, bitv);
-        mod = -mod;
-      }
-    } else { // Fixes spells to modify affected_by2 instead
-      if (add)
-	SET_BIT(ch->affected_by2, bitv);
-      else {
-	REMOVE_BIT(ch->affected_by2,bitv);
-	mod = -mod;
-      }
-    }
-    switch(loc)
-    {
-	case APPLY_NONE:
-	    break;
+   if (loc >= 1000) return;
+   if(add)
+      SETBIT(ch->affected_by, bitv);
+   else {
+      REMBIT(ch->affected_by, bitv);
+      mod = -mod;
+   }
 
-	case APPLY_STR: {
+   switch(loc)
+   {
+      case APPLY_NONE:
+         break;
+
+      case APPLY_STR: {
             GET_STR_BONUS(ch) += mod;
             GET_STR(ch) = GET_RAW_STR(ch) + GET_STR_BONUS(ch);
             i = get_max_stat(ch, STRENGTH);
@@ -608,7 +574,7 @@ if (!aff2fix) {
         //    if( GET_RAW_STR(ch) > i - 2 && GET_STR(ch) > i - 2 )
           //     GET_STR(ch) = GET_RAW_STR(ch);
 //            GET_STR(ch) = MAX( 1, MIN( (int)GET_STR( ch ), i) ) );
-            if(!IS_SET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
+            if(!ISSET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
                check_weapon_weights(ch);
         }  break;
 
@@ -762,76 +728,76 @@ if (!aff2fix) {
     
         case APPLY_SANCTUARY: {
                if (add) {
-                     SET_BIT(ch->affected_by, AFF_SANCTUARY);
+                     SETBIT(ch->affected_by, AFF_SANCTUARY);
                } else {
-                  REMOVE_BIT(ch->affected_by, AFF_SANCTUARY);
+                  REMBIT(ch->affected_by, AFF_SANCTUARY);
                }
           } break;
         
         case APPLY_SENSE_LIFE: {
             if (add) {
-                     SET_BIT(ch->affected_by, AFF_SENSE_LIFE);
+                     SETBIT(ch->affected_by, AFF_SENSE_LIFE);
             } else {
-                  REMOVE_BIT(ch->affected_by, AFF_SENSE_LIFE);
+                  REMBIT(ch->affected_by, AFF_SENSE_LIFE);
             }
           } break;
     
         case APPLY_DETECT_INVIS: {
                if (add) {
-                     SET_BIT(ch->affected_by, AFF_DETECT_INVISIBLE);
+                     SETBIT(ch->affected_by, AFF_DETECT_INVISIBLE);
             } else {
-                    REMOVE_BIT(ch->affected_by, AFF_DETECT_INVISIBLE);
+                    REMBIT(ch->affected_by, AFF_DETECT_INVISIBLE);
 
              }
           } break;
     
         case APPLY_INVISIBLE: {
                if (add) {
-                     SET_BIT(ch->affected_by, AFF_INVISIBLE);
+                     SETBIT(ch->affected_by, AFF_INVISIBLE);
             } else {
-                  REMOVE_BIT(ch->affected_by, AFF_INVISIBLE);
+                  REMBIT(ch->affected_by, AFF_INVISIBLE);
              }
           } break;
     
         case APPLY_SNEAK: {
                if (add) {
-                     SET_BIT(ch->affected_by, AFF_SNEAK);
+                     SETBIT(ch->affected_by, AFF_SNEAK);
             } else {
-                  REMOVE_BIT(ch->affected_by, AFF_SNEAK);
+                  REMBIT(ch->affected_by, AFF_SNEAK);
              }
           } break;
     
         case APPLY_INFRARED: {
                if (add) {
-                     SET_BIT(ch->affected_by, AFF_INFRARED);
+                     SETBIT(ch->affected_by, AFF_INFRARED);
             } else {
-                  REMOVE_BIT(ch->affected_by, AFF_INFRARED);
+                  REMBIT(ch->affected_by, AFF_INFRARED);
              }
           } break;
     
         case APPLY_HASTE: {
                if (add) {
-                     SET_BIT(ch->affected_by, AFF_HASTE);
+                     SETBIT(ch->affected_by, AFF_HASTE);
             } else {
-                  REMOVE_BIT(ch->affected_by, AFF_HASTE);
+                  REMBIT(ch->affected_by, AFF_HASTE);
              }
           } break;
 
     
         case APPLY_PROTECT_EVIL: {
             if (add) {
-                     SET_BIT(ch->affected_by, AFF_PROTECT_EVIL);
+                     SETBIT(ch->affected_by, AFF_PROTECT_EVIL);
             } else {
-                  REMOVE_BIT(ch->affected_by, AFF_PROTECT_EVIL);
+                  REMBIT(ch->affected_by, AFF_PROTECT_EVIL);
             }
           } break;
 
     
         case APPLY_FLY: {
                if (add) {
-                     SET_BIT(ch->affected_by, AFF_FLYING);
+                     SETBIT(ch->affected_by, AFF_FLYING);
             } else {
-                  REMOVE_BIT(ch->affected_by, AFF_FLYING);
+                  REMBIT(ch->affected_by, AFF_FLYING);
              }
           } break;
 
@@ -890,51 +856,51 @@ if (!aff2fix) {
 
         case 67: 
             if(add) {
-                SET_BIT(ch->affected_by2, AFF_CAMOUFLAGUE); 
+                SETBIT(ch->affected_by, AFF_CAMOUFLAGUE); 
             } else {
-                REMOVE_BIT(ch->affected_by2, AFF_CAMOUFLAGUE); 
+                REMBIT(ch->affected_by, AFF_CAMOUFLAGUE); 
             }
             break;
         case 68: 
             if(add) {
-                SET_BIT(ch->affected_by2, AFF_FARSIGHT);
+                SETBIT(ch->affected_by, AFF_FARSIGHT);
             } else {
-                REMOVE_BIT(ch->affected_by2, AFF_FARSIGHT); 
+                REMBIT(ch->affected_by, AFF_FARSIGHT); 
             }
             break;
         case 69: 
             if(add) {
-                SET_BIT(ch->affected_by2, AFF_FREEFLOAT); 
+                SETBIT(ch->affected_by, AFF_FREEFLOAT); 
             } else {
-                REMOVE_BIT(ch->affected_by2, AFF_FREEFLOAT); 
+                REMBIT(ch->affected_by, AFF_FREEFLOAT); 
             }
             break;
         case 70: 
              if(add) {
-                 SET_BIT(ch->affected_by, AFF_FROSTSHIELD);
+                 SETBIT(ch->affected_by, AFF_FROSTSHIELD);
              } else {
-                 REMOVE_BIT(ch->affected_by, AFF_FROSTSHIELD);
+                 REMBIT(ch->affected_by, AFF_FROSTSHIELD);
              }
              break;
         case 71: 
             if(add) {
-                SET_BIT(ch->affected_by2, AFF_INSOMNIA); 
+                SETBIT(ch->affected_by, AFF_INSOMNIA); 
             } else {
-                REMOVE_BIT(ch->affected_by2, AFF_INSOMNIA); 
+                REMBIT(ch->affected_by, AFF_INSOMNIA); 
             }
             break;
         case 72: 
             if(add) {
-                SET_BIT(ch->affected_by, AFF_LIGHTNINGSHIELD);
+                SETBIT(ch->affected_by, AFF_LIGHTNINGSHIELD);
             } else {
-                REMOVE_BIT(ch->affected_by, AFF_LIGHTNINGSHIELD);
+                REMBIT(ch->affected_by, AFF_LIGHTNINGSHIELD);
             }
             break;
         case 73: 
             if(add) {
-                SET_BIT(ch->affected_by, AFF_REFLECT);
+                SETBIT(ch->affected_by, AFF_REFLECT);
             } else {
-                REMOVE_BIT(ch->affected_by, AFF_REFLECT);
+                REMBIT(ch->affected_by, AFF_REFLECT);
             }
             break;
         case 74: 
@@ -946,23 +912,23 @@ if (!aff2fix) {
             break;
         case 75:
             if(add) {
-                SET_BIT(ch->affected_by2, AFF_SHADOWSLIP); 
+                SETBIT(ch->affected_by, AFF_SHADOWSLIP); 
             } else {
-                REMOVE_BIT(ch->affected_by2, AFF_SHADOWSLIP); 
+                REMBIT(ch->affected_by, AFF_SHADOWSLIP); 
             }
             break;
         case 76:
             if(add) {
-                SET_BIT(ch->affected_by, AFF_SOLIDITY);
+                SETBIT(ch->affected_by, AFF_SOLIDITY);
             } else {
-                REMOVE_BIT(ch->affected_by, AFF_SOLIDITY);
+                REMBIT(ch->affected_by, AFF_SOLIDITY);
             }
             break;
         case 77:
             if(add) {
-                SET_BIT(ch->affected_by2, AFF_STABILITY);
+                SETBIT(ch->affected_by, AFF_STABILITY);
             } else {
-                REMOVE_BIT(ch->affected_by2, AFF_STABILITY);
+                REMBIT(ch->affected_by, AFF_STABILITY);
             }
             break;
         case 78: 
@@ -983,17 +949,17 @@ if (!aff2fix) {
 
         case APPLY_INSANE_CHANT:
             if(add) {
-                SET_BIT(ch->affected_by2, AFF_INSANE);
+                SETBIT(ch->affected_by, AFF_INSANE);
             } else {
-                REMOVE_BIT(ch->affected_by2, AFF_INSANE);
+                REMBIT(ch->affected_by, AFF_INSANE);
             }
             break;
 
         case APPLY_GLITTER_DUST:
             if(add) {
-                SET_BIT(ch->affected_by2, AFF_GLITTER_DUST);
+                SETBIT(ch->affected_by, AFF_GLITTER_DUST);
             } else {
-                REMOVE_BIT(ch->affected_by2, AFF_GLITTER_DUST);
+                REMBIT(ch->affected_by, AFF_GLITTER_DUST);
             }
             break;
 
@@ -1032,9 +998,9 @@ if (!aff2fix) {
 
         case APPLY_PROTECT_GOOD:
            if (add)
-              SET_BIT(ch->affected_by2, AFF_PROTECT_GOOD);
+              SETBIT(ch->affected_by, AFF_PROTECT_GOOD);
            else
-              REMOVE_BIT(ch->affected_by2, AFF_PROTECT_GOOD);
+              REMBIT(ch->affected_by, AFF_PROTECT_GOOD);
            break;
 
  	case APPLY_MELEE_DAMAGE:
@@ -1070,7 +1036,7 @@ void affect_total(CHAR_DATA *ch)
     struct affected_type *tmp_af;
     int i,j;
 
-    SET_BIT(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT); // so weapons stop falling off
+    SETBIT(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT); // so weapons stop falling off
 
     // remove all affects from the player
     for(i=0; i<MAX_WEAR; i++) {
@@ -1085,7 +1051,7 @@ void affect_total(CHAR_DATA *ch)
     {
 //        bool secFix = FALSE;
         tmp_af = af->next;
-        affect_modify(ch, af->location, af->modifier, af->bitvector, FALSE,isaff2(af->type));
+        affect_modify(ch, af->location, af->modifier, af->bitvector, FALSE);
     }
             
     // add everything back
@@ -1099,10 +1065,10 @@ void affect_total(CHAR_DATA *ch)
     for(af = ch->affected; af; af=af->next)
     {
 //      bool secFix = FALSE;
-        affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE,isaff2(af->type));
+        affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE);
     }
     add_totem_stats(ch);
-    REMOVE_BIT(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT); // so weapons stop fall off
+    REMBIT(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT); // so weapons stop fall off
 }
 
 
@@ -1123,7 +1089,7 @@ void affect_to_char( CHAR_DATA *ch, struct affected_type *af )
     ch->affected = affected_alloc;
 
     affect_modify(ch, af->location, af->modifier,
-		  af->bitvector, TRUE,isaff2(af->type));
+		  af->bitvector, TRUE);
 }
 
 
@@ -1131,7 +1097,7 @@ void affect_to_char( CHAR_DATA *ch, struct affected_type *af )
 /* Remove an affected_type structure from a char (called when duration
    reaches zero). Pointer *af must never be NIL! Frees mem and calls 
    affect_location_apply                                                */
-void affect_remove( CHAR_DATA *ch, struct affected_type *af, int flags, bool aff2fix )
+void affect_remove( CHAR_DATA *ch, struct affected_type *af, int flags)
 {
     struct affected_type *hjp;
     char buf[200];
@@ -1144,8 +1110,7 @@ void affect_remove( CHAR_DATA *ch, struct affected_type *af, int flags, bool aff
     assert(ch);
     assert(ch->affected);
 
-    affect_modify(ch, af->location, af->modifier,
-		  af->bitvector, FALSE, isaff2(af->type));
+    affect_modify(ch, af->location, af->modifier, af->bitvector, FALSE);
 
 
     /* remove structure *af from linked list */
@@ -1173,7 +1138,7 @@ void affect_remove( CHAR_DATA *ch, struct affected_type *af, int flags, bool aff
       // That isn't handled in affect_modify
 
       case SPELL_IRON_ROOTS:
-         REMOVE_BIT(ch->affected_by2, AFF_NO_FLEE);
+         REMBIT(ch->affected_by, AFF_NO_FLEE);
          break;
       case SPELL_STONE_SKIN:  /* Stone skin wears off... Remove resistance */
          REMOVE_BIT(ch->resist, ISR_PIERCE);
@@ -1354,7 +1319,7 @@ void affect_from_char( CHAR_DATA *ch, int skill)
     for(hjp = ch->affected; hjp; hjp = afc) {
         afc = hjp->next;
 	if (hjp->type == (unsigned)skill)
-	    affect_remove( ch, hjp, 0, isaff2(hjp->type));
+	    affect_remove( ch, hjp, 0);
     }
 }
 
@@ -1397,7 +1362,7 @@ void affect_join( CHAR_DATA *ch, struct affected_type *af,
 	    if (avg_mod)
 		af->modifier /= 2;
 
-	    affect_remove(ch, hjp, SUPPRESS_ALL,isaff2(af->type));
+	    affect_remove(ch, hjp, SUPPRESS_ALL);
 	    affect_to_char(ch, af);
 	    found = TRUE;
 	}
@@ -1431,14 +1396,14 @@ int char_from_room(CHAR_DATA *ch)
        if(i->next_in_room == ch)
          i->next_in_room = ch->next_in_room;
     }
-  if (IS_NPC(ch) && IS_SET(ch->mobdata->actflags, ACT_NOMAGIC))
+  if (IS_NPC(ch) && ISSET(ch->mobdata->actflags, ACT_NOMAGIC))
 	debugpoint();
   for(i = world[ch->in_room].people; i; i = i->next_in_room) {
-     if (IS_NPC(i) && IS_SET(i->mobdata->actflags, ACT_NOMAGIC))
+     if (IS_NPC(i) && ISSET(i->mobdata->actflags, ACT_NOMAGIC))
 	Other = TRUE;
-     if (IS_NPC(i) && IS_SET(i->mobdata->actflags, ACT_NOTRACK))
+     if (IS_NPC(i) && ISSET(i->mobdata->actflags, ACT_NOTRACK))
 	 More = TRUE;
-     if (IS_NPC(i) && IS_SET(i->mobdata->actflags, ACT_NOKI))
+     if (IS_NPC(i) && ISSET(i->mobdata->actflags, ACT_NOKI))
          kimore = TRUE;
      }
   if(!IS_NPC(ch)) // player
@@ -1446,18 +1411,18 @@ int char_from_room(CHAR_DATA *ch)
   if (IS_NPC(ch))
      ch->mobdata->last_room = ch->in_room;
   if (IS_NPC(ch))
-  if (IS_SET(ch->mobdata->actflags, ACT_NOTRACK) && !More && IS_SET(world[ch->in_room].iFlags, NO_TRACK))
+  if (ISSET(ch->mobdata->actflags, ACT_NOTRACK) && !More && IS_SET(world[ch->in_room].iFlags, NO_TRACK))
   {
     REMOVE_BIT(world[ch->in_room].iFlags,NO_TRACK);
     REMOVE_BIT(world[ch->in_room].room_flags, NO_TRACK);
   }
   if (IS_NPC(ch))
-  if (IS_SET(ch->mobdata->actflags, ACT_NOKI) && !kimore && IS_SET(world[ch->in_room].iFlags, NO_TRACK))
+  if (ISSET(ch->mobdata->actflags, ACT_NOKI) && !kimore && IS_SET(world[ch->in_room].iFlags, NO_TRACK))
   {
      REMOVE_BIT(world[ch->in_room].iFlags, NO_TRACK);
      REMOVE_BIT(world[ch->in_room].room_flags, NO_TRACK);
   }
-  if (IS_NPC(ch) && IS_SET(ch->mobdata->actflags, ACT_NOMAGIC) && !Other && IS_SET(world[ch->in_room].iFlags, NO_MAGIC))
+  if (IS_NPC(ch) && ISSET(ch->mobdata->actflags, ACT_NOMAGIC) && !Other && IS_SET(world[ch->in_room].iFlags, NO_MAGIC))
   {
     REMOVE_BIT(world[ch->in_room].iFlags, NO_MAGIC);
     REMOVE_BIT(world[ch->in_room].room_flags, NO_MAGIC);
@@ -1503,7 +1468,7 @@ int char_to_room(CHAR_DATA *ch, int room)
     world[room].light += ch->glow_factor;
     int a,i;
     if (!IS_NPC(ch) && 
-	IS_SET(ch->affected_by, AFF_HIDE) && (a = has_skill(ch, SKILL_HIDE)))
+	ISSET(ch->affected_by, AFF_HIDE) && (a = has_skill(ch, SKILL_HIDE)))
     {
 	for (i = 0; i < MAX_HIDE;i++)
 	  ch->pcdata->hiding_from[i] = NULL;
@@ -1523,7 +1488,7 @@ int char_to_room(CHAR_DATA *ch, int room)
     }
     for (temp = ch->next_in_room; temp; temp = temp->next_in_room)
     {
-      if (IS_SET(temp->affected_by, AFF_HIDE) && !IS_NPC(temp))
+      if (ISSET(temp->affected_by, AFF_HIDE) && !IS_NPC(temp))
         for (i = 0; i < MAX_HIDE; i++)
 	{
 	  if (temp->pcdata->hiding_from[i] == NULL
@@ -1543,17 +1508,17 @@ int char_to_room(CHAR_DATA *ch, int room)
     if(!IS_NPC(ch)) // player
       zone_table[world[room].zone].players++;
   if (IS_NPC(ch)) { 
-    if (IS_SET(ch->mobdata->actflags, ACT_NOMAGIC) && !IS_SET(world[room].room_flags, NO_MAGIC))
+    if (ISSET(ch->mobdata->actflags, ACT_NOMAGIC) && !IS_SET(world[room].room_flags, NO_MAGIC))
     {
 	SET_BIT(world[room].iFlags, NO_MAGIC);
 	SET_BIT(world[room].room_flags, NO_MAGIC);
     }
-    if (IS_SET(ch->mobdata->actflags, ACT_NOKI) && !IS_SET(world[room].room_flags, NO_KI))
+    if (ISSET(ch->mobdata->actflags, ACT_NOKI) && !IS_SET(world[room].room_flags, NO_KI))
     {
 	SET_BIT(world[room].iFlags, NO_KI);
 	SET_BIT(world[room].room_flags, NO_KI);
     }
-    if (IS_SET(ch->mobdata->actflags, ACT_NOTRACK) && !IS_SET(world[room].room_flags, NO_TRACK))
+    if (ISSET(ch->mobdata->actflags, ACT_NOTRACK) && !IS_SET(world[room].room_flags, NO_TRACK))
     {
 	SET_BIT(world[room].iFlags, NO_TRACK);
 	SET_BIT(world[room].room_flags, NO_TRACK);
@@ -2717,7 +2682,7 @@ void extract_char(CHAR_DATA *ch, bool pull)
     {
       dc_free(ch->group_name);
       ch->group_name = NULL;
-      REMOVE_BIT(ch->affected_by,AFF_GROUP); // shrug
+      REMBIT(ch->affected_by,AFF_GROUP); // shrug
     }
 
     if ( ch->fighting )
@@ -2731,7 +2696,7 @@ void extract_char(CHAR_DATA *ch, bool pull)
     }
     // remove any and all affects from the character
     while(ch->affected)
-      affect_remove(ch, ch->affected, SUPPRESS_ALL,isaff2(ch->affected->type));
+      affect_remove(ch, ch->affected, SUPPRESS_ALL);
 
     /* Must remove from room before removing the equipment! */
     was_in = ch->in_room;
@@ -3554,7 +3519,7 @@ void add_memory(CHAR_DATA *ch, char *victim, char type)
     return;
 
   // pets don't know to hate people
-  if(IS_AFFECTED(ch, AFF_CHARM) || IS_AFFECTED2(ch, AFF_FAMILIAR))
+  if(IS_AFFECTED(ch, AFF_CHARM) || IS_AFFECTED(ch, AFF_FAMILIAR))
     return;
 
   if(type == 'h')

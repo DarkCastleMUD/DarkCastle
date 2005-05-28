@@ -36,7 +36,6 @@ int do_clearaff(struct char_data *ch, char *argument, int cmd)
     else {
   for(af = victim->affected; af; af = afpk) {
     afpk = af->next;
-        bool isaff2(int spellnum);
     if(af->type != FUCK_CANTQUIT &&
        af->type != SKILL_LAY_HANDS &&
        af->type != SKILL_HARM_TOUCH &&
@@ -44,7 +43,7 @@ int do_clearaff(struct char_data *ch, char *argument, int cmd)
        af->type != SKILL_QUIVERING_PALM &&
        af->type != SKILL_INNATE_TIMER &&
         af->type != SPELL_HOLY_AURA_TIMER)
-      affect_remove(victim, af, SUPPRESS_ALL,isaff2(af->type));
+      affect_remove(victim, af, SUPPRESS_ALL);
   }
   send_to_char("Done.\r\n",ch);
   send_to_char("Your affects have been cleared.\r\n",victim);
@@ -153,7 +152,7 @@ int do_pardon(struct char_data *ch, char *argument, int cmd)
     }
     else if(!str_cmp("killer", flag))
     {
-      if (IS_SET(victim->affected_by, AFF_CANTQUIT))
+      if (ISSET(victim->affected_by, AFF_CANTQUIT))
       {
         send_to_char("Killer flag removed.\n\r",ch);
         affect_from_char(victim, FUCK_CANTQUIT);

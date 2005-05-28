@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: shop.cpp,v 1.17 2005/05/12 21:14:55 shane Exp $ */
+/* $Id: shop.cpp,v 1.18 2005/05/28 18:56:10 shane Exp $ */
 
 extern "C"
 {
@@ -68,7 +68,7 @@ int is_ok( CHAR_DATA *keeper, CHAR_DATA *ch, int shop_nr )
     // Undesirables.
     // TODO - Figure out if KILLER does anything we want to kill...
     // If not, let's use the AFF bit for something useful....
-    if ( IS_SET(ch->affected_by, AFF_KILLER) )
+    if ( ISSET(ch->affected_by, AFF_KILLER) )
     {
         do_say( keeper, "Go away before I call the guards!!", 0 );
         sprintf( buf, "%s the KILLER is over here!\n\r", GET_SHORT(ch) );

@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.74 2005/05/17 14:45:11 apocalypse Exp $ */
+/* $Id: mob_proc.cpp,v 1.75 2005/05/28 18:56:10 shane Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -753,7 +753,7 @@ int active_magic_user2(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
           return eSUCCESS;
       }
 
-   if (IS_SET(ch->mobdata->actflags, ACT_WIMPY)) {
+   if (ISSET(ch->mobdata->actflags, ACT_WIMPY)) {
 
      percent = (100*GET_HIT(ch)) / GET_MAX_HIT(ch);
 
@@ -1978,7 +1978,7 @@ int secret_agent(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 
     /* for ( tch = world[ch->in_room].people; tch; tch = tch->next_in_room )
     {
-	if ( IS_SET(tch->affected_by, AFF_KILLER) )
+	if ( ISSET(tch->affected_by, AFF_KILLER) )
 	    strName = "KILLER";
 	else
 	    continue;
@@ -2013,7 +2013,7 @@ int Executioner(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 
     /* for ( tch = world[ch->in_room].people; tch; tch = tch->next_in_room )
     {
-	if ( IS_SET(tch->affected_by, AFF_KILLER) )
+	if ( ISSET(tch->affected_by, AFF_KILLER) )
 	    strName = "KILLER";
 	else
 	    continue;
@@ -3573,7 +3573,7 @@ int pet_shops(struct char_data *ch, int cmd, char *arg)
 	 */
 	pet = clone_mobile(pet->mobdata->nr);
 	GET_EXP(pet) = 0;
-	SET_BIT(pet->affected_by, AFF_CHARM);
+	SETBIT(pet->affected_by, AFF_CHARM);
 
       /* people were using this to steal plats from people transing in meta */
 	if ( /* *pet_name */  0) {
@@ -5389,9 +5389,9 @@ int druid_familiar_owl_non(struct char_data *ch, struct obj_data *obj, int cmd, 
      int oldroom = ch->in_room;
      char_from_room(ch);
      char_to_room(ch, to_room);
-     SET_BIT(ch->affected_by, AFF_TRUE_SIGHT);
+     SETBIT(ch->affected_by, AFF_TRUE_SIGHT);
      do_look(ch, "", 9);
-     if (!ts) REMOVE_BIT(ch->affected_by, AFF_TRUE_SIGHT);
+     if (!ts) REMBIT(ch->affected_by, AFF_TRUE_SIGHT);
      char_from_room(ch);
      char_to_room(ch, oldroom);
      return eSUCCESS;

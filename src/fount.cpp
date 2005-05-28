@@ -8,7 +8,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: fount.cpp,v 1.2 2002/06/13 04:41:07 dcastle Exp $ */
+/* $Id: fount.cpp,v 1.3 2005/05/28 18:56:10 shane Exp $ */
 
 extern "C"
 {
@@ -22,8 +22,8 @@ extern "C"
 
 #include <room.h>
 #include <obj.h>
-#include <utility.h>
 #include <character.h>
+#include <utility.h>
 #include <act.h>
 #include <db.h>
 

@@ -84,7 +84,7 @@ const struct golem_data golem_list[] = {
 
 void shatter_message(CHAR_DATA *ch)
 {
-   int golemtype = !IS_AFFECTED2(ch, AFF_GOLEM); // 0 or 1
+   int golemtype = !IS_AFFECTED(ch, AFF_GOLEM); // 0 or 1
    act(golem_list[golemtype].shatter_message, ch, 0, 0, TO_ROOM,0);
 }
 void release_message(CHAR_DATA *ch)
@@ -161,7 +161,7 @@ void save_golem_data(CHAR_DATA *ch)
   FILE *fpfile = NULL;
   int golemtype = 0;
   if (IS_NPC(ch) || GET_CLASS(ch) != CLASS_MAGIC_USER || !ch->pcdata->golem) return;
-  golemtype = !IS_AFFECTED2(ch->pcdata->golem, AFF_GOLEM); // 0 or 1
+  golemtype = !IS_AFFECTED(ch->pcdata->golem, AFF_GOLEM); // 0 or 1
   sprintf(file,"%s/%c/%s.%d",FAMILIAR_DIR, ch->name[0], ch->name,golemtype);
   if (!(fpfile = dc_fopen(file,"w")))
   {
@@ -179,7 +179,7 @@ void save_golem_data(CHAR_DATA *ch)
 
 void advance_golem_level(CHAR_DATA *golem)
 {
-  int golemtype = !IS_AFFECTED2(golem, AFF_GOLEM); // 0 or 1
+  int golemtype = !IS_AFFECTED(golem, AFF_GOLEM); // 0 or 1
   golem->max_hit = golem->raw_hit = (golem->raw_hit + (golem_list[golemtype].max_hp/20));
   GET_HIT(golem) += golem_list[golemtype].max_hp/20;
   golem->hitroll += golem_list[golemtype].hit / 20;
@@ -196,14 +196,13 @@ void set_golem(CHAR_DATA *golem, int golemtype)
         golem->long_desc = str_hsh(golem_list[golemtype].long_desc);
 	golem->description = str_hsh(golem_list[golemtype].description);
         golem->title = 0;
-        golem->affected_by2 = 0;
         if (!golemtype)
-          SET_BIT(golem->affected_by2, AFF_GOLEM);
-        SET_BIT(golem->affected_by, AFF_INFRARED);
-        SET_BIT(golem->affected_by2, AFF_STABILITY);
-        golem->mobdata->actflags = ACT_2ND_ATTACK;
+          SETBIT(golem->affected_by, AFF_GOLEM);
+        SETBIT(golem->affected_by, AFF_INFRARED);
+        SETBIT(golem->affected_by, AFF_STABILITY);
+        SETBIT(golem->mobdata->actflags, ACT_2ND_ATTACK);
 	golem->misc = MISC_IS_MOB;
-        golem->affected_by = 0;
+        golem->affected_by[0] = -1;
         golem->armor = 0;
         golem->level = 1;
         golem->hitroll = golem_list[golemtype].hit / 20;
@@ -293,12 +292,12 @@ int cast_create_golem(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA 
   if (IS_SET(retval, eEXTRA_VALUE))
   {
     send_to_char("Adding in the final ingredient, your golem increases in strength!\r\n",ch);
-    SET_BIT(golem->affected_by, golem_list[i].special_aff);
+    SETBIT(golem->affected_by, golem_list[i].special_aff);
     SET_BIT(golem->resist, golem_list[i].special_res);
   }
   char_to_room(golem, ch->in_room);
   add_follower(golem, ch, 0);
-  SET_BIT(golem->affected_by, AFF_CHARM);
+  SETBIT(golem->affected_by, AFF_CHARM);
 //  struct affected_type af;
   send_to_char(golem_list[i].creation_message,ch);
   return eSUCCESS;
@@ -434,7 +433,7 @@ int do_golem_score(struct char_data *ch, char *argument, int cmd)
        sprintf(buf, "|%c| Affected by %-22s          Modifier %-16s  |%c|\n\r",
                frills[level],"INFRARED","NONE",frills[level]);
         send_to_char(buf,master);
-       if (IS_SET(ch->affected_by, AFF_LIGHTNINGSHIELD))
+       if (ISSET(ch->affected_by, AFF_LIGHTNINGSHIELD))
        sprintf(buf, "|%c| Affected by %-22s          Modifier %-16s  |%c|\n\r",
                frills[level],"LIGHTNING SHIELD","NONE",frills[level]);
         send_to_char(buf,master);

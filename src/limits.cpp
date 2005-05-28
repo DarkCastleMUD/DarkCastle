@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.58 2005/05/16 11:04:51 shane Exp $ */
+/* $Id: limits.cpp,v 1.59 2005/05/28 18:56:10 shane Exp $ */
 
 extern "C"
 {
@@ -231,7 +231,7 @@ int hit_gain(CHAR_DATA *ch)
      gain += con_app[GET_CON(ch)].hp_regen;
       gain += GET_CON(ch);
   }
-  if (ch->affected_by2 & AFF_REGENERATION)
+  if (ISSET(ch->affected_by, AFF_REGENERATION))
     gain += (gain/2);
 
   if((GET_COND(ch, FULL)==0) || (GET_COND(ch, THIRST)==0))
@@ -722,7 +722,7 @@ void point_update( void )
 
     int a;
      CHAR_DATA *temp;
-    if (!IS_NPC(i) && IS_SET(i->affected_by, AFF_HIDE) && (a = 
+    if (!IS_NPC(i) && ISSET(i->affected_by, AFF_HIDE) && (a = 
 has_skill(i, SKILL_HIDE)))
     {
 	int o;

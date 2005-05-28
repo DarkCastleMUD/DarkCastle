@@ -21,7 +21,6 @@ extern "C"
 #endif
 
 #include <assert.h>
-#include <utility.h>
 #include <terminal.h>
 #include <connect.h>
 #include <levels.h>
@@ -32,6 +31,7 @@ extern "C"
 #include <obj.h>
 #include <handler.h>
 #include <interp.h>
+#include <utility.h>
 #include <act.h>
 #include <db.h>
 #include <returnvals.h>

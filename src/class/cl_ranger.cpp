@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: cl_ranger.cpp,v 1.56 2005/05/08 21:43:06 shane Exp $ | cl_ranger.C  *
+ * $Id: cl_ranger.cpp,v 1.57 2005/05/28 18:56:17 shane Exp $ | cl_ranger.C  *
  * Description: Ranger skills/spells                                          *
  *                                                                            *
  * Revision History                                                           *
@@ -126,7 +126,7 @@ int do_tame(CHAR_DATA *ch, char *arg, int cmd)
   WAIT_STATE(ch, PULSE_VIOLENCE * 1);
 
   if((IS_SET(victim->immune, ISR_CHARM)) ||
-      !IS_SET(victim->mobdata->actflags, ACT_CHARM)) {
+      !ISSET(victim->mobdata->actflags, ACT_CHARM)) {
     act("$N is wilder than you thought.", ch, NULL, victim, TO_CHAR, 0);
     return eFAILURE;
   }
@@ -221,7 +221,7 @@ int do_track(CHAR_DATA *ch, char *argument, int cmd)
   // TODO - once we're sure that act_mob is properly checking for this,
   // and that it isn't call from anywhere else, we can probably remove it.
   // That way possessing imms can track.
-  if(IS_MOB(ch) && IS_SET(ch->mobdata->actflags, ACT_STUPID)) {
+  if(IS_MOB(ch) && ISSET(ch->mobdata->actflags, ACT_STUPID)) {
     send_to_char("Being stupid, you cannot find any..\r\n", ch);
     return eFAILURE;
   }
@@ -275,7 +275,7 @@ int do_track(CHAR_DATA *ch, char *argument, int cmd)
 
           if (IS_NPC(ch)) {
                    // temp disable tracking mobs into town
-             if ( (/*!IS_SET(ch->mobdata->actflags, ACT_STAY_NO_TOWN) ||*/
+             if ( (/*!ISSET(ch->mobdata->actflags, ACT_STAY_NO_TOWN) ||*/
 	           !IS_SET(zone_table[world[EXIT(ch, y)->to_room].zone].zone_flags, ZONE_IS_TOWN)
                   ) 
                  && !IS_SET(world[EXIT(ch, y)->to_room].room_flags,NO_TRACK)) 
@@ -439,7 +439,7 @@ int ambush(CHAR_DATA *ch)
        else if(!has_skill(i, SKILL_AMBUSH))
          continue;
 
-       if(IS_AFFECTED2(ch, AFF_ALERT)) {
+       if(IS_AFFECTED(ch, AFF_ALERT)) {
           send_to_char("Your target is far too alert to accomplish an ambush!\r\n", i);
           continue;
        }
@@ -806,7 +806,7 @@ int mob_arrow_response(struct char_data *ch, struct char_data *victim,
      the waterwheel around shire though. 
   */
 
-  if(IS_SET(victim->mobdata->actflags, ACT_STUPID))
+  if(ISSET(victim->mobdata->actflags, ACT_STUPID))
   {
     if(!number(0,20))
        do_shout(victim, "Duh George, someone keeps shooting me!", 9);    
@@ -835,7 +835,7 @@ int mob_arrow_response(struct char_data *ch, struct char_data *victim,
       dir2 = number(0,5);
       if(CAN_GO(ch, dir2))
        if(EXIT(victim, dir2)) {
-          if(!( IS_SET(victim->mobdata->actflags, ACT_STAY_NO_TOWN) &&
+          if(!( ISSET(victim->mobdata->actflags, ACT_STAY_NO_TOWN) &&
                 IS_SET(zone_table[world[EXIT(victim, dir2)->to_room].zone].zone_flags, ZONE_IS_TOWN)
               )
              && !IS_SET(world[EXIT(victim, dir2)->to_room].room_flags,NO_TRACK))
@@ -856,7 +856,7 @@ int mob_arrow_response(struct char_data *ch, struct char_data *victim,
        dir2 = number(0, 5);
     if(EXIT(victim, dir2)) {
         if(CAN_GO(ch, dir2))
-        if(!(IS_SET(victim->mobdata->actflags, ACT_STAY_NO_TOWN) &&
+        if(!(ISSET(victim->mobdata->actflags, ACT_STAY_NO_TOWN) &&
              IS_SET(zone_table[world[EXIT(victim, dir2)->to_room].zone].zone_flags, ZONE_IS_TOWN)))
         if(!IS_SET(world[EXIT(victim, dir2)->to_room].room_flags,NO_TRACK))       
         {

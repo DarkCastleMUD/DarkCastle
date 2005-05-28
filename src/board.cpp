@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: board.cpp,v 1.9 2005/04/09 21:15:27 urizen Exp $
+| $Id: board.cpp,v 1.10 2005/05/28 18:56:09 shane Exp $
 | board.C
 | Description:  This file contains the implementation for the board
 |   code.  It's old and should be rewritten --Morc XXX
@@ -44,13 +44,13 @@ extern "C"
 #include <room.h>
 #include <obj.h>
 #include <player.h> // MAX_*
-#include <utility.h> // FALSE
 #include <connect.h> // CON_WRITE_BOARD
 #include <terminal.h> // BOLD
 #include <fileinfo.h> // for the board files
 #include <levels.h> // levels..
 #include <clan.h>
 #include <character.h> 
+#include <utility.h> // FALSE
 #include <memory.h>
 #include <act.h>
 #include <db.h>

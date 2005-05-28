@@ -702,7 +702,7 @@ int spell_earthquake(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
          {
                   if(IS_NPC(ch) && IS_NPC(tmp_victim)) // mobs don't earthquake each other
                     continue;
-                  if(IS_AFFECTED2(tmp_victim, AFF_FREEFLOAT))
+                  if(IS_AFFECTED(tmp_victim, AFF_FREEFLOAT))
                     retval = spell_damage(ch, tmp_victim, 0, TYPE_MAGIC, SPELL_EARTHQUAKE, 0);
                   else retval = spell_damage(ch, tmp_victim, dam, TYPE_MAGIC, SPELL_EARTHQUAKE, 0);
 	 } 
@@ -873,7 +873,7 @@ int spell_solar_gate(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
                 if(IS_NPC(tmp_victim))  {
                   add_memory(tmp_victim, GET_NAME(ch), 'h');
   if (!IS_NPC(ch) && IS_NPC(tmp_victim))
-     if (!IS_SET(tmp_victim->mobdata->actflags, ACT_STUPID) && !tmp_victim->hunting) 
+     if (!ISSET(tmp_victim->mobdata->actflags, ACT_STUPID) && !tmp_victim->hunting) 
      {
        if (GET_LEVEL(ch) - GET_LEVEL(tmp_victim)/2 > 0)
           {
@@ -895,7 +895,7 @@ int spell_solar_gate(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
 		if(GET_POS(tmp_victim) != POSITION_STANDING)
                     GET_POS(tmp_victim) = POSITION_STANDING;
 		  if(!IS_AFFECTED(tmp_victim, AFF_BLIND) &&
-                     !IS_SET(tmp_victim->mobdata->actflags, ACT_STUPID)&&
+                     !ISSET(tmp_victim->mobdata->actflags, ACT_STUPID)&&
   		     !tmp_victim->fighting)
 		    do_move(tmp_victim, "", to_charge[i]);
 	        }
@@ -1203,7 +1203,7 @@ int spell_teleport(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data
               IS_SET(world[to_room].room_flags, ARENA) ||
               world[to_room].sector_type == SECT_UNDERWATER ||
               IS_SET(zone_table[world[to_room].zone].zone_flags, ZONE_NO_TELEPORT) ||
-              ( (IS_NPC(victim) && IS_SET(victim->mobdata->actflags, ACT_STAY_NO_TOWN)) ? 
+              ( (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_STAY_NO_TOWN)) ? 
                     (IS_SET(zone_table[world[to_room].zone].zone_flags, ZONE_IS_TOWN)) :
                     FALSE
                )
@@ -1526,7 +1526,7 @@ int spell_remove_blind(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
          act("$N can see again!", ch, 0, victim, TO_CHAR, 0);         
     }
     if (IS_AFFECTED(victim, AFF_BLIND)) {
-      REMOVE_BIT(victim->affected_by, AFF_BLIND);
+      REMBIT(victim->affected_by, AFF_BLIND);
       send_to_char("Your vision returns!\n\r", victim);
       if(victim != ch)
          act("$N can see again!", ch, 0, victim, TO_CHAR, 0);
@@ -2253,26 +2253,25 @@ int spell_poison(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *
 {
   struct affected_type af;
   int retval = eSUCCESS;
-   bool endy = FALSE; 
+  bool endy = FALSE; 
+
   if (victim) 
   {
-    set_cantquit(ch, victim);
-   if (IS_SET(victim->immune, ISR_POISON) || (number(1,101) < (get_saves(victim, SAVE_TYPE_POISON) + 5 - (skill < 40 ? 5 : 0) - (skill < 60 ? 5 : 0) - (skill < 80 ? 5 : 0))))
-   {
-act("$N resists your attempt to poison $M!", ch, NULL, victim, 
-TO_CHAR,0);
-act("$N resists $n's attempt to poison $M!", ch, NULL, victim, TO_ROOM,
-NOTVICT);
-act("You resist $n's attempt to posion you!",ch,NULL,victim,TO_VICT,0);
-  endy = TRUE;
-} 
+     set_cantquit(ch, victim);
+     if (IS_SET(victim->immune, ISR_POISON) || (number(1,101) < (get_saves(victim, SAVE_TYPE_POISON) + 5 - (skill < 40 ? 5 : 0) - (skill < 60 ? 5 : 0) - (skill < 80 ? 5 : 0))))
+     {
+         act("$N resists your attempt to poison $M!", ch, NULL, victim, TO_CHAR,0);
+         act("$N resists $n's attempt to poison $M!", ch, NULL, victim, TO_ROOM,NOTVICT);
+         act("You resist $n's attempt to posion you!",ch,NULL,victim,TO_VICT,0);
+         endy = TRUE;
+     } 
      if (IS_NPC(victim) && (!victim->fighting) && GET_POS(ch) > POSITION_SLEEPING) {
          retval = attack(victim, ch, TYPE_UNDEFINED);
          retval = SWAP_CH_VICT(retval);
          return retval;
       }
-    if (endy)
-     return eFAILURE;
+      if (endy)
+         return eFAILURE;
 
         af.type = SPELL_POISON;
         af.duration = 3 + (skill > 33) + (skill > 60) + (skill > 80);
@@ -2331,7 +2330,7 @@ int spell_protection_from_good(byte level, CHAR_DATA *ch, CHAR_DATA *victim, str
 
   int duration = 6 + (skill>40)*4 + (skill>60)*4 + (skill>80)*4;
   int modifier = level + skill/5;
-  if (IS_AFFECTED2(victim,AFF_PROTECT_GOOD) || IS_AFFECTED(victim, AFF_PROTECT_EVIL) || affected_by_spell(victim, SPELL_PROTECT_FROM_EVIL))
+  if (IS_AFFECTED(victim,AFF_PROTECT_GOOD) || IS_AFFECTED(victim, AFF_PROTECT_EVIL) || affected_by_spell(victim, SPELL_PROTECT_FROM_EVIL))
 	 return eFAILURE;
 
   if (!affected_by_spell(victim, SPELL_PROTECT_FROM_GOOD)) 
@@ -2871,7 +2870,7 @@ int spell_sleep(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
 
      /* You can't sleep someone higher level than you*/
   if(affected_by_spell(victim, SPELL_INSOMNIA)
-     || IS_AFFECTED2(victim, AFF_INSOMNIA)) {
+     || IS_AFFECTED(victim, AFF_INSOMNIA)) {
       act("$N does not look sleepy!", ch, NULL, victim, TO_CHAR, 0);
       retval = one_hit(victim, ch, TYPE_UNDEFINED, FIRST);
       retval = SWAP_CH_VICT(retval);
@@ -3139,7 +3138,7 @@ int spell_wizard_eye(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
     return eFAILURE;
   }
 
-  if(IS_AFFECTED2(victim, AFF_FOREST_MELD)) {
+  if(IS_AFFECTED(victim, AFF_FOREST_MELD)) {
     send_to_char("Your target's location is hidden by the forests.\r\n", ch);
     return eFAILURE;
   }
@@ -3322,7 +3321,7 @@ int spell_charm_person(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
   }
 
   if(IS_SET(victim->immune, ISR_CHARM) ||
-		(IS_MOB(victim) && !IS_SET(victim->mobdata->actflags, ACT_CHARM))) {
+		(IS_MOB(victim) && !ISSET(victim->mobdata->actflags, ACT_CHARM))) {
 	 act("$N laughs at your feeble charm attempt.", ch, NULL, victim,
 		  TO_CHAR, 0);
 	 return eFAILURE;
@@ -3823,7 +3822,7 @@ int spell_fear(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *ob
 	int retval;
 	 assert(victim && ch);
          char buf[256]; 
-	 if(IS_NPC(victim) && IS_SET(victim->mobdata->actflags, ACT_STUPID)) {
+	 if(IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_STUPID)) {
            sprintf(buf, "%s doesn't understand your psychological tactics.\n\r",
                    GET_SHORT(victim));
            send_to_char(buf, ch);
@@ -3917,7 +3916,7 @@ int spell_fly(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj
   }
 
   if((cur_af = affected_by_spell(victim, SPELL_FLY)))
-    affect_remove(victim, cur_af, SUPPRESS_ALL,FALSE);
+    affect_remove(victim, cur_af, SUPPRESS_ALL);
 
   if(IS_AFFECTED(victim, AFF_FLYING))
     return eFAILURE;
@@ -4086,7 +4085,7 @@ int spell_know_alignment(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct ob
   }
 
   if((cur_af = affected_by_spell(victim, SPELL_KNOW_ALIGNMENT)))
-    affect_remove(victim, cur_af, SUPPRESS_ALL, FALSE);
+    affect_remove(victim, cur_af, SUPPRESS_ALL);
 
   if (learned <= 40)
     duration = level / 5;
@@ -4203,7 +4202,7 @@ int spell_dispel_minor(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
             }
             if (IS_AFFECTED(victim, AFF_INVISIBLE))
             {
-               REMOVE_BIT(victim->affected_by, AFF_INVISIBLE);
+               REMBIT(victim->affected_by, AFF_INVISIBLE);
                send_to_char("You feel your invisibility dissipate.\n\r", victim);
                act("$n fades into existence.", victim, 0, 0, TO_ROOM, 0);
                done = TRUE;
@@ -4300,7 +4299,7 @@ int spell_dispel_minor(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
             }
  	    if (IS_AFFECTED(victim, AFF_FLYING))
             {
-               REMOVE_BIT(victim->affected_by, AFF_FLYING);
+               REMBIT(victim->affected_by, AFF_FLYING);
                send_to_char("You do not feel lighter than air anymore.\n\r", victim);
                act("$n drops to the ground, no longer lighter than air.", victim, 0, 0, TO_ROOM, 0);
                done = TRUE;
@@ -4387,7 +4386,7 @@ int spell_dispel_magic(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
 
    set_cantquit(ch, victim);
 
-   if(IS_SET(victim->affected_by2, AFF_GOLEM)) {
+   if(ISSET(victim->affected_by, AFF_GOLEM)) {
       send_to_char("The golem seems to shrug off your dispel attempt!\r\n", ch);
       act("The golem seems to ignore $n's dispelling magic!", ch, 0, 0, TO_ROOM, 0);
       return eFAILURE;
@@ -4449,7 +4448,7 @@ int spell_dispel_magic(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
            }
            if (IS_AFFECTED(victim, AFF_SANCTUARY))
            {
-              REMOVE_BIT(victim->affected_by, AFF_SANCTUARY);
+              REMBIT(victim->affected_by, AFF_SANCTUARY);
               act("You don't feel so invunerable anymore.", ch, 0,victim, TO_VICT, 0);
               act("The $B$7white glow$R around $n's body fades.", victim, 0, 0, TO_ROOM, 0);
               done = TRUE;
@@ -4499,7 +4498,7 @@ int spell_dispel_magic(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
 	 case 6: 
 	   if (IS_AFFECTED(victim, AFF_FROSTSHIELD))
            {
-	      REMOVE_BIT(victim->affected_by, AFF_FROSTSHIELD);
+	      REMBIT(victim->affected_by, AFF_FROSTSHIELD);
               act("Your shield of $B$3frost$R melts into nothing!.", ch, 0,victim, TO_VICT, 0);
               act("The $B$3frost$R encompassing $n's body melts away.", victim, 0, 0, TO_ROOM, 0);
               done = TRUE;
@@ -4525,7 +4524,7 @@ int spell_dispel_magic(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
            }
            if (IS_AFFECTED(victim, AFF_FIRESHIELD))
            {
-              REMOVE_BIT(victim->affected_by, AFF_FIRESHIELD);
+              REMBIT(victim->affected_by, AFF_FIRESHIELD);
               act("Your $B$4flames$R have been extinguished!", ch, 0,victim, TO_VICT, 0);
               act("The $B$4flames$R encompassing $n's body are extinguished!", victim, 0, 0, TO_ROOM, 0);
               done = TRUE;
@@ -5200,7 +5199,7 @@ int spell_portal(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *
       GET_MANA(ch) += 25;
     return eFAILURE;
   }
-  if(IS_AFFECTED2(victim, AFF_SHADOWSLIP)) {
+  if(IS_AFFECTED(victim, AFF_SHADOWSLIP)) {
     send_to_char("You can't seem to find a definite path.\n\r", ch);
     if(GET_CLASS(ch) == CLASS_CLERIC)
       GET_MANA(ch) += 100;
@@ -8986,8 +8985,8 @@ int cast_forest_meld(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *
      affect_to_char(ch, &af);
 
         
-// 	SET_BIT(ch->affected_by2, AFF_FOREST_MELD);
-        SET_BIT(ch->affected_by, AFF_HIDE);
+// 	SETBIT(ch->affected_by, AFF_FOREST_MELD);
+        SETBIT(ch->affected_by, AFF_HIDE);
 	return eSUCCESS;
 }
 
@@ -9035,7 +9034,7 @@ int cast_companion(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *vi
          sprintf(name, "fire ");
          mob->max_hit += 300;
          if (dice(1, 100) == 1)	// they got the .25% chance - very lucky
-            SET_BIT(mob->affected_by, AFF_FIRESHIELD);
+            SETBIT(mob->affected_by, AFF_FIRESHIELD);
          SET_BIT(mob->resist, ISR_FIRE);
          break;
       case 2:
@@ -9243,7 +9242,7 @@ int spell_create_golem(int level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
   mob->description = str_hsh(buf); 
   GET_SHORT_ONLY(mob) = str_hsh("A gruesome golem");
   mob->long_desc = str_hsh("A golem created of twisted magic, stands here motionless.\r\n");
-  REMOVE_BIT(mob->mobdata->actflags, ACT_SCAVENGER);
+  REMBIT(mob->mobdata->actflags, ACT_SCAVENGER);
   REMOVE_BIT(mob->immune, ISR_PIERCE);
   REMOVE_BIT(mob->immune, ISR_SLASH);
 
@@ -9261,7 +9260,7 @@ int spell_create_golem(int level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
   GET_DAMROLL(mob) = GET_DAMROLL(victim) + number(1, GET_WIS(ch));
   GET_POS(mob) = POSITION_STANDING;
   GET_ALIGNMENT(mob) = GET_ALIGNMENT(ch);
-  SET_BIT(mob->affected_by2, AFF_GOLEM);
+  SETBIT(mob->affected_by, AFF_GOLEM);
   // kill um all!
   k = ch->followers;
   while(k) 
@@ -9277,34 +9276,34 @@ int spell_create_golem(int level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
   // add random abilities
   if(number(1, 3) > 1)
   {
-    SET_BIT(mob->mobdata->actflags, ACT_2ND_ATTACK);
+    SETBIT(mob->mobdata->actflags, ACT_2ND_ATTACK);
     if(number(1, 2) == 1)
-      SET_BIT(mob->mobdata->actflags, ACT_3RD_ATTACK);
+      SETBIT(mob->mobdata->actflags, ACT_3RD_ATTACK);
   }      
 
   if(number(1, 15) == 15)
-    SET_BIT(mob->affected_by, AFF_SANCTUARY);
+    SETBIT(mob->affected_by, AFF_SANCTUARY);
 
   if(number(1,20) == 20)
-    SET_BIT(mob->affected_by, AFF_FIRESHIELD);
+    SETBIT(mob->affected_by, AFF_FIRESHIELD);
 
   if(number(1,2) == 2)
-    SET_BIT(mob->affected_by, AFF_DETECT_INVISIBLE);
+    SETBIT(mob->affected_by, AFF_DETECT_INVISIBLE);
 
   if(number(1,7) == 7)
-    SET_BIT(mob->affected_by, AFF_FLYING);
+    SETBIT(mob->affected_by, AFF_FLYING);
 
   if(number(1,10) == 10)
-    SET_BIT(mob->affected_by, AFF_SNEAK);
+    SETBIT(mob->affected_by, AFF_SNEAK);
 
   if(number(1,2) == 1)
-    SET_BIT(mob->affected_by, AFF_INFRARED);
+    SETBIT(mob->affected_by, AFF_INFRARED);
 
   if(number(1, 50) == 1)
-    SET_BIT(mob->affected_by, AFF_EAS);
+    SETBIT(mob->affected_by, AFF_EAS);
 
   if(number(1, 3) == 1)
-    SET_BIT(mob->affected_by, AFF_TRUE_SIGHT);
+    SETBIT(mob->affected_by, AFF_TRUE_SIGHT);
 
   // lag mage
   if(number(1,3) == 3  && GET_LEVEL(ch) < ARCHANGEL) {
@@ -9348,7 +9347,7 @@ int spell_release_golem(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DAT
    }
 
    while(temp && !done) {
-      if(IS_SET(temp->follower->affected_by2, AFF_GOLEM))
+      if(ISSET(temp->follower->affected_by, AFF_GOLEM))
          done = 1;
       else temp = temp->next;
    }
@@ -9569,7 +9568,7 @@ int spell_summon_familiar(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_D
 
   k = ch->followers;
   while(k)
-     if(IS_AFFECTED2(k->follower, AFF_FAMILIAR))
+     if(IS_AFFECTED(k->follower, AFF_FAMILIAR))
      {
        send_to_char("But you already have a devoted pet!\r\n", ch);
        return eFAILURE;
@@ -9579,7 +9578,7 @@ int spell_summon_familiar(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_D
   mob = clone_mobile(r_num);
   char_to_room(mob, ch->in_room);
 
-  SET_BIT(mob->affected_by2, AFF_FAMILIAR);
+  SETBIT(mob->affected_by, AFF_FAMILIAR);
 
   af.type = SPELL_SUMMON_FAMILIAR;
   af.duration = -1;
@@ -9863,13 +9862,13 @@ int spell_iron_roots(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
        affect_from_char(ch, SPELL_IRON_ROOTS);
        act("The tree roots encasing $n's legs sink away under the surface of the ground.", ch, 0, 0, TO_ROOM, INVIS_NULL);
        act("The roots release their hold upon you and melt away beneath the surface of the ground.", ch, 0, 0, TO_CHAR, 0);
-       REMOVE_BIT(ch->affected_by2, AFF_NO_FLEE);
+       REMBIT(ch->affected_by, AFF_NO_FLEE);
     }
     else {
        act("Tree roots spring from the ground bracing $n's legs, holding $m down firmly to the ground.", ch, 0, 0, TO_ROOM, INVIS_NULL);
        act("Tree roots spring from the ground firmly holding you to the ground.", ch, 0, 0, TO_CHAR, 0);
 
-       SET_BIT(ch->affected_by2, AFF_NO_FLEE);
+       SETBIT(ch->affected_by, AFF_NO_FLEE);
 
        af.type = SPELL_IRON_ROOTS;
        af.duration = level;
@@ -9965,8 +9964,7 @@ int spell_water_breathing(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct o
 
   
   if ((cur_af = affected_by_spell(victim, SPELL_WATER_BREATHING)))
-    affect_remove(victim, cur_af, SUPPRESS_ALL,FALSE);
-    //affect_from_char(victim, SPELL_WATER_BREATHING);
+    affect_remove(victim, cur_af, SUPPRESS_ALL);
 
   act("Small gills spring forth from $n's neck and begin fanning as $e breathes.", victim, 0, 0, TO_ROOM, INVIS_NULL);
   act("Your neck springs gills and the air around you suddenly seems very dry.", victim, 0, 0, TO_CHAR, 0);
@@ -10669,7 +10667,7 @@ int spell_dismiss_familiar(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct 
    victim = NULL;
 
    for(struct follow_type *k = ch->followers; k; k = k->next)
-     if(IS_MOB(k->follower) && IS_AFFECTED2(k->follower, AFF_FAMILIAR))
+     if(IS_MOB(k->follower) && IS_AFFECTED(k->follower, AFF_FAMILIAR))
      {
         victim = k->follower;
         break;

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.37 2005/05/27 23:46:48 urizen Exp $
+| $Id: cl_warrior.cpp,v 1.38 2005/05/28 18:56:17 shane Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -367,7 +367,7 @@ int do_bash(struct char_data *ch, char *argument, int cmd)
     if(!can_attack(ch) || !can_be_attacked(ch, victim))
       return eFAILURE;
 
-    if (IS_MOB(victim) && IS_SET(victim->mobdata->actflags, ACT_HUGE)) {
+    if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE)) {
       send_to_char("You can't bash something that HUGE!\n\r", ch);
          return eFAILURE;
     }
@@ -385,7 +385,7 @@ int do_bash(struct char_data *ch, char *argument, int cmd)
         return eFAILURE;
     }
 
-    if(IS_AFFECTED2(victim, AFF_STABILITY) && number(0,3) == 0) {
+    if(IS_AFFECTED(victim, AFF_STABILITY) && number(0,3) == 0) {
         act("You bounce off of $N and crash into the ground.", ch, 0, victim, TO_CHAR, 0);
         act("$n bounces off of you and crashes into the ground.", ch, 0, victim, TO_VICT, 0);
         act("$n bounces off of $N and crashes into the ground.", ch, 0, victim, TO_ROOM, NOTVICT);

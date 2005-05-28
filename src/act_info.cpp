@@ -21,10 +21,10 @@ extern "C"
 #include <dmalloc.h>
 #endif
 
-#include <utility.h>
 #include <obj.h>
 #include <mobile.h>
 #include <character.h>
+#include <utility.h>
 #include <player.h>
 #include <levels.h>
 #include <clan.h>

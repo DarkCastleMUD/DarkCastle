@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.132 2005/05/16 11:04:51 shane Exp $ */
+/* $Id: spells.cpp,v 1.133 2005/05/28 18:56:10 shane Exp $ */
 
 extern "C"
 {
@@ -830,8 +830,7 @@ void affect_update( void )
 	        send_to_char(spell_wear_off_msg[af->type], i);
 	        send_to_char("\n\r", i);
 	     }
-  	  bool isaff2(int spellnum);
-	  affect_remove(i, af, 0,isaff2(af->type));
+	  affect_remove(i, af, 0);
 	}
       }
   }
@@ -877,7 +876,7 @@ void extractFamiliar(CHAR_DATA *ch)
 {
     CHAR_DATA *victim = NULL;
     for(struct follow_type *k = ch->followers; k; k = k->next)
-     if(IS_MOB(k->follower) && IS_AFFECTED2(k->follower, AFF_FAMILIAR))
+     if(IS_MOB(k->follower) && IS_AFFECTED(k->follower, AFF_FAMILIAR))
      {
         victim = k->follower;
         break;
@@ -935,7 +934,7 @@ void stop_follower(CHAR_DATA *ch, int cmd)
     return;
   }
 /*
-  if(IS_SET(ch->affected_by2, AFF_FAMILIAR)) {
+  if(ISSET(ch->affected_by, AFF_FAMILIAR)) {
     do_emote(ch, "screams in pain as its connection with its master is broken.", 9); 
     extract_char(ch, TRUE);
     return;
@@ -993,7 +992,7 @@ void stop_follower(CHAR_DATA *ch, int cmd)
   if (cmd != CHANGE_LEADER) {
      if(affected_by_spell(ch, SPELL_CHARM_PERSON))
        affect_from_char(ch, SPELL_CHARM_PERSON);
-     REMOVE_BIT(ch->affected_by, AFF_CHARM | AFF_GROUP); 
+     REMBIT(ch->affected_by, AFF_CHARM | AFF_GROUP); 
   }
 }
 
@@ -1011,7 +1010,7 @@ void die_follower(CHAR_DATA *ch)
     for (k = ch->followers; k; k = j) {
 	j = k->next;
 	zombie = k->follower;
-        if(!IS_SET(zombie->affected_by2, AFF_GOLEM)) {
+        if(!ISSET(zombie->affected_by, AFF_GOLEM)) {
           if(affected_by_spell(zombie, SPELL_CHARM_PERSON))
              affect_from_char(zombie, SPELL_CHARM_PERSON);
 	  stop_follower(zombie, STOP_FOLLOW);
@@ -1037,7 +1036,7 @@ void add_follower(CHAR_DATA *ch, CHAR_DATA *leader, int cmd)
     struct follow_type *k;
 
     if (cmd != 2)
-      REMOVE_BIT(ch->affected_by, AFF_GROUP);
+      REMBIT(ch->affected_by, AFF_GROUP);
 
     assert(!ch->master);
 
@@ -1264,7 +1263,6 @@ int do_release(CHAR_DATA *ch, char *argument, int cmd)
        }
 	  ch->move -= 25;
 
-	  bool isaff2(int spellnum);
 	if (!done)
 	send_to_char("You release the spell.\r\n",ch);
              if (*spell_wear_off_msg[aff->type]) {
@@ -1272,7 +1270,7 @@ int do_release(CHAR_DATA *ch, char *argument, int cmd)
                 send_to_char("\n\r", ch);
              }
 
-	  affect_remove(ch,aff,0,isaff2(aff->type));
+	  affect_remove(ch,aff,0);
 	 done = TRUE;
        }
     }
@@ -1423,7 +1421,7 @@ bool skill_success(CHAR_DATA *ch, CHAR_DATA *victim, int skillnum, int mod )
   
   i = MIN(95, i);
   i = skillmax(ch, skillnum, i);
-  if (IS_AFFECTED2(ch, AFF_FOCUS) && 
+  if (IS_AFFECTED(ch, AFF_FOCUS) && 
 ((skillnum >= SKILL_SONG_BASE && 
 skillnum <= SKILL_SONG_MAX) || (skillnum >= KI_OFFSET && skillnum <= (KI_OFFSET+MAX_KI_LIST))))
    i = 101; // auto success on songs and ki with focus
@@ -1798,7 +1796,7 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
           chance += wis_app[GET_WIS(ch)].conc_bonus;
 	chance = MIN(95, chance);
 
-        if(GET_LEVEL(ch) < IMMORTAL && number(1,100) > chance && !IS_AFFECTED2(ch,AFF_FOCUS))
+        if(GET_LEVEL(ch) < IMMORTAL && number(1,100) > chance && !IS_AFFECTED(ch,AFF_FOCUS))
         {
           csendf(ch, "You lost your concentration and are unable to cast %s!\n\r", spells[spl-1]);
           GET_MANA(ch) -= (use_mana(ch, spl) >> 1);
@@ -1807,10 +1805,10 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
           return eSUCCESS;
         }
 
-        if (IS_AFFECTED(ch, AFF_INVISIBLE) && !IS_AFFECTED2(ch, AFF_ILLUSION)) {
+        if (IS_AFFECTED(ch, AFF_INVISIBLE) && !IS_AFFECTED(ch, AFF_ILLUSION)) {
            act("$n slowly fades into existence.", ch, 0, 0, TO_ROOM, 0);
            affect_from_char(ch, SPELL_INVISIBLE);
-           REMOVE_BIT(ch->affected_by, AFF_INVISIBLE);
+           REMBIT(ch->affected_by, AFF_INVISIBLE);
         }
 
         send_to_char("Ok.\n\r", ch);

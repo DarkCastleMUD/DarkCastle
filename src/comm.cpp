@@ -1521,7 +1521,7 @@ void write_to_output(char *txt, struct descriptor_data *t)
 
   size = strlen(txt);
 
-  if(t->character && IS_AFFECTED2(t->character, AFF_INSANE) && t->connected == CON_PLAYING)
+  if(t->character && IS_AFFECTED(t->character, AFF_INSANE) && t->connected == CON_PLAYING)
   {
 //    temp = str_dup(txt);
 //    scramble_text(temp);

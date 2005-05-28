@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: group.cpp,v 1.15 2005/04/09 21:15:27 urizen Exp $
+| $Id: group.cpp,v 1.16 2005/05/28 18:56:10 shane Exp $
 | group.C
 | Description:  Group related commands; join, abandon, follow, etc..
 */
@@ -121,7 +121,7 @@ int do_found(CHAR_DATA *ch, char *argument, int cmd)
     ch->pcdata->grplvl      = 0;
   }
 
-  SET_BIT(ch->affected_by, AFF_GROUP);
+  SETBIT(ch->affected_by, AFF_GROUP);
   REMOVE_BIT(ch->pcdata->toggles, PLR_LFG);
   return eSUCCESS;  
 }
@@ -351,11 +351,11 @@ int do_group(struct char_data *ch, char *argument, int cmd)
                 stop_grouped_bards(ch);
 		act("$n has been kicked out of the group!", victim, 0, ch, TO_ROOM, 0);
 		act("You are no longer a member of the group!", victim, 0, 0, TO_CHAR, ASLEEP);
-		REMOVE_BIT(victim->affected_by, AFF_GROUP);
+		REMBIT(victim->affected_by, AFF_GROUP);
         } else {
 		act("$n is now a group member.", victim, 0, 0, TO_ROOM, 0);
 		act("You are now a group member.", victim, 0, 0, TO_CHAR, ASLEEP);
-		SET_BIT(victim->affected_by, AFF_GROUP);
+		SETBIT(victim->affected_by, AFF_GROUP);
                 if(!IS_NPC(victim))
                    REMOVE_BIT(victim->pcdata->toggles, PLR_LFG);
         }
@@ -452,7 +452,7 @@ int do_promote(CHAR_DATA *ch, char *argument, int cmd)
        stop_follower(k, CHANGE_LEADER);
        add_follower(k, new_new_leader, 2);
      } else
-        REMOVE_BIT(f->follower->affected_by, AFF_GROUP);
+        REMBIT(f->follower->affected_by, AFF_GROUP);
   }
 
   add_follower(ch, new_new_leader, 2);
@@ -512,7 +512,7 @@ int do_disband(CHAR_DATA *ch, char *argument, int cmd)
           stop_follower(f->follower, STOP_FOLLOW);
        }
 
-    REMOVE_BIT(k->affected_by, AFF_GROUP);
+    REMBIT(k->affected_by, AFF_GROUP);
     return eSUCCESS;
   }
 

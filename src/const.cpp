@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.152 2005/05/27 15:28:05 urizen Exp $ */
+/* $Id: const.cpp,v 1.153 2005/05/28 18:56:09 shane Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -841,33 +841,8 @@ char *equipment_types[] =
     "\n"
 };
 
-/* Should be in exact correlation as the AFF types -Kahn */
-char *affected_bits2[] =
-{ // When you modify this, modify skill_aff2 in mob_commands
-    "SHADOWSLIP",
-    "INSOMNIA",
-    "FREEFLOAT",
-    "FARSIGHT",
-    "CAMOUFLAGE",
-    "STABILITY",
-    "NOT-USED",
-    "GOLEM",
-    "FOREST_MELD",
-    "INSANE",
-    "GLITTER",
-    "UTILITY",
-    "ALERT",
-    "NO_FLEE",
-    "FAMILIAR_NO_SET",
-    "PROTECT_VS_GOOD",
-    "POWERWIELD",
-    "REGENERATION",
-    "FOCUS",
-    "ILLUSION",
-    "KNOW_ALIGN",
-    "\n"
-};
 
+/* Should be in exact correlation as the AFF types -Kahn */
 char *affected_bits[] =
 { // When you modify this, modify skill_aff in mob_commands
     "BLIND",
@@ -903,6 +878,29 @@ char *affected_bits[] =
     "HASTE",
     "FAMILIAR",
     "PROTECT-GOOD",
+    "SHADOWSLIP",
+    "INSOMNIA",
+    "FREEFLOAT",
+    "FARSIGHT",
+    "CAMOUFLAGE",
+    "STABILITY",
+    "NOT-USED",
+    "GOLEM",
+    "FOREST_MELD",
+    "INSANE",
+    "GLITTER",
+    "UTILITY",
+    "ALERT",
+    "NO_FLEE",
+    "FAMILIAR_NO_SET",
+    "PROTECT_VS_GOOD",
+    "POWERWIELD",
+    "REGENERATION",
+    "FOCUS",
+    "ILLUSION",
+    "KNOW_ALIGN",
+    "BLACKJACK_ALERT",
+    "WATERBREATH"
     "\n"
 };
 

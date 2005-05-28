@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_monk.cpp,v 1.22 2005/04/09 21:15:31 urizen Exp $
+| $Id: cl_monk.cpp,v 1.23 2005/05/28 18:56:17 shane Exp $
 | cl_monk.C
 | Description:  Monk skills.
 */
@@ -218,7 +218,7 @@ int do_stun(struct char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if(IS_MOB(victim) && IS_SET(victim->mobdata->actflags, ACT_HUGE))
+  if(IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE))
   {
     send_to_char("You cannot stun something that HUGE!\n\r", ch);
     return eFAILURE;

@@ -2513,7 +2513,6 @@ int do_medit(struct char_data *ch, char *argument, int cmd)
       "constitution",
       "new",
       "delete",
-      "more",
       "\n"
     };
    
@@ -3196,25 +3195,6 @@ mob_index[mob_num].virt);
 	delete_mob_from_index(mob_num);
 	send_to_char("Mobile deleted.\r\n",ch);
       } break;
-     case 32: { /* "More" flags */
-       extern char *affected_bits2[];
-        if(!*buf4) {
-          send_to_char("$3Syntax$R: medit [mob_num] more <flag[s]>\n\r"
-                       "$3Current$R: ", ch);
-          sprintbit(((char_data *)mob_index[mob_num].item)->affected_by2,
-                    affected_bits2, buf);
-          send_to_char(buf, ch);
-          send_to_char("\r\n$3Valid types$R:\r\n", ch);
-          for(i = 0; *affected_bits2[i] != '\n'; i++) {
-            sprintf(buf, "  %s\n\r", affected_bits2[i]);
-            send_to_char(buf, ch);
-          }
-          return eFAILURE;
-        }
-        parse_bitstrings_into_int(affected_bits2, buf4, ch,
-                                     ((char_data *)mob_index[mob_num].item)->affected_by2);
-       
-     }break;
     }
     set_zone_modified_mob(mob_num);
     return eSUCCESS;
@@ -4254,7 +4234,7 @@ int do_rstat(struct char_data *ch, char *argument, int cmd)
                 send_to_char(buf, ch);
             }
  	    struct deny_data *d;
-	    int a = 0,l=0;
+	    int a = 0;
 	    for (d = rm->denied;d;d=d->next)
 	    {
 	      if (a == 0) send_to_char("Mobiles Denied: ",ch);
