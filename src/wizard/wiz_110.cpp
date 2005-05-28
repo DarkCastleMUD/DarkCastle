@@ -399,7 +399,14 @@ int do_rename_char(struct char_data *ch, char *arg, int cmd)
     if (victim->equipment[iWear] && 
         IS_SET(victim->equipment[iWear]->obj_flags.extra_flags, ITEM_SPECIAL))
     {
-      send_to_char("Dammit Valk...this one is wearing GL.\r\n", ch);
+//      send_to_char("Dammit Valk...this one is wearing GL.\r\n", ch);
+	char tmp[256];
+      sprintf(tmp,"%s",victim->equipment[iWear]->name);
+      tmp[strlen(tmp)-strlen(GET_NAME(victim))-1] = '\0';
+      sprintf(tmp,"%s %s",tmp, targetname);
+      victim->equipment[iWear]->name = str_hsh(tmp);
+	//Not freeing, not sure whether name's hsh'd or dup'd, don't
+	// wanna risk. minor leak.
       return eFAILURE;
     }
   }
@@ -409,7 +416,13 @@ int do_rename_char(struct char_data *ch, char *arg, int cmd)
   {
     if(IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL))
     {
-      send_to_char("Dammit Valk...this one is carrying GL.\r\n", ch);
+//      send_to_char("Dammit Valk...this one is carrying GL.\r\n", ch);
+	char tmp[256];
+      sprintf(tmp,"%s",obj->name);
+      tmp[strlen(tmp)-strlen(GET_NAME(victim))-1] = '\0';
+      sprintf(tmp,"%s %s",tmp, targetname);
+      obj->name = str_hsh(tmp);
+
       return eFAILURE;
     }
 
