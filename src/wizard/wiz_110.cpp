@@ -407,7 +407,7 @@ int do_rename_char(struct char_data *ch, char *arg, int cmd)
       victim->equipment[iWear]->name = str_hsh(tmp);
 	//Not freeing, not sure whether name's hsh'd or dup'd, don't
 	// wanna risk. minor leak.
-      return eFAILURE;
+//      return eFAILURE;
     }
   }
  
@@ -423,7 +423,7 @@ int do_rename_char(struct char_data *ch, char *arg, int cmd)
       sprintf(tmp,"%s %s",tmp, targetname);
       obj->name = str_hsh(tmp);
 
-      return eFAILURE;
+  //    return eFAILURE;
     }
 
     obj = obj->next_content;
