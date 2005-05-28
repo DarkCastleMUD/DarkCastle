@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.69 2005/05/28 18:56:10 shane Exp $ */
+/* $Id: info.cpp,v 1.70 2005/05/28 19:59:09 urizen Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -246,6 +246,11 @@ void show_obj_to_char(struct obj_data *object, struct char_data *ch, int mode)
          strcat(flagbuf,"NO_NOTICE");
          found++;
       }
+      if (mode == 0 && IS_SET(object->obj_flags.more_flags, ITEM_NOSEE)) {
+	 if(found) strcat(flagbuf, "$B/$R");
+         strcat(flagbuf,"NO_SEE");
+         found++;
+	}
       if(found) {
          strcat(flagbuf, "$B)$R");
          strcat(buffer, flagbuf);
