@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.24 2005/05/28 18:56:26 shane Exp $
+| $Id: wizard.cpp,v 1.25 2005/05/31 11:24:52 urizen Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -354,14 +354,14 @@ void boro_mob_stat(struct char_data *ch, struct char_data *k)
 		"|o| $7Susceptable$R: %-58s|/|\r\n",
 		buf2, buf3); // immune and susceptable bits, first and second.
 	send_to_char(buf,ch);
-
-	sprintbit(k->affected_by, affected_bits, buf2);
+//TODO:expand with more affecs
+	sprintbit(k->affected_by[0], affected_bits, buf2);
 	sprintf(buf,
 		"|\\| $7Affected By$R: %-58s|~|\r\n", buf2); // affected bits.
 	send_to_char(buf,ch);
 
-	if(IS_MOB(k))
-		sprintbit(k->mobdata->actflags, action_bits,buf2);
+	if(IS_MOB(k)) // AND THIS
+		sprintbit(k->mobdata->actflags[0], action_bits,buf2);
 	else
 		strcpy(buf2,"Not a mob");
 	sprintbit(k->combat, combat_bits, buf3);
@@ -633,7 +633,7 @@ void mob_stat(struct char_data *ch, struct char_data *k)
 
   if(IS_NPC(k)) {
     strcpy(buf,"$3NPC flags$R: ");
-    sprintbit(k->mobdata->actflags, action_bits,buf2);
+    sprintbit(k->mobdata->actflags[0], action_bits,buf2);
   }  
   else {
     strcpy(buf,"$3PC flags$R: ");
@@ -732,7 +732,7 @@ void mob_stat(struct char_data *ch, struct char_data *k)
   if(!IS_MOB(k))
      display_punishes(ch, k);
     
-  sprintbit(k->affected_by, affected_bits, buf);
+  sprintbit(k->affected_by[0], affected_bits, buf);
   csendf(ch, "$3Affected by$R: %s", buf);
 
   sprintbit(k->immune, isr_bits, buf);

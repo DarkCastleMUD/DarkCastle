@@ -1318,7 +1318,7 @@ int do_mpbestow(CHAR_DATA *ch, char *argument, int cmd)
         {
           af.type = BASE_TIMERS + z;
           af.duration = o;
-          af.bitvector = 0;
+          af.bitvector = -1;
           af.location = 0;
           af.modifier = 0;
           affect_join(victim, &af, TRUE, FALSE);
@@ -1338,7 +1338,7 @@ int do_mpbestow(CHAR_DATA *ch, char *argument, int cmd)
         struct affected_type af;
     af.type = BASE_TIMERS + z;
     af.duration = o;
-    af.bitvector = 0;
+    af.bitvector = -1;
     af.location = 0;
     af.modifier = 0;
     affect_join(owner, &af, TRUE, FALSE);

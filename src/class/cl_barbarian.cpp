@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_barbarian.cpp,v 1.52 2005/05/28 18:56:17 shane Exp $
+| $Id: cl_barbarian.cpp,v 1.53 2005/05/31 11:24:48 urizen Exp $
 | cl_barbarian.C
 | Description:  Commands for the barbarian class.
 */
@@ -391,7 +391,7 @@ int do_bloodfury(struct char_data *ch, char *argument, int cmd)
   af.duration  = duration;
   af.modifier  = 0;
   af.location  = 0;
-  af.bitvector = 0;
+  af.bitvector = -1;
 
   affect_to_char(ch, &af);
 
@@ -424,7 +424,7 @@ int do_crazedassault(struct char_data *ch, char *argument, int cmd)
     af.duration  = 2;
     af.modifier  = (has_skill(ch,SKILL_CRAZED_ASSAULT) / 5) + 7; 
     af.location  = APPLY_HITROLL;
-    af.bitvector = 0;
+    af.bitvector = -1;
     affect_to_char(ch, &af);
     duration = 16 - has_skill(ch, SKILL_CRAZED_ASSAULT) / 10;
   }
@@ -435,7 +435,7 @@ int do_crazedassault(struct char_data *ch, char *argument, int cmd)
   af.duration  = duration;
   af.modifier  = 0; 
   af.location  = APPLY_NONE;
-  af.bitvector = 0;
+  af.bitvector = -1;
   affect_to_char(ch, &af);
   return eSUCCESS;
 } 
@@ -560,7 +560,7 @@ int do_ferocity(struct char_data *ch, char *argument, int cmd)
       af.duration  = 1 + has_skill(ch,SKILL_FEROCITY) / 10;
       af.modifier  = 50;
       af.location  = APPLY_HIT;
-      af.bitvector = 0;
+      af.bitvector = -1;
       affect_to_char(tmp_char, &af);
       af.modifier  = 1;
       af.location  = APPLY_HP_REGEN;

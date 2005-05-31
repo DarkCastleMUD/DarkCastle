@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: cl_ranger.cpp,v 1.57 2005/05/28 18:56:17 shane Exp $ | cl_ranger.C  *
+ * $Id: cl_ranger.cpp,v 1.58 2005/05/31 11:24:48 urizen Exp $ | cl_ranger.C  *
  * Description: Ranger skills/spells                                          *
  *                                                                            *
  * Revision History                                                           *
@@ -666,7 +666,7 @@ int do_forage(CHAR_DATA *ch, char *arg, int cmd)
   af.duration = recharge;
   af.modifier = 0;
   af.location = APPLY_NONE;
-  af.bitvector = 0;
+  af.bitvector = -1;
   affect_to_char(ch, &af);
   
   if(!new_obj) {

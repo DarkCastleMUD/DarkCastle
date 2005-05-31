@@ -1,7 +1,7 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.31 2005/05/28 18:56:22 shane Exp $
+| $Id: character.h,v 1.32 2005/05/31 11:24:50 urizen Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
@@ -141,7 +141,7 @@ struct affected_type
     int16  duration;       /* For how long its effects will last      */
     int32  modifier;       /* This is added to apropriate ability     */
     int32  location;       /* Tells which ability to change(APPLY_XXX)*/
-    uint32 bitvector;      /* Tells which bits to set (AFF_XXX)       */
+    int32 bitvector;      /* Tells which bits to set (AFF_XXX)       */
 
     struct affected_type *next;
 };
@@ -428,7 +428,8 @@ struct char_file_u
     int16 armor;       // have to save these since mobs have different bases
     int16 hitroll;
     int16 damroll;
-    int32 afected_by[AFF_MAX/ASIZE+1];
+    int32 afected_by;
+    int32 afected_by2;
     uint32 misc;          // channel flags
 
     int16 clan; 

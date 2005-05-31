@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.59 2005/05/28 18:56:10 shane Exp $ */
+/* $Id: limits.cpp,v 1.60 2005/05/31 11:24:46 urizen Exp $ */
 
 extern "C"
 {
@@ -328,7 +328,7 @@ void redo_hitpoints( CHAR_DATA *ch)
         if (ch->equipment[i]->affected[j].location == APPLY_HIT)
           affect_modify(ch, ch->equipment[i]->affected[j].location,
                            ch->equipment[i]->affected[j].modifier,
-                           0, TRUE);
+                           -1, TRUE);
       }
   }
 }
@@ -371,7 +371,7 @@ void redo_mana ( CHAR_DATA *ch)
         if (ch->equipment[i]->affected[j].location == APPLY_MANA)
           affect_modify(ch, ch->equipment[i]->affected[j].location,
                            ch->equipment[i]->affected[j].modifier,
-                           0, TRUE);
+                           -1, TRUE);
       }
   }
 }
@@ -401,7 +401,7 @@ void redo_ki(CHAR_DATA *ch)
         if (ch->equipment[i]->affected[j].location == APPLY_KI)
           affect_modify(ch, ch->equipment[i]->affected[j].location,
                            ch->equipment[i]->affected[j].modifier,
-                           0, TRUE);
+                           -1, TRUE);
       }
   }
 

@@ -786,7 +786,7 @@ int gazeofgaiot(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
     af.duration  = 30;
     af.modifier  = 0;
     af.location  = APPLY_NONE;
-    af.bitvector = 0;
+    af.bitvector = -1;
     affect_to_char(ch, &af);
     act("You eyes glow red from hatred, and you discharge it all on $N.",ch,0,victim,TO_CHAR,0);
     act("$n's eyes glow with hatred, and $e directs it all at you. OoO, scary!",ch,0,victim,TO_VICT,0);

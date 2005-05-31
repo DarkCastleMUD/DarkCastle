@@ -104,7 +104,7 @@ int do_harmtouch(struct char_data *ch, char *argument, int cmd)
    af.duration  = duration;
    af.modifier  = 0;
    af.location  = APPLY_NONE;
-   af.bitvector = 0;
+   af.bitvector = -1;
    affect_to_char(ch, &af);
 
 
@@ -185,7 +185,7 @@ int do_layhands(struct char_data *ch, char *argument, int cmd)
    af.duration  = duration;
    af.modifier  = 0;
    af.location  = APPLY_NONE;
-   af.bitvector = 0;
+   af.bitvector = -1;
    affect_to_char(ch, &af);
    return eSUCCESS;
 }

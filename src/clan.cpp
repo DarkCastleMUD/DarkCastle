@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.35 2005/05/13 13:29:54 urizen Exp $ */
+/* $Id: clan.cpp,v 1.36 2005/05/31 11:24:46 urizen Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -2451,7 +2451,7 @@ void remove_totem(OBJ_DATA *altar, OBJ_DATA *totem)
      int j;
      for(j=0; j<totem->num_affects; j++)
         affect_modify(t, totem->affected[j].location,
-          totem->affected[j].modifier, 0, FALSE);
+          totem->affected[j].modifier, -1, FALSE);
      redo_hitpoints(t);
      redo_mana(t);
      redo_ki(t);
@@ -2467,7 +2467,7 @@ void add_totem(OBJ_DATA *altar, OBJ_DATA *totem)
      int j;
      for(j=0; j<totem->num_affects; j++)
         affect_modify(t, totem->affected[j].location,
-          totem->affected[j].modifier, 0, TRUE);
+          totem->affected[j].modifier, -1, TRUE);
    }
 }
 
@@ -2481,7 +2481,7 @@ void remove_totem_stats(CHAR_DATA *ch)
     if (a->obj_flags.type_flag != ITEM_TOTEM) continue;
      for(j=0; j<a->num_affects; j++)
         affect_modify(ch, a->affected[j].location,
-          a->affected[j].modifier, 0, FALSE);
+          a->affected[j].modifier, -1, FALSE);
      redo_hitpoints(ch);
      redo_mana(ch);
      redo_ki(ch);
@@ -2498,7 +2498,7 @@ void add_totem_stats(CHAR_DATA *ch)
     if (a->obj_flags.type_flag != ITEM_TOTEM) continue;
      for(j=0; j<a->num_affects; j++)
         affect_modify(ch, a->affected[j].location,
-          a->affected[j].modifier, 0, TRUE);
+          a->affected[j].modifier, -1, TRUE);
      redo_hitpoints(ch);
      redo_mana(ch);
      redo_ki(ch);

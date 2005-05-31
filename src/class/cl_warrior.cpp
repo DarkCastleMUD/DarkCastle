@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.38 2005/05/28 18:56:17 shane Exp $
+| $Id: cl_warrior.cpp,v 1.39 2005/05/31 11:24:48 urizen Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -745,7 +745,7 @@ int do_bladeshield(struct char_data *ch, char *argument, int cmd)
   af.duration  = duration;
   af.modifier  = 0;
   af.location  = APPLY_NONE;
-  af.bitvector = 0;
+  af.bitvector = -1;
   affect_to_char(ch, &af);
   return eSUCCESS;
 }
@@ -934,7 +934,7 @@ int do_tactics(struct char_data *ch, char *argument, int cmd)
       af.duration  = 1 + has_skill(ch,SKILL_TACTICS) / 10;
       af.modifier  = 1;
       af.location  = APPLY_HITROLL;
-      af.bitvector = 0;
+      af.bitvector = -1;
       affect_to_char(tmp_char, &af);
       af.location  = APPLY_DAMROLL;
       affect_to_char(tmp_char, &af);

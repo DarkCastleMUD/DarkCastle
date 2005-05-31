@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.86 2005/05/30 20:51:12 shane Exp $ */
+/* $Id: db.cpp,v 1.87 2005/05/31 11:24:46 urizen Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -1161,17 +1161,18 @@ struct index_data *generate_mob_indices(int *top, struct index_data *index)
     if (mob) {
       mob_index[i].mobspec = mob_index[real_mobile(mob)].mobprogs;
       j = 0;
-      while( ((CHAR_DATA *)mob_index[real_mobile(mob)].item)->mobdata->actflags[j] != -1) {
-         ((CHAR_DATA *)mob_index[i].item)->mobdata->actflags[j] = ((CHAR_DATA *)mob_index[real_mobile(mob)].item)->mobdata->actflags[j];
+      while (j < ACT_MAX/ASIZE+1) {
+
+        SET_BIT(((CHAR_DATA *)mob_index[i].item)->mobdata->actflags[j], ((CHAR_DATA *)mob_index[real_mobile(mob)].item)->mobdata->actflags[j]);
          j++;
       }
-      ((CHAR_DATA *)mob_index[i].item)->mobdata->actflags[j] = -1;
+      ((CHAR_DATA *)mob_index[i].item)->mobdata->actflags[j] = 0;
       j = 0;
-      while( ((CHAR_DATA *)mob_index[real_mobile(mob)].item)->affected_by[j] != -1) {
-         ((CHAR_DATA *)mob_index[i].item)->affected_by[j] = ((CHAR_DATA *)mob_index[real_mobile(mob)].item)->affected_by[j];
+      while( j < AFF_MAX/ASIZE) {
+	SET_BIT(((CHAR_DATA *)mob_index[i].item)->affected_by[j],((CHAR_DATA *)mob_index[real_mobile(mob)].item)->affected_by[j]);
          j++;
       }
-      ((CHAR_DATA *)mob_index[i].item)->affected_by[j] = -1;
+      ((CHAR_DATA *)mob_index[i].item)->affected_by[j] = 0;
     }
     if (mob_index[i].mobspec)
       for (mprg = mob_index[i].mobspec; mprg; mprg = mprg->next)
@@ -2572,7 +2573,7 @@ CHAR_DATA *read_mobile(int nr, FILE *fl)
        mob->affected_by[j] = tmp;
        j++;
     }
-    mob->affected_by[j] = -1;
+    mob->affected_by[j] = 0;
 
     mob->alignment   = fread_int (fl, LONG_MIN, LONG_MAX);
 
@@ -2635,7 +2636,7 @@ CHAR_DATA *read_mobile(int nr, FILE *fl)
          SET_BIT(mob->immune, race_info[(int)GET_RACE(mob)].immune);
          SET_BIT(mob->suscept, race_info[(int)GET_RACE(mob)].suscept);
          SET_BIT(mob->resist, race_info[(int)GET_RACE(mob)].resist);
-         SETBIT(mob->affected_by, race_info[(int)GET_RACE(mob)].affects);
+// TOODO:FIXTHIS         SETBIT(mob->affected_by, race_info[(int)GET_RACE(mob)].affects);
   //      mob->immune  = race_info[(int)GET_RACE(mob)].immune;
     //    mob->suscept = race_info[(int)GET_RACE(mob)].suscept;
       //  mob->resist  = race_info[(int)GET_RACE(mob)].resist;
@@ -2724,16 +2725,18 @@ void write_mobile(char_data * mob, FILE *fl)
     string_to_file( fl, mob->long_desc );
     string_to_file( fl, mob->description );
 
-    while(i < ACT_MAX/ASIZE + 1) {
+    while(i < ACT_MAX/ASIZE+1) {
        fprintf(fl, "%d", mob->mobdata->actflags[i]);
        i++;
     }
+   fprintf(fl," -1");
     i = 0;
 
-    while(i < AFF_MAX/ASIZE + 1) {
+    while(i < AFF_MAX/ASIZE+1) {
        fprintf(fl, "%d", mob->affected_by[i]);
        i++;
     }
+   fprintf(fl," -1");
     fprintf(fl, "\n");
 
     fprintf(fl, "%d %d %d\n"
@@ -3228,7 +3231,7 @@ int create_blank_mobile(int nr)
 #else
     mob->mobdata = (mob_data *) dc_alloc(1, sizeof(mob_data));
 #endif
-    mob->mobdata->actflags[0] = -1;
+    mob->mobdata->actflags[0] = 0;
     mob->mobdata->damnodice = 1;
     mob->mobdata->damsizedice = 1;
     mob->mobdata->default_pos = POSITION_STANDING;
@@ -4664,7 +4667,7 @@ void init_char(CHAR_DATA *ch)
   ch->pcdata->golem = 0;
   SET_BIT(ch->pcdata->toggles, PLR_ANSI);
   SET_BIT(ch->pcdata->toggles, PLR_BARD_SONG);
-  ch->affected_by[0] = -1;
+  ch->affected_by[0] = 0;
 
   apply_initial_saves(ch);
 

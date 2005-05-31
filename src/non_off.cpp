@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: non_off.cpp,v 1.30 2005/05/28 18:56:10 shane Exp $
+| $Id: non_off.cpp,v 1.31 2005/05/31 11:24:47 urizen Exp $
 | non_off.C
 | Description:  Implementation of generic, non-offensive commands.
 */
@@ -891,7 +891,7 @@ int do_sleep(CHAR_DATA *ch, char *argument, int cmd)
     af.duration  = 0;
     af.modifier  = 0;
     af.location  = APPLY_NONE;
-    af.bitvector = 0;
+    af.bitvector = -1;
     affect_to_char(ch, &af);
 
     return eSUCCESS;

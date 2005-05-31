@@ -120,7 +120,7 @@ int do_focused_repelance(struct char_data *ch, char *argument, int cmd)
   af.duration  = duration;
   af.modifier  = 0;
   af.location  = 0;
-  af.bitvector = 0;
+  af.bitvector = -1;
 
   affect_to_char(ch, &af);
 

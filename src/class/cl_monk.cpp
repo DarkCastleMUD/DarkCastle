@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_monk.cpp,v 1.23 2005/05/28 18:56:17 shane Exp $
+| $Id: cl_monk.cpp,v 1.24 2005/05/31 11:24:48 urizen Exp $
 | cl_monk.C
 | Description:  Monk skills.
 */
@@ -170,7 +170,7 @@ int do_quivering_palm(struct char_data *ch, char *argument, int cmd)
   af.duration = duration;
   af.modifier = 0;
   af.location = APPLY_NONE;
-  af.bitvector = 0;
+  af.bitvector = -1;
   affect_to_char(ch, &af);
   
   return retval;

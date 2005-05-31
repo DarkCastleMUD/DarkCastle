@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.35 2005/05/12 20:35:47 shane Exp $ */
+/* $Id: ki.cpp,v 1.36 2005/05/31 11:24:46 urizen Exp $ */
 
 extern "C"
 {
@@ -715,7 +715,7 @@ int ki_stance( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
    af.duration  = 50 - ( ( GET_LEVEL(ch) / 5 ) * 2 );
    af.modifier  = 1;
    af.location  = APPLY_NONE;
-   af.bitvector = 0;
+   af.bitvector = -1;
  
    affect_to_char(ch, &af);
    return eSUCCESS;
@@ -767,7 +767,7 @@ int ki_agility( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
       af.duration  = 1 + learned / 10;
       af.modifier  = 1;
       af.location  = APPLY_MOVE_REGEN;
-      af.bitvector = 0;
+      af.bitvector = -1;
       affect_to_char(tmp_char, &af);
       af.modifier  = -20;
       af.location  = APPLY_ARMOR;

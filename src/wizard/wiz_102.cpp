@@ -2835,7 +2835,7 @@ mob_index[mob_num].virt);
         if(!*buf4) {
           send_to_char("$3Syntax$R: medit [mob_num] affectflags <location[s]>\n\r"
                        "$3Current$R: ", ch);
-          sprintbit(((char_data *)mob_index[mob_num].item)->affected_by,
+          sprintbit(((char_data *)mob_index[mob_num].item)->affected_by[0],
                     affected_bits, buf);
           send_to_char(buf, ch);
           send_to_char("\r\n$3Valid types$R:\r\n", ch);
@@ -2846,7 +2846,8 @@ mob_index[mob_num].virt);
           return eFAILURE;
         }
         parse_bitstrings_into_int(affected_bits, buf4, ch,
-                             (((char_data *)mob_index[mob_num].item)->affected_by));
+                             &((((char_data 
+*)mob_index[mob_num].item)->affected_by[0])));
       } break;
 
      /* edit numdamdice */

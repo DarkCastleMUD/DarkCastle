@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.88 2005/05/28 18:56:10 shane Exp $ */
+/* $Id: handler.cpp,v 1.89 2005/05/31 11:24:46 urizen Exp $ */
     
 extern "C"
 {
@@ -90,7 +90,7 @@ void addTimer(CHAR_DATA *ch, int spell, int ticks)
   af.duration = ticks;
   af.type = spell+BASE_TIMERS;
   af.location = 0;
-  af.bitvector = 0;
+  af.bitvector = -1;
   af.modifier = 0;
   affect_join(ch, &af, TRUE, FALSE);
   return;
@@ -389,7 +389,7 @@ void add_set_stats(char_data *ch, obj_data *obj, int flag)
         }
 	struct affected_type af;
 	af.duration = -1;
-	af.bitvector = 0;
+	af.bitvector = -1;
 	af.type = BASE_SETS + z;
 	af.location = APPLY_NONE;
 	af.modifier = 0;
@@ -432,7 +432,7 @@ void add_set_stats(char_data *ch, obj_data *obj, int flag)
 	    affect_to_char(ch, &af);
 	    af.location = SKILL_BLOOD_FURY *1000;
 	    af.modifier = 5;
-	    af.bitvector = 0;
+	    af.bitvector = -1;
 	    affect_to_char(ch, &af);
 	    break;
 	  case SET_FIELDPLATE:
@@ -549,12 +549,15 @@ void affect_modify(CHAR_DATA *ch, int32 loc, int32 mod, long bitv, bool add)
    int i;
     
    if (loc >= 1000) return;
+   if (bitv != -1 && bitv < AFF_MAX) {
    if(add)
       SETBIT(ch->affected_by, bitv);
    else {
       REMBIT(ch->affected_by, bitv);
-      mod = -mod;
    }
+   }
+ if (!add)
+      mod = -mod;
 
    switch(loc)
    {
@@ -1044,7 +1047,7 @@ void affect_total(CHAR_DATA *ch)
             for(j=0; j< ch->equipment[i]->num_affects; j++)
                 affect_modify(ch, ch->equipment[i]->affected[j].location,
                               ch->equipment[i]->affected[j].modifier,
-                              0, FALSE);
+                               -1, FALSE);
     }
     remove_totem_stats(ch);
     for(af = ch->affected; af; af = tmp_af)
@@ -1060,7 +1063,7 @@ void affect_total(CHAR_DATA *ch)
             for(j=0; j<ch->equipment[i]->num_affects; j++)
                 affect_modify(ch, ch->equipment[i]->affected[j].location,
                               ch->equipment[i]->affected[j].modifier,
-                              0, TRUE);
+                              -1, TRUE);
     }
     for(af = ch->affected; af; af=af->next)
     {
@@ -1640,7 +1643,7 @@ int equip_char(CHAR_DATA *ch, struct obj_data *obj, int pos, int flag)
 
     for(j=0; ch->equipment[pos] && j<ch->equipment[pos]->num_affects; j++)
 	affect_modify(ch, obj->affected[j].location,
-	  obj->affected[j].modifier, 0, TRUE);
+	  obj->affected[j].modifier, -1, TRUE);
 
    add_set_stats(ch, obj, flag);
 
@@ -1723,7 +1726,7 @@ struct obj_data *unequip_char(CHAR_DATA *ch, int pos, int flag)
     }
 
     for(j=0; j<obj->num_affects; j++)
-	affect_modify(ch, obj->affected[j].location, obj->affected[j].modifier, 0, FALSE);
+	affect_modify(ch, obj->affected[j].location, obj->affected[j].modifier, -1, FALSE);
    redo_hitpoints(ch);
    redo_mana(ch);
    redo_ki(ch);

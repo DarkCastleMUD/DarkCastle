@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.106 2005/05/28 18:56:17 shane Exp $
+| $Id: cl_thief.cpp,v 1.107 2005/05/31 11:24:48 urizen Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -644,7 +644,7 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
   pthiefaf.duration = 10;
   pthiefaf.modifier = 0;
   pthiefaf.location = APPLY_NONE;
-  pthiefaf.bitvector = 0;
+  pthiefaf.bitvector = -1;
 
   if(!(victim = get_char_room_vis(ch, victim_name))) {
     send_to_char("Steal what from who?\n\r", ch);
@@ -1067,7 +1067,7 @@ int do_pocket(CHAR_DATA *ch, char *argument, int cmd)
   pthiefaf.duration = 6;
   pthiefaf.modifier = 0;
   pthiefaf.location = APPLY_NONE;
-  pthiefaf.bitvector = 0;
+  pthiefaf.bitvector = -1;
 
   if(!(victim = get_char_room_vis(ch, victim_name))) {
     send_to_char("Steal what from who?\n\r", ch);
@@ -1605,7 +1605,7 @@ int do_vitalstrike(struct char_data *ch, char *argument, int cmd)
   af.duration  = length;
   af.modifier  = 0;
   af.location  = APPLY_NONE;
-  af.bitvector = 0;
+  af.bitvector = -1;
   affect_to_char(ch, &af);
   return eSUCCESS;
 }
@@ -1649,7 +1649,7 @@ int do_deceit(struct char_data *ch, char *argument, int cmd)
       af.duration  = 1 + has_skill(ch,SKILL_DECEIT) / 10;
       af.modifier  = 1 + (has_skill(ch, SKILL_DECEIT) /20);
       af.location  = APPLY_MANA_REGEN;
-      af.bitvector = 0;
+      af.bitvector = -1;
       affect_to_char(tmp_char, &af);
       af.location  = APPLY_DAMROLL;
       affect_to_char(tmp_char, &af);

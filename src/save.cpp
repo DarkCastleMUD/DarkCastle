@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: save.cpp,v 1.31 2005/05/28 18:56:10 shane Exp $ */
+/* $Id: save.cpp,v 1.32 2005/05/31 11:24:47 urizen Exp $ */
 
 extern "C"
 {
@@ -528,6 +528,7 @@ int store_to_char_variable_data(CHAR_DATA * ch, FILE * fpsave)
        fread(&(af->modifier),  sizeof(af->modifier),  1, fpsave);
        fread(&(af->location),  sizeof(af->location),  1, fpsave);
        fread(&(af->bitvector), sizeof(af->bitvector), 1, fpsave);
+
        affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE); // re-affect the char
     }
     fread(&typeflag, sizeof(char), 3, fpsave);
@@ -571,7 +572,7 @@ void save_char_obj (CHAR_DATA *ch)
     log(log_buf, ANGEL, LOG_BUG);
     return;
   }
-
+  
   SETBIT(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT); // so weapons stop falling off
 
   char_to_store (ch, &uchar, tmpage);
@@ -662,7 +663,13 @@ bool load_char_obj( struct descriptor_data *d, char *name )
   store_to_char(&uchar, ch);
   store_to_char_variable_data(ch, fpsave);
   read_pc_or_mob_data(ch, fpsave);
-
+ if (!IS_NPC(ch) && ch->pcdata->time.logon < 1117527906)
+  {
+    extern int do_clearaff(struct char_data *ch, char *argument, int cmd);
+    do_clearaff(ch,"",9);
+    ch->affected_by[0] = ch->affected_by[1] = 0;
+  }
+  
   // stored names only matter for mobs
   if(!IS_MOB(ch)) {
     dc_free(GET_NAME(ch));
@@ -1124,6 +1131,7 @@ void restore_weight(struct obj_data *obj)
        GET_OBJ_WEIGHT( tmp ) += GET_OBJ_WEIGHT( obj );
 }
 
+void donothin() {}
 // Read shared data from pfile
 void store_to_char(struct char_file_u *st, CHAR_DATA *ch)
 {
@@ -1176,14 +1184,20 @@ void store_to_char(struct char_file_u *st, CHAR_DATA *ch)
     ch->armor          = st->armor;
     ch->hitroll        = st->hitroll;
     ch->damroll        = st->damroll;
+    donothin();
 
-    i = 0;
-    while(ch->affected_by[i] != -1) {
+    ch->affected_by[0] = st->afected_by;
+    ch->affected_by[1] = st->afected_by2;
+    if (ch->affected_by[0] == -1) ch->affected_by[0] = 0;
+    if (ch->affected_by[1] == -1) ch->affected_by[1] = 0;
+   
+/*    i = 0;
+    while(st->afected_by[i] != -1) {
        ch->affected_by[i] = st->afected_by[i];
        i++;
     }
     st->afected_by[i] = -1;
-
+*/
     for(i = 0; i <= 2; i++)
       GET_COND(ch, i) = st->conditions[i];
 
@@ -1275,18 +1289,21 @@ void char_to_store(CHAR_DATA *ch, struct char_file_u *st, struct time_data & tmp
     st->armor = ch->armor;
     st->hitroll =  ch->hitroll;
     st->damroll =  ch->damroll;
-    x=0;
-    while(st->afected_by[x] != -1) {
+    st->afected_by = ch->affected_by[0];
+    st->afected_by2 = ch->affected_by[1];
+/*    x=0;
+    while(ch->afected_by[x] != -1) {
        st->afected_by[x] = ch->affected_by[x];
        x++;
     }
-    st->afected_by[x] = -1;
+    st->afected_by[x] = -1;*/
   }
   else { 
     st->armor   = 100;
     st->hitroll =  0;
     st->damroll =  0;
-    st->afected_by[0] = -1;
+    st->afected_by = 0;
+    st->afected_by2 = 0;
     tmpage = ch->pcdata->time;
   }
 

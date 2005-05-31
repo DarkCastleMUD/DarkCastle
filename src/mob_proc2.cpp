@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.47 2005/05/16 11:04:51 shane Exp $ */
+/* $Id: mob_proc2.cpp,v 1.48 2005/05/31 11:24:47 urizen Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -1361,11 +1361,11 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
       act("The Meta-physician touches you.",  ch, 0, 0, TO_CHAR, 0);
 
       // affect the stat by 0 to reflect the new raw stat
-      affect_modify(ch, APPLY_STR, 0, 0, TRUE);
-      affect_modify(ch, APPLY_DEX, 0, 0, TRUE);
-      affect_modify(ch, APPLY_INT, 0, 0, TRUE);
-      affect_modify(ch, APPLY_WIS, 0, 0, TRUE);
-      affect_modify(ch, APPLY_CON, 0, 0, TRUE);
+      affect_modify(ch, APPLY_STR, 0, -1, TRUE);
+      affect_modify(ch, APPLY_DEX, 0, -1, TRUE);
+      affect_modify(ch, APPLY_INT, 0, -1, TRUE);
+      affect_modify(ch, APPLY_WIS, 0, -1, TRUE);
+      affect_modify(ch, APPLY_CON, 0, -1, TRUE);
 
       redo_hitpoints(ch);
       redo_mana(ch);

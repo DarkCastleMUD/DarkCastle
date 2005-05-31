@@ -191,7 +191,7 @@ int spell_chill_touch(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
     af.duration  = skill/18;
     af.modifier  = - skill/18;
     af.location  = APPLY_STR;
-    af.bitvector = 0;
+    af.bitvector = -1;
     affect_join(victim, &af, TRUE, FALSE);
 
 	/* Spellcraft Effect */
@@ -528,7 +528,7 @@ int spell_aegis(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
   af.duration  =  10 + skill / 4;
   af.modifier  = -10 - skill / 4;
   af.location  = APPLY_AC;
-  af.bitvector = 0;
+  af.bitvector = -1;
 
   affect_to_char(ch, &af);
   if (GET_CLASS(ch) == CLASS_PALADIN)
@@ -555,7 +555,7 @@ int spell_armor(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
   af.duration  =  10 + skill / 3;
   af.modifier  = -10 - skill / 3;
   af.location  = APPLY_AC;
-  af.bitvector = 0;
+  af.bitvector = -1;
 
   affect_to_char(victim, &af);
   send_to_char("You feel a magical armour surround you.\n\r", victim);
@@ -584,7 +584,7 @@ int spell_stone_shield(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
   af.duration  = 5 + (skill / 10) + (GET_WIS(ch) > 20);
   af.modifier  = -15 - skill / 5;
   af.location  = 0;
-  af.bitvector = 0;
+  af.bitvector = -1;
 
   affect_to_char(victim, &af);
   send_to_char("A shield of ethereal stones begins to swirl around you.\n\r", victim);
@@ -641,7 +641,7 @@ int spell_greater_stone_shield(byte level, CHAR_DATA *ch, CHAR_DATA *victim, str
   af.duration  = 5 + (skill / 6) + (GET_WIS(ch) > 20);
   af.modifier  = - 20 - skill / 4;
   af.location  = 0;
-  af.bitvector = 0;
+  af.bitvector = -1;
 
   affect_to_char(victim, &af);
   send_to_char("A shield of ethereal stones begins to swirl around you.\n\r", victim);
@@ -1253,7 +1253,7 @@ int spell_bless(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
 		af.duration  = 6 + skill / 3;
 		af.modifier  = 1 + skill / 45;
 		af.location  = APPLY_HITROLL;
-		af.bitvector = 0;
+		af.bitvector = -1;
 		affect_to_char(victim, &af);
 
 		af.location = APPLY_SAVING_MAGIC;
@@ -1676,7 +1676,7 @@ int spell_curse(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
 	 af.location  = APPLY_SAVING_MAGIC;
 	if (skill > 70)
          af.bitvector = AFF_CURSE;
-	else af.bitvector = 0;
+	else af.bitvector = -1;
 	 affect_to_char(victim, &af);
 	 af.location = APPLY_SAVING_FIRE;
 	 affect_to_char(victim, &af);
@@ -3002,7 +3002,7 @@ int spell_strength(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data
   af.duration  = level/2 + skill/3;
   af.modifier  = mod;
   af.location  = APPLY_STR;
-  af.bitvector = 0;
+  af.bitvector = -1;
   affect_to_char(victim, &af);
   return eSUCCESS;
 }
@@ -4766,7 +4766,7 @@ int spell_resist_cold(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
       af.duration = 1 + skill / 10;
       af.modifier = 10 + skill / 6;
       af.location = APPLY_SAVING_COLD;
-      af.bitvector = 0;
+      af.bitvector = -1;
       affect_to_char(victim, &af);
    }
    return eSUCCESS;
@@ -4792,7 +4792,7 @@ int spell_resist_fire(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
       af.duration = 1 + skill / 10;
       af.modifier = 10 + skill / 6;
       af.location = APPLY_SAVING_FIRE;
-      af.bitvector = 0;
+      af.bitvector = -1;
       affect_to_char(victim, &af);
    }
    return eSUCCESS;
@@ -4819,7 +4819,7 @@ int spell_resist_magic(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
       af.duration = 1 + skill / 10;
       af.modifier = 10 + skill / 6;
       af.location = APPLY_SAVING_MAGIC;
-      af.bitvector = 0;
+      af.bitvector = -1;
       affect_to_char(victim, &af);
    }
    return eSUCCESS;
@@ -4846,7 +4846,7 @@ int spell_staunchblood(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
        af.duration = 1 + skill / 10;
        af.modifier = 10 + skill / 6;
        af.location = APPLY_SAVING_POISON;
-       af.bitvector = 0;
+       af.bitvector = -1;
        affect_to_char(ch, &af);
     }
   return eSUCCESS;
@@ -4866,7 +4866,7 @@ int spell_resist_energy(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
       af.duration = 1 + skill / 10;
       af.modifier = 10 + skill / 6;
       af.location = APPLY_SAVING_ENERGY;
-      af.bitvector = 0;
+      af.bitvector = -1;
       affect_to_char(victim, &af);
    }
    return eSUCCESS;
@@ -4893,7 +4893,7 @@ int spell_stone_skin(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
 	af.duration = 3 + skill/6;
 	af.modifier = -(10 + skill/3);
 	af.location = APPLY_AC;
-	af.bitvector = 0;
+	af.bitvector = -1;
 	affect_to_char(ch, &af);
 
         SET_BIT(ch->resist, ISR_PIERCE);
@@ -4929,7 +4929,7 @@ int spell_shield(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *
   af.duration = 6 + skill / 3;
   af.modifier = - ( 9 + skill / 15 );
   af.location = APPLY_AC;
-  af.bitvector = 0;
+  af.bitvector = -1;
   affect_to_char(victim, &af);
 
   return eSUCCESS;
@@ -5006,7 +5006,7 @@ int spell_weaken(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *
 	  af.duration = duration;
 	  af.modifier = str;
 	  af.location = APPLY_STR;
-	  af.bitvector = 0;
+	  af.bitvector = -1;
 	  affect_to_char(victim, &af);
 	  af.modifier = con;
 	  af.location = APPLY_CON;
@@ -8736,7 +8736,7 @@ int cast_barkskin(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *vic
   af.duration  = 5 + level/7;
   af.modifier  = -20;
   af.location  = APPLY_AC;
-  af.bitvector = 0;
+  af.bitvector = -1;
 
   affect_join(victim, &af, FALSE, FALSE);
 
@@ -9078,7 +9078,7 @@ int cast_companion(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *vi
    af.duration = 80;   // Roughly 2 hours
    af.modifier = 0;
    af.location = 0;
-   af.bitvector = 0;
+   af.bitvector = -1;
    affect_join(ch, &af, FALSE, FALSE);
    return eSUCCESS;
 }
@@ -9584,7 +9584,7 @@ int spell_summon_familiar(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_D
   af.duration = -1;
   af.modifier = 0;
   af.location = 0;
-  af.bitvector = 0;
+  af.bitvector = -1;
   affect_to_char(mob, &af);
 
   IS_CARRYING_W(mob) = 0;
@@ -9696,7 +9696,7 @@ int spell_resist_acid(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
        af.duration = 1 + skill / 10;
        af.modifier = 10 + skill / 6;
        af.location = APPLY_SAVING_ACID;
-       af.bitvector = 0;
+       af.bitvector = -1;
        affect_to_char(victim, &af);
     }
   return eSUCCESS;
@@ -9825,7 +9825,7 @@ int spell_rapid_mend(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
        af.duration = duration;
        af.modifier = regen;
        af.location = APPLY_HP_REGEN;
-       af.bitvector = 0;
+       af.bitvector = -1;
        affect_to_char(victim, &af);
     }
     else act("$n is already mending quickly.", victim, 0, 0, TO_CHAR, 0);
@@ -9874,7 +9874,7 @@ int spell_iron_roots(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
        af.duration = level;
        af.modifier = 0;
        af.location = APPLY_NONE;
-       af.bitvector = 0;
+       af.bitvector = -1;
        affect_to_char(ch, &af);
     }
   return eSUCCESS;
@@ -9918,7 +9918,7 @@ int spell_acid_shield(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
     af.duration  = 2 + (skill / 23);
     af.modifier  = learned;
     af.location  = APPLY_NONE;
-    af.bitvector = 0;
+    af.bitvector = -1;
     affect_to_char(victim, &af);
   }
   return eSUCCESS;
@@ -9973,7 +9973,7 @@ int spell_water_breathing(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct o
   af.duration  = 4 + (skill/5);
   af.modifier  = 0;
   af.location  = APPLY_NONE;
-  af.bitvector = 0;
+  af.bitvector = -1;
   affect_to_char(victim, &af);
 
   return eSUCCESS;
@@ -10333,7 +10333,7 @@ int spell_debility(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data
     af.duration  = duration;
     af.modifier  = 0 - (int)((double)hit_gain(victim) * (percent / 100));
     af.location  = APPLY_HP_REGEN;
-    af.bitvector = 0;
+    af.bitvector = -1;
     affect_to_char(victim, &af);
     af.location = APPLY_MOVE_REGEN;
     af.modifier = 0 - (int)((double)move_gain(victim) * (percent / 100));
@@ -10450,7 +10450,7 @@ int spell_attrition(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
     af.duration  = duration;
     af.modifier  = acmod;
     af.location  = APPLY_AC;
-    af.bitvector = 0;
+    af.bitvector = -1;
     affect_to_char(victim, &af);
     af.modifier = tohit;
     af.location = APPLY_HITROLL;
@@ -10530,7 +10530,7 @@ int spell_vampiric_aura(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
     af.duration  = skill / 25;
     af.modifier  = skill;
     af.location  = APPLY_NONE;
-    af.bitvector = 0;
+    af.bitvector = -1;
     affect_to_char(victim, &af);
   }
   return eSUCCESS;
@@ -10590,7 +10590,7 @@ int spell_holy_aura(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
   af.duration  = 4;
   af.modifier  = 50;
   af.location  = APPLY_NONE;
-  af.bitvector = 0;
+  af.bitvector = -1;
   affect_to_char(victim, &af);
 
   af.type      = SPELL_HOLY_AURA_TIMER;
@@ -10646,7 +10646,7 @@ int cast_holy_aura( byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *t
   af.duration  = 4;
   af.modifier  = mod;
   af.location  = APPLY_NONE;
-  af.bitvector = 0;
+  af.bitvector = -1;
   affect_to_char(ch, &af);
 
   af.type      = SPELL_HOLY_AURA_TIMER;
@@ -10790,7 +10790,7 @@ int spell_visage_of_hate(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct ob
     af.duration  = 1 + skill / 10;
     af.modifier  = - skill / 25;
     af.location  = APPLY_HITROLL;
-    af.bitvector = 0;
+    af.bitvector = -1;
     affect_to_char(tmp_char, &af);
     af.modifier  = 1 + skill / 25;
     af.location  = APPLY_DAMROLL;
@@ -10838,7 +10838,7 @@ int spell_blessed_halo(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
     af.duration  = 1 + skill / 10;
     af.modifier  = skill / 18;
     af.location  = APPLY_HITROLL;
-    af.bitvector = 0;
+    af.bitvector = -1;
     affect_to_char(tmp_char, &af);
     af.modifier  = skill / 18;
     af.location  = APPLY_HP_REGEN;

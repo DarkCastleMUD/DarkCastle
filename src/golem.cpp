@@ -196,13 +196,15 @@ void set_golem(CHAR_DATA *golem, int golemtype)
         golem->long_desc = str_hsh(golem_list[golemtype].long_desc);
 	golem->description = str_hsh(golem_list[golemtype].description);
         golem->title = 0;
+        golem->affected_by[0] = 0;
+	golem->affected_by[1] = 0;
+
         if (!golemtype)
           SETBIT(golem->affected_by, AFF_GOLEM);
         SETBIT(golem->affected_by, AFF_INFRARED);
         SETBIT(golem->affected_by, AFF_STABILITY);
         SETBIT(golem->mobdata->actflags, ACT_2ND_ATTACK);
 	golem->misc = MISC_IS_MOB;
-        golem->affected_by[0] = -1;
         golem->armor = 0;
         golem->level = 1;
         golem->hitroll = golem_list[golemtype].hit / 20;

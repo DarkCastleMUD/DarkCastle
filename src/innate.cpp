@@ -108,7 +108,7 @@ int do_innate(CHAR_DATA *ch, char *arg, int cmd)
 		// repair is every 16 ticks, 'cause Apoc's annoying.
 	   af.modifier = 0;
 	   af.location = 0;
-	   af.bitvector = 0;
+	   af.bitvector = -1;
 	   affect_to_char(ch, &af);
 	}
 	return retval;
@@ -255,7 +255,7 @@ int innate_evasion(CHAR_DATA *ch, char *arg, int cmd)
    af.duration = 2;
    af.modifier = 0;
    af.location = 0;
-   af.bitvector = 0;
+   af.bitvector = -1;
    affect_to_char(ch, &af);
    send_to_char("You bring up an aura, blocking all forms of scrying your location.\r\n",ch);
    return eSUCCESS;

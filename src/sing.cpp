@@ -1524,7 +1524,7 @@ int execute_song_insane_chant( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *
    af.duration  = 1;
    af.modifier  = 0;
    af.location  = APPLY_INSANE_CHANT;
-   af.bitvector = 0;
+   af.bitvector = -1;
 
    act("$n's singing starts to drive you INSANE!!!", ch, 0, 0, TO_ROOM, 0);
    send_to_char("Your singing drives you INSANE!!!\r\n", ch);
@@ -1965,7 +1965,7 @@ int execute_song_glitter_dust( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *
    af.duration  = (GET_LEVEL(ch) > 25) ? 2 : 1;
    af.modifier  = 0;
    af.location  = APPLY_GLITTER_DUST;
-   af.bitvector = 0;
+   af.bitvector = -1;
 
    act("The dust in the air clings to you, and begins to shine!", ch, 0, 0, TO_ROOM, 0);
    send_to_char("Your dust clings to everyone, showing where they are!\r\n", ch);
