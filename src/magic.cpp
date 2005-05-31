@@ -8906,7 +8906,7 @@ int cast_feline_agility(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DAT
 	af.duration	= 1+(level/4);
 	af.modifier	= -10 -skill/5; 		/* AC bonus */
 	af.location 	= APPLY_AC;
-	af.bitvector	= 0;
+	af.bitvector	= -1;
 	affect_to_char(victim, &af);
 	send_to_char("Your step lightens as you gain the agility of a cat!\r\n", ch);
 	af.modifier	= 1+(skill/20);		/* + dex */
