@@ -8943,7 +8943,7 @@ CHAR_DATA  *victim, struct obj_data * tar_obj, int skill)
         af.duration     = 1+(level/4);
         af.modifier     = -10 - skill/5;             /* AC apply */
         af.location     = APPLY_AC;
-        af.bitvector    = 0;
+        af.bitvector    = -1;
         affect_to_char(victim, &af);
 	send_to_char("Your fortitude increases to that of an oak.\r\n",ch);
         af.modifier     = 1 + (skill/20);
