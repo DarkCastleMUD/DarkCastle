@@ -400,6 +400,7 @@ int do_shutdown(struct char_data *ch, char *argument, int cmd)
         send_to_all(buf);
         log(buf, ANGEL, LOG_GOD);
         log("Writing sockets to file for hotboot recovery.", 0, LOG_MISC);
+	do_force(ch, "all save",123);
         if(!write_hotboot_file()) {
            log("Hotboot failed.  Closing all sockets.", 0, LOG_MISC);
            send_to_char("Hot reboot failed.\n\r", ch);

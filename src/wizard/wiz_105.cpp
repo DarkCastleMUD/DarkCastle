@@ -30,27 +30,18 @@ int do_clearaff(struct char_data *ch, char *argument, int cmd)
 
     if (!*buf)
      victim = ch;
-//        send_to_char("Clearaff who?\n\r", ch);
-
     else if (!generic_find(argument, FIND_CHAR_WORLD, ch, &victim, &dummy))
         send_to_char("Couldn't find any such creature.\n\r", ch);
 
-    if (victim) {
-  for(af = victim->affected; af; af = afpk) {
-    afpk = af->next;
-/*    if(af->type != FUCK_CANTQUIT &&
-       af->type != SKILL_LAY_HANDS &&
-       af->type != SKILL_HARM_TOUCH &&
-       af->type != SKILL_BLOOD_FURY &&
-       af->type != SKILL_QUIVERING_PALM &&
-       af->type != SKILL_INNATE_TIMER &&
-        af->type != SPELL_HOLY_AURA_TIMER)*/
-      affect_remove(victim, af, SUPPRESS_ALL);
-  }
+  if (victim) {
+      for(af = victim->affected; af; af = afpk) {
+        afpk = af->next;
+        affect_remove(victim, af, SUPPRESS_ALL);
+      }
 
-  send_to_char("Done.\r\n",ch);
-  send_to_char("Your affects have been cleared.\r\n",victim);
-  return eSUCCESS;
+    send_to_char("Done.\r\n",ch);
+    send_to_char("Your affects have been cleared.\r\n",victim);
+    return eSUCCESS;
   }
   return eFAILURE;
 }

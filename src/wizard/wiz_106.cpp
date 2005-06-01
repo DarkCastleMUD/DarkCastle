@@ -59,7 +59,7 @@ int do_force(struct char_data *ch, char *argument, int cmd)
 
   if(IS_NPC(ch))
     return eFAILURE;
-  if(!has_skill(ch, COMMAND_FORCE)) {
+  if(!has_skill(ch, COMMAND_FORCE) && cmd != 123) {
         send_to_char("Huh?\r\n", ch);
         return eFAILURE;
   }

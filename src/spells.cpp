@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.133 2005/05/28 18:56:10 shane Exp $ */
+/* $Id: spells.cpp,v 1.134 2005/06/01 07:51:25 urizen Exp $ */
 
 extern "C"
 {
@@ -992,7 +992,8 @@ void stop_follower(CHAR_DATA *ch, int cmd)
   if (cmd != CHANGE_LEADER) {
      if(affected_by_spell(ch, SPELL_CHARM_PERSON))
        affect_from_char(ch, SPELL_CHARM_PERSON);
-     REMBIT(ch->affected_by, AFF_CHARM | AFF_GROUP); 
+     REMBIT(ch->affected_by, AFF_CHARM);
+     REMBIT(ch->affected_by, AFF_GROUP); 
   }
 }
 
