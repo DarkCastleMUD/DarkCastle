@@ -38,8 +38,8 @@ int do_clearaff(struct char_data *ch, char *argument, int cmd)
         affect_remove(victim, af, SUPPRESS_ALL);
       }
 
-    send_to_char("Done.\r\n",ch);
-    send_to_char("Your affects have been cleared.\r\n",victim);
+//    send_to_char("Done.\r\n",ch);
+  //  send_to_char("Your affects have been cleared.\r\n",victim);
     return eSUCCESS;
   }
   return eFAILURE;

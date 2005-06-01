@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.76 2005/06/01 10:19:15 shane Exp $ */
+/* $Id: mob_proc.cpp,v 1.77 2005/06/01 21:15:00 urizen Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -3043,8 +3043,8 @@ static char *dethSayText [ ] =
   "How important does a person have to be before they are considered assassinated instead of murdered?",
   "If electricity comes from electrons, does morality come from morons?",
   "How is it that we put a man on the moon before we figured out it would be a good idea to put wheels on luggage?",
-  "Why is it that people say they "slept like a baby" when babies wake up like every two hours?",
-  "Why do you have to "put your two cents in" but it's only a "penny for your thoughts"?  Where's that extra penny going to?",
+  "Why is it that people say they 'slept like a baby' when babies wake up like every two hours?",
+  "Why do you have to \"put your two cents in\" but it's only a \"penny for your thoughts\"?  Where's that extra penny going to?",
   "Why do people pay to go up tall buildings and then put money in binoculars to look at things on the ground?",
   "Why do toasters always have a setting that burns the toast to a horrible crisp, which no decent human being would eat?",
   "Can a hearse carrying a corpse drive in the carpool lane?",

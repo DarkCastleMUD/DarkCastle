@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.90 2005/06/01 20:55:04 shane Exp $ */
+/* $Id: nanny.cpp,v 1.91 2005/06/01 21:15:00 urizen Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -601,8 +601,8 @@ int more_than_ten_people_from_this_ip(struct descriptor_data *new_conn)
 
 const char *host_list[]=
 {
-  "62.65.107.", // Urizen
-  "24.165.167.", // Dasein
+  "62.65.106.", // Urizen
+  "24.165.160.", // Dasein
   "24.112.103.", // Apocalypse
   "68.167.255.", // Scyld
   "127.0.0.1", // localhost (duh)
@@ -731,7 +731,7 @@ void nanny(struct descriptor_data *d, char *arg)
          if(file_exists(str_tmp))
          {
             SEND_TO_Q("That character is archived.\n\rPlease mail "
-               "Pirahna with unarchive requests.\n\r", d);
+               "Apocalypse with unarchive requests.\n\r", d);
             close_socket(d);
             return;
          }
