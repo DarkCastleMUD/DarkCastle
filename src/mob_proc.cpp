@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.75 2005/05/28 18:56:10 shane Exp $ */
+/* $Id: mob_proc.cpp,v 1.76 2005/06/01 10:19:15 shane Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -3038,7 +3038,19 @@ static char *dethSayText [ ] =
   "Your lucky number is 7399928377275452622483. Look for it everywhere!",
   "Love is like a snowmobile racing across the tundra and then suddenly it flips over, pinning you underneath. At night, the ice weasels come.",
   "Don't worry about people stealing your ideas. If your ideas are any good, you'll have to ram them down people's throats.",
-  "Avoid hangovers. Stay drunk"
+  "Avoid hangovers. Stay drunk",
+  "If money doesn't grow on trees then why do banks have branches?",
+  "How important does a person have to be before they are considered assassinated instead of murdered?",
+  "If electricity comes from electrons, does morality come from morons?",
+  "How is it that we put a man on the moon before we figured out it would be a good idea to put wheels on luggage?",
+  "Why is it that people say they "slept like a baby" when babies wake up like every two hours?",
+  "Why do you have to "put your two cents in" but it's only a "penny for your thoughts"?  Where's that extra penny going to?",
+  "Why do people pay to go up tall buildings and then put money in binoculars to look at things on the ground?",
+  "Why do toasters always have a setting that burns the toast to a horrible crisp, which no decent human being would eat?",
+  "Can a hearse carrying a corpse drive in the carpool lane?",
+  "Why do people point to their wrist when asking for the time, but don't point to their crotch when they ask where the bathroom is?",
+  "If Wyle E. Coyote had enough money to buy all that ACME crap, why didn't he just buy dinner?",
+  "Did you ever notice that when you blow in a dog's face, he gets mad at you, but when you take him for a car ride, he sticks his out of the window?"
 };
 
 #define DETH_SAY_TEXT_SIZE    ( sizeof ( dethSayText )    / sizeof ( char * ) )
