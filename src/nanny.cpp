@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.89 2005/05/28 18:56:10 shane Exp $ */
+/* $Id: nanny.cpp,v 1.90 2005/06/01 20:55:04 shane Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -70,8 +70,8 @@ extern "C" {
 #define STATE(d)    ((d)->connected)
 
 
-char echo_off_str [] = { (char)IAC, (char)WILL, (char)TELOPT_ECHO, (char)NULL };
-char echo_on_str  [] = { (char)IAC, (char)WONT, (char)TELOPT_ECHO, (char)NULL };
+//char echo_off_str [] = { (char)IAC, (char)WILL, (char)TELOPT_ECHO, (char)NULL };
+//char echo_on_str  [] = { (char)IAC, (char)WONT, (char)TELOPT_ECHO, (char)NULL };
 
 char menu[] = "\n\rWelcome to Dark Castle Mud\n\r\n\r"
               "0) Exit Dark Castle.\n\r"
@@ -762,7 +762,7 @@ void nanny(struct descriptor_data *d, char *arg)
       if ( fOld ) {
          /* Old player */
          SEND_TO_Q( "Password: ", d );
-         SEND_TO_Q( echo_off_str, d );
+//         SEND_TO_Q( echo_off_str, d );
          STATE(d) = CON_GET_OLD_PASSWORD;
          return;
       }
@@ -818,7 +818,7 @@ void nanny(struct descriptor_data *d, char *arg)
 
       sprintf( buf, "Please enter password for account '%s': ", stringtemp.c_str() );
       SEND_TO_Q( buf, d );
-      SEND_TO_Q( echo_off_str, d );
+//      SEND_TO_Q( echo_off_str, d );
       STATE(d) = CON_ACCOUNT_GET_OLD_PASSWORD;
       break;
       
@@ -850,7 +850,7 @@ void nanny(struct descriptor_data *d, char *arg)
          return;
       }
       
-      SEND_TO_Q( echo_on_str, d ); 
+//      SEND_TO_Q( echo_on_str, d ); 
       
       check_playing(d, GET_NAME(ch));
       
@@ -904,7 +904,7 @@ void nanny(struct descriptor_data *d, char *arg)
          return;
       }
       
-      SEND_TO_Q( echo_on_str, d ); 
+//      SEND_TO_Q( echo_on_str, d ); 
       
       sprintf( log_buf, "Account %s@%s has connected.", (d->account->getName()).c_str(), d->host);
       if(GET_LEVEL(ch) < ANGEL)
@@ -941,7 +941,7 @@ void nanny(struct descriptor_data *d, char *arg)
          }
          sprintf( buf, "New character.\n\rGive me a password for %s: ", GET_NAME(ch) );
          SEND_TO_Q( buf, d );
-         SEND_TO_Q( echo_off_str, d );
+//         SEND_TO_Q( echo_off_str, d );
          STATE(d) = CON_GET_NEW_PASSWORD;
          // at this point, pcdata hasn't yet been created.  So we're going to go ahead and
          // allocate it since a new character is obviously a PC
@@ -983,7 +983,7 @@ void nanny(struct descriptor_data *d, char *arg)
             return;
          }
          SEND_TO_Q("Entering account creation...\n\rPlease enter a password: ", d);
-         SEND_TO_Q( echo_off_str, d );
+//         SEND_TO_Q( echo_off_str, d );
          STATE(d) = CON_ACCOUNT_GET_NEW_PASSWORD;
          break;
          
@@ -1038,7 +1038,7 @@ void nanny(struct descriptor_data *d, char *arg)
          return;
       }
       
-      SEND_TO_Q( echo_on_str, d );
+//      SEND_TO_Q( echo_on_str, d );
       SEND_TO_Q( "What is your sex (M/F)? ", d );
       STATE(d) = CON_GET_NEW_SEX;
       break;
@@ -1053,7 +1053,7 @@ void nanny(struct descriptor_data *d, char *arg)
          STATE(d) = CON_GET_NEW_PASSWORD;
          return;
       }
-      SEND_TO_Q( echo_on_str, d );
+//      SEND_TO_Q( echo_on_str, d );
 
       SEND_TO_Q( "Your email address is used to send you a confirmation id that is\n\r"
                  "required in order to play Dark Castle MUD.  Your email address will\n\r"
@@ -1532,7 +1532,7 @@ break;
 SEND_TO_Q("TODO\n\r", d);
 break;
           SEND_TO_Q( "Enter current password: ", d );
-          SEND_TO_Q( echo_off_str, d );
+//          SEND_TO_Q( echo_off_str, d );
           STATE(d) = CON_CONFIRM_PASSWORD_CHANGE;
           break;
       
@@ -1649,7 +1649,7 @@ break;
       
        case '3':
           SEND_TO_Q( "Enter current password: ", d );
-          SEND_TO_Q( echo_off_str, d );
+//          SEND_TO_Q( echo_off_str, d );
           STATE(d) = CON_CONFIRM_PASSWORD_CHANGE;
           break;
       
@@ -1707,12 +1707,12 @@ break;
        SEND_TO_Q( "\n\r", d );
        if(!strncmp( (char *)crypt((char *)arg, (char *)ch->pcdata->pwd), ch->pcdata->pwd, PASSWORD_LEN)) {
           SEND_TO_Q( "Enter a new password: ", d );
-          SEND_TO_Q( echo_off_str, d );
+//          SEND_TO_Q( echo_off_str, d );
           STATE(d) = CON_RESET_PASSWORD;
           break;
        } else {
           SEND_TO_Q( "Incorrect.", d);
-          SEND_TO_Q( echo_on_str, d);
+//          SEND_TO_Q( echo_on_str, d);
           STATE(d) = CON_SELECT_MENU;
           SEND_TO_Q( menu, d );
        }
@@ -1740,7 +1740,7 @@ break;
           return;
        }
        
-       SEND_TO_Q( echo_on_str, d);
+//       SEND_TO_Q( echo_on_str, d);
        SEND_TO_Q( "\n\rDone.\n\r", d );
        SEND_TO_Q( menu, d );
        STATE(d)    = CON_SELECT_MENU;
