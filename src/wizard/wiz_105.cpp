@@ -32,8 +32,7 @@ int do_clearaff(struct char_data *ch, char *argument, int cmd)
      victim = ch;
     else if (!generic_find(argument, FIND_CHAR_WORLD, ch, &victim, &dummy))
         send_to_char("Couldn't find any such creature.\n\r", ch);
-
-  if (victim) {
+    if (victim) {
       for(af = victim->affected; af; af = afpk) {
         afpk = af->next;
         affect_remove(victim, af, SUPPRESS_ALL);

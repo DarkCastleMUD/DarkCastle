@@ -340,10 +340,33 @@ int write_hotboot_file()
       STATE(d) = CON_PLAYING; // if editors.
       if(d->original) {
         fprintf(fp,"%d\n%s\n%s\n",d->descriptor,GET_NAME(d->original),d->host);
+	if (d->original->pcdata){
+   	 if(d->original->pcdata->last_site)
+     	 dc_free(d->original->pcdata->last_site);
+#ifdef LEAK_CHECK
+	    d->original->pcdata->last_site = (char *)calloc(strlen(d->host) + 1, sizeof(char));
+#else
+	    d->original->pcdata->last_site = (char *)dc_alloc(strlen(d->host) + 1, sizeof(char));
+#endif
+	    strcpy (d->original->pcdata->last_site, d->original->desc->host);
+	    d->original->pcdata->time.logon = time(0);
+	}
         save_char_obj(d->original);
+
       }
       else {
         fprintf(fp,"%d\n%s\n%s\n",d->descriptor,GET_NAME(d->character),d->host);
+	if (d->character->pcdata){
+   	 if(d->character->pcdata->last_site)
+     	 dc_free(d->character->pcdata->last_site);
+#ifdef LEAK_CHECK
+	    d->character->pcdata->last_site = (char *)calloc(strlen(d->host) + 1, sizeof(char));
+#else
+	    d->character->pcdata->last_site = (char *)dc_alloc(strlen(d->host) + 1, sizeof(char));
+#endif
+	    strcpy (d->character->pcdata->last_site, d->character->desc->host);
+	    d->character->pcdata->time.logon = time(0);
+	}
         save_char_obj(d->character);
       }
       write_to_descriptor(d->descriptor,"Attempting to maintain your link during reboot.\r\nPlease wait..");
