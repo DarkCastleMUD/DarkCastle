@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.48 2005/05/31 11:24:47 urizen Exp $ */
+/* $Id: mob_proc2.cpp,v 1.49 2005/06/02 19:44:53 shane Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -1289,7 +1289,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     "15) Convert experience to gold. (100mil Exp. = 500000 Gold.)\n\r"
     "16) A deep blue potion of healing. Cost: 25 Platinum coins.\r\n"
     "17) A deep red vial of mana. Cost: 50 Platinum coins.\r\n"
-    "18) Buy a practice session for 10 plats.\n\r"
+    "18) Buy a practice session for 25 plats.\n\r"
     "19) Freedom from HUNGER and THIRST:  Currently out of stock.\n\r"
                  , ch);
 
@@ -1572,8 +1572,8 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 
 
   if(choice == 18) {
-    if (GET_PLATINUM(ch) < 10) {
-       send_to_char ("Costs 10 plats...which you don't have.\n\r", ch);
+    if (GET_PLATINUM(ch) < 25) {
+       send_to_char ("Costs 25 plats...which you don't have.\n\r", ch);
        return eSUCCESS;
     }
     if (IS_MOB(ch)) {
@@ -1582,7 +1582,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     }
     send_to_char("The Meta-Physician gives you a practice session.\n\r", ch);
  
-    GET_PLATINUM(ch) -= 10;
+    GET_PLATINUM(ch) -= 25;
     ch->pcdata->practices += 1;
     return eSUCCESS;
   }
