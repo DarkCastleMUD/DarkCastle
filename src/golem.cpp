@@ -66,7 +66,9 @@ struct golem_data
 
 const struct golem_data golem_list[] = {
   {"iron", "iron golem enchanted", "an enchanted iron golem", "A powerfully enchanted iron golem stands here, guarding its master.\r\n", 
-    "The iron golem is bound by its master's magics.  A mindless automaton,\r\nthe iron golem is one of the most powerful forces available in \r\nwizard's arsenal.  Nearly a full 8 feet tall and weighing several\r\ntons, this behemoth of pure iron is absolutely loyal to its master and\r\nsilently follows commands without fail.\r\n",
+    "The iron golem is bound by its master's magics.  A mindless automaton,\r\nthe iron golem is one of the most 
+powerful forces available in \r\na wizard's arsenal.  Nearly a full 8 feet tall and weighing several\r\ntons, this 
+behemoth of pure iron is absolutely loyal to its master and\r\nsilently follows commands without fail.\r\n",
     1000, 15, 5, 25, 50, {107, 108, 109, 0, 7004}, AFF_LIGHTNINGSHIELD, 0, -100,
     "There is a grinding and shrieking of metal as an iron golem is slowly formed.\r\n",
     "Unable to sustain further damage, the iron golem falls into unrecoverable scrap.",
