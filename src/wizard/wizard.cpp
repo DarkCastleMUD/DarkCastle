@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.25 2005/05/31 11:24:52 urizen Exp $
+| $Id: wizard.cpp,v 1.26 2005/06/03 21:20:29 shane Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -355,13 +355,13 @@ void boro_mob_stat(struct char_data *ch, struct char_data *k)
 		buf2, buf3); // immune and susceptable bits, first and second.
 	send_to_char(buf,ch);
 //TODO:expand with more affecs
-	sprintbit(k->affected_by[0], affected_bits, buf2);
+	sprintbit(k->affected_by, affected_bits, buf2);
 	sprintf(buf,
 		"|\\| $7Affected By$R: %-58s|~|\r\n", buf2); // affected bits.
 	send_to_char(buf,ch);
 
 	if(IS_MOB(k)) // AND THIS
-		sprintbit(k->mobdata->actflags[0], action_bits,buf2);
+		sprintbit(k->mobdata->actflags, action_bits,buf2);
 	else
 		strcpy(buf2,"Not a mob");
 	sprintbit(k->combat, combat_bits, buf3);
@@ -633,7 +633,7 @@ void mob_stat(struct char_data *ch, struct char_data *k)
 
   if(IS_NPC(k)) {
     strcpy(buf,"$3NPC flags$R: ");
-    sprintbit(k->mobdata->actflags[0], action_bits,buf2);
+    sprintbit(k->mobdata->actflags, action_bits,buf2);
   }  
   else {
     strcpy(buf,"$3PC flags$R: ");
@@ -701,7 +701,7 @@ void mob_stat(struct char_data *ch, struct char_data *k)
           k->conditions[FULL],
           k->conditions[DRUNK]);
   send_to_char(buf, ch);
-	sprintf(buf, "Melee: [%d] Spell: [%d] Song: [%d]\r\n", 
+	sprintf(buf, "$3Melee$R: [%d] $3Spell$R: [%d] $3Song$R: [%d]\r\n", 
 		k->melee_mitigation, k->spell_mitigation, k->song_mitigation);
 	send_to_char(buf,ch);
 
@@ -732,7 +732,7 @@ void mob_stat(struct char_data *ch, struct char_data *k)
   if(!IS_MOB(k))
      display_punishes(ch, k);
     
-  sprintbit(k->affected_by[0], affected_bits, buf);
+  sprintbit(k->affected_by, affected_bits, buf);
   csendf(ch, "$3Affected by$R: %s", buf);
 
   sprintbit(k->immune, isr_bits, buf);
@@ -785,9 +785,10 @@ void mob_stat(struct char_data *ch, struct char_data *k)
       sprintf(buf,"     Modifies %s by %d points\n\r",
               apply_types[(int) aff->location], aff->modifier);
       send_to_char(buf, ch);
-      sprintf(buf,"     Expires in %3d hours, Bits set ", aff->duration);
-      send_to_char(buf, ch);
-      sprintbit(aff->bitvector,affected_bits,buf);
+      sprintf(buf,"     Expires in %3d hours", aff->duration);
+//    strcat(buf,",Bits set ");
+//      send_to_char(buf, ch);
+//      sprintbit(aff->bitvector,affected_bits,buf);
       strcat(buf,"\n\r");
       send_to_char(buf, ch);
     }
