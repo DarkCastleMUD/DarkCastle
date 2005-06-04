@@ -658,22 +658,22 @@ int do_thing(CHAR_DATA *ch, char *argument, int cmd)
 
   sprintf(buf, "Hit points: %d\r\n   Exp spent: %lld\r\n   Plats spent: %lld\r\n   Plats enough for: %d\r\n   Exp enough for: %d\r\n",
       GET_RAW_HIT(victim),hps_exp_spent(victim), hps_plats_spent(victim), 
-r_new_meta_platinum_cost(GET_RAW_HIT(victim)-GET_HP_METAS(victim),hps_plats_spent(victim)),
-	r_new_meta_exp_cost(GET_RAW_HIT(victim)-GET_HP_METAS(victim), hps_exp_spent(victim)));
+r_new_meta_platinum_cost(0,hps_plats_spent(victim))+GET_RAW_HIT(victim)-GET_HP_METAS(victim),
+	r_new_meta_exp_cost(0, hps_exp_spent(victim))+GET_RAW_HIT(victim)-GET_HP_METAS(victim));
   send_to_char(buf,ch);
   
 
   sprintf(buf, "Mana points: %d\r\n   Exp spent: %lld\r\n   Plats spent: %lld\r\n   Plats enough for: %d\r\n   Exp enough for: %d\r\n",
       GET_RAW_MANA(victim),mana_exp_spent(victim), mana_plats_spent(victim), 
-r_new_meta_platinum_cost(GET_RAW_MANA(victim)-GET_MANA_METAS(victim),mana_plats_spent(victim)),	
-r_new_meta_exp_cost(GET_RAW_MANA(victim)-GET_MANA_METAS(victim), mana_exp_spent(victim)));
+r_new_meta_platinum_cost(0,mana_plats_spent(victim))+GET_RAW_MANA(victim)-GET_MANA_METAS(victim),	
+r_new_meta_exp_cost(0, mana_exp_spent(victim))+GET_RAW_MANA(victim)-GET_MANA_METAS(victim));
   send_to_char(buf,ch);
 
 
   sprintf(buf, "Move points: %d\r\n   Exp spent: %lld\r\n   Plats spent: %lld\r\n   Plats enough for: %d\r\n   Exp enough for: %d\r\n",
       GET_RAW_MOVE(victim),moves_exp_spent(victim), moves_plats_spent(victim), 
-r_new_meta_platinum_cost(GET_RAW_MOVE(victim)-GET_MOVE_METAS(victim),moves_plats_spent(victim)),
-	r_new_meta_exp_cost(GET_RAW_MOVE(victim)-GET_MOVE_METAS(victim), moves_exp_spent(victim)));
+r_new_meta_platinum_cost(0,moves_plats_spent(victim))+GET_RAW_MOVE(victim)-GET_MOVE_METAS(victim),
+	r_new_meta_exp_cost(0,moves_exp_spent(victim))+GET_RAW_MOVE(victim)-GET_MOVE_METAS(victim));
   send_to_char(buf,ch);
   
   return eSUCCESS;
