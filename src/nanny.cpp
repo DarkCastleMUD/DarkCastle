@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.91 2005/06/01 21:15:00 urizen Exp $ */
+/* $Id: nanny.cpp,v 1.92 2005/06/04 10:57:24 dcastle Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -106,6 +106,9 @@ extern CHAR_DATA *character_list;
 extern struct descriptor_data *descriptor_list;
 extern char *nonew_new_list[30];
 extern CWorld world;
+
+
+extern int learn_skill(char_data * ch, int skill, int amount, int maximum);
 
 
 #ifndef WIN32
@@ -527,10 +530,15 @@ void do_on_login_stuff(char_data * ch)
                 FREE(curr);
 		curr = a;
            } else { prev = curr; curr = curr->next; }
-
    
    barb_magic_resist(ch, 0, has_skill(ch, SKILL_MAGIC_RESIST));
-
+  /* meta reimbursement */
+  if (!has_skill(ch, META_REIMB))
+  {
+     learn_skill(ch, META_REIMB,1, 100);
+          
+  }
+  /* end meta reimbursement */
 }
 
 void roll_and_display_stats(CHAR_DATA * ch)

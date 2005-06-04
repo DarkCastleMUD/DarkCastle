@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.49 2005/06/02 19:44:53 shane Exp $ */
+/* $Id: mob_proc2.cpp,v 1.50 2005/06/04 10:57:24 dcastle Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -53,6 +53,195 @@ extern struct time_info_data time_info;
 void save_corpses(void);
 void hit(struct char_data *ch, struct char_data *victim, int type);
 void gain_exp(struct char_data *ch, int gain);
+
+long long  new_meta_platinum_cost(int start, int end)
+{ // This is the laziest function ever. I didn't feel like
+  // figuring out a formulae to work with the ranges, so I didn't.
+  long long platcost = 0;
+  if (end <= start || end < 0 || start < 0) return 0; // That's cheap!
+  while (start < end)
+  {
+    if (start < 1000) platcost += 100 + (start / 100);
+    else if (start < 1250) platcost += 110 + (start / 30);
+    else if (start < 1500) platcost += 150 + (start / 30);
+    else if (start < 1750) platcost += 200 + (start / 35);
+    else if (start < 2000) platcost += 250 + (start / 40);
+    else if (start < 3000) platcost += 300 + (start / 15);
+    else if (start < 4000) platcost += 500 + (start / 20);
+    else if (start < 5000) platcost += 700 + (start / 25);
+    else if (start < 6000) platcost += 900 + (start / 20);
+    else platcost += (1200 + (start / 20)) > 1500 ? 1500: (1200 + (start / 20));
+    start += 5;
+  }
+  return platcost;
+}
+
+int r_new_meta_platinum_cost(int start, long long plats)
+{ // This is a copy of the laziest function ever. I didn't feel like
+  // figuring out a formulae to work with the ranges, so I didn't.
+  long long platcost = 0;
+  if (plats <= 0 || start < 0) return 0;
+  while (platcost < plats)
+  {
+    if (start < 1000) platcost += 100 + (start / 100);
+    else if (start < 1250) platcost += 110 + (start / 30);
+    else if (start < 1500) platcost += 150 + (start / 30);
+    else if (start < 1750) platcost += 200 + (start / 35);
+    else if (start < 2000) platcost += 250 + (start / 40);
+    else if (start < 3000) platcost += 300 + (start / 15);
+    else if (start < 4000) platcost += 500 + (start / 20);
+    else if (start < 5000) platcost += 700 + (start / 25);
+    else if (start < 6000) platcost += 900 + (start / 20);
+    else platcost += (1200 + (start / 20)) > 1500 ? 1500: (1200 + (start / 20));
+    start += 5;
+  }
+  return start-5;
+}
+
+int r_new_meta_exp_cost(int start, long long exp)
+{
+   if (exp <= 0) return start;
+   while (exp > 0)
+   {
+     exp -= (5000000 + start * 25000);
+     start += 5;
+   }
+   return start-5;
+}
+
+
+long long moves_exp_spent(char_data * ch)
+{
+   int start = GET_RAW_MOVE(ch) - GET_MOVE_METAS(ch);
+   long long expcost = 0;
+   while (start < GET_RAW_MOVE(ch))
+   {
+    expcost += (int)((5000000 + (start * 2500))*1.2);
+    start++;
+   }
+   return expcost; 
+}
+
+long long moves_plats_spent(char_data * ch)
+{
+  long long expcost = 0;
+  int start = GET_RAW_MOVE(ch) - GET_MOVE_METAS(ch);
+  while (start < GET_RAW_MOVE(ch))
+  {
+    expcost += (long long)(((int)(125 + (int)((0.025 * start *(start/1000 == 0 ? 1: start/1000))))*0.9));
+    start++;
+  }
+  return expcost;
+}
+
+long long hps_exp_spent(char_data * ch)
+{
+   long long expcost = 0;
+   int cost;
+   switch (GET_CLASS(ch))
+   {
+      case CLASS_BARBARIAN: cost = 2000; break;
+      case CLASS_WARRIOR: cost = 2100; break;
+      case CLASS_PALADIN: cost = 2200; break;
+      case CLASS_MONK: cost = 2300; break;
+      case CLASS_RANGER: cost = 2500; break;
+      case CLASS_ANTI_PAL: cost = 2500; break;
+      case CLASS_THIEF: cost = 2600; break;
+      case CLASS_BARD: cost = 2600; break;
+      case CLASS_DRUID: cost = 2800; break;
+      case CLASS_CLERIC: cost = 2900; break;
+      case CLASS_MAGIC_USER: cost = 3000; break;
+      default:
+        cost = 3000; break;
+   }
+   int base = GET_RAW_HIT(ch) - GET_HP_METAS(ch);
+   while (base < GET_RAW_HIT(ch))
+   {
+     expcost += (long long)((5000000 + (cost * base))*1.2);
+     base++;
+   }
+   return expcost;
+}
+
+long long hps_plats_spent(char_data * ch)
+{
+   int cost;
+   long long platcost = 0;
+   switch (GET_CLASS(ch))
+   {
+      case CLASS_BARBARIAN: cost = 0; break;
+      case CLASS_WARRIOR: cost = 10; break;
+      case CLASS_PALADIN: cost = 20; break;
+      case CLASS_MONK: cost = 30; break;
+      case CLASS_RANGER: cost = 50; break;
+      case CLASS_ANTI_PAL: cost = 50; break;
+      case CLASS_THIEF: cost = 60; break;
+      case CLASS_BARD: cost = 60; break;
+      case CLASS_DRUID: cost = 80; break;
+      case CLASS_CLERIC: cost = 90; break;
+      case CLASS_MAGIC_USER: cost = 100; break;
+      default:
+        cost = 100; break;
+   }
+   int base = GET_RAW_HIT(ch) - GET_HP_METAS(ch);
+   while (base < GET_RAW_HIT(ch))
+   {
+     platcost += (long long)((100 + cost + (int)(0.025 * base *(base/1000 == 0 ? 1: base/1000))) * 0.9);
+     base++;
+   }
+   return platcost;
+}
+
+long long mana_exp_spent(char_data * ch)
+{
+   int cost;
+   long long expcost = 0;
+   switch (GET_CLASS(ch))
+   {
+      case CLASS_PALADIN: cost = 2800; break;
+      case CLASS_RANGER: cost = 2500; break;
+      case CLASS_ANTI_PAL: cost = 2500; break;
+      case CLASS_DRUID: cost = 2200; break;
+      case CLASS_CLERIC: cost = 2100; break;
+      case CLASS_MAGIC_USER: cost = 2000; break;
+      default:
+        return 0;
+   }
+   int base = GET_RAW_MANA(ch) - GET_MANA_METAS(ch);
+   while (base < GET_RAW_MANA(ch))
+   {
+     expcost += (long long)((5000000 + (cost * base))*1.2);
+     base++;     
+   }
+   return expcost;
+}
+
+
+long long mana_plats_spent(char_data * ch)
+{
+   int cost;
+   long long platcost = 0;
+   switch (GET_CLASS(ch))
+   {
+      case CLASS_PALADIN: cost = 80; break;
+      case CLASS_RANGER: cost = 50; break;
+      case CLASS_ANTI_PAL: cost = 50; break;
+      case CLASS_DRUID: cost = 20; break;
+      case CLASS_CLERIC: cost = 10; break;
+      case CLASS_MAGIC_USER: cost = 0; break;
+      default:
+        return 0;
+   }
+  int base = GET_RAW_MANA(ch) - GET_MANA_METAS(ch);
+  while (base < GET_RAW_MANA(ch))
+  {
+    platcost += (long long)((100 + cost + (int)(0.025 * base * (base/1000 == 0 ? 1: base/1000)))*0.9);
+    base++;
+  }
+  return platcost;
+}
+
+
 
 float value_multiplier(struct obj_data *obj)
 {
@@ -928,11 +1117,9 @@ int meta_get_stat_exp_cost(char_data * ch, byte stat)
     switch(stat) {
       case CONSTITUTION:
 	curr_stat = ch->raw_con;
-//        xp_price = ((GET_LEVEL(ch)*4)*10000)+((ch->raw_con*8)*30000);
         break;
       case STRENGTH:
 	  curr_stat = ch->raw_str;
-//        xp_price = ((GET_LEVEL(ch)*4)*10000)+((ch->raw_str*8)*30000);
         break;
       case DEXTERITY:
 	curr_stat = ch->raw_dex;

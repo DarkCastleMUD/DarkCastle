@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.h,v 1.35 2005/04/28 19:23:35 shane Exp $ */
+/* $Id: interp.h,v 1.36 2005/06/04 10:57:27 dcastle Exp $ */
 
 #ifndef INTERP_H_
 #define INTERP_H_
@@ -53,6 +53,7 @@ struct command_info
 
 DO_FUN  do_boro;
 
+DO_FUN do_thing;
 DO_FUN  do_reload;
 DO_FUN  do_abandon;
 DO_FUN  do_accept;

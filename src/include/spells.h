@@ -14,7 +14,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.h,v 1.68 2005/05/06 11:24:41 shane Exp $ */
+/* $Id: spells.h,v 1.69 2005/06/04 10:57:27 dcastle Exp $ */
 #include <structs.h> // byte, sh_int
 
 #define MAX_BUF_LENGTH               240
@@ -321,7 +321,10 @@ void check_maxes(CHAR_DATA *ch);
 #define SKILL_ICE_ARROW              381
 #define SKILL_TEMPEST_ARROW          382
 #define SKILL_GRANITE_ARROW          383
-#define SKILL_MAX                    383
+#define DO_NOT_USE_I_SUCK	     384 // Oh how convenient skills are for this, 
+					// and so bad looking. yay. I want mysql.
+#define META_REIMB		     385
+#define SKILL_MAX                    385
 
 // if you add a skill, make sure you update "skills[]" in spells.C
 // as well as SKILL_MAX

@@ -627,3 +627,54 @@ int do_range(struct char_data *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
+extern long long new_meta_platinum_cost(int start, int end);
+extern int r_new_meta_platinum_cost(int start, long long plats);
+extern int r_new_meta_exp_cost(int start, long long exp);
+
+extern long long moves_exp_spent(char_data * ch);
+extern long long moves_plats_spent(char_data * ch);
+extern long long hps_exp_spent(char_data * ch);
+extern long long hps_plats_spent(char_data * ch);
+extern long long mana_exp_spent(char_data * ch);
+extern long long mana_plats_spent(char_data * ch);
+
+
+
+int do_thing(CHAR_DATA *ch, char *argument, int cmd)
+{
+  char arg[MAX_INPUT_LENGTH];
+  CHAR_DATA *victim;
+  argument = one_argument(argument, arg);
+  if (arg[0] == '\0' || !(victim = get_pc_vis(ch, arg)))
+  {
+     send_to_char("Do_the_thing who?\r\n",ch);
+     return eFAILURE;
+  }
+  char buf[MAX_STRING_LENGTH];
+  sprintf(buf, "Hps metad: %d Mana metad: %d Moves Metad: %d\r\n",
+	GET_HP_METAS(victim), GET_MANA_METAS(victim), GET_MOVE_METAS(ch));
+  send_to_char(buf,ch);
+
+
+  sprintf(buf, "Hit points: %d\r\n   Exp spent: %lld\r\n   Plats spent: %lld\r\n   Plats enough for: %d\r\n   Exp enough for: %d\r\n",
+      GET_RAW_HIT(victim),hps_exp_spent(victim), hps_plats_spent(victim), 
+r_new_meta_platinum_cost(GET_RAW_HIT(victim)-GET_HP_METAS(victim),hps_plats_spent(victim)),
+	r_new_meta_exp_cost(GET_RAW_HIT(victim)-GET_HP_METAS(victim), hps_exp_spent(victim)));
+  send_to_char(buf,ch);
+  
+
+  sprintf(buf, "Mana points: %d\r\n   Exp spent: %lld\r\n   Plats spent: %lld\r\n   Plats enough for: %d\r\n   Exp enough for: %d\r\n",
+      GET_RAW_MANA(victim),mana_exp_spent(victim), mana_plats_spent(victim), 
+r_new_meta_platinum_cost(GET_RAW_MANA(victim)-GET_MANA_METAS(victim),mana_plats_spent(victim)),	
+r_new_meta_exp_cost(GET_RAW_MANA(victim)-GET_MANA_METAS(victim), mana_exp_spent(victim)));
+  send_to_char(buf,ch);
+
+
+  sprintf(buf, "Move points: %d\r\n   Exp spent: %lld\r\n   Plats spent: %lld\r\n   Plats enough for: %d\r\n   Exp enough for: %d\r\n",
+      GET_RAW_MOVE(victim),moves_exp_spent(victim), moves_plats_spent(victim), 
+r_new_meta_platinum_cost(GET_RAW_MOVE(victim)-GET_MOVE_METAS(victim),moves_plats_spent(victim)),
+	r_new_meta_exp_cost(GET_RAW_MOVE(victim)-GET_MOVE_METAS(victim), moves_exp_spent(victim)));
+  send_to_char(buf,ch);
+  
+  return eSUCCESS;
+}
