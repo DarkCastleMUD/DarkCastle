@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.135 2005/06/04 10:57:24 dcastle Exp $ */
+/* $Id: spells.cpp,v 1.136 2005/06/04 19:42:26 urizen Exp $ */
 
 extern "C"
 {
@@ -579,7 +579,7 @@ char *skills[]=
   "tempest arrows",
   "granite arrows",
   "ignoreme101",
-  "Ignorethis",
+  "Ignorethisaa",
   "\n"
 };
 

@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.77 2005/06/01 21:15:00 urizen Exp $ */
+/* $Id: mob_proc.cpp,v 1.78 2005/06/04 19:42:26 urizen Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -3050,7 +3050,8 @@ static char *dethSayText [ ] =
   "Can a hearse carrying a corpse drive in the carpool lane?",
   "Why do people point to their wrist when asking for the time, but don't point to their crotch when they ask where the bathroom is?",
   "If Wyle E. Coyote had enough money to buy all that ACME crap, why didn't he just buy dinner?",
-  "Did you ever notice that when you blow in a dog's face, he gets mad at you, but when you take him for a car ride, he sticks his out of the window?"
+  "Did you ever notice that when you blow in a dog's face, he gets mad at you, but when you take him for a car ride, he sticks his out of the window?",
+  "Apocalypse is the kind of man who understands, that when you put another man's cock in your mouth, you make a pact."
 };
 
 #define DETH_SAY_TEXT_SIZE    ( sizeof ( dethSayText )    / sizeof ( char * ) )

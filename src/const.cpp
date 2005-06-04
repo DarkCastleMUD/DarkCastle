@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.153 2005/05/28 18:56:09 shane Exp $ */
+/* $Id: const.cpp,v 1.154 2005/06/04 19:42:25 urizen Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -900,7 +900,7 @@ char *affected_bits[] =
     "ILLUSION",
     "KNOW_ALIGN",
     "BLACKJACK_ALERT",
-    "WATERBREATH"
+    "WATERBREATH",
     "\n"
 };
 

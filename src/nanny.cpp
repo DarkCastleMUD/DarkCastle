@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.92 2005/06/04 10:57:24 dcastle Exp $ */
+/* $Id: nanny.cpp,v 1.93 2005/06/04 19:42:26 urizen Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -522,7 +522,8 @@ void do_on_login_stuff(char_data * ch)
 
           while(curr)
             if(curr->skillnum < 600 && search_skills2(curr->skillnum,a)==-1
-		&& search_skills2(curr->skillnum, g_skills) == -1)
+		&& search_skills2(curr->skillnum, g_skills) == -1 &&
+		curr->skillnum != 385)
 	    {
 	    struct char_skill_data *a = curr->next;
                 if (prev) prev->next = curr->next;
@@ -535,8 +536,29 @@ void do_on_login_stuff(char_data * ch)
   /* meta reimbursement */
   if (!has_skill(ch, META_REIMB))
   {
-     learn_skill(ch, META_REIMB,1, 100);
-          
+        learn_skill(ch, META_REIMB, 1, 100);
+	extern long long new_meta_platinum_cost(int start, int end);
+	extern int r_new_meta_platinum_cost(int start, long long plats);
+	extern int r_new_meta_exp_cost(int start, long long exp);
+
+	extern long long moves_exp_spent(char_data * ch);
+	extern long long moves_plats_spent(char_data * ch);
+	extern long long hps_exp_spent(char_data * ch);
+	extern long long hps_plats_spent(char_data * ch);
+	extern long long mana_exp_spent(char_data * ch);
+	extern long long mana_plats_spent(char_data * ch);
+	int new_ = MIN(r_new_meta_platinum_cost(0, hps_plats_spent(ch)), r_new_meta_exp_cost(0, hps_exp_spent(ch)));
+	int ometa = GET_HP_METAS(ch);
+        GET_HP_METAS(ch) = new_;
+	GET_RAW_HIT(ch) += new_ - ometa;
+        new_ = MIN(r_new_meta_platinum_cost(0, mana_plats_spent(ch)), r_new_meta_exp_cost(0, mana_exp_spent(ch)));
+        ometa = GET_MANA_METAS(ch);
+        GET_RAW_MANA(ch) += new_ - ometa;
+	GET_MANA_METAS(ch) = new_;
+        new_ = MIN(r_new_meta_platinum_cost(0, moves_plats_spent(ch)), r_new_meta_exp_cost(0, moves_exp_spent(ch)));
+	ometa = GET_MOVE_METAS(ch);
+	GET_MOVE_METAS(ch) = new_;
+	GET_RAW_MOVE(ch) += new_ - ometa;                  
   }
   /* end meta reimbursement */
 }

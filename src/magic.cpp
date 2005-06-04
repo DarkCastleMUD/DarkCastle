@@ -3988,11 +3988,11 @@ int spell_animate_dead(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
   char buf[200];
   int number, r_num;
 
-  if(!IS_EVIL(ch) && GET_LEVEL(ch) < ARCHANGEL) {
+/*  if(!IS_EVIL(ch) && GET_LEVEL(ch) < ARCHANGEL) {
     send_to_char("You aren't evil enough to cast such a repugnant spell.\n\r",
                  ch);
     return eFAILURE;
-  }
+  }*/
 
   if(many_charms(ch))  {
     send_to_char("How do you plan on controlling so many followers?\n\r", ch);
@@ -4009,6 +4009,7 @@ int spell_animate_dead(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
     return eFAILURE;
   }
 
+  if (GET_ALIGNMENT(ch) < 0) {
   if(level < 20)
     number = 22394;
   else if(level < 30)
@@ -4019,6 +4020,18 @@ int spell_animate_dead(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
     number = 22397;
   else
     number = 22398;
+ } else {
+  if(level < 20)
+    number = 22389;
+  else if(level < 30)
+    number = 22390;
+  else if(level < 40)
+    number = 22391;
+  else if(level < 50)
+    number = 22392;
+  else
+    number = 22393;
+ }
 
   if ((r_num = real_mobile(number)) < 0) {
     send_to_char("Mobile: Zombie not found.\n\r", ch);
@@ -4045,9 +4058,12 @@ int spell_animate_dead(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
   
   mob->short_desc = str_hsh(corpse->short_description);
 
+  if (GET_ALIGNMENT(ch) < 0) 
   sprintf(buf, "%s slowly staggers around.\n\r", corpse->short_description);
+  else
+  sprintf(buf, "%s hovers above the ground here.\r\n",corpse->short_description);
   mob->long_desc = str_hsh(buf);
-
+ // HERETODO
   act("Calling upon your foul magic, you animate $p.\n\r$N slowly lifts "
       "itself to its feet.", ch, corpse, mob, TO_CHAR, INVIS_NULL);
   act("Calling upon $s foul magic, $n animates $p.\n\r$N slowly lifts "

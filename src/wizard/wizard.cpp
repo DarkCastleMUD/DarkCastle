@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.26 2005/06/03 21:20:29 shane Exp $
+| $Id: wizard.cpp,v 1.27 2005/06/04 19:42:30 urizen Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -733,7 +733,7 @@ void mob_stat(struct char_data *ch, struct char_data *k)
      display_punishes(ch, k);
     
   sprintbit(k->affected_by, affected_bits, buf);
-  csendf(ch, "$3Affected by$R: %s", buf);
+  csendf(ch, "$3Affected by$R: %s\r\n", buf);
 
   sprintbit(k->immune, isr_bits, buf);
   csendf(ch, "$3Immune$R: %s\n\r", buf);

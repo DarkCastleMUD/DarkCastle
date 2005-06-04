@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.87 2005/05/31 11:24:46 urizen Exp $ */
+/* $Id: db.cpp,v 1.88 2005/06/04 19:42:25 urizen Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -2563,7 +2563,8 @@ CHAR_DATA *read_mobile(int nr, FILE *fl)
        mob->mobdata->actflags[j] = tmp;
        j++;
     }
-    mob->mobdata->actflags[j] = -1;
+    for ( ; j < ACT_MAX/ASIZE+1; j++)
+       mob->mobdata->actflags[j] = 0;
     if (ISSET(mob->mobdata->actflags, ACT_NOTRACK))
        REMBIT(mob->mobdata->actflags, ACT_NOTRACK);
     SET_BIT(mob->misc, MISC_IS_MOB);
@@ -2573,7 +2574,10 @@ CHAR_DATA *read_mobile(int nr, FILE *fl)
        mob->affected_by[j] = tmp;
        j++;
     }
-    mob->affected_by[j] = 0;
+    for ( ; j < AFF_MAX/ASIZE+1; j++)
+       mob->affected_by[j] = 0;
+
+//    mob->affected_by[j] = 0;
 
     mob->alignment   = fread_int (fl, LONG_MIN, LONG_MAX);
 
@@ -2726,14 +2730,14 @@ void write_mobile(char_data * mob, FILE *fl)
     string_to_file( fl, mob->description );
 
     while(i < ACT_MAX/ASIZE+1) {
-       fprintf(fl, "%d", mob->mobdata->actflags[i]);
+       fprintf(fl, " %d", mob->mobdata->actflags[i]);
        i++;
     }
-   fprintf(fl," -1");
+   fprintf(fl," -1\n");
     i = 0;
 
     while(i < AFF_MAX/ASIZE+1) {
-       fprintf(fl, "%d", mob->affected_by[i]);
+       fprintf(fl, " %d", mob->affected_by[i]);
        i++;
     }
    fprintf(fl," -1");
@@ -4667,8 +4671,10 @@ void init_char(CHAR_DATA *ch)
   ch->pcdata->golem = 0;
   SET_BIT(ch->pcdata->toggles, PLR_ANSI);
   SET_BIT(ch->pcdata->toggles, PLR_BARD_SONG);
-  ch->affected_by[0] = 0;
-
+  int i; 
+ for (i = 0; i < AFF_MAX/ASIZE+1; i++)
+  ch->affected_by[i] = 0;
+  
   apply_initial_saves(ch);
 
   for(int i = 0; i < 3; i++)

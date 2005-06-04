@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.37 2005/05/28 18:56:10 shane Exp $ */
+/* $Id: utility.cpp,v 1.38 2005/06/04 19:42:26 urizen Exp $ */
 
 extern "C"
 {
@@ -272,11 +272,22 @@ void log( char *str, int god_level, long type )
 // function for new SETBIT et al. commands
 void sprintbit( int value[], char *names[], char *result )
 {
-   long nr, vektor;
-   int i=0;
+//   long nr, vektor;
+   int i;
    *result = '\0';
-
-   while(value[i] != -1) {
+   
+   for (i = 0; *names[i] != '\n';i++)
+   {
+     int a = i/ASIZE;
+     if (IS_SET(value[a], 1 << (i - a*32)))
+     {
+      if (!strcmp(names[i], "UNUSED")) continue;
+      strcat(result, names[i]);
+     strcat(result, " ");
+     }
+   }
+/*
+   while( i < AFF_MAX/ASIZE+1) {
       vektor = value[i];
       for ( nr=0; vektor; vektor>>=1 )
       {
@@ -289,12 +300,12 @@ void sprintbit( int value[], char *names[], char *result )
             strcat( result, " " );
          }
 
-         if ( *names[nr+i*ASIZE] != '\n' )
-            nr++;
+//         if ( *names[nr+i*ASIZE] != '\n' )
+          nr++;
       }
       i++;
    }
-
+*/
    if ( *result == '\0' )
       strcat( result, "NoBits " );
 }
@@ -1410,12 +1421,12 @@ void parse_bitstrings_into_int(char * bits[], char * strings, char_data *ch, int
       if (!strcmp("unused",bits[x])) continue;
       if(is_abbrev(buf, bits[x])) 
       {
-        if(ISSET(value, (1<<x))) {
-          REMBIT(value, (1<<x));
+        if(ISSET(value, x)) {
+          REMBIT(value, x);
           csendf(ch, "%s flag REMOVED.\n\r", bits[x]);
         }
         else {
-          SETBIT(value, (1<<x));
+          SETBIT(value, x);
           csendf(ch, "%s flag ADDED.\n\r", bits[x]);
         }
         found = TRUE;

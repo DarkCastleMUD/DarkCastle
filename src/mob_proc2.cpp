@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.50 2005/06/04 10:57:24 dcastle Exp $ */
+/* $Id: mob_proc2.cpp,v 1.51 2005/06/04 19:42:26 urizen Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -103,10 +103,16 @@ int r_new_meta_exp_cost(int start, long long exp)
    if (exp <= 0) return start;
    while (exp > 0)
    {
-     exp -= (5000000 + start * 25000);
+     exp -= new_meta_platinum_cost(start, start+1) * 51523;
      start += 5;
    }
    return start-5;
+}
+
+int new_meta_exp_cost_one(int start)
+{
+   if (start < 0) return 0;
+   return new_meta_platinum_cost(start, start+1) * 51523;
 }
 
 
@@ -1264,96 +1270,32 @@ void meta_list_stats(char_data * ch)
 
 int meta_get_moves_exp_cost(char_data * ch)
 {
-   return (int)((5000000 + (GET_RAW_MOVE(ch) * 2500))*1.2);
+    return new_meta_exp_cost_one(GET_MOVE_METAS(ch));
 }
 
 int meta_get_moves_plat_cost(char_data * ch)
 {
-  return (int)((int)(125 + (int)((0.025 * GET_RAW_MOVE(ch) * 
-(GET_RAW_MOVE(ch)/1000 == 0 ? 1: GET_RAW_MOVE(ch)/1000))))*0.9);
+    return (int)new_meta_platinum_cost(GET_MOVE_METAS(ch), GET_MOVE_METAS(ch)+1);
 }
 
 int meta_get_hps_exp_cost(char_data * ch)
 {
-   int cost;
-
-   switch (GET_CLASS(ch))
-   {
-      case CLASS_BARBARIAN: cost = 2000; break;
-      case CLASS_WARRIOR: cost = 2100; break;
-      case CLASS_PALADIN: cost = 2200; break;
-      case CLASS_MONK: cost = 2300; break;
-      case CLASS_RANGER: cost = 2500; break;
-      case CLASS_ANTI_PAL: cost = 2500; break;
-      case CLASS_THIEF: cost = 2600; break;
-      case CLASS_BARD: cost = 2600; break;
-      case CLASS_DRUID: cost = 2800; break;
-      case CLASS_CLERIC: cost = 2900; break; 
-      case CLASS_MAGIC_USER: cost = 3000; break;
-      default:
-	cost = 3000; break;
-   }
-   cost = 5000000 + (cost * GET_RAW_HIT(ch));
-   return (int)(cost*1.2);
+   return new_meta_exp_cost_one(GET_HP_METAS(ch));
 }
 
 int meta_get_hps_plat_cost(char_data * ch)
 {
-   int cost;
-   switch (GET_CLASS(ch))
-   {
-      case CLASS_BARBARIAN: cost = 0; break;
-      case CLASS_WARRIOR: cost = 10; break;
-      case CLASS_PALADIN: cost = 20; break;
-      case CLASS_MONK: cost = 30; break;
-      case CLASS_RANGER: cost = 50; break;
-      case CLASS_ANTI_PAL: cost = 50; break;
-      case CLASS_THIEF: cost = 60; break;
-      case CLASS_BARD: cost = 60; break;
-      case CLASS_DRUID: cost = 80; break;
-      case CLASS_CLERIC: cost = 90; break;
-      case CLASS_MAGIC_USER: cost = 100; break;
-      default:
-        cost = 100; break;
-   }
-   cost = 100 + cost + (int)(0.025 * GET_RAW_HIT(ch) *(GET_RAW_HIT(ch)/1000 == 0 ? 1: GET_RAW_HIT(ch)/1000));
-   return (int)(cost*0.9);
+    return (int)new_meta_platinum_cost(GET_HP_METAS(ch), GET_HP_METAS(ch)+1);
 }
 
 int meta_get_mana_exp_cost(char_data * ch)
 {
-   int cost;
-   switch (GET_CLASS(ch))
-   {
-      case CLASS_PALADIN: cost = 2800; break;
-      case CLASS_RANGER: cost = 2500; break;
-      case CLASS_ANTI_PAL: cost = 2500; break;
-      case CLASS_DRUID: cost = 2200; break;
-      case CLASS_CLERIC: cost = 2100; break;
-      case CLASS_MAGIC_USER: cost = 2000; break;
-      default:
-        return 0;
-   }
-   cost = 5000000 + (cost * GET_RAW_MANA(ch));
-   return (int)(cost*1.2);
+   return new_meta_exp_cost_one(GET_MANA_METAS(ch));
 }
 
 int meta_get_mana_plat_cost(char_data * ch)
 {
-   int cost;
-   switch (GET_CLASS(ch))
-   {
-      case CLASS_PALADIN: cost = 80; break;
-      case CLASS_RANGER: cost = 50; break;
-      case CLASS_ANTI_PAL: cost = 50; break;
-      case CLASS_DRUID: cost = 20; break;
-      case CLASS_CLERIC: cost = 10; break;
-      case CLASS_MAGIC_USER: cost = 0; break;
-      default:
-        return 0;
-   }
-  cost = 100 + cost + (int)(0.025 * GET_RAW_MANA(ch) * (GET_RAW_MANA(ch)/1000 == 0 ? 1: GET_RAW_MANA(ch)/1000));
-  return (int)(cost*0.9);
+    return (int)new_meta_platinum_cost(GET_MANA_METAS(ch), GET_MANA_METAS(ch)+1);
 }
 
 int meta_get_ki_exp_cost(char_data * ch)
@@ -1442,19 +1384,19 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     meta_list_stats(ch);
      
     if (hit_exp && hit_cost) 
-    csendf(ch, "6) Add to your hit points:   %d experience points and %d"
+    csendf(ch, "6) Add 5 points to your hit points:   %d experience points and %d"
             " Platinum coins.\n\r", hit_exp, hit_cost); 
     else
     csendf(ch, "6) Add to your hit points:   You cannot do this.\r\n");
 
     if (mana_exp && mana_cost)
-    csendf(ch, "7) Add to your mana points:  %d experience points and %d"
+    csendf(ch, "7) Add 5 points to your mana points:  %d experience points and %d"
             " Platinum coins.\n\r", mana_exp, mana_cost);
     else
     csendf(ch, "7) Add to your mana points:  You cannot do this.\r\n");
 
     if (move_exp && move_cost)
-    csendf(ch, "8) Add to your movement points: %d experience points and %d"
+    csendf(ch, "8) Add 5 points to your movement points: %d experience points and %d"
             " Platinum coins.\n\r", move_exp, move_cost);
     else
     csendf(ch, "8) Add to your movement points:  You cannot do this.\r\n");
@@ -1572,9 +1514,9 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
      GET_EXP(ch) -= hit_exp;
      GET_PLATINUM(ch) -= hit_cost;
 
-     increase = 1;
+     increase = 5;
      ch->raw_hit += increase;
-     GET_HP_METAS(ch) += 1;
+     GET_HP_METAS(ch) += 5;
      act("The Meta-physician touches $n.",  ch, 0, 0, TO_ROOM, 0);
      act("The Meta-physician touches you.",  ch, 0, 0, TO_CHAR, 0);
      redo_hitpoints(ch);
@@ -1595,9 +1537,9 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
      GET_EXP(ch) -= mana_exp;
      GET_PLATINUM(ch) -= mana_cost;
 
-     increase = 1;
+     increase = 5;
      ch->raw_mana += increase;
-     GET_MANA_METAS(ch) += 1;
+     GET_MANA_METAS(ch) += 5;
      act("The Meta-physician touches $n.",  ch, 0, 0, TO_ROOM, 0);
      act("The Meta-physician touches you.",  ch, 0, 0, TO_CHAR, 0);
      redo_mana(ch);
@@ -1617,9 +1559,9 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 
      GET_EXP(ch)  -= move_exp;
      GET_PLATINUM(ch) -= move_cost;
-     ch->raw_move += 1;
-     ch->max_move += 1;
-     GET_MOVE_METAS(ch) += 1;
+     ch->raw_move += 5;
+     ch->max_move += 5;
+     GET_MOVE_METAS(ch) += 5;
      act("The Meta-physician touches $n.",  ch, 0, 0, TO_ROOM, 0);
      act("The Meta-physician touches you.",  ch, 0, 0, TO_CHAR, 0);
      redo_hitpoints(ch);

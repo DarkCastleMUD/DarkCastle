@@ -126,7 +126,8 @@ int do_set(struct char_data *ch, char *argument, int cmd)
         "age","sex","class","level","height","weight","str","stradd",
         "int","wis","dex","con","gold","exp","mana","hit","move",
         "sessions","alignment","thirst","drunk","full","race",
-        "bank", "platinum", "ki", "clan", "saves_base", "\n"
+        "bank", "platinum", "ki", "clan", "saves_base", "hpmeta",
+	"manameta","movemeta","\n"
     };
     struct char_data *vict;
     char name[100], buf2[100], buf[100], help[MAX_STRING_LENGTH];
@@ -562,6 +563,21 @@ int do_set(struct char_data *ch, char *argument, int cmd)
               }
               vict->pcdata->saves_mods[i] = value;
             }
+	case 28:
+	{
+              GET_HP_METAS(vict) = atoi(buf);
+              log(buf2, GET_LEVEL(ch), LOG_GOD); 
+	}
+	case 29:
+	{
+              GET_MANA_METAS(vict) = atoi(buf);
+              log(buf2, GET_LEVEL(ch), LOG_GOD); 
+	}
+	case 30:
+	{
+              GET_MOVE_METAS(vict) = atoi(buf);
+              log(buf2, GET_LEVEL(ch), LOG_GOD); 
+	}
         }
     
   send_to_char("Ok.\n\r", ch);
