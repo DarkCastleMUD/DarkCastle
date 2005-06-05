@@ -2640,10 +2640,11 @@ mob_index[mob_num].virt);
           return eFAILURE;
         }
         send_to_char("Enter the mob's description below."
-                     " Terminate with '~' on a new line.\n\r\n\r", ch);
+                     " Terminate with '/s' on a new line.\n\r\n\r", ch);
 // TODO - this causes a memory leak if you edit the desc twice (first one is hsh'd)
 //        ((char_data *)mob_index[mob_num].item)->description = NULL;
         ch->desc->connected = CON_EDITING;
+	((char_data*)mob_index[mob_num].item)->description = str_dup("");
         ch->desc->strnew = &(((char_data *)mob_index[mob_num].item)->description);
         ch->desc->max_str = MAX_MESSAGE_LENGTH;
       } break;

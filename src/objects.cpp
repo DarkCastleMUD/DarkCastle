@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.54 2005/05/28 18:56:10 shane Exp $
+| $Id: objects.cpp,v 1.55 2005/06/05 16:13:21 urizen Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -1424,6 +1424,11 @@ void wear(struct char_data *ch, struct obj_data *obj_object, int keyword)
         send_to_char(buffer, ch);
         return;
       }
+  }
+  if (IS_NPC(ch) && (mob_index[ch->mobdata->nr].virt < 22394 &&
+	mob_index[ch->mobdata->nr].virt > 22388))
+  {
+     return;
   }
   obj = obj_object;
 

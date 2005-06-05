@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.154 2005/06/04 19:42:25 urizen Exp $ */
+/* $Id: const.cpp,v 1.155 2005/06/05 16:13:21 urizen Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -122,7 +122,7 @@ char *spell_wear_off_msg[] =
   "Your blessing has expired.",
   "Your blinding affliction dissolves.",
   "!Burning Hands!",                                           /* 5 */
-  "!Call Lightning",
+  "Your iridescent aura fades.",
   "You feel the affects of the charm end.",
   "A warmth returns to your bones, dispelling the deep $B$3chill$R.",
   "!Clone!",
@@ -1468,6 +1468,7 @@ struct class_skill_defines u_skills[] = { // druid skills
 {    "lighted path",         SPELL_LIGHTED_PATH,         33,     98,     {WIS,DEX} },
 {    "curse",                SPELL_CURSE,                34,     90,     {WIS,INT} },
 {    "sun ray",              SPELL_SUN_RAY,              35,     98,     {INT,CON} },
+{    "call lightning",       SPELL_CALL_LIGHTNING,    35,     98,     {INT,CON} },     
 {    "control weather",      SPELL_CONTROL_WEATHER,      36,     90,     {CON,WIS} },
 {    "barkskin",             SPELL_BARKSKIN,             37,     85,     {CON,DEX} },
 {    "iron roots",           SPELL_IRON_ROOTS,           38,     98,     {STR,DEX} },
@@ -1529,8 +1530,7 @@ struct class_skill_defines c_skills[] = { // cleric skills
 {    "heroes feast",         SPELL_HEROES_FEAST,      31,     98,     {WIS,CON} },
 {    "dispel evil",          SPELL_DISPEL_EVIL,       32,     90,     {WIS,STR} },
 {    "dispel good",          SPELL_DISPEL_GOOD,       33,     90,     {WIS,STR} },     
-{    "call lightning",       SPELL_CALL_LIGHTNING,    34,     98,     {INT,CON} },     
-{    "control weather",      SPELL_CONTROL_WEATHER,   35,     70,     {CON,WIS} },     
+{    "iridescent aura",      SPELL_IRIDESCENT_AURA,   35,     98,     {WIS,INT} },
 {    "protection from evil", SPELL_PROTECT_FROM_EVIL, 36,     90,     {WIS,DEX} },     
 {    "protection from good", SPELL_PROTECT_FROM_GOOD, 37,     90,     {WIS,DEX} },     
 {    "portal",               SPELL_PORTAL,            38,     85,     {STR,INT} },     

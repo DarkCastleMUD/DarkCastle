@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.136 2005/06/04 19:42:26 urizen Exp $ */
+/* $Id: spells.cpp,v 1.137 2005/06/05 16:13:22 urizen Exp $ */
 
 extern "C"
 {
@@ -94,7 +94,7 @@ struct spell_info_type spell_info [ ] =
 
  { /* 05 */ 12, POSITION_FIGHTING, 15, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_burning_hands, SKILL_INCREASE_MEDIUM },
 
- { /* 06 */ 12, POSITION_FIGHTING, 35, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_call_lightning, SKILL_INCREASE_HARD },
+ { /* 06 */ 12, POSITION_STANDING, 15, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_iridescent_aura, SKILL_INCREASE_MEDIUM },
 
  { /* 07 */ /* 18, POSITION_STANDING, 15, TAR_CHAR_ROOM|TAR_SELF_NONO, cast_charm_person */ 0, 0, 0, 0, 0, 0 },
 
@@ -394,7 +394,9 @@ struct spell_info_type spell_info [ ] =
 
  { /* 155 */ 12, POSITION_STANDING, 33, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_resist_magic, SKILL_INCREASE_HARD },
  
- { /* 156 */ 12, POSITION_STANDING, 30, TAR_CHAR_WORLD, cast_eagle_eye, SKILL_INCREASE_HARD }
+ { /* 156 */ 12, POSITION_STANDING, 30, TAR_CHAR_WORLD, cast_eagle_eye, SKILL_INCREASE_HARD },
+
+ { /* 157 */ 12, POSITION_FIGHTING, 35, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_call_lightning, SKILL_INCREASE_HARD }
 
 };
 
@@ -590,7 +592,7 @@ char *spells[]=
    "bless",
    "blindness",
    "burning hands",
-   "call lightning",
+   "iridescent aura",
    "charm person",
    "chill touch",
    "clone",  
@@ -741,6 +743,7 @@ char *spells[]=
    "unholy aegis",
    "resist magic",
    "eagle eye",
+   "call lightning",
    "\n"
 };
 
@@ -798,6 +801,8 @@ void affect_update( void )
     static struct affected_type *af, *next_af_dude;
     static CHAR_DATA *i, * i_next;
     void update_char_objects( CHAR_DATA *ch ); /* handler.c */
+    int faded_spells[20];
+    int a = 0;
 
     for (i = character_list; i; i = i_next) { 
       i_next = i->next;
@@ -831,8 +836,19 @@ void affect_update( void )
 	else {
 	  if ((af->type > 0) && (af->type <= MAX_SPL_LIST)) // only spells for this part
 	     if (*spell_wear_off_msg[af->type]) {
+		int z;
+		bool fadeit = TRUE;
+		for (z = 0;z < a;z++)
+		{
+		  if (faded_spells[z] == af->type)
+		   fadeit = FALSE;
+		} 
+		if (fadeit) {
+		if (a < 19)
+  		  faded_spells[a++] = af->type;
 	        send_to_char(spell_wear_off_msg[af->type], i);
 	        send_to_char("\n\r", i);
+		}
 	     }
 	  affect_remove(i, af, 0);
 	}
@@ -1225,6 +1241,8 @@ int do_release(CHAR_DATA *ch, char *argument, int cmd)
     for (aff = ch->affected; aff; aff = aff_next)
     {
        aff_next = aff->next;
+       while (aff_next && aff_next->type != aff->type)
+	aff_next = aff->next;
        if (!get_skill_name(aff->type))
           continue;
        if (!printed)
@@ -1274,8 +1292,8 @@ int do_release(CHAR_DATA *ch, char *argument, int cmd)
                 send_to_char(spell_wear_off_msg[aff->type], ch);
                 send_to_char("\n\r", ch);
              }
-
-	  affect_remove(ch,aff,0);
+	  affect_from_char(ch, aff->type);
+//	  affect_remove(ch,aff,0);
 	 done = TRUE;
        }
     }

@@ -623,6 +623,32 @@ int cast_stone_shield( byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA
   return eFAILURE;
 }
 
+int cast_iridescent_aura( byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill )
+{
+  switch (type) {
+	case SPELL_TYPE_SPELL:
+		 return spell_iridescent_aura(level,ch,tar_ch,0, skill);
+		 break;
+	case SPELL_TYPE_POTION:
+		 return spell_iridescent_aura(level,ch,ch,0, skill);
+		 break;
+	case SPELL_TYPE_SCROLL:
+		 if (tar_obj) return eFAILURE;
+		 if (!tar_ch) tar_ch = ch;
+		 return spell_iridescent_aura(level,ch,ch,0, skill);
+		 break;
+	case SPELL_TYPE_WAND:
+		 if (tar_obj) return eFAILURE;
+		 if (!tar_ch) tar_ch = ch;
+		 return spell_iridescent_aura(level,ch,tar_ch,0, skill);
+		 break;
+		default :
+	 log("Serious screw-up in iridesent_aura!", ANGEL, LOG_BUG);
+	 break;
+	 }
+  return eFAILURE;
+}
+
 
 /* GREATER STONE SHIELD */
 
@@ -1127,7 +1153,7 @@ int spell_call_lightning(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct ob
 
   if (OUTSIDE(ch) && (weather_info.sky>=SKY_RAINING)) 
   {
-     dam = dice(MIN((int)GET_MANA(ch),700), 1);
+     dam = dice(MIN((int)GET_MANA(ch),650), 1);
      return spell_damage(ch, victim, dam,TYPE_ENERGY, SPELL_CALL_LIGHTNING, 0);
   }
   return eFAILURE;
@@ -3988,11 +4014,11 @@ int spell_animate_dead(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
   char buf[200];
   int number, r_num;
 
-/*  if(!IS_EVIL(ch) && GET_LEVEL(ch) < ARCHANGEL) {
+  if(!IS_EVIL(ch) && GET_LEVEL(ch) < ARCHANGEL && GET_CLASS(ch) == CLASS_ANTI_PAL) {
     send_to_char("You aren't evil enough to cast such a repugnant spell.\n\r",
                  ch);
     return eFAILURE;
-  }*/
+  }
 
   if(many_charms(ch))  {
     send_to_char("How do you plan on controlling so many followers?\n\r", ch);
@@ -4056,18 +4082,27 @@ int spell_animate_dead(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
   sprintf(buf, "%s %s", corpse->name, mob->name);
   mob->name = str_hsh(buf);
   
-  mob->short_desc = str_hsh(corpse->short_description);
+//  mob->short_desc = str_hsh(corpse->short_description);
 
   if (GET_ALIGNMENT(ch) < 0) 
-  sprintf(buf, "%s slowly staggers around.\n\r", corpse->short_description);
-  else
-  sprintf(buf, "%s hovers above the ground here.\r\n",corpse->short_description);
-  mob->long_desc = str_hsh(buf);
- // HERETODO
+  {
+    sprintf(buf, "%s slowly staggers around.\n\r", corpse->short_description);
+    mob->long_desc = str_hsh(buf);
+  }
+//  else
+ // sprintf(buf, "%s hovers above the ground here.\r\n",corpse->short_description);
+
+  if (GET_ALIGNMENT(ch) < 0) {
   act("Calling upon your foul magic, you animate $p.\n\r$N slowly lifts "
       "itself to its feet.", ch, corpse, mob, TO_CHAR, INVIS_NULL);
   act("Calling upon $s foul magic, $n animates $p.\n\r$N slowly lifts "
       "itself to its feet.", ch, corpse, mob, TO_ROOM, INVIS_NULL);
+  } else {
+  act("Invoking your divine magic, you free $p's spirit.\n\r$N slowly rises "
+      "out of the corpse and hovers a few feet above the ground.", ch, corpse, mob, TO_CHAR, INVIS_NULL);
+  act("Invoking $s divine magic, $n releases $p's spirit.\n\r$N slowly rises "
+      "out of the corpse and hovers a few feet above the ground.", ch, corpse, mob, TO_ROOM, INVIS_NULL);
+  }
 
   // zombie should be charmed and follower ch
   // TODO duration needs skill affects too
@@ -4760,6 +4795,40 @@ int spell_flamestrike(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 	 GET_KI(victim) = 0;
    }
    return retval;
+}
+
+int spell_iridescent_aura(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
+{
+   struct affected_type af;
+/*   if (GET_CLASS(ch) == CLASS_PALADIN && ch != victim)
+   {
+	send_to_char("You can only cast this on yourself.\r\n",ch);
+	return eFAILURE;
+   }
+*/
+   if (!affected_by_spell(victim, SPELL_IRIDESCENT_AURA)) {
+//      act("$n's skin turns $3blue$R momentarily.", victim, 0, 0, TO_ROOM, INVIS_NULL);
+//      act("Your skin turns $3blue$R momentarily.", victim, 0, 0, TO_CHAR, 0);
+      act("The air around $n shimmer and an iridescent aura appears around $m.", victim, 0, 0, TO_ROOM, INVIS_NULL);
+      act("The air around you shimmers, and an iridescent aura appears around you.",victim,0,0, TO_CHAR,0);
+      af.type = SPELL_IRIDESCENT_AURA;
+      af.duration = 1 + skill / 10;
+      af.modifier = skill/15;
+      af.bitvector = -1;
+      af.location = APPLY_SAVING_COLD;
+      affect_to_char(victim, &af);
+      af.location = APPLY_SAVING_FIRE;
+      affect_to_char(victim, &af);
+      af.location = APPLY_SAVING_POISON;
+      affect_to_char(victim, &af);
+      af.location = APPLY_SAVING_MAGIC;
+      affect_to_char(victim, &af);
+      af.location = APPLY_SAVING_ACID;
+      affect_to_char(victim, &af);
+      af.location = APPLY_SAVING_ENERGY;
+      affect_to_char(victim, &af);
+   }
+   return eSUCCESS;
 }
 
 
@@ -9747,7 +9816,7 @@ int spell_sun_ray(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data 
 
   set_cantquit( ch, victim );
 
-  dam = MIN((int)GET_MANA(ch), 750);
+  dam = MIN((int)GET_MANA(ch), 650);
 
   if (OUTSIDE(ch) && (weather_info.sky <= SKY_CLOUDY)) {
 

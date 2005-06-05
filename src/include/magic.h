@@ -5,7 +5,7 @@
  *                                                                           *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-/* $Id: magic.h,v 1.20 2005/04/27 11:31:02 shane Exp $ */
+/* $Id: magic.h,v 1.21 2005/06/05 16:13:28 urizen Exp $ */
 #ifndef MAGIC_H_
 #define MAGIC_H_
 
@@ -16,6 +16,8 @@ bool resist_spell(int perc);
 bool resist_spell(CHAR_DATA *ch, int skill);
 int spellcraft(CHAR_DATA *ch, int spell);
 
+int spell_iridescent_aura(byte level, CHAR_DATA *ch,
+    CHAR_DATA *victim, struct obj_data *obj, int skill);
 int spell_resist_fire(byte level, CHAR_DATA * ch,
    CHAR_DATA * victim, struct obj_data * obj, int skill);
 int spell_resist_cold(byte level, CHAR_DATA * ch,
@@ -236,6 +238,8 @@ int spell_hellstream(byte level, CHAR_DATA * ch,
 int spell_group_sanc(byte level, CHAR_DATA *ch, CHAR_DATA *victim, 
 	struct obj_data *obj, int skill);
 
+int cast_iridescent_aura(byte level, CHAR_DATA *ch, char *arg, int type,
+   CHAR_DATA *victim, struct obj_data *tar_obj, int skill);
 int cast_camouflague(byte level, CHAR_DATA * ch, char *arg, int type,
    CHAR_DATA * victim, struct obj_data * tar_obj, int skill);
 int cast_farsight(byte level, CHAR_DATA * ch, char *arg, int type,

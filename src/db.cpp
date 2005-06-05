@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.88 2005/06/04 19:42:25 urizen Exp $ */
+/* $Id: db.cpp,v 1.89 2005/06/05 16:13:21 urizen Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -3235,7 +3235,12 @@ int create_blank_mobile(int nr)
 #else
     mob->mobdata = (mob_data *) dc_alloc(1, sizeof(mob_data));
 #endif
-    mob->mobdata->actflags[0] = 0;
+    int i;
+    for (i = 0; i < ACT_MAX/ASIZE+1;i++)
+    mob->mobdata->actflags[i] = 0;
+    for (i = 0; i < AFF_MAX/ASIZE+1;i++)
+    mob->affected_by[i] = 0;
+
     mob->mobdata->damnodice = 1;
     mob->mobdata->damsizedice = 1;
     mob->mobdata->default_pos = POSITION_STANDING;
@@ -3263,7 +3268,7 @@ int create_blank_mobile(int nr)
            curr->mobdata->nr++;
 
     // update index of all the mob prototypes
-    for(int i = cur_index+1; i <= top_of_mobt; i++)
+    for(i = cur_index+1; i <= top_of_mobt; i++)
        ((char_data *)mob_index[i].item)->mobdata->nr++;
 
     // update obj file indices
@@ -3289,7 +3294,7 @@ int create_blank_mobile(int nr)
         Shop fixes follow.
     */
     extern struct shop_data shop_index[MAX_SHOP];
-    int i;
+ //   int i;
     for (i = 0; i < MAX_SHOP; i++)
     {
       if (shop_index[i].keeper >= cur_index)
@@ -4596,6 +4601,10 @@ void reset_char(CHAR_DATA *ch)
   SET_BIT(ch->misc, CHANNEL_AUCTION);
   SET_BIT(ch->misc, CHANNEL_INFO);
   SET_BIT(ch->misc, CHANNEL_NEWBIE);
+  ch->group_name = 0;
+  ch->ambush = 0;
+  ch->guarding = 0;
+  ch->guarded_by = 0;
 }
 
 
