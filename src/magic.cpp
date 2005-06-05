@@ -1178,7 +1178,7 @@ int spell_power_harm(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
 {
   int dam;
   set_cantquit( ch, victim );
-  dam = 300;
+  dam = 350;
 
   return spell_damage(ch, victim, dam, TYPE_MAGIC, SPELL_POWER_HARM, 0);
 }
@@ -4775,7 +4775,7 @@ int spell_flamestrike(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
    }
 
    set_cantquit (ch, victim);
-   dam = 350;
+   dam = 450;
 
    retval = spell_damage(ch, victim, dam, TYPE_FIRE, SPELL_FLAMESTRIKE, 0);
 
