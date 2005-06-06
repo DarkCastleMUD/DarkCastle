@@ -2,7 +2,7 @@
 #define FIGHT_H_
 
 /************************************************************************
-| $Id: fight.h,v 1.22 2005/06/06 22:57:49 urizen Exp $
+| $Id: fight.h,v 1.23 2005/06/06 22:58:24 urizen Exp $
 | fight.h
 | This file defines the header information for fight.
 */
@@ -132,7 +132,7 @@ struct threat_struct
   struct threat_struct *next;
   int threat;
   char *name;
-}
+};
 
 
 #endif
