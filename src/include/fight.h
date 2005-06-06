@@ -2,7 +2,7 @@
 #define FIGHT_H_
 
 /************************************************************************
-| $Id: fight.h,v 1.21 2005/05/28 18:56:22 shane Exp $
+| $Id: fight.h,v 1.22 2005/06/06 22:57:49 urizen Exp $
 | fight.h
 | This file defines the header information for fight.
 */
@@ -126,5 +126,13 @@ void eq_destroyed(char_data * ch, obj_data * obj, int pos);
 #define DAMAGE_TYPE_PHYSICAL  0
 #define DAMAGE_TYPE_MAGIC     1
 #define DAMAGE_TYPE_SONG      2
+
+struct threat_struct
+{
+  struct threat_struct *next;
+  int threat;
+  char *name;
+}
+
 
 #endif

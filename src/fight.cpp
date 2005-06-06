@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.270 2005/05/28 18:56:09 shane Exp $ */
+/* $Id: fight.cpp,v 1.271 2005/06/06 22:57:45 urizen Exp $ */
 
 extern "C"
 {
@@ -281,6 +281,11 @@ void perform_violence(void)
     if (is_stunned(ch) || IS_AFFECTED(ch, AFF_PARALYSIS))
 	update_stuns(ch);
   }
+}
+
+int generate_threat(CHAR_DATA *mob, int skill, CHAR_DATA *target)
+{
+  
 }
 
 bool gets_dual_wield_attack(char_data * ch)
