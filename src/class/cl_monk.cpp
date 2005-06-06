@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_monk.cpp,v 1.24 2005/05/31 11:24:48 urizen Exp $
+| $Id: cl_monk.cpp,v 1.25 2005/06/06 21:48:03 shane Exp $
 | cl_monk.C
 | Description:  Monk skills.
 */
@@ -39,6 +39,7 @@ int do_eagle_claw(struct char_data *ch, char *argument, int cmd)
    if(ch->equipment[WIELD])          hands++;
    if(ch->equipment[SECOND_WIELD])   hands++;
    if(ch->equipment[HOLD])           hands++;
+   if(ch->equipment[HOLD2])          hands++;
    if(ch->equipment[WEAR_SHIELD])    hands++;
    if(ch->equipment[WEAR_LIGHT])     hands++;
 
@@ -47,7 +48,7 @@ int do_eagle_claw(struct char_data *ch, char *argument, int cmd)
      return eFAILURE;
    }
 
-   if (ch->equipment[HOLD]) {
+   if (ch->equipment[HOLD] && ch->equipment[HOLD2]) {
      send_to_char ("You can't hold anything while you perform this!\n\r", ch);
      return eFAILURE;
    }
