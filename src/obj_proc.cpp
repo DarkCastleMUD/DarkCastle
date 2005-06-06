@@ -2938,7 +2938,7 @@ int spellcraft_glyphs(struct char_data*ch, struct obj_data *obj, int cmd, char*a
       send_to_char("There's no place around to put this special item.\n\r", ch);
       return eFAILURE;
    }
-   argi = one_argument(argi,arg);
+   argi = one_argument(argi, arg);
    argi = one_argument(argi, target);
 
    sunglyph = get_obj_in_list_vis(ch, 6351, ch->carrying);
@@ -3004,7 +3004,6 @@ int spellcraft_glyphs(struct char_data*ch, struct obj_data *obj, int cmd, char*a
      }
    } else
       send_to_char("Which glyph?\n\r", ch);
-
    if(ch->spellcraftglyph == 7) {
       if(GET_CLASS(ch) == CLASS_MAGIC_USER && GET_LEVEL(ch) >= 50 && !has_skill(ch, SKILL_SPELLCRAFT)) {
          send_to_room("The glyph containers glow an eerie pale white.\n\rThe book shoots out a beams of light from the pages.\n\r", ch->in_room);
