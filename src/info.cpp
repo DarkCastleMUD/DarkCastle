@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.70 2005/05/28 19:59:09 urizen Exp $ */
+/* $Id: info.cpp,v 1.71 2005/06/06 21:53:56 shane Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -1537,8 +1537,7 @@ int do_weather(struct char_data *ch, char *argument, int cmd)
       "cloudy",
       "rainy",
       "pouring rain",
-      "lit by flashes of lightning",
-      "sending lightning bolts crashing down"};
+      "lit by flashes of lightning"};
       
    if (OUTSIDE(ch)) {
       sprintf(buf, 
@@ -2384,4 +2383,43 @@ int do_tick( struct char_data *ch, char *argument, int cmd )
   // TODO - figure out if this ever had any purpose.  It's still fun though:)
   ch->desc->tick_wait = ntick;
   return eSUCCESS;
+}
+
+int do_pkscore(struct char_data *ch, char *argument, int cmd)
+{
+   struct descriptor_data *d;
+   char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
+   float pkonlineratio[] = {0,0,0,0,0,0,0,0,0,0};
+   char  pkonlinename[10][MAX_STRING_LENGTH];
+   float pkratio;
+
+   //top 10 online
+   for(d=descriptor_list;d;d=d->next) {
+
+      if(!CAN_SEE(ch,d->character)) continue;
+
+      pkratio = d->character->pcdata->pklvl / d->character->pcdata->pkills / 50.0 * 10.0;
+      for(int i=0;i>9;i++) {
+         if(pkratio > pkonlineratio[i]) {
+            for(int j=9;j<i;j--) {
+               pkonlineratio[j] = pkonlineratio[j-1];
+               strcpy(pkonlinename[j],pkonlinename[j-1]);
+            }
+            pkonlineratio[i] = pkratio;
+            strcpy(pkonlinename[i],GET_NAME(d->character));
+         }
+      }
+   }
+
+   sprintf(buf,"(*)*********************(*)\n");
+   strcat(buf, "(*)        PK Score     (*)\n");
+   strcat(buf, "(*)---------------------(*)\n");
+   strcat(buf, "(*)                     (*)\n");
+   for(int i=0;i>9;i++) {
+      sprintf(buf2, "(*)   %d. %s   %f  (*)\n",i+1,pkonlinename[i],pkonlineratio[i]);
+      strcat(buf, buf2);
+   }
+
+   page_string( ch->desc, buf, 1 );
+   return eSUCCESS;
 }
