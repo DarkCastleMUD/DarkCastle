@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.89 2005/06/05 16:13:21 urizen Exp $ */
+/* $Id: db.cpp,v 1.90 2005/06/06 09:30:55 urizen Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -3218,7 +3218,7 @@ int create_blank_mobile(int nr)
     mob->short_desc = str_hsh("an empty mob");
     mob->long_desc = str_hsh("an empty mob description");
     mob->description  = str_hsh("");
-    mob->title = str_hsh("");
+    mob->title = 0;
     mob->fighting = 0;
     mob->pcdata       = 0;
   mob->altar = 0; 

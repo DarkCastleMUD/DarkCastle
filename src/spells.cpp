@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.137 2005/06/05 16:13:22 urizen Exp $ */
+/* $Id: spells.cpp,v 1.138 2005/06/06 09:30:55 urizen Exp $ */
 
 extern "C"
 {
@@ -1241,8 +1241,8 @@ int do_release(CHAR_DATA *ch, char *argument, int cmd)
     for (aff = ch->affected; aff; aff = aff_next)
     {
        aff_next = aff->next;
-       while (aff_next && aff_next->type != aff->type)
-	aff_next = aff->next;
+//       while (aff_next && aff_next->type == aff->type)
+//	aff_next = aff_next->next;
        if (!get_skill_name(aff->type))
           continue;
        if (!printed)
@@ -1268,7 +1268,10 @@ int do_release(CHAR_DATA *ch, char *argument, int cmd)
 
        for (aff = ch->affected; aff; aff = aff_next)
        {
-         aff_next = aff->next;
+        aff_next = aff->next;
+	while (aff_next && aff_next->type == aff->type)
+         aff_next = aff_next->next;
+
          if (!get_skill_name(aff->type))
             continue;
 	 if (str_prefix(argument,get_skill_name(aff->type)))
