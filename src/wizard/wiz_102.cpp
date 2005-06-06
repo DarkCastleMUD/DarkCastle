@@ -943,7 +943,6 @@ int do_zedit(struct char_data *ch, char *argument, int cmd)
 
       for(int k = 0; k <= top_of_zonet; k++)
       {
-	if (zone_table[k] == NULL) continue;
         if(GET_LEVEL(ch) < DEITY && zone != k)
            continue;
 

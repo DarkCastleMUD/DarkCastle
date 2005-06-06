@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.91 2005/06/06 19:05:54 urizen Exp $ */
+/* $Id: db.cpp,v 1.92 2005/06/06 19:30:40 urizen Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -2300,20 +2300,20 @@ void write_one_zone(FILE * fl, int zon)
   fprintf(fl, "S\n$~\n");
 }
 
-void read_one_zone(FILE * fl, int *num)
+void read_one_zone(FILE * fl, int zon)
 {
   struct reset_com reset_tab[MAX_RESET];
   char *check, buf[161], ch;
-  int reset_top, i, tmp,a;
+  int reset_top, i, tmp;
   char * skipper = NULL;
-  int zon;
+//  int zon;
   ch = fread_char (fl);
   tmp = fread_int (fl, 0, 64000);
   check = fread_string(fl, 0);
-  a = fread_int(fl, 0, 64000);
+  //a = fread_int(fl, 0, 64000);
   /* alloc a new_new zone */
-  *num = zon = a / 100;
-
+  //*num = zon = a / 100;
+  top_of_zonet = zon;
   if ( zon >= MAX_ZONE )
   {
     log("Max zone hit!", 0, LOG_MISC);
@@ -2329,7 +2329,7 @@ void read_one_zone(FILE * fl, int *num)
   curr_name   = check;
 
   zone_table[zon].name = check;
-  zone_table[zon].top  = a;
+  zone_table[zon].top  = fread_int(fl, 0, 64000);
 	
   /*
    * this initialization is important for obtaining the
@@ -2461,8 +2461,8 @@ void boot_zones(void)
   char * temp;
   char endfile[200]; // hopefully noone is stupid and makes a 180 char filename
 
-  for (zon = 0;zon < MAX_ZONE;zon++)
-   zone_table[zon] = NULL; // Null list, top_of_z can't be used now
+//  for (zon = 0;zon < MAX_ZONE;zon++)
+ //  zone_table[zon] = NULL; // Null list, top_of_z can't be used now
  
   if(!code_testing_mode && !bport) 
   {
@@ -2496,11 +2496,11 @@ void boot_zones(void)
       log (temp, 0, LOG_BUG);
       abort();
     }
-    int num = 0;
-    read_one_zone(fl, &num);
-    zone_table[num].filename = strdup(temp);
-
-    if (num > zon) zon = num;
+    //int num = 0;
+    zone_table[zon].filename = strdup(temp);
+    read_one_zone(fl, zon);
+     zon++;
+//    if (num > zon) zon = num;
     dc_fclose(fl);
     dc_free(temp);
   }
@@ -3360,7 +3360,6 @@ void delete_mob_from_index(int nr)
     // update zonefile commands - these store rnums
     for(i = 0; i <= top_of_zonet; i++)
     {
-	if (!zone_table[i]) continue;
        for(j = 0; zone_table[i].cmd[j].command != 'S'; j++)
        {
           switch( zone_table[i].cmd[j].command )
@@ -3444,7 +3443,6 @@ void delete_item_from_index(int nr)
     // update zonefile commands - these store rnums
     for(i = 0; i <= top_of_zonet; i++)
     {
-	if (!zone_table[i]) continue;
        for(j = 0; zone_table[i].cmd[j].command != 'S'; j++)
        {
           switch( zone_table[i].cmd[j].command )
