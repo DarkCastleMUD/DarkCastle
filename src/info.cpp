@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.71 2005/06/06 21:53:56 shane Exp $ */
+/* $Id: info.cpp,v 1.72 2005/06/06 22:03:36 shane Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -1532,7 +1532,7 @@ int do_weather(struct char_data *ch, char *argument, int cmd)
 {
    extern struct weather_data weather_info;
    char buf[256];
-   static char *sky_look[6]= {
+   static char *sky_look[5]= {
       "cloudless",
       "cloudy",
       "rainy",
