@@ -2953,9 +2953,7 @@ int spellcraft_glyphs(struct char_data*ch, struct obj_data *obj, int cmd, char*a
       if(!str_cmp(target, "sun")) {
          send_to_room("The sun glows brightly as it releases the energy inside the glyph.\n\r", ch->in_room);
          obj_from_char(sunglyph);
-         if(ch->spellcraftglyph == 0)
-            ch->spellcraftglyph = 1;
-         else ch->spellcraftglyph += 4;
+	 SET_BIT(ch->spellcraftglyph, 1);
       } else if(!str_cmp(target, "book")) {
          send_to_room("The sun glows a bright red and shatters the glyphs!\n\r", ch->in_room);
          destroy_spellcraft_glyphs(ch);
@@ -2977,9 +2975,7 @@ int spellcraft_glyphs(struct char_data*ch, struct obj_data *obj, int cmd, char*a
       } else if(!str_cmp(target, "book")) {
          send_to_room("The book closes over the glyph, becoming slightly warm.\n\r", ch->in_room);
          obj_from_char(bookglyph);
-         if(ch->spellcraftglyph == 1)
-            ch->spellcraftglyph = 2;
-         else ch->spellcraftglyph += 4;
+	 SET_BIT(ch->spellcraftglyph, 2);
       } else if(!str_cmp(target, "heart")) {
          send_to_room("The book slams shut creating a sonic wave that shatters the glyphs!\n\r", ch->in_room);
          destroy_spellcraft_glyphs(ch);
@@ -3001,9 +2997,7 @@ int spellcraft_glyphs(struct char_data*ch, struct obj_data *obj, int cmd, char*a
       } else if(!str_cmp(target, "heart")) {
          send_to_room("The heart The sun glows a bright red and shatters the glyphs!\n\r", ch->in_room);
          obj_from_char(heartglyph);
-         if(ch->spellcraftglyph == 2) //the person did it correctly
-            ch->spellcraftglyph = 3;
-         else ch->spellcraftglyph += 4;
+	 SET_BIT(ch->spellcraftglyph, 4);
       } else {
          send_to_char("Put it where?\n\r", ch);
          return eFAILURE;
@@ -3011,7 +3005,7 @@ int spellcraft_glyphs(struct char_data*ch, struct obj_data *obj, int cmd, char*a
    } else
       send_to_char("Which glyph?\n\r", ch);
 
-   if(ch->spellcraftglyph == 3) {
+   if(ch->spellcraftglyph == 7) {
       if(GET_CLASS(ch) == CLASS_MAGIC_USER && GET_LEVEL(ch) >= 50 && !has_skill(ch, SKILL_SPELLCRAFT)) {
          send_to_room("The glyph containers glow an eerie pale white.\n\rThe book shoots out a beams of light from the pages.\n\r", ch->in_room);
          send_to_char("A beam of light hits you in the head!\n\rYou have learned spellcraft!\n\r", ch);
@@ -3019,11 +3013,11 @@ int spellcraft_glyphs(struct char_data*ch, struct obj_data *obj, int cmd, char*a
       }
    }
 
-   if(ch->spellcraftglyph > 8) {
+/*   if(ch->spellcraftglyph > 8) {
       send_to_room("The glyph containers ", ch->in_room);
       destroy_spellcraft_glyphs(ch); //just in case
       return eFAILURE;
    }
-
+*/
    return eSUCCESS;   
 }
