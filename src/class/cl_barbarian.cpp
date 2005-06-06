@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_barbarian.cpp,v 1.53 2005/05/31 11:24:48 urizen Exp $
+| $Id: cl_barbarian.cpp,v 1.54 2005/06/06 20:21:16 urizen Exp $
 | cl_barbarian.C
 | Description:  Commands for the barbarian class.
 */
@@ -190,6 +190,9 @@ int do_berserk(struct char_data *ch, char *argument, int cmd)
       send_to_char( "Who do you want to go berserk on?\n\r", ch );
       return eFAILURE;
     }
+  }else if(ch->fighting) {
+      send_to_char("You're already in combat, and focus your energies on your current target instead.\r\n",ch);
+      victim = ch->fighting;
   }
 
   if(ch->in_room != victim->in_room) {
