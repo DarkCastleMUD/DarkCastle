@@ -2926,9 +2926,9 @@ void destroy_spellcraft_glyphs(struct char_data *ch)
    ch->spellcraftglyph = 0;
 }
 
-int spellcraft_glyphs(struct char_data*ch, struct obj_data *obj, int cmd, char*arg, CHAR_DATA *invoker)
+int spellcraft_glyphs(struct char_data*ch, struct obj_data *obj, int cmd, char*argi, CHAR_DATA *invoker)
 {
-   char target[MAX_STRING_LENGTH];
+   char target[MAX_STRING_LENGTH],arg[MAX_STRING_LENGTH];
    struct obj_data * sunglyph, *  bookglyph, * heartglyph;
    extern int learn_skill(char_data *, int, int, int);
 
@@ -2938,8 +2938,8 @@ int spellcraft_glyphs(struct char_data*ch, struct obj_data *obj, int cmd, char*a
       send_to_char("There's no place around to put this special item.\n\r", ch);
       return eFAILURE;
    }
-
-   one_argument(arg, target);
+   argi = one_argument(argi,arg);
+   argi = one_argument(argi, target);
 
    sunglyph = get_obj_in_list_vis(ch, 6351, ch->carrying);
    bookglyph = get_obj_in_list_vis(ch, 6352, ch->carrying);
