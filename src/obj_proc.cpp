@@ -751,7 +751,7 @@ int gazeofgaiot(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
    char vict[256];
 
    one_argument(arg, vict);
-   if (cmd != 187) return eFAILURE;
+   if (cmd != 1820) return eFAILURE;
    if (!ch->equipment[WEAR_FACE] || real_object(9603) != ch->equipment[WEAR_FACE]->item_number)
      return eFAILURE;
 
