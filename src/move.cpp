@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.46 2005/05/28 18:56:10 shane Exp $
+| $Id: move.cpp,v 1.47 2005/06/08 23:33:55 shane Exp $
 | move.C
 | Movement commands and stuff.
 *************************************************************************
@@ -29,6 +29,7 @@
 #include <returnvals.h>
 #include <game_portal.h>
 #include <innate.h>
+#include <weather.h>
 
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
@@ -146,6 +147,21 @@ void record_track_data(CHAR_DATA *ch, int cmd)
   world[ch->in_room].AddTrackItem(newScent);
   
   return;
+}
+
+void do_muddy(CHAR_DATA *ch)
+{
+   short chance = number(0,30);
+
+   if(IS_NPC(ch) || IS_AFFECTED(ch, AFF_FLYING)) {
+      //poop on a stick!
+   } else if(GET_DEX(ch) > chance) {
+      act("You barely avoid slipping in the mud.", ch, 0, 0, TO_CHAR, 0);
+   } else {
+      act("$n slips on the muddy terrain and goes down.", ch, 0, 0, TO_ROOM, 0);
+      act("Your feet slide out from underneath you in the mud.", ch, 0, 0, TO_CHAR, 0);
+      GET_POS(ch) = POSITION_SITTING;
+   }
 }
 
 int do_unstable(CHAR_DATA *ch) 
@@ -684,6 +700,10 @@ int do_simple_move(CHAR_DATA *ch, int cmd, int following)
       retval = do_unstable(ch);
       if(SOMEONE_DIED(retval))
          return eSUCCESS|eCH_DIED; 
+    }
+
+    if(IS_SET(world[ch->in_room].sector_type, SECT_FIELD) && weather_info.sky == SKY_HEAVY_RAIN) {
+       do_muddy(ch);
     }
 
     // let our mobs know they're here

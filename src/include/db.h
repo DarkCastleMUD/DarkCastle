@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: db.h,v 1.14 2005/05/24 16:55:24 urizen Exp $ */
+/* $Id: db.h,v 1.15 2005/06/08 23:34:02 shane Exp $ */
 #ifndef DB_H_
 #define DB_H_
 
@@ -22,6 +22,7 @@ extern "C" {
 }
 
 #include <character.h>
+#include "weather.h"
 
 #define WORLD_MAX_ROOM        50000  // should never get this high...
                                      // it's just to keep builders/imps from 
@@ -177,6 +178,8 @@ struct zone_data
     *  2: Just reset.                           *
     *  Update char * zone_modes[] (const.C) if you change this *
     */
+
+    struct weather_data weather_info; //for zones with unique weather
 
     int num_mob_first_repop; // number of mobs in this zone that were repoped in first repop
     int num_mob_on_repop;    // number of mobs in this zone that were repoped in last repop
