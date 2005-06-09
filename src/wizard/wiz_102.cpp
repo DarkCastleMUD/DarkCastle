@@ -153,8 +153,8 @@ int do_check(struct char_data *ch, char *arg, int cmd) {
           GET_EXP(vict), GET_GOLD(vict), GET_BANK(vict), GET_ALIGNMENT(vict));
   send_to_char(buf, ch);
   if(GET_LEVEL(ch) >= SERAPH) {
-    sprintf(buf, "$3Load Rm$R: %-5d  $3Home Rm$R: %-5hd  $3Platinum$R: %d\n\r",
-      world[vict->in_room].number, vict->hometown, GET_PLATINUM(vict));
+    sprintf(buf, "$3Load Rm$R: %-5d  $3Home Rm$R: %-5hd  $3Platinum$R: %d  $3Clan$R: %d\n\r",
+      world[vict->in_room].number, vict->hometown, GET_PLATINUM(vict), GET_CLAN(vict));
     send_to_char(buf, ch);
   }
   sprintf(buf, "$3Str$R: %-2d  $3Wis$R: %-2d  $3Int$R: %-2d  $3Dex$R: %-2d  $3Con$R: %d\n\r",
