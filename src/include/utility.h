@@ -16,7 +16,7 @@
  *  10/21/2003   Onager    Changed IS_ANONYMOUS() to handle mobs without   *
  *                         crashing                                        *
  ***************************************************************************/
-/* $Id: utility.h,v 1.30 2005/05/28 18:56:22 shane Exp $ */
+/* $Id: utility.h,v 1.31 2005/06/09 23:36:03 shane Exp $ */
 
 #ifndef UTILITY_H_
 #define UTILITY_H_
@@ -244,6 +244,7 @@ bool IS_DARK( int room );
 #define GET_GOLD(ch)     ((ch)->gold)
 #define GET_PLATINUM(ch) ((ch)->plat)
 #define GET_BANK(ch)     ((ch)->pcdata->bank)
+#define GET_CLAN(ch)     ((ch)->clan)
 #define GET_EXP(ch)      ((ch)->exp)
 #define GET_HEIGHT(ch)   ((ch)->height)
 #define GET_WEIGHT(ch)   ((ch)->weight)
