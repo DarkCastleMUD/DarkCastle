@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.138 2005/06/06 09:30:55 urizen Exp $ */
+/* $Id: spells.cpp,v 1.139 2005/06/10 00:22:52 urizen Exp $ */
 
 extern "C"
 {
@@ -801,9 +801,11 @@ void affect_update( void )
     static struct affected_type *af, *next_af_dude;
     static CHAR_DATA *i, * i_next;
     void update_char_objects( CHAR_DATA *ch ); /* handler.c */
-    int faded_spells[20];
-    int a = 0;
-
+    unsigned int faded_spells[20];
+    int a =0;
+    for (; a < 20; a++)
+      faded_spells[a] = 0;
+    a=0;
     for (i = character_list; i; i = i_next) { 
       i_next = i->next;
 //      if(!IS_NPC(i) ) // && !(i->desc)) Linkdeadness doens't save you 

@@ -1,7 +1,7 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.32 2005/05/31 11:24:50 urizen Exp $
+| $Id: character.h,v 1.33 2005/06/10 00:22:54 urizen Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
@@ -241,6 +241,7 @@ struct mob_data
      int16                 mpactnum; // num
     int32 last_room; // Room rnum the mob was last in. Used
 		      // For !magic,!track changing flags.
+    struct threat_struct *threat;
 };
 
 

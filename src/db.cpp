@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.93 2005/06/08 23:33:55 shane Exp $ */
+/* $Id: db.cpp,v 1.94 2005/06/10 00:22:52 urizen Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -1166,13 +1166,13 @@ struct index_data *generate_mob_indices(int *top, struct index_data *index)
         SET_BIT(((CHAR_DATA *)mob_index[i].item)->mobdata->actflags[j], ((CHAR_DATA *)mob_index[real_mobile(mob)].item)->mobdata->actflags[j]);
          j++;
       }
-      ((CHAR_DATA *)mob_index[i].item)->mobdata->actflags[j] = 0;
+//      ((CHAR_DATA *)mob_index[i].item)->mobdata->actflags[j] = 0;
       j = 0;
-      while( j < AFF_MAX/ASIZE) {
+      while( j < AFF_MAX/ASIZE+1) {
 	SET_BIT(((CHAR_DATA *)mob_index[i].item)->affected_by[j],((CHAR_DATA *)mob_index[real_mobile(mob)].item)->affected_by[j]);
          j++;
       }
-      ((CHAR_DATA *)mob_index[i].item)->affected_by[j] = 0;
+//      ((CHAR_DATA *)mob_index[i].item)->affected_by[j] = 0;
     }
     if (mob_index[i].mobspec)
       for (mprg = mob_index[i].mobspec; mprg; mprg = mprg->next)

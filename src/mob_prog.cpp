@@ -257,6 +257,8 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
   /* skip leading spaces */
   while ( *point == ' ' )
     point++;
+  if (mob_index[mob->mobdata->nr].virt == 17201)
+   debugpoint();
 
   /* get whatever comes before the left paren.. ignore spaces */
   while ( *point != '(' ) 
@@ -947,7 +949,6 @@ mob_index[mob->mobdata->nr].virt );
 	case 'z': if (!mob->beacon) return -1;
 		obj = search_char_for_item(((CHAR_DATA*)mob->beacon), real_object(atoi(valu)));
 	      take = ((CHAR_DATA*)mob->beacon);
-
        case 'i': // mob
           obj = search_char_for_item(mob, real_object(atoi(valu)));
 	  take = mob;
@@ -971,7 +972,7 @@ mob_index[mob->mobdata->nr].virt );
           logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'carries'", mob_index[mob->mobdata->nr].virt );
 	  return -1;
     }
-    if (!obj) return -1;
+    if (!obj) return 0;
     if (!str_cmp(bufeh, "keep"))
        return 1;
     else if (!str_cmp(bufeh, "take"))
