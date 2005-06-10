@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.272 2005/06/10 00:22:52 urizen Exp $ */
+/* $Id: fight.cpp,v 1.273 2005/06/10 18:45:47 urizen Exp $ */
 
 extern "C"
 {
@@ -296,9 +296,9 @@ void add_threat(CHAR_DATA *mob, CHAR_DATA *ch, int amt)
      }
    }
    #ifdef LEAK_CHECK
-     thr = (struct threat_data *) calloc(1, sizeof(struct threat_data));
+     thr = (struct threat_struct *) calloc(1, sizeof(struct threat_struct));
    #else
-     thr = (struct threat_data *) dc_calloc(1, sizeof(struct threat_data));
+     thr = (struct threat_struct *) dc_alloc(1, sizeof(struct threat_struct));
    #endif 
    thr->next = mob->mobdata->threat;
    thr->threat = amt;
@@ -317,10 +317,11 @@ void add_threat(CHAR_DATA *mob, CHAR_DATA *ch, int amt)
 void generate_skillthreat(CHAR_DATA *mob, int skill, int damage, CHAR_DATA *actor, CHAR_DATA *target)
 {
   if (!actor || !mob || !IS_NPC(mob)) return;
-  struct threat_data *thr;
+  struct threat_struct *thr;
   float v = (float)has_skill(actor, skill)/100.0;
   if (!v) v = 0.4; // like weapons
   int type = 0;
+  int threat = 0;
   switch (skill)
   {
        case SPELL_HELLSTREAM:
@@ -342,13 +343,13 @@ void generate_skillthreat(CHAR_DATA *mob, int skill, int damage, CHAR_DATA *acto
      if (target != mob && target != actor) {
 	// damaging yerself gets you no coochie coochie
         for (thr = mob->mobdata->threat; thr; thr = thr->next)
-	  if (!str_cmp(thr->name, GET_NAME(target))
-		thr = 0 - threat; // this guy deserves mucho love, let's provide.
+	  if (!str_cmp(thr->name, GET_NAME(target)))
+		threat = 0 - threat; // this guy deserves mucho love, let's provide.
 	// it damaged something else, get pissed off if friendly flagged
-	if (thr > 0 && !ISSET(mob->mobdata->actflags, ACT_FRIENDLY))
+	if (threat > 0 && !ISSET(mob->mobdata->actflags, ACT_FRIENDLY))
 	  return;
      }
-     add_threat(mob, actor, amt);
+     add_threat(mob, actor, threat);
   }
   
 
