@@ -16,7 +16,7 @@
  *  10/21/2003   Onager    Changed IS_ANONYMOUS() to handle mobs without   *
  *                         crashing                                        *
  ***************************************************************************/
-/* $Id: utility.h,v 1.31 2005/06/09 23:36:03 shane Exp $ */
+/* $Id: utility.h,v 1.32 2005/06/10 21:49:34 shane Exp $ */
 
 #ifndef UTILITY_H_
 #define UTILITY_H_
@@ -115,7 +115,7 @@ bool is_hiding(CHAR_DATA *ch, CHAR_DATA *vict);
 
 #define FREE(p) do { if((p) != NULL) { dc_free((p)); (p) = 0; } } while (0) 
 
-#define ASIZE 31
+#define ASIZE 32 //don't change unless you want to be screwed
 #define SETBIT(var,bit) ((var)[(bit)/ASIZE] |= (1 << ((bit)-(((bit)/ASIZE)*ASIZE))))
 // setting with an OR
 #define REMBIT(var,bit) ((var)[(bit)/ASIZE] &= ~(1 << ((bit)-(((bit)/ASIZE)*ASIZE))))
@@ -244,7 +244,7 @@ bool IS_DARK( int room );
 #define GET_GOLD(ch)     ((ch)->gold)
 #define GET_PLATINUM(ch) ((ch)->plat)
 #define GET_BANK(ch)     ((ch)->pcdata->bank)
-#define GET_CLAN(ch)     ((ch)->clan)
+#define GET_CLAN(ch)     (GET_LEVEL((ch)) >= IMMORTAL ? 31337 : (ch)->clan)
 #define GET_EXP(ch)      ((ch)->exp)
 #define GET_HEIGHT(ch)   ((ch)->height)
 #define GET_WEIGHT(ch)   ((ch)->weight)
@@ -340,7 +340,7 @@ char *	str_dup		(const char *str);
 void    log		(char * str, int god_level, long type);
 void    logf            (int level, long type, char *arg, ...);
 int     send_to_gods    (char * str, int god_level, long type);
-void	sprintbit	(int value[], char *names[], char *result);
+void	sprintbit	(uint value[], char *names[], char *result);
 void    sprintbit	(long vektor, char *names[], char *result);
 void    sprinttype	(int type, char *names[], char *result);
 int     consttype       (char * search_str, char *names[]);
@@ -434,7 +434,7 @@ void send_to_char_regardless(char *messg, struct char_data *ch);
 int csendf(struct char_data *ch, char *arg, ...);
 bool check_range_valid_and_convert(int & value, char * buf, int begin, int end);
 bool check_valid_and_convert(int & value, char * buf);
-void parse_bitstrings_into_int(char * bits[], char * strings, char_data * ch, int32 value[]);
+void parse_bitstrings_into_int(char * bits[], char * strings, char_data * ch, uint32 value[]);
 void parse_bitstrings_into_int(char * bits[], char * strings, char_data * ch, uint32 & value);
 void parse_bitstrings_into_int(char * bits[], char * strings, char_data * ch, uint16 & value);
 void display_string_list(char * list[], char_data *ch);
