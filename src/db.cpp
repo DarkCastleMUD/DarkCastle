@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.94 2005/06/10 00:22:52 urizen Exp $ */
+/* $Id: db.cpp,v 1.95 2005/06/10 21:49:16 shane Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -2582,8 +2582,6 @@ CHAR_DATA *read_mobile(int nr, FILE *fl)
     for ( ; j < AFF_MAX/ASIZE+1; j++)
        mob->affected_by[j] = 0;
 
-//    mob->affected_by[j] = 0;
-
     mob->alignment   = fread_int (fl, LONG_MIN, LONG_MAX);
 
     tmp = fread_int (fl, 0, MAX_RACE);
@@ -2735,18 +2733,17 @@ void write_mobile(char_data * mob, FILE *fl)
     string_to_file( fl, mob->description );
 
     while(i < ACT_MAX/ASIZE+1) {
-       fprintf(fl, " %d", mob->mobdata->actflags[i]);
+       fprintf(fl, "%d ", mob->mobdata->actflags[i]);
        i++;
     }
-   fprintf(fl," -1\n");
+    fprintf(fl,"-1\n");
     i = 0;
 
     while(i < AFF_MAX/ASIZE+1) {
-       fprintf(fl, " %d", mob->affected_by[i]);
+       fprintf(fl, "%d ", mob->affected_by[i]);
        i++;
     }
-   fprintf(fl," -1");
-    fprintf(fl, "\n");
+    fprintf(fl, "-1\n");
 
     fprintf(fl, "%d %d %d\n"
             "%d %d %dd%d+%d %dd%d+%d\n"
@@ -3852,7 +3849,7 @@ void reset_zone(int zone)
             last_obj = 0;
             break;
         }
-        if((ZCMD.arg2 == -1 || obj_index[ZCMD.arg1].number < ZCMD.arg2 || !number(0,99))
+        if((ZCMD.arg2 == -1 || obj_index[ZCMD.arg1].number < ZCMD.arg2 || !number(0,5))
             && (obj =  clone_object(ZCMD.arg1))) 
         { 
           obj_to_char(obj, mob);
@@ -3891,7 +3888,7 @@ void reset_zone(int zone)
             last_obj = 0;
             break;
         }
-        if((ZCMD.arg2 == -1 || obj_index[ZCMD.arg1].number < ZCMD.arg2 || !number(0,99)) 
+        if((ZCMD.arg2 == -1 || obj_index[ZCMD.arg1].number < ZCMD.arg2 || !number(0,5)) 
            && (obj = clone_object(ZCMD.arg1))) 
         { 
           if(!equip_char(mob, obj, ZCMD.arg3)) {
