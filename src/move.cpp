@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.48 2005/06/09 01:03:18 shane Exp $
+| $Id: move.cpp,v 1.49 2005/06/13 18:37:45 shane Exp $
 | move.C
 | Movement commands and stuff.
 *************************************************************************
@@ -702,7 +702,8 @@ int do_simple_move(CHAR_DATA *ch, int cmd, int following)
          return eSUCCESS|eCH_DIED; 
     }
 
-    if(IS_SET(world[ch->in_room].sector_type, SECT_FIELD) && weather_info.sky == SKY_HEAVY_RAIN) {
+    if(IS_SET(world[ch->in_room].sector_type, SECT_FIELD) && 
+weather_info.sky == SKY_HEAVY_RAIN && !number(0,19)) {
        do_muddy(ch);
     }
 
