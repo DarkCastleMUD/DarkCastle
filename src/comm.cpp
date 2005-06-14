@@ -2128,9 +2128,6 @@ int close_socket(struct descriptor_data *d)
   if (d->showstr_count)
     dc_free(d->showstr_vector);
 
-  if (d->account)
-    delete d->account;
-
   dc_free(d);
   d = NULL;
 

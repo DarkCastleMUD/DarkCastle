@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.39 2005/06/09 01:03:18 shane Exp $ */
+/* $Id: utility.cpp,v 1.40 2005/06/14 22:13:37 shane Exp $ */
 
 extern "C"
 {
@@ -270,9 +270,8 @@ void log( char *str, int god_level, long type )
 }
 
 // function for new SETBIT et al. commands
-void sprintbit( int value[], char *names[], char *result )
+void sprintbit( uint value[], char *names[], char *result )
 {
-//   long nr, vektor;
    int i;
    *result = '\0';
    
@@ -286,26 +285,7 @@ void sprintbit( int value[], char *names[], char *result )
      strcat(result, " ");
      }
    }
-/*
-   while( i < AFF_MAX/ASIZE+1) {
-      vektor = value[i];
-      for ( nr=0; vektor; vektor>>=1 )
-      {
-         if ( IS_SET(1, vektor) ) {
-            if (!strcmp(names[nr+i*ASIZE], "unused")) continue;
-            if ( *names[nr+i*ASIZE] != '\n')
-               strcat( result, names[nr+i*ASIZE] );
-            else
-               strcat( result, "Undefined" );
-            strcat( result, " " );
-         }
 
-//         if ( *names[nr+i*ASIZE] != '\n' )
-          nr++;
-      }
-      i++;
-   }
-*/
    if ( *result == '\0' )
       strcat( result, "NoBits " );
 }
@@ -1402,7 +1382,7 @@ bool check_valid_and_convert(int & value, char * buf)
 }
 
 // modified for new SETBIT et al. commands
-void parse_bitstrings_into_int(char * bits[], char * strings, char_data *ch, int value[])
+void parse_bitstrings_into_int(char * bits[], char * strings, char_data *ch, uint value[])
 {
   char buf[MAX_INPUT_LENGTH];
   bool found = FALSE;

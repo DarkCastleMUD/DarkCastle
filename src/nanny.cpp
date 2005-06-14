@@ -16,28 +16,19 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.93 2005/06/04 19:42:26 urizen Exp $ */
+/* $Id: nanny.cpp,v 1.94 2005/06/14 22:13:37 shane Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <ctype.h>
 #ifndef WIN32
-#include <arpa/telnet.h>
+//#include <arpa/telnet.h>
 #include <unistd.h>
 
 #else
-		#include <winsock2.h>
+	#include <winsock2.h>
 	#include <process.h>
 	#include <mmsystem.h>
-
-	// swipe some defined out of arpa telnet
-	#define	IAC				255		/* interpret as command: */
-	#define	WONT			252		/* I won't use option */
-	#define	WILL			251		/* I will use option */
-	#define TELOPT_NAOCRD	10	/* negotiate about CR disposition */
-	#define TELOPT_ECHO		1	/* echo */
-	#define TELOPT_NAOFFD	13	/* negotiate about formfeed disposition */
 #endif
 }
 #ifdef LEAK_CHECK
@@ -64,14 +55,9 @@ extern "C" {
 #include <spells.h>
 #include <fight.h>
 #include <handler.h>
-
-#include <Account.h>
+#include <string.h>
 
 #define STATE(d)    ((d)->connected)
-
-
-//char echo_off_str [] = { (char)IAC, (char)WILL, (char)TELOPT_ECHO, (char)NULL };
-//char echo_on_str  [] = { (char)IAC, (char)WONT, (char)TELOPT_ECHO, (char)NULL };
 
 char menu[] = "\n\rWelcome to Dark Castle Mud\n\r\n\r"
               "0) Exit Dark Castle.\n\r"
@@ -81,17 +67,6 @@ char menu[] = "\n\rWelcome to Dark Castle Mud\n\r\n\r"
               "4) Archive this character.\n\r"
               "5) Delete this character.\n\r\n\r"
               "   Make your choice: ";
-
-char accountmenu[] = "\n\rWelcome to Dark Castle Mud\n\r\n\r"
-                         "0) Exit Dark Castle.\n\r"
-                         "1) Enter the game with a character.\n\r"
-                         "2) Enter a character's description.\n\r"
-                         "3) Change your account password.\n\r"
-                         "4) Archive this account.\n\r"
-                         "5) Delete a character.\n\r"
-                         "6) Change/View account details.\n\r"
-                         "7) Create a new character.\n\r\n\r"
-                         "   Make your choice: ";
 
 bool wizlock = false;
 
@@ -127,7 +102,6 @@ char *crypt(const char *key, const char *salt)
 int isbanned(char *hostname);
 int _parse_email( char * arg );
 int _parse_name(char *arg, char *name);
-int _parse_account(char *arg, char *name);
 bool check_deny( struct descriptor_data *d, char *name );
 void update_wizlist(CHAR_DATA *ch);
 void isr_set(CHAR_DATA *ch);
@@ -659,8 +633,6 @@ void nanny(struct descriptor_data *d, char *arg)
    struct  char_data *ch;
    int x, y;
    char    badclssmsg[] = "You must choose a class that matches your stats. These are marked by a '*'.\n\rSelect a class-> ";
-   string  stringtemp;
-   CAccount * acc;
    
    CHAR_DATA *get_pc(char *name);
    void remove_clan_member(int clannumber, struct char_data * ch);
@@ -727,8 +699,6 @@ void nanny(struct descriptor_data *d, char *arg)
       if(!*arg)
         break;
 
-      // TODO - remember that this "Drops through" when I switch to Accounts
-
    case CON_GET_NAME:
 
       if (!*arg) { 
@@ -792,7 +762,6 @@ void nanny(struct descriptor_data *d, char *arg)
       if ( fOld ) {
          /* Old player */
          SEND_TO_Q( "Password: ", d );
-//         SEND_TO_Q( echo_off_str, d );
          STATE(d) = CON_GET_OLD_PASSWORD;
          return;
       }
@@ -803,53 +772,6 @@ void nanny(struct descriptor_data *d, char *arg)
          STATE(d) = CON_CONFIRM_NEW_NAME;
          return;
       }
-      break;
-      
-   case CON_GET_ACCOUNT:
-
-      if (!*arg) {
-         SEND_TO_Q( "Empty account.  Disconnecting...", d );
-         close_socket( d ); 
-         return; 
-      }
-
-      // Capitlize first letter, lowercase rest      
-      arg[0] = UPPER(arg[0]);
-      for(y = 1; arg[y] != '\0'; y++)
-         arg[y] = LOWER(arg[y]);
-      
-      if ( _parse_account(arg, tmp_name)) { 
-         SEND_TO_Q( "Illegal account name, try another.\n\rAccount: ", d );
-         return;
-      }
-
-      stringtemp = tmp_name;
-      acc = new CAccount( tmp_name );
-
-      // Attach to descriptor
-      d->account = acc;
-
-      if( 0 == stringtemp.compare( "new" ) ) {
-         SEND_TO_Q( "\n\rCreating new Dark Castle MUD character account.\n\r"
-                        "Keep in mind that you may only have ONE account per person.\n\r"
-                        "Do you wish to continue with new account creation (Y/N)? ", d );
-         STATE(d) = CON_CONFIRM_NEW_ACCOUNT;
-         return;
-      }
-
-      if( ! acc->ReadFromFile() ) {
-         sprintf( buf, "Account '%s' does not exist.\n\r"
-                       "Please enter your account name: ", stringtemp.c_str() );
-         SEND_TO_Q( buf, d );
-         d->account = NULL;
-         delete acc;
-         return;
-      }
-
-      sprintf( buf, "Please enter password for account '%s': ", stringtemp.c_str() );
-      SEND_TO_Q( buf, d );
-//      SEND_TO_Q( echo_off_str, d );
-      STATE(d) = CON_ACCOUNT_GET_OLD_PASSWORD;
       break;
       
    case CON_GET_OLD_PASSWORD:
@@ -880,7 +802,6 @@ void nanny(struct descriptor_data *d, char *arg)
          return;
       }
       
-//      SEND_TO_Q( echo_on_str, d ); 
       
       check_playing(d, GET_NAME(ch));
       
@@ -920,40 +841,6 @@ void nanny(struct descriptor_data *d, char *arg)
       STATE(d) = CON_READ_MOTD;
       break;
       
-   case CON_ACCOUNT_GET_OLD_PASSWORD:
-      SEND_TO_Q( "\n\r", d );
-      stringtemp = arg;
-      if( 0 != stringtemp.compare( d->account->getPassword() ) )
-      {
-         SEND_TO_Q( "Wrong password.\n\r", d );
-         sprintf(log_buf, "%s wrong password: %s", GET_NAME(ch), d->host);
-         log( log_buf, SERAPH, LOG_SOCKET );
-         d->account->badPWAttempt();
-         d->account->WriteToFile();
-         close_socket(d);
-         return;
-      }
-      
-//      SEND_TO_Q( echo_on_str, d ); 
-      
-      sprintf( log_buf, "Account %s@%s has connected.", (d->account->getName()).c_str(), d->host);
-      if(GET_LEVEL(ch) < ANGEL)
-         log( log_buf, DEITY, LOG_SOCKET );
-      else
-         log( log_buf, GET_LEVEL(ch), LOG_SOCKET );
-
-      SEND_TO_Q( "Remember to check for account already connected.\n\r", d );
-      SEND_TO_Q( "Remember to do MOTD and IMOTD and CMOTD later.\n\r", d );
-
-      if(d->account->getPWAttempts() > 0)
-      {
-         sprintf(buf, "\r\n\r\n$4$BYou have had %d wrong passwords entered since your last complete login.$R\r\n\r\n", 
-                 d->account->getPWAttempts());
-         SEND_TO_Q(buf, d);
-      }
-      STATE(d) = CON_ACCOUNT_MENU;
-      break;
-      
    case CON_CONFIRM_NEW_NAME:
       switch (*arg)
       {
@@ -971,7 +858,6 @@ void nanny(struct descriptor_data *d, char *arg)
          }
          sprintf( buf, "New character.\n\rGive me a password for %s: ", GET_NAME(ch) );
          SEND_TO_Q( buf, d );
-//         SEND_TO_Q( echo_off_str, d );
          STATE(d) = CON_GET_NEW_PASSWORD;
          // at this point, pcdata hasn't yet been created.  So we're going to go ahead and
          // allocate it since a new character is obviously a PC
@@ -998,38 +884,6 @@ void nanny(struct descriptor_data *d, char *arg)
       }
       break;
       
-   case CON_CONFIRM_NEW_ACCOUNT:
-      switch (*arg)
-      {
-      case 'y': case 'Y':
-
-         if(isbanned(d->host) >= BAN_NEW) 
-         {
-            sprintf(buf, "Request for new account %s denied from [%s] (siteban)", (d->account->getName()).c_str(), d->host);
-            log(buf, ANGEL, LOG_SOCKET);
-            SEND_TO_Q("Sorry, new accounts are not allowed from your site.\n\r"
-               "Questions may be directed to Pirahna at dcpirahna@hotmail.com.\n\r", d);
-            STATE(d) = CON_CLOSE;
-            return;
-         }
-         SEND_TO_Q("Entering account creation...\n\rPlease enter a password: ", d);
-//         SEND_TO_Q( echo_off_str, d );
-         STATE(d) = CON_ACCOUNT_GET_NEW_PASSWORD;
-         break;
-         
-      case 'n': case 'N':
-         SEND_TO_Q( "Canceling account creation.\n\rPlease enter your account: ", d );
-         delete d->account;
-         d->account = NULL;
-         STATE(d) = CON_GET_ACCOUNT;
-         break;
-         
-      default:
-         SEND_TO_Q( "Please type Yes or No.\n\rWould you like to create a new account? ", d );
-         break;
-      }
-      break;
-      
    case CON_GET_NEW_PASSWORD:
       SEND_TO_Q("\n\r", d);
       
@@ -1044,21 +898,6 @@ void nanny(struct descriptor_data *d, char *arg)
       STATE(d) = CON_CONFIRM_NEW_PASSWORD;
       break;
       
-   case CON_ACCOUNT_GET_NEW_PASSWORD:
-
-      SEND_TO_Q("\n\r", d);
-      if(arg == 0 || strlen(arg) < 6) {
-         SEND_TO_Q("Password must be at least six characters long.\n\rEnter Password: ", d );
-         return;
-      }
-
-      // For now, account passwords are not encrypted
-      stringtemp = arg;
-      d->account->setPassword( stringtemp );
-      SEND_TO_Q( "Please confirm password: ", d );
-      STATE(d) = CON_ACCOUNT_CONFIRM_NEW_PASSWORD;
-      break;
-      
    case CON_CONFIRM_NEW_PASSWORD:
       SEND_TO_Q( "\n\r", d );
       
@@ -1068,94 +907,8 @@ void nanny(struct descriptor_data *d, char *arg)
          return;
       }
       
-//      SEND_TO_Q( echo_on_str, d );
       SEND_TO_Q( "What is your sex (M/F)? ", d );
       STATE(d) = CON_GET_NEW_SEX;
-      break;
-
-   case CON_ACCOUNT_CONFIRM_NEW_PASSWORD:
-      SEND_TO_Q( "\n\r", d );
-
-      stringtemp = arg;
-      
-      if( 0 != stringtemp.compare( d->account->getPassword() ) ) {
-         SEND_TO_Q("Passwords don't match.\n\rRetype password: ", d );
-         STATE(d) = CON_GET_NEW_PASSWORD;
-         return;
-      }
-//      SEND_TO_Q( echo_on_str, d );
-
-      SEND_TO_Q( "Your email address is used to send you a confirmation id that is\n\r"
-                 "required in order to play Dark Castle MUD.  Your email address will\n\r"
-                 "not be sold/lent/auctioned/given to anyone and is only visible to\n\r"
-                 "high level gods on the game.  You will not get any spam mail from us.\n\r"
-                 "This is used only as a form of contact if you lose your password,\n\r"
-                 "or something horrible happens to your character we need to tell you\n\r"
-                 "about.  If you still don't want to trust us, use a fake one or change\n\r"
-                 "it after the account creation process.\n\r"
-                 "\n\rPlease enter your email address: ", d );
-      STATE(d) = CON_ACCOUNT_GET_EMAIL_ADDRESS;
-      break;
-
-   case CON_ACCOUNT_GET_EMAIL_ADDRESS:
-      SEND_TO_Q( "\n\r", d );
-      if( ! _parse_email( arg ) ) {
-         sprintf( buf, "'%s' is not a valid email address.\n\r"
-                       "Please enter your email address: ", arg );
-         return;
-      }
-
-      stringtemp = arg;
-      d->account->setEmail( stringtemp );
-
-      sprintf( buf, "Email set to: '%s'\n\r"
-                    "If this is incorrect, please fix it at menu screen before you\n\r"
-                    "create your first character.\n\r\n\r", stringtemp.c_str() );
-      SEND_TO_Q( buf, d );
-      SEND_TO_Q( "The new few questions are personal information.  You are NOT REQUIRED\n\r"
-                 "to answer these if you do not wish.  All information is kept private\n\r"
-                 "and can only be viewed by the Implementors of the game.  This info is\n\r"
-                 "used as a worst case to verify your identify in case of lost passwords.\n\r"
-                 "Again, this information is NOT REQUIRED but we encourage you to fill\n\r"
-                 "it out.\n\r\n\r", d );
-      SEND_TO_Q( "Just hit enter to leave a field blank.\n\r", d );
-      SEND_TO_Q( "Enter your first name: ", d );
-      STATE(d) = CON_ACCOUNT_GET_FIRST_NAME;  
-      break;
-
-   case CON_ACCOUNT_GET_FIRST_NAME:
-      stringtemp = arg;
-      d->account->setFirstName( stringtemp );
-      SEND_TO_Q( "Enter your last name: ", d );
-      STATE(d) = CON_ACCOUNT_GET_LAST_NAME;
-      break;
-
-   case CON_ACCOUNT_GET_LAST_NAME:
-      stringtemp = arg;
-      d->account->setLastName( stringtemp );
-      SEND_TO_Q( "Enter your mailing street address: ", d );
-      STATE(d) = CON_ACCOUNT_GET_ADDR1;
-      break;
-
-   case CON_ACCOUNT_GET_ADDR1:
-      stringtemp = arg;
-      d->account->setAddr1( stringtemp );
-      SEND_TO_Q( "Enter your city, state, zip: ", d );
-      STATE(d) = CON_ACCOUNT_GET_CITYSTATEZIP;
-      break;
-
-   case CON_ACCOUNT_GET_CITYSTATEZIP:
-      stringtemp = arg;
-      d->account->setCityStateZip( stringtemp );
-      SEND_TO_Q( "Enter your country: ", d );
-      STATE(d) = CON_ACCOUNT_GET_COUNTRY;
-      break;
-
-   case CON_ACCOUNT_GET_COUNTRY:
-      stringtemp = arg;
-      d->account->setCountry( stringtemp );
-      SEND_TO_Q( "Account Creation Successful.\n\r\n\r", d );
-      STATE(d) = CON_ACCOUNT_MENU;
       break;
 
    case CON_GET_NEW_SEX:
@@ -1476,127 +1229,6 @@ is_race_eligible(ch,7)?'*':' ',is_race_eligible(ch,8)?'*':' ',is_race_eligible(c
        STATE(d) = CON_SELECT_MENU;
        break;
 
-    case CON_ACCOUNT_LOGIN_CHAR:
-
-       // Verify char name entered is valid else back to menu
-       arg[0] = UPPER(arg[0]);
-       for(y = 1; arg[y] != '\0'; y++)
-          arg[y] = LOWER(arg[y]);
-       stringtemp = arg;
-
-       if( ! d->account->hasCharacter( stringtemp ) ) {
-          SEND_TO_Q("\n\rYou do not have a character named '", d);
-          strcpy(buf, stringtemp.c_str());
-          SEND_TO_Q(buf, d);
-          SEND_TO_Q("'.\n\r\n\r", d);
-          SEND_TO_Q(accountmenu, d);
-          STATE(d) = CON_ACCOUNT_MENU;
-          return;
-       }
-
-       // At this point we know we have a valid character name for this account, load and go
-       // TODO - make this happen
-       assert(0);
-
-       load_char_obj(d, tmp_name);
-       ch = d->character;
-
-       // TODO: remove these later after we're sure this doesn't happen
-       assert( GET_LEVEL(ch) > 0 );
-       assert( GET_SHORT_ONLY(ch) );
-
-       ch->next            = character_list;
-       character_list      = ch;
-          
-       send_to_char("\n\rWelcome to Dark Castle Diku Mud.  May your visit here suck.\n\r", ch );
-       do_on_login_stuff(ch);
-       if(GET_LEVEL(ch) < OVERSEER)
-          clan_login(ch);
-       act( "$n has entered the game.", ch, 0, 0, TO_ROOM , INVIS_NULL);
-       update_wizlist(ch);
-       STATE(d) = CON_PLAYING;
-       do_look( ch, "", 8 );
-       break;
-       
-    case CON_ACCOUNT_MENU:
-       switch( *arg )
-       {
-       case '0':
-          close_socket( d );
-          d = NULL;
-          break;
-          
-       case '1':
-          // List characters available to player
-          SEND_TO_Q("Which of the following characters would you like to login?\n\r", d);
-          d->account->charListToBuf(buf);
-          SEND_TO_Q(buf, d);
-          SEND_TO_Q("\n\rName? ", d);
-          STATE(d) = CON_ACCOUNT_LOGIN_CHAR;
-          break;
-          
-       case '2':
-SEND_TO_Q("TODO-move description writing to inside game and remove this completely\n\r", d);
-break;
-          SEND_TO_Q("Enter a text you'd like others to see when they look at you.\n\r"
-                    "Terminate with an '~'\n\r", d);
-          if(ch->description) {
-             SEND_TO_Q("Old description:\n\r", d);
-             SEND_TO_Q(ch->description, d);
-             dc_free(ch->description);
-          }
-#ifdef LEAK_CHECK
-          ch->description = (char *)calloc(240, sizeof(char));
-#else
-          ch->description = (char *)dc_alloc(240, sizeof(char));
-#endif
-
- // TODO - what happens if I get to this point, then disconnect, and reconnect?  memory leak?
-
-          d->str     = &ch->description;
-          d->max_str = 239;
-          STATE(d)   = CON_EXDSCR;
-          break;
-      
-       case '3':
-SEND_TO_Q("TODO\n\r", d);
-break;
-          SEND_TO_Q( "Enter current password: ", d );
-//          SEND_TO_Q( echo_off_str, d );
-          STATE(d) = CON_CONFIRM_PASSWORD_CHANGE;
-          break;
-      
-       case '4':
-          // Archive this account 
-          SEND_TO_Q("Archiving still TODO\n\rDon't worry, noone will get deleted from inactivity for a while.\n\r", d);
-
-//          SEND_TO_Q("This will archive your character until you ask to be unarchived.\n\rYou will need to speak to a god greater than level 107.\n\rType ARCHIVE ME if this is what you want:  ", d);
-//          STATE(d) = CON_ARCHIVE_CHAR;
-          break;
-      
-       case '5':
-          // delete a character 
-          SEND_TO_Q("Deletion still TODO\n\r", d);
-//          SEND_TO_Q("This will _permanently_ erase you.\n\rType ERASE ME if this is really what you want: ", d);
-//          STATE(d) = CON_DELETE_CHAR;
-          break;
-
-       case '6':
-          // View/Change account details
-SEND_TO_Q("TODO\n\r", d);
-break;
-
-       case '7':
-          // create a new character
-SEND_TO_Q("TODO\n\r", d);
-break;
-             
-       default:
-          SEND_TO_Q( accountmenu, d );
-          break;
-       }
-       break;
-
     case CON_SELECT_MENU:
        switch( *arg )
        {
@@ -1679,7 +1311,6 @@ break;
       
        case '3':
           SEND_TO_Q( "Enter current password: ", d );
-//          SEND_TO_Q( echo_off_str, d );
           STATE(d) = CON_CONFIRM_PASSWORD_CHANGE;
           break;
       
@@ -1737,12 +1368,10 @@ break;
        SEND_TO_Q( "\n\r", d );
        if(!strncmp( (char *)crypt((char *)arg, (char *)ch->pcdata->pwd), ch->pcdata->pwd, PASSWORD_LEN)) {
           SEND_TO_Q( "Enter a new password: ", d );
-//          SEND_TO_Q( echo_off_str, d );
           STATE(d) = CON_RESET_PASSWORD;
           break;
        } else {
           SEND_TO_Q( "Incorrect.", d);
-//          SEND_TO_Q( echo_on_str, d);
           STATE(d) = CON_SELECT_MENU;
           SEND_TO_Q( menu, d );
        }
@@ -1770,7 +1399,6 @@ break;
           return;
        }
        
-//       SEND_TO_Q( echo_on_str, d);
        SEND_TO_Q( "\n\rDone.\n\r", d );
        SEND_TO_Q( menu, d );
        STATE(d)    = CON_SELECT_MENU;
@@ -1834,30 +1462,6 @@ int _parse_name(char *arg, char *name)
    
    return 0;
 }
-
-
-// Parse an account name for acceptability.
-// Return 1 for failure
-// Return 0 for valid account name
-int _parse_account(char * arg, char * name)
-{
-   int i;
-   
-   /* skip whitespaces */
-   for (; isspace(*arg); arg++);
-   
-   for (i = 0; (name[i] = arg[i]) != '\0'; i++)
-   {
-      if ( name[i] < 0 || !isalpha(name[i]) || i > ACCOUNT_MAX_LENGTH )
-         return 1;
-   }
-   
-   if ( i < 2 )
-      return 1;
-
-   return 0;
-}
-
 
 
 // Check for denial of service.

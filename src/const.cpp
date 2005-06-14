@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.155 2005/06/05 16:13:21 urizen Exp $ */
+/* $Id: const.cpp,v 1.156 2005/06/14 22:13:37 shane Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -315,24 +315,6 @@ char *connected_states[] =
     "CON_EDIT_MPROG",
     "CON_DISPLAY_ENTRANCE",
     "CON_PRE_DISPLAY_ENTRANCE",
-    "CON_GET_ACCOUNT",                  
-    "CON_CONFIRM_NEW_ACCOUNT",
-    "CON_ACCOUNT_GET_EMAIL_ADDRESS",
-    "CON_ACCOUNT_CONFIRM_NEW_PASSWORD",
-    "CON_ACCOUNT_GET_FIRST_NAME",
-    "CON_ACCOUNT_GET_LAST_NAME",      
-    "CON_ACCOUNT_GET_ADDR1",       
-    "CON_ACCOUNT_GET_ADDR2",           
-    "CON_ACCOUNT_GET_ADDR3",   
-    "CON_ACCOUNT_GET_CITYSTATEZIP",
-    "CON_ACCOUNT_GET_COUNTRY",    
-    "CON_ACCOUNT_GET_PHONE",
-    "CON_ACCOUNT_GET_SECRET_QUESTION",
-    "CON_ACCOUNT_GET_SECRET_ANSWER",
-    "CON_ACCOUNT_GET_OLD_PASSWORD",
-    "CON_ACCOUNT_GET_NEW_PASSWORD",
-    "CON_ACCOUNT_MENU",
-    "CON_ACCOUNT_LOGIN_CHAR",
     "\n"
 };
 

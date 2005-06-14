@@ -1,21 +1,19 @@
 #ifndef CONNECT_H_
 #define CONNECT_H_
 /************************************************************************
-| $Id: connect.h,v 1.8 2005/04/09 21:15:35 urizen Exp $
+| $Id: connect.h,v 1.9 2005/06/14 22:13:45 shane Exp $
 | connect.h
 | Description: State of connectedness information.
 */
 #include <structs.h>  // MAX_INPUT_LENGTH
 #include <comm.h>
  
-#include <Account.h>
-
 #define STATE(d)  ((d)->connected) 
 #define CON_PLAYING                        0 
 #define CON_GET_NAME                       1 
-#define CON_GET_OLD_PASSWORD               2  // this gets replaced by account version
+#define CON_GET_OLD_PASSWORD               2
 #define CON_CONFIRM_NEW_NAME               3 
-#define CON_GET_NEW_PASSWORD               4  // this gets replaces by account version
+#define CON_GET_NEW_PASSWORD               4
 #define CON_CONFIRM_NEW_PASSWORD           5 
 #define CON_GET_NEW_SEX                    6 
 #define CON_GET_NEW_CLASS                  7 
@@ -37,25 +35,6 @@
 #define CON_EDIT_MPROG                     23 
 #define CON_DISPLAY_ENTRANCE               24 
 #define CON_PRE_DISPLAY_ENTRANCE           25
-// below messages are all used for accounts 
-#define CON_GET_ACCOUNT                    26 
-#define CON_CONFIRM_NEW_ACCOUNT            27 
-#define CON_ACCOUNT_GET_EMAIL_ADDRESS      28 
-#define CON_ACCOUNT_CONFIRM_NEW_PASSWORD   29 
-#define CON_ACCOUNT_GET_FIRST_NAME         30 
-#define CON_ACCOUNT_GET_LAST_NAME          31 
-#define CON_ACCOUNT_GET_ADDR1              32 
-#define CON_ACCOUNT_GET_ADDR2              33
-#define CON_ACCOUNT_GET_ADDR3              34 
-#define CON_ACCOUNT_GET_CITYSTATEZIP       35 
-#define CON_ACCOUNT_GET_COUNTRY            36 
-#define CON_ACCOUNT_GET_PHONE              37 
-#define CON_ACCOUNT_GET_SECRET_QUESTION    38 
-#define CON_ACCOUNT_GET_SECRET_ANSWER      39
-#define CON_ACCOUNT_GET_OLD_PASSWORD       40
-#define CON_ACCOUNT_GET_NEW_PASSWORD       41
-#define CON_ACCOUNT_MENU                   42
-#define CON_ACCOUNT_LOGIN_CHAR             43
 
 // if you change, make sure you update char *connected_states[] in const.C
 // also update connected_types[]
@@ -104,8 +83,6 @@ struct descriptor_data
     byte         idle_tics;
     time_t      login_time;
     struct stat_shit * stats;            // for rolling up a char 
-
-    CAccount  * account;                 // Account attached to this desc
 
     char	**strnew;			/* for the modify-str system	*/
     char        *backstr;

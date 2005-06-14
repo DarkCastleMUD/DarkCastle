@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: save.cpp,v 1.32 2005/05/31 11:24:47 urizen Exp $ */
+/* $Id: save.cpp,v 1.33 2005/06/14 22:13:37 shane Exp $ */
 
 extern "C"
 {
@@ -578,10 +578,13 @@ void save_char_obj (CHAR_DATA *ch)
   char_to_store (ch, &uchar, tmpage);
 
   // if they're in a safe room, save them there.
+  // if they're a god, send 'em home
   // otherwise save them in tavern
   if(IS_SET(world[ch->in_room].room_flags, SAFE))
     uchar.load_room = world[ch->in_room].number;
-  else 
+  else if(GET_LEVEL(ch) >= IMMORTAL)
+    uchar.load_room = real_room(GET_HOME(ch));
+  else
     uchar.load_room = real_room(safe);
 
   if((fwrite(&uchar, sizeof(uchar), 1, fpsave))               &&

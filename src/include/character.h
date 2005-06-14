@@ -1,7 +1,7 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.33 2005/06/10 00:22:54 urizen Exp $
+| $Id: character.h,v 1.34 2005/06/14 22:13:45 shane Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
@@ -141,7 +141,7 @@ struct affected_type
     int16  duration;       /* For how long its effects will last      */
     int32  modifier;       /* This is added to apropriate ability     */
     int32  location;       /* Tells which ability to change(APPLY_XXX)*/
-    int32 bitvector;      /* Tells which bits to set (AFF_XXX)       */
+    uint32 bitvector;      /* Tells which bits to set (AFF_XXX)       */
 
     struct affected_type *next;
 };
@@ -227,7 +227,7 @@ struct mob_data
     sbyte default_pos;    // Default position for NPC
     sbyte last_direction; // Last direction the mobile went in
     uint32 attack_type;    // Bitvector of damage type for bare-handed combat
-    int32 actflags[ACT_MAX/ASIZE+1]; // flags for NPC behavior
+    uint32 actflags[ACT_MAX/ASIZE+1]; // flags for NPC behavior
 
     int16 damnodice;         // The number of damage dice's           
     int16 damsizedice;       // The size of the damage dice's         
@@ -350,7 +350,7 @@ struct char_data
     char_data * guarding;              // Pointer to who I am guarding
     follow_type * guarded_by;          // List of people guarding me
 
-    int32 affected_by[AFF_MAX/ASIZE+1]; // Quick reference bitvector for spell affects
+    uint32 affected_by[AFF_MAX/ASIZE+1]; // Quick reference bitvector for spell affects
     uint32 combat;                     // Bitvector for combat related flags (bash, stun, shock)
     uint32 misc;                       // Bitvector for IS_MOB/logs/channels.  So possessed mobs can channel
 

@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: db.h,v 1.15 2005/06/08 23:34:02 shane Exp $ */
+/* $Id: db.h,v 1.16 2005/06/14 22:13:45 shane Exp $ */
 #ifndef DB_H_
 #define DB_H_
 
@@ -35,6 +35,8 @@ extern "C" {
 #ifndef LONG_MAX
 #define LONG_MAX    2147483467
 #define LONG_MIN    -2147483467
+#define INT_MAX     32768
+#define INT_MIN     -32768
 #endif
 
 /* Zone Flag Bits */
