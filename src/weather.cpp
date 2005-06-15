@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: weather.cpp,v 1.7 2005/06/13 18:49:21 shane Exp $ */
+/* $Id: weather.cpp,v 1.8 2005/06/15 19:38:00 shane Exp $ */
 
 extern "C"
 {
@@ -166,7 +166,7 @@ void weather_change(void)
          if (weather_info.pressure<970) {
             if(dice(1,4)==1)
                change = 4;
-            else if(dice(1,4)==1)
+            else if(dice(1,5)==1)
                change = 7;
             else
                change = 0;
@@ -185,7 +185,7 @@ void weather_change(void)
             else change = 0;
          }
          else if (weather_info.pressure<1010) {
-            if(dice(1,2) == 1) change = 8;
+            if(dice(1,3) == 1) change = 8;
             else change = 0;
          }
          else if (weather_info.pressure>1030)

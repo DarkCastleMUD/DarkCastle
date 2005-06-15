@@ -1117,8 +1117,7 @@ int spell_dispel_evil(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 	act("$N does not seem to be affected.", ch, 0, victim, TO_CHAR, 0);
 	return eFAILURE;
   }
-  dam = dice(skill, 4);
-  dam = 225;
+  dam = 300;
 
   return spell_damage(ch, victim, dam, TYPE_MAGIC, SPELL_DISPEL_EVIL, 0);
 }
@@ -1137,7 +1136,7 @@ int spell_dispel_good(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 	act("$N does not seem to be affected.", ch, 0, victim, TO_CHAR, 0);
 	return eFAILURE;
   }
-  dam = 225;
+  dam = 300;
 
   return spell_damage(ch, victim, dam, TYPE_MAGIC, SPELL_DISPEL_GOOD, 0);
 }
@@ -1178,7 +1177,13 @@ int spell_power_harm(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
 {
   int dam;
   set_cantquit( ch, victim );
-  dam = 350;
+
+  if(IS_EVIL(ch))
+     dam = 500;
+  else if(IS_NEUTRAL(ch))
+     dam = 400;
+  else
+     dam = 300;
 
   return spell_damage(ch, victim, dam, TYPE_MAGIC, SPELL_POWER_HARM, 0);
 }
@@ -1739,6 +1744,11 @@ int spell_detect_evil(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
     return eFAILURE;
   }
 
+  if(ch != victim && skill < 70) {
+     send_to_char("You aren't practiced enough to be able to cast on others.\n\r", ch);
+     return eFAILURE;
+  }    
+
   if ( affected_by_spell(victim, SPELL_DETECT_EVIL) )
     affect_from_char(victim, SPELL_DETECT_EVIL);
 
@@ -1750,6 +1760,7 @@ int spell_detect_evil(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 
   affect_to_char(victim, &af);
   send_to_char("You become more conscious of the evil around you.\n\r", victim);
+  act("$n looks to be more conscious of the evil around $s.", victim, 0, 0, TO_ROOM, INVIS_NULL);
   return eSUCCESS;
 }
 
@@ -1766,6 +1777,11 @@ int spell_detect_good(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
     return eFAILURE;
   }
 
+  if(ch != victim && skill < 70) {
+     send_to_char("You aren't practiced enough to be able to cast on others.\n\r", ch);
+     return eFAILURE;
+  }    
+
   if ( affected_by_spell(victim, SPELL_DETECT_GOOD) )
     affect_from_char(victim, SPELL_DETECT_GOOD);
 
@@ -1777,6 +1793,7 @@ int spell_detect_good(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 
   affect_to_char(victim, &af);
   send_to_char("You are now able to truly recognize the good in others.\n\r", victim);
+  act("$n looks to be more conscious of the evil around $s.", victim, 0, 0, TO_ROOM, INVIS_NULL);
   return eSUCCESS;
 }
 
@@ -3023,6 +3040,7 @@ int spell_strength(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data
   }
 
   send_to_char("You feel stronger.\r\n", victim);
+  act("$n's muscles bulge a bit, $s looks stronger.", victim, 0, 0, TO_ROOM,INVIS_NULL);
 
   af.type      = SPELL_STRENGTH;
   af.duration  = level/2 + skill/3;
@@ -4775,7 +4793,7 @@ int spell_flamestrike(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
    }
 
    set_cantquit (ch, victim);
-   dam = 450;
+   dam = 400;
 
    retval = spell_damage(ch, victim, dam, TYPE_FIRE, SPELL_FLAMESTRIKE, 0);
 
@@ -4787,10 +4805,10 @@ int spell_flamestrike(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
    if(skill > 70) {
       send_to_char("The fires $4burn$R into your soul tearing away at your being.\r\n", victim);
       act("Your fires $4burn$R into $N's soul, tearing away at $s being.\r\n",ch,0,victim,TO_CHAR, 0);
-         GET_MANA(victim) -= 40;
+         GET_MANA(victim) -= 80;
       if(GET_MANA(victim) < 0)
          GET_MANA(victim) = 0;
-	 GET_KI(victim) -= 10;
+	 GET_KI(victim) -= 20;
       if(GET_KI(victim) < 0)
 	 GET_KI(victim) = 0;
    }
@@ -4815,17 +4833,7 @@ int spell_iridescent_aura(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct o
       af.duration = 1 + skill / 10;
       af.modifier = skill/15;
       af.bitvector = -1;
-      af.location = APPLY_SAVING_COLD;
-      affect_to_char(victim, &af);
-      af.location = APPLY_SAVING_FIRE;
-      affect_to_char(victim, &af);
-      af.location = APPLY_SAVING_POISON;
-      affect_to_char(victim, &af);
-      af.location = APPLY_SAVING_MAGIC;
-      affect_to_char(victim, &af);
-      af.location = APPLY_SAVING_ACID;
-      affect_to_char(victim, &af);
-      af.location = APPLY_SAVING_ENERGY;
+      af.location = APPLY_SAVES;
       affect_to_char(victim, &af);
    }
    return eSUCCESS;

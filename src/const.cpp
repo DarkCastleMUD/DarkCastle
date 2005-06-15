@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.156 2005/06/14 22:13:37 shane Exp $ */
+/* $Id: const.cpp,v 1.157 2005/06/15 19:38:00 shane Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -992,6 +992,7 @@ char *apply_types[] =
     "SPELL MITIGATION",
     "SONG MITIGATION",
     "RESIST MAGIC",
+    "ALL SAVES",
     "\n"
 };
 
@@ -1249,11 +1250,11 @@ struct class_skill_defines p_skills[] = { // paladin skills
 {    "heal",                 SPELL_HEAL,               37,     85,     {WIS,INT} },
 {    "harm",                 SPELL_HARM,               38,     85,     {WIS,CON} },
 {    "sanctuary",            SPELL_SANCTUARY,          40,     90,     {WIS,INT} },
-{    "holy aegis",           SPELL_AEGIS,              41,     90,     {WIS,INT} },
-{    "dispel evil",          SPELL_DISPEL_EVIL,        42,     90,     {WIS,STR} },
+{    "holy aegis",           SPELL_AEGIS,              42,     90,     {WIS,INT} },
 {    "protection from evil", SPELL_PROTECT_FROM_EVIL,  45,     90,     {WIS,DEX} },
 {    "resist cold",          SPELL_RESIST_COLD,        46,     70,     {CON,STR} },
-{    "power harm",           SPELL_POWER_HARM,         48,     90,     {WIS,CON} },
+{    "dispel evil",          SPELL_DISPEL_EVIL,        48,     90,     {WIS,STR} },
+//{    "power harm",           SPELL_POWER_HARM,         48,     90,     {WIS,CON} },
 {    "holy aura",            SPELL_HOLY_AURA,          50,     98,     {WIS,STR} },
 {    "\n",                   0,                        1,      0,      {0,0} }
 };
@@ -1518,7 +1519,7 @@ struct class_skill_defines c_skills[] = { // cleric skills
 {    "portal",               SPELL_PORTAL,            38,     85,     {STR,INT} },     
 {    "true sight",           SPELL_TRUE_SIGHT,        39,     90,     {WIS,INT} },     
 {    "full heal",            SPELL_FULL_HEAL,         40,     98,     {WIS,INT} },
-{    "power harm",           SPELL_POWER_HARM,        41,     85,     {WIS,CON} },
+{    "power harm",           SPELL_POWER_HARM,        41,     98,     {WIS,CON} },
 {    "resist magic",         SPELL_RESIST_MAGIC,      43,     90,     {INT,WIS} },
 {    "resist energy",        SPELL_RESIST_ENERGY,     44,     85,     {CON,DEX} },
 {    "dispel magic",         SPELL_DISPEL_MAGIC,      45,     85,     {INT,CON} },

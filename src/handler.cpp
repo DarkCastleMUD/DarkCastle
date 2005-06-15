@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.89 2005/05/31 11:24:46 urizen Exp $ */
+/* $Id: handler.cpp,v 1.90 2005/06/15 19:38:00 shane Exp $ */
     
 extern "C"
 {
@@ -724,6 +724,15 @@ void affect_modify(CHAR_DATA *ch, int32 loc, int32 mod, long bitv, bool add)
 	    ch->saves[SAVE_TYPE_POISON] += mod;
             break;
 
+        case APPLY_SAVES:
+	    ch->saves[SAVE_TYPE_FIRE] += mod;
+	    ch->saves[SAVE_TYPE_COLD] += mod;
+	    ch->saves[SAVE_TYPE_MAGIC] += mod;
+	    ch->saves[SAVE_TYPE_ENERGY] += mod;
+	    ch->saves[SAVE_TYPE_ACID] += mod;
+	    ch->saves[SAVE_TYPE_POISON] += mod;
+            break;
+            
         case APPLY_HIT_N_DAM: {
             GET_DAMROLL(ch) += mod;
             GET_HITROLL(ch) += mod;
