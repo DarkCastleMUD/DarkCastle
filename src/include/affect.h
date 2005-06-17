@@ -2,7 +2,7 @@
 #define AFFECT_H_
 
 /************************************************************************
-| $Id: affect.h,v 1.17 2005/06/14 22:13:45 shane Exp $
+| $Id: affect.h,v 1.18 2005/06/17 20:21:25 shane Exp $
 | affect.h
 | This contains the bits for affected_by
 */
@@ -68,5 +68,8 @@
 #define AFF_MAX                 55
 //#define AFF_CHECKTHISASIZE     64 //do not change unless ASIZE changes
 //#define AFF_CHECKTHISASIZE     96 //do not change unless ASIZE changes
+
+//Make sure affected_bits[] in const.cpp is updated
+
 #endif
 
