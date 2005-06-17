@@ -127,7 +127,7 @@ int do_set(struct char_data *ch, char *argument, int cmd)
         "int","wis","dex","con","gold","exp","mana","hit","move",
         "sessions","alignment","thirst","drunk","full","race",
         "bank", "platinum", "ki", "clan", "saves_base", "hpmeta",
-	"manameta","movemeta","align","\n"
+	"manameta","movemeta","\n"
     };
     struct char_data *vict;
     char name[100], buf2[100], buf[100], help[MAX_STRING_LENGTH];
@@ -582,15 +582,6 @@ int do_set(struct char_data *ch, char *argument, int cmd)
               log(buf2, GET_LEVEL(ch), LOG_GOD); 
 	}
         break;
-            case 31: /* align */
-            {
-                value = atoi(buf);
-                log(buf2, IMP, LOG_GOD);
-                /* set align of victim */
-                vict->align = value;
-            }       
-            break;
-
         }
     
   send_to_char("Ok.\n\r", ch);

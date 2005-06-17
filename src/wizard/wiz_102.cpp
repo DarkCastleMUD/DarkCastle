@@ -2847,8 +2847,8 @@ mob_index[mob_num].virt);
           return eFAILURE;
         }
         parse_bitstrings_into_int(affected_bits, buf4, ch,
-                             &((((char_data 
-*)mob_index[mob_num].item)->affected_by[0])));
+					&(((char_data *)mob_index[mob_num].item)->affected_by[0]));
+//                             &((((char_data *)mob_index[mob_num].item)->affected_by[0])));
       } break;
 
      /* edit numdamdice */

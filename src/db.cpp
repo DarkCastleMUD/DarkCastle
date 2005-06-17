@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.95 2005/06/10 21:49:16 shane Exp $ */
+/* $Id: db.cpp,v 1.96 2005/06/17 20:13:44 urizen Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -3075,8 +3075,15 @@ CHAR_DATA *clone_mobile(int nr)
   mob->next_in_room = 0;
 
   handle_automatic_mob_settings(mob);
-
-  return(mob);
+  float mult = 1.0;
+  if (GET_LEVEL(mob) > 80) { mult = 1.5;}
+  else if (GET_LEVEL(mob) > 70) {mult = 1.3;}
+  else if (GET_LEVEL(mob) > 60) {mult = 1.1;}
+  mob->max_hit = mob->raw_hit = mob->hit = mob->max_hit*mult;
+  mob->mobdata->damnodice *= mult;
+  mob->mobdata->damsizedice *= mult;
+  mob->damroll *= mult;
+  return (mob);
 }
 
 // add a new item to the index.  To do this, we need to update ALL the
@@ -3545,7 +3552,7 @@ struct obj_data *read_object(int nr, FILE *fl)
 
         case 'A':
           // these are only two members of obj_affected_type, so nothing else needs initializing
-          loc = fread_int (fl, -1000, INT_MAX);
+          loc = fread_int (fl, -1000, LONG_MAX);
           mod = fread_int (fl, -1000, 1000);
           add_obj_affect(obj, loc, mod);
           break;

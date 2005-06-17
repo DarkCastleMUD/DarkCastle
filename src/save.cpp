@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: save.cpp,v 1.33 2005/06/14 22:13:37 shane Exp $ */
+/* $Id: save.cpp,v 1.34 2005/06/17 20:13:44 urizen Exp $ */
 
 extern "C"
 {
@@ -44,7 +44,8 @@ extern "C"
 
 extern struct index_data *obj_index;
 extern CWorld world;
- 
+extern short bport;
+
 struct obj_data * obj_store_to_char( CHAR_DATA *ch, FILE *fpsave, struct obj_data * last_cont );
 bool put_obj_in_store( struct obj_data *obj, CHAR_DATA *ch, FILE *fpsave, int wear_pos);
 void restore_weight(struct obj_data *obj);
@@ -561,8 +562,11 @@ void save_char_obj (CHAR_DATA *ch)
     return;
 
   // TODO - figure out a way for mob's to save...maybe <mastername>.pet ?
-
+  if (bport)
+  sprintf (name, "%s/%c/%s", BSAVE_DIR, ch->name[0], ch->name);
+  else
   sprintf (name, "%s/%c/%s", SAVE_DIR, ch->name[0], ch->name);
+
   sprintf (strsave, "%s.back", name);
 
   if (!(fpsave = dc_fopen(strsave, "wb"))) {
@@ -647,6 +651,9 @@ bool load_char_obj( struct descriptor_data *d, char *name )
   clear_char(ch);
   ch->desc        = d;
 
+  if (bport)
+  sprintf(strsave, "%s/%c/%s", BSAVE_DIR, UPPER(name[0]), name);
+  else
   sprintf(strsave, "%s/%c/%s", SAVE_DIR, UPPER(name[0]), name);
 
 //  struct stat mystats;
@@ -1191,8 +1198,6 @@ void store_to_char(struct char_file_u *st, CHAR_DATA *ch)
 
     ch->affected_by[0] = st->afected_by;
     ch->affected_by[1] = st->afected_by2;
-    if (ch->affected_by[0] == -1) ch->affected_by[0] = 0;
-    if (ch->affected_by[1] == -1) ch->affected_by[1] = 0;
    
 /*    i = 0;
     while(st->afected_by[i] != -1) {

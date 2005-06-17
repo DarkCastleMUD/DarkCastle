@@ -1684,7 +1684,15 @@ int pull_proc(struct char_data*ch, struct obj_data *obj, int cmd, char*arg, CHAR
         send_to_room("You hear a large clicking noise.\n\r", 9532);
         send_to_room("You hear a large clicking noise.\n\r", ch->in_room);
         break;
-
+      case 29203:
+	if (obj_index[real_object(29202)].number > 0)
+	{
+		send_to_room("A compartment in the ceiling opens, but is it empty.\r\n",29258);
+		break;
+	}
+	send_to_room("A compartment in the ceiling opens, and a key drops to the ground.\r\n", 29258);
+	obj_to_room(clone_object(real_object(29202)), 29258);
+	break;
       default:
         send_to_char("Whatever you pulled doesn't have an entry in the lever pull table.  Tell a god.\r\n", ch);
         logf(LOG_WORLD, IMMORTAL, "'Pull' proc on obj %d without entry in proc table. (pull_proc)\r\n", obj_vnum);

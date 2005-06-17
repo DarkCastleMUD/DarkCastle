@@ -535,6 +535,7 @@ void assign_objects(void)
   assign_one_obj_non(3099,  board); /* Mortal Board */ 
   assign_one_obj_non(3611,  pfe_word);
   assign_one_obj_non(9529,  pull_proc);
+  assign_one_obj_non(29203,  pull_proc);
  // assign_one_obj_non(9530,  no_magic_while_alive);
   assign_one_obj_non(9531,  boat_proc);
   assign_one_obj_non(9532,  leave_boat_proc);

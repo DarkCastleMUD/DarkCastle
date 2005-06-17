@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: group.cpp,v 1.16 2005/05/28 18:56:10 shane Exp $
+| $Id: group.cpp,v 1.17 2005/06/17 20:13:44 urizen Exp $
 | group.C
 | Description:  Group related commands; join, abandon, follow, etc..
 */
@@ -566,13 +566,18 @@ int do_follow(CHAR_DATA *ch, char *argument, int cmd)
     one_argument(argument, name);
 
     if (*name) {
-	if (!(leader = get_char_room_vis(ch, name))) {
+	if (!(leader = get_char_room(name,ch->in_room))) {
 	    send_to_char("I see no person by that name here!\n\r", ch);
 	    return eFAILURE;
 	}
     } else {
 	send_to_char("Who do you wish to follow?\n\r", ch);
 	return eFAILURE;
+    }
+    if (cmd == 9 && !CAN_SEE(ch, leader))
+    { // check it like this instead o' get_char_room_vis 'cause stalk checks.
+      send_to_char("I see no person by that name here!\r\n",ch);
+      return eFAILURE;
     }
 
   if (IS_AFFECTED(ch, AFF_GROUP)) {

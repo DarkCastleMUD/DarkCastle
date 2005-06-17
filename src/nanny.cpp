@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.95 2005/06/15 19:38:00 shane Exp $ */
+/* $Id: nanny.cpp,v 1.96 2005/06/17 20:13:44 urizen Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -1262,6 +1262,13 @@ is_race_eligible(ch,7)?'*':' ',is_race_eligible(ch,8)?'*':' ',is_race_eligible(c
              d->character = 0;
              load_char_obj(d, tmp_name);
              ch = d->character;
+	     if (!ch)
+	     {
+		write_to_descriptor(d->descriptor, "It seems your character has been deleted during logon, or you just experienced some obscure bug.");
+		close_socket(d);
+		d = NULL;
+		break;
+	     }
           }
 	  if  (GET_GOLD(ch) > 1000000000)
           {

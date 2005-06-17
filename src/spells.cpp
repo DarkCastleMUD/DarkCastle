@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.139 2005/06/10 00:22:52 urizen Exp $ */
+/* $Id: spells.cpp,v 1.140 2005/06/17 20:13:44 urizen Exp $ */
 
 extern "C"
 {
@@ -803,9 +803,6 @@ void affect_update( void )
     void update_char_objects( CHAR_DATA *ch ); /* handler.c */
     unsigned int faded_spells[20];
     int a =0;
-    for (; a < 20; a++)
-      faded_spells[a] = 0;
-    a=0;
     for (i = character_list; i; i = i_next) { 
       i_next = i->next;
 //      if(!IS_NPC(i) ) // && !(i->desc)) Linkdeadness doens't save you 
@@ -813,6 +810,9 @@ void affect_update( void )
   //      continue; 
       for (af = i->affected; af; af = next_af_dude) {
 	next_af_dude = af->next;
+        for (; a < 20; a++)
+          faded_spells[a] = 0;
+        a=0;
 
         // This doesn't really belong here, but it beats creating an "update" just for it.
         // That way we don't have to traverse the entire list all over again

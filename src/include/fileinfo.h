@@ -1,7 +1,7 @@
 #ifndef FILEINFO_H_
 #define FILEINFO_H_
 /*
-| $Id: fileinfo.h,v 1.9 2005/05/27 15:28:08 urizen Exp $
+| $Id: fileinfo.h,v 1.10 2005/06/17 20:13:46 urizen Exp $
 | fileinfo.h
 | Description:  Contains information for loading files, ie "../lib", etc..
 */
@@ -12,6 +12,7 @@
 #ifndef WIN32
 #define  DFLT_DIR            "../lib"
 #define  SAVE_DIR            "../save"
+#define  BSAVE_DIR            "../bsave"
 #define  NEWSAVE_DIR         "../newsave"
 #define  ARCHIVE_DIR         "../archive"
 #define  MOB_DIR             "../MOBProgs/"
@@ -24,6 +25,7 @@
 #else
 #define DFLT_DIR             "lib"
 #define  SAVE_DIR            "save"
+#define  BSAVE_DIR            "bsave"
 #define  NEWSAVE_DIR         "newsave"
 #define  ARCHIVE_DIR         "archive"
 #define  MOB_DIR             "MOBProgs/"
