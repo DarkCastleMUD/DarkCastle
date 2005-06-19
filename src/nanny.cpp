@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.96 2005/06/17 20:13:44 urizen Exp $ */
+/* $Id: nanny.cpp,v 1.97 2005/06/19 10:34:02 urizen Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -762,9 +762,9 @@ void nanny(struct descriptor_data *d, char *arg)
       if (allowed_host(d->host))
 	SEND_TO_Q( "You are logging in from an ALLOWED host.\r\n",d);
 
+      extern short bport;
       if(check_reconnect(d, tmp_name, FALSE))
          fOld = TRUE;
-      
       else if((wizlock) && !allowed_host(d->host))/* && strcmp(GET_NAME(ch),"Sadus") &&
          strcmp(GET_NAME(ch),"Pirahna") &&
          strcmp(GET_NAME(ch),"Valkyrie") &&  strcmp(GET_NAME(ch), "Apocalypse")
@@ -775,6 +775,11 @@ void nanny(struct descriptor_data *d, char *arg)
          return;
       }
       
+      if (bport && GET_LEVEL(ch) < 100)
+	{
+		send_to_char("Mortals not allowed on this port.\r\n",ch);
+		close_socket(d);
+	}
       if ( fOld ) {
          /* Old player */
          SEND_TO_Q( "Password: ", d );
@@ -782,6 +787,11 @@ void nanny(struct descriptor_data *d, char *arg)
          return;
       }
       else {
+	if (bport) 
+	{
+	  SEND_TO_Q("New chars not allowed on this port.\r\nEnter a new name: ", d);
+	  return;
+	}
          /* New player */
          sprintf( buf, "Did I get that right, %s (Y/N)? ", tmp_name );
          SEND_TO_Q( buf, d );
@@ -792,7 +802,7 @@ void nanny(struct descriptor_data *d, char *arg)
       
    case CON_GET_OLD_PASSWORD:
       SEND_TO_Q( "\n\r", d );
-      
+
       if(strncmp( (char *)crypt((char *)arg, (char *)ch->pcdata->pwd), ch->pcdata->pwd, (PASSWORD_LEN) )) {
          SEND_TO_Q( "Wrong password.\n\r", d );
          sprintf(log_buf, "%s wrong password: %s", GET_NAME(ch), d->host);

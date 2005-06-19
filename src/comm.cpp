@@ -375,18 +375,23 @@ int write_hotboot_file()
   fclose(fp);
   log("Hotboot descriptor file successfully written.", 0, LOG_MISC);
 
+    
   // note, for debug mode, you have to put the "-c", "6969", in there
-#ifndef WIN32
-  if(-1 == execl("../src/research1", "research1",(char*)NULL)) {
-#else
-	  if(-1 == _execl("../src/research1", "research1", (char*)NULL)) {
-#endif
-//  if(-1 == execv(ext_argv[0], ext_argv)) {
+  if (!bport) {
+    if(-1 == execl("../src/research1", "research1",(char*)NULL)) {
     perror("Hotboot execv call failed.");
     perror(ext_argv[0]);
     unlink("hotboot"); // wipe the file since we can't use it anyway
     return 0;
-  }
+  } } 
+  else {
+    if(-1 == execl("../src/research1", "research1","-b")) {
+    perror("Hotboot execv call failed.");
+    perror(ext_argv[0]);
+    unlink("hotboot"); // wipe the file since we can't use it anyway
+    return 0;
+  } } 
+
   return 1;
 }
 

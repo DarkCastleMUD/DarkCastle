@@ -350,37 +350,46 @@ int show_zone_commands(struct char_data *ch, int i, int start = 0)
       case 9: sprintf(buf, "[%3d] $B$4Ls$R%%%%$B$4Fl$R ", j+1); break;
       default: sprintf(buf, "[%3d] $B$4ERROR(%d)$R", j+1, zone_table[i].cmd[j].if_flag); break;
     }
-
+   int virt;
+    #define ZCMD zone_table[i].cmd[j]
     switch(zone_table[i].cmd[j].command) {
     case 'M':
-      sprintf(buf, "%s $B$1Load mob  [%5d] ", buf, mob_index[zone_table[i].cmd[j].arg1].virt);
+      virt = ZCMD.active?mob_index[ZCMD.arg1].virt:ZCMD.arg1;
+      sprintf(buf, "%s $B$1Load mob  [%5d] ", buf, virt);
       if(zone_table[i].cmd[j].arg2 == -1)
         strcat(buf, "(  always ) in room ");
       else sprintf(buf, "%s(if< [%3d]) in room ", buf, zone_table[i].cmd[j].arg2);
-      sprintf(buf, "%s[%5d].$R\r\n", buf, world[zone_table[i].cmd[j].arg3].number);
+      sprintf(buf, "%s[%5d].$R\r\n", buf,zone_table[i].cmd[j].arg3);
       break;
     case 'O':
-      sprintf(buf, "%s $BLoad obj  [%5d] ", buf, obj_index[zone_table[i].cmd[j].arg1].virt);
+      virt = ZCMD.active?obj_index[ZCMD.arg1].virt:ZCMD.arg1;
+      sprintf(buf, "%s $BLoad obj  [%5d] ", buf, virt);
       if(zone_table[i].cmd[j].arg2 == -1)
         strcat(buf, "(  always ) in room ");
       else sprintf(buf, "%s(if< [%3d]) in room ", buf, zone_table[i].cmd[j].arg2);
-      sprintf(buf, "%s[%5d].$R\r\n", buf, world[zone_table[i].cmd[j].arg3].number);
+//      sprintf(buf, "%s[%5d].$R\r\n", buf, 
+//world[zone_table[i].cmd[j].arg3].number);
+      sprintf(buf, "%s[%5d].$R\r\n", buf,zone_table[i].cmd[j].arg3);
       break;
     case 'P':
-      sprintf(buf, "%s $5Place obj [%5d] ", buf, obj_index[zone_table[i].cmd[j].arg1].virt);
+      virt = ZCMD.active?obj_index[ZCMD.arg1].virt:ZCMD.arg1;
+      sprintf(buf, "%s $5Place obj [%5d] ", buf, virt);
       if(zone_table[i].cmd[j].arg2 == -1)
         strcat(buf, "(  always ) in objt ");
       else sprintf(buf, "%s(if< [%3d]) in objt ", buf, zone_table[i].cmd[j].arg2);
-      sprintf(buf, "%s[%5d] (in last created).$R\r\n", buf, obj_index[zone_table[i].cmd[j].arg3].virt);
+      virt = ZCMD.active?obj_index[ZCMD.arg3].virt:ZCMD.arg3;
+      sprintf(buf, "%s[%5d] (in last created).$R\r\n", buf, virt);
       break;
     case 'G':
-      sprintf(buf, "%s $6Place obj [%5d] ", buf, obj_index[zone_table[i].cmd[j].arg1].virt);
+      virt = ZCMD.active?obj_index[ZCMD.arg1].virt:ZCMD.arg1;
+      sprintf(buf, "%s $6Place obj [%5d] ", buf, virt);
       if(zone_table[i].cmd[j].arg2 == -1)
         strcat(buf, "(  always ) on last mob loaded.$R\r\n");
       else sprintf(buf, "%s(if< [%3d]) on last mob loaded.$R\r\n", buf, zone_table[i].cmd[j].arg2);
       break;
     case 'E':
-      sprintf(buf, "%s $2Equip obj [%5d] ", buf, obj_index[zone_table[i].cmd[j].arg1].virt);
+      virt = ZCMD.active?obj_index[ZCMD.arg1].virt:ZCMD.arg1;
+      sprintf(buf, "%s $2Equip obj [%5d] ", buf, virt);
       if(zone_table[i].cmd[j].arg2 == -1)
         strcat(buf, "(  always ) on last mob on ");
       else sprintf(buf, "%s(if< [%3d]) on last mob on ", buf, zone_table[i].cmd[j].arg2);
@@ -392,7 +401,7 @@ int show_zone_commands(struct char_data *ch, int i, int start = 0)
       break;
     case 'D':
       sprintf(buf, "%s $3Room [%5d] Dir: [%d]", buf,
-        world[zone_table[i].cmd[j].arg1].number,
+        zone_table[i].cmd[j].arg1,
         zone_table[i].cmd[j].arg2);
 
         switch(zone_table[i].cmd[j].arg3) {

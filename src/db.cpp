@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.96 2005/06/17 20:13:44 urizen Exp $ */
+/* $Id: db.cpp,v 1.97 2005/06/19 10:34:02 urizen Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -605,10 +605,11 @@ void boot_db(void)
     
     log("renumbering zone table", 0, LOG_MISC);
     renum_zone_table();
-
-    log("Loading Corpses.", 0, LOG_MISC);
-    load_corpses();
-    
+     extern short bport;
+    if (!bport) {
+      log("Loading Corpses.", 0, LOG_MISC);
+      load_corpses();
+    }
     log("Loading messages.", 0, LOG_MISC);
     load_messages();
 
@@ -2139,42 +2140,73 @@ void renum_zone_table(void)
 
     for (zone = 0; zone <= top_of_zone_table; zone++)
     for (comm = 0; zone_table[zone].cmd[comm].command != 'S'; comm++)
+    {
+	zone_table[zone].cmd[comm].active = 1;
         switch(zone_table[zone].cmd[comm].command)
         {
         case 'M':
-          if(real_room(zone_table[zone].cmd[comm].arg3) < 0) {
+          /*if(real_room(zone_table[zone].cmd[comm].arg3) < 0) {
+	  
             fprintf(stderr, "Problem in zonefile: no room number %d for mob "
 	            "%d - setting to J command\n", zone_table[zone].cmd[comm].arg3,
 		    zone_table[zone].cmd[comm].arg1);
             zone_table[zone].cmd[comm].command = 'J';
-          }
+          }*/
+	if (real_mobile(zone_table[zone].cmd[comm].arg1)
+		&& real_room(zone_table[zone].cmd[comm].arg3) >= 0)
           zone_table[zone].cmd[comm].arg1 =
                 real_mobile(zone_table[zone].cmd[comm].arg1);
-          zone_table[zone].cmd[comm].arg3 = 
-                real_room(zone_table[zone].cmd[comm].arg3);
+	else {
+	  zone_table[zone].cmd[comm].active = 0;
+	}
+//          zone_table[zone].cmd[comm].arg3;// = 
+//                real_room(zone_table[zone].cmd[comm].arg3);
+
         break;
         case 'O':
-            zone_table[zone].cmd[comm].arg1 = 
-            real_object(zone_table[zone].cmd[comm].arg1);
-            if (zone_table[zone].cmd[comm].arg3 != NOWHERE)
-            zone_table[zone].cmd[comm].arg3 =
-            real_room(zone_table[zone].cmd[comm].arg3);
+	  if (real_object(zone_table[zone].cmd[comm].arg1) 
+		&& real_room(zone_table[zone].cmd[comm].arg3) != -1)
+            zone_table[zone].cmd[comm].arg1 = real_object(zone_table[zone].cmd[comm].arg1);
+	  else
+		zone_table[zone].cmd[comm].active = 0;
+
+//            if (zone_table[zone].cmd[comm].arg3 != NOWHERE)
+  //          zone_table[zone].cmd[comm].arg3 =
+    //        real_room(zone_table[zone].cmd[comm].arg3);
         break;
         case 'G':
+	if (real_object(zone_table[zone].cmd[comm].arg1))
             zone_table[zone].cmd[comm].arg1 =
             real_object(zone_table[zone].cmd[comm].arg1);
+	else 
+		zone_table[zone].cmd[comm].active = 0;
+	    
         break;
         case 'E':
+	if (real_object(zone_table[zone].cmd[comm].arg1))
             zone_table[zone].cmd[comm].arg1 =
             real_object(zone_table[zone].cmd[comm].arg1);
+	else
+		zone_table[zone].cmd[comm].active = 0;
+
         break;
         case 'P':
+	if (real_object(zone_table[zone].cmd[comm].arg1)
+	&& real_object(zone_table[zone].cmd[comm].arg3))
+	{
             zone_table[zone].cmd[comm].arg1 =
             real_object(zone_table[zone].cmd[comm].arg1);
             zone_table[zone].cmd[comm].arg3 =
             real_object(zone_table[zone].cmd[comm].arg3);
+
+	}
+	else
+		zone_table[zone].cmd[comm].active = 0;
         break;                  
         case 'D':
+	  if (real_room(zone_table[zone].cmd[comm].arg1) < 0)
+		zone_table[zone].cmd[comm].active = 0;
+	else {
             zone_table[zone].cmd[comm].arg1 =
             real_room(zone_table[zone].cmd[comm].arg1);
             if(zone_table[zone].cmd[comm].arg1 == -1)
@@ -2183,6 +2215,7 @@ void renum_zone_table(void)
 	            " - setting to J command\n");
               zone_table[zone].cmd[comm].command = 'J';
             }
+	}
         break;
         case '%':
             // % doesn't effect the actual world, so there's
@@ -2199,6 +2232,7 @@ void renum_zone_table(void)
           log("Illegal char hit in renum_zone_table", 0, LOG_WORLD);
           break;
         }
+   }
 }
 
 void free_zones_from_memory()
@@ -2218,6 +2252,8 @@ void free_zones_from_memory()
     }
   }
 }
+#define ZCMD zone_table[zone].cmd[cmd_no]
+#define ZWCMD zone_table[zon].cmd[i]
 
 void write_one_zone(FILE * fl, int zon)
 {
@@ -2253,41 +2289,53 @@ void write_one_zone(FILE * fl, int zon)
                                           zone_table[zon].cmd[i].arg3,
                                           zone_table[zon].cmd[i].comment ? 
                                              zone_table[zon].cmd[i].comment : "");
-    else if(zone_table[zon].cmd[i].command == 'M') 
+    else if(zone_table[zon].cmd[i].command == 'M') {
+	int virt = ZWCMD.active?mob_index[ZWCMD.arg1].virt:ZWCMD.arg1;
       fprintf(fl, "M %2d %5d %3d %5d %s\n", zone_table[zon].cmd[i].if_flag,
-                                          mob_index[zone_table[zon].cmd[i].arg1].virt,
+						virt,
                                           zone_table[zon].cmd[i].arg2,
                                           zone_table[zon].cmd[i].arg3,
                                           zone_table[zon].cmd[i].comment ? 
-                                             zone_table[zon].cmd[i].comment : "");
-    else if(zone_table[zon].cmd[i].command == 'P') 
+                                          zone_table[zon].cmd[i].comment : "");
+	}
+    else if(zone_table[zon].cmd[i].command == 'P')  {
+	int virt = ZWCMD.active?obj_index[ZWCMD.arg1].virt:ZWCMD.arg1;
+	int virt2 = ZWCMD.active?obj_index[ZWCMD.arg3].virt:ZWCMD.arg3;
       fprintf(fl, "P %2d %5d %3d %5d %s\n", zone_table[zon].cmd[i].if_flag,
-                                          obj_index[zone_table[zon].cmd[i].arg1].virt,
+                                          virt,
                                           zone_table[zon].cmd[i].arg2,
-                                          obj_index[zone_table[zon].cmd[i].arg3].virt,
+                                          virt,
                                           zone_table[zon].cmd[i].comment ? 
                                              zone_table[zon].cmd[i].comment : "");
-    else if(zone_table[zon].cmd[i].command == 'G') 
-      fprintf(fl, "G %2d %5d %3d %5d %s\n", zone_table[zon].cmd[i].if_flag,
-                                          obj_index[zone_table[zon].cmd[i].arg1].virt,
+     }
+    else if(zone_table[zon].cmd[i].command == 'G') {
+	int virt = ZWCMD.active?obj_index[ZWCMD.arg1].virt:ZWCMD.arg1;
+
+     fprintf(fl, "G %2d %5d %3d %5d %s\n", zone_table[zon].cmd[i].if_flag,
+                                          virt,
                                           zone_table[zon].cmd[i].arg2,
                                           zone_table[zon].cmd[i].arg3,
                                           zone_table[zon].cmd[i].comment ? 
                                              zone_table[zon].cmd[i].comment : "");
-    else if(zone_table[zon].cmd[i].command == 'O') 
+    }
+    else if(zone_table[zon].cmd[i].command == 'O')  {
+	int virt = ZWCMD.active?obj_index[ZWCMD.arg1].virt:ZWCMD.arg1;
       fprintf(fl, "O %2d %5d %3d %5d %s\n", zone_table[zon].cmd[i].if_flag,
-                                          obj_index[zone_table[zon].cmd[i].arg1].virt,
+                                          virt,
                                           zone_table[zon].cmd[i].arg2,
                                           zone_table[zon].cmd[i].arg3,
                                           zone_table[zon].cmd[i].comment ? 
                                              zone_table[zon].cmd[i].comment : "");
-    else if(zone_table[zon].cmd[i].command == 'E') 
-      fprintf(fl, "E %2d %5d %3d %5d %s\n", zone_table[zon].cmd[i].if_flag,
-                                          obj_index[zone_table[zon].cmd[i].arg1].virt,
+     }
+    else if(zone_table[zon].cmd[i].command == 'E') { 
+	int virt = ZWCMD.active?obj_index[ZWCMD.arg1].virt:ZWCMD.arg1;
+     fprintf(fl, "E %2d %5d %3d %5d %s\n", zone_table[zon].cmd[i].if_flag,
+                                          virt,
                                           zone_table[zon].cmd[i].arg2,
                                           zone_table[zon].cmd[i].arg3,
                                           zone_table[zon].cmd[i].comment ? 
                                              zone_table[zon].cmd[i].comment : "");
+  }
     else fprintf(fl, "%c %2d %5d %3d %5d %s\n", zone_table[zon].cmd[i].command,
                                           zone_table[zon].cmd[i].if_flag,
                                           zone_table[zon].cmd[i].arg1,
@@ -3724,7 +3772,6 @@ void zone_update(void)
 
 
 
-#define ZCMD zone_table[zone].cmd[cmd_no]
 
 /* execute the reset command table of a given zone */
 void reset_zone(int zone)
@@ -3760,6 +3807,7 @@ void reset_zone(int zone)
       }
       if (ZCMD.command == 'S')
         break;
+   if (ZCMD.active == 0) continue;
 
     if ( ZCMD.if_flag == 0 ||                            // always
          (last_cmd==1     && ZCMD.if_flag == 1) ||       // if last command true

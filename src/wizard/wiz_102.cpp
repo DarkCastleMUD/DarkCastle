@@ -751,6 +751,7 @@ int do_zedit(struct char_data *ch, char *argument, int cmd)
         for(j = last_cmd; j != (i-2) ; j--)
           zone_table[zone].cmd[j+1] = zone_table[zone].cmd[j];
         // set up the 'J'
+	zone_table[zone].cmd[i-1].active = 1;
         zone_table[zone].cmd[i-1].command = 'J';
         zone_table[zone].cmd[i-1].if_flag = 0;
         zone_table[zone].cmd[i-1].arg1 = 0;   
@@ -764,6 +765,7 @@ int do_zedit(struct char_data *ch, char *argument, int cmd)
         // bump the 'S' up
         zone_table[zone].cmd[last_cmd+1] = zone_table[zone].cmd[last_cmd];
         // set up the 'J'
+	zone_table[zone].cmd[last_cmd].active = 1;
         zone_table[zone].cmd[last_cmd].command = 'J';
         zone_table[zone].cmd[last_cmd].if_flag = 0;
         zone_table[zone].cmd[last_cmd].arg1 = 0;   
@@ -4285,10 +4287,10 @@ int do_rstat(struct char_data *ch, char *argument, int cmd)
                         strcat(buf,"UNDEFINED\n\r");
                     send_to_char(buf, ch);
                     sprintbit(rm->dir_option[i]->exit_info, exit_bits, buf2);
-                    sprintf(buf,
+                   sprintf(buf,
                 "Exit flag: %s \n\rKey no: %d\n\rTo room (V-Number): %d\n\r",
                             buf2, rm->dir_option[i]->key,
-                            world[rm->dir_option[i]->to_room].number);
+                            rm->dir_option[i]->to_room);
                     send_to_char(buf, ch);
                 }
             }
