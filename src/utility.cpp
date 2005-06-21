@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.40 2005/06/14 22:13:37 shane Exp $ */
+/* $Id: utility.cpp,v 1.41 2005/06/21 13:00:56 urizen Exp $ */
 
 extern "C"
 {
@@ -1402,12 +1402,12 @@ void parse_bitstrings_into_int(char * bits[], char * strings, char_data *ch, uin
       if (!strcmp("unused",bits[x])) continue;
       if(is_abbrev(buf, bits[x])) 
       {
-        if(ISSET(value, x)) {
-          REMBIT(value, x);
+        if(ISSET(value, x+1)) {
+          REMBIT(value, x+1);
           csendf(ch, "%s flag REMOVED.\n\r", bits[x]);
         }
         else {
-          SETBIT(value, x);
+          SETBIT(value, x+1);
           csendf(ch, "%s flag ADDED.\n\r", bits[x]);
         }
         found = TRUE;
