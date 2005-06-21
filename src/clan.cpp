@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.36 2005/05/31 11:24:46 urizen Exp $ */
+/* $Id: clan.cpp,v 1.37 2005/06/21 19:00:06 shane Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -2416,6 +2416,7 @@ int do_cwithdraw(CHAR_DATA *ch, char *arg, int cmd)
   get_clan(ch)->balance -= wdraw;
   csendf(ch,"You withdraw %d gold coins.",wdraw);
   save_clans();
+  do_save(ch, "", 0);
   return eSUCCESS;
 }
 

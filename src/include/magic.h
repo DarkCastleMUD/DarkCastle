@@ -5,7 +5,7 @@
  *                                                                           *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-/* $Id: magic.h,v 1.21 2005/06/05 16:13:28 urizen Exp $ */
+/* $Id: magic.h,v 1.22 2005/06/21 19:00:10 shane Exp $ */
 #ifndef MAGIC_H_
 #define MAGIC_H_
 
@@ -138,6 +138,8 @@ int spell_dispel_good(byte level, CHAR_DATA * ch,
 int spell_harm(byte level, CHAR_DATA * ch,
    CHAR_DATA * victim, struct obj_data * obj, int skill);
 int spell_power_harm(byte level, CHAR_DATA * ch,
+   CHAR_DATA * victim, struct obj_data * obj, int skill);
+int spell_divine_fury(byte level, CHAR_DATA * ch,
    CHAR_DATA * victim, struct obj_data * obj, int skill);
 int spell_teleport(byte level, CHAR_DATA * ch,
    CHAR_DATA * victim, struct obj_data * obj, int skill);
@@ -287,6 +289,8 @@ int cast_fireball(byte level, CHAR_DATA * ch, char *arg, int type,
 int cast_harm(byte level, CHAR_DATA * ch, char *arg, int type,
    CHAR_DATA * victim, struct obj_data * tar_obj, int skill);
 int cast_power_harm(byte level, CHAR_DATA * ch, char *arg, int type,
+   CHAR_DATA * victim, struct obj_data * tar_obj, int skill);
+int cast_divine_fury(byte level, CHAR_DATA * ch, char *arg, int type,
    CHAR_DATA * victim, struct obj_data * tar_obj, int skill);
 int cast_lightning_bolt(byte level, CHAR_DATA * ch, char *arg, int type,
    CHAR_DATA * victim, struct obj_data * tar_obj, int skill);

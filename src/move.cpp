@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.49 2005/06/13 18:37:45 shane Exp $
+| $Id: move.cpp,v 1.50 2005/06/21 19:00:06 shane Exp $
 | move.C
 | Movement commands and stuff.
 *************************************************************************
@@ -153,7 +153,7 @@ void do_muddy(CHAR_DATA *ch)
 {
    short chance = number(0,30);
 
-   if(IS_NPC(ch) || IS_AFFECTED(ch, AFF_FLYING) || GET_LEVEL(ch) >= IMMORTAL) {
+   if(IS_NPC(ch) || IS_AFFECTED(ch, AFF_FLYING) || GET_LEVEL(ch) >= IMMORTAL || IS_AFFECTED(ch, AFF_FREEFLOAT)) {
      ; //poop on a stick!
    } else if(GET_DEX(ch) > chance) {
       act("You barely avoid slipping in the mud.", ch, 0, 0, TO_CHAR, 0);
@@ -174,7 +174,7 @@ int do_unstable(CHAR_DATA *ch)
 
     short chance = number(0, 30);
  
-    if(IS_AFFECTED(ch, AFF_FLYING))
+    if(IS_AFFECTED(ch, AFF_FLYING) || IS_AFFECTED(ch, AFF_FREEFLOAT) || GET_LEVEL(ch) >= IMMORTAL)
         return eFAILURE;
 
     if(GET_DEX(ch) > chance) {

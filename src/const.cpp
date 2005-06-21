@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.159 2005/06/17 20:20:56 shane Exp $ */
+/* $Id: const.cpp,v 1.160 2005/06/21 19:00:06 shane Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1250,10 +1250,10 @@ struct class_skill_defines p_skills[] = { // paladin skills
 {    "harm",                 SPELL_HARM,               38,     85,     {WIS,CON} },
 {    "sanctuary",            SPELL_SANCTUARY,          40,     90,     {WIS,INT} },
 {    "holy aegis",           SPELL_AEGIS,              42,     90,     {WIS,INT} },
+{    "dispel evil",          SPELL_DISPEL_EVIL,        43,     90,     {WIS,STR} },
 {    "protection from evil", SPELL_PROTECT_FROM_EVIL,  45,     90,     {WIS,DEX} },
 {    "resist cold",          SPELL_RESIST_COLD,        46,     70,     {CON,STR} },
-{    "dispel evil",          SPELL_DISPEL_EVIL,        48,     90,     {WIS,STR} },
-//{    "power harm",           SPELL_POWER_HARM,         48,     90,     {WIS,CON} },
+{    "divine fury",          SPELL_DIVINE_FURY,        48,     98,     {STR,CON} },
 {    "holy aura",            SPELL_HOLY_AURA,          50,     98,     {WIS,STR} },
 {    "\n",                   0,                        1,      0,      {0,0} }
 };
@@ -1355,6 +1355,7 @@ struct class_skill_defines r_skills[] = { // ranger skills
 {    "whipping",        SKILL_WHIPPING_WEAPONS,  30,     85,     {DEX,STR} },
 {    "ice arrows",      SKILL_ICE_ARROW,         31,     98,     {CON,DEX} },
 {    "rescue",          SKILL_RESCUE,            32,     80,     {WIS,INT} },
+{    "trip",            SKILL_TRIP,              33,     80,     {DEX,STR} },
 {    "ambush",          SKILL_AMBUSH,            35,     98,     {INT,DEX} },
 {    "fire arrows",     SKILL_FIRE_ARROW,        36,     98,     {WIS,DEX} },
 {    "call follower",   SPELL_CALL_FOLLOWER,     38,     98,     {CON,STR} },
@@ -2385,7 +2386,7 @@ struct mob_matrix_data mob_matrix[] =
 /* 104 */{9500000,24000,104,94,-850,3600000},
 /* 105 */{9750000,25000,105,95,-875,3800000},
 /* 106 */{10000000,26000,106,96,-900,4000000},
-/* 107 */{10250000,2700,107,97,-925,4250000},
+/* 107 */{10250000,27000,107,97,-925,4250000},
 /* 108 */{10500000,28000,108,98,-950,4500000},
 /* 109 */{10750000,29000,109,99,-975,4750000},
 /* 110 */{11000000,30000,110,100,-1000,5000000}

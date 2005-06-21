@@ -1108,7 +1108,7 @@ int spell_firestorm(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
 
 int spell_dispel_evil(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
-  int dam;
+  int dam, align;
   set_cantquit( ch, victim );
   if (IS_EVIL(ch))
 	 victim = ch;
@@ -1117,7 +1117,9 @@ int spell_dispel_evil(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 	act("$N does not seem to be affected.", ch, 0, victim, TO_CHAR, 0);
 	return eFAILURE;
   }
-  dam = 300;
+  align = GET_ALIGNMENT(victim);
+  if(align < 0) align = 0-align;
+  dam = 350 + align / 10;
 
   return spell_damage(ch, victim, dam, TYPE_MAGIC, SPELL_DISPEL_EVIL, 0);
 }
@@ -1127,7 +1129,7 @@ int spell_dispel_evil(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 
 int spell_dispel_good(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
-  int dam;
+  int dam, align;
   set_cantquit( ch, victim );
   if (IS_GOOD(ch))
 	 victim = ch;
@@ -1136,7 +1138,9 @@ int spell_dispel_good(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 	act("$N does not seem to be affected.", ch, 0, victim, TO_CHAR, 0);
 	return eFAILURE;
   }
-  dam = 300;
+  align = GET_ALIGNMENT(victim);
+  if(align < 0) align = 0-align;
+  dam = 350 + align / 10;
 
   return spell_damage(ch, victim, dam, TYPE_MAGIC, SPELL_DISPEL_GOOD, 0);
 }
@@ -1186,6 +1190,21 @@ int spell_power_harm(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
      dam = 300;
 
   return spell_damage(ch, victim, dam, TYPE_MAGIC, SPELL_POWER_HARM, 0);
+}
+
+
+/* DIVINE FURE */
+
+int spell_divine_fury(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
+{
+  int dam;
+  set_cantquit( ch, victim );
+  dam = 100 + GET_ALIGNMENT(ch) / 4;
+
+  if(IS_GOOD(victim)) GET_ALIGNMENT(ch) -= 5;
+  if(IS_NEUTRAL(victim)) GET_ALIGNMENT(ch) -= 2;
+
+  return spell_damage(ch, victim, dam, TYPE_MAGIC, SPELL_DIVINE_FURY, 0);
 }
 
 
@@ -6016,6 +6035,43 @@ int cast_power_harm( byte level, CHAR_DATA *ch, char *arg, int type,
 }
 
 
+/* DIVINE FURY (potion, staff) */
+
+int cast_divine_fury( byte level, CHAR_DATA *ch, char *arg, int type,
+  CHAR_DATA *victim, struct obj_data *tar_obj, int skill )
+{
+  int retval;
+  char_data * next_v;
+
+  switch (type) {
+  case SPELL_TYPE_SPELL:
+    return spell_divine_fury(level, ch, victim, 0, skill);
+    break;
+  case SPELL_TYPE_POTION:
+    return spell_divine_fury(level, ch, ch, 0, skill);
+    break;
+  case SPELL_TYPE_STAFF:
+    for (victim = world[ch->in_room].people ; victim ; victim = next_v )
+    {
+      next_v = victim->next_in_room;
+
+      if ( !ARE_GROUPED(ch, victim) )
+      {
+        retval = spell_divine_fury(level, ch, victim, 0, skill);
+        if(IS_SET(retval, eCH_DIED))
+          return retval;
+      }
+    }
+    return eSUCCESS;
+    break;
+  default :
+    log("Serious screw-up in divine fury!", ANGEL, LOG_BUG);
+    break;
+  }
+  return eFAILURE;
+}
+
+
 /* LIGHTNING BOLT (scroll, wand) */
 
 int cast_lightning_bolt( byte level, CHAR_DATA *ch, char *arg, int type,
@@ -8763,7 +8819,21 @@ int cast_creeping_death(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DAT
    int bingo = 0, poison = 0;
 
    set_cantquit(ch, victim);
-   dam = 375;
+   dam = 250;
+
+   if(world[ch->in_room].sector_type == SECT_SWAMP) dam += 150;
+   else if(world[ch->in_room].sector_type == SECT_FOREST) dam += 125;
+   else if(world[ch->in_room].sector_type == SECT_FIELD) dam += 100;
+   else if(world[ch->in_room].sector_type == SECT_HILLS) dam += 75;
+   else if(world[ch->in_room].sector_type == SECT_BEACH) dam += 50;
+   else if(world[ch->in_room].sector_type == SECT_MOUNTAIN) dam += 25;
+   else if(world[ch->in_room].sector_type == SECT_DESERT) dam += 25;
+   else if(world[ch->in_room].sector_type == SECT_WATER_NOSWIM) dam -= 25;
+   else if(world[ch->in_room].sector_type == SECT_UNDERWATER) dam -= 25;
+   else if(world[ch->in_room].sector_type == SECT_PAVED_ROAD) dam -= 25;
+   else if(world[ch->in_room].sector_type == SECT_AIR) dam -= 50;
+   else if(world[ch->in_room].sector_type == SECT_FROZEN_TUNDRA) dam -= 50;
+   else if(world[ch->in_room].sector_type == SECT_ARCTIC) dam -= 75;
    
    if (!OUTSIDE(ch)) {
       send_to_char("Your spell is more draining because you are indoors!\n\r", ch);
