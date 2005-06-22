@@ -2,7 +2,7 @@
 #define AFFECT_H_
 
 /************************************************************************
-| $Id: affect.h,v 1.18 2005/06/17 20:21:25 shane Exp $
+| $Id: affect.h,v 1.19 2005/06/22 21:08:23 shane Exp $
 | affect.h
 | This contains the bits for affected_by
 */
@@ -64,7 +64,7 @@
 #define AFF_ILLUSION		52 // Innate illusion
 #define AFF_KNOW_ALIGN		53
 #define AFF_BLACKJACK_ALERT 	54 // cannot be blackjacked, or blackjack
-#define AFF_WATERBREATHING      55
+#define AFF_WATER_BREATHING     55
 #define AFF_MAX                 55
 //#define AFF_CHECKTHISASIZE     64 //do not change unless ASIZE changes
 //#define AFF_CHECKTHISASIZE     96 //do not change unless ASIZE changes

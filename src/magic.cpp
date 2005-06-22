@@ -1723,20 +1723,10 @@ int spell_curse(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
 	 af.type      = SPELL_CURSE;
 	 af.duration  = duration;
 	 af.modifier  = save;
-	 af.location  = APPLY_SAVING_MAGIC;
+	 af.location  = APPLY_SAVES;
 	if (skill > 70)
          af.bitvector = AFF_CURSE;
 	else af.bitvector = -1;
-	 affect_to_char(victim, &af);
-	 af.location = APPLY_SAVING_FIRE;
-	 affect_to_char(victim, &af);
-	 af.location = APPLY_SAVING_COLD;
-	 affect_to_char(victim, &af);
-	 af.location = APPLY_SAVING_ENERGY;
-	 affect_to_char(victim, &af);
-	 af.location = APPLY_SAVING_ACID;
-	 affect_to_char(victim, &af);
-	 af.location = APPLY_SAVING_POISON;
 	 affect_to_char(victim, &af);
 	 act("$n briefly reveals a $4red$R aura!", victim, 0, 0, TO_ROOM, 0);
 	 act("You feel very uncomfortable as a curse takes hold of you.",victim,0,0,TO_CHAR, 0);
@@ -2310,7 +2300,6 @@ int spell_locate_object(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
 
 /* POISON */
 
-// TODO - needs overhaul as per DC forum post
 int spell_poison(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
   struct affected_type af;
@@ -2347,6 +2336,7 @@ int spell_poison(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *
     if ((obj->obj_flags.type_flag == ITEM_DRINKCON) ||
         (obj->obj_flags.type_flag == ITEM_FOOD)) 
     {
+      act("$P glows green for a second, before returning to its original color.", ch, obj, 0, TO_CHAR, 0);    
       obj->obj_flags.value[3] = 1;
     }
   }
@@ -7259,12 +7249,12 @@ int cast_poison( byte level, CHAR_DATA *ch, char *arg, int type,
   int retval;
   char_data * next_v;
 
-  if (IS_SET(world[ch->in_room].room_flags, SAFE)){
-	 send_to_char("You can not poison someone in a safe area!\n\r",ch);
-	 return eFAILURE;
-  }
   switch (type) {
   case SPELL_TYPE_SPELL:
+    if (IS_SET(world[ch->in_room].room_flags, SAFE)){
+	 send_to_char("You can not poison someone in a safe area!\n\r",ch);
+	 return eFAILURE;
+    }
 		 return spell_poison(level, ch, tar_ch, tar_obj, skill);
 		 break;
   case SPELL_TYPE_POTION:

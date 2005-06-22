@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.50 2005/06/21 19:00:06 shane Exp $
+| $Id: move.cpp,v 1.51 2005/06/22 21:08:19 shane Exp $
 | move.C
 | Movement commands and stuff.
 *************************************************************************
@@ -543,7 +543,7 @@ int do_simple_move(CHAR_DATA *ch, int cmd, int following)
 
     if(!IS_NPC(ch) &&
        world[world[ch->in_room].dir_option[cmd]->to_room].sector_type == SECT_UNDERWATER &&
-       !affected_by_spell(ch, SPELL_WATER_BREATHING)
+       (!affected_by_spell(ch, SPELL_WATER_BREATHING || !IS_AFFECTED(ch, AFF_WATER_BREATHING)))
       )
     {
        send_to_char("Underwater?!\r\n", ch);
@@ -902,7 +902,7 @@ int do_enter(CHAR_DATA *ch, char *argument, int cmd)
    }
 
   if(world[real_room(portal->obj_flags.value[0])].sector_type == SECT_UNDERWATER &&
-     !affected_by_spell(ch, SPELL_WATER_BREATHING))
+     (!affected_by_spell(ch, SPELL_WATER_BREATHING) || !IS_AFFECTED(ch, AFF_WATER_BREATHING)))
   {
      send_to_char("As you put your arm through it gets wet and you realize that might not be a good idea.\r\n", ch);
      return eFAILURE;

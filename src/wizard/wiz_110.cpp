@@ -467,8 +467,8 @@ int do_rename_char(struct char_data *ch, char *arg, int cmd)
 }
 int do_install(struct char_data *ch, char *arg, int cmd)
 {
-  char buf[256], type[256], arg1[256], err[256];
-  int range = 0, type_ok = 0;
+  char buf[256], type[256], arg1[256], err[256], arg2[256];
+  int range = 0, type_ok = 0, numrooms = 0;
   int ret;
   
   if(!has_skill(ch, COMMAND_INSTALL)) {
@@ -476,24 +476,37 @@ int do_install(struct char_data *ch, char *arg, int cmd)
         return eFAILURE;
   }
 
-  half_chop(arg, arg1, type);
+  half_chop(arg, arg1, buf);
+  half_chop(buf, arg2, type);
 
-  if (!*arg1 || !*type) {
-    sprintf(err, "Usage: install <range #> <world|obj|mob|zone|all>\n\r"
-                 "  ie.. install 291 m = installs mob range 29100-29199.\n\r");
+  if (!*arg1 || !*type || !*arg2) {
+    sprintf(err, "Usage: install <range #> <# of rooms> <world|obj|mob|zone|all>\n\r"
+                 "  ie.. install 291 100 m = installs mob range 29100-29199.\n\r");
     send_to_char(err, ch);
     return eFAILURE;
   }
 
   if (!(range = atoi(arg1))) {
-    sprintf(err, "Usage: install <range #> <world|obj|mob|zone|all>\n\r"
-                 "  ie.. install 291 m = installs mob range 29100-29199.\n\r");
+    sprintf(err, "Usage: install <range #> <# of rooms> <world|obj|mob|zone|all>\n\r"
+                 "  ie.. install 291 100 m = installs mob range 29100-29199.\n\r");
     send_to_char(err, ch);
     return eFAILURE;
   }
 
-  if (range <= 0 || range > 319) {
-    send_to_char("Range number must be between 1 and 319\r\n", ch);
+  if (range <= 0) {
+    send_to_char("Range number must be greater than 0\r\n", ch);
+    return eFAILURE;
+  }
+
+  if (!(numrooms = atoi(arg1))) {
+    sprintf(err, "Usage: install <range #> <# of rooms> <world|obj|mob|zone|all>\n\r"
+                 "  ie.. install 291 100 m = installs mob range 29100-29199.\n\r");
+    send_to_char(err, ch);
+    return eFAILURE;
+  }
+
+  if (numrooms <= 0) {
+    send_to_char("Number of rooms must be greater than 0.\r\n", ch);
     return eFAILURE;
   }
 
@@ -516,13 +529,13 @@ int do_install(struct char_data *ch, char *arg, int cmd)
   }
 
   if (type_ok != 1) {
-    sprintf(err, "Usage: install <range #> <world|obj|mob|zone|all>\n\r"
-                 "  ie.. install 291 m = installs mob range 29100-29199.\n\r");
+    sprintf(err, "Usage: install <range #> <# of rooms> <world|obj|mob|zone|all>\n\r"
+                 "  ie.. install 291 100 m = installs mob range 29100-29199.\n\r");
     send_to_char(err, ch);
     return eFAILURE;
   }
   
-  sprintf(buf, "./new_zone %d %c true %s", range, *type,bport == 1 ? "b":"n");
+  sprintf(buf, "./new_zone %d %d %c true %s", range, numrooms, *type,bport == 1 ? "b":"n");
   ret = system(buf);
   // ret = bits, but I didn't use bits because I'm lazy and it only returns 2 values I gives a flyging fuck about!
   // if you change the script, you gotta change this too. - Rahz
@@ -533,8 +546,8 @@ int do_install(struct char_data *ch, char *arg, int cmd)
     sprintf(err, "That range would overlap another range!\r\n");
   } else {
     sprintf(err, "Error Code: %d\r\n"
-                 "Usage: install <range #> <world|obj|mob|zone|all>\n\r"
-                 "  ie.. install 291 m = installs mob range 29100-29199.\n\r", ret);
+                 "Usage: install <range #> <# of rooms> <world|obj|mob|zone|all>\n\r"
+                 "  ie.. install 291 100 m = installs mob range 29100-29199.\n\r", ret);
   }
   send_to_char(err, ch);
   return eSUCCESS;

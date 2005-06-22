@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.55 2005/06/05 16:13:21 urizen Exp $
+| $Id: objects.cpp,v 1.56 2005/06/22 21:08:19 shane Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -880,12 +880,16 @@ int do_drink(struct char_data *ch, char *argument, int cmd)
           act("Ooups, it tasted rather strange ?!!?",ch,0,0,TO_CHAR, 0);
           act("$n chokes and utters some strange sounds.",
               ch,0,0,TO_ROOM, 0);
-          af.type = SPELL_POISON;
-          af.duration = amount*3;
-          af.modifier = 0;
-          af.location = APPLY_NONE;
-          af.bitvector = AFF_POISON;
-          affect_join(ch,&af, FALSE, FALSE);
+          if(number(1,100) < get_saves(ch,SAVE_TYPE_POISON) - 20) {
+             send_to_char("Luckily, your body rejects the poison almost immediately.\n\r",ch);
+          } else {
+             af.type = SPELL_POISON;
+             af.duration = amount*3;
+             af.modifier = 0;
+             af.location = APPLY_NONE;
+             af.bitvector = AFF_POISON;
+             affect_join(ch,&af, FALSE, FALSE);
+          }
         }
         
           /* empty the container, and no longer poison. */
@@ -957,12 +961,16 @@ int do_eat(struct char_data *ch, char *argument, int cmd)
         act("Ooups, it tasted rather strange ?!!?",ch,0,0,TO_CHAR, 0);
         act("$n coughs and utters some strange sounds.",ch,0,0,TO_ROOM, 0);
 
-        af.type = SPELL_POISON;
-        af.duration = temp->obj_flags.value[0]*2;
-        af.modifier = 0;
-        af.location = APPLY_NONE;
-        af.bitvector = AFF_POISON;
-        affect_join(ch,&af, FALSE, FALSE);
+        if(number(1,100) < get_saves(ch,SAVE_TYPE_POISON) - 20) {
+          send_to_char("Luckily, your body rejects the poison almost immediately.\n\r", ch);
+        } else {
+           af.type = SPELL_POISON;
+           af.duration = temp->obj_flags.value[0]*2;
+           af.modifier = 0;
+           af.location = APPLY_NONE;
+           af.bitvector = AFF_POISON;
+           affect_join(ch,&af, FALSE, FALSE);
+        }
     }
 
     extract_obj(temp);
@@ -1142,13 +1150,16 @@ int do_sip(struct char_data *ch, char *argument, int cmd)
     && GET_LEVEL(ch) <IMMORTAL) /* The shit was poisoned ! */
     {
         act("But it also had a strange taste!",ch,0,0,TO_CHAR, 0);
-
-        af.type = SPELL_POISON;
-        af.duration = 3;
-        af.modifier = 0;
-        af.location = APPLY_NONE;
-        af.bitvector = AFF_POISON;
-        affect_to_char(ch,&af);
+        if(number(1,100) < get_saves(ch,SAVE_TYPE_POISON) - 5) {
+           send_to_char("Luckily, your body rejects the poison almost immediately.\n\r",ch);
+        } else {
+           af.type = SPELL_POISON;
+           af.duration = 3;
+           af.modifier = 0;
+           af.location = APPLY_NONE;
+           af.bitvector = AFF_POISON;
+           affect_to_char(ch,&af);
+        }
     }
 
     temp->obj_flags.value[1]--;
@@ -1204,13 +1215,16 @@ int do_taste(struct char_data *ch, char *argument, int cmd)
     && GET_LEVEL(ch) <IMMORTAL) /* The shit was poisoned ! */
     {
         act("Oops, it did not taste good at all!",ch,0,0,TO_CHAR, 0);
-
-        af.type = SPELL_POISON;
-        af.duration = 2;
-        af.modifier = 0;
-        af.location = APPLY_NONE;
-        af.bitvector = AFF_POISON;
-        affect_to_char(ch,&af);
+        if(number(1,100) < get_saves(ch,SAVE_TYPE_POISON) - 20) {
+           send_to_char("Luckily, your body rejects the poison almost immediately.\n\r",ch);
+        } else {
+           af.type = SPELL_POISON;
+           af.duration = 2;
+           af.modifier = 0;
+           af.location = APPLY_NONE;
+           af.bitvector = AFF_POISON;
+          affect_to_char(ch,&af);
+        }
     }
 
     temp->obj_flags.value[0]--;
