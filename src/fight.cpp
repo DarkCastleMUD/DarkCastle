@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.275 2005/06/23 18:07:44 shane Exp $ */
+/* $Id: fight.cpp,v 1.276 2005/06/23 22:32:22 shane Exp $ */
 
 extern "C"
 {
@@ -2013,18 +2013,6 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
   } 
   return eSUCCESS;
 } 
-
-// I removed this function and combined it with "damage".  There was
-// no point in having two huge functions that did almost the same thing.
-// damage() can tell if it's a magic/nonmagic attack anyway
-// I'll remove this when I have time to go through and change all the
-// spells in "spells.C" to use damage() instead
-// -pir 7/26/00
-int spell_damage(CHAR_DATA * ch, CHAR_DATA * victim,
-           int dam, int weapon_type, int attacktype, int weapon)
-{
-  return damage(ch, victim, dam, weapon_type, attacktype, weapon);
-}
 
 // this function deals damage in noncombat situations (falls, drowning, etc.)
 // returns standard returnvals.h return codes

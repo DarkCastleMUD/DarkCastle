@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.36 2005/05/31 11:24:46 urizen Exp $ */
+/* $Id: ki.cpp,v 1.37 2005/06/23 22:32:22 shane Exp $ */
 
 extern "C"
 {
@@ -573,7 +573,7 @@ int ki_storm( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
 	 if ( (ch->in_room == tmp_victim->in_room) && (ch != tmp_victim) &&
 		(!ARE_GROUPED(ch,tmp_victim))) 
          {
-                  retval = spell_damage(ch, tmp_victim, dam, TYPE_KI,
+                  retval = damage(ch, tmp_victim, dam, TYPE_KI,
 		              KI_OFFSET+KI_STORM, 0);
                   if(IS_SET(retval, eCH_DIED))
                     return retval;

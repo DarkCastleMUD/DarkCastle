@@ -2360,7 +2360,7 @@ int glove_combat_procs(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
        act("The mud on $n's gloves spoils $N's flesh causing boils.", ch, obj, ch->fighting, TO_ROOM, NOTVICT);
        act("The mud on $n's gloves spoils your flesh causing boils.", ch, obj, ch->fighting, TO_VICT, 0);
        send_to_char("The mud on your gloves spoils the flesh of your enemy.\r\n", ch);
-       return spell_damage(ch, ch->fighting, dam, TYPE_MAGIC, TYPE_UNDEFINED, 0);
+       return damage(ch, ch->fighting, dam, TYPE_MAGIC, TYPE_UNDEFINED, 0);
      break;
 
      case 21718:

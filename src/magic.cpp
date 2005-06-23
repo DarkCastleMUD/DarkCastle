@@ -202,7 +202,7 @@ int spell_chill_touch(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 	  affect_join(victim, &af, TRUE, FALSE);
 	 }
    } 
-  return spell_damage(ch, victim, dam, TYPE_COLD, SPELL_CHILL_TOUCH, 0);
+  return damage(ch, victim, dam, TYPE_COLD, SPELL_CHILL_TOUCH, 0);
 }
 
 
@@ -213,7 +213,7 @@ int spell_burning_hands(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
   int dam;
   set_cantquit( ch, victim );
   dam = 150;
-  return spell_damage(ch, victim, dam, TYPE_FIRE, SPELL_BURNING_HANDS, 0);
+  return damage(ch, victim, dam, TYPE_FIRE, SPELL_BURNING_HANDS, 0);
 }
 
 
@@ -223,7 +223,7 @@ int spell_shocking_grasp(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct ob
 {
   int dam;
   dam = 130;
-  return spell_damage(ch, victim, dam, TYPE_ENERGY, SPELL_SHOCKING_GRASP, 0);
+  return damage(ch, victim, dam, TYPE_ENERGY, SPELL_SHOCKING_GRASP, 0);
 }
 
 
@@ -234,7 +234,7 @@ int spell_lightning_bolt(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct ob
   int dam;
   set_cantquit( ch, victim );
   dam = 200;
-  return spell_damage(ch, victim, dam, TYPE_ENERGY, SPELL_LIGHTNING_BOLT, 0);
+  return damage(ch, victim, dam, TYPE_ENERGY, SPELL_LIGHTNING_BOLT, 0);
 }
 
 
@@ -245,7 +245,7 @@ int spell_colour_spray(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
    int dam;
    set_cantquit( ch, victim );
    dam = 350;
-   int retval = spell_damage(ch, victim, dam, TYPE_MAGIC, SPELL_COLOUR_SPRAY, 0);
+   int retval = damage(ch, victim, dam, TYPE_MAGIC, SPELL_COLOUR_SPRAY, 0);
 
    if(SOMEONE_DIED(retval))
      return retval;
@@ -280,7 +280,7 @@ int spell_drown(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
 
    set_cantquit( ch, victim );
    dam = 250;
-   retval = spell_damage(ch, victim, dam, TYPE_WATER, SPELL_DROWN, 0);
+   retval = damage(ch, victim, dam, TYPE_WATER, SPELL_DROWN, 0);
    if(SOMEONE_DIED(retval))
      return retval;
 
@@ -292,7 +292,7 @@ int spell_drown(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
         send_to_char(buf, victim);
         act("$N is torn apart by the force of your watery blast and killed instantly!", ch, 0, victim, TO_ROOM, NOTVICT);
         act("$N is torn apart by the force of your watery blast and killed instantly!", ch, 0, victim, TO_CHAR, 0);
-        return spell_damage(ch, victim, dam, TYPE_COLD, SPELL_DROWN, 0);
+        return damage(ch, victim, dam, TYPE_COLD, SPELL_DROWN, 0);
      }
    }
    return eSUCCESS;
@@ -379,7 +379,7 @@ int spell_vampiric_touch (byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct o
   if(saves_spell(ch, victim, ( skill / 3 ), SAVE_TYPE_COLD) < 0) 
   {
     int i = GET_HIT(victim);
-    int retval =  spell_damage (ch, victim, dam,TYPE_COLD, SPELL_VAMPIRIC_TOUCH, 0);
+    int retval =  damage (ch, victim, dam,TYPE_COLD, SPELL_VAMPIRIC_TOUCH, 0);
     if (!SOMEONE_DIED(retval))
     if (GET_HIT(victim) >= i) return retval;
       
@@ -393,7 +393,7 @@ int spell_vampiric_touch (byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct o
     dam >>= 1;
     adam /= 2;
      int i = GET_HIT(victim);
-     int retval =  spell_damage (ch, victim, dam,TYPE_COLD, SPELL_VAMPIRIC_TOUCH, 0);
+     int retval =  damage (ch, victim, dam,TYPE_COLD, SPELL_VAMPIRIC_TOUCH, 0);
     if (!SOMEONE_DIED(retval) && GET_HIT(victim) >= i) return retval;
     if (!SOMEONE_DIED(retval) && GET_HIT(victim) < adam)
        GET_HIT(ch) += GET_HIT(victim);
@@ -413,7 +413,7 @@ int spell_meteor_swarm(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
   set_cantquit( ch, victim );
   dam = 500;
   int retval;
-  retval = spell_damage(ch, victim, dam,TYPE_PHYSICAL_MAGIC, SPELL_METEOR_SWARM, 0);
+  retval = damage(ch, victim, dam,TYPE_PHYSICAL_MAGIC, SPELL_METEOR_SWARM, 0);
 
 	/* Spellcraft Effect */
   if (!SOMEONE_DIED(retval) && spellcraft(ch, SPELL_METEOR_SWARM))
@@ -433,7 +433,7 @@ int spell_fireball(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data
    int dam;
    set_cantquit( ch, victim );
    dam = 300;
-   int retval = spell_damage(ch, victim, dam, TYPE_FIRE, SPELL_FIREBALL, 0);
+   int retval = damage(ch, victim, dam, TYPE_FIRE, SPELL_FIREBALL, 0);
 
    if(SOMEONE_DIED(retval) || ch->in_room != victim->in_room)
      return retval;
@@ -444,7 +444,7 @@ int spell_fireball(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data
    if(number(0, 100) < ( skill / 5 ) ) {
      act("The expanding flames suddenly recombine and fly at $N again!", ch, 0, victim, TO_ROOM, 0);
      act("The expanding flames suddenly recombine and fly at $N again!", ch, 0, victim, TO_CHAR, 0);
-     retval = spell_damage(ch, victim, dam, TYPE_FIRE, SPELL_FIREBALL, 0);
+     retval = damage(ch, victim, dam, TYPE_FIRE, SPELL_FIREBALL, 0);
    }
    return retval;
 }
@@ -457,7 +457,7 @@ int spell_sparks(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *
    int dam;
    set_cantquit( ch, victim );
    dam = dice(level, 2);
-   return spell_damage(ch, victim, dam, TYPE_FIRE, SPELL_SPARKS, 0);
+   return damage(ch, victim, dam, TYPE_FIRE, SPELL_SPARKS, 0);
 }
 
 
@@ -471,9 +471,9 @@ int spell_howl(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *ob
 
    if(saves_spell(ch, victim, 5, SAVE_TYPE_MAGIC) >= 0)
     {
-      return spell_damage(ch, victim, 0, TYPE_FIRE, SPELL_HOWL, 0);
+      return damage(ch, victim, 0, TYPE_FIRE, SPELL_HOWL, 0);
     }
-   retval = spell_damage(ch, victim, 8, TYPE_FIRE, SPELL_HOWL, 0);
+   retval = damage(ch, victim, 8, TYPE_FIRE, SPELL_HOWL, 0);
 
    if(SOMEONE_DIED(retval))
      return retval;
@@ -729,8 +729,8 @@ int spell_earthquake(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
                   if(IS_NPC(ch) && IS_NPC(tmp_victim)) // mobs don't earthquake each other
                     continue;
                   if(IS_AFFECTED(tmp_victim, AFF_FREEFLOAT))
-                    retval = spell_damage(ch, tmp_victim, 0, TYPE_MAGIC, SPELL_EARTHQUAKE, 0);
-                  else retval = spell_damage(ch, tmp_victim, dam, TYPE_MAGIC, SPELL_EARTHQUAKE, 0);
+                    retval = damage(ch, tmp_victim, 0, TYPE_MAGIC, SPELL_EARTHQUAKE, 0);
+                  else retval = damage(ch, tmp_victim, dam, TYPE_MAGIC, SPELL_EARTHQUAKE, 0);
 	 } 
          else if (world[ch->in_room].zone == world[tmp_victim->in_room].zone)
            send_to_char("The earth trembles and shivers.\n\r", tmp_victim);
@@ -763,7 +763,7 @@ int spell_life_leech(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
 
 		 if (GET_HIT(ch) > GET_MAX_HIT(ch))
 		  GET_HIT(ch) = GET_MAX_HIT(ch);
-		 retval &= spell_damage (ch, tmp_victim, dam,TYPE_POISON, SPELL_LIFE_LEECH, 0);
+		 retval &= damage (ch, tmp_victim, dam,TYPE_POISON, SPELL_LIFE_LEECH, 0);
 	}
   }
   return retval;
@@ -853,7 +853,7 @@ int spell_solar_gate(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
      {
 
        dam = 600;
-       retval = spell_damage(ch, tmp_victim, dam,TYPE_FIRE, SPELL_SOLAR_GATE, 0);
+       retval = damage(ch, tmp_victim, dam,TYPE_FIRE, SPELL_SOLAR_GATE, 0);
        if(IS_SET(retval, eCH_DIED))
 	 return retval;
        if(!IS_SET(retval, eVICT_DIED) && spellcraft(ch, SPELL_SOLAR_GATE))
@@ -884,7 +884,7 @@ int spell_solar_gate(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
 	    sprintf(buf,"You are ENVELOPED in a PAINFUL BRIGHT LIGHT pouring in %s.",dirs[i]);
 	    act(buf, tmp_victim, 0, ch, TO_CHAR, 0);
 
-            retval = spell_damage(ch, tmp_victim, dam, TYPE_FIRE, SPELL_SOLAR_GATE, 0);
+            retval = damage(ch, tmp_victim, dam, TYPE_FIRE, SPELL_SOLAR_GATE, 0);
             if(IS_SET(retval, eCH_DIED))
               return retval;
 
@@ -1090,7 +1090,7 @@ int spell_firestorm(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
 		(!ARE_GROUPED(ch,tmp_victim) )){
 
 	  dam = 250;
-	  retval = spell_damage(ch, tmp_victim, dam,TYPE_FIRE, SPELL_FIRESTORM, 0);
+	  retval = damage(ch, tmp_victim, dam,TYPE_FIRE, SPELL_FIRESTORM, 0);
           if(IS_SET(retval, eCH_DIED))
             return retval;
 	 }
@@ -1121,7 +1121,7 @@ int spell_dispel_evil(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
   if(align < 0) align = 0-align;
   dam = 350 + align / 10;
 
-  return spell_damage(ch, victim, dam, TYPE_COLD, SPELL_DISPEL_EVIL, 0);
+  return damage(ch, victim, dam, TYPE_COLD, SPELL_DISPEL_EVIL, 0);
 }
 
 
@@ -1142,7 +1142,7 @@ int spell_dispel_good(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
   if(align < 0) align = 0-align;
   dam = 350 + align / 10;
 
-  return spell_damage(ch, victim, dam, TYPE_COLD, SPELL_DISPEL_GOOD, 0);
+  return damage(ch, victim, dam, TYPE_COLD, SPELL_DISPEL_GOOD, 0);
 }
 
 
@@ -1157,7 +1157,7 @@ int spell_call_lightning(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct ob
   if (OUTSIDE(ch) && (weather_info.sky>=SKY_RAINING)) 
   {
      dam = dice(MIN((int)GET_MANA(ch),650), 1);
-     return spell_damage(ch, victim, dam,TYPE_ENERGY, SPELL_CALL_LIGHTNING, 0);
+     return damage(ch, victim, dam,TYPE_ENERGY, SPELL_CALL_LIGHTNING, 0);
   }
   return eFAILURE;
 }
@@ -1171,7 +1171,7 @@ int spell_harm(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *ob
   set_cantquit( ch, victim );
   dam = 150;
 
-  return spell_damage(ch, victim, dam, TYPE_MAGIC, SPELL_HARM, 0);
+  return damage(ch, victim, dam, TYPE_MAGIC, SPELL_HARM, 0);
 }
 
 
@@ -1189,7 +1189,7 @@ int spell_power_harm(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
   else
      dam = 300;
 
-  return spell_damage(ch, victim, dam, TYPE_MAGIC, SPELL_POWER_HARM, 0);
+  return damage(ch, victim, dam, TYPE_MAGIC, SPELL_POWER_HARM, 0);
 }
 
 
@@ -1208,7 +1208,7 @@ int spell_divine_fury(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
   act("$n calls forth a wrath from the heavens to smite you!", ch, 0, victim, TO_VICT, 0);
   act("$n gestures grandly and calls forth a wrath from the heavens to smite $N!", ch, 0, victim, TO_ROOM, NOTVICT);
 
-  return spell_damage(ch, victim, dam, TYPE_MAGIC, SPELL_DIVINE_FURY, 0);
+  return damage(ch, victim, dam, TYPE_MAGIC, SPELL_DIVINE_FURY, 0);
 }
 
 
@@ -3697,7 +3697,7 @@ int spell_frost_breath(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
 //	 if(saves_spell(ch, victim, 0, SAVE_TYPE_COLD) >= 0)
 //	   dam >>= 1;
 
-	 retval = spell_damage(ch, victim, dam,TYPE_COLD, SPELL_FROST_BREATH, 0);
+	 retval = damage(ch, victim, dam,TYPE_COLD, SPELL_FROST_BREATH, 0);
          if(SOMEONE_DIED(retval))
 	  {
 	    /* The character's DEAD, don't mess with him */
@@ -3749,7 +3749,7 @@ int spell_acid_breath(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 //	 if(saves_spell(ch, victim, 0, SAVE_TYPE_ACID) >= 0)
 //	   dam >>= 1;
 
-	 retval = spell_damage(ch, victim, dam,TYPE_ACID, SPELL_ACID_BREATH, 0);
+	 retval = damage(ch, victim, dam,TYPE_ACID, SPELL_ACID_BREATH, 0);
          if(SOMEONE_DIED(retval))
 	 {
 	   return retval;
@@ -3809,7 +3809,7 @@ int spell_fire_breath(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 //      if(saves_spell(ch,  tmp_victim, 0, SAVE_TYPE_FIRE) >= 0)
   //      dam >>= 1;
 
-      retval = spell_damage(ch, tmp_victim, dam, TYPE_FIRE, SPELL_FIRE_BREATH, 0);
+      retval = damage(ch, tmp_victim, dam, TYPE_FIRE, SPELL_FIRE_BREATH, 0);
       if(IS_SET(retval, eCH_DIED))
         return retval;
     } else
@@ -3840,7 +3840,7 @@ int spell_gas_breath(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
 		// if(saves_spell(ch,  tmp_victim, 0, SAVE_TYPE_POISON) >= 0)
 		//	dam >>= 1;
 
-		 retval = spell_damage(ch, tmp_victim, dam,TYPE_POISON, SPELL_GAS_BREATH, 0);
+		 retval = damage(ch, tmp_victim, dam,TYPE_POISON, SPELL_GAS_BREATH, 0);
                  if(IS_SET(retval, eCH_DIED))
                    return retval;
 	 } else
@@ -3865,7 +3865,7 @@ int spell_lightning_breath(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct 
 //	 if(saves_spell(ch, victim, 0, SAVE_TYPE_ENERGY) >= 0)
 //	   dam >>= 1;
 
-	 return spell_damage(ch, victim, dam,TYPE_ENERGY, SPELL_LIGHTNING_BREATH, 0);
+	 return damage(ch, victim, dam,TYPE_ENERGY, SPELL_LIGHTNING_BREATH, 0);
 }
 
 /* **************************************************************** */
@@ -4751,7 +4751,7 @@ int spell_cause_light(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 
    set_cantquit(ch, victim);
    dam = dice(1, 8) + (skill/3);
-   return spell_damage(ch, victim, dam, TYPE_MAGIC, SPELL_CAUSE_LIGHT, 0);
+   return damage(ch, victim, dam, TYPE_MAGIC, SPELL_CAUSE_LIGHT, 0);
 }
 
 
@@ -4771,7 +4771,7 @@ int spell_cause_critical(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct ob
     
     dam = dice(3,8)-6+skill/2;
 
-    return spell_damage(ch, victim, dam, TYPE_MAGIC, SPELL_CAUSE_CRITICAL, 0);
+    return damage(ch, victim, dam, TYPE_MAGIC, SPELL_CAUSE_CRITICAL, 0);
 }
 
 
@@ -4790,7 +4790,7 @@ int spell_cause_serious(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
 
     dam = dice(2, 8) + (skill/2);
 
-   return spell_damage(ch, victim, dam,TYPE_MAGIC, SPELL_CAUSE_SERIOUS, 0);
+   return damage(ch, victim, dam,TYPE_MAGIC, SPELL_CAUSE_SERIOUS, 0);
 }
 
 
@@ -4808,7 +4808,7 @@ int spell_flamestrike(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
    set_cantquit (ch, victim);
    dam = 400;
 
-   retval = spell_damage(ch, victim, dam, TYPE_FIRE, SPELL_FLAMESTRIKE, 0);
+   retval = damage(ch, victim, dam, TYPE_FIRE, SPELL_FLAMESTRIKE, 0);
 
    if(SOMEONE_DIED(retval))
       return retval;
@@ -5173,7 +5173,7 @@ int spell_acid_blast(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
 
    set_cantquit (ch, victim);
    dam = 400;
-   return spell_damage(ch, victim, dam,TYPE_ACID, SPELL_ACID_BLAST, 0);
+   return damage(ch, victim, dam,TYPE_ACID, SPELL_ACID_BLAST, 0);
 }
 
 
@@ -5185,7 +5185,7 @@ int spell_hellstream(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
 
    set_cantquit (ch, victim);
    dam = 800;
-   return spell_damage(ch, victim, dam,TYPE_FIRE, SPELL_HELLSTREAM, 0);
+   return damage(ch, victim, dam,TYPE_FIRE, SPELL_HELLSTREAM, 0);
 }
 
 
@@ -8737,7 +8737,7 @@ int spell_bee_sting(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
 
    for (i = 0; i < bees; i++) {
 
-   retval = spell_damage(ch, victim, dam, TYPE_PHYSICAL_MAGIC, SPELL_BEE_STING, 0);
+   retval = damage(ch, victim, dam, TYPE_PHYSICAL_MAGIC, SPELL_BEE_STING, 0);
    if(SOMEONE_DIED(retval))
       return retval;
    }
@@ -8798,7 +8798,7 @@ int cast_bee_swarm(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *vi
       if ((ch->in_room == tmp_victim->in_room) && (ch != tmp_victim) &&
           (!ARE_GROUPED(ch,tmp_victim))) {
          set_cantquit(ch, tmp_victim);
-         retval = spell_damage(ch, tmp_victim, dam, TYPE_MAGIC, SPELL_BEE_SWARM, 0);
+         retval = damage(ch, tmp_victim, dam, TYPE_MAGIC, SPELL_BEE_SWARM, 0);
          if(IS_SET(retval, eCH_DIED))
            return retval;
          }
@@ -8844,7 +8844,7 @@ int cast_creeping_death(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DAT
    }
 
 
-   retval = spell_damage(ch, victim, dam, TYPE_POISON, SPELL_CREEPING_DEATH, 0);
+   retval = damage(ch, victim, dam, TYPE_POISON, SPELL_CREEPING_DEATH, 0);
    if(SOMEONE_DIED(retval))
       return retval;
 
@@ -8878,7 +8878,7 @@ int cast_creeping_death(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DAT
                      "through your stomach!\n\r", victim);
         act("$N is completely consumed by insects!", ch, 0, victim, TO_ROOM, NOTVICT);
         act("$N is completely consumed by your insects!", ch, 0, victim, TO_CHAR, 0);
-        return spell_damage(ch, victim, dam, TYPE_MAGIC, SPELL_CREEPING_DEATH, 0);
+        return damage(ch, victim, dam, TYPE_MAGIC, SPELL_CREEPING_DEATH, 0);
      }
    }
    return eSUCCESS;
@@ -9902,7 +9902,7 @@ int spell_sun_ray(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data 
 //	 if(saves_spell(ch, victim, 0, SAVE_TYPE_ENERGY) >= 0)
 //		dam >>= 1;
 
-	 return spell_damage(ch, victim, dam, TYPE_ENERGY, SPELL_SUN_RAY, 0);
+	 return damage(ch, victim, dam, TYPE_ENERGY, SPELL_SUN_RAY, 0);
   }
   return eFAILURE;
 }
@@ -10284,7 +10284,7 @@ int spell_ice_shards(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
   // modify the damage by how much they resisted
   //dam += (int) (dam * (save/100));
   
-  return spell_damage(ch, victim, dam, TYPE_COLD, SPELL_ICE_SHARDS, 0);
+  return damage(ch, victim, dam, TYPE_COLD, SPELL_ICE_SHARDS, 0);
 }
 
 int cast_ice_shards( byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill )

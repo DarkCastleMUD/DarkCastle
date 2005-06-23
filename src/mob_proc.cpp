@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.79 2005/06/13 20:12:02 shane Exp $ */
+/* $Id: mob_proc.cpp,v 1.80 2005/06/23 22:32:22 shane Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -3225,7 +3225,7 @@ int cry_dragon(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
         dam = dice(GET_LEVEL(ch), 8);
         act("$n floods the surroundings with poisonous gas.", ch, 0, 0,
              TO_ROOM, 0);
-        retval = spell_damage(ch, tmp_victim, dam, TYPE_POISON, SPELL_GAS_BREATH, 0);
+        retval = damage(ch, tmp_victim, dam, TYPE_POISON, SPELL_GAS_BREATH, 0);
         if(IS_SET(retval, eCH_DIED))
           return retval;
         if(!affected_by_spell(tmp_victim, SPELL_POISON))
