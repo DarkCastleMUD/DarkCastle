@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.99 2005/06/22 21:08:19 shane Exp $ */
+/* $Id: nanny.cpp,v 1.100 2005/06/23 08:56:07 urizen Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -81,6 +81,7 @@ extern CHAR_DATA *character_list;
 extern struct descriptor_data *descriptor_list;
 extern char *nonew_new_list[30];
 extern CWorld world;
+extern short bport;
 
 
 extern int learn_skill(char_data * ch, int skill, int amount, int maximum);
@@ -349,7 +350,8 @@ void do_on_login_stuff(char_data * ch)
     /* Set ISR's cause they're not saved...   */
     isr_set(ch);
     ch->altar = clan_altar(ch);    
-    if(!IS_MOB(ch) && GET_LEVEL(ch) >= IMMORTAL) {
+    
+    if(!IS_MOB(ch) && GET_LEVEL(ch) >= IMMORTAL && !bport) {
        ch->pcdata->holyLite   = TRUE;
        ch->pcdata->wizinvis = GET_LEVEL(ch);
        GET_COND(ch, THIRST) = -1;
@@ -751,7 +753,6 @@ void nanny(struct descriptor_data *d, char *arg)
       if (allowed_host(d->host))
 	SEND_TO_Q( "You are logging in from an ALLOWED host.\r\n",d);
 
-      extern short bport;
       if(check_reconnect(d, tmp_name, FALSE))
          fOld = TRUE;
       else if((wizlock) && !allowed_host(d->host))/* && strcmp(GET_NAME(ch),"Sadus") &&

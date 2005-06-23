@@ -1669,6 +1669,7 @@ int do_oedit(struct char_data *ch, char *argument, int cmd)
       "delete",
       "stat",
       "timer",
+      "description",
       "\n"
     };
    
@@ -2099,6 +2100,24 @@ int do_oedit(struct char_data *ch, char *argument, int cmd)
         sprintf(buf, "Item timer to %d.\r\n", intval);
         send_to_char(buf, ch);	
 	}break;
+	case 22:
+	extra_descr_data *curr;
+	for (curr = ((obj_data*)obj_index[item_num].item)->ex_description;curr;curr = curr->next)
+	if (!str_cmp(curr->keyword, ((obj_data*)obj_index[item_num].item)->name))
+		break;
+	if (!curr)
+	{ //None existing;
+		curr = (extra_descr_data*)calloc(1, sizeof(extra_descr_data));
+		curr->keyword = str_dup(((obj_data*)obj_index[item_num].item)->name);
+		curr->description = str_dup("");
+		curr->next = ((obj_data*)obj_index[item_num].item)->ex_description;
+		((obj_data*)obj_index[item_num].item)->ex_description = curr;
+	}
+	send_to_char("Write your object's description. End with /s.\r\n",ch);
+	ch->desc->connected = CON_EDITING;
+	ch->desc->strnew = &(curr->description);
+	ch->desc->max_str = MAX_MESSAGE_LENGTH;
+	break;
       default: send_to_char("Illegal value, tell pir.\r\n", ch);
         break;
     }

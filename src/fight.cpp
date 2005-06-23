@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.273 2005/06/10 18:45:47 urizen Exp $ */
+/* $Id: fight.cpp,v 1.274 2005/06/23 08:56:07 urizen Exp $ */
 
 extern "C"
 {
@@ -3866,12 +3866,12 @@ int64 scale_char_xp(CHAR_DATA *ch, CHAR_DATA *killer, CHAR_DATA *victim,
     if(no_killers < 2) {
        /* solo kill */
        levelmod = GET_LEVEL(ch) - GET_LEVEL(victim);
-       if (levelmod <= 15)
+//       if (levelmod <= 15)
           scaled_share = base_xp;
-       else if (levelmod <= 25)
+  /*     else if (levelmod <= 25)
           scaled_share = (base_xp * 75) / 100;
        else
-          scaled_share = (base_xp * 50) / 100;
+          scaled_share = (base_xp * 50) / 100;*/
        *bonus_xp = 0;
     } else {
        /* group kill */
