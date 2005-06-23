@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.107 2005/05/31 11:24:48 urizen Exp $
+| $Id: cl_thief.cpp,v 1.108 2005/06/23 22:18:44 shane Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -142,7 +142,6 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
 {
   CHAR_DATA *victim;
   char name[256];
-  //int skill = 0;
   int was_in = 0;
   int retval;
 
@@ -210,7 +209,6 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
 
   // record the room I'm in.  Used to make sure a dual can go off.
   was_in = ch->in_room;
-  bool bingo = FALSE;
 
   // failure
   if(AWAKE(victim) && !skill_success(ch,victim,SKILL_BACKSTAB))
@@ -227,7 +225,6 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
              )
          ) 
   { 
-    bingo = TRUE;
     act("$N crumples to the ground, $S body still quivering from "
         "$n's brutal assassination.", ch, 0, victim, TO_ROOM, NOTVICT);
     act("You feel $n's blade slip into your heart, and all goes black.",
@@ -241,19 +238,17 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
 
   if (retval & eVICT_DIED && !retval & eCH_DIED)
   {
-    if(!IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_WIMPY) && !bingo)
-        WAIT_STATE(ch, PULSE_VIOLENCE *2);
-     else if (!bingo)
+    if(!IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_WIMPY))
+       WAIT_STATE(ch, PULSE_VIOLENCE *2);
+    else
        WAIT_STATE(ch, PULSE_VIOLENCE);
     return retval;
   }
 
-//  if(!IS_SET(retval, eCH_DIED))
   WAIT_STATE(ch, PULSE_VIOLENCE*2);
 
   // dual backstab
-  if((GET_LEVEL(ch) >= 40)                                            &&
-     (was_in == ch->in_room)                                          && 
+  if((was_in == ch->in_room)                                          && 
      ((GET_CLASS(ch) == CLASS_THIEF) || (GET_LEVEL(ch) >= ARCHANGEL)) &&
      (ch->equipment[SECOND_WIELD])                                    &&
      ((ch->equipment[SECOND_WIELD]->obj_flags.value[3] == 11) ||
@@ -261,23 +256,20 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
      has_skill(ch, SKILL_DUAL_BACKSTAB)
     )
   {
-        if(skill_success(ch,victim,SKILL_DUAL_BACKSTAB))
-        {
-//           percent = number(1, 101);
-           if (AWAKE(victim) && !skill_success(ch,victim, SKILL_BACKSTAB))
-              retval = damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_BACKSTAB, SECOND);
-           else
-              retval = attack(ch, victim, SKILL_BACKSTAB, SECOND);
+     if(skill_success(ch,victim,SKILL_DUAL_BACKSTAB)) {
+        if (AWAKE(victim) && !skill_success(ch,victim, SKILL_BACKSTAB))
+           retval = damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_BACKSTAB, SECOND);
+        else
+           retval = attack(ch, victim, SKILL_BACKSTAB, SECOND);
 
-	 if (retval & eVICT_DIED && !retval & eCH_DIED) 
-	{
+        if (retval & eVICT_DIED && !retval & eCH_DIED) {
 	    if(!IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_WIMPY))
 	        WAIT_STATE(ch, PULSE_VIOLENCE * 2);
 	     else
 	       WAIT_STATE(ch, PULSE_VIOLENCE);
 	}
 
-        }
+     }
   }
   return eSUCCESS;
 }
