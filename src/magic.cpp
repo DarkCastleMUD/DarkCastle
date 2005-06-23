@@ -8811,19 +8811,19 @@ int cast_creeping_death(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DAT
    set_cantquit(ch, victim);
    dam = 250;
 
-   if(world[ch->in_room].sector_type == SECT_SWAMP) dam += 150;
-   else if(world[ch->in_room].sector_type == SECT_FOREST) dam += 125;
-   else if(world[ch->in_room].sector_type == SECT_FIELD) dam += 100;
+        if(world[ch->in_room].sector_type == SECT_SWAMP) dam += 175;
+   else if(world[ch->in_room].sector_type == SECT_FOREST) dam += 150;
+   else if(world[ch->in_room].sector_type == SECT_FIELD) dam += 125;
+   else if(world[ch->in_room].sector_type == SECT_BEACH) dam += 100;
    else if(world[ch->in_room].sector_type == SECT_HILLS) dam += 75;
-   else if(world[ch->in_room].sector_type == SECT_BEACH) dam += 50;
+   else if(world[ch->in_room].sector_type == SECT_DESERT) dam += 50;
    else if(world[ch->in_room].sector_type == SECT_MOUNTAIN) dam += 25;
-   else if(world[ch->in_room].sector_type == SECT_DESERT) dam += 25;
+   else if(world[ch->in_room].sector_type == SECT_PAVED_ROAD) dam += 25;
    else if(world[ch->in_room].sector_type == SECT_WATER_NOSWIM) dam -= 25;
-   else if(world[ch->in_room].sector_type == SECT_UNDERWATER) dam -= 25;
-   else if(world[ch->in_room].sector_type == SECT_PAVED_ROAD) dam -= 25;
-   else if(world[ch->in_room].sector_type == SECT_AIR) dam -= 50;
-   else if(world[ch->in_room].sector_type == SECT_FROZEN_TUNDRA) dam -= 50;
-   else if(world[ch->in_room].sector_type == SECT_ARCTIC) dam -= 75;
+   else if(world[ch->in_room].sector_type == SECT_AIR) dam -= 25;
+   else if(world[ch->in_room].sector_type == SECT_FROZEN_TUNDRA) dam -= 25;
+   else if(world[ch->in_room].sector_type == SECT_UNDERWATER) dam -= 50;
+   else if(world[ch->in_room].sector_type == SECT_ARCTIC) dam -= 50;
    
    if (!OUTSIDE(ch)) {
       send_to_char("Your spell is more draining because you are indoors!\n\r", ch);
