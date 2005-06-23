@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.274 2005/06/23 08:56:07 urizen Exp $ */
+/* $Id: fight.cpp,v 1.275 2005/06/23 18:07:44 shane Exp $ */
 
 extern "C"
 {
@@ -1719,7 +1719,7 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
 
   // Frost Shield won't effect a backstab -pir
   if(attacktype != SKILL_BACKSTAB &&  GET_HIT(victim) > 0 &&
-     typeofdamage == DAMAGE_TYPE_PHYSICAL)
+     (typeofdamage == DAMAGE_TYPE_PHYSICAL || attacktype == TYPE_PHYSICAL_MAGIC))
     if(do_frostshield(ch, victim)) {
       return eSUCCESS;
     }
@@ -1959,7 +1959,7 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
   }
   
   /*  Now for eq damage...   */
-  if(dam > 2 && typeofdamage == DAMAGE_TYPE_PHYSICAL)
+  if(dam > 25 && typeofdamage == DAMAGE_TYPE_PHYSICAL)
       eq_damage(ch, victim, dam, weapon_type, attacktype);
 
   inform_victim(ch, victim, dam);
@@ -5139,6 +5139,7 @@ int damage_type(int weapon_type)
 
   case TYPE_SONG:
     return(DAMAGE_TYPE_SONG);
+
   default:
     return(0);
   }  /* end switch */

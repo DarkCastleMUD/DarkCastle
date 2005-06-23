@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.100 2005/06/23 08:56:07 urizen Exp $ */
+/* $Id: nanny.cpp,v 1.101 2005/06/23 18:07:44 shane Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -381,7 +381,10 @@ void do_on_login_stuff(char_data * ch)
 		curr->skillnum = SPELL_AEGIS;
            if (curr->skillnum == SPELL_POWER_HARM) {
               curr->skillnum = SPELL_DIVINE_FURY;
-              if(GET_LEVEL(ch) == 50)
+           }
+//TODO: take this out after a little while
+           if (curr->skillnum == SPELL_DIVINE_FURY) {
+              if(GET_LEVEL(ch) == 50 && curr->learned < 40)
                  curr->learned = 40;
            }
 	   curr = curr->next;

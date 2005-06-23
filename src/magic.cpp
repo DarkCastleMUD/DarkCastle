@@ -169,7 +169,7 @@ int spell_magic_missile(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
 	/* Spellcraft Effect */
     if (spellcraft(ch, SPELL_MAGIC_MISSILE)) count++;
     while(!SOMEONE_DIED(retval) && count--)
-    retval = damage(ch, victim, dam, TYPE_PHYSICAL_MAGIC, SPELL_MAGIC_MISSILE, 0);
+    retval = damage(ch, victim, dam, TYPE_MAGIC, SPELL_MAGIC_MISSILE, 0);
   return retval;
 }
 
@@ -292,7 +292,7 @@ int spell_drown(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
         send_to_char(buf, victim);
         act("$N is torn apart by the force of your watery blast and killed instantly!", ch, 0, victim, TO_ROOM, NOTVICT);
         act("$N is torn apart by the force of your watery blast and killed instantly!", ch, 0, victim, TO_CHAR, 0);
-        return spell_damage(ch, victim, dam, TYPE_WATER, SPELL_DROWN, 0);
+        return spell_damage(ch, victim, dam, TYPE_COLD, SPELL_DROWN, 0);
      }
    }
    return eSUCCESS;
@@ -413,7 +413,7 @@ int spell_meteor_swarm(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
   set_cantquit( ch, victim );
   dam = 500;
   int retval;
-  retval = spell_damage(ch, victim, dam,TYPE_MAGIC, SPELL_METEOR_SWARM, 0);
+  retval = spell_damage(ch, victim, dam,TYPE_PHYSICAL_MAGIC, SPELL_METEOR_SWARM, 0);
 
 	/* Spellcraft Effect */
   if (!SOMEONE_DIED(retval) && spellcraft(ch, SPELL_METEOR_SWARM))
@@ -763,7 +763,7 @@ int spell_life_leech(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
 
 		 if (GET_HIT(ch) > GET_MAX_HIT(ch))
 		  GET_HIT(ch) = GET_MAX_HIT(ch);
-		 retval &= spell_damage (ch, tmp_victim, dam,TYPE_ENERGY, SPELL_LIFE_LEECH, 0);
+		 retval &= spell_damage (ch, tmp_victim, dam,TYPE_POISON, SPELL_LIFE_LEECH, 0);
 	}
   }
   return retval;
@@ -853,7 +853,7 @@ int spell_solar_gate(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
      {
 
        dam = 600;
-       retval = spell_damage(ch, tmp_victim, dam,TYPE_MAGIC, SPELL_SOLAR_GATE, 0);
+       retval = spell_damage(ch, tmp_victim, dam,TYPE_FIRE, SPELL_SOLAR_GATE, 0);
        if(IS_SET(retval, eCH_DIED))
 	 return retval;
        if(!IS_SET(retval, eVICT_DIED) && spellcraft(ch, SPELL_SOLAR_GATE))
@@ -884,7 +884,7 @@ int spell_solar_gate(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
 	    sprintf(buf,"You are ENVELOPED in a PAINFUL BRIGHT LIGHT pouring in %s.",dirs[i]);
 	    act(buf, tmp_victim, 0, ch, TO_CHAR, 0);
 
-            retval = spell_damage(ch, tmp_victim, dam, TYPE_MAGIC, SPELL_SOLAR_GATE, 0);
+            retval = spell_damage(ch, tmp_victim, dam, TYPE_FIRE, SPELL_SOLAR_GATE, 0);
             if(IS_SET(retval, eCH_DIED))
               return retval;
 
@@ -1121,7 +1121,7 @@ int spell_dispel_evil(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
   if(align < 0) align = 0-align;
   dam = 350 + align / 10;
 
-  return spell_damage(ch, victim, dam, TYPE_MAGIC, SPELL_DISPEL_EVIL, 0);
+  return spell_damage(ch, victim, dam, TYPE_COLD, SPELL_DISPEL_EVIL, 0);
 }
 
 
@@ -1142,7 +1142,7 @@ int spell_dispel_good(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
   if(align < 0) align = 0-align;
   dam = 350 + align / 10;
 
-  return spell_damage(ch, victim, dam, TYPE_MAGIC, SPELL_DISPEL_GOOD, 0);
+  return spell_damage(ch, victim, dam, TYPE_COLD, SPELL_DISPEL_GOOD, 0);
 }
 
 
@@ -1193,7 +1193,7 @@ int spell_power_harm(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
 }
 
 
-/* DIVINE FURE */
+/* DIVINE FURY */
 
 int spell_divine_fury(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
@@ -1203,6 +1203,10 @@ int spell_divine_fury(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 
   if(IS_GOOD(victim)) GET_ALIGNMENT(ch) -= 5;
   if(IS_NEUTRAL(victim)) GET_ALIGNMENT(ch) -= 2;
+
+  act("You call forth a wrath from the heavens to smite $N!", ch, 0, victim, TO_CHAR, 0);
+  act("$n calls forth a wrath from the heavens to smite you!", ch, 0, victim, TO_VICT, 0);
+  act("$n gestures grandly and calls forth a wrath from the heavens to smite $N!", ch, 0, victim, TO_ROOM, NOTVICT);
 
   return spell_damage(ch, victim, dam, TYPE_MAGIC, SPELL_DIVINE_FURY, 0);
 }
@@ -8716,6 +8720,8 @@ int cast_animate_dead( byte level, CHAR_DATA *ch, char *arg, int type,
   return eFAILURE;
 }
 
+/* BEE STING */
+
 int spell_bee_sting(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
    int dam;
@@ -8731,7 +8737,7 @@ int spell_bee_sting(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
 
    for (i = 0; i < bees; i++) {
 
-   retval = spell_damage(ch, victim, dam, TYPE_STING, SPELL_BEE_STING, 0);
+   retval = spell_damage(ch, victim, dam, TYPE_PHYSICAL_MAGIC, SPELL_BEE_STING, 0);
    if(SOMEONE_DIED(retval))
       return retval;
    }
@@ -8775,6 +8781,8 @@ int cast_bee_sting(byte level, CHAR_DATA *ch, char *arg, int type,
   return eFAILURE;
 }
 
+/* BEE SWARM */
+
 int cast_bee_swarm(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *victim, struct obj_data * tar_obj, int skill)
 {
    int dam;
@@ -8800,6 +8808,8 @@ int cast_bee_swarm(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *vi
       }
   return eSUCCESS;
 }
+
+/* CREEPING DEATH */
 
 int cast_creeping_death(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *victim, struct obj_data * tar_obj, int skill)
 {
@@ -8834,7 +8844,7 @@ int cast_creeping_death(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DAT
    }
 
 
-   retval = spell_damage(ch, victim, dam, TYPE_MAGIC, SPELL_CREEPING_DEATH, 0);
+   retval = spell_damage(ch, victim, dam, TYPE_POISON, SPELL_CREEPING_DEATH, 0);
    if(SOMEONE_DIED(retval))
       return retval;
 
@@ -9876,6 +9886,7 @@ int cast_resist_acid(byte level, CHAR_DATA *ch, char *arg, int type,
   return eFAILURE;
 }
 
+/* SUN RAY */
 
 int spell_sun_ray(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
@@ -10364,6 +10375,7 @@ int cast_lightning_shield( byte level, CHAR_DATA *ch, char *arg, int type, CHAR_
   return eFAILURE;
 }
 
+/* BLUE BIRD */
 
 int spell_blue_bird(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
