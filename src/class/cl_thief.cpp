@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.108 2005/06/23 22:18:44 shane Exp $
+| $Id: cl_thief.cpp,v 1.109 2005/06/24 05:03:43 apocalypse Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -1625,7 +1625,7 @@ int do_deceit(struct char_data *ch, char *argument, int cmd)
   }
   else {
     act ("$n instructs $s group on the virtues of deceit.", ch, 0, 0, TO_ROOM, 0);
-    send_to_char("Your instruction is well received and your pupils more able to exploit weakness.\r\n", ch);
+    send_to_char("Your instruction is well received and your pupils are able to exploit other's weaknesses.\r\n", ch);
     
     for(char_data * tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
     { 

@@ -511,7 +511,8 @@ int spell_howl(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *ob
 }
 
 
-/*Aegis/Unholy Aegis*/
+/* HOLY AEGIS/UNHOLY AEGIS*/
+
 int spell_aegis(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
   struct affected_type af;
@@ -3053,7 +3054,7 @@ int spell_strength(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data
   }
 
   send_to_char("You feel stronger.\r\n", victim);
-  act("$n's muscles bulge a bit, $s looks stronger.", victim, 0, 0, TO_ROOM,INVIS_NULL);
+  act("$n's muscles bulge a bit and $e looks stronger.", victim, 0, 0, TO_ROOM,INVIS_NULL);
 
   af.type      = SPELL_STRENGTH;
   af.duration  = level/2 + skill/3;
@@ -4828,19 +4829,14 @@ int spell_flamestrike(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
    return retval;
 }
 
+
+/* IRIDESCENT AURA */
+
 int spell_iridescent_aura(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
    struct affected_type af;
-/*   if (GET_CLASS(ch) == CLASS_PALADIN && ch != victim)
-   {
-	send_to_char("You can only cast this on yourself.\r\n",ch);
-	return eFAILURE;
-   }
-*/
    if (!affected_by_spell(victim, SPELL_IRIDESCENT_AURA)) {
-//      act("$n's skin turns $3blue$R momentarily.", victim, 0, 0, TO_ROOM, INVIS_NULL);
-//      act("Your skin turns $3blue$R momentarily.", victim, 0, 0, TO_CHAR, 0);
-      act("The air around $n shimmer and an iridescent aura appears around $m.", victim, 0, 0, TO_ROOM, INVIS_NULL);
+      act("The air around $n shimmers and an iridescent aura appears around $m.", victim, 0, 0, TO_ROOM, INVIS_NULL);
       act("The air around you shimmers, and an iridescent aura appears around you.",victim,0,0, TO_CHAR,0);
       af.type = SPELL_IRIDESCENT_AURA;
       af.duration = 1 + skill / 10;
@@ -4932,8 +4928,7 @@ int spell_resist_magic(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
 }
 
 
-/* STAUNCHBLOOD (Currenly only on items) */
-// TODO - make this use skill
+/* STAUNCHBLOOD */
 
 int spell_staunchblood(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
@@ -4944,7 +4939,6 @@ int spell_staunchblood(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
 	send_to_char("You can only cast this on yourself.\r\n",ch);
 	return eFAILURE;
    }
-
     if(!affected_by_spell(ch, SPELL_STAUNCHBLOOD)) {
        act("You feel supremely healthy and resistant to $2poison$R!", ch, 0, 0, TO_CHAR, 0);
        act("$n looks supremely healthy and begins looking for snakes and spiders to fight.", victim, 0, 0, TO_ROOM, INVIS_NULL);
@@ -6153,6 +6147,9 @@ int cast_armor( byte level, CHAR_DATA *ch, char *arg, int type,
 	 }
   return eFAILURE;
 }
+
+
+/* HOLY AEGIS/UNHOLY AEGIS (potion, scroll, wand) */
 
 int cast_aegis( byte level, CHAR_DATA *ch, char *arg, int type,
 	 CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill )

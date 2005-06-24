@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.80 2005/06/23 22:32:22 shane Exp $ */
+/* $Id: mob_proc.cpp,v 1.81 2005/06/24 05:03:34 apocalypse Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -5342,9 +5342,9 @@ int mage_familiar_imp_non(struct char_data *ch, struct obj_data *obj, int cmd, c
   if(!ch->fighting) 
   {
     if(ch->in_room != ch->master->in_room) {
-      do_emote(ch, "looks around for it's master than *eep*'s and dissolves into a shadow.\r\n", 9);
+      do_emote(ch, "looks around for its master, then *eep*'s quietly and dissolves into shadow.\r\n", 9);
       move_char(ch, ch->master->in_room);
-      do_emote(ch, "steps out of a nearby shadow relieved to be back in it's master's presence.\r\n", 9);
+      do_emote(ch, "steps out of a nearby shadow relieved to be back in its master's presence.\r\n", 9);
       return eFAILURE;
     }
 
