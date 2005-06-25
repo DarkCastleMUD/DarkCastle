@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.160 2005/06/21 19:00:06 shane Exp $ */
+/* $Id: const.cpp,v 1.161 2005/06/25 18:58:45 shane Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1076,9 +1076,9 @@ char* pc_clss_abbrev[] =
 
 //struct class_skill_defines
 //    char * skillname;         // name of skill
-//    sh_int skillnum;          // ID # of skill
-//    sh_int levelavailable;    // what level class can get it
-//    byte   maximum;           // maximum value PC can train it to (1-99)
+//    int16 skillnum;          // ID # of skill
+//    int16 levelavailable;    // what level class can get it
+//    ubyte   maximum;           // maximum value PC can train it to (1-99)
 //    long   trainer;           // what mob trains them (only one currently) REMOVED 
 //    char *                    // hint to who trains it REMOVED
 
@@ -2177,7 +2177,7 @@ const struct str_app_type str_app[] = {
 };
 
 /* [level] backstab multiplyer (thieves only) */
-byte backstab_mult[61] =
+ubyte backstab_mult[61] =
 {
     1,   /* 0 */
     6,   /* 1 */

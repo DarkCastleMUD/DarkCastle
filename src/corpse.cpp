@@ -53,7 +53,7 @@ extern struct obj_data *object_list;
 struct obj_data *obj_proto;
 extern struct CWorld world;
 extern struct index_data *obj_index;   /* index table for object file   */
-sh_int frozen_start_room = 1;
+int16 frozen_start_room = 1;
 
 /* Local Function Declerations */
 int count_hash_records(FILE * fl);

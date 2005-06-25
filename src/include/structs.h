@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: structs.h,v 1.8 2005/05/13 13:29:56 urizen Exp $
+| $Id: structs.h,v 1.9 2005/06/25 18:58:56 shane Exp $
 | structs.h
 | Description:  This file should go away someday - it's stuff that I
 |   wasn't sure how to break up.  --Morc XXX
@@ -28,12 +28,6 @@ typedef unsigned int            uint32;
 // for some reason.
 typedef signed long long         int64;
 typedef unsigned long long      uint64;
-
-// Try to avoid using these 3.  Here until we can phase them out
-// TODO - phase these out
-typedef unsigned char             byte;
-typedef signed short int        sh_int;
-typedef unsigned short int     ush_int;
 
 typedef	struct char_data	CHAR_DATA;
 typedef	struct obj_data		OBJ_DATA;

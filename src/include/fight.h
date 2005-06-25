@@ -2,11 +2,11 @@
 #define FIGHT_H_
 
 /************************************************************************
-| $Id: fight.h,v 1.24 2005/06/23 22:32:25 shane Exp $
+| $Id: fight.h,v 1.25 2005/06/25 18:58:56 shane Exp $
 | fight.h
 | This file defines the header information for fight.
 */
-#include <structs.h> // byte, ubyte, etc..
+#include <structs.h> // ubyte, ubyte, etc..
 #include <obj.h> // WIELD, SECOND_WIELD
 #include <character.h>
 #include <utility.h> // FALSE

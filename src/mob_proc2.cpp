@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.51 2005/06/04 19:42:26 urizen Exp $ */
+/* $Id: mob_proc2.cpp,v 1.52 2005/06/25 18:58:45 shane Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -37,7 +37,7 @@
 /*   external vars  */
 
 extern CWorld world;
-extern struct obj_data * search_char_for_item(char_data * ch, sh_int 
+extern struct obj_data * search_char_for_item(char_data * ch, int16 
 item_number);
  
 extern struct obj_data *object_list;
@@ -1116,7 +1116,7 @@ int platmerchant(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 // TODO - make sure meta checks for get_stat_max to make sure you can't meta
 // past your racial maximum
 
-int meta_get_stat_exp_cost(char_data * ch, byte stat)
+int meta_get_stat_exp_cost(char_data * ch, ubyte stat)
 {
     int xp_price;
     int curr_stat;
@@ -1173,7 +1173,7 @@ int meta_get_stat_exp_cost(char_data * ch, byte stat)
     return xp_price;
 }
 
-int meta_get_stat_plat_cost(char_data * ch, byte targetstat)
+int meta_get_stat_plat_cost(char_data * ch, ubyte targetstat)
 {
   int plat_cost;
   int stat;

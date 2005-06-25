@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.109 2005/06/24 05:03:43 apocalypse Exp $
+| $Id: cl_thief.cpp,v 1.110 2005/06/25 18:58:53 shane Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -31,7 +31,7 @@ extern int top_of_world;
 extern int arena[4];
 
 int find_door(CHAR_DATA *ch, char *type, char *dir);
-struct obj_data * search_char_for_item(char_data * ch, sh_int item_number);
+struct obj_data * search_char_for_item(char_data * ch, int16 item_number);
 
 int get_weapon_damage_type(struct obj_data * wielded);
 
@@ -1625,7 +1625,7 @@ int do_deceit(struct char_data *ch, char *argument, int cmd)
   }
   else {
     act ("$n instructs $s group on the virtues of deceit.", ch, 0, 0, TO_ROOM, 0);
-    send_to_char("Your instruction is well received and your pupils are able to exploit other's weaknesses.\r\n", ch);
+    send_to_char("Your instruction is well received and your pupils are more able to exploit weaknesses.\r\n", ch);
     
     for(char_data * tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
     { 

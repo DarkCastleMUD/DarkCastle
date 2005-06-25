@@ -83,7 +83,7 @@ SKILL_INCREASE_HARD);
 
 int do_focused_repelance(struct char_data *ch, char *argument, int cmd)
 {
-  //byte percent;
+  //ubyte percent;
   struct affected_type af;
   int duration = 40;
   if(IS_MOB(ch))

@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.90 2005/06/15 19:38:00 shane Exp $ */
+/* $Id: handler.cpp,v 1.91 2005/06/25 18:58:45 shane Exp $ */
     
 extern "C"
 {
@@ -231,7 +231,7 @@ int isname_exact(char *str, char *namelist)
       }
 }
 
-int get_max_stat(char_data * ch, byte stat)
+int get_max_stat(char_data * ch, ubyte stat)
 {
     switch(GET_RACE(ch)) {
       case RACE_ELVEN:
@@ -2140,7 +2140,7 @@ int move_obj(obj_data *obj, char_data * ch)
   int         obj_in_room  = NOWHERE;
   obj_data  * contained_by = 0;
   char_data * carried_by   = 0;
-  struct obj_data * search_char_for_item(char_data * ch, sh_int item_number);
+  struct obj_data * search_char_for_item(char_data * ch, int16 item_number);
 
 //  char buffer[300];
 

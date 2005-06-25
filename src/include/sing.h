@@ -3,22 +3,22 @@
  * singing bard powers, although the sing structure is in
  * spells.h, so that must be included
  */
-/* $Id: sing.h,v 1.9 2004/07/25 20:55:30 urizen Exp $ */
+/* $Id: sing.h,v 1.10 2005/06/25 18:58:56 shane Exp $ */
 
 #ifndef SING_H_
 #define SING_H_
 
-#include <structs.h> // byte, ubyte, etc..
+#include <structs.h> // ubyte, ubyte, etc..
 
-typedef int	SING_FUN		( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill);
+typedef int	SING_FUN		( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill);
 
 struct song_info_type
 {
-	byte beats;	/* Waiting time after ki */
-	byte minimum_position; /* min position for use */
+	ubyte beats;	/* Waiting time after ki */
+	ubyte minimum_position; /* min position for use */
 	ubyte min_useski;	/* minimum ki used */
-        sh_int skill_num;       /* skill number of the song */
-	sh_int targets;		/* Legal targets */
+        int16 skill_num;       /* skill number of the song */
+	int16 targets;		/* Legal targets */
 	SING_FUN *song_pointer;	/* function to call */
         SING_FUN *exec_pointer; /* other function to call */
         SING_FUN *song_pulse;    /* other other function to call */

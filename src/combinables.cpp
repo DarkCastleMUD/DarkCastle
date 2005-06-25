@@ -28,7 +28,7 @@ using namespace std;
 extern CWorld world;
 extern struct index_data *obj_index; 
 
-int saves_spell(CHAR_DATA *ch, CHAR_DATA *vict, int spell_base, sh_int save_type);
+int saves_spell(CHAR_DATA *ch, CHAR_DATA *vict, int spell_base, int16 save_type);
 
 ////////////////////////////////////////////////////////////////////////////
 // local function declarations

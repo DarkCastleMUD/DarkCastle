@@ -941,7 +941,7 @@ mob_index[mob->mobdata->nr].virt );
     CHAR_DATA *take;
     extern void debug_here();
     debug_here();
-    struct obj_data * search_char_for_item(char_data * ch, sh_int item_number);
+    struct obj_data * search_char_for_item(char_data * ch, int16 item_number);
     char bufeh[MAX_STRING_LENGTH];
     char *valu = one_argument(val, bufeh);
     switch (arg[1] )

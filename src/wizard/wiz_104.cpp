@@ -1493,7 +1493,7 @@ int do_teleport(struct char_data *ch, char *argument, int cmd)
       }
 //      for (loop = 0; loop <= top_of_world; loop++) {
 //         if (world[loop].number == target) {
-//            target = (sh_int)loop;
+//            target = (int16)loop;
 //            break;
 //      } else if (loop == top_of_world) {
 //            send_to_char("No room exists with that number.\n\r", ch);

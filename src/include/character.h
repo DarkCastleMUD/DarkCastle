@@ -1,7 +1,7 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.35 2005/06/17 20:13:46 urizen Exp $
+| $Id: character.h,v 1.36 2005/06/25 18:58:56 shane Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
@@ -10,7 +10,7 @@
 
 #include <affect.h>  /* MAX_AFFECTS, etc.. */
 #include <alias.h>   /* struct char_player_alias, MAX_ALIASES, etc.. */
-#include <structs.h> /* byte, ubyte, sh_int, etc.. */
+#include <structs.h> /* ubyte, ubyte, int16, etc.. */
 #include <timeinfo.h> // time data, etc..
 #include <event.h> // eventBrief
 #include <isr.h>   // SAVE_TYPE_MAX

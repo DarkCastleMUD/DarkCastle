@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.37 2005/06/21 19:00:06 shane Exp $ */
+/* $Id: clan.cpp,v 1.38 2005/06/25 18:58:45 shane Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -122,7 +122,7 @@ void boot_clans(void)
 #endif
       new_new_room->next = new_new_clan->rooms;
       tempint = fread_int(fl, 0, 50000);
-      new_new_room->room_number = (sh_int) tempint;
+      new_new_room->room_number = (int16) tempint;
       new_new_clan->rooms = new_new_room;
     }
 
@@ -1493,7 +1493,7 @@ void do_god_clans(CHAR_DATA *ch, char *arg, int cmd)
   char last[MAX_INPUT_LENGTH];
 
   int i, x;
-  sh_int skill;
+  int16 skill;
 
   char *god_values[] = {
           "create", "rename", "leader", "delete", "addroom",
@@ -1986,7 +1986,7 @@ void do_leader_clans(CHAR_DATA *ch, char *arg, int cmd)
 
   int i, j, leader;
 //  int x;
-  sh_int skill;
+  int16 skill;
 
   char *mortal_values[] = {
           "list", 

@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: cl_ranger.cpp,v 1.58 2005/05/31 11:24:48 urizen Exp $ | cl_ranger.C  *
+ * $Id: cl_ranger.cpp,v 1.59 2005/06/25 18:58:53 shane Exp $ | cl_ranger.C  *
  * Description: Ranger skills/spells                                          *
  *                                                                            *
  * Revision History                                                           *
@@ -38,7 +38,7 @@ extern struct zone_data *zone_table;
 extern struct race_shit race_info[];
 extern int rev_dir[];
 
-int saves_spell(CHAR_DATA *ch, CHAR_DATA *vict, int spell_base, sh_int save_type);
+int saves_spell(CHAR_DATA *ch, CHAR_DATA *vict, int spell_base, int16 save_type);
 bool any_charms(CHAR_DATA *ch);
 void check_eq(CHAR_DATA *ch);
 extern struct index_data *mob_index;

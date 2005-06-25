@@ -16,7 +16,7 @@
  *  10/21/2003   Onager    Changed IS_ANONYMOUS() to handle mobs without   *
  *                         crashing                                        *
  ***************************************************************************/
-/* $Id: utility.h,v 1.34 2005/06/17 20:13:46 urizen Exp $ */
+/* $Id: utility.h,v 1.35 2005/06/25 18:58:56 shane Exp $ */
 
 #ifndef UTILITY_H_
 #define UTILITY_H_
@@ -48,18 +48,13 @@ inline int random() { return(rand()); }
 char *index(char *buf, char op);
 #endif
 
-// TODO - FIX THESE
-
 #define MOB_WAIT_STATE(ch)  ((ch)->deaths)
-//#define WAIT_STATE(ch, cycle)  (((ch)->desc) ? (ch)->desc->wait += 
-//(cycle) : 0 )
 
 #define GET_WAIT(ch)  (IS_MOB((ch)) ? (ch)->deaths : ((ch)->desc ? (ch)->desc->wait : 0))
 
 #define WAIT_STATE(czh, cycle)  (((czh)->desc) ? (czh)->desc->wait > (cycle) ? 0 : (czh)->desc->wait = (cycle) :  \
                                   (IS_MOB((czh)) ? MOB_WAIT_STATE((czh)) = (cycle) : 0))
 
-// END TODO
 
 // Defines for gradual skill increase code
 // Usage is defined in guild.cpp
@@ -75,7 +70,6 @@ bool is_hiding(CHAR_DATA *ch, CHAR_DATA *vict);
 // End defines for gradual skill increase code
 
 
-// TODO - I don't think we ever use this
 #define REMOVE_FROM_LIST(item, head, next)      \
    if ((item) == (head))                \
       head = (item)->next;              \
@@ -362,7 +356,7 @@ int32	move_limit	(CHAR_DATA *ch);
 int32	mana_limit	(CHAR_DATA *ch);
 int32	ki_limit	(CHAR_DATA *ch);
 int32	hit_limit	(CHAR_DATA *ch);
-int	has_skill	(CHAR_DATA *ch, sh_int skill);
+int	has_skill	(CHAR_DATA *ch, int16 skill);
 char *  get_skill_name  (int skillnum);
 void	gain_exp_regardless	(CHAR_DATA *ch, int gain);
 void	advance_level	(CHAR_DATA *ch, int is_conversion);

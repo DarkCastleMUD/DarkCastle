@@ -259,7 +259,6 @@ int souldrainer(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
 		if(chance > (2 * percent)) {
 		    chance = number(0, 101);
 		    if(chance > (2 * percent)) {
-                        // TODO - 6 act messages?  We can't combine these?
 			act("You feel your soul being drained as $n's magics swirl around you",
 			    ch, 0, vict, TO_VICT, 0);
                         act("$N gasps in agony as $n's dark magics grasp at $S soul.", 
@@ -350,9 +349,9 @@ int holyavenger(CHAR_DATA *ch, struct obj_data *obj,  int cmd, char *arg,
    if ((vict->equipment[WEAR_NECK_1] && obj_index[vict->equipment[WEAR_NECK_1]->item_number].virt == 518) ||
 (vict->equipment[WEAR_NECK_2] && obj_index[vict->equipment[WEAR_NECK_2]->item_number].virt == 518))
    { // tarrasque's leash..
-	act("You attempt to behead $N, but your sword bounces of their neckwear.",ch, 0, vict, TO_CHAR, 0);
+	act("You attempt to behead $N, but your sword bounces of $S neckwear.",ch, 0, vict, TO_CHAR, 0);
 	act("$n attempts to behead $N, but fails.", ch, 0, vict, TO_ROOM, NOTVICT);
-	act("$n attempts to behead you, but TODO",ch,0,vict,TO_VICT,0);
+	act("$n attempts to behead you, but cannot cut through your neckwear.",ch,0,vict,TO_VICT,0);
 	return eSUCCESS;
    }
    if(GET_HIT(vict) < 3500) {
@@ -2637,7 +2636,7 @@ char*arg,
   }
   addTimer(ch, SPELL_GROUP_SANC, 36);
   send_to_char("Your cassocks begin to hum loudly!\r\n",ch);
-  return spell_group_sanc((byte)50, ch, ch, 0, 100);
+  return spell_group_sanc((ubyte)50, ch, ch, 0, 100);
 }
 
 

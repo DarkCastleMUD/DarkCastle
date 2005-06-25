@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.41 2005/06/21 13:00:56 urizen Exp $ */
+/* $Id: utility.cpp,v 1.42 2005/06/25 18:58:46 shane Exp $ */
 
 extern "C"
 {
@@ -1289,7 +1289,7 @@ int do_beep(struct char_data *ch, char *argument, int cmd)
 // search through a character's list to see if they have a particular skill
 // if so, return their level of knowledge
 // if not, return 0
-int has_skill (CHAR_DATA *ch, sh_int skill)
+int has_skill (CHAR_DATA *ch, int16 skill)
 {
   struct char_skill_data * curr = ch->skills;
   struct obj_data *o;

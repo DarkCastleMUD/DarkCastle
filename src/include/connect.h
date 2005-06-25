@@ -1,7 +1,7 @@
 #ifndef CONNECT_H_
 #define CONNECT_H_
 /************************************************************************
-| $Id: connect.h,v 1.9 2005/06/14 22:13:45 shane Exp $
+| $Id: connect.h,v 1.10 2005/06/25 18:58:56 shane Exp $
 | connect.h
 | Description: State of connectedness information.
 */
@@ -80,7 +80,7 @@ struct descriptor_data
     int         bufptr;
     int         bufspace;
     char        small_outbuf[SMALL_BUFSIZE];
-    byte         idle_tics;
+    ubyte         idle_tics;
     time_t      login_time;
     struct stat_shit * stats;            // for rolling up a char 
 

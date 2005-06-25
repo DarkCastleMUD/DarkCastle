@@ -3,14 +3,14 @@
  * ki powers, although the ki structure is in
  * spells.h, so that must be included
  */
-/* $Id: ki.h,v 1.6 2004/05/30 18:59:08 urizen Exp $ */
+/* $Id: ki.h,v 1.7 2005/06/25 18:58:56 shane Exp $ */
 
 #ifndef KI_H_
 #define KI_H_
 
-#include <structs.h> // byte, ubyte, etc..
+#include <structs.h> // ubyte, ubyte, etc..
 
-typedef int	KI_FUN		( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict);
+typedef int	KI_FUN		( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict);
 
 /************************************************************************
 | These are pretty worthless, since I never did anything with them
@@ -29,10 +29,10 @@ typedef int	KI_FUN		( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict);
 
 struct ki_info_type
 {
-	byte beats;	/* Waiting time after ki */
-	byte minimum_position; /* min position for use */
+	ubyte beats;	/* Waiting time after ki */
+	ubyte minimum_position; /* min position for use */
 	ubyte min_useski;	/* minimum ki used */
-	sh_int targets;		/* Legal targets */
+	int16 targets;		/* Legal targets */
 	KI_FUN *ki_pointer;	/* function to call */
         int difficulty;
 };

@@ -46,11 +46,11 @@ void add_memory(CHAR_DATA *ch, char *victim, char type);
 extern bool check_social( CHAR_DATA *ch, char *pcomm, int length, char *arg );
 void check_eq(CHAR_DATA *ch);
 
-//        byte beats;     /* Waiting time after ki */
-//        byte minimum_position; /* min position for use */
+//        ubyte beats;     /* Waiting time after ki */
+//        ubyte minimum_position; /* min position for use */
 //        ubyte min_useski;       /* minimum ki used */
-//        sh_int skill_num;       /* skill number of the song */
-//        sh_int targets;         /* Legal targets */
+//        int16 skill_num;       /* skill number of the song */
+//        int16 targets;         /* Legal targets */
 //        SING_FUN *song_pointer; /* function to call */
 //        SING_FUN *exec_pointer; /* other function to call */
 //        SING_FUN *song_pulse;    /* other other function to call */
@@ -275,10 +275,10 @@ char *songs[] = {
 };
 
 void update_pos(CHAR_DATA *victim);
-sh_int use_song(CHAR_DATA *ch, int kn);
+int16 use_song(CHAR_DATA *ch, int kn);
 bool ARE_GROUPED(CHAR_DATA *sub, CHAR_DATA *obj);
 
-sh_int use_song(CHAR_DATA *ch, int kn)
+int16 use_song(CHAR_DATA *ch, int kn)
 {
 	return(song_info[kn].min_useski);
 }
@@ -674,7 +674,7 @@ void update_bard_singing()
   }
 }
 
-int song_hypnotic_harmony(byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+int song_hypnotic_harmony(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    if (!victim || !ch) {
       log("Serious problem in song_hypnotic_harmony!", ANGEL, LOG_BUG);
@@ -693,7 +693,7 @@ int song_hypnotic_harmony(byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victi
    return eSUCCESS;
 }
 
-int execute_song_hypnotic_harmony(byte level, CHAR_DATA *ch, char *Arg,
+int execute_song_hypnotic_harmony(ubyte level, CHAR_DATA *ch, char *Arg,
 	CHAR_DATA *victim, int skill)
 {
   struct affected_type af;
@@ -770,7 +770,7 @@ return eSUCCESS;
 
 }
 
-int song_disrupt( byte level, CHAR_DATA *ch, char 
+int song_disrupt( ubyte level, CHAR_DATA *ch, char 
 *arg, CHAR_DATA *victim, int skill)
 {
    if (!victim || !ch) {
@@ -805,7 +805,7 @@ act("You resist $n's disarming limerick!",ch,NULL,victim,TO_VICT,0);
    return spell_dispel_magic(GET_LEVEL(ch)-1, ch, victim, 0, 0);
 }
 
-int song_whistle_sharp( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+int song_whistle_sharp( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    int dam = 0;
    int retval;
@@ -874,7 +874,7 @@ act("You resist $n's whistle sharp!",ch,NULL,victim,TO_VICT,0);
    return eSUCCESS;
 }
 
-int song_healing_melody( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+int song_healing_melody( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    send_to_char("You begin to sing a song of healing...\n\r", ch);
    act("$n raises $s voice in a soothing melody...", ch, 0, 0, TO_ROOM, 0);
@@ -886,7 +886,7 @@ int song_healing_melody( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim
    return eSUCCESS;
 }
 
-int execute_song_healing_melody( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+int execute_song_healing_melody( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    int heal;
    char_data * master = NULL;
@@ -943,7 +943,7 @@ int execute_song_healing_melody( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA
    return eSUCCESS;
 }
 
-int song_revealing_stacato( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+int song_revealing_stacato( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    send_to_char("You begin to sing a song of revealing...\n\r", ch);
    act("$n begins to chant in rhythm...", ch, 0, 0, TO_ROOM, 0);
@@ -951,7 +951,7 @@ int song_revealing_stacato( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vic
    return eSUCCESS;
 }
 
-int execute_song_revealing_stacato( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+int execute_song_revealing_stacato( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    char_data * i;
 
@@ -990,7 +990,7 @@ int execute_song_revealing_stacato( byte level, CHAR_DATA *ch, char *arg, CHAR_D
    return eSUCCESS;
 }
 
-int song_note_of_knowledge( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+int song_note_of_knowledge( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    // store the obj name here, cause A, we don't pass tar_obj
    // and B, there's no place to save it before we execute
@@ -1002,7 +1002,7 @@ int song_note_of_knowledge( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vic
    return eSUCCESS;   
 }
 
-int execute_song_note_of_knowledge( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+int execute_song_note_of_knowledge( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    obj_data * obj = NULL;
 
@@ -1018,7 +1018,7 @@ int execute_song_note_of_knowledge( byte level, CHAR_DATA *ch, char *arg, CHAR_D
    return eSUCCESS;
 }
 
-int song_terrible_clef( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+int song_terrible_clef( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    send_to_char("You begin a song of battle!\n\r", ch);
    act("$n sings a horrible battle hymn!", ch, 0, 0, TO_ROOM, 0);
@@ -1026,7 +1026,7 @@ int song_terrible_clef( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim,
    return eSUCCESS;
 }
 
-int execute_song_terrible_clef( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+int execute_song_terrible_clef( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    int dam = 0;
    int retval;
@@ -1090,7 +1090,7 @@ act("You resist $n's terrible clef!",ch,NULL,victim,TO_VICT,0);
    return eSUCCESS;
 }
 
-int song_listsongs( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+int song_listsongs( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    char buf[200];
 
@@ -1106,7 +1106,7 @@ int song_listsongs( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int
    return eSUCCESS;
 }
 
-int song_soothing_remembrance( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+int song_soothing_remembrance( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    send_to_char("You begin to sing a song of rememberance...\n\r", ch);
    act("$n raises $s voice in a soothing ballad...", ch, 0, 0, TO_ROOM, 0);
@@ -1114,7 +1114,7 @@ int song_soothing_remembrance( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *
    return eSUCCESS;
 }
 
-int execute_song_soothing_remembrance( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+int execute_song_soothing_remembrance( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    int heal;
    char_data * master = NULL;
@@ -1166,7 +1166,7 @@ int execute_song_soothing_remembrance( byte level, CHAR_DATA *ch, char *arg, CHA
    return eSUCCESS;
 }
 
-int song_traveling_march( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+int song_traveling_march( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    send_to_char("You begin to sing a song of travel...\n\r", ch);
    act("$n raises $s voice in an uplifting march...", ch, 0, 0, TO_ROOM, 0);
@@ -1178,7 +1178,7 @@ int song_traveling_march( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victi
    return eSUCCESS;
 }
 
-int execute_song_traveling_march( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+int execute_song_traveling_march( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    int heal;
    char_data * master = NULL;
@@ -1234,7 +1234,7 @@ int execute_song_traveling_march( byte level, CHAR_DATA *ch, char *arg, CHAR_DAT
    return eSUCCESS;
 }
 
-int song_stop( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+int song_stop( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    if(!ch->song_timer)
    {
@@ -1253,7 +1253,7 @@ int song_stop( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skil
    return eSUCCESS;
 }
 
-int song_astral_chanty( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+int song_astral_chanty( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    // Store it for later, since we can't store the vict pointer
    ch->song_data = str_dup(arg);
@@ -1282,7 +1282,7 @@ void do_astral_chanty_movement(CHAR_DATA *victim, CHAR_DATA *target)
   act("$n appears out of nowhere in a chorus of light and song.", victim, 0, 0, TO_ROOM, 0);
 }
 
-int execute_song_astral_chanty( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+int execute_song_astral_chanty( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    char_data * master = NULL;
    follow_type * fvictim = NULL;
@@ -1359,14 +1359,14 @@ int execute_song_astral_chanty( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA 
    return eSUCCESS;
 }
 
-int pulse_song_astral_chanty( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+int pulse_song_astral_chanty( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    if(number(1, 3) == 3)
       act("$n sings a rousing chanty!", ch, 0, 0, TO_ROOM, 0);
    return eSUCCESS;
 }
 
-int song_forgetful_rhythm( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+int song_forgetful_rhythm( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    // store the arg here, cause there's no place to save it before we execute
    ch->song_data = str_dup(arg);
@@ -1377,7 +1377,7 @@ int song_forgetful_rhythm( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict
    return eSUCCESS;
 }
 
-int execute_song_forgetful_rhythm( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+int execute_song_forgetful_rhythm( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    int retval;
 
@@ -1421,7 +1421,7 @@ int execute_song_forgetful_rhythm( byte level, CHAR_DATA *ch, char *arg, CHAR_DA
    return eSUCCESS;
 }
 
-int song_shattering_resonance( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+int song_shattering_resonance( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    // store the arg here, cause there's no place to save it before we execute
    ch->song_data = str_dup(arg);
@@ -1434,7 +1434,7 @@ int song_shattering_resonance( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *
    return eSUCCESS;
 }
 
-int execute_song_shattering_resonance( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+int execute_song_shattering_resonance( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    obj_data * obj = NULL;
    obj_data * tobj = NULL;
@@ -1508,7 +1508,7 @@ int execute_song_shattering_resonance( byte level, CHAR_DATA *ch, char *arg, CHA
    return eSUCCESS;
 }
 
-int song_insane_chant( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+int song_insane_chant( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    send_to_char("You begin chanting insanely...\n\r", ch);
    act("$n begins chanting wildly...", ch, 0, 0, TO_ROOM, 0);
@@ -1516,7 +1516,7 @@ int song_insane_chant( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, 
    return eSUCCESS;
 }
 
-int execute_song_insane_chant( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+int execute_song_insane_chant( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    struct affected_type af;
 
@@ -1549,7 +1549,7 @@ act("You resist $n's insane chant!",ch,NULL,victim,TO_VICT,0);
    return eSUCCESS;
 }
 
-int song_flight_of_bee( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+int song_flight_of_bee( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    send_to_char("You begin to sing a lofty song...\n\r", ch);
    act("$n raises $s voice in an flighty quick march...", ch, 0, 0, TO_ROOM, 0);
@@ -1557,7 +1557,7 @@ int song_flight_of_bee( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim,
    return eSUCCESS;
 }
 
-int execute_song_flight_of_bee( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+int execute_song_flight_of_bee( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    char_data * master = NULL;
    follow_type * fvictim = NULL;
@@ -1609,14 +1609,14 @@ int execute_song_flight_of_bee( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA 
    return eSUCCESS;
 }
 
-int pulse_flight_of_bee( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+int pulse_flight_of_bee( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    if(number(1, 5) == 3)
       act("$n prances around like a fairy.", ch, 0, 0, TO_ROOM, 0);   
    return eSUCCESS;
 }
 
-int intrp_flight_of_bee( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+int intrp_flight_of_bee( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    char_data * master = NULL;
    follow_type * fvictim = NULL;
@@ -1644,7 +1644,7 @@ int intrp_flight_of_bee( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim
    return eSUCCESS;
 }
 
-int song_searching_song( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+int song_searching_song( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    // store the char name here, cause A, we don't pass tar_char
    // and B, there's no place to save it before we execute
@@ -1657,7 +1657,7 @@ int song_searching_song( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim
 }
 
 
-int execute_song_searching_song( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+int execute_song_searching_song( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    char_data * target = NULL;
    char buf[200];
@@ -1710,7 +1710,7 @@ int execute_song_searching_song( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA
    return eSUCCESS;
 }
 
-int song_jig_of_alacrity( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+int song_jig_of_alacrity( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    send_to_char("You begin to sing a quick little jig of alacrity...\n\r", ch);
    act("$n starts humming a quick little ditty...", ch, 0, 0, TO_ROOM, 0);
@@ -1718,14 +1718,14 @@ int song_jig_of_alacrity( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victi
    return eSUCCESS;
 }
 
-int song_fanatical_fanfare(byte level, CHAR_DATA *ch, char *Aag, CHAR_DATA *victim, int skill)
+int song_fanatical_fanfare(ubyte level, CHAR_DATA *ch, char *Aag, CHAR_DATA *victim, int skill)
 {
    send_to_char("You begin to sing loudly, and poke everyone in your surroundings with a stick..\r\n",ch);
    act("$n starts singing loudly, and begins to poke everyone around $m with a stick. Hey!", ch, 0, 0, TO_ROOM, 0);
    ch->song_timer = song_info[ch->song_number].beats;
   return eSUCCESS;
 }
-int execute_song_jig_of_alacrity( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+int execute_song_jig_of_alacrity( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    char_data * master = NULL;
    follow_type * fvictim = NULL;
@@ -1798,7 +1798,7 @@ int execute_song_jig_of_alacrity( byte level, CHAR_DATA *ch, char *arg, CHAR_DAT
    return eSUCCESS;
 }
 
-int execute_song_fanatical_fanfare(byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+int execute_song_fanatical_fanfare(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    char_data * master = NULL;
    follow_type * fvictim = NULL;
@@ -1879,21 +1879,21 @@ int execute_song_fanatical_fanfare(byte level, CHAR_DATA *ch, char *arg, CHAR_DA
    return eSUCCESS;
 }
 
-int pulse_song_fanatical_fanfare(byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+int pulse_song_fanatical_fanfare(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
   if (number(1,5) == 2)
       act("$n combines singing and poking the people with a stick, getting people worked up.", ch, 0, 0, TO_ROOM,0);
   return eSUCCESS;
 }
 
-int pulse_jig_of_alacrity( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+int pulse_jig_of_alacrity( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    if(number(1, 5) == 3)
       act("$n prances around like a fairy.", ch, 0, 0, TO_ROOM, 0);   
    return eSUCCESS;
 }
 
-int intrp_jig_of_alacrity( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+int intrp_jig_of_alacrity( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    char_data * master = NULL;
    follow_type * fvictim = NULL;
@@ -1921,7 +1921,7 @@ int intrp_jig_of_alacrity( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict
    return eSUCCESS;
 }
 
-int intrp_song_fanatical_fanfare( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+int intrp_song_fanatical_fanfare( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    char_data * master = NULL;
    follow_type * fvictim = NULL;
@@ -1949,7 +1949,7 @@ int intrp_song_fanatical_fanfare( byte level, CHAR_DATA *ch, char *arg, CHAR_DAT
 
 }
 
-int song_glitter_dust( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+int song_glitter_dust( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    send_to_char("You throw dust in the air and sing a wily ditty...\n\r", ch);
    act("$n throws some dust in the air and sings a wily ditty...", ch, 0, 0, TO_ROOM, 0);
@@ -1957,7 +1957,7 @@ int song_glitter_dust( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, 
    return eSUCCESS;
 }
 
-int execute_song_glitter_dust( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+int execute_song_glitter_dust( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    struct affected_type af;
 
@@ -1980,7 +1980,7 @@ int execute_song_glitter_dust( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *
    return eSUCCESS;
 }
 
-int song_bountiful_sonnet( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+int song_bountiful_sonnet( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    send_to_char("You begin long restoring sonnet...\n\r", ch);
    act("$n begins a long restorous sonnet...", ch, 0, 0, TO_ROOM, 0);
@@ -1988,7 +1988,7 @@ int song_bountiful_sonnet( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict
    return eSUCCESS;
 }
 
-int execute_song_bountiful_sonnet( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+int execute_song_bountiful_sonnet( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    char_data * master = NULL;
    follow_type * fvictim = NULL;
@@ -2021,7 +2021,7 @@ int execute_song_bountiful_sonnet( byte level, CHAR_DATA *ch, char *arg, CHAR_DA
    return eSUCCESS;
 }
 
-int execute_song_dischordant_dirge( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+int execute_song_dischordant_dirge( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    char_data * target = NULL;
    //char buf[400];
@@ -2110,7 +2110,7 @@ int execute_song_dischordant_dirge( byte level, CHAR_DATA *ch, char *arg, CHAR_D
    return eSUCCESS;
 }
 
-int song_dischordant_dirge( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+int song_dischordant_dirge( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    // store the char name here, cause A, we don't pass tar_char
    // and B, there's no place to save it before we execute
@@ -2125,7 +2125,7 @@ int song_dischordant_dirge( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vic
 }
 
 
-int song_synchronous_chord( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+int song_synchronous_chord( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    // store the char name here, cause A, we don't pass tar_char
    // and B, there's no place to save it before we execute
@@ -2140,7 +2140,7 @@ int song_synchronous_chord( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vic
 }
 
 
-int execute_song_synchronous_chord( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+int execute_song_synchronous_chord( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    char_data * target = NULL;
    char buf[400];
@@ -2177,7 +2177,7 @@ int execute_song_synchronous_chord( byte level, CHAR_DATA *ch, char *arg, CHAR_D
 }
 
 
-int song_sticky_lullaby( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+int song_sticky_lullaby( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    // store the char name here, cause A, we don't pass tar_char
    // and B, there's no place to save it before we execute
@@ -2191,7 +2191,7 @@ int song_sticky_lullaby( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim
    return eSUCCESS;
 }
 
-int execute_song_sticky_lullaby( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+int execute_song_sticky_lullaby( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    if(!(victim = get_char_room_vis(ch, ch->song_data)))
    {
@@ -2219,7 +2219,7 @@ act("You resist $n's sticky lullaby!",ch,NULL,victim,TO_VICT,0);
    return eSUCCESS;
 }
 
-int song_vigilant_siren( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+int song_vigilant_siren( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    send_to_char("You begin to sing a fast nervous tune...\n\r", ch);
    act("$n starts mumbling out a quick, nervous tune...", ch, 0, 0, TO_ROOM, 0);
@@ -2227,7 +2227,7 @@ int song_vigilant_siren( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim
    return eSUCCESS;
 }
 
-int execute_song_vigilant_siren( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+int execute_song_vigilant_siren( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    char_data * master = NULL;
    follow_type * fvictim = NULL;
@@ -2282,14 +2282,14 @@ int execute_song_vigilant_siren( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA
    return eSUCCESS;
 }
 
-int pulse_vigilant_siren( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+int pulse_vigilant_siren( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    if(number(1, 5) == 3)
       act("$n chatters a ditty about being alert and ever watchful.", ch, 0, 0, TO_ROOM, 0);   
    return eSUCCESS;
 }
 
-int intrp_vigilant_siren( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+int intrp_vigilant_siren( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    char_data * master = NULL;
    follow_type * fvictim = NULL;
@@ -2334,7 +2334,7 @@ void make_person_dance(char_data * ch)
    command_interpreter(ch, dothis);
 }
 
-int song_unresistable_ditty( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+int song_unresistable_ditty( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    send_to_char("You begin to sing an irresistable little ditty...\n\r", ch);
    act("$n begins to sing, 'du du dudu du du dudu du du dudu!'", ch, 0, 0, TO_ROOM, 0);
@@ -2342,7 +2342,7 @@ int song_unresistable_ditty( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vi
    return eSUCCESS;
 }
 
-int execute_song_unresistable_ditty( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+int execute_song_unresistable_ditty( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    char_data * i;
 
@@ -2375,7 +2375,7 @@ act("You resist $n's \"irresistible\" ditty!!",ch,NULL,i,TO_VICT,0);
    return eSUCCESS;
 }
 
-int song_crushing_crescendo( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+int song_crushing_crescendo( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    send_to_char("You begin to sing, approaching crescendo!\n\r", ch);
    act("$n begins to sing, raising the volume to deafening levels!", ch, 0, 0, TO_ROOM, 0);
@@ -2384,7 +2384,7 @@ int song_crushing_crescendo( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vi
    return eSUCCESS;
 }
 
-int execute_song_crushing_crescendo( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+int execute_song_crushing_crescendo( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    int dam = 0;
    int retval;

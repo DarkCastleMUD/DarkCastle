@@ -1,13 +1,13 @@
 #ifndef PLAYER_H_
 #define PLAYER_H_
 /************************************************************************
-| $Id: player.h,v 1.19 2005/06/15 19:38:04 shane Exp $
+| $Id: player.h,v 1.20 2005/06/25 18:58:56 shane Exp $
 | player.h
 | Description: This file defines the player vectors..punishment, specials,
 |   etc...
 */
 #include <punish.h> // punishment vectors
-#include <structs.h> // byte
+#include <structs.h> // ubyte
 
 /************************************************************************
 | CHAR_DATA.misc vector
@@ -235,50 +235,50 @@
 // Constructor commented out for const.C initialization purposes
 struct str_app_type
 {
-    sh_int todam;    /* Damage Bonus/Penalty                */
-    sh_int carry_w;  /* Maximum weight that can be carrried */
-    sh_int cold_resistance; /* Cold resistance */
+    int16 todam;    /* Damage Bonus/Penalty                */
+    int16 carry_w;  /* Maximum weight that can be carrried */
+    int16 cold_resistance; /* Cold resistance */
 };
 
 struct dex_app_type
 {
-  sh_int tohit;
-  sh_int ac_mod;
-  sh_int move_gain;
-  sh_int fire_resistance;
+  int16 tohit;
+  int16 ac_mod;
+  int16 move_gain;
+  int16 fire_resistance;
 };
 
 // Constructor commented out for const.C initialization purposes
 struct wis_app_type
 {
-    sh_int mana_regen;
-    sh_int ki_regen;
-    sh_int bonus;       /* how many bonus skills a player can */
+    int16 mana_regen;
+    int16 ki_regen;
+    int16 bonus;       /* how many bonus skills a player can */
 		      /* practice pr. level                 */
-    sh_int energy_resistance;
-    sh_int conc_bonus;
+    int16 energy_resistance;
+    int16 conc_bonus;
 };
 
 // Constructor commented out for const.C initialization purposes
 struct int_app_type
 {
-    sh_int mana_regen;
-    sh_int ki_regen;
-    sh_int easy_bonus;
-    sh_int medium_bonus;
-    sh_int hard_bonus;
-    sh_int learn_bonus;
-    sh_int magic_resistance;
-    sh_int conc_bonus;
+    int16 mana_regen;
+    int16 ki_regen;
+    int16 easy_bonus;
+    int16 medium_bonus;
+    int16 hard_bonus;
+    int16 learn_bonus;
+    int16 magic_resistance;
+    int16 conc_bonus;
 };
 
 // Constructor commented out for const.C initialization purposes
 struct con_app_type
 {
-    sh_int hp_regen;
-    sh_int move_regen;
-    sh_int hp_gain;
-    sh_int poison_resistance;
+    int16 hp_regen;
+    int16 move_regen;
+    int16 hp_gain;
+    int16 poison_resistance;
 };
 
 /* Extern definitions. These are all in const.cpp. */

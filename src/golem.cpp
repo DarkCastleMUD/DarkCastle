@@ -255,7 +255,7 @@ void load_golem_data(CHAR_DATA *ch, int golemtype)
   dc_fclose(fpfile);
 }
 
-int cast_create_golem(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill)
+int cast_create_golem(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill)
 {
   struct char_data *golem;
   int i;
@@ -450,7 +450,7 @@ int do_golem_score(struct char_data *ch, char *argument, int cmd)
    return eSUCCESS;
 }
 
-int spell_release_golem(byte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill)
+int spell_release_golem(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill)
 {
   struct follow_type *fol;
   for (fol = ch->followers; fol; fol = fol->next)

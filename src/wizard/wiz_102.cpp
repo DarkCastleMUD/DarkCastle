@@ -630,7 +630,7 @@ int do_zedit(struct char_data *ch, char *argument, int cmd)
   char buf[MAX_STRING_LENGTH];
   char select[MAX_INPUT_LENGTH];
   char text[MAX_INPUT_LENGTH];
-  sh_int skill;
+  int16 skill;
   int i = 0, j = 0;
   int zone, last_cmd;
   int robj, rmob;
@@ -1058,9 +1058,9 @@ int do_sedit(struct char_data *ch, char *argument, int cmd)
   char_data * vict;
   char_skill_data * skill;
   char_skill_data * lastskill;
-  sh_int field;
-  sh_int skillnum;
-  sh_int learned;
+  int16 field;
+  int16 skillnum;
+  int16 learned;
   int i;
 
   int learn_skill(char_data * ch, int skill, int amount, int maximum);
@@ -4451,10 +4451,6 @@ int do_sockets(struct char_data *ch, char *argument, int cmd)
            continue;
       }
 
-//      if(!d->character)
-//       continue;
-
-      // TODO - determine if I need to leave this uncommented for some reason
       if (*name &&
           !str_str(d->host, name) && (!d->character || !isname(name, GET_NAME(d->character))))
             continue; 

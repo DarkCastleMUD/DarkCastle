@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.37 2005/06/23 22:32:22 shane Exp $ */
+/* $Id: ki.cpp,v 1.38 2005/06/25 18:58:45 shane Exp $ */
 
 extern "C"
 {
@@ -106,10 +106,10 @@ char *ki[] = {
 	"\n"
 };
 void update_pos(CHAR_DATA *victim);
-sh_int use_ki(CHAR_DATA *ch, int kn);
+int16 use_ki(CHAR_DATA *ch, int kn);
 bool ARE_GROUPED(CHAR_DATA *sub, CHAR_DATA *obj);
 
-sh_int use_ki(CHAR_DATA *ch, int kn)
+int16 use_ki(CHAR_DATA *ch, int kn)
 {
 	return(ki_info[kn].min_useski);
 }
@@ -406,7 +406,7 @@ int ki_gain(CHAR_DATA *ch)
 	return MAX(gain, 1);
 }
 
-int ki_blast( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
+int ki_blast( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
 {
    int success = 0;
    int exit = number(0, 5); /* Chooses an exit */
@@ -482,7 +482,7 @@ int ki_blast( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
 	return eSUCCESS;
 }
 
-int ki_punch( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
+int ki_punch( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
 {	
    if (!vict) {
       log("Serious problem in ki punch!", ANGEL, LOG_BUG);
@@ -537,7 +537,7 @@ int ki_punch( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
    return eSUCCESS; // shouldn't get here
 }
 
-int ki_sense( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
+int ki_sense( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
 {
 	struct affected_type af;
 	if(IS_AFFECTED(ch, AFF_INFRARED))
@@ -556,7 +556,7 @@ int ki_sense( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
 	return eSUCCESS;
 }
 
-int ki_storm( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
+int ki_storm( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
 {
   int dam;
   int retval;
@@ -600,7 +600,7 @@ int ki_storm( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
   return eSUCCESS;
 }
 
-int ki_speed( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
+int ki_speed( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
 {
   struct affected_type af;
 
@@ -624,7 +624,7 @@ int ki_speed( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
   return eSUCCESS;
 }
 
-int ki_purify( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
+int ki_purify( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
 {
   if(!vict) {
     log("Null victim sent to ki purify", ANGEL, LOG_BUG); 
@@ -676,7 +676,7 @@ int ki_purify( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
   return eSUCCESS;
 }
 
-int ki_disrupt( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
+int ki_disrupt( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
 {
    if (!vict) {
       log("Serious problem in ki disrupt!", ANGEL, LOG_BUG);
@@ -692,7 +692,7 @@ int ki_disrupt( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
    return spell_dispel_magic(GET_LEVEL(ch)+1, ch, vict, 0, 0);
 }
 
-int ki_stance( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
+int ki_stance( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
 {
    struct affected_type af;
 
@@ -721,7 +721,7 @@ int ki_stance( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
    return eSUCCESS;
 }
 
-int ki_agility( byte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
+int ki_agility( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
 {
   int learned, chance, specialization, percent;
   struct affected_type af;

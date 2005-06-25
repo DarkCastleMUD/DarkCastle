@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.81 2005/06/24 05:03:34 apocalypse Exp $ */
+/* $Id: mob_proc.cpp,v 1.82 2005/06/25 18:58:45 shane Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -55,7 +55,7 @@ int check_components(CHAR_DATA *ch, int destroy, int item_one = 0,
 	bool silent = FALSE);
 /* extern procedures */
 
-int saves_spell(CHAR_DATA *ch, CHAR_DATA *vict, int spell_base, sh_int save_type);
+int saves_spell(CHAR_DATA *ch, CHAR_DATA *vict, int spell_base, int16 save_type);
 bool many_charms(struct char_data *ch);
 struct char_data *get_pc_vis_exact(struct char_data *ch, char *name);
 void gain_exp(struct char_data *ch, int64 gain);

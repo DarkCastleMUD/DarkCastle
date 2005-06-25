@@ -14,8 +14,8 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.h,v 1.71 2005/06/21 19:00:10 shane Exp $ */
-#include <structs.h> // byte, sh_int
+/* $Id: spells.h,v 1.72 2005/06/25 18:58:56 shane Exp $ */
+#include <structs.h> // ubyte, int16
 
 #define MAX_BUF_LENGTH               240
 
@@ -485,7 +485,7 @@ void check_maxes(CHAR_DATA *ch);
 #define TAR_NONE_OK        1<<11
 #define TAR_SELF_DEFAULT   1<<12
 
-typedef	int	SPELL_FUN	( byte level, CHAR_DATA *ch,
+typedef	int	SPELL_FUN	( ubyte level, CHAR_DATA *ch,
 				  char *arg, int type,
 				  CHAR_DATA *tar_ch,
 				  struct obj_data *tar_obj,
@@ -496,12 +496,12 @@ typedef	int	SPELL_FUN	( byte level, CHAR_DATA *ch,
 // using an offset from min_level_magic depending on class *(min_level_magic+2bytes)
 struct spell_info_type
 {
-    byte	beats;			/* Waiting time after spell	*/
-    byte	minimum_position;	/* Position for caster		*/
+    ubyte	beats;			/* Waiting time after spell	*/
+    ubyte	minimum_position;	/* Position for caster		*/
     ubyte	min_usesmana;		/* Mana used			*/
-    sh_int	targets;		/* Legal targets		*/
+    int16	targets;		/* Legal targets		*/
     SPELL_FUN *	spell_pointer;		/* Function to call		*/
-    sh_int      difficulty; 		/* Spell difficulty */
+    int16      difficulty; 		/* Spell difficulty */
 };
 
 

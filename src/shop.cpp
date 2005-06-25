@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: shop.cpp,v 1.18 2005/05/28 18:56:10 shane Exp $ */
+/* $Id: shop.cpp,v 1.19 2005/06/25 18:58:46 shane Exp $ */
 
 extern "C"
 {
@@ -55,7 +55,7 @@ struct shop_data shop_index[MAX_SHOP];
 int max_shop;
 
 // extern function
-struct obj_data * search_char_for_item(char_data * ch, sh_int item_number);
+struct obj_data * search_char_for_item(char_data * ch, int16 item_number);
 int fwrite_string(char *buf, FILE *fl);
 
 /*
@@ -1183,7 +1183,7 @@ void player_shopping_design(char * arg, char_data * ch, char_data * keeper)
 {
   char select[MAX_INPUT_LENGTH];
   char text[MAX_INPUT_LENGTH];
-  sh_int skill;
+  int16 skill;
 
   if(IS_NPC(ch))   
     return;
@@ -1343,7 +1343,7 @@ int do_pshopedit(char_data * ch, char * arg, int cmd)
   char buf[MAX_STRING_LENGTH];
   char select[MAX_INPUT_LENGTH];
   char text[MAX_INPUT_LENGTH];
-  sh_int skill, i;
+  int16 skill, i;
   player_shop * shop;
 
   if(IS_NPC(ch))   

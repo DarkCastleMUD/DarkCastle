@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.56 2005/06/22 21:08:19 shane Exp $
+| $Id: objects.cpp,v 1.57 2005/06/25 18:58:46 shane Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -316,7 +316,7 @@ int do_quaff(struct char_data *ch, char *argument, int cmd)
         {
            lvl = (int) (1.5 * temp->obj_flags.value[0]); 
            retval = ((*spell_info[temp->obj_flags.value[i]].spell_pointer)
-              ((byte) temp->obj_flags.value[0], ch, "", SPELL_TYPE_POTION, ch, 0, lvl));
+              ((ubyte) temp->obj_flags.value[0], ch, "", SPELL_TYPE_POTION, ch, 0, lvl));
         }
      }
      if(IS_SET(retval, eCH_DIED))
@@ -418,7 +418,7 @@ int do_recite(struct char_data *ch, char *argument, int cmd)
         {
           lvl = (int) (1.5 * scroll->obj_flags.value[0]); 
           retval = ((*spell_info[scroll->obj_flags.value[i]].spell_pointer)
-            ((byte) scroll->obj_flags.value[0], ch, "", SPELL_TYPE_SCROLL, victim, obj, lvl));
+            ((ubyte) scroll->obj_flags.value[0], ch, "", SPELL_TYPE_SCROLL, victim, obj, lvl));
           if(SOMEONE_DIED(retval))
             break;
         }
@@ -618,7 +618,7 @@ int do_use(struct char_data *ch, char *argument, int cmd)
 	int retval = 0;
       if (spell_info[stick->obj_flags.value[3]].spell_pointer)
       retval = ((*spell_info[stick->obj_flags.value[3]].spell_pointer)
-        ((byte) stick->obj_flags.value[0], ch, "", SPELL_TYPE_STAFF, 0, 0, lvl));
+        ((ubyte) stick->obj_flags.value[0], ch, "", SPELL_TYPE_STAFF, 0, 0, lvl));
 	else retval= eFAILURE;
       return retval;
     } else {
@@ -644,7 +644,7 @@ int do_use(struct char_data *ch, char *argument, int cmd)
 	int retval;
         if (spell_info[stick->obj_flags.value[3]].spell_pointer)
 	retval= ((*spell_info[stick->obj_flags.value[3]].spell_pointer)
-          ((byte) stick->obj_flags.value[0], ch, "", SPELL_TYPE_WAND, tmp_char, tmp_object, lvl));
+          ((ubyte) stick->obj_flags.value[0], ch, "", SPELL_TYPE_WAND, tmp_char, tmp_object, lvl));
 	else
 	retval = eFAILURE;
 	return retval;

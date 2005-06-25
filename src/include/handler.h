@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.h,v 1.13 2005/05/28 18:56:22 shane Exp $ */
+/* $Id: handler.h,v 1.14 2005/06/25 18:58:56 shane Exp $ */
 
 #ifndef HANDLER_H_
 #define HANDLER_H_
@@ -46,7 +46,7 @@ void affect_join( CHAR_DATA *ch, struct affected_type *af,
 struct obj_data *create_money( int amount );
 int isname(char *str, char *namelist);
 char *fname(char *namelist);
-int get_max_stat(char_data * ch, byte stat);
+int get_max_stat(char_data * ch, ubyte stat);
 //TIMERS
 bool isTimer(CHAR_DATA *ch, int spell);
 void addTimer(CHAR_DATA *ch, int spell, int ticks);

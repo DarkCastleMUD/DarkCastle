@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.276 2005/06/23 22:32:22 shane Exp $ */
+/* $Id: fight.cpp,v 1.277 2005/06/25 18:58:45 shane Exp $ */
 
 extern "C"
 {
@@ -1036,7 +1036,7 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
 
  
 //  extern int thaco[8][61];
-  extern byte backstab_mult[];
+  extern ubyte backstab_mult[];
   
   int do_say(struct char_data *ch, char *argument, int cmd);
   

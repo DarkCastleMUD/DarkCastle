@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.54 2005/05/03 22:37:52 shane Exp $
+| $Id: inventory.cpp,v 1.55 2005/06/25 18:58:45 shane Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -56,7 +56,7 @@ struct obj_data *create_money( int amount );
 int palm  (struct char_data *ch, struct obj_data *obj_object, struct obj_data *sub_object);
 void special_log(char *arg);
 struct obj_data * bring_type_to_front(char_data * ch, int item_type);
-struct obj_data * search_char_for_item(char_data * ch, sh_int item_number);
+struct obj_data * search_char_for_item(char_data * ch, int16 item_number);
 
 
 /* procedures related to get */
@@ -1336,7 +1336,7 @@ struct obj_data * bring_type_to_front(char_data * ch, int item_type)
 }
 
 // Find an item on a character
-struct obj_data * search_char_for_item(char_data * ch, sh_int item_number)
+struct obj_data * search_char_for_item(char_data * ch, int16 item_number)
 {
   struct obj_data *i = NULL;
   struct obj_data *j = NULL;

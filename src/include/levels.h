@@ -1,4 +1,4 @@
-/* $Id: levels.h,v 1.2 2002/06/13 04:41:15 dcastle Exp $ */
+/* $Id: levels.h,v 1.3 2005/06/25 18:58:56 shane Exp $ */
 /* This is purely to define god levels as #defines. */
 #ifndef LEVELS_H_
 #define LEVELS_H_
@@ -40,7 +40,7 @@
 struct bestowable_god_commands_type
 {
     char * name;              // name of command
-    sh_int num;               // ID # of command
+    int16 num;               // ID # of command
 };
 
 #endif

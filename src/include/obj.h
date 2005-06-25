@@ -12,11 +12,11 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: obj.h,v 1.18 2005/04/09 21:15:35 urizen Exp $ */
+/* $Id: obj.h,v 1.19 2005/06/25 18:58:56 shane Exp $ */
 #ifndef OBJ_H_
 #define OBJ_H_
 
-#include <structs.h> // byte
+#include <structs.h> // ubyte
 
 // functions from objects.cpp
 int eq_max_damage(obj_data * obj);

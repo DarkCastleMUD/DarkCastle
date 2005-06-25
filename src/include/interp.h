@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.h,v 1.36 2005/06/04 10:57:27 dcastle Exp $ */
+/* $Id: interp.h,v 1.37 2005/06/25 18:58:56 shane Exp $ */
 
 #ifndef INTERP_H_
 #define INTERP_H_
@@ -43,8 +43,8 @@ struct command_info
 {
     char *command_name;             /* Name of ths command             */
     DO_FUN *command_pointer;        /* Function that does it            */
-    byte minimum_position;          /* Position commander must be in    */
-    byte minimum_level;             /* Minimum level needed             */
+    ubyte minimum_position;          /* Position commander must be in    */
+    ubyte minimum_level;             /* Minimum level needed             */
     ubyte command_number;           /* Passed to function as argument   */
     int flags;                      // what flags the skills has 
 };

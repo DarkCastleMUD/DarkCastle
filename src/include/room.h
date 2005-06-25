@@ -1,13 +1,13 @@
 #ifndef __ROOM_H__
 #define __ROOM_H__
 /************************************************************************
-| $Id: room.h,v 1.11 2005/05/27 15:28:08 urizen Exp $
+| $Id: room.h,v 1.12 2005/06/25 18:58:56 shane Exp $
 | room.h
 | Description:  This file contains all of the room header file/constant
 |   information.  It also contains information about the 'world' structs.
 */
-#include <structs.h> // byte
-#include <obj.h> // byte
+#include <structs.h> // ubyte
+#include <obj.h> // ubyte
 
 // The following defs are for room_data
 
@@ -94,9 +94,9 @@ struct room_direction_data
 {
     char *general_description;       /* When look DIR.                  */ 
     char *keyword;                   /* for open/close                  */  
-    sh_int exit_info;                /* Exit info                       */
-    sh_int key;                      /* Key's number (-1 for no key)    */
-    sh_int to_room;                  /* Where direction leeds (NOWHERE) */
+    int16 exit_info;                /* Exit info                       */
+    int16 key;                      /* Key's number (-1 for no key)    */
+    int16 to_room;                  /* Where direction leeds (NOWHERE) */
 };
 
 struct room_track_data
@@ -121,8 +121,8 @@ struct deny_data
 // ========================= Structure for room ==========================
 struct room_data
 {
-    sh_int number;                       // Rooms number
-    sh_int zone;                         // Room zone (for resetting)
+    int16 number;                       // Rooms number
+    int16 zone;                         // Room zone (for resetting)
     int sector_type;                     // sector type (move/hide)
     struct deny_data *denied;
     char * name;                         // Rooms name 'You are ...'
@@ -130,7 +130,7 @@ struct room_data
     extra_descr_data * ex_description;   // for examine/look
     room_direction_data * dir_option[MAX_DIRS]; // Directions
     uint32 room_flags;                     // DEATH, DARK ... etc
-    sh_int light;                        // Light factor of room
+    int16 light;                        // Light factor of room
     
     int (*funct)(CHAR_DATA*, int, char*);  // special procedure
 	 

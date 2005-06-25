@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.142 2005/06/23 22:18:10 shane Exp $ */
+/* $Id: spells.cpp,v 1.143 2005/06/25 18:58:46 shane Exp $ */
 
 extern "C"
 {
@@ -71,12 +71,12 @@ void make_dust(CHAR_DATA * ch);
 extern struct index_data *mob_index;
 
 #if(0)
-    byte        beats;                  /* Waiting time after spell     */
-    byte        minimum_position;       /* Position for caster          */
+    ubyte        beats;                  /* Waiting time after spell     */
+    ubyte        minimum_position;       /* Position for caster          */
     ubyte       min_usesmana;           /* Mana used                    */
-    sh_int      targets;                /* Legal targets                */
+    int16      targets;                /* Legal targets                */
     SPELL_FUN * spell_pointer;          /* Function to call             */
-    sh_int      difficulty;
+    int16      difficulty;
 #endif
 
 
@@ -1171,7 +1171,7 @@ void say_spell( CHAR_DATA *ch, int si )
 // returns 0 or positive if saving throw is made. The more, the higher it was made.
 // return -number of failure.   The lower, the more it was failed.
 //
-int saves_spell(CHAR_DATA *ch, CHAR_DATA *vict, int spell_base, sh_int save_type)
+int saves_spell(CHAR_DATA *ch, CHAR_DATA *vict, int spell_base, int16 save_type)
 {
     double save = 0;
 
