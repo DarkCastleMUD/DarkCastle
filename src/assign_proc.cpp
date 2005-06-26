@@ -461,7 +461,7 @@ void assign_objects(void)
   SPEC_FUN gazeofgaiot;
   SPEC_FUN moving_portals;
   SPEC_FUN spellcraft_glyphs;
-
+  SPEC_FUN angie_proc;
   SPEC_FUN godload_cassock;
   SPEC_FUN godload_phyraz;
   SPEC_FUN godload_leprosy;
@@ -486,6 +486,7 @@ void assign_objects(void)
     assign_one_obj_com(506,  glove_combat_procs);
     assign_one_obj_com(528, godload_leprosy);
 
+    assign_one_obj_non(29204, angie_proc);
     assign_one_obj_non(534, godload_cassock);
     assign_one_obj_non(500, godload_stargazer);
     assign_one_obj_non(526, godload_armbands);

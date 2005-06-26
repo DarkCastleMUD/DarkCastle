@@ -2119,6 +2119,11 @@ int spell_heal(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
   if(!victim) {
     log("Null victim sent to heal!", ANGEL, LOG_BUG);
     return eFAILURE;
+  } 
+ if (GET_CLASS(ch) == CLASS_PALADIN && victim != ch)
+  {
+    send_to_char("You cannot target others with this spell.\r\n",ch);
+    return eFAILURE;
   }
 
   if(GET_RACE(victim) == RACE_UNDEAD) {
@@ -4474,14 +4479,14 @@ int spell_dispel_magic(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
       act("The golem seems to ignore $n's dispelling magic!", ch, 0, 0, TO_ROOM, 0);
       return eFAILURE;
    }
-
+   /*
    if(!IS_NPC(ch) && !IS_NPC(victim) && victim->fighting &&
        IS_NPC(victim->fighting) && 
       !IS_AFFECTED(victim->fighting, AFF_CHARM)) 
    {
       send_to_char("Your dispelling magic misfires!\n\r", ch);
       victim = ch;
-   }
+   }*/
    int savebonus = 0;
    int learned = has_skill(ch, SPELL_DISPEL_MAGIC);
         if (learned < 41) savebonus = 20;

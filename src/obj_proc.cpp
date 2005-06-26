@@ -36,6 +36,8 @@ extern struct obj_data *object_list;
 extern struct zone_data *zone_table;
 extern struct descriptor_data *descriptor_list;
 
+extern CHAR_DATA *initiate_oproc(CHAR_DATA *ch, OBJ_DATA *obj);
+extern void end_oproc(CHAR_DATA *ch);
 
 // TODO - go over emoting object stuff and make sure it's as effecient as we can get it
  
@@ -2890,6 +2892,33 @@ int godload_hammer(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
   if (!SOMEONE_DIED(retval)) 
       retval |= spell_earthquake(50, ch, ch, 0, 100);
   return retval;
+}
+
+int angie_proc(struct char_data *ch, struct obj_data *obj, int cmd, char *arg, CHAR_DATA *invoker)
+{
+  if (cmd != 98 || ch->in_room != 29263) return eFAILURE;
+  char arg1[MAX_INPUT_LENGTH];
+  arg  = one_argument(arg, arg1);
+  
+  if (str_cmp(arg1,"door")) return eFAILURE;
+  if (!IS_SET(world[ch->in_room].dir_option[0]->exit_info, EX_CLOSED))
+   return eFAILURE;
+  REMOVE_BIT(world[ch->in_room].dir_option[0]->exit_info, EX_CLOSED);
+  REMOVE_BIT(world[29265].dir_option[2]->exit_info, EX_CLOSED);
+  act("$n turns the doorknob, there is a loud click, and a blinding explosion knocks you on your ass.", ch, NULL, NULL, TO_ROOM,0);
+  act("You turn the doorknob, there is a loud click, and a blinding explosion knocks you on your ass.", ch, NULL, NULL, TO_CHAR,0);
+  CHAR_DATA *a, *b,*c;
+  b = initiate_oproc(NULL, obj);
+  for (a = world[ch->in_room].people; a; a = c)
+  {
+    c = a->next_in_room; // 'cause mobs get freed
+   if (a == b) continue;
+    damage(b, a, 1000, TYPE_HIT, 50000, 0);
+  }
+
+  end_oproc(b);
+  extract_obj(obj);
+  return eSUCCESS;
 }
 
 int godload_phyraz(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,

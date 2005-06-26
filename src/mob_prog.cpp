@@ -2568,7 +2568,13 @@ CHAR_DATA *initiate_oproc(CHAR_DATA *ch, OBJ_DATA *obj)
  // dc_free(temp->short_desc);
   temp->short_desc = str_hsh(obj->short_description);
   //dc_free(temp->name);
-  temp->name = str_hsh(obj->name);
+  char buf[MAX_STRING_LENGTH];
+  sprintf(buf, "%s", obj->name);
+  for (int i = strlen(buf)-1;i > 0;i--)
+   if (buf[i] == ' ')
+   { buf[i] = '\0'; break; }
+  temp->name = str_hsh(buf);
+  
   return temp;
 }
 

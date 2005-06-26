@@ -16,7 +16,7 @@
 /* 12/08/2003   Onager   Added chop_half() to work like half_chop() but    */
 /*                       chopping off the last word.                       */
 /***************************************************************************/
-/* $Id: interp.cpp,v 1.68 2005/06/07 20:57:37 urizen Exp $ */
+/* $Id: interp.cpp,v 1.69 2005/06/26 20:06:45 urizen Exp $ */
 
 extern "C"
 {
@@ -172,7 +172,7 @@ struct command_info cmd_info[] =
     { "grab",       do_grab,        POSITION_RESTING,   0,  9,  COM_CHARMIE_OK },
     { "hold",       do_grab,        POSITION_RESTING,   0,  9,  COM_CHARMIE_OK },
     { "lock",       do_lock,        POSITION_RESTING,   0,  9,  COM_CHARMIE_OK },
-    { "open",       do_open,        POSITION_RESTING,   0,  9,  COM_CHARMIE_OK },
+    { "open",       do_open,        POSITION_RESTING,   0,  98,  COM_CHARMIE_OK },
     { "pour",       do_pour,        POSITION_RESTING,   0,  9,  COM_CHARMIE_OK },
     { "put",        do_put,         POSITION_RESTING,   0,  93, COM_CHARMIE_OK },
     { "quaff",      do_quaff,       POSITION_RESTING,   0,  9,  COM_CHARMIE_OK },
@@ -410,8 +410,7 @@ struct command_info cmd_info[] =
     { "boot",       do_boot,         POSITION_DEAD,      DEITY, 9,  0 },
     { "linkdead",   do_linkdead,     POSITION_DEAD,      DEITY, 9,  0 },
     { "teleport",   do_teleport,     POSITION_DEAD,      DEITY, 9,  0 },
-    { "purge",      do_purge,        POSITION_DEAD,      DEITY, 9,  0 },
-
+    { "purge", do_purge, POSITION_DEAD, 103, 9, 0 },
     { "show",       do_show,         POSITION_DEAD,      ANGEL, 9,  0 },
     { "fighting",   do_fighting,     POSITION_DEAD,      104, 9,  0 },
     { "peace",      do_peace,        POSITION_DEAD,      ANGEL, 9,  0 },

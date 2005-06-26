@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.97 2005/06/19 10:34:02 urizen Exp $ */
+/* $Id: db.cpp,v 1.98 2005/06/26 20:06:45 urizen Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -2433,8 +2433,8 @@ void read_one_zone(FILE * fl, int zon)
     tmp = fread_int (fl, 0, 9);
     reset_tab[reset_top].if_flag = tmp;
 
-    reset_tab[reset_top].arg1 = fread_int (fl, -64000, INT_MAX);
-    reset_tab[reset_top].arg2 = fread_int (fl, -64000, INT_MAX);
+    reset_tab[reset_top].arg1 = fread_int (fl, -64000, LONG_MAX);
+    reset_tab[reset_top].arg2 = fread_int (fl, -64000, LONG_MAX);
     if (reset_tab[reset_top].arg1 > 64000) reset_tab[reset_top].arg1 = 2;
 
     if (reset_tab[reset_top].arg2 > 64000) reset_tab[reset_top].arg2 = 1;
@@ -3306,9 +3306,9 @@ int create_blank_mobile(int nr)
     mob->misc = MISC_IS_MOB;
    
      // shift > items right
-    memmove( &mob_index[cur_index+1], &mob_index[cur_index],
-              ( (top_of_mobt - cur_index + 1) * sizeof(index_data) )
-           );
+      memmove( &mob_index[cur_index+1], &mob_index[cur_index],
+                ( (top_of_mobt - cur_index + 1) * sizeof(index_data) )
+             );
     top_of_mobt++;
 
     // insert
