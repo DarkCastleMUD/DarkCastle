@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.53 2005/06/26 20:06:46 urizen Exp $
+| $Id: move.cpp,v 1.54 2005/06/26 20:36:22 shane Exp $
 | move.C
 | Movement commands and stuff.
 *************************************************************************
@@ -543,7 +543,7 @@ int do_simple_move(CHAR_DATA *ch, int cmd, int following)
 
     if(!IS_NPC(ch) &&
        world[world[ch->in_room].dir_option[cmd]->to_room].sector_type == SECT_UNDERWATER &&
-       (!affected_by_spell(ch, SPELL_WATER_BREATHING && !IS_AFFECTED(ch, AFF_WATER_BREATHING)))
+       !(affected_by_spell(ch, SPELL_WATER_BREATHING || IS_AFFECTED(ch, AFF_WATER_BREATHING)))
       )
     {
        send_to_char("Underwater?!\r\n", ch);

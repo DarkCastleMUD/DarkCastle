@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.103 2005/06/26 20:06:46 urizen Exp $ */
+/* $Id: nanny.cpp,v 1.104 2005/06/26 20:36:22 shane Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -1674,7 +1674,8 @@ void update_command_lag_and_poison()
       }
 
       // handle drowning
-      if (!IS_NPC(i) && GET_LEVEL(i) < IMMORTAL && world[i->in_room].sector_type == SECT_UNDERWATER && (!affected_by_spell(i, SPELL_WATER_BREATHING) && !IS_AFFECTED(i, AFF_WATER_BREATHING))) {
+      if (!IS_NPC(i) && GET_LEVEL(i) < IMMORTAL && 
+world[i->in_room].sector_type == SECT_UNDERWATER && !(affected_by_spell(i, SPELL_WATER_BREATHING) || IS_AFFECTED(i, AFF_WATER_BREATHING))) {
          tmp = GET_MAX_HIT(i) / 5;
          sprintf(log_msg, "%s drowned in room %d.", GET_NAME(i), world[i->in_room].number);
          retval = noncombat_damage(i, tmp,
