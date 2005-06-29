@@ -2348,6 +2348,8 @@ int spell_poison(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data 
     {
       act("$P glows green for a second, before returning to its original color.", ch, obj, 0, TO_CHAR, 0);    
       obj->obj_flags.value[3] = 1;
+    } else {
+      send_to_char("Nothing special seems to happen.\n\r", ch);
     }
   }
   return retval;

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.57 2005/06/25 18:58:46 shane Exp $
+| $Id: objects.cpp,v 1.58 2005/06/29 10:41:40 shane Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -880,7 +880,7 @@ int do_drink(struct char_data *ch, char *argument, int cmd)
           act("Ooups, it tasted rather strange ?!!?",ch,0,0,TO_CHAR, 0);
           act("$n chokes and utters some strange sounds.",
               ch,0,0,TO_ROOM, 0);
-          if(number(1,100) < get_saves(ch,SAVE_TYPE_POISON) - 20) {
+          if(number(1,100) < get_saves(ch,SAVE_TYPE_POISON) - 15) {
              send_to_char("Luckily, your body rejects the poison almost immediately.\n\r",ch);
           } else {
              af.type = SPELL_POISON;
@@ -961,7 +961,7 @@ int do_eat(struct char_data *ch, char *argument, int cmd)
         act("Ooups, it tasted rather strange ?!!?",ch,0,0,TO_CHAR, 0);
         act("$n coughs and utters some strange sounds.",ch,0,0,TO_ROOM, 0);
 
-        if(number(1,100) < get_saves(ch,SAVE_TYPE_POISON) - 20) {
+        if(number(1,100) < get_saves(ch,SAVE_TYPE_POISON) - 15) {
           send_to_char("Luckily, your body rejects the poison almost immediately.\n\r", ch);
         } else {
            af.type = SPELL_POISON;
@@ -1150,7 +1150,7 @@ int do_sip(struct char_data *ch, char *argument, int cmd)
     && GET_LEVEL(ch) <IMMORTAL) /* The shit was poisoned ! */
     {
         act("But it also had a strange taste!",ch,0,0,TO_CHAR, 0);
-        if(number(1,100) < get_saves(ch,SAVE_TYPE_POISON) - 5) {
+        if(number(1,100) < get_saves(ch,SAVE_TYPE_POISON) + 15) {
            send_to_char("Luckily, your body rejects the poison almost immediately.\n\r",ch);
         } else {
            af.type = SPELL_POISON;
@@ -1215,7 +1215,7 @@ int do_taste(struct char_data *ch, char *argument, int cmd)
     && GET_LEVEL(ch) <IMMORTAL) /* The shit was poisoned ! */
     {
         act("Oops, it did not taste good at all!",ch,0,0,TO_CHAR, 0);
-        if(number(1,100) < get_saves(ch,SAVE_TYPE_POISON) - 20) {
+        if(number(1,100) < get_saves(ch,SAVE_TYPE_POISON) + 15) {
            send_to_char("Luckily, your body rejects the poison almost immediately.\n\r",ch);
         } else {
            af.type = SPELL_POISON;
