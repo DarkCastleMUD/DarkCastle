@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.161 2005/06/25 18:58:45 shane Exp $ */
+/* $Id: const.cpp,v 1.162 2005/06/30 01:18:00 shane Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1681,40 +1681,40 @@ struct race_shit
 struct race_shit race_info[] =
 {
 // Name,        Plural,     Bodyparts, Immunities, Resists, Suscepts, 
-//Hates/Fears, Friendly, Weight, Height, Affects
-{  "NPC",       "NPC",         63,         0,         0,       0,          0,         0,       0,      0,    AFF_IGNORE_WEAPON_WEIGHT },
-{  "Human",     "Humans",      63,         0,         0,       0,     1<<22|1<<29,    0,     175,     70,    AFF_IGNORE_WEAPON_WEIGHT },
-{  "Elf",       "Elves",       63,         0,       264,       0,      1<<7|1<<2,     0,     150,     85,    AFF_IGNORE_WEAPON_WEIGHT|AFF_INFRARED},
-{  "Dwarf",     "Dwarves",     63,         0,       128,       0,      1<<1|1<<5,     0,     200,     60,    AFF_IGNORE_WEAPON_WEIGHT|AFF_INFRARED },
-{  "Hobbit",    "Hobbits",     63,         0,         0,       0,      1<<7|1<<8,     0,     100,     35,    AFF_IGNORE_WEAPON_WEIGHT|AFF_HIDE },
-{  "Pixie",     "Pixies",      63,         0,         0,       0,      1<<5|1<<8,     0,      50,     20,    AFF_IGNORE_WEAPON_WEIGHT|AFF_INFRARED|AFF_FLYING },
-{  "Giant",     "Giants",      63,         0,         0,       0,      1<<2|1<<4,     0,     500,    125,    AFF_IGNORE_WEAPON_WEIGHT },
-{  "Gnome",     "Gnomes",      63,         0,         0,       0,      1<<9|1<<11,    0,     125,     55,    AFF_IGNORE_WEAPON_WEIGHT|AFF_INFRARED },
-{  "Orc",       "Orcs",        63,         0,         0,       0,      1<<1|1<<3,     0,     225,     90,    AFF_IGNORE_WEAPON_WEIGHT|AFF_INFRARED },
-{  "Troll",     "Trolls",      63,         0,       128,      80,      1<<3|1<<4,     0,     300,    115,    AFF_IGNORE_WEAPON_WEIGHT|AFF_INFRARED },
-{  "Goblin",    "Goblins",     63,         0,         0,       0,      1<<6|1<<11,    0,     175,     70,    AFF_IGNORE_WEAPON_WEIGHT|AFF_INFRARED },
-{  "Reptile",   "Reptiles",    59,         0,         0,     520,          0,         0,       0,      0,    AFF_IGNORE_WEAPON_WEIGHT },
-{  "Dragon",    "Dragons",     91,         0,       268,       0,      1<<6|1<<9,     0,    2500,    200,    AFF_IGNORE_WEAPON_WEIGHT|AFF_INFRARED|AFF_SENSE_LIFE|AFF_DETECT_INVISIBLE|AFF_FLYING|AFF_TRUE_SIGHT|AFF_SOLIDITY },
-{  "Snake",     "Snakes",       3,         0,         1, 2097160,      32768,      4096,       0,      0,    AFF_IGNORE_WEAPON_WEIGHT },
-{  "Horse",     "Horses",      19,         0,         0,       0,       2048,         3,     600,     70,    AFF_IGNORE_WEAPON_WEIGHT },
-{  "Bird",      "Birds",       63,         0,   2097152,       0,      65536,         0,       0,      0,    AFF_IGNORE_WEAPON_WEIGHT|AFF_FLYING },
-{  "Rodent",    "Rodents",     59,         0,         0,     128,       4096,         0,       0,      0,    AFF_IGNORE_WEAPON_WEIGHT},
-{  "Fish",      "Fishes",       3,         0,   4194304,       0,      16384,         0,       0,      0,    AFF_IGNORE_WEAPON_WEIGHT },
-{  "Arachnid",  "Arachnids",   19,         0,       128,       0,     262144,    131072,       0,      0,    AFF_IGNORE_WEAPON_WEIGHT|AFF_INFRARED|AFF_SENSE_LIFE },
-{  "Insect",    "Insects",     19,         0,         0,       0,     131072,    262144,       0,      0,    AFF_IGNORE_WEAPON_WEIGHT|AFF_INFRARED },
-{  "Slime",     "Slimes",       2,         1,        64,     528,          0,         0,       0,      0,    AFF_IGNORE_WEAPON_WEIGHT },
-{  "Animal",    "Animals",     27,         0,         0,     128,    8388608,         0,       0,      0,    AFF_IGNORE_WEAPON_WEIGHT|AFF_SENSE_LIFE },
-{  "Plant",     "Plants",      63,         0,   4194304,      16,    1048576,         0,       0,      0,    AFF_IGNORE_WEAPON_WEIGHT },
-{  "Enfan",     "Enfans",      63,         0,         0,     512,          1,   4194304,       0,      0,    AFF_IGNORE_WEAPON_WEIGHT|AFF_INFRARED },
-{  "Undead",    "Undead",      63,       392,         0,      64,          0,   8388608,       0,      0,    AFF_IGNORE_WEAPON_WEIGHT|AFF_INFRARED|AFF_SENSE_LIFE|AFF_DETECT_INVISIBLE },
-{  "Ghost",     "Spirits",     63,       904,        80,      36,          0,  16777216,       0,      0,    AFF_IGNORE_WEAPON_WEIGHT|AFF_INFRARED|AFF_SENSE_LIFE|AFF_DETECT_INVISIBLE|AFF_FLYING|AFF_INVISIBLE },
-{  "Golem",     "Golems",      63,       256,       128,      64,          0,         0,       0,      0,    AFF_IGNORE_WEAPON_WEIGHT },
-{  "Elemental", "Elementals",  63,         0,      1024,      12,          0,  67108864,       0,      0,    AFF_IGNORE_WEAPON_WEIGHT|AFF_SOLIDITY },
-{  "Planar",    "Planar",      63,        64,         4,      32,          0,         0,       0,      0,    AFF_IGNORE_WEAPON_WEIGHT|AFF_INFRARED|AFF_SENSE_LIFE|AFF_DETECT_INVISIBLE|AFF_SOLIDITY|AFF_REFLECT },
-{  "Demon",     "Demons",     127,        16,         8, 1048576,       1023,         0,       0,      0,    AFF_IGNORE_WEAPON_WEIGHT|AFF_INFRARED|AFF_SENSE_LIFE },
-{  "Yrnali",    "Yrnali",      63,        16,         8, 1048576,          1, 536870912,       0,      0,    AFF_IGNORE_WEAPON_WEIGHT|AFF_INFRARED|AFF_SENSE_LIFE|AFF_DETECT_INVISIBLE },
-{  "Immortal",  "Immortals",  127,      1288,   1048576,       0,          0,         0,       0,      0,    AFF_IGNORE_WEAPON_WEIGHT|AFF_INFRARED|AFF_SENSE_LIFE|AFF_DETECT_INVISIBLE|AFF_FLYING|AFF_TRUE_SIGHT|AFF_SOLIDITY|AFF_SANCTUARY },
-{  "Feline",    "Felines",     27,         0,         0,     128,    8388608,         0,       0,      0,    AFF_IGNORE_WEAPON_WEIGHT|AFF_INFRARED|AFF_SENSE_LIFE|AFF_SNEAK }
+//Hates/Fears, Friendly, Weight, Height, Affects, UnarmedHitType
+{  "NPC",       "NPC",         63,         0,         0,       0,          0,         0,       0,      0,    AFF_IGNORE_WEAPON_WEIGHT, "punch"},
+{  "Human",     "Humans",      63,         0,         0,       0,     1<<22|1<<29,    0,     175,     70,    AFF_IGNORE_WEAPON_WEIGHT, "punch" },
+{  "Elf",       "Elves",       63,         0,       264,       0,      1<<7|1<<2,     0,     150,     85,    AFF_IGNORE_WEAPON_WEIGHT|AFF_INFRARED, "punch"},
+{  "Dwarf",     "Dwarves",     63,         0,       128,       0,      1<<1|1<<5,     0,     200,     60,    AFF_IGNORE_WEAPON_WEIGHT|AFF_INFRARED, "hook" },
+{  "Hobbit",    "Hobbits",     63,         0,         0,       0,      1<<7|1<<8,     0,     100,     35,    AFF_IGNORE_WEAPON_WEIGHT|AFF_HIDE, "jab" },
+{  "Pixie",     "Pixies",      63,         0,         0,       0,      1<<5|1<<8,     0,      50,     20,    AFF_IGNORE_WEAPON_WEIGHT|AFF_INFRARED|AFF_FLYING, "bite" },
+{  "Giant",     "Giants",      63,         0,         0,       0,      1<<2|1<<4,     0,     500,    125,    AFF_IGNORE_WEAPON_WEIGHT, "uppercut" },
+{  "Gnome",     "Gnomes",      63,         0,         0,       0,      1<<9|1<<11,    0,     125,     55,    AFF_IGNORE_WEAPON_WEIGHT|AFF_INFRARED, "punch" },
+{  "Orc",       "Orcs",        63,         0,         0,       0,      1<<1|1<<3,     0,     225,     90,    AFF_IGNORE_WEAPON_WEIGHT|AFF_INFRARED, "hook" },
+{  "Troll",     "Trolls",      63,         0,       128,      80,      1<<3|1<<4,     0,     300,    115,    AFF_IGNORE_WEAPON_WEIGHT|AFF_INFRARED, "uppercut" },
+{  "Goblin",    "Goblins",     63,         0,         0,       0,      1<<6|1<<11,    0,     175,     70,    AFF_IGNORE_WEAPON_WEIGHT|AFF_INFRARED, "jab" },
+{  "Reptile",   "Reptiles",    59,         0,         0,     520,          0,         0,       0,      0,    AFF_IGNORE_WEAPON_WEIGHT, "strike" },
+{  "Dragon",    "Dragons",     91,         0,       268,       0,      1<<6|1<<9,     0,    2500,    200,    AFF_IGNORE_WEAPON_WEIGHT|AFF_INFRARED|AFF_SENSE_LIFE|AFF_DETECT_INVISIBLE|AFF_FLYING|AFF_TRUE_SIGHT|AFF_SOLIDITY, "bite" },
+{  "Snake",     "Snakes",       3,         0,         1, 2097160,      32768,      4096,       0,      0,    AFF_IGNORE_WEAPON_WEIGHT, "bite" },
+{  "Horse",     "Horses",      19,         0,         0,       0,       2048,         3,     600,     70,    AFF_IGNORE_WEAPON_WEIGHT, "bite" },
+{  "Bird",      "Birds",       63,         0,   2097152,       0,      65536,         0,       0,      0,    AFF_IGNORE_WEAPON_WEIGHT|AFF_FLYING, "peck" },
+{  "Rodent",    "Rodents",     59,         0,         0,     128,       4096,         0,       0,      0,    AFF_IGNORE_WEAPON_WEIGHT, "bite"},
+{  "Fish",      "Fishes",       3,         0,   4194304,       0,      16384,         0,       0,      0,    AFF_IGNORE_WEAPON_WEIGHT, "bite" },
+{  "Arachnid",  "Arachnids",   19,         0,       128,       0,     262144,    131072,       0,      0,    AFF_IGNORE_WEAPON_WEIGHT|AFF_INFRARED|AFF_SENSE_LIFE, "bite" },
+{  "Insect",    "Insects",     19,         0,         0,       0,     131072,    262144,       0,      0,    AFF_IGNORE_WEAPON_WEIGHT|AFF_INFRARED, "sting" },
+{  "Slime",     "Slimes",       2,         1,        64,     528,          0,         0,       0,      0,    AFF_IGNORE_WEAPON_WEIGHT, "slap" },
+{  "Animal",    "Animals",     27,         0,         0,     128,    8388608,         0,       0,      0,    AFF_IGNORE_WEAPON_WEIGHT|AFF_SENSE_LIFE, "bite" },
+{  "Plant",     "Plants",      63,         0,   4194304,      16,    1048576,         0,       0,      0,    AFF_IGNORE_WEAPON_WEIGHT, "slap" },
+{  "Enfan",     "Enfans",      63,         0,         0,     512,          1,   4194304,       0,      0,    AFF_IGNORE_WEAPON_WEIGHT|AFF_INFRARED, "jab" },
+{  "Undead",    "Undead",      63,       392,         0,      64,          0,   8388608,       0,      0,    AFF_IGNORE_WEAPON_WEIGHT|AFF_INFRARED|AFF_SENSE_LIFE|AFF_DETECT_INVISIBLE, "punch" },
+{  "Ghost",     "Spirits",     63,       904,        80,      36,          0,  16777216,       0,      0,    AFF_IGNORE_WEAPON_WEIGHT|AFF_INFRARED|AFF_SENSE_LIFE|AFF_DETECT_INVISIBLE|AFF_FLYING|AFF_INVISIBLE, "scream" },
+{  "Golem",     "Golems",      63,       256,       128,      64,          0,         0,       0,      0,    AFF_IGNORE_WEAPON_WEIGHT, "punch" },
+{  "Elemental", "Elementals",  63,         0,      1024,      12,          0,  67108864,       0,      0,    AFF_IGNORE_WEAPON_WEIGHT|AFF_SOLIDITY, "punch" },
+{  "Planar",    "Planar",      63,        64,         4,      32,          0,         0,       0,      0,    AFF_IGNORE_WEAPON_WEIGHT|AFF_INFRARED|AFF_SENSE_LIFE|AFF_DETECT_INVISIBLE|AFF_SOLIDITY|AFF_REFLECT, "punch" },
+{  "Demon",     "Demons",     127,        16,         8, 1048576,       1023,         0,       0,      0,    AFF_IGNORE_WEAPON_WEIGHT|AFF_INFRARED|AFF_SENSE_LIFE, "punch" },
+{  "Yrnali",    "Yrnali",      63,        16,         8, 1048576,          1, 536870912,       0,      0,    AFF_IGNORE_WEAPON_WEIGHT|AFF_INFRARED|AFF_SENSE_LIFE|AFF_DETECT_INVISIBLE, "punch" },
+{  "Immortal",  "Immortals",  127,      1288,   1048576,       0,          0,         0,       0,      0,    AFF_IGNORE_WEAPON_WEIGHT|AFF_INFRARED|AFF_SENSE_LIFE|AFF_DETECT_INVISIBLE|AFF_FLYING|AFF_TRUE_SIGHT|AFF_SOLIDITY|AFF_SANCTUARY, "gaze" },
+{  "Feline",    "Felines",     27,         0,         0,     128,    8388608,         0,       0,      0,    AFF_IGNORE_WEAPON_WEIGHT|AFF_INFRARED|AFF_SENSE_LIFE|AFF_SNEAK, "claw" }
 }; 
 
 int mob_race_mod[][5] =

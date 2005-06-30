@@ -2319,7 +2319,7 @@ int spell_poison(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data 
   if (victim) 
   {
      set_cantquit(ch, victim);
-     if (IS_SET(victim->immune, ISR_POISON) || (number(1,101) < (get_saves(victim, SAVE_TYPE_POISON) + 5 - (skill < 40 ? 5 : 0) - (skill < 60 ? 5 : 0) - (skill < 80 ? 5 : 0))))
+     if (IS_SET(victim->immune, ISR_POISON) || number(1,101) < get_saves(victim, SAVE_TYPE_POISON))
      {
          act("$N resists your attempt to poison $M!", ch, NULL, victim, TO_CHAR,0);
          act("$N resists $n's attempt to poison $M!", ch, NULL, victim, TO_ROOM,NOTVICT);
@@ -2335,7 +2335,7 @@ int spell_poison(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data 
          return eFAILURE;
 
         af.type = SPELL_POISON;
-        af.duration = 3 + (skill > 33) + (skill > 60) + (skill > 80);
+        af.duration = (skill / 10);
         af.modifier = skill;
         af.location = APPLY_NONE;
         af.bitvector = AFF_POISON;

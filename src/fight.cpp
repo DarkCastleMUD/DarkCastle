@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.277 2005/06/25 18:58:45 shane Exp $ */
+/* $Id: fight.cpp,v 1.278 2005/06/30 01:18:00 shane Exp $ */
 
 extern "C"
 {
@@ -67,7 +67,6 @@ extern CWorld world;
 extern struct index_data *mob_index;
 extern struct index_data *obj_index;
 extern struct zone_data *zone_table;
-
 struct clan_data * get_clan(struct char_data *);
 
 /* functions that nobody else should be calling */
@@ -250,7 +249,7 @@ void perform_violence(void)
       next_af_dude = af->next;
       if (af->type == SPELL_POISON)
       {
-        int dam = dam_percent(affected_by_spell(ch, SPELL_POISON)->modifier, 50);
+        int dam = (affected_by_spell(ch, SPELL_POISON)->modifier) / 400 * GET_HIT(ch);
         int retval = damage(ch, ch, dam, TYPE_POISON, 0, 0);
         if (SOMEONE_DIED(retval))
         { over = TRUE; break; }
@@ -3909,7 +3908,8 @@ void dam_message(int dam, CHAR_DATA * ch, CHAR_DATA * victim,
     "hit", "pound", "pierce", "slash", "whip", "claw",
       "bite", "sting", "crush"
   };
-  
+  extern struct race_shit race_info[];
+
   char buf1[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH], buf3[MAX_STRING_LENGTH];
   char *vs, *vp, *vx;
   char *attack;
@@ -4008,6 +4008,7 @@ void dam_message(int dam, CHAR_DATA * ch, CHAR_DATA * victim,
      log("Dam_message: bad w_type", ANGEL, LOG_BUG);
      w_type = 0;
    }
+
    punct = (dam <= 29) ? '.' : '!';
 
    if(IS_SET(modifier, COMBAT_MOD_FRENZY)) {
@@ -4049,23 +4050,25 @@ void dam_message(int dam, CHAR_DATA * ch, CHAR_DATA * victim,
      if (GET_CLASS(victim) == CLASS_MONK) {
        if (w_type == 0)
        {
-         sprintf(buf1, "$n's punch %s $N%s as it deflects off $S %s%c", vp, vx,  shield,punct);
-         sprintf(buf2, "You %s $N%s as $E raises $S %s to deflect your %s%c", vs, vx,shield, "punch", punct);
-         sprintf(buf3, "$n %s you%s as you deflect $s punch with your %s%c", vp, vx, shield, punct);
+         attack = race_info[GET_RACE(victim)].unarmed;
+         sprintf(buf1, "$n's %s %s $N%s as it deflects off $S %s%c", attack, vp, vx,  shield,punct);
+         sprintf(buf2, "You %s $N%s as $E raises $S %s to deflect your %s%c", vs, vx,shield, attack, punct);
+         sprintf(buf3, "$n %s you%s as you deflect $s %s with your %s%c", vp, vx, attack, shield, punct);
        }
        else
        {
          attack = attack_table[w_type];
          sprintf(buf1, "$n's %s %s $N%s as it deflects off $S %s%c", attack, vp, vx, shield,punct);
          sprintf(buf2, "You %s $N%s as $E raises $S %s to deflect your %s%c", vs, vx,shield, attack, punct);
-         sprintf(buf3, "$n %s you%s as you deflect $s punch with your %s%c", vp, vx, shield, punct); 
+         sprintf(buf3, "$n %s you%s as you deflect $s %s with your %s%c", vp, vx, attack, shield, punct); 
        }
      } else {
        if (w_type == 0)
        {
-         sprintf(buf1, "$n's %s %s $N%s as it strikes $S %s%c", "punch", vp, vx, shield, punct);
-         sprintf(buf2, "You %s $N%s as $E raises $S %s to deflect your %s%c", vs, vx,  shield, "punch",punct);
-         sprintf(buf3, "$n %s you%s as you deflect part of $s punch with your %s%c", vp, vx, shield, punct);
+         attack = race_info[GET_RACE(victim)].unarmed;
+         sprintf(buf1, "$n's %s %s $N%s as it strikes $S %s%c", attack, vp, vx, shield, punct);
+         sprintf(buf2, "You %s $N%s as $E raises $S %s to deflect your %s%c", vs, vx,  shield, attack,punct);
+         sprintf(buf3, "$n %s you%s as you deflect part of $s %s with your %s%c", vp, vx, attack, shield, punct);
        }
        else
        {
@@ -4079,9 +4082,10 @@ void dam_message(int dam, CHAR_DATA * ch, CHAR_DATA * victim,
    else {
      if (w_type == 0)
      {
-       sprintf(buf1, "$n's %spunch %s $N%s%s%c", modstring, vp, vx, endstring, punct);
-       sprintf(buf2, "Your %spunch %s $N%s%s%c", modstring, vp, vx, endstring, punct);
-       sprintf(buf3, "$n's %spunch %s you%s%s%c", modstring, vp, vx, endstring, punct);
+       attack = race_info[GET_RACE(victim)].unarmed;
+       sprintf(buf1, "$n's %s%s %s $N%s%s%c", modstring, attack, vp, vx, endstring, punct);
+       sprintf(buf2, "Your %s%s %s $N%s%s%c", modstring, attack, vp, vx, endstring, punct);
+       sprintf(buf3, "$n's %s%s %s you%s%s%c", modstring, attack, vp, vx, endstring, punct);
      }
      else
      {

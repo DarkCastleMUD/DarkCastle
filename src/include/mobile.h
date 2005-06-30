@@ -1,7 +1,7 @@
 #ifndef MOBILE_H_
 #define MOBILE_H_
 /************************************************************************
-| $Id: mobile.h,v 1.15 2005/06/14 22:13:45 shane Exp $
+| $Id: mobile.h,v 1.16 2005/06/30 01:18:24 shane Exp $
 | mobile.h
 | Description:  This file contains the header information for mobile
 |   control.
@@ -70,6 +70,7 @@ struct race_shit
   int  weight;      /* average weight of ths race    */
   int  height;      /* average height for ths race   */
   int affects;      /* automatically added affects   */
+  char *unarmed;    // unarmed attack message
 };
 
 int oprog_act_trigger( char *txt, CHAR_DATA *ch );
