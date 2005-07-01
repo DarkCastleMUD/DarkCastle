@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.43 2005/07/01 11:52:37 shane Exp $ */
+/* $Id: utility.cpp,v 1.44 2005/07/01 18:54:53 shane Exp $ */
 
 extern "C"
 {
@@ -898,6 +898,11 @@ int do_recall( CHAR_DATA *ch, char *argument, int cmd )
   int is_mob;
 
   act( "$n prays to $s God for transportation!", ch, 0, 0, TO_ROOM , INVIS_NULL);
+
+  if(IS_AFFECTED(ch, AFF_SOLIDITY)) {
+    send_to_char( "Something seems to prevent you from transfer.\n\r", ch);
+    return eFAILURE;
+  }
 
   if(!IS_NPC(ch))
   {
