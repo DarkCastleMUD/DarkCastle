@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.279 2005/07/01 10:51:25 urizen Exp $ */
+/* $Id: fight.cpp,v 1.280 2005/07/01 18:35:26 shane Exp $ */
 
 extern "C"
 {
@@ -4050,7 +4050,7 @@ void dam_message(int dam, CHAR_DATA * ch, CHAR_DATA * victim,
      if (GET_CLASS(victim) == CLASS_MONK) {
        if (w_type == 0)
        {
-         attack = race_info[GET_RACE(victim)].unarmed;
+         attack = race_info[GET_RACE(ch)].unarmed;
          sprintf(buf1, "$n's %s %s $N%s as it deflects off $S %s%c", attack, vp, vx,  shield,punct);
          sprintf(buf2, "You %s $N%s as $E raises $S %s to deflect your %s%c", vs, vx,shield, attack, punct);
          sprintf(buf3, "$n %s you%s as you deflect $s %s with your %s%c", vp, vx, attack, shield, punct);
@@ -4065,7 +4065,7 @@ void dam_message(int dam, CHAR_DATA * ch, CHAR_DATA * victim,
      } else {
        if (w_type == 0)
        {
-         attack = race_info[GET_RACE(victim)].unarmed;
+         attack = race_info[GET_RACE(ch)].unarmed;
          sprintf(buf1, "$n's %s %s $N%s as it strikes $S %s%c", attack, vp, vx, shield, punct);
          sprintf(buf2, "You %s $N%s as $E raises $S %s to deflect your %s%c", vs, vx,  shield, attack,punct);
          sprintf(buf3, "$n %s you%s as you deflect part of $s %s with your %s%c", vp, vx, attack, shield, punct);
@@ -4082,7 +4082,7 @@ void dam_message(int dam, CHAR_DATA * ch, CHAR_DATA * victim,
    else {
      if (w_type == 0)
      {
-       attack = race_info[GET_RACE(victim)].unarmed;
+       attack = race_info[GET_RACE(ch)].unarmed;
        sprintf(buf1, "$n's %s%s %s $N%s%s%c", modstring, attack, vp, vx, endstring, punct);
        sprintf(buf2, "Your %s%s %s $N%s%s%c", modstring, attack, vp, vx, endstring, punct);
        sprintf(buf3, "$n's %s%s %s you%s%s%c", modstring, attack, vp, vx, endstring, punct);
