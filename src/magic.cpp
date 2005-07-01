@@ -4826,10 +4826,10 @@ int spell_flamestrike(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
    if(skill > 70) {
       send_to_char("The fires $4burn$R into your soul tearing away at your being.\r\n", victim);
       act("Your fires $4burn$R into $N's soul, tearing away at $s being.\r\n",ch,0,victim,TO_CHAR, 0);
-         GET_MANA(victim) -= 80;
+         GET_MANA(victim) -= number(15,75);
       if(GET_MANA(victim) < 0)
          GET_MANA(victim) = 0;
-	 GET_KI(victim) -= 20;
+	 GET_KI(victim) -= number(1,15);
       if(GET_KI(victim) < 0)
 	 GET_KI(victim) = 0;
    }
