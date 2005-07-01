@@ -38,6 +38,8 @@ extern "C"
 #include <returnvals.h>
 extern CWorld world;
 extern index_data *mob_index;
+char_data *origsing = NULL;
+
  
 extern pulse_data *bard_list;
 extern CHAR_DATA *character_list;
@@ -283,10 +285,13 @@ int16 use_song(CHAR_DATA *ch, int kn)
 	return(song_info[kn].min_useski);
 }
 
-void stop_grouped_bards(CHAR_DATA *ch)
+
+void stop_grouped_bards(CHAR_DATA *ch, int action)
 {
    char_data * master = NULL;
    follow_type * fvictim = NULL;
+   if (action == 1)
+     origsing = ch;
 
    if(!(master = ch->master))
       master = ch;
@@ -302,6 +307,7 @@ void stop_grouped_bards(CHAR_DATA *ch)
    {
       do_sing(master, "stop", 9);
    }
+   origsing = NULL;
 }
 
 void get_instrument_bonus(char_data * ch, int & comb, int & non_comb)
@@ -578,17 +584,19 @@ int do_sing(CHAR_DATA *ch, char *arg, int cmd)
 
       if(ch->song_timer > 0) // I'm singing
       {
-        send_to_char("You stop singing ", ch);
-        send_to_char(songs[ch->song_number], ch);
-        send_to_char(".\r\n", ch);
+	if (!origsing) {
+         send_to_char("You stop singing ", ch);
+         send_to_char(songs[ch->song_number], ch);
+         send_to_char(".\r\n", ch);
+	}
         // If the song is a steady one, (like flight) than it needs to be
         // interrupted so we stop and remove the affects
         if((song_info[ch->song_number].intrp_pointer))
            ((*song_info[ch->song_number].intrp_pointer)(GET_LEVEL(ch),ch, NULL, NULL, learned));
-        if(spl != 2) // song 'stop'
+        if(spl != 2 && !origsing) // song 'stop'
            ch->song_timer = 0;
       }
-
+      if (origsing) return eSUCCESS;
 //     Song messages are done in the actual song.  There is no 'standard'
 //     entrance message since the songs aren't really alike anyway:)
 //      send_to_char("You begin to sing...\n\r", ch);
@@ -1236,6 +1244,7 @@ int execute_song_traveling_march( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DA
 
 int song_stop( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
+   if (origsing) return eFAILURE;
    if(!ch->song_timer)
    {
       send_to_char("Might wanna start the performance first...Hope this isn't indicative of your love life...\r\n", ch);
@@ -1246,7 +1255,7 @@ int song_stop( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int ski
 	      dc_free(ch->song_data);
       ch->song_data = 0;
    }
-
+ 
    send_to_char("You finish off your song with a flourish...\n\r", ch);
    act("$n finishes $s song in a flourish and a bow.", ch, 0, 0, TO_ROOM, 0);
    ch->song_timer = 0;
@@ -1627,6 +1636,7 @@ int intrp_flight_of_bee( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victi
 
    for(fvictim = master->followers; fvictim; fvictim = fvictim->next)
    {
+      if (origsing && origsing != fvictim->follower) continue;
       if(ISSET(fvictim->follower->affected_by, AFF_FLYING) &&
          !affected_by_spell(fvictim->follower, SPELL_FLY))
       {
@@ -1635,6 +1645,7 @@ int intrp_flight_of_bee( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victi
       }
    }
 
+  if (!origsing || origsing == master)
    if(ISSET(master->affected_by, AFF_FLYING) &&
       !affected_by_spell(master, SPELL_FLY))
    {
@@ -1904,6 +1915,7 @@ int intrp_jig_of_alacrity( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vic
 
    for(fvictim = master->followers; fvictim; fvictim = fvictim->next)
    {
+      if (origsing && origsing != fvictim->follower) continue;
       if(ISSET(fvictim->follower->affected_by, AFF_HASTE) &&
          !affected_by_spell(fvictim->follower, SPELL_HASTE))
       {
@@ -1912,6 +1924,7 @@ int intrp_jig_of_alacrity( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vic
       }
    }
 
+   if (!origsing || origsing == master)
    if(ISSET(master->affected_by, AFF_HASTE) &&
       !affected_by_spell(master, SPELL_HASTE))
    {
@@ -1931,6 +1944,7 @@ int intrp_song_fanatical_fanfare( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DA
    else master = ch;
    for(fvictim = master->followers; fvictim; fvictim = fvictim->next)
    {
+      if (origsing && origsing != fvictim->follower) continue;
       if(ISSET(fvictim->follower->affected_by, AFF_INSOMNIA) &&
          !affected_by_spell(fvictim->follower, SPELL_INSOMNIA))
       {
@@ -1939,6 +1953,7 @@ int intrp_song_fanatical_fanfare( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DA
       }
    }
 
+   if (!origsing || origsing == master)
    if(ISSET(master->affected_by, AFF_INSOMNIA) &&
       !affected_by_spell(master, SPELL_INSOMNIA))
    {
@@ -2300,12 +2315,14 @@ int intrp_vigilant_siren( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict
 
    for(fvictim = master->followers; fvictim; fvictim = fvictim->next)
    {
+      if (origsing && origsing != fvictim->follower) continue;
       if(ISSET(fvictim->follower->affected_by, AFF_ALERT)) {
          REMBIT(fvictim->follower->affected_by, AFF_ALERT);
          send_to_char("You stop watching your back so closely.\r\n", fvictim->follower);
       }
    }
 
+   if (!origsing || origsing == ch)
    if(ISSET(master->affected_by, AFF_ALERT)) {
       REMBIT(master->affected_by, AFF_ALERT);
       send_to_char("You stop watching your back so closely.\r\n", master);

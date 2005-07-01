@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.278 2005/06/30 01:18:00 shane Exp $ */
+/* $Id: fight.cpp,v 1.279 2005/07/01 10:51:25 urizen Exp $ */
 
 extern "C"
 {
@@ -2197,7 +2197,7 @@ void fight_kill(CHAR_DATA *ch, CHAR_DATA *vict, int type, int spec_type)
      if(ich->fighting == vict)
         stop_fighting(ich);
   }
-  if (vict->master || vict->followers) stop_grouped_bards(vict);
+  if (vict->master || vict->followers) stop_grouped_bards(vict,1);
   
   switch(type)
   {
@@ -3438,7 +3438,7 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
   
   if (victim->followers || victim->master)
   {
-     stop_grouped_bards(victim);
+     stop_grouped_bards(victim,1);
   }
 
 

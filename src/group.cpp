@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: group.cpp,v 1.17 2005/06/17 20:13:44 urizen Exp $
+| $Id: group.cpp,v 1.18 2005/07/01 10:51:25 urizen Exp $
 | group.C
 | Description:  Group related commands; join, abandon, follow, etc..
 */
@@ -59,7 +59,7 @@ int do_abandon(CHAR_DATA *ch, char *argument, int cmd)
       return eFAILURE;
   }
 
-  stop_grouped_bards(ch);
+  stop_grouped_bards(ch,1);
 
   k = ch->master;
    
@@ -348,7 +348,7 @@ int do_group(struct char_data *ch, char *argument, int cmd)
       }
 //      if((abs(GET_LEVEL(ch) - GET_LEVEL(victim)) ) <= 99) {
         if (IS_AFFECTED(victim, AFF_GROUP)) {
-                stop_grouped_bards(ch);
+                stop_grouped_bards(victim, 1);
 		act("$n has been kicked out of the group!", victim, 0, ch, TO_ROOM, 0);
 		act("You are no longer a member of the group!", victim, 0, 0, TO_CHAR, ASLEEP);
 		REMBIT(victim->affected_by, AFF_GROUP);
@@ -491,7 +491,6 @@ int do_disband(CHAR_DATA *ch, char *argument, int cmd)
   }
 
   if(isname(name, "all")) {
-    stop_grouped_bards(ch);
     k = ch;
     sprintf(buf, "You disband your group: %s", k->group_name);
     act(buf, k, 0, 0, TO_CHAR, 0);
@@ -508,8 +507,10 @@ int do_disband(CHAR_DATA *ch, char *argument, int cmd)
 
     for(f = k->followers; f; f = next_f) { 
        next_f = f->next;
-       if (!IS_NPC(f->follower)) 
+       if (!IS_NPC(f->follower)) {
+	    stop_grouped_bards(f->follower,1);
           stop_follower(f->follower, STOP_FOLLOW);
+	}
        }
 
     REMBIT(k->affected_by, AFF_GROUP);
@@ -538,7 +539,7 @@ int do_disband(CHAR_DATA *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  stop_grouped_bards(ch);
+  stop_grouped_bards(adios,1);
   if(!IS_MOB(adios)) {
     adios->pcdata->grplvl      = 0;
     adios->pcdata->group_kills = 0;

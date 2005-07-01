@@ -2090,6 +2090,11 @@ int close_socket(struct descriptor_data *d)
     strcat(idiotbuf, "\0");
     string_hash_add(d, idiotbuf);
   }
+  if(d->strnew) {
+    strcpy(idiotbuf, "/s\n\r");
+    strcat(idiotbuf, "\0");
+    new_string_add(d, idiotbuf);
+  }
   if (d->character) {
     // target_idnum = GET_IDNUM(d->character);
     if (d->connected == CON_PLAYING) {

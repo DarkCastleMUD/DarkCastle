@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: modify.cpp,v 1.14 2005/04/09 21:15:27 urizen Exp $ */
+/* $Id: modify.cpp,v 1.15 2005/07/01 10:51:25 urizen Exp $ */
 
 extern "C"
 {
@@ -64,7 +64,7 @@ char *string_fields[] =
 // maximum length for text field x+1 
 int length[] =
 {
-    15,
+    40,
     60,
     256,
     240,
