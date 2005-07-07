@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.98 2005/06/26 20:06:45 urizen Exp $ */
+/* $Id: db.cpp,v 1.99 2005/07/07 20:14:20 shane Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -3904,7 +3904,8 @@ void reset_zone(int zone)
             last_obj = 0;
             break;
         }
-        if((ZCMD.arg2 == -1 || obj_index[ZCMD.arg1].number < ZCMD.arg2 || !number(0,5))
+        if((ZCMD.arg2 == -1 || obj_index[ZCMD.arg1].number < ZCMD.arg2 
+|| number(0,1))
             && (obj =  clone_object(ZCMD.arg1))) 
         { 
           obj_to_char(obj, mob);
@@ -3921,7 +3922,7 @@ void reset_zone(int zone)
         case '%': /* percent chance of next command happening */
 	z = ZCMD.arg1 / ZCMD.arg2;
 	if (z > 0.2 || mud_is_booting) i = ZCMD.arg1;
-	else i = (int)((float)ZCMD.arg1 * 1.5);
+	else i = (int)((float)ZCMD.arg1 * 2);
 
         if( number(0, ZCMD.arg2) <= i )
         {

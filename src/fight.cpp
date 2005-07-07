@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.280 2005/07/01 18:35:26 shane Exp $ */
+/* $Id: fight.cpp,v 1.281 2005/07/07 20:14:20 shane Exp $ */
 
 extern "C"
 {
@@ -1968,7 +1968,7 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
    attacktype == SKILL_ICE_ARROW || attacktype == SKILL_TEMPEST_ARROW ||
    attacktype == SKILL_GRANITE_ARROW)) // Wimpy
       return eSUCCESS;   
-  if(typeofdamage == DAMAGE_TYPE_PHYSICAL && dam > 0 && ch != victim)
+  if(typeofdamage == DAMAGE_TYPE_PHYSICAL && dam > 0 && ch != victim && attacktype != SKILL_ARCHERY)
   {
     retval = do_fireshield(ch, victim, dam);
     if(SOMEONE_DIED(retval))
