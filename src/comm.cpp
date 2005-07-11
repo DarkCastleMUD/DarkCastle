@@ -1,4 +1,5 @@
-/* ************************************************************************
+/* 
+************************************************************************
 *   File: comm.c                                        Part of CircleMUD *
 *  Usage: Communication, socket handling, main(), central game loop       *
 *                                                                         *
@@ -95,8 +96,8 @@ extern int restrict;
 //extern int mini_mud;
 //extern int no_rent_check;
 extern FILE *player_fl;
-int DFLT_PORT = 23, DFLT_PORT2 = 6666, DFLT_PORT3 = 80;
-int DFLT_PORT4 = 4000;
+int DFLT_PORT = 6667, DFLT_PORT2 = 6666, DFLT_PORT3 =4000;
+int DFLT_PORT4 =6669;
 
 extern CWorld world;	/* In db.c */
 extern int top_of_world;	/* In db.c */

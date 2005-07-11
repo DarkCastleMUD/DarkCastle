@@ -1550,7 +1550,7 @@ TO_CHAR,0);
 act("$N resists $n's insane chant!", ch, NULL, victim, TO_ROOM,
 NOTVICT);
 act("You resist $n's insane chant!",ch,NULL,victim,TO_VICT,0);
-     return eFAILURE;
+     continue;
    }
 
      affect_to_char(victim, &af);
