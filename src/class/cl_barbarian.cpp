@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_barbarian.cpp,v 1.54 2005/06/06 20:21:16 urizen Exp $
+| $Id: cl_barbarian.cpp,v 1.55 2005/07/11 03:21:58 shane Exp $
 | cl_barbarian.C
 | Description:  Commands for the barbarian class.
 */
@@ -479,7 +479,7 @@ int do_bullrush(struct char_data *ch, char *argument, int cmd)
   for(int i = 0; i < 6; i++) {
     if(!str_prefix(direction,dirs[i]))
     {
-      dir = i;
+      dir = i + 1;
       break;
     }
   }
@@ -500,7 +500,7 @@ int do_bullrush(struct char_data *ch, char *argument, int cmd)
     return retval;
   if (!(victim = get_char_room_vis(ch,who)))
   {
-     send_to_char("You charge in, but is left confused by the complete lack of such a target!\r\n",ch);
+     send_to_char("You charge in, but are left confused by the complete lack of such a target!\r\n",ch);
      WAIT_STATE(ch,PULSE_VIOLENCE/2);
      return eFAILURE;
   }
@@ -648,7 +648,7 @@ int do_knockback(struct char_data *ch, char *argument, int cmd)
       for(int i = 0; i < 6; i++) {
         if(!str_prefix(where,dirs[i]))
         {
-          dir = i;
+          dir = i + 1;
           break;
         }
       }
@@ -657,7 +657,7 @@ int do_knockback(struct char_data *ch, char *argument, int cmd)
   }
 
   if(!dir)
-    dir = number(0,5);
+    dir = number(1,6);
   dampercent = 0;
   if(ch->height > 102) dampercent += 15;
   else if(ch->height > 42) dampercent += 7;
@@ -704,7 +704,7 @@ int do_knockback(struct char_data *ch, char *argument, int cmd)
           if(ch->fighting == victim)
              stop_fighting(ch);
        }
-       move_char(victim, (world[(ch)->in_room].dir_option[dir])->to_room);
+       attempt_move(victim, dir);
     }
     WAIT_STATE(ch, PULSE_VIOLENCE);
     return eSUCCESS;
