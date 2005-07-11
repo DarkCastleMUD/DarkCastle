@@ -546,7 +546,7 @@ int spell_armor(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *
   struct affected_type af;
   if(affected_by_spell(victim, SPELL_ARMOR))
     affect_from_char(victim, SPELL_ARMOR);
-  if(affected_by_spell(victim, SPELL_AEGIS))
+  if(affected_by_spell(victim, SPELL_AEGIS) || affected_by_spell(victim, SPELL_U_AEGIS))
   {
     act("$n is already protected by magical armour.",victim, 0, ch, TO_VICT, 0);
     return eFAILURE;
