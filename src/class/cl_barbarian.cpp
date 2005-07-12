@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_barbarian.cpp,v 1.55 2005/07/11 03:21:58 shane Exp $
+| $Id: cl_barbarian.cpp,v 1.56 2005/07/12 19:55:15 shane Exp $
 | cl_barbarian.C
 | Description:  Commands for the barbarian class.
 */
@@ -387,7 +387,7 @@ int do_bloodfury(struct char_data *ch, char *argument, int cmd)
     GET_HIT(ch) += (int)((float)GET_MAX_HIT(ch) * modifier);
     if(GET_HIT(ch) > GET_MAX_HIT(ch))
       GET_HIT(ch) = GET_MAX_HIT(ch);
-    duration = 42 - (GET_LEVEL(ch) / 4);
+    duration = 36 - (GET_LEVEL(ch) / 4);
   }
 
   af.type      = SKILL_BLOOD_FURY;

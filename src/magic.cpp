@@ -5174,7 +5174,7 @@ int spell_acid_blast(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
    int dam;
 
    set_cantquit (ch, victim);
-   dam = 400;
+   dam = 375;
    return damage(ch, victim, dam,TYPE_ACID, SPELL_ACID_BLAST, 0);
 }
 
