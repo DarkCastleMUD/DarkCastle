@@ -1310,7 +1310,7 @@ int do_mpbestow(CHAR_DATA *ch, char *argument, int cmd)
 		return eFAILURE;
         }
 	af.duration = i;
-	af.bitvector = (!a ? -1 : a);
+	af.bitvector = a+1;
 	af.location = 0;
 	af.modifier = 987; // Notifies that it's timered. 
 	affect_join(victim, &af, TRUE, FALSE);

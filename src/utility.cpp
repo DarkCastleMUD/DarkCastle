@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.44 2005/07/01 18:54:53 shane Exp $ */
+/* $Id: utility.cpp,v 1.45 2005/07/16 10:49:16 dcastle Exp $ */
 
 extern "C"
 {
@@ -899,11 +899,6 @@ int do_recall( CHAR_DATA *ch, char *argument, int cmd )
 
   act( "$n prays to $s God for transportation!", ch, 0, 0, TO_ROOM , INVIS_NULL);
 
-  if(IS_AFFECTED(ch, AFF_SOLIDITY)) {
-    send_to_char( "Something seems to prevent you from transfer.\n\r", ch);
-    return eFAILURE;
-  }
-
   if(!IS_NPC(ch))
   {
     x = GET_WIS(ch);
@@ -998,7 +993,7 @@ int do_recall( CHAR_DATA *ch, char *argument, int cmd )
     }
     GET_GOLD(ch) -= cost;
   }
-   if (IS_AFFECTED(victim, AFF_CURSE))
+   if (IS_AFFECTED(victim, AFF_CURSE) || IS_AFFECTED(victim, AFF_SOLIDITY))
    {
 	send_to_char("Something blocks it.\r\n",ch);
 	return eFAILURE;

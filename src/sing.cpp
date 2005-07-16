@@ -2219,12 +2219,10 @@ int execute_song_sticky_lullaby( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DAT
    ch->song_data = 0;
    if (number(1,101) < get_saves(victim, SAVE_TYPE_POISON))
    {
-act("$N resists your sticky lullaby!", ch, NULL, victim, 
-TO_CHAR,0);
-act("$N resists $n's sticky lullaby!", ch, NULL, victim, TO_ROOM,
-NOTVICT);
-act("You resist $n's sticky lullaby!",ch,NULL,victim,TO_VICT,0);
-     return eFAILURE;
+      act("$N resists your sticky lullaby!", ch, NULL, victim, TO_CHAR,0);
+      act("$N resists $n's sticky lullaby!", ch, NULL, victim, TO_ROOM,NOTVICT);
+      act("You resist $n's sticky lullaby!",ch,NULL,victim,TO_VICT,0);
+      return eFAILURE;
    }
 
    act("$n lulls $N's feet into a numbing sleep.", ch, 0, victim, TO_ROOM, NOTVICT);

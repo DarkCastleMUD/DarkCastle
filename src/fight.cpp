@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.281 2005/07/07 20:14:20 shane Exp $ */
+/* $Id: fight.cpp,v 1.282 2005/07/16 10:49:15 dcastle Exp $ */
 
 extern "C"
 {
@@ -994,7 +994,7 @@ int get_monk_bare_damage(char_data * ch) {
     else if(GET_LEVEL(ch) < 50)
       dam = dice(4, 5);
     else if(GET_LEVEL(ch) < 51)
-      dam = dice(5, 4);
+      dam = dice(5, 5);
     else if(GET_LEVEL(ch) < IMMORTAL)
       dam = dice(10, 6);
     else if(GET_LEVEL(ch) < IMP)

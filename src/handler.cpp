@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.91 2005/06/25 18:58:45 shane Exp $ */
+/* $Id: handler.cpp,v 1.92 2005/07/16 10:49:15 dcastle Exp $ */
     
 extern "C"
 {
@@ -1306,6 +1306,22 @@ void affect_remove( CHAR_DATA *ch, struct affected_type *af, int flags)
                add_memory(ch, GET_NAME(ch->master), 'h');
             stop_follower(ch, BROKE_CHARM);
          }
+         break;
+      case SKILL_TACTICS:
+         if (!(flags & SUPPRESS_MESSAGES))
+            send_to_char("You forget your instruction in tactical fighting.\r\n", ch);
+         break;
+      case SKILL_DECEIT:
+         if (!(flags & SUPPRESS_MESSAGES))
+            send_to_char("Your deceitful practices have stopped helping you.\r\n", ch);
+         break;
+      case SKILL_FEROCITY:
+         if (!(flags & SUPPRESS_MESSAGES))
+            send_to_char("The ferocity within your mind has dwindled.\r\n", ch);
+         break;
+      case KI_AGILITY+KI_OFFSET:
+         if (!(flags & SUPPRESS_MESSAGES))
+            send_to_char("Your body has lost its focused agility.\r\n", ch);
          break;
       default:
          break;
