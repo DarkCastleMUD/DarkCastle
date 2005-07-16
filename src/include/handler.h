@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.h,v 1.14 2005/06/25 18:58:56 shane Exp $ */
+/* $Id: handler.h,v 1.15 2005/07/16 10:46:53 shane Exp $ */
 
 #ifndef HANDLER_H_
 #define HANDLER_H_
@@ -93,6 +93,8 @@ CHAR_DATA *get_active_pc_vis(CHAR_DATA *ch, char *name);
 CHAR_DATA *get_active_pc(char *name);
 CHAR_DATA *get_char_room_vis(CHAR_DATA *ch, char *name);
 CHAR_DATA *get_char_vis(CHAR_DATA *ch, char *name);
+CHAR_DATA *get_pc_vis(CHAR_DATA *ch, char *name);
+CHAR_DATA *get_pc_vis_exact(CHAR_DATA *ch, char *name);
 CHAR_DATA *get_mob_vis(CHAR_DATA *ch, char *name);
 CHAR_DATA *get_mob_vnum(int vnum);
 OBJ_DATA *get_obj_vnum(int vnum);
