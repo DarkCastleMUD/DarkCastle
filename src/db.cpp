@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.99 2005/07/07 20:14:20 shane Exp $ */
+/* $Id: db.cpp,v 1.100 2005/07/16 10:46:42 shane Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -3131,6 +3131,7 @@ CHAR_DATA *clone_mobile(int nr)
   mob->mobdata->damnodice *= mult;
   mob->mobdata->damsizedice *= mult;
   mob->damroll *= mult;
+  mob->hometown = old->in_room;
   return (mob);
 }
 

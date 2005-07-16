@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.38 2005/06/25 18:58:45 shane Exp $ */
+/* $Id: clan.cpp,v 1.39 2005/07/16 10:46:42 shane Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -851,7 +851,9 @@ int do_outcast(CHAR_DATA *ch, char *arg, int cmd)
 {
   CHAR_DATA *victim;
   struct clan_data *clan;
-  char buf[MAX_STRING_LENGTH];
+  struct descriptor_data d;
+  char buf[MAX_STRING_LENGTH], tmp_buf[MAX_STRING_LENGTH];
+  bool connected = TRUE;
 
   while(isspace(*arg))
     arg++;
@@ -868,9 +870,27 @@ int do_outcast(CHAR_DATA *ch, char *arg, int cmd)
 
   one_argument(arg, buf);
 
-  if(!(victim = get_char_room_vis(ch, buf))) {
-    send_to_char("You can't cast someone out of your clan who isn't here!\n\r", ch);
-    return eFAILURE;
+  if(!(victim = get_pc_vis_exact(ch, buf))) {
+    buf[0] = UPPER(buf[0]);
+
+    // must be done to clear out "d" before it is used
+    memset((char *) &d, 0, sizeof(struct descriptor_data));
+
+    if(!(load_char_obj(&d, buf))) {
+      
+      sprintf(tmp_buf, "../archive/%s.gz", buf);
+      if(file_exists(tmp_buf))
+         send_to_char("Character is archived.\r\n", ch);
+      else send_to_char("Unable to outcast, type the entire name.\n\r", ch);
+      return eFAILURE; 
+    }
+
+    victim = d.character;
+    victim->desc = 0;
+
+    victim->hometown = 3001;
+    victim->in_room = 3001;
+    connected = FALSE;    
   }
 
   if(!victim->clan) {
@@ -915,6 +935,10 @@ int do_outcast(CHAR_DATA *ch, char *arg, int cmd)
 
   sprintf(buf, "%s was outcasted from clan [%s].", GET_NAME(victim), clan->name);
   log(buf, 110, LOG_CLAN);
+
+  do_save(victim,"",666);
+  if(!connected) free_char(victim);
+
   return eSUCCESS;
 }
 
