@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.111 2005/07/12 19:55:15 shane Exp $
+| $Id: cl_thief.cpp,v 1.112 2005/07/16 10:49:32 dcastle Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -632,10 +632,10 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
 	send_to_char("You are not experienced within that field.\r\n",ch);
 	return eFAILURE;
   }
-  if (affected_by_spell(ch, FUCK_PTHIEF)) {
-     send_to_char("You're too busy watching your back to steal anything right now!\r\n",ch);
-     return eFAILURE;
-  }
+//  if (affected_by_spell(ch, FUCK_PTHIEF)) {
+//     send_to_char("You're too busy watching your back to steal anything right now!\r\n",ch);
+//     return eFAILURE;
+//  }
   pthiefaf.type = FUCK_PTHIEF;
   pthiefaf.duration = 10;
   pthiefaf.modifier = 0;
@@ -760,15 +760,15 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
           {
             do_save(victim, "", 666);
             do_save(ch, "", 666);
-/*            if(!AWAKE(victim))
+            if(!AWAKE(victim))
             {
-              if(number(1, 3) == 1)
+//              if(number(1, 3) == 1)
                 send_to_char("You dream of someone stealing your equipment...\r\n", victim);
 
               // if i'm not a thief, or if I fail dex-roll wake up victim
-              if(GET_CLASS(ch) != CLASS_THIEF || number(1, 100) > GET_DEX(ch))
-              {
-                send_to_char("Oops...\r\n", ch);
+//              if(GET_CLASS(ch) != CLASS_THIEF || number(1, 100) > GET_DEX(ch))
+//              {
+//                send_to_char("Oops...\r\n", ch);
               if((paf = affected_by_spell(victim, SPELL_SLEEP))&& paf->modifier == 1)
               {
                 paf->modifier = 0; // make sleep no longer work
@@ -778,9 +778,9 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
                 paf->modifier = 0; // make sleep no longer work
               }
                 do_wake(ch, GET_NAME(victim), 9);
-              }
+//              }
             }
-*/
+
             // if victim isn't a pthief
 //            if(!affected_by_spell(victim, FUCK_PTHIEF) ) 
             {
@@ -931,13 +931,13 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
       {
         paf->modifier = 0; // make sleep no longer work
       }
-              if((paf = affected_by_spell(victim, SKILL_BLACKJACK))&& paf->modifier == 1)
-              {
-                paf->modifier = 0; // make sleep no longer work
-              }
+      if((paf = affected_by_spell(victim, SKILL_BLACKJACK))&& paf->modifier == 1)
+      {
+         paf->modifier = 0; // make sleep no longer work
+      }
 
       do_wake(ch, GET_NAME(victim), 9);
-      act("$n tried to steal something from you, waking you up in the prrocess.!", ch, 0, victim, TO_VICT, 0);
+      act("$n tried to steal something from you, waking you up in the process.!", ch, 0, victim, TO_VICT, 0);
       act("$n fails stealing something from $N, waking $N up in the process.", ch, 0, victim, TO_ROOM, INVIS_NULL|NOTVICT);
     } 
     else if (!number(1,4))
@@ -949,7 +949,15 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
         act("You awake to find $n removing some of your equipment.",ch,obj,victim,TO_VICT, 0);
 	do_save(victim,"",666);
 	set_cantquit(ch,victim);
-
+        if((paf = affected_by_spell(victim, SPELL_SLEEP))&& paf->modifier == 1)
+        {
+           paf->modifier = 0; // make sleep no longer work
+        }
+        if((paf = affected_by_spell(victim, SKILL_BLACKJACK))&& paf->modifier == 1)
+        {
+           paf->modifier = 0; // make sleep no longer work
+        }
+        do_wake(ch, GET_NAME(victim), 9);
     }
     else 
     {
@@ -973,16 +981,24 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
           do_save(ch, "", 666);
           if(!AWAKE(victim))
           {
-/*            if(number(1, 3) == 1)
-              send_to_char("You dream of someone stealing your equipment...\r\n", victim);
+//            if(number(1, 3) == 1)
+             send_to_char("You dream of someone stealing your equipment...\r\n", victim);
 
             // if i'm not a thief, or if I fail dex-roll wake up victim
-            if(number(1,101) > wakey)
-            {
-              send_to_char("Oops, that was clumsy...\r\n", ch);
-              do_wake(ch, GET_NAME(victim), 9);
-            }
-*/
+//            if(number(1,101) > wakey)
+//            {
+//              send_to_char("Oops, that was clumsy...\r\n", ch);
+             if((paf = affected_by_spell(victim, SPELL_SLEEP))&& paf->modifier == 1)
+             {
+                paf->modifier = 0; // make sleep no longer work
+             }
+             if((paf = affected_by_spell(victim, SKILL_BLACKJACK))&& paf->modifier == 1)
+             {
+                paf->modifier = 0; // make sleep no longer work
+             }
+             do_wake(ch, GET_NAME(victim), 9);
+//            }
+
           }
 
           // You don't get a thief flag from stealing from a pthief
@@ -1677,6 +1693,10 @@ int do_blackjack(struct char_data *ch, char *argument, int cmd)
   if (!has_skill(ch, SKILL_BLACKJACK))
   {
     send_to_char("You wouldn't know how.\r\n",ch);
+    return eFAILURE;
+  }
+  else {
+    send_to_char("Some magical, godlike force prevents you from completing your attempt.\r\n",ch);
     return eFAILURE;
   }
 
