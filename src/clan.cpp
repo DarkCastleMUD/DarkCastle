@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.39 2005/07/16 10:46:42 shane Exp $ */
+/* $Id: clan.cpp,v 1.40 2005/07/17 11:29:15 shane Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -870,8 +870,8 @@ int do_outcast(CHAR_DATA *ch, char *arg, int cmd)
 
   one_argument(arg, buf);
 
+  buf[0] = UPPER(buf[0]);
   if(!(victim = get_pc_vis_exact(ch, buf))) {
-    buf[0] = UPPER(buf[0]);
 
     // must be done to clear out "d" before it is used
     memset((char *) &d, 0, sizeof(struct descriptor_data));
