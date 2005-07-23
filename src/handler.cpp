@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.92 2005/07/16 10:49:15 dcastle Exp $ */
+/* $Id: handler.cpp,v 1.93 2005/07/23 01:21:20 shane Exp $ */
     
 extern "C"
 {
@@ -1625,6 +1625,10 @@ int equip_char(CHAR_DATA *ch, struct obj_data *obj, int pos, int flag)
 	    act("$n is zapped by $p and instantly drops it.", ch, obj, 0, TO_ROOM, 0);
 	    recheck_height_wears(ch);
 	    obj_to_room(obj, ch->in_room);
+            if(!ch->equipment[WIELD] && ch->equipment[SECOND_WIELD]) {
+              obj_from_char(obj);
+              equip_char(ch, obj, WIELD);
+            }
 	    return 1;
 	} else {
 	    log("ch->in_room = NOWHERE when equipping char.", 0, LOG_BUG);
