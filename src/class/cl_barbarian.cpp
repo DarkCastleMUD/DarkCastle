@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_barbarian.cpp,v 1.56 2005/07/12 19:55:15 shane Exp $
+| $Id: cl_barbarian.cpp,v 1.57 2005/07/23 01:20:29 dcastle Exp $
 | cl_barbarian.C
 | Description:  Commands for the barbarian class.
 */
@@ -658,6 +658,7 @@ int do_knockback(struct char_data *ch, char *argument, int cmd)
 
   if(!dir)
     dir = number(1,6);
+  dir--;
   dampercent = 0;
   if(ch->height > 102) dampercent += 15;
   else if(ch->height > 42) dampercent += 7;
@@ -667,7 +668,7 @@ int do_knockback(struct char_data *ch, char *argument, int cmd)
   dam = (int)(dam * (1.0 + dampercent / 100.0));
 
   if(!skill_success(ch, victim, SKILL_KNOCKBACK, 0-(learned/4 * 3))) {
-    act("You lunge forward in an attempt to smash $N but fall, missing $S completely.", ch, 0, victim, TO_CHAR, 0);
+    act("You lunge forward in an attempt to smash $N but fall, missing $M completely.", ch, 0, victim, TO_CHAR, 0);
     act("$n lunges forward in an attempt to smash into you but falls flat on $s face, missing completely.", ch, 0, victim, TO_VICT, 0);
     act("$n lunges forward in an attempt to smash into $N but falls flat on $s face.", ch, 0, victim, TO_ROOM, NOTVICT);
     GET_POS(ch) = POSITION_SITTING;
@@ -701,10 +702,11 @@ int do_knockback(struct char_data *ch, char *argument, int cmd)
              add_memory(victim, GET_NAME(ch), 'h');
              remove_memory(victim, 'f');
           }
+          stop_fighting(victim);
           if(ch->fighting == victim)
              stop_fighting(ch);
        }
-       attempt_move(victim, dir);
+       move_char(victim, (world[(ch)->in_room].dir_option[dir])->to_room);
     }
     WAIT_STATE(ch, PULSE_VIOLENCE);
     return eSUCCESS;

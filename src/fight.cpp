@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.283 2005/07/16 11:01:31 dcastle Exp $ */
+/* $Id: fight.cpp,v 1.284 2005/07/23 01:20:25 dcastle Exp $ */
 
 extern "C"
 {
@@ -1833,7 +1833,7 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
 
   } // can_miss
   struct affected_type * pspell = NULL;
-  if(GET_LEVEL(victim) < IMMORTAL && dam > 0 && typeofdamage == DAMAGE_TYPE_PHYSICAL
+  if(GET_LEVEL(victim) < IMMORTAL && dam > 0 && typeofdamage == DAMAGE_TYPE_PHYSICAL &&
      (
       (pspell = affected_by_spell(victim, SPELL_STONE_SHIELD)) ||
       (pspell = affected_by_spell(victim, SPELL_GREATER_STONE_SHIELD))
