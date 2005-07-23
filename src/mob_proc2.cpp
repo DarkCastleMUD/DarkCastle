@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.52 2005/06/25 18:58:45 shane Exp $ */
+/* $Id: mob_proc2.cpp,v 1.53 2005/07/23 23:45:01 shane Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -1389,37 +1389,55 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     else
     csendf(ch, "6) Add to your hit points:   You cannot do this.\r\n");
 
+    if (hit_exp && hit_cost) 
+    csendf(ch, "7) Add 1 point to your hit points:   %d experience points and %d"
+            " Platinum coins.\n\r", (int)(hit_exp/5*1.1), (int)(hit_cost/5*1.1)); 
+    else
+    csendf(ch, "7) Add to your hit points:   You cannot do this.\r\n");
+
     if (mana_exp && mana_cost)
-    csendf(ch, "7) Add 5 points to your mana points:  %d experience points and %d"
+    csendf(ch, "8) Add 5 points to your mana points:  %d experience points and %d"
             " Platinum coins.\n\r", mana_exp, mana_cost);
     else
-    csendf(ch, "7) Add to your mana points:  You cannot do this.\r\n");
+    csendf(ch, "8) Add to your mana points:  You cannot do this.\r\n");
+
+    if (mana_exp && mana_cost) 
+    csendf(ch, "9) Add 1 point to your mana points:   %d experience points and %d"
+            " Platinum coins.\n\r", (int)(mana_exp/5*1.1), (int)(mana_cost/5*1.1)); 
+    else
+    csendf(ch, "9) Add to your mana points:   You cannot do this.\r\n");
 
     if (move_exp && move_cost)
-    csendf(ch, "8) Add 5 points to your movement points: %d experience points and %d"
+    csendf(ch, "10) Add 5 points to your movement points: %d experience points and %d"
             " Platinum coins.\n\r", move_exp, move_cost);
     else
-    csendf(ch, "8) Add to your movement points:  You cannot do this.\r\n");
+    csendf(ch, "10) Add to your movement points:  You cannot do this.\r\n");
+
+    if (move_exp && move_cost) 
+    csendf(ch, "11) Add 1 points to your movement points:   %d experience points and %d"
+            " Platinum coins.\n\r", (int)(move_exp/5*1.1), (int)(hit_cost/5*1.1)); 
+    else
+    csendf(ch, "11) Add to your movement points:   You cannot do this.\r\n");
 
     if(!IS_MOB(ch) && ki_cost && ki_exp) {   // mobs can't meta ki
       if(GET_KI_METAS(ch) > 4)
-        send_to_char("9) Your ki is already meta'd fully.\n\r", ch);
-      else csendf(ch, "9) Add a point of ki:        %d experience points and %d Platinum.\n\r", ki_exp, ki_cost);
+        send_to_char("12) Your ki is already meta'd fully.\n\r", ch);
+      else csendf(ch, "12) Add a point of ki:        %d experience points and %d Platinum.\n\r", ki_exp, ki_cost);
     }
     else if (!IS_MOB(ch))
-    csendf(ch, "9) Add a point of ki:        You cannot do this.\r\n");
+    csendf(ch, "12) Add a point of ki:        You cannot do this.\r\n");
 
     send_to_char(
-    "10) One (1) Platinum coin     Cost: 20,000 Gold Coins.\n\r"
-    "11) Five (5) Platinum coins   Cost: 100,000 Gold Coins.\n\r"
-    "12) 250 Platinum coins        Cost: 5,000,000 Gold Coins.\n\r"
-    "13) 90,000 Gold Coins         Cost: Five (5) Platinum coins.\n\r"
-    "14) 4,500,000 Gold Coins      Cost: 250 Platinum coins.\n\r"
-    "15) Convert experience to gold. (100mil Exp. = 500000 Gold.)\n\r"
-    "16) A deep blue potion of healing. Cost: 25 Platinum coins.\r\n"
-    "17) A deep red vial of mana. Cost: 50 Platinum coins.\r\n"
-    "18) Buy a practice session for 25 plats.\n\r"
-    "19) Freedom from HUNGER and THIRST:  Currently out of stock.\n\r"
+    "13) One (1) Platinum coin     Cost: 20,000 Gold Coins.\n\r"
+    "14) Five (5) Platinum coins   Cost: 100,000 Gold Coins.\n\r"
+    "15) 250 Platinum coins        Cost: 5,000,000 Gold Coins.\n\r"
+    "16) 90,000 Gold Coins         Cost: Five (5) Platinum coins.\n\r"
+    "17) 4,500,000 Gold Coins      Cost: 250 Platinum coins.\n\r"
+    "18) Convert experience to gold. (100mil Exp. = 500000 Gold.)\n\r"
+    "19) A deep blue potion of healing. Cost: 25 Platinum coins.\r\n"
+    "20) A deep red vial of mana. Cost: 50 Platinum coins.\r\n"
+    "21) Buy a practice session for 25 plats.\n\r"
+    "22) Freedom from HUNGER and THIRST:  Currently out of stock.\n\r"
                  , ch);
 
     return eSUCCESS;
@@ -1523,7 +1541,32 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
      return eSUCCESS;
    }
 
-   if(choice == 7 && mana_exp && mana_cost) {
+   if(choice == 7 && hit_exp && hit_cost) {
+     hit_exp /= 5;
+     hit_exp *= 1.1;
+     hit_cost /= 5;
+     hit_cost *= 1.1;
+     if(GET_EXP(ch) < hit_exp) {
+       send_to_char("The Meta-physician tells you, 'You lack the experience.'\n\r", ch);
+       return eSUCCESS;
+     }
+     if(GET_PLATINUM(ch) < (uint32)hit_cost) {
+       send_to_char("The Meta-physician tells you, 'You can't afford my services!  SCRAM!'\n\r", ch);
+       return eSUCCESS;
+     }
+     GET_EXP(ch) -= hit_exp;
+     GET_PLATINUM(ch) -= hit_cost;
+
+     increase = 1;
+     ch->raw_hit += increase;
+     GET_HP_METAS(ch) += 1;
+     act("The Meta-physician touches $n.",  ch, 0, 0, TO_ROOM, 0);
+     act("The Meta-physician touches you.",  ch, 0, 0, TO_CHAR, 0);
+     redo_hitpoints(ch);
+     return eSUCCESS;
+   }
+
+   if(choice == 8 && mana_exp && mana_cost) {
 
      if(GET_EXP(ch) < mana_exp) {
        send_to_char("The Meta-physician tells you, 'You lack the experience.'\n\r", ch);
@@ -1546,7 +1589,34 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
      return eSUCCESS;
    }
 
-   if(choice == 8 && move_exp && move_cost) 
+   if(choice == 9 && mana_exp && mana_cost) {
+     mana_exp /= 5;
+     mana_exp *= 1.1;
+     mana_cost /= 5;
+     mana_cost *= 1.1;
+
+     if(GET_EXP(ch) < mana_exp) {
+       send_to_char("The Meta-physician tells you, 'You lack the experience.'\n\r", ch);
+       return eSUCCESS;
+     }
+     if(GET_PLATINUM(ch) < (uint32)mana_cost) {
+       send_to_char("The Meta-physician tells you, 'You can't afford my services!  SCRAM!'\n\r", ch);
+       return eSUCCESS;
+     }
+
+     GET_EXP(ch) -= mana_exp;
+     GET_PLATINUM(ch) -= mana_cost;
+
+     increase = 1;
+     ch->raw_mana += increase;
+     GET_MANA_METAS(ch) += 1;
+     act("The Meta-physician touches $n.",  ch, 0, 0, TO_ROOM, 0);
+     act("The Meta-physician touches you.",  ch, 0, 0, TO_CHAR, 0);
+     redo_mana(ch);
+     return eSUCCESS;
+   }
+
+   if(choice == 10 && move_exp && move_cost) 
    {
      if(GET_EXP(ch) < move_exp) {
        send_to_char("The Meta-physician tells you, 'You lack the experience.'\n\r", ch);
@@ -1568,7 +1638,36 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
      redo_mana(ch);
      return eSUCCESS;
    }
-/*   if(choice == 19) {
+
+   if(choice == 11 && move_exp && move_cost) 
+   {
+     move_exp /= 5;
+     move_exp *= 1.1;
+     move_cost /= 5;
+     move_cost *= 1.1;
+
+     if(GET_EXP(ch) < move_exp) {
+       send_to_char("The Meta-physician tells you, 'You lack the experience.'\n\r", ch);
+       return eSUCCESS;
+     }
+     if(GET_PLATINUM(ch) < (uint32)move_cost) {
+       send_to_char("The Meta-physician tells you, 'You can't afford my services!  SCRAM!'\n\r", ch);
+       return eSUCCESS;
+     }
+
+     GET_EXP(ch)  -= move_exp;
+     GET_PLATINUM(ch) -= move_cost;
+     ch->raw_move += 1;
+     ch->max_move += 1;
+     GET_MOVE_METAS(ch) += 1;
+     act("The Meta-physician touches $n.",  ch, 0, 0, TO_ROOM, 0);
+     act("The Meta-physician touches you.",  ch, 0, 0, TO_CHAR, 0);
+     redo_hitpoints(ch);
+     redo_mana(ch);
+     return eSUCCESS;
+   }
+
+/*   if(choice == 22) {
      price = 100000000;
      if(GET_COND(ch, FULL) == -1) {
        send_to_char("The Meta-physician tells you, 'You already have "
@@ -1600,10 +1699,10 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
      return eSUCCESS;
    }
 */
-  if (choice == 16 || choice == 17)
+  if (choice == 19 || choice == 20)
   {
-   int vnum = choice == 16 ? 27903: 27904;
-   unsigned int cost = choice == 16 ? 25:50;
+   int vnum = choice == 19 ? 27903: 27904;
+   unsigned int cost = choice == 19 ? 25:50;
    if (GET_PLATINUM(ch) < cost)
    {
       send_to_char("The Meta-physician tells you, 'You can't afford that!'\r\n",ch);
@@ -1628,7 +1727,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
    send_to_char("The Meta-physician tells you, 'Here is your potion.'\r\n",ch);
    return eSUCCESS;
   }
-   if(choice == 11) {
+   if(choice == 14) {
      if (affected_by_spell(ch, FUCK_GTHIEF))
      {
 	send_to_char("The Meta-physician tells you, 'You cannot do this because of your criminal actions!'\r\n",ch);
@@ -1644,7 +1743,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
      send_to_char("Ok.\n\r", ch);
      return eSUCCESS;
    }
-   if(choice == 10) {
+   if(choice == 13) {
      if (affected_by_spell(ch, FUCK_GTHIEF))
      {
         send_to_char("The Meta-physician tells you, 'You cannot do this because of your criminal actions!'\r\n",ch);
@@ -1660,7 +1759,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
      send_to_char("Ok.\n\r", ch);
      return eSUCCESS;
    }
-  if(choice == 12) {
+  if(choice == 15) {
     if(!IS_MOB(ch) && affected_by_spell(ch, FUCK_GTHIEF)) 
     {
       send_to_char("Your criminal acts prohibit it.\n\r", ch);
@@ -1677,7 +1776,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     send_to_char("Ok.\n\r", ch);
     return eSUCCESS;
   }
-  if(choice == 13) {
+  if(choice == 16) {
     if(GET_PLATINUM(ch) < 5) {
       send_to_char("The Meta-physician tells you, 'You can't afford that!\n\r", ch);
       return eSUCCESS;
@@ -1688,7 +1787,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     return eSUCCESS;
   }
 
-  if(choice == 14) {
+  if(choice == 17) {
     if(GET_PLATINUM(ch) < 250) {
       send_to_char("The Meta-physician tells you, 'You can't afford that!\n\r", ch);
       return eSUCCESS;
@@ -1700,7 +1799,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
   }
 
 
-  if(choice == 18) {
+  if(choice == 21) {
     if (GET_PLATINUM(ch) < 25) {
        send_to_char ("Costs 25 plats...which you don't have.\n\r", ch);
        return eSUCCESS;
@@ -1715,7 +1814,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     ch->pcdata->practices += 1;
     return eSUCCESS;
   }
-  if(choice == 9 && ki_exp && ki_cost) {
+  if(choice == 12 && ki_exp && ki_cost) {
     if(IS_MOB(ch)) {
       send_to_char("Mobs cannot meta ki.\r\n", ch);
       return eSUCCESS;
@@ -1743,7 +1842,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     act("The Meta-physician touches you.",  ch, 0, 0, TO_CHAR, 0);
     return eSUCCESS;
   }
-  if (choice == 15) {
+  if (choice == 18) {
     if (GET_EXP(ch) < 100000000) {
       send_to_char("The Meta-physician tells you, 'You lack the experience.'\n\r", ch);
       return eSUCCESS;
