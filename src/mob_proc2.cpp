@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.53 2005/07/23 23:45:01 shane Exp $ */
+/* $Id: mob_proc2.cpp,v 1.54 2005/07/24 00:15:07 dcastle Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -1542,10 +1542,9 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
    }
 
    if(choice == 7 && hit_exp && hit_cost) {
-     hit_exp /= 5;
-     hit_exp *= 1.1;
-     hit_cost /= 5;
-     hit_cost *= 1.1;
+     hit_exp = (int)(hit_exp/5*1.1);
+     hit_cost = (int)(hit_exp/5*1.1);
+
      if(GET_EXP(ch) < hit_exp) {
        send_to_char("The Meta-physician tells you, 'You lack the experience.'\n\r", ch);
        return eSUCCESS;
@@ -1590,10 +1589,8 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
    }
 
    if(choice == 9 && mana_exp && mana_cost) {
-     mana_exp /= 5;
-     mana_exp *= 1.1;
-     mana_cost /= 5;
-     mana_cost *= 1.1;
+     mana_exp = (int)(mana_exp/5*1.1);
+     mana_cost = (int)(mana_cost/5*1.1);
 
      if(GET_EXP(ch) < mana_exp) {
        send_to_char("The Meta-physician tells you, 'You lack the experience.'\n\r", ch);
@@ -1641,10 +1638,8 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 
    if(choice == 11 && move_exp && move_cost) 
    {
-     move_exp /= 5;
-     move_exp *= 1.1;
-     move_cost /= 5;
-     move_cost *= 1.1;
+     move_exp = (int)(move_exp/5*1.1);
+     move_cost = (int)(move_cost/5*1.1);
 
      if(GET_EXP(ch) < move_exp) {
        send_to_char("The Meta-physician tells you, 'You lack the experience.'\n\r", ch);
