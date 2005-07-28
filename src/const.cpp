@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.162 2005/06/30 01:18:00 shane Exp $ */
+/* $Id: const.cpp,v 1.163 2005/07/28 15:24:06 urizen Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1701,7 +1701,7 @@ struct race_shit race_info[] =
 {  "Rodent",    "Rodents",     59,         0,         0,     128,       4096,         0,       0,      0,    AFF_IGNORE_WEAPON_WEIGHT, "bite"},
 {  "Fish",      "Fishes",       3,         0,   4194304,       0,      16384,         0,       0,      0,    AFF_IGNORE_WEAPON_WEIGHT, "bite" },
 {  "Arachnid",  "Arachnids",   19,         0,       128,       0,     262144,    131072,       0,      0,    AFF_IGNORE_WEAPON_WEIGHT|AFF_INFRARED|AFF_SENSE_LIFE, "bite" },
-{  "Insect",    "Insects",     19,         0,         0,       0,     131072,    262144,       0,      0,    AFF_IGNORE_WEAPON_WEIGHT|AFF_INFRARED, "sting" },
+{  "Insect",    "Insects",     19,         0,         0,       0,     131072,    262144,       0,      0,    AFF_IGNORE_WEAPON_WEIGHT|AFF_INFRARED, "bite" },
 {  "Slime",     "Slimes",       2,         1,        64,     528,          0,         0,       0,      0,    AFF_IGNORE_WEAPON_WEIGHT, "slap" },
 {  "Animal",    "Animals",     27,         0,         0,     128,    8388608,         0,       0,      0,    AFF_IGNORE_WEAPON_WEIGHT|AFF_SENSE_LIFE, "bite" },
 {  "Plant",     "Plants",      63,         0,   4194304,      16,    1048576,         0,       0,      0,    AFF_IGNORE_WEAPON_WEIGHT, "slap" },

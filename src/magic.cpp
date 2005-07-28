@@ -9554,6 +9554,11 @@ int spell_beacon(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *vic
          send_to_char("Your beacon cannot take you into or out of the arena!\r\n", ch);
          return eFAILURE;
    }
+   if (IS_SET(world[ch->beacon->in_room].room_flags, CLAN_ROOM))
+   {
+	send_to_char("You cannot beacon into a clan hall.\r\n",ch);
+	return eFAILURE;
+   }
 
    if(ch->fighting && (0 == number(0, 20))) {
      send_to_char("In the heat of combat, you forget your beacon's location!\n\r", ch);

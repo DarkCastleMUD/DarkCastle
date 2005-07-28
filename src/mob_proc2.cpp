@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.54 2005/07/24 00:15:07 dcastle Exp $ */
+/* $Id: mob_proc2.cpp,v 1.55 2005/07/28 15:24:06 urizen Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -1543,7 +1543,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 
    if(choice == 7 && hit_exp && hit_cost) {
      hit_exp = (int)(hit_exp/5*1.1);
-     hit_cost = (int)(hit_exp/5*1.1);
+     hit_cost = (int)(hit_cost/5*1.1);
 
      if(GET_EXP(ch) < hit_exp) {
        send_to_char("The Meta-physician tells you, 'You lack the experience.'\n\r", ch);

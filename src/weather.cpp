@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: weather.cpp,v 1.9 2005/06/25 18:58:46 shane Exp $ */
+/* $Id: weather.cpp,v 1.10 2005/07/28 15:24:06 urizen Exp $ */
 
 extern "C"
 {
@@ -212,9 +212,10 @@ void weather_change(void)
       case 0 : 
          break;
       case 1 :
-         switch(number(1, 2)) {
+         switch(number(1, 3)) {
          case 1:  send_to_outdoor("A bitter chill sets in as billowing clouds form on the horizon.\n\r"); break;
          case 2:  send_to_outdoor("Dark and heavy clouds begin to crowd the sky, blocking off the light of the heavens.\n\r"); break;
+         case 3:  send_to_outdoor("The sun's light diffuses as clouds roll in to create a pale and dreary scape.\n\r");break;
          }
          weather_info.sky=SKY_CLOUDY;
          break;
