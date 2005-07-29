@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.55 2005/06/26 20:45:03 shane Exp $
+| $Id: move.cpp,v 1.56 2005/07/29 11:42:47 dcastle Exp $
 | move.C
 | Movement commands and stuff.
 *************************************************************************
@@ -299,6 +299,7 @@ int do_fall(CHAR_DATA *ch, short dir)
          "Luckily the ground breaks your fall.\n\r",
          "$n plummets into the room and hits the ground with a wet-sounding splat!",
         damage, KILL_FALL);
+  if (SOMEONE_DIED(retval)) return eSUCCESS;
   if (!SOMEONE_DIED(retval)) {
     act("$n plummets into the room and hits the floor HARD.", ch, 0, 0, TO_ROOM, 0);
   }
