@@ -3962,6 +3962,9 @@ int spell_refresh(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data
   else
     GET_MOVE(victim) += dam;
 
+  if(ch != victim) {
+    act("Your magic flows through $M and $E looks less tired.",ch,0,victim,TO_CHAR,0);
+  }
   send_to_char("You feel less tired.\n\r", victim);
   return eSUCCESS;
 }

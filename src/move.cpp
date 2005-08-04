@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.56 2005/07/29 11:42:47 dcastle Exp $
+| $Id: move.cpp,v 1.57 2005/08/04 17:23:37 dcastle Exp $
 | move.C
 | Movement commands and stuff.
 *************************************************************************
@@ -215,7 +215,7 @@ int do_fall(CHAR_DATA *ch, short dir)
 
   // Don't effect mobs
   if(IS_NPC(ch)) {
-    act("$n's clings to the terrain around $m and avoids falling.", ch, 0, 0, TO_ROOM, 0);
+    act("$n clings to the terrain around $m and avoids falling.", ch, 0, 0, TO_ROOM, 0);
     return eFAILURE;
   }
 

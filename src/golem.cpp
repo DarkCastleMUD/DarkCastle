@@ -280,7 +280,7 @@ int cast_create_golem(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA
   int retval = verify_existing_components(ch,i);
   if (IS_SET(retval, eFAILURE))
   {
-      send_to_char("Since you do not have the require spell components, the magic fades into nothingness.\r\n",ch);
+      send_to_char("Since you do not have the required spell components, the magic fades into nothingness.\r\n",ch);
       return eFAILURE;
   }
   load_golem_data(ch, i); // Load the golem up;
