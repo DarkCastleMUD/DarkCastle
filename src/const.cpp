@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.163 2005/07/28 15:24:06 urizen Exp $ */
+/* $Id: const.cpp,v 1.164 2005/09/01 00:52:31 dcastle Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1123,7 +1123,7 @@ struct class_skill_defines w_skills[] = { // warrior skills
 {    "whipping",        SKILL_WHIPPING_WEAPONS,   30,   90,     {DEX,STR} },
 {    "tactics",         SKILL_TACTICS,            31,   98,     {INT,WIS} },
 {    "archery",         SKILL_ARCHERY,            32,   55,     {DEX,WIS} },
-{    "stun",            SKILL_STUN,               35,   75,     {DEX,INT} },
+{    "stun",            SKILL_STUN,               35,   85,     {DEX,INT} },
 {    "guard",           SKILL_GUARD,              37,   98,     {STR,WIS} },
 {    "deathstroke",     SKILL_DEATHSTROKE,        39,   98,     {STR,INT} },
 {    "riposte",         SKILL_RIPOSTE,            40,   98,     {INT,DEX} },
@@ -1359,7 +1359,7 @@ struct class_skill_defines r_skills[] = { // ranger skills
 {    "ambush",          SKILL_AMBUSH,            35,     98,     {INT,DEX} },
 {    "fire arrows",     SKILL_FIRE_ARROW,        36,     98,     {WIS,DEX} },
 {    "call follower",   SPELL_CALL_FOLLOWER,     38,     98,     {CON,STR} },
-{    "stun",            SKILL_STUN,              40,     70,     {DEX,INT} },
+{    "stun",            SKILL_STUN,              40,     80,     {DEX,INT} },
 {    "granite arrows",  SKILL_GRANITE_ARROW,     41,     98,     {STR,DEX} },
 {    "disarm",          SKILL_DISARM,            42,     70,     {DEX,WIS} },
 {    "staunchblood",    SPELL_STAUNCHBLOOD,      44,     70,     {CON,WIS} },
