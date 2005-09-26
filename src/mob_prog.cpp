@@ -344,6 +344,10 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
     {
       return ( number(1, 100) <= atoi(arg) );
     }
+  if (!str_cmp(buf, "amtitems"))
+  {
+     return mprog_veval(obj_index[real_object(atoi(arg))].number,opr,atoi(val));
+  }
   if ( !str_cmp(buf, "numpcs"))
   {
      struct char_data *p;
@@ -935,13 +939,68 @@ mob_index[mob->mobdata->nr].virt );
 	}
     }
 
+  if (!str_cmp(buf, "wears"))
+  {
+    struct obj_data *obj=0;
+    CHAR_DATA *take;
+    extern void debug_here();
+    debug_here();
+    struct obj_data * search_char_for_item(char_data * ch, int16 item_number, bool wearingonly = FALSE);
+    char bufeh[MAX_STRING_LENGTH];
+    char *valu = one_argument(val, bufeh);
+    switch (arg[1] )
+    {
+	case 'z': if (!mob->beacon) return -1;
+		obj = search_char_for_item(((CHAR_DATA*)mob->beacon), real_object(atoi(valu)), TRUE);
+	      take = ((CHAR_DATA*)mob->beacon);
+       case 'i': // mob
+          obj = search_char_for_item(mob, real_object(atoi(valu)),TRUE);
+	  take = mob;
+	   break;
+       case 'n': // actor
+	 if (!actor) return -1;
+         obj = search_char_for_item(actor, real_object(atoi(valu)),TRUE);
+	 take = actor;
+	     break;
+	case 't': // vict
+	  if (!vict) return -1;
+          obj = search_char_for_item(vict, real_object(atoi(valu)),TRUE);
+	  take = vict;
+	  break;
+       case 'r': // rndm
+	 if (!rndm) return -1;
+	  obj = search_char_for_item(rndm, real_object(atoi(valu)),TRUE);
+	  take = rndm;
+	  break;
+	default:
+          logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'carries'", mob_index[mob->mobdata->nr].virt );
+	  return -1;
+    }
+    if (!obj) return 0;
+    if (!str_cmp(bufeh, "keep"))
+       return 1;
+    else if (!str_cmp(bufeh, "take"))
+    {
+	int i;
+       if (obj->carried_by)
+	  obj_from_char(obj);
+      for (i=0; i < MAX_WEAR; i++)
+	 if (obj == take->equipment[i])
+	 {
+	   obj_from_char(unequip_char(take, i));
+	 }
+      extract_obj(obj);
+      return 1;
+    }
+    return -1;
+   }
   if (!str_cmp(buf, "carries"))
   {
     struct obj_data *obj=0;
     CHAR_DATA *take;
     extern void debug_here();
     debug_here();
-    struct obj_data * search_char_for_item(char_data * ch, int16 item_number);
+    struct obj_data * search_char_for_item(char_data * ch, int16 item_number, bool wearingonly = FALSE);
     char bufeh[MAX_STRING_LENGTH];
     char *valu = one_argument(val, bufeh);
     switch (arg[1] )

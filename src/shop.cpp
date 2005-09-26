@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: shop.cpp,v 1.19 2005/06/25 18:58:46 shane Exp $ */
+/* $Id: shop.cpp,v 1.20 2005/09/26 21:47:11 urizen Exp $ */
 
 extern "C"
 {
@@ -55,7 +55,7 @@ struct shop_data shop_index[MAX_SHOP];
 int max_shop;
 
 // extern function
-struct obj_data * search_char_for_item(char_data * ch, int16 item_number);
+struct obj_data * search_char_for_item(char_data * ch, int16 item_number, bool wearonly = FALSE);
 int fwrite_string(char *buf, FILE *fl);
 
 /*

@@ -242,13 +242,14 @@ int do_mpjunk( CHAR_DATA *ch, char *argument, int cmd )
     char      arg[ MAX_INPUT_LENGTH ];
     OBJ_DATA *obj;
     int location;
-
+    bool dot = FALSE;
+    char dotbuf[MAX_INPUT_LENGTH];
     if ( !IS_NPC( ch ) )
     {
         send_to_char( "Huh?\n\r", ch );
 	return eSUCCESS;
     }
-
+    dotbuf[0] = '\0';
     one_argument( argument, arg );
 
     if ( arg[0] == '\0')
@@ -256,8 +257,9 @@ int do_mpjunk( CHAR_DATA *ch, char *argument, int cmd )
         logf( IMMORTAL, LOG_WORLD, "Mpjunk - No argument: vnum %d.", mob_index[ch->mobdata->nr].virt );
 	return eFAILURE|eINTERNAL_ERROR;
     }
+    
 
-    if ( str_cmp( arg, "all" ) )
+    if ( str_cmp( arg, "all" ) && !sscanf(arg, "all.%s", dotbuf))
     {
       if ((obj = get_object_in_equip_vis(ch, arg, ch->equipment, &location )))
       {
@@ -272,13 +274,22 @@ int do_mpjunk( CHAR_DATA *ch, char *argument, int cmd )
     }
     else
     {
+	if (dotbuf[0] != '\0')
+           dot = TRUE;
+
         for(int l = 0; l < MAX_WEAR; l++ )
           if ( ch->equipment[l] )
+	   if (!dotbuf || isname(dotbuf, ch->equipment[l]->name))
             extract_obj(unequip_char(ch,l));
 
-        while(ch->carrying)
-          extract_obj(ch->carrying);
+  	OBJ_DATA *x,*v;
+        for (x = ch->carrying; x; x =v)
+	{
+	   v = x->next_content;
+	   if (!dotbuf || isname(dotbuf, x->name))
+             extract_obj(x);
 
+	}
         return eSUCCESS;
     }
     return eFAILURE;
@@ -855,7 +866,7 @@ int do_mpforce( CHAR_DATA *ch, char *argument, int cmd )
 	{
             if(GET_LEVEL( victim ) < IMMORTAL)
 	        command_interpreter( victim, argument );
-            else csendf(ch, "Mob %d just tried to MOBProg force you to '%s'.\r\n", 
+            else csendf(victim, "Mob %d just tried to MOBProg force you to '%s'.\r\n", 
                             mob_index[ch->mobdata->nr].virt, argument);
         }
     }

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: board.cpp,v 1.10 2005/05/28 18:56:09 shane Exp $
+| $Id: board.cpp,v 1.11 2005/09/26 21:47:11 urizen Exp $
 | board.C
 | Description:  This file contains the implementation for the board
 |   code.  It's old and should be rewritten --Morc XXX
@@ -99,7 +99,7 @@ int board_clan[] = { -1,
                      -1, -1, -1, -1,  1,  2,  8, 9, 11, 4, // 1 through 10
                      15,  5, 10,  7, 24,  9, 17, -1, 19, 11, // 11 through 20
                      -1,  3, 20, 13, 27, 18,  5,  14, 6,  7, // 21 - 30
-                     16, -1, 9, 12, -1, -1, 10, 26, 11, 15, // 31 - 40
+                     16, -1, 9, 13, -1, -1, 10, 26, 11, 15, // 31 - 40
                      -1, 21, -1, -1, -1, -1, -1, -1, -1, -1,
 		     -1, -1, -1, -1, -1
 		     };
@@ -271,7 +271,7 @@ int find_board(CHAR_DATA *ch)
        return(32);
      else if (!(strcmp(i->name, "board special nazgul")))
        return(33);
-     else if (!(strcmp(i->name, "board clan slackers")))
+     else if (!(strcmp(i->name, "board slackers clanboard")))
        return(34);
      else if (!(strcmp(i->name, "board clan Co.Rpse second")))
        return(35);

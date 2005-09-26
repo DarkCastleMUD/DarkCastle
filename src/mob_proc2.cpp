@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.55 2005/07/28 15:24:06 urizen Exp $ */
+/* $Id: mob_proc2.cpp,v 1.56 2005/09/26 21:47:11 urizen Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -38,7 +38,7 @@
 
 extern CWorld world;
 extern struct obj_data * search_char_for_item(char_data * ch, int16 
-item_number);
+item_number, bool wearonly = FALSE);
  
 extern struct obj_data *object_list;
 extern struct descriptor_data *descriptor_list;

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.112 2005/07/16 10:49:32 dcastle Exp $
+| $Id: cl_thief.cpp,v 1.113 2005/09/26 21:47:13 urizen Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -31,7 +31,7 @@ extern int top_of_world;
 extern int arena[4];
 
 int find_door(CHAR_DATA *ch, char *type, char *dir);
-struct obj_data * search_char_for_item(char_data * ch, int16 item_number);
+struct obj_data * search_char_for_item(char_data * ch, int16 item_number, bool wearonly = FALSE);
 
 int get_weapon_damage_type(struct obj_data * wielded);
 

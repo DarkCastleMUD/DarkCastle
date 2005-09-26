@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.94 2005/07/24 00:15:07 dcastle Exp $ */
+/* $Id: handler.cpp,v 1.95 2005/09/26 21:47:11 urizen Exp $ */
     
 extern "C"
 {
@@ -2162,7 +2162,7 @@ int move_obj(obj_data *obj, char_data * ch)
   int         obj_in_room  = NOWHERE;
   obj_data  * contained_by = 0;
   char_data * carried_by   = 0;
-  struct obj_data * search_char_for_item(char_data * ch, int16 item_number);
+  struct obj_data * search_char_for_item(char_data * ch, int16 item_number, bool wearonly = FALSE);
 
 //  char buffer[300];
 
