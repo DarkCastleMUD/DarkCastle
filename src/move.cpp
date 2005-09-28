@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.57 2005/08/04 17:23:37 dcastle Exp $
+| $Id: move.cpp,v 1.58 2005/09/28 22:31:19 chadman Exp $
 | move.C
 | Movement commands and stuff.
 *************************************************************************
@@ -149,20 +149,21 @@ void record_track_data(CHAR_DATA *ch, int cmd)
   return;
 }
 
-void do_muddy(CHAR_DATA *ch)
-{
-   short chance = number(0,30);
-
-   if(IS_NPC(ch) || IS_AFFECTED(ch, AFF_FLYING) || GET_LEVEL(ch) >= IMMORTAL || IS_AFFECTED(ch, AFF_FREEFLOAT)) {
-     ; //poop on a stick!
-   } else if(GET_DEX(ch) > chance) {
-      act("You barely avoid slipping in the mud.", ch, 0, 0, TO_CHAR, 0);
-   } else {
-      act("$n slips on the muddy terrain and goes down.", ch, 0, 0, TO_ROOM, 0);
-      act("Your feet slide out from underneath you in the mud.", ch, 0, 0, TO_CHAR, 0);
-      GET_POS(ch) = POSITION_SITTING;
-   }
-}
+// Removed this due to it being a funky cold medina. - Nocturnal 09/28/05
+//void do_muddy(CHAR_DATA *ch)
+//{
+//   short chance = number(0,30);
+//
+//   if(IS_NPC(ch) || IS_AFFECTED(ch, AFF_FLYING) || GET_LEVEL(ch) >= IMMORTAL || IS_AFFECTED(ch, AFF_FREEFLOAT)) {
+//     ; //poop on a stick!
+//   } else if(GET_DEX(ch) > chance) {
+//      act("You barely avoid slipping in the mud.", ch, 0, 0, TO_CHAR, 0);
+//   } else {
+//      act("$n slips on the muddy terrain and goes down.", ch, 0, 0, TO_ROOM, 0);
+//      act("Your feet slide out from underneath you in the mud.", ch, 0, 0, TO_CHAR, 0);
+//      GET_POS(ch) = POSITION_SITTING;
+//   }
+//}
 
 int do_unstable(CHAR_DATA *ch) 
 {
@@ -703,10 +704,11 @@ int do_simple_move(CHAR_DATA *ch, int cmd, int following)
          return eSUCCESS|eCH_DIED; 
     }
 
-    if(IS_SET(world[ch->in_room].sector_type, SECT_FIELD) && 
-weather_info.sky == SKY_HEAVY_RAIN && !number(0,19)) {
-       do_muddy(ch);
-    }
+// Mud is messy.  Removed.  - Nocturnal 09/28/05
+//    if(IS_SET(world[ch->in_room].sector_type, SECT_FIELD) && 
+//weather_info.sky == SKY_HEAVY_RAIN && !number(0,19)) {
+//       do_muddy(ch);
+//    }
 
     // let our mobs know they're here
     retval = mprog_entry_trigger( ch );
