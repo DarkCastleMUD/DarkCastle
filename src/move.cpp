@@ -1,5 +1,5 @@
-/************************************************************************
-| $Id: move.cpp,v 1.58 2005/09/28 22:31:19 chadman Exp $
+ /************************************************************************
+| $Id: move.cpp,v 1.59 2005/09/29 17:46:13 chadman Exp $
 | move.C
 | Movement commands and stuff.
 *************************************************************************
@@ -907,8 +907,8 @@ int do_enter(CHAR_DATA *ch, char *argument, int cmd)
   if(world[real_room(portal->obj_flags.value[0])].sector_type == SECT_UNDERWATER &&
      !(affected_by_spell(ch, SPELL_WATER_BREATHING) || IS_AFFECTED(ch, AFF_WATER_BREATHING)))
   {
-     send_to_char("As you put your arm through it gets wet and you realize that might not be a good idea.\r\n", ch);
-     return eFAILURE;
+     send_to_char("You bravely attempt to plunge through the portal - let's hope you have gills!\r\n", ch);
+     return eSUCCESS;
   }
 
    if(GET_LEVEL(ch) > IMMORTAL &&
