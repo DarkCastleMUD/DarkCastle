@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.113 2005/09/26 21:47:13 urizen Exp $
+| $Id: cl_thief.cpp,v 1.114 2005/09/29 21:36:21 dcastle Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -426,7 +426,7 @@ int do_trip(CHAR_DATA *ch, char *argument, int cmd)
     act("$n fumbles clumsily as $e attempts to trip you!", ch, NULL, victim, TO_VICT, 0 );
     act("You fumble the trip!", ch, NULL, victim, TO_CHAR , 0);
     act("$n fumbles as $e tries to trip $N!", ch, NULL, victim, TO_ROOM, NOTVICT );
-    WAIT_STATE(ch, PULSE_VIOLENCE*1);
+    WAIT_STATE(ch, PULSE_VIOLENCE*2);
     retval = damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_TRIP, 0);
   }
   else {
@@ -437,7 +437,7 @@ int do_trip(CHAR_DATA *ch, char *argument, int cmd)
        GET_POS(victim) = POSITION_SITTING;
     SET_BIT(victim->combat, COMBAT_BASH2);
     WAIT_STATE(ch, PULSE_VIOLENCE*2);
-    WAIT_STATE(victim, PULSE_VIOLENCE*2);
+    WAIT_STATE(victim, PULSE_VIOLENCE*1);
     retval = damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_TRIP, 0);
   }
   return retval;
