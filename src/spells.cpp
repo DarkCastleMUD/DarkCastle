@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.144 2005/06/29 10:41:40 shane Exp $ */
+/* $Id: spells.cpp,v 1.145 2005/09/30 10:21:37 urizen Exp $ */
 
 extern "C"
 {
@@ -1490,7 +1490,7 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (GET_LEVEL(ch) < ARCHANGEL) {
+  if (GET_LEVEL(ch) < ARCHANGEL && (!IS_NPC(ch) || IS_AFFECTED(ch, AFF_CHARM))) {
     if (GET_CLASS(ch) == CLASS_WARRIOR) {
         send_to_char("Think you had better stick to fighting...\n\r", ch);
         return eFAILURE;
