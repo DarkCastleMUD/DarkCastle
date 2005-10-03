@@ -8772,7 +8772,7 @@ int cast_bee_sting(ubyte level, CHAR_DATA *ch, char *arg, int type,
    switch (type) {
       case SPELL_TYPE_SPELL:
          if (!OUTSIDE(ch)) {
-            send_to_char("Your spell is more draining because you are indoors!\n\r", ch);
+            send_to_char("Your mana fucking hates not being outdoors!\n\r", ch);
             GET_MANA(ch) -= level / 2;
             if(GET_MANA(ch) < 0)
                GET_MANA(ch) = 0;
@@ -8798,7 +8798,7 @@ int cast_bee_swarm(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *v
 
    dam = 175;
 
-   act("$n Calls upon the insect world!\n\r", ch, 0, 0, TO_ROOM, INVIS_NULL);
+   act("$n calls upon the insect world!\n\r", ch, 0, 0, TO_ROOM, INVIS_NULL);
 
    for(tmp_victim = character_list; tmp_victim; tmp_victim = temp) {
       temp = tmp_victim->next;
@@ -8828,22 +8828,22 @@ int cast_creeping_death(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DA
    set_cantquit(ch, victim);
    dam = 250;
 
-        if(world[ch->in_room].sector_type == SECT_SWAMP) dam += 175;
-   else if(world[ch->in_room].sector_type == SECT_FOREST) dam += 150;
-   else if(world[ch->in_room].sector_type == SECT_FIELD) dam += 125;
-   else if(world[ch->in_room].sector_type == SECT_BEACH) dam += 100;
-   else if(world[ch->in_room].sector_type == SECT_HILLS) dam += 75;
+        if(world[ch->in_room].sector_type == SECT_SWAMP) dam += 220;
+   else if(world[ch->in_room].sector_type == SECT_FOREST) dam += 210;
+   else if(world[ch->in_room].sector_type == SECT_FIELD) dam += 170;
+   else if(world[ch->in_room].sector_type == SECT_BEACH) dam += 135;
+   else if(world[ch->in_room].sector_type == SECT_HILLS) dam += 135;
    else if(world[ch->in_room].sector_type == SECT_DESERT) dam += 50;
-   else if(world[ch->in_room].sector_type == SECT_MOUNTAIN) dam += 25;
-   else if(world[ch->in_room].sector_type == SECT_PAVED_ROAD) dam += 25;
+   else if(world[ch->in_room].sector_type == SECT_MOUNTAIN) dam += 100;
+   else if(world[ch->in_room].sector_type == SECT_PAVED_ROAD) dam += 100;
    else if(world[ch->in_room].sector_type == SECT_WATER_NOSWIM) dam -= 25;
-   else if(world[ch->in_room].sector_type == SECT_AIR) dam -= 25;
+   else if(world[ch->in_room].sector_type == SECT_AIR) dam += 25;
    else if(world[ch->in_room].sector_type == SECT_FROZEN_TUNDRA) dam -= 25;
-   else if(world[ch->in_room].sector_type == SECT_UNDERWATER) dam -= 50;
+   else if(world[ch->in_room].sector_type == SECT_UNDERWATER) dam -= 75;
    else if(world[ch->in_room].sector_type == SECT_ARCTIC) dam -= 50;
    
    if (!OUTSIDE(ch)) {
-      send_to_char("Your spell is more draining because you are indoors!\n\r", ch);
+      send_to_char("Your mana loves you for casting inside!\n\r", ch);
       // If they are NOT outside it costs extra mana
       GET_MANA(ch) -= level / 2;
       if(GET_MANA(ch) < 0)
@@ -8851,7 +8851,7 @@ int cast_creeping_death(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DA
    }
 
 
-   retval = damage(ch, victim, dam, TYPE_POISON, SPELL_CREEPING_DEATH, 0);
+   retval = damage(ch, victim, dam, TYPE_MAGIC, SPELL_CREEPING_DEATH, 0);
    if(SOMEONE_DIED(retval))
       return retval;
 
