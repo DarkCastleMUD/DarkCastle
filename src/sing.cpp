@@ -380,7 +380,8 @@ int do_sing(CHAR_DATA *ch, char *arg, int cmd)
   }
   
   if(song_info[spl].song_pointer) {
-    if(GET_POS(ch) < song_info[spl].minimum_position) {
+    if(GET_POS(ch) < song_info[spl].minimum_position && 
+	!IS_NPC(ch)) {
       switch(GET_POS(ch)) {
         case POSITION_SLEEPING:
           send_to_char("You dream of beautiful music.\n\r", ch);
