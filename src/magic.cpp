@@ -2120,11 +2120,13 @@ int spell_heal(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
     log("Null victim sent to heal!", ANGEL, LOG_BUG);
     return eFAILURE;
   } 
- if (GET_CLASS(ch) == CLASS_PALADIN && victim != ch)
-  {
-    send_to_char("You cannot target others with this spell.\r\n",ch);
-    return eFAILURE;
-  }
+/* Adding paladin ability to heal others back in. 
+ * if (GET_CLASS(ch) == CLASS_PALADIN && victim != ch)
+ * {
+ *   send_to_char("You cannot target others with this spell.\r\n",ch);
+ *   return eFAILURE;
+ * }
+ */ 
 
   if(GET_RACE(victim) == RACE_UNDEAD) {
     send_to_char("Healing spells are useless on the undead.\n\r", ch);
