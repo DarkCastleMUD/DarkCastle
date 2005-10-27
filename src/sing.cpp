@@ -630,7 +630,7 @@ void update_bard_singing()
         send_to_char("Your singing ruins your hiding place.\r\n", i);
       }
 
-      if((GET_POS(i) < song_info[i->song_number].minimum_position)
+      if(( (GET_POS(i) < song_info[i->song_number].minimum_position) && !IS_NPC(i))
          || IS_SET(i->combat, COMBAT_STUNNED)
          || IS_SET(i->combat, COMBAT_STUNNED2)
          || IS_SET(i->combat, COMBAT_BASH1)

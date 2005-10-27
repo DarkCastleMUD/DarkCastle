@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.284 2005/07/23 01:20:25 dcastle Exp $ */
+/* $Id: fight.cpp,v 1.285 2005/10/27 18:57:08 urizen Exp $ */
 
 extern "C"
 {
@@ -2373,7 +2373,7 @@ bool check_parry(CHAR_DATA * ch, CHAR_DATA * victim, int attacktype)
   int modifier = 0;  
   if((IS_SET(victim->combat, COMBAT_STUNNED)) ||
     (victim->equipment[WIELD] == NULL) ||
-    (ch->equipment[WIELD] == NULL && number(1, 101) >= 50) ||
+//    (ch->equipment[WIELD] == NULL && number(1, 101) >= 50) ||
     (IS_NPC(victim) && (!ISSET(victim->mobdata->actflags, ACT_PARRY))) ||
     (IS_SET(victim->combat, COMBAT_STUNNED2)) ||
     (IS_SET(victim->combat, COMBAT_BASH1)) ||

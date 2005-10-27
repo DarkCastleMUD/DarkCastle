@@ -169,12 +169,12 @@ int do_fsave(struct char_data *ch, char *argument, int cmd)
     send_to_char("No-one by that name here..\n\r", ch);
 
   else {
-    if((GET_LEVEL(ch) <= GET_LEVEL(vict)) && !IS_NPC(vict)) {
+    /*if((GET_LEVEL(ch) <= GET_LEVEL(vict)) && !IS_NPC(vict)) {
       send_to_char("Hahaha\n\r", ch);
       sprintf(buf, "$n has failed to force you to save.");
       act(buf,  ch, 0, vict, TO_VICT, 0);
     }
-    else {
+    else */{
       if (ch->pcdata->stealth == FALSE) {
         sprintf(buf, "$n has forced you to 'save'.");
         act(buf,  ch, 0, vict, TO_VICT, 0);

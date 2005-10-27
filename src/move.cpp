@@ -1,5 +1,5 @@
  /************************************************************************
-| $Id: move.cpp,v 1.60 2005/09/30 18:03:58 dcastle Exp $
+| $Id: move.cpp,v 1.61 2005/10/27 18:57:08 urizen Exp $
 | move.C
 | Movement commands and stuff.
 *************************************************************************
@@ -548,7 +548,7 @@ int do_simple_move(CHAR_DATA *ch, int cmd, int following)
        !(affected_by_spell(ch, SPELL_WATER_BREATHING) || IS_AFFECTED(ch, AFF_WATER_BREATHING))
       )
     {
-         send_to_char("You hold your breath and plung into the watery depths.\n\r", ch);
+         send_to_char("You feel air trying to explode from your lungs as you swim around.\n\r", ch);
 //       send_to_char("Underwater?!\r\n", ch);
 //       return eFAILURE;
     }

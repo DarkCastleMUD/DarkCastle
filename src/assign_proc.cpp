@@ -514,9 +514,10 @@ void assign_objects(void)
   assign_one_obj_non(358, barbweap);
   assign_one_obj_non(9,  phish_locator);	
   assign_one_obj_non(13,  board); /* Quest Board */
-  assign_one_obj_non(2313, board);
+  assign_one_obj_non(2402, board);
   assign_one_obj_non(2303, board);
   assign_one_obj_non(2308, board);
+  assign_one_obj_non(2313, board);
   assign_one_obj_non(2390, board);
   assign_one_obj_non(2328, board);
   assign_one_obj_non(2360, board);

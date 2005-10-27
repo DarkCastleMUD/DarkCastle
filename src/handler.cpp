@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.95 2005/09/26 21:47:11 urizen Exp $ */
+/* $Id: handler.cpp,v 1.96 2005/10/27 18:57:08 urizen Exp $ */
     
 extern "C"
 {
@@ -1152,6 +1152,9 @@ void affect_remove( CHAR_DATA *ch, struct affected_type *af, int flags)
       case SPELL_IRON_ROOTS:
          REMBIT(ch->affected_by, AFF_NO_FLEE);
          break;
+      case SPELL_OAKEN_FORTITUDE:
+	 redo_hitpoints(ch);
+	break;
       case SPELL_STONE_SKIN:  /* Stone skin wears off... Remove resistance */
          REMOVE_BIT(ch->resist, ISR_PIERCE);
          break;

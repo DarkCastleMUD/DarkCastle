@@ -386,7 +386,7 @@ int write_hotboot_file()
     return 0;
   } } 
   else {
-    if(-1 == execl("../src/research1", "research1","-b")) {
+    if(-1 == execl("../src/research1.b", "research1.b","-b")) {
     perror("Hotboot execv call failed.");
     perror(ext_argv[0]);
     unlink("hotboot"); // wipe the file since we can't use it anyway

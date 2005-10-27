@@ -8774,7 +8774,7 @@ int cast_bee_sting(ubyte level, CHAR_DATA *ch, char *arg, int type,
    switch (type) {
       case SPELL_TYPE_SPELL:
          if (!OUTSIDE(ch)) {
-            send_to_char("Your mana fucking hates not being outdoors!\n\r", ch);
+            send_to_char("Your spell is more draining because you are indoors!\n\r", ch);
             GET_MANA(ch) -= level / 2;
             if(GET_MANA(ch) < 0)
                GET_MANA(ch) = 0;
@@ -8845,7 +8845,7 @@ int cast_creeping_death(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DA
    else if(world[ch->in_room].sector_type == SECT_ARCTIC) dam -= 50;
    
    if (!OUTSIDE(ch)) {
-      send_to_char("Your mana loves you for casting inside!\n\r", ch);
+      send_to_char("Your spell is more draning because you are indoors!\n\r", ch);
       // If they are NOT outside it costs extra mana
       GET_MANA(ch) -= level / 2;
       if(GET_MANA(ch) < 0)

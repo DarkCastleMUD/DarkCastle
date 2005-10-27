@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: board.cpp,v 1.11 2005/09/26 21:47:11 urizen Exp $
+| $Id: board.cpp,v 1.12 2005/10/27 18:57:07 urizen Exp $
 | board.C
 | Description:  This file contains the implementation for the board
 |   code.  It's old and should be rewritten --Morc XXX
@@ -96,7 +96,7 @@ int min_remove_level[] = { IMMORTAL, IMMORTAL, OVERSEER, IMMORTAL, SERAPH, 0,
  };
 	
 int board_clan[] = { -1,
-                     -1, -1, -1, -1,  1,  2,  8, 9, 11, 4, // 1 through 10
+                     -1, -1, -1, -1,  1,  2,  8, 9, 9, 4, // 1 through 10
                      15,  5, 10,  7, 24,  9, 17, -1, 19, 11, // 11 through 20
                      -1,  3, 20, 13, 27, 18,  5,  14, 6,  7, // 21 - 30
                      16, -1, 9, 13, -1, -1, 10, 26, 11, 15, // 31 - 40
