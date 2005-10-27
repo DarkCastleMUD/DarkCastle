@@ -522,6 +522,7 @@ void assign_objects(void)
   assign_one_obj_non(2328, board);
   assign_one_obj_non(2360, board);
   assign_one_obj_non(2339, board);
+  assign_one_obj_non(2406, board); /*Urukhai Board */
   assign_one_obj_non(25,  mob_summoner);
   assign_one_obj_non(41,  restring_machine);
   assign_one_obj_non(40,  emoting_object);
