@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.56 2005/09/26 21:47:11 urizen Exp $ */
+/* $Id: mob_proc2.cpp,v 1.57 2005/10/30 15:59:46 urizen Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -252,7 +252,7 @@ long long mana_plats_spent(char_data * ch)
 float value_multiplier(struct obj_data *obj)
 {
   // this is to keep containers from losing $$ since they can't be damaged
-  if(GET_ITEM_TYPE(obj) == ITEM_CONTAINER) {
+  if(GET_ITEM_TYPE(obj) == ITEM_CONTAINER || GET_ITEM_TYPE(obj) == ITEM_LOCKPICK) {
     return 1;
   }
 

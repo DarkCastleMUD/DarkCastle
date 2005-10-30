@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.45 2005/07/16 10:49:16 dcastle Exp $ */
+/* $Id: utility.cpp,v 1.46 2005/10/30 15:59:46 urizen Exp $ */
 
 extern "C"
 {
@@ -954,6 +954,11 @@ int do_recall( CHAR_DATA *ch, char *argument, int cmd )
       location = real_room(START_ROOM);
     else
       location = real_room(GET_HOME(victim));
+    if (location < 0)
+    {
+	send_to_char("Failed.\r\n",ch);
+	return eFAILURE;
+    }
 
     // make sure they arne't recalling into someone's chall
     if(IS_SET(world[location].room_flags, CLAN_ROOM)) 

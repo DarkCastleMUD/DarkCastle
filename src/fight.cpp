@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.285 2005/10/27 18:57:08 urizen Exp $ */
+/* $Id: fight.cpp,v 1.286 2005/10/30 15:59:45 urizen Exp $ */
 
 extern "C"
 {
@@ -249,7 +249,7 @@ void perform_violence(void)
       next_af_dude = af->next;
       if (af->type == SPELL_POISON)
       {
-        int dam = (affected_by_spell(ch, SPELL_POISON)->modifier) / 400 * GET_HIT(ch);
+        int dam = (affected_by_spell(ch, SPELL_POISON)->modifier) * number(1,5);
         int retval = damage(ch, ch, dam, TYPE_POISON, 0, 0);
         if (SOMEONE_DIED(retval))
         { over = TRUE; break; }

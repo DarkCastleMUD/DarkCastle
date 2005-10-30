@@ -84,6 +84,7 @@ bool ARE_GROUPED( CHAR_DATA *sub, CHAR_DATA *obj);
 void add_memory(CHAR_DATA *ch, char *victim, char type);
 extern struct index_data *mob_index;
 extern struct index_data *obj_index;
+extern struct race_shit race_info[];
 
 bool malediction_res(CHAR_DATA *ch, CHAR_DATA *victim, int spell)
 {
@@ -758,6 +759,10 @@ int spell_life_leech(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 	{
 		dam = 75;
 		int adam = dam_percent(skill,75);
+               if (IS_SET(race_info[(int)GET_RACE(tmp_victim)].immune, ISR_POISON))
+   		{
+		  adam = 0;
+		}
 		 if (GET_HIT(tmp_victim) < adam)
 		  GET_HIT(ch) += GET_HIT(tmp_victim);
 		 else GET_HIT(ch) += adam;
@@ -2433,6 +2438,7 @@ int spell_remove_curse(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
 			  return eSUCCESS; // only do it once
 			SET_BIT(obj->obj_flags.extra_flags, ITEM_HUM);
 			add_obj_affect(obj, APPLY_MANA_REGEN, 2);
+			
 			act("With the restrictive curse lifted, $p begins to hum with renewed power!",ch,obj,0, TO_ROOM, 0);
 			act("With the restrictive curse lifted, $p begins to hum with renewed power!",ch,obj,0, TO_CHAR, 0);
 		}
@@ -2458,6 +2464,7 @@ int spell_remove_curse(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
 			  return eSUCCESS; // only do it once
 			SET_BIT(obj->obj_flags.extra_flags, ITEM_HUM);
 			add_obj_affect(obj, APPLY_MANA_REGEN, 2);
+			victim->mana_regen += 2;
 			act("With the restrictive curse lifted, $p begins to hum with renewed power!",victim,obj,0, TO_ROOM, 0);
 			act("With the restrictive curse lifted, $p begins to hum with renewed power!",victim,obj,0, TO_CHAR, 0);
 		}

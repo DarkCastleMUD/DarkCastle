@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: cl_ranger.cpp,v 1.59 2005/06/25 18:58:53 shane Exp $ | cl_ranger.C  *
+ * $Id: cl_ranger.cpp,v 1.60 2005/10/30 15:59:47 urizen Exp $ | cl_ranger.C  *
  * Description: Ranger skills/spells                                          *
  *                                                                            *
  * Revision History                                                           *
@@ -970,7 +970,7 @@ int do_arrow_damage(struct char_data *ch, struct char_data *victim,
 int do_fire(struct char_data *ch, char *arg, int cmd)
 {
   struct char_data *victim;
-  int dam, dir, artype, cost, retval, victroom;
+  int dam, dir = -1, artype, cost, retval, victroom;
   struct obj_data *found;
   unsigned cur_room, new_room;
   char direct[MAX_STRING_LENGTH], arrow[MAX_STRING_LENGTH], 
@@ -1049,22 +1049,6 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
   artype = 0;
 
   if(*arrow) {
-     if(direct[0] == 'n') dir = 0;
-     else if(direct[0] == 'e') dir = 1;
-     else if(direct[0] == 's') dir = 2;
-     else if(direct[0] == 'w') dir = 3;
-     else if(direct[0] == 'u') dir = 4;
-     else if(direct[0] == 'd') dir = 5;
-     else {
-        send_to_char("Shoot in which direction?\r\n", ch);
-        return eFAILURE;
-     }
-
-     if(!CAN_GO(ch, dir)) {
-        send_to_char("There is nothing to shoot in that direction.\r\n", ch);
-        return eFAILURE;
-     }
-
      artype = parse_arrow(ch, arrow);
      if(!artype)
      {
@@ -1078,7 +1062,8 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
         case 3:  cost = 10; break;
         case 4:  cost = 40; break;
      }
-  } else if(*direct) {
+  } 
+  if(*direct) {
      if(direct[0] == 'n') dir = 0;
      else if(direct[0] == 'e') dir = 1;
      else if(direct[0] == 's') dir = 2;
