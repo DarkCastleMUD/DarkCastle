@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.29 2005/06/25 18:58:59 shane Exp $
+| $Id: wizard.cpp,v 1.30 2006/01/13 16:49:24 dcastle Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -531,7 +531,7 @@ void mob_stat(struct char_data *ch, struct char_data *k)
   else
     send_to_char("None", ch);
 
-  strcpy(buf,"$3Class$R: ");
+  strcpy(buf,"\r\n$3Class$R: ");
   sprinttype(k->c_class, pc_clss_types, buf2);
 
   strcat(buf, buf2);
@@ -540,7 +540,8 @@ void mob_stat(struct char_data *ch, struct char_data *k)
           k->alignment);
   strcat(buf, buf2);
   send_to_char(buf, ch);
-     
+  sprintf(buf, "$3Spelldamage$R:[%d] ", k->spelldamage);
+  send_to_char(buf,ch);
   sprintf(buf,"$3Race$R: %s\r\n", race_info[(int)(GET_RACE(k))].singular_name);
   send_to_char(buf, ch);
 

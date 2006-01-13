@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.164 2005/09/01 00:52:31 dcastle Exp $ */
+/* $Id: const.cpp,v 1.165 2006/01/13 16:49:14 dcastle Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -66,6 +66,7 @@ bestowable_god_commands_type bestowable_god_commands[] =
 {"whattonerf",COMMAND_WHATTONERF},
 {"find",COMMAND_FIND},
 {"log",COMMAND_LOG},
+{"addnews",COMMAND_ADDNEWS},
 { "\n",		-1 }
 };
 
@@ -233,9 +234,9 @@ char *spell_wear_off_msg[] =
   "!Sparks!",     // 114
   "Your $2c$7a$0$Bmo$Ru$2fl$7a$0$Bg$R$7e$R has worn off.",
   "!FarSight!",
-  "!FreeFloat!",
+  "You slowly float down to the ground.",
   "!Insomnia!",
-  "!ShadowSlip!",
+  "You step out of the shadows.",
   "The $5yellow$R in your skin fades.",  // 120
   "You no longer feel immune to the affects of poisons.",
   "!CreateGolem!",  // 122
@@ -992,6 +993,7 @@ char *apply_types[] =
     "SONG MITIGATION",
     "RESIST MAGIC",
     "ALL SAVES",
+    "SPELLEFFECT",
     "\n"
 };
 
@@ -1374,7 +1376,7 @@ struct class_skill_defines d_skills[] = { // bard skills
 
 // Ability Name            Ability File                  Level    Max      Requisites
 // ------------            ------------                  -----    ---      ----------
-{ "listsongs",             SKILL_SONG_LIST_SONGS,          1,      98,     {INT,WIS} },
+//{ "listsongs",             SKILL_SONG_LIST_SONGS,          1,      98,     {INT,WIS} },
 { "whistle sharp",         SKILL_SONG_WHISTLE_SHARP,       1,      98,     {STR,INT} },
 { "stop",                  SKILL_SONG_STOP,                2,      98,     {INT,WIS} },
 { "irresistable ditty",    SKILL_SONG_UNRESIST_DITTY,      3,      98,     {DEX,WIS} },
@@ -1396,7 +1398,7 @@ struct class_skill_defines d_skills[] = { // bard skills
 { "piercing",              SKILL_PIERCEING_WEAPONS,        30,     70,     {DEX,STR} },
 { "slashing",              SKILL_SLASHING_WEAPONS,         30,     70,     {DEX,STR} },
 { "bludgeoning",           SKILL_BLUDGEON_WEAPONS,         30,     70,     {STR,DEX} },
-{ "crushing",              SKILL_CRUSHING_WEAPONS,         30,     70,     {STR,DEX} },
+{ "whipping",              SKILL_WHIPPING_WEAPONS,         30,     70,     {STR,DEX} },
 { "soothing rememberance", SKILL_SONG_SOOTHING_REMEM,      31,     98,     {INT,WIS} },
 { "searching song",        SKILL_SONG_SEARCHING_SONG,      32,     98,     {INT,DEX} },
 { "dischordant dirge",     SKILL_SONG_DISCHORDANT_DIRGE,   34,     98,     {WIS,CON} },
@@ -1408,6 +1410,7 @@ struct class_skill_defines d_skills[] = { // bard skills
 { "astral chanty",         SKILL_SONG_ASTRAL_CHANTY,       45,     98,     {STR,DEX} },
 { "crushing crescendo",    SKILL_SONG_CRUSHING_CRESCENDO,  46,     98,     {CON,STR} },
 { "shattering resonance",  SKILL_SONG_SHATTERING_RESO,     48,     98,     {STR,CON} },
+{ "mountain king's charge",SKILL_SONG_MKING_CHARGE,        49,     98,     {STR,CON} },
 { "hypnotic harmony",      SKILL_SONG_HYPNOTIC_HARMONY,    50,     98,     {WIS,INT} },
 { "\n",                    0,                              1,      0,      {0,0} }
 };
@@ -1460,7 +1463,7 @@ struct class_skill_defines u_skills[] = { // druid skills
 {    "lightning shield",     SPELL_LIGHTNING_SHIELD,     41,     98,     {WIS,INT} },
 {    "blindness",            SPELL_BLINDNESS,            42,     98,     {CON,WIS} },  
 {    "forage",               SKILL_FORAGE,               43,     90,     {INT,CON} },  
-{    "eagle eye",            SPELL_EAGLE_EYE,            43,     98,     {WIS,INT} },
+{    "spiritwalk",            SPELL_GHOSTWALK,            43,     98,     {WIS,INT} },
 {    "stoneskin",            SPELL_STONE_SKIN,           44,     70,     {STR,CON} },  
 {    "power heal",           SPELL_POWER_HEAL,           45,     98,     {WIS,STR} },  
 {    "forest meld",          SPELL_FOREST_MELD,          46,     90,     {WIS,DEX} },  
@@ -1511,19 +1514,19 @@ struct class_skill_defines c_skills[] = { // cleric skills
 {    "bludgeoning",          SKILL_BLUDGEON_WEAPONS,  30,     80,     {STR,DEX} },
 {    "crushing",             SKILL_CRUSHING_WEAPONS,  30,     80,     {STR,DEX} },
 {    "heroes feast",         SPELL_HEROES_FEAST,      31,     98,     {WIS,CON} },
-{    "dispel evil",          SPELL_DISPEL_EVIL,       32,     90,     {WIS,STR} },
-{    "dispel good",          SPELL_DISPEL_GOOD,       33,     90,     {WIS,STR} },     
+{    "dispel evil",          SPELL_DISPEL_EVIL,       32,     90,     {STR,INT} },
+{    "dispel good",          SPELL_DISPEL_GOOD,       33,     90,     {STR,INT} },     
 {    "iridescent aura",      SPELL_IRIDESCENT_AURA,   35,     98,     {WIS,INT} },
 {    "protection from evil", SPELL_PROTECT_FROM_EVIL, 36,     90,     {WIS,DEX} },     
 {    "protection from good", SPELL_PROTECT_FROM_GOOD, 37,     90,     {WIS,DEX} },     
 {    "portal",               SPELL_PORTAL,            38,     85,     {STR,INT} },     
 {    "true sight",           SPELL_TRUE_SIGHT,        39,     90,     {WIS,INT} },     
 {    "full heal",            SPELL_FULL_HEAL,         40,     98,     {WIS,INT} },
-{    "power harm",           SPELL_POWER_HARM,        41,     98,     {WIS,CON} },
+{    "power harm",           SPELL_POWER_HARM,        41,     98,     {STR,CON} },
 {    "resist magic",         SPELL_RESIST_MAGIC,      43,     90,     {INT,WIS} },
 {    "resist energy",        SPELL_RESIST_ENERGY,     44,     85,     {CON,DEX} },
 {    "dispel magic",         SPELL_DISPEL_MAGIC,      45,     85,     {INT,CON} },
-{    "flamestrike",          SPELL_FLAMESTRIKE,       46,     98,     {INT,WIS} },
+{    "flamestrike",          SPELL_FLAMESTRIKE,       46,     98,     {STR,WIS} },
 {    "group recall",         SPELL_GROUP_RECALL,      47,     98,     {DEX,STR} },
 {    "heal spray",           SPELL_HEAL_SPRAY,        48,     98,     {WIS,CON} },
 {    "group sanctuary",      SPELL_GROUP_SANC,        49,     98,     {STR,WIS} },
@@ -1785,6 +1788,7 @@ char
     "NOKI",
     "NOMATRIX",
     "BOSS",
+    "SOLID",
     "\n"
 };
 
@@ -1813,6 +1817,7 @@ char *player_bits[] =
     "NOTAX",
     "GUIDE",
     "GUIDE_TOG",
+    "NEWS",
     "\n"
 };
 
@@ -2107,19 +2112,19 @@ const struct wis_app_type wis_app[] = {
 // Dexterity Attribute Modifiers
 const struct dex_app_type dex_app[] = {
 /* STAT# { TO_HIT_ BONUS, AC_BONUS, MOVE_GAIN/LEVEL, FIRE_RES	},*/
-/*  0 */ {	-13,	     48,	-4,		-6,	},
-/*  1 */ {	-12,	     40,	-4,     	-5,	},
-/*  2 */ {	-11,	     36,	-3,		-5,	},
-/*  3 */ {	-10,	     32,	-3,		-4,	},
-/*  4 */ {	-9,	     28,	-3,		-4,	},
-/*  5 */ {	-8,	     24,	-2,		-3,	},
-/*  6 */ {	-7,	     20,	-2,		-3,	},
-/*  7 */ {	-6,	     16,	-2,		-2,	},
-/*  8 */ {	-5,	     12,	-1,		-2,	},
-/*  9 */ {	-4,	     8,		-1,		-2,	},
+/*  0 */ {	-5,	     48,	-4,		-6,	},
+/*  1 */ {	-4,	     40,	-4,     	-5,	},
+/*  2 */ {	-3,	     36,	-3,		-5,	},
+/*  3 */ {	-3,	     32,	-3,		-4,	},
+/*  4 */ {	-2,	     28,	-3,		-4,	},
+/*  5 */ {	-2,	     24,	-2,		-3,	},
+/*  6 */ {	-2,	     20,	-2,		-3,	},
+/*  7 */ {	-2,	     16,	-2,		-2,	},
+/*  8 */ {	-1,	     12,	-1,		-2,	},
+/*  9 */ {	-1,	     8,		-1,		-2,	},
 /* 10 */ {	-3,	     6,		-1,		-1,	},
-/* 11 */ {	-2,	     4,		 0,		-1,	},
-/* 12 */ {	-1,	     3,		 0,		-1,	},
+/* 11 */ {	-1,	     4,		 0,		-1,	},
+/* 12 */ {	0,	     3,		 0,		-1,	},
 /* 13 */ {	 0,	     1,		 0,		 0,	},
 /* 14 */ {	 0,	     0,		 0,		 0,	},
 /* 15 */ {	 0,	    -1,		 0,		 0,	},
@@ -2143,19 +2148,19 @@ const struct dex_app_type dex_app[] = {
 // Strength Attribute Modifiers
 const struct str_app_type str_app[] = {
 /* STAT# { TO_DAMAGE_BONUS, MAX_CARRIED, COLD RES	},*/
-/*  0 */ {	-13,	    	25,	   -6,		},
-/*  1 */ {	-12,		25,	   -5,		},
-/*  2 */ {	-11,		30,	   -5,		},
-/*  3 */ {	-10,		40,	   -4,		},
-/*  4 */ {	-9,		50,	   -4,		},
-/*  5 */ {	-8,		60,	   -3,		},
-/*  6 */ {	-7,		70,	   -3,		},
-/*  7 */ {	-6,		80,	   -2,		},
-/*  8 */ {	-5,		90,	   -2,		},
-/*  9 */ {	-4,		100,	   -2,		},
-/* 10 */ {	-3,		110,	   -1,		},
-/* 11 */ {	-2,		120,	   -1,		},
-/* 12 */ {	-1,		130,	   -1,		},
+/*  0 */ {	-7,	    	25,	   -6,		},
+/*  1 */ {	-6,		25,	   -5,		},
+/*  2 */ {	-5,		30,	   -5,		},
+/*  3 */ {	-4,		40,	   -4,		},
+/*  4 */ {	-3,		50,	   -4,		},
+/*  5 */ {	-3,		60,	   -3,		},
+/*  6 */ {	-2,		70,	   -3,		},
+/*  7 */ {	-2,		80,	   -2,		},
+/*  8 */ {	-2,		90,	   -2,		},
+/*  9 */ {	-1,		100,	   -2,		},
+/* 10 */ {	-1,		110,	   -1,		},
+/* 11 */ {	 -1,		120,	   -1,		},
+/* 12 */ {	 0,		130,	   -1,		},
 /* 13 */ {	 0,		140,	    0,		},
 /* 14 */ {	 0,		150,	    0,		},
 /* 15 */ {	 0,		160,	    0,		},

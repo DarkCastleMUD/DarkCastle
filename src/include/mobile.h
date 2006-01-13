@@ -1,7 +1,7 @@
 #ifndef MOBILE_H_
 #define MOBILE_H_
 /************************************************************************
-| $Id: mobile.h,v 1.16 2005/06/30 01:18:24 shane Exp $
+| $Id: mobile.h,v 1.17 2006/01/13 16:49:21 dcastle Exp $
 | mobile.h
 | Description:  This file contains the header information for mobile
 |   control.
@@ -52,7 +52,8 @@ void    mprog_driver            ( char* com_list, CHAR_DATA* mob,
 #define ACT_NOKI	    27
 #define ACT_NOMATRIX	    28
 #define ACT_BOSS 	    29
-#define ACT_MAX             29
+#define ACT_SOLID           30
+#define ACT_MAX             30
 //#define CHECKTHISACT      32 //Do not change unless ASIZE changes
 //#define CHECKTHISACT      64 //Do not chance unless ASIZE changes
 

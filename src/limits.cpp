@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.60 2005/05/31 11:24:46 urizen Exp $ */
+/* $Id: limits.cpp,v 1.61 2006/01/13 16:49:15 dcastle Exp $ */
 
 extern "C"
 {
@@ -181,6 +181,8 @@ int mana_gain(CHAR_DATA *ch)
   gain /= 4;
   gain /= divisor; 
   gain += MIN(age(ch).year,100) / 5;
+  if (GET_LEVEL(ch) < 50)
+  gain = (float)gain * (2.0-(float)GET_LEVEL(ch)/50.0);
 
   gain += ch->mana_regen;
 
@@ -241,6 +243,8 @@ int hit_gain(CHAR_DATA *ch)
 
   gain /= divisor;
   gain += ch->hit_regen;
+  if (GET_LEVEL(ch) < 50)
+  gain = (float)gain * (2.0-(float)GET_LEVEL(ch)/50.0);
  
   return MAX(1,gain);
 }
@@ -296,6 +300,8 @@ int move_gain(CHAR_DATA *ch)
  
    gain += ch->move_regen;
 
+  if (GET_LEVEL(ch) < 50)
+  gain = (float)gain * (2.0-(float)GET_LEVEL(ch)/50.0);
 
     return MAX(1,gain);
 }
@@ -714,9 +720,24 @@ void point_update( void )
     next_dude = i->next;
   if (affected_by_spell(i, SPELL_POISON))
   {
+	debugpoint();
     send_to_char("You feel very sick.\r\n",i);
-    int dam = dam_percent(affected_by_spell(i, SPELL_POISON)->modifier, 50);
-    damage(i, i, dam, TYPE_POISON, SPELL_POISON, 0);
+        int dam = affected_by_spell(i, SPELL_POISON)->duration*number(10,50);
+        int retval;
+        bool found = FALSE;
+        struct char_data *findchar;
+        for (findchar = character_list;findchar;findchar = findchar->next)
+          if ((int)findchar == affected_by_spell(i, SPELL_POISON)->modifier)
+        { // Verify that caster still exists.
+                found = TRUE;
+                break;
+        }
+        if (found)
+     retval = damage((CHAR_DATA*)(affected_by_spell(i,SPELL_POISON)->modifier), i,dam, TYPE_POISON, SPELL_POISON, 0);
+        else
+      retval = damage(i, i, dam, TYPE_POISON, SPELL_POISON, 0);
+
+//    damage(i, i, dam, TYPE_POISON, SPELL_POISON, 0);
     continue;
   }
 

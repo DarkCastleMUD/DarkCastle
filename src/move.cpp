@@ -1,5 +1,5 @@
  /************************************************************************
-| $Id: move.cpp,v 1.61 2005/10/27 18:57:08 urizen Exp $
+| $Id: move.cpp,v 1.62 2006/01/13 16:49:15 dcastle Exp $
 | move.C
 | Movement commands and stuff.
 *************************************************************************
@@ -516,6 +516,42 @@ int do_simple_move(CHAR_DATA *ch, int cmd, int following)
     } 
 
   struct room_data *rm = &(world[world[ch->in_room].dir_option[cmd]->to_room]);
+  if (rm->sector_type != world[ch->in_room].sector_type
+		&& ch->desc && ch->desc->original &&
+		ch->desc->original->level < 51)
+  {
+    int s2 = rm->sector_type, s1 = world[ch->in_room].sector_type;
+    if (
+	(s1 == SECT_CITY && (s2 != SECT_INSIDE && s2 != SECT_PAVED_ROAD)) ||
+	(s1 == SECT_INSIDE && (s2 != SECT_CITY && s2 != SECT_PAVED_ROAD)) ||
+	(s1 == SECT_PAVED_ROAD && (s2 != SECT_INSIDE && s2 != SECT_CITY)) ||
+
+	(s1 == SECT_FIELD && (s2 != SECT_HILLS && s2 != SECT_MOUNTAIN)) ||
+	(s1 == SECT_HILLS && (s2 != SECT_MOUNTAIN && s2 != SECT_FIELD)) ||
+	(s1 == SECT_MOUNTAIN && (s2 != SECT_HILLS && s2 != SECT_FIELD)) ||
+
+	(s1 == SECT_WATER_NOSWIM && (s2 != SECT_UNDERWATER && s2 != SECT_WATER_SWIM)) ||
+	(s1 == SECT_WATER_SWIM && (s2 != SECT_UNDERWATER && s2 != SECT_WATER_NOSWIM)) ||
+	(s1 == SECT_UNDERWATER && (s2 != SECT_WATER_NOSWIM && s2 != SECT_WATER_SWIM)) ||
+
+	
+	(s1 == SECT_BEACH && (s2 != SECT_DESERT)) ||
+	(s1 == SECT_DESERT && (s2 != SECT_BEACH)) ||
+
+	(s1 == SECT_FROZEN_TUNDRA && (s2 != SECT_ARCTIC)) ||
+	(s1 == SECT_ARCTIC && (s2 != SECT_FROZEN_TUNDRA)) ||
+
+	(s1 == SECT_AIR) ||
+
+	(s1 == SECT_SWAMP)
+	)
+	{
+		send_to_char("The ghost evaporates as you leave its habitat.\r\n",ch);
+		do_return(ch, "", 0);
+//		extract_char(ch,TRUE);
+		return eSUCCESS|eCH_DIED;
+	}
+  }
   if (IS_SET(rm->room_flags, TUNNEL))
   {
     int ppl = 0;
@@ -806,6 +842,13 @@ int attempt_move(CHAR_DATA *ch, int cmd, int is_retreat = 0)
       next_dude = k->next;
       if((was_in == k->follower->in_room) && 
         ((is_retreat && GET_POS(k->follower) > POSITION_RESTING) || (GET_POS(k->follower) >= POSITION_STANDING))) {
+  if(IS_AFFECTED(k->follower, AFF_NO_FLEE)) {
+     if(affected_by_spell(k->follower, SPELL_IRON_ROOTS))
+       send_to_char("The roots bracing your legs make it impossible to run!\r\n", k->follower);
+     else send_to_char("Your legs are too tired for running away!\r\n", k->follower);
+     return eFAILURE;
+  }
+
         if(CAN_SEE(k->follower, ch))
           sprintf(tmp, "You follow %s.\n\r\n\r", GET_SHORT(ch));
         else
@@ -814,6 +857,7 @@ int attempt_move(CHAR_DATA *ch, int cmd, int is_retreat = 0)
         //do_move(k->follower, "", cmd + 1);
         char tempcommand[32];
         strcpy(tempcommand, dirs[cmd]);
+        if (k->follower->fighting) stop_fighting(k->follower);
         command_interpreter(k->follower, tempcommand);
       } else {
        // sprintf(tmp, "%s attempted to follow %s but failed. (was_in:%d fol->in_room:%d pos: %d ret: %d", GET_NAME(k->follower), GET_NAME(ch), was_in, k->follower->in_room, GET_POS(k->follower), is_retreat);

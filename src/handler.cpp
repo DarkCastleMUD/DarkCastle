@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.96 2005/10/27 18:57:08 urizen Exp $ */
+/* $Id: handler.cpp,v 1.97 2006/01/13 16:49:14 dcastle Exp $ */
     
 extern "C"
 {
@@ -77,6 +77,7 @@ int do_fall(CHAR_DATA *ch, short dir);
 void remove_memory(CHAR_DATA *ch, char type);
 void add_memory(CHAR_DATA *ch, char *victim, char type);
 
+extern void debug_point();
 //TIMERS
 
 bool isTimer(CHAR_DATA *ch, int spell)
@@ -325,39 +326,42 @@ bool still_affected_by_poison(CHAR_DATA * ch)
 }
 
 const struct set_data set_list[] = {
-  { "Ascetic's Focus", { 2700, 6904, 8301, 8301, 9567, 9567, 12108, 14805, 15621, 
+  { "Ascetic's Focus", 19, { 2700, 6904, 8301, 8301, 9567, 9567, 12108, 14805, 15621, 
 	21718, 22302, 22314, 22600, 22601, 22602, 24815, 24815, 24816, 26237 },
 	"You attach your penis mightier.\r\n",
 	"You remove your penis mightier.\r\n"},
-  { "Warlock's Vestments", {17334,17335,17336,17337,17338,17339,17340,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+  { "Warlock's Vestments", 7, {17334,17335,17336,17337,17338,17339,17340,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
 	"You feel an increase in energy coursing through your body.\r\n",
 	"Your magical energy returns to its normal state.\r\n"},
-  { "Hunter's Arsenal", {17327,17328,17329,17330,17331,17332,17333,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+  { "Hunter's Arsenal", 7, {17327,17328,17329,17330,17331,17332,17333,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
         "You sense your accuracy and endurance have undergone a magical improvement.\r\n",
 	"Your accuracy and endurance return to their normal levels.\r\n"},
-  { "Captain's Regalia", {17341,17342,17343,17344,17345,17346,17347,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+  { "Captain's Regalia", 7, {17341,17342,17343,17344,17345,17346,17347,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
         "You feel an increased vigor surge throughout your body.\n",
 	"Your vigor is reduced to its normal state.\n"},
-  { "Celebrant's Defenses", {17319,17320,17321,17322,17323,17324,17325,17326,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+  { "Celebrant's Defenses", 7, {17319,17320,17321,17322,17323,17324,17325,17326,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
         "Your inner focus feels as though it is more powerful.\r\n",
 	"Your inner focus has reverted to its original form.\r\n"},
-  { "Battlerager's Fury", {352, 353, 354, 355, 356, 357, 358, 359, 359,
+  { "Battlerager's Fury", 18, {352, 353, 354, 355, 356, 357, 358, 359, 359,
 	360, 361, 362, 362, 9702, 9808, 9808, 27114, 27114, -1},
 	"You feel your stance harden and blood boil as you strap on your battlerager's gear.\r\n",
 	"Your blood returns to its normal temperature as you remove your battlerager's gear.\r\n"},
-  { "Veteran's Field Plate Armour", {21719, 21720, 21721, 21722, 21723, 21724, 21725, 21726, 21727,
+  { "Veteran's Field Plate Armour", 9, {21719, 21720, 21721, 21722, 21723, 21724, 21725, 21726, 21727,
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
  	"There is an audible *click* as the field plate locks into its optimal assembly.\r\n",
 	"There is a soft *click* as you remove the field plate from its optimal positioning.\r\n"},
-  { "Mother of All Dragons' Trophies", {22320, 22321, 22322, 22323, 22324, 22325, 22326, -1, -1, -1,
+  { "Mother of All Dragons' Trophies", 7, {22320, 22321, 22322, 22323, 22324, 22325, 22326, -1, -1, -1,
 	-1, -1, -1, -1, -1, -1, -1, -1, -1},
 	"You feel the might of the ancient dragonkind surge through your body.\r\n",
 	"The might of the ancient dragonkind has left you.\r\n"},
-  { "\n", {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+  { "Feral Fangs", 2, {4818, 4819,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+   "As the pairs of fangs' cries harmonize they seem to unleash something feral inside you.\r\n",
+   "As you remove the fangs your muscles relax and focus is restored.\r\n"},
+  { "\n", 0, {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
 	"\n","\n"}
 };
 
-void add_set_stats(char_data *ch, obj_data *obj, int flag)
+void add_set_stats(char_data *ch, obj_data *obj, int flag, int pos)
 {
   // obj has just been worn
   int obj_vnum = obj_index[obj->item_number].virt;
@@ -369,6 +373,8 @@ void add_set_stats(char_data *ch, obj_data *obj, int flag)
    for (y = 0; y < 19 && set_list[z].vnum[y] != -1; y++)
     if (set_list[z].vnum[y] == obj_vnum)
     {  // Aye, 'tis part of a set.
+	if ((obj_vnum == 4818 || obj_vnum == 4819) && pos == WEAR_HANDS)
+	continue;
 	for (y = 0; y < 19 && set_list[z].vnum[y] != -1;y++)
 	{
 	  if (set_list[z].vnum[y] == 17326 && GET_CLASS(ch) != CLASS_BARD) continue;
@@ -413,6 +419,17 @@ void add_set_stats(char_data *ch, obj_data *obj, int flag)
 	    affect_to_char(ch, &af);
 	    af.location = APPLY_MOVE;
 	    af.modifier = 25;
+	    affect_to_char(ch, &af);
+	    break;
+	  case SET_FERAL:
+	    af.location = APPLY_HITROLL;
+	    af.modifier = 2;
+	    affect_to_char(ch, &af);
+	    af.location = APPLY_HIT;
+	    af.modifier = 10;
+	    affect_to_char(ch, &af);
+	    af.location = APPLY_DAMROLL;
+	    af.modifier = 1;
 	    affect_to_char(ch, &af);
 	    break;
 	  case SET_CAPTAINS:
@@ -513,8 +530,7 @@ void check_weapon_weights(char_data * ch)
   if (ISSET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT)) return;
   // make sure we're still strong enough to wield our weapons
   if(!IS_MOB(ch) && ch->equipment[WIELD] &&
-       GET_OBJ_WEIGHT(ch->equipment[WIELD]) > MIN(GET_STR(ch), 
-get_max_stat(ch, STRENGTH)) && !ISSET(ch->affected_by, AFF_POWERWIELD))
+       GET_OBJ_WEIGHT(ch->equipment[WIELD]) > GET_STR(ch) && !ISSET(ch->affected_by, AFF_POWERWIELD))
   {
     act("Being too heavy to wield, you move your $p to your inventory.",
          ch, ch->equipment[WIELD], 0, TO_CHAR, 0);
@@ -532,15 +548,29 @@ get_max_stat(ch, STRENGTH)) && !ISSET(ch->affected_by, AFF_POWERWIELD))
   }
 
   if(ch->equipment[SECOND_WIELD] &&
-       GET_OBJ_WEIGHT(ch->equipment[SECOND_WIELD]) > MIN(GET_STR(ch)/2, 
-get_max_stat(ch, STRENGTH)/2) && !ISSET(ch->affected_by, 
-AFF_POWERWIELD))
+       GET_OBJ_WEIGHT(ch->equipment[SECOND_WIELD]) > GET_STR(ch)/2 && !ISSET(ch->affected_by,AFF_POWERWIELD))
   {
     act("Being too heavy to wield, you move your $p to your inventory.",
          ch, ch->equipment[SECOND_WIELD], 0, TO_CHAR, 0);
     act("$n stops using $p.", ch, ch->equipment[SECOND_WIELD], 0, TO_ROOM, INVIS_NULL);
     obj_to_char(unequip_char(ch, SECOND_WIELD), ch);
   }
+
+
+  if (ch->equipment[WEAR_SHIELD] && 
+((ch->equipment[WIELD] && 
+GET_OBJ_WEIGHT(ch->equipment[WIELD]) > GET_STR(ch) 
+&& !ISSET(ch->affected_by, AFF_POWERWIELD)) 
+|| (ch->equipment[SECOND_WIELD] && 
+GET_OBJ_WEIGHT(ch->equipment[SECOND_WIELD]) > GET_STR(ch)/2 
+&&!ISSET(ch->affected_by, AFF_POWERWIELD) ) ))
+  {
+    act("You shift your shield into your inventory.",
+         ch, ch->equipment[WEAR_SHIELD], 0, TO_CHAR, 0);
+    act("$n stops using $p.", ch, ch->equipment[WEAR_SHIELD], 0, TO_ROOM, INVIS_NULL);
+    obj_to_char(unequip_char(ch, WEAR_SHIELD), ch);
+  }
+
 }
 
 void affect_modify(CHAR_DATA *ch, int32 loc, int32 mod, long bitv, bool add)
@@ -699,11 +729,13 @@ void affect_modify(CHAR_DATA *ch, int32 loc, int32 mod, long bitv, bool add)
 	case APPLY_DAMROLL:
 	    GET_DAMROLL(ch) += mod;
 	    break;
+	case APPLY_SPELLDAMAGE:
+	    ch->spelldamage += mod;
+	    break;
 
 	case APPLY_SAVING_FIRE:
 	    ch->saves[SAVE_TYPE_FIRE] += mod;
 	    break;
-
 	case APPLY_SAVING_COLD:
 	    ch->saves[SAVE_TYPE_COLD] += mod;
 	    break;
@@ -1247,14 +1279,14 @@ void affect_remove( CHAR_DATA *ch, struct affected_type *af, int flags)
 	 break;
       case SKILL_INNATE_POWERWIELD:
            struct obj_data *obj;
-	   obj = ch->equipment[WIELD];
+/*	   obj = ch->equipment[WIELD];
            if (obj)
 	   if (obj->obj_flags.extra_flags & ITEM_TWO_HANDED)
            {
 	     obj_to_char(unequip_char(ch, WIELD, (flags & SUPPRESS_MESSAGES)),ch);
 	         if (!(flags & SUPPRESS_MESSAGES))
  	     act("You shift $p into your inventory.",ch, obj, NULL, TO_CHAR, 0);
-  	   }
+  	   }*/
            obj = ch->equipment[SECOND_WIELD];
  	   if (obj)
            if (obj->obj_flags.extra_flags & ITEM_TWO_HANDED)
@@ -1597,6 +1629,7 @@ int equip_char(CHAR_DATA *ch, struct obj_data *obj, int pos, int flag)
     }
     if(ch->equipment[pos])
     {
+	debug_point();
        log("Already equipped in equip_char!", ANGEL, LOG_BUG);
        return 0;
     }
@@ -1679,7 +1712,7 @@ int equip_char(CHAR_DATA *ch, struct obj_data *obj, int pos, int flag)
 	affect_modify(ch, obj->affected[j].location,
 	  obj->affected[j].modifier, -1, TRUE);
 
-   add_set_stats(ch, obj, flag);
+   add_set_stats(ch, obj, flag,pos);
 
    redo_hitpoints(ch);
    redo_mana(ch);
@@ -2680,11 +2713,15 @@ void extract_char(CHAR_DATA *ch, bool pull)
     void stop_guarding(char_data * guard);
     struct obj_data *i;
     CHAR_DATA *omast = NULL;
+    int ret = eSUCCESS;
     if ( !IS_NPC(ch) && !ch->desc )
        for ( t_desc = descriptor_list; t_desc; t_desc = t_desc->next )
 	   if ( t_desc->original == ch )
-	      do_return( t_desc->character, "", 0 );
-
+	      ret = do_return( t_desc->character, "", 0 );
+   if (SOMEONE_DIED(ret))
+   { // already taken care of
+   return;
+   }
     if ( ch->in_room == NOWHERE ) {
 	log( "Extract_char: NOWHERE", ANGEL, LOG_BUG );
         return;
@@ -2785,7 +2822,7 @@ void extract_char(CHAR_DATA *ch, bool pull)
     GET_AC(ch) = 100;
 
     if ( ch->desc && ch->desc->original )
-	do_return( ch, "", 0 );
+	do_return( ch, "", 12 );
 
     if ( IS_NPC(ch) && ch->mobdata->nr > -1 )
 	mob_index[ch->mobdata->nr].number--;
@@ -3383,7 +3420,8 @@ int generic_find(char *arg, int bitvector, CHAR_DATA *ch,
 
     if(IS_SET(bitvector, FIND_OBJ_EQUIP)) {
       for(found=FALSE, i=0; i < MAX_WEAR && !found; i++)
-         if(ch->equipment[i] && isname(name, ch->equipment[i]->name)) {
+         if(ch->equipment[i] && isname(name, ch->equipment[i]->name) &&
+		CAN_SEE_OBJ(ch, ch->equipment[i])) {
 	   *tar_obj = ch->equipment[i];
 	   found = TRUE;
 	 }

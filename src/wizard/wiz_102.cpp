@@ -945,7 +945,7 @@ int do_zedit(struct char_data *ch, char *argument, int cmd)
 
       for(int k = 0; k <= top_of_zonet; k++)
       {
-        if(GET_LEVEL(ch) < DEITY && zone != k)
+        if(!has_skill(ch, COMMAND_RANGE) && zone != k)
            continue;
 
         for(i = 0; i < last_cmd; i++)
@@ -4406,6 +4406,14 @@ int do_return(struct char_data *ch, char *argument, int cmd)
 
         ch->desc->character->desc = ch->desc; 
         ch->desc = 0;
+	if (IS_NPC(ch) && mob_index[ch->mobdata->nr].virt > 90 &&
+	  mob_index[ch->mobdata->nr].virt < 100 &&
+	cmd != 12)
+	{
+	  act("$n evaporates.",ch, 0, 0, TO_ROOM, 0);
+	  extract_char(ch, TRUE);
+	  return eSUCCESS|eCH_DIED;
+	}
     }
     return eSUCCESS;
 }

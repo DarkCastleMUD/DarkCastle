@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.58 2005/06/29 10:41:40 shane Exp $
+| $Id: objects.cpp,v 1.59 2006/01/13 16:49:15 dcastle Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -232,8 +232,7 @@ int do_switch(struct char_data *ch, char *arg, int cmd)
     act("You fail to switch your weapons.", ch, 0,0, TO_CHAR, 0);
     return eFAILURE;
   }
-  if (GET_OBJ_WEIGHT(ch->equipment[WIELD]) > MIN(GET_STR(ch)/2, 
-get_max_stat(ch, STRENGTH)/2)
+  if (GET_OBJ_WEIGHT(ch->equipment[WIELD]) > GET_STR(ch)/2 
 && !IS_AFFECTED(ch, AFF_POWERWIELD))
   {
      send_to_char("Your primary wield is too heavy to wield as secondary.\r\n",ch);
@@ -1692,12 +1691,11 @@ void wear(struct char_data *ch, struct obj_data *obj_object, int keyword)
 
   case 12:
     if(CAN_WEAR(obj_object,ITEM_WIELD)) {
-      if(!ch->equipment[WIELD] && GET_OBJ_WEIGHT(obj_object) > 
-MIN(GET_STR(ch), get_max_stat(ch, STRENGTH)) && 
+      if(!ch->equipment[WIELD] && GET_OBJ_WEIGHT(obj_object) > GET_STR(ch) && 
 !ISSET(ch->affected_by,AFF_POWERWIELD))
         send_to_char("It is too heavy for you to use.\n\r",ch);
       else if(ch->equipment[WIELD] && GET_OBJ_WEIGHT(obj_object) > 
-MIN(GET_STR(ch)/2, get_max_stat(ch, STRENGTH)/2) && 
+GET_STR(ch)/2 && 
 !ISSET(ch->affected_by, AFF_POWERWIELD))
         send_to_char("It is too heavy for you to use as a secondary weapon.\n\r",ch);
       else if((!hands_are_free(ch, 2)) && 

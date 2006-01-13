@@ -87,6 +87,7 @@ int do_harmtouch(struct char_data *ch, char *argument, int cmd)
    if(!skill_success(ch,victim,SKILL_HARM_TOUCH)) {
      send_to_char("Your god refuses you.\r\n", ch);
      duration = 12;
+     WAIT_STATE(ch, PULSE_VIOLENCE/2 + number(1, PULSE_VIOLENCE/2));
    }
    else {
      dam = 750;

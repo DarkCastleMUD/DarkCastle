@@ -191,6 +191,7 @@ void assign_non_combat_procs() {
     assign_one_mob_non(1935,  guild);
     assign_one_mob_non(1937,  guild);
     assign_one_mob_non(10018, gl_repair_shop);
+    assign_one_mob_non(10004, godload_sales);
     assign_one_mob_non(10019, godload_sales);
     assign_one_mob_non(10020, godload_sales);
     assign_one_mob_non(10021, godload_sales);
@@ -205,6 +206,7 @@ void assign_non_combat_procs() {
     assign_one_mob_non(3061,  janitor);
     assign_one_mob_non(3062,  fido);
     assign_one_mob_non(3066,  fido);
+    assign_one_mob_non(22021,  fido);
     assign_one_mob_non(1941,  guild);
     assign_one_mob_non(1938,  guild_guard);
     assign_one_mob_non(1940,  guild_guard);
@@ -229,6 +231,7 @@ void assign_non_combat_procs() {
     assign_one_mob_non(2306,  clan_guard);
     assign_one_mob_non(2307,  clan_guard);
     assign_one_mob_non(2308,  clan_guard);
+    assign_one_mob_non(2310,  clan_guard);
     assign_one_mob_non(2399,  clan_guard);
     assign_one_mob_non(9511,  bodyguard);
     assign_one_mob_non(9531,  bodyguard);
@@ -477,9 +480,15 @@ void assign_objects(void)
   SPEC_FUN godload_aligngood;
   SPEC_FUN godload_alignevil;
   SPEC_FUN godload_hammer;
+  SPEC_FUN transfer_thing;
  // combvat procs
   SPEC_FUN godload_banshee;
   SPEC_FUN godload_claws;
+    SPEC_FUN    godload_foecrusher;
+    SPEC_FUN    godload_hydratail;
+    SPEC_FUN    godload_jaelgreth;
+    SPEC_FUN    godload_grathelok;
+
   //Godload procs follow.
     assign_one_obj_com(565,   godload_banshee);
     assign_one_obj_com(511,   godload_claws);
@@ -523,12 +532,14 @@ void assign_objects(void)
   assign_one_obj_non(2360, board);
   assign_one_obj_non(2339, board);
   assign_one_obj_non(2406, board); /*Urukhai Board */
+  assign_one_obj_non(2370,  board); /* Quest Board */
   assign_one_obj_non(25,  mob_summoner);
   assign_one_obj_non(41,  restring_machine);
   assign_one_obj_non(40,  emoting_object);
   assign_one_obj_non(71,  board); /* Punishment Board */
   assign_one_obj_non(101,  globe_of_darkness_proc);
   assign_one_obj_non(185,  devilsword);
+  assign_one_obj_non(4801, transfer_thing);
   assign_one_obj_non(225,  weenie_weedy);
   assign_one_obj_non(393,  hot_potato);
   assign_one_obj_non(396,  noremove_eq);
@@ -565,6 +576,8 @@ void assign_objects(void)
 //  assign_one_obj_non(2056,  gem_assembler);  
 //  assign_one_obj_non(2068,  gem_assembler);  
 
+  assign_one_obj_com(4818, glove_combat_procs);
+  assign_one_obj_com(4819, glove_combat_procs);
 
   // Crystalline tir
   assign_one_obj_non(12607,  gem_assembler);  
@@ -606,10 +619,12 @@ void assign_objects(void)
   assign_one_obj_com(19503,  glove_combat_procs);
   assign_one_obj_com(26807,  goldenbatleth);
   assign_one_obj_com(30627,  eliara_combat);
-//  assign_one_obj_com(22732,  drainingstaff);
+  assign_one_obj_com(570,  godload_jaelgreth);
+  assign_one_obj_com(575,  godload_grathelok);
+  assign_one_obj_com(584,  godload_foecrusher);
+  assign_one_obj_com(586,  godload_hydratail);
 //  assign_one_obj_com(22743,  bonusattack);
 //  assign_one_obj_com(22605,  souldrainer);
-
     int i;
     for (i = 1940; i <= 1950; i++) /* Guild boards.*/
       assign_one_obj_non(i, board); 

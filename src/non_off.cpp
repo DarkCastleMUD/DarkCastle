@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: non_off.cpp,v 1.31 2005/05/31 11:24:47 urizen Exp $
+| $Id: non_off.cpp,v 1.32 2006/01/13 16:49:15 dcastle Exp $
 | non_off.C
 | Description:  Implementation of generic, non-offensive commands.
 */
@@ -266,6 +266,7 @@ char * toggle_txt[] = {
   "notell",
   "notax",
   "guide",
+  "news-up",
   ""
 };
 
@@ -357,6 +358,10 @@ int do_toggle(struct char_data * ch, char * arg, int cmd)
          sprintf(buf + strlen(buf), "%s\n\r",
            IS_SET(ch->pcdata->toggles, PLR_GUIDE_TOG) ? "on" : "off");
          break;
+         case 15:
+         sprintf(buf + strlen(buf), "%s\n\r",
+           IS_SET(ch->pcdata->toggles, PLR_NEWS) ? "on" : "off");
+         break;
 
 
 	 
@@ -438,6 +443,9 @@ int do_toggle(struct char_data * ch, char * arg, int cmd)
     
     case 14:
     do_guide_toggle(ch, "", 9);
+    break;
+    case 15:
+    do_news_toggle(ch, "", 9);
     break;
 
     default:
@@ -576,6 +584,24 @@ int do_guide_toggle(struct char_data *ch, char *argument, int cmd)
     {
         send_to_char("You will now show your guide tag.\n\r", ch);
         SET_BIT(ch->pcdata->toggles, PLR_GUIDE_TOG);
+    }
+    
+    return eSUCCESS;
+} 
+int do_news_toggle(struct char_data *ch, char *argument, int cmd)
+{
+    if (IS_NPC(ch))
+        return eFAILURE; 
+    
+    if (IS_SET(ch->pcdata->toggles, PLR_NEWS))
+    {
+        send_to_char("You now view news in an up-down fashion.\n\r", ch);
+        REMOVE_BIT(ch->pcdata->toggles, PLR_NEWS);
+    }
+    else 
+    {
+        send_to_char("You now view news in a down-up fashion..\n\r", ch);
+        SET_BIT(ch->pcdata->toggles, PLR_NEWS);
     }
     
     return eSUCCESS;

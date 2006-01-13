@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.286 2005/10/30 15:59:45 urizen Exp $ */
+/* $Id: fight.cpp,v 1.287 2006/01/13 16:49:14 dcastle Exp $ */
 
 extern "C"
 {
@@ -194,7 +194,7 @@ void perform_violence(void)
       if(SOMEONE_DIED(retval)) // no point in going anymore
         continue;
 
-      if(ch->equipment[WIELD]) {
+/*	      if(ch->equipment[WIELD]) {
         if(obj_index[ch->equipment[WIELD]->item_number].combat_func) {
           retval = ((*obj_index[ch->equipment[WIELD]->item_number].combat_func)
                      (ch, ch->equipment[WIELD], 0, "", ch));
@@ -212,7 +212,7 @@ void perform_violence(void)
       }
       if (SOMEONE_DIED(retval))
           continue;    // Fix for procs beng called on dead chars. 
-      // MOB Progs
+  */    // MOB Progs
       retval = mprog_hitprcnt_trigger( ch, ch->fighting );
       if(SOMEONE_DIED(retval))
         continue;
@@ -249,8 +249,20 @@ void perform_violence(void)
       next_af_dude = af->next;
       if (af->type == SPELL_POISON)
       {
-        int dam = (affected_by_spell(ch, SPELL_POISON)->modifier) * number(1,5);
-        int retval = damage(ch, ch, dam, TYPE_POISON, 0, 0);
+        int dam = (affected_by_spell(ch, SPELL_POISON)->duration) * number(10,50);
+	int retval;
+	bool found = FALSE;
+	struct char_data *findchar;
+	for (findchar = character_list;findchar;findchar = findchar->next)
+	  if ((int)findchar == affected_by_spell(ch, SPELL_POISON)->modifier)
+	{ // Verify that caster still exists.
+		found = TRUE;	
+		break;
+	}
+	if (found)
+     retval = damage((CHAR_DATA*)(affected_by_spell(ch,SPELL_POISON)->modifier),ch, dam, TYPE_POISON, SPELL_POISON, 0);
+	else  
+      retval = damage(ch, ch, dam, TYPE_POISON, SPELL_POISON, 0);
         if (SOMEONE_DIED(retval))
         { over = TRUE; break; }
       }
@@ -382,7 +394,7 @@ int attack(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
 
   if (!ch || !vict) { 
     log("NULL Victim or Ch sent to attack!  This crashes us!", -1, LOG_BUG);
-    debug_point();
+   // debug_point();
     return eINTERNAL_ERROR;
   }
 
@@ -400,7 +412,8 @@ int attack(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
   // when cast by mobs, I need to make sure mobs aren't killing each other  
   if (IS_NPC(ch) && IS_NPC(vict) && 
       !IS_AFFECTED(ch, AFF_CHARM) &&   !IS_AFFECTED(ch, AFF_FAMILIAR) &&
-      !IS_AFFECTED(vict, AFF_CHARM) && !IS_AFFECTED(vict, AFF_FAMILIAR)) 
+      !IS_AFFECTED(vict, AFF_CHARM) && !IS_AFFECTED(vict, AFF_FAMILIAR)
+	&& !ch->desc && !vict->desc) 
   {
    if (ch->fighting == vict) {
     stop_fighting(ch);
@@ -469,6 +482,9 @@ int attack(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
       if(affected_by_spell(ch, SPELL_HASTE))  // spell is 33%
         chance = 33;
       else chance = 66;                       // eq/bard is 66%
+      if ((ch->equipment[WIELD] && obj_index[ch->equipment[WIELD]->item_number].virt == 586) ||
+      (ch->equipment[SECOND_WIELD] && obj_index[ch->equipment[SECOND_WIELD]->item_number].virt == 586))
+		chance = 101;
       if(chance > number(1, 100))
       {
         result = one_hit(ch, vict, type, FIRST);
@@ -525,6 +541,10 @@ int attack(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
       if(affected_by_spell(ch, SPELL_HASTE))  // spell is 33%
         chance = 33;
       else chance = 66;                       // eq/bard is 66%
+      if ((ch->equipment[WIELD] && obj_index[ch->equipment[WIELD]->item_number].virt == 586) ||
+      (ch->equipment[SECOND_WIELD] && obj_index[ch->equipment[SECOND_WIELD]->item_number].virt == 586))
+		chance = 101;
+
       if(chance > number(1, 100))
       {
         result = one_hit(ch, vict, type, FIRST); 
@@ -629,7 +649,7 @@ void update_stuns(CHAR_DATA *ch)
       if (GET_POS(ch) != POSITION_FIGHTING) {
         act("$n regains consciousness...", ch, 0, 0, TO_ROOM, 0);
         act("You regain consciousness...", ch, 0, 0, TO_CHAR, 0);
-        GET_POS(ch) = POSITION_SITTING;
+        GET_POS(ch) = POSITION_STANDING;
 	if (IS_SET(ch->combat, COMBAT_BERSERK))
 	{
 	  send_to_char("After that period of unconsciousness, you've forgotten what you were mad about.\r\n",ch);
@@ -1107,9 +1127,9 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
   if(IS_AFFECTED(vict, AFF_PARALYSIS) || !AWAKE(vict) || is_stunned(vict))
     chance = 102; // can't miss
   else {
-    chance = 25;
+    chance = 45;
     if (IS_NPC(vict)) chance += 25;
-    chance += GET_LEVEL(ch) - GET_LEVEL(vict);
+    chance += (GET_LEVEL(ch) - GET_LEVEL(vict))/2;
     chance += GET_REAL_HITROLL(ch);
   //  chance += dex_app[GET_DEX(ch)].tohit;
     chance += ( GET_ARMOR(vict) / 10 );  // (positive ac hurts you, negative helps)
@@ -1216,6 +1236,19 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
     if(!SOMEONE_DIED(retval) && ch->equipment[HOLD2] && obj_index[ch->equipment[HOLD2]->item_number].combat_func)
           retval = ((*obj_index[ch->equipment[HOLD2]->item_number].combat_func)
                        (ch, ch->equipment[HOLD2], 0, "", ch));
+
+              if(!SOMEONE_DIED(retval) && ch->equipment[WIELD]) {
+        if(obj_index[ch->equipment[WIELD]->item_number].combat_func) {
+          retval = ((*obj_index[ch->equipment[WIELD]->item_number].combat_func)
+                     (ch, ch->equipment[WIELD], 0, "", ch));
+        }
+	}
+        if(!SOMEONE_DIED(retval) && ch->equipment[SECOND_WIELD]) {
+          if(obj_index[ch->equipment[SECOND_WIELD]->item_number].combat_func) {
+            retval = ((*obj_index[ch->equipment[SECOND_WIELD]->item_number].combat_func)
+                     (ch, ch->equipment[SECOND_WIELD], 0, "", ch));
+          }
+        }
   }
   if (!SOMEONE_DIED(retval))
     if (IS_MOB(ch) && ISSET(ch->mobdata->actflags, ACT_DRAINY))
@@ -1459,6 +1492,7 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
   bool reflected = FALSE;  
   char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH], buf3[MAX_STRING_LENGTH];
 
+  weapon_bit = get_weapon_bit(weapon_type);
   if(!weapon)
     weapon = WIELD;
   typeofdamage = damage_type(weapon_type);
@@ -1467,7 +1501,8 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
   if (ch->in_room != victim->in_room && !(attacktype == SPELL_SOLAR_GATE ||
    attacktype == SKILL_ARCHERY ||attacktype == SPELL_LIGHTNING_BOLT || 
    attacktype == SKILL_FIRE_ARROW || attacktype == SKILL_TEMPEST_ARROW || 
-   attacktype == SKILL_GRANITE_ARROW || attacktype == SKILL_ICE_ARROW)) 
+   attacktype == SKILL_GRANITE_ARROW || attacktype == SKILL_ICE_ARROW ||
+	attacktype == SPELL_POISON)) 
      return eSUCCESS;
   int l=0;
   if (dam!=0 && attacktype && attacktype < TYPE_HIT)
@@ -1521,10 +1556,14 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
        REMOVE_BIT(victim->combat, COMBAT_REPELANCE);
   //  }
   }
+  bool imm = FALSE;
+  if (IS_SET(victim->immune, weapon_bit))
+   imm = TRUE;
+
   if (has_skill(victim, SKILL_MAGIC_RESIST))
     skill_increase_check(victim, SKILL_MAGIC_RESIST, has_skill(victim,SKILL_MAGIC_RESIST), SKILL_INCREASE_HARD);
-
   int save = 0;
+   if (!imm)
     switch(weapon_type) {
        case TYPE_FIRE:
             save = get_saves(victim, SAVE_TYPE_FIRE);
@@ -1571,7 +1610,8 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
      }
 
    }
-   if (save < 0)
+
+   if (save < 0 && !imm)
    { double mult = 0 - save; // Turns positive.
      mult = 1.0 + (double)mult/100;
      dam = (int)(dam * mult);
@@ -1604,11 +1644,8 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
         strcat(buf2, buf3);
         act(buf2, victim, 0, ch, TO_CHAR, 0);
      }
-//        act("$n is susceptable to $N's assault and sustains additional damage.", victim, 0, ch, TO_ROOM, NOTVICT);
-//        act("$n is susceptable to your assault and sustains additional damage.",victim,0,ch, TO_VICT, 0);
-//        act("You are susceptable to $N's assault and sustain additional damage.", victim, 0, ch, TO_CHAR, 0); 
    }
-   else if (number(1,100) < save) {
+   else if (number(1,100) < save && !imm) {
       if (save > 50) save = 50;
       dam -= (int)(dam * (double)save/100); // Save chance.
       if(reflected) {
@@ -1659,7 +1696,11 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
      }
      if (v > o && has_skill(ch, attacktype) > o) dam += v;
   }
+
   }
+  if (affected_by_spell(ch, SKILL_SONG_MKING_CHARGE))
+    dam *= 1.1; // scary!
+
   // Can't hurt god, but he likes to see the messages. 
   if (GET_LEVEL(victim) >= IMMORTAL && !IS_NPC(victim))
     dam = 0;
@@ -1720,7 +1761,7 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
   if(attacktype != SKILL_BACKSTAB &&  GET_HIT(victim) > 0 &&
      (typeofdamage == DAMAGE_TYPE_PHYSICAL || attacktype == TYPE_PHYSICAL_MAGIC))
     if(do_frostshield(ch, victim)) {
-      return eSUCCESS;
+      return eSUCCESS|eEXTRA_VALUE;;
     }
 
   if(typeofdamage == DAMAGE_TYPE_PHYSICAL) {
@@ -1897,19 +1938,14 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
   {
     dam = 0;
     if (attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING) {
-//      act("You ignore $n's puny weapon.", ch, 0, victim, TO_VICT, 0);
-//      act("$N ignores your puny weapon.", ch, 0, victim, TO_CHAR, 0);
-//      act("$N ignores $n's puny weapon.", ch, 0, victim, TO_ROOM, NOTVICT);
       SET_BIT(modifier, COMBAT_MOD_IGNORE);
     }
-  } 
-  else if (IS_SET(victim->suscept, weapon_bit)) 
+  }
+ 
+/*  else if (IS_SET(victim->suscept, weapon_bit)) 
   {
     dam = (int)(dam * 1.3);
     if (attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING) {
-//      act("You shudder from the power of $n's weapon.", ch, 0, victim, TO_VICT, 0);
-//      act("$N shudders from the power of your weapon.", ch, 0, victim, TO_CHAR, 0);
-//      act("$N shudders from the power of $n's weapon.", ch, 0, victim, TO_ROOM, NOTVICT);
       SET_BIT(modifier, COMBAT_MOD_SUSCEPT);
     } else {
       act("You shudder from the power of $n's spell.", ch, 0, victim, TO_VICT, 0);
@@ -1921,9 +1957,6 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
   {
     dam = (int)(dam * 0.7);
     if (attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING)  {
-//      act("You resist against the power of $n's weapon.", ch, 0, victim, TO_VICT, 0);
-//      act("$N resists against the power of your weapon.", ch, 0, victim, TO_CHAR, 0);
-//      act("$N resists against the power of $n's weapon.", ch, 0, victim, TO_ROOM, NOTVICT);
         SET_BIT(modifier, COMBAT_MOD_RESIST);
     } 
     else {
@@ -1932,7 +1965,7 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
       act("$N resists against the power of $n's spell.", ch, 0, victim, TO_ROOM, NOTVICT);
     }
   }
-  
+  */
   if (dam < 0)
     dam = 0;
 
@@ -1965,7 +1998,7 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
    !(attacktype == SPELL_SOLAR_GATE|| attacktype == SKILL_ARCHERY || 
    attacktype == SPELL_LIGHTNING_BOLT || attacktype == SKILL_FIRE_ARROW ||
    attacktype == SKILL_ICE_ARROW || attacktype == SKILL_TEMPEST_ARROW ||
-   attacktype == SKILL_GRANITE_ARROW)) // Wimpy
+   attacktype == SKILL_GRANITE_ARROW || attacktype == SPELL_POISON)) // Wimpy
       return eSUCCESS;   
   if(typeofdamage == DAMAGE_TYPE_PHYSICAL && dam > 0 && ch != victim && attacktype != SKILL_ARCHERY)
   {
@@ -3258,7 +3291,10 @@ void make_heart(CHAR_DATA * ch, CHAR_DATA * vict)
 {
   struct obj_data *corpse;
   char buf[MAX_STRING_LENGTH];
-  
+  int hands_are_free(CHAR_DATA *ch, int number);
+
+  if (!hands_are_free(ch, 1))
+    return;
 #ifdef LEAK_CHECK
   corpse = (struct obj_data *)calloc(1, sizeof(struct obj_data));
 #else
@@ -3295,8 +3331,12 @@ void make_heart(CHAR_DATA * ch, CHAR_DATA * vict)
     corpse->obj_flags.more_flags = 0;
     corpse->obj_flags.timer = MAX_PC_CORPSE_TIME;
   }
+  if (!ch->equipment[HOLD] && !ch->equipment[WIELD] && !ch->equipment[WEAR_LIGHT]) 
   equip_char(ch, corpse, HOLD);
-  
+  else if (!ch->equipment[HOLD2] && !ch->equipment[SECOND_WIELD])
+  equip_char(ch, corpse, HOLD2);
+  else
+   { extract_obj(corpse); }
   return;
 }
 
@@ -3519,7 +3559,7 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
 
     // update stats
     GET_RDEATHS(victim) += 1;
-    debug_point();
+    //debug_point();
     /* gods don't suffer from stat loss */
     if (GET_LEVEL(victim) < IMMORTAL && GET_LEVEL(victim) > 19)
     {
@@ -4762,11 +4802,11 @@ int weapon_spells(CHAR_DATA *ch, CHAR_DATA *vict, int weapon)
     case WEP_CREATE_FOOD:
       retval = cast_create_food(GET_LEVEL(ch), ch, "", 0, vict, 0, wep_skill);
       break;
-
+/*
     case WEP_THIEF_POISON:
       retval = handle_poisoned_weapon_attack(ch, vict, percent);
       break;
-
+*/
     default:
       retval = eSUCCESS;
       // Don't want to log this since a non-spell affect is going to happen all

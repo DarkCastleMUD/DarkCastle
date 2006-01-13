@@ -19,7 +19,7 @@
 /* 12/06/2003   Onager   Modified mobile_activity() to prevent charmie    */
 /*                       scavenging                                       */
 /**************************************************************************/
-/* $Id: mob_act.cpp,v 1.34 2005/06/28 19:49:56 shane Exp $ */
+/* $Id: mob_act.cpp,v 1.35 2006/01/13 16:49:15 dcastle Exp $ */
 
 extern "C"
 {
@@ -45,6 +45,7 @@ extern "C"
 #include <spells.h>
 #include <race.h> // Race defines used in align-aggro messages.
 #include <comm.h>
+#include <connect.h>
 
 extern CHAR_DATA *character_list;
 extern struct index_data *mob_index;
@@ -113,7 +114,7 @@ void mobile_activity(void)
   /* Examine all mobs. */
   for(ch = character_list; ch; ch = next_dude) 
   {
-    if (!ch) break;
+    if (!ch || ch == (CHAR_DATA*)0x95959595) break;
     next_dude = ch->next;
     
     if(!IS_MOB(ch))
@@ -168,9 +169,10 @@ void mobile_activity(void)
     
     if(IS_SET(retval, eCH_DIED))
       continue;
-
+   extern bool selfpurge;
+	selfpurge = FALSE;
      retval = mprog_arandom_trigger (ch);
-     if (IS_SET(retval, eCH_DIED))
+     if (IS_SET(retval, eCH_DIED) || selfpurge)
        continue;
     // activate mprog act triggers
     if ( ch->mobdata->mpactnum > 0 )  // we check to make sure ch is mob in very beginning, so safe
@@ -184,7 +186,7 @@ void mobile_activity(void)
              if(IS_SET(retval, eCH_DIED))
                break; // break so we can continue with the next mob
         }
-        if(IS_SET(retval, eCH_DIED))
+        if(IS_SET(retval, eCH_DIED) || selfpurge)
           continue; // move on to next mob, this one is dead
 
         for ( tmp_act = ch->mobdata->mpact; tmp_act != NULL; tmp_act = tmp2_act )
@@ -349,11 +351,13 @@ void mobile_activity(void)
             continue;      
           if(!CAN_SEE(ch, tmp_ch))
             continue;
-          if(IS_NPC(tmp_ch) && !IS_AFFECTED(tmp_ch, AFF_CHARM))
+          if(IS_NPC(tmp_ch) && !IS_AFFECTED(tmp_ch, AFF_CHARM) && !tmp_ch->desc)
             continue;
           if(ISSET(ch->mobdata->actflags, ACT_WIMPY) && AWAKE(tmp_ch) )
             continue;
-          if(!IS_MOB(tmp_ch) && IS_SET(tmp_ch->pcdata->toggles, PLR_NOHASSLE) )
+          if ((!IS_MOB(tmp_ch) && IS_SET(tmp_ch->pcdata->toggles, PLR_NOHASSLE) )
+		|| (tmp_ch->desc && tmp_ch->desc->original && 
+		IS_SET(tmp_ch->desc->original->pcdata->toggles, PLR_NOHASSLE)))
             continue;
       
           /* check for PFG/PFE, (anti)pal perma-protections, etc. */
@@ -403,15 +407,18 @@ void mobile_activity(void)
       
         /* check for PFE/PFG, (anti)pal perma-protections, etc. */
         if (is_protected(tmp_ch, ch))
-           continue;
+	continue;
 
         tmp_bitv = GET_BITV(tmp_ch);
 
         if(ISSET(ch->mobdata->actflags, ACT_FRIENDLY) &&
            tmp_ch->fighting &&
+	  CAN_SEE(ch, tmp_ch) &&
            (IS_SET(race_info[(int)GET_RACE(ch)].friendly, tmp_bitv) ||
 	     (int)GET_RACE(ch) == (int)GET_RACE(tmp_ch)) &&
-           !(IS_NPC(tmp_ch->fighting) && !IS_AFFECTED(tmp_ch->fighting, AFF_CHARM)))
+		
+           !(IS_NPC(tmp_ch->fighting) && !IS_AFFECTED(tmp_ch->fighting, AFF_CHARM))
+		&& !IS_SET(race_info[(int)GET_RACE(ch)].friendly, GET_BITV(tmp_ch->fighting)))
         {
           tmp_race = GET_RACE(tmp_ch);
           if(GET_RACE(ch) == tmp_race)
@@ -427,9 +434,13 @@ void mobile_activity(void)
           break;
         }
       
-        if(!IS_NPC(tmp_ch) && !tmp_ch->fighting && CAN_SEE(ch, tmp_ch) &&
+//           continue;
+
+        if((!IS_NPC(tmp_ch) && !tmp_ch->fighting && CAN_SEE(ch, tmp_ch) &&
            !IS_SET(world[ch->in_room].room_flags, SAFE) &&
-           !IS_SET(tmp_ch->pcdata->toggles, PLR_NOHASSLE) // this is safe, cause we checked !IS_NPC first
+           !IS_SET(tmp_ch->pcdata->toggles, PLR_NOHASSLE) ||
+	  (IS_NPC(tmp_ch) && tmp_ch->desc && tmp_ch->desc->original && CAN_SEE(ch, tmp_ch)
+		&& !IS_SET(tmp_ch->desc->original->pcdata->toggles, PLR_NOHASSLE))) // this is safe, cause we checked !IS_NPC first
           )
         { 
 	int i=0;

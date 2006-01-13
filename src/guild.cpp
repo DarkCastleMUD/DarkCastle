@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.79 2005/05/16 11:04:51 shane Exp $
+| $Id: guild.cpp,v 1.80 2006/01/13 16:49:14 dcastle Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -16,6 +16,7 @@
 #include <ki.h>
 #include <mobile.h>
 #include <room.h>
+#include <sing.h>
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -231,7 +232,7 @@ int skills_guild(struct char_data *ch, char *arg, struct char_data *owner)
           continue;
       specialization = known / 100;
       known = known % 100;
-      sprintf(buf, " %-20s%14s   (Level %2d)", skilllist[i].skillname,
+      sprintf(buf, " %-25s%14s   (Level %2d)", skilllist[i].skillname,
                    how_good(known), skilllist[i].levelavailable);
       send_to_char(buf, ch);
       if(skilllist[i].skillnum >= 1 && skilllist[i].skillnum <= MAX_SPL_LIST) 
@@ -242,7 +243,19 @@ int skills_guild(struct char_data *ch, char *arg, struct char_data *owner)
         sprintf(buf," Mana: %4d ",use_mana(ch,skilllist[i].skillnum));
         send_to_char(buf, ch);
       }
-      else send_to_char("            ", ch);
+      else if (skilllist[i].skillnum >= SKILL_SONG_BASE && skilllist[i].skillnum <= SKILL_SONG_MAX)
+      {
+	extern struct song_info_type song_info[];
+	sprintf(buf, " Ki: %4d   ",song_info[skilllist[i].skillnum-SKILL_SONG_BASE].min_useski);
+	send_to_char(buf,ch);
+      }
+      else if (skilllist[i].skillnum >= KI_OFFSET && skilllist[i].skillnum <= KI_OFFSET+MAX_KI_LIST)
+      {
+	extern struct ki_info_type ki_info[];
+	sprintf(buf, " Ki: %4d   ",ki_info[skilllist[i].skillnum-KI_OFFSET].min_useski);
+	send_to_char(buf,ch);
+      }
+	else send_to_char("            ", ch);
       if (skilllist[i].attrs[0])
       {
 	sprintf(buf, " %s ",attrname(skilllist[i].attrs[0]));
@@ -554,7 +567,7 @@ int get_stat(CHAR_DATA *ch, int stat)
 void skill_increase_check(char_data * ch, int skill, int learned, int difficulty)
 {
    int chance, maximum;
-   if (ch->in_room && IS_SET(world[ch->in_room].room_flags, NOLEARN))
+if (ch->in_room && IS_SET(world[ch->in_room].room_flags, NOLEARN))
 	return;
 
    if (!difficulty) 
@@ -593,27 +606,27 @@ void skill_increase_check(char_data * ch, int skill, int learned, int difficulty
      }
    }
    if (!maximum) return;
-   int to = (int)((float)maximum*(float)0.75);
+   int to = maximum-3,mod = 0;
    if (skilllist[i].attrs[0])
    {
 	int thing = get_stat(ch,skilllist[i].attrs[0])-20;
-	if (thing > 0)
- 	 to += (int)((get_stat(ch,skilllist[i].attrs[0])-20)*2.5);
-	if (to > 90) to = 90;
+	if (thing > 8)
+ 	{ to += 2; mod += thing/2;}
+	
    }
    if (skilllist[i].attrs[1])
    {
 	int thing = get_stat(ch,skilllist[i].attrs[1])-20;
-	if (thing > 0)
-         to += (get_stat(ch,skilllist[i].attrs[1])-20);
+	if (thing > 6)
+         {to += 1;mod+= thing/4;}
    }
-   if (to > maximum) to = maximum;
    if(learned >= to)
      return;
 
    chance = number(1, 101);
    if(learned < 15)
       chance += 5;
+
    int oi = 101;
    if (difficulty > 500) { oi = 100; difficulty -= 500; }
    switch(difficulty) {
@@ -633,6 +646,7 @@ void skill_increase_check(char_data * ch, int skill, int learned, int difficulty
        log("Illegal difficulty value sent to skill_increase_check", IMMORTAL, LOG_BUG);
        break;
    }
+   oi -= mod;
    if (oi > chance) return;
    // figure out the name of the affect (if any)
    char * skillname = get_skill_name(skill);
@@ -652,7 +666,8 @@ int get_max(CHAR_DATA *ch, int skill)
    int maximum;
    class_skill_defines * skilllist = get_skill_list(ch);
    if(!skilllist)
-     return -1;  // class has no skills by default
+	skilllist = g_skills;
+//     return -1;  // class has no skills by default
    maximum = 0;
    int i;
    for(i = 0; *skilllist[i].skillname != '\n'; i++)
@@ -661,20 +676,27 @@ int get_max(CHAR_DATA *ch, int skill)
        maximum = skilllist[i].maximum;
        break;
      }
-   int percent = (int) ((float)maximum * 0.75);
-   if (skilllist[i].attrs[0])
+   if (skilllist != g_skills) { skilllist = g_skills; 
+   for(i = 0; *skilllist[i].skillname != '\n'; i++)
+     if(skilllist[i].skillnum == skill)
+     {
+       maximum = skilllist[i].maximum;
+       break;
+     }
+   }
+   int percent = maximum-3;
+   if (maximum && skilllist[i].attrs[0])
    {
         int thing = get_stat(ch,skilllist[i].attrs[0])-20;
-        if (thing > 0)
-          percent += (int)((get_stat(ch,skilllist[i].attrs[0])-20)*2.5);
-        if(percent > 90) percent = 90;
+	if (thing >= 8) percent+=2;
    }
-   if (skilllist[i].attrs[1])
+   if (maximum && skilllist[i].attrs[1])
    {
         int thing = get_stat(ch,skilllist[i].attrs[1])-20;
-        if (thing > 0)
-        percent += (get_stat(ch,skilllist[i].attrs[1])-20);
-   }
+        if (thing > 6)
+        percent += 1;
+  }
+
    return percent;
 }
 
@@ -689,21 +711,19 @@ void check_maxes(CHAR_DATA *ch)
    for(i = 0; *skilllist[i].skillname != '\n'; i++)
      {
        maximum = skilllist[i].maximum;
-	int to = (int)((float)maximum*0.75);
+	int to = maximum-3;
        if (skilllist[i].attrs[0])
        {
             int thing = get_stat(ch,skilllist[i].attrs[0])-20;
-            if (thing > 0)
-              to += (int)((get_stat(ch,skilllist[i].attrs[0])-20)*2.5);
-	    if (to > 90) to = 90;
+            if (thing > 8)
+              to += 2;
        }
        if (skilllist[i].attrs[1])
        {
             int thing = get_stat(ch,skilllist[i].attrs[1])-20;
-            if (thing > 0)
-              to += (get_stat(ch,skilllist[i].attrs[1])-20);
+            if (thing > 6)
+              to += 1;
        }
-       if (to > maximum) to = maximum;
        if (has_skill(ch,skilllist[i].skillnum) > to)
        {
 	  struct char_skill_data * curr = ch->skills;

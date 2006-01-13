@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.145 2005/09/30 10:21:37 urizen Exp $ */
+/* $Id: spells.cpp,v 1.146 2006/01/13 16:49:15 dcastle Exp $ */
 
 extern "C"
 {
@@ -200,7 +200,7 @@ struct spell_info_type spell_info [ ] =
 
  { /* 58 */ 12, POSITION_STANDING,  5, TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_know_alignment, SKILL_INCREASE_EASY },
 
- { /* 59 */ 12, POSITION_FIGHTING, 30, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_OBJ_ROOM|TAR_OBJ_INV|TAR_SELF_NONO, cast_dispel_magic, SKILL_INCREASE_HARD },
+ { /* 59 */ 12, POSITION_FIGHTING, 30, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_dispel_magic, SKILL_INCREASE_HARD },
 
  { /* 60 */ /* 24, POSITION_STANDING, 150, TAR_NONE_OK, cast_conjure_elemental */ 0, 0, 0, 0, 0, 0 },
 
@@ -398,7 +398,9 @@ struct spell_info_type spell_info [ ] =
 
  { /* 157 */ 12, POSITION_FIGHTING, 35, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_call_lightning, SKILL_INCREASE_HARD },
 
- { /* 158 */ 12, POSITION_FIGHTING, 45, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_divine_fury, SKILL_INCREASE_HARD }
+ { /* 158 */ 12, POSITION_FIGHTING, 45, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_divine_fury, SKILL_INCREASE_HARD },
+
+ { /* 159 */ 12, POSITION_STANDING, 45, TAR_IGNORE, cast_ghost_walk, SKILL_INCREASE_HARD }
 
 };
 
@@ -747,6 +749,7 @@ char *spells[]=
    "eagle eye",
    "call lightning",
    "divine fury",
+   "spiritwalk",
    "\n"
 };
 
@@ -1438,12 +1441,17 @@ bool skill_success(CHAR_DATA *ch, CHAR_DATA *victim, int skillnum, int mod )
   int i = 0,learned = 0;
 
     if (!IS_MOB(ch))      i = learned = has_skill(ch, skillnum);
-    else    		i = GET_LEVEL(ch);
- 
+    else {
+	if (GET_LEVEL(ch) < 30) i = 30;
+	else if (GET_LEVEL(ch) < 50) i =40;
+	else if (GET_LEVEL(ch) < 70) i =60;
+	else if (GET_LEVEL(ch) < 90) i =70;
+	else i =75;
+   }
     if (stat && victim)
 	i -= stat_mod[get_stat(victim,stat)];
   i += mod;
-  if (i < 40) i = 40;
+  if (i < 55) i = 55;
 
   if (GET_CLASS(ch) == CLASS_MAGIC_USER || GET_CLASS(ch) == CLASS_ANTI_PAL 
 	|| GET_CLASS(ch) == CLASS_THIEF )
@@ -1660,9 +1668,15 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
               target_ok = TRUE;
 
           if (!target_ok && IS_SET(spell_info[spl].targets, TAR_CHAR_WORLD))
+	{
+		bool orig = ISSET(ch->affected_by, AFF_TRUE_SIGHT);
+		if (spl == SPELL_EAGLE_EYE)
+		  SETBIT(ch->affected_by, AFF_TRUE_SIGHT);
             if ( ( tar_char = get_char_vis(ch, name) ) != NULL )
               target_ok = TRUE;
-      
+		if (!orig)
+		  REMBIT(ch->affected_by, AFF_TRUE_SIGHT);
+      }
           if (!target_ok && IS_SET(spell_info[spl].targets, TAR_OBJ_INV))
             if ( ( tar_obj = get_obj_in_list_vis(ch, name, ch->carrying)) != NULL )
               target_ok = TRUE;
@@ -1769,7 +1783,7 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
           return eFAILURE;
         }
       }
-     if (IS_SET(spell_info[spl].targets, TAR_FIGHT_VICT))
+     if (tar_char && IS_SET(spell_info[spl].targets, TAR_FIGHT_VICT))
      {
 	  if (!can_attack(ch) || !can_be_attacked(ch, tar_char))
 	    return eFAILURE;

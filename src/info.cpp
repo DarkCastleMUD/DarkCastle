@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.72 2005/06/06 22:03:36 shane Exp $ */
+/* $Id: info.cpp,v 1.73 2006/01/13 16:49:14 dcastle Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -831,7 +831,8 @@ int do_look(struct char_data *ch, char *argument, int cmd)
                         send_to_char(buffer, ch);
                      }
                   }
-                  else if (GET_ITEM_TYPE(tmp_object) == ITEM_CONTAINER)
+                  else if (GET_ITEM_TYPE(tmp_object) == ITEM_CONTAINER ||
+			GET_ITEM_TYPE(tmp_object) == ITEM_ALTAR)
                   {
                      if (!IS_SET(tmp_object->obj_flags.value[1],
                         CONT_CLOSED))
@@ -1714,14 +1715,14 @@ int do_story(struct char_data *ch, char *argument, int cmd)
    page_string(ch->desc, story, 0);
    return eSUCCESS;
 }
-
+/*
 int do_news(struct char_data *ch, char *argument, int cmd) 
 {   
    page_string(ch->desc, news, 0);
    return eSUCCESS;
 }
 
-
+*/
 int do_info(struct char_data *ch, char *argument, int cmd) 
 {
    page_string(ch->desc, info, 0);

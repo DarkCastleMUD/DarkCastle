@@ -71,7 +71,7 @@
 #define INVALID_SOCKET -1
 #endif
 
-
+extern bool MOBtrigger;
 short code_testing_mode = 0;
 short code_testing_mode_mob = 0;
 short code_testing_mode_world = 0;
@@ -503,7 +503,9 @@ void finish_hotboot()
   }
 
   for (d=descriptor_list;d;d=d->next)
-    do_look(d->character, "", 8);
+ {   do_look(d->character, "", 8);
+    do_save(d->character,"",666);
+  }
 }
 
 /* Init sockets, run game, and cleanup sockets */
@@ -767,7 +769,8 @@ void game_loop(unsigned mother_desc, unsigned other_desc, unsigned third_desc, u
 
 //logf(110, LOG_BUG, "Startloop");
 //gettimeofday(&debugtimer1, NULL);
-
+	extern bool selfpurge;
+	selfpurge = FALSE;
     // Set up the input, output, and exception sets for select().
     FD_ZERO(&input_set);
     FD_ZERO(&output_set);
@@ -1102,13 +1105,13 @@ int do_prompt(CHAR_DATA *ch, char *arg, int cmd)
 
 char * calc_color_align(int align)
 {
-  if(align <= -401)
+  if(align <= -351)
     return BOLD RED;
   if (align <= -300) 
      return BOLD YELLOW;
   if (align <= 299)
      return BOLD GREY;
-  if (align <= 400)
+  if (align <= 349)
      return BOLD YELLOW;
   return BOLD GREEN;
 }
@@ -2098,7 +2101,8 @@ int close_socket(struct descriptor_data *d)
   }
   if (d->character) {
     // target_idnum = GET_IDNUM(d->character);
-    if (d->connected == CON_PLAYING) {
+    if (d->connected == CON_PLAYING || d->connected == CON_WRITE_BOARD ||
+	d->connected == CON_EDITING || d->connected == CON_EDIT_MPROG) {
       save_char_obj(d->character);
 
       // end any performances
@@ -2116,6 +2120,13 @@ int close_socket(struct descriptor_data *d)
       sprintf(buf, "Losing player: %s.",
 	      GET_NAME(d->character) ? GET_NAME(d->character) : "<null>");
       log(buf, ANGEL, LOG_SOCKET);
+      if (d->connected == CON_WRITE_BOARD || d->connected ==
+		CON_EDITING || d->connected == CON_EDIT_MPROG)
+	{
+//		sprintf(buf, "Suspicious: %s.", 
+//			GET_NAME(d->character));
+//		log(buf, 110, LOG_HMM);
+	}
       free_char(d->character);
     }
   }
@@ -2370,7 +2381,13 @@ void send_to_char_regardless(char *messg, CHAR_DATA *ch) {
 
 void send_to_char(char *messg, struct char_data *ch)
 {
-  if ((ch->desc && messg) && (!is_busy(ch))) {
+  extern bool selfpurge;
+  if (IS_NPC(ch) && !ch->desc && MOBtrigger && messg)
+    mprog_act_trigger( messg, ch, 0, 0, 0 );
+  if (IS_NPC(ch) && !ch->desc && !selfpurge && MOBtrigger && messg)
+    oprog_act_trigger( messg, ch);
+
+  if (!selfpurge && (ch->desc && messg) && (!is_busy(ch))) {
     SEND_TO_Q(messg, ch->desc);
   }
 }

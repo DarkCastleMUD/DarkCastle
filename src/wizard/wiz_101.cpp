@@ -39,6 +39,17 @@ int do_wizhelp(struct char_data *ch, char *argument, int cmd_arg)
   buf[0] = '\0';
   buf2[0] = '\0';
 
+  if (argument && *argument)
+  {
+    char arg[MAX_INPUT_LENGTH],arg2[MAX_INPUT_LENGTH];
+    argument = one_argument(argument, arg);
+    one_argument(argument, arg2);
+    sprintf(buf, "Arg1: %s\n",arg);    
+    send_to_char(buf,ch);
+    sprintf(buf, "Arg2: %s\n",arg2);    
+    send_to_char(buf,ch);
+    return eSUCCESS;
+  }
   send_to_char("Here are your godly powers:\n\r\n\r", ch);
 
   int v;

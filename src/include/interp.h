@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.h,v 1.37 2005/06/25 18:58:56 shane Exp $ */
+/* $Id: interp.h,v 1.38 2006/01/13 16:49:21 dcastle Exp $ */
 
 #ifndef INTERP_H_
 #define INTERP_H_
@@ -58,6 +58,7 @@ DO_FUN  do_reload;
 DO_FUN  do_abandon;
 DO_FUN  do_accept;
 DO_FUN  do_action;
+DO_FUN  do_addnews;
 DO_FUN  do_advance;
 DO_FUN  do_guide;
 DO_FUN  do_alias;
@@ -90,6 +91,7 @@ DO_FUN  do_bloodfury;
 DO_FUN  do_boot;
 DO_FUN  do_boss;
 DO_FUN  do_brief;
+DO_FUN  do_news_toggle;
 DO_FUN  do_bug;
 DO_FUN  do_bullrush;
 DO_FUN  do_cast;

@@ -348,14 +348,6 @@ int holyavenger(CHAR_DATA *ch, struct obj_data *obj,  int cmd, char *arg,
    if(!(vict = ch->fighting)) {
        return eFAILURE;
    }
-   if ((vict->equipment[WEAR_NECK_1] && obj_index[vict->equipment[WEAR_NECK_1]->item_number].virt == 518) ||
-(vict->equipment[WEAR_NECK_2] && obj_index[vict->equipment[WEAR_NECK_2]->item_number].virt == 518))
-   { // tarrasque's leash..
-	act("You attempt to behead $N, but your sword bounces of $S neckwear.",ch, 0, vict, TO_CHAR, 0);
-	act("$n attempts to behead $N, but fails.", ch, 0, vict, TO_ROOM, NOTVICT);
-	act("$n attempts to behead you, but cannot cut through your neckwear.",ch,0,vict,TO_VICT,0);
-	return eSUCCESS;
-   }
    if(GET_HIT(vict) < 3500) {
        percent = (100 * GET_HIT(vict)) / GET_MAX_HIT(vict);
        chance = number(0, 101);
@@ -367,6 +359,14 @@ int holyavenger(CHAR_DATA *ch, struct obj_data *obj,  int cmd, char *arg,
                if(chance > (2 * percent)) {
                    chance = number(0, 101);
                    if(chance > (2 * percent)) {
+   if ((vict->equipment[WEAR_NECK_1] && obj_index[vict->equipment[WEAR_NECK_1]->item_number].virt == 518) ||
+(vict->equipment[WEAR_NECK_2] && obj_index[vict->equipment[WEAR_NECK_2]->item_number].virt == 518))
+   { // tarrasque's leash..
+	act("You attempt to behead $N, but your sword bounces of $S neckwear.",ch, 0, vict, TO_CHAR, 0);
+	act("$n attempts to behead $N, but fails.", ch, 0, vict, TO_ROOM, NOTVICT);
+	act("$n attempts to behead you, but cannot cut through your neckwear.",ch,0,vict,TO_VICT,0);
+	return eSUCCESS;
+   }
                        act("You feel your life end as $n's sword SLICES YOUR HEAD OFF!", ch, 0, vict, TO_VICT, 0);
                        act("You SLICE $N's head CLEAN OFF $S body!", ch, 0, vict, TO_CHAR, 0);
                        act("$n cleanly slices $N's head off $S body!", ch, 0, vict, TO_ROOM, NOTVICT);
@@ -394,7 +394,7 @@ int hooktippedsteelhalberd(CHAR_DATA *ch, struct obj_data *obj, int cmd,
    CHAR_DATA *victim;
    if (!(victim = ch->fighting))
      return eFAILURE;
-   if (number(1,101) > 5) return eFAILURE;
+   if (number(1,101) > 2) return eFAILURE;
    int which = number(0, MAX_WEAR);
    if (!victim->equipment[which])
      return eFAILURE; // Lucky
@@ -408,37 +408,6 @@ int hooktippedsteelhalberd(CHAR_DATA *ch, struct obj_data *obj, int cmd,
     }
    return eSUCCESS;
 }
-
-int goldenbatleth(CHAR_DATA *ch, struct obj_data *obj,  int cmd, char *arg, 
-                   CHAR_DATA *invoker)
-{
-   CHAR_DATA *vict; 
-
-   if(!(vict = ch->fighting))
-       return eFAILURE;
-
-   if(GET_HIT(vict) > 40)
-     return eFAILURE;
-
-   switch(number(0, 1)) {
-     case 0:
-       act("$n's blow rips your leg from your body.  Extreme pain is yours to know until you hit the ground mercifully dead.", ch, 0, vict, TO_VICT, 0);
-       act("You attack takes off $N's leg at the knee!  Ahh the blood!", ch, 0, vict, TO_CHAR, 0);
-       act("$n fierce swing takes off $N's leg at the knee leaving a bloody stump and a brief scream.", ch, 0, vict, TO_ROOM, NOTVICT);
-       make_leg(vict);
-       break;
-     case 1:
-       act("$n's attack takes off your arm at the shoulder.  You stare in shock at the fountaining blood before $e crushes your skull.", ch, 0, vict, TO_VICT, 0);
-       act("You violently rip off $S arm with the attack before caving in $N's forehead.", ch, 0, vict, TO_CHAR, 0);
-       act("With a grunt of exertion, $n swings with enough force to rip $N's arm off!", ch, 0, vict, TO_ROOM, NOTVICT);
-       make_arm(vict);
-       break;
-   }
-   GET_HIT(vict) = -20;
-   group_gain(ch, vict); 
-   fight_kill(ch, vict, TYPE_CHOOSE, 0);
-   return eSUCCESS; 
-} 
 
 // TODO - I think we actually used this for a while but it was too powerful
 int drainingstaff(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, 
@@ -635,6 +604,41 @@ struct assembler_data gem_data[] = {
    }
 
 };
+
+int transfer_thing(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, 
+                   CHAR_DATA *invoker)
+{
+  if (cmd != 11) return eFAILURE;
+  char junk[MAX_INPUT_LENGTH];
+   char arg1[MAX_INPUT_LENGTH];
+  
+   half_chop(arg, arg1, junk);
+   if(*junk)
+      return eFAILURE;
+  
+  if (str_cmp(arg1, "vanity")) return eFAILURE;
+  if (invoker->fighting) return eFAILURE;
+  
+ send_to_char("The hellmouth reaches out and embraces you. As you become completely\r\n"
+ "immersed in its energy your skin burns, your sight fades into darkness,\r\n" 
+ "your nose recoils at the stench of sulphur, and all you can taste is\r\n"
+ "blood.\r\n",invoker);
+  char_from_room(invoker);
+  char_to_room(invoker, real_room(4801));
+  GET_KI(invoker) -= 50;
+  if (GET_KI(invoker) < 0) GET_KI(invoker) = 0;
+  GET_HIT(invoker) /= 2;
+  GET_MANA(invoker) /= 2;
+  GET_MOVE(invoker) /= 2;  
+  do_look(invoker, "", 9);
+   send_to_char("In an instant your senses are restored and you are left only\r\n"
+ "temporarily dazed. Although you appear to be somewhere other\r\n"
+ "than where you were prior to this experience, your life feels\r\n"
+ "as though it has ebbed to the brink of death and has been only\r\n"
+ "partially restored.\r\n",invoker);
+  return eSUCCESS;
+}
+
 
 int gem_assembler(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, 
                    CHAR_DATA *invoker)
@@ -2364,6 +2368,14 @@ int glove_combat_procs(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
        return damage(ch, ch->fighting, dam, TYPE_MAGIC, TYPE_UNDEFINED, 0);
      break;
 
+     case 4818:
+	if (number(0,19))
+	  return eFAILURE;
+	return spell_burning_hands(ch->level, ch, ch->fighting, NULL, 50);
+     case 4819:
+	if (number(0,19))
+	  return eFAILURE;
+	return spell_chill_touch(ch->level, ch, ch->fighting, NULL, 50);
      case 21718:
       if (affected_by_spell(ch, BASE_SETS+SET_SAIYAN))
       {
@@ -2877,9 +2889,10 @@ int godload_tovmier(struct char_data*ch, struct obj_data *obj, int cmd, char*arg
 int godload_hammer(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
                    CHAR_DATA *invoker)
 {
-  if (cmd != 188 && is_wearing(ch,obj))
+  if (cmd != 188 || !ch)
     return eFAILURE;
 
+  if (!is_wearing(ch, obj)) return eFAILURE;
   if (isTimer(ch, SPELL_EARTHQUAKE)) 
   {  
      send_to_char("The hammer glows, but nothing happens.\r\n",ch);
@@ -3054,4 +3067,206 @@ int spellcraft_glyphs(struct char_data*ch, struct obj_data *obj, int cmd, char*a
    }
 */
    return eSUCCESS;   
+}
+
+int godload_grathelok(CHAR_DATA *ch, struct obj_data *obj,  int cmd, char *arg, 
+                   CHAR_DATA *invoker)
+{
+   CHAR_DATA *vict; 
+
+   if(!(vict = ch->fighting))
+       return eFAILURE;
+
+   if(GET_HIT(vict) > 100)
+     return eFAILURE;
+
+   switch(number(0, 1)) {
+     case 0:
+       act("$n's blow rips your leg from your body.  Extreme pain is yours to know until you hit the ground mercifully dead.", ch, 0, vict, TO_VICT, 0);
+       act("You attack takes off $N's leg at the knee!  Ahh the blood!", ch, 0, vict, TO_CHAR, 0);
+       act("$n fierce swing takes off $N's leg at the knee leaving a bloody stump and a brief scream.", ch, 0, vict, TO_ROOM, NOTVICT);
+       make_leg(vict);
+       break;
+     case 1:
+       act("$n's attack takes off your arm at the shoulder.  You stare in shock at the fountaining blood before $e crushes your skull.", ch, 0, vict, TO_VICT, 0);
+       act("You violently rip off $S arm with the attack before caving in $N's forehead.", ch, 0, vict, TO_CHAR, 0);
+       act("With a grunt of exertion, $n swings with enough force to rip $N's arm off!", ch, 0, vict, TO_ROOM, NOTVICT);
+       make_arm(vict);
+       break;
+   }
+   GET_HIT(vict) = -20;
+   group_gain(ch, vict); 
+   fight_kill(ch, vict, TYPE_CHOOSE, 0);
+   return eSUCCESS|eVICT_DIED; 
+} 
+int goldenbatleth(CHAR_DATA *ch, struct obj_data *obj,  int cmd, char *arg, 
+                   CHAR_DATA *invoker)
+{
+   CHAR_DATA *vict; 
+
+   if(!(vict = ch->fighting))
+       return eFAILURE;
+
+   if(GET_HIT(vict) > 40)
+     return eFAILURE;
+
+   switch(number(0, 1)) {
+     case 0:
+       act("$n's blow rips your leg from your body.  Extreme pain is yours to know until you hit the ground mercifully dead.", ch, 0, vict, TO_VICT, 0);
+       act("You attack takes off $N's leg at the knee!  Ahh the blood!", ch, 0, vict, TO_CHAR, 0);
+       act("$n fierce swing takes off $N's leg at the knee leaving a bloody stump and a brief scream.", ch, 0, vict, TO_ROOM, NOTVICT);
+       make_leg(vict);
+       break;
+     case 1:
+       act("$n's attack takes off your arm at the shoulder.  You stare in shock at the fountaining blood before $e crushes your skull.", ch, 0, vict, TO_VICT, 0);
+       act("You violently rip off $S arm with the attack before caving in $N's forehead.", ch, 0, vict, TO_CHAR, 0);
+       act("With a grunt of exertion, $n swings with enough force to rip $N's arm off!", ch, 0, vict, TO_ROOM, NOTVICT);
+       make_arm(vict);
+       break;
+   }
+   GET_HIT(vict) = -20;
+   group_gain(ch, vict); 
+   fight_kill(ch, vict, TYPE_CHOOSE, 0);
+   return eSUCCESS|eVICT_DIED; 
+} 
+
+int godload_jaelgreth(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, 
+                   CHAR_DATA *invoker)
+{
+   if(cmd)                                  return eFAILURE;
+   if(!ch || !ch->fighting)                 return eFAILURE;
+   if(ch->equipment[WIELD] != obj &&
+      ch->equipment[SECOND_WIELD] != obj)   return eFAILURE;
+
+   if(number(1, 100) > 5)
+      return eFAILURE;
+
+   send_to_char("You thrust your sacrificial blade into your victim, leeching their lifeforce!\r\n", ch);
+   act("$n's dagger sinks into your flesh, and you feel your life force being drained!", 
+              ch, obj, ch->fighting, TO_VICT, 0);
+   int dam = 50;
+   CHAR_DATA *victim = ch->fighting;
+   if (GET_HIT(victim) < 100) dam = GET_HIT(victim)+1;
+   else dam = 100;
+   GET_HIT(victim) -= dam;
+   GET_HIT(ch) += dam;
+   if (GET_HIT(ch) > GET_MAX_HIT(ch)) GET_HIT(ch) = GET_MAX_HIT(ch);
+   if (GET_MANA(victim) < 100) dam = GET_MANA(victim);
+   else dam = 100;
+   GET_MANA(victim) -= dam;
+   GET_MANA(ch) += dam;
+   if (GET_MANA(ch) > GET_MAX_MANA(ch)) GET_MANA(ch) = GET_MAX_MANA(ch);
+
+   update_pos(victim);
+
+  if (GET_POS(victim) == POSITION_DEAD) {
+      act("$n is DEAD!!", victim, 0, 0, TO_ROOM, INVIS_NULL);
+      group_gain(ch, victim);
+      if(!IS_NPC(victim))
+         send_to_char("You have been KILLED!!\n\r\n\r", victim);
+      fight_kill(ch, victim, TYPE_CHOOSE, 0);
+      return eSUCCESS|eVICT_DIED;
+  }
+  return eSUCCESS;
+
+}
+
+
+int godload_foecrusher(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, 
+                   CHAR_DATA *invoker)
+{
+   if(cmd)                                  return eFAILURE;
+   if(!ch || !ch->fighting)                 return eFAILURE;
+   if(ch->equipment[WIELD] != obj &&
+      ch->equipment[SECOND_WIELD] != obj)   return eFAILURE;
+
+   if(number(1, 100) > 5)
+      return eFAILURE;
+
+
+   int dam;
+   switch (number(1,2))
+   {
+     case 1:
+      act("$n smashes $s hammer into your face!", 
+              ch, obj, ch->fighting, TO_VICT, 0);
+      act("You smash your hammer into $N's face!", 
+              ch, obj, ch->fighting, TO_CHAR, 0);
+	dam = 80;
+	break;
+     case 2:
+	dam= 130;
+      act("The force of the blow dealt by $n's Foecrusher inflicts heavy damage on you.", 
+              ch, obj, ch->fighting, TO_VICT, 0);
+      act("The force of your hammer's blow inflicts heavy damage on $N.", 
+              ch, obj, ch->fighting, TO_CHAR, 0);
+	break;
+   }
+   CHAR_DATA *victim = ch->fighting;
+   dam = number(50,dam);
+
+   GET_HIT(victim) -= dam;
+
+   update_pos(victim);
+
+  if (GET_POS(victim) == POSITION_DEAD) {
+      act("$n is DEAD!!", victim, 0, 0, TO_ROOM, INVIS_NULL);
+      group_gain(ch, victim);
+      if(!IS_NPC(victim))
+         send_to_char("You have been KILLED!!\n\r\n\r", victim);
+      fight_kill(ch, victim, TYPE_CHOOSE, 0);
+      return eSUCCESS|eVICT_DIED;
+  }
+  return eSUCCESS;
+
+}
+
+
+int godload_hydratail(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, 
+                   CHAR_DATA *invoker)
+{
+   if(cmd)                                  return eFAILURE;
+   if(!ch || !ch->fighting)                 return eFAILURE;
+   if(ch->equipment[WIELD] != obj &&
+      ch->equipment[SECOND_WIELD] != obj)   return eFAILURE;
+
+   if(number(1, 100) > 10)
+      return eFAILURE;
+
+   int damtype = 0;
+   switch (number(1,4))
+   {
+     case 1:
+      act("A head on $n's whip lashes out of its own accord unleashing a $4$Bfiery$R blast at you!", 
+              ch, obj, ch->fighting, TO_VICT, 0);
+      act("A head on your whip lashes out of its own accord unleashing a $4$Bfiery$R blast at $N!", 
+              ch, obj, ch->fighting, TO_CHAR, 0);
+	damtype = TYPE_FIRE;
+	break;
+     case 2:
+      act("A head on $n's whip lashes out of its own accord unleashing a $3$Bchilling$R blast at you!", 
+              ch, obj, ch->fighting, TO_VICT, 0);
+      act("A head on your whip lashes out of its own accord unleashing a $3$Bchilling$R blast at $N!", 
+              ch, obj, ch->fighting, TO_CHAR, 0);
+	damtype = TYPE_COLD;
+	break;
+     case 3:
+      act("A head on $n's whip lashes out of its own accord unleashing a $2$Bacidic$R blast at you!", 
+              ch, obj, ch->fighting, TO_VICT, 0);
+      act("A head on your whip lashes out of its own accord unleashing a $2$Bacidic$R blast at $N!", 
+              ch, obj, ch->fighting, TO_CHAR, 0);
+	damtype = TYPE_ACID;
+	break;
+     case 4:
+      act("A head on $n's whip lashes out of its own accord unleashing a $5$Bshocking$R blast at you!", 
+              ch, obj, ch->fighting, TO_VICT, 0);
+      act("A head on your whip lashes out of its own accord unleashing a $5$Bshocking$R blast at $N!", 
+              ch, obj, ch->fighting, TO_CHAR, 0);
+	damtype = TYPE_ENERGY;
+	break;
+   }
+   CHAR_DATA *victim = ch->fighting;
+   int dam;
+   dam = number(50,100);
+   return damage(ch, victim, dam, damtype, 0, 0);
 }

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: channel.cpp,v 1.9 2005/04/09 21:15:27 urizen Exp $
+| $Id: channel.cpp,v 1.10 2006/01/13 16:49:14 dcastle Exp $
 | channel.C
 | Description:  All of the channel - type commands; do_say, gossip, etc..
 */
@@ -64,14 +64,14 @@ int do_say(struct char_data *ch, char *argument, int cmd)
       act(buf, ch, 0, 0, TO_CHAR, 0);
 
       if(!IS_NPC(ch)) {
-        retval = mprog_speech_trigger( argument, ch );
         MOBtrigger = TRUE;
+        retval = mprog_speech_trigger( argument, ch );
         if(SOMEONE_DIED(retval))
           return SWAP_CH_VICT(retval);
       }
        if(!IS_NPC(ch)) {
-        retval = oprog_speech_trigger( argument, ch );
         MOBtrigger = TRUE;
+        retval = oprog_speech_trigger( argument, ch );
         if(SOMEONE_DIED(retval))
           return SWAP_CH_VICT(retval);
       }
@@ -126,7 +126,7 @@ int do_psay(struct char_data *ch, char *argument, int cmd)
      MOBtrigger = FALSE;
    sprintf(buf,"$BYou say (to $N) '%s'$R", message);
    act(buf, ch, 0, victim, TO_CHAR, 0);
-
+   MOBtrigger = TRUE;
 //   if(!IS_NPC(ch)) {
 //     retval = mprog_speech_trigger( message, ch );
 //     MOBtrigger = TRUE;

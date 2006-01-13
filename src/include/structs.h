@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: structs.h,v 1.9 2005/06/25 18:58:56 shane Exp $
+| $Id: structs.h,v 1.10 2006/01/13 16:49:21 dcastle Exp $
 | structs.h
 | Description:  This file should go away someday - it's stuff that I
 |   wasn't sure how to break up.  --Morc XXX
@@ -97,14 +97,6 @@ struct message_list
 */
 
 extern void debugpoint();
-
-struct mirror_data // structure used for mirroring data
-{
-  char *name;
-  size_t offset;
-  int type;
-  bool procable;
-};
 
 struct active_vote_data
 {

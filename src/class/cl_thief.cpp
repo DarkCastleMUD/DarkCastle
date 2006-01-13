@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.114 2005/09/29 21:36:21 dcastle Exp $
+| $Id: cl_thief.cpp,v 1.115 2006/01/13 16:49:17 dcastle Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -203,7 +203,7 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
   }
   
  
-  int itemp = number(1, 101);
+  int itemp = number(1, 100);
   if (GET_CLASS(ch) == CLASS_ANTI_PAL)
     itemp++; // One extra %'s chance.
 
@@ -519,7 +519,11 @@ int do_stalk(CHAR_DATA *ch, char *argument, int cmd)
       stop_follower(ch, 1);
     return eFAILURE;
   }
-
+  if (IS_AFFECTED(ch, AFF_GROUP))
+  {
+    send_to_char("You must first abandon your group.\r\n",ch);
+    return eFAILURE;
+  }
   if(GET_MOVE(ch) < 10) {
     send_to_char("You are too tired to stealthily follow somebody.\n\r", ch);
     return eFAILURE;
@@ -1171,13 +1175,15 @@ int do_pocket(CHAR_DATA *ch, char *argument, int cmd)
     if (gold > 0) {
       GET_GOLD(ch)     += gold;
       GET_GOLD(victim) -= gold;
-      _exp = gold / 10000;
+      _exp = 5 + GET_LEVEL(victim) - GET_LEVEL(ch);
+      _exp *= exp_table[GET_LEVEL(ch)] / 1000 / (GET_LEVEL(ch) / 10)*5;
+	if (!IS_NPC(victim)) _exp = 0;
       if(IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_NICE_THIEF)) _exp = 1; 
       if(GET_POS(victim) <= POSITION_SLEEPING || IS_AFFECTED(victim, AFF_PARALYSIS)) _exp = 0;
 
       sprintf(buf, "Nice work! You pilfered %d gold coins.\n\r", gold);
       send_to_char(buf, ch);
-      if(_exp) {
+      if(_exp && _exp > 1) {
          GET_EXP(ch) += _exp; /* exp for stealing :) */
          sprintf(buf,"You receive %d experience.\n\r", _exp);
          send_to_char(buf, ch);

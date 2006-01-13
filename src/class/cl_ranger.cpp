@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: cl_ranger.cpp,v 1.60 2005/10/30 15:59:47 urizen Exp $ | cl_ranger.C  *
+ * $Id: cl_ranger.cpp,v 1.61 2006/01/13 16:49:17 dcastle Exp $ | cl_ranger.C  *
  * Description: Ranger skills/spells                                          *
  *                                                                            *
  * Revision History                                                           *
@@ -592,74 +592,60 @@ int do_forage(CHAR_DATA *ch, char *arg, int cmd)
     return eFAILURE;
   }
 
-  skill_increase_check(ch, SKILL_FORAGE, learned, SKILL_INCREASE_HARD);
+//  skill_increase_check(ch, SKILL_FORAGE, learned, SKILL_INCREASE_MEDIUM);
 
   // TODO - have forage use learned to modify how often you get rare items
   // TODO - add ability for zones to add zone-specific forage items
-
-  if(GET_CLASS(ch) == CLASS_RANGER) 
-    foraged = number(1,
-            (75 + (GET_LEVEL(ch)*2)) / 2 );
-  else
-    foraged = number(1, 75);
-
-  switch(world[ch->in_room].sector_type) {
-  case SECT_FIELD:
-    if(foraged > 85)
-      new_obj = clone_object( real_object( pick_one(3180, 3181) ) );
-    else if(foraged > 65)
-      new_obj = clone_object( real_object( pick_one(3178, 3179) ) );
-    else if(foraged > 15)
-      new_obj = clone_object( real_object( pick_one(3175, 3176, 3177) ) );
-    break;    
-  case SECT_FOREST:
-    if(foraged > 85)
-      new_obj = clone_object( real_object( pick_one(3174, 3184) ) );
-    else if(foraged > 65)
-      new_obj = clone_object( real_object( pick_one(3172, 3173) ) );
-    else if(foraged > 15)
-      new_obj = clone_object( real_object( pick_one(3169, 3170, 3171) ) );
-    break;    
-  case SECT_WATER_SWIM:
-    if(foraged > 85)
-      new_obj = clone_object( real_object( 3164 ) );
-    else if(foraged > 65)
-      new_obj = clone_object( real_object( 3163 ) );
-    else if(foraged > 15)
-      new_obj = clone_object( real_object( pick_one(3160, 3161, 3162) ) );
-    break;    
-  case SECT_HILLS:
-    if(foraged > 95)
-      new_obj = clone_object( real_object( 2053 ) );
-    else if(foraged > 80)
-      new_obj = clone_object( real_object( pick_one(2066, 2067, 2054) ) );
-    else if(foraged > 65)
-      new_obj = clone_object( real_object( pick_one(2068, 2056, 2055) ) );
-    else if(foraged > 15)
-      new_obj = clone_object( real_object( pick_one(2050, 2051, 2052) ) );
-    break;
-  case SECT_MOUNTAIN:
-    if(foraged > 70)
-      new_obj = clone_object( real_object( 3168 ) );
-    else if(foraged > 15)
-      new_obj = clone_object( real_object( pick_one(3165, 3166, 3167) ) );
-    break;    
-  case SECT_BEACH:
-    if(foraged > 80)
-      new_obj = clone_object( real_object( pick_one(2060, 2061, 2062) ) );
-    else if(foraged > 65)
-      new_obj = clone_object( real_object( pick_one(2063, 2064, 2065) ) );
-    else if(foraged > 15)
-      new_obj = clone_object( real_object( pick_one(2057, 2058, 2059) ) );
-    break;
-  default:
-    break;
+  int HerbFind[101],i;
+  for (i = 0; i < 15; i++)
+    HerbFind[i] = DETECT_GOOD_VNUM;
+  for (i = 15; i < 30; i++)
+    HerbFind[i] = DETECT_EVIL_VNUM;
+  for (i = 30; i < 45; i++)
+    HerbFind[i] = DETECT_INVISIBLE_VNUM;
+  for (i = 45; i < 60; i++)
+    HerbFind[i] = SENSE_LIFE_VNUM;
+  for (i = 60; i < 75; i++)
+    HerbFind[i] = INFRA_VNUM;
+  for (i = 75; i < 80; i++)
+    HerbFind[i] = INVIS_VNUM;
+  for (i = 80; i < 90; i++)
+    HerbFind[i] = FARSIGHT_VNUM;
+  for (i = 90; i < 93; i++)
+    HerbFind[i] = SOLIDITY_VNUM;
+  for (i = 93; i < 95; i++)
+    HerbFind[i] = LIGHTNING_SHIELD_VNUM;
+  for (i = 95; i < 98; i++)
+    HerbFind[i] = INSOMNIA_VNUM;
+  for (i = 98; i < 100; i++)
+    HerbFind[i] = HASTE_VNUM;
+  if (learned > 40)
+  {
+    HerbFind[10] = TRUE_VNUM;
+    HerbFind[20] = HASTE_VNUM;
+    HerbFind[40] = LIGHTNING_SHIELD_VNUM;
+    HerbFind[30] = LIGHTNING_SHIELD_VNUM;
   }
+  if (learned > 60)
+  {
+    HerbFind[11] = TRUE_VNUM;
+    HerbFind[21] = HASTE_VNUM;
+    HerbFind[41] = LIGHTNING_SHIELD_VNUM;
+    HerbFind[31] = LIGHTNING_SHIELD_VNUM;
+  }
+  if (learned > 80)
+  {
+    HerbFind[12] = TRUE_VNUM;
+    HerbFind[22] = HASTE_VNUM;
+    HerbFind[42] = LIGHTNING_SHIELD_VNUM;
+    HerbFind[32] = LIGHTNING_SHIELD_VNUM;
+  }
+  new_obj = clone_object(real_object( HerbFind[number(0,100)]));
 
   int recharge;
 
   if(new_obj)
-     recharge = 5 - (learned / 30);
+     recharge = 3 - (learned/70);
   else recharge = 1;
 
   af.type = SKILL_FORAGE;
@@ -833,7 +819,7 @@ int mob_arrow_response(struct char_data *ch, struct char_data *victim,
     if(number(1,2) == 1) {
       do_say(victim, "Where are these fricken arrows coming from?!", 0);
       dir2 = number(0,5);
-      if(CAN_GO(ch, dir2))
+      if(CAN_GO(victim, dir2))
        if(EXIT(victim, dir2)) {
           if(!( ISSET(victim->mobdata->actflags, ACT_STAY_NO_TOWN) &&
                 IS_SET(zone_table[world[EXIT(victim, dir2)->to_room].zone].zone_flags, ZONE_IS_TOWN)
@@ -1004,12 +990,12 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
     send_to_char("You need to be holding a bow moron.\r\n", ch);
     return eFAILURE;
   }
-
+/*
   if(GET_POS(ch) == POSITION_FIGHTING)
   {
     send_to_char("Aren't you a bit busy with hand to hand combat?\r\n", ch);
     return eFAILURE;
-  }
+  }*/
 
   if(ch->shotsthisround > 0)
   {
@@ -1201,11 +1187,11 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
     return eFAILURE;
   }
 /* check if target is fighting */
-  if(victim->fighting)
+/*  if(victim->fighting)
   {
       send_to_char("You can't seem to get a clear line of sight.\r\n", ch);
       return eFAILURE;
-  }
+  }*/
 
 /* check for arrows here */
 
@@ -1313,6 +1299,8 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
            act(buf, victim, 0, 0, TO_CHAR, 0);
            sprintf(buf, "%s hits $n!", found->short_description);
            act(buf, victim, 0, ch, TO_ROOM, NOTVICT);           
+           sprintf(buf, "You hit %s with %s!\r\n", GET_SHORT(victim), found->short_description);
+           send_to_char(buf, ch);
         } else {
            sprintf(buf, "You hit %s with %s!\r\n", GET_SHORT(victim), found->short_description);
            send_to_char(buf, ch);

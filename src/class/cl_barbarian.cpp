@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_barbarian.cpp,v 1.57 2005/07/23 01:20:29 dcastle Exp $
+| $Id: cl_barbarian.cpp,v 1.58 2006/01/13 16:49:17 dcastle Exp $
 | cl_barbarian.C
 | Description:  Commands for the barbarian class.
 */
@@ -288,8 +288,12 @@ int do_headbutt(struct char_data *ch, char *argument, int cmd)
   if(!can_attack(ch) || !can_be_attacked(ch, victim))
     return eFAILURE;
 
-  if(IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE)) {
+  if(IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE) && has_skill(ch, SKILL_SHOCK) < 80) {
     send_to_char("You're too puny to headbutt someone that HUGE!\n\r",ch);
+    return eFAILURE;
+  }
+  if(IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_SOLID)) {
+    send_to_char("That would be like smashing your head into a wall!\n\r",ch);
     return eFAILURE;
   }
 
@@ -332,7 +336,11 @@ int do_headbutt(struct char_data *ch, char *argument, int cmd)
        REMOVE_BIT(victim->combat, COMBAT_BERSERK);
 
     set_fighting(victim, ch);
+  if(IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE))
+    WAIT_STATE(ch, PULSE_VIOLENCE*6);
+  else
     WAIT_STATE(ch, PULSE_VIOLENCE*4);
+  
     WAIT_STATE(victim, PULSE_VIOLENCE*2);
     SET_BIT(victim->combat, COMBAT_SHOCKED);
     retval = damage (ch, victim, 50, TYPE_HIT, SKILL_SHOCK, 0);
@@ -632,12 +640,12 @@ int do_knockback(struct char_data *ch, char *argument, int cmd)
   if(!can_attack(ch) || !can_be_attacked(ch, victim))
     return eFAILURE;
 
+  learned = has_skill(ch, SKILL_KNOCKBACK);
   if(IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE)) {
     send_to_char("You're too tiny to knock someone that HUGE anywhere!\n\r",ch);
     return eFAILURE;
   }
 
-  learned = has_skill(ch, SKILL_KNOCKBACK);
 
   dam = 100;
 

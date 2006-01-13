@@ -99,6 +99,12 @@ int do_innate(CHAR_DATA *ch, char *arg, int cmd)
 	  send_to_char("You cannot use that yet.\r\n",ch);
 	  return eFAILURE;
 	}
+	if (GET_POS(ch) == POSITION_SLEEPING && 
+		i != 1)
+	{
+		send_to_char("In your dreams, or what?\r\n",ch);
+		return eFAILURE;
+	}
 	int retval = (*(innates[i].func))(ch,arg,cmd);
 	if (retval & eSUCCESS)
 	{

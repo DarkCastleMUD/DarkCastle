@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: alias.cpp,v 1.5 2002/10/23 11:32:32 waz Exp $
+| $Id: alias.cpp,v 1.6 2006/01/13 16:49:14 dcastle Exp $
 | alias.C
 | Description:  Commands for the alias processor.
 */
@@ -101,17 +101,21 @@ int do_alias(struct char_data *ch, char *arg, int cmd)
 
       /*
        * alias is a bad alias to have! waz
-       
+     */       
       if (!str_cmp(buf, "alias")) {
           sprintf(outbuf, "Setting 'alias' as an alias would be silly!\n\r");
           send_to_char(outbuf, ch);
-          dc_free (curr->command);
-          curr->command = str_dup(buf1);      
           dc_free(buf);
           dc_free(buf1);
           return eSUCCESS;
       }
-*/
+      if (!str_cmp(buf, "deleteall")) {
+          sprintf(outbuf, "Setting 'deleteall' as an alias would be silly!\n\r");
+          send_to_char(outbuf, ch);
+          dc_free(buf);
+          dc_free(buf1);
+          return eSUCCESS;
+      }
 	    
       /*   Check for keyword match...
        *   If match found, replace command with command...
@@ -183,11 +187,12 @@ int do_alias(struct char_data *ch, char *arg, int cmd)
          dc_free(buf);
          return eSUCCESS;
       }
-            
-      for (curr = ch->pcdata->alias; curr; curr = curr->next)
+      int o = 1;
+      for (curr = ch->pcdata->alias; curr; curr = curr->next,o++)
       {
+	  
           if (!str_cmp(buf, curr->keyword)) {
-            sprintf(outbuf,"Alias %2d: %s == %s DELETED.\n\r",x+1, 
+            sprintf(outbuf,"Alias %2d: %s == %s DELETED.\n\r",o, 
                    curr->keyword, curr->command);
             send_to_char(outbuf, ch);
             // if we're first, reassign the chain

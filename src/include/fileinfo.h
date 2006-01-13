@@ -1,7 +1,7 @@
 #ifndef FILEINFO_H_
 #define FILEINFO_H_
 /*
-| $Id: fileinfo.h,v 1.10 2005/06/17 20:13:46 urizen Exp $
+| $Id: fileinfo.h,v 1.11 2006/01/13 16:49:21 dcastle Exp $
 | fileinfo.h
 | Description:  Contains information for loading files, ie "../lib", etc..
 */
@@ -13,6 +13,7 @@
 #define  DFLT_DIR            "../lib"
 #define  SAVE_DIR            "../save"
 #define  BSAVE_DIR            "../bsave"
+#define  QSAVE_DIR            "../save/qdata"
 #define  NEWSAVE_DIR         "../newsave"
 #define  ARCHIVE_DIR         "../archive"
 #define  MOB_DIR             "../MOBProgs/"
@@ -24,6 +25,7 @@
 #define  FAMILIAR_DIR        "../familiar"
 #else
 #define DFLT_DIR             "lib"
+#define QSAVE_DIR	     "save/qdata"
 #define  SAVE_DIR            "save"
 #define  BSAVE_DIR            "bsave"
 #define  NEWSAVE_DIR         "newsave"
@@ -74,7 +76,9 @@
 #define WORLD_LOG           "../log/world.log"
 #define CHAOS_LOG           "../log/chaos.log"
 #define CLAN_LOG            "../log/clan.log" 
+#define HMM_LOG            "../log/hmm.log" 
 #else
+#define HMM_LOG            "hmm.log" 
 #define BUG_FILE            "bug.log"
 #define GOD_FILE            "god.log"
 #define MORTAL_FILE         "mortal.log"

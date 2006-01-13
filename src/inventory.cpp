@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.56 2005/09/26 21:47:11 urizen Exp $
+| $Id: inventory.cpp,v 1.57 2006/01/13 16:49:14 dcastle Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -66,6 +66,10 @@ void get(struct char_data *ch, struct obj_data *obj_object, struct obj_data *sub
    
     if(!sub_object || sub_object->carried_by != ch) 
     {
+     if (IS_SET(obj_object->obj_flags.more_flags, ITEM_NO_TRADE) && IS_NPC(ch)) {
+	  send_to_char("You cannot get that item.\r\n",ch);
+	  return;
+	}
       // we only have to check for uniqueness if the container is not on the character
       // or if there is no container
       if(IS_SET(obj_object->obj_flags.more_flags, ITEM_UNIQUE)) {
@@ -282,7 +286,8 @@ int do_get(struct char_data *ch, char *argument, int cmd)
 			send_to_char(buffer, ch);
 			fail = TRUE;
 		    } 
-                    else if ((IS_CARRYING_W(ch) + obj_object->obj_flags.weight) > CAN_CARRY_W(ch) && GET_LEVEL(ch) < IMMORTAL) 
+                    else if ((IS_CARRYING_W(ch) + obj_object->obj_flags.weight) > CAN_CARRY_W(ch) && GET_LEVEL(ch) < IMMORTAL
+			&& GET_ITEM_TYPE(obj_object) != ITEM_MONEY)
                     {
 			sprintf(buffer, "%s : You can't carry that much weight.\n\r", fname(obj_object->name));
 			send_to_char(buffer, ch);
@@ -338,8 +343,8 @@ int do_get(struct char_data *ch, char *argument, int cmd)
 		    sprintf(buffer, "%s : You can't carry that many items.\n\r", fname(obj_object->name));
 		    send_to_char(buffer, ch);
 		    fail = TRUE;
-		} else if((IS_CARRYING_W(ch) + obj_object->obj_flags.weight) > 
-			CAN_CARRY_W(ch) && GET_LEVEL(ch) < IMMORTAL) 
+		} else if((IS_CARRYING_W(ch) + obj_object->obj_flags.weight) > CAN_CARRY_W(ch) &&
+                        GET_LEVEL(ch) < IMMORTAL && GET_ITEM_TYPE(obj_object) != ITEM_MONEY)
                 {
 		    sprintf(buffer,"%s : You can't carry that much weight.\n\r", fname(obj_object->name));
 		    send_to_char(buffer, ch);
@@ -421,9 +426,21 @@ int do_get(struct char_data *ch, char *argument, int cmd)
 		    next_obj = obj_object->next_content;
 		if (GET_ITEM_TYPE(obj_object) == ITEM_CONTAINER && contains_no_trade_item(obj_object))
 		{
-                  csendf(ch, "%s : It seems magically attached to the corpse.\n\r", fname(obj_object->name));
+                  csendf(ch, "%s : It seems magically attached to the corpse.\n\r", 
+fname(obj_object->name));
 		  continue;
-		}
+		} /*
+		   struct obj_data *temp,*next_contentthing;
+		   for (temp = obj_object->contains;temp;temp = next_contentthing)
+		   {
+			next_contentthing = temp->next_content;
+			if(IS_SET(temp->obj_flags.more_flags, ITEM_NO_TRADE))
+			{
+			csendf(ch, "Whoa!  The %s inside the %s poofed into thin air!\r\n", temp->short_description,obj_object->short_description);
+			extract_obj(temp);
+			}
+		   }*/
+//		}
 		    /* IF all.obj, only get those named "obj" */
 		    if (alldot && !isname(allbuf,obj_object->name)){
 		      continue;
@@ -448,13 +465,19 @@ int do_get(struct char_data *ch, char *argument, int cmd)
                       {
 		        if (inventorycontainer || 
                             (IS_CARRYING_W(ch) + obj_object->obj_flags.weight) < CAN_CARRY_W(ch) ||
-                            GET_LEVEL(ch) > IMMORTAL) 
+                            GET_LEVEL(ch) > IMMORTAL || GET_ITEM_TYPE(obj_object) == ITEM_MONEY) 
                         {
                           if(has_consent && IS_SET(obj_object->obj_flags.more_flags, ITEM_NO_TRADE)) {
                             // if I have consent and i'm touching the corpse, then I shouldn't be able
                             // to pick up no_trade items because it is someone else's corpse.  If I am
                             // the other of the corpse, has_consent will be false.
                             if (GET_LEVEL(ch) < 100) {
+			       if (isname(obj_object->name, "thiefcorpse"))
+				{
+                        csendf(ch, "Whoa!  The %s poofed into thin air!\r\n", obj_object->short_description);
+			extract_obj(obj_object);
+			continue;
+				}
                               csendf(ch, "%s : It seems magically attached to the corpse.\n\r", fname(obj_object->name));
                               continue;
                             }
@@ -569,7 +592,8 @@ int do_get(struct char_data *ch, char *argument, int cmd)
                   send_to_char(buffer, ch);
 	          fail = TRUE;
 	        } else if (inventorycontainer || 
-                     (IS_CARRYING_W(ch) + obj_object->obj_flags.weight) < CAN_CARRY_W(ch)) 
+                     (IS_CARRYING_W(ch) + obj_object->obj_flags.weight) < CAN_CARRY_W(ch)
+			|| GET_ITEM_TYPE(obj_object) == ITEM_MONEY) 
                 {
                     if(has_consent && ( IS_SET(obj_object->obj_flags.more_flags, ITEM_NO_TRADE) || 
                                         contains_no_trade_item(obj_object) ) ) 
@@ -578,8 +602,14 @@ int do_get(struct char_data *ch, char *argument, int cmd)
                   // to pick up no_trade items because it is someone else's corpse.  If I am
                   // the other of the corpse, has_consent will be false.
                       if (GET_LEVEL(ch) < 100) {
+                              if (isname(obj_object->name, "thiefcorpse"))
+                                {
+                        csendf(ch, "Whoa!  The %s poofed into thin air!\r\n", obj_object->short_description);
+                        extract_obj(obj_object);
+			fail = TRUE;
+                                } else {
                         csendf(ch, "%s : It seems magically attached to the corpse.\n\r", fname(obj_object->name));
-                        fail = TRUE;
+                        fail = TRUE; }
                       }
                     }
 		    else if (CAN_WEAR(obj_object,ITEM_TAKE)) 
@@ -886,13 +916,13 @@ void do_putalldot(struct char_data *ch, char *name, char *target, int cmd)
 
   for(tmp_object = ch->carrying; tmp_object; tmp_object = next_object) {
      next_object = tmp_object->next_content;
-     if(!name) {
+     if(!name && CAN_SEE_OBJ(ch, tmp_object)) {
        sprintf(buf, "%s %s", fname(tmp_object->name), target);
        buf[99] = 0;
        found = TRUE;
        do_put(ch, buf, cmd);
      }
-     else if(isname(name, tmp_object->name)) {
+     else if(isname(name, tmp_object->name) && CAN_SEE_OBJ(ch, tmp_object)) {
        sprintf(buf, "%s %s", name, target);
        buf[99] = 0;
        found = TRUE;
@@ -1296,14 +1326,12 @@ int do_give(struct char_data *ch, char *argument, int cmd)
     do_save(vict,"",10);
     // if I gave a no_trade item to a mob, the mob needs to destroy it
     // otherwise it defeats the purpose of no_trade:)
-    if(IS_SET(obj->obj_flags.more_flags, ITEM_NO_TRADE) && IS_NPC(vict))
-    {
-       extract_obj(obj);
-	return eSUCCESS;
-    }
-
 
     retval = mprog_give_trigger( vict, ch, obj );
+
+    if(!IS_SET(retval, eEXTRA_VALUE) && IS_SET(obj->obj_flags.more_flags, ITEM_NO_TRADE) && IS_NPC(vict))
+       extract_obj(obj);
+
     if(SOMEONE_DIED(retval)) {
       retval = SWAP_CH_VICT(retval);
       return eSUCCESS|retval;

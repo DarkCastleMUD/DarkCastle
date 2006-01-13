@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.101 2005/09/26 21:47:11 urizen Exp $ */
+/* $Id: db.cpp,v 1.102 2006/01/13 16:49:14 dcastle Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -544,11 +544,15 @@ void boot_db(void)
 #ifdef LEAK_CHECK
     cause_leak();
 #endif
-
+    
     boot_clans();
 
-    log("Loading new help file.", 0, LOG_MISC);
+    log("Loading new news file.", 0, LOG_MISC);
+    extern void loadnews();
+    loadnews();
 
+    log("Loading new help file.", 0, LOG_MISC);
+    
     // new help file stuff
     if(!(new_help_fl = dc_fopen(NEW_HELP_FILE, "r"))) {
       perror( NEW_HELP_FILE );
@@ -2152,7 +2156,7 @@ void renum_zone_table(void)
 		    zone_table[zone].cmd[comm].arg1);
             zone_table[zone].cmd[comm].command = 'J';
           }*/
-	if (real_mobile(zone_table[zone].cmd[comm].arg1)
+	if (real_mobile(zone_table[zone].cmd[comm].arg1) >= 0
 		&& real_room(zone_table[zone].cmd[comm].arg3) >= 0)
           zone_table[zone].cmd[comm].arg1 =
                 real_mobile(zone_table[zone].cmd[comm].arg1);
@@ -2164,8 +2168,8 @@ void renum_zone_table(void)
 
         break;
         case 'O':
-	  if (real_object(zone_table[zone].cmd[comm].arg1) 
-		&& real_room(zone_table[zone].cmd[comm].arg3) != -1)
+	  if (real_object(zone_table[zone].cmd[comm].arg1) >= 0
+		&& real_room(zone_table[zone].cmd[comm].arg3) >= 0)
             zone_table[zone].cmd[comm].arg1 = real_object(zone_table[zone].cmd[comm].arg1);
 	  else
 		zone_table[zone].cmd[comm].active = 0;
@@ -2175,7 +2179,7 @@ void renum_zone_table(void)
     //        real_room(zone_table[zone].cmd[comm].arg3);
         break;
         case 'G':
-	if (real_object(zone_table[zone].cmd[comm].arg1))
+	if (real_object(zone_table[zone].cmd[comm].arg1) >= 0)
             zone_table[zone].cmd[comm].arg1 =
             real_object(zone_table[zone].cmd[comm].arg1);
 	else 
@@ -2183,7 +2187,7 @@ void renum_zone_table(void)
 	    
         break;
         case 'E':
-	if (real_object(zone_table[zone].cmd[comm].arg1))
+	if (real_object(zone_table[zone].cmd[comm].arg1) >= 0)
             zone_table[zone].cmd[comm].arg1 =
             real_object(zone_table[zone].cmd[comm].arg1);
 	else
@@ -2191,8 +2195,8 @@ void renum_zone_table(void)
 
         break;
         case 'P':
-	if (real_object(zone_table[zone].cmd[comm].arg1)
-	&& real_object(zone_table[zone].cmd[comm].arg3))
+	if (real_object(zone_table[zone].cmd[comm].arg1) >= 0
+	&& real_object(zone_table[zone].cmd[comm].arg3) >= 0)
 	{
             zone_table[zone].cmd[comm].arg1 =
             real_object(zone_table[zone].cmd[comm].arg1);
@@ -2304,7 +2308,7 @@ void write_one_zone(FILE * fl, int zon)
       fprintf(fl, "P %2d %5d %3d %5d %s\n", zone_table[zon].cmd[i].if_flag,
                                           virt,
                                           zone_table[zon].cmd[i].arg2,
-                                          virt,
+                                          virt2,
                                           zone_table[zon].cmd[i].comment ? 
                                              zone_table[zon].cmd[i].comment : "");
      }
@@ -2380,8 +2384,8 @@ void read_one_zone(FILE * fl, int zon)
   zone_table[zon].top  = fread_int(fl, 0, 64000);
   extern void debug_point();
 
-  if (tmp == 23)
-     debug_point();
+//  if (tmp == 23)
+  //   debug_point();
 	
   /*
    * this initialization is important for obtaining the
@@ -2436,7 +2440,8 @@ void read_one_zone(FILE * fl, int zon)
 
     tmp = fread_int (fl, 0, 9);
     reset_tab[reset_top].if_flag = tmp;
-
+    reset_tab[reset_top].last = time(NULL) - number(0, 12*3600);
+	// randomize last repop on boot
     reset_tab[reset_top].arg1 = fread_int (fl, -64000, LONG_MAX);
     reset_tab[reset_top].arg2 = fread_int (fl, -64000, LONG_MAX);
     if (reset_tab[reset_top].arg1 > 64000) reset_tab[reset_top].arg1 = 2;
@@ -2744,6 +2749,20 @@ CHAR_DATA *read_mobile(int nr, FILE *fl)
 
     for (i = 0; i <= SAVE_TYPE_MAX; i++)
        mob->saves[i] = GET_LEVEL(mob)/3;
+
+   if (IS_SET(mob->resist, ISR_FIRE))  mob->saves[SAVE_TYPE_FIRE] += 50;
+   if (IS_SET(mob->resist, ISR_ACID))  mob->saves[SAVE_TYPE_ACID] += 50;
+   if (IS_SET(mob->resist, ISR_POISON))  mob->saves[SAVE_TYPE_POISON] += 50;
+   if (IS_SET(mob->resist, ISR_COLD))  mob->saves[SAVE_TYPE_COLD] += 50;
+   if (IS_SET(mob->resist, ISR_ENERGY))  mob->saves[SAVE_TYPE_ENERGY] += 50;
+   if (IS_SET(mob->resist, ISR_MAGIC))  mob->saves[SAVE_TYPE_MAGIC] += 50;
+
+   if (IS_SET(mob->suscept, ISR_FIRE))  mob->saves[SAVE_TYPE_FIRE] -= 50;
+   if (IS_SET(mob->suscept, ISR_ACID))  mob->saves[SAVE_TYPE_ACID] -= 50;
+   if (IS_SET(mob->suscept, ISR_POISON))  mob->saves[SAVE_TYPE_POISON] -= 50;
+   if (IS_SET(mob->suscept, ISR_COLD))  mob->saves[SAVE_TYPE_COLD] -= 50;
+   if (IS_SET(mob->suscept, ISR_ENERGY))  mob->saves[SAVE_TYPE_ENERGY] -= 50;
+   if (IS_SET(mob->suscept, ISR_MAGIC))  mob->saves[SAVE_TYPE_MAGIC] -= 50;
 
     mob->mobdata->nr = nr;
     mob->desc = 0;
@@ -3787,7 +3806,7 @@ void reset_zone(int zone)
     int last_no;
     CHAR_DATA *mob = NULL;
     struct obj_data *obj, *obj_to;
-
+    int hrs;
     last_cmd = last_mob = last_obj = last_percent = -1;
     int i;
     float z;
@@ -3882,6 +3901,10 @@ void reset_zone(int zone)
         break;
 
         case 'P': /* object to object */
+	void debug_point();
+	debug_point();
+
+
         if(ZCMD.arg2 == -1 || obj_index[ZCMD.arg1].number < ZCMD.arg2) {
           obj_to = 0;
           obj    = 0;
@@ -3926,11 +3949,18 @@ void reset_zone(int zone)
 
         case '%': /* percent chance of next command happening */
 	z = ZCMD.arg1 / ZCMD.arg2;
-	if (z > 0.2 || mud_is_booting) i = ZCMD.arg1;
+	if (z > 0.2) i = ZCMD.arg1;
 	else i = (int)((float)ZCMD.arg1 * 2);
+        
+	hrs = (time(NULL) - ZCMD.last)/3600;
+	if (hrs > 24) i *= 4;
+	else if (hrs > 8) i *= 3;
+	else if (hrs > 2) i *= 2;
+	else if (hrs > 1) i *= 1.5;
 
         if( number(0, ZCMD.arg2) <= i )
         {
+  	   ZCMD.last = time(NULL);
            last_percent = 1;
            last_cmd = 1;
         }
@@ -3949,8 +3979,8 @@ void reset_zone(int zone)
             last_obj = 0;
             break;
         }
-        if((ZCMD.arg2 == -1 || obj_index[ZCMD.arg1].number < ZCMD.arg2 || !number(0,5)) 
-           && (obj = clone_object(ZCMD.arg1))) 
+//        if((ZCMD.arg2 == -1 || obj_index[ZCMD.arg1].number < ZCMD.arg2 || !number(0,5)) 
+          if((obj = clone_object(ZCMD.arg1))) 
         { 
           if(!equip_char(mob, obj, ZCMD.arg3)) {
              sprintf(buf, "Bad equip_char zone %d cmd %d", zone, cmd_no);
@@ -4626,6 +4656,7 @@ void reset_char(CHAR_DATA *ch)
   ch->followers = 0;
   ch->master = 0;
 
+  ch->spelldamage = 0;
   ch->carrying = 0;
   ch->carry_weight = 0;
   ch->carry_items  = 0;
@@ -4684,6 +4715,7 @@ void clear_char(CHAR_DATA *ch)
   ch->tempVariable = NULL;
   GET_HOME(ch) = START_ROOM;
   GET_AC(ch) = 100; /* Basic Armor */
+  ch->spelldamage = 0;
 }
 
 

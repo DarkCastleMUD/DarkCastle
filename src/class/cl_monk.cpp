@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_monk.cpp,v 1.25 2005/06/06 21:48:03 shane Exp $
+| $Id: cl_monk.cpp,v 1.26 2006/01/13 16:49:17 dcastle Exp $
 | cl_monk.C
 | Description:  Monk skills.
 */
@@ -230,7 +230,7 @@ int do_stun(struct char_data *ch, char *argument, int cmd)
      act("In your enraged state, you shake off $n's attempt to immobilize you.", ch, NULL, victim, TO_VICT, 0);
      act("$N shakes off $n's attempt to immobilize them.",ch, NULL, victim, TO_ROOM, NOTVICT);
      act("$N shakes off your attempt to immobilize them.",ch, NULL, victim, TO_CHAR, 0);
-     WAIT_STATE(ch, PULSE_VIOLENCE*4);
+//     WAIT_STATE(ch, PULSE_VIOLENCE*4);
 	return eSUCCESS;     
   }
   if(!skill_success(ch,victim, SKILL_STUN) && GET_POS(victim) != POSITION_SLEEPING) {

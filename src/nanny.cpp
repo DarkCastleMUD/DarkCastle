@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.105 2005/10/30 15:59:46 urizen Exp $ */
+/* $Id: nanny.cpp,v 1.106 2006/01/13 16:49:15 dcastle Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -477,12 +477,41 @@ void do_on_login_stuff(char_data * ch)
                 break;
             } else { prev = curr; curr = curr->next; }
       }
+   // Remove listsongs
+     if (GET_CLASS(ch) == CLASS_BARD && has_skill(ch, SKILL_SONG_LIST_SONGS)) {
+          struct char_skill_data * curr = ch->skills, *prev = NULL;
+          while(curr)
+            if(curr->skillnum == SKILL_SONG_LIST_SONGS) {
+                if (prev) prev->next = curr->next;
+                else ch->skills = curr->next;
+                FREE(curr);
+                break;
+            } else { prev = curr; curr = curr->next; }
+      }
     // Replace shieldblock on barbs
      if (GET_CLASS(ch) == CLASS_BARBARIAN && has_skill(ch, SKILL_SHIELDBLOCK)) {
           struct char_skill_data * curr = ch->skills;
           while(curr)
             if(curr->skillnum == SKILL_SHIELDBLOCK) {
 		curr->skillnum = SKILL_DODGE;
+                break;
+            } else { curr = curr->next; }
+      }
+    // Replace eagleeye on druids
+     if (GET_CLASS(ch) == CLASS_DRUID && has_skill(ch, SPELL_EAGLE_EYE)) {
+          struct char_skill_data * curr = ch->skills;
+          while(curr)
+            if(curr->skillnum == SPELL_EAGLE_EYE) {
+		curr->skillnum = SPELL_GHOSTWALK;
+                break;
+            } else { curr = curr->next; }
+      }
+    // Replace crushing on bards
+     if (GET_CLASS(ch) == CLASS_BARD && has_skill(ch, SKILL_CRUSHING_WEAPONS)) {
+          struct char_skill_data * curr = ch->skills;
+          while(curr)
+            if(curr->skillnum == SKILL_CRUSHING_WEAPONS) {
+		curr->skillnum = SKILL_WHIPPING_WEAPONS;
                 break;
             } else { curr = curr->next; }
       }

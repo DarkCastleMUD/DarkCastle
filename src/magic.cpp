@@ -27,6 +27,7 @@ extern "C"
 #include <stdio.h>
 #include <assert.h>
   #include <stdlib.h>
+#include <math.h> // pow(double,double)
 }
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
@@ -417,7 +418,8 @@ int spell_meteor_swarm(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
   retval = damage(ch, victim, dam,TYPE_PHYSICAL_MAGIC, SPELL_METEOR_SWARM, 0);
 
 	/* Spellcraft Effect */
-  if (!SOMEONE_DIED(retval) && spellcraft(ch, SPELL_METEOR_SWARM))
+  if (!SOMEONE_DIED(retval) && spellcraft(ch, SPELL_METEOR_SWARM)
+	&& !number(0,9))
    {
         act("The force of the spell knocks $N over!",ch,0,victim, TO_CHAR, 0);
 	send_to_char("The force of the spell knocks you over!\r\n",ch);
@@ -457,7 +459,7 @@ int spell_sparks(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data 
 {
    int dam;
    set_cantquit( ch, victim );
-   dam = dice(level, 2);
+   dam = dice(level, 6);
    return damage(ch, victim, dam, TYPE_FIRE, SPELL_SPARKS, 0);
 }
 
@@ -469,6 +471,7 @@ int spell_howl(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
    char_data * tmp_char;
    int retval;
    set_cantquit( ch, victim );
+   int chit = GET_HIT(ch);
 
    if(saves_spell(ch, victim, 5, SAVE_TYPE_MAGIC) >= 0)
     {
@@ -478,7 +481,8 @@ int spell_howl(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
 
    if(SOMEONE_DIED(retval))
      return retval;
-
+   if (chit != GET_HIT(ch)) // it reflected..
+    ch = victim; 
    for (tmp_char = world[ch->in_room].people; tmp_char;
         tmp_char = tmp_char->next_in_room)
     {
@@ -750,19 +754,29 @@ int spell_life_leech(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 
   if(IS_SET(world[ch->in_room].room_flags, SAFE)) 
     return eFAILURE;
-
-  for(tmp_victim = character_list; tmp_victim; tmp_victim = temp)
+  double o = 0.0, m = 0.0, avglevel = 0.0;
+  for (tmp_victim = world[ch->in_room].people;tmp_victim;tmp_victim = tmp_victim->next_in_room)
+    if (!ARE_GROUPED(ch, tmp_victim) && ch != tmp_victim)
+     { o++; m++; avglevel *= o-1; avglevel += GET_LEVEL(tmp_victim); avglevel /= o;}
+    else m++;
+  m--; // don't count player
+  avglevel -= (double)GET_LEVEL(ch);
+  double powmod = 0.2;
+  powmod -= (avglevel*0.001);
+  powmod -= (has_skill(ch, SPELL_LIFE_LEECH) * 0.001);
+  int max = (int)(o * 50 * ( m / pow(m, powmod*m)));
+  max += number(-10,10);
+  for(tmp_victim = world[ch->in_room].people;tmp_victim;tmp_victim = temp)
   {
-	 temp = tmp_victim->next;
+	 temp = tmp_victim->next_in_room;
 	 if ( (ch->in_room == tmp_victim->in_room) && (ch != tmp_victim) &&
 		(!ARE_GROUPED(ch,tmp_victim)))
 	{
-		dam = 75;
-		int adam = dam_percent(skill,75);
-               if (IS_SET(race_info[(int)GET_RACE(tmp_victim)].immune, ISR_POISON))
-   		{
+		dam = max / o;
+		int adam = max / o;
+                if (IS_SET(tmp_victim->immune, ISR_POISON))
 		  adam = 0;
-		}
+
 		 if (GET_HIT(tmp_victim) < adam)
 		  GET_HIT(ch) += GET_HIT(tmp_victim);
 		 else GET_HIT(ch) += adam;
@@ -1304,8 +1318,8 @@ int spell_bless(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *
 
   if(affected_by_spell(victim, SPELL_BLESS))
     affect_from_char(victim, SPELL_BLESS);
-  if(GET_POS(victim) != POSITION_FIGHTING) 
-  {
+//  if(GET_POS(victim) != POSITION_FIGHTING) 
+ // {
 		send_to_char("You feel blessed.\n\r", victim);
 		if (victim != ch)
 		  act("$N receives the blessing from your god.", ch, NULL, victim, TO_CHAR, 0);
@@ -1319,7 +1333,7 @@ int spell_bless(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *
 		af.location = APPLY_SAVING_MAGIC;
 		af.modifier = 1 + skill / 18;
 		affect_to_char(victim, &af);
-    }
+   // }
   }
   return eSUCCESS;
 }
@@ -1333,6 +1347,7 @@ int spell_paralyze(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
   char buf[180];
   int retval;
 
+ set_cantquit( ch, victim );
   if (affected_by_spell(victim, SPELL_PARALYZE))
          return eFAILURE;
 
@@ -1368,7 +1383,6 @@ int spell_paralyze(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
     send_to_char("Your cold-blooded act causes your magic to misfire!\n\r", ch);
     victim = ch;
   }
- set_cantquit( ch, victim );
 
    if (number(1,101) < get_saves(victim, SAVE_TYPE_MAGIC))
    {
@@ -2333,27 +2347,27 @@ int spell_poison(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data 
          act("You resist $n's attempt to posion you!",ch,NULL,victim,TO_VICT,0);
          endy = TRUE;
      } 
-     if (IS_NPC(victim) && (!victim->fighting) && GET_POS(ch) > POSITION_SLEEPING) {
-         retval = attack(victim, ch, TYPE_UNDEFINED);
-         retval = SWAP_CH_VICT(retval);
-         return retval;
-      }
       if (endy)
          return eFAILURE;
 
         af.type = SPELL_POISON;
         af.duration = (skill / 10);
-        af.modifier = skill;
+        af.modifier = (int)ch;
         af.location = APPLY_NONE;
         af.bitvector = AFF_POISON;
         affect_join(victim, &af, FALSE, FALSE);
         send_to_char("You feel very sick.\n\r", victim);
         act("$N looks very sick.", ch,0,victim, TO_CHAR, 0);
+     if (IS_NPC(victim) && (!victim->fighting) && GET_POS(ch) > POSITION_SLEEPING) {
+         retval = attack(victim, ch, TYPE_UNDEFINED);
+         retval = SWAP_CH_VICT(retval);
+         return retval;
+      }
   } else { /* Object poison */
     if ((obj->obj_flags.type_flag == ITEM_DRINKCON) ||
         (obj->obj_flags.type_flag == ITEM_FOOD)) 
     {
-      act("$P glows green for a second, before returning to its original color.", ch, obj, 0, TO_CHAR, 0);    
+      act("$p glows green for a second, before returning to its original color.", ch, obj, 0, TO_CHAR, 0);    
       obj->obj_flags.value[3] = 1;
     } else {
       send_to_char("Nothing special seems to happen.\n\r", ch);
@@ -2430,14 +2444,26 @@ int spell_remove_curse(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
 	 if(IS_SET(obj->obj_flags.extra_flags, ITEM_NODROP)) {
 		act("$p briefly glows blue.", ch, obj, 0, TO_CHAR, 0);
 		REMOVE_BIT(obj->obj_flags.extra_flags, ITEM_NODROP);
-		if (skill > 70 && obj_index[obj->item_number].virt == 514)
+		if (obj_index[obj->item_number].virt == 514)
 		{
 			int i = 0;
 			for (i= 0; i < obj->num_affects;i++)
 			  if (obj->affected[i].location == APPLY_MANA_REGEN)
 			  return eSUCCESS; // only do it once
 			SET_BIT(obj->obj_flags.extra_flags, ITEM_HUM);
+		struct char_data *t = obj->equipped_by;
+		int z = -1;
+	extern void wear(struct char_data *ch, struct obj_data *obj_object, int keyword);
+		if (t->equipment[WEAR_FINGER_L] == obj)
+			z = WEAR_FINGER_L;
+		else
+			z = WEAR_FINGER_R;
+		if (t)
+		    obj_to_char(unequip_char(t, z) , t);
 			add_obj_affect(obj, APPLY_MANA_REGEN, 2);
+		if (t) 
+			wear(t, obj, 0);
+			
 			
 			act("With the restrictive curse lifted, $p begins to hum with renewed power!",ch,obj,0, TO_ROOM, 0);
 			act("With the restrictive curse lifted, $p begins to hum with renewed power!",ch,obj,0, TO_CHAR, 0);
@@ -4221,12 +4247,31 @@ int spell_dispel_minor(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
    int done = FALSE;
    int retval;
 
-   if(obj && (int)obj > 100) /* Trying to dispel_minor an obj */
+   if(obj) /* Trying to dispel_minor an obj */
    {   // Heh, it passes spell cast through obj now too. Less than 100 = not 
        // an actual obj.
       if(GET_ITEM_TYPE(obj) != ITEM_BEACON) {
-         send_to_char("You can't dispel that!\n\r", ch);
-         return eFAILURE;
+	 if (!obj->equipped_by && !obj->carried_by)
+	 {
+          send_to_char("You can't dispel that!\n\r", ch);
+	  return eFAILURE;
+	 }
+	 if (IS_SET(obj->obj_flags.extra_flags, ITEM_INVISIBLE))
+	 {
+	  REMOVE_BIT(obj->obj_flags.extra_flags, ITEM_INVISIBLE);
+	  send_to_char("You remove the item's invisibility.\r\n",ch);
+	  return eSUCCESS;
+	 } 
+	 else if (IS_SET(obj->obj_flags.extra_flags, ITEM_GLOW))
+	 {
+	  REMOVE_BIT(obj->obj_flags.extra_flags, ITEM_GLOW);
+	  send_to_char("You remove the item's glowing aura.\r\n",ch);
+	  return eSUCCESS;
+	 } 
+	 else {
+	  send_to_char("That item is not imbued with dispellable magic.\r\n",ch);
+	  return eFAILURE;
+	}
       }
       if(!obj->equipped_by) {
        // Someone load it or something?
@@ -4519,7 +4564,7 @@ int spell_dispel_magic(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
 // If victim higher level, they get a save vs magic for no effect
 //      if((GET_LEVEL(victim) > GET_LEVEL(ch)) && 0 > saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC))
 //          return eFAILURE;
-   if (number(1,101) < get_saves(victim, SAVE_TYPE_MAGIC) + savebonus)
+   if (number(1,101) < get_saves(victim, SAVE_TYPE_MAGIC) + savebonus && level != GET_LEVEL(ch)-1)
    {
 	act("$N resists your attempt to dispel magic!", ch, NULL, victim, TO_CHAR,0);
 	act("$N resists $n's attempt to dispel magic!", ch, NULL, victim, TO_ROOM,NOTVICT);
@@ -6685,7 +6730,7 @@ int cast_curse( ubyte level, CHAR_DATA *ch, char *arg, int type,
 {
   int retval;
 
-  if (IS_SET(world[ch->in_room].room_flags, SAFE)){
+  if (IS_SET(world[ch->in_room].room_flags, SAFE) && tar_ch){
 	 send_to_char("You cannot curse someone in a safe area!\n\r", ch);
 	 return eFAILURE;
   }
@@ -8945,12 +8990,9 @@ int cast_herb_lore(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *v
         return eFAILURE;
   }
 
-
-
   if (!can_heal(ch,victim, SPELL_HERB_LORE)) return eFAILURE;
 
-  if(OUTSIDE(ch))
-    GET_HIT(victim) += dam_percent(skill,180);
+  if(OUTSIDE(ch))    GET_HIT(victim) += dam_percent(skill,180);
   else /* if not outside */
     GET_HIT(victim) += dam_percent(skill,80);
 
@@ -8964,7 +9006,112 @@ int cast_herb_lore(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *v
   {
     act("The herb makes $N look much healthier...and hungry?",ch,0,victim, TO_CHAR, 0);
   }
-
+  char arg1[MAX_INPUT_LENGTH];
+  one_argument(arg, arg1);
+  if (arg1[0])
+  {
+    OBJ_DATA *obj = get_obj_in_list_vis(ch, arg1, ch->carrying);
+    if (!obj)
+    {
+	send_to_char("You don't seem to be carrying any such root.\r\n",ch);
+	return eFAILURE;
+    }
+    int virt = obj_index[obj->item_number].virt;
+    int aff = 0,spl = 0;
+    switch (virt)
+    {
+      case INVIS_VNUM: 
+		aff = AFF_INVISIBLE; spl = SPELL_INVISIBLE;
+    if (affected_by_spell(victim, spl)) { send_to_char("They are already affected by that spell.\r\n",ch); return eFAILURE; }
+		act("$n slowly fades out of existence.", victim, 0, 0, TO_ROOM, 0);
+		act("You slowly fade out of existence.", victim, 0, 0, TO_CHAR, 0);
+		break;
+      case HASTE_VNUM:
+		aff = AFF_HASTE; spl = SPELL_HASTE;
+    if (affected_by_spell(victim, spl)) { send_to_char("They are already affected by that spell.\r\n",ch); return eFAILURE; }
+		act("$n begins moving faster!", victim, 0, 0, TO_ROOM, 0);
+		act("You begin moving faster!", victim, 0, 0, TO_CHAR, 0);
+		break;
+      case TRUE_VNUM: 
+	aff = AFF_TRUE_SIGHT; spl = SPELL_TRUE_SIGHT;
+    if (affected_by_spell(victim, spl)) { send_to_char("They are already affected by that spell.\r\n",ch); return eFAILURE; }
+		act("$n's eyes starts to gently glow white.", victim, 0, 0, TO_ROOM, 0);
+		act("Your eyes start to glow white.", victim, 0, 0, TO_CHAR, 0);
+		break;
+      case INFRA_VNUM: 
+		aff = AFF_INFRARED; spl = SPELL_INFRAVISION;
+    if (affected_by_spell(victim, spl)) { send_to_char("They are already affected by that spell.\r\n",ch); return eFAILURE; }
+		act("$n's eyes starts to glow red.", victim, 0, 0, TO_ROOM, 0);
+		act("Your eyes start to glow red.", victim, 0, 0, TO_CHAR, 0);
+		break;
+      case FARSIGHT_VNUM: 
+		aff = AFF_FARSIGHT; spl = SPELL_FARSIGHT;
+    if (affected_by_spell(victim, spl)) { send_to_char("They are already affected by that spell.\r\n",ch); return eFAILURE; }
+		act("$n's eyes blur and seem to darken.", victim, 0, 0, TO_ROOM, 0);
+		act("Your eyes blur and the world around you seems to come closers.", victim, 0, 0, TO_CHAR, 0);
+		break;
+      case LIGHTNING_SHIELD_VNUM: 
+		aff = AFF_LIGHTNINGSHIELD; spl = SPELL_LIGHTNING_SHIELD;
+    if (affected_by_spell(victim, spl)) { send_to_char("They are already affected by that spell.\r\n",ch); return eFAILURE; }
+		act("$n is surrounded by electricity.", victim, 0, 0, TO_ROOM, 0);
+		act("You become surrounded by electricity.", victim, 0, 0, TO_CHAR, 0);
+		break;
+      case INSOMNIA_VNUM: 
+		aff = AFF_INSOMNIA; spl = SPELL_INSOMNIA;
+    if (affected_by_spell(victim, spl)) { send_to_char("They are already affected by that spell.\r\n",ch); return eFAILURE; }
+		act("$n blinks and looks a little twitchy.", victim, 0, 0, TO_ROOM, 0);
+		act("You gain insomnia. Yay.", victim, 0, 0, TO_CHAR, 0);
+		break;
+      case DETECT_GOOD_VNUM: 
+		aff = AFF_DETECT_GOOD; spl = SPELL_DETECT_GOOD; 
+    if (affected_by_spell(victim, spl)) { send_to_char("They are already affected by that spell.\r\n",ch); return eFAILURE; }
+		act("$n's eyes starts to gently glow yellow.", victim, 0, 0, TO_ROOM, 0);
+		act("Your eyes start to glow yellow.", victim, 0, 0, TO_CHAR, 0);
+		break;
+      case DETECT_EVIL_VNUM: 
+		aff = AFF_DETECT_EVIL; spl = SPELL_DETECT_EVIL; 
+    if (affected_by_spell(victim, spl)) { send_to_char("They are already affected by that spell.\r\n",ch); return eFAILURE; }
+		act("$n's eyes starts to gently glow blue.", victim, 0, 0, TO_ROOM, 0);
+		act("Your eyes start to glow blue.", victim, 0, 0, TO_CHAR, 0);
+		break;
+      case DETECT_INVISIBLE_VNUM: 
+		aff = AFF_DETECT_INVISIBLE; spl = SPELL_DETECT_INVISIBLE;
+    if (affected_by_spell(victim, spl)) { send_to_char("They are already affected by that spell.\r\n",ch); return eFAILURE; }
+		act("$n's eyes starts to gently glow green.", victim, 0, 0, TO_ROOM, 0);
+		act("Your eyes start to glow green.", victim, 0, 0, TO_CHAR, 0);
+		break;
+      case SENSE_LIFE_VNUM: 
+		aff = AFF_SENSE_LIFE; spl = SPELL_SENSE_LIFE;
+    if (affected_by_spell(victim, spl)) { send_to_char("They are already affected by that spell.\r\n",ch); return eFAILURE; }
+//		act("$n's eyes starts to gently glow white.", victim, 0, 0, TO_ROOM, 0);
+		act("Your become hyper-aware of your surroundings.", victim, 0, 0, TO_CHAR, 0);
+		break;
+      case SOLIDITY_VNUM: 
+		aff = AFF_SOLIDITY; spl = SPELL_SOLIDITY; 
+    if (affected_by_spell(victim, spl)) { send_to_char("They are already affected by that spell.\r\n",ch); return eFAILURE; }
+		act("$n is surrounded by a pulsing, yellow shield.", victim, 0, 0, TO_ROOM, 0);
+		act("You become surrounded by a pulsing, yellow shield.", victim, 0, 0, TO_CHAR, 0);
+		break;
+	case 2256:
+		aff = 0; spl =0;
+		send_to_char("Adding the herbs improve the healing effect of the spell.\r\n",ch);
+		GET_HIT(victim) += 40;
+		if (GET_HIT(victim) > GET_MAX_HIT(victim)) GET_HIT(victim) = GET_MAX_HIT(victim);
+		break;
+	default:
+		send_to_char("That's not a herb!\r\n",ch);
+		return eFAILURE;
+    }
+    extract_obj(obj);
+    struct affected_type af;
+    af.type      = spl;
+    af.duration  =  3;
+    af.modifier  = 0;
+    af.location  = 0;
+    af.bitvector = aff;
+    if (aff)
+    affect_to_char(victim, &af);
+  }
   return eSUCCESS;
 }
 
@@ -9016,7 +9163,7 @@ int cast_entangle(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *vi
 	if(!OUTSIDE(ch))
 	{
 		send_to_char("You must be outside to cast this spell!\n\r", ch);
-		GET_MANA(ch) += 10; /*Mana kludge */
+	//	GET_MANA(ch) += 10; /*Mana kludge */
 		return eFAILURE;
 	}
 	set_cantquit(ch, victim);
@@ -9035,7 +9182,10 @@ int cast_entangle(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *vi
            spell_blindness(level, ch, victim, 0, 0);       /* The plants blind the victim . . */
 	}
 	if (GET_POS(victim) > POSITION_SITTING)
-	GET_POS(victim) = POSITION_SITTING;		/* And pull the victim down to the ground */
+	{GET_POS(victim) = POSITION_SITTING;		/* And pull the victim down to the ground */
+	if (victim->fighting)
+		SET_BIT(victim->combat, COMBAT_BASH2);
+	}
 	update_pos(victim);
 	return eSUCCESS;
 }
@@ -11044,6 +11194,102 @@ int cast_blessed_halo( ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DAT
        break;
     default :
        log("Serious screw-up in blessed_halo!", ANGEL, LOG_BUG);
+       break;
+  }
+  return eFAILURE;
+}
+
+int spell_ghost_walk(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
+{
+  if (ch->fighting)
+  {
+	send_to_char("You're a bit too distracted by the battle.\r\n",ch);
+	return eFAILURE;
+  }
+  if (!ch->desc || ch->desc->snooping || IS_NPC(ch) || !ch->in_room)
+  {
+    send_to_char("You can't do that at the moment.\r\n",ch);
+    return eFAILURE;
+  }
+
+  if (ch->desc->snoop_by)
+  {
+                 send_to_char ("Whoa! Almost got caught snooping!\n",ch->desc->snoop_by->character);
+                 send_to_char ("Your victim is casting spiritwalk spell.\r\n", ch->desc->snoop_by->character);
+                 do_snoop (ch->desc->snoop_by->character, ch->desc->snoop_by->character->name, 0);
+  }
+  int vnum;
+  switch (world[ch->in_room].sector_type)
+  {
+    case SECT_INSIDE:
+    case SECT_CITY:
+    case SECT_PAVED_ROAD:
+	vnum = 99;
+	break;
+    case SECT_FIELD:
+    case SECT_HILLS:
+    case SECT_MOUNTAIN:
+	vnum = 98;
+	break;
+    case SECT_WATER_SWIM:
+    case SECT_WATER_NOSWIM:
+    case SECT_UNDERWATER:
+	vnum = 97;
+	break;
+    case SECT_AIR:
+	vnum = 96;
+	break;
+    case SECT_FROZEN_TUNDRA:
+    case SECT_ARCTIC:
+    	vnum = 95;
+	break;
+    case SECT_DESERT:
+    case SECT_BEACH:
+	vnum = 94;
+	break;
+    case SECT_SWAMP:
+	vnum = 93;
+	break;
+    case SECT_FOREST:
+//    case SECT_JUNGLE:
+      vnum = 92;
+	break;
+	default:
+	send_to_char("Invalid sectortype. Please report location to an imm.\r\n",ch);
+	return eFAILURE;
+  }
+  int mobile;
+  if ( ( mobile = real_mobile( vnum ) ) < 0 )
+  {
+      logf( IMMORTAL, LOG_WORLD, "Ghostwalk - Bad mob vnum: vnum %d.", vnum );
+      send_to_char("\"Spirit\" for this sector not yet implented.\r\n",ch);
+      return eFAILURE|eINTERNAL_ERROR;
+  }
+
+  struct char_data *mob;
+  mob = clone_mobile( mobile );
+  mob->hometown = world[ch->in_room].number;
+  char_to_room( mob, ch->in_room );
+
+  send_to_char("You call upon the spirits of this area, shifting into a trance-state.\r\n",ch);
+  send_to_char("(Use the 'return' command to return to your body).\r\n",ch);
+  ch->pcdata->possesing = 1;
+  ch->desc->character = mob;
+  ch->desc->original = ch;
+  mob->desc = ch->desc;
+  ch->desc = 0;
+  return eSUCCESS;
+}
+
+int cast_ghost_walk( ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill )
+{
+  switch (type) 
+  {
+    case SPELL_TYPE_SPELL:
+       return spell_ghost_walk(level, ch, tar_ch, 0, skill);
+       break;
+    default :
+       log("Serious screw-up in ghost_walk!", ANGEL, LOG_BUG);
        break;
   }
   return eFAILURE;

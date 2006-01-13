@@ -16,7 +16,7 @@
  *  10/21/2003   Onager    Changed IS_ANONYMOUS() to handle mobs without   *
  *                         crashing                                        *
  ***************************************************************************/
-/* $Id: utility.h,v 1.35 2005/06/25 18:58:56 shane Exp $ */
+/* $Id: utility.h,v 1.36 2006/01/13 16:49:21 dcastle Exp $ */
 
 #ifndef UTILITY_H_
 #define UTILITY_H_
@@ -483,6 +483,14 @@ struct mprog_throw_type {
    char *var;			// temporary variable
 };
 
+struct mprog_variable_data {
+  char *invoker;
+  char *object;
+  char *rndm;
+  char *voi;
+  int nested; // amount of nested ifs, at time of pause
+  char *program;
+};
 
 int handle_poisoned_weapon_attack(char_data * ch, char_data * vict, int percent);
 

@@ -451,6 +451,7 @@ int do_mpmload( CHAR_DATA *ch, char *argument, int cmd )
     }
 
     victim = clone_mobile( realnum );
+    victim->hometown = world[ch->in_room].number;
     char_to_room( victim, ch->in_room );
     return eSUCCESS;
 }
@@ -569,7 +570,8 @@ int do_mppurge( CHAR_DATA *ch, char *argument, int cmd )
     }
 
 //    issame = (ch == victim);
-
+    if (ch == victim)
+	{ extern bool selfpurge; selfpurge = TRUE; }
     extract_char( victim, TRUE );
 
 //    if(issame)
@@ -613,6 +615,10 @@ int do_mpgoto( CHAR_DATA *ch, char *argument, int cmd )
 	logf( IMMORTAL, LOG_WORLD, "Mpgoto - No such location: vnum %d.", mob_index[ch->mobdata->nr].virt );
 	return eFAILURE|eINTERNAL_ERROR;
     }
+    extern room_data ** world_array;
+    extern int top_of_world;
+    if (location > top_of_world || !world_array[location])
+	location = 0;
 
     if ( ch->fighting != NULL )
 	stop_fighting( ch );
@@ -648,13 +654,17 @@ int do_mpat( CHAR_DATA *ch, char *argument, int cmd )
 
 // TODO - make location take args
     location = atoi(arg);
+    
 
     if ( location < 0 )
     {
 	logf( IMMORTAL, LOG_WORLD, "Mpat - No such location: vnum %d.", mob_index[ch->mobdata->nr].virt );
 	return eFAILURE|eINTERNAL_ERROR;
     }
-
+    extern room_data ** world_array;
+    extern int top_of_world;
+    if (location > top_of_world || !world_array[location])
+	location = 0;
     original = ch->in_room;
     char_from_room( ch );
     char_to_room( ch, location );
@@ -1058,6 +1068,7 @@ int do_mpsettemp(CHAR_DATA *ch, char *argument, int cmd)
   char arg[MAX_INPUT_LENGTH];
   char temp[MAX_INPUT_LENGTH];
   char arg2[MAX_INPUT_LENGTH];
+  char arg3[MAX_INPUT_LENGTH];
   CHAR_DATA *victim;
   if (!IS_NPC(ch)) {
     send_to_char("Huh?\r\n",ch);
@@ -1066,6 +1077,7 @@ int do_mpsettemp(CHAR_DATA *ch, char *argument, int cmd)
   argument = one_argument(argument, arg);
   argument = one_argument(argument, temp);
   argument = one_argument(argument, arg2);
+  argument = one_argument(argument, arg3);
   if (arg[0] == '\0' || temp[0] == '\0' || arg2[0] == '\0')
   {
     int num = mob_index[ch->mobdata->nr].virt;
@@ -1097,6 +1109,10 @@ int do_mpsettemp(CHAR_DATA *ch, char *argument, int cmd)
      eh->name = str_dup(temp);
      eh->next = victim->tempVariable;
      victim->tempVariable = eh;
+     if (arg3[0] != '\0' && !str_cmp(arg3, "save"))
+	eh->save = 1;
+     else
+	eh->save = 0;
   }
   return eSUCCESS;
 }
@@ -1271,7 +1287,7 @@ int skill_aff[] =
   33, 34, 84, 81, 86, 38,
   89, 0, 0, 0, 0, 0, SPELL_SOLIDITY, 72,
   SPELL_CANTQUIT, SPELL_KILLER, 56, 133, 74, 0,
-  143, SPELL_SHADOWSLIP, SPELL_INSOMNIA, SPELL_FREEFLOAT,
+  SPELL_SHADOWSLIP, SPELL_INSOMNIA, SPELL_FREEFLOAT,
   SPELL_FARSIGHT, SPELL_CAMOUFLAGE, SPELL_STABILITY,
   0, 0, SPELL_FOREST_MELD, SKILL_SONG_INSANE_CHANT,
   SKILL_SONG_GLITTER_DUST, SKILL_SONG_STICKY_LULL,
@@ -1356,3 +1372,73 @@ int do_mpbestow(CHAR_DATA *ch, char *argument, int cmd)
   }
   return eSUCCESS;
 }
+
+// simulate a pause in proc execution
+// stops prog, mpthrow a special kinda throw, picks it up again when delay is over
+int do_mppause( CHAR_DATA *ch, char *argument, int cmd )
+{
+  struct mprog_throw_type * throwitem = NULL;
+  int mob_num;
+  int catch_num;
+  int delay;
+
+  char first[MAX_INPUT_LENGTH];
+  char second[MAX_INPUT_LENGTH];
+  char third[MAX_INPUT_LENGTH];
+  char fourth[MAX_INPUT_LENGTH];	
+  char fifth[MAX_INPUT_LENGTH];
+  // locate and validate argument to find target
+  argument = one_argument(argument, first);
+
+  if(isdigit(*first)) {
+    if(!check_valid_and_convert(mob_num, first) || (real_mobile(mob_num) < 0)) {
+      logf( IMMORTAL, LOG_WORLD, "Mpthrow - Invalid mobnum: vnum %d.",
+	  	mob_index[ch->mobdata->nr].virt );
+      return eFAILURE;
+    }
+    *first = '\0';
+  }
+  else {
+    if(strlen(first) >= MAX_THROW_NAME) {
+      logf( IMMORTAL, LOG_WORLD, "Mpthrow - Name too long: vnum %d.",
+	  	mob_index[ch->mobdata->nr].virt );
+      return eFAILURE;
+    }
+  }
+
+  if(!check_range_valid_and_convert(catch_num, second, MPROG_CATCH_MIN, MPROG_CATCH_MAX)) {
+    logf( IMMORTAL, LOG_WORLD, "Mpthrow - Invalid catch_num: vnum %d.",
+	  	mob_index[ch->mobdata->nr].virt );
+    return eFAILURE;
+  }
+
+  if(!check_range_valid_and_convert(delay, third, 0, 500)) {
+    logf( IMMORTAL, LOG_WORLD, "Mpthrow - Invalid delay: vnum %d.",
+	  	mob_index[ch->mobdata->nr].virt );
+    return eFAILURE;
+  }
+
+  int opt = 0;
+  if(!check_range_valid_and_convert(opt, fifth, 0, 50000))
+     opt = 0;
+
+  // create struct
+  throwitem = (struct mprog_throw_type *)dc_alloc(1, sizeof(struct mprog_throw_type));
+  throwitem->target_mob_num = mob_num;
+  strcpy(throwitem->target_mob_name, first);
+  throwitem->data_num = catch_num;
+  throwitem->delay = delay;
+  throwitem->mob = TRUE; // This is, suprisingly, a mob
+  
+  if (fourth[0] !='\0')
+   throwitem->var = str_dup(fourth);
+  else
+   throwitem->var = NULL;
+  throwitem->opt = opt;
+  // add to delay list
+  throwitem->next = g_mprog_throw_list;
+  g_mprog_throw_list = throwitem;
+
+  return eSUCCESS;
+}
+

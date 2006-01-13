@@ -521,6 +521,7 @@ int do_emote(struct char_data *ch, char *argument, int cmd)
     MOBtrigger = FALSE;
     act(buf,ch,0,0,TO_ROOM, 0);
     csendf(ch, "%s %s\n\r", GET_SHORT(ch), argument + i);
+    MOBtrigger = TRUE;
   }
   return eSUCCESS;
 }

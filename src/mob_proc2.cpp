@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.57 2005/10/30 15:59:46 urizen Exp $ */
+/* $Id: mob_proc2.cpp,v 1.58 2006/01/13 16:49:15 dcastle Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -1865,10 +1865,12 @@ char *gl_item(OBJ_DATA *obj, int number, CHAR_DATA *ch)
   char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH],buf3[MAX_STRING_LENGTH];
   int length,i = 0;
   sprintf(buf,"$B$7%-2d$R) %s ", number+1, obj->short_description);
-  length = strlen(buf);
   extern char* apply_types[];
-
-  for (;i<obj->num_affects;i++)
+  if (obj->obj_flags.type_flag == ITEM_WEAPON) { // weapon
+    sprintf(buf, "%s%dd%d, ", buf, obj->obj_flags.value[1], obj->obj_flags.value[2]);
+  }
+  length = strlen(buf);
+ for (;i<obj->num_affects;i++)
     if ((obj->affected[i].location != APPLY_NONE) &&
           (obj->affected[i].modifier != 0))
     {
@@ -1931,6 +1933,7 @@ const struct platsmith platsmith_list[]=
  {10022, {500, 501, 502, 503, 520, 521, 522, 523, 528, 529, 530, 531, 0}},
  {10023, {542, 543, 544, 545, 532, 533, 534, 535, 536, 550, 551, 552, 553}},
  {10026, {558, 559, 560, 561, 562, 563, 564, 565, 566, 0, 0, 0, 0}}, 
+ {10004, {570, 571, 575, 577, 578, 580, 582, 584, 586, 587, 590, 591,0}},
  {0, {0,0,0,0,0,0,0,0,0,0,0,0,0}}
 };
 

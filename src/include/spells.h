@@ -14,7 +14,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.h,v 1.72 2005/06/25 18:58:56 shane Exp $ */
+/* $Id: spells.h,v 1.73 2006/01/13 16:49:21 dcastle Exp $ */
 #include <structs.h> // ubyte, int16
 
 #define MAX_BUF_LENGTH               240
@@ -210,7 +210,8 @@ void check_maxes(CHAR_DATA *ch);
 #define SPELL_EAGLE_EYE             156
 #define SPELL_CALL_LIGHTNING	    157
 #define SPELL_DIVINE_FURY           158
-#define MAX_SPL_LIST                158
+#define SPELL_GHOSTWALK		    159
+#define MAX_SPL_LIST                159
 
 // if you add a spell, make sure you update "spells[]" in spells.C
 
@@ -360,7 +361,8 @@ void check_maxes(CHAR_DATA *ch);
 #define SKILL_SONG_DISCHORDANT_DIRGE 549
 #define SKILL_SONG_CRUSHING_CRESCENDO 550
 #define SKILL_SONG_HYPNOTIC_HARMONY  551
-#define SKILL_SONG_MAX               551
+#define SKILL_SONG_MKING_CHARGE      552
+#define SKILL_SONG_MAX               552
 // if you add a song, make sure you update "songs[]" in sing.C
 // as well as SKILL_SONG_MAX
 
@@ -399,6 +401,7 @@ void check_maxes(CHAR_DATA *ch);
 #define COMMAND_OPEDIT		     630
 #define COMMAND_EQMAX		     631
 #define COMMAND_LOG 		     632
+#define COMMAND_ADDNEWS		     633
 // make sure up you update bestowable_god_commands_type bestowable_god_commands[]
 // if you modify this command list any
 
@@ -530,5 +533,18 @@ struct attack_hit_type
 #define END_STALK	1
 #define CHANGE_LEADER	2
 #define BROKE_CHARM	3
+
+  #define DETECT_GOOD_VNUM 6302
+  #define DETECT_EVIL_VNUM 6301
+  #define DETECT_INVISIBLE_VNUM 6306
+  #define SENSE_LIFE_VNUM 6304
+  #define INFRA_VNUM 6308
+  #define INVIS_VNUM 6303
+  #define FARSIGHT_VNUM 6307
+  #define SOLIDITY_VNUM 6309
+  #define LIGHTNING_SHIELD_VNUM 6310
+  #define INSOMNIA_VNUM 6311
+  #define HASTE_VNUM 6312
+  #define TRUE_VNUM 6305
 
 #endif

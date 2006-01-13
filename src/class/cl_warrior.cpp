@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.39 2005/05/31 11:24:48 urizen Exp $
+| $Id: cl_warrior.cpp,v 1.40 2006/01/13 16:49:18 dcastle Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -198,6 +198,13 @@ int do_retreat(struct char_data *ch, char *argument, int cmd)
      return eFAILURE;
    }
 
+  if(IS_AFFECTED(ch, AFF_NO_FLEE)) {
+     if(affected_by_spell(ch, SPELL_IRON_ROOTS))
+       send_to_char("The roots bracing your legs make it impossible to run!\r\n", ch);
+     else send_to_char("Your legs are too tired for running away!\r\n", ch);
+     return eFAILURE;
+  }
+
    // after the below line, buf should contain the argument, hopefully
    // a direction to retreat.
    one_argument(argument, buf); 
@@ -303,12 +310,14 @@ int do_hitall(struct char_data *ch, char *argument, int cmd)
              add_memory(vict, GET_NAME(ch), 'h');
          }
       }
+    WAIT_STATE(ch, PULSE_VIOLENCE*3);
 
    } else 
    {
       act ("You start swinging like a MADMAN!", ch, 0, 0, TO_CHAR, 0);
       act ("$n starts swinging like a MADMAN!", ch, 0, 0, TO_ROOM, 0);
       SET_BIT(ch->combat, COMBAT_HITALL);
+    WAIT_STATE(ch, PULSE_VIOLENCE*3);
 
       for (vict = character_list; vict; vict = temp) 
       {
@@ -324,7 +333,6 @@ int do_hitall(struct char_data *ch, char *argument, int cmd)
        }
        REMOVE_BIT(ch->combat, COMBAT_HITALL);
     }
-    WAIT_STATE(ch, PULSE_VIOLENCE*3);
     return eSUCCESS;
 }
 
@@ -425,19 +433,23 @@ int do_bash(struct char_data *ch, char *argument, int cmd)
 	retval = damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_BASH, 0);
     }
     else {
-        hit = 1;
 	GET_POS(victim) = POSITION_SITTING;
         SET_BIT(victim->combat, COMBAT_BASH1);
+	retval = damage(ch, victim, 25, TYPE_UNDEFINED, SKILL_BASH, 0);
+	if (!(retval & eEXTRA_VALUE)) {
+        hit = 1;
         // if they already have 2 rounds of wait, only tack on 1 instead of 2
+
+	if (!SOMEONE_DIED(retval))
         if(victim->desc)
           WAIT_STATE(victim, PULSE_VIOLENCE * 2);
+	}
 //	else WAIT_STATE(victim, PULSE_VIOLENCE * 3);
  //       act("Your bash at $N sends $M sprawling.", ch, NULL, victim, 
 //TO_CHAR , 0);
  //       act("$n sends you sprawling.", ch, NULL, victim, TO_VICT , 0);
  //       act("$n sends $N sprawling with a powerful bash.", ch, NULL, 
 //victim, TO_ROOM, NOTVICT);
-	retval = damage(ch, victim, 25, TYPE_UNDEFINED, SKILL_BASH, 0);
     }
 
     if(SOMEONE_DIED(retval))
@@ -688,14 +700,15 @@ int do_rescue(struct char_data *ch, char *argument, int cmd)
        stop_fighting(victim);
     if (tmp_ch->fighting)
        stop_fighting(tmp_ch);
-    if (ch->fighting)
-       stop_fighting(ch);
+//    if (ch->fighting)
+  //     stop_fighting(ch);
 
     /*
      * so rescuing an NPC who is fighting a PC does not result in
      * the other guy getting killer flag
      */
-    set_fighting(ch, tmp_ch);
+  if (!ch->fighting)  
+  set_fighting(ch, tmp_ch);
     set_fighting(tmp_ch, ch);
 
     WAIT_STATE(ch, MAX(PULSE_VIOLENCE*2, tempwait));

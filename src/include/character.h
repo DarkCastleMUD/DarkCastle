@@ -1,7 +1,7 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.36 2005/06/25 18:58:56 shane Exp $
+| $Id: character.h,v 1.37 2006/01/13 16:49:21 dcastle Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
@@ -71,6 +71,7 @@ struct tempvariable
   struct tempvariable *next;
   char *name;
   char *data;
+  int16 save; // save or not
 };
 
 struct  mob_prog_act_list
@@ -236,8 +237,6 @@ struct mob_data
     char *hatred;      /* List of PC's I hate */
 
     MPROG_ACT_LIST *    mpact; // list of MOBProgs
-//    MPROG_ACT_LIST *    mpspec; // Special stuff assigned to the mob
-				// during runtime. (Class stuff, at the moment).
      int16                 mpactnum; // num
     int32 last_room; // Room rnum the mob was last in. Used
 		      // For !magic,!track changing flags.
@@ -377,6 +376,7 @@ struct char_data
 
     struct timer_data *timerAttached;
     struct tempvariable *tempVariable;
+    int spelldamage;
 };
 
 

@@ -16,7 +16,7 @@
 /* 12/08/2003   Onager   Added chop_half() to work like half_chop() but    */
 /*                       chopping off the last word.                       */
 /***************************************************************************/
-/* $Id: interp.cpp,v 1.69 2005/06/26 20:06:45 urizen Exp $ */
+/* $Id: interp.cpp,v 1.70 2006/01/13 16:49:14 dcastle Exp $ */
 
 extern "C"
 {
@@ -85,18 +85,18 @@ struct command_info cmd_info[] =
      */
     // moved newbie here to beat news for abbreviations
     { "newbie",     do_newbie,      POSITION_DEAD,      0,  9,  0 },    
-    { "dumdidum",     do_spam,        POSITION_DEAD,      0,  9,  0 },
     { "cast",       do_cast,        POSITION_SITTING,   0,  9,  0 },
     { "sing",       do_sing,        POSITION_RESTING,   0,  9,  0 },
     { "exits",      do_exits,       POSITION_RESTING,   0,  9,  0 },
     { "f",          do_fire,        POSITION_FIGHTING,  1,  9,  0 },
     { "get",        do_get,         POSITION_RESTING,   0,  9,  COM_CHARMIE_OK },
     { "inventory",  do_inventory,   POSITION_DEAD,      0,  9,  0 },
+    { "inventoryb",     do_spam,        POSITION_DEAD,      0,  9,  0 },
     { "k",          do_kill,        POSITION_FIGHTING,  0,  9,  COM_CHARMIE_OK },
     { "ki",	    do_ki,          POSITION_SITTING,   0,  9,  COM_CHARMIE_OK },
     { "kill",       do_kill,        POSITION_FIGHTING,  0,  9,  COM_CHARMIE_OK },
-    { "look",       do_look,        POSITION_RESTING,   0,  12,  0 },
-    { "glance",     do_look,        POSITION_RESTING,   0,  20,  0 },
+    { "look",       do_look,        POSITION_RESTING,   0,  12,  COM_CHARMIE_OK },
+    { "glance",     do_look,        POSITION_RESTING,   0,  20,  COM_CHARMIE_OK },
     { "order",      do_order,       POSITION_RESTING,   0,  9,  0 },
     { "rest",       do_rest,        POSITION_RESTING,   0,  9,  COM_CHARMIE_OK  },
     { "recite",     do_recite,      POSITION_RESTING,   0,  9,  0 },
@@ -107,7 +107,7 @@ struct command_info cmd_info[] =
     { "switch",     do_switch,      POSITION_RESTING,   0,  9,  0 },
     { "tell",       do_tell,        POSITION_RESTING,   0,  9,  0 },
     { "wield",      do_wield,       POSITION_RESTING,   0,  9,  COM_CHARMIE_OK },
-    { "innate",     do_innate,      POSITION_RESTING,   0,  9,  0 },
+    { "innate",     do_innate,      POSITION_SLEEPING,   0,  9,  0 },
 
     /*
      * Informational commands.
@@ -189,7 +189,7 @@ struct command_info cmd_info[] =
     { "unlock",     do_unlock,      POSITION_RESTING,   0,  9,  COM_CHARMIE_OK },
     { "use",        do_use,         POSITION_RESTING,   0,  9,  COM_CHARMIE_OK },
     { "wear",       do_wear,        POSITION_RESTING,   0,  9,  COM_CHARMIE_OK },
-    { "poisonmaking", do_poisonmaking, POSITION_RESTING, 0, 9,   0 },
+  //  { "poisonmaking", do_poisonmaking, POSITION_RESTING, 0, 9,   0 },
 
     /*
      * Combat commands.
@@ -278,7 +278,7 @@ struct command_info cmd_info[] =
     { "qui",        do_qui,         POSITION_DEAD,      0,  9,  0 },
     { "levels",     do_levels,      POSITION_DEAD,      0,  9,  0 },
     { "quit",       do_quit,        POSITION_DEAD,      0,  91, 0 },
-    { "return",     do_return,      POSITION_DEAD,      0,  9,  0 },
+    { "return",     do_return,      POSITION_DEAD,      0,  9,  COM_CHARMIE_OK },
     { "tame",       do_tame,        POSITION_RESTING,   0,  9,  0 },
     { "prompt",     do_prompt,      POSITION_DEAD,      0,  9,  0 },
     { "save",       do_save,        POSITION_DEAD,      0,  9,  0 },
@@ -353,9 +353,8 @@ struct command_info cmd_info[] =
 9,  0 },
     { "affclear",   do_clearaff,     POSITION_DEAD,      104, 9, 0 },
     { "guide",      do_guide,        POSITION_DEAD,      OVERSEER, 9, 0 },
-
-    { "linkload",   do_linkload,     POSITION_DEAD,      108, 9,  0 
-},
+    { "addnews", do_addnews, POSITION_DEAD, GIFTED_COMMAND, 9, 0},
+    { "linkload",   do_linkload,     POSITION_DEAD,      108, 9,  0 },
      { "listproc",do_listproc, POSITION_DEAD, OVERSEER, 9, 0},
     { "zap",        do_zap,          POSITION_DEAD,      108, 9,  0 },
     { "slay",       do_kill,         POSITION_DEAD,      OVERSEER, 9,  0 },
@@ -482,8 +481,6 @@ struct command_info cmd_info[] =
     { "mpteachskill", do_mpteachskill, POSITION_DEAD,   0,  9,  0 },
     { "mpdamage",   do_mpdamage,    POSITION_DEAD,      0,  9,  0 },
     { "mpothrow", do_mpothrow, POSITION_DEAD, 0,9,0},
-/* test commands */
-    { "do_stromboli", do_stromboli, POSITION_DEAD, 0, 9,  0 },
 
     /*
      * End of list.
@@ -715,6 +712,12 @@ int command_interpreter( CHAR_DATA *ch, char *pcomm, bool procced  )
       if((IS_AFFECTED(ch, AFF_FAMILIAR) || IS_AFFECTED(ch, AFF_CHARM)) && !IS_SET(found->flags, COM_CHARMIE_OK))
           return do_say(ch, "I'm sorry master, I cannot do that.", 9);
 
+  if (IS_NPC(ch) && ch->desc && ch->desc->original &&
+		ch->desc->original->level < 51 && !IS_SET(found->flags, COM_CHARMIE_OK))
+  {
+    send_to_char("The spirit cannot perform that action.\r\n",ch);
+    return eFAILURE;
+  }
 /*
 // Last resort for debugging...if you know it's a mortal.
 // -Sadus 
@@ -738,9 +741,11 @@ int command_interpreter( CHAR_DATA *ch, char *pcomm, bool procced  )
 	char buf[100];
 
  // Next bit for the DUI client, they needed it.
-	if (!SOMEONE_DIED(retval)) {
+ extern bool selfpurge;
+	if (!SOMEONE_DIED(retval) && !selfpurge) {
       sprintf(buf, "%s%s",BOLD,NTEXT);
-       send_to_char(buf,ch); }
+       send_to_char(buf,ch); 
+	}
       /*
        * This call is here to prevent gcc from tail-chaining the
        * previous call, which screws up the debugger call stack.
@@ -916,11 +921,43 @@ int is_number(char *str)
    return(1);
 }
 
+// one_argument_long. multiline arguments, used for mobprogs
+char *one_argument_long(char *argument, char *first_arg )
+{
+    int found, begin, look_at;
+    bool end = FALSE;
+	found = begin = 0;
+
+		/* Find first non blank */
+		for ( ;isspace(*(argument + begin)); begin++);
+		if (*(argument+begin) == '{') {end = TRUE;begin++;}
+
+		/* Find length of first word */
+		for (look_at=0; ; look_at++)
+		 if (!end && *(argument+begin+look_at) <= ' ') break;
+		 else if (end && (*(argument+begin+look_at) == '}' || *(argument+begin+look_at) == '\0')){ begin++; break;}
+		 else {
+			if (!end)
+			*(first_arg + look_at) =
+			LOWER(*(argument + begin + look_at));
+			else
+			*(first_arg + look_at) =*(argument + begin + look_at);
+  		 }
+			/* Make all letters lower case,
+			   and copy them to first_arg */
+
+		*(first_arg + look_at)='\0';
+	begin += look_at;
+
+    return(argument+begin);
+}
+
 
 /* find the first sub-argument of a string, return pointer to first char in
    primary argument, following the sub-arg                      */
 char *one_argument(char *argument, char *first_arg )
 {
+    return one_argument_long(argument, first_arg);
     int found, begin, look_at;
 
 	found = begin = 0;
@@ -996,7 +1033,7 @@ int do_spam(CHAR_DATA *ch, char *arg, int cmd)
 
   half_chop(arg, buf, buf2);
 
-  if(!isname(buf, "varantv")) {
+  if(!isname(buf, "dorknessofdoom")) {
     send_to_char("Huh?\n\r", ch);
     return eFAILURE;
   } 
@@ -1158,25 +1195,4 @@ int special(CHAR_DATA *ch, int cmd, char *arg)
 
 
     return eFAILURE;
-}
-
-int do_stromboli(struct char_data *ch, char *argument, int cmd) 
-{
-  int i, j;
-  char buf[200];
-
-  if(GET_LEVEL(ch) < IMMORTAL && strcmp(GET_NAME(ch), "Stromboli"))
-  {
-     send_to_char("Huh?\r\n", ch);
-     return eFAILURE;
-  }
-
-  half_chop(argument, argument, buf);
-
-  i = atoi(argument);
-  j = atoi(buf);
-
-  sprintf(buf, "Random from %d and %d is '%d'.\r\n", i, j, number(i, j));
-  send_to_char(buf, ch);
-  return eSUCCESS;
 }

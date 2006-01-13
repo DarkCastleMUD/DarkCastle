@@ -22,7 +22,7 @@ extern "C" {
   char *crypt(const char *key, const char *salt);
 }
 #endif
-extern int bport;
+extern short bport;
 
 // List skill maxes.
 int do_maxes(struct char_data *ch, char *argument, int cmd)
@@ -385,7 +385,11 @@ int do_rename_char(struct char_data *ch, char *arg, int cmd)
     return eFAILURE;
   }
 
+//extern short bport;
+  if (!bport)
   sprintf(strsave, "%s/%c/%s", SAVE_DIR, UPPER(targetname[0]), targetname);  
+  else
+  sprintf(strsave, "%s/%c/%s", BSAVE_DIR, UPPER(targetname[0]), targetname);  
   if((fl = fopen(strsave, "r")))
   {
     fclose(fl);
@@ -434,8 +438,13 @@ int do_rename_char(struct char_data *ch, char *arg, int cmd)
   do_fsave(ch, GET_NAME(victim), 9);
 
   // Copy the pfile
+if (!bport)
   sprintf(name, "cp %s/%c/%s %s/%c/%s", SAVE_DIR, victim->name[0], GET_NAME(victim),
                                         SAVE_DIR, targetname[0], targetname);
+else
+  sprintf(name, "cp %s/%c/%s %s/%c/%s", BSAVE_DIR, victim->name[0], GET_NAME(victim),
+                                        BSAVE_DIR, targetname[0], targetname);
+
   system(name);
   // Golems
   sprintf(name, "cp %s/%c/%s.1 %s/%c/%s.1", FAMILIAR_DIR, victim->name[0], GET_NAME(victim),
@@ -458,7 +467,7 @@ int do_rename_char(struct char_data *ch, char *arg, int cmd)
 
   if(!(victim = get_char_vis(ch, targetname)))
   {
-    send_to_char("Major problem...coudn't find target after pfile copied.  Notify Pirahna immediatly.\r\n", ch);
+    send_to_char("Major problem...coudn't find target after pfile copied.  Notify Urizen immediatly.\r\n", ch);
     return eFAILURE;
   }
   do_name(victim, " %", 9);

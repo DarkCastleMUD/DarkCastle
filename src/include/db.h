@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: db.h,v 1.17 2005/06/19 10:34:09 urizen Exp $ */
+/* $Id: db.h,v 1.18 2006/01/13 16:49:21 dcastle Exp $ */
 #ifndef DB_H_
 #define DB_H_
 
@@ -135,6 +135,7 @@ struct reset_com
     int arg3;
     char * comment; /* Any comments that went with the command */
     int active; // is it active? alot aren't on the builders' port
+    time_t last; // when was it last reset
     /* 
     *  Commands:              *
     *  'M': Read a mobile     *

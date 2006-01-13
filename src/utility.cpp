@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.46 2005/10/30 15:59:46 urizen Exp $ */
+/* $Id: utility.cpp,v 1.47 2006/01/13 16:49:15 dcastle Exp $ */
 
 extern "C"
 {
@@ -175,7 +175,7 @@ FILE * player_file = 0;
 FILE * world_log   = 0;
 FILE * chaos_log   = 0;
 FILE * clan_log   = 0;
-
+FILE * hmm_log = 0;
 // writes a string to the log 
 void log( char *str, int god_level, long type )
 {
@@ -249,6 +249,13 @@ void log( char *str, int god_level, long type )
         f = &clan_log;
         if(!(*f = dc_fopen(CLAN_LOG, "a"))) {
           fprintf(stderr, "Unable to open clan log.\n");
+          exit(1);
+        }
+        break;
+      case LOG_HMM:
+        f = &hmm_log;
+        if(!(*f = dc_fopen(HMM_LOG, "a"))) {
+          fprintf(stderr, "Unable to open hmm log.\n");
           exit(1);
         }
         break;
@@ -1309,6 +1316,8 @@ int has_skill (CHAR_DATA *ch, int16 skill)
 	  if (o->affected[a].location == skill*1000)
 	  {
 	    bonus += o->affected[a].modifier;
+	extern int get_max(CHAR_DATA *ch, int skill);
+	    if ((int)curr->learned+bonus > get_max(ch, curr->skillnum)) bonus = get_max(ch, curr->skillnum) - curr->learned;
 	  }
 	}	
        }  
@@ -1425,10 +1434,40 @@ void parse_bitstrings_into_int(char * bits[], char * strings, char_data *ch, uin
 // calls below uint32 version
 void parse_bitstrings_into_int(char * bits[], char * strings, char_data * ch, uint16 & value)
 {
-   uint32 temp = 0;
-   parse_bitstrings_into_int(bits, strings, ch, temp);
-   // this is dangerous...hopefully caller made sure their array is small enough
-   value = (uint16)temp;
+  char buf[MAX_INPUT_LENGTH];
+  int  found = FALSE;
+
+  if(!ch)
+    return;
+
+  for(;;) 
+  {
+    if(!*strings)
+      break;
+
+    half_chop(strings, buf, strings);
+                       
+    for(int x = 0 ;*bits[x] != '\n'; x++) 
+    {
+      if (!strcmp("unused",bits[x])) continue;
+      if(is_abbrev(buf, bits[x])) 
+      {
+        if(IS_SET(value, (1<<x))) {
+          REMOVE_BIT(value, (1<<x));
+          csendf(ch, "%s flag REMOVED.\n\r", bits[x]);
+        }
+        else {
+          SET_BIT(value, (1<<x));
+          csendf(ch, "%s flag ADDED.\n\r", bits[x]);
+        }
+        found = TRUE;
+        break;
+      }
+    } 
+  }
+  if(!found)
+    send_to_char("No matching bits found.\r\n", ch);
+
 }
 
 // Assumes bits is array of strings, ending with a "\n" string

@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.84 2005/10/27 18:57:08 urizen Exp $ */
+/* $Id: mob_proc.cpp,v 1.85 2006/01/13 16:49:15 dcastle Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -2286,6 +2286,7 @@ int clan_guard(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 	(in_room == real_room(2350) && cmd != 3) ||
 	(in_room == real_room(2360) && cmd != 5) ||
         (in_room == real_room(2370) && cmd != 6) ||
+        (in_room == real_room(2410) && cmd != 5) ||
         (in_room == real_room(2380) && cmd != 1))
 	return eFAILURE;
 
@@ -2331,6 +2332,7 @@ int clan_guard(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     ||   (ch->clan != 3 && in_room ==  real_room(2360))  // arcana
     ||   (ch->clan != 17 && in_room == real_room(2370))  // voodoo
     ||   (ch->clan != 13 && in_room == real_room(2380))  // slackers
+    ||   (ch->clan != 6 && in_room == real_room(2410))  // timewarp
 	)
     {
 	act( "$n is turned away from the clan hall.", ch, 0, 0, TO_ROOM , 0);
@@ -3051,7 +3053,9 @@ static char *dethSayText [ ] =
   "Why do people point to their wrist when asking for the time, but don't point to their crotch when they ask where the bathroom is?",
   "If Wyle E. Coyote had enough money to buy all that ACME crap, why didn't he just buy dinner?",
   "Did you ever notice that when you blow in a dog's face, he gets mad at you, but when you take him for a car ride, he sticks his face out of the window?",
-  "Apocalypse is the kind of man who understands, that when you put another man's cock in your mouth, you make a pact."
+  "Apocalypse is the kind of man who understands, that when you put another man's cock in your mouth, you make a pact.",
+  "Chuck Norris' genes aren't DNA. They're barbed wire.",
+  "Since 1940, the year Chuck Norris was born, roundhouse kick related deaths have increased 13,000 percent."
 };
 
 #define DETH_SAY_TEXT_SIZE    ( sizeof ( dethSayText )    / sizeof ( char * ) )

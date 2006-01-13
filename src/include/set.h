@@ -4,6 +4,7 @@
 struct set_data
 {
   char *SetName;
+  int amount;
   int vnum[19];
   char *Set_Wear_Message;
   char *Set_Remove_Message;
@@ -21,6 +22,6 @@ struct set_data
 #define SET_RAGER 5
 #define SET_FIELDPLATE 6
 #define SET_MOAD 7
-
+#define SET_FERAL 8
 extern const struct set_data set_list[];
  

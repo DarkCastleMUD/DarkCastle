@@ -1,7 +1,7 @@
 #ifndef PLAYER_H_
 #define PLAYER_H_
 /************************************************************************
-| $Id: player.h,v 1.20 2005/06/25 18:58:56 shane Exp $
+| $Id: player.h,v 1.21 2006/01/13 16:49:21 dcastle Exp $
 | player.h
 | Description: This file defines the player vectors..punishment, specials,
 |   etc...
@@ -39,6 +39,7 @@
 #define LOG_HELP	   1<<19
 
 #define LOG_DATABASE	1<<20
+#define LOG_HMM	   1<<21
 // ...
 #define MISC_IS_MOB        1<<31
 
@@ -75,7 +76,7 @@
 #define PLR_NOTAX	 1<<19
 #define PLR_GUIDE	 1<<20
 #define PLR_GUIDE_TOG	 1<<21
-
+#define PLR_NEWS         1<<22
 /************************************************************************
 | Class types for PCs
 */
@@ -223,7 +224,9 @@
 #define APPLY_SONG_DAMAGE      100
 #define APPLY_RESIST_MAGIC     101
 #define APPLY_SAVES            102
-#define APPLY_MAXIMUM_VALUE    102
+#define APPLY_SPELLDAMAGE      103
+#define APPLY_MAXIMUM_VALUE    103
+
 
 /*
  1000+ are reserved, so if you were thinking about using, think
