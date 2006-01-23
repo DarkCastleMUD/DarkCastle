@@ -16,7 +16,7 @@
 /* 12/08/2003   Onager   Added chop_half() to work like half_chop() but    */
 /*                       chopping off the last word.                       */
 /***************************************************************************/
-/* $Id: interp.cpp,v 1.71 2006/01/23 18:26:26 eas Exp $ */
+/* $Id: interp.cpp,v 1.72 2006/01/23 18:53:23 eas Exp $ */
 
 extern "C"
 {
@@ -83,12 +83,12 @@ void add_command_to_radix(struct command_info *cmd);
 struct command_info cmd_info[] =
 {
     // Movement commands
-    { "north",	do_move,	POSITION_STANDING, 0, 1,  COM_CHARMIE_OK, 5 },
-    { "east",	do_move,	POSITION_STANDING, 0, 2,  COM_CHARMIE_OK, 5 },
-    { "south",	do_move,	POSITION_STANDING, 0, 3,  COM_CHARMIE_OK, 5 },
-    { "west",	do_move,	POSITION_STANDING, 0, 4,  COM_CHARMIE_OK, 5 },
-    { "up",	do_move,	POSITION_STANDING, 0, 5,  COM_CHARMIE_OK, 5 },
-    { "down",	do_move,	POSITION_STANDING, 0, 6,  COM_CHARMIE_OK, 5 },
+    { "north",	do_move,	POSITION_STANDING, 0, 1,  COM_CHARMIE_OK, 1 },
+    { "east",	do_move,	POSITION_STANDING, 0, 2,  COM_CHARMIE_OK, 1 },
+    { "south",	do_move,	POSITION_STANDING, 0, 3,  COM_CHARMIE_OK, 1 },
+    { "west",	do_move,	POSITION_STANDING, 0, 4,  COM_CHARMIE_OK, 1 },
+    { "up",	do_move,	POSITION_STANDING, 0, 5,  COM_CHARMIE_OK, 1 },
+    { "down",	do_move,	POSITION_STANDING, 0, 6,  COM_CHARMIE_OK, 1 },
 
     // Common commands
     { "newbie",		do_newbie,	POSITION_DEAD, 0, 9, 0, 1 },    
@@ -102,8 +102,8 @@ struct command_info cmd_info[] =
     { "k",		do_kill,	POSITION_FIGHTING, 0, 9, COM_CHARMIE_OK, 1 },
     { "ki",		do_ki,		POSITION_SITTING, 0, 9, COM_CHARMIE_OK, 0 },
     { "kill",		do_kill,	POSITION_FIGHTING, 0, 9, COM_CHARMIE_OK, 1 },
-    { "look",		do_look,	POSITION_RESTING, 0, 12, COM_CHARMIE_OK, 5 },
-    { "glance",		do_look,	POSITION_RESTING, 0, 20, COM_CHARMIE_OK, 10 },
+    { "look",		do_look,	POSITION_RESTING, 0, 12, COM_CHARMIE_OK, 1 },
+    { "glance",		do_look,	POSITION_RESTING, 0, 20, COM_CHARMIE_OK, 1 },
     { "order",		do_order,	POSITION_RESTING, 0, 9, 0, 0 },
     { "rest",		do_rest,	POSITION_RESTING, 0, 9, COM_CHARMIE_OK, 0 },
     { "recite",		do_recite,	POSITION_RESTING, 0, 9, 0, 0 },
