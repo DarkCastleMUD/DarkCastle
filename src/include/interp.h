@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.h,v 1.38 2006/01/13 16:49:21 dcastle Exp $ */
+/* $Id: interp.h,v 1.39 2006/01/23 18:26:38 eas Exp $ */
 
 #ifndef INTERP_H_
 #define INTERP_H_
@@ -47,6 +47,7 @@ struct command_info
     ubyte minimum_level;             /* Minimum level needed             */
     ubyte command_number;           /* Passed to function as argument   */
     int flags;                      // what flags the skills has 
+    ubyte toggle_hide;
 };
 
 #define COM_CHARMIE_OK       1
