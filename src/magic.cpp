@@ -10348,21 +10348,24 @@ int spell_globe_of_darkness(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struc
   int learned = has_skill(ch, SPELL_GLOBE_OF_DARKNESS);
   int dur = 0, mod = 0;
 
-  if (learned <= 40) {
-    dur = 1;
+  if (learned <= 20) {
+    dur = 2;
     mod = 10;
+  } else if (learned > 20 && learned <= 40) {
+    dur = 3;
+    mod = 15;
   } else if (learned > 40 && learned <= 60) {
-    dur = 1;
+    dur = 3;
     mod = 15;
   } else if (learned > 60 && learned <= 80) {
-    dur = 2;
+    dur = 4;
     mod = 20;
   } else if (learned > 80 && learned <= 90) {
-    dur = 2;
-    mod = 25;
+    dur = 4;
+    mod = 20;
   } else if (learned > 90) {
-    dur = 3;
-    mod = 30;
+    dur = 5;
+    mod = 25;
   }
   if (skill == 150) {dur = 2;mod = 15;}
   globe = clone_object(real_object(GLOBE_OF_DARKNESS_OBJECT));

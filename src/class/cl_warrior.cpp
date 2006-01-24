@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.40 2006/01/13 16:49:18 dcastle Exp $
+| $Id: cl_warrior.cpp,v 1.41 2006/01/24 09:39:55 eas Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -28,67 +28,95 @@ extern char *dirs[];
 bool ARE_GROUPED( CHAR_DATA *sub, CHAR_DATA *obj);
 int attempt_move(CHAR_DATA *ch, int cmd, int is_retreat = 0);
 
+
 /************************************************************************
 | OFFENSIVE commands.  These are commands that should require the
 |   victim to retaliate.
 */
 int do_kick(struct char_data *ch, char *argument, int cmd)
 {
-    struct char_data *victim;
-    char name[256];
-    int dam;
-    int retval;
+  struct char_data *victim;
+  struct char_data *next_victim;
+  char name[256];
+  int dam;
+  int retval;
 
-   if(IS_MOB(ch) || GET_LEVEL(ch) > ARCHANGEL)   
-     ;
-   else if(!has_skill(ch, SKILL_KICK)) {
-     send_to_char("Go learn it from a master before you make a fool out of yourself.\r\n", ch);
-     return eFAILURE;
-   }
-
-    one_argument(argument, name);
-
-    if (!(victim = get_char_room_vis(ch, name))) {
-	if (ch->fighting) {
-	    victim = ch->fighting;
-	} else {
-	    send_to_char("Kick whom?\n\r", ch);
-	    return eFAILURE;
-	}
+  if(IS_MOB(ch) || GET_LEVEL(ch) > ARCHANGEL)
+    ;
+  else if (!has_skill(ch, SKILL_KICK)) {
+    send_to_char("You will have to study from a master before you can use this.\r\n", ch);
+    return eFAILURE;
     }
 
-    if (victim == ch) {
-	send_to_char("That would be pretty funny to watch...\n\r", ch);
-	return eFAILURE;
-    }
+  one_argument(argument, name);
 
-    if(!can_attack(ch) || !can_be_attacked(ch, victim))
-          return eFAILURE;
-
-    WAIT_STATE(ch, (int)(PULSE_VIOLENCE*1.5));
-    if (!skill_success(ch,victim,SKILL_KICK)) {
-        dam = 0;
-	retval = damage(ch, victim, 0,TYPE_UNDEFINED, SKILL_KICK, 0);
-    } else {
-//        dam = GET_LEVEL(ch) * 4;
-	dam = 150;
-	retval = damage(ch, victim, dam, TYPE_UNDEFINED, SKILL_KICK, 0);
-    }
-
-    if(SOMEONE_DIED(retval))
-      return retval;
-
-    // if our boots have a combat proc, and we did damage, let'um have it!
-    if(dam && ch->equipment[WEAR_FEET]) {
-      if(obj_index[ch->equipment[WEAR_FEET]->item_number].combat_func) {
-        retval = ((*obj_index[ch->equipment[WEAR_FEET]->item_number].combat_func)
-                       (ch, ch->equipment[WEAR_FEET], 0, "", ch));
+  if (!(victim = get_char_room_vis(ch, name))) {
+    if (ch->fighting) {
+      victim = ch->fighting;
+      }
+    else {
+      send_to_char("Your foot comes up, but there's nobody there...\r\n", ch);
+      return eFAILURE;
       }
     }
 
-    return retval;
-}
+  if (victim == ch) {
+    send_to_char("You kick yourself, metaphorically speaking.\r\n", ch);
+    return eFAILURE;
+    }
 
+  if (!can_attack(ch) || !can_be_attacked(ch, victim))
+    return eFAILURE;
+
+  WAIT_STATE(ch, (int)(PULSE_VIOLENCE*1.5));
+
+  if (!skill_success(ch,victim,SKILL_KICK)) {
+    dam = 0;
+    retval = damage(ch, victim, 0,TYPE_UNDEFINED, SKILL_KICK, 0);
+    if(SOMEONE_DIED(retval))
+      return retval;
+    }
+  else {
+    dam = (GET_DEX(ch) * 3) + (GET_STR(ch) * 2) + (has_skill(ch, SKILL_KICK));
+    retval = damage(ch, victim, dam, TYPE_UNDEFINED, SKILL_KICK, 0);
+    if(SOMEONE_DIED(retval))
+      return retval;
+    }
+
+  // if our boots have a combat proc, and we did damage, let'um have it!
+  if(dam && ch->equipment[WEAR_FEET]) {
+    if(obj_index[ch->equipment[WEAR_FEET]->item_number].combat_func) {
+      retval = ((*obj_index[ch->equipment[WEAR_FEET]->item_number].combat_func)
+      (ch, ch->equipment[WEAR_FEET], 0, "", ch));
+      }
+    if(SOMEONE_DIED(retval))
+      return retval;
+    }
+
+  // Extra kick targeting main opponent for monks
+  if ((GET_CLASS(ch) == CLASS_MONK) && ch->fighting && ch->in_room == ch->fighting->in_room) {
+    next_victim = ch->fighting;
+    if (!skill_success(ch, next_victim, SKILL_KICK)) {
+      dam = 0;
+      retval = damage(ch, next_victim, 0, TYPE_UNDEFINED, SKILL_KICK, 0);
+      }
+    else {
+      dam = (GET_DEX(ch) * 2) + (GET_STR(ch)) + (has_skill(ch, SKILL_KICK) / 2);
+      retval = damage(ch, next_victim, dam, TYPE_UNDEFINED, SKILL_KICK, 0);
+      }
+    if(SOMEONE_DIED(retval))
+      return retval;
+    // if our boots have a combat proc, and we did damage, let'um have it!
+    if (dam && ch->equipment[WEAR_FEET]) {
+      if(obj_index[ch->equipment[WEAR_FEET]->item_number].combat_func) {
+        retval = ((*obj_index[ch->equipment[WEAR_FEET]->item_number].combat_func)
+        (ch, ch->equipment[WEAR_FEET], 0, "", ch));
+        }
+      }
+    }
+
+  return retval;
+}
 
 
 int do_deathstroke(struct char_data *ch, char *argument, int cmd)

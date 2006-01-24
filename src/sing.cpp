@@ -1267,17 +1267,20 @@ int song_stop( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int ski
    return eSUCCESS;
 }
 
+
 int song_astral_chanty( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
-   // Store it for later, since we can't store the vict pointer
-   ch->song_data = str_dup(arg);
+  // Store it for later, since we can't store the vict pointer
+  ch->song_data = str_dup(arg);
 
-   send_to_char("You begin to sing an astral chanty...\n\r", ch);
-   act("$n starts quietly in a sea chanty...", ch, 0, 0, TO_ROOM, 0);
+  send_to_char("You begin to sing an astral chanty...\n\r", ch);
+  act("$n starts quietly in a sea chanty...", ch, 0, 0, TO_ROOM, 0);
 
-   ch->song_timer = song_info[ch->song_number].beats;
-   return eSUCCESS;
+  ch->song_timer = song_info[ch->song_number].beats;
+
+  return eSUCCESS;
 }
+
 
 void do_astral_chanty_movement(CHAR_DATA *victim, CHAR_DATA *target)
 {
@@ -1285,107 +1288,102 @@ void do_astral_chanty_movement(CHAR_DATA *victim, CHAR_DATA *target)
 
   retval = move_char(victim, target->in_room);
 
-  if(!IS_SET(retval, eSUCCESS))
-  {
-    send_to_char("Mistic winds shock you back into your old reality.\r\n", victim);
+  if(!IS_SET(retval, eSUCCESS)) {
+    send_to_char("Mystic winds shock you back into your old reality.\r\n", victim);
     act("$n shudders as magical reality refuses to set in.", victim, 0, 0, TO_ROOM, 0);
     WAIT_STATE(victim, PULSE_VIOLENCE * 3);
     return;
-  }
+    }
+
   do_look(victim, "", 9);
   WAIT_STATE(victim, PULSE_VIOLENCE*2);
   act("$n appears out of nowhere in a chorus of light and song.", victim, 0, 0, TO_ROOM, 0);
 }
 
+
 int execute_song_astral_chanty( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
-   char_data * master = NULL;
-   follow_type * fvictim = NULL;
+  char_data * master = NULL;
+  follow_type * fvictim = NULL;
 
-   if(ch->master && ch->master->in_room == ch->in_room && 
-                    ISSET(ch->affected_by, AFF_GROUP))
-      master = ch->master;
-   else master = ch;
+  if(ch->master && ch->master->in_room == ch->in_room &&
+    ISSET(ch->affected_by, AFF_GROUP))
+    master = ch->master;
+  else
+    master = ch;
 
-   victim = get_char(ch->song_data);
+  victim = get_char(ch->song_data);
 
-   if(!victim) {
-      if(ch->song_data) {
-        dc_free(ch->song_data);
-        ch->song_data = 0;
+  if (!victim) {
+    if(ch->song_data) {
+      dc_free(ch->song_data);
+      ch->song_data = 0;
       }
-      send_to_char("Ye can't seem to recall the right words.\r\n", ch);
-      return eFAILURE;
-   }
+    send_to_char("You can't recall the right words.\r\n", ch);
+    return eFAILURE;
+    }
 
-   if(GET_LEVEL(victim) > GET_LEVEL(ch)) {
-      send_to_char("Your target resists the songs draw.\r\n", ch);
-      if(ch->song_data) {
-        dc_free(ch->song_data);
-        ch->song_data = 0;
+  if (GET_LEVEL(victim) > GET_LEVEL(ch)) {
+    send_to_char("Your target resists the song's draw.\r\n", ch);
+    if(ch->song_data) {
+      dc_free(ch->song_data);
+      ch->song_data = 0;
       }
-      return eFAILURE;
-   }
+    return eFAILURE;
+    }
 
-   if(IS_SET(world[victim->in_room].room_flags, NO_PORTAL) ||
-           (IS_SET(world[victim->in_room].room_flags, ARENA) && !IS_SET(world[ch->in_room].room_flags, ARENA)) ||
-           (IS_SET(world[ch->in_room].room_flags, ARENA) && !IS_SET(world[victim->in_room].room_flags, ARENA))
-           ||(IS_AFFECTED(victim,AFF_SHADOWSLIP)))
-      send_to_char("Something seems to be keeping you out.\r\n", ch);
-   else 
-   {
-      // This looks kinda gross but it works....
-      // First, we move everyone BUT the bard that is grouped, and in the room
-      for(fvictim = master->followers; fvictim; fvictim = fvictim->next)
-      {
-         if(!ISSET(fvictim->follower->affected_by, AFF_GROUP) || 
-             fvictim->follower == ch || 
-             fvictim->follower->in_room != ch->in_room)
-            continue;
-
-         do_astral_chanty_movement(fvictim->follower, victim);
+  if(IS_SET(world[victim->in_room].room_flags, NO_PORTAL) ||
+    (IS_SET(world[victim->in_room].room_flags, ARENA) && !IS_SET(world[ch->in_room].room_flags, ARENA)) ||
+    (IS_SET(world[ch->in_room].room_flags, ARENA) && !IS_SET(world[victim->in_room].room_flags, ARENA))||
+    (IS_AFFECTED(victim, AFF_SHADOWSLIP)))
+    send_to_char("A mystical force seems to be keeping you out.\r\n", ch);
+  else {
+    // Move the group, NOT the leader, NOT the bard
+    for (fvictim = master->followers; fvictim; fvictim = fvictim->next) {
+      if (!ISSET(fvictim->follower->affected_by, AFF_GROUP) ||
+        fvictim->follower == ch ||
+        fvictim->follower->in_room != ch->in_room)
+        continue;
+      do_astral_chanty_movement(fvictim->follower, victim);
       }
 
-      send_to_char("Your song completes, and your vision fades.\r\n", ch);
-      act("$n's voice fades off into the ether.", ch, 0, 0, TO_ROOM, 0);
-
-      // Now, we move the master if he's the bard or
-      // the master if he's NOT the bard, but in the room
-      if(ch == master ||
-         ( ISSET(master->affected_by, AFF_GROUP) && 
-           master->in_room == ch->in_room
-         ))
-      {
-        do_astral_chanty_movement(master, victim);
+    // Move just the group leader, but NEVER the bard
+    if (ch != master && (ISSET(master->affected_by, AFF_GROUP) &&
+      master->in_room == ch->in_room)) {
+      do_astral_chanty_movement(master, victim);
       }
 
-	// Move charmie
-     for(struct follow_type *k = ch->followers; k; k = k->next)
-     if(IS_MOB(k->follower) && affected_by_spell(k->follower, SPELL_CHARM_PERSON)
-		&& k->follower->in_room == ch->in_room)
+    // Move the bard's charm
+    for(struct follow_type *k = ch->followers; k; k = k->next)
+      if(IS_MOB(k->follower) && affected_by_spell(k->follower, SPELL_CHARM_PERSON) &&
+        k->follower->in_room == ch->in_room)
         do_astral_chanty_movement(k->follower, victim);
 
-      // If the bard wasn't the master, we now move him last
-      if(ch != master)
-      {
-        do_astral_chanty_movement(ch, victim);
-      }
-   }
+    send_to_char("Your song completes, and your vision fades.\r\n", ch);
+    act("$n's voice fades off into the ether.", ch, 0, 0, TO_ROOM, 0);
 
-   // free our stored char name
-   if(ch->song_data) {
-     dc_free(ch->song_data);
-     ch->song_data = 0;
-   }
-   return eSUCCESS;
+    // Move the bard after the charm because of the same_room check
+    do_astral_chanty_movement(ch, victim);
+    }
+
+  // free our stored char name
+  if(ch->song_data) {
+    dc_free(ch->song_data);
+    ch->song_data = 0;
+    }
+
+  return eSUCCESS;
 }
+
 
 int pulse_song_astral_chanty( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
-   if(number(1, 3) == 3)
-      act("$n sings a rousing chanty!", ch, 0, 0, TO_ROOM, 0);
-   return eSUCCESS;
+  if (number(1, 3) == 3)
+    act("$n sings a rousing chanty!", ch, 0, 0, TO_ROOM, 0);
+
+  return eSUCCESS;
 }
+
 
 int song_forgetful_rhythm( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
