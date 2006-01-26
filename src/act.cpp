@@ -67,7 +67,7 @@ void act
 
   if ((IS_AFFECTED(ch, AFF_HIDE) || ISSET(ch->affected_by, AFF_FOREST_MELD)) &&
     (destination != TO_CHAR) && !(flags & GODS) && !(flags & STAYHIDE)) {
-    //REMBIT(ch->affected_by, AFF_HIDE);
+    REMBIT(ch->affected_by, AFF_HIDE);
     affect_from_char(ch, SPELL_FOREST_MELD);
     }
     

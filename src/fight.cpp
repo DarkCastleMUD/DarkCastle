@@ -20,7 +20,7 @@
 *                       of just race stuff
 ******************************************************************************
 */ 
-/* $Id: fight.cpp,v 1.287 2006/01/13 16:49:14 dcastle Exp $ */
+/* $Id: fight.cpp,v 1.288 2006/01/26 09:44:23 eas Exp $ */
 
 extern "C"
 {
@@ -2033,15 +2033,17 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
     }
       
   // Payoff for killing things. 
-  if(GET_POS(victim) == POSITION_DEAD)
-  {
+  if(GET_POS(victim) == POSITION_DEAD) {
+    if (attacktype == SKILL_EAGLE_CLAW)
+      make_heart(ch, victim);
     group_gain(ch, victim);
     if (attacktype == SPELL_POISON)
       fight_kill(ch, victim, TYPE_CHOOSE, KILL_POISON);
     else
       fight_kill(ch, victim, TYPE_CHOOSE, 0);
     return damage_retval(ch, victim, (eSUCCESS|eVICT_DIED));
-  } 
+    }
+
   return eSUCCESS;
 } 
 
@@ -3318,25 +3320,26 @@ void make_heart(CHAR_DATA * ch, CHAR_DATA * vict)
   corpse->obj_flags.type_flag = ITEM_FOOD;
   corpse->obj_flags.wear_flags = ITEM_TAKE + ITEM_HOLD;
   corpse->obj_flags.value[0] = 0;	/* You can't store stuff in a heart */
-  corpse->obj_flags.value[3] = 1;	/* corpse identifyer */
+  corpse->obj_flags.value[3] = 1;	/* corpse identifier */
   corpse->obj_flags.weight = 2;
   corpse->obj_flags.eq_level = 0;
-  if (IS_NPC(ch))
-  {
+
+  if (IS_NPC(ch)) {
     corpse->obj_flags.more_flags = 0;
     corpse->obj_flags.timer = MAX_NPC_CORPSE_TIME;
-  }
-  else
-  {
+    }
+  else {
     corpse->obj_flags.more_flags = 0;
     corpse->obj_flags.timer = MAX_PC_CORPSE_TIME;
-  }
-  if (!ch->equipment[HOLD] && !ch->equipment[WIELD] && !ch->equipment[WEAR_LIGHT]) 
-  equip_char(ch, corpse, HOLD);
+    }
+
+  if (!ch->equipment[HOLD] && !ch->equipment[WIELD] && !ch->equipment[WEAR_LIGHT])
+    equip_char(ch, corpse, HOLD);
   else if (!ch->equipment[HOLD2] && !ch->equipment[SECOND_WIELD])
-  equip_char(ch, corpse, HOLD2);
+    equip_char(ch, corpse, HOLD2);
   else
-   { extract_obj(corpse); }
+    extract_obj(corpse);
+
   return;
 }
 

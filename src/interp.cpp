@@ -16,7 +16,7 @@
 /* 12/08/2003   Onager   Added chop_half() to work like half_chop() but    */
 /*                       chopping off the last word.                       */
 /***************************************************************************/
-/* $Id: interp.cpp,v 1.74 2006/01/24 09:39:49 eas Exp $ */
+/* $Id: interp.cpp,v 1.75 2006/01/26 09:44:23 eas Exp $ */
 
 extern "C"
 {
@@ -67,7 +67,7 @@ void update_wizlist(CHAR_DATA *ch);
 void add_command_to_radix(struct command_info *cmd);
 
 
-//
+// Temp removal to perfect system. 1/25/06 Eas
 // WARNING WARNING WARNING WARNING WARNING
 // The command list was modified to account for toggle_hide.
 // The last integer will affect a char being removed from hide when they perform the command.
@@ -701,6 +701,7 @@ int command_interpreter( CHAR_DATA *ch, char *pcomm, bool procced  )
         send_to_char("The spirit cannot perform that action.\r\n",ch);
         return eFAILURE;
         }
+/*
       if (IS_AFFECTED(ch, AFF_HIDE)) {
         if (found->toggle_hide == 0) {
           REMBIT(ch->affected_by, AFF_HIDE);
@@ -713,6 +714,7 @@ int command_interpreter( CHAR_DATA *ch, char *pcomm, bool procced  )
           act(buf, ch, 0, 0, TO_CHAR, 0);
           }
         }
+*/
 /*
       // Last resort for debugging...if you know it's a mortal.
       // -Sadus 

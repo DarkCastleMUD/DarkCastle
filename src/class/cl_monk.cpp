@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_monk.cpp,v 1.26 2006/01/13 16:49:17 dcastle Exp $
+| $Id: cl_monk.cpp,v 1.27 2006/01/26 09:44:27 eas Exp $
 | cl_monk.C
 | Description:  Monk skills.
 */
@@ -18,77 +18,66 @@
 #include <db.h>
 #include <room.h>
 
+
 /************************************************************************
 | OFFENSIVE commands.
 */
 int do_eagle_claw(struct char_data *ch, char *argument, int cmd)
 {
-   struct char_data *victim;
-   char name[MAX_INPUT_LENGTH];
-   int dam;
-   int retval;
+  struct char_data *victim;
+  char name[MAX_INPUT_LENGTH];
+  int dam;
+  int retval;
 
-   if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
-     ;
-   else if(!has_skill(ch, SKILL_EAGLE_CLAW)) {
-     send_to_char("Eagle my ass...you're still just a pigeon boy.\r\n", ch);
-     return eFAILURE;
-   }
+  if (IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
+    ;
+  else if(!has_skill(ch, SKILL_EAGLE_CLAW)) {
+    send_to_char("Yooo are not pepared to use thees skeel, grasshoppa.\r\n", ch);
+    return eFAILURE;
+    }
 
-   int hands = 0;
-   if(ch->equipment[WIELD])          hands++;
-   if(ch->equipment[SECOND_WIELD])   hands++;
-   if(ch->equipment[HOLD])           hands++;
-   if(ch->equipment[HOLD2])          hands++;
-   if(ch->equipment[WEAR_SHIELD])    hands++;
-   if(ch->equipment[WEAR_LIGHT])     hands++;
+  int hands = 0;
+  if(ch->equipment[WIELD])          hands++;
+  if(ch->equipment[SECOND_WIELD])   hands++;
+  if(ch->equipment[HOLD])           hands++;
+  if(ch->equipment[HOLD2])          hands++;
+  if(ch->equipment[WEAR_SHIELD])    hands++;
+  if(ch->equipment[WEAR_LIGHT])     hands++;
 
-   if(hands > 1) {
-     send_to_char ("You need at least one hand free to perform this!\n\r", ch);
-     return eFAILURE;
-   }
+  if(hands > 1) {
+    send_to_char ("You need a free hand to eagleclaw someone.\r\n", ch);
+    return eFAILURE;
+    }
 
-   if (ch->equipment[HOLD] && ch->equipment[HOLD2]) {
-     send_to_char ("You can't hold anything while you perform this!\n\r", ch);
-     return eFAILURE;
-   }
+  one_argument(argument, name);
 
-   one_argument(argument, name);
-
-   if (!(victim = get_char_room_vis(ch, name))) {
-      if (ch->fighting) {
-         victim = ch->fighting;
-      } else {
-         send_to_char("Eagle claw whom?\n\r", ch);
-         return eFAILURE;
-      }
-   }
-
-   if (victim == ch) {
-      send_to_char("Aren't we funny today...\n\r", ch);
+  if (!(victim = get_char_room_vis(ch, name))) {
+    if (ch->fighting)
+      victim = ch->fighting;
+    else {
+      send_to_char("You raise your hand in a claw and make strange bird noises.\r\n", ch);
       return eFAILURE;
-   }
-
-   if(!can_attack(ch) || !can_be_attacked(ch, victim))
-      return eFAILURE;
-
-   WAIT_STATE(ch, PULSE_VIOLENCE*3);
-
-   if (!skill_success(ch,victim, SKILL_EAGLE_CLAW)) 
-      retval = damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_EAGLE_CLAW, 0);
-   else 
-   {
-      dam = dice(GET_LEVEL(ch), 6);
-
-      if (dam >= GET_HIT(victim)) {
-         // TODO - have 'learned' effect how good the heart is that you grab out
-         // for the later modifications to this.  Hearts regen ki, etc etc.
-         make_heart(ch, victim);
-         dam += 20;
       }
-      retval = damage(ch, victim, 250,TYPE_UNDEFINED, SKILL_EAGLE_CLAW, 0);
-   }
-   return retval;
+    }
+
+  if (victim == ch) {
+    send_to_char("You lower your claw-shaped hand and scratch yourself gently.\r\n", ch);
+    return eFAILURE;
+    }
+
+  if (!can_attack(ch) || !can_be_attacked(ch, victim))
+    return eFAILURE;
+
+  WAIT_STATE(ch, PULSE_VIOLENCE * 3);
+
+  if (!skill_success(ch,victim, SKILL_EAGLE_CLAW))
+    retval = damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_EAGLE_CLAW, 0);
+  else {
+    dam = (GET_STR(ch) * 3) + (GET_DEX(ch) * 2) + dice(2, GET_LEVEL(ch)) + 100;
+    retval = damage(ch, victim, dam, TYPE_UNDEFINED, SKILL_EAGLE_CLAW, 0);
+    }
+
+  return retval;
 }
 
 
