@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.165 2006/01/13 16:49:14 dcastle Exp $ */
+/* $Id: const.cpp,v 1.166 2006/03/24 00:53:42 apocalypse Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -137,7 +137,7 @@ char *spell_wear_off_msg[] =
   "The curse upon you has ended.",
   "Your ability to sense evil has expired.",
   "Your ability to detect invisibility has expired.",
-  "Your ability to detect magic has expired.",                               /* 20 */
+  "Your ability to detect magic has expired.",                 /* 20 */
   "Your ability to detect poison has expired.",
   "!Dispel Evil!",
   "!Earthquake!",
@@ -162,7 +162,7 @@ char *spell_wear_off_msg[] =
   "!Word of Recall!",
   "!Remove Poison!",
   "You feel less aware of your surroundings.",
-  "!Call Familiar!",                                         /* 45 */
+  "!Call Familiar!",                                           /* 45 */
   "!Lighted Path!",
   "The $2green$R in your skin fades.",
   "!Sun ray!",
@@ -456,11 +456,11 @@ char *drinks[] =
     "wine",
     "ale",
     "dark ale",
-    "whisky",
+    "whiskey",
     "lemonade",
     "firebreather",
     "local speciality",
-    "slime mold juice",
+    "dirty water",
     "milk",
     "tea",
     "coffee",
@@ -479,11 +479,11 @@ char *drinknames[] =
     "wine",
     "ale",
     "ale",
-    "whisky",
+    "whiskey",
     "lemonade",
     "firebreather",
-    "local",
-    "juice",
+    "speciality",
+    "dirt",
     "milk",
     "tea",
     "coffee",
@@ -497,16 +497,16 @@ char *drinknames[] =
 
 int drink_aff[][3] =
 {
-    { 0,1,10 },  /* Water    */
+    { 0,1,10 },  /* water    */
     { 3,2,5 },   /* beer     */
     { 5,2,5 },   /* wine     */
     { 2,2,5 },   /* ale      */
     { 1,2,5 },   /* ale      */
-    { 6,1,4 },   /* Whiskey  */
+    { 6,1,4 },   /* whiskey  */
     { 0,1,8 },   /* lemonade */
     { 10,0,0 },  /* firebr   */
     { 3,3,3 },   /* local    */
-    { 0,4,-8 },  /* juice    */
+    { 0,4,-8 },  /* dirty    */
     { 0,3,6 },
     { 0,1,6 },
     { 0,1,6 },
@@ -554,12 +554,12 @@ char *fullness[] =
 int exp_table[ ] =
 {
 0,   
-1,          L(1 K),     L(3 K),     L(9 K),     L(15 K),   // level 5
-L(30 K),    L(50 K),    L(100 K),   L(200 K),   L(300 K),  // level 10
-L(400 K),   L(550 K),   L(850 K),   L(1.2 M),   L(1.4 M),  // level 15
-L(1.8 M),   L(2.3 M),   L(3 M),     L(3.8 M),   L(4.8 M),  // level 20
-L(7 M),     L(8.8 M),   L(9.7 M),   L(11 M),    L(12 M),   // level 25
-L(13.5 M),  L(14.5 M),  L(16.5 M),  L(18 M),    L(21.5 M), // level 30
+1,          L(1 K),     L(2.5 K),   L(5 K),     L(10 K),   // level 5
+L(20 K),    L(40 K),    L(60 K),    L(80 K),    L(100 K),  // level 10
+L(200 K),   L(300 K),   L(500 K),   L(750 K),   L(1 M),    // level 15
+L(1.5 M),   L(2 M),     L(3 M),     L(4 M),     L(5 M),    // level 20
+L(6 M),     L(7 M),     L(8 M),     L(9 M),     L(10 M),   // level 25
+L(12 M),    L(14 M),    L(16 M),    L(18 M),    L(20 M),   // level 30
 L(22 M),    L(24 M),    L(26 M),    L(28 M),    L(31 M),   // level 35
 L(34 M),    L(37 M),    L(40 M),    L(45 M),    L(50 M),   // level 40
 L(60 M),    L(70 M),    L(80 M),    L(90 M),    L(100 M),  // level 45
@@ -626,7 +626,7 @@ char *wear_bits[] =
     "ARMS",
     "SHIELD",
     "ABOUT",
-    "WAISTE",
+    "WAIST",
     "WRIST",
     "WIELD",
     "HOLD",
@@ -1376,7 +1376,6 @@ struct class_skill_defines d_skills[] = { // bard skills
 
 // Ability Name            Ability File                  Level    Max      Requisites
 // ------------            ------------                  -----    ---      ----------
-//{ "listsongs",             SKILL_SONG_LIST_SONGS,          1,      98,     {INT,WIS} },
 { "whistle sharp",         SKILL_SONG_WHISTLE_SHARP,       1,      98,     {STR,INT} },
 { "stop",                  SKILL_SONG_STOP,                2,      98,     {INT,WIS} },
 { "irresistable ditty",    SKILL_SONG_UNRESIST_DITTY,      3,      98,     {DEX,WIS} },
@@ -2124,7 +2123,7 @@ const struct dex_app_type dex_app[] = {
 /*  9 */ {	-1,	     8,		-1,		-2,	},
 /* 10 */ {	-3,	     6,		-1,		-1,	},
 /* 11 */ {	-1,	     4,		 0,		-1,	},
-/* 12 */ {	0,	     3,		 0,		-1,	},
+/* 12 */ {	 0, 	     3,		 0,		-1,	},
 /* 13 */ {	 0,	     1,		 0,		 0,	},
 /* 14 */ {	 0,	     0,		 0,		 0,	},
 /* 15 */ {	 0,	    -1,		 0,		 0,	},
@@ -2159,7 +2158,7 @@ const struct str_app_type str_app[] = {
 /*  8 */ {	-2,		90,	   -2,		},
 /*  9 */ {	-1,		100,	   -2,		},
 /* 10 */ {	-1,		110,	   -1,		},
-/* 11 */ {	 -1,		120,	   -1,		},
+/* 11 */ {	-1,		120,	   -1,		},
 /* 12 */ {	 0,		130,	   -1,		},
 /* 13 */ {	 0,		140,	    0,		},
 /* 14 */ {	 0,		150,	    0,		},
