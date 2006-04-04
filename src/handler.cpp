@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.97 2006/01/13 16:49:14 dcastle Exp $ */
+/* $Id: handler.cpp,v 1.98 2006/04/04 04:35:43 apocalypse Exp $ */
     
 extern "C"
 {
@@ -355,8 +355,15 @@ const struct set_data set_list[] = {
 	"You feel the might of the ancient dragonkind surge through your body.\r\n",
 	"The might of the ancient dragonkind has left you.\r\n"},
   { "Feral Fangs", 2, {4818, 4819,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
-   "As the pairs of fangs' cries harmonize they seem to unleash something feral inside you.\r\n",
-   "As you remove the fangs your muscles relax and focus is restored.\r\n"},
+        "As the fangs' cries harmonize they unleash something feral inside you.\r\n",
+        "As you remove the fangs your muscles relax and focus is restored.\r\n"},
+  { "White Crystal Armours", 10, {22003,22006,22010,22014,22015,22020,22021,22022,22023,22024,
+        -1,-1,-1,-1,-1,-1,-1,-1,-1},
+        "Your crystal armours begin to $B$7glow$R with an ethereal light.\r\n",
+        "The $B$7glow$R fades from your crystal armours.\r\n"},
+  { "Black Crystal Armours", 7, {22011,22017,22025,22026,22027,22028,22029,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+        "Your crystal armours $B$0darken$R and begin to hum with magic.\r\n",
+        "The $B$0darkness$R disperses as the crystal armours are removed.\r\n",
   { "\n", 0, {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
 	"\n","\n"}
 };
@@ -410,7 +417,7 @@ void add_set_stats(char_data *ch, obj_data *obj, int flag, int pos)
   	    break;
 	  case SET_VESTMENTS:
 	    af.location = APPLY_MANA;
-	    af.modifier = 50;
+	    af.modifier = 75;
 	    affect_to_char(ch, &af);
 	    break;
 	  case SET_HUNTERS:
@@ -418,7 +425,7 @@ void add_set_stats(char_data *ch, obj_data *obj, int flag, int pos)
 	    af.modifier = 5;
 	    affect_to_char(ch, &af);
 	    af.location = APPLY_MOVE;
-	    af.modifier = 25;
+	    af.modifier = 40;
 	    affect_to_char(ch, &af);
 	    break;
 	  case SET_FERAL:
@@ -434,12 +441,12 @@ void add_set_stats(char_data *ch, obj_data *obj, int flag, int pos)
 	    break;
 	  case SET_CAPTAINS:
 	    af.location = APPLY_HIT;
-	    af.modifier = 50;
+	    af.modifier = 75;
 	    affect_to_char(ch,&af);
 	    break;
 	  case SET_CELEBRANTS:
 	    af.location = APPLY_KI;
-	    af.modifier = 5;
+	    af.modifier = 8;
 	    affect_to_char(ch, &af);
 	    break;
 	  case SET_RAGER:
@@ -477,6 +484,30 @@ void add_set_stats(char_data *ch, obj_data *obj, int flag, int pos)
 	    af.modifier = -5;
 	    affect_to_char(ch, &af);
 	    break;
+          case SET_WHITECRYSTAL:
+            af.location = APPLY_HITROLL;
+            af.modifier = 10;
+            affect_to_char(ch, &af);
+            af.location = APPLY_HIT;
+            af.modifer = 50;
+            affect_to_char(ch, &af);
+            af.location = APPLY_MANA;
+            af.modifier = 50;
+            affect_to_char(ch, &af);
+            af.location = APPLY_SAVING_MAGIC;
+            af.modifier = 8;
+          case SET_BLACKCRYSTAL:
+            af.location = APPLY_HIT_N_DAM;
+            af.modifier = 4;
+            affect_to_char{ch, &af};
+            af.location = APPLY_MANA;
+            af.modifier = 80;
+            affect_to_char{ch, &af};
+            af.location = APPLY_SAVING_ACID;
+            af.modifier = 8;
+            affect_to_char{ch, &af};
+            af.location = APPLY_SAVING_ENERGY;
+            af.modifier = 8;
 	  default: 
 		send_to_char("Tough luck, you completed an unimplemented set. Report what you just wore, eh?\r\n",ch);
 		break;

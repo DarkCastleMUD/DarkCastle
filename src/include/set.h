@@ -23,5 +23,7 @@ struct set_data
 #define SET_FIELDPLATE 6
 #define SET_MOAD 7
 #define SET_FERAL 8
+#define SET_WHITECRYSTAL 10
+#define SET_BLACKCRYSTAL 7
 extern const struct set_data set_list[];
  
