@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.166 2006/03/24 00:53:42 apocalypse Exp $ */
+/* $Id: const.cpp,v 1.167 2006/04/08 21:09:40 apocalypse Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1139,19 +1139,19 @@ struct class_skill_defines w_skills[] = { // warrior skills
 // thief 3022 guildmaster - done and checked, Apoc
 struct class_skill_defines t_skills[] = { // thief skills
 
-//   Ability Name       Ability File          Level   Max     Requisites
-//   ------------       ------------          -----   ---     ----------
-{    "sneak",           SKILL_SNEAK,            1,      90,   {DEX,INT} },  
-{    "backstab",        SKILL_BACKSTAB,         2,      90,   {DEX,STR} },  
+//   Ability Name       Ability File          Level    Max    Requisites
+//   ------------       ------------          -----    ---    ----------
+{    "backstab",        SKILL_BACKSTAB,         1,      90,   {DEX,STR} },  
+{    "sneak",           SKILL_SNEAK,            2,      90,   {DEX,INT} },  
 {    "shield block",    SKILL_SHIELDBLOCK,      4,      40,   {STR,DEX} },  
 {    "stalk",           SKILL_STALK,            6,      98,   {CON,DEX} },
 {    "hide",            SKILL_HIDE,             7,      90,   {INT,WIS} },  
 {    "dual wield",      SKILL_DUAL_WIELD,       10,     90,   {DEX,CON} },  
-{    "blackjack",	SKILL_BLACKJACK, 	11, 	98,   {WIS,STR} },
+{    "trip",            SKILL_TRIP,             11,     85,   {DEX,STR} },
 {    "palm",            SKILL_PALM,             12,     98,   {DEX,INT} },  
 {    "slip",            SKILL_SLIP,             13,     98,   {DEX,INT} },  
 {    "dodge",           SKILL_DODGE,            15,     90,   {DEX,INT} },
-{    "trip",            SKILL_TRIP,             17,     85,   {DEX,STR} },
+{    "blackjack",       SKILL_BLACKJACK,        17,     98,   {WIS,STR} },
 {    "pocket",          SKILL_POCKET,           20,     98,   {INT,DEX} },
 {    "appraise",        SKILL_APPRAISE,         21,     98,   {INT,WIS} },
 {    "pick",            SKILL_PICK_LOCK,        22,     98,   {WIS,DEX} },  

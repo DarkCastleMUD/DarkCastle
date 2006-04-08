@@ -8791,10 +8791,7 @@ int spell_bee_sting(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
    affected_type af;
    int i;
    set_cantquit(ch, victim);
-//   dam = dice(2, 8) + skill/2;
-   dam = 30; 
-//   if (saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC) >= 0)
-  //    dam >>= 1;
+   dam = dice (4, 3) + skill/3;
 
    for (i = 0; i < bees; i++) {
 
@@ -8803,7 +8800,7 @@ int spell_bee_sting(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
       return retval;
    }
    // Extra added bonus 1% of the time
-   if (dice(1, 100) == 1)
+   if (dice(1, 100) == 3)
       if (!IS_SET(victim->immune, ISR_POISON))
          if (saves_spell(ch, victim, 0, SAVE_TYPE_POISON) < 0) {
             af.type = SPELL_POISON;
@@ -8910,12 +8907,12 @@ int cast_creeping_death(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DA
       return retval;
 
    if (skill > 40 && skill <= 60) {
-     poison = 1;
-   } else if (skill > 60 && skill <= 80) {
      poison = 2;
+   } else if (skill > 60 && skill <= 80) {
+     poison = 3;
    } else if (skill > 80) {
      bingo = 1;
-     poison = 3;
+     poison = 4;
    }
 
    
