@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.41 2006/01/24 09:39:55 eas Exp $
+| $Id: cl_warrior.cpp,v 1.42 2006/04/08 21:10:38 apocalypse Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -748,7 +748,7 @@ int do_rescue(struct char_data *ch, char *argument, int cmd)
 int do_bladeshield(struct char_data *ch, char *argument, int cmd)
 {
   struct affected_type af;
-  int duration = 25;
+  int duration = 18;
   if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)   
     ;
   else if(!has_skill(ch, SKILL_BLADESHIELD)) {
@@ -973,7 +973,7 @@ int do_tactics(struct char_data *ch, char *argument, int cmd)
       act("$n's leadership makes you feel more comfortable with battle.", ch, 0, tmp_char, TO_VICT, 0);
       af.type      = SKILL_TACTICS;
       af.duration  = 1 + has_skill(ch,SKILL_TACTICS) / 10;
-      af.modifier  = 1;
+      af.modifier  = 1 + has_skill(ch,SKILL_TACTICS) / 20;
       af.location  = APPLY_HITROLL;
       af.bitvector = -1;
       affect_to_char(tmp_char, &af);
