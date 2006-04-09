@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.h,v 1.39 2006/01/23 18:26:38 eas Exp $ */
+/* $Id: interp.h,v 1.40 2006/04/09 23:32:31 dcastle Exp $ */
 
 #ifndef INTERP_H_
 #define INTERP_H_
@@ -53,6 +53,7 @@ struct command_info
 #define COM_CHARMIE_OK       1
 
 DO_FUN  do_boro;
+DO_FUN do_clanarea;
 
 DO_FUN do_thing;
 DO_FUN  do_reload;

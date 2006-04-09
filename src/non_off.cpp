@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: non_off.cpp,v 1.32 2006/01/13 16:49:15 dcastle Exp $
+| $Id: non_off.cpp,v 1.33 2006/04/09 23:32:27 dcastle Exp $
 | non_off.C
 | Description:  Implementation of generic, non-offensive commands.
 */
@@ -993,8 +993,8 @@ int do_wake(CHAR_DATA *ch, char *argument, int cmd)
             send_to_char("You can't wake up!\n\r", ch);
         }else if ((af = affected_by_spell(ch, SKILL_BLACKJACK)) && af->modifier == 1) {
             send_to_char("You can't wake up!\n\r", ch);
-        } else if ((af = affected_by_spell(ch, INTERNAL_SLEEPING))) {
-            send_to_char("You just went to sleep!  Your body is still too tired.  Your dreaming continues...\r\n", ch);
+//        } else if ((af = affected_by_spell(ch, INTERNAL_SLEEPING))) {
+//            send_to_char("You just went to sleep!  Your body is still too tired.  Your dreaming continues...\r\n", ch);
         } else {
 //            else {
                 send_to_char("You wake, and stand up.\n\r", ch);

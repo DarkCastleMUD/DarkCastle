@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.58 2006/01/13 16:49:15 dcastle Exp $ */
+/* $Id: mob_proc2.cpp,v 1.59 2006/04/09 23:32:27 dcastle Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -2042,10 +2042,8 @@ int godload_sales(struct char_data *ch, struct obj_data *obj, int cmd, char *arg
         do_tell(owner, buf, 0); 
         return eSUCCESS;
     }
-    float percent = (float)(0.5 * ((float)eq_current_damage(obj) / (float)eq_max_damage(obj)));
-    percent = 1 - percent;
-    int cost = obj->obj_flags.cost;
-    cost =(int)(cost*percent*0.1);
+    int cost = obj->obj_flags.cost/10;
+
     sprintf(buf, "%s I'll give you %d plats for that. Thanks for shoppin'.",GET_NAME(ch),cost);
     do_tell(owner, buf, 0);
     extract_obj(obj);

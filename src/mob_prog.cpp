@@ -236,7 +236,7 @@ bool istank(CHAR_DATA *ch)
 }
 
 void translate_value(char *left, char *right, int16 *vali, uint32 *valui,
-		char *valstr, CHAR_DATA *mob, CHAR_DATA *actor, 
+		char *valstr, int64 *vali64, sbyte *valb, CHAR_DATA *mob, CHAR_DATA *actor, 
 		OBJ_DATA *obj, void *vo, CHAR_DATA *rndm)
 {
   CHAR_DATA *target = NULL;
@@ -273,7 +273,6 @@ void translate_value(char *left, char *right, int16 *vali, uint32 *valui,
     otarget = get_obj(left);
   } else if (!str_prefix(left, "ozone")) {
     left += 5;
-//    otarget = get_obj_in_list
     OBJ_DATA *otmp;
     int z = world[mob->in_room].zone;
     for (otmp = object_list;otmp;otmp = otmp->next)
@@ -314,8 +313,11 @@ void translate_value(char *left, char *right, int16 *vali, uint32 *valui,
   // target acquired. fucking boring code.
   // more boring code. FUCK.
   int16 *intval = NULL;
+
   uint32 *uintval = NULL;
   char *stringval = NULL;
+  int64 *llval = NULL;
+  sbyte *sbval = NULL;
   bool tError = FALSE;
   /*
      When a variable is created and assigned the value of the target-data, it is because it is
@@ -326,13 +328,13 @@ void translate_value(char *left, char *right, int16 *vali, uint32 *valui,
     case 'a':
 		if (!str_cmp(right, "armor"))
 		{  if (!target) tError = TRUE;
-		  else intval = &target->armor;
+		  else {intval = &target->armor;break;}
 		} else if (!str_cmp(right, "alignment"))
 		{  if (!target) tError = TRUE;
-		  else intval = &target->alignment;
+		  else {intval = &target->alignment;break;}
 		} else if (!str_cmp(right, "acidsave"))
 		{  if (!target) tError = TRUE;
-		  else intval = &target->saves[SAVE_TYPE_ACID];
+		  else {intval = &target->saves[SAVE_TYPE_ACID];break;}
 		} else if (!str_cmp(right, "age"))
 		{  if (!target || !target->pcdata) tError = TRUE;
 		  else {int16 age=mud_time_passed(time(0),target->pcdata->time.birth).year+17;intval = &age;}
@@ -357,11 +359,129 @@ void translate_value(char *left, char *right, int16 *vali, uint32 *valui,
 		} else if (!str_cmp(right, "coldsave"))
 		{  if (!target) tError = TRUE;
 		  else {intval = &target->saves[SAVE_TYPE_COLD];}
-		} /*else if (!str_cmp(right, "constitution"))
+		} else if (!str_cmp(right, "constitution"))
+		{ if (!target) tError = TRUE;
+		  else {sbval = &target->con; }
+		}
+		break;
+    case 'd':
+		if (!str_cmp(right, "damroll"))
 		{  if (!target) tError = TRUE;
-		  else {intval = &target->con; }
-		} 
-		*/
+		  else {intval = &target->damroll;}
+		} else if (!str_cmp(right,"description"))
+		{
+		   if (!target) tError = TRUE;
+		   else {stringval =target->description;}
+		} else if (!str_cmp(right,"dexterity"))
+		{
+		   if (!target) tError = TRUE;
+		   else {sbval = &target->dex;}
+		} else if (!str_cmp(right,"drunk"))
+		{
+		   if (!target) tError = TRUE;
+		   else {sbval= &target->conditions[DRUNK];}
+		}
+		break;
+	case 'e':
+		if (!str_cmp(right,"energysaves"))
+		{
+		   if (!target) tError = TRUE;
+		  else intval = &target->saves[SAVE_TYPE_ACID];
+		} else if (!str_cmp(right,"experience"))
+		{
+		   if (!target) tError = TRUE;
+		   else {llval= &target->exp;}
+		}
+		break;
+	case 'f':
+		if (!str_cmp(right,"firesaves"))
+		{
+		   if (!target) tError = TRUE;
+		  else intval = &target->saves[SAVE_TYPE_FIRE];
+		}
+		break;
+	case 'g':
+		if (!str_cmp(right,"gold"))
+		{
+		   if (!target) tError = TRUE;
+		  else uintval = &target->gold;
+		} else if (!str_cmp(right,"glowfactor"))
+		{
+		   if (!target) tError = TRUE;
+		  else intval = &target->glow_factor;
+		}
+		break;
+	case 'h':
+		if (!str_cmp(right,"height"))
+		{
+		   if (!target) tError = TRUE;
+		  else sbval = (sbyte*)(&target->height);
+		} else if (!str_cmp(right,"hitpoints"))
+		{
+		   if (!target) tError = TRUE;
+		  else uintval = (uint32*)&target->hit;
+		} else if (!str_cmp(right,"hitroll"))
+		{
+		   if (!target) tError = TRUE;
+		  else intval = &target->hitroll;
+		} else if (!str_cmp(right,"homeroom"))
+		{
+		   if (!target) tError = TRUE;
+		  else intval = &target->hometown;
+		} else if (!str_cmp(right,"hunger"))
+		{
+		   if (!target) tError = TRUE;
+		   else {sbval= &target->conditions[FULL];}
+		}
+		break;
+	case 'i':
+		if (!str_cmp(right,"immune"))
+		{
+		   if (!target) tError = TRUE;
+		  else uintval = (uint32*)&target->immune;
+		} else if (!str_cmp(right,"inroom"))
+		{
+		   if (!target) tError = TRUE;
+		  else uintval = (uint32*)&target->in_room;
+		} else if (!str_cmp(right,"intelligence"))
+		{
+		   if (!target) tError = TRUE;
+		  else uintval = (uint32*)&target->intel;
+		}
+		break;
+	case 'l':
+		if (!str_cmp(right,"level"))
+		{
+		   if (!target) tError = TRUE;
+		   else {sbval= &target->level;}
+		} else if (!str_cmp(right,"long"))
+		{
+		   if (!target) tError = TRUE;
+		   else {stringval= target->long_desc;}
+		}
+		break;
+	case 'k':
+		if (!str_cmp(right,"ki"))
+		{
+		   if (!target) tError = TRUE;
+		   else {uintval = (uint32*)&target->ki;}
+		}
+		break;
+	case 'm':
+		break;
+	case 'n':
+		break;
+	case 'o':
+		break;
+	case 'p':
+		break;
+	case 'q':
+		break;
+	case 'r':
+		break;
+	case 's':
+		break;
+					
   }
     
   return;
@@ -527,15 +647,18 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
   ye = TRUE;
  }
   
-  int16 lvali = 0-(LONG_MAX-1);
-  uint32 lvalui = 0-(LONG_MAX<<16-1);
+  int16 lvali;
+  uint32 lvalui;
   char lvalstr[MAX_STRING_LENGTH];
+  int64 lvali64;
+  sbyte lvalb; 
+  int type = 0;
   lvalstr[0] = '\0';
   if (!traditional)
-  translate_value(buf,arg,&lvali,&lvalui, &lvalstr[0],mob,actor, obj, vo, rndm);
+  translate_value(buf,arg,&lvali,&lvalui, &lvalstr[0],&lvali64, &lvalb,mob,actor, obj, vo, rndm);
  else // switch order of traditional so it'd be $n(ispc), to conform with
       // new ifchecks
-  translate_value(arg,buf,&lvali,&lvalui, &lvalstr[0],mob,actor, obj, vo, rndm);
+  translate_value(arg,buf,&lvali,&lvalui, &lvalstr[0],&lvali64, &lvalb, mob,actor, obj, vo, rndm);
 
   if ( !str_cmp( buf, "rand" ) )
     {

@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: db.h,v 1.18 2006/01/13 16:49:21 dcastle Exp $ */
+/* $Id: db.h,v 1.19 2006/04/09 23:32:31 dcastle Exp $ */
 #ifndef DB_H_
 #define DB_H_
 
@@ -46,6 +46,7 @@ extern "C" {
 #define ZONE_MODIFIED      1<<2
 #define ZONE_UNUSED        1<<3
 #define ZONE_BPORT	   1<<4
+#define ZONE_NOCLAIM        1<<5 // cannot claim this area
 // Remember to update const.C  zone_bits[] if you change this
 
 
@@ -189,6 +190,8 @@ struct zone_data
     int death_counter;       // +- counter for how often mobs in zone are killed
     int counter_mod;         // how quickly mobs are taken off the death_counter
     int died_this_tick;      // number of mobs that have died in this zone this pop
+    int clanowner;
+    int gold;	// gold (possibly the most descriptive comment of all time)
 };
 
 

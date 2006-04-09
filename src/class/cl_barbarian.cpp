@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_barbarian.cpp,v 1.59 2006/04/08 21:10:38 apocalypse Exp $
+| $Id: cl_barbarian.cpp,v 1.60 2006/04/09 23:32:29 dcastle Exp $
 | cl_barbarian.C
 | Description:  Commands for the barbarian class.
 */
@@ -427,7 +427,7 @@ int do_crazedassault(struct char_data *ch, char *argument, int cmd)
           
   if(!skill_success(ch,NULL,SKILL_CRAZED_ASSAULT)) {
     send_to_char("You try to psyche yourself up for it but just can't muster the concentration.\r\n", ch);
-    duration = 8 - has_skill(ch, SKILL_CRAZED_ASSAULT) / 10;
+    duration = 10 - has_skill(ch, SKILL_CRAZED_ASSAULT) / 10;
   }
   else {
     send_to_char("Your mind focuses completely on hitting your opponent.\r\n", ch);
@@ -703,6 +703,9 @@ int do_knockback(struct char_data *ch, char *argument, int cmd)
        act(buf, ch, 0, victim, TO_CHAR, 0);
        sprintf(buf, "%s smashes into you, sending you reeling %s.", GET_NAME(ch), dirs[dir]);
        act(buf, ch, 0, victim, TO_VICT, 0);
+	extern bool selfpurge;
+	if (selfpurge)
+		return eSUCCESS|eVICT_DIED;	
        sprintf(buf, "%s smashes into %s and sends $S reeling to the %s.", GET_NAME(ch), GET_SHORT(victim), dirs[dir]);
        act(buf, ch, 0, victim, TO_ROOM, NOTVICT);
        if(victim->fighting) {

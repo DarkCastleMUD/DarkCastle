@@ -161,6 +161,7 @@ void heartbeat();
 void report_debug_logging();
 
 /* extern fcnts */
+void pulse_takeover(void);
 void boot_db(void);
 void boot_world(void);
 void zone_update(void);
@@ -1015,8 +1016,9 @@ void heartbeat()
   if (--pulse_regen < 1)
   {
     // random pulse timer for regen to make tick sleeping impossible
-    pulse_regen = number(PULSE_REGEN-8, PULSE_REGEN+5);
+    pulse_regen = number(PULSE_REGEN-8*PASSES_PER_SEC, PULSE_REGEN+5*PASSES_PER_SEC);
     point_update();
+    pulse_takeover();
   }
 
   if(--pulse_time < 1) {
@@ -2104,7 +2106,10 @@ int close_socket(struct descriptor_data *d)
     if (d->connected == CON_PLAYING || d->connected == CON_WRITE_BOARD ||
 	d->connected == CON_EDITING || d->connected == CON_EDIT_MPROG) {
       save_char_obj(d->character);
-
+	// clan area stuff
+      extern void check_quitter(CHAR_DATA *ch);
+      check_quitter(d->character);
+	
       // end any performances
       if(IS_SINGING(d->character))
          do_sing(d->character, "stop", 9);

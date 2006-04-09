@@ -11,7 +11,7 @@ struct set_data
 };
 
 #define BASE_SETS                     1200
-#define SET_MAX 		       1204
+#define SET_MAX 		       1210
 // Eq_sets.
 
 #define SET_SAIYAN 0
@@ -23,7 +23,7 @@ struct set_data
 #define SET_FIELDPLATE 6
 #define SET_MOAD 7
 #define SET_FERAL 8
-#define SET_WHITECRYSTAL 10
-#define SET_BLACKCRYSTAL 7
+#define SET_WHITECRYSTAL 9
+#define SET_BLACKCRYSTAL 10
 extern const struct set_data set_list[];
  

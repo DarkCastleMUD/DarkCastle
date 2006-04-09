@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.115 2006/01/13 16:49:17 dcastle Exp $
+| $Id: cl_thief.cpp,v 1.116 2006/04/09 23:32:29 dcastle Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -21,7 +21,7 @@
 #include <db.h>
 #include <string.h>
 #include <returnvals.h>
-
+#include <clan.h>
 extern int rev_dir[];
 extern CWorld world;
  
@@ -29,6 +29,7 @@ extern struct index_data *mob_index;
 extern struct index_data *obj_index;
 extern int top_of_world;
 extern int arena[4];
+extern struct zone_data *zone_table;
 
 int find_door(CHAR_DATA *ch, char *type, char *dir);
 struct obj_data * search_char_for_item(char_data * ch, int16 item_number, bool wearonly = FALSE);
@@ -78,6 +79,16 @@ int palm(CHAR_DATA *ch, struct obj_data *obj_object,
     sprintf(buffer, "There was %d coins.\n\r",
       obj_object->obj_flags.value[0]);
     send_to_char(buffer, ch);
+        if (zone_table[world[ch->in_room].zone].clanowner > 0 && ch->clan !=
+                zone_table[world[ch->in_room].zone].clanowner)
+        {
+                 int cgold = (int)((float)(obj_object->obj_flags.value[0]) * 0.1);
+                 obj_object->obj_flags.value[0] -= cgold;
+                 csendf(ch, "Clan %s collects %d bounty, leaving %d for you.\r\n",get_clan(zone_table[world[ch->in_room].zone].clanowner)->name,cgold,
+                       obj_object->obj_flags.value[0]);
+                zone_table[world[ch->in_room].zone].gold += cgold;
+        }
+
     GET_GOLD(ch) += obj_object->obj_flags.value[0];
     extract_obj(obj_object);
   }
@@ -302,7 +313,8 @@ int do_circle(CHAR_DATA *ch, char *argument, int cmd)
       return eFAILURE;
    }
 
-   if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE)) {
+   if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE) &&
+	has_skill(ch, SKILL_CIRCLE) <= 80) {
       send_to_char("You cannot circle behind someone that HUGE!\n\r", ch);
       return eFAILURE;
    }
@@ -1147,7 +1159,7 @@ int do_pocket(CHAR_DATA *ch, char *argument, int cmd)
   }
   GET_MOVE(ch) -= 6;
 
-  WAIT_STATE(ch, 10); /* It takes TIME to steal */
+  WAIT_STATE(ch, 16); /* It takes TIME to steal */
 
 
 //    skill_increase_check(ch, SKILL_POCKET, has_skill(ch,SKILL_POCKET),SKILL_INCREASE_MEDIUM);
@@ -1701,10 +1713,10 @@ int do_blackjack(struct char_data *ch, char *argument, int cmd)
     send_to_char("You wouldn't know how.\r\n",ch);
     return eFAILURE;
   }
-  else {
-    send_to_char("Some magical, godlike force prevents you from completing your attempt.\r\n",ch);
-    return eFAILURE;
-  }
+//  else {
+//    send_to_char("Some magical, godlike force prevents you from completing your attempt.\r\n",ch);
+ //   return eFAILURE;
+  //}
 
   { //weaponchecks
     if (ch->equipment[WIELD])

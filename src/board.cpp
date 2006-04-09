@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: board.cpp,v 1.12 2005/10/27 18:57:07 urizen Exp $
+| $Id: board.cpp,v 1.13 2006/04/09 23:32:26 dcastle Exp $
 | board.C
 | Description:  This file contains the implementation for the board
 |   code.  It's old and should be rewritten --Morc XXX
@@ -898,13 +898,14 @@ int board_display_msg(CHAR_DATA *ch, char *arg, int bnum)
 int board_show_board(CHAR_DATA *ch, char *arg, int bnum)
 {
   int i;
-  char buf[MAX_STRING_LENGTH], tmp[MAX_INPUT_LENGTH+1];
-
-  one_argument(arg, tmp);
-
-  if (!*tmp || !isname(tmp, "board bulletin"))
-    return eFAILURE;
-
+  char buf[MAX_STRING_LENGTH], tmp[MAX_INPUT_LENGTH+1],tmp2[MAX_STRING_LENGTH];
+  
+  arg = one_argument(arg, tmp);
+  one_argument(arg, tmp2);
+  if (!*tmp)     return eFAILURE;
+  if (!isname(tmp, "board bulletin"))
+    if (!isname(tmp, "at") || !isname(tmp2, "board bulletin"))
+       return eFAILURE;
   curr_board = &boards[bnum];
 
   if(board_clan[bnum] != -1 && GET_LEVEL(ch) < OVERSEER) {

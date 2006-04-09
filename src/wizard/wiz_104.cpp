@@ -506,6 +506,15 @@ char *str_nospace(char *stri)
   return test;
 }
 
+int find_file(world_file_list_item *itm, int high)
+{
+  int i;
+  world_file_list_item *tmp;
+  for (i = 0,tmp=itm;tmp;tmp = tmp->next,i++)
+  if (tmp->lastnum/100 == high/100) return i;
+  return -1;
+}
+
 int do_show(struct char_data *ch, char *argument, int cmd)
 {
   char name[MAX_INPUT_LENGTH], buf[200];
@@ -796,8 +805,8 @@ int do_show(struct char_data *ch, char *argument, int cmd)
                    "--- ------------------------------------------------------\r\n", ch);
       for(i = 0; i <= top_of_zone_table; i++)
       {
-        sprintf(buf, "%3d %s\r\n",
-                   i, zone_table[i].name);
+        sprintf(buf, "%3d %5d-%-5d %s\r\n",
+                   i, zone_table[i].bottom_rnum, zone_table[i].top_rnum,zone_table[i].name);
         send_to_char(buf, ch);
       }
     }

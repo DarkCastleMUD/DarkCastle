@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.167 2006/04/08 21:09:40 apocalypse Exp $ */
+/* $Id: const.cpp,v 1.168 2006/04/09 23:32:26 dcastle Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -564,8 +564,8 @@ L(22 M),    L(24 M),    L(26 M),    L(28 M),    L(31 M),   // level 35
 L(34 M),    L(37 M),    L(40 M),    L(45 M),    L(50 M),   // level 40
 L(60 M),    L(70 M),    L(80 M),    L(90 M),    L(100 M),  // level 45
 L(120 M),   L(140 M),   L(160 M),   L(180 M),   L(200 M),  // level 50
-L(400 M),   L(2 M),     L(3 M),     L(4 M),     L(5 M),    // level 55
-L(6 M),     L(7 M),     L(8 M),     L(9 M),     L(10 M),   // level 60
+L(400 M),   L(600 M),     L(800 M),     L(1000 M),     L(1200 M),    // level 55
+L(1400 M),     L(1600 M),     L(1800 M),     L(2000 M),     L(2000 M),   // level 60
 L(0x7FFFFFFF)
 };
 
@@ -650,8 +650,10 @@ char *zone_bits[] =
     "NO_TELEPORT",
     "IS_TOWN(keep out STAY_NO_TOWN mobs)",
     "MODIFIED",
+    "UNUSED",
     "BPORT",
-    ""
+    "NOCLAIM",
+    "\n"
 };
 
 // new obj flags
@@ -1109,7 +1111,8 @@ struct class_skill_defines w_skills[] = { // warrior skills
 {    "rescue",          SKILL_RESCUE,             5,    70,     {WIS,INT} },
 {    "double",          SKILL_SECOND_ATTACK,      7,    90,     {STR,DEX} },
 {    "disarm",          SKILL_DISARM,             10,   70,     {DEX,WIS} },
-{    "headbutt",        SKILL_SHOCK,              12,   55,     {CON,WIS} },
+{    "headbutt",        SKILL_SHOCK,              12,   85,     
+{CON,WIS} },
 {    "shield block",    SKILL_SHIELDBLOCK,        15,   85,     {STR,DEX} },
 {    "retreat",         SKILL_RETREAT,            17,   98,     {WIS,INT} },
 {    "frenzy",          SKILL_FRENZY,             18,   80,     {CON,INT} },
@@ -1817,6 +1820,7 @@ char *player_bits[] =
     "GUIDE",
     "GUIDE_TOG",
     "NEWS",
+    "50PLUS",
     "\n"
 };
 

@@ -395,7 +395,7 @@ int hooktippedsteelhalberd(CHAR_DATA *ch, struct obj_data *obj, int cmd,
    if (!(victim = ch->fighting))
      return eFAILURE;
    if (number(1,101) > 2) return eFAILURE;
-   int which = number(0, MAX_WEAR);
+   int which = number(0, MAX_WEAR-1);
    if (!victim->equipment[which])
      return eFAILURE; // Lucky
    int i = damage_eq_once(victim->equipment[which]);
@@ -1754,10 +1754,10 @@ char*arg, CHAR_DATA *invoker)
 		if (o->obj_flags.type_flag == ITEM_PORTAL) portal = TRUE;
         if (!portal) break;
       } // Find a room
-      act(msg1,NULL,NULL,NULL,TO_ROOM,0);
+      send_to_room(msg1,obj->in_room);
       obj_from_room(obj);
       obj_to_room(obj, room);
-      act(msg2,NULL,NULL,NULL,TO_ROOM,0);
+      send_to_room(msg2,obj->in_room);
       return eSUCCESS;
    }
    return eFAILURE;

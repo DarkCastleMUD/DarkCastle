@@ -5,7 +5,7 @@
  *                                                                           *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-/* $Id: magic.h,v 1.24 2006/01/13 16:49:21 dcastle Exp $ */
+/* $Id: magic.h,v 1.25 2006/04/09 23:32:31 dcastle Exp $ */
 #ifndef MAGIC_H_
 #define MAGIC_H_
 
@@ -70,7 +70,7 @@ int spell_chill_touch(ubyte level, CHAR_DATA * ch,
 int spell_colour_spray(ubyte level, CHAR_DATA * ch,
    CHAR_DATA * victim, struct obj_data * obj, int skill);
 int spell_conjure_elemental(ubyte level, CHAR_DATA * ch,
-   CHAR_DATA * victim, struct obj_data * obj, int skill);
+   char *arg, CHAR_DATA * victim, struct obj_data * obj, int skill);
 int spell_cont_light(ubyte level, CHAR_DATA * ch,
    CHAR_DATA * victim, struct obj_data * obj, int skill);
 int spell_create_food(ubyte level, CHAR_DATA * ch,

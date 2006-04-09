@@ -1328,7 +1328,7 @@ int do_mpbestow(CHAR_DATA *ch, char *argument, int cmd)
    {
     if (!str_cmp(affected_bits[a], arg1))
     {
-	debugpoint();
+	//debugpoint();
 	struct affected_type af;
         af.type = z = skill_aff[a];
 	if (affected_by_spell(victim, z+BASE_TIMERS))

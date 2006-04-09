@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.61 2006/01/13 16:49:15 dcastle Exp $ */
+/* $Id: limits.cpp,v 1.62 2006/04/09 23:32:27 dcastle Exp $ */
 
 extern "C"
 {
@@ -720,7 +720,7 @@ void point_update( void )
     next_dude = i->next;
   if (affected_by_spell(i, SPELL_POISON))
   {
-	debugpoint();
+//	debugpoint();
     send_to_char("You feel very sick.\r\n",i);
         int dam = affected_by_spell(i, SPELL_POISON)->duration*number(10,50);
         int retval;

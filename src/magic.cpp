@@ -4713,58 +4713,6 @@ int spell_dispel_magic(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
 }
 
 
-/* CONJURE ELEMENTAL */
-
-int spell_conjure_elemental(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj)
-{
-	 struct affected_type af;
-
-	 /*
-	  *   victim, in this case, is the elemental
-	  *   object could be the sacrificial object
-     */
-
-	 if(!ch || !victim || !obj)
-	 {
-	   log("Null victim, object, or ch sent to conjure_elemental!", ANGEL, LOG_BUG);
-	   return eFAILURE;
-	 }
-
-	 /*
-	 ** objects:
-         **     fire  : red stone
-	 **     water : pale blue stone
-	 **     earth : grey stone
-	 **     air   : clear stone
-    */
-
-    act("$n gestures, and a cloud of smoke appears", ch, 0, 0, TO_ROOM, INVIS_NULL);
-	 act("$n gestures, and a cloud of smoke appears", ch, 0, 0, TO_CHAR, INVIS_NULL);
-	 act("$p explodes with a loud BANG!", ch, obj, 0, TO_ROOM, INVIS_NULL);
-	 act("$p explodes with a loud BANG!", ch, obj, 0, TO_CHAR, INVIS_NULL);
-         obj_from_char(obj);
-	 extract_obj(obj);
-    char_to_room(victim, ch->in_room);
-    act("Out of the smoke, $N emerges", ch, 0, victim, TO_ROOM, NOTVICT|INVIS_NULL);
-
-    /* charm them for a while */
-    if (victim->master)
-	stop_follower(victim, STOP_FOLLOW);
-
-	 add_follower(victim, ch, 0);
-
-	 af.type = SPELL_CHARM_PERSON;
-	 af.duration = 48;
-         af.modifier = 0;
-	 af.location = 0;
-	 af.bitvector = AFF_CHARM;
-
-	 affect_to_char(victim, &af);
-
-  return eSUCCESS;
-}
-
-
 /* CURE SERIOUS */
 
 int spell_cure_serious(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
@@ -8158,8 +8106,7 @@ int cast_conjure_elemental( ubyte level, CHAR_DATA *ch,
 		char *arg, int type,
 		CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill)
 {
-  /* not working yet! */
-  return eFAILURE;
+  return spell_conjure_elemental(level, ch, arg, 0, tar_obj, skill);
 }
 
 int cast_cure_serious( ubyte level, CHAR_DATA *ch, char *arg, int type,
@@ -11293,5 +11240,119 @@ int cast_ghost_walk( ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA 
        break;
   }
   return eFAILURE;
+}
+
+
+int spell_conjure_elemental(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, struct obj_data *component, int skill)
+{
+  CHAR_DATA *mob;
+  struct obj_data *obj_object, *next_obj;
+  struct affected_type af;
+  char buf[200];
+  int number, r_num;
+  int liquid;
+ int virt;
+// 88 = fire fire
+// 89 = water magic
+// 90 = air cold
+// 91 = earth energy
+
+  if(many_charms(ch))  {
+    send_to_char("How do you plan on controlling so many followers?\n\r", ch);
+    return eFAILURE;
+  }
+  OBJ_DATA *container  = NULL;
+  if (!str_cmp(arg, "fire"))
+  {
+	virt = 88;
+	liquid = 13;
+  }
+  else if (!str_cmp(arg, "water"))
+  {
+	virt = 89;
+	liquid = 17;
+  }
+  else if (!str_cmp(arg, "air"))
+  {
+	virt = 90;
+	liquid = 2;
+  }
+  else if (!str_cmp(arg, "earth"))
+  {
+	virt = 91;
+	liquid = 9;
+  }
+  else {
+	send_to_char("Unknown elemental type. Applicaple types are: fire, water, air and earth.\r\n",ch);
+	return eFAILURE;
+  }
+/*  if (!(check_container(ch, 1))
+  {
+	send_to_char("You do not seems to have the item needed to perform such a summoning.\r\n",ch);
+	return eFAILURE;
+  }*/
+  switch (virt)
+  {
+	case 88:
+          act("Your small piece of flint turns to ash as a denizen of the elemental plane of fire arrives in a blast of flame!", ch, NULL,NULL, TO_CHAR, 0);
+          act("$n's small piece of flint turns to ash as a denizen of the elemental plane of fire arrives in a blast of flame!", ch, NULL,NULL, TO_ROOM, 0);
+	  break;
+	case 89:
+          act("Calling out to the spirits of fire, shaping them into an elemental servant.", ch, NULL,NULL, TO_CHAR, 0);
+          act("$n calls out, and a fire elemental appears.", ch, NULL,NULL, TO_ROOM, 0);
+	  break;
+	case 90:
+          act("Calling out to the spirits of fire, shaping them into an elemental servant.", ch, NULL,NULL, TO_CHAR, 0);
+          act("$n calls out, and a fire elemental appears.", ch, NULL,NULL, TO_ROOM, 0);
+	  break;
+	case 91:
+          act("Calling out to the spirits of fire, shaping them into an elemental servant.", ch, NULL,NULL, TO_CHAR, 0);
+          act("$n calls out, and a fire elemental appears.", ch, NULL,NULL, TO_ROOM, 0);
+	  break;
+	default:
+		send_to_char("That item is not used for elemental summoning.\r\n",ch);
+		return eFAILURE;
+  }
+  if ((r_num = real_mobile(virt)) < 0) {
+    send_to_char("Mobile: Zombie not found.\n\r", ch);
+    return eFAILURE;
+  }
+  
+  mob = clone_mobile(r_num);
+  char_to_room(mob, ch->in_room);
+
+  IS_CARRYING_W(mob) = 0;
+  IS_CARRYING_N(mob) = 0;
+
+  // set up descriptions and such
+
+//  sprintf(buf, "%s %s", corpse->name, mob->name);
+//  mob->name = str_hsh(buf);
+  
+//  mob->short_desc = str_hsh(corpse->short_description);
+
+  if (GET_ALIGNMENT(ch) < 0) 
+  {
+//    sprintf(buf, "%s slowly staggers around.\n\r", corpse->short_description);
+  //  mob->long_desc = str_hsh(buf);
+  }
+//  else
+ // sprintf(buf, "%s hovers above the ground here.\r\n",corpse->short_description);
+
+  // zombie should be charmed and follower ch
+  // TODO duration needs skill affects too
+
+  af.type = SPELL_CHARM_PERSON;
+  af.duration = 5 + level / 2;
+  af.modifier = 0;
+  af.location = 0;
+  af.bitvector = AFF_CHARM;
+  affect_to_char(mob, &af);
+  if(IS_SET(mob->immune, ISR_PIERCE))
+    REMOVE_BIT(mob->immune, ISR_PIERCE);
+  add_follower(mob, ch, 0);
+
+//  extract_obj(corpse);
+  return eSUCCESS;
 }
 

@@ -184,7 +184,7 @@ void boot_social_messages(void)
 
   // initialize our array
   num_socials = 0;
-  social_array_size = 100; // Guess on number of socials.  Closer this is to actual without
+  social_array_size = 450; // Guess on number of socials.  Closer this is to actual without
                            // going over saves on memory and boot up speed since we won't
                            // have to realloc as often.
 #ifdef LEAK_CHECK

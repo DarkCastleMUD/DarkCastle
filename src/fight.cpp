@@ -1,26 +1,11 @@
-/*	Fight1.c written from the original by Morcallen 1/17/95
-*	This contains all the fight starting mechanisms as well
-*	as damage.
-*
-******************************************************************************
-*  Revision History                                                          *
-*  10/23/2003  Onager   Added checks for ch == NULL in raw_kill() to prevent *
-*                       crashes from non-(N)PC deaths                        *
-*                       Changed raw_kill() to make imms immune to stat loss  *
-*  11/09/2003  Onager   Added noncombat_damage() to do noncombat-related     *
-*                       damage (such as falls, drowning) that may kill       *
-*  11/24/2003  Onager   Totally revamped group_gain(); subbed out a lot of   *
-*                       the code and revised exp calculations for soloers    *
-*                       and groups.                                          *
-*  12/01/2003  Onager   Re-revised group_gain() to divide up mob exp among   *
-*                       groupies                                             *
-*  12/08/2003  Onager   Changed change_alignment() to a simpler algorithm    *
-*                       with smaller changes in alignment                    *
-*  12/28/2003  Pirahna  Changed do_fireshield() to check ch->immune instead  *
-*                       of just race stuff
-******************************************************************************
-*/ 
-/* $Id: fight.cpp,v 1.288 2006/01/26 09:44:23 eas Exp $ */
+/* Fight1.c written from the original by Morcallen 1/17/95 * This contains all the fight starting mechanisms as well * as damage. *
+****************************************************************************** * Revision History * * 10/23/2003 Onager Added checks for ch == NULL
+in raw_kill() to prevent * * crashes from non-(N)PC deaths * * Changed raw_kill() to make imms immune to stat loss * * 11/09/2003 Onager Added
+noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) that may kill * * 11/24/2003 Onager Totally revamped group_gain();
+subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
+mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
+12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
+****************************************************************************** */ /* $Id: fight.cpp,v 1.289 2006/04/09 23:32:26 dcastle Exp $ */
 
 extern "C"
 {
@@ -1484,14 +1469,14 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
   int damage_type(int weapon_type);
   long int get_weapon_bit(int weapon_type);
   int32 hit_limit(CHAR_DATA * ch);
-  int retval;
+  int retval = 0;
   int modifier = 0;
   int percent;
   int learned;
   int ethereal = 0;
   bool reflected = FALSE;  
   char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH], buf3[MAX_STRING_LENGTH];
-
+  SET_BIT(retval, eSUCCESS);
   weapon_bit = get_weapon_bit(weapon_type);
   if(!weapon)
     weapon = WIELD;
@@ -1503,7 +1488,7 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
    attacktype == SKILL_FIRE_ARROW || attacktype == SKILL_TEMPEST_ARROW || 
    attacktype == SKILL_GRANITE_ARROW || attacktype == SKILL_ICE_ARROW ||
 	attacktype == SPELL_POISON)) 
-     return eSUCCESS;
+     return retval;
   int l=0;
   if (dam!=0 && attacktype && attacktype < TYPE_HIT)
   { // Skill damages based on learned %
@@ -1532,8 +1517,10 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
         act("$n's spell reflects off of $N's magical aura", ch, 0, victim, TO_ROOM, NOTVICT);
         victim = ch;
         reflected = TRUE;
+	SET_BIT(retval,eEXTRA_VAL2);
       }
     }
+ 
     if(IS_SET(victim->combat, COMBAT_REPELANCE))
     {
        if(GET_LEVEL(ch) > 70)
@@ -1551,7 +1538,7 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
          act("$n's spell streaks at $N and suddenly ceases to be.", ch, 0, victim, TO_ROOM, NOTVICT);
         }
         REMOVE_BIT(victim->combat, COMBAT_REPELANCE);
-        return eSUCCESS;
+        return retval;
        }
        REMOVE_BIT(victim->combat, COMBAT_REPELANCE);
   //  }
@@ -1761,7 +1748,7 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
   if(attacktype != SKILL_BACKSTAB &&  GET_HIT(victim) > 0 &&
      (typeofdamage == DAMAGE_TYPE_PHYSICAL || attacktype == TYPE_PHYSICAL_MAGIC))
     if(do_frostshield(ch, victim)) {
-      return eSUCCESS|eEXTRA_VALUE;;
+      return retval|eEXTRA_VALUE;;
     }
 
   if(typeofdamage == DAMAGE_TYPE_PHYSICAL) {
@@ -1999,21 +1986,22 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
    attacktype == SPELL_LIGHTNING_BOLT || attacktype == SKILL_FIRE_ARROW ||
    attacktype == SKILL_ICE_ARROW || attacktype == SKILL_TEMPEST_ARROW ||
    attacktype == SKILL_GRANITE_ARROW || attacktype == SPELL_POISON)) // Wimpy
-      return eSUCCESS;   
+      return retval;   
   if(typeofdamage == DAMAGE_TYPE_PHYSICAL && dam > 0 && ch != victim && attacktype != SKILL_ARCHERY)
   {
-    retval = do_fireshield(ch, victim, dam);
-    if(SOMEONE_DIED(retval))
-      return damage_retval(ch, victim, retval);
-    retval = do_acidshield(ch, victim, dam);
-    if(SOMEONE_DIED(retval))
-      return damage_retval(ch, victim, retval);
-    retval = do_lightning_shield(ch, victim, dam);
-    if(SOMEONE_DIED(retval))
-      return damage_retval(ch, victim, retval);
-    retval = do_vampiric_aura(ch, victim);
-    if(SOMEONE_DIED(retval))
-      return damage_retval(ch, victim, retval);
+    int retval2;
+    retval2 = do_fireshield(ch, victim, dam);
+    if(SOMEONE_DIED(retval2))
+      return damage_retval(ch, victim, retval2);
+    retval2 = do_acidshield(ch, victim, dam);
+    if(SOMEONE_DIED(retval2))
+      return damage_retval(ch, victim, retval2);
+    retval2 = do_lightning_shield(ch, victim, dam);
+    if(SOMEONE_DIED(retval2))
+      return damage_retval(ch, victim, retval2);
+    retval2 = do_vampiric_aura(ch, victim);
+    if(SOMEONE_DIED(retval2))
+      return damage_retval(ch, victim, retval2);
   }
 
   // Sleep spells.
@@ -2044,7 +2032,7 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
     return damage_retval(ch, victim, (eSUCCESS|eVICT_DIED));
     }
 
-  return eSUCCESS;
+  return retval;
 } 
 
 // this function deals damage in noncombat situations (falls, drowning, etc.)
@@ -3421,8 +3409,8 @@ int do_skewer(CHAR_DATA *ch, CHAR_DATA *vict, int dam, int wt, int wt2, int weap
       act("$n's weapon rips through $N's chest sending gore and entrails flying for yards!\r\n", ch, 0, vict, NOTVICT, 0);
    //duplicate message   act("$n is DEAD!!", vict, 0, 0, TO_ROOM, INVIS_NULL);
       send_to_char("You have been SKEWERED!!\n\r\n\r", vict);
-      damage(ch, vict, 1, wt, wt2, weapon);
-      update_pos(vict);
+      damage(ch, vict, 99999, TYPE_UNDEFINED, SKILL_SKEWER, weapon);
+//      update_pos(vict);
       return eSUCCESS|eVICT_DIED;
     }
     return retval;
@@ -4247,7 +4235,8 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim, int type)
   if(ch) {
     set_cantquit(ch, victim);
   }
-    
+   extern void pk_check(CHAR_DATA *ch, CHAR_DATA *victim);
+  pk_check(ch, victim); 
   // Kill charmed mobs outright
   if(IS_NPC(victim)) {
     fight_kill(ch, victim, TYPE_RAW_KILL, 0);
@@ -4527,7 +4516,7 @@ void arena_kill(CHAR_DATA *ch, CHAR_DATA *victim, int type)
   // if it's a chaos, see if the clan was eliminated
   if(victim && arena[2] == -2 && clan2)
   {
-    for(tmp = character_list; tmp; tmp = tmp->next) {
+     for(tmp = character_list; tmp; tmp = tmp->next) {
       if (IS_SET(world[tmp->in_room].room_flags, ARENA))
         if(victim->clan == tmp->clan && victim != tmp && GET_LEVEL(tmp) < IMMORTAL)
           eliminated = 0;

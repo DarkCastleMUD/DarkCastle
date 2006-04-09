@@ -873,27 +873,35 @@ int do_zedit(struct char_data *ch, char *argument, int cmd)
       argument = one_argumentnolow(argument, text);
       if(!*text)
       {   
-        send_to_char("$3Usage$R: zedit flags <true|false>\r\n"
-                     "This is the flags currently effecting the zone.\r\n"
-                     "It is a bitvector.  Currently the only zone wide flag\r\n"
-                     "Is NO_TELEPORT.  Turn it true or false.\r\n", ch);
+        send_to_char("$3Usage$R: zedit flags <noteleport|noclaim>\r\n",ch);
         return eFAILURE;
       }
       
-      if(!strcmp(text, "true")) {
-        SET_BIT(zone_table[zone].zone_flags, ZONE_NO_TELEPORT);
-      }
-      else if(!strcmp(text, "false")) {
-        REMOVE_BIT(zone_table[zone].zone_flags, ZONE_NO_TELEPORT);
+	if (!str_cmp(text, "noclaim"))
+	{
+		TOGGLE_BIT(zone_table[zone].zone_flags, ZONE_NOCLAIM);
+		if (IS_SET(zone_table[zone].zone_flags, ZONE_NOCLAIM))
+		send_to_char("Noclaim turned on.\r\n",ch);
+		else
+		send_to_char("Noclaim turned off.\r\n",ch);
+	}
+	
+
+      else if(!strcmp(text, "noteleport")) {
+		TOGGLE_BIT(zone_table[zone].zone_flags, ZONE_NO_TELEPORT);
+		if (IS_SET(zone_table[zone].zone_flags, ZONE_NO_TELEPORT))
+		send_to_char("Noteleport turned on.\r\n",ch);
+		else
+		send_to_char("Noteleport turned off.\r\n",ch);
       }
       else {
-        sprintf(buf, "'%s' invalid.  Enter 'true' or 'false'.\r\n", text);
+        sprintf(buf, "'%s' invalid.  Enter 'noclaim' or 'noteleport'.\r\n", text);
         send_to_char(buf, ch);
         return eFAILURE;
       }
  
       sprintf(buf, "Zone %d's lifetime changed to %s.\r\n", zone, 
-                    zone_table[zone].zone_flags ? "true" : "false");
+                    zone_table[zone].zone_flags&1 ? "true" : "false");
       send_to_char(buf, ch);
       break;
     }

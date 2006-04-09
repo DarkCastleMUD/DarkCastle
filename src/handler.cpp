@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.98 2006/04/04 04:35:43 apocalypse Exp $ */
+/* $Id: handler.cpp,v 1.99 2006/04/09 23:32:26 dcastle Exp $ */
     
 extern "C"
 {
@@ -363,7 +363,7 @@ const struct set_data set_list[] = {
         "The $B$7glow$R fades from your crystal armours.\r\n"},
   { "Black Crystal Armours", 7, {22011,22017,22025,22026,22027,22028,22029,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
         "Your crystal armours $B$0darken$R and begin to hum with magic.\r\n",
-        "The $B$0darkness$R disperses as the crystal armours are removed.\r\n",
+        "The $B$0darkness$R disperses as the crystal armours are removed.\r\n"},
   { "\n", 0, {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
 	"\n","\n"}
 };
@@ -489,25 +489,29 @@ void add_set_stats(char_data *ch, obj_data *obj, int flag, int pos)
             af.modifier = 10;
             affect_to_char(ch, &af);
             af.location = APPLY_HIT;
-            af.modifer = 50;
+            af.modifier = 50;
             affect_to_char(ch, &af);
             af.location = APPLY_MANA;
             af.modifier = 50;
             affect_to_char(ch, &af);
             af.location = APPLY_SAVING_MAGIC;
             af.modifier = 8;
+            affect_to_char(ch, &af);
+	   break;
           case SET_BLACKCRYSTAL:
             af.location = APPLY_HIT_N_DAM;
             af.modifier = 4;
-            affect_to_char{ch, &af};
+            affect_to_char(ch, &af);
             af.location = APPLY_MANA;
             af.modifier = 80;
-            affect_to_char{ch, &af};
+            affect_to_char(ch, &af);
             af.location = APPLY_SAVING_ACID;
             af.modifier = 8;
-            affect_to_char{ch, &af};
+            affect_to_char(ch, &af);
             af.location = APPLY_SAVING_ENERGY;
             af.modifier = 8;
+            affect_to_char(ch, &af);
+	   break;
 	  default: 
 		send_to_char("Tough luck, you completed an unimplemented set. Report what you just wore, eh?\r\n",ch);
 		break;
@@ -1110,6 +1114,7 @@ void affect_total(CHAR_DATA *ch)
     struct affected_type *af;
     struct affected_type *tmp_af;
     int i,j;
+    bool already = ISSET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT);
 
     SETBIT(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT); // so weapons stop falling off
 
@@ -1143,6 +1148,7 @@ void affect_total(CHAR_DATA *ch)
         affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE);
     }
     add_totem_stats(ch);
+	if (!already)
     REMBIT(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT); // so weapons stop fall off
 }
 
@@ -1490,8 +1496,8 @@ int char_from_room(CHAR_DATA *ch)
        if(i->next_in_room == ch)
          i->next_in_room = ch->next_in_room;
     }
-  if (IS_NPC(ch) && ISSET(ch->mobdata->actflags, ACT_NOMAGIC))
-	debugpoint();
+//  if (IS_NPC(ch) && ISSET(ch->mobdata->actflags, ACT_NOMAGIC))
+//	debugpoint();
   for(i = world[ch->in_room].people; i; i = i->next_in_room) {
      if (IS_NPC(i) && ISSET(i->mobdata->actflags, ACT_NOMAGIC))
 	Other = TRUE;
@@ -2621,7 +2627,9 @@ bool has_random(OBJ_DATA *obj);
                 dc_free(active_obj);
                 break;
             } else if(active_obj->obj == obj) {
-                last_active = active_obj->next;
+                active_head.obj = active_obj->next->obj;
+		active_head.next = active_obj->next->next;
+//		last_active->next = active_obj->next;
                 dc_free(active_obj);
                 break;
             }

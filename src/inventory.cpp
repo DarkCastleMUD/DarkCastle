@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.57 2006/01/13 16:49:14 dcastle Exp $
+| $Id: inventory.cpp,v 1.58 2006/04/09 23:32:27 dcastle Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -103,9 +103,30 @@ void get(struct char_data *ch, struct obj_data *obj_object, struct obj_data *sub
     if((obj_object->obj_flags.type_flag == ITEM_MONEY) && 
 	(obj_object->obj_flags.value[0]>=1)) {
 	obj_from_char(obj_object);
-	sprintf(buffer,"There was %d coins.\n\r",
+	sprintf(buffer,"There was %d coins.",
 		obj_object->obj_flags.value[0]);
-	send_to_char(buffer,ch);
+        if(IS_MOB(ch) || !IS_SET(ch->pcdata->toggles, PLR_BRIEF))
+	{
+	  send_to_char(buffer, ch);
+	  send_to_char("\r\n",ch);
+	}
+	extern zone_data *zone_table;
+	bool tax = FALSE;
+        if (zone_table[world[ch->in_room].zone].clanowner > 0 && ch->clan != 
+		zone_table[world[ch->in_room].zone].clanowner)
+	{
+	         int cgold = (int)((float)(obj_object->obj_flags.value[0]) * 0.1);
+		 obj_object->obj_flags.value[0] -= cgold;
+	if(!IS_MOB(ch) && IS_SET(ch->pcdata->toggles, PLR_BRIEF))
+	{
+		tax = TRUE;
+		sprintf(buffer, "%s Bounty: %d", buffer, cgold);
+	}
+	else
+		 csendf(ch, "Clan %s collects %d bounty, leaving %d for you.\r\n",get_clan(zone_table[world[ch->in_room].zone].clanowner)->name,cgold,
+			obj_object->obj_flags.value[0]);
+		zone_table[world[ch->in_room].zone].gold += cgold;
+	}
 //	if (sub_object && sub_object->obj_flags.value[3] == 1 && 
 //           !isname("pc",sub_object->name) && ch->clan 
 //            && get_clan(ch)->tax && !IS_SET(GET_TOGGLES(ch), PLR_NOTAX))
@@ -114,12 +135,25 @@ void get(struct char_data *ch, struct obj_data *obj_object, struct obj_data *sub
             && get_clan(ch)->tax && !IS_SET(GET_TOGGLES(ch), PLR_NOTAX))
 	{
 	  int cgold = (int)((float)(obj_object->obj_flags.value[0]) * (float)((float)(get_clan(ch)->tax)/100.0));
-	  GET_GOLD(ch) += obj_object->obj_flags.value[0] - cgold;
+	  obj_object->obj_flags.value[0] -= cgold;
+	  GET_GOLD(ch) += obj_object->obj_flags.value[0];
           get_clan(ch)->balance += cgold;
+	if(!IS_MOB(ch) && IS_SET(ch->pcdata->toggles, PLR_BRIEF))
+        {
+		tax = TRUE;
+		sprintf(buffer, "%s ClanTax: %d", buffer, cgold);
+        }
+	else
 	  csendf(ch,"Your clan taxes you %d gold, leaving %d gold for you.\r\n",cgold, obj_object->obj_flags.value[0]-cgold);
 	  save_clans();
 	} else
 	GET_GOLD(ch) += obj_object->obj_flags.value[0];
+	if (tax)
+	 sprintf(buffer, "%s. %d gold remaining.\r\n",buffer, obj_object->obj_flags.value[0]);
+	else sprintf(buffer, "%s\r\n",buffer);
+
+        if(!IS_MOB(ch) && IS_SET(ch->pcdata->toggles, PLR_BRIEF))
+  	  send_to_char(buffer,ch);
 	extract_obj(obj_object);
     }
 

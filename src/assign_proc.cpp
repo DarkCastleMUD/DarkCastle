@@ -166,6 +166,10 @@ void assign_non_combat_procs() {
     SPEC_FUN    startrek_miles;
     SPEC_FUN    generic_area_guard;
     SPEC_FUN    pthief_hater;
+    assign_one_mob_non(1203, Executioner);
+    assign_one_mob_non(501, arena_only);
+    assign_one_mob_non(502, arena_only);
+    assign_one_mob_non(503, arena_only);
     assign_one_mob_non(8, mage_golem);
     assign_one_mob_non(1,  deth);
     assign_one_mob_non(3,  platmerchant);
@@ -179,15 +183,10 @@ void assign_non_combat_procs() {
     assign_one_mob_non(207,  adept);
     assign_one_mob_non(208,  adept);
     assign_one_mob_non(214,  fido);
-    assign_one_mob_non(1932,  guild);
     assign_one_mob_non(222,  newbie_zone_guard);
     assign_one_mob_non(250,  annoyingbirthdayshout);
-    assign_one_mob_non(501,  arena_only);
-    assign_one_mob_non(502,  arena_only);
-    assign_one_mob_non(503,  arena_only);
     assign_one_mob_non(1203,  Executioner);
     assign_one_mob_non(1334, generic_doorpick_blocker);
-    assign_one_mob_non(1932,  guild);
     assign_one_mob_non(1935,  guild);
     assign_one_mob_non(1937,  guild);
     assign_one_mob_non(10018, gl_repair_shop);
@@ -199,6 +198,7 @@ void assign_non_combat_procs() {
     assign_one_mob_non(10023, godload_sales);
     assign_one_mob_non(10026, godload_sales);
     assign_one_mob_non(1939,  guild);
+    assign_one_mob_non(1932,  guild);
     assign_one_mob_non(1929,  guild_guard);
     assign_one_mob_non(1931,  guild_guard);
     assign_one_mob_non(1933,  guild_guard);
@@ -615,7 +615,6 @@ void assign_objects(void)
   assign_one_obj_com(9806,   glove_combat_procs);
   assign_one_obj_com(10000,  holyavenger);
   assign_one_obj_com(10001,  holyavenger);
-  assign_one_obj_com(16903,  generic_weapon_combat);
   assign_one_obj_com(19503,  glove_combat_procs);
   assign_one_obj_com(26807,  goldenbatleth);
   assign_one_obj_com(30627,  eliara_combat);

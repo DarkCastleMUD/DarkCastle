@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.40 2005/07/17 11:29:15 shane Exp $ */
+/* $Id: clan.cpp,v 1.41 2006/04/09 23:32:26 dcastle Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -33,6 +33,8 @@ extern "C"
 extern CHAR_DATA *character_list;
 extern struct descriptor_data *descriptor_list;
 extern CWorld world;
+extern struct zone_data *zone_table;
+extern void send_info(char *messg);
 
 struct clan_data * clan_list = 0;
 struct clan_data * end_clan_list = 0;
@@ -60,6 +62,7 @@ char * clan_rights[] = {
    "tax",
    "withdraw",
    "channel",
+   "area",
    "\n"
 };
 
@@ -2530,3 +2533,420 @@ void add_totem_stats(CHAR_DATA *ch)
   }
 }
 
+/*
+
+ Clanarea functions follow.
+
+
+*/
+
+struct takeover_pulse_data *pulse_list=NULL;
+extern int top_of_zonet;
+
+int count_plrs(int zone, int clan)
+{
+  CHAR_DATA *tmpch;
+  int i = 0;
+  for (tmpch = character_list; tmpch; tmpch = tmpch->next)
+     if (!IS_NPC(tmpch) && world[tmpch->in_room].zone == zone && clan == tmpch->clan &&
+		GET_LEVEL(tmpch) < 100)
+       i++;
+
+  return i;
+}
+
+struct takeover_pulse_data
+{
+ struct takeover_pulse_data *next;
+ int clan1; //defending clan
+ int clan1points;
+ int clan2; // challenging clan
+ int clan2points;
+ int zone;
+ int pulse;
+};
+bool can_collect(int zone)
+{
+  struct takeover_pulse_data *take;
+  for (take = pulse_list;take;take = take->next)
+	if (zone == take->zone && take->clan2 != -2)
+		return FALSE;
+  return TRUE;
+}
+
+
+
+bool can_challenge(int clan, int zone)
+{
+  struct takeover_pulse_data *take;
+  for (take = pulse_list;take;take = take->next)
+    if (take->clan2 == -2 && 
+		take->clan1 == clan && zone == take->zone)
+	return FALSE;
+    else if (zone == take->zone && take->clan2 > 0 &&
+		take->clan1 > 0)
+	return FALSE;
+  return TRUE;  
+}
+
+void takeover_pause(int clan, int zone)
+{
+    struct takeover_pulse_data *pl;
+    #ifdef LEAK_CHECK
+         pl = (struct takeover_pulse_data *)calloc(1, sizeof(struct takeover_pulse_data));
+    #else
+         pl = (struct takeover_pulse_data *)dc_alloc(1, sizeof(struct takeover_pulse_data));
+    #endif
+    pl->next = pulse_list;
+    pl->clan1 = clan;
+    pl->clan2 = -2;
+    pl->pulse = 0;
+    pl->zone = zone;
+    pulse_list = pl;
+ 
+}
+
+void claimArea(int clan, bool defend, bool challenge, int clan2, int zone)
+{
+  char buf[MAX_STRING_LENGTH];
+
+  if (challenge) {
+    if (!defend) {
+//      zone_table[zone].gold = 0;
+      sprintf(buf, "\r\n##Clan %s has broken clan %s's control of%s!", 
+	get_clan(clan)->name, get_clan(clan2)->name, zone_table[zone].name);
+      takeover_pause(clan2, zone);
+    } else {
+      takeover_pause(clan2, zone);
+      sprintf(buf, "\r\n##Clan %s has defended against clan %s's challenge for control of%s!", 
+	get_clan(clan)->name, get_clan(clan2)->name, zone_table[zone].name);
+    }
+  } else{
+      sprintf(buf, "\r\n##%s has been claimed by clan %s!", 
+	zone_table[zone].name,get_clan(clan)->name);
+     zone_table[zone].gold = 0;
+  }
+  zone_table[zone].clanowner = clan;
+  send_info(buf);
+}
+
+int count_controlled_areas(int clan)
+{
+  int i,z=0;
+  for (i = 0; i <= top_of_zonet; i++)
+    if (zone_table[i].clanowner == clan && can_collect(i)) z++;
+  struct takeover_pulse_data *plc;
+  for (plc = pulse_list;plc;plc=plc->next)
+    if ((plc->clan1 == clan || plc->clan2 == clan) && !plc->clan2 == -2) z++;
+  return z;
+}
+
+void recycle_pulse_data(struct takeover_pulse_data *pl)
+{
+  struct takeover_pulse_data *plc, *plp = NULL;
+  for (plc = pulse_list;plc;plc = plc->next)
+  {
+	if (plc == pl)
+	{
+		if (plp) plp->next = plc->next;
+		else pulse_list = plc->next;
+		dc_free(pl);
+		return; // No point going on..
+	}
+	plp = plc;
+  }
+}
+
+int online_clan_members(int clan)
+{
+  CHAR_DATA *Tmpch;
+  int i =0;
+  for (Tmpch = character_list;Tmpch;Tmpch = Tmpch->next)
+  {
+	if (!IS_NPC(Tmpch) && Tmpch->clan == clan && GET_LEVEL(Tmpch) < 100)
+		i++;
+  }
+  return i;
+}
+
+void check_victory(struct takeover_pulse_data *take)
+{
+    if (take->clan2 == -2) return;
+    if (take->clan1points >= 15)
+    {
+	claimArea(take->clan1, TRUE, TRUE, take->clan2,take->zone);
+	recycle_pulse_data(take);
+    }
+    else if (take->clan2points >= 15)
+    {
+	claimArea(take->clan2, FALSE, TRUE, take->clan1,take->zone);
+	recycle_pulse_data(take);
+    }
+}
+
+
+void check_quitter(CHAR_DATA *ch)
+{
+  if (!ch->clan) return;
+  char buf[MAX_STRING_LENGTH];
+  if (count_controlled_areas(ch->clan) >= online_clan_members(ch->clan))
+  { // One needs to go.
+     int i = number(1, count_controlled_areas(ch->clan));
+     int a,z = 0;
+     for (a = 0; a <= top_of_zonet; a++)
+	if (zone_table[a].clanowner == ch->clan && can_collect(a))
+		if (++z == i)
+		{
+			zone_table[a].gold = 0;
+			zone_table[a].clanowner = 0;
+			sprintf(buf, "\r\n##Clan %s has lost control of%s!\r\n",
+				get_clan(ch->clan)->name, zone_table[a].name);
+			send_info(buf);
+			return;
+		}
+     struct takeover_pulse_data *pl;
+     for (pl = pulse_list;pl;pl = pl->next)
+     {
+	if (pl->clan1 == ch->clan && pl->clan2 != -2)
+		if (++z == i)
+		{
+			pl->clan2points += 20;
+			check_victory(pl);
+			return;
+		}
+	if (pl->clan2 == ch->clan)
+		if (++z == i)
+		{
+			pl->clan1points += 20;
+			check_victory(pl);
+			return;
+		}
+     }
+  }
+}
+
+void pk_check(CHAR_DATA *ch, CHAR_DATA *victim)
+{
+  if (!ch || !victim) return;
+  if (!ch->clan || !victim->clan) return; // No point;
+  struct takeover_pulse_data *plc,*pln;
+  for (plc = pulse_list; plc; plc=pln)
+  {
+    pln = plc->next;
+    if (plc->clan1 == ch->clan && plc->clan2 == victim->clan)
+	plc->clan1points += 2;
+    else if (plc->clan1 == victim->clan && plc->clan2 == ch->clan)
+	plc->clan2points += 2;
+    check_victory(plc);   
+  }
+}
+
+void pulse_takeover()
+{ 
+  struct takeover_pulse_data *take,*next;
+  for (take = pulse_list;take;take = next)
+  {
+	next = take->next;
+    take->pulse++;
+   if (take->clan2 == -2)
+   { // stopthing
+     if (take->pulse >= 36)
+	recycle_pulse_data(take);
+     continue;
+   }
+   if (take->pulse < 2) continue; // first two pulses nothing happens
+   if (take->pulse > 30 && take->clan2 != -2) {
+        char buf[MAX_STRING_LENGTH];
+	sprintf(buf, "\r\n##Control of%s has been lost!\r\n",
+		zone_table[take->zone].name);
+	send_info(buf);
+	zone_table[take->zone].clanowner = 0;
+	zone_table[take->zone].gold = 0;
+	recycle_pulse_data(take);
+	continue;
+   }
+
+    int favour = count_plrs(take->zone, take->clan1) - count_plrs(take->zone, take->clan2);
+    if (favour > 0)
+	take->clan1points += favour;
+     else
+	take->clan2points -= favour; // it's negative, so that's a +
+    
+    check_victory(take);
+  }  
+}
+
+int do_clanarea(CHAR_DATA *ch, char *argument, int cmd)
+{
+  char arg[MAX_INPUT_LENGTH];
+  argument = one_argument(argument, arg);
+
+  if (!ch->clan)
+  {
+	send_to_char("You're not in a clan!\r\n",ch);
+	return eFAILURE;
+  }
+  if (!has_right(ch, CLAN_RIGHTS_AREA))
+  {
+	send_to_char("You have not been granted that right.\r\n",ch);
+	return eFAILURE;
+  }  
+  if (!str_cmp(arg, "claim"))
+  {
+    if (zone_table[world[ch->in_room].zone].clanowner > 0)
+    {
+	csendf(ch, "This area is claimed by %s, you need to challenge to obtain leadership.\r\n",
+			get_clan(zone_table[world[ch->in_room].zone].clanowner)->name);
+
+	return eFAILURE;
+    }
+    if (IS_SET(zone_table[world[ch->in_room].zone].zone_flags, ZONE_NOCLAIM))
+    {
+	send_to_char("This area cannot be claimed.\r\n",ch);
+	return eFAILURE;
+    }
+    if (count_controlled_areas(ch->clan) >= online_clan_members(ch->clan))
+    {
+	send_to_char("You cannot claim any more areas.\r\n",ch);
+	return eFAILURE;
+    }
+    send_to_char("You claim the area on behalf of your clan.\r\n",ch);
+    char buf[MAX_STRING_LENGTH];
+    sprintf(buf, "\r\n##%s has been claimed by %s!\r\n",
+		zone_table[world[ch->in_room].zone].name, get_clan(ch->clan)->name);
+    send_info(buf);
+    zone_table[world[ch->in_room].zone].clanowner = ch->clan;
+    zone_table[world[ch->in_room].zone].gold = 0;
+    return eSUCCESS;
+  }
+  else if (!str_cmp(arg, "yield"))
+  {
+    if (zone_table[world[ch->in_room].zone].clanowner == 0)
+    {
+	send_to_char("This zone is not under anyone's control.\r\n",ch);
+	return eFAILURE;
+    }
+    if (zone_table[world[ch->in_room].zone].clanowner != ch->clan)
+    {
+	send_to_char("This zone is not under your clan's control.\r\n",ch);
+	return eFAILURE;
+    }
+
+    struct takeover_pulse_data *take;
+    for (take = pulse_list;take; take = take->next)
+	if (take->zone == world[ch->in_room].zone &&
+		take->clan1 == ch->clan && take->clan2 !=
+		-2)
+	{
+		take->clan2points += 20;
+		check_victory(take);
+		return eSUCCESS;
+	}
+    send_to_char("You yield the area on behalf of your clan.\r\n",ch);
+    char buf[MAX_STRING_LENGTH];
+    sprintf(buf, "\r\n##Clan %s has yielded control of%s!\r\n",
+	get_clan(ch->clan)->name,zone_table[world[ch->in_room].zone].name);
+    send_info(buf);
+    zone_table[world[ch->in_room].zone].clanowner = 0;
+    zone_table[world[ch->in_room].zone].gold = 0;
+    return eSUCCESS;
+  } else if (!str_cmp(arg, "collect"))
+  {
+    if (zone_table[world[ch->in_room].zone].clanowner == 0)
+    {
+	send_to_char("This area is not under anyone's control.\r\n",ch);
+	return eFAILURE;
+    }
+    
+    if (zone_table[world[ch->in_room].zone].clanowner != ch->clan)
+    {
+	send_to_char("This area is not under your clan's control.\r\n",ch);
+	return eFAILURE;
+    }
+   
+    if (zone_table[world[ch->in_room].zone].gold == 0)
+    {
+	send_to_char("There is no gold to collect.\r\n",ch);
+	return eFAILURE;
+    }
+    if (!!can_collect(world[ch->in_room].zone))
+    {
+	send_to_char("There is currently an active challenge for this area, and collecting is not possible.\r\n",ch);
+	return eFAILURE;
+    }
+    get_clan(ch)->balance += zone_table[world[ch->in_room].zone].gold;
+    csendf(ch, "You collect %d gold for your clan's treasury.\r\n",
+	    zone_table[world[ch->in_room].zone].gold);
+    zone_table[world[ch->in_room].zone].gold = 0;
+    save_clans();
+    return eSUCCESS;
+  } else if (!str_cmp(arg, "list")) {
+	int i,z=0;
+	for (i = 0; i <= top_of_zonet; i++)
+	  if (zone_table[i].clanowner == ch->clan)
+	  {
+		if (++z == 1)
+		  csendf(ch, "$BAreas Claimed by %s:$R\r\n",
+		    get_clan(ch)->name);
+		csendf(ch, "%d)%s\r\n",
+			z, zone_table[i].name);
+	  }
+	if (z  == 0)
+	{
+		send_to_char("Your clan has not claimed any areas.\r\n",ch);
+		return eFAILURE;
+	}
+    return eSUCCESS;
+  } else if (!str_cmp(arg, "challenge")) {
+    // most annoying one for last.
+    if (zone_table[world[ch->in_room].zone].clanowner == 0)
+    {
+	send_to_char("This area is not under anyone's control, you could simply claim it.\r\n",ch);
+	return eFAILURE;
+    }
+    if (!can_challenge(ch->clan, world[ch->in_room].zone))
+    {
+	send_to_char("You cannot issue a challenge for this area at the moment.\r\n",ch);
+	return eFAILURE;
+    }
+    if (zone_table[world[ch->in_room].zone].clanowner == ch->clan)
+    {
+	send_to_char("Your clan already controls this area!\r\n",ch);
+	return eFAILURE;
+    }
+    if (count_controlled_areas(ch->clan) >= online_clan_members(ch->clan))
+    {
+	send_to_char("You cannot own any more areas.\r\n",ch);
+	return eFAILURE;
+    }
+
+    // no point checking for noclaim flag, at this point it already IS under someone's control    
+    struct takeover_pulse_data *pl;
+    #ifdef LEAK_CHECK
+         pl = (struct takeover_pulse_data *)calloc(1, sizeof(struct takeover_pulse_data));
+    #else
+         pl = (struct takeover_pulse_data *)dc_alloc(1, sizeof(struct takeover_pulse_data));
+    #endif
+    pl->next = pulse_list;
+    pl->clan1 = zone_table[world[ch->in_room].zone].clanowner;
+    pl->clan2 = ch->clan;
+    pl->clan1points = pl->clan2points = 0;
+    pl->pulse = 0;
+    pl->zone = world[ch->in_room].zone;
+    pulse_list = pl;
+    char buf[MAX_STRING_LENGTH];
+    sprintf(buf, "\r\n##Clan %s has challenged clan %s for control of%s!\r\n",
+			get_clan(ch)->name, get_clan(pl->clan1)->name, 
+			zone_table[world[ch->in_room].zone].name);
+    send_info(buf);
+    return eSUCCESS;
+  }
+  send_to_char("Clan Area Commands:\r\n"
+		"--------------------\r\n"
+		"clanarea list         (lists areas currently claimed by your clan)\r\n"
+		"clanarea claim        (claim the area you are currently in for your clan)\r\n"
+		"clanarea challenge    (challenge for control of the area you are currently in)\r\n"
+		"clanarea yield        (yield an area your clan controls that you are currently in)\r\n"
+		"clanarea collect      (collect bounty from an area you are currently in that your clan controls)\r\n",ch);
+  return eSUCCESS;
+}

@@ -2,7 +2,7 @@
 #define CLAN_H_
 
 /************************************************************************
-| $Id: clan.h,v 1.14 2005/04/09 21:15:35 urizen Exp $
+| $Id: clan.h,v 1.15 2006/04/09 23:32:31 dcastle Exp $
 | clan.h
 | Description:  Header information for clans.
 */
@@ -25,7 +25,8 @@ void save_clans();
 #define CLAN_RIGHTS_TAX		 1<<9
 #define CLAN_RIGHTS_WITHDRAW	 1<<10
 #define CLAN_RIGHTS_CHANNEL	 1<<11
-//#define CLAN_RIGHTS_DEPOSIT      1<<11 Anyone can deposit
+#define CLAN_RIGHTS_AREA      1<<12
+
 // if you add to the clan rights, update clan_rights[] in clan.C
 
 
