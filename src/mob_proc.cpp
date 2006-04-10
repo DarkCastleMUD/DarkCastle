@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.87 2006/04/10 03:13:19 apocalypse Exp $ */
+/* $Id: mob_proc.cpp,v 1.88 2006/04/10 17:51:59 apocalypse Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -3055,8 +3055,8 @@ static char *dethSayText [ ] =
   "Did you ever notice that when you blow in a dog's face, he gets mad at you, but when you take him for a car ride, he sticks his face out of the window?",
   "Apocalypse is the kind of man who understands, that when you put another man's cock in your mouth, you make a pact.",
   "Chuck Norris' genes aren't DNA. They're barbed wire.",
-  "Since 1940, the year Chuck Norris was born, roundhouse kick related deaths have increased 13,000 percent."
-  "This mud sucks. I'm going to steal the code and make my own!"
+  "Since 1940, the year Chuck Norris was born, roundhouse kick related deaths have increased 13,000 percent.",
+  "This mud sucks. I'm going to steal the code and make my own!",
   "Hmm, I'm not so sure that was meatball sauce I saw Urizen licking off his fingers."
 };
 

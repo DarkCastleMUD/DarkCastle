@@ -197,6 +197,7 @@ void assign_non_combat_procs() {
     assign_one_mob_non(10022, godload_sales);
     assign_one_mob_non(10023, godload_sales);
     assign_one_mob_non(10026, godload_sales);
+    assign_one_mob_non(10024, godload_sales);
     assign_one_mob_non(1939,  guild);
     assign_one_mob_non(1932,  guild);
     assign_one_mob_non(1929,  guild_guard);
