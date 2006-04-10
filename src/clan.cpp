@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.41 2006/04/09 23:32:26 dcastle Exp $ */
+/* $Id: clan.cpp,v 1.42 2006/04/10 17:34:44 dcastle Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -2565,6 +2565,7 @@ struct takeover_pulse_data
  int zone;
  int pulse;
 };
+
 bool can_collect(int zone)
 {
   struct takeover_pulse_data *take;
@@ -2613,12 +2614,12 @@ void claimArea(int clan, bool defend, bool challenge, int clan2, int zone)
   if (challenge) {
     if (!defend) {
 //      zone_table[zone].gold = 0;
-      sprintf(buf, "\r\n##Clan %s has broken clan %s's control of%s!", 
+      sprintf(buf, "\r\n##Clan %s has broken clan %s's control of%s!\r\n", 
 	get_clan(clan)->name, get_clan(clan2)->name, zone_table[zone].name);
       takeover_pause(clan2, zone);
     } else {
       takeover_pause(clan2, zone);
-      sprintf(buf, "\r\n##Clan %s has defended against clan %s's challenge for control of%s!", 
+      sprintf(buf, "\r\n##Clan %s has defended against clan %s's challenge for control of%s!\r\n", 
 	get_clan(clan)->name, get_clan(clan2)->name, zone_table[zone].name);
     }
   } else{
@@ -2663,7 +2664,7 @@ int online_clan_members(int clan)
   int i =0;
   for (Tmpch = character_list;Tmpch;Tmpch = Tmpch->next)
   {
-	if (!IS_NPC(Tmpch) && Tmpch->clan == clan && GET_LEVEL(Tmpch) < 100)
+	if (!IS_NPC(Tmpch) && Tmpch->clan == clan && GET_LEVEL(Tmpch) < 100 && Tmpch->desc)
 		i++;
   }
   return i;
@@ -2869,7 +2870,7 @@ int do_clanarea(CHAR_DATA *ch, char *argument, int cmd)
 	send_to_char("There is no gold to collect.\r\n",ch);
 	return eFAILURE;
     }
-    if (!!can_collect(world[ch->in_room].zone))
+    if (!can_collect(world[ch->in_room].zone))
     {
 	send_to_char("There is currently an active challenge for this area, and collecting is not possible.\r\n",ch);
 	return eFAILURE;
