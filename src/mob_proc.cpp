@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.86 2006/03/24 00:53:43 apocalypse Exp $ */
+/* $Id: mob_proc.cpp,v 1.87 2006/04/10 03:13:19 apocalypse Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -3056,6 +3056,8 @@ static char *dethSayText [ ] =
   "Apocalypse is the kind of man who understands, that when you put another man's cock in your mouth, you make a pact.",
   "Chuck Norris' genes aren't DNA. They're barbed wire.",
   "Since 1940, the year Chuck Norris was born, roundhouse kick related deaths have increased 13,000 percent."
+  "This mud sucks. I'm going to steal the code and make my own!"
+  "Hmm, I'm not so sure that was meatball sauce I saw Urizen licking off his fingers."
 };
 
 #define DETH_SAY_TEXT_SIZE    ( sizeof ( dethSayText )    / sizeof ( char * ) )
