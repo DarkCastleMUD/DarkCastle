@@ -1137,36 +1137,36 @@ int restring_machine(struct char_data *ch, struct obj_data *obj, int cmd, char *
     return eFAILURE;
 
   act("The machine flashes and shoots sparks and smoke throughout the room.", ch, 0, 0, TO_ROOM, 0);
-  send_to_char("The machine beeps and emits a voice.\n", ch);
+  send_to_char("The machine beeps and emits hollow a voice...\n", ch);
 
   half_chop(arg, name, buf);
 
   if(!*arg || !*name || !*buf )
   {
-    send_to_char("'Restring Machine v1.2' *beep*'\r\n"
+    send_to_char("'Restring Machine v2.1' *beep*'\r\n"
                  "'restring <Item> <Description>' *beep*'\r\n"
                  "'This requires up to 50 platinum.  *beep*'\r\n"
-                 "'Currently only works on godload. *beep*'\r\n"
-                 "'Careful to type correctly.  No refunds.'\r\n"
+                 "'This will only work on Godload. *beep*'\r\n"
+                 "'Be careful and type correctly.  No refunds.'\r\n"
                  , ch);
     return eSUCCESS;
   }
 
   if(!(target_obj = get_obj_in_list_vis(ch, name, ch->carrying)))
   {
-    send_to_char("'Cannot find item in your inventory.  *beep*'\n", ch);
+    send_to_char("'Cannot find this item in your inventory.  *beep*'\n", ch);
     return eSUCCESS;
   }
 
   if(!IS_SET(target_obj->obj_flags.extra_flags, ITEM_SPECIAL))
   {
-    send_to_char("'Item must be godload.  *beep*'\n", ch);
+    send_to_char("'The item must be godload.  *beep*'\n", ch);
     return eSUCCESS;
   }
 
   if(GET_PLATINUM(ch) < (uint32)(GET_LEVEL(ch)) )
   {
-    send_to_char("'Not enough platinum.  *beep*'\n", ch);
+    send_to_char("'Insufficient platinum.  *beep*'\n", ch);
     return eSUCCESS;
   }
 
@@ -1175,9 +1175,10 @@ int restring_machine(struct char_data *ch, struct obj_data *obj, int cmd, char *
 //  dc_free(target_obj->short_description);
 //  target_obj->short_description = (char *) dc_alloc(strlen(buf)+1, sizeof(char));
 //  strcpy(target_obj->short_description, buf);
+  sprintf(buf, "$B$7%s$R", buf)
   target_obj->short_description = str_hsh(buf);
 
-  send_to_char("\r\n'Beginning magical transformation process.'\r\n"
+  send_to_char("\r\n'Beginning magical transformation process. *beep*'\r\n"
                "You put your item into the machine and close the lid.\r\n"
                "Smoke pours out of the machine and sparks fly out blackening the floor.\r\n"
                "Your item looks new!\r\n\r\n"

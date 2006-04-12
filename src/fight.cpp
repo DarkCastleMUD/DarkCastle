@@ -5,7 +5,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.289 2006/04/09 23:32:26 dcastle Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.290 2006/04/12 03:19:38 apocalypse Exp $ */
 
 extern "C"
 {
@@ -3950,7 +3950,7 @@ void dam_message(int dam, CHAR_DATA * ch, CHAR_DATA * victim,
   if( 0 == dam && IS_SET(modifier, COMBAT_MOD_IGNORE) ) 
   {
      sprintf(buf1, "$n's pitiful attack is ignored by $N!");
-     sprintf(buf2, "Your weak attack is completely ignored by $N!");
+     sprintf(buf2, "Your pitiful attack is completely ignored by $N!");
      sprintf(buf3, "You ignore $n's pitiful attack.");
      act(buf1, ch, NULL, victim, TO_ROOM, NOTVICT);
      act(buf2, ch, NULL, victim, TO_CHAR, 0);
@@ -3960,76 +3960,99 @@ void dam_message(int dam, CHAR_DATA * ch, CHAR_DATA * victim,
  
   vx = "";
   
-  if(dam == 0) { 
-    vs = "miss";
-    vp = "misses";
+ if(dam == 0) { 
+   vs = "miss";
+   vp = "misses";
   }
-  else if(dam <= 2) { 
-    vs = "tickle";
-    vp = "tickles";
-	 }
-  else if(dam <= 5) { 
-    vs = "graze";
-    vp = "grazes";
-	 }
-  else if(dam <= 10) { 
-    vs = "hit";
-    vp = "hits";
+ else if(dam <= 2) { 
+   vs = "tickle";
+   vp = "tickles";
   }
-  else if(dam <= 15) { 
-    vs = "hit";
-    vp = "hits";
-    vx = " hard";
+ else if(dam <= 5) {
+   vs = "scratch";
+   vp = "scratches";
   }
-  else if(dam <= 20) { 
-    vs = "hit";
-    vp = "hits";
-    vx = " very hard";
+ else if(dam <= 9) { 
+   vs = "graze";
+   vp = "grazes";
   }
-  else if(dam <= 27) { 
-    vs = "hit";
-    vp = "hits";
-    vx = " damn hard";
-	 }
-  else if(dam <= 35) { 
-    vs = "massacre";
-    vp = "massacres";
+ else if(dam <= 14) { 
+   vs = "hit";
+   vp = "hits";
   }
-  else if(dam <= 49) { 
-    vs = "annihilate";
-    vp = "annihilates";
+ else if(dam <= 19) { 
+   vs = "hit";
+   vp = "hits";
+   vx = " hard";
   }
-  else if(dam <= 55) { 
-    vs = "obliterate";
-    vp = "obliterates"; 
+ else if(dam <= 25) { 
+   vs = "hit";
+   vp = "hits";
+   vx = " very hard";
   }
-  else if(dam <= 70) {
-    vs = "cremate";
-    vp = "cremates";
+ else if(dam <= 31) { 
+   vs = "hit";
+   vp = "hits";
+   vx = " damn hard";
   }
-  else if(dam <= 90) {
-    vs = "beat the shit out of";
-    vp = "beats the shit out of";
-  } 
-  else if(dam <= 115) {
-    vs = "brutally pummel";
-    vp = "brutally pummels";
+ else if(dam <= 39) { 
+   vs = "pummel";
+   vp = "pummels";
   }
-  else if(dam <= 140) {
-    vs = "BEAT THE LIVING SHIT out of";
-    vp = "BEATS THE LIVING SHIT out of";
+ else if(dam <= 49) { 
+   vs = "massacre";
+   vp = "massacres";
   }
-  else if(dam <= 180) {
-    vs = "POUND THE FUCK out of";
-    vp = "POUNDS THE FUCK out of";
+ else if(dam <= 59) { 
+   vs = "annihilate";
+   vp = "annihilates";
   }
-  else if(dam <= 230) {
-    vs = "FUCKING DEMOLISH";
-    vp = "FUCKING DEMOLISHES";
+ else if(dam <= 69) { 
+   vs = "obliterate";
+   vp = "obliterates"; 
   }
-  else { 
+ else if(dam <= 79) {
+   vs = "cremate";
+   vp = "cremates";
+  }
+ else if(dam <= 94) {
+   vs = "decimate";
+   vp = "decimates";
+  }
+ else if(dam <= 109) {
+   vs = "mangle";
+   vp = "mangles";
+  }
+ else if(dam <= 129) {
+   vs = "eviscerate";
+   vp = "eviscerates";
+  }
+ else if(dam <= 149) {
+   vs = "beat the shit out of";
+   vp = "beats the shit out of";
+  }
+ else if(dam <= 174) {
+   vs = "BEAT THE LIVING SHIT out of";
+   vp = "BEATS THE LIVING SHIT out of";
+  }
+ else if(dam <= 204) {
+   vs = "POUND THE FUCK out of";
+   vp = "POUNDS THE FUCK out of";
+  }
+ else if(dam <= 249) {
+   vs = "FUCKING DEMOLISH";
+   vp = "FUCKING DEMOLISHES";
+  }
+ else if(dam <= 299) {
+   vs = "TOTALLY FUCKING ERADICATE";
+   vp = "TOTALLY FUCKING ERADICATES";
+  }
+ else if(dam <= 999) {
      vs = "TOTALLY FUCKING DISINTEGRATE";
      vp = "TOTALLY FUCKING DISINTEGRATES";
+ else { 
+     vs = "nick";
+     vp = "nicks";
   }
    
    w_type -= TYPE_HIT;
