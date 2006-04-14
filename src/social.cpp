@@ -40,7 +40,15 @@ bool check_social( struct char_data *ch, char *pcomm, int length, char *arg )
     char buf[MAX_INPUT_LENGTH];
     struct social_messg *action = 0;
     struct char_data *vict;
-
+//    char argz[MAX_INPUT_LENGTH];
+  //  pcomm = one_argument(pcomm, argz);
+    if (*arg) arg++;
+    int i=0;
+     while (*(pcomm+i)!='\0')
+        if (*(pcomm+i)==' ')
+	  { *(pcomm+i) = '\0';   break;}
+	else
+	  i++;
     if(!(action = find_social(pcomm)))
       return FALSE;
 
@@ -169,13 +177,40 @@ int read_social_from_file(long int num_social, FILE * fl)
 // this function used by qsort to sort the social array
 int compare_social_sort(const void * A, const void * B)
 {
-  return strcmp( ((social_messg *) A)->name, ((social_messg *) B)->name );
+  int i;
+  for (i = 0;;i++)
+      if (!(*(((social_messg*)A)->name+i) && *(((social_messg*)B)->name+i)))
+	break;
+      else if ( *(((social_messg*)A)->name+i) > *(((social_messg*)B)->name+i))
+         return 1;
+      else if ( *(((social_messg*)A)->name+i) < *(((social_messg*)B)->name+i))
+	return -1;
+  // Match so far..
+  if (strlen(((social_messg*)A)->name) > strlen(((social_messg*)B)->name))
+    return 1;
+  if (strlen(((social_messg*)A)->name) < strlen(((social_messg*)B)->name))
+    return -1;
+  return 0;
 }
 
 // this function used by qsort to search the social array
 int compare_social_search(const void * A, const void * B)
 {
-  return len_cmp( (char *) A, ((social_messg *) B)->name );
+  int i;
+  for (i = 0;;i++)
+      if (!(*(((char*)A)+i) && *(((social_messg*)B)->name+i)))
+	break;
+      else if ( *(((char*)A)+i) > *(((social_messg*)B)->name+i))
+         return 1;
+      else if ( *(((char*)A)+i) < *(((social_messg*)B)->name+i))
+	return -1;
+  // Match so far..
+  if (strlen(((char*)A)) > strlen(((social_messg*)B)->name))
+    return 1;
+  if (strlen(((char*)A)) < strlen(((social_messg*)B)->name))
+    return 0;
+  return 0;
+//  return len_cmp( (char *) A, ((social_messg *) B)->name );
 } 
 
 void boot_social_messages(void)
@@ -227,7 +262,20 @@ void boot_social_messages(void)
 
 struct social_messg * find_social(char *arg)
 {
-  return (social_messg *) bsearch(arg, soc_mess_list, num_socials, sizeof(struct social_messg), compare_social_search);
+// now uses a linear search
+  int i;
+
+  for(i = 1; i < num_socials; i++)
+	if (!compare_social_search((void*)arg,(void*)&soc_mess_list[i]))
+	  return &soc_mess_list[i];
+
+
+  return NULL;
+//    sprintf(buf + strlen(buf), "%18s", soc_mess_list[i].name);
+
+  
+
+//  return (social_messg *) bsearch(arg, soc_mess_list, num_socials, sizeof(struct social_messg), compare_social_search);
 }
     
 void clean_socials_from_memory()
@@ -263,7 +311,7 @@ int do_social(struct char_data *ch, char *argument, int cmd)
   char buf[MAX_STRING_LENGTH];  
   *buf = '\0';
  
-  for(i = 0; i < num_socials; i++)
+  for(i = 1; i < num_socials; i++)
   {
     sprintf(buf + strlen(buf), "%18s", soc_mess_list[i].name);
     if (!(i % 4))

@@ -160,12 +160,12 @@ int do_news(struct char_data *ch, char *argument, int cmd)
      if (!tnews->news || *tnews->news == '\0') continue;
      strftime(&timez[0], 10,"%d/%b/%y", gmtime(&tnews->time));
      strcpy(old,buf);
-     const char *newsstring = newsify(tnews->news);
+     const char *newsstring = tnews->news;//newsify(tnews->news);
 //     if (str_cmp(otimez,timez)) {   
        if (up)
-	sprintf(buf, "%s$B$4[ $3%-9s $4] $R%s\n", old, timez, newsstring);
+	sprintf(buf, "%s$B$4[ $3%-9s $4] \r\n$R%s\n", old, timez, newsstring);
        else 
-	sprintf(buf, "$B$4[ $3%-9s$4 ] $R%s\n%s", timez, newsstring, old);
+	sprintf(buf, "$B$4[ $3%-9s$4 ] \r\n$R%s\n%s", timez, newsstring, old);
 //	dc_free(newsstring);
   /*   } else {
        if (up)

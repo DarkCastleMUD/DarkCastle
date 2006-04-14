@@ -16,7 +16,7 @@
 /* 12/08/2003   Onager   Added chop_half() to work like half_chop() but    */
 /*                       chopping off the last word.                       */
 /***************************************************************************/
-/* $Id: interp.cpp,v 1.76 2006/04/09 23:32:26 dcastle Exp $ */
+/* $Id: interp.cpp,v 1.77 2006/04/14 14:02:01 dcastle Exp $ */
 
 extern "C"
 {
@@ -670,6 +670,9 @@ int command_interpreter( CHAR_DATA *ch, char *pcomm, bool procced  )
   if((found = find_cmd_in_radix(pcomm)))
     if(GET_LEVEL(ch) >= found->minimum_level && found->command_pointer != NULL) {
       // Character not in position for command?
+	if (GET_POS(ch) == POSITION_FIGHTING && !ch->fighting)
+	  GET_POS(ch) = POSITION_STANDING;
+	// fix for thin air thing
       if ( GET_POS(ch) < found->minimum_position ) {
         switch( GET_POS(ch) ) {
           case POSITION_DEAD:

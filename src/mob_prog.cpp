@@ -483,7 +483,11 @@ void translate_value(char *left, char *right, int16 *vali, uint32 *valui,
 		break;
 					
   }
-    
+
+  if (intval) *vali = *intval;
+  if (uintval) *valui = *uintval;
+//  if (stringval) *valstr = *stringval;
+  if (llval) *vali64 = *llval;
   return;
 }
 
@@ -647,11 +651,11 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
   ye = TRUE;
  }
   
-  int16 lvali;
-  uint32 lvalui;
+  int16 lvali = 0;
+  uint32 lvalui = 0;
   char lvalstr[MAX_STRING_LENGTH];
-  int64 lvali64;
-  sbyte lvalb; 
+  int64 lvali64 = 0;
+  sbyte lvalb=0; 
   int type = 0;
   lvalstr[0] = '\0';
   if (!traditional)
@@ -659,6 +663,13 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
  else // switch order of traditional so it'd be $n(ispc), to conform with
       // new ifchecks
   translate_value(arg,buf,&lvali,&lvalui, &lvalstr[0],&lvali64, &lvalb, mob,actor, obj, vo, rndm);
+
+  if (lvali)
+    return mprog_veval(lvali, opr, atoi(val));
+  if (lvalui)
+    return mprog_veval(lvalui, opr, atoi(val));
+  if (lvali64)
+    return mprog_veval((int)lvali64,opr, atoi(val));
 
   if ( !str_cmp( buf, "rand" ) )
     {

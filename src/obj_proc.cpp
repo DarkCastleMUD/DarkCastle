@@ -1175,8 +1175,9 @@ int restring_machine(struct char_data *ch, struct obj_data *obj, int cmd, char *
 //  dc_free(target_obj->short_description);
 //  target_obj->short_description = (char *) dc_alloc(strlen(buf)+1, sizeof(char));
 //  strcpy(target_obj->short_description, buf);
-  sprintf(buf, "$B$7%s$R", buf)
-  target_obj->short_description = str_hsh(buf);
+  char zarg[MAX_STRING_LENGTH];
+  sprintf(zarg, "$B$7%s$R", buf);
+  target_obj->short_description = str_hsh(zarg);
 
   send_to_char("\r\n'Beginning magical transformation process. *beep*'\r\n"
                "You put your item into the machine and close the lid.\r\n"

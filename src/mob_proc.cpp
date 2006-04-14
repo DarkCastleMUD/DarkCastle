@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.88 2006/04/10 17:51:59 apocalypse Exp $ */
+/* $Id: mob_proc.cpp,v 1.89 2006/04/14 14:02:01 dcastle Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -2287,6 +2287,7 @@ int clan_guard(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 	(in_room == real_room(2360) && cmd != 5) ||
         (in_room == real_room(2370) && cmd != 6) ||
         (in_room == real_room(2410) && cmd != 5) ||
+        (in_room == real_room(2420) && cmd != 3) ||
         (in_room == real_room(2380) && cmd != 1))
 	return eFAILURE;
 
@@ -2333,6 +2334,7 @@ int clan_guard(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     ||   (ch->clan != 17 && in_room == real_room(2370))  // voodoo
     ||   (ch->clan != 13 && in_room == real_room(2380))  // slackers
     ||   (ch->clan != 6 && in_room == real_room(2410))  // timewarp
+    ||   (ch->clan != 19 && in_room == real_room(2420))  // Solaris
 	)
     {
 	act( "$n is turned away from the clan hall.", ch, 0, 0, TO_ROOM , 0);

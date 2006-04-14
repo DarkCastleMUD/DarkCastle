@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.116 2006/04/09 23:32:29 dcastle Exp $
+| $Id: cl_thief.cpp,v 1.117 2006/04/14 14:02:07 dcastle Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -745,6 +745,7 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
       if(!number(0, 4)) {
         act("$n tried to steal something from you!", ch, 0, victim, TO_VICT, 0);
         act("$n tries to steal something from $N.", ch, 0, victim, TO_ROOM, INVIS_NULL|NOTVICT);
+	REMBIT(ch->affected_by, AFF_HIDE);
       } else {
 	act("You managed to keep $N unaware of your failed attempt.", ch, 0, victim, TO_CHAR, 0);
 	return eFAILURE;
@@ -1159,7 +1160,7 @@ int do_pocket(CHAR_DATA *ch, char *argument, int cmd)
   }
   GET_MOVE(ch) -= 6;
 
-  WAIT_STATE(ch, 16); /* It takes TIME to steal */
+  WAIT_STATE(ch, 20); /* It takes TIME to steal */
 
 
 //    skill_increase_check(ch, SKILL_POCKET, has_skill(ch,SKILL_POCKET),SKILL_INCREASE_MEDIUM);
@@ -1172,6 +1173,7 @@ int do_pocket(CHAR_DATA *ch, char *argument, int cmd)
 	    if(number(0, 6)) {
       act("You discover that $n has $s hands in your wallet.", ch,0,victim,TO_VICT, 0);
       act("$n tries to steal gold from $N.", ch, 0, victim, TO_ROOM, NOTVICT|INVIS_NULL);
+	REMBIT(ch->affected_by, AFF_HIDE);
     } else {
       act("You manage to keep $N unaware of your botched attempt.", ch, 0, victim, TO_CHAR, 0);
       return eFAILURE;
