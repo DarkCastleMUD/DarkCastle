@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.103 2006/04/09 23:32:26 dcastle Exp $ */
+/* $Id: db.cpp,v 1.104 2006/04/14 14:00:41 dcastle Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -2383,6 +2383,7 @@ void read_one_zone(FILE * fl, int zon)
   zone_table[zon].name = check;
   zone_table[zon].top  = fread_int(fl, 0, 64000);
   zone_table[zon].clanowner = 0;
+  zone_table[zon].gold = 0;
   extern void debug_point();
 
 //  if (tmp == 23)
@@ -3148,9 +3149,12 @@ CHAR_DATA *clone_mobile(int nr)
 
   handle_automatic_mob_settings(mob);
   float mult = 1.0;
-  if (GET_LEVEL(mob) > 80) { mult = 1.5;}
-  else if (GET_LEVEL(mob) > 70) {mult = 1.3;}
-  else if (GET_LEVEL(mob) > 60) {mult = 1.1;}
+  if (!ISSET(mob->mobdata->actflags, ACT_NOMATRIX))
+  {
+    if (GET_LEVEL(mob) > 80) { mult = 1.5;}
+    else if (GET_LEVEL(mob) > 70) {mult = 1.3;}
+    else if (GET_LEVEL(mob) > 60) {mult = 1.1;}
+  }
   mob->max_hit = mob->raw_hit = mob->hit = mob->max_hit*mult;
   mob->mobdata->damnodice *= mult;
   mob->mobdata->damsizedice *= mult;
@@ -3206,6 +3210,7 @@ int create_blank_item(int nr)
     obj->in_room      = NOWHERE;
     obj->next_content = 0;
     obj->next_skill = 0;
+    obj->table = 0;
     obj->carried_by   = 0;
     obj->equipped_by  = 0;
     obj->in_obj       = 0;
@@ -3567,6 +3572,7 @@ struct obj_data *read_object(int nr, FILE *fl)
     obj->short_description  = fread_string (fl, 1);
     obj->description        = fread_string (fl, 1);
     obj->action_description = fread_string (fl, 1);
+    obj->table = 0;
 
     curr_virtno = nr;
     curr_name = obj->name;
@@ -3752,6 +3758,7 @@ struct obj_data *clone_object(int nr)
     obj->affected[i].location = old->affected[i].location;
     obj->affected[i].modifier = old->affected[i].modifier;
   }
+  obj->table = 0;
   obj->next_skill = 0;
   obj->next_content        = 0;
   obj->next        = object_list;

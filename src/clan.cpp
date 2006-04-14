@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.42 2006/04/10 17:34:44 dcastle Exp $ */
+/* $Id: clan.cpp,v 1.43 2006/04/14 14:00:41 dcastle Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -2625,7 +2625,7 @@ void claimArea(int clan, bool defend, bool challenge, int clan2, int zone)
   } else{
       sprintf(buf, "\r\n##%s has been claimed by clan %s!", 
 	zone_table[zone].name,get_clan(clan)->name);
-     zone_table[zone].gold = 0;
+//     zone_table[zone].gold = 0;
   }
   zone_table[zone].clanowner = clan;
   send_info(buf);
@@ -2673,12 +2673,12 @@ int online_clan_members(int clan)
 void check_victory(struct takeover_pulse_data *take)
 {
     if (take->clan2 == -2) return;
-    if (take->clan1points >= 15)
+    if (take->clan1points >= 20)
     {
 	claimArea(take->clan1, TRUE, TRUE, take->clan2,take->zone);
 	recycle_pulse_data(take);
     }
-    else if (take->clan2points >= 15)
+    else if (take->clan2points >= 20)
     {
 	claimArea(take->clan2, FALSE, TRUE, take->clan1,take->zone);
 	recycle_pulse_data(take);
@@ -2688,7 +2688,7 @@ void check_victory(struct takeover_pulse_data *take)
 
 void check_quitter(CHAR_DATA *ch)
 {
-  if (!ch->clan) return;
+  if (!ch->clan || GET_LEVEL(ch) > 100) return;
   char buf[MAX_STRING_LENGTH];
   if (count_controlled_areas(ch->clan) >= online_clan_members(ch->clan))
   { // One needs to go.
@@ -2698,7 +2698,7 @@ void check_quitter(CHAR_DATA *ch)
 	if (zone_table[a].clanowner == ch->clan && can_collect(a))
 		if (++z == i)
 		{
-			zone_table[a].gold = 0;
+//			zone_table[a].gold = 0;
 			zone_table[a].clanowner = 0;
 			sprintf(buf, "\r\n##Clan %s has lost control of%s!\r\n",
 				get_clan(ch->clan)->name, zone_table[a].name);
@@ -2742,6 +2742,16 @@ void pk_check(CHAR_DATA *ch, CHAR_DATA *victim)
   }
 }
 
+bool can_lose(struct takeover_pulse_data *take)
+{
+  CHAR_DATA *ch;
+  for (ch = character_list;ch;ch = ch->next)
+  if (!IS_NPC(ch) && world[ch->in_room].zone == take->zone &&
+	(take->clan1 == ch->clan || take->clan2 == ch->clan))
+	return FALSE;
+  return TRUE;
+}
+
 void pulse_takeover()
 { 
   struct takeover_pulse_data *take,*next;
@@ -2751,18 +2761,18 @@ void pulse_takeover()
     take->pulse++;
    if (take->clan2 == -2)
    { // stopthing
-     if (take->pulse >= 36)
+     if (take->pulse >= 36*4)
 	recycle_pulse_data(take);
      continue;
    }
    if (take->pulse < 2) continue; // first two pulses nothing happens
-   if (take->pulse > 30 && take->clan2 != -2) {
+   if (take->pulse > 120 && take->clan2 != -2 && can_lose(take)) {
         char buf[MAX_STRING_LENGTH];
 	sprintf(buf, "\r\n##Control of%s has been lost!\r\n",
 		zone_table[take->zone].name);
 	send_info(buf);
 	zone_table[take->zone].clanowner = 0;
-	zone_table[take->zone].gold = 0;
+//	zone_table[take->zone].gold = 0;
 	recycle_pulse_data(take);
 	continue;
    }
@@ -2817,7 +2827,7 @@ int do_clanarea(CHAR_DATA *ch, char *argument, int cmd)
 		zone_table[world[ch->in_room].zone].name, get_clan(ch->clan)->name);
     send_info(buf);
     zone_table[world[ch->in_room].zone].clanowner = ch->clan;
-    zone_table[world[ch->in_room].zone].gold = 0;
+//    zone_table[world[ch->in_room].zone].gold = 0;
     return eSUCCESS;
   }
   else if (!str_cmp(arg, "yield"))
@@ -2849,7 +2859,7 @@ int do_clanarea(CHAR_DATA *ch, char *argument, int cmd)
 	get_clan(ch->clan)->name,zone_table[world[ch->in_room].zone].name);
     send_info(buf);
     zone_table[world[ch->in_room].zone].clanowner = 0;
-    zone_table[world[ch->in_room].zone].gold = 0;
+//    zone_table[world[ch->in_room].zone].gold = 0;
     return eSUCCESS;
   } else if (!str_cmp(arg, "collect"))
   {

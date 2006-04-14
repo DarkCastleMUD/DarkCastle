@@ -5,7 +5,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.291 2006/04/12 18:25:51 apocalypse Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.292 2006/04/14 14:00:41 dcastle Exp $ */
 
 extern "C"
 {
@@ -1728,6 +1728,11 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
     GET_POS(victim) = POSITION_FIGHTING;
   }
 
+  if (GET_POS(ch) == POSITION_FIGHTING &&
+	!ch->fighting)
+  { // fix for fighting thin air thing related to poison
+	GET_POS(ch) = POSITION_STANDING;
+  }
   if (GET_POS(ch) > POSITION_STUNNED && ch != victim) {
     if (!ch->fighting && ch->in_room == victim->in_room)
       set_fighting(ch, victim);
@@ -4050,6 +4055,7 @@ void dam_message(int dam, CHAR_DATA * ch, CHAR_DATA * victim,
  else if(dam <= 999) {
      vs = "TOTALLY FUCKING DISINTEGRATE";
      vp = "TOTALLY FUCKING DISINTEGRATES";
+  }
  else { 
      vs = "nick";
      vp = "nicks";
