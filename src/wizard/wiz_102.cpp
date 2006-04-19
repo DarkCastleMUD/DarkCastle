@@ -415,7 +415,7 @@ int do_mpstat(struct char_data *ch, char *arg, int cmd)
 
   if(!has_range)
   {
-    if(!can_modify_mobile(ch, x)) {
+    if(!can_modify_mobile(ch, mob_index[x].virt)) {
       send_to_char("You are unable to work creation outside of your range.\n\r", ch);
       return eFAILURE;
     }
@@ -4341,7 +4341,7 @@ int do_possess(struct char_data *ch, char *argument, int cmd)
     }
     else
     {
-        if (!(victim = get_char(arg)))
+        if (!(victim = get_char_vis(ch, arg)))
              send_to_char("They aren't here.\n\r", ch);
         else
         {

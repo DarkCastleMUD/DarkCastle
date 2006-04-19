@@ -1238,6 +1238,7 @@ void make_prompt(struct descriptor_data *d, char *prompt)
      } else {
         if (!IS_SET(GET_TOGGLES(d->character), PLR_COMPACT))
             strcat(prompt, "\n\r");
+
         struct room_data *rm = &world[d->character->in_room];
         sprintf(buf,
                 IS_SET(GET_TOGGLES(d->character), PLR_ANSI) ?
@@ -1254,7 +1255,6 @@ void generate_prompt(CHAR_DATA *ch, char *prompt)
   char *source;
   char *pro;
   pro = gprompt;
-
   char * mobprompt = "HP: %i/%H %f >";
 
   if(IS_NPC(ch))
@@ -1717,7 +1717,11 @@ int process_output(struct descriptor_data *t)
   /* now, append the 'real' output */
   strcpy(i + 2, t->output);
   
+  extern void blackjack_prompt(CHAR_DATA *ch, char *prompt, bool ascii);
+  if (t->character && t->connected == CON_PLAYING)
+  blackjack_prompt(t->character,i,t->character->pcdata&&!IS_SET(t->character->pcdata->toggles, PLR_ASCII));
   make_prompt(t, i);
+
   /* if we're in the overflow state, notify the user */
   if (t->bufptr < 0)
     strcat(i, "**OVERFLOW**");
@@ -2475,7 +2479,7 @@ void send_to_zone(char *messg, int zone)
    }
 }
 
-void send_to_room(char *messg, int room)
+void send_to_room(char *messg, int room, CHAR_DATA *nta)
 {
     CHAR_DATA *i = NULL;
     if(!world_array[room] || !world[room].people) {
@@ -2483,7 +2487,7 @@ void send_to_room(char *messg, int room)
     }
     if (messg)
         for (i = world[room].people; i; i = i->next_in_room)
-            if (i->desc && !is_busy(i))
+            if (i->desc && !is_busy(i) && nta != i)
                 SEND_TO_Q(messg, i->desc);
 }
 

@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.62 2006/04/09 23:32:27 dcastle Exp $ */
+/* $Id: limits.cpp,v 1.63 2006/04/19 18:59:47 dcastle Exp $ */
 
 extern "C"
 {
@@ -45,6 +45,7 @@ extern "C"
 #include <race.h>
 #include <returnvals.h>
 #include <interp.h>
+#include <clan.h> //totem
 
 extern CHAR_DATA *character_list;
 extern struct obj_data *object_list;
@@ -337,6 +338,7 @@ void redo_hitpoints( CHAR_DATA *ch)
                            -1, TRUE);
       }
   }
+  add_totem_stats(ch, APPLY_HIT);
 }
 
 
@@ -380,6 +382,7 @@ void redo_mana ( CHAR_DATA *ch)
                            -1, TRUE);
       }
   }
+  add_totem_stats(ch, APPLY_MANA);
 }
 
 void redo_ki(CHAR_DATA *ch)
@@ -410,6 +413,7 @@ void redo_ki(CHAR_DATA *ch)
                            -1, TRUE);
       }
   }
+  add_totem_stats(ch, APPLY_KI);
 
 }
 

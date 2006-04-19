@@ -385,9 +385,9 @@ int spell_vampiric_touch (ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct 
     if (!SOMEONE_DIED(retval))
     if (GET_HIT(victim) >= i) return retval;
       
-    if (!SOMEONE_DIED(retval) && GET_HIT(victim) < adam)
+/*    if (!SOMEONE_DIED(retval) && GET_HIT(victim) < adam)
         GET_HIT(ch) += GET_HIT(victim);
-    else GET_HIT(ch) += adam;
+    else*/ GET_HIT(ch) += adam;
     if (GET_HIT(ch) > GET_MAX_HIT(ch))
         GET_HIT(ch) = GET_MAX_HIT(ch);
     return retval;
@@ -397,9 +397,9 @@ int spell_vampiric_touch (ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct 
      int i = GET_HIT(victim);
      int retval =  damage (ch, victim, dam,TYPE_COLD, SPELL_VAMPIRIC_TOUCH, 0);
     if (!SOMEONE_DIED(retval) && GET_HIT(victim) >= i) return retval;
-    if (!SOMEONE_DIED(retval) && GET_HIT(victim) < adam)
+   /* if (!SOMEONE_DIED(retval) && GET_HIT(victim) < adam)
        GET_HIT(ch) += GET_HIT(victim);
-    else GET_HIT(ch) += adam;
+    else*/ GET_HIT(ch) += adam;
     if (GET_HIT(ch) > GET_MAX_HIT(ch))
         GET_HIT(ch) = GET_MAX_HIT(ch);
    return retval;

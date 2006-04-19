@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.99 2006/04/09 23:32:26 dcastle Exp $ */
+/* $Id: handler.cpp,v 1.100 2006/04/19 18:59:47 dcastle Exp $ */
     
 extern "C"
 {
@@ -2644,7 +2644,10 @@ bool has_random(OBJ_DATA *obj);
        obj->equipped_by->beacon = 0;
        obj->equipped_by = 0;
     }
-
+    if (obj->table) {
+	extern void destroy_table(struct table_data *tbl);
+	destroy_table(obj->table);
+    }
     if(obj->equipped_by)
     {
             int iEq;

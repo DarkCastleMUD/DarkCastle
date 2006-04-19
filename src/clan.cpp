@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.43 2006/04/14 14:00:41 dcastle Exp $ */
+/* $Id: clan.cpp,v 1.44 2006/04/19 18:59:47 dcastle Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -2499,7 +2499,7 @@ void add_totem(OBJ_DATA *altar, OBJ_DATA *totem)
    }
 }
 
-void remove_totem_stats(CHAR_DATA *ch)
+void remove_totem_stats(CHAR_DATA *ch, int stat)
 {
   OBJ_DATA *a;
   if (!ch->altar) return;
@@ -2508,15 +2508,22 @@ void remove_totem_stats(CHAR_DATA *ch)
     int j;
     if (a->obj_flags.type_flag != ITEM_TOTEM) continue;
      for(j=0; j<a->num_affects; j++)
+       if (stat && stat == a->affected[j].location)
         affect_modify(ch, a->affected[j].location,
           a->affected[j].modifier, -1, FALSE);
+	else if (!stat)
+        affect_modify(ch, a->affected[j].location,
+          a->affected[j].modifier, -1, FALSE);
+
+  }  
+  if (!stat){
      redo_hitpoints(ch);
      redo_mana(ch);
      redo_ki(ch);
-  }  
+ }
 }
 
-void add_totem_stats(CHAR_DATA *ch)
+void add_totem_stats(CHAR_DATA *ch, int stat)
 {
   OBJ_DATA *a;
   if (!ch->altar) return;
@@ -2525,13 +2532,20 @@ void add_totem_stats(CHAR_DATA *ch)
     int j;
     if (a->obj_flags.type_flag != ITEM_TOTEM) continue;
      for(j=0; j<a->num_affects; j++)
+       if (stat && stat == a->affected[j].location)
         affect_modify(ch, a->affected[j].location,
           a->affected[j].modifier, -1, TRUE);
+	else if (!stat)
+        affect_modify(ch, a->affected[j].location,
+          a->affected[j].modifier, -1, TRUE);
+  }
+  if (!stat){
      redo_hitpoints(ch);
      redo_mana(ch);
      redo_ki(ch);
-  }
+ }
 }
+
 
 /*
 
@@ -2549,7 +2563,7 @@ int count_plrs(int zone, int clan)
   int i = 0;
   for (tmpch = character_list; tmpch; tmpch = tmpch->next)
      if (!IS_NPC(tmpch) && world[tmpch->in_room].zone == zone && clan == tmpch->clan &&
-		GET_LEVEL(tmpch) < 100)
+		GET_LEVEL(tmpch) < 100 && GET_LEVEL(tmpch) > 10)
        i++;
 
   return i;
@@ -2664,7 +2678,7 @@ int online_clan_members(int clan)
   int i =0;
   for (Tmpch = character_list;Tmpch;Tmpch = Tmpch->next)
   {
-	if (!IS_NPC(Tmpch) && Tmpch->clan == clan && GET_LEVEL(Tmpch) < 100 && Tmpch->desc)
+	if (!IS_NPC(Tmpch) && Tmpch->clan == clan && GET_LEVEL(Tmpch) < 100 && Tmpch->desc && GET_LEVEL(Tmpch) > 10)
 		i++;
   }
   return i;
@@ -2686,36 +2700,36 @@ void check_victory(struct takeover_pulse_data *take)
 }
 
 
-void check_quitter(CHAR_DATA *ch)
+void check_quitter(void *arg1, void *arg2,void *arg3)
 {
-  if (!ch->clan || GET_LEVEL(ch) > 100) return;
+  int clan = (int)arg1;
   char buf[MAX_STRING_LENGTH];
-  if (count_controlled_areas(ch->clan) >= online_clan_members(ch->clan))
+  if (count_controlled_areas(clan) > online_clan_members(clan))
   { // One needs to go.
-     int i = number(1, count_controlled_areas(ch->clan));
+     int i = number(1, count_controlled_areas(clan));
      int a,z = 0;
      for (a = 0; a <= top_of_zonet; a++)
-	if (zone_table[a].clanowner == ch->clan && can_collect(a))
+	if (zone_table[a].clanowner == clan && can_collect(a))
 		if (++z == i)
 		{
 //			zone_table[a].gold = 0;
 			zone_table[a].clanowner = 0;
 			sprintf(buf, "\r\n##Clan %s has lost control of%s!\r\n",
-				get_clan(ch->clan)->name, zone_table[a].name);
+				get_clan(clan)->name, zone_table[a].name);
 			send_info(buf);
 			return;
 		}
      struct takeover_pulse_data *pl;
      for (pl = pulse_list;pl;pl = pl->next)
      {
-	if (pl->clan1 == ch->clan && pl->clan2 != -2)
+	if (pl->clan1 == clan && pl->clan2 != -2)
 		if (++z == i)
 		{
 			pl->clan2points += 20;
 			check_victory(pl);
 			return;
 		}
-	if (pl->clan2 == ch->clan)
+	if (pl->clan2 == clan)
 		if (++z == i)
 		{
 			pl->clan1points += 20;
@@ -2725,6 +2739,25 @@ void check_quitter(CHAR_DATA *ch)
      }
   }
 }
+
+void check_quitter(CHAR_DATA *ch)
+{
+  if (!ch->clan || GET_LEVEL(ch) > 100) return;
+  
+          struct timer_data *timer;
+ #ifdef LEAK_CHECK
+          timer = (struct timer_data *)calloc(1, sizeof(struct timer_data));
+ #else
+          timer = (struct timer_data *)dc_alloc(1, sizeof(struct timer_data));
+ #endif
+          timer->arg1 = (void*)ch->clan;
+          timer->function = check_quitter;
+          timer->timeleft = 30;
+	  extern void addtimer(struct timer_data *timer);
+          addtimer(timer);
+
+}
+
 
 void pk_check(CHAR_DATA *ch, CHAR_DATA *victim)
 {
@@ -2766,7 +2799,7 @@ void pulse_takeover()
      continue;
    }
    if (take->pulse < 2) continue; // first two pulses nothing happens
-   if (take->pulse > 120 && take->clan2 != -2 && can_lose(take)) {
+   if (take->pulse > 60 && take->clan2 != -2 && can_lose(take)) {
         char buf[MAX_STRING_LENGTH];
 	sprintf(buf, "\r\n##Control of%s has been lost!\r\n",
 		zone_table[take->zone].name);

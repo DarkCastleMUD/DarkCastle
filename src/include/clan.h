@@ -2,7 +2,7 @@
 #define CLAN_H_
 
 /************************************************************************
-| $Id: clan.h,v 1.15 2006/04/09 23:32:31 dcastle Exp $
+| $Id: clan.h,v 1.16 2006/04/19 18:59:51 dcastle Exp $
 | clan.h
 | Description:  Header information for clans.
 */
@@ -74,7 +74,7 @@ struct clan_data
 
 void add_totem(OBJ_DATA *altar, OBJ_DATA *totem);
 void remove_totem(OBJ_DATA *altar, OBJ_DATA *totem);
-void add_totem_stats(CHAR_DATA *ch);
-void remove_totem_stats(CHAR_DATA *ch);
+void add_totem_stats(CHAR_DATA *ch, int stat = 0);
+void remove_totem_stats(CHAR_DATA *ch, int stat = 0);
 
 #endif /* CLAN_H_ */

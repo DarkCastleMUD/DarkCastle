@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.47 2006/01/13 16:49:15 dcastle Exp $ */
+/* $Id: utility.cpp,v 1.48 2006/04/19 18:59:48 dcastle Exp $ */
 
 extern "C"
 {
@@ -1544,7 +1544,8 @@ void check_timer()
     if (curr->timeleft <= 0)
     {
 	(*(curr->function))(curr->arg1,curr->arg2,curr->arg3);	
-        if (las)
+        if (!nex && curr->next) nex = curr->next;
+	if (las)
 	  las->next = curr->next;
 	else
 	  timer_list = curr->next;

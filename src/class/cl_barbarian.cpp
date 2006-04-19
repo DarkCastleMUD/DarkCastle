@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_barbarian.cpp,v 1.60 2006/04/09 23:32:29 dcastle Exp $
+| $Id: cl_barbarian.cpp,v 1.61 2006/04/19 18:59:50 dcastle Exp $
 | cl_barbarian.C
 | Description:  Commands for the barbarian class.
 */
@@ -302,7 +302,7 @@ int do_headbutt(struct char_data *ch, char *argument, int cmd)
      act("In your enraged state, you shake off $n's attempt to immobilize you.", ch, NULL, victim, TO_VICT, 
 0);
      act("$N shakes off $n's attempt to immobilize them.",ch, NULL, victim, TO_ROOM, NOTVICT);
-     act("$N shakes off your attempt to immobilize them.",ch, NULL, victim, TO_ROOM, NOTVICT);
+     act("$N shakes off your attempt to immobilize them.",ch, NULL, victim, TO_CHAR, NOTVICT);
      WAIT_STATE(ch, PULSE_VIOLENCE*4);
         return eSUCCESS;
   }

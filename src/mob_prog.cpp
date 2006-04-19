@@ -336,8 +336,8 @@ void translate_value(char *left, char *right, int16 *vali, uint32 *valui,
 		{  if (!target) tError = TRUE;
 		  else {intval = &target->saves[SAVE_TYPE_ACID];break;}
 		} else if (!str_cmp(right, "age"))
-		{  if (!target || !target->pcdata) tError = TRUE;
-		  else {int16 age=mud_time_passed(time(0),target->pcdata->time.birth).year+17;intval = &age;}
+		{  if (!target) tError = TRUE;
+		  else {int16 ageint=age(target).year;intval = &ageint;}
 		}
 		break;
     case 'b':
@@ -503,6 +503,7 @@ void debugpoint(){}
  * to reduce the redundancy of the mammoth if statement list.
  * If there are errors, then return -1 otherwise return boolean 1,0
  */
+void debugp(){}
 
 // Azrack -- this was originally returning a bool, but its returning all sorts of values,
 // switched it to int 
@@ -807,17 +808,17 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
 	{
 	case 'i': return 1;
 	case 'z': if (mob->beacon)
-             return IS_NPC(((CHAR_DATA*)mob->beacon));
+             return IS_NPC(((CHAR_DATA*)mob->beacon))/100;
            else return -1;
 
 	case 'n': if ( actor )
-	             return IS_NPC( actor );
+	             return IS_NPC( actor )/100;
 	          else return -1;
 	case 't': if ( vict )
-                     return IS_NPC( vict );
+                     return IS_NPC( vict )/100;
 	          else return -1;
 	case 'r': if ( rndm )
-	             return IS_NPC( rndm );
+	             return IS_NPC( rndm )/100;
 	          else return -1;
 	default:
 	  logf( IMMORTAL, LOG_WORLD, "Mob: %d bad argument to 'isnpc'", mob_index[mob->mobdata->nr].virt ); 
@@ -2082,6 +2083,7 @@ char *mprog_process_if( char *ifchck, char *com_list, CHAR_DATA *mob,
  int  legal;
 
  *null = '\0';
+  if (mob_index[mob->mobdata->nr].virt == 100) debugp();
 
  /* check for trueness of the ifcheck */
  if ( ( legal = mprog_do_ifchck( ifchck, mob, actor, obj, vo, rndm ) ) )

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.58 2006/04/09 23:32:27 dcastle Exp $
+| $Id: inventory.cpp,v 1.59 2006/04/19 18:59:47 dcastle Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -117,15 +117,15 @@ void get(struct char_data *ch, struct obj_data *obj_object, struct obj_data *sub
 	{
 	         int cgold = (int)((float)(obj_object->obj_flags.value[0]) * 0.1);
 		 obj_object->obj_flags.value[0] -= cgold;
+		zone_table[world[ch->in_room].zone].gold += cgold;
 	if(!IS_MOB(ch) && IS_SET(ch->pcdata->toggles, PLR_BRIEF))
 	{
 		tax = TRUE;
 		sprintf(buffer, "%s Bounty: %d", buffer, cgold);
-	}
-	else
-		 csendf(ch, "Clan %s collects %d bounty, leaving %d for you.\r\n",get_clan(zone_table[world[ch->in_room].zone].clanowner)->name,cgold,
-			obj_object->obj_flags.value[0]);
 		zone_table[world[ch->in_room].zone].gold += cgold;
+	}
+	else csendf(ch, "Clan %s collects %d bounty, leaving %d for you.\r\n",get_clan(zone_table[world[ch->in_room].zone].clanowner)->name,cgold,
+			obj_object->obj_flags.value[0]);
 	}
 //	if (sub_object && sub_object->obj_flags.value[3] == 1 && 
 //           !isname("pc",sub_object->name) && ch->clan 

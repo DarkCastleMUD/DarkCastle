@@ -16,7 +16,7 @@
 /* 12/08/2003   Onager   Added chop_half() to work like half_chop() but    */
 /*                       chopping off the last word.                       */
 /***************************************************************************/
-/* $Id: interp.cpp,v 1.77 2006/04/14 14:02:01 dcastle Exp $ */
+/* $Id: interp.cpp,v 1.78 2006/04/19 18:59:47 dcastle Exp $ */
 
 extern "C"
 {
@@ -194,7 +194,7 @@ struct command_info cmd_info[] =
     { "retreat",	do_retreat,	POSITION_FIGHTING, 0, 9, 0, 0 },
     { "disarm",		do_disarm,	POSITION_FIGHTING, 2, 9, 0, 0 },
     { "flee",		do_flee,	POSITION_FIGHTING, 0, 28, COM_CHARMIE_OK, 0 }, 
-    { "hit",		do_hit,		POSITION_FIGHTING, 0, 9, COM_CHARMIE_OK, 0 },
+    { "hit",		do_hit,		POSITION_FIGHTING, 0, 194, COM_CHARMIE_OK, 0 },
     { "join",		do_join,	POSITION_FIGHTING, 0, 9, COM_CHARMIE_OK, 0 },
     { "murder",		do_murder,	POSITION_FIGHTING, 0, 9, COM_CHARMIE_OK, 0 },
     { "rescue",		do_rescue,	POSITION_FIGHTING, 0, 9, 0, 0 },
@@ -240,7 +240,7 @@ struct command_info cmd_info[] =
     { "whoclan",	do_whoclan,	POSITION_DEAD, 0, 9, 0, 1 },
     { "cpromote",	do_cpromote,	POSITION_RESTING, 0, 9, 0, 1 },
     { "clans",		do_clans,	POSITION_SLEEPING, 0, 9, 0, 1 },
-    { "clanarea",      do_clanarea,     POSITION_RESTING, 0, 9, 0, 1 },
+    { "clanarea",      do_clanarea,     POSITION_RESTING, 11, 9, 0, 1 },
     { "cinfo",		do_cinfo,	POSITION_SLEEPING, 0, 9, 0, 1 },
     { "ambush",		do_ambush,	POSITION_RESTING, 0, 9, 0, 1 },
     { "whoarena",	do_whoarena,	POSITION_SLEEPING, 0, 9, 0, 1 },
@@ -277,7 +277,7 @@ struct command_info cmd_info[] =
     { "save",		do_save,	POSITION_DEAD, 0, 9, 0, 1 },
     { "sneak",		do_sneak,	POSITION_STANDING, 1, 9, 0, 0 },
     { "home",		do_home,	POSITION_DEAD, 0, 9, 0, 1 },
-    { "split",		do_split,	POSITION_RESTING, 0, 9, 0, 0 },
+    { "split",		do_split,	POSITION_RESTING, 0, 193, 0, 0 },
     { "spells",		do_spells,	POSITION_SLEEPING, 0, 9, 0, 1 },
     { "steal",		do_steal,	POSITION_STANDING, 1, 9, 0, 10 },
     { "pocket",		do_pocket,	POSITION_STANDING, 1, 9, 0, 10 },
@@ -327,7 +327,10 @@ struct command_info cmd_info[] =
     { "pull",		do_not_here,	POSITION_STANDING, 0, 186, 0, 0 },
     { "gaze",		do_not_here,	POSITION_STANDING, 0, 1820, 0, 0 },
     { "tremor",		do_not_here,	POSITION_FIGHTING, 0, 188, 0, 0 },
-    
+    { "bet",		do_not_here,	POSITION_STANDING, 0, 189, 0, 0 },
+    { "insurance",		do_not_here,	POSITION_STANDING, 0, 190, 0, 0 },
+    { "double",		do_not_here,	POSITION_STANDING, 0, 191, 0, 0 },
+    { "stay",		do_not_here,	POSITION_STANDING, 0, 192, 0, 0 },
     // Immortal commands
     { "thunder",	do_thunder,	POSITION_DEAD, IMP, 9, 0, 1 },
     { "wizlock",	do_wizlock,	POSITION_DEAD, IMP, 9, 0, 1 },

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: non_off.cpp,v 1.33 2006/04/09 23:32:27 dcastle Exp $
+| $Id: non_off.cpp,v 1.34 2006/04/19 18:59:48 dcastle Exp $
 | non_off.C
 | Description:  Implementation of generic, non-offensive commands.
 */
@@ -267,6 +267,7 @@ char * toggle_txt[] = {
   "notax",
   "guide",
   "news-up",
+  "ascii",
   ""
 };
 
@@ -361,6 +362,10 @@ int do_toggle(struct char_data * ch, char * arg, int cmd)
          case 15:
          sprintf(buf + strlen(buf), "%s\n\r",
            IS_SET(ch->pcdata->toggles, PLR_NEWS) ? "on" : "off");
+	break;
+         case 16:
+         sprintf(buf + strlen(buf), "%s\n\r",
+           IS_SET(ch->pcdata->toggles, PLR_ASCII) ? "off" : "on");
          break;
 
 
@@ -444,8 +449,13 @@ int do_toggle(struct char_data * ch, char * arg, int cmd)
     case 14:
     do_guide_toggle(ch, "", 9);
     break;
+
     case 15:
     do_news_toggle(ch, "", 9);
+    break;
+
+    case 16:
+    do_ascii_toggle(ch, "", 9);
     break;
 
     default:
@@ -602,6 +612,25 @@ int do_news_toggle(struct char_data *ch, char *argument, int cmd)
     {
         send_to_char("You now view news in a down-up fashion..\n\r", ch);
         SET_BIT(ch->pcdata->toggles, PLR_NEWS);
+    }
+    
+    return eSUCCESS;
+} 
+
+int do_ascii_toggle(struct char_data *ch, char *argument, int cmd)
+{
+    if (IS_NPC(ch))
+        return eFAILURE; 
+    
+    if (IS_SET(ch->pcdata->toggles, PLR_ASCII))
+    {
+        REMOVE_BIT(ch->pcdata->toggles, PLR_ASCII);
+        send_to_char("Cards are now displayed through ASCII.\n\r", ch);
+    }
+    else 
+    {
+        send_to_char("Cards are no longer dislayed through ASCII.\n\r", ch);
+        SET_BIT(ch->pcdata->toggles, PLR_ASCII);
     }
     
     return eSUCCESS;

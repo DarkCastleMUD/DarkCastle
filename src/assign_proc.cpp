@@ -416,6 +416,7 @@ void assign_objects(void)
 {
   SPEC_FUN board;
   SPEC_FUN bank;
+  SPEC_FUN casino_atm;
   SPEC_FUN holyavenger;
   SPEC_FUN drainingstaff;
   SPEC_FUN souldrainer;
@@ -483,6 +484,7 @@ void assign_objects(void)
   SPEC_FUN godload_alignevil;
   SPEC_FUN godload_hammer;
   SPEC_FUN transfer_thing;
+  SPEC_FUN blackjack_table;
  // combvat procs
   SPEC_FUN godload_banshee;
   SPEC_FUN godload_claws;
@@ -498,6 +500,11 @@ void assign_objects(void)
     assign_one_obj_com(528, godload_leprosy);
 
     assign_one_obj_non(29204, angie_proc);
+    assign_one_obj_non(70, blackjack_table);
+    assign_one_obj_non(21900, blackjack_table);
+    assign_one_obj_non(21901, blackjack_table);
+    assign_one_obj_non(21902, blackjack_table);
+    assign_one_obj_non(21903, blackjack_table);
     assign_one_obj_non(534, godload_cassock);
     assign_one_obj_non(500, godload_stargazer);
     assign_one_obj_non(526, godload_armbands);
@@ -564,6 +571,7 @@ void assign_objects(void)
   assign_one_obj_non(9997,  board); /* imp board */ 
   assign_one_obj_non(9999,  board); /* wiz board */ 
   assign_one_obj_non(9995,  bank);  /* bank */
+  assign_one_obj_non(21904,  casino_atm);  /* ATM */
 //  assign_one_obj_non(17800,  arenaporter);
   assign_one_obj_non(26723,  generic_push_proc);
   assign_one_obj_non(30627,  eliara_non_combat);  

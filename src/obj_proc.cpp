@@ -513,6 +513,46 @@ int bank(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
   return eSUCCESS;
 }
 
+int casino_atm(struct char_data *ch, struct obj_data *obj, int cmd, char *arg, 
+                   CHAR_DATA *invoker)
+{
+  char buf[MAX_INPUT_LENGTH];
+  int32 x;
+
+  if(cmd < 172 || cmd > 174)
+    return eFAILURE;
+
+  /* balance */
+  if(cmd == 172) {
+    sprintf(buf, "You have %d coins in the bank.\n\r", GET_BANK(ch));
+    send_to_char(buf, ch);
+    return eSUCCESS;
+  }
+
+  /* deposit */
+  if(cmd == 173) {
+    send_to_char("You cannot use this for depositing money.\r\n",ch);
+    return eSUCCESS;
+  }
+
+  /* withdraw */
+  one_argument(arg, buf);
+  if(!*buf || !(x = atoi(buf)) || x < 0) {
+    send_to_char("Withdraw what?\n\r", ch);
+    return eSUCCESS;
+  }
+  if((uint32)x > GET_BANK(ch)) {
+    send_to_char("You don't have that much gold in the bank!\n\r", ch);
+    return eSUCCESS;
+  }
+  GET_GOLD(ch) += x;
+  GET_BANK(ch) -= x;
+  sprintf(buf, "You withdraw %d coins.\n\r", x);
+  send_to_char(buf, ch);
+  save_char_obj(ch);
+  return eSUCCESS;
+}
+
 // if you are in the room with this obj, and you try to go in any
 // direction, and you don't have the correct obj in your inventory, it sends
 // you to a particular room 
