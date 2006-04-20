@@ -412,7 +412,7 @@ int do_mpstat(struct char_data *ch, char *arg, int cmd)
     }
     x = vict->mobdata->nr;
   }
-
+/*
   if(!has_range)
   {
     if(!can_modify_mobile(ch, mob_index[x].virt)) {
@@ -420,7 +420,7 @@ int do_mpstat(struct char_data *ch, char *arg, int cmd)
       return eFAILURE;
     }
   }
-
+*/
   mpstat(ch, (char_data *) mob_index[x].item);
   return eSUCCESS;
 }

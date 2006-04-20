@@ -46,6 +46,7 @@ void addtimer(struct timer_data *add);
 int hand_number(struct player_data *plr);
 int hands(struct player_data *plr);
 void blackjack_prompt(CHAR_DATA *ch, char *prompt, bool ascii);
+bool charExists(CHAR_DATA *ch);
 
 struct player_data
 {
@@ -74,6 +75,7 @@ struct table_data
   struct cDeck *deck;
   struct player_data *plr;
   struct player_data *cr; // current
+  bool gold;
   int options;
   CHAR_DATA *dealer;
   int hand_data[21]; // dealer
@@ -117,16 +119,21 @@ void switch_cards(struct cDeck *tDeck, int pos1, int pos2)
 
 void free_player(struct player_data *plr)
 {
-  struct player_data *tmp,*prev = NULL;
+  struct player_data *tmp,*prev = NULL,*pnext;
   struct table_data *tbl = plr->table;
   for (tmp = tbl->plr;tmp;tmp = tmp->next)
   {
+    pnext = tmp->next;
     if (tmp == plr)
     {
 	if (prev) prev->next = plr->next;
 	else	  tbl->plr = plr->next;
     }
     prev = tmp;
+  }
+  if (plr->ch && charExists(plr->ch) && !IS_NPC(plr->ch))
+  {
+     do_save(plr->ch, "", 666);
   }
   if (tbl->cr == plr)
   {
@@ -137,6 +144,7 @@ void free_player(struct player_data *plr)
 	else
 	reset_table(tbl);*/
   }
+  if (!tbl->plr) reset_table(tbl);
   dc_free(plr);
 }
 
@@ -153,24 +161,6 @@ void nextturn(struct table_data *tbl)
 	}
 }
 
-bool verify(struct player_data *plr)
-{
-  // make sure player didn't quit, die, or whatever
-  CHAR_DATA *ch;
-
-  for (ch = character_list;ch;ch=ch->next)
-    if (ch == plr->ch) break;
-
-  if (!ch || ch->in_room != plr->table->obj->in_room) 
-  {
-    free_player(plr); 
-    return FALSE; 
-  }// dead or quit
-  return TRUE;
-}
-
-
-
 void send_to_table(char *msg, struct table_data *tbl, struct player_data *plrSilent = NULL)
 {
   struct player_data *plr;
@@ -181,6 +171,41 @@ void send_to_table(char *msg, struct table_data *tbl, struct player_data *plrSil
 if (tbl->obj->in_room)
   send_to_room(msg, tbl->obj->in_room, plrSilent?plrSilent->ch:0);
 }
+bool charExists(CHAR_DATA *ch)
+{
+  CHAR_DATA *tch;
+
+  for (tch = character_list;ch;ch=ch->next)
+    if (tch ==ch) break;
+  if (tch) return TRUE;
+  return FALSE;
+}
+
+bool verify(struct player_data *plr)
+{
+  // make sure player didn't quit, die, or whatever
+  CHAR_DATA *ch;
+
+  for (ch = character_list;ch;ch=ch->next)
+    if (ch == plr->ch) break;
+
+  if (!ch || ch->in_room != plr->table->obj->in_room) 
+  {
+	if (ch)
+	{
+	 char buf[MAX_STRING_LENGTH];
+	 sprintf(buf, "%s folds as %s leaves the room.\r\n", GET_NAME(plr->ch), HSSH(plr->ch));
+	 send_to_table(buf, plr->table);
+	 send_to_char("Your hand is folded as you leave the room.\r\n",plr->ch);
+	}
+    free_player(plr); 
+    return FALSE; 
+  }// dead or quit
+  return TRUE;
+}
+
+
+
 void shuffle_deck(struct cDeck *tDeck)
 { // this would not hold up to a test of true randomization, but then
   // neither would a real dealer shuffling a deck
@@ -267,7 +292,7 @@ bool canSplit(struct player_data *plr)
   return FALSE;
 }
 
-struct player_data *createPlayer(CHAR_DATA *ch, struct table_data *tbl)
+struct player_data *createPlayer(CHAR_DATA *ch, struct table_data *tbl, int noadd = 0)
 {
   struct player_data *plr;
  #ifdef LEAK_CHECK
@@ -281,6 +306,7 @@ struct player_data *createPlayer(CHAR_DATA *ch, struct table_data *tbl)
  plr->bet = 0;
  plr->insurance = plr->doubled = FALSE;
  plr->state = 0;
+ if (!noadd) {
   struct player_data *tmp;
  for (tmp = tbl->plr; tmp; tmp = tmp->next)
    if (tmp->next == NULL) break;
@@ -288,6 +314,7 @@ struct player_data *createPlayer(CHAR_DATA *ch, struct table_data *tbl)
   if (tmp)  tmp->next = plr;
   else tbl->plr = plr;
  plr->next = NULL;
+ }
  return plr;
 }
 
@@ -369,10 +396,11 @@ void check_active(void *arg1, void *arg2, void *arg3)
 {
   struct player_data *plr = (struct player_data *) arg1;
   struct table_data *tbl = (struct table_data *) arg3;
-  struct player_data *ptmp;
+  struct player_data *ptmp = NULL;
   for (ptmp = tbl->plr; ptmp; ptmp = ptmp->next)
     if (ptmp == plr) break;
   if (!ptmp) return; // handled elsewhere
+
   if ((int)arg2 == plr->table->handnr || (int)arg2 == (plr->table->handnr+100) *2)
   {
      if (verify(plr))
@@ -405,7 +433,15 @@ void check_active(void *arg1, void *arg2, void *arg3)
 	char buf[MAX_STRING_LENGTH];
 	sprintf(buf, "Security removes a sleepy %s from the table.\r\n",GET_NAME(plr->ch));
 	send_to_table(buf,tbl,plr);
-	free_player(plr);
+	struct player_data *tmp, *tnext;
+	for (tmp = tbl->plr; tmp; tmp = tnext)
+	{
+ 	  tnext = tmp->next;
+	  if (tmp->ch == ch && tbl->cr != tmp)
+		free_player(tmp); // free non-active hands FIRST
+	}
+	if (tbl->cr && tbl->cr->ch == ch)
+		free_player(tbl->cr);
 	send_to_char("Security helps you up from the table where you've apparently fallen asleep!\r\n",ch);
     }
   }
@@ -527,9 +563,12 @@ void check_winner(struct table_data *tbl)
 	  tbl->hand_data[2] == 0)
     {// insurance bet paid off
 	int pay = plr->doubled ? plr->bet/2 : plr->bet;
-	csendf(plr->ch, "Your insurance bet paid %d gold.\r\n",
-		pay);
+	csendf(plr->ch, "Your insurance bet paid %d %s.\r\n",
+		pay,plr->table->gold?"gold":"platinum");
+	if (plr->table->gold)
 	GET_GOLD(plr->ch) += pay;
+	else
+	GET_PLATINUM(plr->ch) += pay;
     }
     if  (hand_strength(plr) > 21) continue;
     if (dealer == hand_strength(plr))
@@ -541,7 +580,10 @@ void check_winner(struct table_data *tbl)
       sprintf(buf,"The dealer gives %s %d coins.\r\n",GET_NAME(plr->ch),
 		plr->bet);
       send_to_table(buf,tbl, plr);
+	if (plr->table->gold)
       GET_GOLD(plr->ch) += plr->bet;
+	else
+      GET_PLATINUM(plr->ch) += plr->bet;
       free_player(plr);
 	continue;
     }
@@ -556,7 +598,10 @@ void check_winner(struct table_data *tbl)
       sprintf(buf,"The dealer gives %s %d coins.\r\n",GET_NAME(plr->ch),
 		plr->bet*2);
       send_to_table(buf,tbl, plr);
+	if (plr->table->gold)
       GET_GOLD(plr->ch) += plr->bet*2;
+	else
+      GET_PLATINUM(plr->ch) += plr->bet*2;
       free_player(plr);
     } else {
 	if (verify(plr)) {
@@ -586,9 +631,10 @@ void bj_dealer_ai(void *arg1, void *arg2, void *arg3)
 		suitcol(tbl->hand_data[1]), valstri(tbl->hand_data[1]), suit(tbl->hand_data[1]),
 		NTEXT);
 	send_to_table(buf, tbl);
-	struct player_data *plr;
-	for (plr=tbl->plr;plr;plr = plr->next)
+	struct player_data *plr,*pnext;
+	for (plr=tbl->plr;plr;plr = pnext)
 	{ // check if all players have busted
+	   pnext = plr->next;
 	  if (hand_strength(plr) < 22) cont = TRUE;
 	}
 	if (!cont) {check_winner(tbl); return;}
@@ -630,10 +676,20 @@ void bj_dealer_ai(void *arg1, void *arg2, void *arg3)
 
 void check_blackjacks(struct table_data *tbl)
 {
+  char buf[MAX_STRING_LENGTH];
   struct player_data *plr, *next;
   if (hand_strength(tbl) == 21)
   {
     send_to_table("The dealer blackjacked!\r\n",tbl);
+    for (plr = tbl->plr; plr; plr = next)
+    {
+	next = plr->next;
+	if (!verify(plr)) continue;
+	buf[0] = '\0';
+	blackjack_prompt(plr->ch, buf, !IS_SET(plr->ch->pcdata->toggles, PLR_ASCII));
+	send_to_char(buf, plr->ch);
+	
+    }
 	check_winner(tbl);
 	return;
   }
@@ -644,7 +700,6 @@ void check_blackjacks(struct table_data *tbl)
 	if (hand_strength(plr) == 21 &&
 		hand_strength(tbl) != 21)
 	{
-		char buf[MAX_STRING_LENGTH];
 		sprintf(buf, "%s blackjacks!\r\n",GET_NAME(plr->ch));
 		send_to_table(buf,tbl, plr);
 		send_to_char("$BYou BLACKJACK!$R\r\n",plr->ch);
@@ -653,8 +708,10 @@ void check_blackjacks(struct table_data *tbl)
 		buf[0] = '\0';
 		blackjack_prompt(plr->ch, buf, !IS_SET(plr->ch->pcdata->toggles, PLR_ASCII));
 		send_to_char(buf, plr->ch);
-
+		if (plr->table->gold)
 		GET_GOLD(plr->ch) += plr->bet*2.5;
+		else
+		GET_PLATINUM(plr->ch) += plr->bet*2.5;
 //        	nextturn(plr->table);
 		free_player(plr);
 		if (!tbl->plr)
@@ -694,7 +751,7 @@ void check_insurance(struct table_data *tbl)
   if (val(tbl->hand_data[0]) == 1)
   { // ace showing
      tbl->state = 1;
-     send_to_table("$B$7The dealer says 'Insurance is available. Any takers?'$R\r\n",tbl);
+     send_to_table("$B$7The dealer says 'Blackjack insurance is available. Type INSURANCE to buy some.'$R\r\n",tbl);
      struct timer_data *timer;
  #ifdef LEAK_CHECK
      timer = (struct timer_data *)calloc(1, sizeof(struct timer_data));
@@ -704,7 +761,7 @@ void check_insurance(struct table_data *tbl)
      timer->arg1 = (void*)tbl;
      timer->arg2 = 0;
      timer->function = check_insurance2;
-     timer->timeleft = 8;
+     timer->timeleft = 12;
     addtimer(timer);
   } else {
     check_blackjacks(tbl);
@@ -740,14 +797,17 @@ void pulse_table_bj(struct table_data *tbl, int recall )
   // new hand
     tbl->handnr++;
     send_to_table("The dealer passes out cards to everyone at the table.\r\n",tbl);
-    struct player_data *plr;
-    for (plr = tbl->plr;plr; plr = plr->next)
+    struct player_data *plr,*pnext;
+    for (plr = tbl->plr;plr; plr = pnext)
+    {
+	pnext = plr->next;
 	if (verify(plr))
 	{
 	  plr->hand_data[0] = pickCard(tbl->deck);
 	  plr->hand_data[1] = pickCard(tbl->deck);
 	  plr->state = 1;
 	}
+    }
     tbl->hand_data[0] = pickCard(tbl->deck);
     tbl->hand_data[1] = pickCard(tbl->deck);
     check_insurance(tbl);
@@ -763,6 +823,8 @@ void create_table(struct obj_data *obj)
   table = (struct table_data *)dc_alloc(1, sizeof(struct table_data));
  #endif
   table->obj = obj;
+  if (obj->obj_flags.value[2]) table->gold = FALSE;
+  else table->gold = TRUE;
   table->deck = create_deck(6);
   shuffle_deck(table->deck);
   table->plr = table->cr = NULL;
@@ -947,17 +1009,21 @@ void blackjack_prompt(CHAR_DATA *ch, char *prompt, bool ascii)
     if (++plrsdone % 3 == 0)
     {
   if (buf[0]!= '\0'){
-  strcat(prompt,lineTop);
   strcat(prompt,"\r\n");
+  if (ascii) {
+  strcat(prompt,lineTop);
+  strcat(prompt,"\r\n"); }
   strcat(prompt,buf);
   strcat(prompt,"\r\n");
-  strcat(prompt,lineTwo);
-  strcat(prompt,"\r\n");
+  if (ascii) {
+  strcat(prompt,lineTwo); 
+  strcat(prompt,"\r\n"); }
+
   for (int z = 0; lineTop[z];z++)
 	if (lineTop[z] == ',') lineTop[z] = '\'';
-
+  if (ascii) {
   strcat(prompt,lineTop);
-  strcat(prompt,"\r\n");
+  strcat(prompt,"\r\n"); }
   buf[0] = '\0';
   lineTwo[0] = '\0';
   lineTop[0] = '\0';
@@ -973,16 +1039,21 @@ void blackjack_prompt(CHAR_DATA *ch, char *prompt, bool ascii)
   sprintf(buf, "%s\r\n",buf); }
   //fixPadding(&buf[0]);
   if (buf[0]!= '\0'){
+  strcat(prompt,"\r\n");
+  if (ascii) {
   strcat(prompt,lineTop);
-  strcat(prompt,"\r\n");
+  strcat(prompt,"\r\n"); }
   strcat(prompt,buf);
+  if (ascii) {
   strcat(prompt,lineTwo);
-  strcat(prompt,"\r\n");
+  strcat(prompt,"\r\n"); }
   for (int z = 0; lineTop[z];z++)
 	if (lineTop[z] == ',') lineTop[z] = '\'';
 	else if (lineTop[z] == '_') lineTop[z] = '-';
+  if (ascii) {
   strcat(prompt,lineTop);
   strcat(prompt,"\r\n");
+  }
   }  
 }
 
@@ -1027,14 +1098,26 @@ int blackjack_table(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
 	return eSUCCESS;
      }
      int amt = atoi(arg1);
-     if (amt < 0 || amt < obj->obj_flags.value[0] || amt > obj->obj_flags.value[1])
-     {
+	if (obj->table->gold)
+	{
+	if (amt < 0 || amt > obj->obj_flags.value[1] || amt < obj->obj_flags.value[0]) {
+     
 	csendf(ch, "Minimum bet: %d\r\nMaximum bet: %d\r\n", obj->obj_flags.value[0], obj->obj_flags.value[1]);
-       return eSUCCESS;
-     }
-     if (amt > GET_GOLD(ch))
+        return eSUCCESS;
+	}
+	} else {
+	if (amt < 0 || amt > obj->obj_flags.value[3] || amt < obj->obj_flags.value[2]) {
+     
+	csendf(ch, "Minimum bet: %d\r\nMaximum bet: %d\r\n", obj->obj_flags.value[2], obj->obj_flags.value[3]);
+        return eSUCCESS;
+	}
+	}
+     if (obj->table->gold && amt > GET_GOLD(ch))
      {
 	send_to_char("You cannot afford that.\r\n$B$7The dealer whispers to you, 'You can find an ATM machine in the lobby, buddy.'$R\r\n",ch);
+	return eSUCCESS;
+     } else if (!obj->table->gold && amt > GET_PLATINUM(ch)) {
+	send_to_char("You cannot afford that.\r\n",ch);
 	return eSUCCESS;
      }
      if (players(obj->table) > 5)
@@ -1044,7 +1127,10 @@ int blackjack_table(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
      }
      plr = createPlayer(ch, obj->table);
      plr->bet = amt;
+	if (obj->table->gold)
      GET_GOLD(ch) -= amt;
+	else
+     GET_PLATINUM(ch) -= amt;
      send_to_char("The dealer accepts your bet.\r\n",ch);
      char buf[MAX_STRING_LENGTH];
      sprintf(buf, "%s bets %d.\r\n",GET_NAME(ch), amt);
@@ -1087,7 +1173,12 @@ int blackjack_table(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
 	send_to_char("You cannot make an insurance bet at the moment.\r\n",ch);
 	return eSUCCESS;
      }
-     if (GET_GOLD(ch) < plr->bet/2)
+     if (plr->table->gold && GET_GOLD(ch) < plr->bet/2)
+     {
+	send_to_char("You cannot afford an insurance bet right now.\r\n",ch);
+	return eSUCCESS;
+     }
+     if (!plr->table->gold && GET_PLATINUM(ch) < plr->bet/2)
      {
 	send_to_char("You cannot afford an insurance bet right now.\r\n",ch);
 	return eSUCCESS;
@@ -1095,6 +1186,8 @@ int blackjack_table(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
      plr->table->handnr++;
      plr->insurance = TRUE;
      char buf[MAX_STRING_LENGTH];
+	if (plr->table->gold) GET_GOLD(ch) -= plr->bet/2;
+	else GET_PLATINUM(ch) -= plr->bet/2;
      sprintf(buf,"%s makes an insurance bet.\r\n",
 		GET_NAME(ch));
      send_to_table(buf, plr->table, plr);
@@ -1113,7 +1206,8 @@ int blackjack_table(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
 	send_to_char("It is not currently your turn.\r\n",ch);
 	return eSUCCESS;
      }
-     if (GET_GOLD(plr->ch) < plr->bet)
+     if ((plr->table->gold && GET_GOLD(plr->ch) < plr->bet) ||
+	(!plr->table->gold && GET_PLATINUM(plr->ch) < plr->bet))
      {
 	send_to_char("You cannot afford to double your bet.\r\n",ch);
 	return eSUCCESS;
@@ -1123,7 +1217,8 @@ int blackjack_table(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
 	send_to_char("You cannot double right now.\r\n",ch);
 	return eSUCCESS;
      }
-     GET_GOLD(plr->ch) -= plr->bet;
+     if (plr->table->gold) GET_GOLD(plr->ch) -= plr->bet;
+     else GET_PLATINUM(plr->ch) -= plr->bet;
      plr->bet *= 2;
      plr->doubled = TRUE;
      plr->table->handnr++;
@@ -1187,12 +1282,17 @@ int blackjack_table(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
 	send_to_char("You cannot split right now.\r\n",ch);
 	return eSUCCESS;
      }
-     if (GET_GOLD(ch) < plr->bet)
+     if ((GET_GOLD(ch) < plr->bet && plr->table->gold)
+	|| (GET_PLATINUM(ch) < plr->bet && !plr->table->gold))
      {
 	send_to_char("You cannot afford to split.\r\n",ch);
 	return eSUCCESS;
      }
-     struct player_data *nw = createPlayer(ch, plr->table);
+	if (plr->table->gold) GET_GOLD(ch) -= plr->bet;
+	else GET_PLATINUM(ch) -= plr->bet;
+     struct player_data *nw = createPlayer(ch, plr->table, 1);
+     nw->next = plr->next;
+     plr->next = nw;
      nw->bet = plr->bet;
      plr->table->handnr++;
      nw->hand_data[0] = plr->hand_data[1];

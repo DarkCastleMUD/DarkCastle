@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.48 2006/04/19 18:59:48 dcastle Exp $ */
+/* $Id: utility.cpp,v 1.49 2006/04/20 03:13:29 dcastle Exp $ */
 
 extern "C"
 {
@@ -1236,6 +1236,12 @@ int do_home(struct char_data *ch, char *argument, int cmd)
                   "security.\n\r", ch);
      return eFAILURE;
      }
+     if (IS_SET(world[ch->in_room].room_flags, NOHOME))
+	{
+     send_to_char("Something prevents it.\n\r", ch);
+     return eFAILURE;
+
+	}
 
     if(GET_LEVEL(ch) < 11) {
       send_to_char("You must grow a bit before you can leave the nursery.\n\r", ch);

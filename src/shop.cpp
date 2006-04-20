@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: shop.cpp,v 1.20 2005/09/26 21:47:11 urizen Exp $ */
+/* $Id: shop.cpp,v 1.21 2006/04/20 03:13:29 dcastle Exp $ */
 
 extern "C"
 {
@@ -576,17 +576,17 @@ void shopping_list( char *arg, CHAR_DATA *ch,
 	for (tobj = keeper->carrying; tobj; tobj = tobj->next_content)
           if (obj_index[tobj->item_number].virt == obj_index[obj->item_number].virt)
 	    a++;
-        if ( GET_ITEM_TYPE(obj) == ITEM_DRINKCON && obj->obj_flags.value[1] )
+/*        if ( GET_ITEM_TYPE(obj) == ITEM_DRINKCON && obj->obj_flags.value[1] )
         {
             sprintf( buf, "[%3d] [%7d] %s of %s.\n\r",
                 a, cost, obj->short_description,
                 drinks[obj->obj_flags.value[2]] );
         }
         else
-        {
+        {*/
             sprintf( buf, "[%3d] [%7d] %s.\n\r",
                 a, cost, obj->short_description );
-        }
+//        }
         send_to_char(buf, ch);
     }
 
@@ -633,8 +633,8 @@ int shop_keeper( CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, CHAR_D
     return eFAILURE;
 
  LFound2:
-    if ( ch->in_room != shop_index[shop_nr].in_room )
-        return eFAILURE;
+//    if ( ch->in_room != shop_index[shop_nr].in_room )
+  //      return eFAILURE;
 
     switch ( cmd )
     {
