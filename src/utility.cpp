@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.49 2006/04/20 03:13:29 dcastle Exp $ */
+/* $Id: utility.cpp,v 1.50 2006/04/20 03:17:46 urizen Exp $ */
 
 extern "C"
 {
@@ -297,7 +297,7 @@ void sprintbit( uint value[], char *names[], char *result )
       strcat( result, "NoBits " );
 }
 
-void sprintbit( long vektor, char *names[], char *result )
+void sprintbit( unsigned long vektor, char *names[], char *result )
 {
     long nr;
 
