@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.44 2006/04/19 18:59:47 dcastle Exp $ */
+/* $Id: clan.cpp,v 1.45 2006/04/24 21:12:30 apocalypse Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -2839,7 +2839,7 @@ int do_clanarea(CHAR_DATA *ch, char *argument, int cmd)
   {
     if (zone_table[world[ch->in_room].zone].clanowner > 0)
     {
-	csendf(ch, "This area is claimed by %s, you need to challenge to obtain leadership.\r\n",
+	csendf(ch, "This area is claimed by %s, you need to challenge to obtain ownership.\r\n",
 			get_clan(zone_table[world[ch->in_room].zone].clanowner)->name);
 
 	return eFAILURE;
