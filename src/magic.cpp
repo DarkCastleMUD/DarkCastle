@@ -4361,7 +4361,7 @@ int spell_dispel_minor(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
             {
                affect_from_char(victim, SPELL_DETECT_INVISIBLE);
                send_to_char("Your ability to detect invisible has been dispelled!\n\r", victim);
-               act("$n's ability to detect invisible is removed.", ch,0,victim, TO_CHAR, 0);
+               act("$N's ability to detect invisible is removed.", ch,0,victim, TO_CHAR, 0);
                done = TRUE;
             }
             break;
@@ -4371,7 +4371,7 @@ int spell_dispel_minor(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
             {
                affect_from_char(victim, SPELL_CAMOUFLAGE);
                send_to_char("Your camouflage has been dispelled!.\n\r", victim);
-               act("$n's form is less obscured as you dispel $s camouflage.", ch,0,victim, TO_CHAR, 0);
+               act("$N's form is less obscured as you dispel $S camouflage.", ch,0,victim, TO_CHAR, 0);
                done = TRUE;
             }
             break;
@@ -4381,7 +4381,7 @@ int spell_dispel_minor(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
             {
                affect_from_char(victim, SPELL_RESIST_ACID);
                send_to_char("The $2green$R in your skin is dispelled!\n\r", victim);
-               act("$n's skin loses its $2green$R hue.", ch,0,victim, TO_CHAR, 0);
+               act("$N's skin loses its $2green$R hue.", ch,0,victim, TO_CHAR, 0);
                done = TRUE;
             }
             break;
@@ -4391,7 +4391,7 @@ int spell_dispel_minor(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
             {
                affect_from_char(victim, SPELL_RESIST_COLD);
                send_to_char("The $3blue$R in your skin is dispelled!\n\r", victim);
-               act("$n's skin loses its $3blue$R hue.", ch,0,victim, TO_CHAR, 0);
+               act("$N's skin loses its $3blue$R hue.", ch,0,victim, TO_CHAR, 0);
                done = TRUE;
             }
             break;
@@ -4401,7 +4401,7 @@ int spell_dispel_minor(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
             {
                affect_from_char(victim, SPELL_RESIST_FIRE);
                send_to_char("The $4red$R in your skin is dispelled!\n\r", victim);
-               act("$n's skin loses its $4red$R hue.", ch,0,victim, TO_CHAR, 0);
+               act("$N's skin loses its $4red$R hue.", ch,0,victim, TO_CHAR, 0);
                done = TRUE;
             }
             break;
@@ -4411,7 +4411,7 @@ int spell_dispel_minor(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
             {
                affect_from_char(victim, SPELL_RESIST_ENERGY);
                send_to_char("The $5yellow$R in your skin is dispelled!\n\r", victim);
-               act("$n's skin loses its $5yellow$R hue.", ch,0,victim, TO_CHAR, 0);
+               act("$N's skin loses its $5yellow$R hue.", ch,0,victim, TO_CHAR, 0);
                done = TRUE;
             }
             break;
@@ -4421,7 +4421,7 @@ int spell_dispel_minor(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
             {
                affect_from_char(victim, SPELL_BARKSKIN);
                send_to_char("Your woody has been dispelled!\n\r", victim);
-               act("$n loses $s woody.", ch,0,victim, TO_CHAR, 0);
+               act("$N loses $S woody.", ch,0,victim, TO_CHAR, 0);
                done = TRUE;
             }
             break;
@@ -4431,7 +4431,7 @@ int spell_dispel_minor(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
             {
                affect_from_char(victim, SPELL_STONE_SKIN);
                send_to_char("Your skin loses stone-like consistency.\n\r", victim);
-               act("$n's looks like less of a stoner as $s skin returns to normal.", ch,0,victim, TO_CHAR, 0);
+               act("$N's looks like less of a stoner as $S skin returns to normal.", ch,0,victim, TO_CHAR, 0);
                done = TRUE;
             }
             break;
@@ -4441,7 +4441,7 @@ int spell_dispel_minor(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
             {
                affect_from_char(victim, SPELL_FLY);
                send_to_char("You do not feel lighter than air anymore.\n\r", victim);
-               act("$n is no longer lighter than air.", ch,0,victim, TO_CHAR, 0);
+               act("$N is no longer lighter than air.", ch,0,victim, TO_CHAR, 0);
                done = TRUE;
             }
  	    if (IS_AFFECTED(victim, AFF_FLYING))
@@ -4458,7 +4458,7 @@ int spell_dispel_minor(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
             {
                affect_from_char(victim, SPELL_TRUE_SIGHT);
                send_to_char("You no longer see what is hidden.\n\r", victim);
-               act("$n no longer sees what is hidden.", ch,0,victim, TO_CHAR, 0);
+               act("$N no longer sees what is hidden.", ch,0,victim, TO_CHAR, 0);
                done = TRUE;
             }
             break;
@@ -4468,7 +4468,7 @@ int spell_dispel_minor(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
             {
                affect_from_char(victim, SPELL_WATER_BREATHING);
                send_to_char("You can no longer breathe underwater!\n\r", victim);
-               act("$n can no longer breathe underwater!", ch,0,victim, TO_CHAR, 0);
+               act("$N can no longer breathe underwater!", ch,0,victim, TO_CHAR, 0);
                done = TRUE;
             }
             break;
@@ -4478,7 +4478,7 @@ int spell_dispel_minor(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
 	      affect_from_char(victim, SPELL_ARMOR);
 		done = TRUE;
 		send_to_char("Your magical armour is dispelled!\r\n",victim);
-		act("$n's magical armour is dispelled!",ch,0,victim, TO_CHAR, 0);
+		act("$N's magical armour is dispelled!",ch,0,victim, TO_CHAR, 0);
 	   }
 	   break;
 	 case 14:
@@ -4487,7 +4487,7 @@ int spell_dispel_minor(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
 		affect_from_char(victim, SPELL_SHIELD);
 		done = TRUE;
 		send_to_char("Your force shield shimmers and fades away.\r\n",victim);
-		act("$n's force shield shimmers and fades away.",ch,0,victim, TO_CHAR, 0);
+		act("$N's force shield shimmers and fades away.",ch,0,victim, TO_CHAR, 0);
 	   }
 	   break;
 
@@ -4496,7 +4496,7 @@ int spell_dispel_minor(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
             {
                affect_from_char(victim, SPELL_RESIST_MAGIC);
                send_to_char("The $B$7white$R in your skin is dispelled!\n\r", victim);
-               act("$n's skin loses its $B$7white$R hue.", ch,0,victim, TO_CHAR, 0);
+               act("$N's skin loses its $B$7white$R hue.", ch,0,victim, TO_CHAR, 0);
                done = TRUE;
             }
             break;
