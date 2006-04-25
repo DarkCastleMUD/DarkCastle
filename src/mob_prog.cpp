@@ -244,6 +244,7 @@ void translate_value(char *left, char *right, int16 *vali, uint32 *valui,
   int rtarget = -1;
   int val = 0;
   bool valset = FALSE; // done like that to determine if value is set, since it can be 0 
+	          struct tempvariable *eh = mob->tempVariable;
 
   if (!str_prefix(left, "world")) {
     left += 5;
@@ -297,6 +298,33 @@ void translate_value(char *left, char *right, int16 *vali, uint32 *valui,
 		case 't': target = (CHAR_DATA*)vo;break;
 		case 'o': otarget = obj;break;
 		case 'p': otarget = (OBJ_DATA*)vo;break;
+		case 'v':
+			char buf[MAX_STRING_LENGTH];
+			buf[0] = '\0';
+			int i;
+			for (i = 2; *(left+i); i++)
+			{
+				if (*(left+i) == '[') continue;
+				if (*(left+i) == ']')
+				{
+					buf[i-3] = '\0';
+					break;
+				}
+				buf[i-3] = *(left+i);
+			
+			}
+	          for (; eh; eh = eh->next)
+	            if (!str_cmp(buf, eh->name))
+	              break;
+	         if (eh) strcpy(buf, eh->data);
+	        
+
+			if (buf[0] != '\0')
+			{
+		   	  if (!is_number(buf)) target = get_char_room(buf, mob->in_room);
+  		 	  else { val = atoi(buf); valset = TRUE; }
+			}
+			break;
 		default:
 		break;
 	}
@@ -1159,7 +1187,7 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
 	}
     }
 
-  if ( !str_cmp( buf, "inroom" ) )
+/*  if ( !str_cmp( buf, "inroom" ) )
     {
 	if (fvict)
 	{
@@ -1168,7 +1196,7 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
 	 return mprog_veval(lhsvl,opr,rhsvl);
 	}
 	if (ye) return FALSE;
-      switch ( arg[1] )  /* arg should be "$*" so just get the letter */
+      switch ( arg[1] )
 	{
 	case 'i': lhsvl = world[mob->in_room].number;
 	          rhsvl = atoi(val);
@@ -1209,7 +1237,7 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
 	  return -1;
 	}
     }
-
+*/
   if ( !str_cmp( buf, "sex" ) )
     {
 	if (fvict)

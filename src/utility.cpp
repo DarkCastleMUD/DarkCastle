@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.50 2006/04/20 03:17:46 urizen Exp $ */
+/* $Id: utility.cpp,v 1.51 2006/04/25 10:35:29 dcastle Exp $ */
 
 extern "C"
 {
@@ -252,10 +252,10 @@ void log( char *str, int god_level, long type )
           exit(1);
         }
         break;
-      case LOG_HMM:
+      case LOG_GIVE:
         f = &hmm_log;
         if(!(*f = dc_fopen(HMM_LOG, "a"))) {
-          fprintf(stderr, "Unable to open hmm log.\n");
+          fprintf(stderr, "Unable to open give log.\n");
           exit(1);
         }
         break;
@@ -967,7 +967,16 @@ int do_recall( CHAR_DATA *ch, char *argument, int cmd )
 	return eFAILURE;
     }
 
+
+      if (IS_SET(world[location].room_flags, NOHOME))
+      {
+	send_to_char("The gods reset your home.\r\n",victim);
+	location = real_room(START_ROOM);
+	GET_HOME(victim) = START_ROOM;
+	}
+
     // make sure they arne't recalling into someone's chall
+
     if(IS_SET(world[location].room_flags, CLAN_ROOM)) 
        if(!victim->clan || !(clan = get_clan(victim))) {
          send_to_char("The gods frown on you, and reset your home.\r\n", ch);

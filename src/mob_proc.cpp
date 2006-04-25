@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.89 2006/04/14 14:02:01 dcastle Exp $ */
+/* $Id: mob_proc.cpp,v 1.90 2006/04/25 10:35:29 dcastle Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -2513,7 +2513,7 @@ static char *dethSayText [ ] =
   "Gods help!  Someone keeps pingponging me!",
   "Boy, mages and barbs have just been fucked over...",
   "Where the hell did Phire go?",
-  "I'm gonna be an Uruk'hai so the Nazgul stop killing me.",
+  "I'm gonna become Uruk'hai so the Nazgul stop killing me.",
   "Can someone help me get wintin to run on my Mac?",
   "I can never seem to rent a U-Haul in Oklahoma anymore.",
   "Quick!  Everyone buy stock in Netscape, I have a g00d feeling!",
@@ -3059,7 +3059,9 @@ static char *dethSayText [ ] =
   "Chuck Norris' genes aren't DNA. They're barbed wire.",
   "Since 1940, the year Chuck Norris was born, roundhouse kick related deaths have increased 13,000 percent.",
   "This mud sucks. I'm going to steal the code and make my own!",
-  "Hmm, I'm not so sure that was meatball sauce I saw Urizen licking off his fingers."
+  "Hmm, I'm not so sure that was meatball sauce I saw Urizen licking off his fingers.",
+  "Of all the Daliesque tourist traps in the world, we had to walk into this one."
+
 };
 
 #define DETH_SAY_TEXT_SIZE    ( sizeof ( dethSayText )    / sizeof ( char * ) )

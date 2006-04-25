@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.59 2006/04/19 18:59:47 dcastle Exp $
+| $Id: inventory.cpp,v 1.60 2006/04/25 10:35:29 dcastle Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -1175,11 +1175,9 @@ int do_give(struct char_data *ch, char *argument, int cmd)
       csendf(ch, "You give %ld coin%s to %s.\n\r", (long) amount,
              amount == 1 ? "" : "s", GET_SHORT(vict));
 
-      if(GET_LEVEL(ch) >= IMMORTAL || IS_NPC(ch)) { 
         sprintf(buf, "%s gives %d coins to %s", GET_NAME(ch), amount,
                 GET_NAME(vict));
-        log(buf, 110, LOG_PLAYER);
-      }
+        log(buf, 110, LOG_GIVE);
       
       sprintf(buf, "%s gives you %d gold coin%s.\n\r", PERS(ch, vict), amount,
                amount == 1 ? "" : "s");
@@ -1331,7 +1329,7 @@ int do_give(struct char_data *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
-    if(GET_LEVEL(ch) >= IMMORTAL)
+/*    if(GET_LEVEL(ch) >= IMMORTAL)
     {
     sprintf(buf, "%s gives %s to %s.", GET_NAME(ch), obj->short_description,
             GET_NAME(vict));
@@ -1343,11 +1341,15 @@ int do_give(struct char_data *ch, char *argument, int cmd)
                     GET_NAME(vict));
        special_log(buf);
     }
-
+*/
     move_obj(obj, vict);
     act("$n gives $p to $N.", ch, obj, vict, TO_ROOM, INVIS_NULL|NOTVICT);
     act("$n gives you $p.", ch, obj, vict, TO_VICT, 0);
     act("You give $p to $N.", ch, obj, vict, TO_CHAR, 0);
+
+    sprintf(buf, "%s gives %s to %s", GET_NAME(ch), obj->name,
+                GET_NAME(vict));
+    log(buf, 110, LOG_GIVE);
 
     if((vict->in_room >= 0 && vict->in_room <= top_of_world) && GET_LEVEL(vict) < IMMORTAL && 
       IS_SET(world[vict->in_room].room_flags, ARENA) && arena[2] == -3 && obj_index[obj->item_number].virt == 393) {

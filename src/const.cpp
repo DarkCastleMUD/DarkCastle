@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.170 2006/04/20 03:13:29 dcastle Exp $ */
+/* $Id: const.cpp,v 1.171 2006/04/25 10:35:29 dcastle Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -732,7 +732,7 @@ char *size_bits[] =
 char *room_bits[] =
 {
     "dark",
-    "unused1",
+    "nohome",
     "no_mob",
     "indoors",
     "teleport_block",
@@ -762,7 +762,6 @@ char *room_bits[] =
     "no_scan",
     "no_where",
     "light",
-    "nohome",
     "\n"
 };
 
@@ -1136,6 +1135,7 @@ struct class_skill_defines w_skills[] = { // warrior skills
 {    "stinging",        SKILL_STINGING_WEAPONS,   43,   90,     {DEX,INT} },
 {    "skewer",          SKILL_SKEWER,             45,   98,     {STR,CON} },
 {    "blade shield",    SKILL_BLADESHIELD,        47,   98,     {CON,DEX} },
+{    "combat mastery",  SKILL_COMBAT_MASTERY,     50,   98,     {DEX, CON} },
 {    "\n",              0,                        1,    0,      {0,0} }
 };
 

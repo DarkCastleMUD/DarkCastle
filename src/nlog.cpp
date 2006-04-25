@@ -1,4 +1,4 @@
-/* $Id: nlog.cpp,v 1.5 2005/04/09 21:15:27 urizen Exp $ */
+/* $Id: nlog.cpp,v 1.6 2006/04/25 10:35:29 dcastle Exp $ */
 
 extern "C"
 {
@@ -195,6 +195,7 @@ char * handle_ansi(char * s, char_data * ch)
              case 'B':  i = BOLD; break;
              case 'R':  i = NTEXT; break;
 	     case 'L':  i = FLASH;break;
+	     case 'K':  i = BLINK;break;
              case 'I':  i = INVERSE; break;
              case '$':  i = dollarstring; break;
              case '\0': // this happens if we end a line with $

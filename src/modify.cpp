@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: modify.cpp,v 1.15 2005/07/01 10:51:25 urizen Exp $ */
+/* $Id: modify.cpp,v 1.16 2006/04/25 10:35:29 dcastle Exp $ */
 
 extern "C"
 {
@@ -637,6 +637,7 @@ struct help_index_element *build_help_index(FILE *fl, int *num)
 char *next_page(char *str)
 {
   int col = 1, line = 1, spec_code = FALSE;
+  int chars = 0;
   for (;; str++) {
     // If end of string, return NULL. 
     if (*str == '\0')
@@ -652,8 +653,8 @@ char *next_page(char *str)
       }
       str++; // skip the $
              // This causes the next char to get skipped in the loop iteration
+	chars += 7;
     }
-
     // Check for the begining of an ANSI color code block. 
     else if (*str == '\x1B' && !spec_code)
       spec_code = TRUE;
@@ -667,9 +668,12 @@ char *next_page(char *str)
     // beep color into the pager menu (hopefully)
     else if (line > PAGE_LENGTH)
       return str;
-
+    else if (chars > 2048)
+	return str;
     // Check for everything else. 
     else if (!spec_code) {
+	chars +=1;
+
       // Carriage return puts us in column one. 
       if (*str == '\r')
         col = 1;

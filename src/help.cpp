@@ -227,6 +227,8 @@ int load_new_help(FILE *fl, int reload, struct char_data *ch)
   return eSUCCESS;
 }
 
+char help_buf[MAX_STRING_LENGTH*4];
+
 int do_hindex(struct char_data *ch, char *argument, int cmd)
 {
    int i, minlen, count = 0;
@@ -237,9 +239,8 @@ int do_hindex(struct char_data *ch, char *argument, int cmd)
       return eFAILURE;
   }
 
-   half_chop(argument, argument, arg);
-  
-   if (!*argument) {
+  half_chop(argument, argument, arg);
+   if (!arg[0]) {
      csendf(ch, "Usage: hindex <ID#>\r\n"
                   "       hindex <low ID#> <high ID#>  (you can display up to 30 at a time)\r\n"
                   "       hindex <start of a word(s)>\r\n"
@@ -251,10 +252,20 @@ int do_hindex(struct char_data *ch, char *argument, int cmd)
                   "\r\n", IMP);
      return eFAILURE;
    }
-
+   int start = 0;
    if (*argument == '-') { // we are doing a function, not a normal search
      if ((*(argument+1) == 'l' || *(argument+1) == 'L')) {  // show help based on level range, excluded all level 1's
-       half_chop(arg, argument, arg);
+       //half_chop(arg, argument, arg);
+	char arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
+	argument = &arg[0];
+	argument = one_argument(argument, arg2);
+	argument = one_argument(argument, arg3);
+	one_argument(argument, arg);
+	if (arg[0] && is_number(arg))
+	  start = atoi(arg);
+	argument = &arg2[0];
+//	arg = str_cpy(arg3);
+	strcpy(arg, arg3);
        if ((((atoi(argument)) > 0) || *argument == '0') && ((atoi(arg)) > 0)) {  // not valid numbers
          if (atoi(argument) > atoi(arg)) {
             send_to_char("Usage: hindex -l <low level> <high level>\r\n", ch);
@@ -264,7 +275,7 @@ int do_hindex(struct char_data *ch, char *argument, int cmd)
          show_help_header(ch);
          for (i = 0; i < new_top_of_helpt; i++) {
            if (new_help_table[i].min_level >= atoi(argument) && new_help_table[i].min_level <= atoi(arg) 
-               && new_help_table[i].min_level != 1) // too many level 1s, so we must exclude them or get an OVERFLOW
+               && start-- <= 0) // too many level 1s, so we must exclude them or get an OVERFLOW
              count = show_one_help_entry(i, ch, count);
          }
          show_help_bar(ch);
@@ -326,6 +337,7 @@ int do_hindex(struct char_data *ch, char *argument, int cmd)
      }
      show_help_bar(ch);
    }
+   send_to_char(help_buf, ch);
    csendf(ch, "$B$7Total Shown: $B$5%d$R\r\n", count);
    csendf(ch, "$B$7Total Help Entries: $B$5%d$R\r\n", new_top_of_helpt);
 
@@ -333,8 +345,9 @@ int do_hindex(struct char_data *ch, char *argument, int cmd)
 }
 
 int show_one_help_entry(int entry, struct char_data *ch, int count) {
-    csendf(ch, "$B$6%3d $B$7- $B$5%3d $B$7[$3%-20.20s$B$7] $B$7[$3%-20.20s$B$7] $B$7[$3%-20.20s$B$7] "
-               "$B$7[$3%-20.20s$B$7] $B$7[$3%-20.20s$B$7]\n\r", entry,
+
+   csendf(ch, "$B$6%3d $7- $5%3d $7[$3%-20.20s$7] [$3%-20.20s$B$7] [$3%-20.20s$B$7] "
+               "[$3%-20.20s$B$7] [$3%-20.20s$B$7]\n\r", entry,
                 (new_help_table[entry].min_level >= 0 ? new_help_table[entry].min_level : 999),
                 (*new_help_table[entry].keyword1 ? new_help_table[entry].keyword1 : "None"),
                 (*new_help_table[entry].keyword2 ? new_help_table[entry].keyword2 : "None"),
@@ -351,7 +364,7 @@ void show_help_header(struct char_data *ch) {
 }
 
 void show_help_bar(struct char_data *ch) {
-   send_to_char("$B$7--------------------------------------------------------------------------"
+   send_to_char("%s$B$7--------------------------------------------------------------------------"
                 "--------------------------------------------------\r\n$R", ch);
 }
 

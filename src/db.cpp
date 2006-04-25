@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.104 2006/04/14 14:00:41 dcastle Exp $ */
+/* $Id: db.cpp,v 1.105 2006/04/25 10:35:29 dcastle Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -1450,10 +1450,6 @@ int read_one_room(FILE *fl, int & room_nr)
     } // of top_of_zone_table > 0
 
     world[room_nr].room_flags  = fread_bitvector (fl, -1, LONG_MAX);
-    if (IS_SET(world[room_nr].room_flags, DEATH))
-      REMOVE_BIT(world[room_nr].room_flags,DEATH);
-    if (IS_SET(world[room_nr].room_flags,NO_ASTRAL))
-      REMOVE_BIT(world[room_nr].room_flags,NO_ASTRAL);
     if (IS_SET(world[room_nr].room_flags,NO_ASTRAL))
       REMOVE_BIT(world[room_nr].room_flags,NO_ASTRAL);
 

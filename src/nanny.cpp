@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.106 2006/01/13 16:49:15 dcastle Exp $ */
+/* $Id: nanny.cpp,v 1.107 2006/04/25 10:35:29 dcastle Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -682,7 +682,7 @@ void nanny(struct descriptor_data *d, char *arg)
    if(arg) for ( ; isspace(*arg); arg++ );
    if (!str_prefix("help",arg) && (STATE(d) == CON_GET_NEW_CLASS || STATE(d) == CON_GET_RACE || STATE(d) == CON_CHOOSE_STATS) )
    {
-     do_help(d->character, arg+4, 88);
+     do_new_help(d->character, arg+4, 88);
      return;
    }
    

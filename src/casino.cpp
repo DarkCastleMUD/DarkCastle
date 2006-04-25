@@ -81,6 +81,8 @@ struct table_data
   int hand_data[21]; // dealer
   int handnr;
   int state;
+  int won;
+  int lost;
 };
 
 
@@ -397,14 +399,13 @@ void check_active(void *arg1, void *arg2, void *arg3)
   struct player_data *plr = (struct player_data *) arg1;
   struct table_data *tbl = (struct table_data *) arg3;
   struct player_data *ptmp = NULL;
-  for (ptmp = tbl->plr; ptmp; ptmp = ptmp->next)
+ for (ptmp = tbl->plr; ptmp; ptmp = ptmp->next)
     if (ptmp == plr) break;
   if (!ptmp) return; // handled elsewhere
+  if (!verify(plr) ) return;
 
   if ((int)arg2 == plr->table->handnr || (int)arg2 == (plr->table->handnr+100) *2)
   {
-     if (verify(plr))
-     {
 	  struct timer_data *timer;
  #ifdef LEAK_CHECK
 	  timer = (struct timer_data *)calloc(1, sizeof(struct timer_data));
@@ -421,12 +422,9 @@ void check_active(void *arg1, void *arg2, void *arg3)
   	  sprintf(buf, "The dealer nudges %s.\r\n",GET_NAME(plr->ch));
 	  send_to_table(buf, plr->table, plr);
 	  send_to_char("The dealer nudges you.\r\n",plr->ch);	  
-     }
   }
   if ((int)arg2 == (((plr->table->handnr+100)*2+100)*2))
   {// inactive
-    if (verify(plr))
-    {
 	struct table_data *tbl = plr->table;
 	CHAR_DATA *ch = plr->ch;
 	
@@ -443,7 +441,6 @@ void check_active(void *arg1, void *arg2, void *arg3)
 	if (tbl->cr && tbl->cr->ch == ch)
 		free_player(tbl->cr);
 	send_to_char("Security helps you up from the table where you've apparently fallen asleep!\r\n",ch);
-    }
   }
 }
 
@@ -713,8 +710,7 @@ void check_blackjacks(struct table_data *tbl)
 		else
 		GET_PLATINUM(plr->ch) += plr->bet*2.5;
 //        	nextturn(plr->table);
-		free_player(plr);
-		if (!tbl->plr)
+		if (tbl->plr == plr && !plr->next)
 		{ // all players blackjacked
 	char buf[MAX_STRING_LENGTH];
 		sprintf(buf, "The dealer flips over his card revealing a %s%s%s%s.\r\n",
@@ -723,9 +719,13 @@ void check_blackjacks(struct table_data *tbl)
 		send_to_table(buf, tbl);
 		sprintf(buf, "The dealer has %d!\r\n",hand_strength(tbl));
 		send_to_table(buf, tbl);
+		free_player(plr);
 		reset_table(tbl);
 		add_new_bets(tbl);
+		return;
 		}
+		free_player(plr);
+		
 	}
   }
 }
@@ -761,7 +761,7 @@ void check_insurance(struct table_data *tbl)
      timer->arg1 = (void*)tbl;
      timer->arg2 = 0;
      timer->function = check_insurance2;
-     timer->timeleft = 12;
+     timer->timeleft = 8;
     addtimer(timer);
   } else {
     check_blackjacks(tbl);

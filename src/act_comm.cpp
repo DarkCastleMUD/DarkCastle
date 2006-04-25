@@ -150,6 +150,9 @@ int send_to_gods(char *str, int god_level, long type)
     case LOG_HELP:
       sprintf(typestr, "help");
       break;
+    case LOG_GIVE:
+      sprintf(typestr, "give");
+      break;
     default:
       sprintf(typestr, "unknown");
       break;
@@ -211,6 +214,7 @@ int do_channel(struct char_data *ch, char *arg, int cmd)
     "warnings",
     "help",
     "database",   
+    "give",
  "\\@"
   };
 
@@ -234,7 +238,8 @@ int do_channel(struct char_data *ch, char *arg, int cmd)
       }
     }
     else {
-      for(x = 0; x <= 19; x++) {
+	int o = GET_LEVEL(ch) == 110? 21:19;
+      for(x = 0; x <= o; x++) {
          if(IS_SET(ch->misc, (1<<x)))
            y = 1;
          else
@@ -246,8 +251,8 @@ int do_channel(struct char_data *ch, char *arg, int cmd)
     return eSUCCESS;
   }
 
-  for(x = 0; x <= 20; x++) {
-     if(x == 20) {
+  for(x = 0; x <= 21; x++) {
+     if(x == 21) {
        send_to_char("That type was not found.\n\r", ch);
        return eSUCCESS;
      }
@@ -260,7 +265,11 @@ int do_channel(struct char_data *ch, char *arg, int cmd)
     send_to_char("That type was not found.\n\r", ch);
     return eSUCCESS;
   }
-
+  if (x > 19 && GET_LEVEL(ch) != 110)
+  {
+    send_to_char("That type was not found.\n\r", ch);
+    return eSUCCESS;
+  }
   if(IS_SET(ch->misc, (1<<x))) {
     sprintf(buf, "%s channel turned OFF.\n\r", types[x]);
     send_to_char(buf, ch);
