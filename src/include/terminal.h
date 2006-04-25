@@ -1,7 +1,7 @@
 #ifndef TERMINAL_H_
 #define TERMINAL_H_
 /************************************************************************
-| $Id: terminal.h,v 1.4 2005/04/09 21:15:35 urizen Exp $
+| $Id: terminal.h,v 1.5 2006/04/25 10:36:13 dcastle Exp $
 | Terminal.h
 | Description: This file defines all of the terminal constants and
 |   header information.
@@ -37,6 +37,7 @@
 #define HOMEPOS  "[H"
 
 #define FLASH     "[4m"
+#define BLINK     "[5m"
 #define BOLD     "[1m"
 #define INVERSE  "[7m"
 #define NTEXT    "[0m[37m"      /* Makes it normal */

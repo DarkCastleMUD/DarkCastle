@@ -16,7 +16,7 @@
  *  10/21/2003   Onager    Changed IS_ANONYMOUS() to handle mobs without   *
  *                         crashing                                        *
  ***************************************************************************/
-/* $Id: utility.h,v 1.37 2006/04/19 18:59:51 dcastle Exp $ */
+/* $Id: utility.h,v 1.38 2006/04/25 10:36:13 dcastle Exp $ */
 
 #ifndef UTILITY_H_
 #define UTILITY_H_
@@ -335,7 +335,7 @@ void    log		(char * str, int god_level, long type);
 void    logf            (int level, long type, char *arg, ...);
 int     send_to_gods    (char * str, int god_level, long type);
 void	sprintbit	(uint value[], char *names[], char *result);
-void    sprintbit	(long vektor, char *names[], char *result);
+void    sprintbit	(unsigned long vektor, char *names[], char *result);
 void    sprinttype	(int type, char *names[], char *result);
 int     consttype       (char * search_str, char *names[]);
 char *  constindex      (int index, char *names[]);

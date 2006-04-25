@@ -310,6 +310,10 @@ int do_zap(struct char_data *ch, char *arg, int cmd)
             GET_SHORT(ch));
 
     sprintf(name, "%s has deleted %s.", ch->name, victim->name);
+    extern short bport;
+     if (bport)
+    sprintf(f, "mv %s/%c/%s ../archive/zapped", BSAVE_DIR, victim->name[0], victim->name);
+    else
     sprintf(f, "mv %s/%c/%s ../archive/zapped", SAVE_DIR, victim->name[0], victim->name);
 
     if(ch->clan)

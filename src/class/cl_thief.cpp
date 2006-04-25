@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.117 2006/04/14 14:02:07 dcastle Exp $
+| $Id: cl_thief.cpp,v 1.118 2006/04/25 10:36:09 dcastle Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -1436,6 +1436,11 @@ int do_slip(struct char_data *ch, char *argument, int cmd)
            amount);
          act(buf, ch, 0, vict, TO_VICT, GODS);
          act("$n slips some gold to $N.", ch, 0, vict, TO_ROOM, GODS|NOTVICT);
+
+        sprintf(buf, "%s slips %d coins to %s", GET_NAME(ch), amount,
+                GET_NAME(vict));
+        log(buf, 110, LOG_GIVE);
+
     
          if (IS_NPC(ch) || (GET_LEVEL(ch) < DEITY))
             GET_GOLD(ch) -= amount;
@@ -1575,12 +1580,16 @@ int do_slip(struct char_data *ch, char *argument, int cmd)
     
    // Success
    else {
-      if (GET_LEVEL(ch) >= IMMORTAL  && GET_LEVEL(ch) <= DEITY ) {
+/*      if (GET_LEVEL(ch) >= IMMORTAL  && GET_LEVEL(ch) <= DEITY ) {
          sprintf(buf, "%s slips %s to %s.", GET_NAME(ch),
                  obj->short_description, GET_NAME(vict));
          special_log(buf);
          }
-   
+  */ 
+        sprintf(buf, "%s slips %s to %s", GET_NAME(ch), obj->name,
+                GET_NAME(vict));
+        log(buf, 110, LOG_GIVE);
+
       move_obj(obj, vict);
       act("$n slips $p to $N.", ch, obj, vict, TO_ROOM, GODS|NOTVICT);
       act("$n slips you $p.", ch, obj, vict, TO_VICT, GODS);

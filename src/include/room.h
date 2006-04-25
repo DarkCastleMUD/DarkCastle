@@ -1,7 +1,7 @@
 #ifndef __ROOM_H__
 #define __ROOM_H__
 /************************************************************************
-| $Id: room.h,v 1.13 2006/04/20 03:13:31 dcastle Exp $
+| $Id: room.h,v 1.14 2006/04/25 10:36:13 dcastle Exp $
 | room.h
 | Description:  This file contains all of the room header file/constant
 |   information.  It also contains information about the 'world' structs.
@@ -16,7 +16,7 @@
 /* Bitvector For 'room_flags' */
 
 #define DARK         1
-#define DEATH        1<<1    // unused
+#define NOHOME        1<<1    
 #define NO_MOB       1<<2
 #define INDOORS      1<<3
 #define TELEPORT_BLOCK  1<<4
@@ -46,7 +46,7 @@
 #define NO_SCAN      1<<28
 #define NO_WHERE     1<<29
 #define LIGHT_ROOM   1<<30
-#define NOHOME       1<<31
+//#define NOHOME       1<<31
 //#define NO_KI        1<<31
 
 /* Internal flags */

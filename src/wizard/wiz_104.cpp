@@ -274,7 +274,6 @@ int show_zone_commands(struct char_data *ch, int i, int start = 0)
   extern char * zone_modes[];
   extern char *equipment_types[];
   extern int top_of_zonet;
-  void sprintbit( long vektor, char *names[], char *result );
   int k = 0;
   int num_to_show;
 

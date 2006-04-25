@@ -1,7 +1,7 @@
 #ifndef FILEINFO_H_
 #define FILEINFO_H_
 /*
-| $Id: fileinfo.h,v 1.11 2006/01/13 16:49:21 dcastle Exp $
+| $Id: fileinfo.h,v 1.12 2006/04/25 10:36:13 dcastle Exp $
 | fileinfo.h
 | Description:  Contains information for loading files, ie "../lib", etc..
 */
@@ -76,9 +76,9 @@
 #define WORLD_LOG           "../log/world.log"
 #define CHAOS_LOG           "../log/chaos.log"
 #define CLAN_LOG            "../log/clan.log" 
-#define HMM_LOG            "../log/hmm.log" 
+#define HMM_LOG            "../log/give.log" 
 #else
-#define HMM_LOG            "hmm.log" 
+#define HMM_LOG            "give.log" 
 #define BUG_FILE            "bug.log"
 #define GOD_FILE            "god.log"
 #define MORTAL_FILE         "mortal.log"

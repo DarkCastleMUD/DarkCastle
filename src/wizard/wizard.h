@@ -1,7 +1,7 @@
 #ifndef WIZARD_H_
 #define WIZARD_H_
 /************************************************************************
-| $Id: wizard.h,v 1.4 2004/05/18 00:17:47 urizen Exp $
+| $Id: wizard.h,v 1.5 2006/04/25 10:36:15 dcastle Exp $
 | wizard.h
 | Description:  This is NOT a global include file, it's used only
 |   for the wiz_1*.C files to consolidate the header files they
@@ -69,7 +69,7 @@ void sprinttype(int type, char *names[], char *result);
 void remove_memory(CHAR_DATA *ch, char type);
 int is_in_range(CHAR_DATA *ch, int virt);
 int create_one_room(CHAR_DATA *ch, int vnum);
-void sprintbit(long vektor, char *names[], char *result);
+void sprintbit(unsigned long vektor, char *names[], char *result);
 int mana_gain(CHAR_DATA *ch);
 int hit_gain(CHAR_DATA *ch);
 int move_gain(CHAR_DATA *ch);
