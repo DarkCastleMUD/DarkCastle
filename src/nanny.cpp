@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.107 2006/04/25 10:35:29 dcastle Exp $ */
+/* $Id: nanny.cpp,v 1.108 2006/04/26 19:27:52 shane Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -397,6 +397,24 @@ void do_on_login_stuff(char_data * ch)
 	  while(curr) {
 	   if (curr->skillnum == SPELL_STONE_SKIN)
 		curr->skillnum = SPELL_U_AEGIS;
+	   curr = curr->next;
+          }
+    }
+    if (GET_CLASS(ch) == CLASS_BARD && GET_LEVEL(ch) >= 30)
+    {
+	  struct char_skill_data * curr = ch->skills;
+	  while(curr) {
+	   if (curr->skillnum == SKILL_CRUSHING_WEAPONS)
+		curr->skillnum = SKILL_STINGING_WEAPONS;
+	   curr = curr->next;
+          }
+    }
+    if (GET_CLASS(ch) == CLASS_BARD && GET_LEVEL(ch) >= 30)
+    {
+	  struct char_skill_data * curr = ch->skills;
+	  while(curr) {
+	   if (curr->skillnum == SKILL_BLUDGEON_WEAPONS)
+		curr->skillnum = SKILL_WHIPPING_WEAPONS;
 	   curr = curr->next;
           }
     }

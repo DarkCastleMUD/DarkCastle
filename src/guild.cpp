@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.81 2006/04/09 23:32:26 dcastle Exp $
+| $Id: guild.cpp,v 1.82 2006/04/26 19:27:52 shane Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -272,8 +272,13 @@ int skills_guild(struct char_data *ch, char *arg, struct char_data *owner)
           send_to_char("*", ch);
         send_to_char("\r\n", ch);
       }
+      if(skilllist[i].skillnum == SKILL_SONG_DISARMING_LIMERICK) { 
+        send_to_char("#\n\r", ch);
+      }
       else send_to_char("\n\r", ch);
     }
+    if(GET_CLASS(ch) == CLASS_BARD)
+       send_to_char("\n\r# denotes a song which requires an instrument.\n\r", ch);
     send_to_char("\n\r* denotes a point of specialization.\n\r", ch);
     return eSUCCESS;
   }

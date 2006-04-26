@@ -94,7 +94,7 @@ struct song_info_type song_info [ ] = {
 },
 
 { /* 5 */
-	5, POSITION_FIGHTING, 9, SKILL_SONG_INSANE_CHANT, 
+	5, POSITION_SITTING, 9, SKILL_SONG_INSANE_CHANT, 
         TAR_IGNORE, 
         song_insane_chant, execute_song_insane_chant,
 	NULL, NULL, SKILL_INCREASE_MEDIUM
@@ -136,7 +136,7 @@ NULL,   SKILL_INCREASE_HARD
 },
 
 { /* 12 */
-	10, POSITION_RESTING, 3, SKILL_SONG_FLIGHT_OF_BEE, 
+	4, POSITION_RESTING, 3, SKILL_SONG_FLIGHT_OF_BEE, 
         TAR_IGNORE, 
         song_flight_of_bee, execute_song_flight_of_bee,
         pulse_flight_of_bee, intrp_flight_of_bee,
@@ -232,7 +232,7 @@ NULL,   SKILL_INCREASE_HARD
 NULL,    SKILL_INCREASE_HARD
 },
 { /* 26 */
-        2, POSITION_FIGHTING, 6, SKILL_SONG_CRUSHING_CRESCENDO, 
+        2, POSITION_SITTING, 6, SKILL_SONG_CRUSHING_CRESCENDO, 
         TAR_IGNORE, song_crushing_crescendo, execute_song_crushing_crescendo,
         NULL, NULL, SKILL_INCREASE_HARD
 }, 
@@ -798,6 +798,8 @@ int song_disrupt( ubyte level, CHAR_DATA *ch, char
       return eFAILURE;
    }
 
+   int learned = has_skill(ch, song_info[SKILL_SONG_DISARMING_LIMERICK].skill_num);
+
    act("$n sings a witty little limerick to you!\r\nYour laughing makes it hard to concentrate on keeping your spells up!", 
        ch, 0, victim, TO_VICT, 0);
    act("$n sings a hilarious limerick about a man from Nantucket to $N!",
@@ -807,12 +809,29 @@ int song_disrupt( ubyte level, CHAR_DATA *ch, char
    WAIT_STATE(ch, PULSE_VIOLENCE);
    if (number(1,101) < get_saves(victim, SAVE_TYPE_MAGIC))
    {
-act("$N resists your disarming limerick!", ch, NULL, victim, 
-TO_CHAR,0);
-act("$N resists $n's disarming limerick!", ch, NULL, victim, TO_ROOM,
-NOTVICT);
+act("$N resists your disarming limerick!", ch, NULL, victim, TO_CHAR,0);
+act("$N resists $n's disarming limerick!", ch, NULL, victim, TO_ROOM,NOTVICT);
 act("You resist $n's disarming limerick!",ch,NULL,victim,TO_VICT,0);
      return eFAILURE;
+   }
+
+   if(learned > 90) {
+      if(IS_SET(victim->combat, COMBAT_REPELANCE)) {
+         act("Your limerick disrupts $S magical barrier!\n\r", ch, 0, victim, TO_CHAR, 0);
+         act("$n's limerick broke your concentration of your magical barrier!\n\r", ch, 0, victim, TO_VICT, 0);
+         act("$N's concentration faultered from $n's gut-busting limerick!\n\r", ch, 0, victim, TO_ROOM, NOTVICT);
+         REMOVE_BIT(victim->combat, COMBAT_REPELANCE);
+         return eSUCCESS;
+      }
+   }
+   if(learned >= 85) {
+      if(affected_by_spell(victim, KI_STANCE+KI_OFFSET)) {
+         act("Your limerick breaks $S stance!\n\r", ch, 0, victim, TO_CHAR, 0);
+         act("$n's limerick causes you to break your stance!\n\r", ch, 0, victim, TO_VICT, 0);
+         act("$N's stance breaks down from $n's hilarious limerick!\n\r", ch, 0, victim, TO_ROOM, NOTVICT);
+         affect_from_char(victim, KI_STANCE+KI_OFFSET);
+         return eSUCCESS;
+      }
    }
 
    return spell_dispel_magic(GET_LEVEL(ch)-1, ch, victim, 0, 0);
@@ -1334,8 +1353,9 @@ int execute_song_astral_chanty( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA
 
   if(IS_SET(world[victim->in_room].room_flags, NO_PORTAL) ||
     (IS_SET(world[victim->in_room].room_flags, ARENA) && !IS_SET(world[ch->in_room].room_flags, ARENA)) ||
-    (IS_SET(world[ch->in_room].room_flags, ARENA) && !IS_SET(world[victim->in_room].room_flags, ARENA))||
-    (IS_AFFECTED(victim, AFF_SHADOWSLIP)))
+    (IS_SET(world[ch->in_room].room_flags, ARENA) && !IS_SET(world[victim->in_room].room_flags, ARENA))
+//  ||    (IS_AFFECTED(victim, AFF_SHADOWSLIP))
+    )
     send_to_char("A mystical force seems to be keeping you out.\r\n", ch);
   else {
     // Move the group, NOT the leader, NOT the bard
@@ -1391,8 +1411,8 @@ int song_forgetful_rhythm( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vic
    ch->song_data = str_dup(arg);
 
    send_to_char("You begin to sing a song of forgetfulness...\n\r", ch);
-   act("$n begins an entrancing rhythm...", ch, 0, 0, TO_ROOM, 0);
-   ch->song_timer = song_info[ch->song_number].beats;
+   act("$n begins an entrancing rhythm...", ch, 0, 0, TO_ROOM, 0);   
+   ch->song_timer = song_info[ch->song_number].beats -  (int) (has_skill(ch, song_info[ch->song_number].skill_num) / 15);
    return eSUCCESS;
 }
 
