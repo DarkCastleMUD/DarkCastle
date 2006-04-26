@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.90 2006/04/25 10:35:29 dcastle Exp $ */
+/* $Id: mob_proc.cpp,v 1.91 2006/04/26 04:28:32 apocalypse Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -3021,7 +3021,7 @@ static char *dethSayText [ ] =
   "It's a good thing Microsoft isn't in the condom busines.",
   "Whenever I clean my glasses, my monitor becomes dirty as hell.",
   "Okay so this baby seal walks into a club....",
-  "There's two types of women on the internet.  .jpg and .gif",
+  "There's two types of women on the internet.  .avi and .mpg",
   "It's sad when Perl is the closest thing you have to a relationship with a woman.",
   "Lucifer is sooo 20th century.  The Devil should rename himself something like 1337Ki11@r.",
   "What does God do when a kitten masturbates?",
@@ -3060,8 +3060,10 @@ static char *dethSayText [ ] =
   "Since 1940, the year Chuck Norris was born, roundhouse kick related deaths have increased 13,000 percent.",
   "This mud sucks. I'm going to steal the code and make my own!",
   "Hmm, I'm not so sure that was meatball sauce I saw Urizen licking off his fingers.",
-  "Of all the Daliesque tourist traps in the world, we had to walk into this one."
-
+  "Of all the Daliesque tourist traps in the world, we had to walk into this one.",
+  "Ahh yes, the good old days of the Internet...when men were men, women were men, and children were FBI agents.",
+  "I think Bush's foreign policy is quite reasonable.",
+  "Remember, arguing on the Internet is like entering the Special Olympics...even if you win, you're still a retard."
 };
 
 #define DETH_SAY_TEXT_SIZE    ( sizeof ( dethSayText )    / sizeof ( char * ) )
