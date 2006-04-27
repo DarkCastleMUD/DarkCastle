@@ -2,6 +2,7 @@
 
  Real bloody blackjack. Who does two cards then nothing else? Wankers, that's who
 
+ 
 */
 extern "C"
 {
@@ -47,6 +48,10 @@ int hand_number(struct player_data *plr);
 int hands(struct player_data *plr);
 void blackjack_prompt(CHAR_DATA *ch, char *prompt, bool ascii);
 bool charExists(CHAR_DATA *ch);
+
+/*
+   BLACKJACK!
+*/
 
 struct player_data
 {
@@ -230,12 +235,12 @@ void shuffle_deck(struct cDeck *tDeck)
 }
 
 
-char *suit(int card)
+char suit(int card)
 {
-  if (card < 14) return "h";
-  else if (card < 27) return "d";
-  else if (card < 40) return "c";
-  else return "s";
+  if (card < 14) return 'h';
+  else if (card < 27) return 'd';
+  else if (card < 40) return 'c';
+  else return 's';
 }
 
 char *suitcol(int card)
@@ -624,7 +629,7 @@ void bj_dealer_ai(void *arg1, void *arg2, void *arg3)
     case 2:
 	send_to_table("It is now the dealer's turn.\r\n", tbl);
 	tbl->state++;
-	sprintf(buf, "The dealer flips over his card revealing a %s%s%s%s.\r\n",
+	sprintf(buf, "The dealer flips over his card revealing a %s%s%c%s.\r\n",
 		suitcol(tbl->hand_data[1]), valstri(tbl->hand_data[1]), suit(tbl->hand_data[1]),
 		NTEXT);
 	send_to_table(buf, tbl);
@@ -648,7 +653,7 @@ void bj_dealer_ai(void *arg1, void *arg2, void *arg3)
 		if (tbl->hand_data[i] == 0) break;
 	   tbl->hand_data[i] = nc;
 
-	   sprintf(buf, "The dealer takes a new card, revealing a %s%s%s%s! The dealer has %d!\r\n", suitcol(nc), valstri(nc), 
+	   sprintf(buf, "The dealer takes a new card, revealing a %s%s%c%s! The dealer has %d!\r\n", suitcol(nc), valstri(nc), 
 			suit(nc), NTEXT,hand_strength(tbl));
  	   send_to_table(buf, tbl);
  	   add_timer_bj_dealer(tbl);
@@ -713,7 +718,7 @@ void check_blackjacks(struct table_data *tbl)
 		if (tbl->plr == plr && !plr->next)
 		{ // all players blackjacked
 	char buf[MAX_STRING_LENGTH];
-		sprintf(buf, "The dealer flips over his card revealing a %s%s%s%s.\r\n",
+		sprintf(buf, "The dealer flips over his card revealing a %s%s%c%s.\r\n",
 		suitcol(tbl->hand_data[1]), valstri(tbl->hand_data[1]), suit(tbl->hand_data[1]),
 		NTEXT);
 		send_to_table(buf, tbl);
@@ -892,7 +897,7 @@ char *show_hand(int hand_data[21], int hide, bool ascii)
 	if (i == 1 && hide)
 	sprintf(buf,"%s %sDC%s", buf, BOLD, NTEXT);
 	else
-	sprintf(buf,"%s %s%s%s%s", buf, suitcol(hand_data[i]), valstri(hand_data[i]), suit(hand_data[i]),NTEXT);
+	sprintf(buf,"%s %s%s%c%s", buf, suitcol(hand_data[i]), valstri(hand_data[i]), suit(hand_data[i]),NTEXT);
 	i++;
       } else {
 	if (i == 1 && hide)
@@ -903,7 +908,7 @@ char *show_hand(int hand_data[21], int hide, bool ascii)
 	}
 	else {
 	sprintf(buf,"%s%s|%s %s%s%s %s|%s", buf, BOLD, NTEXT, suitcol(hand_data[i]), valstri(hand_data[i]),NTEXT,BOLD, NTEXT);
-	sprintf(lineTwo, "%s%s|%s %s%s%s %s|%s", lineTwo,BOLD, NTEXT,suitcol(hand_data[i]),suit(hand_data[i]),NTEXT,BOLD, NTEXT);
+	sprintf(lineTwo, "%s%s|%s %s%c%s %s|%s", lineTwo,BOLD, NTEXT,suitcol(hand_data[i]),suit(hand_data[i]),NTEXT,BOLD, NTEXT);
 	  sprintf(lineTop, "%s%s,---,%s",lineTop, BOLD, NTEXT);
 	}
 	i++;
@@ -1082,7 +1087,7 @@ int blackjack_table(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
 
   if (cmd == 189) // bet
   {
-     if (obj->table->state > 1 || obj->table->cr)
+     if (obj->table->state > 1 || obj->table->cr || obj->table->hand_data[0])
      {
 	send_to_char("There is a hand in progress. No bets are accepted at the moment.\r\n",ch);
 	return eSUCCESS;
@@ -1229,10 +1234,10 @@ int blackjack_table(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
      send_to_char("You double your bet.\r\n",ch);
     
      plr->hand_data[2] = pickCard(plr->table->deck);
-     sprintf(buf, "%s receives a %s%s%s%s.\r\n",GET_NAME(ch),
+     sprintf(buf, "%s receives a %s%s%c%s.\r\n",GET_NAME(ch),
 		suitcol(plr->hand_data[2]), valstri(plr->hand_data[2]), suit(plr->hand_data[2]),NTEXT);
      send_to_table(buf, plr->table,plr);
-     sprintf(buf, "You receive a %s%s%s%s.\r\n",
+     sprintf(buf, "You receive a %s%s%c%s.\r\n",
 		suitcol(plr->hand_data[2]), valstri(plr->hand_data[2]), suit(plr->hand_data[2]),NTEXT);
      send_to_char(buf, ch);
 
@@ -1324,10 +1329,10 @@ int blackjack_table(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
 	if (plr->hand_data[i] == 0) break;
      plr->hand_data[i] = pickCard(plr->table->deck);
      char buf[MAX_STRING_LENGTH];
-     sprintf(buf, "%s hits and receives a %s%s%s%s.\r\n",GET_NAME(ch),
+     sprintf(buf, "%s hits and receives a %s%s%c%s.\r\n",GET_NAME(ch),
 		suitcol(plr->hand_data[i]), valstri(plr->hand_data[i]), suit(plr->hand_data[i]),NTEXT);
      send_to_table(buf, plr->table,plr);
-     sprintf(buf, "You hit and receive a %s%s%s%s.\r\n",
+     sprintf(buf, "You hit and receive a %s%s%c%s.\r\n",
 		suitcol(plr->hand_data[i]), valstri(plr->hand_data[i]), suit(plr->hand_data[i]),NTEXT);
      send_to_char(buf, ch);
      if (hand_strength(plr) > 21) // busted
@@ -1349,4 +1354,161 @@ int blackjack_table(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
   }
 }
 
-// 21900+
+/* End Blackjack */
+
+/* Texas Hold'em! */
+struct tplayer;
+struct ttable;
+
+int hand[5][2]; 
+ // cycles between using two spaces for temporary data
+ // as comparisons need to be made
+
+struct tplayer
+{
+  struct ttable *table;
+  int hand[5]; // 0-1 playercards, 2-4 = top table cards
+  int chips;
+  int pos;
+  int options;
+  bool nw;
+  bool dealer;
+};
+
+struct ttable
+{
+  struct cDeck *deck;
+  struct tplayer *player[6];
+  int cards[5]; // cards on the table
+};
+
+int has_seat(struct ttable *ttbl)
+{
+  for (int i = 0; i < 6; i++)
+     if (ttbl->player[i] == NULL) return i;
+  return -1;
+}
+
+bool findcard(struct tplayer *tplr, int val, char suit, int num = 0)
+{
+  int i;
+/*  for (i = 0; i<2;i++)
+    if (!val || val(tplr->hand[i]) == val)
+      if (!suit || suit(tplr->hand[i]) == suit)
+	if (--num < 0) return TRUE;
+  for (i = 0; i<5;i++)
+    if (!val || val(tplr->hand[i]) == val)
+      if (!suit || suit(tplr->hand[i]) == suit)
+	if (--num < 0) return TRUE;
+*/
+  return FALSE;
+}
+
+int has_flush(struct tplayer *tplr)
+{
+  return findcard(tplr, 0, suit(tplr->hand[0]), 4);
+}
+
+bool has_rsf(struct tplayer *tplr)
+{
+ if (tplr->hand[0] == 0) return FALSE; // shockingly, nope
+ char st = suit(tplr->hand[0]);
+ 
+}
+
+char *hand_name(struct tplayer *tplr)
+{
+  
+
+
+}
+
+
+int get_hand(int which) // struct tplayer *tplr, int which)
+{
+ static int i = 0;
+ 
+// struct ttable *ttbl = tplr->table;
+ TOGGLE_BIT(i,1); // if it's 1, set to 0, if 0, set to 1. Gooo toggle!
+ int z;
+ for (z = 0; z < 5; z++)
+    hand[z][i] = 0;
+/* int temphand[7];
+ temphand[0] = tplr->hand[0];
+ temphand[1] = tplr->hand[1];
+ temphand[2] = ttbl->hand[0];
+ temphand[3] = ttbl->hand[1];
+ temphand[4] = ttbl->hand[2];
+ temphand[5] = ttbl->hand[3];
+ temphand[6] = ttbl->hand[4];
+ for (z = 0; z < 7; z++)
+    if (temphand[z] == 0) break; */
+
+ int o;
+ int one = 0, two = 1, three = 2, four = 3, five = 4;
+ int bleh[5] = {0,1,2,3,4},p;
+ for (o = 0; o < which; o++)
+ {
+    p = 4;
+    bleh[p]++;
+    while (bleh[p] == (3+p))
+    {
+	if (p == 0) return -1; // invalid
+	bleh[--p]++;
+	int zz;
+	for (zz = p+1; zz < 5;zz++)
+	  bleh[zz] = bleh[zz-1]+1;
+//	bleh[p+1] = bleh[p] + 1;
+    }
+ }
+  for (z = 0; z < 5; z++)
+    hand[z][i] = bleh[z]; 
+// if (!tplr->hand[0]) return i;
+// if (!ttbl->cards[0]) return i;
+
+ return i;
+}
+
+
+int do_testhand(CHAR_DATA *ch, char *argument, int cmd)
+{
+  char arg[MAX_INPUT_LENGTH];
+  one_argument(argument, arg);
+  int i = atoi(arg);
+  int z = get_hand(i);
+  char buf[MAX_STRING_LENGTH];
+  sprintf(buf, "One: %d Two: %d Three: %d Four: %d Five: %d\r\n",
+	hand[0][z],hand[1][z],
+	hand[2][z],hand[3][z],
+	hand[4][z]);
+  send_to_char(buf, ch);
+  return eSUCCESS;
+}
+int find_highhand(struct tplayer *tplr)
+{
+  int hand=0;
+}
+
+
+struct tplayer *createTplayer(struct ttable *ttbl)
+{
+  int seat = has_seat(ttbl);
+  if (seat < 0) return NULL; 
+  struct tplayer *tplr;
+  
+#ifdef LEAK_CHECK
+  tplr = (struct tplayer*) calloc(1, sizeof(struct tplayer));
+#else
+  tplr = (struct tplayer*) dc_alloc(1, sizeof(struct tplayer));
+#endif
+   ttbl->player[seat] = tplr;
+  tplr->nw = TRUE;
+  tplr->table=ttbl;
+  for (int i = 0; i < 2; i++) tplr->hand[i] = 0;
+  tplr->chips = 0;
+  tplr->pos = -1;
+  tplr->dealer = FALSE;
+  tplr->options = 0;
+}
+
+/* End Texas Hold'em */

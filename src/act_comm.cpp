@@ -251,8 +251,8 @@ int do_channel(struct char_data *ch, char *arg, int cmd)
     return eSUCCESS;
   }
 
-  for(x = 0; x <= 21; x++) {
-     if(x == 21) {
+  for(x = 0; x <= 22; x++) {
+     if(x == 22) {
        send_to_char("That type was not found.\n\r", ch);
        return eSUCCESS;
      }

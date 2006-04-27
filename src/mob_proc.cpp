@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.91 2006/04/26 04:28:32 apocalypse Exp $ */
+/* $Id: mob_proc.cpp,v 1.92 2006/04/27 22:52:44 dcastle Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -2449,7 +2449,7 @@ static char *dethSayText [ ] =
   "Ooo bastard enfan scrapped my lantern.",
   "Quit killing me, I'm saving up for a new pair of plate leggings.",
   "I think I'll stroll on over and hang out with Wesley Crusher for a while.",  
-  "There is something inately sexual about my bald head.",
+  "There is something innately sexual about my bald head.",
   "How does a moron think up a punchline?",
   "I've got the kleenex, I've got the vaseline.  Party!",
   "Michael Bolton ROCKS!!",
@@ -2866,7 +2866,7 @@ static char *dethSayText [ ] =
   "Sometimes I like to rub icy hot over my entire body, and sit naked fondling myself as I watch excercise videos.",
   "Oh, it's just a RAM upgrade...I can back up those files later.",
   "Why do they call it common sense if so few people seem to have it?",
-  "Oh whatever.  MUDing won't effect my GPA.  I can handle it.",
+  "Oh whatever.  MUDing won't affect my GPA.  I can handle it.",
   "I've been throwing this lettuce in the air for an hour now...when does it start feeling good?",
   "Do not sully the great name of Mike Ditka.",
   "Did you ever notice when you put the 2 words 'The' and 'IRS' together it spells 'THEIRS'?",

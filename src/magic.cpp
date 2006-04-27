@@ -2385,7 +2385,7 @@ int spell_protection_from_evil(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, st
   assert(victim);
 
   int duration = 6 + (skill>40)*4 + (skill>60)*4 + (skill>80)*4;
-  int modifier = level + skill/5;
+  int modifier = level + skill/10;
  
   /* keep spells from stacking */
   if (IS_AFFECTED(victim,AFF_PROTECT_EVIL) || affected_by_spell(victim, SPELL_PROTECT_FROM_GOOD))
@@ -11294,10 +11294,8 @@ int spell_conjure_elemental(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vi
   switch (virt)
   {
 	case 88:
-          act("Your small piece of flint turns to ash as a denizen of the elemental plane of $B$4fire$R arrives in a 
-blast of flame!", ch, NULL,NULL, TO_CHAR, 0);
-          act("$n's small piece of flint turns to ash as a denizen of the elemental plane of $B$4fire$R arrives in a 
-blast of flame!", ch, NULL,NULL, TO_ROOM, 0);
+          act("Your small piece of flint turns to ash as a denizen of the elemental plane of $B$4fire$R arrives in a blast of flame!", ch, NULL,NULL, TO_CHAR, 0);
+          act("$n's small piece of flint turns to ash as a denizen of the elemental plane of $B$4fire$R arrives in a blast of flame!", ch, NULL,NULL, TO_ROOM, 0);
 	  break;
 	case 89:
           act("Calling out to the spirits of $B$4fire$R, shaping them into an elemental servant.", ch, NULL,NULL, 

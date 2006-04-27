@@ -240,7 +240,7 @@ int do_hindex(struct char_data *ch, char *argument, int cmd)
   }
 
   half_chop(argument, argument, arg);
-   if (!arg[0]) {
+   if (!*argument) {
      csendf(ch, "Usage: hindex <ID#>\r\n"
                   "       hindex <low ID#> <high ID#>  (you can display up to 30 at a time)\r\n"
                   "       hindex <start of a word(s)>\r\n"

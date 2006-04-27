@@ -16,7 +16,7 @@
 /* 12/08/2003   Onager   Added chop_half() to work like half_chop() but    */
 /*                       chopping off the last word.                       */
 /***************************************************************************/
-/* $Id: interp.cpp,v 1.79 2006/04/27 04:01:52 apocalypse Exp $ */
+/* $Id: interp.cpp,v 1.80 2006/04/27 22:52:44 dcastle Exp $ */
 
 extern "C"
 {
@@ -372,6 +372,7 @@ struct command_info cmd_info[] =
     { "/",		do_wiz,		POSITION_DEAD, GIFTED_COMMAND, 8, 0, 1 },
     { "arena",		do_arena,	POSITION_DEAD, GIFTED_COMMAND, 9, 0, 1 },
     { "load",		do_load,	POSITION_DEAD, GIFTED_COMMAND, 9, 0, 1 },
+    { "prize",		do_load,	POSITION_DEAD, GIFTED_COMMAND, 999, 0, 1 },
     { "shutdow",	do_shutdow,	POSITION_DEAD, GIFTED_COMMAND, 9, 0, 1 },
     { "shutdown",	do_shutdown,	POSITION_DEAD, GIFTED_COMMAND, 9, 0, 1 },
     { "opedit",		do_opedit,	POSITION_DEAD, GIFTED_COMMAND, 9, 0, 1 },
@@ -432,7 +433,7 @@ struct command_info cmd_info[] =
     { "imotd",		do_imotd,	POSITION_DEAD, IMMORTAL, 9, 0, 1 },
     { "mhelp",		do_mortal_help,	POSITION_DEAD, IMMORTAL, 9, 0, 1 },
     { "sqsave",		do_write_skillquest,	POSITION_DEAD, GIFTED_COMMAND, 9, 0, 1 },
-    
+    { "testhand", do_testhand, POSITION_DEAD, 110, 9, 0, 1},    
     // Special procedure commands placed to not disrupt god commands
     { "setup",		do_mortal_set,	POSITION_STANDING, 0,  9,  0, 1 },
     { "do_the_thing",	do_thing,	POSITION_DEAD, 110, 9, 0, 1 },
