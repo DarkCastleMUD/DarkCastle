@@ -445,8 +445,8 @@ int spell_fireball(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
 	/* Fireball Recombining Effect */
    if (has_skill(ch, SPELL_FIREBALL) > 80)
    if(number(0, 100) < ( skill / 5 ) ) {
-     act("The expanding flames suddenly recombine and fly at $N again!", ch, 0, victim, TO_ROOM, 0);
-     act("The expanding flames suddenly recombine and fly at $N again!", ch, 0, victim, TO_CHAR, 0);
+     act("The expanding $B$4flames$R suddenly recombine and fly at $N again!", ch, 0, victim, TO_ROOM, 0);
+     act("The expanding $B$4flames$R suddenly recombine and fly at $N again!", ch, 0, victim, TO_CHAR, 0);
      retval = damage(ch, victim, dam, TYPE_FIRE, SPELL_FIREBALL, 0);
    }
    return retval;
@@ -806,7 +806,7 @@ void do_solar_blind(CHAR_DATA *ch, CHAR_DATA *tmp_victim)
     if(!IS_AFFECTED(tmp_victim, AFF_BLIND)) 
     {
       act("$n seems to be blinded!", tmp_victim, 0, 0, TO_ROOM, INVIS_NULL);
-      send_to_char("The world dims and goes black as you are blinded!\n\r", tmp_victim);
+      send_to_char("The world dims and goes $B$0black$R as you are blinded!\n\r", tmp_victim);
 
       af.type      = SPELL_BLINDNESS;
       af.location  = APPLY_HITROLL;
@@ -1099,8 +1099,8 @@ int spell_firestorm(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
   int retval = eSUCCESS;
   CHAR_DATA *tmp_victim, *temp;
 
-  send_to_char("Fire falls from the heavens!\n\r", ch);
-  act("$n makes fire fall from the heavens!\n\rYour flesh is seared off by scorching flames!",
+  send_to_char("$B$4Fire$R falls from the heavens!\n\r", ch);
+  act("$n makes $B$4fire$R fall from the heavens!\n\rYour flesh is seared off by scorching $B$4flames$R!",
 		ch, 0, 0, TO_ROOM, 0);
 
   for(tmp_victim = character_list; tmp_victim; tmp_victim = temp)
@@ -1358,8 +1358,8 @@ int spell_paralyze(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
        if (number(0,1))
           send_to_char("The combined magics fizzle!\r\n",ch);
 	if (GET_POS(victim) == POSITION_SLEEPING) {
-	  send_to_char("You are awakened by a burst of energy!\r\n",victim);
-	  act("$n is awakened in a burst of energy!",victim,NULL,NULL, TO_ROOM,0);
+	  send_to_char("You are awakened by a burst of $6energy$R!\r\n",victim);
+	  act("$n is awakened in a burst of $6energy$R!",victim,NULL,NULL, TO_ROOM,0);
 	  GET_POS(victim) = POSITION_SITTING;
 	}
        else {
@@ -1706,7 +1706,7 @@ int spell_curse(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *
 	  if(obj->obj_flags.type_flag == ITEM_WEAPON)  {
 		 if (obj->obj_flags.value[2] > 1) {
 	  obj->obj_flags.value[2]--;
-	  act("$p glows red.", ch, obj, 0, TO_CHAR, 0);
+	  act("$p glows $4red$R.", ch, obj, 0, TO_CHAR, 0);
 		 }
 		 else {
 	  send_to_char("Your curse has failed.\n\r", ch);
@@ -1918,9 +1918,9 @@ int spell_infravision(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
   af.bitvector = AFF_INFRARED;
 
   affect_to_char(victim, &af);
-  send_to_char("Your eyes glow red.\n\r", victim);
+  send_to_char("Your eyes glow $B$4red$R.\n\r", victim);
   if (ch!=victim)
-    csendf(ch, "%s's eyes glow red.\n\r", GET_SHORT(victim));
+    csendf(ch, "%s's eyes glow $B$4red$R.\n\r", GET_SHORT(victim));
 
   return eSUCCESS;
 }
@@ -2041,9 +2041,9 @@ int spell_enchant_armor(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct ob
 		act("$p glows blue.",ch,obj,0,TO_CHAR, 0);
 	 } else if (IS_EVIL(ch)) {
 		SET_BIT(obj->obj_flags.extra_flags, ITEM_ANTI_GOOD);
-		act("$p glows red.",ch,obj,0,TO_CHAR, 0);
+		act("$p glows $4red$R.",ch,obj,0,TO_CHAR, 0);
     } else {
-      act("$p glows yellow.",ch,obj,0,TO_CHAR, 0);
+      act("$p glows $5yellow$R.",ch,obj,0,TO_CHAR, 0);
 	}
 	 }
   return eSUCCESS;
@@ -2090,9 +2090,9 @@ int spell_enchant_weapon(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct o
       act("$p glows blue.",ch,obj,0,TO_CHAR,0);
 	 } else if (IS_EVIL(ch)) {
       SET_BIT(obj->obj_flags.extra_flags, ITEM_ANTI_GOOD);
-      act("$p glows red.",ch,obj,0,TO_CHAR, 0);
+      act("$p glows $4red$R.",ch,obj,0,TO_CHAR, 0);
     } else {
-      act("$p glows yellow.",ch,obj,0,TO_CHAR, 0);
+      act("$p glows $5yellow$R.",ch,obj,0,TO_CHAR, 0);
 	}
 	 }
   if(GET_ITEM_TYPE(obj) == ITEM_MISSILE)
@@ -2367,7 +2367,7 @@ int spell_poison(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data 
     if ((obj->obj_flags.type_flag == ITEM_DRINKCON) ||
         (obj->obj_flags.type_flag == ITEM_FOOD)) 
     {
-      act("$p glows green for a second, before returning to its original color.", ch, obj, 0, TO_CHAR, 0);    
+      act("$p glows $2green$R for a second, before returning to its original color.", ch, obj, 0, TO_CHAR, 0);    
       obj->obj_flags.value[3] = 1;
     } else {
       send_to_char("Nothing special seems to happen.\n\r", ch);
@@ -2474,7 +2474,7 @@ int spell_remove_curse(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
 
   /* Then it is a PC | NPC */
   if(affected_by_spell(victim, SPELL_CURSE)) {
-	 act("$n briefly glows red, then blue.",victim,0,0,TO_ROOM, 0);
+	 act("$n briefly glows $4red$R, then $3blue$R.",victim,0,0,TO_ROOM, 0);
 	 act("You feel better.",victim,0,0,TO_CHAR, 0);
 	 affect_from_char(victim, SPELL_CURSE);
 	 return eSUCCESS;
@@ -2519,7 +2519,7 @@ int spell_remove_curse(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
 	  }
 
   if(affected_by_spell(victim, SPELL_ATTRITION)) {
-	 act("$n briefly glows red, then blue.",victim,0,0,TO_ROOM, 0);
+	 act("$n briefly glows $4red$R, then $3blue$R.",victim,0,0,TO_ROOM, 0);
 	 act("The curse of attrition afflicting you has been lifted!",victim,0,0,TO_CHAR, 0);
 	 affect_from_char(victim, SPELL_ATTRITION);
 	 return eSUCCESS;
@@ -2574,8 +2574,8 @@ int spell_fireshield(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 
   if (!affected_by_spell(victim, SPELL_FIRESHIELD))
   {
-    act("$n is surrounded by flames.",victim,0,0,TO_ROOM, INVIS_NULL);
-    act("You are surrounded by flames.",victim,0,0,TO_CHAR, 0);
+    act("$n is surrounded by $B$4flames$R.",victim,0,0,TO_ROOM, INVIS_NULL);
+    act("You are surrounded by $B$4flames$R.",victim,0,0,TO_CHAR, 0);
 
     af.type      = SPELL_FIRESHIELD;
     af.duration  = 1 + skill / 23;
@@ -3831,7 +3831,7 @@ int spell_fire_breath(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
   int retval;
   CHAR_DATA *tmp_victim, *temp;
 
-  act("$B$4You are $IENVELOPED$I$B$4 in scorching flames!$R", ch, 0, 0, TO_ROOM, 0);
+  act("$B$4You are $IENVELOPED$I$B$4 in scorching $B$4flames$R!$R", ch, 0, 0, TO_ROOM, 0);
 
   for(tmp_victim = character_list; tmp_victim; tmp_victim = temp)
   {
@@ -3964,7 +3964,7 @@ act("You resist $n's attempt to fear you!",ch,NULL,victim,TO_VICT,0);
 
 	 if((saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC) >= 0) || (!number(0, 5))) {
 		send_to_char("For a moment you feel compelled to run away, but you fight back the urge.\n\r", victim);
-		act("$N doesnt seem to be the yellow bellied slug you thought!", ch, NULL, victim, TO_CHAR, 0);
+		act("$N doesnt seem to be the yellow-bellied slug you thought!", ch, NULL, victim, TO_CHAR, 0);
 		if (IS_NPC(victim)) {
 		retval = one_hit(victim, ch, TYPE_UNDEFINED, FIRST);
 		retval = SWAP_CH_VICT(retval);
@@ -4265,7 +4265,7 @@ int spell_dispel_minor(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
 	 else if (IS_SET(obj->obj_flags.extra_flags, ITEM_GLOW))
 	 {
 	  REMOVE_BIT(obj->obj_flags.extra_flags, ITEM_GLOW);
-	  send_to_char("You remove the item's glowing aura.\r\n",ch);
+	  send_to_char("You remove the item's $Bglowing$R aura.\r\n",ch);
 	  return eSUCCESS;
 	 } 
 	 else {
@@ -8849,7 +8849,7 @@ int cast_creeping_death(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DA
    }
 
 
-   retval = damage(ch, victim, dam, TYPE_MAGIC, SPELL_CREEPING_DEATH, 0);
+   retval = damage(ch, victim, dam, TYPE_PHYSICAL_MAGIC, SPELL_CREEPING_DEATH, 0);
    if(SOMEONE_DIED(retval))
       return retval;
 
@@ -8979,62 +8979,62 @@ int cast_herb_lore(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *v
       case TRUE_VNUM: 
 	aff = AFF_TRUE_SIGHT; spl = SPELL_TRUE_SIGHT;
     if (affected_by_spell(victim, spl)) { send_to_char("They are already affected by that spell.\r\n",ch); return eFAILURE; }
-		act("$n's eyes starts to gently glow white.", victim, 0, 0, TO_ROOM, 0);
-		act("Your eyes start to glow white.", victim, 0, 0, TO_CHAR, 0);
+		act("$n's eyes starts to gently glow $Bwhite$R.", victim, 0, 0, TO_ROOM, 0);
+		act("Your eyes start to glow $Bwhite$R.", victim, 0, 0, TO_CHAR, 0);
 		break;
       case INFRA_VNUM: 
 		aff = AFF_INFRARED; spl = SPELL_INFRAVISION;
     if (affected_by_spell(victim, spl)) { send_to_char("They are already affected by that spell.\r\n",ch); return eFAILURE; }
-		act("$n's eyes starts to glow red.", victim, 0, 0, TO_ROOM, 0);
-		act("Your eyes start to glow red.", victim, 0, 0, TO_CHAR, 0);
+		act("$n's eyes starts to glow $B$4red$R.", victim, 0, 0, TO_ROOM, 0);
+		act("Your eyes start to glow $B$4red$R.", victim, 0, 0, TO_CHAR, 0);
 		break;
       case FARSIGHT_VNUM: 
 		aff = AFF_FARSIGHT; spl = SPELL_FARSIGHT;
     if (affected_by_spell(victim, spl)) { send_to_char("They are already affected by that spell.\r\n",ch); return eFAILURE; }
-		act("$n's eyes blur and seem to darken.", victim, 0, 0, TO_ROOM, 0);
+		act("$n's eyes blur and seem to $B$0darken$R.", victim, 0, 0, TO_ROOM, 0);
 		act("Your eyes blur and the world around you seems to come closer.", victim, 0, 0, TO_CHAR, 0);
 		break;
       case LIGHTNING_SHIELD_VNUM: 
 		aff = AFF_LIGHTNINGSHIELD; spl = SPELL_LIGHTNING_SHIELD;
     if (affected_by_spell(victim, spl)) { send_to_char("They are already affected by that spell.\r\n",ch); return eFAILURE; }
-		act("$n is surrounded by electricity.", victim, 0, 0, TO_ROOM, 0);
-		act("You become surrounded by electricity.", victim, 0, 0, TO_CHAR, 0);
+		act("$n is surrounded by $B$5electricity$R.", victim, 0, 0, TO_ROOM, 0);
+		act("You become surrounded by $B$5electricity$R.", victim, 0, 0, TO_CHAR, 0);
 		break;
       case INSOMNIA_VNUM: 
 		aff = AFF_INSOMNIA; spl = SPELL_INSOMNIA;
     if (affected_by_spell(victim, spl)) { send_to_char("They are already affected by that spell.\r\n",ch); return eFAILURE; }
 		act("$n blinks and looks a little twitchy.", victim, 0, 0, TO_ROOM, 0);
-		act("You gain insomnia. Yay.", victim, 0, 0, TO_CHAR, 0);
+		act("You suddenly feel very energetic and not at all sleepy.", victim, 0, 0, TO_CHAR, 0);
 		break;
       case DETECT_GOOD_VNUM: 
 		aff = AFF_DETECT_GOOD; spl = SPELL_DETECT_GOOD; 
     if (affected_by_spell(victim, spl)) { send_to_char("They are already affected by that spell.\r\n",ch); return eFAILURE; }
-		act("$n's eyes starts to gently glow yellow.", victim, 0, 0, TO_ROOM, 0);
-		act("Your eyes start to glow yellow.", victim, 0, 0, TO_CHAR, 0);
+		act("$n's eyes starts to gently glow $B$1blue$R.", victim, 0, 0, TO_ROOM, 0);
+		act("Your eyes start to glow $B$1blue$R.", victim, 0, 0, TO_CHAR, 0);
 		break;
       case DETECT_EVIL_VNUM: 
 		aff = AFF_DETECT_EVIL; spl = SPELL_DETECT_EVIL; 
     if (affected_by_spell(victim, spl)) { send_to_char("They are already affected by that spell.\r\n",ch); return eFAILURE; }
-		act("$n's eyes starts to gently glow blue.", victim, 0, 0, TO_ROOM, 0);
-		act("Your eyes start to glow blue.", victim, 0, 0, TO_CHAR, 0);
+		act("$n's eyes starts to gently glow $4deep red$R.", victim, 0, 0, TO_ROOM, 0);
+		act("Your eyes start to glow $4deep red$R.", victim, 0, 0, TO_CHAR, 0);
 		break;
       case DETECT_INVISIBLE_VNUM: 
 		aff = AFF_DETECT_INVISIBLE; spl = SPELL_DETECT_INVISIBLE;
     if (affected_by_spell(victim, spl)) { send_to_char("They are already affected by that spell.\r\n",ch); return eFAILURE; }
-		act("$n's eyes starts to gently glow green.", victim, 0, 0, TO_ROOM, 0);
-		act("Your eyes start to glow green.", victim, 0, 0, TO_CHAR, 0);
+		act("$n's eyes starts to gently glow $B$5yellow$R.", victim, 0, 0, TO_ROOM, 0);
+		act("Your eyes start to glow $B$5yellow$R.", victim, 0, 0, TO_CHAR, 0);
 		break;
       case SENSE_LIFE_VNUM: 
 		aff = AFF_SENSE_LIFE; spl = SPELL_SENSE_LIFE;
     if (affected_by_spell(victim, spl)) { send_to_char("They are already affected by that spell.\r\n",ch); return eFAILURE; }
-//		act("$n's eyes starts to gently glow white.", victim, 0, 0, TO_ROOM, 0);
-		act("Your become hyper-aware of your surroundings.", victim, 0, 0, TO_CHAR, 0);
+//		act("$n's eyes starts to gently glow a $2deep green$R.", victim, 0, 0, TO_ROOM, 0);
+		act("Your become intensely aware of your surroundings.", victim, 0, 0, TO_CHAR, 0);
 		break;
       case SOLIDITY_VNUM: 
 		aff = AFF_SOLIDITY; spl = SPELL_SOLIDITY; 
     if (affected_by_spell(victim, spl)) { send_to_char("They are already affected by that spell.\r\n",ch); return eFAILURE; }
-		act("$n is surrounded by a pulsing, yellow shield.", victim, 0, 0, TO_ROOM, 0);
-		act("You become surrounded by a pulsing, yellow shield.", victim, 0, 0, TO_CHAR, 0);
+		act("$n is surrounded by a pulsing, $6violet$R aura.", victim, 0, 0, TO_ROOM, 0);
+		act("You become surrounded by a pulsing, $6violet$R aura.", victim, 0, 0, TO_CHAR, 0);
 		break;
 	case 2256:
 		aff = 0; spl =0;
@@ -9803,8 +9803,8 @@ void familiar_creation_message(char_data * ch, int fam_type)
       act("$n throws a batwing into the air which explodes into flame.\r\n"
         "A small imp appears from the smoke and perches on $n's shoulder.",
         ch, 0, 0, TO_ROOM, 0);
-      send_to_char("You channel a miniature fireball into the wing and throw it into the air.\r\n"
-               "A small imp appears from the flames and perches upon your shoulder.\r\n", ch);
+      send_to_char("You channel a miniature $B$4fireball$R into the wing and throw it into the air.\r\n"
+               "A small imp appears from the $B$4flames$R and perches upon your shoulder.\r\n", ch);
     break;
     case FAMILIAR_MOB_CHIPMUNK:
       act("$n coaxs a chipmunk from nowhere and gives it an acorn to eat.\r\n"
@@ -11253,9 +11253,9 @@ int spell_conjure_elemental(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vi
   int liquid;
  int virt;
 // 88 = fire fire
-// 89 = water magic
-// 90 = air cold
-// 91 = earth energy
+// 89 = water cold
+// 90 = air energy
+// 91 = earth magic
 
   if(many_charms(ch))  {
     send_to_char("How do you plan on controlling so many followers?\n\r", ch);
@@ -11294,20 +11294,25 @@ int spell_conjure_elemental(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vi
   switch (virt)
   {
 	case 88:
-          act("Your small piece of flint turns to ash as a denizen of the elemental plane of fire arrives in a blast of flame!", ch, NULL,NULL, TO_CHAR, 0);
-          act("$n's small piece of flint turns to ash as a denizen of the elemental plane of fire arrives in a blast of flame!", ch, NULL,NULL, TO_ROOM, 0);
+          act("Your small piece of flint turns to ash as a denizen of the elemental plane of $B$4fire$R arrives in a 
+blast of flame!", ch, NULL,NULL, TO_CHAR, 0);
+          act("$n's small piece of flint turns to ash as a denizen of the elemental plane of $B$4fire$R arrives in a 
+blast of flame!", ch, NULL,NULL, TO_ROOM, 0);
 	  break;
 	case 89:
-          act("Calling out to the spirits of fire, shaping them into an elemental servant.", ch, NULL,NULL, TO_CHAR, 0);
-          act("$n calls out, and a fire elemental appears.", ch, NULL,NULL, TO_ROOM, 0);
+          act("Calling out to the spirits of $B$4fire$R, shaping them into an elemental servant.", ch, NULL,NULL, 
+TO_CHAR, 0);
+          act("$n calls out, and a $B$4fire$R elemental appears.", ch, NULL,NULL, TO_ROOM, 0);
 	  break;
 	case 90:
-          act("Calling out to the spirits of fire, shaping them into an elemental servant.", ch, NULL,NULL, TO_CHAR, 0);
-          act("$n calls out, and a fire elemental appears.", ch, NULL,NULL, TO_ROOM, 0);
+          act("Calling out to the spirits of $B$4fire$R, shaping them into an elemental servant.", ch, NULL,NULL, 
+TO_CHAR, 0);
+          act("$n calls out, and a $B$4fire$R elemental appears.", ch, NULL,NULL, TO_ROOM, 0);
 	  break;
 	case 91:
-          act("Calling out to the spirits of fire, shaping them into an elemental servant.", ch, NULL,NULL, TO_CHAR, 0);
-          act("$n calls out, and a fire elemental appears.", ch, NULL,NULL, TO_ROOM, 0);
+          act("Calling out to the spirits of $B$4fire$R, shaping them into an elemental servant.", ch, NULL,NULL, 
+TO_CHAR, 0);
+          act("$n calls out, and a $B$4fire$R elemental appears.", ch, NULL,NULL, TO_ROOM, 0);
 	  break;
 	default:
 		send_to_char("That item is not used for elemental summoning.\r\n",ch);

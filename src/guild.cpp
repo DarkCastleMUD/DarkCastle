@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.82 2006/04/26 19:27:52 shane Exp $
+| $Id: guild.cpp,v 1.83 2006/04/27 02:52:48 apocalypse Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -279,7 +279,6 @@ int skills_guild(struct char_data *ch, char *arg, struct char_data *owner)
     }
     if(GET_CLASS(ch) == CLASS_BARD)
        send_to_char("\n\r# denotes a song which requires an instrument.\n\r", ch);
-    send_to_char("\n\r* denotes a point of specialization.\n\r", ch);
     return eSUCCESS;
   }
   if (GET_POS(ch) == POSITION_SLEEPING) {
