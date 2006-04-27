@@ -99,18 +99,28 @@ int do_load(struct char_data *ch, char *arg, int cmd)
   if(IS_NPC(ch))
     return eFAILURE;
 
-  if(!has_skill(ch, COMMAND_LOAD)) {
+  if(!has_skill(ch, COMMAND_LOAD) && cmd == 9) {
+        send_to_char("Huh?\r\n", ch);
+        return eFAILURE;
+  }
+  if (!has_skill(ch, COMMAND_PRIZE) && cmd == 999)
+  {
         send_to_char("Huh?\r\n", ch);
         return eFAILURE;
   }
 
   half_chop(arg, type, arg2);
 
-  if(!*type || !*arg2) {
+  if(cmd == 9 && (!*type || !*arg2)) {
     send_to_char("Usage:  load <mob|obj> <name|vnum>\n\r", ch);
     return eFAILURE;
+  } 
+  if (cmd == 999 && !*type) {
+	send_to_char("Usage: prize <name|vnum>\r\n",ch);
+	return eFAILURE;
   }
 
+  if (cmd == 9) {
   half_chop (arg2, name, arg3);
 
   if (arg3) cnt = atoi(arg3);
@@ -119,10 +129,13 @@ int do_load(struct char_data *ch, char *arg, int cmd)
   {
      send_to_char("Sorry, you can only load at most 50 of something at a time.\r\n", ch);
      return eFAILURE;
-  }
-
+  } }
+  if (cmd == 9)
   c = name;
+  else
+  c = type;
 
+  if (cmd == 9) {
   for(x = 0; x <= 2; x++) {
      if(x == 2) {
        send_to_char("Type must mobile or object.\n\r", ch);
@@ -131,6 +144,8 @@ int do_load(struct char_data *ch, char *arg, int cmd)
      if(is_abbrev(type, types[x]))
        break; 
   }
+  } else 
+	x = 1;
 
   switch(x) {
     default:
@@ -172,7 +187,12 @@ int do_load(struct char_data *ch, char *arg, int cmd)
           send_to_char("Why would you want to load that?\n\r", ch);
           return eFAILURE;
         }
-        if(GET_LEVEL(ch) < DEITY && !can_modify_object(ch, num)) {
+        else if (cmd == 999 && !isname("prize",((struct obj_data*)(obj_index[number].item))->name))
+	{
+	send_to_char("This command can only load prize items.\r\n",ch);
+	return eFAILURE;
+        }
+        else if(cmd != 999 && GET_LEVEL(ch) < DEITY && !can_modify_object(ch, num)) {
           send_to_char("You may only load objects inside of your range.\n\r", ch);
           return eFAILURE;
         } 

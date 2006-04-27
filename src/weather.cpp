@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: weather.cpp,v 1.10 2005/07/28 15:24:06 urizen Exp $ */
+/* $Id: weather.cpp,v 1.11 2006/04/27 22:53:13 dcastle Exp $ */
 
 extern "C"
 {
@@ -78,14 +78,14 @@ void another_hour(int mode)
             else send_to_outdoor("Orange flares join the sun touching the morning sky.\n\r");
             break;
          case 11 :
-            send_to_outdoor("The shadows shift imperceptably as another hour passes.\n\r");
+            send_to_outdoor("The shadows shift imperceptibly as another hour passes.\n\r");
             break;
          case 13 :
             if(weather_info.sky == SKY_CLOUDLESS)
               send_to_outdoor("Finishing its daily climb, the sun burns brightly overhead and begins its descent.\n\r");
             break;
          case 15 :
-            send_to_outdoor("The shadows shift imperceptably as another hour passes.\n\r");
+            send_to_outdoor("The shadows shift imperceptibly as another hour passes.\n\r");
             break;
          case 21 :
             weather_info.sunlight = SUN_SET;

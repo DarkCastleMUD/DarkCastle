@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.h,v 1.41 2006/04/19 18:59:51 dcastle Exp $ */
+/* $Id: interp.h,v 1.42 2006/04/27 22:53:15 dcastle Exp $ */
 
 #ifndef INTERP_H_
 #define INTERP_H_
@@ -45,7 +45,7 @@ struct command_info
     DO_FUN *command_pointer;        /* Function that does it            */
     ubyte minimum_position;          /* Position commander must be in    */
     ubyte minimum_level;             /* Minimum level needed             */
-    ubyte command_number;           /* Passed to function as argument   */
+    int command_number;           /* Passed to function as argument   */
     int flags;                      // what flags the skills has 
     ubyte toggle_hide;
 };
@@ -105,6 +105,7 @@ DO_FUN  do_cinfo;
 DO_FUN  do_circle;
 DO_FUN  do_clans; 
 DO_FUN  do_clear;
+DO_FUN  do_testhand;
 DO_FUN  do_clearaff;
 DO_FUN  do_climb;
 DO_FUN  do_close;

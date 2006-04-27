@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: who.cpp,v 1.19 2005/05/17 09:36:43 shane Exp $
+| $Id: who.cpp,v 1.20 2006/04/27 22:53:13 dcastle Exp $
 | who.C
 | Commands for who, maybe? :P
 */
@@ -296,7 +296,7 @@ int do_who(struct char_data *ch, char *argument, int cmd)
     int   lfgcheck = 0;
     int   guidecheck = 0;
     int   race = 0;
-
+    charname[0] = '\0';
     char* immortFields[] = {
         "   Immortal  ",
         "  Architect  ",
@@ -650,7 +650,7 @@ int do_where(struct char_data *ch, char *argument, int cmd)
       }
     } // for
   } else {  // normal, mortal where
-    zonenumber = ((world[ch->in_room].number) / 100);
+    zonenumber = world[ch->in_room].zone;
     send_to_char("Players in your vicinity:\n\r-------------------------\n\r", ch);
     if (IS_SET(world[ch->in_room].room_flags, NO_WHERE))
        return eFAILURE;
@@ -658,7 +658,7 @@ int do_where(struct char_data *ch, char *argument, int cmd)
       if (d->character && (d->connected == CON_PLAYING) && (d->character->in_room != NOWHERE) &&
           !IS_SET(world[d->character->in_room].room_flags, NO_WHERE) &&
  	  CAN_SEE(ch, d->character) && !IS_MOB(d->character) /*Don't show snooped mobs*/)  {
-          if (((world[d->character->in_room].number) / 100) == zonenumber)
+          if (world[d->character->in_room].zone == zonenumber)
             csendf(ch, "%-20s - %s$R\n\r", d->character->name,
           world[d->character->in_room].name);
        }

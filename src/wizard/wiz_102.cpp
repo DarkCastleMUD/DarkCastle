@@ -2042,9 +2042,9 @@ int do_oedit(struct char_data *ch, char *argument, int cmd)
 	  return eFAILURE;
 	}
      */
-        if (!has_skill(ch,COMMAND_RANGE))
+        if (!can_modify_object(ch, intval))
         {
-	  send_to_char("You cannot create items.\r\n",ch);
+	  send_to_char("You cannot create items in that range.\r\n",ch);
 	  return eFAILURE;
         }
 /*
@@ -3199,9 +3199,9 @@ mob_index[mob_num].virt);
           send_to_char("Please specifiy a valid number.\r\n", ch);
           return eFAILURE;
         }
-        if (!has_skill(ch,COMMAND_RANGE))
+        if (!can_modify_mobile(ch, intval))
         {
-          send_to_char("You cannot create mobiles.\r\n",ch);
+          send_to_char("You cannot create mobiles in that range.\r\n",ch);
           return eFAILURE;
         }
         x = create_blank_mobile(intval);
