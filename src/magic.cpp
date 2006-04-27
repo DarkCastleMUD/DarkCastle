@@ -1452,7 +1452,7 @@ act("You resist $n's attempt to paralyze you!",ch,NULL,victim,TO_VICT,0);
   af.type      = SPELL_PARALYZE;
   af.location  = APPLY_NONE;
   af.modifier  = 0;
-  af.duration  = 1;
+  af.duration  = 2;
   int learned = has_skill(ch, SPELL_PARALYZE);
   if (learned > 75) af.duration++;
   if (learned > 50) af.duration++;
