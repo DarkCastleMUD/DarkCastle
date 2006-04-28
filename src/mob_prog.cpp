@@ -573,6 +573,11 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
 	traditional =TRUE;
 	break;
     }
+    else if (*point == ' ')
+    {
+	logf( IMMORTAL, LOG_WORLD,  "Mob: %d ifchck syntax error", mob_index[mob->mobdata->nr].virt ); 
+	return -1;
+    }
     else if ( *point == '.' )
     {
 	break;

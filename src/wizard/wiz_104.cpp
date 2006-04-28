@@ -211,6 +211,12 @@ int do_load(struct char_data *ch, char *arg, int cmd)
         send_to_char("Why would you want to load that?\n\r", ch);
         return eFAILURE;
       }
+        else if (cmd == 999 && !isname("prize",((struct obj_data*)(obj_index[num].item))->name))
+	{
+	send_to_char("This command can only load prize items.\r\n",ch);
+	return eFAILURE;
+        }
+
       do_oload(ch, num, cnt);
       return eSUCCESS;
   }
