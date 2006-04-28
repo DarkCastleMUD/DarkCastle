@@ -702,7 +702,7 @@ int song_hypnotic_harmony(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict
       send_to_char("You are already in the middle of another song!\n\r", ch);
       return eFAILURE;
    }
-   if(!ch->equipment[HOLD] || GET_ITEM_TYPE(ch->equipment[HOLD]) != ITEM_INSTRUMENT || !ch->equipment[HOLD2] || GET_ITEM_TYPE(ch->equipment[HOLD2]) != ITEM_INSTRUMENT)
+   if((!ch->equipment[HOLD] || GET_ITEM_TYPE(ch->equipment[HOLD]) != ITEM_INSTRUMENT) && (!ch->equipment[HOLD2] || GET_ITEM_TYPE(ch->equipment[HOLD2]) != ITEM_INSTRUMENT))
    {
       send_to_char("You need an instrument to sing this.\r\n", ch);
       return eFAILURE;
@@ -814,7 +814,7 @@ int song_disrupt( ubyte level, CHAR_DATA *ch, char
       return eFAILURE;
    }
 
-   if(!ch->equipment[HOLD] || GET_ITEM_TYPE(ch->equipment[HOLD]) != ITEM_INSTRUMENT || !ch->equipment[HOLD2] || GET_ITEM_TYPE(ch->equipment[HOLD2]) != ITEM_INSTRUMENT)
+   if((!ch->equipment[HOLD] || GET_ITEM_TYPE(ch->equipment[HOLD]) != ITEM_INSTRUMENT) && (!ch->equipment[HOLD2] || GET_ITEM_TYPE(ch->equipment[HOLD2]) != ITEM_INSTRUMENT))
    {
       send_to_char("You need an instrument to sing this.\r\n", ch);
       return eFAILURE;
@@ -1528,7 +1528,7 @@ int song_shattering_resonance( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA 
       send_to_char("You are already in the middle of another song!\n\r", ch);
       return eFAILURE;
    }
-   if(!ch->equipment[HOLD] || GET_ITEM_TYPE(ch->equipment[HOLD]) != ITEM_INSTRUMENT || !ch->equipment[HOLD2] || GET_ITEM_TYPE(ch->equipment[HOLD2]) != ITEM_INSTRUMENT)
+   if((!ch->equipment[HOLD] || GET_ITEM_TYPE(ch->equipment[HOLD]) != ITEM_INSTRUMENT) && (!ch->equipment[HOLD2] || GET_ITEM_TYPE(ch->equipment[HOLD2]) != ITEM_INSTRUMENT))
    {
       send_to_char("You need an instrument to sing this.\r\n", ch);
       return eFAILURE;
@@ -1771,7 +1771,7 @@ int song_searching_song( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victi
       send_to_char("You are already in the middle of another song!\n\r", ch);
       return eFAILURE;
    }
-   if(!ch->equipment[HOLD] || GET_ITEM_TYPE(ch->equipment[HOLD]) != ITEM_INSTRUMENT || !ch->equipment[HOLD2] || GET_ITEM_TYPE(ch->equipment[HOLD2]) != ITEM_INSTRUMENT)
+   if((!ch->equipment[HOLD] || GET_ITEM_TYPE(ch->equipment[HOLD]) != ITEM_INSTRUMENT) && (!ch->equipment[HOLD2] || GET_ITEM_TYPE(ch->equipment[HOLD2]) != ITEM_INSTRUMENT))
    {
       send_to_char("You need an instrument to sing this.\r\n", ch);
       return eFAILURE;
@@ -1860,7 +1860,7 @@ int song_fanatical_fanfare(ubyte level, CHAR_DATA *ch, char *Aag, CHAR_DATA *vic
       send_to_char("You are already in the middle of another song!\n\r", ch);
       return eFAILURE;
    }
-   if(!ch->equipment[HOLD] || GET_ITEM_TYPE(ch->equipment[HOLD]) != ITEM_INSTRUMENT || !ch->equipment[HOLD2] || GET_ITEM_TYPE(ch->equipment[HOLD2]) != ITEM_INSTRUMENT)
+   if((!ch->equipment[HOLD] || GET_ITEM_TYPE(ch->equipment[HOLD]) != ITEM_INSTRUMENT) && (!ch->equipment[HOLD2] || GET_ITEM_TYPE(ch->equipment[HOLD2]) != ITEM_INSTRUMENT))
    {
       send_to_char("You need an instrument to sing this.\r\n", ch);
       return eFAILURE;
@@ -1877,7 +1877,7 @@ int song_mking_charge(ubyte level, CHAR_DATA *ch, char *Aag, CHAR_DATA *victim, 
       send_to_char("You are already in the middle of another song!\n\r", ch);
       return eFAILURE;
    }
-   if(!ch->equipment[HOLD] || GET_ITEM_TYPE(ch->equipment[HOLD]) != ITEM_INSTRUMENT || !ch->equipment[HOLD2] || GET_ITEM_TYPE(ch->equipment[HOLD2]) != ITEM_INSTRUMENT)
+   if((!ch->equipment[HOLD] || GET_ITEM_TYPE(ch->equipment[HOLD]) != ITEM_INSTRUMENT) && (!ch->equipment[HOLD2] || GET_ITEM_TYPE(ch->equipment[HOLD2]) != ITEM_INSTRUMENT))
    {
       send_to_char("You need an instrument to sing this.\r\n", ch);
       return eFAILURE;
