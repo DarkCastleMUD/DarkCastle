@@ -822,18 +822,18 @@ int song_disrupt( ubyte level, CHAR_DATA *ch, char
 
    int learned = has_skill(ch, song_info[SKILL_SONG_DISARMING_LIMERICK].skill_num);
 
-   act("$n sings a witty little limerick to you!\r\nYour laughing makes it hard to concentrate on keeping your spells up!", 
+   act("$n sings a witty little limerick to you!\r\nYour laughing makes it hard to concentrate on keeping your spells up!\n\r", 
        ch, 0, victim, TO_VICT, 0);
-   act("$n sings a hilarious limerick about a man from Nantucket to $N!",
+   act("$n sings a hilarious limerick about a man from Nantucket to $N!\n\r",
        ch, 0, victim, TO_ROOM, NOTVICT);
    send_to_char("You sing your funniest limerick!\r\n", ch);
    
    WAIT_STATE(ch, PULSE_VIOLENCE);
    if (number(1,101) < get_saves(victim, SAVE_TYPE_MAGIC))
    {
-act("$N resists your disarming limerick!", ch, NULL, victim, TO_CHAR,0);
-act("$N resists $n's disarming limerick!", ch, NULL, victim, TO_ROOM,NOTVICT);
-act("You resist $n's disarming limerick!",ch,NULL,victim,TO_VICT,0);
+act("$N resists your disarming limerick!\n\r", ch, NULL, victim, TO_CHAR,0);
+act("$N resists $n's disarming limerick!\n\r", ch, NULL, victim, TO_ROOM,NOTVICT);
+act("You resist $n's disarming limerick!\n\r",ch,NULL,victim,TO_VICT,0);
      return eFAILURE;
    }
 
