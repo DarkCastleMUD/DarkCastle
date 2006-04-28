@@ -1703,15 +1703,14 @@ int spell_curse(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *
 
   if (obj) {
 	 SET_BIT(obj->obj_flags.extra_flags, ITEM_NODROP);
-
+         act("$p glows $4red$R momentarily, before returning to its original color.", ch, obj, 0, TO_CHAR, 0);
 	 /* LOWER ATTACK DICE BY -1 */
 	  if(obj->obj_flags.type_flag == ITEM_WEAPON)  {
 		 if (obj->obj_flags.value[2] > 1) {
-	  obj->obj_flags.value[2]--;
-	  act("$p glows $4red$R.", ch, obj, 0, TO_CHAR, 0);
+		  obj->obj_flags.value[2]--;
 		 }
 		 else {
-	  send_to_char("Your curse has failed.\n\r", ch);
+		  send_to_char("Your curse has failed.\n\r", ch);
 		 }
 	  }
   } else {
