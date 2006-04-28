@@ -5,7 +5,7 @@
  *                                                                           *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-/* $Id: magic.h,v 1.25 2006/04/09 23:32:31 dcastle Exp $ */
+/* $Id: magic.h,v 1.26 2006/04/28 18:38:22 shane Exp $ */
 #ifndef MAGIC_H_
 #define MAGIC_H_
 
@@ -240,13 +240,15 @@ int spell_hellstream(ubyte level, CHAR_DATA * ch,
    CHAR_DATA * victim, struct obj_data * obj, int skill);
 int spell_group_sanc(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, 
 	struct obj_data *obj, int skill);
-
 int spell_ghost_walk(ubyte level, CHAR_DATA * ch,
+   CHAR_DATA * victim, struct obj_data * obj, int skill);
+int spell_mend_golem(ubyte level, CHAR_DATA * ch,
    CHAR_DATA * victim, struct obj_data * obj, int skill);
 
 int cast_ghost_walk(ubyte level, CHAR_DATA *ch, char *arg, int type,
    CHAR_DATA *victim, struct obj_data *tar_obj, int skill);
-
+int cast_mend_golem(ubyte level, CHAR_DATA *ch, char *arg, int type,
+   CHAR_DATA *victim, struct obj_data *tar_obj, int skill);
 int cast_iridescent_aura(ubyte level, CHAR_DATA *ch, char *arg, int type,
    CHAR_DATA *victim, struct obj_data *tar_obj, int skill);
 int cast_camouflague(ubyte level, CHAR_DATA * ch, char *arg, int type,

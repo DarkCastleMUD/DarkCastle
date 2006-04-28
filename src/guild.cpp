@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.83 2006/04/27 02:52:48 apocalypse Exp $
+| $Id: guild.cpp,v 1.84 2006/04/28 18:38:10 shane Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -273,6 +273,24 @@ int skills_guild(struct char_data *ch, char *arg, struct char_data *owner)
         send_to_char("\r\n", ch);
       }
       if(skilllist[i].skillnum == SKILL_SONG_DISARMING_LIMERICK) { 
+        send_to_char("#\n\r", ch);
+      }
+      if(skilllist[i].skillnum == SKILL_SONG_FANATICAL_FANFARE) { 
+        send_to_char("#\n\r", ch);
+      }
+      if(skilllist[i].skillnum == SKILL_SONG_SEARCHING_SONG) { 
+        send_to_char("#\n\r", ch);
+      }
+      if(skilllist[i].skillnum == SKILL_SONG_VIGILANT_SIREN) { 
+        send_to_char("#\n\r", ch);
+      }
+      if(skilllist[i].skillnum == SKILL_SONG_MKING_CHARGE) { 
+        send_to_char("#\n\r", ch);
+      }
+      if(skilllist[i].skillnum == SKILL_SONG_HYPNOTIC_HARMONY) { 
+        send_to_char("#\n\r", ch);
+      }
+      if(skilllist[i].skillnum == SKILL_SONG_SHATTERING_RESO) { 
         send_to_char("#\n\r", ch);
       }
       else send_to_char("\n\r", ch);

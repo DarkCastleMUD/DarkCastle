@@ -2,7 +2,7 @@
 #define AFFECT_H_
 
 /************************************************************************
-| $Id: affect.h,v 1.19 2005/06/22 21:08:23 shane Exp $
+| $Id: affect.h,v 1.20 2006/04/28 18:38:22 shane Exp $
 | affect.h
 | This contains the bits for affected_by
 */
@@ -65,7 +65,8 @@
 #define AFF_KNOW_ALIGN		53
 #define AFF_BLACKJACK_ALERT 	54 // cannot be blackjacked, or blackjack
 #define AFF_WATER_BREATHING     55
-#define AFF_MAX                 55
+#define AFF_AMBUSH_ALERT        56 // alert enough even for ambush
+#define AFF_MAX                 56
 //#define AFF_CHECKTHISASIZE     64 //do not change unless ASIZE changes
 //#define AFF_CHECKTHISASIZE     96 //do not change unless ASIZE changes
 

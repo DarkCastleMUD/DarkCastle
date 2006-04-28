@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.173 2006/04/27 22:52:44 dcastle Exp $ */
+/* $Id: const.cpp,v 1.174 2006/04/28 18:38:10 shane Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -885,6 +885,7 @@ char *affected_bits[] =
     "KNOW_ALIGN",
     "BLACKJACK_ALERT",
     "WATERBREATHING",
+    "AMBUSH_ALERT",
     "\n"
 };
 
@@ -1111,8 +1112,7 @@ struct class_skill_defines w_skills[] = { // warrior skills
 {    "rescue",          SKILL_RESCUE,             5,    70,     {WIS,INT} },
 {    "double",          SKILL_SECOND_ATTACK,      7,    90,     {STR,DEX} },
 {    "disarm",          SKILL_DISARM,             10,   70,     {DEX,WIS} },
-{    "headbutt",        SKILL_SHOCK,              12,   85,     
-{CON,WIS} },
+{    "headbutt",        SKILL_SHOCK,              12,   85,     {CON,WIS} },
 {    "shield block",    SKILL_SHIELDBLOCK,        15,   85,     {STR,DEX} },
 {    "retreat",         SKILL_RETREAT,            17,   98,     {WIS,INT} },
 {    "frenzy",          SKILL_FRENZY,             18,   80,     {CON,INT} },
@@ -1211,7 +1211,7 @@ struct class_skill_defines a_skills[] = { // anti-paladin skills
 {    "dispel good",          SPELL_DISPEL_GOOD,       38,     90,     {WIS,STR} },
 {    "acid shield",          SPELL_ACID_SHIELD,       40,     98,     {INT,STR} },
 {    "curse",                SPELL_CURSE,             41,     70,     {WIS,INT} },
-{    "firestorm",            SPELL_FIRESTORM,         42,     85,     {INT,STR} },
+{    "life leech",           SPELL_LIFE_LEECH,        42,     98,     {INT,STR} },
 {    "unholy aegis",         SPELL_U_AEGIS,           44,     90,     {WIS,INT} },
 {    "protection from good", SPELL_PROTECT_FROM_GOOD, 45,     90,     {WIS,DEX} },
 {    "resist acid",          SPELL_RESIST_ACID,       46,     70,     {CON,INT} },
@@ -1564,7 +1564,7 @@ struct class_skill_defines m_skills[] = { // mage skills
 {    "souldrain",           SPELL_SOULDRAIN,         22,     98,     {WIS,CON} }, 
 {    "dispel minor",        SPELL_DISPEL_MINOR,      25,     90,     {WIS,CON} }, 
 {    "mass invisibility",   SPELL_MASS_INVISIBILITY, 26,     98,     {DEX,INT} }, 
-{    "life leech",          SPELL_LIFE_LEECH,        27,     98,     {CON,STR} },
+{    "firestorm",           SPELL_FIRESTORM,         27,     98,     {INT,STR} }, 
 {    "portal",              SPELL_PORTAL,            28,     90,     {STR,INT} },
 {    "fireball",            SPELL_FIREBALL,          29,     98,     {INT,CON} },
 {    "focused repelance",   SKILL_FOCUSED_REPELANCE, 30,     98,     {DEX,INT} },
@@ -1580,12 +1580,12 @@ struct class_skill_defines m_skills[] = { // mage skills
 {    "stoneskin",           SPELL_STONE_SKIN,        39,     70,     {STR,CON} }, 
 {    "meteor swarm",        SPELL_METEOR_SWARM,      40,     98,     {STR,INT} }, 
 {    "word of recall",      SPELL_WORD_OF_RECALL,    42,     85,     {STR,WIS} }, 
-{    "firestorm",           SPELL_FIRESTORM,         43,     90,     {INT,STR} }, 
-{    "paralyze",            SPELL_PARALYZE,          44,     98,     {INT,DEX} },
+{    "create golem",        SPELL_CREATE_GOLEM,      43,     90,     {WIS,STR} },
+{    "release golem",       SPELL_RELEASE_GOLEM,     43,     90,     {WIS,INT} },
+{    "mend golem",          SPELL_MEND_GOLEM,        44,     98,     {INT,CON} },
 {    "hellstream",          SPELL_HELLSTREAM,        45,     98,     {INT,STR} },
 {    "fireshield",          SPELL_FIRESHIELD,        47,     98,     {CON,INT} },
-{    "create golem",        SPELL_CREATE_GOLEM,      48,     90,     {WIS,STR} },
-{    "release golem",       SPELL_RELEASE_GOLEM,     48,     90,     {WIS,INT} },
+{    "paralyze",            SPELL_PARALYZE,          48,     98,     {INT,DEX} },
 {    "solar gate",          SPELL_SOLAR_GATE,        49,     98,     {WIS,INT} },
 {    "spellcraft",          SKILL_SPELLCRAFT,        50,     98,     {WIS,INT} },
 {    "\n",                  0,                       1,      0,      {0,0} }

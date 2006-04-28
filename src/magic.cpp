@@ -754,7 +754,7 @@ int spell_life_leech(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 
   if(IS_SET(world[ch->in_room].room_flags, SAFE)) 
     return eFAILURE;
-  double o = 0.0, m = 0.0, avglevel = 0.0;
+/*  double o = 0.0, m = 0.0, avglevel = 0.0;
   for (tmp_victim = world[ch->in_room].people;tmp_victim;tmp_victim = tmp_victim->next_in_room)
     if (!ARE_GROUPED(ch, tmp_victim) && ch != tmp_victim)
      { o++; m++; avglevel *= o-1; avglevel += GET_LEVEL(tmp_victim); avglevel /= o;}
@@ -766,20 +766,22 @@ int spell_life_leech(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
   powmod -= (has_skill(ch, SPELL_LIFE_LEECH) * 0.001);
   int max = (int)(o * 50 * ( m / pow(m, powmod*m)));
   max += number(-10,10);
+*/
   for(tmp_victim = world[ch->in_room].people;tmp_victim;tmp_victim = temp)
   {
 	 temp = tmp_victim->next_in_room;
 	 if ( (ch->in_room == tmp_victim->in_room) && (ch != tmp_victim) &&
 		(!ARE_GROUPED(ch,tmp_victim)))
 	{
-		dam = max / o;
-		int adam = max / o;
+//		dam = max / o;
+                dam = 150;
+		int adam = dam_percent(skill, dam);
                 if (IS_SET(tmp_victim->immune, ISR_POISON))
 		  adam = 0;
 
 		 if (GET_HIT(tmp_victim) < adam)
-		  GET_HIT(ch) += GET_HIT(tmp_victim);
-		 else GET_HIT(ch) += adam;
+		  GET_HIT(ch) += GET_HIT(tmp_victim) * 0.3;
+		 else GET_HIT(ch) += adam * 0.3;
 
 		 if (GET_HIT(ch) > GET_MAX_HIT(ch))
 		  GET_HIT(ch) = GET_MAX_HIT(ch);
@@ -2584,6 +2586,27 @@ int spell_fireshield(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
     af.bitvector = AFF_FIRESHIELD;
     affect_to_char(victim, &af);
   }
+  return eSUCCESS;
+}
+
+
+/* MEND GOLEM */
+
+int spell_mend_golem(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
+{
+  struct follow_type *fol;
+  for (fol = ch->followers; fol; fol = fol->next)
+    if (IS_NPC(fol->follower) && mob_index[fol->follower->mobdata->nr].virt == 8)
+    {
+      GET_HIT(fol->follower) += GET_MAX_HIT(fol->follower) * 0.2;
+      if (GET_HIT(fol->follower) > GET_MAX_HIT(fol->follower))
+        GET_HIT(fol->follower) = GET_MAX_HIT(fol->follower);
+
+      act("$n focuses $s magical energy and many of the scratches on $s golem are fixed.\n\r", ch, 0, 0, TO_ROOM, 0);
+      send_to_char("You focus your magical energy and many of the scratches on your golem are fixed.\n\r", ch);
+      return eSUCCESS;
+    }
+  send_to_char("You don't have a golem.\r\n",ch);
   return eSUCCESS;
 }
 
@@ -11357,5 +11380,19 @@ TO_CHAR, 0);
 
 //  extract_obj(corpse);
   return eSUCCESS;
+}
+
+int cast_mend_golem( ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill )
+{
+  switch (type) 
+  {
+    case SPELL_TYPE_SPELL:
+       return spell_mend_golem(level, ch, tar_ch, 0, skill);
+       break;
+    default :
+       log("Serious screw-up in ghost_walk!", ANGEL, LOG_BUG);
+       break;
+  }
+  return eFAILURE;
 }
 

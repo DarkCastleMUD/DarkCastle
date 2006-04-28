@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.118 2006/04/25 10:36:09 dcastle Exp $
+| $Id: cl_thief.cpp,v 1.119 2006/04/28 18:38:17 shane Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -1762,7 +1762,10 @@ int do_blackjack(struct char_data *ch, char *argument, int cmd)
     send_to_char("That would look pretty amusing.\r\n",ch);
     return eFAILURE;
   }
-  
+  if(IS_AFFECTED(victim, AFF_ALERT)) {
+    act("$E is too alert and nervous looking and you are unable to sneak behind!", ch,0,victim, TO_CHAR, 0);
+    return eFAILURE;
+  }  
   if((GET_LEVEL(ch) < G_POWER) || IS_NPC(ch)) {
       if(!can_attack(ch) || !can_be_attacked(ch, victim))
       return eFAILURE;
