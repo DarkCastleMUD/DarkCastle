@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.175 2006/04/29 15:46:08 apocalypse Exp $ */
+/* $Id: const.cpp,v 1.176 2006/04/29 16:17:55 apocalypse Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1186,7 +1186,7 @@ struct class_skill_defines a_skills[] = { // anti-paladin skills
 {    "infravision",          SPELL_INFRAVISION,       7,      90,     {INT,DEX} },
 {    "detect good",          SPELL_DETECT_GOOD,       8,      98,     {WIS,INT} },
 {    "dual wield",           SKILL_DUAL_WIELD,        10,     85,     {DEX,CON} },
-{    "shocking grasp",       SPELL_SHOCKING_GRASP,    11,     98,     {INT,DEX} },
+{    "shocking grasp",       SPELL_SHOCKING_GRASP,    11,     98,     {DEX,INT} },
 {    "detect invisibility",  SPELL_DETECT_INVISIBLE,  12,     85,     {INT,DEX} },
 {    "invisibility",         SPELL_INVISIBLE,         13,     90,     {INT,DEX} },
 {    "backstab",             SKILL_BACKSTAB,          15,     90,     {DEX,STR} },
