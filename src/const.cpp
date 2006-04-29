@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.174 2006/04/28 18:38:10 shane Exp $ */
+/* $Id: const.cpp,v 1.175 2006/04/29 15:46:08 apocalypse Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1526,7 +1526,7 @@ struct class_skill_defines c_skills[] = { // cleric skills
 {    "true sight",           SPELL_TRUE_SIGHT,        39,     90,     {WIS,INT} },     
 {    "full heal",            SPELL_FULL_HEAL,         40,     98,     {WIS,INT} },
 {    "power harm",           SPELL_POWER_HARM,        41,     98,     {STR,CON} },
-{    "resist magic",         SPELL_RESIST_MAGIC,      43,     90,     {INT,WIS} },
+{    "resist magic",         SPELL_RESIST_MAGIC,      43,     85,     {INT,WIS} },
 {    "resist energy",        SPELL_RESIST_ENERGY,     44,     85,     {CON,DEX} },
 {    "dispel magic",         SPELL_DISPEL_MAGIC,      45,     85,     {INT,CON} },
 {    "flamestrike",          SPELL_FLAMESTRIKE,       46,     98,     {STR,WIS} },
@@ -1580,8 +1580,8 @@ struct class_skill_defines m_skills[] = { // mage skills
 {    "stoneskin",           SPELL_STONE_SKIN,        39,     70,     {STR,CON} }, 
 {    "meteor swarm",        SPELL_METEOR_SWARM,      40,     98,     {STR,INT} }, 
 {    "word of recall",      SPELL_WORD_OF_RECALL,    42,     85,     {STR,WIS} }, 
-{    "create golem",        SPELL_CREATE_GOLEM,      43,     90,     {WIS,STR} },
-{    "release golem",       SPELL_RELEASE_GOLEM,     43,     90,     {WIS,INT} },
+{    "create golem",        SPELL_CREATE_GOLEM,      43,     98,     {WIS,STR} },
+{    "release golem",       SPELL_RELEASE_GOLEM,     43,     98,     {WIS,INT} },
 {    "mend golem",          SPELL_MEND_GOLEM,        44,     98,     {INT,CON} },
 {    "hellstream",          SPELL_HELLSTREAM,        45,     98,     {INT,STR} },
 {    "fireshield",          SPELL_FIRESHIELD,        47,     98,     {CON,INT} },
