@@ -2039,10 +2039,10 @@ int spell_enchant_armor(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct ob
 
     if (IS_GOOD(ch)) {
 		SET_BIT(obj->obj_flags.extra_flags, ITEM_ANTI_EVIL);
-		act("$p glows blue.",ch,obj,0,TO_CHAR, 0);
+		act("$p glows $B$3blue$R.",ch,obj,0,TO_CHAR, 0);
 	 } else if (IS_EVIL(ch)) {
 		SET_BIT(obj->obj_flags.extra_flags, ITEM_ANTI_GOOD);
-		act("$p glows $4red$R.",ch,obj,0,TO_CHAR, 0);
+		act("$p glows $B$4red$R.",ch,obj,0,TO_CHAR, 0);
     } else {
       act("$p glows $5yellow$R.",ch,obj,0,TO_CHAR, 0);
 	}
@@ -2088,12 +2088,12 @@ int spell_enchant_weapon(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct o
 
     if (IS_GOOD(ch)) {
 		SET_BIT(obj->obj_flags.extra_flags, ITEM_ANTI_EVIL);
-      act("$p glows blue.",ch,obj,0,TO_CHAR,0);
+      act("$p glows $B$1blue$R.",ch,obj,0,TO_CHAR,0);
 	 } else if (IS_EVIL(ch)) {
       SET_BIT(obj->obj_flags.extra_flags, ITEM_ANTI_GOOD);
-      act("$p glows $4red$R.",ch,obj,0,TO_CHAR, 0);
+      act("$p glows $B$4red$R.",ch,obj,0,TO_CHAR, 0);
     } else {
-      act("$p glows $5yellow$R.",ch,obj,0,TO_CHAR, 0);
+      act("$p glows $B$5yellow$R.",ch,obj,0,TO_CHAR, 0);
 	}
 	 }
   if(GET_ITEM_TYPE(obj) == ITEM_MISSILE)
@@ -2443,7 +2443,7 @@ int spell_remove_curse(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
 
   if(obj) {
 	 if(IS_SET(obj->obj_flags.extra_flags, ITEM_NODROP)) {
-		act("$p briefly glows blue.", ch, obj, 0, TO_CHAR, 0);
+		act("$p briefly glows $3blue$R.", ch, obj, 0, TO_CHAR, 0);
 		REMOVE_BIT(obj->obj_flags.extra_flags, ITEM_NODROP);
 		if (obj_index[obj->item_number].virt == 514)
 		{
@@ -2503,7 +2503,8 @@ int spell_remove_curse(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
 
   for(obj = victim->carrying; obj; obj = obj->next_content)
 	  if(IS_SET(obj->obj_flags.extra_flags, ITEM_NODROP)) {
-		 act("$n's $p briefly glows blue.", victim, obj, 0, TO_ROOM, 0);
+		 act("$n's $p briefly glows $3blue$R.", victim, obj, 0, TO_ROOM, 0);
+                 act("The $p briefly glows $3blue$R.", ch, obj, 0, TO_CHAR, 0); 
 		if (skill > 70 && obj_index[obj->item_number].virt == 514)
 		{
 			int i = 0;
