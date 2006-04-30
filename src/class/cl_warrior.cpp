@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.42 2006/04/08 21:10:38 apocalypse Exp $
+| $Id: cl_warrior.cpp,v 1.43 2006/04/30 15:50:24 dcastle Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -346,17 +346,26 @@ int do_hitall(struct char_data *ch, char *argument, int cmd)
       act ("$n starts swinging like a MADMAN!", ch, 0, 0, TO_ROOM, 0);
       SET_BIT(ch->combat, COMBAT_HITALL);
     WAIT_STATE(ch, PULSE_VIOLENCE*3);
-
+      CHAR_DATA *nxtplr;
       for (vict = character_list; vict; vict = temp) 
       {
          temp = vict->next;
+	 nxtplr = temp; // nxtplayer is the next 100% safe target.
+			
+	 while (nxtplr && IS_NPC(nxtplr) && ch->in_room == nxtplr->in_room
+		&& !ARE_GROUPED(ch, nxtplr) && nxtplr != ch) nxtplr = nxtplr->next;
+
          if ((!ARE_GROUPED(ch, vict)) && (ch->in_room == vict->in_room) &&
             (vict != ch)) 
          {
+		bool victnpc = IS_NPC(vict);
 	    if(can_be_attacked(ch, vict))
               retval = one_hit(ch, vict, TYPE_UNDEFINED, FIRST);
             if(IS_SET(retval, eCH_DIED))
               return retval;
+	    if (IS_SET(retval, eVICT_DIED) && temp && IS_NPC(temp) && !victnpc)
+		temp = nxtplr;
+		// some mobs vanish when their master dies making temp invalid
          }
        }
        REMOVE_BIT(ch->combat, COMBAT_HITALL);

@@ -155,10 +155,20 @@ int do_news(struct char_data *ch, char *argument, int cmd)
    buf[0] = '\0';
    otimez[0] = '\0';
    int length = 0;
+   time_t thetime;
+   char arg[MAX_INPUT_LENGTH];
+   one_argument(argument, arg);
+   if (str_cmp(arg, "all"))
+     thetime = time(NULL) - 604800;
+   else
+     thetime = 0;    
+
    for (tnews = thenews;tnews;tnews = tnews->next)
    {
      if (!tnews->news || *tnews->news == '\0') continue;
+     if (tnews->time < thetime) continue;
      strftime(&timez[0], 10,"%d/%b/%y", gmtime(&tnews->time));
+    
      strcpy(old,buf);
      const char *newsstring = tnews->news;//newsify(tnews->news);
 //     if (str_cmp(otimez,timez)) {   

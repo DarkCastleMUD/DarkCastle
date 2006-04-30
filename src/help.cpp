@@ -87,8 +87,8 @@ int do_new_help(struct char_data *ch, char *argument, int cmd)
       log(buf, DEITY, LOG_HELP);
       return eFAILURE;
     }
-
-  if (this_help->min_level > GET_LEVEL(ch)) {
+  int a = GET_LEVEL(ch) == 0? 1:GET_LEVEL(ch);
+  if (this_help->min_level > a) {
     send_to_char("There is no help on that word.\r\n", ch);
     return eFAILURE;
   }

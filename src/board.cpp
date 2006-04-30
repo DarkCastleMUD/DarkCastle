@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: board.cpp,v 1.15 2006/04/19 18:59:47 dcastle Exp $
+| $Id: board.cpp,v 1.16 2006/04/30 15:50:22 dcastle Exp $
 | board.C
 | Description:  This file contains the implementation for the board
 |   code.  It's old and should be rewritten --Morc XXX
@@ -833,8 +833,10 @@ int board_display_msg(CHAR_DATA *ch, char *arg, int bnum)
   }
 
   if (!*number || !isdigit(*number))
+  {
+    send_to_char("Read what?\r\n",ch);
     return(0);
-
+  }
   if (!(tmessage = atoi(number))) return(0);
 
   curr_board = &boards[bnum];

@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.149 2006/04/28 18:38:10 shane Exp $ */
+/* $Id: spells.cpp,v 1.150 2006/04/30 15:50:22 dcastle Exp $ */
 
 extern "C"
 {
@@ -754,6 +754,7 @@ char *spells[]=
    "call lightning",
    "divine fury",
    "spiritwalk",
+   "mend golem",
    "\n"
 };
 

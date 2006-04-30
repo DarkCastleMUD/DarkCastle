@@ -1343,7 +1343,7 @@ int blackjack_table(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
 	send_to_char("$BYou BUSTED!$R\r\nThe dealer takes your bet.\r\n",ch);
         nextturn(plr->table);
 	if (plr->table->plr == plr && plr->next == NULL) // make dealer show cards..
-	;else	free_player(plr);
+		;else	free_player(plr);
      }else {
 	if (plr->doubled) nextturn(plr->table);
 	else {
@@ -1389,31 +1389,121 @@ int has_seat(struct ttable *ttbl)
   return -1;
 }
 
-bool findcard(struct tplayer *tplr, int val, char suit, int num = 0)
+bool findcard(int hand[5], int valu, char su, int num = 1)
 {
   int i;
-/*  for (i = 0; i<2;i++)
-    if (!val || val(tplr->hand[i]) == val)
-      if (!suit || suit(tplr->hand[i]) == suit)
-	if (--num < 0) return TRUE;
   for (i = 0; i<5;i++)
-    if (!val || val(tplr->hand[i]) == val)
-      if (!suit || suit(tplr->hand[i]) == suit)
-	if (--num < 0) return TRUE;
-*/
+    if (!valu || val(hand[i]) == valu)
+      if (!su || suit(hand[i]) == su)
+	if (--num <= 0) return TRUE;
+
   return FALSE;
 }
 
-int has_flush(struct tplayer *tplr)
+int highcard(int hand[5])
 {
-  return findcard(tplr, 0, suit(tplr->hand[0]), 4);
+  int a = hand[0];
+  for (int i = 1; i < 5; i++)
+    if (val(a) < val(hand[i]) || val(hand[i]) == 1)
+	a = hand[i];
+  return a;
 }
 
-bool has_rsf(struct tplayer *tplr)
+int lowcard(int hand[5])
+{ // counts aces for straight purposes.
+  int a = hand[0];
+  for (int i = 1; i < 5; i++)
+    if (val(a) > val(hand[i]))
+	a = hand[i];
+  return a;
+}
+
+bool has_flush(int hand[5])
 {
- if (tplr->hand[0] == 0) return FALSE; // shockingly, nope
- char st = suit(tplr->hand[0]);
- 
+  return findcard(hand, 0, suit(hand[0]), 5);
+}
+
+bool has_straight(int hand[5])
+{
+  int i = lowcard(hand);
+  if (findcard(hand, i+1, 0, 1) &&
+	findcard(hand, i+2, 0, 1) &&
+	findcard(hand, i+3, 0, 1) &&
+	findcard(hand, i+4, 0, 1))
+    return TRUE;
+ if (i == 1) {
+   if (findcard(hand, 10, 0, 1) &&
+	findcard(hand, 11, 0, 1) &&
+	findcard(hand, 12, 0, 1) &&
+	findcard(hand, 13, 0, 1))
+         return TRUE;
+ }
+ return FALSE;
+    
+}
+
+bool has_rsf(int hand[5])
+{
+  if (hand[0] == 0) return FALSE; // shockingly, nope
+  if (has_flush(hand) && has_straight(hand) && highcard(hand) == 1)
+   return TRUE; // yegods
+
+  return FALSE;  
+}
+
+bool has_sf(int hand[5])
+{
+  if (hand[0] == 0) return FALSE;
+  if (has_flush(hand) && has_straight(hand))
+   return TRUE;
+
+  return FALSE;  
+}
+
+bool has_4kind(int hand[5])
+{
+  if (findcard(hand, val(hand[0]), 0, 4) ||
+	findcard(hand,val(hand[1]), 0, 4))
+       return TRUE;
+   // one of the first two cards has to be part of the 4kind
+ return FALSE;
+}
+
+bool has_fhouse(int hand[5])
+{
+  int card1 = val(hand[0]);
+  int i;
+  for (i = 1; i < 5; i++) 
+   if (val(hand[i]) != card1)
+     break;
+  // no error checking needed, it is not possible to have 5 of a kind
+  if ((findcard(hand, card1, 0, 3) &&
+	findcard(hand, val(hand[i]), 0, 2)) ||
+	(findcard(hand, card1, 0, 2) &&
+	findcard(hand, val(hand[i]), 0, 3)))
+  	return TRUE;
+  return FALSE;
+}
+
+bool has_3kind(int hand[5])
+{
+  if (findcard(hand, val(hand[0]), 0, 3) ||
+	findcard(hand, val(hand[1]), 0, 3) ||
+	findcard(hand, val(hand[2]), 0, 3))
+    return TRUE;
+  return FALSE;
+}
+
+bool has_2pair(int hand[5])
+{
+  int first = 0;
+  for (int i = 0; i < 5; i++)
+    if (val(hand[i]) != val(first) && findcard(hand, val(hand[i]), 0, 2))
+	{
+		if (first) return TRUE;
+		else first = hand[i];
+	}
+ return FALSE;
 }
 
 char *hand_name(struct tplayer *tplr)
@@ -1469,6 +1559,10 @@ int get_hand(int which) // struct tplayer *tplr, int which)
  return i;
 }
 
+int handcompare(int hand1[5], int hand2[5])
+{
+  
+}
 
 int do_testhand(CHAR_DATA *ch, char *argument, int cmd)
 {
@@ -1484,6 +1578,7 @@ int do_testhand(CHAR_DATA *ch, char *argument, int cmd)
   send_to_char(buf, ch);
   return eSUCCESS;
 }
+
 int find_highhand(struct tplayer *tplr)
 {
   int hand=0;

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.60 2006/04/25 10:35:29 dcastle Exp $
+| $Id: inventory.cpp,v 1.61 2006/04/30 15:50:22 dcastle Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -144,7 +144,7 @@ void get(struct char_data *ch, struct obj_data *obj_object, struct obj_data *sub
 		sprintf(buffer, "%s ClanTax: %d", buffer, cgold);
         }
 	else
-	  csendf(ch,"Your clan taxes you %d gold, leaving %d gold for you.\r\n",cgold, obj_object->obj_flags.value[0]-cgold);
+	  csendf(ch,"Your clan taxes you %d gold, leaving %d gold for you.\r\n",cgold, obj_object->obj_flags.value[0]);
 	  save_clans();
 	} else
 	GET_GOLD(ch) += obj_object->obj_flags.value[0];

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: channel.cpp,v 1.10 2006/01/13 16:49:14 dcastle Exp $
+| $Id: channel.cpp,v 1.11 2006/04/30 15:50:22 dcastle Exp $
 | channel.C
 | Description:  All of the channel - type commands; do_say, gossip, etc..
 */
@@ -545,6 +545,7 @@ int do_tell(struct char_data *ch, char *argument, int cmd)
                 PERS(ch, vict), message, IS_SET(vict->pcdata->toggles, PLR_BEEP) ? '\a' : '\0');
           if(vict->pcdata->last_tell)
              dc_free(vict->pcdata->last_tell);
+	if (!IS_NPC(ch))
           vict->pcdata->last_tell = str_dup(GET_NAME(ch));
         }
         ansi_color(GREEN, vict);
@@ -553,7 +554,8 @@ int do_tell(struct char_data *ch, char *argument, int cmd)
         ansi_color(NTEXT, vict);
 
         sprintf(buf,"$2$BYou tell %s, '%s'$R", PERS(vict, ch), message);
-        act(buf, ch, 0, 0, TO_CHAR, STAYHIDE);
+        send_to_char(buf, ch);
+//        act(buf, ch, 0, 0, TO_CHAR, STAYHIDE);
       }
       else if(!is_busy(vict) && GET_POS(vict) > POSITION_SLEEPING)
        {
