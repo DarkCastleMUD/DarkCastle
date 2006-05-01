@@ -649,10 +649,12 @@ void update_bard_singing()
          || IS_SET(i->combat, COMBAT_BASH1)
          || IS_SET(i->combat, COMBAT_BASH2) )
       {
-        send_to_char("You can't keep singing in this position!\r\n", i); 
-        i->song_timer = 0;
-        if((song_info[i->song_number].intrp_pointer))
-          ((*song_info[i->song_number].intrp_pointer) (GET_LEVEL(i), i, NULL, NULL, -1));
+        if( i->song_number != 26 || !(IS_SET(i->combat, COMBAT_BASH1) || IS_SET(i->combat, COMBAT_BASH2))) {
+           send_to_char("You can't keep singing in this position!\r\n", i); 
+           i->song_timer = 0;
+           if((song_info[i->song_number].intrp_pointer))
+             ((*song_info[i->song_number].intrp_pointer) (GET_LEVEL(i), i, NULL, NULL, -1));
+        } //keep singing crushing crescendo if bashed or tripped
       }
     }
 
@@ -2535,7 +2537,7 @@ int song_vigilant_siren( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victi
       send_to_char("You are already in the middle of another song!\n\r", ch);
       return eFAILURE;
    }
-   if(!ch->equipment[HOLD] || GET_ITEM_TYPE(ch->equipment[HOLD]) != ITEM_INSTRUMENT || !ch->equipment[HOLD2] || GET_ITEM_TYPE(ch->equipment[HOLD2]) != ITEM_INSTRUMENT)
+   if((!ch->equipment[HOLD] || GET_ITEM_TYPE(ch->equipment[HOLD]) != ITEM_INSTRUMENT) && (!ch->equipment[HOLD2] || GET_ITEM_TYPE(ch->equipment[HOLD2]) != ITEM_INSTRUMENT))
    {
       send_to_char("You need an instrument to sing this.\r\n", ch);
       return eFAILURE;
