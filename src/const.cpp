@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.176 2006/04/29 16:17:55 apocalypse Exp $ */
+/* $Id: const.cpp,v 1.177 2006/05/02 18:12:39 apocalypse Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -273,7 +273,7 @@ char *spell_wear_off_msg[] =
   "!ALIGN_EVIL!",
   "Your protective aegis dissipates.",
   "Your unholy aegis dissipates.",
-  "Your natural resistance to magic fades.",
+  "Your resistance to $Bmagic$R fades.",
   "!EAGLE_EYE!",
   "!UNUSED!"
 };
