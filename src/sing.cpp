@@ -787,10 +787,9 @@ bool any_charms(CHAR_DATA *ch);
   add_follower(victim, ch, 0);
 
   af.type      = SPELL_CHARM_PERSON;
-  //int i = has_skill(ch, SKILL_SONG_HYPNOTIC_HARMONY);
   af.duration  = 24 + ((level > 40) * 6) + ((level > 60) * 6) + ((level > 80) * 12) ;
 
- af.modifier  = 0;
+  af.modifier  = 0;
   af.location  = 0;
   af.bitvector = AFF_CHARM;
   affect_to_char(victim, &af);
@@ -848,7 +847,7 @@ act("You resist $n's disarming limerick!",ch,NULL,victim,TO_VICT,0);
          return eSUCCESS;
       }
    }
-   if(learned >= 85) {
+   if(learned > 85) {
       if(affected_by_spell(victim, KI_STANCE+KI_OFFSET)) {
          act("Your limerick breaks $S stance!", ch, 0, victim, TO_CHAR, 0);
          act("$n's limerick causes you to break your stance!", ch, 0, victim, TO_VICT, 0);
@@ -1077,16 +1076,32 @@ int song_note_of_knowledge( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vi
 int execute_song_note_of_knowledge( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    obj_data * obj = NULL;
+   char_data * vict = NULL;
+   obj_data * corpse = NULL;
+   char buf[MAX_STRING_LENGTH];
 
    obj = get_obj_in_list(ch->song_data, ch->carrying);
-  
+   vict = get_char_room_vis(ch, ch->song_data);
+   corpse = get_obj_in_list_vis(ch, ch->song_data, world[ch->in_room].contents);
+   if(GET_ITEM_TYPE(corpse) != ITEM_CONTAINER || corpse->obj_flags.value[3] != 1)
+      corpse = NULL;
+   int learned = has_skill(ch, song_info[SKILL_SONG_NOTE_OF_KNOWLEDGE].skill_num);
+
    dc_free(ch->song_data);
    ch->song_data = 0;
 
    if(obj) {
       spell_identify(GET_LEVEL(ch), ch, 0, obj, 0);
    }
-   else send_to_char("You don't seem to have that item.\r\n", ch);
+   else if(learned > 80 && corpse) {
+      sprintf(buf, "Corpse '%s'\n\r", corpse->name);
+      send_to_char(buf, ch);
+      spell_identify(GET_LEVEL(ch), ch, 0, corpse, 0);
+   }
+   else if(learned > 85 && vict) {
+      spell_identify(GET_LEVEL(ch), ch, vict, 0, 0);
+   }
+   else send_to_char("You can't seem to find that item.\r\n", ch);
    return eSUCCESS;
 }
 
@@ -1725,7 +1740,12 @@ int execute_song_flight_of_bee( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA
          send_to_char("Your musical flight ends.\n\r", master);
       }
    }
-//   if (skill_success(ch, 0, SKILL_SONG_FLIGHT_OF_BEE))
+
+   if (!skill_success(ch, 0, SKILL_SONG_FLIGHT_OF_BEE)) {
+      send_to_char("You run out of lyrics and end the song.\r\n", ch);
+      return eSUCCESS;
+   }
+
    ch->song_timer = song_info[ch->song_number].beats;
    return eSUCCESS;
 }
@@ -1953,6 +1973,11 @@ int execute_song_jig_of_alacrity( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DA
          REMBIT(master->affected_by, AFF_HASTE);
          send_to_char("Your limbs slow back to normal.\n\r", fvictim->follower);
       }
+   }
+
+   if(!skill_success(ch, NULL, SKILL_SONG_JIG_OF_ALACRITY)) {
+      send_to_char("You run out of lyrics and end the song.\r\n", ch);
+      return eSUCCESS;
    }
 
    GET_KI(ch) -= 2;
@@ -2455,6 +2480,9 @@ int execute_song_synchronous_chord( ubyte level, CHAR_DATA *ch, char *arg, CHAR_
    char_data * target = NULL;
    char buf[400];
    char * get_random_hate(CHAR_DATA *ch);
+   int learned = has_skill(ch, song_info[SKILL_SONG_SYNC_CHORD].skill_num);
+
+   extern char *isr_bits[];
 
    target = get_char_room_vis(ch, ch->song_data);
 
@@ -2483,6 +2511,20 @@ int execute_song_synchronous_chord( ubyte level, CHAR_DATA *ch, char *arg, CHAR_
    sprintf(buf, "%s seems to hate... %s.\r\n", GET_SHORT(target),
             get_random_hate(target) ? get_random_hate(target) : "Noone!");
    send_to_char(buf, ch);
+
+   if(learned > 80) {
+      sprintbit(target->resist, isr_bits, buf);
+      csendf(ch, "%s is resistant to: %s\n\r", GET_SHORT(target), buf);
+   }
+   if (learned > 85) {
+      sprintbit(target->immune, isr_bits, buf);
+      csendf(ch, "%s is immune to: %s\n\r", GET_SHORT(target), buf);
+   }
+   if (learned > 90) {  
+      sprintbit(target->suscept, isr_bits, buf);
+      csendf(ch, "%s is susceptable to: %s\n\r", GET_SHORT(target), buf);
+   }
+
    return eSUCCESS;
 }
 
