@@ -2509,7 +2509,7 @@ int execute_song_synchronous_chord( ubyte level, CHAR_DATA *ch, char *arg, CHAR_
 
    act("You enter $S mind...", ch, 0, target, TO_CHAR, INVIS_NULL);
    sprintf(buf, "%s seems to hate... %s.\r\n", GET_SHORT(target),
-            get_random_hate(target) ? get_random_hate(target) : "Noone!");
+            get_random_hate(target) ? get_random_hate(target) : "no one!");
    send_to_char(buf, ch);
 
    if(learned > 80) {
