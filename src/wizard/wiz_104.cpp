@@ -1080,12 +1080,12 @@ int do_show(struct char_data *ch, char *argument, int cmd)
       if(act)
 	for (i = 0; i < 31; i++)
            if (IS_SET(act,1<<i))
-      if (!ISSET(((struct char_data *)(mob_index[nr].item))->mobdata->actflags, 1<<i))
+      if (!ISSET(((struct char_data *)(mob_index[nr].item))->mobdata->actflags, i+1))
          goto eheh;
       if(affect)
 	for (i = 0; i < 31; i++)
            if (IS_SET(affect,1<<i))
-      		if (!ISSET(((struct char_data *)(mob_index[nr].item))->affected_by, 1<<i))
+      		if (!ISSET(((struct char_data *)(mob_index[nr].item))->affected_by, i+1))
         		goto eheh;
       count++;
       if (count > 200)

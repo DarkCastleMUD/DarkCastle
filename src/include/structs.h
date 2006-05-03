@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: structs.h,v 1.10 2006/01/13 16:49:21 dcastle Exp $
+| $Id: structs.h,v 1.11 2006/05/03 18:41:06 dcastle Exp $
 | structs.h
 | Description:  This file should go away someday - it's stuff that I
 |   wasn't sure how to break up.  --Morc XXX
@@ -83,6 +83,7 @@ struct message_list
     int a_type;               /* Attack type				*/
     int number_of_attacks;    /* # messages to chose from		*/
     struct message_type *msg; /* List of messages			*/
+    struct message_type *msg2; /* List of messages with toggle damage ON */
 };
 
 /*
