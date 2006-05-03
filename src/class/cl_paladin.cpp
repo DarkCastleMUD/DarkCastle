@@ -178,8 +178,10 @@ int do_layhands(struct char_data *ch, char *argument, int cmd)
        GET_HIT(victim) = GET_MAX_HIT(victim);
 
      send_to_char("Praying fervently, you lay hands as life force granted by your god streams from your body.\r\n", ch);
-     act("Your body surges with holy energies as life force granted by $N's god pours into you!", victim, 0, ch, TO_CHAR, 0);
-     act("A blinding flash fills the area as life force granted from $n's god pours into $N", ch, 0, victim, TO_ROOM, NOTVICT);
+     act("Your body surges with holy energies as life force granted by $N's god pours into you!\r\n", victim, 0, ch, 
+TO_CHAR, 0);
+     act("A blinding flash fills the area as life force granted from $n's god pours into $N!\r\n", ch, 0, victim, 
+TO_ROOM, NOTVICT);
    }
 
    af.type = SKILL_LAY_HANDS;

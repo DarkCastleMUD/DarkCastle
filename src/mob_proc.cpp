@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.92 2006/04/27 22:52:44 dcastle Exp $ */
+/* $Id: mob_proc.cpp,v 1.93 2006/05/03 03:44:14 apocalypse Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -2893,7 +2893,7 @@ static char *dethSayText [ ] =
   "He who turns the other cheek too far gets it in the neck.",
   "Horsepower was a lot safer when only horses had it.",
   "If all cars in the U.S. were placed end to end, some fool would try to pass them.",
-  "To get away with criticizing, leave the person with the idea he has been helped.",
+  "To get away with criticising, leave the person with the idea he has been helped.",
   "If you want to forget all your other troubles, wear tight shoes.",
   "Intuition enables a woman to contradict her husband before he says anything.",
   "Many men are self-made, but only the successful ones will admit it.",
@@ -3063,7 +3063,8 @@ static char *dethSayText [ ] =
   "Of all the Daliesque tourist traps in the world, we had to walk into this one.",
   "Ahh yes, the good old days of the Internet...when men were men, women were men, and children were FBI agents.",
   "I think Bush's foreign policy is quite reasonable.",
-  "Remember, arguing on the Internet is like entering the Special Olympics...even if you win, you're still a retard."
+  "Remember, arguing on the Internet is like entering the Special Olympics...even if you win, you're still a retard.",
+  "Sorry guys, I have to step down as Implementor so I can pass my PhD."
 };
 
 #define DETH_SAY_TEXT_SIZE    ( sizeof ( dethSayText )    / sizeof ( char * ) )

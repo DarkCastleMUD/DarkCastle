@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.177 2006/05/02 18:12:39 apocalypse Exp $ */
+/* $Id: const.cpp,v 1.178 2006/05/03 03:44:14 apocalypse Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -168,7 +168,7 @@ char *spell_wear_off_msg[] =
   "The $2green$R in your skin fades.",
   "!Sun ray!",
   "Your body's healing process slows to normal.",
-  "The shield of $2acid$R around you dissapates into the air.", /* 50 */
+  "The shield of $2acid$R around you dissipates into the air.", /* 50 */
   "The gills on your neck shrink to nothing.",
   "!Globe Of Darkness!",
   "!Identify!",
