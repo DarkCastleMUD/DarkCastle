@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.60 2006/04/10 17:51:59 apocalypse Exp $ */
+/* $Id: mob_proc2.cpp,v 1.61 2006/05/03 18:40:21 dcastle Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -1430,14 +1430,14 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     send_to_char(
     "13) One (1) Platinum coin     Cost: 20,000 Gold Coins.\n\r"
     "14) Five (5) Platinum coins   Cost: 100,000 Gold Coins.\n\r"
-    "15) 250 Platinum coins        Cost: 5,000,000 Gold Coins.\n\r"
-    "16) 90,000 Gold Coins         Cost: Five (5) Platinum coins.\n\r"
-    "17) 4,500,000 Gold Coins      Cost: 250 Platinum coins.\n\r"
-    "18) Convert experience to gold. (100mil Exp. = 500000 Gold.)\n\r"
+    "15) 250 Platinum coins        Cost: 5,000,000 Gold Coins.\r\n"
+    "16) 100,000 Gold Coins        Cost: Five (5) Platinum coins.\r\n"
+    "17) 5,000,000 Gold Coins      Cost: 250 Platinum coins.\r\n"
+    "18) Convert experience to gold. (100mil Exp. = 500000 Gold.)\r\n"
     "19) A deep blue potion of healing. Cost: 25 Platinum coins.\r\n"
     "20) A deep red vial of mana. Cost: 50 Platinum coins.\r\n"
-    "21) Buy a practice session for 25 plats.\n\r"
-    "22) Freedom from HUNGER and THIRST:  Currently out of stock.\n\r"
+    "21) Buy a practice session for 25 plats.\r\n"
+    "22) Freedom from HUNGER and THIRST:  Currently out of stock.\r\n"
                  , ch);
 
     return eSUCCESS;
@@ -1777,7 +1777,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
       return eSUCCESS;
     }
     GET_PLATINUM(ch) -= 5;
-    GET_GOLD(ch) += 90000;
+    GET_GOLD(ch) += 100000;
     send_to_char("Ok.\n\r", ch);
     return eSUCCESS;
   }
@@ -1788,7 +1788,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
       return eSUCCESS;
     }
     GET_PLATINUM(ch) -= 250;
-    GET_GOLD(ch) += 4500000;
+    GET_GOLD(ch) += 5000000;
     send_to_char("Ok.\n\r", ch);
     return eSUCCESS;
   }
@@ -1867,7 +1867,8 @@ char *gl_item(OBJ_DATA *obj, int number, CHAR_DATA *ch)
   sprintf(buf,"$B$7%-2d$R) %s ", number+1, obj->short_description);
   extern char* apply_types[];
   if (obj->obj_flags.type_flag == ITEM_WEAPON) { // weapon
-    sprintf(buf, "%s%dd%d, ", buf, obj->obj_flags.value[1], obj->obj_flags.value[2]);
+    sprintf(buf, "%s%dd%d, %s, ", buf, obj->obj_flags.value[1], obj->obj_flags.value[2],
+		IS_SET(obj->obj_flags.extra_flags, ITEM_TWO_HANDED)?"Two-handed":"One-handed");
   }
   length = strlen(buf);
  for (;i<obj->num_affects;i++)

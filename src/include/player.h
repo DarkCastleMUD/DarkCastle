@@ -1,7 +1,7 @@
 #ifndef PLAYER_H_
 #define PLAYER_H_
 /************************************************************************
-| $Id: player.h,v 1.24 2006/04/25 10:36:13 dcastle Exp $
+| $Id: player.h,v 1.25 2006/05/03 18:40:25 dcastle Exp $
 | player.h
 | Description: This file defines the player vectors..punishment, specials,
 |   etc...
@@ -79,6 +79,7 @@
 #define PLR_NEWS         1<<22
 #define PLR_50PLUS	 1<<23
 #define PLR_ASCII         1<<24
+#define PLR_DAMAGE       1<<25
 /************************************************************************
 | Class types for PCs
 */

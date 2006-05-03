@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: save.cpp,v 1.34 2005/06/17 20:13:44 urizen Exp $ */
+/* $Id: save.cpp,v 1.35 2006/05/03 18:40:21 dcastle Exp $ */
 
 extern "C"
 {
@@ -586,10 +586,8 @@ void save_char_obj (CHAR_DATA *ch)
   // otherwise save them in tavern
   if(IS_SET(world[ch->in_room].room_flags, SAFE))
     uchar.load_room = world[ch->in_room].number;
-  else if(GET_LEVEL(ch) >= IMMORTAL)
-    uchar.load_room = real_room(GET_HOME(ch));
   else
-    uchar.load_room = real_room(safe);
+    uchar.load_room = real_room(GET_HOME(ch));
 
   if((fwrite(&uchar, sizeof(uchar), 1, fpsave))               &&
      (char_to_store_variable_data(ch, fpsave))                &&

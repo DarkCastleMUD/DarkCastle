@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.43 2006/04/30 15:50:24 dcastle Exp $
+| $Id: cl_warrior.cpp,v 1.44 2006/05/03 18:40:23 dcastle Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -297,7 +297,7 @@ int do_retreat(struct char_data *ch, char *argument, int cmd)
 int do_hitall(struct char_data *ch, char *argument, int cmd)
 {
     struct char_data *vict, *temp;
-    int retval;
+    int retval=0;
 
     extern struct char_data *character_list;
 
@@ -355,8 +355,8 @@ int do_hitall(struct char_data *ch, char *argument, int cmd)
 	 while (nxtplr && IS_NPC(nxtplr) && ch->in_room == nxtplr->in_room
 		&& !ARE_GROUPED(ch, nxtplr) && nxtplr != ch) nxtplr = nxtplr->next;
 
-         if ((!ARE_GROUPED(ch, vict)) && (ch->in_room == vict->in_room) &&
-            (vict != ch)) 
+         if ((ch->in_room == vict->in_room) &&
+            (vict != ch) && !ARE_GROUPED(ch,vict)) 
          {
 		bool victnpc = IS_NPC(vict);
 	    if(can_be_attacked(ch, vict))

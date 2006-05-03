@@ -14,7 +14,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.h,v 1.77 2006/04/28 18:38:22 shane Exp $ */
+/* $Id: spells.h,v 1.78 2006/05/03 18:40:25 dcastle Exp $ */
 #include <structs.h> // ubyte, int16
 
 #define MAX_BUF_LENGTH               240
@@ -465,11 +465,6 @@ void check_maxes(CHAR_DATA *ch);
 
 // NOTE  "skill" numbers 1500-1599 are reserved for innate skill abilities
 // These are in innate.h
-
-// NOTE  "skill" numbers 2000-2199 are reserved for weapon poisoning damage message
-
-#define POISON_MESSAGE_BASE          2000
-
 
 
 // NOTE 'spell' wear off timers are here.  Reserved messages 4000-4999

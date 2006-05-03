@@ -16,7 +16,7 @@
 /* 12/08/2003   Onager   Added chop_half() to work like half_chop() but    */
 /*                       chopping off the last word.                       */
 /***************************************************************************/
-/* $Id: interp.cpp,v 1.80 2006/04/27 22:52:44 dcastle Exp $ */
+/* $Id: interp.cpp,v 1.81 2006/05/03 18:40:21 dcastle Exp $ */
 
 extern "C"
 {
@@ -119,6 +119,8 @@ struct command_info cmd_info[] =
     // Informational commands
     { "alias",		do_alias,	POSITION_DEAD, 0, 9, 0, 1 },
     { "toggle",		do_toggle,	POSITION_DEAD, 0, 9, 0, 1 },
+    { "consider",	do_consider,	POSITION_RESTING, 0, 9, 0, 1 },
+    { "configure",		do_toggle,	POSITION_DEAD, 0, 9, 0, 1 },
     { "credits",	do_credits,	POSITION_DEAD, 0, 9, 0, 1 },
     { "equipment",	do_equipment,	POSITION_DEAD, 0, 9, 0, 1 },
     { "ohelp",		do_help,	POSITION_DEAD, 0, 9, 0, 1 },
@@ -249,7 +251,6 @@ struct command_info cmd_info[] =
     { "bs",		do_backstab,	POSITION_STANDING, 0, 9, 0, 0 },
     { "boss",		do_boss,	POSITION_DEAD, 0, 9, 0, 1 },
     { "blackjack",	do_blackjack,	POSITION_STANDING, 0, 9, 0, 0 },
-    { "consider",	do_consider,	POSITION_RESTING, 0, 9, 0, 1 },
     { "enter",		do_enter,	POSITION_STANDING, 0, 60, COM_CHARMIE_OK, 20 },
     { "climb",		do_climb,	POSITION_STANDING, 0, 60, COM_CHARMIE_OK, 20 },
     { "examine",	do_examine,	POSITION_RESTING, 0, 9, 0, 1 },

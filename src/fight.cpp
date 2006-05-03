@@ -5,7 +5,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.292 2006/04/14 14:00:41 dcastle Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.293 2006/05/03 18:40:21 dcastle Exp $ */
 
 extern "C"
 {
@@ -45,6 +45,7 @@ extern "C"
 #include <assert.h>
 #include <sing.h> // stop_grouped_bards
 #include <innate.h>
+#include <token.h>
 extern int top_of_world;
 extern CHAR_DATA *character_list;
 extern struct descriptor_data *descriptor_list;
@@ -2089,10 +2090,59 @@ int is_pkill(CHAR_DATA *ch, CHAR_DATA *vict)
   return FALSE;
 }
 
+void send_damage(char *buf, CHAR_DATA *ch, OBJ_DATA *obj, CHAR_DATA *victim, char *dmg, char *buf2, int to)
+{
+ void send_message(TokenList * tokens, CHAR_DATA *ch, OBJ_DATA * obj, void * vch, int flags, CHAR_DATA *to);
+  CHAR_DATA *tmpch;
+ char string1[MAX_INPUT_LENGTH], string2[MAX_INPUT_LENGTH];
+ 
+ int i, z = 0, y = 0;
+ for (i = 0; i <= strlen(buf); i++)
+ {
+   if (*(buf+i) == '|')
+   {
+     string1[z] = '\0'; 
+     strcat(string1, dmg);
+      z += strlen(dmg);
+   } else {
+      string1[z++] = *(buf+i);
+      string2[y++] = *(buf+i);
+   }
+ }
+ if (buf2) // lazy, should've done it earlier, some extra processing wasted, but I don't care!
+    strcpy(string2, buf2);
+
+ TokenList *tokens,*tokens2;
+ tokens = new TokenList(string1);
+ tokens2 = new TokenList(string2);
+ if (to == TO_ROOM) {
+ for (tmpch = world[ch->in_room].people;tmpch;tmpch = tmpch->next_in_room)
+ {
+    if (tmpch == ch || tmpch == victim) continue;
+     if (!IS_NPC(tmpch) && IS_SET(tmpch->pcdata->toggles, PLR_DAMAGE))
+	send_message(tokens, ch, obj, victim, 0, tmpch);
+     else
+	send_message(tokens2, ch, obj, victim, 0, tmpch);
+  }
+  } else if (to == TO_CHAR) {
+     if (!IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_DAMAGE))
+	send_message(tokens, ch, obj, victim, 0, ch);
+     else
+	send_message(tokens2, ch, obj, victim, 0, ch);
+  } else if (to == TO_VICT) {
+     if (!IS_NPC(victim) && IS_SET(victim->pcdata->toggles, PLR_DAMAGE))
+	send_message(tokens, ch, obj, victim, 0, victim);
+     else
+	send_message(tokens2, ch, obj, victim, 0, victim);
+  }
+}
+
+
+
 void do_dam_msgs(CHAR_DATA *ch, CHAR_DATA *victim, int dam, int attacktype, int weapon)
 {
   extern struct message_list fight_messages[MAX_MESSAGES];
-  struct message_type *messages;
+  struct message_type *messages,*messages2;
   int i,j,  nr;
   if (dam > 100000) return; //bingo
   for (i = 0; i < MAX_MESSAGES; i++)
@@ -2102,9 +2152,15 @@ void do_dam_msgs(CHAR_DATA *ch, CHAR_DATA *victim, int dam, int attacktype, int 
     
     nr = dice(1, fight_messages[i].number_of_attacks);
     j = 1;
-    for (messages = fight_messages[i].msg; j < nr && messages; j++)
+    for (messages = fight_messages[i].msg, messages2 = fight_messages[i].msg2; j < nr && messages; j++)
+    {
       messages = messages->next;
-    
+      if (messages2) messages2 = messages2->next;
+    }
+    char dmgmsg[MAX_INPUT_LENGTH];
+    dmgmsg[0] = '\0';
+	if (dam > 0)
+    sprintf(dmgmsg, "$B%d$R", dam);
     if (!messages) return;
     if (!IS_NPC(victim) && GET_LEVEL(victim) >= IMMORTAL)
     {
@@ -2128,21 +2184,29 @@ void do_dam_msgs(CHAR_DATA *ch, CHAR_DATA *victim, int dam, int attacktype, int 
       else
         if (GET_POS(victim) == POSITION_DEAD)
         {
-          act(messages->die_msg.attacker_msg,
-            ch, ch->equipment[weapon], victim, TO_CHAR, 0);
-          act(messages->die_msg.victim_msg,
-            ch, ch->equipment[weapon], victim, TO_VICT, 0);
-          act(messages->die_msg.room_msg,
-            ch, ch->equipment[weapon], victim, TO_ROOM, NOTVICT);
+	send_damage(messages2->die_msg.victim_msg, ch, ch->equipment[weapon],
+		victim, dmgmsg, messages->die_msg.victim_msg, TO_VICT);
+	send_damage(messages2->die_msg.attacker_msg, ch, ch->equipment[weapon],
+		victim, dmgmsg, messages->die_msg.attacker_msg, TO_CHAR);
+	send_damage(messages2->die_msg.room_msg, ch, ch->equipment[weapon],
+		victim, dmgmsg, messages->die_msg.room_msg, TO_ROOM);
+//          act(messages->die_msg.room_msg,
+  //          ch, ch->equipment[weapon], victim, TO_ROOM, NOTVICT);
         }
         else
         {
-          act(messages->hit_msg.attacker_msg,
+/*          act(messages->hit_msg.attacker_msg,
             ch, ch->equipment[weapon], victim, TO_CHAR, 0);
           act(messages->hit_msg.victim_msg,
-            ch, ch->equipment[weapon], victim, TO_VICT, 0);
-          act(messages->hit_msg.room_msg,
-            ch, ch->equipment[weapon], victim, TO_ROOM, NOTVICT);
+            ch, ch->equipment[weapon], victim, TO_VICT, 0);*/
+	send_damage(messages2->hit_msg.victim_msg, ch, ch->equipment[weapon],
+		victim, dmgmsg, messages->hit_msg.victim_msg, TO_VICT);
+	send_damage(messages2->hit_msg.attacker_msg, ch, ch->equipment[weapon],
+		victim, dmgmsg, messages->hit_msg.attacker_msg, TO_CHAR);
+	send_damage(messages2->hit_msg.room_msg, ch, ch->equipment[weapon],
+		victim, dmgmsg, messages->hit_msg.room_msg, TO_ROOM);
+//          act(messages->hit_msg.room_msg,
+  //          ch, ch->equipment[weapon], victim, TO_ROOM, NOTVICT);
         }
   }
 }
@@ -2543,7 +2607,7 @@ bool check_dodge(CHAR_DATA * ch, CHAR_DATA * victim, int attacktype)
 /*
 * Load fighting messages into memory.
 */
-void load_messages(void)
+void load_messages(char *file, int base)
 {
 	 FILE *fl;
    int i, type;
@@ -2551,17 +2615,18 @@ void load_messages(void)
    struct message_type *messages;
    char chk[100];
    
-   if (!(fl = dc_fopen(MESS_FILE, "r")))
+   if (!(fl = dc_fopen(file, "r")))
    {
      perror("read messages");
      exit(0);
    }
-   
+   if (base == 0)
    for (i = 0; i < MAX_MESSAGES; i++)
    {
      fight_messages[i].a_type = 0;
      fight_messages[i].number_of_attacks = 0;
      fight_messages[i].msg = 0;
+     fight_messages[i].msg2 = 0;
    }
    
    fscanf(fl, "%s\n", chk);
@@ -2569,6 +2634,7 @@ void load_messages(void)
    while (*chk == 'M')
    {
      fscanf(fl, " %d\n", &type);
+//     type += base;
      for (i = 0; (i < MAX_MESSAGES) && (fight_messages[i].a_type != type) &&
        (fight_messages[i].a_type); i++);
      if (i >= MAX_MESSAGES)
@@ -2584,11 +2650,16 @@ void load_messages(void)
      messages = (struct message_type *)
        dc_alloc(1, sizeof(struct message_type));
 #endif
+     if (!base)
      fight_messages[i].number_of_attacks++;
      fight_messages[i].a_type = type;
+     if (!base) {
      messages->next = fight_messages[i].msg;
      fight_messages[i].msg = messages;
-     
+     } else {
+     messages->next = fight_messages[i].msg2;
+     fight_messages[i].msg2 = messages;
+     }
      messages->die_msg.attacker_msg = fread_string(fl, 0);
      messages->die_msg.victim_msg = fread_string(fl, 0);
      messages->die_msg.room_msg = fread_string(fl, 0);
@@ -2725,12 +2796,12 @@ timer_data));
       count++;
   }
 
-  if( ( !IS_NPC(ch) || IS_AFFECTED(ch, AFF_CHARM) ) 
+/*(  if( ( !IS_NPC(ch) || IS_AFFECTED(ch, AFF_CHARM) ) 
       && count >= 6 ) 
   {
     send_to_char("You can't get close enough to fight.\r\n",ch);
     return;
-  }
+  }*/
     
   ch->next_fighting = combat_list;
   combat_list = ch;
@@ -3919,6 +3990,7 @@ int64 scale_char_xp(CHAR_DATA *ch, CHAR_DATA *killer, CHAR_DATA *victim,
     return(scaled_share);
 }
 
+
 /* advance to the next follower in the list */
 CHAR_DATA *loop_followers(struct follow_type **f)
 {
@@ -4089,6 +4161,17 @@ void dam_message(int dam, CHAR_DATA * ch, CHAR_DATA * victim,
    else *endstring = '\0';
 
    char shield[MAX_INPUT_LENGTH];
+   char dammsg[MAX_INPUT_LENGTH];
+   dammsg[0] = '\0';
+   if (dam > 0)
+   switch (number(0,3))
+   {
+	case 0: sprintf(dammsg, " causing $B%d $Rdamage", dam);
+	case 1: sprintf(dammsg, " delivering $B%d$R damage", dam);
+	case 2: sprintf(dammsg, " inflicting $B%d$R damage", dam);
+	case 3: sprintf(dammsg, " dealing $B%d$R damage", dam);
+
+   }
 
    if (IS_SET(modifier, COMBAT_MOD_REDUCED))
    {
@@ -4110,31 +4193,31 @@ void dam_message(int dam, CHAR_DATA * ch, CHAR_DATA * victim,
        if (w_type == 0)
        {
          attack = race_info[GET_RACE(ch)].unarmed;
-         sprintf(buf1, "$n's %s %s $N%s as it deflects off $S %s%c", attack, vp, vx,  shield,punct);
-         sprintf(buf2, "You %s $N%s as $E raises $S %s to deflect your %s%c", vs, vx,shield, attack, punct);
-         sprintf(buf3, "$n %s you%s as you deflect $s %s with your %s%c", vp, vx, attack, shield, punct);
+         sprintf(buf1, "$n's %s %s $N%s |as it deflects off $S %s%c", attack, vp, vx,  shield,punct);
+         sprintf(buf2, "You %s $N%s %sas $E raises $S %s to deflect your %s%c", vs, vx, !IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_DAMAGE)?dammsg:"", shield, attack, punct);
+         sprintf(buf3, "$n %s you%s %sas you deflect $s %s with your %s%c", vp, vx, !IS_NPC(victim) && IS_SET(victim->pcdata->toggles, PLR_DAMAGE)?dammsg:"", attack, shield, punct);
        }
        else
        {
          attack = attack_table[w_type];
-         sprintf(buf1, "$n's %s %s $N%s as it deflects off $S %s%c", attack, vp, vx, shield,punct);
-         sprintf(buf2, "You %s $N%s as $E raises $S %s to deflect your %s%c", vs, vx,shield, attack, punct);
-         sprintf(buf3, "$n %s you%s as you deflect $s %s with your %s%c", vp, vx, attack, shield, punct); 
+         sprintf(buf1, "$n's %s %s $N%s |as it deflects off $S %s%c", attack, vp, vx, shield,punct);
+         sprintf(buf2, "You %s $N%s %sas $E raises $S %s to deflect your %s%c", vs, vx, !IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_DAMAGE)?dammsg:"", shield, attack, punct);
+         sprintf(buf3, "$n %s you%s %sas you deflect $s %s with your %s%c", vp, vx, !IS_NPC(victim) && IS_SET(victim->pcdata->toggles, PLR_DAMAGE)?dammsg:"", attack, shield, punct);
        }
      } else {
        if (w_type == 0)
        {
          attack = race_info[GET_RACE(ch)].unarmed;
-         sprintf(buf1, "$n's %s %s $N%s as it strikes $S %s%c", attack, vp, vx, shield, punct);
-         sprintf(buf2, "You %s $N%s as $E raises $S %s to deflect your %s%c", vs, vx,  shield, attack,punct);
-         sprintf(buf3, "$n %s you%s as you deflect part of $s %s with your %s%c", vp, vx, attack, shield, punct);
+         sprintf(buf1, "$n's %s %s $N%s |as it strikes $S %s%c", attack, vp, vx, shield, punct);
+         sprintf(buf2, "You %s $N%s %sas $E raises $S %s to deflect your %s%c", vs, vx, !IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_DAMAGE)?dammsg:"", shield, attack, punct);
+         sprintf(buf3, "$n %s you%s %sas you deflect $s %s with your %s%c", vp, vx, !IS_NPC(victim) && IS_SET(victim->pcdata->toggles, PLR_DAMAGE)?dammsg:"", attack, shield, punct);
        }
        else
        {
          attack = attack_table[w_type];
-         sprintf(buf1, "$n's %s %s $N%s as it strikes $S %s%c", attack, vp, vx, shield, punct);
-         sprintf(buf2, "You %s $N%s as $E raises $S %s to deflect your %s%c", vs, vx,  shield, attack,punct);
-         sprintf(buf3, "$n %s you%s as you deflect part of $s %s with your %s%c", vp, vx, attack, shield, punct); 
+         sprintf(buf1, "$n's %s %s $N%s |as it strikes $S %s%c", attack, vp, vx, shield, punct);
+         sprintf(buf2, "You %s $N%s %sas $E raises $S %s to deflect your %s%c", vs, vx, !IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_DAMAGE)?dammsg:"", shield, attack, punct);
+         sprintf(buf3, "$n %s you%s %sas you deflect $s %s with your %s%c", vp, vx, !IS_NPC(victim) && IS_SET(victim->pcdata->toggles, PLR_DAMAGE)?dammsg:"", attack, shield, punct);
        }
      }
    }
@@ -4142,19 +4225,20 @@ void dam_message(int dam, CHAR_DATA * ch, CHAR_DATA * victim,
      if (w_type == 0)
      {
        attack = race_info[GET_RACE(ch)].unarmed;
-       sprintf(buf1, "$n's %s%s %s $N%s%s%c", modstring, attack, vp, vx, endstring, punct);
-       sprintf(buf2, "Your %s%s %s $N%s%s%c", modstring, attack, vp, vx, endstring, punct);
-       sprintf(buf3, "$n's %s%s %s you%s%s%c", modstring, attack, vp, vx, endstring, punct);
+       sprintf(buf1, "$n's %s%s %s $N%s|%c", modstring, attack, vp, vx, punct);
+       sprintf(buf2, "Your %s%s %s $N%s%s%c", modstring, attack, vp, vx,!IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_DAMAGE)?dammsg:"", punct);
+       sprintf(buf3, "$n's %s%s %s you%s%s%c", modstring, attack, vp, vx, !IS_NPC(victim) && IS_SET(victim->pcdata->toggles, PLR_DAMAGE)?dammsg:"", punct);
      }
      else
      {
        attack = attack_table[w_type];
-       sprintf(buf1, "$n's %s%s %s $N%s%s%c", modstring, attack, vp, vx, endstring, punct);
-       sprintf(buf2, "Your %s%s %s $N%s%s%c", modstring, attack, vp, vx, endstring, punct);
-       sprintf(buf3, "$n's %s%s %s you%s%s%c", modstring, attack, vp, vx, endstring, punct);
+       sprintf(buf1, "$n's %s%s %s $N%s|%c", modstring, attack, vp, vx, punct);
+       sprintf(buf2, "Your %s%s %s $N%s%s%c", modstring, attack, vp, vx,!IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_DAMAGE)?dammsg:"", punct);
+       sprintf(buf3, "$n's %s%s %s you%s%s%c", modstring, attack, vp, vx, !IS_NPC(victim) && IS_SET(victim->pcdata->toggles, PLR_DAMAGE)?dammsg:"", punct);
      }
    }
-   act(buf1, ch, NULL, victim, TO_ROOM, NOTVICT);
+//   act(buf1, ch, NULL, victim, TO_ROOM, NOTVICT);
+   send_damage(buf1, ch, 0, victim, dammsg,0, TO_ROOM);
    act(buf2, ch, NULL, victim, TO_CHAR, 0);
    act(buf3, ch, NULL, victim, TO_VICT, 0);
 }

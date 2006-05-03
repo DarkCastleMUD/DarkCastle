@@ -345,7 +345,7 @@ int handle_poisoned_weapon_attack(char_data * ch, char_data * vict, int type)
       return (eFAILURE | eINTERNAL_ERROR);
    }
 
-   switch(type)
+/*   switch(type)
    {
       case 0: // bee stinger poison
          if(saves_spell(ch, vict, 1, SAVE_TYPE_POISON) < 0)
@@ -389,7 +389,7 @@ int handle_poisoned_weapon_attack(char_data * ch, char_data * vict, int type)
 
    // you can do this even if the mob died, because the weapon is still valid
    remove_obj_affect_by_type(ch->equipment[WIELD], WEP_THIEF_POISON);
-
+*/
    return retval;
 }
 

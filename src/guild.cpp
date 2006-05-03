@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.85 2006/04/28 19:05:11 shane Exp $
+| $Id: guild.cpp,v 1.86 2006/05/03 18:40:21 dcastle Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -53,36 +53,69 @@ int do_practice(CHAR_DATA *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
+char *per_col(int percent)
+{
+  if (percent == 0)
+    return ( "$B$0");
+  if (percent <= 5)
+    return ( "$4");
+  if (percent <= 10)
+    return ( "$4");
+  if (percent <= 15)
+    return ( "$B$4");
+  if (percent <= 20)
+    return ( "$B$4");
+  if (percent <= 30)
+    return ( "$5");
+  if (percent <= 40)
+    return ( "$5");
+  if (percent <=50)
+    return ( "$B$5");
+  if (percent <= 60)
+    return ( "$B$5");
+  if (percent <= 70)
+    return ( "$2");
+  if (percent <= 80)
+    return ( "$B$2");
+  if(percent <= 85)
+    return ( "$B$3");
+  if (percent <= 90)
+    return ("$B$3");
+
+  return ("$B$7");
+  
+}
+
 char *how_good(int percent)
 {
   if (percent == 0)
-    return ( " (not learned)");
+    return ( " not learned$R");
   if (percent <= 5)
-    return ( " (horrible)");
+    return ( " horrible$R");
   if (percent <= 10)
-    return ( " (crappy)");
+    return ( " crappy$R");
   if (percent <= 15)
-    return ( " (meager)");
+    return ( " meager$R");
   if (percent <= 20)
-    return ( " (bad)");
+    return ( " bad$R");
   if (percent <= 30)
-    return ( " (poor)");
+    return ( " poor$R");
   if (percent <= 40)
-    return ( " (decent)");
+    return ( " decent$R");
   if (percent <= 50)
-    return ( " (average)");
+    return ( " average$R");
   if (percent <= 60)
-    return ( " (fair)");
+    return ( " fair$R");
   if (percent <= 70)
-    return ( " (good)");
+    return ( " good$R");
   if (percent <= 80)
-    return ( " (very good)");
+    return ( " very good$R");
   if(percent <= 85)
-    return ( " (excellent)");
+    return ( " excellent$R");
   if (percent <= 90)
-    return (" (superb)");
+    return (" superb$R");
 
-  return (" (Masterful)");
+  return (" Masterful$R");
 }
 	
 // return a 1 if I just learned skill for first time
@@ -199,62 +232,76 @@ int skillmax(struct char_data *ch, int skill, int eh)
   class_skill_defines * skilllist = get_skill_list(ch);
   if (IS_NPC(ch)) return eh;
   if(!skilllist)
-    return eh; // scan etc
+    skilllist = g_skills;
   int i = search_skills2(skill, skilllist);
-  if (i==-1) return eh; // imm trying it out, doesn't have the skill
-  if (skilllist[i].maximum < eh)
-	return skilllist[i].maximum;
-  return eh;
+  if (i==-1 && skilllist != g_skills){ skilllist = g_skills; i = search_skills2(skill, g_skills);}
+  if (i==-1) return 0;
+  return skilllist[i].maximum;
 }
 
-int skills_guild(struct char_data *ch, char *arg, struct char_data *owner)
+char charthing(struct char_data *ch, int known, int skill, int maximum)
 {
-  char buf[160];
-  int known, x;
-  int skillnumber;
-  int percent;
-  int specialization;
-  int loop;
+  if (get_max(ch, skill) <= known) return '*';
+  if (known >= maximum/2) return '=';
+//  if (known >= GET_LEVEL(ch)*2) return '=';
+  return '+';
+}
 
-  class_skill_defines * skilllist = get_skill_list(ch);
-  if(!skilllist)
-    return eFAILURE;  // no skills to train
-
-  if (!*arg) // display skills that can be learned
-  {
-    sprintf(buf,"You have %d practice sessions left.\n\r", ch->pcdata->practices);
-    send_to_char(buf, ch);
-    send_to_char("You can practice any of these skills:\n\r", ch);
-    for(int i=0; *skilllist[i].skillname != '\n';i++) 
+void output_praclist(struct char_data *ch, class_skill_defines *skilllist)
+{
+  int known;
+  char buf[MAX_STRING_LENGTH];
+     for(int i=0; *skilllist[i].skillname != '\n';i++) 
     {
       known = has_skill(ch, skilllist[i].skillnum);
       if(!known && GET_LEVEL(ch) < skilllist[i].levelavailable)
           continue;
-      specialization = known / 100;
       known = known % 100;
-      sprintf(buf, " %-25s%14s   (Level %2d)", skilllist[i].skillname,
-                   how_good(known), skilllist[i].levelavailable);
+      sprintf(buf, " %c%-24s%s%14s   $B$0($R%c %s%2d$B$0) $R    $B%2d$R   ", UPPER(*skilllist[i].skillname), (skilllist[i].skillname+1),
+                   per_col(known), how_good(known),charthing(ch, known,skilllist[i].skillnum, skilllist[i].maximum), per_col(known), known,
+		skilllist[i].levelavailable);
       send_to_char(buf, ch);
       if(skilllist[i].skillnum >= 1 && skilllist[i].skillnum <= MAX_SPL_LIST) 
       {
 	if (skilllist[i].skillnum == SPELL_PORTAL && GET_CLASS(ch) == CLASS_CLERIC)
-	sprintf(buf," Mana: %4d ", 150);
+	sprintf(buf," Mana: $B%4d$R ", 150);
 	else
-        sprintf(buf," Mana: %4d ",use_mana(ch,skilllist[i].skillnum));
+        sprintf(buf," Mana: $B%4d$R ",use_mana(ch,skilllist[i].skillnum));
         send_to_char(buf, ch);
       }
       else if (skilllist[i].skillnum >= SKILL_SONG_BASE && skilllist[i].skillnum <= SKILL_SONG_MAX)
       {
 	extern struct song_info_type song_info[];
-	sprintf(buf, " Ki: %4d   ",song_info[skilllist[i].skillnum-SKILL_SONG_BASE].min_useski);
+	sprintf(buf, " Ki: $B%4d$R   ",song_info[skilllist[i].skillnum-SKILL_SONG_BASE].min_useski);
 	send_to_char(buf,ch);
       }
       else if (skilllist[i].skillnum >= KI_OFFSET && skilllist[i].skillnum <= KI_OFFSET+MAX_KI_LIST)
       {
 	extern struct ki_info_type ki_info[];
-	sprintf(buf, " Ki: %4d   ",ki_info[skilllist[i].skillnum-KI_OFFSET].min_useski);
+	sprintf(buf, " Ki: $B%4d$R   ",ki_info[skilllist[i].skillnum-KI_OFFSET].min_useski);
 	send_to_char(buf,ch);
       }
+      else if (skilllist[i].skillnum == 318) // scan
+      {
+	sprintf(buf, " Move: $B%4d$R ",2);
+	send_to_char(buf,ch);
+      }
+      else if (skilllist[i].skillnum == 320) // switch
+      {
+	sprintf(buf, " Move: $B%4d$R ",4);
+	send_to_char(buf,ch);
+      }
+      else if (skilllist[i].skillnum == 319) // consider
+      {
+	sprintf(buf, " Move: $B%4d$R ",5);
+	send_to_char(buf,ch);
+      }
+      else if (skilllist[i].skillnum == 368) // release
+      {
+	sprintf(buf, " Move: $B%4d$R ",35);
+	send_to_char(buf,ch);
+      }
+
 	else send_to_char("            ", ch);
       if (skilllist[i].attrs[0])
       {
@@ -266,12 +313,12 @@ int skills_guild(struct char_data *ch, char *arg, struct char_data *owner)
         sprintf(buf, " (%s) ",attrname(skilllist[i].attrs[1]));
         send_to_char(buf, ch);
       }
-      if(specialization) 
+/*      if(specialization) 
       {
         for(loop = 0; loop < specialization; loop++)
           send_to_char("*", ch);
         send_to_char("\r\n", ch);
-      }
+      }*/
       if(skilllist[i].skillnum == SKILL_SONG_DISARMING_LIMERICK) { 
         send_to_char("#\n\r", ch);
       }
@@ -295,9 +342,47 @@ int skills_guild(struct char_data *ch, char *arg, struct char_data *owner)
       }
       else send_to_char("\n\r", ch);
     }
+
+}
+int skills_guild(struct char_data *ch, char *arg, struct char_data *owner)
+{
+  char buf[160];
+  int known, x;
+  int skillnumber;
+  int percent;
+  int specialization;
+  int loop;
+
+  if (IS_NPC(ch)) return eFAILURE;
+    class_skill_defines * skilllist = get_skill_list(ch);
+    if(!skilllist)
+      return eFAILURE;  // no skills to train
+
+  if (!*arg) // display skills that can be learned
+  {
+    sprintf(buf,"You have %d practice sessions left.\n\r", ch->pcdata->practices);
+    send_to_char(buf, ch);
+    send_to_char("You can practice any of these skills:\n\r\r\n", ch);
+
+    send_to_char("$BUniversal skills:$R\r\n\r\n",ch);
+    send_to_char(" Ability:                  Expertise:              Level:   Cost:     Requisites:\r\n",ch);
+    send_to_char("---------------------------------------------------------------------------------\r\n",ch);
+    output_praclist(ch, g_skills);
+     extern char *pc_clss_types[];
+    sprintf(buf, "\r\n$B%c%s skills:$R\r\n", UPPER(*pc_clss_types[GET_CLASS(ch)]), (1+pc_clss_types[GET_CLASS(ch)]));
+    send_to_char(buf, ch);
+    send_to_char(" Ability:                  Expertise:              Level:   Cost:     Requisites:\r\n",ch);
+    send_to_char("---------------------------------------------------------------------------------\r\n",ch);
+    output_praclist(ch, skilllist);
+     send_to_char("\r\n",ch);
     if(GET_CLASS(ch) == CLASS_BARD)
-       send_to_char("\n\r# denotes a song which requires an instrument.\n\r", ch);
+       send_to_char("# denotes a song which requires an instrument.\n\r", ch);
+    send_to_char("$B*$R indicates this skill is at its maximum for your race and class.\r\n"
+		"$B+$R indicates you can still use practice sessions to improve this skill.\r\n"
+		"$B=$R indicates you must use this skill to continue improving.\r\n",ch);
+    
     return eSUCCESS;
+ 
   }
   if (GET_POS(ch) == POSITION_SLEEPING) {
    send_to_char("You can't practice in your sleep.\r\n",ch);

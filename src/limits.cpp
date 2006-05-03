@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.64 2006/04/30 15:50:22 dcastle Exp $ */
+/* $Id: limits.cpp,v 1.65 2006/05/03 18:40:21 dcastle Exp $ */
 
 extern "C"
 {
@@ -186,6 +186,7 @@ int mana_gain(CHAR_DATA *ch)
   gain = (float)gain * (2.0-(float)GET_LEVEL(ch)/50.0);
 
   gain += ch->mana_regen;
+  if (ch->in_room >= 0)
   if (IS_SET(world[ch->in_room].room_flags, SAFE))
      gain *= 1.25;
 
@@ -248,6 +249,8 @@ int hit_gain(CHAR_DATA *ch)
   gain += ch->hit_regen;
   if (GET_LEVEL(ch) < 50)
   gain = (float)gain * (2.0-(float)GET_LEVEL(ch)/50.0);
+
+  if (ch->in_room >= 0)
   if (IS_SET(world[ch->in_room].room_flags, SAFE))
      gain *= 1.5;
  
@@ -307,6 +310,8 @@ int move_gain(CHAR_DATA *ch)
 
   if (GET_LEVEL(ch) < 50)
   gain = (float)gain * (2.0-(float)GET_LEVEL(ch)/50.0);
+
+  if (ch->in_room >= 0)
   if (IS_SET(world[ch->in_room].room_flags, SAFE))
      gain *= 1.5;
     return MAX(1,gain);

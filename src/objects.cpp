@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.59 2006/01/13 16:49:15 dcastle Exp $
+| $Id: objects.cpp,v 1.60 2006/05/03 18:40:21 dcastle Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -391,6 +391,7 @@ int do_recite(struct char_data *ch, char *argument, int cmd)
     act("You recite $p which dissolves.",ch,scroll,0,TO_CHAR, 0);
 
     int failmark = 35 - GET_INT(ch);
+    if (IS_NPC(ch)) failmark -= 15; 
 
     if( GET_CLASS(ch) == CLASS_MAGIC_USER ||
         GET_CLASS(ch) == CLASS_CLERIC     ||
@@ -398,8 +399,8 @@ int do_recite(struct char_data *ch, char *argument, int cmd)
       )
       failmark -= 5;
     WAIT_STATE(ch,PULSE_VIOLENCE);
-
-    if( number(0, 100) < failmark )
+    
+    if( ch->fighting && number(0, 100) < failmark )
     {
       // failed to read scroll
       act("$n mumbles the words on the scroll and it goes up in flame!", ch, 0, 0, TO_ROOM, 0);

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: channel.cpp,v 1.11 2006/04/30 15:50:22 dcastle Exp $
+| $Id: channel.cpp,v 1.12 2006/05/03 18:40:21 dcastle Exp $
 | channel.C
 | Description:  All of the channel - type commands; do_say, gossip, etc..
 */
@@ -543,9 +543,9 @@ int do_tell(struct char_data *ch, char *argument, int cmd)
         else { 
           sprintf(buf,"%s tells you, '%s'%c",
                 PERS(ch, vict), message, IS_SET(vict->pcdata->toggles, PLR_BEEP) ? '\a' : '\0');
-          if(vict->pcdata->last_tell)
+          if(!IS_NPC(ch) && !IS_NPC(vict) &&vict->pcdata->last_tell)
              dc_free(vict->pcdata->last_tell);
-	if (!IS_NPC(ch))
+	if (!IS_NPC(ch) & !IS_NPC(vict))
           vict->pcdata->last_tell = str_dup(GET_NAME(ch));
         }
         ansi_color(GREEN, vict);

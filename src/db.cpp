@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.105 2006/04/25 10:35:29 dcastle Exp $ */
+/* $Id: db.cpp,v 1.106 2006/05/03 18:40:21 dcastle Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -208,7 +208,7 @@ extern bool MOBtrigger;
 
 /* external refs */
 extern struct descriptor_data *descriptor_list;
-void load_messages(void);
+void load_messages(char *file, int base = 0);
 int dice(int number, int size);
 int number(int from, int to);
 void boot_social_messages(void);
@@ -615,7 +615,8 @@ void boot_db(void)
       load_corpses();
     }
     log("Loading messages.", 0, LOG_MISC);
-    load_messages();
+    load_messages(MESS_FILE);
+    load_messages(MESS2_FILE,2000);
 
     log("Loading socials.", 0, LOG_MISC);
     boot_social_messages();

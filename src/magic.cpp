@@ -722,7 +722,7 @@ int spell_earthquake(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
   CHAR_DATA *tmp_victim, *temp;
   dam = 150;
   send_to_char("The earth trembles beneath your feet!\n\r", ch);
-  act("$n makes the earth tremble and shiver.\n\rYou fall, and hit yourself!\n\r",
+  act("$n makes the earth tremble and shiver.\n\r",
 		ch, 0, 0, TO_ROOM, 0);
 
   for(tmp_victim = character_list; (tmp_victim && !IS_SET(retval, eCH_DIED)); tmp_victim = temp)
@@ -855,8 +855,7 @@ int spell_solar_gate(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 
 	  // do room caster is in
   send_to_char("A Bright light comes down from the heavens.\n\r", ch);
-  act("$n opens a Solar Gate.\n\r You are ENVELOPED in a PAINFUL BRIGHT "
-      "LIGHT!", ch, 0, 0, TO_ROOM, 0);
+  act("$n opens a Solar Gate.\n\r", ch, 0, 0, TO_ROOM, 0);
 
   // we use "orig_room" for this now, instead of ch->in_room.  The reason for
   // this, is so if we die from a reflect, we don't keep looping through and
@@ -1102,7 +1101,7 @@ int spell_firestorm(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
   CHAR_DATA *tmp_victim, *temp;
 
   send_to_char("$B$4Fire$R falls from the heavens!\n\r", ch);
-  act("$n makes $B$4fire$R fall from the heavens!\n\rYour flesh is seared off by scorching $B$4flames$R!",
+  act("$n makes $B$4fire$R fall from the heavens!\n\r",
 		ch, 0, 0, TO_ROOM, 0);
 
   for(tmp_victim = character_list; tmp_victim; tmp_victim = temp)
@@ -1225,11 +1224,11 @@ int spell_divine_fury(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
 
   if(IS_GOOD(victim)) GET_ALIGNMENT(ch) -= 5;
   if(IS_NEUTRAL(victim)) GET_ALIGNMENT(ch) -= 2;
-
+/*
   act("You call forth a wrath from the heavens to smite $N!", ch, 0, victim, TO_CHAR, 0);
   act("$n calls forth a wrath from the heavens to smite you!", ch, 0, victim, TO_VICT, 0);
   act("$n gestures grandly and calls forth a wrath from the heavens to smite $N!", ch, 0, victim, TO_ROOM, NOTVICT);
-
+*/
   return damage(ch, victim, dam, TYPE_MAGIC, SPELL_DIVINE_FURY, 0);
 }
 
@@ -3594,7 +3593,7 @@ int spell_identify(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
          strcat(buf, "\r\n");
          send_to_char(buf, ch);
 
-	 sprintf(buf,"Weight: %d, Value: %d\n\r", obj->obj_flags.weight, obj->obj_flags.cost);
+	 sprintf(buf,"Weight: %d, Value: %d, Level: %d\n\r", obj->obj_flags.weight, obj->obj_flags.cost, obj->obj_flags.eq_level);
 	 send_to_char(buf, ch);
 
 	 switch (GET_ITEM_TYPE(obj)) {
@@ -11387,6 +11386,9 @@ int cast_mend_golem( ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA 
   switch (type) 
   {
     case SPELL_TYPE_SPELL:
+    case SPELL_TYPE_WAND:
+    case SPELL_TYPE_SCROLL:
+    case SPELL_TYPE_STAFF:
        return spell_mend_golem(level, ch, tar_ch, 0, skill);
        break;
     default :

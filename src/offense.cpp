@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: offense.cpp,v 1.16 2005/05/28 18:56:10 shane Exp $
+| $Id: offense.cpp,v 1.17 2006/05/03 18:40:21 dcastle Exp $
 | offense.C
 | Description:  Commands that are generically offensive - that is, the
 |   victim should retaliate.  The class-specific offensive commands are
@@ -71,12 +71,12 @@ int do_hit(struct char_data *ch, char *argument, int cmd)
 	    if (k->fighting == victim)
 	      count++;
 	  }
-	  
+	  /*
 	  if (count >= 6) {
             send_to_char("You can't get close enough to do anything.", ch);
 	    return eFAILURE;
 	  }
-	  
+	  */
 	  WAIT_STATE(ch, PULSE_VIOLENCE);
 	  return attack(ch, victim, TYPE_UNDEFINED);
 	}
@@ -289,12 +289,12 @@ int do_join(struct char_data *ch, char *argument, int cmd)
      if(k->fighting == tmp_ch)
        count++;
   } 
-
+/*
   if(count >= 6) {
     send_to_char("You can't get close enough to do anything.", ch);
     return eFAILURE;
   }
-
+*/
   send_to_char("ARGGGGG!!!! *** K I L L ***!!!!.\n\r", ch);
   act("$N joins you in the fight!", victim, 0, ch, TO_CHAR, 0);
   act("$n has joined $N in the battle.", ch, 0, victim, TO_ROOM, NOTVICT);

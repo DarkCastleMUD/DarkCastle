@@ -1,7 +1,7 @@
 #ifndef FILEINFO_H_
 #define FILEINFO_H_
 /*
-| $Id: fileinfo.h,v 1.12 2006/04/25 10:36:13 dcastle Exp $
+| $Id: fileinfo.h,v 1.13 2006/05/03 18:40:25 dcastle Exp $
 | fileinfo.h
 | Description:  Contains information for loading files, ie "../lib", etc..
 */
@@ -57,6 +57,7 @@
 #define  IDEA_FILE          "ideas.txt"
 #define  TYPO_FILE          "typos.txt"
 #define  MESS_FILE          "messages.txt"
+#define  MESS2_FILE         "messages2.txt"
 #define  SOCIAL_FILE        "social.txt"
 #define  HELP_KWRD_FILE     "help_key.txt"
 #define  HELP_PAGE_FILE     "help.txt"

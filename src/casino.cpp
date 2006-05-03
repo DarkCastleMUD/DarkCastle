@@ -356,12 +356,18 @@ int hand_strength(struct player_data *plr)
 		z+=val(plr->hand_data[i]);
 		break;
     }
+  int v = 0;
   for (i = 0;plr->hand_data[i] != 0;i++)
 	if (val(plr->hand_data[i]) == 1)
 	{
-	 if (z + 11 > 21) z += 1;
-	 else z += 11;
+	v++;
 	}
+  while (v > 1) { v--; z++; }
+  if (v == 1)
+  {
+    if (z+11 > 21) z++;
+    else z+=11;
+  }
   return z;
 }
 
@@ -576,11 +582,12 @@ void check_winner(struct table_data *tbl)
     if (dealer == hand_strength(plr))
     {
       char buf[MAX_STRING_LENGTH];
-      sprintf(buf,"It's a PUSH!\r\nThe dealer takes your cards and gives you %d coins.\r\n",
-		plr->bet);
+      sprintf(buf,"It's a PUSH!\r\nThe dealer takes your cards and gives you %d %s coins.\r\n",
+		plr->bet, plr->table->gold?"gold":"platinum");
       send_to_char(buf,plr->ch);
       sprintf(buf,"The dealer gives %s %d coins.\r\n",GET_NAME(plr->ch),
-		plr->bet);
+		plr->bet, plr->table->gold?"gold":"platinum");
+//		plr->bet);
       send_to_table(buf,tbl, plr);
 	if (plr->table->gold)
       GET_GOLD(plr->ch) += plr->bet;
@@ -594,11 +601,11 @@ void check_winner(struct table_data *tbl)
     {
       char buf[MAX_STRING_LENGTH];
 	send_to_char("$BYou WIN!$R\r\n",plr->ch);
-      sprintf(buf,"The dealer takes your cards and gives you %d coins.\r\n",
-		plr->bet*2);
+      sprintf(buf,"The dealer takes your cards and gives you %d %s coins.\r\n",
+		plr->bet*2, plr->table->gold?"gold":"platinum");
       send_to_char(buf,plr->ch);
-      sprintf(buf,"The dealer gives %s %d coins.\r\n",GET_NAME(plr->ch),
-		plr->bet*2);
+      sprintf(buf,"The dealer gives %s %d %s coins.\r\n",GET_NAME(plr->ch),
+		plr->bet*2, plr->table->gold?"gold":"platinum");
       send_to_table(buf,tbl, plr);
 	if (plr->table->gold)
       GET_GOLD(plr->ch) += plr->bet*2;
@@ -705,7 +712,9 @@ void check_blackjacks(struct table_data *tbl)
 		sprintf(buf, "%s blackjacks!\r\n",GET_NAME(plr->ch));
 		send_to_table(buf,tbl, plr);
 		send_to_char("$BYou BLACKJACK!$R\r\n",plr->ch);
-		sprintf(buf, "The dealer gives you %d coins.\r\n", (int)(plr->bet *2.5));
+		sprintf(buf, "The dealer gives you %d %s coins.\r\n", 
+		(int)(plr->bet*2.5), plr->table->gold?"gold":"platinum");
+
 		send_to_char(buf, plr->ch);
 		buf[0] = '\0';
 		blackjack_prompt(plr->ch, buf, !IS_SET(plr->ch->pcdata->toggles, PLR_ASCII));
@@ -1405,7 +1414,7 @@ int highcard(int hand[5])
   int a = hand[0];
   for (int i = 1; i < 5; i++)
     if (val(a) < val(hand[i]) || val(hand[i]) == 1)
-	a = hand[i];
+	a = val(hand[i]);
   return a;
 }
 
@@ -1414,62 +1423,65 @@ int lowcard(int hand[5])
   int a = hand[0];
   for (int i = 1; i < 5; i++)
     if (val(a) > val(hand[i]))
-	a = hand[i];
+	a = val(hand[i]);
   return a;
 }
 
-bool has_flush(int hand[5])
+int has_flush(int hand[5])
 {
-  return findcard(hand, 0, suit(hand[0]), 5);
+  if (findcard(hand, 0, suit(hand[0]), 5))
+   return highcard(hand);
+  return FALSE;
 }
 
-bool has_straight(int hand[5])
+int has_straight(int hand[5])
 {
   int i = lowcard(hand);
   if (findcard(hand, i+1, 0, 1) &&
 	findcard(hand, i+2, 0, 1) &&
 	findcard(hand, i+3, 0, 1) &&
 	findcard(hand, i+4, 0, 1))
-    return TRUE;
+    return i+4;
  if (i == 1) {
    if (findcard(hand, 10, 0, 1) &&
 	findcard(hand, 11, 0, 1) &&
 	findcard(hand, 12, 0, 1) &&
 	findcard(hand, 13, 0, 1))
-         return TRUE;
+         return 14;
  }
  return FALSE;
     
 }
 
-bool has_rsf(int hand[5])
+int has_rsf(int hand[5])
 {
   if (hand[0] == 0) return FALSE; // shockingly, nope
-  if (has_flush(hand) && has_straight(hand) && highcard(hand) == 1)
+  if (has_flush(hand) && has_straight(hand) == 14)
    return TRUE; // yegods
 
   return FALSE;  
 }
 
-bool has_sf(int hand[5])
+int has_sf(int hand[5])
 {
   if (hand[0] == 0) return FALSE;
-  if (has_flush(hand) && has_straight(hand))
-   return TRUE;
+  if (has_flush(hand))
+   return has_straight(hand);
 
   return FALSE;  
 }
 
-bool has_4kind(int hand[5])
+int has_4kind(int hand[5])
 {
-  if (findcard(hand, val(hand[0]), 0, 4) ||
-	findcard(hand,val(hand[1]), 0, 4))
-       return TRUE;
+  if (findcard(hand, val(hand[0]), 0, 4))
+    return val(hand[0]);
+  if (findcard(hand,val(hand[1]), 0, 4))
+    return val(hand[1]);
    // one of the first two cards has to be part of the 4kind
  return FALSE;
 }
 
-bool has_fhouse(int hand[5])
+int has_fhouse(int hand[5])
 {
   int card1 = val(hand[0]);
   int i;
@@ -1481,61 +1493,121 @@ bool has_fhouse(int hand[5])
 	findcard(hand, val(hand[i]), 0, 2)) ||
 	(findcard(hand, card1, 0, 2) &&
 	findcard(hand, val(hand[i]), 0, 3)))
-  	return TRUE;
+  	return highcard(hand) * 1000 + lowcard(hand);// works
   return FALSE;
 }
 
-bool has_3kind(int hand[5])
+int has_3kind(int hand[5])
 {
-  if (findcard(hand, val(hand[0]), 0, 3) ||
-	findcard(hand, val(hand[1]), 0, 3) ||
-	findcard(hand, val(hand[2]), 0, 3))
-    return TRUE;
+  if (findcard(hand, val(hand[0]), 0, 3))
+     return val(hand[0]);
+  if (findcard(hand, val(hand[1]), 0, 3))
+     return val(hand[1]);
+  if (findcard(hand, val(hand[2]), 0, 3))
+     return val(hand[2]);
   return FALSE;
 }
 
-bool has_2pair(int hand[5])
+int has_2pair(int hand[5])
 {
   int first = 0;
   for (int i = 0; i < 5; i++)
     if (val(hand[i]) != val(first) && findcard(hand, val(hand[i]), 0, 2))
 	{
-		if (first) return TRUE;
+		if (first) return MAX(val(first), val(hand[i]))*1000+MIN(val(first), val(hand[i]));
 		else first = hand[i];
 	}
  return FALSE;
 }
 
-char *hand_name(struct tplayer *tplr)
+int has_pair(int hand[5])
 {
-  
+  if (findcard(hand, val(hand[0]), 0, 2))
+    return val(hand[0]);
+	if (findcard(hand, val(hand[1]), 0, 2))
+    return val(hand[0]);
+	if (findcard(hand, val(hand[2]), 0, 2))
+    return val(hand[0]);
+	if (findcard(hand, val(hand[3]), 0, 2))
+    return val(hand[0]);
+  return FALSE;
+}
 
-
+char *cardname(int card)
+{
+  switch (card)
+  {
+    case 1: return "Ace";
+    case 2: return "Two";
+    case 3: return "Three";
+    case 4: return "Four"; 
+    case 5: return "Five";
+    case 6: return "Six";
+    case 7: return "Seven";
+    case 8: return "Eight";
+    case 9:  return "Nine";
+    case 10: return "Jack";
+    case 12: return "Queen";
+    case 13: return "King";
+  }
+  return "Invalid";
 }
 
 
-int get_hand(int which) // struct tplayer *tplr, int which)
+char *hand_name(int hand[5])
+{
+  char buf[MAX_STRING_LENGTH];
+  buf[0] = '\0';
+  int i = 0;
+  if (has_rsf(hand))
+    return "Royal Straight Flush";
+  else if ((i = has_sf(hand)))
+  {
+     sprintf(buf, "%s-high Straight Flush",cardname(i));
+  } else if ((i = has_4kind(hand))) {
+     sprintf(buf, "Four of a kind, %ss",cardname(i));
+  } else if ((i = has_fhouse(hand))) {
+     sprintf(buf, "Full House, %s over %ss",cardname(i/1000), cardname(i-(i/1000)*1000));
+  } else if ((i = has_flush(hand))) {
+     sprintf(buf, "%s-high Flush",cardname(i));
+  } else if ((i = has_straight(hand))) {
+     sprintf(buf, "%s-high Straight",cardname(i));
+  } else if ((i = has_3kind(hand))) {
+     sprintf(buf, "Three of a kind, %ss",cardname(i));
+  } else if ((i = has_2pair(hand))) {
+     sprintf(buf, "Two Pair, %ss and %ss",cardname(i/1000), cardname(i-(i/1000)*1000));
+  } else if ((i = has_pair(hand))) {
+     sprintf(buf, "Pair of %ss",cardname(i));
+  } else {
+    sprintf(buf, "%s high", cardname(highcard(hand)));
+  }
+  return buf;
+}
+
+
+int get_hand(struct tplayer *tplr, int which)
 {
  static int i = 0;
  
-// struct ttable *ttbl = tplr->table;
+ struct ttable *ttbl = tplr->table;
  TOGGLE_BIT(i,1); // if it's 1, set to 0, if 0, set to 1. Gooo toggle!
  int z;
  for (z = 0; z < 5; z++)
     hand[z][i] = 0;
-/* int temphand[7];
- temphand[0] = tplr->hand[0];
- temphand[1] = tplr->hand[1];
- temphand[2] = ttbl->hand[0];
- temphand[3] = ttbl->hand[1];
- temphand[4] = ttbl->hand[2];
- temphand[5] = ttbl->hand[3];
- temphand[6] = ttbl->hand[4];
- for (z = 0; z < 7; z++)
-    if (temphand[z] == 0) break; */
 
  int o;
- int one = 0, two = 1, three = 2, four = 3, five = 4;
+ int temphand[7];
+ temphand[0] = tplr->hand[0];
+ temphand[1] = tplr->hand[1];
+ temphand[2] = ttbl->cards[0];
+ temphand[3] = ttbl->cards[1];
+ temphand[4] = ttbl->cards[2];
+ temphand[5] = ttbl->cards[3];
+ temphand[6] = ttbl->cards[4];
+ for (z = 0; z < 7; z++)
+    if (temphand[z] == 0) break;
+
+// int one = 0, two = 1, three = 2, four = 3, five = 4;
  int bleh[5] = {0,1,2,3,4},p;
  for (o = 0; o < which; o++)
  {
@@ -1552,16 +1624,47 @@ int get_hand(int which) // struct tplayer *tplr, int which)
     }
  }
   for (z = 0; z < 5; z++)
-    hand[z][i] = bleh[z]; 
+    hand[z][i] = temphand[bleh[z]];
 // if (!tplr->hand[0]) return i;
 // if (!ttbl->cards[0]) return i;
 
  return i;
 }
 
+
+typedef int HAND_FUNC   (int hand[5]);
+struct hand_function
+{
+     HAND_FUNC *func;
+};
+
+const struct hand_function funcs[] = {
+  { has_rsf },
+  { has_sf },
+  { has_4kind},
+  { has_fhouse},
+  { has_flush },
+  { has_straight},
+  { has_3kind},
+  { has_2pair},
+  { has_pair},
+  { highcard},
+  { 0}
+};
+
 int handcompare(int hand1[5], int hand2[5])
 {
-  
+   int v = 0;
+   for (; funcs[v].func != 0;v++)
+   {
+      int a = (*(funcs[v].func))(hand1), b = (*(funcs[v].func))(hand2);
+      if (a > b) return 1;
+      if (b > a) return 2;
+      if (a == b) return 3; //
+   }   
+    log("Error in handcompare.", 110, LOG_MORTAL);
+
+  return -1;
 }
 
 int do_testhand(CHAR_DATA *ch, char *argument, int cmd)
@@ -1569,19 +1672,25 @@ int do_testhand(CHAR_DATA *ch, char *argument, int cmd)
   char arg[MAX_INPUT_LENGTH];
   one_argument(argument, arg);
   int i = atoi(arg);
-  int z = get_hand(i);
+//  int z = get_hand(i);
   char buf[MAX_STRING_LENGTH];
-  sprintf(buf, "One: %d Two: %d Three: %d Four: %d Five: %d\r\n",
-	hand[0][z],hand[1][z],
-	hand[2][z],hand[3][z],
-	hand[4][z]);
-  send_to_char(buf, ch);
+ // sprintf(buf, "One: %d Two: %d Three: %d Four: %d Five: %d\r\n",
+//	hand[0][z],hand[1][z],
+//	hand[2][z],hand[3][z],
+//	hand[4][z]);
+  //send_to_char(buf, ch);
   return eSUCCESS;
 }
 
 int find_highhand(struct tplayer *tplr)
 {
-  int hand=0;
+  int handnr=0;
+  for (int i = 1; i < 21; i++)
+  {
+    int v = handcompare(hand[get_hand(tplr, handnr)], hand[get_hand(tplr, i)]);
+    if (v == 2) handnr = i;
+  }
+  return handnr;
 }
 
 
@@ -1596,7 +1705,7 @@ struct tplayer *createTplayer(struct ttable *ttbl)
 #else
   tplr = (struct tplayer*) dc_alloc(1, sizeof(struct tplayer));
 #endif
-   ttbl->player[seat] = tplr;
+  ttbl->player[seat] = tplr;
   tplr->nw = TRUE;
   tplr->table=ttbl;
   for (int i = 0; i < 2; i++) tplr->hand[i] = 0;
@@ -1604,6 +1713,19 @@ struct tplayer *createTplayer(struct ttable *ttbl)
   tplr->pos = -1;
   tplr->dealer = FALSE;
   tplr->options = 0;
+  return tplr;
 }
+
+int first_to_act(int state, struct tplayer *player[6])
+{
+   int plrs = 0,  dlr = 0;
+   for (int i = 0; i < 6; i++)
+   {
+     if (player[i]) plrs++;
+     else continue;
+     if (player[i]->dealer) dlr = i;
+   }
+   
+};
 
 /* End Texas Hold'em */

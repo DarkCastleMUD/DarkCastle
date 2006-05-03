@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: non_off.cpp,v 1.34 2006/04/19 18:59:48 dcastle Exp $
+| $Id: non_off.cpp,v 1.35 2006/05/03 18:40:21 dcastle Exp $
 | non_off.C
 | Description:  Implementation of generic, non-offensive commands.
 */
@@ -268,6 +268,7 @@ char * toggle_txt[] = {
   "guide",
   "news-up",
   "ascii",
+  "damage",
   ""
 };
 
@@ -285,7 +286,10 @@ int do_toggle(struct char_data * ch, char * arg, int cmd)
 
   if(!*buf) {
     for(x = 0; toggle_txt[x][0] != '\0'; x++) {
+	if (x != 8 || GET_CLASS(ch) == CLASS_BARD)
+	  if (x != 14 ||  (IS_SET(ch->pcdata->toggles, PLR_GUIDE)))
        sprintf(buf + strlen(buf), "%-10s ", toggle_txt[x]);
+
        switch(x) {
          case 0:
 	 sprintf(buf + strlen(buf), "%s\n\r",
@@ -328,6 +332,7 @@ int do_toggle(struct char_data * ch, char * arg, int cmd)
 	 break;
 	 
          case 8:
+	if (GET_CLASS(ch) == CLASS_BARD)
 	 sprintf(buf + strlen(buf), "%s\n\r",
 	   IS_SET(ch->pcdata->toggles, PLR_BARD_SONG) ? "on" : "off");
 	 break;
@@ -356,6 +361,7 @@ int do_toggle(struct char_data * ch, char * arg, int cmd)
            IS_SET(ch->pcdata->toggles, PLR_NOTAX) ? "on" : "off");
          break;
          case 14:
+	if (IS_SET(ch->pcdata->toggles, PLR_GUIDE))
          sprintf(buf + strlen(buf), "%s\n\r",
            IS_SET(ch->pcdata->toggles, PLR_GUIDE_TOG) ? "on" : "off");
          break;
@@ -366,6 +372,10 @@ int do_toggle(struct char_data * ch, char * arg, int cmd)
          case 16:
          sprintf(buf + strlen(buf), "%s\n\r",
            IS_SET(ch->pcdata->toggles, PLR_ASCII) ? "off" : "on");
+         break;
+         case 17:
+         sprintf(buf + strlen(buf), "%s\n\r",
+           IS_SET(ch->pcdata->toggles, PLR_DAMAGE) ? "on" : "off");
          break;
 
 
@@ -423,7 +433,9 @@ int do_toggle(struct char_data * ch, char * arg, int cmd)
     break;
     
     case 8:
+   if (GET_CLASS(ch) == CLASS_BARD)
     do_bard_song_toggle(ch, "", 9);
+   else send_to_char("You're not a bard!\r\n",ch);
     break;
     
     case 9:
@@ -447,7 +459,9 @@ int do_toggle(struct char_data * ch, char * arg, int cmd)
     break;
     
     case 14:
+	if (IS_SET(ch->pcdata->toggles, PLR_GUIDE))
     do_guide_toggle(ch, "", 9);
+   else send_to_char("You're not a guide!\r\n",ch);
     break;
 
     case 15:
@@ -456,6 +470,9 @@ int do_toggle(struct char_data * ch, char * arg, int cmd)
 
     case 16:
     do_ascii_toggle(ch, "", 9);
+    break;
+    case 17:
+    do_damage_toggle(ch, "", 9);
     break;
 
     default:
@@ -635,6 +652,26 @@ int do_ascii_toggle(struct char_data *ch, char *argument, int cmd)
     
     return eSUCCESS;
 } 
+
+int do_damage_toggle(struct char_data *ch, char *argument, int cmd)
+{
+    if (IS_NPC(ch))
+        return eFAILURE; 
+    
+    if (IS_SET(ch->pcdata->toggles, PLR_DAMAGE))
+    {
+        REMOVE_BIT(ch->pcdata->toggles, PLR_DAMAGE);
+        send_to_char("Damage numbers will no longer be displayed in combat.\n\r", ch);
+    }
+    else 
+    {
+        send_to_char("Damage numbers will now be displayed in combat.\n\r", ch);
+        SET_BIT(ch->pcdata->toggles, PLR_DAMAGE);
+    }
+    
+    return eSUCCESS;
+} 
+
 
 int do_notax_toggle(struct char_data *ch, char *argument, int cmd)
 {
