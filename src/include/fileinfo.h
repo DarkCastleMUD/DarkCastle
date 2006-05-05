@@ -1,7 +1,7 @@
 #ifndef FILEINFO_H_
 #define FILEINFO_H_
 /*
-| $Id: fileinfo.h,v 1.13 2006/05/03 18:40:25 dcastle Exp $
+| $Id: fileinfo.h,v 1.14 2006/05/05 12:21:01 shane Exp $
 | fileinfo.h
 | Description:  Contains information for loading files, ie "../lib", etc..
 */
@@ -67,6 +67,7 @@
 #define  NEW_HELP_FILE	     "new_help.txt"
 #define  NEW_HELP_PAGE_FILE  "new_help_screen.txt"
 #define  NEW_IHELP_PAGE_FILE "new_ihelp_screen.txt"
+#define  LEADERBOARD_FILE    "leaderboard.txt"
 
 #ifndef WIN32
 #define BUG_FILE            "../log/bug.log"

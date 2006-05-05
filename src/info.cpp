@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.73 2006/01/13 16:49:14 dcastle Exp $ */
+/* $Id: info.cpp,v 1.74 2006/05/05 12:20:55 shane Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -41,7 +41,7 @@ extern "C"
 #include <act.h>
 #include <set.h>
 #include <returnvals.h>
-
+#include <fileinfo.h>
 
 /* extern variables */
 
@@ -2386,41 +2386,257 @@ int do_tick( struct char_data *ch, char *argument, int cmd )
   return eSUCCESS;
 }
 
-int do_pkscore(struct char_data *ch, char *argument, int cmd)
+int do_pkscore(CHAR_DATA * ch)
 {
-   struct descriptor_data *d;
-   char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
-   float pkonlineratio[] = {0,0,0,0,0,0,0,0,0,0};
-   char  pkonlinename[10][MAX_STRING_LENGTH];
-   float pkratio;
+   return 0;
+}
 
-   //top 10 online
+int do_pdscore(CHAR_DATA * ch)
+{
+   return 0;
+}
+
+void check_leaderboard()
+{
+   // check online players to the file and make sure the file is up to date
+   struct descriptor_data *d;
+   FILE  *fl;
+   int   i, j;
+   char  *hpactivename[5], *mnactivename[5], *kiactivename[5], *pkactivename[5], *pdactivename[5], *rdactivename[5];
+   int   hpactive[5], mnactive[5], kiactive[5], pkactive[5], pdactive[5], rdactive[5];
+
+   if (!(fl = dc_fopen(LEADERBOARD_FILE, "w"))) {
+      log("Cannot open leaderboard file.", 0, LOG_MISC);
+      abort();
+   }
+   for(i=0;i<5;i++) {
+      hpactivename[i] = fread_string(fl, 0);
+      hpactive[i] = fread_int(fl, 0, LONG_MAX);
+   }
+   for(i=0;i<5;i++) {
+      mnactivename[i] = fread_string(fl, 0);
+      mnactive[i] = fread_int(fl, 0, LONG_MAX);
+   }
+   for(i=0;i<5;i++) {
+      kiactivename[i] = fread_string(fl, 0);
+      kiactive[i] = fread_int(fl, 0, LONG_MAX);
+   }
+   for(i=0;i<5;i++) {
+      pkactivename[i] = fread_string(fl, 0);
+      pkactive[i] = fread_int(fl, 0, LONG_MAX);
+   }
+   for(i=0;i<5;i++) {
+      pdactivename[i] = fread_string(fl, 0);
+      pdactive[i] = fread_int(fl, 0, LONG_MAX);
+   }
+   for(i=0;i<5;i++) {
+      rdactivename[i] = fread_string(fl, 0);
+      rdactive[i] = fread_int(fl, 0, LONG_MAX);
+   }
+
    for(d=descriptor_list;d;d=d->next) {
 
-      if(!CAN_SEE(ch,d->character)) continue;
+      if(GET_LEVEL(d->character) >= IMMORTAL) continue;
 
-      pkratio = d->character->pcdata->pklvl / d->character->pcdata->pkills / 50.0 * 10.0;
-      for(int i=0;i>9;i++) {
-         if(pkratio > pkonlineratio[i]) {
-            for(int j=9;j<i;j--) {
-               pkonlineratio[j] = pkonlineratio[j-1];
-               strcpy(pkonlinename[j],pkonlinename[j-1]);
+      for(i=0;i<5;i++) {
+         if(GET_MAX_HIT(d->character) > hpactive[i]) {
+            for(j=4;j<i;j--) {
+               hpactive[j] = hpactive[j-1];
+               strcpy(hpactivename[j],hpactivename[j-1]);
             }
-            pkonlineratio[i] = pkratio;
-            strcpy(pkonlinename[i],GET_NAME(d->character));
+            hpactive[i] = GET_MAX_HIT(d->character);
+            strcpy(hpactivename[i],GET_NAME(d->character));
+         }
+      }
+      for(i=0;i<5;i++) {
+         if(GET_MAX_MANA(d->character) > mnactive[i]) {
+            for(j=4;j<i;j--) {
+               mnactive[j] = mnactive[j-1];
+               strcpy(mnactivename[j],mnactivename[j-1]);
+            }
+            mnactive[i] = GET_MAX_MANA(d->character);
+            strcpy(mnactivename[i],GET_NAME(d->character));
+         }
+      }
+      for(i=0;i<5;i++) {
+         if(GET_MAX_KI(d->character) > kiactive[i]) {
+            for(j=4;j<i;j--) {
+               kiactive[j] = kiactive[j-1];
+               strcpy(kiactivename[j],kiactivename[j-1]);
+            }
+            kiactive[i] = GET_MAX_KI(d->character);
+            strcpy(kiactivename[i],GET_NAME(d->character));
+         }
+      }
+      for(i=0;i<5;i++) {
+         if(do_pkscore(d->character) > pkactive[i]) {
+            for(j=4;j<i;j--) {
+               pkactive[j] = pkactive[j-1];
+               strcpy(pkactivename[j],pkactivename[j-1]);
+            }
+            pkactive[i] = do_pkscore(d->character);
+            strcpy(pkactivename[i],GET_NAME(d->character));
+         }
+      }
+      for(i=0;i<5;i++) {
+         if(do_pdscore(d->character) > pdactive[i]) {
+            for(j=4;j<i;j--) {
+               pdactive[j] = pdactive[j-1];
+               strcpy(pdactivename[j],pdactivename[j-1]);
+            }
+            pdactive[i] = do_pdscore(d->character);
+            strcpy(pdactivename[i],GET_NAME(d->character));
+         }
+      }
+      for(i=0;i<5;i++) {
+         if(GET_RDEATHS(d->character) > rdactive[i] && GET_LEVEL(d->character) >= 50) {
+            for(j=4;j<i;j--) {
+               rdactive[j] = rdactive[j-1];
+               strcpy(kiactivename[j],rdactivename[j-1]);
+            }
+            rdactive[i] = GET_RDEATHS(d->character);
+            strcpy(rdactivename[i],GET_NAME(d->character));
          }
       }
    }
 
-   sprintf(buf,"(*)*********************(*)\n");
-   strcat(buf, "(*)        PK Score     (*)\n");
-   strcat(buf, "(*)---------------------(*)\n");
-   strcat(buf, "(*)                     (*)\n");
-   for(int i=0;i>9;i++) {
-      sprintf(buf2, "(*)   %d. %s   %f  (*)\n",i+1,pkonlinename[i],pkonlineratio[i]);
-      strcat(buf, buf2);
+   for(i=0;i<5;i++) fprintf(fl, "%s %d\n", hpactivename[i], hpactive[i]);
+   for(i=0;i<5;i++) fprintf(fl, "%s %d\n", mnactivename[i], mnactive[i]);
+   for(i=0;i<5;i++) fprintf(fl, "%s %d\n", kiactivename[i], kiactive[i]);
+   for(i=0;i<5;i++) fprintf(fl, "%s %d\n", pkactivename[i], pkactive[i]);
+   for(i=0;i<5;i++) fprintf(fl, "%s %d\n", pdactivename[i], pdactive[i]);
+   for(i=0;i<5;i++) fprintf(fl, "%s %d\n", rdactivename[i], rdactive[i]);
+
+   dc_fclose(fl);
+}
+
+int do_leaderboard(struct char_data *ch, char *argument, int cmd)
+{
+   struct descriptor_data *d;
+   FILE  *fl;
+   char  buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
+   int   i, j;
+   char  hponlinename[5][MAX_STRING_LENGTH];
+   char  mnonlinename[5][MAX_STRING_LENGTH];
+   char  kionlinename[5][MAX_STRING_LENGTH];
+   char  pkonlinename[5][MAX_STRING_LENGTH];
+   char  pdonlinename[5][MAX_STRING_LENGTH];
+   char  rdonlinename[5][MAX_STRING_LENGTH];
+   int   hponline[] = {0,0,0,0,0}, mnonline[] = {0,0,0,0,0}, kionline[] = {0,0,0,0,0}, pkonline[] = {0,0,0,0,0}, pdonline[] = {0,0,0,0,0}, rdonline[] = {0,0,0,0,0};
+   char  *hpactivename[5], *mnactivename[5], *kiactivename[5], *pkactivename[5], *pdactivename[5], *rdactivename[5];
+   int   hpactive[5], mnactive[5], kiactive[5], pkactive[5], pdactive[5], rdactive[5];
+
+   check_leaderboard();
+
+   if (!(fl = dc_fopen(LEADERBOARD_FILE, "r"))) {
+      log("Cannot open leaderboard file.", 0, LOG_MISC);
+      abort();
+   }
+   for(i=0;i<5;i++) {
+      hpactivename[i] = fread_string(fl, 0);
+      hpactive[i] = fread_int(fl, 0, LONG_MAX);
+   }
+   for(i=0;i<5;i++) {
+      mnactivename[i] = fread_string(fl, 0);
+      mnactive[i] = fread_int(fl, 0, LONG_MAX);
+   }
+   for(i=0;i<5;i++) {
+      kiactivename[i] = fread_string(fl, 0);
+      kiactive[i] = fread_int(fl, 0, LONG_MAX);
+   }
+   for(i=0;i<5;i++) {
+      pkactivename[i] = fread_string(fl, 0);
+      pkactive[i] = fread_int(fl, 0, LONG_MAX);
+   }
+   for(i=0;i<5;i++) {
+      pdactivename[i] = fread_string(fl, 0);
+      pdactive[i] = fread_int(fl, 0, LONG_MAX);
+   }
+   for(i=0;i<5;i++) {
+      rdactivename[i] = fread_string(fl, 0);
+      rdactive[i] = fread_int(fl, 0, LONG_MAX);
+   }
+   dc_fclose(fl);
+
+   //top 5 online
+   for(d=descriptor_list;d;d=d->next) {
+
+      if(!CAN_SEE(ch,d->character) || GET_LEVEL(d->character) >= IMMORTAL) continue;
+
+      for(i=0;i<5;i++) {
+         if(GET_MAX_HIT(d->character) > hponline[i]) {
+            for(j=4;j<i;j--) {
+               hponline[j] = hponline[j-1];
+               strcpy(hponlinename[j],hponlinename[j-1]);
+            }
+            hponline[i] = GET_MAX_HIT(d->character);
+            strcpy(hponlinename[i],GET_NAME(d->character));
+         }
+      }
+      for(i=0;i<5;i++) {
+         if(GET_MAX_MANA(d->character) > mnonline[i]) {
+            for(j=4;j<i;j--) {
+               mnonline[j] = mnonline[j-1];
+               strcpy(mnonlinename[j],mnonlinename[j-1]);
+            }
+            mnonline[i] = GET_MAX_MANA(d->character);
+            strcpy(mnonlinename[i],GET_NAME(d->character));
+         }
+      }
+      for(i=0;i<5;i++) {
+         if(GET_MAX_KI(d->character) > kionline[i]) {
+            for(j=4;j<i;j--) {
+               kionline[j] = kionline[j-1];
+               strcpy(kionlinename[j],kionlinename[j-1]);
+            }
+            kionline[i] = GET_MAX_KI(d->character);
+            strcpy(kionlinename[i],GET_NAME(d->character));
+         }
+      }
+      for(i=0;i<5;i++) {
+         if(do_pkscore(d->character) > pkonline[i]) {
+            for(j=4;j<i;j--) {
+               pkonline[j] = pkonline[j-1];
+               strcpy(pkonlinename[j],pkonlinename[j-1]);
+            }
+            pkonline[i] = do_pkscore(d->character);
+            strcpy(pkonlinename[i],GET_NAME(d->character));
+         }
+      }
+      for(i=0;i<5;i++) {
+         if(do_pdscore(d->character) > pdonline[i]) {
+            for(j=4;j<i;j--) {
+               pdonline[j] = pdonline[j-1];
+               strcpy(pdonlinename[j],pdonlinename[j-1]);
+            }
+            pdonline[i] = do_pdscore(d->character);
+            strcpy(pdonlinename[i],GET_NAME(d->character));
+         }
+      }
+      for(i=0;i<5;i++) {
+         if(GET_RDEATHS(d->character) > rdonline[i] && GET_LEVEL(d->character) >= 50) {
+            for(j=4;j<i;j--) {
+               rdonline[j] = rdonline[j-1];
+               strcpy(kionlinename[j],rdonlinename[j-1]);
+            }
+            rdonline[i] = GET_RDEATHS(d->character);
+            strcpy(rdonlinename[i],GET_NAME(d->character));
+         }
+      }
    }
 
+   sprintf(buf,"(*)********************************(*)\n");
+   strcat(buf, "(*)           Leaderboard          (*)\n");
+   strcat(buf, "(*)--------------------------------(*)\n");
+   strcat(buf, "(*)                                (*)\n");
+   strcat(buf, "(*)     Online           Active    (*)\n");
+   for(int i=0;i>5;i++) {
+      sprintf(buf2, "(*) %d) %-12s %d) %-12s  (*)\n",i+1,hponlinename[i],i+1,hpactivename[i]);
+      strcat(buf, buf2);
+   }
+   strcat(buf, "(*)                                (*)\n");
+   strcat(buf, "(*)--------------------------------(*)\n");
+   strcat(buf, "(*)********************************(*)\n");
    page_string( ch->desc, buf, 1 );
    return eSUCCESS;
 }

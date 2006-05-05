@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.65 2006/05/03 18:40:21 dcastle Exp $ */
+/* $Id: limits.cpp,v 1.66 2006/05/05 12:20:55 shane Exp $ */
 
 extern "C"
 {
@@ -52,11 +52,12 @@ extern struct obj_data *object_list;
 extern CWorld world;
 extern struct index_data *obj_index;
 extern struct index_data *mob_index;
-/* External procedures */
 
+/* External procedures */
 void save_corpses(void);
 void update_pos( CHAR_DATA *victim );                 /* in fight.c */
 struct time_info_data age(CHAR_DATA *ch);
+void check_leaderboard();
 
 /* When age < 15 return the value p0 */
 /* When age in 15..29 calculate the line between p1 & p2 */
@@ -349,6 +350,7 @@ void redo_hitpoints( CHAR_DATA *ch)
       }
   }
   add_totem_stats(ch, APPLY_HIT);
+  check_leaderboard();
 }
 
 
@@ -393,6 +395,7 @@ void redo_mana ( CHAR_DATA *ch)
       }
   }
   add_totem_stats(ch, APPLY_MANA);
+  check_leaderboard();
 }
 
 void redo_ki(CHAR_DATA *ch)
@@ -424,7 +427,7 @@ void redo_ki(CHAR_DATA *ch)
       }
   }
   add_totem_stats(ch, APPLY_KI);
-
+  check_leaderboard();
 }
 
 /* Gain maximum in various */
