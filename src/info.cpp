@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.77 2006/05/05 19:39:21 shane Exp $ */
+/* $Id: info.cpp,v 1.78 2006/05/05 20:12:44 shane Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -2437,7 +2437,7 @@ void check_leaderboard()
 
    for(d=descriptor_list;d;d=d->next) {
 
-      if(GET_LEVEL(d->character) >= IMMORTAL) continue;
+      if(!d->character || GET_LEVEL(d->character) >= IMMORTAL) continue;
 
       for(i=0;i<5;i++) {
          if(GET_MAX_HIT(d->character) > hpactive[i]) {
@@ -2565,7 +2565,7 @@ int do_leaderboard(struct char_data *ch, char *argument, int cmd)
    //top 5 online
    for(d=descriptor_list;d;d=d->next) {
 
-      if(!CAN_SEE(ch,d->character) || GET_LEVEL(d->character) >= IMMORTAL) continue;
+      if(!d->character || !CAN_SEE(ch,d->character) || GET_LEVEL(d->character) >= IMMORTAL) continue;
 
       for(i=0;i<5;i++) {
          if(GET_MAX_HIT(d->character) > hponline[i]) {
@@ -2629,43 +2629,43 @@ int do_leaderboard(struct char_data *ch, char *argument, int cmd)
       }
    }
 
-   sprintf(buf,"(*)********************************(*)\n");
-   strcat(buf, "(*)           Leaderboard          (*)\n");
-   strcat(buf, "(*)--------------------------------(*)\n");
-   strcat(buf, "(*)                                (*)\n");
-   strcat(buf, "(*)     Online           Active    (*)\n");
-   strcat(buf, "(*)                                (*)\n");
-   strcat(buf, "(*)           Hit Points           (*)\n");
+   sprintf(buf,"(*)**********************************(*)\n");
+   strcat(buf, "(*)            Leaderboard           (*)\n");
+   strcat(buf, "(*)----------------------------------(*)\n");
+   strcat(buf, "(*)                                  (*)\n");
+   strcat(buf, "(*)      Online           Active     (*)\n");
+   strcat(buf, "(*)                                  (*)\n");
+   strcat(buf, "(*)            Hit Points            (*)\n");
    for(i=0;i<5;i++) {
       sprintf(buf2, "(*) %d) %-12s %d) %-12s  (*)\n",i+1,hponlinename[i],i+1,hpactivename[i]);
       strcat(buf, buf2);
    }
-   strcat(buf, "(*)                                (*)\n");
-   strcat(buf, "(*)              Mana              (*)\n");
+   strcat(buf, "(*)                                  (*)\n");
+   strcat(buf, "(*)               Mana               (*)\n");
    for(i=0;i<5;i++) {
       sprintf(buf2, "(*) %d) %-12s %d) %-12s  (*)\n",i+1,mnonlinename[i],i+1,mnactivename[i]);
       strcat(buf, buf2);
    }
-   strcat(buf, "(*)                                (*)\n");
-   strcat(buf, "(*)               Ki               (*)\n");
+   strcat(buf, "(*)                                  (*)\n");
+   strcat(buf, "(*)                Ki                (*)\n");
    for(i=0;i<5;i++) {
       sprintf(buf2, "(*) %d) %-12s %d) %-12s  (*)\n",i+1,kionlinename[i],i+1,kiactivename[i]);
       strcat(buf, buf2);
    }
-   strcat(buf, "(*)                                (*)\n");
-   strcat(buf, "(*)        Player Kill Score       (*)\n");
+   strcat(buf, "(*)                                  (*)\n");
+   strcat(buf, "(*)         Player Kill Score        (*)\n");
    for(i=0;i<5;i++) {
       sprintf(buf2, "(*) %d) %-12s %d) %-12s  (*)\n",i+1,pkonlinename[i],i+1,pkactivename[i]);
       strcat(buf, buf2);
    }
-   strcat(buf, "(*)                                (*)\n");
-   strcat(buf, "(*)       Player Death Score       (*)\n");
+   strcat(buf, "(*)                                  (*)\n");
+   strcat(buf, "(*)        Player Death Score        (*)\n");
    for(i=0;i<5;i++) {
       sprintf(buf2, "(*) %d) %-12s %d) %-12s  (*)\n",i+1,pdonlinename[i],i+1,pdactivename[i]);
       strcat(buf, buf2);
    }
-   strcat(buf, "(*)                                (*)\n");
-   strcat(buf, "(*)          Real Deaths           (*)\n");
+   strcat(buf, "(*)                                  (*)\n");
+   strcat(buf, "(*)           Real Deaths            (*)\n");
    for(i=0;i<5;i++) {
       sprintf(buf2, "(*) %d) %-12s %d) %-12s  (*)\n",i+1,rdonlinename[i],i+1,rdactivename[i]);
       strcat(buf, buf2);
