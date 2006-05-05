@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.74 2006/05/05 12:20:55 shane Exp $ */
+/* $Id: info.cpp,v 1.75 2006/05/05 12:34:04 shane Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -2405,7 +2405,7 @@ void check_leaderboard()
    char  *hpactivename[5], *mnactivename[5], *kiactivename[5], *pkactivename[5], *pdactivename[5], *rdactivename[5];
    int   hpactive[5], mnactive[5], kiactive[5], pkactive[5], pdactive[5], rdactive[5];
 
-   if (!(fl = dc_fopen(LEADERBOARD_FILE, "w"))) {
+   if (!(fl = dc_fopen(LEADERBOARD_FILE, "r"))) {
       log("Cannot open leaderboard file.", 0, LOG_MISC);
       abort();
    }
@@ -2433,6 +2433,7 @@ void check_leaderboard()
       rdactivename[i] = fread_string(fl, 0);
       rdactive[i] = fread_int(fl, 0, LONG_MAX);
    }
+   dc_fclose(fl);
 
    for(d=descriptor_list;d;d=d->next) {
 
@@ -2440,7 +2441,7 @@ void check_leaderboard()
 
       for(i=0;i<5;i++) {
          if(GET_MAX_HIT(d->character) > hpactive[i]) {
-            for(j=4;j<i;j--) {
+            for(j=4;j>i;j--) {
                hpactive[j] = hpactive[j-1];
                strcpy(hpactivename[j],hpactivename[j-1]);
             }
@@ -2450,7 +2451,7 @@ void check_leaderboard()
       }
       for(i=0;i<5;i++) {
          if(GET_MAX_MANA(d->character) > mnactive[i]) {
-            for(j=4;j<i;j--) {
+            for(j=4;j>i;j--) {
                mnactive[j] = mnactive[j-1];
                strcpy(mnactivename[j],mnactivename[j-1]);
             }
@@ -2460,7 +2461,7 @@ void check_leaderboard()
       }
       for(i=0;i<5;i++) {
          if(GET_MAX_KI(d->character) > kiactive[i]) {
-            for(j=4;j<i;j--) {
+            for(j=4;j>i;j--) {
                kiactive[j] = kiactive[j-1];
                strcpy(kiactivename[j],kiactivename[j-1]);
             }
@@ -2470,7 +2471,7 @@ void check_leaderboard()
       }
       for(i=0;i<5;i++) {
          if(do_pkscore(d->character) > pkactive[i]) {
-            for(j=4;j<i;j--) {
+            for(j=4;j>i;j--) {
                pkactive[j] = pkactive[j-1];
                strcpy(pkactivename[j],pkactivename[j-1]);
             }
@@ -2480,7 +2481,7 @@ void check_leaderboard()
       }
       for(i=0;i<5;i++) {
          if(do_pdscore(d->character) > pdactive[i]) {
-            for(j=4;j<i;j--) {
+            for(j=4;j>i;j--) {
                pdactive[j] = pdactive[j-1];
                strcpy(pdactivename[j],pdactivename[j-1]);
             }
@@ -2490,7 +2491,7 @@ void check_leaderboard()
       }
       for(i=0;i<5;i++) {
          if(GET_RDEATHS(d->character) > rdactive[i] && GET_LEVEL(d->character) >= 50) {
-            for(j=4;j<i;j--) {
+            for(j=4;j>i;j--) {
                rdactive[j] = rdactive[j-1];
                strcpy(kiactivename[j],rdactivename[j-1]);
             }
@@ -2500,13 +2501,16 @@ void check_leaderboard()
       }
    }
 
+   if (!(fl = dc_fopen(LEADERBOARD_FILE, "w"))) {
+      log("Cannot open leaderboard file.", 0, LOG_MISC);
+      abort();
+   }
    for(i=0;i<5;i++) fprintf(fl, "%s %d\n", hpactivename[i], hpactive[i]);
    for(i=0;i<5;i++) fprintf(fl, "%s %d\n", mnactivename[i], mnactive[i]);
    for(i=0;i<5;i++) fprintf(fl, "%s %d\n", kiactivename[i], kiactive[i]);
    for(i=0;i<5;i++) fprintf(fl, "%s %d\n", pkactivename[i], pkactive[i]);
    for(i=0;i<5;i++) fprintf(fl, "%s %d\n", pdactivename[i], pdactive[i]);
    for(i=0;i<5;i++) fprintf(fl, "%s %d\n", rdactivename[i], rdactive[i]);
-
    dc_fclose(fl);
 }
 
@@ -2565,7 +2569,7 @@ int do_leaderboard(struct char_data *ch, char *argument, int cmd)
 
       for(i=0;i<5;i++) {
          if(GET_MAX_HIT(d->character) > hponline[i]) {
-            for(j=4;j<i;j--) {
+            for(j=4;j>i;j--) {
                hponline[j] = hponline[j-1];
                strcpy(hponlinename[j],hponlinename[j-1]);
             }
@@ -2575,7 +2579,7 @@ int do_leaderboard(struct char_data *ch, char *argument, int cmd)
       }
       for(i=0;i<5;i++) {
          if(GET_MAX_MANA(d->character) > mnonline[i]) {
-            for(j=4;j<i;j--) {
+            for(j=4;j>i;j--) {
                mnonline[j] = mnonline[j-1];
                strcpy(mnonlinename[j],mnonlinename[j-1]);
             }
@@ -2585,7 +2589,7 @@ int do_leaderboard(struct char_data *ch, char *argument, int cmd)
       }
       for(i=0;i<5;i++) {
          if(GET_MAX_KI(d->character) > kionline[i]) {
-            for(j=4;j<i;j--) {
+            for(j=4;j>i;j--) {
                kionline[j] = kionline[j-1];
                strcpy(kionlinename[j],kionlinename[j-1]);
             }
@@ -2595,7 +2599,7 @@ int do_leaderboard(struct char_data *ch, char *argument, int cmd)
       }
       for(i=0;i<5;i++) {
          if(do_pkscore(d->character) > pkonline[i]) {
-            for(j=4;j<i;j--) {
+            for(j=4;j>i;j--) {
                pkonline[j] = pkonline[j-1];
                strcpy(pkonlinename[j],pkonlinename[j-1]);
             }
@@ -2605,7 +2609,7 @@ int do_leaderboard(struct char_data *ch, char *argument, int cmd)
       }
       for(i=0;i<5;i++) {
          if(do_pdscore(d->character) > pdonline[i]) {
-            for(j=4;j<i;j--) {
+            for(j=4;j>i;j--) {
                pdonline[j] = pdonline[j-1];
                strcpy(pdonlinename[j],pdonlinename[j-1]);
             }
@@ -2615,7 +2619,7 @@ int do_leaderboard(struct char_data *ch, char *argument, int cmd)
       }
       for(i=0;i<5;i++) {
          if(GET_RDEATHS(d->character) > rdonline[i] && GET_LEVEL(d->character) >= 50) {
-            for(j=4;j<i;j--) {
+            for(j=4;j>i;j--) {
                rdonline[j] = rdonline[j-1];
                strcpy(kionlinename[j],rdonlinename[j-1]);
             }
