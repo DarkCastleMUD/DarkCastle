@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.75 2006/05/05 12:34:04 shane Exp $ */
+/* $Id: info.cpp,v 1.76 2006/05/05 19:28:44 shane Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -2505,12 +2505,12 @@ void check_leaderboard()
       log("Cannot open leaderboard file.", 0, LOG_MISC);
       abort();
    }
-   for(i=0;i<5;i++) fprintf(fl, "%s %d\n", hpactivename[i], hpactive[i]);
-   for(i=0;i<5;i++) fprintf(fl, "%s %d\n", mnactivename[i], mnactive[i]);
-   for(i=0;i<5;i++) fprintf(fl, "%s %d\n", kiactivename[i], kiactive[i]);
-   for(i=0;i<5;i++) fprintf(fl, "%s %d\n", pkactivename[i], pkactive[i]);
-   for(i=0;i<5;i++) fprintf(fl, "%s %d\n", pdactivename[i], pdactive[i]);
-   for(i=0;i<5;i++) fprintf(fl, "%s %d\n", rdactivename[i], rdactive[i]);
+   for(i=0;i<5;i++) fprintf(fl, "%s~ %d\n", hpactivename[i], hpactive[i]);
+   for(i=0;i<5;i++) fprintf(fl, "%s~ %d\n", mnactivename[i], mnactive[i]);
+   for(i=0;i<5;i++) fprintf(fl, "%s~ %d\n", kiactivename[i], kiactive[i]);
+   for(i=0;i<5;i++) fprintf(fl, "%s~ %d\n", pkactivename[i], pkactive[i]);
+   for(i=0;i<5;i++) fprintf(fl, "%s~ %d\n", pdactivename[i], pdactive[i]);
+   for(i=0;i<5;i++) fprintf(fl, "%s~ %d\n", rdactivename[i], rdactive[i]);
    dc_fclose(fl);
 }
 
@@ -2634,8 +2634,40 @@ int do_leaderboard(struct char_data *ch, char *argument, int cmd)
    strcat(buf, "(*)--------------------------------(*)\n");
    strcat(buf, "(*)                                (*)\n");
    strcat(buf, "(*)     Online           Active    (*)\n");
+   strcat(buf, "(*)                                (*)\n");
+   strcat(buf, "(*)           Hit Points           (*)\n");
    for(int i=0;i>5;i++) {
       sprintf(buf2, "(*) %d) %-12s %d) %-12s  (*)\n",i+1,hponlinename[i],i+1,hpactivename[i]);
+      strcat(buf, buf2);
+   }
+   strcat(buf, "(*)                                (*)\n");
+   strcat(buf, "(*)              Mana              (*)\n");
+   for(int i=0;i>5;i++) {
+      sprintf(buf2, "(*) %d) %-12s %d) %-12s  (*)\n",i+1,mnonlinename[i],i+1,mnactivename[i]);
+      strcat(buf, buf2);
+   }
+   strcat(buf, "(*)                                (*)\n");
+   strcat(buf, "(*)               Ki               (*)\n");
+   for(int i=0;i>5;i++) {
+      sprintf(buf2, "(*) %d) %-12s %d) %-12s  (*)\n",i+1,kionlinename[i],i+1,kiactivename[i]);
+      strcat(buf, buf2);
+   }
+   strcat(buf, "(*)                                (*)\n");
+   strcat(buf, "(*)        Player Kill Score       (*)\n");
+   for(int i=0;i>5;i++) {
+      sprintf(buf2, "(*) %d) %-12s %d) %-12s  (*)\n",i+1,pkonlinename[i],i+1,pkactivename[i]);
+      strcat(buf, buf2);
+   }
+   strcat(buf, "(*)                                (*)\n");
+   strcat(buf, "(*)       Player Death Score       (*)\n");
+   for(int i=0;i>5;i++) {
+      sprintf(buf2, "(*) %d) %-12s %d) %-12s  (*)\n",i+1,pdonlinename[i],i+1,pdactivename[i]);
+      strcat(buf, buf2);
+   }
+   strcat(buf, "(*)                                (*)\n");
+   strcat(buf, "(*)          Real Deaths           (*)\n");
+   for(int i=0;i>5;i++) {
+      sprintf(buf2, "(*) %d) %-12s %d) %-12s  (*)\n",i+1,rdonlinename[i],i+1,rdactivename[i]);
       strcat(buf, buf2);
    }
    strcat(buf, "(*)                                (*)\n");

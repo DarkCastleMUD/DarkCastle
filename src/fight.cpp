@@ -5,7 +5,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.294 2006/05/03 18:43:56 dcastle Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.295 2006/05/05 19:28:43 shane Exp $ */
 
 extern "C"
 {
@@ -54,6 +54,7 @@ extern struct index_data *mob_index;
 extern struct index_data *obj_index;
 extern struct zone_data *zone_table;
 struct clan_data * get_clan(struct char_data *);
+extern void check_leaderboard(void);
 
 /* functions that nobody else should be calling */
 void save_corpses(void); 
@@ -2309,6 +2310,7 @@ void fight_kill(CHAR_DATA *ch, CHAR_DATA *vict, int type, int spec_type)
     case TYPE_RAW_KILL: raw_kill(ch, vict); break;
     case TYPE_ARENA_KILL: arena_kill(ch, vict, spec_type); break;
   }
+  check_leaderboard();
 }
 
 // check riposte never returns eSUCCESS because that would
