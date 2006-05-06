@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.78 2006/05/05 20:12:44 shane Exp $ */
+/* $Id: info.cpp,v 1.79 2006/05/06 03:52:41 shane Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -2388,12 +2388,14 @@ int do_tick( struct char_data *ch, char *argument, int cmd )
 
 int do_pkscore(CHAR_DATA * ch)
 {
-   return 0;
+   return ch->pcdata->pklvl / ch->pcdata->pkills / 50.0 * 1000.0;
+//   return 0;
 }
 
 int do_pdscore(CHAR_DATA * ch)
 {
-   return 0;
+   return ch->pcdata->pdeaths;
+//   return 0;
 }
 
 void check_leaderboard()
@@ -2447,6 +2449,7 @@ void check_leaderboard()
             }
             hpactive[i] = GET_MAX_HIT(d->character);
             strcpy(hpactivename[i],GET_NAME(d->character));
+            break;
          }
       }
       for(i=0;i<5;i++) {
@@ -2457,6 +2460,7 @@ void check_leaderboard()
             }
             mnactive[i] = GET_MAX_MANA(d->character);
             strcpy(mnactivename[i],GET_NAME(d->character));
+            break;
          }
       }
       for(i=0;i<5;i++) {
@@ -2467,6 +2471,7 @@ void check_leaderboard()
             }
             kiactive[i] = GET_MAX_KI(d->character);
             strcpy(kiactivename[i],GET_NAME(d->character));
+            break;
          }
       }
       for(i=0;i<5;i++) {
@@ -2477,6 +2482,7 @@ void check_leaderboard()
             }
             pkactive[i] = do_pkscore(d->character);
             strcpy(pkactivename[i],GET_NAME(d->character));
+            break;
          }
       }
       for(i=0;i<5;i++) {
@@ -2487,6 +2493,7 @@ void check_leaderboard()
             }
             pdactive[i] = do_pdscore(d->character);
             strcpy(pdactivename[i],GET_NAME(d->character));
+            break;
          }
       }
       for(i=0;i<5;i++) {
@@ -2497,6 +2504,7 @@ void check_leaderboard()
             }
             rdactive[i] = GET_RDEATHS(d->character);
             strcpy(rdactivename[i],GET_NAME(d->character));
+            break;
          }
       }
    }
@@ -2575,6 +2583,7 @@ int do_leaderboard(struct char_data *ch, char *argument, int cmd)
             }
             hponline[i] = GET_MAX_HIT(d->character);
             strcpy(hponlinename[i],GET_NAME(d->character));
+            break;
          }
       }
       for(i=0;i<5;i++) {
@@ -2585,6 +2594,7 @@ int do_leaderboard(struct char_data *ch, char *argument, int cmd)
             }
             mnonline[i] = GET_MAX_MANA(d->character);
             strcpy(mnonlinename[i],GET_NAME(d->character));
+            break;
          }
       }
       for(i=0;i<5;i++) {
@@ -2595,6 +2605,7 @@ int do_leaderboard(struct char_data *ch, char *argument, int cmd)
             }
             kionline[i] = GET_MAX_KI(d->character);
             strcpy(kionlinename[i],GET_NAME(d->character));
+            break;
          }
       }
       for(i=0;i<5;i++) {
@@ -2605,6 +2616,7 @@ int do_leaderboard(struct char_data *ch, char *argument, int cmd)
             }
             pkonline[i] = do_pkscore(d->character);
             strcpy(pkonlinename[i],GET_NAME(d->character));
+            break;
          }
       }
       for(i=0;i<5;i++) {
@@ -2615,6 +2627,7 @@ int do_leaderboard(struct char_data *ch, char *argument, int cmd)
             }
             pdonline[i] = do_pdscore(d->character);
             strcpy(pdonlinename[i],GET_NAME(d->character));
+            break;
          }
       }
       for(i=0;i<5;i++) {
@@ -2625,54 +2638,37 @@ int do_leaderboard(struct char_data *ch, char *argument, int cmd)
             }
             rdonline[i] = GET_RDEATHS(d->character);
             strcpy(rdonlinename[i],GET_NAME(d->character));
+            break;
          }
       }
    }
 
-   sprintf(buf,"(*)**********************************(*)\n");
-   strcat(buf, "(*)            Leaderboard           (*)\n");
-   strcat(buf, "(*)----------------------------------(*)\n");
-   strcat(buf, "(*)                                  (*)\n");
-   strcat(buf, "(*)      Online           Active     (*)\n");
-   strcat(buf, "(*)                                  (*)\n");
-   strcat(buf, "(*)            Hit Points            (*)\n");
+   sprintf(buf,"(*)********************************************************************(*)\n");
+   strcat(buf, "(*)                             Leaderboard                            (*)\n");
+   strcat(buf, "(*)--------------------------------------------------------------------(*)\n");
+   strcat(buf, "(*)                                                                    (*)\n");
+   strcat(buf, "(*)    Online          Active            Online          Active        (*)\n");
+   strcat(buf, "(*)                                                                    (*)\n");
+   strcat(buf, "(*) $2$BHit Points                        Mana$R                             (*)\n");
    for(i=0;i<5;i++) {
-      sprintf(buf2, "(*) %d) %-12s %d) %-12s  (*)\n",i+1,hponlinename[i],i+1,hpactivename[i]);
+      sprintf(buf2, "(*) %d) $B%-12s$R %d) $B%-12s$R   %d) $B%-12s$R %d) $B%-12s$R (*)\n",i+1,hponlinename[i],i+1,hpactivename[i],i+1,mnonlinename[i],i+1,mnactivename[i]);
       strcat(buf, buf2);
    }
-   strcat(buf, "(*)                                  (*)\n");
-   strcat(buf, "(*)               Mana               (*)\n");
+   strcat(buf, "(*)                                                                    (*)\n");
+   strcat(buf, "(*) $2$BKi                                Player Kill Score$R                      (*)\n");
    for(i=0;i<5;i++) {
-      sprintf(buf2, "(*) %d) %-12s %d) %-12s  (*)\n",i+1,mnonlinename[i],i+1,mnactivename[i]);
+      sprintf(buf2, "(*) %d) $B%-12s$R %d) $B%-12s$R   %d) $B%-12s$R %d) $B%-12s$R (*)\n",i+1,kionlinename[i],i+1,kiactivename[i],i+1,pkonlinename[i],i+1,pkactivename[i]);
       strcat(buf, buf2);
    }
-   strcat(buf, "(*)                                  (*)\n");
-   strcat(buf, "(*)                Ki                (*)\n");
+   strcat(buf, "(*)                                                                    (*)\n");
+   strcat(buf, "(*) $2$BPlayer Death Score                Real Deaths$R                      (*)\n");
    for(i=0;i<5;i++) {
-      sprintf(buf2, "(*) %d) %-12s %d) %-12s  (*)\n",i+1,kionlinename[i],i+1,kiactivename[i]);
+      sprintf(buf2, "(*) %d) $B%-12s$R %d) $B%-12s$R   %d) $B%-12s$R %d) $B%-12s$R (*)\n",i+1,pdonlinename[i],i+1,pdactivename[i],i+1,rdonlinename[i],i+1,rdactivename[i]);
       strcat(buf, buf2);
    }
-   strcat(buf, "(*)                                  (*)\n");
-   strcat(buf, "(*)         Player Kill Score        (*)\n");
-   for(i=0;i<5;i++) {
-      sprintf(buf2, "(*) %d) %-12s %d) %-12s  (*)\n",i+1,pkonlinename[i],i+1,pkactivename[i]);
-      strcat(buf, buf2);
-   }
-   strcat(buf, "(*)                                  (*)\n");
-   strcat(buf, "(*)        Player Death Score        (*)\n");
-   for(i=0;i<5;i++) {
-      sprintf(buf2, "(*) %d) %-12s %d) %-12s  (*)\n",i+1,pdonlinename[i],i+1,pdactivename[i]);
-      strcat(buf, buf2);
-   }
-   strcat(buf, "(*)                                  (*)\n");
-   strcat(buf, "(*)           Real Deaths            (*)\n");
-   for(i=0;i<5;i++) {
-      sprintf(buf2, "(*) %d) %-12s %d) %-12s  (*)\n",i+1,rdonlinename[i],i+1,rdactivename[i]);
-      strcat(buf, buf2);
-   }
-   strcat(buf, "(*)                                (*)\n");
-   strcat(buf, "(*)--------------------------------(*)\n");
-   strcat(buf, "(*)********************************(*)\n");
+   strcat(buf, "(*)                                                                    (*)\n");
+   strcat(buf, "(*)--------------------------------------------------------------------(*)\n");
+   strcat(buf, "(*)********************************************************************(*)\n");
    page_string( ch->desc, buf, 1 );
    return eSUCCESS;
 }
