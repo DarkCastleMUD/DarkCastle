@@ -667,7 +667,7 @@ void update_bard_singing()
          || IS_SET(i->combat, COMBAT_BASH1)
          || IS_SET(i->combat, COMBAT_BASH2) )
       {
-        if( i->song_number != 26 || !(IS_SET(i->combat, COMBAT_BASH1) || IS_SET(i->combat, COMBAT_BASH2))) {
+        if( i->song_number != 26 && !(IS_SET(i->combat, COMBAT_BASH1) || IS_SET(i->combat, COMBAT_BASH2))) {
            send_to_char("You can't keep singing in this position!\r\n", i); 
            i->song_timer = 0;
            if((song_info[i->song_number].intrp_pointer))
