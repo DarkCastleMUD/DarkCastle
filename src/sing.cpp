@@ -2718,7 +2718,7 @@ int execute_song_crushing_crescendo( ubyte level, CHAR_DATA *ch, char *arg, CHAR
      case 2:
        act("$N is injured further by the intensity of your music!", ch, NULL, victim, TO_CHAR,0);
        act("The strength of $n's music increases, and causes further injury to $N!", ch, NULL, victim, TO_ROOM,NOTVICT);
-       act("The strength of $n's crushing crescendo increasing, and hurts even more!",ch,NULL,victim,TO_VICT,0);
+       act("The strength of $n's crushing crescendo increases, and hurts even more!",ch,NULL,victim,TO_VICT,0);
        break;     
      case 3:
        act("The force of your song powerfully crushes the life out of $N!", ch, NULL, victim, TO_CHAR,0);
