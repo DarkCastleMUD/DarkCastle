@@ -1077,7 +1077,7 @@ int execute_song_note_of_knowledge( ubyte level, CHAR_DATA *ch, char *arg, CHAR_
    obj = get_obj_in_list(ch->song_data, ch->carrying);
    vict = get_char_room_vis(ch, ch->song_data);
    corpse = get_obj_in_list_vis(ch, ch->song_data, world[ch->in_room].contents);
-   if(GET_ITEM_TYPE(corpse) != ITEM_CONTAINER || corpse->obj_flags.value[3] != 1)
+   if(corpse && (GET_ITEM_TYPE(corpse) != ITEM_CONTAINER || corpse->obj_flags.value[3] != 1))
       corpse = NULL;
    int learned = has_skill(ch, song_info[SKILL_SONG_NOTE_OF_KNOWLEDGE].skill_num);
 

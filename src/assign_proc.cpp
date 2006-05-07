@@ -224,6 +224,7 @@ void assign_non_combat_procs() {
     assign_one_mob_non(8543,  koban_non_combat);
     assign_one_mob_non(9042,  robber);
     assign_one_mob_non(2300,  clan_guard);
+    assign_one_mob_non(2312,  clan_guard);
     assign_one_mob_non(2311,  clan_guard);
     assign_one_mob_non(2301,  clan_guard);
     assign_one_mob_non(2302,  clan_guard);
@@ -532,7 +533,7 @@ void assign_objects(void)
   assign_one_obj_non(358, barbweap);
   assign_one_obj_non(9,  phish_locator);	
   assign_one_obj_non(13,  board); /* Quest Board */
-  assign_one_obj_non(13,  board); /* Quest Board */
+  assign_one_obj_non(2343,  board);
   assign_one_obj_non(2376, board);
   assign_one_obj_non(2402, board);
   assign_one_obj_non(2303, board);

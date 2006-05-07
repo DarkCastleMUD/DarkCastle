@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: cl_ranger.cpp,v 1.61 2006/01/13 16:49:17 dcastle Exp $ | cl_ranger.C  *
+ * $Id: cl_ranger.cpp,v 1.62 2006/05/07 23:07:57 dcastle Exp $ | cl_ranger.C  *
  * Description: Ranger skills/spells                                          *
  *                                                                            *
  * Revision History                                                           *
@@ -301,7 +301,7 @@ int do_track(CHAR_DATA *ch, char *argument, int cmd)
 		    return eFAILURE;
                  if (tmp_ch->in_room == ch->in_room) {
 		    // The mob can't see him
-                    act("$n says 'Damn, must have lost $m!'", ch, 0, 0,
+                    act("$n says 'Damn, must have lost $M!'", ch, 0, tmp_ch,
 		        TO_ROOM, 0);
 //                    remove_memory(ch, 't');
 	            }

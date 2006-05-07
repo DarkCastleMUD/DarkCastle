@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: save.cpp,v 1.35 2006/05/03 18:40:21 dcastle Exp $ */
+/* $Id: save.cpp,v 1.36 2006/05/07 23:07:53 dcastle Exp $ */
 
 extern "C"
 {
@@ -322,7 +322,7 @@ void read_pc_data(struct char_data *ch, FILE* fpsave)
   i->rooms     = fread_var_string(fpsave);
   i->mobiles   = fread_var_string(fpsave);
   i->objects   = fread_var_string(fpsave);
-
+  i->skillchange = 0;
   typeflag[3] = '\0';
   fread(&typeflag, sizeof(char), 3, fpsave);
 

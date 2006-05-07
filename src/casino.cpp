@@ -1723,9 +1723,13 @@ int first_to_act(int state, struct tplayer *player[6])
    {
      if (player[i]) plrs++;
      else continue;
+
      if (player[i]->dealer) dlr = i;
    }
-   
+
+
+  if (plrs == 2)
+   return dlr; // dealer acts first when there's only 2 players   
 };
 
 /* End Texas Hold'em */

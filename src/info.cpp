@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.79 2006/05/06 03:52:41 shane Exp $ */
+/* $Id: info.cpp,v 1.80 2006/05/07 23:03:37 dcastle Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -2497,10 +2497,11 @@ void check_leaderboard()
          }
       }
       for(i=0;i<5;i++) {
-         if(GET_RDEATHS(d->character) > rdactive[i] && GET_LEVEL(d->character) >= 50) {
+         if(GET_LEVEL(d->character) < 50) break;
+         if(GET_RDEATHS(d->character) > rdactive[i]) {
             for(j=4;j>i;j--) {
                rdactive[j] = rdactive[j-1];
-               strcpy(kiactivename[j],rdactivename[j-1]);
+               strcpy(rdactivename[j],rdactivename[j-1]);
             }
             rdactive[i] = GET_RDEATHS(d->character);
             strcpy(rdactivename[i],GET_NAME(d->character));
@@ -2631,10 +2632,11 @@ int do_leaderboard(struct char_data *ch, char *argument, int cmd)
          }
       }
       for(i=0;i<5;i++) {
-         if(GET_RDEATHS(d->character) > rdonline[i] && GET_LEVEL(d->character) >= 50) {
+         if(GET_LEVEL(d->character) < 50) break;
+         if(GET_RDEATHS(d->character) > rdonline[i]) {
             for(j=4;j>i;j--) {
                rdonline[j] = rdonline[j-1];
-               strcpy(kionlinename[j],rdonlinename[j-1]);
+               strcpy(rdonlinename[j],rdonlinename[j-1]);
             }
             rdonline[i] = GET_RDEATHS(d->character);
             strcpy(rdonlinename[i],GET_NAME(d->character));

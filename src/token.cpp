@@ -231,7 +231,8 @@ char * TokenList::Interpret(CHAR_DATA *from, OBJ_DATA *obj,
           case 'I': strcat(interp, INVERSE); break;
           case 'R': strcat(interp, NTEXT);   break;
           case '*': strcat(interp, EEEE);    break;
-          default:                           break;
+          case '$': strcat(interp, "$"); break; 
+         default:                           break;
         } // switch
       } // if they are appropriate
     } // if it's ansi or vt100

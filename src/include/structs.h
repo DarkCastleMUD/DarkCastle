@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: structs.h,v 1.11 2006/05/03 18:41:06 dcastle Exp $
+| $Id: structs.h,v 1.12 2006/05/07 23:08:00 dcastle Exp $
 | structs.h
 | Description:  This file should go away someday - it's stuff that I
 |   wasn't sure how to break up.  --Morc XXX
@@ -34,7 +34,7 @@ typedef	struct obj_data		OBJ_DATA;
 
 #define MAX_STRING_LENGTH   8192
 #define MAX_INPUT_LENGTH     160
-#define MAX_MESSAGES          70
+#define MAX_MESSAGES         150
 
 #define MESS_ATTACKER 1
 #define MESS_VICTIM   2

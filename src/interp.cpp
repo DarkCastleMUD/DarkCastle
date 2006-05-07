@@ -16,7 +16,7 @@
 /* 12/08/2003   Onager   Added chop_half() to work like half_chop() but    */
 /*                       chopping off the last word.                       */
 /***************************************************************************/
-/* $Id: interp.cpp,v 1.82 2006/05/05 12:20:55 shane Exp $ */
+/* $Id: interp.cpp,v 1.83 2006/05/07 23:03:37 dcastle Exp $ */
 
 extern "C"
 {
@@ -184,7 +184,6 @@ struct command_info cmd_info[] =
     { "track",		do_track,	POSITION_STANDING, 0, 10, 0, 10 },
     { "take",		do_get,		POSITION_RESTING, 0, 9, COM_CHARMIE_OK, 0 },
     { "palm",		do_get,		POSITION_RESTING, 3, 10, 0, 1 },
-    { "junk",		do_tap,		POSITION_RESTING, 0, 92, COM_CHARMIE_OK, 25 },
     { "sacrifice",	do_tap,		POSITION_RESTING, 0, 92, COM_CHARMIE_OK, 25 },
     { "taste",		do_taste,	POSITION_RESTING, 0, 9, COM_CHARMIE_OK, 25 },
     { "unlock",		do_unlock,	POSITION_RESTING, 0, 9, COM_CHARMIE_OK, 25 },
@@ -199,6 +198,10 @@ struct command_info cmd_info[] =
     { "flee",		do_flee,	POSITION_FIGHTING, 0, 28, COM_CHARMIE_OK, 0 }, 
     { "hit",		do_hit,		POSITION_FIGHTING, 0, 194, COM_CHARMIE_OK, 0 },
     { "join",		do_join,	POSITION_FIGHTING, 0, 9, COM_CHARMIE_OK, 0 },
+
+// Junk movedso join precedes it
+    { "junk",		do_tap,		POSITION_RESTING, 0, 92, COM_CHARMIE_OK, 25 },
+
     { "murder",		do_murder,	POSITION_FIGHTING, 0, 9, COM_CHARMIE_OK, 0 },
     { "rescue",		do_rescue,	POSITION_FIGHTING, 0, 9, 0, 0 },
     { "trip",		do_trip,	POSITION_FIGHTING, 0, 9, 0, 0 },

@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.66 2006/05/05 12:20:55 shane Exp $ */
+/* $Id: limits.cpp,v 1.67 2006/05/07 23:03:37 dcastle Exp $ */
 
 extern "C"
 {
@@ -350,6 +350,7 @@ void redo_hitpoints( CHAR_DATA *ch)
       }
   }
   add_totem_stats(ch, APPLY_HIT);
+  if (!IS_NPC(ch))
   check_leaderboard();
 }
 
@@ -395,6 +396,7 @@ void redo_mana ( CHAR_DATA *ch)
       }
   }
   add_totem_stats(ch, APPLY_MANA);
+  if (!IS_NPC(ch))
   check_leaderboard();
 }
 
@@ -427,6 +429,7 @@ void redo_ki(CHAR_DATA *ch)
       }
   }
   add_totem_stats(ch, APPLY_KI);
+  if (!IS_NPC(ch))
   check_leaderboard();
 }
 

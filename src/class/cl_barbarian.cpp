@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_barbarian.cpp,v 1.61 2006/04/19 18:59:50 dcastle Exp $
+| $Id: cl_barbarian.cpp,v 1.62 2006/05/07 23:07:57 dcastle Exp $
 | cl_barbarian.C
 | Description:  Commands for the barbarian class.
 */
@@ -548,7 +548,7 @@ int do_ferocity(struct char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (skill_success(ch,NULL,SKILL_FEROCITY)) {
+  if (!skill_success(ch,NULL,SKILL_FEROCITY)) {
      send_to_char("Guess you just weren't that angry.\r\n", ch);
      act ("$n tries to rile you up but just seems to be pouty.", ch, 0, 0, TO_ROOM, 0);
   }

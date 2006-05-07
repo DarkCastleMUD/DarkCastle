@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.151 2006/05/03 18:40:21 dcastle Exp $ */
+/* $Id: spells.cpp,v 1.152 2006/05/07 23:07:53 dcastle Exp $ */
 
 extern "C"
 {
@@ -1458,7 +1458,7 @@ bool skill_success(CHAR_DATA *ch, CHAR_DATA *victim, int skillnum, int mod )
     if (stat && victim)
 	i -= stat_mod[get_stat(victim,stat)];
   i += mod;
-  if (i < 55) i = 55;
+//  if (i < 55) i = 55;
 
   if (GET_CLASS(ch) == CLASS_MAGIC_USER || GET_CLASS(ch) == CLASS_ANTI_PAL 
 	|| GET_CLASS(ch) == CLASS_THIEF )
@@ -1473,8 +1473,9 @@ skillnum <= SKILL_SONG_MAX) || (skillnum >= KI_OFFSET && skillnum <= (KI_OFFSET+
    i = 101; // auto success on songs and ki with focus
 
   int a = get_difficulty(skillnum);
-
-  if (i > number(1,101) || GET_LEVEL(ch) >= IMMORTAL)
+  int o = GET_LEVEL(ch)*2+1;
+  if (o > 101 || IS_NPC(ch)) o = 101;
+  if (i > number(1,o) || GET_LEVEL(ch) >= IMMORTAL)
   {
     skill_increase_check(ch,skillnum,learned,a+500);
     return TRUE; // Success

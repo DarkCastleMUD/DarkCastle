@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.86 2006/05/03 18:40:21 dcastle Exp $
+| $Id: guild.cpp,v 1.87 2006/05/07 23:03:37 dcastle Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -235,8 +235,9 @@ int skillmax(struct char_data *ch, int skill, int eh)
     skilllist = g_skills;
   int i = search_skills2(skill, skilllist);
   if (i==-1 && skilllist != g_skills){ skilllist = g_skills; i = search_skills2(skill, g_skills);}
-  if (i==-1) return 0;
-  return skilllist[i].maximum;
+  if (i==-1) return eh;
+  if (skilllist[i].maximum < i) return skilllist[i].maximum;
+  return eh;
 }
 
 char charthing(struct char_data *ch, int known, int skill, int maximum)
@@ -693,7 +694,7 @@ if (ch->in_room && IS_SET(world[ch->in_room].room_flags, NOLEARN))
    if( ! ( learned = has_skill(ch, skill) ) )
       return; // get out if i don't have the skill
 
-   if(learned > ( GET_LEVEL(ch) * 2 ))
+   if(learned >= ( GET_LEVEL(ch) * 2 ))
       return;
 
    if(IS_MOB(ch))

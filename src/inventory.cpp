@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.61 2006/04/30 15:50:22 dcastle Exp $
+| $Id: inventory.cpp,v 1.62 2006/05/07 23:03:37 dcastle Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -809,13 +809,13 @@ int do_drop(struct char_data *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
-    if(strlen(arg) > 7) {
+/*    if(strlen(arg) > 7) {
       send_to_char("Number field too big.\n\r", ch);
       return eFAILURE;
-    }
+    }*/
     amount = atoi(arg);
     argument=one_argument(argument,arg);
-    if(str_cmp("coins",arg) && str_cmp("coin",arg)) {
+    if(str_cmp("coins",arg) && str_cmp("coin",arg) && str_cmp("gold", arg)) {
       send_to_char("Sorry, you can't do that (yet)...\n\r", ch);
       return eFAILURE;
     }
@@ -1131,14 +1131,14 @@ int do_give(struct char_data *ch, char *argument, int cmd)
       send_to_char("Your criminal acts prohibit it.\n\r", ch);
       return eFAILURE;
     }
-
+/*
     if(strlen(obj_name) > 7) {
       send_to_char("Number field too large.\n\r", ch);
       return eFAILURE;
-    }
+    }*/
     amount = atoi(obj_name);
     argument = one_argument(argument, arg);
-    if(str_cmp("coins",arg) && str_cmp("coin",arg)) { 
+    if(str_cmp("gold", arg) && str_cmp("coins",arg) && str_cmp("coin",arg)) { 
       send_to_char("Sorry, you can't do that (yet)...\n\r",ch);
       return eFAILURE;
     }

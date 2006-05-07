@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.106 2006/05/03 18:40:21 dcastle Exp $ */
+/* $Id: db.cpp,v 1.107 2006/05/07 23:03:36 dcastle Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -2381,7 +2381,7 @@ void read_one_zone(FILE * fl, int zon)
   zone_table[zon].top  = fread_int(fl, 0, 64000);
   zone_table[zon].clanowner = 0;
   zone_table[zon].gold = 0;
-  extern void debug_point();
+///  extern void debug_point();
 
 //  if (tmp == 23)
   //   debug_point();
@@ -3906,8 +3906,6 @@ void reset_zone(int zone)
         break;
 
         case 'P': /* object to object */
-	void debug_point();
-	debug_point();
 
 
         if(ZCMD.arg2 == -1 || obj_index[ZCMD.arg1].number < ZCMD.arg2) {

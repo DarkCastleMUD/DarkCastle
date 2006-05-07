@@ -388,7 +388,7 @@ int do_mpstat(struct char_data *ch, char *arg, int cmd)
   one_argument(arg, name);
 
   if(!*name) {
-    send_to_char("Usage:  mpstat <name|num>\n\r", ch);
+    send_to_char("Usage:  procstat <name|num>\n\r", ch);
     return eFAILURE;
   }
 
