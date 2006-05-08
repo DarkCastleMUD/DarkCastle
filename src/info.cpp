@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.80 2006/05/07 23:03:37 dcastle Exp $ */
+/* $Id: info.cpp,v 1.81 2006/05/08 00:03:51 dcastle Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -2388,8 +2388,8 @@ int do_tick( struct char_data *ch, char *argument, int cmd )
 
 int do_pkscore(CHAR_DATA * ch)
 {
-   return ch->pcdata->pklvl / ch->pcdata->pkills / 50.0 * 1000.0;
-//   return 0;
+   if(ch->pcdata->pkills == 0) return 0;
+   else return ch->pcdata->pklvl / ch->pcdata->pkills / 50.0 * 1000.0;
 }
 
 int do_pdscore(CHAR_DATA * ch)
@@ -2399,7 +2399,7 @@ int do_pdscore(CHAR_DATA * ch)
 }
 
 void check_leaderboard()
-{
+{}/*
    // check online players to the file and make sure the file is up to date
    struct descriptor_data *d;
    FILE  *fl;
@@ -2521,7 +2521,7 @@ void check_leaderboard()
    for(i=0;i<5;i++) fprintf(fl, "%s~ %d\n", pdactivename[i], pdactive[i]);
    for(i=0;i<5;i++) fprintf(fl, "%s~ %d\n", rdactivename[i], rdactive[i]);
    dc_fclose(fl);
-}
+}*/
 
 int do_leaderboard(struct char_data *ch, char *argument, int cmd)
 {
@@ -2645,32 +2645,33 @@ int do_leaderboard(struct char_data *ch, char *argument, int cmd)
       }
    }
 
-   sprintf(buf,"(*)********************************************************************(*)\n");
-   strcat(buf, "(*)                             Leaderboard                            (*)\n");
-   strcat(buf, "(*)--------------------------------------------------------------------(*)\n");
-   strcat(buf, "(*)                                                                    (*)\n");
-   strcat(buf, "(*)    Online          Active            Online          Active        (*)\n");
-   strcat(buf, "(*)                                                                    (*)\n");
-   strcat(buf, "(*) $2$BHit Points                        Mana$R                             (*)\n");
+   sprintf(buf,"(*)*******************************************************************(*)\n");
+   strcat(buf, "(*)                   $BDark Castle Leaderboard                            
+(*)\n");
+   strcat(buf, "(*)-------------------------------------------------------------------(*)\n");
+   strcat(buf, "(*)                                                                   (*)\n");
+   strcat(buf, "(*)    Online          All Time          Online          All Time     (*)\n");
+   strcat(buf, "(*)                                                                   (*)\n");
+   strcat(buf, "(*) $2$BHit Points                        Mana$R                            (*)\n");
    for(i=0;i<5;i++) {
       sprintf(buf2, "(*) %d) $B%-12s$R %d) $B%-12s$R   %d) $B%-12s$R %d) $B%-12s$R (*)\n",i+1,hponlinename[i],i+1,hpactivename[i],i+1,mnonlinename[i],i+1,mnactivename[i]);
       strcat(buf, buf2);
    }
-   strcat(buf, "(*)                                                                    (*)\n");
-   strcat(buf, "(*) $2$BKi                                Player Kill Score$R                      (*)\n");
+   strcat(buf, "(*)                                                                   (*)\n");
+   strcat(buf, "(*) $2$BKi                                Player Kill Score$R               (*)\n");
    for(i=0;i<5;i++) {
       sprintf(buf2, "(*) %d) $B%-12s$R %d) $B%-12s$R   %d) $B%-12s$R %d) $B%-12s$R (*)\n",i+1,kionlinename[i],i+1,kiactivename[i],i+1,pkonlinename[i],i+1,pkactivename[i]);
       strcat(buf, buf2);
    }
-   strcat(buf, "(*)                                                                    (*)\n");
-   strcat(buf, "(*) $2$BPlayer Death Score                Real Deaths$R                      (*)\n");
+   strcat(buf, "(*)                                                                   (*)\n");
+   strcat(buf, "(*) $2$BPlayer Death Score                Real Deaths$R                     (*)\n");
    for(i=0;i<5;i++) {
       sprintf(buf2, "(*) %d) $B%-12s$R %d) $B%-12s$R   %d) $B%-12s$R %d) $B%-12s$R (*)\n",i+1,pdonlinename[i],i+1,pdactivename[i],i+1,rdonlinename[i],i+1,rdactivename[i]);
       strcat(buf, buf2);
    }
-   strcat(buf, "(*)                                                                    (*)\n");
-   strcat(buf, "(*)--------------------------------------------------------------------(*)\n");
-   strcat(buf, "(*)********************************************************************(*)\n");
+   strcat(buf, "(*)                                                                   (*)\n");
+   strcat(buf, "(*)-------------------------------------------------------------------(*)\n");
+   strcat(buf, "(*)*******************************************************************(*)\n");
    page_string( ch->desc, buf, 1 );
    return eSUCCESS;
 }
