@@ -792,6 +792,16 @@ return eFAILURE;
     send_to_char("Sorry, following in circles can not be allowed.\n\r", ch);
     return eFAILURE;
   }
+
+int charm_levels(CHAR_DATA *ch);
+int charm_space(int level);
+
+
+ if(charm_levels(ch) - charm_space(GET_LEVEL(victim)) < 0)  {
+     send_to_char("How you plan on controlling so many followers?\n\r", ch);
+     return eFAILURE;
+ }
+/*
 bool any_charms(CHAR_DATA *ch);
 
    if(any_charms(ch))  {
@@ -811,7 +821,7 @@ bool any_charms(CHAR_DATA *ch);
          add_memory(vict, GET_NAME(ch), 'h');
         }
      }
-   }   
+   }   */
  if(victim->master)
     stop_follower(victim, 0);
 

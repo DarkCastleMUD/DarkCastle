@@ -2959,13 +2959,8 @@ int spell_sanctuary(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
 	 act("You start $Bglowing$R.", victim, 0, 0, TO_CHAR, 0);
  	 af.type      = SPELL_SANCTUARY;
 	 af.duration  = 3 + skill / 18;
-	 af.modifier  = 25;
+	 af.modifier  = 35;
 
-	if (GET_CLASS(ch) == CLASS_CLERIC) af.modifier += 10;
-//	{
-//	  if (GET_ALIGNMENT(ch) > -350) af.modifier += 5;
-//	  if (GET_ALIGNMENT(ch) > 350) af.modifier += 5;	 
-//	}
 	 af.location  = APPLY_NONE;
 	 af.bitvector = AFF_SANCTUARY;
 	 affect_to_char(victim, &af);
@@ -9093,7 +9088,8 @@ int cast_call_follower(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DAT
    victim = NULL;
 
    for(struct follow_type *k = ch->followers; k; k = k->next)
-     if(IS_MOB(k->follower) && affected_by_spell(k->follower, SPELL_CHARM_PERSON))
+     if(IS_MOB(k->follower) && affected_by_spell(k->follower, SPELL_CHARM_PERSON) &&
+		k->follower->in_room != ch->in_room)
      {
         victim = k->follower;
         break;
@@ -9102,7 +9098,7 @@ int cast_call_follower(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DAT
 
    
    if (NULL == victim) {
-      send_to_char("You don't have any tamed friends to summon!\n\r", ch);
+      send_to_char("You don't have any tamed friends in need of a summon!\n\r", ch);
       return eFAILURE;
    }
 

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_barbarian.cpp,v 1.63 2006/05/11 10:34:25 shane Exp $
+| $Id: cl_barbarian.cpp,v 1.64 2006/05/11 21:09:49 dcastle Exp $
 | cl_barbarian.C
 | Description:  Commands for the barbarian class.
 */
@@ -288,7 +288,7 @@ int do_headbutt(struct char_data *ch, char *argument, int cmd)
   if(!can_attack(ch) || !can_be_attacked(ch, victim))
     return eFAILURE;
 
-  if(IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE) && has_skill(ch, SKILL_SHOCK) < 85) {
+  if(IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE) && has_skill(ch, SKILL_SHOCK) < 86) {
     send_to_char("You're too puny to headbutt someone that HUGE!\n\r",ch);
     return eFAILURE;
   }
@@ -307,7 +307,11 @@ int do_headbutt(struct char_data *ch, char *argument, int cmd)
         return eSUCCESS;
   }
   
-  if (!skill_success(ch,victim,SKILL_SHOCK) ) 
+  int mod = 0;
+  if(IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE))
+     mod = -25;
+
+  if (!skill_success(ch,victim,SKILL_SHOCK,mod) ) 
   {
 //    act( "$n tries to headbutt you but fails miserably.", ch, NULL, 
 //victim, TO_VICT , 0);

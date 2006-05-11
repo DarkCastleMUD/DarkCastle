@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.152 2006/05/07 23:07:53 dcastle Exp $ */
+/* $Id: spells.cpp,v 1.153 2006/05/11 21:09:47 dcastle Exp $ */
 
 extern "C"
 {
@@ -898,7 +898,6 @@ void isr_set(CHAR_DATA *ch)
 bool many_charms(CHAR_DATA *ch)
 {
   struct follow_type *k;
-   
   for(k = ch->followers; k; k = k->next) {
      if(IS_AFFECTED(k->follower, AFF_CHARM)) 
         return TRUE;
@@ -1456,7 +1455,7 @@ bool skill_success(CHAR_DATA *ch, CHAR_DATA *victim, int skillnum, int mod )
 	else i =75;
    }
     if (stat && victim)
-	i -= stat_mod[get_stat(victim,stat)];
+	i -= stat_mod[get_stat(victim,stat)] * GET_LEVEL(ch) / 50; // less impact on low levels..
   i += mod;
 //  if (i < 55) i = 55;
 
@@ -1475,6 +1474,7 @@ skillnum <= SKILL_SONG_MAX) || (skillnum >= KI_OFFSET && skillnum <= (KI_OFFSET+
   int a = get_difficulty(skillnum);
   int o = GET_LEVEL(ch)*2+1;
   if (o > 101 || IS_NPC(ch)) o = 101;
+  if (i > o) o = i+1;
   if (i > number(1,o) || GET_LEVEL(ch) >= IMMORTAL)
   {
     skill_increase_check(ch,skillnum,learned,a+500);

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: channel.cpp,v 1.12 2006/05/03 18:40:21 dcastle Exp $
+| $Id: channel.cpp,v 1.13 2006/05/11 21:09:47 dcastle Exp $
 | channel.C
 | Description:  All of the channel - type commands; do_say, gossip, etc..
 */
@@ -545,7 +545,7 @@ int do_tell(struct char_data *ch, char *argument, int cmd)
                 PERS(ch, vict), message, IS_SET(vict->pcdata->toggles, PLR_BEEP) ? '\a' : '\0');
           if(!IS_NPC(ch) && !IS_NPC(vict) &&vict->pcdata->last_tell)
              dc_free(vict->pcdata->last_tell);
-	if (!IS_NPC(ch) & !IS_NPC(vict))
+	if (!IS_NPC(ch) && !IS_NPC(vict))
           vict->pcdata->last_tell = str_dup(GET_NAME(ch));
         }
         ansi_color(GREEN, vict);
@@ -564,8 +564,9 @@ int do_tell(struct char_data *ch, char *argument, int cmd)
         else {
           sprintf(buf,"$2$B%s tells you, '%s'$R%c", PERS(ch, vict), message,
 	        IS_SET(vict->pcdata->toggles, PLR_BEEP) ? '\a' : '\0');
-          if(vict->pcdata->last_tell)
+          if(vict->pcdata->last_tell && !IS_NPC(ch) && !IS_NPC(vict))
             dc_free(vict->pcdata->last_tell);
+          if (!IS_NPC(ch) && !IS_NPC(vict))
 	  vict->pcdata->last_tell = str_dup(GET_NAME(ch));
         }
         act(buf, vict, 0, 0, TO_CHAR, STAYHIDE);
@@ -587,8 +588,10 @@ int do_tell(struct char_data *ch, char *argument, int cmd)
         else {
           sprintf(buf,"%s tells you, '%s'%c",
                 PERS(ch, vict), message, IS_SET(vict->pcdata->toggles, PLR_BEEP) ? '\a' : '\0');
-          if(vict->pcdata->last_tell)
-             dc_free(vict->pcdata->last_tell);
+
+          if(vict->pcdata->last_tell && !IS_NPC(ch) && !IS_NPC(vict))
+            dc_free(vict->pcdata->last_tell);
+          if (!IS_NPC(ch) && !IS_NPC(vict))
           vict->pcdata->last_tell = str_dup(GET_NAME(ch));
         }
         ansi_color(GREEN, vict);

@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.107 2006/05/07 23:03:36 dcastle Exp $ */
+/* $Id: db.cpp,v 1.108 2006/05/11 21:09:47 dcastle Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -945,7 +945,7 @@ struct index_data *generate_mob_indices(int *top, struct index_data *index)
   extern short code_testing_mode_mob;
   
   log("Opening mobile file index.", 0, LOG_MISC);
-  if (!code_testing_mode_mob && !bport) {
+  if (!code_testing_mode_mob) {
     if(!(flMobIndex = dc_fopen(MOB_INDEX_FILE, "r"))) {
       log("Could not open index file.", 0, LOG_MISC);
       abort();
@@ -1220,20 +1220,20 @@ struct index_data *generate_obj_indices(int *top,
   char endfile[180];
   struct world_file_list_item * pItem = NULL;
 
-  if (!bport) {
+//  if (!bport) {
 
     if(!(flObjIndex = dc_fopen(OBJECT_INDEX_FILE, "r"))) {
       log("Cannot open object file index.", 0, LOG_MISC);
       abort();
    }
-
+/*
   } else {
     if (!(flObjIndex = dc_fopen(OBJECT_INDEX_FILE_TINY,"r"))) {
      log("Cannot open object file index.(tiny).",0,LOG_MISC);
      abort();
     }
   }
-
+*/
   log("Opening object files.", 0, LOG_MISC);
 
   // note, we don't worry about free'ing temp, cause it's held in the "obj_file_list"  
@@ -1713,7 +1713,7 @@ bool can_modify_object(char_data * ch, long obj)
       GET_OBJ_RANGE(ch) = NULL;
    }
    for(world_file_list_item * curr = obj_file_list; curr; curr = curr->next)
-      if(real_object(obj) >= curr->firstnum && real_object(obj) <= curr->lastnum)
+      if(real_object(obj) >= curr->firstnum && real_object(obj) <= curr->lastnum)  
       {
          GET_OBJ_RANGE(ch) = str_dup(curr->filename);
          csendf(ch, "Range set to '%s'...\r\n", GET_OBJ_RANGE(ch));
@@ -1956,7 +1956,7 @@ void boot_world(void)
   character_list = 0;
   object_list    = 0;
 
-  if((!code_testing_mode || code_testing_mode_world) && !bport)
+  if((!code_testing_mode || code_testing_mode_world) )
   {
     if(!(flWorldIndex = dc_fopen(WORLD_INDEX_FILE, "r"))) 
     {
@@ -2520,7 +2520,7 @@ void boot_zones(void)
 //  for (zon = 0;zon < MAX_ZONE;zon++)
  //  zone_table[zon] = NULL; // Null list, top_of_z can't be used now
  
-  if(!code_testing_mode && !bport) 
+  if(!code_testing_mode) 
   {
     if (!(flZoneIndex = dc_fopen(ZONE_INDEX_FILE, "r")))
     {
@@ -4570,6 +4570,8 @@ void free_char( CHAR_DATA *ch )
   remove_memory(ch, 't');
 
   SETBIT(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT); // so weapons stop falling off
+
+  if (ch->pcdata) ch->pcdata->skillchange = NULL;
 
   for(iWear = 0; iWear < MAX_WEAR; iWear++) {
      if(ch->equipment[iWear])

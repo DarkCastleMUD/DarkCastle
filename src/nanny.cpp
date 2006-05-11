@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.111 2006/04/30 15:50:22 dcastle Exp $ */
+/* $Id: nanny.cpp,v 1.112 2006/05/11 21:09:47 dcastle Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -1309,6 +1309,8 @@ is_race_eligible(ch,7)?'*':' ',is_race_eligible(ch,8)?'*':' ',is_race_eligible(c
           // by logging in twice, and leaving one at the password: prompt
           if(GET_LEVEL(ch) > 0) {
              strcpy(tmp_name, GET_NAME(ch));
+		if (d->character->pcdata)
+	    d->character->pcdata->skillchange = 0;
              free_char(d->character);
              d->character = 0;
              load_char_obj(d, tmp_name);

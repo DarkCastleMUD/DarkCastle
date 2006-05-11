@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.60 2006/05/03 18:40:21 dcastle Exp $
+| $Id: objects.cpp,v 1.61 2006/05/11 21:09:47 dcastle Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -1321,6 +1321,54 @@ if ((IS_OBJ_STAT(obj, ITEM_WARRIOR) && (GET_CLASS(ch) == CLASS_WARRIOR)) ||
 return TRUE;
 }
 
+int charmie_restricted(struct char_data *ch, struct obj_data *obj, int wear_loc)
+{
+  if (IS_NPC(ch) && ISSET(ch->affected_by, AFF_CHARM) && ch->master && ch->mobdata)
+  {
+	int vnum = mob_index[ch->mobdata->nr].virt;
+	if (vnum == 8 || (vnum > 22388 && vnum < 22399))
+           return FALSE; // golems and corpses wear all
+        switch (ch->race)
+	{
+		case RACE_GHOST:
+		case RACE_ELEMENT:
+		case RACE_SLIME:
+		   return TRUE; // screw 'em!
+		case RACE_REPTILE:
+		case RACE_DRAGON:
+		case RACE_SNAKE:
+		case RACE_HORSE:
+		case RACE_BIRD:
+		case RACE_RODENT:
+		case RACE_FISH:
+		case RACE_ARACHNID:
+		case RACE_INSECT:
+		case RACE_ANIMAL:
+		case RACE_TREE:
+		case RACE_FELINE:
+		  switch (wear_loc)
+		  {
+			case WEAR_ABOUT:
+			case WEAR_FINGER_L:
+			case WEAR_FINGER_R:
+			case WEAR_EAR_L:
+			case WEAR_EAR_R:
+			case WEAR_WRIST_L:
+			case WEAR_WRIST_R:
+			case WEAR_NECK_1:
+			case WEAR_FACE:
+				return FALSE;
+			default:
+				return TRUE;
+		  }			
+		break;
+             default:
+		return FALSE;
+	}
+  }
+  return FALSE;
+}
+
 int size_restricted(struct char_data *ch, struct obj_data *obj)
 {
   if(IS_SET(obj->obj_flags.size, SIZE_ANY))
@@ -1422,6 +1470,26 @@ void wear(struct char_data *ch, struct obj_data *obj_object, int keyword)
   struct obj_data *obj;
   char buffer[MAX_STRING_LENGTH];
   int do_say(struct char_data *ch, char *argument, int cmd);
+  if (!obj_object) return;
+
+  obj = obj_object;
+  if(class_restricted(ch, obj_object))
+  {
+    send_to_char("You are forbidden.\n\r", ch);
+    return;
+  }
+
+  if(size_restricted(ch, obj_object))
+  {
+    send_to_char("The size does not fit.\r\n", ch);
+    return;
+  }
+
+  if(will_screwup_worn_sizes(ch, obj_object, 1))
+  {
+    // will_screwup_worn_sizes() takes care of the messages
+    return;
+  }
 
   if (!IS_NPC(ch)) {
     if(GET_LEVEL(ch) < obj_object->obj_flags.eq_level) {
@@ -1439,30 +1507,11 @@ void wear(struct char_data *ch, struct obj_data *obj_object, int keyword)
         return;
       }
   }
-  if (IS_NPC(ch) && (mob_index[ch->mobdata->nr].virt < 22394 &&
+/*  if (IS_NPC(ch) && (mob_index[ch->mobdata->nr].virt < 22394 &&
 	mob_index[ch->mobdata->nr].virt > 22388))
   {
      return;
-  }
-  obj = obj_object;
-
-  if(class_restricted(ch, obj))
-  {
-    send_to_char("You are forbidden.\n\r", ch);
-    return;
-  }
-
-  if(size_restricted(ch, obj))
-  {
-    send_to_char("The size does not fit.\r\n", ch);
-    return;
-  }
-
-  if(will_screwup_worn_sizes(ch, obj, 1))
-  {
-    // will_screwup_worn_sizes() takes care of the messages
-    return;
-  }
+  }*/
 
   if(IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL) &&
      !isname(GET_NAME(ch), obj->name) && GET_LEVEL(ch) < IMP) {
@@ -1477,7 +1526,9 @@ void wear(struct char_data *ch, struct obj_data *obj_object, int keyword)
   switch (keyword) {
   case 0: {
     if(CAN_WEAR(obj_object,ITEM_WEAR_FINGER)) {
-      if((ch->equipment[WEAR_FINGER_L])
+      if (charmie_restricted(ch, obj_object, WEAR_FINGER_L))
+	  send_to_char("You cannot wear this.\r\n",ch);
+      else  if((ch->equipment[WEAR_FINGER_L])
         && (ch->equipment[WEAR_FINGER_R])) {
         act("You are already wearing $p on your left ring-finger.", ch, ch->equipment[WEAR_FINGER_L], 0, TO_CHAR, 0);
         act("You are already wearing $p on your right ring-finger.", ch, ch->equipment[WEAR_FINGER_R], 0, TO_CHAR, 0);
@@ -1505,7 +1556,9 @@ void wear(struct char_data *ch, struct obj_data *obj_object, int keyword)
   } break;
   case 1: {
     if(CAN_WEAR(obj_object,ITEM_WEAR_NECK)) {
-      if((ch->equipment[WEAR_NECK_1])
+      if (charmie_restricted(ch, obj_object, WEAR_NECK_1))
+	  send_to_char("You cannot wear this.\r\n",ch);
+      else if((ch->equipment[WEAR_NECK_1])
         && (ch->equipment[WEAR_NECK_2])) {
         act("You are already wearing $p on your neck.", ch, ch->equipment[WEAR_NECK_1], 0, TO_CHAR, 0);
         act("You are already wearing $p on your neck.", ch, ch->equipment[WEAR_NECK_2], 0, TO_CHAR, 0);
@@ -1527,8 +1580,10 @@ void wear(struct char_data *ch, struct obj_data *obj_object, int keyword)
       send_to_char("You can't wear that around your neck.\n\r", ch);
   } break;
   case 2: {
-    if(CAN_WEAR(obj_object,ITEM_WEAR_BODY)) {
-      if(ch->equipment[WEAR_BODY]) {
+     if(CAN_WEAR(obj_object,ITEM_WEAR_BODY)) {
+      if (charmie_restricted(ch, obj_object, WEAR_BODY))
+	  send_to_char("You cannot wear this.\r\n",ch);
+      else if(ch->equipment[WEAR_BODY]) {
         act("You already wear $p on your body.", ch, ch->equipment[WEAR_BODY], 0, TO_CHAR, 0);
       }
       else {
@@ -1543,7 +1598,9 @@ void wear(struct char_data *ch, struct obj_data *obj_object, int keyword)
   } break;
   case 3: {
     if(CAN_WEAR(obj_object,ITEM_WEAR_HEAD)) {
-      if(ch->equipment[WEAR_HEAD]) {
+      if (charmie_restricted(ch, obj_object, WEAR_HEAD))
+	  send_to_char("You cannot wear this.\r\n",ch);
+      else if(ch->equipment[WEAR_HEAD]) {
         act("You already wear $p on your head.", ch, ch->equipment[WEAR_HEAD], 0, TO_CHAR, 0);
       }
       else {
@@ -1558,7 +1615,9 @@ void wear(struct char_data *ch, struct obj_data *obj_object, int keyword)
   } break;
   case 4: {
     if(CAN_WEAR(obj_object,ITEM_WEAR_LEGS)) {
-      if(ch->equipment[WEAR_LEGS]) {
+      if (charmie_restricted(ch, obj_object, WEAR_LEGS))
+	  send_to_char("You cannot wear this.\r\n",ch);
+      else if(ch->equipment[WEAR_LEGS]) {
         act("You already wear $p on your legs.", ch, ch->equipment[WEAR_LEGS], 0, TO_CHAR, 0);
       }
       else {
@@ -1573,7 +1632,9 @@ void wear(struct char_data *ch, struct obj_data *obj_object, int keyword)
   } break;
   case 5: {
     if(CAN_WEAR(obj_object,ITEM_WEAR_FEET)) {
-      if(ch->equipment[WEAR_FEET]) {
+      if (charmie_restricted(ch, obj_object, WEAR_FEET))
+	  send_to_char("You cannot wear this.\r\n",ch);
+      else if(ch->equipment[WEAR_FEET]) {
         act("You already wear $p on your feet.", ch, ch->equipment[WEAR_FEET], 0, TO_CHAR, 0);
       }
       else {
@@ -1588,7 +1649,9 @@ void wear(struct char_data *ch, struct obj_data *obj_object, int keyword)
   } break;
   case 6: {
     if(CAN_WEAR(obj_object,ITEM_WEAR_HANDS)) {
-      if(ch->equipment[WEAR_HANDS]) {
+      if (charmie_restricted(ch, obj_object, WEAR_HANDS))
+	  send_to_char("You cannot wear this.\r\n",ch);
+      else if(ch->equipment[WEAR_HANDS]) {
         act("You already wear $p on your hands.", ch, ch->equipment[WEAR_HANDS], 0, TO_CHAR, 0);
       }
       else {
@@ -1603,7 +1666,9 @@ void wear(struct char_data *ch, struct obj_data *obj_object, int keyword)
   } break;
   case 7: {
     if(CAN_WEAR(obj_object,ITEM_WEAR_ARMS)) {
-      if(ch->equipment[WEAR_ARMS]) {
+      if (charmie_restricted(ch, obj_object, WEAR_ARMS))
+	  send_to_char("You cannot wear this.\r\n",ch);
+      else if(ch->equipment[WEAR_ARMS]) {
         act("You already wear $p on your arms.", ch, ch->equipment[WEAR_ARMS], 0, TO_CHAR, 0);
       }
       else {
@@ -1618,7 +1683,9 @@ void wear(struct char_data *ch, struct obj_data *obj_object, int keyword)
   } break;
   case 8: {
     if(CAN_WEAR(obj_object,ITEM_WEAR_ABOUT)) {
-      if(ch->equipment[WEAR_ABOUT]) {
+      if (charmie_restricted(ch, obj_object, WEAR_ABOUT))
+	  send_to_char("You cannot wear this.\r\n",ch);
+      else if(ch->equipment[WEAR_ABOUT]) {
         act("You already wear $p about your body.", ch, ch->equipment[WEAR_ABOUT], 0, TO_CHAR, 0);
       }
       else {
@@ -1633,7 +1700,9 @@ void wear(struct char_data *ch, struct obj_data *obj_object, int keyword)
   } break;
   case 9: {
     if(CAN_WEAR(obj_object,ITEM_WEAR_WAISTE)) {
-      if(ch->equipment[WEAR_WAISTE]) {
+      if (charmie_restricted(ch, obj_object, WEAR_WAISTE))
+	  send_to_char("You cannot wear this.\r\n",ch);
+      else if(ch->equipment[WEAR_WAISTE]) {
         act("You already wear $p about your waist.", ch, ch->equipment[WEAR_WAISTE], 0, TO_CHAR, 0);
       }
       else {
@@ -1648,7 +1717,9 @@ void wear(struct char_data *ch, struct obj_data *obj_object, int keyword)
   } break;
   case 10: {
     if(CAN_WEAR(obj_object,ITEM_WEAR_WRIST)) {
-      if((ch->equipment[WEAR_WRIST_L])
+      if (charmie_restricted(ch, obj_object, WEAR_WRIST_L))
+	  send_to_char("You cannot wear this.\r\n",ch);
+      else if((ch->equipment[WEAR_WRIST_L])
         && (ch->equipment[WEAR_WRIST_R])) {
         act("You already wear $p around your left wrist.", ch, ch->equipment[WEAR_WRIST_L], 0, TO_CHAR, 0);
         act("You already wear $p around your right wrist.", ch, ch->equipment[WEAR_WRIST_R], 0, TO_CHAR, 0);
@@ -1676,7 +1747,9 @@ void wear(struct char_data *ch, struct obj_data *obj_object, int keyword)
 
   case 11: {
     if(CAN_WEAR(obj_object,ITEM_WEAR_FACE)) {
-      if((ch->equipment[WEAR_FACE])) {
+      if (charmie_restricted(ch, obj_object, WEAR_FACE))
+	  send_to_char("You cannot wear this.\r\n",ch);
+      else if((ch->equipment[WEAR_FACE])) {
         send_to_char("You only have one face.\n\r", ch);
       }
       else {
@@ -1725,7 +1798,9 @@ GET_STR(ch)/2 &&
 
   case 13: {
     if(CAN_WEAR(obj_object, ITEM_WEAR_SHIELD)) {
-      if(ch->equipment[WEAR_SHIELD]) {
+      if (charmie_restricted(ch, obj_object, WEAR_SHIELD))
+	  send_to_char("You cannot wear this.\r\n",ch);
+      else if(ch->equipment[WEAR_SHIELD]) {
         act("You already using $p as a shield.", ch, ch->equipment[WEAR_SHIELD], 0, TO_CHAR, 0);
       }
       else if((!hands_are_free(ch, 2)) && 
@@ -1750,7 +1825,10 @@ GET_STR(ch)/2 &&
 
   case 14:
     if(CAN_WEAR(obj_object, ITEM_HOLD)) {
-      if(!hands_are_free(ch, 1))
+
+      if (charmie_restricted(ch, obj_object, HOLD))
+	  send_to_char("You cannot wear this.\r\n",ch);
+      else if(!hands_are_free(ch, 1))
         send_to_char("Your hands are already full.\n\r", ch);
       else if((!hands_are_free(ch, 2)) && 
              (IS_SET(obj_object->obj_flags.extra_flags, ITEM_TWO_HANDED) && !ISSET(ch->affected_by, AFF_POWERWIELD)))
@@ -1776,7 +1854,9 @@ GET_STR(ch)/2 &&
 
   case 15: {
     if(CAN_WEAR(obj_object,ITEM_WEAR_EAR)) {
-      if((ch->equipment[WEAR_EAR_L])
+      if (charmie_restricted(ch, obj_object, WEAR_EAR_L))
+	  send_to_char("You cannot wear this.\r\n",ch);
+     else if((ch->equipment[WEAR_EAR_L])
         && (ch->equipment[WEAR_EAR_R])) {
         act("You already wearing $p on your left ear.", ch, ch->equipment[WEAR_EAR_L], 0, TO_CHAR, 0);
         act("You already wearing $p on your right ear.", ch, ch->equipment[WEAR_EAR_R], 0, TO_CHAR, 0);
@@ -1799,7 +1879,9 @@ GET_STR(ch)/2 &&
   } break;
 
   case 16: {  /* LIGHT SOURCE */
-    if(ch->equipment[WEAR_LIGHT]) {
+      if (charmie_restricted(ch, obj_object, WEAR_LIGHT))
+	  send_to_char("You cannot wear this.\r\n",ch);
+   else if(ch->equipment[WEAR_LIGHT]) {
       act("You are already holding $p as a light.", ch, ch->equipment[WEAR_LIGHT], 0, TO_CHAR, 0);
     }
       else if((!hands_are_free(ch, 2)) && 

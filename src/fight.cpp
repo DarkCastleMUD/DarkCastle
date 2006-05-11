@@ -5,7 +5,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.297 2006/05/07 23:03:36 dcastle Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.298 2006/05/11 21:09:47 dcastle Exp $ */
 
 extern "C"
 {
@@ -1808,7 +1808,7 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
   // sanct damage now based on caster align (25% = evil, 30% = neut, 35% = good)
   if (IS_AFFECTED(victim, AFF_SANCTUARY))
   {
-    int mod = affected_by_spell(victim, SPELL_SANCTUARY)? affected_by_spell(victim, SPELL_SANCTUARY)->modifier:25;
+    int mod = affected_by_spell(victim, SPELL_SANCTUARY)? affected_by_spell(victim, SPELL_SANCTUARY)->modifier:35;
     dam -= (int) (float)((float)dam*((float)mod/100.0));
 
   }
@@ -2432,13 +2432,13 @@ int check_shieldblock(CHAR_DATA * ch, CHAR_DATA * victim, int attacktype)
      return 0;
    else if (GET_CLASS(victim) == CLASS_MONK && !((reduce = has_skill(victim, SKILL_DEFENSE))))
      return 0;
-  modifier += speciality_bonus(ch,attacktype);
+  modifier += speciality_bonus(ch,attacktype,GET_LEVEL(victim));
 
-  extern int stat_mod[];
-  modifier -= stat_mod[GET_DEX(ch)];
+//  extern int stat_mod[];
+ // modifier -= stat_mod[GET_DEX(ch)];
 
 //  if (IS_NPC(victim)) modifier -= 50;
-  modifier += GET_DEX(victim)/2;
+//  modifier += GET_DEX(victim)/2;
   if (GET_CLASS(victim)== CLASS_MONK) {
     if (!skill_success(victim, ch, SKILL_DEFENSE, modifier))
 	return 0;
@@ -2499,12 +2499,12 @@ bool check_parry(CHAR_DATA * ch, CHAR_DATA * victim, int attacktype)
   if (!modifier && IS_NPC(victim) && (ISSET(victim->mobdata->actflags, ACT_PARRY)))
     modifier = 10;
 
-  modifier += speciality_bonus(ch,attacktype);
+  modifier += speciality_bonus(ch,attacktype,GET_LEVEL(victim));
 //  if (IS_NPC(victim)) modifier -= 50;
 //  if (attacktype==TYPE_HIT) modifier += 30; // Harder to parry unarmed attacks
 //  else modifier += 22;
-  modifier -= GET_DEX(ch)  / 2;
-
+  modifier -= GET_DEX(ch) / 2;
+  modifier -= 10;
   if(!skill_success(victim,ch, SKILL_PARRY, modifier)&&
      !IS_SET(victim->combat, COMBAT_BLADESHIELD1)&&
      !IS_SET(victim->combat, COMBAT_BLADESHIELD2))
@@ -2517,7 +2517,7 @@ bool check_parry(CHAR_DATA * ch, CHAR_DATA * victim, int attacktype)
   return TRUE;
 }
 
-int speciality_bonus(CHAR_DATA *ch,int attacktype)
+int speciality_bonus(CHAR_DATA *ch,int attacktype, int level)
 {
   int skill = 0;
 /*  int w_type = TYPE_HIT;
@@ -2548,9 +2548,12 @@ int speciality_bonus(CHAR_DATA *ch,int attacktype)
       default:
 	break;
    }
+   level -= GET_LEVEL(ch);
    if (!skill) return 0;
-   int l = has_skill(ch,skill);
-   if (IS_NPC(ch)) return 0 - (GET_LEVEL(ch)/2);
+   if (level < 0 && IS_NPC(ch)) return 0 - GET_LEVEL(ch);
+   else if (IS_NPC(ch)) return 0 - (GET_LEVEL(ch)/3.5);
+
+   int l = has_skill(ch,skill)/2;
    return 0 - l;
 }
 
@@ -2593,11 +2596,10 @@ bool check_dodge(CHAR_DATA * ch, CHAR_DATA * victim, int attacktype)
   if (modifier == 0 && IS_NPC(victim))
     return FALSE;
 
-  modifier += speciality_bonus(ch, attacktype);
+  modifier += speciality_bonus(ch, attacktype,GET_LEVEL(victim));
 //  if (IS_NPC(victim)) modifier = 50; // 75 is base, and it's calculated 
 //around here
-
-  modifier += GET_DEX(victim) / 2;
+  modifier -= GET_DEX(ch) / 2;
   if (!skill_success(victim,ch,SKILL_DODGE, modifier))
     return FALSE;
   
