@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: cl_ranger.cpp,v 1.62 2006/05/07 23:07:57 dcastle Exp $ | cl_ranger.C  *
+ * $Id: cl_ranger.cpp,v 1.63 2006/05/11 21:26:11 dcastle Exp $ | cl_ranger.C  *
  * Description: Ranger skills/spells                                          *
  *                                                                            *
  * Revision History                                                           *
@@ -39,11 +39,34 @@ extern struct race_shit race_info[];
 extern int rev_dir[];
 
 int saves_spell(CHAR_DATA *ch, CHAR_DATA *vict, int spell_base, int16 save_type);
-bool any_charms(CHAR_DATA *ch);
 void check_eq(CHAR_DATA *ch);
 extern struct index_data *mob_index;
 int get_difficulty(int);
 
+int charm_space(int level)
+{
+  if (level >= 50) return 10;
+  if (level >= 41) return 7;
+  if (level >= 31) return 5;
+  if (level >= 21) return 3;
+  if (level >= 11) return 2;
+  return 1;
+}
+
+int charm_levels(CHAR_DATA *ch)
+{
+  int i = GET_LEVEL(ch)/5;
+  int z = 3;
+  struct follow_type *f;
+  for (f = ch->followers;f;f = f->next)
+     if (IS_AFFECTED(f->follower, AFF_CHARM))
+     {
+	z--;
+        i -= charm_space(GET_LEVEL(f->follower));
+	}
+  if (z <= 0) return -1;
+  return i;
+}
 
 int do_tame(CHAR_DATA *ch, char *arg, int cmd)
 {
@@ -89,7 +112,7 @@ int do_tame(CHAR_DATA *ch, char *arg, int cmd)
   }
 
   if(IS_AFFECTED(victim, AFF_CHARM) || IS_AFFECTED(ch, AFF_CHARM) ||
-     (GET_LEVEL(ch) <= GET_LEVEL(victim))) {
+     (GET_LEVEL(ch) < GET_LEVEL(victim))) {
     send_to_char("You find yourself unable to tame this creature.\n\r", ch);
     return eFAILURE;
   }
@@ -99,11 +122,11 @@ int do_tame(CHAR_DATA *ch, char *arg, int cmd)
     return eFAILURE;
   }
 
-   if(any_charms(ch))  {
-//     send_to_char("How you plan on controlling so many followers?\n\r", 
-//ch);
-//     return eFAILURE;
-   CHAR_DATA * vict = NULL;
+  
+   if(charm_levels(ch) - charm_space(GET_LEVEL(victim)) < 0)  {
+     send_to_char("How you plan on controlling so many followers?\n\r", ch);
+     return eFAILURE;
+/*   CHAR_DATA * vict = NULL;
    for(struct follow_type *k = ch->followers; k; k = k->next)
      if(IS_MOB(k->follower) && affected_by_spell(k->follower, SPELL_CHARM_PERSON))
      {
@@ -118,7 +141,7 @@ int do_tame(CHAR_DATA *ch, char *arg, int cmd)
          stop_follower(vict, BROKE_CHARM);	
          add_memory(vict, GET_NAME(ch), 'h');
  	}
-     }
+     }*/
    }
 
   act("$n holds out $s hand to $N and beckons softly.", ch, NULL, victim, TO_ROOM, INVIS_NULL); 

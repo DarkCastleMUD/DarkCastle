@@ -480,11 +480,11 @@ int do_install(struct char_data *ch, char *arg, int cmd)
   int range = 0, type_ok = 0, numrooms = 0;
   int ret;
   
-  if(!has_skill(ch, COMMAND_INSTALL)) {
+/*  if(!has_skill(ch, COMMAND_INSTALL)) {
         send_to_char("Huh?\r\n", ch);
         return eFAILURE;
   }
-
+*/
   half_chop(arg, arg1, buf);
   half_chop(buf, arg2, type);
 

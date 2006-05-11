@@ -460,8 +460,11 @@ int do_zone_single_edit(struct char_data * ch, char * argument, int zone)
          case '%':
 	 case '*':
            zone_table[zone].cmd[cmd].command = result;
-           sprintf(select, "Type for command %d changed to %c.\r\n", cmd+1, result);
+           sprintf(select, "Type for command %d changed to %c.\r\nArg1-3 reset.\r\n", cmd+1, result);
            send_to_char(select, ch);
+	   zone_table[zone].cmd[cmd].arg1 = 0;
+	   zone_table[zone].cmd[cmd].arg2 = 0;
+	   zone_table[zone].cmd[cmd].arg3 = 0;
            break;
          default:
            send_to_char("Type must be:  M, O, P, G, E, D, X, K, *, or %.\r\n", ch);
@@ -641,7 +644,7 @@ int do_zedit(struct char_data *ch, char *argument, int cmd)
   char * zedit_values[] = {
     "remove", "add", "edit", "list", "name", 
     "lifetime", "mode", "flags", "help", "search", 
-    "swap", 
+    "swap", "copy",
     "\n"
   };
 
@@ -671,7 +674,7 @@ int do_zedit(struct char_data *ch, char *argument, int cmd)
     send_to_char("You are unable to modify a zone other than the one your room-range is in.\n\r", ch);
     return eFAILURE;
   }
-
+  int from, to;
   // set the zone we're in
   zone = world[ch->in_room].zone;
 
@@ -712,6 +715,7 @@ int do_zedit(struct char_data *ch, char *argument, int cmd)
       send_to_char(buf, ch);
       break;
     }
+
     case 1: /* add */
     {
       argument = one_argumentnolow(argument, text);
@@ -1017,7 +1021,60 @@ int do_zedit(struct char_data *ch, char *argument, int cmd)
       csendf(ch, "Commands %d and %d swapped.\r\n", i, j);
       break;
     }
+    case 11: // copy
+      argument = one_argumentnolow(argument, text);
+      char arg[MAX_INPUT_LENGTH];
+      argument = one_argumentnolow(argument, arg);
+      if(!text[0] || !is_number(text))
+      {
+        send_to_char("$3Usage$R: zedit copy <source line> <destination line>\r\nDestination line is optional. If no such line exists, it tacks it on at the end.", ch);
+        return eFAILURE;
+      }
+      from = atoi(text)-1;
+      to = 0;
+      if (arg[0]) to = atoi(arg);
 
+      if (from > last_cmd || from < 0)
+      {
+        sprintf(buf, "Source line must be between 0 and %d.\n\r"
+                     "'%s' is not valid.\n\r", zone_table[zone].reset_total, text);
+        send_to_char(buf, ch);
+        return eFAILURE;
+      }
+
+      // if the zone memory is full, allocate another 10 commands worth
+      if(last_cmd >= (zone_table[zone].reset_total-2))
+      {
+        zone_table[zone].cmd = (struct reset_com *)
+            realloc(zone_table[zone].cmd, (zone_table[zone].reset_total + 10) * sizeof(struct reset_com));
+        zone_table[zone].reset_total += 10;
+      }
+
+      struct reset_com tmp = zone_table[zone].cmd[from];
+      if(to)
+      {
+        // bump everything up a slot
+        for(j = last_cmd; j != (to-2) ; j--)
+          zone_table[zone].cmd[j+1] = zone_table[zone].cmd[j];
+        sprintf(buf, "Command copied to %d.\r\n", to);
+	to--;
+      }
+      else // tack it on the end
+      {
+        // bump the 'S' up
+        zone_table[zone].cmd[last_cmd+1] = zone_table[zone].cmd[last_cmd];
+	to = last_cmd;
+        sprintf(buf, "Command copied.\r\n");
+      }
+      zone_table[zone].cmd[to].active = tmp.active;
+      zone_table[zone].cmd[to].command = tmp.command;
+      zone_table[zone].cmd[to].if_flag = tmp.if_flag;
+      zone_table[zone].cmd[to].arg1 = tmp.arg1;
+      zone_table[zone].cmd[to].arg2 = tmp.arg2;
+      zone_table[zone].cmd[to].arg3 = tmp.arg3;
+      zone_table[zone].cmd[to].comment = tmp.comment;
+      send_to_char(buf, ch);
+      break;
     default: 
       send_to_char("Error:  Couldn't find item in switch.\r\n", ch);
       break;
@@ -2042,11 +2099,16 @@ int do_oedit(struct char_data *ch, char *argument, int cmd)
 	  return eFAILURE;
 	}
      */
+	if (!has_skill(ch, COMMAND_RANGE))
+	{
+	  send_to_char("You cannot create items.\r\n",ch);
+	  return eFAILURE;
+	}/*
         if (!can_modify_object(ch, intval))
         {
 	  send_to_char("You cannot create items in that range.\r\n",ch);
 	  return eFAILURE;
-        }
+        }*/
 /*
         if(!can_modify_object(ch, intval)) {
           send_to_char("You are unable to work creation outside of your range.\n\r", ch);

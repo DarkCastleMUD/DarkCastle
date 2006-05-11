@@ -1929,3 +1929,37 @@ int do_opedit(char_data *ch, char *argument, int cmd)
   send_to_char(buf,ch);
   return eSUCCESS;
 }
+
+
+int do_oclone(struct char_data *ch, char *argument, int cmd)
+{
+  char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+  argument = one_argument(argument, arg1);
+  one_argument(argument, arg2);
+  if (!arg1[0] || !arg2[0] || !is_number(arg1) || !is_number(arg2))
+  {
+    send_to_char("Syntax: oclone <destination vnum> <source vnum>\r\n",ch);
+    return eFAILURE;
+  }
+  OBJ_DATA *obj,*otmp;
+  int v1 = atoi(arg1), v2 = atoi(arg2);
+  int r1 = real_object(v1), r2 = real_object(v2);
+  if (r2 < 0)
+  {
+    send_to_char("Source vnum does not exist.\r\n",ch);
+    return eFAILURE;
+  }
+  if (r1 < 0) {
+    char buf[30];
+    sprintf(buf, "new %d", v1);
+    int retval = do_oedit(ch, buf, 9);
+    if (!IS_SET(retval, eSUCCESS)) return eFAILURE;
+    r1 = real_object(v1);
+    r2 = real_object(v2); // oedit new changes it
+  }
+  obj = clone_object(r2);
+  otmp = (OBJ_DATA*)obj_index[r1].item;  
+  obj_index[r1].item = (void*)obj;
+  extract_obj(otmp);
+  send_to_char("Done!\r\n",ch);
+}

@@ -14,7 +14,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.h,v 1.78 2006/05/03 18:40:25 dcastle Exp $ */
+/* $Id: spells.h,v 1.79 2006/05/11 21:26:13 dcastle Exp $ */
 #include <structs.h> // ubyte, int16
 
 #define MAX_BUF_LENGTH               240
@@ -396,7 +396,7 @@ void check_maxes(CHAR_DATA *ch);
 #define COMMAND_SOCKETS              622
 #define COMMAND_PUNISH               623
 #define COMMAND_SQEDIT		     624
-#define COMMAND_INSTALL		     625
+#define COMMAND_OCLONE		     625
 #define COMMAND_RELOAD 		     626
 #define COMMAND_HEDIT		     627
 #define COMMAND_HINDEX		     628

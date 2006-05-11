@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.119 2006/04/28 18:38:17 shane Exp $
+| $Id: cl_thief.cpp,v 1.120 2006/05/11 21:26:11 dcastle Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -1719,14 +1719,15 @@ void blackjack_clear(void *arg1, void *arg2, void *arg3)
 int do_blackjack(struct char_data *ch, char *argument, int cmd)
 {
   bool wpnok = FALSE;
+
   if (!has_skill(ch, SKILL_BLACKJACK))
   {
     send_to_char("You wouldn't know how.\r\n",ch);
     return eFAILURE;
   }
 //  else {
-//    send_to_char("Some magical, godlike force prevents you from completing your attempt.\r\n",ch);
- //   return eFAILURE;
+    send_to_char("Some magical, godlike force prevents you from completing your attempt.\r\n",ch);
+    return eFAILURE;
   //}
 
   { //weaponchecks

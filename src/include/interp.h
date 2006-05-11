@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.h,v 1.44 2006/05/05 12:21:01 shane Exp $ */
+/* $Id: interp.h,v 1.45 2006/05/11 21:26:13 dcastle Exp $ */
 
 #ifndef INTERP_H_
 #define INTERP_H_
@@ -257,6 +257,7 @@ DO_FUN  do_not_here;
 DO_FUN  do_notax_toggle;
 DO_FUN  do_guide_toggle;
 DO_FUN  do_notell_toggle;
+DO_FUN  do_oclone;
 DO_FUN  do_oedit;
 DO_FUN  do_offer;
 DO_FUN  do_olocate;
