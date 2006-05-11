@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.81 2006/05/08 00:03:51 dcastle Exp $ */
+/* $Id: info.cpp,v 1.82 2006/05/11 10:33:58 shane Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -2389,17 +2389,16 @@ int do_tick( struct char_data *ch, char *argument, int cmd )
 int do_pkscore(CHAR_DATA * ch)
 {
    if(ch->pcdata->pkills == 0) return 0;
-   else return ch->pcdata->pklvl / ch->pcdata->pkills / 50.0 * 1000.0;
+   else return ch->pcdata->pklvl / ch->pcdata->pkills / 50.0 * 1000.0 + ch->pcdata->pkills;
 }
 
 int do_pdscore(CHAR_DATA * ch)
 {
    return ch->pcdata->pdeaths;
-//   return 0;
 }
 
 void check_leaderboard()
-{}/*
+{
    // check online players to the file and make sure the file is up to date
    struct descriptor_data *d;
    FILE  *fl;
@@ -2436,11 +2435,19 @@ void check_leaderboard()
       rdactive[i] = fread_int(fl, 0, LONG_MAX);
    }
    dc_fclose(fl);
-
+/*
    for(d=descriptor_list;d;d=d->next) {
 
       if(!d->character || GET_LEVEL(d->character) >= IMMORTAL) continue;
 
+      for(i=0;i<5;i++) {
+         if(!strcmp(hpactivename[i],GET_NAME(d->character))) {
+            for(j=i;j<4;j++) {
+               hpactive[j] = hpactive[j+1];
+               strcpy(hpactivename[j],hpactivename[j+1]);
+            }
+         }
+      }
       for(i=0;i<5;i++) {
          if(GET_MAX_HIT(d->character) > hpactive[i]) {
             for(j=4;j>i;j--) {
@@ -2509,7 +2516,7 @@ void check_leaderboard()
          }
       }
    }
-
+*/
    if (!(fl = dc_fopen(LEADERBOARD_FILE, "w"))) {
       log("Cannot open leaderboard file.", 0, LOG_MISC);
       abort();
@@ -2521,7 +2528,7 @@ void check_leaderboard()
    for(i=0;i<5;i++) fprintf(fl, "%s~ %d\n", pdactivename[i], pdactive[i]);
    for(i=0;i<5;i++) fprintf(fl, "%s~ %d\n", rdactivename[i], rdactive[i]);
    dc_fclose(fl);
-}*/
+}
 
 int do_leaderboard(struct char_data *ch, char *argument, int cmd)
 {
@@ -2646,8 +2653,7 @@ int do_leaderboard(struct char_data *ch, char *argument, int cmd)
    }
 
    sprintf(buf,"(*)*******************************************************************(*)\n");
-   strcat(buf, "(*)                   $BDark Castle Leaderboard                            
-(*)\n");
+   strcat(buf, "(*)                   $BDark Castle Leaderboard$R                         (*)\n");
    strcat(buf, "(*)-------------------------------------------------------------------(*)\n");
    strcat(buf, "(*)                                                                   (*)\n");
    strcat(buf, "(*)    Online          All Time          Online          All Time     (*)\n");

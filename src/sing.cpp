@@ -345,7 +345,7 @@ int do_sing(CHAR_DATA *ch, char *arg, int cmd)
   int qend, spl = -1;
   bool target_ok;
   int learned;
-  int specialization;
+//  int specialization;
 
    if (!IS_NPC(ch) && GET_CLASS(ch) != CLASS_BARD && GET_LEVEL(ch) < IMMORTAL) {
       check_social(ch, "sing", 0, arg); // do the social:)
@@ -575,8 +575,8 @@ int do_sing(CHAR_DATA *ch, char *arg, int cmd)
     else {
 
       learned = has_skill(ch, song_info[spl].skill_num);
-      specialization = learned / 100;
-      learned %= 100;
+//      specialization = learned / 100;
+//      learned %= 100;
 
       if(spl == SKILL_SONG_HYPNOTIC_HARMONY - SKILL_SONG_BASE ||
          spl == SKILL_SONG_DISARMING_LIMERICK - SKILL_SONG_BASE ||
@@ -664,15 +664,40 @@ void update_bard_singing()
       if(( (GET_POS(i) < song_info[i->song_number].minimum_position) && !IS_NPC(i))
          || IS_SET(i->combat, COMBAT_STUNNED)
          || IS_SET(i->combat, COMBAT_STUNNED2)
-         || IS_SET(i->combat, COMBAT_BASH1)
-         || IS_SET(i->combat, COMBAT_BASH2) )
+         || IS_SET(i->combat, COMBAT_SHOCKED) )
       {
-        if( i->song_number != 26 && !(IS_SET(i->combat, COMBAT_BASH1) || IS_SET(i->combat, COMBAT_BASH2))) {
            send_to_char("You can't keep singing in this position!\r\n", i); 
            i->song_timer = 0;
            if((song_info[i->song_number].intrp_pointer))
              ((*song_info[i->song_number].intrp_pointer) (GET_LEVEL(i), i, NULL, NULL, -1));
-        } //keep singing crushing crescendo if bashed or tripped
+           if(i->song_data) {
+              if ((int)i->song_data > 10) // Otherwise it's a temp variable.
+                 dc_free(i->song_data);
+              i->song_data = 0;
+           }
+           return;
+      }
+
+      if(i->song_number == SKILL_SONG_HYPNOTIC_HARMONY - SKILL_SONG_BASE ||
+         i->song_number == SKILL_SONG_DISARMING_LIMERICK - SKILL_SONG_BASE ||
+         i->song_number == SKILL_SONG_SHATTERING_RESO - SKILL_SONG_BASE ||
+         i->song_number == SKILL_SONG_SEARCHING_SONG - SKILL_SONG_BASE ||
+         i->song_number == SKILL_SONG_FANATICAL_FANFARE - SKILL_SONG_BASE ||
+         i->song_number == SKILL_SONG_MKING_CHARGE - SKILL_SONG_BASE ||
+         i->song_number == SKILL_SONG_VIGILANT_SIREN - SKILL_SONG_BASE)
+      {
+         if((!i->equipment[HOLD] || GET_ITEM_TYPE(i->equipment[HOLD]) != ITEM_INSTRUMENT) && (!i->equipment[HOLD2] || GET_ITEM_TYPE(i->equipment[HOLD2]) != ITEM_INSTRUMENT)) {
+            send_to_char("Without an instrument, your song dies away.\r\n", i);
+            if((song_info[i->song_number].intrp_pointer))
+               ((*song_info[i->song_number].intrp_pointer) (GET_LEVEL(i), i, NULL, NULL, -1));
+            i->song_timer = 0;
+            if(i->song_data) {
+	       if ((int)i->song_data > 10) // Otherwise it's a temp variable.
+                  dc_free(i->song_data);
+               i->song_data = 0;
+            }
+            return;
+         }
       }
     }
 
@@ -718,12 +743,6 @@ void update_bard_singing()
 
 int song_hypnotic_harmony(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
-   if((!ch->equipment[HOLD] || GET_ITEM_TYPE(ch->equipment[HOLD]) != ITEM_INSTRUMENT) && (!ch->equipment[HOLD2] || GET_ITEM_TYPE(ch->equipment[HOLD2]) != ITEM_INSTRUMENT))
-   {
-      send_to_char("You need an instrument to sing this.\r\n", ch);
-      return eFAILURE;
-   }
-
    if (!victim || !ch) {
       log("Serious problem in song_hypnotic_harmony!", ANGEL, LOG_BUG);
       return eFAILURE|eINTERNAL_ERROR;
@@ -824,12 +843,6 @@ int song_disrupt( ubyte level, CHAR_DATA *ch, char
       log("Serious problem in song_disrupt!", ANGEL, LOG_BUG);
       return eFAILURE|eINTERNAL_ERROR;
       }
-
-   if((!ch->equipment[HOLD] || GET_ITEM_TYPE(ch->equipment[HOLD]) != ITEM_INSTRUMENT) && (!ch->equipment[HOLD2] || GET_ITEM_TYPE(ch->equipment[HOLD2]) != ITEM_INSTRUMENT))
-   {
-      send_to_char("You need an instrument to sing this.\r\n", ch);
-      return eFAILURE;
-   }
 
    int learned = has_skill(ch, song_info[SKILL_SONG_DISARMING_LIMERICK].skill_num);
 
@@ -1019,6 +1032,18 @@ int song_revealing_stacato( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vi
 int execute_song_revealing_stacato( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    char_data * i;
+   struct room_data *room;
+   char buf[MAX_STRING_LENGTH];
+   char *direction[] =
+   {
+      "to the North",
+      "to the East",
+      "to the South",
+      "to the West",
+      "above you",
+      "below you",
+      "\n",
+   };
 
    for (i = world[ch->in_room].people; i; i = i->next_in_room)
    {
@@ -1040,13 +1065,29 @@ int execute_song_revealing_stacato( ubyte level, CHAR_DATA *ch, char *arg, CHAR_
               ch, 0, i, TO_CHAR, 0);
       }
    }
+ 
+   if(skill > 80) {
+      for(int j=0;j<6;j++) {
+         if(CAN_GO(ch, j)) {
+            room = &world[world[ch->in_room].dir_option[j]->to_room];
+            if(room == &world[ch->in_room])
+               continue;
+            for (i = room->people; i; i = i->next_in_room) {
+               if(!ISSET(i->affected_by, AFF_HIDE) && !ISSET(i->affected_by, AFF_FOREST_MELD))
+                  continue;
+               REMBIT(i->affected_by, AFF_HIDE);
+               affect_from_char(i,AFF_FOREST_MELD);
+               sprintf(buf, "$n's song makes you notice $N hiding a little bit %s", direction[j]);
+               act(buf, ch, 0, i, TO_ROOM, NOTVICT);
+               sprintf(buf, "Your song makes you notice $N hiding a little bit %s", direction[j]);
+               act(buf, ch, 0, i, TO_CHAR, 0);
+            }
+         }
+      }
+   }
    send_to_char("You tap your foot along to the revealing staccato.\r\n", ch);
 
-   //int specialization = skill / 100;
-   skill %= 100;
-
-  if(//number(1, 101) > ( 50 + skill/2 )
-        !skill_success(ch,NULL,  SKILL_SONG_REVEAL_STACATO)  ) {
+   if( !skill_success(ch,NULL,  SKILL_SONG_REVEAL_STACATO)  ) {
       send_to_char("You run out of lyrics and end the song.\r\n", ch);
       return eSUCCESS;
    }
@@ -1511,12 +1552,6 @@ int execute_song_forgetful_rhythm( ubyte level, CHAR_DATA *ch, char *arg, CHAR_D
 
 int song_shattering_resonance( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
-   if((!ch->equipment[HOLD] || GET_ITEM_TYPE(ch->equipment[HOLD]) != ITEM_INSTRUMENT) && (!ch->equipment[HOLD2] || GET_ITEM_TYPE(ch->equipment[HOLD2]) != ITEM_INSTRUMENT))
-   {
-      send_to_char("You need an instrument to sing this.\r\n", ch);
-      return eFAILURE;
-   }
-
    // store the arg here, cause there's no place to save it before we execute
    ch->song_data = str_dup(arg);
 
@@ -1747,12 +1782,6 @@ int intrp_flight_of_bee( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victi
 
 int song_searching_song( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
-   if((!ch->equipment[HOLD] || GET_ITEM_TYPE(ch->equipment[HOLD]) != ITEM_INSTRUMENT) && (!ch->equipment[HOLD2] || GET_ITEM_TYPE(ch->equipment[HOLD2]) != ITEM_INSTRUMENT))
-   {
-      send_to_char("You need an instrument to sing this.\r\n", ch);
-      return eFAILURE;
-   }
-
    // store the char name here, cause A, we don't pass tar_char
    // and B, there's no place to save it before we execute
    ch->song_data = str_dup(arg);
@@ -1828,12 +1857,6 @@ int song_jig_of_alacrity( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict
 
 int song_fanatical_fanfare(ubyte level, CHAR_DATA *ch, char *Aag, CHAR_DATA *victim, int skill)
 {
-   if((!ch->equipment[HOLD] || GET_ITEM_TYPE(ch->equipment[HOLD]) != ITEM_INSTRUMENT) && (!ch->equipment[HOLD2] || GET_ITEM_TYPE(ch->equipment[HOLD2]) != ITEM_INSTRUMENT))
-   {
-      send_to_char("You need an instrument to sing this.\r\n", ch);
-      return eFAILURE;
-   }
-
    send_to_char("You begin to sing loudly, and poke everyone in your surroundings with a stick..\r\n",ch);
    act("$n starts singing loudly, and begins to poke everyone around $m with a stick. Hey!", ch, 0, 0, TO_ROOM, 0);
    ch->song_timer = song_info[ch->song_number].beats;
@@ -1841,12 +1864,6 @@ int song_fanatical_fanfare(ubyte level, CHAR_DATA *ch, char *Aag, CHAR_DATA *vic
 }
 int song_mking_charge(ubyte level, CHAR_DATA *ch, char *Aag, CHAR_DATA *victim, int skill)
 {
-   if((!ch->equipment[HOLD] || GET_ITEM_TYPE(ch->equipment[HOLD]) != ITEM_INSTRUMENT) && (!ch->equipment[HOLD2] || GET_ITEM_TYPE(ch->equipment[HOLD2]) != ITEM_INSTRUMENT))
-   {
-      send_to_char("You need an instrument to sing this.\r\n", ch);
-      return eFAILURE;
-   }
-
    send_to_char("You inspire your allies with your rousing songs about rising against oppression!\r\n",ch);
    act("$n starts singing songs about former glory and past victories, rousing $s allies!", ch, 0, 0, TO_ROOM, 0);
    ch->song_timer = song_info[ch->song_number].beats;
@@ -2238,6 +2255,7 @@ int execute_song_glitter_dust( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA 
        continue;
      affect_to_char(victim, &af);
    }
+      
    return eSUCCESS;
 }
 
@@ -2497,12 +2515,6 @@ int execute_song_sticky_lullaby( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DAT
 
 int song_vigilant_siren( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
-   if((!ch->equipment[HOLD] || GET_ITEM_TYPE(ch->equipment[HOLD]) != ITEM_INSTRUMENT) && (!ch->equipment[HOLD2] || GET_ITEM_TYPE(ch->equipment[HOLD2]) != ITEM_INSTRUMENT))
-   {
-      send_to_char("You need an instrument to sing this.\r\n", ch);
-      return eFAILURE;
-   }
-
    send_to_char("You begin to sing a fast nervous tune...\n\r", ch);
    act("$n starts mumbling out a quick, nervous tune...", ch, 0, 0, TO_ROOM, 0);
    ch->song_timer = song_info[ch->song_number].beats;
