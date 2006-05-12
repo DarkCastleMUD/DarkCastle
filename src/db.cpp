@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.109 2006/05/12 09:59:47 dcastle Exp $ */
+/* $Id: db.cpp,v 1.110 2006/05/12 10:54:08 dcastle Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -3862,7 +3862,11 @@ void reset_zone(int zone)
           zone_table[zone].num_mob_on_repop++;
           last_cmd = 1;
           last_mob = 1;
-	  mprog_load_trigger(mob);
+		extern bool selfpurge;
+		selfpurge = FALSE;
+	   int retval = mprog_load_trigger(mob);
+	  if (selfpurge){ mob = NULL; last_mob = 0; last_cmd = 0;}
+
         }
         else
         {

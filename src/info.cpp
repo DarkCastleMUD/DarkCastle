@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.85 2006/05/12 10:14:57 shane Exp $ */
+/* $Id: info.cpp,v 1.86 2006/05/12 10:54:08 dcastle Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -2443,34 +2443,47 @@ void check_leaderboard()
          if(!strcmp(hpactivename[i],GET_NAME(d->character))) {
             for(j=i;j<4;j++) {
                hpactive[j] = hpactive[j+1];
-               strcpy(hpactivename[j],hpactivename[j+1]);
+		dc_free(hpactivename[j]);
+		hpactivename[j] = str_dup(hpactivename[j+1]);		
             }
             hpactive[4] = 0;
-            strcpy(hpactivename[4],"BozoDaClown");
+		dc_free(hpactivename[4]);
+		hpactivename[4] = str_dup("BozoDaClown");		
          }
          if(!strcmp(mnactivename[i],GET_NAME(d->character))) {
             for(j=i;j<4;j++) {
                mnactive[j] = mnactive[j+1];
-               strcpy(mnactivename[j],mnactivename[j+1]);
+		dc_free(mnactivename[j]);
+		mnactivename[j] = str_dup(mnactivename[j+1]);		
+//               strcpy(mnactivename[j],mnactivename[j+1]);
             }
             mnactive[4] = 0;
-            strcpy(mnactivename[4],"BozoDaClown");
+		dc_free(mnactivename[4]);
+		mnactivename[4] = str_dup("BozoDaClown");		
          }
          if(!strcmp(kiactivename[i],GET_NAME(d->character))) {
             for(j=i;j<4;j++) {
                kiactive[j] = kiactive[j+1];
-               strcpy(kiactivename[j],kiactivename[j+1]);
+		dc_free(kiactivename[j]);
+		kiactivename[j] = str_dup(kiactivename[j+1]);		
+
+//               strcpy(kiactivename[j],kiactivename[j+1]);
             }
             kiactive[4] = 0;
-            strcpy(kiactivename[4],"BozoDaClown");
+		dc_free(kiactivename[4]);
+		kiactivename[4] = str_dup("BozoDaClown");		
          }
          if(!strcmp(pkactivename[i],GET_NAME(d->character))) {
             for(j=i;j<4;j++) {
                pkactive[j] = pkactive[j+1];
-               strcpy(pkactivename[j],pkactivename[j+1]);
+//               strcpy(pkactivename[j],pkactivename[j+1]);
+		dc_free(pkactivename[j]);
+		pkactivename[j] = str_dup(pkactivename[j+1]);		
+
             }
             pkactive[4] = 0;
-            strcpy(pkactivename[4],"BozoDaClown");
+		dc_free(pkactivename[4]);
+		pkactivename[4] = str_dup("BozoDaClown");		
          }
          if(!strcmp(pdactivename[i],GET_NAME(d->character))) {
             for(j=i;j<4;j++) {
@@ -2478,7 +2491,8 @@ void check_leaderboard()
                strcpy(pdactivename[j],pdactivename[j+1]);
             }
             pdactive[4] = 0;
-            strcpy(pdactivename[4],"BozoDaClown");
+		dc_free(pdactivename[4]);
+		pdactivename[4] = str_dup("BozoDaClown");		
          }
          if(!strcmp(rdactivename[i],GET_NAME(d->character))) {
             for(j=i;j<4;j++) {
@@ -2486,7 +2500,8 @@ void check_leaderboard()
                strcpy(rdactivename[j],rdactivename[j+1]);
             }
             rdactive[4] = 0;
-            strcpy(rdactivename[4],"BozoDaClown");
+		dc_free(rdactivename[4]);
+		rdactivename[4] = str_dup("BozoDaClown");		
          }
       }
       for(i=0;i<5;i++) {
@@ -2569,12 +2584,13 @@ void check_leaderboard()
    for(i=0;i<5;i++) fprintf(fl, "%s~ %d\n", pdactivename[i], pdactive[i]);
    for(i=0;i<5;i++) fprintf(fl, "%s~ %d\n", rdactivename[i], rdactive[i]);
    dc_fclose(fl);
-   for(i=0;i<5;i++) dc_free(hpactivename[i]);
+/*   for(i=0;i<5;i++) dc_free(hpactivename[i]);
    for(i=0;i<5;i++) dc_free(mnactivename[i]);
    for(i=0;i<5;i++) dc_free(kiactivename[i]);
    for(i=0;i<5;i++) dc_free(pkactivename[i]);
    for(i=0;i<5;i++) dc_free(pdactivename[i]);
    for(i=0;i<5;i++) dc_free(rdactivename[i]);
+*/
 }
 
 int do_leaderboard(struct char_data *ch, char *argument, int cmd)
@@ -2726,12 +2742,12 @@ int do_leaderboard(struct char_data *ch, char *argument, int cmd)
    strcat(buf, "(*)-------------------------------------------------------------------(*)\n");
    strcat(buf, "(*)*******************************************************************(*)\n");
    page_string( ch->desc, buf, 1 );
-   for(i=0;i<5;i++) dc_free(hpactivename[i]);
+/*   for(i=0;i<5;i++) dc_free(hpactivename[i]);
    for(i=0;i<5;i++) dc_free(mnactivename[i]);
    for(i=0;i<5;i++) dc_free(kiactivename[i]);
    for(i=0;i<5;i++) dc_free(pkactivename[i]);
    for(i=0;i<5;i++) dc_free(pdactivename[i]);
    for(i=0;i<5;i++) dc_free(rdactivename[i]);
-
+*/
    return eSUCCESS;
 }
