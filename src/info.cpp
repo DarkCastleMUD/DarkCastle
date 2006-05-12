@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.86 2006/05/12 10:54:08 dcastle Exp $ */
+/* $Id: info.cpp,v 1.87 2006/05/12 11:27:33 shane Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -2389,7 +2389,7 @@ int do_tick( struct char_data *ch, char *argument, int cmd )
 int do_pkscore(CHAR_DATA * ch)
 {
    if(ch->pcdata->pkills == 0) return 0;
-   else return ch->pcdata->pklvl / ch->pcdata->pkills / 50.0 * 1000.0 + ch->pcdata->pkills;
+   else return (int)(ch->pcdata->pklvl / ch->pcdata->pkills / 50.0 * 1000.0 + ch->pcdata->pkills);
 }
 
 int do_pdscore(CHAR_DATA * ch)
@@ -2443,75 +2443,74 @@ void check_leaderboard()
          if(!strcmp(hpactivename[i],GET_NAME(d->character))) {
             for(j=i;j<4;j++) {
                hpactive[j] = hpactive[j+1];
-		dc_free(hpactivename[j]);
-		hpactivename[j] = str_dup(hpactivename[j+1]);		
+               dc_free(hpactivename[j]);
+               hpactivename[j] = str_dup(hpactivename[j+1]);		
             }
             hpactive[4] = 0;
-		dc_free(hpactivename[4]);
-		hpactivename[4] = str_dup("BozoDaClown");		
+            dc_free(hpactivename[4]);
+            hpactivename[4] = str_dup("BozoDaClown");		
          }
          if(!strcmp(mnactivename[i],GET_NAME(d->character))) {
             for(j=i;j<4;j++) {
                mnactive[j] = mnactive[j+1];
-		dc_free(mnactivename[j]);
-		mnactivename[j] = str_dup(mnactivename[j+1]);		
-//               strcpy(mnactivename[j],mnactivename[j+1]);
+               dc_free(mnactivename[j]);
+               mnactivename[j] = str_dup(mnactivename[j+1]);		
             }
             mnactive[4] = 0;
-		dc_free(mnactivename[4]);
-		mnactivename[4] = str_dup("BozoDaClown");		
+            dc_free(mnactivename[4]);
+            mnactivename[4] = str_dup("BozoDaClown");		
          }
          if(!strcmp(kiactivename[i],GET_NAME(d->character))) {
             for(j=i;j<4;j++) {
                kiactive[j] = kiactive[j+1];
-		dc_free(kiactivename[j]);
-		kiactivename[j] = str_dup(kiactivename[j+1]);		
-
-//               strcpy(kiactivename[j],kiactivename[j+1]);
+               dc_free(kiactivename[j]);
+               kiactivename[j] = str_dup(kiactivename[j+1]);		
             }
             kiactive[4] = 0;
-		dc_free(kiactivename[4]);
-		kiactivename[4] = str_dup("BozoDaClown");		
+            dc_free(kiactivename[4]);
+            kiactivename[4] = str_dup("BozoDaClown");		
          }
          if(!strcmp(pkactivename[i],GET_NAME(d->character))) {
             for(j=i;j<4;j++) {
                pkactive[j] = pkactive[j+1];
-//               strcpy(pkactivename[j],pkactivename[j+1]);
-		dc_free(pkactivename[j]);
-		pkactivename[j] = str_dup(pkactivename[j+1]);		
-
+               dc_free(pkactivename[j]);
+               pkactivename[j] = str_dup(pkactivename[j+1]);		
             }
             pkactive[4] = 0;
-		dc_free(pkactivename[4]);
-		pkactivename[4] = str_dup("BozoDaClown");		
+            dc_free(pkactivename[4]);
+            pkactivename[4] = str_dup("BozoDaClown");		
          }
          if(!strcmp(pdactivename[i],GET_NAME(d->character))) {
             for(j=i;j<4;j++) {
                pdactive[j] = pdactive[j+1];
-               strcpy(pdactivename[j],pdactivename[j+1]);
+               dc_free(pdactivename[j]);
+               pdactivename[j] = str_dup(pdactivename[j+1]);
             }
             pdactive[4] = 0;
-		dc_free(pdactivename[4]);
-		pdactivename[4] = str_dup("BozoDaClown");		
+            dc_free(pdactivename[4]);
+            pdactivename[4] = str_dup("BozoDaClown");		
          }
          if(!strcmp(rdactivename[i],GET_NAME(d->character))) {
             for(j=i;j<4;j++) {
                rdactive[j] = rdactive[j+1];
-               strcpy(rdactivename[j],rdactivename[j+1]);
+               dc_free(rdactivename[j]);
+               rdactivename[j] = str_dup(rdactivename[j+1]);
             }
             rdactive[4] = 0;
-		dc_free(rdactivename[4]);
-		rdactivename[4] = str_dup("BozoDaClown");		
+            dc_free(rdactivename[4]);
+            rdactivename[4] = str_dup("BozoDaClown");		
          }
       }
       for(i=0;i<5;i++) {
          if(GET_MAX_HIT(d->character) > hpactive[i]) {
             for(j=4;j>i;j--) {
                hpactive[j] = hpactive[j-1];
-               strcpy(hpactivename[j],hpactivename[j-1]);
+               dc_free(hpactivename[j]);
+               hpactivename[j] = str_dup(hpactivename[j-1]);
             }
             hpactive[i] = GET_MAX_HIT(d->character);
-            strcpy(hpactivename[i],GET_NAME(d->character));
+            dc_free(hpactivename[i]);
+            hpactivename[i] = str_dup(GET_NAME(d->character));
             break;
          }
       }
@@ -2519,10 +2518,12 @@ void check_leaderboard()
          if(GET_MAX_MANA(d->character) > mnactive[i]) {
             for(j=4;j>i;j--) {
                mnactive[j] = mnactive[j-1];
-               strcpy(mnactivename[j],mnactivename[j-1]);
+               dc_free(mnactivename[j]);
+               mnactivename[j] = str_dup(mnactivename[j-1]);
             }
             mnactive[i] = GET_MAX_MANA(d->character);
-            strcpy(mnactivename[i],GET_NAME(d->character));
+            dc_free(mnactivename[i]);
+            mnactivename[i] = str_dup(GET_NAME(d->character));
             break;
          }
       }
@@ -2530,10 +2531,12 @@ void check_leaderboard()
          if(GET_MAX_KI(d->character) > kiactive[i]) {
             for(j=4;j>i;j--) {
                kiactive[j] = kiactive[j-1];
-               strcpy(kiactivename[j],kiactivename[j-1]);
+               dc_free(kiactivename[j]);
+               kiactivename[j] = str_dup(kiactivename[j-1]);
             }
             kiactive[i] = GET_MAX_KI(d->character);
-            strcpy(kiactivename[i],GET_NAME(d->character));
+            dc_free(kiactivename[i]);
+            kiactivename[i] = str_dup(GET_NAME(d->character));
             break;
          }
       }
@@ -2541,10 +2544,12 @@ void check_leaderboard()
          if(do_pkscore(d->character) > pkactive[i]) {
             for(j=4;j>i;j--) {
                pkactive[j] = pkactive[j-1];
-               strcpy(pkactivename[j],pkactivename[j-1]);
+               dc_free(pkactivename[j]);
+               pkactivename[j] = str_dup(pkactivename[j-1]);
             }
             pkactive[i] = do_pkscore(d->character);
-            strcpy(pkactivename[i],GET_NAME(d->character));
+            dc_free(pkactivename[i]);
+            pkactivename[i] = str_dup(GET_NAME(d->character));
             break;
          }
       }
@@ -2552,22 +2557,26 @@ void check_leaderboard()
          if(do_pdscore(d->character) > pdactive[i]) {
             for(j=4;j>i;j--) {
                pdactive[j] = pdactive[j-1];
-               strcpy(pdactivename[j],pdactivename[j-1]);
+               dc_free(pdactivename[j]);
+               pdactivename[j] = str_dup(pdactivename[j-1]);
             }
             pdactive[i] = do_pdscore(d->character);
-            strcpy(pdactivename[i],GET_NAME(d->character));
+            dc_free(pdactivename[i]);
+            pdactivename[i] = str_dup(GET_NAME(d->character));
             break;
          }
       }
       for(i=0;i<5;i++) {
          if(GET_LEVEL(d->character) < 50) break;
-         if(GET_RDEATHS(d->character) > rdactive[i]) {
+         if((int)GET_RDEATHS(d->character) > rdactive[i]) {
             for(j=4;j>i;j--) {
                rdactive[j] = rdactive[j-1];
-               strcpy(rdactivename[j],rdactivename[j-1]);
+               dc_free(rdactivename[j]);
+               rdactivename[j] = str_dup(rdactivename[j-1]);
             }
-            rdactive[i] = GET_RDEATHS(d->character);
-            strcpy(rdactivename[i],GET_NAME(d->character));
+            rdactive[i] = (int)GET_RDEATHS(d->character);
+            dc_free(rdactivename[i]);
+            rdactivename[i] = str_dup(GET_NAME(d->character));
             break;
          }
       }
@@ -2703,12 +2712,12 @@ int do_leaderboard(struct char_data *ch, char *argument, int cmd)
       }
       for(i=0;i<5;i++) {
          if(GET_LEVEL(d->character) < 50) break;
-         if(GET_RDEATHS(d->character) > rdonline[i]) {
+         if((int)GET_RDEATHS(d->character) > rdonline[i]) {
             for(j=4;j>i;j--) {
                rdonline[j] = rdonline[j-1];
                strcpy(rdonlinename[j],rdonlinename[j-1]);
             }
-            rdonline[i] = GET_RDEATHS(d->character);
+            rdonline[i] = (int)GET_RDEATHS(d->character);
             strcpy(rdonlinename[i],GET_NAME(d->character));
             break;
          }
@@ -2742,12 +2751,12 @@ int do_leaderboard(struct char_data *ch, char *argument, int cmd)
    strcat(buf, "(*)-------------------------------------------------------------------(*)\n");
    strcat(buf, "(*)*******************************************************************(*)\n");
    page_string( ch->desc, buf, 1 );
-/*   for(i=0;i<5;i++) dc_free(hpactivename[i]);
+   for(i=0;i<5;i++) dc_free(hpactivename[i]);
    for(i=0;i<5;i++) dc_free(mnactivename[i]);
    for(i=0;i<5;i++) dc_free(kiactivename[i]);
    for(i=0;i<5;i++) dc_free(pkactivename[i]);
    for(i=0;i<5;i++) dc_free(pdactivename[i]);
    for(i=0;i<5;i++) dc_free(rdactivename[i]);
-*/
+
    return eSUCCESS;
 }
