@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.84 2006/05/12 09:59:47 dcastle Exp $ */
+/* $Id: info.cpp,v 1.85 2006/05/12 10:14:57 shane Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -2445,48 +2445,48 @@ void check_leaderboard()
                hpactive[j] = hpactive[j+1];
                strcpy(hpactivename[j],hpactivename[j+1]);
             }
-            hpactive[5] = 0;
-            strcpy(hpactivename[5],"BozoDaClown");
+            hpactive[4] = 0;
+            strcpy(hpactivename[4],"BozoDaClown");
          }
          if(!strcmp(mnactivename[i],GET_NAME(d->character))) {
             for(j=i;j<4;j++) {
                mnactive[j] = mnactive[j+1];
                strcpy(mnactivename[j],mnactivename[j+1]);
             }
-            mnactive[5] = 0;
-            strcpy(mnactivename[5],"BozoDaClown");
+            mnactive[4] = 0;
+            strcpy(mnactivename[4],"BozoDaClown");
          }
          if(!strcmp(kiactivename[i],GET_NAME(d->character))) {
             for(j=i;j<4;j++) {
                kiactive[j] = kiactive[j+1];
                strcpy(kiactivename[j],kiactivename[j+1]);
             }
-            kiactive[5] = 0;
-            strcpy(kiactivename[5],"BozoDaClown");
+            kiactive[4] = 0;
+            strcpy(kiactivename[4],"BozoDaClown");
          }
          if(!strcmp(pkactivename[i],GET_NAME(d->character))) {
             for(j=i;j<4;j++) {
                pkactive[j] = pkactive[j+1];
                strcpy(pkactivename[j],pkactivename[j+1]);
             }
-            pkactive[5] = 0;
-            strcpy(pkactivename[5],"BozoDaClown");
+            pkactive[4] = 0;
+            strcpy(pkactivename[4],"BozoDaClown");
          }
          if(!strcmp(pdactivename[i],GET_NAME(d->character))) {
             for(j=i;j<4;j++) {
                pdactive[j] = pdactive[j+1];
                strcpy(pdactivename[j],pdactivename[j+1]);
             }
-            pdactive[5] = 0;
-            strcpy(pdactivename[5],"BozoDaClown");
+            pdactive[4] = 0;
+            strcpy(pdactivename[4],"BozoDaClown");
          }
          if(!strcmp(rdactivename[i],GET_NAME(d->character))) {
             for(j=i;j<4;j++) {
                rdactive[j] = rdactive[j+1];
                strcpy(rdactivename[j],rdactivename[j+1]);
             }
-            rdactive[5] = 0;
-            strcpy(rdactivename[5],"BozoDaClown");
+            rdactive[4] = 0;
+            strcpy(rdactivename[4],"BozoDaClown");
          }
       }
       for(i=0;i<5;i++) {
