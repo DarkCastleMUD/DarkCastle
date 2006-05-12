@@ -704,6 +704,7 @@ void update_bard_singing()
               dc_free(i->song_data);
             i->song_data = 0;
          }
+         i->song_timer = 0;
          return;
       }
 
