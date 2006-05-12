@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.113 2006/05/12 09:59:47 dcastle Exp $ */
+/* $Id: nanny.cpp,v 1.114 2006/05/12 18:36:43 shane Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -877,7 +877,7 @@ void nanny(struct descriptor_data *d, char *arg)
       
       sprintf( log_buf, "%s@%s has connected.", GET_NAME(ch), d->host);
       if(GET_LEVEL(ch) < ANGEL)
-         log( log_buf, DEITY, LOG_SOCKET );
+         log( log_buf, OVERSEER, LOG_SOCKET );
       else
          log( log_buf, GET_LEVEL(ch), LOG_SOCKET );
 

@@ -2579,7 +2579,7 @@ void warn_if_duplicate_ip(char_data * ch)
         )
       {
 	highlev = MAX(GET_LEVEL(d->character), GET_LEVEL(ch));
-	highlev = MAX(highlev, IMMORTAL);
+	highlev = MAX(highlev, OVERSEER);
        // sprintf(buf, "MultipleIP: %s -> %s (%d)/ %s (%d)", d->host, GET_NAME(ch), 
       //                  (world[ch->in_room].number ? world[ch->in_room].number : -1), GET_NAME(d->character),
       //                  (world[d->character->in_room].number ? world[d->character->in_room].number : -1));
