@@ -94,21 +94,21 @@ struct song_info_type song_info [ ] = {
 },
 
 { /* 5 */
-	5, POSITION_SITTING, 9, SKILL_SONG_INSANE_CHANT, 
+	5, POSITION_FIGHTING, 9, SKILL_SONG_INSANE_CHANT, 
         TAR_IGNORE, 
         song_insane_chant, execute_song_insane_chant,
 	NULL, NULL, SKILL_INCREASE_MEDIUM
 },
 
 { /* 7 */
-        4, POSITION_STANDING, 5, SKILL_SONG_GLITTER_DUST, 
+        4, POSITION_RESTING, 5, SKILL_SONG_GLITTER_DUST, 
         TAR_IGNORE,
         song_glitter_dust, execute_song_glitter_dust,
         NULL, NULL, SKILL_INCREASE_HARD
 },
 
 { /* 8 */
-	6, POSITION_FIGHTING, 2, SKILL_SONG_SYNC_CHORD, 
+	6, POSITION_RESTING, 2, SKILL_SONG_SYNC_CHORD, 
 	TAR_CHAR_ROOM|TAR_FIGHT_VICT, 
 	song_synchronous_chord, execute_song_synchronous_chord, NULL, 
 NULL,   SKILL_INCREASE_MEDIUM
@@ -122,14 +122,14 @@ NULL,   SKILL_INCREASE_MEDIUM
 },
 
 { /* 10 */
-        3, POSITION_FIGHTING, 7, SKILL_SONG_STICKY_LULL, 
+        3, POSITION_SITTING, 7, SKILL_SONG_STICKY_LULL, 
         TAR_CHAR_ROOM|TAR_FIGHT_VICT,
         song_sticky_lullaby, execute_song_sticky_lullaby, NULL, NULL,
         SKILL_INCREASE_HARD
 }, 
 
 { /* 11 */
-	1, POSITION_FIGHTING, 1, SKILL_SONG_REVEAL_STACATO, 
+	1, POSITION_RESTING, 1, SKILL_SONG_REVEAL_STACATO, 
 	TAR_IGNORE, 
 	song_revealing_stacato, execute_song_revealing_stacato, NULL, 
 NULL,   SKILL_INCREASE_HARD
@@ -144,7 +144,7 @@ NULL,   SKILL_INCREASE_HARD
 },
 
 { /* 13 */
-	5, POSITION_RESTING, 4, SKILL_SONG_JIG_OF_ALACRITY, 
+	5, POSITION_FIGHTING, 4, SKILL_SONG_JIG_OF_ALACRITY, 
         TAR_IGNORE, 
         song_jig_of_alacrity, execute_song_jig_of_alacrity,
         pulse_jig_of_alacrity, intrp_jig_of_alacrity,
@@ -152,7 +152,7 @@ NULL,   SKILL_INCREASE_HARD
 },
 
 { /* 14 */
-	7, POSITION_STANDING, 3, SKILL_SONG_NOTE_OF_KNOWLEDGE, 
+	7, POSITION_RESTING, 3, SKILL_SONG_NOTE_OF_KNOWLEDGE, 
 	TAR_OBJ_INV, song_note_of_knowledge,
 	execute_song_note_of_knowledge, NULL, NULL,
         SKILL_INCREASE_MEDIUM
@@ -173,7 +173,7 @@ NULL,   SKILL_INCREASE_HARD
 },
 
 { /* 17 */
-	10, POSITION_STANDING, 2, SKILL_SONG_FORGETFUL_RHYTHM, 
+	10, POSITION_RESTING, 2, SKILL_SONG_FORGETFUL_RHYTHM, 
         TAR_CHAR_ROOM, 
         song_forgetful_rhythm, execute_song_forgetful_rhythm,
 	NULL, NULL, SKILL_INCREASE_HARD
@@ -207,7 +207,7 @@ NULL,   SKILL_INCREASE_HARD
 },
 
 { /* 22 */
-	2, POSITION_RESTING, 6, SKILL_SONG_SHATTERING_RESO, 
+	2, POSITION_FIGHTING, 6, SKILL_SONG_SHATTERING_RESO, 
         TAR_OBJ_ROOM, 
         song_shattering_resonance, execute_song_shattering_resonance,
 	NULL, NULL, SKILL_INCREASE_HARD
@@ -352,10 +352,10 @@ int do_sing(CHAR_DATA *ch, char *arg, int cmd)
       return eSUCCESS;
    }
 
-   if ((IS_SET(world[ch->in_room].room_flags, SAFE)) && (GET_LEVEL(ch) < IMP)) {
-      send_to_char("For now, no songs can be sung in a safe room.\n\r", ch);
-      return eFAILURE;
-      }
+//   if ((IS_SET(world[ch->in_room].room_flags, SAFE)) && (GET_LEVEL(ch) < IMP)) {
+//      send_to_char("For now, no songs can be sung in a safe room.\n\r", ch);
+//      return eFAILURE;
+//      }
 
   // we do this so we can pass constants to "do_sing" and no crash
   strcpy(spellarg, arg);
@@ -395,6 +395,26 @@ int do_sing(CHAR_DATA *ch, char *arg, int cmd)
     send_to_char("You are already in the middle of another song!\n\r", ch);
     return eFAILURE;
   }
+
+  if ((IS_SET(world[ch->in_room].room_flags, SAFE)) && (GET_LEVEL(ch) < IMP) && (
+        spl == SKILL_SONG_WHISTLE_SHARP - SKILL_SONG_BASE ||
+        spl == SKILL_SONG_UNRESIST_DITTY - SKILL_SONG_BASE ||
+        spl == SKILL_SONG_GLITTER_DUST - SKILL_SONG_BASE ||
+        spl == SKILL_SONG_STICKY_LULL - SKILL_SONG_BASE ||
+        spl == SKILL_SONG_REVEAL_STACATO - SKILL_SONG_BASE ||
+        spl == SKILL_SONG_TERRIBLE_CLEF - SKILL_SONG_BASE ||
+        spl == SKILL_SONG_DISCHORDANT_DIRGE - SKILL_SONG_BASE ||
+        spl == SKILL_SONG_INSANE_CHANT - SKILL_SONG_BASE ||
+        spl == SKILL_SONG_JIG_OF_ALACRITY - SKILL_SONG_BASE ||
+        spl == SKILL_SONG_DISARMING_LIMERICK - SKILL_SONG_BASE ||
+        spl == SKILL_SONG_CRUSHING_CRESCENDO - SKILL_SONG_BASE ||
+        spl == SKILL_SONG_SHATTERING_RESO - SKILL_SONG_BASE ||
+        spl == SKILL_SONG_MKING_CHARGE - SKILL_SONG_BASE ||
+        spl == SKILL_SONG_HYPNOTIC_HARMONY - SKILL_SONG_BASE))        
+  {
+     send_to_char("This room feels too safe to sing an offensive song such as this.\n\r", ch);
+     return eFAILURE;
+  }  
   
   if(song_info[spl].song_pointer) {
     if(GET_POS(ch) < song_info[spl].minimum_position && 
@@ -660,11 +680,46 @@ void update_bard_singing()
         REMBIT(i->affected_by, AFF_HIDE);
         send_to_char("Your singing ruins your hiding place.\r\n", i);
       }
+      if ((IS_SET(world[i->in_room].room_flags, SAFE)) && (GET_LEVEL(i) < IMP) && (
+            i->song_number == SKILL_SONG_WHISTLE_SHARP - SKILL_SONG_BASE ||
+            i->song_number == SKILL_SONG_UNRESIST_DITTY - SKILL_SONG_BASE ||
+            i->song_number == SKILL_SONG_GLITTER_DUST - SKILL_SONG_BASE ||
+            i->song_number == SKILL_SONG_STICKY_LULL - SKILL_SONG_BASE ||
+            i->song_number == SKILL_SONG_REVEAL_STACATO - SKILL_SONG_BASE ||
+            i->song_number == SKILL_SONG_TERRIBLE_CLEF - SKILL_SONG_BASE ||
+            i->song_number == SKILL_SONG_DISCHORDANT_DIRGE - SKILL_SONG_BASE ||
+            i->song_number == SKILL_SONG_INSANE_CHANT - SKILL_SONG_BASE ||
+            i->song_number == SKILL_SONG_JIG_OF_ALACRITY - SKILL_SONG_BASE ||
+            i->song_number == SKILL_SONG_DISARMING_LIMERICK - SKILL_SONG_BASE ||
+            i->song_number == SKILL_SONG_CRUSHING_CRESCENDO - SKILL_SONG_BASE ||
+            i->song_number == SKILL_SONG_SHATTERING_RESO - SKILL_SONG_BASE ||
+            i->song_number == SKILL_SONG_MKING_CHARGE - SKILL_SONG_BASE ||
+            i->song_number == SKILL_SONG_HYPNOTIC_HARMONY - SKILL_SONG_BASE))        
+      {
+         send_to_char("In this room, your song quiety fades away.\r\n", i);
+         if((song_info[i->song_number].intrp_pointer))
+            ((*song_info[i->song_number].intrp_pointer) (GET_LEVEL(i), i, NULL, NULL, -1));
+         if(i->song_data) {
+	    if ((int)i->song_data > 10) // Otherwise it's a temp variable.
+              dc_free(i->song_data);
+            i->song_data = 0;
+         }
+         return;
+      }
 
       if(( (GET_POS(i) < song_info[i->song_number].minimum_position) && !IS_NPC(i))
          || IS_SET(i->combat, COMBAT_STUNNED)
          || IS_SET(i->combat, COMBAT_STUNNED2)
-         || IS_SET(i->combat, COMBAT_SHOCKED) )
+         || IS_SET(i->combat, COMBAT_SHOCKED) 
+         || (IS_SET(i->combat, COMBAT_BASH1) || IS_SET(i->combat, COMBAT_BASH2)) &&
+            (i->song_number == SKILL_SONG_TRAVELING_MARCH - SKILL_SONG_BASE ||
+             i->song_number == SKILL_SONG_BOUNT_SONNET - SKILL_SONG_BASE ||
+             i->song_number == SKILL_SONG_HEALING_MELODY - SKILL_SONG_BASE ||
+             i->song_number == SKILL_SONG_SYNC_CHORD - SKILL_SONG_BASE ||
+             i->song_number == SKILL_SONG_NOTE_OF_KNOWLEDGE - SKILL_SONG_BASE ||
+             i->song_number == SKILL_SONG_SOOTHING_REMEM - SKILL_SONG_BASE ||
+             i->song_number == SKILL_SONG_SEARCHING_SONG - SKILL_SONG_BASE ||
+             i->song_number == SKILL_SONG_FORGETFUL_RHYTHM - SKILL_SONG_BASE) )
       {
            send_to_char("You can't keep singing in this position!\r\n", i); 
            i->song_timer = 0;
@@ -719,18 +774,18 @@ void update_bard_singing()
     {
       i->song_timer = 0;
 
-      if(GET_LEVEL(i) < IMMORTAL)
-        if(IS_SET(world[i->in_room].room_flags, SAFE)) {
-          send_to_char("No singing in safe rooms yet.\r\n", i);
-          if((song_info[i->song_number].intrp_pointer))
-            ((*song_info[i->song_number].intrp_pointer) (GET_LEVEL(i), i, NULL, NULL, -1));
-          if(i->song_data) {
-	    if ((int)i->song_data > 10) // Otherwise it's a temp variable.
-              dc_free(i->song_data);
-            i->song_data = 0;
-          }
-          return;
-        }
+//      if(GET_LEVEL(i) < IMMORTAL)
+//        if(IS_SET(world[i->in_room].room_flags, SAFE)) {
+//          send_to_char("No singing in safe rooms yet.\r\n", i);
+//          if((song_info[i->song_number].intrp_pointer))
+//            ((*song_info[i->song_number].intrp_pointer) (GET_LEVEL(i), i, NULL, NULL, -1));
+//          if(i->song_data) {
+//	    if ((int)i->song_data > 10) // Otherwise it's a temp variable.
+//              dc_free(i->song_data);
+//            i->song_data = 0;
+//          }
+//          return;
+//        }
 
       int learned = has_skill(i, ( i->song_number + SKILL_SONG_BASE ) );
 
