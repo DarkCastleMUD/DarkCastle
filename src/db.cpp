@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.108 2006/05/11 21:09:47 dcastle Exp $ */
+/* $Id: db.cpp,v 1.109 2006/05/12 09:59:47 dcastle Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -4504,6 +4504,17 @@ void free_char( CHAR_DATA *ch )
 	dc_free(temp);
      }
   }
+  SETBIT(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT); // so weapons stop falling off
+
+  for(iWear = 0; iWear < MAX_WEAR; iWear++) {
+     if(ch->equipment[iWear])
+       obj_to_char( unequip_char( ch, iWear,1 ), ch );
+  }
+  while(ch->carrying)
+    extract_obj( ch->carrying );
+
+
+
   if(!IS_NPC(ch)) {
     if(ch->name)
       dc_free(ch->name);
@@ -4568,18 +4579,6 @@ void free_char( CHAR_DATA *ch )
   ch->title = NULL;
 
   remove_memory(ch, 't');
-
-  SETBIT(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT); // so weapons stop falling off
-
-  if (ch->pcdata) ch->pcdata->skillchange = NULL;
-
-  for(iWear = 0; iWear < MAX_WEAR; iWear++) {
-     if(ch->equipment[iWear])
-       obj_to_char( unequip_char( ch, iWear,1 ), ch );
-  }
-
-  while(ch->carrying)
-    extract_obj( ch->carrying );
 
 // Since affect_remove updates the linked list itself, do it this way
    while(ch->affected)

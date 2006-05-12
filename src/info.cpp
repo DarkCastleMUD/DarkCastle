@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.83 2006/05/12 09:26:10 shane Exp $ */
+/* $Id: info.cpp,v 1.84 2006/05/12 09:59:47 dcastle Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -2405,7 +2405,6 @@ void check_leaderboard()
    int   i, j;
    char  *hpactivename[5], *mnactivename[5], *kiactivename[5], *pkactivename[5], *pdactivename[5], *rdactivename[5];
    int   hpactive[5], mnactive[5], kiactive[5], pkactive[5], pdactive[5], rdactive[5];
-
    if (!(fl = dc_fopen(LEADERBOARD_FILE, "r"))) {
       log("Cannot open leaderboard file.", 0, LOG_MISC);
       abort();
@@ -2435,7 +2434,7 @@ void check_leaderboard()
       rdactive[i] = fread_int(fl, 0, LONG_MAX);
    }
    dc_fclose(fl);
-/*
+
    for(d=descriptor_list;d;d=d->next) {
 
       if(!d->character || GET_LEVEL(d->character) >= IMMORTAL) continue;
@@ -2558,7 +2557,7 @@ void check_leaderboard()
          }
       }
    }
-*/
+
    if (!(fl = dc_fopen(LEADERBOARD_FILE, "w"))) {
       log("Cannot open leaderboard file.", 0, LOG_MISC);
       abort();
@@ -2570,6 +2569,12 @@ void check_leaderboard()
    for(i=0;i<5;i++) fprintf(fl, "%s~ %d\n", pdactivename[i], pdactive[i]);
    for(i=0;i<5;i++) fprintf(fl, "%s~ %d\n", rdactivename[i], rdactive[i]);
    dc_fclose(fl);
+   for(i=0;i<5;i++) dc_free(hpactivename[i]);
+   for(i=0;i<5;i++) dc_free(mnactivename[i]);
+   for(i=0;i<5;i++) dc_free(kiactivename[i]);
+   for(i=0;i<5;i++) dc_free(pkactivename[i]);
+   for(i=0;i<5;i++) dc_free(pdactivename[i]);
+   for(i=0;i<5;i++) dc_free(rdactivename[i]);
 }
 
 int do_leaderboard(struct char_data *ch, char *argument, int cmd)
@@ -2721,5 +2726,12 @@ int do_leaderboard(struct char_data *ch, char *argument, int cmd)
    strcat(buf, "(*)-------------------------------------------------------------------(*)\n");
    strcat(buf, "(*)*******************************************************************(*)\n");
    page_string( ch->desc, buf, 1 );
+   for(i=0;i<5;i++) dc_free(hpactivename[i]);
+   for(i=0;i<5;i++) dc_free(mnactivename[i]);
+   for(i=0;i<5;i++) dc_free(kiactivename[i]);
+   for(i=0;i<5;i++) dc_free(pkactivename[i]);
+   for(i=0;i<5;i++) dc_free(pdactivename[i]);
+   for(i=0;i<5;i++) dc_free(rdactivename[i]);
+
    return eSUCCESS;
 }

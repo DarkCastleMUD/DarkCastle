@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.153 2006/05/11 21:09:47 dcastle Exp $ */
+/* $Id: spells.cpp,v 1.154 2006/05/12 09:59:47 dcastle Exp $ */
 
 extern "C"
 {
@@ -402,7 +402,7 @@ struct spell_info_type spell_info [ ] =
 
  { /* 159 */ 12, POSITION_STANDING, 45, TAR_IGNORE, cast_ghost_walk, SKILL_INCREASE_HARD },
 
- { /* 160 */ 12, POSITION_STANDING, 120, TAR_CHAR_ROOM, cast_mend_golem, SKILL_INCREASE_MEDIUM }
+ { /* 160 */ 12, POSITION_STANDING, 120, TAR_IGNORE, cast_mend_golem, SKILL_INCREASE_MEDIUM }
 
 };
 
@@ -1836,20 +1836,23 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
           if(GET_CLASS(ch) == CLASS_MAGIC_USER || GET_CLASS(ch) == CLASS_ANTI_PAL)
              chance += GET_INT(ch);
           else chance += GET_WIS(ch);*/
+
         chance = has_skill(ch, spl);
 
-        if (chance <= 40) 
+/*        if (chance <= 40) 
           chance = 40;
         else 
           chance = chance + (int)((float)(chance) / 1.75);
-
+*/
 	if (GET_CLASS(ch) == CLASS_MAGIC_USER || GET_CLASS(ch) == CLASS_ANTI_PAL)
 	  chance += int_app[GET_INT(ch)].conc_bonus;
 	else 
           chance += wis_app[GET_WIS(ch)].conc_bonus;
 	chance = MIN(95, chance);
+	int o = GET_LEVEL(ch)*2+1;
+        if (chance > o) o = chance + 1;
 
-        if(GET_LEVEL(ch) < IMMORTAL && number(1,100) > chance && !IS_AFFECTED(ch,AFF_FOCUS))
+        if(GET_LEVEL(ch) < IMMORTAL && number(1,o) > chance && !IS_AFFECTED(ch,AFF_FOCUS))
         {
           csendf(ch, "You lost your concentration and are unable to cast %s!\n\r", spells[spl-1]);
           GET_MANA(ch) -= (use_mana(ch, spl) >> 1);
