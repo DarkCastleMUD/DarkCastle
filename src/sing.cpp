@@ -1135,7 +1135,7 @@ int execute_song_revealing_stacato( ubyte level, CHAR_DATA *ch, char *arg, CHAR_
       for(int j=0;j<6;j++) {
          if(CAN_GO(ch, j)) {
             room = &world[world[ch->in_room].dir_option[j]->to_room];
-            if(room == &world[ch->in_room])
+            if(room == &world[ch->in_room] || IS_SET(room->room_flags, SAFE))
                continue;
             for (i = room->people; i; i = i->next_in_room) {
                if(!ISSET(i->affected_by, AFF_HIDE) && !ISSET(i->affected_by, AFF_FOREST_MELD))
