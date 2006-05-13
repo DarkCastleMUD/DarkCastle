@@ -475,9 +475,9 @@ int spell_howl(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
 
    if(saves_spell(ch, victim, 5, SAVE_TYPE_MAGIC) >= 0)
     {
-      return damage(ch, victim, 0, TYPE_FIRE, SPELL_HOWL, 0);
+      return damage(ch, victim, 0, TYPE_SONG, SPELL_HOWL, 0);
     }
-   retval = damage(ch, victim, 8, TYPE_FIRE, SPELL_HOWL, 0);
+   retval = damage(ch, victim, 300, TYPE_SING, SPELL_HOWL, 0);
 
    if(SOMEONE_DIED(retval))
      return retval;
