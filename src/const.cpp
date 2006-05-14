@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.182 2006/05/13 18:39:16 apocalypse Exp $ */
+/* $Id: const.cpp,v 1.183 2006/05/14 03:15:27 shane Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -2372,7 +2372,7 @@ struct mob_matrix_data mob_matrix[] =
 /* 74 */{2900000,  5000, 74, 64, -380,  175000},
 /* High Level and 50+ Range Above Here */
 /* ------ EQ Mob Range Starts Here ------    */
-/* 75 */{5000000,  6000, 75, 65, -400,  400000}
+/* 75 */{5000000,  6000, 75, 65, -400,  400000},
 /* 76 */{5100000,  6250, 76, 66, -420,  425000},
 /* 77 */{5200000,  6500, 77, 67, -440,  450000},
 /* 78 */{5300000,  6750, 78, 68, -460,  475000},

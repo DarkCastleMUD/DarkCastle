@@ -477,7 +477,7 @@ int spell_howl(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
     {
       return damage(ch, victim, 0, TYPE_SONG, SPELL_HOWL, 0);
     }
-   retval = damage(ch, victim, 300, TYPE_SING, SPELL_HOWL, 0);
+   retval = damage(ch, victim, 300, TYPE_SONG, SPELL_HOWL, 0);
 
    if(SOMEONE_DIED(retval))
      return retval;

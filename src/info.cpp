@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.87 2006/05/12 11:27:33 shane Exp $ */
+/* $Id: info.cpp,v 1.88 2006/05/14 03:15:27 shane Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -2593,13 +2593,12 @@ void check_leaderboard()
    for(i=0;i<5;i++) fprintf(fl, "%s~ %d\n", pdactivename[i], pdactive[i]);
    for(i=0;i<5;i++) fprintf(fl, "%s~ %d\n", rdactivename[i], rdactive[i]);
    dc_fclose(fl);
-/*   for(i=0;i<5;i++) dc_free(hpactivename[i]);
+   for(i=0;i<5;i++) dc_free(hpactivename[i]);
    for(i=0;i<5;i++) dc_free(mnactivename[i]);
    for(i=0;i<5;i++) dc_free(kiactivename[i]);
    for(i=0;i<5;i++) dc_free(pkactivename[i]);
    for(i=0;i<5;i++) dc_free(pdactivename[i]);
    for(i=0;i<5;i++) dc_free(rdactivename[i]);
-*/
 }
 
 int do_leaderboard(struct char_data *ch, char *argument, int cmd)
@@ -2724,32 +2723,35 @@ int do_leaderboard(struct char_data *ch, char *argument, int cmd)
       }
    }
 
-   sprintf(buf,"(*)*******************************************************************(*)\n");
-   strcat(buf, "(*)                   $BDark Castle Leaderboard$R                         (*)\n");
-   strcat(buf, "(*)-------------------------------------------------------------------(*)\n");
-   strcat(buf, "(*)                                                                   (*)\n");
-   strcat(buf, "(*)    Online          All Time          Online          All Time     (*)\n");
-   strcat(buf, "(*)                                                                   (*)\n");
-   strcat(buf, "(*) $2$BHit Points                        Mana$R                            (*)\n");
-   for(i=0;i<5;i++) {
-      sprintf(buf2, "(*) %d) $B%-12s$R %d) $B%-12s$R   %d) $B%-12s$R %d) $B%-12s$R (*)\n",i+1,hponlinename[i],i+1,hpactivename[i],i+1,mnonlinename[i],i+1,mnactivename[i]);
+   sprintf(buf,"(*)***********************************************************************************(*)\n");
+   strcat(buf, "(*)                           $BDark Castle Leaderboard$R                                 (*)\n");
+   strcat(buf, "(*)-----------------------------------------------------------------------------------(*)\n");
+   strcat(buf, "(*)                                                                                   (*)\n");
+   strcat(buf, "(*)    Online          All Time                  Online          All Time             (*)\n");
+   strcat(buf, "(*)                                                                           (*)\n");
+   strcat(buf, "(*) $2$BHit Points                                Mana$R                            (*)\n");
+   sprintf(buf2, "(*) 1) $4$B%-12s$R 1) $4$B%-12s$R           1) $4$B%-12s$R 1) $4$B%-12s$R         (*)\n",hponlinename[0],hpactivename[0],mnonlinename[0],mnactivename[0]);
+   for(i=1;i<5;i++) {
+      sprintf(buf2, "(*) %d) $B%-12s$R %d) $B%-12s$R (-%-4d)  %d) $B%-12s$R %d) $B%-12s$R  (-%-4d) (*)\n",i+1,hponlinename[i],i+1,hpactivename[i],hpactive[0]-hpactive[i],i+1,mnonlinename[i],i+1,mnactivename[i],mnactive[0]-mnactive[i]);
       strcat(buf, buf2);
    }
-   strcat(buf, "(*)                                                                   (*)\n");
-   strcat(buf, "(*) $2$BKi                                Player Kill Score$R               (*)\n");
-   for(i=0;i<5;i++) {
-      sprintf(buf2, "(*) %d) $B%-12s$R %d) $B%-12s$R   %d) $B%-12s$R %d) $B%-12s$R (*)\n",i+1,kionlinename[i],i+1,kiactivename[i],i+1,pkonlinename[i],i+1,pkactivename[i]);
+   strcat(buf, "(*)                                                                                   (*)\n");
+   strcat(buf, "(*) $2$BKi                                        Player Kill Score$R                       (*)\n");
+   sprintf(buf2, "(*) 1) $4$B%-12s$R 1) $4$B%-12s$R           1) $4$B%-12s$R 1) $4$B%-12s$R        (*)\n",kionlinename[0],kiactivename[0],pkonlinename[0],pkactivename[0]);
+   for(i=1;i<5;i++) {
+      sprintf(buf2, "(*) %d) $B%-12s$R %d) $B%-12s$R (-%-4d)   %d) $B%-12s$R %d) $B%-12s$R (-%-4d) (*)\n",i+1,kionlinename[i],i+1,kiactivename[i],kiactive[0]-kiactive[i],i+1,pkonlinename[i],i+1,pkactivename[i],pkactive[0]-pkactive[i]);
       strcat(buf, buf2);
    }
-   strcat(buf, "(*)                                                                   (*)\n");
-   strcat(buf, "(*) $2$BPlayer Death Score                Real Deaths$R                     (*)\n");
-   for(i=0;i<5;i++) {
-      sprintf(buf2, "(*) %d) $B%-12s$R %d) $B%-12s$R   %d) $B%-12s$R %d) $B%-12s$R (*)\n",i+1,pdonlinename[i],i+1,pdactivename[i],i+1,rdonlinename[i],i+1,rdactivename[i]);
+   strcat(buf, "(*)                                                                                   (*)\n");
+   strcat(buf, "(*) $2$BPlayer Death Score                        Real Deaths (Level 50)$R                  (*)\n");
+   sprintf(buf2, "(*) 1) $4$B%-12s$R 1) $4$B%-12s$R           1) $4$B%-12s$R 1) $4$B%-12s$R         (*)\n",pdonlinename[0],pdactivename[0],rdonlinename[0],rdactivename[0]);
+   for(i=1;i<5;i++) {
+      sprintf(buf2, "(*) %d) $B%-12s$R %d) $B%-12s$R (-%-4d)  %d) $B%-12s$R %d) $B%-12s$R (-%-4d) (*)\n",i+1,pdonlinename[i],i+1,pdactivename[i],pdactive[0]-pdactive[i],i+1,rdonlinename[i],i+1,rdactivename[i],rdactive[0]-rdactive[i]);
       strcat(buf, buf2);
    }
-   strcat(buf, "(*)                                                                   (*)\n");
-   strcat(buf, "(*)-------------------------------------------------------------------(*)\n");
-   strcat(buf, "(*)*******************************************************************(*)\n");
+   strcat(buf, "(*)                                                                                   (*)\n");
+   strcat(buf, "(*)-----------------------------------------------------------------------------------(*)\n");
+   strcat(buf, "(*)***********************************************************************************(*)\n");
    page_string( ch->desc, buf, 1 );
    for(i=0;i<5;i++) dc_free(hpactivename[i]);
    for(i=0;i<5;i++) dc_free(mnactivename[i]);
