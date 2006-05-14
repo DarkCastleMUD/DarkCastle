@@ -2349,11 +2349,17 @@ int execute_song_bountiful_sonnet( ubyte level, CHAR_DATA *ch, char *arg, CHAR_D
          fvictim->follower->in_room != ch->in_room)
          continue;
 
+      af.type      = AFF_BOUNTIFUL_SONNET;
+      af.duration  = skill / 4;
+      af.modifier  = 0;
+      af.location  = NULL;
+      af.bitvector = -1;
+
       send_to_char("You feel like you've just eaten a huge meal!\r\n", fvictim->follower);
       if(GET_COND(fvictim->follower, FULL) != -1)
-         GET_COND(fvictim->follower, FULL) = 20;
+         affect_to_char(ch, &af);
       if(GET_COND(fvictim->follower, THIRST) != -1)
-         GET_COND(fvictim->follower, THIRST) = 20;
+         affect_to_char(ch, &af);
    }
    if(ch->in_room == master->in_room)
    {

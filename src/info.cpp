@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.88 2006/05/14 03:15:27 shane Exp $ */
+/* $Id: info.cpp,v 1.89 2006/05/14 21:34:48 shane Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -2724,29 +2724,32 @@ int do_leaderboard(struct char_data *ch, char *argument, int cmd)
    }
 
    sprintf(buf,"(*)***********************************************************************************(*)\n");
-   strcat(buf, "(*)                           $BDark Castle Leaderboard$R                                 (*)\n");
+   strcat(buf, "(*)                              $BDark Castle Leaderboard$R                              (*)\n");
    strcat(buf, "(*)-----------------------------------------------------------------------------------(*)\n");
-   strcat(buf, "(*)                                                                                   (*)\n");
-   strcat(buf, "(*)    Online          All Time                  Online          All Time             (*)\n");
+   strcat(buf, "(*)                                                                                           (*)\n");
+   strcat(buf, "(*)    Online          All Time                 Online          All Time              (*)\n");
    strcat(buf, "(*)                                                                           (*)\n");
-   strcat(buf, "(*) $2$BHit Points                                Mana$R                            (*)\n");
-   sprintf(buf2, "(*) 1) $4$B%-12s$R 1) $4$B%-12s$R           1) $4$B%-12s$R 1) $4$B%-12s$R         (*)\n",hponlinename[0],hpactivename[0],mnonlinename[0],mnactivename[0]);
+   strcat(buf, "(*) $2$BHit Points                                Mana$R                                    (*)\n");
+   sprintf(buf2, "(*) 1) $5$B%-12s$R 1) $5$B%-12s$R           1) $5$B%-12s$R 1) $5$B%-12s$R         (*)\n",hponlinename[0],hpactivename[0],mnonlinename[0],mnactivename[0]);
+   strcat(buf,buf2);
    for(i=1;i<5;i++) {
-      sprintf(buf2, "(*) %d) $B%-12s$R %d) $B%-12s$R (-%-4d)  %d) $B%-12s$R %d) $B%-12s$R  (-%-4d) (*)\n",i+1,hponlinename[i],i+1,hpactivename[i],hpactive[0]-hpactive[i],i+1,mnonlinename[i],i+1,mnactivename[i],mnactive[0]-mnactive[i]);
+      sprintf(buf2, "(*) %d) $B%-12s$R %d) $B%-12s$R (-%-4d)   %d) $B%-12s$R %d) $B%-12s$R (-%-4d) (*)\n",i+1,hponlinename[i],i+1,hpactivename[i],hpactive[0]-hpactive[i],i+1,mnonlinename[i],i+1,mnactivename[i],mnactive[0]-mnactive[i]);
       strcat(buf, buf2);
    }
    strcat(buf, "(*)                                                                                   (*)\n");
    strcat(buf, "(*) $2$BKi                                        Player Kill Score$R                       (*)\n");
-   sprintf(buf2, "(*) 1) $4$B%-12s$R 1) $4$B%-12s$R           1) $4$B%-12s$R 1) $4$B%-12s$R        (*)\n",kionlinename[0],kiactivename[0],pkonlinename[0],pkactivename[0]);
+   sprintf(buf2, "(*) 1) $5$B%-12s$R 1) $5$B%-12s$R           1) $5$B%-12s$R 1) $5$B%-12s$R        (*)\n",kionlinename[0],kiactivename[0],pkonlinename[0],pkactivename[0]);
+   strcat(buf,buf2);
    for(i=1;i<5;i++) {
       sprintf(buf2, "(*) %d) $B%-12s$R %d) $B%-12s$R (-%-4d)   %d) $B%-12s$R %d) $B%-12s$R (-%-4d) (*)\n",i+1,kionlinename[i],i+1,kiactivename[i],kiactive[0]-kiactive[i],i+1,pkonlinename[i],i+1,pkactivename[i],pkactive[0]-pkactive[i]);
       strcat(buf, buf2);
    }
    strcat(buf, "(*)                                                                                   (*)\n");
    strcat(buf, "(*) $2$BPlayer Death Score                        Real Deaths (Level 50)$R                  (*)\n");
-   sprintf(buf2, "(*) 1) $4$B%-12s$R 1) $4$B%-12s$R           1) $4$B%-12s$R 1) $4$B%-12s$R         (*)\n",pdonlinename[0],pdactivename[0],rdonlinename[0],rdactivename[0]);
+   sprintf(buf2, "(*) 1) $5$B%-12s$R 1) $5$B%-12s$R           1) $5$B%-12s$R 1) $5$B%-12s$R         (*)\n",pdonlinename[0],pdactivename[0],rdonlinename[0],rdactivename[0]);
+   strcat(buf,buf2);
    for(i=1;i<5;i++) {
-      sprintf(buf2, "(*) %d) $B%-12s$R %d) $B%-12s$R (-%-4d)  %d) $B%-12s$R %d) $B%-12s$R (-%-4d) (*)\n",i+1,pdonlinename[i],i+1,pdactivename[i],pdactive[0]-pdactive[i],i+1,rdonlinename[i],i+1,rdactivename[i],rdactive[0]-rdactive[i]);
+      sprintf(buf2, "(*) %d) $B%-12s$R %d) $B%-12s$R (-%-4d)   %d) $B%-12s$R %d) $B%-12s$R (-%-4d) (*)\n",i+1,pdonlinename[i],i+1,pdactivename[i],pdactive[0]-pdactive[i],i+1,rdonlinename[i],i+1,rdactivename[i],rdactive[0]-rdactive[i]);
       strcat(buf, buf2);
    }
    strcat(buf, "(*)                                                                                   (*)\n");
