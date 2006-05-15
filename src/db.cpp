@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.112 2006/05/15 04:31:24 apocalypse Exp $ */
+/* $Id: db.cpp,v 1.113 2006/05/15 21:09:41 apocalypse Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -3148,9 +3148,11 @@ CHAR_DATA *clone_mobile(int nr)
   float mult = 1.0;
   if (!ISSET(mob->mobdata->actflags, ACT_NOMATRIX))
   {
-    if (GET_LEVEL(mob) > 80) { mult = 1.5;}
-    else if (GET_LEVEL(mob) > 70) {mult = 1.3;}
-    else if (GET_LEVEL(mob) > 60) {mult = 1.1;}
+    if (GET_LEVEL(mob) > 100) { mult = 1.5;}
+    else if (GET_LEVEL(mob) > 95) {mult = 1.4;}
+    else if (GET_LEVEL(mob) > 90) {mult = 1.3;}
+    else if (GET_LEVEL(mob) > 85) {mult = 1.2;}
+    else if (GET_LEVEL(mob) > 75) {mult = 1.1;}
   }
   mob->max_hit = mob->raw_hit = mob->hit = mob->max_hit*mult;
   mob->mobdata->damnodice *= mult;
