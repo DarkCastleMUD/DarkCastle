@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.111 2006/05/15 04:10:24 apocalypse Exp $ */
+/* $Id: db.cpp,v 1.112 2006/05/15 04:31:24 apocalypse Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -393,7 +393,7 @@ char * funnybootmessages[] =
   "Finding something fun in game to remove...\r\n",
   "Determining array dope vectors...\r\n",
   "Divide By Cucumber Error. Please Reinstall Universe And Reboot\r\n"
-  "Removing Apocalypse's genital warts....ERROR: Unable to remove warts!\r\n"
+  "Removing Rahz's genital warts....ERROR: Unable to remove warts!\r\n"
   "Removing crash bugs...\r\n"
   "Making Rahz's virtual penis grow...\r\n"
   "Cooking Swedish meatballs...\r\n"

@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.114 2006/05/12 18:36:43 shane Exp $ */
+/* $Id: nanny.cpp,v 1.115 2006/05/15 04:31:24 apocalypse Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -338,11 +338,6 @@ void do_on_login_stuff(char_data * ch)
     {
        GET_AC(ch) -= (GET_LEVEL(ch) * 2);
     }
-/*    if (!str_cmp(GET_NAME(ch), "Apocalypse") && !IS_NPC(ch) && ch->pcdata)
-    {
-	send_to_char("You tosser. Here you go: one silence.\r\n",ch);
-	SET_BIT(ch->pcdata->punish, PUNISH_SILENCED);
-    } */
     if (affected_by_spell(ch,INTERNAL_SLEEPING))
     {
       affect_from_char(ch,INTERNAL_SLEEPING);
@@ -383,13 +378,6 @@ void do_on_login_stuff(char_data * ch)
            if (curr->skillnum == SPELL_POWER_HARM) {
               curr->skillnum = SPELL_DIVINE_FURY;
            }
-//TODO: take this out after a little while
-           if (curr->skillnum == SPELL_DIVINE_FURY) {
-              if(GET_LEVEL(ch) == 50 && curr->learned < 40)
-                 curr->learned = 40;
-           }
-	   curr = curr->next;
-          }
     }
     if (GET_CLASS(ch) == CLASS_ANTI_PAL && GET_LEVEL(ch) >= 44)
     {
@@ -475,17 +463,6 @@ void do_on_login_stuff(char_data * ch)
 	    else { prev = curr; curr = curr->next; }
 	
      }
-    // Remove ventriloquate
-     if (GET_CLASS(ch) == CLASS_MAGIC_USER && has_skill(ch, SPELL_VENTRILOQUATE)) {
-          struct char_skill_data * curr = ch->skills, *prev = NULL;
-          while(curr)
-            if(curr->skillnum == SPELL_VENTRILOQUATE) {
-                if (prev) prev->next = curr->next;
-                else ch->skills = curr->next;
-                FREE(curr);
-                break;
-            } else { prev = curr; curr = curr->next; }
-      }
    // Remove listsongs
      if (GET_CLASS(ch) == CLASS_BARD && has_skill(ch, SKILL_SONG_LIST_SONGS)) {
           struct char_skill_data * curr = ch->skills, *prev = NULL;
@@ -652,7 +629,7 @@ int more_than_ten_people_from_this_ip(struct descriptor_data *new_conn)
       SEND_TO_Q("Sorry, there are more than 6 connections from this IP address\r\n"
                 "already logged into Dark Castle.  If you have a valid reason\r\n"
                 "for having this many connections from one IP please let Apocalypse\r\n"
-                "know and he will speak with you. (dc_apoc@hotmail.com)\r\n",
+                "know and he will speak with you. (DC_Apoc@hotmail.com)\r\n",
                 new_conn);
       close_socket( new_conn );
       return 1;
@@ -664,11 +641,9 @@ int more_than_ten_people_from_this_ip(struct descriptor_data *new_conn)
 const char *host_list[]=
 {
   "62.65.106.", // Urizen
-  "24.165.160.", // Dasein
-  "24.112.103.", // Apocalypse
+  "72.139.200.", // Apocalypse
   "68.167.255.", // Scyld
   "127.0.0.1", // localhost (duh)
-  "68.124.193.", // Valkyrie
 };
 
 bool allowed_host(char *host)
@@ -789,7 +764,7 @@ void nanny(struct descriptor_data *d, char *arg)
          if(file_exists(str_tmp))
          {
             SEND_TO_Q("That character is archived.\n\rPlease mail "
-               "Apocalypse with unarchive requests.\n\r", d);
+               "Apocalypse with unarchive requests (DC_Apoc@hotmail.com).\n\r", d);
             close_socket(d);
             return;
          }
@@ -806,10 +781,12 @@ void nanny(struct descriptor_data *d, char *arg)
 
       if(check_reconnect(d, tmp_name, FALSE))
          fOld = TRUE;
-      else if((wizlock) && !allowed_host(d->host))/* && strcmp(GET_NAME(ch),"Sadus") &&
-         strcmp(GET_NAME(ch),"Pirahna") &&
-         strcmp(GET_NAME(ch),"Valkyrie") &&  strcmp(GET_NAME(ch), "Apocalypse")
-         && strcmp(GET_NAME(ch), "Urizen"))*/
+      else if((wizlock) && !allowed_host(d->host))/* &&
+         strcmp(GET_NAME(ch),"Apocalypse") &&
+         strcmp(GET_NAME(ch),"Urizen") &&
+         strcmp(GET_NAME(ch),"Scyld") &&
+         strcmp(GET_NAME(ch),"Julian") &&
+         strcmp(GET_NAME(ch),"Wendy"))*/
       {
          SEND_TO_Q( "The game is wizlocked.\n\r", d );
          close_socket( d );
@@ -914,11 +891,11 @@ void nanny(struct descriptor_data *d, char *arg)
       case 'y': case 'Y':
 
          if(isbanned(d->host) >= BAN_NEW) {
-            sprintf(buf, "Request for new char %s denied from [%s] (siteban)",
+            sprintf(buf, "Request for new character %s denied from [%s] (siteban)",
                GET_NAME(d->character), d->host);
             log(buf, ANGEL, LOG_SOCKET);
             SEND_TO_Q("Sorry, new chars are not allowed from your site.\n\r"
-                      "Questions may be directed to Apocalypse at dc_apoc@hotmail.com\n\r",
+                      "Questions may be directed to Apocalypse at DC_Apoc@hotmail.com\n\r",
                d);
             STATE(d) = CON_CLOSE;
             return;
@@ -1331,7 +1308,7 @@ is_race_eligible(ch,7)?'*':' ',is_race_eligible(ch,8)?'*':' ',is_race_eligible(c
 	     sprintf(log_buf,"%s has more than a billion gold in the bank. Rich fucker or bugged.",GET_NAME(ch));
 	     log( log_buf, 100, LOG_WARNINGS);
 	  }      
-          send_to_char("\n\rWelcome to Dark Castle Diku Mud.  May your visit here suck.\n\r", ch );
+          send_to_char("\n\rWelcome to Dark Castle.  May your visit here suck.\n\r", ch );
           ch->next            = character_list;
           character_list      = ch;
           
