@@ -106,6 +106,7 @@ extern char help[];
 extern char * sector_types[];
 extern struct room_data ** world_array;
 extern struct char_data *character_list;
+void check_leaderboard(void);
 
 /* local globals */
 struct descriptor_data *descriptor_list = NULL;		/* master desc list */
@@ -1019,6 +1020,7 @@ void heartbeat()
     pulse_regen = number(PULSE_REGEN-8*PASSES_PER_SEC, PULSE_REGEN+5*PASSES_PER_SEC);
     point_update();
     pulse_takeover();
+    check_leaderboard(); //good place to put this
   }
 
   if(--pulse_time < 1) {

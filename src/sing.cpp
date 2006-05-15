@@ -2337,6 +2337,7 @@ int execute_song_bountiful_sonnet( ubyte level, CHAR_DATA *ch, char *arg, CHAR_D
 {
    char_data * master = NULL;
    follow_type * fvictim = NULL;
+   struct affected_type af;
 
    if(ch->master && ch->master->in_room == ch->in_room && 
                     ISSET(ch->affected_by, AFF_GROUP))
@@ -2349,17 +2350,19 @@ int execute_song_bountiful_sonnet( ubyte level, CHAR_DATA *ch, char *arg, CHAR_D
          fvictim->follower->in_room != ch->in_room)
          continue;
 
-      af.type      = AFF_BOUNTIFUL_SONNET;
-      af.duration  = skill / 4;
-      af.modifier  = 0;
-      af.location  = NULL;
-      af.bitvector = -1;
+//      af.type      = SKILL_BOUNTIFUL_SONNET;
+//      af.duration  = skill / 4;
+//      af.modifier  = 0;
+//      af.location  = APPLY_BOUNTIFUL_SONNET;
+//      af.bitvector = -1;
 
       send_to_char("You feel like you've just eaten a huge meal!\r\n", fvictim->follower);
       if(GET_COND(fvictim->follower, FULL) != -1)
-         affect_to_char(ch, &af);
+//         affect_to_char(ch, &af);
+         GET_COND(fvictim->follower, FULL) = 20;
       if(GET_COND(fvictim->follower, THIRST) != -1)
-         affect_to_char(ch, &af);
+//         affect_to_char(ch, &af);
+         GET_COND(fvictim->follower, THIRST) = 20;
    }
    if(ch->in_room == master->in_room)
    {

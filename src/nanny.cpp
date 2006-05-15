@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.115 2006/05/15 04:31:24 apocalypse Exp $ */
+/* $Id: nanny.cpp,v 1.116 2006/05/15 08:44:07 shane Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -375,9 +375,9 @@ void do_on_login_stuff(char_data * ch)
 	  while(curr) {
 	   if (curr->skillnum == SPELL_ARMOR)
 		curr->skillnum = SPELL_AEGIS;
-           if (curr->skillnum == SPELL_POWER_HARM) {
+           if (curr->skillnum == SPELL_POWER_HARM)
               curr->skillnum = SPELL_DIVINE_FURY;
-           }
+          }
     }
     if (GET_CLASS(ch) == CLASS_ANTI_PAL && GET_LEVEL(ch) >= 44)
     {
@@ -642,7 +642,7 @@ const char *host_list[]=
 {
   "62.65.106.", // Urizen
   "72.139.200.", // Apocalypse
-  "68.167.255.", // Scyld
+  "172.192.3.", // Scyld
   "127.0.0.1", // localhost (duh)
 };
 
