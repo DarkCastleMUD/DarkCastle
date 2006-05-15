@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.110 2006/05/12 10:54:08 dcastle Exp $ */
+/* $Id: db.cpp,v 1.111 2006/05/15 04:10:24 apocalypse Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -3059,7 +3059,7 @@ void handle_automatic_mob_settings(char_data * mob)
   if (ISSET(mob->mobdata->actflags, ACT_WIMPY)) alevel -= 1.0;
   if (ISSET(mob->mobdata->actflags, ACT_STUPID)) alevel += 3.0;
   if (ISSET(mob->mobdata->actflags, ACT_HUGE)) alevel -= 1.5;
-  if (ISSET(mob->mobdata->actflags, ACT_DRAINY)) alevel -= 0.5;
+  if (ISSET(mob->mobdata->actflags, ACT_DRAINY)) alevel -= 2.0;
 
   if (!c&& IS_AFFECTED(mob,AFF_SANCTUARY)) alevel -= 0.5;
   if (!c&& IS_AFFECTED(mob,AFF_FIRESHIELD)) alevel -= 0.5;

@@ -316,7 +316,7 @@ int spell_energy_drain(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
 
    gain_exp(victim, 0-mult);
    GET_HIT(victim) -= GET_HIT(victim) /20;
-   send_to_char("Your knees buckle as life force is drained from your body!\n\rYou have lost some experience!", victim);
+   send_to_char("Your knees buckle as life force is drained from your body!\n\rYou have lost some experience!\n\r", victim);
    return eSUCCESS;
 }
 
