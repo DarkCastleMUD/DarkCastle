@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.90 2006/05/15 09:07:00 shane Exp $ */
+/* $Id: info.cpp,v 1.91 2006/05/15 20:06:13 shane Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -2616,6 +2616,7 @@ int do_leaderboard(struct char_data *ch, char *argument, int cmd)
    int   hponline[] = {0,0,0,0,0}, mnonline[] = {0,0,0,0,0}, kionline[] = {0,0,0,0,0}, pkonline[] = {0,0,0,0,0}, pdonline[] = {0,0,0,0,0}, rdonline[] = {0,0,0,0,0};
    char  *hpactivename[5], *mnactivename[5], *kiactivename[5], *pkactivename[5], *pdactivename[5], *rdactivename[5];
    int   hpactive[5], mnactive[5], kiactive[5], pkactive[5], pdactive[5], rdactive[5];
+   int   placea=1,placeb=1,placec=1,placed=1;
 
    check_leaderboard();
 
@@ -2733,23 +2734,37 @@ int do_leaderboard(struct char_data *ch, char *argument, int cmd)
    sprintf(buf2, "(*) 1) $5$B%-12s$R 1) $5$B%-12s$R           1) $5$B%-12s$R 1) $5$B%-12s$R         (*)\n",hponlinename[0],hpactivename[0],mnonlinename[0],mnactivename[0]);
    strcat(buf,buf2);
    for(i=1;i<5;i++) {
-      sprintf(buf2, "(*) %d) $B%-12s$R %d) $B%-12s$R (-%-4d)   %d) $B%-12s$R %d) $B%-12s$R (-%-4d) (*)\n",i+1,hponlinename[i],i+1,hpactivename[i],hpactive[0]-hpactive[i],i+1,mnonlinename[i],i+1,mnactivename[i],mnactive[0]-mnactive[i]);
+      if(hponline[i] != hponline[i-1]) placea++;
+      if(hpactive[i] != hpactive[i-1]) placeb++;
+      if(mnonline[i] != mnonline[i-1]) placec++;
+      if(mnactive[i] != mnactive[i-1]) placed++;
+      sprintf(buf2, "(*) %d) $B%-12s$R %d) $B%-12s$R (-%-4d)   %d) $B%-12s$R %d) $B%-12s$R (-%-4d) (*)\n",placea,hponlinename[i],placeb,hpactivename[i],hpactive[0]-hpactive[i],placec,mnonlinename[i],placed,mnactivename[i],mnactive[0]-mnactive[i]);
       strcat(buf, buf2);
    }
+   placea=1;placeb=1;placec=1;placed=1;
    strcat(buf, "(*)                                                                                   (*)\n");
    strcat(buf, "(*) $2$BKi                                        Player Kill Score$R                       (*)\n");
    sprintf(buf2, "(*) 1) $5$B%-12s$R 1) $5$B%-12s$R           1) $5$B%-12s$R 1) $5$B%-12s$R         (*)\n",kionlinename[0],kiactivename[0],pkonlinename[0],pkactivename[0]);
    strcat(buf,buf2);
    for(i=1;i<5;i++) {
-      sprintf(buf2, "(*) %d) $B%-12s$R %d) $B%-12s$R (-%-4d)   %d) $B%-12s$R %d) $B%-12s$R (-%-4d) (*)\n",i+1,kionlinename[i],i+1,kiactivename[i],kiactive[0]-kiactive[i],i+1,pkonlinename[i],i+1,pkactivename[i],pkactive[0]-pkactive[i]);
+      if(kionline[i] != kionline[i-1]) placea++;
+      if(kiactive[i] != kiactive[i-1]) placeb++;
+      if(pkonline[i] != pkonline[i-1]) placec++;
+      if(pkactive[i] != pkactive[i-1]) placed++;
+      sprintf(buf2, "(*) %d) $B%-12s$R %d) $B%-12s$R (-%-4d)   %d) $B%-12s$R %d) $B%-12s$R (-%-4d) (*)\n",placea,kionlinename[i],placeb,kiactivename[i],kiactive[0]-kiactive[i],placec,pkonlinename[i],placed,pkactivename[i],pkactive[0]-pkactive[i]);
       strcat(buf, buf2);
    }
+   placea=1;placeb=1;placec=1;placed=1;
    strcat(buf, "(*)                                                                                   (*)\n");
    strcat(buf, "(*) $2$BPlayer Death Score                        Real Deaths (Level 50)$R                  (*)\n");
    sprintf(buf2, "(*) 1) $5$B%-12s$R 1) $5$B%-12s$R           1) $5$B%-12s$R 1) $5$B%-12s$R         (*)\n",pdonlinename[0],pdactivename[0],rdonlinename[0],rdactivename[0]);
    strcat(buf,buf2);
    for(i=1;i<5;i++) {
-      sprintf(buf2, "(*) %d) $B%-12s$R %d) $B%-12s$R (-%-4d)   %d) $B%-12s$R %d) $B%-12s$R (-%-4d) (*)\n",i+1,pdonlinename[i],i+1,pdactivename[i],pdactive[0]-pdactive[i],i+1,rdonlinename[i],i+1,rdactivename[i],rdactive[0]-rdactive[i]);
+      if(pdonline[i] != pdonline[i-1]) placea++;
+      if(pdactive[i] != pdactive[i-1]) placeb++;
+      if(rdonline[i] != rdonline[i-1]) placec++;
+      if(rdactive[i] != rdactive[i-1]) placed++;
+      sprintf(buf2, "(*) %d) $B%-12s$R %d) $B%-12s$R (-%-4d)   %d) $B%-12s$R %d) $B%-12s$R (-%-4d) (*)\n",placea,pdonlinename[i],placeb,pdactivename[i],pdactive[0]-pdactive[i],placec,rdonlinename[i],placed,rdactivename[i],rdactive[0]-rdactive[i]);
       strcat(buf, buf2);
    }
    strcat(buf, "(*)                                                                                   (*)\n");
