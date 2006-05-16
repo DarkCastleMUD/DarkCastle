@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.92 2006/05/16 07:20:44 shane Exp $ */
+/* $Id: info.cpp,v 1.93 2006/05/16 09:01:06 shane Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -3051,9 +3051,13 @@ int do_leaderboard(struct char_data *ch, char *argument, int cmd)
 
    sprintf(buf,"(*)***********************************************************************************(*)\n");
    strcat(buf, "(*)                              $BDark Castle Leaderboard$R                              (*)\n");
+   if(validclass) {
+      k!=2 ? sprintf(buf2, "(*)                                 $Bfor %11ss$R                                  (*)\n",clss_types[k]) : sprintf(buf2, "(*)                                 $Bfor      thieves$R                                  (*)\n");
+      strcat(buf,buf2);
+   }
    strcat(buf, "(*)-----------------------------------------------------------------------------------(*)\n");
    strcat(buf, "(*)                                                                                   (*)\n");
-   strcat(buf, "(*)    Online          All Time                   Online          All Time            (*)\n");
+   strcat(buf, "(*)    Online          All Time                  Online          All Time             (*)\n");
    strcat(buf, "(*)                                                                                   (*)\n");
    strcat(buf, "(*) $2$BHit Points                                Mana$R                                    (*)\n");
    sprintf(buf2, "(*) 1) $5$B%-12s$R 1) $5$B%-12s$R           1) $5$B%-12s$R 1) $5$B%-12s$R         (*)\n",hponlinename[0],hpactivename[0],mnonlinename[0],mnactivename[0]);
