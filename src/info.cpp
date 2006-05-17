@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.94 2006/05/17 09:21:44 shane Exp $ */
+/* $Id: info.cpp,v 1.95 2006/05/17 09:54:30 shane Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -2911,70 +2911,7 @@ int do_leaderboard(struct char_data *ch, char *argument, int cmd)
       if(GET_MAX_HIT(d->character) > 15000) continue;
 
       if(validclass && GET_CLASS(d->character) != k + 1) continue;
-/*
-      for(i=0;i<5;i++) {
-         if(!strcmp(hponlinename[i],GET_NAME(d->character))) {
-            for(j=i;j<4;j++) {
-               hponline[j] = hponline[j+1];
-               dc_free(hponlinename[j]);
-               hponlinename[j] = str_dup(hponlinename[j+1]);		
-            }
-            hponline[4] = 0;
-            dc_free(hponlinename[4]);
-            hponlinename[4] = str_dup(" ");		
-         }
-         if(!strcmp(mnonlinename[i],GET_NAME(d->character))) {
-            for(j=i;j<4;j++) {
-               mnonline[j] = mnonline[j+1];
-               dc_free(mnonlinename[j]);
-               mnonlinename[j] = str_dup(mnonlinename[j+1]);		
-            }
-            mnonline[4] = 0;
-            dc_free(mnonlinename[4]);
-            mnonlinename[4] = str_dup(" ");		
-         }
-         if(!strcmp(kionlinename[i],GET_NAME(d->character))) {
-            for(j=i;j<4;j++) {
-               kionline[j] = kionline[j+1];
-               dc_free(kionlinename[j]);
-               kionlinename[j] = str_dup(kionlinename[j+1]);		
-            }
-            kionline[4] = 0;
-            dc_free(kionlinename[4]);
-            kionlinename[4] = str_dup(" ");		
-         }
-         if(!strcmp(pkonlinename[i],GET_NAME(d->character))) {
-            for(j=i;j<4;j++) {
-               pkonline[j] = pkonline[j+1];
-               dc_free(pkonlinename[j]);
-               pkonlinename[j] = str_dup(pkonlinename[j+1]);		
-            }
-            pkonline[4] = 0;
-            dc_free(pkonlinename[4]);
-            pkonlinename[4] = str_dup(" ");		
-         }
-         if(!strcmp(pdonlinename[i],GET_NAME(d->character))) {
-            for(j=i;j<4;j++) {
-               pdonline[j] = pdonline[j+1];
-               dc_free(pdonlinename[j]);
-               pdonlinename[j] = str_dup(pdonlinename[j+1]);
-            }
-            pdonline[4] = 0;
-            dc_free(pdonlinename[4]);
-            pdonlinename[4] = str_dup(" ");		
-         }
-         if(!strcmp(rdonlinename[i],GET_NAME(d->character))) {
-            for(j=i;j<4;j++) {
-               rdonline[j] = rdonline[j+1];
-               dc_free(rdonlinename[j]);
-               rdonlinename[j] = str_dup(rdonlinename[j+1]);
-            }
-            rdonline[4] = 0;
-            dc_free(rdonlinename[4]);
-            rdonlinename[4] = str_dup(" ");		
-         }
-      }
-*/
+
       for(i=0;i<5;i++) {
          if(GET_MAX_HIT(d->character) > hponline[i]) {
             for(j=4;j>i;j--) {
