@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.97 2006/05/17 18:44:15 shane Exp $ */
+/* $Id: info.cpp,v 1.98 2006/05/17 18:48:10 shane Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -3003,7 +3003,7 @@ int do_leaderboard(struct char_data *ch, char *argument, int cmd)
    strcat(buf, "(*)                                                                           (*)\n");
    strcat(buf, "(*)    Online         All Time                Online        All Time          (*)\n");
    strcat(buf, "(*)                                                                           (*)\n");
-   strcat(buf, "(*)          $2$BHit Points                            Mana$R                      (*)\n");
+   strcat(buf, "(*)          $2$BHit Points                             Mana$R                      (*)\n");
    sprintf(buf2, "(*) 1) $5$B%-12s$R1) $5$B%-12s$R        1) $5$B%-12s$R1) $5$B%-12s$R      (*)\n",hponlinename[0],hpactivename[0],mnonlinename[0],mnactivename[0]);
    strcat(buf,buf2);
    for(i=1;i<5;i++) {
@@ -3032,7 +3032,7 @@ int do_leaderboard(struct char_data *ch, char *argument, int cmd)
    }
    placea=1;placeb=1;placec=1;placed=1;skippeda=0;skippedb=0;skippedc=0;skippedd=0;
    strcat(buf, "(*)                                                                           (*)\n");
-   strcat(buf, "(*)              $2$BKi                             Player Kill Score$R            (*)\n");
+   strcat(buf, "(*)              $2$BKi                             Player Kill Score$R             (*)\n");
    sprintf(buf2, "(*) 1) $5$B%-12s$R1) $5$B%-12s$R        1) $5$B%-12s$R1) $5$B%-12s$R      (*)\n",kionlinename[0],kiactivename[0],pkonlinename[0],pkactivename[0]);
    strcat(buf,buf2);
    for(i=1;i<5;i++) {
@@ -3061,7 +3061,7 @@ int do_leaderboard(struct char_data *ch, char *argument, int cmd)
    }
    placea=1;placeb=1;placec=1;placed=1;skippeda=0;skippedb=0;skippedc=0;skippedd=0;
    strcat(buf, "(*)                                                                           (*)\n");
-   strcat(buf, "(*)      $2$BPlayer Death Score                  Real Deaths (Level 50)$R          (*)\n");
+   strcat(buf, "(*)      $2$BPlayer Death Score                  Real Deaths (Level 50)$R           (*)\n");
    sprintf(buf2, "(*) 1) $5$B%-12s$R1) $5$B%-12s$R        1) $5$B%-12s$R1) $5$B%-12s$R      (*)\n",pdonlinename[0],pdactivename[0],rdonlinename[0],rdactivename[0]);
    strcat(buf,buf2);
    for(i=1;i<5;i++) {
