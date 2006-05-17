@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.93 2006/05/16 09:01:06 shane Exp $ */
+/* $Id: info.cpp,v 1.94 2006/05/17 09:21:44 shane Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -2824,6 +2824,13 @@ int do_leaderboard(struct char_data *ch, char *argument, int cmd)
 
    check_leaderboard();
 
+   for(i=0;i<5;i++) hponlinename[i] = str_dup(" ");
+   for(i=0;i<5;i++) mnonlinename[i] = str_dup(" ");
+   for(i=0;i<5;i++) kionlinename[i] = str_dup(" ");
+   for(i=0;i<5;i++) pkonlinename[i] = str_dup(" ");
+   for(i=0;i<5;i++) pdonlinename[i] = str_dup(" ");
+   for(i=0;i<5;i++) rdonlinename[i] = str_dup(" ");
+
    one_argument(argument,buf);
    for(k=0;k<11;k++)  {
       if(is_abbrev(buf, clss_types[k])) {
@@ -2904,7 +2911,7 @@ int do_leaderboard(struct char_data *ch, char *argument, int cmd)
       if(GET_MAX_HIT(d->character) > 15000) continue;
 
       if(validclass && GET_CLASS(d->character) != k + 1) continue;
-
+/*
       for(i=0;i<5;i++) {
          if(!strcmp(hponlinename[i],GET_NAME(d->character))) {
             for(j=i;j<4;j++) {
@@ -2967,7 +2974,7 @@ int do_leaderboard(struct char_data *ch, char *argument, int cmd)
             rdonlinename[4] = str_dup(" ");		
          }
       }
-
+*/
       for(i=0;i<5;i++) {
          if(GET_MAX_HIT(d->character) > hponline[i]) {
             for(j=4;j>i;j--) {
