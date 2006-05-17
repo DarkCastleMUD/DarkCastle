@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.99 2006/05/17 18:56:09 shane Exp $ */
+/* $Id: info.cpp,v 1.100 2006/05/17 18:58:01 shane Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -3003,7 +3003,7 @@ int do_leaderboard(struct char_data *ch, char *argument, int cmd)
    strcat(buf, "(*)                                                                           (*)\n");
    strcat(buf, "(*)    Online         All Time                Online        All Time          (*)\n");
    strcat(buf, "(*)                                                                           (*)\n");
-   strcat(buf, "(*)            $2$BHit Points                              Mana$R                   (*)\n");
+   strcat(buf, "(*)            $2$BHit Points                               Mana$R                  (*)\n");
    sprintf(buf2, "(*) 1) $5$B%-12s$R1) $5$B%-12s$R        1) $5$B%-12s$R1) $5$B%-12s$R      (*)\n",hponlinename[0],hpactivename[0],mnonlinename[0],mnactivename[0]);
    strcat(buf,buf2);
    for(i=1;i<5;i++) {
