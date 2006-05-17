@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.95 2006/05/17 09:54:30 shane Exp $ */
+/* $Id: info.cpp,v 1.96 2006/05/17 10:26:27 shane Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -2993,18 +2993,18 @@ int do_leaderboard(struct char_data *ch, char *argument, int cmd)
       }
    }
 
-   sprintf(buf,"(*)***********************************************************************************(*)\n");
-   strcat(buf, "(*)                              $BDark Castle Leaderboard$R                              (*)\n");
+   sprintf(buf,"(*)***************************************************************************(*)\n");
+   strcat(buf, "(*)                          $BDark Castle Leaderboard$R                          (*)\n");
    if(validclass) {
-      k!=2 ? sprintf(buf2, "(*)                                 $Bfor %11ss$R                                  (*)\n",clss_types[k]) : sprintf(buf2, "(*)                                 $Bfor      thieves$R                                  (*)\n");
+      k!=2 ? sprintf(buf2, "(*)                             $Bfor %11ss$R                              (*)\n",clss_types[k]) : sprintf(buf2, "(*)                             $Bfor      thieves$R                              (*)\n");
       strcat(buf,buf2);
    }
-   strcat(buf, "(*)-----------------------------------------------------------------------------------(*)\n");
-   strcat(buf, "(*)                                                                                   (*)\n");
-   strcat(buf, "(*)    Online          All Time                  Online          All Time             (*)\n");
-   strcat(buf, "(*)                                                                                   (*)\n");
-   strcat(buf, "(*) $2$BHit Points                                Mana$R                                    (*)\n");
-   sprintf(buf2, "(*) 1) $5$B%-12s$R 1) $5$B%-12s$R           1) $5$B%-12s$R 1) $5$B%-12s$R         (*)\n",hponlinename[0],hpactivename[0],mnonlinename[0],mnactivename[0]);
+   strcat(buf, "(*)---------------------------------------------------------------------------(*)\n");
+   strcat(buf, "(*)                                                                           (*)\n");
+   strcat(buf, "(*)    Online         All Time                Online        All Time          (*)\n");
+   strcat(buf, "(*)                                                                           (*)\n");
+   strcat(buf, "(*) $2$BHit Points                            Mana$R                                (*)\n");
+   sprintf(buf2, "(*) 1) $5$B%-12s$R1) $5$B%-12s$R        1) $5$B%-12s$R1) $5$B%-12s$R      (*)\n",hponlinename[0],hpactivename[0],mnonlinename[0],mnactivename[0]);
    strcat(buf,buf2);
    for(i=1;i<5;i++) {
       if(hponline[i] != hponline[i-1]) {
@@ -3027,13 +3027,13 @@ int do_leaderboard(struct char_data *ch, char *argument, int cmd)
          skippedd = 0;
       }
       else skippedd++;
-      sprintf(buf2, "(*) %d) $B%-12s$R %d) $B%-12s$R (-%-4d)   %d) $B%-12s$R %d) $B%-12s$R (-%-4d) (*)\n",placea,hponlinename[i],placeb,hpactivename[i],hpactive[0]-hpactive[i],placec,mnonlinename[i],placed,mnactivename[i],mnactive[0]-mnactive[i]);
+      sprintf(buf2, "(*) %d) $B%-12s$R%d) $B%-12s$R-%-4d   %d) $B%-12s$R%d) $B%-12s$R-%-4d (*)\n",placea,hponlinename[i],placeb,hpactivename[i],hpactive[0]-hpactive[i],placec,mnonlinename[i],placed,mnactivename[i],mnactive[0]-mnactive[i]);
       strcat(buf, buf2);
    }
    placea=1;placeb=1;placec=1;placed=1;skippeda=0;skippedb=0;skippedc=0;skippedd=0;
-   strcat(buf, "(*)                                                                                   (*)\n");
-   strcat(buf, "(*) $2$BKi                                        Player Kill Score$R                       (*)\n");
-   sprintf(buf2, "(*) 1) $5$B%-12s$R 1) $5$B%-12s$R           1) $5$B%-12s$R 1) $5$B%-12s$R         (*)\n",kionlinename[0],kiactivename[0],pkonlinename[0],pkactivename[0]);
+   strcat(buf, "(*)                                                                           (*)\n");
+   strcat(buf, "(*) $2$BKi                                    Player Kill Score$R                   (*)\n");
+   sprintf(buf2, "(*) 1) $5$B%-12s$R1) $5$B%-12s$R        1) $5$B%-12s$R1) $5$B%-12s$R      (*)\n",kionlinename[0],kiactivename[0],pkonlinename[0],pkactivename[0]);
    strcat(buf,buf2);
    for(i=1;i<5;i++) {
       if(kionline[i] != kionline[i-1]) {
@@ -3056,13 +3056,13 @@ int do_leaderboard(struct char_data *ch, char *argument, int cmd)
          skippedd = 0;
       }
       else skippedd++;
-      sprintf(buf2, "(*) %d) $B%-12s$R %d) $B%-12s$R (-%-4d)   %d) $B%-12s$R %d) $B%-12s$R (-%-4d) (*)\n",placea,kionlinename[i],placeb,kiactivename[i],kiactive[0]-kiactive[i],placec,pkonlinename[i],placed,pkactivename[i],pkactive[0]-pkactive[i]);
+      sprintf(buf2, "(*) %d) $B%-12s$R%d) $B%-12s$R-%-4d   %d) $B%-12s$R%d) $B%-12s$R-%-4d (*)\n",placea,kionlinename[i],placeb,kiactivename[i],kiactive[0]-kiactive[i],placec,pkonlinename[i],placed,pkactivename[i],pkactive[0]-pkactive[i]);
       strcat(buf, buf2);
    }
    placea=1;placeb=1;placec=1;placed=1;skippeda=0;skippedb=0;skippedc=0;skippedd=0;
-   strcat(buf, "(*)                                                                                   (*)\n");
-   strcat(buf, "(*) $2$BPlayer Death Score                        Real Deaths (Level 50)$R                  (*)\n");
-   sprintf(buf2, "(*) 1) $5$B%-12s$R 1) $5$B%-12s$R           1) $5$B%-12s$R 1) $5$B%-12s$R         (*)\n",pdonlinename[0],pdactivename[0],rdonlinename[0],rdactivename[0]);
+   strcat(buf, "(*)                                                                           (*)\n");
+   strcat(buf, "(*) $2$BPlayer Death Score                    Real Deaths (Level 50)$R              (*)\n");
+   sprintf(buf2, "(*) 1) $5$B%-12s$R1) $5$B%-12s$R        1) $5$B%-12s$R1) $5$B%-12s$R      (*)\n",pdonlinename[0],pdactivename[0],rdonlinename[0],rdactivename[0]);
    strcat(buf,buf2);
    for(i=1;i<5;i++) {
       if(pdonline[i] != pdonline[i-1]) {
@@ -3085,12 +3085,12 @@ int do_leaderboard(struct char_data *ch, char *argument, int cmd)
          skippedd = 0;
       }
       else skippedd++;
-      sprintf(buf2, "(*) %d) $B%-12s$R %d) $B%-12s$R (-%-4d)   %d) $B%-12s$R %d) $B%-12s$R (-%-4d) (*)\n",placea,pdonlinename[i],placeb,pdactivename[i],pdactive[0]-pdactive[i],placec,rdonlinename[i],placed,rdactivename[i],rdactive[0]-rdactive[i]);
+      sprintf(buf2, "(*) %d) $B%-12s$R%d) $B%-12s$R-%-4d   %d) $B%-12s$R%d) $B%-12s$R-%-4d (*)\n",placea,pdonlinename[i],placeb,pdactivename[i],pdactive[0]-pdactive[i],placec,rdonlinename[i],placed,rdactivename[i],rdactive[0]-rdactive[i]);
       strcat(buf, buf2);
    }
-   strcat(buf, "(*)                                                                                   (*)\n");
-   strcat(buf, "(*)-----------------------------------------------------------------------------------(*)\n");
-   strcat(buf, "(*)***********************************************************************************(*)\n");
+   strcat(buf, "(*)                                                                           (*)\n");
+   strcat(buf, "(*)---------------------------------------------------------------------------(*)\n");
+   strcat(buf, "(*)***************************************************************************(*)\n");
    page_string( ch->desc, buf, 1 );
    for(i=0;i<5;i++) dc_free(hponlinename[i]);
    for(i=0;i<5;i++) dc_free(mnonlinename[i]);
