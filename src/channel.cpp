@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: channel.cpp,v 1.13 2006/05/11 21:09:47 dcastle Exp $
+| $Id: channel.cpp,v 1.14 2006/05/18 07:46:00 shane Exp $
 | channel.C
 | Description:  All of the channel - type commands; do_say, gossip, etc..
 */
@@ -398,21 +398,21 @@ int do_trivia(struct char_data *ch, char *argument, int cmd)
   }
 
   if(GET_LEVEL(ch) >= 102) {
-    sprintf(buf1, "$3$BQuestion $R$3($n)$B: '%s'$R", argument);
+    sprintf(buf1, "$3$BQuestion $R$3(%s)$B: '%s'$R", GET_SHORT(ch), argument);
     sprintf(buf2, "$3$BYou ask, $R$3'%s'$R", argument); 
   }
   else {
-    sprintf(buf1, "$3$B$n answers '%s'$R", argument);
+    sprintf(buf1, "$3$B%s answers '%s'$R", GET_SHORT(ch), argument);
     sprintf(buf2, "$3$BYou answer '%s'$R", argument);
   }
     
-  act(buf2, ch, 0, 0, TO_CHAR, 0);
+  send_to_char(buf2, ch);
 
   for(i = descriptor_list; i; i = i->next)
     if(i->character != ch && !i->connected && 
        (IS_SET(i->character->misc, CHANNEL_TRIVIA)) &&
             !is_ignoring(i->character, ch))
-      act(buf1, ch, 0, i->character, TO_VICT, 0);
+      send_to_char(buf1, i->character);
   return eSUCCESS;
 }
 
@@ -763,10 +763,10 @@ int do_newbie(struct char_data *ch, char *argument, int cmd)
       return do_say(ch, "Why don't you just do that yourself!", 9);
     }
 
-    if(GET_POS(ch) == POSITION_SLEEPING) {
-      send_to_char("You're asleep.  Dream or something....\r\n", ch);
-      return eSUCCESS;
-    }
+//    if(GET_POS(ch) == POSITION_SLEEPING) {
+//      send_to_char("You're asleep.  Dream or something....\r\n", ch);
+//      return eSUCCESS;
+//    }
 
     if(!IS_NPC(ch)) {
       if(IS_SET(ch->pcdata->punish, PUNISH_SILENCED)) {
@@ -791,15 +791,15 @@ int do_newbie(struct char_data *ch, char *argument, int cmd)
         GET_MOVE(ch) += 5;
         return eSUCCESS;
       }
-      sprintf(buf1, "$5$n newbies '$R$B%s$R$5'$R", argument);
+      sprintf(buf1, "$5%s newbies '$R$B%s$R$5'$R", GET_SHORT(ch), argument);
       sprintf(buf2, "$5You newbie '$R$B%s$R$5'$R", argument);
-      act(buf2, ch, 0, 0, TO_CHAR, 0);
+      send_to_char(buf2, ch);
 
       for(i = descriptor_list; i; i = i->next)
 	 if(i->character != ch && !i->connected && 
            !is_ignoring(i->character, ch) &&
     	   (IS_SET(i->character->misc, CHANNEL_NEWBIE)) )
-	  act(buf1, ch, 0, i->character, TO_VICT, 0);
+          send_to_char(buf1, i->character);
     }
     return eSUCCESS;
 }

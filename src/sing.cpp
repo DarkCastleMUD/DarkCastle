@@ -2053,6 +2053,10 @@ int execute_song_fanatical_fanfare(ubyte level, CHAR_DATA *ch, char *arg, CHAR_D
             REMBIT(fvictim->follower->affected_by, AFF_INSOMNIA);
             send_to_char("Your mind returns to its normal state.\n\r", fvictim->follower);
          }
+         if(IS_AFFECTED(fvictim->follower, AFF_FEARLESS))
+            REMBIT(fvictim->follower->affected_by, AFF_FEARLESS);
+         if(IS_AFFECTED(fvictim->follower, AFF_NO_PARA))
+            REMBIT(fvictim->follower->affected_by, AFF_NO_PARA);
          continue;
       }
       if(affected_by_spell(fvictim->follower, SPELL_INSOMNIA))
@@ -2061,6 +2065,8 @@ int execute_song_fanatical_fanfare(ubyte level, CHAR_DATA *ch, char *arg, CHAR_D
          send_to_char("Your mind returns to its normal state.\n\r", fvictim->follower);
       }
       SETBIT(fvictim->follower->affected_by, AFF_INSOMNIA);
+      if (skill > 85) SETBIT(fvictim->follower->affected_by, AFF_FEARLESS);
+      if (skill > 90) SETBIT(fvictim->follower->affected_by, AFF_NO_PARA);
       send_to_char("Your mind races at a thousand miles an hour, following the beat of the song!\r\n", fvictim->follower);
    }
 
@@ -2068,6 +2074,8 @@ int execute_song_fanatical_fanfare(ubyte level, CHAR_DATA *ch, char *arg, CHAR_D
    if(ch->in_room == master->in_room &&!ended) 
    {
       SETBIT(master->affected_by, AFF_INSOMNIA);
+      if (skill > 85) SETBIT(fvictim->follower->affected_by, AFF_FEARLESS);
+      if (skill > 90) SETBIT(fvictim->follower->affected_by, AFF_NO_PARA);
       send_to_char("Your song causes your mind to race at a thousand miles an hour!\r\n", master);
    }
    else
@@ -2078,6 +2086,10 @@ int execute_song_fanatical_fanfare(ubyte level, CHAR_DATA *ch, char *arg, CHAR_D
          REMBIT(master->affected_by, AFF_INSOMNIA);
          send_to_char("Your mind returns to its normal state.\n\r", master);
       }
+      if(IS_AFFECTED(fvictim->follower, AFF_FEARLESS))
+         REMBIT(fvictim->follower->affected_by, AFF_FEARLESS);
+      if(IS_AFFECTED(fvictim->follower, AFF_NO_PARA))
+         REMBIT(fvictim->follower->affected_by, AFF_NO_PARA);
    }
 
 
@@ -2251,6 +2263,11 @@ int intrp_song_fanatical_fanfare( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DA
          REMBIT(fvictim->follower->affected_by, AFF_INSOMNIA);
          send_to_char("Your mind returns to its normal state.\n\r", fvictim->follower);
       }
+      if(IS_AFFECTED(fvictim->follower, AFF_FEARLESS))
+         REMBIT(fvictim->follower->affected_by, AFF_FEARLESS);
+      if(IS_AFFECTED(fvictim->follower, AFF_NO_PARA))
+         REMBIT(fvictim->follower->affected_by, AFF_NO_PARA);
+
    }
 
    if (!origsing || origsing == master)
@@ -2260,6 +2277,11 @@ int intrp_song_fanatical_fanfare( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DA
       REMBIT(master->affected_by, AFF_INSOMNIA);
       send_to_char("Your mind returns to its normal state.\r\n", master);
    }
+   if(IS_AFFECTED(fvictim->follower, AFF_FEARLESS))
+      REMBIT(fvictim->follower->affected_by, AFF_FEARLESS);
+   if(IS_AFFECTED(fvictim->follower, AFF_NO_PARA))
+      REMBIT(fvictim->follower->affected_by, AFF_NO_PARA);
+
    return eSUCCESS;
 
 }
@@ -2350,27 +2372,32 @@ int execute_song_bountiful_sonnet( ubyte level, CHAR_DATA *ch, char *arg, CHAR_D
          fvictim->follower->in_room != ch->in_room)
          continue;
 
-//      af.type      = SKILL_BOUNTIFUL_SONNET;
-//      af.duration  = skill / 4;
-//      af.modifier  = 0;
-//      af.location  = APPLY_BOUNTIFUL_SONNET;
-//      af.bitvector = -1;
+      af.type      = SKILL_SONG_BOUNT_SONNET;
+      af.duration  = skill / 4;
+      af.modifier  = 0;
+      af.bitvector = -1;
 
       send_to_char("You feel like you've just eaten a huge meal!\r\n", fvictim->follower);
-      if(GET_COND(fvictim->follower, FULL) != -1)
-//         affect_to_char(ch, &af);
-         GET_COND(fvictim->follower, FULL) = 20;
-      if(GET_COND(fvictim->follower, THIRST) != -1)
-//         affect_to_char(ch, &af);
-         GET_COND(fvictim->follower, THIRST) = 20;
+      if(GET_COND(fvictim->follower, FULL) != -1) {
+         af.location  = APPLY_BOUNT_SONNET_HUNGER;
+         affect_to_char(fvictim->follower, &af);
+      }
+      if(GET_COND(fvictim->follower, THIRST) != -1) {
+         af.location  = APPLY_BOUNT_SONNET_THIRST;
+         affect_to_char(fvictim->follower, &af);
+      }
    }
    if(ch->in_room == master->in_room)
    {
       send_to_char("You feel like you've just eaten a huge meal!\r\n", master);
-      if(GET_COND(master, FULL) != -1)
-         GET_COND(master, FULL) = 20;
-      if(GET_COND(master, THIRST) != -1)
-         GET_COND(master, THIRST) = 20;
+      if(GET_COND(master, FULL) != -1) {
+         af.location  = APPLY_BOUNT_SONNET_HUNGER;
+         affect_to_char(fvictim->follower, &af);
+      }
+      if(GET_COND(master, THIRST) != -1) {
+         af.location  = APPLY_BOUNT_SONNET_THIRST;
+         affect_to_char(fvictim->follower, &af);
+      }
    }
    return eSUCCESS;
 }
@@ -2621,30 +2648,43 @@ int execute_song_vigilant_siren( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DAT
       if(!ISSET(fvictim->follower->affected_by, AFF_GROUP))
          continue;
 
-      if(ch->in_room != fvictim->follower->in_room &&
-         ISSET(fvictim->follower->affected_by, AFF_ALERT))
-      {
-         REMBIT(fvictim->follower->affected_by, AFF_ALERT);
-         send_to_char("You stop watching your back so closely.\r\n", fvictim->follower);
+      if(ch->in_room != fvictim->follower->in_room) {
+         if(ISSET(fvictim->follower->affected_by, AFF_ALERT)) {
+            REMBIT(fvictim->follower->affected_by, AFF_ALERT);
+            send_to_char("You stop watching your back so closely.\r\n", fvictim->follower);
+         }
+         if(IS_AFFECTED(fvictim->follower, AFF_NO_CIRCLE))
+            REMBIT(fvictim->follower->affected_by, AFF_NO_CIRCLE);
+         if(IS_AFFECTED(fvictim->follower, AFF_NO_BEHEAD))
+            REMBIT(fvictim->follower->affected_by, AFF_NO_BEHEAD);
          continue;
       }
       if (ch->in_room != fvictim->follower->in_room) continue;
       SETBIT(fvictim->follower->affected_by, AFF_ALERT);
+      if(skill > 85) SETBIT(fvictim->follower->affected_by, AFF_NO_CIRCLE);
+      if(skill > 90) SETBIT(fvictim->follower->affected_by, AFF_NO_BEHEAD);
       send_to_char("You nervously watch your surroundings with magical speed!\r\n", fvictim->follower);
    }
 
    if(ch->in_room == master->in_room)
    {
       SETBIT(master->affected_by, AFF_ALERT);
+      if(skill > 85) SETBIT(fvictim->follower->affected_by, AFF_NO_CIRCLE);
+      if(skill > 90) SETBIT(fvictim->follower->affected_by, AFF_NO_BEHEAD);
       send_to_char("You nervously watch your surroundings with magical speed!\r\n", master);
    }
-   else if(ISSET(master->affected_by, AFF_ALERT))
-   {
-      REMBIT(master->affected_by, AFF_ALERT);
-      send_to_char("You stop watching your back so closely.\r\n", fvictim->follower);
+   else {
+      if(ISSET(master->affected_by, AFF_ALERT)) {
+         REMBIT(master->affected_by, AFF_ALERT);
+         send_to_char("You stop watching your back so closely.\r\n", fvictim->follower);
+      }
+      if(IS_AFFECTED(fvictim->follower, AFF_NO_CIRCLE))
+         REMBIT(fvictim->follower->affected_by, AFF_NO_CIRCLE);
+      if(IS_AFFECTED(fvictim->follower, AFF_NO_BEHEAD))
+         REMBIT(fvictim->follower->affected_by, AFF_NO_BEHEAD);
    }
 
-   GET_KI(ch) -= 1;
+   GET_KI(ch) -= skill > 85 ? 2 : 1;
 
    ch->song_timer = song_info[ch->song_number].beats + 
                              (GET_LEVEL(ch) > 48);
@@ -2674,6 +2714,10 @@ int intrp_vigilant_siren( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict
          REMBIT(fvictim->follower->affected_by, AFF_ALERT);
          send_to_char("You stop watching your back so closely.\r\n", fvictim->follower);
       }
+      if(IS_AFFECTED(fvictim->follower, AFF_NO_CIRCLE))
+         REMBIT(fvictim->follower->affected_by, AFF_NO_CIRCLE);
+      if(IS_AFFECTED(fvictim->follower, AFF_NO_BEHEAD))
+         REMBIT(fvictim->follower->affected_by, AFF_NO_BEHEAD);
    }
 
    if (!origsing || origsing == ch)
@@ -2681,6 +2725,11 @@ int intrp_vigilant_siren( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict
       REMBIT(master->affected_by, AFF_ALERT);
       send_to_char("You stop watching your back so closely.\r\n", master);
    }
+   if(IS_AFFECTED(fvictim->follower, AFF_NO_CIRCLE))
+      REMBIT(fvictim->follower->affected_by, AFF_NO_CIRCLE);
+   if(IS_AFFECTED(fvictim->follower, AFF_NO_BEHEAD))
+      REMBIT(fvictim->follower->affected_by, AFF_NO_BEHEAD);
+
    return eSUCCESS;
 }
 

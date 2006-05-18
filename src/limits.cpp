@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.68 2006/05/15 08:44:07 shane Exp $ */
+/* $Id: limits.cpp,v 1.69 2006/05/18 07:46:00 shane Exp $ */
 
 extern "C"
 {
@@ -636,6 +636,11 @@ void gain_condition(CHAR_DATA *ch,int condition,int value)
 
     if(GET_COND(ch, condition)==-1) /* No change */
 	return;
+
+    if(condition == FULL && IS_AFFECTED(ch, AFF_BOUNT_SONNET_HUNGER))
+       return;
+    if(condition == THIRST && IS_AFFECTED(ch, AFF_BOUNT_SONNET_THIRST))
+       return;
 
     intoxicated=(GET_COND(ch, DRUNK) > 0);
 

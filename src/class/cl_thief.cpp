@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.120 2006/05/11 21:26:11 dcastle Exp $
+| $Id: cl_thief.cpp,v 1.121 2006/05/18 07:46:05 shane Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -316,6 +316,13 @@ int do_circle(CHAR_DATA *ch, char *argument, int cmd)
    if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE) &&
 	has_skill(ch, SKILL_CIRCLE) <= 80) {
       send_to_char("You cannot circle behind someone that HUGE!\n\r", ch);
+      return eFAILURE;
+   }
+
+   if(IS_AFFECTED(victim, AFF_NO_CIRCLE)) {
+      act("$N notices your attempt and turns $S back away from you!", ch, 0, victim, TO_CHAR, 0);
+      act("$N notives $n's attempt to circle behind, and backs away quickly!", ch, 0, victim, TO_ROOM, NOTVICT);
+      act("You see $n try to circle around you, and quickly block his access!", ch, 0, victim, TO_VICT, 0);
       return eFAILURE;
    }
        

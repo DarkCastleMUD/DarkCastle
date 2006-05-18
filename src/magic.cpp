@@ -1371,7 +1371,7 @@ int spell_paralyze(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
      }
   }
 
-  if(IS_SET(victim->immune, ISR_PARA)) {
+  if(IS_SET(victim->immune, ISR_PARA) || IS_AFFECTED(victim, AFF_NO_PARA)) {
      act("$N absorbs your puny spell and seems no different!", ch, NULL, victim, TO_CHAR, 0);
      act("$N absorbs $n's puny spell and seems no different!", ch, NULL, victim, TO_ROOM, NOTVICT);
      if(!IS_NPC(victim))
@@ -2503,7 +2503,7 @@ int spell_remove_curse(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
   for(obj = victim->carrying; obj; obj = obj->next_content)
 	  if(IS_SET(obj->obj_flags.extra_flags, ITEM_NODROP)) {
 		 act("$n's $p briefly glows $3blue$R.", victim, obj, 0, TO_ROOM, 0);
-                 act("The $p briefly glows $3blue$R.", ch, obj, 0, TO_CHAR, 0); 
+                 act("The $p briefly glows $3blue$R.", victim, obj, 0, TO_CHAR, 0); 
 		if (skill > 70 && obj_index[obj->item_number].virt == 514)
 		{
 			int i = 0;
@@ -3947,6 +3947,12 @@ int spell_fear(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
          }
          if(GET_POS(victim) == POSITION_SLEEPING) {
            send_to_char("How do you expect a sleeping person to be scared?\r\n", ch);
+           return eFAILURE;
+         }
+         if(IS_AFFECTED(victim, AFF_FEARLESS)) {
+            act("$N seems to be quite unafraid of anything.", ch, 0, victim, TO_CHAR, 0);
+            act("You laugh at $n's feeble attempt to frighten you.", ch, 0, victim, TO_VICT, 0);
+            act("$N laughs at $n's futile attempt at scaring $M.", ch, 0, victim, TO_ROOM, NOTVICT);
            return eFAILURE;
          }
 

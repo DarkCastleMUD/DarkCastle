@@ -1,7 +1,7 @@
 #ifndef ISR_H_
 #define ISR_H_
 /************************************************************************
-| $Id: isr.h,v 1.2 2002/06/13 04:41:15 dcastle Exp $
+| $Id: isr.h,v 1.3 2006/05/18 07:46:08 shane Exp $
 | isr.h
 | Description:  This file defines the isr (IMMUNE/SUSCEPTIBLE/RESIST)
 |   vectors for everything.
@@ -30,6 +30,7 @@
 #define ISR_KI             1<<20
 #define ISR_SONG           1<<21
 #define ISR_WATER          1<<22
+#define ISR_FEAR           1<<23
 
 
 #define SAVE_TYPE_FIRE     0

@@ -1219,7 +1219,7 @@ void make_prompt(struct descriptor_data *d, char *prompt)
      }
      if (d->showstr_count) {
      sprintf(buf,
-             "\r[ Return to continue, (q)uit, (r)efresh, (b)ack, or page number (%d %d) ]",
+             "\r$B$0[ Return to continue, (q)uit, (r)efresh, (b)ack, or page number (%d %d) ]$R",
               d->showstr_page, d->showstr_count);
      strcat(prompt, buf);
      } else if(d->strnew) {

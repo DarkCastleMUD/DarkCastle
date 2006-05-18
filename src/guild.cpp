@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.87 2006/05/07 23:03:37 dcastle Exp $
+| $Id: guild.cpp,v 1.88 2006/05/18 07:46:00 shane Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -365,7 +365,7 @@ int skills_guild(struct char_data *ch, char *arg, struct char_data *owner)
     send_to_char(buf, ch);
     send_to_char("You can practice any of these skills:\n\r\r\n", ch);
 
-    send_to_char("$BUniversal skills:$R\r\n\r\n",ch);
+    send_to_char("$BUniversal skills:$R\r\n",ch);
     send_to_char(" Ability:                  Expertise:              Level:   Cost:     Requisites:\r\n",ch);
     send_to_char("---------------------------------------------------------------------------------\r\n",ch);
     output_praclist(ch, g_skills);
@@ -575,7 +575,9 @@ int guild(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
   {
     if(IS_SET(skills_guild(ch, arg, owner), eSUCCESS))
       return eSUCCESS;
-    send_to_char("You do not know of this ability...\n\r", ch);
+    else if (search_skills(arg,g_skills) != -1)
+       send_to_char("Seek out the SKILLS MASTER in the forests west of Sorpigal to learn this ability.\n\r", ch);
+    else send_to_char("You do not know of this ability...\n\r", ch);
   }
 
   return eSUCCESS;
@@ -617,7 +619,9 @@ int skill_master(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     number = search_skills(arg,g_skills);
     
     if (number == -1) {
-      send_to_char("You do not know of this skill...\n\r", ch);
+      if(IS_SET(skills_guild(ch, arg, invoker), eSUCCESS))
+         send_to_char("You must speak with your guildmaster to learn such a complicated ability.\n\r", ch);
+      else send_to_char("You do not know of this skill...\n\r", ch);
       return eSUCCESS;
     }
 

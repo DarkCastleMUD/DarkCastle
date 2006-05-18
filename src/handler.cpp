@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.100 2006/04/19 18:59:47 dcastle Exp $ */
+/* $Id: handler.cpp,v 1.101 2006/05/18 07:46:00 shane Exp $ */
     
 extern "C"
 {
@@ -1093,6 +1093,16 @@ void affect_modify(CHAR_DATA *ch, int32 loc, int32 mod, long bitv, bool add)
  	case APPLY_SONG_DAMAGE:
 	   ch->song_mitigation += mod;
  	   break;
+
+        case APPLY_BOUNT_SONNET_HUNGER:
+           if(add) SETBIT(ch->affected_by, AFF_BOUNT_SONNET_HUNGER);
+           else REMBIT(ch->affected_by, AFF_BOUNT_SONNET_HUNGER);
+           break;
+
+        case APPLY_BOUNT_SONNET_THIRST:
+           if(add) SETBIT(ch->affected_by, AFF_BOUNT_SONNET_THIRST);
+           else REMBIT(ch->affected_by, AFF_BOUNT_SONNET_THIRST);
+           break;
 
 	default:
           sprintf(log_buf, "Unknown apply adjust attempt: %d. (handler.c, "
