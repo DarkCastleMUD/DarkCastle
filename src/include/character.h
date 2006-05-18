@@ -1,7 +1,7 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.37 2006/01/13 16:49:21 dcastle Exp $
+| $Id: character.h,v 1.38 2006/05/18 07:50:38 dcastle Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
@@ -154,6 +154,24 @@ struct follow_type
     struct follow_type *next;
 };
 
+struct vault_access_data
+{
+  struct vault_access_data *next;
+  char *name; // also used as an integer for clans. 
+  bool view;
+  bool deposit;
+  bool withdraw;
+};
+
+struct player_vault
+{
+  char *segment_names[20];
+  int max_contain;
+  OBJ_DATA *content;
+  struct vault_access_data *acc;
+};
+
+
 // DO NOT change most of these types without checking the save files
 // first, or you will probably end up corrupting all the pfiles
 struct pc_data
@@ -220,6 +238,7 @@ struct pc_data
     struct char_data *golem; // CURRENT golem. 
     bool hide[MAX_HIDE];
     CHAR_DATA *hiding_from[MAX_HIDE];
+    struct player_vault *vault;
 };
 
 struct mob_data

@@ -768,6 +768,19 @@ int gem_assembler(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
          return eSUCCESS;
       }
    }
+   if (real_object(gem_data[position].pieces[MAX_GEM_ASSEMBLER_ITEM-1]) < 0)
+   {
+      send_to_char("Assembled item not found.\r\n",ch);
+      return eSUCCESS;
+   }
+  struct obj_data * search_char_for_item(char_data * ch, int16 item_number, bool wearonly = FALSE);
+
+  if(IS_SET(((OBJ_DATA*)obj_index[real_object(gem_data[position].pieces[MAX_GEM_ASSEMBLER_ITEM-1])].item)->obj_flags.more_flags, ITEM_UNIQUE)) {
+      if(search_char_for_item(ch, real_object(gem_data[position].pieces[MAX_GEM_ASSEMBLER_ITEM-1]))) {
+         send_to_char("You already have one of those!\r\n", ch);
+         return eSUCCESS;
+      }
+    }
 
    // if we get here, ptr_array[0 through i] contain all our objs
 

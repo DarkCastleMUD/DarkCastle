@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.184 2006/05/18 07:46:00 shane Exp $ */
+/* $Id: const.cpp,v 1.185 2006/05/18 07:50:34 dcastle Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -68,6 +68,7 @@ bestowable_god_commands_type bestowable_god_commands[] =
 {"log",COMMAND_LOG},
 {"addnews",COMMAND_ADDNEWS},
 {"prize",COMMAND_PRIZE},
+{"sockets",COMMAND_SOCKETS},
 { "\n",		-1 }
 };
 
@@ -1276,9 +1277,9 @@ struct class_skill_defines b_skills[] = { // barbarian skills
 {    "dual wield",      SKILL_DUAL_WIELD,         1,    90,  {DEX,CON} },
 {    "bash",            SKILL_BASH,               2,    90,  {STR,CON} },
 {    "kick",            SKILL_KICK,               3,    80,  {DEX,STR} },
-{    "parry",           SKILL_PARRY,              5,    70,  {DEX,WIS} },
+{    "parry",           SKILL_PARRY,              5,    80,  {DEX,WIS} },
 {    "double",          SKILL_SECOND_ATTACK,      8,    85,  {STR,DEX} },
-{    "dodge",           SKILL_DODGE,  	          10,   70,  {DEX,INT} },
+{    "dodge",           SKILL_DODGE,  	          10,   80,  {DEX,INT} },
 {    "blood fury",      SKILL_BLOOD_FURY,         12,   98,  {CON,WIS} },
 {    "crazedassault",   SKILL_CRAZED_ASSAULT,     15,   98,  {WIS,STR} },
 {    "frenzy",          SKILL_FRENZY,             18,   90,  {CON,INT} },
@@ -1309,11 +1310,11 @@ struct class_skill_defines k_skills[] = { // monk skills
 //   Ability Name       Ability File          Level    Max      Requisites
 //   ------------       ------------          -----    ---      ----------
 {    "kick",            SKILL_KICK,             1,      85,     {DEX,STR} },
-{    "dodge",           SKILL_DODGE,            2,      85,     {DEX,INT} },
+{    "dodge",           SKILL_DODGE,            2,      80,     {DEX,INT} },
 {    "redirect",        SKILL_REDIRECT,         3,      85,     {INT,CON} },
 {    "trip",            SKILL_TRIP,             5,      70,     {DEX,STR} },
 {    "purify",          KI_PURIFY+KI_OFFSET,    8,      98,     {CON,WIS} },
-{    "martial defense", SKILL_DEFENSE,          10,     80,     {STR,DEX} },
+{    "martial defense", SKILL_DEFENSE,          10,     98,     {STR,DEX} },
 {    "rescue",          SKILL_RESCUE,           12,     75,     {WIS,INT} },
 {    "punch",           KI_PUNCH+KI_OFFSET,     15,     98,     {STR,DEX} },
 {    "eagleclaw",       SKILL_EAGLE_CLAW,       17,     98,     {STR,DEX} },

@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: obj.h,v 1.20 2006/04/14 14:02:09 dcastle Exp $ */
+/* $Id: obj.h,v 1.21 2006/05/18 07:50:38 dcastle Exp $ */
 #ifndef OBJ_H_
 #define OBJ_H_
 
@@ -238,6 +238,7 @@ struct obj_data
     struct obj_data *next;         /* For the object list              */
     struct obj_data *next_skill; 
     struct table_data *table;
+    char *cmsg; // custom message for vaults
 };
 
 /* For 'equipment' */

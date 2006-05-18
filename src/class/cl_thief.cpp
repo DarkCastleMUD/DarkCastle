@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.121 2006/05/18 07:46:05 shane Exp $
+| $Id: cl_thief.cpp,v 1.122 2006/05/18 07:50:36 dcastle Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -256,7 +256,14 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
     return retval;
   }
 
+  if (retval & eCH_DIED) return retval;
   WAIT_STATE(ch, PULSE_VIOLENCE*2);
+
+  if (retval & eVICT_DIED)
+     return retval;
+  extern bool charExists(char_data *ch);
+  if (!charExists(victim))// heh
+      return eSUCCESS|eVICT_DIED;
 
   // dual backstab
   if((was_in == ch->in_room)                                          && 

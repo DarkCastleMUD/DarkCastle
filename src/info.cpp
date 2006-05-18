@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.100 2006/05/17 18:58:01 shane Exp $ */
+/* $Id: info.cpp,v 1.101 2006/05/18 07:50:34 dcastle Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -1296,6 +1296,7 @@ int do_score(struct char_data *ch, char *argument, int cmd)
    extern char *pc_clss_types[];
    
    int64 exp_needed;
+   int i;
    
    sprintf(race, "%s", race_info[(int)GET_RACE(ch)].singular_name);
    exp_needed = (exp_table[(int)GET_LEVEL(ch) + 1] - GET_EXP(ch));
@@ -2407,6 +2408,8 @@ void check_leaderboard()
    int   hpactive[5], mnactive[5], kiactive[5], pkactive[5], pdactive[5], rdactive[5];
    char  *hpactiveclassname[CLASS_MAX-2][5], *mnactiveclassname[CLASS_MAX-2][5], *kiactiveclassname[CLASS_MAX-2][5], *pkactiveclassname[CLASS_MAX-2][5], *pdactiveclassname[CLASS_MAX-2][5], *rdactiveclassname[CLASS_MAX-2][5];
    int   hpactiveclass[CLASS_MAX-2][5], mnactiveclass[CLASS_MAX-2][5], kiactiveclass[CLASS_MAX-2][5], pkactiveclass[CLASS_MAX-2][5], pdactiveclass[CLASS_MAX-2][5], rdactiveclass[CLASS_MAX-2][5];
+   extern short bport;
+   if (bport) return;
 
    if (!(fl = dc_fopen(LEADERBOARD_FILE, "r"))) {
       log("Cannot open leaderboard file.", 0, LOG_MISC);
@@ -2466,8 +2469,9 @@ void check_leaderboard()
 
    for(d=descriptor_list;d;d=d->next) {
 
-      if(!d->character || GET_LEVEL(d->character) >= IMMORTAL) continue;
-
+      if(!d->character || GET_LEVEL(d->character) >= IMMORTAL || IS_NPC(d->character)) continue;
+      if (!d->connected == CON_PLAYING) continue;
+      if (!d->character->pcdata) continue;
       if(GET_MAX_HIT(d->character) > 15000) continue;
 
       k = MIN(CLASS_DRUID - 1,GET_CLASS(d->character) - 1);
@@ -2906,8 +2910,10 @@ int do_leaderboard(struct char_data *ch, char *argument, int cmd)
    //top 5 online
    for(d=descriptor_list;d;d=d->next) {
 
-      if(!d->character || !CAN_SEE(ch,d->character) || GET_LEVEL(d->character) >= IMMORTAL) continue;
-
+      if(!d->character || GET_LEVEL(d->character) >= IMMORTAL) continue;
+      if (!d->connected == CON_PLAYING) continue;
+      if (!d->character->pcdata) continue;
+      if (!CAN_SEE(ch, d->character)) continue;
       if(GET_MAX_HIT(d->character) > 15000) continue;
 
       if(validclass && GET_CLASS(d->character) != k + 1) continue;

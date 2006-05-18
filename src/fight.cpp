@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.301 2006/05/17 10:16:08 shane Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.302 2006/05/18 07:50:34 dcastle Exp $ */
 
 extern "C"
 {
@@ -490,7 +490,7 @@ int attack(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
       send_to_char("Your body refuses to work properly and you miss an attack.\r\n", ch);
       REMOVE_BIT(ch->combat, COMBAT_MISS_AN_ATTACK);
     }
-    else {
+    else if (!IS_NPC(ch) || !ISSET(ch->mobdata->actflags, ACT_NOATTACK)) {
       result = one_hit(ch, vict, type, FIRST);
       if(SOMEONE_DIED(result))       return result;
     }
@@ -502,7 +502,7 @@ int attack(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
       send_to_char("Your body refuses to work properly and you miss an attack.\r\n", ch);
       REMOVE_BIT(ch->combat, COMBAT_MISS_AN_ATTACK);
     }
-    else {
+    else if (!IS_NPC(ch) || !ISSET(ch->mobdata->actflags, ACT_NOATTACK)) {
       result = one_hit(ch, vict, type, FIRST);       // everyone get's one hit (normally)
       if(SOMEONE_DIED(result))       return result;
     }
@@ -2550,7 +2550,8 @@ int speciality_bonus(CHAR_DATA *ch,int attacktype, int level)
    level -= GET_LEVEL(ch);
    if (!skill) return 0;
 
-   if (level < -20 && IS_NPC(ch)) return 0 - GET_LEVEL(ch)/1.2;
+   if (level < -20 && IS_NPC(ch)) return 0 - GET_LEVEL(ch)/2.4;
+   else if (level < -10 && IS_NPC(ch)) return 0 - GET_LEVEL(ch)/2.6;
    else if (level < 0 && IS_NPC(ch)) return 0 - GET_LEVEL(ch)/2.8;
    else if (IS_NPC(ch)) return 0 - (GET_LEVEL(ch)/3.5);
 

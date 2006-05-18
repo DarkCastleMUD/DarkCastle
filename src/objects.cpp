@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.61 2006/05/11 21:09:47 dcastle Exp $
+| $Id: objects.cpp,v 1.62 2006/05/18 07:50:35 dcastle Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -1323,6 +1323,7 @@ return TRUE;
 
 int charmie_restricted(struct char_data *ch, struct obj_data *obj, int wear_loc)
 {
+  return FALSE; // sigh, work for nohin'
   if (IS_NPC(ch) && ISSET(ch->affected_by, AFF_CHARM) && ch->master && ch->mobdata)
   {
 	int vnum = mob_index[ch->mobdata->nr].virt;
@@ -2236,3 +2237,49 @@ int recheck_height_wears(char_data * ch)
   return eSUCCESS;
 }
 
+
+
+
+void write_player_vault(CHAR_DATA *ch)
+{
+  // yay! this is gonna be a fun function to write *puke*
+  FILE *fl;
+  char buf[MAX_STRING_LENGTH];
+  if (!ch || IS_NPC(ch) || !ch->pcdata || !ch->pcdata->vault) return;
+  
+  sprintf(buf, "../vault/%c/%s", UPPER(*ch->name), ch->name);
+  if ( ( fl = dc_fopen(buf, "w") ) == 0)
+  {
+    send_to_char("Could not open vaultfile.\r\n",ch);
+    return;
+  }
+  struct player_vault *v = ch->pcdata->vault;
+  struct vault_access_data *a = v->acc;
+  struct obj_data *o = v->content;
+  fprintf(fl,"M %d\n",v->max_contain);
+  for ( ; a; a = a->next)
+   if ((int)a->name > 100)
+    fprintf(fl,"A %s %c %c %c\n", a->name, a->view?"t":"f", a->deposit?"t":"f", a->withdraw?"t":"f");
+   else
+    fprintf(fl,"A %d %c %c %c\n", (int)a->name, a->view?"t":"f", a->deposit?"t":"f", a->withdraw?"t":"f");
+  for (; o ; o = o->next_content)
+  {
+     fprintf(fl, "O %s\n", o->cmsg?o->cmsg:"swedenrocks");
+     write_object(o, fl);
+  }
+  dc_fclose(fl);
+  return;
+}
+
+void read_player_vault(CHAR_DATA *ch)
+{
+  FILE *fl;
+  char buf[MAX_STRING_LENGTH];
+  if (ch && ch->pcdata && ch->pcdata->vault) return; // already read
+  sprintf(buf, "../vault/%c/%s", UPPER(*ch->name), ch->name);
+  if ( ( fl = dc_fopen(buf, "w") ) == 0)
+    return; // we no care
+  
+  
+  
+}

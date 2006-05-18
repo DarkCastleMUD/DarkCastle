@@ -3260,12 +3260,17 @@ mob_index[mob_num].virt);
         if(!check_range_valid_and_convert(intval, buf4, 0, 35000)) {
           send_to_char("Please specifiy a valid number.\r\n", ch);
           return eFAILURE;
-        }
+        }/*
         if (!can_modify_mobile(ch, intval))
         {
           send_to_char("You cannot create mobiles in that range.\r\n",ch);
           return eFAILURE;
-        }
+        }*/
+        if (!has_skill(ch, COMMAND_RANGE))
+        {
+          send_to_char("You cannot create mobiles in that range.\r\n",ch);
+          return eFAILURE;
+	}
         x = create_blank_mobile(intval);
         if(x < 0) {
           csendf(ch, "Could not create mobile '%d'.  Max index hit or mob already exists.\r\n",intval);
@@ -4499,6 +4504,10 @@ int do_sockets(struct char_data *ch, char *argument, int cmd)
    descriptor_data * d = 0, *ad = 0;
 
    extern char *connected_states[];
+  if(!has_skill(ch, COMMAND_SOCKETS)) {
+        send_to_char("Huh?\r\n", ch);
+        return eFAILURE;
+  }
 
    if (IS_NPC(ch)) {
       send_to_char( "Monsters don't care who's logged in.\n\r", ch );

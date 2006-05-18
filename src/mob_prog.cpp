@@ -55,6 +55,10 @@ extern struct index_data *obj_index;
 CHAR_DATA *rndm2;
 extern struct obj_data  *object_list;
 
+CHAR_DATA *activeActor;
+OBJ_DATA *activeObj;
+void *activeVo;
+
 // Global defined here
 
 bool  MOBtrigger;
@@ -2631,6 +2635,18 @@ int mprog_process_cmnd( char *cmnd, CHAR_DATA *mob, CHAR_DATA *actor,
   return command_interpreter( mob, buf, TRUE );
 }
 
+bool objExists(OBJ_DATA *obj)
+{
+  obj_data *tobj;
+
+  for (tobj = object_list;tobj;tobj = tobj->next)
+    if (tobj == obj) break;
+  if (tobj) return TRUE;
+  return FALSE;
+}
+
+
+
 /* The main focus of the MOBprograms.  This routine is called 
  *  whenever a trigger is successful.  It is responsible for parsing
  *  the command list and figuring out what to do. However, like all
@@ -2652,7 +2668,14 @@ void mprog_driver ( char *com_list, CHAR_DATA *mob, CHAR_DATA *actor,
    return;
  selfpurge = FALSE;
  mprog_cur_result = eSUCCESS;
+ extern bool charExists(CHAR_DATA *ch);
 
+ if (!charExists(actor)) actor = NULL; 
+ if (!objExists(obj)) obj = NULL; 
+
+ activeActor = actor;
+ activeObj = obj;
+ activeVo = vo;
  if(!com_list) // this can happen when someone is editing
    return;
 // int count2 = 0;
@@ -3114,7 +3137,7 @@ int mprog_speech_trigger( char *txt, CHAR_DATA *mob )
 
 }
 
-int mprog_catch_trigger(char_data * mob, int catch_num, char *var, int opt)
+int mprog_catch_trigger(char_data * mob, int catch_num, char *var, int opt, char_data *actor, obj_data *obj, void *vo)
 {
  MPROG_DATA *mprg;
  MPROG_DATA *next;
@@ -3164,7 +3187,7 @@ int mprog_catch_trigger(char_data * mob, int catch_num, char *var, int opt)
 
 		}
 	  }
-           mprog_driver( mprg->comlist, mob, NULL, NULL, NULL );
+           mprog_driver( mprg->comlist, mob,actor, obj, vo );
 		if (selfpurge) return mprog_cur_result;
 
            break;
@@ -3225,9 +3248,9 @@ void update_mprog_throws()
 
       // if !vict, oh well....remove it anyway.  Someone killed him.
       if(vict)  // activate
-        mprog_catch_trigger(vict, action->data_num, action->var,action->opt);
+        mprog_catch_trigger(vict, action->data_num, action->var,action->opt,action->actor, action->obj, action->vo);
       else if (vobj)
-	oprog_catch_trigger(vobj, action->data_num, action->var,action->opt);
+	oprog_catch_trigger(vobj, action->data_num, action->var,action->opt, action->actor, action->obj, action->vo);
       dc_free(action);
    }
 };
@@ -3312,7 +3335,7 @@ int oprog_speech_trigger( char *txt, CHAR_DATA *ch )
 }
 
 
-int oprog_catch_trigger(obj_data *obj, int catch_num, char *var, int opt)
+int oprog_catch_trigger(obj_data *obj, int catch_num, char *var, int opt, char_data *actor, obj_data *obj2, void *vo)
 {
  MPROG_DATA *mprg;
  int curr_catch;
@@ -3349,7 +3372,7 @@ int oprog_catch_trigger(obj_data *obj, int catch_num, char *var, int opt)
 	     vmob->tempVariable = eh;
            }
 
-           mprog_driver( mprg->comlist, vmob, NULL, NULL, NULL );
+           mprog_driver( mprg->comlist, vmob, actor, obj2, vo );
 		if (selfpurge) return mprog_cur_result;
 	   end_oproc(vmob);
 	   break;

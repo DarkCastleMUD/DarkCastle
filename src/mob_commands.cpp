@@ -279,14 +279,14 @@ int do_mpjunk( CHAR_DATA *ch, char *argument, int cmd )
 
         for(int l = 0; l < MAX_WEAR; l++ )
           if ( ch->equipment[l] )
-	   if (!dotbuf || isname(dotbuf, ch->equipment[l]->name))
+	   if (!dot || isname(dotbuf, ch->equipment[l]->name))
             extract_obj(unequip_char(ch,l));
 
   	OBJ_DATA *x,*v;
         for (x = ch->carrying; x; x =v)
 	{
 	   v = x->next_content;
-	   if (!dotbuf || isname(dotbuf, x->name))
+	   if (!dot || isname(dotbuf, x->name))
              extract_obj(x);
 
 	}
@@ -945,6 +945,12 @@ int do_mpthrow( CHAR_DATA *ch, char *argument, int cmd )
   throwitem->data_num = catch_num;
   throwitem->delay = delay;
   throwitem->mob = TRUE; // This is, suprisingly, a mob
+  extern CHAR_DATA *activeActor;
+  extern OBJ_DATA *activeObj;
+  extern void *activeVo;
+  throwitem->actor = activeActor;
+  throwitem->obj = activeObj;
+  throwitem->vo = activeVo;
   
   if (fourth[0] !='\0')
    throwitem->var = str_dup(fourth);

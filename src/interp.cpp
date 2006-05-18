@@ -16,7 +16,7 @@
 /* 12/08/2003   Onager   Added chop_half() to work like half_chop() but    */
 /*                       chopping off the last word.                       */
 /***************************************************************************/
-/* $Id: interp.cpp,v 1.84 2006/05/11 21:09:47 dcastle Exp $ */
+/* $Id: interp.cpp,v 1.85 2006/05/18 07:50:35 dcastle Exp $ */
 
 extern "C"
 {
@@ -127,7 +127,7 @@ struct command_info cmd_info[] =
     { "help",		do_new_help,	POSITION_DEAD, 0, 9, 0, 1 },
     { "idea",		do_idea,	POSITION_DEAD, 0, 9, 0, 1 },
     { "info",		do_info,	POSITION_DEAD, 0, 9, 0, 1 },
-    { "leaderboard",    do_leaderboard, POSITION_DEAD, IMMORTAL, 9, 0, 1},
+    { "leaderboard",    do_leaderboard, POSITION_DEAD, 3, 9, 0, 1},
     { "news",		do_news,	POSITION_DEAD, 0, 9, 0, 1 },
     { "thenews",	do_news,	POSITION_DEAD, 0, 9, 0, 1 },
     { "story",		do_story,	POSITION_DEAD, 0, 9, 0, 1 },
@@ -342,6 +342,7 @@ struct command_info cmd_info[] =
     { "processes",	do_processes,	POSITION_DEAD, 108, 9, 0, 1 },
     { "bestow",		do_bestow,	POSITION_DEAD, IMP, 9, 0, 1 },
     { "oclone",		do_oclone,	POSITION_DEAD, GIFTED_COMMAND, 9, 0, 1 },
+    { "mclone",		do_mclone,	POSITION_DEAD, GIFTED_COMMAND, 9, 0, 1 },
     { "revoke",		do_revoke,	POSITION_DEAD, IMP, 9, 0, 1 },
     { "chpwd",		do_chpwd,	POSITION_DEAD, IMP, 9, 0, 1 },
     { "advance",	do_advance,	POSITION_DEAD, IMP, 9, 0, 1 },
@@ -388,7 +389,7 @@ struct command_info cmd_info[] =
     { "range",		do_range,	POSITION_DEAD, GIFTED_COMMAND, 9, 0, 1 },
     { "pshopedit",	do_pshopedit,	POSITION_DEAD, GIFTED_COMMAND, 9, 0, 1 },
     { "sedit",		do_sedit,	POSITION_DEAD, GIFTED_COMMAND, 9, 0, 1 },
-    { "sockets",	do_sockets,	POSITION_DEAD, 105, 9, 0, 1 },
+    { "sockets",	do_sockets,	POSITION_DEAD, GIFTED_COMMAND, 9, 0, 1 },
     { "punish",		do_punish,	POSITION_DEAD, GIFTED_COMMAND, 9, 0, 1 },
     { "sqedit",		do_sqedit,	POSITION_DEAD, GIFTED_COMMAND, 9, 0, 1 },
     { "install",	do_install,	POSITION_DEAD, IMP, 9, 0, 1 },

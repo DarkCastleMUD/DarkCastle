@@ -19,7 +19,7 @@
 /* 12/06/2003   Onager   Modified mobile_activity() to prevent charmie    */
 /*                       scavenging                                       */
 /**************************************************************************/
-/* $Id: mob_act.cpp,v 1.35 2006/01/13 16:49:15 dcastle Exp $ */
+/* $Id: mob_act.cpp,v 1.36 2006/05/18 07:50:35 dcastle Exp $ */
 
 extern "C"
 {
@@ -405,9 +405,6 @@ void mobile_activity(void)
         if(ch == tmp_ch)
            continue;
       
-        /* check for PFE/PFG, (anti)pal perma-protections, etc. */
-        if (is_protected(tmp_ch, ch))
-	continue;
 
         tmp_bitv = GET_BITV(tmp_ch);
 
@@ -416,7 +413,7 @@ void mobile_activity(void)
 	  CAN_SEE(ch, tmp_ch) &&
            (IS_SET(race_info[(int)GET_RACE(ch)].friendly, tmp_bitv) ||
 	     (int)GET_RACE(ch) == (int)GET_RACE(tmp_ch)) &&
-		
+
            !(IS_NPC(tmp_ch->fighting) && !IS_AFFECTED(tmp_ch->fighting, AFF_CHARM))
 		&& !IS_SET(race_info[(int)GET_RACE(ch)].friendly, GET_BITV(tmp_ch->fighting)))
         {
@@ -434,6 +431,11 @@ void mobile_activity(void)
           break;
         }
       
+        /* check for PFE/PFG, (anti)pal perma-protections, etc. */
+// AFTER Friendly check, 'cause I don't wanna be protected against friendly...
+        if (is_protected(tmp_ch, ch))
+	continue;
+
 //           continue;
 
         if((!IS_NPC(tmp_ch) && !tmp_ch->fighting && CAN_SEE(ch, tmp_ch) &&

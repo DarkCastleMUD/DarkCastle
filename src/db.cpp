@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.113 2006/05/15 21:09:41 apocalypse Exp $ */
+/* $Id: db.cpp,v 1.114 2006/05/18 07:50:34 dcastle Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -3210,6 +3210,7 @@ int create_blank_item(int nr)
     obj->next_content = 0;
     obj->next_skill = 0;
     obj->table = 0;
+    obj->cmsg = 0;
     obj->carried_by   = 0;
     obj->equipped_by  = 0;
     obj->in_obj       = 0;
@@ -3572,7 +3573,7 @@ struct obj_data *read_object(int nr, FILE *fl)
     obj->description        = fread_string (fl, 1);
     obj->action_description = fread_string (fl, 1);
     obj->table = 0;
-
+    obj->cmsg = 0;
     curr_virtno = nr;
     curr_name = obj->name;
     curr_type = "Object";
@@ -3757,6 +3758,7 @@ struct obj_data *clone_object(int nr)
     obj->affected[i].location = old->affected[i].location;
     obj->affected[i].modifier = old->affected[i].modifier;
   }
+  obj->cmsg = 0;
   obj->table = 0;
   obj->next_skill = 0;
   obj->next_content        = 0;
@@ -4722,10 +4724,10 @@ void clear_char(CHAR_DATA *ch)
 
   ch->in_room = NOWHERE;
   ch->position = POSITION_STANDING;
-  ch->tempVariable = NULL;
+//  ch->tempVariable = NULL;
   GET_HOME(ch) = START_ROOM;
   GET_AC(ch) = 100; /* Basic Armor */
-  ch->spelldamage = 0;
+//  ch->spelldamage = 0;
 }
 
 

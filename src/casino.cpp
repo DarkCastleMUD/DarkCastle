@@ -1373,6 +1373,13 @@ int hand[5][2];
  // cycles between using two spaces for temporary data
  // as comparisons need to be made
 
+
+struct pot
+{
+  struct pot *next;
+  struct tplayer *player[6]; 
+};
+
 struct tplayer
 {
   struct ttable *table;
@@ -1387,8 +1394,12 @@ struct tplayer
 struct ttable
 {
   struct cDeck *deck;
+  struct pot *pots;
   struct tplayer *player[6];
   int cards[5]; // cards on the table
+  int bet;
+  int crPlayer;
+  int state;
 };
 
 int has_seat(struct ttable *ttbl)
@@ -1729,7 +1740,36 @@ int first_to_act(int state, struct tplayer *player[6])
 
   if (plrs == 2)
    return dlr; // dealer acts first when there's only 2 players   
+  int j = 2;
+  for (int i = dlr; ; i++)
+  {
+	if (i==6) i = 0;
+        if (player[i]&& --j == 0) return i;
+  }
+
+  return dlr; // shouldn't happen  
+}
+
+int find_winner(struct ttable *ttbl)
+{
+  int i, win = -1, winhand = 0;
+  for (i = 0; i < 6; i++)
+  {
+	if (!ttbl->player[i]) continue;
+	int highhand = find_highhand(ttbl->player[i]);
+	if (win == -1) {win = i; winhand = highhand;}
+        else { 
+		if (handcompare(hand[get_hand(ttbl->player[i], highhand)],
+				hand[get_hand(ttbl->player[win], winhand)]) == 1)
+			{ winhand = highhand; win = i; }
+	}
+  }
+  return win;
+}
+
+void pulse_holdem(struct ttbl *tbl)
+{
   
-};
+}
 
 /* End Texas Hold'em */

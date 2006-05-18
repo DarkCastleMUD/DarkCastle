@@ -597,6 +597,8 @@ void new_string_add(struct descriptor_data *d, char *str)
           return;
         }
       }
+    if (str[a-1] == '\r') str[a-1] = '\0';
+    if (str[a-2] == '\r') { str[a-1] = '\0'; str[a-2] = '\n'; }
 
     if ((action = (*str == '/'))) {
       while (str[i] != '\0') {
@@ -724,7 +726,7 @@ bool ishashed(char *arg);
     }
   } else {
     if (!action && !((int)(strlen(str) + strlen(*d->strnew) + 2) > d->max_str)) {
-      strcat(*d->strnew, "\r\n");
+      strcat(*d->strnew, "\n");
     }
   }
 }
