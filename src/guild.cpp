@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.88 2006/05/18 07:46:00 shane Exp $
+| $Id: guild.cpp,v 1.89 2006/05/18 08:59:33 shane Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -576,7 +576,7 @@ int guild(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     if(IS_SET(skills_guild(ch, arg, owner), eSUCCESS))
       return eSUCCESS;
     else if (search_skills(arg,g_skills) != -1)
-       send_to_char("Seek out the SKILLS MASTER in the forests west of Sorpigal to learn this ability.\n\r", ch);
+       do_say(owner,"Seek out the SKILLS MASTER in the forests west of Sorpigal to learn this ability.", 9);
     else send_to_char("You do not know of this ability...\n\r", ch);
   }
 
@@ -590,6 +590,7 @@ int skill_master(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
   char buf[MAX_STRING_LENGTH];
   int number, i, percent;
   int learned = 0;
+  class_skill_defines * skilllist = get_skill_list(ch);
 
   if(IS_MOB(ch)) {
     send_to_char("Why practice?  You're just going to die anyway...\r\n", ch);
@@ -604,7 +605,7 @@ int skill_master(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
   if (!*arg) {
       sprintf(buf,"You have %d practice sessions left.\n\r", ch->pcdata->practices);
       send_to_char(buf, ch);
-      send_to_char("You can practice  any of these skills:\n\r", ch);
+      send_to_char("You can practice any of these skills:\n\r", ch);
       for(i=0; *g_skills[i].skillname != '\n';i++) 
       {
         int known = has_skill(ch, g_skills[i].skillnum);
@@ -619,8 +620,9 @@ int skill_master(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     number = search_skills(arg,g_skills);
     
     if (number == -1) {
-      if(IS_SET(skills_guild(ch, arg, invoker), eSUCCESS))
-         send_to_char("You must speak with your guildmaster to learn such a complicated ability.\n\r", ch);
+      if(!skilllist) return eFAILURE;
+      if(search_skills(arg, skilllist) == -1)
+         do_say(invoker,"You must speak with your guildmaster to learn such a complicated ability.", 9);
       else send_to_char("You do not know of this skill...\n\r", ch);
       return eSUCCESS;
     }
