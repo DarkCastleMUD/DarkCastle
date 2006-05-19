@@ -9003,22 +9003,24 @@ int cast_herb_lore(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *v
         return eFAILURE;
   }
 
-  if (!can_heal(ch,victim, SPELL_HERB_LORE)) return eFAILURE;
+  if (can_heal(ch,victim, SPELL_HERB_LORE)) {
+     if(OUTSIDE(ch))    GET_HIT(victim) += dam_percent(skill,180);
+     else { /* if not outside */
+       GET_HIT(victim) += dam_percent(skill,80);
+       send_to_char("Your spell is less effective because you are indoors!\n\r", ch);
+     }
+     if (GET_HIT(victim) >= hit_limit(victim))
+        GET_HIT(victim) = hit_limit(victim)-dice(1,4);
 
-  if(OUTSIDE(ch))    GET_HIT(victim) += dam_percent(skill,180);
-  else /* if not outside */
-    GET_HIT(victim) += dam_percent(skill,80);
+     update_pos( victim );
 
-  if (GET_HIT(victim) >= hit_limit(victim))
-    GET_HIT(victim) = hit_limit(victim)-dice(1,4);
-
-  update_pos( victim );
-
-  send_to_char("The magic herb makes you feel much better!\n\r", victim);
-  if (ch!=victim)
-  {
-    act("The herb makes $N look much healthier...and hungry?",ch,0,victim, TO_CHAR, 0);
+     send_to_char("The magic herb makes you feel much better!\n\r", victim);
+     if (ch!=victim)
+     {
+       act("The herb makes $N look much healthier...and hungry?",ch,0,victim, TO_CHAR, 0);
+     }
   }
+
   char arg1[MAX_INPUT_LENGTH];
   one_argument(arg, arg1);
   if (arg1[0])
