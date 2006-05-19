@@ -93,12 +93,12 @@ int do_harmtouch(struct char_data *ch, char *argument, int cmd)
      dam = 750;
      retval = damage(ch, victim, dam, TYPE_ACID, SKILL_HARM_TOUCH, 0);
      WAIT_STATE(ch, PULSE_VIOLENCE);
-   }
-   if(IS_SET(retval, eVICT_DIED) && !IS_SET(retval, eCH_DIED)) {
-     if(has_skill(ch,SKILL_HARM_TOUCH) > 30 && number(1, 3) == 1) {
-        send_to_char("Your god basks in your worship of pain and infuses you with life.\r\n", ch);
-        GET_HIT(ch) += GET_LEVEL(ch) * 10;
-        GET_HIT(ch) = MIN(GET_HIT(ch), GET_MAX_HIT(ch));
+     if(IS_SET(retval, eVICT_DIED) && !IS_SET(retval, eCH_DIED)) {
+        if(has_skill(ch,SKILL_HARM_TOUCH) > 30 && number(1, 3) == 1) {
+           send_to_char("Your god basks in your worship of pain and infuses you with life.\r\n", ch);
+           GET_HIT(ch) += GET_LEVEL(ch) * 10;
+           GET_HIT(ch) = MIN(GET_HIT(ch), GET_MAX_HIT(ch));
+        }
      }
    }
    af.type = SKILL_HARM_TOUCH;
