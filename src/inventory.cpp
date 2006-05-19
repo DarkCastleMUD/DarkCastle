@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.62 2006/05/07 23:03:37 dcastle Exp $
+| $Id: inventory.cpp,v 1.63 2006/05/19 08:14:52 shane Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -794,6 +794,9 @@ int do_drop(struct char_data *ch, char *argument, int cmd)
   struct obj_data *tmp_object;
   struct obj_data *next_obj;
   bool test = FALSE;
+  char alldot[MAX_STRING_LENGTH];
+
+  alldot[0] = '\0';
 
   if(IS_SET(world[ch->in_room].room_flags, QUIET)) {
     send_to_char ("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
@@ -846,43 +849,44 @@ int do_drop(struct char_data *ch, char *argument, int cmd)
   }
 
   if(*arg) {
-    if(!str_cmp(arg,"all")) {
+    if(!str_cmp(arg,"all") || sscanf(arg,"all.%s",alldot) != 0) {
       for(tmp_object = ch->carrying; tmp_object; tmp_object = next_obj) {
          next_obj = tmp_object->next_content;
+
+         if(alldot && !isname(alldot, tmp_object->name)) continue;
 
          if(IS_SET(tmp_object->obj_flags.extra_flags, ITEM_SPECIAL))
            continue;
 
-      if(!IS_MOB(ch) && affected_by_spell(ch, FUCK_PTHIEF)) {
-        send_to_char("Your criminal acts prohibit it.\n\r", ch);
-        return eFAILURE;
-      }
+         if(!IS_MOB(ch) && affected_by_spell(ch, FUCK_PTHIEF)) {
+            send_to_char("Your criminal acts prohibit it.\n\r", ch);
+            return eFAILURE;
+         }
          if(IS_SET(tmp_object->obj_flags.more_flags, ITEM_NO_TRADE)) 
            continue;
          if(contains_no_trade_item(tmp_object))
            continue;
          if(!IS_SET(tmp_object->obj_flags.extra_flags, ITEM_NODROP) ||
-            GET_LEVEL(ch) >= IMMORTAL) {
-           if(IS_SET(tmp_object->obj_flags.extra_flags, ITEM_NODROP))
-             send_to_char("(This item is cursed, BTW.)\n\r", ch);
-           if(CAN_SEE_OBJ(ch, tmp_object)) {
-             sprintf(buffer, "You drop the %s.\n\r", fname(tmp_object->name));
-             send_to_char(buffer, ch);
-           }
-           else
-             send_to_char("You drop something.\n\r", ch);
+               GET_LEVEL(ch) >= IMMORTAL) {
+            if(IS_SET(tmp_object->obj_flags.extra_flags, ITEM_NODROP))
+               send_to_char("(This item is cursed, BTW.)\n\r", ch);
+            if(CAN_SEE_OBJ(ch, tmp_object)) {
+               sprintf(buffer, "You drop the %s.\n\r", fname(tmp_object->name));
+               send_to_char(buffer, ch);
+            }
+            else
+               send_to_char("You drop something.\n\r", ch);
 
-           act("$n drops $p.", ch, tmp_object, 0, TO_ROOM, INVIS_NULL);
-           move_obj(tmp_object, ch->in_room);
-           test = TRUE;
+            act("$n drops $p.", ch, tmp_object, 0, TO_ROOM, INVIS_NULL);
+            move_obj(tmp_object, ch->in_room);
+            test = TRUE;
          }
          else {
-           if(CAN_SEE_OBJ(ch, tmp_object)) {
-             sprintf(buffer, "You can't drop the %s, it must be CURSED!\n\r",
-		     fname(tmp_object->name));
-             send_to_char(buffer, ch);
-             test = TRUE;
-           }
+            if(CAN_SEE_OBJ(ch, tmp_object)) {
+               sprintf(buffer, "You can't drop the %s, it must be CURSED!\n\r", fname(tmp_object->name));
+               send_to_char(buffer, ch);
+               test = TRUE;
+            }
          }
       } /* for */
 
