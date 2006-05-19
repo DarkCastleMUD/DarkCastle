@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: obj.h,v 1.21 2006/05/18 07:50:38 dcastle Exp $ */
+/* $Id: obj.h,v 1.22 2006/05/19 08:31:06 shane Exp $ */
 #ifndef OBJ_H_
 #define OBJ_H_
 
@@ -142,7 +142,6 @@ int recheck_height_wears(char_data *ch);
 #define SIZE_SMALL		1<<1
 #define SIZE_MEDIUM		1<<2
 #define SIZE_LARGE		1<<3
-#define SIZE_CHARMIE_OK		1<<4
 
 /* Different types of 'utility' items */
 
