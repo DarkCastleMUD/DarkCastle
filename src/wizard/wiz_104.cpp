@@ -87,9 +87,12 @@ int do_load(struct char_data *ch, char *arg, int cmd)
   char name[MAX_INPUT_LENGTH];
   char arg2[MAX_INPUT_LENGTH];
   char arg3[MAX_INPUT_LENGTH];
+  char buf[MAX_STRING_LENGTH];
 
   char *c;
   int x, number =0, num = 0,cnt = 1;
+
+  extern int top_of_objt;
 
   char *types[] = {
     "mobile",
@@ -116,8 +119,30 @@ int do_load(struct char_data *ch, char *arg, int cmd)
     return eFAILURE;
   } 
   if (cmd == 999 && !*type) {
-	send_to_char("Usage: prize <name|vnum>\r\n",ch);
-	return eFAILURE;
+
+     *buf = '\0';
+     send_to_char("[#  ] [OBJ #] OBJECT'S DESCRIPTION\n\n\r", ch);
+
+     for(x = 0; ( x < obj_index[top_of_objt].virt); x++) 
+     {
+        if((num = real_object(x)) < 0)
+          continue;
+
+        if(isname("prize", ((struct obj_data *)(obj_index[num].item))->name)) 
+        {
+           cnt++;
+           sprintf(buf, "[%3d] [%5d] %s\n\r", cnt, x, ((struct obj_data *)(obj_index[num].item))->short_description);
+           send_to_char(buf, ch);
+        }
+
+        if(cnt > 200) {
+           send_to_char("Maximum number of searchable items hit.  Search ended.\r\n", ch);
+           break;
+        }
+     }
+
+     send_to_char("To load: prize <name|vnum>\r\n",ch);
+     return eFAILURE;
   }
 
   if (cmd == 9) {
