@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.101 2006/05/18 07:46:00 shane Exp $ */
+/* $Id: handler.cpp,v 1.102 2006/05/19 06:47:46 shane Exp $ */
     
 extern "C"
 {
@@ -1325,27 +1325,52 @@ void affect_remove( CHAR_DATA *ch, struct affected_type *af, int flags)
 	 send_to_char("Your regeneration slows back to normal.\r\n",ch);
 	 break;
       case SKILL_INNATE_POWERWIELD:
-           struct obj_data *obj;
-/*	   obj = ch->equipment[WIELD];
-           if (obj)
-	   if (obj->obj_flags.extra_flags & ITEM_TWO_HANDED)
-           {
-	     obj_to_char(unequip_char(ch, WIELD, (flags & SUPPRESS_MESSAGES)),ch);
-	         if (!(flags & SUPPRESS_MESSAGES))
- 	     act("You shift $p into your inventory.",ch, obj, NULL, TO_CHAR, 0);
-  	   }*/
-           obj = ch->equipment[SECOND_WIELD];
- 	   if (obj)
-           if (obj->obj_flags.extra_flags & ITEM_TWO_HANDED)
-           {
-             obj_to_char(unequip_char(ch, SECOND_WIELD, (flags & SUPPRESS_MESSAGES)),ch);
-	         if (!(flags & SUPPRESS_MESSAGES))
-             act("You shift $p into your inventory.",ch, obj, NULL, TO_CHAR, 0);
-           }
+         struct obj_data *obj;
+         obj = ch->equipment[WIELD];
+         if (obj)
+         if (obj->obj_flags.extra_flags & ITEM_TWO_HANDED)
+         {
+            if ((obj = ch->equipment[SECOND_WIELD])) {
+               obj_to_char(unequip_char(ch, SECOND_WIELD, (flags & SUPPRESS_MESSAGES)),ch);
+               if (!(flags & SUPPRESS_MESSAGES))
+                  act("You shift $p into your inventory.",ch, obj, NULL, TO_CHAR, 0);
+            }
+            else if((obj = ch->equipment[HOLD])) {
+               obj_to_char(unequip_char(ch, HOLD, (flags & SUPPRESS_MESSAGES)),ch);
+               if (!(flags & SUPPRESS_MESSAGES))
+                  act("You shift $p into your inventory.",ch, obj, NULL, TO_CHAR, 0);
+            }
+            else if((obj = ch->equipment[HOLD2])) {
+               obj_to_char(unequip_char(ch, HOLD2, (flags & SUPPRESS_MESSAGES)),ch);
+               if (!(flags & SUPPRESS_MESSAGES))
+                  act("You shift $p into your inventory.",ch, obj, NULL, TO_CHAR, 0);
+            }
+            else if((obj = ch->equipment[WEAR_SHIELD])) {
+               obj_to_char(unequip_char(ch, WEAR_SHIELD, (flags & SUPPRESS_MESSAGES)),ch);
+               if (!(flags & SUPPRESS_MESSAGES))
+                  act("You shift $p into your inventory.",ch, obj, NULL, TO_CHAR, 0);
+            }
+            else if((obj = ch->equipment[WEAR_LIGHT])) {
+               obj_to_char(unequip_char(ch, WEAR_LIGHT, (flags & SUPPRESS_MESSAGES)),ch);
+               if (!(flags & SUPPRESS_MESSAGES))
+                  act("You shift $p into your inventory.",ch, obj, NULL, TO_CHAR, 0);
+            }
+         }
+         obj = ch->equipment[SECOND_WIELD];
+         if (obj)
+         if (obj->obj_flags.extra_flags & ITEM_TWO_HANDED)
+         {
+            obj = ch->equipment[WIELD];
+            if(obj) {
+               obj_to_char(unequip_char(ch, SECOND_WIELD, (flags & SUPPRESS_MESSAGES)),ch);
+               if (!(flags & SUPPRESS_MESSAGES))
+                  act("You shift $p into your inventory.",ch, obj, NULL, TO_CHAR, 0);
+            }
+         }
          if (!(flags & SUPPRESS_MESSAGES))
-   	   send_to_char("You can no longer wield two handed weapons.\r\n",ch);
+            send_to_char("You can no longer wield two handed weapons.\r\n",ch);
          check_weapon_weights(ch);
-	 break;
+         break;
       case SKILL_BLADESHIELD:
          if (!(flags & SUPPRESS_MESSAGES))
             send_to_char("The draining affect of the blade shield technique has worn off.\r\n", ch);
