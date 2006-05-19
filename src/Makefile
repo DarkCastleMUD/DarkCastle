@@ -4,7 +4,7 @@
 #---
 CXX = g++
 SRC_DIR=.
-SRCS = $(shell find $(SRC_DIR) -name "*.cpp" -maxdepth 2)
+SRCS = $(shell find $(SRC_DIR) -maxdepth 2 -name "*.cpp")
 
 OBJS = $(SRCS:.cpp=.o)
 
@@ -16,7 +16,7 @@ PROF_FLAGS = $(DEBUG_FLAGS) -pg
 #Changed when we switched to Linux Mandrake - Pir
 #LDFLAGS = -lstdc++ -lcrypt -lgcc -lm -lc -lg -lWiz -lClass
 LDFLAGS = -L/usr/lib/mysql -lcrypt -lmcheck -lmysqlclient -lz
-IN_CXXFLAGS = -Wall -I./include -DLINUX
+IN_CXXFLAGS = -Wall -I./include -DLINUX -m32
 
 BASENAME = research# Base product name -- NO SPACES
 
