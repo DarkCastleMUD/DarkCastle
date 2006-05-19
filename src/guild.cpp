@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.89 2006/05/18 08:59:33 shane Exp $
+| $Id: guild.cpp,v 1.90 2006/05/19 19:25:34 shane Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -621,7 +621,7 @@ int skill_master(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     
     if (number == -1) {
       if(!skilllist) return eFAILURE;
-      if(search_skills(arg, skilllist) == -1)
+      if(search_skills(arg, skilllist) != -1)
          do_say(invoker,"You must speak with your guildmaster to learn such a complicated ability.", 9);
       else send_to_char("You do not know of this skill...\n\r", ch);
       return eSUCCESS;
