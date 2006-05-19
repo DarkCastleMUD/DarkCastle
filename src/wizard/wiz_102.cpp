@@ -1022,6 +1022,7 @@ int do_zedit(struct char_data *ch, char *argument, int cmd)
       break;
     }
     case 11: // copy
+    {
       argument = one_argumentnolow(argument, text);
       char arg[MAX_INPUT_LENGTH];
       argument = one_argumentnolow(argument, arg);
@@ -1075,6 +1076,7 @@ int do_zedit(struct char_data *ch, char *argument, int cmd)
       zone_table[zone].cmd[to].comment = tmp.comment;
       send_to_char(buf, ch);
       break;
+    }
     default: 
       send_to_char("Error:  Couldn't find item in switch.\r\n", ch);
       break;
