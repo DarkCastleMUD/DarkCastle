@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.186 2006/05/19 07:38:09 shane Exp $ */
+/* $Id: const.cpp,v 1.187 2006/05/19 08:30:40 shane Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -717,7 +717,6 @@ char *size_bitfields[] =
     "SMALL",
     "MEDIUM",
     "LARGE",
-    "CHARMIE",
     "\n"
 };
 
@@ -727,7 +726,6 @@ char *size_bits[] =
     "Small races",
     "Medium races",
     "Large races",
-    "Charmies",
     "\n"
 };
 
