@@ -1,7 +1,7 @@
 #ifndef PLAYER_H_
 #define PLAYER_H_
 /************************************************************************
-| $Id: player.h,v 1.27 2006/05/18 07:46:08 shane Exp $
+| $Id: player.h,v 1.28 2006/05/19 07:38:17 shane Exp $
 | player.h
 | Description: This file defines the player vectors..punishment, specials,
 |   etc...
@@ -230,7 +230,10 @@
 #define APPLY_SPELLDAMAGE      103
 #define APPLY_BOUNT_SONNET_HUNGER 104
 #define APPLY_BOUNT_SONNET_THIRST 105
-#define APPLY_MAXIMUM_VALUE    105
+#define APPLY_BLIND            106
+#define APPLY_WATER_BREATHING  107
+#define APPLY_DETECT_MAGIC     108
+#define APPLY_MAXIMUM_VALUE    108
 
 
 /*

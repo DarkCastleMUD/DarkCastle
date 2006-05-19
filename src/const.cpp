@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.185 2006/05/18 07:50:34 dcastle Exp $ */
+/* $Id: const.cpp,v 1.186 2006/05/19 07:38:09 shane Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -935,7 +935,7 @@ char *apply_types[] =
     "PROTECTION FROM EVIL",
     "FLY",
     "MAGIC MISSILE",
-    "BLIND",
+    "WEP BLIND",
     "EARTHQUAKE",
     "CURSE",
     "COLOUR SPRAY", // 40
@@ -1002,6 +1002,11 @@ char *apply_types[] =
     "RESIST MAGIC",
     "ALL SAVES",
     "SPELLEFFECT",
+    "FREEDOM FROM HUNGER",
+    "FREEDOM FROM THIRST",
+    "AFF BLIND",
+    "WATERBREATHING",
+    "DETECT MAGIC",
     "\n"
 };
 

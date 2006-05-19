@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.51 2006/04/25 10:35:29 dcastle Exp $ */
+/* $Id: utility.cpp,v 1.52 2006/05/19 07:38:09 shane Exp $ */
 
 extern "C"
 {
@@ -938,7 +938,7 @@ int do_recall( CHAR_DATA *ch, char *argument, int cmd )
      send_to_char("You can't, you're bashed!\r\n", ch);
      return eFAILURE;
   }
- 
+
   one_argument(argument, name);
 
   if (!(*name))
@@ -949,15 +949,17 @@ int do_recall( CHAR_DATA *ch, char *argument, int cmd )
      return eFAILURE;
   }
 
+  if(affected_by_spell(victim, FUCK_PTHIEF) || affected_by_spell(victim, FUCK_GTHIEF)) {
+     send_to_char("The gods frown upon your thieving ways and refuse to aid your escape.\n\r", victim);
+     return eFAILURE;
+  }
+
   if (IS_NPC(ch))
     location = real_room(GET_HOME(ch));
   else
   {
     if( GET_HOME(victim) == 0 || GET_LEVEL(victim) < 11 ||
-        IS_AFFECTED(victim, AFF_CANTQUIT) ||
-	affected_by_spell(victim, FUCK_PTHIEF) || 
-	affected_by_spell(victim, FUCK_GTHIEF)
-      )
+        IS_AFFECTED(victim, AFF_CANTQUIT) )
       location = real_room(START_ROOM);
     else
       location = real_room(GET_HOME(victim));

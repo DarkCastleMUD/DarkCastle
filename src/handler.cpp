@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.102 2006/05/19 06:47:46 shane Exp $ */
+/* $Id: handler.cpp,v 1.103 2006/05/19 07:38:09 shane Exp $ */
     
 extern "C"
 {
@@ -1102,6 +1102,21 @@ void affect_modify(CHAR_DATA *ch, int32 loc, int32 mod, long bitv, bool add)
         case APPLY_BOUNT_SONNET_THIRST:
            if(add) SETBIT(ch->affected_by, AFF_BOUNT_SONNET_THIRST);
            else REMBIT(ch->affected_by, AFF_BOUNT_SONNET_THIRST);
+           break;
+
+        case APPLY_BLIND:
+           if(add) SETBIT(ch->affected_by, AFF_BLIND);
+           else REMBIT(ch->affected_by, AFF_BLIND);
+           break;
+
+        case APPLY_WATER_BREATHING:
+           if(add) SETBIT(ch->affected_by, AFF_WATER_BREATHING);
+           else REMBIT(ch->affected_by, AFF_WATER_BREATHING);
+           break;
+
+        case APPLY_DETECT_MAGIC:
+           if(add) SETBIT(ch->affected_by, AFF_DETECT_MAGIC);
+           else REMBIT(ch->affected_by, AFF_DETECT_MAGIC);
            break;
 
 	default:

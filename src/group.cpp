@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: group.cpp,v 1.18 2005/07/01 10:51:25 urizen Exp $
+| $Id: group.cpp,v 1.19 2006/05/19 07:38:09 shane Exp $
 | group.C
 | Description:  Group related commands; join, abandon, follow, etc..
 */
@@ -137,6 +137,11 @@ int do_split(CHAR_DATA *ch, char *argument, int cmd)
   if (!*argument){
     send_to_char("Split what?\n\r", ch);
     return eFAILURE;
+  }
+
+  if(affected_by_spell(ch, FUCK_GTHIEF)) {
+     send_to_char("Nobody wants any part of your stolen booty!\n\r", ch);
+     return eFAILURE;
   }
 
   one_argument (argument, number);
