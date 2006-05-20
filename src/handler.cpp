@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.104 2006/05/20 04:14:46 apocalypse Exp $ */
+/* $Id: handler.cpp,v 1.105 2006/05/20 06:31:05 jhhudso Exp $ */
     
 extern "C"
 {
@@ -364,9 +364,10 @@ const struct set_data set_list[] = {
   { "Black Crystal Armours", 7, {22011,22017,22025,22026,22027,22028,22029,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
         "Your crystal armours $B$0darken$R and begin to hum with magic.\r\n",
         "The $B$0darkness$R disperses as the crystal armours are removed.\r\n"},
+
   { "Aqua Pendants", 2, {5611,5643,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
         "The pendants click softly and you feel a surge of energy as gills spring from your neck!\r\n",
-        "Your gills retract and fade as the two pendants separate quietly.\r\n", 
+        "Your gills retract and fade as the two pendants separate quietly.\r\n"}, 
   { "\n", 0, {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
 	"\n","\n"}
 };
