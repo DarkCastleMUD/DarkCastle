@@ -338,7 +338,7 @@ void determine_trade_skill_increase(char_data * ch, int skillnum, int learned, i
 int handle_poisoned_weapon_attack(char_data * ch, char_data * vict, int type)
 {
    int retval = eSUCCESS;
-   int dam;
+   // unused   int dam;
 
    if(!ch->equipment[WIELD]) {
       send_to_char("In handle_poisoned_weapon_atack() with null wield.  Tell a god.\r\n", ch);
