@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.64 2006/05/19 19:25:34 shane Exp $
+| $Id: move.cpp,v 1.65 2006/05/20 16:23:52 shane Exp $
 | move.C
 | Movement commands and stuff.
 *************************************************************************
@@ -225,6 +225,11 @@ int do_fall(CHAR_DATA *ch, short dir)
   if(GET_LEVEL(ch) >= IMMORTAL) {
     return eFAILURE;
     }
+
+  if(IS_AFFECTED(ch, AFF_FREEFLOAT)) {
+    dam = 0;
+    send_to_char("Your freefloating magics reduce your fall to a safer speed.\n\r",ch);
+  }
 
   // Don't effect mobs
   if(IS_NPC(ch)) {
@@ -502,7 +507,7 @@ int do_simple_move(CHAR_DATA *ch, int cmd, int following)
             if(ch->equipment[x]->obj_flags.type_flag == ITEM_BOAT)
               has_boat = TRUE;
       if (!has_boat && !IS_AFFECTED(ch, AFF_FLYING) &&
-        GET_RACE(ch) != RACE_FISH && GET_RACE(ch) != RACE_SLIME) {
+        GET_RACE(ch) != RACE_FISH && GET_RACE(ch) != RACE_SLIME && !IS_AFFECTED(ch, AFF_FREEFLOAT)) {
         send_to_char("You need a boat to go there.\n\r", ch);
         return eFAILURE;
         }

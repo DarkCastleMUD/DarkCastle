@@ -226,7 +226,7 @@ NULL,   SKILL_INCREASE_HARD
 
 },
 { /* 25 */
-        12, POSITION_FIGHTING, 7, SKILL_SONG_DISCHORDANT_DIRGE,
+        9, POSITION_FIGHTING, 7, SKILL_SONG_DISCHORDANT_DIRGE,
 	        TAR_CHAR_ROOM|TAR_FIGHT_VICT,
         song_dischordant_dirge, execute_song_dischordant_dirge, NULL, 
 NULL,    SKILL_INCREASE_HARD
