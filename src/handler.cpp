@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.103 2006/05/19 07:38:09 shane Exp $ */
+/* $Id: handler.cpp,v 1.104 2006/05/20 04:14:46 apocalypse Exp $ */
     
 extern "C"
 {
@@ -364,6 +364,9 @@ const struct set_data set_list[] = {
   { "Black Crystal Armours", 7, {22011,22017,22025,22026,22027,22028,22029,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
         "Your crystal armours $B$0darken$R and begin to hum with magic.\r\n",
         "The $B$0darkness$R disperses as the crystal armours are removed.\r\n"},
+  { "Aqua Pendants", 2, {5611,5643,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+        "The pendants click softly and you feel a surge of energy as gills spring from your neck!\r\n",
+        "Your gills retract and fade as the two pendants separate quietly.\r\n", 
   { "\n", 0, {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
 	"\n","\n"}
 };
@@ -414,12 +417,12 @@ void add_set_stats(char_data *ch, obj_data *obj, int flag, int pos)
 	  case SET_SAIYAN: // (aka Ascetic's Focus)
 	    af.bitvector = AFF_HASTE;
 	    affect_to_char(ch,&af);
-  	    break;
+  	   break;
 	  case SET_VESTMENTS:
 	    af.location = APPLY_MANA;
 	    af.modifier = 75;
 	    affect_to_char(ch, &af);
-	    break;
+	   break;
 	  case SET_HUNTERS:
 	    af.location = APPLY_HITROLL;
 	    af.modifier = 5;
@@ -427,7 +430,7 @@ void add_set_stats(char_data *ch, obj_data *obj, int flag, int pos)
 	    af.location = APPLY_MOVE;
 	    af.modifier = 40;
 	    affect_to_char(ch, &af);
-	    break;
+	   break;
 	  case SET_FERAL:
 	    af.location = APPLY_HITROLL;
 	    af.modifier = 2;
@@ -438,17 +441,17 @@ void add_set_stats(char_data *ch, obj_data *obj, int flag, int pos)
 	    af.location = APPLY_DAMROLL;
 	    af.modifier = 1;
 	    affect_to_char(ch, &af);
-	    break;
+	   break;
 	  case SET_CAPTAINS:
 	    af.location = APPLY_HIT;
 	    af.modifier = 75;
 	    affect_to_char(ch,&af);
-	    break;
+	   break;
 	  case SET_CELEBRANTS:
 	    af.location = APPLY_KI;
 	    af.modifier = 8;
 	    affect_to_char(ch, &af);
-	    break;
+	   break;
 	  case SET_RAGER:
 	    af.location = 0;
 	    af.modifier = 0;
@@ -458,7 +461,7 @@ void add_set_stats(char_data *ch, obj_data *obj, int flag, int pos)
 	    af.modifier = 5;
 	    af.bitvector = -1;
 	    affect_to_char(ch, &af);
-	    break;
+	   break;
 	  case SET_FIELDPLATE:
             af.location = APPLY_HIT;
 	    af.modifier = 100;
@@ -469,7 +472,7 @@ void add_set_stats(char_data *ch, obj_data *obj, int flag, int pos)
 	    af.location = APPLY_AC;
 	    af.modifier = -40;
 	    affect_to_char(ch, &af);
-	    break;
+	   break;
 	  case SET_MOAD:
 	    af.location = APPLY_HIT_N_DAM;
 	    af.modifier = 4;
@@ -483,7 +486,7 @@ void add_set_stats(char_data *ch, obj_data *obj, int flag, int pos)
 	    af.location = APPLY_SONG_DAMAGE;
 	    af.modifier = -5;
 	    affect_to_char(ch, &af);
-	    break;
+	   break;
           case SET_WHITECRYSTAL:
             af.location = APPLY_HITROLL;
             af.modifier = 10;
@@ -511,7 +514,13 @@ void add_set_stats(char_data *ch, obj_data *obj, int flag, int pos)
             af.location = APPLY_SAVING_ENERGY;
             af.modifier = 8;
             affect_to_char(ch, &af);
-	   break;
+           break;
+          case SET_AQUA:
+	    af.bitvector = AFF_WATER_BREATHING;
+	    affect_to_char(ch,&af);
+  	    af.location = APPLY_HIT_N_DAM;
+            af.modifier = 2;
+           break;
 	  default: 
 		send_to_char("Tough luck, you completed an unimplemented set. Report what you just wore, eh?\r\n",ch);
 		break;
