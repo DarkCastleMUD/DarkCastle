@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.105 2006/05/20 06:31:05 jhhudso Exp $ */
+/* $Id: handler.cpp,v 1.106 2006/05/20 07:17:04 jhhudso Exp $ */
     
 extern "C"
 {
@@ -1133,7 +1133,7 @@ void affect_modify(CHAR_DATA *ch, int32 loc, int32 mod, long bitv, bool add)
           sprintf(log_buf, "Unknown apply adjust attempt: %d. (handler.c, "
                   "affect_modify.)", loc);
 	  log(log_buf, 0, LOG_BUG); 
-	  strcpy(0,0);
+	  //	  strcpy(0,0); /* Why was this here? -Jared */
 	  break;
 
     } /* switch */
