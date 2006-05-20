@@ -143,7 +143,7 @@ int write_corpse_to_disk(FILE *fp, struct obj_data *obj, int locate)
         *buf1 = 0;
         fprintf(fp,
              "#%d\n"
-             "%d %d %d %d %d %ld %d %d\n",
+             "%d %d %d %d %d %u %d %d\n",
               GET_OBJ_VNUM(obj),   
               locate,
               GET_OBJ_VAL(obj, 0),  
