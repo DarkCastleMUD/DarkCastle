@@ -167,7 +167,7 @@ int do_check(struct char_data *ch, char *arg, int cmd) {
           GET_KI(vict), GET_MAX_KI(vict));
   send_to_char(buf, ch);
 
-  if(GET_LEVEL(ch) >= DEITY && !IS_MOB(vict))
+  if(GET_LEVEL(ch) >= OVERSEER && !IS_MOB(vict) && GET_LEVEL(ch) >= GET_LEVEL(vict))
   {
     sprintf(buf, "$3Last connected from$R: %s\n\r", vict->pcdata->last_site);
     send_to_char(buf, ch);
@@ -181,7 +181,7 @@ int do_check(struct char_data *ch, char *arg, int cmd) {
 
   if(connected) 
     if(vict->desc) {
-      if(GET_LEVEL(ch) >= DEITY)
+      if(GET_LEVEL(ch) >= OVERSEER && GET_LEVEL(ch) >= GET_LEVEL(vict))
       {
         sprintf(buf, "$3Connected from$R: %s\n\r", vict->desc->host);
         send_to_char(buf, ch);
