@@ -173,7 +173,7 @@ int do_pardon(struct char_data *ch, char *argument, int cmd)
 
 char *print_classes(int bitv)
 {
-  char buf[512];
+  static char buf[512];
   int i = 0;
   buf[0] = '\0';
   extern char*pc_clss_types2[];
