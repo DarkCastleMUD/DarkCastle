@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: cl_ranger.cpp,v 1.63 2006/05/11 21:26:11 dcastle Exp $ | cl_ranger.C  *
+ * $Id: cl_ranger.cpp,v 1.64 2006/05/20 11:58:15 jhhudso Exp $ | cl_ranger.C  *
  * Description: Ranger skills/spells                                          *
  *                                                                            *
  * Revision History                                                           *
@@ -585,7 +585,7 @@ int pick_one(int a, int b, int c, int d)
 
 int do_forage(CHAR_DATA *ch, char *arg, int cmd)
 {
-  int foraged, learned, specialization;
+  int learned, specialization;
   struct obj_data * new_obj = 0;
   struct affected_type af;
 
