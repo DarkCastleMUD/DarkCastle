@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.94 2006/05/07 23:07:53 dcastle Exp $ */
+/* $Id: mob_proc.cpp,v 1.95 2006/05/20 16:51:52 shane Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -1744,7 +1744,7 @@ static char *poetSayText [] = {
    "With dreams, with drugs, with waking nightmares,",
    "Incomparable blind streets of shuddering cloud and mind-lightning,",
    "Illuminating all the motionless world of Time between,",
-   "Backyard green tree cemetary dawns, wine drunkeness over the rooftops,",
+   "Backyard green tree cemetery dawns, wine drunkeness over the rooftops,",
    "Sun and moon and tree vibrations in the winter dusks of Hyperborea,",
    "A lost battalion of platonic conversationalists jumping from the moon,",
    "Leaving a trail of ambiguous picture postcards of Midgaard,",

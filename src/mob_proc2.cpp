@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.61 2006/05/03 18:40:21 dcastle Exp $ */
+/* $Id: mob_proc2.cpp,v 1.62 2006/05/20 16:51:52 shane Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -118,9 +118,9 @@ int new_meta_exp_cost_one(int start)
 
 long long moves_exp_spent(char_data * ch)
 {
-   int start = GET_RAW_MOVE(ch) - GET_MOVE_METAS(ch);
+   int start = GET_MAX_MOVE(ch) - GET_MOVE_METAS(ch);
    long long expcost = 0;
-   while (start < GET_RAW_MOVE(ch))
+   while (start < GET_MAX_MOVE(ch))
    {
     expcost += (int)((5000000 + (start * 2500))*1.2);
     start++;
@@ -131,8 +131,8 @@ long long moves_exp_spent(char_data * ch)
 long long moves_plats_spent(char_data * ch)
 {
   long long expcost = 0;
-  int start = GET_RAW_MOVE(ch) - GET_MOVE_METAS(ch);
-  while (start < GET_RAW_MOVE(ch))
+  int start = GET_MAX_MOVE(ch) - GET_MOVE_METAS(ch);
+  while (start < GET_MAX_MOVE(ch))
   {
     expcost += (long long)(((int)(125 + (int)((0.025 * start *(start/1000 == 0 ? 1: start/1000))))*0.9));
     start++;
@@ -160,8 +160,8 @@ long long hps_exp_spent(char_data * ch)
       default:
         cost = 3000; break;
    }
-   int base = GET_RAW_HIT(ch) - GET_HP_METAS(ch);
-   while (base < GET_RAW_HIT(ch))
+   int base = GET_MAX_HIT(ch) - GET_HP_METAS(ch);
+   while (base < GET_MAX_HIT(ch))
    {
      expcost += (long long)((5000000 + (cost * base))*1.2);
      base++;
@@ -189,8 +189,8 @@ long long hps_plats_spent(char_data * ch)
       default:
         cost = 100; break;
    }
-   int base = GET_RAW_HIT(ch) - GET_HP_METAS(ch);
-   while (base < GET_RAW_HIT(ch))
+   int base = GET_MAX_HIT(ch) - GET_HP_METAS(ch);
+   while (base < GET_MAX_HIT(ch))
    {
      platcost += (long long)((100 + cost + (int)(0.025 * base *(base/1000 == 0 ? 1: base/1000))) * 0.9);
      base++;
@@ -213,8 +213,8 @@ long long mana_exp_spent(char_data * ch)
       default:
         return 0;
    }
-   int base = GET_RAW_MANA(ch) - GET_MANA_METAS(ch);
-   while (base < GET_RAW_MANA(ch))
+   int base = GET_MAX_MANA(ch) - GET_MANA_METAS(ch);
+   while (base < GET_MAX_MANA(ch))
    {
      expcost += (long long)((5000000 + (cost * base))*1.2);
      base++;     
@@ -238,8 +238,8 @@ long long mana_plats_spent(char_data * ch)
       default:
         return 0;
    }
-  int base = GET_RAW_MANA(ch) - GET_MANA_METAS(ch);
-  while (base < GET_RAW_MANA(ch))
+  int base = GET_MAX_MANA(ch) - GET_MANA_METAS(ch);
+  while (base < GET_MAX_MANA(ch))
   {
     platcost += (long long)((100 + cost + (int)(0.025 * base * (base/1000 == 0 ? 1: base/1000)))*0.9);
     base++;
@@ -1309,7 +1309,7 @@ int meta_get_ki_exp_cost(char_data * ch)
       cost = 7400; break;
     default: return 0;
   }
-  cost = 10000000 + (GET_RAW_KI(ch) * cost);
+  cost = 10000000 + (GET_MAX_KI(ch) * cost);
   return (int)(cost*1.2);
 }
  
@@ -1324,7 +1324,7 @@ int meta_get_ki_plat_cost(char_data * ch)
       cost = 400; break;
     default: return 0;
   } 
-  cost = 500 + cost + ((GET_RAW_KI(ch)/2) * (GET_RAW_KI(ch)/10));
+  cost = 500 + cost + ((GET_MAX_KI(ch)/2) * (GET_MAX_KI(ch)/10));
   return (int)(cost*0.9);
 }
 
