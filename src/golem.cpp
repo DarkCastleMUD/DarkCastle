@@ -220,8 +220,8 @@ void set_golem(CHAR_DATA *golem, int golemtype)
         golem->position = POSITION_STANDING;
         golem->immune = golem->suscept = golem->resist = 0;
         golem->c_class = 0;
-        golem->height = 350;
-        golem->weight = 530;
+        golem->height = 255; // Was 350, but it can't fit in a byte
+        golem->weight = 255; // Was 530, ditto
 }
 
 void load_golem_data(CHAR_DATA *ch, int golemtype)
