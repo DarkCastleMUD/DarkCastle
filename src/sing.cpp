@@ -2375,27 +2375,27 @@ int execute_song_bountiful_sonnet( ubyte level, CHAR_DATA *ch, char *arg, CHAR_D
       af.type      = SKILL_SONG_BOUNT_SONNET;
       af.duration  = skill / 4;
       af.modifier  = 0;
-      af.bitvector = -1;
+      af.location  = 0;
 
-      send_to_char("You feel like you've just eaten a huge meal!\r\n", fvictim->follower);
+      send_to_char("Your appetite has been completely satiated.\r\n", fvictim->follower);
       if(GET_COND(fvictim->follower, FULL) != -1) {
-         af.location  = APPLY_BOUNT_SONNET_HUNGER;
+         af.bitvector  = AFF_BOUNT_SONNET_HUNGER;
          affect_to_char(fvictim->follower, &af);
       }
       if(GET_COND(fvictim->follower, THIRST) != -1) {
-         af.location  = APPLY_BOUNT_SONNET_THIRST;
+         af.bitvector  = AFF_BOUNT_SONNET_THIRST;
          affect_to_char(fvictim->follower, &af);
       }
    }
    if(ch->in_room == master->in_room)
    {
-      send_to_char("You feel like you've just eaten a huge meal!\r\n", master);
+      send_to_char("Your appetite has been completely satiated.\r\n", master);
       if(GET_COND(master, FULL) != -1) {
-         af.location  = APPLY_BOUNT_SONNET_HUNGER;
+         af.bitvector  = AFF_BOUNT_SONNET_HUNGER;
          affect_to_char(fvictim->follower, &af);
       }
       if(GET_COND(master, THIRST) != -1) {
-         af.location  = APPLY_BOUNT_SONNET_THIRST;
+         af.bitvector  = AFF_BOUNT_SONNET_THIRST;
          affect_to_char(fvictim->follower, &af);
       }
    }
