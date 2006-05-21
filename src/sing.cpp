@@ -2366,16 +2366,16 @@ int execute_song_bountiful_sonnet( ubyte level, CHAR_DATA *ch, char *arg, CHAR_D
       master = ch->master;
    else master = ch;
 
+   af.type      = SKILL_SONG_BOUNT_SONNET;
+   af.duration  = skill / 4;
+   af.modifier  = 0;
+   af.location  = 0;
+
    for(fvictim = master->followers; fvictim; fvictim = fvictim->next)
    {
       if(!ISSET(fvictim->follower->affected_by, AFF_GROUP) || 
          fvictim->follower->in_room != ch->in_room)
          continue;
-
-      af.type      = SKILL_SONG_BOUNT_SONNET;
-      af.duration  = skill / 4;
-      af.modifier  = 0;
-      af.location  = 0;
 
       send_to_char("Your appetite has been completely satiated.\r\n", fvictim->follower);
       if(GET_COND(fvictim->follower, FULL) != -1) {
@@ -2392,11 +2392,11 @@ int execute_song_bountiful_sonnet( ubyte level, CHAR_DATA *ch, char *arg, CHAR_D
       send_to_char("Your appetite has been completely satiated.\r\n", master);
       if(GET_COND(master, FULL) != -1) {
          af.bitvector  = AFF_BOUNT_SONNET_HUNGER;
-         affect_to_char(fvictim->follower, &af);
+         affect_to_char(master, &af);
       }
       if(GET_COND(master, THIRST) != -1) {
          af.bitvector  = AFF_BOUNT_SONNET_THIRST;
-         affect_to_char(fvictim->follower, &af);
+         affect_to_char(master, &af);
       }
    }
    return eSUCCESS;
