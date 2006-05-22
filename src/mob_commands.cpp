@@ -717,7 +717,7 @@ int do_mpxpreward( CHAR_DATA *ch, char *argument, int cmd )
         return eSUCCESS;
       }
       
-    csendf(vict, "You recieve %d exps.\r\n", reward);
+    csendf(vict, "You receive %d exps.\r\n", reward);
     gain_exp(vict, reward);
     return eSUCCESS;
 }

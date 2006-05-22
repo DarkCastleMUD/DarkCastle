@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.95 2006/05/20 16:51:52 shane Exp $ */
+/* $Id: mob_proc.cpp,v 1.96 2006/05/22 22:14:01 apocalypse Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -3014,7 +3014,7 @@ static char *dethSayText [ ] =
   "Damn needy players. They should be happy with 2600 baud and dual wield.",
   "Philosophy SUCKS!",
   "Dyslexics of the world, UNTIE!",
-  "I love Swedes and Canadians...my puny American ways are insignificant when compared to the power of Moose and Meatballs!",
+  "I love Swedes and Canadians...my puny American ways are insignificant when compared to the power of Meatballs and Moose!",
   "I got fired from work trying to find this amulet of Yendor, and I finally have it. Now what?",
   "People who gives blowjobs are fucked in the head.",
   "What's difference between Michael Jackson and acne? Acne waits till 13 to come on your face.",

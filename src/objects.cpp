@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.62 2006/05/18 07:50:35 dcastle Exp $
+| $Id: objects.cpp,v 1.63 2006/05/22 22:14:01 apocalypse Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -282,7 +282,7 @@ int do_quaff(struct char_data *ch, char *argument, int cmd)
   }
  
   if ((GET_COND(ch,FULL) >= 24) && (GET_COND(ch,THIRST) >= 24)) {
-    act("Your stomach is to full to quaff that!", ch,0,0,TO_CHAR, 0);
+    act("Your stomach is too full to quaff that!", ch,0,0,TO_CHAR, 0);
     return eFAILURE;
   }
 

@@ -1136,7 +1136,7 @@ int arenaporter(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
    }
 
    send_to_char("A dimensional hole swallows you.\r\nYou reappear elsewhere.\r\n", ch);
-   act("$n fades out of existance.", ch, 0,0,TO_ROOM, INVIS_NULL);
+   act("$n fades out of existence.", ch, 0,0,TO_ROOM, INVIS_NULL);
 
    do_look(ch, "\0", 15);
 
@@ -1172,7 +1172,7 @@ int movingarenaporter(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
       return eFAILURE;
 
    send_to_char("A dimensional hole swallows you.\r\nYou reappear elsewhere.\r\n", ch);
-   act("$n fades out of existance.", ch, 0,0,TO_ROOM, INVIS_NULL);
+   act("$n fades out of existence.", ch, 0,0,TO_ROOM, INVIS_NULL);
 
    if(ch->fighting)
    {
@@ -2448,8 +2448,8 @@ int glove_combat_procs(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
        if(number(0, 17))
          return eFAILURE;
 
-       act("$n's $o begin pulse with a white light for a moment.", ch, obj, 0, TO_ROOM, 0);
-       send_to_char("Your gloves begin to pulse with a white light for a moment.\r\n", ch);
+       act("$n's $o momentarily pulse with a $B$7white light$R.", ch, obj, 0, TO_ROOM, 0);
+       send_to_char("Your gloves momentarily pulse with a $B$7white light$R.\r\n", ch);
        return spell_cure_serious(30, ch, ch, 0, 50);
      break;
       case 506:
@@ -2632,7 +2632,7 @@ int godload_banshee(struct char_data *ch, struct obj_data *obj, int cmd,
    if (cmd) return eFAILURE;
    if (!(vict = ch->fighting)) return eFAILURE;
    if (number(1,101) > 12) return eFAILURE;
-   act("$n's instrument takes on a life on it's own, sending out a piercing wail.",ch,0,vict, TO_ROOM,0);  
+   act("$n's instrument takes on a life of its own, sending out a piercing wail.",ch,0,vict, TO_ROOM,0);  
    send_to_char("Your instrument sends out a piercing wail.\r\n",ch);
    return song_whistle_sharp(51,ch,"",vict, 50); 
 }
@@ -2731,7 +2731,7 @@ char*arg, CHAR_DATA *invoker)
   }
   addTimer(ch, SPELL_TELEPORT, 24);
   send_to_char("Your armbands crackle, and you phase out of existence",ch);
-  act("$n phases out of existance.",ch, 0, 0, TO_ROOM,0);
+  act("$n phases out of existence.",ch, 0, 0, TO_ROOM,0);
   return spell_teleport(50,ch, ch, 0, 100);
 }
 

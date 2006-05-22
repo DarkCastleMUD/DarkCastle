@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.65 2006/05/20 16:23:52 shane Exp $
+| $Id: move.cpp,v 1.66 2006/05/22 22:14:01 apocalypse Exp $
 | move.C
 | Movement commands and stuff.
 *************************************************************************
@@ -1023,7 +1023,7 @@ int do_enter(CHAR_DATA *ch, char *argument, int cmd)
     case 0:
       do_look(ch, "", 9);
       WAIT_STATE(ch, PULSE_VIOLENCE);
-      send_to_char("\n\rYou are momentarily dazed from the dimensional shift\n\r", ch);
+      send_to_char("\n\rYou are momentarily dazed from the dimensional shift.\n\r", ch);
       act("The portal glows brighter for a second as $n appears beside you.", ch, 0, 0, TO_ROOM, 0);
       break;
     case 1:

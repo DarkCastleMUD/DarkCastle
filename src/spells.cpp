@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.158 2006/05/18 07:50:35 dcastle Exp $ */
+/* $Id: spells.cpp,v 1.159 2006/05/22 22:14:02 apocalypse Exp $ */
 
 extern "C"
 {
@@ -1579,7 +1579,7 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
           send_to_char("You can't do this sitting!\n\r", ch);
           break;
         case POSITION_FIGHTING :
-          send_to_char("Impossible! You can't concentrate enough!.\n\r", ch);
+          send_to_char("Impossible! You can't concentrate enough!\n\r", ch);
           break;
         default:
           send_to_char("It seems like you're in a pretty bad shape!\n\r",ch);

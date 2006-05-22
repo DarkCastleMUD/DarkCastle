@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: non_off.cpp,v 1.35 2006/05/03 18:40:21 dcastle Exp $
+| $Id: non_off.cpp,v 1.36 2006/05/22 22:14:01 apocalypse Exp $
 | non_off.C
 | Description:  Implementation of generic, non-offensive commands.
 */
@@ -699,12 +699,12 @@ int do_notell_toggle(struct char_data *ch, char *argument, int cmd)
 
     if (IS_SET(ch->pcdata->toggles, PLR_NOTELL))
     {
-	send_to_char( "You are able to send and recieve tells again.\n\r", ch);
+	send_to_char( "You are able to send and receive tells again.\n\r", ch);
 	REMOVE_BIT(ch->pcdata->toggles, PLR_NOTELL);
     }
     else
     {
-	send_to_char( "You are no longer able to send or recieve tells.\n\r", ch);
+	send_to_char( "You are no longer able to send or receive tells.\n\r", ch);
 	SET_BIT(ch->pcdata->toggles, PLR_NOTELL);
     }
 

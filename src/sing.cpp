@@ -1494,7 +1494,7 @@ int execute_song_astral_chanty( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA
       dc_free(ch->song_data);
       ch->song_data = 0;
       }
-    send_to_char("You can't recall the right words.\r\n", ch);
+    send_to_char("You cannot seem to accurately focus your song.\r\n", ch);
     return eFAILURE;
     }
 
@@ -1655,7 +1655,7 @@ int execute_song_shattering_resonance( ubyte level, CHAR_DATA *ch, char *arg, CH
       }
       else {
          send_to_char("The magic is shattered by your will!\n\r", ch);
-         act("$p blinks out of existance with a bang!", ch, obj, 0, TO_ROOM, INVIS_NULL);
+         act("$p blinks out of existence with a bang!", ch, obj, 0, TO_ROOM, INVIS_NULL);
          send_to_char("Your magic beacon is shattered!\n\r", obj->equipped_by);
          obj->equipped_by->beacon = NULL;
          obj->equipped_by = NULL;
@@ -2582,7 +2582,7 @@ int song_sticky_lullaby( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victi
    ch->song_data = str_dup(arg);
 
    send_to_char("You begin a slow numbing lullaby...\n\r", ch);
-   act("$n starts a eye-drooping lullaby.", ch, 0, 0, TO_ROOM, 0);
+   act("$n starts singing an eye-drooping lullaby.", ch, 0, 0, TO_ROOM, 0);
    ch->song_timer = song_info[ch->song_number].beats;
    if(GET_LEVEL(ch) < 40)
       ch->song_timer += 2;

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.122 2006/05/18 07:50:36 dcastle Exp $
+| $Id: cl_thief.cpp,v 1.123 2006/05/22 22:14:07 apocalypse Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -180,7 +180,7 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
   }
 
   if(IS_AFFECTED(victim, AFF_ALERT)) {
-    act("$E is too alert and nervous looking and you are unable to sneak behind!", ch,0,victim, TO_CHAR, 0);
+    act("$E is too alert and nervous looking; you are unable to sneak behind!", ch,0,victim, TO_CHAR, 0);
     return eFAILURE;
   }
 
@@ -1073,7 +1073,7 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
     } // if(obj)
     else
     { // they don't got it
-      act("They do not have that item.",ch,0,victim,TO_CHAR, 0);
+      act("$N does not seem to possess that item.",ch,0,victim,TO_CHAR, 0);
       return eFAILURE;
     }
   } // of else, not in inventory

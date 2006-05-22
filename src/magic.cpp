@@ -1793,7 +1793,7 @@ int spell_detect_evil(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
 
   affect_to_char(victim, &af);
   send_to_char("You become more conscious of the evil around you.\n\r", victim);
-  act("$n looks to be more conscious of the evil around $s.", victim, 0, 0, TO_ROOM, INVIS_NULL);
+  act("$n looks to be more conscious of the evil around $m.", victim, 0, 0, TO_ROOM, INVIS_NULL);
   return eSUCCESS;
 }
 
@@ -1826,7 +1826,7 @@ int spell_detect_good(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
 
   affect_to_char(victim, &af);
   send_to_char("You are now able to truly recognize the good in others.\n\r", victim);
-  act("$n looks to be more conscious of the evil around $s.", victim, 0, 0, TO_ROOM, INVIS_NULL);
+  act("$n looks to be more conscious of the evil around $m.", victim, 0, 0, TO_ROOM, INVIS_NULL);
   return eSUCCESS;
 }
 
@@ -3971,11 +3971,11 @@ int spell_fear(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
 
    if (number(1,101) < get_saves(victim, SAVE_TYPE_COLD))
    {
-act("$N resists your attempt to fear $M!", ch, NULL, victim, 
+act("$N resists your attempt to scare $M!", ch, NULL, victim, 
 TO_CHAR,0);
-act("$N resists $n's attempt to fear $M!", ch, NULL, victim, TO_ROOM,
+act("$N resists $n's attempt to scare $M!", ch, NULL, victim, TO_ROOM,
 NOTVICT);
-act("You resist $n's attempt to fear you!",ch,NULL,victim,TO_VICT,0);
+act("You resist $n's attempt to scare you!",ch,NULL,victim,TO_VICT,0);
       if (IS_NPC(victim) && (!victim->fighting) && GET_POS(ch) > POSITION_SLEEPING) {
          retval = attack(victim, ch, TYPE_UNDEFINED);
          retval = SWAP_CH_VICT(retval);
@@ -4872,8 +4872,8 @@ int spell_iridescent_aura(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct 
    struct affected_type af;
 
    if (!affected_by_spell(victim, SPELL_IRIDESCENT_AURA)) {
-      act("The air around $n shimmers and an iridescent aura appears around $m.", victim, 0, 0, TO_ROOM, INVIS_NULL);
-      act("The air around you shimmers, and an iridescent aura appears around you.",victim,0,0, TO_CHAR,0);
+      act("The air around $n shimmers and an $B$3i$7r$3i$7d$3e$7s$3c$7e$3n$7t$R aura appears around $m.", victim, 0, 0, TO_ROOM, INVIS_NULL);
+      act("The air around you shimmers and an $B$3i$7r$3i$7d$3e$7s$3c$7e$3n$7t$R aura appears around you.",victim,0,0, TO_CHAR,0);
       af.type = SPELL_IRIDESCENT_AURA;
       af.duration = 1 + skill / 10;
       af.modifier = skill/15;

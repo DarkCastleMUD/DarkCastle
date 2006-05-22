@@ -193,8 +193,8 @@ int innate_illusion(CHAR_DATA *ch, char *arg, int cmd)
    af.type = SPELL_INVISIBLE;
    af.bitvector = AFF_INVISIBLE;
    affect_to_char(ch, &af);
-   send_to_char("You use your race's innate illusion powers, and fade out of existance.\r\n",ch);
-   act("$n chants something incoherent and fades out of existance.", ch, NULL, NULL, TO_ROOM, 0);
+   send_to_char("You use your race's innate illusion powers, and fade out of existence.\r\n",ch);
+   act("$n chants something incoherent and fades out of existence.", ch, NULL, NULL, TO_ROOM, 0);
    return eSUCCESS;
 }
 
