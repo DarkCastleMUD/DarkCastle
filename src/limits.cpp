@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.69 2006/05/18 07:46:00 shane Exp $ */
+/* $Id: limits.cpp,v 1.70 2006/05/22 21:36:33 shane Exp $ */
 
 extern "C"
 {
@@ -736,40 +736,17 @@ void point_update( void )
   for(i = character_list; i; i = next_dude) 
   {
     next_dude = i->next;
-  if (affected_by_spell(i, SPELL_POISON))
-  {
-//	debugpoint();
-    send_to_char("You feel very sick.\r\n",i);
-        int dam = affected_by_spell(i, SPELL_POISON)->duration*number(10,50);
-        int retval;
-        bool found = FALSE;
-        struct char_data *findchar;
-        for (findchar = character_list;findchar;findchar = findchar->next)
-          if ((int)findchar == affected_by_spell(i, SPELL_POISON)->modifier)
-        { // Verify that caster still exists.
-                found = TRUE;
-                break;
-        }
-        if (found)
-     retval = damage((CHAR_DATA*)(affected_by_spell(i,SPELL_POISON)->modifier), i,dam, TYPE_POISON, SPELL_POISON, 0);
-        else
-      retval = damage(i, i, dam, TYPE_POISON, SPELL_POISON, 0);
-
-//    damage(i, i, dam, TYPE_POISON, SPELL_POISON, 0);
-    continue;
-  }
+    if (affected_by_spell(i, SPELL_POISON)) continue;
 
     int a;
      CHAR_DATA *temp;
-    if (!IS_NPC(i) && ISSET(i->affected_by, AFF_HIDE) && (a = 
-has_skill(i, SKILL_HIDE)))
+    if (!IS_NPC(i) && ISSET(i->affected_by, AFF_HIDE) && (a = has_skill(i, SKILL_HIDE)))
     {
 	int o;
         for (o = 0; o < MAX_HIDE;o++)
           i->pcdata->hiding_from[o] = NULL;
         o = 0;
-        for (temp = world[i->in_room].people; temp; temp = 
-temp->next_in_room)
+        for (temp = world[i->in_room].people; temp; temp = temp->next_in_room)
         {
           if (i == temp) continue;
           if (o >= MAX_HIDE) break;

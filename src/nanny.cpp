@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.117 2006/05/18 07:50:35 dcastle Exp $ */
+/* $Id: nanny.cpp,v 1.118 2006/05/22 21:36:33 shane Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -1686,9 +1686,14 @@ void update_command_lag_and_poison()
 
       // handle poison
       if(IS_AFFECTED(i, AFF_POISON)) {
-        tmp = GET_POISON_AMOUNT(i);
+        int tmp = affected_by_spell(i, SPELL_POISON)->duration*number(10,50);
+        if(get_saves(i, SAVE_TYPE_POISON) > number(1,101)) {
+           tmp = tmp * get_saves(i, SAVE_TYPE_POISON) / 100;
+           send_to_char("You feel very sick, but resist the poison's damage.\n\r", i);
+        } else send_to_char("You feel very sick.\n\r", i);
         if(tmp) {
-           //retval = damage(i, i, tmp, TYPE_POISON, SPELL_POISON, 0);
+           act("You feel burning $2poison$R in your blood and suffer painful convulsions.", i, 0, 0, TO_CHAR, 0);
+           act("$N looks extremely sick and shivers uncomfortably from the $2poison$R in $S veins.", 0, 0, i, TO_ROOM, NOTVICT);
            retval = noncombat_damage(i, tmp,
               "You quiver from the effects of the poison and have no enegry left...",
               "$n stops struggling as $e is consumed by poison.",

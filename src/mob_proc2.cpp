@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.63 2006/05/20 17:58:45 shane Exp $ */
+/* $Id: mob_proc2.cpp,v 1.64 2006/05/22 21:36:33 shane Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -1271,60 +1271,42 @@ void meta_list_stats(char_data * ch)
 int meta_get_moves_exp_cost(char_data * ch)
 {
    int meta = GET_MOVE_METAS(ch);
-   if(GET_RAW_MOVE(ch) > GET_MAX_MOVE(ch))
-      meta -= GET_RAW_MOVE(ch) - GET_MAX_MOVE(ch);
-   if(GET_MAX_MOVE(ch) > GET_RAW_MOVE(ch))
-      meta += GET_MAX_MOVE(ch) - GET_RAW_MOVE(ch);
+   meta += GET_MAX_MOVE(ch) - GET_RAW_MOVE(ch);
    return new_meta_exp_cost_one(MAX(0,meta));
 }
 
 int meta_get_moves_plat_cost(char_data * ch)
 {
    int meta = GET_MOVE_METAS(ch);
-   if(GET_RAW_MOVE(ch) > GET_MAX_MOVE(ch))
-      meta -= GET_RAW_MOVE(ch) - GET_MAX_MOVE(ch);
-   if(GET_MAX_MOVE(ch) > GET_RAW_MOVE(ch))
-      meta += GET_MAX_MOVE(ch) - GET_RAW_MOVE(ch);
+   meta += GET_MAX_MOVE(ch) - GET_RAW_MOVE(ch);
    return (int)new_meta_platinum_cost(MAX(0,meta), MAX(0,meta)+1);
 }
 
 int meta_get_hps_exp_cost(char_data * ch)
 {
    int meta = GET_HP_METAS(ch);
-   if(GET_RAW_HIT(ch) > GET_MAX_HIT(ch))
-      meta -= GET_RAW_HIT(ch) - GET_MAX_HIT(ch);
-   if(GET_MAX_HIT(ch) > GET_RAW_HIT(ch))
-      meta += GET_MAX_HIT(ch) - GET_RAW_HIT(ch);
+   meta += GET_MAX_HIT(ch) - GET_RAW_HIT(ch);
    return new_meta_exp_cost_one(MAX(0,meta));
 }
 
 int meta_get_hps_plat_cost(char_data * ch)
 {
    int meta = GET_HP_METAS(ch);
-   if(GET_RAW_HIT(ch) > GET_MAX_HIT(ch))
-      meta -= GET_RAW_HIT(ch) - GET_MAX_HIT(ch);
-   if(GET_MAX_HIT(ch) > GET_RAW_HIT(ch))
-      meta += GET_MAX_HIT(ch) - GET_RAW_HIT(ch);
+   meta += GET_MAX_HIT(ch) - GET_RAW_HIT(ch);
    return (int)new_meta_platinum_cost(MAX(0,meta), MAX(0,meta)+1);
 }
 
 int meta_get_mana_exp_cost(char_data * ch)
 {
    int meta = GET_MANA_METAS(ch);
-   if(GET_RAW_MANA(ch) > GET_MAX_MANA(ch))
-      meta -= GET_RAW_MANA(ch) - GET_MAX_MANA(ch);
-   if(GET_MAX_MANA(ch) > GET_RAW_MANA(ch))
-      meta += GET_MAX_MANA(ch) - GET_RAW_MANA(ch);
+   meta += GET_MAX_MANA(ch) - GET_RAW_MANA(ch);
    return new_meta_exp_cost_one(MAX(0,meta));
 }
 
 int meta_get_mana_plat_cost(char_data * ch)
 {
    int meta = GET_MANA_METAS(ch);
-   if(GET_RAW_MANA(ch) > GET_MAX_MANA(ch))
-      meta -= GET_RAW_MANA(ch) - GET_MAX_MANA(ch);
-   if(GET_MAX_MANA(ch) > GET_RAW_MANA(ch))
-      meta += GET_MAX_MANA(ch) - GET_RAW_MANA(ch);
+   meta += GET_MAX_MANA(ch) - GET_RAW_MANA(ch);
    return (int)new_meta_platinum_cost(MAX(0,meta), MAX(0,meta)+1);
 }
 
