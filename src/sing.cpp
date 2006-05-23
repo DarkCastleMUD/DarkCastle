@@ -2593,10 +2593,13 @@ int execute_song_sticky_lullaby( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DAT
 {
    if(!(victim = get_char_room_vis(ch, ch->song_data)))
    {
-      send_to_char("You don't see that person here.\r\n", ch);
-      dc_free(ch->song_data);
-      ch->song_data = 0;
-      return eFAILURE;
+      if(ch->fighting) victim = ch->fighting;
+      else {
+         send_to_char("You don't see that person here.\r\n", ch);
+         dc_free(ch->song_data);
+         ch->song_data = 0;
+         return eFAILURE;
+      }
    }
    dc_free(ch->song_data);
    ch->song_data = 0;
