@@ -1975,6 +1975,7 @@ int do_oclone(struct char_data *ch, char *argument, int cmd)
   obj_index[r1].item = (void*)obj;
   extract_obj(otmp);
   send_to_char("Done!\r\n",ch);
+  return eSUCCESS;
 }
 
 int do_mclone(struct char_data *ch, char *argument, int cmd)
@@ -2013,5 +2014,6 @@ int do_mclone(struct char_data *ch, char *argument, int cmd)
   mob_index[r1].item = (void*)obj;
   extract_char(otmp,TRUE);
   send_to_char("Done!\r\n",ch);
+  return eSUCCESS;
 }
 
