@@ -33,8 +33,6 @@ extern "C"
 #include <race.h>
 #include <returnvals.h>
 
-char *str_nospace(char *stri);
-
 // Urizen's rebuild rnum references to enable additions to mob/obj arrays w/out screwing everything up.
 // A hack of renum_zone_tables *yawns*
 // type 1 = mobs, type 2 = objs. Simple as that.
@@ -1095,22 +1093,22 @@ int find_skill_num(char * name)
 
   // try ki
   for(i = 0; *ki[i] != '\n'; i++)
-    if (strlen(name) <= strlen(ki[i]) && !strncasecmp(name, str_nospace(ki[i]),strlen(name)))
+    if (strlen(name) <= strlen(ki[i]) && !str_n_nosp_cmp(name, ki[i],strlen(name)))
       return (i + KI_OFFSET);
 
   // try spells
   for(i = 0; *spells[i] != '\n'; i++)
-    if (strlen(name) <= strlen(spells[i]) && !strncasecmp(name, str_nospace(spells[i]), strlen(name)))
+    if (strlen(name) <= strlen(spells[i]) && !str_n_nosp_cmp(name, spells[i], strlen(name)))
       return (i + 1);
 
   // try skills
   for(i = 0; *skills[i] != '\n'; i++)
-    if (strlen(name) <= strlen(skills[i]) && !strncasecmp(name, str_nospace(skills[i]), strlen(name)))
+    if (strlen(name) <= strlen(skills[i]) && !str_n_nosp_cmp(name, skills[i], strlen(name)))
       return (i + SKILL_BASE);
 
   // try songs
   for(i = 0; *songs[i] != '\n'; i++)
-    if (strlen(name) <= strlen(songs[i]) && !strncasecmp(name, str_nospace(songs[i]), strlen(name)))
+    if (strlen(name) <= strlen(songs[i]) && !str_n_nosp_cmp(name, songs[i], strlen(name)))
       return (i + SKILL_SONG_BASE);
 
   return -1;    

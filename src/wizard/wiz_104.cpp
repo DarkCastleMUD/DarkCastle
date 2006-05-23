@@ -539,23 +539,6 @@ int show_zone_commands(struct char_data *ch, int i, int start = 0)
   return eSUCCESS;
 }
 
-char *str_nospace(char *stri)
-{
-  char test[512]; // Why not
-  int i = 0;
-  if (!stri) return "";
-  while (*(stri+i))
-  {
-     if (*(stri+i) == ' ')
-       test[i] = '_';
-     else
-       test[i] = *(stri+i);
-     i++;
-  }
-  test[i] = '\0';
-  return test;
-}
-
 int find_file(world_file_list_item *itm, int high)
 {
   int i;
@@ -951,25 +934,25 @@ int do_show(struct char_data *ch, char *argument, int cmd)
           goto thisLoop;
         }
        for (i = 0; *isr_bits[i] != '\n' ; i++)
-        if (!str_cmp(str_nospace(isr_bits[i]),arg1))
+        if (!str_nosp_cmp(isr_bits[i],arg1))
         {
           SET_BIT(immune, 1<<i);
           goto thisLoop;
         }
        for (i = 0; *action_bits[i] != '\n' ; i++)
-        if (!str_cmp(str_nospace(action_bits[i]),arg1))
+        if (!str_nosp_cmp(action_bits[i],arg1))
         {
           SET_BIT(act, 1<<i);
           goto thisLoop;
         }
        for (i = 0; *affected_bits[i] != '\n' ; i++)
-        if (!str_cmp(str_nospace(affected_bits[i]),arg1))
+        if (!str_nosp_cmp(affected_bits[i],arg1))
         {
           SET_BIT(affect, 1<<i);
           goto thisLoop;
         }
        for (i = 0; i <= MAX_RACE; i++)
-        if (!str_cmp(str_nospace(race_info[i].singular_name),arg1))
+        if (!str_nosp_cmp(race_info[i].singular_name,arg1))
         {
           race = i;
           goto thisLoop;
@@ -1003,7 +986,7 @@ int do_show(struct char_data *ch, char *argument, int cmd)
 	for (z = 0; *action_bits[z] != '\n';z++)
 	{
 	   o++;
-	   send_to_char(str_nospace(action_bits[z]),ch);
+	   send_to_char_nosp(action_bits[z],ch);
 	   if (o%7==0)
 	     send_to_char("\r\n",ch);
 	   else
@@ -1012,7 +995,7 @@ int do_show(struct char_data *ch, char *argument, int cmd)
 	for (z = 0; *isr_bits[z] != '\n';z++)
 	{
 	   o++;
-	   send_to_char(str_nospace(isr_bits[z]),ch);
+	   send_to_char_nosp(isr_bits[z],ch);
 	   if (o%7==0)
 	     send_to_char("\r\n",ch);
 	   else
@@ -1021,7 +1004,7 @@ int do_show(struct char_data *ch, char *argument, int cmd)
 	for (z = 0; *affected_bits[z] != '\n';z++)
 	{
 	   o++;
-	   send_to_char(str_nospace(affected_bits[z]),ch);
+	   send_to_char_nosp(affected_bits[z],ch);
 	   if (o%7==0)
 	     send_to_char("\r\n",ch);
 	   else
@@ -1039,7 +1022,7 @@ int do_show(struct char_data *ch, char *argument, int cmd)
       for (i = 0; i <= MAX_RACE; i++)
 	{
 	   o++;
-	   send_to_char(str_nospace(race_info[i].singular_name),ch);
+	   send_to_char_nosp(race_info[i].singular_name,ch);
 	   if (o%7==0)
 	     send_to_char("\r\n",ch);
 	   else
@@ -1147,27 +1130,27 @@ char_data *)(mob_index[nr].item))->level,
        if (strlen(arg1) < 2) break;
 	fo = TRUE;
        for (i = 0; *wear_bits[i] != '\n' ; i++)
-	if (!str_cmp(str_nospace(wear_bits[i]),arg1))
+	if (!str_nosp_cmp(wear_bits[i],arg1))
 	{
 	  SET_BIT(wear, 1<<i);
 	  goto endy;
 	}
 	for (i=0; *item_types[i] != '\n';i++)
 	{
-	  if (!str_cmp(str_nospace(item_types[i]),arg1))
+	  if (!str_nosp_cmp(item_types[i],arg1))
 	  {
 	     type = i;
 	     goto endy;
 	  }
 	}
        for (i = 0; *strs_damage_types[i] != '\n' ; i++)
-        if (!str_cmp(str_nospace(strs_damage_types[i]),arg1))
+        if (!str_nosp_cmp(strs_damage_types[i],arg1))
         {
 	  dam = i;
           goto endy;
         }
        for (i = 0; *extra_bits[i] != '\n' ; i++)
-        if (!str_cmp(str_nospace(extra_bits[i]),arg1))
+        if (!str_nosp_cmp(extra_bits[i],arg1))
         {
 	if (!str_cmp(extra_bits[i], "ANY_CLASS"))
 	  any = i;
@@ -1176,19 +1159,19 @@ char_data *)(mob_index[nr].item))->level,
           goto endy;
         }
        for (i = 0; *more_obj_bits[i] != '\n' ; i++)
-        if (!str_cmp(str_nospace(more_obj_bits[i]),arg1))
+        if (!str_nosp_cmp(more_obj_bits[i],arg1))
         {
           SET_BIT(more, 1<<i);
           goto endy;
         }
        for (i = 0; *size_bitfields[i] != '\n' ; i++)
-        if (!str_cmp(str_nospace(size_bitfields[i]),arg1))
+        if (!str_nosp_cmp(size_bitfields[i],arg1))
         {
           SET_BIT(size, 1<<i);
           goto endy;
         }
        for (i = 0; *apply_types[i] != '\n' ; i++)
-        if (!str_cmp(str_nospace(apply_types[i]),arg1))
+        if (!str_nosp_cmp(apply_types[i],arg1))
         {
   	    affect = i;
             goto endy;
@@ -1238,7 +1221,7 @@ char_data *)(mob_index[nr].item))->level,
 	for (z = 0; *wear_bits[z] != '\n';z++)
 	{
 	   o++;
-	   send_to_char(str_nospace(wear_bits[z]),ch);
+	   send_to_char_nosp(wear_bits[z], ch);
 	   if (o%7==0)
 	     send_to_char("\r\n",ch);
 	   else
@@ -1247,7 +1230,7 @@ char_data *)(mob_index[nr].item))->level,
 	for (z = 0; *extra_bits[z] != '\n';z++)
 	{
 	   o++;
-	   send_to_char(str_nospace(extra_bits[z]),ch);
+	   send_to_char_nosp(extra_bits[z], ch);
 	   if (o%7==0)
 	     send_to_char("\r\n",ch);
 	   else
@@ -1256,7 +1239,7 @@ char_data *)(mob_index[nr].item))->level,
         for (z = 0; *strs_damage_types[z] != '\n';z++)
         {
            o++;
-           send_to_char(str_nospace(strs_damage_types[z]),ch);
+           send_to_char_nosp(strs_damage_types[z],ch);
            if (o%7==0)
              send_to_char("\r\n",ch);
            else
@@ -1266,7 +1249,7 @@ char_data *)(mob_index[nr].item))->level,
         for (z = 0; *more_obj_bits[z] != '\n';z++)
         {
            o++;
-           send_to_char(str_nospace(more_obj_bits[z]),ch);
+           send_to_char_nosp(more_obj_bits[z],ch);
            if (o%7==0)
              send_to_char("\r\n",ch);
            else
@@ -1275,7 +1258,7 @@ char_data *)(mob_index[nr].item))->level,
 	for (z = 0; *item_types[z] != '\n';z++)
 	{
 	   o++;
-	   send_to_char(str_nospace(item_types[z]),ch);
+	   send_to_char_nosp(item_types[z],ch);
 	   if (o%7==0)
 	     send_to_char("\r\n",ch);
 	   else
@@ -1284,7 +1267,7 @@ char_data *)(mob_index[nr].item))->level,
 	for (z = 0; *size_bitfields[z] != '\n';z++)
 	{
 	   o++;
-	   send_to_char(str_nospace(size_bitfields[z]),ch);
+	   send_to_char_nosp(size_bitfields[z],ch);
 	   if (o%7==0)
 	     send_to_char("\r\n",ch);
 	   else
@@ -1293,7 +1276,7 @@ char_data *)(mob_index[nr].item))->level,
 	for (z = 0; *apply_types[z] != '\n';z++)
 	{
 	   o++;
-	   send_to_char(str_nospace(apply_types[z]),ch);
+	   send_to_char_nosp(apply_types[z],ch);
 	   if (o%7==0)
 	     send_to_char("\r\n",ch);
 	   else

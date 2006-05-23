@@ -15,8 +15,6 @@
 #include <innate.h>
 #include <fileinfo.h>
 
-char *str_nospace(char *stri);
-
 int do_clearaff(struct char_data *ch, char *argument, int cmd)
 {
 
@@ -193,7 +191,7 @@ struct skill_quest *find_sq(char *testa)
 {
    struct skill_quest *curr;
    for (curr = skill_list; curr; curr = curr->next)
-     if (!str_cmp(str_nospace(get_skill_name(curr->num)), testa))
+     if (!str_nosp_cmp(get_skill_name(curr->num), testa))
        return curr;
    return NULL;
 }

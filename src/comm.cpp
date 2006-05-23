@@ -2390,6 +2390,13 @@ void send_to_char_regardless(char *messg, CHAR_DATA *ch) {
   }
 }
 
+void send_to_char_nosp(char *messg, struct char_data *ch)
+{
+  char *tmp = str_nospace(messg);
+  send_to_char(tmp, ch);
+  dc_free(tmp);
+}
+
 void send_to_char(char *messg, struct char_data *ch)
 {
   extern bool selfpurge;

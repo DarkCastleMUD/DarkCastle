@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.52 2006/05/19 07:38:09 shane Exp $ */
+/* $Id: utility.cpp,v 1.53 2006/05/23 13:28:14 jhhudso Exp $ */
 
 extern "C"
 {
@@ -164,6 +164,45 @@ int str_cmp( char *arg1, char *arg2 )
     }
 
     return 0;
+}
+
+char *str_nospace(char *stri)
+{
+  if (!stri) return "";
+
+  char *stri_new = str_dup(stri);
+  int i = 0;
+
+  while (*(stri+i))
+  {
+     if (*(stri+i) == ' ')
+       stri_new[i] = '_';
+     i++;
+  }
+  return stri_new; // Must be freed by caller to avoid memory leak
+}
+
+// compare strings but ignore case and change all spaces to underscores
+int str_nosp_cmp( char *arg1, char *arg2 )
+{
+  char *tmp_arg1 = str_nospace(arg1);
+  char *tmp_arg2 = str_nospace(arg2);
+  int retval = str_cmp(tmp_arg1, tmp_arg2);
+  dc_free(tmp_arg2);
+  dc_free(tmp_arg1);
+  
+  return retval;
+}
+
+int str_n_nosp_cmp( char *arg1, char *arg2, int size)
+{
+  char *tmp_arg1 = str_nospace(arg1);
+  char *tmp_arg2 = str_nospace(arg2);
+  int retval = strncasecmp(tmp_arg1, tmp_arg2, size);
+  dc_free(tmp_arg2);
+  dc_free(tmp_arg1);
+  
+  return retval;
 }
 
 // TODO - Declare these in a more appropriate place
