@@ -86,6 +86,7 @@ void add_memory(CHAR_DATA *ch, char *victim, char type);
 extern struct index_data *mob_index;
 extern struct index_data *obj_index;
 extern struct race_shit race_info[];
+void send_damage(char *, CHAR_DATA *, OBJ_DATA *, CHAR_DATA *, char *, char *, int);
 
 bool malediction_res(CHAR_DATA *ch, CHAR_DATA *victim, int spell)
 {
@@ -1618,6 +1619,7 @@ int spell_remove_blind(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
 int spell_cure_critic(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
   int healpoints;
+  char buf[MAX_STRING_LENGTH],dammsg[MAX_STRING_LENGTH];
 
   if(!victim)
   {
@@ -1637,18 +1639,31 @@ int spell_cure_critic(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
 
   if (!can_heal(ch,victim, SPELL_CURE_CRITIC)) return eFAILURE;
   healpoints = dam_percent(skill, 100);
-  if ( (healpoints + GET_HIT(victim)) > hit_limit(victim) )
+  if ( (healpoints + GET_HIT(victim)) > hit_limit(victim) ) {
+    healpoints += hit_limit(victim) - GET_HIT(victim);
 	 GET_HIT(victim) = hit_limit(victim);
+  }
   else
 	 GET_HIT(victim) += healpoints;
-  send_to_char("Healing magic flows into you, closing several critical wounds!\n\r", victim);
 
   update_pos(victim);
 
-  if (ch!=victim)
-  {
-     act("$N looks much better as several critical wounds on $m are sealed.",ch,0,victim, TO_CHAR, 0);
+  sprintf(dammsg,"$B%d$R damage", healpoints);
+
+  if (ch!=victim) {
+     sprintf(buf,"You heal %s of the more critical wounds on $N.",IS_SET(ch->pcdata->toggles, PLR_DAMAGE)?dammsg:"several");
+     act(buf,ch,0,victim,TO_CHAR,0);
+     sprintf(buf,"$n heals %s of your more critical wounds.",IS_SET(ch->pcdata->toggles, PLR_DAMAGE)?dammsg:"several");
+     act(buf,ch,0,victim, TO_VICT, 0);
+     sprintf(buf,"$n heals | of the more critical wounds on $N.");
+     send_damage(buf, ch, 0, victim, dammsg,"$n heals several of the more critical wounds on $N.", TO_ROOM);
+  } else {
+     sprintf(buf,"You heal %s of your more critical wounds.",IS_SET(ch->pcdata->toggles, PLR_DAMAGE)?dammsg:"several");
+     act(buf,ch,0,0,TO_CHAR,0);
+     sprintf(buf,"$n heals | of $s more critical wounds.");
+     send_damage(buf,ch,0,victim,dammsg,"$n heals several of $s more critical wounds.",TO_ROOM);
   }
+
   return eSUCCESS;
 }
 
@@ -1658,6 +1673,7 @@ int spell_cure_critic(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
 int spell_cure_light(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
   int healpoints;
+  char buf[MAX_STRING_LENGTH],dammsg[MAX_STRING_LENGTH];
 
   if(!ch || !victim)
   {
@@ -1677,17 +1693,29 @@ int spell_cure_light(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 
   if (!can_heal(ch,victim, SPELL_CURE_LIGHT)) return eFAILURE;
   healpoints = dam_percent(skill, 25);
-  if ( (healpoints+GET_HIT(victim)) > hit_limit(victim) )
+  if ( (healpoints+GET_HIT(victim)) > hit_limit(victim) ) {
+     healpoints += hit_limit(victim) - GET_HIT(victim);
 	 GET_HIT(victim) = hit_limit(victim);
+  }
   else
 	 GET_HIT(victim) += healpoints;
 
   update_pos( victim );
-  send_to_char("Several small cuts and bruises you have sustained are healed.\n\r", victim);
 
-  if (ch!=victim)
-  {
-     act("Several small cuts and bruises on $N have been healed.",ch,0,victim, TO_CHAR, 0);
+  sprintf(dammsg,"$B%d$R damage", healpoints);
+
+  if (ch!=victim) {
+     sprintf(buf,"You heal %s small cuts and scratches on $N.",IS_SET(ch->pcdata->toggles, PLR_DAMAGE)?dammsg:"several");
+     act(buf,ch,0,victim,TO_CHAR,0);
+     sprintf(buf,"$n heals %s of your small cuts and scratches.",IS_SET(ch->pcdata->toggles, PLR_DAMAGE)?dammsg:"several");
+     act(buf,ch,0,victim, TO_VICT, 0);
+     sprintf(buf,"$n heals | of small cuts and scratches on $N.");
+     send_damage(buf, ch, 0, victim, dammsg,"$n heals several small cuts and scratches on $N.", TO_ROOM);
+  } else {
+     sprintf(buf,"You heal %s of your small cuts and scratches.",IS_SET(ch->pcdata->toggles, PLR_DAMAGE)?dammsg:"several");
+     act(buf,ch,0,0,TO_CHAR,0);
+     sprintf(buf,"$n heals | of $s small cuts and scratches.");
+     send_damage(buf,ch,0,victim,dammsg,"$n heals several of $s small cuts and scratches.",TO_ROOM);
   }
   return eSUCCESS;
 }
@@ -2135,6 +2163,9 @@ int spell_mana(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
 
 int spell_heal(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
+  int healy;
+  char buf[MAX_STRING_LENGTH],dammsg[MAX_STRING_LENGTH];
+
   if(!victim) {
     log("Null victim sent to heal!", ANGEL, LOG_BUG);
     return eFAILURE;
@@ -2157,15 +2188,31 @@ int spell_heal(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
   }
 
   if (!can_heal(ch,victim,SPELL_HEAL)) return eFAILURE;
-  int healy = dam_percent(skill,250);
+  healy = dam_percent(skill,250);
   GET_HIT(victim) += healy;
 
-  if (GET_HIT(victim) >= hit_limit(victim))
+  if (GET_HIT(victim) >= hit_limit(victim)) {
+     healy += hit_limit(victim) - GET_HIT(victim) - dice(1,4);
 	 GET_HIT(victim) = hit_limit(victim)-dice(1,4);
+  }
 
   update_pos( victim );
 
-  send_to_char("A healing warmth fills your body.\n\r", victim);
+  sprintf(dammsg," of $B%d$R damage", healy);
+
+  if (ch!=victim) {
+     sprintf(buf,"Your incantation heals $N%s.",IS_SET(ch->pcdata->toggles, PLR_DAMAGE)?dammsg:"");
+     act(buf,ch,0,victim,TO_CHAR,0);
+     sprintf(buf,"$n calls forth an incantation that heals you%s.",IS_SET(ch->pcdata->toggles, PLR_DAMAGE)?dammsg:"");
+     act(buf,ch,0,victim, TO_VICT, 0);
+     sprintf(buf,"$n calls forth an incantation that heals $N|.");
+     send_damage(buf, ch, 0, victim, dammsg,"", TO_ROOM);
+  } else {
+     sprintf(buf,"Your incantation heals you%s.",IS_SET(ch->pcdata->toggles, PLR_DAMAGE)?dammsg:"");
+     act(buf,ch,0,0,TO_CHAR,0);
+     sprintf(buf,"$n calls forth an incantation that heals $s|.");
+     send_damage(buf,ch,0,victim,dammsg,"",TO_ROOM);
+  }
   return eSUCCESS;
 }
 
@@ -2174,6 +2221,9 @@ int spell_heal(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
 
 int spell_power_heal(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
+  int healy;
+  char buf[MAX_STRING_LENGTH],dammsg[MAX_STRING_LENGTH];
+
   if(!victim) {
     log("Null victim sent to power heal!", ANGEL, LOG_BUG);
     return eFAILURE;
@@ -2189,15 +2239,32 @@ int spell_power_heal(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
   }
 
   if (!can_heal(ch,victim, SPELL_POWER_HEAL)) return eFAILURE;
-  int healy = dam_percent(skill, 300);
+  healy = dam_percent(skill, 300);
   GET_HIT(victim) += healy;
 
-  if (GET_HIT(victim) >= hit_limit(victim))
+  if (GET_HIT(victim) >= hit_limit(victim)) {
+     healy += hit_limit(victim)-GET_HIT(victim)-dice(1,4);
 	 GET_HIT(victim) = hit_limit(victim)-dice(1,4);
+  }
 
   update_pos( victim );
 
-  send_to_char("Powerful healing fills your body with warmth.\n\r", victim);
+  sprintf(dammsg," of $B%d$R damage", healy);
+
+  if (ch!=victim) {
+     sprintf(buf,"Your powerful incantation heals $N%s.",IS_SET(ch->pcdata->toggles, PLR_DAMAGE)?dammsg:"");
+     act(buf,ch,0,victim,TO_CHAR,0);
+     sprintf(buf,"$n calls forth a powerful incantation that heals you%s.",IS_SET(ch->pcdata->toggles, PLR_DAMAGE)?dammsg:"");
+     act(buf,ch,0,victim, TO_VICT, 0);
+     sprintf(buf,"$n calls forth a powerful incantation that heals $N|.");
+     send_damage(buf, ch, 0, victim, dammsg,"", TO_ROOM);
+  } else {
+     sprintf(buf,"Your powerful incantation heals you%s.",IS_SET(ch->pcdata->toggles, PLR_DAMAGE)?dammsg:"");
+     act(buf,ch,0,0,TO_CHAR,0);
+     sprintf(buf,"$n calls forth a powerful incantation that heals $s|.");
+     send_damage(buf,ch,0,victim,dammsg,"",TO_ROOM);
+  }
+
   return eSUCCESS;
 }
 
@@ -2208,6 +2275,7 @@ int spell_full_heal(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
 {
   assert(victim);
   int healamount = 0;
+  char buf[MAX_STRING_LENGTH],dammsg[MAX_STRING_LENGTH];
 
   if(GET_RACE(victim) == RACE_UNDEAD) {
     send_to_char("Healing spells are useless on the undead.\n\r", ch);
@@ -2233,7 +2301,22 @@ int spell_full_heal(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
 
   update_pos( victim );
 
-  send_to_char("A rush of warmth fills your body as strong healing magic courses through you.\n\r", victim);
+  sprintf(dammsg," of $B%d$R damage", healamount);
+
+  if (ch!=victim) {
+     sprintf(buf,"You call forth the magic of the gods to restore $N%s.",IS_SET(ch->pcdata->toggles, PLR_DAMAGE)?dammsg:"");
+     act(buf,ch,0,victim,TO_CHAR,0);
+     sprintf(buf,"$n calls forth the magic of the gods to restore you%s.",IS_SET(ch->pcdata->toggles, PLR_DAMAGE)?dammsg:"");
+     act(buf,ch,0,victim, TO_VICT, 0);
+     sprintf(buf,"$n calls forth the magic of the gods to restore $N|.");
+     send_damage(buf, ch, 0, victim, dammsg,"", TO_ROOM);
+  } else {
+     sprintf(buf,"You call forth the magic of the gods to restore you%s.",IS_SET(ch->pcdata->toggles, PLR_DAMAGE)?dammsg:"");
+     act(buf,ch,0,0,TO_CHAR,0);
+     sprintf(buf,"$n calls forth the magic of the gods to restore $s|.");
+     send_damage(buf,ch,0,victim,dammsg,"",TO_ROOM);
+  }
+
   return eSUCCESS;
 }
 
@@ -4740,7 +4823,8 @@ int spell_dispel_magic(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
 
 int spell_cure_serious(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
-    int healpoints;
+  int healpoints;
+  char buf[MAX_STRING_LENGTH],dammsg[MAX_STRING_LENGTH];
 
   if(!ch || !victim) {
     log("Null ch or victim sent to cure_serious!", ANGEL, LOG_BUG);
@@ -4758,18 +4842,31 @@ int spell_cure_serious(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
 
   if (!can_heal(ch,victim, SPELL_CURE_SERIOUS)) return eFAILURE;
       healpoints = dam_percent(skill,50);
-  if ((healpoints + GET_HIT(victim)) > hit_limit(victim))
+  if ((healpoints + GET_HIT(victim)) > hit_limit(victim)) {
+    healpoints += hit_limit(victim) - GET_HIT(victim);
     GET_HIT(victim) = hit_limit(victim);
+  }
   else
     GET_HIT(victim) += healpoints;
 
   update_pos(victim);
 
-  send_to_char("Some of your more serious cuts and bruises have been healed.\n\r", victim);
-  if (ch!=victim)
-  {
-     act("Some of $N's more serious cuts and bruises are healed.", ch,0,victim, TO_CHAR, 0);
+  sprintf(dammsg,"$B%d$R damage", healpoints);
+
+  if (ch!=victim) {
+     sprintf(buf,"You heal %s of the more serious wounds on $N.",IS_SET(ch->pcdata->toggles, PLR_DAMAGE)?dammsg:"several");
+     act(buf,ch,0,victim,TO_CHAR,0);
+     sprintf(buf,"$n heals %s of your more serious wounds.",IS_SET(ch->pcdata->toggles, PLR_DAMAGE)?dammsg:"several");
+     act(buf,ch,0,victim, TO_VICT, 0);
+     sprintf(buf,"$n heals | of the more serious wounds on $N.");
+     send_damage(buf, ch, 0, victim, dammsg,"$n heals several of the more serious wounds on $N.", TO_ROOM);
+  } else {
+     sprintf(buf,"You heal %s of your more serious wounds.",IS_SET(ch->pcdata->toggles, PLR_DAMAGE)?dammsg:"several");
+     act(buf,ch,0,0,TO_CHAR,0);
+     sprintf(buf,"$n heals | of $s more serious wounds.");
+     send_damage(buf,ch,0,victim,dammsg,"$n heals several of $s more serious wounds.",TO_ROOM);
   }
+
   return eSUCCESS;
 }
 
@@ -7121,11 +7218,6 @@ int cast_heal( ubyte level, CHAR_DATA *ch, char *arg, int type,
 {
   switch (type) {
 	 case SPELL_TYPE_SPELL:
-		 act("$n heals $N.", ch, 0, tar_ch, TO_ROOM, NOTVICT);
-		 if (ch!=tar_ch)
-		{ 
-		 act("You heal $N.", ch, 0, tar_ch, TO_CHAR, 0);
-		}
 		 return spell_heal(level, ch, tar_ch, 0, skill);
 		 break;
 	case SPELL_TYPE_WAND:
@@ -7154,11 +7246,6 @@ int cast_power_heal( ubyte level, CHAR_DATA *ch, char *arg, int type,
 {
   switch (type) {
 	 case SPELL_TYPE_SPELL:
-		 act("$n power heals $N.", ch, 0, tar_ch, TO_ROOM, NOTVICT);
-		 if (ch!=tar_ch)
-		{
-		 act("You power heal $N.", ch, 0, tar_ch, TO_CHAR, 0);
-		}
 		 return spell_power_heal(level, ch, tar_ch, 0, skill);
 		 break;
 	 case SPELL_TYPE_POTION:
@@ -7186,11 +7273,6 @@ int cast_full_heal( ubyte level, CHAR_DATA *ch, char *arg, int type,
 {
   switch (type) {
 	 case SPELL_TYPE_SPELL:
-		 act("$n FULL heals $N.", ch, 0, tar_ch, TO_ROOM, NOTVICT);
-		 if (ch!=tar_ch)
-		{
-		 act("You FULL heal $N.", ch, 0, tar_ch, TO_CHAR, 0);
-		}
 		 return spell_full_heal(level, ch, tar_ch, 0, skill);
 		 break;
 	 case SPELL_TYPE_POTION:
@@ -8993,6 +9075,8 @@ int cast_barkskin(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *vi
 
 int cast_herb_lore(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *victim, struct obj_data * tar_obj, int skill)
 {
+  int healamount;
+  char buf[MAX_STRING_LENGTH],dammsg[MAX_STRING_LENGTH];
 
   if(GET_RACE(victim) == RACE_UNDEAD) {
     send_to_char("Healing spells are useless on the undead.\n\r", ch);
@@ -9004,20 +9088,35 @@ int cast_herb_lore(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *v
   }
 
   if (can_heal(ch,victim, SPELL_HERB_LORE)) {
-     if(OUTSIDE(ch))    GET_HIT(victim) += dam_percent(skill,180);
+     healamount = dam_percent(skill,180);
+     if(OUTSIDE(ch))    GET_HIT(victim) += healamount;
      else { /* if not outside */
-       GET_HIT(victim) += dam_percent(skill,80);
+       healamount = dam_percent(skill,80);
+       GET_HIT(victim) += healamount;
        send_to_char("Your spell is less effective because you are indoors!\n\r", ch);
      }
-     if (GET_HIT(victim) >= hit_limit(victim))
+     if (GET_HIT(victim) >= hit_limit(victim)) {
+        healamount += hit_limit(victim)-GET_HIT(victim)-dice(1,4);
         GET_HIT(victim) = hit_limit(victim)-dice(1,4);
+     }
 
      update_pos( victim );
 
-     send_to_char("The magic herb makes you feel much better!\n\r", victim);
-     if (ch!=victim)
-     {
-       act("The herb makes $N look much healthier...and hungry?",ch,0,victim, TO_CHAR, 0);
+     sprintf(dammsg," of $B%d$R damage", healamount);
+
+     if (ch!=victim) {
+        sprintf(buf,"Your herbs heal $N%s and makes $m...hungry?",IS_SET(ch->pcdata->toggles, PLR_DAMAGE)?dammsg:"");
+        act(buf,ch,0,victim,TO_CHAR,0);
+        sprintf(dammsg,", healing you of $B%d$R damage", healamount);
+        sprintf(buf,"$n magic herbs make you feel much better%s!",IS_SET(ch->pcdata->toggles, PLR_DAMAGE)?dammsg:"");
+        act(buf,ch,0,victim, TO_VICT, 0);
+        sprintf(buf,"$n magic herbs heal $N| and make $M look...hungry?");
+        send_damage(buf, ch, 0, victim, dammsg,"", TO_ROOM);
+     } else {
+        sprintf(buf,"Your magic herbs make you feel much better%s!",IS_SET(ch->pcdata->toggles, PLR_DAMAGE)?dammsg:"");
+        act(buf,ch,0,0,TO_CHAR,0);
+        sprintf(buf,"$n magic herbs heal $m| and make $m look...hungry?");
+        send_damage(buf,ch,0,victim,dammsg,"",TO_ROOM);
      }
   }
 
