@@ -293,7 +293,7 @@ int spell_drown(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *
         dam = GET_HIT(victim)*5 + 20;
         sprintf(buf, "You are torn apart by the force of %s's watery blast and are killed instantly!", GET_NAME(ch));
         send_to_char(buf, victim);
-        act("$N is torn apart by the force of your watery blast and killed instantly!", ch, 0, victim, TO_ROOM, NOTVICT);
+        act("$N is torn apart by the force of $n's watery blast and killed instantly!", ch, 0, victim, TO_ROOM, NOTVICT);
         act("$N is torn apart by the force of your watery blast and killed instantly!", ch, 0, victim, TO_CHAR, 0);
         return damage(ch, victim, dam, TYPE_COLD, SPELL_DROWN, 0);
      }
@@ -6265,7 +6265,7 @@ int cast_armor( ubyte level, CHAR_DATA *ch, char *arg, int type,
 	case SPELL_TYPE_SCROLL:
 		 if (tar_obj) return eFAILURE;
 		 if (!tar_ch) tar_ch = ch;
-		 return spell_armor(level,ch,ch,0, skill);
+		 return spell_armor(level,ch,tar_ch,0, skill);
 		 break;
 	case SPELL_TYPE_WAND:
 		 if (tar_obj) return eFAILURE;

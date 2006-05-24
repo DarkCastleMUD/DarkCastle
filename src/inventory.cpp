@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.63 2006/05/19 08:14:52 shane Exp $
+| $Id: inventory.cpp,v 1.64 2006/05/24 18:34:03 shane Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -1072,7 +1072,8 @@ int do_put(struct char_data *ch, char *argument, int cmd)
                 else
 		  move_obj(obj_object, sub_object);
 		
-		act("$n puts $p in $P", ch, obj_object, sub_object, TO_ROOM, INVIS_NULL);
+		act("$n puts $p in $P.", ch, obj_object, sub_object, TO_ROOM, INVIS_NULL);
+                act("You put $p in $P.",ch,obj_object,sub_object,TO_CHAR,0);
                 return eSUCCESS;
 	      }
               else {

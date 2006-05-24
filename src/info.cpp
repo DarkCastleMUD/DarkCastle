@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.101 2006/05/18 07:50:34 dcastle Exp $ */
+/* $Id: info.cpp,v 1.102 2006/05/24 18:34:03 shane Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -1540,7 +1540,11 @@ int do_weather(struct char_data *ch, char *argument, int cmd)
       "rainy",
       "pouring rain",
       "lit by flashes of lightning"};
-      
+
+   if(GET_POS(ch) <= POSITION_SLEEPING) {
+      send_to_char("You dream of being on a tropical island surrounded by beautiful members of the attractive sex.\n\r", ch);
+      return eSUCCESS;
+   }
    if (OUTSIDE(ch)) {
       sprintf(buf, 
          "The sky is %s and %s.\n\r",
