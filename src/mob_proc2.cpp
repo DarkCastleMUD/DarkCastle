@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.64 2006/05/22 21:36:33 shane Exp $ */
+/* $Id: mob_proc2.cpp,v 1.65 2006/05/24 20:07:04 shane Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -1270,7 +1270,7 @@ void meta_list_stats(char_data * ch)
 
 int meta_get_moves_exp_cost(char_data * ch)
 {
-   int meta = GET_MOVE_METAS(ch);
+   int meta = GET_MOVE_METAS(ch);  
    meta += GET_MAX_MOVE(ch) - GET_RAW_MOVE(ch);
    return new_meta_exp_cost_one(MAX(0,meta));
 }
@@ -1285,6 +1285,10 @@ int meta_get_moves_plat_cost(char_data * ch)
 int meta_get_hps_exp_cost(char_data * ch)
 {
    int meta = GET_HP_METAS(ch);
+
+   for(int i = 16; i < GET_RAW_CON(ch); i++)
+      meta -= (i * i) / 30;
+
    meta += GET_MAX_HIT(ch) - GET_RAW_HIT(ch);
    return new_meta_exp_cost_one(MAX(0,meta));
 }
@@ -1292,6 +1296,10 @@ int meta_get_hps_exp_cost(char_data * ch)
 int meta_get_hps_plat_cost(char_data * ch)
 {
    int meta = GET_HP_METAS(ch);
+
+   for(int i = 16; i < GET_RAW_CON(ch); i++)
+      meta -= (i * i) / 30;
+
    meta += GET_MAX_HIT(ch) - GET_RAW_HIT(ch);
    return (int)new_meta_platinum_cost(MAX(0,meta), MAX(0,meta)+1);
 }
@@ -1299,6 +1307,17 @@ int meta_get_hps_plat_cost(char_data * ch)
 int meta_get_mana_exp_cost(char_data * ch)
 {
    int meta = GET_MANA_METAS(ch);
+   int stat;
+
+   if (GET_CLASS(ch) == CLASS_MAGIC_USER || GET_CLASS(ch) == CLASS_ANTI_PAL || GET_CLASS(ch) == CLASS_RANGER)
+      stat = GET_RAW_INT(ch);
+   else if(GET_CLASS(ch) == CLASS_CLERIC || GET_CLASS(ch) == CLASS_PALADIN || GET_CLASS(ch) == CLASS_DRUID)
+      stat = GET_RAW_WIS(ch);
+   else stat = 0;
+
+   for(int i = 16; i < stat; i++)
+      meta -= (i * i) / 30;
+
    meta += GET_MAX_MANA(ch) - GET_RAW_MANA(ch);
    return new_meta_exp_cost_one(MAX(0,meta));
 }
@@ -1306,37 +1325,60 @@ int meta_get_mana_exp_cost(char_data * ch)
 int meta_get_mana_plat_cost(char_data * ch)
 {
    int meta = GET_MANA_METAS(ch);
+   int stat;
+
+   if (GET_CLASS(ch) == CLASS_MAGIC_USER || GET_CLASS(ch) == CLASS_ANTI_PAL || GET_CLASS(ch) == CLASS_RANGER)
+      stat = GET_RAW_INT(ch);
+   else if(GET_CLASS(ch) == CLASS_CLERIC || GET_CLASS(ch) == CLASS_PALADIN || GET_CLASS(ch) == CLASS_DRUID)
+      stat = GET_RAW_WIS(ch);
+   else stat = 0;
+
+   for(int i = 16; i < stat; i++)
+      meta -= (i * i) / 30;
+
    meta += GET_MAX_MANA(ch) - GET_RAW_MANA(ch);
    return (int)new_meta_platinum_cost(MAX(0,meta), MAX(0,meta)+1);
 }
 
 int meta_get_ki_exp_cost(char_data * ch)
 {
-  int cost;
+  int cost, stat;
   switch (GET_CLASS(ch))
   {
     case CLASS_MONK:
-      cost = 7700; break;
+      cost = 7700;
+      stat = GET_RAW_WIS(ch) - 15;
+      stat = MAX(0,stat);
+      break;
     case CLASS_BARD:
-      cost = 7400; break;
+      cost = 7400;
+      stat = GET_RAW_INT(ch) - 15;
+      stat = MAX(0,stat);
+      break;
     default: return 0;
   }
-  cost = 10000000 + (GET_MAX_KI(ch) * cost);
+  cost = 10000000 + ((GET_MAX_KI(ch)-stat) * cost);
   return (int)(cost*1.2);
 }
  
 int meta_get_ki_plat_cost(char_data * ch)
 {
-  int cost;
+  int cost, stat;
   switch (GET_CLASS(ch))
   {
     case CLASS_MONK:
-      cost = 500; break;
+      cost = 500;
+      stat = GET_RAW_WIS(ch) - 15;
+      stat = MAX(0,stat);
+      break;
     case CLASS_BARD:
-      cost = 400; break;
+      cost = 400;
+      stat = GET_RAW_INT(ch) - 15;
+      stat = MAX(0,stat);
+      break;
     default: return 0;
   } 
-  cost = 500 + cost + ((GET_MAX_KI(ch)/2) * (GET_MAX_KI(ch)/10));
+  cost = 500 + cost + (((GET_MAX_KI(ch)-stat)/2) * ((GET_MAX_KI(ch)-stat)/10));
   return (int)(cost*0.9);
 }
 
