@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: cl_ranger.cpp,v 1.64 2006/05/20 11:58:15 jhhudso Exp $ | cl_ranger.C  *
+ * $Id: cl_ranger.cpp,v 1.65 2006/05/24 18:34:32 shane Exp $ | cl_ranger.C  *
  * Description: Ranger skills/spells                                          *
  *                                                                            *
  * Revision History                                                           *
@@ -1173,6 +1173,7 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
         char_from_room(ch);
         char_to_room(ch, cur_room);
         victim = get_char_room_vis(ch, target);
+        dir = -1;
      }
      else if(dir < 0) {
         send_to_char("You aren't skilled enough to fire at a target this close.\n\r", ch);
