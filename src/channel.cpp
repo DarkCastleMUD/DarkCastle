@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: channel.cpp,v 1.15 2006/05/18 08:21:21 shane Exp $
+| $Id: channel.cpp,v 1.16 2006/05/25 11:47:35 jhhudso Exp $
 | channel.C
 | Description:  All of the channel - type commands; do_say, gossip, etc..
 */
@@ -512,7 +512,16 @@ int do_tell(struct char_data *ch, char *argument, int cmd)
       cmd = 9;
     }
     else if(!(vict = get_active_pc_vis(ch, name))) { 
-      send_to_char("No-one by that name here.\n\r", ch);
+      vict = get_pc_vis(ch, name);
+      if ((vict != NULL) && GET_LEVEL(vict) >= IMMORTAL) {
+	send_to_char("That person is busy right now.\n\r", ch);
+	send_to_char("Your message has been saved.\n\r", ch);
+	sprintf(buf,"$2$B%s told you, '%s'$R\n\r", PERS(ch, vict), message);
+	record_msg(buf, vict);
+      } else {
+	send_to_char("No-one by that name here.\n\r", ch);
+      }
+
       return eSUCCESS;
     }
    

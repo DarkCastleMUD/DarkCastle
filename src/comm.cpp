@@ -2397,6 +2397,51 @@ void send_to_char_nosp(char *messg, struct char_data *ch)
   dc_free(tmp);
 }
 
+void record_msg(char *messg, struct char_data *ch)
+{
+  if (!messg || IS_NPC(ch) || GET_LEVEL(ch) < IMMORTAL)
+    return;
+
+  if (ch->pcdata->away_msgs == 0) {
+    ch->pcdata->away_msgs = new std::queue<char *>();
+  }
+
+  if (ch->pcdata->away_msgs->size() < 1000) {
+    char *our_copy = str_dup(messg);
+    ch->pcdata->away_msgs->push(our_copy);
+  }
+}
+
+int do_awaymsgs(CHAR_DATA *ch, char *argument, int cmd)
+{
+  int lines = 0;
+  char *tmp;
+  
+  if (IS_NPC(ch))
+    return eFAILURE;
+  
+  if (ch->pcdata->away_msgs->empty()) {
+    SEND_TO_Q("No messages have been recorded.\n\r", ch->desc);
+    return eSUCCESS;
+  }
+
+  // Show 23 lines of text, then stop
+  while (! ch->pcdata->away_msgs->empty()) {
+    tmp = ch->pcdata->away_msgs->front();
+    SEND_TO_Q(tmp, ch->desc);
+    dc_free(tmp);
+    ch->pcdata->away_msgs->pop();
+    
+    if (++lines == 23) {
+      SEND_TO_Q("\n\rMore msgs available. Type awaymsgs to see more\n\r",
+		ch->desc);
+      break;
+    }
+  }
+
+  return eSUCCESS;
+}
+
 void send_to_char(char *messg, struct char_data *ch)
 {
   extern bool selfpurge;

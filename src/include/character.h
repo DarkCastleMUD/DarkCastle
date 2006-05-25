@@ -1,7 +1,7 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.38 2006/05/18 07:50:38 dcastle Exp $
+| $Id: character.h,v 1.39 2006/05/25 11:47:35 jhhudso Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
@@ -16,6 +16,7 @@
 #include <isr.h>   // SAVE_TYPE_MAX
 #include <utility.h>
 #include <mobile.h>
+#include <queue>
 
 #define START_ROOM        3001 // Where you login
 #define SECOND_START_ROOM 3059 // Where you go if killed in start room
@@ -239,6 +240,7 @@ struct pc_data
     bool hide[MAX_HIDE];
     CHAR_DATA *hiding_from[MAX_HIDE];
     struct player_vault *vault;
+    std::queue<char *> *away_msgs;
 };
 
 struct mob_data

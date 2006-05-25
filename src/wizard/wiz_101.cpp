@@ -533,30 +533,18 @@ int do_wiz(struct char_data *ch, char *argument, int cmd)
         else
           sprintf(buf1, "$B$7%s> %s$R\n\r", GET_SHORT(ch), argument);
 
-/*        if(cmd == 9)  {
-          ansi_color( PURPLE, ch);
-	  ansi_color( BOLD, ch);
-	}
-        else {
-          ansi_color( GREY, ch);
-          ansi_color( BOLD, ch); 
-        }
-  */      send_to_char(buf1, ch);
+	send_to_char(buf1, ch);
         ansi_color( NTEXT, ch);
 
-        for (i = descriptor_list; i; i = i->next)
-        if (i->character != ch && !i->connected && 
-                GET_LEVEL(i->character) >= IMMORTAL)
-                if((cmd == 8) && has_skill(i->character, COMMAND_IMP_CHAN)) { 
-                  send_to_char(buf1, i->character);
-//                  ansi_color( NTEXT, i->character);
-                }
-                else if (cmd != 8) { 
-//                  ansi_color( GREY, i->character);
-//		  ansi_color( BOLD, i->character);
-                  send_to_char(buf1, i->character);
-//                  ansi_color( NTEXT, i->character);
-                }
+        for (i = descriptor_list; i; i = i->next) {
+	  if (i->character != ch && GET_LEVEL(i->character) >= IMMORTAL) {
+	    if (STATE(i) == CON_PLAYING) {
+	      send_to_char(buf1, i->character);
+	    } else {
+	      record_msg(buf1, i->character);
+	    }
+	  }
+	}
     }
     return eSUCCESS;
 }
