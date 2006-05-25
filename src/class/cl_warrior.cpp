@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.44 2006/05/03 18:40:23 dcastle Exp $
+| $Id: cl_warrior.cpp,v 1.45 2006/05/25 21:04:49 shane Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -72,13 +72,13 @@ int do_kick(struct char_data *ch, char *argument, int cmd)
 
   if (!skill_success(ch,victim,SKILL_KICK)) {
     dam = 0;
-    retval = damage(ch, victim, 0,TYPE_UNDEFINED, SKILL_KICK, 0);
+    retval = damage(ch, victim, 0,TYPE_BLUDGEON, SKILL_KICK, 0);
     if(SOMEONE_DIED(retval))
       return retval;
     }
   else {
     dam = (GET_DEX(ch) * 3) + (GET_STR(ch) * 2) + (has_skill(ch, SKILL_KICK));
-    retval = damage(ch, victim, dam, TYPE_UNDEFINED, SKILL_KICK, 0);
+    retval = damage(ch, victim, dam, TYPE_BLUDGEON, SKILL_KICK, 0);
     if(SOMEONE_DIED(retval))
       return retval;
     }
@@ -123,7 +123,7 @@ int do_deathstroke(struct char_data *ch, char *argument, int cmd)
 {
     struct char_data *victim;
     char name[256];
-    int dam;
+    int dam, attacktype;
     int retval;
     int failchance = 25;
 
@@ -182,9 +182,10 @@ int do_deathstroke(struct char_data *ch, char *argument, int cmd)
     dam *= (GET_LEVEL(ch) / 5); // 10 at level 50
 
     WAIT_STATE(ch, PULSE_VIOLENCE*3);
+    attacktype = ch->equipment[WIELD]->obj_flags.value[3] + TYPE_HIT;
 
     if (!skill_success(ch,victim,SKILL_DEATHSTROKE)) {
-	retval = damage(ch, victim, 0,TYPE_UNDEFINED, SKILL_DEATHSTROKE, 0);
+	retval = damage(ch, victim, 0,attacktype, SKILL_DEATHSTROKE, 0);
         if (number(1,101) > failchance)
 	{
 		send_to_char("You manage to retain your balance!\r\n",ch);
@@ -200,7 +201,7 @@ int do_deathstroke(struct char_data *ch, char *argument, int cmd)
           return eSUCCESS|eCH_DIED;
         }
     } else {
-	retval = damage(ch, victim, dam,TYPE_UNDEFINED, SKILL_DEATHSTROKE, 0);
+	retval = damage(ch, victim, dam, attacktype, SKILL_DEATHSTROKE, 0);
     }
 
     return retval;
@@ -467,12 +468,12 @@ int do_bash(struct char_data *ch, char *argument, int cmd)
 //ch, NULL, victim, TO_VICT , 0);
   //      act("$N avoids being bashed by $n who loses $s balance and 
 //falls.", ch, NULL, victim, TO_ROOM, NOTVICT);
-	retval = damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_BASH, 0);
+	retval = damage(ch, victim, 0, TYPE_BLUDGEON, SKILL_BASH, 0);
     }
     else {
 	GET_POS(victim) = POSITION_SITTING;
         SET_BIT(victim->combat, COMBAT_BASH1);
-	retval = damage(ch, victim, 25, TYPE_UNDEFINED, SKILL_BASH, 0);
+	retval = damage(ch, victim, 25, TYPE_BLUDGEON, SKILL_BASH, 0);
 	if (!(retval & eEXTRA_VALUE)) {
         hit = 1;
         // if they already have 2 rounds of wait, only tack on 1 instead of 2

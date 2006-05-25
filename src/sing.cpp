@@ -1748,7 +1748,7 @@ int song_flight_of_bee( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim
 {
    send_to_char("You begin to sing a lofty song...\n\r", ch);
    act("$n raises $s voice in an flighty quick march...", ch, 0, 0, TO_ROOM, 0);
-   ch->song_timer = song_info[ch->song_number].beats;
+   ch->song_timer = 1;
    return eSUCCESS;
 }
 
@@ -1925,8 +1925,8 @@ int song_fanatical_fanfare(ubyte level, CHAR_DATA *ch, char *Aag, CHAR_DATA *vic
 {
    send_to_char("You begin to sing loudly, and poke everyone in your surroundings with a stick..\r\n",ch);
    act("$n starts singing loudly, and begins to poke everyone around $m with a stick. Hey!", ch, 0, 0, TO_ROOM, 0);
-   ch->song_timer = song_info[ch->song_number].beats;
-  return eSUCCESS;
+   ch->song_timer = 1;
+   return eSUCCESS;
 }
 int song_mking_charge(ubyte level, CHAR_DATA *ch, char *Aag, CHAR_DATA *victim, int skill)
 {
@@ -2622,7 +2622,7 @@ int song_vigilant_siren( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victi
 {
    send_to_char("You begin to sing a fast nervous tune...\n\r", ch);
    act("$n starts mumbling out a quick, nervous tune...", ch, 0, 0, TO_ROOM, 0);
-   ch->song_timer = song_info[ch->song_number].beats;
+   ch->song_timer = 1;
    return eSUCCESS;
 }
 

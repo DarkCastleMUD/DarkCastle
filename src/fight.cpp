@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.305 2006/05/24 20:44:56 shane Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.306 2006/05/25 21:04:44 shane Exp $ */
 
 extern "C"
 {
@@ -237,6 +237,7 @@ void perform_violence(void)
       if (af->type == SPELL_POISON)
       {
         int dam = (affected_by_spell(ch, SPELL_POISON)->duration) * number(10,50);
+        if(number(0,1)) affected_by_spell(ch, SPELL_POISON)->duration -= 1;
         if(get_saves(ch, SAVE_TYPE_POISON) > number(1,101)) {
            dam = dam * get_saves(ch, SAVE_TYPE_POISON) / 100;
            send_to_char("You feel very sick, but resist the poison's damage.\n\r", ch);
@@ -248,7 +249,7 @@ void perform_violence(void)
            retval = noncombat_damage(ch, dam,
                  "You quiver from the effects of the poison and have no enegry left...",
                  "$n stops struggling as $e is consumed by poison.",
-                 "", KILL_POISON);
+                 '\0', KILL_POISON);
         }
 
         if (SOMEONE_DIED(retval))
@@ -1934,6 +1935,7 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
     dam = 0;
     if (attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING) {
       SET_BIT(modifier, COMBAT_MOD_IGNORE);
+      SET_BIT(retval,eEXTRA_VALUE);
     }
   }
  

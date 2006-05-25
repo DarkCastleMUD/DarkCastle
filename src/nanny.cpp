@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.119 2006/05/24 20:44:56 shane Exp $ */
+/* $Id: nanny.cpp,v 1.120 2006/05/25 21:04:44 shane Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -1686,19 +1686,18 @@ void update_command_lag_and_poison()
 
       // handle poison
       if(IS_AFFECTED(i, AFF_POISON)) {
-        int tmp = affected_by_spell(i, SPELL_POISON)->duration*number(10,50);
+        int tmp = affected_by_spell(i, SPELL_POISON)->duration*number(5,25);
         if(get_saves(i, SAVE_TYPE_POISON) > number(1,101)) {
-           tmp = tmp * get_saves(i, SAVE_TYPE_POISON) / 100;
+           tmp *= get_saves(i, SAVE_TYPE_POISON) / 100;
            send_to_char("You feel very sick, but resist the poison's damage.\n\r", i);
         } else send_to_char("You feel very sick.\n\r", i);
         if(tmp) {
            act("You feel burning $2poison$R in your blood and suffer painful convulsions.", i, 0,i, TO_CHAR, 0);
            act("$n looks extremely sick and shivers uncomfortably from the $2poison$R in $s veins.", i, 0, 0, TO_ROOM, 0);
-           sprintf(log_msg, "%s died in room %d from poison.", GET_NAME(i), world[i->in_room].number);
            retval = noncombat_damage(i, tmp,
               "You quiver from the effects of the poison and have no enegry left...",
               "$n stops struggling as $e is consumed by poison.",
-              log_msg, KILL_POISON);
+              '\0', KILL_POISON);
            if(SOMEONE_DIED(retval))
              continue;
         }

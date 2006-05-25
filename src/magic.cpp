@@ -182,11 +182,14 @@ int spell_magic_missile(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct ob
 int spell_chill_touch(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
   struct affected_type af;
-  int dam;
+  int dam = 250;
   int save;
+  int retval = damage(ch, victim, dam, TYPE_COLD, SPELL_CHILL_TOUCH, 0);
 
-  set_cantquit( ch, victim );
-  dam = 250;
+  if(SOMEONE_DIED(retval)) return retval;
+  if(IS_SET(retval,eEXTRA_VAL2)) victim = ch;
+  if(IS_SET(retval,eEXTRA_VALUE)) return retval;
+
   save = saves_spell(ch, victim, (level/2), SAVE_TYPE_COLD);
   if(save < 0 && skill > 50) // if failed
    {
@@ -205,7 +208,7 @@ int spell_chill_touch(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
 	  affect_join(victim, &af, TRUE, FALSE);
 	 }
    } 
-  return damage(ch, victim, dam, TYPE_COLD, SPELL_CHILL_TOUCH, 0);
+  return retval;
 }
 
 
@@ -253,6 +256,8 @@ int spell_colour_spray(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
    if(SOMEONE_DIED(retval))
      return retval;
 
+   if(IS_SET(retval,eEXTRA_VAL2)) victim = ch;
+   if(IS_SET(retval,eEXTRA_VALUE)) return retval;
 	/*  Dazzle Effect */
    if(number(1,101) > get_saves(victim, SAVE_TYPE_MAGIC) + 40 && (skill > 50 || IS_NPC(ch)) ) {
      act("$N blinks in confusion from the distraction of the colour spray.", ch, 0, victim, TO_ROOM, NOTVICT);
@@ -287,6 +292,8 @@ int spell_drown(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *
    if(SOMEONE_DIED(retval))
      return retval;
 
+   if(IS_SET(retval,eEXTRA_VAL2)) victim = ch;
+   if(IS_SET(retval,eEXTRA_VALUE)) return retval;
 	/* Drown BINGO Effect */
    if (skill > 80) {
      if (number(1, 100) == 1 && GET_LEVEL(victim) < IMMORTAL) {
@@ -422,6 +429,8 @@ int spell_meteor_swarm(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
   if (!SOMEONE_DIED(retval) && spellcraft(ch, SPELL_METEOR_SWARM)
 	&& !number(0,9))
    {
+        if(IS_SET(retval,eEXTRA_VAL2)) victim = ch;
+        if(IS_SET(retval,eEXTRA_VALUE)) return retval;
         act("The force of the spell knocks $N over!",ch,0,victim, TO_CHAR, 0);
 	send_to_char("The force of the spell knocks you over!\r\n",ch);
 	GET_POS(victim) = POSITION_SITTING;	
@@ -442,6 +451,9 @@ int spell_fireball(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
    if(SOMEONE_DIED(retval) || ch->in_room != victim->in_room)
      return retval;
    // Above: Fleeing now saves you from the second blast.
+
+   if(IS_SET(retval,eEXTRA_VAL2)) victim = ch;
+   if(IS_SET(retval,eEXTRA_VALUE)) return retval;
 
 	/* Fireball Recombining Effect */
    if (has_skill(ch, SPELL_FIREBALL) > 80)
@@ -482,8 +494,10 @@ int spell_howl(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
 
    if(SOMEONE_DIED(retval))
      return retval;
-   if (chit != GET_HIT(ch)) // it reflected..
-    ch = victim; 
+
+   if(IS_SET(retval,eEXTRA_VAL2)) victim = ch;
+   if(IS_SET(retval,eEXTRA_VALUE)) return retval;
+
    for (tmp_char = world[ch->in_room].people; tmp_char;
         tmp_char = tmp_char->next_in_room)
     {
@@ -878,7 +892,8 @@ int spell_solar_gate(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
        retval = damage(ch, tmp_victim, dam,TYPE_FIRE, SPELL_SOLAR_GATE, 0);
        if(IS_SET(retval, eCH_DIED))
 	 return retval;
-       if(!IS_SET(retval, eVICT_DIED) && spellcraft(ch, SPELL_SOLAR_GATE))
+       if(IS_SET(retval,eEXTRA_VALUE)) return retval;
+       if(!IS_SET(retval, eVICT_DIED) && spellcraft(ch, SPELL_SOLAR_GATE) && !IS_SET(retval, eEXTRA_VAL2))
          do_solar_blind(ch, tmp_victim);
      }  // if are grouped, etc
   } 	// for
@@ -1225,11 +1240,7 @@ int spell_divine_fury(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
 
   if(IS_GOOD(victim)) GET_ALIGNMENT(ch) -= 5;
   if(IS_NEUTRAL(victim)) GET_ALIGNMENT(ch) -= 2;
-/*
-  act("You call forth a wrath from the heavens to smite $N!", ch, 0, victim, TO_CHAR, 0);
-  act("$n calls forth a wrath from the heavens to smite you!", ch, 0, victim, TO_VICT, 0);
-  act("$n gestures grandly and calls forth a wrath from the heavens to smite $N!", ch, 0, victim, TO_ROOM, NOTVICT);
-*/
+
   return damage(ch, victim, dam, TYPE_MAGIC, SPELL_DIVINE_FURY, 0);
 }
 
@@ -1317,25 +1328,23 @@ int spell_bless(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *
 		act("$p briefly glows.",ch,obj,0,TO_CHAR, 0);
     }
   } else {
+     if(affected_by_spell(victim, SPELL_BLESS))
+       affect_from_char(victim, SPELL_BLESS);
+     send_to_char("You feel blessed.\n\r", victim);
 
-  if(affected_by_spell(victim, SPELL_BLESS))
-    affect_from_char(victim, SPELL_BLESS);
-//  if(GET_POS(victim) != POSITION_FIGHTING) 
- // {
-		send_to_char("You feel blessed.\n\r", victim);
-		if (victim != ch)
-		  act("$N receives the blessing from your god.", ch, NULL, victim, TO_CHAR, 0);
-		af.type      = SPELL_BLESS;
-		af.duration  = 6 + skill / 3;
-		af.modifier  = 1 + skill / 45;
-		af.location  = APPLY_HITROLL;
-		af.bitvector = -1;
-		affect_to_char(victim, &af);
+     if (victim != ch)
+        act("$N receives the blessing from your god.", ch, NULL, victim, TO_CHAR, 0);
 
-		af.location = APPLY_SAVING_MAGIC;
-		af.modifier = 1 + skill / 18;
-		affect_to_char(victim, &af);
-   // }
+     af.type      = SPELL_BLESS;
+     af.duration  = 6 + skill / 3;
+     af.modifier  = 1 + skill / 45;
+     af.location  = APPLY_HITROLL;
+     af.bitvector = -1;
+     affect_to_char(victim, &af);
+
+     af.location = APPLY_SAVING_MAGIC;
+     af.modifier = 1 + skill / 18;
+     affect_to_char(victim, &af);
   }
   return eSUCCESS;
 }
@@ -1386,13 +1395,10 @@ int spell_paralyze(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
     victim = ch;
   }
 
-   if (number(1,101) < get_saves(victim, SAVE_TYPE_MAGIC))
-   {
-act("$N resists your attempt to paralyze $M!", ch, NULL, victim, 
-TO_CHAR,0);
-act("$N resists $n's attempt to paralyze $M!", ch, NULL, victim, TO_ROOM,
-NOTVICT);
-act("You resist $n's attempt to paralyze you!",ch,NULL,victim,TO_VICT,0);
+   if (number(1,101) < get_saves(victim, SAVE_TYPE_MAGIC)) {
+      act("$N resists your attempt to paralyze $M!", ch, NULL, victim, TO_CHAR,0);
+      act("$N resists $n's attempt to paralyze $M!", ch, NULL, victim, TO_ROOM,NOTVICT);
+      act("You resist $n's attempt to paralyze you!",ch,NULL,victim,TO_VICT,0);
       if (IS_NPC(victim) && (!victim->fighting) && GET_POS(victim) > POSITION_SLEEPING) {
          retval = attack(victim, ch, TYPE_UNDEFINED);
          retval = SWAP_CH_VICT(retval);
@@ -1473,12 +1479,11 @@ int spell_blindness(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
   int retval;
   set_cantquit( ch, victim );
 
-   if (number(1,101) < (get_saves(victim, SAVE_TYPE_MAGIC) + 30 - 
-(skill <40 ? 5 : 0) - (skill < 60 ? 5 : 0) - (skill < 80 ? 5 : 0)))
+   if (number(1,101) < (get_saves(victim, SAVE_TYPE_MAGIC) + 30 - (skill <40 ? 5 : 0) - (skill < 60 ? 5 : 0) - (skill < 80 ? 5 : 0)))
    {
-act("$N resists your attempt to blind $M!", ch, NULL, victim, TO_CHAR,0);
-act("$N resists $n's attempt to blind $M!", ch, NULL, victim, TO_ROOM,NOTVICT);
-act("You resist $n's attempt to blind you!",ch,NULL,victim,TO_VICT,0);
+      act("$N resists your attempt to blind $M!", ch, NULL, victim, TO_CHAR,0);
+      act("$N resists $n's attempt to blind $M!", ch, NULL, victim, TO_ROOM,NOTVICT);
+      act("You resist $n's attempt to blind you!",ch,NULL,victim,TO_VICT,0);
       if (IS_NPC(victim) && (!victim->fighting) && GET_POS(ch) > POSITION_SLEEPING) {
          retval = attack(victim, ch, TYPE_UNDEFINED);
          retval = SWAP_CH_VICT(retval);
@@ -2210,7 +2215,7 @@ int spell_heal(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
   } else {
      sprintf(buf,"Your incantation heals you%s.",IS_SET(ch->pcdata->toggles, PLR_DAMAGE)?dammsg:"");
      act(buf,ch,0,0,TO_CHAR,0);
-     sprintf(buf,"$n calls forth an incantation that heals $s|.");
+     sprintf(buf,"$n calls forth an incantation that heals $m|.");
      send_damage(buf,ch,0,victim,dammsg,"",TO_ROOM);
   }
   return eSUCCESS;
@@ -2261,7 +2266,7 @@ int spell_power_heal(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
   } else {
      sprintf(buf,"Your powerful incantation heals you%s.",IS_SET(ch->pcdata->toggles, PLR_DAMAGE)?dammsg:"");
      act(buf,ch,0,0,TO_CHAR,0);
-     sprintf(buf,"$n calls forth a powerful incantation that heals $s|.");
+     sprintf(buf,"$n calls forth a powerful incantation that heals $m|.");
      send_damage(buf,ch,0,victim,dammsg,"",TO_ROOM);
   }
 
@@ -2313,7 +2318,7 @@ int spell_full_heal(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
   } else {
      sprintf(buf,"You call forth the magic of the gods to restore you%s.",IS_SET(ch->pcdata->toggles, PLR_DAMAGE)?dammsg:"");
      act(buf,ch,0,0,TO_CHAR,0);
-     sprintf(buf,"$n calls forth the magic of the gods to restore $s|.");
+     sprintf(buf,"$n calls forth the magic of the gods to restore $m|.");
      send_damage(buf,ch,0,victim,dammsg,"",TO_ROOM);
   }
 
@@ -2434,7 +2439,7 @@ int spell_poison(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data 
          return eFAILURE;
 
         af.type = SPELL_POISON;
-        af.duration = (skill / 10);
+        af.duration = (skill / 25);
         af.modifier = (int)ch;
         af.location = APPLY_NONE;
         af.bitvector = AFF_POISON;
@@ -4945,7 +4950,8 @@ int spell_flamestrike(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
 
    if(SOMEONE_DIED(retval))
       return retval;
-
+   if(IS_SET(retval,eEXTRA_VAL2)) victim = ch;
+   if(IS_SET(retval,eEXTRA_VALUE)) return retval;
 // Burns up ki and mana on victim if learned over skill level 70
 
    if(skill > 70) {
@@ -6769,7 +6775,7 @@ int cast_cure_light( ubyte level, CHAR_DATA *ch, char *arg, int type,
 	 return spell_cure_light(level,ch,tar_ch,0, skill);
 	 break;
   case SPELL_TYPE_WAND:
-    if(tar_ch) return eFAILURE;
+    if(!tar_ch) return eFAILURE;
       return spell_cure_light(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_POTION:
@@ -9004,6 +9010,9 @@ int cast_creeping_death(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DA
    if(SOMEONE_DIED(retval))
       return retval;
 
+   if(IS_SET(retval,eEXTRA_VAL2)) victim = ch;
+   if(IS_SET(retval,eEXTRA_VALUE)) return retval;
+
    if (skill > 40 && skill <= 60) {
      poison = 2;
    } else if (skill > 60 && skill <= 80) {
@@ -9111,11 +9120,11 @@ int cast_herb_lore(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *v
      if (ch!=victim) {
         sprintf(buf,"Your herbs heal $N%s and makes $m...hungry?",IS_SET(ch->pcdata->toggles, PLR_DAMAGE)?dammsg:"");
         act(buf,ch,0,victim,TO_CHAR,0);
+        sprintf(buf,"$n's magic herbs heal $N| and make $M look...hungry?");
+        send_damage(buf, ch, 0, victim, dammsg,"", TO_ROOM);
         sprintf(dammsg,", healing you of $B%d$R damage", healamount);
         sprintf(buf,"$n magic herbs make you feel much better%s!",IS_SET(ch->pcdata->toggles, PLR_DAMAGE)?dammsg:"");
         act(buf,ch,0,victim, TO_VICT, 0);
-        sprintf(buf,"$n magic herbs heal $N| and make $M look...hungry?");
-        send_damage(buf, ch, 0, victim, dammsg,"", TO_ROOM);
      } else {
         sprintf(buf,"Your magic herbs make you feel much better%s!",IS_SET(ch->pcdata->toggles, PLR_DAMAGE)?dammsg:"");
         act(buf,ch,0,0,TO_CHAR,0);
@@ -9328,8 +9337,8 @@ int cast_eyes_of_the_owl(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_D
 
 	af.type      = SPELL_INFRAVISION;
 	af.duration  = skill*2;
-	af.modifier  = 0;
-	af.location  = APPLY_NONE;
+	af.modifier  = 1+(skill/20);
+	af.location  = APPLY_WIS;
 	af.bitvector = AFF_INFRARED;
 	affect_join(victim, &af, FALSE, FALSE);
 

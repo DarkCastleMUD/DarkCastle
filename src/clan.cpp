@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.45 2006/04/24 21:12:30 apocalypse Exp $ */
+/* $Id: clan.cpp,v 1.46 2006/05/25 21:04:44 shane Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -2264,6 +2264,13 @@ int do_cinfo(CHAR_DATA *ch, char *arg, int cmd)
                     clan->logout_message ? clan->logout_message : "(No Message)",
                     clan->death_message ? clan->death_message : "(No Message)");
    send_to_char(buf, ch);
+  }
+  if(GET_LEVEL(ch) >= POWER || (!strcmp(clan->leader, GET_NAME(ch)) && nClan == ch->clan) ||
+        ( nClan == ch->clan && has_right(ch, CLAN_RIGHTS_MEMBER_LIST) )
+    )
+  {
+     sprintf(buf, "$3Balance$R:       %ld\r\n", get_clan(ch)->balance);
+     send_to_char(buf,ch);
   }
   return eSUCCESS;
 }

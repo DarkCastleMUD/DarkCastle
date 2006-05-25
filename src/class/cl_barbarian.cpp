@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_barbarian.cpp,v 1.64 2006/05/11 21:09:49 dcastle Exp $
+| $Id: cl_barbarian.cpp,v 1.65 2006/05/25 21:04:49 shane Exp $
 | cl_barbarian.C
 | Description:  Commands for the barbarian class.
 */
@@ -324,7 +324,7 @@ int do_headbutt(struct char_data *ch, char *argument, int cmd)
        WAIT_STATE(ch, PULSE_VIOLENCE*2);
     }
     else WAIT_STATE(ch, PULSE_VIOLENCE*3);
-    retval = damage (ch, victim, 0, TYPE_UNDEFINED, SKILL_SHOCK, 0);
+    retval = damage (ch, victim, 0, TYPE_CRUSH, SKILL_SHOCK, 0);
     // the damage call here takes care of starting combat and such
     retval = eSUCCESS;
   }
@@ -347,7 +347,7 @@ int do_headbutt(struct char_data *ch, char *argument, int cmd)
   
     WAIT_STATE(victim, PULSE_VIOLENCE*2);
     SET_BIT(victim->combat, COMBAT_SHOCKED);
-    retval = damage (ch, victim, 50, TYPE_HIT, SKILL_SHOCK, 0);
+    retval = damage (ch, victim, 50, TYPE_CRUSH, SKILL_SHOCK, 0);
     if (!SOMEONE_DIED(retval) && !number(0,9) &&
 	  ch->equipment[WEAR_HEAD] && obj_index[ch->equipment[WEAR_HEAD]->item_number].virt == 508)
     {
@@ -693,7 +693,7 @@ int do_knockback(struct char_data *ch, char *argument, int cmd)
 //the room?
     char temp[256];  // what did my innocent bugfix ever do to you?
     sprintf(temp,"%s",GET_SHORT(victim));
-    retval = damage(ch, victim, dam, TYPE_HIT, SKILL_KNOCKBACK, 0);
+    retval = damage(ch, victim, dam, TYPE_CRUSH, SKILL_KNOCKBACK, 0);
     if(SOMEONE_DIED(retval)) {
       sprintf(buf, "You smash %s apart!",temp);
        act(buf, ch, 0, 0, TO_CHAR, 0);
@@ -730,7 +730,7 @@ int do_knockback(struct char_data *ch, char *argument, int cmd)
     act("$N barely keeps $S footing, stumbling backwards after your smash.", ch, 0, victim, TO_CHAR, 0);
     act("$n knocks you back across the room.", ch, 0, victim, TO_VICT, 0);
     WAIT_STATE(ch, PULSE_VIOLENCE);
-    retval = damage(ch, victim, dam, TYPE_HIT, SKILL_KNOCKBACK ,0);
+    retval = damage(ch, victim, dam, TYPE_CRUSH, SKILL_KNOCKBACK ,0);
     if(!SOMEONE_DIED(retval))
        return attack(victim, ch, TYPE_UNDEFINED);
   }
