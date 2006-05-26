@@ -381,7 +381,7 @@ int do_mpstat(struct char_data *ch, char *arg, int cmd)
         return eFAILURE;
   }
 
-  int has_range = has_skill(ch, COMMAND_RANGE);
+  //  int has_range = has_skill(ch, COMMAND_RANGE);
 
   one_argument(arg, name);
 
