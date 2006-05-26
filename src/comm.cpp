@@ -2433,7 +2433,7 @@ int do_awaymsgs(CHAR_DATA *ch, char *argument, int cmd)
     ch->pcdata->away_msgs->pop();
     
     if (++lines == 23) {
-      SEND_TO_Q("\n\rMore msgs available. Type awaymsgs to see more\n\r",
+      SEND_TO_Q("\n\rMore msgs available. Type awaymsgs to see them\n\r",
 		ch->desc);
       break;
     }
@@ -2454,8 +2454,8 @@ void check_for_awaymsgs(struct char_data *ch)
     return;
   }
 
-  send_to_char("There were messages saved while you were away.\n\r", ch);
-  send_to_char("Type awaymsgs to view your saved messages.\n\r", ch);
+  send_to_char("You have unviewed away messages. ", ch);
+  send_to_char("Type awaymsgs to view them.\n\r", ch);
 }
 
 void send_to_char(char *messg, struct char_data *ch)

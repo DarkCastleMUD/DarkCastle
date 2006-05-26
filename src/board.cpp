@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: board.cpp,v 1.17 2006/05/07 23:03:36 dcastle Exp $
+| $Id: board.cpp,v 1.18 2006/05/26 18:24:30 jhhudso Exp $
 | board.C
 | Description:  This file contains the implementation for the board
 |   code.  It's old and should be rewritten --Morc XXX
@@ -69,6 +69,7 @@ int board_show_board(CHAR_DATA *ch, char *arg, int bnum);
 int fwrite_string(char *buf, FILE *fl);
 void board_unlock_board(CHAR_DATA *ch);
 void new_edit_board_unlock_board(CHAR_DATA *ch, int abort);
+void check_for_awaymsgs(char_data *ch);
 
 extern CHAR_DATA *character_list;
 extern CWorld world;
@@ -394,6 +395,7 @@ void new_edit_board_unlock_board(CHAR_DATA *ch, int abort)
         board_lock[x].lock = 0;
         board_lock[x].locked_for = NULL;
         csendf(ch, "Your message is number %d.\n\r", boards[x].number);
+	check_for_awaymsgs(ch);
       } else {
         ind = boards[x].number;
         curr_board = &boards[x];
