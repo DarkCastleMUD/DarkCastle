@@ -2420,7 +2420,7 @@ int do_awaymsgs(CHAR_DATA *ch, char *argument, int cmd)
   if (IS_NPC(ch))
     return eFAILURE;
   
-  if (ch->pcdata->away_msgs->empty()) {
+  if ((ch->pcdata->away_msgs == 0) || ch->pcdata->away_msgs->empty()) {
     SEND_TO_Q("No messages have been recorded.\n\r", ch->desc);
     return eSUCCESS;
   }
@@ -2440,6 +2440,22 @@ int do_awaymsgs(CHAR_DATA *ch, char *argument, int cmd)
   }
 
   return eSUCCESS;
+}
+
+void check_for_awaymsgs(struct char_data *ch)
+{
+  if (!ch)
+    return;
+
+  if (IS_NPC(ch))
+    return;
+
+  if ((ch->pcdata->away_msgs == 0) || ch->pcdata->away_msgs->empty()) {
+    return;
+  }
+
+  send_to_char("There were messages saved while you were away.\n\r", ch);
+  send_to_char("Type awaymsgs to view your saved messages.\n\r", ch);
 }
 
 void send_to_char(char *messg, struct char_data *ch)

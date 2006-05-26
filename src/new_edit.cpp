@@ -27,6 +27,7 @@ extern "C"
 void new_edit_board_unlock_board(CHAR_DATA *ch, int abort);
 void format_text(char **ptr_string, int mode, struct descriptor_data *d, int maxlen);
 int replace_str(char **string, char *pattern, char *replacement, int rep_all, int max_size);
+void check_for_awaymsgs(char_data *);
 
 /*  handle some editor commands */
 void parse_action(int command, char *string, struct descriptor_data *d) {
@@ -705,6 +706,7 @@ bool ishashed(char *arg);
          d->connected = CON_PLAYING;
        }
        send_to_char("Aborted.\r\n", ch);
+       check_for_awaymsgs(ch);
     } else {
       if (strlen(*d->strnew) == 0) {
         SEND_TO_Q("You can't save blank messages, try /a for abort.\r\n", d);
@@ -721,6 +723,7 @@ bool ishashed(char *arg);
         } else {
           d->connected = CON_PLAYING;
           send_to_char("Ok.\n\r", ch);
+	  check_for_awaymsgs(ch);
         }
       }
     }

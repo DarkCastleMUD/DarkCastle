@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: modify.cpp,v 1.16 2006/04/25 10:35:29 dcastle Exp $ */
+/* $Id: modify.cpp,v 1.17 2006/05/26 18:14:35 jhhudso Exp $ */
 
 extern "C"
 {
@@ -47,6 +47,7 @@ extern "C"
 #define TP_ERROR  2
 
 void show_string(struct descriptor_data *d, char *input);
+void check_for_awaymsgs(char_data *ch);
 
 extern char menu[];
 
@@ -157,6 +158,7 @@ void string_add(struct descriptor_data *d, char *str)
       if(d->connected == CON_SEND_MAIL) {
         d->connected = CON_PLAYING;
         send_to_char("Ok.\n\r", ch);
+	check_for_awaymsgs(ch);
         // send_mail();
       }
       if(d->connected == CON_EDITING ||
@@ -164,6 +166,7 @@ void string_add(struct descriptor_data *d, char *str)
       {
         d->connected = CON_PLAYING;
         send_to_char("Ok.\n\r", ch);
+	check_for_awaymsgs(ch);
       }
     }
     else
@@ -224,6 +227,7 @@ void string_hash_add(struct descriptor_data *d, char *str)
       d->hashstr = 0;
       d->connected = CON_PLAYING;
       send_to_char("Ok.\n\r", ch);
+      check_for_awaymsgs(ch);
     }
     else
        strcat(*d->hashstr, "\n\r");
