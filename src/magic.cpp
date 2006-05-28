@@ -98,9 +98,10 @@ bool malediction_res(CHAR_DATA *ch, CHAR_DATA *victim, int spell)
     case SPELL_BLINDNESS: res = SAVE_TYPE_MAGIC; break;
     case SPELL_POISON: res = SAVE_TYPE_POISON; break;
     case SPELL_ATTRITION: res = SAVE_TYPE_POISON; break;
+    case SPELL_DEBILITY: res = SAVE_TYPE_POISON; break;
+    case SPELL_FEAR: res = SAVE_TYPE_COLD; break;
   }
-  int l = MAX(33,has_skill(ch, spell));
-  res = victim->saves[res] + 3 + (100-l)/4;
+  res = victim->saves[res] + 5 + (100-has_skill(ch, spell))/2;
   if (number(1,101) < res) return TRUE;
   return FALSE;
 }
@@ -484,7 +485,6 @@ int spell_howl(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
    char_data * tmp_char;
    int retval;
    set_cantquit( ch, victim );
-   int chit = GET_HIT(ch);
 
    if(saves_spell(ch, victim, 5, SAVE_TYPE_MAGIC) >= 0)
     {
@@ -1479,8 +1479,7 @@ int spell_blindness(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
   int retval;
   set_cantquit( ch, victim );
 
-   if (number(1,101) < (get_saves(victim, SAVE_TYPE_MAGIC) + 30 - (skill <40 ? 5 : 0) - (skill < 60 ? 5 : 0) - (skill < 80 ? 5 : 0)))
-   {
+   if (malediction_res(ch, victim, SPELL_BLINDNESS)) {
       act("$N resists your attempt to blind $M!", ch, NULL, victim, TO_CHAR,0);
       act("$N resists $n's attempt to blind $M!", ch, NULL, victim, TO_ROOM,NOTVICT);
       act("You resist $n's attempt to blind you!",ch,NULL,victim,TO_VICT,0);
@@ -1765,9 +1764,7 @@ int spell_curse(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *
 
  set_cantquit( ch, victim );
 
-   if (number(1,101) < (get_saves(victim, SAVE_TYPE_MAGIC) + 5 + (skill <
-40 ? 5 : 0) + (skill < 60 ? 5 : 0) + (skill < 80 ? 5 : 0)))
-{
+   if (malediction_res(ch, victim, SPELL_CURSE)) {
 	act("$N resists your attempt to curse $M!", ch, NULL, victim, TO_CHAR,0);
 	act("$N resists $n's attempt to curse $M!", ch, NULL, victim, TO_ROOM,NOTVICT);
 	act("You resist $n's attempt to curse you!",ch,NULL,victim,TO_VICT,0);
@@ -2428,8 +2425,7 @@ int spell_poison(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data 
   if (victim) 
   {
      set_cantquit(ch, victim);
-     if (IS_SET(victim->immune, ISR_POISON) || number(1,101) < get_saves(victim, SAVE_TYPE_POISON))
-     {
+     if (IS_SET(victim->immune, ISR_POISON) || malediction_res(ch, victim, SPELL_POISON)) {
          act("$N resists your attempt to poison $M!", ch, NULL, victim, TO_CHAR,0);
          act("$N resists $n's attempt to poison $M!", ch, NULL, victim, TO_ROOM,NOTVICT);
          act("You resist $n's attempt to posion you!",ch,NULL,victim,TO_VICT,0);
@@ -4057,13 +4053,10 @@ int spell_fear(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
          }
  set_cantquit( ch, victim );
 
-   if (number(1,101) < get_saves(victim, SAVE_TYPE_COLD))
-   {
-act("$N resists your attempt to scare $M!", ch, NULL, victim, 
-TO_CHAR,0);
-act("$N resists $n's attempt to scare $M!", ch, NULL, victim, TO_ROOM,
-NOTVICT);
-act("You resist $n's attempt to scare you!",ch,NULL,victim,TO_VICT,0);
+   if (malediction_res(ch, victim, SPELL_FEAR)) {
+      act("$N resists your attempt to scare $M!", ch, NULL, victim, TO_CHAR,0);
+      act("$N resists $n's attempt to scare $M!", ch, NULL, victim, TO_ROOM,NOTVICT);
+      act("You resist $n's attempt to scare you!",ch,NULL,victim,TO_VICT,0);
       if (IS_NPC(victim) && (!victim->fighting) && GET_POS(ch) > POSITION_SLEEPING) {
          retval = attack(victim, ch, TYPE_UNDEFINED);
          retval = SWAP_CH_VICT(retval);
@@ -5184,7 +5177,6 @@ int spell_weaken(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data 
     int retval;
     int duration = 0, str = 0, con = 0;
     int learned = has_skill(ch, SPELL_WEAKEN);
-    int save_mod = 0;
     void check_weapon_weights(char_data * ch);
 
     if(!ch || !victim)
@@ -5197,27 +5189,22 @@ int spell_weaken(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data 
        duration = 2; 
        str = -4; 
        con = -1; 
-       save_mod = 0;
      } else if (learned > 40 && learned <= 60) { 
        duration = 3; 
        str = -8; 
        con = -2; 
-       save_mod = 5;
      } else if (learned > 60 && learned <= 80) { 
        duration = 4; 
        str = -10; 
        con = -3; 
-       save_mod = 10;
      } else if (learned > 80) {
        duration = 5; 
        str = -12;  
        con = -4;
-       save_mod = 15;
      }
    
     set_cantquit (ch, victim);
-   if (number(1,101) < MIN(96, (get_saves(victim, SAVE_TYPE_MAGIC) - save_mod)))
-   {
+   if (malediction_res(ch, victim, SPELL_WEAKEN)) {
 	act("$N resists your attempt to weaken $M!", ch, NULL, victim, TO_CHAR,0);
 	act("$N resists $n's attempt to weaken $M!", ch, NULL, victim, TO_ROOM,NOTVICT);
 	act("You resist $n's attempt to weaken you!",ch,NULL,victim,TO_VICT,0);
@@ -10808,7 +10795,6 @@ int spell_debility(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
   extern int mana_gain(CHAR_DATA*ch);
   extern int ki_gain(CHAR_DATA *ch);
   extern int move_gain(CHAR_DATA *ch);
-  int save_mod = 0;
 
   if(affected_by_spell(victim, SPELL_DEBILITY)) {
      send_to_char("Your victim has already been debilitized.\r\n", ch);
@@ -10817,29 +10803,24 @@ int spell_debility(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
 
   if (learned < 40) { 
     percent = 30; 
-    save_mod = 0;
     duration = 2;
   } else if (learned > 40 && learned <= 60) { 
     percent = 45; 
-    save_mod = 5;
     duration = 3;
   } else if (learned > 60 && learned <= 80) { 
     percent =  60;
-    save_mod = 10;
     duration =  4;
   } else if (learned > 80 && learned <= 90) { 
     percent =  75; 
-    save_mod = 15;
     duration =  5;
   } else if (learned > 90) {
     percent =  90;
-    save_mod = 20;
     duration =  6;
   }
 
   set_cantquit( ch, victim );
 
-   if (number(1,101) < MIN(96, (get_saves(victim, SAVE_TYPE_POISON) - save_mod))) { 
+   if (malediction_res(ch, victim, SPELL_DEBILITY)) {
      act("$N resists your attempt to $6debilitize$R $M!", ch, NULL, victim, TO_CHAR,0);
      act("$N resists $n's attempt to $6debilitize$R $M!", ch, NULL, victim, TO_ROOM,NOTVICT);
      act("You resist $n's attempt to $6debilitize$R you!",ch,NULL,victim,TO_VICT,0);
@@ -10923,7 +10904,6 @@ int spell_attrition(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
   int retval = eSUCCESS;
   int acmod = 0, tohit = 0, duration = 0;
   int learned = has_skill(ch, SPELL_ATTRITION);
-  int save_mod = 0;
 
   if(affected_by_spell(victim, SPELL_ATTRITION)) {
      send_to_char("Your victim is already suffering from the affects of that spell.\r\n", ch);
@@ -10933,33 +10913,28 @@ int spell_attrition(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
   if (learned < 40) { 
     acmod = 30; 
     tohit = -3; 
-    save_mod = 0;
     duration = 2;
   } else if (learned > 40 && learned <= 60 ) { 
     acmod = 45; 
     tohit = -6;
-    save_mod = 5;
     duration = 3;
   } else if (learned > 60 && learned <= 80 ) { 
     acmod = 60; 
     tohit = -9;
-    save_mod = 10;
     duration = 4;
   } else if (learned > 80 && learned <= 90 ) { 
     acmod = 75; 
     tohit = -12; 
-    save_mod = 15;
     duration = 5;
   } else if (learned > 90 ) {
     acmod = 90;
     tohit = -15;
-    save_mod = 20;
     duration = 6;
   }
 
   set_cantquit( ch, victim );
 
-   if (number(1,101) < MIN(96, (get_saves(victim, SAVE_TYPE_MAGIC) - save_mod))) {
+   if (malediction_res(ch, victim, SPELL_ATTRITION)) {
      act("$N resists your attempt to cast attrition on $M!", ch, NULL, victim, TO_CHAR, 0);
      act("$N resists $n's attempt to cast attrition on $M!", ch, NULL, victim, TO_ROOM, NOTVICT);
      act("You resist $n's attempt to cast attrition on you!",ch,NULL,victim,TO_VICT,0);
