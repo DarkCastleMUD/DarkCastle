@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.91 2006/05/23 13:28:14 jhhudso Exp $
+| $Id: guild.cpp,v 1.92 2006/05/28 18:58:36 shane Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -350,8 +350,6 @@ int skills_guild(struct char_data *ch, char *arg, struct char_data *owner)
   int known, x;
   int skillnumber;
   int percent;
-  int specialization;
-  int loop;
 
   if (IS_NPC(ch)) return eFAILURE;
     class_skill_defines * skilllist = get_skill_list(ch);
@@ -731,7 +729,7 @@ if (ch->in_room && IS_SET(world[ch->in_room].room_flags, NOLEARN))
    if (skilllist[i].attrs[0])
    {
 	int thing = get_stat(ch,skilllist[i].attrs[0])-20;
-	if (thing > 8)
+	if (thing >= 8)
  	{ to += 2; mod += thing/2;}
 	
    }
