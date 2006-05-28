@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.120 2006/05/25 21:04:44 shane Exp $ */
+/* $Id: nanny.cpp,v 1.121 2006/05/28 20:50:52 shane Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -1697,7 +1697,7 @@ void update_command_lag_and_poison()
            retval = noncombat_damage(i, tmp,
               "You quiver from the effects of the poison and have no enegry left...",
               "$n stops struggling as $e is consumed by poison.",
-              '\0', KILL_POISON);
+              0, KILL_POISON);
            if(SOMEONE_DIED(retval))
              continue;
         }
