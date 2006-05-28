@@ -264,7 +264,6 @@ int do_hindex(struct char_data *ch, char *argument, int cmd)
 	if (arg[0] && is_number(arg))
 	  start = atoi(arg);
 	argument = &arg2[0];
-//	arg = str_cpy(arg3);
 	strcpy(arg, arg3);
        if ((((atoi(argument)) > 0) || *argument == '0') && ((atoi(arg)) > 0)) {  // not valid numbers
          if (atoi(argument) > atoi(arg)) {
@@ -311,22 +310,73 @@ int do_hindex(struct char_data *ch, char *argument, int cmd)
         return eFAILURE;
      } 
      show_help_header(ch);
-     for (i = 0; i < new_top_of_helpt; i++) {
-       if (i >= atoi(argument) && i <= atoi(arg)) 
-         count = show_one_help_entry(i, ch, count);
+     for (i = atoi(argument); i <= atoi(arg); i++) {
+        count = show_one_help_entry(i, ch, count);
      }
      show_help_bar(ch);
    } else if (((atoi(argument)) > 0) || *argument == '0') { // show a specific ID #
      show_help_header(ch);
-     for (i = 0; i < new_top_of_helpt; i++) {
-       if (i == atoi(argument)) 
-          count = show_one_help_entry(i, ch, count);
-     }
+     count = show_one_help_entry(atoi(argument), ch, count);
      show_help_bar(ch);
    } else { // we are searching based on keywords, show as many as you find
      minlen = strlen(argument);
      show_help_header(ch);
      for (i = 0; i < new_top_of_helpt; i++) {
+       if (!strn_cmp(argument, new_help_table[i].keyword1, minlen) ||
+           !strn_cmp(argument, new_help_table[i].keyword2, minlen) ||
+           !strn_cmp(argument, new_help_table[i].keyword3, minlen) ||
+           !strn_cmp(argument, new_help_table[i].keyword4, minlen) ||
+           !strn_cmp(argument, new_help_table[i].keyword5, minlen)) {
+           count = show_one_help_entry(i, ch, count);
+       }
+     }
+     show_help_bar(ch);
+   }
+   send_to_char(help_buf, ch);
+   csendf(ch, "$B$7Total Shown: $B$5%d$R\r\n", count);
+   csendf(ch, "$B$7Total Help Entries: $B$5%d$R\r\n", new_top_of_helpt);
+
+   return eSUCCESS;
+}
+
+int do_index(struct char_data *ch, char *argument, int cmd)
+{
+   int i, minlen, count = 0;
+   char arg[256];
+
+  half_chop(argument, argument, arg);
+   if (!*argument) {
+     csendf(ch, "Usage: hindex <ID#>\r\n"
+                  "       hindex <low ID#> <high ID#>  (you can display up to 30 at a time)\r\n"
+                  "       hindex <start of a word(s)>\r\n"
+                  "\r\n");
+     return eFAILURE;
+   }
+   
+   if ((((atoi(argument)) > 0) || *argument == '0') && ((atoi(arg)) > 0)) { // index #s out of range
+     if (atoi(argument) > atoi(arg)) {
+        send_to_char("Usage: hindex <low ID#> <high ID#>\r\n", ch); // wrong order, first > second
+        return eFAILURE;
+     } 
+     show_help_header(ch);
+     for (i = atoi(argument); i <= atoi(arg); i++) {
+       if(new_help_table[i].min_level > 1) continue;
+       if(count > 30) break;
+       count = show_one_help_entry(i, ch, count);
+     }
+     show_help_bar(ch);
+   } else if (((atoi(argument)) > 0) || *argument == '0') { // show a specific ID #
+     show_help_header(ch);
+     if(new_help_table[i].min_level > 1) {
+        send_to_char("Sorry, this help file is for immortals only.\n\r", ch);
+     } else count = show_one_help_entry(atoi(argument), ch, count);
+     show_help_bar(ch);
+   } else { // we are searching based on keywords, show as many as you find
+     minlen = strlen(argument);
+     show_help_header(ch);
+     for (i = 0; i < new_top_of_helpt; i++) {
+       if(new_help_table[i].min_level > 1) continue;
+       if(count > 30) break;
        if (!strn_cmp(argument, new_help_table[i].keyword1, minlen) ||
            !strn_cmp(argument, new_help_table[i].keyword2, minlen) ||
            !strn_cmp(argument, new_help_table[i].keyword3, minlen) ||
@@ -354,7 +404,7 @@ int show_one_help_entry(int entry, struct char_data *ch, int count) {
                 (*new_help_table[entry].keyword2 ? new_help_table[entry].keyword3 : "None"),
                 (*new_help_table[entry].keyword2 ? new_help_table[entry].keyword4 : "None"),
                 (*new_help_table[entry].keyword3 ? new_help_table[entry].keyword5 : "None"));
-    return count++;
+    return ++count;
 }
 
 void show_help_header(struct char_data *ch) {
