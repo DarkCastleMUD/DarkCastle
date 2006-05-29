@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.124 2006/05/25 21:04:49 shane Exp $
+| $Id: cl_thief.cpp,v 1.125 2006/05/29 08:44:54 shane Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -233,6 +233,9 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
           && (GET_LEVEL(victim) <= GET_LEVEL(ch) + 5) 
           && ((!IS_NPC(ch) && GET_LEVEL(ch) >= IMMORTAL) || itemp > 94 || 
                ( !IS_NPC(victim) && IS_SET(victim->pcdata->punish, PUNISH_UNLUCKY) )
+             )
+          && (ch->equipment[WIELD]->obj_flags.value[3] == 11 && !IS_SET(victim->immune, ISR_PIERCE) ||
+              ch->equipment[WIELD]->obj_flags.value[3] == 9 && !IS_SET(victim->immune, ISR_STING)
              )
          ) 
   { 
