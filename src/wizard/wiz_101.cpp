@@ -537,7 +537,9 @@ int do_wiz(struct char_data *ch, char *argument, int cmd)
         ansi_color( NTEXT, ch);
 
         for (i = descriptor_list; i; i = i->next) {
-	  if (i->character != ch && GET_LEVEL(i->character) >= IMMORTAL) {
+	  if (i->character && !i->connected && i->character != ch && GET_LEVEL(i->character) >= IMMORTAL) {
+	  if (cmd == 8 && !has_skill(i->character, COMMAND_IMP_CHAN)) continue;
+
 	    if (STATE(i) == CON_PLAYING) {
 	      send_to_char(buf1, i->character);
 	    } else {

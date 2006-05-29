@@ -3341,7 +3341,6 @@ int do_redit(struct char_data *ch, char *argument, int cmd)
       return eFAILURE;
 
     half_chop(argument, buf, buf2);
-
     if(!*buf) {
       send_to_char("The field must be one of the following:\n\r", ch);
       for(x = 0 ;; x++) {
