@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.307 2006/05/28 20:50:52 shane Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.308 2006/05/29 22:18:15 dcastle Exp $ */
 
 extern "C"
 {
@@ -96,6 +96,50 @@ bool someone_fighting(CHAR_DATA *ch)
  }
  return FALSE;
 }
+
+int check_autojoiners(CHAR_DATA *ch, int skill = 0)
+{
+  if (IS_NPC(ch)) return eFAILURE; // irrelevant
+  if (!ch->fighting) return eFAILURE; 
+  
+  CHAR_DATA *tmp;
+  for (tmp = world[ch->in_room].people;tmp; tmp = tmp->next_in_room)
+  {
+     if (tmp == ch || tmp == ch->fighting) continue;
+     if (IS_NPC(tmp)) continue;
+     if (tmp->fighting) continue;
+     if (!tmp->desc) continue;
+     if (GET_POS(tmp) != POSITION_STANDING) continue;
+     if (!tmp->pcdata || !tmp->pcdata->joining) continue;
+     if (!isname(GET_NAME(ch), tmp->pcdata->joining)) continue;
+     if (skill && !skill_success(tmp, ch, SKILL_FASTJOIN)) continue;
+     int retval = do_join(tmp, GET_NAME(ch), 9);
+     if (SOMEONE_DIED(retval)) return retval;
+  }
+  return eSUCCESS;
+}
+
+int check_charmiejoin(CHAR_DATA *ch, int skill = 0)
+{
+  if (!IS_NPC(ch)) return eFAILURE; // irrelevant
+  if (!ch->fighting) return eFAILURE; 
+  
+  CHAR_DATA *tmp = ch->master;
+  if (!tmp) return eFAILURE;
+  if (tmp == ch || tmp == ch->fighting) return eFAILURE;
+  if (!tmp->desc) return eFAILURE;
+  if (IS_NPC(tmp)) return eFAILURE;
+  if (tmp->fighting) return eFAILURE;
+  if (GET_POS(tmp) != POSITION_STANDING) return eFAILURE;
+  if (!tmp->pcdata || !tmp->pcdata->joining) return eFAILURE;
+  if (!isname("follower", tmp->pcdata->joining) &&
+	!isname("followers", tmp->pcdata->joining)) return eFAILURE;
+  if (skill && !skill_success(tmp, ch, SKILL_FASTJOIN)) return eFAILURE;
+  int retval = do_join(tmp, GET_NAME(ch), 9);
+
+  return retval;
+}
+
 void perform_violence(void)
 {
   //char debug[256];
@@ -106,6 +150,7 @@ void perform_violence(void)
   extern char *spell_wear_off_msg[];
   
   if(!combat_list)                  return;
+
   
   for(ch = combat_list; ch; ch = combat_next_dude) {
     // if combat_next_dude gets killed, it get's updated in "stop_fighting"
@@ -116,7 +161,7 @@ void perform_violence(void)
       log("Error in perform_violence()!  Null ch->fighting!", IMMORTAL, LOG_BUG);
       return;
     }
-
+    
 // DEBUG CODE
    int last_virt = -1;
    int last_class = GET_CLASS(ch);
@@ -130,6 +175,10 @@ void perform_violence(void)
      stop_fighting(ch);
      continue;
    }
+   int retval = check_autojoiners(ch);
+   if (SOMEONE_DIED(retval)) continue;
+   if (IS_AFFECTED(ch, AFF_CHARM)) retval = check_charmiejoin(ch);
+   if (SOMEONE_DIED(retval)) continue;
 
     if(can_attack(ch)) {
       is_mob = IS_MOB(ch);
@@ -1991,6 +2040,10 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
       eq_damage(ch, victim, dam, weapon_type, attacktype);
 
   inform_victim(ch, victim, dam);
+
+
+
+
   if (GET_POS(victim) != POSITION_DEAD &&ch->in_room != victim->in_room && 
    !(attacktype == SPELL_SOLAR_GATE|| attacktype == SKILL_ARCHERY || 
    attacktype == SPELL_LIGHTNING_BOLT || attacktype == SKILL_FIRE_ARROW ||
@@ -2040,8 +2093,13 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
     else
       fight_kill(ch, victim, TYPE_CHOOSE, 0);
     return damage_retval(ch, victim, (eSUCCESS|eVICT_DIED));
-    }
-
+    } else {
+  
+  SET_BIT(retval, check_autojoiners(ch,1));
+  if (!SOMEONE_DIED(retval))
+  if (IS_AFFECTED(ch, AFF_CHARM)) SET_BIT(retval, check_charmiejoin(ch));
+  if (SOMEONE_DIED(retval)) return retval;
+ }
   return retval;
 } 
 
@@ -2745,6 +2803,10 @@ void set_fighting(CHAR_DATA * ch, CHAR_DATA * vict)
   
   if(ch->fighting) /* If he's already fighting */
     return;
+  if (IS_AFFECTED(ch, AFF_HIDE))
+     REMBIT(ch->affected_by, AFF_HIDE);
+  if (IS_AFFECTED(vict, AFF_HIDE))
+     REMBIT(vict->affected_by, AFF_HIDE);
   
   if(!IS_NPC(ch) && IS_NPC(vict))
     if(!ISSET(vict->mobdata->actflags, ACT_STUPID))
@@ -4716,7 +4778,13 @@ int can_be_attacked(CHAR_DATA *ch, CHAR_DATA *vict)
   if(vict->in_room < 0 || vict->in_room >= top_of_world || 
        ch->in_room < 0 || ch->in_room   >= top_of_world) 
     return FALSE;
-  
+
+  if (IS_NPC(vict))
+  if (ISSET(vict->mobdata->actflags, ACT_NOATTACK))
+  {
+    send_to_char("Due to heavy magics, they cannot be attacked.\r\n",ch);
+    return FALSE;
+  }
   if(IS_NPC(vict))
   {
     if((IS_AFFECTED(vict, AFF_FAMILIAR) || mob_index[vict->mobdata->nr].virt == 8

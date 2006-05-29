@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.115 2006/05/25 11:47:35 jhhudso Exp $ */
+/* $Id: db.cpp,v 1.116 2006/05/29 22:18:15 dcastle Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -4556,6 +4556,8 @@ void free_char( CHAR_DATA *ch )
         dc_free(ch->pcdata->last_tell);
       if (ch->pcdata->golem)
          log("Error, golem not released properly",ANGEL, LOG_BUG);
+	if (ch->pcdata->joining)
+		dc_free(ch->pcdata->joining);
       /* Free aliases... (I was to lazy to do before. ;) */
       for( x = ch->pcdata->alias; x ; x = next) {
          next = x->next;
@@ -4782,6 +4784,7 @@ void init_char(CHAR_DATA *ch)
   ch->altar = NULL;
   GET_PROMPT(ch)          = 0;
   ch->pcdata->skillchange = 0;
+  ch->pcdata->joining = 0;
   ch->pcdata->practices   = 0;
   ch->pcdata->time.birth  = time(0);
   ch->pcdata->time.played = 0;

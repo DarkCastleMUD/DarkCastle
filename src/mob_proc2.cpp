@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.65 2006/05/24 20:07:04 shane Exp $ */
+/* $Id: mob_proc2.cpp,v 1.66 2006/05/29 22:18:15 dcastle Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -1271,6 +1271,7 @@ void meta_list_stats(char_data * ch)
 int meta_get_moves_exp_cost(char_data * ch)
 {
    int meta = GET_MOVE_METAS(ch);  
+  if (GET_MAX_MOVE(ch) - GET_RAW_MOVE(ch) < 0)
    meta += GET_MAX_MOVE(ch) - GET_RAW_MOVE(ch);
    return new_meta_exp_cost_one(MAX(0,meta));
 }
@@ -1278,6 +1279,7 @@ int meta_get_moves_exp_cost(char_data * ch)
 int meta_get_moves_plat_cost(char_data * ch)
 {
    int meta = GET_MOVE_METAS(ch);
+  if (GET_MAX_MOVE(ch) - GET_RAW_MOVE(ch) < 0)
    meta += GET_MAX_MOVE(ch) - GET_RAW_MOVE(ch);
    return (int)new_meta_platinum_cost(MAX(0,meta), MAX(0,meta)+1);
 }
@@ -1289,6 +1291,7 @@ int meta_get_hps_exp_cost(char_data * ch)
    for(int i = 16; i < GET_RAW_CON(ch); i++)
       meta -= (i * i) / 30;
 
+  if (GET_MAX_HIT(ch) - GET_RAW_HIT(ch) < 0)
    meta += GET_MAX_HIT(ch) - GET_RAW_HIT(ch);
    return new_meta_exp_cost_one(MAX(0,meta));
 }
@@ -1300,6 +1303,7 @@ int meta_get_hps_plat_cost(char_data * ch)
    for(int i = 16; i < GET_RAW_CON(ch); i++)
       meta -= (i * i) / 30;
 
+  if (GET_MAX_HIT(ch) - GET_RAW_HIT(ch) < 0)
    meta += GET_MAX_HIT(ch) - GET_RAW_HIT(ch);
    return (int)new_meta_platinum_cost(MAX(0,meta), MAX(0,meta)+1);
 }
@@ -1318,6 +1322,7 @@ int meta_get_mana_exp_cost(char_data * ch)
    for(int i = 16; i < stat; i++)
       meta -= (i * i) / 30;
 
+  if (GET_MAX_MANA(ch) - GET_RAW_MANA(ch) < 0)
    meta += GET_MAX_MANA(ch) - GET_RAW_MANA(ch);
    return new_meta_exp_cost_one(MAX(0,meta));
 }
@@ -1336,6 +1341,7 @@ int meta_get_mana_plat_cost(char_data * ch)
    for(int i = 16; i < stat; i++)
       meta -= (i * i) / 30;
 
+  if (GET_MAX_MANA(ch) - GET_RAW_MANA(ch) < 0)
    meta += GET_MAX_MANA(ch) - GET_RAW_MANA(ch);
    return (int)new_meta_platinum_cost(MAX(0,meta), MAX(0,meta)+1);
 }

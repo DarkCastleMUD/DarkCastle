@@ -1,7 +1,7 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.39 2006/05/25 11:47:35 jhhudso Exp $
+| $Id: character.h,v 1.40 2006/05/29 22:18:18 dcastle Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
@@ -155,10 +155,16 @@ struct follow_type
     struct follow_type *next;
 };
 
+#define VIEW_ACCESS 1
+#define DEPOSIT_ACCESS 2
+#define WITHDRAW_ACCESS 3
+
 struct vault_access_data
 {
   struct vault_access_data *next;
+  bool self; // own vault, or remote vault
   char *name; // also used as an integer for clans. 
+  int segment;
   bool view;
   bool deposit;
   bool withdraw;
@@ -166,8 +172,9 @@ struct vault_access_data
 
 struct player_vault
 {
-  char *segment_names[20];
-  int max_contain;
+  char *segment[20];
+  int max_contain, contains;
+  int nr_items;
   OBJ_DATA *content;
   struct vault_access_data *acc;
 };
@@ -241,6 +248,7 @@ struct pc_data
     CHAR_DATA *hiding_from[MAX_HIDE];
     struct player_vault *vault;
     std::queue<char *> *away_msgs;
+    char *joining;
 };
 
 struct mob_data

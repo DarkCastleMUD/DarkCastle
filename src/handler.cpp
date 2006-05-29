@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.106 2006/05/20 07:17:04 jhhudso Exp $ */
+/* $Id: handler.cpp,v 1.107 2006/05/29 22:18:15 dcastle Exp $ */
     
 extern "C"
 {
@@ -518,9 +518,11 @@ void add_set_stats(char_data *ch, obj_data *obj, int flag, int pos)
            break;
           case SET_AQUA:
 	    af.bitvector = AFF_WATER_BREATHING;
-	    affect_to_char(ch,&af);
+	    affect_to_char(ch, &af);
+	    af.bitvector = -1;
   	    af.location = APPLY_HIT_N_DAM;
             af.modifier = 2;
+	    affect_to_char(ch, &af);
            break;
 	  default: 
 		send_to_char("Tough luck, you completed an unimplemented set. Report what you just wore, eh?\r\n",ch);

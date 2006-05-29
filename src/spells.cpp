@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.160 2006/05/25 17:02:34 apocalypse Exp $ */
+/* $Id: spells.cpp,v 1.161 2006/05/29 22:18:15 dcastle Exp $ */
 
 extern "C"
 {
@@ -496,6 +496,7 @@ struct skill_stuff skill_info[] =
 /* 85 */      { "ignore_this", SKILL_INCREASE_HARD},
 /* 86 */      { "ignorethiss",0},
 /* 87 */      { "combat mastery", SKILL_INCREASE_HARD},
+/* 87 */      { "rapid join", SKILL_INCREASE_EASY},
 /*    */                  { "\n", 0 },
 };
 
@@ -590,6 +591,7 @@ char *skills[]=
   "ignoreme101",
   "Ignorethisaa",
   "combat mastery",
+  "rapid join",
   "\n"
 };
 

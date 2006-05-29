@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: group.cpp,v 1.19 2006/05/19 07:38:09 shane Exp $
+| $Id: group.cpp,v 1.20 2006/05/29 22:18:15 dcastle Exp $
 | group.C
 | Description:  Group related commands; join, abandon, follow, etc..
 */
@@ -625,5 +625,76 @@ int do_follow(CHAR_DATA *ch, char *argument, int cmd)
 //	      }
 	  }
       }
+  return eSUCCESS;
+}
+
+int do_autojoin(CHAR_DATA *ch, char *argument, int cmd)
+{
+  if (!ch->pcdata) return eFAILURE;
+  char buf[MAX_STRING_LENGTH];
+  if (!*argument)
+  {
+	sprintf(buf, "You are currently joining: ");
+	if (ch->pcdata->joining)
+		strcat(buf, ch->pcdata->joining);
+	else
+		strcat(buf, "Nobody");
+	strcat(buf, "\r\n");
+	send_to_char(buf,ch);
+
+	send_to_char("Syntax: autojoin <player1> <player2> <player3> ...\r\nExample: autojoin Urizen Apocalypse Wendy Scyld\r\n",ch);
+	
+	return eFAILURE;
+  }
+  char tmp[MAX_STRING_LENGTH],tmp2[MAX_STRING_LENGTH],tmp3[MAX_STRING_LENGTH];
+  char arg[MAX_INPUT_LENGTH];
+  tmp[0] = tmp2[0] = tmp3[0] = '\0';
+
+  if (ch->pcdata->joining) { 
+    strcpy(tmp, ch->pcdata->joining);
+    dc_free(ch->pcdata->joining);
+    ch->pcdata->joining = 0;
+  }
+  
+  while (1) {
+
+  // worst logic ever, but I don't feel like thinking and it's not like we need the processing power
+
+   argument = one_argument(argument,arg);
+   if (arg[0] == '\0') break;
+   if (!str_cmp(GET_NAME(ch), arg))
+   {
+	send_to_char("You cannot autojoin yourself.\r\n",ch);
+	continue;
+   }
+   if (!str_cmp(arg, "clear"))
+   {
+	send_to_char("Joinlist cleared.\r\n",ch);
+	return eSUCCESS;
+   }
+
+   if (isname(arg,tmp))
+   {
+	strcat(tmp3, arg);
+	strcat(tmp3, " ");
+   } else {
+	strcat(tmp2, arg);
+	strcat(tmp2, " ");
+   }
+  }
+  argument = &tmp[0];
+  while (1) { // BAD BAD BAD
+   argument = one_argument(argument,arg);
+   if (arg[0] == '\0') break;
+   if (!isname(arg,tmp3))
+   {
+	strcat(tmp2, arg);
+	strcat(tmp2, " ");
+   }
+  }
+
+  ch->pcdata->joining = str_dup(tmp2);
+  sprintf(buf, "You are now autojoining: %s\r\n",ch->pcdata->joining);
+  send_to_char(buf,ch);
   return eSUCCESS;
 }

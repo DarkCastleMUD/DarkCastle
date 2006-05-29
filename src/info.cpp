@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.102 2006/05/24 18:34:03 shane Exp $ */
+/* $Id: info.cpp,v 1.103 2006/05/29 22:18:15 dcastle Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -175,6 +175,26 @@ char *find_ex_description(char *word, struct extra_descr_data *list)
    return(0);
 }
 
+char *item_condition(struct obj_data *object)
+{
+         int percent = 100 - (int)(100 * ((float)eq_current_damage(object) / (float)eq_max_damage(object)));
+
+         if (percent >= 100)
+            return " [$B$2Excellent$R]";
+         else if (percent >= 80)
+            return " [$2Good$R]";
+         else if (percent >= 60)
+            return " [$3Decent$R]";
+         else if (percent >= 40)
+            return " [$B$5Damaged$R]";
+         else if (percent >= 20)
+            return " [$4Quite Damaged$R]";
+         else if (percent >= 0)
+            return " [$B$4Falling Apart$R]";
+         else return " [$5Pile of Scraps$R]";
+
+}
+
 void show_obj_to_char(struct obj_data *object, struct char_data *ch, int mode)
 {
    char buffer[MAX_STRING_LENGTH];
@@ -267,6 +287,7 @@ void show_obj_to_char(struct obj_data *object, struct char_data *ch, int mode)
 	  object->obj_flags.type_flag == ITEM_LIGHT
          )
       {
+	 strcat(buffer, item_condition(object));/*
          percent = 100 - (int)(100 * ((float)eq_current_damage(object) / (float)eq_max_damage(object)));
                   
          if (percent >= 100) 
@@ -282,7 +303,7 @@ void show_obj_to_char(struct obj_data *object, struct char_data *ch, int mode)
          else if (percent >= 0)
             strcat(buffer, " [$B$4Falling Apart$R]");
          else strcat(buffer, " [$5Pile of Scraps$R]");
-      }
+*/      }
       
       if(mode == 0) // 'look' 
          strcat(buffer, "$B$1"); // setup color background

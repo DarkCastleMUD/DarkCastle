@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: save.cpp,v 1.36 2006/05/07 23:07:53 dcastle Exp $ */
+/* $Id: save.cpp,v 1.37 2006/05/29 22:18:15 dcastle Exp $ */
 
 extern "C"
 {
@@ -277,6 +277,12 @@ void save_pc_data(struct pc_data * i, FILE * fpsave, struct time_data tmpage)
     fwrite("KIM", sizeof(char), 3, fpsave);
     fwrite(&(i->kimetas), sizeof(i->kimetas), 1, fpsave);
   }
+  // autojoinin'
+  if(i->joining) {
+    fwrite("JIN", sizeof(char), 3, fpsave);
+    fwrite_var_string(i->joining, fpsave);
+//    fwrite(&(i->kimetas), sizeof(i->kimetas), 1, fpsave);
+  }
 
 
   // Any future additions to this save file will need to be placed LAST here with a 3 letter code
@@ -353,6 +359,12 @@ void read_pc_data(struct char_data *ch, FILE* fpsave)
   if(!strcmp("KIM", typeflag))
   {
     fread(&i->kimetas, sizeof(i->kimetas), 1, fpsave);
+    fread(&typeflag, sizeof(char), 3, fpsave);
+  }
+  i->joining = 0;
+  if (!strcmp("JIN", typeflag))
+  {
+    i->joining = fread_var_string(fpsave);
     fread(&typeflag, sizeof(char), 3, fpsave);
   }
   i->skillchange = 0;

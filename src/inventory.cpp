@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.65 2006/05/24 20:07:04 shane Exp $
+| $Id: inventory.cpp,v 1.66 2006/05/29 22:18:15 dcastle Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -853,7 +853,7 @@ int do_drop(struct char_data *ch, char *argument, int cmd)
       for(tmp_object = ch->carrying; tmp_object; tmp_object = next_obj) {
          next_obj = tmp_object->next_content;
 
-         if(alldot && !isname(alldot, tmp_object->name)) continue;
+         if(alldot[0] != '\0' && !isname(alldot, tmp_object->name)) continue;
 
          if(IS_SET(tmp_object->obj_flags.extra_flags, ITEM_SPECIAL))
            continue;

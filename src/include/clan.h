@@ -2,7 +2,7 @@
 #define CLAN_H_
 
 /************************************************************************
-| $Id: clan.h,v 1.16 2006/04/19 18:59:51 dcastle Exp $
+| $Id: clan.h,v 1.17 2006/05/29 22:18:18 dcastle Exp $
 | clan.h
 | Description:  Header information for clans.
 */
@@ -70,6 +70,7 @@ struct clan_data
   clan_room_data * rooms;
   clan_member_data * members;
   struct clan_data * next;
+  struct vault_access_data *acc;
 };
 
 void add_totem(OBJ_DATA *altar, OBJ_DATA *totem);

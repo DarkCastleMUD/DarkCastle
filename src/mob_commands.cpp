@@ -653,8 +653,14 @@ int do_mpat( CHAR_DATA *ch, char *argument, int cmd )
     }
 
 // TODO - make location take args
-    location = atoi(arg);
-    
+   CHAR_DATA *vict;
+   if (!(vict = get_char_vis(ch, arg)))
+   {
+       location = atoi(arg);
+   }
+   else {
+        location = vict->in_room; 
+   }
 
     if ( location < 0 )
     {

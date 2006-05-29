@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.h,v 1.48 2006/05/28 18:28:09 shane Exp $ */
+/* $Id: interp.h,v 1.49 2006/05/29 22:18:18 dcastle Exp $ */
 
 #ifndef INTERP_H_
 #define INTERP_H_
@@ -67,6 +67,7 @@ DO_FUN  do_guide;
 DO_FUN  do_alias;
 DO_FUN  do_archive;
 DO_FUN  do_autoeat;
+DO_FUN  do_autojoin;
 DO_FUN  do_unban;
 DO_FUN  do_ambush;
 DO_FUN  do_anonymous;
