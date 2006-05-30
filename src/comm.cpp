@@ -1924,7 +1924,8 @@ int process_input(struct descriptor_data *t)
           tmp_ptr = (ptr+1);
           if(isdigit(*tmp_ptr) || *tmp_ptr == 'I' || *tmp_ptr == 'L' ||
                                   *tmp_ptr == '*' || *tmp_ptr == 'R' ||
-                                  *tmp_ptr == 'B' || t->connected == CON_EDIT_MPROG
+                                  *tmp_ptr == 'B' || t->connected == CON_EDIT_MPROG ||
+				  t->connected == CON_EDITING
             )
           { // write it like normal
             *write_point++ = *ptr;
