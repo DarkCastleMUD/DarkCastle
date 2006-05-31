@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: shop.cpp,v 1.22 2006/05/31 09:42:15 shane Exp $ */
+/* $Id: shop.cpp,v 1.23 2006/05/31 09:58:49 shane Exp $ */
 
 extern "C"
 {
@@ -533,6 +533,35 @@ void shopping_value( char *arg, CHAR_DATA *ch,
        }
        else
           do_say(keeper, "I only know the properties of scrolls, potions, staves, and wands.", 9);
+    }
+
+    if(mob_index[keeper->mobdata->nr].virt == 3010 && keeperhas) { //if the leather worker in town
+       act("The Leather Worker holds up $p for you to examine.", ch, obj, 0, TO_CHAR, 0);
+       act("The Leather Worker holds up $p for $n to examine.", ch, obj, 0, TO_ROOM, 0);
+       if(GET_ITEM_TYPE(obj) == ITEM_ARMOR) {
+          if(obj->obj_flags.eq_level < 20) {
+             sprintf(buf, "Ah yes, %s can be worn by ", obj->short_description);
+             sprintbit(obj->obj_flags.size, size_bits, buf2);
+             strcat(buf, buf2);
+             do_say(keeper, buf, 9);
+             sprintf(buf, "and it can be worn by these classes: ");
+             sprintbit(obj->obj_flags.extra_flags, extra_bits, buf2);
+             strcat(buf, buf2);
+             do_say(keeper, buf, 9);
+             sprintf(buf, "The minimum level necessary to use it is %d.", obj->obj_flags.eq_level);
+             do_say(keeper, buf, 9);
+             for(int i=0;i<obj->num_affects;i++) {
+                if(obj->affected[i].location == APPLY_AC && obj->affected[i].modifier != 0) {
+                   sprintf(buf, "Your armor class will change by %d.", obj->affected[i].modifier);
+                   do_say(keeper, buf, 9);
+                   if(obj->affected[i].modifier < 0)
+                      do_say(keeper, "Don't worry, this is a good thing.", 9);
+                }
+             }
+          }
+          else
+             do_say(keeper, "This armor is crafted using too advanced techniques for me.", 9);
+       } else do_say(keeper, "I don't know anything about this item, actually.", 9);
     }
 
     if ( !trade_with( obj, shop_nr ) || obj->obj_flags.cost < 1 )
