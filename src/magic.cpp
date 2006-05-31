@@ -394,9 +394,7 @@ int spell_vampiric_touch (ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct 
     if (!SOMEONE_DIED(retval))
     if (GET_HIT(victim) >= i) return retval;
       
-/*    if (!SOMEONE_DIED(retval) && GET_HIT(victim) < adam)
-        GET_HIT(ch) += GET_HIT(victim);
-    else*/ GET_HIT(ch) += adam;
+    GET_HIT(ch) += MIN(adam, i-GET_HIT(victim));
     if (GET_HIT(ch) > GET_MAX_HIT(ch))
         GET_HIT(ch) = GET_MAX_HIT(ch);
     return retval;
@@ -406,9 +404,7 @@ int spell_vampiric_touch (ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct 
      int i = GET_HIT(victim);
      int retval =  damage (ch, victim, dam,TYPE_COLD, SPELL_VAMPIRIC_TOUCH, 0);
     if (!SOMEONE_DIED(retval) && GET_HIT(victim) >= i) return retval;
-   /* if (!SOMEONE_DIED(retval) && GET_HIT(victim) < adam)
-       GET_HIT(ch) += GET_HIT(victim);
-    else*/ GET_HIT(ch) += adam;
+    GET_HIT(ch) += MIN(adam, i-GET_HIT(victim));
     if (GET_HIT(ch) > GET_MAX_HIT(ch))
         GET_HIT(ch) = GET_MAX_HIT(ch);
    return retval;
@@ -9375,8 +9371,7 @@ int cast_feline_agility(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DA
 
 /* OAKEN FORTITUDE */
 
-int cast_oaken_fortitude(ubyte level, CHAR_DATA *ch, char *arg, int type, 
-CHAR_DATA  *victim, struct obj_data * tar_obj, int skill)
+int cast_oaken_fortitude(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA  *victim, struct obj_data * tar_obj, int skill)
 { // Feline agility rip
         struct affected_type af;
 
@@ -9398,11 +9393,39 @@ CHAR_DATA  *victim, struct obj_data * tar_obj, int skill)
         af.location     = APPLY_AC;
         af.bitvector    = -1;
         affect_to_char(victim, &af);
-	send_to_char("Your fortitude increases to that of an oak.\r\n",ch);
+	send_to_char("Your fortitude increases to that of an oak.\r\n",victim);
         af.modifier     = 1 + (skill/20);
         af.location     = APPLY_CON;
         affect_to_char(victim, &af);
 	redo_hitpoints(victim);
+	return eSUCCESS;
+}
+
+/* CLARITY */
+
+int cast_clarity(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA  *victim, struct obj_data * tar_obj, int skill)
+{ // Feline agility rip
+        struct affected_type af;
+
+        if(affected_by_spell(victim, SPELL_CLARITY))
+        {
+	 	send_to_char("You cannot clear your mind any further without going stupid.\r\n",ch);
+		return eFAILURE;
+        }
+
+
+        af.type         = SPELL_CLARITY;
+        af.duration     = 3 + skill/6;
+        af.modifier     = 3 + skill/20;
+        af.location     = APPLY_INT;
+        af.bitvector    = -1;
+        affect_to_char(victim, &af);
+        redo_mana(victim);
+	send_to_char("You suddenly feel smarter than everyone else.\r\n",victim);
+        act("$N's eyes shine with powerful intellect!", victim, 0, 0, TO_ROOM, 0);
+        af.modifier     = 3 + (skill/20);
+        af.location     = APPLY_MANA_REGEN;
+        affect_to_char(victim, &af);
 	return eSUCCESS;
 }
 

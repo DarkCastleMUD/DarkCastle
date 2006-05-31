@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.162 2006/05/31 08:15:37 shane Exp $ */
+/* $Id: spells.cpp,v 1.163 2006/05/31 21:33:26 shane Exp $ */
 
 extern "C"
 {
@@ -402,7 +402,9 @@ struct spell_info_type spell_info [ ] =
 
  { /* 159 */ 12, POSITION_STANDING, 45, TAR_IGNORE, cast_ghost_walk, SKILL_INCREASE_HARD },
 
- { /* 160 */ 12, POSITION_STANDING, 120, TAR_IGNORE, cast_mend_golem, SKILL_INCREASE_MEDIUM }
+ { /* 160 */ 12, POSITION_STANDING, 120, TAR_IGNORE, cast_mend_golem, SKILL_INCREASE_MEDIUM },
+
+ { /* 161 */ 12, POSITION_STANDING, 10, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_clarity, SKILL_INCREASE_MEDIUM }
 
 };
 

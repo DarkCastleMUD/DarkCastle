@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.189 2006/05/31 08:15:36 shane Exp $ */
+/* $Id: const.cpp,v 1.190 2006/05/31 21:33:26 shane Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1554,6 +1554,7 @@ struct class_skill_defines m_skills[] = { // mage skills
 //   ------------           ------------           -----     ---     ----------   
 {    "magic missile",       SPELL_MAGIC_MISSILE,     1,      98,     {INT,STR} }, 
 {    "ventriloquate",       SPELL_VENTRILOQUATE,     2,      98,     {WIS,INT} }, 
+{    "clarity",             SPELL_CLARITY,           2,      98,     {INT,WIS} },
 {    "detect magic",        SPELL_DETECT_MAGIC,      3,      90,     {INT,WIS} }, 
 {    "detect invisibility", SPELL_DETECT_INVISIBLE,  4,      90,     {INT,DEX} }, 
 {    "invisibility",        SPELL_INVISIBLE,         5,      90,     {INT,DEX} }, 
