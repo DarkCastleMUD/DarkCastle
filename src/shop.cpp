@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: shop.cpp,v 1.21 2006/04/20 03:13:29 dcastle Exp $ */
+/* $Id: shop.cpp,v 1.22 2006/05/31 09:42:15 shane Exp $ */
 
 extern "C"
 {
@@ -385,6 +385,7 @@ void shopping_value( char *arg, CHAR_DATA *ch,
     char argm[MAX_INPUT_LENGTH+1];
     struct obj_data *obj;
     int cost;
+    bool keeperhas = FALSE;
     extern char *extra_bits[];
     extern char *size_bits[];
     extern char *spells[];
@@ -403,15 +404,24 @@ void shopping_value( char *arg, CHAR_DATA *ch,
 
     if ( ( obj = get_obj_in_list_vis( ch, argm, ch->carrying ) ) == NULL )
     {
-        sprintf( buf, shop_index[shop_nr].no_such_item2, GET_NAME(ch) );
-        do_tell( keeper, buf, 0 );
-        return;
+       if ( ( obj = get_obj_in_list_vis( keeper, argm, keeper->carrying ) ) != NULL )
+          keeperhas = TRUE;
+       else {
+          sprintf( buf, shop_index[shop_nr].no_such_item2, GET_NAME(ch) );
+          do_tell( keeper, buf, 0 );
+          return;
+       }
     }
 
     if(mob_index[keeper->mobdata->nr].virt == 3003) { //if the weaponsmith in town
-       act("You hold up $p for the Weaponsmith to examine.", ch, obj, 0, TO_CHAR, 0);
-       act("$n holds up $p for the Weaponsmith to examine..", ch, obj, 0, TO_ROOM, 0);
-       do_emote(keeper, "looks carefully at the item.", 9);
+       if(keeperhas) {
+          act("The Weaponsmith holds up his $p for you to examine.", ch, obj, 0, TO_CHAR, 0);
+          act("The Weaponsmith holds up his $p for $n to examine.", ch, obj, 0, TO_ROOM, 0);
+       } else {
+          act("You hold up $p for the Weaponsmith to examine.", ch, obj, 0, TO_CHAR, 0);
+          act("$n holds up $p for the Weaponsmith to examine.", ch, obj, 0, TO_ROOM, 0);
+          do_emote(keeper, "looks carefully at the item.", 9);
+       }
        if(GET_ITEM_TYPE(obj) == ITEM_WEAPON) {
           if(obj->obj_flags.eq_level < 20) {
              sprintf(buf, "Well, %s is able to be used by ", obj->short_description);
@@ -421,7 +431,9 @@ void shopping_value( char *arg, CHAR_DATA *ch,
              sprintf(buf, "and it can be wielded by these classes: ");
              sprintbit(obj->obj_flags.extra_flags, extra_bits, buf2);
              strcat(buf, buf2);
-             do_say(keeper, buf, 9); 
+             do_say(keeper, buf, 9);
+             sprintf(buf, "The minimum level necessary to use it is %d.", obj->obj_flags.eq_level);
+             do_say(keeper, buf, 9);
              sprintf(buf, "The damage dice are '%dD%d'", obj->obj_flags.value[1], obj->obj_flags.value[2]);
              do_say(keeper, buf, 9);
              for(int i=0;i<obj->num_affects;i++) {
@@ -442,9 +454,14 @@ void shopping_value( char *arg, CHAR_DATA *ch,
           do_say(keeper, "I'm a weapons expert, that is all.", 9);
     }
     if(mob_index[keeper->mobdata->nr].virt == 3004) { //if the armourer in town
-       act("You hold up $p for the Armourer to examine.", ch, obj, 0, TO_CHAR, 0);
-       act("$n holds up $p to the Armourer to examine.", ch, obj, 0, TO_ROOM, 0);
-       do_emote(keeper, "looks carefully at the item.", 9);
+       if(keeperhas) {
+          act("The Armourer holds up his $p for you to examine.", ch, obj, 0, TO_CHAR, 0);
+          act("The Armourer holds up his $p for $n to examine.", ch, obj, 0, TO_ROOM, 0);
+       } else {
+          act("You hold up $p for the Armourer to examine.", ch, obj, 0, TO_CHAR, 0);
+          act("$n holds up $p to the Armourer to examine.", ch, obj, 0, TO_ROOM, 0);
+          do_emote(keeper, "looks carefully at the item.", 9);
+       }
        if(GET_ITEM_TYPE(obj) == ITEM_ARMOR) {
           if(obj->obj_flags.eq_level < 20) {
              sprintf(buf, "Ah yes, %s can be worn by ", obj->short_description);
@@ -455,6 +472,8 @@ void shopping_value( char *arg, CHAR_DATA *ch,
              sprintbit(obj->obj_flags.extra_flags, extra_bits, buf2);
              strcat(buf, buf2);
              do_say(keeper, buf, 9); 
+             sprintf(buf, "The minimum level necessary to use it is %d.", obj->obj_flags.eq_level);
+             do_say(keeper, buf, 9);
              for(int i=0;i<obj->num_affects;i++) {
                 if(obj->affected[i].location == APPLY_AC && obj->affected[i].modifier != 0) {
                    sprintf(buf, "Your armor class will change by %d.", obj->affected[i].modifier);
@@ -471,9 +490,14 @@ void shopping_value( char *arg, CHAR_DATA *ch,
           do_say(keeper, "I deal with armor exclusively.", 9);
     }
     if(mob_index[keeper->mobdata->nr].virt == 3000) { //if the wizard in town
-       act("You hold up $p for the Wizard to examine.", ch, obj, 0, TO_CHAR, 0);
-       act("$n holds up $p for the Wizard to examine..", ch, obj, 0, TO_ROOM, 0);
-       do_emote(keeper, "looks carefully at the item.", 9);
+       if(keeperhas) {
+          act("The Wizard holds up $p for you to examine.", ch, obj, 0, TO_CHAR, 0);
+          act("The Wizard holds up $p for $n to examine.", ch, obj, 0, TO_ROOM, 0);
+       } else {
+          act("You hold up $p for the Wizard to examine.", ch, obj, 0, TO_CHAR, 0);
+          act("$n holds up $p for the Wizard to examine.", ch, obj, 0, TO_ROOM, 0);
+          do_emote(keeper, "looks carefully at the item.", 9);
+       }
        if(GET_ITEM_TYPE(obj) == ITEM_SCROLL || GET_ITEM_TYPE(obj) == ITEM_WAND || GET_ITEM_TYPE(obj) == ITEM_POTION || GET_ITEM_TYPE(obj) == ITEM_STAFF) {
           if(obj->obj_flags.value[0] < 20) {
              sprintf(buf, "Excellent, %s has been imbued with energies of the %dth level.", obj->short_description, obj->obj_flags.value[0]);
@@ -490,7 +514,7 @@ void shopping_value( char *arg, CHAR_DATA *ch,
                 else if(obj->obj_flags.value[2] == 0)
                    do_say(keeper, "Though unfortunately, there are no more charges left.", 9);
                 else
-                   do_say(keeper, "It looks like it's been used some.", 9);
+                   do_say(keeper, "It looks like it has been used some.", 9);
              }
              else {
                 if(obj->obj_flags.value[1] >= 1) {
@@ -517,11 +541,11 @@ void shopping_value( char *arg, CHAR_DATA *ch,
         do_tell( keeper, buf, 0 );
         return;
     }
-
-    cost = (int) ( obj->obj_flags.cost * shop_index[shop_nr].profit_sell );
-    sprintf( buf, "%s I'll give you %d gold coins for that.",
-        GET_NAME(ch), cost );
-    do_tell( keeper, buf, 0 );
+    if(!keeperhas) {
+       cost = (int) ( obj->obj_flags.cost * shop_index[shop_nr].profit_sell );
+       sprintf( buf, "%s I'll give you %d gold coins for that.", GET_NAME(ch), cost );
+       do_tell( keeper, buf, 0 );
+    }
     return;
 }
 
