@@ -346,9 +346,9 @@ int do_index(struct char_data *ch, char *argument, int cmd)
 
   half_chop(argument, argument, arg);
    if (!*argument) {
-     csendf(ch, "Usage: hindex <ID#>\r\n"
-                  "       hindex <low ID#> <high ID#>  (you can display up to 30 at a time)\r\n"
-                  "       hindex <start of a word(s)>\r\n"
+     csendf(ch, "Usage: index <ID#>\r\n"
+                  "       index <low ID#> <high ID#>  (you can display up to 30 at a time)\r\n"
+                  "       index <start of a word(s)>\r\n"
                   "\r\n");
      return eFAILURE;
    }
@@ -368,7 +368,7 @@ int do_index(struct char_data *ch, char *argument, int cmd)
    } else if (((atoi(argument)) > 0) || *argument == '0') { // show a specific ID #
      show_help_header(ch);
      if(new_help_table[i].min_level > 1) {
-        send_to_char("Sorry, this help file is for immortals only.\n\r", ch);
+        send_to_char("You are not high enough level to view this helpfile.\n\r", ch);
      } else count = show_one_help_entry(atoi(argument), ch, count);
      show_help_bar(ch);
    } else { // we are searching based on keywords, show as many as you find

@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.188 2006/05/29 22:18:15 dcastle Exp $ */
+/* $Id: const.cpp,v 1.189 2006/05/31 08:15:36 shane Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1127,6 +1127,7 @@ struct class_skill_defines w_skills[] = { // warrior skills
 {    "frenzy",          SKILL_FRENZY,             18,   80,     {CON,INT} },
 {    "parry",           SKILL_PARRY,              20,   90,     {DEX,WIS} },
 {    "blindfighting",   SKILL_BLINDFIGHTING,      21,   80,     {INT,DEX} },
+{"enhanced regeneration",SKILL_ENHANCED_REGEN,    22,   75,     {CON,WIS} },
 {    "triple",          SKILL_THIRD_ATTACK,       23,   90,     {STR,DEX} },
 {    "hitall",          SKILL_HITALL,             25,   80,     {STR,CON} },
 {    "dual wield",      SKILL_DUAL_WIELD,         28,   90,     {DEX,CON} },
@@ -1288,6 +1289,7 @@ struct class_skill_defines b_skills[] = { // barbarian skills
 {    "crazedassault",   SKILL_CRAZED_ASSAULT,     15,   98,  {WIS,STR} },
 {    "frenzy",          SKILL_FRENZY,             18,   90,  {CON,INT} },
 {    "rage",            SKILL_RAGE,               20,   98,  {CON,STR} },
+{"enhanced regeneration",SKILL_ENHANCED_REGEN,    22,   90,  {CON,WIS} },
 {    "triple",          SKILL_THIRD_ATTACK,       25,   85,  {STR,DEX} },
 {    "battlecry",       SKILL_BATTLECRY,          27,   98,  {WIS,INT} },
 {    "blindfighting",   SKILL_BLINDFIGHTING,      28,   65,  {INT,DEX} },

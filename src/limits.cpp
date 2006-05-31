@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.70 2006/05/22 21:36:33 shane Exp $ */
+/* $Id: limits.cpp,v 1.71 2006/05/31 08:15:37 shane Exp $ */
 
 extern "C"
 {
@@ -204,6 +204,7 @@ int hit_gain(CHAR_DATA *ch)
   int gain = 1;
   struct affected_type * af;
   int divisor =1;
+  int learned = has_skill(ch, SKILL_ENHANCED_REGEN);
  /* Neat and fast */
   if(IS_NPC(ch))
   {
@@ -239,6 +240,9 @@ int hit_gain(CHAR_DATA *ch)
   }
   if (ISSET(ch->affected_by, AFF_REGENERATION))
     gain += (gain/2);
+
+  if(learned && skill_success(ch, NULL, SKILL_ENHANCED_REGEN))
+     gain += 3 + learned / 5;
 
   if((GET_COND(ch, FULL)==0) || (GET_COND(ch, THIRST)==0))
     gain >>= 2;
@@ -279,6 +283,7 @@ int move_gain(CHAR_DATA *ch)
 {
     int gain;
     int divisor = 100000;
+    int learned = has_skill(ch, SKILL_ENHANCED_REGEN);
     struct affected_type * af;
 
     if(IS_NPC(ch)) {
@@ -307,6 +312,9 @@ int move_gain(CHAR_DATA *ch)
    gain -= MIN(100, age(ch).year) / 10;
  
    gain += ch->move_regen;
+
+  if(learned && skill_success(ch, NULL, SKILL_ENHANCED_REGEN))
+     gain += 3 + learned / 10;
 
   if (GET_LEVEL(ch) < 50)
   gain = (float)gain * (2.0-(float)GET_LEVEL(ch)/50.0);
