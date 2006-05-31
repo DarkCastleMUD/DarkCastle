@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.116 2006/05/29 22:18:15 dcastle Exp $ */
+/* $Id: db.cpp,v 1.117 2006/05/31 03:39:35 jhhudso Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -3937,7 +3937,7 @@ void reset_zone(int zone)
         case 'G': /* obj_to_char */
         if ( mob == NULL )
         {
-            sprintf(buf, "Null mob in G, reseting zone %d cmd %d", zone, cmd_no);
+            sprintf(buf, "Null mob in G, reseting zone %d cmd %d", zone, cmd_no+1);
             log(buf, IMMORTAL, LOG_WORLD);
             last_cmd = 0;
             last_obj = 0;
