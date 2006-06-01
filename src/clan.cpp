@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.47 2006/05/29 22:18:15 dcastle Exp $ */
+/* $Id: clan.cpp,v 1.48 2006/06/01 00:44:25 shane Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -2269,7 +2269,7 @@ int do_cinfo(CHAR_DATA *ch, char *arg, int cmd)
         ( nClan == ch->clan && has_right(ch, CLAN_RIGHTS_MEMBER_LIST) )
     )
   {
-     sprintf(buf, "$3Balance$R:       %ld\r\n", get_clan(ch)->balance);
+     sprintf(buf, "$3Balance$R:         %ld coins\r\n", get_clan(ch)->balance);
      send_to_char(buf,ch);
   }
   return eSUCCESS;

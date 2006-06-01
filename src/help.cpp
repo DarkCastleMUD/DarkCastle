@@ -305,7 +305,7 @@ int do_hindex(struct char_data *ch, char *argument, int cmd)
      if (atoi(argument) > atoi(arg)) {
         send_to_char("Usage: hindex <low ID#> <high ID#>\r\n", ch); // wrong order, first > second
         return eFAILURE;
-     } else if ((atoi(arg) - atoi(argument)) > 30) { // too many listed, only 30 at a time or we get too much spam
+     } else if ((atoi(arg) - atoi(argument)) >= 30) { // too many listed, only 30 at a time or we get too much spam
         send_to_char("You can only list 30 help entries at a time.\r\n", ch);
         return eFAILURE;
      } 
@@ -361,22 +361,24 @@ int do_index(struct char_data *ch, char *argument, int cmd)
      show_help_header(ch);
      for (i = atoi(argument); i <= atoi(arg); i++) {
        if(new_help_table[i].min_level > 1) continue;
-       if(count > 30) break;
+       if(count >= 30) break;
        count = show_one_help_entry(i, ch, count);
      }
      show_help_bar(ch);
    } else if (((atoi(argument)) > 0) || *argument == '0') { // show a specific ID #
-     show_help_header(ch);
-     if(new_help_table[i].min_level > 1) {
+     if(new_help_table[atoi(argument)].min_level > 1)
         send_to_char("You are not high enough level to view this helpfile.\n\r", ch);
-     } else count = show_one_help_entry(atoi(argument), ch, count);
-     show_help_bar(ch);
+     else {
+        show_help_header(ch);
+        count = show_one_help_entry(atoi(argument), ch, count);
+        show_help_bar(ch);
+     }
    } else { // we are searching based on keywords, show as many as you find
      minlen = strlen(argument);
      show_help_header(ch);
      for (i = 0; i < new_top_of_helpt; i++) {
        if(new_help_table[i].min_level > 1) continue;
-       if(count > 30) break;
+       if(count >= 30) break;
        if (!strn_cmp(argument, new_help_table[i].keyword1, minlen) ||
            !strn_cmp(argument, new_help_table[i].keyword2, minlen) ||
            !strn_cmp(argument, new_help_table[i].keyword3, minlen) ||
