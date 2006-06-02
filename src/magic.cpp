@@ -791,8 +791,8 @@ int spell_life_leech(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 		  adam = 0;
 
 		 if (GET_HIT(tmp_victim) < adam)
-		  GET_HIT(ch) += GET_HIT(tmp_victim) * 0.3;
-		 else GET_HIT(ch) += adam * 0.3;
+		  GET_HIT(ch) += (int)(GET_HIT(tmp_victim) * 0.3);
+		 else GET_HIT(ch) += (int)(adam * 0.3);
 
 		 if (GET_HIT(ch) > GET_MAX_HIT(ch))
 		  GET_HIT(ch) = GET_MAX_HIT(ch);
@@ -2678,7 +2678,7 @@ int spell_mend_golem(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
   for (fol = ch->followers; fol; fol = fol->next)
     if (IS_NPC(fol->follower) && mob_index[fol->follower->mobdata->nr].virt == 8)
     {
-      GET_HIT(fol->follower) += GET_MAX_HIT(fol->follower) * 0.2;
+      GET_HIT(fol->follower) += (int)(GET_MAX_HIT(fol->follower) * 0.2);
       if (GET_HIT(fol->follower) > GET_MAX_HIT(fol->follower))
         GET_HIT(fol->follower) = GET_MAX_HIT(fol->follower);
 
