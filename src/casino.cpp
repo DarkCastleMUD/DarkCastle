@@ -170,7 +170,7 @@ void nextturn(struct table_data *tbl)
 
 void send_to_table(char *msg, struct table_data *tbl, struct player_data *plrSilent = NULL)
 {
-  struct player_data *plr;
+  //  struct player_data *plr;
 /*  for (plr = tbl->plr ; plr ; plr = plr->next)
    if (verify(plr) && plrSilent != plr)
      send_to_char(msg,plr->ch);
@@ -586,7 +586,7 @@ void check_winner(struct table_data *tbl)
 		plr->bet, plr->table->gold?"gold":"platinum");
       send_to_char(buf,plr->ch);
       sprintf(buf,"The dealer gives %s %d coins.\r\n",GET_NAME(plr->ch),
-		plr->bet, plr->table->gold?"gold":"platinum");
+	      plr->bet);//, plr->table->gold?"gold":"platinum");
 //		plr->bet);
       send_to_table(buf,tbl, plr);
 	if (plr->table->gold)
@@ -719,10 +719,11 @@ void check_blackjacks(struct table_data *tbl)
 		buf[0] = '\0';
 		blackjack_prompt(plr->ch, buf, !IS_SET(plr->ch->pcdata->toggles, PLR_ASCII));
 		send_to_char(buf, plr->ch);
+
 		if (plr->table->gold)
-		GET_GOLD(plr->ch) += plr->bet*2.5;
+		GET_GOLD(plr->ch) += (uint32)(plr->bet*2.5);
 		else
-		GET_PLATINUM(plr->ch) += plr->bet*2.5;
+		GET_PLATINUM(plr->ch) += (uint32)(plr->bet*2.5);
 //        	nextturn(plr->table);
 		if (tbl->plr == plr && !plr->next)
 		{ // all players blackjacked
@@ -1126,11 +1127,11 @@ int blackjack_table(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
         return eSUCCESS;
 	}
 	}
-     if (obj->table->gold && amt > GET_GOLD(ch))
+     if (obj->table->gold && (uint32)amt > GET_GOLD(ch))
      {
 	send_to_char("You cannot afford that.\r\n$B$7The dealer whispers to you, 'You can find an ATM machine in the lobby, buddy.'$R\r\n",ch);
 	return eSUCCESS;
-     } else if (!obj->table->gold && amt > GET_PLATINUM(ch)) {
+     } else if (!obj->table->gold && (uint32)amt > GET_PLATINUM(ch)) {
 	send_to_char("You cannot afford that.\r\n",ch);
 	return eSUCCESS;
      }
@@ -1187,12 +1188,12 @@ int blackjack_table(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
 	send_to_char("You cannot make an insurance bet at the moment.\r\n",ch);
 	return eSUCCESS;
      }
-     if (plr->table->gold && GET_GOLD(ch) < plr->bet/2)
+     if (plr->table->gold && GET_GOLD(ch) < (uint32)(plr->bet/2))
      {
 	send_to_char("You cannot afford an insurance bet right now.\r\n",ch);
 	return eSUCCESS;
      }
-     if (!plr->table->gold && GET_PLATINUM(ch) < plr->bet/2)
+     if (!plr->table->gold && GET_PLATINUM(ch) < (uint32)(plr->bet/2))
      {
 	send_to_char("You cannot afford an insurance bet right now.\r\n",ch);
 	return eSUCCESS;
@@ -1220,8 +1221,8 @@ int blackjack_table(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
 	send_to_char("It is not currently your turn.\r\n",ch);
 	return eSUCCESS;
      }
-     if ((plr->table->gold && GET_GOLD(plr->ch) < plr->bet) ||
-	(!plr->table->gold && GET_PLATINUM(plr->ch) < plr->bet))
+     if ((plr->table->gold && GET_GOLD(plr->ch) < (uint32)plr->bet) ||
+	(!plr->table->gold && GET_PLATINUM(plr->ch) < (uint32)plr->bet))
      {
 	send_to_char("You cannot afford to double your bet.\r\n",ch);
 	return eSUCCESS;
@@ -1296,8 +1297,8 @@ int blackjack_table(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
 	send_to_char("You cannot split right now.\r\n",ch);
 	return eSUCCESS;
      }
-     if ((GET_GOLD(ch) < plr->bet && plr->table->gold)
-	|| (GET_PLATINUM(ch) < plr->bet && !plr->table->gold))
+     if ((GET_GOLD(ch) < (uint32)plr->bet && plr->table->gold)
+	|| (GET_PLATINUM(ch) < (uint32)plr->bet && !plr->table->gold))
      {
 	send_to_char("You cannot afford to split.\r\n",ch);
 	return eSUCCESS;
@@ -1361,6 +1362,7 @@ int blackjack_table(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
      }
     return eSUCCESS;    
   }
+  return eSUCCESS;
 }
 
 /* End Blackjack */
@@ -1592,7 +1594,7 @@ char *hand_name(int hand[5])
   } else {
     sprintf(buf, "%s high", cardname(highcard(hand)));
   }
-  return buf;
+  return str_dup(buf);
 }
 
 
@@ -1682,9 +1684,9 @@ int do_testhand(CHAR_DATA *ch, char *argument, int cmd)
 {
   char arg[MAX_INPUT_LENGTH];
   one_argument(argument, arg);
-  int i = atoi(arg);
+  //  int i = atoi(arg);
 //  int z = get_hand(i);
-  char buf[MAX_STRING_LENGTH];
+  //char buf[MAX_STRING_LENGTH];
  // sprintf(buf, "One: %d Two: %d Three: %d Four: %d Five: %d\r\n",
 //	hand[0][z],hand[1][z],
 //	hand[2][z],hand[3][z],
