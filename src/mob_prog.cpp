@@ -694,7 +694,7 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
   char lvalstr[MAX_STRING_LENGTH];
   int64 lvali64 = 0;
   sbyte lvalb=0; 
-  int type = 0;
+  //  int type = 0;
   lvalstr[0] = '\0';
   if (!traditional)
   translate_value(buf,arg,&lvali,&lvalui, &lvalstr[0],&lvali64, &lvalb,mob,actor, obj, vo, rndm);

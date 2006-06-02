@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.65 2006/05/29 22:18:15 dcastle Exp $
+| $Id: objects.cpp,v 1.66 2006/06/02 07:23:49 jhhudso Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -2256,9 +2256,9 @@ void write_clan_vault_info()
     fprintf(fl,"C %d\n,", clan->number);
   for ( ; a; a = a->next)
    if ((int)a->name > 100)
-    fprintf(fl,"A %s %d %c %c %c %c\n", a->name, a->segment,a->self?"t":"f", a->view?"t":"f", a->deposit?"t":"f", a->withdraw?"t":"f");
+    fprintf(fl,"A %s %d %c %c %c %c\n", a->name, a->segment,a->self?'t':'f', a->view?'t':'f', a->deposit?'t':'f', a->withdraw?'t':'f');
    else
-    fprintf(fl,"A %d %d %c %c %c %c\n", (int)a->name, a->segment,a->self?"t":"f", a->view?"t":"f", a->deposit?"t":"f", a->withdraw?"t":"f");
+    fprintf(fl,"A %d %d %c %c %c %c\n", (int)a->name, a->segment,a->self?'t':'f', a->view?'t':'f', a->deposit?'t':'f', a->withdraw?'t':'f');
   }  
   fprintf(fl,"E\n");
   dc_fclose(fl);
@@ -2289,9 +2289,9 @@ void write_player_vault(CHAR_DATA *ch)
       fprintf(fl, "S %d %s\n",i, v->segment[i]);
   for ( ; a; a = a->next)
    if ((int)a->name > 100)
-    fprintf(fl,"A %s %d %c %c %c %c\n", a->name, a->segment, a->self?"t":"f",a->view?"t":"f", a->deposit?"t":"f", a->withdraw?"t":"f");
+    fprintf(fl,"A %s %d %c %c %c %c\n", a->name, a->segment, a->self?'t':'f',a->view?'t':'f', a->deposit?'t':'f', a->withdraw?'t':'f');
    else
-    fprintf(fl,"A %d %d %c %c %c %c\n", (int)a->name, a->segment, a->self?"t":"f",a->view?"t":"f", a->deposit?"t":"f", a->withdraw?"t":"f");
+    fprintf(fl,"A %d %d %c %c %c %c\n", (int)a->name, a->segment, a->self?'t':'f',a->view?'t':'f', a->deposit?'t':'f', a->withdraw?'t':'f');
   for (; o ; o = o->next_content)
   {
      fprintf(fl, "O %d %s~\n", o->vroom, o->cmsg?o->cmsg:"swedenrocks");

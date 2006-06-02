@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: shop.cpp,v 1.23 2006/05/31 09:58:49 shane Exp $ */
+/* $Id: shop.cpp,v 1.24 2006/06/02 07:23:49 jhhudso Exp $ */
 
 extern "C"
 {
@@ -589,7 +589,7 @@ void shopping_list( char *arg, CHAR_DATA *ch,
     char buf[MAX_STRING_LENGTH];
     struct obj_data *obj,*tobj;
     int cost;
-    extern char *drinks[];
+    //    extern char *drinks[];
     int found;
     int done[100]; // To show 'em numbered instead of a long list of duplicates
     int i,a;

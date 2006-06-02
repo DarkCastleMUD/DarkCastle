@@ -82,7 +82,8 @@ void savenews()
   struct news_data *tmpnews;
   for (tmpnews = thenews; tmpnews; tmpnews = tmpnews->next)
   {
-    fprintf(fl, "%d %s~\n",tmpnews->time,tmpnews->addedby);
+    // This should be %ld but we need to through the existing news files 1st
+    fprintf(fl, "%d %s~\n",(int)tmpnews->time,tmpnews->addedby);
     fprintf(fl, "%s~\n",tmpnews->news);
   }
    fprintf(fl,"0\n");
@@ -113,7 +114,7 @@ void loadnews()
     nnews->news = fread_string(fl,0);
     int i,v=0;
 	char buf[MAX_STRING_LENGTH];
-	for (i = 0; i < strlen(nnews->news);i++)
+	for (i = 0; i < (int)strlen(nnews->news);i++)
 	{
 	  if (*(nnews->news+i) != '\r') buf[v++] = *(nnews->news+i);
 	}
@@ -154,7 +155,7 @@ int do_news(struct char_data *ch, char *argument, int cmd)
    char timez[15],otimez[15];
    buf[0] = '\0';
    otimez[0] = '\0';
-   int length = 0;
+   //int length = 0;
    time_t thetime;
    char arg[MAX_INPUT_LENGTH];
    one_argument(argument, arg);

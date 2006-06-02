@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.163 2006/05/31 21:33:26 shane Exp $ */
+/* $Id: spells.cpp,v 1.164 2006/06/02 07:23:49 jhhudso Exp $ */
 
 extern "C"
 {
@@ -80,7 +80,7 @@ extern struct index_data *mob_index;
 #endif
 
 
-struct spell_info_type spell_info [ ] =
+struct spell_info_type spell_info [] =
 {
  { /* 00 */ /* Note: All arrays start at 0! CGT */  0, 0, 0, 0, 0 },
 

@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: save.cpp,v 1.37 2006/05/29 22:18:15 dcastle Exp $ */
+/* $Id: save.cpp,v 1.38 2006/06/02 07:23:49 jhhudso Exp $ */
 
 extern "C"
 {
@@ -567,7 +567,7 @@ void save_char_obj (CHAR_DATA *ch)
   FILE *  fpsave  = NULL;
   char    strsave[MAX_INPUT_LENGTH];
   char    name[200];
-  int     safe = START_ROOM;
+  //  int     safe = START_ROOM;
   struct time_data tmpage;
 
   if(IS_NPC(ch) || GET_LEVEL(ch) < 2)
