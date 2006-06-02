@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.117 2006/05/31 03:39:35 jhhudso Exp $ */
+/* $Id: db.cpp,v 1.118 2006/06/02 07:01:05 jhhudso Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -3154,10 +3154,10 @@ CHAR_DATA *clone_mobile(int nr)
     else if (GET_LEVEL(mob) > 85) {mult = 1.2;}
     else if (GET_LEVEL(mob) > 75) {mult = 1.1;}
   }
-  mob->max_hit = mob->raw_hit = mob->hit = mob->max_hit*mult;
-  mob->mobdata->damnodice *= mult;
-  mob->mobdata->damsizedice *= mult;
-  mob->damroll *= mult;
+  mob->max_hit = mob->raw_hit = mob->hit = (int32)(mob->max_hit*mult);
+  mob->mobdata->damnodice = (int16)(mob->mobdata->damnodice * mult);
+  mob->mobdata->damsizedice = (int16)(mob->mobdata->damsizedice * mult);
+  mob->damroll = (int16)(mob->damroll * mult);
   mob->hometown = old->in_room;
   return (mob);
 }
@@ -3868,7 +3868,7 @@ void reset_zone(int zone)
           last_mob = 1;
 		extern bool selfpurge;
 		selfpurge = FALSE;
-	   int retval = mprog_load_trigger(mob);
+	  //int retval = mprog_load_trigger(mob);
 	  if (selfpurge){ mob = NULL; last_mob = 0; last_cmd = 0;}
 
         }
@@ -3967,7 +3967,7 @@ void reset_zone(int zone)
 	if (hrs > 24) i *= 4;
 	else if (hrs > 8) i *= 3;
 	else if (hrs > 2) i *= 2;
-	else if (hrs > 1) i *= 1.5;
+	else if (hrs > 1) i = (int)(i * 1.5);
 
         if( number(0, ZCMD.arg2) <= i )
         {
