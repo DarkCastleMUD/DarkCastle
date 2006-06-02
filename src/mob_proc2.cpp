@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.66 2006/05/29 22:18:15 dcastle Exp $ */
+/* $Id: mob_proc2.cpp,v 1.67 2006/06/02 07:20:36 jhhudso Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -1977,7 +1977,7 @@ char *gl_item(OBJ_DATA *obj, int number, CHAR_DATA *ch)
 	length += strlen(buf2);
 	sprintf(buf, "%s%s",buf,buf2);
     }
-  return buf;
+  return str_dup(buf);
 }
 
 struct platsmith
@@ -2026,8 +2026,11 @@ int godload_sales(struct char_data *ch, struct obj_data *obj, int cmd, char *arg
   extern char* pc_clss_types3[];
   sprintf(buf, "%s Here's what I can do for you, %s.",GET_NAME(ch),pc_clss_types3[GET_CLASS(ch)]);
   do_tell(owner, buf, 0); 
-  for (int z = 0; z < 13 && platsmith_list[o].sales[z] != 0; z++)
-  send_to_char(gl_item((OBJ_DATA*)obj_index[real_object(platsmith_list[o].sales[z])].item,z,ch),ch);
+  for (int z = 0; z < 13 && platsmith_list[o].sales[z] != 0; z++) {
+    char *tmp = gl_item((OBJ_DATA*)obj_index[real_object(platsmith_list[o].sales[z])].item,z,ch);
+    send_to_char(tmp, ch);
+    dc_free(tmp);
+  }
   return eSUCCESS; 
  } else if (cmd == 56) {
   if (!CAN_SEE(owner, ch))
