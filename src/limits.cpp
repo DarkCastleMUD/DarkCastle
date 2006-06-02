@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.71 2006/05/31 08:15:37 shane Exp $ */
+/* $Id: limits.cpp,v 1.72 2006/06/02 07:07:38 jhhudso Exp $ */
 
 extern "C"
 {
@@ -183,12 +183,12 @@ int mana_gain(CHAR_DATA *ch)
   gain /= divisor; 
   gain += MIN(age(ch).year,100) / 5;
   if (GET_LEVEL(ch) < 50)
-  gain = (float)gain * (2.0-(float)GET_LEVEL(ch)/50.0);
+  gain = (int)((float)gain * (2.0-(float)GET_LEVEL(ch)/50.0));
 
   gain += ch->mana_regen;
   if (ch->in_room >= 0)
   if (IS_SET(world[ch->in_room].room_flags, SAFE))
-     gain *= 1.25;
+     gain = (int)(gain * 1.25);
 
   return MAX(1,gain);
 }
@@ -252,11 +252,11 @@ int hit_gain(CHAR_DATA *ch)
   gain /= divisor;
   gain += ch->hit_regen;
   if (GET_LEVEL(ch) < 50)
-  gain = (float)gain * (2.0-(float)GET_LEVEL(ch)/50.0);
+  gain = (int)((float)gain * (2.0-(float)GET_LEVEL(ch)/50.0));
 
   if (ch->in_room >= 0)
   if (IS_SET(world[ch->in_room].room_flags, SAFE))
-     gain *= 1.5;
+     gain = (int)(gain * 1.5);
  
   return MAX(1,gain);
 }
@@ -317,11 +317,11 @@ int move_gain(CHAR_DATA *ch)
      gain += 3 + learned / 10;
 
   if (GET_LEVEL(ch) < 50)
-  gain = (float)gain * (2.0-(float)GET_LEVEL(ch)/50.0);
+  gain = (int)((float)gain * (2.0-(float)GET_LEVEL(ch)/50.0));
 
   if (ch->in_room >= 0)
   if (IS_SET(world[ch->in_room].room_flags, SAFE))
-     gain *= 1.5;
+     gain = (int)(gain * 1.5);
     return MAX(1,gain);
 }
 
