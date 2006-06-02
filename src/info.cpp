@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.105 2006/05/31 19:54:48 shane Exp $ */
+/* $Id: info.cpp,v 1.106 2006/06/02 07:03:51 jhhudso Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -200,7 +200,7 @@ void show_obj_to_char(struct obj_data *object, struct char_data *ch, int mode)
    char buffer[MAX_STRING_LENGTH];
    char flagbuf[MAX_STRING_LENGTH];
    int found = 0;
-   int percent;
+   //   int percent;
 
    // Don't show NO_NOTICE items in a room with "look" unless they have holylite
    if(mode == 0 && IS_SET(object->obj_flags.more_flags, ITEM_NONOTICE) &&
@@ -1317,7 +1317,7 @@ int do_score(struct char_data *ch, char *argument, int cmd)
    extern char *pc_clss_types[];
    
    int64 exp_needed;
-   int i;
+   //int i;
    
    sprintf(race, "%s", race_info[(int)GET_RACE(ch)].singular_name);
    exp_needed = (exp_table[(int)GET_LEVEL(ch) + 1] - GET_EXP(ch));
