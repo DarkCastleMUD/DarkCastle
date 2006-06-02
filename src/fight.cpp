@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.310 2006/05/31 19:54:48 shane Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.311 2006/06/02 07:02:53 jhhudso Exp $ */
 
 extern "C"
 {
@@ -383,7 +383,7 @@ void generate_skillthreat(CHAR_DATA *mob, int skill, int damage, CHAR_DATA *acto
     logf(110, LOG_BUG, "Skill/spell %s(%d) missing threatsetting.", get_skill_name(skill),skill);
     return;
   }
-  threat *= v; // vary depending on skill
+  threat = (int)(threat * v); // vary depending on skill
 
   if (type == DAMAGE)
   {
@@ -1739,7 +1739,7 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
 
   }
   if (affected_by_spell(ch, SKILL_SONG_MKING_CHARGE))
-    dam *= 1.1; // scary!
+    dam = (int)(dam * 1.1); // scary!
 
   // Can't hurt god, but he likes to see the messages. 
   if (GET_LEVEL(victim) >= IMMORTAL && !IS_NPC(victim))
@@ -2159,7 +2159,7 @@ void send_damage(char *buf, CHAR_DATA *ch, OBJ_DATA *obj, CHAR_DATA *victim, cha
  char string1[MAX_INPUT_LENGTH], string2[MAX_INPUT_LENGTH];
  
  int i, z = 0, y = 0;
- for (i = 0; i <= strlen(buf); i++)
+ for (i = 0; i <= (int)strlen(buf); i++)
  {
    if (*(buf+i) == '|')
    {
@@ -2611,10 +2611,10 @@ int speciality_bonus(CHAR_DATA *ch,int attacktype, int level)
    level -= GET_LEVEL(ch);
    if (!skill) return 0;
 
-   if (level < -20 && IS_NPC(ch)) return 0 - GET_LEVEL(ch)/2.4;
-   else if (level < -10 && IS_NPC(ch)) return 0 - GET_LEVEL(ch)/2.6;
-   else if (level < 0 && IS_NPC(ch)) return 0 - GET_LEVEL(ch)/2.8;
-   else if (IS_NPC(ch)) return 0 - (GET_LEVEL(ch)/3.5);
+   if (level < -20 && IS_NPC(ch)) return 0 - (int)(GET_LEVEL(ch)/2.4);
+   else if (level < -10 && IS_NPC(ch)) return 0 - (int)(GET_LEVEL(ch)/2.6);
+   else if (level < 0 && IS_NPC(ch)) return 0 - (int)(GET_LEVEL(ch)/2.8);
+   else if (IS_NPC(ch)) return 0 - (int)(GET_LEVEL(ch)/3.5);
 
    int l = has_skill(ch,skill)/2;
    return 0 - l;
