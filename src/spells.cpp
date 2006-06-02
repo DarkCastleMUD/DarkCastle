@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.164 2006/06/02 07:23:49 jhhudso Exp $ */
+/* $Id: spells.cpp,v 1.165 2006/06/02 07:49:12 jhhudso Exp $ */
 
 extern "C"
 {
@@ -761,6 +761,7 @@ char *spells[]=
    "divine fury",
    "spiritwalk",
    "mend golem",
+   "clarity",
    "\n"
 };
 
@@ -1565,7 +1566,6 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
   }
   
   spl = old_search_block(argument, 1, qend-1, spells, 0);
-  
   if (spl <= 0) {
     send_to_char("Your lips do not move, no magic appears.\n\r",ch);
     return eFAILURE;
