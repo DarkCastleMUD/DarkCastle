@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.45 2006/05/25 21:04:49 shane Exp $
+| $Id: cl_warrior.cpp,v 1.46 2006/06/03 09:29:53 dcastle Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -916,6 +916,7 @@ int do_guard(struct char_data *ch, char *argument, int cmd)
      send_to_char("You have no idea how to be a full time bodyguard.\r\n", ch);
      return eFAILURE;
    }
+   if (IS_NPC(ch)) return eFAILURE;
 
    one_argument(argument, name);
 
