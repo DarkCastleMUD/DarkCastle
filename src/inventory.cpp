@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.66 2006/05/29 22:18:15 dcastle Exp $
+| $Id: inventory.cpp,v 1.67 2006/06/03 09:29:36 dcastle Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -1368,8 +1368,9 @@ int do_give(struct char_data *ch, char *argument, int cmd)
     // otherwise it defeats the purpose of no_trade:)
 
     retval = mprog_give_trigger( vict, ch, obj );
-
-    if(!IS_SET(retval, eEXTRA_VALUE) && IS_SET(obj->obj_flags.more_flags, ITEM_NO_TRADE) && IS_NPC(vict))
+bool objExists(OBJ_DATA *obj);
+    if(!IS_SET(retval, eEXTRA_VALUE) && IS_SET(obj->obj_flags.more_flags, ITEM_NO_TRADE) && IS_NPC(vict) && 
+		objExists(obj))
        extract_obj(obj);
 
     if(SOMEONE_DIED(retval)) {

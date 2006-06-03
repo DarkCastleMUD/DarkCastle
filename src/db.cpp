@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.118 2006/06/02 07:01:05 jhhudso Exp $ */
+/* $Id: db.cpp,v 1.119 2006/06/03 09:29:36 dcastle Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -4247,6 +4247,9 @@ char *fread_word(FILE *fl, int hasher)
     char *  pAlloc;
     char *  pBufLast;
     char *  temp;
+    char tmp;
+    while ((tmp = getc(fl)) == ' ') ;
+    ungetc(tmp,fl);
 
     for ( pBufLast = buf; pBufLast < &buf[sizeof(buf)-2]; )
     {

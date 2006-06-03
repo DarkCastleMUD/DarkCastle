@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.72 2006/06/02 07:07:38 jhhudso Exp $ */
+/* $Id: limits.cpp,v 1.73 2006/06/03 09:29:36 dcastle Exp $ */
 
 extern "C"
 {
@@ -183,13 +183,17 @@ int mana_gain(CHAR_DATA *ch)
   gain /= divisor; 
   gain += MIN(age(ch).year,100) / 5;
   if (GET_LEVEL(ch) < 50)
+
   gain = (int)((float)gain * (2.0-(float)GET_LEVEL(ch)/50.0));
 
-  gain += ch->mana_regen;
+  if (ch->mana_regen > 0)
+    gain += ch->mana_regen;
   if (ch->in_room >= 0)
   if (IS_SET(world[ch->in_room].room_flags, SAFE))
      gain = (int)(gain * 1.25);
 
+  if (ch->mana_regen < 0)
+  gain += ch->mana_regen;
   return MAX(1,gain);
 }
 
@@ -250,14 +254,16 @@ int hit_gain(CHAR_DATA *ch)
   gain -= MIN(age(ch).year,100) / 10;
 
   gain /= divisor;
-  gain += ch->hit_regen;
+  if (ch->hit_regen > 0)
+    gain += ch->hit_regen;
   if (GET_LEVEL(ch) < 50)
   gain = (int)((float)gain * (2.0-(float)GET_LEVEL(ch)/50.0));
 
   if (ch->in_room >= 0)
   if (IS_SET(world[ch->in_room].room_flags, SAFE))
      gain = (int)(gain * 1.5);
- 
+  if (ch->hit_regen < 0)
+     gain += ch->hit_regen;
   return MAX(1,gain);
 }
 
@@ -311,6 +317,7 @@ int move_gain(CHAR_DATA *ch)
    gain /= divisor;
    gain -= MIN(100, age(ch).year) / 10;
  
+  if (ch->move_regen > 0)
    gain += ch->move_regen;
 
   if(learned && skill_success(ch, NULL, SKILL_ENHANCED_REGEN))
@@ -322,6 +329,9 @@ int move_gain(CHAR_DATA *ch)
   if (ch->in_room >= 0)
   if (IS_SET(world[ch->in_room].room_flags, SAFE))
      gain = (int)(gain * 1.5);
+  if (ch->move_regen < 0)
+   gain += ch->move_regen;
+
     return MAX(1,gain);
 }
 

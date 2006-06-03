@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.66 2006/06/02 07:23:49 jhhudso Exp $
+| $Id: objects.cpp,v 1.67 2006/06/03 09:29:36 dcastle Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -2240,7 +2240,27 @@ int recheck_height_wears(char_data * ch)
   return eSUCCESS;
 }
 
-void write_clan_vault_info()
+void create_pc_vault(CHAR_DATA *ch)
+{
+  if (!ch->pcdata || ch->pcdata->vault) return;
+  struct player_vault *v;
+#ifdef LEAK_CHECK
+  v = (struct player_vault *) calloc(1, sizeof(struct player_vault));
+#else
+  v = (struct player_vault *) dc_alloc(1, sizeof(struct player_vault));
+#endif
+  for (int i = 1; i < 20; i++)
+     v->segment[i] = 0;
+  v->segment[0] = str_dup("Default");
+  v->max_contain = 500;
+  v->contains = v->nr_items = 0;
+  v->content = 0;
+  v->acc = 0;
+  ch->pcdata->vault = v;
+}
+
+
+void write_clan_vaults()
 {
   struct clan_data *clan;
   FILE *fl;
@@ -2253,7 +2273,7 @@ void write_clan_vault_info()
   {
     if (!clan->acc) continue;
     struct vault_access_data * a = clan->acc;
-    fprintf(fl,"C %d\n,", clan->number);
+    fprintf(fl,"C %d\n", clan->number);
   for ( ; a; a = a->next)
    if ((int)a->name > 100)
     fprintf(fl,"A %s %d %c %c %c %c\n", a->name, a->segment,a->self?'t':'f', a->view?'t':'f', a->deposit?'t':'f', a->withdraw?'t':'f');
@@ -2313,7 +2333,7 @@ void read_clan_vault()
   FILE *fl;
   char buf[MAX_STRING_LENGTH];
 
-  if ( ( fl = dc_fopen("../vault/clan/clan.txt", "w") ) == 0)
+  if ( ( fl = dc_fopen("../vault/clan/clan.txt", "r") ) == 0)
     return; // non-existant
   char c;
   struct vault_access_data *a;
@@ -2344,8 +2364,8 @@ void read_clan_vault()
 		tmp = atoi(a->name);
 		dc_free(a->name);
 		a->name = (char*)tmp;
-	  }	   
-	  a->segment = fread_int(fl, 0, LONG_MAX);
+	  }
+	  a->segment = fread_int(fl, -1, LONG_MAX);
 	  a->self = tf(fread_char(fl));  
 	  a->view = tf(fread_char(fl));  
 	  a->deposit = tf(fread_char(fl));
@@ -2369,7 +2389,7 @@ void read_player_vault(CHAR_DATA *ch)
   if (ch && ch->pcdata && ch->pcdata->vault) return; // already read
   if (!ch || !ch->pcdata) return;
   sprintf(buf, "../vault/%c/%s", UPPER(*ch->name), ch->name);
-  if ( ( fl = dc_fopen(buf, "w") ) == 0)
+  if ( ( fl = dc_fopen(buf, "r") ) == 0)
     return; // we no care
   struct player_vault *v;
 #ifdef LEAK_CHECK
@@ -2435,8 +2455,8 @@ void read_player_vault(CHAR_DATA *ch)
 		tmp = atoi(a->name);
 		dc_free(a->name);
 		a->name = (char*)tmp;
-	  }	   
-	  a->segment = fread_int(fl, 0, LONG_MAX);
+	  }
+	  a->segment = fread_int(fl, -1, LONG_MAX);
 	  a->self = tf(fread_char(fl));  
 	  a->view = tf(fread_char(fl));  
 	  a->deposit = tf(fread_char(fl));
@@ -2456,6 +2476,7 @@ void read_player_vault(CHAR_DATA *ch)
 bool has_access(char_data *ch, char_data *vict, int segment, int type)
 {
   struct vault_access_data *a;
+  if (ch && ch == vict) return TRUE;
   if (!vict || !vict->pcdata || !vict->pcdata->vault) return FALSE;
   if (!ch || !ch->pcdata) return FALSE;
   struct player_vault *v = vict->pcdata->vault;
@@ -2524,20 +2545,27 @@ struct char_data *get_vault_owner(char_data *ch, char *vault, descriptor_data *d
 {
   char buf[MAX_STRING_LENGTH];
   char_data *vict;
-  vict = get_char(vault);
-  if (vict) return vict; // yahoo
   memset((char *) d, 0, sizeof(struct descriptor_data));
-  
+
+extern CHAR_DATA *get_pc(char *name);
+  vict = get_pc(vault);
+  if (vict) { 
+    if (vict->pcdata && !vict->pcdata->vault)
+         create_pc_vault(vict);
+    if (vict->pcdata)
+   return vict; // yahoo
+  }
   if(!(load_char_obj(d, vault))) {
     sprintf(buf, "../archive/%s.gz", vault);
-    if(file_exists(buf))
-       send_to_char("Cannot access vault of an archived character.\r\n", ch);
+    if(file_exists(buf)) send_to_char("Cannot access vault of an archived character.\r\n", ch);
     else send_to_char("No such player exists.\n\r", ch);
     return 0;
   }
   vict = d->character;
   vict->desc = 0;
   online = FALSE;  
+  if (!vict->pcdata->vault)
+    create_pc_vault(vict); //initialize
   return vict;
 }
 // do_save(victim, "", 666)
@@ -2589,22 +2617,124 @@ bool item_match(obj_data *o, search_type *s)
   return TRUE;
 }
 
-bool grant_access(char_data *ch, char_data *vict, int access)
+bool toggle_access(char_data *ch, char_data *vict,int access, int segment)
 {
-  struct vault_access_data *a, *chMatch = NULL, *victMatch=NULL;
+  struct vault_access_data *a, *chMatch = NULL, *victMatch = NULL;
 
 //  bool chMatch = FALSE, victMatch = FALSE;
   // error checking done before this function.
 
   // Check ch for pre-existing access data
   for (a = ch->pcdata->vault->acc;a;a = a->next)
-    if (a->self == FALSE && ((int)a->name == (int)vict || 
-		((int)a->name > 1000 && !str_cmp(GET_NAME(vict),a->name))))
+    if (a->self == FALSE && segment == a->segment && ((int)a->name == (int)vict || 
+		((int)a->name > 1000 && (int)vict > 1000 && !str_cmp(GET_NAME(vict),a->name))))
 			{ chMatch = a; break; }
-  if ((int)vict > 1000)
+
+  if ((int)vict > 1000) {
     for (a = vict->pcdata->vault->acc;a;a = a->next)
-      if (a->self == TRUE && ((int)a->name > 1000 && !str_cmp(GET_NAME(ch),a->name)))
+      if (a->self == TRUE && a->segment == segment && ((int)a->name > 1000 && !str_cmp(GET_NAME(ch),a->name)))
 			{ victMatch = a; break; }
+  } else {
+    for (a = get_clan((int)vict)->acc;a;a = a->next)
+     if (a->self == TRUE && a->segment == segment && !str_cmp(GET_NAME(ch),a->name))
+	{victMatch = a; break; }
+  }
+  
+
+  if (!chMatch)
+  {
+	#ifdef LEAK_CHECK
+          chMatch = (struct vault_access_data*) calloc(1, sizeof(struct vault_access_data));
+        #else
+          chMatch = (struct vault_access_data*) dc_alloc(1, sizeof(struct vault_access_data));
+        #endif
+	chMatch->self = FALSE;
+	if((int)vict > 1000)
+	{
+	  chMatch->name = str_dup(vict->name);
+	} else {
+	  chMatch->name = (char*)vict; 
+	}
+	chMatch->segment = segment;
+	chMatch->view = FALSE;
+	chMatch->deposit = FALSE;
+	chMatch->withdraw = FALSE;
+	chMatch->next = ch->pcdata->vault->acc;
+	ch->pcdata->vault->acc = chMatch;
+  }
+  if (!victMatch)
+  {
+	#ifdef LEAK_CHECK
+          victMatch = (struct vault_access_data*) calloc(1, sizeof(struct vault_access_data));
+        #else
+          victMatch = (struct vault_access_data*) dc_alloc(1, sizeof(struct vault_access_data));
+        #endif
+	victMatch->self = TRUE;
+	victMatch->name = str_dup(ch->name);
+
+	victMatch->segment = segment;
+	victMatch->view = FALSE;
+	victMatch->deposit = FALSE;
+	victMatch->withdraw = FALSE;
+	if ((int)vict > 1000) 
+	{
+		victMatch->next = vict->pcdata->vault->acc;
+		vict->pcdata->vault->acc = victMatch;
+	} else {
+		victMatch->next = get_clan((int)vict)->acc;
+		get_clan((int)vict)->acc = victMatch;
+	}
+  }
+  switch (access)
+  {
+    case VIEW_ACCESS:
+	if (victMatch->view && chMatch->view)
+	{
+		victMatch->view = FALSE;
+		chMatch->view = FALSE;
+		return FALSE;
+	} else {
+		victMatch->view = TRUE;
+		chMatch->view = TRUE;
+		return TRUE;
+	}
+    case WITHDRAW_ACCESS:
+	if (victMatch->withdraw && chMatch->withdraw)
+	{
+		victMatch->withdraw = FALSE;
+		chMatch->withdraw = FALSE;
+		return FALSE;
+	} else {
+		victMatch->withdraw = TRUE;
+		chMatch->withdraw = TRUE;
+		return TRUE;
+	}
+    case DEPOSIT_ACCESS:
+	if (victMatch->deposit && chMatch->deposit)
+	{
+		victMatch->deposit = FALSE;
+		chMatch->deposit = FALSE;
+		return FALSE;
+	} else {
+		victMatch->deposit = TRUE;
+		chMatch->deposit = TRUE;
+		return TRUE;
+	}
+   case FULL_ACCESS:
+	if (victMatch->deposit && chMatch->deposit && chMatch->view && victMatch->view &&
+		victMatch->withdraw && chMatch->withdraw)
+        {
+		victMatch->deposit = chMatch->deposit = FALSE;
+		victMatch->withdraw = chMatch->withdraw = FALSE;
+		victMatch->view = chMatch->view = FALSE;
+		return FALSE;
+        } else {
+		victMatch->deposit = chMatch->deposit = TRUE;
+		victMatch->withdraw = chMatch->withdraw = TRUE;
+		victMatch->view = chMatch->view = TRUE;
+		return TRUE;
+	}
+  }
   
 }
 
@@ -2668,11 +2798,12 @@ void display_vault(char_data *ch, char_data *vict, search_type *search)
 
 int do_vault(char_data *ch, char *arg, int cmd)
 {
-  char action[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH];
+  char action[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH],arg2[MAX_INPUT_LENGTH];
   arg = one_argument(arg, action);
   if (!ch || IS_NPC(ch) || !ch->pcdata) return eFAILURE;
+  
 
-//  if (!ch->pcdata->vault) create_vault(ch);
+  if (!ch->pcdata->vault) create_pc_vault(ch);
   char *actions[]= 
   {
     "view",
@@ -2702,20 +2833,26 @@ int do_vault(char_data *ch, char *arg, int cmd)
   struct player_vault *v;
 
   descriptor_data d;
+  d.character = 0;
   char_data *vict = NULL;
   online = TRUE;
   struct search_type a;
-  memcpy((char*)&a,0,sizeof(search_type));
+  memset((char*)&a,0,sizeof(search_type));
 
   char buf[MAX_STRING_LENGTH];
-  int size = 0;
-  int clas = 0;
-  int levellow = 0, levelhigh = 0;
-  int wearpos = 0;
-  int alignment = 0;
-  int type = 0;
   int searchtype = 0;
   char cmsg[MAX_INPUT_LENGTH];
+  char *b = &arg1[0];
+  if (*b)
+  {
+    *b = UPPER(*b);
+    b++;
+    while (*b)
+    {
+	*b = LOWER(*b);
+	b++;
+    }
+  }
   switch (z)
   {
     case 4: // SEARCH
@@ -2776,12 +2913,12 @@ int do_vault(char_data *ch, char *arg, int cmd)
 	  }
 	  arg = one_argument(arg, arg1);
 	}
-	
+	break;	
     case 0: // VIEW
 	if (!vict && arg1[0] != '\0')
 	{
 	   vict = get_vault_owner(ch, arg1, &d);
-	   if (!vict) return eFAILURE; // get_vault owner handles error message
+	   if (!vict) return eFAILURE; // get_vault_owner handles error message
 	} else if (!vict) vict = ch;
 	if (!has_access(ch, vict, -1, VIEW_ACCESS))
 	{
@@ -2795,6 +2932,11 @@ int do_vault(char_data *ch, char *arg, int cmd)
 	  return eFAILURE;
 	}
 	display_vault(ch, vict,0);
+	if (d.character)
+	{
+	  char_from_room(vict);
+	  free_char(vict);
+	}
 //	v = vict->pcdata->vault;
 	return eSUCCESS;
     case 1: // DEPOSIT
@@ -2811,7 +2953,115 @@ int do_vault(char_data *ch, char *arg, int cmd)
 	return eFAILURE;
       }
     case 3: // ACCESS
+      if (arg1[0] == '\0')
+      { // list access data
+	struct vault_access_data *a,*b;
+	bool any = FALSE;
+        for (a = ch->pcdata->vault->acc;a;a = a->next)
+	{
+	  
+	}
+
+	return eSUCCESS;
+      }
+      arg = one_argument(arg,arg2);
+      char *cmd_list[] = 
+	{
+	"view",
+	"deposit",
+	"withdraw",
+	"full",
+	"\n"
+	};  
+         
+     int i;
+     for (i = 0;cmd_list[i][0] != '\n';i++)
+	if (!str_cmp(arg2, cmd_list[i]))
 		break;
+      if (cmd_list[i][0] == '\n')
+      {
+        send_to_char("What right do you want to toggle for them? [view deposit withdraw full]\r\n",ch);
+	return eFAILURE;
+      }
+      int segment = -1;
+      arg = one_argument(arg, arg2);
+      if (arg2[0] != '\0')
+      {
+	for (int z = 0; z < 20; z++)
+		if (!str_cmp(ch->pcdata->vault->segment[z],arg2))
+			segment = z;
+	if (segment < 0)
+	{
+		send_to_char("Unknown vault section.\r\n",ch);
+		return eFAILURE;
+	}
+      }
+      if (is_number(arg1))
+	vict = (CHAR_DATA*)atoi(arg1);
+      else
+        vict = get_vault_owner(ch, arg1, &d);
+      if (!vict)
+      {
+	send_to_char("Cannot find anyone by that name.\r\n",ch);
+	return eFAILURE;
+      }
+      if (vict == ch)
+      {
+	send_to_char("You can't remove your own access, silly.\r\n",ch);
+	return eFAILURE;
+      }
+      
+      if (toggle_access(ch,vict, i+1, segment))
+      {
+	if (segment < 0)
+	  sprintf(buf, "You grant them %s access to your vault.\r\n",cmd_list[i]);
+	else
+	  sprintf(buf, "You grant them %s access to section %s.\r\n",cmd_list[i],
+			ch->pcdata->vault->segment[segment]);
+	send_to_char(buf,ch);
+        if (!d.character && (int)vict > 1000) {
+ 	  if (segment < 0)
+            sprintf(buf, "%s grants you %s access to their vault.\r\n",GET_NAME(ch), 
+								cmd_list[i]);
+	  else
+            sprintf(buf, "%s grants you %s access to their vault's %s section.\r\n",GET_NAME(ch), 
+								cmd_list[i],ch->pcdata->vault->segment[segment]);
+	  send_to_char(buf,vict);
+	}
+        write_player_vault(ch);
+	if ((int)vict > 1000)
+          write_player_vault(vict);
+ 	else
+  	  write_clan_vaults();
+	
+      } else {
+	if (segment < 0)
+	  sprintf(buf, "You revoke their %s access.\r\n",cmd_list[i]);
+	else
+	  sprintf(buf, "You revoke their %s access from section %s.\r\n",cmd_list[i],
+			ch->pcdata->vault->segment[segment]);
+	send_to_char(buf,ch);
+        if (!d.character && (int)vict > 1000) {
+ 	  if (segment < 0)
+            sprintf(buf, "%s revokes your %s access to their vault.\r\n",GET_NAME(ch), 
+								cmd_list[i]);
+	  else
+            sprintf(buf, "%s revokes your %s access to their vault's %s section.\r\n",GET_NAME(ch), 
+								cmd_list[i],ch->pcdata->vault->segment[segment]);
+	  send_to_char(buf,vict);
+	}
+        write_player_vault(ch);
+	if ((int)vict > 1000)
+          write_player_vault(vict);
+ 	else
+  	  write_clan_vaults();
+      }
+      if (d.character)
+      {
+        char_from_room(vict);
+        free_char(vict);
+      }
+
   }
 
 }

@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.48 2006/06/01 00:44:25 shane Exp $ */
+/* $Id: clan.cpp,v 1.49 2006/06/03 09:29:36 dcastle Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -102,7 +102,7 @@ void boot_clans(void)
     new_new_clan->logout_message = NULL;
     new_new_clan->rooms = NULL;
     new_new_clan->members = NULL;
-
+    new_new_clan->acc = 0;
 //    sscanf(buf, "%s %s %s %hd", new_new_clan->leader, new_new_clan->founder,
 //           new_new_clan->name, &new_new_clan->number);
 
@@ -200,6 +200,8 @@ void boot_clans(void)
   }
 
   dc_fclose(fl);
+  extern void read_clan_vault();
+  read_clan_vault();
 }
 
 void save_clans(void)
@@ -1582,6 +1584,7 @@ void do_god_clans(CHAR_DATA *ch, char *arg, int cmd)
       clan->founder = str_dup(GET_NAME(ch));
       clan->name = str_dup(text);
       clan->number = x;
+      clan->acc = 0;
       clan->rooms = 0;
       clan->next = 0;
       clan->email = NULL;

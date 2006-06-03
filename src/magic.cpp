@@ -394,7 +394,10 @@ int spell_vampiric_touch (ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct 
     if (!SOMEONE_DIED(retval))
     if (GET_HIT(victim) >= i) return retval;
       
+     if (!SOMEONE_DIED(retval))
     GET_HIT(ch) += MIN(adam, i-GET_HIT(victim));
+      else
+     GET_HIT(ch) += MIN(adam, i);
     if (GET_HIT(ch) > GET_MAX_HIT(ch))
         GET_HIT(ch) = GET_MAX_HIT(ch);
     return retval;
@@ -404,7 +407,12 @@ int spell_vampiric_touch (ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct 
      int i = GET_HIT(victim);
      int retval =  damage (ch, victim, dam,TYPE_COLD, SPELL_VAMPIRIC_TOUCH, 0);
     if (!SOMEONE_DIED(retval) && GET_HIT(victim) >= i) return retval;
+
+     if (!SOMEONE_DIED(retval))
     GET_HIT(ch) += MIN(adam, i-GET_HIT(victim));
+      else
+     GET_HIT(ch) += MIN(adam, i);
+
     if (GET_HIT(ch) > GET_MAX_HIT(ch))
         GET_HIT(ch) = GET_MAX_HIT(ch);
    return retval;
@@ -4348,7 +4356,7 @@ int spell_dispel_minor(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
    int done = FALSE;
    int retval;
 
-   if(obj) /* Trying to dispel_minor an obj */
+   if(obj && (int)obj > 100) /* Trying to dispel_minor an obj */
    {   // Heh, it passes spell cast through obj now too. Less than 100 = not 
        // an actual obj.
       if(GET_ITEM_TYPE(obj) != ITEM_BEACON) {
@@ -9422,7 +9430,7 @@ int cast_clarity(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA  *vi
         affect_to_char(victim, &af);
         redo_mana(victim);
 	send_to_char("You suddenly feel smarter than everyone else.\r\n",victim);
-        act("$N's eyes shine with powerful intellect!", victim, 0, 0, TO_ROOM, 0);
+        act("$n's eyes shine with powerful intellect!", victim, 0, 0, TO_ROOM, 0);
         af.modifier     = 3 + (skill/20);
         af.location     = APPLY_MANA_REGEN;
         affect_to_char(victim, &af);
