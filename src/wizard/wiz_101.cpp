@@ -392,7 +392,7 @@ int do_at(struct char_data *ch, char *argument, int cmd)
 
     original_loc = ch->in_room;
     move_char(ch, location);
-    command_interpreter(ch, command);
+    int retval = command_interpreter(ch, command);
 
     /* check if the guy's still there */
     for (target_mob = world[location].people; target_mob; target_mob =
@@ -401,7 +401,7 @@ int do_at(struct char_data *ch, char *argument, int cmd)
         {
 	    move_char(ch, original_loc);
         }
-   return eSUCCESS;
+   return retval;
 }
 
 int do_highfive(struct char_data *ch, char *argument, int cmd)
@@ -537,7 +537,7 @@ int do_wiz(struct char_data *ch, char *argument, int cmd)
         ansi_color( NTEXT, ch);
 
         for (i = descriptor_list; i; i = i->next) {
-	  if (i->character && !i->connected && i->character != ch && GET_LEVEL(i->character) >= IMMORTAL) {
+	  if (i->character && i->character != ch && GET_LEVEL(i->character) >= IMMORTAL && !IS_NPC(i->character)) {
 	  if (cmd == 8 && !has_skill(i->character, COMMAND_IMP_CHAN)) continue;
 
 	    if (STATE(i) == CON_PLAYING) {
