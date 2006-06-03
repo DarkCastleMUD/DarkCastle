@@ -1,7 +1,7 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.40 2006/05/29 22:18:18 dcastle Exp $
+| $Id: character.h,v 1.41 2006/06/03 09:30:55 dcastle Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
@@ -158,6 +158,7 @@ struct follow_type
 #define VIEW_ACCESS 1
 #define DEPOSIT_ACCESS 2
 #define WITHDRAW_ACCESS 3
+#define FULL_ACCESS 4
 
 struct vault_access_data
 {
