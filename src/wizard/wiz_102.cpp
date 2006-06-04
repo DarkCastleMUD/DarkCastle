@@ -2326,17 +2326,21 @@ int do_mpedit(struct char_data *ch, char *argument, int cmd)
         prog->comlist = strdup("say This is my new mob prog!\n\r");
         prog->next = NULL;
 
+	int prog_num = 1;
         if((currprog = mob_index[mob_num].mobprogs)) {
-          while(currprog->next)
+          while(currprog->next) {
+	    prog_num++;
             currprog = currprog->next;
+	  }
           currprog->next = prog;
+	  prog_num++;
         }
         else 
           mob_index[mob_num].mobprogs = prog;
 
         update_mobprog_bits(mob_num);
 
-        send_to_char("New mobprog created.\r\n", ch);
+	 csendf(ch, "New mobprog created as #%d.\r\n", prog_num);
       } break;
 
      /* remove */
