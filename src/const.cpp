@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.191 2006/06/03 09:29:36 dcastle Exp $ */
+/* $Id: const.cpp,v 1.192 2006/06/04 01:03:57 jhhudso Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -249,7 +249,7 @@ char *spell_wear_off_msg[] =
   "The ethereal stones around you fade away.",
   "The ethereal stones around you fade away.", // greater stone shield
   "!Iron Roots!",
-  "!Eyes of the Eagle!",
+  "!Eyes of the Eagle!", // 130
   "!Haste Other!",
   "!Ice Shards!",  
   "The $B$5lightning$R around you fades away leaving only static cling.",
@@ -259,7 +259,7 @@ char *spell_wear_off_msg[] =
   "The $B$0shadow$R in your aura fades away into the ethereal.",
   "Your serene aura of holiness fades.",
   "!DismissFamiliar!",
-  "!DismissCorpse!",
+  "!DismissCorpse!", // 140
   "Your blessed halo fades.",
   "You don't feel quite so hateful anymore.",
   "The foul mantle surrounding you dissipates to nothing.",
@@ -269,7 +269,7 @@ char *spell_wear_off_msg[] =
   "You are no longer flagged as a thief.",
   "You are no longer CANTQUIT flagged.",
   "You are again susceptible to magical transport as your solidity fades.",
-  "You feel more susceptable to damage.",
+  "You feel more susceptable to damage.", // 150
   "!ALIGN_GOOD!",
   "!ALIGN_EVIL!",
   "Your protective aegis dissipates.",
@@ -279,7 +279,7 @@ char *spell_wear_off_msg[] =
   "!UNUSED!",
   "!UNUSED!",
   "!UNUSED!",
-  "!UNUSED!",
+  "!UNUSED!", // 160
   "You feel dumber."
 };
 
