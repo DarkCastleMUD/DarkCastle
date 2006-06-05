@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.67 2006/06/03 09:29:36 dcastle Exp $
+| $Id: objects.cpp,v 1.68 2006/06/05 23:46:28 dcastle Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -2255,6 +2255,7 @@ void create_pc_vault(CHAR_DATA *ch)
   v->max_contain = 500;
   v->contains = v->nr_items = 0;
   v->content = 0;
+  v->amt = 0;
   v->acc = 0;
   ch->pcdata->vault = v;
 }
@@ -2373,6 +2374,7 @@ void read_clan_vault()
 	  if (clannr == -1) { if ((int)a->name > 1000) dc_free(a->name); dc_free(a); continue; }
 	  a->next = get_clan(clannr)->acc;
 	  get_clan(clannr)->acc = a;
+	  get_clan(clannr)->amt++;
 	  break;
 	case 'C':
 	  clannr = fread_int(fl, 0, LONG_MAX);
@@ -2462,6 +2464,8 @@ void read_player_vault(CHAR_DATA *ch)
 	  a->deposit = tf(fread_char(fl));
 	  a->withdraw = tf(fread_char(fl));
 	  a->next = v->acc;
+	  if (a->self)
+	    v->amt++;
 	  v->acc = a;
 	  break;
 	case 'S':
@@ -2956,12 +2960,108 @@ int do_vault(char_data *ch, char *arg, int cmd)
       if (arg1[0] == '\0')
       { // list access data
 	struct vault_access_data *a,*b;
-	bool any = FALSE;
+	int i = ch->pcdata->vault->amt;
+	if (get_clan(ch))
+	  i += get_clan(ch)->amt;
+	struct access_display {
+		char *name;
+		int segment;
+		int access;
+		int access2;
+	} displaydata[i+1];
+
+        for (int y = 0; y < i;y++) {
+	   displaydata[y].name = 0;
+	   displaydata[y].segment = -1;
+	   displaydata[y].access = 0;
+	   displaydata[y].access2 = 0;
+  	}
+
         for (a = ch->pcdata->vault->acc;a;a = a->next)
 	{
-	  
+	  if (!a->self) continue;
+	  for (int y = 0; y < i; y++) // sort it
+		if (!displaydata[y].name || str_cmp(displaydata[y].name,a->name) > 0 ||
+			!str_cmp(displaydata[y].name,a->name))
+		{
+			for (int z = i-1; z >= y; z--)
+			{
+				if (z == 0 || !displaydata[z-1].name) continue;
+				displaydata[z].name = displaydata[z-1].name;
+				displaydata[z].access = displaydata[z-1].access;
+				displaydata[z].segment = displaydata[z-1].segment;
+			}
+			displaydata[y].name = a->name; // just reference it, no freeing this later on.
+			displaydata[y].segment = a->segment;
+			if (a->view) SET_BIT(displaydata[y].access,1);
+			if (a->withdraw) SET_BIT(displaydata[y].access,2);
+			if (a->deposit) SET_BIT(displaydata[y].access,4);
+			break;
+		}
 	}
+	if (get_clan(ch))
+          for (a = get_clan(ch)->acc;a;a = a->next)
+  	  {
+	    int t; // so str_cmp doesn't have to be called twice/for
+	    for (int y = 0; y < i; y++)
+	    {
+		if (displaydata[y].name && !(t = str_cmp(displaydata[y].name,a->name)) &&
+			displaydata[y].segment == a->segment) {
+			if (a->view) SET_BIT(displaydata[y].access2,1);
+			if (a->withdraw) SET_BIT(displaydata[y].access2,2);
+			if (a->deposit) SET_BIT(displaydata[y].access2,4);
+			break;
+		} else if (!displaydata[y].name || t > 0 || !t) {
+			// !t is true when it's a different segment
+			for (int z = i-1; z > y; z--)
+			{
+				displaydata[z].name = displaydata[z-1].name;
+				displaydata[z].access2 = displaydata[z-1].access2;
+			}
+			displaydata[y].name = a->name; // just reference it, no freeing this later on.
+			if (a->view) SET_BIT(displaydata[y].access2,1);
+			if (a->withdraw) SET_BIT(displaydata[y].access2,2);
+			if (a->deposit) SET_BIT(displaydata[y].access2,4);
+			break;
 
+		}
+	    }
+	  }
+	char suffix[40];
+	char buf[MAX_STRING_LENGTH];
+        char temp[150];
+	buf[0] = '\0';
+	for (int y = 0; y < i; y++)
+	{
+		if (!displaydata[y].name) continue;
+		suffix[0] = '\0';
+		if ((displaydata[y].access | displaydata[y].access2) == 7)
+		{
+		  strcat(suffix, " $2FULL");
+		} else {
+		  if (IS_SET(displaydata[y].access2, 1))
+		    strcat(suffix, " $2VIEW");
+		  else if (IS_SET(displaydata[y].access, 1))
+		    strcat(suffix, " $3VIEW");
+
+		  if (IS_SET(displaydata[y].access2, 2))
+		    strcat(suffix, " $2WITHDRAW");
+		  else if (IS_SET(displaydata[y].access, 2))
+		    strcat(suffix, " $3WITHDRAW");
+
+		  if (IS_SET(displaydata[y].access2, 4))
+		    strcat(suffix, " $2DEPOSIT");
+		  else if (IS_SET(displaydata[y].access, 4))
+	  	    strcat(suffix, " $3DEPOSIT");
+		}
+		sprintf(temp, "%-15s - %s$R\r\n",displaydata[y].name,suffix);
+		if (suffix[0] != '\0')
+		  strcat(buf,temp);
+	}
+	if (buf[0] != '\0')
+	  send_to_char(buf,ch);
+	else
+	  send_to_char("You do not have access to anyone's vault.\r\n",ch);
 	return eSUCCESS;
       }
       arg = one_argument(arg,arg2);
@@ -3065,3 +3165,4 @@ int do_vault(char_data *ch, char *arg, int cmd)
   }
 
 }
+

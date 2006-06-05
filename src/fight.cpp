@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.311 2006/06/02 07:02:53 jhhudso Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.312 2006/06/05 23:46:27 dcastle Exp $ */
 
 extern "C"
 {
@@ -2895,7 +2895,7 @@ timer_data));
 }
 
 // Stop fights.
-void stop_fighting(CHAR_DATA * ch)
+void stop_fighting(CHAR_DATA * ch, int clearlag)
 {
   CHAR_DATA *tmp;
   
@@ -2961,7 +2961,7 @@ void stop_fighting(CHAR_DATA * ch)
   update_pos(ch);
   
   // Remove ch's lag if he wasn't using wimpy.
-  if (!IS_NPC(ch) && ch->desc && !IS_SET(ch->pcdata->toggles, PLR_WIMPY))
+  if (!IS_NPC(ch) && ch->desc && !IS_SET(ch->pcdata->toggles, PLR_WIMPY) && clearlag)
     ch->desc->wait = 0;
   
   if (ch == combat_next_dude)
@@ -4081,6 +4081,14 @@ CHAR_DATA *loop_followers(struct follow_type **f)
    return(tmp_ch);
 }
 
+       char *elem_type[] = 
+	{
+	  "$B$4stream of flame$R",
+	"$B$0stone fist$R",
+	"$B$5bolt of energy$R",
+	"$B$3shards of ice$R"
+	};
+
 void dam_message(int dam, CHAR_DATA * ch, CHAR_DATA * victim,
                  int w_type, long modifier)
 {
@@ -4306,6 +4314,9 @@ PLR_DAMAGE)?dammsg:"", attack, shield, punct);
      if (w_type == 0)
      {
        attack = race_info[GET_RACE(ch)].unarmed;
+	int a;
+	if (IS_NPC(ch) && (a = mob_index[ch->mobdata->nr].virt) < 92 && a > 87)
+	 attack = elem_type[a-88];
        sprintf(buf1, "$n's %s%s %s $N%s|%c", modstring, attack, vp, vx, punct);
        sprintf(buf2, "Your %s%s %s $N%s%s%c", modstring, attack, vp, vx,!IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_DAMAGE)?dammsg:"", punct);
        sprintf(buf3, "$n's %s%s %s you%s%s%c", modstring, attack, vp, vx, !IS_NPC(victim) && IS_SET(victim->pcdata->toggles, PLR_DAMAGE)?dammsg:"", punct);

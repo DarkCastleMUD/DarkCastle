@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.107 2006/05/29 22:18:15 dcastle Exp $ */
+/* $Id: handler.cpp,v 1.108 2006/06/05 23:46:28 dcastle Exp $ */
     
 extern "C"
 {
@@ -69,7 +69,6 @@ int strncasecmp(char *s1, const char *s2, int len);
 /* External procedures */
 void save_corpses(void);
 int str_cmp(char *arg1, char *arg2);
-void stop_fighting(CHAR_DATA *ch);
 void remove_follower(CHAR_DATA *ch);
 int do_fall(CHAR_DATA *ch, short dir);
 
@@ -77,7 +76,6 @@ int do_fall(CHAR_DATA *ch, short dir);
 void remove_memory(CHAR_DATA *ch, char type);
 void add_memory(CHAR_DATA *ch, char *victim, char type);
 
-extern void debug_point();
 //TIMERS
 
 bool isTimer(CHAR_DATA *ch, int spell)
@@ -1728,7 +1726,6 @@ int equip_char(CHAR_DATA *ch, struct obj_data *obj, int pos, int flag)
     }
     if(ch->equipment[pos])
     {
-	debug_point();
        log("Already equipped in equip_char!", ANGEL, LOG_BUG);
        return 0;
     }

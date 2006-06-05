@@ -2,7 +2,7 @@
 #define CLAN_H_
 
 /************************************************************************
-| $Id: clan.h,v 1.17 2006/05/29 22:18:18 dcastle Exp $
+| $Id: clan.h,v 1.18 2006/06/05 23:46:32 dcastle Exp $
 | clan.h
 | Description:  Header information for clans.
 */
@@ -67,6 +67,7 @@ struct clan_data
   long balance;
   uint16 tax;
   uint16 number;
+  uint16 amt;
   clan_room_data * rooms;
   clan_member_data * members;
   struct clan_data * next;

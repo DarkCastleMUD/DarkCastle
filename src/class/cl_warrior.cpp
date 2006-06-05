@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.46 2006/06/03 09:29:53 dcastle Exp $
+| $Id: cl_warrior.cpp,v 1.47 2006/06/05 23:46:30 dcastle Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -736,8 +736,9 @@ int do_rescue(struct char_data *ch, char *argument, int cmd)
 
     if (victim->fighting == tmp_ch)
        stop_fighting(victim);
+
     if (tmp_ch->fighting)
-       stop_fighting(tmp_ch);
+       stop_fighting(tmp_ch,0);
 //    if (ch->fighting)
   //     stop_fighting(ch);
 

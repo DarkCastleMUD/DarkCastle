@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.49 2006/06/03 09:29:36 dcastle Exp $ */
+/* $Id: clan.cpp,v 1.50 2006/06/05 23:46:27 dcastle Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -103,6 +103,7 @@ void boot_clans(void)
     new_new_clan->rooms = NULL;
     new_new_clan->members = NULL;
     new_new_clan->acc = 0;
+    new_new_clan->amt = 0;
 //    sscanf(buf, "%s %s %s %hd", new_new_clan->leader, new_new_clan->founder,
 //           new_new_clan->name, &new_new_clan->number);
 
@@ -1581,6 +1582,7 @@ void do_god_clans(CHAR_DATA *ch, char *arg, int cmd)
       clan = (struct clan_data *)dc_alloc(1, sizeof(clan_data));
 #endif
       clan->leader = str_dup(GET_NAME(ch));
+      clan->amt = 0;
       clan->founder = str_dup(GET_NAME(ch));
       clan->name = str_dup(text);
       clan->number = x;

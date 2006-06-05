@@ -1,7 +1,7 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.41 2006/06/03 09:30:55 dcastle Exp $
+| $Id: character.h,v 1.42 2006/06/05 23:46:32 dcastle Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
@@ -176,6 +176,7 @@ struct player_vault
   char *segment[20];
   int max_contain, contains;
   int nr_items;
+  uint amt;
   OBJ_DATA *content;
   struct vault_access_data *acc;
 };

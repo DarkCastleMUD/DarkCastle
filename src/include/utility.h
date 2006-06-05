@@ -16,7 +16,7 @@
  *  10/21/2003   Onager    Changed IS_ANONYMOUS() to handle mobs without   *
  *                         crashing                                        *
  ***************************************************************************/
-/* $Id: utility.h,v 1.40 2006/05/23 13:28:14 jhhudso Exp $ */
+/* $Id: utility.h,v 1.41 2006/06/05 23:46:32 dcastle Exp $ */
 
 #ifndef UTILITY_H_
 #define UTILITY_H_
@@ -352,7 +352,7 @@ bool ARE_CLANNED( struct char_data *sub, struct char_data *obj);
 int	is_number	(char *str);
 void	gain_condition	(CHAR_DATA *ch, int condition, int value);
 void	set_fighting	(CHAR_DATA *ch, CHAR_DATA *vict);
-void	stop_fighting	(CHAR_DATA *ch);
+void	stop_fighting	(CHAR_DATA *ch, int clearlag = 1);
 int	do_simple_move	(CHAR_DATA *ch, int cmd, int following);
 // int	attempt_move	(CHAR_DATA *ch, int cmd, int is_retreat = 0);
 int32	move_limit	(CHAR_DATA *ch);
