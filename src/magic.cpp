@@ -8205,50 +8205,152 @@ int cast_dispel_minor( ubyte level, CHAR_DATA *ch, char *arg, int type,
   return eFAILURE;
 }
 
-char_data *grouped_elem(char_data *ch);
-
+	
 int elemental_damage_bonus(int spell, char_data *ch)
 {
-  ch = grouped_elem(ch); // ch not actually needed, just the elem
-  if (!ch) return 0;
-  int virt = mob_index[ch->mobdata->nr].virt;  
+  char_data *mst = ch->master?ch->master:ch;
+  struct follow_type *f, *t;
+  bool fire, ice, earth, energy;
+  fire = ice = earth = energy = FALSE;
+  for (f=mst->followers; f; f=f->next)
+  {
+    if (IS_NPC(f->follower) && f->follower->height == 77)
+    {
+	switch (mob_index[f->follower->mobdata->nr].virt)
+	{
+		case 88:
+		  fire = TRUE; break;
+		case 89:
+		  ice = TRUE; break;
+		case 90:
+		  energy = TRUE; break;
+		case 91:
+		  earth = TRUE; break;
+		default: break;
+	}
+    } else {
+	  for (t=f->follower->followers; t; t=t->next)
+    	    if (IS_NPC(t->follower) && t->follower->height == 77)
+    	    {
+		switch (mob_index[t->follower->mobdata->nr].virt)
+		{
+			case 88:
+			  fire = TRUE; break;
+			case 89:
+			  ice = TRUE; break;
+			case 90:
+			  energy = TRUE; break;
+			case 91:
+			  earth = TRUE; break;
+			default: break;
+		}
+	    }
+     }
+  }
   switch (spell)
   {
+ // done this way to ensure no unintended spells get the bonus
+ // (shields, for instance, prolly other things with TYPE_FIRE etc damage that's unintended)
 	case SPELL_FIREBALL:
         case SPELL_FIRESTORM:
         case SPELL_FLAMESTRIKE:
         case SPELL_HELLSTREAM:
-	   if (virt == 88) return dice(5,6);
+	   if (fire) return dice(5,6);
 	   else return 0;
         case SPELL_METEOR_SWARM:
+        case SPELL_BEE_STING:
+	case SPELL_CREEPING_DEATH:
+	case SPELL_BLUE_BIRD:
+	   if (earth) return dice(8,4);
+	   else return 0;
+	case SPELL_CALL_LIGHTNING:
+	case SPELL_SUN_RAY:
+	case SPELL_SHOCKING_GRASP:
+	case SPELL_LIGHTNING_BOLT:
+	   if (energy) return dice(1,50);
+	   else return 0;
+	case SPELL_DROWN:
+	case SPELL_VAMPIRIC_TOUCH:
+	case SPELL_DISPEL_EVIL:
+	case SPELL_DISPEL_GOOD:
+	case SPELL_CHILL_TOUCH:
+	    if (ice) return dice(6,5);
+	    else return 0;
         default: return 0;
   }
 }
 
-char_data *grouped_elem(char_data *ch)
+bool elemental_score(char_data *ch, int level)
 {
   char_data *mst = ch->master?ch->master:ch;
   struct follow_type *f, *t;
-
+  bool fire, ice, earth, energy;
+  fire = ice = earth = energy = FALSE;
+  // reuse of elemental damage function
   for (f=mst->followers; f; f=f->next)
   {
     if (IS_NPC(f->follower))
     {
-        if (mob_index[f->follower->mobdata->nr].virt >= 88 &&
-		mob_index[f->follower->mobdata->nr].virt <= 92)
-		return f->follower;
+	if (f->follower->height == 77) // improved
+	switch (mob_index[f->follower->mobdata->nr].virt)
+	{
+		case 88:
+		  fire = TRUE; break;
+		case 89:
+		  ice = TRUE; break;
+		case 90:
+		  energy = TRUE; break;
+		case 91:
+		  earth = TRUE; break;
+		default: break;
+	}
     } else {
 	  for (t=f->follower->followers; t; t=t->next)
+   	   if (t->follower->height == 77) // improved
     	    if (IS_NPC(t->follower))
     	    {
-        	if (mob_index[t->follower->mobdata->nr].virt >= 88 &&
-			mob_index[t->follower->mobdata->nr].virt <= 92)
-			return t->follower;
+		switch (mob_index[t->follower->mobdata->nr].virt)
+		{
+			case 88:
+			  fire = TRUE; break;
+			case 89:
+			  ice = TRUE; break;
+			case 90:
+			  energy = TRUE; break;
+			case 91:
+			  earth = TRUE; break;
+			default: break;
+		}
 	    }
-    }
+     }
   }
-  return NULL;
-
+  char buf[MAX_STRING_LENGTH];
+  extern char frills[];
+  if (fire) {
+    sprintf(buf, "|%c| Affected by %-22s          Modifier %-16s  |%c|\n\r",
+               frills[level],"ENHANCED_FIRE_AURA","NONE",frills[level]);
+        send_to_char(buf,ch);
+        if (++level == 4) level = 0;
+  }
+  if (ice) {
+    sprintf(buf, "|%c| Affected by %-22s          Modifier %-16s  |%c|\n\r",
+               frills[level],"ENHANCED_COLD_AURA","NONE",frills[level]);
+        send_to_char(buf,ch);
+        if (++level == 4) level = 0;
+  }
+  if (energy) {
+    sprintf(buf, "|%c| Affected by %-22s          Modifier %-16s  |%c|\n\r",
+               frills[level],"ENHANCED_ENERGY_AURA","NONE",frills[level]);
+        send_to_char(buf,ch);
+        if (++level == 4) level = 0;
+  }
+  if (earth) {
+    sprintf(buf, "|%c| Affected by %-22s          Modifier %-16s  |%c|\n\r",
+               frills[level],"ENHANCED_PHYSICAL_AURA","NONE",frills[level]);
+        send_to_char(buf,ch);
+        if (++level == 4) level = 0;
+  }
+  return (fire || earth || energy || ice);
 }
 
 int cast_conjure_elemental( ubyte level, CHAR_DATA *ch,
@@ -11539,7 +11641,7 @@ int spell_conjure_elemental(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vi
 	liquid = 9;
   }
   else {
-	send_to_char("Unknown elemental type. Applicaple types are: fire, water, air and earth.\r\n",ch);
+	send_to_char("Unknown elemental type. Applicable types are: fire, water, air and earth.\r\n",ch);
 	return eFAILURE;
   }
   obj_data *obj;
@@ -11559,20 +11661,23 @@ int spell_conjure_elemental(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vi
   switch (virt)
   {
 	case 88:
-          act("Your small piece of flint turns to ash as a denizen of the elemental plane of $B$4fire$R arrives in a blast of flame!", ch, NULL,NULL, TO_CHAR, 0);
-          act("$n's small piece of flint turns to ash as a denizen of the elemental plane of $B$4fire$R arrives in a blast of flame!", ch, NULL,NULL, TO_ROOM, 0);
+          act("Your container of blood burns hotly as a denizen of the elemental plane of fire arrives in a blast of flame!", ch, NULL,NULL, TO_CHAR, 0);
+          act("$n's container of blood burns hotly as a denizen of the elemental plane of fire arrives in a blast of flame!", ch, NULL,NULL, TO_ROOM, 
+0);
 	  break;
 	case 89:
-          act("Calling out to the spirits of $B$4fire$R, shaping them into an elemental servant.", ch, NULL,NULL, TO_CHAR, 0);
-          act("$n calls out, and a $B$4fire$R elemental appears.", ch, NULL,NULL, TO_ROOM, 0);
-	  break;
-	case 90:
-          act("Calling out to the spirits of $B$4fire$R, shaping them into an elemental servant.", ch, NULL,NULL, TO_CHAR, 0);
-          act("$n calls out, and a $B$4fire$R elemental appears.", ch, NULL,NULL, TO_ROOM, 0);
+          act("Your holy water bubbles briefly as an icy denizen of the elemental plane of water crystalizes into existence.", ch, NULL,NULL, 
+TO_CHAR, 0);
+          act("$n's holy water bubbles briefly as an icy denizen of the elemental plane of water crystalizes intoto existence.", ch, NULL,NULL, 
+TO_ROOM, 0);
 	  break;
 	case 91:
-          act("Calling out to the spirits of $B$4fire$R, shaping them into an elemental servant.", ch, NULL,NULL, TO_CHAR, 0);
-          act("$n calls out, and a $B$4fire$R elemental appears.", ch, NULL,NULL, TO_ROOM, 0);
+          act("Your dirty water churns violently as a denizen of the elemental plane of earth rises from the ground.", ch, NULL,NULL, TO_CHAR, 0);
+          act("$n's dirty water churns violently as a denizen of the elemental plane of earth rises from the ground.", ch, NULL,NULL, TO_ROOM, 0);
+	  break;
+	case 90:
+          act("Your wine boils with energy as a denizen of the elemental plane of air crackles into existance.", ch, NULL,NULL, TO_CHAR, 0);
+          act("$n's wine boils with energy as a denizen of the elemental plane of air crackles into existance.", ch, NULL,NULL, TO_ROOM, 0);
 	  break;
 	default:
 		send_to_char("That item is not used for elemental summoning.\r\n",ch);
@@ -11585,7 +11690,9 @@ int spell_conjure_elemental(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vi
   
   mob = clone_mobile(r_num);
   char_to_room(mob, ch->in_room);
-
+  mob->max_hit += skill*5;
+  mob->hit = mob->max_hit;
+  if (skill > 80) mob->height = 77;
   IS_CARRYING_W(mob) = 0;
   IS_CARRYING_N(mob) = 0;
 

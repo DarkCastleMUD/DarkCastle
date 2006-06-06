@@ -355,9 +355,14 @@ int do_index(struct char_data *ch, char *argument, int cmd)
    
    if ((((atoi(argument)) > 0) || *argument == '0') && ((atoi(arg)) > 0)) { // index #s out of range
      if (atoi(argument) > atoi(arg)) {
-        send_to_char("Usage: hindex <low ID#> <high ID#>\r\n", ch); // wrong order, first > second
+        send_to_char("Usage: index <low ID#> <high ID#>\r\n", ch); // wrong order, first > second
         return eFAILURE;
      } 
+     if (atoi(argument) > new_top_of_helpt || atoi(arg) > new_top_of_helpt)
+     {
+        send_to_char("Out of range.\r\n", ch); // wrong order, first > second
+        return eFAILURE;
+     }
      show_help_header(ch);
      for (i = atoi(argument); i <= atoi(arg); i++) {
        if(new_help_table[i].min_level > 1) continue;

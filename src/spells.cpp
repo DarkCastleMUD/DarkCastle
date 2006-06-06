@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.165 2006/06/02 07:49:12 jhhudso Exp $ */
+/* $Id: spells.cpp,v 1.166 2006/06/06 12:13:58 dcastle Exp $ */
 
 extern "C"
 {
@@ -202,7 +202,7 @@ struct spell_info_type spell_info [] =
 
  { /* 59 */ 12, POSITION_FIGHTING, 30, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_dispel_magic, SKILL_INCREASE_HARD },
 
- { /* 60 */ /* 24, POSITION_STANDING, 150, TAR_NONE_OK, cast_conjure_elemental */ 0, 0, 0, 0, 0, 0 },
+ { /* 60 */  24, POSITION_STANDING, 150, TAR_IGNORE, cast_conjure_elemental, SKILL_INCREASE_MEDIUM },
 
  { /* 61 */ 12, POSITION_FIGHTING, 15, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_cure_serious, SKILL_INCREASE_EASY },
 
@@ -1593,11 +1593,15 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
       } /* Switch */
     } else 
     {
-      if (GET_LEVEL(ch) < ARCHANGEL && !IS_MOB(ch)) 
+      if (!IS_MOB(ch))
       {
         if(!(learned = has_skill(ch, spl))) {
+	if (GET_LEVEL(ch) < 101) {
           send_to_char("You do not know how to cast that spell!\n\r", ch);
           return eFAILURE;
+        } else {
+	  learned = 80;
+	}
         }
       }
       else learned = 80;

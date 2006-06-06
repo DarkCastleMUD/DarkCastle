@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.66 2006/05/22 22:14:01 apocalypse Exp $
+| $Id: move.cpp,v 1.67 2006/06/06 12:13:58 dcastle Exp $
 | move.C
 | Movement commands and stuff.
 *************************************************************************
@@ -37,6 +37,7 @@
 
 extern struct obj_data *object_list;
 extern struct index_data *obj_index;
+extern struct index_data *mob_index;
 extern struct zone_data *zone_table;
 extern CWorld world;
  
@@ -703,6 +704,38 @@ int do_simple_move(CHAR_DATA *ch, int cmd, int following)
     act("$n has arrived.", ch, 0,0, TO_ROOM, INVIS_NULL);
 
   do_look(ch, "\0", 15);
+
+  // Elemental stuff goes HERE
+  if (IS_NPC(ch))
+  {
+     int a = mob_index[ch->mobdata->nr].virt;
+       // code a bit repeaty, but whatever ;)
+     if (a == 88 && world[ch->in_room].sector_type == SECT_UNDERWATER)
+     {
+       act("Unable to survive underwater, $n returns to the elemental plane of fire.",ch, 0, 0, TO_ROOM, 0);
+       extract_char(ch, TRUE);
+       return eSUCCESS|eCH_DIED;
+     }
+     if (a == 89 && world[ch->in_room].sector_type == SECT_DESERT)
+     {
+       act("Unable to survive in the desert, your elemental returns to the elemental plane of water.",ch, 0, 0, TO_ROOM, 0);
+       extract_char(ch, TRUE);
+       return eSUCCESS|eCH_DIED;
+     }
+     if (a == 90 && world[ch->in_room].sector_type == SECT_SWAMP)
+     {
+       act("Unable to survive in the swamp, your elemental returns to the elemental plane of air.",ch, 0, 0, TO_ROOM, 0);
+       extract_char(ch, TRUE);
+       return eSUCCESS|eCH_DIED;
+     }
+     if (a == 91 && world[ch->in_room].sector_type == SECT_AIR)
+     {
+       act("Unable to survive in the air, your elemental returns to the elemental plane of earth.",ch, 0, 0, TO_ROOM, 0);
+       extract_char(ch, TRUE);
+       return eSUCCESS|eCH_DIED;
+     }
+  }
+  // Elemental stuff ends HERE
 
   if((IS_SET(world[ch->in_room].room_flags, FALL_NORTH) && (dir = 0)) ||
     (IS_SET(world[ch->in_room].room_flags, FALL_DOWN) && (dir = 5)) ||

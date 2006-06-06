@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.106 2006/06/02 07:03:51 jhhudso Exp $ */
+/* $Id: info.cpp,v 1.107 2006/06/06 12:13:58 dcastle Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -1448,6 +1448,10 @@ int do_score(struct char_data *ch, char *argument, int cmd)
      send_to_char(buf, ch);
      found = TRUE;
    }
+   extern bool elemental_score(char_data *ch, int level);
+   if (!found) found = elemental_score(ch, level);
+   else elemental_score(ch,level);
+
    if(found)
      send_to_char("($5:$7)========================================================================($5:$7)\n\r", ch);
 
