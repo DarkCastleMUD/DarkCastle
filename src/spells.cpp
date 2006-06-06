@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.166 2006/06/06 12:13:58 dcastle Exp $ */
+/* $Id: spells.cpp,v 1.167 2006/06/06 19:43:24 shane Exp $ */
 
 extern "C"
 {
@@ -1484,13 +1484,15 @@ skillnum <= SKILL_SONG_MAX) || (skillnum >= KI_OFFSET && skillnum <= (KI_OFFSET+
   if (i > o) o = i+1;
   if (i > number(1,o) || GET_LEVEL(ch) >= IMMORTAL)
   {
-    skill_increase_check(ch,skillnum,learned,a+500);
+    if(skillnum != SKILL_ENHANCED_REGEN || ( skillnum == SKILL_ENHANCED_REGEN && GET_HIT(ch) + 50 < GET_MAX_HIT(ch) && ( GET_POS(ch) == POSITION_RESTING || GET_POS(ch) == POSITION_SLEEPING ) ) )
+      skill_increase_check(ch,skillnum,learned,a+500);
     return TRUE; // Success
   }
   else {
   /* Check for skill improvement anyway */
-   skill_increase_check(ch, skillnum, learned,a);
-   return FALSE; // Failure  
+    if(skillnum != SKILL_ENHANCED_REGEN || ( skillnum == SKILL_ENHANCED_REGEN && GET_HIT(ch) + 50 < GET_MAX_HIT(ch) && ( GET_POS(ch) == POSITION_RESTING || GET_POS(ch) == POSITION_SLEEPING ) ) )
+      skill_increase_check(ch, skillnum, learned,a);
+    return FALSE; // Failure  
   }
 }
 
