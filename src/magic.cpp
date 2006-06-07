@@ -11654,7 +11654,7 @@ int spell_conjure_elemental(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vi
   {
      if (obj->obj_flags.type_flag == ITEM_DRINKCON &&
 		obj->obj_flags.value[2] == liquid &&
-		obj->obj_flags.value[1] > 5)
+		obj->obj_flags.value[1] >= 5)
 		break;
   }
   if (!obj)

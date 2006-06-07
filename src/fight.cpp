@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.314 2006/06/06 19:43:24 shane Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.315 2006/06/07 20:25:10 dcastle Exp $ */
 
 extern "C"
 {
@@ -1257,6 +1257,20 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
   }
   */
   if (SOMEONE_DIED(retval)) return retval;
+
+  if (w_type == TYPE_HIT && IS_NPC(ch))
+  {
+    int a = mob_index[ch->mobdata->nr].virt;
+    switch (a)
+    {
+	case 88: w_type = TYPE_FIRE;break;
+	case 89: w_type = TYPE_WATER;break;
+	case 90: w_type = TYPE_ENERGY;break;
+	case 91: w_type = TYPE_CRUSH;break;
+	default: break;
+    }
+  }
+
   retval = damage(ch, vict, dam, weapon_type, w_type, weapon);
 
   if(!IS_SET(retval, eCH_DIED) && 
@@ -2025,7 +2039,8 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
     dam = 0;
 
   // Check for parry, mob disarm, and trip. Print a suitable damage message. 
-  if (attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING)
+  if ((attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING) || (IS_NPC(ch) && 
+	mob_index[ch->mobdata->nr].virt > 87 && mob_index[ch->mobdata->nr].virt < 92))
   {
     if (ch->equipment[weapon] == NULL)
       dam_message(dam, ch, victim, TYPE_HIT, modifier);
@@ -4093,9 +4108,9 @@ CHAR_DATA *loop_followers(struct follow_type **f)
        char *elem_type[] = 
 	{
 	  "$B$4stream of flame$R",
-	"$B$0stone fist$R",
+	"$B$3shards of ice$R",
 	"$B$5bolt of energy$R",
-	"$B$3shards of ice$R"
+	"$B$0stone fist$R"
 	};
 
 void dam_message(int dam, CHAR_DATA * ch, CHAR_DATA * victim,

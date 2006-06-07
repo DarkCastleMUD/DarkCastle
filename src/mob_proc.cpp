@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.96 2006/05/22 22:14:01 apocalypse Exp $ */
+/* $Id: mob_proc.cpp,v 1.97 2006/06/07 20:25:11 dcastle Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -5247,6 +5247,32 @@ int museum_guard(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 
    return eFAILURE;
 }
+
+
+int druid_elemental(struct char_data *ch, struct obj_data *obj,
+ int cmd, char *arg, struct char_data *owner)
+{
+  if (cmd) return eFAILURE;
+  if(!ch->master) {
+    log("Elemental without a master.", IMMORTAL, LOG_BUG);
+    extract_char(ch, TRUE);
+    return (eCH_DIED | eSUCCESS);
+  }
+  if( GET_POS(ch) < POSITION_STANDING )
+     return eFAILURE;
+  if(!ch->fighting) 
+  {
+    if(ch->in_room != ch->master->in_room) {
+      do_emote(ch, "creates an elemental gateway and steps through.\r\n", 9);
+      move_char(ch, ch->master->in_room);
+      act("An elemental gateway shimmers into existance and $n emerges.",ch, 0, 0, TO_ROOM, 0);
+      return eSUCCESS;
+    }
+  }
+
+  return eSUCCESS;
+}
+
 
 int mage_golem(struct char_data *ch, struct obj_data *obj, int cmd,
 	char *arg, struct char_data *owner)

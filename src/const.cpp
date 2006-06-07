@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.192 2006/06/04 01:03:57 jhhudso Exp $ */
+/* $Id: const.cpp,v 1.193 2006/06/07 20:25:10 dcastle Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1488,7 +1488,7 @@ struct class_skill_defines u_skills[] = { // druid skills
 {    "greater stoneshield",  SPELL_GREATER_STONE_SHIELD, 47,     98,     {STR,WIS} },  
 {    "colour spray",         SPELL_COLOUR_SPRAY,         48,     98,     {WIS,INT} },  
 {    "summon",               SPELL_SUMMON,               49,     98,     {INT,STR} },  
-//{ "conjure elemental",     SPELL_CONJURE_ELEMENTAL,    50,     98,     {0,0} },
+{ "conjure elemental",     SPELL_CONJURE_ELEMENTAL,    50,     98,     {WIS,STR} },
 {    "\n",                   0,                          1,      0,      {0,0} }
 };
 

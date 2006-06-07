@@ -156,6 +156,7 @@ void assign_non_combat_procs() {
     SPEC_FUN    koban_non_combat;
     SPEC_FUN    arena_only;
     SPEC_FUN mage_golem;
+    SPEC_FUN druid_elemental;
     SPEC_FUN druid_familiar_owl_non;
     SPEC_FUN mage_familiar_gremlin_non;
     SPEC_FUN    mage_familiar_imp_non;
@@ -177,6 +178,10 @@ void assign_non_combat_procs() {
    assign_one_mob_non(4, mage_familiar_gremlin_non);
     assign_one_mob_non(6,  druid_familiar_chipmunk_non);
    assign_one_mob_non(7, druid_familiar_owl_non);
+   assign_one_mob_non(88, druid_elemental);
+   assign_one_mob_non(89, druid_elemental);
+   assign_one_mob_non(90, druid_elemental);
+   assign_one_mob_non(91, druid_elemental);
     //assign_one_mob_non(69,  areanotopen);
     assign_one_mob_non(70,  pir_slut);
     assign_one_mob_non(200,  mud_school_adept);
