@@ -3461,6 +3461,11 @@ int spell_summon(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data 
        return eFAILURE;
     }
 
+  if(IS_ARENA(victim->in_room) && !IS_ARENA(ch->in_room)) {
+    send_to_char("You can't summon someone OUT of an areana!\n\r", ch);
+    return eFAILURE;
+  }
+
   if(number(1, 100) > 50 + skill/2 ||
 	affected_by_spell(victim, FUCK_PTHIEF) || affected_by_spell(victim, FUCK_GTHIEF)) {
     send_to_char("Your attempted summoning fails.\r\n", ch);
