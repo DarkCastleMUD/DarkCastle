@@ -2472,13 +2472,18 @@ int spell_protection_from_evil(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, st
   struct affected_type af;
   assert(victim);
 
-  int duration = 6 + (skill>40)*4 + (skill>60)*4 + (skill>80)*4;
-  int modifier = level + skill/10;
+  int duration = skill/3;
+  int modifier = level + skill/6;
  
   /* keep spells from stacking */
-  if (IS_AFFECTED(victim,AFF_PROTECT_EVIL) || affected_by_spell(victim, SPELL_PROTECT_FROM_GOOD))
-	 return eFAILURE;
+  if (IS_AFFECTED(victim, AFF_PROTECT_EVIL) || 
+      IS_AFFECTED(victim, AFF_PROTECT_GOOD) || 
+      affected_by_spell(victim, SPELL_PROTECT_FROM_GOOD))
+    return eFAILURE;
+
+  // Used to identify PFE from godload_defender(), obj vnum 556
   if (skill == 150) { duration = 4; modifier = 60; } 
+
   if (!affected_by_spell(victim, SPELL_PROTECT_FROM_EVIL) ) 
   {
 	 af.type      = SPELL_PROTECT_FROM_EVIL;
@@ -2501,10 +2506,14 @@ int spell_protection_from_good(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, st
   struct affected_type af;
   assert(victim);
 
-  int duration = 6 + (skill>40)*4 + (skill>60)*4 + (skill>80)*4;
-  int modifier = level + skill/5;
-  if (IS_AFFECTED(victim,AFF_PROTECT_GOOD) || IS_AFFECTED(victim, AFF_PROTECT_EVIL) || affected_by_spell(victim, SPELL_PROTECT_FROM_EVIL))
-	 return eFAILURE;
+  int duration = skill/3;
+  int modifier = level + skill/6;
+
+  /* keep spells from stacking */
+  if (IS_AFFECTED(victim, AFF_PROTECT_GOOD) ||
+      IS_AFFECTED(victim, AFF_PROTECT_EVIL) ||
+      affected_by_spell(victim, SPELL_PROTECT_FROM_EVIL))
+    return eFAILURE;
 
   if (!affected_by_spell(victim, SPELL_PROTECT_FROM_GOOD)) 
   {
