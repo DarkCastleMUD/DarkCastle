@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.122 2006/06/08 20:17:58 shane Exp $ */
+/* $Id: db.cpp,v 1.123 2006/06/08 20:42:05 shane Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -662,6 +662,9 @@ void boot_db(void)
 
     log ("Turning on MOB Progs", 0, LOG_MISC);
     MOBtrigger = TRUE;
+
+    log ("Loading quest one liners.", 0, LOG_MISC);
+    load_quests();
 
     mud_is_booting = FALSE;
 }
