@@ -2483,7 +2483,7 @@ int spell_protection_from_evil(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, st
   assert(victim);
 
   int duration = skill/3;
-  int modifier = level + skill/6;
+  int modifier = level + 10;
  
   /* keep spells from stacking */
   if (IS_AFFECTED(victim, AFF_PROTECT_EVIL) || 
@@ -2517,7 +2517,7 @@ int spell_protection_from_good(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, st
   assert(victim);
 
   int duration = skill/3;
-  int modifier = level + skill/6;
+  int modifier = level + 10;
 
   /* keep spells from stacking */
   if (IS_AFFECTED(victim, AFF_PROTECT_GOOD) ||
@@ -7439,23 +7439,20 @@ int cast_protection_from_evil( ubyte level, CHAR_DATA *ch, char *arg, int type,
          return spell_protection_from_evil(level, ch, tar_ch, 0, skill);
       break;
 
-    // for potions/wands etc, to get the numbers right, we *level by 2
-    // since it gets divided by 2 for the level affected and have a skill
-    // of 0 to make the numbers work right.
     case SPELL_TYPE_POTION:
-      return spell_protection_from_evil(level*2, ch, ch, 0, 0);
+      return spell_protection_from_evil(level, ch, ch, 0, 0);
       break;
     case SPELL_TYPE_WAND:
       if(tar_obj) return eFAILURE;
-      return spell_protection_from_evil(level*2, ch, tar_ch, 0, 0);
+      return spell_protection_from_evil(level, ch, tar_ch, 0, 0);
     case SPELL_TYPE_SCROLL:
       if(tar_obj) return eFAILURE;
       if(!tar_ch) tar_ch = ch;
-        return spell_protection_from_evil(level*2, ch, tar_ch, 0, 0);
+        return spell_protection_from_evil(level, ch, tar_ch, 0, 0);
       break;
     case SPELL_TYPE_STAFF:
       for (tar_ch = world[ch->in_room].people; tar_ch ; tar_ch = tar_ch->next_in_room)
-        spell_protection_from_evil(level*2,ch,tar_ch,0, 0);
+        spell_protection_from_evil(level,ch,tar_ch,0, 0);
       break;
     default :
       log("Serious screw-up in protection from evil!", ANGEL, LOG_BUG);
@@ -7481,23 +7478,20 @@ int cast_protection_from_good( ubyte level, CHAR_DATA *ch, char *arg, int type,
          return spell_protection_from_good(level, ch, tar_ch, 0, skill);
       break;
 
-    // for potions/wands etc, to get the numbers right, we *level by 2
-    // since it gets divided by 2 for the level affected and have a skill
-    // of 0 to make the numbers work right.
     case SPELL_TYPE_POTION:
-      return spell_protection_from_good(level*2, ch, ch, 0, 0);
+      return spell_protection_from_good(level, ch, ch, 0, 0);
       break;
     case SPELL_TYPE_WAND:
       if(tar_obj) return eFAILURE;
-      return spell_protection_from_good(level*2, ch, tar_ch, 0, 0);
+      return spell_protection_from_good(level, ch, tar_ch, 0, 0);
     case SPELL_TYPE_SCROLL:
       if(tar_obj) return eFAILURE;
       if(!tar_ch) tar_ch = ch;
-        return spell_protection_from_good(level*2, ch, tar_ch, 0, 0);
+        return spell_protection_from_good(level, ch, tar_ch, 0, 0);
       break;
     case SPELL_TYPE_STAFF:
       for (tar_ch = world[ch->in_room].people; tar_ch ; tar_ch = tar_ch->next_in_room)
-        spell_protection_from_good(level*2,ch,tar_ch,0, 0);
+        spell_protection_from_good(level,ch,tar_ch,0, 0);
       break;
     default :
       log("Serious screw-up in protection from good!", ANGEL, LOG_BUG);
