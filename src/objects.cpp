@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.68 2006/06/05 23:46:28 dcastle Exp $
+| $Id: objects.cpp,v 1.69 2006/06/08 15:37:14 apocalypse Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -829,7 +829,7 @@ int do_drink(struct char_data *ch, char *argument, int cmd)
     {
       if(temp->obj_flags.value[1]>0)  /* Not empty */
       {   
-        sprintf(buf, "$n drinks %s from $p",drinks[temp->obj_flags.value[2]]);
+        sprintf(buf, "$n drinks %s from $p.",drinks[temp->obj_flags.value[2]]);
         act(buf, ch, temp, 0, TO_ROOM, INVIS_NULL);
         sprintf(buf, "You drink the %s.\n\r",drinks[temp->obj_flags.value[2]]);
         send_to_char(buf,ch);
