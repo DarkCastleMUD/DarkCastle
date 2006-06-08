@@ -16,7 +16,7 @@
  *  10/21/2003   Onager    Changed IS_ANONYMOUS() to handle mobs without   *
  *                         crashing                                        *
  ***************************************************************************/
-/* $Id: utility.h,v 1.41 2006/06/05 23:46:32 dcastle Exp $ */
+/* $Id: utility.h,v 1.42 2006/06/08 20:18:02 shane Exp $ */
 
 #ifndef UTILITY_H_
 #define UTILITY_H_
@@ -247,7 +247,7 @@ bool IS_DARK( int room );
 #define GET_REAL_HITROLL(ch) ((ch)->hitroll + dex_app[GET_DEX((ch))].tohit)
 #define GET_DAMROLL(ch)  ((ch)->damroll)
 #define GET_REAL_DAMROLL(ch) ((ch)->damroll + str_app[GET_STR((ch))].todam)
-
+#define GET_QPOINTS(ch)  ((ch)->pcdata->quest_points)
 
 #define GET_RACE(ch)     ((ch)->race)
 #define GET_BITV(ch)     ((ch)->race==1?1:(1<<(((ch)->race)-1)))

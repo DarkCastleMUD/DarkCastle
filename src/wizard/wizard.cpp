@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.30 2006/01/13 16:49:24 dcastle Exp $
+| $Id: wizard.cpp,v 1.31 2006/06/08 20:18:05 shane Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -605,8 +605,8 @@ void mob_stat(struct char_data *ch, struct char_data *k)
   send_to_char(buf, ch);
 
   if(!IS_MOB(k)) {
-    sprintf(buf, "$3Plats$R:[%d]  $3Bank$R:[%d]  $3Clan$R:[%d]\n\r", 
-          GET_PLATINUM(k), GET_BANK(k), GET_CLAN(k) );
+    sprintf(buf, "$3Plats$R:[%d]  $3Bank$R:[%d]  $3Clan$R:[%d]  $3Quest Points$R:[%d]\n\r", 
+          GET_PLATINUM(k), GET_BANK(k), GET_CLAN(k), GET_QPOINTS(k) );
     send_to_char(buf, ch);
   }
    

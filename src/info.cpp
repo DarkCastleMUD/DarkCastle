@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.107 2006/06/06 12:13:58 dcastle Exp $ */
+/* $Id: info.cpp,v 1.108 2006/06/08 20:17:58 shane Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -1361,7 +1361,7 @@ int do_score(struct char_data *ch, char *argument, int cmd)
       "|~|   $3BonusDam$7: %+4d $3RDeaths$7: %5d |o|    $3Experience$7:     %-10lld      |\\|\n\r"
       "|/|   $B$4FIRE$R[%+3d] $B$3COLD$R[%+3d] $B$5NRGY$R[%+3d] |\\|    $3ExpTillLevel$7:   %-10lld      |o|\n\r"
       "|o|   $B$2ACID$R[%+3d] $B$7MAGK$R[%+3d] $2POIS$7[%+3d] |~|    $3Gold$7: %-9d $3Platinum$7: %-5d |/|\n\r"
-      "|\\|   $3MELE$R[%+3d] $3SPEL$R[%+3d] $3SONG$R[%+3d] |/|    $3Bank$7: %-10d                |-|\n\r"
+      "|\\|   $3MELE$R[%+3d] $3SPEL$R[%+3d] $3SONG$R[%+3d] |/|    $3Bank$7: %-10d$3QPoints$7: %-5d |-|\n\r"
       "($5:$7)=================================($5:$7)====================================($5:$7)\n\r",
    GET_ARMOR(ch), GET_PKILLS(ch),   IS_CARRYING_N(ch), CAN_CARRY_N(ch),
    to_hit, GET_PDEATHS(ch),  IS_CARRYING_W(ch), CAN_CARRY_W(ch),
@@ -1369,7 +1369,7 @@ int do_score(struct char_data *ch, char *argument, int cmd)
    get_saves(ch,SAVE_TYPE_FIRE), get_saves(ch, SAVE_TYPE_COLD), get_saves(ch, SAVE_TYPE_ENERGY), GET_LEVEL(ch) == IMP ? 0 
 : exp_needed, 
    get_saves(ch, SAVE_TYPE_ACID), get_saves(ch, SAVE_TYPE_MAGIC), get_saves(ch, SAVE_TYPE_POISON), (int)GET_GOLD(ch), (int)GET_PLATINUM(ch),
-   ch->melee_mitigation, ch->spell_mitigation, ch->song_mitigation, (int)GET_BANK(ch));
+   ch->melee_mitigation, ch->spell_mitigation, ch->song_mitigation, (int)GET_BANK(ch), GET_QPOINTS(ch));
 
      send_to_char(buf, ch);
    }

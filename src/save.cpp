@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: save.cpp,v 1.39 2006/06/03 09:29:36 dcastle Exp $ */
+/* $Id: save.cpp,v 1.40 2006/06/08 20:17:58 shane Exp $ */
 
 extern "C"
 {
@@ -281,9 +281,14 @@ void save_pc_data(struct pc_data * i, FILE * fpsave, struct time_data tmpage)
   if(i->joining) {
     fwrite("JIN", sizeof(char), 3, fpsave);
     fwrite_var_string(i->joining, fpsave);
-//    fwrite(&(i->kimetas), sizeof(i->kimetas), 1, fpsave);
   }
 
+  fwrite("QST", sizeof(char), 3, fpsave);
+  fwrite(&(i->quest_points), sizeof(i->quest_points), 1, fpsave);
+  for(int j=0;j<QUEST_PASS;j++)
+    fwrite(&(i->quest_pass[j]), sizeof(i->quest_pass[j]), 1, fpsave);
+  for(int j=0;j<=QUEST_TOTAL/QSIZE;j++)
+    fwrite(&(i->quest_complete[j]), sizeof(i->quest_complete[j]), 1, fpsave);
 
   // Any future additions to this save file will need to be placed LAST here with a 3 letter code
   // and appropriate strcmp statement in the read_mob_data object
@@ -366,6 +371,14 @@ void read_pc_data(struct char_data *ch, FILE* fpsave)
   {
     i->joining = fread_var_string(fpsave);
     fread(&typeflag, sizeof(char), 3, fpsave);
+  }
+  if (!strcmp("QST", typeflag))
+  {
+    fread(&(i->quest_points), sizeof(i->quest_points), 3, fpsave);
+    for(int j = 0;j<QUEST_PASS;j++)
+      fread(&(i->quest_pass[j]), sizeof(i->quest_pass[j]), 3, fpsave);
+    for(int j=0;j<=QUEST_TOTAL/QSIZE;j++)
+      fread(&(i->quest_complete[j]), sizeof(i->quest_complete[j]), 3, fpsave);
   }
   i->skillchange = 0;
   // Add new items in this format

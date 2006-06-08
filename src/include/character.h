@@ -1,7 +1,7 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.42 2006/06/05 23:46:32 dcastle Exp $
+| $Id: character.h,v 1.43 2006/06/08 20:18:02 shane Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
@@ -17,6 +17,7 @@
 #include <utility.h>
 #include <mobile.h>
 #include <queue>
+#include <quest.h>
 
 #define START_ROOM        3001 // Where you login
 #define SECOND_START_ROOM 3059 // Where you go if killed in start room
@@ -251,6 +252,11 @@ struct pc_data
     struct player_vault *vault;
     std::queue<char *> *away_msgs;
     char *joining;
+    uint32 quest_points;
+    int16  quest_current[QUEST_MAX];
+    uint32 quest_current_timestarted[QUEST_MAX];
+    int16  quest_pass[QUEST_PASS];
+    uint32 quest_complete[QUEST_TOTAL/QSIZE+1];
 };
 
 struct mob_data

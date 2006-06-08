@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.h,v 1.50 2006/06/03 09:30:55 dcastle Exp $ */
+/* $Id: interp.h,v 1.51 2006/06/08 20:18:02 shane Exp $ */
 
 #ifndef INTERP_H_
 #define INTERP_H_
@@ -292,7 +292,9 @@ DO_FUN  do_punish;
 DO_FUN  do_purge;
 DO_FUN  do_purloin;
 DO_FUN  do_put;
+DO_FUN  do_qedit;
 DO_FUN  do_quaff;
+DO_FUN  do_quest;
 DO_FUN  do_qui;
 DO_FUN  do_quivering_palm;
 DO_FUN  do_quit;

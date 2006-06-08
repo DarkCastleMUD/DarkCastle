@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.121 2006/06/05 23:51:28 jhhudso Exp $ */
+/* $Id: db.cpp,v 1.122 2006/06/08 20:17:58 shane Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -59,6 +59,7 @@ extern "C"
 #include <spells.h> // command_range
 #include <shop.h>
 #include <help.h>
+#include <quest.h>
 
 int load_new_help(FILE *fl, int reload, struct char_data *ch);
 void load_corpses(void);
@@ -94,6 +95,7 @@ extern short bport;
 
 CHAR_DATA *character_list = 0; /* global l-list of chars          */
 pulse_data *bard_list = 0;      /* global l-list of bards          */
+struct quest_info *quest_list = 0; /* global l-list of quests */
 
 room_data & CWorld::operator[](int rnum)
 {

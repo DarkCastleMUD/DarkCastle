@@ -65,6 +65,7 @@
 #include <db.h>
 #include <comm.h>
 #include <returnvals.h>
+#include <quest.h>
 
 
 #ifndef INVALID_SOCKET
@@ -1031,6 +1032,7 @@ void heartbeat()
     affect_update();
     update_corpses_and_portals();
     check_idle_passwords();
+    quest_update();
   }
 }
 

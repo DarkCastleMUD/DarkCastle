@@ -125,7 +125,8 @@ void assign_non_combat_procs() {
     SPEC_FUN    platmerchant;
     SPEC_FUN    moritician;
     SPEC_FUN    meta_dude;
-     SPEC_FUN gl_repair_shop;
+    SPEC_FUN    quest_master;
+    SPEC_FUN    gl_repair_shop;
     SPEC_FUN    godload_sales;
     SPEC_FUN    skill_master;
     SPEC_FUN    repair_guy;
@@ -258,6 +259,7 @@ void assign_non_combat_procs() {
     assign_one_mob_non(1926,  guild);
     assign_one_mob_non(10011,  skill_master);
     assign_one_mob_non(10009, meta_dude);
+    assign_one_mob_non(10027, quest_master);
     assign_one_mob_non(1927,  guild_guard);
     assign_one_mob_non(1928,  guild);
     assign_one_mob_non(14537, apiary_worker);

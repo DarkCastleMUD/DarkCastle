@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.53 2006/05/23 13:28:14 jhhudso Exp $ */
+/* $Id: utility.cpp,v 1.54 2006/06/08 20:17:58 shane Exp $ */
 
 extern "C"
 {
@@ -1202,6 +1202,7 @@ mob_index[fol->follower->mobdata->nr].virt == 8)
     extract_obj(ch->beacon);
 
   find_and_remove_player_portal(ch);
+  stop_all_quests(ch);
 
   if(cmd != 666)
      clan_logout(ch);

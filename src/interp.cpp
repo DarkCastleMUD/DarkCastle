@@ -16,7 +16,7 @@
 /* 12/08/2003   Onager   Added chop_half() to work like half_chop() but    */
 /*                       chopping off the last word.                       */
 /***************************************************************************/
-/* $Id: interp.cpp,v 1.89 2006/06/03 09:29:36 dcastle Exp $ */
+/* $Id: interp.cpp,v 1.90 2006/06/08 20:17:58 shane Exp $ */
 
 extern "C"
 {
@@ -276,6 +276,7 @@ struct command_info cmd_info[] =
     { "leave",		do_leave,	POSITION_STANDING, 0, 187, COM_CHARMIE_OK, 20 },
     { "name",		do_name,	POSITION_DEAD, 1, 9, 0, 1 },
     { "pick",		do_pick,	POSITION_STANDING, 0, 35, 0, 20 },
+    { "quest",          do_quest,       POSITION_DEAD, IMMORTAL, 9, 0, 1 },
     { "qui",		do_qui,		POSITION_DEAD, 0, 9, 0, 1 },
     { "levels",		do_levels,	POSITION_DEAD, 0, 9, 0, 1 },
     { "quit",		do_quit,	POSITION_DEAD, 0, 91, 0, 1 },
@@ -395,6 +396,7 @@ struct command_info cmd_info[] =
     { "sockets",	do_sockets,	POSITION_DEAD, GIFTED_COMMAND, 9, 0, 1 },
     { "punish",		do_punish,	POSITION_DEAD, GIFTED_COMMAND, 9, 0, 1 },
     { "sqedit",		do_sqedit,	POSITION_DEAD, GIFTED_COMMAND, 9, 0, 1 },
+    { "qedit",		do_qedit,	POSITION_DEAD, GIFTED_COMMAND, 9, 0, 1 },
     { "install",	do_install,	POSITION_DEAD, IMP, 9, 0, 1 },
     { "hedit",		do_hedit,	POSITION_DEAD, GIFTED_COMMAND, 9, 0, 1 },
     { "hindex",		do_hindex,	POSITION_DEAD, GIFTED_COMMAND, 9, 0, 1 },

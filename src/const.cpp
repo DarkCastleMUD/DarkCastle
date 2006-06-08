@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.193 2006/06/07 20:25:10 dcastle Exp $ */
+/* $Id: const.cpp,v 1.194 2006/06/08 20:17:58 shane Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -36,39 +36,40 @@ extern "C"
 #include <mobile.h>
 bestowable_god_commands_type bestowable_god_commands[] =
 {
-{ "impchan",		COMMAND_IMP_CHAN },
+{ "impchan",	COMMAND_IMP_CHAN },
 { "snoop",	COMMAND_SNOOP },
 { "global",	COMMAND_GLOBAL },
 { "restore",	COMMAND_RESTORE },
 { "purloin",	COMMAND_PURLOIN },
-{ "possess",   COMMAND_POSSESS},
+{ "possess",	COMMAND_POSSESS},
 { "arena",	COMMAND_ARENA },
 { "set",	COMMAND_SET },
 { "load",	COMMAND_LOAD },
 { "shutdown",   COMMAND_SHUTDOWN },
-{ "procedit",     COMMAND_MP_EDIT },
+{ "procedit",	COMMAND_MP_EDIT },
 { "range",      COMMAND_RANGE },
-{ "procstat",     COMMAND_MPSTAT },
+{ "procstat",	COMMAND_MPSTAT },
 { "pshopedit",  COMMAND_PSHOPEDIT },
 { "sedit",      COMMAND_SEDIT },
 { "punish",     COMMAND_PUNISH },
 { "sqedit",     COMMAND_SQEDIT },
-{ "oclone",    COMMAND_OCLONE },
+{ "oclone",	COMMAND_OCLONE },
 { "hedit",      COMMAND_HEDIT },
 { "hindex",     COMMAND_HINDEX },
 { "opstat",	COMMAND_OPSTAT },
 { "opedit",	COMMAND_OPEDIT },
-{ "eqmax",COMMAND_EQMAX},
-{"force",COMMAND_FORCE},
-{"string",COMMAND_STRING},
-{"stat",COMMAND_STAT},
-{"sqsave",COMMAND_SQSAVE},
-{"whattonerf",COMMAND_WHATTONERF},
-{"find",COMMAND_FIND},
-{"log",COMMAND_LOG},
-{"addnews",COMMAND_ADDNEWS},
-{"prize",COMMAND_PRIZE},
-{"sockets",COMMAND_SOCKETS},
+{ "eqmax",	COMMAND_EQMAX },
+{ "force",	COMMAND_FORCE },
+{ "string",	COMMAND_STRING },
+{ "stat",	COMMAND_STAT },
+{ "sqsave",	COMMAND_SQSAVE },
+{ "whattonerf",	COMMAND_WHATTONERF },
+{ "find",	COMMAND_FIND },
+{ "log",	COMMAND_LOG },
+{ "addnews",	COMMAND_ADDNEWS },
+{ "prize",	COMMAND_PRIZE },
+{ "sockets",	COMMAND_SOCKETS },
+{ "qedit",	COMMAND_QEDIT },
 { "\n",		-1 }
 };
 
