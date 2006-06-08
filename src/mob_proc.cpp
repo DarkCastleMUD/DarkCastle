@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.97 2006/06/07 20:25:11 dcastle Exp $ */
+/* $Id: mob_proc.cpp,v 1.98 2006/06/08 18:30:06 apocalypse Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -3066,7 +3066,11 @@ static char *dethSayText [ ] =
   "Ahh yes, the good old days of the Internet...when men were men, women were men, and children were FBI agents.",
   "I think Bush's foreign policy is quite reasonable.",
   "Remember, arguing on the Internet is like entering the Special Olympics...even if you win, you're still a retard.",
-  "Sorry guys, I have to step down as Implementor so I can pass my PhD."
+  "Sorry guys, I have to step down as Implementor so I can pass my PhD.",
+  "Chuck Norris doesn't teabag the ladies, he potato sacks them!",
+  "Chuck Norris' tears could cure cancer except he's never cried.",
+  "Sheep are great and all, but goats have handlebars and rabbits are handheld.",
+  "Don't worry guys, I'll Imm more and shave when I'm done "finding myself"...until then I'm going to roam the land like in Kung Fu."
 };
 
 #define DETH_SAY_TEXT_SIZE    ( sizeof ( dethSayText )    / sizeof ( char * ) )
