@@ -110,6 +110,16 @@ bool can_heal(CHAR_DATA *ch, CHAR_DATA *victim, int spellnum)
 {
   bool can_cast = TRUE;
 
+  // You cannot heal an elemental from "conjure elemental"
+  if (IS_NPC(victim) &&
+      (mob_index[victim->mobdata->nr].virt == 88 ||
+       mob_index[victim->mobdata->nr].virt == 89 ||
+       mob_index[victim->mobdata->nr].virt == 90 ||
+       mob_index[victim->mobdata->nr].virt == 91)) {
+    send_to_char("The heavy magics surrounding this being prevent healing.\r\n",ch);
+    return FALSE;
+  }
+
   if (GET_HIT(victim) > GET_MAX_HIT(victim)-10)
   {
     if (spellnum != SPELL_CURE_LIGHT)
