@@ -2895,7 +2895,7 @@ int godload_aligngood(struct char_data*ch, struct obj_data *obj, int cmd, char*a
      return eSUCCESS;
   }
   addTimer(ch, SPELL_ALIGN_GOOD, 48);
-  GET_ALIGNMENT(ch) += 100;
+  GET_ALIGNMENT(ch) += 400;
   if (GET_ALIGNMENT(ch) > 1000) GET_ALIGNMENT(ch) = 1000;
   send_to_char("You are purified by the light of the fire.\r\n",ch);
   return eSUCCESS;  
@@ -2916,7 +2916,7 @@ int godload_alignevil(struct char_data*ch, struct obj_data *obj, int cmd, char*a
      return eSUCCESS;
   }
   addTimer(ch, SPELL_ALIGN_EVIL, 48);
-  GET_ALIGNMENT(ch) -= 100;
+  GET_ALIGNMENT(ch) -= 400;
   if (GET_ALIGNMENT(ch) < -1000) GET_ALIGNMENT(ch) = -1000;
   send_to_char("You are burnt by the heart's darkness.\r\n",ch);
   return eSUCCESS;
