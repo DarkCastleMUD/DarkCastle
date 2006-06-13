@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.125 2006/06/13 18:56:07 shane Exp $ */
+/* $Id: nanny.cpp,v 1.126 2006/06/13 23:52:07 shane Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -338,6 +338,8 @@ void do_on_login_stuff(char_data * ch)
     {
        GET_AC(ch) -= (GET_LEVEL(ch) * 2);
     }
+    GET_AC(ch) -= has_skill(ch, SKILL_COMBAT_MASTERY)/2;
+
     if (affected_by_spell(ch,INTERNAL_SLEEPING))
     {
       affect_from_char(ch,INTERNAL_SLEEPING);
@@ -385,7 +387,7 @@ void do_on_login_stuff(char_data * ch)
           struct char_skill_data * curr = ch->skills;
           while(curr) {
            if (curr->skillnum == SKILL_SHIELDBLOCK) {
-              curr->skillnum == SKILL_DODGE;
+              curr->skillnum = SKILL_DODGE;
               curr->learned = MIN(curr->learned, 50);
            }
            curr = curr->next;
@@ -1738,7 +1740,12 @@ world[i->in_room].sector_type == SECT_UNDERWATER && !(affected_by_spell(i, SPELL
           i->timer--;
         else i->timer = 0;
       }
+
       i->shotsthisround = 0;
+
+      if(IS_AFFECTED(i, AFF_CMAST_WEAKEN)) REMBIT(i->affected_by, AFF_CMAST_WEAKEN);
+      affect_from_char(i, SKILL_COMBAT_MASTERY);
+
    }
 }
 

@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.195 2006/06/13 18:56:07 shane Exp $ */
+/* $Id: const.cpp,v 1.196 2006/06/13 23:52:07 shane Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -894,6 +894,9 @@ char *affected_bits[] =
     "NO_PARA",
     "NO_CIRCLE",
     "NO_BEHEAD",
+    "BOUNT_SONNET_HUNGER",
+    "BOUNT_SONNET_THIRST",
+    "CMAST_WEAKEN",
     "\n"
 };
 
@@ -1151,7 +1154,7 @@ struct class_skill_defines w_skills[] = { // warrior skills
 {    "stinging",        SKILL_STINGING_WEAPONS,   43,   90,     {DEX,INT} },
 {    "skewer",          SKILL_SKEWER,             45,   98,     {STR,CON} },
 {    "blade shield",    SKILL_BLADESHIELD,        47,   98,     {CON,DEX} },
-{    "combat mastery",  SKILL_COMBAT_MASTERY,     50,   98,     {DEX, CON} },
+{    "combat mastery",  SKILL_COMBAT_MASTERY,     50,   98,     {DEX,CON} },
 {    "\n",              0,                        1,    0,      {0,0} }
 };
 

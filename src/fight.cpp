@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.316 2006/06/13 21:04:30 urizen Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.317 2006/06/13 23:52:07 shane Exp $ */
 
 extern "C"
 {
@@ -1238,25 +1238,10 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
   
   // Now check for special code that occurs each hit
   retval = do_skewer(ch, vict, dam, weapon_type, w_type,weapon);
-/*
-  // if we both died in the skewer, don't kill the victim
-  if(IS_SET(retval, eCH_DIED)) {
-    if(IS_SET(retval, eVICT_DIED)) {
-      GET_HIT(vict) = 1;
-      update_pos(vict);
-    }
-    REMOVE_BIT(retval, eVICT_DIED);
-    return retval;
-  }
-
-  // HA!  skewered the bastard to death!
-  if(IS_SET(retval, eVICT_DIED)) { 
-    group_gain(ch, vict);
-    fight_kill(ch, vict, TYPE_CHOOSE, 0);
-    return ( eSUCCESS|eVICT_DIED );
-  }
-  */
   if (SOMEONE_DIED(retval)) return retval;
+
+  do_combatmastery(ch, vict, weapon);
+  if(ISSET(ch->affected_by, AFF_CMAST_WEAKEN)) dam /= 2;
 
   if (w_type == TYPE_HIT && IS_NPC(ch))
   {
@@ -3592,6 +3577,60 @@ int do_skewer(CHAR_DATA *ch, CHAR_DATA *vict, int dam, int wt, int wt2, int weap
   }
   // if they're still here the skewer missed
   return eSUCCESS;
+}
+
+void do_combatmastery(CHAR_DATA *ch, CHAR_DATA *vict, int weapon)
+{
+  if((GET_CLASS(ch) != CLASS_WARRIOR) && GET_LEVEL(ch) < ARCHANGEL)  return;
+  if(!IS_NPC(vict) && GET_LEVEL(vict) >= IMMORTAL)                   return;	
+  if(!ch->equipment[weapon])                                         return;
+  if (!has_skill(ch, SKILL_COMBAT_MASTERY)) return;
+  if (ch->in_room != vict->in_room) return;
+
+  int type = get_weapon_damage_type(ch->equipment[weapon]);
+  if( ! (type == TYPE_STING || type == TYPE_WHIP || type == TYPE_CRUSH || type == TYPE_BLUDGEON ))  return;
+
+  GET_AC(ch)+=has_skill(ch, SKILL_COMBAT_MASTERY)/2;
+  if(!skill_success(ch,vict, SKILL_COMBAT_MASTERY))                  return;
+  GET_AC(ch)-=has_skill(ch, SKILL_COMBAT_MASTERY)/2;
+
+  if(type == TYPE_STING) {
+     if(!IS_AFFECTED(vict, AFF_BLIND)) {
+        struct affected_type af;
+        af.type      = SKILL_COMBAT_MASTERY;
+        af.location  = APPLY_HITROLL;
+        af.modifier  = has_skill(vict,SKILL_BLINDFIGHTING)?skill_success(vict,0,SKILL_BLINDFIGHTING)?-10:-20:-20;
+        af.duration  = 1;
+        af.bitvector = AFF_BLIND;
+        affect_to_char(vict, &af);
+
+        af.location = APPLY_AC;
+        af.modifier  = has_skill(vict,SKILL_BLINDFIGHTING)?skill_success(vict,0,SKILL_BLINDFIGHTING)?+25:50:50;
+        affect_to_char(vict, &af);
+
+        act("Your attack stings $N's eyes, causing momentary blindness!", ch, 0, vict, TO_CHAR, 0);
+        act("$n's attack stings your eyes, causing momentary blindness!", ch, 0, vict, TO_VICT, 0);
+        act("$n's attack stings $N's eyes, causing momentary blindness!", ch, 0, vict, TO_ROOM, NOTVICT);
+     }
+  }
+  if(type == TYPE_BLUDGEON || type == TYPE_CRUSH) {
+     if(!IS_AFFECTED(vict, AFF_CMAST_WEAKEN)) {
+        SETBIT(vict->affected_by, AFF_CMAST_WEAKEN);
+        act("Your crushing blow causes $N's attacks to momentarily weaken!", ch, 0, vict, TO_CHAR, 0);
+        act("$n's crushing blow causes your attacks to momentarily weaken!", ch, 0, vict, TO_VICT, 0);
+        act("$n's crushing blow causes $N's attacks to momentarily weaken!", ch, 0, vict, TO_ROOM, NOTVICT);
+     }
+  }
+  if(type == TYPE_WHIP) {
+     if(GET_POS(vict) > POSITION_SITTING) {
+        GET_POS(vict) = POSITION_SITTING;
+        act("Your whipping attack trips up $N and $E goes down!", ch, 0, vict, TO_CHAR, 0);
+        act("$n's whipping attack trips you up, causing you to stumble and fall!", ch, 0, vict, TO_VICT, 0);
+        act("$n's whipping attack trips up $N causing $M to stumble and fall!", ch, 0, vict, TO_ROOM, NOTVICT);
+     }
+  }
+
+  return;
 }
 
 void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
