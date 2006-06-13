@@ -2482,7 +2482,7 @@ int spell_protection_from_evil(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, st
   struct affected_type af;
   assert(victim);
 
-  int duration = skill/3;
+  int duration = skill?skill/3:level/3;
   int modifier = level + 10;
  
   /* keep spells from stacking */
@@ -2516,7 +2516,7 @@ int spell_protection_from_good(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, st
   struct affected_type af;
   assert(victim);
 
-  int duration = skill/3;
+  int duration = skill?skill/3:level/3;
   int modifier = level + 10;
 
   /* keep spells from stacking */
