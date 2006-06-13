@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.194 2006/06/08 20:17:58 shane Exp $ */
+/* $Id: const.cpp,v 1.195 2006/06/13 18:56:07 shane Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1357,7 +1357,7 @@ struct class_skill_defines r_skills[] = { // ranger skills
 {    "redirect",        SKILL_REDIRECT,          7,      80,     {INT,CON} },
 {    "eyes of the owl", SPELL_EYES_OF_THE_OWL,   8,      90,     {INT,DEX} },
 {    "sense life",      SPELL_SENSE_LIFE,        9,      90,     {CON,INT} },
-{    "shield block",    SKILL_SHIELDBLOCK,       10,     60,     {STR,DEX} },
+{    "dodge",    	SKILL_DODGE,    	 10,     50,     {STR,DEX} },
 {    "tame",            SKILL_TAME,              11,     98,     {WIS,INT} },
 {    "double",          SKILL_SECOND_ATTACK,     12,     85,     {STR,DEX} },
 {    "feline agility",  SPELL_FELINE_AGILITY,    14,     98,     {DEX,INT} },
