@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.319 2006/06/14 05:49:55 shane Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.320 2006/06/14 17:58:39 urizen Exp $ */
 
 extern "C"
 {
@@ -3590,9 +3590,13 @@ void do_combatmastery(CHAR_DATA *ch, CHAR_DATA *vict, int weapon)
   int type = get_weapon_damage_type(ch->equipment[weapon]);
   if( ! (type == TYPE_STING || type == TYPE_WHIP || type == TYPE_CRUSH || type == TYPE_BLUDGEON ))  return;
 
-  GET_AC(ch)+=has_skill(ch, SKILL_COMBAT_MASTERY)/2;
+//  GET_AC(ch)+=has_skill(ch, SKILL_COMBAT_MASTERY)/2;
   if(!skill_success(ch,vict, SKILL_COMBAT_MASTERY))                  return;
-  GET_AC(ch)-=has_skill(ch, SKILL_COMBAT_MASTERY)/2;
+//  GET_AC(ch)-=has_skill(ch, SKILL_COMBAT_MASTERY)/2;
+  // AC irrelevant in skill_success and would get set back incorrectly if you gained a skillpoint
+
+
+  if (number(0,7)) return; // Chance lowered
 
   if(type == TYPE_STING) {
      if(!IS_AFFECTED(vict, AFF_BLIND)) {
