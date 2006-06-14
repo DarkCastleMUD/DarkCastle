@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.171 2006/06/14 16:42:38 urizen Exp $ */
+/* $Id: spells.cpp,v 1.172 2006/06/14 16:52:01 urizen Exp $ */
 
 extern "C"
 {
@@ -1308,9 +1308,9 @@ int do_release(CHAR_DATA *ch, char *argument, int cmd)
 	 ch->move -= 10;
          return eFAILURE;
        }
-	  ch->move -= 25;
 
 	if (!done)
+	  ch->move -= 25;
 	send_to_char("You release the spell.\r\n",ch);
              if (*spell_wear_off_msg[aff->type]) {
                 send_to_char(spell_wear_off_msg[aff->type], ch);
