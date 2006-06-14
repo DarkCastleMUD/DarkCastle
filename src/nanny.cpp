@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.126 2006/06/13 23:52:07 shane Exp $ */
+/* $Id: nanny.cpp,v 1.127 2006/06/14 19:08:04 shane Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -362,6 +362,17 @@ void do_on_login_stuff(char_data * ch)
     else                                 char_to_room( ch, real_room(START_ROOM) );
 
     REMBIT(ch->affected_by, AFF_BLACKJACK_ALERT);
+    for(int i=0;i<QUEST_MAX;i++) {
+       ch->pcdata->quest_current[i] = 0;
+       ch->pcdata->quest_current_timestarted[i] = 0;
+    }
+//    if(last login time was before when we put this in) {
+       ch->pcdata->quest_points = 0;
+       for(int i=0;i<QUEST_PASS;i++)
+          ch->pcdata->quest_pass[i] = 0;
+       for(int i=0;i<QUEST_TOTAL/QSIZE;i++)
+          ch->pcdata->quest_complete[i] = 0;
+//    }
     if (GET_CLASS(ch) == CLASS_MONK && GET_LEVEL(ch) > 10)
     {
 	  struct char_skill_data * curr = ch->skills;

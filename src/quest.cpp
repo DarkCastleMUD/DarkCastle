@@ -198,6 +198,8 @@ int check_quest_timer(CHAR_DATA *ch, struct quest_info *quest)
 
 bool check_available_quest(CHAR_DATA *ch, struct quest_info *quest)
 {
+   if(!quest) return FALSE;
+
    if(GET_LEVEL(ch) >= quest->level && check_quest_current(ch, quest->number)
          && check_quest_pass(ch, quest->number) && check_quest_complete(ch, quest->number)
          && !(quest->active) )
@@ -387,14 +389,13 @@ void show_complete_quests(CHAR_DATA *ch)
 
 int start_quest(CHAR_DATA *ch, struct quest_info *quest)
 {
-   int retval, count = 0;
+   int count = 0;
    uint16 price;
    OBJ_DATA *obj;
    CHAR_DATA *mob;
    char *buf;
 
-   retval = check_available_quest(ch, quest);
-   if(IS_SET(retval, eFAILURE)) return eFAILURE;
+   if(!check_available_quest(ch, quest)) return eFAILURE;
 
    while(count < QUEST_MAX) {
       if(!ch->pcdata->quest_current[count])
@@ -456,6 +457,8 @@ int complete_quest(CHAR_DATA *ch, struct quest_info *quest)
    OBJ_DATA *obj;
    char *buf;
 
+   if(!quest) return eFAILURE;
+
    while(count < QUEST_MAX) {
       if(ch->pcdata->quest_current[count] == quest->number)
          break;
@@ -484,7 +487,8 @@ int stop_current_quest(CHAR_DATA *ch, struct quest_info *quest)
    int count;
    OBJ_DATA *obj;
    char *buf;
-   if (!quest) return eSUCCESS;
+
+   if (!quest) return eFAILURE;
 
    while(count < QUEST_MAX) {
       if(ch->pcdata->quest_current[count] == quest->number)
@@ -508,14 +512,14 @@ int stop_current_quest(CHAR_DATA *ch, struct quest_info *quest)
 
 int stop_current_quest(CHAR_DATA *ch, int number)
 {
-   if (!number) return eSUCCESS;
+   if (!number) return eFAILURE;
+
    struct quest_info *quest = get_quest_struct(number);
    return stop_current_quest(ch, quest);
 }
 
 int stop_all_quests(CHAR_DATA *ch)
 {
-   return eSUCCESS;
    int retval;
 
    for(int i = 0;i < QUEST_MAX; i++)
@@ -598,13 +602,14 @@ int quest_master(CHAR_DATA *ch, OBJ_DATA *obj, int cmd, char *arg, CHAR_DATA *ow
       return eFAILURE;
 
 
-   if(cmd == 59)
+   if(cmd == 59) {
       send_to_char("The Quest Master tells you, 'Here is what I can do for you.'\n\r", ch);
       csendf(ch, "1) something\n\r"
                  "2) something else\n\r"
                  "3) something fun\n\r"
                  "\n\r"
              );
+   }
 
    if(cmd == 56 && isdigit(*arg))
       switch (atoi(arg)){
@@ -635,27 +640,27 @@ int do_quest(CHAR_DATA *ch, char *arg, int cmd)
       show_complete_quests(ch);
    else if(is_abbrev(arg, "available")) {
       if(!qmaster) return eFAILURE;
-      if(ch->in_room == qmaster->in_room)
+      if(ch->in_room != qmaster->in_room)
          send_to_char("You must ask the Quest Master for available quests.\n\r", ch);
       else retval = quest_handler(ch, qmaster, 1, 0);
    }
    else if(is_abbrev(arg, "passed") && *name) {
       if(!qmaster) return eFAILURE;
-      if(ch->in_room == qmaster->in_room)
+      if(ch->in_room != qmaster->in_room)
          send_to_char("You must let the Quest Master know of your intentions.\n\r", ch);
       else retval = quest_handler(ch, qmaster, 2, name);
       return retval;
    }
    else if(is_abbrev(arg, "start") && *name) {
       if(!qmaster) return eFAILURE;
-      if(ch->in_room == qmaster->in_room)
+      if(ch->in_room != qmaster->in_room)
          send_to_char("You may only begin quests given from the Quest Master.\n\r", ch);
       else retval = quest_handler(ch, qmaster, 3, name);
       return retval;
    }
    else if(is_abbrev(arg, "finish") && *name) {
       if(!qmaster) return eFAILURE;
-      if(ch->in_room == qmaster->in_room)
+      if(ch->in_room != qmaster->in_room)
          send_to_char("You may only finish quests in the presence of the Quest Master.\n\r", ch);
       else retval = quest_handler(ch, qmaster, 4, name);
       return retval;

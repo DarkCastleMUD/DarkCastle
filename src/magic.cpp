@@ -4328,8 +4328,6 @@ int spell_animate_dead(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
 
   extract_obj(corpse);
 
-//  mob->clan = GET_CLAN(ch);
-
   return eSUCCESS;
 }
 
@@ -9916,8 +9914,6 @@ int spell_create_golem(int level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
   if(number(1, 3) == 1)
     SETBIT(mob->affected_by, AFF_TRUE_SIGHT);
 
-//  mob->clan = GET_CLAN(ch);
-
   // lag mage
   if(number(1,3) == 3  && GET_LEVEL(ch) < ARCHANGEL) {
     act("$n falls to the ground, unable to move while $s body recovers from such an incredible and draining magical feat.",
@@ -11721,8 +11717,6 @@ TO_ROOM, 0);
   SETBIT(mob->affected_by, AFF_CHARM);
 
   add_follower(mob, ch, 0);
-
-//  mob->clan = GET_CLAN(ch);
 
   return eSUCCESS;
 }
