@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.99 2006/06/08 20:17:58 shane Exp $ */
+/* $Id: mob_proc.cpp,v 1.100 2006/06/14 16:43:05 dcastle Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -2323,20 +2323,46 @@ int clan_guard(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 	)
       return eFAILURE;
 */	
-	
-    if ( (ch->clan != 14 && in_room == real_room(2300))  // black_axe
-    ||   (ch->clan != 4 && in_room ==  real_room(2310))  // dc_guard
-    ||   (ch->clan != 18 && in_room == real_room(2320))  // anarchist
-    ||   (ch->clan != 20 && in_room == real_room(2390))  // sindicate
-    ||   (ch->clan != 1 && in_room ==  real_room(2330))  // uln'hyrr
-    ||   (ch->clan != 10 && in_room == real_room(2340))  // moor
-    ||   (ch->clan != 9 && in_room == real_room(2350))  // eclipse
-    ||   (ch->clan != 3 && in_room ==  real_room(2360))  // arcana
-    ||   (ch->clan != 17 && in_room == real_room(2370))  // voodoo
-    ||   (ch->clan != 13 && in_room == real_room(2380))  // slackers
-    ||   (ch->clan != 6 && in_room == real_room(2410))  // timewarp
-    ||   (ch->clan != 19 && in_room == real_room(2420))  // Solaris
-    ||   (ch->clan != 8 && in_room == real_room(2400))  // merc
+
+    int zz = ch->clan;
+     if (IS_NPC(ch) && IS_AFFECTED(ch, AFF_CHARM))
+     {
+	int b = mob_index[ch->mobdata->nr].virt;
+	switch (b)
+	{
+		case 8:
+		case 88:
+		case 89:
+		case 90:
+		case 91:
+		case 22389:
+		case 22391:
+		case 22392:
+		case 22393:
+		case 22394:
+		case 22395:
+		case 22396:
+		case 22397:
+		case 22398:
+			if (ch->master) zz = ch->master->clan;
+		default:
+		break;
+	}
+     }
+
+    if ( (zz != 14 && in_room == real_room(2300))  // black_axe
+    ||   (zz != 4 && in_room ==  real_room(2310))  // dc_guard
+    ||   (zz != 18 && in_room == real_room(2320))  // anarchist
+    ||   (zz != 20 && in_room == real_room(2390))  // sindicate
+    ||   (zz != 1 && in_room ==  real_room(2330))  // uln'hyrr
+    ||   (zz != 10 && in_room == real_room(2340))  // moor
+    ||   (zz != 9 && in_room == real_room(2350))  // eclipse
+    ||   (zz != 3 && in_room ==  real_room(2360))  // arcana
+    ||   (zz != 17 && in_room == real_room(2370))  // voodoo
+    ||   (zz != 13 && in_room == real_room(2380))  // slackers
+    ||   (zz != 6 && in_room == real_room(2410))  // timewarp
+    ||   (zz != 19 && in_room == real_room(2420))  // Solaris
+    ||   (zz != 8 && in_room == real_room(2400))  // merc
 	)
     {
 	act( "$n is turned away from the clan hall.", ch, 0, 0, TO_ROOM , 0);
