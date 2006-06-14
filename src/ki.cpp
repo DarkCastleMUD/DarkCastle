@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.41 2006/06/14 01:06:39 shane Exp $ */
+/* $Id: ki.cpp,v 1.42 2006/06/14 05:49:55 shane Exp $ */
 
 extern "C"
 {
@@ -35,6 +35,7 @@ extern "C"
 extern CWorld world;
  
 extern CHAR_DATA *character_list;
+extern int hit_gain(CHAR_DATA *, int);
 
 void remove_memory(CHAR_DATA *ch, char type);
 void add_memory(CHAR_DATA *ch, char *victim, char type);
@@ -174,7 +175,7 @@ int do_ki(CHAR_DATA *ch, char *argument, int cmd)
   }
 
   if(ki_info[spl].ki_pointer) {
-    if(GET_POS(ch) < ki_info[spl].minimum_position || spl==KI_MEDITATION && GET_POS(ch) == POSITION_FIGHTING) {
+    if(GET_POS(ch) < ki_info[spl].minimum_position || (spl==KI_MEDITATION && (GET_POS(ch) == POSITION_FIGHTING || GET_POS(ch) <= POSITION_SLEEPING))) {
       switch(GET_POS(ch)) {
         case POSITION_SLEEPING:
           send_to_char("You dream of wonderful ki powers.\n\r", ch);
@@ -788,21 +789,16 @@ int ki_agility( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
 
 int ki_meditation( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
 {
-   struct affected_type af;
+   int gain;
 
-   if(affected_by_spell(ch, KI_MEDITATION+KI_OFFSET))
-      affect_from_char(ch, KI_MEDITATION+KI_OFFSET);
+   if(IS_NPC(ch)) return eFAILURE;
 
    act("You enter a brief meditative state and focus your ki to heal your injuries.",ch, 0, vict, TO_CHAR, 0);
    act("$n enters a brief meditative state and focuses $s ki to heal several wounds.",ch, 0, vict, TO_ROOM, 0);
 
-   af.type      = KI_MEDITATION + KI_OFFSET;
-   af.duration  = 1+has_skill(ch, KI_MEDITATION+KI_OFFSET)/40;
-   af.modifier  = 0;
-   af.location  = APPLY_HP_REGEN;
-   af.bitvector = -1;
- 
-   affect_to_char(ch, &af);
+   gain = hit_gain(ch, POSITION_SLEEPING);
+
+   GET_HIT(ch)  = MIN(GET_HIT(ch) + gain,  hit_limit(ch));
+
    return eSUCCESS;
 }
-

@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.74 2006/06/14 01:06:39 shane Exp $ */
+/* $Id: limits.cpp,v 1.75 2006/06/14 05:49:55 shane Exp $ */
 
 extern "C"
 {
@@ -202,7 +202,7 @@ const int hit_regens[] = {
 };
 
 /* Hitpoint gain pr. game hour */
-int hit_gain(CHAR_DATA *ch)
+int hit_gain(CHAR_DATA *ch, int position)
 {
 
   int gain = 1;
@@ -220,13 +220,12 @@ int hit_gain(CHAR_DATA *ch)
     gain = (int)(ch->max_hit * (float)hit_regens[GET_CLASS(ch)] /100);
 
     /* Position calculations    */
-    switch (GET_POS(ch)) {
+    switch (position) {
       case POSITION_SLEEPING: divisor = 1; break;
       case POSITION_RESTING:  divisor = 2; break;
       case POSITION_SITTING:  divisor = 2; break;
       default:                divisor = 3; break;
     }
-    if(affected_by_spell(ch, KI_MEDITATION+KI_OFFSET)) divisor = 1;
 
     if(gain < 1) 
       gain = 1;
@@ -269,21 +268,9 @@ int hit_gain(CHAR_DATA *ch)
   return MAX(1,gain);
 }
 
-
-int ki_gain_level(CHAR_DATA *ch)
+int hit_gain(CHAR_DATA *ch)
 {
-	if(IS_NPC(ch))
-		return 0;
-
-	/* Monks gain one point /level */
-	if(GET_CLASS(ch) == CLASS_MONK)
-		return 1;
-
-	/* If they're stll here they're not a monk */
-	/* Other chars gain one point every other level */
-	if(GET_LEVEL(ch) % 2)
-		return 1;
-	return 0;
+   return hit_gain(ch, GET_POS(ch));
 }
 
 int move_gain(CHAR_DATA *ch)

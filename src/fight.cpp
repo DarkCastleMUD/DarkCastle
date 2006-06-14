@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.318 2006/06/14 01:06:39 shane Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.319 2006/06/14 05:49:55 shane Exp $ */
 
 extern "C"
 {
@@ -1789,11 +1789,6 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
     GET_POS(victim) = POSITION_FIGHTING;
   }
 
-  if(affected_by_spell(ch, KI_MEDITATION+KI_OFFSET))
-     affect_from_char(ch, KI_MEDITATION+KI_OFFSET);
-  if(affected_by_spell(victim, KI_MEDITATION+KI_OFFSET))
-     affect_from_char(victim, KI_MEDITATION+KI_OFFSET);
-
   if (GET_POS(ch) == POSITION_FIGHTING &&
 	!ch->fighting)
   { // fix for fighting thin air thing related to poison
@@ -3537,7 +3532,7 @@ int do_skewer(CHAR_DATA *ch, CHAR_DATA *vict, int dam, int wt, int wt2, int weap
   if (ch->in_room != vict->in_room) return 0;
 
   int type = get_weapon_damage_type(ch->equipment[weapon]);
-  if( ! (type == TYPE_STING || type == TYPE_PIERCE || type == TYPE_SLASH ))  return 0;
+  if( ! ( type == TYPE_PIERCE || type == TYPE_SLASH ))  return 0;
   if(!skill_success(ch,vict, SKILL_SKEWER))                          return 0;
 
   if (number(0, 100) < 25) {
