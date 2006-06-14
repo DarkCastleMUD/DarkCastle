@@ -2481,7 +2481,6 @@ int spell_protection_from_evil(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, st
 {
   struct affected_type af;
   assert(victim);
-
   int duration = skill?skill/3:level/3;
   int modifier = level + 10;
  
@@ -4329,7 +4328,7 @@ int spell_animate_dead(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
 
   extract_obj(corpse);
 
-  mob->clan = GET_CLAN(ch);
+//  mob->clan = GET_CLAN(ch);
 
   return eSUCCESS;
 }
@@ -9917,7 +9916,7 @@ int spell_create_golem(int level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
   if(number(1, 3) == 1)
     SETBIT(mob->affected_by, AFF_TRUE_SIGHT);
 
-  mob->clan = GET_CLAN(ch);
+//  mob->clan = GET_CLAN(ch);
 
   // lag mage
   if(number(1,3) == 3  && GET_LEVEL(ch) < ARCHANGEL) {
@@ -11723,7 +11722,7 @@ TO_ROOM, 0);
 
   add_follower(mob, ch, 0);
 
-  mob->clan = GET_CLAN(ch);
+//  mob->clan = GET_CLAN(ch);
 
   return eSUCCESS;
 }

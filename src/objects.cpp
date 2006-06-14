@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.70 2006/06/08 19:08:50 shane Exp $
+| $Id: objects.cpp,v 1.71 2006/06/14 15:58:00 urizen Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -2332,13 +2332,12 @@ bool tf(char c)
 void read_clan_vault()
 {
   FILE *fl;
-  char buf[MAX_STRING_LENGTH];
 
   if ( ( fl = dc_fopen("../vault/clan/clan.txt", "r") ) == 0)
     return; // non-existant
   char c;
   struct vault_access_data *a;
-  int tmp,tmp2;
+  int tmp;
   int clannr = -1;
   while (1)
   {
@@ -2383,16 +2382,13 @@ void read_clan_vault()
   }
 }
 
-
-void read_player_vault(CHAR_DATA *ch)
+struct player_vault *read_player_vault(char *name)
 {
   FILE *fl;
   char buf[MAX_STRING_LENGTH];
-  if (ch && ch->pcdata && ch->pcdata->vault) return; // already read
-  if (!ch || !ch->pcdata) return;
-  sprintf(buf, "../vault/%c/%s", UPPER(*ch->name), ch->name);
+  sprintf(buf, "../vault/%c/%s", UPPER(*name), name);
   if ( ( fl = dc_fopen(buf, "r") ) == 0)
-    return; // we no care
+    return NULL; // we no care
   struct player_vault *v;
 #ifdef LEAK_CHECK
   v = (struct player_vault *) calloc(1, sizeof(struct player_vault));
@@ -2408,7 +2404,6 @@ void read_player_vault(CHAR_DATA *ch)
   v->contains = 0;
   v->acc = 0;
   char c;
-  ch->pcdata->vault = v;
   char *msg;
   obj_data *otmp;
   struct vault_access_data *a;
@@ -2420,7 +2415,7 @@ void read_player_vault(CHAR_DATA *ch)
     {
 	case 'E':
 		dc_fclose(fl);
-		return;
+		return v;
         case '\r':
 	case '\n':
 	case ' ': // sod 'em
@@ -2474,6 +2469,16 @@ void read_player_vault(CHAR_DATA *ch)
 	  continue;
     }
   }
+  return v;
+}
+
+void read_player_vault(CHAR_DATA *ch)
+{
+  FILE *fl;
+  char buf[MAX_STRING_LENGTH];
+  if (ch && ch->pcdata && ch->pcdata->vault) return; // already read
+  if (!ch || !ch->pcdata) return;
+  ch->pcdata->vault = read_player_vault(GET_NAME(ch));
 }
 
 
@@ -2574,6 +2579,26 @@ extern CHAR_DATA *get_pc(char *name);
 }
 // do_save(victim, "", 666)
 // free_char(victim)
+
+
+struct player_vault *get_vault_owner(char_data *ch, char *vault, bool *toFree)
+{
+  char buf[MAX_STRING_LENGTH];
+  char_data *vict;
+
+  extern CHAR_DATA *get_pc(char *name);
+  vict = get_pc(vault);
+  if (vict) {
+    if (vict->pcdata && !vict->pcdata->vault)
+         create_pc_vault(vict);
+    if (vict->pcdata)
+   return vict->pcdata->vault; // yahoo
+  }
+
+  return read_player_vault(vault);
+}
+
+
 
 struct search_type
 {
