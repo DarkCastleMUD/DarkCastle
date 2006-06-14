@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.317 2006/06/13 23:52:07 shane Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.318 2006/06/14 01:06:39 shane Exp $ */
 
 extern "C"
 {
@@ -1107,7 +1107,7 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
     do_say(ch, "What the hell am I DOING?!?!\r\n", 9);
     return eFAILURE;
   }
-  
+
   if(GET_POS(vict) == POSITION_DEAD)            return ( eSUCCESS|eVICT_DIED );
 
   // TODO - I'd like to remove these 3 cause they are checked in attack()
@@ -1788,6 +1788,11 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
     send_to_char("You are awakened from combat adrenaline springing you to your feet!", ch);
     GET_POS(victim) = POSITION_FIGHTING;
   }
+
+  if(affected_by_spell(ch, KI_MEDITATION+KI_OFFSET))
+     affect_from_char(ch, KI_MEDITATION+KI_OFFSET);
+  if(affected_by_spell(victim, KI_MEDITATION+KI_OFFSET))
+     affect_from_char(victim, KI_MEDITATION+KI_OFFSET);
 
   if (GET_POS(ch) == POSITION_FIGHTING &&
 	!ch->fighting)

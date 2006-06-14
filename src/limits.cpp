@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.73 2006/06/03 09:29:36 dcastle Exp $ */
+/* $Id: limits.cpp,v 1.74 2006/06/14 01:06:39 shane Exp $ */
 
 extern "C"
 {
@@ -226,6 +226,8 @@ int hit_gain(CHAR_DATA *ch)
       case POSITION_SITTING:  divisor = 2; break;
       default:                divisor = 3; break;
     }
+    if(affected_by_spell(ch, KI_MEDITATION+KI_OFFSET)) divisor = 1;
+
     if(gain < 1) 
       gain = 1;
 

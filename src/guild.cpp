@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.92 2006/05/28 18:58:36 shane Exp $
+| $Id: guild.cpp,v 1.93 2006/06/14 01:06:39 shane Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -457,6 +457,8 @@ int skills_guild(struct char_data *ch, char *arg, struct char_data *owner)
       case SKILL_BULLRUSH:
       case SPELL_HOLY_AURA:
       case SKILL_SPELLCRAFT:
+      case SKILL_COMBAT_MASTERY:
+      case KI_MEDITATION+KI_OFFSET:
 	do_say(owner, "I cannot teach you that. You need to learn it by yourself.\r\n",9);
 	return eFAILURE;
       default: break;

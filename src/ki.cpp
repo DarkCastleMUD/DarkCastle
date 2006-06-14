@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.40 2006/06/02 07:05:33 jhhudso Exp $ */
+/* $Id: ki.cpp,v 1.41 2006/06/14 01:06:39 shane Exp $ */
 
 extern "C"
 {
@@ -89,6 +89,11 @@ struct ki_info_type ki_info [ ] = {
 { /* 8 */
 	12, POSITION_FIGHTING, 20,
         TAR_IGNORE, ki_agility, SKILL_INCREASE_MEDIUM
+},
+
+{ /* 9 */
+	12, POSITION_RESTING, 15,
+        TAR_SELF_ONLY, ki_meditation, SKILL_INCREASE_HARD
 }
 
 };
@@ -103,6 +108,7 @@ char *ki[] = {
         "disrupt",
         "stance",
         "agility",
+        "meditation",
 	"\n"
 };
 void update_pos(CHAR_DATA *victim);
@@ -153,7 +159,7 @@ int do_ki(CHAR_DATA *ch, char *argument, int cmd)
   }
   
    if (((IS_SET(world[ch->in_room].room_flags, SAFE)) && (GET_LEVEL(ch) < IMP)) 
-&& spl != 2 && spl!=4 && spl!=5 && spl!=7 && spl!=8) {
+&& spl != 2 && spl!=4 && spl!=5 && spl!=7 && spl!=8 && spl!=9) {
       send_to_char("You feel at peace, calm, relaxed, one with yourself and "
                    "the universe.\n\r", ch);
       return eFAILURE;
@@ -168,7 +174,7 @@ int do_ki(CHAR_DATA *ch, char *argument, int cmd)
   }
 
   if(ki_info[spl].ki_pointer) {
-    if(GET_POS(ch) < ki_info[spl].minimum_position) {
+    if(GET_POS(ch) < ki_info[spl].minimum_position || spl==KI_MEDITATION && GET_POS(ch) == POSITION_FIGHTING) {
       switch(GET_POS(ch)) {
         case POSITION_SLEEPING:
           send_to_char("You dream of wonderful ki powers.\n\r", ch);
@@ -779,3 +785,24 @@ int ki_agility( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
   WAIT_STATE(ch, PULSE_VIOLENCE * 2);
   return eSUCCESS;  
 }  
+
+int ki_meditation( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
+{
+   struct affected_type af;
+
+   if(affected_by_spell(ch, KI_MEDITATION+KI_OFFSET))
+      affect_from_char(ch, KI_MEDITATION+KI_OFFSET);
+
+   act("You enter a brief meditative state and focus your ki to heal your injuries.",ch, 0, vict, TO_CHAR, 0);
+   act("$n enters a brief meditative state and focuses $s ki to heal several wounds.",ch, 0, vict, TO_ROOM, 0);
+
+   af.type      = KI_MEDITATION + KI_OFFSET;
+   af.duration  = 1+has_skill(ch, KI_MEDITATION+KI_OFFSET)/40;
+   af.modifier  = 0;
+   af.location  = APPLY_HP_REGEN;
+   af.bitvector = -1;
+ 
+   affect_to_char(ch, &af);
+   return eSUCCESS;
+}
+

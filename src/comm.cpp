@@ -1021,7 +1021,6 @@ void heartbeat()
     pulse_regen = number(PULSE_REGEN-8*PASSES_PER_SEC, PULSE_REGEN+5*PASSES_PER_SEC);
     point_update();
     pulse_takeover();
-    check_leaderboard(); //good place to put this
   }
 
   if(--pulse_time < 1) {
@@ -1032,6 +1031,7 @@ void heartbeat()
     affect_update();
     update_corpses_and_portals();
     check_idle_passwords();
+    check_leaderboard(); //good place to put this
     quest_update();
   }
 }

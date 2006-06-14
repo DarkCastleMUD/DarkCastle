@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.109 2006/06/07 20:25:11 dcastle Exp $ */
+/* $Id: handler.cpp,v 1.110 2006/06/14 01:06:39 shane Exp $ */
     
 extern "C"
 {
@@ -1454,6 +1454,10 @@ void affect_remove( CHAR_DATA *ch, struct affected_type *af, int flags)
       case KI_AGILITY+KI_OFFSET:
          if (!(flags & SUPPRESS_MESSAGES))
             send_to_char("Your body has lost its focused agility.\r\n", ch);
+         break;
+      case KI_MEDITATION+KI_OFFSET:
+         if (!(flags & SUPPRESS_MESSAGES))
+            send_to_char("You come out of your meditation.\n\r", ch);
          break;
       default:
          break;
