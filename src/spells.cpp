@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.170 2006/06/14 02:53:33 jhhudso Exp $ */
+/* $Id: spells.cpp,v 1.171 2006/06/14 16:42:38 urizen Exp $ */
 
 extern "C"
 {
@@ -1644,7 +1644,7 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
 	   int new_room = world[ch->in_room].dir_option[dir]->to_room;
 	   if(IS_SET(world[new_room].room_flags, SAFE))
 	   {
-   	     send_to_char("That room is protected from this harmful magic\r\n", ch);
+   	     send_to_char("That room is protected from this harmful magic.\r\n", ch);
 	     return eFAILURE;
 	   }
 	   int oldroom = ch->in_room;
