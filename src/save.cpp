@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: save.cpp,v 1.40 2006/06/08 20:17:58 shane Exp $ */
+/* $Id: save.cpp,v 1.41 2006/06/14 00:40:21 dcastle Exp $ */
 
 extern "C"
 {
@@ -312,6 +312,12 @@ void read_pc_data(struct char_data *ch, FILE* fpsave)
   struct pc_data * i = ch->pcdata;
 
   i->golem = 0;
+  i->quest_points = 0;
+  for(int j=0;j<QUEST_PASS;j++)
+	i->quest_pass[j] = 0;
+  for(int j=0;j<=QUEST_TOTAL/QSIZE;j++)
+	i->quest_complete[j] = 0;
+
   fread(i->pwd,            sizeof(char),       PASSWORD_LEN+1, fpsave);
   i->alias = read_char_aliases(fpsave);
   if (has_skill(ch, NEW_SAVE))
@@ -374,11 +380,12 @@ void read_pc_data(struct char_data *ch, FILE* fpsave)
   }
   if (!strcmp("QST", typeflag))
   {
-    fread(&(i->quest_points), sizeof(i->quest_points), 3, fpsave);
+    fread(&(i->quest_points), sizeof(i->quest_points), 1, fpsave);
     for(int j = 0;j<QUEST_PASS;j++)
-      fread(&(i->quest_pass[j]), sizeof(i->quest_pass[j]), 3, fpsave);
+      fread(&(i->quest_pass[j]), sizeof(i->quest_pass[j]), 1, fpsave);
     for(int j=0;j<=QUEST_TOTAL/QSIZE;j++)
-      fread(&(i->quest_complete[j]), sizeof(i->quest_complete[j]), 3, fpsave);
+      fread(&(i->quest_complete[j]), sizeof(i->quest_complete[j]), 1, fpsave);
+   fread(&typeflag, sizeof(char), 3, fpsave);
   }
   i->skillchange = 0;
   // Add new items in this format

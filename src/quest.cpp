@@ -484,6 +484,7 @@ int stop_current_quest(CHAR_DATA *ch, struct quest_info *quest)
    int count;
    OBJ_DATA *obj;
    char *buf;
+   if (!quest) return eSUCCESS;
 
    while(count < QUEST_MAX) {
       if(ch->pcdata->quest_current[count] == quest->number)
@@ -507,13 +508,14 @@ int stop_current_quest(CHAR_DATA *ch, struct quest_info *quest)
 
 int stop_current_quest(CHAR_DATA *ch, int number)
 {
+   if (!number) return eSUCCESS;
    struct quest_info *quest = get_quest_struct(number);
-   
    return stop_current_quest(ch, quest);
 }
 
 int stop_all_quests(CHAR_DATA *ch)
 {
+   return eSUCCESS;
    int retval;
 
    for(int i = 0;i < QUEST_MAX; i++)
