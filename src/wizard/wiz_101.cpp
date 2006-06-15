@@ -552,4 +552,27 @@ int do_wiz(struct char_data *ch, char *argument, int cmd)
 }
 
 
+int do_varstat(char_data *ch, char *argument, int cmd)
+{
+    char arg[MAX_INPUT_LENGTH];
+    argument = one_argument(argument, arg);
+    char_data *vict;
 
+    if ( ( vict = get_char_vis(ch, arg) ) == NULL )
+    {
+	send_to_char("Target not found.\r\n",ch);
+	return eFAILURE;
+    }
+    char buf[MAX_STRING_LENGTH];
+    buf[0] = '\0';
+    struct tempvariable *eh;
+    for (eh = ch->tempVariable; eh; eh = eh->next)
+    {
+       sprintf(buf, "$B$3%-30s $R-- $B$5 %s\r\n",
+		eh->name, eh->data);
+       send_to_char(buf,ch);
+    }
+    if (buf[0] == '\0') 
+    { send_to_char("No temporary variables found.\r\n",ch); }
+    return eSUCCESS;
+}
