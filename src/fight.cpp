@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.321 2006/06/14 19:08:04 shane Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.322 2006/06/15 12:38:21 urizen Exp $ */
 
 extern "C"
 {
@@ -766,7 +766,8 @@ int do_lightning_shield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
       
 //  dam /= 5;
   GET_HIT(ch) -= dam;
-  if(dam > 0) {
+  do_dam_msgs(vict, ch, dam, SPELL_ACID_SHIELD, WIELD);
+/*  if(dam > 0) {
     act("Sparks from $N's $B$5lightning$R shield sting you.", ch, 0, vict, TO_CHAR, 0);
     act("Sparks from your $B$5lightning$R shield sting $n.", ch, 0, vict, TO_VICT, 0);
     act("Sparks from $N's $B$5lightning$R shield sting $n.", ch, 0, vict, TO_ROOM, NOTVICT);
@@ -774,7 +775,7 @@ int do_lightning_shield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
     act("You ignore $N's pathetic sparks.", ch, 0, vict, TO_CHAR, 0);
     act("$n ignores $N's pathetic sparks.", ch, 0, vict, TO_ROOM, NOTVICT);
     act("$n ignores your pathetic sparks.", ch, 0, vict, TO_VICT, 0);
-  }
+  }*/
   update_pos(ch);
     
   if (GET_POS(ch) == POSITION_DEAD) {
