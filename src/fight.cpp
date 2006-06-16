@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.324 2006/06/16 12:46:02 urizen Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.325 2006/06/16 13:49:42 dcastle Exp $ */
 
 extern "C"
 {
@@ -766,7 +766,7 @@ int do_lightning_shield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
       
 //  dam /= 5;
   GET_HIT(ch) -= dam;
-  do_dam_msgs(vict, ch, dam, SPELL_ACID_SHIELD, WIELD);
+  do_dam_msgs(vict, ch, dam, SPELL_LIGHTNING_SHIELD, WIELD);
 /*  if(dam > 0) {
     act("Sparks from $N's $B$5lightning$R shield sting you.", ch, 0, vict, TO_CHAR, 0);
     act("Sparks from your $B$5lightning$R shield sting $n.", ch, 0, vict, TO_VICT, 0);

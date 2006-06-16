@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.68 2006/06/15 20:30:06 shane Exp $ */
+/* $Id: mob_proc2.cpp,v 1.69 2006/06/16 13:49:42 dcastle Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -1287,7 +1287,7 @@ int meta_get_moves_plat_cost(char_data * ch)
 int meta_get_hps_exp_cost(char_data * ch)
 {
    int meta = GET_HP_METAS(ch);
-   int bonus;
+   int bonus = 0;
 
    for(int i = 16; i < GET_RAW_CON(ch); i++)
       bonus += (i * i) / 30;
@@ -1303,7 +1303,7 @@ int meta_get_hps_exp_cost(char_data * ch)
 int meta_get_hps_plat_cost(char_data * ch)
 {
    int meta = GET_HP_METAS(ch);
-   int bonus;
+   int bonus = 0;
 
    for(int i = 16; i < GET_RAW_CON(ch); i++)
       bonus += (i * i) / 30;
@@ -1319,7 +1319,7 @@ int meta_get_hps_plat_cost(char_data * ch)
 int meta_get_mana_exp_cost(char_data * ch)
 {
    int meta = GET_MANA_METAS(ch);
-   int stat, bonus;
+   int stat, bonus = 0;
 
    if (GET_CLASS(ch) == CLASS_MAGIC_USER || GET_CLASS(ch) == CLASS_ANTI_PAL || GET_CLASS(ch) == CLASS_RANGER)
       stat = GET_RAW_INT(ch);
@@ -1341,7 +1341,7 @@ int meta_get_mana_exp_cost(char_data * ch)
 int meta_get_mana_plat_cost(char_data * ch)
 {
    int meta = GET_MANA_METAS(ch);
-   int stat, bonus;
+   int stat, bonus = 0;
 
    if (GET_CLASS(ch) == CLASS_MAGIC_USER || GET_CLASS(ch) == CLASS_ANTI_PAL || GET_CLASS(ch) == CLASS_RANGER)
       stat = GET_RAW_INT(ch);
