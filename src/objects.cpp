@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.71 2006/06/14 15:58:00 urizen Exp $
+| $Id: objects.cpp,v 1.72 2006/06/16 12:46:02 urizen Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -2260,6 +2260,31 @@ void create_pc_vault(CHAR_DATA *ch)
   ch->pcdata->vault = v;
 }
 
+void freeVault(struct player_vault *v)
+{
+  if (!v) return;
+  for (int i = 0; i < 20; i++)
+    if (v->segment[i])
+      dc_free(v->segment[i]);
+  while (v->content)
+  {
+     struct obj_data *t = v->content->next;
+     extract_obj(v->content);
+     v->content = t;
+  }
+  struct vault_access_data *a;
+  while (v->acc)
+  {
+     a = v->acc->next;
+     if ((int)v->acc->name > 1000)
+	dc_free(v->acc->name);
+     dc_free(v->acc);
+     v->acc = a;
+  }
+  dc_free(v);
+}
+
+
 
 void write_clan_vaults()
 {
@@ -2547,6 +2572,71 @@ bool has_access(char_data *ch, char_data *vict, int segment, int type)
   return FALSE;
 }
 
+bool has_access(char_data *ch, player_vault *vvict, int segment, int type)
+{
+  struct vault_access_data *a;
+  struct player_vault *vch = ch?ch->pcdata?ch->pcdata->vault:0:0;
+  if (vch && vch == vvict) return TRUE;
+  if (!vvict) return FALSE;
+  if (!vch) return FALSE;
+  struct player_vault *v = vvict;
+  bool view, deposit, withdraw;
+  bool cview, cdeposit, cwithdraw;
+ // differentiates between clan access player acccess
+ // as player access needs to be matched in ch's stuff AND vault owner's stuff
+ // while clan only needs one verification 
+  view = deposit = withdraw = cview = cdeposit = cwithdraw =FALSE;
+
+  for (a = v->acc;a;a = a->next)
+  {
+    if (a->self) continue; // own access stuff
+    if (segment != -1 && a->segment != -1 && segment != a->segment) continue;
+    if ((int)a->name < 1000)
+    {
+	if ((int)a->name == ch->clan)
+	{
+		cview = a->view;
+		cdeposit = a->deposit;
+		cwithdraw = a->withdraw;
+	} else if (!str_cmp(a->name, ch->name)) {
+		view = a->view;
+		deposit = a->deposit;
+		withdraw = a->withdraw;
+	}
+    }
+  }
+ // one down
+  switch (type)
+  {
+	case VIEW_ACCESS:
+		if (cview) return TRUE;
+		if (!view) return FALSE;
+		break;
+	case DEPOSIT_ACCESS:
+		if (cdeposit) return TRUE;
+		if (!deposit) return FALSE;
+		break;
+	case WITHDRAW_ACCESS:
+		if (cwithdraw) return TRUE;
+		if (!withdraw) return FALSE;
+		break;
+  }
+/*  for (a = ch->pcdata->vault->acc;a;a = a->next)
+  {
+    if (!a->self) continue; // remote access stuff
+    if (segment >= 0 && a->segment >= 0 && segment != a->segment) continue;
+    if (str_cmp(a->name, vict->name)) continue;
+    switch (type)
+    {
+	case VIEW_ACCESS: return a->view;
+	case DEPOSIT_ACCESS: return a->deposit;
+	case WITHDRAW_ACCESS: return a->withdraw;
+    }
+  }*/
+  return FALSE;
+}
+
+
 bool online = TRUE;
 extern bool str_prefix(const char *astr, const char *bstr);
 
@@ -2595,10 +2685,9 @@ struct player_vault *get_vault_owner(char_data *ch, char *vault, bool *toFree)
    return vict->pcdata->vault; // yahoo
   }
 
+  *toFree = TRUE;
   return read_player_vault(vault);
 }
-
-
 
 struct search_type
 {
@@ -2607,10 +2696,12 @@ struct search_type
   int size;
   int wearpos;
   int align;
+  char *keyword;
 };
 
 bool item_match(obj_data *o, search_type *s)
 {
+  if (!s) return TRUE;
   if (s->lvllow)
     if (s->lvllow > o->obj_flags.eq_level)
 	return FALSE;
@@ -2642,7 +2733,7 @@ bool item_match(obj_data *o, search_type *s)
 		(s->align == 3 && IS_OBJ_STAT(o,ITEM_ANTI_GOOD)))
 			return FALSE;
   }
-     
+  if (s->keyword && !isname(s->keyword, o->name)) return FALSE;     
   return TRUE;
 }
 
@@ -2767,36 +2858,36 @@ bool toggle_access(char_data *ch, char_data *vict,int access, int segment)
   
 }
 
-void display_vault(char_data *ch, char_data *vict, search_type *search)
+char *display_vault(char_data *ch, player_vault *v, search_type *search)
 { // error checking done before this function.
-	char buf[MAX_STRING_LENGTH];
-	struct player_vault *v = vict->pcdata->vault;
+	static char buf[MAX_STRING_LENGTH];
         bool alreadyDone;
 	int i, m, p, q,y;
 	struct obj_data *otmp,*otmp2;
         int tmp[20][v->nr_items];//stacks
-
- 	for (i = 0; i < 20;i++)
+	for (i = 0; i < 20;i++)
 	  for (y = 0; y < v->nr_items;y++)
      	    tmp[i][y] = 0;
-
-	if (vict == ch)
+	buf[0] = '\0';
+	if (ch->pcdata && ch->pcdata->vault && ch->pcdata->vault == v && !search)
 	{
-		sprintf(buf, "Your vault is at %d of %d max pounds and contains:\r\n",v->contains, v->max_contain);
-		send_to_char(buf, ch);
+//		sprintf(buf, "Your vault is at %d of %d max pounds and contains:\r\n",v->contains, v->max_contain);
 	} else {
-		sprintf(buf, "%s's vault contains:\r\n",vict->name);
-		send_to_char(buf, ch);
+/*		if (!search) {
+  		  sprintf(buf, "%s's vault contains:\r\n",vict->name);
+		} else {
+  		  sprintf(buf, "%s's vault contains the following matching items:\r\n",vict->name);
+		}*/
 	}
 	extern char *item_condition(struct obj_data *obj);
 	p = 0;
-	buf[0] = '\0';
+	char tmpbuf[MAX_INPUT_LENGTH];
 	for (q = 0; q < 20; q++)
 	{
 	  if (!v->segment[q]) continue;
-	  if (!has_access(ch, vict, q, VIEW_ACCESS)) continue;
+	  if (!has_access(ch, v, q, VIEW_ACCESS)) continue;
 	  m = 0;
-	  csendf(ch, "  $B%s$R:\n", v->segment[q]);
+	  sprintf(tmpbuf, "  $B%s$R:\n", v->segment[q]);
 	  for (otmp = v->content;otmp;otmp = otmp->next_content)
 	  {
 		if (otmp->vroom != q) continue;
@@ -2811,16 +2902,18 @@ void display_vault(char_data *ch, char_data *vict, search_type *search)
 		  if (otmp2->item_number == otmp->item_number && otmp2->vroom == otmp->vroom) i++; // count the stack
 		p++;
 		if (i > 1)
-			sprintf(buf,"%s%2d) %-20s (%-2d) %-14s Lv: %d - %s\r\n",buf,
+			sprintf(buf,"%s%s%2d) %-20s (%-2d) %-14s Lv: %d - %s\r\n",buf,tmpbuf,
 					p, otmp->short_description, i, item_condition(otmp), 
 					otmp->obj_flags.eq_level, otmp->cmsg);
 		else
-			sprintf(buf,"%s%2d) %-20s      %-14s Lv: %d - %s\r\n",buf,
+			sprintf(buf,"%s%s%2d) %-20s      %-14s Lv: %d - %s\r\n",buf,tmpbuf,
 					p, otmp->short_description, item_condition(otmp), 
 					otmp->obj_flags.eq_level, otmp->cmsg);
+		tmpbuf[0] = '\0';
 		tmp[otmp->vroom][m++] = otmp->item_number;
 	  }
-	  page_string(ch->desc, buf, 1);
+	  if (!p) return NULL;
+	  return &buf[0];
 	}
    
 }
@@ -2864,6 +2957,7 @@ int do_vault(char_data *ch, char *arg, int cmd)
   descriptor_data d;
   d.character = 0;
   char_data *vict = NULL;
+  obj_data *o;
   online = TRUE;
   struct search_type a;
   memset((char*)&a,0,sizeof(search_type));
@@ -2882,6 +2976,10 @@ int do_vault(char_data *ch, char *arg, int cmd)
 	b++;
     }
   }
+struct vault_access_data *ac;
+char tmp[MAX_INPUT_LENGTH];
+int item = 0;
+char *ptmp;
   switch (z)
   {
     case 4: // SEARCH
@@ -2939,9 +3037,39 @@ int do_vault(char_data *ch, char *arg, int cmd)
 		SET_BIT(a.clas, ITEM_RANGER);
 	  } else if (!str_prefix(arg1, "monk")) {
 		SET_BIT(a.clas, ITEM_MONK);
+	  } else {
+		if (!a.keyword)
+		  a.keyword = str_dup(arg1);
 	  }
 	  arg = one_argument(arg, arg1);
 	}
+	buf[0] = '\0';
+	for (ac = ch->pcdata->vault->acc; ac; ac = ac->next)
+ 	{
+		if (ac->self) continue;
+		struct player_vault *tv;
+		bool toFree = FALSE;
+		if ((int) ac->name > 1000)
+  		  tv = get_vault_owner(ch, ac->name, &toFree);
+		else continue;
+		if (!tv) continue;
+		ptmp = display_vault(ch, tv, &a);
+		if (ptmp)
+		{
+			if (ch->pcdata->vault == tv)
+				sprintf(tmp, "Your own vault:\r\n%s\r\n",ptmp);
+			else
+				sprintf(tmp, "%s's vault:\r\n%s\r\n",ac->name, ptmp);
+			strcat(buf,tmp);
+		}
+		if (toFree)
+			freeVault(tv);
+	}
+	if (buf[0] == '\0')
+	{ send_to_char("No matching items found.\r\n",ch); return eSUCCESS; }
+	else
+	page_string(ch->desc, buf, 1); // Yay.
+	if (a.keyword) dc_free(a.keyword);
 	break;	
     case 0: // VIEW
 	if (!vict && arg1[0] != '\0')
@@ -2949,18 +3077,27 @@ int do_vault(char_data *ch, char *arg, int cmd)
 	   vict = get_vault_owner(ch, arg1, &d);
 	   if (!vict) return eFAILURE; // get_vault_owner handles error message
 	} else if (!vict) vict = ch;
-	if (!has_access(ch, vict, -1, VIEW_ACCESS))
+/*	if (!has_access(ch, vict, -1, VIEW_ACCESS))
 	{
 	  send_to_char("You do not have access to view their vault.\r\n",ch);
 	  return eFAILURE;
-	}
-//TODO
+	} Checked in display_vault*/ 
+
+
 	if (!vict || !vict->pcdata)
 	{
 	  send_to_char("Bug in vview.\r\n",ch);
 	  return eFAILURE;
 	}
-	display_vault(ch, vict,0);
+	ptmp = display_vault(ch, vict->pcdata->vault,0);
+	if (!ptmp)
+	{ send_to_char("The vault appears to be empty.\r\n",ch); return eFAILURE; }
+	else {
+		if (vict == ch)
+		  csendf(ch, "Your vault is at %d of %d max pounds and contains:\r\n%s\r\n",ch->pcdata->vault->contains, ch->pcdata->vault->max_contain,ptmp);
+		else
+ 		  csendf(ch, "%s's vault contains:\r\n%s\r\n",GET_NAME(vict), ptmp);
+	}
 	if (d.character)
 	{
 	  char_from_room(vict);
@@ -2974,13 +3111,23 @@ int do_vault(char_data *ch, char *arg, int cmd)
 	send_to_char("You can only deposit items into your vault from a safe room.\r\n",ch);
 	return eFAILURE;
       }
-
+      if ((o = get_obj_in_list_vis(ch, arg1, ch->carrying)))
+      {
+	obj_from_char(o);
+	o->cmsg = NULL;
+	o->next_content = ch->pcdata->vault->content;
+	ch->pcdata->vault->content = o;
+	send_to_char("Deposited, yay.\r\n",ch);
+	write_player_vault(ch);
+      }
+      break;
     case 2: // WITHDRAW
       if (!IS_SET(world[ch->in_room].room_flags, SAFE))
       {
 	send_to_char("You can only withdraw items from your vault from a safe room.\r\n",ch);
 	return eFAILURE;
       }
+      break;
     case 3: // ACCESS
       if (arg1[0] == '\0')
       { // list access data
