@@ -110,8 +110,8 @@ int do_innate(CHAR_DATA *ch, char *arg, int cmd)
 	{
 	   struct affected_type af;
 	   af.type = SKILL_INNATE_TIMER;
-	   af.duration = !str_cmp(buf, "repair")?16:24;
-		// repair is every 16 ticks, 'cause Apoc's annoying.
+	   af.duration = !str_cmp(buf, "repair")?12:18;
+		// repair is every 12 ticks
 	   af.modifier = 0;
 	   af.location = 0;
 	   af.bitvector = -1;
@@ -167,7 +167,7 @@ int innate_focus(CHAR_DATA *ch, char *arg, int cmd)
 
    struct affected_type af;
    af.type = SKILL_INNATE_FOCUS;
-   af.duration = 3;
+   af.duration = 4;
    af.modifier = 0;
    af.location = APPLY_NONE;
    af.bitvector = AFF_FOCUS;
@@ -258,7 +258,7 @@ int innate_evasion(CHAR_DATA *ch, char *arg, int cmd)
 {
    struct affected_type af;
    af.type = SKILL_INNATE_EVASION;
-   af.duration = 2;
+   af.duration = 4;
    af.modifier = 0;
    af.location = 0;
    af.bitvector = -1;
@@ -271,7 +271,7 @@ int innate_shadowslip(CHAR_DATA *ch, char *arg, int cmd)
 {
    struct affected_type af;
    af.type = SKILL_INNATE_SHADOWSLIP;
-   af.duration = 3;
+   af.duration = 4;
    af.modifier = 0;
    af.location = 0;
    af.bitvector = AFF_SHADOWSLIP;

@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.325 2006/06/16 13:49:42 dcastle Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.326 2006/06/16 20:26:18 apocalypse Exp $ */
 
 extern "C"
 {
@@ -1828,11 +1828,11 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
     if (IS_SET(ch->combat, COMBAT_ORC_BLOODLUST1)) {
       dam = (int)(dam * 1.5); 
 //      REMOVE_BIT(ch->combat, COMBAT_ORC_BLOODLUST1);
-  //    SET_BIT(ch->combat, COMBAT_ORC_BLOODLUST2);
+//      SET_BIT(ch->combat, COMBAT_ORC_BLOODLUST2);
     }
     if (IS_SET(ch->combat, COMBAT_ORC_BLOODLUST2)) {
       dam = (int)(dam * 1.5);
-    //  REMOVE_BIT(ch->combat, COMBAT_ORC_BLOODLUST2);
+//      REMOVE_BIT(ch->combat, COMBAT_ORC_BLOODLUST2);
     }
 
     percent = (int) (( ((float)GET_HIT(ch)) / ((float)GET_MAX_HIT(ch)) ) * 100);
@@ -3595,7 +3595,7 @@ void do_combatmastery(CHAR_DATA *ch, CHAR_DATA *vict, int weapon)
 
   if(!skill_success(ch,vict, SKILL_COMBAT_MASTERY))                  return;
 
-  if (number(0,7)) return; // Chance lowered
+  if (number(0,8)) return; // Chance lowered
 
   if(type == TYPE_STING) {
      if(!IS_AFFECTED(vict, AFF_BLIND)) {
