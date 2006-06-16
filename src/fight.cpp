@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.322 2006/06/15 12:38:21 urizen Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.323 2006/06/16 08:28:57 shane Exp $ */
 
 extern "C"
 {
@@ -286,8 +286,8 @@ void perform_violence(void)
       next_af_dude = af->next;
       if (af->type == SPELL_POISON)
       {
-        int dam = ((affected_by_spell(ch, SPELL_POISON)->duration) + 1) * number(25,50);
-        if(number(0,1)) affected_by_spell(ch, SPELL_POISON)->duration -= 1;
+        int dam = 100 + (affected_by_spell(ch, SPELL_POISON)->modifier);
+        affected_by_spell(ch, SPELL_POISON)->duration -= 1;
         if(get_saves(ch, SAVE_TYPE_POISON) > number(1,101)) {
            dam = dam * get_saves(ch, SAVE_TYPE_POISON) / 100;
            send_to_char("You feel very sick, but resist the poison's damage.\n\r", ch);

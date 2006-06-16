@@ -2449,8 +2449,8 @@ int spell_poison(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data 
          return eFAILURE;
 
         af.type = SPELL_POISON;
-        af.duration = (skill / 25);
-        af.modifier = (int)ch;
+        af.duration = skill / 10;
+        af.modifier = skill;
         af.location = APPLY_NONE;
         af.bitvector = AFF_POISON;
         affect_join(victim, &af, FALSE, FALSE);
@@ -9138,9 +9138,9 @@ int cast_creeping_death(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DA
    if (poison > 0) {
      if (dice(1, 100) <= poison && !IS_SET(victim->immune, ISR_POISON)) {
         af.type = SPELL_POISON;
-        af.duration = level*2;
-        af.modifier = -2;
-        af.location = APPLY_STR;
+        af.duration = skill / 27;
+        af.modifier = skill;
+        af.location = APPLY_NONE;
         af.bitvector = AFF_POISON;
         affect_join(victim, &af, FALSE, FALSE);
         send_to_char("The insect $2poison$R has gotten into your blood!\n\r", victim);

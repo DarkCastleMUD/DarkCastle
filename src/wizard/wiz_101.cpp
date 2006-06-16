@@ -566,7 +566,7 @@ int do_varstat(char_data *ch, char *argument, int cmd)
     char buf[MAX_STRING_LENGTH];
     buf[0] = '\0';
     struct tempvariable *eh;
-    for (eh = ch->tempVariable; eh; eh = eh->next)
+    for (eh = vict->tempVariable; eh; eh = eh->next)
     {
        sprintf(buf, "$B$3%-30s $R-- $B$5 %s\r\n",
 		eh->name, eh->data);
