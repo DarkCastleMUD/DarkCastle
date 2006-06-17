@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.326 2006/06/16 20:26:18 apocalypse Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.327 2006/06/17 04:02:19 shane Exp $ */
 
 extern "C"
 {
@@ -1242,7 +1242,8 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
   if (SOMEONE_DIED(retval)) return retval;
 
   do_combatmastery(ch, vict, weapon);
-  if(ISSET(ch->affected_by, AFF_CMAST_WEAKEN)) dam /= 2;
+  if(ISSET(ch->affected_by, AFF_CMAST_WEAKEN))
+     dam *= MAX(GET_LEVEL(ch), 50) / 100;
 
   if (w_type == TYPE_HIT && IS_NPC(ch))
   {
@@ -3617,6 +3618,12 @@ void do_combatmastery(CHAR_DATA *ch, CHAR_DATA *vict, int weapon)
      }
   }
   if(type == TYPE_BLUDGEON || type == TYPE_CRUSH) {
+     if(GET_LEVEL(vict) >= 90 || IS_MOB(vict) && ISSET(vict->mobdata->actflags, ACT_HUGE)) {
+        act("$N shakes off your crushing blow!", ch, 0, vict, TO_CHAR, 0);
+        act("$N shakes off $n's crushing blow!", ch, 0, vict, TO_ROOM, NOTVICT);
+        act("You shake off $n's crushing blow!", ch, 0, vict, TO_VICT, 0);
+        return;
+     }
      if(!IS_AFFECTED(vict, AFF_CMAST_WEAKEN)) {
         SETBIT(vict->affected_by, AFF_CMAST_WEAKEN);
         act("Your crushing blow causes $N's attacks to momentarily weaken!", ch, 0, vict, TO_CHAR, 0);
