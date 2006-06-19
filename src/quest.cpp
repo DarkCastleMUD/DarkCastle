@@ -440,6 +440,8 @@ int pass_quest(CHAR_DATA *ch, struct quest_info *quest)
 {
    int count = 0;
 
+   if(!quest) return eFAILURE;
+
    while(count < QUEST_PASS) {
       if(!ch->pcdata->quest_pass[count])
          break;
@@ -683,14 +685,13 @@ int do_quest(CHAR_DATA *ch, char *arg, int cmd)
 
 int do_qedit(CHAR_DATA *ch, char *arg, int cmd)
 {
-   char num[MAX_STRING_LENGTH];
    char field[MAX_STRING_LENGTH];
    char value[MAX_STRING_LENGTH];
    int  holdernum;
    int i, lownum, highnum;
    struct quest_info *quest = NULL;
 
-   half_chop(arg, arg, num);
+   half_chop(arg, arg, field);
 
    if(!*arg) {
       csendf(ch, "Usage: qedit list                      (list all quest names and numbers)\n\r"
@@ -702,8 +703,6 @@ int do_qedit(CHAR_DATA *ch, char *arg, int cmd)
                  "\n\r");
       return eFAILURE;
    }
-
-   half_chop(num, num, field);
 
    char *valid_fields[] = {
       "name",
@@ -719,14 +718,14 @@ int do_qedit(CHAR_DATA *ch, char *arg, int cmd)
       "\n"
    };
 
-   if(is_abbrev(num, "show")) {
+   if(is_abbrev(arg, "show")) {
       if(!*field || !is_number(field)) send_to_char("Usage: qedit show <number>\n\r", ch);
       else
          show_quest_info(ch, atoi(field));
       return eSUCCESS;
    }
 
-   if(is_abbrev(num, "new")) {
+   if(is_abbrev(arg, "new")) {
       if(!*field || is_number(field)) {
          send_to_char("Usage: qedit new <name>\n\r", ch);
          return eFAILURE;
@@ -744,13 +743,13 @@ int do_qedit(CHAR_DATA *ch, char *arg, int cmd)
       }
    }
 
-   if(is_abbrev(num, "save")) {
+   if(is_abbrev(arg, "save")) {
       return save_quests();
    }
 
    half_chop(field, field, value);
 
-   if(is_abbrev(num, "list") && !*field) {
+   if(is_abbrev(arg, "list") && !*field) {
       list_quests(ch, 0, QUEST_MAX);
       return eSUCCESS;
    } else if(*field && is_number(field)) {
@@ -769,12 +768,12 @@ int do_qedit(CHAR_DATA *ch, char *arg, int cmd)
       return eSUCCESS;
    }
 
-   if(!is_number(num)) {
+   if(!is_number(arg)) {
       send_to_char("Usage: qedit <number> <field> <value>\n\r", ch);
       return eFAILURE;
    }
 
-   holdernum = atoi(num);
+   holdernum = atoi(arg);
 
    if(holdernum <= 0 || holdernum >= QUEST_MAX) {
       send_to_char("Invalid quest number.\n\r", ch);
@@ -782,8 +781,7 @@ int do_qedit(CHAR_DATA *ch, char *arg, int cmd)
    }
 
    if(!*field) {
-      send_to_char("Valid fields: level, objnum, objshort, objlong, objkey, mobnum, timer, reward or hints.\n\r", 
-ch);
+      send_to_char("Valid fields: level, objnum, objshort, objlong, objkey, mobnum, timer, reward or hints.\n\r", ch);
       return eFAILURE;
    }
 
