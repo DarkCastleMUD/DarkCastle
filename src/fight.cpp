@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.328 2006/06/21 10:27:51 urizen Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.329 2006/06/21 19:01:14 shane Exp $ */
 
 extern "C"
 {
@@ -537,7 +537,7 @@ int attack(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
     //  if(SOMEONE_DIED(result))       return result;
    // }
 
-    if(IS_SET(ch->combat, COMBAT_MISS_AN_ATTACK))
+    if(IS_SET(ch->combat, COMBAT_MISS_AN_ATTACK) || IS_AFFECTED(ch, AFF_CRIPPLE))
     {
       send_to_char("Your body refuses to work properly and you miss an attack.\r\n", ch);
       REMOVE_BIT(ch->combat, COMBAT_MISS_AN_ATTACK);
@@ -549,7 +549,7 @@ int attack(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
   } // End of the monk attacks
   else // It's a normal attack
   {
-    if(IS_SET(ch->combat, COMBAT_MISS_AN_ATTACK))
+    if(IS_SET(ch->combat, COMBAT_MISS_AN_ATTACK) || IS_AFFECTED(ch, AFF_CRIPPLE))
     {
       send_to_char("Your body refuses to work properly and you miss an attack.\r\n", ch);
       REMOVE_BIT(ch->combat, COMBAT_MISS_AN_ATTACK);

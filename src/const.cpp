@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.199 2006/06/21 15:51:33 urizen Exp $ */
+/* $Id: const.cpp,v 1.200 2006/06/21 19:01:14 shane Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -899,6 +899,7 @@ char *affected_bits[] =
     "CMAST_WEAKEN",
     "RESERVEDBAD",
     "BULLRUSHCD",
+    "CRIPPLE",
     "\n"
 };
 
@@ -1191,6 +1192,7 @@ struct class_skill_defines t_skills[] = { // thief skills
 {    "dual backstab",   SKILL_DUAL_BACKSTAB,    40,     98,   {DEX,INT} },  
 {    "eyegouge",        SKILL_EYEGOUGE,         42,     98,   {STR,CON} },  
 {    "vitalstrike",     SKILL_VITAL_STRIKE,     45,     98,   {CON,DEX} },  
+{    "cripple",		SKILL_CRIPPLE,		50,	98,   {STR,INT} },
 {    "\n",              0,                      1,      0,    {0,0} }
 };
 

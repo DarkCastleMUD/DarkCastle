@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.126 2006/06/21 16:28:08 apocalypse Exp $
+| $Id: cl_thief.cpp,v 1.127 2006/06/21 19:01:18 shane Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -100,6 +100,7 @@ int do_eyegouge(CHAR_DATA *ch, char *argument, int cmd)
   CHAR_DATA *victim;
   char name[256];
   argument = one_argument(argument,name);
+  int level = has_skill(ch, SKILL_EYEGOUGE);
 
   if(!(victim = get_char_room_vis(ch, name)) && (victim = ch->fighting)==NULL) {
     send_to_char("There is no one like that here to gouge.\n\r", ch);
@@ -117,31 +118,19 @@ int do_eyegouge(CHAR_DATA *ch, char *argument, int cmd)
  if(!can_be_attacked(ch, victim) || !can_attack(ch))
     return eFAILURE;
 
-  if (!has_skill(ch,SKILL_EYEGOUGE))
+  if (!level)
   {
     send_to_char("You would...if you knew how.\r\n",ch);
     return eFAILURE;
   }
   int retval = 0;
   if (!skill_success(ch,victim, SKILL_EYEGOUGE))
-  {//
-    // act("You miss $N's eye.",ch, NULL, victim, TO_CHAR, 0);
-  //   act("$n walks up to $N and tries to push $s thumb into $N's eye, 
-//but misses!",ch, NULL, victim, TO_ROOM, NOTVICT);
-//     act("$n walks up to you and tries to push $s thumb into your eye, 
-//but misses!",ch, NULL, victim, TO_VICT, 0);
+  {
      retval = damage(ch,victim, 0, TYPE_PIERCE, SKILL_EYEGOUGE, 0);
   } else {
-  //   act("You press your thumb into $N's eye.",ch, NULL, victim, 
-//TO_CHAR, 0);
-  //   act("$n walks up to $N and pushes $s thumb into $N's eye!",ch, 
-//NULL, victim, TO_ROOM, NOTVICT);
-  //   act("$n walks up to you and pushes $s thumb into your eye! Ow!",ch, 
-
-//NULL, victim, TO_VICT, 0);
      SETBIT(victim->affected_by, AFF_BLIND);
      SET_BIT(victim->combat, COMBAT_THI_EYEGOUGE);
-     retval = damage(ch, victim, skill_level*2, TYPE_PIERCE, SKILL_EYEGOUGE, 0);
+     retval = damage(ch, victim, level*2, TYPE_PIERCE, SKILL_EYEGOUGE, 0);
   }
 
   if(!SOMEONE_DIED(retval) || (!IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_WIMPY)))
@@ -1994,6 +1983,68 @@ int do_appraise(CHAR_DATA *ch, char *argument, int cmd)
       else sprintf(buf, "After some consideration, you estimate the amount of gold %s is carrying to be %d.\n\r", GET_NAME(victim), appraised);
       send_to_char(buf, ch);
       WAIT_STATE(ch, (int)(PULSE_VIOLENCE * 1.5));
+   }
+
+   return eSUCCESS;
+}
+
+int do_cripple(CHAR_DATA *ch, char *argument, int cmd)
+{
+   CHAR_DATA *vict;
+   char name[MAX_STRING_LENGTH];
+   int skill;
+
+   one_argument(argument, name);
+
+   if(!(skill = has_skill(ch, SKILL_CRIPPLE))) {
+      send_to_char("You don't know how to cripple anybody.\n\r", ch);
+      return eFAILURE;
+   }
+
+   if(ch->fighting)
+      vict = ch->fighting;
+
+   if(!(vict = get_char_room_vis(ch, name))) {
+      send_to_char("Cripple whom?\n\r", ch);
+      return eFAILURE;
+   }
+
+   if(vict == ch) {
+      send_to_char("You turn your head and grimace as you break your ankles with a sledgehammer.\n\r", ch);
+      return eFAILURE;
+   }
+
+   if(IS_MOB(vict) && ISSET(vict->mobdata->actflags, ACT_HUGE)) {
+      send_to_char("You can't cripple someone that HUGE!\r\n", ch);
+      return eFAILURE;
+   }
+
+   if((GET_LEVEL(ch) < IMMORTAL) || IS_NPC(ch))
+      if(!can_attack(ch) || !can_be_attacked(ch, vict))
+         return eFAILURE;
+
+   if(IS_AFFECTED(vict, AFF_CRIPPLE)) {
+      act("$n has already been crippled!", ch, 0, vict, TO_CHAR, 0);
+      return eFAILURE;
+   }
+
+   WAIT_STATE(ch, PULSE_VIOLENCE * 2);
+
+   if(!skill_success(ch, vict, SKILL_CRIPPLE)) {
+      act("You quickly lash out but fail to cripple $n.", ch, 0, vict, TO_CHAR, 0);
+      act("$N quickly lashes out, narrowly missing an attempt to cripple you!", ch, 0, vict, TO_VICT, 0);
+      act("$N quicly lashes out but fails to cripple $n.", ch, 0, vict, TO_ROOM, NOTVICT);
+   } else {
+      act("You quickly lash out and strike a crippling blow to $n!", ch, 0, vict, TO_CHAR, 0);
+      act("$N lashes out quickly and cripples you with a painful blow!", ch, 0, vict, TO_VICT, 0);
+      act("$N quickly lashes out and strikes a crippling blow to $n!", ch, 0, vict, TO_ROOM, NOTVICT);
+      struct affected_type af;
+      af.type      = SKILL_CRIPPLE;
+      af.duration  = skill / 20;
+      af.modifier  = skill;
+      af.location  = APPLY_NONE;
+      af.bitvector = AFF_CRIPPLE;
+      affect_to_char(vict, &af);
    }
 
    return eSUCCESS;

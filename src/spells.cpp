@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.172 2006/06/14 16:52:01 urizen Exp $ */
+/* $Id: spells.cpp,v 1.173 2006/06/21 19:01:15 shane Exp $ */
 
 extern "C"
 {
@@ -596,6 +596,7 @@ char *skills[]=
   "combat mastery",
   "rapid join",
   "enhanced regeneration",
+  "cripple",
   "\n"
 };
 
@@ -1858,6 +1859,8 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
 	if (o > 101) o = 101; // imms/mobs
         if ((float)((float)chance/(float)o) < 0.4) chance = (int)(o*0.4);
 	if (GET_LEVEL(ch) == 1) chance++;
+        if(IS_AFFECTED(ch, AFF_CRIPPLE))
+           chance -= 1 + affected_by_spell(ch, SKILL_CRIPPLE)->modifier/10;
         if(GET_LEVEL(ch) < IMMORTAL && number(1,o) > chance && !IS_AFFECTED(ch,AFF_FOCUS))
         {
           csendf(ch, "You lost your concentration and are unable to cast %s!\n\r", spells[spl-1]);

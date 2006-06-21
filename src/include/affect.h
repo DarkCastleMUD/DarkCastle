@@ -2,7 +2,7 @@
 #define AFFECT_H_
 
 /************************************************************************
-| $Id: affect.h,v 1.23 2006/06/21 15:51:50 urizen Exp $
+| $Id: affect.h,v 1.24 2006/06/21 19:01:20 shane Exp $
 | affect.h
 | This contains the bits for affected_by
 */
@@ -75,7 +75,8 @@
 #define AFF_CMAST_WEAKEN        63
 //#define AFF_CHECKTHISASIZE     64 //do not change unless ASIZE changes
 #define AFF_RUSH_CD		65 // bullrush cooldown
-#define AFF_MAX                 65
+#define AFF_CRIPPLE             66
+#define AFF_MAX                 66
 //#define AFF_CHECKTHISASIZE     64 //do not change unless ASIZE changes
 //#define AFF_CHECKTHISASIZE     96 //do not change unless ASIZE changes
 

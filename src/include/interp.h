@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.h,v 1.52 2006/06/15 12:36:46 urizen Exp $ */
+/* $Id: interp.h,v 1.53 2006/06/21 19:01:20 shane Exp $ */
 
 #ifndef INTERP_H_
 #define INTERP_H_
@@ -125,6 +125,7 @@ DO_FUN  do_count;
 DO_FUN  do_cpromote;
 DO_FUN  do_crazedassault;
 DO_FUN  do_credits;
+DO_FUN  do_cripple;
 DO_FUN  do_ctell; 
 DO_FUN  do_deathstroke;
 DO_FUN  do_deceit;

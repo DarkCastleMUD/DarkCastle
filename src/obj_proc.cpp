@@ -370,7 +370,7 @@ int holyavenger(CHAR_DATA *ch, struct obj_data *obj,  int cmd, char *arg,
    if(IS_AFFECTED(vict, AFF_NO_BEHEAD)) {
       act("$N deftly dodges your beheading attempt!", ch, 0, vict, TO_CHAR, 0);
       act("$N deftly dodges $n's attempt to behead $M!", ch, 0, vict, TO_ROOM, NOTVICT);
-      act("you deftly avoid $n's attempt to behead you!", ch, 0, vict, TO_VICT, 0);
+      act("You deftly avoid $n's attempt to lop your head off!", ch, 0, vict, TO_VICT, 0);
       return eSUCCESS;
    }
                        act("You feel your life end as $n's sword SLICES YOUR HEAD OFF!", ch, 0, vict, TO_VICT, 0);

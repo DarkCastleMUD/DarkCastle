@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.67 2006/06/06 12:13:58 dcastle Exp $
+| $Id: move.cpp,v 1.68 2006/06/21 19:01:15 shane Exp $
 | move.C
 | Movement commands and stuff.
 *************************************************************************
@@ -656,6 +656,11 @@ int do_simple_move(CHAR_DATA *ch, int cmd, int following)
   record_track_data(ch, cmd);
 
   retval = move_char(ch, world[was_in].dir_option[cmd]->to_room);
+
+  if(IS_SET(retval, eSUCCESS) && IS_AFFECTED(ch, AFF_CRIPPLE)) {
+    send_to_char("Your crippled body responds slowly.\n\r", ch);
+    WAIT_STATE(ch, PULSE_VIOLENCE);
+  }
 
   if (!IS_SET(retval, eSUCCESS)) {
     send_to_char("You fail to move.\n\r", ch);
