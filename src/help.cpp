@@ -308,13 +308,24 @@ int do_hindex(struct char_data *ch, char *argument, int cmd)
      } else if ((atoi(arg) - atoi(argument)) >= 30) { // too many listed, only 30 at a time or we get too much spam
         send_to_char("You can only list 30 help entries at a time.\r\n", ch);
         return eFAILURE;
-     } 
+     } else if (atoi(argument) > new_top_of_helpt || atoi(arg) > new_top_of_helpt)
+     {
+        send_to_char("Out of range.\r\n", ch); // wrong order, first > second
+        return eFAILURE;
+     }
+
      show_help_header(ch);
      for (i = atoi(argument); i <= atoi(arg); i++) {
         count = show_one_help_entry(i, ch, count);
      }
      show_help_bar(ch);
    } else if (((atoi(argument)) > 0) || *argument == '0') { // show a specific ID #
+     if (atoi(argument) > new_top_of_helpt)
+     {
+        send_to_char("Out of range.\r\n", ch); // wrong order, first > second
+        return eFAILURE;
+     }
+
      show_help_header(ch);
      count = show_one_help_entry(atoi(argument), ch, count);
      show_help_bar(ch);
@@ -371,6 +382,12 @@ int do_index(struct char_data *ch, char *argument, int cmd)
      }
      show_help_bar(ch);
    } else if (((atoi(argument)) > 0) || *argument == '0') { // show a specific ID #
+     if (atoi(argument) > new_top_of_helpt)
+     {
+        send_to_char("Out of range.\r\n", ch);
+        return eFAILURE;
+     }
+   
      if(new_help_table[atoi(argument)].min_level > 1)
         send_to_char("You are not high enough level to view this helpfile.\n\r", ch);
      else {
