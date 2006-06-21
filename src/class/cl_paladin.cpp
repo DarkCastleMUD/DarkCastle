@@ -173,7 +173,7 @@ int do_layhands(struct char_data *ch, char *argument, int cmd)
      duration /= 2;
    }
    else {
-     GET_HIT(victim) += 500 + (skill_level*10);
+     GET_HIT(victim) += 500 + (has_skill(ch, SKILL_LAY_HANDS)*10);
      if(GET_HIT(victim) > GET_MAX_HIT(victim))
        GET_HIT(victim) = GET_MAX_HIT(victim);
 
