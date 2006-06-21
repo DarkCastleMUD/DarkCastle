@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.42 2006/06/14 05:49:55 shane Exp $ */
+/* $Id: ki.cpp,v 1.43 2006/06/21 01:11:07 urizen Exp $ */
 
 extern "C"
 {
@@ -60,7 +60,7 @@ struct ki_info_type ki_info [ ] = {
 },
 
 { /* 3 */
-	12, POSITION_STANDING, 8,
+	12, POSITION_FIGHTING, 8,
 	TAR_IGNORE, ki_storm, SKILL_INCREASE_HARD
 },
 
@@ -94,7 +94,7 @@ struct ki_info_type ki_info [ ] = {
 
 { /* 9 */
 	12, POSITION_RESTING, 15,
-        TAR_SELF_ONLY, ki_meditation, SKILL_INCREASE_HARD
+        TAR_IGNORE, ki_meditation, SKILL_INCREASE_HARD
 }
 
 };
