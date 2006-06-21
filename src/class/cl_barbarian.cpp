@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_barbarian.cpp,v 1.65 2006/05/25 21:04:49 shane Exp $
+| $Id: cl_barbarian.cpp,v 1.66 2006/06/21 15:49:58 urizen Exp $
 | cl_barbarian.C
 | Description:  Commands for the barbarian class.
 */
@@ -455,6 +455,14 @@ int do_crazedassault(struct char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 } 
 
+void rush_reset(void *arg1, void *arg2, void *arg3)
+{
+  CHAR_DATA *ch = (CHAR_DATA*)arg1;
+  extern bool charExists(CHAR_DATA *ch);
+  if (!charExists(ch)) return;
+  REMBIT(ch->affected_by, AFF_RUSH_CD);
+}
+
 int do_bullrush(struct char_data *ch, char *argument, int cmd)
 {
   char direction[MAX_INPUT_LENGTH];
@@ -468,7 +476,12 @@ int do_bullrush(struct char_data *ch, char *argument, int cmd)
     send_to_char("You are feeling too weak right now for rushing to and fro.\r\n", ch);
     return eFAILURE;
   }
- 
+
+  if (IS_AFFECTED(ch, AFF_RUSH_CD))
+  {
+     send_to_char("You must take a moment to gather your strength before another rush!\r\n",ch);
+     return eFAILURE;
+  }
   if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL )
     ;
   else if(!has_skill(ch, SKILL_BULLRUSH)) {
@@ -506,17 +519,32 @@ int do_bullrush(struct char_data *ch, char *argument, int cmd)
   retval = special( ch, dir, "" );
   if(IS_SET(retval, eSUCCESS) || IS_SET(retval, eCH_DIED))
      return retval;
+  SETBIT(ch->affected_by, AFF_RUSH_CD);
+  extern void addtimer(struct timer_data *add);
+
+ // Reset bullrush AFF in 5 seconds
+  struct timer_data *timer;
+ #ifdef LEAK_CHECK
+  timer = (struct timer_data *)calloc(1, sizeof(struct timer_data));
+ #else
+  timer = (struct timer_data *)dc_alloc(1, sizeof(struct timer_data));
+ #endif
+  timer->arg1 = (void*)ch;
+  timer->function = rush_reset;
+  timer->timeleft = 5;
+  addtimer(timer);
 
   retval = attempt_move(ch, dir);
   if(SOMEONE_DIED(retval))
     return retval;
+
   if (!(victim = get_char_room_vis(ch,who)))
   {
      send_to_char("You charge in, but are left confused by the complete lack of such a target!\r\n",ch);
-     WAIT_STATE(ch,PULSE_VIOLENCE/2);
+//     WAIT_STATE(ch,PULSE_VIOLENCE/2);
      return eFAILURE;
   }
-  WAIT_STATE(ch, PULSE_VIOLENCE);
+//  WAIT_STATE(ch, PULSE_VIOLENCE);
 
   if(!skill_success(ch,victim,SKILL_BULLRUSH) )
   {
@@ -527,7 +555,7 @@ int do_bullrush(struct char_data *ch, char *argument, int cmd)
   }
 
   if(!victim || victim == ch) {
-    send_to_char("You successfully rush in and bushwack....the air.\r\n", ch);
+    send_to_char("You successfully rush in and bushwack... the air.\r\n", ch);
     return eFAILURE;
   }
 
