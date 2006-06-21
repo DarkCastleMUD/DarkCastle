@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.327 2006/06/17 04:02:19 shane Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.328 2006/06/21 10:27:51 urizen Exp $ */
 
 extern "C"
 {
@@ -688,7 +688,10 @@ void update_stuns(CHAR_DATA *ch)
       if (GET_POS(ch) != POSITION_FIGHTING) {
         act("$n regains consciousness...", ch, 0, 0, TO_ROOM, 0);
         act("You regain consciousness...", ch, 0, 0, TO_CHAR, 0);
-        GET_POS(ch) = POSITION_STANDING;
+	if (ch->fighting)
+	  GET_POS(ch) = POSITION_FIGHTING;
+	else
+          GET_POS(ch) = POSITION_STANDING;
 	if (IS_SET(ch->combat, COMBAT_BERSERK))
 	{
 	  send_to_char("After that period of unconsciousness, you've forgotten what you were mad about.\r\n",ch);
