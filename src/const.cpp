@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.198 2006/06/14 05:49:55 shane Exp $ */
+/* $Id: const.cpp,v 1.199 2006/06/21 15:51:33 urizen Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -897,6 +897,8 @@ char *affected_bits[] =
     "BOUNT_SONNET_HUNGER",
     "BOUNT_SONNET_THIRST",
     "CMAST_WEAKEN",
+    "RESERVEDBAD",
+    "BULLRUSHCD",
     "\n"
 };
 
