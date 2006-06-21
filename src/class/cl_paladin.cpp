@@ -126,7 +126,7 @@ int do_layhands(struct char_data *ch, char *argument, int cmd)
    // struct char_data *tmp_ch;
    char victim_name[240];
    struct affected_type af;
-   int duration = 72;
+   int duration = 24;
    one_argument(argument, victim_name);
 
    if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL )
@@ -173,7 +173,7 @@ int do_layhands(struct char_data *ch, char *argument, int cmd)
      duration /= 2;
    }
    else {
-     GET_HIT(victim) += 1000;
+     GET_HIT(victim) += 500 + (skill_level*10);
      if(GET_HIT(victim) > GET_MAX_HIT(victim))
        GET_HIT(victim) = GET_MAX_HIT(victim);
 
