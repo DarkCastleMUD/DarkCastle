@@ -2766,7 +2766,7 @@ int godload_wailka(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
   arg = one_argument(arg, arg2);
 
   if (str_cmp(arg1, "suloaki")) return eFAILURE;
-  if (isTimer(ch, SPELL_PARALYZE)) 
+  if (isTimer(ch, SPELL_PARALYZE) || IS_SET(world[ch->in_room].room_flags, SAFE)) 
   {  
      send_to_char("The ring hums, but nothing happens.\r\n",ch);
      return eSUCCESS;

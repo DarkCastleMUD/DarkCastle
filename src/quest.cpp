@@ -172,11 +172,11 @@ void show_quest_info(CHAR_DATA *ch, int num)
                      quest->name, quest->level, quest->hint1, quest->hint2, quest->hint3,
                      quest->objnum, quest->mobnum, quest->objshort, quest->objlong,
                      quest->objkey, quest->timer, quest->reward);
-         break;
+         return;
       }
       quest = quest->next;
    }
-         
+   send_to_char("That quest doesn't exist.\n\r", ch);
 }
 
 int check_quest_timer(CHAR_DATA *ch, struct quest_info *quest)
@@ -744,6 +744,7 @@ int do_qedit(CHAR_DATA *ch, char *arg, int cmd)
    }
 
    if(is_abbrev(arg, "save")) {
+      send_to_char("Quests saved.\n\r", ch);
       return save_quests();
    }
 
@@ -775,7 +776,7 @@ int do_qedit(CHAR_DATA *ch, char *arg, int cmd)
 
    holdernum = atoi(arg);
 
-   if(holdernum <= 0 || holdernum >= QUEST_MAX) {
+   if(holdernum <= 0 || holdernum > QUEST_TOTAL) {
       send_to_char("Invalid quest number.\n\r", ch);
       return eFAILURE;
    }
@@ -799,7 +800,10 @@ int do_qedit(CHAR_DATA *ch, char *arg, int cmd)
          break;
    }
    
-   quest = get_quest_struct(holdernum);
+   if(!(quest = get_quest_struct(holdernum)) {
+      send_to_char("That quest doesn't exist.\n\r", ch);
+      return eFAILURE;
+   }
 
    switch(i) {
       case 0:
