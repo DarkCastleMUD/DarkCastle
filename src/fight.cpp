@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.329 2006/06/21 19:01:14 shane Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.330 2006/06/23 22:37:28 shane Exp $ */
 
 extern "C"
 {
@@ -675,8 +675,11 @@ void update_flags(CHAR_DATA *vict)
 
 void update_stuns(CHAR_DATA *ch)
 {
-  if (IS_SET(ch->combat, COMBAT_SHOCKED))
+  if (IS_SET(ch->combat, COMBAT_SHOCKED)) {
     REMOVE_BIT(ch->combat, COMBAT_SHOCKED);
+    SET_BIT(ch->combat, COMBAT_SHOCKED2);
+  } else if (IS_SET(ch->combat, COMBAT_SHOCKED2))
+    REMOVE_BIT(ch->combat, COMBAT_SHOCKED2);
   
   if (IS_SET(ch->combat, COMBAT_STUNNED)) {
     REMOVE_BIT(ch->combat, COMBAT_STUNNED);
@@ -699,13 +702,6 @@ void update_stuns(CHAR_DATA *ch)
 	}
       }
   } 
-//  struct affected_type *eh;
-//  if ((eh = affected_by_spell(ch, SPELL_PARALYZE)) != NULL)
- // {
-  //  eh->duration -= 1;
-   // if (eh->duration == 0)
-    //  affect_from_char(ch, SPELL_PARALYZE);
- // }
 }
 
 bool do_frostshield(CHAR_DATA *ch, CHAR_DATA *vict) 
@@ -1158,6 +1154,7 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
 //  if(IS_AFFECTED(vict, AFF_PARALYSIS) || !AWAKE(vict) ||
 //    IS_SET(vict->combat, COMBAT_STUNNED) ||
 //    IS_SET(vict->combat, COMBAT_STUNNED2) ||
+//    IS_SET(vict->combat, COMBAT_SHOCKED2) ||
 //    IS_SET(vict->combat, COMBAT_SHOCKED))
 //    diceroll = 20;
   
@@ -2446,6 +2443,7 @@ int check_magic_block(CHAR_DATA *ch, CHAR_DATA *victim, int attacktype)
     (IS_SET(victim->combat, COMBAT_BASH1)) ||
     (IS_SET(victim->combat, COMBAT_BASH2)) ||
     (IS_SET(victim->combat, COMBAT_SHOCKED)) ||
+    (IS_SET(victim->combat, COMBAT_SHOCKED2)) ||
     (IS_AFFECTED(victim, AFF_PARALYSIS)))
     return 0;
   if (IS_NPC(victim)) reduce = GET_LEVEL(victim)/2; // shrug
@@ -2486,6 +2484,7 @@ int check_shieldblock(CHAR_DATA * ch, CHAR_DATA * victim, int attacktype)
     (IS_SET(victim->combat, COMBAT_BASH1)) ||
     (IS_SET(victim->combat, COMBAT_BASH2)) ||
     (IS_SET(victim->combat, COMBAT_SHOCKED)) ||
+    (IS_SET(victim->combat, COMBAT_SHOCKED2)) ||
     (IS_AFFECTED(victim, AFF_PARALYSIS)))
     return 0;
   
@@ -2551,6 +2550,7 @@ bool check_parry(CHAR_DATA * ch, CHAR_DATA * victim, int attacktype)
     (IS_SET(victim->combat, COMBAT_BASH1)) ||
     (IS_SET(victim->combat, COMBAT_BASH2)) ||
     (IS_SET(victim->combat, COMBAT_SHOCKED)) ||
+    (IS_SET(victim->combat, COMBAT_SHOCKED2)) ||
     (IS_AFFECTED(victim, AFF_PARALYSIS)))
     return FALSE;
   
@@ -2648,6 +2648,7 @@ bool check_dodge(CHAR_DATA * ch, CHAR_DATA * victim, int attacktype)
     (IS_SET(victim->combat, COMBAT_BASH1)) ||
     (IS_SET(victim->combat, COMBAT_BASH2)) ||
     (IS_SET(victim->combat, COMBAT_SHOCKED)) ||
+    (IS_SET(victim->combat, COMBAT_SHOCKED2)) ||
     (IS_AFFECTED(victim, AFF_PARALYSIS)))
     return FALSE;
 
@@ -2948,6 +2949,8 @@ void stop_fighting(CHAR_DATA * ch, int clearlag)
   }
   
   // make sure people aren't stuck unable to do anything
+  if(IS_SET(ch->combat, COMBAT_SHOCKED2))
+    REMOVE_BIT(ch->combat, COMBAT_SHOCKED2);
   if(IS_SET(ch->combat, COMBAT_SHOCKED))
     REMOVE_BIT(ch->combat, COMBAT_SHOCKED);
 
@@ -4828,6 +4831,8 @@ int is_stunned(CHAR_DATA *ch)
   if(IS_SET(ch->combat, COMBAT_STUNNED2))
     return TRUE;
   if(IS_SET(ch->combat, COMBAT_SHOCKED))
+    return TRUE;
+  if(IS_SET(ch->combat, COMBAT_SHOCKED2))
     return TRUE;
   return FALSE;
 }

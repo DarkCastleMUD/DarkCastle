@@ -16,7 +16,7 @@
  *  10/21/2003   Onager    Changed IS_ANONYMOUS() to handle mobs without   *
  *                         crashing                                        *
  ***************************************************************************/
-/* $Id: utility.h,v 1.42 2006/06/08 20:18:02 shane Exp $ */
+/* $Id: utility.h,v 1.43 2006/06/23 22:37:37 shane Exp $ */
 
 #ifndef UTILITY_H_
 #define UTILITY_H_
@@ -404,7 +404,7 @@ void stop_follower(CHAR_DATA *ch, int cmd);
 bool CAN_SEE( CHAR_DATA *sub, CHAR_DATA *obj );
 int  SWAP_CH_VICT(int value);
 bool SOMEONE_DIED(int value);
-bool CAN_SEE_OBJ( CHAR_DATA *sub, struct obj_data *obj );
+bool CAN_SEE_OBJ( CHAR_DATA *sub, struct obj_data *obj, bool bf = FALSE);
 bool check_blind( CHAR_DATA *ch );
 void raw_kill(CHAR_DATA *ch, CHAR_DATA *victim);
 void check_killer( CHAR_DATA *ch, CHAR_DATA *victim );
@@ -415,7 +415,7 @@ void send_to_all(char *messg);
 void ansi_color(char *txt, CHAR_DATA *ch);
 void send_to_char(char *messg, CHAR_DATA *ch);
 void send_to_char_nosp(char *messg, CHAR_DATA *ch);
-void send_to_room(char *messg, int room, CHAR_DATA *nta = NULL);
+void send_to_room(char *messg, int room, bool awakeonly = FALSE, CHAR_DATA *nta = NULL);
 void record_track_data(CHAR_DATA *ch, int cmd); 
 int write_to_descriptor(int desc, char *txt);
 int write_to_descriptor_fd(int desc, char *txt);

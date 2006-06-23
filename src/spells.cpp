@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.173 2006/06/21 19:01:15 shane Exp $ */
+/* $Id: spells.cpp,v 1.174 2006/06/23 22:37:29 shane Exp $ */
 
 extern "C"
 {
@@ -1454,7 +1454,10 @@ bool skill_success(CHAR_DATA *ch, CHAR_DATA *victim, int skillnum, int mod )
        }
   int i = 0,learned = 0;
 
-    if (!IS_MOB(ch))      i = learned = has_skill(ch, skillnum);
+    if (!IS_MOB(ch)) {
+        i = learned = has_skill(ch, skillnum);
+        if(!learned) return FALSE;
+    }
     else {
 	if (GET_LEVEL(ch) < 30) i = 30;
 	else if (GET_LEVEL(ch) < 50) i =40;

@@ -1283,7 +1283,7 @@ int stupid_message(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
    if(number(1, 10) == 1)
       send_to_room("The shadows swirl to reveal a face before you.\r\n"
                    "It speaks suddenly, 'Only with the key can you unlock the masters name' "
-                   "and then fades away.\r\n", obj->in_room);
+                   "and then fades away.\r\n", obj->in_room, TRUE);
 
    return eSUCCESS;
 }
@@ -1746,17 +1746,17 @@ int pull_proc(struct char_data*ch, struct obj_data *obj, int cmd, char*arg, CHAR
         // unlock the gate
         REMOVE_BIT(world[9531].dir_option[1]->exit_info, EX_LOCKED);
         REMOVE_BIT(world[9532].dir_option[3]->exit_info, EX_LOCKED);
-        send_to_room("You hear a large clicking noise.\n\r", 9531);
-        send_to_room("You hear a large clicking noise.\n\r", 9532);
-        send_to_room("You hear a large clicking noise.\n\r", ch->in_room);
+        send_to_room("You hear a large clicking noise.\n\r", 9531, TRUE);
+        send_to_room("You hear a large clicking noise.\n\r", 9532, TRUE);
+        send_to_room("You hear a large clicking noise.\n\r", ch->in_room, TRUE);
         break;
       case 29203:
 	if (obj_index[real_object(29202)].number > 0)
 	{
-		send_to_room("A compartment in the ceiling opens, but is it empty.\r\n",29258);
+		send_to_room("A compartment in the ceiling opens, but is it empty.\r\n",29258, TRUE);
 		break;
 	}
-	send_to_room("A compartment in the ceiling opens, and a key drops to the ground.\r\n", 29258);
+	send_to_room("A compartment in the ceiling opens, and a key drops to the ground.\r\n", 29258, TRUE);
 	obj_to_room(clone_object(real_object(29202)), 29258);
 	break;
       default:
@@ -1815,10 +1815,10 @@ char*arg, CHAR_DATA *invoker)
 		if (o->obj_flags.type_flag == ITEM_PORTAL) portal = TRUE;
         if (!portal) break;
       } // Find a room
-      send_to_room(msg1,obj->in_room);
+      send_to_room(msg1,obj->in_room, TRUE);
       obj_from_room(obj);
       obj_to_room(obj, room);
-      send_to_room(msg2,obj->in_room);
+      send_to_room(msg2,obj->in_room, TRUE);
       return eSUCCESS;
    }
    return eFAILURE;
@@ -1863,11 +1863,11 @@ void send_to_boat(int boat, char * message)
 {
   switch(boat) {
     case 9531: // dk boat
-       send_to_room(message, 9522);
-       send_to_room(message, 9523);
-       send_to_room(message, 9524);
-       send_to_room(message, 9525);
-       send_to_room(message, 9587);
+       send_to_room(message, 9522, TRUE);
+       send_to_room(message, 9523, TRUE);
+       send_to_room(message, 9524, TRUE);
+       send_to_room(message, 9525, TRUE);
+       send_to_room(message, 9587, TRUE);
        break;
     default:
       break;
@@ -1944,11 +1944,11 @@ int boat_proc(struct char_data*ch, struct obj_data *obj, int cmd, char*arg, CHAR
          send_to_boat(obj_index[obj->item_number].virt, "The ship docks at its destination.\n\r");
        }
      }
-     send_to_room("The ship sails away.\n\r", obj->in_room);
+     send_to_room("The ship sails away.\n\r", obj->in_room, TRUE);
      send_to_boat(obj_index[obj->item_number].virt, "The ship sails onwards.\n\r");
      obj_from_room(obj);
      obj_to_room(obj, move_to);
-     send_to_room("A ship sails in.\n\r", obj->in_room);
+     send_to_room("A ship sails in.\n\r", obj->in_room, TRUE);
    }
    return eSUCCESS;
 }
@@ -2049,13 +2049,13 @@ int mob_summoner(struct char_data*ch, struct obj_data *obj, int cmd, char*arg, C
 
        switch(obj->obj_flags.value[0]) {
          case 0:
-           send_to_room("The shadows in the room begin to shift and slide in tricks of the light.\n\r", BONEWRACK_ROOM);
+           send_to_room("The shadows in the room begin to shift and slide in tricks of the light.\n\r", BONEWRACK_ROOM, TRUE);
            break;
          case 1:
            send_to_zone("A loud roar echos audibly through the entire kingdom.\n\r", world[obj->in_room].zone);
            break;
          case 2:
-           send_to_room("The dragon $B$2Bonewrack$R flies in from above!\n\r", BONEWRACK_ROOM);
+           send_to_room("The dragon $B$2Bonewrack$R flies in from above!\n\r", BONEWRACK_ROOM, TRUE);
            move_char(vict, BONEWRACK_ROOM);
            obj->obj_flags.value[0] = 0;
            break;
@@ -2072,13 +2072,13 @@ int mob_summoner(struct char_data*ch, struct obj_data *obj, int cmd, char*arg, C
 
        switch(obj->obj_flags.value[0]) {
          case 0:
-           send_to_room("In the distance a winged creature can be seen flying towards you.\n\r", GAIOT_AVATAR);
+           send_to_room("In the distance a winged creature can be seen flying towards you.\n\r", GAIOT_AVATAR, TRUE);
            break;
          case 1:
-           send_to_room("The winged creature flies closer and closer.\n\r", GAIOT_AVATAR);
+           send_to_room("The winged creature flies closer and closer.\n\r", GAIOT_AVATAR, TRUE);
            break;
          case 2:
-           send_to_room("The creature shatters in illusion!\n\r", GAIOT_AVATAR);
+           send_to_room("The creature shatters in illusion!\n\r", GAIOT_AVATAR, TRUE);
            move_char(vict, GAIOT_AVATAR);
            obj->obj_flags.value[0] = 0;
            break;
@@ -2110,7 +2110,7 @@ int globe_of_darkness_proc(struct char_data*ch, struct obj_data *obj, int cmd, c
    if(obj->obj_flags.value[0] < 1) {
       // time to kill myself
       world[obj->in_room].light += obj->obj_flags.value[1]; // light back up
-      send_to_room("The globe of darkness fades brightening the room some.\n\r", obj->in_room);
+      send_to_room("The globe of darkness fades brightening the room some.\n\r", obj->in_room, TRUE);
       extract_obj(obj);
    }
    else obj->obj_flags.value[0]--;

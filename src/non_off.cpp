@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: non_off.cpp,v 1.36 2006/05/22 22:14:01 apocalypse Exp $
+| $Id: non_off.cpp,v 1.37 2006/06/23 22:37:29 shane Exp $
 | non_off.C
 | Description:  Implementation of generic, non-offensive commands.
 */
@@ -944,9 +944,6 @@ int do_sleep(CHAR_DATA *ch, char *argument, int cmd)
     if (!IS_SET(world[ch->in_room].room_flags, SAFE))
       send_to_char ("Be careful sleeping out here!  This isn't a safe room, so people can steal your equipment while you sleep!\r\n", ch);
 
-    if ((paf = affected_by_spell(ch, SKILL_BLACKJACK)) && 
-		paf->modifier == 1 && GET_POS(ch) != POSITION_SLEEPING)
- 	paf->modifier = 0;
     if ((paf = affected_by_spell(ch, SPELL_SLEEP)) && 
 		paf->modifier == 1 && GET_POS(ch) != POSITION_SLEEPING)
  	paf->modifier = 0;
@@ -1017,8 +1014,6 @@ int do_wake(CHAR_DATA *ch, char *argument, int cmd)
                             }
                             if ((af = affected_by_spell(tmp_char, SPELL_SLEEP)) && af->modifier == 1) {  
                                 act("You can not wake $M up!", ch, 0, tmp_char, TO_CHAR, 0);
-                            }else if ((af = affected_by_spell(tmp_char, SKILL_BLACKJACK)) && af->modifier == 1) {  
-                                act("You can not wake $M up!", ch, 0, tmp_char, TO_CHAR, 0);
                             } else {
                                 act("You manage to give $M a swift kick in the ribs.", ch, 0, tmp_char, TO_CHAR, 0);
                                 GET_POS(tmp_char) = POSITION_SITTING;
@@ -1033,8 +1028,6 @@ int do_wake(CHAR_DATA *ch, char *argument, int cmd)
                     else {
                         if (GET_POS(tmp_char) == POSITION_SLEEPING) {
                             if ((af = affected_by_spell(tmp_char, SPELL_SLEEP)) && af->modifier == 1) {  
-                                act("You can not wake $M up!", ch, 0, tmp_char, TO_CHAR, 0);
-                            } else if ((af = affected_by_spell(tmp_char, SKILL_BLACKJACK)) && af->modifier == 1) {  
                                 act("You can not wake $M up!", ch, 0, tmp_char, TO_CHAR, 0);
                             } else {
                                 act("You wake $M up.", ch, 0, tmp_char, TO_CHAR, 0);
@@ -1056,8 +1049,6 @@ int do_wake(CHAR_DATA *ch, char *argument, int cmd)
         if (GET_POS(ch) > POSITION_SLEEPING)
            send_to_char("You are already awake...\n\r", ch);
         else if ((af = affected_by_spell(ch, SPELL_SLEEP)) && af->modifier == 1) {
-            send_to_char("You can't wake up!\n\r", ch);
-        }else if ((af = affected_by_spell(ch, SKILL_BLACKJACK)) && af->modifier == 1) {
             send_to_char("You can't wake up!\n\r", ch);
 //        } else if ((af = affected_by_spell(ch, INTERNAL_SLEEPING))) {
 //            send_to_char("You just went to sleep!  Your body is still too tired.  Your dreaming continues...\r\n", ch);

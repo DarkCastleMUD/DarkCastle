@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.h,v 1.15 2005/07/16 10:46:53 shane Exp $ */
+/* $Id: handler.h,v 1.16 2006/06/23 22:37:37 shane Exp $ */
 
 #ifndef HANDLER_H_
 #define HANDLER_H_
@@ -99,9 +99,9 @@ CHAR_DATA *get_mob_vis(CHAR_DATA *ch, char *name);
 CHAR_DATA *get_mob_vnum(int vnum);
 OBJ_DATA *get_obj_vnum(int vnum);
 struct obj_data *get_obj_in_list_vis(CHAR_DATA *ch, char *name, 
-		struct obj_data *list);
+		struct obj_data *list, bool bf = FALSE);
 struct obj_data *get_obj_in_list_vis(CHAR_DATA *ch, int item_num, 
-		struct obj_data *list);
+		struct obj_data *list, bool bf = FALSE);
 struct obj_data *get_obj_vis(CHAR_DATA *ch, char *name, bool loc = FALSE);
 
 void extract_char(CHAR_DATA *ch, bool pull);

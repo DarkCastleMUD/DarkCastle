@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.128 2006/06/23 01:49:15 shane Exp $
+| $Id: cl_thief.cpp,v 1.129 2006/06/23 22:37:34 shane Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -287,7 +287,7 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
 int do_circle(CHAR_DATA *ch, char *argument, int cmd)
 {
    CHAR_DATA * victim;
-   // char name[256];
+   bool blackjack = FALSE;
    int retval;
 
    if(IS_MOB(ch))
@@ -343,8 +343,11 @@ int do_circle(CHAR_DATA *ch, char *argument, int cmd)
 
    if((ch->equipment[WIELD]->obj_flags.value[3] != 11) &&
      (ch->equipment[WIELD]->obj_flags.value[3] != 9)) {
-        send_to_char("Only certain weapons can be used for backstabbing, this isn't one of them.\n\r", ch);
-        return eFAILURE;
+      if(ch->equipment[WIELD]->obj_flags.value[3] == TYPE_BLUDGEON) blackjack = TRUE;
+      else {
+         send_to_char("Only certain weapons can be used for backstabbing, this isn't one of them.\n\r", ch);
+         return eFAILURE;
+      }
    }
 
    if (ch == victim->fighting) {
@@ -356,20 +359,20 @@ int do_circle(CHAR_DATA *ch, char *argument, int cmd)
    act ("You circle around your target...",  ch, 0, 0, TO_CHAR, 0);
    act ("$n circles around $s target...", ch, 0, 0, TO_ROOM, INVIS_NULL);
 
-   WAIT_STATE(ch, PULSE_VIOLENCE * 2);
+   blackjack?WAIT_STATE(ch, PULSE_VIOLENCE*3):WAIT_STATE(ch, PULSE_VIOLENCE * 2);
    
    if (AWAKE(victim) && !skill_success(ch,victim,SKILL_CIRCLE))
-      return damage(ch, victim, 0,TYPE_UNDEFINED, SKILL_BACKSTAB, FIRST);
+      return blackjack?damage(ch, victim, 0,TYPE_UNDEFINED, SKILL_BLACKJACK, FIRST):damage(ch, victim, 0,TYPE_UNDEFINED, SKILL_BACKSTAB, FIRST);
    else 
    {
       SET_BIT(ch->combat, COMBAT_CIRCLE);
-      retval = one_hit(ch, victim, SKILL_BACKSTAB, FIRST);
+      retval = blackjack?one_hit(ch, victim, SKILL_BLACKJACK, FIRST):one_hit(ch, victim, SKILL_BACKSTAB, FIRST);
 
       if(SOMEONE_DIED(retval))
         return retval;
     }
       // Now go for dual backstab
-      if (has_skill(ch, SKILL_DUAL_BACKSTAB) &&
+      if (has_skill(ch, SKILL_DUAL_BACKSTAB) && !blackjack &&
           ((GET_CLASS(ch) == CLASS_THIEF) || (GET_LEVEL(ch) >= ARCHANGEL)))
          if (ch->equipment[SECOND_WIELD])
             if ((ch->equipment[SECOND_WIELD]->obj_flags.value[3] == 11) ||
@@ -796,10 +799,6 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
               {
                 paf->modifier = 0; // make sleep no longer work
               }
-              if((paf = affected_by_spell(victim, SKILL_BLACKJACK))&& paf->modifier == 1)
-              {
-                paf->modifier = 0; // make sleep no longer work
-              }
                 do_wake(ch, GET_NAME(victim), 9);
 //              }
             }
@@ -954,10 +953,6 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
       {
         paf->modifier = 0; // make sleep no longer work
       }
-      if((paf = affected_by_spell(victim, SKILL_BLACKJACK))&& paf->modifier == 1)
-      {
-         paf->modifier = 0; // make sleep no longer work
-      }
 
       do_wake(ch, GET_NAME(victim), 9);
       act("$n tried to steal something from you, waking you up in the process.!", ch, 0, victim, TO_VICT, 0);
@@ -973,10 +968,6 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
 	do_save(victim,"",666);
 	set_cantquit(ch,victim);
         if((paf = affected_by_spell(victim, SPELL_SLEEP))&& paf->modifier == 1)
-        {
-           paf->modifier = 0; // make sleep no longer work
-        }
-        if((paf = affected_by_spell(victim, SKILL_BLACKJACK))&& paf->modifier == 1)
         {
            paf->modifier = 0; // make sleep no longer work
         }
@@ -1012,10 +1003,6 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
 //            {
 //              send_to_char("Oops, that was clumsy...\r\n", ch);
              if((paf = affected_by_spell(victim, SPELL_SLEEP))&& paf->modifier == 1)
-             {
-                paf->modifier = 0; // make sleep no longer work
-             }
-             if((paf = affected_by_spell(victim, SKILL_BLACKJACK))&& paf->modifier == 1)
              {
                 paf->modifier = 0; // make sleep no longer work
              }
@@ -1781,53 +1768,25 @@ int do_blackjack(struct char_data *ch, char *argument, int cmd)
       if(!can_attack(ch) || !can_be_attacked(ch, victim))
       return eFAILURE;
   }
-  if (victim->fighting)
-  {
-    act("$N is in combat and is too alert for you to knock out.",ch, 0, victim, TO_CHAR, 0);
-//    send_to_char("They're in combat, and you can't sneak up.\r\n",ch);
-    return eFAILURE;
-  }
-  if (GET_POS(victim) == POSITION_SLEEPING)
-  {
-    act("$N is already asleep.",ch,0,victim,TO_CHAR,0);
-	return eFAILURE;
-  }
   if (affected_by_spell(victim, SPELL_PARALYZE))
   {
     act("$N is magically frozen in place by paralysis and cannot be blackjacked.",ch, 0, victim, TO_CHAR, 0);
     return eFAILURE;
   }
   
-  if (affected_by_spell(victim, SKILL_BLACKJACK)
-	|| ISSET(victim->affected_by, AFF_BLACKJACK_ALERT))
+  if (ISSET(victim->affected_by, AFF_BLACKJACK_ALERT))
   {
     act("$N is too alert to be blackjacked right now.",ch, 0, victim, TO_CHAR, 0);
     return eFAILURE;
   }
-  if (affected_by_spell(ch, SKILL_BLACKJACK)
-	|| ISSET(ch->affected_by, AFF_BLACKJACK_ALERT))
+  if (ISSET(ch->affected_by, AFF_BLACKJACK_ALERT))
   {
     act("You cannot blackjack yet.",ch, 0, victim, TO_CHAR, 0);
     return eFAILURE;
   }
-  bool autofail = FALSE;
-  int i = GET_LEVEL(ch) - GET_LEVEL(victim);
-  if (IS_NPC(victim) && i <= -10)
-     autofail = TRUE;
-  if (!IS_NPC(victim) && (i > 10 || i < -10))
-     autofail = TRUE;
-  
-  int chance = GET_HITROLL(ch) / 3 + has_skill(ch,SKILL_BLACKJACK) / 15;
-    // skill doesn't have as much of an impact as hitroll
- // let's say 65 hit max = max 21 chance, skill 95 -> max 6 additional
-   // 27 max. to an approx max of 7% equals the following
-  chance *= 100; chance /= 27;
-  chance *= 700; chance /= 10000; // could shorten it down, and did it with the big numbers
-  // to remove the needs of using floats.
-  skill_increase_check(ch, SKILL_BLACKJACK, has_skill(ch,SKILL_BLACKJACK), SKILL_INCREASE_HARD);
   set_cantquit(ch, victim);
   WAIT_STATE(ch, PULSE_VIOLENCE*3);
-  if (number(1,101) > chance)
+  if (!skill_success(ch, victim, SKILL_BLACKJACK))
   { // failure!
      act("$N notices $n approaching and thwarts $s attempted blackjack.", ch, 0, victim, TO_ROOM, NOTVICT);
      act("You notice $n approaching from the shadows with a club in hand, thwarting $s chance to blackjack you.", ch, 0, victim, TO_VICT, 0 );
@@ -1864,24 +1823,12 @@ int do_blackjack(struct char_data *ch, char *argument, int cmd)
       }
      return eFAILURE;
   } else {
-     struct affected_type af;
-     af.type      = SKILL_BLACKJACK;
-     af.duration  = 2;
-     af.modifier  = 1;
-     af.location  = APPLY_NONE;
-     af.bitvector = AFF_SLEEP;
-     affect_join(victim, &af, FALSE, FALSE);
-     af.type      = SKILL_BLACKJACK;
-     af.duration  = 2;
-     af.modifier  = 0;
-     af.location  = APPLY_NONE;
-     af.bitvector = AFF_SLEEP;
-     affect_join(ch, &af, FALSE, FALSE);
-     act("$N leaps from the shadows and strikes a sharp blow to the back of your head, knocking you unconscious...",victim,0,ch,TO_CHAR,0);
-     act("$n sneaks behind $N and knocks $M unconscious with a sharp blow to the head.",ch,0,victim,TO_ROOM, INVIS_NULL);
-     act("You sneak behind $N and knock $M unconscious with a sharp rap to the head.",ch,0,victim,TO_CHAR, 0);
-     GET_POS(victim)=POSITION_SLEEPING;
-     return eSUCCESS;
+     act("$N leaps from the shadows and strikes a sharp blow to the back of your head, shocking you!",victim,0,ch,TO_CHAR,0);
+     act("$n sneaks behind $N and shocks $M with a sharp blow to the head.",ch,0,victim,TO_ROOM, INVIS_NULL);
+     act("You sneak behind $N and shock $M with a sharp rap to the head.",ch,0,victim,TO_CHAR, 0);
+     SET_BIT(victim->combat, COMBAT_SHOCKED2);
+     WAIT_STATE(victim, PULSE_VIOLENCE * 2);
+     return damage(ch, victim, 50, TYPE_BLUDGEON, SKILL_BLACKJACK, 0);
   }
 }
 

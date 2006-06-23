@@ -712,6 +712,7 @@ void update_bard_singing()
          || IS_SET(i->combat, COMBAT_STUNNED)
          || IS_SET(i->combat, COMBAT_STUNNED2)
          || IS_SET(i->combat, COMBAT_SHOCKED) 
+         || IS_SET(i->combat, COMBAT_SHOCKED2)
          || (IS_SET(i->combat, COMBAT_BASH1) || IS_SET(i->combat, COMBAT_BASH2)) &&
             (i->song_number == SKILL_SONG_TRAVELING_MARCH - SKILL_SONG_BASE ||
              i->song_number == SKILL_SONG_BOUNT_SONNET - SKILL_SONG_BASE ||

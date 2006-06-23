@@ -100,6 +100,7 @@ bool malediction_res(CHAR_DATA *ch, CHAR_DATA *victim, int spell)
     case SPELL_ATTRITION: res = SAVE_TYPE_POISON; break;
     case SPELL_DEBILITY: res = SAVE_TYPE_POISON; break;
     case SPELL_FEAR: res = SAVE_TYPE_COLD; break;
+    case SPELL_PARALYZE: res = SAVE_TYPE_MAGIC; break;
   }
   res = victim->saves[res] + 5 + (100-has_skill(ch, spell))/2;
   if (number(1,101) < res) return TRUE;
@@ -274,7 +275,7 @@ int spell_colour_spray(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
      act("$N blinks in confusion from the distraction of the colour spray.", ch, 0, victim, TO_ROOM, NOTVICT);
      act("Brilliant streams of colour streak from $n's fingers!  WHOA!  Cool!", ch, 0, victim, TO_VICT, 0 );
      act("Your colours of brilliance dazzle the simpleminded $N.", ch, 0, victim, TO_CHAR, 0 );
-     SET_BIT(victim->combat, COMBAT_SHOCKED);
+     SET_BIT(victim->combat, COMBAT_SHOCKED2);
    }
    return retval;
 }
@@ -1410,7 +1411,7 @@ int spell_paralyze(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
     victim = ch;
   }
 
-   if (number(1,101) < get_saves(victim, SAVE_TYPE_MAGIC)) {
+   if (malediction_res(ch, victim, SPELL_PARALYZE)) {
       act("$N resists your attempt to paralyze $M!", ch, NULL, victim, TO_CHAR,0);
       act("$N resists $n's attempt to paralyze $M!", ch, NULL, victim, TO_ROOM,NOTVICT);
       act("You resist $n's attempt to paralyze you!",ch,NULL,victim,TO_VICT,0);
@@ -1659,7 +1660,7 @@ int spell_cure_critic(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
   if (!can_heal(ch,victim, SPELL_CURE_CRITIC)) return eFAILURE;
   healpoints = dam_percent(skill, 100);
   if ( (healpoints + GET_HIT(victim)) > hit_limit(victim) ) {
-    healpoints += hit_limit(victim) - GET_HIT(victim);
+    healpoints = hit_limit(victim) - GET_HIT(victim);
 	 GET_HIT(victim) = hit_limit(victim);
   }
   else
@@ -1713,7 +1714,7 @@ int spell_cure_light(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
   if (!can_heal(ch,victim, SPELL_CURE_LIGHT)) return eFAILURE;
   healpoints = dam_percent(skill, 25);
   if ( (healpoints+GET_HIT(victim)) > hit_limit(victim) ) {
-     healpoints += hit_limit(victim) - GET_HIT(victim);
+     healpoints = hit_limit(victim) - GET_HIT(victim);
 	 GET_HIT(victim) = hit_limit(victim);
   }
   else
@@ -4871,7 +4872,7 @@ int spell_cure_serious(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
   if (!can_heal(ch,victim, SPELL_CURE_SERIOUS)) return eFAILURE;
       healpoints = dam_percent(skill,50);
   if ((healpoints + GET_HIT(victim)) > hit_limit(victim)) {
-    healpoints += hit_limit(victim) - GET_HIT(victim);
+    healpoints = hit_limit(victim) - GET_HIT(victim);
     GET_HIT(victim) = hit_limit(victim);
   }
   else

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.67 2006/06/03 09:29:36 dcastle Exp $
+| $Id: inventory.cpp,v 1.68 2006/06/23 22:37:28 shane Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -179,7 +179,7 @@ int do_get(struct char_data *ch, char *argument, int cmd)
     bool has_consent = FALSE;
     int type   = 3;
     bool alldot = FALSE;
-    bool inventorycontainer = FALSE;
+    bool inventorycontainer = FALSE, blindlag = FALSE;
     char allbuf[MAX_STRING_LENGTH];
 
     argument_interpreter(argument, arg1, arg2);
@@ -575,7 +575,7 @@ fname(obj_object->name));
 	  sub_object = get_obj_in_list_vis(ch, arg2, 
 			   world[ch->in_room].contents);
 	  if (!sub_object){
-	    sub_object = get_obj_in_list_vis(ch, arg2, ch->carrying);
+	    sub_object = get_obj_in_list_vis(ch, arg2, ch->carrying, TRUE);
             inventorycontainer = TRUE;
 	  }
 	  if(sub_object) {
@@ -601,6 +601,10 @@ fname(obj_object->name));
 	        return eFAILURE;
 	      }
 	      obj_object = get_obj_in_list_vis(ch, arg1, sub_object->contains);
+              if(!obj_object && IS_AFFECTED(ch, AFF_BLIND) && has_skill(ch, SKILL_BLINDFIGHTING)) {
+	         obj_object = get_obj_in_list_vis(ch, arg1, sub_object->contains, TRUE);
+                 blindlag = TRUE;
+              }
 	      if (obj_object) 
               {
                 if (GET_ITEM_TYPE(obj_object) == ITEM_MONEY &&
@@ -651,6 +655,7 @@ fname(obj_object->name));
                       if(cmd == 10) palm(ch, obj_object, sub_object);
 		      else          get (ch, obj_object, sub_object);
 		      found = TRUE;
+                      if(blindlag) WAIT_STATE(ch, PULSE_VIOLENCE);
 		    } else {
 		      send_to_char("You can't take that.\n\r", ch);
 		      fail = TRUE;
@@ -793,7 +798,7 @@ int do_drop(struct char_data *ch, char *argument, int cmd)
   char buffer[MAX_STRING_LENGTH];
   struct obj_data *tmp_object;
   struct obj_data *next_obj;
-  bool test = FALSE;
+  bool test = FALSE, blindlag = FALSE;
   char alldot[MAX_STRING_LENGTH];
 
   alldot[0] = '\0';
@@ -874,15 +879,21 @@ int do_drop(struct char_data *ch, char *argument, int cmd)
                sprintf(buffer, "You drop the %s.\n\r", fname(tmp_object->name));
                send_to_char(buffer, ch);
             }
+            else if(CAN_SEE_OBJ(ch, tmp_object, TRUE)) {
+               sprintf(buffer, "You drop the %s.\n\r", fname(tmp_object->name));
+               send_to_char(buffer, ch);
+               blindlag = TRUE;
+            }
             else
                send_to_char("You drop something.\n\r", ch);
 
             act("$n drops $p.", ch, tmp_object, 0, TO_ROOM, INVIS_NULL);
             move_obj(tmp_object, ch->in_room);
             test = TRUE;
+            if(blindlag) WAIT_STATE(ch, PULSE_VIOLENCE);
          }
          else {
-            if(CAN_SEE_OBJ(ch, tmp_object)) {
+            if(CAN_SEE_OBJ(ch, tmp_object, TRUE)) {
                sprintf(buffer, "You can't drop the %s, it must be CURSED!\n\r", fname(tmp_object->name));
                send_to_char(buffer, ch);
                test = TRUE;
@@ -1574,11 +1585,11 @@ int do_open(CHAR_DATA *ch, char *argument, int cmd)
                   {
                      sprintf(buf, "The %s is opened from the other side.\n\r",
                                 fname(back->keyword));
-                     send_to_room(buf, EXIT(ch, door)->to_room);
+                     send_to_room(buf, EXIT(ch, door)->to_room, TRUE);
                   }
                   else
                      send_to_room("The door is opened from the other side.\n\r",
-                                EXIT(ch, door)->to_room);
+                                EXIT(ch, door)->to_room, TRUE);
                }
 
          if((IS_SET(world[ch->in_room].room_flags, FALL_DOWN) && (door = 5)) ||
@@ -1597,7 +1608,7 @@ int do_open(CHAR_DATA *ch, char *argument, int cmd)
                if(IS_NPC(victim) || IS_AFFECTED(victim, AFF_FLYING))  
                   continue;
                if(!success) {
-                  send_to_room("With the door no longer closed for support, this area's strange gravity takes over!\r\n", victim->in_room);
+                  send_to_room("With the door no longer closed for support, this area's strange gravity takes over!\r\n", victim->in_room, TRUE);
                   success = 1;
                }
                if(victim == ch)
@@ -1665,11 +1676,11 @@ int do_close(CHAR_DATA *ch, char *argument, int cmd)
                   {
                      sprintf(buf, "The %s closes quietly.\n\r",
                                    fname(back->keyword));
-                     send_to_room(buf, EXIT(ch, door)->to_room);
+                     send_to_room(buf, EXIT(ch, door)->to_room, TRUE);
                   }
                   else
                      send_to_room("The door closes quietly.\n\r",
-                                       EXIT(ch, door)->to_room);
+                                       EXIT(ch, door)->to_room, TRUE);
                }
       }
    }

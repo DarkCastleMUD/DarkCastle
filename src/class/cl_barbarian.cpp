@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_barbarian.cpp,v 1.66 2006/06/21 15:49:58 urizen Exp $
+| $Id: cl_barbarian.cpp,v 1.67 2006/06/23 22:37:34 shane Exp $
 | cl_barbarian.C
 | Description:  Commands for the barbarian class.
 */
@@ -346,7 +346,7 @@ int do_headbutt(struct char_data *ch, char *argument, int cmd)
     WAIT_STATE(ch, PULSE_VIOLENCE*4);
   
     WAIT_STATE(victim, PULSE_VIOLENCE*2);
-    SET_BIT(victim->combat, COMBAT_SHOCKED);
+    SET_BIT(victim->combat, COMBAT_SHOCKED2);
     retval = damage (ch, victim, 50, TYPE_CRUSH, SKILL_SHOCK, 0);
     if (!SOMEONE_DIED(retval) && !number(0,9) &&
 	  ch->equipment[WEAR_HEAD] && obj_index[ch->equipment[WEAR_HEAD]->item_number].virt == 508)

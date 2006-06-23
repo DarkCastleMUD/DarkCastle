@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.113 2006/06/23 01:49:11 shane Exp $ */
+/* $Id: handler.cpp,v 1.114 2006/06/23 22:37:28 shane Exp $ */
     
 extern "C"
 {
@@ -3324,7 +3324,7 @@ CHAR_DATA *get_active_pc_vis(CHAR_DATA *ch, char *name)
 
 // search by item number
 struct obj_data *get_obj_in_list_vis(CHAR_DATA *ch, int item_num, 
-		struct obj_data *list)
+		struct obj_data *list, bool blindfighting)
 {
     struct obj_data *i;
     int number = real_object(item_num);
@@ -3334,14 +3334,14 @@ struct obj_data *get_obj_in_list_vis(CHAR_DATA *ch, int item_num,
        return NULL;
 
     for (i = list ; i ; i = i->next_content)
-       if (i->item_number == number && CAN_SEE_OBJ(ch, i))
+       if (i->item_number == number && CAN_SEE_OBJ(ch, i, blindfighting))
           return i;
 
     return NULL;
 }
 
 struct obj_data *get_obj_in_list_vis(CHAR_DATA *ch, char *name, 
-		struct obj_data *list)
+		struct obj_data *list, bool blindfighting)
 {
     struct obj_data *i;
     int j, number;
@@ -3355,7 +3355,7 @@ struct obj_data *get_obj_in_list_vis(CHAR_DATA *ch, char *name,
 
     for (i = list, j = 1; i && (j <= number); i = i->next_content)
 	if (isname(tmp, i->name))
-	    if (CAN_SEE_OBJ(ch, i)) {
+	    if (CAN_SEE_OBJ(ch, i, blindfighting)) {
 		if (j == number)
 		    return(i);
 		j++;

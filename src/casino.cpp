@@ -176,7 +176,7 @@ void send_to_table(char *msg, struct table_data *tbl, struct player_data *plrSil
      send_to_char(msg,plr->ch);
   */
 if (tbl->obj->in_room)
-  send_to_room(msg, tbl->obj->in_room, plrSilent?plrSilent->ch:0);
+  send_to_room(msg, tbl->obj->in_room, TRUE, plrSilent?plrSilent->ch:0);
 }
 bool charExists(CHAR_DATA *ch)
 {
@@ -527,7 +527,7 @@ void add_timer_bj_dealer2(struct table_data *tbl, int time = 10)
 void bj_finish(void *arg1, void *arg2, void *arg3)
 {
   struct table_data *tbl = (table_data*)arg1;
-  send_to_room("$B$7The dealer says 'Place your bets!'$R\r\n",tbl->obj->in_room);
+  send_to_room("$B$7The dealer says 'Place your bets!'$R\r\n",tbl->obj->in_room, TRUE);
   tbl->state = 0;
 }
 
@@ -672,7 +672,7 @@ void bj_dealer_ai(void *arg1, void *arg2, void *arg3)
     case 1: 
 // TODO CHECK THIS
 //	if (!tbl->plr) { add_timer_bj_dealer2(tbl); return; }
-	send_to_room("$B$7The dealer says 'No more bets!'$R\r\n\r\n",tbl->obj->in_room);
+	send_to_room("$B$7The dealer says 'No more bets!'$R\r\n\r\n",tbl->obj->in_room, TRUE);
 	tbl->state = 0;
 	pulse_table_bj(tbl);
 	break;

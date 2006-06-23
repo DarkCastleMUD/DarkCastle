@@ -2552,7 +2552,7 @@ void send_to_zone(char *messg, int zone)
    }
 }
 
-void send_to_room(char *messg, int room, CHAR_DATA *nta)
+void send_to_room(char *messg, int room, bool awakeonly, CHAR_DATA *nta)
 {
     CHAR_DATA *i = NULL;
     if(!world_array[room] || !world[room].people) {
@@ -2561,7 +2561,8 @@ void send_to_room(char *messg, int room, CHAR_DATA *nta)
     if (messg)
         for (i = world[room].people; i; i = i->next_in_room)
             if (i->desc && !is_busy(i) && nta != i)
-                SEND_TO_Q(messg, i->desc);
+               if(!awakeonly || GET_POS(i) > POSITION_SLEEPING)
+                  SEND_TO_Q(messg, i->desc);
 }
 
 int is_busy(CHAR_DATA *ch)

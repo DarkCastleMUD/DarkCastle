@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.72 2006/06/16 12:46:02 urizen Exp $
+| $Id: objects.cpp,v 1.73 2006/06/23 22:37:29 shane Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -181,7 +181,7 @@ void object_activity()
 		   && active_obj->obj->ex_description && active_obj->obj->obj_flags.value[0]-- == 0)
 	    {
   	      active_obj->obj->obj_flags.value[0] = ((obj_data *) obj_index[active_obj->obj->item_number].item)->obj_flags.value[1];
- 	      send_to_room(active_obj->obj->ex_description->description, active_obj->obj->in_room);
+ 	      send_to_room(active_obj->obj->ex_description->description, active_obj->obj->in_room, TRUE);
 	    } else 
 		oprog_rand_trigger(active_obj->obj);
         } 
@@ -271,8 +271,12 @@ int do_quaff(struct char_data *ch, char *argument, int cmd)
 	pos = HOLD2;
       if ((temp==0) || !isname(buf, temp->name))
       {
-        act("You do not have that item.",ch,0,0,TO_CHAR, 0);
-        return eFAILURE;
+        equipped = FALSE;
+        pos = -2;
+        if(!(temp = get_obj_in_list_vis(ch,buf,ch->carrying,TRUE))) {
+          act("You do not have that item.",ch,0,0,TO_CHAR, 0);
+          return eFAILURE;
+        }
       }
     }
   }
@@ -302,6 +306,8 @@ int do_quaff(struct char_data *ch, char *argument, int cmd)
     send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
     return eFAILURE;
   }
+
+  if(pos == -2) WAIT_STATE(ch, PULSE_VIOLENCE);
 
   act("$n quaffs $p.", ch, temp, 0, TO_ROOM, 0);
   act("You quaff $p which dissolves.",ch,temp,0,TO_CHAR, 0);
@@ -1956,6 +1962,7 @@ int do_wear(struct char_data *ch, char *argument, int cmd)
     char buffer[MAX_STRING_LENGTH];
     struct obj_data *obj_object, *tmp_object, *next_obj;
     int keyword;
+    bool blindlag = FALSE;
     static char *keywords[] = {
         "finger",
         "neck",
@@ -2007,6 +2014,10 @@ int do_wear(struct char_data *ch, char *argument, int cmd)
     }
 
     obj_object = get_obj_in_list_vis(ch, arg1, ch->carrying);
+    if(!obj_object && IS_AFFECTED(ch, AFF_BLIND) && has_skill(ch, SKILL_BLINDFIGHTING)) {
+       obj_object = get_obj_in_list_vis(ch, arg1, ch->carrying, TRUE);
+       blindlag = TRUE;
+    }
     if (obj_object) {
         if (*arg2) {
             keyword = search_block(arg2, keywords, FALSE);
@@ -2022,6 +2033,7 @@ int do_wear(struct char_data *ch, char *argument, int cmd)
         else {
              wear(ch, obj_object, keywordfind(obj_object));
         }
+        if(blindlag) WAIT_STATE(ch, PULSE_VIOLENCE);
     }
     else {
          sprintf(buffer, "You do not seem to have the '%s'.\n\r",arg1);
@@ -2038,6 +2050,7 @@ int do_wield(struct char_data *ch, char *argument, int cmd)
   char arg2[MAX_STRING_LENGTH];
   char buffer[MAX_STRING_LENGTH];
   struct obj_data *obj_object;
+  bool blindlag = FALSE;
   int keyword = 12;
 
     if (IS_SET(world[ch->in_room].room_flags, QUIET))
@@ -2049,8 +2062,13 @@ int do_wield(struct char_data *ch, char *argument, int cmd)
     argument_interpreter(argument, arg1, arg2);
     if (*arg1) {
         obj_object = get_obj_in_list_vis(ch, arg1, ch->carrying);
+        if(!obj_object && IS_AFFECTED(ch, AFF_BLIND) && has_skill(ch, SKILL_BLINDFIGHTING)) {
+           obj_object = get_obj_in_list_vis(ch, arg1, ch->carrying, TRUE);
+           blindlag = TRUE;
+        }
         if (obj_object) {
             wear(ch, obj_object, keyword);
+            if(blindlag) WAIT_STATE(ch, PULSE_VIOLENCE);
         } else {
             sprintf(buffer, "You do not seem to have the '%s'.\n\r",arg1);
             send_to_char(buffer,ch);
@@ -2068,6 +2086,7 @@ int do_grab(struct char_data *ch, char *argument, int cmd)
     char arg2[MAX_STRING_LENGTH];
     char buffer[MAX_STRING_LENGTH];
     struct obj_data *obj_object;
+    bool blindlag = FALSE;
 
     if (IS_SET(world[ch->in_room].room_flags, QUIET))
       {
@@ -2079,11 +2098,16 @@ int do_grab(struct char_data *ch, char *argument, int cmd)
 
     if (*arg1) {
         obj_object = get_obj_in_list_vis(ch, arg1, ch->carrying);
+        if(!obj_object && IS_AFFECTED(ch, AFF_BLIND) && has_skill(ch, SKILL_BLINDFIGHTING)) {
+           obj_object = get_obj_in_list_vis(ch, arg1, ch->carrying, TRUE);
+           blindlag = TRUE;
+        }
         if (obj_object) {
             if (obj_object->obj_flags.type_flag == ITEM_LIGHT)
                 wear(ch, obj_object, 16);
             else
                 wear(ch, obj_object, 14);
+            if(blindlag) WAIT_STATE(ch, PULSE_VIOLENCE);
         } else {
             sprintf(buffer, "You do not seem to have the '%s'.\n\r",arg1);
             send_to_char(buffer,ch);

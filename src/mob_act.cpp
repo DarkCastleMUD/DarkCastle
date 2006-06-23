@@ -19,7 +19,7 @@
 /* 12/06/2003   Onager   Modified mobile_activity() to prevent charmie    */
 /*                       scavenging                                       */
 /**************************************************************************/
-/* $Id: mob_act.cpp,v 1.36 2006/05/18 07:50:35 dcastle Exp $ */
+/* $Id: mob_act.cpp,v 1.37 2006/06/23 22:37:29 shane Exp $ */
 
 extern "C"
 {
@@ -124,9 +124,9 @@ void mobile_activity(void)
     if(IS_AFFECTED(ch, AFF_PARALYSIS))
       continue;
     
-    if(IS_SET(ch->combat, COMBAT_SHOCKED))
+    if(IS_SET(ch->combat, COMBAT_SHOCKED) || IS_SET(ch->combat, COMBAT_SHOCKED2))
       continue;
-    
+
     if((IS_SET(ch->combat, COMBAT_STUNNED)) || 
       (IS_SET(ch->combat, COMBAT_STUNNED2)))
       continue;

@@ -8,7 +8,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: fount.cpp,v 1.3 2005/05/28 18:56:10 shane Exp $ */
+/* $Id: fount.cpp,v 1.4 2006/06/23 22:37:28 shane Exp $ */
 
 extern "C"
 {
@@ -26,6 +26,7 @@ extern "C"
 #include <utility.h>
 #include <act.h>
 #include <db.h>
+#include <handler.h>
 
 extern CWorld world;
 int real_object(int i);
@@ -60,8 +61,6 @@ int do_fill(CHAR_DATA *ch, char *argument, int cmd)
   struct obj_data *to_obj;
   int amount;
   void name_to_drinkcon(struct obj_data *obj, int type);
-  struct obj_data *get_obj_in_list_vis(CHAR_DATA *ch, char *name, \
-		       struct obj_data *list);
   
   one_argument(argument, buf);
 
