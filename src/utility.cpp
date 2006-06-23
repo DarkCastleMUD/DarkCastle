@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.54 2006/06/08 20:17:58 shane Exp $ */
+/* $Id: utility.cpp,v 1.55 2006/06/23 01:49:11 shane Exp $ */
 
 extern "C"
 {
@@ -1373,8 +1373,7 @@ int has_skill (CHAR_DATA *ch, int16 skill)
 	  if (o->affected[a].location == skill*1000)
 	  {
 	    bonus += o->affected[a].modifier;
-	extern int get_max(CHAR_DATA *ch, int skill);
-	    if ((int)curr->learned+bonus > get_max(ch, curr->skillnum)) bonus = get_max(ch, curr->skillnum) - curr->learned;
+	    if ((int)curr->learned+bonus > 98) bonus = 98 - curr->learned;
 	  }
 	}	
        }  

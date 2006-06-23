@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.112 2006/06/16 20:26:18 apocalypse Exp $ */
+/* $Id: handler.cpp,v 1.113 2006/06/23 01:49:11 shane Exp $ */
     
 extern "C"
 {
@@ -409,6 +409,7 @@ void add_set_stats(char_data *ch, obj_data *obj, int flag, int pos)
 	af.location = APPLY_NONE;
 	af.modifier = 0;
         // By gawd, they just completed the set.
+        if(affected_by_spell(ch, BASE_SETS + z)) return;
 	if (!flag)
 	send_to_char(set_list[z].Set_Wear_Message, ch);
 	switch (z)

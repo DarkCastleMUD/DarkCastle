@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.200 2006/06/21 19:01:14 shane Exp $ */
+/* $Id: const.cpp,v 1.201 2006/06/23 01:49:10 shane Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -238,7 +238,7 @@ char *spell_wear_off_msg[] =
   "Your $2c$7a$0$Bmo$Ru$2fl$7a$0$Bg$R$7e$R has worn off.",
   "!FarSight!",
   "You slowly float down to the ground.",
-  "!Insomnia!",
+  "You are able to sleep once again.",
   "You step out of the shadows.",
   "The $5yellow$R in your skin fades.",  // 120
   "You no longer feel immune to the affects of poisons.",

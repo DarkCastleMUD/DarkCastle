@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.127 2006/06/21 19:01:18 shane Exp $
+| $Id: cl_thief.cpp,v 1.128 2006/06/23 01:49:15 shane Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -1356,6 +1356,8 @@ int do_slip(struct char_data *ch, char *argument, int cmd)
    struct char_data *vict;
    struct obj_data *obj, *tmp_object, *container;
 
+   extern int weight_in(OBJ_DATA *);
+
     if(!IS_MOB(ch) && affected_by_spell(ch, FUCK_PTHIEF) ) { 
       send_to_char("Your criminal acts prohibit this action.\n\r", ch);
       return eFAILURE;
@@ -1506,8 +1508,9 @@ int do_slip(struct char_data *ch, char *argument, int cmd)
          send_to_char("It seems to be closed.\r\n", ch);
          return eFAILURE;
       }
-      if((container->obj_flags.weight + obj->obj_flags.weight) >=
-          container->obj_flags.value[0]) {
+      if(((container->obj_flags.weight + obj->obj_flags.weight) >=
+            container->obj_flags.value[0]) && (obj_index[container->item_number].virt != 536 || 
+            weight_in(container) + obj->obj_flags.weight >= 200)) {
          send_to_char("It won't fit...cheater.\r\n", ch);
          return eFAILURE;
       }
@@ -1518,7 +1521,8 @@ int do_slip(struct char_data *ch, char *argument, int cmd)
       else act("$n slips $p in $P.", ch, obj, container, TO_ROOM, GODS);
       move_obj(obj, container);
       // fix weight (move_obj doesn't re-add it, but it removes it)
-      IS_CARRYING_W(ch) += GET_OBJ_WEIGHT(obj);
+      if (obj_index[container->item_number].virt != 536)
+         IS_CARRYING_W(ch) += GET_OBJ_WEIGHT(obj);
       send_to_char("Ok.\r\n", ch);
       return eSUCCESS;      
    }

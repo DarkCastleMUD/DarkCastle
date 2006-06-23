@@ -800,7 +800,7 @@ int do_qedit(CHAR_DATA *ch, char *arg, int cmd)
          break;
    }
    
-   if(!(quest = get_quest_struct(holdernum)) {
+   if(!(quest = get_quest_struct(holdernum))) {
       send_to_char("That quest doesn't exist.\n\r", ch);
       return eFAILURE;
    }
