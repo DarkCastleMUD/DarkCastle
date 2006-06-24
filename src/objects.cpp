@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.73 2006/06/23 22:37:29 shane Exp $
+| $Id: objects.cpp,v 1.74 2006/06/24 00:07:45 shane Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -45,7 +45,7 @@ extern struct index_data *mob_index;
 int FOUNTAINisPresent (CHAR_DATA *ch);
 int hands_are_free(CHAR_DATA *ch, int number);
 struct obj_data *get_object_in_equip_vis(struct char_data *ch,
-    char *arg, struct obj_data *equipment[], int *j);
+    char *arg, struct obj_data *equipment[], int *j, bool blindfighting);
 
 // add an affect to an item
 void add_obj_affect(obj_data * obj, int loc, int mod)
@@ -2162,6 +2162,7 @@ int do_remove(struct char_data *ch, char *argument, int cmd)
 {
   char arg1[MAX_STRING_LENGTH];
   struct obj_data *obj_object;
+  bool blindlag = FALSE;
   int j;
 
   if (IS_SET(world[ch->in_room].room_flags, QUIET))
@@ -2200,8 +2201,11 @@ int do_remove(struct char_data *ch, char *argument, int cmd)
       }
     } else 
     {
-      obj_object = get_object_in_equip_vis(ch, arg1, ch->equipment, &j);
-
+      obj_object = get_object_in_equip_vis(ch, arg1, ch->equipment, &j, FALSE);
+      if(!obj_object && IS_AFFECTED(ch, AFF_BLIND) && has_skill(ch, SKILL_BLINDFIGHTING)) {
+         obj_object = get_object_in_equip_vis(ch, arg1, ch->equipment, &j, TRUE);
+         blindlag = TRUE;
+      }
       if (obj_object) 
       {
         if(CAN_CARRY_N(ch) != IS_CARRYING_N(ch)) 
@@ -2227,6 +2231,7 @@ int do_remove(struct char_data *ch, char *argument, int cmd)
 
           act("You stop using $p.",ch,obj_object,0,TO_CHAR, 0);
           act("$n stops using $p.",ch,obj_object,0,TO_ROOM, INVIS_NULL);
+          if(blindlag) WAIT_STATE(ch, PULSE_VIOLENCE);
         } else {
           send_to_char("You can't carry that many items.\n\r", ch);
           j = MAX_WEAR;

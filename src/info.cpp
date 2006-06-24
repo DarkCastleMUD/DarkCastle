@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.110 2006/06/23 22:37:28 shane Exp $ */
+/* $Id: info.cpp,v 1.111 2006/06/24 00:07:45 shane Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -150,11 +150,11 @@ void argument_split_3(char *argument, char *first_arg, char *second_arg, char *t
 }
 
 struct obj_data *get_object_in_equip_vis(struct char_data *ch,
-                char *arg, struct obj_data *equipment[], int *j) {
+                char *arg, struct obj_data *equipment[], int *j, bool blindfighting) {
    
    for ((*j) = 0; (*j) < MAX_WEAR ; (*j)++)
       if (equipment[(*j)])
-         if (CAN_SEE_OBJ(ch,equipment[(*j)]))
+         if (CAN_SEE_OBJ(ch,equipment[(*j)], blindfighting))
             if (isname(arg, equipment[(*j)]->name))
                return(equipment[(*j)]);
             

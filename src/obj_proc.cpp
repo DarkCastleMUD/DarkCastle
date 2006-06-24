@@ -869,7 +869,7 @@ int pfe_word(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
    int j;
 
    struct obj_data *get_object_in_equip_vis(struct char_data *ch,
-         char *arg, struct obj_data *equipment[], int *j);
+         char *arg, struct obj_data *equipment[], int *j, bool blindfighting);
 
    if(!cmd && obj) // This is where we recharge
       if(obj->obj_flags.value[3])
@@ -936,7 +936,7 @@ int pfe_word(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
    }
   else // cmd=69 (remove)
    {
-      obj_object = get_object_in_equip_vis(ch, arg1, ch->equipment, &j);
+      obj_object = get_object_in_equip_vis(ch, arg1, ch->equipment, &j, FALSE);
       if(!obj_object)
          return eFAILURE;
 

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.129 2006/06/23 22:37:34 shane Exp $
+| $Id: cl_thief.cpp,v 1.130 2006/06/24 00:07:49 shane Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -343,11 +343,11 @@ int do_circle(CHAR_DATA *ch, char *argument, int cmd)
 
    if((ch->equipment[WIELD]->obj_flags.value[3] != 11) &&
      (ch->equipment[WIELD]->obj_flags.value[3] != 9)) {
-      if(ch->equipment[WIELD]->obj_flags.value[3] == TYPE_BLUDGEON) blackjack = TRUE;
-      else {
+//      if(ch->equipment[WIELD]->obj_flags.value[3] == 7) blackjack = TRUE;
+  //    else {
          send_to_char("Only certain weapons can be used for backstabbing, this isn't one of them.\n\r", ch);
          return eFAILURE;
-      }
+  //    }
    }
 
    if (ch == victim->fighting) {
@@ -362,7 +362,7 @@ int do_circle(CHAR_DATA *ch, char *argument, int cmd)
    blackjack?WAIT_STATE(ch, PULSE_VIOLENCE*3):WAIT_STATE(ch, PULSE_VIOLENCE * 2);
    
    if (AWAKE(victim) && !skill_success(ch,victim,SKILL_CIRCLE))
-      return blackjack?damage(ch, victim, 0,TYPE_UNDEFINED, SKILL_BLACKJACK, FIRST):damage(ch, victim, 0,TYPE_UNDEFINED, SKILL_BACKSTAB, FIRST);
+      return blackjack?damage(ch, victim, 0,TYPE_BLUDGEON, SKILL_BLACKJACK, FIRST):damage(ch, victim, 0,TYPE_UNDEFINED, SKILL_BACKSTAB, FIRST);
    else 
    {
       SET_BIT(ch->combat, COMBAT_CIRCLE);
@@ -1722,10 +1722,6 @@ int do_blackjack(struct char_data *ch, char *argument, int cmd)
     send_to_char("You wouldn't know how.\r\n",ch);
     return eFAILURE;
   }
-//  else {
-    send_to_char("Some magical, godlike force prevents you from completing your attempt.\r\n",ch);
-    return eFAILURE;
-  //}
 
   { //weaponchecks
     if (ch->equipment[WIELD])
@@ -1824,7 +1820,7 @@ int do_blackjack(struct char_data *ch, char *argument, int cmd)
      return eFAILURE;
   } else {
      act("$N leaps from the shadows and strikes a sharp blow to the back of your head, shocking you!",victim,0,ch,TO_CHAR,0);
-     act("$n sneaks behind $N and shocks $M with a sharp blow to the head.",ch,0,victim,TO_ROOM, INVIS_NULL);
+     act("$n sneaks behind $N and shocks $M with a sharp blow to the head.",ch,0,victim,TO_ROOM, INVIS_NULL|NOTVICT);
      act("You sneak behind $N and shock $M with a sharp rap to the head.",ch,0,victim,TO_CHAR, 0);
      SET_BIT(victim->combat, COMBAT_SHOCKED2);
      WAIT_STATE(victim, PULSE_VIOLENCE * 2);

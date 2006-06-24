@@ -60,7 +60,7 @@ extern struct descriptor_data *descriptor_list;
 extern bool MOBtrigger;
 extern struct mprog_throw_type *g_mprog_throw_list;
 
-struct obj_data *get_object_in_equip_vis(struct char_data *ch, char *arg, struct obj_data *equipment[], int *j);
+struct obj_data *get_object_in_equip_vis(struct char_data *ch, char *arg, struct obj_data *equipment[], int *j, bool blindfighting);
 
 /*
  * Local functions.
@@ -261,7 +261,7 @@ int do_mpjunk( CHAR_DATA *ch, char *argument, int cmd )
 
     if ( str_cmp( arg, "all" ) && !sscanf(arg, "all.%s", dotbuf))
     {
-      if ((obj = get_object_in_equip_vis(ch, arg, ch->equipment, &location )))
+      if ((obj = get_object_in_equip_vis(ch, arg, ch->equipment, &location, FALSE )))
       {
 	extract_obj( unequip_char( ch, location ) );
 	return eSUCCESS;
