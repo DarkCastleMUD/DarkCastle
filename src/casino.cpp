@@ -182,7 +182,7 @@ bool charExists(CHAR_DATA *ch)
 {
   CHAR_DATA *tch;
 
-  for (tch = character_list;ch;ch=ch->next)
+  for (tch = character_list;tch;tch=tch->next)
     if (tch ==ch) break;
   if (tch) return TRUE;
   return FALSE;
