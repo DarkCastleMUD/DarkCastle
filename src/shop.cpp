@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: shop.cpp,v 1.24 2006/06/02 07:23:49 jhhudso Exp $ */
+/* $Id: shop.cpp,v 1.25 2006/06/24 20:04:12 jhhudso Exp $ */
 
 extern "C"
 {
@@ -881,9 +881,9 @@ player_shop * read_one_player_shop(FILE *fp)
   player_shop * shop = (player_shop *)dc_alloc(1, sizeof(player_shop));
 
   fread(&shop->owner, sizeof(char), PC_SHOP_OWNER_SIZE, fp);
-  fread(&shop->room_num, sizeof(long), 1, fp);
+  fread(&shop->room_num, sizeof(int32), 1, fp);
   fread(&shop->sell_message, sizeof(char), PC_SHOP_SELL_MESS_SIZE, fp);
-  fread(&shop->money_on_hand, sizeof(long), 1, fp);
+  fread(&shop->money_on_hand, sizeof(int32), 1, fp);
 
   code[3] = '\0';
   fread(&code, sizeof(char), 3, fp);
@@ -897,7 +897,7 @@ player_shop * read_one_player_shop(FILE *fp)
     exit(1);
   }
 
-  fread(&count, sizeof(long), 1, fp);
+  fread(&count, sizeof(int32), 1, fp);
 
   shop->sale_list = NULL;
   for(int i = 0; i < count; i++)
@@ -933,9 +933,9 @@ void write_one_player_shop(player_shop * shop)
   }
 
   fwrite(&(shop->owner), sizeof(char), PC_SHOP_OWNER_SIZE, fp);
-  fwrite(&(shop->room_num), sizeof(long), 1, fp);
+  fwrite(&(shop->room_num), sizeof(int32), 1, fp);
   fwrite(&(shop->sell_message), sizeof(char), PC_SHOP_SELL_MESS_SIZE, fp);
-  fwrite(&(shop->money_on_hand), sizeof(long), 1, fp);
+  fwrite(&(shop->money_on_hand), sizeof(int32), 1, fp);
 
   // add stuff later here with 3 digit code
   // end of variable data
@@ -944,7 +944,7 @@ void write_one_player_shop(player_shop * shop)
   for(item = shop->sale_list; item; item = item->next)
     count++;
 
-  fwrite(&(count), sizeof(long), 1, fp);
+  fwrite(&(count), sizeof(int32), 1, fp);
 
   for(item = shop->sale_list; item; item = item->next)
   {
