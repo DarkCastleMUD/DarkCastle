@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.130 2006/06/24 00:07:49 shane Exp $
+| $Id: cl_thief.cpp,v 1.131 2006/06/24 19:45:59 shane Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -343,11 +343,11 @@ int do_circle(CHAR_DATA *ch, char *argument, int cmd)
 
    if((ch->equipment[WIELD]->obj_flags.value[3] != 11) &&
      (ch->equipment[WIELD]->obj_flags.value[3] != 9)) {
-//      if(ch->equipment[WIELD]->obj_flags.value[3] == 7) blackjack = TRUE;
-  //    else {
+      if(ch->equipment[WIELD]->obj_flags.value[3] == 7) blackjack = TRUE;
+      else {
          send_to_char("Only certain weapons can be used for backstabbing, this isn't one of them.\n\r", ch);
          return eFAILURE;
-  //    }
+      }
    }
 
    if (ch == victim->fighting) {
@@ -362,11 +362,11 @@ int do_circle(CHAR_DATA *ch, char *argument, int cmd)
    blackjack?WAIT_STATE(ch, PULSE_VIOLENCE*3):WAIT_STATE(ch, PULSE_VIOLENCE * 2);
    
    if (AWAKE(victim) && !skill_success(ch,victim,SKILL_CIRCLE))
-      return blackjack?damage(ch, victim, 0,TYPE_BLUDGEON, SKILL_BLACKJACK, FIRST):damage(ch, victim, 0,TYPE_UNDEFINED, SKILL_BACKSTAB, FIRST);
+      return blackjack?damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_BLACKJACK, FIRST):damage(ch, victim, 0,TYPE_UNDEFINED, SKILL_BACKSTAB, FIRST);
    else 
    {
       SET_BIT(ch->combat, COMBAT_CIRCLE);
-      retval = blackjack?one_hit(ch, victim, SKILL_BLACKJACK, FIRST):one_hit(ch, victim, SKILL_BACKSTAB, FIRST);
+      retval = blackjack?attack(ch, victim, SKILL_BLACKJACK, FIRST):one_hit(ch, victim, SKILL_BACKSTAB, FIRST);
 
       if(SOMEONE_DIED(retval))
         return retval;
@@ -1716,6 +1716,7 @@ void blackjack_clear(void *arg1, void *arg2, void *arg3)
 int do_blackjack(struct char_data *ch, char *argument, int cmd)
 {
   bool wpnok = FALSE;
+  int retval;
 
   if (!has_skill(ch, SKILL_BLACKJACK))
   {
@@ -1723,20 +1724,20 @@ int do_blackjack(struct char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  { //weaponchecks
+//  { //weaponchecks
     if (ch->equipment[WIELD])
     {
       int w_type = get_weapon_damage_type(ch->equipment[WIELD]);
       if (w_type == TYPE_BLUDGEON)
         wpnok = TRUE;
     }
-    if (!wpnok && ch->equipment[SECOND_WIELD])
+/*    if (!wpnok && ch->equipment[SECOND_WIELD])
     {
       int w_type = get_weapon_damage_type(ch->equipment[SECOND_WIELD]);
       if (w_type == TYPE_BLUDGEON)
         wpnok = TRUE;
     } 
-  }
+  }*/
 
   if (!wpnok)
   {
@@ -1764,27 +1765,32 @@ int do_blackjack(struct char_data *ch, char *argument, int cmd)
       if(!can_attack(ch) || !can_be_attacked(ch, victim))
       return eFAILURE;
   }
-  if (affected_by_spell(victim, SPELL_PARALYZE))
-  {
-    act("$N is magically frozen in place by paralysis and cannot be blackjacked.",ch, 0, victim, TO_CHAR, 0);
+  if(IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE)) {
+    send_to_char("You can't backstab someone that HUGE!\r\n", ch);
     return eFAILURE;
   }
+//  if (affected_by_spell(victim, SPELL_PARALYZE))
+//  {
+//    act("$N is magically frozen in place by paralysis and cannot be blackjacked.",ch, 0, victim, TO_CHAR, 0);
+//    return eFAILURE;
+//  }
   
-  if (ISSET(victim->affected_by, AFF_BLACKJACK_ALERT))
-  {
-    act("$N is too alert to be blackjacked right now.",ch, 0, victim, TO_CHAR, 0);
-    return eFAILURE;
-  }
-  if (ISSET(ch->affected_by, AFF_BLACKJACK_ALERT))
-  {
-    act("You cannot blackjack yet.",ch, 0, victim, TO_CHAR, 0);
-    return eFAILURE;
-  }
+//  if (ISSET(victim->affected_by, AFF_BLACKJACK_ALERT))
+//  {
+//    act("$N is too alert to be blackjacked right now.",ch, 0, victim, TO_CHAR, 0);
+//    return eFAILURE;
+//  }
+//  if (ISSET(ch->affected_by, AFF_BLACKJACK_ALERT))
+//  {
+//    act("You cannot blackjack yet.",ch, 0, victim, TO_CHAR, 0);
+//    return eFAILURE;
+//  }
   set_cantquit(ch, victim);
   WAIT_STATE(ch, PULSE_VIOLENCE*3);
-  if (!skill_success(ch, victim, SKILL_BLACKJACK))
+  if ( AWAKE(victim) && !skill_success(ch, victim, SKILL_BLACKJACK) )
   { // failure!
-     act("$N notices $n approaching and thwarts $s attempted blackjack.", ch, 0, victim, TO_ROOM, NOTVICT);
+
+/*     act("$N notices $n approaching and thwarts $s attempted blackjack.", ch, 0, victim, TO_ROOM, NOTVICT);
      act("You notice $n approaching from the shadows with a club in hand, thwarting $s chance to blackjack you.", ch, 0, victim, TO_VICT, 0 );
      act("You approach $N from the shadows, but $E spots you and thwarts your attempted mugging.", ch, 0, victim, TO_CHAR, 0 );
      SETBIT(ch->affected_by, AFF_BLACKJACK_ALERT);
@@ -1818,14 +1824,36 @@ int do_blackjack(struct char_data *ch, char *argument, int cmd)
          return retval;
       }
      return eFAILURE;
+*/
+     retval = damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_BLACKJACK, 0);
   } else {
+/*
      act("$N leaps from the shadows and strikes a sharp blow to the back of your head, shocking you!",victim,0,ch,TO_CHAR,0);
      act("$n sneaks behind $N and shocks $M with a sharp blow to the head.",ch,0,victim,TO_ROOM, INVIS_NULL|NOTVICT);
      act("You sneak behind $N and shock $M with a sharp rap to the head.",ch,0,victim,TO_CHAR, 0);
      SET_BIT(victim->combat, COMBAT_SHOCKED2);
      WAIT_STATE(victim, PULSE_VIOLENCE * 2);
-     return damage(ch, victim, 50, TYPE_BLUDGEON, SKILL_BLACKJACK, 0);
+*/
+     retval =  attack(ch, victim, SKILL_BLACKJACK, FIRST);
   }
+
+  if (retval & eVICT_DIED && !retval & eCH_DIED)
+  {
+    if(!IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_WIMPY))
+       WAIT_STATE(ch, PULSE_VIOLENCE *2);
+    else
+       WAIT_STATE(ch, PULSE_VIOLENCE);
+    return retval;
+  }
+
+  if (retval & eCH_DIED) return retval;
+  WAIT_STATE(ch, PULSE_VIOLENCE*2);
+
+  if (retval & eVICT_DIED)
+     return retval;
+
+  return eSUCCESS;
+
 }
 
 int do_appraise(CHAR_DATA *ch, char *argument, int cmd)
@@ -1978,13 +2006,13 @@ int do_cripple(CHAR_DATA *ch, char *argument, int cmd)
    WAIT_STATE(ch, PULSE_VIOLENCE * 2);
 
    if(!skill_success(ch, vict, SKILL_CRIPPLE)) {
-      act("You quickly lash out but fail to cripple $n.", ch, 0, vict, TO_CHAR, 0);
-      act("$N quickly lashes out, narrowly missing an attempt to cripple you!", ch, 0, vict, TO_VICT, 0);
-      act("$N quicly lashes out but fails to cripple $n.", ch, 0, vict, TO_ROOM, NOTVICT);
+      act("You quickly lash out but fail to cripple $N.", ch, 0, vict, TO_CHAR, 0);
+      act("$n quickly lashes out, narrowly missing an attempt to cripple you!", ch, 0, vict, TO_VICT, 0);
+      act("$n quicly lashes out but fails to cripple $N.", ch, 0, vict, TO_ROOM, NOTVICT);
    } else {
-      act("You quickly lash out and strike a crippling blow to $n!", ch, 0, vict, TO_CHAR, 0);
-      act("$N lashes out quickly and cripples you with a painful blow!", ch, 0, vict, TO_VICT, 0);
-      act("$N quickly lashes out and strikes a crippling blow to $n!", ch, 0, vict, TO_ROOM, NOTVICT);
+      act("You quickly lash out and strike a crippling blow to $N!", ch, 0, vict, TO_CHAR, 0);
+      act("$n lashes out quickly and cripples you with a painful blow!", ch, 0, vict, TO_VICT, 0);
+      act("$n quickly lashes out and strikes a crippling blow to $N!", ch, 0, vict, TO_ROOM, NOTVICT);
       struct affected_type af;
       af.type      = SKILL_CRIPPLE;
       af.duration  = skill / 20;

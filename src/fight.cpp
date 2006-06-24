@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.330 2006/06/23 22:37:28 shane Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.331 2006/06/24 19:45:56 shane Exp $ */
 
 extern "C"
 {
@@ -477,7 +477,7 @@ int attack(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
     set_fighting(ch, vict);
   wielded = ch->equipment[WIELD];
 
-  if(type != SKILL_BACKSTAB)
+  if(type != SKILL_BACKSTAB && type != SKILL_BLACKJACK)
     if(handle_any_guard(vict))
     {
       if ((vict = ch->fighting)==NULL)
@@ -488,6 +488,9 @@ int attack(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
   /* if it's backstab send it to one_hit so it can be handled */
   if(type == SKILL_BACKSTAB)  {
     return one_hit(ch, vict, SKILL_BACKSTAB, weapon);
+  }
+  else if(type == SKILL_BLACKJACK) {
+    return one_hit(ch, vict, SKILL_BLACKJACK, weapon);
   }
   else if(GET_CLASS(ch) == CLASS_MONK && wielded == FALSE)
   {
@@ -1133,6 +1136,8 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
   weapon_type = w_type;
   if(type == SKILL_BACKSTAB)
     w_type = SKILL_BACKSTAB;
+  if(type == SKILL_BLACKJACK)
+    w_type = SKILL_BLACKJACK;
   
   /* Calculate thac0 vs. armor clss.  Thac0 for mobs is in hitroll */
 //  if(!IS_NPC(ch))
@@ -1231,6 +1236,14 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
       }
       else dam *= 20;
     }
+  }
+
+  if(type == SKILL_BLACKJACK) {
+    if(IS_SET(ch->combat,COMBAT_CIRCLE))
+       REMOVE_BIT(ch->combat, COMBAT_CIRCLE);
+    dam = has_skill(ch, SKILL_BLACKJACK);
+    SET_BIT(vict->combat, COMBAT_SHOCKED2);
+    WAIT_STATE(vict, PULSE_VIOLENCE *2);
   }
   
   if(dam < 1)
