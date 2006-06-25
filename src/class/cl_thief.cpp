@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.131 2006/06/24 19:45:59 shane Exp $
+| $Id: cl_thief.cpp,v 1.132 2006/06/25 16:49:32 urizen Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -1979,7 +1979,7 @@ int do_cripple(CHAR_DATA *ch, char *argument, int cmd)
    if(ch->fighting)
       vict = ch->fighting;
 
-   if(!(vict = get_char_room_vis(ch, name))) {
+   if(!vict && !(vict = get_char_room_vis(ch, name))) {
       send_to_char("Cripple whom?\n\r", ch);
       return eFAILURE;
    }
@@ -2004,6 +2004,11 @@ int do_cripple(CHAR_DATA *ch, char *argument, int cmd)
    }
 
    WAIT_STATE(ch, PULSE_VIOLENCE * 2);
+  // Make 'em fight eachother
+   if (!vict->fighting)
+     set_fighting(vict,ch);
+   if (!ch->fighting)
+    set_fighting(ch, vict);
 
    if(!skill_success(ch, vict, SKILL_CRIPPLE)) {
       act("You quickly lash out but fail to cripple $N.", ch, 0, vict, TO_CHAR, 0);
