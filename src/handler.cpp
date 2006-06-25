@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.114 2006/06/23 22:37:28 shane Exp $ */
+/* $Id: handler.cpp,v 1.115 2006/06/25 09:29:11 shane Exp $ */
     
 extern "C"
 {
@@ -625,7 +625,7 @@ void affect_modify(CHAR_DATA *ch, int32 loc, int32 mod, long bitv, bool add)
    int i;
     
    if (loc >= 1000) return;
-   if (bitv != -1 && bitv < AFF_MAX) {
+   if (bitv != -1 && bitv <= AFF_MAX) {
    if(add)
       SETBIT(ch->affected_by, bitv);
    else {
