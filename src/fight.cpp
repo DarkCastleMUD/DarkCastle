@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.332 2006/06/25 16:49:14 urizen Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.333 2006/06/25 16:57:11 urizen Exp $ */
 
 extern "C"
 {
@@ -312,8 +312,6 @@ void perform_violence(void)
          GET_HIT(ch) -= 25;
          GET_HIT(ch) = MAX(1, GET_HIT(ch));  // doesn't kill only hurts
       }
-      else if (af->type == SKILL_CRIPPLE) ; 
-            
       else if (af->type != SPELL_PARALYZE || !someone_fighting(ch))
          continue;
 
