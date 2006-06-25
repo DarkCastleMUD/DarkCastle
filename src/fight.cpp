@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.331 2006/06/24 19:45:56 shane Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.332 2006/06/25 16:49:14 urizen Exp $ */
 
 extern "C"
 {
@@ -312,18 +312,20 @@ void perform_violence(void)
          GET_HIT(ch) -= 25;
          GET_HIT(ch) = MAX(1, GET_HIT(ch));  // doesn't kill only hurts
       }
+      else if (af->type == SKILL_CRIPPLE) ; 
+            
       else if (af->type != SPELL_PARALYZE || !someone_fighting(ch))
          continue;
 
       if (af->duration >= 1)
         af->duration--;
       if(af->duration == 0) {
-        if (*spell_wear_off_msg[af->type]) {
+        if (af->type < MAX_SPL_LIST && *spell_wear_off_msg[af->type]) {
           send_to_char(spell_wear_off_msg[af->type], ch);
           send_to_char("\n\r", ch);
+	}
           while (next_af_dude&&af->type == next_af_dude->type) next_af_dude = next_af_dude->next;
           affect_remove(ch, af, 0);
-        }
       }
     }
     if (over) continue;
