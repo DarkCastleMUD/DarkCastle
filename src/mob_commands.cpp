@@ -599,7 +599,7 @@ int do_mpgoto( CHAR_DATA *ch, char *argument, int cmd )
 	return eSUCCESS;
     }
 
-    one_argument( argument, arg );
+    argument = one_argument( argument, arg );
     if ( arg[0] == '\0' )
     {
 	logf( IMMORTAL, LOG_WORLD, "Mpgoto - No argument: vnum %d.", mob_index[ch->mobdata->nr].virt );
@@ -608,8 +608,42 @@ int do_mpgoto( CHAR_DATA *ch, char *argument, int cmd )
 
 // TODO - make this work with strings (goto chode) too
 
-    location = atoi(arg);
-
+   CHAR_DATA *vict;
+   if (!str_cmp(arg, "mob"))
+   {
+      one_argument(argument, arg);
+      if (arg[0] == '\0' || !is_number(arg))
+      {
+	logf( IMMORTAL, LOG_WORLD, "Mpgoto - Missing vnum after 'mob' argument: vnum %d.", mob_index[ch->mobdata->nr].virt );
+	return eFAILURE|eINTERNAL_ERROR;
+      }
+      vict = get_mob_vnum(atoi(arg));
+      if (!vict)
+	location = -1;
+      else location = vict->in_room;
+   } else if (!str_cmp(arg, "pc")) {
+      one_argument(argument, arg);
+      if (arg[0] == '\0')
+      {
+	logf( IMMORTAL, LOG_WORLD, "Mpgoto - Missing arg after 'pc' argument: vnum %d.", mob_index[ch->mobdata->nr].virt );
+	return eFAILURE|eINTERNAL_ERROR;
+      }
+      extern CHAR_DATA *get_pc(char *name);
+      if (!(vict = get_pc(arg)))
+	location = -1;
+      else location = vict->in_room;
+   } else {
+     OBJ_DATA *obj;
+     if ((vict = get_char_vis(ch, arg)))
+     {
+        location = vict->in_room; 
+     }
+     else if ((obj = get_obj_vis(ch, arg)) && obj->in_room >= 0) {
+   	location = obj->in_room;
+     } else {
+       location = atoi(arg);
+     }
+    }
     if ( location < 0 )
     {
 	logf( IMMORTAL, LOG_WORLD, "Mpgoto - No such location: vnum %d.", mob_index[ch->mobdata->nr].virt );
