@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.43 2006/06/21 01:11:07 urizen Exp $ */
+/* $Id: ki.cpp,v 1.44 2006/06/25 10:37:25 shane Exp $ */
 
 extern "C"
 {
@@ -480,7 +480,7 @@ int ki_blast( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
 		act("$N is thrown to the ground by your blast!", ch, 0, vict,
 		  TO_CHAR, 0);
 		act("$n blasts you across the room!", ch, 0, vict, TO_VICT, 0);
-//		GET_HIT(vict) -= number(1,4) * GET_LEVEL(ch);
+		GET_HIT(vict) -= number(1,4) * GET_LEVEL(ch);
 		damage(ch,vict,100, TYPE_KI,KI_OFFSET+KI_BLAST,0);
 		if(!vict->fighting && IS_NPC(vict))
 			return attack(vict, ch, TYPE_UNDEFINED);
@@ -506,12 +506,12 @@ int ki_punch( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
       if (number(1, 101) <
           (GET_LEVEL(ch) / 2) + GET_LEVEL(ch) - GET_LEVEL(vict))
       {
-         act("$n punches $s fist RIGHT INTO $N!", ch, 0, vict,
-             TO_ROOM, NOTVICT);
-         act("The blood gushes as you put your fist into $N's chest!",
-             ch, 0, vict, TO_CHAR, 0);
-         act("$n shoves $s hand into your chest, and your lifeblood "
-	     "ebbs away.", ch, 0, vict, TO_VICT, INVIS_VISIBLE);
+//         act("$n punches $s fist RIGHT INTO $N!", ch, 0, vict,
+//             TO_ROOM, NOTVICT);
+//         act("The blood gushes as you put your fist into $N's chest!",
+//             ch, 0, vict, TO_CHAR, 0);
+//         act("$n shoves $s hand into your chest, and your lifeblood "
+//	     "ebbs away.", ch, 0, vict, TO_VICT, INVIS_VISIBLE);
  	 GET_MANA(vict) -= manadam;
 	 int retval = damage(ch,vict,dam, TYPE_UNDEFINED, KI_OFFSET+KI_PUNCH,0);
 //         group_gain(ch, vict);
@@ -523,12 +523,12 @@ int ki_punch( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
 	return retval;
       }
       else {
-         act("$N narrowly avoids $n's deadly thrust!", ch, 0, vict,
-		TO_ROOM, NOTVICT);
-         act("$N dodges out of your way, barely saving $S life!", 
-		  ch, 0, vict, TO_CHAR, 0);
-         act("$n makes a killer move, which you luckily dodge.", 
-		  ch, 0, vict, TO_VICT, INVIS_VISIBLE);
+//         act("$N narrowly avoids $n's deadly thrust!", ch, 0, vict,
+//		TO_ROOM, NOTVICT);
+//         act("$N dodges out of your way, barely saving $S life!", 
+//		  ch, 0, vict, TO_CHAR, 0);
+//         act("$n makes a killer move, which you luckily dodge.", 
+//		  ch, 0, vict, TO_VICT, INVIS_VISIBLE);
          GET_HIT(ch) -= 1/8 * (GET_MAX_HIT(ch));
 	 WAIT_STATE(ch, PULSE_VIOLENCE);
          if (!vict->fighting)
