@@ -2555,6 +2555,11 @@ void send_to_zone(char *messg, int zone)
 void send_to_room(char *messg, int room, bool awakeonly, CHAR_DATA *nta)
 {
     CHAR_DATA *i = NULL;
+
+    //If a megaphone goes off when in someone's inventory this happens
+    if (room == -1)
+      return;
+
     if(!world_array[room] || !world[room].people) {
         return;
     }
