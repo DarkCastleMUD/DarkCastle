@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: cl_ranger.cpp,v 1.66 2006/06/26 14:24:03 jhhudso Exp $ | cl_ranger.C  *
+ * $Id: cl_ranger.cpp,v 1.67 2006/06/26 14:40:55 jhhudso Exp $ | cl_ranger.C  *
  * Description: Ranger skills/spells                                          *
  *                                                                            *
  * Revision History                                                           *
@@ -760,6 +760,14 @@ int do_forage(CHAR_DATA *ch, char *arg, int cmd)
     lgroup = 3;
   }
   int cur_sector = world[ch->in_room].sector_type;
+
+  // If in a clan or safe room, set sector to inside so we fail forage
+  if (IS_SET(world[ch->in_room].room_flags, CLAN_ROOM) ||
+      IS_SET(world[ch->in_room].room_flags, SAFE) ||
+      IS_SET(world[ch->in_room].room_flags, INDOORS)) {
+    cur_sector = SECT_INSIDE;
+  }
+
   int last = 0;
 
   for (int i=0; i < 6; i++) {
