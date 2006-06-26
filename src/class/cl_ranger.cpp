@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: cl_ranger.cpp,v 1.65 2006/05/24 18:34:32 shane Exp $ | cl_ranger.C  *
+ * $Id: cl_ranger.cpp,v 1.66 2006/06/26 14:24:03 jhhudso Exp $ | cl_ranger.C  *
  * Description: Ranger skills/spells                                          *
  *                                                                            *
  * Revision History                                                           *
@@ -583,15 +583,152 @@ int pick_one(int a, int b, int c, int d)
     return d;
 }
 
+struct forage_lookup {
+  int ovnum;
+  int rate[4];
+};
+
+
+struct forage_lookup forage_lookup_table[SECT_MAX_SECT+1][6] = {
+  // SECT_INSIDE
+  {{0,{0,0,0,0}}, 
+   {0,{0,0,0,0}},
+   {0,{0,0,0,0}},
+   {0,{0,0,0,0}},
+   {0,{0,0,0,0}},
+   {0,{0,0,0,0}}},
+
+  // SECT_CITY
+  {{0,{0,0,0,0}}, 
+   {0,{0,0,0,0}},
+   {0,{0,0,0,0}},
+   {0,{0,0,0,0}},
+   {0,{0,0,0,0}},
+   {0,{0,0,0,0}}},
+
+  // SECT_FIELD
+  {{6306,{6,7,8,9}}, 
+   {6310,{1,2,3,4}},
+   {3171,{40,38,36,34}},
+   {3173,{5,6,7,8}},
+   {3174,{8,9,10,11}},
+   {3176,{40,38,36,34}}},
+
+  // SECT_FOREST
+  {{6308,{6,7,8,9}}, 
+   {6311,{1,2,3,4}},
+   {3167,{40,38,36,34}},
+   {3175,{40,38,36,34}},
+   {3185,{8,9,10,11}},
+   {27800,{5,6,7,8}}},
+
+// SECT_HILLS
+  {{6306,{6,7,8,9}}, 
+   {6310,{1,2,3,4}},
+   {3171,{40,38,36,34}},
+   {3173,{5,6,7,8}},
+   {3174,{8,9,10,11}},
+   {3176,{40,38,36,34}}},
+
+  // SECT_MOUNTAIN
+  {{6305,{1,2,3,4}}, 
+   {3177,{40,38,36,34}},
+   {3178,{6,7,8,9}},
+   {3179,{5,6,7,8}},
+   {3184,{40,38,36,34}},
+   {4,{8,9,10,11}}},
+
+  // SECT_WATER_SWIM
+  {{6303,{6,7,8,9}}, 
+   {3160,{40,38,36,34}},
+   {3162,{5,6,7,8}},
+   {3163,{8,9,10,11}},
+   {3164,{1,2,3,4}},
+   {3189,{40,38,36,34}}},
+
+  // SECT_WATER_NOSWIM
+  {{6303,{6,7,8,9}}, 
+   {3160,{40,38,36,34}},
+   {3162,{5,6,7,8}},
+   {3163,{8,9,10,11}},
+   {3164,{1,2,3,4}},
+   {3189,{40,38,36,34}}},
+
+  // SECT_BEACH
+  {{6302,{6,7,8,9}}, 
+   {6309,{1,2,3,4}},
+   {6304,{5,6,7,8}},
+   {3161,{40,38,36,34}},
+   {3169,{40,38,36,34}},
+   {3187,{8,9,10,11}}},
+
+// SECT_PAVED_ROAD
+  {{0,{0,0,0,0}}, 
+   {0,{0,0,0,0}},
+   {0,{0,0,0,0}},
+   {0,{0,0,0,0}},
+   {0,{0,0,0,0}},
+   {0,{0,0,0,0}}},
+
+  // SECT_DESERT
+  {{6307,{1,2,3,4}}, 
+   {3165,{40,38,36,34}},
+   {3166,{40,38,36,34}},
+   {3172,{6,7,8,9}},
+   {3186,{8,9,10,11}},
+   {1570,{5,6,7,8}}},
+
+  // SECT_UNDERWATER
+  {{0,{0,0,0,0}}, 
+   {0,{0,0,0,0}},
+   {0,{0,0,0,0}},
+   {0,{0,0,0,0}},
+   {0,{0,0,0,0}},
+   {0,{0,0,0,0}}},
+
+  // SECT_SWAMP
+  {{6301, {6, 7, 8, 9}}, 
+   {6312, {1, 2, 3, 4}}, 
+   {3170, {40, 38, 36, 34}}, 
+   {3180, {5, 6, 7, 8}}, 
+   {3181, {8, 9, 10, 11}}, 
+   {7717, {40, 38, 36, 34}}},
+
+// SECT_AIR
+  {{0,{0,0,0,0}}, 
+   {0,{0,0,0,0}},
+   {0,{0,0,0,0}},
+   {0,{0,0,0,0}},
+   {0,{0,0,0,0}},
+   {0,{0,0,0,0}}},
+
+// SECT_FROZEN_TUNDRA
+  {{28314,{5,6,7,8}}, 
+   {44,{8,9,10,11}},
+   {5219,{40,38,36,34}},
+   {3168,{6,7,8,9}},
+   {28313,{1,2,3,4}},
+   {28301,{40,38,36,34}}},
+
+// SECT_ARCTIC
+  {{28314,{5,6,7,8}}, 
+   {44,{8,9,10,11}},
+   {5219,{40,38,36,34}},
+   {3168,{6,7,8,9}},
+   {28313,{1,2,3,4}},
+   {28301,{40,38,36,34}}},
+};
+
+
 int do_forage(CHAR_DATA *ch, char *arg, int cmd)
 {
-  int learned, specialization;
+  int learned;
   struct obj_data * new_obj = 0;
   struct affected_type af;
 
   if(affected_by_spell(ch, SKILL_FORAGE)) {
-     send_to_char("You already foraged recently.  Give mother nature a break!\n\r", ch);
-     return eFAILURE;
+    send_to_char("You already foraged recently.  Give mother nature a break!\n\r", ch);
+    return eFAILURE;
   }
   
   if(GET_MOVE(ch) < 5) {
@@ -602,71 +739,45 @@ int do_forage(CHAR_DATA *ch, char *arg, int cmd)
   GET_MOVE(ch) -= 5;
  
   learned = has_skill(ch, SKILL_FORAGE);
-  specialization = learned / 100;
-  learned = learned % 100;
-  
   if(!learned) {
     send_to_char("Not knowing how to forage, you poke at the dirt with a stick, finding nothing.\r\n", ch);
     return eFAILURE;
   }
 
-  if ((1+IS_CARRYING_N(ch)) > CAN_CARRY_N(ch)) {
-    send_to_char("You can't carry that many items!\r\n", ch);
-    return eFAILURE;
-  }
+  skill_increase_check(ch, SKILL_FORAGE, learned, SKILL_INCREASE_HARD);
 
-//  skill_increase_check(ch, SKILL_FORAGE, learned, SKILL_INCREASE_MEDIUM);
+  int pick = number(1, 100);
+  int ovnum;
+  int lgroup;
 
-  // TODO - have forage use learned to modify how often you get rare items
-  // TODO - add ability for zones to add zone-specific forage items
-  int HerbFind[101],i;
-  for (i = 0; i < 15; i++)
-    HerbFind[i] = DETECT_GOOD_VNUM;
-  for (i = 15; i < 30; i++)
-    HerbFind[i] = DETECT_EVIL_VNUM;
-  for (i = 30; i < 45; i++)
-    HerbFind[i] = DETECT_INVISIBLE_VNUM;
-  for (i = 45; i < 60; i++)
-    HerbFind[i] = SENSE_LIFE_VNUM;
-  for (i = 60; i < 75; i++)
-    HerbFind[i] = INFRA_VNUM;
-  for (i = 75; i < 80; i++)
-    HerbFind[i] = INVIS_VNUM;
-  for (i = 80; i < 90; i++)
-    HerbFind[i] = FARSIGHT_VNUM;
-  for (i = 90; i < 93; i++)
-    HerbFind[i] = SOLIDITY_VNUM;
-  for (i = 93; i < 95; i++)
-    HerbFind[i] = LIGHTNING_SHIELD_VNUM;
-  for (i = 95; i < 98; i++)
-    HerbFind[i] = INSOMNIA_VNUM;
-  for (i = 98; i < 100; i++)
-    HerbFind[i] = HASTE_VNUM;
-  if (learned > 40)
-  {
-    HerbFind[10] = TRUE_VNUM;
-    HerbFind[20] = HASTE_VNUM;
-    HerbFind[40] = LIGHTNING_SHIELD_VNUM;
-    HerbFind[30] = LIGHTNING_SHIELD_VNUM;
+  if (learned >= 1 && learned <= 30) {
+    lgroup = 0;
+  } else if (learned >= 31 && learned <= 60) {
+    lgroup = 1;
+  } else if (learned >= 61 && learned <= 90) {
+    lgroup = 2;
+  } else if (learned >= 91) {
+    lgroup = 3;
   }
-  if (learned > 60)
-  {
-    HerbFind[11] = TRUE_VNUM;
-    HerbFind[21] = HASTE_VNUM;
-    HerbFind[41] = LIGHTNING_SHIELD_VNUM;
-    HerbFind[31] = LIGHTNING_SHIELD_VNUM;
+  int cur_sector = world[ch->in_room].sector_type;
+  int last = 0;
+
+  for (int i=0; i < 6; i++) {
+    if (pick > last && pick <= last+forage_lookup_table[cur_sector][i].rate[lgroup]) {
+      ovnum = forage_lookup_table[cur_sector][i].ovnum;
+
+      if ((1+IS_CARRYING_N(ch)) > CAN_CARRY_N(ch)) {
+	send_to_char("You can't carry that many items!\r\n", ch);
+	return eFAILURE;
+      }
+
+      new_obj = clone_object(real_object(ovnum));
+      break;
+    }
+    last = last + forage_lookup_table[cur_sector][i].rate[lgroup];
   }
-  if (learned > 80)
-  {
-    HerbFind[12] = TRUE_VNUM;
-    HerbFind[22] = HASTE_VNUM;
-    HerbFind[42] = LIGHTNING_SHIELD_VNUM;
-    HerbFind[32] = LIGHTNING_SHIELD_VNUM;
-  }
-  new_obj = clone_object(real_object( HerbFind[number(0,100)]));
 
   int recharge;
-
   if(new_obj)
      recharge = 3 - (learned/70);
   else recharge = 1;
