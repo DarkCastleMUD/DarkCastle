@@ -26,5 +26,6 @@ struct set_data
 #define SET_WHITECRYSTAL 9
 #define SET_BLACKCRYSTAL 10
 #define SET_AQUA 11
+#define SET_APPARATUS 12
 extern const struct set_data set_list[];
  

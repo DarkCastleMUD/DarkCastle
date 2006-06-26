@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.115 2006/06/25 09:29:11 shane Exp $ */
+/* $Id: handler.cpp,v 1.116 2006/06/26 03:38:44 apocalypse Exp $ */
     
 extern "C"
 {
@@ -362,10 +362,12 @@ const struct set_data set_list[] = {
   { "Black Crystal Armours", 7, {22011,22017,22025,22026,22027,22028,22029,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
         "Your crystal armours $B$0darken$R and begin to hum with magic.\r\n",
         "The $B$0darkness$R disperses as the crystal armours are removed.\r\n"},
-
   { "Aqua Pendants", 2, {5611,5643,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
         "The pendants click softly and you feel a surge of energy as gills spring from your neck!\r\n",
         "Your gills retract and fade as the two pendants separate quietly.\r\n"}, 
+  { "Arcane Apparatus", 19, {367,368,369,370,371,372,373,374,375,376,377,378,379,379,380,381,382,383,383},
+        "The power of ancient magicks surges through your body as you slowly fade out of existence.\r\n",
+        "You feel a slight tingle of fading magicks as you shimmer into existence.\r\n"},
   { "\n", 0, {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
 	"\n","\n"}
 };
@@ -524,6 +526,10 @@ void add_set_stats(char_data *ch, obj_data *obj, int flag, int pos)
 	    affect_to_char(ch, &af);
            break;
 	  default: 
+	  case SET_APPARATUS:
+	    af.bitvector = AFF_INVISIBILITY;
+	    affect_to_char(ch,&af);
+  	   break;
 		send_to_char("Tough luck, you completed an unimplemented set. Report what you just wore, eh?\r\n",ch);
 		break;
 	}
