@@ -622,9 +622,7 @@ struct assembler_data gem_data[] = {
    },
 
    // Item 2, Broadhead arrow from forage items
-   { "You carefully sand down the pointy stick, adding to its excellent form.\r\n  Splitting the feathers down, you 
-carefully attach them to the pointy stick.\r\n  Finally, you shape the scorpion stinger into a deadly arrowhead and 
-secure it to the front.\r\n",
+   { "You carefully sand down the pointy stick, adding to its excellent form.\r\n  Splitting the feathers down, you carefully attach them to the pointy stick.\r\n  Finally, you shape the scorpion stinger into a deadly arrowhead and secure it to the front.\r\n",
      "$n sits down with some junk and tries $s hand at fletching.",
      "You don't have all the items required to fletch an arrow.\r\n",
      { 3185, 3186, 3187, -1, -1, -1, -1, -1, -1, -1, 3188 }
