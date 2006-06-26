@@ -591,17 +591,17 @@ void assign_objects(void)
   assign_one_obj_non(6352, spellcraft_glyphs);
   assign_one_obj_non(6353, spellcraft_glyphs);  
     
-  // assembled items
-  // forage arrow
-//  assign_one_obj_non(2055,  gem_assembler);  
-//  assign_one_obj_non(2056,  gem_assembler);  
-//  assign_one_obj_non(2068,  gem_assembler);  
+// assembled items
+// forage arrow
+  assign_one_obj_non(3185,  gem_assembler);  
+  assign_one_obj_non(3186,  gem_assembler);  
+  assign_one_obj_non(3187,  gem_assembler);  
 
   assign_one_obj_com(4818, glove_combat_procs);
   assign_one_obj_com(4819, glove_combat_procs);
 
   // Crystalline tir
-  assign_one_obj_non(12607,  gem_assembler);  
+  assign_one_obj_non(12607, gem_assembler);  
   assign_one_obj_non(2602,  gem_assembler);  
   assign_one_obj_non(2714,  gem_assembler);  
 
