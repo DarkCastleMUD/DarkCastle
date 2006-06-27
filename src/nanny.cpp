@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.130 2006/06/25 16:57:23 urizen Exp $ */
+/* $Id: nanny.cpp,v 1.131 2006/06/27 21:17:51 shane Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -373,6 +373,9 @@ void do_on_login_stuff(char_data * ch)
        for(int i=0;i<QUEST_TOTAL/QSIZE;i++)
           ch->pcdata->quest_complete[i] = 0;
 //    }
+    if (ch->pcdata->time.logon < 1151440662)
+       SET_BIT(ch->misc, CHANNEL_TELL);
+
     if (GET_RACE(ch) == RACE_PIXIE) {
        if(GET_RAW_WIS(ch) == 27) {
           GET_RAW_WIS(ch) = 25;
