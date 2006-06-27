@@ -1,7 +1,7 @@
 #ifndef PLAYER_H_
 #define PLAYER_H_
 /************************************************************************
-| $Id: player.h,v 1.28 2006/05/19 07:38:17 shane Exp $
+| $Id: player.h,v 1.29 2006/06/27 19:19:03 shane Exp $
 | player.h
 | Description: This file defines the player vectors..punishment, specials,
 |   etc...
@@ -40,6 +40,7 @@
 
 #define LOG_DATABASE	1<<20
 #define LOG_GIVE 1<<21
+#define CHANNEL_TELL       1<<22
 // ...
 #define MISC_IS_MOB        1<<31
 
@@ -72,7 +73,7 @@
 #define PLR_ANONYMOUS    1<<15
 #define PLR_AUTOEAT      1<<16
 #define PLR_LFG          1<<17
-#define PLR_NOTELL       1<<18
+#define PLR_CHARMIEJOIN  1<<18
 #define PLR_NOTAX	 1<<19
 #define PLR_GUIDE	 1<<20
 #define PLR_GUIDE_TOG	 1<<21

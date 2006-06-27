@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: non_off.cpp,v 1.37 2006/06/23 22:37:29 shane Exp $
+| $Id: non_off.cpp,v 1.38 2006/06/27 19:18:59 shane Exp $
 | non_off.C
 | Description:  Implementation of generic, non-offensive commands.
 */
@@ -263,7 +263,7 @@ char * toggle_txt[] = {
   "auto-eat",
   "summonable",
   "lfg",
-  "notell",
+  "charmiejoin",
   "notax",
   "guide",
   "news-up",
@@ -354,7 +354,7 @@ int do_toggle(struct char_data * ch, char * arg, int cmd)
 	 
          case 12:
 	 sprintf(buf + strlen(buf), "%s\n\r",
-	   IS_SET(ch->pcdata->toggles, PLR_NOTELL) ? "on" : "off");
+	   IS_SET(ch->pcdata->toggles, PLR_CHARMIEJOIN) ? "on" : "off");
 	 break;
          case 13:
          sprintf(buf + strlen(buf), "%s\n\r",
@@ -451,7 +451,7 @@ int do_toggle(struct char_data * ch, char * arg, int cmd)
     break;
     
     case 12:
-    do_notell_toggle(ch, "", 9);
+    do_charmiejoin_toggle(ch, "", 9);
     break;
 
     case 13:
@@ -692,20 +692,20 @@ int do_notax_toggle(struct char_data *ch, char *argument, int cmd)
     return eSUCCESS;
 }
 
-int do_notell_toggle(struct char_data *ch, char *argument, int cmd)
+int do_charmiejoin_toggle(struct char_data *ch, char *argument, int cmd)
 {
     if (IS_NPC(ch))
 	return eFAILURE;
 
-    if (IS_SET(ch->pcdata->toggles, PLR_NOTELL))
+    if (IS_SET(ch->pcdata->toggles, PLR_CHARMIEJOIN))
     {
-	send_to_char( "You are able to send and receive tells again.\n\r", ch);
-	REMOVE_BIT(ch->pcdata->toggles, PLR_NOTELL);
+	send_to_char( "Your followers will no longer automatically join you.\n\r", ch);
+	REMOVE_BIT(ch->pcdata->toggles, PLR_CHARMIEJOIN);
     }
     else
     {
-	send_to_char( "You are no longer able to send or receive tells.\n\r", ch);
-	SET_BIT(ch->pcdata->toggles, PLR_NOTELL);
+	send_to_char( "Your followers will automatically aid you in battle.\n\r", ch);
+	SET_BIT(ch->pcdata->toggles, PLR_CHARMIEJOIN);
     }
 
     return eSUCCESS;

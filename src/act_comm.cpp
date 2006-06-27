@@ -215,6 +215,7 @@ int do_channel(struct char_data *ch, char *arg, int cmd)
     "help",
     "database",   
     "give",
+    "tell",
  "\\@"
   };
 
@@ -248,11 +249,18 @@ int do_channel(struct char_data *ch, char *arg, int cmd)
          send_to_char(buf2, ch);
       }
     }
+    if(IS_SET(ch->misc, 1<<22))
+       y = 1;
+    else
+       y = 0;
+    sprintf(buf2, "%-9s%s\n\r", types[22], on_off[y]); 
+    send_to_char(buf2, ch);
+
     return eSUCCESS;
   }
 
-  for(x = 0; x <= 22; x++) {
-     if(x == 22) {
+  for(x = 0; x <= 23; x++) {
+     if(x == 23) {
        send_to_char("That type was not found.\n\r", ch);
        return eSUCCESS;
      }
@@ -261,11 +269,11 @@ int do_channel(struct char_data *ch, char *arg, int cmd)
   }
 
   if(GET_LEVEL(ch) < IMMORTAL &&
-      ( x < 7 || x > 14) ) {
+      ( x < 7 || x > 14 && x < 22) ) {
     send_to_char("That type was not found.\n\r", ch);
     return eSUCCESS;
   }
-  if (x > 19 && GET_LEVEL(ch) != 110)
+  if (x > 19 && GET_LEVEL(ch) != 110 && x < 22)
   {
     send_to_char("That type was not found.\n\r", ch);
     return eSUCCESS;

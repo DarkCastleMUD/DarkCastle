@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: channel.cpp,v 1.16 2006/05/25 11:47:35 jhhudso Exp $
+| $Id: channel.cpp,v 1.17 2006/06/27 19:18:59 shane Exp $
 | channel.C
 | Description:  All of the channel - type commands; do_say, gossip, etc..
 */
@@ -489,8 +489,8 @@ int do_tell(struct char_data *ch, char *argument, int cmd)
 	return eSUCCESS;
     }
 
-    if (!IS_MOB(ch) && IS_SET(ch->pcdata->toggles, PLR_NOTELL)) {
-	send_to_char("You have NOTELL toggled on!!\n\r", ch);
+    if (!IS_MOB(ch) && !IS_SET(ch->misc, CHANNEL_TELL)) {
+	send_to_char("You have tell channeled off!!\n\r", ch);
 	return eSUCCESS;
     }
 
@@ -528,14 +528,14 @@ int do_tell(struct char_data *ch, char *argument, int cmd)
         // vict guarantted to be a PC
         // Re: Last comment. Switched immortals crash this.
 	
-    if( !IS_NPC(vict) && IS_SET(vict->pcdata->toggles, PLR_NOTELL) 
+    if( !IS_NPC(vict) && !IS_SET(vict->misc, CHANNEL_TELL) 
 	&& ch->level < 51) {
       send_to_char("The person is ignoring all tells right now.\r\n", ch);
       return eSUCCESS;
     }
-   else if( !IS_NPC(vict) && IS_SET(vict->pcdata->toggles, PLR_NOTELL)) {
+   else if( !IS_NPC(vict) && !IS_SET(vict->misc, CHANNEL_TELL)) {
      // Immortal sent a tell to a player with NOTELL.  Allow the tell butnotify the imm.
-     send_to_char("That player has NOTELL btw...\r\n", ch);
+     send_to_char("That player has tell channeled off btw...\r\n", ch);
    }    
     if(ch == vict)
       send_to_char("You try to tell yourself something.\n\r", ch);

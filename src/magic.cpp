@@ -2447,9 +2447,7 @@ int spell_poison(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data 
          act("You resist $n's attempt to posion you!",ch,NULL,victim,TO_VICT,0);
          endy = TRUE;
      } 
-      if (endy)
-         return eFAILURE;
-
+     if (!endy) {
         af.type = SPELL_POISON;
         af.duration = skill / 10;
         af.modifier = skill;
@@ -2458,6 +2456,7 @@ int spell_poison(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data 
         affect_join(victim, &af, FALSE, FALSE);
         send_to_char("You feel very sick.\n\r", victim);
         act("$N looks very sick.", ch,0,victim, TO_CHAR, 0);
+     }
      if (IS_NPC(victim) && (!victim->fighting) && GET_POS(ch) > POSITION_SLEEPING) {
          retval = attack(victim, ch, TYPE_UNDEFINED);
          retval = SWAP_CH_VICT(retval);

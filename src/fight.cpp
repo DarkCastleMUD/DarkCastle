@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.333 2006/06/25 16:57:11 urizen Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.334 2006/06/27 19:18:59 shane Exp $ */
 
 extern "C"
 {
@@ -120,7 +120,7 @@ int check_autojoiners(CHAR_DATA *ch, int skill = 0)
   return eSUCCESS;
 }
 
-int check_charmiejoin(CHAR_DATA *ch, int skill = 0)
+int check_joincharmie(CHAR_DATA *ch, int skill = 0)
 {
   if (!IS_NPC(ch)) return eFAILURE; // irrelevant
   if (!ch->fighting) return eFAILURE; 
@@ -141,6 +141,19 @@ int check_charmiejoin(CHAR_DATA *ch, int skill = 0)
   return retval;
 }
 
+int check_charmiejoin(CHAR_DATA *ch)
+{
+  if (ch->fighting) return eFAILURE; 
+  
+  CHAR_DATA *tmp = ch->master;
+  if (!tmp) return eFAILURE;
+  if (tmp == ch || tmp == ch->fighting) return eFAILURE;
+  if (GET_POS(ch) != POSITION_STANDING) return eFAILURE;
+  int retval = do_join(ch, GET_NAME(tmp), 9);
+
+  return retval;
+}
+
 void perform_violence(void)
 {
   //char debug[256];
@@ -148,6 +161,7 @@ void perform_violence(void)
   int is_mob = 0;
   int retval;
   static struct affected_type *af, *next_af_dude;
+  struct follow_type *fol;
   extern char *spell_wear_off_msg[];
   
   if(!combat_list)                  return;
@@ -178,7 +192,16 @@ void perform_violence(void)
    }
    int retval = check_autojoiners(ch);
    if (SOMEONE_DIED(retval)) continue;
-   if (IS_AFFECTED(ch, AFF_CHARM)) retval = check_charmiejoin(ch);
+   if (IS_AFFECTED(ch, AFF_CHARM)) retval = check_joincharmie(ch);
+   if (SOMEONE_DIED(retval)) continue;
+   if(!IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_CHARMIEJOIN)) {
+      if(ch->followers) {
+         for(fol = ch->followers; fol; fol = fol->next) {
+            if (IS_AFFECTED(fol->follower, AFF_CHARM) && ch->in_room == fol->follower->in_room) retval = check_charmiejoin(fol->follower);
+            if (IS_SET(retval, eVICT_DIED)) break;
+         }
+      }
+   }
    if (SOMEONE_DIED(retval)) continue;
 
     if(can_attack(ch)) {
@@ -1549,6 +1572,7 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
   if(!weapon)
     weapon = WIELD;
   typeofdamage = damage_type(weapon_type);
+  struct follow_type *fol;
 
   if(GET_POS(victim) == POSITION_DEAD)           return (eSUCCESS|eVICT_DIED);
   if (ch->in_room != victim->in_room && !(attacktype == SPELL_SOLAR_GATE ||
@@ -2122,8 +2146,18 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
   if (ch->in_room == victim->in_room) {
   SET_BIT(retval, check_autojoiners(ch,1));
   if (!SOMEONE_DIED(retval))
-  if (IS_AFFECTED(ch, AFF_CHARM)) SET_BIT(retval, check_charmiejoin(ch));
+  if (IS_AFFECTED(ch, AFF_CHARM)) SET_BIT(retval, check_joincharmie(ch));
   if (SOMEONE_DIED(retval)) return retval;
+   if(!IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_CHARMIEJOIN)) {
+      if(ch->followers) {
+         for(fol = ch->followers; fol; fol = fol->next) {
+            if (IS_AFFECTED(fol->follower, AFF_CHARM) && ch->in_room == fol->follower->in_room) retval = check_charmiejoin(fol->follower);
+            if (IS_SET(retval, eVICT_DIED)) break;
+         }
+      }
+   }
+  if (SOMEONE_DIED(retval)) return retval;
+
   }
  }
   return retval;

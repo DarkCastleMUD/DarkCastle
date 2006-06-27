@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.h,v 1.53 2006/06/21 19:01:20 shane Exp $ */
+/* $Id: interp.h,v 1.54 2006/06/27 19:19:03 shane Exp $ */
 
 #ifndef INTERP_H_
 #define INTERP_H_
@@ -102,6 +102,7 @@ DO_FUN  do_bug;
 DO_FUN  do_bullrush;
 DO_FUN  do_cast;
 DO_FUN  do_channel;
+DO_FUN  do_charmiejoin_toggle;
 DO_FUN  do_check;
 DO_FUN  do_chpwd;
 DO_FUN  do_cinfo;
@@ -260,7 +261,6 @@ DO_FUN  do_noname;
 DO_FUN  do_not_here;
 DO_FUN  do_notax_toggle;
 DO_FUN  do_guide_toggle;
-DO_FUN  do_notell_toggle;
 DO_FUN  do_oclone;
 DO_FUN  do_mclone;
 DO_FUN  do_oedit;
