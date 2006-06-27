@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.132 2006/06/25 16:49:32 urizen Exp $
+| $Id: cl_thief.cpp,v 1.133 2006/06/27 14:25:21 apocalypse Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -1999,7 +1999,7 @@ int do_cripple(CHAR_DATA *ch, char *argument, int cmd)
          return eFAILURE;
 
    if(IS_AFFECTED(vict, AFF_CRIPPLE)) {
-      act("$n has already been crippled!", ch, 0, vict, TO_CHAR, 0);
+      act("$N has already been crippled!", ch, 0, vict, TO_CHAR, 0);
       return eFAILURE;
    }
 
