@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: cl_ranger.cpp,v 1.67 2006/06/26 14:40:55 jhhudso Exp $ | cl_ranger.C  *
+ * $Id: cl_ranger.cpp,v 1.68 2006/06/27 21:59:32 jhhudso Exp $ | cl_ranger.C  *
  * Description: Ranger skills/spells                                          *
  *                                                                            *
  * Revision History                                                           *
@@ -787,11 +787,12 @@ int do_forage(CHAR_DATA *ch, char *arg, int cmd)
 
   int recharge;
   if(new_obj)
-     recharge = 3 - (learned/70);
+     recharge = 3 - (learned/40);
   else recharge = 1;
 
   af.type = SKILL_FORAGE;
   af.duration = recharge;
+  af.duration_type = PULSE_REGEN;
   af.modifier = 0;
   af.location = APPLY_NONE;
   af.bitvector = -1;

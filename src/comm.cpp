@@ -167,7 +167,7 @@ void pulse_takeover(void);
 void boot_db(void);
 void boot_world(void);
 void zone_update(void);
-void affect_update(void);	/* In spells.c */
+void affect_update(int32 duration_type);	/* In spells.c */
 void point_update(void);	/* In limits.c */
 void food_update(void);		/* In limits.c */
 void mobile_activity(void);
@@ -988,6 +988,7 @@ void heartbeat()
   {
      pulse_timer = PULSE_TIMER;
      check_timer();
+     affect_update(PULSE_TIMER);
   }
   if (--pulse_short < 1)
   {
@@ -1007,6 +1008,7 @@ void heartbeat()
     pulse_violence = PULSE_VIOLENCE;
     perform_violence();
     update_command_lag_and_poison();
+    affect_update(PULSE_VIOLENCE);
   }
 
   if(--pulse_weather < 1)
@@ -1021,6 +1023,7 @@ void heartbeat()
     pulse_regen = number(PULSE_REGEN-8*PASSES_PER_SEC, PULSE_REGEN+5*PASSES_PER_SEC);
     point_update();
     pulse_takeover();
+    affect_update(PULSE_REGEN);
   }
 
   if(--pulse_time < 1) {
@@ -1028,7 +1031,7 @@ void heartbeat()
     zone_update();
     time_update();
     food_update();
-    affect_update();
+    affect_update(PULSE_TIME);
     update_corpses_and_portals();
     check_idle_passwords();
     check_leaderboard(); //good place to put this

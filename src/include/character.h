@@ -1,7 +1,7 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.43 2006/06/08 20:18:02 shane Exp $
+| $Id: character.h,v 1.44 2006/06/27 21:59:32 jhhudso Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
@@ -142,6 +142,7 @@ struct affected_type
 {
     uint32 type;           /* The type of spell that caused ths      */
     int16  duration;       /* For how long its effects will last      */
+    int32  duration_type;  
     int32  modifier;       /* This is added to apropriate ability     */
     int32  location;       /* Tells which ability to change(APPLY_XXX)*/
     int32 bitvector;      /* Tells which bits to set (AFF_XXX)       */

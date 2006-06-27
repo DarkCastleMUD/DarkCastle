@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.175 2006/06/24 19:45:56 shane Exp $ */
+/* $Id: spells.cpp,v 1.176 2006/06/27 21:59:32 jhhudso Exp $ */
 
 extern "C"
 {
@@ -816,13 +816,20 @@ int use_mana( CHAR_DATA *ch, int sn )
 }
 
 
-void affect_update( void )
+void affect_update( int32 duration_type )
 {
     static struct affected_type *af, *next_af_dude;
     static CHAR_DATA *i, * i_next;
     void update_char_objects( CHAR_DATA *ch ); /* handler.c */
     unsigned int faded_spells[20];
     int a =0;
+
+    if (duration_type != PULSE_REGEN &&
+	duration_type != PULSE_TIMER &&
+	duration_type != PULSE_VIOLENCE &&
+	duration_type != PULSE_TIME) // Default
+      return;
+
     for (i = character_list; i; i = i_next) { 
       i_next = i->next;
 //      if(!IS_NPC(i) ) // && !(i->desc)) Linkdeadness doens't save you 
@@ -830,6 +837,11 @@ void affect_update( void )
   //      continue; 
       for (af = i->affected; af; af = next_af_dude) {
 	next_af_dude = af->next;
+	if (af->duration_type == 0 && duration_type == PULSE_TIME) {
+	  // Business as usual
+	} else if (af->duration_type != duration_type) {
+	  continue;
+	}
 //	while (next_af_dude && next_af_dude->type == af->type) next_af_dude = next_af_dude->next;
         for (; a < 20; a++)
           faded_spells[a] = 0;
