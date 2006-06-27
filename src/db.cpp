@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.125 2006/06/16 12:46:02 urizen Exp $ */
+/* $Id: db.cpp,v 1.126 2006/06/27 19:27:44 shane Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -4724,6 +4724,7 @@ void reset_char(CHAR_DATA *ch)
   SET_BIT(ch->misc, CHANNEL_AUCTION);
   SET_BIT(ch->misc, CHANNEL_INFO);
   SET_BIT(ch->misc, CHANNEL_NEWBIE);
+  SET_BIT(ch->misc, CHANNEL_TELL);
   ch->group_name = 0;
   ch->ambush = 0;
   ch->guarding = 0;
