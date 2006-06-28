@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: offense.cpp,v 1.17 2006/05/03 18:40:21 dcastle Exp $
+| $Id: offense.cpp,v 1.18 2006/06/28 15:03:54 urizen Exp $
 | offense.C
 | Description:  Commands that are generically offensive - that is, the
 |   victim should retaliate.  The class-specific offensive commands are
@@ -33,6 +33,38 @@ extern "C"
 
 extern CWorld world;
 extern struct index_data *mob_index;
+
+int do_suicide(struct char_data *ch, char *argument, int cmd)
+{
+  IS_SET(world[ch->in_room].room_flags, SAFE))
+  {
+	send_to_char("This place is too peaceful for that.\r\n",ch);
+	return eFAILURE;
+  }
+  IS_SET(world[ch->in_room].room_flags, ARENA))
+  {
+	send_to_char("You can't do that in the arena.\r\n",ch);
+	return eFAILURE;
+  }
+ if(affected_by_spell(victim, FUCK_PTHIEF) || (affected_by_spell(victim, FUCK_GTHIEF)) {
+	send_to_char("You're too busy running from the law!\r\n",ch);
+	return eFAILURE;
+  }
+
+  int percent = number(1,100);
+  if (percent > GET_WIS(ch)) percent -= GET_WIS(ch);
+
+  if (percent > 50)
+  {
+	send_to_char("You miss your wrists with the blade and knick your kneecap!\r\n",ch);
+	act("$n tries to suicide, but fails miserably.",ch, 0, 0, TO_ROOM, 0);
+        return eFAILURE;
+  }
+  send_to_char("Looking out upon the world, you decide that it would be a better place without you.\r\n",ch);
+  act("Tired of life, $n decides to end $s.",ch, 0, 0, TO_ROOM, 0);
+  fight_kill(ch, ch, TYPE_PKILL, 0);
+  return eSUCCESS;
+}
 
 // TODO - check differences between hit, murder, and kill....I think we can
 // just pull out alot of the code into a function.
