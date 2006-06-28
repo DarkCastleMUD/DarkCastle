@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.118 2006/06/28 06:07:48 jhhudso Exp $ */
+/* $Id: handler.cpp,v 1.119 2006/06/28 15:10:11 shane Exp $ */
     
 extern "C"
 {
@@ -1113,12 +1113,12 @@ void affect_modify(CHAR_DATA *ch, int32 loc, int32 mod, long bitv, bool add)
 
         case APPLY_BOUNT_SONNET_HUNGER:
            if(add) SETBIT(ch->affected_by, AFF_BOUNT_SONNET_HUNGER);
-           else REMBIT(ch->affected_by, AFF_BOUNT_SONNET_HUNGER);
+           else {REMBIT(ch->affected_by, AFF_BOUNT_SONNET_HUNGER);GET_COND(ch,FULL)=12;}
            break;
 
         case APPLY_BOUNT_SONNET_THIRST:
            if(add) SETBIT(ch->affected_by, AFF_BOUNT_SONNET_THIRST);
-           else REMBIT(ch->affected_by, AFF_BOUNT_SONNET_THIRST);
+           else {REMBIT(ch->affected_by, AFF_BOUNT_SONNET_THIRST);GET_COND(ch,THIRST)=12;}
            break;
 
         case APPLY_BLIND:
