@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.134 2006/06/28 15:10:17 shane Exp $
+| $Id: cl_thief.cpp,v 1.135 2006/06/28 22:11:15 dcastle Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -349,7 +349,7 @@ int do_circle(CHAR_DATA *ch, char *argument, int cmd)
          return eFAILURE;
       }
    }
-
+  if (blackjack) { send_to_char("Soon :)",ch); return eFAILURE; }
    if (ch == victim->fighting) {
       send_to_char("You can't break away while that person is hitting you!\n\r", ch);
       return eFAILURE;
@@ -1718,6 +1718,8 @@ int do_blackjack(struct char_data *ch, char *argument, int cmd)
   bool wpnok = FALSE;
   int retval;
 
+  send_to_char("Soon :)",ch);
+  return eFAILURE;
   if (!has_skill(ch, SKILL_BLACKJACK))
   {
     send_to_char("You wouldn't know how.\r\n",ch);
@@ -2025,7 +2027,7 @@ int do_cripple(CHAR_DATA *ch, char *argument, int cmd)
       af.modifier  = skill;
       af.location  = APPLY_NONE;
       af.bitvector = AFF_CRIPPLE;
-      affect_to_char(vict, &af);
+      affect_to_char(vict, &af, PULSE_VIOLENCE);
    }
 
    return eSUCCESS;
