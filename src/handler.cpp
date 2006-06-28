@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.117 2006/06/26 12:02:53 shane Exp $ */
+/* $Id: handler.cpp,v 1.118 2006/06/28 06:07:48 jhhudso Exp $ */
     
 extern "C"
 {
@@ -1197,7 +1197,7 @@ void affect_total(CHAR_DATA *ch)
 
 /* Insert an affect_type in a char_data structure
    Automatically sets apropriate bits and apply's */
-void affect_to_char( CHAR_DATA *ch, struct affected_type *af )
+void affect_to_char( CHAR_DATA *ch, struct affected_type *af, int32 duration_type)
 {
 //    bool secFix;
     struct affected_type *affected_alloc;
@@ -1208,6 +1208,7 @@ void affect_to_char( CHAR_DATA *ch, struct affected_type *af )
     affected_alloc = (struct affected_type *) dc_alloc(1, sizeof(struct affected_type));
 #endif
     *affected_alloc = *af;
+    affected_alloc->duration_type = duration_type;
     affected_alloc->next = ch->affected;
     ch->affected = affected_alloc;
 

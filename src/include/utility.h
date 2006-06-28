@@ -16,7 +16,7 @@
  *  10/21/2003   Onager    Changed IS_ANONYMOUS() to handle mobs without   *
  *                         crashing                                        *
  ***************************************************************************/
-/* $Id: utility.h,v 1.43 2006/06/23 22:37:37 shane Exp $ */
+/* $Id: utility.h,v 1.44 2006/06/28 06:07:48 jhhudso Exp $ */
 
 #ifndef UTILITY_H_
 #define UTILITY_H_
@@ -399,7 +399,6 @@ void save_char_obj( CHAR_DATA *ch );
 void char_to_store(CHAR_DATA *ch, struct char_file_u *st, struct time_data & tmpage);
 bool obj_to_store( struct obj_data *obj, CHAR_DATA *ch, FILE *fpsave, int wear_pos );
 void check_idling(CHAR_DATA *ch);
-void affect_to_char( CHAR_DATA *ch, struct affected_type *af );
 void stop_follower(CHAR_DATA *ch, int cmd);
 bool CAN_SEE( CHAR_DATA *sub, CHAR_DATA *obj );
 int  SWAP_CH_VICT(int value);

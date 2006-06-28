@@ -12,12 +12,13 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.h,v 1.16 2006/06/23 22:37:37 shane Exp $ */
+/* $Id: handler.h,v 1.17 2006/06/28 06:07:48 jhhudso Exp $ */
 
 #ifndef HANDLER_H_
 #define HANDLER_H_
 
 #include <structs.h> // ubyte, etc..
+#include <comm.h>
 
 #ifdef NeXT
 #ifndef bool
@@ -28,7 +29,7 @@
 /* handling the affected-structures */
 void affect_total(CHAR_DATA *ch);
 void affect_modify(CHAR_DATA *ch, int32 loc, int32 mod, long bitv, bool add);
-void affect_to_char( CHAR_DATA *ch, struct affected_type *af );
+void affect_to_char( CHAR_DATA *ch, struct affected_type *af, int32 duration_type = PULSE_TIME);
 void affect_from_char( CHAR_DATA *ch, int skill);
 void affect_remove( CHAR_DATA *ch, struct affected_type *af, int flags);
 affected_type * affected_by_spell( CHAR_DATA *ch, int skill );
