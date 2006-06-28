@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: offense.cpp,v 1.18 2006/06/28 15:03:54 urizen Exp $
+| $Id: offense.cpp,v 1.19 2006/06/28 15:17:15 urizen Exp $
 | offense.C
 | Description:  Commands that are generically offensive - that is, the
 |   victim should retaliate.  The class-specific offensive commands are
@@ -36,6 +36,7 @@ extern struct index_data *mob_index;
 
 int do_suicide(struct char_data *ch, char *argument, int cmd)
 {
+  if (IS_NPC(ch)) return eFAILURE; // just in case 
   IS_SET(world[ch->in_room].room_flags, SAFE))
   {
 	send_to_char("This place is too peaceful for that.\r\n",ch);
