@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.h,v 1.54 2006/06/27 19:19:03 shane Exp $ */
+/* $Id: interp.h,v 1.55 2006/06/28 15:07:12 urizen Exp $ */
 
 #ifndef INTERP_H_
 #define INTERP_H_
@@ -360,6 +360,7 @@ DO_FUN  do_stealth;
 DO_FUN  do_story;
 DO_FUN  do_string;
 DO_FUN  do_stun;
+DO_FUN  do_suicide;
 DO_FUN  do_switch;
 DO_FUN  do_tactics;
 DO_FUN  do_tame;
