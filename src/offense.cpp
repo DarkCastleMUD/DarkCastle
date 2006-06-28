@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: offense.cpp,v 1.19 2006/06/28 15:17:15 urizen Exp $
+| $Id: offense.cpp,v 1.20 2006/06/28 15:21:56 dcastle Exp $
 | offense.C
 | Description:  Commands that are generically offensive - that is, the
 |   victim should retaliate.  The class-specific offensive commands are
@@ -37,17 +37,17 @@ extern struct index_data *mob_index;
 int do_suicide(struct char_data *ch, char *argument, int cmd)
 {
   if (IS_NPC(ch)) return eFAILURE; // just in case 
-  IS_SET(world[ch->in_room].room_flags, SAFE))
+  if (IS_SET(world[ch->in_room].room_flags, SAFE))
   {
 	send_to_char("This place is too peaceful for that.\r\n",ch);
 	return eFAILURE;
   }
-  IS_SET(world[ch->in_room].room_flags, ARENA))
+  if (IS_SET(world[ch->in_room].room_flags, ARENA))
   {
 	send_to_char("You can't do that in the arena.\r\n",ch);
 	return eFAILURE;
   }
- if(affected_by_spell(victim, FUCK_PTHIEF) || (affected_by_spell(victim, FUCK_GTHIEF)) {
+ if(affected_by_spell(ch, FUCK_PTHIEF) || (affected_by_spell(ch, FUCK_GTHIEF))) {
 	send_to_char("You're too busy running from the law!\r\n",ch);
 	return eFAILURE;
   }
