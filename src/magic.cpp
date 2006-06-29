@@ -1208,7 +1208,7 @@ int spell_call_lightning(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct o
 
   if (OUTSIDE(ch) && (weather_info.sky>=SKY_RAINING)) 
   {
-     dam = dice(MIN((int)GET_MANA(ch),650), 1);
+     dam = dice(MIN((int)GET_MANA(ch),750), 1);
      return damage(ch, victim, dam,TYPE_ENERGY, SPELL_CALL_LIGHTNING, 0);
   }
   return eFAILURE;
@@ -10379,7 +10379,7 @@ int spell_sun_ray(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data
 
   set_cantquit( ch, victim );
 
-  dam = MIN((int)GET_MANA(ch), 650);
+  dam = MIN((int)GET_MANA(ch), 750);
 
   if (OUTSIDE(ch) && (weather_info.sky <= SKY_CLOUDY)) {
 
