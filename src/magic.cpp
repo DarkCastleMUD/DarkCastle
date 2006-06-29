@@ -1509,6 +1509,22 @@ int spell_blindness(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
 
   if (affected_by_spell(victim, SPELL_BLINDNESS) || IS_AFFECTED(victim, AFF_BLIND))
     return eFAILURE;
+
+  int spellret = saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC);
+
+  if(spellret >= 0 && (victim != ch)) {
+      act("$N seems to be unaffected!", ch, NULL, victim, TO_CHAR, 0);
+      if(!IS_NPC(victim)) {
+         act("$n tried to blind you!", ch, NULL, victim, TO_VICT, 0);
+      }
+      if (IS_NPC(victim) && (!victim->fighting) && GET_POS(victim) > POSITION_SLEEPING) {
+         retval = attack(victim, ch, TYPE_UNDEFINED);
+         retval = SWAP_CH_VICT(retval);
+         return retval;
+      }
+      return eSUCCESS;
+  }
+
   act("$n seems to be blinded!", victim, 0, 0, TO_ROOM, INVIS_NULL);
   send_to_char("You have been blinded!\n\r", victim);
 
