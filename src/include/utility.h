@@ -16,7 +16,7 @@
  *  10/21/2003   Onager    Changed IS_ANONYMOUS() to handle mobs without   *
  *                         crashing                                        *
  ***************************************************************************/
-/* $Id: utility.h,v 1.44 2006/06/28 06:07:48 jhhudso Exp $ */
+/* $Id: utility.h,v 1.45 2006/06/29 08:57:06 shane Exp $ */
 
 #ifndef UTILITY_H_
 #define UTILITY_H_
@@ -55,6 +55,9 @@ char *index(char *buf, char op);
 #define WAIT_STATE(czh, cycle)  (((czh)->desc) ? (czh)->desc->wait > (cycle) ? 0 : (czh)->desc->wait = (cycle) :  \
                                   (IS_MOB((czh)) ? MOB_WAIT_STATE((czh)) = (cycle) : 0))
 
+#define REM_WAIT_STATE(czh, cycle) (((czh)->desc) ? (czh)->desc->wait < (cycle) ? (czh)->desc->wait = 0 : \
+                            (czh)->desc->wait -= (cycle) : IS_MOB((czh)) ? MOB_WAIT_STATE((czh)) < (cycle) ? \
+                            MOB_WAIT_STATE((czh)) = 0 : MOB_WAIT_STATE((czh)) -= (cycle) : 0)
 
 // Defines for gradual skill increase code
 // Usage is defined in guild.cpp

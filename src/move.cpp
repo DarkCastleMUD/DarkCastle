@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.68 2006/06/21 19:01:15 shane Exp $
+| $Id: move.cpp,v 1.69 2006/06/29 08:57:01 shane Exp $
 | move.C
 | Movement commands and stuff.
 *************************************************************************
@@ -723,19 +723,19 @@ int do_simple_move(CHAR_DATA *ch, int cmd, int following)
      }
      if (a == 89 && world[ch->in_room].sector_type == SECT_DESERT)
      {
-       act("Unable to survive in the desert, your elemental returns to the elemental plane of water.",ch, 0, 0, TO_ROOM, 0);
+       act("Unable to survive in the desert, $n returns to the elemental plane of water.",ch, 0, 0, TO_ROOM, 0);
        extract_char(ch, TRUE);
        return eSUCCESS|eCH_DIED;
      }
      if (a == 90 && world[ch->in_room].sector_type == SECT_SWAMP)
      {
-       act("Unable to survive in the swamp, your elemental returns to the elemental plane of air.",ch, 0, 0, TO_ROOM, 0);
+       act("Unable to survive in the swamp, $n returns to the elemental plane of air.",ch, 0, 0, TO_ROOM, 0);
        extract_char(ch, TRUE);
        return eSUCCESS|eCH_DIED;
      }
      if (a == 91 && world[ch->in_room].sector_type == SECT_AIR)
      {
-       act("Unable to survive in the air, your elemental returns to the elemental plane of earth.",ch, 0, 0, TO_ROOM, 0);
+       act("Unable to survive in the air, $n returns to the elemental plane of earth.",ch, 0, 0, TO_ROOM, 0);
        extract_char(ch, TRUE);
        return eSUCCESS|eCH_DIED;
      }

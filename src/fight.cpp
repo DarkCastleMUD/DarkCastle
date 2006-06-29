@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.334 2006/06/27 19:18:59 shane Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.335 2006/06/29 08:57:01 shane Exp $ */
 
 extern "C"
 {
@@ -2148,14 +2148,14 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
   if (!SOMEONE_DIED(retval))
   if (IS_AFFECTED(ch, AFF_CHARM)) SET_BIT(retval, check_joincharmie(ch));
   if (SOMEONE_DIED(retval)) return retval;
-   if(!IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_CHARMIEJOIN)) {
-      if(ch->followers) {
-         for(fol = ch->followers; fol; fol = fol->next) {
-            if (IS_AFFECTED(fol->follower, AFF_CHARM) && ch->in_room == fol->follower->in_room) retval = check_charmiejoin(fol->follower);
-            if (IS_SET(retval, eVICT_DIED)) break;
-         }
-      }
-   }
+  if(!IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_CHARMIEJOIN) && attacktype != SKILL_BACKSTAB && attacktype != SKILL_AMBUSH) {
+     if(ch->followers) {
+        for(fol = ch->followers; fol; fol = fol->next) {
+           if (IS_AFFECTED(fol->follower, AFF_CHARM) && ch->in_room == fol->follower->in_room) retval = check_charmiejoin(fol->follower);
+           if (IS_SET(retval, eVICT_DIED)) break;
+        }
+     }
+  }
   if (SOMEONE_DIED(retval)) return retval;
 
   }
@@ -4993,6 +4993,7 @@ int can_be_attacked(CHAR_DATA *ch, CHAR_DATA *vict)
 int weapon_spells(CHAR_DATA *ch, CHAR_DATA *vict, int weapon)
 {
   int i, current_affect, chance, percent, retval;
+  OBJ_DATA *weap;
   
   if(!ch || !vict) {
     log("Null ch or vict sent to weapon spells!", -1, LOG_BUG);
@@ -5004,22 +5005,27 @@ int weapon_spells(CHAR_DATA *ch, CHAR_DATA *vict, int weapon)
   if(!can_attack(ch) || !can_be_attacked(ch, vict))
     return eFAILURE;
   
-  if(ch->in_room != vict->in_room || GET_POS(vict) == POSITION_DEAD)
+  if((ch->in_room != vict->in_room && weapon != ITEM_MISSILE) || GET_POS(vict) == POSITION_DEAD)
     return eFAILURE;
   
-  if(!ch->equipment[weapon])
+  if(!ch->equipment[weapon] && weapon != ITEM_MISSILE)
     return eFAILURE;
   
   int wep_skill = 40;
-    
-  for(i = 0; i < ch->equipment[weapon]->num_affects; i++)
+
+  if(weapon == ITEM_MISSILE) weap = get_obj_in_list_vis(ch, "arrow", ch->carrying);
+  else weap = ch->equipment[weapon];
+
+  if(!weap) return eFAILURE;
+ 
+  for(i = 0; i < weap->num_affects; i++)
   {
     /* It's possible the victim has fled or died */
     if(ch->in_room != vict->in_room) return eFAILURE;
     if(GET_POS(vict) == POSITION_DEAD) return eSUCCESS|eVICT_DIED;
     chance = number(0, 101);
-    percent = ch->equipment[weapon]->affected[i].modifier;
-    current_affect = ch->equipment[weapon]->affected[i].location;
+    percent = weap->affected[i].modifier;
+    current_affect = weap->affected[i].location;
     
     /* If they don't roll under chance, it doesn't work! */
     if(chance > percent) continue;
@@ -5152,8 +5158,8 @@ int weapon_spells(CHAR_DATA *ch, CHAR_DATA *vict, int weapon)
    
   } /* for loop */
 
-  if (obj_index[ch->equipment[weapon]->item_number].progtypes & WEAPON_PROG)
-     oprog_weapon_trigger(ch, ch->equipment[weapon]);
+  if (obj_index[weap->item_number].progtypes & WEAPON_PROG)
+     oprog_weapon_trigger(ch, weap);
 
   return eSUCCESS;    
 }  /* spell effects */

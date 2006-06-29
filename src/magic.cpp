@@ -2705,7 +2705,7 @@ int spell_mend_golem(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
   for (fol = ch->followers; fol; fol = fol->next)
     if (IS_NPC(fol->follower) && mob_index[fol->follower->mobdata->nr].virt == 8)
     {
-      GET_HIT(fol->follower) += (int)(GET_MAX_HIT(fol->follower) * 0.2);
+      GET_HIT(fol->follower) += (int)(GET_MAX_HIT(fol->follower) * (0.12 + level / 1000.0));
       if (GET_HIT(fol->follower) > GET_MAX_HIT(fol->follower))
         GET_HIT(fol->follower) = GET_MAX_HIT(fol->follower);
 
@@ -9362,7 +9362,8 @@ int cast_call_follower(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DAT
    if(IS_SET(world[ch->in_room].room_flags, CLAN_ROOM)) {
       send_to_char("I don't think your fellow clan members would appreciate the wildlife.\n\r", ch);
       GET_MANA(ch) += 75;
-      return eFAILURE;
+      REM_WAIT_STATE(ch, skill / 10);
+     return eFAILURE;
    }
 
    victim = NULL;
@@ -9379,6 +9380,7 @@ int cast_call_follower(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DAT
    
    if (NULL == victim) {
       send_to_char("You don't have any tamed friends in need of a summon!\n\r", ch);
+      REM_WAIT_STATE(ch, skill / 10);
       return eFAILURE;
    }
 
@@ -9395,6 +9397,8 @@ int cast_call_follower(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DAT
       if(GET_MANA(ch) < 0)
          GET_MANA(ch) = 0;
    }
+
+   REM_WAIT_STATE(ch, skill / 10);
    return eSUCCESS;
 }
 

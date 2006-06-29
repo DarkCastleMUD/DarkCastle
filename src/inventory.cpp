@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.68 2006/06/23 22:37:28 shane Exp $
+| $Id: inventory.cpp,v 1.69 2006/06/29 08:57:01 shane Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -708,7 +708,7 @@ int do_consent(struct char_data *ch, char *arg, int cmd)
   }
  
   if(!(vict = get_char_vis(ch, buf))) {
-    csendf(ch, "Consent who?  You can't see any %s.\n\r", buf);
+    csendf(ch, "Consent whom?  You can't see any %s.\n\r", buf);
     return eFAILURE;
   }
 
@@ -1116,10 +1116,37 @@ int do_put(struct char_data *ch, char *argument, int cmd)
   return eFAILURE;
 }
 
+void do_givealldot(CHAR_DATA *ch, char *name, char *target, int cmd)
+{
+  struct obj_data *tmp_object;
+  struct obj_data *next_object;
+  char buf[200];
+  bool found = FALSE;
+
+  for(tmp_object = ch->carrying; tmp_object; tmp_object = next_object) {
+     next_object = tmp_object->next_content;
+     if(!name && CAN_SEE_OBJ(ch, tmp_object)) {
+       sprintf(buf, "%s %s", fname(tmp_object->name), target);
+       buf[99] = 0;
+       found = TRUE;
+       do_give(ch, buf, cmd);
+     }
+     else if(isname(name, tmp_object->name) && CAN_SEE_OBJ(ch, tmp_object)) {
+       sprintf(buf, "%s %s", name, target);
+       buf[99] = 0;
+       found = TRUE;
+       do_give(ch, buf, cmd);
+     }
+  }
+
+  if(!found)
+    send_to_char("You don't have one.\n\r", ch);
+}
+
 int do_give(struct char_data *ch, char *argument, int cmd)
 {
   char obj_name[MAX_INPUT_LENGTH+1], vict_name[MAX_INPUT_LENGTH+1], buf[200];
-  char arg[80];
+  char arg[80], allbuf[80];
   int amount;
   int retval;
   extern int arena[4];
@@ -1168,12 +1195,12 @@ int do_give(struct char_data *ch, char *argument, int cmd)
     }
     argument = one_argument(argument, vict_name);
     if(!*vict_name) { 
-      send_to_char("To who?\n\r",ch);
+      send_to_char("To whom?\n\r",ch);
       return eFAILURE;
     }
     
       if (!(vict = get_char_room_vis(ch, vict_name))) {
-	 send_to_char("To who?\n\r",ch);
+	 send_to_char("To whom?\n\r",ch);
 	 return eFAILURE;
 	 }
       
@@ -1231,9 +1258,31 @@ int do_give(struct char_data *ch, char *argument, int cmd)
 
     if (!*obj_name || !*vict_name)
     {
-	send_to_char("Give what to who?\n\r", ch);
+	send_to_char("Give what to whom?\n\r", ch);
 	return eFAILURE;
     }
+
+    if (!(vict = get_char_room_vis(ch, vict_name)))
+    {
+	send_to_char("No one by that name around here.\n\r", ch);
+	return eFAILURE;
+    }
+
+    if (ch == vict)
+    {
+       send_to_char("Why give yourself stuff?\r\n", ch);
+       return eFAILURE;
+    }
+
+    if(!str_cmp(obj_name, "all")) {
+       do_givealldot(ch, 0, vict_name, cmd);
+       return eSUCCESS;
+    }
+    else if(sscanf(obj_name, "all.%s", allbuf) != 0) {
+       do_givealldot(ch, allbuf, vict_name, cmd);
+       return eSUCCESS;
+    }
+
     if (!(obj = get_obj_in_list_vis(ch, obj_name, ch->carrying)))
     {
 	send_to_char("You do not seem to have anything like that.\n\r",
@@ -1259,18 +1308,6 @@ int do_give(struct char_data *ch, char *argument, int cmd)
       }
       else
         send_to_char("This item is NODROP btw.\n\r", ch);
-    }
-
-    if (!(vict = get_char_room_vis(ch, vict_name)))
-    {
-	send_to_char("No one by that name around here.\n\r", ch);
-	return eFAILURE;
-    }
-
-    if (ch == vict)
-    {
-       send_to_char("Why give yourself stuff?\r\n", ch);
-       return eFAILURE;
     }
 
     // You can give no_trade items to mobs for quest purposes.  It's taken care of later
@@ -1344,19 +1381,6 @@ int do_give(struct char_data *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
-/*    if(GET_LEVEL(ch) >= IMMORTAL)
-    {
-    sprintf(buf, "%s gives %s to %s.", GET_NAME(ch), obj->short_description,
-            GET_NAME(vict));
-    special_log(buf);
-    }
-    if(IS_NPC(ch) && (!IS_AFFECTED(ch, AFF_CHARM) || GET_LEVEL(ch) > 50))
-    {
-       sprintf(buf, "%s gives %s to %s.", GET_NAME(ch), obj->short_description, 
-                    GET_NAME(vict));
-       special_log(buf);
-    }
-*/
     move_obj(obj, vict);
     act("$n gives $p to $N.", ch, obj, vict, TO_ROOM, INVIS_NULL|NOTVICT);
     act("$n gives you $p.", ch, obj, vict, TO_VICT, 0);

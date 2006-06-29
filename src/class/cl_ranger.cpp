@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: cl_ranger.cpp,v 1.70 2006/06/29 02:25:13 apocalypse Exp $ | cl_ranger.C  *
+ * $Id: cl_ranger.cpp,v 1.71 2006/06/29 08:57:04 shane Exp $ | cl_ranger.C  *
  * Description: Ranger skills/spells                                          *
  *                                                                            *
  * Revision History                                                           *
@@ -1462,7 +1462,7 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
            }
      }
 
-//     retval = weapon_spells(ch, victim, );
+     retval = weapon_spells(ch, victim, ITEM_MISSILE);
 
      if(!SOMEONE_DIED(retval)) {
         switch(artype) {
