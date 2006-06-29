@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.119 2006/06/28 15:10:11 shane Exp $ */
+/* $Id: handler.cpp,v 1.120 2006/06/29 04:34:42 apocalypse Exp $ */
     
 extern "C"
 {
@@ -529,6 +529,9 @@ void add_set_stats(char_data *ch, obj_data *obj, int flag, int pos)
 	  case SET_APPARATUS:
 	    af.bitvector = AFF_INVISIBLE;
 	    affect_to_char(ch,&af);
+            af.bitfector = AFF_HP_REGEN;
+            af.modifier = 10;
+	    affect_to_char(ch, &af);
   	   break;
 		send_to_char("Tough luck, you completed an unimplemented set. Report what you just wore, eh?\r\n",ch);
 		break;
