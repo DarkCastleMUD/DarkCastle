@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.336 2006/06/30 12:05:11 shane Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.337 2006/06/30 13:17:51 dcastle Exp $ */
 
 extern "C"
 {
@@ -161,7 +161,7 @@ void perform_violence(void)
   int is_mob = 0;
   int retval;
   static struct affected_type *af, *next_af_dude;
-  struct follow_type *fol;
+  struct follow_type *fol,*folnext;
   extern char *spell_wear_off_msg[];
   
   if(!combat_list)                  return;
@@ -196,7 +196,8 @@ void perform_violence(void)
    if (SOMEONE_DIED(retval)) continue;
    if(!IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_CHARMIEJOIN)) {
       if(ch->followers) {
-         for(fol = ch->followers; fol; fol = fol->next) {
+         for(fol = ch->followers; fol; fol = folnext) {
+	    folnext = fol->next;
             if (IS_AFFECTED(fol->follower, AFF_CHARM) && ch->in_room == fol->follower->in_room) retval = check_charmiejoin(fol->follower);
             if (IS_SET(retval, eVICT_DIED)) break;
          }
