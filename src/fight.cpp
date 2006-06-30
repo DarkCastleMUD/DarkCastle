@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.335 2006/06/29 08:57:01 shane Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.336 2006/06/30 12:05:11 shane Exp $ */
 
 extern "C"
 {
@@ -2151,7 +2151,7 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
   if(!IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_CHARMIEJOIN) && attacktype != SKILL_BACKSTAB && attacktype != SKILL_AMBUSH) {
      if(ch->followers) {
         for(fol = ch->followers; fol; fol = fol->next) {
-           if (IS_AFFECTED(fol->follower, AFF_CHARM) && ch->in_room == fol->follower->in_room) retval = check_charmiejoin(fol->follower);
+           if (IS_AFFECTED(fol->follower, AFF_CHARM) && ch->in_room == fol->follower->in_room) SET_BIT(retval,check_charmiejoin(fol->follower));
            if (IS_SET(retval, eVICT_DIED)) break;
         }
      }
@@ -2179,7 +2179,7 @@ int noncombat_damage(CHAR_DATA * ch, int dam, char *char_death_msg,
         act(room_death_msg, ch, 0, 0, TO_ROOM, 0);
      if (death_log_msg)
         log(death_log_msg, IMMORTAL, LOG_MORTAL);
-     fight_kill(NULL, ch, TYPE_PKILL, type);
+     fight_kill(NULL, ch, TYPE_CHOOSE, type);
      return eSUCCESS|eCH_DIED;
   } else {
      return eSUCCESS;
@@ -2192,7 +2192,9 @@ int is_pkill(CHAR_DATA *ch, CHAR_DATA *vict)
   CHAR_DATA *tmp_ch;
 
   // TODO - change this so a mob following another mob isn't a pkill
-  
+
+  if(!ch) return TRUE;
+
   for(tmp_ch = ch; tmp_ch; tmp_ch = tmp_ch->master) 
   { 
     if(!IS_NPC(tmp_ch))
@@ -4865,7 +4867,7 @@ void arena_kill(CHAR_DATA *ch, CHAR_DATA *victim, int type)
   GET_MOVE(victim) = GET_MAX_MOVE(victim);
   GET_KI(victim) = GET_MAX_KI(victim);
 
-  ch->combat = 0;  // remove all combat effects
+  if(ch) ch->combat = 0;  // remove all combat effects
 
   remove_active_potato(victim);
   save_char_obj(victim);
