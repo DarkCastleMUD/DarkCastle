@@ -649,6 +649,8 @@ int do_mpgoto( CHAR_DATA *ch, char *argument, int cmd )
 	logf( IMMORTAL, LOG_WORLD, "Mpgoto - No such location: vnum %d.", mob_index[ch->mobdata->nr].virt );
 	return eFAILURE|eINTERNAL_ERROR;
     }
+    if (location == ch->in_room)
+      return eFAILURE; // zz
     extern room_data ** world_array;
     extern int top_of_world;
     if (location > top_of_world || !world_array[location])
