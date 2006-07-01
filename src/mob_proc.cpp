@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.101 2006/06/25 17:24:16 apocalypse Exp $ */
+/* $Id: mob_proc.cpp,v 1.102 2006/07/01 04:12:50 apocalypse Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -3098,7 +3098,10 @@ static char *dethSayText [ ] =
   "Chuck Norris doesn't teabag the ladies, he potato sacks them!",
   "Chuck Norris' tears could cure cancer except he's never cried.",
   "Sheep are great and all, but goats have handlebars and rabbits are handheld.",
-  "Don't worry guys, I'll Imm more and shave when I'm done \"finding myself\"...until then I'm going to roam the land like in Kung Fu."
+  "Don't worry guys, I'll Imm more and shave when I'm done \"finding myself\"...until then I'm going to roam the land like in Kung Fu.",
+  "The only hellstream I have ever seen is when I pee after sex with your mom.",
+  "Wow, I really should have checked that this Dixie-cup wasn't Tainted before I drank from it!",
+  "I know! I'm going to steal a MUD call it my own...People will trust me then for sure!"
 };
 
 #define DETH_SAY_TEXT_SIZE    ( sizeof ( dethSayText )    / sizeof ( char * ) )
