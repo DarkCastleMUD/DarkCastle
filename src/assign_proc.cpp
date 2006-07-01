@@ -545,6 +545,7 @@ void assign_objects(void)
   assign_one_obj_non(2376, board);
   assign_one_obj_non(2402, board);
   assign_one_obj_non(2303, board);
+  assign_one_obj_non(2363, board);
   assign_one_obj_non(2308, board);
   assign_one_obj_non(2313, board);
   assign_one_obj_non(2390, board);
