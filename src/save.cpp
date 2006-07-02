@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: save.cpp,v 1.41 2006/06/14 00:40:21 dcastle Exp $ */
+/* $Id: save.cpp,v 1.42 2006/07/02 20:44:54 urizen Exp $ */
 
 extern "C"
 {
@@ -722,8 +722,6 @@ bool load_char_obj( struct descriptor_data *d, char *name )
 
   if(fpsave != NULL)
     dc_fclose(fpsave);
-  extern void read_player_vault(CHAR_DATA *ch);
-  read_player_vault(ch);
   return TRUE;
 }
 
