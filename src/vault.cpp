@@ -1625,6 +1625,7 @@ int sleazy_vault_guy(struct char_data *ch, struct obj_data *obj, int cmd, char *
 		if (!has_right(ch, CLAN_RIGHTS_VAULT))
 		{
 		  send_to_char("You are not authorized to make that purchase.\r\n",ch);
+		  return eSUCCESS;
 		}
 		if (GET_PLATINUM(ch) < 500)
 		{
