@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: save.cpp,v 1.42 2006/07/02 20:44:54 urizen Exp $ */
+/* $Id: save.cpp,v 1.43 2006/07/02 21:50:16 urizen Exp $ */
 
 extern "C"
 {
@@ -41,6 +41,7 @@ extern "C"
 #include <connect.h>
 #include <handler.h>
 #include <race.h>
+#include <vault.h>
 
 extern struct index_data *obj_index;
 extern CWorld world;
@@ -644,6 +645,9 @@ void save_char_obj (CHAR_DATA *ch)
   }
 
   REMBIT(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT);
+  struct vault_data *vault;
+  if ((vault = has_vault(GET_NAME(ch))))
+    save_vault(vault->owner);
 }
 
 // just error crap to avoid using "goto" like we were
