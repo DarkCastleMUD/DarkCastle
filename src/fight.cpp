@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.338 2006/07/02 21:53:46 urizen Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.339 2006/07/02 22:03:11 urizen Exp $ */
 
 extern "C"
 {
@@ -47,6 +47,7 @@ extern "C"
 #include <sing.h> // stop_grouped_bards
 #include <innate.h>
 #include <token.h>
+#include <vault.h>
 extern int top_of_world;
 extern CHAR_DATA *character_list;
 extern struct descriptor_data *descriptor_list;
