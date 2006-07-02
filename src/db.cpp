@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.128 2006/07/02 21:44:17 urizen Exp $ */
+/* $Id: db.cpp,v 1.129 2006/07/02 21:49:52 urizen Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -3222,7 +3222,6 @@ int create_blank_item(int nr)
     obj->next_content = 0;
     obj->next_skill = 0;
     obj->table = 0;
-    obj->cmsg = 0;
     obj->carried_by   = 0;
     obj->equipped_by  = 0;
     obj->in_obj       = 0;
@@ -3585,7 +3584,6 @@ struct obj_data *read_object(int nr, FILE *fl)
     obj->description        = fread_string (fl, 1);
     obj->action_description = fread_string (fl, 1);
     obj->table = 0;
-    obj->cmsg = 0;
     curr_virtno = nr;
     curr_name = obj->name;
     curr_type = "Object";
@@ -3770,7 +3768,6 @@ struct obj_data *clone_object(int nr)
     obj->affected[i].location = old->affected[i].location;
     obj->affected[i].modifier = old->affected[i].modifier;
   }
-  obj->cmsg = 0;
   obj->table = 0;
   obj->next_skill = 0;
   obj->next_content        = 0;
