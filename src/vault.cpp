@@ -954,6 +954,7 @@ void item_add(obj_data *obj, struct vault_data *vault) {
     }
   }
 
+  obj_from_char(obj);
   CREATE(item, struct vault_items_data, 1);
   item->obj       = obj;
   item->item_vnum = vnum;
