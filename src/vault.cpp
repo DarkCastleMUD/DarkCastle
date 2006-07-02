@@ -928,7 +928,7 @@ void get_from_vault(CHAR_DATA *ch, char *object, char *owner) {
 
     sprintf(buf, "%s removed %s[%d] from %s's vault.", GET_NAME(ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), owner);
     vault_log(buf, owner);
-    csendf(ch, "The %s has been removed from the vault.\r\n", GET_OBJ_SHORT(obj));
+    csendf(ch, "%s has been removed from the vault.\r\n", GET_OBJ_SHORT(obj));
   
     item_remove(obj, vault);
    
@@ -1117,7 +1117,7 @@ int can_put_in_vault(struct obj_data *obj, int self, struct vault_data *vault, s
 //  struct obj_data *tmp_obj;
  
   if (GET_OBJ_VNUM(obj) == NOWHERE) {
-    csendf(ch, "The %s is hardly worth saving.\r\n", GET_OBJ_SHORT(obj));
+    csendf(ch, "%s is hardly worth saving.\r\n", GET_OBJ_SHORT(obj));
     return 0;
   }
 
@@ -1132,37 +1132,37 @@ int can_put_in_vault(struct obj_data *obj, int self, struct vault_data *vault, s
   }
 
   if (IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL)) { // GL
-    csendf(ch, "The %s is far too valuable to place in the vault.\r\n", GET_OBJ_SHORT(obj));
+    csendf(ch, "%s is far too valuable to place in the vault.\r\n", GET_OBJ_SHORT(obj));
     return 0;
   }
 
   if (!self && IS_SET(obj->obj_flags.more_flags, ITEM_NO_TRADE) && GET_LEVEL(ch) < IMMORTAL) { // no_trade
-    csendf(ch, "The %s seems bound to you.\r\n", GET_OBJ_SHORT(obj));
+    csendf(ch, "%s seems bound to you.\r\n", GET_OBJ_SHORT(obj));
     return 0;
   }
  
   if (IS_SET(obj->obj_flags.extra_flags, ITEM_NODROP))  { //cursed
-    csendf(ch, "The %s is stuck! Ack!.\r\n", GET_OBJ_SHORT(obj));
+    csendf(ch, "%s is stuck! Ack!.\r\n", GET_OBJ_SHORT(obj));
     return 0;
   }
 
   if (IS_SET(obj->obj_flags.extra_flags, ITEM_NOSAVE))   { //nosave
-    csendf(ch, "The %s doesn't seem to be a permanent part of the world.\r\n", GET_OBJ_SHORT(obj));
+    csendf(ch, "%s doesn't seem to be a permanent part of the world.\r\n", GET_OBJ_SHORT(obj));
     return 0;
   }
 
   if (obj->obj_flags.type_flag == ITEM_KEY)  { // keys
-    csendf(ch, "Its not nice to horde all the %s.\r\n", GET_OBJ_SHORT(obj));
+    csendf(ch, "Its not nice to horde all %s.\r\n", GET_OBJ_SHORT(obj));
     return 0;
   }
 
   if (obj->obj_flags.type_flag == ITEM_CONTAINER && obj->contains)  { // non-empty containers
-    csendf(ch, "The %s needs to be emptied first.\r\n", GET_OBJ_SHORT(obj));
+    csendf(ch, "%s needs to be emptied first.\r\n", GET_OBJ_SHORT(obj));
     return 0;
   }
 
   if ((GET_OBJ_WEIGHT(obj) + vault->weight) > vault->size) { // vault is full
-    csendf(ch, "You can't seem to stuff the %s in the vault.  Its too big!\r\n", GET_OBJ_SHORT(obj));
+    csendf(ch, "You can't seem to stuff %s in the vault.  Its too big!\r\n", GET_OBJ_SHORT(obj));
     return 0;
   }
 
@@ -1198,12 +1198,12 @@ void put_in_vault(CHAR_DATA *ch, char *object, char *owner) {
         continue;
       
       if ((GET_OBJ_WEIGHT(obj) + vault->weight) > vault->size) {
-        csendf(ch, "The %s won't fit in the vault!\r\n", GET_OBJ_SHORT(obj));
+        csendf(ch, "%s won't fit in the vault!\r\n", GET_OBJ_SHORT(obj));
         continue;
       }
       sprintf(buf, "%s added %s[%d] to %s's vault.", GET_NAME(ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), owner);
       vault_log(buf, owner);
-      csendf(ch, "The %s has been placed in the vault.\r\n", GET_OBJ_SHORT(obj));
+      csendf(ch, "%s has been placed in the vault.\r\n", GET_OBJ_SHORT(obj));
       if (!fullSave(obj))
          { item_add(GET_OBJ_VNUM(obj), vault); extract_obj(obj); }
       else { item_add(obj, vault); obj_from_char(obj); }
@@ -1217,12 +1217,12 @@ void put_in_vault(CHAR_DATA *ch, char *object, char *owner) {
         continue;
 
       if ((GET_OBJ_WEIGHT(obj) + vault->weight) > vault->size) {
-        csendf(ch, "The %s won't fit in the vault!\r\n", GET_OBJ_SHORT(obj));
+        csendf(ch, "%s won't fit in the vault!\r\n", GET_OBJ_SHORT(obj));
         continue;
       }
       sprintf(buf, "%s added %s[%d] to %s's vault.", GET_NAME(ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), owner);
       vault_log(buf, owner);
-      csendf(ch, "The %s has been placed in the vault.\r\n", GET_OBJ_SHORT(obj));
+      csendf(ch, "%s has been placed in the vault.\r\n", GET_OBJ_SHORT(obj));
       if (!fullSave(obj)) {
         item_add(GET_OBJ_VNUM(obj), vault); extract_obj(obj); }
       else { item_add(obj, vault); obj_from_char(obj); }
@@ -1237,13 +1237,13 @@ void put_in_vault(CHAR_DATA *ch, char *object, char *owner) {
       return;
 
     if ((GET_OBJ_WEIGHT(obj) + vault->weight) > vault->size) {
-      csendf(ch, "The %s won't fit in the vault!\r\n", GET_OBJ_SHORT(obj));
+      csendf(ch, "%s won't fit in the vault!\r\n", GET_OBJ_SHORT(obj));
       return;
     }
 
     sprintf(buf, "%s added %s[%d] to %s's vault.", GET_NAME(ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), owner);
     vault_log(buf, owner);
-    csendf(ch, "The %s has been placed in the vault.\r\n", GET_OBJ_SHORT(obj));
+    csendf(ch, "%s has been placed in the vault.\r\n", GET_OBJ_SHORT(obj));
   
     if (!fullSave(obj)) {
       item_add(GET_OBJ_VNUM(obj), vault); extract_obj(obj); }
