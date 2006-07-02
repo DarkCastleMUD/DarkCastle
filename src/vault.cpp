@@ -118,6 +118,7 @@ bool fullSave(obj_data *obj)
 
   if (obj->obj_flags.wear_flags != tmp_obj->obj_flags.wear_flags)
 	return 1;
+
   if (obj->obj_flags.type_flag == ITEM_STAFF && obj->obj_flags.value[1] != obj->obj_flags.value[2])
     return 1;
 
@@ -560,7 +561,7 @@ void load_vaults(void) {
 
   fscanf(index, "%s\n", line);
   while (*line != '$') {
-    sprintf(fname, "../vaults/%c/%s.vault", *line, line);
+    sprintf(fname, "../vaults/%c/%s.vault", UPPER(*line), line);
     if(!(fl = dc_fopen(fname, "r"))) {
       sprintf(buf, "boot_vaults: unable to open file [%s].", fname);
       log(buf, IMMORTAL, LOG_BUG);
