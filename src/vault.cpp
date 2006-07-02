@@ -574,7 +574,7 @@ void load_vaults(void) {
           vault->gold	= gold;
           break;
         case 'O':
-          if (sscanf(type, "%s %d %d %d", tmp, &vnum, &count, &full) == 3) {
+          if (sscanf(type, "%s %d %d %d", tmp, &vnum, &count, &full) == 4) {
             ;
           } else {
             sprintf(buf, "boot_vaults: Bad 'O' option in file [%s]: %s\r\n", fname, type);
