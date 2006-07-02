@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: structs.h,v 1.12 2006/05/07 23:08:00 dcastle Exp $
+| $Id: structs.h,v 1.13 2006/07/02 20:46:27 urizen Exp $
 | structs.h
 | Description:  This file should go away someday - it's stuff that I
 |   wasn't sure how to break up.  --Morc XXX
@@ -17,6 +17,7 @@ int dc_fclose(FILE * fl);
 
 typedef signed char		 sbyte;
 typedef unsigned char		 ubyte;
+typedef signed char		 byte;
 
 typedef signed short int         int16;
 typedef unsigned short int      uint16;
