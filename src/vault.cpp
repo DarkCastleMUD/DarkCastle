@@ -150,7 +150,6 @@ void save_vault(char *name) {
 
   if (!(vault = has_vault(name)))
     return;
-  name[0] = UPPER(name[0]);
 
   sprintf(fname, "../vaults/%c/%s.vault", *name, name);
   if(!(fl = dc_fopen(fname, "w"))) {
@@ -966,7 +965,6 @@ void item_add(obj_data *obj, struct vault_data *vault) {
     }
   }
 
-  obj_from_char(obj);
   CREATE(item, struct vault_items_data, 1);
   item->obj       = obj;
   item->item_vnum = vnum;
@@ -1196,7 +1194,7 @@ void put_in_vault(CHAR_DATA *ch, char *object, char *owner) {
       csendf(ch, "The %s has been placed in the vault.\r\n", GET_OBJ_SHORT(obj));
       if (!fullSave(obj))
          { item_add(GET_OBJ_VNUM(obj), vault); extract_obj(obj); }
-      else item_add(obj, vault); 
+      else { item_add(obj, vault); obj_from_char(obj); }
     }
   } else if (sscanf(object, "all.%s", object)) {
     for (obj = ch->carrying; obj ; obj = tmp_obj) {
@@ -1215,7 +1213,7 @@ void put_in_vault(CHAR_DATA *ch, char *object, char *owner) {
       csendf(ch, "The %s has been placed in the vault.\r\n", GET_OBJ_SHORT(obj));
       if (!fullSave(obj)) {
         item_add(GET_OBJ_VNUM(obj), vault); extract_obj(obj); }
-      else item_add(obj, vault);
+      else { item_add(obj, vault); obj_from_char(obj); }
     }
   } else {
     if (!(obj = get_obj_in_list_vis(ch, object, ch->carrying))) {
@@ -1237,7 +1235,7 @@ void put_in_vault(CHAR_DATA *ch, char *object, char *owner) {
   
     if (!fullSave(obj)) {
       item_add(GET_OBJ_VNUM(obj), vault); extract_obj(obj); }
-    else item_add(obj, vault); 
+    else { item_add(obj, vault); obj_from_char(obj); }
   }
   save_vault(owner);
   save_char_obj(ch);
