@@ -1,7 +1,7 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.44 2006/06/27 21:59:32 jhhudso Exp $
+| $Id: character.h,v 1.45 2006/07/02 20:46:47 urizen Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
@@ -156,7 +156,7 @@ struct follow_type
     CHAR_DATA *follower;
     struct follow_type *next;
 };
-
+/*
 #define VIEW_ACCESS 1
 #define DEPOSIT_ACCESS 2
 #define WITHDRAW_ACCESS 3
@@ -176,13 +176,14 @@ struct vault_access_data
 struct player_vault
 {
   char *segment[20];
+  char *last_search;
   int max_contain, contains;
   int nr_items;
   uint amt;
   OBJ_DATA *content;
   struct vault_access_data *acc;
 };
-
+*/
 
 // DO NOT change most of these types without checking the save files
 // first, or you will probably end up corrupting all the pfiles
@@ -250,7 +251,6 @@ struct pc_data
     struct char_data *golem; // CURRENT golem. 
     bool hide[MAX_HIDE];
     CHAR_DATA *hiding_from[MAX_HIDE];
-    struct player_vault *vault;
     std::queue<char *> *away_msgs;
     char *joining;
     uint32 quest_points;
