@@ -94,7 +94,7 @@ struct vault_data *has_vault(char *name) {
      add_new_vault(GET_NAME(ch), 0);
      for (vault = vault_table;vault;vault = vault->next)
        if (vault && vault->owner && !strcasecmp(vault->owner, name)) {
-	 send_to_char("A vault was created for you.\r\n",ch);
+//	 send_to_char("A vault was created for you.\r\n",ch);
          return vault;
        }
   }
@@ -917,7 +917,7 @@ void get_from_vault(CHAR_DATA *ch, char *object, char *owner) {
     } 
   
     if (!self && (IS_SET(obj->obj_flags.more_flags, ITEM_NO_TRADE) ||
-		IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL) && GET_LEVEL(ch) < IMMORTAL) {
+		IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL)) && GET_LEVEL(ch) < IMMORTAL) {
       send_to_char("That item seems to be bound to the vault.\r\n", ch);
       return;
     } 
