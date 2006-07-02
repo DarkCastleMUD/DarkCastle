@@ -16,7 +16,7 @@
  *  10/21/2003   Onager    Changed IS_ANONYMOUS() to handle mobs without   *
  *                         crashing                                        *
  ***************************************************************************/
-/* $Id: utility.h,v 1.45 2006/06/29 08:57:06 shane Exp $ */
+/* $Id: utility.h,v 1.46 2006/07/02 20:41:21 urizen Exp $ */
 
 #ifndef UTILITY_H_
 #define UTILITY_H_
@@ -177,7 +177,9 @@ bool IS_DARK( int room );
 #define GET_MOB_RANGE(ch) ((ch)->pcdata->mobiles)
 #define GET_OBJ_RANGE(ch) ((ch)->pcdata->objects)
 
-/* mike stuff */
+#define GET_OBJ_SHORT(obj)      ((obj)->short_description)
+#define GET_OBJ_NAME(obj)       ((obj)->name)
+
 #define GET_OBJ_RNUM(obj)       ((obj)->item_number)
 #define GET_OBJ_VAL(obj, val)   ((obj)->obj_flags.value[(val)])
 #define GET_OBJ_VROOM(obj)      ((obj)->vroom)
@@ -192,7 +194,6 @@ bool IS_DARK( int room );
 #define VALID_ROOM_RNUM(rnum)   ((rnum) != NOWHERE && (rnum) <= top_of_world)
 #define GET_ROOM_VNUM(rnum) \
         ((long)(VALID_ROOM_RNUM(rnum) ? world[(rnum)].number : NOWHERE))
-/* end mike */
 
 #define GET_PROMPT(ch)  ((ch)->pcdata->prompt)
 #define GET_TOGGLES(ch) ((ch)->pcdata->toggles)
