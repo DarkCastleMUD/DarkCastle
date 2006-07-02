@@ -40,6 +40,7 @@ void show_vault_log(CHAR_DATA *ch, char *owner, char *arg);
 int class_restricted(struct char_data *ch, struct obj_data *obj);
 int size_restricted(struct char_data *ch, struct obj_data *obj);
 int spell_identify(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill);
+char *clanVName(int c);
 
 extern struct index_data *obj_index;
 extern struct obj_data * search_char_for_item(char_data * ch, int16 item_number, bool wearOnly = FALSE);
@@ -258,6 +259,8 @@ int do_vault(CHAR_DATA *ch, char *argument, int cmd)
     if (GET_LEVEL(ch) > IMMORTAL) send_to_char(imm_vault_usage, ch);
     return eSUCCESS;
   } 
+  if (!str_cmp(arg1, "clan") && ch->clan)
+    strcpy(arg1, clanVName(ch->clan));
 
   // show the contents of your or someone elses vault
   if (!strncmp(arg, "list", strlen(arg))) {
