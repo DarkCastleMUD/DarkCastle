@@ -1,7 +1,7 @@
 #ifndef FILEINFO_H_
 #define FILEINFO_H_
 /*
-| $Id: fileinfo.h,v 1.15 2006/06/08 20:18:02 shane Exp $
+| $Id: fileinfo.h,v 1.16 2006/07/02 20:46:10 urizen Exp $
 | fileinfo.h
 | Description:  Contains information for loading files, ie "../lib", etc..
 */
@@ -101,5 +101,9 @@
 #define  WORLD_INDEX_FILE_TINY   "worldindex.tiny"
 #define  MOB_INDEX_FILE_TINY "mobindex.tiny"
 #define  ZONE_INDEX_FILE_TINY "zoneindex.tiny"
+
+#define VAULT_INDEX_FILE     "vaults/vaultindex"
+#define VAULT_INDEX_FILE_TMP "vaults/vaultindex.tmp"
+
 
 #endif // FILEINFO_H_
