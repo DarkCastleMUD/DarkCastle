@@ -259,8 +259,11 @@ int do_vault(CHAR_DATA *ch, char *argument, int cmd)
     if (GET_LEVEL(ch) > IMMORTAL) send_to_char(imm_vault_usage, ch);
     return eSUCCESS;
   } 
+
   if (!str_cmp(arg1, "clan") && ch->clan)
     strcpy(arg1, clanVName(ch->clan));
+  if (!str_cmp(arg2, "clan") && ch->clan)
+    strcpy(arg2, clanVName(ch->clan));
 
   // show the contents of your or someone elses vault
   if (!strncmp(arg, "list", strlen(arg))) {
