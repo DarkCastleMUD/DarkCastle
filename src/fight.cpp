@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.337 2006/06/30 13:17:51 dcastle Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.338 2006/07/02 21:53:46 urizen Exp $ */
 
 extern "C"
 {
@@ -3897,6 +3897,7 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
              "         \\               /\\ |\r\n"
              "          \\             /  \\|\r\n"
              "           `-----------`\r\n", victim);
+	   remove_vault(GET_NAME(victim));
            do_quit(victim, "", 666);
            unlink(buf1);
            sprintf(buf2, "%s permanently dies.", buf1);
@@ -3908,7 +3909,7 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
            sprintf(buf1, "%s/%c/%s", SAVE_DIR, victim->name[0], victim->name);
            send_to_char("Your Intelligence has reached 4...you are permanently dead!\n\r", victim);
            send_to_char("\r\n"
-  "                     At least you have something nice to look at before your character is erased! - Valkyrie\r\n"
+  "                     At least you have something nice to look at before your character is erased! - Wendy\r\n"
 "   888   M:::::::::::::M8888888888888M:::::mM888888888888888    8888\r\n"
 "    888  M::::::::::::M8888:888888888888::::m::Mm88888 888888   8888\r\n"
 "     88  M::::::::::::8888:88888888888888888::::::Mm8   88888   888\r\n"
@@ -3935,6 +3936,7 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
 "           8   88MM::::::::::::::::::::::M:::M::::::::MM\r\n",victim);
 
 
+	   remove_vault(GET_NAME(victim));
            do_quit(victim, "", 666);
            unlink(buf1);
            sprintf(buf2, "%s sees tits.", buf1);
@@ -3953,6 +3955,7 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
 	"         /.-.-./ \" \" \\.-.-.\\\r\n",victim);
 
 
+	   remove_vault(GET_NAME(victim));
            do_quit(victim, "", 666);
            unlink(buf1);
            sprintf(buf2, "%s gets batted to death.", buf1);
@@ -3976,6 +3979,7 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
   "       `''\\/-.                        |\r\n"
   "              \\                       | \r\n"
   "              |                       |\r\n",victim);
+	   remove_vault(GET_NAME(victim));
            do_quit(victim, "", 666);
            unlink(buf1);
            sprintf(buf2, "%s goes to moose heaven.", buf1);
@@ -4008,6 +4012,7 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
 		"      \\|    /   /               \\   \\   |/\r\n"
 		"       `\\   VVV~                 ~VVV  /'$R\r\n",victim);
 
+	   remove_vault(GET_NAME(victim));
            do_quit(victim, "", 666);
            unlink(buf1);
            sprintf(buf2, "%s permanently dies the horrible dex-death.",buf1);
