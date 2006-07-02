@@ -262,8 +262,6 @@ int do_vault(CHAR_DATA *ch, char *argument, int cmd)
 
   if (!str_cmp(arg1, "clan") && ch->clan)
     strcpy(arg1, clanVName(ch->clan));
-  if (!str_cmp(arg2, "clan") && ch->clan)
-    strcpy(arg2, clanVName(ch->clan));
 
   // show the contents of your or someone elses vault
   if (!strncmp(arg, "list", strlen(arg))) {
@@ -289,6 +287,8 @@ int do_vault(CHAR_DATA *ch, char *argument, int cmd)
   // show how much gold in vault
   } else if (!strncmp(arg, "log", strlen(arg))) {
     half_chop(arg1, argument, arg2);
+    if (!str_cmp(arg2, "clan") && ch->clan)
+      strcpy(arg2, clanVName(ch->clan));
     if (!*argument || GET_LEVEL(ch) < IMMORTAL) sprintf(argument, "%s", GET_NAME(ch));
     show_vault_log(ch, argument, arg2);
 
@@ -299,6 +299,8 @@ int do_vault(CHAR_DATA *ch, char *argument, int cmd)
 
   } else if (!strncmp(arg, "withdraw", strlen(arg))) {
     half_chop(arg1, argument, arg2);
+    if (!str_cmp(arg2, "clan") && ch->clan)
+      strcpy(arg2, clanVName(ch->clan));
     if (!*argument) {
       send_to_char("How much gold would you like get from the vault?\r\n", ch);
       return eSUCCESS;
@@ -308,6 +310,8 @@ int do_vault(CHAR_DATA *ch, char *argument, int cmd)
 
   } else if (!strncmp(arg, "deposit", strlen(arg))) {
     half_chop(arg1, argument, arg2);
+    if (!str_cmp(arg2, "clan") && ch->clan)
+      strcpy(arg2, clanVName(ch->clan));
     if (!*argument) {
       send_to_char("How much gold would you like to place in the vault?\r\n", ch);
       return eSUCCESS;
@@ -318,6 +322,8 @@ int do_vault(CHAR_DATA *ch, char *argument, int cmd)
   // put something in your vault
   } else if (!strncmp(arg, "put", strlen(arg))) {
     half_chop(arg1, argument, arg2);
+    if (!str_cmp(arg2, "clan") && ch->clan)
+      strcpy(arg2, clanVName(ch->clan));
     if (!*argument) {
       send_to_char("What item would you like to place in the vault?\r\n", ch);
       return eSUCCESS;
@@ -328,6 +334,9 @@ int do_vault(CHAR_DATA *ch, char *argument, int cmd)
   // get something from your or someone elses vault
   } else if (!strncmp(arg, "get", strlen(arg))) {
     half_chop(arg1, argument, arg2);
+    if (!str_cmp(arg2, "clan") && ch->clan)
+      strcpy(arg2, clanVName(ch->clan));
+
     if (!*argument) {
       send_to_char("What item would you like to get from the vault?\r\n", ch);
       return eSUCCESS;
