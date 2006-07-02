@@ -916,7 +916,8 @@ void get_from_vault(CHAR_DATA *ch, char *object, char *owner) {
       return;
     } 
   
-    if (!self && IS_SET(obj->obj_flags.more_flags, ITEM_NO_TRADE) && GET_LEVEL(ch) < IMMORTAL) {
+    if (!self && (IS_SET(obj->obj_flags.more_flags, ITEM_NO_TRADE) ||
+		IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL) && GET_LEVEL(ch) < IMMORTAL) {
       send_to_char("That item seems to be bound to the vault.\r\n", ch);
       return;
     } 
@@ -1131,8 +1132,8 @@ int can_put_in_vault(struct obj_data *obj, int self, struct vault_data *vault, s
     return 0;
   }
 
-  if (IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL)) { // GL
-    csendf(ch, "%s is far too valuable to place in the vault.\r\n", GET_OBJ_SHORT(obj));
+  if (IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL) && !self) { // GL
+    csendf(ch, "%s is far too valuable to place in someone else's vault.\r\n", GET_OBJ_SHORT(obj));
     return 0;
   }
 
