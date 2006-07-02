@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.51 2006/06/17 07:32:16 shane Exp $ */
+/* $Id: clan.cpp,v 1.52 2006/07/02 20:42:37 urizen Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -63,6 +63,7 @@ char * clan_rights[] = {
    "withdraw",
    "channel",
    "area",
+   "vault",
    "\n"
 };
 
@@ -201,8 +202,6 @@ void boot_clans(void)
   }
 
   dc_fclose(fl);
-  extern void read_clan_vault();
-  read_clan_vault();
 }
 
 void save_clans(void)
