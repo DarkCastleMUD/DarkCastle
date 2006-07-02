@@ -161,7 +161,7 @@ void save_vault(char *name) {
   if (!(vault = has_vault(name)))
     return;
 
-  sprintf(fname, "../vaults/%c/%s.vault", *name, name);
+  sprintf(fname, "../vaults/%c/%s.vault", UPPER(*name), name);
   if(!(fl = dc_fopen(fname, "w"))) {
     sprintf(buf, "save_vaults: could not open vault file for [%s].", fname);
     log (buf, IMMORTAL, LOG_BUG);
