@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.132 2006/06/28 15:10:11 shane Exp $ */
+/* $Id: nanny.cpp,v 1.133 2006/07/02 21:39:56 urizen Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -56,6 +56,7 @@ extern "C" {
 #include <fight.h>
 #include <handler.h>
 #include <string.h>
+#include <vault.h>
 
 #define STATE(d)    ((d)->connected)
 
@@ -1443,6 +1444,7 @@ is_race_eligible(ch,7)?'*':' ',is_race_eligible(ch,8)?'*':' ',is_race_eligible(c
              remove_clan_member(d->character->clan, d->character);
           sprintf(buf, "rm -f %s/%c/%s", SAVE_DIR, d->character->name[0], d->character->name);
           update_wizlist(d->character);
+          remove_vault(d->character->name);
           close_socket(d); 
           d = NULL;
           system (buf);
