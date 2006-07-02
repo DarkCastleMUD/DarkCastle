@@ -151,7 +151,7 @@ void save_vault(char *name) {
     return;
   name[0] = UPPER(name[0]);
 
-  sprintf(fname, "vault/%c/%s.vault", *name, name);
+  sprintf(fname, "../vaults/%c/%s.vault", *name, name);
   if(!(fl = dc_fopen(fname, "w"))) {
     sprintf(buf, "save_vaults: could not open vault file for [%s].", fname);
     log (buf, IMMORTAL, LOG_BUG);
@@ -458,9 +458,9 @@ void remove_vault(char *name) {
   if (!(vault = has_vault(name)))
     return;
 
-  sprintf(h, "vault/%c/%s.vault", *name, name);
+  sprintf(h, "../vaults/%c/%s.vault", *name, name);
   unlink(h);
-  sprintf(h, "vault/%c/%s.vault.log", *name, name);
+  sprintf(h, "../vaults/%c/%s.vault.log", *name, name);
   unlink(h);
   sprintf(h, "cat %s| grep -iv '^%s$' > %s", VAULT_INDEX_FILE, name, VAULT_INDEX_FILE_TMP);
   system(h);
@@ -537,7 +537,7 @@ void load_vaults(void) {
 
   fscanf(index, "%s\n", line);
   while (*line != '$') {
-    sprintf(fname, "vault/%c/%s.vault", *line, line);
+    sprintf(fname, "../vaults/%c/%s.vault", *line, line);
     if(!(fl = dc_fopen(fname, "r"))) {
       sprintf(buf, "boot_vaults: unable to open file [%s].", fname);
       log(buf, IMMORTAL, LOG_BUG);
@@ -1320,7 +1320,7 @@ void add_new_vault(char *name, int indexonly) {
 
 
   // now create a new vault for the player
-  sprintf(fname, "vault/%c/%s.vault", UPPER(*name), name);
+  sprintf(fname, "../vaults/%c/%s.vault", UPPER(*name), name);
   if (!(pvfl = dc_fopen(fname, "w"))) {
     sprintf(buf, "add_new_vault: error opening new vault file [%s].", fname);
     log(buf, IMMORTAL, LOG_BUG);
@@ -1423,7 +1423,7 @@ void show_vault_log(CHAR_DATA *ch, char *owner, char *arg)
 
   owner[0] = UPPER(owner[0]);
 
-  sprintf(fname, "vault/%c/%s.vault.log", *owner, owner);
+  sprintf(fname, "../vaults/%c/%s.vault.log", *owner, owner);
   vault_log_to_string(fname, buf1);
 
   sprintf(buf, "The following are your most recent vault log entries (Times are EST):\r\n");
@@ -1458,8 +1458,8 @@ void vault_log(char *message, char *name) {
 
   log(message, IMMORTAL, LOG_VAULT);
 
-  sprintf(fname, "vault/%c/%s.vault.log",  *name, name);
-  sprintf(nfname, "vault/%c/%s.vault.log.tmp", *name, name);
+  sprintf(fname, "../vaults/%c/%s.vault.log",  *name, name);
+  sprintf(nfname, "../vaults/%c/%s.vault.log.tmp", *name, name);
 
   if(!(ofile = dc_fopen(fname, "r"))) {
     if(!(ofile = dc_fopen(fname, "w"))) {
