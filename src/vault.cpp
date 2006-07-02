@@ -88,6 +88,15 @@ struct vault_data *has_vault(char *name) {
   for (vault = vault_table;vault;vault = vault->next)
     if (vault && vault->owner && !strcasecmp(vault->owner, name))
       return vault;
+  char_data *ch = find_owner(name);
+  if (ch && GET_LEVEL(ch) > 10) {
+     add_new_vault(GET_NAME(ch), 0);
+     for (vault = vault_table;vault;vault = vault->next)
+       if (vault && vault->owner && !strcasecmp(vault->owner, name)) {
+	 send_to_char("A vault was created for you.\r\n",ch);
+         return vault;
+       }
+  }
   return 0;
 }
 
@@ -708,6 +717,13 @@ void access_remove(char *name, struct vault_data *vault) {
   }
 }
 
+char *clanVName(int c)
+{ // returns clan1, clan2, etc
+  static char buf[512];
+  sprintf(buf,"clan%d",c);
+  return &buf[0];
+}
+
 int has_vault_access(char *who, struct vault_data *vault) 
 {
   struct vault_access_data *access;
@@ -720,7 +736,7 @@ int has_vault_access(char *who, struct vault_data *vault)
   if (!strcasecmp(vault->owner, who)) 
     return 1;
 
-  if (ch && ch->clan && get_clan(ch->clan) && !str_cmp(get_clan(ch->clan)->name, vault->owner)
+  if (ch && ch->clan && get_clan(ch->clan) && !str_cmp(clanVName(ch->clan), vault->owner)
 	&& has_right(ch, CLAN_RIGHTS_VAULT))
      return 1;
 
@@ -1528,4 +1544,125 @@ int vault_log_to_string(const char *name, char *buf) {
     dc_fclose(fl);
 
     return(0);
+}
+
+
+int sleazy_vault_guy(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
+          struct char_data *owner)
+{
+  if (cmd != 59 && cmd != 56) return eFAILURE;
+  if (IS_NPC(ch)) return eFAILURE;
+  char arg1[MAX_INPUT_LENGTH],buf[MAX_STRING_LENGTH];
+  arg = one_argument(arg, arg1);
+  
+  struct vault_data *vault = has_vault(GET_NAME(ch));
+  struct vault_data *cvault = ch->clan?has_vault(clanVName(ch->clan)):0;
+  if (cmd == 59)
+  {
+      if (!vault)
+      {
+	send_to_char("You need to level up some before obtaining a vault.\r\n",ch);
+	return eSUCCESS;
+      }
+      else if (vault->size < VAULT_MAX_SIZE)
+         sprintf(buf, "1) Increase the size of vault by 10 lbs: %d platinum.\r\n",VAULT_UPGRADE_COST);
+      else
+	sprintf(buf, "1) You cannot increase your vault-size further.\r\n");
+      send_to_char(buf,ch);
+
+      sprintf(buf,"2) Purchase a clan vault: %s\r\n",
+		ch->clan?cvault?"Your clan already has a vault":has_right(ch, CLAN_RIGHTS_VAULT)?"500 platinum coins.":"You are not authorized to make this purchase.":"You are not a member of any clan.");
+      send_to_char(buf,ch);
+
+      if (!cvault)
+        sprintf(buf, "3) Increase the size of your clan vault by 10 lbs: %s\r\n", ch->clan?"Your clan has no vault.":"You're not in a clan.");
+      else if (cvault->size < VAULT_MAX_SIZE)
+        sprintf(buf, "3) Increase the size of your clan vault by 10 lbs: %s\r\n", has_right(ch, CLAN_RIGHTS_VAULT)?"20 platinum coins.":"You are not authorized to make this purchase.");
+      else
+        sprintf(buf, "3) Increase the size of your clan vault by 10 lbs: You cannot increase the vault's size further.\r\n");
+      send_to_char(buf,ch);
+      return eSUCCESS;
+  } else {
+     int i = atoi(arg1); 
+     switch (i)
+     {
+	case 1:
+		if (!vault) 
+	        {
+	  	  send_to_char("You need to level up some before obtaining a vault.\r\n",ch);
+		  return eSUCCESS;
+	        }
+		if (vault->size >= VAULT_MAX_SIZE)
+		{
+		  send_to_char("Your vault's size is already at its maximum capacity.\r\n",ch);
+		  return eSUCCESS;
+		}
+		if (GET_PLATINUM(ch) < VAULT_UPGRADE_COST)
+		{
+		  send_to_char("You do not have enough platinum.\r\n",ch);
+		  return eSUCCESS;
+		}
+		GET_PLATINUM(ch) -= VAULT_UPGRADE_COST;
+		vault->size += 10;
+		save_char_obj(ch);
+		save_vault(vault->owner);
+		send_to_char("10 lbs added to personal vault.\r\n",ch);
+		return eSUCCESS;
+	case 2: 
+		if (cvault) 
+	        {
+	  	  send_to_char("Your clan already has a vault.\r\n",ch);
+		  return eSUCCESS;
+	        }
+		if (!ch->clan)
+		{
+		  send_to_char("You're not a member of any clan.\r\n",ch);
+		  return eSUCCESS;
+		}
+		if (!has_right(ch, CLAN_RIGHTS_VAULT))
+		{
+		  send_to_char("You are not authorized to make that purchase.\r\n",ch);
+		}
+		if (GET_PLATINUM(ch) < 500)
+		{
+		  send_to_char("You do not have enough platinum.\r\n",ch);
+		  return eSUCCESS;
+		}
+		GET_PLATINUM(ch) -= 500;
+		add_new_vault(clanVName(ch->clan),0);
+		save_char_obj(ch);
+		save_vault(clanVName(ch->clan));
+		send_to_char("You have purchased vault for your clan's perusal.\r\n",ch);
+		return eSUCCESS;
+	case 3:
+		if (!cvault) 
+	        {
+	  	  send_to_char("Your clan does not have a vault.\r\n",ch);
+		  return eSUCCESS;
+	        }
+		if (!has_right(ch, CLAN_RIGHTS_VAULT))
+		{
+		  send_to_char("You are not authorized to make that purchase.\r\n",ch);
+		  return eSUCCESS;
+		}
+		if (cvault->size >= VAULT_MAX_SIZE)
+		{
+		  send_to_char("The vault is already at its maximum capacity.\r\n",ch);
+		  return eSUCCESS;
+		}
+		if (GET_PLATINUM(ch) < 20)
+		{
+		  send_to_char("You do not have enough platinum.\r\n",ch);
+		  return eSUCCESS;
+		}
+		GET_PLATINUM(ch) -= 20;
+		cvault->size += 10;
+		save_char_obj(ch);
+		save_vault(clanVName(ch->clan));
+		send_to_char("You have added 10 lbs capacity to your clan's vault.\r\n",ch);
+		return eSUCCESS;
+		
+     }
+  }
+  return eFAILURE;
 }
