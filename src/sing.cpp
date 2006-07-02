@@ -410,7 +410,7 @@ int do_sing(CHAR_DATA *ch, char *arg, int cmd)
         spl == SKILL_SONG_CRUSHING_CRESCENDO - SKILL_SONG_BASE ||
         spl == SKILL_SONG_SHATTERING_RESO - SKILL_SONG_BASE ||
         spl == SKILL_SONG_MKING_CHARGE - SKILL_SONG_BASE ||
-        spl == SKILL_SONG_HYPNOTIC_HARMONY - SKILL_SONG_BASE))        
+        spl == SKILL_SONG_HYPNOTIC_HARMONY - SKILL_SONG_BASE))
   {
      send_to_char("This room feels too safe to sing an offensive song such as this.\n\r", ch);
      return eFAILURE;
