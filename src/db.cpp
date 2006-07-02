@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.126 2006/06/27 19:27:44 shane Exp $ */
+/* $Id: db.cpp,v 1.127 2006/07/02 20:47:21 urizen Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -166,6 +166,9 @@ struct time_info_data time_info;    /* the infomation about the time   */
 struct weather_data weather_info;   /* the infomation about the weather */
 
 int mud_is_booting;
+
+struct vault_data *vault_table = 0;
+
 
 /* local procedures */
 void boot_zones(void);
@@ -4578,10 +4581,6 @@ void free_char( CHAR_DATA *ch )
 
       if (ch->pcdata->away_msgs)
 	free(ch->pcdata->away_msgs); //Allocated using new, not dc_alloc
-
-      extern void freeVault(player_vault *v);
-      if (ch->pcdata->vault)
-	freeVault(ch->pcdata->vault);
 
       dc_free(ch->pcdata);
     }
