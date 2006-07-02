@@ -161,6 +161,7 @@ void save_vault(char *name) {
   if (!(vault = has_vault(name)))
     return;
 
+  *name = UPPER(*name);
   sprintf(fname, "../vaults/%c/%s.vault", UPPER(*name), name);
   if(!(fl = dc_fopen(fname, "w"))) {
     sprintf(buf, "save_vaults: could not open vault file for [%s].", fname);
@@ -561,6 +562,7 @@ void load_vaults(void) {
 
   fscanf(index, "%s\n", line);
   while (*line != '$') {
+    *line = UPPER(*line);
     sprintf(fname, "../vaults/%c/%s.vault", UPPER(*line), line);
     if(!(fl = dc_fopen(fname, "r"))) {
       sprintf(buf, "boot_vaults: unable to open file [%s].", fname);
