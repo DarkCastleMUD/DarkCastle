@@ -147,6 +147,9 @@ int send_to_gods(char *str, int god_level, long type)
      case LOG_DATABASE:
 	sprintf(typestr, "database");
 	break;
+     case LOG_VAULT:
+	sprintf(typestr, "vault");
+	break;
     case LOG_HELP:
       sprintf(typestr, "help");
       break;
@@ -216,6 +219,7 @@ int do_channel(struct char_data *ch, char *arg, int cmd)
     "database",   
     "give",
     "tell",
+    "vault",   
  "\\@"
   };
 
