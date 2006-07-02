@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.127 2006/07/02 20:47:21 urizen Exp $ */
+/* $Id: db.cpp,v 1.128 2006/07/02 21:44:17 urizen Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -62,6 +62,7 @@ extern "C"
 #include <quest.h>
 
 int load_new_help(FILE *fl, int reload, struct char_data *ch);
+void load_vaults();
 void load_corpses(void);
 extern int fflush(FILE *);
 extern int _filbuf(FILE *);
@@ -669,6 +670,9 @@ void boot_db(void)
     log ("Loading quest one liners.", 0, LOG_MISC);
     load_quests();
 
+
+    log ("Loading vaults.", 0, LOG_MISC);
+    load_vaults();
     mud_is_booting = FALSE;
 }
 
