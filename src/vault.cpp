@@ -105,10 +105,19 @@ bool fullSave(obj_data *obj)
 {
   if (eq_current_damage(obj))
     return 1;
+
   obj_data *tmp_obj = get_obj(GET_OBJ_VNUM(obj));
   if (strcmp(GET_OBJ_SHORT(obj), GET_OBJ_SHORT(tmp_obj)))
     return 1;
   
+  if (obj->obj_flags.extra_flags != tmp_obj->obj_flags.extra_flags)
+	return 1;
+
+  if (obj->obj_flags.more_flags != tmp_obj->obj_flags.more_flags)
+	return 1;
+
+  if (obj->obj_flags.wear_flags != tmp_obj->obj_flags.wear_flags)
+	return 1;
   if (obj->obj_flags.type_flag == ITEM_STAFF && obj->obj_flags.value[1] != obj->obj_flags.value[2])
     return 1;
 
