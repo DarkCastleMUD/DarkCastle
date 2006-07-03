@@ -1,5 +1,4 @@
-
-#define VAULT_UPGRADE_COST 10 // plats
+#define VAULT_UPGRADE_COST 100 // plats
 #define VAULT_BASE_SIZE 500  // weight
 #define VAULT_MAX_SIZE  10000 // weight
 
