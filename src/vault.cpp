@@ -45,44 +45,6 @@ char *clanVName(int c);
 extern struct index_data *obj_index;
 extern struct obj_data * search_char_for_item(char_data * ch, int16 item_number, bool wearOnly = FALSE);
 
-static char *classes[] = {
-  "any",
-  "warrior",
-  "mage",
-  "thief",
-  "cleric", 
-  "paladin",
-  "antipaladin",
-  "barbarian",
-  "monk",
-  "ranger",
-  "druid",
-  "bard",
-  "\n"
-};
-
-static char *slots[] = {
-  "finger", 
-  "neck",
-  "body",
-  "head",
-  "legs",
-  "feet",
-  "hands", 
-  "arms",
-  "shield",
-  "about", 
-  "waist",
-  "wrist",
-  "wield",
-  "hold",
-  "throw",
-  "light",
-  "face",
-  "ear",
-  "\n"
-};
-
 struct vault_data *has_vault(char *name) {
   struct vault_data *vault;
 
@@ -746,7 +708,7 @@ void access_remove(char *name, struct vault_data *vault) {
 char *clanVName(int c)
 { // returns clan1, clan2, etc
   static char buf[512];
-  sprintf(buf,"clan%d",c);
+  sprintf(buf,"Clan%d",c);
   return &buf[0];
 }
 
@@ -1377,51 +1339,6 @@ void add_new_vault(char *name, int indexonly) {
   save_vault(name);
 }
 
-int is_wearable(char *arg, struct obj_data *obj) {
-  if (!arg && !obj)
-    return 0;
-
-  int slot = search_block(arg, slots, FALSE);
-  if (slot != -1 && CAN_WEAR(obj, (1 << slot + 1)))
-    return 1;
-
-  return 0;
-}
-
-int vault_match(char *name, struct obj_data *obj, struct vault_data *vault) {
-  char tmp[MAX_INPUT_LENGTH];
-  int slot, cls;
-
-  strcpy(tmp, name);
-  tmp[0] = UPPER(tmp[0]);
-
-  if (strstr(GET_OBJ_NAME(obj), name) || strstr(GET_OBJ_SHORT(obj), name) || !strcmp(tmp, vault->owner))
-    return 1;
-
-  if ((slot = search_block(name, slots, FALSE)) >= 0 && CAN_WEAR(obj, (1 << (slot + 1))))
-    return 1;
-
-  if (!strcmp(name, "held") && (CAN_WEAR(obj, ITEM_WIELD) || CAN_WEAR(obj, ITEM_HOLD)))
-    return 1;
-
-  cls = search_block(name, classes, FALSE);
-  switch (cls) {
-    case 0:
-      cls = 4;
-      break;
-    case -1:
-      break;
-    default:
-      cls += 11;
-      break;
-  }
-
-  if (cls > 0 && IS_OBJ_STAT(obj, (1 << cls)))
-    return 1;
-
-  return 0;
-}
-
 struct char_data *find_owner(char *name) {
   extern char_data * character_list;
   struct char_data *ch;
@@ -1591,6 +1508,7 @@ int sleazy_vault_guy(struct char_data *ch, struct obj_data *obj, int cmd, char *
 	send_to_char("You need to level up some before obtaining a vault.\r\n",ch);
 	return eSUCCESS;
       }
+      send_to_char("Paul the sleazy vault salesman tells you, 'How aboot a bigger vault? Size matters, you know'\r\n",ch);
       else if (vault->size < VAULT_MAX_SIZE)
          sprintf(buf, "1) Increase the size of vault by 10 lbs: %d platinum.\r\n",VAULT_UPGRADE_COST);
       else
@@ -1633,7 +1551,7 @@ int sleazy_vault_guy(struct char_data *ch, struct obj_data *obj, int cmd, char *
 		vault->size += 10;
 		save_char_obj(ch);
 		save_vault(vault->owner);
-		send_to_char("10 lbs added to personal vault.\r\n",ch);
+		send_to_char("Paul the sleazy vault salesman tells you, '10 lbs added to your vault.'\r\n",ch);
 		return eSUCCESS;
 	case 2: 
 		if (cvault) 
@@ -1678,13 +1596,13 @@ int sleazy_vault_guy(struct char_data *ch, struct obj_data *obj, int cmd, char *
 		  send_to_char("The vault is already at its maximum capacity.\r\n",ch);
 		  return eSUCCESS;
 		}
-		if (GET_PLATINUM(ch) < 20)
+		if (GET_PLATINUM(ch) < 200)
 		{
 		  send_to_char("You do not have enough platinum.\r\n",ch);
 		  return eSUCCESS;
 		}
-		GET_PLATINUM(ch) -= 20;
-		cvault->size += 10;
+		GET_PLATINUM(ch) -= 200;
+		cvault->size += 1;
 		save_char_obj(ch);
 		save_vault(clanVName(ch->clan));
 		send_to_char("You have added 10 lbs capacity to your clan's vault.\r\n",ch);
