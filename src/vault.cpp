@@ -93,6 +93,39 @@ bool fullSave(obj_data *obj)
   return 0;
 }
 
+void copySaveData(obj_data *new_obj, obj_data *obj)
+{
+  int i;
+  if ((i = eq_current_damage(obj)) > 0)
+  {
+     for (;i>0;i--)
+       damage_eq_once(new_obj);
+  }
+
+  if (strcmp(GET_OBJ_SHORT(obj), GET_OBJ_SHORT(new_obj)))
+    GET_OBJ_SHORT(new_obj) = str_hsh(GET_OBJ_SHORT(obj));
+
+  if (obj->obj_flags.extra_flags != new_obj->obj_flags.extra_flags)
+	new_obj->obj_flags.extra_flags = obj->obj_flags.extra_flags;
+
+  if (obj->obj_flags.more_flags != new_obj->obj_flags.more_flags)
+	new_obj->obj_flags.more_flags = obj->obj_flags.more_flags;
+
+  if (obj->obj_flags.wear_flags != new_obj->obj_flags.wear_flags)
+	new_obj->obj_flags.wear_flags = obj->obj_flags.wear_flags;
+
+  if (obj->obj_flags.type_flag == ITEM_STAFF && obj->obj_flags.value[1] != new_obj->obj_flags.value[1])
+  	new_obj->obj_flags.value[1] = obj->obj_flags.value[1];
+
+  if (obj->obj_flags.type_flag == ITEM_WAND && obj->obj_flags.value[1] != new_obj->obj_flags.value[1])
+  	new_obj->obj_flags.value[1] = obj->obj_flags.value[1];
+
+  if (obj->obj_flags.type_flag == ITEM_DRINKCON && obj->obj_flags.value[0] != new_obj->obj_flags.value[0])
+  	new_obj->obj_flags.value[0] = obj->obj_flags.value[0];
+
+  return;
+}
+
 bool fullItemMatch(obj_data *obj, obj_data *obj2)
 {
   if (eq_current_damage(obj) != eq_current_damage(obj2))
@@ -101,6 +134,15 @@ bool fullItemMatch(obj_data *obj, obj_data *obj2)
   if (strcmp(GET_OBJ_SHORT(obj), GET_OBJ_SHORT(obj2)))
     return 0;
   
+  if (obj->obj_flags.extra_flags != obj2->obj_flags.extra_flags)
+	return 0;
+
+  if (obj->obj_flags.more_flags != obj2->obj_flags.more_flags)
+	return 0;
+
+  if (obj->obj_flags.wear_flags != obj2->obj_flags.wear_flags)
+	return 0;
+
   if (obj->obj_flags.type_flag == ITEM_STAFF && obj->obj_flags.value[1] != obj2->obj_flags.value[1])
     return 0;
 
@@ -515,6 +557,7 @@ void load_vaults(void) {
 
   sprintf(buf, "boot_vaults: found [%d] player vaults to read.", total_vaults);
   log(buf, IMMORTAL, LOG_BUG);
+  if (total_vaults)
   CREATE(vault_table, struct vault_data, total_vaults);
 
   if(!(index = dc_fopen(VAULT_INDEX_FILE, "r"))) {
@@ -605,8 +648,8 @@ void load_vaults(void) {
       get_line(fl, type);
     }
 
-    vault->next = vault_table->next;
-    vault_table->next = vault;
+    vault->next = vault_table;
+    vault_table = vault;
 
     dc_fclose(fl);
     fscanf(index, "%s\n", line);
@@ -820,6 +863,17 @@ struct obj_data *get_obj_in_vault(struct vault_data *vault, char *object, int nu
   return 0;
 }
 
+struct obj_data *exists_in_vault(struct vault_data *vault, obj_data *obj)
+{
+  struct vault_items_data *items;
+  if (!obj) return 0;
+  for (items = vault->items;items;items = items->next) {
+      if (items->obj == obj) return obj;
+  }
+
+  return 0;
+}
+
 void get_from_vault(CHAR_DATA *ch, char *object, char *owner) {
   char buf[MAX_INPUT_LENGTH];
   struct obj_data *obj, *tmp_obj;
@@ -897,7 +951,13 @@ void get_from_vault(CHAR_DATA *ch, char *object, char *owner) {
    
     if (!fullSave(obj))
       tmp_obj = clone_object(real_object(GET_OBJ_VNUM(obj)));
-    else tmp_obj = obj;
+    else 
+    {
+      if (exists_in_vault(vault, obj)) {
+         tmp_obj = clone_object(real_object(GET_OBJ_VNUM(obj)));
+	 copySaveData(tmp_obj,obj);
+      } else tmp_obj = obj;
+    }
     if (IS_SET(tmp_obj->obj_flags.extra_flags, ITEM_NODROP))
       REMOVE_BIT(tmp_obj->obj_flags.extra_flags, ITEM_NODROP);
     obj_to_char(tmp_obj, ch);
@@ -935,7 +995,6 @@ void item_add(obj_data *obj, struct vault_data *vault) {
     if (item->item_vnum == vnum && item->obj && fullItemMatch(item->obj, obj)) {
       item->count++;
       vault->weight += GET_OBJ_WEIGHT(obj);
-      extract_obj(obj);
       return;
     }
   }
@@ -1248,7 +1307,7 @@ void show_vault(CHAR_DATA *ch, char *owner) {
    
   
   for (items = vault->items;items;items = items->next) {
-
+    buf1[0] = '\0';
     if (items->count > 1) {
       sprintf(buf1, "[$5%d$R] ", items->count);
       strcat(buf, buf1);
@@ -1257,7 +1316,6 @@ void show_vault(CHAR_DATA *ch, char *owner) {
 //    obj = get_obj(items->item_vnum);
     obj = items->obj?items->obj:get_obj(items->item_vnum);
     sprintf(buf1, "%s ", GET_OBJ_SHORT(obj));
-    strcat(buf, buf1);
 
       if (obj->obj_flags.type_flag == ITEM_ARMOR ||
           obj->obj_flags.type_flag == ITEM_WEAPON ||
@@ -1270,17 +1328,18 @@ void show_vault(CHAR_DATA *ch, char *owner) {
       { 
  extern char *item_condition(struct obj_data *obj);
 
-    sprintf(buf1, " %s $3Lvl: %dÂ$R",
+    sprintf(buf1, "%s %s $3Lvl: %d$R",buf1,
 			item_condition(obj), obj->obj_flags.eq_level);
-	strcat(buf,buf1);
        }
     if (GET_LEVEL(ch) > IMMORTAL) {
-      sprintf(buf1, " [%d]", items->item_vnum);
-      strcat(buf, buf1);
+      sprintf(buf1, "%s [%d]", buf1,items->item_vnum);
     }
- 
     objects = 1;
-    strcat(buf, "\r\n");
+    strcat(buf1,"\r\n");
+    if (strlen(buf1) + strlen(buf) < MAX_STRING_LENGTH)
+      strcat(buf,buf1);
+    else {
+      send_to_char("Overflow!!\r\n",ch); break; }
   }
 
   if (!objects)
@@ -1348,8 +1407,8 @@ void add_new_vault(char *name, int indexonly) {
   vault->weight	= 0;
   vault->access	= NULL;
   vault->items 	= NULL;
-  vault->next = vault_table->next;
-  vault_table->next = vault;
+  vault->next = vault_table;
+  vault_table = vault;
 
   save_vault(name);
 }
@@ -1532,7 +1591,7 @@ int sleazy_vault_guy(struct char_data *ch, struct obj_data *obj, int cmd, char *
       send_to_char(buf,ch);
 
       sprintf(buf,"$B2)$R Purchase a clan vault: %s\r\n",
-		ch->clan?cvault?"Your clan already has a vault":has_right(ch, CLAN_RIGHTS_VAULT)?"500 platinum coins.":"You are not authorized to make this purchase.":"You are not a member of any clan.");
+		ch->clan?cvault?"Your clan already has a vault":has_right(ch, CLAN_RIGHTS_VAULT)?"1000 platinum coins.":"You are not authorized to make this purchase.":"You are not a member of any clan.");
       send_to_char(buf,ch);
 
       if (!cvault)
