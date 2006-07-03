@@ -207,13 +207,13 @@ void show_vault_balance(CHAR_DATA *ch, char *owner) {
     csendf(ch, "There are %llu gold coins in %s's vault.\r\n", vault->gold, owner);
 }
 
-char *vault_usage = "Usage: vault <list | balance> [name of vault owner]\r\n"
-                    "       vault <put | get> <object> [name of vault owner]\r\n"
-                    "       vault <deposit | withdraw> <amount>\r\n"
-                    "       vault <access | myaccess> [name to add/remove access]\r\n"
-                    "       vault log\r\n";
+char *vault_usage = "Syntax: vault <list | balance> [name of vault owner]\r\n"
+                    "        vault <put | get> <object> [name of vault owner]\r\n"
+                    "        vault <deposit | withdraw> <amount>\r\n"
+                    "        vault <access | myaccess> [name to add/remove access]\r\n"
+                    "        vault log\r\n";
 
-char *imm_vault_usage = "       vault <stats> [name]\r\n";
+char *imm_vault_usage = "         vault <stats> [name]\r\n";
 
 int do_vault(CHAR_DATA *ch, char *argument, int cmd)
 {
@@ -331,7 +331,7 @@ void vault_stats(CHAR_DATA *ch, char *name) {
   int items = 0, weight = 0, accesses = 0, num = 0, unique = 0, count = 0, skipped = 0;
   char buf[MAX_STRING_LENGTH], buf1[MAX_STRING_LENGTH];
 
-  sprintf(buf, "###) Character Name        Gold     Items (Unique) Weight/Max   Access\r\n");
+  sprintf(buf, "###) Character Name        Gold     Items (Unique) Weight/  Max   Access\r\n");
   for (vault = vault_table;vault;vault = vault->next, num++) {
     if (!num) continue; // skip 0 cause its null
 
@@ -350,7 +350,7 @@ void vault_stats(CHAR_DATA *ch, char *name) {
       accesses++;
     }
 
-    sprintf(buf1, "%3d) %-15s $B$5%10llu$R     %5d (%4d)   %6d/%5d %6d\r\n",
+    sprintf(buf1, "%3d) %-15s $B$5%10llu$R     %5d (%4d  ) %6d/%5d %6d\r\n",
                    count, vault->owner, vault->gold, items, unique, weight, vault->size, accesses);
     if ((strlen(buf1) + strlen(buf)) < MAX_STRING_LENGTH)
       strcat(buf, buf1);
@@ -1250,7 +1250,7 @@ void show_vault(CHAR_DATA *ch, char *owner) {
   for (items = vault->items;items;items = items->next) {
 
     if (items->count > 1) {
-      sprintf(buf1, "[%d] ", items->count);
+      sprintf(buf1, "[$5%d$R] ", items->count);
       strcat(buf, buf1);
     }
 
@@ -1258,16 +1258,22 @@ void show_vault(CHAR_DATA *ch, char *owner) {
     obj = items->obj?items->obj:get_obj(items->item_vnum);
     sprintf(buf1, "%s ", GET_OBJ_SHORT(obj));
     strcat(buf, buf1);
-   
+
       if (obj->obj_flags.type_flag == ITEM_ARMOR ||
           obj->obj_flags.type_flag == ITEM_WEAPON ||
           obj->obj_flags.type_flag == ITEM_FIREWEAPON ||
           obj->obj_flags.type_flag == ITEM_CONTAINER ||
           obj->obj_flags.type_flag == ITEM_INSTRUMENT ||
+          obj->obj_flags.type_flag == ITEM_STAFF ||
           obj->obj_flags.type_flag == ITEM_WAND ||
-          object->obj_flags.type_flag == ITEM_STAFF ||
           obj->obj_flags.type_flag == ITEM_LIGHT)
-	        strcat(buf, item_condition(obj));
+      { 
+ extern char *item_condition(struct obj_data *obj);
+
+    sprintf(buf1, " %s $3Lvl: %dÂ$R",
+			item_condition(obj), obj->obj_flags.eq_level);
+	strcat(buf,buf1);
+       }
     if (GET_LEVEL(ch) > IMMORTAL) {
       sprintf(buf1, " [%d]", items->item_vnum);
       strcat(buf, buf1);
@@ -1279,7 +1285,7 @@ void show_vault(CHAR_DATA *ch, char *owner) {
 
   if (!objects)
     if (self)
-      csendf(ch, "Your vault is currently empty.\r\n", owner);
+      csendf(ch, "Your vault is currently empty and can hold %d pounds.\r\n", vault->size);
     else
       csendf(ch, "%s's vault is currently empty.\r\n", owner);
   else
@@ -1517,11 +1523,12 @@ int sleazy_vault_guy(struct char_data *ch, struct obj_data *obj, int cmd, char *
 	send_to_char("You need to level up some before obtaining a vault.\r\n",ch);
 	return eSUCCESS;
       }
-      send_to_char("$B$2Paul the sleazy vault salesman tells you, 'How aboot a bigger vault? Size matters, you know'$R\r\n",ch);
       else if (vault->size < VAULT_MAX_SIZE)
          sprintf(buf, "$B1)$R Increase the size of vault by 10 lbs: %d platinum.\r\n",VAULT_UPGRADE_COST);
       else
-	sprintf(buf, "$B1)$R You cannot increase your vault-size further.\r\n");
+	sprintf(buf, "1) You cannot increase your vault-size further.\r\n");
+      send_to_char("$B$2Paul the sleazy vault salesman tells you, 'How aboot a bigger vault? Size matters, you know'$R\r\n",ch);
+
       send_to_char(buf,ch);
 
       sprintf(buf,"$B2)$R Purchase a clan vault: %s\r\n",
@@ -1529,14 +1536,11 @@ int sleazy_vault_guy(struct char_data *ch, struct obj_data *obj, int cmd, char *
       send_to_char(buf,ch);
 
       if (!cvault)
-        sprintf(buf, "$B3)$R Increase the size of your clan vault by 10 lbs: %s\r\n", ch->clan?"Your clan has no 
-vault.":"You're not in a clan.");
+        sprintf(buf, "$B3)$R Increase the size of your clan vault by 10 lbs: %s\r\n", ch->clan?"Your clan has no vault.":"You're not in a clan.");
       else if (cvault->size < VAULT_MAX_SIZE)
-        sprintf(buf, "$B3)$R Increase the size of your clan vault by 10 lbs: %s\r\n", has_right(ch, 
-CLAN_RIGHTS_VAULT)?"20 platinum coins.":"You are not authorized to make this purchase.");
+        sprintf(buf, "$B3)$R Increase the size of your clan vault by 10 lbs: %s\r\n", has_right(ch, CLAN_RIGHTS_VAULT)?"20 platinum coins.":"You are not authorized to make this purchase.");
       else
-        sprintf(buf, "$B3)$R Increase the size of your clan vault by 10 lbs: You cannot increase the vault's size 
-further.\r\n");
+        sprintf(buf, "$B3)$R Increase the size of your clan vault by 10 lbs: You cannot increase the vault's size further.\r\n");
       send_to_char(buf,ch);
       return eSUCCESS;
   } else {
@@ -1581,12 +1585,12 @@ further.\r\n");
 		  send_to_char("You are not authorized to make that purchase.\r\n",ch);
 		  return eSUCCESS;
 		}
-		if (GET_PLATINUM(ch) < 500)
+		if (GET_PLATINUM(ch) < 1000)
 		{
 		  send_to_char("You do not have enough platinum.\r\n",ch);
 		  return eSUCCESS;
 		}
-		GET_PLATINUM(ch) -= 500;
+		GET_PLATINUM(ch) -= 1000;
 		add_new_vault(clanVName(ch->clan),0);
 		save_char_obj(ch);
 		save_vault(clanVName(ch->clan));
