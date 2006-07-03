@@ -1268,7 +1268,7 @@ void put_in_vault(CHAR_DATA *ch, char *object, char *owner) {
     }
   } else {
     if (!(obj = get_obj_in_list_vis(ch, object, ch->carrying))) {
-      send_to_char("You don't anything like that.\n\r", ch);
+      send_to_char("You don't have anything like that.\n\r", ch);
       return;
     }
   
