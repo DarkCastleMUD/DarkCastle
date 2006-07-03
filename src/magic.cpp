@@ -2456,13 +2456,17 @@ int spell_poison(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data 
 
   if (victim) 
   {
-     set_cantquit(ch, victim);
-     if (IS_SET(victim->immune, ISR_POISON) || malediction_res(ch, victim, SPELL_POISON)) {
+     if(IS_AFFECTED(victim, AFF_POISON)) {
+        act("$N's insides are already being eaten away by poison!", ch, NULL, victim, TO_CHAR, 0);
+        endy = TRUE;
+     }
+     else if (IS_SET(victim->immune, ISR_POISON) || malediction_res(ch, victim, SPELL_POISON)) {
          act("$N resists your attempt to poison $M!", ch, NULL, victim, TO_CHAR,0);
          act("$N resists $n's attempt to poison $M!", ch, NULL, victim, TO_ROOM,NOTVICT);
          act("You resist $n's attempt to posion you!",ch,NULL,victim,TO_VICT,0);
          endy = TRUE;
-     } 
+     }
+     set_cantquit(ch, victim);
      if (!endy) {
         af.type = SPELL_POISON;
         af.duration = skill / 10;

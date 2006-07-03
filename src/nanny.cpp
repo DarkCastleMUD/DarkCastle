@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.133 2006/07/02 21:39:56 urizen Exp $ */
+/* $Id: nanny.cpp,v 1.134 2006/07/03 20:48:16 shane Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -1722,15 +1722,8 @@ void update_command_lag_and_poison()
    for(i = character_list; i; i = next_dude) 
    {
       next_dude = i->next;
-/*
-       if (IS_AFFECTED(i, AFF_CRIPPLE))
-       {
-	 affected_type *t = affected_by_spell(i, SKILL_CRIPPLE);
-	 if (t && t->duration-- <= 0)
-	   affect_remove(i, t, 0);
-       }*/
       // handle poison
-      if(IS_AFFECTED(i, AFF_POISON)) {
+      if(IS_AFFECTED(i, AFF_POISON) && !i->fighting) {
         int tmp = 1 + (affected_by_spell(i, SPELL_POISON)->modifier) / 10;
         if(get_saves(i, SAVE_TYPE_POISON) > number(1,101)) {
            tmp *= get_saves(i, SAVE_TYPE_POISON) / 100;
