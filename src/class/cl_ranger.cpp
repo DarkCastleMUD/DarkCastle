@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: cl_ranger.cpp,v 1.71 2006/06/29 08:57:04 shane Exp $ | cl_ranger.C  *
+ * $Id: cl_ranger.cpp,v 1.72 2006/07/03 22:59:24 shane Exp $ | cl_ranger.C  *
  * Description: Ranger skills/spells                                          *
  *                                                                            *
  * Revision History                                                           *
@@ -34,9 +34,10 @@ extern "C"  {
 
 extern CWorld world;
 extern struct zone_data *zone_table;
- 
+extern struct obj_data *object_list; 
 extern struct race_shit race_info[];
 extern int rev_dir[];
+void save_corpses(void);
 
 int saves_spell(CHAR_DATA *ch, CHAR_DATA *vict, int spell_base, int16 save_type);
 void check_eq(CHAR_DATA *ch);
@@ -1462,7 +1463,32 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
            }
      }
 
-     retval = weapon_spells(ch, victim, ITEM_MISSILE);
+     if(!SOMEONE_DIED(retval)) {
+        cur_room = ch->in_room;
+        char_from_room(ch);
+        if(!char_to_room(ch, victim->in_room)) {
+           char_to_room(ch, cur_room);
+           send_to_char("Error moving you to room in do_fire.\n\r", ch);
+           return eFAILURE;
+        }
+        retval = weapon_spells(ch, victim, ITEM_MISSILE);
+        //just in case
+        if(IS_SET(retval, eCH_DIED)) {
+           OBJ_DATA *corpse, *next;
+           for(corpse = object_list; corpse; corpse = next) {
+              next = corpse->next;
+              if(IS_OBJ_STAT(corpse, ITEM_PC_CORPSE) && isname(GET_NAME(ch), GET_OBJ_NAME(corpse))) {
+                 obj_from_room(corpse);
+                 obj_to_room(corpse, cur_room);
+                 save_corpses();
+                 break;
+              }
+           }
+        } else {
+           char_from_room(ch);
+           char_to_room(ch, cur_room);
+        }
+     }
 
      if(!SOMEONE_DIED(retval)) {
         switch(artype) {
