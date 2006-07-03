@@ -371,7 +371,7 @@ void vault_stats(CHAR_DATA *ch, char *name) {
   struct vault_access_data *access;
   struct obj_data *obj;
   int items = 0, weight = 0, accesses = 0, num = 0, unique = 0, count = 0, skipped = 0;
-  char buf[MAX_STRING_LENGTH], buf1[MAX_STRING_LENGTH];
+  char buf[MAX_STRING_LENGTH*4], buf1[MAX_STRING_LENGTH];
 
   sprintf(buf, "###) Character Name        Gold     Items (Unique) Weight/  Max   Access\r\n");
   for (vault = vault_table;vault;vault = vault->next, num++) {
@@ -394,7 +394,7 @@ void vault_stats(CHAR_DATA *ch, char *name) {
 
     sprintf(buf1, "%3d) %-15s $B$5%10llu$R     %5d (%4d  ) %6d/%5d %6d\r\n",
                    count, vault->owner, vault->gold, items, unique, weight, vault->size, accesses);
-    if ((strlen(buf1) + strlen(buf)) < MAX_STRING_LENGTH)
+    if ((strlen(buf1) + strlen(buf)) < MAX_STRING_LENGTH*4)
       strcat(buf, buf1);
     else
       skipped++;
@@ -1281,7 +1281,7 @@ void show_vault(CHAR_DATA *ch, char *owner) {
   struct vault_data *vault;
   struct obj_data *obj;
   int objects = 0, self = 0;
-  char buf[MAX_STRING_LENGTH];
+  char buf[MAX_STRING_LENGTH*4];
   char buf1[MAX_INPUT_LENGTH];
 
   owner[0] = UPPER(owner[0]);
@@ -1336,10 +1336,10 @@ void show_vault(CHAR_DATA *ch, char *owner) {
     }
     objects = 1;
     strcat(buf1,"\r\n");
-    if (strlen(buf1) + strlen(buf) < MAX_STRING_LENGTH)
+    if (strlen(buf1) + strlen(buf) < MAX_STRING_LENGTH*4 - 200)
       strcat(buf,buf1);
     else {
-      send_to_char("Overflow!!\r\n",ch); break; }
+      strcat(buf, "Overflow!!!\r\n"); break; }
   }
 
   if (!objects)
