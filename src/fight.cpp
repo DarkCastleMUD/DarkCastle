@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.339 2006/07/02 22:03:11 urizen Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.340 2006/07/03 14:29:02 urizen Exp $ */
 
 extern "C"
 {
@@ -2625,6 +2625,8 @@ bool check_parry(CHAR_DATA * ch, CHAR_DATA * victim, int attacktype)
      return FALSE;
   if (!modifier && IS_NPC(victim) && (ISSET(victim->mobdata->actflags, ACT_PARRY)))
     modifier = 10;
+  else if (IS_NPC(victim) && !ISSET(victim->mobdata->actflags, ACT_PARRY)))
+	return FALSE; // damned mobs
 
   modifier += speciality_bonus(ch,attacktype,GET_LEVEL(victim));
 //  if (IS_NPC(victim)) modifier -= 50;
@@ -2719,9 +2721,11 @@ bool check_dodge(CHAR_DATA * ch, CHAR_DATA * victim, int attacktype)
       case CLASS_NECROMANCER:   modifier = -5; break;
       default:                  modifier = 0; break;
     }
-    if(0 == modifier && ISSET(victim->mobdata->actflags, ACT_DODGE))
-      modifier = 5;
-  } else if (!has_skill(victim, SKILL_DODGE))
+    if(!ISSET(victim->mobdata->actflags, ACT_DODGE))
+	modifier = 0; // damned mobs
+    else if (modifier == 0)
+	modifier = 5;
+    } else if (!has_skill(victim, SKILL_DODGE))
       return FALSE;
 
   if (modifier == 0 && IS_NPC(victim))
