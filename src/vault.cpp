@@ -1256,9 +1256,18 @@ void show_vault(CHAR_DATA *ch, char *owner) {
 
 //    obj = get_obj(items->item_vnum);
     obj = items->obj?items->obj:get_obj(items->item_vnum);
-    sprintf(buf1, "%s", GET_OBJ_SHORT(obj));
+    sprintf(buf1, "%s ", GET_OBJ_SHORT(obj));
     strcat(buf, buf1);
-
+   
+      if (obj->obj_flags.type_flag == ITEM_ARMOR ||
+          obj->obj_flags.type_flag == ITEM_WEAPON ||
+          obj->obj_flags.type_flag == ITEM_FIREWEAPON ||
+          obj->obj_flags.type_flag == ITEM_CONTAINER ||
+          obj->obj_flags.type_flag == ITEM_INSTRUMENT ||
+          obj->obj_flags.type_flag == ITEM_WAND ||
+          object->obj_flags.type_flag == ITEM_STAFF ||
+          obj->obj_flags.type_flag == ITEM_LIGHT)
+	        strcat(buf, item_condition(obj));
     if (GET_LEVEL(ch) > IMMORTAL) {
       sprintf(buf1, " [%d]", items->item_vnum);
       strcat(buf, buf1);
