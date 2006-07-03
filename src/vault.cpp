@@ -1694,7 +1694,7 @@ int sleazy_vault_guy(struct char_data *ch, struct obj_data *obj, int cmd, char *
 		  return eSUCCESS;
 		}
 		GET_PLATINUM(ch) -= 200;
-		cvault->size += 1;
+		cvault->size += 10;
 		save_char_obj(ch);
 		save_vault(clanVName(ch->clan));
 		send_to_char("You have added 10 lbs capacity to your clan's vault.\r\n",ch);
