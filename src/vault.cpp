@@ -1517,23 +1517,26 @@ int sleazy_vault_guy(struct char_data *ch, struct obj_data *obj, int cmd, char *
 	send_to_char("You need to level up some before obtaining a vault.\r\n",ch);
 	return eSUCCESS;
       }
-      send_to_char("Paul the sleazy vault salesman tells you, 'How aboot a bigger vault? Size matters, you know'\r\n",ch);
+      send_to_char("$B$2Paul the sleazy vault salesman tells you, 'How aboot a bigger vault? Size matters, you know'$R\r\n",ch);
       else if (vault->size < VAULT_MAX_SIZE)
-         sprintf(buf, "1) Increase the size of vault by 10 lbs: %d platinum.\r\n",VAULT_UPGRADE_COST);
+         sprintf(buf, "$B1)$R Increase the size of vault by 10 lbs: %d platinum.\r\n",VAULT_UPGRADE_COST);
       else
-	sprintf(buf, "1) You cannot increase your vault-size further.\r\n");
+	sprintf(buf, "$B1)$R You cannot increase your vault-size further.\r\n");
       send_to_char(buf,ch);
 
-      sprintf(buf,"2) Purchase a clan vault: %s\r\n",
+      sprintf(buf,"$B2)$R Purchase a clan vault: %s\r\n",
 		ch->clan?cvault?"Your clan already has a vault":has_right(ch, CLAN_RIGHTS_VAULT)?"500 platinum coins.":"You are not authorized to make this purchase.":"You are not a member of any clan.");
       send_to_char(buf,ch);
 
       if (!cvault)
-        sprintf(buf, "3) Increase the size of your clan vault by 10 lbs: %s\r\n", ch->clan?"Your clan has no vault.":"You're not in a clan.");
+        sprintf(buf, "$B3)$R Increase the size of your clan vault by 10 lbs: %s\r\n", ch->clan?"Your clan has no 
+vault.":"You're not in a clan.");
       else if (cvault->size < VAULT_MAX_SIZE)
-        sprintf(buf, "3) Increase the size of your clan vault by 10 lbs: %s\r\n", has_right(ch, CLAN_RIGHTS_VAULT)?"20 platinum coins.":"You are not authorized to make this purchase.");
+        sprintf(buf, "$B3)$R Increase the size of your clan vault by 10 lbs: %s\r\n", has_right(ch, 
+CLAN_RIGHTS_VAULT)?"20 platinum coins.":"You are not authorized to make this purchase.");
       else
-        sprintf(buf, "3) Increase the size of your clan vault by 10 lbs: You cannot increase the vault's size further.\r\n");
+        sprintf(buf, "$B3)$R Increase the size of your clan vault by 10 lbs: You cannot increase the vault's size 
+further.\r\n");
       send_to_char(buf,ch);
       return eSUCCESS;
   } else {
@@ -1560,7 +1563,7 @@ int sleazy_vault_guy(struct char_data *ch, struct obj_data *obj, int cmd, char *
 		vault->size += 10;
 		save_char_obj(ch);
 		save_vault(vault->owner);
-		send_to_char("Paul the sleazy vault salesman tells you, '10 lbs added to your vault.'\r\n",ch);
+		send_to_char("$B$2Paul the sleazy vault salesman tells you, '10 lbs added to your vault.$R'\r\n",ch);
 		return eSUCCESS;
 	case 2: 
 		if (cvault) 
