@@ -213,9 +213,26 @@ void vault_access(CHAR_DATA *ch, char *who)
     add_vault_access(ch, who, vault);
 }
 
-void my_vault_access(CHAR_DATA *ch)
+void my_vault_access(CHAR_DATA *ch, char arg[MAX_INPUT_LENGTH])
 {
   struct vault_data *vault;
+
+  if (arg[0] != '\0')
+  {
+     if (!(vault = has_vault(arg)))
+     {
+	send_to_char("No such player.\r\n",ch);
+	return;
+     }
+     if (!has_vault_access(GET_NAME(ch), vault))
+     {
+	send_to_char("You do not have access to that vault anyway.\r\n",ch);
+	return;
+     }
+     access_remove(GET_NAME(ch), vault);
+     send_to_char("You remove your access to that vault.\r\n",ch);
+     return;
+  }
 
   send_to_char("You have access to the following vaults:\r\n", ch);
   for (vault = vault_table;vault;vault = vault->next)
@@ -289,7 +306,7 @@ int do_vault(CHAR_DATA *ch, char *argument, int cmd)
 
   // show what vaults I have access to
   } else if (!strncmp(arg, "myaccess", strlen(arg))) {
-      my_vault_access(ch);
+      my_vault_access(ch,arg1);
 
   // show my current access, add access, or remove access
   } else if (!strncmp(arg, "access", strlen(arg))) {
