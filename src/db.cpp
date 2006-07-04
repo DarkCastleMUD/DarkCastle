@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.129 2006/07/02 21:49:52 urizen Exp $ */
+/* $Id: db.cpp,v 1.130 2006/07/04 22:22:19 dcastle Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -208,7 +208,7 @@ void load_site_lists(void);
 int 		mprog_name_to_type	( char* name );
 MPROG_DATA *	mprog_file_read 	( char* f, MPROG_DATA* mprg, long i );
 //void		load_mobprogs           ( FILE* fp );
-void   		mprog_read_programs     ( FILE* fp, long i);
+void   		mprog_read_programs     ( FILE* fp, long i, bool zz = FALSE);
 
 extern bool MOBtrigger;
 
@@ -2614,11 +2614,9 @@ CHAR_DATA *read_mobile(int nr, FILE *fl)
     /***** String data *** */
   
     mob->name = fread_string(fl, 1);
- 
     /* set up the fread debug stuff */
     curr_type = "Mob";
     curr_name = mob->name;
-
     mob->short_desc = fread_string (fl, 1); 
     mob->long_desc  = fread_string (fl, 1);
     mob->description = fread_string (fl, 1);
@@ -3558,7 +3556,7 @@ void delete_item_from_index(int nr)
 }
 
 /* read an object from OBJ_FILE */
-struct obj_data *read_object(int nr, FILE *fl)
+struct obj_data *read_object(int nr, FILE *fl, bool zz)
     {
     struct obj_data *obj;
     int tmpp;
@@ -3636,7 +3634,7 @@ struct obj_data *read_object(int nr, FILE *fl)
 
         case '\\':
             ungetc( '\\', fl );
-            mprog_read_programs( fl, nr );
+            mprog_read_programs( fl, nr,zz );
              break;
 
         case 'A':
@@ -5043,12 +5041,12 @@ void load_mobprogs(FILE *fp)
   return;
 }
 
-void mprog_read_programs( FILE *fp, long i )
+void mprog_read_programs( FILE *fp, long i, bool zz )
 {
   MPROG_DATA *mprog;
   char letter;
   int type;
-  
+  MPROG_DATA lmprog;
   for ( ; ; )
   {
     if ( (letter = fread_char(fp)) == '|' )
@@ -5073,14 +5071,17 @@ void mprog_read_programs( FILE *fp, long i )
         SET_BIT(mob_index[i].progtypes, type);
       else
 	SET_BIT(obj_index[i].progtypes, type);
+     if (!zz) {
 #ifdef LEAK_CHECK
       mprog = (MPROG_DATA *) calloc(1, sizeof(MPROG_DATA));
 #else
       mprog = (MPROG_DATA *) dc_alloc(1, sizeof(MPROG_DATA));
 #endif
+     } else mprog = &lmprog;
       mprog->type = type;
       mprog->arglist = fread_string(fp, 0);
       mprog->comlist = fread_string(fp, 0);
+    if (!zz) {
     if (letter == '>') {
       mprog->next = mob_index[i].mobprogs;   // when we write them, we write last first
       mob_index[i].mobprogs = mprog;         // so reading them this way keeps them in order
@@ -5088,6 +5089,7 @@ void mprog_read_programs( FILE *fp, long i )
 	mprog->next = obj_index[i].mobprogs;
 	obj_index[i].mobprogs = mprog;
    }
+    }
       break;
     }
   }

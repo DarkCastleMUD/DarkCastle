@@ -632,7 +632,9 @@ void load_vaults(void) {
 	    items->obj = NULL;
 	  }
 	  else {
-  	    obj = read_object(real_object(vnum), fl);
+	    char tmp[MAX_INPUT_LENGTH];
+	    get_line(fl, tmp);
+  	    obj = read_object(real_object(vnum), fl, TRUE);
 	    items->obj = obj;
 	  }
           if (!obj) {
@@ -646,7 +648,7 @@ void load_vaults(void) {
           items->next  	= vault->items;
           vault->items 	= items;
           sprintf(buf, "boot_vaults: got item [%s(%d)(%d)(%d)] from file [%s].", GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), count, vnum, fname);
-          log(buf, IMMORTAL, LOG_BUG);
+//          log(buf, IMMORTAL, LOG_BUG);
           break;
         case 'A':
           sscanf(type, "%s %s", tmp, value);
@@ -655,7 +657,7 @@ void load_vaults(void) {
           access->next  = vault->access;
           vault->access = access;
           sprintf(buf, "boot_vaults: got access [%s] from file [%s].", access->name, fname);
-          log(buf, IMMORTAL, LOG_BUG);
+  //        log(buf, IMMORTAL, LOG_BUG);
           break;
         default:
           sprintf(buf, "boot_vaults: unknown type in file [%s].", fname);

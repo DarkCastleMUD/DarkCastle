@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: db.h,v 1.19 2006/04/09 23:32:31 dcastle Exp $ */
+/* $Id: db.h,v 1.20 2006/07/04 22:22:21 dcastle Exp $ */
 #ifndef DB_H_
 #define DB_H_
 
@@ -113,7 +113,7 @@ extern struct skill_quest *skill_list;
 #define REAL 0
 #define VIRTUAL 1
 
-struct obj_data  *read_object(int nr, FILE *fl);
+struct obj_data  *read_object(int nr, FILE *fl, bool zz = FALSE);
 CHAR_DATA *read_mobile(int nr, FILE *fl);
 struct obj_data  *clone_object(int nr);
 CHAR_DATA *clone_mobile(int nr);
