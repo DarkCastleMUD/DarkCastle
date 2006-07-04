@@ -78,8 +78,9 @@ void act
     send_message(tokens, ch, obj, vict_obj, flags, ch);
     }
   else if(destination == TO_ROOM) {
-    char_data * tmp_char;
-    for (tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room) {
+    char_data * tmp_char, *next_tmp_char;
+    for (tmp_char = world[ch->in_room].people; tmp_char; tmp_char = next_tmp_char) {
+      next_tmp_char = tmp_char->next_in_room;
       // If they're not really playing, and no force flag, don't send
       if (tmp_char == ch)
         continue;
