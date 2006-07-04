@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.343 2006/07/03 22:58:51 shane Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.344 2006/07/04 11:03:43 urizen Exp $ */
 
 extern "C"
 {
@@ -785,6 +785,8 @@ int do_lightning_shield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
       dam /= 4;
     if (IS_AFFECTED(ch, AFF_SANCTUARY))
       dam /= 2;
+    if (affected_by_spell(ch, SPELL_HOLY_AURA) && affected_by_spell(ch, SPELL_HOLY_AURA)->modifier == 25)
+	dam /= 2;
   }
       
 //  dam /= 5;
@@ -887,6 +889,9 @@ int do_fireshield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
       dam /= 4;
     if (IS_AFFECTED(ch, AFF_SANCTUARY))
       dam /= 2;
+    if (affected_by_spell(ch, SPELL_HOLY_AURA) && affected_by_spell(ch, SPELL_HOLY_AURA)->modifier == 25)
+	dam /= 2;
+
   }
     
   GET_HIT(ch) -= dam;
@@ -947,6 +952,8 @@ int do_acidshield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
       dam /= 4;
     if (IS_AFFECTED(ch, AFF_SANCTUARY))
       dam /= 2;
+    if (affected_by_spell(ch, SPELL_HOLY_AURA) && affected_by_spell(ch, SPELL_HOLY_AURA)->modifier == 25)
+	dam /= 2;
   }
     
   GET_HIT(ch) -= dam;
