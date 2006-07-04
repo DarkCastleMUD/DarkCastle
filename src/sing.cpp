@@ -970,11 +970,9 @@ int song_whistle_sharp( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim
 
 //   dam = GET_LEVEL(ch) + GET_INT(ch) + combat;
    dam = 80;
-   act("You send a sharp piercing whistle at $N.", ch, 0, victim, TO_CHAR, 0);
-   act("$n whistles a sharp tune that ravages your ear drums and pierces you to the bone!", 
-       ch, 0, victim, TO_VICT, 0);
-   act("$n whistles a super-high note at $N and blood drips from $S ears!",
-       ch, 0, victim, TO_ROOM, NOTVICT);
+//   act("You send a sharp piercing whistle at $N.", ch, 0, victim, TO_CHAR, 0);
+//   act("$n whistles a sharp tune that ravages your ear drums and pierces you to the bone!", ch, 0, victim, TO_VICT, 0);
+//   act("$n whistles a super-high note at $N and blood drips from $S ears!", ch, 0, victim, TO_ROOM, NOTVICT);
 
    if (number(1,101) < get_saves(victim, SAVE_TYPE_MAGIC))
    {
@@ -988,7 +986,7 @@ act("You resist $n's whistle sharp!",ch,NULL,victim,TO_VICT,0);
 
   char buf[MAX_STRING_LENGTH];
   strcpy(buf, victim->short_desc);
-    bool ispc = !IS_NPC(victim);
+//    bool ispc = !IS_NPC(victim);
 
    retval = damage(ch, victim, dam, TYPE_SONG,SKILL_SONG_WHISTLE_SHARP, 0);
    if(IS_SET(retval, eCH_DIED))
@@ -996,14 +994,14 @@ act("You resist $n's whistle sharp!",ch,NULL,victim,TO_VICT,0);
 
    if(IS_SET(retval, eVICT_DIED))
    {
-	char buf2[MAX_STRING_LENGTH];
-      sprintf(buf2, "$n's whistle goes off the scale and %s's head explodes!", buf);
+//	char buf2[MAX_STRING_LENGTH];
+//      sprintf(buf2, "$n's whistle goes off the scale and %s's head explodes!", buf);
 
-      act(buf2, ch, NULL, victim, TO_ROOM, NOTVICT);
-      if (ispc)
-        act("$n's whistle goes off the scale and your head explodes!", ch, NULL, victim, TO_VICT, 0);
-      sprintf(buf2, "%s's head explodes as your whistle goes off the scale!", buf);
-      act(buf2, ch, NULL, victim, TO_CHAR, 0);
+//      act(buf2, ch, NULL, victim, TO_ROOM, NOTVICT);
+//      if (ispc)
+//        act("$n's whistle goes off the scale and your head explodes!", ch, NULL, victim, TO_VICT, 0);
+//      sprintf(buf2, "%s's head explodes as your whistle goes off the scale!", buf);
+//      act(buf2, ch, NULL, victim, TO_CHAR, 0);
 
       send_to_char("You dance a small jig on the corpse.\r\n", ch);
       act("$n dances a little jig on the fallen corpse.",
@@ -1220,7 +1218,6 @@ int execute_song_terrible_clef( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA
    int dam = 0;
    int retval;
 
-   //int specialization = skill / 100;
    skill %= 100;
 
    victim = ch->fighting;
@@ -1236,9 +1233,9 @@ int execute_song_terrible_clef( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA
 
 //   dam = GET_LEVEL(ch) * 4 + GET_WIS(ch) * 2 + combat*2;
    dam = 300;
-   send_to_char("Your singing hurts your opponent!\r\n", ch);
-   act("$n's singing causes pain in $N's ears!\r\n", ch, 0, victim, TO_ROOM, NOTVICT);
-   send_to_char("The music!  It hurts!  It hurts!\r\n", victim);
+//   send_to_char("Your singing hurts your opponent!\r\n", ch);
+//   act("$n's singing causes pain in $N's ears!\r\n", ch, 0, victim, TO_ROOM, NOTVICT);
+//   send_to_char("The music!  It hurts!  It hurts!\r\n", victim);
    if (number(1,101) < get_saves(victim, SAVE_TYPE_MAGIC))
    {
 act("$N resists your terrible clef!", ch, NULL, victim, 
@@ -1248,7 +1245,7 @@ NOTVICT);
 act("You resist $n's terrible clef!",ch,NULL,victim,TO_VICT,0);
     dam /= 2;
    }
-   bool ispc = !IS_NPC(victim);
+//   bool ispc = !IS_NPC(victim);
    char buf[MAX_STRING_LENGTH];
    strcpy(buf, victim->short_desc);
    retval = damage(ch, victim, dam, TYPE_SONG,SKILL_SONG_TERRIBLE_CLEF, 0);
@@ -1256,13 +1253,13 @@ act("You resist $n's terrible clef!",ch,NULL,victim,TO_VICT,0);
      return retval;
    if(IS_SET(retval, eVICT_DIED))
    {
-      char buf2[MAX_STRING_LENGTH];
-	sprintf(buf2, "$n's terrible clef bangs against %s until they are no more!", buf);
-      act(buf2, ch, NULL, NULL, TO_ROOM, NOTVICT);
-      if (ispc)
-        act("$n's terrible clef has beaten you to a pulp!", ch, NULL, victim, TO_VICT, 0);
-      sprintf(buf2, "The terrible clef has left %s broken, bloody, and dead!", buf);
-      act(buf2, ch, NULL, victim, TO_CHAR, 0);
+//      char buf2[MAX_STRING_LENGTH];
+//	sprintf(buf2, "$n's terrible clef bangs against %s until they are no more!", buf);
+//      act(buf2, ch, NULL, NULL, TO_ROOM, NOTVICT);
+//      if (ispc)
+//        act("$n's terrible clef has beaten you to a pulp!", ch, NULL, victim, TO_VICT, 0);
+//      sprintf(buf2, "The terrible clef has left %s broken, bloody, and dead!", buf);
+//      act(buf2, ch, NULL, victim, TO_CHAR, 0);
 
       send_to_char("You dance a small jig on the corpse.\r\n", ch);
       act("$n dances a little jig on the fallen corpse.",

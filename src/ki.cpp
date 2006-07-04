@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.46 2006/06/29 08:57:01 shane Exp $ */
+/* $Id: ki.cpp,v 1.47 2006/07/04 08:42:13 shane Exp $ */
 
 extern "C"
 {
@@ -571,9 +571,8 @@ int ki_storm( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
   CHAR_DATA *tmp_victim, *temp;
 
   dam = number(135,165);
-  send_to_char("Your wholeness of spirit purges the souls of those around you!\n\r", ch);
-  act("$n's eyes flash as $e pools the energy within $m!\n\rA burst of energy slams into you!\r\n",
-		ch, 0, 0, TO_ROOM, 0);
+//  send_to_char("Your wholeness of spirit purges the souls of those around you!\n\r", ch);
+//  act("$n's eyes flash as $e pools the energy within $m!\n\rA burst of energy slams into you!\r\n",
   int32 room = ch->in_room;
   for(tmp_victim = world[ch->in_room].people; tmp_victim; tmp_victim = temp)
   {
@@ -585,6 +584,7 @@ int ki_storm( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
 		              KI_OFFSET+KI_STORM, 0);
                   if(IS_SET(retval, eCH_DIED))
                     return retval;
+                  act("A burst of energy slams into you!", ch, 0, 0, TO_ROOM, 0);
 	 } //else
 //		if (world[ch->in_room].zone == world[tmp_victim->in_room].zone)
 //	send_to_char("A crackle of energy echos past you.\n\r", tmp_victim);
