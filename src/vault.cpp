@@ -962,7 +962,12 @@ void get_from_vault(CHAR_DATA *ch, char *object, char *owner) {
       return;
     }
 
-    sprintf(buf, "%s removed %s[%d] from %s's vault.", GET_NAME(ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), owner);
+
+    if (GET_LEVEL(ch) < IMMORTAL)
+      sprintf(buf, "%s removed %s from %s's vault.", GET_NAME(ch), GET_OBJ_SHORT(obj), owner);
+    else
+      sprintf(buf, "%s removed %s[%d] from %s's vault.", GET_NAME(ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), owner);
+
     vault_log(buf, owner);
     csendf(ch, "%s has been removed from the vault.\r\n", GET_OBJ_SHORT(obj));
   
@@ -1242,7 +1247,12 @@ void put_in_vault(CHAR_DATA *ch, char *object, char *owner) {
         csendf(ch, "%s won't fit in the vault!\r\n", GET_OBJ_SHORT(obj));
         continue;
       }
+
+    if (GET_LEVEL(ch) < IMMORTAL)
+      sprintf(buf, "%s added %s to %s's vault.", GET_NAME(ch), GET_OBJ_SHORT(obj), owner);
+    else
       sprintf(buf, "%s added %s[%d] to %s's vault.", GET_NAME(ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), owner);
+
       vault_log(buf, owner);
       csendf(ch, "%s has been placed in the vault.\r\n", GET_OBJ_SHORT(obj));
       if (!fullSave(obj))
@@ -1261,7 +1271,12 @@ void put_in_vault(CHAR_DATA *ch, char *object, char *owner) {
         csendf(ch, "%s won't fit in the vault!\r\n", GET_OBJ_SHORT(obj));
         continue;
       }
-      sprintf(buf, "%s added %s[%d] to %s's vault.", GET_NAME(ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), owner);
+
+      if (GET_LEVEL(ch) < IMMORTAL)
+	sprintf(buf, "%s added %s to %s's vault.", GET_NAME(ch), GET_OBJ_SHORT(obj), owner);
+      else
+	sprintf(buf, "%s added %s[%d] to %s's vault.", GET_NAME(ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), owner);
+
       vault_log(buf, owner);
       csendf(ch, "%s has been placed in the vault.\r\n", GET_OBJ_SHORT(obj));
       if (!fullSave(obj)) {
@@ -1282,7 +1297,11 @@ void put_in_vault(CHAR_DATA *ch, char *object, char *owner) {
       return;
     }
 
-    sprintf(buf, "%s added %s[%d] to %s's vault.", GET_NAME(ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), owner);
+    if (GET_LEVEL(ch) < IMMORTAL)
+      sprintf(buf, "%s added %s to %s's vault.", GET_NAME(ch), GET_OBJ_SHORT(obj), owner);
+    else
+      sprintf(buf, "%s added %s[%d] to %s's vault.", GET_NAME(ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), owner);
+
     vault_log(buf, owner);
     csendf(ch, "%s has been placed in the vault.\r\n", GET_OBJ_SHORT(obj));
   
