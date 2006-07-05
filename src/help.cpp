@@ -227,6 +227,12 @@ int load_new_help(FILE *fl, int reload, struct char_data *ch)
   return eSUCCESS;
 }
 
+int do_areas(CHAR_DATA *ch, char *arg, int cmd)
+{
+   strcpy(arg, "areas");
+   return do_new_help(ch, arg, cmd);
+}
+
 char help_buf[MAX_STRING_LENGTH*4];
 
 int do_hindex(struct char_data *ch, char *argument, int cmd)

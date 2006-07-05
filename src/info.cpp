@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.111 2006/06/24 00:07:45 shane Exp $ */
+/* $Id: info.cpp,v 1.112 2006/07/05 01:34:02 shane Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -3136,6 +3136,16 @@ int do_leaderboard(struct char_data *ch, char *argument, int cmd)
    for(i=0;i<5;i++) dc_free(pkactivename[i]);
    for(i=0;i<5;i++) dc_free(pdactivename[i]);
    for(i=0;i<5;i++) dc_free(rdactivename[i]);
+
+   return eSUCCESS;
+}
+
+int do_show_exp(CHAR_DATA *ch, char *arg, int cmd)
+{
+   if(GET_LEVEL(ch) < MAX_MORTAL)
+      csendf(ch, "You require %ld experience to advance to level %d.\n\r",
+                 exp_table[(int)GET_LEVEL(ch) + 1] - GET_EXP(ch), GET_LEVEL(ch) + 1);
+   else send_to_char("You require 7399928377275452622483 experience to advance to the next level.\n\r", ch);
 
    return eSUCCESS;
 }

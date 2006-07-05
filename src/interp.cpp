@@ -16,7 +16,7 @@
 /* 12/08/2003   Onager   Added chop_half() to work like half_chop() but    */
 /*                       chopping off the last word.                       */
 /***************************************************************************/
-/* $Id: interp.cpp,v 1.95 2006/07/02 23:10:31 urizen Exp $ */
+/* $Id: interp.cpp,v 1.96 2006/07/05 01:34:02 shane Exp $ */
 
 extern "C"
 {
@@ -140,6 +140,9 @@ struct command_info cmd_info[] =
     { "wizlist",	do_wizlist,	POSITION_DEAD, 0, 9, 0, 1 },
     { "socials",	do_social,	POSITION_DEAD, 0, 9, 0, 0 },
     { "index",		do_index,	POSITION_DEAD, 0, 9, 0, 1 },
+    { "areas",		do_areas,	POSITION_DEAD, 0, 9, 0, 1 },
+    { "commands", 	do_new_help,	POSITION_DEAD, 0, 9, 0, 1 },
+    { "experience",	do_show_exp,	POSITION_DEAD, 0, 9, 0, 1 },
 
     // Communication commands
     { "ask",		do_ask,		POSITION_RESTING, 0, 9, COM_CHARMIE_OK, 0 },
@@ -289,6 +292,8 @@ struct command_info cmd_info[] =
     { "home",		do_home,	POSITION_DEAD, 0, 9, 0, 1 },
     { "split",		do_split,	POSITION_RESTING, 0, 193, 0, 0 },
     { "spells",		do_spells,	POSITION_SLEEPING, 0, 9, 0, 1 },
+    { "skills",		do_skills,	POSITION_SLEEPING, 0, 9, 0, 1 },
+    { "songs",		do_songs,	POSITION_SLEEPING, 0, 9, 0, 1 },
     { "steal",		do_steal,	POSITION_STANDING, 1, 9, 0, 10 },
     { "pocket",		do_pocket,	POSITION_STANDING, 1, 9, 0, 10 },
     { "motd",		do_motd,	POSITION_DEAD, 0, 9, 0, 1 },

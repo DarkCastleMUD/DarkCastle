@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.177 2006/06/29 09:12:29 shane Exp $ */
+/* $Id: spells.cpp,v 1.178 2006/07/05 01:34:02 shane Exp $ */
 
 extern "C"
 {
@@ -56,8 +56,21 @@ extern "C"
 // Global data 
 
 extern CWorld world;
- 
+extern struct class_skill_defines w_skills[];
+extern struct class_skill_defines t_skills[];
+extern struct class_skill_defines d_skills[];
+extern struct class_skill_defines b_skills[];
+extern struct class_skill_defines a_skills[];
+extern struct class_skill_defines p_skills[];
+extern struct class_skill_defines r_skills[];
+extern struct class_skill_defines k_skills[];
+extern struct class_skill_defines u_skills[];
+extern struct class_skill_defines c_skills[];
+extern struct class_skill_defines m_skills[];
 extern CHAR_DATA *character_list;
+extern char *attrname(int);
+extern struct song_info_type song_info[];
+extern struct ki_info_type ki_info[];
 extern char *spell_wear_off_msg[];
 
 // Functions used in spells.C
@@ -1907,120 +1920,312 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
   return eFAILURE;
 }
 
-int do_spells(CHAR_DATA *ch, char *argument, int cmd_arg)
+int do_skills(CHAR_DATA *ch, char *arg, int cmd)
 {
-    if (IS_NPC(ch))
-        return eFAILURE;
+   char buf[16384];
+   char buf2[MAX_STRING_LENGTH],buf3[MAX_STRING_LENGTH];
+   int mage, cleric, thief, warrior, anti, pal, barb, monk, ranger, bard, druid;
 
-// TODO - fix spells command to show a PC his spells data
-// or...if a god, all the spells
-    send_to_char("The spells command is currently disabled.\n\r", ch);
-    return eSUCCESS;
+   if(IS_NPC(ch)) return eFAILURE;
 
-/*
-    char buf[16384];
-    int cmd, clss, level;
+   buf[0] = '\0';
 
-    clss = GET_CLASS(ch);
-    level = GET_LEVEL(ch);
-
-    if (level > ARCHANGEL)
-      clss = ARCHANGEL;
-
-    buf[0] = '\0';
-    for ( cmd = 0; cmd < MAX_SPL_LIST; cmd++ )
-    {
-      if ( (cmd > 43) && (cmd < 53) )
-         continue;
-    switch(clss) {
-    case CLASS_CLERIC:
-      if (spl_lvl(spell_info[cmd+1].min_level_cleric) > 0)
-      {
-        sprintf( buf + strlen(buf), "Spell %-20s  Level: %-2d  Mana: %-3d",
-        spells[cmd], spl_lvl(spell_info[cmd+1].min_level_cleric), 
-        spell_info[cmd+1].min_usesmana);
-
-            strcat(buf, "\n\r");
+   for(int i = KI_OFFSET; i <= SKILL_MAX; i++) {
+      mage = 0;
+      cleric = 0;
+      thief = 0;
+      warrior = 0;
+      anti = 0;
+      pal = 0;
+      barb = 0;
+      monk = 0;
+      ranger = 0;
+      bard = 0;
+      druid = 0;
+      buf2[0] = '\0';
+      for(int j = 0; m_skills[j].skillnum; j++) {
+         if(m_skills[j].skillnum == i) {
+            mage = j;
+            sprintf(buf2, "Mag(%d)", m_skills[j].levelavailable);
+            break;
+         }
       }
-    break;
-
-    case CLASS_MAGIC_USER:
-      if (spl_lvl(spell_info[cmd+1].min_level_magic) > 0)
-      {
-        sprintf( buf + strlen(buf), "Spell %-19s  Level: %-2d  Mana: %-3d",
-        spells[cmd], spl_lvl(spell_info[cmd+1].min_level_magic),
-        spell_info[cmd+1].min_usesmana);
-
-            strcat(buf, "\n\r");
+      for(int j = 0; c_skills[j].skillnum; j++) {
+         if(c_skills[j].skillnum == i) {
+            cleric = j;
+            if(buf2[0] != '\0') strcat(buf2, ", ");
+            sprintf(buf3, "Cle(%d)", c_skills[j].levelavailable);
+            strcat(buf2, buf3);
+            break;
+         }
       }
-    break;
-
-    case CLASS_ANTI_PAL:
-      if (spl_lvl(spell_info[cmd+1].min_level_anti) > 0)
-      {
-        sprintf( buf + strlen(buf), "Spell %-19s  Level: %-2d  Mana: %-3d",
-        spells[cmd], spl_lvl(spell_info[cmd+1].min_level_anti),
-        spell_info[cmd+1].min_usesmana);
-
-            strcat(buf, "\n\r");
+      for(int j = 0; t_skills[j].skillnum; j++) {
+         if(t_skills[j].skillnum == i) {
+            thief = j;
+            if(buf2[0] != '\0') strcat(buf2, ", ");
+            sprintf(buf3, "Thi(%d)", t_skills[j].levelavailable);
+            strcat(buf2, buf3);
+            break;
+         }
       }
-    break;
-
-    case CLASS_PALADIN:
-      if (spl_lvl(spell_info[cmd+1].min_level_paladin) > 0)
-      {
-        sprintf( buf + strlen(buf), "Spell %-19s  Level: %-2d  Mana: %-3d",
-        spells[cmd], spl_lvl(spell_info[cmd+1].min_level_paladin),
-        spell_info[cmd+1].min_usesmana);
-
-            strcat(buf, "\n\r");
+      for(int j = 0; w_skills[j].skillnum; j++) {
+         if(w_skills[j].skillnum == i) {
+            warrior = j;
+            if(buf2[0] != '\0') strcat(buf2, ", ");
+            sprintf(buf3, "War(%d)", w_skills[j].levelavailable);
+            strcat(buf2, buf3);
+            break;
+         }
       }
-    break;
-
-    case CLASS_RANGER:
-      if (spl_lvl(spell_info[cmd+1].min_level_ranger) > 0)
-      {
-        sprintf( buf + strlen(buf), "Spell %-19s  Level: %-2d  Mana: %-3d",
-        spells[cmd], spl_lvl(spell_info[cmd+1].min_level_ranger),
-        spell_info[cmd+1].min_usesmana);
-
-            strcat(buf, "\n\r");
+      for(int j = 0; a_skills[j].skillnum; j++) {
+         if(a_skills[j].skillnum == i) {
+            anti = j;
+            if(buf2[0] != '\0') strcat(buf2, ", ");
+            sprintf(buf3, "Ant(%d)", a_skills[j].levelavailable);
+            strcat(buf2, buf3);
+            break;
+         }
       }
-    break;
-
-    case CLASS_DRUID:
-      if (spl_lvl(spell_info[cmd+1].min_level_druid) > 0)
-      {
-        sprintf( buf + strlen(buf), "Spell %-19s  Level: %-2d  Mana: %-3d",
-        spells[cmd], spl_lvl(spell_info[cmd+1].min_level_druid),
-        spell_info[cmd+1].min_usesmana);
-
-            strcat(buf, "\n\r");
+      for(int j = 0; p_skills[j].skillnum; j++) {
+         if(p_skills[j].skillnum == i) {
+            pal = j;
+            if(buf2[0] != '\0') strcat(buf2, ", ");
+            sprintf(buf3, "Pal(%d)", p_skills[j].levelavailable);
+            strcat(buf2, buf3);
+            break;
+         }
       }
-    break;
+      for(int j = 0; b_skills[j].skillnum; j++) {
+         if(b_skills[j].skillnum == i) {
+            barb = j;
+            if(buf2[0] != '\0') strcat(buf2, ", ");
+            sprintf(buf3, "Bar(%d)", b_skills[j].levelavailable);
+            strcat(buf2, buf3);
+            break;
+         }
+      }
+      for(int j = 0; k_skills[j].skillnum; j++) {
+         if(k_skills[j].skillnum == i) {
+            monk = j;
+            if(buf2[0] != '\0') strcat(buf2, ", ");
+            sprintf(buf3, "Mon(%d)", k_skills[j].levelavailable);
+            strcat(buf2, buf3);
+            break;
+         }
+      }
+      for(int j = 0; r_skills[j].skillnum; j++) {
+         if(r_skills[j].skillnum == i) {
+            ranger = j;
+            if(buf2[0] != '\0') strcat(buf2, ", ");
+            sprintf(buf3, "Ran(%d)", r_skills[j].levelavailable);
+            strcat(buf2, buf3);
+            break;
+         }
+      }
+      for(int j = 0; d_skills[j].skillnum; j++) {
+         if(d_skills[j].skillnum == i) {
+            bard = j;
+            if(buf2[0] != '\0') strcat(buf2, ", ");
+            sprintf(buf3, "Brd(%d)", d_skills[j].levelavailable);
+            strcat(buf2, buf3);
+            break;
+         }
+      }
+      for(int j = 0; u_skills[j].skillnum; j++) {
+         if(u_skills[j].skillnum == i) {
+            druid = j;
+            if(buf2[0] != '\0') strcat(buf2, ", ");
+            sprintf(buf3, "Dru(%d)", u_skills[j].levelavailable);
+            strcat(buf2, buf3);
+            break;
+         }
+      }
+      if(mage) {
+         sprintf(buf + strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Reqs:$R %s (%s)  $B$7Class:$R ",
+               UPPER(*m_skills[mage].skillname),m_skills[mage].skillname+1,attrname(m_skills[mage].attrs[0]),
+               attrname(m_skills[mage].attrs[1]));
+      } else if(cleric) {
+         sprintf(buf + strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Reqs:$R %s (%s)  $B$7Class:$R ",
+               UPPER(*c_skills[cleric].skillname),c_skills[cleric].skillname+1,attrname(c_skills[cleric].attrs[0]),
+               attrname(c_skills[cleric].attrs[1]));
+      } else if(thief) {
+         sprintf(buf + strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Reqs:$R %s (%s)  $B$7Class:$R ",
+               UPPER(*t_skills[thief].skillname),t_skills[thief].skillname+1,attrname(t_skills[thief].attrs[0]),
+               attrname(t_skills[thief].attrs[1]));
+      } else if(warrior) {
+         sprintf(buf + strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Reqs:$R %s (%s)  $B$7Class:$R ",
+               UPPER(*w_skills[warrior].skillname),w_skills[warrior].skillname+1,attrname(w_skills[warrior].attrs[0]),
+               attrname(w_skills[warrior].attrs[1]));
+      } else if(anti) {
+         sprintf(buf + strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Reqs:$R %s (%s)  $B$7Class:$R ",
+               UPPER(*a_skills[anti].skillname),a_skills[anti].skillname+1,attrname(a_skills[anti].attrs[0]),
+               attrname(a_skills[anti].attrs[1]));
+      } else if(pal) {
+         sprintf(buf + strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Reqs:$R %s (%s)  $B$7Class:$R ",
+               UPPER(*p_skills[pal].skillname),p_skills[pal].skillname+1,attrname(p_skills[pal].attrs[0]),
+               attrname(p_skills[pal].attrs[1]));
+      } else if(barb) {
+         sprintf(buf + strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Reqs:$R %s (%s)  $B$7Class:$R ",
+               UPPER(*b_skills[barb].skillname),b_skills[barb].skillname+1,attrname(b_skills[barb].attrs[0]),
+               attrname(b_skills[barb].attrs[1]));
+      } else if(monk) {
+         sprintf(buf + strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Reqs:$R %s (%s)  $B$7Class:$R ",
+               UPPER(*k_skills[monk].skillname),k_skills[monk].skillname+1,attrname(k_skills[monk].attrs[0]),
+               attrname(k_skills[monk].attrs[1]));
+      } else if(ranger) {
+         sprintf(buf + strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Reqs:$R %s (%s)  $B$7Class:$R ",
+               UPPER(*r_skills[ranger].skillname),r_skills[ranger].skillname+1,attrname(r_skills[ranger].attrs[0]),
+               attrname(r_skills[ranger].attrs[1]));
+      } else if(bard) {
+         sprintf(buf + strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Reqs:$R %s (%s)  $B$7Class:$R ",
+               UPPER(*d_skills[bard].skillname),d_skills[bard].skillname+1,attrname(d_skills[bard].attrs[0]),
+               attrname(d_skills[bard].attrs[1]));
+      } else if(druid) {
+         sprintf(buf + strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Reqs:$R %s (%s)  $B$7Class:$R ",
+               UPPER(*u_skills[druid].skillname),u_skills[druid].skillname+1,attrname(u_skills[druid].attrs[0]),
+               attrname(u_skills[druid].attrs[1]));
+      } else continue;
 
-    case ARCHANGEL:
-        sprintf( buf + strlen(buf), "Spell %-19s Ma %-2d Cl %-2d AP %-2d Pl %-2d Rn %-2d Du %-2d  Mana: %-3d",
-        spells[cmd], spl_lvl(spell_info[cmd+1].min_level_magic),spl_lvl(spell_info[cmd+1].min_level_cleric),
-        spl_lvl(spell_info[cmd+1].min_level_anti), spl_lvl(spell_info[cmd+1].min_level_paladin),
-        spl_lvl(spell_info[cmd+1].min_level_ranger), spl_lvl(spell_info[cmd+1].min_level_druid),
-        spell_info[cmd+1].min_usesmana);
-
-            strcat(buf, "\n\r");
-    break;
-
-    default:
-      strcat(buf, "You do not have any spells. -->BONK<--\n\r");
-      cmd = MAX_SPL_LIST + 1;
+      strcat(buf, buf2);
       strcat(buf, "\n\r");
-    break;
-    }
-    }
+   }
 
-    strcat(buf, "\n\r");
-    page_string(ch->desc, buf, 1);
-    return eSUCCESS;
-*/
+   strcat(buf, "\n\r");
+   page_string(ch->desc, buf, 1);
+
+   return eSUCCESS;
+}
+
+int do_songs(CHAR_DATA *ch, char *arg, int cmd)
+{
+   char buf[16384];
+
+   if (IS_NPC(ch))
+      return eFAILURE;
+
+   buf[0] = '\0';
+
+   for(int i = 0; d_skills[i].skillnum; i++) {
+      if(d_skills[i].skillnum >= SKILL_SONG_BASE && d_skills[i].skillnum <= SKILL_SONG_MAX) {
+         sprintf(buf + strlen(buf), "$B$7Song:$R %c%-22s  $B$7Reqs:$R %s (%s)  $B$7Ki:$R %-3d  $B$7Class:$R %s (%d)",
+               UPPER(*d_skills[i].skillname),d_skills[i].skillname+1, attrname(d_skills[i].attrs[0]), 
+               attrname(d_skills[i].attrs[1]), song_info[d_skills[i].skillnum - SKILL_SONG_BASE].min_useski,
+               "Brd", d_skills[i].levelavailable);
+         strcat(buf, "\n\r");
+      }
+   }
+
+   strcat(buf, "\n\r");
+   page_string(ch->desc, buf, 1);
+
+   return eSUCCESS;
+}
+
+int do_spells(CHAR_DATA *ch, char *arg, int cmd)
+{
+   char buf[16384];
+   char buf2[MAX_STRING_LENGTH],buf3[MAX_STRING_LENGTH];
+   int mage, cleric, anti, pal, ranger, druid;
+
+   if (IS_NPC(ch))
+      return eFAILURE;
+
+   buf[0] = '\0';
+
+   for(int i = 0; i <= MAX_SPL_LIST; i++) {
+      mage = 0;
+      cleric = 0;
+      anti = 0;
+      pal = 0;
+      ranger = 0;
+      druid = 0;
+      buf2[0] = '\0';
+      for(int j = 0; m_skills[j].skillnum; j++) {
+         if(m_skills[j].skillnum == i) {
+            mage = j;
+            sprintf(buf2, "Mag(%d)", m_skills[j].levelavailable);
+            break;
+         }
+      }
+      for(int j = 0; c_skills[j].skillnum; j++) {
+         if(c_skills[j].skillnum == i) {
+            cleric = j;
+            if(buf2[0] != '\0') strcat(buf2, ", ");
+            sprintf(buf3, "Cle(%d)", c_skills[j].levelavailable);
+            strcat(buf2, buf3);
+            break;
+         }
+      }
+      for(int j = 0; a_skills[j].skillnum; j++) {
+         if(a_skills[j].skillnum == i) {
+            anti = j;
+            if(buf2[0] != '\0') strcat(buf2, ", ");
+            sprintf(buf3, "Ant(%d)", a_skills[j].levelavailable);
+            strcat(buf2, buf3);
+            break;
+         }
+      }
+      for(int j = 0; p_skills[j].skillnum; j++) {
+         if(p_skills[j].skillnum == i) {
+            pal = j;
+            if(buf2[0] != '\0') strcat(buf2, ", ");
+            sprintf(buf3, "Pal(%d)", p_skills[j].levelavailable);
+            strcat(buf2, buf3);
+            break;
+         }
+      }
+      for(int j = 0; r_skills[j].skillnum; j++) {
+         if(r_skills[j].skillnum == i) {
+            ranger = j;
+            if(buf2[0] != '\0') strcat(buf2, ", ");
+            sprintf(buf3, "Ran(%d)", r_skills[j].levelavailable);
+            strcat(buf2, buf3);
+            break;
+         }
+      }
+      for(int j = 0; u_skills[j].skillnum; j++) {
+         if(u_skills[j].skillnum == i) {
+            druid = j;
+            if(buf2[0] != '\0') strcat(buf2, ", ");
+            sprintf(buf3, "Dru(%d)", u_skills[j].levelavailable);
+            strcat(buf2, buf3);
+            break;
+         }
+      }
+      if(mage) {
+         sprintf(buf + strlen(buf), "$B$7Spell:$R %c%-20s  $B$7Reqs:$R %s (%s)  $B$7Mana:$R %-3d  $B$7Class:$R ",
+               UPPER(*m_skills[mage].skillname),m_skills[mage].skillname+1,attrname(m_skills[mage].attrs[0]),
+               attrname(m_skills[mage].attrs[1]),spell_info[mage].min_usesmana);
+      } else if(cleric) {
+         sprintf(buf + strlen(buf), "$B$7Spell:$R %c%-20s  $B$7Reqs:$R %s (%s)  $B$7Mana:$R %-3d  $B$7Class:$R ",
+               UPPER(*c_skills[cleric].skillname),c_skills[cleric].skillname+1,attrname(c_skills[cleric].attrs[0]),
+               attrname(c_skills[cleric].attrs[1]),spell_info[cleric].min_usesmana);
+      } else if(anti) {
+         sprintf(buf + strlen(buf), "$B$7Spell:$R %c%-20s  $B$7Reqs:$R %s (%s)  $B$7Mana:$R %-3d  $B$7Class:$R ",
+               UPPER(*a_skills[anti].skillname),a_skills[anti].skillname+1,attrname(a_skills[anti].attrs[0]),
+               attrname(a_skills[anti].attrs[1]),spell_info[anti].min_usesmana);
+      } else if(pal) {
+         sprintf(buf + strlen(buf), "$B$7Spell:$R %c%-20s  $B$7Reqs:$R %s (%s)  $B$7Mana:$R %-3d  $B$7Class:$R ",
+               UPPER(*p_skills[pal].skillname),p_skills[pal].skillname+1,attrname(p_skills[pal].attrs[0]),
+               attrname(p_skills[pal].attrs[1]),spell_info[pal].min_usesmana);
+      } else if(ranger) {
+         sprintf(buf + strlen(buf), "$B$7Spell:$R %c%-20s  $B$7Reqs:$R %s (%s)  $B$7Mana:$R %-3d  $B$7Class:$R ",
+               UPPER(*r_skills[ranger].skillname),r_skills[ranger].skillname+1,attrname(r_skills[ranger].attrs[0]),
+               attrname(r_skills[ranger].attrs[1]),spell_info[ranger].min_usesmana);
+      } else if(druid) {
+         sprintf(buf + strlen(buf), "$B$7Spell:$R %c%-20s  $B$7Reqs:$R %s (%s)  $B$7Mana:$R %-3d  $B$7Class:$R ",
+               UPPER(*u_skills[druid].skillname),u_skills[druid].skillname+1,attrname(u_skills[druid].attrs[0]),
+               attrname(u_skills[druid].attrs[1]),spell_info[druid].min_usesmana);
+      } else continue;
+
+      strcat(buf, buf2);
+      strcat(buf, "\n\r");
+   }
+
+   strcat(buf, "\n\r");
+   page_string(ch->desc, buf, 1);
+
+   return eSUCCESS;
 }
 
 int spl_lvl(int lev)
