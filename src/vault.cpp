@@ -1616,7 +1616,7 @@ int sleazy_vault_guy(struct char_data *ch, struct obj_data *obj, int cmd, char *
       if (!cvault)
         sprintf(buf, "$B3)$R Increase the size of your clan vault by 10 lbs: %s\r\n", ch->clan?"Your clan has no vault.":"You're not in a clan.");
       else if (cvault->size < VAULT_MAX_SIZE)
-        sprintf(buf, "$B3)$R Increase the size of your clan vault by 10 lbs: %s\r\n", has_right(ch, CLAN_RIGHTS_VAULT)?"20 platinum coins.":"You are not authorized to make this purchase.");
+        sprintf(buf, "$B3)$R Increase the size of your clan vault by 10 lbs: %s\r\n", has_right(ch, CLAN_RIGHTS_VAULT)?"200 platinum coins.":"You are not authorized to make this purchase.");
       else
         sprintf(buf, "$B3)$R Increase the size of your clan vault by 10 lbs: You cannot increase the vault's size further.\r\n");
       send_to_char(buf,ch);
