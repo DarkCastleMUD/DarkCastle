@@ -16,7 +16,7 @@ typedef int socket_t;
 #endif
 
 #define SMALL_BUFSIZE           1024
-#define LARGE_BUFSIZE           (12 * 2048)
+#define LARGE_BUFSIZE           (24 * 2048)
 #define GARBAGE_SPACE           32
 #define NUM_RESERVED_DESCS      8
 //#define OPT_USEC                250000  
