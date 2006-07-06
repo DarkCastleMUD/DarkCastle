@@ -108,6 +108,9 @@ void copySaveData(obj_data *new_obj, obj_data *obj)
   if (strcmp(GET_OBJ_SHORT(obj), GET_OBJ_SHORT(new_obj)))
     GET_OBJ_SHORT(new_obj) = str_hsh(GET_OBJ_SHORT(obj));
 
+  if (strcmp(obj->name, new_obj->name))
+    new_obj->name = str_hsh(obj->name);
+
   if (obj->obj_flags.extra_flags != new_obj->obj_flags.extra_flags)
 	new_obj->obj_flags.extra_flags = obj->obj_flags.extra_flags;
 
@@ -137,6 +140,9 @@ bool fullItemMatch(obj_data *obj, obj_data *obj2)
   if (strcmp(GET_OBJ_SHORT(obj), GET_OBJ_SHORT(obj2)))
     return 0;
   
+  if (strcmp(obj->name, obj2->name)) 
+    return 0;
+
   if (obj->obj_flags.extra_flags != obj2->obj_flags.extra_flags)
 	return 0;
 
