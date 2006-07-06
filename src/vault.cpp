@@ -71,6 +71,9 @@ bool fullSave(obj_data *obj)
   obj_data *tmp_obj = get_obj(GET_OBJ_VNUM(obj));
   if (strcmp(GET_OBJ_SHORT(obj), GET_OBJ_SHORT(tmp_obj)))
     return 1;
+
+  if (strcmp(obj->name, tmp_obj->name)) // GL. and stuff.
+    return 1;
   
   if (obj->obj_flags.extra_flags != tmp_obj->obj_flags.extra_flags)
 	return 1;
