@@ -204,13 +204,6 @@ void vault_access(CHAR_DATA *ch, char *who)
   struct vault_access_data *access;
   struct vault_data *vault;
 
-  if (!str_cmp(who, "clan") && ch->clan)
-  {
-    if (!(vault = has_vault(clanVName(ch->clan)))) {
-      send_to_char("Your clan does not seem to have a vault.\r\n", ch);
-      return;
-    }
-  }
   if (!vault && !(vault = has_vault(GET_NAME(ch)))) {
     send_to_char("You don't seem to have a vault.\r\n", ch);
     return;
