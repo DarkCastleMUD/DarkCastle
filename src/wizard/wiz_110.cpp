@@ -472,6 +472,9 @@ else
   }
   do_name(victim, " %", 9);
   send_to_char("Character now name %'d.\r\n", ch);
+  extern void rename_vault_owner(char *arg1, char *arg2);
+  rename_vault_owner(name, targetname);
+
   return eSUCCESS;
 }
 int do_install(struct char_data *ch, char *arg, int cmd)
