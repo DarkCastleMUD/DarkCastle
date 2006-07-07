@@ -204,7 +204,14 @@ void vault_access(CHAR_DATA *ch, char *who)
   struct vault_access_data *access;
   struct vault_data *vault;
 
-  if (!(vault = has_vault(GET_NAME(ch)))) {
+  if (!str_cmp(who, "clan") && ch->clan)
+  {
+    if (!(vault = has_vault(clanVName(ch->clan)))) {
+      send_to_char("Your clan does not seem to have a vault.\r\n", ch);
+      return;
+    }
+  }
+  if (!vault && !(vault = has_vault(GET_NAME(ch)))) {
     send_to_char("You don't seem to have a vault.\r\n", ch);
     return;
   }
@@ -403,7 +410,7 @@ void vault_stats(CHAR_DATA *ch, char *name) {
   for (vault = vault_table;vault;vault = vault->next, num++) {
     if (!num) continue; // skip 0 cause its null
 
-    if (*name && strncasecmp(vault->owner, name, strlen(name))) continue;
+    if (name && *name && vault->owner && strncasecmp(vault->owner, name, strlen(name))) continue;
     count++;
 
     for (item = vault->items; item; item = item->next) {
