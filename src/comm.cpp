@@ -181,6 +181,7 @@ void show_string(struct descriptor_data *d, char *input);
 int isbanned(char *hostname);
 void time_update();
 void weather_update();
+void send_hint();
 
 //extern char greetings1[MAX_STRING_LENGTH];
 //extern char greetings2[MAX_STRING_LENGTH];
@@ -1009,6 +1010,7 @@ void heartbeat()
     perform_violence();
     update_command_lag_and_poison();
     affect_update(PULSE_VIOLENCE);
+    if(!number(0,14)) send_hint();
   }
 
   if(--pulse_weather < 1)

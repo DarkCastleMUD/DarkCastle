@@ -35,6 +35,7 @@ extern "C"
 #include <act.h>
 #include <db.h>
 #include <returnvals.h>
+#include <fileinfo.h>
 
 extern CWorld world;
 extern struct descriptor_data *descriptor_list;
@@ -219,6 +220,7 @@ int do_channel(struct char_data *ch, char *arg, int cmd)
     "database",   
     "give",
     "tell",
+    "hints",
     "vault",   
  "\\@"
   };
@@ -259,12 +261,18 @@ int do_channel(struct char_data *ch, char *arg, int cmd)
        y = 0;
     sprintf(buf2, "%-9s%s\n\r", types[22], on_off[y]); 
     send_to_char(buf2, ch);
+    if(IS_SET(ch->misc, 1<<23))
+       y = 1;
+    else
+       y = 0;
+    sprintf(buf2, "%-9s%s\n\r", types[23], on_off[y]); 
+    send_to_char(buf2, ch);
 
     return eSUCCESS;
   }
 
-  for(x = 0; x <= 23; x++) {
-     if(x == 23) {
+  for(x = 0; x <= 24; x++) {
+     if(x == 24) {
        send_to_char("That type was not found.\n\r", ch);
        return eSUCCESS;
      }
@@ -547,4 +555,51 @@ int do_emote(struct char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
+#define MAX_HINTS 100
+char hints[MAX_HINTS][MAX_STRING_LENGTH];
 
+void load_hints()
+{
+   FILE *fl;
+   int num;
+   char *buf;
+
+   if(!(fl = dc_fopen(HINTS_FILE, "r"))) {
+      log("Error opening the hint file", IMMORTAL, LOG_MISC);
+      return;
+   }
+
+   while(fgetc(fl) != '$') {
+      num = fread_int(fl, 0, INT_MAX);
+      if(num > MAX_HINTS) {
+         log("Raise MAX_HINTS or something.", IMMORTAL, LOG_MISC);
+         break;
+      }
+      buf = fread_string(fl, 0);
+      strcpy(hints[num-1],buf);
+   }
+
+   dc_free(buf);
+
+   dc_fclose(fl);
+
+   return;
+}
+
+void send_hint()
+{
+   char hint[MAX_STRING_LENGTH];
+   struct descriptor_data *i;
+   int num = number(0, MAX_HINTS-1);
+
+   while(hints[num][0] == '\0') num = number(0, MAX_HINTS-1);
+   
+   sprintf(hint, "$B$5HINT:$7 %s$R\n\r", hints[num]);
+
+   for(i = descriptor_list;i;i = i->next) {
+      if(i->connected || !i->character || !i->character->desc || is_busy(i->character) || IS_NPC(i->character))continue;
+      if(IS_SET(i->character->misc, CHANNEL_HINTS)) send_to_char(hint, i->character);
+   }
+
+   return;
+}

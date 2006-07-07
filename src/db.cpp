@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.130 2006/07/04 22:22:19 dcastle Exp $ */
+/* $Id: db.cpp,v 1.131 2006/07/07 22:16:59 shane Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -67,6 +67,7 @@ void load_corpses(void);
 extern int fflush(FILE *);
 extern int _filbuf(FILE *);
 int count_hash_records(FILE * fl);
+void load_hints();
 
 /* load stuff */
 char* curr_type;
@@ -673,6 +674,10 @@ void boot_db(void)
 
     log ("Loading vaults.", 0, LOG_MISC);
     load_vaults();
+
+    log ("Loading player hints.", 0, LOG_MISC);
+    load_hints();
+
     mud_is_booting = FALSE;
 }
 
@@ -4723,6 +4728,7 @@ void reset_char(CHAR_DATA *ch)
   SET_BIT(ch->misc, CHANNEL_INFO);
   SET_BIT(ch->misc, CHANNEL_NEWBIE);
   SET_BIT(ch->misc, CHANNEL_TELL);
+  SET_BIT(ch->misc, CHANNEL_HINTS);
   ch->group_name = 0;
   ch->ambush = 0;
   ch->guarding = 0;

@@ -1,7 +1,7 @@
 #ifndef FILEINFO_H_
 #define FILEINFO_H_
 /*
-| $Id: fileinfo.h,v 1.17 2006/07/02 22:29:43 urizen Exp $
+| $Id: fileinfo.h,v 1.18 2006/07/07 22:17:02 shane Exp $
 | fileinfo.h
 | Description:  Contains information for loading files, ie "../lib", etc..
 */
@@ -105,5 +105,6 @@
 #define VAULT_INDEX_FILE     "../vaults/vaultindex"
 #define VAULT_INDEX_FILE_TMP "../vaults/vaultindex.tmp"
 
+#define HINTS_FILE           "playerhints.txt"
 
 #endif // FILEINFO_H_
