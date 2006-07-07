@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.h,v 1.56 2006/07/05 01:34:06 shane Exp $ */
+/* $Id: interp.h,v 1.57 2006/07/07 13:06:55 urizen Exp $ */
 
 #ifndef INTERP_H_
 #define INTERP_H_
@@ -152,6 +152,7 @@ DO_FUN  do_fighting;
 DO_FUN  do_fill;
 DO_FUN  do_find;
 DO_FUN  do_fire;
+DO_FUN  do_fixvault;
 DO_FUN  do_flee;
 /* DO_FUN  do_fly; */
 DO_FUN  do_focused_repelance;

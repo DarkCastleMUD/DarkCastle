@@ -479,6 +479,7 @@ int do_fixvault(char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
   rename_vault_owner(arg1, arg2);
+  return eSUCCESS;
 }
 
 void rename_vault_owner(char *oldname, char *newname) {
@@ -487,6 +488,9 @@ void rename_vault_owner(char *oldname, char *newname) {
   char buf[MAX_INPUT_LENGTH];
   int num = 0;
 
+  if ((vault = has_vault(newname))) {
+    remove_vault(newname); // free it up first..
+  }
   if ((vault = has_vault(oldname))) {
     free(vault->owner);
     vault->owner = str_dup(newname);
@@ -511,6 +515,7 @@ void rename_vault_owner(char *oldname, char *newname) {
 
   add_new_vault(newname, 1);
   reload_vaults();
+  remove_vault(oldname);
 }
 
 void remove_vault(char *name) {
