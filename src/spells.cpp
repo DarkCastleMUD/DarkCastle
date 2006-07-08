@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.178 2006/07/05 01:34:02 shane Exp $ */
+/* $Id: spells.cpp,v 1.179 2006/07/08 18:58:55 urizen Exp $ */
 
 extern "C"
 {
@@ -1888,7 +1888,7 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
 	if (o > 101) o = 101; // imms/mobs
         if ((float)((float)chance/(float)o) < 0.4) chance = (int)(o*0.4);
 	if (GET_LEVEL(ch) == 1) chance++;
-        if(IS_AFFECTED(ch, AFF_CRIPPLE))
+        if(IS_AFFECTED(ch, AFF_CRIPPLE) && affected_by_spell(ch, SKILL_CRIPPLE))
            chance -= 1 + affected_by_spell(ch, SKILL_CRIPPLE)->modifier/10;
         if(GET_LEVEL(ch) < IMMORTAL && number(1,o) > chance && !IS_AFFECTED(ch,AFF_FOCUS))
         {
