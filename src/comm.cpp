@@ -379,10 +379,7 @@ int write_hotboot_file()
   }
   fclose(fp);
   log("Hotboot descriptor file successfully written.", 0, LOG_MISC);
-
-    
-  fprintf(stderr, "%s\n", getcwd(NULL, 0));
-
+  
   // note, for debug mode, you have to put the "-c", "6969", in there
   if (!bport) {
     if(-1 == execl("../src/research1", "research1",(char*)NULL)) {
