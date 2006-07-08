@@ -30,6 +30,9 @@ extern "C"
 #include <MobActivity.h>
 
 extern CWorld world;
+extern zone_data *zone_table;
+
+
 class Path *mPathList = NULL;
 
 
@@ -96,7 +99,7 @@ char *Path::determineRoute(char_data *ch, int from, int to)
 void Path::resetPath()
 {
   for( map<int, int>::iterator iter = begin(); iter != end(); iter++ )
-    (*iter).second = 0;
+    (*iter).second = 1000;
 }
 
 extern const char *dirs[];
@@ -105,9 +108,9 @@ extern int rev_dir[];
 bool Path::findRoom(int from, int to, int steps, int leastSteps, char *buf)
 {
   if (steps > leastSteps) return FALSE;
-  if ((*this)[from] > 0) return FALSE; // already checked this room, circly paths
+  if ((*this)[from] <= steps) return FALSE; // already checked this room, circly paths
 
-  (*this)[from] = 1;
+  (*this)[from] = steps;
 
   for (int i = 0; i < MAX_DIRS; i++)
   {
@@ -128,19 +131,20 @@ bool Path::findRoom(int from, int to, int steps, int leastSteps, char *buf)
 
 int Path::leastSteps(int from, int to, int val, int *bestval)
 {
-  (*this)[from] = 1;
+  if (val > (*this)[from]) return *bestval; // Already been here.
+  (*this)[from] = val;
+  
   for (int i = 0; i < MAX_DIRS; i++)
   {
     if (!world[from].dir_option[i]) continue;
     if (world[from].dir_option[i]->to_room < 0) continue;
     if (!isRoomPathed(world[from].dir_option[i]->to_room)) continue;
-    if ((*this)[world[from].dir_option[i]->to_room] > 0) continue; // already checked
 
     if (world[from].dir_option[i]->to_room == to) 
 	{
 	   if (val < *bestval) *bestval = val;
-	   return val;
-	}
+  	   return val;
+	} else
     leastSteps(world[from].dir_option[i]->to_room, to, val+1, bestval);
   }
   return *bestval;
@@ -209,11 +213,55 @@ int do_newPath(char_data *ch, char *argument, int cmd)
 	send_to_char("Syntax: newPath <name of path>\r\nNote that the room you are currently in will automatically be added to the path.\r\n",ch);
 	return eFAILURE;
   }
-  class Path *p = new Path;
+  class Path *p;
+  for (p = mPathList; p; p = p->next)
+    if (!str_cmp(p->name, arg1))
+     break;
+  if (p)
+  {
+	send_to_char("That path already exists.\r\n",ch);
+	return eFAILURE;
+  }
+  p = new Path;
   p->name = str_dup(arg1);
   p->addRoom(ch, ch->in_room, TRUE);
   p->next = mPathList;
   mPathList = p;
+  return eSUCCESS;
+}
+
+int do_listPathsByZone(char_data *ch, char *argument, int cmd)
+{
+  int i = world[ch->in_room].zone, low = zone_table[i].bottom_rnum, high = zone_table[i].top_rnum;
+
+  class Path *p;
+  bool found = FALSE;
+  for (p = mPathList; p; p = p->next)
+    for( map<int, int>::iterator iter = p->begin(); iter != p->end(); iter++ )
+	if ((*iter).first >= low && (*iter).first <= high)
+	{
+	  csendf(ch, "Path '%s' connects to this zone.\r\n",p->name);
+	  found = TRUE;
+	  break;
+	}
+  if (!found)
+    send_to_char("No paths connecting to this zone has been found.\r\n",ch);
+
+  return eSUCCESS;
+}
+
+int do_listAllPaths(char_data *ch, char *argument, int cmd)
+{
+  class Path *p;
+  bool found = FALSE;
+  for (p = mPathList; p; p = p->next)
+  {
+    csendf(ch, "Path '%s'.\r\n",p->name);
+    found = TRUE;
+  }
+  if (!found)
+    send_to_char("No paths found.\r\n",ch);
+
   return eSUCCESS;
 }
 
