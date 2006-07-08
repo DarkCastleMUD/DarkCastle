@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.131 2006/07/07 22:16:59 shane Exp $ */
+/* $Id: db.cpp,v 1.132 2006/07/08 13:19:42 urizen Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -1421,6 +1421,7 @@ int read_one_room(FILE *fl, int & room_nr)
 
     world_array[room_nr] = (room_data *) calloc(1, sizeof(room_data));
 
+    world[room_nr].paths = 0;
     world[room_nr].number      = room_nr;
     world[room_nr].name        = temp;
     world[room_nr].description = fread_string (fl, 0);
