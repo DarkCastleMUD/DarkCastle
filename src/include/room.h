@@ -1,13 +1,14 @@
 #ifndef __ROOM_H__
 #define __ROOM_H__
 /************************************************************************
-| $Id: room.h,v 1.14 2006/04/25 10:36:13 dcastle Exp $
+| $Id: room.h,v 1.15 2006/07/08 13:18:40 urizen Exp $
 | room.h
 | Description:  This file contains all of the room header file/constant
 |   information.  It also contains information about the 'world' structs.
 */
 #include <structs.h> // ubyte
 #include <obj.h> // ubyte
+#include <MobActivity.h> // struct path_data
 
 // The following defs are for room_data
 
@@ -146,6 +147,7 @@ struct room_data
     room_track_data * TrackItem(int nIndex);
     void              FreeTracks();
     int 	      iFlags; // Internal flags. These do NOT save.
+    struct path_data *paths;
 };
 
 #endif // __ROOM_H__
