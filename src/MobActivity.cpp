@@ -29,12 +29,16 @@ extern "C"
 #include <fileinfo.h>
 #include <MobActivity.h>
 
+// Externs
 extern CWorld world;
 extern zone_data *zone_table;
 
 
+// Locals
 class Path *mPathList = NULL;
 
+
+/* PATHFINDING */
 
 struct path_data *newPath()
 {
@@ -150,11 +154,11 @@ int Path::leastSteps(int from, int to, int val, int *bestval)
   return *bestval;
 }
 
-bool Path::isPathConnected(struct path_data *pa)
+bool Path::isPathConnected(class Path *pa)
 {
   struct path_data *t;
   for (t = p; t; t = t->next)
-     if (t->p == pa->p) return TRUE;
+     if (t->p == pa) return TRUE;
 
   return FALSE;
 }
@@ -178,23 +182,40 @@ void Path::addRoom(char_data *ch, int room, bool IgnoreConnectingIssues)
      return;
   }
   struct path_data *pa;
+
   if (world[room].paths)
   {
      struct path_data *t;
-     for (pa = world[room].paths; pa; pa = p->next)
+     for (pa = world[room].paths; pa; pa = pa->next)
      {
-	if (isPathConnected(pa))
+	if (isPathConnected(pa->p))
 	{
-		pa->num++;
-		continue;
+	  struct path_data *t;
+	  for (t = this->p; t; t = t->next)
+	   if (t->p == pa->p) t->num++;
+	} else {
+  	  t = newPath();
+	  t->p = pa->p;
+	  t->num = 1;
+	  t->next = p;
+	  p = t;
 	}
-	t = newPath();
-	t->p = pa->p;
-	t->num = 1;
-	t->next = p;
-	p = t;
+	
+	if (pa->p->isPathConnected(this))
+	{
+	  struct path_data *t;
+	  for (t = pa->p->p; t; t = t->next)
+	   if (t->p == this) t->num++;
+	} else {
+  	  t = newPath();
+	  t->p = this;
+	  t->num = 1;
+	  t->next = pa->p->p;
+	  pa->p->p = t;
+	}
      }
   }
+
   pa = newPath();
   pa->p = this;
   pa->next = world[room].paths;
@@ -241,6 +262,10 @@ int do_listPathsByZone(char_data *ch, char *argument, int cmd)
 	if ((*iter).first >= low && (*iter).first <= high)
 	{
 	  csendf(ch, "Path '%s' connects to this zone.\r\n",p->name);
+	    struct path_data *pa;
+	    for (pa = p->p; pa; pa = pa->next)
+		csendf(ch, " --- Path '%s' connects to that path in %d places.\r\n",
+			pa->p->name, pa->num);
 	  found = TRUE;
 	  break;
 	}
@@ -257,7 +282,12 @@ int do_listAllPaths(char_data *ch, char *argument, int cmd)
   for (p = mPathList; p; p = p->next)
   {
     csendf(ch, "Path '%s'.\r\n",p->name);
+    struct path_data *pa;
+    for (pa = p->p; pa; pa = pa->next)
+	csendf(ch, " --- Path '%s' connects to that path in %d places.\r\n",
+		pa->p->name, pa->num);
     found = TRUE;
+
   }
   if (!found)
     send_to_char("No paths found.\r\n",ch);
@@ -307,14 +337,232 @@ int do_findPath(char_data *ch, char *argument, int cmd)
   }
   int start, end;
   argument = one_argument(argument, arg1);
+
   if (!arg1[0] || !is_number(arg1)) {do_findPath(ch, "", 9); return eFAILURE; }
   start = atoi(arg1);
   argument = one_argument(argument, arg1);
+
   if (!arg1[0] || !is_number(arg1)) {do_findPath(ch, "", 9); return eFAILURE; }
   end = atoi(arg1);
   char *path = p->determineRoute(ch, start, end);
-  if (!path) return eFAILURE;
 
+  if (!path) return eFAILURE;
 
   return eSUCCESS;
 }
+
+int leastPathSteps(class Path *goal, class Path *at, int steps, int *beststeps)
+{
+ if (at->s < steps) return *beststeps; // bad
+ if (steps > *beststeps) return *beststeps;
+ // Determine path
+ at->s = steps;
+ struct path_data *pt;
+ for (pt = at->p; pt; pt = pt->next)
+ {
+    if (pt->p == goal)
+    {
+      *beststeps = steps;
+      return steps;
+    }
+    leastPathSteps(goal, pt->p, steps+1, beststeps);
+ }
+}
+
+bool determinePath(class Path *goal, class Path *at, int beststeps, int steps, class Path **end)
+{
+ if (at->s < steps) return FALSE;
+ if (steps > beststeps) return FALSE;
+ // Determine path
+ at->s = steps;
+ struct path_data *pt;
+ for (pt = at->p; pt; pt = pt->next)
+ {
+    if (pt->p == goal)
+    {
+     *end = at;
+     *(&end[1]) = goal;
+      return TRUE;
+    }
+    if (determinePath(goal, pt->p, beststeps, steps+1, &end[1]))
+    {  *end = at; return TRUE; }
+ }
+ return FALSE;
+}
+
+
+int do_pathpath(char_data *ch, char *argument, int cmd)
+{
+  char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+  argument = one_argument(argument, arg1);
+  argument = one_argument(argument, arg2);
+  class Path *pt = NULL, *pt2 = NULL;
+  for (pt = mPathList;pt;pt = pt->next)
+    if (!str_cmp(pt->name, arg1)) break;
+
+  for (pt2 = mPathList;pt2;pt2 = pt2->next)
+    if (!str_cmp(pt2->name, arg2)) break;
+  if (!pt || !pt2)
+  {
+    send_to_char("Missing path.\r\n",ch);
+    return eFAILURE;
+  }
+  class Path *pa;
+  for (pa = mPathList; pa; pa = pa->next)
+    pa->s = 1000;
+
+ // Find the least # of steps needed
+  int i = 1000;
+  leastPathSteps(pt, pt2, 1, &i);
+
+  csendf(ch, "Least # of steps: %d\r\n", i);
+
+  if (i >= 50)
+  {
+    send_to_char("Crazy #. Stopping.\r\n",ch);
+    return eFAILURE;
+  }
+
+  class Path *p[50]; // Maximum of 50 pathsteps atm
+  for (int z = 0; z < 50; z++) 
+    p[z] = 0;
+  for (pa = mPathList; pa; pa = pa->next)
+    pa->s = 1000;
+
+  determinePath(pt, pt2, i, 1, &p[0]);
+  for (int z = 0; p[z]; z++) 
+  {
+	csendf(ch, "%s -- \r\n",p[z]->name);
+  }
+  return eSUCCESS;
+}
+
+
+int find_closest_path(int from, int steps, char *buf, map<int,int> z)
+{
+  if (steps > 5) return 0;
+
+  z[from] = steps;
+  int zenew;
+
+  for (int i = 0; i < MAX_DIRS; i++)
+  {
+    if (!world[from].dir_option[i]) continue;
+    if (world[from].dir_option[i]->to_room < 0) continue;
+    if (z[world[from].dir_option[i]->to_room] <= steps
+	&& z[world[from].dir_option[i]->to_room] != 0) continue;
+
+    if (world[world[from].dir_option[i]->to_room].paths)
+    {
+	   *buf = *dirs[i];
+	   *(buf+1) = '\0';
+	   return world[from].dir_option[i]->to_room;
+    }
+    if ((zenew = find_closest_path(world[from].dir_option[i]->to_room, steps+1, buf+1, z)) != 0)
+    {
+	*buf = *dirs[i];
+	return zenew;
+    }
+  }
+  return 0;
+}
+
+int Path::connectRoom(class Path *z)
+{
+  struct path_data *pa;
+
+  for( map<int, int>::iterator iter = this->begin(); iter != this->end(); iter++ )
+    for (pa = world[(*iter).first].paths; pa; pa = pa->next)
+	if (pa->p == z) return (*iter).first;
+
+  return 0;
+}
+
+
+char *findPath(int from, int to, char_data *ch = NULL)
+{
+  char buf[MAX_STRING_LENGTH];
+  char endbuf[MAX_STRING_LENGTH];
+  endbuf[0] = buf[0] = '\0';
+  class Path *start,*stop;  
+  if (world[from].paths)
+  {
+     csendf(ch, "Starting from path %s.\r\n", world[from].paths->p->name);
+  } 
+  else 
+  {
+    map<int,int> z; 
+    from = find_closest_path(from, 1, &buf[0], z);
+    if (from && world[from].paths)
+    csendf(ch, "Starting from path %s.\r\n", world[from].paths->p->name);
+  }
+  strcat(endbuf, buf);
+  start = world[from].paths->p;
+  if (world[to].paths)
+  {
+     csendf(ch, "Ending in path %s.\r\n", world[from].paths->p->name);
+  } 
+  else 
+  {
+    map<int,int> z; 
+    from = find_closest_path(to, 1, &buf[0], z);
+    if (to && world[to].paths)
+    csendf(ch, "Ending in path %s.\r\n", world[to].paths->p->name);
+  }
+  stop = world[to].paths->p;
+  if (!start || !stop)
+    return "Invalid path";
+
+  class Path *pa;
+  for (pa = mPathList; pa; pa = pa->next)
+    pa->s = 1000;
+
+ // Find the least # of steps needed
+  int i = 1000;
+  leastPathSteps(start, stop, 1, &i);
+
+  csendf(ch, "Least # of steps: %d\r\n", i);
+
+  if (i >= 50)
+  {
+    send_to_char("Crazy #. Stopping.\r\n",ch);
+    return "Crazy #";
+  }
+
+  class Path *p[50]; // Maximum of 50 pathsteps atm
+  for (int z = 0; z < 50; z++) 
+    p[z] = 0;
+  for (pa = mPathList; pa; pa = pa->next)
+    pa->s = 1000;
+
+  determinePath(start, stop, i, 1, &p[0]);
+  int endto = to;
+  for (int z = 49; z >= 0; z--) 
+  {
+	if (!p[z]) continue;
+	csendf(ch, "%s -- \r\n",p[z]->name);
+	if (z>0 && p[z-1])
+  	  to = p[z]->connectRoom(p[z-1]);
+        else to = endto;
+	strcat(endbuf, p[z]->determineRoute(ch, from, to));
+	from = to;
+//	char *Path::determineRoute(char_data *ch, int from, int to)
+        
+  }
+  return &endbuf[0];
+  
+}
+
+int do_findpath(char_data *ch, char *argument, int cmd)
+{
+  char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+  argument = one_argument(argument, arg1);
+  argument = one_argument(argument, arg2);
+  int i = atoi(arg1), z = atoi(arg2);
+  if (!i || !z) { send_to_char("BLeh!\r\n",ch); return eFAILURE; }
+  char *t =  findPath(i, z, ch);
+  csendf(ch, "Final Path: %s\r\n",t);
+  return eSUCCESS;
+}
+
+/* END PATHFINDING */
