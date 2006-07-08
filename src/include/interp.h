@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.h,v 1.59 2006/07/08 14:23:03 urizen Exp $ */
+/* $Id: interp.h,v 1.60 2006/07/08 18:57:45 urizen Exp $ */
 
 #ifndef INTERP_H_
 #define INTERP_H_
@@ -152,6 +152,7 @@ DO_FUN  do_ferocity;
 DO_FUN  do_fighting;
 DO_FUN  do_fill;
 DO_FUN  do_find;
+DO_FUN  do_findpath;
 DO_FUN  do_findPath;
 DO_FUN  do_fire;
 DO_FUN  do_fixvault;
@@ -280,6 +281,7 @@ DO_FUN  do_osave;
 DO_FUN  do_outcast;
 DO_FUN  do_pager;
 DO_FUN  do_pardon;
+DO_FUN  do_pathpath;
 DO_FUN  do_peace;
 DO_FUN  do_pick;
 DO_FUN  do_plats;
