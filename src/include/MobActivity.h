@@ -32,9 +32,11 @@ class Path : public map<int, int>
     
     bool isRoomPathed(int room);
     bool isRoomConnected(int room);
-    bool isPathConnected(struct path_data *pa);
+    bool isPathConnected(class Path *pa);
+    int connectRoom(class Path *);
     struct path_data *p;
     char *name;
+    int s;
     Path() { p = 0; name = 0; }
 };
 
