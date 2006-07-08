@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.75 2006/06/14 05:49:55 shane Exp $ */
+/* $Id: limits.cpp,v 1.76 2006/07/08 18:56:03 urizen Exp $ */
 
 extern "C"
 {
@@ -252,7 +252,7 @@ int hit_gain(CHAR_DATA *ch, int position)
   if((GET_COND(ch, FULL)==0) || (GET_COND(ch, THIRST)==0))
     gain >>= 2;
   gain /= 4;
-  gain -= MIN(age(ch).year,100) / 10;
+//  gain -= MIN(age(ch).year,100) / 10;
 
   gain /= divisor;
   if (ch->hit_regen > 0)
