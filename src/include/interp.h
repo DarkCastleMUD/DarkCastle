@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.h,v 1.58 2006/07/08 13:20:42 urizen Exp $ */
+/* $Id: interp.h,v 1.59 2006/07/08 14:23:03 urizen Exp $ */
 
 #ifndef INTERP_H_
 #define INTERP_H_
@@ -214,6 +214,8 @@ DO_FUN  do_levels;
 DO_FUN  do_lfg_toggle;
 DO_FUN  do_linkdead;
 DO_FUN  do_linkload;
+DO_FUN  do_listAllPaths;
+DO_FUN  do_listPathsByZone;
 DO_FUN  do_listproc;
 DO_FUN  do_load;
 DO_FUN  do_medit;
