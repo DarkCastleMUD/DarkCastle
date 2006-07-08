@@ -85,7 +85,7 @@ int try_to_hotboot_on_crash = 0;
 int was_hotboot = 0;
 int died_from_sigsegv = 0;
 
-char ** ext_argv = 0;
+//char ** ext_argv = 0;
 
 /* these are here for the eventual addition of ban */
 int num_invalid = 0;
@@ -214,7 +214,7 @@ int main(int argc, char **argv)
   port2 = DFLT_PORT2;
   port3 = DFLT_PORT3;
   port4 = DFLT_PORT4;
-  ext_argv = argv;
+  //  ext_argv = argv;
 
   while ((pos < argc) && (*(argv[pos]) == '-')) {
     switch (*(argv[pos] + 1)) {
@@ -327,7 +327,7 @@ int write_hotboot_file()
   extern int other_desc;
   extern int third_desc;
   */
-  extern char ** ext_argv;
+  //  extern char ** ext_argv;
 
   if ((fp=fopen("hotboot","w"))==NULL) {   
     log("Hotboot failed, unable to open hotboot file.", 0, LOG_MISC);
@@ -381,18 +381,20 @@ int write_hotboot_file()
   log("Hotboot descriptor file successfully written.", 0, LOG_MISC);
 
     
+  fprintf(stderr, "%s\n", getcwd(NULL, 0));
+
   // note, for debug mode, you have to put the "-c", "6969", in there
   if (!bport) {
     if(-1 == execl("../src/research1", "research1",(char*)NULL)) {
-    perror("Hotboot execv call failed.");
-    perror(ext_argv[0]);
+    log("Hotboot execv call failed.", 0, LOG_MISC);
+    perror("../src/research1");
     unlink("hotboot"); // wipe the file since we can't use it anyway
     return 0;
   } } 
   else {
     if(-1 == execl("../src/research1.b", "research1.b","-b", (char *)NULL)) {
-    perror("Hotboot execv call failed.");
-    perror(ext_argv[0]);
+    log("Hotboot execv call failed.", 0, LOG_MISC);
+    perror("../src/research1.b");
     unlink("hotboot"); // wipe the file since we can't use it anyway
     return 0;
   } } 
