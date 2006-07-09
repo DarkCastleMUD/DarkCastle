@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: non_off.cpp,v 1.38 2006/06/27 19:18:59 shane Exp $
+| $Id: non_off.cpp,v 1.39 2006/07/09 23:14:16 apocalypse Exp $
 | non_off.C
 | Description:  Implementation of generic, non-offensive commands.
 */
@@ -293,89 +293,89 @@ int do_toggle(struct char_data * ch, char * arg, int cmd)
        switch(x) {
          case 0:
 	 sprintf(buf + strlen(buf), "%s\n\r",
-	   IS_SET(ch->pcdata->toggles, PLR_BRIEF) ? "on" : "off");
+	   IS_SET(ch->pcdata->toggles, PLR_BRIEF) ? "$B$2on$R" : "$B$4off$R");
 	 break;
 	 
          case 1:
 	 sprintf(buf + strlen(buf), "%s\n\r",
-	   IS_SET(ch->pcdata->toggles, PLR_COMPACT) ? "on" : "off");
+	   IS_SET(ch->pcdata->toggles, PLR_COMPACT) ? "$B$2on$R" : "$B$4off$R");
 	 break;
 	 
          case 2:
 	 sprintf(buf + strlen(buf), "%s\n\r",
-	   IS_SET(ch->pcdata->toggles, PLR_BEEP) ? "on" : "off");
+	   IS_SET(ch->pcdata->toggles, PLR_BEEP) ? "$B$2on$R" : "$B$4off$R");
 	 break;
 	 
          case 3:
 	 sprintf(buf + strlen(buf), "%s\n\r",
-           IS_SET(ch->pcdata->toggles, PLR_ANONYMOUS) ? "on" : "off");
+           IS_SET(ch->pcdata->toggles, PLR_ANONYMOUS) ? "$B$2on$R" : "$B$4off$R");
 	 break;
 	 
          case 4:
 	 sprintf(buf + strlen(buf), "%s\n\r",
-	   IS_SET(ch->pcdata->toggles, PLR_ANSI) ? "on" : "off");
+	   IS_SET(ch->pcdata->toggles, PLR_ANSI) ? "$B$2on$R" : "$B$4off$R");
 	 break;
 	 
          case 5:
 	 sprintf(buf + strlen(buf), "%s\n\r",
-	   IS_SET(ch->pcdata->toggles, PLR_VT100) ? "on" : "off");
+	   IS_SET(ch->pcdata->toggles, PLR_VT100) ? "$B$2on$R" : "$B$4off$R");
 	 break;
 	 
          case 6:
 	 sprintf(buf + strlen(buf), "%s\n\r",
-	   IS_SET(ch->pcdata->toggles, PLR_WIMPY) ? "on" : "off");
+	   IS_SET(ch->pcdata->toggles, PLR_WIMPY) ? "$B$2on$R" : "$B$4off$R");
 	 break;
 	 
          case 7:
 	 sprintf(buf + strlen(buf), "%s\n\r",
-	   IS_SET(ch->pcdata->toggles, PLR_PAGER) ? "on" : "off");
+	   IS_SET(ch->pcdata->toggles, PLR_PAGER) ? "$B$2on$R" : "$B$4off$R");
 	 break;
 	 
          case 8:
 	if (GET_CLASS(ch) == CLASS_BARD)
 	 sprintf(buf + strlen(buf), "%s\n\r",
-	   IS_SET(ch->pcdata->toggles, PLR_BARD_SONG) ? "on" : "off");
+	   IS_SET(ch->pcdata->toggles, PLR_BARD_SONG) ? "$B$2on$R" : "$B$4off$R");
 	 break;
 	 
          case 9:
 	 sprintf(buf + strlen(buf), "%s\n\r",
-	   IS_SET(ch->pcdata->toggles, PLR_AUTOEAT) ? "on" : "off");
+	   IS_SET(ch->pcdata->toggles, PLR_AUTOEAT) ? "$B$2on$R" : "$B$4off$R");
 	 break;
 	 
          case 10:
 	 sprintf(buf + strlen(buf), "%s\n\r",
-	   IS_SET(ch->pcdata->toggles, PLR_SUMMONABLE) ? "on" : "off");
+	   IS_SET(ch->pcdata->toggles, PLR_SUMMONABLE) ? "$B$2on$R" : "$B$4off$R");
 	 break;
 	 
          case 11:
 	 sprintf(buf + strlen(buf), "%s\n\r",
-	   IS_SET(ch->pcdata->toggles, PLR_LFG) ? "on" : "off");
+	   IS_SET(ch->pcdata->toggles, PLR_LFG) ? "$B$2on$R" : "$B$4off$R");
 	 break;
 	 
          case 12:
 	 sprintf(buf + strlen(buf), "%s\n\r",
-	   IS_SET(ch->pcdata->toggles, PLR_CHARMIEJOIN) ? "on" : "off");
+	   IS_SET(ch->pcdata->toggles, PLR_CHARMIEJOIN) ? "$B$2on$R" : "$B$4off$R");
 	 break;
          case 13:
          sprintf(buf + strlen(buf), "%s\n\r",
-           IS_SET(ch->pcdata->toggles, PLR_NOTAX) ? "on" : "off");
+           IS_SET(ch->pcdata->toggles, PLR_NOTAX) ? "$B$2on$R" : "$B$4off$R");
          break;
          case 14:
 	if (IS_SET(ch->pcdata->toggles, PLR_GUIDE))
          sprintf(buf + strlen(buf), "%s\n\r",
-           IS_SET(ch->pcdata->toggles, PLR_GUIDE_TOG) ? "on" : "off");
+           IS_SET(ch->pcdata->toggles, PLR_GUIDE_TOG) ? "$B$2on$R" : $B$4"off$R");
          break;
          case 15:
          sprintf(buf + strlen(buf), "%s\n\r",
-           IS_SET(ch->pcdata->toggles, PLR_NEWS) ? "on" : "off");
+           IS_SET(ch->pcdata->toggles, PLR_NEWS) ? "$B$2on$R" : "$B$4off$R");
 	break;
          case 16:
          sprintf(buf + strlen(buf), "%s\n\r",
-           IS_SET(ch->pcdata->toggles, PLR_ASCII) ? "off" : "on");
+           IS_SET(ch->pcdata->toggles, PLR_ASCII) ? "$B$4off$R" : "$B$2on$R");
          break;
          case 17:
          sprintf(buf + strlen(buf), "%s\n\r",
-           IS_SET(ch->pcdata->toggles, PLR_DAMAGE) ? "on" : "off");
+           IS_SET(ch->pcdata->toggles, PLR_DAMAGE) ? "$B$2on$R" : "$B$4off$R");
          break;
 
 

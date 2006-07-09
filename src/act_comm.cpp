@@ -192,8 +192,8 @@ int do_channel(struct char_data *ch, char *arg, int cmd)
   char buf2[200];
  
   char *on_off[] = {
-    "off",
-    "on"
+    "$B$4off$R",
+    "$B$2on$R"
   };
 
   char *types[] = {
@@ -291,12 +291,12 @@ int do_channel(struct char_data *ch, char *arg, int cmd)
     return eSUCCESS;
   }
   if(IS_SET(ch->misc, (1<<x))) {
-    sprintf(buf, "%s channel turned OFF.\n\r", types[x]);
+    sprintf(buf, "%s channel turned $B$4OFF$R.\n\r", types[x]);
     send_to_char(buf, ch);
     REMOVE_BIT(ch->misc, (1<<x));
   }
   else {
-    sprintf(buf, "%s channel turned ON.\n\r", types[x]);
+    sprintf(buf, "%s channel turned $B$2ON$R.\n\r", types[x]);
     send_to_char(buf, ch);
     SET_BIT(ch->misc, (1<<x));
   }
