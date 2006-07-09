@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.135 2006/06/28 22:11:15 dcastle Exp $
+| $Id: cl_thief.cpp,v 1.136 2006/07/09 22:03:56 urizen Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -35,6 +35,12 @@ int find_door(CHAR_DATA *ch, char *type, char *dir);
 struct obj_data * search_char_for_item(char_data * ch, int16 item_number, bool wearonly = FALSE);
 
 int get_weapon_damage_type(struct obj_data * wielded);
+
+
+
+extern int check_autojoiners(CHAR_DATA *ch, int skill = 0);
+extern int check_joincharmie(CHAR_DATA *ch, int skill = 0);
+
 
 int palm(CHAR_DATA *ch, struct obj_data *obj_object,
           struct obj_data *sub_object)
@@ -281,7 +287,15 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
 
      }
   }
-  return eSUCCESS;
+  if (!SOMEONE_DIED(retval)) {
+    SET_BIT(retval, check_autojoiners(ch,1));
+    if (!SOMEONE_DIED(retval))
+
+    if (IS_AFFECTED(ch, AFF_CHARM)) SET_BIT(retval, check_joincharmie(ch,1));
+    if (SOMEONE_DIED(retval)) return retval;
+  }
+
+  return retval;
 }
 
 int do_circle(CHAR_DATA *ch, char *argument, int cmd)
@@ -362,7 +376,7 @@ int do_circle(CHAR_DATA *ch, char *argument, int cmd)
    blackjack?WAIT_STATE(ch, PULSE_VIOLENCE*3):WAIT_STATE(ch, PULSE_VIOLENCE * 2);
    
    if (AWAKE(victim) && !skill_success(ch,victim,SKILL_CIRCLE))
-      return blackjack?damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_BLACKJACK, FIRST):damage(ch, victim, 0,TYPE_UNDEFINED, SKILL_BACKSTAB, FIRST);
+      retval = blackjack? damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_BLACKJACK, FIRST): damage(ch, victim, 0,TYPE_UNDEFINED,  SKILL_BACKSTAB, FIRST);
    else 
    {
       SET_BIT(ch->combat, COMBAT_CIRCLE);
@@ -370,7 +384,7 @@ int do_circle(CHAR_DATA *ch, char *argument, int cmd)
 
       if(SOMEONE_DIED(retval))
         return retval;
-    }
+
       // Now go for dual backstab
       if (has_skill(ch, SKILL_DUAL_BACKSTAB) && !blackjack &&
           ((GET_CLASS(ch) == CLASS_THIEF) || (GET_LEVEL(ch) >= ARCHANGEL)))
@@ -380,15 +394,24 @@ int do_circle(CHAR_DATA *ch, char *argument, int cmd)
 	               WAIT_STATE(ch, PULSE_VIOLENCE);
 
                if (AWAKE(victim) && !skill_success(ch,victim,SKILL_DUAL_BACKSTAB))
-                  damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_BACKSTAB,
+                  retval = damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_BACKSTAB,
                          SECOND);
                else {
                   SET_BIT(ch->combat, COMBAT_CIRCLE);
-                  return one_hit(ch, victim, SKILL_BACKSTAB, SECOND);
+                  retval = one_hit(ch, victim, SKILL_BACKSTAB, SECOND);
                   }
                } // end of if that checks weapon's validity
    //} // end of else
-   return eSUCCESS;
+    }
+
+  if (!SOMEONE_DIED(retval)) {
+    SET_BIT(retval, check_autojoiners(ch,1));
+    if (!SOMEONE_DIED(retval))
+    if (IS_AFFECTED(ch, AFF_CHARM)) SET_BIT(retval, check_joincharmie(ch,1));
+    if (SOMEONE_DIED(retval)) return retval;
+  }
+
+   return retval;
 }
 
 int do_trip(CHAR_DATA *ch, char *argument, int cmd)
