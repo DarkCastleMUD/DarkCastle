@@ -483,6 +483,7 @@ int pass_quest(CHAR_DATA *ch, struct quest_info *quest)
    int count = 0;
 
    if(!quest) return eFAILURE;
+   if(!check_quest_current(ch, quest->number)) return eFAILURE;
 
    while(count < QUEST_PASS) {
       if(!ch->pcdata->quest_pass[count])
@@ -490,6 +491,7 @@ int pass_quest(CHAR_DATA *ch, struct quest_info *quest)
       count++;
       if(count >= QUEST_PASS) return eEXTRA_VALUE;
    }
+
    ch->pcdata->quest_pass[count] = quest->number;
 
    return stop_current_quest(ch, quest);
@@ -687,7 +689,8 @@ int quest_handler(CHAR_DATA *ch, CHAR_DATA *qmaster, int cmd, char *name)
 
 int quest_master(CHAR_DATA *ch, OBJ_DATA *obj, int cmd, char *arg, CHAR_DATA *owner)
 {
-
+   int choice;
+   char buf[MAX_STRING_LENGTH];
 
    if((cmd != 59) && (cmd != 56))
       return eFAILURE;
@@ -700,7 +703,8 @@ int quest_master(CHAR_DATA *ch, OBJ_DATA *obj, int cmd, char *arg, CHAR_DATA *ow
 
 
    if(cmd == 59) {
-      send_to_char("The Quest Master tells you, 'Here is what I can do for you.'\n\r", ch);
+      sprintf(buf, "%s Here is what I can do for you.", GET_NAME(ch));
+      do_tell(owner, buf, 9);
       csendf(ch, "1) something\n\r"
                  "2) something else\n\r"
                  "3) something fun\n\r"
@@ -708,14 +712,22 @@ int quest_master(CHAR_DATA *ch, OBJ_DATA *obj, int cmd, char *arg, CHAR_DATA *ow
              );
    }
 
-   if(cmd == 56 && isdigit(*arg))
+   if(cmd == 56) {
+      if((choice = atoi(arg)) == 0 || choice < 0) {
+         sprintf(buf, "%s Try a number from the list.", GET_NAME(ch));
+         do_tell(owner, buf, 9);
+         return eSUCCESS;
+      }
       switch (atoi(arg)){
          case 1:
-            //stuff
+            do_say(owner, "Sure, bum.", 9);
+            break;
          default:
-            do_say(owner, "I don't offer that service.", 9);
+            sprintf(buf, "%s I don't offer that service.", GET_NAME(ch));
+            do_tell(owner, buf, 9);
       }
-      
+   }
+
    return eSUCCESS;
 }
 
