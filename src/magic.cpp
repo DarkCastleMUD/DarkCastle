@@ -10914,7 +10914,7 @@ int spell_blue_bird(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
   }
   
   while(!SOMEONE_DIED(retval) && count--) {
-     dam = number(4, GET_LEVEL(ch) + 3);
+     dam = number(10, GET_LEVEL(ch) + 5);
      retval = damage(ch, victim, dam, TYPE_PHYSICAL_MAGIC, SPELL_BLUE_BIRD, 0);
   }
 
