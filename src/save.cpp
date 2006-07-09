@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: save.cpp,v 1.43 2006/07/02 21:50:16 urizen Exp $ */
+/* $Id: save.cpp,v 1.44 2006/07/09 00:08:53 shane Exp $ */
 
 extern "C"
 {
@@ -288,7 +288,7 @@ void save_pc_data(struct pc_data * i, FILE * fpsave, struct time_data tmpage)
   fwrite(&(i->quest_points), sizeof(i->quest_points), 1, fpsave);
   for(int j=0;j<QUEST_PASS;j++)
     fwrite(&(i->quest_pass[j]), sizeof(i->quest_pass[j]), 1, fpsave);
-  for(int j=0;j<=QUEST_TOTAL/QSIZE;j++)
+  for(int j=0;j<=QUEST_TOTAL/ASIZE;j++)
     fwrite(&(i->quest_complete[j]), sizeof(i->quest_complete[j]), 1, fpsave);
 
   // Any future additions to this save file will need to be placed LAST here with a 3 letter code
@@ -316,7 +316,7 @@ void read_pc_data(struct char_data *ch, FILE* fpsave)
   i->quest_points = 0;
   for(int j=0;j<QUEST_PASS;j++)
 	i->quest_pass[j] = 0;
-  for(int j=0;j<=QUEST_TOTAL/QSIZE;j++)
+  for(int j=0;j<=QUEST_TOTAL/ASIZE;j++)
 	i->quest_complete[j] = 0;
 
   fread(i->pwd,            sizeof(char),       PASSWORD_LEN+1, fpsave);
@@ -384,7 +384,7 @@ void read_pc_data(struct char_data *ch, FILE* fpsave)
     fread(&(i->quest_points), sizeof(i->quest_points), 1, fpsave);
     for(int j = 0;j<QUEST_PASS;j++)
       fread(&(i->quest_pass[j]), sizeof(i->quest_pass[j]), 1, fpsave);
-    for(int j=0;j<=QUEST_TOTAL/QSIZE;j++)
+    for(int j=0;j<=QUEST_TOTAL/ASIZE;j++)
       fread(&(i->quest_complete[j]), sizeof(i->quest_complete[j]), 1, fpsave);
    fread(&typeflag, sizeof(char), 3, fpsave);
   }

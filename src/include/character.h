@@ -1,7 +1,7 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.45 2006/07/02 20:46:47 urizen Exp $
+| $Id: character.h,v 1.46 2006/07/09 00:08:56 shane Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
@@ -257,7 +257,7 @@ struct pc_data
     int16  quest_current[QUEST_MAX];
     uint32 quest_current_timestarted[QUEST_MAX];
     int16  quest_pass[QUEST_PASS];
-    uint32 quest_complete[QUEST_TOTAL/QSIZE+1];
+    uint32 quest_complete[QUEST_TOTAL/ASIZE+1];
 };
 
 struct mob_data

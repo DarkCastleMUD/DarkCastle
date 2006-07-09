@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.70 2006/06/29 09:12:29 shane Exp $
+| $Id: inventory.cpp,v 1.71 2006/07/09 00:08:53 shane Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -342,7 +342,7 @@ int do_get(struct char_data *ch, char *argument, int cmd)
                 }
 	    } // of for loop
 	    if (found) {
-		send_to_char("OK.\n\r", ch);
+//		send_to_char("OK.\n\r", ch);
                  do_save(ch,"", 666);
 	    } else {
 		if (!fail) send_to_char("You see nothing here.\n\r", ch);

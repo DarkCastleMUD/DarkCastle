@@ -18,12 +18,6 @@ one liner quest shit
 #include <connect.h>
 #include <quest.h>
 
-//figure out something to do if the object gets destroyed quest restart name?
-//make sure somebody else can't get the quest object
-//put a quest object looker-uper to make sure the object is still there for the quest to continue?
-//quests get reversed every time there's a read and write of the quests?
-
-
 extern struct quest_info *quest_list;
 extern void string_to_file(FILE *, char *);
 extern int keywordfind(OBJ_DATA *);
@@ -33,14 +27,21 @@ extern CHAR_DATA *character_list;
 int load_quests()
 {
    FILE *fl;
-   struct quest_info *quest = NULL;
+   struct quest_info *quest;
 
    if(!(fl = dc_fopen(QUEST_FILE, "r"))) {
       log("Failed to open quest file for reading!", 0, LOG_MISC);
       return eFAILURE;
    }
 
-   while(!EOF) {
+   while(fgetc(fl) != '$') {
+
+#ifdef LEAK_CHECK
+  quest = (struct quest_info *)calloc(1, sizeof(struct quest_info));
+#else
+  quest = (struct quest_info *)dc_alloc(1, sizeof(struct quest_info));
+#endif
+
       quest->number = fread_int(fl, 0, INT_MAX);
       quest->name   = fread_string(fl, 1);
       quest->hint1  = fread_string(fl, 1);
@@ -54,6 +55,7 @@ int load_quests()
       quest->mobnum = fread_int(fl, 0, INT_MAX);
       quest->timer  = fread_int(fl, 0, INT_MAX);
       quest->reward = fread_int(fl, 0, INT_MAX);
+      quest->active = FALSE;
       quest->next = quest_list;
       quest_list = quest;
    }
@@ -66,7 +68,18 @@ int load_quests()
 int save_quests()
 {
    FILE *fl;
-   struct quest_info *quest = quest_list;
+   struct quest_info *oldquest = quest_list, *quest, *tmpquest;
+
+   //reverse the list for saving
+   quest = 0;
+
+   while(oldquest) {
+      tmpquest = oldquest->next;
+      oldquest->next = quest;
+      quest = oldquest;
+      oldquest = tmpquest;
+   }
+   quest_list = quest;
 
    if(!(fl = dc_fopen(QUEST_FILE, "w"))) {
       log("Failed to open quest file for writing!", 0, LOG_MISC);
@@ -74,7 +87,7 @@ int save_quests()
    }
 
    while(quest) {
-      fprintf(fl, "%d\n", quest->number);
+      fprintf(fl, "#%d\n", quest->number);
       string_to_file(fl, quest->name);
       string_to_file(fl, quest->hint1);
       string_to_file(fl, quest->hint2);
@@ -86,6 +99,20 @@ int save_quests()
       quest = quest->next;
    }
 
+   fprintf(fl, "$");
+
+   //put the quest_list back
+   quest = quest_list;
+   oldquest = 0;
+
+   while(quest) {
+      tmpquest = quest->next;
+      quest->next = oldquest;
+      oldquest = quest;
+      quest = tmpquest;
+   }
+   quest_list = oldquest;
+
    dc_fclose(fl);
 
    return eSUCCESS;
@@ -93,6 +120,8 @@ int save_quests()
 
 struct quest_info * get_quest_struct(int num)
 {
+   if(!num) return 0;
+
    struct quest_info *quest = quest_list;
 
    while(quest) {
@@ -106,10 +135,12 @@ struct quest_info * get_quest_struct(int num)
 
 struct quest_info * get_quest_struct(char *name)
 {
+   if(!*name) return 0;
+
    struct quest_info *quest = quest_list;
 
    while(quest) {
-      if(!strcmp(name, quest->name))
+      if(!str_nosp_cmp(name, quest->name))
          return quest;
       quest = quest->next;
    }
@@ -119,12 +150,18 @@ struct quest_info * get_quest_struct(char *name)
 
 int do_add_quest(CHAR_DATA *ch, char *name)
 {
-   struct quest_info *quest = NULL; //new quest
+   struct quest_info * quest; //new quest
+
+#ifdef LEAK_CHECK
+  quest = (struct quest_info *)calloc(1, sizeof(struct quest_info));
+#else
+  quest = (struct quest_info *)dc_alloc(1, sizeof(struct quest_info));
+#endif
 
    quest->name = str_hsh(name);
    quest->hint1 = str_hsh(" ");
-   quest->hint2 = str_hsh(0);
-   quest->hint3 = str_hsh(0);
+   quest->hint2 = str_hsh(" ");
+   quest->hint3 = str_hsh(" ");
    quest->objshort = str_hsh("a Quest Item");
    quest->objlong = str_hsh("A quest item lies here.");
    quest->objkey = str_hsh("quest item");
@@ -133,6 +170,7 @@ int do_add_quest(CHAR_DATA *ch, char *name)
    quest->mobnum = QUEST_MASTER;
    quest->timer = 0;
    quest->reward = 0;
+   quest->active = FALSE;
 
    quest->number = quest_list->number + 1;
    quest->next = quest_list;
@@ -163,12 +201,14 @@ void show_quest_info(CHAR_DATA *ch, int num)
    while(quest) {
       if(quest->number == num) {
          csendf(ch, "Quest Name: %-35s   Level: %d\n\r"
-                    "Hint: %s\n\r%s\n\r%s"
-                    "Objnum: %d   Quest Mobnum: %d\n\r"
+                    "Hint: %s\n\r"
+                    "      %s\n\r"
+                    "      %s\n\r"
+                    "Objnum:   %d     Quest Mobnum: %d\n\r"
                     "Objshort: %s\n\r"
-                    "Objlong: %s\n\r"
-                    "Keywords: %s\n\r"
-                    "Timer: %d    Reward: %d\n\r",
+                    "Objlong:  %s\n\r"
+                    "Objkey:   %s\n\r"
+                    "Timer:    %d     Reward: %d\n\r",
                      quest->name, quest->level, quest->hint1, quest->hint2, quest->hint3,
                      quest->objnum, quest->mobnum, quest->objshort, quest->objlong,
                      quest->objkey, quest->timer, quest->reward);
@@ -200,9 +240,8 @@ bool check_available_quest(CHAR_DATA *ch, struct quest_info *quest)
 {
    if(!quest) return FALSE;
 
-   if(GET_LEVEL(ch) >= quest->level && check_quest_current(ch, quest->number)
-         && check_quest_pass(ch, quest->number) && check_quest_complete(ch, quest->number)
-         && !(quest->active) )
+   if(GET_LEVEL(ch) >= quest->level && !check_quest_current(ch, quest->number)
+         && !check_quest_complete(ch, quest->number) && !(quest->active) )
       return TRUE;
 
    return FALSE;
@@ -226,7 +265,7 @@ bool check_quest_pass(CHAR_DATA *ch, int number)
 
 bool check_quest_complete(CHAR_DATA *ch, int number)
 {
-   if(IS_SET(ch->pcdata->quest_complete[number/QSIZE], 1 >> (number % QSIZE)))
+   if(ISSET(ch->pcdata->quest_complete, number))
          return TRUE;
    return FALSE;
 }
@@ -241,7 +280,7 @@ void show_quest_header(CHAR_DATA *ch)
    csendf(ch,"  .-------------------------------------------------------------------------.\n\r"
              " /  .-.                                                                  .-.  \\\n\r"
              "[  /   \\                                                               /   \\  ]\n\r"
-             "[ !\\_.  !                  Dark Castle Quest System                   !    /! ]\n\r"
+             "[ !\\_.  !                  $B$2Dark Castle Quest System$R                   !    /! ]\n\r"
              "[\\!  ! /]                                                             [\\  ! !/]\n\r"
              "[ `---' ]                                                             [ `---' ]\n\r"
           );
@@ -250,9 +289,7 @@ void show_quest_header(CHAR_DATA *ch)
 
 void show_quest_amount(CHAR_DATA *ch, int count)
 {
-   csendf(ch,"[       ]                                                             [       ]\n\r"
-             "[       ] Total Quests Shown: %-4d                                    [       ]\n\r", count
-          );
+   csendf(ch,"[       ] $B$2Total Quests Shown:$7 %-4d $R                                   [       ]\n\r", count);
    return;
 }
 
@@ -271,45 +308,47 @@ int show_one_quest(CHAR_DATA *ch, struct quest_info *quest, int count)
 {
    int i, amount = 0;
 
-   csendf(ch,"[       ] Name: %-35s                   [       ]\n\r"
-             "[       ] Hint: %-52s  [       ]\n\r",
+   csendf(ch,"[       ] $B$2Name:$7 %-35s$R                   [       ]\n\r"
+             "[       ] $B$2Hint:$7 %-52s$R  [       ]\n\r",
              quest->name, quest->hint1);
    if(quest->hint2)
-      csendf(ch,"[       ]       %-52s  [       ]\n\r", quest->hint2);
+      csendf(ch,"[       ]       $B$7%-52s$R  [       ]\n\r", quest->hint2);
    if(quest->hint3)
-      csendf(ch,"[       ]       %-52s  [       ]\n\r", quest->hint3);
+      csendf(ch,"[       ]       $B$7%-52s$R  [       ]\n\r", quest->hint3);
    if(quest->timer) {
       for(i = 0;i < QUEST_MAX;i++)
          if(quest->number == ch->pcdata->quest_current[i])
             amount = ch->pcdata->quest_current_timestarted[i];
       if(!amount)
          log("Somebody passed a quest into here that they don't really have.", IMMORTAL, LOG_BUG);
-      csendf(ch,"[       ] Level: %d  Time remaining: %-7ld  Reward: %-5d           [       ]\n\r",
+      csendf(ch,"[       ] $B$2Level:$7 %d  $2Time remaining:$7 %-7ld  $2Reward:$7 %-5d$R           [       ]\n\r",
                 quest->level, quest->timer - time(0) + amount, quest->reward);
    }
-   else csendf(ch,"[       ] Level: %d  Reward: %-5d                                    [       ]\n\r",
+   else csendf(ch,"[       ] $B$2Level:$7 %d  $2Reward:$7 %-5d$R                                    [       ]\n\r",
                   quest->level, quest->reward);
+   csendf(ch,"[       ]                                                             [       ]\n\r");
 
    return ++count;
 }
 
 int show_one_complete_quest(CHAR_DATA *ch, struct quest_info *quest, int count)
 {
-   csendf(ch,"[       ] Name: %-35s Reward: %-5d       [       ]\n\r", quest->name, quest->reward);
+   csendf(ch,"[       ] $B$2Name:$7 %-35s $2Reward:$7 %-5d$R     [       ]\n\r", quest->name, quest->reward);
    return ++count;
 }
 
 int show_one_available_quest(CHAR_DATA *ch, struct quest_info *quest, int count)
 {
-   csendf(ch,"[       ] Name: %-35s                   [       ]\n\r"
-             "[       ] Price: %-3d          Reward: %-5d                           [       ]\n\r",
+   csendf(ch,"[       ] $B$2Name:$7 %-35s$R                   [       ]\n\r"
+             "[       ] $B$2Price:$7 %-3d          $2Reward:$7 %-5d$R                           [       ]\n\r"
+             "[       ]                                                             [       ]\n\r",
              quest->name, get_quest_price(quest), quest->reward);
    return ++count;
 }
 
 void show_available_quests(CHAR_DATA *ch)
 {
-   int count;
+   int count = 0;
    struct quest_info *quest = quest_list;
 
    show_quest_header(ch);
@@ -323,11 +362,10 @@ void show_available_quests(CHAR_DATA *ch)
    if(!count) send_to_char("[       ]                                                             [       ]\n\r"
                            "[       ]                                                             [       ]\n\r"
                            "[       ]                                                             [       ]\n\r"
-                           "[       ] There are currently no available quests for you, try later. [       ]\n\r"
+                           "[       ] $B$7There are currently no available quests for you, try later.$R [       ]\n\r"
                            "[       ]                                                             [       ]\n\r"
                            "[       ]                                                             [       ]\n\r"
-                           "[       ]                                                             [       ]\n\r", 
-ch);
+                           "[       ]                                                             [       ]\n\r", ch);
    else show_quest_amount(ch, count);
    show_quest_closer(ch);
 
@@ -393,7 +431,13 @@ int start_quest(CHAR_DATA *ch, struct quest_info *quest)
    uint16 price;
    OBJ_DATA *obj;
    CHAR_DATA *mob;
-   char *buf;
+   char buf[MAX_STRING_LENGTH];
+
+   if(check_quest_current(ch, quest->number)) {
+      sprintf(buf, "q%d", quest->number);
+      obj = get_obj(buf);
+      if(!obj) return 0;
+   }
 
    if(!check_available_quest(ch, quest)) return eFAILURE;
 
@@ -406,15 +450,13 @@ int start_quest(CHAR_DATA *ch, struct quest_info *quest)
 
    price = get_quest_price(quest);
    if(GET_PLATINUM(ch) < price) return eEXTRA_VAL2;
-
+  
    if((mob = get_mob_vnum(quest->mobnum))) {
       obj = clone_object(quest->objnum);
       obj->short_description = str_hsh(quest->objshort);
       obj->description = str_hsh(quest->objlong);
-      obj->name = str_hsh(quest->objkey);
-      sprintf(buf, "q%d", quest->number);
-      obj->name = str_dup(buf);
-      dc_free(buf);
+      sprintf(buf, "%s q%d", quest->objkey, quest->number);
+      obj->name = str_hsh(buf);
       obj_to_char(obj, mob);
       wear(mob, obj, keywordfind(obj));
    } else return eFAILURE;
@@ -457,28 +499,26 @@ int complete_quest(CHAR_DATA *ch, struct quest_info *quest)
 {
    int count = 0;
    OBJ_DATA *obj;
-   char *buf;
+   char buf[MAX_STRING_LENGTH];
 
-   if(!quest) return eFAILURE;
+   if(!quest) return eEXTRA_VALUE;
 
    while(count < QUEST_MAX) {
       if(ch->pcdata->quest_current[count] == quest->number)
          break;
       count++;
       if(count >= QUEST_MAX) {
-         log("Somebody ending a quest they weren't on?", IMMORTAL, LOG_BUG);
-         return eFAILURE;
+         return eEXTRA_VALUE;
       }
    }
    sprintf(buf, "q%d", quest->number);
    obj = get_obj_in_list(buf, ch->carrying);
-   dc_free(buf);
    if(!obj) return eFAILURE;
    obj_from_char(obj);
    ch->pcdata->quest_points += quest->reward;
    ch->pcdata->quest_current[count] = 0;
    ch->pcdata->quest_current_timestarted[count] = 0;
-   SET_BIT(ch->pcdata->quest_complete[quest->number/QSIZE], 1 >> (quest->number % QSIZE));
+   SETBIT(ch->pcdata->quest_complete, quest->number);
    quest->active = FALSE;
 
    return eSUCCESS;
@@ -486,9 +526,9 @@ int complete_quest(CHAR_DATA *ch, struct quest_info *quest)
 
 int stop_current_quest(CHAR_DATA *ch, struct quest_info *quest)
 {
-   int count;
+   int count = 0;
    OBJ_DATA *obj;
-   char *buf;
+   char buf[MAX_STRING_LENGTH];
 
    if (!quest) return eFAILURE;
 
@@ -497,7 +537,6 @@ int stop_current_quest(CHAR_DATA *ch, struct quest_info *quest)
          break;
       count++;
       if(count >= QUEST_MAX) {
-         log("Somebody stopping a quest they aren't on?", IMMORTAL, LOG_BUG);
          return eFAILURE;
       }
    }
@@ -506,7 +545,6 @@ int stop_current_quest(CHAR_DATA *ch, struct quest_info *quest)
    quest->active = FALSE;
    sprintf(buf, "q%d", quest->number);
    obj = get_obj(buf);
-   dc_free(buf);
    if(obj) extract_obj(obj);
 
    return eSUCCESS;
@@ -524,23 +562,46 @@ int stop_all_quests(CHAR_DATA *ch)
 {
    int retval;
 
-   for(int i = 0;i < QUEST_MAX; i++)
+   for(int i = 0;i < QUEST_MAX; i++) {
       retval &= stop_current_quest(ch, ch->pcdata->quest_current[i]);
+   }
    return retval;
 }
 
 void quest_update()
 {
-   CHAR_DATA *i, *next_dude;
+   char buf[MAX_STRING_LENGTH];
+   CHAR_DATA *i, *next_dude, *mob;
+   OBJ_DATA *obj;
    struct quest_info *quest, *next_quest;
    int retval;
 
    for(i = character_list; i; i = next_dude) {
       next_dude = i->next;
+
+      if(!i->desc || IS_NPC(i)) continue;
+
       for(quest = quest_list; quest; quest = next_quest) {
          next_quest = quest->next;
+
          retval = check_quest_timer(i, quest);
          if(!retval) retval = stop_current_quest(i, quest);
+
+         if(check_quest_current(i, quest->number)) {
+            sprintf(buf, "q%d", quest->number);
+            obj = get_obj(buf);
+            if(!obj) {
+               if((mob = get_mob_vnum(quest->mobnum))) {
+                  obj = clone_object(quest->objnum);
+                  obj->short_description = str_hsh(quest->objshort);
+                  obj->description = str_hsh(quest->objlong);
+                  sprintf(buf, "%s q%d", quest->objkey, quest->number);
+                  obj->name = str_hsh(buf);
+                  obj_to_char(obj, mob);
+                  wear(mob, obj, keywordfind(obj));
+               }
+            }            
+         }
       }
    }
 }
@@ -548,40 +609,74 @@ void quest_update()
 int quest_handler(CHAR_DATA *ch, CHAR_DATA *qmaster, int cmd, char *name)
 {
    int retval;
-   struct quest_info *quest = get_quest_struct(name);
+   char buf[MAX_STRING_LENGTH];
+   struct quest_info *quest;
+
+   if(cmd != 1) quest = get_quest_struct(name);
 
    switch(cmd) {
       case 1:
-         do_emote(qmaster, "looks at his notes and hands you a scroll.", 9);
-         do_say(qmaster, "Here are some currently available quests.", 9);
+         do_emote(qmaster, "looks at his notes and writes a scroll.", 9);
+         sprintf(buf, "%s Here are some currently available quests.", GET_NAME(ch));
+         do_psay(qmaster, buf, 9);
          show_available_quests(ch);
          break;
       case 2:
          retval = pass_quest(ch, quest);
-         if(IS_SET(retval, eSUCCESS))
-            do_say(qmaster, "You may begin this quest again if you speak with me.", 9);
-         else if(IS_SET(retval, eEXTRA_VALUE))
-            do_say(qmaster, "You cannot pass up any more quests without completing some of them.", 9);
-         else
-            do_say(qmaster, "You weren't doing this quest to begin with.", 9);
+         if(IS_SET(retval, eSUCCESS)) {
+            sprintf(buf, "%s You may begin this quest again if you speak with me.", GET_NAME(ch));
+            do_psay(qmaster, buf, 9);
+         }
+         else if(IS_SET(retval, eEXTRA_VALUE)) {
+            sprintf(buf, "%s You cannot pass up any more quests without completing some of them.", GET_NAME(ch));
+            do_psay(qmaster, buf, 9);
+         }
+         else {
+            sprintf(buf, "%s You weren't doing this quest to begin with.", GET_NAME(ch));
+            do_psay(qmaster, buf, 9);
+         }
          break;
       case 3:
          retval = start_quest(ch, quest);
-         if(IS_SET(retval, eSUCCESS))
-            do_say(qmaster, "Excellent!  Let me write down the quest information for you.", 9);
-         else if(IS_SET(retval, eEXTRA_VALUE))
-            do_say(qmaster, "You cannot start any more quests without completing some first.", 9);
-         else if(IS_SET(retval, eEXTRA_VAL2))
-            do_say(qmaster, "You do not have the required funds to get the clue from me, beggar!", 9);
-         else
-            do_say(qmaster, "Sorry, you cannot start this quest right now.", 9);
+         if(IS_SET(retval, eSUCCESS)) {
+            sprintf(buf, "%s Excellent!  Let me write down the quest information for you.", GET_NAME(ch));
+            do_psay(qmaster, buf, 9);
+            do_emote(qmaster, "gives up the scroll.", 9);
+            show_quest_header(ch);
+            show_one_quest(ch, quest, 0);
+            show_quest_closer(ch);
+         }
+         else if(IS_SET(retval, eEXTRA_VALUE)) {
+            sprintf(buf, "%s You cannot start any more quests without completing some first.", GET_NAME(ch));
+            do_psay(qmaster, buf, 9);
+         }
+         else if(IS_SET(retval, eEXTRA_VAL2)) {
+            sprintf(buf, "%s You do not have the required funds to get the clue from me, beggar!", GET_NAME(ch));
+            do_psay(qmaster, buf, 9);
+         }
+         else if(!retval) {
+            sprintf(buf, "%s The quest item has left this world.  It will appear again soon.", GET_NAME(ch));
+            do_psay(qmaster, buf, 9);
+         }
+         else {
+            sprintf(buf, "%s Sorry, you cannot start this quest right now.", GET_NAME(ch));
+            do_psay(qmaster, buf, 9);
+         }
          break;
       case 4:
          retval = complete_quest(ch, quest);
-         if(IS_SET(retval, eSUCCESS))
-            do_say(qmaster, "Wonderful job!  Here is your reward!", 9);
-         else
-            do_say(qmaster, "You have not yet completed this quest.", 9);
+         if(IS_SET(retval, eSUCCESS)) {
+            sprintf(buf, "%s This is it!  Wonderful job, I will add your reward to your current amount of points!", GET_NAME(ch));
+            do_psay(qmaster, buf, 9);
+         }
+         else if(IS_SET(retval, eEXTRA_VALUE)) {
+            sprintf(buf, "%s You weren't doing this quest to begin with.", GET_NAME(ch));
+            do_psay(qmaster, buf, 9);
+         }
+         else {
+            sprintf(buf, "%s You have not yet completed this quest.", GET_NAME(ch));
+            do_say(qmaster, buf, 9);
+         }
          break;
       default:
          log("Bug in quest_handler, how'd they get here?", IMMORTAL, LOG_BUG);
@@ -627,12 +722,10 @@ int quest_master(CHAR_DATA *ch, OBJ_DATA *obj, int cmd, char *arg, CHAR_DATA *ow
 int do_quest(CHAR_DATA *ch, char *arg, int cmd)
 {
    int retval;
-   char name[MAX_INPUT_LENGTH-1];
-   char field[MAX_INPUT_LENGTH-1];
+   char name[MAX_STRING_LENGTH];
    CHAR_DATA *qmaster = get_mob_vnum(QUEST_MASTER);
 
    half_chop(arg, arg, name);
-   half_chop(name, name, field);
 
    if(!*arg)
       show_current_quests(ch);
@@ -683,15 +776,17 @@ int do_quest(CHAR_DATA *ch, char *arg, int cmd)
    return eSUCCESS;
 }
 
-int do_qedit(CHAR_DATA *ch, char *arg, int cmd)
+int do_qedit(CHAR_DATA *ch, char *argument, int cmd)
 {
+   char arg[MAX_STRING_LENGTH];
    char field[MAX_STRING_LENGTH];
    char value[MAX_STRING_LENGTH];
    int  holdernum;
    int i, lownum, highnum;
    struct quest_info *quest = NULL;
 
-   half_chop(arg, arg, field);
+   argument = one_argument(argument, arg);
+   for(; *argument==' ';argument++);
 
    if(!*arg) {
       csendf(ch, "Usage: qedit list                      (list all quest names and numbers)\n\r"
@@ -704,6 +799,11 @@ int do_qedit(CHAR_DATA *ch, char *arg, int cmd)
       return eFAILURE;
    }
 
+   if(is_abbrev(arg, "save")) {
+      send_to_char("Quests saved.\n\r", ch);
+      return save_quests();
+   }
+
    char *valid_fields[] = {
       "name",
       "level",
@@ -714,9 +814,32 @@ int do_qedit(CHAR_DATA *ch, char *arg, int cmd)
       "mobnum",
       "timer",
       "reward",
-      "hints",
+      "hint1",
+      "hint2",
+      "hint3",
       "\n"
    };
+
+   if(is_abbrev(arg, "new")) {
+      if(!*argument) {
+         send_to_char("Usage: qedit new <name>\n\r", ch);
+         return eFAILURE;
+      }
+      else {
+         quest = get_quest_struct(argument);
+         if(quest) {
+            send_to_char("A quest by this name already exists.\n\r", ch);
+            return eFAILURE;
+         }
+         else {
+            do_add_quest(ch, argument);
+            return eSUCCESS;
+         }
+      }
+   }
+
+   argument = one_argument(argument, field);
+   for(; *argument==' ';argument++);
 
    if(is_abbrev(arg, "show")) {
       if(!*field || !is_number(field)) send_to_char("Usage: qedit show <number>\n\r", ch);
@@ -725,38 +848,16 @@ int do_qedit(CHAR_DATA *ch, char *arg, int cmd)
       return eSUCCESS;
    }
 
-   if(is_abbrev(arg, "new")) {
-      if(!*field || is_number(field)) {
-         send_to_char("Usage: qedit new <name>\n\r", ch);
-         return eFAILURE;
-      }
-      else {
-         quest = get_quest_struct(field);
-         if(quest) {
-            send_to_char("A quest by this name already exists.\n\r", ch);
-            return eFAILURE;
-         }
-         else {
-            do_add_quest(ch, field);
-            return eSUCCESS;
-         }
-      }
-   }
-
-   if(is_abbrev(arg, "save")) {
-      send_to_char("Quests saved.\n\r", ch);
-      return save_quests();
-   }
-
-   half_chop(field, field, value);
+   argument = one_argument(argument, value);
+   for(; *argument==' ';argument++);
 
    if(is_abbrev(arg, "list") && !*field) {
-      list_quests(ch, 0, QUEST_MAX);
+      list_quests(ch, 0, QUEST_TOTAL);
       return eSUCCESS;
-   } else if(*field && is_number(field)) {
+   } else if(is_abbrev(arg, "list") && *field && is_number(field)) {
       lownum = MAX(0,atoi(field));
       if(*value && is_number(value)) {
-         highnum = MIN(QUEST_MAX, atoi(value));
+         highnum = MIN(QUEST_TOTAL, atoi(value));
          if(lownum > highnum) {
             holdernum = lownum;
             lownum = highnum;
@@ -765,7 +866,7 @@ int do_qedit(CHAR_DATA *ch, char *arg, int cmd)
          list_quests(ch, lownum, highnum);
       }
       else
-         list_quests(ch, lownum, QUEST_MAX);
+         list_quests(ch, lownum, QUEST_TOTAL);
       return eSUCCESS;
    }
 
@@ -781,35 +882,45 @@ int do_qedit(CHAR_DATA *ch, char *arg, int cmd)
       return eFAILURE;
    }
 
-   if(!*field) {
-      send_to_char("Valid fields: level, objnum, objshort, objlong, objkey, mobnum, timer, reward or hints.\n\r", ch);
-      return eFAILURE;
-   }
-
-   if(!(*value) && !is_abbrev(field, "hints")) {
-      send_to_char("You must enter a value.\n\r", ch);
-      return eFAILURE;
-   }
-
-   for(i = 0; i <= 10; i++) {
-      if (i == 10) {
-         send_to_char("Valid fields: name, level, objnum, objshort, objlong, objkey, mobnum, timer, reward or hints.\n\r",ch);
-         return eFAILURE;
-      }
-      if (is_abbrev(field, valid_fields[i]))
-         break;
-   }
-   
    if(!(quest = get_quest_struct(holdernum))) {
       send_to_char("That quest doesn't exist.\n\r", ch);
       return eFAILURE;
    }
 
+   if(!*field) {
+      send_to_char("Valid fields: level, objnum, objshort, objlong, objkey, mobnum, timer, reward or hints.\n\r", ch);
+      return eFAILURE;
+   }
+
+   if(!(*value)) {
+      send_to_char("You must enter a value.\n\r", ch);
+      return eFAILURE;
+   }
+
+   for(i = 0; i <= 13; i++) {
+      if (i == 13) {
+         send_to_char("Valid fields: name, level, objnum, objshort, objlong, objkey, mobnum, timer, reward, hint1, hint2, or hint3.\n\r",ch);
+         return eFAILURE;
+      }
+      if (is_abbrev(field, valid_fields[i]))
+         break;
+   }
+
+   struct quest_info *oldquest;   
+
    switch(i) {
       case 0:
-         csendf(ch, "Name changed from %s ", quest->name);
-         quest->name = str_hsh(value);
-         csendf(ch, "to %s.\n\r", quest->name);
+         sprintf(field, "%s %s", value, argument);
+         oldquest = get_quest_struct(field);
+         if(oldquest) {
+            send_to_char("A quest by this name already exists.\n\r", ch);
+            return eFAILURE;
+         }
+         else {
+            csendf(ch, "Name changed from %s ", quest->name);
+            quest->name = str_hsh(field);
+            csendf(ch, "to %s.\n\r", quest->name);
+         }
          break;
       case 1:
          csendf(ch, "Level changed from %d ", quest->level);
@@ -823,17 +934,20 @@ int do_qedit(CHAR_DATA *ch, char *arg, int cmd)
          break;
       case 3:
          csendf(ch, "Objshort changed from %s ", quest->objshort);
-         quest->objshort = str_hsh(value);
+         sprintf(field, "%s %s", value, argument);
+         quest->objshort = str_hsh(field);
          csendf(ch, "to %s.\n\r", quest->objshort);
          break;
       case 4:
          csendf(ch, "Objlong changed from %s ", quest->objlong);
-         quest->objlong = str_hsh(value);
+         sprintf(field, "%s %s", value, argument);
+         quest->objlong = str_hsh(field);
          csendf(ch, "to %s.\n\r", quest->objlong);
          break;
       case 5:
          csendf(ch, "Objkey changed from %s ", quest->objkey);
-         quest->objkey = str_hsh(value);
+         sprintf(field, "%s %s", value, argument);
+         quest->objkey = str_hsh(field);
          csendf(ch, "to %s.\n\r", quest->objkey);
          break;
       case 6:
@@ -852,21 +966,22 @@ int do_qedit(CHAR_DATA *ch, char *arg, int cmd)
          csendf(ch, "to %d.\n\r", quest->reward);
          break;
       case 9:
-         send_to_char("|--Enter first line for quest between the lines ---|", ch);
-         if (quest->hint1) send_to_char(quest->hint1, ch);
-         ch->desc->connected = CON_EDITING;
-         ch->desc->strnew = &(quest->hint1);
-         ch->desc->max_str = 52;
-         send_to_char("|--Enter second line for quest hint between lines--|", ch);
-         if (quest->hint2) send_to_char(quest->hint2, ch);
-         ch->desc->connected = CON_EDITING;
-         ch->desc->strnew = &(quest->hint2);
-         ch->desc->max_str = 52;
-         send_to_char("|--Enter third line for quest hint between lines --|", ch);
-         if (quest->hint3) send_to_char(quest->hint3, ch);
-         ch->desc->connected = CON_EDITING;
-         ch->desc->strnew = &(quest->hint3);
-         ch->desc->max_str = 52;
+         sprintf(field, "%s %s", value, argument);
+         csendf(ch, "Name changed from %s ", quest->hint1);
+         quest->hint1 = str_hsh(field);
+         csendf(ch, "to %s.\n\r", quest->hint1);
+         break;
+      case 10:
+         sprintf(field, "%s %s", value, argument);
+         csendf(ch, "Name changed from %s ", quest->hint2);
+         quest->hint2 = str_hsh(field);
+         csendf(ch, "to %s.\n\r", quest->hint2);
+         break;
+      case 11:
+         sprintf(field, "%s %s", value, argument);
+         csendf(ch, "Name changed from %s ", quest->hint3);
+         quest->hint3 = str_hsh(field);
+         csendf(ch, "to %s.\n\r", quest->hint3);
          break;
       default:
          log("Screw up in do_edit_quest, whatsamaddahyou?", IMMORTAL, LOG_BUG);
