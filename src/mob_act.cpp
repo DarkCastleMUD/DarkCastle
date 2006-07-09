@@ -19,7 +19,7 @@
 /* 12/06/2003   Onager   Modified mobile_activity() to prevent charmie    */
 /*                       scavenging                                       */
 /**************************************************************************/
-/* $Id: mob_act.cpp,v 1.37 2006/06/23 22:37:29 shane Exp $ */
+/* $Id: mob_act.cpp,v 1.38 2006/07/09 22:07:24 shane Exp $ */
 
 extern "C"
 {
@@ -592,6 +592,8 @@ bool is_protected(struct char_data *vict, struct char_data *ch)
 
    if(IS_EVIL(ch) && GET_LEVEL(ch) < level_protected)
       return(true);
+
+   if(IS_EVIL(ch) && GET_LEVEL(ch) <= GET_LEVEL(vict) && IS_AFFECTED(vict, AFF_PROTECT_EVIL)) return TRUE;
       
    aff = affected_by_spell(vict, SPELL_PROTECT_FROM_GOOD);
    level_protected = aff?aff->modifier:0;
@@ -600,6 +602,8 @@ bool is_protected(struct char_data *vict, struct char_data *ch)
 
    if(IS_GOOD(ch) && GET_LEVEL(ch) < level_protected)
       return(true);
+
+   if(IS_GOOD(ch) && GET_LEVEL(ch) <= GET_LEVEL(vict) && IS_AFFECTED(vict, AFF_PROTECT_GOOD)) return TRUE;
 
 /* old version
    if(IS_EVIL(ch) && GET_LEVEL(ch) <= (GET_LEVEL(vict))) {
