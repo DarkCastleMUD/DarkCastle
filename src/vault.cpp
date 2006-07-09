@@ -514,7 +514,7 @@ void rename_vault_owner(char *oldname, char *newname) {
   }
 
   add_new_vault(newname, 1);
-  reload_vaults();
+  //reload_vaults();
   remove_vault(oldname);
 }
 
