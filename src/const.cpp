@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.202 2006/06/27 19:18:59 shane Exp $ */
+/* $Id: const.cpp,v 1.203 2006/07/09 01:50:16 jhhudso Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1262,7 +1262,7 @@ struct class_skill_defines p_skills[] = { // paladin skills
 {    "detect evil",          SPELL_DETECT_EVIL,        17,     98,     {INT,WIS} },
 {    "remove poison",        SPELL_REMOVE_POISON,      18,     90,     {CON,WIS} },
 {    "detect invisibility",  SPELL_DETECT_INVISIBLE,   20,     85,     {INT,DEX} },
-{    "cure critic",          SPELL_CURE_CRITIC,        22,     85,     {WIS,INT} },
+{    "cure critical",        SPELL_CURE_CRITIC,        22,     85,     {WIS,INT} },
 {    "parry",                SKILL_PARRY,              23,     70,     {DEX,WIS} },
 {    "bash",                 SKILL_BASH,               25,     85,     {STR,CON} },
 {    "sense life",           SPELL_SENSE_LIFE,         26,     85,     {CON,INT} },
@@ -1466,7 +1466,7 @@ struct class_skill_defines u_skills[] = { // druid skills
 {    "stoneshield",          SPELL_STONE_SHIELD,         20,     98,     {STR,WIS} },
 {    "poison",               SPELL_POISON,               21,     90,     {CON,WIS} },
 {    "staunchblood",         SPELL_STAUNCHBLOOD,         22,     90,     {CON,WIS} },
-{    "cure critic",          SPELL_CURE_CRITIC,          23,     85,     {WIS,INT} },
+{    "cure critical",        SPELL_CURE_CRITIC,          23,     85,     {WIS,INT} },
 {    "call familiar",        SPELL_SUMMON_FAMILIAR,      25,     90,     {INT,STR} },
 {    "dismiss familiar",     SPELL_DISMISS_FAMILIAR,     26,     90,     {WIS,CON} },  
 {    "debility",             SPELL_DEBILITY,             27,     98,     {DEX,CON} },  
