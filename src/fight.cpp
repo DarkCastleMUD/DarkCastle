@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.344 2006/07/04 11:03:43 urizen Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.345 2006/07/09 22:02:37 urizen Exp $ */
 
 extern "C"
 {
@@ -2148,21 +2148,20 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
     return damage_retval(ch, victim, (eSUCCESS|eVICT_DIED));
     } else {
   
-  if (ch->in_room == victim->in_room) {
-  SET_BIT(retval, check_autojoiners(ch,1));
-  if (!SOMEONE_DIED(retval))
-  if (IS_AFFECTED(ch, AFF_CHARM)) SET_BIT(retval, check_joincharmie(ch));
-  if (SOMEONE_DIED(retval)) return retval;
-  if(!IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_CHARMIEJOIN) && attacktype != SKILL_BACKSTAB && attacktype != SKILL_AMBUSH) {
-     if(ch->followers) {
-        for(fol = ch->followers; fol; fol = fol->next) {
-           if (IS_AFFECTED(fol->follower, AFF_CHARM) && ch->in_room == fol->follower->in_room) SET_BIT(retval,check_charmiejoin(fol->follower));
-           if (IS_SET(retval, eVICT_DIED)) break;
-        }
-     }
-  }
-  if (SOMEONE_DIED(retval)) return retval;
-
+  if (ch->in_room == victim->in_room && attacktype != SKILL_BACKSTAB && attacktype != SKILL_CIRCLE) {
+    SET_BIT(retval, check_autojoiners(ch,1));
+    if (!SOMEONE_DIED(retval))
+    if (IS_AFFECTED(ch, AFF_CHARM)) SET_BIT(retval, check_joincharmie(ch));
+    if (SOMEONE_DIED(retval)) return retval;
+     if(!IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_CHARMIEJOIN) && attacktype != SKILL_AMBUSH) {
+       if(ch->followers) {
+          for(fol = ch->followers; fol; fol = fol->next) {
+             if (IS_AFFECTED(fol->follower, AFF_CHARM) && ch->in_room == fol->follower->in_room) SET_BIT(retval,check_charmiejoin(fol->follower));
+             if (IS_SET(retval, eVICT_DIED)) break;
+          }
+       }
+    }
+    if (SOMEONE_DIED(retval)) return retval;
   }
  }
   return retval;
