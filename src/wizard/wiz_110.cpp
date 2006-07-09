@@ -23,7 +23,7 @@ extern "C" {
 }
 #endif
 extern short bport;
-
+int get_max(CHAR_DATA *, int);
 // List skill maxes.
 int do_maxes(struct char_data *ch, char *argument, int cmd)
 {
@@ -63,23 +63,20 @@ int do_maxes(struct char_data *ch, char *argument, int cmd)
 	GET_RACE(ch) = i;
 	for (i = 0; *classskill[i].skillname != '\n'; i++)
 	{
-	  float max = classskill[i].maximum;
-	  max *= 0.75;
+	  int max = classskill[i].maximum - 3;
+
 	  if (classskill[i].attrs[0])
 	  {
 	       int thing = get_max_stat(ch,classskill[i].attrs[0])-20;
-	       if (thing > 0)
-	       max += (int)((get_max_stat(ch,classskill[i].attrs[0])-20)*2.5);
-	       if (max > 90) max = 90;
+	       if (thing >= 8 ) max += 2;
 	  }
 	  if (classskill[i].attrs[1])
 	  {
 	       int thing = get_max_stat(ch,classskill[i].attrs[1])-20;
-	       if (thing > 0)
-	        max += (get_max_stat(ch,classskill[i].attrs[1])-20);
+	       if (thing > 6) max += 1;
 	  }
 
-	  csendf(ch, "%s: %d\n\r", classskill[i].skillname, (int)max);
+	  csendf(ch, "%s: %d\n\r", classskill[i].skillname, max);
 	}
 	GET_RACE(ch) = orace;
 	return eSUCCESS;
