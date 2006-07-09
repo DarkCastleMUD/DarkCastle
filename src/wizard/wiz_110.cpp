@@ -341,7 +341,7 @@ int do_rename_char(struct char_data *ch, char *arg, int cmd)
 {
   struct char_data *victim;
   struct obj_data *obj;
-  char name[160], targetname[160];
+  char name[160], targetname[160], oldname[160];
   char strsave[MAX_INPUT_LENGTH];
   char * c;
   FILE * fl;
@@ -353,6 +353,7 @@ int do_rename_char(struct char_data *ch, char *arg, int cmd)
     send_to_char("Usage:  rename <oldname> <newname>\n\r", ch);
     return eFAILURE;
   }
+  strcpy(oldname, name);
 
   if(!(victim = get_char_vis(ch, name))) {
     sprintf(name, "%s is not in the game.\r\n", name);
@@ -470,7 +471,8 @@ else
   do_name(victim, " %", 9);
   send_to_char("Character now name %'d.\r\n", ch);
   extern void rename_vault_owner(char *arg1, char *arg2);
-  rename_vault_owner(name, targetname);
+
+  rename_vault_owner(oldname, targetname);
 
   return eSUCCESS;
 }

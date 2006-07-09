@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: non_off.cpp,v 1.39 2006/07/09 23:14:16 apocalypse Exp $
+| $Id: non_off.cpp,v 1.40 2006/07/09 23:53:25 urizen Exp $
 | non_off.C
 | Description:  Implementation of generic, non-offensive commands.
 */
@@ -363,7 +363,7 @@ int do_toggle(struct char_data * ch, char * arg, int cmd)
          case 14:
 	if (IS_SET(ch->pcdata->toggles, PLR_GUIDE))
          sprintf(buf + strlen(buf), "%s\n\r",
-           IS_SET(ch->pcdata->toggles, PLR_GUIDE_TOG) ? "$B$2on$R" : $B$4"off$R");
+           IS_SET(ch->pcdata->toggles, PLR_GUIDE_TOG) ? "$B$2on$R" : "$B$4off$R");
          break;
          case 15:
          sprintf(buf + strlen(buf), "%s\n\r",

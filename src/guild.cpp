@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.95 2006/07/09 23:00:25 shane Exp $
+| $Id: guild.cpp,v 1.96 2006/07/09 23:53:25 urizen Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -770,7 +770,7 @@ if (ch->in_room && IS_SET(world[ch->in_room].room_flags, NOLEARN))
        break;
    }
    oi -= mod;
-//   if (oi > chance) return;
+   if (oi > chance) return;
    // figure out the name of the affect (if any)
    char * skillname = get_skill_name(skill);
 
