@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.71 2006/07/09 00:08:53 shane Exp $
+| $Id: inventory.cpp,v 1.72 2006/07/09 23:00:25 shane Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -1330,7 +1330,7 @@ int do_give(struct char_data *ch, char *argument, int cmd)
       }
     }
 
-    if (IS_NPC(vict) && mob_index[vict->mobdata->nr].non_combat_func == shop_keeper)
+    if (IS_NPC(vict) && (mob_index[vict->mobdata->nr].non_combat_func == shop_keeper || mob_index[vict->mobdata->nr].virt == QUEST_MASTER))
     {
        act("$N graciously refuses your gift.", ch, 0, vict, TO_CHAR, 0);
        return eFAILURE;

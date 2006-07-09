@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.94 2006/06/21 19:01:14 shane Exp $
+| $Id: guild.cpp,v 1.95 2006/07/09 23:00:25 shane Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -742,6 +742,7 @@ if (ch->in_room && IS_SET(world[ch->in_room].room_flags, NOLEARN))
 	if (thing > 6)
          {to += 1;mod+= thing/4;}
    }
+
    if(learned >= to)
      return;
 
@@ -769,7 +770,7 @@ if (ch->in_room && IS_SET(world[ch->in_room].room_flags, NOLEARN))
        break;
    }
    oi -= mod;
-   if (oi > chance) return;
+//   if (oi > chance) return;
    // figure out the name of the affect (if any)
    char * skillname = get_skill_name(skill);
 
@@ -798,7 +799,7 @@ int get_max(CHAR_DATA *ch, int skill)
        maximum = skilllist[i].maximum;
        break;
      }
-   if (skilllist != g_skills) { skilllist = g_skills; 
+   if (!maximum && skilllist != g_skills) { skilllist = g_skills; 
    for(i = 0; *skilllist[i].skillname != '\n'; i++)
      if(skilllist[i].skillnum == skill)
      {
@@ -837,7 +838,7 @@ void check_maxes(CHAR_DATA *ch)
        if (skilllist[i].attrs[0])
        {
             int thing = get_stat(ch,skilllist[i].attrs[0])-20;
-            if (thing > 8)
+            if (thing >= 8)
               to += 2;
        }
        if (skilllist[i].attrs[1])
