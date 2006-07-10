@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: non_off.cpp,v 1.40 2006/07/09 23:53:25 urizen Exp $
+| $Id: non_off.cpp,v 1.41 2006/07/10 00:01:16 apocalypse Exp $
 | non_off.C
 | Description:  Implementation of generic, non-offensive commands.
 */
@@ -489,12 +489,12 @@ int do_brief(struct char_data *ch, char *argument, int cmd)
 
     if (IS_SET(ch->pcdata->toggles, PLR_BRIEF))
     {
-	send_to_char("Brief mode off.\n\r", ch);
+	send_to_char("Brief mode $B$4off$R.\n\r", ch);
 	REMOVE_BIT(ch->pcdata->toggles, PLR_BRIEF);
     }
     else
     {
-	send_to_char("Brief mode on.\n\r", ch);
+	send_to_char("Brief mode $B$2on$R.\n\r", ch);
 	SET_BIT(ch->pcdata->toggles, PLR_BRIEF);
     }
     return eSUCCESS;
@@ -507,12 +507,12 @@ int do_ansi(struct char_data *ch, char *argument, int cmd)
 
     if (IS_SET(ch->pcdata->toggles, PLR_ANSI))
     {
-       send_to_char("ANSI COLOR off.\n\r", ch);
+       send_to_char("ANSI COLOR $B$4off$R.\n\r", ch);
        REMOVE_BIT(ch->pcdata->toggles, PLR_ANSI);
     }
     else
     {
-       send_to_char("ANSI COLOR on.\n\r", ch);
+       send_to_char("ANSI COLOR $B$2on$R.\n\r", ch);
        SET_BIT(ch->pcdata->toggles, PLR_ANSI);
     }
     return eSUCCESS;
@@ -525,12 +525,12 @@ int do_vt100(struct char_data *ch, char *argument, int cmd)
 
     if (IS_SET(ch->pcdata->toggles, PLR_VT100))
     {
-       send_to_char("VT100 off.\n\r", ch);
+       send_to_char("VT100 $B$4off$R.\n\r", ch);
        REMOVE_BIT(ch->pcdata->toggles, PLR_VT100);
     }
     else
     {
-       send_to_char("VT100 on.\n\r", ch);
+       send_to_char("VT100 $B$2on$R.\n\r", ch);
        SET_BIT(ch->pcdata->toggles, PLR_VT100);
     }
     return eSUCCESS;
@@ -544,12 +544,12 @@ int do_compact(struct char_data *ch, char *argument, int cmd)
 
     if (IS_SET(ch->pcdata->toggles, PLR_COMPACT))
     {
-	send_to_char( "Compact mode off.\n\r", ch);
+	send_to_char( "Compact mode $B$4off$R.\n\r", ch);
 	REMOVE_BIT(ch->pcdata->toggles, PLR_COMPACT);
     }
     else
     {
-	send_to_char( "Compact mode on.\n\r", ch);
+	send_to_char( "Compact mode $B$2on$R.\n\r", ch);
 	SET_BIT(ch->pcdata->toggles, PLR_COMPACT);
     }
     return eSUCCESS;
@@ -568,7 +568,7 @@ int do_summon_toggle(struct char_data *ch, char *argument, int cmd)
     else
     {
 	send_to_char( "You may now be summoned by other players.\n\r"
-                      "Make _sure_ you want this... they could summon you to your death..\r\n", ch);
+                      "Make _sure_ you want this...they could summon you to your death!\r\n", ch);
 	SET_BIT(ch->pcdata->toggles, PLR_SUMMONABLE);
     }
     return eSUCCESS;
@@ -598,18 +598,18 @@ int do_guide_toggle(struct char_data *ch, char *argument, int cmd)
         return eFAILURE; 
     
     if (!IS_SET(ch->pcdata->toggles, PLR_GUIDE)) {
-      send_to_char("You must be assigned as a guide by the gods before you can toggle it.\r\n", ch);
+      send_to_char("You must be assigned as a $BGuide$R by the gods before you can toggle it.\r\n", ch);
       return eFAILURE; 
     }
 
     if (IS_SET(ch->pcdata->toggles, PLR_GUIDE_TOG))
     {
-        send_to_char("You have hidden your guide tag.\n\r", ch);
+        send_to_char("You have hidden your $B(Guide)$R tag.\n\r", ch);
         REMOVE_BIT(ch->pcdata->toggles, PLR_GUIDE_TOG);
     }
     else 
     {
-        send_to_char("You will now show your guide tag.\n\r", ch);
+        send_to_char("You will now show your $B(Guide)$R tag.\n\r", ch);
         SET_BIT(ch->pcdata->toggles, PLR_GUIDE_TOG);
     }
     
