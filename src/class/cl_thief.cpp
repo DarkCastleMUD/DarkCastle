@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.136 2006/07/09 22:03:56 urizen Exp $
+| $Id: cl_thief.cpp,v 1.137 2006/07/10 20:51:50 shane Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -761,6 +761,10 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
     {
 	send_to_char("That piece of equipment is protected by the powerful magics of the MUD-school elders.\r\n",ch);
 	return eFAILURE;
+    }
+    if(obj_index[obj->item_number].virt == CHAMPION_ITEM) {
+       send_to_char("You must earn that flag, no stealing allowed!", ch);
+       return eFAILURE;
     }
     if (GET_OBJ_WEIGHT(obj) > 50)
     {

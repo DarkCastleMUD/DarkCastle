@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.203 2006/07/09 01:50:16 jhhudso Exp $ */
+/* $Id: const.cpp,v 1.204 2006/07/10 20:51:45 shane Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -900,6 +900,7 @@ char *affected_bits[] =
     "RESERVEDBAD",
     "BULLRUSHCD",
     "CRIPPLE",
+    "CHAMPION",
     "\n"
 };
 

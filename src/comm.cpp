@@ -1009,7 +1009,6 @@ void heartbeat()
     perform_violence();
     update_command_lag_and_poison();
     affect_update(PULSE_VIOLENCE);
-    if(!number(0,14)) send_hint();
   }
 
   if(--pulse_weather < 1)
@@ -1025,6 +1024,7 @@ void heartbeat()
     point_update();
     pulse_takeover();
     affect_update(PULSE_REGEN);
+    if(!number(0,2)) send_hint();
   }
 
   if(--pulse_time < 1) {

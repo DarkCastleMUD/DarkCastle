@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.345 2006/07/09 22:02:37 urizen Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.346 2006/07/10 20:51:46 shane Exp $ */
 
 extern "C"
 {
@@ -2379,7 +2379,7 @@ void set_cantquit(CHAR_DATA *ch, CHAR_DATA *vict, bool forced )
     return;
 
   if(is_pkill(realch, realvict) && !ISSET(realvict->affected_by, AFF_CANTQUIT) &&
-              !affected_by_spell(realvict, FUCK_GTHIEF) && 
+              !affected_by_spell(realvict, FUCK_GTHIEF) && !IS_AFFECTED(realvict, AFF_CHAMPION) && !IS_AFFECTED(realch, AFF_CHAMPION) &&
 	      !affected_by_spell(realvict, FUCK_PTHIEF) && !forced) { 
     af.type = FUCK_CANTQUIT;
     af.duration = 5;
@@ -4794,6 +4794,16 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim, int type)
   }
 
   send_info(killer_message);
+
+  if(IS_AFFECTED(victim, AFF_CHAMPION) && ch) {
+     REMBIT(victim->affected_by, AFF_CHAMPION);
+     OBJ_DATA *obj = NULL;
+     if(!(obj = get_obj_in_list_num(real_object(CHAMPION_ITEM), victim->carrying))) {log("Champion without the flag, no bueno amigo!", IMMORTAL, LOG_BUG);return;}
+     move_obj(obj, ch);
+     SETBIT(ch->affected_by, AFF_CHAMPION);
+     sprintf(killer_message,"##%s has become the new Champion!\n\r", GET_NAME(ch));
+     send_info(killer_message);
+  }
 }
 
 // 'ch' can be null
@@ -4948,7 +4958,7 @@ int can_be_attacked(CHAR_DATA *ch, CHAR_DATA *vict)
 	) && 
        vict->master && 
        vict->fighting != ch && 
-       !IS_AFFECTED(vict->master, AFF_CANTQUIT) &&
+       !(IS_AFFECTED(vict->master, AFF_CANTQUIT) || IS_AFFECTED(vict->master, AFF_CHAMPION)) &&
        IS_SET(world[vict->in_room].room_flags, SAFE)
       )
     {
@@ -4964,7 +4974,7 @@ int can_be_attacked(CHAR_DATA *ch, CHAR_DATA *vict)
     return FALSE;
   }
 
-  if(IS_AFFECTED(vict, AFF_CANTQUIT) || affected_by_spell(vict, FUCK_PTHIEF) || affected_by_spell(vict, FUCK_GTHIEF))
+  if(IS_AFFECTED(vict, AFF_CANTQUIT) || affected_by_spell(vict, FUCK_PTHIEF) || affected_by_spell(vict, FUCK_GTHIEF) || IS_AFFECTED(vict, AFF_CHAMPION))
     return TRUE;
   
   if(!IS_NPC(ch) && GET_LEVEL(vict) < 5)  {
@@ -4989,7 +4999,7 @@ int can_be_attacked(CHAR_DATA *ch, CHAR_DATA *vict)
         return TRUE;
     }
     /* Allow players to continue fighting if they have a cantquit */
-    if(IS_AFFECTED(ch, AFF_CANTQUIT)) // (tested earlier) || IS_AFFECTED(vict, AFF_CANTQUIT))
+    if(IS_AFFECTED(ch, AFF_CANTQUIT) || IS_AFFECTED(ch, AFF_CHAMPION))
     {
       if(ch->fighting == vict)
         return TRUE;

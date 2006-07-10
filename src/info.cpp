@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.112 2006/07/05 01:34:02 shane Exp $ */
+/* $Id: info.cpp,v 1.113 2006/07/10 20:51:46 shane Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -518,6 +518,8 @@ void show_char_to_char(struct char_data *i, struct char_data *ch, int mode)
             strcat(buffer, "$B$1(Blue Halo) ");
          if (IS_AFFECTED(ch, AFF_KNOW_ALIGN) && !IS_GOOD(i) && !IS_EVIL(i)) 
             strcat(buffer, "$B$5(Yellow Halo) ");
+         if(IS_AFFECTED(i, AFF_CHAMPION))
+            strcat(buffer, "$B$4(Champion) ");
          strcat(buffer,"$R\n\r");
          send_to_char(buffer, ch);
          

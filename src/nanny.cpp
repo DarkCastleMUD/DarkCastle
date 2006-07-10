@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.136 2006/07/09 00:08:53 shane Exp $ */
+/* $Id: nanny.cpp,v 1.137 2006/07/10 20:51:46 shane Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -365,7 +365,7 @@ void do_on_login_stuff(char_data * ch)
     REMBIT(ch->affected_by, AFF_BLACKJACK_ALERT);
     for(int i=0;i<QUEST_MAX;i++) {
        ch->pcdata->quest_current[i] = 0;
-       ch->pcdata->quest_current_timestarted[i] = 0;
+       ch->pcdata->quest_current_ticksleft[i] = 0;
     }
     if(ch->pcdata->time.logon < 1151506181) {
        ch->pcdata->quest_points = 0;

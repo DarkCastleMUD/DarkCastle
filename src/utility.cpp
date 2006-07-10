@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.56 2006/06/23 22:37:29 shane Exp $ */
+/* $Id: utility.cpp,v 1.57 2006/07/10 20:51:46 shane Exp $ */
 
 extern "C"
 {
@@ -1092,6 +1092,7 @@ int do_quit(struct char_data *ch, char *argument, int cmd)
    struct clan_data * clan;
    struct clan_room_data * room;
    int found = 0;
+  char buf[MAX_STRING_LENGTH];
 
   void find_and_remove_player_portal(char_data * ch);
 
@@ -1204,6 +1205,11 @@ mob_index[fol->follower->mobdata->nr].virt == 8)
   if(ch->beacon)
     extract_obj(ch->beacon);
 
+  if(IS_AFFECTED(ch, AFF_CHAMPION)) {
+     REMBIT(ch->affected_by, AFF_CHAMPION);
+     sprintf(buf, "\n\r##%s has just logged out, watch for the Champion flag to reappear!\n\r", GET_NAME(ch));
+     send_info(buf);
+  }
   find_and_remove_player_portal(ch);
   stop_all_quests(ch);
 

@@ -9,7 +9,6 @@ one liner quest shit
 #include <fileinfo.h>
 #include <returnvals.h>
 #include <obj.h>
-#include <timeinfo.h>
 #include <act.h>
 #include <levels.h>
 #include <interp.h>
@@ -219,23 +218,6 @@ void show_quest_info(CHAR_DATA *ch, int num)
    send_to_char("That quest doesn't exist.\n\r", ch);
 }
 
-int check_quest_timer(CHAR_DATA *ch, struct quest_info *quest)
-{
-   int i;
-   int retval = -1;
-   int timeonquest;
-
-   if(quest->timer) {
-      for(i=0;i<QUEST_MAX;i++)
-         if(ch->pcdata->quest_current[i] == quest->number)
-            timeonquest = time(0) - ch->pcdata->quest_current_timestarted[i];
-      if(timeonquest > quest->timer) retval = 0;
-      else retval = timeonquest;
-   }
-
-   return retval;
-}
-
 bool check_available_quest(CHAR_DATA *ch, struct quest_info *quest)
 {
    if(!quest) return FALSE;
@@ -318,11 +300,11 @@ int show_one_quest(CHAR_DATA *ch, struct quest_info *quest, int count)
    if(quest->timer) {
       for(i = 0;i < QUEST_MAX;i++)
          if(quest->number == ch->pcdata->quest_current[i])
-            amount = ch->pcdata->quest_current_timestarted[i];
+            amount = ch->pcdata->quest_current_ticksleft[i];
       if(!amount)
          log("Somebody passed a quest into here that they don't really have.", IMMORTAL, LOG_BUG);
       csendf(ch,"[       ] $B$2Level:$7 %d  $2Time remaining:$7 %-7ld  $2Reward:$7 %-5d$R           [       ]\n\r",
-                quest->level, quest->timer - time(0) + amount, quest->reward);
+                quest->level, amount, quest->reward);
    }
    else csendf(ch,"[       ] $B$2Level:$7 %d  $2Reward:$7 %-5d$R                                    [       ]\n\r",
                   quest->level, quest->reward);
@@ -462,7 +444,7 @@ int start_quest(CHAR_DATA *ch, struct quest_info *quest)
    } else return eFAILURE;
 
    ch->pcdata->quest_current[count] = quest->number;     
-   ch->pcdata->quest_current_timestarted[count] = time(0);
+   ch->pcdata->quest_current_ticksleft[count] = quest->timer;
    quest->active = TRUE;
    count = 0;
    while(count < QUEST_PASS) {
@@ -519,7 +501,7 @@ int complete_quest(CHAR_DATA *ch, struct quest_info *quest)
    obj_from_char(obj);
    ch->pcdata->quest_points += quest->reward;
    ch->pcdata->quest_current[count] = 0;
-   ch->pcdata->quest_current_timestarted[count] = 0;
+   ch->pcdata->quest_current_ticksleft[count] = 0;
    SETBIT(ch->pcdata->quest_complete, quest->number);
    quest->active = FALSE;
 
@@ -543,7 +525,7 @@ int stop_current_quest(CHAR_DATA *ch, struct quest_info *quest)
       }
    }
    ch->pcdata->quest_current[count] = 0;
-   ch->pcdata->quest_current_timestarted[count] = 0;
+   ch->pcdata->quest_current_ticksleft[count] = 0;
    quest->active = FALSE;
    sprintf(buf, "q%d", quest->number);
    obj = get_obj(buf);
@@ -586,8 +568,16 @@ void quest_update()
       for(quest = quest_list; quest; quest = next_quest) {
          next_quest = quest->next;
 
-         retval = check_quest_timer(i, quest);
-         if(!retval) retval = stop_current_quest(i, quest);
+         if(quest->timer)
+            for(int j=0;j<QUEST_MAX;j++)
+               if(i->pcdata->quest_current[j] == quest->number) {
+                  if(i->pcdata->quest_current_ticksleft[j] <= 0) {
+                     retval = stop_current_quest(i, quest);
+                     csendf(i, "Time has expired for %s.  This quest has ended.\n\r", quest->name);
+                  }
+                  i->pcdata->quest_current_ticksleft[j]--;
+                  break;
+               }
 
          if(check_quest_current(i, quest->number)) {
             sprintf(buf, "q%d", quest->number);

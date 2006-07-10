@@ -1,7 +1,7 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.46 2006/07/09 00:08:56 shane Exp $
+| $Id: character.h,v 1.47 2006/07/10 20:51:52 shane Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
@@ -62,6 +62,7 @@ typedef struct char_data CHAR_DATA;
 #define CON CONSTITUTION // Gawddamn I'm lazy ;)
 
 #define MAX_HIDE 10
+#define CHAMPION_ITEM 45
 
 // * ------- Begin MOBProg stuff ----------- *
 
@@ -255,7 +256,7 @@ struct pc_data
     char *joining;
     uint32 quest_points;
     int16  quest_current[QUEST_MAX];
-    uint32 quest_current_timestarted[QUEST_MAX];
+    uint32 quest_current_ticksleft[QUEST_MAX];
     int16  quest_pass[QUEST_PASS];
     uint32 quest_complete[QUEST_TOTAL/ASIZE+1];
 };

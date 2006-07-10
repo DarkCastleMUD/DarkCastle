@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: who.cpp,v 1.22 2006/05/31 19:54:48 shane Exp $
+| $Id: who.cpp,v 1.23 2006/07/10 20:51:46 shane Exp $
 | who.C
 | Commands for who, maybe? :P
 */
@@ -525,7 +525,7 @@ int do_who(struct char_data *ch, char *argument, int cmd)
         if((d->connected) == CON_WRITE_BOARD || (d->connected) == CON_EDITING ||
            (d->connected) == CON_EDIT_MPROG)
         {
-            strcpy(tailBuf, "$1$B(writing)");
+            strcpy(tailBuf, "$1$B(writing) ");
         }
         else *tailBuf = '\0'; // clear it
 
@@ -534,7 +534,10 @@ int do_who(struct char_data *ch, char *argument, int cmd)
         else *preBuf = '\0';
         
         if(IS_SET(i->pcdata->toggles, PLR_LFG))
-           strcat(tailBuf, "$3(LFG)");
+           strcat(tailBuf, "$3(LFG) ");
+
+        if(IS_AFFECTED(i, AFF_CHAMPION))
+           strcat(tailBuf, "$B$4(Champion)$R");
 
         if(i->clan && (clan = get_clan(i)) && GET_LEVEL(i) < OVERSEER) 
            sprintf(buf,"[%s] %s$3%s %s %s $2[%s$R$2] %s$R\n\r",

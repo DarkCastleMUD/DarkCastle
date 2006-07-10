@@ -19,7 +19,6 @@ struct quest_info * get_quest_struct(char *);
 int  do_add_quest(CHAR_DATA *, char *);
 void list_quests(CHAR_DATA *);
 void show_quest_info(CHAR_DATA *, int);
-int  check_quest_timer(CHAR_DATA *, struct quest_info *);
 bool check_available_quest(CHAR_DATA *, struct quest_info *);
 bool check_quest_current(CHAR_DATA *, int);
 bool check_quest_pass(CHAR_DATA *, int);

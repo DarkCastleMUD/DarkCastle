@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.102 2006/07/01 04:12:50 apocalypse Exp $ */
+/* $Id: mob_proc.cpp,v 1.103 2006/07/10 20:51:46 shane Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -2234,7 +2234,7 @@ int guild_guard(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 //    cmd++;
     if ((cmd == dir || cmd == dir2) && (
         (!IS_MOB(ch) && (affected_by_spell(ch, FUCK_PTHIEF) || 
-affected_by_spell(ch, FUCK_GTHIEF))) ||
+affected_by_spell(ch, FUCK_GTHIEF) || IS_AFFECTED(ch, AFF_CHAMPION))) ||
 GET_CLASS(ch) != clas || (align == 1 && !IS_EVIL(ch)) || (align == 3 && 
 !IS_GOOD(ch)))) {
 	act( "The guard humiliates $n, and blocks $s way.",
@@ -2375,6 +2375,11 @@ int clan_guard(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 	act( "$n is turned away from the clan hall.", ch, 0, 0, TO_ROOM , 0);
 	send_to_char("The clan guard says 'Hey don't be bringing trouble around here!'\n\r", ch );
 	return eSUCCESS;
+    }
+    else if(IS_AFFECTED(ch, AFF_CHAMPION)) {
+       act( "$n is turned away from the clan hall.", ch, 0, 0, TO_ROOM , 0);
+       send_to_char("The clan guard says, 'Hey, don't be a wuss, get outta here.'\n\r", ch);
+       return eSUCCESS;
     }
     return eFAILURE;
 }

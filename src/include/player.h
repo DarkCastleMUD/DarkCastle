@@ -1,7 +1,7 @@
 #ifndef PLAYER_H_
 #define PLAYER_H_
 /************************************************************************
-| $Id: player.h,v 1.31 2006/07/07 22:17:02 shane Exp $
+| $Id: player.h,v 1.32 2006/07/10 20:51:52 shane Exp $
 | player.h
 | Description: This file defines the player vectors..punishment, specials,
 |   etc...
@@ -120,6 +120,7 @@
       default:
          break;
    }
+
 */
 /************************************************************************
 | These should not be here - in fact, some of them should not exist.  We're

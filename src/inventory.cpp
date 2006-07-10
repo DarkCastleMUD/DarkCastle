@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.72 2006/07/09 23:00:25 shane Exp $
+| $Id: inventory.cpp,v 1.73 2006/07/10 20:51:46 shane Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -57,7 +57,7 @@ int palm  (struct char_data *ch, struct obj_data *obj_object, struct obj_data *s
 void special_log(char *arg);
 struct obj_data * bring_type_to_front(char_data * ch, int item_type);
 struct obj_data * search_char_for_item(char_data * ch, int16 item_number, bool wearonly = FALSE);
-
+void send_info(char *);
 
 /* procedures related to get */
 void get(struct char_data *ch, struct obj_data *obj_object, struct obj_data *sub_object)
@@ -98,6 +98,11 @@ void get(struct char_data *ch, struct obj_data *obj_object, struct obj_data *sub
 	move_obj(obj_object, ch);
 	act("You get $p.", ch, obj_object, 0, TO_CHAR, 0);
 	act("$n gets $p.", ch, obj_object, 0, TO_ROOM, INVIS_NULL);
+        if(obj_index[obj_object->item_number].virt == CHAMPION_ITEM) {
+           SETBIT(ch->affected_by, AFF_CHAMPION);
+           sprintf(buffer, "\n\r##%s has just picked up the Champion flag!\n\r", GET_NAME(ch));
+           send_info(buffer);
+        }
     }
 
     if((obj_object->obj_flags.type_flag == ITEM_MONEY) && 
@@ -1038,6 +1043,10 @@ int do_put(struct char_data *ch, char *argument, int cmd)
           else
             send_to_char("(This item is cursed, BTW.)\n\r", ch);
         } 
+        if(obj_index[obj_object->item_number].virt == CHAMPION_ITEM) {
+          send_to_char("You must display this flag for all to see!\n\r", ch);
+          return eFAILURE;
+        }
 	if (IS_SET(obj_object->obj_flags.extra_flags, ITEM_NEWBIE)) {
 	  send_to_char("The protective enchantment this item holds cannot be held within this container.\r\n",ch);
 	  return eFAILURE;
