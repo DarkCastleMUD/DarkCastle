@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.121 2006/06/29 05:16:50 shane Exp $ */
+/* $Id: handler.cpp,v 1.122 2006/07/11 21:10:59 shane Exp $ */
     
 extern "C"
 {
@@ -368,6 +368,12 @@ const struct set_data set_list[] = {
   { "Arcane Apparatus", 19, {367,368,369,370,371,372,373,374,375,376,377,378,379,379,380,381,382,383,383},
         "The power of ancient magicks surges through your body as you slowly fade out of existence.\r\n",
         "You feel a slight tingle of fading magicks as you shimmer into existence.\r\n"},
+  { "Titanic Gear", 11, {19402,19404,19406,19407,19408,19409,19410,19411,19413,19417,19419,-1,-1,-1,-1,-1,-1,-1,-1},
+	"You feel a mighty surge as your body rapidly expands.\n\r",
+	"You feel your size reduce to normal proportions.\n\r"},
+  { "Moss Equipment", 11, {18001,18002,18003,18004,18006,18008,18009,18010,18011,18016,18017,-1,-1,-1,-1,-1,-1,-1,-1},
+	"A strange energy surges through you and you feel your senses sharpen.\n\r",
+	"Your senses return to normal as you remove your mossy garb.\n\r"},
   { "\n", 0, {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
 	"\n","\n"}
 };
@@ -525,7 +531,6 @@ void add_set_stats(char_data *ch, obj_data *obj, int flag, int pos)
             af.modifier = 2;
 	    affect_to_char(ch, &af);
            break;
-	  default: 
 	  case SET_APPARATUS:
 	    af.bitvector = AFF_INVISIBLE;
 	    affect_to_char(ch,&af);
@@ -534,6 +539,47 @@ void add_set_stats(char_data *ch, obj_data *obj, int flag, int pos)
             af.modifier = 10;
 	    affect_to_char(ch, &af);
   	   break;
+          case SET_TITANIC:
+            af.location = APPLY_STR;
+            af.modifier = 3;
+            affect_to_char(ch, &af);
+            af.location = APPLY_INT;
+            affect_to_char(ch, &af);
+            af.location = APPLY_HIT;
+            af.modifier = 25;
+            affect_to_char(ch, &af);
+            af.location = APPLY_MANA;
+            affect_to_char(ch, &af);
+            af.location = APPLY_MOVE;
+            affect_to_char(ch, &af);
+            af.location = APPLY_CHAR_HEIGHT;
+            af.modifier = 30;
+            affect_to_char(ch, &af);
+            af.location = APPLY_CHAR_WEIGHT;
+            af.modifier = 60;
+            affect_to_char(ch, &af);
+            break;
+          case SET_MOSS:
+            af.bitvector = AFF_INFRARED;
+            affect_to_char(ch, &af);
+            af.bitvector = -1;
+            af.location = APPLY_HIT;
+            af.modifier = 25;
+            affect_to_char(ch, &af);
+            af.location = APPLY_KI;
+            af.modifier = 5;
+            affect_to_char(ch, &af);
+            af.location = APPLY_MOVE;
+            af.modifier = 50;
+            affect_to_char(ch, &af);
+            af.location = APPLY_HIT_N_DAM;
+            af.modifier = 5;
+            affect_to_char(ch, &af);
+            af.location = APPLY_WIS;
+            af.modifier = 3;
+            affect_to_char(ch, &af);
+            break;
+	  default:           
 		send_to_char("Tough luck, you completed an unimplemented set. Report what you just wore, eh?\r\n",ch);
 		break;
 	}

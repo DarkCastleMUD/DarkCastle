@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.113 2006/07/10 20:51:46 shane Exp $ */
+/* $Id: info.cpp,v 1.114 2006/07/11 21:10:59 shane Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -1396,6 +1396,10 @@ int do_score(struct char_data *ch, char *argument, int cmd)
 	     if (aff->location == 0)
 		aff_name = "Battlerager's Fury";
 		break;	     
+           case BASE_SETS+SET_MOSS:
+             if(aff->location == 0)
+                aff_name = "infravision";
+             break;
            case FUCK_CANTQUIT:
              aff_name = "CANT_QUIT";
              break;
@@ -3140,6 +3144,46 @@ int do_leaderboard(struct char_data *ch, char *argument, int cmd)
    for(i=0;i<5;i++) dc_free(rdactivename[i]);
 
    return eSUCCESS;
+}
+
+void rename_leaderboard(char *oldname, char *newname)
+{
+   FILE  *fl;
+   int lines = 30*(CLASS_MAX-1);
+   int value[lines], i;
+   char *name[lines];
+
+   extern short bport;
+   if (bport) return;
+
+   if (!(fl = dc_fopen(LEADERBOARD_FILE, "r"))) {
+      log("Cannot open leaderboard file.", 0, LOG_MISC);
+      abort();
+   }
+   for(i=0;i<lines;i++) {
+      name[i] = fread_string(fl, 0);
+      value[i] = fread_int(fl, 0, LONG_MAX);
+   }
+   dc_fclose(fl);
+
+   for(i=0;i<lines;i++) {
+      if(!strcmp(name[i], oldname)) {
+         dc_free(name[i]);
+         name[i] = str_dup(newname);
+      }
+   }
+
+   if (!(fl = dc_fopen(LEADERBOARD_FILE, "w"))) {
+      log("Cannot open leaderboard file.", 0, LOG_MISC);
+      abort();
+   }
+
+   for(i=0;i<lines;i++)
+      fprintf(fl, "%s~ %d\n", name[i], value[i]);
+   dc_fclose(fl);
+
+   for(i=0;i<lines;i++)
+      dc_free(name[i]);
 }
 
 int do_show_exp(CHAR_DATA *ch, char *arg, int cmd)

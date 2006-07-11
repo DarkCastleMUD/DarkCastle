@@ -471,8 +471,10 @@ else
   do_name(victim, " %", 9);
   send_to_char("Character now name %'d.\r\n", ch);
   extern void rename_vault_owner(char *arg1, char *arg2);
+  extern void rename_leaderboard(char *, char *);
 
   rename_vault_owner(oldname, targetname);
+  rename_leaderboard(oldname, targetname);
 
   return eSUCCESS;
 }
