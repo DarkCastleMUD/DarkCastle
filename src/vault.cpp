@@ -662,7 +662,11 @@ void load_vaults(void) {
 	    char tmp[MAX_INPUT_LENGTH];
 	    get_line(fl, tmp);
   	    obj = read_object(real_object(vnum), fl, TRUE);
-	    items->obj = obj;
+	    struct obj_data *tmp_obj;
+            tmp_obj = clone_object(real_object(GET_OBJ_VNUM(obj)));
+   	    copySaveData(tmp_obj,obj);
+	    items->obj = tmp_obj;
+	    extract_obj(obj);
 	  }
           if (!obj) {
             sprintf(buf, "boot_vaults: bad item vnum (#%d)", vnum);
