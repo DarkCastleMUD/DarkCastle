@@ -120,14 +120,14 @@ void copySaveData(obj_data *new_obj, obj_data *obj)
   if (obj->obj_flags.wear_flags != new_obj->obj_flags.wear_flags)
 	new_obj->obj_flags.wear_flags = obj->obj_flags.wear_flags;
 
-  if (obj->obj_flags.type_flag == ITEM_STAFF && obj->obj_flags.value[1] != new_obj->obj_flags.value[1])
-  	new_obj->obj_flags.value[1] = obj->obj_flags.value[1];
+  if (obj->obj_flags.type_flag == ITEM_STAFF && obj->obj_flags.value[2] != new_obj->obj_flags.value[2])
+  	new_obj->obj_flags.value[2] = obj->obj_flags.value[2];
 
   if (obj->obj_flags.type_flag == ITEM_WAND && obj->obj_flags.value[1] != new_obj->obj_flags.value[1])
-  	new_obj->obj_flags.value[1] = obj->obj_flags.value[1];
+  	new_obj->obj_flags.value[2] = obj->obj_flags.value[2];
 
-  if (obj->obj_flags.type_flag == ITEM_DRINKCON && obj->obj_flags.value[0] != new_obj->obj_flags.value[0])
-  	new_obj->obj_flags.value[0] = obj->obj_flags.value[0];
+  if (obj->obj_flags.type_flag == ITEM_DRINKCON && obj->obj_flags.value[1] != new_obj->obj_flags.value[1])
+  	new_obj->obj_flags.value[1] = obj->obj_flags.value[1];
 
   return;
 }
@@ -189,7 +189,7 @@ void save_vault(char *name) {
   {
     fprintf(fl, "O %d %d %d\n", items->item_vnum, items->count, items->obj?1:0);
     if (items->obj)
-      write_object(items->obj,fl); 
+      write_object(items->obj,fl);
   }
 
   for (access = vault->access;access;access = access->next)
@@ -1029,6 +1029,7 @@ void item_add(int vnum, struct vault_data *vault) {
     }
   }
 
+
   CREATE(item, struct vault_items_data, 1);
   item->item_vnum = vnum;
   item->count     = 1;
@@ -1065,8 +1066,7 @@ void item_remove(obj_data *obj, struct vault_data *vault) {
   int vnum = GET_OBJ_VNUM(obj);
   for (item = vault->items; item ; item = next_item) {
     next_item = item->next;
-   
-    if ((!fullSave(obj) && item->item_vnum == vnum) || (item->obj && fullItemMatch(obj, item->obj))) {
+    if ((!fullSave(obj) && (!item->obj || !fullSave(item->obj)) && item->item_vnum == vnum) || (item->obj && fullItemMatch(obj, item->obj))) {
       if (item->count > 1) {
         item->count--;
         vault->weight -= GET_OBJ_WEIGHT(get_obj(vnum));
@@ -1334,7 +1334,7 @@ void put_in_vault(CHAR_DATA *ch, char *object, char *owner) {
   
     if (!fullSave(obj)) {
       item_add(GET_OBJ_VNUM(obj), vault); extract_obj(obj); }
-    else { item_add(obj, vault); obj_from_char(obj); }
+    else { obj_from_char(obj); item_add(obj, vault);  }
   }
   save_vault(owner);
   save_char_obj(ch);
