@@ -44,6 +44,7 @@ char *clanVName(int c);
 
 extern struct index_data *obj_index;
 extern struct obj_data * search_char_for_item(char_data * ch, int16 item_number, bool wearOnly = FALSE);
+extern struct obj_data  *object_list;
 
 struct vault_data *has_vault(char *name) {
   struct vault_data *vault;
@@ -81,9 +82,6 @@ bool fullSave(obj_data *obj)
   if (obj->obj_flags.more_flags != tmp_obj->obj_flags.more_flags)
 	return 1;
 
-  if (obj->obj_flags.wear_flags != tmp_obj->obj_flags.wear_flags)
-	return 1;
-
   if (obj->obj_flags.type_flag == ITEM_STAFF && obj->obj_flags.value[1] != obj->obj_flags.value[2])
     return 1;
 
@@ -94,6 +92,23 @@ bool fullSave(obj_data *obj)
     return 1;
 
   return 0;
+}
+
+
+void remove_from_object_list(obj_data *obj)
+{
+  obj_data *tObj, *pObj = NULL;
+  for (tObj = object_list; tObj; tObj = tObj->next)
+  {
+    if (tObj == obj)
+    {
+	if (pObj) pObj->next = tObj->next;
+	else object_list = tObj->next;
+	tObj->next = NULL;
+	break;
+    }
+    pObj = tObj;
+  }
 }
 
 void copySaveData(obj_data *new_obj, obj_data *obj)
@@ -116,9 +131,6 @@ void copySaveData(obj_data *new_obj, obj_data *obj)
 
   if (obj->obj_flags.more_flags != new_obj->obj_flags.more_flags)
 	new_obj->obj_flags.more_flags = obj->obj_flags.more_flags;
-
-  if (obj->obj_flags.wear_flags != new_obj->obj_flags.wear_flags)
-	new_obj->obj_flags.wear_flags = obj->obj_flags.wear_flags;
 
   if (obj->obj_flags.type_flag == ITEM_STAFF && obj->obj_flags.value[2] != new_obj->obj_flags.value[2])
   	new_obj->obj_flags.value[2] = obj->obj_flags.value[2];
@@ -147,9 +159,6 @@ bool fullItemMatch(obj_data *obj, obj_data *obj2)
 	return 0;
 
   if (obj->obj_flags.more_flags != obj2->obj_flags.more_flags)
-	return 0;
-
-  if (obj->obj_flags.wear_flags != obj2->obj_flags.wear_flags)
 	return 0;
 
   if (obj->obj_flags.type_flag == ITEM_STAFF && obj->obj_flags.value[1] != obj2->obj_flags.value[1])
@@ -594,7 +603,7 @@ void load_vaults(void) {
   while (*line != '$') {
     total_vaults++;
     sprintf(buf, "%d - %s", total_vaults, line);
-    log(buf, IMMORTAL, LOG_BUG);
+//    log(buf, IMMORTAL, LOG_BUG);
     fscanf(index, "%s\n", line);
   }
   dc_fclose(index);
@@ -620,7 +629,7 @@ void load_vaults(void) {
       continue;
     } else {
       sprintf(buf, "boot_vaults: sucessfully opened file [%s].", fname);
-      log(buf, IMMORTAL, LOG_BUG);
+//      log(buf, IMMORTAL, LOG_BUG);
     }
 
     CREATE(vault, struct vault_data, 1);
@@ -662,12 +671,9 @@ void load_vaults(void) {
 	    char tmp[MAX_INPUT_LENGTH];
 	    get_line(fl, tmp);
   	    obj = read_object(real_object(vnum), fl, TRUE);
-	    struct obj_data *tmp_obj;
-            tmp_obj = clone_object(real_object(GET_OBJ_VNUM(obj)));
-   	    copySaveData(tmp_obj,obj);
-	    items->obj = tmp_obj;
-	    extract_obj(obj);
+	    items->obj = obj;
 	  }
+
           if (!obj) {
             sprintf(buf, "boot_vaults: bad item vnum (#%d)", vnum);
             log(buf, 1, LOG_MISC);
@@ -679,7 +685,9 @@ void load_vaults(void) {
           items->next  	= vault->items;
           vault->items 	= items;
           sprintf(buf, "boot_vaults: got item [%s(%d)(%d)(%d)] from file [%s].", GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), count, vnum, fname);
-//          log(buf, IMMORTAL, LOG_BUG);
+	  if (items->obj && ((items->obj->obj_flags.wear_flags != get_obj(vnum)->obj_flags.wear_flags)||
+(items->obj->obj_flags.size != get_obj(vnum)->obj_flags.size)||(items->obj->obj_flags.eq_level != get_obj(vnum)->obj_flags.eq_level)))
+            log(buf, IMMORTAL, LOG_BUG);
           break;
         case 'A':
           sscanf(type, "%s %s", tmp, value);
@@ -1008,13 +1016,11 @@ void get_from_vault(CHAR_DATA *ch, char *object, char *owner) {
       tmp_obj = clone_object(real_object(GET_OBJ_VNUM(obj)));
     else 
     {
-      if (exists_in_vault(vault, obj)) {
-         tmp_obj = clone_object(real_object(GET_OBJ_VNUM(obj)));
-	 copySaveData(tmp_obj,obj);
-      } else tmp_obj = obj;
+      tmp_obj = clone_object(real_object(GET_OBJ_VNUM(obj)));
+      copySaveData(tmp_obj,obj);
+      if (!exists_in_vault(vault, obj))
+	extract_obj(obj);
     }
-    if (IS_SET(tmp_obj->obj_flags.extra_flags, ITEM_NODROP))
-      REMOVE_BIT(tmp_obj->obj_flags.extra_flags, ITEM_NODROP);
     obj_to_char(tmp_obj, ch);
   }
 
@@ -1026,7 +1032,7 @@ void item_add(int vnum, struct vault_data *vault) {
   struct vault_items_data *item;
 
   for (item = vault->items; item; item = item->next) {
-    if (item->item_vnum == vnum) {
+    if (item->item_vnum == vnum && !item->obj) {
       item->count++;
       vault->weight += GET_OBJ_WEIGHT(get_obj(vnum));
       return;
@@ -1047,6 +1053,7 @@ void item_add(obj_data *obj, struct vault_data *vault) {
   struct vault_items_data *item;
   int vnum = GET_OBJ_VNUM(obj);
 
+  remove_from_object_list(obj);
   for (item = vault->items; item; item = item->next) {
     if (item->item_vnum == vnum && item->obj && fullItemMatch(item->obj, obj)) {
       item->count++;
@@ -1068,6 +1075,7 @@ void item_add(obj_data *obj, struct vault_data *vault) {
 void item_remove(obj_data *obj, struct vault_data *vault) {
   struct vault_items_data *item, *next_item, *prev_item;
   int vnum = GET_OBJ_VNUM(obj);
+
   for (item = vault->items; item ; item = next_item) {
     next_item = item->next;
     if ((!fullSave(obj) && (!item->obj || !fullSave(item->obj)) && item->item_vnum == vnum) || (item->obj && fullItemMatch(obj, item->obj))) {
@@ -1288,7 +1296,7 @@ void put_in_vault(CHAR_DATA *ch, char *object, char *owner) {
       csendf(ch, "%s has been placed in the vault.\r\n", GET_OBJ_SHORT(obj));
       if (!fullSave(obj))
          { item_add(GET_OBJ_VNUM(obj), vault); extract_obj(obj); }
-      else { item_add(obj, vault); obj_from_char(obj); }
+      else { obj_from_char(obj); item_add(obj, vault); }
     }
   } else if (sscanf(object, "all.%s", object)) {
     for (obj = ch->carrying; obj ; obj = tmp_obj) {
@@ -1312,7 +1320,7 @@ void put_in_vault(CHAR_DATA *ch, char *object, char *owner) {
       csendf(ch, "%s has been placed in the vault.\r\n", GET_OBJ_SHORT(obj));
       if (!fullSave(obj)) {
         item_add(GET_OBJ_VNUM(obj), vault); extract_obj(obj); }
-      else { item_add(obj, vault); obj_from_char(obj); }
+      else { obj_from_char(obj); item_add(obj, vault); }
     }
   } else {
     if (!(obj = get_obj_in_list_vis(ch, object, ch->carrying))) {
