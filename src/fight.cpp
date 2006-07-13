@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.346 2006/07/10 20:51:46 shane Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.347 2006/07/13 16:27:52 dcastle Exp $ */
 
 extern "C"
 {
@@ -4096,7 +4096,8 @@ void group_gain(CHAR_DATA * ch, CHAR_DATA * victim)
     if (IS_AFFECTED(victim, AFF_CHARM)) { share = 0; base_xp = 0; bonus_xp = 0;}
     /* calculate this character's share of the XP */
     else {share = scale_char_xp(tmp_ch, ch, victim, no_members, total_levels, GET_LEVEL(highest), base_xp, &bonus_xp); }
-    
+
+    if (IS_AFFECTED(tmp_ch, AFF_CHAMPION)) share = (int)((double)share * 1.05);    
     sprintf(buf, "You receive %lld exps of %lld total.\n\r", share, base_xp + bonus_xp);
     send_to_char(buf, tmp_ch);
     gain_exp(tmp_ch, share);

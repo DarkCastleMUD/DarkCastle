@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.75 2006/07/13 16:07:50 dcastle Exp $
+| $Id: inventory.cpp,v 1.76 2006/07/13 16:27:52 dcastle Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -109,8 +109,6 @@ void get(struct char_data *ch, struct obj_data *obj_object, struct obj_data *sub
 	(obj_object->obj_flags.value[0]>=1)) {
 	obj_from_char(obj_object);
 
-	if (sub_object && IS_AFFECTED(ch, AFF_CHAMPION))
-	  obj_object->obj_flags.value[0] *= 1.05;
 	sprintf(buffer,"There was %d coins.",
 		obj_object->obj_flags.value[0]);
         if(IS_MOB(ch) || !IS_SET(ch->pcdata->toggles, PLR_BRIEF))
