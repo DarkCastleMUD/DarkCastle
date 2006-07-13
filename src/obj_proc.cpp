@@ -2654,7 +2654,7 @@ int godload_claws(struct char_data *ch, struct obj_data *obj, int cmd,
 int godload_defender(struct char_data*ch, struct obj_data *obj, int cmd, 
 char*arg,
                    CHAR_DATA *invoker)
-{
+ {
   char arg1[MAX_INPUT_LENGTH],arg2[MAX_INPUT_LENGTH];
   if (cmd != 11|| !is_wearing(ch, obj))
     return eFAILURE;
@@ -2730,7 +2730,7 @@ char*arg, CHAR_DATA *invoker)
      return eSUCCESS;
   }
   addTimer(ch, SPELL_TELEPORT, 24);
-  send_to_char("Your armbands crackle, and you phase out of existence",ch);
+  send_to_char("Your armbands crackle, and you phase out of existence.\n\r",ch);
   act("$n phases out of existence.",ch, 0, 0, TO_ROOM,0);
   return spell_teleport(50,ch, ch, 0, 100);
 }

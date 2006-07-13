@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.122 2006/07/11 21:10:59 shane Exp $ */
+/* $Id: handler.cpp,v 1.123 2006/07/13 23:04:05 shane Exp $ */
     
 extern "C"
 {
@@ -1512,6 +1512,57 @@ void affect_remove( CHAR_DATA *ch, struct affected_type *af, int flags)
       case KI_AGILITY+KI_OFFSET:
          if (!(flags & SUPPRESS_MESSAGES))
             send_to_char("Your body has lost its focused agility.\r\n", ch);
+         break;
+      case BASE_TIMERS+SPELL_MANA:
+         if (!(flags & SUPPRESS_MESSAGES))
+            send_to_char("The magical energy of your robes has recharged.\n\r", ch);
+         break;
+      case BASE_TIMERS+SPELL_PROTECT_FROM_EVIL:
+         if (!(flags & SUPPRESS_MESSAGES))
+            send_to_char("The defender's magical energy has recharged.\n\r", ch);
+         break;
+      case BASE_TIMERS+SPELL_GROUP_SANC:
+         if (!(flags & SUPPRESS_MESSAGES))
+            send_to_char("The cassock's magical energy has recharged.\n\r", ch);
+         break;
+      case BASE_TIMERS+SPELL_TELEPORT:
+         if (!(flags & SUPPRESS_MESSAGES))
+            send_to_char("The armbands' magical energy has recharged.\n\r", ch);
+         break;
+      case BASE_TIMERS+SPELL_KNOW_ALIGNMENT:
+         if (!(flags & SUPPRESS_MESSAGES))
+            send_to_char("The gaze's magical energy has recharged.\n\r", ch);
+         break;
+      case BASE_TIMERS+SPELL_PARALYZE:
+         if (!(flags & SUPPRESS_MESSAGES))
+            send_to_char("The ring's magical energy has recharged.\n\r", ch);
+         break;
+      case BASE_TIMERS+SPELL_GLOBE_OF_DARKNESS:
+         if (!(flags & SUPPRESS_MESSAGES))
+            send_to_char("The choker's magical energy has recharged.\n\r", ch);
+         break;
+      case BASE_TIMERS+SPELL_CONT_LIGHT:
+         if (!(flags & SUPPRESS_MESSAGES))
+            send_to_char("The necklace's magical energy has recharged.\n\r", ch);
+         break;
+      case BASE_TIMERS+SPELL_MISANRA_QUIVER:
+         if (!(flags & SUPPRESS_MESSAGES))
+            send_to_char("The quiver's magical energy has recharged.\n\r", ch);
+         break;
+      case BASE_TIMERS+SPELL_ALIGN_GOOD:
+         if (!(flags & SUPPRESS_MESSAGES))
+            send_to_char("The fire's magical energy has recharged.\n\r", ch);
+         break;
+      case BASE_TIMERS+SPELL_ALIGN_EVIL:
+         if (!(flags & SUPPRESS_MESSAGES))
+            send_to_char("The blackened heart's magical energy has recharged.\n\r", ch);
+         break;
+      case BASE_TIMERS+SPELL_EARTHQUAKE:
+         if (!(flags & SUPPRESS_MESSAGES))
+            send_to_char("The magical energy of your hammer has recharged.\n\r", ch);
+         break;
+      case BASE_TIMERS+SPELL_WIZARD_EYE:
+         send_to_char("The scrying ball's magical energies have recharged.\n\r", ch);
          break;
       default:
          break;
