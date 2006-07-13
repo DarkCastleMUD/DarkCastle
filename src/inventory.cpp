@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.73 2006/07/10 20:51:46 shane Exp $
+| $Id: inventory.cpp,v 1.74 2006/07/13 16:00:15 dcastle Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -108,6 +108,10 @@ void get(struct char_data *ch, struct obj_data *obj_object, struct obj_data *sub
     if((obj_object->obj_flags.type_flag == ITEM_MONEY) && 
 	(obj_object->obj_flags.value[0]>=1)) {
 	obj_from_char(obj_object);
+
+	if (IS_AFFECTED(ch, AFF_CHAMPION))
+	  obj_object->obj_flags.value[0] *= 1.05;
+
 	sprintf(buffer,"There was %d coins.",
 		obj_object->obj_flags.value[0]);
         if(IS_MOB(ch) || !IS_SET(ch->pcdata->toggles, PLR_BRIEF))
@@ -117,6 +121,7 @@ void get(struct char_data *ch, struct obj_data *obj_object, struct obj_data *sub
 	}
 	extern zone_data *zone_table;
 	bool tax = FALSE;
+
         if (zone_table[world[ch->in_room].zone].clanowner > 0 && ch->clan != 
 		zone_table[world[ch->in_room].zone].clanowner)
 	{
