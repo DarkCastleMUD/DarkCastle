@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.104 2006/07/13 16:13:08 apocalypse Exp $ */
+/* $Id: mob_proc.cpp,v 1.105 2006/07/13 16:18:38 apocalypse Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -3109,7 +3109,7 @@ static char *dethSayText [ ] =
   "I know! I'm going to steal a MUD call it my own...People will trust me then for sure!"
   "Hey Zizou!  Yo Momma!",
   "Hey gods, tell Parry to stop trying to shoot his pointy thing into me!",
-  "Sorry guys, I can't build right now...I have to work on my Liberal Arts degre, its very serious."
+  "Sorry guys, I can't build right now...I have to work on my Liberal Arts degree, its very serious."
 };
 
 #define DETH_SAY_TEXT_SIZE    ( sizeof ( dethSayText )    / sizeof ( char * ) )
