@@ -19,7 +19,7 @@
 /* 12/06/2003   Onager   Modified mobile_activity() to prevent charmie    */
 /*                       scavenging                                       */
 /**************************************************************************/
-/* $Id: mob_act.cpp,v 1.38 2006/07/09 22:07:24 shane Exp $ */
+/* $Id: mob_act.cpp,v 1.39 2006/07/13 21:03:27 shane Exp $ */
 
 extern "C"
 {
@@ -49,6 +49,7 @@ extern "C"
 
 extern CHAR_DATA *character_list;
 extern struct index_data *mob_index;
+extern struct index_data *obj_index;
 extern CWorld world;
 extern struct zone_data *zone_table;
 
@@ -635,6 +636,8 @@ void scavenge(struct char_data *ch)
   {
     if(!CAN_GET_OBJ(ch, obj))
       continue;
+
+    if(obj_index[obj->item_number].virt == CHAMPION_ITEM) continue;
     
     keyword = keywordfind(obj);
     
