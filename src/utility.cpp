@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.57 2006/07/10 20:51:46 shane Exp $ */
+/* $Id: utility.cpp,v 1.58 2006/07/13 20:14:47 shane Exp $ */
 
 extern "C"
 {
@@ -1044,6 +1044,16 @@ int do_recall( CHAR_DATA *ch, char *argument, int cmd )
     send_to_char("You are completely lost.\n\r", victim);
     return eFAILURE|eINTERNAL_ERROR;
   }
+
+  if(IS_SET(world[location].room_flags, CLAN_ROOM) && IS_AFFECTED(victim, AFF_CHAMPION)) {
+     send_to_char("No recalling into a clan hall whilst Champion.\n\r", victim);
+     return eFAILURE;
+  }
+  if(location >= 1900 && location <= 1999 && IS_AFFECTED(victim, AFF_CHAMPION)) {
+     send_to_char("No recalling into a guild hall whilst Champion.\n\r", victim);
+     return eFAILURE;
+  }
+
 
   // calculate the gold needed
   level = GET_LEVEL(victim);

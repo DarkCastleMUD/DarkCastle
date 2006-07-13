@@ -1309,7 +1309,10 @@ int spell_teleport(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
               ( (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_STAY_NO_TOWN)) ? 
                     (IS_SET(zone_table[world[to_room].zone].zone_flags, ZONE_IS_TOWN)) :
                     FALSE
-               )
+               ) ||
+              ( IS_AFFECTED(victim, AFF_CHAMPION) && (IS_SET(world[to_room].room_flags, CLAN_ROOM) ||
+                to_room >= 1900 && to_room <= 1999)
+              )
              );
   }
 
@@ -3312,7 +3315,7 @@ int spell_word_of_recall(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct o
 	    // make sure they aren't recalling into someone's chall
     if(IS_SET(world[location].room_flags, CLAN_ROOM))
        if(!victim->clan || !(clan = get_clan(victim))) {
-         send_to_char("The gods frown on you, and reset your home.\r\n", ch);
+         send_to_char("The gods frown on you, and reset your home.\r\n", victim);
          location = real_room(START_ROOM);
          GET_HOME(victim) = START_ROOM;
        }
@@ -3322,7 +3325,7 @@ int spell_word_of_recall(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct o
                found = 1;
 
           if(!found) {
-             send_to_char("The gods frown on you, and reset your home.\r\n", ch);
+             send_to_char("The gods frown on you, and reset your home.\r\n", victim);
              location = real_room(START_ROOM);
              GET_HOME(victim) = START_ROOM;
           }
@@ -3333,6 +3336,15 @@ int spell_word_of_recall(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct o
   {
 	 send_to_char("You are completely lost.\n\r", victim);
 	 return eFAILURE;
+  }
+
+  if(IS_SET(world[location].room_flags, CLAN_ROOM) && IS_AFFECTED(victim, AFF_CHAMPION)) {
+     send_to_char("No recalling into a clan hall whilst Champion.\n\r", victim);
+     return eFAILURE;
+  }
+  if(location >= 1900 && location <= 1999 && IS_AFFECTED(victim, AFF_CHAMPION)) {
+     send_to_char("No recalling into a guild hall whilst Champion.\n\r", victim);
+     return eFAILURE;
   }
 
   if (!IS_NPC(victim) && victim->pcdata->golem && victim->pcdata->golem->in_room == victim->in_room)
@@ -3508,6 +3520,11 @@ int spell_summon(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data 
   if(number(1, 100) > 50 + skill/2 ||
 	affected_by_spell(victim, FUCK_PTHIEF) || affected_by_spell(victim, FUCK_GTHIEF)) {
     send_to_char("Your attempted summoning fails.\r\n", ch);
+    return eFAILURE;
+  }
+
+  if(IS_AFFECTED(victim, AFF_CHAMPION) && ( IS_SET(world[ch->in_room].room_flags, CLAN_ROOM) || ch->in_room >= 1900 && ch->in_room <= 1999) ) {
+    send_to_char("You cannot summon a Champion here.\n\r", ch);
     return eFAILURE;
   }
     
@@ -10031,6 +10048,11 @@ int spell_beacon(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *vic
    {
 	send_to_char("You cannot beacon into a clan hall.\r\n",ch);
 	return eFAILURE;
+   }
+   if(IS_AFFECTED(ch, AFF_CHAMPION) && ch->beacon->in_room >= 1900 && ch->beacon->in_room <= 1999)
+   {
+      send_to_char("You cannot beacon into a guild whilst Champion.\n\r", ch);
+      return eFAILURE;
    }
 
    if(ch->fighting && (0 == number(0, 20))) {

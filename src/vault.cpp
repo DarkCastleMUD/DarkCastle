@@ -36,7 +36,7 @@ void item_add(int vnum, struct vault_data *vault);
 
 void vault_log(char *message, char *name);
 struct char_data *find_owner(char *name);
-void show_vault_log(CHAR_DATA *ch, char *owner, char *arg);
+void show_vault_log(CHAR_DATA *ch, char *owner);
 int class_restricted(struct char_data *ch, struct obj_data *obj);
 int size_restricted(struct char_data *ch, struct obj_data *obj);
 int spell_identify(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill);
@@ -335,11 +335,11 @@ int do_vault(CHAR_DATA *ch, char *argument, int cmd)
  
   // show how much gold in vault
   } else if (!strncmp(arg, "log", strlen(arg))) {
-    half_chop(arg1, argument, arg2);
-    if (!str_cmp(arg2, "clan") && ch->clan)
-      strcpy(arg2, clanVName(ch->clan));
-    if (!*argument || GET_LEVEL(ch) < IMMORTAL) sprintf(argument, "%s", GET_NAME(ch));
-    show_vault_log(ch, argument, arg2);
+    if(*arg1 && !str_cmp(arg1, "clan") && ch->clan && has_right(ch, CLAN_RIGHTS_VAULT))
+       strcpy(arg1, clanVName(ch->clan));
+    if(!*arg1 || GET_LEVEL(ch) < IMMORTAL)
+       sprintf(arg1, "%s", GET_NAME(ch));
+    show_vault_log(ch, arg1);
 
   // putting this here so that anything below it requires you to be in a safe room.
   } else if (!IS_SET(world[ch->in_room].room_flags, SAFE)) {
@@ -1507,21 +1507,22 @@ struct obj_data *get_obj(int vnum)
   return ((struct obj_data *)obj_index[num].item); 
 }
 
-void show_vault_log(CHAR_DATA *ch, char *owner, char *arg)
+void show_vault_log(CHAR_DATA *ch, char *owner)
 {
   char buf1[MAX_STRING_LENGTH];
   char buf[MAX_STRING_LENGTH];
-  char tmp[MAX_STRING_LENGTH];
   char fname[256];
 
-  one_argument(arg, tmp);
+  if(!strcmp(owner,clanVName(ch->clan))) {
+     sprintf(buf, "The following are your clans most recent vault log entries(Times are EST):\n\r");
+  }
+  else sprintf(buf, "The following are your most recent vault log entries (Times are EST):\r\n");
 
   owner[0] = UPPER(owner[0]);
 
   sprintf(fname, "../vaults/%c/%s.vault.log", *owner, owner);
   vault_log_to_string(fname, buf1);
 
-  sprintf(buf, "The following are your most recent vault log entries (Times are EST):\r\n");
   strcat(buf, buf1);
 
   page_string(ch->desc, buf, 1);
