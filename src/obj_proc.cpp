@@ -608,8 +608,8 @@ struct assembler_data {
 
 struct assembler_data gem_data[] = {
    // Item 0, the crystalline tir stuff
-   { "A brilliant flash of colored light erupts from your hands as the gems mold themselves together, forming a cohesive and flawless gem.\r\n",
-     "A brilliant flash of colored light erupts from $n's hands as the gems $e holds mold themselves together, forming a new cohesive nand flawless gem.",
+   { "A brilliant flash of light erupts from your hands as the gems mold themselves together and form a cohesive and flawless gem.\r\n",
+     "A brilliant flash of light erupts from $n's hands as the gems $e holds form a new cohesive and flawless gem.",
      "One of the gems seems to be missing.\r\n",
      { 2714, 2602, 12607, -1, -1, -1, -1, -1, -1, -1, 1506 }
    },
