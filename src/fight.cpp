@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.349 2006/07/14 07:39:16 shane Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.350 2006/07/14 08:26:20 shane Exp $ */
 
 extern "C"
 {
@@ -4796,7 +4796,7 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim, int type)
 
   send_info(killer_message);
 
-  if(IS_AFFECTED(victim, AFF_CHAMPION) && ch) {
+  if(IS_AFFECTED(victim, AFF_CHAMPION) && ch && ch != victim) {
      REMBIT(victim->affected_by, AFF_CHAMPION);
      OBJ_DATA *obj = NULL;
      if(!(obj = get_obj_in_list_num(real_object(CHAMPION_ITEM), victim->carrying))) {log("Champion without the flag, no bueno amigo!", IMMORTAL, LOG_BUG);return;}

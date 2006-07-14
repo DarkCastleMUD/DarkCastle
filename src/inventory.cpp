@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.76 2006/07/13 16:27:52 dcastle Exp $
+| $Id: inventory.cpp,v 1.77 2006/07/14 08:26:20 shane Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -82,6 +82,11 @@ void get(struct char_data *ch, struct obj_data *obj_object, struct obj_data *sub
          send_to_char("Something inside the item is unique and prevents it!\r\n", ch);
          return;
       }
+    }
+
+    if(IS_NPC(ch) && obj_index[obj_object->item_number].virt == CHAMPION_ITEM) {
+       send_to_char("No champion flag for you, two years!\n\r", ch);
+       return;
     }
 
     if (sub_object) {
