@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.h,v 1.17 2006/06/28 06:07:48 jhhudso Exp $ */
+/* $Id: handler.h,v 1.18 2006/07/15 10:06:26 jhhudso Exp $ */
 
 #ifndef HANDLER_H_
 #define HANDLER_H_
@@ -93,6 +93,7 @@ int  char_to_room(CHAR_DATA *ch, int room);
 CHAR_DATA *get_active_pc_vis(CHAR_DATA *ch, char *name);
 CHAR_DATA *get_active_pc(char *name);
 CHAR_DATA *get_char_room_vis(CHAR_DATA *ch, char *name);
+CHAR_DATA *get_rand_other_char_room_vis(CHAR_DATA *ch);
 CHAR_DATA *get_char_vis(CHAR_DATA *ch, char *name);
 CHAR_DATA *get_pc_vis(CHAR_DATA *ch, char *name);
 CHAR_DATA *get_pc_vis_exact(CHAR_DATA *ch, char *name);

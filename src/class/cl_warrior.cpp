@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.47 2006/06/05 23:46:30 dcastle Exp $
+| $Id: cl_warrior.cpp,v 1.48 2006/07/15 10:06:26 jhhudso Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -53,12 +53,11 @@ int do_kick(struct char_data *ch, char *argument, int cmd)
   if (!(victim = get_char_room_vis(ch, name))) {
     if (ch->fighting) {
       victim = ch->fighting;
-      }
-    else {
+    } else { 
       send_to_char("Your foot comes up, but there's nobody there...\r\n", ch);
       return eFAILURE;
-      }
     }
+  }
 
   if (victim == ch) {
     send_to_char("You kick yourself, metaphorically speaking.\r\n", ch);

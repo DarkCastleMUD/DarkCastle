@@ -2,7 +2,7 @@
 #define AFFECT_H_
 
 /************************************************************************
-| $Id: affect.h,v 1.25 2006/07/10 20:51:52 shane Exp $
+| $Id: affect.h,v 1.26 2006/07/15 10:06:26 jhhudso Exp $
 | affect.h
 | This contains the bits for affected_by
 */
@@ -77,7 +77,8 @@
 #define AFF_RUSH_CD		65 // bullrush cooldown
 #define AFF_CRIPPLE             66
 #define AFF_CHAMPION		67
-#define AFF_MAX                 67
+#define AFF_BLACKJACK           68
+#define AFF_MAX                 68
 //#define AFF_CHECKTHISASIZE     96 //do not change unless ASIZE changes
 
 //Make sure affected_bits[] in const.cpp is updated

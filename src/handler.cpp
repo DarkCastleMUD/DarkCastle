@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.123 2006/07/13 23:04:05 shane Exp $ */
+/* $Id: handler.cpp,v 1.124 2006/07/15 10:06:26 jhhudso Exp $ */
     
 extern "C"
 {
@@ -3068,6 +3068,39 @@ void extract_char(CHAR_DATA *ch, bool pull)
    *********************************************************************** */
 
 
+/* 
+ * Get a random character from the player's current room that is visible to
+ * him and not him.
+ */
+CHAR_DATA *get_rand_other_char_room_vis(CHAR_DATA *ch)
+{
+  char_data * vict = NULL;
+  int count = 0;
+
+  // Count the number of players in room
+  for (vict = world[ch->in_room].people; vict; vict = vict->next_in_room)
+    if (CAN_SEE(ch, vict) && ch != vict)
+      count++;
+
+  if(!count) // no players
+    return NULL;
+
+  // Pick a random one
+  count = number(1, count);
+
+  // Find the "count" player and return them
+  for (vict = world[ch->in_room].people; vict; vict = vict->next_in_room)
+    if (CAN_SEE(ch, vict) && ch != vict)
+      if(count > 1)
+	count--;
+      else return vict;
+
+  // we should never get here
+  return NULL;
+
+}
+
+
 CHAR_DATA *get_char_room_vis(CHAR_DATA *ch, char *name)
 {
    CHAR_DATA *i;
@@ -3076,8 +3109,18 @@ CHAR_DATA *get_char_room_vis(CHAR_DATA *ch, char *name)
    char tmpname[MAX_INPUT_LENGTH];
    char *tmp;
 
-   partial_match = 0;
+   if (IS_AFFECTED(ch, AFF_BLACKJACK)) {
+     struct affected_type *af = affected_by_spell(ch, SKILL_BLACKJACK);
+     if (af) {
+       if (af->modifier == 1) {
+	 send_to_char("You're so dizzy you don't know who you're hitting.\n\r", ch);
+	 ch->fighting = get_rand_other_char_room_vis(ch);
+	 return ch->fighting;
+       }
+     }
+   }
 
+   partial_match = 0;
 
    strcpy(tmpname,name);
    tmp = tmpname;
