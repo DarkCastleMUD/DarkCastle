@@ -595,10 +595,11 @@ void assign_objects(void)
   assign_one_obj_non(6353, spellcraft_glyphs);  
     
 // assembled items
-// forage arrow
+// forage arrow (2 kinds, 3185 and 3187 used for both kinds)
   assign_one_obj_non(3185,  gem_assembler);  
   assign_one_obj_non(3186,  gem_assembler);  
   assign_one_obj_non(3187,  gem_assembler);  
+  assign_one_obj_non(28301, gem_assembler);  
 
   assign_one_obj_com(4818, glove_combat_procs);
   assign_one_obj_com(4819, glove_combat_procs);
@@ -613,7 +614,7 @@ void assign_objects(void)
   assign_one_obj_non(182,  gem_assembler);  
   assign_one_obj_non(183,  gem_assembler);  
 
-  // DK Giaot key
+  // DK Gaiot key
   assign_one_obj_non(9502,  gem_assembler);  
   assign_one_obj_non(9503,  gem_assembler);  
   assign_one_obj_non(9504,  gem_assembler);  

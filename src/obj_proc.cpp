@@ -628,14 +628,21 @@ struct assembler_data gem_data[] = {
      { 3185, 3186, 3187, -1, -1, -1, -1, -1, -1, -1, 3188 }
    },
 
-   // Item 2, Gaiot key in DK
+   // Item 3, Wolf tooh arrow from forage items
+   { "You carefully sand down the pointy stick, adding to its excellent form.\r\n  Splitting the feathers down, you carefully attach them to the pointy stick.\r\n  Finally, you hone the wolf's tooth stinger into a sharp arrowhead and secure it to the front.\r\n",
+     "$n sits down with some junk and tries $s hand at fletching.",
+     "You don't have all the items required to fletch an arrow.\r\n",
+     { 3185, 28301, 3187, -1, -1, -1, -1, -1, -1, -1, 3190 }
+   },
+
+   // Item 4, Gaiot key in DK
    { "The stone pieces join together to form a small statue of a dragon.\r\n",
      "$n assembles some stones together to form a black statue.\r\n",
      "The pieces click together but fall apart as if something is missing.\r\n",
      { 9502, 9503, 9504, 9505, 9506, -1, -1, -1, -1, -1, 9501 }
    },
 
-   // Item 3, ventriloquate dummy - rahz
+   // Item 5, ventriloquate dummy - rahz
    { "You are able to put the parts together, and create a ventriloquist's dummy.\r\n",
      "$n manages to the parts together, creating a ventriloquist's dummy.\r\n",
      "The pieces don't seem to fit together quite right.\r\n",

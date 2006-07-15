@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.70 2006/07/03 01:47:10 apocalypse Exp $ */
+/* $Id: mob_proc2.cpp,v 1.71 2006/07/15 04:31:22 apocalypse Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -2004,7 +2004,7 @@ const struct platsmith platsmith_list[]=
  {10023, {542, 543, 544, 545, 532, 533, 534, 535, 536, 550, 551, 552, 553}},
  {10026, {558, 559, 560, 561, 562, 563, 564, 565, 566,   0,   0,   0,   0}}, 
  {10004, {570, 571, 575, 577, 578, 580, 582, 584, 586, 587, 590, 591,   0}}, //weapon dude in cozy
- {10024, {593, 594,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0}}, //2handed weapon dude
+ {10024, {593, 594, 567, 568,   0,   0,   0,   0,   0,   0,   0,   0,   0}}, //2handed weapon/bow dude
  {0, {0,0,0,0,0,0,0,0,0,0,0,0,0}}
 };
 
