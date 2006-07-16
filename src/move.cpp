@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.70 2006/07/10 20:51:46 shane Exp $
+| $Id: move.cpp,v 1.71 2006/07/16 10:43:55 shane Exp $
 | move.C
 | Movement commands and stuff.
 *************************************************************************
@@ -79,7 +79,7 @@ void move_player_home(CHAR_DATA *victim)
   // next four lines ping-pong people from meta to tavern to help lessen spam
   if (world[was_in].number == GET_HOME(victim) && GET_HOME(victim) == START_ROOM)
     move_player(victim, real_room(SECOND_START_ROOM));
-  else if (world[was_in].number == GET_HOME(victim))
+  else if (world[was_in].number == GET_HOME(victim) || IS_AFFECTED(victim, AFF_CHAMPION))
     move_player(victim, real_room(START_ROOM));
   // recalling into a clan room
   else if (!IS_SET(world[real_room(GET_HOME(victim))].room_flags, CLAN_ROOM))

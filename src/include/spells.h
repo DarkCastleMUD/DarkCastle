@@ -14,7 +14,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.h,v 1.85 2006/06/21 19:01:20 shane Exp $ */
+/* $Id: spells.h,v 1.86 2006/07/16 10:44:09 shane Exp $ */
 #include <structs.h> // ubyte, int16
 
 #define MAX_BUF_LENGTH               240
@@ -334,7 +334,8 @@ void check_maxes(CHAR_DATA *ch);
 #define SKILL_FASTJOIN		     387
 #define SKILL_ENHANCED_REGEN         388
 #define SKILL_CRIPPLE                389
-#define SKILL_MAX                    389
+#define SKILL_NAT_SELECT	     390
+#define SKILL_MAX                    390
 
 // if you add a skill, make sure you update "skills[]" in spells.C
 // as well as SKILL_MAX
@@ -475,7 +476,7 @@ void check_maxes(CHAR_DATA *ch);
 
 // NOTE 'spell' wear off timers are here.  Reserved messages 4000-4999
 #define SPELL_HOLY_AURA_TIMER        4000
-
+#define SPELL_NAT_SELECT_TIMER       4001
 
 
 

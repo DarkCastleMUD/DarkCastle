@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.350 2006/07/14 08:26:20 shane Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.351 2006/07/16 10:43:54 shane Exp $ */
 
 extern "C"
 {
@@ -311,7 +311,7 @@ void perform_violence(void)
       next_af_dude = af->next;
       if (af->type == SPELL_POISON)
       {
-        int dam = af->modifier + number(30,50);
+        int dam = af->duration * 10 + number(30,50);
         if(get_saves(ch, SAVE_TYPE_POISON) > number(1,101)) {
            dam = dam * get_saves(ch, SAVE_TYPE_POISON) / 100;
            send_to_char("You feel very sick, but resist the poison's damage.\n\r", ch);
@@ -1204,8 +1204,16 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
     if (IS_NPC(vict)) chance += 25;
     chance += (GET_LEVEL(ch) - GET_LEVEL(vict))/2;
     chance += GET_REAL_HITROLL(ch);
+    if(has_skill(ch, SKILL_NAT_SELECT))
+      if(GET_RACE(vict) - 1 < 10 && GET_RACE(vict))
+        if(IS_AFFECTED(ch, AFF_NAT_SELECT_HUM + GET_RACE(vict) - 1))
+          chance += 5 + has_skill(ch, SKILL_NAT_SELECT)/10;
   //  chance += dex_app[GET_DEX(ch)].tohit;
     chance += ( GET_ARMOR(vict) / 10 );  // (positive ac hurts you, negative helps)
+    if(has_skill(vict, SKILL_NAT_SELECT))
+      if(GET_RACE(ch) - 1 < 10 && GET_RACE(ch))
+        if(IS_AFFECTED(vict, AFF_NAT_SELECT_HUM + GET_RACE(ch) - 1))
+          chance -= 20 - has_skill(vict, SKILL_NAT_SELECT) / 5;
     chance += weapon_skill_hit_bonus;
 
     if(IS_SET(vict->combat, COMBAT_BASH1) ||
@@ -1273,7 +1281,7 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
     SET_BIT(vict->combat, COMBAT_SHOCKED2);
     WAIT_STATE(vict, PULSE_VIOLENCE *2);
   }
-  
+
   if(dam < 1)
     dam = 1;
   
@@ -1282,6 +1290,11 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
   retval = do_skewer(ch, vict, dam, weapon_type, w_type,weapon);
   if (SOMEONE_DIED(retval)) return retval;
 
+  if(has_skill(ch, SKILL_NAT_SELECT))
+    if(GET_RACE(vict) - 1 < 10 && GET_RACE(vict))
+      if(IS_AFFECTED(ch, AFF_NAT_SELECT_HUM + GET_RACE(vict) - 1 ))
+        dam += 5 + has_skill(ch, SKILL_NAT_SELECT)/10;
+  
   do_combatmastery(ch, vict, weapon);
   if(ISSET(ch->affected_by, AFF_CMAST_WEAKEN))
      dam *= MAX(GET_LEVEL(ch), 50) / 100;
@@ -2424,7 +2437,7 @@ void fight_kill(CHAR_DATA *ch, CHAR_DATA *vict, int type, int spec_type)
   {
     case TYPE_CHOOSE:
       /* if it's a mob then it can't be pkilled */
-      if(IS_NPC(vict))
+      if(IS_NPC(vict) || spec_type == KILL_POISON && affected_by_spell(vict, SPELL_POISON)->modifier == -123)
         raw_kill(ch, vict);
       else if(IS_ARENA(vict->in_room))
         arena_kill(ch, vict, spec_type);
@@ -4615,6 +4628,13 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim, int type)
     GET_AC(victim) -= 30;
   }
   
+  if(type == KILL_POISON && affected_by_spell(victim, SPELL_POISON)->modifier > 0) {
+    struct char_data *findchar;
+    for (findchar = character_list;findchar;findchar = findchar->next)
+      if ((int)findchar == affected_by_spell(victim, SPELL_POISON)->modifier)
+        ch = findchar;
+  }
+
   for(af = victim->affected; af; af = afpk) {
     afpk = af->next;
     if(af->type != FUCK_CANTQUIT && 
@@ -4646,6 +4666,8 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim, int type)
   if (ch != NULL) {
     if (type == KILL_POTATO)
       sprintf(killer_message,"\n\r##%s just got POTATOED!!\n\r", GET_NAME(victim));
+    else if (type == KILL_POISON)
+      sprintf(killer_message,"\n\r##%s has perished from %s's POISON!\n\r", GET_NAME(victim), GET_NAME(ch));
     else if (!str_cmp(GET_NAME(ch), GET_NAME(victim))) 
       sprintf(killer_message,"\n\r##%s just commited SUICIDE!\n\r", GET_NAME(victim));
     else if(GET_LEVEL(victim) < PKILL_COUNT_LIMIT || ch == victim)

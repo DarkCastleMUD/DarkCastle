@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.137 2006/07/10 20:51:46 shane Exp $ */
+/* $Id: nanny.cpp,v 1.138 2006/07/16 10:43:55 shane Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -1724,7 +1724,7 @@ void update_command_lag_and_poison()
       next_dude = i->next;
       // handle poison
       if(IS_AFFECTED(i, AFF_POISON) && !i->fighting) {
-        int tmp = 1 + (affected_by_spell(i, SPELL_POISON)->modifier) / 10;
+        int tmp = 1 + affected_by_spell(i, SPELL_POISON)->duration;
         if(get_saves(i, SAVE_TYPE_POISON) > number(1,101)) {
            tmp *= get_saves(i, SAVE_TYPE_POISON) / 100;
            send_to_char("You feel very sick, but resist the poison's damage.\n\r", i);

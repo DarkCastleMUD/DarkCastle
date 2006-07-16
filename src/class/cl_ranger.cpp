@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: cl_ranger.cpp,v 1.73 2006/07/04 08:42:16 shane Exp $ | cl_ranger.C  *
+ * $Id: cl_ranger.cpp,v 1.74 2006/07/16 10:44:05 shane Exp $ | cl_ranger.C  *
  * Description: Ranger skills/spells                                          *
  *                                                                            *
  * Revision History                                                           *
@@ -1610,4 +1610,54 @@ void check_eq(CHAR_DATA *ch)
       if (ch->equipment[pos])
          equip_char(ch, unequip_char(ch, pos), pos);
    }
+}
+
+int do_natural_selection(CHAR_DATA *ch, char *arg, int cmd)
+{
+   int i;
+   char buf[MAX_STRING_LENGTH];
+   extern char *race_types[];
+   struct affected_type af;
+
+   one_argument(arg, buf);
+
+   if(IS_NPC(ch) || !has_skill(ch, SKILL_NAT_SELECT)) {
+      send_to_char("You don't know how to use this to your advantage.\n\r", ch);
+      return eFAILURE;
+   }
+
+   if(affected_by_spell(ch, SPELL_NAT_SELECT_TIMER)) {
+      send_to_char("You cannot yet select a new enemy of choice.\n\r", ch);
+      return eFAILURE;
+   }
+
+   for(i=1;i<10;i++) {
+      if(is_abbrev(buf,race_types[i])) {
+         if(IS_AFFECTED(ch, AFF_NAT_SELECT_HUM + i - 1)) {
+            send_to_char("You are already studying this race.\n\r", ch);
+            return eFAILURE;
+         }
+         break;
+      }
+      if(i==9) {
+         send_to_char("Please select a valid race.\n\r", ch);
+         return eFAILURE;
+      }
+   }
+
+   for(int j=0;j<10;j++)
+      REMBIT(ch->affected_by, AFF_NAT_SELECT_HUM + j);
+
+   SETBIT(ch->affected_by, AFF_NAT_SELECT_HUM + i - 1);
+
+   af.type = SPELL_NAT_SELECT_TIMER;
+   af.duration = 60;
+   af.modifier = 0;
+   af.location = 0;
+   af.bitvector = -1;
+   affect_to_char(ch, &af);
+
+   csendf(ch, "You study the habits of the %s People and select them as your enemy of choice.\n\r", race_types[i]);
+
+   return eSUCCESS;
 }

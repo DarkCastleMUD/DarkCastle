@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.124 2006/07/15 10:06:26 jhhudso Exp $ */
+/* $Id: handler.cpp,v 1.125 2006/07/16 10:43:54 shane Exp $ */
     
 extern "C"
 {
@@ -1563,6 +1563,9 @@ void affect_remove( CHAR_DATA *ch, struct affected_type *af, int flags)
          break;
       case BASE_TIMERS+SPELL_WIZARD_EYE:
          send_to_char("The scrying ball's magical energies have recharged.\n\r", ch);
+         break;
+      case SPELL_NAT_SELECT_TIMER:
+         send_to_char("You feel capable of studying a new enemy of choice.\n\r", ch);
          break;
       default:
          break;

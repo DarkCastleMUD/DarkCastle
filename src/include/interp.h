@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.h,v 1.60 2006/07/08 18:57:45 urizen Exp $ */
+/* $Id: interp.h,v 1.61 2006/07/16 10:44:09 shane Exp $ */
 
 #ifndef INTERP_H_
 #define INTERP_H_
@@ -260,6 +260,7 @@ DO_FUN( do_mptransfer   );
 DO_FUN( do_mpxpreward   );
 DO_FUN  do_murder;
 DO_FUN  do_name;
+DO_FUN  do_natural_selection;
 DO_FUN  do_newbie;
 DO_FUN  do_newPath;
 DO_FUN  do_news;

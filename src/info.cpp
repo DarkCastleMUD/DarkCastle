@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.114 2006/07/11 21:10:59 shane Exp $ */
+/* $Id: info.cpp,v 1.115 2006/07/16 10:43:55 shane Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -64,6 +64,7 @@ extern char *fullness[];
 extern char *sector_types[];
 extern char *room_bits[];
 extern struct race_shit race_info[];
+extern char *race_types[];
 
 /* Used for "who" */
 extern int max_who;
@@ -1428,6 +1429,9 @@ int do_score(struct char_data *ch, char *argument, int cmd)
            case SPELL_HOLY_AURA_TIMER:
              aff_name = "holy aura timer";
              break;
+           case SPELL_NAT_SELECT_TIMER:
+             aff_name = "natural select timer";
+             break;
            default: break;
          }
          if(!aff_name) // not one we want displayed
@@ -1450,6 +1454,16 @@ int do_score(struct char_data *ch, char *argument, int cmd)
              scratch, scratch);
      send_to_char(buf, ch);
      found = TRUE;
+     level++;
+   }
+   for(int iter=0;iter<10;iter++) {
+      if(IS_AFFECTED(ch, AFF_NAT_SELECT_HUM + iter)) {
+         scratch = frills[level];
+         sprintf(buf, "|%c| Affected by natural selection               Modifier %-6s            |%c|\n\r",
+               scratch, race_types[iter + 1], scratch);
+         send_to_char(buf, ch);
+         found = TRUE;
+      }
    }
    extern bool elemental_score(char_data *ch, int level);
    if (!found) found = elemental_score(ch, level);
@@ -3194,4 +3208,27 @@ int do_show_exp(CHAR_DATA *ch, char *arg, int cmd)
    else send_to_char("You require 7399928377275452622483 experience to advance to the next level.\n\r", ch);
 
    return eSUCCESS;
+}
+
+void check_champion()
+{
+   CHAR_DATA *ch = character_list, *nextch;
+   OBJ_DATA *obj;
+
+   for(;ch;ch = nextch) {
+      nextch = ch->next;
+
+      if((IS_NPC(ch) || !ch->desc) && (obj = get_obj_in_list_num(real_object(CHAMPION_ITEM), ch->carrying))) {
+         obj_from_char(obj);
+         obj_to_room(obj, 3014);
+      }
+
+      if(IS_AFFECTED(ch, AFF_CHAMPION) && !(obj = get_obj_in_list_num(real_object(CHAMPION_ITEM), ch->carrying))) {
+         REMBIT(ch->affected_by, AFF_CHAMPION);
+      }
+
+   }
+
+   if(!(obj = get_obj_num(real_object(CHAMPION_ITEM)))) obj_to_room(clone_object(real_object(CHAMPION_ITEM)), 3014);
+
 }

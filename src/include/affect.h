@@ -2,7 +2,7 @@
 #define AFFECT_H_
 
 /************************************************************************
-| $Id: affect.h,v 1.26 2006/07/15 10:06:26 jhhudso Exp $
+| $Id: affect.h,v 1.27 2006/07/16 10:44:09 shane Exp $
 | affect.h
 | This contains the bits for affected_by
 */
@@ -63,7 +63,7 @@
 #define AFF_FOCUS		51 // Innate focus
 #define AFF_ILLUSION		52 // Innate illusion
 #define AFF_KNOW_ALIGN		53
-#define AFF_BLACKJACK_ALERT 	54 // cannot be blackjacked, or blackjack
+#define AFF_BLACKJACK_ALERT 	54 // cannot be blackjacked, or blackjack //no longer used?
 #define AFF_WATER_BREATHING     55
 #define AFF_AMBUSH_ALERT        56 // alert enough even for ambush
 #define AFF_FEARLESS            57
@@ -78,8 +78,18 @@
 #define AFF_CRIPPLE             66
 #define AFF_CHAMPION		67
 #define AFF_BLACKJACK           68
-#define AFF_MAX                 68
+#define AFF_NAT_SELECT_HUM      69
+#define AFF_NAT_SELECT_ELF	70
+#define AFF_NAT_SELECT_DWA	71
+#define AFF_NAT_SELECT_HOB	72
+#define AFF_NAT_SELECT_PIX	73
+#define AFF_NAT_SELECT_GIA	74
+#define AFF_NAT_SELECT_GNO	75
+#define AFF_NAT_SELECT_ORC	76
+#define AFF_NAT_SELECT_TRO	77
+#define AFF_MAX                 77
 //#define AFF_CHECKTHISASIZE     96 //do not change unless ASIZE changes
+//#define AFF_CHECKTHISASIZE	128
 
 //Make sure affected_bits[] in const.cpp is updated
 

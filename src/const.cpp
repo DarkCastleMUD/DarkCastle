@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.204 2006/07/10 20:51:45 shane Exp $ */
+/* $Id: const.cpp,v 1.205 2006/07/16 10:43:54 shane Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -901,6 +901,16 @@ char *affected_bits[] =
     "BULLRUSHCD",
     "CRIPPLE",
     "CHAMPION",
+    "BLACKJACK",
+    "NAT_SELECT_HUM",
+    "NAT_SELECT_ELF",
+    "NAT_SELECT_DWA",
+    "NAT_SELECT_HOB",
+    "NAT_SELECT_PIX",
+    "NAT_SELECT_GIA",
+    "NAT_SELECT_GNO",
+    "NAT_SELECT_ORC",
+    "NAT_SELECT_TRO",
     "\n"
 };
 
@@ -1397,6 +1407,7 @@ struct class_skill_defines r_skills[] = { // ranger skills
 {    "forest meld",     SPELL_FOREST_MELD,       45,     90,     {WIS,DEX} },
 {    "camouflage",      SPELL_CAMOUFLAGE,        46,     90,     {INT,DEX} },
 {    "creeping death",  SPELL_CREEPING_DEATH,    48,     98,     {WIS,STR} },
+{ "natural selection",	SKILL_NAT_SELECT,	 50,	 98,	 {CON,INT} },
 {      "\n",            0,                       1,      0,      {0,0} }
 };
 
