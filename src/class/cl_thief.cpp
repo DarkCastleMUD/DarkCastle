@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.140 2006/07/16 16:19:26 dcastle Exp $
+| $Id: cl_thief.cpp,v 1.141 2006/07/16 23:30:46 jhhudso Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -1820,19 +1820,19 @@ int do_blackjack(struct char_data *ch, char *argument, int cmd)
     skill_increase_check (ch, SKILL_BLACKJACK, has_skill(ch, SKILL_BLACKJACK), SKILL_INCREASE_MEDIUM);
 
     if ((fail_percentage+work_percentage) < value && value <= (fail_percentage+work_percentage+rand_percentage)) {
-      act("$N leaps from the shadows and strikes a sharp blow to the back of your head, making you feel dizzy!",victim, 0, ch, TO_CHAR, 0);
-      act("$n sneaks behind $N and makes $M dizzy with a sharp blow to the head.", ch, 0, victim, TO_ROOM, INVIS_NULL|NOTVICT);
-      act("You sneak behind $N and make $M dizzy with a sharp blow to the head.", ch, 0, victim, TO_CHAR, 0);
+      //      act("$N leaps from the shadows and strikes a sharp blow to the back of your head, making you feel dizzy!",victim, 0, ch, TO_CHAR, 0);
+      //      act("$n sneaks behind $N and makes $M dizzy with a sharp blow to the head.", ch, 0, victim, TO_ROOM, INVIS_NULL|NOTVICT);
+      //      act("You sneak behind $N and make $M dizzy with a sharp blow to the head.", ch, 0, victim, TO_CHAR, 0);
       af.modifier = 1;     // ramdom affect
     } else if ( fail_percentage < value && value <= (fail_percentage+work_percentage)) {
-      act("$N leaps from the shadows and attempts to strike a sharp blow to the back of your head, but fails miserably!",victim, 0, ch, TO_CHAR, 0);
-      act("$n sneaks behind $N and attempts to hit $M on the back of the head, but fails miserably.", ch, 0, victim, TO_ROOM, INVIS_NULL|NOTVICT);
-      act("You sneak behind $N and attempt to strike $M, but fail miserably.", ch, 0, victim, TO_CHAR, 0);
+      //      act("$N leaps from the shadows and attempts to strike a sharp blow to the back of your head, but fails miserably!",victim, 0, ch, TO_CHAR, 0);
+      //      act("$n sneaks behind $N and attempts to hit $M on the back of the head, but fails miserably.", ch, 0, victim, TO_ROOM, INVIS_NULL|NOTVICT);
+      //      act("You sneak behind $N and attempt to strike $M, but fail miserably.", ch, 0, victim, TO_CHAR, 0);
       af.modifier  = 0;       // no affect
     } else if (0 < value && value <= fail_percentage) {
-      act("$N leaps from the shadows and strikes a sharp blow to the back of your head, knocking you down!",victim, 0, ch, TO_CHAR, 0);
-      act("$n sneaks behind $N and knocks $M down with a sharp blow to the head.", ch, 0, victim, TO_ROOM, INVIS_NULL|NOTVICT);
-      act("You sneak behind $N and knock $M down with a sharp blow to the head.", ch, 0, victim, TO_CHAR, 0);
+      //      act("$N leaps from the shadows and strikes a sharp blow to the back of your head, knocking you down!",victim, 0, ch, TO_CHAR, 0);
+      //      act("$n sneaks behind $N and knocks $M down with a sharp blow to the head.", ch, 0, victim, TO_ROOM, INVIS_NULL|NOTVICT);
+      //      act("You sneak behind $N and knock $M down with a sharp blow to the head.", ch, 0, victim, TO_CHAR, 0);
       af.modifier  = 2;	// Fail affect
       GET_POS(victim) = POSITION_SITTING;
       SET_BIT(victim->combat, COMBAT_BASH1);
