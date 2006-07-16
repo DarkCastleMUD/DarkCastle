@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.138 2006/07/15 10:06:26 jhhudso Exp $
+| $Id: cl_thief.cpp,v 1.139 2006/07/16 16:11:40 urizen Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -210,8 +210,20 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
   
  
   int itemp = number(1, 100);
-  if (GET_CLASS(ch) == CLASS_ANTI_PAL)
-    itemp++; // One extra %'s chance.
+  if (!IS_NPC(ch) && !IS_NPC(victim))
+  {
+    if (GET_LEVEL(victim) > GET_LEVEL(ch))
+	itemp -= 5;
+    else if (GET_MAX_HIT(victim) > GET_MAX_HIT(ch)) 
+    {
+        if (GET_MAX_HIT(victim) * 0.85 > GET_MAX_HIT(ch)) itemp--;
+        if (GET_MAX_HIT(victim) * 0.70 > GET_MAX_HIT(ch)) itemp--;
+        if (GET_MAX_HIT(victim) * 0.55 > GET_MAX_HIT(ch)) itemp--;
+        if (GET_MAX_HIT(victim) * 0.40 > GET_MAX_HIT(ch)) itemp--;
+        if (GET_MAX_HIT(victim) * 0.25 > GET_MAX_HIT(ch)) itemp--;
+    }
+  }
+  
 
   // record the room I'm in.  Used to make sure a dual can go off.
   was_in = ch->in_room;
