@@ -82,7 +82,8 @@ int do_new_help(struct char_data *ch, char *argument, int cmd)
 
 
   if (!(this_help = find_help(argument))) {
-      send_to_char("There is no help on that word.\r\n", ch);
+      snprintf(buf, 256, "There is no help entry for \'%s\'.\r\n", argument);
+      send_to_char(buf, ch);
       sprintf(buf, "'%s' has no help entry.  %s just tried to call it.", argument, GET_NAME(ch));
       log(buf, DEITY, LOG_HELP);
       return eFAILURE;
