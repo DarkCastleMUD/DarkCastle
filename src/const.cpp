@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.205 2006/07/16 10:43:54 shane Exp $ */
+/* $Id: const.cpp,v 1.206 2006/07/16 17:49:06 shane Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -902,15 +902,6 @@ char *affected_bits[] =
     "CRIPPLE",
     "CHAMPION",
     "BLACKJACK",
-    "NAT_SELECT_HUM",
-    "NAT_SELECT_ELF",
-    "NAT_SELECT_DWA",
-    "NAT_SELECT_HOB",
-    "NAT_SELECT_PIX",
-    "NAT_SELECT_GIA",
-    "NAT_SELECT_GNO",
-    "NAT_SELECT_ORC",
-    "NAT_SELECT_TRO",
     "\n"
 };
 

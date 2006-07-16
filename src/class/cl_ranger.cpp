@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: cl_ranger.cpp,v 1.74 2006/07/16 10:44:05 shane Exp $ | cl_ranger.C  *
+ * $Id: cl_ranger.cpp,v 1.75 2006/07/16 17:49:10 shane Exp $ | cl_ranger.C  *
  * Description: Ranger skills/spells                                          *
  *                                                                            *
  * Revision History                                                           *
@@ -1616,8 +1616,8 @@ int do_natural_selection(CHAR_DATA *ch, char *arg, int cmd)
 {
    int i;
    char buf[MAX_STRING_LENGTH];
-   extern char *race_types[];
-   struct affected_type af;
+   extern struct race_shit race_info[];
+   struct affected_type af, *cur;
 
    one_argument(arg, buf);
 
@@ -1631,24 +1631,30 @@ int do_natural_selection(CHAR_DATA *ch, char *arg, int cmd)
       return eFAILURE;
    }
 
-   for(i=1;i<10;i++) {
-      if(is_abbrev(buf,race_types[i])) {
-         if(IS_AFFECTED(ch, AFF_NAT_SELECT_HUM + i - 1)) {
+   cur = affected_by_spell(ch, SKILL_NAT_SELECT);
+
+   for(i=1;i<33;i++) {
+      if(is_abbrev(buf,race_info[i].singular_name)) {
+         if(cur && cur->modifier == i) {
             send_to_char("You are already studying this race.\n\r", ch);
             return eFAILURE;
          }
          break;
       }
-      if(i==9) {
+      if(i==32) {
          send_to_char("Please select a valid race.\n\r", ch);
          return eFAILURE;
       }
    }
 
-   for(int j=0;j<10;j++)
-      REMBIT(ch->affected_by, AFF_NAT_SELECT_HUM + j);
-
-   SETBIT(ch->affected_by, AFF_NAT_SELECT_HUM + i - 1);
+   affect_remove(ch, cur, SUPPRESS_ALL);
+      
+   af.type = SKILL_NAT_SELECT;
+   af.duration = -1;
+   af.modifier = i;
+   af.location = 0;
+   af.bitvector = -1;
+   affect_to_char(ch, &af);
 
    af.type = SPELL_NAT_SELECT_TIMER;
    af.duration = 60;
@@ -1657,7 +1663,7 @@ int do_natural_selection(CHAR_DATA *ch, char *arg, int cmd)
    af.bitvector = -1;
    affect_to_char(ch, &af);
 
-   csendf(ch, "You study the habits of the %s People and select them as your enemy of choice.\n\r", race_types[i]);
+   csendf(ch, "You study the habits of the %s People and select them as your enemy of choice.\n\r", race_info[i].singular_name);
 
    return eSUCCESS;
 }

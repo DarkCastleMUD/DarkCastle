@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.115 2006/07/16 10:43:55 shane Exp $ */
+/* $Id: info.cpp,v 1.116 2006/07/16 17:49:06 shane Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -1314,6 +1314,7 @@ int do_score(struct char_data *ch, char *argument, int cmd)
    int  level = 0;
    int to_dam, to_hit;
    int flying = 0;
+   bool modifyOutput = FALSE;
    
    struct affected_type *aff;
    extern char *apply_types[];
@@ -1432,6 +1433,10 @@ int do_score(struct char_data *ch, char *argument, int cmd)
            case SPELL_NAT_SELECT_TIMER:
              aff_name = "natural select timer";
              break;
+           case SKILL_NAT_SELECT:
+             aff_name = "natural selection";
+             modifyOutput = TRUE;
+             break;
            default: break;
          }
          if(!aff_name) // not one we want displayed
@@ -1440,8 +1445,9 @@ int do_score(struct char_data *ch, char *argument, int cmd)
          sprintf(buf, "|%c| Affected by %-22s %s Modifier %-16s  |%c|\n\r",						 
                scratch, aff_name,
                ((IS_AFFECTED(ch, AFF_DETECT_MAGIC) && aff->duration < 3) ? 
-                          "$2(fading)$7" : "        "),
-               apply_types[(int)aff->location], scratch);
+                          "$2(fading)$7" : "        "),modifyOutput?
+		race_info[affected_by_spell(ch, SKILL_NAT_SELECT)->modifier].singular_name:
+		apply_types[(int)aff->location], scratch);
          send_to_char(buf, ch);
          found = TRUE;
          if(++level == 4)
@@ -1456,7 +1462,7 @@ int do_score(struct char_data *ch, char *argument, int cmd)
      found = TRUE;
      level++;
    }
-   for(int iter=0;iter<10;iter++) {
+/*   for(int iter=0;iter<10;iter++) {
       if(IS_AFFECTED(ch, AFF_NAT_SELECT_HUM + iter)) {
          scratch = frills[level];
          sprintf(buf, "|%c| Affected by natural selection               Modifier %-6s            |%c|\n\r",
@@ -1464,7 +1470,7 @@ int do_score(struct char_data *ch, char *argument, int cmd)
          send_to_char(buf, ch);
          found = TRUE;
       }
-   }
+   }*/
    extern bool elemental_score(char_data *ch, int level);
    if (!found) found = elemental_score(ch, level);
    else elemental_score(ch,level);
