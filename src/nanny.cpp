@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.138 2006/07/16 10:43:55 shane Exp $ */
+/* $Id: nanny.cpp,v 1.139 2006/07/17 18:29:52 shane Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -1717,21 +1717,24 @@ void update_command_lag_and_poison()
 {
    CHAR_DATA *i, *next_dude;
    int tmp, retval;
-   char log_msg[MAX_STRING_LENGTH];
+   char log_msg[MAX_STRING_LENGTH], dammsg[MAX_STRING_LENGTH];
    
    for(i = character_list; i; i = next_dude) 
    {
       next_dude = i->next;
       // handle poison
       if(IS_AFFECTED(i, AFF_POISON) && !i->fighting) {
-        int tmp = 1 + affected_by_spell(i, SPELL_POISON)->duration;
+        int tmp = number(1,2) + affected_by_spell(i, SPELL_POISON)->duration;
         if(get_saves(i, SAVE_TYPE_POISON) > number(1,101)) {
            tmp *= get_saves(i, SAVE_TYPE_POISON) / 100;
-           send_to_char("You feel very sick, but resist the poison's damage.\n\r", i);
-        } else send_to_char("You feel very sick.\n\r", i);
+           send_to_char("You feel very sick, but resist the $2poison's$R damage.\n\r", i);
+        }
         if(tmp) {
-           act("You feel burning $2poison$R in your blood and suffer painful convulsions.", i, 0,i, TO_CHAR, 0);
-           act("$n looks extremely sick and shivers uncomfortably from the $2poison$R in $s veins.", i, 0, 0, TO_ROOM, 0);
+           sprintf(dammsg, "$B%d$R", tmp);
+           send_damage("You feel burning $2poison$R in your blood and suffer painful convulsions for | damage.", 
+                 i, 0,i, dammsg, "You feel burning $2poison$R in your blood and suffer painful convulsions.", TO_CHAR);
+           send_damage("$n looks extremely sick and shivers uncomfortably from the $2poison$R in $s veins that did | damage.",
+                 i, 0, 0, dammsg, "$n looks extremely sick and shivers uncomfortably from the $2poison$R in $s veins.", TO_ROOM);
            retval = noncombat_damage(i, tmp,
               "You quiver from the effects of the poison and have no enegry left...",
               "$n stops struggling as $e is consumed by poison.",
@@ -1753,8 +1756,11 @@ world[i->in_room].sector_type == SECT_UNDERWATER && !(affected_by_spell(i, SPELL
          if (SOMEONE_DIED(retval))
             continue;
          else {
-            act("$n thrashes and gasps, struggling vainly for air.", i, 0, 0, TO_ROOM, 0);
-            act("You gasp and fight madly for air; you are drowning!", i, 0, 0, TO_CHAR, 0);
+            sprintf(dammsg,"$B%d$R",tmp);
+            send_damage("$n thrashes and gasps, struggling vainly for air, taking | damage.", i, 0, 0, 
+                  dammsg, "$n thrashes and gasps, stuggling vainly for air.", TO_ROOM);
+            send_damage("You gasp and fight madly for air; you are drowning and take | damage!", i, 0, 0, 
+                  dammsg, "You gasp and fight madly for air; you are drowning!", TO_CHAR);
          }
       }
         

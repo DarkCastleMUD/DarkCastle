@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.352 2006/07/16 17:49:06 shane Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.353 2006/07/17 18:29:52 shane Exp $ */
 
 extern "C"
 {
@@ -314,11 +314,15 @@ void perform_violence(void)
         int dam = af->duration * 10 + number(30,50);
         if(get_saves(ch, SAVE_TYPE_POISON) > number(1,101)) {
            dam = dam * get_saves(ch, SAVE_TYPE_POISON) / 100;
-           send_to_char("You feel very sick, but resist the poison's damage.\n\r", ch);
-        } else send_to_char("You feel very sick.\n\r", ch);
+           send_to_char("You feel very sick, but resist the $2poison's$R damage.\n\r", ch);
+        }
         if(dam) {
-           act("You feel burning $2poison$R in your blood and suffer painful convulsions.", ch, 0, 0, TO_CHAR, 0);
-           act("$n looks extremely sick and shivers uncomfortably from the $2poison$R in $s veins.", ch, 0, 0, TO_ROOM, 0);
+           char dammsg[MAX_STRING_LENGTH];
+           sprintf(dammsg, "$B%d$R", dam);
+           send_damage("You feel burning $2poison$R in your blood and suffer painful convulsions for | damage.", ch, 
+                 0, 0, dammsg, "You feel burning $2poison$R in your blood and suffer painful convulsions.", TO_CHAR);
+           send_damage("$n looks extremely sick and shivers uncomfortably from the $2poison$R in $s veins that did | damage.", ch,
+                 0, 0, dammsg, "$n looks extremely sick and shivers uncomfortably from the $2poison$R in $s veins.", TO_ROOM);
            retval = noncombat_damage(ch, dam,
                  "You quiver from the effects of the poison and have no enegry left...",
                  "$n stops struggling as $e is consumed by poison.",

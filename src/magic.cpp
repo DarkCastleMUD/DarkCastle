@@ -86,7 +86,6 @@ void add_memory(CHAR_DATA *ch, char *victim, char type);
 extern struct index_data *mob_index;
 extern struct index_data *obj_index;
 extern struct race_shit race_info[];
-void send_damage(char *, CHAR_DATA *, OBJ_DATA *, CHAR_DATA *, char *, char *, int);
 
 bool malediction_res(CHAR_DATA *ch, CHAR_DATA *victim, int spell)
 {
