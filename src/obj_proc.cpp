@@ -684,11 +684,10 @@ int transfer_thing(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
   GET_MANA(invoker) /= 2;
   GET_MOVE(invoker) /= 2;  
   do_look(invoker, "", 9);
-   send_to_char("In an instant your senses are restored and you are left only\r\n"
- "temporarily dazed. Although you appear to be somewhere other\r\n"
- "than where you were prior to this experience, your life feels\r\n"
- "as though it has ebbed to the brink of death and has been only\r\n"
- "partially restored.\r\n",invoker);
+   send_to_char("In an instant your senses are restored and you are left only temporarily\r\n"
+                "dazed. Although you appear to be somewhere other than where you were prior\r\n"
+                "to this experience, your life feels as though it has ebbed to the brink of\r\n"
+ 	        "death and has been only partially restored.\r\n",invoker);
   return eSUCCESS;
 }
 
