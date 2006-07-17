@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.116 2006/07/16 17:49:06 shane Exp $ */
+/* $Id: info.cpp,v 1.117 2006/07/17 00:12:38 jhhudso Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -3235,6 +3235,11 @@ void check_champion()
 
    }
 
-   if(!(obj = get_obj_num(real_object(CHAMPION_ITEM)))) obj_to_room(clone_object(real_object(CHAMPION_ITEM)), 3014);
-
+   if(!(obj = get_obj_num(real_object(CHAMPION_ITEM)))) {
+     if ((obj = clone_object(real_object(CHAMPION_ITEM)))) {
+       obj_to_room(obj, 3014);
+     } else {
+       log("CHAMPION_ITEM obj not found. Please create one.", 0, LOG_MISC);
+     }
+   }
 }
