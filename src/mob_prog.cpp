@@ -1092,7 +1092,6 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
 
   if ( !str_cmp( buf, "isworn" ) )
     {
-///	debug_point();
         OBJ_DATA *o;
 	if (mob->mobdata->last_room > 50000) // an object
 	 o = (OBJ_DATA*) mob->mobdata->last_room;
@@ -1400,8 +1399,6 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
   {
     struct obj_data *obj=0;
     CHAR_DATA *take;
-    extern void debug_here();
-    debug_here();
     struct obj_data * search_char_for_item(char_data * ch, int16 item_number, bool wearingonly = FALSE);
     char bufeh[MAX_STRING_LENGTH];
     char *valu = one_argument(val, bufeh);
@@ -1464,8 +1461,6 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
   {
     struct obj_data *obj=0;
     CHAR_DATA *take;
-    extern void debug_here();
-    debug_here();
     struct obj_data * search_char_for_item(char_data * ch, int16 item_number, bool wearingonly = FALSE);
     char bufeh[MAX_STRING_LENGTH];
     char *valu = one_argument(val, bufeh);
@@ -2257,6 +2252,7 @@ bool do_bufs(char *bufpt, char *argpt, char *point)
   return TRUE;
 }
 
+void debugpoint() {};
 /* This procedure simply copies the cmnd to a buffer while expanding
  * any variables by calling the translate procedure.  The observant
  * code scrutinizer will notice that this is taken from act()
@@ -2290,8 +2286,9 @@ int mprog_process_cmnd( char *cmnd, CHAR_DATA *mob, CHAR_DATA *actor,
 	  sbyte *lvalb = 0; 
 	  char type = *str;
 	  *str = '\0';
+	  debugpoint();
 	  if (do_bufs(&buf[0], &tmp[0], cmnd)) 
-	    translate_value(buf,tmp,&lvali,&lvalui, &lvalstr,&lvali64, &lvalb,mob,actor, obj, vo, rndm);
+	    translate_value(buf, tmp, &lvali,&lvalui, &lvalstr,&lvali64, &lvalb,mob,actor, obj, vo, rndm);
 	  else strcpy(left, cmnd);
 
 	  str += 2;
@@ -2302,8 +2299,19 @@ int mprog_process_cmnd( char *cmnd, CHAR_DATA *mob, CHAR_DATA *actor,
 	    translate_value(buf,tmp,&lvali,&lvalui, &lvalstr,&lvali64, &lvalb,mob,actor, obj, vo, rndm);
 	  else strcpy(right, str);
 	char buf[MAX_STRING_LENGTH];
-	sprintf(buf, "Lvali: %d\nLvalui: %d\nLvalstr = %s\nlvali64: %lld\nlvalb: %d\nleft: %s\nright: %s\n",
-		lvali, lvalui, lvalstr, lvali64, lvalb, left, right);
+	buf[0] = '\0';
+	if (lvali)
+	  sprintf(buf, "%sLvali: %d\n", buf,*lvali);
+	if (lvalui)
+	  sprintf(buf, "%sLvalui: %d\n", buf,*lvalui);
+	if (lvali64)
+	  sprintf(buf, "%sLvali64: %lld\n", buf,*lvali64);
+	if (lvalb)
+	  sprintf(buf, "%sLvalb: %d\n", buf,*lvalb);
+	if (lvalstr)
+	  sprintf(buf, "%sLvalstr: %s\n", buf,lvalstr);
+	sprintf(buf,"%sLeft: %s\n",buf,left);
+	sprintf(buf,"%sRight: %s\n",buf,right);
         if (actor)
 	  send_to_char(buf, actor);
 	return eSUCCESS;
