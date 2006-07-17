@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.353 2006/07/17 18:29:52 shane Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.354 2006/07/17 19:02:32 shane Exp $ */
 
 extern "C"
 {
@@ -4824,9 +4824,14 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim, int type)
      OBJ_DATA *obj = NULL;
      if(!(obj = get_obj_in_list_num(real_object(CHAMPION_ITEM), victim->carrying))) {log("Champion without the flag, no bueno amigo!", IMMORTAL, LOG_BUG);return;}
      if(IS_NPC(ch) && ch->master) {
-        move_obj(obj,ch->master);
-        SETBIT(ch->master->affected_by, AFF_CHAMPION);
-        sprintf(killer_message,"##%s has become the new Champion!\n\r", GET_NAME(ch->master));
+        if(ch->master->in_room >= 1900 || ch->master->in_room <= 1999 || IS_SET(world[ch->master->in_room].room_flags, CLAN_ROOM)) {
+           SETBIT(victim->affected_by, AFF_CHAMPION);
+           sprintf(killer_message,"##%s didn't deserve to become the new Champion, it remains %s!\n\r", GET_NAME(ch->master), GET_NAME(victim));
+        } else {
+           move_obj(obj,ch->master);
+           SETBIT(ch->master->affected_by, AFF_CHAMPION);
+           sprintf(killer_message,"##%s has become the new Champion!\n\r", GET_NAME(ch->master));
+        }
      } else {
         move_obj(obj, ch);
         SETBIT(ch->affected_by, AFF_CHAMPION);
