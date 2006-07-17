@@ -239,18 +239,18 @@ bool istank(CHAR_DATA *ch)
   return FALSE;
 }
 
-void translate_value(char *left, char *right, int16 *vali, uint32 *valui,
-		char *valstr, int64 *vali64, sbyte *valb, CHAR_DATA *mob, CHAR_DATA *actor, 
+void translate_value(char *left, char *right, int16 **vali, uint32 **valui,
+		char **valstr, int64 **vali64, sbyte **valb, CHAR_DATA *mob, CHAR_DATA *actor, 
 		OBJ_DATA *obj, void *vo, CHAR_DATA *rndm)
 {
   CHAR_DATA *target = NULL;
   OBJ_DATA *otarget = NULL;
-  int rtarget = -1;
+  int rtarget = -1, ztarget = -1;
   int val = 0;
   bool valset = FALSE; // done like that to determine if value is set, since it can be 0 
 	          struct tempvariable *eh = mob->tempVariable;
 
-  if (!str_prefix(left, "world")) {
+  if (!str_cmp(left, "world")) {
     left += 5;
     CHAR_DATA *tmp;
     for (tmp = character_list; tmp; tmp = tmp->next)
@@ -258,7 +258,7 @@ void translate_value(char *left, char *right, int16 *vali, uint32 *valui,
 	if (isname(left, GET_NAME(tmp)))
 	 { target = tmp; break; }
     }
-  } else if (!str_prefix(left, "zone")) {
+  } else if (!str_cmp(left, "zone")) {
     left += 4;
     CHAR_DATA *tmp;
     for (tmp = character_list; tmp; tmp = tmp->next)
@@ -267,16 +267,16 @@ void translate_value(char *left, char *right, int16 *vali, uint32 *valui,
 	if (isname(left, GET_NAME(tmp)))
 	 { target = tmp; break; }
     }
-  } else if (!str_prefix(left, "room")) {
+  } else if (!str_cmp(left, "room")) {
     left += 4;
     if (is_number(left))
 	rtarget = real_room(atoi(left));
     else
 	rtarget = mob->in_room;
-  } else if (!str_prefix(left, "oworld")) {
+  } else if (!str_cmp(left, "oworld")) {
     left += 6;
     otarget = get_obj(left);
-  } else if (!str_prefix(left, "ozone")) {
+  } else if (!str_cmp(left, "ozone")) {
     left += 5;
     OBJ_DATA *otmp;
     int z = world[mob->in_room].zone;
@@ -290,9 +290,12 @@ void translate_value(char *left, char *right, int16 *vali, uint32 *valui,
 		{ otarget = otmp; break; }	
     }
     otarget = get_obj(left);
-  } else if (!str_prefix(left, "oroom")) {
+  } else if (!str_cmp(left, "oroom")) {
     left += 5;
     otarget = get_obj_in_list(left, world[mob->in_room].contents);
+  } else if (!str_cmp(left, "zone")) {
+    ztarget = world[mob->in_room].zone;
+    left += 4;
   } else if (*left == '$') {
  	switch (*(left+1))
 	{
@@ -337,7 +340,7 @@ void translate_value(char *left, char *right, int16 *vali, uint32 *valui,
    	else { val = atoi(left); valset = TRUE; }
   }
 
-  if ( !target && !otarget && rtarget == -1 && !valset && str_cmp(right,"numpcs"))
+  if ( !target && !otarget && ztarget == -1 && rtarget == -1 && !valset && str_cmp(right,"numpcs"))
     {
         logf( IMMORTAL, LOG_WORLD,  "Mob: %d invalid target in mobprog", mob_index[mob->mobdata->nr].virt ); 
       return;
@@ -345,16 +348,17 @@ void translate_value(char *left, char *right, int16 *vali, uint32 *valui,
   // target acquired. fucking boring code.
   // more boring code. FUCK.
   int16 *intval = NULL;
-
   uint32 *uintval = NULL;
   char *stringval = NULL;
   int64 *llval = NULL;
   sbyte *sbval = NULL;
   bool tError = FALSE;
+
   /*
      When a variable is created and assigned the value of the target-data, it is because it is
       not meant to be modify-able through mob-progs, such as character class.
   */
+
   switch (LOWER(*right))
   {
     case 'a':
@@ -379,7 +383,14 @@ void translate_value(char *left, char *right, int16 *vali, uint32 *valui,
 		}
 		break;
     case 'c':
-		if (!str_cmp(right, "carryingitems"))
+	        if (!str_cmp(right, "carriedby"))
+		{  if (!otarget) tError = TRUE;
+		  else if (otarget->carried_by) {stringval = otarget->carried_by->name;}
+		  else if (otarget->equipped_by) {stringval = otarget->equipped_by->name;}
+		  else if (otarget->in_obj && otarget->in_obj->carried_by) {stringval = otarget->in_obj->carried_by->name;}
+		  else if (otarget->in_obj && otarget->in_obj->equipped_by) {stringval = otarget->in_obj->equipped_by->name;}
+		  else stringval = NULL;
+		} else if (!str_cmp(right, "carryingitems"))
 		{  if (!target) tError = TRUE;
 		  else {int16 car = target->carry_items;intval = &car;}
 		} else if (!str_cmp(right, "carryingweight"))
@@ -394,6 +405,10 @@ void translate_value(char *left, char *right, int16 *vali, uint32 *valui,
 		} else if (!str_cmp(right, "constitution"))
 		{ if (!target) tError = TRUE;
 		  else {sbval = &target->con; }
+		} else if (!str_cmp(right, "cost"))
+		{
+		  if (!otarget) tError = TRUE;
+		  else { uintval = (uint32*)&otarget->obj_flags.cost; }
 		}
 		break;
     case 'd':
@@ -402,8 +417,9 @@ void translate_value(char *left, char *right, int16 *vali, uint32 *valui,
 		  else {intval = &target->damroll;}
 		} else if (!str_cmp(right,"description"))
 		{
-		   if (!target) tError = TRUE;
-		   else {stringval =target->description;}
+		   if (!target && !otarget) tError = TRUE;
+		   else if (otarget) { stringval = otarget->description; }
+		   else {stringval = target->description; }
 		} else if (!str_cmp(right,"dexterity"))
 		{
 		   if (!target) tError = TRUE;
@@ -423,6 +439,10 @@ void translate_value(char *left, char *right, int16 *vali, uint32 *valui,
 		{
 		   if (!target) tError = TRUE;
 		   else {llval= &target->exp;}
+		} else if (!str_cmp(right,"extra"))
+		{
+		   if (!otarget) tError = TRUE;
+		   else {uintval = &otarget->obj_flags.extra_flags;}
 		}
 		break;
 	case 'f':
@@ -473,8 +493,9 @@ void translate_value(char *left, char *right, int16 *vali, uint32 *valui,
 		  else uintval = (uint32*)&target->immune;
 		} else if (!str_cmp(right,"inroom"))
 		{
-		   if (!target) tError = TRUE;
-		  else uintval = (uint32*)&target->in_room;
+		   if (!target && !otarget) tError = TRUE;
+		  else if (target) { uint32 tmp = (uint32)target->in_room; uintval = &tmp; }
+		  else { uint32 tmp = (uint32)otarget->in_room; uintval = &tmp; }
 		} else if (!str_cmp(right,"intelligence"))
 		{
 		   if (!target) tError = TRUE;
@@ -484,8 +505,9 @@ void translate_value(char *left, char *right, int16 *vali, uint32 *valui,
 	case 'l':
 		if (!str_cmp(right,"level"))
 		{
-		   if (!target) tError = TRUE;
-		   else {sbval= &target->level;}
+		   if (!target && !otarget) tError = TRUE;
+		   else if (otarget) {intval = &otarget->obj_flags.eq_level;}
+		   else { sbyte car = target->level; if (IS_NPC(target)) sbval= &target->level; else sbval = &target->level;}
 		} else if (!str_cmp(right,"long"))
 		{
 		   if (!target) tError = TRUE;
@@ -500,31 +522,211 @@ void translate_value(char *left, char *right, int16 *vali, uint32 *valui,
 		}
 		break;
 	case 'm':
+		if (!str_cmp(right,"magicsaves"))
+		{
+		   if (!target) tError = TRUE;
+		  else intval = &target->saves[SAVE_TYPE_MAGIC];
+		} else if (!str_cmp(right, "mana"))
+		{
+		  if (!target) tError = TRUE;
+		  else uintval = (uint32*)&target->mana;
+		} else if (!str_cmp(right, "maxhitpoints"))
+		{
+		  if (!target) tError = TRUE;
+		  else uintval = (uint32*)&target->max_hit;
+		} else if (!str_cmp(right, "maxmana"))
+		{
+		  if (!target) tError = TRUE;
+		  else uintval = (uint32*)&target->max_mana;
+		} else if (!str_cmp(right, "maxmove"))
+		{
+		  if (!target) tError = TRUE;
+		  else uintval = (uint32*)&target->max_move;
+		} else if (!str_cmp(right, "maxki"))
+		{
+		  if (!target) tError = TRUE;
+		  else uintval = (uint32*)&target->max_ki;
+		} else if (!str_cmp(right, "meleemit"))
+		{
+		  if (!target) tError = TRUE;
+		  else intval = &target->melee_mitigation;
+		} else if (!str_cmp(right, "misc"))
+		{
+		  if (!target) tError = TRUE;
+		  else uintval = &target->misc;
+		} else if (!str_cmp(right,"more"))
+		{
+		   if (!otarget) tError = TRUE;
+		   else {uintval = &otarget->obj_flags.more_flags;}
+		} else if (!str_cmp(right, "move"))
+		{
+		  if (!target) tError = TRUE;
+		  else uintval = (uint32*)&target->move;
+		}
 		break;
 	case 'n':
+		if (!str_cmp(right, "name"))
+		{
+		  if (!target) tError = TRUE;
+		  else stringval = target->name;
+		}
 		break;
 	case 'o':
 		break;
 	case 'p':
+		if (!str_cmp(right, "platinum"))
+		{
+		  if (!target) tError = TRUE;
+		  else uintval = &target->plat;
+		} else if (!str_cmp(right,"poisonsaves"))
+		{
+		   if (!target) tError = TRUE;
+		  else intval = &target->saves[SAVE_TYPE_POISON];
+                } else if (!str_cmp(right, "position"))
+                {
+                  if (!target) tError = TRUE;
+                  else intval = (int16*)&target->position;
+		} else if (!str_cmp(right, "practices"))
+		{
+		  if (!target || !target->pcdata)  tError = TRUE;
+		  else intval = (int16*)&target->pcdata->practices;
+		}
 		break;
 	case 'q':
 		break;
 	case 'r':
+		if (!str_cmp(right, "race"))
+		{  if (!target) tError = TRUE;
+		  else sbval = &target->race;
+		} else if (!str_cmp(right, "rawstr"))
+		{  if (!target) tError = TRUE;
+		  else sbval = &target->raw_str;
+		} else if (!str_cmp(right, "rawcon"))
+		{  if (!target) tError = TRUE;
+		  else sbval = &target->raw_con;
+		} else if (!str_cmp(right, "rawwis"))
+		{  if (!target) tError = TRUE;
+		  else sbval = &target->raw_wis;
+		} else if (!str_cmp(right, "rawdex"))
+		{  if (!target) tError = TRUE;
+		  else sbval = &target->raw_dex;
+		} else if (!str_cmp(right, "rawint"))
+		{  if (!target) tError = TRUE;
+		  else sbval = &target->raw_intel;
+		} else if (!str_cmp(right, "rawhit"))
+		{  if (!target) tError = TRUE;
+		  else uintval = (uint32*)&target->raw_hit;
+		} else if (!str_cmp(right, "rawmana"))
+		{  if (!target) tError = TRUE;
+		  else uintval = (uint32*)&target->raw_mana;
+		} else if (!str_cmp(right, "rawmove"))
+		{  if (!target) tError = TRUE;
+		  else uintval = (uint32*)&target->raw_move;
+		} else if (!str_cmp(right, "rawki"))
+		{  if (!target) tError = TRUE;
+		  else uintval = (uint32*)&target->raw_ki;
+		} else if (!str_cmp(right, "resist"))
+		{  if (!target) tError = TRUE;
+		  else uintval = &target->resist;
+		}
 		break;
 	case 's':
+		if (!str_cmp(right, "sex"))
+		{  if (!target) tError = TRUE;
+		  else sbval = &target->sex;
+		} else if (!str_cmp(right, "size"))
+		{  if (!otarget) tError = TRUE;
+		   else { intval = (int16*)&otarget->obj_flags.size; }
+		} else if (!str_cmp(right, "short"))
+		{  if (!target && !otarget) tError = TRUE;
+		   else if (otarget) { stringval = otarget->short_description; }
+		  else stringval = target->short_desc;
+		} else if (!str_cmp(right, "songmit"))
+		{  if (!target) tError = TRUE;
+		  else intval = &target->song_mitigation;
+		} else if (!str_cmp(right, "spelleffect"))
+		{  if (!target) tError = TRUE;
+		  else uintval = (uint32*)&target->spelldamage;
+		} else if (!str_cmp(right, "spellmit"))
+		{  if (!target) tError = TRUE;
+		  else intval = &target->spell_mitigation;
+		} else if (!str_cmp(right, "strength"))
+		{  if (!target) tError = TRUE;
+		  else sbval = &target->str;
+		} else if (!str_cmp(right, "suscept"))
+		{  if (!target) tError = TRUE;
+		  else uintval = &target->suscept;
+		}
+		break;
+	case 't':
+		if (!str_cmp(right, "title"))
+		{
+		  if (!target) tError = TRUE;
+		  else stringval = target->title;
+		} else if (!str_cmp(right, "type"))
+		{
+		  if (!otarget) tError = TRUE;
+		  else sbval = (sbyte*)&otarget->obj_flags.type_flag;
+		} else if (!str_cmp(right, "thirst"))
+		{
+		  if (!target) tError = TRUE;
+		  else {sbval= &target->conditions[THIRST];}
+		}
+		break;
+        case 'v':
+		if (!str_cmp(right, "value0"))
+		{
+		  if (!otarget) tError = TRUE;
+		  else uintval = (uint32*)&otarget->obj_flags.value[0];
+		} else if (!str_cmp(right, "value1"))
+		{
+		  if (!otarget) tError = TRUE;
+		  else uintval = (uint32*)&otarget->obj_flags.value[1];
+		} else if (!str_cmp(right, "value2"))
+		{
+		  if (!otarget) tError = TRUE;
+		  else uintval = (uint32*)&otarget->obj_flags.value[2];
+		} else if (!str_cmp(right, "value3"))
+		{
+		  if (!otarget) tError = TRUE;
+		  else uintval = (uint32*)&otarget->obj_flags.value[3];
+		}
+		break;
+	case 'w':
+		if (!str_cmp(right, "wearable"))
+		{
+		  if (!otarget) tError = TRUE;
+		  else uintval = &otarget->obj_flags.wear_flags;
+		} else if (!str_cmp(right, "weight"))
+		{
+		  if (!target && !otarget) tError = TRUE;
+		  else if (otarget) { intval = &otarget->obj_flags.weight; }
+		  else sbval = (sbyte*)&target->weight;
+		} else if (!str_cmp(right, "wisdom"))
+		{
+		  if (!target) tError = TRUE;
+		  else sbval = &target->wis;
+		}
+		break;
+	default: 
 		break;
 					
   }
+  if (tError)
+  {
+      logf( IMMORTAL, LOG_WORLD,  "Mob: %d tries to access non-existant field of target.", mob_index[mob->mobdata->nr].virt ); 
+      return;
+  }
+  if (intval) *vali = intval;
+  if (uintval) *valui = uintval;
+  if (stringval) *valstr = stringval;
+  if (llval) *vali64 = llval;
+  if (sbval) *valb = sbval;
 
-  if (intval) *vali = *intval;
-  if (uintval) *valui = *uintval;
-//  if (stringval) *valstr = *stringval;
-  if (llval) *vali64 = *llval;
   return;
 }
 
 
-void debugpoint(){}
 /* This function performs the evaluation of the if checks.  It is
  * here that you can add any ifchecks which you so desire. Hopefully
  * it is clear from what follows how one would go about adding your
@@ -535,7 +737,6 @@ void debugpoint(){}
  * to reduce the redundancy of the mammoth if statement list.
  * If there are errors, then return -1 otherwise return boolean 1,0
  */
-void debugp(){}
 
 // Azrack -- this was originally returning a bool, but its returning all sorts of values,
 // switched it to int 
@@ -566,8 +767,6 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
   /* skip leading spaces */
   while ( *point == ' ' )
     point++;
-//  if (mob_index[mob->mobdata->nr].virt == 17201)
-//   debugpoint();
   bool traditional = FALSE, traditional2 = TRUE;
 
   /* get whatever comes before the left paren.. ignore spaces */
@@ -689,26 +888,29 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
   ye = TRUE;
  }
   
-  int16 lvali = 0;
-  uint32 lvalui = 0;
-  char lvalstr[MAX_STRING_LENGTH];
-  int64 lvali64 = 0;
-  sbyte lvalb=0; 
+  int16 *lvali = 0;
+  uint32 *lvalui = 0;
+  char *lvalstr = 0;
+  int64 *lvali64 = 0;
+  sbyte *lvalb = 0; 
   //  int type = 0;
-  lvalstr[0] = '\0';
+
   if (!traditional)
-  translate_value(buf,arg,&lvali,&lvalui, &lvalstr[0],&lvali64, &lvalb,mob,actor, obj, vo, rndm);
+  translate_value(buf,arg,&lvali,&lvalui, &lvalstr,&lvali64, &lvalb,mob,actor, obj, vo, rndm);
  else // switch order of traditional so it'd be $n(ispc), to conform with
       // new ifchecks
-  translate_value(arg,buf,&lvali,&lvalui, &lvalstr[0],&lvali64, &lvalb, mob,actor, obj, vo, rndm);
+  translate_value(arg,buf,&lvali,&lvalui, &lvalstr,&lvali64, &lvalb, mob,actor, obj, vo, rndm);
 
   if (lvali)
-    return mprog_veval(lvali, opr, atoi(val));
+    return mprog_veval(*lvali, opr, atoi(val));
   if (lvalui)
-    return mprog_veval(lvalui, opr, atoi(val));
+    return mprog_veval(*lvalui, opr, atoi(val));
   if (lvali64)
-    return mprog_veval((int)lvali64,opr, atoi(val));
-
+    return mprog_veval((int)*lvali64,opr, atoi(val));
+  if (lvalb)
+    return mprog_veval((int)*lvalb, opr, atoi(val));
+  if (lvalstr)
+    return mprog_seval(lvalstr, opr, val);
   if ( !str_cmp( buf, "rand" ) )
     {
       return ( number(1, 100) <= atoi(arg) );
@@ -724,9 +926,7 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
      for (p = world[mob->in_room].people;p;p=p->next_in_room)
        if (!IS_NPC(p))
 	i++;
-
-           return mprog_veval( i, opr, atoi(val) );
-     
+     return mprog_veval( i, opr, atoi(val) );
   }
   if ( !str_cmp( buf, "ispc" ) )
     {
@@ -1196,315 +1396,6 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
 	}
     }
 
-/*  if ( !str_cmp( buf, "inroom" ) )
-    {
-	if (fvict)
-	{
-	  lhsvl = world[fvict->in_room].number;
-	  rhsvl = atoi(val);
-	 return mprog_veval(lhsvl,opr,rhsvl);
-	}
-	if (ye) return FALSE;
-      switch ( arg[1] )
-	{
-	case 'i': lhsvl = world[mob->in_room].number;
-	          rhsvl = atoi(val);
-	          return mprog_veval( lhsvl, opr, rhsvl );
-	case 'z': if (mob->beacon) {
-		lhsvl = world[((CHAR_DATA*)mob->beacon)->in_room].number;
-	        rhsvl = atoi(val);
-             return mprog_veval(lhsvl, opr, rhsvl);;
-	}
-           else return -1;
-
-	case 'n': if ( actor )
-	          {
-		    lhsvl = world[actor->in_room].number;
-		    rhsvl = atoi( val );
-		    return mprog_veval( lhsvl, opr, rhsvl );
-		  }
-	          else
-		    return -1;
-	case 't': if ( vict )
-	          {
-		    lhsvl = world[vict->in_room].number;
-		    rhsvl = atoi( val );
-		    return mprog_veval( lhsvl, opr, rhsvl );
-		  }
-	          else
-		    return -1;
-	case 'r': if ( rndm )
-	          {
-		    lhsvl = world[rndm->in_room].number;
-		    rhsvl = atoi( val );
-		    return mprog_veval( lhsvl, opr, rhsvl );
-		  }
-	          else
-		    return -1;
-	default:
-	  logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'inroom'", mob_index[mob->mobdata->nr].virt ); 
-	  return -1;
-	}
-    }
-*/
-  if ( !str_cmp( buf, "sex" ) )
-    {
-	if (fvict)
-	 {
-		lhsvl = fvict->sex;
-		rhsvl = atoi(val);
-		return mprog_veval(lhsvl, opr, rhsvl);
-	}
-	if (ye) return FALSE;
-      switch ( arg[1] )  /* arg should be "$*" so just get the letter */
-	{
-	case 'z': if (mob->beacon) {
-		lhsvl = ((CHAR_DATA*)mob->beacon)->sex;
-	      rhsvl = atoi(val);
-             return mprog_veval(lhsvl, opr, rhsvl);
-	}
-           else return -1;
-
-	case 'i': lhsvl = mob->sex;
-	          rhsvl = atoi( val );
-	          return mprog_veval( lhsvl, opr, rhsvl );
-	case 'n': if ( actor )
-	          {
-		    lhsvl = actor->sex;
-		    rhsvl = atoi( val );
-		    return mprog_veval( lhsvl, opr, rhsvl );
-		  }
-	          else
-		    return -1;
-	case 't': if ( vict )
-	          {
-		    lhsvl = vict->sex;
-		    rhsvl = atoi( val );
-		    return mprog_veval( lhsvl, opr, rhsvl );
-		  }
-	          else
-		    return -1;
-	case 'r': if ( rndm )
-	          {
-		    lhsvl = rndm->sex;
-		    rhsvl = atoi( val );
-		    return mprog_veval( lhsvl, opr, rhsvl );
-		  }
-	          else
-		    return -1;
-	default:
-	  logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'sex'", mob_index[mob->mobdata->nr].virt ); 
-	  return -1;
-	}
-    }
-
-  if ( !str_cmp( buf, "position" ) )
-    {
-	if (fvict)
-	{
-		lhsvl = fvict->position;
-	          rhsvl = atoi( val );
-	          return mprog_veval( lhsvl, opr, rhsvl );
-	}
-	if (ye) return FALSE;
-
-      switch ( arg[1] )  /* arg should be "$*" so just get the letter */
-	{
-	case 'i': lhsvl = mob->position;
-	          rhsvl = atoi( val );
-	          return mprog_veval( lhsvl, opr, rhsvl );
-	case 'z': if (mob->beacon) {
-		lhsvl = ((CHAR_DATA*)mob->beacon)->position;
-		rhsvl = atoi(val);
-             return mprog_veval(lhsvl, opr, rhsvl);
-	}
-           else return -1;
-
-	case 'n': if ( actor )
-	          {
-		    lhsvl = actor->position;
-		    rhsvl = atoi( val );
-		    return mprog_veval( lhsvl, opr, rhsvl );
-		  }
-	          else
-		    return -1;
-	case 't': if ( vict )
-	          {
-		    lhsvl = vict->position;
-		    rhsvl = atoi( val );
-		    return mprog_veval( lhsvl, opr, rhsvl );
-		  }
-	          else
-		    return -1;
-	case 'r': if ( rndm )
-	          {
-		    lhsvl = rndm->position;
-		    rhsvl = atoi( val );
-		    return mprog_veval( lhsvl, opr, rhsvl );
-		  }
-	          else
-		    return -1;
-	default:
-	  logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'position'", mob_index[mob->mobdata->nr].virt ); 
-	  return -1;
-	}
-    }
-
-  if ( !str_cmp( buf, "level" ) )
-    {
-	if (fvict)
-	{
-		lhsvl = GET_LEVEL(fvict);
-	          rhsvl = atoi( val );
-	          return mprog_veval( lhsvl, opr, rhsvl );
-
-	}
-	if (ye) return FALSE;
-      switch ( arg[1] )  /* arg should be "$*" so just get the letter */
-	{
-	case 'z': if (mob->beacon) {
-		lhsvl = GET_LEVEL(((CHAR_DATA*)mob->beacon));
-		rhsvl = atoi(val);
-             return mprog_veval(lhsvl, opr, rhsvl);
-		}
-           else return -1;
-
-	case 'i': lhsvl = GET_LEVEL( mob );
-	          rhsvl = atoi( val );
-	          return mprog_veval( lhsvl, opr, rhsvl );
-	case 'n': if ( actor )
-	          {
-		    lhsvl = GET_LEVEL( actor );
-		    rhsvl = atoi( val );
-		    return mprog_veval( lhsvl, opr, rhsvl );
-		  }
-	          else 
-		    return -1;
-	case 't': if ( vict )
-	          {
-		    lhsvl = GET_LEVEL( vict );
-		    rhsvl = atoi( val );
-		    return mprog_veval( lhsvl, opr, rhsvl );
-		  }
-	          else
-		    return -1;
-	case 'r': if ( rndm )
-	          {
-		    lhsvl = GET_LEVEL( rndm );
-		    rhsvl = atoi( val );
-		    return mprog_veval( lhsvl, opr, rhsvl );
-		  }
-	          else
-		    return -1;
-	default:
-	  logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'level'", mob_index[mob->mobdata->nr].virt ); 
-	  return -1;
-	}
-    }
-  if (!str_cmp(buf, "race") )
-  {
-	if (fvict)
-	{
-		lhsvl = GET_RACE(fvict);
-	          rhsvl = atoi( val );
-	          return mprog_veval( lhsvl, opr, rhsvl );
-	}
-	if (ye) return FALSE;
-      switch ( arg[1] )  /* arg should be "$*" so just get the letter */
-        {
-        case 'i': lhsvl = GET_RACE(mob);
-                  rhsvl = atoi( val );
-                  return mprog_veval( lhsvl, opr, rhsvl );
-	case 'z': if (mob->beacon)
-	  {
-	      lhsvl = GET_RACE(((CHAR_DATA*)mob->beacon));
-	     rhsvl = atoi(val);
-             return mprog_veval(lhsvl, opr, rhsvl);
-	  }
-           else return -1;
-
-        case 'n': if ( actor )
-                  {
-                    lhsvl = GET_RACE(actor);
-                    rhsvl = atoi( val );
-                    return mprog_veval( lhsvl, opr, rhsvl );
-                  }
-                  else
-                    return -1;
-        case 't': if ( vict )
-                  {
-                    lhsvl = GET_RACE(vict);
-                    rhsvl = atoi( val );
-                    return mprog_veval( lhsvl, opr, rhsvl );
-                  }
-                  else
-                    return -1;
-        case 'r': if ( rndm )
-                  {
-                    lhsvl = GET_RACE(rndm);
-                    rhsvl = atoi( val );
-                    return mprog_veval( lhsvl, opr, rhsvl );
-                  }
-                  else
-                    return -1;
-        default:
-          logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'race'", mob_index[mob->mobdata->nr].virt );
-          return -1;
-        }
-       
-  }
-  if ( !str_cmp( buf, "class" ) )
-    {
-	if (fvict) {
-		lhsvl = GET_CLASS(fvict);
-	          rhsvl = atoi( val );
-	          return mprog_veval( lhsvl, opr, rhsvl );
-     }
-	if (ye) return FALSE;
-      switch ( arg[1] )  /* arg should be "$*" so just get the letter */
-	{
-	case 'z': if (mob->beacon)
-	  {
-	      lhsvl = GET_CLASS(((CHAR_DATA*)mob->beacon));
-	     rhsvl = atoi(val);
-             return mprog_veval(lhsvl, opr, rhsvl);
-	  }
-           else return -1;
-
-	case 'i': lhsvl = GET_CLASS(mob);
-	          rhsvl = atoi( val );
-                  return mprog_veval( lhsvl, opr, rhsvl );
-	case 'n': if ( actor )
-	          {
-		    lhsvl = GET_CLASS(actor);
-		    rhsvl = atoi( val );
-		    return mprog_veval( lhsvl, opr, rhsvl );
-		  }
-	          else 
-		    return -1;
-	case 't': if ( vict )
-	          {
-		    lhsvl = GET_CLASS(vict);
-		    rhsvl = atoi( val );
-		    return mprog_veval( lhsvl, opr, rhsvl );
-		  }
-	          else
-		    return -1;
-	case 'r': if ( rndm )
-	          {
-		    lhsvl = GET_CLASS(rndm);
-		    rhsvl = atoi( val );
-		    return mprog_veval( lhsvl, opr, rhsvl );
-		  }
-	          else
-		    return -1;
-	default:
-	  logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'class'", 
-mob_index[mob->mobdata->nr].virt ); 
-	  return -1;
-	}
-    }
-
   if (!str_cmp(buf, "wears"))
   {
     struct obj_data *obj=0;
@@ -1630,188 +1521,6 @@ mob_index[mob->mobdata->nr].virt );
     }
     return -1;
    }
-  if ( !str_cmp( buf, "goldamt" ) )
-    {
-     if (fvict)
-	{
-	 lhsvl = fvict->gold;
-	     rhsvl = atoi(val);
-             return mprog_veval(lhsvl, opr, rhsvl);
-	}
-	if (ye) return FALSE;
-
-      switch ( arg[1] )  /* arg should be "$*" so just get the letter */
-	{
-	case 'z': if (mob->beacon)
-	  {
-	      lhsvl = ((CHAR_DATA*)mob->beacon)->gold;
-	     rhsvl = atoi(val);
-             return mprog_veval(lhsvl, opr, rhsvl);
-	  }
-           else return -1;
-
-	case 'i': lhsvl = mob->gold;
-                  rhsvl = atoi( val );
-                  return mprog_veval( lhsvl, opr, rhsvl );
-	case 'n': if ( actor )
-	          {
-		    lhsvl = actor->gold;
-		    rhsvl = atoi( val );
-		    return mprog_veval( lhsvl, opr, rhsvl );
-		  }
-	          else
-		    return -1;
-	case 't': if ( vict )
-	          {
-		    lhsvl = vict->gold;
-		    rhsvl = atoi( val );
-		    return mprog_veval( lhsvl, opr, rhsvl );
-		  }
-	          else
-		    return -1;
-	case 'r': if ( rndm )
-	          {
-		    lhsvl = rndm->gold;
-		    rhsvl = atoi( val );
-		    return mprog_veval( lhsvl, opr, rhsvl );
-		  }
-	          else
-		    return -1;
-	default:
-	  logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'goldamt'", mob_index[mob->mobdata->nr].virt ); 
-	  return -1;
-	}
-    }
-
-  if ( !str_cmp( buf, "objtype" ) )
-    {
-      switch ( arg[1] )  /* arg should be "$*" so just get the letter */
-	{
-	case 'o': if ( obj )
-	          {
-		    lhsvl = GET_ITEM_TYPE(obj);
-		    rhsvl = atoi( val );
-		    return mprog_veval( lhsvl, opr, rhsvl );
-		  }
-	         else
-		   return -1;
-	case 'p': if ( v_obj )
-	          {
-		    lhsvl = GET_ITEM_TYPE(obj);
-		    rhsvl = atoi( val );
-		    return mprog_veval( lhsvl, opr, rhsvl );
-		  }
-	          else
-		    return -1;
-	default:
-	  logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'objtype'", mob_index[mob->mobdata->nr].virt ); 
-	  return -1;
-	}
-    }
-
-  if ( !str_cmp( buf, "objval0" ) )
-    {
-      switch ( arg[1] )  /* arg should be "$*" so just get the letter */
-	{
-	case 'o': if ( obj )
-	          {
-		    lhsvl = obj->obj_flags.value[0];
-		    rhsvl = atoi( val );
-		    return mprog_veval( lhsvl, opr, rhsvl );
-		  }
-	          else
-		    return -1;
-	case 'p': if ( v_obj )
-	          {
-		    lhsvl = v_obj->obj_flags.value[0];
-		    rhsvl = atoi( val );
-		    return mprog_veval( lhsvl, opr, rhsvl );
-		  }
-	          else 
-		    return -1;
-	default:
-	  logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'objval0'",mob_index[mob->mobdata->nr].virt ); 
-	  return -1;
-	}
-    }
-
-  if ( !str_cmp( buf, "objval1" ) )
-    {
-      switch ( arg[1] )  /* arg should be "$*" so just get the letter */
-	{
-	case 'o': if ( obj )
-	          {
-		    lhsvl = obj->obj_flags.value[1];
-		    rhsvl = atoi( val );
-		    return mprog_veval( lhsvl, opr, rhsvl );
-		  }
-	          else
-		    return -1;
-	case 'p': if ( v_obj )
-	          {
-		    lhsvl = v_obj->obj_flags.value[1];
-		    rhsvl = atoi( val );
-		    return mprog_veval( lhsvl, opr, rhsvl );
-		  }
-	          else
-		    return -1;
-	default:
-	  logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'objval1'", mob_index[mob->mobdata->nr].virt ); 
-	  return -1;
-	}
-    }
-
-  if ( !str_cmp( buf, "objval2" ) )
-    {
-      switch ( arg[1] )  /* arg should be "$*" so just get the letter */
-	{
-	case 'o': if ( obj )
-	          {
-		    lhsvl = obj->obj_flags.value[2];
-		    rhsvl = atoi( val );
-		    return mprog_veval( lhsvl, opr, rhsvl );
-		  }
-	          else
-		    return -1;
-	case 'p': if ( v_obj )
-	          {
-		    lhsvl = v_obj->obj_flags.value[2];
-		    rhsvl = atoi( val );
-		    return mprog_veval( lhsvl, opr, rhsvl );
-		  }
-	          else
-		    return -1;
-	default:
-	  logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'objval2'",mob_index[mob->mobdata->nr].virt ); 
-	  return -1;
-	}
-    }
-
-  if ( !str_cmp( buf, "objval3" ) )
-    {
-      switch ( arg[1] )  /* arg should be "$*" so just get the letter */
-	{
-	case 'o': if ( obj )
-	          {
-		    lhsvl = obj->obj_flags.value[3];
-		    rhsvl = atoi( val );
-		    return mprog_veval( lhsvl, opr, rhsvl );
-		  }
-	          else
-		    return -1;
-	case 'p': if ( v_obj ) 
-	          {
-		    lhsvl = v_obj->obj_flags.value[3];
-		    rhsvl = atoi( val );
-		    return mprog_veval( lhsvl, opr, rhsvl );
-		  }
-	          else
-		    return -1;
-	default:
-	  logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'objval3'", mob_index[mob->mobdata->nr].virt ); 
-	  return -1;
-	}
-    }
 
   if ( !str_cmp( buf, "number" ) )
     {
@@ -1949,47 +1658,6 @@ mob_index[mob->mobdata->nr].virt );
           return -1;
         }
     }
-  if ( !str_cmp( buf, "name" ) )
-    {
-    if (val[0] == '$' && val[1])
-        mprog_translate(val[1], val, mob, actor, obj, vo, rndm);
-       if (fvict)
-	  return mprog_seval(fvict->name, opr, val);
-	if (ye) return FALSE;
-       switch ( arg[1] )  /* arg should be "$*" so just get the letter */
-	{
-	case 'z': if (mob->beacon)
-	  {
-             return mprog_seval(((CHAR_DATA*)mob->beacon)->name, opr, val);
-	  }
-           else return -1;
-
-	case 'i': return mprog_seval( mob->name, opr, val );
-	case 'n': if ( actor )
-	            return mprog_seval( actor->name, opr, val );
-	          else
-		    return -1;
-	case 't': if ( vict )
-	            return mprog_seval( vict->name, opr, val );
-	          else
-		    return -1;
-	case 'r': if ( rndm )
-	            return mprog_seval( rndm->name, opr, val );
-	          else
-		    return -1;
-	case 'o': if ( obj )
-	            return mprog_seval( obj->name, opr, val );
-	          else
-		    return -1;
-	case 'p': if ( v_obj )
-	            return mprog_seval( v_obj->name, opr, val );
-	          else
-		    return -1;
-	default:
-	  logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'name'",mob_index[mob->mobdata->nr].virt ); 
-	  return -1;
-	}
-    }
 
   // search a room for a mob with vnum arg
   if ( !str_cmp( buf, "ismobvnuminroom" ) )
@@ -2120,7 +1788,6 @@ char *mprog_process_if( char *ifchck, char *com_list, CHAR_DATA *mob,
  int  legal;
 
  *null = '\0';
-  if (mob_index[mob->mobdata->nr].virt == 100) debugp();
 
  /* check for trueness of the ifcheck */
  if ( ( legal = mprog_do_ifchck( ifchck, mob, actor, obj, vo, rndm ) ) )
@@ -2334,32 +2001,6 @@ void mprog_translate( char ch, char *t, CHAR_DATA *mob, CHAR_DATA *actor,
 	  strcpy(t,"error");
 	*t = UPPER(*t);
 	break;
-/*     case 'v':
-	if (mob->tempVariable)
-  	  strcpy(t, mob->tempVariable);
-	else
-	  strcpy(t,"");
-	break;
-     case 'V':
-	if (actor)
-	  if (actor->tempVariable)
-	  {  strcpy(t,actor->tempVariable); break; }
-	if (t && *t) *t = UPPER(*t);
-	strcpy(t,"error");
-	break;
-     case 'w':
-        if (vict)
-          if (vict->tempVariable)
-          {  strcpy(t, vict->tempVariable); break; }
-        strcpy(t,"error");
-        break;
-     case 'W':
-        if (rndm)
-          if (rndm->tempVariable)
-          {  strcpy(t,rndm->tempVariable); break; }
-        strcpy(t,"error");
-        break;
-*/
      case 'n':
          if ( actor ) {
 // Mobs can see them no matter what.  Use "cansee()" if you don't want that
@@ -2566,7 +2207,55 @@ void mprog_translate( char ch, char *t, CHAR_DATA *mob, CHAR_DATA *actor,
 
 }
 
+bool do_bufs(char *bufpt, char *argpt, char *point)
+{
+  bool traditional = FALSE, traditional2 = TRUE;
 
+  /* get whatever comes before the left paren.. ignore spaces */
+  while ( *point )
+    if (*point == '(')
+    {
+	traditional = TRUE;
+	break;
+    }
+    else if (*point == ' ')
+    {
+	return FALSE;
+    }
+    else if ( *point == '.' )
+    {
+	break;
+    }
+    else if ( *point == '\0' ) 
+      {
+	return FALSE;
+      }   
+    else
+      if ( *point == ' ' )
+	point++;
+      else 
+	*bufpt++ = *point++; 
+  *bufpt = '\0';
+  point++;
+
+  /* get whatever is in between the parens.. ignore spaces */
+  while ( *point ) 
+    if (traditional && *point == ')') break;
+    else if (!traditional && !isalpha(*point)) { point--; break; }
+    else if ( *point == '\0' )
+      {
+	return FALSE;
+      }   
+    else
+      if ( *point == ' ' )
+	point++;
+      else 
+	*argpt++ = *point++; 
+
+  *argpt = '\0';
+//  point++;
+  return TRUE;
+}
 
 /* This procedure simply copies the cmnd to a buffer while expanding
  * any variables by calling the translate procedure.  The observant
@@ -2577,13 +2266,51 @@ int mprog_process_cmnd( char *cmnd, CHAR_DATA *mob, CHAR_DATA *actor,
 {
   char buf[ MAX_INPUT_LENGTH*2 ];
   char tmp[ MAX_INPUT_LENGTH*2 ];
+  char left[ MAX_INPUT_LENGTH*2 ];
+  char right[ MAX_INPUT_LENGTH*2 ];
   char *str;
   char *i;
   char *point;
 
   point   = buf;
   str     = cmnd;
+  left[0] = right[0] = '\0';
+  while ( *str == ' ' )
+    str++;
 
+  while (*str != '\0')
+  {
+     if ((*str == '=' || *str == '+' || *str == '-' || *str == '&' || *str == '|' ||
+		*str == '*' || *str == '/') && *(str+1) == '=' && *(str+2) != '\0')
+     {
+	  int16 *lvali = 0;
+	  uint32 *lvalui = 0;
+	  char *lvalstr = 0;
+	  int64 *lvali64 = 0;
+	  sbyte *lvalb = 0; 
+	  char type = *str;
+	  *str = '\0';
+	  if (do_bufs(&buf[0], &tmp[0], cmnd)) 
+	    translate_value(buf,tmp,&lvali,&lvalui, &lvalstr,&lvali64, &lvalb,mob,actor, obj, vo, rndm);
+	  else strcpy(left, cmnd);
+
+	  str += 2;
+
+	  while ( *str == ' ' )
+ 	    str++;
+	  if (do_bufs(&buf[0], &tmp[0], str)) 
+	    translate_value(buf,tmp,&lvali,&lvalui, &lvalstr,&lvali64, &lvalb,mob,actor, obj, vo, rndm);
+	  else strcpy(right, str);
+	char buf[MAX_STRING_LENGTH];
+	sprintf(buf, "Lvali: %d\nLvalui: %d\nLvalstr = %s\nlvali64: %lld\nlvalb: %d\nleft: %s\nright: %s\n",
+		lvali, lvalui, lvalstr, lvali64, lvalb, left, right);
+        if (actor)
+	  send_to_char(buf, actor);
+	return eSUCCESS;
+     }
+     str++;
+  }
+  str = cmnd;
   while ( *str != '\0' )
   {
     if ( *str != '$' )
