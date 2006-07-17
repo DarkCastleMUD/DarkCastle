@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.142 2006/07/17 00:30:46 jhhudso Exp $
+| $Id: cl_thief.cpp,v 1.143 2006/07/17 01:01:06 jhhudso Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -1825,7 +1825,7 @@ int do_blackjack(struct char_data *ch, char *argument, int cmd)
       // victim's next target will be random
       af.modifier = 1;     
       affect_to_char(victim, &af, PULSE_VIOLENCE);
-      retval = attack(ch, victim, SKILL_BLACKJACK, FIRST);
+      retval = damage(ch, victim, 25, TYPE_BLUDGEON, SKILL_BLACKJACK, 0);
     } else if ( fail_percentage < value &&
 		value <= (fail_percentage+work_percentage)) {
       // ch failed to blackjack victim
@@ -1835,11 +1835,11 @@ int do_blackjack(struct char_data *ch, char *argument, int cmd)
       GET_POS(victim) = POSITION_SITTING;
       SET_BIT(victim->combat, COMBAT_BASH1);
       affect_to_char(victim, &af, PULSE_VIOLENCE);
-      retval = attack(ch, victim, SKILL_BLACKJACK, FIRST);
+      retval = damage(ch, victim, 25, TYPE_BLUDGEON, SKILL_BLACKJACK, 0);
       // victim's next attack will fail
     }
   } else {
-    retval = damage(ch,victim, 0, TYPE_BLUDGEON, SKILL_BLACKJACK, 0);
+    retval = attack(ch, victim, SKILL_BLACKJACK, FIRST);
   }
 
   if (retval & eVICT_DIED && !retval & eCH_DIED)
