@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.125 2006/07/16 10:43:54 shane Exp $ */
+/* $Id: handler.cpp,v 1.126 2006/07/17 00:13:06 jhhudso Exp $ */
     
 extern "C"
 {
@@ -2578,6 +2578,9 @@ int obj_from_char(struct obj_data *object)
 int obj_to_room(struct obj_data *object, int room)
 {
   struct obj_data *obj;
+
+  if (!object)
+    return 0;
 
   if(object->obj_flags.type_flag == ITEM_PORTAL)
     world[room].light++;
