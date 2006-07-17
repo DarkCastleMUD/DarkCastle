@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.141 2006/07/16 23:30:46 jhhudso Exp $
+| $Id: cl_thief.cpp,v 1.142 2006/07/17 00:30:46 jhhudso Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -1817,37 +1817,31 @@ int do_blackjack(struct char_data *ch, char *argument, int cmd)
 
     //    fprintf(stderr, "l:%d f:%d w:%d r:%d v:%d\n\r", learned, fail_percentage, work_percentage, rand_percentage, value);
     
-    skill_increase_check (ch, SKILL_BLACKJACK, has_skill(ch, SKILL_BLACKJACK), SKILL_INCREASE_MEDIUM);
+    skill_increase_check (ch, SKILL_BLACKJACK, has_skill(ch, SKILL_BLACKJACK),
+			  SKILL_INCREASE_MEDIUM);
 
-    if ((fail_percentage+work_percentage) < value && value <= (fail_percentage+work_percentage+rand_percentage)) {
-      //      act("$N leaps from the shadows and strikes a sharp blow to the back of your head, making you feel dizzy!",victim, 0, ch, TO_CHAR, 0);
-      //      act("$n sneaks behind $N and makes $M dizzy with a sharp blow to the head.", ch, 0, victim, TO_ROOM, INVIS_NULL|NOTVICT);
-      //      act("You sneak behind $N and make $M dizzy with a sharp blow to the head.", ch, 0, victim, TO_CHAR, 0);
-      af.modifier = 1;     // ramdom affect
-    } else if ( fail_percentage < value && value <= (fail_percentage+work_percentage)) {
-      //      act("$N leaps from the shadows and attempts to strike a sharp blow to the back of your head, but fails miserably!",victim, 0, ch, TO_CHAR, 0);
-      //      act("$n sneaks behind $N and attempts to hit $M on the back of the head, but fails miserably.", ch, 0, victim, TO_ROOM, INVIS_NULL|NOTVICT);
-      //      act("You sneak behind $N and attempt to strike $M, but fail miserably.", ch, 0, victim, TO_CHAR, 0);
-      af.modifier  = 0;       // no affect
-    } else if (0 < value && value <= fail_percentage) {
-      //      act("$N leaps from the shadows and strikes a sharp blow to the back of your head, knocking you down!",victim, 0, ch, TO_CHAR, 0);
-      //      act("$n sneaks behind $N and knocks $M down with a sharp blow to the head.", ch, 0, victim, TO_ROOM, INVIS_NULL|NOTVICT);
-      //      act("You sneak behind $N and knock $M down with a sharp blow to the head.", ch, 0, victim, TO_CHAR, 0);
-      af.modifier  = 2;	// Fail affect
-      GET_POS(victim) = POSITION_SITTING;
-      SET_BIT(victim->combat, COMBAT_BASH1);
-    }
-
-    if (af.modifier) {
+    if ((fail_percentage+work_percentage) < value &&
+	value <= (fail_percentage+work_percentage+rand_percentage)) {
+      // victim's next target will be random
+      af.modifier = 1;     
       affect_to_char(victim, &af, PULSE_VIOLENCE);
       retval = attack(ch, victim, SKILL_BLACKJACK, FIRST);
-    } else {
-      retval = damage(ch,victim, 0, TYPE_BLUDGEON, SKILL_BLACKJACK, 0);
+    } else if ( fail_percentage < value &&
+		value <= (fail_percentage+work_percentage)) {
+      // ch failed to blackjack victim
+      retval = damage(ch, victim, 0, TYPE_BLUDGEON, SKILL_BLACKJACK, 0);
+    } else if (0 < value && value <= fail_percentage) {
+      af.modifier = 2;
+      GET_POS(victim) = POSITION_SITTING;
+      SET_BIT(victim->combat, COMBAT_BASH1);
+      affect_to_char(victim, &af, PULSE_VIOLENCE);
+      retval = attack(ch, victim, SKILL_BLACKJACK, FIRST);
+      // victim's next attack will fail
     }
   } else {
     retval = damage(ch,victim, 0, TYPE_BLUDGEON, SKILL_BLACKJACK, 0);
   }
-  
+
   if (retval & eVICT_DIED && !retval & eCH_DIED)
   {
     if(!IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_WIMPY))
