@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.143 2006/07/17 01:01:06 jhhudso Exp $
+| $Id: cl_thief.cpp,v 1.144 2006/07/18 21:04:59 dcastle Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -62,6 +62,14 @@ int palm(CHAR_DATA *ch, struct obj_data *obj_object,
         send_to_char("Something inside the item is unique and prevents it!\n\r", ch);
         return eFAILURE;
      }
+  }
+
+  
+  if(obj_index[obj_object->item_number].virt == CHAMPION_ITEM) {
+     if (IS_NPC(ch) || GET_LEVEL(ch) <= 5) return eFAILURE;
+           SETBIT(ch->affected_by, AFF_CHAMPION);
+           sprintf(buffer, "\n\r##%s has just picked up the Champion flag!\n\r", GET_NAME(ch));
+           send_info(buffer);
   }
 
   move_obj(obj_object, ch);
