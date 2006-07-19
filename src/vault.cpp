@@ -161,13 +161,13 @@ bool fullItemMatch(obj_data *obj, obj_data *obj2)
   if (obj->obj_flags.more_flags != obj2->obj_flags.more_flags)
 	return 0;
 
-  if (obj->obj_flags.type_flag == ITEM_STAFF && obj->obj_flags.value[1] != obj2->obj_flags.value[1])
+  if (obj->obj_flags.type_flag == ITEM_STAFF && obj->obj_flags.value[2] != obj2->obj_flags.value[2])
     return 0;
 
-  if (obj->obj_flags.type_flag == ITEM_WAND && obj->obj_flags.value[1] != obj2->obj_flags.value[1])
+  if (obj->obj_flags.type_flag == ITEM_WAND && obj->obj_flags.value[2] != obj2->obj_flags.value[2])
     return 0;
 
-  if (obj->obj_flags.type_flag == ITEM_DRINKCON && obj->obj_flags.value[0] != obj2->obj_flags.value[0])
+  if (obj->obj_flags.type_flag == ITEM_DRINKCON && obj->obj_flags.value[1] != obj2->obj_flags.value[1])
     return 0;
 
   return 1;
