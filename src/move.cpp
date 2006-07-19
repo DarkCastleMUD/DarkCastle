@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.72 2006/07/17 18:29:52 shane Exp $
+| $Id: move.cpp,v 1.73 2006/07/19 19:37:02 shane Exp $
 | move.C
 | Movement commands and stuff.
 *************************************************************************
@@ -1012,8 +1012,10 @@ int do_enter(CHAR_DATA *ch, char *argument, int cmd)
     return eFAILURE;
     }
 
-  if (!IS_MOB(ch) && (affected_by_spell(ch, FUCK_PTHIEF) || affected_by_spell(ch, FUCK_GTHIEF) || IS_AFFECTED(ch, AFF_CHAMPION))
-    && (IS_SET(world[real_room(portal->obj_flags.value[0])].room_flags, CLAN_ROOM || portal->obj_flags.value[0] >= 1900 || portal->obj_flags.value[0] <= 1999))) {
+  if (!IS_MOB(ch) &&
+      (affected_by_spell(ch, FUCK_PTHIEF) || affected_by_spell(ch, FUCK_GTHIEF) || IS_AFFECTED(ch, AFF_CHAMPION)) &&
+      (IS_SET(world[real_room(portal->obj_flags.value[0])].room_flags, CLAN_ROOM) ||
+        portal->obj_flags.value[0] >= 1900 && portal->obj_flags.value[0] <= 1999 && !portal->obj_flags.value[1])) {
     send_to_char("The portal's destination rebels against you.\r\n", ch);
     act("$n finds $mself unable to enter!", ch, 0, 0, TO_ROOM, 0);
     return eFAILURE;
