@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.31 2006/06/08 20:18:05 shane Exp $
+| $Id: wizard.cpp,v 1.32 2006/07/24 19:58:45 dcastle Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -997,9 +997,11 @@ extern char * strs_damage_types[];
 	  sprintf(buf,
 	          "$3Max-contains(v1)$R : %d\n\r"
                   "$3Locktype(v2)$R     : %d\n\r"
+                  "$3Key #$R            : %d\n\r"
                   "$3Corpse(v4)$R       : %s",
 	          j->obj_flags.value[0],
 	          j->obj_flags.value[1],
+	          j->obj_flags.value[2],
 	          j->obj_flags.value[3]?"Yes":"No");
 	  break;
       case ITEM_DRINKCON :
