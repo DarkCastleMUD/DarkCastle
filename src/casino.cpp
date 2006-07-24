@@ -36,6 +36,7 @@ extern "C"
 
 extern CHAR_DATA *character_list;
 extern CWorld world;
+extern struct index_data *obj_index;
 
 void pulse_table_bj(struct table_data *tbl, int recall = 0);
 void reset_table(struct table_data *tbl);
@@ -48,6 +49,7 @@ int hand_number(struct player_data *plr);
 int hands(struct player_data *plr);
 void blackjack_prompt(CHAR_DATA *ch, char *prompt, bool ascii);
 bool charExists(CHAR_DATA *ch);
+void reel_spin(void *, void *, void *);
 
 /*
    BLACKJACK!
@@ -1775,3 +1777,288 @@ void pulse_holdem(struct ttbl *tbl)
 }
 
 /* End Texas Hold'em */
+
+/* Slot Machines! */
+
+struct machine_data
+{
+   OBJ_DATA *obj;
+   CHAR_DATA *prch;
+   CHAR_DATA *ch;
+   uint cost;
+   uint lastwin;
+   int bet;
+   uint32 jackpot;
+   bool busy;
+   bool gold;
+   bool button;
+};
+
+char *reel1[] = {
+"$5Orange$R", "$B$2 Melon$R", "$B$6 Plum $R", "$B$4Cherry$R", "$B$6 Plum $R", "$5Orange$R", "$B   7  $R", 
+"$B$3Bl$R/$B$0BAR$R", "$5Orange$R", "$B$4Cherry$R", "$B$0  BAR $R", "$B$6 Plum $R", "$5Orange$R", "$B$6 Plum $R", 
+"$B$2 Melon$R", "$B$6 Plum $R", "$5Orange$R", "$B$6 Plum $R", "$B$0  BAR $R", "$B$6 Plum $R"
+};
+
+char *reel2[] = {
+"$B$4Cherry$R", "$B$6 Plum $R", "$B$4Cherry$R", "$B7$R/$5Orng$R", "$B$4Cherry$R", "$B$3 Bell $R", 
+"$B$6Pl$R/$B$0BAR$R", "$B$3 Bell $R", "$B$4Cherry$R", "$5Orange$R", "$B$3 Bell $R", "$B$2Mln$R/$5Or$R", "$B$6 Plum $R",
+"$B$3 Bell $R", "$B$4Cherry$R", "$B$0 BAR  $R", "$5Orange$R", "$B$4Cherry$R", "$B$3 Bell $R", "$B$2Mln$R/$5Or$R"
+};
+
+char *reel3[] = {
+"$B$3 Bell $R", "$5Orange$R", "$B$6 Plum $R", "$B$3 Bell $R", "$5Orange$R", "$B$5Lemon $R", "$B$3 Bell $R",
+"$B$2Mln$R/$5Or$R", "$B$3 Bell $R", "$B$6 Plum $R", "$B$5Lemon $R", "$B$3 Bell $R", "$B$6 Plum $R", "$B$3 Bell $R", 
+"$B 7$R/$B$0BAR$R", "$B$5Lemon $R", "$B$3 Bell $R", "$B$2Mln$R/$5Or$R", "$B$3 Bell $R", "$B$5Lemon $R"
+};
+
+void save_slot_machines()
+{
+  FILE *f = (FILE *)NULL;
+  world_file_list_item * curr;
+  char buf[180];
+  char buf2[180];
+
+  extern world_file_list_item * obj_file_list;
+
+  curr = obj_file_list;
+  while(curr && strcmp(curr->filename, "21900-21999.obj"))
+    curr = curr->next;
+
+  if(!curr) {
+    log("Mess up in save_slot_machines, no object file.", IMMORTAL, LOG_BUG);
+    return;
+  }
+
+  sprintf(buf, "objects/%s", curr->filename);
+  sprintf(buf2, "cp %s %s.last", buf, buf);
+  system(buf2);
+
+  if((f = dc_fopen(buf, "w")) == NULL) {
+    fprintf(stderr,"Couldn't open obj save file %s for save_slot_machines.\n\r",
+            curr->filename);
+    return;
+  }
+
+  for(int x = curr->firstnum; x <= curr->lastnum; x++) 
+     write_object((obj_data *)obj_index[x].item, f);
+
+  // end file
+  fprintf(f, "$~\n");
+
+  dc_fclose(f);
+}
+
+void create_slot(OBJ_DATA *obj)
+{
+   struct machine_data *slot;
+ #ifdef LEAK_CHECK
+   slot = (struct machine_data *)calloc(1, sizeof(struct machine_data));
+ #else
+   slot = (struct machine_data *)dc_alloc(1, sizeof(struct machine_data));
+ #endif
+
+   slot->obj = obj;
+   slot->ch = NULL;
+   slot->prch = NULL;
+   slot->cost = obj->obj_flags.value[0];
+   slot->jackpot = obj->obj_flags.value[1];
+   slot->lastwin = 0;
+   slot->bet = 1;
+   if(obj->obj_flags.value[2]) slot->gold = FALSE;
+   else slot->gold = TRUE;
+   slot->busy = FALSE;
+   slot->button = FALSE;
+   obj->slot = slot;
+}
+
+bool verify_slot(struct machine_data *machine)
+{
+   if(machine->ch->in_room == machine->obj->in_room)
+      return TRUE;
+
+   return FALSE;
+}
+
+void slot_timer(struct machine_data *machine, int stop1, int stop2, int delay)
+{
+  struct timer_data *timer;
+ #ifdef LEAK_CHECK
+  timer = (struct timer_data *)calloc(1, sizeof(struct timer_data));
+ #else
+  timer = (struct timer_data *)dc_alloc(1, sizeof(struct timer_data));
+ #endif
+
+   timer->arg1 = (void*)machine;
+   timer->arg2 = (void*)stop1;
+   timer->arg3 = (void*)stop2;
+   timer->function = reel_spin;
+   timer->timeleft = delay;
+   addtimer(timer);
+}
+
+void reel_spin(void *arg1, void *arg2, void *arg3)
+{
+   struct machine_data *machine = (struct machine_data *) arg1;
+   int stop1 = (int)arg2;
+   int stop2 = (int)arg3;
+
+   char buf[MAX_STRING_LENGTH];
+
+   if(stop1 < 0 && charExists(machine->ch) && verify_slot(machine)) {
+      stop1 = number(0, 19);
+      send_to_room("You hear a loud clunk as the first stopper snaps into place.\n\r", machine->obj->in_room);
+      sprintf(buf, "%s    |      |\n\r", reel1[stop1]);
+      send_to_char(buf, machine->ch);
+      slot_timer(machine, stop1, -1, 2);
+   } else if(stop2 < 0 && charExists(machine->ch) && verify_slot(machine)) {
+      stop2 = number(0, 19);
+      send_to_room("You hear a loud clunk as the second stopper snaps into place.\n\r", machine->obj->in_room);
+      sprintf(buf, "%s %s    |\n\r", reel1[stop1], reel2[stop2]);
+      send_to_char(buf, machine->ch);
+      slot_timer(machine, stop1, stop2, 2);
+   } else if(charExists(machine->ch) && verify_slot(machine)) {
+      int payout = 0;
+      int stop3 = number(0, 19);
+      send_to_room("You hear a loud clunk as the final stopper snaps into place.\n\r", machine->obj->in_room);
+      sprintf(buf, "%s %s %s\n\r", reel1[stop1], reel2[stop2], reel3[stop3]);
+      send_to_char(buf, machine->ch);
+
+      if(stop1 == 6 && stop2 == 3 && stop3 == 14) payout = 200;
+      else if((stop1 == 7 || stop1 == 11 || stop1 == 18) && (stop2 == 6 || stop2 == 15) && stop3 == 14) payout = 100;
+      else if((stop1 == 1 || stop1 == 14) && (stop2 == 11 || stop2 == 19) && (stop3 == 7 || stop3 == 17 || stop3 == 14)) payout = 100;
+      else if(stop1 == 7 && (stop2 == 5 || stop2 == 7 || stop2 == 10 || stop2 == 13 || stop2 == 18) && (stop3 == 0 || 
+            stop3 == 3 || stop3 == 6 || stop3 == 8 || stop3 == 11 || stop3 == 13 || stop3 == 14 || stop3 == 16 || stop3 == 18)) payout = 18;
+      else if((stop1 == 2 || stop1 == 4 || stop1 == 11 || stop1 == 13 || stop1 == 15 || stop1 == 17 || stop1 == 19) && 
+            (stop2 == 1 || stop2 == 6 || stop2 == 12) && (stop3 == 2 || stop3 == 9 || stop3 == 12 || stop3 == 14)) payout = 14;
+      else if((stop1 == 0 || stop1 == 5 || stop1 == 8 || stop1 == 12 || stop1 == 16) && (stop2 == 3 || stop2 == 9 || 
+            stop2 == 11 || stop2 == 16 || stop2 == 19) && (stop3 == 1 || stop3 == 4 || stop3 == 7 || stop3 == 14 || stop3 == 17)) payout = 10;
+      else if((stop1 == 3 || stop1 == 9) && (stop2 == 0 || stop2 == 2 || stop2 == 4 || stop2 == 8 || stop2 == 14 || stop2 == 17)) payout = 5;
+      else if(stop1 == 3 || stop1 == 9) payout = 2;
+      else {
+         machine->jackpot += machine->cost * machine->bet;
+         ((OBJ_DATA *)obj_index[machine->obj->item_number].item)->obj_flags.value[1] = machine->jackpot;
+         sprintf(buf, "A slot machine which displays '$R$BJackpot: %d %s!$1' sits here.", machine->jackpot, machine->gold?"coins":"plats");
+         machine->obj->description = str_hsh(buf);
+         ((OBJ_DATA *)obj_index[machine->obj->item_number].item)->description = str_hsh(buf);
+      }
+      if(payout) {
+         send_to_room("Lights flash and noises eminate from the slot machine!\n\r", machine->obj->in_room);
+         machine->lastwin = machine->cost * payout * machine->bet;
+         sprintf(buf, "$BWinner!!$R  You win %d %s!\n\r", machine->lastwin, machine->gold?"coins":"plats");
+         if(machine->gold)
+            GET_GOLD(machine->ch) += machine->lastwin;
+         else GET_PLATINUM(machine->ch) += machine->lastwin;
+         send_to_char(buf, machine->ch);
+         send_to_char("A tiny panel flips open on the slot machine, revealing red and black buttons.\n\r", machine->ch);
+         machine->button = TRUE;
+      }
+      if(payout == 200 && machine->bet == 5) {
+         send_to_room("The jackpot lights flash and loud noises come from all around you!\n\r", machine->obj->in_room);
+         csendf(machine->ch, "$BJACKPOT!!!!!!  You win the jackpot of %d %s!!$R\n\r", machine->jackpot, machine->gold?"coins":"plats");
+         if(machine->gold)
+            GET_GOLD(machine->ch) += machine->jackpot;
+         else GET_PLATINUM(machine->ch) += machine->jackpot;
+         machine->jackpot = 0;
+         ((OBJ_DATA *)obj_index[machine->obj->item_number].item)->obj_flags.value[1] = machine->jackpot;
+         sprintf(buf, "A slot machine which displays '$R$BJackpot: %d %s!$1' sits here.", machine->jackpot, machine->gold?"coins":"plats");
+         machine->obj->description = str_hsh(buf);
+         ((OBJ_DATA *)obj_index[machine->obj->item_number].item)->description = str_hsh(buf);
+         save_slot_machines();
+      }
+      machine->busy = FALSE;
+   } else { //something bad happened
+      machine->busy = FALSE;
+   }
+}
+
+int slot_machine(CHAR_DATA *ch, OBJ_DATA *obj, int cmd, char *arg, CHAR_DATA *invoker)
+{
+   char buf[MAX_STRING_LENGTH];
+
+   if(cmd != 186 && cmd != 189 && cmd != 185) //pull or bet or push
+      return eFAILURE;
+   if(!ch || IS_NPC(ch)) return eFAILURE;
+
+   if (IS_AFFECTED(ch, AFF_CANTQUIT) || affected_by_spell(ch, FUCK_PTHIEF) || affected_by_spell(ch, FUCK_GTHIEF))
+   {
+      send_to_char("You cannot play the slots while you are flagged as naughty.\r\n",ch);
+      return eSUCCESS;
+   }
+
+   one_argument(arg, buf);
+
+   if(cmd == 186 && strcmp(buf, "handle")) {
+      send_to_char("Try pulling the handle.\n\r", ch);
+      return eSUCCESS;
+   }
+
+   if(!obj->slot) create_slot(obj);
+
+   if(obj->slot->busy) {
+      send_to_char("This machine is already in use, try another one.\n\r", ch);
+      return eSUCCESS;
+   }
+
+   if(cmd == 189) {
+      if(atoi(buf) >= 1 && atoi(buf) <= 5) {
+         obj->slot->bet = atoi(buf);
+         obj->slot->prch = ch;
+         if(obj->slot->bet == 1)
+            send_to_char("You place only the minimum bet into the slot machine now.\n\r", ch);
+         else
+            csendf(ch, "You now start placing %d times the base amount into the slot machine.\n\r", obj->slot->bet);
+         return eSUCCESS;
+      }
+      send_to_char("You can only multiply the bet by 2, 3, 4, or 5, or set it back to 1.\n\r", ch);
+      return eSUCCESS;
+   }
+
+   if(cmd == 185) {
+      if(obj->slot->button) {
+         if(obj->slot->prch == ch) {
+            if(is_abbrev(buf, "red") || is_abbrev(buf, "black")) {
+               if(obj->slot->gold && GET_GOLD(ch) < obj->slot->lastwin || !obj->slot->gold && GET_PLATINUM(ch) < obj->slot->lastwin) {
+                  send_to_char("You don't have enough money to try to double your last win.\n\r", ch);
+               } else if(number(0,1)) {
+                  send_to_char("$BWinner!!$R The button lights up and the room is filled with whirring noises!\n\r", ch);
+                  if(obj->slot->gold) GET_GOLD(ch) += obj->slot->lastwin;
+                  else GET_PLATINUM(ch) += obj->slot->lastwin;
+                  obj->slot->button = FALSE;
+               } else {
+                  send_to_char("Oh no!! The other button lights up! You lose everything!\n\r", ch);
+                  if(obj->slot->gold) GET_GOLD(ch) -= obj->slot->lastwin;
+                  else GET_PLATINUM(ch) -= obj->slot->lastwin;
+                  obj->slot->button = FALSE;
+               }
+            } else send_to_char("You must push either the red or black button.\n\r", ch);
+         } else send_to_char("Nothing seems to happen.\n\r", ch);            
+      } else send_to_char("You can find nothing to push.\n\r", ch);
+      return eSUCCESS;
+   }
+
+   if(obj->slot->prch != ch) obj->slot->bet = 1;
+   if(obj->slot->button) send_to_char("The panel closes quietly.\n\r", ch);
+   obj->slot->button = FALSE;
+
+   if(obj->slot->gold && GET_GOLD(ch) < obj->slot->cost * obj->slot->bet || !obj->slot->gold && GET_PLATINUM(ch) < obj->slot->cost * obj->slot->bet) {
+      send_to_char("You don't have enough money to start the machine.\n\r", ch);
+      return eSUCCESS;
+   }
+
+   if(obj->slot->gold)
+      GET_GOLD(ch) -= obj->slot->cost * obj->slot->bet;
+   else GET_PLATINUM(ch) -= obj->slot->cost * obj->slot->bet;
+   obj->slot->busy = TRUE;
+   sprintf(buf, "You place %d %s into the slot and set the reels spinning!\n\r", obj->slot->cost * obj->slot->bet, obj->slot->gold?"coins":"plats");
+   send_to_char(buf, ch);
+   act("$n reaches for the handle and pulls down.", ch, 0, 0, TO_ROOM, 0);
+   send_to_char("   |      |      |\n\r", ch);
+   obj->slot->ch = ch;
+
+   slot_timer(obj->slot, -1, -1, 2);
+
+   return eSUCCESS;
+}
+
+/* End Slot Machines */

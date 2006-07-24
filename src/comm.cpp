@@ -109,6 +109,7 @@ extern struct room_data ** world_array;
 extern struct char_data *character_list;
 void check_leaderboard(void);
 void check_champion(void);
+void save_slot_machines(void);
 
 /* local globals */
 struct descriptor_data *descriptor_list = NULL;		/* master desc list */
@@ -1039,6 +1040,7 @@ void heartbeat()
     check_leaderboard(); //good place to put this
     quest_update();
     check_champion();
+    save_slot_machines();
   }
 }
 
