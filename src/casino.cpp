@@ -1952,6 +1952,7 @@ void reel_spin(void *arg1, void *arg2, void *arg3)
          send_to_char(buf, machine->ch);
          send_to_char("A tiny panel flips open on the slot machine, revealing red and black buttons.\n\r", machine->ch);
          machine->button = TRUE;
+         machine->prch = machine->ch;
       }
       if(payout == 200 && machine->bet == 5) {
          send_to_room("The jackpot lights flash and loud noises come from all around you!\n\r", machine->obj->in_room);

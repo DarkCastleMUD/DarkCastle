@@ -43,6 +43,7 @@ char_data *origsing = NULL;
  
 extern pulse_data *bard_list;
 extern CHAR_DATA *character_list;
+extern struct zone_data *zone_table;
 void remove_memory(CHAR_DATA *ch, char type);
 void add_memory(CHAR_DATA *ch, char *victim, char type);
 extern bool check_social( CHAR_DATA *ch, char *pcomm, int length, char *arg );
@@ -1505,7 +1506,8 @@ int execute_song_astral_chanty( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA
     return eFAILURE;
     }
 
-  if(IS_SET(world[victim->in_room].room_flags, NO_PORTAL) ||
+  if(IS_SET(world[victim->in_room].room_flags, NO_PORTAL) || 
+     IS_SET(zone_table[world[victim->in_room].zone].zone_flags, ZONE_NO_TELEPORT) ||
     (IS_SET(world[victim->in_room].room_flags, ARENA) && !IS_SET(world[ch->in_room].room_flags, ARENA)) ||
     (IS_SET(world[ch->in_room].room_flags, ARENA) && !IS_SET(world[victim->in_room].room_flags, ARENA))
 //  ||    (IS_AFFECTED(victim, AFF_SHADOWSLIP))

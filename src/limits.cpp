@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.76 2006/07/08 18:56:03 urizen Exp $ */
+/* $Id: limits.cpp,v 1.77 2006/07/28 07:43:15 shane Exp $ */
 
 extern "C"
 {
@@ -52,6 +52,7 @@ extern struct obj_data *object_list;
 extern CWorld world;
 extern struct index_data *obj_index;
 extern struct index_data *mob_index;
+extern char *pc_clss_types[];
 
 /* External procedures */
 void save_corpses(void);
@@ -611,8 +612,11 @@ void gain_exp( CHAR_DATA *ch, int64 gain )
   if(IS_NPC(ch))
     return;
 
-  if(!x && GET_EXP(ch) >= y)
+  if(!x && GET_EXP(ch) >= y) {
      send_to_char("You now have enough experience to level!\n\r", ch);
+     if(GET_LEVEL(ch) == 1)
+        csendf(ch, "$B$2An acolyte of Pirahna tells you, 'To find the way to your guild, young %s, please read $7HELP GUILD$2'$R\n\r", pc_clss_types[GET_CLASS(ch)]);
+  }
 
   return;
 }

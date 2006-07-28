@@ -698,6 +698,7 @@ int gem_assembler(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
    obj_data * ptr_array[MAX_GEM_ASSEMBLER_ITEM - 1];
    obj_data * reward = NULL;
    int position, i, done;
+   bool haveall = FALSE;
    char buf[200];
    extern struct index_data *obj_index;
 
@@ -713,9 +714,14 @@ int gem_assembler(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
       {
          if(gem_data[position].pieces[i] == obj_index[obj->item_number].virt)
          { 
-            done = 1; 
-            break; 
+            for(int j=0;j<MAX_GEM_ASSEMBLER_ITEM;j++) {
+               if(gem_data[position].pieces[j] == -1) haveall = TRUE;
+               if(!(get_obj_in_list_num(real_object(gem_data[position].pieces[j]), ch->carrying)))
+                  break;
+            }
+            if(haveall) done = 1; 
          }
+         if(done) break;
          if(-1 == gem_data[position].pieces[i])
             break;
       }

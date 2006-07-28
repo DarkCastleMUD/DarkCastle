@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.144 2006/07/18 21:04:59 dcastle Exp $
+| $Id: cl_thief.cpp,v 1.145 2006/07/28 07:43:19 shane Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -113,10 +113,12 @@ int do_eyegouge(CHAR_DATA *ch, char *argument, int cmd)
 {
   CHAR_DATA *victim;
   char name[256];
-  argument = one_argument(argument,name);
   int level = has_skill(ch, SKILL_EYEGOUGE);
 
-  if(!(victim = get_char_room_vis(ch, name)) && (victim = ch->fighting)==NULL) {
+  if(ch->fighting && !*argument) strcpy(name, GET_NAME(ch->fighting));
+  else argument = one_argument(argument,name);
+
+  if(!(victim = get_char_room_vis(ch, name))) {
     send_to_char("There is no one like that here to gouge.\n\r", ch);
 	    return eFAILURE;
   }
@@ -1966,8 +1968,8 @@ int do_appraise(CHAR_DATA *ch, char *argument, int cmd)
       WAIT_STATE(ch, PULSE_VIOLENCE);
    } else {
       if(weight)
-         sprintf(buf, "After some consideration, you estimate the weight of %s to be %d.\n\r", obj->name, appraised);
-      else if(found) sprintf(buf, "After some consideration, you estimate the value of %s to be %d.\n\r", obj->name, appraised);
+         sprintf(buf, "After some consideration, you estimate the weight of %s to be %d.\n\r", GET_OBJ_SHORT(obj), appraised);
+      else if(found) sprintf(buf, "After some consideration, you estimate the value of %s to be %d.\n\r", GET_OBJ_SHORT(obj), appraised);
       else sprintf(buf, "After some consideration, you estimate the amount of gold %s is carrying to be %d.\n\r", GET_NAME(victim), appraised);
       send_to_char(buf, ch);
       WAIT_STATE(ch, (int)(PULSE_VIOLENCE * 1.5));

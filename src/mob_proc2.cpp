@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.71 2006/07/15 04:31:22 apocalypse Exp $ */
+/* $Id: mob_proc2.cpp,v 1.72 2006/07/28 07:43:15 shane Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -457,6 +457,7 @@ int super_repair_guy(struct char_data *ch, struct obj_data *obj, int cmd, char *
                                        /*  for armor... cuz he can.. */
   } 
   else if (obj->obj_flags.type_flag == ITEM_WEAPON ||
+           obj->obj_flags.type_flag == ITEM_FIREWEAPON ||
 		obj->obj_flags.type_flag == ITEM_INSTRUMENT ||
 		obj->obj_flags.type_flag == ITEM_STAFF ||
 		obj->obj_flags.type_flag == ITEM_WAND &&
@@ -560,6 +561,7 @@ int repair_shop(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     price *= 4;                   /* he likes to charge more..  */
                                   /*  for armor... cuz he's a crook..  */
   } else if (obj->obj_flags.type_flag == ITEM_WEAPON ||
+             obj->obj_flags.type_flag == ITEM_FIREWEAPON ||
              obj->obj_flags.type_flag == ITEM_CONTAINER ||
 		obj->obj_flags.type_flag == ITEM_STAFF ||
 		obj->obj_flags.type_flag == ITEM_WAND &&
