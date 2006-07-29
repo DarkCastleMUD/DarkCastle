@@ -1,7 +1,9 @@
-/* $Id: levels.h,v 1.3 2005/06/25 18:58:56 shane Exp $ */
+/* $Id: levels.h,v 1.4 2006/07/29 21:05:31 jhhudso Exp $ */
 /* This is purely to define god levels as #defines. */
 #ifndef LEVELS_H_
 #define LEVELS_H_
+
+#include "structs.h"
 
 #define MORTAL 50
 /* #define GLADIATOR */
