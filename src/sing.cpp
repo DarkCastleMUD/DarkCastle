@@ -2427,12 +2427,12 @@ int execute_song_dischordant_dirge( ubyte level, CHAR_DATA *ch, char *arg, CHAR_
    }
 
    if(ch==target ) {
-      send_to_char("Your loyalties has been broken. And stuff. What did you think?\r\n", ch);
+      send_to_char("Your loyalties have been broken. And stuff. What did you think?\r\n", ch);
       return eFAILURE;
    }
 
    if(!IS_NPC(target)) {
-      send_to_char("You cannot break their bonds of loyalty.\r\n", ch);
+      csendf(ch, "%s is too strong willed for you to break any of %s loyalties.\r\n", GET_NAME(target), HSHR(target));
       return eFAILURE;
    }
    if (!affected_by_spell(target, SPELL_CHARM_PERSON) && !IS_AFFECTED(target, AFF_FAMILIAR))
@@ -2846,36 +2846,43 @@ int execute_song_crushing_crescendo( ubyte level, CHAR_DATA *ch, char *arg, CHAR
 //   if ((int)ch->song_data < 3) // Doesn't help beyond that.
      ch->song_data = (char*)((int)ch->song_data + 1); // Add one round.
 		// Bleh, C allows easier pointer manipulation
-   if (number(1,101) < get_saves(victim, SAVE_TYPE_MAGIC))
-   {
-     act("$N resists your crushing crescendo!", ch, NULL, victim, TO_CHAR,0);
-     act("$N resists $n's crushing crescendo!", ch, NULL, victim, TO_ROOM,NOTVICT);
-     act("You resist $n's crushing crescendo!",ch,NULL,victim,TO_VICT,0);
-     dam /= 2;
-   }
-
-   switch ((int)ch->song_data)
-   {
-     case 1:
-       act("$N is injured by the strength of your music!", ch, NULL, victim, TO_CHAR,0);
-       act("The strength of $n's music injures $N!", ch, NULL, victim, TO_ROOM,NOTVICT);
-       act("The strength of $n's crushing crescendo injures you!",ch,NULL,victim,TO_VICT,0);
-       break;     
-     case 2:
-       act("$N is injured further by the intensity of your music!", ch, NULL, victim, TO_CHAR,0);
-       act("The strength of $n's music increases, and causes further injury to $N!", ch, NULL, victim, TO_ROOM,NOTVICT);
-       act("The strength of $n's crushing crescendo increases, and hurts even more!",ch,NULL,victim,TO_VICT,0);
-       break;     
-     case 3:
-       act("The force of your song powerfully crushes the life out of $N!", ch, NULL, victim, TO_CHAR,0);
-       act("The force of $n's crushes the life out of $N!", ch, NULL, victim, TO_ROOM,NOTVICT);
-       act("The force of $n's crushes the life out of you!",ch,NULL,victim,TO_VICT,0);
-       break;     
-     default:
-       act("$N is injured by the strength of your music!", ch, NULL, victim, TO_CHAR,0);
-       act("The strength of $n's music injures $N!", ch, NULL, victim, TO_ROOM,NOTVICT);
-       act("The strength of $n's crushing crescendo injures you!",ch,NULL,victim,TO_VICT,0);
-       break;     
+   if(IS_SET(victim->immune, ISR_SONG)) {
+      act("$N laughs at your crushing crescendo!", ch, 0, victim, TO_CHAR, 0);
+      act("You laugh at $n's crushing crescendo.", ch, 0, victim, TO_VICT, 0);
+      act("$N laughs at $n's crushing crescendo.", ch, 0, victim, TO_ROOM, NOTVICT);
+   } else {
+      if (number(1,101) < get_saves(victim, SAVE_TYPE_MAGIC))
+      {
+        act("$N resists your crushing crescendo!", ch, NULL, victim, TO_CHAR,0);
+        act("$N resists $n's crushing crescendo!", ch, NULL, victim, TO_ROOM,NOTVICT);
+        act("You resist $n's crushing crescendo!",ch,NULL,victim,TO_VICT,0);
+        dam /= 2;
+      }
+      char dmgmsg[MAX_STRING_LENGTH];
+      sprintf(dmgmsg, "$B%d$R", dam);
+      switch ((int)ch->song_data)
+      {
+        case 1:
+          send_damage("$N is injured for | damage by the strength of your music!", ch, 0, victim, dmgmsg, "$N is injured by the strength of your music!", TO_CHAR);
+          send_damage("The strength of $n's music injures $N for |!", ch, 0, victim, dmgmsg, "The strength of $n's music injures $N!", TO_ROOM);
+          send_damage("The strength of $n's crushing crescendo injures you for |!", ch, 0, victim, dmgmsg, "The strength of $n's crushing crescendo injures you!", TO_VICT);
+          break;     
+        case 2:
+          send_damage("$N is injured further by the intensity of your music for | damage!", ch, 0, victim, dmgmsg, "$N is injured further by the intensity of your music!", TO_CHAR);
+          send_damage("The strength of $n's music increases, and causes further injury to $N for | damage!", ch, 0, victim, dmgmsg, "The strength of $n's music increases, and causes further injury to $N!", TO_ROOM);
+          send_damage("The strength of $n's crushing crescendo increases, and hurts for | damage!", ch, 0, victim, dmgmsg, "The strength of $n's crushing crescendo increases, and hurts even more!", TO_VICT);
+          break;     
+        case 3:
+          send_damage("The force of your song powerfully crushes $N for | damage!", ch, 0, victim, dmgmsg, "The force of your song powerfully crushes the life out of $N!", TO_CHAR);
+          send_damage("The force of $n's crushes $N for | damage!", ch, 0, victim, dmgmsg, "The force of $n's crushes the life out of $N!", TO_ROOM);
+          send_damage("The force of $n's crushes you for | damage!", ch, 0, victim, dmgmsg, "The force of $n's crushes the life out of you!", TO_VICT);
+          break;     
+        default:
+          send_damage("$N is injured for | damage by the strength of your music!", ch, 0, victim, dmgmsg, "$N is injured by the strength of your music!", TO_CHAR);
+          send_damage("The strength of $n's music injures $N for | damage!", ch, 0, victim, dmgmsg, "The strength of $n's music injures $N!", TO_ROOM);
+          send_damage("The strength of $n's crushing crescendo injures you for | damage!", ch, 0, victim, dmgmsg, "The strength of $n's crushing crescendo injures you!", TO_VICT);
+          break;     
+      }
    }
 
    bool ispc = !IS_NPC(victim);

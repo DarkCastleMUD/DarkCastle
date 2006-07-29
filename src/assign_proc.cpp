@@ -517,7 +517,10 @@ void assign_objects(void)
     assign_one_obj_non(21901, blackjack_table);
     assign_one_obj_non(21902, blackjack_table);
     assign_one_obj_non(21903, blackjack_table);
-    assign_one_obj_non(21905, slot_machine);
+    assign_one_obj_non(21906, slot_machine);
+    assign_one_obj_non(21907, slot_machine);
+    assign_one_obj_non(21908, slot_machine);
+    assign_one_obj_non(21909, slot_machine);
     assign_one_obj_non(534, godload_cassock);
     assign_one_obj_non(500, godload_stargazer);
     assign_one_obj_non(526, godload_armbands);

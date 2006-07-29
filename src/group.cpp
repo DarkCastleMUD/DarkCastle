@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: group.cpp,v 1.21 2006/05/30 10:25:04 dcastle Exp $
+| $Id: group.cpp,v 1.22 2006/07/29 06:15:46 shane Exp $
 | group.C
 | Description:  Group related commands; join, abandon, follow, etc..
 */
@@ -513,10 +513,12 @@ int do_disband(CHAR_DATA *ch, char *argument, int cmd)
     for(f = k->followers; f; f = next_f) { 
        next_f = f->next;
        if (!IS_NPC(f->follower)) {
-	    stop_grouped_bards(f->follower,1);
+          stop_grouped_bards(f->follower,1);
           stop_follower(f->follower, STOP_FOLLOW);
-	}
        }
+       if(IS_NPC(f->follower))
+          REMBIT(f->follower->affected_by, AFF_GROUP);
+    }
 
     REMBIT(k->affected_by, AFF_GROUP);
     return eSUCCESS;
