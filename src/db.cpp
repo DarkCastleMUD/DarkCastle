@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.133 2006/07/09 00:08:53 shane Exp $ */
+/* $Id: db.cpp,v 1.134 2006/07/31 11:11:24 dcastle Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -2426,9 +2426,13 @@ void read_one_zone(FILE * fl, int zon)
       perror( "Too many zone resets" );
       abort();
     }
-
+    reset_tab[reset_top].comment = NULL; // needs to be initialized
     reset_tab[reset_top].command = fread_char (fl);
-
+    reset_tab[reset_top].if_flag = 0;
+    reset_tab[reset_top].last = 0;
+    reset_tab[reset_top].arg1 = 0;
+    reset_tab[reset_top].arg2 = 0;
+    reset_tab[reset_top].arg3 = 0;
     if (reset_tab[reset_top].command == 'S')
     {
       reset_top++;
@@ -2448,7 +2452,6 @@ void read_one_zone(FILE * fl, int zon)
         buf[strlen(buf)-1] = '\0';
 
       // if any, keep anything left
-      reset_tab[reset_top].comment = NULL;
       if(*skipper)
          reset_tab[reset_top].comment = str_hsh(skipper);
       reset_top++;
@@ -2496,7 +2499,6 @@ void read_one_zone(FILE * fl, int zon)
       buf[strlen(buf)-1] = '\0';
 
     // if any, keep anything left
-    reset_tab[reset_top].comment = NULL;
     if(*skipper)
        reset_tab[reset_top].comment = str_hsh(skipper);
   
