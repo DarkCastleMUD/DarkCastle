@@ -298,9 +298,9 @@ int do_vault(CHAR_DATA *ch, char *argument, int cmd)
 
   half_chop(argument, arg, arg1);
 
-  if (affected_by_spell(ch, FUCK_PTHIEF)) {
-    send_to_char("No thieves allowed in the vault area!\r\n", ch);
-    return eSUCCESS;
+ if(affected_by_spell(ch, FUCK_PTHIEF) || (affected_by_spell(ch, FUCK_GTHIEF))) {
+        send_to_char("You're too busy running from the law!\r\n",ch);
+        return eFAILURE;
   }
 
   if (!*arg) {
@@ -818,7 +818,7 @@ int has_vault_access(char *who, struct vault_data *vault)
   struct vault_access_data *access;
   struct char_data *ch;
 
-  if ((ch = find_owner(who)) && GET_LEVEL(ch) >= 109)
+  if ((ch = find_owner(who)) && GET_LEVEL(ch) >= 108)
     return 1;
 
   // its their vault
