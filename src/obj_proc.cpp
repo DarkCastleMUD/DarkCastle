@@ -936,7 +936,7 @@ int pfe_word(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
   {
          af.type      = SPELL_PROTECT_FROM_EVIL;
          af.duration  = 5;
-         af.modifier  = GET_LEVEL(ch);
+         af.modifier  = GET_LEVEL(ch)+10;
          af.location  = APPLY_NONE;
          af.bitvector = AFF_PROTECT_EVIL;
          affect_to_char(ch, &af);
