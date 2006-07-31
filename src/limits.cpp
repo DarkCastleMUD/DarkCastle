@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.77 2006/07/28 07:43:15 shane Exp $ */
+/* $Id: limits.cpp,v 1.78 2006/07/31 11:12:18 dcastle Exp $ */
 
 extern "C"
 {
@@ -875,7 +875,7 @@ void update_corpses_and_portals(void)
             {
 	     if (next_thing == jj)
 	       next_thing = jj->next;
-	     while (next_thing->in_obj == jj)
+	     while (next_thing && next_thing->in_obj == jj)
 		next_thing = next_thing->next;
 	     extract_obj(jj);
 	    }
