@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.354 2006/07/17 19:02:32 shane Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.355 2006/07/31 06:12:00 shane Exp $ */
 
 extern "C"
 {
@@ -3801,7 +3801,7 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
   }
   if(affected_by_spell(victim, FUCK_GTHIEF)) {
     if(GET_GOLD(victim) > 0) {
-      act("$N drops $S stolen booty!", ch, 0, victim, TO_ROOM, NOTVICT);
+      act("$n drops $s stolen booty!", victim, 0, 0, TO_ROOM, 0);
       obj_to_room(create_money(GET_GOLD(victim)), victim->in_room);
       GET_GOLD(victim) = 0;
       save_char_obj(victim);
@@ -3859,26 +3859,17 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
        /* New death system... dying is a BITCH!  */
        // thief + mob kill = stat loss
        // or got a bad roll
-//       int chance = GET_RACE(victim)==RACE_TROLL?;
 
 	if (is_thief)
           pir_stat_loss(victim, 100, TRUE, is_thief);
        else if( GET_LEVEL(victim)>20  )
        {
-//	int chance = GET_LEVEL(ch) - GET_LEVEL(victim);
-	int chance = GET_LEVEL(ch) /10;
+	int chance = ch?GET_LEVEL(ch):50 /10;
 	chance += GET_LEVEL(victim) /2;
 	if (GET_LEVEL(victim) == 50)
-	  chance += (int)(25.0*(float)((float)GET_LEVEL(ch)/100.0)*(float)((float)GET_LEVEL(ch)/100.0));
-//	if (chance < 0) chance = 0 - chance; // turn it positive, eh.
-//	float a = (float)GET_LEVEL(victim),b;
-//	// many casts are such a bother
-//	b = a/50.0;
-//	b *=b;
-  //      chance *= b; // (level/50)^2 
-//	chance += GET_LEVEL(victim) / 2;
-         if (number(1,101) < chance)
-         {
+	  chance += (int)(25.0*(float)((float)(ch?GET_LEVEL(ch):50)/100.0)*(float)((float)(ch?GET_LEVEL(ch):50)/100.0));
+        if (number(1,101) < chance)
+        {
               if (GET_RACE(victim) != RACE_TROLL) {
                 GET_CON(victim) -= 1;
                 victim->raw_con -= 1;
@@ -4042,7 +4033,6 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
            log(buf2, ANGEL, LOG_MORTAL);
            return;
          }
-//       } // lose stats
     }
 
     float penalty = 1;
