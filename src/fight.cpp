@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.355 2006/07/31 06:12:00 shane Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.356 2006/07/31 11:09:53 dcastle Exp $ */
 
 extern "C"
 {
@@ -115,7 +115,9 @@ int check_autojoiners(CHAR_DATA *ch, int skill = 0)
      if (!isname(GET_NAME(ch), tmp->pcdata->joining)) continue;
      if (IS_AFFECTED(tmp, AFF_INSANE)) continue;
      if (skill && !skill_success(tmp, ch, SKILL_FASTJOIN)) continue;
-     int retval = do_join(tmp, GET_NAME(ch), 9);
+     char buf[MAX_STRING_LENGTH];
+     sprintf(buf, "0.%s",GET_NAME(ch));
+     int retval = do_join(tmp, buf, 9);
      if (SOMEONE_DIED(retval)) return retval;
   }
   return eSUCCESS;
@@ -137,8 +139,9 @@ int check_joincharmie(CHAR_DATA *ch, int skill = 0)
   if (!isname("follower", tmp->pcdata->joining) &&
 	!isname("followers", tmp->pcdata->joining)) return eFAILURE;
   if (skill && !skill_success(tmp, ch, SKILL_FASTJOIN)) return eFAILURE;
-  int retval = do_join(tmp, GET_NAME(ch), 9);
-
+   char buf[MAX_STRING_LENGTH];
+   sprintf(buf, "0.%s",GET_NAME(ch));
+   int retval = do_join(tmp, buf, 9);
   return retval;
 }
 
@@ -150,7 +153,8 @@ int check_charmiejoin(CHAR_DATA *ch)
   if (!tmp) return eFAILURE;
   if (tmp == ch || tmp == ch->fighting) return eFAILURE;
   if (GET_POS(ch) != POSITION_STANDING) return eFAILURE;
-  int retval = do_join(ch, GET_NAME(tmp), 9);
+
+  int retval = do_join(ch, "follower", 9);
 
   return retval;
 }
