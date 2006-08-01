@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.59 2006/07/17 18:29:53 shane Exp $ */
+/* $Id: utility.cpp,v 1.60 2006/08/01 10:38:59 jhhudso Exp $ */
 
 extern "C"
 {
@@ -1288,6 +1288,9 @@ int do_save(struct char_data *ch, char *argument, int cmd)
     }
 
     save_char_obj(ch);
+#ifdef USE_SQL
+    save_char_obj_db(ch);
+#endif
 	void save_golem_data(CHAR_DATA *ch);
     if (ch->pcdata->golem) save_golem_data(ch); // Golem data, eh!
     return eSUCCESS;

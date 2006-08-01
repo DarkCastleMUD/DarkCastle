@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: save.cpp,v 1.44 2006/07/09 00:08:53 shane Exp $ */
+/* $Id: save.cpp,v 1.45 2006/08/01 10:38:59 jhhudso Exp $ */
 
 extern "C"
 {
@@ -42,6 +42,13 @@ extern "C"
 #include <handler.h>
 #include <race.h>
 #include <vault.h>
+
+#ifdef USE_SQL
+#include <iostream>
+#include <libpq-fe.h>
+
+using namespace std;
+#endif
 
 extern struct index_data *obj_index;
 extern CWorld world;
@@ -579,6 +586,63 @@ int store_to_char_variable_data(CHAR_DATA * ch, FILE * fpsave)
 
   return 1;
 }
+
+
+#ifdef USE_SQL
+void save_char_obj_db(CHAR_DATA *ch)
+{
+  if (ch == 0)
+    return;
+
+  if(IS_NPC(ch) || GET_LEVEL(ch) < 2)
+    return;
+
+  // so weapons stop falling off
+  SETBIT(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT); 
+  
+  char_file_u uchar;
+  time_data tmpage;
+  char_to_store(ch, &uchar, tmpage);
+
+  // if they're in a safe room, save them there.
+  // if they're a god, send 'em home
+  // otherwise save them in tavern
+  if(IS_SET(world[ch->in_room].room_flags, SAFE))
+    uchar.load_room = world[ch->in_room].number;
+  else
+    uchar.load_room = real_room(GET_HOME(ch));
+  
+  /*
+  if((fwrite(&uchar, sizeof(uchar), 1, fpsave))               &&
+     (char_to_store_variable_data(ch, fpsave))                &&
+     (save_pc_or_mob_data(ch, fpsave, tmpage))                &&
+     (obj_to_store (ch->carrying, ch, fpsave, -1))            &&
+     (store_worn_eq(ch, fpsave))
+    )
+  {
+    if(fpsave != NULL)
+      dc_fclose(fpsave);
+    sprintf(log_buf, "mv %s %s", strsave, name); 
+    system(log_buf);
+  }
+  else
+  {
+    if(fpsave != NULL)
+      dc_fclose(fpsave);
+    sprintf(log_buf, "Save_char_obj: %s", strsave);
+    send_to_char ("WARNING: file problem. You did not save!", ch);
+    perror(log_buf);
+    log(log_buf, ANGEL, LOG_BUG);
+  }
+
+  REMBIT(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT);
+  struct vault_data *vault;
+  if ((vault = has_vault(GET_NAME(ch))))
+    save_vault(vault->owner);
+  */
+
+}
+#endif
 
 // save a character and inventory.
 // maybe modify it to save mobs for quest purposes too
