@@ -1925,7 +1925,7 @@ void reel_spin(void *arg1, void *arg2, void *arg3)
       send_to_char(buf, machine->ch);
 
       if(stop1 == 6 && stop2 == 3 && stop3 == 14) payout = 200;
-      else if((stop1 == 7 || stop1 == 11 || stop1 == 18) && (stop2 == 6 || stop2 == 15) && stop3 == 14) payout = 100;
+      else if((stop1 == 7 || stop1 == 10 || stop1 == 18) && (stop2 == 6 || stop2 == 15) && stop3 == 14) payout = 100;
       else if((stop1 == 1 || stop1 == 14) && (stop2 == 11 || stop2 == 19) && (stop3 == 7 || stop3 == 17 || stop3 == 14)) payout = 100;
       else if(stop1 == 7 && (stop2 == 5 || stop2 == 7 || stop2 == 10 || stop2 == 13 || stop2 == 18) && (stop3 == 0 || 
             stop3 == 3 || stop3 == 6 || stop3 == 8 || stop3 == 11 || stop3 == 13 || stop3 == 14 || stop3 == 16 || stop3 == 18)) payout = 18;
