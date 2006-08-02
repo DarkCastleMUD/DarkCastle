@@ -346,17 +346,11 @@ int do_sing(CHAR_DATA *ch, char *arg, int cmd)
   int qend, spl = -1;
   bool target_ok;
   int learned;
-//  int specialization;
 
    if (!IS_NPC(ch) && GET_CLASS(ch) != CLASS_BARD && GET_LEVEL(ch) < IMMORTAL) {
       check_social(ch, "sing", 0, arg); // do the social:)
       return eSUCCESS;
    }
-
-//   if ((IS_SET(world[ch->in_room].room_flags, SAFE)) && (GET_LEVEL(ch) < IMP)) {
-//      send_to_char("For now, no songs can be sung in a safe room.\n\r", ch);
-//      return eFAILURE;
-//      }
 
   // we do this so we can pass constants to "do_sing" and no crash
   strcpy(spellarg, arg);
@@ -596,8 +590,6 @@ int do_sing(CHAR_DATA *ch, char *arg, int cmd)
     else {
 
       learned = has_skill(ch, song_info[spl].skill_num);
-//      specialization = learned / 100;
-//      learned %= 100;
 
       if(spl == SKILL_SONG_HYPNOTIC_HARMONY - SKILL_SONG_BASE ||
          spl == SKILL_SONG_DISARMING_LIMERICK - SKILL_SONG_BASE ||
@@ -650,10 +642,6 @@ int do_sing(CHAR_DATA *ch, char *arg, int cmd)
            ch->song_timer = 0;
       }
       if (origsing) return eSUCCESS;
-//     Song messages are done in the actual song.  There is no 'standard'
-//     entrance message since the songs aren't really alike anyway:)
-//      send_to_char("You begin to sing...\n\r", ch);
-//      act("$n raises $s voice in song...", ch, 0, 0, TO_ROOM, 0);
 
       ch->song_number = spl;
       GET_KI(ch) -= use_song(ch, spl);
@@ -674,6 +662,18 @@ void update_bard_singing()
   {
 //    i = loop->thechar;
     if (!IS_NPC(i) && GET_CLASS(i) != CLASS_BARD && GET_LEVEL(i) < 100) continue;
+    if(i->song_timer == -1) {
+       send_to_char("You run out of lyrics and end the song.\n\r", i);
+       if((song_info[i->song_number].intrp_pointer))
+          ((*song_info[i->song_number].intrp_pointer) (GET_LEVEL(i), i, NULL, NULL, -1));      
+       i->song_timer = 0;
+       if(i->song_data) {
+          if ((int)i->song_data > 10) // Otherwise it's a temp variable.
+             dc_free(i->song_data);
+          i->song_data = 0;
+       }
+       continue;
+    }
     if(i->song_timer > 0) 
     {
       if(ISSET(i->affected_by, AFF_HIDE))
@@ -681,7 +681,8 @@ void update_bard_singing()
         REMBIT(i->affected_by, AFF_HIDE);
         send_to_char("Your singing ruins your hiding place.\r\n", i);
       }
-      if ((IS_SET(world[i->in_room].room_flags, SAFE)) && (GET_LEVEL(i) < IMP) && (
+      if (GET_LEVEL(i) < IMP && (IS_SET(world[i->in_room].room_flags, NO_KI) ||
+            IS_SET(world[i->in_room].room_flags, SAFE) && (
             i->song_number == SKILL_SONG_WHISTLE_SHARP - SKILL_SONG_BASE ||
             i->song_number == SKILL_SONG_UNRESIST_DITTY - SKILL_SONG_BASE ||
             i->song_number == SKILL_SONG_GLITTER_DUST - SKILL_SONG_BASE ||
@@ -695,7 +696,7 @@ void update_bard_singing()
             i->song_number == SKILL_SONG_CRUSHING_CRESCENDO - SKILL_SONG_BASE ||
             i->song_number == SKILL_SONG_SHATTERING_RESO - SKILL_SONG_BASE ||
             i->song_number == SKILL_SONG_MKING_CHARGE - SKILL_SONG_BASE ||
-            i->song_number == SKILL_SONG_HYPNOTIC_HARMONY - SKILL_SONG_BASE))        
+            i->song_number == SKILL_SONG_HYPNOTIC_HARMONY - SKILL_SONG_BASE)))
       {
          send_to_char("In this room, your song quiety fades away.\r\n", i);
          if((song_info[i->song_number].intrp_pointer))
@@ -706,10 +707,7 @@ void update_bard_singing()
             i->song_data = 0;
          }
          i->song_timer = 0;
-         return;
-      }
-
-      if(( (GET_POS(i) < song_info[i->song_number].minimum_position) && !IS_NPC(i))
+      } else if(( (GET_POS(i) < song_info[i->song_number].minimum_position) && !IS_NPC(i))
          || IS_SET(i->combat, COMBAT_STUNNED)
          || IS_SET(i->combat, COMBAT_STUNNED2)
          || IS_SET(i->combat, COMBAT_SHOCKED) 
@@ -733,10 +731,7 @@ void update_bard_singing()
                  dc_free(i->song_data);
               i->song_data = 0;
            }
-           return;
-      }
-
-      if(i->song_number == SKILL_SONG_HYPNOTIC_HARMONY - SKILL_SONG_BASE ||
+      } else if(i->song_number == SKILL_SONG_HYPNOTIC_HARMONY - SKILL_SONG_BASE ||
          i->song_number == SKILL_SONG_DISARMING_LIMERICK - SKILL_SONG_BASE ||
          i->song_number == SKILL_SONG_SHATTERING_RESO - SKILL_SONG_BASE ||
          i->song_number == SKILL_SONG_SEARCHING_SONG - SKILL_SONG_BASE ||
@@ -754,7 +749,6 @@ void update_bard_singing()
                   dc_free(i->song_data);
                i->song_data = 0;
             }
-            return;
          }
       }
     }
@@ -776,19 +770,6 @@ void update_bard_singing()
     else if(i->song_timer == 1)
     {
       i->song_timer = 0;
-
-//      if(GET_LEVEL(i) < IMMORTAL)
-//        if(IS_SET(world[i->in_room].room_flags, SAFE)) {
-//          send_to_char("No singing in safe rooms yet.\r\n", i);
-//          if((song_info[i->song_number].intrp_pointer))
-//            ((*song_info[i->song_number].intrp_pointer) (GET_LEVEL(i), i, NULL, NULL, -1));
-//          if(i->song_data) {
-//	    if ((int)i->song_data > 10) // Otherwise it's a temp variable.
-//              dc_free(i->song_data);
-//            i->song_data = 0;
-//          }
-//          return;
-//        }
 
       int learned = has_skill(i, ( i->song_number + SKILL_SONG_BASE ) );
 
@@ -1073,8 +1054,7 @@ int execute_song_healing_melody( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DAT
          GET_HIT(master) = GET_MAX_HIT(master);
    }
 
-   if(//number(1, 101) > ( 50 + skill/2 )
-	!skill_success(ch, NULL, SKILL_SONG_HEALING_MELODY)  ) {
+   if(!skill_success(ch, NULL, SKILL_SONG_HEALING_MELODY)  ) {
       send_to_char("You run out of lyrics and end the song.\r\n", ch);
       return eSUCCESS;
    }
@@ -1343,8 +1323,7 @@ int execute_song_soothing_remembrance( ubyte level, CHAR_DATA *ch, char *arg, CH
          GET_MANA(master) = GET_MAX_MANA(master);
    }
 
-  if(//number(1, 101) > ( 50 + skill/2 )
-        !skill_success(ch, NULL, SKILL_SONG_SOOTHING_REMEM)  ) {
+  if(!skill_success(ch, NULL, SKILL_SONG_SOOTHING_REMEM)  ) {
       send_to_char("You run out of lyrics and end the song.\r\n", ch);
       return eSUCCESS;
    }
@@ -1407,8 +1386,7 @@ int execute_song_traveling_march( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DA
          GET_MOVE(master) = GET_MAX_MOVE(master);
    }
 
-  if(//number(1, 101) > ( 50 + skill/2 )
-        !skill_success(ch, NULL, SKILL_SONG_TRAVELING_MARCH)  ) {
+  if(!skill_success(ch, NULL, SKILL_SONG_TRAVELING_MARCH)  ) {
       send_to_char("You run out of lyrics and end the song.\r\n", ch);
       return eSUCCESS;
    }
@@ -1801,7 +1779,7 @@ int execute_song_flight_of_bee( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA
    }
 
    if (!skill_success(ch, 0, SKILL_SONG_FLIGHT_OF_BEE)) {
-      send_to_char("You run out of lyrics and end the song.\r\n", ch);
+      ch->song_timer = -1;
       return eSUCCESS;
    }
 
@@ -1942,11 +1920,6 @@ int execute_song_jig_of_alacrity( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DA
 
    // Note, the jig effects everyone in the group BUT the bard.
 
-   if (IS_SET(world[ch->in_room].room_flags, NO_KI)) {
-     send_to_char("You find yourself unable to use energy based chants here.\n\r", ch);
-     return intrp_jig_of_alacrity(level, ch, arg, victim, -1);
-   }
-
    if(GET_KI(ch) < 2) // we don't have the ki to keep the song going
    {
      return intrp_jig_of_alacrity(level, ch, arg, victim, -1);
@@ -2001,7 +1974,7 @@ int execute_song_jig_of_alacrity( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DA
    }
 
    if(!skill_success(ch, NULL, SKILL_SONG_JIG_OF_ALACRITY)) {
-      send_to_char("You run out of lyrics and end the song.\r\n", ch);
+      ch->song_timer = -1;
       return eSUCCESS;
    }
 
@@ -2018,17 +1991,7 @@ int execute_song_fanatical_fanfare(ubyte level, CHAR_DATA *ch, char *arg, CHAR_D
    char_data * master = NULL;
    follow_type * fvictim = NULL;
 
-   // Note, the jig effects everyone in the group BUT the bard.
-
-   if (IS_SET(world[ch->in_room].room_flags, NO_KI)) {
-     send_to_char("You find yourself unable to use energy based chants here.\n\r", ch);
-     return intrp_song_fanatical_fanfare(level, ch, arg, victim, -1);
-   }
-
-   bool ended = FALSE;
-   if (!skill_success(ch, NULL, SKILL_SONG_FANATICAL_FANFARE))
-	ended = TRUE;
-   if(!ended && GET_KI(ch) < (has_skill(ch,SKILL_SONG_FANATICAL_FANFARE) > 60?1:2)) // we don't have the ki to keep the song going
+   if(GET_KI(ch) < (has_skill(ch,SKILL_SONG_FANATICAL_FANFARE) > 60?1:2)) // we don't have the ki to keep the song going
    {
      return intrp_song_fanatical_fanfare(level, ch, arg, victim, -1);
    }
@@ -2046,7 +2009,7 @@ int execute_song_fanatical_fanfare(ubyte level, CHAR_DATA *ch, char *arg, CHAR_D
       if(!ISSET(fvictim->follower->affected_by, AFF_GROUP))
          continue;
 
-      if(ch->in_room != fvictim->follower->in_room || ended)
+      if(ch->in_room != fvictim->follower->in_room)
       {
          if(ISSET(fvictim->follower->affected_by, AFF_INSOMNIA) &&
             !affected_by_spell(fvictim->follower, SPELL_INSOMNIA))         {
@@ -2070,8 +2033,7 @@ int execute_song_fanatical_fanfare(ubyte level, CHAR_DATA *ch, char *arg, CHAR_D
       send_to_char("Your mind races at a thousand miles an hour, following the beat of the song!\r\n", fvictim->follower);
    }
 
-  //if(ch != master)
-   if(ch->in_room == master->in_room &&!ended) 
+   if(ch->in_room == master->in_room) 
    {
       SETBIT(master->affected_by, AFF_INSOMNIA);
       if (skill > 85) SETBIT(master->affected_by, AFF_FEARLESS);
@@ -2093,10 +2055,9 @@ int execute_song_fanatical_fanfare(ubyte level, CHAR_DATA *ch, char *arg, CHAR_D
    }
 
 
-   if (ended)
+   if (!skill_success(ch, NULL, SKILL_SONG_FANATICAL_FANFARE))
    {
-	send_to_char("You run out of lyrics and end the song.\r\n",ch);
-	return eSUCCESS;
+      
    }
 
    GET_KI(ch) -= (has_skill(ch,SKILL_SONG_FANATICAL_FANFARE) > 60?1:2);
@@ -2112,17 +2073,8 @@ int execute_mking_charge(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victi
    char_data * master = NULL;
    follow_type * fvictim = NULL;
 
-   if (IS_SET(world[ch->in_room].room_flags, NO_KI)) {
-     send_to_char("You find yourself unable to sing here.\n\r", ch);
-     return intrp_mking_charge(level, ch, arg, victim, -1);
-   }
-
-   bool ended = FALSE;
-   if (!skill_success(ch, NULL, SKILL_SONG_MKING_CHARGE))
-	ended = TRUE;
-   if(!ended && GET_KI(ch) < 5) // we don't have the ki to keep the song going
+   if(GET_KI(ch) < 5) // we don't have the ki to keep the song going
    {
-	ended = TRUE;
      return intrp_mking_charge(level, ch, arg, victim, -1);
    }
     struct affected_type af;
@@ -2147,7 +2099,7 @@ else af.bitvector = -1;
       if(!ISSET(fvictim->follower->affected_by, AFF_GROUP))
          continue;
 
-      if(ch->in_room != fvictim->follower->in_room || ended)
+      if(ch->in_room != fvictim->follower->in_room)
       {
 	if (affected_by_spell(fvictim->follower, SKILL_SONG_MKING_CHARGE))
 	{
@@ -2162,8 +2114,7 @@ else af.bitvector = -1;
      act("$n's songs and tales of your ancestors' struggles fuel you with rage, sending you into a temporary frenzy!  To arms!", ch, 0, fvictim->follower, TO_VICT, 0); 
    }
 
-  //if(ch != master)
-   if(ch->in_room == master->in_room &&!ended) 
+   if(ch->in_room == master->in_room) 
    {
 	if (!affected_by_spell(master, SKILL_SONG_MKING_CHARGE))
 	affect_to_char(master, &af);
@@ -2185,10 +2136,10 @@ else af.bitvector = -1;
      send_to_char("Weaving the jig of alacrity into your song of battle, your allies move faster.\r\n",ch);
    }
 
-   if (ended)
+   if (!skill_success(ch, NULL, SKILL_SONG_MKING_CHARGE))
    {
-	send_to_char("You run out of lyrics and end the song.\r\n",ch);
-	return eSUCCESS;
+      ch->song_timer = -1;
+      return eSUCCESS;
    }
 
    GET_KI(ch) -= 5;
@@ -2638,11 +2589,6 @@ int execute_song_vigilant_siren( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DAT
    char_data * master = NULL;
    follow_type * fvictim = NULL;
 
-   if (IS_SET(world[ch->in_room].room_flags, NO_KI)) {
-     send_to_char("You find yourself unable to use energy based chants here.\n\r", ch);
-     return intrp_vigilant_siren(level, ch, arg, victim, -1);
-   }
-
    if(GET_KI(ch) < 2) // we don't have the ki to keep the song going
    {
      return intrp_vigilant_siren(level, ch, arg, victim, -1);
@@ -2692,6 +2638,11 @@ int execute_song_vigilant_siren( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DAT
          REMBIT(master->affected_by, AFF_NO_CIRCLE);
       if(IS_AFFECTED(master, AFF_NO_BEHEAD))
          REMBIT(master->affected_by, AFF_NO_BEHEAD);
+   }
+
+   if(!skill_success(ch, NULL, SKILL_SONG_VIGILANT_SIREN)) {
+      ch->song_timer = -1;
+      return eSUCCESS;
    }
 
    GET_KI(ch) -= skill > 85 ? 2 : 1;
@@ -2823,11 +2774,6 @@ int execute_song_crushing_crescendo( ubyte level, CHAR_DATA *ch, char *arg, CHAR
    skill %= 100;
 
    victim = ch->fighting;
-
-   if (IS_SET(world[ch->in_room].room_flags, NO_KI)) {
-     send_to_char("You find yourself unable to use energy based chants here.\n\r", ch);
-     return eSUCCESS;
-   } 
 
    if(!victim)
    {
@@ -2983,6 +2929,11 @@ int execute_song_submariners_chorus( ubyte level, CHAR_DATA *ch, char *arg, CHAR
          REMBIT(master->affected_by, AFF_WATER_BREATHING);
          send_to_char("Your musical ability to breath water ends.\n\r", master);
       }
+   }
+
+   if(!skill_success(ch, NULL, SKILL_SONG_SUBMARINERS_CHORUS)) {
+      ch->song_timer = -1;
+      return eSUCCESS;
    }
 
    ch->song_timer = song_info[ch->song_number].beats;
