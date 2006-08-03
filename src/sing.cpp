@@ -300,28 +300,47 @@ int16 use_song(CHAR_DATA *ch, int kn)
 }
 
 
-void stop_grouped_bards(CHAR_DATA *ch, int action)
+void stop_grouped_bards(CHAR_DATA *ch, int bardsing)
 {
    char_data * master = NULL;
    follow_type * fvictim = NULL;
-   if (action == 1)
-     origsing = ch;
 
-   if(!(master = ch->master))
-      master = ch;
+   if(IS_SINGING(ch)) { //kill everybody elses love
+      if(!(master = ch->master))
+         master = ch;
+      else {
+         if(bardsing)
+            origsing = master;
+         do_sing(ch, "stop", 9);
+         origsing = NULL;
+      }
+      for(fvictim = master->followers; fvictim; fvictim = fvictim->next)
+      {
+         if(fvictim->follower == ch && bardsing) continue;
+         else origsing = fvictim->follower;
+         do_sing(ch, "stop", 9);
+         origsing = NULL;
+      }
+   } else { //kill the person's love
 
-   for(fvictim = master->followers; fvictim; fvictim = fvictim->next)
-   {
-      // end any performances
-      if(IS_SINGING(fvictim->follower))
-         do_sing(fvictim->follower, "stop", 9);
+      origsing = ch;
 
+      if(!(master = ch->master))
+         master = ch;
+
+      for(fvictim = master->followers; fvictim; fvictim = fvictim->next)
+      {
+         // end any performances
+         if(IS_SINGING(fvictim->follower))
+            do_sing(fvictim->follower, "stop", 9);
+     }
+
+      if(IS_SINGING(master))
+      {
+         do_sing(master, "stop", 9);
+      }
+      origsing = NULL;
    }
-   if(IS_SINGING(master))
-   {
-      do_sing(master, "stop", 9);
-   }
-   origsing = NULL;
 }
 
 void get_instrument_bonus(char_data * ch, int & comb, int & non_comb)
@@ -413,7 +432,7 @@ int do_sing(CHAR_DATA *ch, char *arg, int cmd)
   
   if(song_info[spl].song_pointer) {
     if(GET_POS(ch) < song_info[spl].minimum_position && 
-	!IS_NPC(ch)) {
+	!IS_NPC(ch) && spl != 2) {
       switch(GET_POS(ch)) {
         case POSITION_SLEEPING:
           send_to_char("You dream of beautiful music.\n\r", ch);
