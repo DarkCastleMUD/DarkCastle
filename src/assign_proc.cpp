@@ -327,6 +327,7 @@ void assign_combat_procs() {
     SPEC_FUN    hiryushi_combat;
     SPEC_FUN    izumi_combat;
     SPEC_FUN    shogura_combat;
+    SPEC_FUN    sc_golem;
     SPEC_FUN    mage_familiar_imp;
 
     /* I spent forever putting these fuckers in numerical order,
@@ -335,6 +336,7 @@ void assign_combat_procs() {
    assign_one_mob_com(4, mage_familiar_gremlin);
     assign_one_mob_com(5,  mage_familiar_imp);
 //   assign_one_mob_com(7, druid_familiar_owl);
+   assign_one_mob_com(8, sc_golem);
     assign_one_mob_com(1364,  active_grandmaster);
     assign_one_mob_com(3059,  fighter);
     assign_one_mob_com(5005,  brass_dragon);

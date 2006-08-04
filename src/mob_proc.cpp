@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.106 2006/07/31 11:10:56 dcastle Exp $ */
+/* $Id: mob_proc.cpp,v 1.107 2006/08/04 18:01:03 dcastle Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -498,6 +498,38 @@ int robber(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
          npc_steal(ch, cons); 
 
     return eSUCCESS;
+}
+
+int sc_golem(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,        
+          struct char_data *owner)
+{
+   if (cmd) return eFAILURE;
+   if (!ch->fighting) return eFAILURE;
+   bool iron = FALSE;
+   if (IS_AFFECTED(ch, AFF_GOLEM))  iron = TRUE;
+   SPELL_FUN *iron_list[] = {
+      cast_shocking_grasp,
+      cast_lightning_bolt,
+      cast_sparks,
+      cast_chill_touch,
+      cast_cure_critic
+   };
+   SPELL_FUN *stone_list[] = {
+      cast_fireball,
+      cast_cause_critical,
+      cast_meteor_swarm,
+      cast_bee_sting,
+      cast_cure_critic
+   };
+   if (!(owner = ch->master) || !has_skill(ch->master, SKILL_SPELLCRAFT) > 80)
+      return eFAILURE;
+   int i = number(0,4);
+   SPELL_FUN *func = iron?iron_list[i]:stone_list[i];
+   
+   if (i == 4)
+  return (*func)(50, ch, "",  SPELL_TYPE_SPELL, ch, 0, 0);
+   else
+  return (*func)(50, ch, "",  SPELL_TYPE_SPELL, ch->fighting, 0, 0);
 }
 
 // non_combat proc for all mob "mages"

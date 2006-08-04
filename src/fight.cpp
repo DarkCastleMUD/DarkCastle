@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.358 2006/08/03 08:42:24 shane Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.359 2006/08/04 18:00:09 dcastle Exp $ */
 
 extern "C"
 {
@@ -1709,15 +1709,6 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
         if (save && dam!=0 && attacktype && attacktype < TYPE_HIT)
           save -= GET_INT(ch) / 3;
      }
-     if (attacktype == SPELL_HELLSTREAM) {
-	if (spellcraft(ch, SPELL_HELLSTREAM))
-	{
-	  double mult = (double)number(1,5);
-	  mult = 1.0 + (double)mult/100;
-	  dam = (int)(dam * mult);
-	}
-     }
-
    }
 
    if (save < 0 && !imm)
@@ -1790,7 +1781,7 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
 //        act("$n resists your assault and sustains reduced damage.", victim,0,ch, TO_VICT,0);
 //        act("You resist $N's assault and sustain reduced damage.", victim, 0, ch, TO_CHAR, 0);
    }
-  
+  /*
   if (v) { // spellcraft damage bonus
 	int o = 0;
      switch (attacktype)
@@ -1805,7 +1796,7 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
      }
      if (v > o && has_skill(ch, attacktype) > o) dam += v;
   }
-
+*/
   }
   if (affected_by_spell(ch, SKILL_SONG_MKING_CHARGE))
     dam = (int)(dam * 1.1); // scary!
