@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.147 2006/08/01 22:44:00 dcastle Exp $
+| $Id: cl_thief.cpp,v 1.148 2006/08/04 08:57:17 shane Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -1787,7 +1787,7 @@ int do_blackjack(struct char_data *ch, char *argument, int cmd)
 
   if (!(victim = get_char_room_vis(ch, arg)))
   {
-    send_to_char("Blackjack who?\r\n",ch);
+    send_to_char("Blackjack whom?\r\n",ch);
     return eFAILURE;
   }
   if (victim == ch)
@@ -2024,7 +2024,7 @@ int do_cripple(CHAR_DATA *ch, char *argument, int cmd)
    if(!skill_success(ch, vict, SKILL_CRIPPLE)) {
       act("You quickly lash out but fail to cripple $N.", ch, 0, vict, TO_CHAR, 0);
       act("$n quickly lashes out, narrowly missing an attempt to cripple you!", ch, 0, vict, TO_VICT, 0);
-      act("$n quicly lashes out but fails to cripple $N.", ch, 0, vict, TO_ROOM, NOTVICT);
+      act("$n quickly lashes out but fails to cripple $N.", ch, 0, vict, TO_ROOM, NOTVICT);
    } else {
       act("You quickly lash out and strike a crippling blow to $N!", ch, 0, vict, TO_CHAR, 0);
       act("$n lashes out quickly and cripples you with a painful blow!", ch, 0, vict, TO_VICT, 0);
