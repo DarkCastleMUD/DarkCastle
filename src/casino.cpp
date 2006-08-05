@@ -2005,6 +2005,10 @@ int slot_machine(CHAR_DATA *ch, OBJ_DATA *obj, int cmd, char *arg, CHAR_DATA *in
       if(atoi(buf) >= 1 && atoi(buf) <= 5) {
          obj->slot->bet = atoi(buf);
          obj->slot->prch = ch;
+         if(obj->slot->button) {
+            send_to_char("The panel closes quietly.\n\r", ch);
+            obj->slot->button = FALSE;
+         }
          if(obj->slot->bet == 1)
             send_to_char("You place only the minimum bet into the slot machine now.\n\r", ch);
          else
@@ -2038,14 +2042,14 @@ int slot_machine(CHAR_DATA *ch, OBJ_DATA *obj, int cmd, char *arg, CHAR_DATA *in
       return eSUCCESS;
    }
 
-   if(obj->slot->prch != ch) obj->slot->bet = 1;
-   if(obj->slot->button) send_to_char("The panel closes quietly.\n\r", ch);
-   obj->slot->button = FALSE;
-
    if(obj->slot->gold && GET_GOLD(ch) < obj->slot->cost * obj->slot->bet || !obj->slot->gold && GET_PLATINUM(ch) < obj->slot->cost * obj->slot->bet) {
       send_to_char("You don't have enough money to start the machine.\n\r", ch);
       return eSUCCESS;
    }
+
+   if(obj->slot->prch != ch) obj->slot->bet = 1;
+   if(obj->slot->button) send_to_char("The panel closes quietly.\n\r", ch);
+   obj->slot->button = FALSE;
 
    if(obj->slot->gold)
       GET_GOLD(ch) -= obj->slot->cost * obj->slot->bet;
