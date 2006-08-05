@@ -19,7 +19,7 @@
 /* 12/06/2003   Onager   Modified mobile_activity() to prevent charmie    */
 /*                       scavenging                                       */
 /**************************************************************************/
-/* $Id: mob_act.cpp,v 1.39 2006/07/13 21:03:27 shane Exp $ */
+/* $Id: mob_act.cpp,v 1.40 2006/08/05 20:12:58 shane Exp $ */
 
 extern "C"
 {
@@ -249,6 +249,7 @@ void mobile_activity(void)
       && (door = number(0,30)) <= 5
       && CAN_GO(ch, door)
       && !IS_SET(world[EXIT(ch,door)->to_room].room_flags, NO_MOB)
+      && !IS_SET(world[EXIT(ch,door)->to_room].room_flags, CLAN_ROOM)
       && ( IS_AFFECTED(ch, AFF_FLYING) ||
            !IS_SET(world[EXIT(ch,door)->to_room].room_flags, 
                    (FALL_UP | FALL_SOUTH | FALL_NORTH | FALL_EAST | FALL_WEST | FALL_DOWN))
