@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.54 2006/08/07 18:59:45 jhhudso Exp $ */
+/* $Id: clan.cpp,v 1.55 2006/08/07 19:43:58 jhhudso Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -1645,7 +1645,10 @@ void do_god_clans(CHAR_DATA *ch, char *arg, int cmd)
         return;
       }
 
-      strcpy(tarclan->leader, last);
+      if (tarclan->leader)
+	dc_free(tarclan->leader);
+      tarclan->leader = str_dup(last);
+
       send_to_char("Clan leader name changed.\r\n", ch);
       break;
     }
