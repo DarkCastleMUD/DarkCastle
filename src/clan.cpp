@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.53 2006/08/07 11:06:33 jhhudso Exp $ */
+/* $Id: clan.cpp,v 1.54 2006/08/07 18:59:45 jhhudso Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -2201,13 +2201,7 @@ int do_clans(CHAR_DATA *ch, char *arg, int cmd)
 {
   struct clan_data * clan = 0;
 
-  if(!strcmp("Pirahna", GET_NAME(ch)) || 
-     !strcmp("Apocalypse", GET_NAME(ch)) ||
-     !strcmp("Urizen", GET_NAME(ch)) ||
-     !strcmp("Dasein", GET_NAME(ch)) ||
-     !strcmp("Valkyrie", GET_NAME(ch))
-    ) 
-  {
+  if(!IS_NPC(ch) && (GET_LEVEL(ch) == IMP)) {
     do_god_clans(ch, arg, cmd);
     return eSUCCESS;
   }
