@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.52 2006/07/02 20:42:37 urizen Exp $ */
+/* $Id: clan.cpp,v 1.53 2006/08/07 11:06:33 jhhudso Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -634,6 +634,9 @@ int num_clan_members(struct clan_data * clan)
 struct clan_data * get_clan(int nClan)
 {
   struct clan_data *clan = NULL;
+
+  if (nClan == 0)
+    return 0;
 
   for(clan = clan_list; clan; clan = clan->next)
      if(nClan == clan->number)

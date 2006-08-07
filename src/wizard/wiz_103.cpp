@@ -14,6 +14,7 @@
 #include <handler.h>
 #include <returnvals.h>
 #include <spells.h>
+#include <clan.h>
 
 int do_boot(struct char_data *ch, char *arg, int cmd)
 {
@@ -190,25 +191,60 @@ int do_fsave(struct char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_fighting(struct char_data *ch, char *arg, int cmd)
+int do_fighting(struct char_data *ch, char *argument, int cmd)
 {
+  const int CLANTAG_LEN = MAX_CLAN_LEN+3; // "[Foobar]"
   struct char_data *i;
-  int x = 0;
-  char buf[100];
+  bool arenaONLY = false;
+  int countFighters = 0;
+  char buf[80];
+  char arg[MAX_STRING_LENGTH];
+  struct clan_data *ch_clan = 0;
+  char ch_clan_name[CLANTAG_LEN];
+  ch_clan_name[0] = 0;
+  struct clan_data *victim_clan = 0;
+  char victim_clan_name[CLANTAG_LEN];
+  victim_clan_name[0] = 0;
   
-  for(i = combat_list; i; i = i->next_fighting, x++) {
-     if(IS_NPC(i)) {
-       x--; 
-       continue;
-     }
-     sprintf(buf, "%14s fighting %14s-- [%ld] %s\n\r", GET_NAME(i),
-             GET_NAME(i->fighting), (long)(world[i->in_room].number),
-             (world[i->in_room].name));
-     send_to_char(buf, ch);
+  one_argument(argument, arg);
+  if (!strcmp(arg, "arena"))
+    arenaONLY = true;
+
+  for(i = combat_list; i; i = i->next_fighting) {
+    // Don't show mobs fighting or people not in the arena when arena
+    // keyword was specified.
+    if(IS_NPC(i)
+       || (arenaONLY && !IS_SET(world[i->in_room].room_flags, ARENA))) {
+      continue;
+    } else {
+      countFighters++;
+    }
+  
+    // If they're in a clan
+    if ((ch_clan = get_clan(i)))
+      snprintf(ch_clan_name, CLANTAG_LEN, "[%s]", ch_clan->name);    
+
+    if((victim_clan = get_clan(i->fighting)))
+      snprintf(victim_clan_name, CLANTAG_LEN, "[%s]", victim_clan->name);
+
+    snprintf(buf, 80, "%14s %-17s fighting %14s %-17s\n\r",
+	    GET_NAME(i), ch_clan_name,
+	    GET_NAME(i->fighting), victim_clan_name);
+    send_to_char(buf, ch);
+     
+    snprintf(buf, 80, "in room: %s [%ld]\n\r",
+	     (world[i->in_room].name),
+	     (long)(world[i->in_room].number));
+    send_to_char(buf, ch);
   }
   
-  if(!x)
-    send_to_char("No fighting characters found.\n\r", ch);
+  
+  if(countFighters == 0) {
+    if (arenaONLY)
+      send_to_char("No fighting characters found in the arena.\n\r", ch);
+    else
+      send_to_char("No fighting characters found.\n\r", ch);
+  }
   return eSUCCESS;
 }
 
