@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.107 2006/08/04 18:01:03 dcastle Exp $ */
+/* $Id: mob_proc.cpp,v 1.108 2006/08/09 02:06:50 jhhudso Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -3051,7 +3051,7 @@ static char *dethSayText [ ] =
   "Make sure cat is not sleeping in bass drum before you begin playing them.",
   "Warning:  Do not let Dr. Mario touch your genitals.  He is NOT a real doctor.",
   "General rule about female mudders seems to be:  Attractive, Single, Mentally Stable.  Choose 2.",
-  "The most secure computer in the world is one not connected to the internet.  That's why I reccomend AOL Broadband.",
+  "The most secure computer in the world is one not connected to the internet.  That's why I recommend AOL Broadband.",
   "In a perfect world spammers would be locked up with men that have enlarged their penis, taken Viagra, and are looking for new relationships.",
   "I'm going to name my kids Control, Alt, and Delete so I can just hit them all at once to solve any acting up.",
   "Does anyone here have a computer?",
@@ -3082,7 +3082,7 @@ static char *dethSayText [ ] =
   "I love Swedes and Canadians...my puny American ways are insignificant when compared to the power of Meatballs and Moose!",
   "I got fired from work trying to find this amulet of Yendor, and I finally have it. Now what?",
   "People who gives blowjobs are fucked in the head.",
-  "What's difference between Michael Jackson and acne? Acne waits till 13 to come on your face.",
+  "What's the difference between Michael Jackson and acne? Acne waits till you're 13 to come on your face.",
   "I put racing strips on my computer.  Makes me feel like it goes faster.",
   "What happened to sex, drugs, and rock'n'roll.  Now we have AIDS, crack, and techno.",
   "It's a good thing Microsoft isn't in the condom busines.",
