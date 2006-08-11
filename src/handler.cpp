@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.126 2006/07/17 00:13:06 jhhudso Exp $ */
+/* $Id: handler.cpp,v 1.127 2006/08/11 19:12:36 shane Exp $ */
     
 extern "C"
 {
@@ -596,7 +596,7 @@ void remove_set_stats(char_data *ch, obj_data *obj, int flag)
   // Quadruply nested for. Annoying, but it's gotta be done.
   // I'm sure "quadruply" is a word.
   for (; *(set_list[z].SetName) != '\n'; z++)
-   for (y = 0; y < 17 && set_list[z].vnum[y] != -1; y++)
+   for (y = 0; y < 19 && set_list[z].vnum[y] != -1; y++)
     if (set_list[z].vnum[y] == obj_vnum)
     {  // Aye, 'tis part of a set.
         for (y= 0; y < 19 && set_list[z].vnum[y] != -1;y++)
