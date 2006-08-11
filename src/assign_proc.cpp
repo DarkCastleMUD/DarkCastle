@@ -523,6 +523,14 @@ void assign_objects(void)
     assign_one_obj_non(21907, slot_machine);
     assign_one_obj_non(21908, slot_machine);
     assign_one_obj_non(21909, slot_machine);
+    assign_one_obj_non(21910, slot_machine);
+    assign_one_obj_non(21911, slot_machine);
+    assign_one_obj_non(21912, slot_machine);
+    assign_one_obj_non(21913, slot_machine);
+    assign_one_obj_non(21914, slot_machine);
+    assign_one_obj_non(21915, slot_machine);
+    assign_one_obj_non(21916, slot_machine);
+    assign_one_obj_non(21917, slot_machine);
     assign_one_obj_non(534, godload_cassock);
     assign_one_obj_non(500, godload_stargazer);
     assign_one_obj_non(526, godload_armbands);
