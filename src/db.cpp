@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.134 2006/07/31 11:11:24 dcastle Exp $ */
+/* $Id: db.cpp,v 1.135 2006/08/13 14:24:11 dcastle Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -1308,7 +1308,7 @@ struct index_data *generate_obj_indices(int *top,
     dc_fclose(fl);
   } // for next_in_file
 
-  *top = i - 2;
+  *top = i-1;
   dc_fclose(flObjIndex);
   return(index);
 }
