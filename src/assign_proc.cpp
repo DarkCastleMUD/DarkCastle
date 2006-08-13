@@ -499,6 +499,7 @@ void assign_objects(void)
   SPEC_FUN transfer_thing;
   SPEC_FUN blackjack_table;
   SPEC_FUN slot_machine;
+  SPEC_FUN roulette_table;
  // combvat procs
   SPEC_FUN godload_banshee;
   SPEC_FUN godload_claws;
@@ -531,6 +532,7 @@ void assign_objects(void)
     assign_one_obj_non(21915, slot_machine);
     assign_one_obj_non(21916, slot_machine);
     assign_one_obj_non(21917, slot_machine);
+    assign_one_obj_non(21918, roulette_table);
     assign_one_obj_non(534, godload_cassock);
     assign_one_obj_non(500, godload_stargazer);
     assign_one_obj_non(526, godload_armbands);

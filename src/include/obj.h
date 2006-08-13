@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: obj.h,v 1.24 2006/07/24 20:50:43 shane Exp $ */
+/* $Id: obj.h,v 1.25 2006/08/13 17:53:53 shane Exp $ */
 #ifndef OBJ_H_
 #define OBJ_H_
 
@@ -238,6 +238,7 @@ struct obj_data
     struct obj_data *next_skill; 
     struct table_data *table;
     struct machine_data *slot;
+    struct wheel_data *wheel;
 };
 
 /* For 'equipment' */

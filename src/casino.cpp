@@ -35,6 +35,7 @@ extern "C"
 #include <timeinfo.h>
 
 extern CHAR_DATA *character_list;
+extern OBJ_DATA *object_list;
 extern CWorld world;
 extern struct index_data *obj_index;
 
@@ -1789,6 +1790,7 @@ struct machine_data
    uint lastwin;
    int bet;
    int32 jackpot;
+   int linkedto;
    bool busy;
    bool gold;
    bool button;
@@ -1863,6 +1865,7 @@ void create_slot(OBJ_DATA *obj)
    slot->prch = NULL;
    slot->cost = obj->obj_flags.value[0];
    slot->jackpot = obj->obj_flags.value[1];
+   slot->linkedto = obj->obj_flags.value[3];
    slot->lastwin = 0;
    slot->bet = 1;
    if(obj->obj_flags.value[2]) slot->gold = FALSE;
@@ -1878,6 +1881,23 @@ bool verify_slot(struct machine_data *machine)
       return TRUE;
 
    return FALSE;
+}
+
+void update_linked_slots(struct machine_data *machine)
+{
+   char buf[MAX_STRING_LENGTH];
+
+   for(int i=21906;i<21918;i++) {
+      if( ((OBJ_DATA *)obj_index[real_object(i)].item)->obj_flags.value[3] == machine->linkedto ) {
+         ((OBJ_DATA *)obj_index[real_object(i)].item)->obj_flags.value[1] = machine->jackpot;
+         sprintf(buf, "A slot machine which displays '$R$BJackpot: %d %s!$1' sits here.", machine->jackpot / 100, 
+               machine->gold?"coins":"plats");
+         for(OBJ_DATA *j=object_list; j; j = j->next)
+            if(j->item_number == real_object(i))
+               j->description = str_hsh(buf);
+         ((OBJ_DATA *)obj_index[real_object(i)].item)->description = str_hsh(buf);
+      }
+   }
 }
 
 void slot_timer(struct machine_data *machine, int stop1, int stop2, int delay)
@@ -1937,10 +1957,14 @@ void reel_spin(void *arg1, void *arg2, void *arg3)
       else if(stop1 == 3 || stop1 == 9) payout = 2;
       else {
          machine->jackpot += machine->cost * machine->bet * 5;
-         ((OBJ_DATA *)obj_index[machine->obj->item_number].item)->obj_flags.value[1] = machine->jackpot;
-         sprintf(buf, "A slot machine which displays '$R$BJackpot: %d %s!$1' sits here.", machine->jackpot / 100, machine->gold?"coins":"plats");
-         machine->obj->description = str_hsh(buf);
-         ((OBJ_DATA *)obj_index[machine->obj->item_number].item)->description = str_hsh(buf);
+         if(machine->linkedto) {
+            update_linked_slots(machine);
+         } else {
+            ((OBJ_DATA *)obj_index[machine->obj->item_number].item)->obj_flags.value[1] = machine->jackpot;
+            sprintf(buf, "A slot machine which displays '$R$BJackpot: %d %s!$1' sits here.", machine->jackpot / 100, machine->gold?"coins":"plats");
+            machine->obj->description = str_hsh(buf);
+            ((OBJ_DATA *)obj_index[machine->obj->item_number].item)->description = str_hsh(buf);
+         }
       }
       if(payout) {
          send_to_room("Lights flash and noises eminate from the slot machine!\n\r", machine->obj->in_room);
@@ -1961,10 +1985,14 @@ void reel_spin(void *arg1, void *arg2, void *arg3)
             GET_GOLD(machine->ch) += machine->jackpot / 100;
          else GET_PLATINUM(machine->ch) += machine->jackpot / 100;
          machine->jackpot = machine->cost * 2500;
-         ((OBJ_DATA *)obj_index[machine->obj->item_number].item)->obj_flags.value[1] = machine->jackpot;
-         sprintf(buf, "A slot machine which displays '$R$BJackpot: %d %s!$1' sits here.", machine->jackpot / 100, machine->gold?"coins":"plats");
-         machine->obj->description = str_hsh(buf);
-         ((OBJ_DATA *)obj_index[machine->obj->item_number].item)->description = str_hsh(buf);
+         if(machine->linkedto) {
+            update_linked_slots(machine);
+         } else {
+            ((OBJ_DATA *)obj_index[machine->obj->item_number].item)->obj_flags.value[1] = machine->jackpot;
+            sprintf(buf, "A slot machine which displays '$R$BJackpot: %d %s!$1' sits here.", machine->jackpot / 100, machine->gold?"coins":"plats");
+            machine->obj->description = str_hsh(buf);
+            ((OBJ_DATA *)obj_index[machine->obj->item_number].item)->description = str_hsh(buf);
+         }
          save_slot_machines();
       }
       machine->busy = FALSE;
@@ -2067,3 +2095,508 @@ int slot_machine(CHAR_DATA *ch, OBJ_DATA *obj, int cmd, char *arg, CHAR_DATA *in
 }
 
 /* End Slot Machines */
+
+/* Roulette! */
+
+char *roulette_display[] = {
+   "$2$B0$R", "$4$B1$R", "$0$B2$R", "$4$B3$R", "$0$B4$R", "$4$B5$R", "$0$B6$R", "$4$B7$R", "$0$B8$R",
+   "$4$B9$R", "$0$B10$R", "$0$B11$R", "$4$B12$R", "$0$B13$R", "$4$B14$R", "$0$B15$R", "$4$B16$R",
+   "$0$B17$R", "$4$B18$R", "$4$B19$R", "$0$B20$R", "$4$B21$R", "$0$B22$R", "$4$B23$R", "$0$B24$R",
+   "$4$B25$R", "$0$B26$R", "$4$B27$R", "$0$B28$R", "$0$B29$R", "$4$B30$R", "$0$B31$R", "$4$B32$R",
+   "$0$B33$R", "$4$B34$R", "$0$B35$R", "$4$B36$R", "$2$B00$R",
+};
+
+struct roulette_player
+{
+   CHAR_DATA *ch;
+   uint32 bet_array[49];
+};
+
+struct wheel_data
+{
+   OBJ_DATA *obj;
+   struct roulette_player *plr[6];
+   int countdown;
+   bool spinning;
+};
+
+void create_wheel(OBJ_DATA *obj)
+{
+   struct wheel_data *wheel;
+ #ifdef LEAK_CHECK
+   wheel = (struct wheel_data *)calloc(1, sizeof(struct wheel_data));
+ #else
+   wheel = (struct wheel_data *)dc_alloc(1, sizeof(struct wheel_data));
+ #endif
+   wheel->obj = obj;
+   for(int i=0;i<6;i++) {
+ #ifdef LEAK_CHECK
+   wheel->plr[i] = (struct roulette_player *)calloc(1, sizeof(struct roulette_player));
+ #else
+   wheel->plr[i] = (struct roulette_player *)dc_alloc(1, sizeof(struct roulette_player));
+ #endif
+      wheel->plr[i]->ch = NULL;
+      for(int j=0;j<49;j++)
+         wheel->plr[i]->bet_array[j] = 0;
+   }
+   wheel->countdown = 11;
+   wheel->spinning = FALSE;
+   obj->wheel = wheel;
+}
+
+void send_wheel_bets(CHAR_DATA *ch, struct wheel_data *wheel)
+{
+   int i,j;
+   bool found = FALSE;
+   char *bet_name[] = {
+      "$B$0BLACK$R", "$4$BRED$R", "$BEVEN$R", "$BODD$R", "$B1-12$R", "$B13-24$R", "$B25-36$R", "$B1-8$R", "$B9-16$R", 
+      "$B17-24$R", "$B25-36$R", "$2$B00$R"
+   };
+
+   for(i=0;i<6;i++) {
+      if(ch == wheel->plr[i]->ch) {
+         for(j=0;j<12;j++) {
+            if(wheel->plr[i]->bet_array[j]) {
+               if(!found) {send_to_char("You have", ch); found = TRUE;}
+               else send_to_char(" and", ch);
+               csendf(ch, " a bet of %u on %s", wheel->plr[i]->bet_array[j], bet_name[j]);
+            }
+         }
+         for(j=12;j<49;j++) {
+            if(wheel->plr[i]->bet_array[j]) {
+               if(!found) {send_to_char("You have", ch); found = TRUE;}
+               else send_to_char(" and", ch);
+               csendf(ch, " a bet of %u on %s", wheel->plr[i]->bet_array[j], roulette_display[j-12]);
+            }
+         }
+      }
+   }
+   if(!found) send_to_char("You have not placed any bets", ch);
+   send_to_char(".\n\r", ch);
+}
+
+uint32 check_roulette_wins(struct roulette_player *plr, int num)
+{
+   uint32 tmp;
+   uint32 winnings = 0;
+
+   if(plr->bet_array[0] && (num == 2 || num == 4 || num == 6 || num == 8 || num == 10 ||
+         num == 11 || num == 13 || num == 15 || num == 17 || num == 20 || num == 22 ||
+         num == 24 || num == 26 || num == 28 || num == 29 || num == 31 || num == 33 ||
+         num == 35)) {
+      tmp = 2 * plr->bet_array[0];
+      csendf(plr->ch, "You WIN %u coins on your bet of $0$BBLACK$R!\n\r", tmp);
+      winnings += tmp;
+   }
+
+   if(plr->bet_array[1] && !(num == 2 || num == 4 || num == 6 || num == 8 || num == 10 ||
+         num == 11 || num == 13 || num == 15 || num == 17 || num == 20 || num == 22 ||
+         num == 24 || num == 26 || num == 28 || num == 29 || num == 31 || num == 33 ||
+         num == 35 || num == 0 || num == 37)) {
+      tmp = 2 * plr->bet_array[1];
+      csendf(plr->ch, "You WIN %u coins on your bet of $4$BRED$R!\n\r", tmp);
+      winnings += tmp;
+   }
+   if(plr->bet_array[2] && num%2 == 0 && num) {
+      tmp = 2 * plr->bet_array[2];
+      csendf(plr->ch, "You WIN %u coins on your bet of $BEVEN$R!\n\r", tmp);
+      winnings += tmp;
+   }
+   if(plr->bet_array[3] && num%2 == 1) {
+      tmp = 2 * plr->bet_array[3];
+      csendf(plr->ch, "You WIN %u coins on your bet of $BODD$R!\n\r", tmp);
+      winnings += tmp;
+   }
+   if(plr->bet_array[4] && num > 0 && num < 13) {
+      tmp = 3 * plr->bet_array[4];
+      csendf(plr->ch, "You WIN %u coins on your bet of $B1-12$R!\n\r", tmp);
+      winnings += tmp;
+   }
+   if(plr->bet_array[5] && num > 12 && num < 25) {
+      tmp = 3 * plr->bet_array[5];
+      csendf(plr->ch, "You WIN %u coins on your bet of $B13-24$R!\n\r", tmp);
+      winnings += tmp;
+   }
+   if(plr->bet_array[6] && num > 24 && num < 37) {
+      tmp = 3 * plr->bet_array[6];
+      csendf(plr->ch, "You WIN %u coins on your bet of $B25-36$R!\n\r", tmp);
+      winnings += tmp;
+   }
+   if(plr->bet_array[7] && num > 0 && num < 9) {
+      tmp = 4 * plr->bet_array[7];
+      csendf(plr->ch, "You WIN %u coins on your bet of $B1-8$R!\n\r", tmp);
+      winnings += tmp;
+   }
+   if(plr->bet_array[8] && num > 8 && num < 17) {
+      tmp = 4 * plr->bet_array[8];
+      csendf(plr->ch, "You WIN %u coins on your bet of $B9-16$R!\n\r", tmp);
+      winnings += tmp;
+   }
+   if(plr->bet_array[9] && num > 16 && num < 25) {
+      tmp = 4 * plr->bet_array[9];
+      csendf(plr->ch, "You WIN %u coins on your bet of $B17-24$R!\n\r", tmp);
+      winnings += tmp;
+   }
+   if(plr->bet_array[10] && num > 24 && num < 37) {
+      tmp = 4 * plr->bet_array[10];
+      csendf(plr->ch, "You WIN %u coins on your bet of $B25-36$R!\n\r", tmp);
+      winnings += tmp;
+   }
+   if(plr->bet_array[11] && num == 37) {
+      tmp = 36 * plr->bet_array[11];
+      csendf(plr->ch, "You WIN %u coins on your bet of $2$B00$R!\n\r", tmp);
+      winnings += tmp;
+   }
+   for(int i=12;i<49;i++) {
+      if(plr->bet_array[i] && num == i-12) {
+         tmp = 36 * plr->bet_array[i];
+         csendf(plr->ch, "You WIN %u coins on your bet of %s!\n\r", tmp, roulette_display[num]);
+         winnings += tmp;
+      }
+   }
+   return winnings;
+}
+
+void send_roulette_message(struct wheel_data *wheel)
+{
+   char buf[MAX_STRING_LENGTH];
+
+   char *introbuf[] = {
+      "A silver blur rounds the outside of the wheel as it spins.\n\r",
+      "The distinct sound of the metal ball rounding the wheel is heard.\n\r",
+   };
+   char *middlebuf[] = {
+      "The ball bounces off of the",
+      "The ball caroms off of the metal part of the",
+      "The ball makes a clacking noise as it hits the",
+      "Clacking noises fill the air as the ball hits the",
+   };
+   char *endbuf[] = {
+      "and immediatly bounces out.\n\r",
+      "and bounces almost straight up in the air.\n\r",
+      "then short-hops a couple of spaces.\n\r",
+      "and gets knocked slightly backwards.\n\r",
+   };
+
+   if(wheel->countdown >= 2)
+      send_to_room(introbuf[number(0,1)], wheel->obj->in_room);
+   else {
+      sprintf(buf, "%s %s %s", middlebuf[number(0,3)], roulette_display[number(0,36)], endbuf[number(0,3)]);
+      send_to_room(buf, wheel->obj->in_room);
+   }
+}
+
+void wheel_stop(struct wheel_data *wheel)
+{
+   int num = number(0,37); //37 == 00
+   uint32 payout = 0;
+   char buf[MAX_STRING_LENGTH];
+
+   sprintf(buf, "The ball lands on %s!\n\r", roulette_display[num]);
+   send_to_room(buf, wheel->obj->in_room);
+
+   for(int i=0;i<6;i++) {
+      if(charExists(wheel->plr[i]->ch)) {
+         if(wheel->plr[i]->ch->in_room != wheel->obj->in_room) {
+            wheel->plr[i]->ch = NULL;
+         } else {
+            if((payout = check_roulette_wins(wheel->plr[i], num))) {
+               if(payout > 1000000)
+                  act("$n is a BIG winner!", wheel->plr[i]->ch, 0, 0, TO_ROOM, 0);
+               else
+                  act("$n is a winner!", wheel->plr[i]->ch, 0, 0, TO_ROOM, 0);
+               GET_GOLD(wheel->plr[i]->ch) += payout;
+            } else {
+               send_to_char("The croupier gathers your money.\n\r", wheel->plr[i]->ch);
+            }
+         }
+      }
+      for(int j=0;j<49;j++)
+         wheel->plr[i]->bet_array[j] = 0;
+   }
+   wheel->spinning = FALSE;
+   wheel->countdown = 11;
+}
+
+void pulse_countdown(void *arg1, void *arg2, void *arg3);
+
+void roulette_timer(struct wheel_data *wheel, int spin)
+{
+  struct timer_data *timer;
+ #ifdef LEAK_CHECK
+  timer = (struct timer_data *)calloc(1, sizeof(struct timer_data));
+ #else
+  timer = (struct timer_data *)dc_alloc(1, sizeof(struct timer_data));
+ #endif
+
+   timer->arg1 = (void*)wheel;
+   timer->arg2 = (void*)spin;
+   timer->function = pulse_countdown;
+   timer->timeleft = 6;
+   addtimer(timer);
+}
+
+void pulse_countdown(void *arg1, void *arg2, void *arg3)
+{
+   struct wheel_data *wheel = (struct wheel_data *) arg1;
+   int spin = (int) arg2;
+   char buf[MAX_STRING_LENGTH];
+
+   if(wheel->countdown <= 0 && !spin) {
+      wheel->spinning = TRUE;
+      send_to_room("The croupier places the ball on the wheel and spins both objects....\n\r", wheel->obj->in_room);
+      wheel->countdown = 2;
+      roulette_timer(wheel, 1);
+   } else if(!spin) {
+      if(number(0,1)) {
+         sprintf(buf, "The croupier announces, 'The wheel will be spun in about %d seconds!'\n\r", wheel->countdown * 3);
+         send_to_room(buf, wheel->obj->in_room);
+      }
+      wheel->countdown -= 1;
+      roulette_timer(wheel, 0);
+   } else if(wheel->countdown < 0) {
+      wheel_stop(wheel);
+   } else {
+      send_roulette_message(wheel);
+      wheel->countdown -= 1;
+      roulette_timer(wheel, 1);
+   }
+}
+
+int roulette_table(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, CHAR_DATA *invoker)
+{
+   char arg1[MAX_INPUT_LENGTH], arg2[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH];
+   uint32 bet=0;
+   int i=0;
+   bool playing = FALSE;
+   arg = one_argument(arg, arg1);
+   arg = one_argument(arg, arg2);
+   if (cmd != 189) return eFAILURE;
+   if (!ch || IS_NPC(ch)) return eFAILURE; // craziness
+   if (obj->in_room <= 0) return eFAILURE;
+   if (!obj->wheel)
+	create_wheel(obj);
+   if (IS_AFFECTED(ch, AFF_CANTQUIT) ||
+        affected_by_spell(ch, FUCK_PTHIEF) ||
+        affected_by_spell(ch, FUCK_GTHIEF))
+   {
+        send_to_char("You cannot play roulette while you are flagged as naughty.\r\n",ch);
+	return eSUCCESS;
+   }
+
+   if(obj->wheel->spinning) {
+      send_to_char("No bets may be placed while the wheel is spinning.\n\r", ch);
+      return eSUCCESS;
+   }
+
+   for(i=0;i<6;i++) {
+      if(obj->wheel->plr[i]->ch == ch) {
+         playing = TRUE;
+         break;
+      }
+   }
+
+   if(!playing) {
+      for(i=0;i<7;i++) {
+         if(i==6) {
+            send_to_char("You cannot muscle your way to the table.\n\r", ch);
+            return eSUCCESS;
+         }
+         if(!obj->wheel->plr[i]->ch) {
+            obj->wheel->plr[i]->ch = ch;
+            break;
+         }
+      }
+   }   
+
+   if(cmd == 189) // bet
+   {
+      if(!*arg2) {
+         send_to_char("Syntax: Bet <keyword>/<range (1-12)>/<number>  <amount>\n\r", ch);
+         return eSUCCESS;
+      }
+      if(!is_number(arg2) || atoi(arg2) < 100) {
+         send_to_char("You must bet an amount greater than 100 coins.\n\r", ch);
+         return eSUCCESS;
+      } else bet = atoi(arg2);
+      if(bet > 20000000) {
+         send_to_char("The maximum bet is 20 million coins.\n\r", ch);
+         bet = 20000000;
+      }
+      if(GET_GOLD(ch) < bet) {
+         send_to_char("You do not have enough money to place that bet.\n\r", ch);
+         return eSUCCESS;
+      } else GET_GOLD(ch) -= bet;
+      if(!str_cmp(arg1, "black")) {
+         if(obj->wheel->plr[i]->bet_array[0]) {
+            csendf(ch, "You add %u to your bet on $B$0BLACK$R.  The total bet is now %u coins.\n\r", bet, obj->wheel->plr[i]->bet_array[0] + bet);
+            sprintf(buf, "$n adds to $s bet on $B$0BLACK$R for a total of %u coins.", obj->wheel->plr[i]->bet_array[0] + bet);
+            act(buf, ch, 0, 0, TO_ROOM, 0);
+         }
+         else {
+            csendf(ch, "You have placed a bet of %u on $B$0BLACK$R.\n\r", bet);
+            sprintf(buf, "$n places a bet of %u on $B$0BLACK$R.", bet);
+            act(buf, ch, 0, 0, TO_ROOM, 0);
+         }
+         obj->wheel->plr[i]->bet_array[0] += bet;
+      } else if(!str_cmp(arg1, "red")) {
+         if(obj->wheel->plr[i]->bet_array[1]) {
+            csendf(ch, "You add %u to your bet on $B$4RED$R.  The total bet is now %u coins.\n\r", bet, obj->wheel->plr[i]->bet_array[1] + bet);
+            sprintf(buf, "$n adds to $s bet on $B$4RED$R for a total of %u coins.", obj->wheel->plr[i]->bet_array[1] + bet);
+            act(buf, ch, 0, 0, TO_ROOM, 0);
+         }
+         else {
+            csendf(ch, "You have placed a bet of %u on $B$4RED$R.\n\r", bet);
+            sprintf(buf, "$n places a bet of %u on $B$4RED$R.", bet);
+            act(buf, ch, 0, 0, TO_ROOM, 0);
+         }
+         obj->wheel->plr[i]->bet_array[1] += bet;
+      } else if(!str_cmp(arg1, "even")) {
+         if(obj->wheel->plr[i]->bet_array[2]) {
+            csendf(ch, "You add %u to your bet on $BEVEN$R.  The total bet is now %u coins.\n\r", bet, obj->wheel->plr[i]->bet_array[2] + bet);
+            sprintf(buf, "$n adds to $s bet on $BEVEN$R for a total of %u coins.", obj->wheel->plr[i]->bet_array[2] + bet);
+            act(buf, ch, 0, 0, TO_ROOM, 0);
+         }
+         else {
+            csendf(ch, "You have placed a bet of %u on $BEVEN$R.\n\r", bet);
+            sprintf(buf, "$n places a bet of %u on $BEVEN$R.", bet);
+            act(buf, ch, 0, 0, TO_ROOM, 0);
+         }
+         obj->wheel->plr[i]->bet_array[2] += bet;
+      } else if(!str_cmp(arg1, "odd")) {
+         if(obj->wheel->plr[i]->bet_array[3]) {
+            csendf(ch, "You add %u to your bet on $BODD$R.  The total bet is now %u coins.\n\r", bet, obj->wheel->plr[i]->bet_array[3] + bet);
+            sprintf(buf, "$n adds to $s bet on $BODDR for a total of %u coins.", obj->wheel->plr[i]->bet_array[3] + bet);
+            act(buf, ch, 0, 0, TO_ROOM, 0);
+         }
+         else {
+            csendf(ch, "You have placed a bet of %u on $BODD$R.\n\r", bet);
+            sprintf(buf, "$n places a bet of %u on $BODD$R.", bet);
+            act(buf, ch, 0, 0, TO_ROOM, 0);
+         }
+         obj->wheel->plr[i]->bet_array[3] += bet;
+      } else if(!str_cmp(arg1, "1-12")) {
+         if(obj->wheel->plr[i]->bet_array[4]) {
+            csendf(ch, "You add %u to your bet on $B1-12$R.  The total bet is now %u coins.\n\r", bet, obj->wheel->plr[i]->bet_array[4] + bet);
+            sprintf(buf, "$n adds to $s bet on $B1-12$R for a total of %u coins.", obj->wheel->plr[i]->bet_array[4] + bet);
+            act(buf, ch, 0, 0, TO_ROOM, 0);
+         }
+         else {
+            csendf(ch, "You have placed a bet of %u on $B1-12$R.\n\r", bet);
+            sprintf(buf, "$n places a bet of %u on $B1-12$R.", bet);
+            act(buf, ch, 0, 0, TO_ROOM, 0);
+         }
+         obj->wheel->plr[i]->bet_array[4] += bet;
+      } else if(!str_cmp(arg1, "13-24")) {
+         if(obj->wheel->plr[i]->bet_array[5]) {
+            csendf(ch, "You add %u to your bet on $B13-24$R.  The total bet is now %u coins.\n\r", bet, obj->wheel->plr[i]->bet_array[5] + bet);
+            sprintf(buf, "$n adds to $s bet on $B13-24$R for a total of %u coins.", obj->wheel->plr[i]->bet_array[5] + bet);
+            act(buf, ch, 0, 0, TO_ROOM, 0);
+         }
+         else {
+            csendf(ch, "You have placed a bet of %u on $B13-24$R.\n\r", bet);
+            sprintf(buf, "$n places a bet of %u on $B13-24$R.", bet);
+            act(buf, ch, 0, 0, TO_ROOM, 0);
+         }
+         obj->wheel->plr[i]->bet_array[5] += bet;
+      } else if(!str_cmp(arg1, "25-36")) {
+         if(obj->wheel->plr[i]->bet_array[6]) {
+            csendf(ch, "You add %u to your bet on $B25-36$R.  The total bet is now %u coins.\n\r", bet, obj->wheel->plr[i]->bet_array[6] + bet);
+            sprintf(buf, "$n adds to $s bet on $B25-36$R for a total of %u coins.", obj->wheel->plr[i]->bet_array[6] + bet);
+            act(buf, ch, 0, 0, TO_ROOM, 0);
+         }
+         else {
+            csendf(ch, "You have placed a bet of %u on $B25-36$R.\n\r", bet);
+            sprintf(buf, "$n places a bet of %u on $B25-36$R.", bet);
+            act(buf, ch, 0, 0, TO_ROOM, 0);
+         }
+         obj->wheel->plr[i]->bet_array[6] += bet;
+      } else if(!str_cmp(arg1, "1-8")) {
+         if(obj->wheel->plr[i]->bet_array[7]) {
+            csendf(ch, "You add %u to your bet on $B1-8$R.  The total bet is now %u coins.\n\r", bet, obj->wheel->plr[i]->bet_array[1] + bet);
+            sprintf(buf, "$n adds to $s bet on $B1-8$R for a total of %u coins.", obj->wheel->plr[i]->bet_array[7] + bet);
+            act(buf, ch, 0, 0, TO_ROOM, 0);
+         }
+         else {
+            csendf(ch, "You have placed a bet of %u on $B1-8$R.\n\r", bet);
+            sprintf(buf, "$n places a bet of %u on $B1-8$R.", bet);
+            act(buf, ch, 0, 0, TO_ROOM, 0);
+         }
+         obj->wheel->plr[i]->bet_array[7] += bet;
+      } else if(!str_cmp(arg1, "9-16")) {
+         if(obj->wheel->plr[i]->bet_array[8]) {
+            csendf(ch, "You add %u to your bet on $B9-16$R.  The total bet is now %u coins.\n\r", bet, obj->wheel->plr[i]->bet_array[8] + bet);
+            sprintf(buf, "$n adds to $s bet on $B9-16$R for a total of %u coins.", obj->wheel->plr[i]->bet_array[7] + bet);
+            act(buf, ch, 0, 0, TO_ROOM, 0);
+         }
+         else {
+            csendf(ch, "You have placed a bet of %u on $B9-16$R.\n\r", bet);
+            sprintf(buf, "$n places a bet of %u on $B9-16$R.", bet);
+            act(buf, ch, 0, 0, TO_ROOM, 0);
+         }
+         obj->wheel->plr[i]->bet_array[8] += bet;
+      } else if(!str_cmp(arg1, "17-24")) {
+         if(obj->wheel->plr[i]->bet_array[9]) {
+            csendf(ch, "You add %u to your bet on $B17-24$R.  The total bet is now %u coins.\n\r", bet, obj->wheel->plr[i]->bet_array[9] + bet);
+            sprintf(buf, "$n adds to $s bet on $B17-24$R for a total of %u coins.", obj->wheel->plr[i]->bet_array[9] + bet);
+            act(buf, ch, 0, 0, TO_ROOM, 0);
+         }
+         else {
+            csendf(ch, "You have placed a bet of %u on $B17-24$R.\n\r", bet);
+            sprintf(buf, "$n places a bet of %u on $B17-24$R.", bet);
+            act(buf, ch, 0, 0, TO_ROOM, 0);
+         }
+         obj->wheel->plr[i]->bet_array[9] += bet;
+      } else if(!str_cmp(arg1, "25-36")) {
+         if(obj->wheel->plr[i]->bet_array[10]) {
+            csendf(ch, "You add %u to your bet on $B25-36$R.  The total bet is now %u coins.\n\r", bet, obj->wheel->plr[i]->bet_array[10] + bet);
+            sprintf(buf, "$n adds to $s bet on $B25-36$R for a total of %u coins.", obj->wheel->plr[i]->bet_array[10] + bet);
+            act(buf, ch, 0, 0, TO_ROOM, 0);
+         }
+         else {
+            csendf(ch, "You have placed a bet of %u on $B25-36$R.\n\r", bet);
+            sprintf(buf, "$n places a bet of %u on $B25-36$R.", bet);
+            act(buf, ch, 0, 0, TO_ROOM, 0);
+         }
+         obj->wheel->plr[i]->bet_array[10] += bet;
+      } else if(!str_cmp(arg1, "00")) {
+         if(obj->wheel->plr[i]->bet_array[11]) {
+            csendf(ch, "You add %u to your bet on $B$200$R.  The total bet is now %u coins.\n\r", bet, obj->wheel->plr[i]->bet_array[11] + bet);
+            sprintf(buf, "$n adds to $s bet on $B$200$R for a total of %u coins.", obj->wheel->plr[i]->bet_array[11] + bet);
+            act(buf, ch, 0, 0, TO_ROOM, 0);
+         }
+         else {
+            csendf(ch, "You have placed a bet of %u on $B$200$R.\n\r", bet);
+            sprintf(buf, "$n places a bet of %u on $B$200$R.", bet);
+            act(buf, ch, 0, 0, TO_ROOM, 0);
+         }
+         obj->wheel->plr[i]->bet_array[11] += bet;
+      } else if(is_number(arg1) && atoi(arg1) >= 0 && atoi(arg1) <= 36) {
+         if(obj->wheel->plr[i]->bet_array[atoi(arg1)+12]) {
+            csendf(ch, "You add %u to your bet on %s.  The total bet is now %u coins.\n\r", bet, 
+                  roulette_display[atoi(arg1)], obj->wheel->plr[i]->bet_array[atoi(arg1)+12] + bet);
+            sprintf(buf, "$n adds to $s bet on %s for a total of %u coins.", 
+                  roulette_display[atoi(arg1)], obj->wheel->plr[i]->bet_array[atoi(arg1)+12] + bet);
+            act(buf, ch, 0, 0, TO_ROOM, 0);
+         }
+         else {
+            csendf(ch, "You have placed a bet of %u on %s.\n\r", bet, roulette_display[atoi(arg1)]);
+            sprintf(buf, "$n places a bet of %u on %s.", bet, roulette_display[atoi(arg1)]);
+            act(buf, ch, 0, 0, TO_ROOM, 0);
+         }
+         obj->wheel->plr[i]->bet_array[atoi(arg1)+12] += bet;
+      } else {
+         send_to_char("Bet what?\n\r", ch);
+         return eSUCCESS;
+      }
+      send_wheel_bets(ch, obj->wheel);
+      if(obj->wheel->countdown == 11) {
+         obj->wheel->countdown = 10;
+         roulette_timer(obj->wheel, 0);
+      }
+   }
+
+   return eSUCCESS;
+}
+
+/* End Roulette */
