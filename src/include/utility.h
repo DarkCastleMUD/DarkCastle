@@ -16,7 +16,7 @@
  *  10/21/2003   Onager    Changed IS_ANONYMOUS() to handle mobs without   *
  *                         crashing                                        *
  ***************************************************************************/
-/* $Id: utility.h,v 1.47 2006/08/01 10:38:59 jhhudso Exp $ */
+/* $Id: utility.h,v 1.48 2006/08/14 11:42:00 jhhudso Exp $ */
 
 #ifndef UTILITY_H_
 #define UTILITY_H_
@@ -331,6 +331,7 @@ void double_dollars(char * destination, char * source);
 void    clan_death      (char* b, char_data *ch);
 
 int     move_char       (CHAR_DATA *ch, int dest);
+int     move_char       (CHAR_DATA *ch, int dest, bool stop_all_fighting);
 int	number		(int from, int to);
 int 	dice		(int number, int size);
 int	str_cmp		(char *arg1, char *arg2);
@@ -383,6 +384,7 @@ int search_block( char *arg, char **list, bool exact );
 void free_obj(struct obj_data *obj);
 
 int char_to_room(CHAR_DATA *ch, int room);
+int char_from_room(CHAR_DATA *ch, bool stop_fighting);
 int char_from_room(CHAR_DATA *ch);
 void do_start(CHAR_DATA *ch);
 

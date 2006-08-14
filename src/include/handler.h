@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.h,v 1.18 2006/07/15 10:06:26 jhhudso Exp $ */
+/* $Id: handler.h,v 1.19 2006/08/14 11:42:00 jhhudso Exp $ */
 
 #ifndef HANDLER_H_
 #define HANDLER_H_
@@ -86,6 +86,7 @@ CHAR_DATA *get_char_num(int nr);
 CHAR_DATA *get_char(char *name);
 CHAR_DATA *get_mob(char *name);
 
+int char_from_room(CHAR_DATA *ch, bool stop_all_fighting);
 int char_from_room(CHAR_DATA *ch);
 int  char_to_room(CHAR_DATA *ch, int room);
 

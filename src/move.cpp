@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.73 2006/07/19 19:37:02 shane Exp $
+| $Id: move.cpp,v 1.74 2006/08/14 11:42:00 jhhudso Exp $
 | move.C
 | Movement commands and stuff.
 *************************************************************************
@@ -1084,6 +1084,11 @@ int do_enter(CHAR_DATA *ch, char *argument, int cmd)
 
 int move_char (CHAR_DATA *ch, int dest)
 {
+  return move_char(ch, dest, true);  
+}
+
+int move_char (CHAR_DATA *ch, int dest, bool stop_all_fighting)
+{
   if(!ch) {
     log("Error in move_char(), NULL character", OVERSEER, LOG_BUG);
     return eINTERNAL_ERROR;
@@ -1093,7 +1098,7 @@ int move_char (CHAR_DATA *ch, int dest)
 
   if(ch->in_room != NOWHERE) {
     // Couldn't move char from the room
-    if(char_from_room(ch) == 0) {
+    if(char_from_room(ch, stop_all_fighting) == 0) {
       log("Error in move_char(), character not NOWHERE, but couldn't be moved.",
       OVERSEER, LOG_BUG);
       return eINTERNAL_ERROR;

@@ -391,7 +391,7 @@ int do_at(struct char_data *ch, char *argument, int cmd)
     }
 
     original_loc = ch->in_room;
-    move_char(ch, location);
+    move_char(ch, location, false);
     int retval = command_interpreter(ch, command);
 
     /* check if the guy's still there */

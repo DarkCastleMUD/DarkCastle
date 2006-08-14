@@ -708,7 +708,7 @@ int do_mpat( CHAR_DATA *ch, char *argument, int cmd )
     if (location > top_of_world || !world_array[location])
 	location = 0;
     original = ch->in_room;
-    char_from_room( ch );
+    char_from_room( ch, false ); // Don't stop all fighting
     char_to_room( ch, location );
     result = command_interpreter( ch, argument );
 

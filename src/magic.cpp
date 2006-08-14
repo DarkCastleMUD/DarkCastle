@@ -3417,7 +3417,7 @@ int spell_wizard_eye(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
   if (affected_by_spell(victim, SPELL_DETECT_MAGIC) && affected_by_spell(victim, SPELL_DETECT_MAGIC)->modifier > 80)
     send_to_char("You sense you are the target of magical scrying.\r\n", victim);
 
-  move_char(ch, target);
+  move_char(ch, target, false);
   send_to_char("A vision forms in your mind... \n\r", ch);
   do_look(ch,"",15);
   move_char(ch, original_loc);
@@ -3464,7 +3464,7 @@ int spell_eagle_eye(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
   original_loc = ch->in_room;
   target        =  victim->in_room;
 
-  move_char(ch, target);
+  move_char(ch, target, false);
   send_to_char("You summon a large eagle to scan the area.\n\rThrough the eagle's eyes you see...\n\r", ch);
   do_look(ch,"",15);
   move_char(ch, original_loc);

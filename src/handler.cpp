@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.127 2006/08/11 19:12:36 shane Exp $ */
+/* $Id: handler.cpp,v 1.128 2006/08/14 11:42:00 jhhudso Exp $ */
     
 extern "C"
 {
@@ -1648,19 +1648,35 @@ void affect_join( CHAR_DATA *ch, struct affected_type *af,
 	affect_to_char(ch, af);
 }
 
-/* move a player out of a room */
-/* Returns 0 on failure, non-zero otherwise */
 int char_from_room(CHAR_DATA *ch)
 {
-  CHAR_DATA *i;
+  return char_from_room(ch, true);
+}
+
+/* move a player out of a room */
+/* Returns 0 on failure, non-zero otherwise */
+int char_from_room(CHAR_DATA *ch, bool stop_all_fighting)
+{
+  CHAR_DATA *i, *fighter, *next_char;
+  extern CHAR_DATA *combat_list;
   bool Other = FALSE, More = FALSE, kimore = FALSE;
 
   if(ch->in_room == NOWHERE) {
     return(0); 
   }
 
-  if(ch->fighting)
+  if (ch->fighting && stop_all_fighting) {
+    // Stop the person we're moving from fighting
     stop_fighting(ch);
+
+    // Stop all the people fighting ch from fighting ch anymore
+    for (fighter = combat_list; fighter; fighter = next_char) {
+      next_char = fighter->next_fighting;
+
+      if (fighter->fighting == ch)
+	stop_fighting(fighter);
+    }
+  }
 
   world[ch->in_room].light -= ch->glow_factor;
 
