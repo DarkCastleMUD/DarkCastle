@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.362 2006/08/14 10:56:04 jhhudso Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.363 2006/08/14 11:25:57 jhhudso Exp $ */
 
 extern "C"
 {
@@ -2981,6 +2981,8 @@ timer_data));
 // Stop fights.
 void stop_fighting(CHAR_DATA * ch, int clearlag)
 {
+  CHAR_DATA *tmp;
+  
   if (!ch)
   {
     log("Null ch in stop_fighting.  This would have crashed us.", IMP, LOG_BUG);
@@ -3051,20 +3053,18 @@ void stop_fighting(CHAR_DATA * ch, int clearlag)
   if (ch == combat_next_dude)
     combat_next_dude = ch->next_fighting;
   
-  if (combat_list == ch) {
+  if (combat_list == ch)
     combat_list = ch->next_fighting;
-  } else {
-    for (CHAR_DATA *fighter = combat_list;
-	 fighter && (fighter->next_fighting != ch);
-	 fighter = fighter->next_fighting)
+  else {
+    for (tmp = combat_list; tmp && (tmp->next_fighting != ch);
+    tmp = tmp->next_fighting)
       ;
-
     if (!tmp) {
       log("Stop_fighting: char not found", ANGEL, LOG_BUG);
       // abort();
       return;
     }
-    fighter->next_fighting = ch->next_fighting;
+    tmp->next_fighting = ch->next_fighting;
   }
   
   ch->next_fighting = 0;
