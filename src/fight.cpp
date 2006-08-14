@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.363 2006/08/14 11:25:57 jhhudso Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.364 2006/08/14 20:32:52 shane Exp $ */
 
 extern "C"
 {
@@ -2182,6 +2182,16 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
 int noncombat_damage(CHAR_DATA * ch, int dam, char *char_death_msg,
                      char *room_death_msg, char *death_log_msg, int type)
 {
+  if(IS_AFFECTED(ch, AFF_EAS)) dam /= 4;
+  if (IS_AFFECTED(ch, AFF_SANCTUARY)) {
+     int mod = affected_by_spell(ch, SPELL_SANCTUARY)? affected_by_spell(ch, SPELL_SANCTUARY)->modifier:35;
+     dam -= (int) (float)((float)dam*((float)mod/100.0));
+  }
+  if(affected_by_spell(ch, SPELL_HOLY_AURA) && affected_by_spell(ch, SPELL_HOLY_AURA)->modifier == 50 && (type == KILL_DROWN || type == KILL_FALL))
+     dam /= 2;
+  if(affected_by_spell(ch, SPELL_HOLY_AURA) && affected_by_spell(ch, SPELL_HOLY_AURA)->modifier == 25 && type == KILL_POISON)
+     dam /= 2;
+
   GET_HIT(ch) -= dam;
   update_pos(ch);
   if(GET_POS(ch) == POSITION_DEAD) {

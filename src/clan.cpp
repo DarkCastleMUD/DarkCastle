@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.55 2006/08/07 19:43:58 jhhudso Exp $ */
+/* $Id: clan.cpp,v 1.56 2006/08/14 20:32:52 shane Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -2663,7 +2663,7 @@ int count_controlled_areas(int clan)
     if (zone_table[i].clanowner == clan && can_collect(i)) z++;
   struct takeover_pulse_data *plc;
   for (plc = pulse_list;plc;plc=plc->next)
-    if ((plc->clan1 == clan || plc->clan2 == clan) && !plc->clan2 == -2) z++;
+    if ((plc->clan1 == clan || plc->clan2 == clan) && plc->clan2 != -2) z++;
   return z;
 }
 
