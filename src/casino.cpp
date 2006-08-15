@@ -1868,14 +1868,14 @@ void create_slot(OBJ_DATA *obj)
    slot->linkedto = obj->obj_flags.value[3];
    slot->lastwin = 0;
    slot->bet = 1;
-   if(obj->obj_flags.value[2]) slot->gold = FALSE;
-   else slot->gold = TRUE;
+   slot->gold = (! obj->obj_flags.value[2]);
    slot->busy = FALSE;
    slot->button = FALSE;
+
    obj->slot = slot;
 }
 
-bool verify_slot(struct machine_data *machine)
+bool is_player_with_slot(struct machine_data *machine)
 {
    if(machine->ch->in_room == machine->obj->in_room)
       return TRUE;
@@ -1885,17 +1885,35 @@ bool verify_slot(struct machine_data *machine)
 
 void update_linked_slots(struct machine_data *machine)
 {
-   char buf[MAX_STRING_LENGTH];
+   char ldesc[MAX_STRING_LENGTH];
 
-   for(int i=21906;i<21918;i++) {
-      if( ((OBJ_DATA *)obj_index[real_object(i)].item)->obj_flags.value[3] == machine->linkedto ) {
-         ((OBJ_DATA *)obj_index[real_object(i)].item)->obj_flags.value[1] = machine->jackpot;
-         sprintf(buf, "A slot machine which displays '$R$BJackpot: %d %s!$1' sits here.", machine->jackpot / 100, 
-               machine->gold?"coins":"plats");
-         for(OBJ_DATA *j=object_list; j; j = j->next)
-            if(j->item_number == real_object(i))
-               j->description = str_hsh(buf);
-         ((OBJ_DATA *)obj_index[real_object(i)].item)->description = str_hsh(buf);
+   snprintf(ldesc, MAX_STRING_LENGTH,
+	   "A slot machine which displays '$R$BJackpot: %d %s!$1' sits here.",
+	   machine->jackpot / 100, 
+	   machine->gold ? "coins": "plats");
+
+   // Find all the slot machines
+   for(int i=21906; i<21918; i++) {
+     OBJ_DATA *slot_obj = (OBJ_DATA *)obj_index[real_object(i)].item;
+
+     // Find all the slot machines linked to the same slot machine as us
+     // and update their v1 jackpot, their machine's jackpot (if applicable)
+     // and their long description
+      if(slot_obj->obj_flags.value[3] == machine->linkedto) {
+	 slot_obj->description = str_hsh(ldesc);
+         slot_obj->obj_flags.value[1] = machine->jackpot;
+	 if (slot_obj->slot)
+	   slot_obj->slot->jackpot = machine->jackpot;
+
+	 // Update instances of the original slot obj
+         for(OBJ_DATA *j=object_list; j; j = j->next) {
+	   if(j->item_number == real_object(i)) {
+	     j->description = str_hsh(ldesc);
+	     j->obj_flags.value[1] = machine->jackpot;
+	     if (j->slot)
+	       j->slot->jackpot = machine->jackpot;
+	   }
+	 }
       }
    }
 }
@@ -1925,19 +1943,19 @@ void reel_spin(void *arg1, void *arg2, void *arg3)
 
    char buf[MAX_STRING_LENGTH];
 
-   if(stop1 < 0 && charExists(machine->ch) && verify_slot(machine)) {
+   if(stop1 < 0 && charExists(machine->ch) && is_player_with_slot(machine)) {
       stop1 = number(0, 19);
       send_to_room("You hear a loud clunk as the first stopper snaps into place.\n\r", machine->obj->in_room);
       sprintf(buf, "%s    |      |\n\r", reel1[stop1]);
       send_to_char(buf, machine->ch);
       slot_timer(machine, stop1, -1, 2);
-   } else if(stop2 < 0 && charExists(machine->ch) && verify_slot(machine)) {
+   } else if(stop2 < 0 && charExists(machine->ch) && is_player_with_slot(machine)) {
       stop2 = number(0, 19);
       send_to_room("You hear a loud clunk as the second stopper snaps into place.\n\r", machine->obj->in_room);
       sprintf(buf, "%s %s    |\n\r", reel1[stop1], reel2[stop2]);
       send_to_char(buf, machine->ch);
       slot_timer(machine, stop1, stop2, 2);
-   } else if(charExists(machine->ch) && verify_slot(machine)) {
+   } else if(charExists(machine->ch) && is_player_with_slot(machine)) {
       int payout = 0;
       int stop3 = number(0, 19);
       send_to_room("You hear a loud clunk as the final stopper snaps into place.\n\r", machine->obj->in_room);
