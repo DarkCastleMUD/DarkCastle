@@ -57,19 +57,17 @@ SKILL_INCREASE_HARD);
   }
   if (spell == SPELL_PARALYZE && a > 60)
   {
-    if (a < 71) skill_increase_check(ch, SKILL_SPELLCRAFT, a,
-SKILL_INCREASE_HARD);
+    if (a < 71) skill_increase_check(ch, SKILL_SPELLCRAFT, a,SKILL_INCREASE_HARD);
     return eSUCCESS;
   }
   if (spell == SPELL_CREATE_GOLEM && a > 70)
   {
-    if (a < 81) skill_increase_check(ch, SKILL_SPELLCRAFT, a,
-SKILL_INCREASE_HARD);
+    if (a < 91) skill_increase_check(ch, SKILL_SPELLCRAFT, a,SKILL_INCREASE_HARD);
     return eSUCCESS;
   }
   if (spell == SPELL_SOLAR_GATE && a > 90)
   {
-    if (a < 91) skill_increase_check(ch, SKILL_SPELLCRAFT, a,
+    if (a < 98) skill_increase_check(ch, SKILL_SPELLCRAFT, a,
 SKILL_INCREASE_HARD);
     return eSUCCESS;
   }
