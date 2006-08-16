@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: cl_ranger.cpp,v 1.76 2006/08/16 01:15:07 jhhudso Exp $ | cl_ranger.C  *
+ * $Id: cl_ranger.cpp,v 1.77 2006/08/16 15:33:50 dcastle Exp $ | cl_ranger.C  *
  * Description: Ranger skills/spells                                          *
  *                                                                            *
  * Revision History                                                           *
@@ -1648,6 +1648,7 @@ int do_natural_selection(CHAR_DATA *ch, char *arg, int cmd)
       }
    }
 
+   if (cur)
    affect_remove(ch, cur, SUPPRESS_ALL);
       
    af.type = SKILL_NAT_SELECT;
