@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.74 2006/08/14 11:42:00 jhhudso Exp $
+| $Id: move.cpp,v 1.75 2006/08/16 00:36:03 jhhudso Exp $
 | move.C
 | Movement commands and stuff.
 *************************************************************************
@@ -313,7 +313,7 @@ int do_fall(CHAR_DATA *ch, short dir)
 
   do_look(ch, "\0", 15);
 
-  sprintf(damage,"%s fall from %d was lethal and killed them.",
+  sprintf(damage,"%s's fall from %d was lethal and it killed them.",
     GET_NAME(ch), world[ch->in_room].number);
   retval = noncombat_damage(ch, dam,
     "Luckily the ground breaks your fall.\n\r",
