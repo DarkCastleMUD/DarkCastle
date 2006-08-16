@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: cl_ranger.cpp,v 1.75 2006/07/16 17:49:10 shane Exp $ | cl_ranger.C  *
+ * $Id: cl_ranger.cpp,v 1.76 2006/08/16 01:15:07 jhhudso Exp $ | cl_ranger.C  *
  * Description: Ranger skills/spells                                          *
  *                                                                            *
  * Revision History                                                           *
@@ -1621,8 +1621,9 @@ int do_natural_selection(CHAR_DATA *ch, char *arg, int cmd)
 
    one_argument(arg, buf);
 
-   if(IS_NPC(ch) || !has_skill(ch, SKILL_NAT_SELECT)) {
-      send_to_char("You don't know how to use this to your advantage.\n\r", ch);
+   int learned = has_skill(ch, SKILL_NAT_SELECT);
+   if(IS_NPC(ch) || !learned) {
+     send_to_char("You don't know how to use this to your advantage.\n\r", ch);
       return eFAILURE;
    }
 
@@ -1657,13 +1658,13 @@ int do_natural_selection(CHAR_DATA *ch, char *arg, int cmd)
    affect_to_char(ch, &af);
 
    af.type = SPELL_NAT_SELECT_TIMER;
-   af.duration = 60;
+   af.duration = 60 - learned/5;
    af.modifier = 0;
    af.location = 0;
    af.bitvector = -1;
    affect_to_char(ch, &af);
 
-   csendf(ch, "You study the habits of the %s People and select them as your enemy of choice.\n\r", race_info[i].singular_name);
+   csendf(ch, "You study the habits of the %s race and select them as your enemy of choice.\n\r", race_info[i].singular_name);
 
    return eSUCCESS;
 }
