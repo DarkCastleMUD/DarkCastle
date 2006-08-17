@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.136 2006/08/17 11:36:26 jhhudso Exp $ */
+/* $Id: db.cpp,v 1.137 2006/08/17 11:48:19 dcastle Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -1032,7 +1032,7 @@ struct index_data *generate_mob_indices(int *top, struct index_data *index)
 
     dc_fclose(fl);
   }
-  *top = i - 2;
+  *top = i - 1;
   dc_fclose(flMobIndex);
   /*
     Here the index gets processed, and mob classes gets
