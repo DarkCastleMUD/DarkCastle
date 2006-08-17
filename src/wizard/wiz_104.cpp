@@ -636,7 +636,7 @@ int do_show(struct char_data *ch, char *argument, int cmd)
          }
        }
        else {
-         for(i = begin;i < mob_index[top_of_mobt].virt && i <= end; i++) {
+         for(i = begin;i <= mob_index[top_of_mobt].virt && i <= end; i++) {
             if((nr = real_mobile(i)) < 0)
               continue;
 
@@ -656,7 +656,7 @@ int do_show(struct char_data *ch, char *argument, int cmd)
        *buf = '\0';
        send_to_char("[#  ] [MOB #] MOB'S DESCRIPTION\n\n\r", ch);
  
-       for(i = 0; (i < mob_index[top_of_mobt].virt); i++) 
+       for(i = 0; (i <= mob_index[top_of_mobt].virt); i++) 
        {
           if((nr = real_mobile(i)) < 0)
             continue;
@@ -728,7 +728,7 @@ int do_show(struct char_data *ch, char *argument, int cmd)
          }
        }
        else {
-         for(i = begin;i < obj_index[top_of_objt].virt && i <= end; i++) {
+         for(i = begin;i <= obj_index[top_of_objt].virt && i <= end; i++) {
             if((nr = real_object(i)) < 0)
               continue;
 
@@ -748,7 +748,7 @@ int do_show(struct char_data *ch, char *argument, int cmd)
        *buf = '\0';
        send_to_char("[#  ] [OBJ #] OBJECT'S DESCRIPTION\n\n\r", ch);
 
-       for(i = 0; ( i < obj_index[top_of_objt].virt); i++) 
+       for(i = 0; ( i <= obj_index[top_of_objt].virt); i++) 
        {
           if((nr = real_object(i)) < 0)
             continue;
