@@ -1992,27 +1992,54 @@ int do_mclone(struct char_data *ch, char *argument, int cmd)
     send_to_char("Syntax: mclone <destination vnum> <source vnum>\r\n",ch);
     return eFAILURE;
   }
-  CHAR_DATA *obj,*otmp;
-  int v1 = atoi(arg1), v2 = atoi(arg2);
-  int r1 = real_object(v1), r2 = real_object(v2);
-  if (r2 < 0)
+  CHAR_DATA *mob;
+  int vdst = atoi(arg1), vsrc = atoi(arg2);
+  int dst = real_mobile(vdst), src = real_mobile(vsrc);
+  if (src < 0)
   {
     send_to_char("Source vnum does not exist.\r\n",ch);
     return eFAILURE;
   }
-  if (r1 < 0) {
+  if (dst < 0) {
     char buf[30];
-    sprintf(buf, "new %d", v1);
+    sprintf(buf, "new %d", vdst);
     int retval = do_medit(ch, buf, 9);
     if (!IS_SET(retval, eSUCCESS)) return eFAILURE;
-    r1 = real_object(v1);
-    r2 = real_object(v2); // medit new changes it
+    dst = real_mobile(vdst);
+    src = real_mobile(vsrc); // medit new changes it
   }
-  obj = clone_mobile(r2);
-  otmp = (CHAR_DATA*)mob_index[r1].item;  
-  obj->mobdata->nr = r1;
-  mob_index[r1].item = (void*)obj;
-  extract_char(otmp,TRUE);
+  mob = clone_mobile(src);
+  mob->mobdata->nr = dst;
+
+  // Find old mobile in world and remove
+  char_data *old_mob = (CHAR_DATA*)mob_index[dst].item;
+  if (old_mob && old_mob->in_room != NOWHERE) {
+    csendf(ch, "%d\n\r", old_mob->in_room);
+    extract_char(old_mob, TRUE);
+  }
+
+  // Overwrite old mob with new mob
+  mob_index[dst].item = (void*)mob;
+  mob_index[dst].number = 0;
+  mob_index[dst].non_combat_func = 0;
+  mob_index[dst].combat_func = 0;
+  mob_index[dst].mobprogs = NULL;
+  mob_index[dst].mobspec = 0;
+  mob_index[dst].progtypes = 0;
+  mob_index[dst].virt = vdst;
+
+  add_mobspec(dst);
+
+  if (mob_index[src].non_combat_func) {
+    send_to_char("Warning: hardcoded non_combat function found. Notify coder.\n\r", ch);
+  }
+  if (mob_index[src].combat_func) {
+    send_to_char("Warning: hardcoded combat function found. Notify coder.\n\r", ch);
+  }
+  if (mob_index[src].mobprogs) {
+    send_to_char("Warning: mob program found. This will need to be copied manually.\n\r", ch);
+  }
+
   send_to_char("Done!\r\n",ch);
   return eSUCCESS;
 }
