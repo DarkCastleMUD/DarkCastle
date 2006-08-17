@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.108 2006/08/09 02:06:50 jhhudso Exp $ */
+/* $Id: mob_proc.cpp,v 1.109 2006/08/17 21:18:50 dcastle Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -3138,10 +3138,11 @@ static char *dethSayText [ ] =
   "Don't worry guys, I'll Imm more and shave when I'm done \"finding myself\"...until then I'm going to roam the land like in Kung Fu.",
   "The only hellstream I have ever seen is when I pee after sex with your mom.",
   "Wow, I really should have checked that this Dixie-cup wasn't Tainted before I drank from it!",
-  "I know! I'm going to steal a MUD call it my own...People will trust me then for sure!"
+  "I know! I'm going to steal a MUD call it my own...People will trust me then for sure!",
   "Hey Zizou!  Yo Momma!",
   "Hey gods, tell Parry to stop trying to shoot his pointy thing into me!",
-  "Sorry guys, I can't build right now...I have to work on my Liberal Arts degree, its very serious."
+  "Sorry guys, I can't build right now...I have to work on my Liberal Arts degree, its very serious.",
+  "Dark Castle MUD is like a box of chocolates.....thrown into a room full of starving psychotic teenagers with weapons."
 };
 
 #define DETH_SAY_TEXT_SIZE    ( sizeof ( dethSayText )    / sizeof ( char * ) )
