@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.109 2006/08/17 21:18:50 dcastle Exp $ */
+/* $Id: mob_proc.cpp,v 1.110 2006/08/17 22:24:03 apocalypse Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -3142,7 +3142,8 @@ static char *dethSayText [ ] =
   "Hey Zizou!  Yo Momma!",
   "Hey gods, tell Parry to stop trying to shoot his pointy thing into me!",
   "Sorry guys, I can't build right now...I have to work on my Liberal Arts degree, its very serious.",
-  "Dark Castle MUD is like a box of chocolates.....thrown into a room full of starving psychotic teenagers with weapons."
+  "Dark Castle MUD is like a box of chocolates.....thrown into a room full of starving psychotic teenagers with weapons.",
+  "Wow guys, you shoulda seen this goat's balls, they were HUGE!  I couldn't stop droo...err stari...err yeah they were huge!"
 };
 
 #define DETH_SAY_TEXT_SIZE    ( sizeof ( dethSayText )    / sizeof ( char * ) )
