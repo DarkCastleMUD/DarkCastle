@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.135 2006/08/13 14:24:11 dcastle Exp $ */
+/* $Id: db.cpp,v 1.136 2006/08/17 11:36:26 jhhudso Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -950,7 +950,7 @@ void reset_time(void)
 /* generate index table for monster file */
 struct index_data *generate_mob_indices(int *top, struct index_data *index)
 {
-  int i = 0, j;
+  int i = 0;
   char buf[82];
   char log_buf[256];
   FILE * flMobIndex;
@@ -1043,165 +1043,178 @@ struct index_data *generate_mob_indices(int *top, struct index_data *index)
   */
   for (i = 0; i <= top_of_mobt; i++)
   {
-    CHAR_DATA *a = (CHAR_DATA *)mob_index[i].item;
-    int mob = 0;
-    MPROG_DATA *mprg;
-    if (!a) continue;
-    if (!a->c_class) continue;
-    switch (a->c_class)
-    {
-	case CLASS_MAGIC_USER:
-	  if (a->level < 21)
-		mob = 101; 
-	  else if (a->level < 35)
-		mob = 102;
-	  else if (a->level < 51)
-		mob = 103;
-	  else 
-		mob = 104;
-	  break;
-        case CLASS_CLERIC:
-          if (a->level < 21)
-		mob = 105;
-          else if (a->level < 35)
-		mob = 106;
-          else if (a->level < 51)
-		mob = 107;
-          else 
-		mob = 108;
-	  break;
-        case CLASS_WARRIOR:
-          if (a->level < 21)
-		mob = 109;
-          else if (a->level < 35)
-		mob = 110;
-          else if (a->level < 51)
-		mob = 111;
-          else 
-		mob = 112;
-          break;
-        case CLASS_BARBARIAN:
-          if (a->level < 21)
-		mob = 113;
-          else if (a->level < 35)
-		mob = 114;
-          else if (a->level < 51)
-		mob = 115;
-          else 
-		mob = 116;
-          break;
-        case CLASS_MONK:
-          if (a->level < 21)
-		mob = 117;
-          else if (a->level < 35)
-		mob = 118;
-          else if (a->level < 51)
-		mob = 119;
-          else 
-		mob = 120;
-          break;
-        case CLASS_THIEF:
-          if (a->level < 21)
-		mob = 121;
-          else if (a->level < 35)
-		mob = 122;
-          else if (a->level < 51)
-		mob = 123;
-          else 
-		mob = 124;
-          break;
-        case CLASS_PALADIN:
-          if (a->level < 21)
-		mob = 125;
-          else if (a->level < 35)
-		mob = 126;
-          else if (a->level < 51)
-		mob = 127;
-          else 
-		mob = 128;
-          break;
-        case CLASS_ANTI_PAL:
-          if (a->level < 21)
-		mob = 129;
-          else if (a->level < 35)
-		mob = 130;
-          else if (a->level < 51)
-		mob = 131;
-          else 
-		mob = 132;
-          break;
-        case CLASS_RANGER:
-          if (a->level < 21)
-		mob = 133;
-          else if (a->level < 35)
-		mob = 134;
-          else if (a->level < 51)
-		mob = 135;
-          else 
-		mob = 136;
-          break;
-        case CLASS_BARD:
-          if (a->level < 21)
-		mob = 137;
-          else if (a->level < 35)
-		mob = 138;
-          else if (a->level < 51)
-		mob = 139;
-          else 
-		mob = 140;
-          break;
-        case CLASS_DRUID:
-          if (a->level < 21)
-		mob = 141;
-          else if (a->level < 35)
-		mob = 142;
-          else if (a->level < 51)
-		mob = 143;
-          else 
-		mob = 144;
-          break;
-        case CLASS_NECROMANCER:
-          if (a->level < 21)
-		mob = 145;
-          else if (a->level < 35)
-		mob = 146;
-          else if (a->level < 51)
-		mob = 147;
-          else 
-		mob = 148;
-          break;
-        case CLASS_PSIONIC:
-          if (a->level < 21)
-                mob_index[i].mobspec = mob_index[real_mobile(149)].mobprogs;
-          else if (a->level < 35)
-                mob_index[i].mobspec = mob_index[real_mobile(150)].mobprogs;
-          else if (a->level < 51)
-                mob_index[i].mobspec = mob_index[real_mobile(151)].mobprogs;
-          else mob_index[i].mobspec = mob_index[real_mobile(152)].mobprogs;
-          break;
-	default: break;
-    }
-    if (mob) {
-      mob_index[i].mobspec = mob_index[real_mobile(mob)].mobprogs;
-      j = 0;
-      while (j < ACT_MAX/ASIZE+1) {
-
-        SET_BIT(((CHAR_DATA *)mob_index[i].item)->mobdata->actflags[j], ((CHAR_DATA *)mob_index[real_mobile(mob)].item)->mobdata->actflags[j]);
-         j++;
-      }
-//      ((CHAR_DATA *)mob_index[i].item)->mobdata->actflags[j] = 0;
-      j = 0;
-      while( j < AFF_MAX/ASIZE+1) {
-	SET_BIT(((CHAR_DATA *)mob_index[i].item)->affected_by[j],((CHAR_DATA *)mob_index[real_mobile(mob)].item)->affected_by[j]);
-         j++;
-      }
-//      ((CHAR_DATA *)mob_index[i].item)->affected_by[j] = 0;
-    }
-    if (mob_index[i].mobspec)
-      for (mprg = mob_index[i].mobspec; mprg; mprg = mprg->next)
-        SET_BIT(mob_index[i].progtypes, mprg->type);
+    add_mobspec(i);
   }
   return(index);
+}
+
+void add_mobspec(int i)
+{
+  if (i < 0)
+    return;
+
+  CHAR_DATA *a = (CHAR_DATA *)mob_index[i].item;
+  if (!a)
+    return;
+  if (!a->c_class)
+    return;
+
+  int mob = 0;
+  MPROG_DATA *mprg;
+
+  switch (a->c_class)
+    {
+    case CLASS_MAGIC_USER:
+      if (a->level < 21)
+	mob = 101; 
+      else if (a->level < 35)
+	mob = 102;
+      else if (a->level < 51)
+	mob = 103;
+      else 
+	mob = 104;
+      break;
+    case CLASS_CLERIC:
+      if (a->level < 21)
+	mob = 105;
+      else if (a->level < 35)
+	mob = 106;
+      else if (a->level < 51)
+	mob = 107;
+      else 
+	mob = 108;
+      break;
+    case CLASS_WARRIOR:
+      if (a->level < 21)
+	mob = 109;
+      else if (a->level < 35)
+	mob = 110;
+      else if (a->level < 51)
+	mob = 111;
+      else 
+	mob = 112;
+      break;
+    case CLASS_BARBARIAN:
+      if (a->level < 21)
+	mob = 113;
+      else if (a->level < 35)
+	mob = 114;
+      else if (a->level < 51)
+	mob = 115;
+      else 
+	mob = 116;
+      break;
+    case CLASS_MONK:
+      if (a->level < 21)
+	mob = 117;
+      else if (a->level < 35)
+	mob = 118;
+      else if (a->level < 51)
+	mob = 119;
+      else 
+	mob = 120;
+      break;
+    case CLASS_THIEF:
+      if (a->level < 21)
+	mob = 121;
+      else if (a->level < 35)
+	mob = 122;
+      else if (a->level < 51)
+	mob = 123;
+      else 
+	mob = 124;
+      break;
+    case CLASS_PALADIN:
+      if (a->level < 21)
+	mob = 125;
+      else if (a->level < 35)
+	mob = 126;
+      else if (a->level < 51)
+	mob = 127;
+      else 
+	mob = 128;
+      break;
+    case CLASS_ANTI_PAL:
+      if (a->level < 21)
+	mob = 129;
+      else if (a->level < 35)
+	mob = 130;
+      else if (a->level < 51)
+	mob = 131;
+      else 
+	mob = 132;
+      break;
+    case CLASS_RANGER:
+      if (a->level < 21)
+	mob = 133;
+      else if (a->level < 35)
+	mob = 134;
+      else if (a->level < 51)
+	mob = 135;
+      else 
+	mob = 136;
+      break;
+    case CLASS_BARD:
+      if (a->level < 21)
+	mob = 137;
+      else if (a->level < 35)
+	mob = 138;
+      else if (a->level < 51)
+	mob = 139;
+      else 
+	mob = 140;
+      break;
+    case CLASS_DRUID:
+      if (a->level < 21)
+	mob = 141;
+      else if (a->level < 35)
+	mob = 142;
+      else if (a->level < 51)
+	mob = 143;
+      else 
+	mob = 144;
+      break;
+    case CLASS_NECROMANCER:
+      if (a->level < 21)
+	mob = 145;
+      else if (a->level < 35)
+	mob = 146;
+      else if (a->level < 51)
+	mob = 147;
+      else 
+	mob = 148;
+      break;
+    case CLASS_PSIONIC:
+      if (a->level < 21)
+	mob_index[i].mobspec = mob_index[real_mobile(149)].mobprogs;
+      else if (a->level < 35)
+	mob_index[i].mobspec = mob_index[real_mobile(150)].mobprogs;
+      else if (a->level < 51)
+	mob_index[i].mobspec = mob_index[real_mobile(151)].mobprogs;
+      else
+	mob_index[i].mobspec = mob_index[real_mobile(152)].mobprogs;
+      break;
+    default:
+      break;
+    }
+
+  if (mob) {
+    mob_index[i].mobspec = mob_index[real_mobile(mob)].mobprogs;
+
+    for(int j=0; j < ACT_MAX/ASIZE+1; j++) {
+      SET_BIT(((CHAR_DATA *)mob_index[i].item)->mobdata->actflags[j],
+	      ((CHAR_DATA *)mob_index[real_mobile(mob)].item)->mobdata->actflags[j]);
+    }
+
+    for(int j=0; j < AFF_MAX/ASIZE+1; j++) {
+      SET_BIT(((CHAR_DATA *)mob_index[i].item)->affected_by[j],
+	      ((CHAR_DATA *)mob_index[real_mobile(mob)].item)->affected_by[j]);
+    }
+  }
+
+  if (mob_index[i].mobspec)
+    for (mprg = mob_index[i].mobspec; mprg; mprg = mprg->next)
+      SET_BIT(mob_index[i].progtypes, mprg->type);
 }
 
 void remove_all_mobs_from_world()
