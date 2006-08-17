@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.47 2006/07/04 08:42:13 shane Exp $ */
+/* $Id: ki.cpp,v 1.48 2006/08/17 22:25:00 dcastle Exp $ */
 
 extern "C"
 {
@@ -499,9 +499,11 @@ int ki_punch( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
 
    set_cantquit(ch, vict);
    int dam = GET_HIT(vict) / 4, manadam = GET_MANA(vict) / 4;
-   if (dam > 1000)
-     dam = 1000;
-   if (manadam > 1000) manadam = 1000;
+
+   dam = MAX(350, dam);
+   dam = MIN(1000,dam);
+   manadam = MAX(350, dam);
+   manadam = MIN(1000, dam);
    if (GET_HIT(vict) < 500000) {
       if (number(1, 101) <
           (GET_LEVEL(ch) / 2) + GET_LEVEL(ch) - GET_LEVEL(vict))
