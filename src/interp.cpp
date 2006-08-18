@@ -16,7 +16,7 @@
 /* 12/08/2003   Onager   Added chop_half() to work like half_chop() but    */
 /*                       chopping off the last word.                       */
 /***************************************************************************/
-/* $Id: interp.cpp,v 1.102 2006/08/01 19:52:59 dcastle Exp $ */
+/* $Id: interp.cpp,v 1.103 2006/08/18 03:23:02 apocalypse Exp $ */
 
 extern "C"
 {
@@ -1073,7 +1073,7 @@ void automail(char * name)
   blah = dc_fopen("../lib/whassup.txt", "w");
   fprintf(blah, name);
   dc_fclose(blah);
-  sprintf(buf, "mail pirahna@dcastle.ad1440.net < ../lib/whassup.txt");
+  sprintf(buf, "mail void@dcastle.net < ../lib/whassup.txt");
   system(buf);
 }
 

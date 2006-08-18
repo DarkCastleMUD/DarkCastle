@@ -2292,7 +2292,7 @@ int generic_weapon_combat(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *ar
        return spell_ice_shards((GET_LEVEL(ch)/2), ch, ch->fighting, 0, 0);
 
      default:
-       send_to_char("Weapon with invalid generic_weapon_combat, tell pirahna.\r\n", ch);
+       send_to_char("Weapon with invalid generic_weapon_combat, tell an Immortal.\r\n", ch);
        break;
    }
    return eFAILURE;
