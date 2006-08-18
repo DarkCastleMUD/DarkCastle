@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.32 2006/07/24 19:58:45 dcastle Exp $
+| $Id: wizard.cpp,v 1.33 2006/08/18 08:44:39 jhhudso Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -351,8 +351,8 @@ void boro_mob_stat(struct char_data *ch, struct char_data *k)
 	sprintbit(k->immune, isr_bits, buf3);
 	sprintf(buf,
 		"|/| $7Immune$R: %-63s|o|\r\n"
-		"|o| $7Susceptable$R: %-58s|/|\r\n",
-		buf2, buf3); // immune and susceptable bits, first and second.
+		"|o| $7Susceptible$R: %-58s|/|\r\n",
+		buf2, buf3); // immune and susceptible bits, first and second.
 	send_to_char(buf,ch);
 	sprintbit(k->affected_by, affected_bits, buf2);
 	sprintf(buf,
@@ -739,7 +739,7 @@ void mob_stat(struct char_data *ch, struct char_data *k)
   csendf(ch, "$3Immune$R: %s\n\r", buf);
      
   sprintbit(k->suscept, isr_bits, buf);
-  csendf(ch, "$3Susceptable$R: %s\n\r", buf);
+  csendf(ch, "$3Susceptible$R: %s\n\r", buf);
      
   sprintbit(k->resist, isr_bits, buf);
   csendf(ch, "$3Resistant$R: %s\n\r", buf);
