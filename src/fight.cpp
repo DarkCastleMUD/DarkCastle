@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.365 2006/08/16 15:33:11 dcastle Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.366 2006/08/18 01:49:36 shane Exp $ */
 
 extern "C"
 {
@@ -512,6 +512,10 @@ int attack(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
         return eFAILURE;
     }
   assert(vict);
+
+  if(has_skill(ch, SKILL_NAT_SELECT) && affected_by_spell(ch, SKILL_NAT_SELECT) &&
+      affected_by_spell(ch, SKILL_NAT_SELECT)->modifier == GET_RACE(vict) && !number(0,4))
+    skill_increase_check(ch, SKILL_NAT_SELECT, has_skill(ch, SKILL_NAT_SELECT), SKILL_INCREASE_HARD);
 
   /* if it's backstab send it to one_hit so it can be handled */
   if(type == SKILL_BACKSTAB)  {
@@ -1734,13 +1738,13 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
         strcat(buf, buf2);
         sprintf(buf2, " additional damage.");
         strcat(buf3, buf2);
-        sprintf(buf2, "%s is susceptable to %s's ", GET_SHORT(victim), GET_SHORT(ch));
+        sprintf(buf2, "%s is susceptible to %s's ", GET_SHORT(victim), GET_SHORT(ch));
         strcat(buf2, buf);
         act(buf2, victim, 0, ch, TO_ROOM, NOTVICT);
-        sprintf(buf2, "%s is susceptable to your ", GET_SHORT(victim));
+        sprintf(buf2, "%s is susceptible to your ", GET_SHORT(victim));
         strcat(buf2, buf);
         act(buf2, victim, 0, ch, TO_VICT, 0);
-        sprintf(buf2, "You are susceptable to %s's ", GET_SHORT(ch));
+        sprintf(buf2, "You are susceptible to %s's ", GET_SHORT(ch));
         strcat(buf2, buf3);
         act(buf2, victim, 0, ch, TO_CHAR, 0);
      }

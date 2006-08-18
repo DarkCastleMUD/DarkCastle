@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.206 2006/07/16 17:49:06 shane Exp $ */
+/* $Id: const.cpp,v 1.207 2006/08/18 01:49:36 shane Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -270,7 +270,7 @@ char *spell_wear_off_msg[] =
   "You are no longer flagged as a thief.",
   "You are no longer CANTQUIT flagged.",
   "You are again susceptible to magical transport as your solidity fades.",
-  "You feel more susceptable to damage.", // 150
+  "You feel more susceptible to damage.", // 150
   "!ALIGN_GOOD!",
   "!ALIGN_EVIL!",
   "Your protective aegis dissipates.",

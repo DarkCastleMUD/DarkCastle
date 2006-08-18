@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.117 2006/07/17 00:12:38 jhhudso Exp $ */
+/* $Id: info.cpp,v 1.118 2006/08/18 01:49:37 shane Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -1314,7 +1314,7 @@ int do_score(struct char_data *ch, char *argument, int cmd)
    int  level = 0;
    int to_dam, to_hit;
    int flying = 0;
-   bool modifyOutput = FALSE;
+   bool modifyOutput;
    
    struct affected_type *aff;
    extern char *apply_types[];
@@ -1388,6 +1388,7 @@ int do_score(struct char_data *ch, char *argument, int cmd)
          if(aff->type == SKILL_SNEAK)
             continue;
          scratch = frills[level];
+         modifyOutput = FALSE;
 
          // figure out the name of the affect (if any)
          char * aff_name = get_skill_name(aff->type);
@@ -1462,15 +1463,6 @@ int do_score(struct char_data *ch, char *argument, int cmd)
      found = TRUE;
      level++;
    }
-/*   for(int iter=0;iter<10;iter++) {
-      if(IS_AFFECTED(ch, AFF_NAT_SELECT_HUM + iter)) {
-         scratch = frills[level];
-         sprintf(buf, "|%c| Affected by natural selection               Modifier %-6s            |%c|\n\r",
-               scratch, race_types[iter + 1], scratch);
-         send_to_char(buf, ch);
-         found = TRUE;
-      }
-   }*/
    extern bool elemental_score(char_data *ch, int level);
    if (!found) found = elemental_score(ch, level);
    else elemental_score(ch,level);

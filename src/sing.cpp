@@ -2545,7 +2545,7 @@ int execute_song_synchronous_chord( ubyte level, CHAR_DATA *ch, char *arg, CHAR_
    }
    if (learned > 90) {  
       sprintbit(target->suscept, isr_bits, buf);
-      csendf(ch, "%s is susceptable to: %s\n\r", GET_SHORT(target), buf);
+      csendf(ch, "%s is susceptible to: %s\n\r", GET_SHORT(target), buf);
    }
 
    return eSUCCESS;

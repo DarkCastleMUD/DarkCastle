@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.48 2006/08/17 22:25:00 dcastle Exp $ */
+/* $Id: ki.cpp,v 1.49 2006/08/18 01:49:37 shane Exp $ */
 
 extern "C"
 {
@@ -607,6 +607,7 @@ int ki_storm( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
     GET_HIT(ch) += dam;
     if (GET_HIT(ch) > GET_MAX_HIT(ch)) GET_HIT(ch) = GET_MAX_HIT(ch);
   }
+  WAIT_STATE(ch, PULSE_VIOLENCE);
   return eSUCCESS;
 }
 
@@ -698,6 +699,8 @@ int ki_disrupt( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
    act("$n focuses a blast of ki to disrupt the flow of magic around $N!",
        ch, 0, vict, TO_ROOM, 0);
    send_to_char("You focus your ki to disrupt the flow of magic around your opponent!\r\n", ch);
+
+   WAIT_STATE(ch, PULSE_VIOLENCE);
    
    return spell_dispel_magic(GET_LEVEL(ch)+1, ch, vict, 0, 0);
 }
