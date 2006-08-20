@@ -2350,7 +2350,7 @@ void roulette_timer(struct wheel_data *wheel, int spin)
    timer->arg1 = (void*)wheel;
    timer->arg2 = (void*)spin;
    timer->function = pulse_countdown;
-   timer->timeleft = 6;
+   timer->timeleft = 4;
    addtimer(timer);
 }
 
@@ -2366,8 +2366,8 @@ void pulse_countdown(void *arg1, void *arg2, void *arg3)
       wheel->countdown = 2;
       roulette_timer(wheel, 1);
    } else if(!spin) {
-      if(number(0,1)) {
-         sprintf(buf, "The croupier announces, 'The wheel will be spun in about %d seconds!'\n\r", wheel->countdown * 3);
+      if(!number(0,3)) {
+         sprintf(buf, "The croupier announces, 'The wheel will be spun in about %d seconds!'\n\r", wheel->countdown * 2);
          send_to_room(buf, wheel->obj->in_room);
       }
       wheel->countdown -= 1;
