@@ -405,7 +405,7 @@ int do_sing(CHAR_DATA *ch, char *arg, int cmd)
     send_to_char("You know not of that song.\n\r", ch);
     return eFAILURE;
   }
-  if(spl != 2 && ch->song_timer > 0) {
+  if(spl != 2 && ch->song_timer != 0) {
     send_to_char("You are already in the middle of another song!\n\r", ch);
     return eFAILURE;
   }
@@ -646,7 +646,7 @@ int do_sing(CHAR_DATA *ch, char *arg, int cmd)
      send_to_char("There is no safe haven from an angry IMP!\n\r", tar_char);
      }
 
-      if(ch->song_timer > 0) // I'm singing
+      if(ch->song_timer != 0) // I'm singing
       {
 	if (!origsing) {
          send_to_char("You stop singing ", ch);
@@ -855,7 +855,7 @@ int charm_levels(CHAR_DATA *ch);
 int charm_space(int level);
 
 
- if(charm_levels(ch) - charm_space(GET_LEVEL(victim)) < 0)  {
+ if(charm_levels(ch) - charm_space(GET_LEVEL(victim)) < 0 && victim->master != ch)  {
      send_to_char("How you plan on controlling so many followers?\n\r", ch);
      return eFAILURE;
  }
@@ -880,6 +880,7 @@ bool any_charms(CHAR_DATA *ch);
         }
      }
    }   */
+
  if(victim->master)
     stop_follower(victim, 0);
 
