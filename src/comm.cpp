@@ -831,7 +831,7 @@ void game_loop(unsigned mother_desc, unsigned other_desc, unsigned third_desc, u
 	if (process_input(d) < 0) {
     sprintf(buf, "Connection attempt bailed from %s", d->host);
     printf(buf);
-	   log(buf, ANGEL, LOG_SOCKET);
+	   log(buf, OVERSEER, LOG_SOCKET);
 	  close_socket(d);
 	}
     }
@@ -1689,7 +1689,7 @@ int new_descriptor(int s)
                                                   
     CLOSE_SOCKET(desc);
     sprintf(buf, "Connection attempt denied from [%s]", newd->host);
-    log(buf, ANGEL, LOG_SOCKET);
+    log(buf, OVERSEER, LOG_SOCKET);
    // dc_free(newd->host);
     dc_free(newd);
     return 0;

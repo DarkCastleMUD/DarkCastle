@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.141 2006/08/19 01:58:34 apocalypse Exp $ */
+/* $Id: nanny.cpp,v 1.142 2006/08/22 10:04:45 shane Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -863,7 +863,7 @@ void nanny(struct descriptor_data *d, char *arg)
       if(strncmp( (char *)crypt((char *)arg, (char *)ch->pcdata->pwd), ch->pcdata->pwd, (PASSWORD_LEN) )) {
          SEND_TO_Q( "Wrong password.\n\r", d );
          sprintf(log_buf, "%s wrong password: %s", GET_NAME(ch), d->host);
-         log( log_buf, SERAPH, LOG_SOCKET );
+         log( log_buf, OVERSEER, LOG_SOCKET );
          if((ch = get_pc(GET_NAME(d->character))))
          {
             sprintf(log_buf, "$4$BWARNING: Someone just tried to log in as you with the wrong password.\r\n"
@@ -932,7 +932,7 @@ void nanny(struct descriptor_data *d, char *arg)
          if(isbanned(d->host) >= BAN_NEW) {
             sprintf(buf, "Request for new character %s denied from [%s] (siteban)",
                GET_NAME(d->character), d->host);
-            log(buf, ANGEL, LOG_SOCKET);
+            log(buf, OVERSEER, LOG_SOCKET);
             SEND_TO_Q("Sorry, new chars are not allowed from your site.\n\r"
                       "Questions may be directed to Apocalypse at DC_Apoc@hotmail.com\n\r",
                d);
@@ -1299,7 +1299,7 @@ is_race_eligible(ch,7)?'*':' ',is_race_eligible(ch,8)?'*':' ',is_race_eligible(c
        init_char( ch );
 
        sprintf( log_buf, "%s@%s new player.", GET_NAME(ch), d->host );
-       log( log_buf, ANGEL, LOG_SOCKET );
+       log( log_buf, OVERSEER, LOG_SOCKET );
        SEND_TO_Q( "\n\r", d );
        SEND_TO_Q( motd, d );
        SEND_TO_Q("\n\rIf you have read this motd, press Return.", d);
@@ -1616,7 +1616,7 @@ bool check_reconnect( struct descriptor_data *d, char *name, bool fReconnect )
          if(GET_LEVEL(tmp_ch) < ANGEL) {
             WAIT_STATE(tmp_ch, PULSE_VIOLENCE * 4);
             send_to_char("Heya sport, how about some RECONNECT LAG?\n\r", tmp_ch); 
-            log( log_buf, SERAPH, LOG_SOCKET );
+            log( log_buf, OVERSEER, LOG_SOCKET );
          } 
          else
             log( log_buf, GET_LEVEL(tmp_ch), LOG_SOCKET );
