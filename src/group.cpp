@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: group.cpp,v 1.23 2006/08/02 21:10:30 shane Exp $
+| $Id: group.cpp,v 1.24 2006/08/22 09:51:02 shane Exp $
 | group.C
 | Description:  Group related commands; join, abandon, follow, etc..
 */
@@ -210,11 +210,21 @@ int do_split(CHAR_DATA *ch, char *argument, int cmd)
   sprintf( buf, "%s splits %d gold coins.  "
                 "Your share is %d gold coins.\n\r", GET_SHORT(ch), amount, share );
 
+  char buf2[MAX_STRING_LENGTH];
   if(k != ch && k->in_room == ch->in_room) {
     send_to_char(buf, k);
-    GET_GOLD(k) += share;
+    int lost = 0;
+    if (k->clan && get_clan(k)->tax && !IS_SET(GET_TOGGLES(k), PLR_NOTAX) &&
+          (k->clan != ch->clan || k->clan == ch->clan && IS_SET(GET_TOGGLES(ch), PLR_NOTAX)) )
+      {
+	lost = (int)((float)share*(float)((float)get_clan(k)->tax/100));
+	sprintf(buf2,"Your clan taxes %d gold of your share.\r\n",lost);
+	get_clan(k)->balance += lost;
+	save_clans();
+      send_to_char(buf2, k);
+      }
+      GET_GOLD(k) += (share - lost);
   }
-  char buf2[MAX_STRING_LENGTH];
   for (f=k->followers; f; f=f->next) 
   {
     if (IS_AFFECTED(f->follower, AFF_GROUP) &&
@@ -224,8 +234,8 @@ int do_split(CHAR_DATA *ch, char *argument, int cmd)
     {
       send_to_char( buf, f->follower );
       int lost = 0;
-      if (f->follower->clan && get_clan(f->follower)->tax && 
-           !IS_SET(GET_TOGGLES(f->follower), PLR_NOTAX))
+      if (f->follower->clan && get_clan(f->follower)->tax && !IS_SET(GET_TOGGLES(f->follower), PLR_NOTAX) &&
+            (f->follower->clan != ch->clan || f->follower->clan == ch->clan && IS_SET(GET_TOGGLES(ch), PLR_NOTAX)) )
       {
 	lost = (int)((float)share*(float)((float)get_clan(f->follower)->tax/100));
 	sprintf(buf2,"Your clan taxes %d gold of your share.\r\n",lost);
