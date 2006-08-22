@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.50 2006/08/21 08:42:22 urizen Exp $ */
+/* $Id: ki.cpp,v 1.51 2006/08/22 20:27:28 shane Exp $ */
 
 extern "C"
 {
@@ -603,9 +603,11 @@ int ki_storm( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
         send_to_char("A crackle of energy echoes past you.\r\n",tmp_victim);
   }
   if(number(1,4) == 4 && !ch->fighting) {
-    send_to_char("The flash of energy surges within you!\r\n", ch);
+    char dammsg[MAX_STRING_LENGTH];
+    sprintf(dammsg, "$B%d$R", dam);
+    if (dam + GET_HIT(ch) > GET_MAX_HIT(ch)) dam -= GET_MAX_HIT(ch) - GET_HIT(ch);
     GET_HIT(ch) += dam;
-    if (GET_HIT(ch) > GET_MAX_HIT(ch)) GET_HIT(ch) = GET_MAX_HIT(ch);
+    send_damage("The flash of energy surges within you for | life!", ch, 0, 0, dammsg, "The flash of energy surges within you!", TO_CHAR);
   }
   WAIT_STATE(ch, PULSE_VIOLENCE);
   return eSUCCESS;

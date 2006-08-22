@@ -95,9 +95,12 @@ int do_harmtouch(struct char_data *ch, char *argument, int cmd)
      WAIT_STATE(ch, PULSE_VIOLENCE);
      if(IS_SET(retval, eVICT_DIED) && !IS_SET(retval, eCH_DIED)) {
         if(has_skill(ch,SKILL_HARM_TOUCH) > 30 && number(1, 3) == 1) {
-           send_to_char("Your god basks in your worship of pain and infuses you with life.\r\n", ch);
-           GET_HIT(ch) += GET_LEVEL(ch) * 10;
-           GET_HIT(ch) = MIN(GET_HIT(ch), GET_MAX_HIT(ch));
+           char dammsg[MAX_STRING_LENGTH];
+           int amount = GET_LEVEL(ch) * 10;
+           if(amount + GET_HIT(ch) > GET_MAX_HIT(ch)) amount -= GET_MAX_HIT(ch) - GET_HIT(ch);
+           sprintf(dammsg, "$B%d$R", amount);
+           send_damage("Your god basks in your worship of pain and infuses you with | life.", ch, 0, victim, dammsg, "You god basks in your worship of pain and infuses you with life.", TO_CHAR);
+           GET_HIT(ch) += amount;
         }
      }
    }
@@ -173,15 +176,18 @@ int do_layhands(struct char_data *ch, char *argument, int cmd)
      duration /= 2;
    }
    else {
-     GET_HIT(victim) += 500 + (has_skill(ch, SKILL_LAY_HANDS)*10);
-     if(GET_HIT(victim) > GET_MAX_HIT(victim))
-       GET_HIT(victim) = GET_MAX_HIT(victim);
-
-     send_to_char("Praying fervently, you lay hands as life force granted by your god streams from your body.\r\n", ch);
-     act("Your body surges with holy energies as life force granted by $N's god pours into you!\r\n", victim, 0, ch, 
-TO_CHAR, 0);
-     act("A blinding flash fills the area as life force granted from $n's god pours into $N!\r\n", ch, 0, victim, 
-TO_ROOM, NOTVICT);
+     char dammsg[MAX_STRING_LENGTH];
+     int amount = 500 + (has_skill(ch, SKILL_LAY_HANDS)*10);
+     if(amount + GET_HIT(victim) > GET_MAX_HIT(victim))
+       amount -= GET_MAX_HIT(victim) - GET_HIT(victim);
+     GET_HIT(victim) += amount;
+     sprintf(dammsg, "$B%d$R", amount);
+     send_damage("Praying fervently, you lay hands as life force granted by your god streams from your body healing $N for | health.",
+ch, 0, victim, dammsg, "Praying fervently, you lay hands as life force granted by your god streams from your body into $N.", TO_CHAR);
+     send_damage("Your body surges with holy energies as | points of life force granted by $n's god pours into you!", 
+ch, 0, victim, dammsg, "Your body surges with holy energies as life force granted by $n's god pours into you!", TO_VICT);
+     send_damage("A blinding flash fills the area as | points of life force granted from $n's god pours into $N!", ch, 0, 
+victim, dammsg, "A blinding flash fills the area as life force granted from $n's god pours into $N!", TO_ROOM);
    }
 
    af.type = SKILL_LAY_HANDS;

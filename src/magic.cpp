@@ -373,10 +373,14 @@ int spell_souldrain(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
 
    GET_MANA(victim) -= mana;
    GET_MANA(ch) += mana;
-   act("You drain $N's very soul!",ch,0,victim, TO_CHAR, 0);
-   send_to_char("You feel your very soul being drained!\n\r", victim);
+   char buf[MAX_STRING_LENGTH];
+   sprintf(buf, "$B%d$R", mana);
+   send_damage("You drain $N's very soul for | mana!", ch, 0, victim, buf, "You drain $N's very soul!", TO_CHAR);
+   send_damage("You feel your very soul being drained by $n for | mana!", ch, 0, victim, buf, "You feel your very soul being drained by $n!", TO_VICT);
+   send_damage("$N's soul is drained away by $n for | mana!", ch, 0, victim, buf, "$N's soul is drained away by $n!", TO_ROOM);
 
    if (GET_MANA(ch) > GET_MAX_MANA(ch)) GET_MANA(ch) = GET_MAX_MANA(ch);
+
    int retval;
    if (IS_MOB(victim) && !victim->fighting)
 	{
@@ -397,36 +401,23 @@ int spell_vampiric_touch (ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct 
   dam = 225;
   int adam = dam_percent(skill, 225); // Actual damage, for drainy purposes.
 
-  if(saves_spell(ch, victim, ( skill / 3 ), SAVE_TYPE_COLD) < 0) 
-  {
-    int i = GET_HIT(victim);
-    int retval =  damage (ch, victim, dam,TYPE_COLD, SPELL_VAMPIRIC_TOUCH, 0);
-    if (!SOMEONE_DIED(retval))
-    if (GET_HIT(victim) >= i) return retval;
-      
-     if (!SOMEONE_DIED(retval))
-    GET_HIT(ch) += MIN(adam, i-GET_HIT(victim));
-      else
-     GET_HIT(ch) += MIN(adam, i);
-    if (GET_HIT(ch) > GET_MAX_HIT(ch))
-        GET_HIT(ch) = GET_MAX_HIT(ch);
-    return retval;
-  } else {
+  if(saves_spell(ch, victim, ( skill / 3 ), SAVE_TYPE_COLD) >= 0) {
     dam >>= 1;
     adam /= 2;
-     int i = GET_HIT(victim);
-     int retval =  damage (ch, victim, dam,TYPE_COLD, SPELL_VAMPIRIC_TOUCH, 0);
-    if (!SOMEONE_DIED(retval) && GET_HIT(victim) >= i) return retval;
-
-     if (!SOMEONE_DIED(retval))
-    GET_HIT(ch) += MIN(adam, i-GET_HIT(victim));
-      else
-     GET_HIT(ch) += MIN(adam, i);
-
-    if (GET_HIT(ch) > GET_MAX_HIT(ch))
-        GET_HIT(ch) = GET_MAX_HIT(ch);
-   return retval;
   }
+
+  int i = GET_HIT(victim);
+  int retval =  damage (ch, victim, dam,TYPE_COLD, SPELL_VAMPIRIC_TOUCH, 0);
+  if (!SOMEONE_DIED(retval) && GET_HIT(victim) >= i) return retval;
+      
+  if (!SOMEONE_DIED(retval))
+    GET_HIT(ch) += MIN(adam, i-GET_HIT(victim));
+  else
+    GET_HIT(ch) += MIN(adam, i);
+  if (GET_HIT(ch) > GET_MAX_HIT(ch))
+    GET_HIT(ch) = GET_MAX_HIT(ch);
+
+   return retval;
 }
 
 
@@ -4162,14 +4153,18 @@ int spell_refresh(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data
   dam = MAX(dam, 20);
 
   if ((dam + GET_MOVE(victim)) > move_limit(victim))
-    GET_MOVE(victim) = move_limit(victim);
-  else
-    GET_MOVE(victim) += dam;
+    dam -= move_limit(victim) - GET_MOVE(victim);
 
-  if(ch != victim) {
-    act("Your magic flows through $M and $E looks less tired.",ch,0,victim,TO_CHAR,0);
-  }
-  send_to_char("You feel less tired.\n\r", victim);
+  GET_MOVE(victim) += dam;
+
+  char buf[MAX_STRING_LENGTH];
+  sprintf(buf, "$B%d$R", dam);
+
+  if(ch != victim)
+    send_damage("Your magic flows through $N and $E looks less tired by | fatigue points.",ch,0,victim,buf,"Your magic flows through $N and $E looks less tired.", TO_CHAR);
+
+  send_damage("You feel less tired by | fatigue points.", ch, 0, victim, buf, "You feel less tired.", TO_VICT);
+  send_damage("$N feels less tired by | fatigue points.", ch, 0, victim, buf, "$N feels less tired.", TO_ROOM);
   return eSUCCESS;
 }
 
@@ -5014,14 +5009,15 @@ int spell_flamestrike(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
 // Burns up ki and mana on victim if learned over skill level 70
 
    if(skill > 70) {
-      send_to_char("The fires $4burn$R into your soul tearing away at your being.\r\n", victim);
-      act("Your fires $4burn$R into $N's soul, tearing away at $s being.\r\n",ch,0,victim,TO_CHAR, 0);
-         GET_MANA(victim) -= number(50,75);
-      if(GET_MANA(victim) < 0)
-         GET_MANA(victim) = 0;
-	 GET_KI(victim) -= number(1,10);
-      if(GET_KI(victim) < 0)
-	 GET_KI(victim) = 0;
+      char buf[MAX_STRING_LENGTH];
+      int mamount = number(50, 75), kamount = number(1,7);
+      if(GET_MANA(victim) - mamount < 0) mamount = GET_MANA(victim);
+      if(GET_KI(victim) - kamount < 0) kamount = GET_KI(victim);
+      GET_MANA(victim) -= mamount;
+      GET_KI(victim) -= kamount;
+      sprintf(buf, "$B%d$R mana and $B%d$R ki", mamount, kamount);
+      send_damage("$n's fires $4burn$R into your soul tearing away at your being for |.", ch, 0, victim, buf, "The fires $4burn$R into your soul tearing away at your being.", TO_VICT);
+      send_damage("Your fires $4burn$R into $N's soul, tearing away at $S being for |.",ch,0,victim,buf, "Your fires $4burn$R $N's soul, tearing away at $S being.", TO_CHAR);
    }
    return retval;
 }
