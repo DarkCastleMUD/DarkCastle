@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.368 2006/08/21 21:42:41 shane Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.369 2006/08/22 23:37:45 dcastle Exp $ */
 
 extern "C"
 {
@@ -1217,12 +1217,12 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
     chance += GET_REAL_HITROLL(ch);
     if(has_skill(ch, SKILL_NAT_SELECT) && affected_by_spell(ch, SKILL_NAT_SELECT))
       if(affected_by_spell(ch, SKILL_NAT_SELECT)->modifier == GET_RACE(vict))
-        chance += 5 + has_skill(ch, SKILL_NAT_SELECT)/10;
+        chance += 15 + has_skill(ch, SKILL_NAT_SELECT)/10;
   //  chance += dex_app[GET_DEX(ch)].tohit;
     chance += ( GET_ARMOR(vict) / 10 );  // (positive ac hurts you, negative helps)
     if(has_skill(vict, SKILL_NAT_SELECT) && affected_by_spell(vict, SKILL_NAT_SELECT))
       if(affected_by_spell(vict, SKILL_NAT_SELECT)->modifier == GET_RACE(ch))
-        chance -= 20 - has_skill(vict, SKILL_NAT_SELECT) / 5;
+        chance -= 40 - has_skill(vict, SKILL_NAT_SELECT) / 5;
     chance += weapon_skill_hit_bonus;
 
     if(IS_SET(vict->combat, COMBAT_BASH1) ||
@@ -1301,7 +1301,7 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
 
   if(has_skill(ch, SKILL_NAT_SELECT) && affected_by_spell(ch, SKILL_NAT_SELECT))
     if(affected_by_spell(ch, SKILL_NAT_SELECT)->modifier == GET_RACE(vict))
-      dam += 5 + has_skill(ch, SKILL_NAT_SELECT)/10;
+      dam += 15 + has_skill(ch, SKILL_NAT_SELECT)/10;
   
   do_combatmastery(ch, vict, weapon);
   if(ISSET(ch->affected_by, AFF_CMAST_WEAKEN))

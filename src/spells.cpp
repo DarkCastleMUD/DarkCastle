@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.182 2006/08/22 23:21:38 jhhudso Exp $ */
+/* $Id: spells.cpp,v 1.183 2006/08/22 23:37:46 dcastle Exp $ */
 
 extern "C"
 {
@@ -1649,6 +1649,7 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
       tar_char = 0;
       tar_obj = 0;
       bool ok_self = FALSE;
+      int oldroom = 0;
       if (spl == SPELL_LIGHTNING_BOLT && has_skill(ch, SKILL_SPELLCRAFT))
       { // Oh the special cases of spellcraft.
 	 name[0] = '\0';
@@ -1679,7 +1680,12 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
    	     send_to_char("That room is protected from this harmful magic.\r\n", ch);
 	     return eFAILURE;
 	   }
-	   int oldroom = ch->in_room;
+	  if (!spellcraft(ch, SPELL_LIGHTNING_BOLT))
+	  {
+		send_to_char("You don't know how.\r\n",ch);
+		return eFAILURE;
+           }
+	   oldroom = ch->in_room;
 	   char_from_room(ch);
 	   if (!char_to_room(ch, new_room)) {
 	     char_to_room(ch, oldroom);
@@ -1688,20 +1694,17 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
 	   }
 	   if (!(tar_char = get_char_room_vis(ch, name)))
 	   {
-		   char_from_room(ch); 
+		char_from_room(ch); 
 		char_to_room(ch, oldroom);
 	        send_to_char("You don't see anyone like that there.\r\n",ch);
 		return eFAILURE;
 	   }
-	  if (spellcraft(ch, SPELL_LIGHTNING_BOLT))
-	  {
-		send_to_char("You don't know how.\r\n",ch);
-		return eFAILURE;
-           }
+
 	   if (IS_NPC(tar_char) && mob_index[tar_char->mobdata->nr].virt >= 2300 &&
 		mob_index[tar_char->mobdata->nr].virt <= 2399)
 	   {
-	   
+   	        char_from_room(ch); 
+		char_to_room(ch, oldroom);
 		tar_char = ch;
 		send_to_char("Your spell bounces off the fortress' enchantments, and the lightning bolt comes flying back towards you!\r\n",ch);
 	 	ok_self = TRUE;
@@ -1817,6 +1820,10 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
         return eFAILURE;
       } else { /* TARGET IS OK */
         if ((tar_char == ch) && !ok_self && IS_SET(spell_info[spl].targets, TAR_SELF_NONO)) {
+	  if (oldroom) {
+		char_from_room(ch); 
+		char_to_room(ch, oldroom);
+	  }
           send_to_char("You can not cast this spell upon yourself.\n\r", ch);
           return eFAILURE;
         }
@@ -1831,6 +1838,10 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
 
       if (GET_LEVEL(ch) < ARCHANGEL && !IS_MOB(ch)) {
         if (GET_MANA(ch) < use_mana(ch, spl)) {
+	  if (oldroom) {
+		char_from_room(ch); 
+		char_to_room(ch, oldroom);
+	  }
           send_to_char("You can't summon enough energy to cast the spell.\n\r",ch);
           return eFAILURE;
         }
@@ -1838,7 +1849,13 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
      if (tar_char && IS_SET(spell_info[spl].targets, TAR_FIGHT_VICT))
      {
 	  if (!can_attack(ch) || !can_be_attacked(ch, tar_char))
+	  {
+	  if (oldroom) {
+		char_from_room(ch); 
+		char_to_room(ch, oldroom);
+	  }
 	    return eFAILURE;
+	  }
      }
 
       if (spl != SPELL_VENTRILOQUATE)  /* :-) */
@@ -1898,6 +1915,10 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
           GET_MANA(ch) -= (use_mana(ch, spl) >> 1);
           act("$n loses $s concentration and is unable to complete $s spell.", ch, 0, 0, TO_ROOM, 0);
 	  skill_increase_check(ch, spl, learned, spell_info[spl].difficulty);
+	  if (oldroom) {
+		char_from_room(ch); 
+		char_to_room(ch, oldroom);
+	  }
           return eSUCCESS;
         }
 
@@ -1922,8 +1943,12 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
 		    GET_NAME(tar_char));
 	   log( log_buf, 110, LOG_PLAYER );
 	 }
+	int retval = ((*spell_info[spl].spell_pointer) (GET_LEVEL(ch), ch, argument, SPELL_TYPE_SPELL, tar_char, tar_obj, learned));
 
-        return ((*spell_info[spl].spell_pointer) (GET_LEVEL(ch), ch, argument, SPELL_TYPE_SPELL, tar_char, tar_obj, learned));
+	if (oldroom && !IS_SET(retval, eCH_DIED))
+		{ char_from_room(ch); char_to_room(ch, oldroom); }
+
+        return retval;
       }
     }   /* if GET_POS < min_pos */
     return eFAILURE;

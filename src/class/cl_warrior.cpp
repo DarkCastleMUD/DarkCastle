@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.48 2006/07/15 10:06:26 jhhudso Exp $
+| $Id: cl_warrior.cpp,v 1.49 2006/08/22 23:37:53 dcastle Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -28,6 +28,7 @@ extern char *dirs[];
 bool ARE_GROUPED( CHAR_DATA *sub, CHAR_DATA *obj);
 int attempt_move(CHAR_DATA *ch, int cmd, int is_retreat = 0);
 
+extern struct index_data *mob_index;
 
 /************************************************************************
 | OFFENSIVE commands.  These are commands that should require the
@@ -345,7 +346,7 @@ int do_hitall(struct char_data *ch, char *argument, int cmd)
       act ("You start swinging like a MADMAN!", ch, 0, 0, TO_CHAR, 0);
       act ("$n starts swinging like a MADMAN!", ch, 0, 0, TO_ROOM, 0);
       SET_BIT(ch->combat, COMBAT_HITALL);
-    WAIT_STATE(ch, PULSE_VIOLENCE*3);
+      WAIT_STATE(ch, PULSE_VIOLENCE*3);
       CHAR_DATA *nxtplr;
       for (vict = character_list; vict; vict = temp) 
       {
@@ -640,8 +641,10 @@ int do_disarm( struct char_data *ch, char *argument, int cmd )
 
     if ( skill_success(ch,victim,SKILL_DISARM,modifier))
     {
-        if ((IS_SET(wielded->obj_flags.extra_flags,ITEM_NODROP)) || 
-            (GET_LEVEL(victim) >= IMMORTAL)) 
+
+        if (((IS_SET(wielded->obj_flags.extra_flags,ITEM_NODROP)) || 
+            (GET_LEVEL(victim) >= IMMORTAL)) && (!IS_NPC(victim) || mob_index[victim->mobdata->nr].virt > 2400 ||
+		mob_index[victim->mobdata->nr].virt < 2300))
           send_to_char("You can't seem to work it loose.\n\r", ch);
         else
 	  disarm( ch, victim );

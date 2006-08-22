@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: offense.cpp,v 1.21 2006/07/14 08:26:20 shane Exp $
+| $Id: offense.cpp,v 1.22 2006/08/22 23:37:46 dcastle Exp $
 | offense.C
 | Description:  Commands that are generically offensive - that is, the
 |   victim should retaliate.  The class-specific offensive commands are
@@ -253,8 +253,9 @@ int do_join(struct char_data *ch, char *argument, int cmd)
     send_to_char(" Aren't you helping enough as it is?\n\r", ch);
     return eFAILURE;
   }
-
-  if(IS_MOB(ch) && isdigit(*victim_name)) {
+  char tmp[MAX_STRING_LENGTH];
+  int num;
+   if(IS_MOB(ch) && isdigit(*victim_name) && (!sscanf(victim_name,"%d.%s",&num,tmp)) == 2) {
     count = atoi(victim_name);
     victim = world[ch->in_room].people;
     for(; victim; victim = victim->next_in_room)

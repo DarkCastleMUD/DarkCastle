@@ -1868,20 +1868,42 @@ void create_slot(OBJ_DATA *obj)
    slot->linkedto = obj->obj_flags.value[3];
    slot->lastwin = 0;
    slot->bet = 1;
-   slot->gold = (! obj->obj_flags.value[2]);
+   if(obj->obj_flags.value[2]) slot->gold = FALSE;
+   else slot->gold = TRUE;
    slot->busy = FALSE;
    slot->button = FALSE;
-
    obj->slot = slot;
 }
 
-bool is_player_with_slot(struct machine_data *machine)
+bool verify_slot(struct machine_data *machine)
 {
    if(machine->ch->in_room == machine->obj->in_room)
       return TRUE;
 
    return FALSE;
 }
+
+/*void update_linked_slots(struct machine_data *machine)
+{
+   char buf[MAX_STRING_LENGTH];
+
+   for(int i=21906;i<21918;i++) {
+      if( ((OBJ_DATA *)obj_index[real_object(i)].item)->obj_flags.value[3] == machine->linkedto ) {
+         sprintf(buf, "A slot machine which displays '$R$BJackpot: %d %s!$1' sits here.", machine->jackpot / 100, 
+               machine->gold?"coins":"plats");
+         for(OBJ_DATA *j=object_list; j; j = j->next)
+            if(j->item_number == real_object(i))
+	    {
+               j->description = str_hsh(buf);
+	       if (j->slot) j->slot->jackpot = machine->jackpot;
+	    }
+         ((OBJ_DATA *)obj_index[real_object(i)].item)->obj_flags.value[1] = machine->jackpot;
+         ((OBJ_DATA *)obj_index[real_object(i)].item)->description = str_hsh(buf);
+      }
+   }
+}
+*/
+
 
 void update_linked_slots(struct machine_data *machine)
 {
@@ -1918,6 +1940,7 @@ void update_linked_slots(struct machine_data *machine)
    }
 }
 
+
 void slot_timer(struct machine_data *machine, int stop1, int stop2, int delay)
 {
   struct timer_data *timer;
@@ -1943,19 +1966,19 @@ void reel_spin(void *arg1, void *arg2, void *arg3)
 
    char buf[MAX_STRING_LENGTH];
 
-   if(stop1 < 0 && charExists(machine->ch) && is_player_with_slot(machine)) {
+   if(stop1 < 0 && charExists(machine->ch) && verify_slot(machine)) {
       stop1 = number(0, 19);
       send_to_room("You hear a loud clunk as the first stopper snaps into place.\n\r", machine->obj->in_room);
       sprintf(buf, "%s    |      |\n\r", reel1[stop1]);
       send_to_char(buf, machine->ch);
       slot_timer(machine, stop1, -1, 2);
-   } else if(stop2 < 0 && charExists(machine->ch) && is_player_with_slot(machine)) {
+   } else if(stop2 < 0 && charExists(machine->ch) && verify_slot(machine)) {
       stop2 = number(0, 19);
       send_to_room("You hear a loud clunk as the second stopper snaps into place.\n\r", machine->obj->in_room);
       sprintf(buf, "%s %s    |\n\r", reel1[stop1], reel2[stop2]);
       send_to_char(buf, machine->ch);
       slot_timer(machine, stop1, stop2, 2);
-   } else if(charExists(machine->ch) && is_player_with_slot(machine)) {
+   } else if(charExists(machine->ch) && verify_slot(machine)) {
       int payout = 0;
       int stop3 = number(0, 19);
       send_to_room("You hear a loud clunk as the final stopper snaps into place.\n\r", machine->obj->in_room);
@@ -2589,6 +2612,7 @@ int roulette_table(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, CHAR
          obj->wheel->plr[i]->bet_array[number+11] += bet;
       } else {
          send_to_char("Bet what?\n\r", ch);
+	 GET_GOLD(ch) += bet;
          return eSUCCESS;
       }
       send_wheel_bets(ch, obj->wheel);

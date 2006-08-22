@@ -438,8 +438,8 @@ int spell_meteor_swarm(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
         if(IS_SET(retval,eEXTRA_VAL2)) victim = ch;
         if(IS_SET(retval,eEXTRA_VALUE)) return retval;
         act("The force of the spell knocks $N over!",ch,0,victim, TO_CHAR, 0);
-	send_to_char("The force of the spell knocks you over!\r\n",ch);
-	GET_POS(victim) = POSITION_SITTING;	
+	send_to_char("The force of the spell knocks you over!\r\n",victim);
+	GET_POS(victim) = POSITION_SITTING;
    }
  return retval;
 }
@@ -5535,16 +5535,20 @@ int cast_burning_hands( ubyte level, CHAR_DATA *ch, char *arg, int type,
   CHAR_DATA *victim, struct obj_data *tar_obj, int skill )
 {
  int retval ;
+  char arg1[MAX_STRING_LENGTH];
+  arg1[0] = '\0';
 	 switch (type)
 	 {
 	 case SPELL_TYPE_SPELL:
 	 retval = spell_burning_hands(level, ch, victim, 0, skill);
-	 if (SOMEONE_DIED(retval)) return retval;
-         if (arg && *arg && spellcraft(ch, SPELL_BURNING_HANDS))
-	   victim = get_char_room_vis(ch, arg);
-	else victim = NULL;
-	if (!victim) return retval;
-	return spell_burning_hands(level, ch, victim, 0, skill);
+//	 if (SOMEONE_DIED(retval)) return retval;
+	 one_argument(arg, arg1);
+	 CHAR_DATA *vict;
+         if (arg1[0] && spellcraft(ch, SPELL_BURNING_HANDS))
+	   vict = get_char_room_vis(ch, arg1);
+	else vict = NULL;
+	if (!vict || vict == victim) return retval;
+	return spell_burning_hands(level, ch, vict, 0, skill);
 	break;
 	case SPELL_TYPE_SCROLL:
 	if (victim)

@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.51 2006/08/22 20:27:28 shane Exp $ */
+/* $Id: ki.cpp,v 1.52 2006/08/22 23:37:46 dcastle Exp $ */
 
 extern "C"
 {
@@ -502,11 +502,12 @@ int ki_punch( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
 
    dam = MAX(350, dam);
    dam = MIN(1000,dam);
-   manadam = MAX(350, manadam);
-   manadam = MIN(1000, manadam);
+   manadam = MAX(150, manadam);
+   manadam = MIN(750, manadam);
    if (GET_HIT(vict) < 500000) {
-      if (number(1, 101) <
-          (GET_LEVEL(ch) / 2) + GET_LEVEL(ch) - GET_LEVEL(vict))
+	      if (number(1, 101) <
+           GET_LEVEL(ch)/5 + has_skill(ch, KI_OFFSET+KI_PUNCH)/2 - GET_LEVEL(vict)/5)
+
       {
 //         act("$n punches $s fist RIGHT INTO $N!", ch, 0, vict,
 //             TO_ROOM, NOTVICT);
