@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.60 2006/08/01 10:38:59 jhhudso Exp $ */
+/* $Id: utility.cpp,v 1.61 2006/08/22 06:32:11 jhhudso Exp $ */
 
 extern "C"
 {
@@ -259,7 +259,7 @@ void log( char *str, int god_level, long type )
      case LOG_SOCKET:
         f = &socket_file;
         if(!(*f = dc_fopen(SOCKET_FILE, "a"))) {
-          fprintf(stderr, "Unable to open socket file.\n");
+          fprintf(stderr, "Unable to open socket file: %s\n", SOCKET_FILE);
           exit(1);
         }
 	break;
