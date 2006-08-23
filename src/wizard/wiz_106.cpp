@@ -74,13 +74,6 @@ int do_force(struct char_data *ch, char *argument, int cmd)
     if(!(vict = get_char_vis(ch, name)))
       send_to_char("No one by that name here..\n\r", ch);
     else {
-      if(!strcmp(GET_NAME(vict), "Waz") || !strcmp(GET_NAME(vict), "Sadus") || !strcmp(GET_NAME(vict), "Pirahna")) {
-        send_to_char ("WOW! Backfire!\n\r", ch);
-        sprintf(buf, "Hehe, $n has failed to force you to '%s'.", to_force);
-        act(buf, ch, 0, vict, TO_VICT, 0);
-        command_interpreter(ch, to_force);
-        return eSUCCESS;
-      }
       if (GET_LEVEL(ch) < GET_LEVEL(vict) && IS_NPC(vict)) {
         send_to_char("Now doing that would just tick off the IMPS!\n\r", ch);
         sprintf(buf, "%s just tried to force %s to, %s", GET_NAME(ch), GET_NAME(vict),to_force);
