@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: who.cpp,v 1.24 2006/08/23 17:49:13 apocalypse Exp $
+| $Id: who.cpp,v 1.25 2006/08/23 17:57:22 apocalypse Exp $
 | who.C
 | Commands for who, maybe? :P
 */
@@ -466,13 +466,13 @@ int do_who(struct char_data *ch, char *argument, int cmd)
         if(GET_LEVEL(i) > MORTAL) {
             /* Immortals can't be anonymous */
             infoField = immortFields[GET_LEVEL(i) - IMMORTAL];
-/*	    if (!strcmp(GET_NAME(i),"Julian")) {
+	    if (!strcmp(GET_NAME(i),"Julian")) {
 	  	infoField = infoBuf;
 		sprintf(infoBuf,"    $B$2O.W.L$R    ");
-	    }*/
+	    }
 	     if (!str_cmp(GET_NAME(i), "Urizen")) {
 		infoField = infoBuf;
-		sprintf(infoBuf, " $B$5Sir Sweden$R ");
+		sprintf(infoBuf, " $B$5Sir Sweden$R  ");
 	     }
 	     if (!str_cmp(GET_NAME(i), "Dasein")) {
 		infoField = infoBuf;
