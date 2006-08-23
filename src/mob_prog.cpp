@@ -1093,7 +1093,7 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
   if ( !str_cmp( buf, "isworn" ) )
     {
         OBJ_DATA *o;
-	if (mob->mobdata->last_room > 50000) // an object
+	if ((unsigned int)mob->mobdata->last_room > 50000) // an object
 	 o = (OBJ_DATA*) mob->mobdata->last_room;
 	if (fvict)
    	  return is_wearing(fvict, o);
