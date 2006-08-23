@@ -4412,7 +4412,7 @@ int spell_dispel_minor(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
    int done = FALSE;
    int retval;
 
-   if(obj && (int)obj > 100) /* Trying to dispel_minor an obj */
+   if(obj && (unsigned int)obj > 100) /* Trying to dispel_minor an obj */
    {   // Heh, it passes spell cast through obj now too. Less than 100 = not 
        // an actual obj.
       if(GET_ITEM_TYPE(obj) != ITEM_BEACON) {
