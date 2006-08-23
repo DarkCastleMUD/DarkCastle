@@ -577,7 +577,7 @@ int do_sing(CHAR_DATA *ch, char *arg, int cmd)
 
     if(!IS_SET(song_info[spl].targets, TAR_IGNORE)) 
      if(!tar_char && !tar_obj) {
-       log("Dammit Pir, fix that null tar_char thing in do_song", IMP, LOG_BUG);
+       log("Dammit, fix that null tar_char thing in do_song", IMP, LOG_BUG);
        send_to_char("If you triggered this message, you almost crashed the\n\r"
                     "game.  Tell a god what you did immediately.\n\r", ch);
        return eFAILURE|eINTERNAL_ERROR;
@@ -1690,7 +1690,7 @@ int execute_song_shattering_resonance( ubyte level, CHAR_DATA *ch, char *arg, CH
    if(!(tobj = get_obj_in_list("pcportal",
                world[real_room(obj->obj_flags.value[0])].contents))) 
    {
-      send_to_char("Could not find matching exit portal? Tell Pirahna.\r\n", ch);
+      send_to_char("Could not find matching exit portal? Tell an Immortal.\r\n", ch);
       return eFAILURE;
    }
 

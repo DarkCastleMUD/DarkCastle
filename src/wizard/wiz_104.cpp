@@ -1467,7 +1467,7 @@ int do_trans(struct char_data *ch, char *argument, int cmd)
        if (!(victim = get_char_vis(ch,buf)))
           send_to_char("No-one by that name around.\n\r",ch);
        else {
-          if (world[ch->in_room].number == 25 && !isname(GET_NAME(ch), "Pirahna"))
+          if (world[ch->in_room].number == 25 && !isname(GET_NAME(ch), "Apocalypse"))
           {
             send_to_char ("Damn! That is rude! This ain't your place. :P\n\r", ch);
             return eFAILURE;
@@ -1549,7 +1549,7 @@ int do_teleport(struct char_data *ch, char *argument, int cmd)
       return eFAILURE;
     } /* if */
 
-    if (world[target].number == 25 && !isname (GET_NAME(victim), "Pirahna"))
+    if (world[target].number == 25 && !isname (GET_NAME(victim), "Apocalypse"))
       {
       send_to_char ("Sorry, you need permission first!\n\r", ch);
       return eFAILURE;

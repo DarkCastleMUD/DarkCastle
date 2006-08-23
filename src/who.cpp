@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: who.cpp,v 1.23 2006/07/10 20:51:46 shane Exp $
+| $Id: who.cpp,v 1.24 2006/08/23 17:49:13 apocalypse Exp $
 | who.C
 | Commands for who, maybe? :P
 */
@@ -305,7 +305,7 @@ int do_who(struct char_data *ch, char *argument, int cmd)
         "   --------  ",
         "   --------  ",
         "   Divinity  ",
-        "PirsLoveSlave",
+        "   --------  ",
         " Implementor "
     };
     char *clss_types[] = {
@@ -466,35 +466,27 @@ int do_who(struct char_data *ch, char *argument, int cmd)
         if(GET_LEVEL(i) > MORTAL) {
             /* Immortals can't be anonymous */
             infoField = immortFields[GET_LEVEL(i) - IMMORTAL];
-/*	    if (!strcmp(GET_NAME(i),"Dasein")) {
+/*	    if (!strcmp(GET_NAME(i),"Julian")) {
 	  	infoField = infoBuf;
-		sprintf(infoBuf,"    $B$5O$6.$5W$6.$5L$R    ");
+		sprintf(infoBuf,"    $B$2O.W.L$R    ");
 	    }*/
 	     if (!str_cmp(GET_NAME(i), "Urizen")) {
 		infoField = infoBuf;
-		sprintf(infoBuf, "    Coder    "); // No imagination today.
+		sprintf(infoBuf, " $B$5Sir Sweden$R ");
 	     }
 	     if (!str_cmp(GET_NAME(i), "Dasein")) {
 		infoField = infoBuf;
 		sprintf(infoBuf, "    Logos    ");
 	     }
-            if(!strcmp(GET_NAME(i), "Rahz")) {
-                infoField = infoBuf;
-                sprintf(infoBuf, "   Crasher   ");
-            }
 	   if (!strcmp(GET_NAME(i), "Apocalypse"))
 	{
                 infoField = infoBuf;
-                sprintf(infoBuf, "    Moose    ");
+                sprintf(infoBuf, "    $B$0Moose$R    ");
 
 	}
             if(!strcmp(GET_NAME(i), "Pirahna")) {
                 infoField = infoBuf;
                 sprintf(infoBuf, "   $B$4>$5<$1($2($1($5:$4>$R   ");
-            }
-            if(!strcmp(GET_NAME(i), "Nyx")) {
-                infoField = infoBuf;
-                sprintf(infoBuf, "$B$5*:)-3-->$R$5===8$R ");
             }
             if(!strcmp(GET_NAME(i), "Wynn")) {
                 infoField = infoBuf;

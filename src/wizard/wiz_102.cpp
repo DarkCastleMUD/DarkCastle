@@ -4024,7 +4024,7 @@ int do_instazone(struct char_data *ch, char *arg, int cmd)
 
     bool found_room = FALSE;
 
- send_to_char("Whoever thought of this had a good idea, but never really finished it.  Beg Pirahna to finish it some time.\r\n", ch);
+ send_to_char("Whoever thought of this had a good idea, but never really finished it.  Beg someone to finish it some time.\r\n", ch);
  return eFAILURE;
 
 // Remember if you change this that it uses string_to_file which now appends a ~\n to the end

@@ -491,7 +491,7 @@ void finish_hotboot()
     if (!load_char_obj(d, d->output)) {
       sprintf(buf, "Could not load char '%s' in hotboot.",  d->output);
       log(buf, 0, LOG_MISC);
-      write_to_descriptor( d->descriptor, "Link Failed!  Tell Pirahna when you can.\n\r" );
+      write_to_descriptor( d->descriptor, "Link Failed!  Tell an Immortal when you can.\n\r" );
       close_socket(d);
       continue;
     }
