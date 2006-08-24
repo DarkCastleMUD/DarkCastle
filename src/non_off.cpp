@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: non_off.cpp,v 1.41 2006/07/10 00:01:16 apocalypse Exp $
+| $Id: non_off.cpp,v 1.42 2006/08/24 22:59:21 shane Exp $
 | non_off.C
 | Description:  Implementation of generic, non-offensive commands.
 */
@@ -33,9 +33,32 @@ extern "C"
 #include <returnvals.h>
 #include <comm.h>
 #include <utility.h>
+#include <fileinfo.h>
 
 extern CWorld world;
+extern struct index_data *obj_index;
  
+void log_sacrifice(CHAR_DATA *ch, OBJ_DATA *obj)
+{
+  FILE *fl;
+  long ct;
+  char *tmstr;
+
+  if(GET_OBJ_RNUM(obj) == NOWHERE) return;
+
+  if(!(fl = dc_fopen(SAC_LOG, "a"))) {
+    log("Could not open the sacrifice log file.", IMMORTAL, LOG_BUG);
+    return;
+  }
+
+  ct = time(0);
+  tmstr = asctime(localtime(&ct));
+  *(tmstr + strlen(tmstr) - 1) = '\0';
+
+  fprintf(fl, "%s :: %s just sacrificed %s [obj num: %d]\n", tmstr, GET_NAME(ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj));
+
+  dc_fclose(fl);
+}
 
 int do_tap(struct char_data *ch, char *argument, int cmd)
 {
@@ -100,6 +123,7 @@ int do_tap(struct char_data *ch, char *argument, int cmd)
   act("$n sacrifices $p to $s god.", ch, obj, 0, TO_ROOM , 0);
   act("You get one gold coin for your sacrifice.", ch, obj, 0, TO_CHAR , 0);
   GET_GOLD(ch) += 1;
+  log_sacrifice(ch, obj);
   extract_obj(obj);
   return eSUCCESS;
 }

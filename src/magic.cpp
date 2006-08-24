@@ -4153,7 +4153,7 @@ int spell_refresh(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data
   dam = MAX(dam, 20);
 
   if ((dam + GET_MOVE(victim)) > move_limit(victim))
-    dam -= move_limit(victim) - GET_MOVE(victim);
+    dam = move_limit(victim) - GET_MOVE(victim);
 
   GET_MOVE(victim) += dam;
 

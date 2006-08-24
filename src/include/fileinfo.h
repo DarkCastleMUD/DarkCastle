@@ -1,7 +1,7 @@
 #ifndef FILEINFO_H_
 #define FILEINFO_H_
 /*
-| $Id: fileinfo.h,v 1.18 2006/07/07 22:17:02 shane Exp $
+| $Id: fileinfo.h,v 1.19 2006/08/24 22:59:40 shane Exp $
 | fileinfo.h
 | Description:  Contains information for loading files, ie "../lib", etc..
 */
@@ -80,6 +80,7 @@
 #define CHAOS_LOG           "../log/chaos.log"
 #define CLAN_LOG            "../log/clan.log" 
 #define HMM_LOG            "../log/give.log" 
+#define SAC_LOG		    "../log/sacrifice.log"
 #else
 #define HMM_LOG            "give.log" 
 #define BUG_FILE            "bug.log"
@@ -90,6 +91,7 @@
 #define WORLD_LOG           "world.log"
 #define CHAOS_LOG           "chaos.log"
 #define CLAN_LOG            "clan.log" 
+#define SAC_LOG 	    "sacrifice.log"
 #endif
 #define  WORLD_INDEX_FILE  "worldindex"
 #define  OBJECT_INDEX_FILE "objectindex"
@@ -106,5 +108,4 @@
 #define VAULT_INDEX_FILE_TMP "../vaults/vaultindex.tmp"
 
 #define HINTS_FILE           "playerhints.txt"
-
 #endif // FILEINFO_H_

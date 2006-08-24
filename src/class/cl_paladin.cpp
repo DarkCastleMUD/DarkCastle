@@ -97,7 +97,7 @@ int do_harmtouch(struct char_data *ch, char *argument, int cmd)
         if(has_skill(ch,SKILL_HARM_TOUCH) > 30 && number(1, 3) == 1) {
            char dammsg[MAX_STRING_LENGTH];
            int amount = GET_LEVEL(ch) * 10;
-           if(amount + GET_HIT(ch) > GET_MAX_HIT(ch)) amount -= GET_MAX_HIT(ch) - GET_HIT(ch);
+           if(amount + GET_HIT(ch) > GET_MAX_HIT(ch)) amount = GET_MAX_HIT(ch) - GET_HIT(ch);
            sprintf(dammsg, "$B%d$R", amount);
            send_damage("Your god basks in your worship of pain and infuses you with | life.", ch, 0, victim, dammsg, "You god basks in your worship of pain and infuses you with life.", TO_CHAR);
            GET_HIT(ch) += amount;
@@ -179,7 +179,7 @@ int do_layhands(struct char_data *ch, char *argument, int cmd)
      char dammsg[MAX_STRING_LENGTH];
      int amount = 500 + (has_skill(ch, SKILL_LAY_HANDS)*10);
      if(amount + GET_HIT(victim) > GET_MAX_HIT(victim))
-       amount -= GET_MAX_HIT(victim) - GET_HIT(victim);
+       amount = GET_MAX_HIT(victim) - GET_HIT(victim);
      GET_HIT(victim) += amount;
      sprintf(dammsg, "$B%d$R", amount);
      send_damage("Praying fervently, you lay hands as life force granted by your god streams from your body healing $N for | health.",
