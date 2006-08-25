@@ -14,7 +14,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.h,v 1.86 2006/07/16 10:44:09 shane Exp $ */
+/* $Id: spells.h,v 1.87 2006/08/25 20:18:29 shane Exp $ */
 #include <structs.h> // ubyte, int16
 
 #define MAX_BUF_LENGTH               240
@@ -213,7 +213,8 @@ void check_maxes(CHAR_DATA *ch);
 #define SPELL_GHOSTWALK		    159
 #define SPELL_MEND_GOLEM            160
 #define SPELL_CLARITY               161
-#define MAX_SPL_LIST                161
+#define SPELL_DIVINE_INTER	    162
+#define MAX_SPL_LIST                162
 
 // if you add a spell, make sure you update "spells[]" in spells.C
 
@@ -477,6 +478,7 @@ void check_maxes(CHAR_DATA *ch);
 // NOTE 'spell' wear off timers are here.  Reserved messages 4000-4999
 #define SPELL_HOLY_AURA_TIMER        4000
 #define SPELL_NAT_SELECT_TIMER       4001
+#define SPELL_DIV_INT_TIMER	     4002
 
 
 

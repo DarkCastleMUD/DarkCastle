@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.119 2006/08/22 05:32:43 jhhudso Exp $ */
+/* $Id: info.cpp,v 1.120 2006/08/25 20:18:18 shane Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -1434,6 +1434,9 @@ int do_score(struct char_data *ch, char *argument, int cmd)
            case SPELL_NAT_SELECT_TIMER:
              aff_name = "natural select timer";
              break;
+           case SPELL_DIV_INT_TIMER:
+             aff_name = "divine intervention timer";
+             break;
            case SKILL_NAT_SELECT:
              aff_name = "natural selection";
              modifyOutput = TRUE;
@@ -1443,7 +1446,7 @@ int do_score(struct char_data *ch, char *argument, int cmd)
          if(!aff_name) // not one we want displayed
            continue;
 
-         sprintf(buf, "|%c| Affected by %-22s %s Modifier %-16s  |%c|\n\r",						 
+         sprintf(buf, "|%c| Affected by %-25s %s Modifier %-13s  |%c|\n\r",						 
                scratch, aff_name,
                ((IS_AFFECTED(ch, AFF_DETECT_MAGIC) && aff->duration < 3) ? 
                           "$2(fading)$7" : "        "),modifyOutput?

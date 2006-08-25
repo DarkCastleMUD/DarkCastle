@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.207 2006/08/18 01:49:36 shane Exp $ */
+/* $Id: const.cpp,v 1.208 2006/08/25 20:18:18 shane Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -281,7 +281,8 @@ char *spell_wear_off_msg[] =
   "!UNUSED!",
   "!UNUSED!",
   "!UNUSED!", // 160
-  "You feel dumber."
+  "You feel dumber.",
+  "The divine powers have left you."
 };
 
 
@@ -1560,6 +1561,7 @@ struct class_skill_defines c_skills[] = { // cleric skills
 {    "group recall",         SPELL_GROUP_RECALL,      47,     98,     {DEX,STR} },
 {    "heal spray",           SPELL_HEAL_SPRAY,        48,     98,     {WIS,CON} },
 {    "group sanctuary",      SPELL_GROUP_SANC,        49,     98,     {STR,WIS} },
+{    "divine intervention",  SPELL_DIVINE_INTER,      50,     98,     {WIS,CON} },
 {    "\n",                         0,                         1,      0,      {0,0} }  
 };
 

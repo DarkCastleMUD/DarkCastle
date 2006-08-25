@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.97 2006/07/16 10:43:54 shane Exp $
+| $Id: guild.cpp,v 1.98 2006/08/25 20:18:18 shane Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -454,6 +454,7 @@ int skills_guild(struct char_data *ch, char *arg, struct char_data *owner)
   switch(skillnumber)
   {
       case SPELL_VAMPIRIC_AURA:
+      case SPELL_DIVINE_INTER:
       case SKILL_BULLRUSH:
       case SPELL_HOLY_AURA:
       case SKILL_SPELLCRAFT:

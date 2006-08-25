@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.110 2006/08/17 22:24:03 apocalypse Exp $ */
+/* $Id: mob_proc.cpp,v 1.111 2006/08/25 20:18:18 shane Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -355,7 +355,10 @@ void damage_all_players_in_room(struct char_data *ch, int damage)
       if(GET_LEVEL(vict) >= IMMORTAL)
         continue;
 
-      GET_HIT(vict) -= damage; // Note -damage will HEAL the player
+      if(affected_by_spell(vict, SPELL_DIVINE_INTER) && damage > affected_by_spell(vict, SPELL_DIVINE_INTER)->modifier)
+         GET_HIT(vict) -= affected_by_spell(vict, SPELL_DIVINE_INTER)->modifier;
+      else
+         GET_HIT(vict) -= damage; // Note -damage will HEAL the player
       update_pos(vict);
       inform_victim(ch, vict, damage);
       if(GET_HIT(vict) < 1)

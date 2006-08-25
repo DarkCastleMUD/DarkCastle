@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.369 2006/08/22 23:37:45 dcastle Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.370 2006/08/25 20:18:18 shane Exp $ */
 
 extern "C"
 {
@@ -337,7 +337,9 @@ void perform_violence(void)
       else if (af->type == SPELL_ATTRITION)
       {
          send_to_char("Your body aches at the effort of combat.\r\n", ch);
-         GET_HIT(ch) -= 25;
+         if(affected_by_spell(ch, SPELL_DIVINE_INTER))
+            GET_HIT(ch) -= affected_by_spell(ch, SPELL_DIVINE_INTER)->modifier;
+         else GET_HIT(ch) -= 25;
          GET_HIT(ch) = MAX(1, GET_HIT(ch));  // doesn't kill only hurts
       }
       else if (af->type != SPELL_PARALYZE || !someone_fighting(ch))
@@ -798,6 +800,8 @@ int do_lightning_shield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
       dam /= 2;
     if (affected_by_spell(ch, SPELL_HOLY_AURA) && affected_by_spell(ch, SPELL_HOLY_AURA)->modifier == 25)
 	dam /= 2;
+    if(affected_by_spell(ch, SPELL_DIVINE_INTER) && dam > affected_by_spell(ch, SPELL_DIVINE_INTER)->modifier)
+      dam = affected_by_spell(ch, SPELL_DIVINE_INTER)->modifier;
   }
       
 //  dam /= 5;
@@ -836,7 +840,6 @@ int do_vampiric_aura(CHAR_DATA *ch, CHAR_DATA *vict)
   }
   
   if(GET_POS(vict) == POSITION_DEAD)            return eFAILURE;
-//  if(!IS_NPC(ch) && GET_LEVEL(ch) >= IMMORTAL)  return eFAILURE;
 
   struct affected_type * af;
 
@@ -847,7 +850,6 @@ int do_vampiric_aura(CHAR_DATA *ch, CHAR_DATA *vict)
   if( number(0, 101) < ( (af->modifier)/10 ) )
   {
     int level = MAX(1, af->modifier/6);
-//    skill_increase_check(vict, SPELL_VAMPIRIC_AURA, af->modifier, SKILL_INCREASE_MEDIUM);
     int retval = spell_vampiric_touch(level, vict, ch, 0, af->modifier);
     retval = SWAP_CH_VICT( retval );
     return retval;
@@ -902,7 +904,8 @@ int do_fireshield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
       dam /= 2;
     if (affected_by_spell(ch, SPELL_HOLY_AURA) && affected_by_spell(ch, SPELL_HOLY_AURA)->modifier == 25)
 	dam /= 2;
-
+    if(affected_by_spell(ch, SPELL_DIVINE_INTER) && dam > affected_by_spell(ch, SPELL_DIVINE_INTER)->modifier)
+      dam = affected_by_spell(ch, SPELL_DIVINE_INTER)->modifier;
   }
     
   GET_HIT(ch) -= dam;
@@ -965,6 +968,8 @@ int do_acidshield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
       dam /= 2;
     if (affected_by_spell(ch, SPELL_HOLY_AURA) && affected_by_spell(ch, SPELL_HOLY_AURA)->modifier == 25)
 	dam /= 2;
+    if(affected_by_spell(ch, SPELL_DIVINE_INTER) && dam > affected_by_spell(ch, SPELL_DIVINE_INTER)->modifier)
+      dam = affected_by_spell(ch, SPELL_DIVINE_INTER)->modifier;
   }
     
   GET_HIT(ch) -= dam;
@@ -2079,6 +2084,9 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
   if (dam < 0)
     dam = 0;
 
+  if(affected_by_spell(victim, SPELL_DIVINE_INTER) && dam > affected_by_spell(victim, SPELL_DIVINE_INTER)->modifier)
+    dam = affected_by_spell(victim, SPELL_DIVINE_INTER)->modifier;
+
   // Check for parry, mob disarm, and trip. Print a suitable damage message. 
   if ((attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING) || (IS_NPC(ch) && 
 	mob_index[ch->mobdata->nr].virt > 87 && mob_index[ch->mobdata->nr].virt < 92))
@@ -2195,6 +2203,8 @@ int noncombat_damage(CHAR_DATA * ch, int dam, char *char_death_msg,
      dam /= 2;
   if(affected_by_spell(ch, SPELL_HOLY_AURA) && affected_by_spell(ch, SPELL_HOLY_AURA)->modifier == 25 && type == KILL_POISON)
      dam /= 2;
+  if(affected_by_spell(ch, SPELL_DIVINE_INTER) && dam > affected_by_spell(ch, SPELL_DIVINE_INTER)->modifier)
+    dam = affected_by_spell(ch, SPELL_DIVINE_INTER)->modifier;
 
   GET_HIT(ch) -= dam;
   update_pos(ch);
@@ -4645,6 +4655,8 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim, int type)
        af->type != SKILL_QUIVERING_PALM &&
        af->type != SKILL_INNATE_TIMER &&
        af->type != SPELL_HOLY_AURA_TIMER &&
+       af->type != SPELL_NAT_SELECT_TIMER &&
+       af->type != SPELL_DIV_INT_TIMER &&
        af->type != SKILL_CRAZED_ASSAULT &&
        af->type != SKILL_FOCUSED_REPELANCE && !(
 	af->type >= 1100 && af->type <= 1300))

@@ -5,7 +5,7 @@
  *                                                                           *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-/* $Id: magic.h,v 1.27 2006/05/31 21:33:42 shane Exp $ */
+/* $Id: magic.h,v 1.28 2006/08/25 20:18:28 shane Exp $ */
 #ifndef MAGIC_H_
 #define MAGIC_H_
 
@@ -54,6 +54,8 @@ int cast_burning_hands(ubyte level, CHAR_DATA * ch, char *arg, int type,
 int cast_oaken_fortitude(ubyte level, CHAR_DATA * ch, char *arg, int type,
    CHAR_DATA * victim, struct obj_data * tar_obj, int skill);
 int cast_clarity(ubyte level, CHAR_DATA * ch, char *arg, int type,
+   CHAR_DATA * victim, struct obj_data * tar_obj, int skill);
+int cast_divine_intervention(ubyte level, CHAR_DATA * ch, char *arg, int type,
    CHAR_DATA * victim, struct obj_data * tar_obj, int skill);
 
 

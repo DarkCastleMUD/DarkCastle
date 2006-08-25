@@ -435,6 +435,8 @@ int drainingstaff(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
         if(dam >= GET_HIT(vict)) {
             dam = GET_HIT(vict) - 1;
         }
+      if(affected_by_spell(vict, SPELL_DIVINE_FURY) && dam > affected_by_spell(vict, SPELL_DIVINE_FURY)->modifier)
+         dam = affected_by_spell(vict, SPELL_DIVINE_FURY)->modifier;
         GET_HIT(vict) -= dam;
         GET_MANA(ch) += dam;
     } else { // We have a character... drain mana 
@@ -3225,6 +3227,8 @@ int godload_jaelgreth(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
    CHAR_DATA *victim = ch->fighting;
    if (GET_HIT(victim) < 100) dam = GET_HIT(victim)+1;
    else dam = 100;
+   if(affected_by_spell(victim, SPELL_DIVINE_INTER) && dam > affected_by_spell(victim, SPELL_DIVINE_INTER)->modifier)
+      dam = affected_by_spell(victim, SPELL_DIVINE_INTER)->modifier;
    GET_HIT(victim) -= dam;
    GET_HIT(ch) += dam;
    if (GET_HIT(ch) > GET_MAX_HIT(ch)) GET_HIT(ch) = GET_MAX_HIT(ch);
@@ -3282,6 +3286,8 @@ int godload_foecrusher(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
    CHAR_DATA *victim = ch->fighting;
    dam = number(50,dam);
 
+   if(affected_by_spell(victim, SPELL_DIVINE_INTER) && dam > affected_by_spell(victim, SPELL_DIVINE_INTER)->modifier)
+      dam = affected_by_spell(victim, SPELL_DIVINE_INTER)->modifier;
    GET_HIT(victim) -= dam;
 
    update_pos(victim);
