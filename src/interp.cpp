@@ -16,7 +16,7 @@
 /* 12/08/2003   Onager   Added chop_half() to work like half_chop() but    */
 /*                       chopping off the last word.                       */
 /***************************************************************************/
-/* $Id: interp.cpp,v 1.103 2006/08/18 03:23:02 apocalypse Exp $ */
+/* $Id: interp.cpp,v 1.104 2006/08/26 06:22:09 jhhudso Exp $ */
 
 extern "C"
 {
@@ -357,8 +357,8 @@ struct command_info cmd_info[] =
     { "wizlock",	do_wizlock,	POSITION_DEAD, IMP, 9, 0, 1 },
     { "processes",	do_processes,	POSITION_DEAD, 108, 9, 0, 1 },
     { "bestow",		do_bestow,	POSITION_DEAD, IMP, 9, 0, 1 },
-    { "oclone",		do_oclone,	POSITION_DEAD, GIFTED_COMMAND, 9, 0, 1 },
-    { "mclone",		do_mclone,	POSITION_DEAD, GIFTED_COMMAND, 9, 0, 1 },
+    { "oclone",		do_oclone,	POSITION_DEAD, 103, 9, 0, 1 },
+    { "mclone",		do_mclone,	POSITION_DEAD, 103, 9, 0, 1 },
     { "revoke",		do_revoke,	POSITION_DEAD, IMP, 9, 0, 1 },
     { "chpwd",		do_chpwd,	POSITION_DEAD, IMP, 9, 0, 1 },
     { "advance",	do_advance,	POSITION_DEAD, IMP, 9, 0, 1 },
@@ -370,7 +370,7 @@ struct command_info cmd_info[] =
     { "listproc",	do_listproc,	POSITION_DEAD, OVERSEER, 9, 0, 1 },
     { "zap",		do_zap,		POSITION_DEAD, 108, 9, 0, 1 },
     { "slay",		do_kill,	POSITION_DEAD, OVERSEER, 9, 0, 1 },
-    { "rename",		do_rename_char,	POSITION_DEAD, 108, 9, 0, 1 },
+    { "rename",		do_rename_char,	POSITION_DEAD, GIFTED_COMMAND, 9, 0, 1 },
     { "archive",	do_archive,	POSITION_DEAD, 108, 9, 0, 1 },
     { "unarchive",	do_unarchive,	POSITION_DEAD, 108, 9, 0, 1 },
     { "stealth",	do_stealth,	POSITION_DEAD, OVERSEER, 9, 0, 1 },

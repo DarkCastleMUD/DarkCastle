@@ -1961,6 +1961,13 @@ int do_oclone(struct char_data *ch, char *argument, int cmd)
     send_to_char("Source vnum does not exist.\r\n",ch);
     return eFAILURE;
   }
+
+  if(!can_modify_object(ch, v1)) {
+    send_to_char("You are unable to work creation outside of your range.\n\r",
+		 ch);
+    return eFAILURE;
+  }
+
   if (r1 < 0) {
     char buf[30];
     sprintf(buf, "new %d", v1);
@@ -2000,6 +2007,13 @@ int do_mclone(struct char_data *ch, char *argument, int cmd)
     send_to_char("Source vnum does not exist.\r\n",ch);
     return eFAILURE;
   }
+
+  if(!can_modify_mobile(ch, vdst)) {
+    send_to_char("You are unable to work creation outside of your range.\n\r",
+		 ch);
+    return eFAILURE;
+  }
+
   if (dst < 0) {
     char buf[30];
     sprintf(buf, "new %d", vdst);
