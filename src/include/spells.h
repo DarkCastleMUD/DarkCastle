@@ -14,7 +14,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.h,v 1.87 2006/08/25 20:18:29 shane Exp $ */
+/* $Id: spells.h,v 1.88 2006/08/26 10:02:04 urizen Exp $ */
 #include <structs.h> // ubyte, int16
 
 #define MAX_BUF_LENGTH               240
@@ -414,6 +414,7 @@ void check_maxes(CHAR_DATA *ch);
 #define COMMAND_ADDNEWS		     633
 #define COMMAND_PRIZE		     634
 #define COMMAND_QEDIT                635
+#define COMMAND_RENAME		     636
 // make sure up you update bestowable_god_commands_type bestowable_god_commands[]
 // if you modify this command list any
 
