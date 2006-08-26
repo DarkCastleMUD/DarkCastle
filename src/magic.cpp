@@ -9494,7 +9494,7 @@ int cast_eyes_of_the_owl(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_D
 	af.location  = APPLY_WIS;
 	af.bitvector = AFF_INFRARED;
 	affect_join(victim, &af, FALSE, FALSE);
-
+        redo_mana(victim);
   send_to_char("You feel your vision become much more acute.\n\r", victim);
   return eSUCCESS;
 }
@@ -11824,7 +11824,7 @@ int spell_divine_intervention(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, OBJ
   if(ch != victim) affect_to_char(victim, &af);
 
   af.type = SPELL_DIVINE_INTER;
-  af.duration = 6 + skill / 6;
+  af.duration = 6 + skill / 10;
   af.modifier = 10 - skill / 10;
   affect_to_char(victim, &af, PULSE_VIOLENCE);
 
