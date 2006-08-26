@@ -242,8 +242,9 @@ void assign_non_combat_procs() {
     assign_one_mob_non(2307,  clan_guard);
     assign_one_mob_non(2308,  clan_guard);
     assign_one_mob_non(2310,  clan_guard);
-    assign_one_mob_non(2399,  clan_guard);
     assign_one_mob_non(2313,  clan_guard);
+    assign_one_mob_non(2315,  clan_guard);
+    assign_one_mob_non(2399,  clan_guard);
     assign_one_mob_non(9511,  bodyguard);
     assign_one_mob_non(9531,  bodyguard);
     assign_one_mob_non(9532,  bodyguard);
