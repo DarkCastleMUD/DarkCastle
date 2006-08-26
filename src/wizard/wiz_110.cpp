@@ -341,58 +341,55 @@ int do_rename_char(struct char_data *ch, char *arg, int cmd)
 {
   struct char_data *victim;
   struct obj_data *obj;
-  char name[160], targetname[160], oldname[160];
+  char name[160];
   char strsave[MAX_INPUT_LENGTH];
-  char * c;
+  char oldname[MAX_INPUT_LENGTH];
+  char newname[MAX_INPUT_LENGTH];
+
   FILE * fl;
   int iWear;
 
-  half_chop(arg, name, targetname);
+  arg = one_argument(arg, oldname);
+  arg = one_argument(arg, newname);
 
-  if(!(*name) || !(*targetname)) {
-    send_to_char("Usage:  rename <oldname> <newname>\n\r", ch);
+  fprintf(stderr, "[%s] [%s]\n", oldname, newname);
+
+  if(!(*oldname) || !(*newname)) {
+    send_to_char("Usage: rename <oldname> <newname>\n\r", ch);
     return eFAILURE;
   }
-  strcpy(oldname, name);
 
-  if(!(victim = get_char_vis(ch, name))) {
-    sprintf(name, "%s is not in the game.\r\n", name);
-    send_to_char(name, ch);
+  oldname[0] = UPPER(oldname[0]);
+  newname[0] = UPPER(newname[0]);
+
+  if(!(victim = get_pc(oldname))) {
+    csendf(ch, "%s is not in the game.\r\n", oldname);
     return eFAILURE;
   }
 
   if(GET_LEVEL(ch) <= GET_LEVEL(victim)) {
     send_to_char("That might just piss them off.\r\n", ch);
-    sprintf(name, "%s just tried to rename you.\r\n", GET_NAME(ch));
-    send_to_char(name, victim);
+    csendf(victim, "%s just tried to rename you.\r\n", GET_NAME(ch));
     return eFAILURE;
   }
 
-  c = targetname;
-  *c = UPPER(*c);
-  c++;
-  while(*c) {   
-    *c = LOWER(*c);
-    c++;
-  }
-
   // +1 cause you can actually have 13 char names
-  if(strlen(targetname) > (MAX_NAME_LENGTH+1))
+  if(strlen(newname) > (MAX_NAME_LENGTH+1))
   {
     send_to_char("New name too long.\r\n", ch);
     return eFAILURE;
   }
 
 //extern short bport;
-  if (!bport)
-  sprintf(strsave, "%s/%c/%s", SAVE_DIR, UPPER(targetname[0]), targetname);  
-  else
-  sprintf(strsave, "%s/%c/%s", BSAVE_DIR, UPPER(targetname[0]), targetname);  
-  if((fl = fopen(strsave, "r")))
-  {
+  if (!bport) {
+    sprintf(strsave, "%s/%c/%s", SAVE_DIR, newname[0], newname);  
+  } else {
+    sprintf(strsave, "%s/%c/%s", BSAVE_DIR, newname[0], newname);  
+  }
+
+  if((fl = fopen(strsave, "r"))) {
     fclose(fl);
-    sprintf(name, "The name %s is already in use.\r\n", targetname);
-    send_to_char(name, ch);
+    csendf(ch, "The name %s is already in use.\r\n", newname);
     return eFAILURE;
   }
 
@@ -401,15 +398,11 @@ int do_rename_char(struct char_data *ch, char *arg, int cmd)
     if (victim->equipment[iWear] && 
         IS_SET(victim->equipment[iWear]->obj_flags.extra_flags, ITEM_SPECIAL))
     {
-//      send_to_char("Dammit Valk...this one is wearing GL.\r\n", ch);
-	char tmp[256];
+      char tmp[256];
       sprintf(tmp,"%s",victim->equipment[iWear]->name);
       tmp[strlen(tmp)-strlen(GET_NAME(victim))-1] = '\0';
-      sprintf(tmp,"%s %s",tmp, targetname);
+      sprintf(tmp,"%s %s",tmp, newname);
       victim->equipment[iWear]->name = str_hsh(tmp);
-	//Not freeing, not sure whether name's hsh'd or dup'd, don't
-	// wanna risk. minor leak.
-//      return eFAILURE;
     }
   }
  
@@ -418,14 +411,11 @@ int do_rename_char(struct char_data *ch, char *arg, int cmd)
   {
     if(IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL))
     {
-//      send_to_char("Dammit Valk...this one is carrying GL.\r\n", ch);
-	char tmp[256];
+      char tmp[256];
       sprintf(tmp,"%s",obj->name);
       tmp[strlen(tmp)-strlen(GET_NAME(victim))-1] = '\0';
-      sprintf(tmp,"%s %s",tmp, targetname);
+      sprintf(tmp,"%s %s",tmp, newname);
       obj->name = str_hsh(tmp);
-
-  //    return eFAILURE;
     }
 
     obj = obj->next_content;
@@ -436,45 +426,47 @@ int do_rename_char(struct char_data *ch, char *arg, int cmd)
   do_fsave(ch, GET_NAME(victim), 9);
 
   // Copy the pfile
-if (!bport)
-  sprintf(name, "cp %s/%c/%s %s/%c/%s", SAVE_DIR, victim->name[0], GET_NAME(victim),
-                                        SAVE_DIR, targetname[0], targetname);
-else
-  sprintf(name, "cp %s/%c/%s %s/%c/%s", BSAVE_DIR, victim->name[0], GET_NAME(victim),
-                                        BSAVE_DIR, targetname[0], targetname);
+  if (!bport) {
+    sprintf(name, "cp %s/%c/%s %s/%c/%s", SAVE_DIR, victim->name[0],
+	    GET_NAME(victim), SAVE_DIR, newname[0], newname);
+  } else {
+    sprintf(name, "cp %s/%c/%s %s/%c/%s", BSAVE_DIR, victim->name[0],
+	    GET_NAME(victim), BSAVE_DIR, newname[0], newname);
+  }
 
   system(name);
+
   // Golems
-  sprintf(name, "cp %s/%c/%s.1 %s/%c/%s.1", FAMILIAR_DIR, victim->name[0], GET_NAME(victim),
-					   FAMILIAR_DIR, targetname[0], targetname);
+  sprintf(name, "cp %s/%c/%s.1 %s/%c/%s.1", FAMILIAR_DIR, victim->name[0],
+	  GET_NAME(victim), FAMILIAR_DIR, newname[0], newname);
   system(name);
+
   // Golems
-  sprintf(name, "cp %s/%c/%s.0 %s/%c/%s.0", FAMILIAR_DIR, victim->name[0], GET_NAME(victim),
-                                           FAMILIAR_DIR, targetname[0], targetname);
+  sprintf(name, "cp %s/%c/%s.0 %s/%c/%s.0", FAMILIAR_DIR, victim->name[0],
+	  GET_NAME(victim), FAMILIAR_DIR, newname[0], newname);
   system(name);
 
-
-  sprintf(name, "%s renamed to %s.", GET_NAME(victim), targetname);
+  sprintf(name, "%s renamed to %s.", GET_NAME(victim), newname);
   log(name, GET_LEVEL(ch), LOG_GOD);
 
   // Get rid of the existing one
   do_zap(ch, GET_NAME(victim), 9);
 
   // load the new guy
-  do_linkload(ch, targetname, 9);
+  do_linkload(ch, newname, 9);
 
-  if(!(victim = get_char_vis(ch, targetname)))
+  if(!(victim = get_pc(newname)))
   {
     send_to_char("Major problem...coudn't find target after pfile copied.  Notify Urizen immediatly.\r\n", ch);
     return eFAILURE;
   }
   do_name(victim, " %", 9);
-  send_to_char("Character now name %'d.\r\n", ch);
+
   extern void rename_vault_owner(char *arg1, char *arg2);
   extern void rename_leaderboard(char *, char *);
 
-  rename_vault_owner(oldname, targetname);
-  rename_leaderboard(oldname, targetname);
+  rename_vault_owner(oldname, newname);
+  rename_leaderboard(oldname, newname);
 
   return eSUCCESS;
 }
