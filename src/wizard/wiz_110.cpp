@@ -352,6 +352,11 @@ int do_rename_char(struct char_data *ch, char *arg, int cmd)
   arg = one_argument(arg, oldname);
   arg = one_argument(arg, newname);
 
+  if (!has_skill(ch, COMMAND_RENAME))
+  {
+    send_to_char("Huh?\r\n",ch);
+    return eFAILURE;
+  }
   fprintf(stderr, "[%s] [%s]\n", oldname, newname);
 
   if(!(*oldname) || !(*newname)) {
