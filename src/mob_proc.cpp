@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.112 2006/08/26 19:17:42 jhhudso Exp $ */
+/* $Id: mob_proc.cpp,v 1.113 2006/08/27 08:04:36 jhhudso Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -524,7 +524,7 @@ int sc_golem(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
       cast_bee_sting,
       cast_cure_critic
    };
-   if (!(owner = ch->master) || !has_skill(ch->master, SKILL_SPELLCRAFT) > 80)
+   if (!(owner = ch->master) || !(has_skill(ch->master,SKILL_SPELLCRAFT) > 80))
       return eFAILURE;
    int i = number(0,4);
    SPELL_FUN *func = iron?iron_list[i]:stone_list[i];
