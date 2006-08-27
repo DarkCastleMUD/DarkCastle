@@ -1997,7 +1997,7 @@ void reel_spin(void *arg1, void *arg2, void *arg3)
       else if((stop1 == 3 || stop1 == 9) && (stop2 == 0 || stop2 == 2 || stop2 == 4 || stop2 == 8 || stop2 == 14 || stop2 == 17)) payout = 5;
       else if(stop1 == 3 || stop1 == 9) payout = 2;
       else {
-         machine->jackpot += machine->cost * machine->bet * 5;
+         machine->jackpot += machine->cost * machine->bet * 4;
          if(machine->linkedto) {
             update_linked_slots(machine);
          } else {
