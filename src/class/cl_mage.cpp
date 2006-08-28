@@ -20,7 +20,7 @@ int spellcraft(struct char_data *ch, int spell)
 {
   int a = has_skill(ch, SKILL_SPELLCRAFT);
   if (!a) return FALSE;
-  if (has_skill(ch, spell) < 70) return FALSE;
+  if (has_skill(ch, spell) < 71) return FALSE;
   if (spell == SPELL_MAGIC_MISSILE)
   {
     if (a < 11) skill_increase_check(ch, SKILL_SPELLCRAFT, a, SKILL_INCREASE_HARD);

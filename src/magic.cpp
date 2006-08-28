@@ -197,6 +197,8 @@ int spell_chill_touch(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
   int save;
   int retval = damage(ch, victim, dam, TYPE_COLD, SPELL_CHILL_TOUCH, 0);
 
+  bool hasSpellcraft = spellcraft(ch, SPELL_CHILL_TOUCH);
+
   if(SOMEONE_DIED(retval)) return retval;
   if(IS_SET(retval,eEXTRA_VAL2)) victim = ch;
   if(IS_SET(retval,eEXTRA_VALUE)) return retval;
@@ -212,8 +214,8 @@ int spell_chill_touch(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
     affect_join(victim, &af, TRUE, FALSE);
 
 	/* Spellcraft Effect */
-    if (spellcraft(ch, SPELL_CHILL_TOUCH))
-	 {
+    if (hasSpellcraft)
+         {
 	  af.modifier = - skill/18;
 	  af.location = APPLY_DEX;
 	  affect_join(victim, &af, TRUE, FALSE);
@@ -2390,7 +2392,7 @@ int spell_invisibility(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
 
 /* LOCATE OBJECT */
 
-int spell_locate_object(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
+int spell_locate_object(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
   struct obj_data *i;
   char name[256];
@@ -2399,7 +2401,10 @@ int spell_locate_object(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct ob
   int total;
 
   assert(ch);
-  strcpy(name, fname(obj->name));
+  if (!arg)
+    return eFAILURE;
+
+  one_argument(arg, name);
 
   total = j = (int) (skill / 1.5);
 
@@ -2420,11 +2425,15 @@ int spell_locate_object(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct ob
         sprintf(buf,"%s is in %s.\n\r",i->short_description, i->in_obj->short_description);
         send_to_char(buf,ch);
 	j--;
-      } else if (i->in_room != NOWHERE || i->equipped_by != NULL) {
-        sprintf(buf,"%s is in %s.\n\r",i->short_description,
-           (i->in_room == NOWHERE ? "use in an unknown location" : world[i->in_room].name));
-        send_to_char(buf,ch);
-        j--;
+      } else if (i->in_room != NOWHERE) {
+        sprintf(buf, "%s is in %s.\n\r", i->short_description,
+		world[i->in_room].name);
+        send_to_char(buf, ch);
+	j--;
+      } else if (i->equipped_by != NULL && (IS_NPC(i->equipped_by) || (i->equipped_by->desc && STATE(i->equipped_by->desc) == CON_PLAYING))) {
+        sprintf(buf, "%s is in use in an unknown location.\n\r", i->short_description);
+        send_to_char(buf, ch);
+	j--;
       }
     }
   }
@@ -7406,14 +7415,14 @@ int cast_locate_object( ubyte level, CHAR_DATA *ch, char *arg, int type,
 {
   switch (type) {
   case SPELL_TYPE_SPELL:
-	 return spell_locate_object(level, ch, 0, tar_obj, skill);
+	 return spell_locate_object(level, ch, arg, 0, 0, skill);
 	 break;
   case SPELL_TYPE_SCROLL:
 	 if (tar_ch) return eFAILURE;
-	 return spell_locate_object(level, ch, 0, tar_obj, skill);
+	 return spell_locate_object(level, ch, arg, 0, 0, skill);
 	 break;
-	 default :
-		log("Serious screw-up in locate object!", ANGEL, LOG_BUG);
+  default:
+         log("Serious screw-up in locate object!", ANGEL, LOG_BUG);
 	 break;
   }
   return eFAILURE;

@@ -5,7 +5,7 @@
  *                                                                           *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-/* $Id: magic.h,v 1.28 2006/08/25 20:18:28 shane Exp $ */
+/* $Id: magic.h,v 1.29 2006/08/28 07:45:44 jhhudso Exp $ */
 #ifndef MAGIC_H_
 #define MAGIC_H_
 
@@ -178,7 +178,7 @@ int spell_full_heal(ubyte level, CHAR_DATA * ch,
    CHAR_DATA * victim, struct obj_data * obj, int skill);
 int spell_invisibility(ubyte level, CHAR_DATA * ch,
    CHAR_DATA * victim, struct obj_data * obj, int skill);
-int spell_locate_object(ubyte level, CHAR_DATA * ch,
+int spell_locate_object(ubyte level, CHAR_DATA * ch, char *arg,
    CHAR_DATA * victim, struct obj_data * obj, int skill);
 int spell_poison(ubyte level, CHAR_DATA * ch,
    CHAR_DATA * victim, struct obj_data * obj, int skill);
