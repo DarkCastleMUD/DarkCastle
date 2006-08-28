@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.186 2006/08/25 20:18:18 shane Exp $ */
+/* $Id: spells.cpp,v 1.187 2006/08/28 05:43:57 jhhudso Exp $ */
 
 extern "C"
 {
@@ -1683,11 +1683,15 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
    	     send_to_char("That room is protected from this harmful magic.\r\n", ch);
 	     return eFAILURE;
 	   }
-	  if (!spellcraft(ch, SPELL_LIGHTNING_BOLT))
-	  {
-		send_to_char("You don't know how.\r\n",ch);
-		return eFAILURE;
+
+	   // can't use spellcraft(ch, SPELL_LIGHTNING_BOLT) here because it
+	   // will cause spellcraft to increase possibly
+	   if ((has_skill(ch, SPELL_LIGHTNING_BOLT) < 71) ||
+	       (has_skill(ch, SKILL_SPELLCRAFT) < 21)) {
+	     send_to_char("You don't know how.\r\n",ch);
+	     return eFAILURE;
            }
+
 	   oldroom = ch->in_room;
 	   char_from_room(ch);
 	   if (!char_to_room(ch, new_room)) {
@@ -1714,6 +1718,7 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
 	   }
 	   target_ok = TRUE;
 	 }
+	 spellcraft(ch, SPELL_LIGHTNING_BOLT);
       }
       if (!target_ok && !IS_SET(spell_info[spl].targets, TAR_IGNORE)) 
       {
