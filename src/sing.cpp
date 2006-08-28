@@ -1037,18 +1037,12 @@ int execute_song_healing_melody( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DAT
    char_data * master = NULL;
    follow_type * fvictim = NULL;
 
-   int specialization = skill / 100;
-   skill %= 100;
-
    heal = 3*(GET_LEVEL(ch)/5);
 
    int combat, non_combat;
    get_instrument_bonus(ch, combat, non_combat);
 
    heal += non_combat;
-
-   if(specialization > 0)
-     heal = (int)(heal * 1.5);
 
    if(ch->master && ISSET(ch->affected_by, AFF_GROUP))
       master = ch->master;
@@ -1062,14 +1056,14 @@ int execute_song_healing_melody( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DAT
          continue;
 
       send_to_char("You feel a little better.\r\n", fvictim->follower);
-      GET_HIT(fvictim->follower) += number(1, heal);
+      GET_HIT(fvictim->follower) += number(skill/4, heal);
       if(GET_HIT(fvictim->follower) > GET_MAX_HIT(fvictim->follower))
          GET_HIT(fvictim->follower) = GET_MAX_HIT(fvictim->follower);
    }
    if(ch->in_room == master->in_room && !IS_UNDEAD(master))
    {
       send_to_char("You feel a little better.\r\n", master);
-      GET_HIT(master) += number(1, heal);
+      GET_HIT(master) += number(skill/4, heal);
       if(GET_HIT(master) > GET_MAX_HIT(master))
          GET_HIT(master) = GET_MAX_HIT(master);
    }
@@ -1306,8 +1300,6 @@ int execute_song_soothing_remembrance( ubyte level, CHAR_DATA *ch, char *arg, CH
    int heal;
    char_data * master = NULL;
    follow_type * fvictim = NULL;
-   int specialization = skill / 100;
-   skill %= 100;
 
    heal = GET_LEVEL(ch)/5;
 
@@ -1315,9 +1307,6 @@ int execute_song_soothing_remembrance( ubyte level, CHAR_DATA *ch, char *arg, CH
    get_instrument_bonus(ch, combat, non_combat);
 
    heal += non_combat;
-
-   if(specialization > 0)
-      heal = (int) (heal * 1.5);
 
    if(ch->master && ch->master->in_room == ch->in_room && 
                     ISSET(ch->affected_by, AFF_GROUP))
@@ -1331,14 +1320,14 @@ int execute_song_soothing_remembrance( ubyte level, CHAR_DATA *ch, char *arg, CH
          continue;
 
       send_to_char("You feel soothed.\r\n", fvictim->follower);
-      GET_MANA(fvictim->follower) += number(1, heal);
+      GET_MANA(fvictim->follower) += number(skill/15 + 1, heal);
       if(GET_MANA(fvictim->follower) > GET_MAX_MANA(fvictim->follower))
          GET_MANA(fvictim->follower) = GET_MAX_MANA(fvictim->follower);
    }
    if(ch->in_room == master->in_room)
    {
       send_to_char("You feel soothed.\r\n", master);
-      GET_MANA(master) += number(1, heal);
+      GET_MANA(master) += number(skill/15 + 1, heal);
       if(GET_MANA(master) > GET_MAX_MANA(master))
          GET_MANA(master) = GET_MAX_MANA(master);
    }
