@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.49 2006/08/22 23:37:53 dcastle Exp $
+| $Id: cl_warrior.cpp,v 1.50 2006/08/28 20:09:48 shane Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -832,7 +832,7 @@ int handle_any_guard(char_data * ch)
    if(!guard) // my guard isn't here
       return FALSE;
 
-   if(skill_success(guard,ch,SKILL_GUARD)) {
+   if(ch->fighting && can_be_attacked(guard, ch->fighting) && skill_success(guard,ch,SKILL_GUARD)) {
       do_rescue(guard, GET_NAME(ch), 9);
       if (ch->fighting)
       return TRUE;
