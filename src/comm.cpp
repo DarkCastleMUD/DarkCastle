@@ -67,6 +67,9 @@
 #include <returnvals.h>
 #include <quest.h>
 
+#include <sstream>
+#include <iostream>
+using namespace std;
 
 #ifndef INVALID_SOCKET
 #define INVALID_SOCKET -1
@@ -204,6 +207,15 @@ void gettimeofday(struct timeval *t, struct timezone *dummy)
 
 int main(int argc, char **argv)
 {
+  // Make a copy of our executable so that in the event of a crash we have a
+  // known good copy to debug with.
+  stringstream cmd;
+  cmd << "cp " << argv[0] << " " << argv[0] << ".`pidof " << argv[0] << "`";
+  if (int retval = system(cmd.str().c_str()) != 0) {
+    cerr << "Unable to make backup of executable due to system error: "
+	 << retval << endl;
+  }
+
   char buf[512];
   int pos = 1;
   char dir[256];
