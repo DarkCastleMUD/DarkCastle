@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: who.cpp,v 1.27 2006/08/26 19:21:17 jhhudso Exp $
+| $Id: who.cpp,v 1.28 2006/08/28 13:29:46 jhhudso Exp $
 | who.C
 | Commands for who, maybe? :P
 */
@@ -441,9 +441,10 @@ int do_who(struct char_data *ch, char *argument, int cmd)
             i = d->original;
         else i = d->character;
         
-        if(IS_NPC(i))                                                           continue;
-        // This line used to be up top.  Moved it down here so you can't see invis possessing gods.  -pir
-        if(!CAN_SEE(ch, i) && strcmp(GET_NAME(ch), "Pirahna"))                  continue;
+        if(IS_NPC(i))
+	  continue;
+        if(!CAN_SEE(ch, i))
+	  continue;
 
         charmatchistrue = is_abbrev(charname, GET_NAME(i));
         if(charmatch && !charmatchistrue)                                       continue;
