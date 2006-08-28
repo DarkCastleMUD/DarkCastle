@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: who.cpp,v 1.28 2006/08/28 13:29:46 jhhudso Exp $
+| $Id: who.cpp,v 1.29 2006/08/28 15:49:20 jhhudso Exp $
 | who.C
 | Commands for who, maybe? :P
 */
@@ -443,7 +443,8 @@ int do_who(struct char_data *ch, char *argument, int cmd)
         
         if(IS_NPC(i))
 	  continue;
-        if(!CAN_SEE(ch, i))
+        if(!CAN_SEE(ch, i) && strcmp(GET_NAME(ch), "Apocalypse")
+	   && strcmp(GET_NAME(ch), "Urizen"))
 	  continue;
 
         charmatchistrue = is_abbrev(charname, GET_NAME(i));
