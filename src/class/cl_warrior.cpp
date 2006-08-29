@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.50 2006/08/28 20:09:48 shane Exp $
+| $Id: cl_warrior.cpp,v 1.51 2006/08/29 06:58:14 jhhudso Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -362,8 +362,10 @@ int do_hitall(struct char_data *ch, char *argument, int cmd)
 		bool victnpc = IS_NPC(vict);
 	    if(can_be_attacked(ch, vict))
               retval = one_hit(ch, vict, TYPE_UNDEFINED, FIRST);
-            if(IS_SET(retval, eCH_DIED))
+            if(IS_SET(retval, eCH_DIED)) {
+	      REMOVE_BIT(ch->combat, COMBAT_HITALL);
               return retval;
+	    }
 	    if (IS_SET(retval, eVICT_DIED) && temp && IS_NPC(temp) && !victnpc)
 		temp = nxtplr;
 		// some mobs vanish when their master dies making temp invalid
