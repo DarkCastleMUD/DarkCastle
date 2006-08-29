@@ -4328,17 +4328,17 @@ int spell_animate_dead(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
   }
 
   // set up descriptions and such
-
-  sprintf(buf, "%s %s", corpse->name, mob->name);
-  mob->name = str_hsh(buf);
+//all in the mob now, no need
+//  sprintf(buf, "%s %s", corpse->name, mob->name);
+//  mob->name = str_hsh(buf);
   
 //  mob->short_desc = str_hsh(corpse->short_description);
 
-  if (GET_ALIGNMENT(ch) < 0) 
-  {
-    sprintf(buf, "%s slowly staggers around.\n\r", corpse->short_description);
-    mob->long_desc = str_hsh(buf);
-  }
+//  if (GET_ALIGNMENT(ch) < 0) 
+  //{
+    //sprintf(buf, "%s slowly staggers around.\n\r", corpse->short_description);
+//    mob->long_desc = str_hsh(buf);
+  //}
 //  else
  // sprintf(buf, "%s hovers above the ground here.\r\n",corpse->short_description);
 
