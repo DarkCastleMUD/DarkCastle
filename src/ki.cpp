@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.53 2006/08/24 22:59:20 shane Exp $ */
+/* $Id: ki.cpp,v 1.54 2006/08/30 17:39:25 jhhudso Exp $ */
 
 extern "C"
 {
@@ -581,7 +581,7 @@ int ki_storm( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
   {
 	 temp = tmp_victim->next_in_room;
 	 if ( (ch->in_room == tmp_victim->in_room) && (ch != tmp_victim) &&
-		(!ARE_GROUPED(ch,tmp_victim))) 
+	      (!ARE_GROUPED(ch,tmp_victim)) && can_be_attacked(ch, tmp_victim)) 
          {
                   retval = damage(ch, tmp_victim, dam, TYPE_KI,
 		              KI_OFFSET+KI_STORM, 0);

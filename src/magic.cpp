@@ -752,7 +752,8 @@ int spell_earthquake(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 	 temp = tmp_victim->next;
 	 if ( (ch->in_room == tmp_victim->in_room) 
            && (ch != tmp_victim) 
-           && (!ARE_GROUPED(ch,tmp_victim))) 
+	   && (!ARE_GROUPED(ch,tmp_victim))
+	   && can_be_attacked(ch, tmp_victim))
          {
                   if(IS_NPC(ch) && IS_NPC(tmp_victim)) // mobs don't earthquake each other
                     continue;
@@ -793,7 +794,7 @@ int spell_life_leech(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
   {
 	 temp = tmp_victim->next_in_room;
 	 if ( (ch->in_room == tmp_victim->in_room) && (ch != tmp_victim) &&
-		(!ARE_GROUPED(ch,tmp_victim)))
+		(!ARE_GROUPED(ch,tmp_victim)) && can_be_attacked(ch, tmp_victim))
 	{
 //		dam = max / o;
                 dam = 150;
@@ -1131,7 +1132,7 @@ int spell_firestorm(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
   {
 	 temp = tmp_victim->next;
 	 if ( (ch->in_room == tmp_victim->in_room) && (ch != tmp_victim) &&
-		(!ARE_GROUPED(ch,tmp_victim) )){
+		(!ARE_GROUPED(ch,tmp_victim)) && can_be_attacked(ch, tmp_victim)){
 
 	  dam = 250;
 	  retval = damage(ch, tmp_victim, dam,TYPE_FIRE, SPELL_FIRESTORM, 0);
@@ -9116,7 +9117,7 @@ int cast_bee_swarm(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *v
    for(tmp_victim = character_list; tmp_victim; tmp_victim = temp) {
       temp = tmp_victim->next;
       if ((ch->in_room == tmp_victim->in_room) && (ch != tmp_victim) &&
-          (!ARE_GROUPED(ch,tmp_victim))) {
+          (!ARE_GROUPED(ch,tmp_victim)) && can_be_attacked(ch, tmp_victim)) {
          set_cantquit(ch, tmp_victim);
          retval = damage(ch, tmp_victim, dam, TYPE_MAGIC, SPELL_BEE_SWARM, 0);
          if(IS_SET(retval, eCH_DIED))
