@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.77 2006/07/14 08:26:20 shane Exp $
+| $Id: inventory.cpp,v 1.78 2006/08/30 20:31:48 shane Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -1405,6 +1405,11 @@ int do_give(struct char_data *ch, char *argument, int cmd)
     sprintf(buf, "%s gives %s to %s", GET_NAME(ch), obj->name,
                 GET_NAME(vict));
     log(buf, 110, LOG_GIVE);
+    for(OBJ_DATA *loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
+              logf(IMP, LOG_GIVE, "The %s contained %s[%d]", 
+                          obj->short_description,
+                          loop_obj->short_description,
+                          obj_index[loop_obj->item_number].virt);
 
     if((vict->in_room >= 0 && vict->in_room <= top_of_world) && GET_LEVEL(vict) < IMMORTAL && 
       IS_SET(world[vict->in_room].room_flags, ARENA) && arena[2] == -3 && obj_index[obj->item_number].virt == 393) {
