@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.113 2006/08/27 08:04:36 jhhudso Exp $ */
+/* $Id: mob_proc.cpp,v 1.114 2006/08/30 04:19:38 jhhudso Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -3078,7 +3078,7 @@ static char *dethSayText [ ] =
   "Isn't American cheese appropriately named? It's fake and processed, just like America.",
   "Women are like hurricanes. When they come, they're wet and wild, but when they go, they take your house and car.",
   "Even 'The Magic 8 Ball' is smart and knows Microsoft Sucks.  It says 'Outlook not good.'",
-  "Life really is like a box of chocolate.  A cheap meaningless gift that noone ever asks for.",
+  "Life really is like a box of chocolate.  A cheap meaningless gift that no one ever asks for.",
   "My anus is itchy and I can't scratch it because then my hand would smell like ass.",
   "There's a difference between being grumpy and hating every little bastard in existence.",
   "Hello Kitty is one cat I'd like to violate.",
