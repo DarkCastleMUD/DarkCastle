@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.209 2006/08/26 10:01:54 urizen Exp $ */
+/* $Id: const.cpp,v 1.210 2006/08/30 19:02:34 shane Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -283,7 +283,7 @@ char *spell_wear_off_msg[] =
   "!UNUSED!",
   "!UNUSED!", // 160
   "You feel dumber.",
-  "The divine powers have left you."
+  "The protective intervention of the gods has ended."
 };
 
 

@@ -11831,25 +11831,13 @@ int spell_divine_intervention(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, OBJ
   struct affected_type af;
 
   if(affected_by_spell(ch, SPELL_DIV_INT_TIMER)) {
-    send_to_char("You cannot plead for divine intervention again so soon.\n\r", ch);
+    send_to_char("The gods are unwilling to intervene on your behalf again so soon.\n\r", ch);
     GET_MANA(ch) /= 2;
     return eFAILURE;
   }
 
-  if(affected_by_spell(victim, SPELL_DIV_INT_TIMER) || affected_by_spell(victim, SPELL_DIVINE_INTER)) {
-    act("$N cannot be aided by the divines again so soon.", ch, 0, victim, TO_CHAR, 0);
-    GET_MANA(ch) /= 2;
-    return eFAILURE;
-  }
-
-  if(ch != victim) {
-    act("You call upon the great divines to aid $N!", ch, 0, victim, TO_CHAR, 0);
-    act("$n calls upon the great divines to aid you!", ch, 0, victim, TO_VICT, 0);
-    act("$n calls upon the great divines to aid $N!", ch, 0, victim, TO_ROOM, NOTVICT);
-  } else {
-    act("You call upon the great divines to aid you!", ch, 0, 0, TO_CHAR, 0);
-    act("$n calls upon the great divines for assistance!", ch, 0, 0, TO_ROOM, 0);
-  }
+  act("Light pours down from above bathing you in a protective shell of divinity.", ch, 0, 0, TO_CHAR, 0);
+  act("Light pours down from above and surrounds $n in a protective shell of divinity.", ch, 0, 0, TO_ROOM, 0);
 
   GET_MANA(ch) = 0;
 
@@ -11859,12 +11847,11 @@ int spell_divine_intervention(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, OBJ
   af.location = 0;
   af.bitvector = -1;
   affect_to_char(ch, &af);
-  if(ch != victim) affect_to_char(victim, &af);
 
   af.type = SPELL_DIVINE_INTER;
   af.duration = 6 + skill / 10;
   af.modifier = 10 - skill / 10;
-  affect_to_char(victim, &af, PULSE_VIOLENCE);
+  affect_to_char(ch, &af, PULSE_VIOLENCE);
 
   return eSUCCESS;
 }
@@ -11877,7 +11864,7 @@ int cast_divine_intervention(ubyte level, CHAR_DATA *ch, char *arg, int type, CH
     case SPELL_TYPE_WAND:
     case SPELL_TYPE_SCROLL:
     case SPELL_TYPE_STAFF:
-      return spell_divine_intervention(level, ch, tar_ch, 0, skill);
+      return spell_divine_intervention(level, ch, 0, 0, skill);
       break;
     default:
       log("Serious screw-up in divine intervention!", ANGEL, LOG_BUG);
