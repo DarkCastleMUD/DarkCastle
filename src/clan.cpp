@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.56 2006/08/14 20:32:52 shane Exp $ */
+/* $Id: clan.cpp,v 1.57 2006/08/30 13:35:30 jhhudso Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -647,6 +647,10 @@ struct clan_data * get_clan(int nClan)
 
 struct clan_data * get_clan(CHAR_DATA *ch)
 {
+  if (ch == 0) {
+    return 0;
+  }
+
   struct clan_data *clan;
 
   for(clan = clan_list; clan; clan = clan->next)
@@ -3004,4 +3008,33 @@ int do_clanarea(CHAR_DATA *ch, char *argument, int cmd)
 		"clanarea yield        (yield an area your clan controls that you are currently in)\r\n"
 		"clanarea collect      (collect bounty from an area you are currently in that your clan controls)\r\n",ch);
   return eSUCCESS;
+}
+
+bool others_clan_room(char_data *ch, room_data *room)
+{
+  // Passed null values
+  if (ch == 0 || room == 0) {
+    return false;
+  }
+    
+  // room is not a clan room
+  if(IS_SET(room->room_flags, CLAN_ROOM) == false) {
+    return false;
+  }
+
+  // ch is not in a clan
+  clan_data *clan;
+  if ((clan = get_clan(ch)) == 0) {
+    return true;
+  }
+
+  // Search through our clan's list of rooms, to see if room is one of them
+  for(clan_room_data *c_room = clan->rooms; c_room; c_room = c_room->next) {
+    if(room->number == c_room->room_number) {
+      return false;
+    }
+  }
+
+  // Room was a clan room, we are in a clan, but this room is not ours
+  return true;
 }

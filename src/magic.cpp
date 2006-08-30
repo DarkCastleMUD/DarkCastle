@@ -10052,15 +10052,26 @@ int spell_beacon(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *vic
          send_to_char("Your beacon cannot take you into or out of the arena!\r\n", ch);
          return eFAILURE;
    }
-   if (IS_SET(world[ch->beacon->in_room].room_flags, CLAN_ROOM))
-   {
-	send_to_char("You cannot beacon into a clan hall.\r\n",ch);
-	return eFAILURE;
+
+   if(IS_AFFECTED(ch, AFF_CHAMPION)) {
+     if (ch->beacon->in_room >= 1900 && ch->beacon->in_room <= 1999) {
+       send_to_char("You cannot beacon into a guild whilst Champion.\n\r", ch);
+       return eFAILURE;
+     }
+
+     if (IS_SET(world[ch->beacon->in_room].room_flags, CLAN_ROOM)) {
+       send_to_char("You cannot beacon into a clan hall whilst Champion.\r\n",ch);
+       return eFAILURE;
+     }
    }
-   if(IS_AFFECTED(ch, AFF_CHAMPION) && ch->beacon->in_room >= 1900 && ch->beacon->in_room <= 1999)
-   {
-      send_to_char("You cannot beacon into a guild whilst Champion.\n\r", ch);
-      return eFAILURE;
+
+
+   if (others_clan_room(ch, &world[ch->beacon->in_room]) == true) {
+     send_to_char("You cannot beacon into another clan's hall.\n\r", ch);
+     ch->beacon->equipped_by = NULL;
+     extract_obj(ch->beacon);
+     ch->beacon = NULL;
+     return eFAILURE;
    }
 
    if(ch->fighting && (0 == number(0, 20))) {
@@ -10092,6 +10103,23 @@ int do_beacon(struct char_data *ch, char *argument, int cmd)
    if(GET_CLASS(ch) != CLASS_ANTI_PAL && GET_LEVEL(ch) < ARCHANGEL) {
       send_to_char("Sorry, but you cannot do that here!\r\n", ch);
       return eFAILURE;
+   }
+
+   if(IS_AFFECTED(ch, AFF_CHAMPION) && ch->in_room >= 1900 && ch->in_room <= 1999)
+   {
+      send_to_char("You cannot set a beacon in a guild whilst Champion.\n\r", ch);
+      return eFAILURE;
+   }
+
+   if (IS_AFFECTED(ch, AFF_CHAMPION) && IS_SET(world[ch->in_room].room_flags, CLAN_ROOM))
+   {
+	send_to_char("You cannot set a beacon in a clan hall whilst Champion.\r\n",ch);
+	return eFAILURE;
+   }
+
+   if (others_clan_room(ch, &world[ch->in_room]) == true) {
+     send_to_char("You cannot set a beacon in another clan's hall.\n\r", ch);
+     return eFAILURE;
    }
 
    send_to_char("You set a magical beacon in the air.\r\n", ch);
