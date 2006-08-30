@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.51 2006/08/29 06:58:14 jhhudso Exp $
+| $Id: cl_warrior.cpp,v 1.52 2006/08/30 15:26:58 jhhudso Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -352,9 +352,17 @@ int do_hitall(struct char_data *ch, char *argument, int cmd)
       {
          temp = vict->next;
 	 nxtplr = temp; // nxtplayer is the next 100% safe target.
-			
-	 while (nxtplr && IS_NPC(nxtplr) && ch->in_room == nxtplr->in_room
-		&& !ARE_GROUPED(ch, nxtplr) && nxtplr != ch) nxtplr = nxtplr->next;
+
+	 if (nxtplr == (char_data *)0x95959595) {
+	   fprintf(stderr, "Error in hitall, nxtplr with 0x95959595\n\r");
+	   
+	 }
+
+	 while (nxtplr && nxtplr != (char_data *)0x95959595 && IS_NPC(nxtplr)
+		&& ch->in_room == nxtplr->in_room
+		&& !ARE_GROUPED(ch, nxtplr) && nxtplr != ch) {
+	   nxtplr = nxtplr->next;
+	 }
 
          if ((ch->in_room == vict->in_room) &&
             (vict != ch) && !ARE_GROUPED(ch,vict)) 
