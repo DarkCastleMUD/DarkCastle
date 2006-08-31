@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: who.cpp,v 1.29 2006/08/28 15:49:20 jhhudso Exp $
+| $Id: who.cpp,v 1.30 2006/08/31 19:59:49 apocalypse Exp $
 | who.C
 | Commands for who, maybe? :P
 */
@@ -470,11 +470,11 @@ int do_who(struct char_data *ch, char *argument, int cmd)
             infoField = immortFields[GET_LEVEL(i) - IMMORTAL];
 	    if (!strcmp(GET_NAME(i),"Julian")) {
 	  	infoField = infoBuf;
-		sprintf(infoBuf, "    $B$2O.W.L.$R   ");
+		sprintf(infoBuf, "    Lackey   ");
 	    }
 	     if (!str_cmp(GET_NAME(i), "Urizen")) {
 		infoField = infoBuf;
-		sprintf(infoBuf, "  $B$5Sir Sweden$R ");
+		sprintf(infoBuf, "   Meatball  ");
 	     }
 	     if (!str_cmp(GET_NAME(i), "Dasein")) {
 		infoField = infoBuf;
@@ -483,7 +483,7 @@ int do_who(struct char_data *ch, char *argument, int cmd)
 	   if (!strcmp(GET_NAME(i), "Apocalypse"))
 	{
                 infoField = infoBuf;
-                sprintf(infoBuf, "    $B$0Moose$R    ");
+                sprintf(infoBuf, "    $5Moose$R    ");
 
 	}
             if(!strcmp(GET_NAME(i), "Pirahna")) {
@@ -496,7 +496,7 @@ int do_who(struct char_data *ch, char *argument, int cmd)
             }
             if(!strcmp(GET_NAME(i), "Scyld")) {
                 infoField = infoBuf;
-                sprintf(infoBuf, "   Lackey    ");
+                sprintf(infoBuf, "Senior Lackey");
             }
             
             if(GET_LEVEL(ch) >= IMMORTAL && !IS_MOB(i) && i->pcdata->wizinvis > 0) {
