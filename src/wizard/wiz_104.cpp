@@ -626,11 +626,11 @@ int do_show(struct char_data *ch, char *argument, int cmd)
        }
 
        *buf = '\0';
-       send_to_char("[#  ] [MOB #] MOB'S DESCRIPTION\n\n\r", ch);
+       send_to_char("[#  ] [MOB #] [LV] MOB'S DESCRIPTION\n\n\r", ch);
 
        if(end == -1) {
          if((nr = real_mobile(begin)) >= 0) {
-           sprintf(buf, "[  1] [%5d] %s\n\r", begin,
+           sprintf(buf, "[  1] [%5d] [%2d] %s\n\r", begin, ((struct char_data*)(mob_index[nr].item))->level,
                    ((struct char_data *)(mob_index[nr].item))->short_desc);
            send_to_char(buf, ch);
          }
@@ -641,7 +641,7 @@ int do_show(struct char_data *ch, char *argument, int cmd)
               continue;
 
            count++;
-           sprintf(buf, "[%3d] [%5d] %s\n\r", count, i, 
+           sprintf(buf, "[%3d] [%5d] [%2d] %s\n\r", count, i, ((struct char_data*)(mob_index[nr].item))->level,
               ((struct char_data *)(mob_index[nr].item))->short_desc);
            send_to_char(buf, ch);
 
@@ -654,7 +654,7 @@ int do_show(struct char_data *ch, char *argument, int cmd)
     }
     else {
        *buf = '\0';
-       send_to_char("[#  ] [MOB #] MOB'S DESCRIPTION\n\n\r", ch);
+       send_to_char("[#  ] [MOB #] [LV] MOB'S DESCRIPTION\n\n\r", ch);
  
        for(i = 0; (i <= mob_index[top_of_mobt].virt); i++) 
        {
@@ -717,12 +717,11 @@ int do_show(struct char_data *ch, char *argument, int cmd)
        }
 
        *buf = '\0';
-       send_to_char("[#  ] [OBJ #] OBJECT'S DESCRIPTION\n\n\r", ch);
-
+       send_to_char("[#  ] [OBJ #] [LV] OBJECT'S DESCRIPTION\n\n\r", ch);
 
        if(end == -1) {
          if((nr = real_object(begin)) >= 0) {
-           sprintf(buf, "[  1] [%5d] %s\n\r", begin,
+           sprintf(buf, "[  1] [%5d] [%2d] %s\n\r", begin, ((struct obj_data *)(obj_index[nr].item))->obj_flags.eq_level,
                    ((struct obj_data *)(obj_index[nr].item))->short_description);
            send_to_char(buf, ch);
          }
@@ -746,7 +745,7 @@ int do_show(struct char_data *ch, char *argument, int cmd)
     }
     else {
        *buf = '\0';
-       send_to_char("[#  ] [OBJ #] OBJECT'S DESCRIPTION\n\n\r", ch);
+       send_to_char("[#  ] [OBJ #] [LV] OBJECT'S DESCRIPTION\n\n\r", ch);
 
        for(i = 0; ( i <= obj_index[top_of_objt].virt); i++) 
        {
@@ -756,7 +755,7 @@ int do_show(struct char_data *ch, char *argument, int cmd)
           if(isname(name, ((struct obj_data *)(obj_index[nr].item))->name)) 
           {
             count++;
-            sprintf(buf, "[%3d] [%5d] %s\n\r", count, i,
+            sprintf(buf, "[%3d] [%5d] [%2d] %s\n\r", count, i, ((struct obj_data *)(obj_index[nr].item))->obj_flags.eq_level,
                 ((struct obj_data *)(obj_index[nr].item))->short_description);
             send_to_char(buf, ch);
           }
