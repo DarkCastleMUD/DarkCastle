@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.57 2006/08/30 13:35:30 jhhudso Exp $ */
+/* $Id: clan.cpp,v 1.58 2006/09/03 07:34:02 shane Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -2782,9 +2782,9 @@ void pk_check(CHAR_DATA *ch, CHAR_DATA *victim)
   for (plc = pulse_list; plc; plc=pln)
   {
     pln = plc->next;
-    if (plc->clan1 == ch->clan && plc->clan2 == victim->clan)
+    if (plc->clan1 == ch->clan && plc->clan2 == victim->clan && world[ch->in_room].zone == plc->zone)
 	plc->clan1points += 2;
-    else if (plc->clan1 == victim->clan && plc->clan2 == ch->clan)
+    else if (plc->clan1 == victim->clan && plc->clan2 == ch->clan && world[ch->in_room].zone == plc->zone)
 	plc->clan2points += 2;
     check_victory(plc);   
   }
