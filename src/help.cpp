@@ -80,19 +80,26 @@ int do_new_help(struct char_data *ch, char *argument, int cmd)
     return eFAILURE; 
   }
 
-
-  if (!(this_help = find_help(argument))) {
-      snprintf(buf, 256, "There is no help entry for \'%s\'.\r\n", argument);
+  char *upper_argument = str_dup(argument);
+  if (!(this_help = find_help(upper_argument))) {
+      snprintf(buf, 256, "There is no help entry for \'%s\'.\r\n",
+	       upper_argument);
       send_to_char(buf, ch);
-      sprintf(buf, "'%s' has no help entry.  %s just tried to call it.", argument, GET_NAME(ch));
+      sprintf(buf, "'%s' has no help entry.  %s just tried to call it.",
+	      upper_argument, GET_NAME(ch));
       log(buf, DEITY, LOG_HELP);
+
+      dc_free(upper_argument);    
       return eFAILURE;
     }
+
+  dc_free(upper_argument);
   int a = GET_LEVEL(ch) == 0? 1:GET_LEVEL(ch);
   if (this_help->min_level > a) {
     send_to_char("There is no help on that word.\r\n", ch);
     return eFAILURE;
   }
+
 
   sprintf(key1, "'%s'", this_help->keyword1);
   sprintf(key2, "'%s'", this_help->keyword2);
