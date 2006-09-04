@@ -497,7 +497,7 @@ void assign_objects(void)
   SPEC_FUN godload_aligngood;
   SPEC_FUN godload_alignevil;
   SPEC_FUN godload_hammer;
-  SPEC_FUN transfer_thing;
+  SPEC_FUN hellmouth_thing;
   SPEC_FUN blackjack_table;
   SPEC_FUN slot_machine;
   SPEC_FUN roulette_table;
@@ -580,7 +580,7 @@ void assign_objects(void)
   assign_one_obj_non(71,  board); /* Punishment Board */
   assign_one_obj_non(101,  globe_of_darkness_proc);
   assign_one_obj_non(185,  devilsword);
-  assign_one_obj_non(4801, transfer_thing);
+  assign_one_obj_non(4801, hellmouth_thing);
   assign_one_obj_non(225,  weenie_weedy);
   assign_one_obj_non(393,  hot_potato);
   assign_one_obj_non(396,  noremove_eq);

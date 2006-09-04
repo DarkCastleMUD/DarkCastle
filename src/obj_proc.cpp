@@ -664,37 +664,42 @@ struct assembler_data gem_data[] = {
 
 };
 
-int transfer_thing(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, 
+int hellmouth_thing(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, 
                    CHAR_DATA *invoker)
 {
   if (cmd != 11) return eFAILURE;
   char junk[MAX_INPUT_LENGTH];
-   char arg1[MAX_INPUT_LENGTH];
+  char arg1[MAX_INPUT_LENGTH];
   
    half_chop(arg, arg1, junk);
    if(*junk)
       return eFAILURE;
   
-  if (str_cmp(arg1, "vanity")) return eFAILURE;
-  if (invoker->fighting) return eFAILURE;
+  if (str_cmp(arg1, "vanity"))
+    return eFAILURE;
+
+  if (invoker->fighting)
+    return eFAILURE;
   
- send_to_char("The hellmouth reaches out and embraces you. As you become completely\r\n"
- "immersed in its energy your skin burns, your sight fades into darkness,\r\n" 
- "your nose recoils at the stench of sulphur, and all you can taste is\r\n"
- "blood.\r\n",invoker);
-  char_from_room(invoker);
-  char_to_room(invoker, real_room(4801));
+  // send_to_char("The hellmouth reaches out and embraces you. As you become completely\r\n"
+  // "immersed in its energy your skin burns, your sight fades into darkness,\r\n" 
+  // "your nose recoils at the stench of sulphur, and all you can taste is\r\n"
+  // "blood.\r\n",invoker);
+//  char_from_room(invoker);
+//  char_to_room(invoker, real_room(4801));
   GET_KI(invoker) -= 50;
-  if (GET_KI(invoker) < 0) GET_KI(invoker) = 0;
+  if (GET_KI(invoker) < 0)
+    GET_KI(invoker) = 0;
   GET_HIT(invoker) /= 2;
   GET_MANA(invoker) /= 2;
   GET_MOVE(invoker) /= 2;  
-  do_look(invoker, "", 9);
-   send_to_char("In an instant your senses are restored and you are left only temporarily\r\n"
-                "dazed. Although you appear to be somewhere other than where you were prior\r\n"
-                "to this experience, your life feels as though it has ebbed to the brink of\r\n"
- 	        "death and has been only partially restored.\r\n",invoker);
-  return eSUCCESS;
+  //  do_look(invoker, "", 9);
+  //   send_to_char("In an instant your senses are restored and you are left only temporarily\r\n"
+  //                "dazed. Although you appear to be somewhere other than where you were prior\r\n"
+  //                "to this experience, your life feels as though it has ebbed to the brink of\r\n"
+  // 	        "death and has been only partially restored.\r\n",invoker);
+
+  return eFAILURE; // So normal say function will execute after this
 }
 
 
