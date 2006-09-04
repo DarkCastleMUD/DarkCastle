@@ -2398,8 +2398,11 @@ int spell_locate_object(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim
   struct obj_data *i;
   char name[256];
   char buf[MAX_STRING_LENGTH];
-  int j;
+  char tmpname[256];
+  char *tmp;
+  int j, n;
   int total;
+  int number;
 
   assert(ch);
   if (!arg)
@@ -2407,9 +2410,14 @@ int spell_locate_object(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim
 
   one_argument(arg, name);
 
+  strncpy(tmpname, name, 256);
+  tmp = tmpname;
+  if((number = get_number(&tmp))<0)
+    number = 0;
+
   total = j = (int) (skill / 1.5);
 
-  for (i = object_list; i && (j>0); i = i->next)
+  for (i = object_list, n = 0; i && (j>0) && (number>0); i = i->next)
   {
     if (IS_OBJ_STAT(i, ITEM_NOSEE))
        continue;
@@ -2417,27 +2425,67 @@ int spell_locate_object(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim
     if(IS_SET(i->obj_flags.more_flags, ITEM_NOLOCATE))
        continue;
 
-    if (isname(name, i->name)) {
+    char_data *owner = 0;
+    int room = -1;
+    if (i->equipped_by)
+      owner = i->equipped_by;
+
+    if (i->carried_by)
+      owner = i->carried_by;
+	  
+    if (i->in_room)
+      room = i->in_room;
+
+    if (i->in_obj && i->in_obj->equipped_by)
+      owner = i->in_obj->equipped_by;
+
+    if (i->in_obj && i->in_obj->carried_by)
+      owner = i->in_obj->carried_by;
+
+    if (i->in_obj && i->in_obj->in_room)
+      room = i->in_obj->in_room;
+
+    // If owner, PC, with desc and not con_playing or wizinvis,
+    if (owner && is_in_game(owner) &&
+	(owner->pcdata->wizinvis > GET_LEVEL(ch)))
+      continue;
+
+    // Skip objs in god rooms
+    if (room >= 0 && room <= 47)
+      continue;
+
+    buf[0] = 0;
+    if (isname(tmp, i->name)) {
       if(i->carried_by) {
-        sprintf(buf,"%s carried by %s.\n\r", i->short_description,PERS(i->carried_by,ch));
-        send_to_char(buf,ch);
-	j--;
+	sprintf(buf,"%s carried by %s.\n\r", i->short_description,
+		PERS(i->carried_by,ch));
       } else if (i->in_obj) {
-        sprintf(buf,"%s is in %s.\n\r",i->short_description, i->in_obj->short_description);
-        send_to_char(buf,ch);
-	j--;
+	sprintf(buf,"%s is in %s.\n\r",i->short_description,
+		i->in_obj->short_description);
       } else if (i->in_room != NOWHERE) {
         sprintf(buf, "%s is in %s.\n\r", i->short_description,
 		world[i->in_room].name);
-        send_to_char(buf, ch);
-	j--;
-      } else if (i->equipped_by != NULL && (IS_NPC(i->equipped_by) || (i->equipped_by->desc && STATE(i->equipped_by->desc) == CON_PLAYING))) {
-        sprintf(buf, "%s is in use in an unknown location.\n\r", i->short_description);
-        send_to_char(buf, ch);
-	j--;
+      } else if (i->equipped_by != NULL) {
+        sprintf(buf, "%s is in use in an unknown location.\n\r",
+		i->short_description);
       }
+
+      if (buf[0] != 0) {
+	n++;
+	if (n >= number) {
+	  send_to_char(buf, ch);
+	  j--;
+	}
+      }
+
+      if ((buf[0] != 0)) {
+	fprintf(stderr, "%d %d\n", n, number);
+      }
+
     }
   }
+
+  fprintf(stderr, "%d %d\n", j, total);
 
   if(j==total)
 	 send_to_char("There appears to be no such object.\n\r",ch);
@@ -3105,7 +3153,7 @@ int spell_sanctuary(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
 int spell_sleep(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
   struct affected_type af;
-  char buf[80];
+  char buf[100];
   int retval;
 
   set_cantquit( ch, victim );
@@ -3166,9 +3214,9 @@ int spell_sleep(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *
    }
 
   if (level < GET_LEVEL(victim)){
-	 sprintf(buf,"%s laughs in your face at your feeble attempt.\n\r", GET_SHORT(victim));
+	 snprintf(buf, 100, "%s laughs in your face at your feeble attempt.\n\r", GET_SHORT(victim));
 	 send_to_char(buf,ch);
-	 sprintf(buf,"%s tries to make you sleep, but fails miserably.\n\r", GET_SHORT(ch));
+	 snprintf(buf, 100, "%s tries to make you sleep, but fails miserably.\n\r", GET_SHORT(ch));
 	 send_to_char(buf,victim);
 	 retval = one_hit(victim,ch,TYPE_UNDEFINED, FIRST);
          retval = SWAP_CH_VICT(retval);
@@ -4262,7 +4310,6 @@ int spell_animate_dead(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
   CHAR_DATA *mob;
   struct obj_data *obj_object, *next_obj;
   struct affected_type af;
-  char buf[200];
   int number, r_num;
 
   if(!IS_EVIL(ch) && GET_LEVEL(ch) < ARCHANGEL && GET_CLASS(ch) == CLASS_ANTI_PAL) {

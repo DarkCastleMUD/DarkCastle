@@ -16,7 +16,7 @@
  *  10/21/2003   Onager    Changed IS_ANONYMOUS() to handle mobs without   *
  *                         crashing                                        *
  ***************************************************************************/
-/* $Id: utility.h,v 1.49 2006/08/21 21:42:59 shane Exp $ */
+/* $Id: utility.h,v 1.50 2006/09/04 06:12:52 jhhudso Exp $ */
 
 #ifndef UTILITY_H_
 #define UTILITY_H_
@@ -478,6 +478,7 @@ int 	mprog_catch_trigger	(char_data * mob, int catch_num, char
 int 	mprog_attack_trigger	(char_data * mob, CHAR_DATA* ch);
 int     mprog_load_trigger      (CHAR_DATA *mob);
 int oprog_catch_trigger(obj_data *obj, int catch_num, char *var, int opt, char_data *actor, obj_data *obj, void *vo);
+bool is_in_game(char_data *ch);
 
 #define MAX_THROW_NAME     60
 #define MPROG_CATCH_MIN    1

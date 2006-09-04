@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.h,v 1.19 2006/08/14 11:42:00 jhhudso Exp $ */
+/* $Id: handler.h,v 1.20 2006/09/04 06:12:52 jhhudso Exp $ */
 
 #ifndef HANDLER_H_
 #define HANDLER_H_
@@ -115,6 +115,8 @@ int find_skill_num(char *name);
 
 int generic_find(char *arg, int bitvector, CHAR_DATA *ch,
 		   CHAR_DATA **tar_ch, struct obj_data **tar_obj);
+
+int get_number(char **name);
 
 #define FIND_CHAR_ROOM      1
 #define FIND_CHAR_WORLD     2

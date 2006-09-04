@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.61 2006/08/22 06:32:11 jhhudso Exp $ */
+/* $Id: utility.cpp,v 1.62 2006/09/04 06:12:52 jhhudso Exp $ */
 
 extern "C"
 {
@@ -55,6 +55,9 @@ extern "C"
 #include <fight.h>
 #include <returnvals.h>
 #include <set.h>
+
+#include <iostream>
+using namespace std;
 
 #ifndef GZIP
   #define GZIP "gzip"
@@ -1282,6 +1285,8 @@ int do_save(struct char_data *ch, char *argument, int cmd)
     if (IS_NPC(ch) || GET_LEVEL(ch) > IMP)
 	return eFAILURE;
 
+  cerr << "do_save(\"" << ch->name << "\")" << endl;
+
     if(cmd != 666) {
       sprintf(buf, "Saving %s.\n\r", GET_NAME(ch));
       send_to_char(buf, ch);
@@ -1702,6 +1707,38 @@ int number( int from, int to )
         ;
 
     return from + number;
+}
+
+
+bool is_in_game(char_data *ch)
+{
+  // Bug in code if this happens
+  if (ch == 0) {
+    log("NULL args sent to is_pc_playing in utility.c!", ANGEL, LOG_BUG);
+    return false;
+  }
+
+  // ch is a mob
+  if (IS_NPC(ch)) {
+    return false;
+  }
+
+  // Linkdead
+  if (ch->desc == 0) {
+    return true;
+  }
+
+  switch(STATE(ch->desc)) {
+  case CON_PLAYING:
+  case CON_EDIT_MPROG:
+  case CON_WRITE_BOARD:
+  case CON_EDITING:
+  case CON_SEND_MAIL:
+    return true;
+  default:
+    return false;
+    break;
+  }
 }
 
 
