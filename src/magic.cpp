@@ -2477,15 +2477,8 @@ int spell_locate_object(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim
 	  j--;
 	}
       }
-
-      if ((buf[0] != 0)) {
-	fprintf(stderr, "%d %d\n", n, number);
-      }
-
     }
   }
-
-  fprintf(stderr, "%d %d\n", j, total);
 
   if(j==total)
 	 send_to_char("There appears to be no such object.\n\r",ch);
