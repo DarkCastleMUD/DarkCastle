@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.143 2006/09/03 07:34:02 shane Exp $ */
+/* $Id: nanny.cpp,v 1.144 2006/09/04 11:32:53 jhhudso Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -1371,7 +1371,9 @@ is_race_eligible(ch,7)?'*':' ',is_race_eligible(ch,8)?'*':' ',is_race_eligible(c
           STATE(d) = CON_PLAYING;
           if ( GET_LEVEL(ch) == 0 ) {
              do_start( ch );
-	     do_new_help(ch, "new", 99);
+	     // This doesnt look right on initial login
+	     //	     do_new_help(ch, "new", 99);
+	     do_help(ch, "new", 99);
           }
 	  do_look( ch, "", 8 );
   	  extern void zap_eq_check(char_data *ch);
