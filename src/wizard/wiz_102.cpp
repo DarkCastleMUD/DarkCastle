@@ -792,7 +792,7 @@ int do_zedit(struct char_data *ch, char *argument, int cmd)
         show_zone_commands(ch, zone);
       }
       else {
-        if(!(i = atoi(text)))
+        if((i = atoi(text)) < 1)
         {
           send_to_char("Use zedit list <number>.\r\n", ch);
           return eFAILURE;

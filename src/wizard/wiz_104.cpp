@@ -328,6 +328,9 @@ int show_zone_commands(struct char_data *ch, int i, int start = 0)
   int k = 0;
   int num_to_show;
 
+  if (start < 0)
+    start = 0;
+
   if(i > top_of_zonet) {
     send_to_char("There is no such zone.\r\n", ch);
     return eFAILURE;
