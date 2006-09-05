@@ -11876,8 +11876,8 @@ int spell_divine_intervention(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, OBJ
     return eFAILURE;
   }
 
-  act("Light pours down from above bathing you in a protective shell of divinity.", ch, 0, 0, TO_CHAR, 0);
-  act("Light pours down from above and surrounds $n in a protective shell of divinity.", ch, 0, 0, TO_ROOM, 0);
+  act("Light pours down from above bathing you in a shell of divine protection.", ch, 0, 0, TO_CHAR, 0);
+  act("Light pours down from above and surrounds $n in a shell of divine protection.", ch, 0, 0, TO_ROOM, 0);
 
   GET_MANA(ch) = 0;
 
