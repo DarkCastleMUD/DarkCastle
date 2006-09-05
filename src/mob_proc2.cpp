@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.72 2006/07/28 07:43:15 shane Exp $ */
+/* $Id: mob_proc2.cpp,v 1.73 2006/09/05 18:27:04 shane Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -1491,7 +1491,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 
     if (move_exp && move_cost) 
     csendf(ch, "$B11)$R Add 1 points to your movement points:   %d experience points and %d"
-            " Platinum coins.\n\r", (int)(move_exp/5*1.1), (int)(hit_cost/5*1.1)); 
+            " Platinum coins.\n\r", (int)(move_exp/5*1.1), (int)(move_cost/5*1.1)); 
     else
     csendf(ch, "$B11)$R Add to your movement points:   You cannot do this.\r\n");
 
