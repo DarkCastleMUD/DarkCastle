@@ -129,7 +129,10 @@ int do_new_help(struct char_data *ch, char *argument, int cmd)
                ((this_help->min_level < IMMORTAL) ? " " : "\r\nImmortal-only command.\r\n"),
          this_help->entry, this_help->related);
 
-  page_string(ch->desc, entry, 1);
+  if(cmd)
+    page_string(ch->desc, entry, 1);
+  else
+    send_to_char(entry, ch);
 
   return eSUCCESS;
 }

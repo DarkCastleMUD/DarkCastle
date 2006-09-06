@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.98 2006/08/25 20:18:18 shane Exp $
+| $Id: guild.cpp,v 1.99 2006/09/06 11:01:23 shane Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -298,7 +298,7 @@ void output_praclist(struct char_data *ch, class_skill_defines *skilllist)
       }
       else if (skilllist[i].skillnum == 368) // release
       {
-	sprintf(buf, " Move: $B%4d$R ",35);
+	sprintf(buf, " Move: $B%4d$R ",25);
 	send_to_char(buf,ch);
       }
 
