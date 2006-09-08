@@ -1427,69 +1427,37 @@ int do_mpbestow(CHAR_DATA *ch, char *argument, int cmd)
 int do_mppause( CHAR_DATA *ch, char *argument, int cmd )
 {
   struct mprog_throw_type * throwitem = NULL;
-  int mob_num;
   int catch_num;
   int delay;
 
   char first[MAX_INPUT_LENGTH];
   char second[MAX_INPUT_LENGTH];
-  char third[MAX_INPUT_LENGTH];
-  char fourth[MAX_INPUT_LENGTH];	
-  char fifth[MAX_INPUT_LENGTH];
-  // locate and validate argument to find target
+
   argument = one_argument(argument, first);
-
-  if(isdigit(*first)) {
-    if(!check_valid_and_convert(mob_num, first) || (real_mobile(mob_num) < 0)) {
-      logf( IMMORTAL, LOG_WORLD, "Mpthrow - Invalid mobnum: vnum %d.",
-	  	mob_index[ch->mobdata->nr].virt );
-      return eFAILURE;
-    }
-    *first = '\0';
-  }
-  else {
-    if(strlen(first) >= MAX_THROW_NAME) {
-      logf( IMMORTAL, LOG_WORLD, "Mpthrow - Name too long: vnum %d.",
-	  	mob_index[ch->mobdata->nr].virt );
-      return eFAILURE;
-    }
-  }
-
   argument = one_argument(argument, second);
 
-  if(!check_range_valid_and_convert(catch_num, second, MPROG_CATCH_MIN, MPROG_CATCH_MAX)) {
-    logf( IMMORTAL, LOG_WORLD, "Mpthrow - Invalid catch_num: vnum %d.",
+  if(!check_range_valid_and_convert(catch_num, first, MPROG_CATCH_MIN, MPROG_CATCH_MAX)) {
+    logf( IMMORTAL, LOG_WORLD, "Mppause - Invalid catch_num: vnum %d.",
 	  	mob_index[ch->mobdata->nr].virt );
     return eFAILURE;
   }
 
-  argument = one_argument(argument, third);
-  argument = one_argument(argument, fourth);
-  argument = one_argument(argument, fifth);
-
-  if(!check_range_valid_and_convert(delay, third, 0, 500)) {
-    logf( IMMORTAL, LOG_WORLD, "Mpthrow - Invalid delay: vnum %d.",
+  if(!check_range_valid_and_convert(delay, second, 0, 500)) {
+    logf( IMMORTAL, LOG_WORLD, "Mppause - Invalid delay: vnum %d.",
 	  	mob_index[ch->mobdata->nr].virt );
     return eFAILURE;
   }
-
-  int opt = 0;
-  if(!check_range_valid_and_convert(opt, fifth, 0, 50000))
-     opt = 0;
 
   // create struct
   throwitem = (struct mprog_throw_type *)dc_alloc(1, sizeof(struct mprog_throw_type));
-  throwitem->target_mob_num = mob_num;
-  strcpy(throwitem->target_mob_name, first);
+  throwitem->target_mob_num = mob_index[ch->mobdata->nr].virt;
+  throwitem->target_mob_name[0] = '\0';
   throwitem->data_num = catch_num;
   throwitem->delay = delay;
   throwitem->mob = TRUE; // This is, suprisingly, a mob
   
-  if (fourth[0] !='\0')
-   throwitem->var = str_dup(fourth);
-  else
-   throwitem->var = NULL;
-  throwitem->opt = opt;
+  throwitem->var = NULL;
+  throwitem->opt = 0;
   // add to delay list
   throwitem->next = g_mprog_throw_list;
   g_mprog_throw_list = throwitem;
