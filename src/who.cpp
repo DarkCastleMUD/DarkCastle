@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: who.cpp,v 1.31 2006/09/01 02:17:55 shane Exp $
+| $Id: who.cpp,v 1.32 2006/09/08 13:47:53 jhhudso Exp $
 | who.C
 | Commands for who, maybe? :P
 */
@@ -538,7 +538,7 @@ int do_who(struct char_data *ch, char *argument, int cmd)
                 infoField,   preBuf,   GET_SHORT(i),   i->title,
                 extraBuf,    clan->name,     tailBuf);
         else
-            sprintf(buf,"[%s] %s$3%s %s %s %s$R\n\r",
+            sprintf(buf,"[%s] %s$3%s %s$R$3 %s %s$R\n\r",
                 infoField,   preBuf, GET_SHORT(i),   i->title,
                 extraBuf,    tailBuf);
         
