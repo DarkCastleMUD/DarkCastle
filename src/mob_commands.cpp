@@ -1455,11 +1455,17 @@ int do_mppause( CHAR_DATA *ch, char *argument, int cmd )
     }
   }
 
+  argument = one_argument(argument, second);
+
   if(!check_range_valid_and_convert(catch_num, second, MPROG_CATCH_MIN, MPROG_CATCH_MAX)) {
     logf( IMMORTAL, LOG_WORLD, "Mpthrow - Invalid catch_num: vnum %d.",
 	  	mob_index[ch->mobdata->nr].virt );
     return eFAILURE;
   }
+
+  argument = one_argument(argument, third);
+  argument = one_argument(argument, fourth);
+  argument = one_argument(argument, fifth);
 
   if(!check_range_valid_and_convert(delay, third, 0, 500)) {
     logf( IMMORTAL, LOG_WORLD, "Mpthrow - Invalid delay: vnum %d.",
