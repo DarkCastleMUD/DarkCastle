@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.120 2006/08/25 20:18:18 shane Exp $ */
+/* $Id: info.cpp,v 1.121 2006/09/08 05:54:43 shane Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -413,11 +413,6 @@ void show_char_to_char(struct char_data *i, struct char_data *ch, int mode)
    char buf2[MAX_STRING_LENGTH];
    struct clan_data * clan;
    char buf[200];
-   int know_align = -1;
-   struct affected_type * cur_af;
-
-   if ((cur_af = affected_by_spell(ch, SPELL_KNOW_ALIGNMENT)))
-     know_align = (int)cur_af->modifier;
    
    if(mode == 0) 
    {
@@ -435,14 +430,6 @@ void show_char_to_char(struct char_data *i, struct char_data *ch, int mode)
             *buffer = '\0';
             if(!i->desc)
                strcpy(buffer, "*linkdead*  ");
-            if (know_align > 80) {
-              if ((IS_AFFECTED(ch, AFF_DETECT_EVIL) || IS_AFFECTED(ch, AFF_KNOW_ALIGN)) && IS_EVIL(i)) 
-                strcat(buffer, "$B$4(Red Halo)$B$3 ");
-              if ((IS_AFFECTED(ch, AFF_DETECT_GOOD) || IS_AFFECTED(ch, AFF_KNOW_ALIGN)) && IS_GOOD(i)) 
-                strcat(buffer, "$B$1(Blue Halo)$B$3 ");
-              if (IS_AFFECTED(ch, AFF_KNOW_ALIGN) && !IS_GOOD(i) && !IS_EVIL(i)) 
-                strcat(buffer, "$B$5(Yellow Halo)$B$3 ");
-            }
             if (IS_SET(i->pcdata->toggles, PLR_GUIDE_TOG))
               strcat(buffer, "$B$7(Guide)$B$3 ");
             strcat(buffer, GET_SHORT(i));
