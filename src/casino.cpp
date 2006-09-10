@@ -2438,6 +2438,10 @@ int roulette_table(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, CHAR
             send_to_char("You cannot muscle your way to the table.\n\r", ch);
             return eSUCCESS;
          }
+         if(obj->wheel->plr[i]->ch && charExists(obj->wheel->plr[i]->ch) && obj->wheel->plr[i]->ch->in_room != obj->in_room)
+            obj->wheel->plr[i]->ch = NULL;
+         else if(obj->wheel->plr[i]->ch && !charExists(obj->wheel->plr[i]->ch))
+            obj->wheel->plr[i]->ch = NULL;
          if(!obj->wheel->plr[i]->ch) {
             obj->wheel->plr[i]->ch = ch;
             break;

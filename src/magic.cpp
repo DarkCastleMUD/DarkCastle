@@ -2072,6 +2072,8 @@ int spell_detect_poison(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct ob
 	act("Poisonous fumes are revealed.", ch, 0, 0, TO_CHAR, 0);
       else
 	send_to_char("It looks very delicious.\n\r", ch);
+    } else {
+      send_to_char("There is nothing much that poison would do on this.\n\r", ch);
     }
   }
   return eSUCCESS;
