@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: offense.cpp,v 1.23 2006/09/06 09:39:04 jhhudso Exp $
+| $Id: offense.cpp,v 1.24 2006/09/13 19:41:18 shane Exp $
 | offense.C
 | Description:  Commands that are generically offensive - that is, the
 |   victim should retaliate.  The class-specific offensive commands are
@@ -54,6 +54,15 @@ int do_suicide(struct char_data *ch, char *argument, int cmd)
   if(IS_AFFECTED(ch, AFF_CHAMPION)) {
      send_to_char("You have no reason to feel sad, oh great Champion!\n\r", ch);
      return eFAILURE;
+  }
+  if (IS_AFFECTED(ch, AFF_CURSE) || IS_AFFECTED(ch, AFF_SOLIDITY))
+  {
+    send_to_char("Something blocks your attempted suicide, be happy!  You have a new lease on life!\r\n",ch);
+    return eFAILURE;
+  }
+  if(GET_POS(ch) == POSITION_FIGHTING) {
+    send_to_char("You are too busy trying to kill somebody else!\n\r", ch);
+    return eFAILURE;
   }
 
   int percent = number(1,100);
