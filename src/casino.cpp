@@ -1789,7 +1789,7 @@ struct machine_data
    uint cost;
    uint lastwin;
    int bet;
-   int32 jackpot;
+   uint32 jackpot;
    int linkedto;
    bool busy;
    bool gold;
