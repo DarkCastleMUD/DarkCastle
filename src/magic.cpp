@@ -5478,6 +5478,7 @@ void make_portal(CHAR_DATA * ch, CHAR_DATA * vict)
            IS_SET(world[destination].room_flags, PRIVATE) ||
            IS_SET(world[destination].room_flags, CLAN_ROOM) ||
            IS_SET(world[destination].room_flags, NO_PORTAL) ||
+           IS_SET(world[destination].room_flags, NO_TELEPORT) ||
            IS_SET(zone_table[world[destination].zone].zone_flags, ZONE_NO_TELEPORT)) 
         {
            good_destination = false;
@@ -5522,6 +5523,7 @@ int spell_portal(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data 
   struct obj_data *portal = 0;
 
   if(IS_SET(world[victim->in_room].room_flags, PRIVATE) ||
+     IS_SET(world[victim->in_room].room_flags, IMP_ONLY) ||
      IS_SET(world[victim->in_room].room_flags, NO_PORTAL) )  {
     send_to_char ("You can't seem to find a path.\n\r", ch);
     if(GET_CLASS(ch) == CLASS_CLERIC)
