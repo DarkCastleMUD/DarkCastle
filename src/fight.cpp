@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.374 2006/09/14 17:30:57 jhhudso Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.375 2006/09/20 11:03:14 jhhudso Exp $ */
 
 extern "C"
 {
@@ -1326,53 +1326,55 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
   }
 
   retval = damage(ch, vict, dam, weapon_type, w_type, weapon);
+  if (SOMEONE_DIED(retval) || !ch->fighting) {
+    return retval | eSUCCESS;
+  }  
+  
+  // Was last hit a success?
+  if(IS_SET(retval, eSUCCESS)) 
+    // If they're wielding a weapon check for weapon spells, otherwise check for hand spells
+    if (wielded) {
+      retval = weapon_spells(ch, vict, weapon);     
+      if (SOMEONE_DIED(retval) || !ch->fighting) {
+        return retval | eSUCCESS;
+      }  
 
-  if(!IS_SET(retval, eCH_DIED) && 
-     !IS_SET(retval, eVICT_DIED) && 
-      IS_SET(retval, eSUCCESS) &&
-     ch->fighting) // make sure it didn't flee
-  {
-    if(wielded)
-       retval = weapon_spells(ch, vict, weapon);
-    if(!wielded && !SOMEONE_DIED(retval) && ch->equipment[WEAR_HANDS] && obj_index[ch->equipment[WEAR_HANDS]->item_number].combat_func) 
-         retval = ((*obj_index[ch->equipment[WEAR_HANDS]->item_number].combat_func)
-                       (ch, ch->equipment[WEAR_HANDS], 0, "", ch));
-    if(!SOMEONE_DIED(retval) && ch->equipment[HOLD] && obj_index[ch->equipment[HOLD]->item_number].combat_func)
-          retval = ((*obj_index[ch->equipment[HOLD]->item_number].combat_func)
-                       (ch, ch->equipment[HOLD], 0, "", ch));
-    if(!SOMEONE_DIED(retval) && ch->equipment[HOLD2] && obj_index[ch->equipment[HOLD2]->item_number].combat_func)
-          retval = ((*obj_index[ch->equipment[HOLD2]->item_number].combat_func)
-                       (ch, ch->equipment[HOLD2], 0, "", ch));
+      if (ch->equipment[weapon] && obj_index[ch->equipment[weapon]->item_number].combat_func) {
+        retval = ((*obj_index[ch->equipment[weapon]->item_number].combat_func)(ch, ch->equipment[weapon], 0, "", ch));
+        if (SOMEONE_DIED(retval) || !ch->fighting) {
+          return retval | eSUCCESS;
+        }        
+      }
+    } else { //not wielding a weapon    
+      if (ch->equipment[WEAR_HANDS] && obj_index[ch->equipment[WEAR_HANDS]->item_number].combat_func) { 
+        retval = ((*obj_index[ch->equipment[WEAR_HANDS]->item_number].combat_func)(ch, ch->equipment[WEAR_HANDS], 0, "", ch));
+        if (SOMEONE_DIED(retval) || !ch->fighting) {
+          return retval | eSUCCESS;
+        }        
+      }
+      
+      if (ch->equipment[HOLD] && obj_index[ch->equipment[HOLD]->item_number].combat_func) {
+        retval = ((*obj_index[ch->equipment[HOLD]->item_number].combat_func)(ch, ch->equipment[HOLD], 0, "", ch));
+        if (SOMEONE_DIED(retval) || !ch->fighting) {
+          return retval | eSUCCESS;
+        }        
+      }
 
-    // Code needs to be changed so that obj_index[ch->equipment[weapon]->item_number].combat_func
-    // is executed here. This will decrease number of combat_func executing per combat round,
-    // so in exchange perhaps we can increase some of the combat_func percentages?
-    // The issue is that you can be stinging with Lizard King's Acidic Awl yet your second wield
-    // say the Jaelgreth's Sacrificial Blade performs a life leech.
-              if(!SOMEONE_DIED(retval) && ch->equipment[WIELD]) {
-        if(obj_index[ch->equipment[WIELD]->item_number].combat_func) {
-          retval = ((*obj_index[ch->equipment[WIELD]->item_number].combat_func)
-                     (ch, ch->equipment[WIELD], 0, "", ch));
-        }
-	}
-        if(!SOMEONE_DIED(retval) && ch->equipment[SECOND_WIELD]) {
-          if(obj_index[ch->equipment[SECOND_WIELD]->item_number].combat_func) {
-            retval = ((*obj_index[ch->equipment[SECOND_WIELD]->item_number].combat_func)
-                     (ch, ch->equipment[SECOND_WIELD], 0, "", ch));
-          }
-        }
-  }
-  if (!SOMEONE_DIED(retval))
-    if (IS_MOB(ch) && ISSET(ch->mobdata->actflags, ACT_DRAINY))
-       if (number(1,101) <= 10)
-          SET_BIT(retval, spell_energy_drain(1,ch,vict,0,0));
+      if (ch->equipment[HOLD2] && obj_index[ch->equipment[HOLD2]->item_number].combat_func) {
+        retval = ((*obj_index[ch->equipment[HOLD2]->item_number].combat_func)(ch, ch->equipment[HOLD2], 0, "", ch));
+        if (SOMEONE_DIED(retval) || !ch->fighting) {
+          return retval | eSUCCESS;
+        }        
+      }          
+    }
+  
+    if (IS_MOB(ch) && ISSET(ch->mobdata->actflags, ACT_DRAINY)) {
+      if (number(1,101) <= 10) {
+        SET_BIT(retval, spell_energy_drain(1, ch, vict, 0, 0));
+      }
+    }
 
-  // weapon spells is going to return failure if a spell didn't go off.  However,
-  // we did actually hit the opponent, so set it to success and get out
-  SET_BIT(retval, eSUCCESS);
-
-  // if we got here, i hit him, and noone died
-  return retval;  
+  return retval | eSUCCESS;  
 } // one_hit 
 
 
