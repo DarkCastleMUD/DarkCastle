@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.115 2006/09/02 07:07:31 shane Exp $ */
+/* $Id: mob_proc.cpp,v 1.116 2006/09/22 15:05:20 jhhudso Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -2770,7 +2770,7 @@ static char *dethSayText [ ] =
   "Change is inevitable....except from vending machines.",
   "Drugs may lead to nowhere, but at least it's the scenic route.",
   "A big mountain of sugar is too much for one man. I can see now why God portions it out in those little packets.",
-  "If a pig loses it's voice, is it disgruntled?",
+  "If a pig loses its voice, is it disgruntled?",
   "Do Roman paramedics refer to IV's as 4's?",
   "Are people more violently opposed to fur rather than leather because it's much easier to harass rich women than motorcycle gangs?",
   "If you take an Oriental person and spin him around several times, does he become disoriented?",
