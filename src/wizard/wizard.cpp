@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.33 2006/08/18 08:44:39 jhhudso Exp $
+| $Id: wizard.cpp,v 1.34 2006/09/22 15:09:21 jhhudso Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -1214,7 +1214,7 @@ int do_repop(struct char_data *ch, char *argument, int cmd)
           return eFAILURE;
         }
 
-        send_to_char("Resetting ths entire zone!\n\r", ch);
+        send_to_char("Resetting this entire zone!\n\r", ch);
         sprintf(buf, "%s repopped zone #%d.", GET_NAME(ch), world[ch->in_room].zone);
         log(buf, GET_LEVEL(ch), LOG_GOD);
         reset_zone(world[ch->in_room].zone);
