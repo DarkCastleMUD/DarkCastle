@@ -135,7 +135,7 @@ void copySaveData(obj_data *new_obj, obj_data *obj)
   if (obj->obj_flags.type_flag == ITEM_STAFF && obj->obj_flags.value[2] != new_obj->obj_flags.value[2])
   	new_obj->obj_flags.value[2] = obj->obj_flags.value[2];
 
-  if (obj->obj_flags.type_flag == ITEM_WAND && obj->obj_flags.value[1] != new_obj->obj_flags.value[1])
+  if (obj->obj_flags.type_flag == ITEM_WAND && obj->obj_flags.value[2] != new_obj->obj_flags.value[2])
   	new_obj->obj_flags.value[2] = obj->obj_flags.value[2];
 
   if (obj->obj_flags.type_flag == ITEM_DRINKCON && obj->obj_flags.value[1] != new_obj->obj_flags.value[1])
