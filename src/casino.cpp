@@ -2333,9 +2333,7 @@ void wheel_stop(struct wheel_data *wheel)
 
    for(int i=0;i<6;i++) {
       if(charExists(wheel->plr[i]->ch)) {
-         if(wheel->plr[i]->ch->in_room != wheel->obj->in_room) {
-            wheel->plr[i]->ch = NULL;
-         } else {
+         if(wheel->plr[i]->ch->in_room == wheel->obj->in_room) {
             if((payout = check_roulette_wins(wheel->plr[i], num))) {
                if(payout > 1000000)
                   act("$n is a BIG winner!", wheel->plr[i]->ch, 0, 0, TO_ROOM, 0);
@@ -2349,6 +2347,7 @@ void wheel_stop(struct wheel_data *wheel)
       }
       for(int j=0;j<48;j++)
          wheel->plr[i]->bet_array[j] = 0;
+      wheel->plr[i]->ch = NULL;
    }
    wheel->spinning = FALSE;
    wheel->countdown = 11;
