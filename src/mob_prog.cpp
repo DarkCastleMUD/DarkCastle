@@ -398,7 +398,7 @@ void translate_value(char *left, char *right, int16 **vali, uint32 **valui,
 		  else {int16 car = target->carry_weight;intval = &car;}
 		} else if (!str_cmp(right, "class"))
 		{  if (!target) tError = TRUE;
-		  else {int16 car = target->c_class;intval = &car;}
+		  else {sbyte car = target->c_class; sbval = &target->c_class;}
 		} else if (!str_cmp(right, "coldsave"))
 		{  if (!target) tError = TRUE;
 		  else {intval = &target->saves[SAVE_TYPE_COLD];}
