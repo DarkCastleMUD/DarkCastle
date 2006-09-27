@@ -1789,7 +1789,7 @@ struct machine_data
    uint cost;
    uint lastwin;
    int bet;
-   uint32 jackpot;
+   float jackpot;
    int linkedto;
    bool busy;
    bool gold;
@@ -1883,35 +1883,13 @@ bool verify_slot(struct machine_data *machine)
    return FALSE;
 }
 
-/*void update_linked_slots(struct machine_data *machine)
-{
-   char buf[MAX_STRING_LENGTH];
-
-   for(int i=21906;i<21918;i++) {
-      if( ((OBJ_DATA *)obj_index[real_object(i)].item)->obj_flags.value[3] == machine->linkedto ) {
-         sprintf(buf, "A slot machine which displays '$R$BJackpot: %d %s!$1' sits here.", machine->jackpot / 100, 
-               machine->gold?"coins":"plats");
-         for(OBJ_DATA *j=object_list; j; j = j->next)
-            if(j->item_number == real_object(i))
-	    {
-               j->description = str_hsh(buf);
-	       if (j->slot) j->slot->jackpot = machine->jackpot;
-	    }
-         ((OBJ_DATA *)obj_index[real_object(i)].item)->obj_flags.value[1] = machine->jackpot;
-         ((OBJ_DATA *)obj_index[real_object(i)].item)->description = str_hsh(buf);
-      }
-   }
-}
-*/
-
-
 void update_linked_slots(struct machine_data *machine)
 {
    char ldesc[MAX_STRING_LENGTH];
 
    snprintf(ldesc, MAX_STRING_LENGTH,
 	   "A slot machine which displays '$R$BJackpot: %d %s!$1' sits here.",
-	   machine->jackpot / 100, 
+	   (int)machine->jackpot, 
 	   machine->gold ? "coins": "plats");
 
    // Find all the slot machines
@@ -1923,7 +1901,7 @@ void update_linked_slots(struct machine_data *machine)
      // and their long description
       if(slot_obj->obj_flags.value[3] == machine->linkedto) {
 	 slot_obj->description = str_hsh(ldesc);
-         slot_obj->obj_flags.value[1] = machine->jackpot;
+         slot_obj->obj_flags.value[1] = (int)machine->jackpot;
 	 if (slot_obj->slot)
 	   slot_obj->slot->jackpot = machine->jackpot;
 
@@ -1931,7 +1909,7 @@ void update_linked_slots(struct machine_data *machine)
          for(OBJ_DATA *j=object_list; j; j = j->next) {
 	   if(j->item_number == real_object(i)) {
 	     j->description = str_hsh(ldesc);
-	     j->obj_flags.value[1] = machine->jackpot;
+	     j->obj_flags.value[1] = (int)machine->jackpot;
 	     if (j->slot)
 	       j->slot->jackpot = machine->jackpot;
 	   }
@@ -1997,12 +1975,13 @@ void reel_spin(void *arg1, void *arg2, void *arg3)
       else if((stop1 == 3 || stop1 == 9) && (stop2 == 0 || stop2 == 2 || stop2 == 4 || stop2 == 8 || stop2 == 14 || stop2 == 17)) payout = 5;
       else if(stop1 == 3 || stop1 == 9) payout = 2;
       else {
-         machine->jackpot += machine->cost * machine->bet * 4;
+         machine->jackpot += (float)machine->cost * (float)machine->bet * 0.04;
+         machine->jackpot = MIN(machine->jackpot, 2000000000); // NEVER AGAIN!!! :P
          if(machine->linkedto) {
             update_linked_slots(machine);
          } else {
-            ((OBJ_DATA *)obj_index[machine->obj->item_number].item)->obj_flags.value[1] = machine->jackpot;
-            sprintf(buf, "A slot machine which displays '$R$BJackpot: %d %s!$1' sits here.", machine->jackpot / 100, machine->gold?"coins":"plats");
+            ((OBJ_DATA *)obj_index[machine->obj->item_number].item)->obj_flags.value[1] = (int)machine->jackpot;
+            sprintf(buf, "A slot machine which displays '$R$BJackpot: %d %s!$1' sits here.", (int)machine->jackpot, machine->gold?"coins":"plats");
             machine->obj->description = str_hsh(buf);
             ((OBJ_DATA *)obj_index[machine->obj->item_number].item)->description = str_hsh(buf);
          }
@@ -2021,16 +2000,16 @@ void reel_spin(void *arg1, void *arg2, void *arg3)
       }
       if(payout == 200 && machine->bet == 5) {
          send_to_room("The jackpot lights flash and loud noises come from all around you!\n\r", machine->obj->in_room);
-         csendf(machine->ch, "$BJACKPOT!!!!!!  You win the jackpot of %d %s!!$R\n\r", machine->jackpot / 100, machine->gold?"coins":"plats");
+         csendf(machine->ch, "$BJACKPOT!!!!!!  You win the jackpot of %d %s!!$R\n\r", (int)machine->jackpot, machine->gold?"coins":"plats");
          if(machine->gold)
-            GET_GOLD(machine->ch) += machine->jackpot / 100;
-         else GET_PLATINUM(machine->ch) += machine->jackpot / 100;
-         machine->jackpot = machine->cost * 2500;
+            GET_GOLD(machine->ch) += (int)machine->jackpot;
+         else GET_PLATINUM(machine->ch) += (int)machine->jackpot;
+         machine->jackpot = machine->cost * 25;
          if(machine->linkedto) {
             update_linked_slots(machine);
          } else {
-            ((OBJ_DATA *)obj_index[machine->obj->item_number].item)->obj_flags.value[1] = machine->jackpot;
-            sprintf(buf, "A slot machine which displays '$R$BJackpot: %d %s!$1' sits here.", machine->jackpot / 100, machine->gold?"coins":"plats");
+            ((OBJ_DATA *)obj_index[machine->obj->item_number].item)->obj_flags.value[1] = (int)machine->jackpot;
+            sprintf(buf, "A slot machine which displays '$R$BJackpot: %d %s!$1' sits here.", (int)machine->jackpot, machine->gold?"coins":"plats");
             machine->obj->description = str_hsh(buf);
             ((OBJ_DATA *)obj_index[machine->obj->item_number].item)->description = str_hsh(buf);
          }
