@@ -790,7 +790,7 @@ int spell_life_leech(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
   int max = (int)(o * 50 * ( m / pow(m, powmod*m)));
   max += number(-10,10);
 */
-  for(tmp_victim = world[ch->in_room].people;tmp_victim;tmp_victim = temp)
+  for(tmp_victim = world[ch->in_room].people;tmp_victim && tmp_victim != (char_data *)0x95959595;tmp_victim = temp)
   {
 	 temp = tmp_victim->next_in_room;
 	 if ( (ch->in_room == tmp_victim->in_room) && (ch != tmp_victim) &&
