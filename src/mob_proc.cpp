@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.117 2006/09/25 08:38:27 shane Exp $ */
+/* $Id: mob_proc.cpp,v 1.118 2006/09/27 12:05:10 jhhudso Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -2312,54 +2312,23 @@ int clan_guard(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     // 3 = south, 2 = east, 5 = up
     // 1 = north, 4  = west, 6 = down
 
-    if ((in_room == real_room(2300) && cmd != 5) ||
-	(in_room == real_room(2310) && cmd != 2) ||
-	(in_room == real_room(2320) && cmd != 3) ||
-	(in_room == real_room(2390) && cmd != 3) ||
-	(in_room == real_room(2330) && cmd != 3) ||
-	(in_room == real_room(2340) && cmd != 1) ||
-	(in_room == real_room(2350) && cmd != 3) ||
-	(in_room == real_room(2360) && cmd != 3) ||
-        (in_room == real_room(2370) && cmd != 6) ||
-        (in_room == real_room(2410) && cmd != 5) ||
-        (in_room == real_room(2420) && cmd != 3) ||
-        (in_room == real_room(2380) && cmd != 1) ||
-	(in_room == real_room(2400) && cmd != 4) ||
-	(in_room == real_room(2430) && cmd != 3) ||	
-	(in_room == real_room(2440) && cmd != 2))
-	return eFAILURE;
-
-/* Old Clan Halls
-    if ( (in_room == real_room(161) && cmd != 2 )
-    ||   (in_room == real_room(158) && cmd != 4 )
-    ||   (in_room == real_room(2426) && cmd != 2 ) // anaphrodesia, east
-    ||   (in_room == real_room(127) && cmd != 4 )  // west
-    ||   (in_room == real_room(124) && cmd != 1 )
-    ||   (in_room == real_room(138) && cmd != 1 )
-    ||   (in_room == real_room(141) && cmd != 3 )  
-    ||   (in_room == real_room(144) && cmd != 2 )
-    ||   (in_room == real_room(2339) && cmd != 1 )  // askani, north
-    ||   (in_room == real_room(6010) && cmd != 6 )
-    ||   (in_room == real_room(167) && cmd != 1 )
-    ||   (in_room == real_room(2350) && cmd != 3 )  // eclipse, south
-    ||	 (in_room == real_room(2344) && cmd != 1 )  // north
-    ||	 (in_room == real_room(187) && cmd != 1 )   // sng, north
-    ||	 (in_room == real_room(2315) && cmd != 1 )  // ferach, north
-    ||	 (in_room == real_room(2411) && cmd != 1 )  // sindicate north
-    ||	 (in_room == real_room(2305) && cmd != 2 )  // arcana, east
-    ||   (in_room == real_room(181) && cmd != 2 )   // dark_tide, east
-    ||	 (in_room == real_room(2300) && cmd != 1 )  // bandaleros, north
-    ||	 (in_room == real_room(2321) && cmd != 3 )  // anarchist, south
-    ||	 (in_room == real_room(2329) && cmd != 3 )  // darkened2, south
-    ||	 (in_room == real_room(2325) && cmd != 1 )  // blackaxe, north
-    ||	 (in_room == real_room(2336) && cmd != 1 )  // timewarp, north
-    ||	 (in_room == real_room(2370) && cmd != 1 )  // tayledreas, north
-    ||	 (in_room == real_room(2374) && cmd != 5 )  // solaris, up
-    ||   (in_room == real_room(2380) && cmd != 3 )  // overlords, south
-    ||   (in_room == real_room(9344) && cmd != 1 )  // overlords, north 
-	)
-      return eFAILURE;
-*/	
+    if ((in_room == real_room(2300) && cmd != 5) || // up
+        (in_room == real_room(2310) && cmd != 2) || // east
+        (in_room == real_room(2320) && cmd != 3) || // south
+        (in_room == real_room(2390) && cmd != 3) || // south
+        (in_room == real_room(2330) && cmd != 3) || // south
+        (in_room == real_room(2340) && cmd != 1) || // north
+        (in_room == real_room(2350) && cmd != 3) || // south
+        (in_room == real_room(2360) && cmd != 3) || // south
+        (in_room == real_room(2370) && cmd != 6) || // down
+        (in_room == real_room(2410) && cmd != 5) || // up
+        (in_room == real_room(2420) && cmd != 3) || // south
+        (in_room == real_room(2380) && cmd != 1) || // north
+        (in_room == real_room(2400) && cmd != 4) || // west
+        (in_room == real_room(2430) && cmd != 3) || // south
+        (in_room == real_room(2440) && cmd != 2) || // east
+        (in_room == real_room(2450) && cmd != 4))   // west
+        return eFAILURE;
 
     int zz = ch->clan;
      if (IS_NPC(ch) && IS_AFFECTED(ch, AFF_CHARM))
@@ -2401,7 +2370,8 @@ int clan_guard(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     ||   (zz != 19 && in_room == real_room(2420))  // solaris
     ||   (zz !=  8 && in_room == real_room(2400))  // merc
     ||   (zz != 15 && in_room == real_room(2430))  // askan'i
-    ||   (zz !=  2 && in_room == real_room(2440))  // askan'i
+    ||   (zz !=  2 && in_room == real_room(2440))  // tengu
+    ||   (zz != 16 && in_room == real_room(2450))  // houseless_rogues
 
 	)
     {
