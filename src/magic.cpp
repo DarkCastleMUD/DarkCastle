@@ -1407,7 +1407,7 @@ int spell_paralyze(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
     victim = ch;
   }
 
-   if (malediction_res(ch, victim, SPELL_PARALYZE)) {
+   if (malediction_res(ch, victim, SPELL_PARALYZE) || number(0,3)) {
       act("$N resists your attempt to paralyze $M!", ch, NULL, victim, TO_CHAR,0);
       act("$N resists $n's attempt to paralyze $M!", ch, NULL, victim, TO_ROOM,NOTVICT);
       act("You resist $n's attempt to paralyze you!",ch,NULL,victim,TO_VICT,0);
