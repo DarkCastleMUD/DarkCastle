@@ -1407,11 +1407,11 @@ int spell_paralyze(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
     victim = ch;
   }
 
-   if (malediction_res(ch, victim, SPELL_PARALYZE) || number(0,3)) {
+   if (malediction_res(ch, victim, SPELL_PARALYZE)) {
       act("$N resists your attempt to paralyze $M!", ch, NULL, victim, TO_CHAR,0);
       act("$N resists $n's attempt to paralyze $M!", ch, NULL, victim, TO_ROOM,NOTVICT);
       act("You resist $n's attempt to paralyze you!",ch,NULL,victim,TO_VICT,0);
-      if (IS_NPC(victim) && (!victim->fighting) && GET_POS(victim) > POSITION_SLEEPING) {
+      if ((!victim->fighting) && GET_POS(victim) > POSITION_SLEEPING) {
          retval = attack(victim, ch, TYPE_UNDEFINED);
          retval = SWAP_CH_VICT(retval);
          return retval;
