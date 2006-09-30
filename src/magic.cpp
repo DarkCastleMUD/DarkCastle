@@ -90,6 +90,7 @@ extern struct race_shit race_info[];
 bool malediction_res(CHAR_DATA *ch, CHAR_DATA *victim, int spell)
 {
   int res = 0;
+  int mod = 0;
   switch (spell)
   {
     case SPELL_CURSE: res = SAVE_TYPE_MAGIC; break;
@@ -99,9 +100,9 @@ bool malediction_res(CHAR_DATA *ch, CHAR_DATA *victim, int spell)
     case SPELL_ATTRITION: res = SAVE_TYPE_POISON; break;
     case SPELL_DEBILITY: res = SAVE_TYPE_POISON; break;
     case SPELL_FEAR: res = SAVE_TYPE_COLD; break;
-    case SPELL_PARALYZE: res = SAVE_TYPE_MAGIC; break;
+    case SPELL_PARALYZE: res = SAVE_TYPE_MAGIC; mod = 20; break;
   }
-  res = victim->saves[res] + 5 + (100-has_skill(ch, spell))/2;
+  res = victim->saves[res] + mod + 5 + (100-has_skill(ch, spell))/2;
   if (number(1,101) < res) return TRUE;
   return FALSE;
 }
