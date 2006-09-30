@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.190 2006/09/10 08:09:51 shane Exp $ */
+/* $Id: spells.cpp,v 1.191 2006/09/30 21:48:53 dcastle Exp $ */
 
 extern "C"
 {
@@ -1677,6 +1677,11 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
 		send_to_char("The wall blocks your attempt.\r\n",ch);
 		return eFAILURE;
 	   }
+	   if (!CAN_GO(ch, dir))
+	   {
+		send_to_char("You cannot do that.\r\n",ch);
+		return eFAILURE;
+	   }
 	   int new_room = world[ch->in_room].dir_option[dir]->to_room;
 	   if(IS_SET(world[new_room].room_flags, SAFE))
 	   {
@@ -1868,6 +1873,7 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
 
       if (spl != SPELL_VENTRILOQUATE)  /* :-) */
         say_spell(ch, spl);
+
 	if ((spl != SPELL_MAGIC_MISSILE && spl != SPELL_FIREBALL) ||
 	  !spellcraft(ch,spl))
       WAIT_STATE(ch, spell_info[spl].beats);
@@ -1953,7 +1959,8 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
 	int retval = ((*spell_info[spl].spell_pointer) (GET_LEVEL(ch), ch, argument, SPELL_TYPE_SPELL, tar_char, tar_obj, learned));
 
 	if (oldroom && !IS_SET(retval, eCH_DIED))
-		{ char_from_room(ch); char_to_room(ch, oldroom); }
+		{ char_from_room(ch); char_to_room(ch, oldroom);WAIT_STATE(ch, (int)(spell_info[spl].beats));
+}
 
         return retval;
       }
