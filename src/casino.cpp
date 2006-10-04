@@ -2507,7 +2507,7 @@ int roulette_table(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, CHAR
                send_to_char("That bet would put you over the 20 million coin limit.\n\r", ch);
             } else {
                csendf(ch, "You add %u to your bet on $BODD$R.  The total bet is now %u coins.\n\r", bet, obj->wheel->plr[i]->bet_array[3] + bet);
-               sprintf(buf, "$n adds to $s bet on $BODDR for a total of %u coins.", obj->wheel->plr[i]->bet_array[3] + bet);
+               sprintf(buf, "$n adds to $s bet on $BODD$R for a total of %u coins.", obj->wheel->plr[i]->bet_array[3] + bet);
                act(buf, ch, 0, 0, TO_ROOM, 0);
             }
          }
