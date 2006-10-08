@@ -33,6 +33,9 @@ extern "C"
 #include <race.h>
 #include <returnvals.h>
 
+#include <string>
+using namespace std;
+
 // Urizen's rebuild rnum references to enable additions to mob/obj arrays w/out screwing everything up.
 // A hack of renum_zone_tables *yawns*
 // type 1 = mobs, type 2 = objs. Simple as that.
@@ -4359,17 +4362,18 @@ int do_rstat(struct char_data *ch, char *argument, int cmd)
             strcat(buf, "\n\r");
             send_to_char(buf, ch);
 
-            strcpy(buf, "--------- Contents ---------\n\r");
+            string buffer;
+            buffer = "--------- Contents ---------\n\r";
             for (j = rm->contents; j; j = j->next_content)
-            {
-              if(CAN_SEE_OBJ(ch,j))
-                {
-                  strcat(buf, j->name);
-                  strcat(buf, "\n\r");
-                }
-            }
-            strcat(buf, "\n\r");
-            send_to_char(buf, ch);
+	      {
+		if(CAN_SEE_OBJ(ch,j))
+		  {
+		    buffer += j->name;
+		    buffer += "\n\r";
+		  }
+	      }
+            buffer += "\n\r";
+	    send_to_char(const_cast<char *>(buffer.c_str()), ch);
 
             send_to_char("------- Exits defined -------\n\r", ch);
             for (i = 0; i <= 5; i++) {
