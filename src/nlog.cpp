@@ -1,4 +1,4 @@
-/* $Id: nlog.cpp,v 1.6 2006/04/25 10:35:29 dcastle Exp $ */
+/* $Id: nlog.cpp,v 1.7 2006/10/08 09:18:30 jhhudso Exp $ */
 
 extern "C"
 {
@@ -19,9 +19,9 @@ extern "C"
 #include <utility.h>
 #include <terminal.h>
 #include <player.h> // PLR_ANSI
+#include <utility.h>
 
 extern struct descriptor_data* descriptorList;
-void log( char *str, int god_level, long type );
 void send_to_char(char *messg, CHAR_DATA *ch);
 
 /*
