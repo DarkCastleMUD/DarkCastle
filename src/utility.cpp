@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.62 2006/09/04 06:12:52 jhhudso Exp $ */
+/* $Id: utility.cpp,v 1.63 2006/10/08 09:15:25 jhhudso Exp $ */
 
 extern "C"
 {
@@ -57,6 +57,7 @@ extern "C"
 #include <set.h>
 
 #include <iostream>
+#include <sstream>
 using namespace std;
 
 #ifndef GZIP
@@ -219,7 +220,7 @@ FILE * chaos_log   = 0;
 FILE * clan_log   = 0;
 FILE * hmm_log = 0;
 // writes a string to the log 
-void log( char *str, int god_level, long type )
+void log( const char *str, int god_level, long type, char_data *vict)
 {
     long ct;
     char *tmstr;
@@ -268,9 +269,19 @@ void log( char *str, int god_level, long type )
 	break;
       case LOG_PLAYER:
         f = &player_file;
-        if(!(*f = dc_fopen(PLAYER_FILE, "a"))) {
-          fprintf(stderr, "Unable to open player file.\n");
-          exit(1);
+        if (vict && vict->name) {
+	  stringstream filepath;
+	  filepath << PLAYER_DIR << vict->name;
+          if(!(*f = dc_fopen(filepath.str().c_str(), "a"))) {
+            fprintf(stderr, "Unable to open player file '%s'.\n",
+		    filepath.str().c_str());
+            exit(1);
+          }
+        } else {
+          if(!(*f = dc_fopen(PLAYER_FILE, "a"))) {
+            fprintf(stderr, "Unable to open player file.\n");
+            exit(1);
+          }
         }
 	break;
       case LOG_WORLD:
@@ -1284,8 +1295,6 @@ int do_save(struct char_data *ch, char *argument, int cmd)
 
     if (IS_NPC(ch) || GET_LEVEL(ch) > IMP)
 	return eFAILURE;
-
-  cerr << "do_save(\"" << ch->name << "\")" << endl;
 
     if(cmd != 666) {
       sprintf(buf, "Saving %s.\n\r", GET_NAME(ch));
