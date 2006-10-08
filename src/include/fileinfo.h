@@ -1,7 +1,7 @@
 #ifndef FILEINFO_H_
 #define FILEINFO_H_
 /*
-| $Id: fileinfo.h,v 1.19 2006/08/24 22:59:40 shane Exp $
+| $Id: fileinfo.h,v 1.20 2006/10/08 09:12:16 jhhudso Exp $
 | fileinfo.h
 | Description:  Contains information for loading files, ie "../lib", etc..
 */
@@ -76,6 +76,7 @@
 #define MORTAL_FILE         "../log/mortal.log"
 #define SOCKET_FILE         "../log/socket.log"
 #define PLAYER_FILE         "../log/player.log"
+#define PLAYER_DIR          "../log/player/"
 #define WORLD_LOG           "../log/world.log"
 #define CHAOS_LOG           "../log/chaos.log"
 #define CLAN_LOG            "../log/clan.log" 
