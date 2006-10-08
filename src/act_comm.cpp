@@ -95,7 +95,7 @@ int do_report(struct char_data *ch, char *argument, int cmd)
 | Returns: 0 on failure, non-zero on success
 | Notes:
 */
-int send_to_gods(char *str, int god_level, long type)
+int send_to_gods(const char *str, int god_level, long type)
 {
   char buf1[MAX_STRING_LENGTH];
   char buf[MAX_STRING_LENGTH];
@@ -217,7 +217,7 @@ int do_channel(struct char_data *ch, char *arg, int cmd)
     "logclan",
     "warnings",
     "help",
-    "database",   
+    "database",   // 20
     "give",
     "tell",
     "hints",
