@@ -1,7 +1,7 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.47 2006/07/10 20:51:52 shane Exp $
+| $Id: character.h,v 1.48 2006/10/08 09:13:15 jhhudso Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
@@ -416,6 +416,9 @@ struct char_data
     struct timer_data *timerAttached;
     struct tempvariable *tempVariable;
     int spelldamage;
+#ifdef USE_SQL
+    int player_id;
+#endif
 };
 
 
