@@ -10,48 +10,42 @@
 #include "character.h"
 #include "Backend.h"
 
-#define CONN_OPTS "dbname=dcastle user=dcastle password=W2dFF83"
-
 using namespace std;
 
-union paramData {
-  int int_data;
-  char char_data;
-  char *char_ptr_data;
-};
+#define CONN_OPTS "dbname=dcastle user=dcastle password=W2dFF83"
 
-enum paramType { INTEGER, CHARACTER, CHARACTER_PTR };
-
-struct param {
-  union paramData data;
-  enum paramType type;
-};
-
-typedef vector<pair<string, param> > PrepareVector;
+typedef vector<pair<string, string> > PrepareVector;
 
 class Prepare {
  private:
   string generateInsertQuery(void);
   string generateUpdateQuery(void);
   static map<string, PGresult *> existing_prepares;
+  PGconn *conn;
+    
   string tableName;
   string prepareID;
-  PGconn *conn;
+  string whereString;
+  string whereData;
   PrepareVector current_prepare;
 
  public:
   Prepare(PGconn *conn, string prepare_id);
+  ~Prepare();
   void setTableName(string tableName);
   void setConn(PGconn *conn);
   void setPrepareID(string prepareID);
   void addCol(string colName, int value);
-  void addCol(string colName, char value);
-  void addCol(string colName, char *value);
+  void addCol(string colName, char * value);
+  void where(string ws, int wd);
+  void where(string ws, char * wd);
   void exec(void);
 
   // Exceptions
   class emptyName {};
   class emptyPrepareID {};
+  
+  PGresult *lastResult;
 };
 
 class Database : public Backend {
@@ -61,10 +55,11 @@ class Database : public Backend {
 
  public:
   Database();
-  virtual void save(CHAR_DATA *ch);
-  virtual void save(char_file_u *st);
+  virtual void save(CHAR_DATA *ch, char_file_u *st);
   virtual CHAR_DATA *load(void);
   Prepare createPrepare(string prepare_id);
+  int lookupPlayerID(const char *name);
+  int createPlayerID(char *name);  
 };
 
 
