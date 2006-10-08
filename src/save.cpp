@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: save.cpp,v 1.45 2006/08/01 10:38:59 jhhudso Exp $ */
+/* $Id: save.cpp,v 1.46 2006/10/08 09:17:07 jhhudso Exp $ */
 
 extern "C"
 {
@@ -46,7 +46,7 @@ extern "C"
 #ifdef USE_SQL
 #include <iostream>
 #include <libpq-fe.h>
-
+#include "Backend/Database.h"
 using namespace std;
 #endif
 
@@ -611,7 +611,10 @@ void save_char_obj_db(CHAR_DATA *ch)
     uchar.load_room = world[ch->in_room].number;
   else
     uchar.load_room = real_room(GET_HOME(ch));
-  
+
+  Database db;
+  db.save(ch, &uchar);
+
   /*
   if((fwrite(&uchar, sizeof(uchar), 1, fpsave))               &&
      (char_to_store_variable_data(ch, fpsave))                &&
