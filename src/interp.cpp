@@ -16,7 +16,7 @@
 /* 12/08/2003   Onager   Added chop_half() to work like half_chop() but    */
 /*                       chopping off the last word.                       */
 /***************************************************************************/
-/* $Id: interp.cpp,v 1.105 2006/09/08 23:00:51 shane Exp $ */
+/* $Id: interp.cpp,v 1.106 2006/10/08 09:16:01 jhhudso Exp $ */
 
 extern "C"
 {
@@ -647,7 +647,7 @@ int command_interpreter( CHAR_DATA *ch, char *pcomm, bool procced  )
   // Handle logged players.
   if(!IS_NPC(ch) && IS_SET(ch->pcdata->punish, PUNISH_LOG)) {
     sprintf( log_buf, "Log %s: %s", GET_NAME(ch), pcomm );
-    log( log_buf, 110, LOG_PLAYER );
+    log( log_buf, 110, LOG_PLAYER, ch );
     }
     
   // Implement freeze command.

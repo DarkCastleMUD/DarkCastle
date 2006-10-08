@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: channel.cpp,v 1.17 2006/06/27 19:18:59 shane Exp $
+| $Id: channel.cpp,v 1.18 2006/10/08 09:16:01 jhhudso Exp $
 | channel.C
 | Description:  All of the channel - type commands; do_say, gossip, etc..
 */
@@ -585,7 +585,7 @@ int do_tell(struct char_data *ch, char *argument, int cmd)
         if(!IS_MOB(vict) && IS_SET(vict->pcdata->punish, PUNISH_LOG)) {
           sprintf( log_buf, "Log %s: %s told them: %s", GET_NAME(vict),
                          GET_NAME(ch),  message);
-          log( log_buf, IMP, LOG_PLAYER );
+          log( log_buf, IMP, LOG_PLAYER, vict );
         }
       }
       else if(!is_busy(vict) && GET_POS(vict) == POSITION_SLEEPING &&
@@ -616,7 +616,7 @@ int do_tell(struct char_data *ch, char *argument, int cmd)
         if(!IS_MOB(vict) && IS_SET(vict->pcdata->punish, PUNISH_LOG)) {
           sprintf( log_buf, "Log %s: %s told them: %s", GET_NAME(vict),
                          GET_NAME(ch),  message);
-          log( log_buf, IMP, LOG_PLAYER );
+          log( log_buf, IMP, LOG_PLAYER, vict );
         }
 
       }

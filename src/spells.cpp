@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.192 2006/10/02 21:26:04 shane Exp $ */
+/* $Id: spells.cpp,v 1.193 2006/10/08 09:16:01 jhhudso Exp $ */
 
 extern "C"
 {
@@ -1954,7 +1954,7 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
 	     && ch->desc && (!strcmp(tar_char->desc->host, ch->desc->host))) {
 	   sprintf( log_buf, "Multi: %s casted '%s' on %s", GET_NAME(ch),
 		    get_skill_name(spl), GET_NAME(tar_char));
-	   log( log_buf, 110, LOG_PLAYER );
+	   log( log_buf, 110, LOG_PLAYER, ch );
 	 }
 	int retval = ((*spell_info[spl].spell_pointer) (GET_LEVEL(ch), ch, argument, SPELL_TYPE_SPELL, tar_char, tar_obj, learned));
 
