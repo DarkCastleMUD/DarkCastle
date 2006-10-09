@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.148 2006/08/04 08:57:17 shane Exp $
+| $Id: cl_thief.cpp,v 1.149 2006/10/09 19:39:24 shane Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -1243,8 +1243,7 @@ int do_pocket(CHAR_DATA *ch, char *argument, int cmd)
     if (gold > 0) {
       GET_GOLD(ch)     += gold;
       GET_GOLD(victim) -= gold;
-      _exp = 5 + GET_LEVEL(victim) - GET_LEVEL(ch);
-      _exp *= exp_table[GET_LEVEL(ch)] / 1000 / (GET_LEVEL(ch) / 10)*5;
+      _exp = gold / 100 * GET_LEVEL(victim) / 5;
 	if (!IS_NPC(victim)) _exp = 0;
       if(IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_NICE_THIEF)) _exp = 1; 
       if(GET_POS(victim) <= POSITION_SLEEPING || IS_AFFECTED(victim, AFF_PARALYSIS)) _exp = 0;
