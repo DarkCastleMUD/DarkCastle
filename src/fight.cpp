@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.375 2006/09/20 11:03:14 jhhudso Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.376 2006/10/09 19:39:05 shane Exp $ */
 
 extern "C"
 {
@@ -802,20 +802,15 @@ int do_lightning_shield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
 	dam /= 2;
     if(affected_by_spell(ch, SPELL_DIVINE_INTER) && dam > affected_by_spell(ch, SPELL_DIVINE_INTER)->modifier)
       dam = affected_by_spell(ch, SPELL_DIVINE_INTER)->modifier;
+    int save = get_saves(ch, SAVE_TYPE_ENERGY);
+    if (number(1,101) < save || save < 0) {
+      if(save > 50) save = 50;
+      dam -= (int)(dam * (double)save/100);
+    }
   }
       
-//  dam /= 5;
   GET_HIT(ch) -= dam;
   do_dam_msgs(vict, ch, dam, SPELL_LIGHTNING_SHIELD, WIELD);
-/*  if(dam > 0) {
-    act("Sparks from $N's $B$5lightning$R shield sting you.", ch, 0, vict, TO_CHAR, 0);
-    act("Sparks from your $B$5lightning$R shield sting $n.", ch, 0, vict, TO_VICT, 0);
-    act("Sparks from $N's $B$5lightning$R shield sting $n.", ch, 0, vict, TO_ROOM, NOTVICT);
-  } else {
-    act("You ignore $N's pathetic sparks.", ch, 0, vict, TO_CHAR, 0);
-    act("$n ignores $N's pathetic sparks.", ch, 0, vict, TO_ROOM, NOTVICT);
-    act("$n ignores your pathetic sparks.", ch, 0, vict, TO_VICT, 0);
-  }*/
   update_pos(ch);
     
   if (GET_POS(ch) == POSITION_DEAD) {
@@ -906,6 +901,11 @@ int do_fireshield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
 	dam /= 2;
     if(affected_by_spell(ch, SPELL_DIVINE_INTER) && dam > affected_by_spell(ch, SPELL_DIVINE_INTER)->modifier)
       dam = affected_by_spell(ch, SPELL_DIVINE_INTER)->modifier;
+    int save = get_saves(ch, SAVE_TYPE_FIRE);
+    if (number(1,101) < save || save < 0) {
+      if(save > 50) save = 50;
+      dam -= (int)(dam * (double)save/100);
+    }
   }
     
   GET_HIT(ch) -= dam;
@@ -970,6 +970,11 @@ int do_acidshield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
 	dam /= 2;
     if(affected_by_spell(ch, SPELL_DIVINE_INTER) && dam > affected_by_spell(ch, SPELL_DIVINE_INTER)->modifier)
       dam = affected_by_spell(ch, SPELL_DIVINE_INTER)->modifier;
+    int save = get_saves(ch, SAVE_TYPE_ACID);
+    if (number(1,101) < save || save < 0) {
+      if(save > 50) save = 50;
+      dam -= (int)(dam * (double)save/100);
+    }
   }
     
   GET_HIT(ch) -= dam;
