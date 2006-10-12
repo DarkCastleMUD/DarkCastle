@@ -1793,7 +1793,9 @@ int spell_curse(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *
 
  set_cantquit( ch, victim );
 
-   if (malediction_res(ch, victim, SPELL_CURSE)) {
+   if (malediction_res(ch, victim, SPELL_CURSE) || 
+       (!IS_NPC(victim) && GET_LEVEL(ch) >= IMMORTAL )
+      ) {
 	act("$N resists your attempt to curse $M!", ch, NULL, victim, TO_CHAR,0);
 	act("$N resists $n's attempt to curse $M!", ch, NULL, victim, TO_ROOM,NOTVICT);
 	act("You resist $n's attempt to curse you!",ch,NULL,victim,TO_VICT,0);
@@ -2507,7 +2509,11 @@ int spell_poison(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data 
         act("$N's insides are already being eaten away by poison!", ch, NULL, victim, TO_CHAR, 0);
         endy = TRUE;
      }
-     else if (IS_SET(victim->immune, ISR_POISON) || malediction_res(ch, victim, SPELL_POISON)) {
+     else if (IS_SET(victim->immune, ISR_POISON) || 
+              malediction_res(ch, victim, SPELL_POISON) ||
+              (!IS_NPC(victim) && GET_LEVEL(ch) >= IMMORTAL )
+             ) 
+     {
          act("$N resists your attempt to poison $M!", ch, NULL, victim, TO_CHAR,0);
          act("$N resists $n's attempt to poison $M!", ch, NULL, victim, TO_ROOM,NOTVICT);
          act("You resist $n's attempt to poison you!",ch,NULL,victim,TO_VICT,0);
