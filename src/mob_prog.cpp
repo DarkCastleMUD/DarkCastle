@@ -3128,6 +3128,7 @@ int oprog_act_trigger( char *txt, CHAR_DATA *ch )
 
   mprog_cur_result = eSUCCESS;
 
+  if (ch->in_room < 0) return mprog_cur_result;
 
   for (item = world[ch->in_room].contents; item; item = 
 item->next_content)
