@@ -16,7 +16,7 @@
  *  10/21/2003   Onager    Changed IS_ANONYMOUS() to handle mobs without   *
  *                         crashing                                        *
  ***************************************************************************/
-/* $Id: utility.h,v 1.51 2006/10/08 09:14:19 jhhudso Exp $ */
+/* $Id: utility.h,v 1.52 2006/10/13 14:59:54 jhhudso Exp $ */
 
 #ifndef UTILITY_H_
 #define UTILITY_H_
@@ -144,6 +144,7 @@ bool IS_DARK( int room );
 //#define ANA(obj) (index("aeiouyAEIOUY", *(obj)->name) ? "An" : "A")
 //#define SANA(obj) (index("aeiouyAEIOUY", *(obj)->name) ? "an" : "a")
 
+#define IS_PC(ch)   (!IS_NPC(ch))
 #define IS_NPC(ch)  (IS_SET((ch)->misc, MISC_IS_MOB))
 #define IS_MOB(ch)  (IS_NPC(ch))
 #define IS_FAMILIAR(ch)	(IS_AFFECTED(ch, AFF_FAMILIAR))
