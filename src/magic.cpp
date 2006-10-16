@@ -7305,30 +7305,60 @@ int cast_enchant_weapon( ubyte level, CHAR_DATA *ch, char *arg, int type,
   return eFAILURE;
 }
 
-
 int cast_mana( ubyte level, CHAR_DATA *ch, char *arg, int type,
   CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill )
 {
+  
   switch (type) {
-	 case SPELL_TYPE_SPELL:
-		 return spell_mana(level, ch, tar_ch, 0, skill);
-		 break;
-	 case SPELL_TYPE_SCROLL:
-	   if (!tar_ch) tar_ch = ch;
-	return spell_mana(level,ch,tar_ch,0,skill);
-	break;
-	 case SPELL_TYPE_POTION:
-	 return spell_mana(level, ch, ch, 0, skill);
-	 break;
-	 case SPELL_TYPE_STAFF:
-	 for (tar_ch = world[ch->in_room].people ;
-			tar_ch ; tar_ch = tar_ch->next_in_room)
-		 spell_mana(level,ch,tar_ch,0, skill);
-	 break;
-	 default :
-	 log("Serious screw-up in mana!", ANGEL, LOG_BUG);
-	 break;
-	 }
+  case SPELL_TYPE_SPELL:
+    if (ch && affected_by_spell(ch, SPELL_DIV_INT_TIMER2)) {
+      send_to_char("Divine intervention has blocked the effect of that "
+		   "spell.\n\r", ch);
+    } else {
+      return spell_mana(level, ch, tar_ch, 0, skill);
+    }
+    break;
+  case SPELL_TYPE_SCROLL:
+    if (!tar_ch)
+      tar_ch = ch;
+
+    if (tar_ch && affected_by_spell(tar_ch, SPELL_DIV_INT_TIMER2)) {
+      send_to_char("Divine intervention has blocked the effect of that "
+		   "scroll.\n\r", tar_ch);
+      if (tar_ch != ch)
+	send_to_char("Divine intervention has blocked the effect of that "
+		     "scroll.\n\r", ch);
+    } else {
+      return spell_mana(level,ch,tar_ch,0,skill);
+    }
+    break;
+  case SPELL_TYPE_POTION:
+    if (ch && affected_by_spell(ch, SPELL_DIV_INT_TIMER2)) {
+      send_to_char("Divine intervention has blocked the effect of that "
+		   "potion.\n\r", ch);
+    } else {
+      return spell_mana(level, ch, ch, 0, skill);
+    }
+    break;
+  case SPELL_TYPE_STAFF:
+    for (tar_ch = world[ch->in_room].people ;
+	 tar_ch ; tar_ch = tar_ch->next_in_room)
+      
+      if (tar_ch && affected_by_spell(tar_ch, SPELL_DIV_INT_TIMER2)) {
+	send_to_char("Divine intervention has blocked the effect of that "
+		     "staff.\n\r", tar_ch);
+	if (tar_ch != ch) {
+	  send_to_char("Divine intervention has blocked the effect of that "
+		       "staff.\n\r", ch);
+	}
+      } else {
+	spell_mana(level,ch,tar_ch,0, skill);
+      }
+    break;
+  default :
+    log("Serious screw-up in mana!", ANGEL, LOG_BUG);
+    break;
+  }
   return eFAILURE;
 }
 
@@ -11894,6 +11924,13 @@ int spell_divine_intervention(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, OBJ
 
   af.type = SPELL_DIV_INT_TIMER;
   af.duration = 24;
+  af.modifier = 0;
+  af.location = 0;
+  af.bitvector = -1;
+  affect_to_char(ch, &af);
+
+  af.type = SPELL_DIV_INT_TIMER2;
+  af.duration = 2;
   af.modifier = 0;
   af.location = 0;
   af.bitvector = -1;
