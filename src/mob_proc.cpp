@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.118 2006/09/27 12:05:10 jhhudso Exp $ */
+/* $Id: mob_proc.cpp,v 1.119 2006/10/16 10:03:25 jhhudso Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -2454,24 +2454,24 @@ int gossip(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 /*--+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+--*/
 static char *dethSayText [ ] =
 {
-    "Can i lick your stamps ?",
-    "Want to buy a some cheap godload equipment ?",
-    "Gravity.  It's not just a good idea, it's the law.",
-    "I'm hooked on phonics !",
-    "I'm through with Sergio, he treats me like a ragdoll",
-    "How much vaseline should i use the first time ?",
-    "Saaaweeet looking ass on that sanitation engineer !",
-    "Want to see my hathead ?",
-    "Can I borrow a few coins, at least until i find another sucker..",
-    "I don't think the hydrostatic law is REALLY true.",
-    "I'm an Innie, You ?",
-    "I think I'll meta con next.",
-    "See ya later, I need to go buy some more pipeweed.",
-    "Good God, such soft hands you have..touch me more.",
-    "Is it in yet ? I can't feel a thing.",
-    "Why does my butt itch ?",
-    "I like to lick testicles. Do you have any?",
-    "My doctor recommends Monistat 7.", 
+  "Can i lick your stamps ?",
+  "Want to buy a some cheap godload equipment ?",
+  "Gravity.  It's not just a good idea, it's the law.",
+  "I'm hooked on phonics !",
+  "I'm through with Sergio, he treats me like a ragdoll",
+  "How much vaseline should i use the first time ?",
+  "Saaaweeet looking ass on that sanitation engineer !",
+  "Want to see my hathead ?",
+  "Can I borrow a few coins, at least until i find another sucker..",
+  "I don't think the hydrostatic law is REALLY true.",
+  "I'm an Innie, You ?",
+  "I think I'll meta con next.",
+  "See ya later, I need to go buy some more pipeweed.",
+  "Good God, such soft hands you have..touch me more.",
+  "Is it in yet ? I can't feel a thing.",
+  "Why does my butt itch ?",
+  "I like to lick testicles. Do you have any?",
+  "My doctor recommends Monistat 7.", 
   "All that grunting and groaning for one measly fart?!",
   "I'll give you a brownie point if you snuggle me.",
   "Shirt and shoes required? Hell, that's all I need?",
@@ -2901,7 +2901,7 @@ static char *dethSayText [ ] =
   "Honk if you love peace and quiet.",
   "Energizer Bunny Arrested! Charged with battery.",
   "I bet you I could stop gambling.",
-  "A Unix user once said, 'rm -rf /*'  And since then everything has been null and void.",
+  "A Unix user once said, 'rm -rf /'  And since then everything has been null and void.",
   "All your base are belong to us.",
   "You have no chance to survive make your time.",
   "Someone set up us the bomb.",
@@ -3031,7 +3031,7 @@ static char *dethSayText [ ] =
   "In a perfect world spammers would be locked up with men that have enlarged their penis, taken Viagra, and are looking for new relationships.",
   "I'm going to name my kids Control, Alt, and Delete so I can just hit them all at once to solve any acting up.",
   "Does anyone here have a computer?",
-  "Girls always act all old and mature until you fuck them in the ass and they're like 'STOP IM THIRTEEN IM THIRTEEN'",
+  "Girls always act all old and mature until you fuck them in the ass and they're like 'STOP IM ONLY THIRTEEN, IM ONLY THIRTEEN!'",
   "Sorry Mario but the Princess is on another MUD.",
   "I'm annoyed that they can get 11KBps from mars but can't get me a stable 5KBps over 17 miles.",
   "If my calculations are correct SLINKY + ESCALATOR = EVERLASTING FUN!",
@@ -3119,7 +3119,8 @@ static char *dethSayText [ ] =
   "Hey gods, tell Parry to stop trying to shoot his pointy thing into me!",
   "Sorry guys, I can't build right now...I have to work on my Psychology degree, its very serious.",
   "Dark Castle MUD is like a box of chocolates.....thrown into a room full of starving psychotic teenagers with weapons.",
-  "Wow guys, you shoulda seen this goat's balls, they were HUGE!  I couldn't stop droo...err stari...err yeah they were huge!"
+  "Wow guys, you shoulda seen this goat's balls, they were HUGE!  I couldn't stop droo...err stari...err yeah they were huge!",
+  "My girlfiend said to me in bed last night, \"You're a pervert.\" I said, \"That's a big word for a girl who's only nine.\""
 };
 
 #define DETH_SAY_TEXT_SIZE    ( sizeof ( dethSayText )    / sizeof ( char * ) )
