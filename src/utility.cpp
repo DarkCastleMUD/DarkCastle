@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.63 2006/10/08 09:15:25 jhhudso Exp $ */
+/* $Id: utility.cpp,v 1.64 2006/10/16 06:07:47 jhhudso Exp $ */
 
 extern "C"
 {
@@ -832,7 +832,7 @@ int do_order(struct char_data *ch, char *argument, int cmd)
           org_room = ch->in_room;
 
           if(ch->followers)
-	    for (k = ch->followers; k; k = k->next) {
+	    for (k = ch->followers; k && k != (follow_type *)0x95959595; k = k->next) {
 		if (org_room == k->follower->in_room)
 		    if (IS_AFFECTED(k->follower, AFF_CHARM)) {
 			found = TRUE;
