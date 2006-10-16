@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.133 2006/09/13 19:41:18 shane Exp $ */
+/* $Id: handler.cpp,v 1.134 2006/10/16 06:09:58 jhhudso Exp $ */
     
 extern "C"
 {
@@ -1580,6 +1580,10 @@ void affect_remove( CHAR_DATA *ch, struct affected_type *af, int flags)
       case SPELL_DIV_INT_TIMER:
          if(!(flags & SUPPRESS_MESSAGES))
          send_to_char("The gods smile upon you and are ready to intervene on your behalf again.\n\r", ch);
+         break;
+      case SPELL_DIV_INT_TIMER2:
+         if(!(flags & SUPPRESS_MESSAGES))
+         send_to_char("You feel mana regenerating within you again.\n\r", ch);
          break;
       case SKILL_QUIVERING_PALM:
          if(!(flags & SUPPRESS_MESSAGES))
