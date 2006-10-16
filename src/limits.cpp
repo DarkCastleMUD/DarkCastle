@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.78 2006/07/31 11:12:18 dcastle Exp $ */
+/* $Id: limits.cpp,v 1.79 2006/10/16 06:09:45 jhhudso Exp $ */
 
 extern "C"
 {
@@ -776,7 +776,10 @@ void point_update( void )
     // only heal linkalive's and mobs
     if(GET_POS(i) > POSITION_DEAD && (IS_NPC(i) || i->desc)) {
       GET_HIT(i)  = MIN(GET_HIT(i)  + hit_gain(i),  hit_limit(i));
-      GET_MANA(i) = MIN(GET_MANA(i) + mana_gain(i), mana_limit(i));
+
+      if (!affected_by_spell(i, SPELL_DIV_INT_TIMER2))
+	GET_MANA(i) = MIN(GET_MANA(i) + mana_gain(i), mana_limit(i));
+
       GET_MOVE(i) = MIN(GET_MOVE(i) + move_gain(i), move_limit(i));
       GET_KI(i)   = MIN(GET_KI(i)   + ki_gain(i),   ki_limit(i));
     }
