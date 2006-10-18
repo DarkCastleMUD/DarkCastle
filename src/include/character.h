@@ -1,7 +1,7 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.48 2006/10/08 09:13:15 jhhudso Exp $
+| $Id: character.h,v 1.49 2006/10/18 04:32:39 jhhudso Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
@@ -20,6 +20,7 @@
 #include <quest.h>
 
 #define START_ROOM        3001 // Where you login
+#define CFLAG_HOME        3014 // Where the champion flag normally rests
 #define SECOND_START_ROOM 3059 // Where you go if killed in start room
 
 #define PASSWORD_LEN    20
