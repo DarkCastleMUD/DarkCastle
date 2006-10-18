@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: non_off.cpp,v 1.43 2006/10/18 04:24:04 jhhudso Exp $
+| $Id: non_off.cpp,v 1.44 2006/10/18 04:30:13 jhhudso Exp $
 | non_off.C
 | Description:  Implementation of generic, non-offensive commands.
 */
@@ -188,7 +188,7 @@ int do_donate(struct char_data *ch, char *argument, int cmd)
 
   // Handle yielding the champion flag
   if (GET_OBJ_VNUM(obj) == 45) {
-    if (IS_SET(world[new_room].room_flags, SAFE)) {
+    if (IS_SET(world[ch->in_room].room_flags, SAFE)) {
       if(IS_AFFECTED(ch, AFF_CHAMPION)) {
 	REMBIT(ch->affected_by, AFF_CHAMPION);
 
@@ -217,7 +217,7 @@ int do_donate(struct char_data *ch, char *argument, int cmd)
 	return eFAILURE;
       }
     } else {
-      send_to_char("You can only yield the Champion flag from a safe room.\n\r");
+      send_to_char("You can only yield the Champion flag from a safe room.\n\r", ch);
       return eFAILURE;
     }
   }
@@ -228,18 +228,20 @@ int do_donate(struct char_data *ch, char *argument, int cmd)
   }
 
   if(IS_SET(obj->obj_flags.more_flags, ITEM_NO_TRADE)) { 
-    if(GET_LEVEL(ch) > IMMORTAL)
+    if(GET_LEVEL(ch) > IMMORTAL) {
       send_to_char("That was a NO_TRADE item btw....\r\n", ch);
-    else {
+    } else {
       send_to_char("It seems magically attached to you.\r\n", ch);
-    return eFAILURE;
+      return eFAILURE;
+    }
   }
 
   if(contains_no_trade_item(obj)) {
-    if(GET_LEVEL(ch) > IMMORTAL)
-       send_to_char("That was a NO_TRADE item btw....\r\n", ch);
-    else {
-      send_to_char("Something inside it seems magically attached to you.\r\n", ch);
+    if(GET_LEVEL(ch) > IMMORTAL) {
+      send_to_char("That was a NO_TRADE item btw....\r\n", ch);
+    } else {
+      send_to_char("Something inside it seems magically attached to you.\r\n"
+		   , ch);
       return eFAILURE;
     }
   } 
