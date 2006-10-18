@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.121 2006/10/18 19:21:14 jhhudso Exp $ */
+/* $Id: mob_proc.cpp,v 1.122 2006/10/18 21:00:53 pirahna Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -3120,8 +3120,15 @@ static char *dethSayText [ ] =
   "Sorry guys, I can't build right now...I have to work on my Psychology degree, its very serious.",
   "Dark Castle MUD is like a box of chocolates.....thrown into a room full of starving psychotic teenagers with weapons.",
   "Wow guys, you shoulda seen this goat's balls, they were HUGE!  I couldn't stop droo...err stari...err yeah they were huge!",
-  "My girlfiend said to me in bed last night, \"You're a pervert.\" I said, \"That's a big word for a girl who's only thirteen.\""
+  "My girlfiend said to me in bed last night, \"You're a pervert.\" I said, \"That's a big word for a girl who's only thirteen.\"",
+  "So what's the speed of dark?",
+  "A conclusion is the place where you got tired of thinking.",
+  "If you think nobody cares about you, try missing a couple of payments.",
+  "Someone sent me a postcard picture of the earth.  On the back it said, \"Wish you were here.\"",
+  "I spilled spot remover on my dog. Now he's gone."
 };
+
+// ENDOFCHAIN
 
 #define DETH_SAY_TEXT_SIZE    ( sizeof ( dethSayText )    / sizeof ( char * ) )
 
