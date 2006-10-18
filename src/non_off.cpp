@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: non_off.cpp,v 1.42 2006/08/24 22:59:21 shane Exp $
+| $Id: non_off.cpp,v 1.43 2006/10/18 04:24:04 jhhudso Exp $
 | non_off.C
 | Description:  Implementation of generic, non-offensive commands.
 */
@@ -186,13 +186,52 @@ int do_donate(struct char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
+  // Handle yielding the champion flag
+  if (GET_OBJ_VNUM(obj) == 45) {
+    if (IS_SET(world[new_room].room_flags, SAFE)) {
+      if(IS_AFFECTED(ch, AFF_CHAMPION)) {
+	REMBIT(ch->affected_by, AFF_CHAMPION);
+
+	sprintf(buf, "\n\r##%s has just yielded the Champion flag!\n\r",
+		GET_NAME(ch));
+	send_info(buf);
+
+	act("$n yields $p.", ch, obj, 0, TO_ROOM, 0);
+	act("You yield $p.", ch, obj, 0, TO_CHAR, 0);
+ 
+	location = real_room(CFLAG_HOME);
+	origin = ch->in_room;
+	move_char(ch, location);
+
+	act("$p falls from the heavens...", ch, obj, 0, TO_ROOM, INVIS_NULL);
+      
+	move_char(ch, origin);
+	move_obj(obj, location);
+      
+	do_save(ch, "", 0);
+	return eSUCCESS;
+      } else {
+	sprintf(buf, "%s had the champion flag, but no AFF_CHAMPION.",
+		GET_NAME(ch));
+	log(buf, IMMORTAL, LOG_BUG);
+	return eFAILURE;
+      }
+    } else {
+      send_to_char("You can only yield the Champion flag from a safe room.\n\r");
+      return eFAILURE;
+    }
+  }
+
   if(IS_SET(obj->obj_flags.extra_flags, ITEM_NODROP)) {
     send_to_char("Since you can't let go of it, how are you going to donate it?\n\r", ch);
     return eFAILURE;
   }
 
   if(IS_SET(obj->obj_flags.more_flags, ITEM_NO_TRADE)) { 
-    send_to_char("It seems magically attached to you.\r\n", ch);
+    if(GET_LEVEL(ch) > IMMORTAL)
+      send_to_char("That was a NO_TRADE item btw....\r\n", ch);
+    else {
+      send_to_char("It seems magically attached to you.\r\n", ch);
     return eFAILURE;
   }
 
