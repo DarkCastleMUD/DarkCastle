@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.122 2006/10/18 21:00:53 pirahna Exp $ */
+/* $Id: mob_proc.cpp,v 1.123 2006/10/19 20:37:28 pirahna Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -3125,7 +3125,30 @@ static char *dethSayText [ ] =
   "A conclusion is the place where you got tired of thinking.",
   "If you think nobody cares about you, try missing a couple of payments.",
   "Someone sent me a postcard picture of the earth.  On the back it said, \"Wish you were here.\"",
-  "I spilled spot remover on my dog. Now he's gone."
+  "I spilled spot remover on my dog. Now he's gone.",
+  "Cross country skiing is great if you live in a small country.",
+  "I used to work in a fire hydrant factory.  You couldn't park anywhere near the place.",
+  "What's another word for Thesaurus?",
+  "You can't have everything...where would you put it?",
+  "A lot of people are afraid of heights. Not me, I'm afraid of widths.",
+  "I planted some bird seed. A bird came up. Now I don't know what to feed it.",
+  "I brought a mirror to Lovers' Lane. I told everybody I'm Narcissus.",
+  "If you can wave a fan, and you can wave a club, can you wave a fan club?",
+  "Smoking cures weight problems...eventually...",
+  "Droughts are because god didn't pay his water bill.",
+  "Is \"tired old cliche\" one?",
+  "The sign said \"eight items or less\". So I changed my name to Les.",
+  "Yesterday I saw a chicken crossing the road. I asked it why. It told me it was none of my business.",
+  "I xeroxed a mirror. Now I have an extra xerox machine.",
+  "I went to San Francisco. I found someone's heart.",
+  "You know the guy who writes all those bumper stickers?  He hates New York.",
+  "I washed a sock. Then I put it in the dryer. When I took it out, it was gone.",
+  "The Bermuda Triangle got tired of warm weather. It moved to Alaska. Now Santa Claus is missing.",
+  "If a word in the dictionary were misspelled, how would we know?",
+  "When I was a little kid we had a sand box. It was a quicksand box. I was an only child....eventually.",
+  "For my birthday I got a humidifier and a de-humidifier...I put them in the same room and let them fight it out.",
+  "I put contact lenses in my dog's eyes. They had little pictures of cats on them. Then I took one out and he ran around in circles.",
+  "When I was little, my grandfather used to make me stand in a closet for five minutes without moving. He said it was elevator practice."
 };
 
 // ENDOFCHAIN
