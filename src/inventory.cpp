@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.78 2006/08/30 20:31:48 shane Exp $
+| $Id: inventory.cpp,v 1.79 2006/10/22 08:33:31 shane Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -1081,6 +1081,12 @@ int do_put(struct char_data *ch, char *argument, int cmd)
               {
                 send_to_char("Are you crazy?!  Someone could steal it!\r\n", ch);
                 return eFAILURE;
+              }
+              if(IS_SET(obj_object->obj_flags.more_flags, ITEM_NO_TRADE) &&
+                sub_object->carried_by != ch)
+              {
+                 send_to_char("Now, now, no doing that *wink*.\n\r", ch);
+                 return eFAILURE;
               }
 	      if (((sub_object->obj_flags.weight) + 
                (obj_object->obj_flags.weight)) <
