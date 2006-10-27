@@ -11930,11 +11930,11 @@ int spell_divine_intervention(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, OBJ
   affect_to_char(ch, &af);
 
   af.type = SPELL_DIV_INT_TIMER2;
-  af.duration = 1;
+  af.duration = (6 + skill / 10) * 2;
   af.modifier = 0;
   af.location = 0;
   af.bitvector = -1;
-  affect_to_char(ch, &af);
+  affect_to_char(ch, &af, PULSE_VIOLENCE);
 
   af.type = SPELL_DIVINE_INTER;
   af.duration = 6 + skill / 10;
