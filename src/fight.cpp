@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.377 2006/10/16 06:10:01 jhhudso Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.378 2006/10/28 00:16:17 jhhudso Exp $ */
 
 extern "C"
 {
@@ -3871,11 +3871,17 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
   }
   
   /* If we're still here we can thrash the victim */
-  if(!IS_NPC(victim)) /* We don't need mob deaths logged */
-  {
-    if(ch)
-      sprintf(buf, "%s killed by %s", GET_NAME(victim), GET_NAME(ch));
-    else sprintf(buf, "%s killed by [null killer]", GET_NAME(victim));
+  if(IS_PC(victim)) { /* Only log player deaths */
+    if(ch) {
+      if (ch->mobdata) {
+	sprintf(buf, "%s killed by %d (%s)", GET_NAME(victim), mob_index[ch->mobdata->nr].virt,
+		GET_NAME(ch));
+      } else {
+	sprintf(buf, "%s killed by %s", GET_NAME(victim), GET_NAME(ch));
+      }
+    } else {
+      sprintf(buf, "%s killed by [null killer]", GET_NAME(victim));
+    }
 
     // notify the clan members - clan_death checks for null ch/vict
     clan_death (victim, ch);
