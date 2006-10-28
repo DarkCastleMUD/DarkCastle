@@ -28,7 +28,7 @@ struct set_data
 #define SET_MOSS                14
 #define SET_BLACKSTEELA         15
 #define SET_BLACKSTEELB         16
-#define SET_MAX			1214
+#define SET_MAX			1216
 
 extern const struct set_data set_list[];
  
