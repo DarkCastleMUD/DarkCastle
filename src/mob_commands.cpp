@@ -1465,3 +1465,23 @@ int do_mppause( CHAR_DATA *ch, char *argument, int cmd )
   return eSUCCESS;
 }
 
+int do_mppeace( struct char_data *ch, char *argument, int cmd )
+{
+    if ( !IS_NPC( ch ) )
+    {
+        send_to_char( "Huh?\n\r", ch );
+	return eSUCCESS;
+    }
+
+    struct char_data *rch;
+
+    for (rch = world[ch->in_room].people; rch!=NULL; rch = rch->next_in_room) {
+        if ( IS_MOB(rch) && rch->mobdata->hatred != NULL )
+            remove_memory(rch, 'h');
+        if ( rch->fighting != NULL )
+            stop_fighting(rch);
+    }
+    act("$n makes a gesture and all fighting stops.", ch,0,0,TO_ROOM, 0);
+    send_to_char( "You stop all fighting in this room.\n\r", ch );
+    return eSUCCESS;
+}
