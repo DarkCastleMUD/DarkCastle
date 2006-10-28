@@ -398,7 +398,7 @@ void translate_value(char *left, char *right, int16 **vali, uint32 **valui,
 		  else {int16 car = target->carry_weight;intval = &car;}
 		} else if (!str_cmp(right, "class"))
 		{  if (!target) tError = TRUE;
-		  else {sbyte car = target->c_class; sbval = &target->c_class;}
+		  else {sbval = &target->c_class;}
 		} else if (!str_cmp(right, "coldsave"))
 		{  if (!target) tError = TRUE;
 		  else {intval = &target->saves[SAVE_TYPE_COLD];}
@@ -507,7 +507,7 @@ void translate_value(char *left, char *right, int16 **vali, uint32 **valui,
 		{
 		   if (!target && !otarget) tError = TRUE;
 		   else if (otarget) {intval = &otarget->obj_flags.eq_level;}
-		   else { sbyte car = target->level; if (IS_NPC(target)) sbval= &target->level; else sbval = &target->level;}
+		   else { if (IS_NPC(target)) sbval= &target->level; else sbval = &target->level;}
 		} else if (!str_cmp(right,"long"))
 		{
 		   if (!target) tError = TRUE;
@@ -2204,7 +2204,7 @@ void mprog_translate( char ch, char *t, CHAR_DATA *mob, CHAR_DATA *actor,
 
 bool do_bufs(char *bufpt, char *argpt, char *point)
 {
-  bool traditional = FALSE, traditional2 = TRUE;
+  bool traditional = FALSE;
 
   /* get whatever comes before the left paren.. ignore spaces */
   while ( *point )
@@ -2284,7 +2284,6 @@ int mprog_process_cmnd( char *cmnd, CHAR_DATA *mob, CHAR_DATA *actor,
 	  char *lvalstr = 0;
 	  int64 *lvali64 = 0;
 	  sbyte *lvalb = 0; 
-	  char type = *str;
 	  *str = '\0';
 	  debugpoint();
 	  if (do_bufs(&buf[0], &tmp[0], cmnd)) 
