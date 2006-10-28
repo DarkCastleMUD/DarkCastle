@@ -367,6 +367,8 @@ int leastPathSteps(class Path *goal, class Path *at, int steps, int *beststeps)
     }
     leastPathSteps(goal, pt->p, steps+1, beststeps);
  }
+
+ return 0; //otherwise, warning: control reaches end of non-void function
 }
 
 bool determinePath(class Path *goal, class Path *at, int beststeps, int steps, class Path **end)
