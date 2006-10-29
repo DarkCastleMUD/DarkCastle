@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.136 2006/10/28 23:54:28 jhhudso Exp $ */
+/* $Id: handler.cpp,v 1.137 2006/10/29 01:03:00 jhhudso Exp $ */
     
 extern "C"
 {
@@ -374,10 +374,10 @@ const struct set_data set_list[] = {
   { "Moss Equipment", 11, {18001,18002,18003,18004,18006,18008,18009,18010,18011,18016,18017,-1,-1,-1,-1,-1,-1,-1,-1},
 	"A strange energy surges through you and you feel your senses sharpen.\n\r",
 	"Your senses return to normal as you remove your mossy garb.\n\r"},
-  { "Blacksteel Battlegear A", 19, {283,283,284,284,285,286,287,288,289,290,292,293,294,294,295,296,296,297,298},
+  { "Blacksteel Battlegear", 19, {283,283,284,284,285,286,287,288,289,290,292,293,294,294,295,296,296,297,298},
         "The might of the warrior's spirit, past, present, and future, hums through your body.\n\r",
         "The harmony of the warrior's spirit has left you.\n\r"},
-  { "Blacksteel Battlegear B", 19, {283,283,284,284,285,286,287,288,289,290,292,293,294,294,295,296,296,297,291},
+  { "Blacksteel Battlegear", 19, {283,283,284,284,285,286,287,288,289,290,292,293,294,294,295,296,296,297,291},
         "The might of the warrior's spirit, past, present, and future, hums through your body.\n\r",
         "The harmony of the warrior's spirit has left you.\n\r"},
   { "\n", 0, {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
@@ -592,6 +592,7 @@ void add_set_stats(char_data *ch, obj_data *obj, int flag, int pos)
             af.location = APPLY_SAVES;
             af.modifier = 25;
             affect_to_char(ch, &af);
+	    break;
           case SET_BLACKSTEELB:
             af.location = APPLY_ARMOR;
             af.modifier = -50;
@@ -599,6 +600,7 @@ void add_set_stats(char_data *ch, obj_data *obj, int flag, int pos)
             af.location = APPLY_SAVES;
             af.modifier = 25;
             affect_to_char(ch, &af);
+	    break;
 	  default:           
 		send_to_char("Tough luck, you completed an unimplemented set. Report what you just wore, eh?\r\n",ch);
 		break;
