@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.99 2006/09/06 11:01:23 shane Exp $
+| $Id: guild.cpp,v 1.100 2006/10/29 17:45:40 jhhudso Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -696,7 +696,7 @@ if (ch->in_room && IS_SET(world[ch->in_room].room_flags, NOLEARN))
 
    if (!difficulty) 
    {
-     logf(IMMORTAL, LOG_BUG, "Illegal difficulty in skill %d. Tell someone.", skill);
+     logf(IMMORTAL, LOG_BUG, "%s had an invalid skill level of %d in skill %d.", GET_NAME(ch), difficulty, skill);
      return; // Skill w/out difficulty.
    }
    if( ! ( learned = has_skill(ch, skill) ) )
