@@ -2741,6 +2741,41 @@ int spell_remove_poison(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct ob
 }
 
 
+bool find_spell_shield(CHAR_DATA *ch, CHAR_DATA *victim)
+{
+  if (IS_AFFECTED(victim, AFF_FIRESHIELD))
+  {
+    if (ch == victim)
+      send_to_char("You are already protected by a shield of fire.\n\r", ch);
+    else
+      act("$N is already protected by a shield of fire.", ch, 0, victim, TO_CHAR, INVIS_NULL);
+
+    return TRUE;
+  }
+
+  if (IS_AFFECTED(victim, AFF_LIGHTNINGSHIELD))
+  {
+    if (ch == victim)
+      send_to_char("You are already protected by a shield of lightning.\n\r", ch);
+    else
+      act("$N is already protected by a shield of lightning.", ch, 0, victim, TO_CHAR, INVIS_NULL);
+
+    return TRUE;
+  }
+
+  if (affected_by_spell(victim, SPELL_ACID_SHIELD))
+  {
+    if (ch == victim)
+      send_to_char("You are already protected by a shield of acid.\n\r", ch);
+    else
+      act("$N is already protected by a shield of acid.", ch, 0, victim, TO_CHAR, INVIS_NULL);
+
+    return TRUE;
+  }
+
+  return FALSE;
+}
+
 /* FIRESHIELD */
 
 int spell_fireshield(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
@@ -2748,11 +2783,8 @@ int spell_fireshield(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
   struct affected_type af;
   int learned = has_skill(ch, SPELL_FIRESHIELD);
 
-  if ( IS_AFFECTED(victim,AFF_FIRESHIELD) )
-  {
-	 act("$N is already fireshielded.",ch,0,victim,TO_CHAR, INVIS_NULL);
-	 return eFAILURE;
-  }
+  if (find_spell_shield(ch, victim))
+    return eFAILURE;
 
   if (!affected_by_spell(victim, SPELL_FIRESHIELD))
   {
@@ -10706,6 +10738,9 @@ int spell_acid_shield(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
   struct affected_type af;
   int learned = has_skill(ch, SPELL_ACID_SHIELD);
 
+  if (find_spell_shield(ch, victim))
+    return eFAILURE;
+
   if (!affected_by_spell(victim, SPELL_ACID_SHIELD))
   {
     act("$n is surrounded by a gaseous shield of $B$2acid$R.", victim, 0, 0, TO_ROOM, INVIS_NULL);
@@ -10980,6 +11015,9 @@ int spell_lightning_shield(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct
 {
   struct affected_type af;
   int learned = has_skill(ch, SPELL_LIGHTNING_SHIELD);
+
+  if (find_spell_shield(ch, victim))
+    return eFAILURE;
 
   if (!affected_by_spell(victim, SPELL_LIGHTNING_SHIELD))
   {
