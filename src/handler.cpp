@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.137 2006/10/29 01:03:00 jhhudso Exp $ */
+/* $Id: handler.cpp,v 1.138 2006/10/30 12:25:33 jhhudso Exp $ */
     
 extern "C"
 {
@@ -697,11 +697,45 @@ GET_OBJ_WEIGHT(ch->equipment[SECOND_WIELD]) > GET_STR(ch)/2
 
 }
 
-void affect_modify(CHAR_DATA *ch, int32 loc, int32 mod, long bitv, bool add)
+void affect_modify(CHAR_DATA *ch, int32 loc, int32 mod, long bitv, bool add, int flag)
 {
    char log_buf[256];
    int i;
-    
+
+   if (add) {
+     if (loc == APPLY_LIGHTNING_SHIELD) {
+       if (affected_by_spell(ch, SPELL_LIGHTNING_SHIELD)) {
+	 affect_from_char(ch, SPELL_LIGHTNING_SHIELD);
+       }
+
+       if (affected_by_spell(ch, SPELL_FIRESHIELD)) {
+	 affect_from_char(ch, SPELL_FIRESHIELD);
+
+	 if (!flag) {
+	   send_to_char("The magic of this item clashes with your fire "
+			"shield.\n\r", ch);
+	   act("Your $B$4flames$R have been extinguished!",
+	       ch, 0, ch, TO_VICT, 0);
+	   act("The $B$4flames$R encompassing $n's body are extinguished!",
+	       ch, 0, 0, TO_ROOM, 0);
+	 }
+       }
+
+       if (affected_by_spell(ch, SPELL_ACID_SHIELD)) {
+	 affect_from_char(ch, SPELL_ACID_SHIELD);
+
+	 if (!flag) {
+	   send_to_char("The magic of this item clashes with your acid "
+			"shield.\n\r", ch);
+	   act("Your shield of $B$2acid$R dissolves to nothing!",
+	       ch, 0, ch, TO_VICT, 0);
+	   act("The $B$2acid$R swirling about $n's body dissolves to nothing!",
+	       ch, 0, 0, TO_ROOM, 0);
+	 }
+       }
+     }
+   }
+
    if (loc >= 1000) return;
    if (bitv != -1 && bitv <= AFF_MAX) {
    if(add)
@@ -1983,7 +2017,7 @@ int equip_char(CHAR_DATA *ch, struct obj_data *obj, int pos, int flag)
 
     for(j=0; ch->equipment[pos] && j<ch->equipment[pos]->num_affects; j++)
 	affect_modify(ch, obj->affected[j].location,
-	  obj->affected[j].modifier, -1, TRUE);
+	  obj->affected[j].modifier, -1, TRUE, flag);
 
    add_set_stats(ch, obj, flag,pos);
 
