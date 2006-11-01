@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.210 2006/08/30 19:02:34 shane Exp $ */
+/* $Id: const.cpp,v 1.211 2006/11/01 01:15:10 jhhudso Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -53,7 +53,6 @@ bestowable_god_commands_type bestowable_god_commands[] =
 { "sedit",      COMMAND_SEDIT },
 { "punish",     COMMAND_PUNISH },
 { "sqedit",     COMMAND_SQEDIT },
-{ "oclone",	COMMAND_OCLONE },
 { "hedit",      COMMAND_HEDIT },
 { "hindex",     COMMAND_HINDEX },
 { "opstat",	COMMAND_OPSTAT },
