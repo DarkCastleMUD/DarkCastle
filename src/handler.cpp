@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.138 2006/10/30 12:25:33 jhhudso Exp $ */
+/* $Id: handler.cpp,v 1.139 2006/11/01 01:43:49 jhhudso Exp $ */
     
 extern "C"
 {
@@ -702,7 +702,7 @@ void affect_modify(CHAR_DATA *ch, int32 loc, int32 mod, long bitv, bool add, int
    char log_buf[256];
    int i;
 
-   if (add) {
+   if (add && IS_PC(ch)) {
      if (loc == APPLY_LIGHTNING_SHIELD) {
        if (affected_by_spell(ch, SPELL_LIGHTNING_SHIELD)) {
 	 affect_from_char(ch, SPELL_LIGHTNING_SHIELD);
