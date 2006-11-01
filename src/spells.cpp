@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.194 2006/10/27 02:56:54 jhhudso Exp $ */
+/* $Id: spells.cpp,v 1.195 2006/11/01 01:46:57 jhhudso Exp $ */
 
 extern "C"
 {
@@ -81,6 +81,7 @@ int do_fall(CHAR_DATA *ch, short dir);
 void remove_memory(CHAR_DATA *ch, char type);
 void add_memory(CHAR_DATA *ch, char *victim, char type);
 void make_dust(CHAR_DATA * ch);
+void say_spell( CHAR_DATA *ch, int si, int room = 0);
 extern struct index_data *mob_index;
 
 #if(0)
@@ -1140,7 +1141,7 @@ void add_follower(CHAR_DATA *ch, CHAR_DATA *leader, int cmd)
 }
 
 
-void say_spell( CHAR_DATA *ch, int si )
+void say_spell( CHAR_DATA *ch, int si, int room )
 {
     char buf[MAX_STRING_LENGTH], splwd[MAX_BUF_LENGTH];
     char buf2[MAX_STRING_LENGTH];
@@ -1204,7 +1205,14 @@ void say_spell( CHAR_DATA *ch, int si )
     sprintf(buf2,"$n utters the words, '%s'", buf);
     sprintf(buf, "$n utters the words, '%s'", spells[si-1]);
 
-    for(temp_char = world[ch->in_room].people;
+    CHAR_DATA *people;
+    if (room > 0) {
+      people = world[room].people;
+    } else {
+      people = world[ch->in_room].people;
+    }
+
+    for(temp_char = people;
 	temp_char;
 	temp_char = temp_char->next_in_room)
 	if(temp_char != ch) {
@@ -1653,13 +1661,13 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
       tar_obj = 0;
       bool ok_self = FALSE;
       int oldroom = 0;
+      int dir = -1;
       if (spl == SPELL_LIGHTNING_BOLT && has_skill(ch, SKILL_SPELLCRAFT))
       { // Oh the special cases of spellcraft.
 	 name[0] = '\0';
          one_argument(argument, name);
 	 if (argument && strlen(argument) > strlen(name))
 	 {
-  	  int dir = -1;
 	   *argument = LOWER(*(argument + strlen(name) +1));
  	   if(*argument == 'n') dir = 0;
 	   else if(*argument == 'e') dir = 1;
@@ -1871,8 +1879,8 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
 	  }
      }
 
-      if (spl != SPELL_VENTRILOQUATE)  /* :-) */
-        say_spell(ch, spl);
+      if (spl != SPELL_VENTRILOQUATE) /* :-) */
+	say_spell(ch, spl, oldroom);
 
 	if ((spl != SPELL_MAGIC_MISSILE && spl != SPELL_FIREBALL) ||
 	  !spellcraft(ch,spl))
@@ -1958,9 +1966,37 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
 	 }
 	int retval = ((*spell_info[spl].spell_pointer) (GET_LEVEL(ch), ch, argument, SPELL_TYPE_SPELL, tar_char, tar_obj, learned));
 
-	if (oldroom && !IS_SET(retval, eCH_DIED))
-		{ char_from_room(ch); char_to_room(ch, oldroom);WAIT_STATE(ch, (int)(spell_info[spl].beats));
-}
+	if (oldroom && !IS_SET(retval, eCH_DIED)) {
+	  char_from_room(ch);
+	  char_to_room(ch, oldroom);
+	  WAIT_STATE(ch, (int)(spell_info[spl].beats));
+
+	  if (spl == SPELL_LIGHTNING_BOLT) {
+	    char buffer[MAX_STRING_LENGTH];
+	    strcpy(buffer, "$n unleashes a bolt of $B$5lightning$R to the ");
+	    switch (dir) {
+	    case 0:
+	      strcat(buffer, "north.");
+	      break;
+	    case 1:
+	      strcat(buffer, "east.");
+	      break;
+	    case 2:
+	      strcat(buffer, "south.");
+	      break;
+	    case 3:
+	      strcat(buffer, "west.");
+	      break;
+	    case 4:
+	      strcat(buffer, "area above you.");
+	      break;
+	    case 5:
+	      strcat(buffer, "area below you.");
+	      break;
+	    }
+	    act(buffer, ch, 0, 0, TO_ROOM, 0);
+	  }
+	}
 
         return retval;
       }
