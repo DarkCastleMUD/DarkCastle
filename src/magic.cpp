@@ -2783,7 +2783,7 @@ int spell_fireshield(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
   struct affected_type af;
   int learned = has_skill(ch, SPELL_FIRESHIELD);
 
-  if (find_spell_shield(ch, victim))
+  if (find_spell_shield(ch, victim) && IS_PC(victim))
     return eFAILURE;
 
   if (!affected_by_spell(victim, SPELL_FIRESHIELD))
@@ -10738,7 +10738,7 @@ int spell_acid_shield(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
   struct affected_type af;
   int learned = has_skill(ch, SPELL_ACID_SHIELD);
 
-  if (find_spell_shield(ch, victim))
+  if (find_spell_shield(ch, victim) && IS_PC(victim))
     return eFAILURE;
 
   if (!affected_by_spell(victim, SPELL_ACID_SHIELD))
@@ -11016,7 +11016,7 @@ int spell_lightning_shield(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct
   struct affected_type af;
   int learned = has_skill(ch, SPELL_LIGHTNING_SHIELD);
 
-  if (find_spell_shield(ch, victim))
+  if (find_spell_shield(ch, victim) && IS_PC(victim))
     return eFAILURE;
 
   if (!affected_by_spell(victim, SPELL_LIGHTNING_SHIELD))
