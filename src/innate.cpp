@@ -82,6 +82,14 @@ char * innate_skills[] =
 // command functions
 int do_innate(CHAR_DATA *ch, char *arg, int cmd)
 {
+  extern int arena[4];
+
+  if(ch && ch->in_room > 0 &&
+     IS_SET(world[ch->in_room].room_flags, ARENA) && arena[2] == -3) {
+    send_to_char("Cannot use innate skills within a potato arena.\n\r", ch);
+    return eFAILURE;
+  }
+
   int i;
   char buf[512];
   arg = one_argument(arg,buf);
