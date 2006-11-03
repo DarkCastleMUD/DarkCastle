@@ -911,7 +911,7 @@ int do_qedit(CHAR_DATA *ch, char *argument, int cmd)
    struct quest_info *oldquest;   
 
    switch(i) {
-      case 0:
+   case 0: // name
          sprintf(field, "%s %s", value, argument);
          oldquest = get_quest_struct(field);
          if(oldquest) {
@@ -924,64 +924,64 @@ int do_qedit(CHAR_DATA *ch, char *argument, int cmd)
             csendf(ch, "to %s.\n\r", quest->name);
          }
          break;
-      case 1:
+   case 1: // level
          csendf(ch, "Level changed from %d ", quest->level);
          quest->level = atoi(value);
          csendf(ch, "to %d.\n\r", quest->level);
          break;
-      case 2:
+   case 2: // objnum
          csendf(ch, "Objnum changed from %d ", quest->objnum);
          quest->objnum = atoi(value);
          csendf(ch, "to %d.\n\r", quest->objnum);
          break;
-      case 3:
+   case 3: // objshort
          csendf(ch, "Objshort changed from %s ", quest->objshort);
          sprintf(field, "%s %s", value, argument);
          quest->objshort = str_hsh(field);
          csendf(ch, "to %s.\n\r", quest->objshort);
          break;
-      case 4:
+   case 4: // objlong
          csendf(ch, "Objlong changed from %s ", quest->objlong);
          sprintf(field, "%s %s", value, argument);
          quest->objlong = str_hsh(field);
          csendf(ch, "to %s.\n\r", quest->objlong);
          break;
-      case 5:
+   case 5: // objkey
          csendf(ch, "Objkey changed from %s ", quest->objkey);
          sprintf(field, "%s %s", value, argument);
          quest->objkey = str_hsh(field);
          csendf(ch, "to %s.\n\r", quest->objkey);
          break;
-      case 6:
+   case 6: // mobnum
          csendf(ch, "Mobnum changed from %d ", quest->mobnum);
          quest->mobnum = atoi(value);
          csendf(ch, "to %d.\n\r", quest->mobnum);
          break;
-      case 7:
+   case 7: //timer
          csendf(ch, "Timer changed from %d ", quest->timer);
          quest->timer = atoi(value);
          csendf(ch, "to %d.\n\r", quest->timer);
          break;
-      case 8:
+   case 8: //reward
          csendf(ch, "Reward changed from %d ", quest->reward);
          quest->reward = atoi(value);
          csendf(ch, "to %d.\n\r", quest->reward);
          break;
-      case 9:
+   case 9: // hint1
          sprintf(field, "%s %s", value, argument);
-         csendf(ch, "Name changed from %s ", quest->hint1);
+         csendf(ch, "Hint #1 changed from %s ", quest->hint1);
          quest->hint1 = str_hsh(field);
          csendf(ch, "to %s.\n\r", quest->hint1);
          break;
-      case 10:
+   case 10: // hint2
          sprintf(field, "%s %s", value, argument);
-         csendf(ch, "Name changed from %s ", quest->hint2);
+         csendf(ch, "Hint #2 changed from %s ", quest->hint2);
          quest->hint2 = str_hsh(field);
          csendf(ch, "to %s.\n\r", quest->hint2);
          break;
-      case 11:
+   case 11: //hint3
          sprintf(field, "%s %s", value, argument);
-         csendf(ch, "Name changed from %s ", quest->hint3);
+         csendf(ch, "Hint #3 changed from %s ", quest->hint3);
          quest->hint3 = str_hsh(field);
          csendf(ch, "to %s.\n\r", quest->hint3);
          break;
