@@ -604,7 +604,13 @@ int quest_handler(CHAR_DATA *ch, CHAR_DATA *qmaster, int cmd, char *name)
    char buf[MAX_STRING_LENGTH];
    struct quest_info *quest;
 
-   if(cmd != 1) quest = get_quest_struct(name);
+   if(cmd != 1) {
+     quest = get_quest_struct(name);
+     if (quest == 0) {
+       csendf(ch, "That is not a valid quest name.\n\r");
+       return eFAILURE;
+     }
+   }
 
    switch(cmd) {
       case 1:
