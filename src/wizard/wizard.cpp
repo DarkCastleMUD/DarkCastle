@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.34 2006/09/22 15:09:21 jhhudso Exp $
+| $Id: wizard.cpp,v 1.35 2006/11/04 14:36:24 jhhudso Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -96,9 +96,10 @@ void do_mload(struct char_data *ch, int rnum, int cnt)
   act("$n has created $N!", ch, 0, mob, TO_ROOM, 0);
   sprintf(buf,"You create %i %s!\n\r",cnt, mob->short_desc);
   send_to_char(buf, ch);
-  sprintf(buf,"%s loads %i %s at %s.",
+  sprintf(buf,"%s loads %i %d (%s) at %s.",
           GET_NAME(ch),
           cnt,
+	  mob_index[rnum].virt,
           mob->short_desc,
           world[ch->in_room].name);
   log(buf, GET_LEVEL(ch), LOG_GOD);
@@ -128,9 +129,10 @@ void do_oload(struct char_data *ch, int rnum, int cnt)
   act("$n has created $p!", ch, obj, 0, TO_ROOM, 0);
   sprintf(buf, "You create %i %s.\n\r", cnt, obj->short_description);
   send_to_char(buf, ch);
-  sprintf(buf,"%s loads %i %s at %s.",
+  sprintf(buf,"%s loads %i %d (%s) at %s.",
           GET_NAME(ch),
           cnt,
+	  GET_OBJ_VNUM(obj),
           obj->short_description,
           world[ch->in_room].name);
   log(buf, GET_LEVEL(ch), LOG_GOD);
