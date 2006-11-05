@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.378 2006/10/28 00:16:17 jhhudso Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.379 2006/11/05 02:16:03 apocalypse Exp $ */
 
 extern "C"
 {
@@ -1892,9 +1892,9 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
 
   if(typeofdamage == DAMAGE_TYPE_PHYSICAL) {
     if (IS_SET(ch->combat, COMBAT_BERSERK))
-      dam = (int)(dam * 1.6);
+      dam = (int)(dam * 1.8);
     if (IS_SET(ch->combat, COMBAT_RAGE1) || IS_SET(ch->combat, COMBAT_RAGE2) && attacktype != SKILL_BACKSTAB)
-      dam = (int)(dam * 1.3);
+      dam = (int)(dam * 1.4);
     if (IS_SET(ch->combat, COMBAT_HITALL))
       dam = (int)(dam * 2);
     if (IS_SET(ch->combat, COMBAT_ORC_BLOODLUST1)) {
