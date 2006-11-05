@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.55 2006/10/11 08:23:24 shane Exp $ */
+/* $Id: ki.cpp,v 1.56 2006/11/05 03:29:10 jhhudso Exp $ */
 
 extern "C"
 {
@@ -690,22 +690,286 @@ int ki_purify( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
   return eSUCCESS;
 }
 
-int ki_disrupt( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
+int ki_disrupt( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim)
 {
-   if (!vict) {
+   if (!victim) {
       log("Serious problem in ki disrupt!", ANGEL, LOG_BUG);
       return eINTERNAL_ERROR;
       }
 
    act("$n slams a bolt of focused ki energy into the flow of magic around you!", 
-       ch, 0, vict, TO_VICT, 0);
+       ch, 0, victim, TO_VICT, 0);
    act("$n focuses a blast of ki to disrupt the flow of magic around $N!",
-       ch, 0, vict, TO_ROOM, 0);
+       ch, 0, victim, TO_ROOM, 0);
    send_to_char("You focus your ki to disrupt the flow of magic around your opponent!\r\n", ch);
 
    WAIT_STATE(ch, PULSE_VIOLENCE);
-   
-   return spell_dispel_magic(GET_LEVEL(ch)+1, ch, vict, 0, 0);
+   set_cantquit(ch, victim);
+
+   if(ISSET(victim->affected_by, AFF_GOLEM)) {
+      send_to_char("The golem seems to shrug off your dispel attempt!\r\n", ch);
+      act("The golem seems to ignore $n's dispelling magic!", ch, 0, 0, TO_ROOM, 0);
+      return eFAILURE;
+   }
+
+   int learned = has_skill(ch, KI_OFFSET+KI_DISRUPT);
+   int success_chance = learned - get_saves(victim, SAVE_TYPE_MAGIC);
+
+// If victim higher level, they get a save vs magic for no effect
+//      if((GET_LEVEL(victim) > GET_LEVEL(ch)) && 0 > saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC))
+//          return eFAILURE;
+
+   int retval = 0;
+
+   if (number(1,101) > success_chance) {
+     act("$N resists your attempt to dispel magic!", ch, NULL, victim,
+	  TO_CHAR,0);
+     act("$N resists $n's attempt to dispel magic!", ch, NULL, victim, TO_ROOM,
+	  NOTVICT);
+     act("You resist $n's attempt to dispel magic!",ch, NULL, victim, TO_VICT,
+	 0);
+     if (IS_NPC(victim) && (!victim->fighting) &&
+	 GET_POS(ch) > POSITION_SLEEPING) {
+       retval = attack(victim, ch, TYPE_UNDEFINED);
+       retval = SWAP_CH_VICT(retval);
+       return retval;
+     }
+
+     return eFAILURE;
+   }
+
+   // Dispel Bingo chance
+   if (learned > 85) {
+     int level_diff = GET_LEVEL(ch) - GET_LEVEL(victim);
+
+     if (level_diff >= 0) {
+       success_chance = 5;
+     } else if (level_diff >= -20) {
+       success_chance = 3;
+     } else if (level_diff >= -100) {
+       success_chance = 1;
+     } else {
+       success_chance = 0;
+     }
+
+     if (success_chance > 0 && number(1,100) <= success_chance) {
+       if (affected_by_spell(victim, SPELL_SANCTUARY))
+	 {
+	   affect_from_char(victim, SPELL_SANCTUARY);
+	   act("You don't feel so invulnerable anymore.", ch, 0, victim, TO_VICT, 0);
+	   act("The $B$7white glow$R around $n's body fades.", victim, 0, 0, TO_ROOM, 0);
+           }
+       if (IS_AFFECTED(victim, AFF_SANCTUARY))
+	 {
+	   REMBIT(victim->affected_by, AFF_SANCTUARY);
+	   act("You don't feel so invunerable anymore.", ch, 0,victim, TO_VICT, 0);
+	   act("The $B$7white glow$R around $n's body fades.", victim, 0, 0, TO_ROOM, 0);
+	 }
+       if (affected_by_spell(victim, SPELL_PROTECT_FROM_EVIL))
+	 {
+	   affect_from_char(victim, SPELL_PROTECT_FROM_EVIL);
+	   act("Your protection from evil has been dispelled!", ch, 0,victim, TO_VICT, 0);
+	   act("The dark, $6pulsing$R aura surrounding $n has been dispelled!", victim, 0, 0, TO_ROOM, 0);
+	 }
+
+       if (affected_by_spell(victim, SPELL_HASTE))
+	 {
+	   affect_from_char(victim, SPELL_HASTE);
+	   act("Your magically enhanced speed has been dispelled!", ch, 0,victim, TO_VICT, 0);
+	   act("$n's actions slow to their normal speed.", victim, 0, 0, TO_ROOM, 0);
+	 }
+
+       if (affected_by_spell(victim, SPELL_STONE_SHIELD)) 
+	 {
+	   affect_from_char(victim, SPELL_STONE_SHIELD);
+	   act("Your shield of swirling stones falls harmlessly to the ground!", ch, 0,victim, TO_VICT, 0);
+	   act("The shield of stones swirling about $n's body fall to the ground!", victim, 0, 0, TO_ROOM, 0);
+	 }
+
+       if (affected_by_spell(victim, SPELL_GREATER_STONE_SHIELD))
+	 {
+	   affect_from_char(victim, SPELL_GREATER_STONE_SHIELD);
+	   act("Your shield of swirling stones falls harmlessly to the ground!", ch, 0,victim, TO_VICT, 0);
+	   act("The shield of stones swirling about $n's body falls to the ground!", victim, 0, 0, TO_ROOM, 0);
+	 }
+       
+       if (IS_AFFECTED(victim, AFF_FROSTSHIELD))
+	 {
+	   REMBIT(victim->affected_by, AFF_FROSTSHIELD);
+	   act("Your shield of $B$3frost$R melts into nothing!.", ch, 0,victim, TO_VICT, 0);
+	   act("The $B$3frost$R encompassing $n's body melts away.", victim, 0, 0, TO_ROOM, 0);
+	 }
+       
+       if (affected_by_spell(victim, SPELL_LIGHTNING_SHIELD))
+	 {
+	   affect_from_char(victim, SPELL_LIGHTNING_SHIELD);
+	   act("Your crackling shield of $B$5electricity$R vanishes!", ch, 0,victim, TO_VICT, 0);
+	   act("The $B$5electricity$R crackling around $n's body fades away.", victim, 0, 0, TO_ROOM, 0);
+	   
+	 }       
+       if (affected_by_spell(victim, SPELL_FIRESHIELD))
+	 {
+	   affect_from_char(victim, SPELL_FIRESHIELD);
+	   act("Your $B$4flames$R have been extinguished!", ch, 0,victim, TO_VICT, 0);
+	   act("The $B$4flames$R encompassing $n's body are extinguished!", victim, 0, 0, TO_ROOM, 0);
+	 }
+       if (IS_AFFECTED(victim, AFF_FIRESHIELD))
+	 {
+	   REMBIT(victim->affected_by, AFF_FIRESHIELD);
+	   act("Your $B$4flames$R have been extinguished!", ch, 0,victim, TO_VICT, 0);
+	   act("The $B$4flames$R encompassing $n's body are extinguished!", victim, 0, 0, TO_ROOM, 0);
+	 }
+       if (affected_by_spell(victim, SPELL_ACID_SHIELD))
+	 {
+	   affect_from_char(victim, SPELL_ACID_SHIELD);
+	   act("Your shield of $B$2acid$R dissolves to nothing!", ch, 0,victim, TO_VICT, 0);
+	   act("The $B$2acid$R swirling about $n's body dissolves to nothing!", victim, 0, 0, TO_ROOM, 0);
+	 }       
+       if (affected_by_spell(victim, SPELL_PROTECT_FROM_GOOD))
+	 {
+	   affect_from_char(victim, SPELL_PROTECT_FROM_GOOD);
+	   act("Your protection from good has been dispelled!", ch, 0,victim, TO_VICT, 0);
+	   act("The light, $B$6pulsing$R aura surrounding $n has been dispelled!", victim, 0, 0, TO_ROOM, 0);
+	 }       
+     }
+	
+     return eSUCCESS;
+   }
+
+
+   int rots = 0;
+   int done = FALSE;
+// Number of spells in the switch statement goes here
+   while(!done && ((rots += 1) < 15))
+   {
+     int x = number(1,10);
+     switch(x) 
+     {
+        case 1: 
+           if (affected_by_spell(victim, SPELL_SANCTUARY))
+           {
+              affect_from_char(victim, SPELL_SANCTUARY);
+	      act("You don't feel so invulnerable anymore.", ch, 0, victim, TO_VICT, 0);
+              act("The $B$7white glow$R around $n's body fades.", victim, 0, 0, TO_ROOM, 0);
+              done = TRUE;
+           }
+           if (IS_AFFECTED(victim, AFF_SANCTUARY))
+           {
+              REMBIT(victim->affected_by, AFF_SANCTUARY);
+              act("You don't feel so invunerable anymore.", ch, 0,victim, TO_VICT, 0);
+              act("The $B$7white glow$R around $n's body fades.", victim, 0, 0, TO_ROOM, 0);
+              done = TRUE;
+           }
+           break;
+
+        case 2: 
+           if (affected_by_spell(victim, SPELL_PROTECT_FROM_EVIL))
+           {
+              affect_from_char(victim, SPELL_PROTECT_FROM_EVIL);
+              act("Your protection from evil has been dispelled!", ch, 0,victim, TO_VICT, 0);
+              act("The dark, $6pulsing$R aura surrounding $n has been dispelled!", victim, 0, 0, TO_ROOM, 0);
+              done = TRUE;
+           }
+           break;
+
+        case 3: 
+           if (affected_by_spell(victim, SPELL_HASTE))
+           {
+              affect_from_char(victim, SPELL_HASTE);
+              act("Your magically enhanced speed has been dispelled!", ch, 0,victim, TO_VICT, 0);
+              act("$n's actions slow to their normal speed.", victim, 0, 0, TO_ROOM, 0);
+              done = TRUE;
+           }
+           break;
+
+        case 4: 
+           if (affected_by_spell(victim, SPELL_STONE_SHIELD)) 
+           {
+              affect_from_char(victim, SPELL_STONE_SHIELD);
+              act("Your shield of swirling stones falls harmlessly to the ground!", ch, 0,victim, TO_VICT, 0);
+              act("The shield of stones swirling about $n's body fall to the ground!", victim, 0, 0, TO_ROOM, 0);
+              done = TRUE;
+           }
+           break;
+
+	 case 5: 
+           if (affected_by_spell(victim, SPELL_GREATER_STONE_SHIELD))
+           {
+              affect_from_char(victim, SPELL_GREATER_STONE_SHIELD);
+              act("Your shield of swirling stones falls harmlessly to the ground!", ch, 0,victim, TO_VICT, 0);
+              act("The shield of stones swirling about $n's body falls to the ground!", victim, 0, 0, TO_ROOM, 0);
+              done = TRUE;
+           }
+           break;
+
+	 case 6: 
+	   if (IS_AFFECTED(victim, AFF_FROSTSHIELD))
+           {
+	      REMBIT(victim->affected_by, AFF_FROSTSHIELD);
+              act("Your shield of $B$3frost$R melts into nothing!.", ch, 0,victim, TO_VICT, 0);
+              act("The $B$3frost$R encompassing $n's body melts away.", victim, 0, 0, TO_ROOM, 0);
+              done = TRUE;
+           }
+           break;
+
+	 case 7: 
+           if (affected_by_spell(victim, SPELL_LIGHTNING_SHIELD))
+           {
+              affect_from_char(victim, SPELL_LIGHTNING_SHIELD);
+              act("Your crackling shield of $B$5electricity$R vanishes!", ch, 0,victim, TO_VICT, 0);
+              act("The $B$5electricity$R crackling around $n's body fades away.", victim, 0, 0, TO_ROOM, 0);
+              done = TRUE;
+           }
+           break;
+	 case 8: 
+           if (affected_by_spell(victim, SPELL_FIRESHIELD))
+           {
+              affect_from_char(victim, SPELL_FIRESHIELD);
+              act("Your $B$4flames$R have been extinguished!", ch, 0,victim, TO_VICT, 0);
+              act("The $B$4flames$R encompassing $n's body are extinguished!", victim, 0, 0, TO_ROOM, 0);
+              done = TRUE;
+           }
+           if (IS_AFFECTED(victim, AFF_FIRESHIELD))
+           {
+              REMBIT(victim->affected_by, AFF_FIRESHIELD);
+              act("Your $B$4flames$R have been extinguished!", ch, 0,victim, TO_VICT, 0);
+              act("The $B$4flames$R encompassing $n's body are extinguished!", victim, 0, 0, TO_ROOM, 0);
+              done = TRUE;
+	   }
+           break;
+	 case 9: 
+           if (affected_by_spell(victim, SPELL_ACID_SHIELD))
+           {
+              affect_from_char(victim, SPELL_ACID_SHIELD);
+              act("Your shield of $B$2acid$R dissolves to nothing!", ch, 0,victim, TO_VICT, 0);
+              act("The $B$2acid$R swirling about $n's body dissolves to nothing!", victim, 0, 0, TO_ROOM, 0);
+              done = TRUE;
+           }
+           break;
+      
+        case 10:
+           if (affected_by_spell(victim, SPELL_PROTECT_FROM_GOOD))
+           {
+              affect_from_char(victim, SPELL_PROTECT_FROM_GOOD);
+              act("Your protection from good has been dispelled!", ch, 0,victim, TO_VICT, 0);
+              act("The light, $B$6pulsing$R aura surrounding $n has been dispelled!", victim, 0, 0, TO_ROOM, 0);
+              done = TRUE;
+           }
+           break;
+
+           default: send_to_char("Illegal Value sent to dispel_magic switch statement.  Tell a god.", ch);
+              done = TRUE;
+              break;
+      } // end of switch
+   } // end of while
+
+   if (IS_NPC(victim) && !victim->fighting) 
+   {
+      retval = one_hit(victim, ch, TYPE_UNDEFINED, FIRST);
+      retval = SWAP_CH_VICT(retval);
+      return retval;
+   }
+   return eSUCCESS;
 }
 
 int ki_stance( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
