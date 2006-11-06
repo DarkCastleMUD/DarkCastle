@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.139 2006/11/01 01:43:49 jhhudso Exp $ */
+/* $Id: handler.cpp,v 1.140 2006/11/06 23:26:16 jhhudso Exp $ */
     
 extern "C"
 {
@@ -1698,7 +1698,27 @@ affected_type * affected_by_spell( CHAR_DATA *ch, int skill )
   return NULL;
 }
 
+affected_type * affected_by_random(CHAR_DATA *ch)
+{
+  if (ch->affected == 0)
+    return 0;
 
+  //Count number of affects
+  int aff_cnt = 0;
+  for(affected_type *curr = ch->affected; curr; curr = curr->next)
+    aff_cnt++;
+
+  int j = 1;
+  int pick = number(1, aff_cnt);
+  for(affected_type *curr = ch->affected; curr; curr = curr->next) {
+    if (j == pick)
+      return curr;
+    else
+      j++;
+  }
+
+  return 0;
+}
 
 void affect_join( CHAR_DATA *ch, struct affected_type *af,
 		  bool avg_dur, bool avg_mod )
