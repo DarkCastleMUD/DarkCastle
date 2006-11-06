@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.h,v 1.21 2006/10/30 12:26:43 jhhudso Exp $ */
+/* $Id: handler.h,v 1.22 2006/11/06 23:27:43 jhhudso Exp $ */
 
 #ifndef HANDLER_H_
 #define HANDLER_H_
@@ -35,7 +35,7 @@ void affect_remove( CHAR_DATA *ch, struct affected_type *af, int flags);
 affected_type * affected_by_spell( CHAR_DATA *ch, int skill );
 void affect_join( CHAR_DATA *ch, struct affected_type *af,
 		  bool avg_dur, bool avg_mod );
-
+affected_type * affected_by_random(CHAR_DATA *ch);
 
 
 /* flag bit values for affect_remove() */
