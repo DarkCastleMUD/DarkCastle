@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.53 2006/11/07 02:58:51 jhhudso Exp $
+| $Id: cl_warrior.cpp,v 1.54 2006/11/07 03:27:08 jhhudso Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -468,19 +468,27 @@ int do_bash(struct char_data *ch, char *argument, int cmd)
     case CLASS_CLERIC:
     case CLASS_DRUID:
     case CLASS_BARD:
-      modifier += 10;
+      modifier += 8;
       break;
     case CLASS_THIEF:
     case CLASS_RANGER:
     case CLASS_PALADIN:
     case CLASS_ANTI_PAL:
-      modifier += 5;
+    case CLASS_PSIONIC:
+    case CLASS_NECROMANCER:
+      modifier += 4;
       break;
     default:
       break;
     }
     
-    modifier += get_stat(ch, STR) - get_stat(victim, STR);
+    int stat_mod = get_stat(ch, STR) - get_stat(victim, STR);
+    if (stat_mod > 10)
+      stat_mod = 10;
+    if (stat_mod < -10)
+      stat_mod = -10;
+
+    modifier += stat_mod;
 
     // if it's a barb
 //    if(ch->equipment[WIELD] && 
