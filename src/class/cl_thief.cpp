@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.150 2006/11/04 02:20:36 jhhudso Exp $
+| $Id: cl_thief.cpp,v 1.151 2006/11/07 03:24:20 jhhudso Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -500,7 +500,13 @@ int do_trip(CHAR_DATA *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if(!skill_success(ch,victim,SKILL_TRIP)) {
+  int modifier = get_stat(ch, DEX) - get_stat(victim, DEX);
+  if (modifier > 10)
+    modifier = 10;
+  if (modifier < -10)
+    modifier = -10;
+
+  if(!skill_success(ch,victim,SKILL_TRIP, modifier)) {
     act("$n fumbles clumsily as $e attempts to trip you!", ch, NULL, victim, TO_VICT, 0 );
     act("You fumble the trip!", ch, NULL, victim, TO_CHAR , 0);
     act("$n fumbles as $e tries to trip $N!", ch, NULL, victim, TO_ROOM, NOTVICT );
