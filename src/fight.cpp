@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.379 2006/11/05 02:16:03 apocalypse Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.380 2006/11/07 01:20:55 jhhudso Exp $ */
 
 extern "C"
 {
@@ -2095,6 +2095,50 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
   */
   if (dam < 0)
     dam = 0;
+
+  percent = (int) (( ((float)GET_HIT(victim)) / 
+		     ((float)GET_MAX_HIT(victim)) ) * 100);
+  if( percent < 40 && (learned = has_skill(victim, SKILL_FRENZY))) {    
+    switch(attacktype) {
+    case SPELL_BURNING_HANDS:
+    case SPELL_DROWN:
+    case SPELL_CAUSE_SERIOUS:
+    case SPELL_ACID_BLAST:
+    case SPELL_FIREBALL:
+    case SPELL_LIGHTNING_BOLT:
+    case SPELL_VAMPIRIC_TOUCH:
+    case SPELL_METEOR_SWARM:
+    case SPELL_CALL_LIGHTNING:
+    case SPELL_CHILL_TOUCH:
+    case SPELL_COLOUR_SPRAY:
+    case SPELL_CAUSE_LIGHT:
+    case SPELL_CAUSE_CRITICAL:
+    case SPELL_SPARKS:
+    case SPELL_FLAMESTRIKE:
+    case SPELL_DISPEL_EVIL:
+    case SPELL_DISPEL_GOOD:
+    case SPELL_HELLSTREAM:
+    case SPELL_HARM:
+    case SPELL_POWER_HARM:
+    case SPELL_MAGIC_MISSILE:
+    case SPELL_BLUE_BIRD:
+    case SPELL_SHOCKING_GRASP:
+    case SPELL_SUN_RAY:
+    case SPELL_BEE_STING:
+    case SPELL_DIVINE_FURY:
+      if (number(1,100) <= (learned/2)) {
+	act("In your frenzied state you shake off some of the affects of "
+	    "$n's magical attack!", ch, 0, victim, TO_VICT, 0);
+	act("In $k frenzied state, $N shakes off some of the damage of "
+	    "your spell!", ch, 0, victim, TO_CHAR, 0);
+	act("In $k frenzied state, $N shakes off some of the damage of "
+	    "$n's spell!", ch, 0, victim, TO_ROOM, NOTVICT);
+
+	dam = (int)(dam * (double)(number(45,55) / 100.0));
+      }
+      break;
+    }
+  }
 
   if(affected_by_spell(victim, SPELL_DIVINE_INTER) && dam > affected_by_spell(victim, SPELL_DIVINE_INTER)->modifier)
     dam = affected_by_spell(victim, SPELL_DIVINE_INTER)->modifier;
