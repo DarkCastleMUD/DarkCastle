@@ -199,18 +199,29 @@ void show_quest_info(CHAR_DATA *ch, int num)
 
    while(quest) {
       if(quest->number == num) {
-         csendf(ch, "Quest Name: %-35s   Level: %d\n\r"
-                    "Hint: %s\n\r"
-                    "      %s\n\r"
-                    "      %s\n\r"
-                    "Objnum:   %d     Quest Mobnum: %d\n\r"
-                    "Objshort: %s\n\r"
-                    "Objlong:  %s\n\r"
-                    "Objkey:   %s\n\r"
-                    "Timer:    %d     Reward: %d\n\r",
-                     quest->name, quest->level, quest->hint1, quest->hint2, quest->hint3,
-                     quest->objnum, quest->mobnum, quest->objshort, quest->objlong,
-                     quest->objkey, quest->timer, quest->reward);
+         csendf(ch, 
+		"$3Quest Info for #$R%d\n\r"
+		"$3========================================$R\n\r"
+		"$3Name:$R   %s\n\r"
+		"$3Level:$R  %d\n\r"
+		"$3Cost:$R   %d plats\n\r"
+		"$3Reward:$R %d qpoints\n\r"
+		"$3Timer:$R  %d\n\r"
+		"$3----------------------------------------$R\n\r"
+		"$3Quest Mob Vnum:$R %d\n\r"
+		"$3----------------------------------------$R\n\r"
+		"$3Quest Object Vnum:$R %d\n\r"
+		"$3Keywords:$R          %s\n\r"
+		"$3Short description:$R %s\n\r"
+		"$3Long description:$R  %s\n\r"
+		"$3----------------------------------------$R\n\r"		
+		"$3Hints:$R\n\r"
+		"$31.$R %s\n\r"
+		"$32.$R %s\n\r"
+		"$33.$R %s\n\r",
+		quest->number, quest->name, quest->level, get_quest_price(quest),
+                quest->reward, quest->timer, quest->mobnum, quest->objnum, quest->objkey,
+                quest->objshort, quest->objlong,quest->hint1, quest->hint2, quest->hint3);
          return;
       }
       quest = quest->next;
@@ -421,27 +432,39 @@ int start_quest(CHAR_DATA *ch, struct quest_info *quest)
       if(!obj) return 0;
    }
 
-   if(!check_available_quest(ch, quest)) return eFAILURE;
+   if(!check_available_quest(ch, quest)) {
+     send_to_char("That quest is not available to you.\n\r", ch);
+     return eFAILURE;
+   }
 
    while(count < QUEST_MAX) {
       if(!ch->pcdata->quest_current[count])
          break;
       count++;
-      if(count == QUEST_MAX) return eEXTRA_VALUE;
+      if(count == QUEST_MAX) {
+	send_to_char("You've got too many quests started already.\n\r", ch);
+	return eEXTRA_VALUE;
+      }
    }
 
    price = get_quest_price(quest);
-   if(GET_PLATINUM(ch) < price) return eEXTRA_VAL2;
+   if(GET_PLATINUM(ch) < price) {
+     csendf(ch, "You need %d platinum coins to start this quest, which you don't have!\n\r", price);
+     return eEXTRA_VAL2;
+   }
   
    if((mob = get_mob_vnum(quest->mobnum))) {
-      obj = clone_object(quest->objnum);
+      obj = clone_object(real_object(quest->objnum));
       obj->short_description = str_hsh(quest->objshort);
       obj->description = str_hsh(quest->objlong);
       sprintf(buf, "%s q%d", quest->objkey, quest->number);
       obj->name = str_hsh(buf);
       obj_to_char(obj, mob);
       wear(mob, obj, keywordfind(obj));
-   } else return eFAILURE;
+   } else {
+     send_to_char("This quest is temporarily unavailable.\n\r", ch);
+     return eFAILURE;
+   }
 
    ch->pcdata->quest_current[count] = quest->number;     
    ch->pcdata->quest_current_ticksleft[count] = quest->timer;
@@ -497,7 +520,12 @@ int complete_quest(CHAR_DATA *ch, struct quest_info *quest)
    }
    sprintf(buf, "q%d", quest->number);
    obj = get_obj_in_list(buf, ch->carrying);
-   if(!obj) return eFAILURE;
+
+   if(!obj) {
+     send_to_char("You do not appear to have the quest object yet.\n\r", ch);
+     return eFAILURE;
+   }
+
    obj_from_char(obj);
    ch->pcdata->quest_points += quest->reward;
    ch->pcdata->quest_current[count] = 0;
