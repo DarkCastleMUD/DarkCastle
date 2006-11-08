@@ -69,6 +69,14 @@
 
 #include <sstream>
 #include <iostream>
+#include <list>
+
+struct multiplayer {
+  char *host;
+  char *name1;
+  char *name2;
+};
+
 using namespace std;
 
 #ifndef INVALID_SOCKET
@@ -2670,22 +2678,30 @@ void warn_if_duplicate_ip(char_data * ch)
 {
    char buf[256];
    int highlev = 51;
+
+   list<multiplayer> multi_list;
+
    for(descriptor_data * d = descriptor_list; d; d = d->next) 
    {
       if( d->character && 
           strcmp(GET_NAME(ch), GET_NAME(d->character)) &&
           !strcmp(d->host, ch->desc->host)
-        )
-      {
+        ) {
+	multiplayer m;
+	m.host = d->host;
+	m.name1 = GET_NAME(ch);
+	m.name2 = GET_NAME(d->character);
+
+	multi_list.push_back(m);
+
 	highlev = MAX(GET_LEVEL(d->character), GET_LEVEL(ch));
 	highlev = MAX(highlev, OVERSEER);
-       // sprintf(buf, "MultipleIP: %s -> %s (%d)/ %s (%d)", d->host, GET_NAME(ch), 
-      //                  (world[ch->in_room].number ? world[ch->in_room].number : -1), GET_NAME(d->character),
-      //                  (world[d->character->in_room].number ? world[d->character->in_room].number : -1));
-
-        sprintf(buf, "MultipleIP: %s -> %s / %s ", d->host, GET_NAME(ch), GET_NAME(d->character));
-        log(buf, highlev, LOG_WARNINGS );
       }
+   }
+
+   for(list<multiplayer>::iterator i=multi_list.begin(); i != multi_list.end(); ++i) {
+     snprintf(buf, 256, "MultipleIP: %s -> %s / %s ", (*i).host, (*i).name1, (*i).name2);
+     log(buf, highlev, LOG_WARNINGS );
    }
 
 }
