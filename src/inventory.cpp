@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.80 2006/11/09 01:13:39 jhhudso Exp $
+| $Id: inventory.cpp,v 1.81 2006/11/09 01:45:15 jhhudso Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -1576,24 +1576,6 @@ int do_open(CHAR_DATA *ch, char *argument, int cmd)
             
    if (!*type)
       send_to_char("Open what?\n\r", ch);
-   else if (generic_find(argument, FIND_OBJ_INV | FIND_OBJ_ROOM, ch, &victim, &obj))
-   {
-      // this is an object
-      if (obj->obj_flags.type_flag != ITEM_CONTAINER)
-         send_to_char("That's not a container.\n\r", ch);
-      else if (!IS_SET(obj->obj_flags.value[1], CONT_CLOSED))
-         send_to_char("But it's already open!\n\r", ch);
-      else if (!IS_SET(obj->obj_flags.value[1], CONT_CLOSEABLE))
-         send_to_char("You can't do that.\n\r", ch);
-      else if (IS_SET(obj->obj_flags.value[1], CONT_LOCKED))
-         send_to_char("It seems to be locked.\n\r", ch);   
-      else
-      {   
-         REMOVE_BIT(obj->obj_flags.value[1], CONT_CLOSED);
-         send_to_char("Ok.\n\r", ch);
-         act("$n opens $p.", ch, obj, 0, TO_ROOM, 0);
-      }
-   }
    else if ((door = find_door(ch, type, dir)) >= 0)
    { 
       if (!IS_SET(EXIT(ch, door)->exit_info, EX_ISDOOR))
@@ -1669,6 +1651,25 @@ int do_open(CHAR_DATA *ch, char *argument, int cmd)
          }
       }
    }
+   else if (generic_find(argument, FIND_OBJ_INV | FIND_OBJ_ROOM, ch, &victim, &obj))
+   {
+      // this is an object
+      if (obj->obj_flags.type_flag != ITEM_CONTAINER)
+         send_to_char("That's not a container.\n\r", ch);
+      else if (!IS_SET(obj->obj_flags.value[1], CONT_CLOSED))
+         send_to_char("But it's already open!\n\r", ch);
+      else if (!IS_SET(obj->obj_flags.value[1], CONT_CLOSEABLE))
+         send_to_char("You can't do that.\n\r", ch);
+      else if (IS_SET(obj->obj_flags.value[1], CONT_LOCKED))
+         send_to_char("It seems to be locked.\n\r", ch);   
+      else
+      {   
+         REMOVE_BIT(obj->obj_flags.value[1], CONT_CLOSED);
+         send_to_char("Ok.\n\r", ch);
+         act("$n opens $p.", ch, obj, 0, TO_ROOM, 0);
+      }
+   }
+
    // in case ch died or anything
    if(retval)
       return retval;
