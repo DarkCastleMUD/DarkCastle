@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.79 2006/10/22 08:33:31 shane Exp $
+| $Id: inventory.cpp,v 1.80 2006/11/09 01:13:39 jhhudso Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -1687,21 +1687,6 @@ int do_close(CHAR_DATA *ch, char *argument, int cmd)
     
    if (!*type)
       send_to_char("Close what?\n\r", ch);
-   else if (generic_find(argument, FIND_OBJ_INV | FIND_OBJ_ROOM, ch, &victim, &obj))
-   {     
-      if (obj->obj_flags.type_flag != ITEM_CONTAINER)
-         send_to_char("That's not a container.\n\r", ch);
-      else if (IS_SET(obj->obj_flags.value[1], CONT_CLOSED))
-         send_to_char("But it's already closed!\n\r", ch); 
-      else if (!IS_SET(obj->obj_flags.value[1], CONT_CLOSEABLE))
-         send_to_char("That's impossible.\n\r", ch);
-      else
-      {   
-         SET_BIT(obj->obj_flags.value[1], CONT_CLOSED);
-         send_to_char("Ok.\n\r", ch);
-         act("$n closes $p.", ch, obj, 0, TO_ROOM, 0);
-      }
-   }
    else if ((door = find_door(ch, type, dir)) >= 0)
    {    
       if (!IS_SET(EXIT(ch, door)->exit_info, EX_ISDOOR))
@@ -1735,6 +1720,22 @@ int do_close(CHAR_DATA *ch, char *argument, int cmd)
                }
       }
    }
+   else if (generic_find(argument, FIND_OBJ_INV | FIND_OBJ_ROOM, ch, &victim, &obj))
+   {     
+      if (obj->obj_flags.type_flag != ITEM_CONTAINER)
+         send_to_char("That's not a container.\n\r", ch);
+      else if (IS_SET(obj->obj_flags.value[1], CONT_CLOSED))
+         send_to_char("But it's already closed!\n\r", ch); 
+      else if (!IS_SET(obj->obj_flags.value[1], CONT_CLOSEABLE))
+         send_to_char("That's impossible.\n\r", ch);
+      else
+      {   
+         SET_BIT(obj->obj_flags.value[1], CONT_CLOSED);
+         send_to_char("Ok.\n\r", ch);
+         act("$n closes $p.", ch, obj, 0, TO_ROOM, 0);
+      }
+   }
+
    return eSUCCESS;
 }
 
