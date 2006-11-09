@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.124 2006/11/09 18:07:08 pirahna Exp $ */
+/* $Id: mob_proc.cpp,v 1.125 2006/11/09 19:45:41 pirahna Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -3161,7 +3161,24 @@ static char *dethSayText [ ] =
   "What do you get when you cross an archer with a gift-wrapper?    Ribbon Hood.",
   "Saddam Hussein: \"Why are you carrying groceries in a box son?\" Son: \"Because we have no more Baghdad.\"",
   "What do you get when you pour hot water down a rabbit hole?   A hot cross bunny.",
-  "Which key has legs but can't open doors?  A turkey"
+  "Which key has legs but can't open doors?  A turkey",
+  "Did you hear about the guy who stayed up all night to find out where the sun went?  In the morning it dawned on him.",
+  "If you jumped off the bridge in Paris and swam in the river that goes through the city people would say you were insane.",
+  "If you make lots of telephone calls in China there's a good chance you'll get the Wong number.",
+  "How do you get down from an elephant?   You don't. You get down from a duck.",
+  "What do John The Baptist and Kermit The Frog have in common?    Same middle name.",
+  "A termite walks into a bar. It asks, \"Is the bar tender here?\"",
+  "Why do soldiers in Helsinki wash their tanks and trucks so often?   They're trying to protect the Finnish.",
+  "What did the boy firefly say to the girl firefly?     You glow girl!",
+  "Why did the scientist install a traditional knocker on his front door?   So he could win the NoBell prize.",
+  "Two fonts walk into a bar.  The barman says to them, \"Get out. We don't serve your type here.\"",
+  "Why does a chicken coop have two doors?  Because if it had four doors it would be a chicken sedan.",
+  "Guy: Doc, I think I'm shrinking...I think I'm getting a little smaller every day. Doc: I think you'll have to be a little patient.",
+  "Two fish are in a tank.  One says to the other, \"Do you know how to drive this thing?\"",
+  "Two birds are sitting on a perch.  One says to the other, \"Do you smell fish?\"",
+  "Some bacon and eggs walk into a bar.  Bartenders says, \"Get out!  We don't serve breakfast here.\"",
+  "A skeleton walked into a bar. \"What'll it be?\", asked the barman. \"I'll have a beer and a mop,\" said the skeleton.",
+  "If a canyon ate too much, do you think it would gorge itself?"
 };
 
 // ENDOFCHAIN
