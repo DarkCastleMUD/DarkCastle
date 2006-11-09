@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.123 2006/10/19 20:37:28 pirahna Exp $ */
+/* $Id: mob_proc.cpp,v 1.124 2006/11/09 18:07:08 pirahna Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -3148,7 +3148,20 @@ static char *dethSayText [ ] =
   "When I was a little kid we had a sand box. It was a quicksand box. I was an only child....eventually.",
   "For my birthday I got a humidifier and a de-humidifier...I put them in the same room and let them fight it out.",
   "I put contact lenses in my dog's eyes. They had little pictures of cats on them. Then I took one out and he ran around in circles.",
-  "When I was little, my grandfather used to make me stand in a closet for five minutes without moving. He said it was elevator practice."
+  "When I was little, my grandfather used to make me stand in a closet for five minutes without moving. He said it was elevator practice.",
+  "Have you heard about the new corduroy pillows?  They're making headlines all over.",
+  "I said to my doctor \"There's a strawberry growing out of my head!\" The doc said \"Let me give you some cream to put on it.\"",
+  "A pair of 0s walked up to an 8.  The first 0 said \"Nice belt.\"",
+  "Two flies where playing soccer in a saucer.  One says to the other: \"If we don't get better we'll never get into the Cup.\"",
+  "Why did the two strawberries get upset?  Their parents were in a jam.",
+  "What happens to children when they hear that they are going to an Easter Egg Hunt?  They get eggcited!",
+  "What happens to an egg if it rolls down a hill?   It eggelerates!",
+  "\"The baby can't be mine Jerry\" said Mr. Broom.  \"That girl and I have never swept together.\"",
+  "She criticized my apartment, so I knocked her flat.",
+  "What do you get when you cross an archer with a gift-wrapper?    Ribbon Hood.",
+  "Saddam Hussein: \"Why are you carrying groceries in a box son?\" Son: \"Because we have no more Baghdad.\"",
+  "What do you get when you pour hot water down a rabbit hole?   A hot cross bunny.",
+  "Which key has legs but can't open doors?  A turkey"
 };
 
 // ENDOFCHAIN
