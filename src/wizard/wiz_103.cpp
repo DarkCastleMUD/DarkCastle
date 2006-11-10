@@ -227,14 +227,10 @@ int do_fighting(struct char_data *ch, char *argument, int cmd)
     if((victim_clan = get_clan(i->fighting)))
       snprintf(victim_clan_name, CLANTAG_LEN, "[%s]", victim_clan->name);
 
-    snprintf(buf, 80, "%14s %-17s fighting %14s %-17s",
-	    GET_NAME(i), ch_clan_name,
-	    GET_NAME(i->fighting), victim_clan_name);
-    send_to_char(buf, ch);
-     
-    snprintf(buf, 80, "\n\rin room: %s [%ld]\n\r",
-	     (world[i->in_room].name),
-	     (long)(world[i->in_room].number));
+    snprintf(buf, 80, "%s %s fighting %s %s (%d)\n\r",
+	     GET_NAME(i), ch_clan_name,
+	     GET_NAME(i->fighting), victim_clan_name,
+	     world[i->in_room].number);
     send_to_char(buf, ch);
   }
   
