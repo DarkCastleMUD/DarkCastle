@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.123 2006/10/18 18:27:05 jhhudso Exp $ */
+/* $Id: info.cpp,v 1.124 2006/11/11 17:32:49 jhhudso Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -1450,7 +1450,7 @@ int do_score(struct char_data *ch, char *argument, int cmd)
    }
    if (flying == 0 && IS_AFFECTED(ch, AFF_FLYING)) {
      scratch = frills[level];
-     sprintf(buf, "|%c| Affected by fly                             Modifier NONE              |%c|\n\r",
+     sprintf(buf, "|%c| Affected by fly                                Modifier NONE           |%c|\n\r",
              scratch, scratch);
      send_to_char(buf, ch);
      found = TRUE;
