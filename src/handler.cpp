@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.140 2006/11/06 23:26:16 jhhudso Exp $ */
+/* $Id: handler.cpp,v 1.141 2006/11/13 08:16:53 jhhudso Exp $ */
     
 extern "C"
 {
@@ -585,21 +585,37 @@ void add_set_stats(char_data *ch, obj_data *obj, int flag, int pos)
             af.modifier = 3;
             affect_to_char(ch, &af);
             break;
-          case SET_BLACKSTEELA:
-            af.location = APPLY_ARMOR;
-            af.modifier = -50;
-            affect_to_char(ch, &af);
-            af.location = APPLY_SAVES;
-            af.modifier = 25;
-            affect_to_char(ch, &af);
+	  case SET_BLACKSTEELA:
+	    af.bitvector = AFF_FLYING;
+	    af.location = 0;
+	    af.modifier = 0;
+	    affect_to_char(ch,&af);
+
+	    af.bitvector = -1;
+	    af.location = APPLY_ARMOR;
+	    af.modifier = -100;
+	    affect_to_char(ch, &af);
+
+	    af.bitvector = -1;
+	    af.location = APPLY_SAVES;
+	    af.modifier = 25;
+	    affect_to_char(ch, &af);
 	    break;
-          case SET_BLACKSTEELB:
-            af.location = APPLY_ARMOR;
-            af.modifier = -50;
-            affect_to_char(ch, &af);
-            af.location = APPLY_SAVES;
-            af.modifier = 25;
-            affect_to_char(ch, &af);
+	  case SET_BLACKSTEELB:
+	    af.bitvector = AFF_FLYING;
+	    af.location = 0;
+	    af.modifier = 0;
+	    affect_to_char(ch,&af);
+
+	    af.bitvector = -1;
+	    af.location = APPLY_ARMOR;
+	    af.modifier = -100;
+	    affect_to_char(ch, &af);
+
+	    af.bitvector = -1;
+	    af.location = APPLY_SAVES;
+	    af.modifier = 25;
+	    affect_to_char(ch, &af);
 	    break;
 	  default:           
 		send_to_char("Tough luck, you completed an unimplemented set. Report what you just wore, eh?\r\n",ch);
