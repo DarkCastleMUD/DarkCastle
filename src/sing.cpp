@@ -967,6 +967,16 @@ int song_whistle_sharp( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim
 
    set_cantquit( ch, victim );
 
+   if (number(1,1000) == 1) {
+     act("$n's piercing note causes $N's brains to leak from $S ears. EEEW!",
+	 ch, 0, victim, TO_ROOM, NOTVICT);
+     act("$n's piercing note turns your brains to pulp!",
+	 ch, 0, victim, TO_VICT, 0);
+     act("Your piercing note causes $N's brain to leak out $S ears in a "
+	 "painful death.", ch, 0, victim, TO_CHAR, 0);
+     return damage(ch, victim, 9999999, TYPE_UNDEFINED, SKILL_SONG_WHISTLE_SHARP, 0);
+   }
+
    int combat, non_combat;
    get_instrument_bonus(ch, combat, non_combat);
 
