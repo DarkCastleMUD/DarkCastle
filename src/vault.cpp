@@ -24,6 +24,10 @@ extern "C"
 #include <interp.h>
 #include <spells.h>
 #include <clan.h> // clan right
+#include <fstream>
+#include <sstream>
+
+using namespace std;
 
 extern CWorld world;
 int total_vaults = 0;
@@ -1509,23 +1513,25 @@ struct obj_data *get_obj(int vnum)
 
 void show_vault_log(CHAR_DATA *ch, char *owner)
 {
-  char buf1[MAX_STRING_LENGTH];
   char buf[MAX_STRING_LENGTH];
   char fname[256];
 
-  if(!strcmp(owner,clanVName(ch->clan))) {
-     sprintf(buf, "The following are your clans most recent vault log entries(Times are EST):\n\r");
+  if (!strcmp(owner, clanVName(ch->clan))) {
+    strncpy(buf, "The following are your clan's most recent vault log entries (Times are UTC):\n\r", MAX_STRING_LENGTH);
+  } else {
+    strncpy(buf, "The following are your most recent vault log entries (Times are UTC):\r\n", MAX_STRING_LENGTH);
   }
-  else sprintf(buf, "The following are your most recent vault log entries (Times are EST):\r\n");
 
   owner[0] = UPPER(owner[0]);
 
-  sprintf(fname, "../vaults/%c/%s.vault.log", *owner, owner);
-  vault_log_to_string(fname, buf1);
+  snprintf(fname, 256, "../vaults/%c/%s.vault.log", *owner, owner);
 
-  strcat(buf, buf1);
+  ifstream fin(fname);
+  stringstream buffer;
+  buffer << buf;
+  buffer << fin.rdbuf();
 
-  page_string(ch->desc, buf, 1);
+  page_string(ch->desc, const_cast<char *>(buffer.str().c_str()), 1);
 }
 
 void vault_log(char *message, char *name) {
@@ -1609,39 +1615,6 @@ void vault_log(char *message, char *name) {
  // sprintf(cmd, "mv %s %s", nfname, fname);
  // system(cmd);
 }
-
-int vault_log_to_string(const char *name, char *buf) {
-    FILE *fl;
-    char tmp[512];
-
-    *buf = '\0';
-
-    if (!(fl = dc_fopen(name, "r"))) {
-      perror("vault_log_to_string");
-      return(-1);
-    }
-
-    do {
-      fgets(tmp, 510, fl);
-
-      if (!feof(fl)) {
-        if (strlen(buf) + strlen(tmp) + 2 > MAX_STRING_LENGTH) {
-          log("fl->strng: string too big (vault_log_to_string)", 0, LOG_BUG);
-          *buf = '\0';
-          return(-1);
-        }
-
-        tmp[strlen(tmp) -1] = '\0';
-        strcat(tmp, "\r\n");
-        strcat(buf, tmp);
-      }
-    } while (!feof(fl));
-
-    dc_fclose(fl);
-
-    return(0);
-}
-
 
 int sleazy_vault_guy(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
           struct char_data *owner)
