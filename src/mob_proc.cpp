@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.125 2006/11/09 19:45:41 pirahna Exp $ */
+/* $Id: mob_proc.cpp,v 1.126 2006/11/16 03:06:33 apocalypse Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -3127,58 +3127,31 @@ static char *dethSayText [ ] =
   "Someone sent me a postcard picture of the earth.  On the back it said, \"Wish you were here.\"",
   "I spilled spot remover on my dog. Now he's gone.",
   "Cross country skiing is great if you live in a small country.",
-  "I used to work in a fire hydrant factory.  You couldn't park anywhere near the place.",
   "What's another word for Thesaurus?",
   "You can't have everything...where would you put it?",
   "A lot of people are afraid of heights. Not me, I'm afraid of widths.",
-  "I planted some bird seed. A bird came up. Now I don't know what to feed it.",
-  "I brought a mirror to Lovers' Lane. I told everybody I'm Narcissus.",
   "If you can wave a fan, and you can wave a club, can you wave a fan club?",
   "Smoking cures weight problems...eventually...",
-  "Droughts are because god didn't pay his water bill.",
   "Is \"tired old cliche\" one?",
   "The sign said \"eight items or less\". So I changed my name to Les.",
-  "Yesterday I saw a chicken crossing the road. I asked it why. It told me it was none of my business.",
   "I xeroxed a mirror. Now I have an extra xerox machine.",
-  "I went to San Francisco. I found someone's heart.",
   "You know the guy who writes all those bumper stickers?  He hates New York.",
-  "I washed a sock. Then I put it in the dryer. When I took it out, it was gone.",
-  "The Bermuda Triangle got tired of warm weather. It moved to Alaska. Now Santa Claus is missing.",
   "If a word in the dictionary were misspelled, how would we know?",
   "When I was a little kid we had a sand box. It was a quicksand box. I was an only child....eventually.",
   "For my birthday I got a humidifier and a de-humidifier...I put them in the same room and let them fight it out.",
-  "I put contact lenses in my dog's eyes. They had little pictures of cats on them. Then I took one out and he ran around in circles.",
-  "When I was little, my grandfather used to make me stand in a closet for five minutes without moving. He said it was elevator practice.",
   "Have you heard about the new corduroy pillows?  They're making headlines all over.",
   "I said to my doctor \"There's a strawberry growing out of my head!\" The doc said \"Let me give you some cream to put on it.\"",
-  "A pair of 0s walked up to an 8.  The first 0 said \"Nice belt.\"",
-  "Two flies where playing soccer in a saucer.  One says to the other: \"If we don't get better we'll never get into the Cup.\"",
-  "Why did the two strawberries get upset?  Their parents were in a jam.",
-  "What happens to children when they hear that they are going to an Easter Egg Hunt?  They get eggcited!",
-  "What happens to an egg if it rolls down a hill?   It eggelerates!",
-  "\"The baby can't be mine Jerry\" said Mr. Broom.  \"That girl and I have never swept together.\"",
   "She criticized my apartment, so I knocked her flat.",
-  "What do you get when you cross an archer with a gift-wrapper?    Ribbon Hood.",
-  "Saddam Hussein: \"Why are you carrying groceries in a box son?\" Son: \"Because we have no more Baghdad.\"",
-  "What do you get when you pour hot water down a rabbit hole?   A hot cross bunny.",
-  "Which key has legs but can't open doors?  A turkey",
   "Did you hear about the guy who stayed up all night to find out where the sun went?  In the morning it dawned on him.",
   "If you jumped off the bridge in Paris and swam in the river that goes through the city people would say you were insane.",
   "If you make lots of telephone calls in China there's a good chance you'll get the Wong number.",
-  "How do you get down from an elephant?   You don't. You get down from a duck.",
   "What do John The Baptist and Kermit The Frog have in common?    Same middle name.",
-  "A termite walks into a bar. It asks, \"Is the bar tender here?\"",
   "Why do soldiers in Helsinki wash their tanks and trucks so often?   They're trying to protect the Finnish.",
-  "What did the boy firefly say to the girl firefly?     You glow girl!",
-  "Why did the scientist install a traditional knocker on his front door?   So he could win the NoBell prize.",
   "Two fonts walk into a bar.  The barman says to them, \"Get out. We don't serve your type here.\"",
-  "Why does a chicken coop have two doors?  Because if it had four doors it would be a chicken sedan.",
-  "Guy: Doc, I think I'm shrinking...I think I'm getting a little smaller every day. Doc: I think you'll have to be a little patient.",
   "Two fish are in a tank.  One says to the other, \"Do you know how to drive this thing?\"",
   "Two birds are sitting on a perch.  One says to the other, \"Do you smell fish?\"",
-  "Some bacon and eggs walk into a bar.  Bartenders says, \"Get out!  We don't serve breakfast here.\"",
-  "A skeleton walked into a bar. \"What'll it be?\", asked the barman. \"I'll have a beer and a mop,\" said the skeleton.",
-  "If a canyon ate too much, do you think it would gorge itself?"
+  "If a canyon ate too much, do you think it would gorge itself?",
+  "Hey guys, do you mind if I add a whole bunch of dumb jokes to my material?"
 };
 
 // ENDOFCHAIN
