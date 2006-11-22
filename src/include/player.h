@@ -1,7 +1,7 @@
 #ifndef PLAYER_H_
 #define PLAYER_H_
 /************************************************************************
-| $Id: player.h,v 1.32 2006/07/10 20:51:52 shane Exp $
+| $Id: player.h,v 1.33 2006/11/22 13:06:42 dcastle Exp $
 | player.h
 | Description: This file defines the player vectors..punishment, specials,
 |   etc...
@@ -87,6 +87,7 @@
 | Class types for PCs
 */
 #define CLASS_MAGIC_USER   1
+#define CLASS_MAGE 	   1 // Laziness > consistency
 #define CLASS_CLERIC       2
 #define CLASS_THIEF        3
 #define CLASS_WARRIOR      4

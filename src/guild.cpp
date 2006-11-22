@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.100 2006/10/29 17:45:40 jhhudso Exp $
+| $Id: guild.cpp,v 1.101 2006/11/22 13:06:38 dcastle Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -533,6 +533,28 @@ int guild(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 
    // TODO - make it so you have to be at YOUR guildmaster to gain
 
+    if (GET_LEVEL(ch) == 50)
+    { // To get past 50 you need to know your q skill.
+       int skl = -1;
+       switch (GET_CLASS(ch))
+       {
+	 case CLASS_MAGE: skl = SKILL_SPELLCRAFT; break;
+	 case CLASS_BARBARIAN: skl = SKILL_BULLRUSH; break;
+	 case CLASS_PALADIN: skl = SPELL_HOLY_AURA; break;
+	 case CLASS_MONK: skl = KI_OFFSET+KI_MEDITATION; break;
+	 case CLASS_WARRIOR: skl = SKILL_COMBAT_MASTERY; break;
+	 case CLASS_THIEF: skl = SKILL_CRIPPLE; break;
+	 case CLASS_RANGER: skl = SKILL_NAT_SELECT; break;
+         case CLASS_CLERIC: skl = SPELL_DIVINE_INTER; break;
+ 	 case CLASS_ANTI_PAL: skl = SPELL_VAMPIRIC_AURA; break;
+         case CLASS_DRUID: skl = SPELL_CONJURE_ELEMENTAL; break;   
+       }
+       if (!has_skill(ch, skl))
+       {
+	 send_to_char("You need to learn your questkill before you can progress further.\r\n",ch);
+         return eSUCCESS;
+       }
+    }
     exp_needed = exp_table[(int)GET_LEVEL(ch) + 1];
 
     if(exp_needed > GET_EXP(ch)) {
