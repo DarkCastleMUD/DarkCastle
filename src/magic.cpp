@@ -89,22 +89,38 @@ extern struct race_shit race_info[];
 
 bool malediction_res(CHAR_DATA *ch, CHAR_DATA *victim, int spell)
 {
-  int res = 0;
+  int chance = 0;
+  int type = 0;
   int mod = 0;
-  switch (spell)
-  {
-    case SPELL_CURSE: res = SAVE_TYPE_MAGIC; break;
-    case SPELL_WEAKEN: res = SAVE_TYPE_MAGIC; break;
-    case SPELL_BLINDNESS: res = SAVE_TYPE_MAGIC; break;
-    case SPELL_POISON: res = SAVE_TYPE_POISON; break;
-    case SPELL_ATTRITION: res = SAVE_TYPE_POISON; break;
-    case SPELL_DEBILITY: res = SAVE_TYPE_POISON; break;
-    case SPELL_FEAR: res = SAVE_TYPE_COLD; break;
-    case SPELL_PARALYZE: res = SAVE_TYPE_MAGIC; mod = 20; break;
+  switch (spell) {
+  case SPELL_CURSE:
+  case SPELL_WEAKEN:
+  case SPELL_BLINDNESS:
+    type = SAVE_TYPE_MAGIC;
+    break;
+
+  case SPELL_POISON:
+  case SPELL_ATTRITION:
+  case SPELL_DEBILITY:
+    type = SAVE_TYPE_POISON;
+    break;
+  case SPELL_FEAR:
+    type = SAVE_TYPE_COLD;
+    break;
+  case SPELL_PARALYZE:
+    type = SAVE_TYPE_MAGIC;
+    mod = 20;
+    break;
+  default:
+    logf(OVERSEER, LOG_BUG, "Error in malediction_res(), sent spell %d.",
+	 spell);
+    break;
   }
-  res = victim->saves[res] + mod + 5 + (100-has_skill(ch, spell))/2;
-  if (number(1,101) < res) return TRUE;
-  return FALSE;
+  chance = victim->saves[type] + mod + 5 + (100-has_skill(ch, spell))/2;
+  if (number(1,101) < chance)
+    return TRUE; // victim resists spell
+  else
+    return FALSE; // victim does not resist spell
 }
 
 bool can_heal(CHAR_DATA *ch, CHAR_DATA *victim, int spellnum)
