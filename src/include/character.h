@@ -1,7 +1,7 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.49 2006/10/18 04:32:39 jhhudso Exp $
+| $Id: character.h,v 1.50 2006/11/24 19:30:11 jhhudso Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
@@ -45,10 +45,11 @@ typedef struct char_data CHAR_DATA;
 //#define POSITION_INCAP       2
 #define POSITION_STUNNED     3
 #define POSITION_SLEEPING    4
-#define POSITION_RESTING     5
-#define POSITION_SITTING     6
-#define POSITION_FIGHTING    7
-#define POSITION_STANDING    8
+#define POSITION_PARALYZED   5
+#define POSITION_RESTING     6
+#define POSITION_SITTING     7
+#define POSITION_FIGHTING    8
+#define POSITION_STANDING    9
 
 #define STRENGTH             1
 #define DEXTERITY            2
