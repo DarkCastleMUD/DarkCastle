@@ -1395,14 +1395,14 @@ int spell_paralyze(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
      if (number(1,6)<5)
      {
        int retval;
-       if (number(0,1))
+       if (number(0,1)) {
           send_to_char("The combined magics fizzle!\r\n",ch);
 	if (GET_POS(victim) == POSITION_SLEEPING) {
 	  send_to_char("You are awakened by a burst of $6energy$R!\r\n",victim);
 	  act("$n is awakened in a burst of $6energy$R!",victim,NULL,NULL, TO_ROOM,0);
 	  GET_POS(victim) = POSITION_SITTING;
 	}
-       else {
+       } else {
           send_to_char("The combined magics cause an explosion!\r\n",ch);
 	  retval = damage(ch,ch,number(5,10), 0, TYPE_MAGIC, 0);
       }
