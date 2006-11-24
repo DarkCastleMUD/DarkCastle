@@ -16,7 +16,7 @@
  *  10/21/2003   Onager    Changed IS_ANONYMOUS() to handle mobs without   *
  *                         crashing                                        *
  ***************************************************************************/
-/* $Id: utility.h,v 1.53 2006/11/07 02:57:46 jhhudso Exp $ */
+/* $Id: utility.h,v 1.54 2006/11/24 19:29:49 jhhudso Exp $ */
 
 #ifndef UTILITY_H_
 #define UTILITY_H_
@@ -148,6 +148,9 @@ bool IS_DARK( int room );
 #define IS_NPC(ch)  (IS_SET((ch)->misc, MISC_IS_MOB))
 #define IS_MOB(ch)  (IS_NPC(ch))
 #define IS_FAMILIAR(ch)	(IS_AFFECTED(ch, AFF_FAMILIAR))
+
+#define IS_MINLEVEL_PC(ch, level) (GET_LEVEL(ch) >= level && IS_PC(ch))
+#define IS_MINLEVEL_NPC(ch, level) (GET_LEVEL(ch) >= level && IS_NPC(ch))
 
 #define GET_RDEATHS(ch)      ((ch)->pcdata->rdeaths)
 #define GET_PDEATHS(ch)      ((ch)->pcdata->pdeaths)
