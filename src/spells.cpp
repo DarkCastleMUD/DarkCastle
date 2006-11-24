@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.195 2006/11/01 01:46:57 jhhudso Exp $ */
+/* $Id: spells.cpp,v 1.196 2006/11/24 19:31:04 jhhudso Exp $ */
 
 extern "C"
 {
@@ -1232,8 +1232,13 @@ int saves_spell(CHAR_DATA *ch, CHAR_DATA *vict, int spell_base, int16 save_type)
     double save = 0;
 
     // Gods always succeed saving throws.  We rock!
-    if(!IS_NPC(vict) && (GET_LEVEL(vict) >= ARCHANGEL)) {
-        return(TRUE);
+    if (IS_MINLEVEL_PC(vict, IMMORTAL)) {
+        return 100;
+    }
+
+    // If a God attacks you, nothing can save you
+    if (IS_MINLEVEL_PC(ch, DEITY) && GET_LEVEL(vict) < GET_LEVEL(ch)) {
+      return -100;
     }
 
     // Get the base save type for this roll
