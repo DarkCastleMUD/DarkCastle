@@ -89,38 +89,53 @@ extern struct race_shit race_info[];
 
 bool malediction_res(CHAR_DATA *ch, CHAR_DATA *victim, int spell)
 {
-  int chance = 0;
+  // A lower level character cannot resist a Deity+ immortal
+  if (IS_MINLEVEL_PC(ch, DEITY) && GET_LEVEL(victim) < GET_LEVEL(ch)) {
+    return false;
+  }
+
+  // An immortal+ victim always resists a lesser character's spell
+  if (IS_MINLEVEL_PC(victim, IMMORTAL) && GET_LEVEL(victim) > GET_LEVEL(ch)) {
+    return true;
+  }
+
   int type = 0;
   int mod = 0;
   switch (spell) {
   case SPELL_CURSE:
   case SPELL_WEAKEN:
+    type = SAVE_TYPE_MAGIC;
+    mod = 5;
+    break;
   case SPELL_BLINDNESS:
     type = SAVE_TYPE_MAGIC;
+    mod = 10;
     break;
-
   case SPELL_POISON:
   case SPELL_ATTRITION:
   case SPELL_DEBILITY:
     type = SAVE_TYPE_POISON;
+    mod = 5;
     break;
   case SPELL_FEAR:
     type = SAVE_TYPE_COLD;
+    mod = 5;
     break;
   case SPELL_PARALYZE:
     type = SAVE_TYPE_MAGIC;
-    mod = 20;
+    mod = 25; // Tweak this if paralyze needs adjusting
     break;
   default:
     logf(OVERSEER, LOG_BUG, "Error in malediction_res(), sent spell %d.",
 	 spell);
+    return true; // It's safer to have the victim resist an unknown spell
     break;
   }
-  chance = victim->saves[type] + mod + 5 + (100-has_skill(ch, spell))/2;
-  if (number(1,101) < chance)
-    return TRUE; // victim resists spell
+  int chance = victim->saves[type] + mod + (100-has_skill(ch, spell))/2;
+  if (number(0,99) < chance)
+    return true; // victim resists spell
   else
-    return FALSE; // victim does not resist spell
+    return false; // victim does not resist spell
 }
 
 bool can_heal(CHAR_DATA *ch, CHAR_DATA *victim, int spellnum)
@@ -1462,8 +1477,9 @@ int spell_paralyze(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
       return eSUCCESS;
   }
 
-	/* if they are too big - do a dice roll to see if they backfire */
-  if(!IS_NPC(ch) && !IS_NPC(victim) && ((level - GET_LEVEL(victim)) > 10)) {
+  /* if they are too big - do a dice roll to see if they backfire */
+  if(!IS_NPC(ch) && !IS_NPC(victim) && ((level - GET_LEVEL(victim)) > 10) &&
+     (! IS_MINLEVEL_PC(ch, DEITY) || GET_LEVEL(victim) >= GET_LEVEL(ch))) {
       act("$N seems to be unaffected!", ch, NULL, victim, TO_CHAR, 0);
       victim = ch;
       if(saves_spell(ch, ch, -100, SAVE_TYPE_MAGIC) >= 0) {
@@ -1496,6 +1512,8 @@ int spell_paralyze(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
   if (spellcraft(ch, SPELL_PARALYZE))  af.duration++;
   af.bitvector = AFF_PARALYSIS;
   affect_to_char(victim, &af);
+
+  GET_POS(victim) = POSITION_PARALYZED;
   return eSUCCESS;
 }
 
