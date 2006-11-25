@@ -123,7 +123,7 @@ bool malediction_res(CHAR_DATA *ch, CHAR_DATA *victim, int spell)
     break;
   case SPELL_PARALYZE:
     type = SAVE_TYPE_MAGIC;
-    mod = 25; // Tweak this if paralyze needs adjusting
+    mod = 30; // Tweak this if paralyze needs adjusting
     break;
   default:
     logf(OVERSEER, LOG_BUG, "Error in malediction_res(), sent spell %d.",
