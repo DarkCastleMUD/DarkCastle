@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.142 2006/11/25 00:45:59 jhhudso Exp $ */
+/* $Id: handler.cpp,v 1.143 2006/11/25 03:10:15 jhhudso Exp $ */
     
 extern "C"
 {
@@ -1115,11 +1115,15 @@ void affect_modify(CHAR_DATA *ch, int32 loc, int32 mod, long bitv, bool add, int
             }
             break;
         case 73: 
-            if(add) {
+	    ch->spell_reflect += mod;
+
+	    if(add) {
                 SETBIT(ch->affected_by, AFF_REFLECT);
-            } else {
+	    } else {
+	      if (ch->spell_reflect <= 0) {
                 REMBIT(ch->affected_by, AFF_REFLECT);
-            }
+	      }
+	    }
             break;
         case 74: 
             if(add) {
@@ -1664,6 +1668,10 @@ void affect_remove( CHAR_DATA *ch, struct affected_type *af, int flags)
          if(!(flags & SUPPRESS_MESSAGES))
          send_to_char("Your body feels well enough to vibrate intensely once more.\n\r", ch);
          break;
+      case SKILL_FORAGE:
+         if(!(flags & SUPPRESS_MESSAGES))
+         send_to_char("You feel ready to look for \"herb\" again.\n\r", ch);
+         break;     
       default:
          break;
    }
