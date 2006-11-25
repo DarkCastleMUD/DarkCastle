@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.196 2006/11/24 19:31:04 jhhudso Exp $ */
+/* $Id: spells.cpp,v 1.197 2006/11/25 03:09:09 jhhudso Exp $ */
 
 extern "C"
 {
@@ -1734,6 +1734,30 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
 		send_to_char("Your spell bounces off the fortress' enchantments, and the lightning bolt comes flying back towards you!\r\n",ch);
 	 	ok_self = TRUE;
 	   }
+
+	   if (IS_AFFECTED(tar_char, AFF_REFLECT) && 
+	       number(0,99) < tar_char->spell_reflect) {
+	     if(ch == tar_char) { // some idiot was shooting at himself
+	       act("Your spell reflects into the unknown.", ch, 0, 0, TO_CHAR, 0);
+	       act("$n's spell rebounds into the unknown.", ch, 0, 0, TO_ROOM, 0);
+	       return eSUCCESS;
+	     } else {
+	       act("$n's spell bounces back at $m.", ch, 0, tar_char, TO_VICT, 0);
+	       act("Oh SHIT! Your spell bounces off of $N and heads right back at you.", ch, 0, tar_char, TO_CHAR, 0);
+	       act("$n's spell reflects off of $N's magical aura", ch, 0, tar_char, TO_ROOM, NOTVICT);
+	       tar_char = ch;
+	       ok_self = TRUE;
+
+	       // Ping-pong
+	       if (IS_AFFECTED(tar_char, AFF_REFLECT) && 
+		   number(0,99) < tar_char->spell_reflect) {
+		 act("Your spell reflects into the unknown.", tar_char, 0, 0, TO_CHAR, 0);
+		 act("$n's spell rebounds into the unknown.", tar_char, 0, 0, TO_ROOM, 0);
+		 return eSUCCESS;
+	       }
+	     }
+	   }
+
 	   target_ok = TRUE;
 	 }
 	 spellcraft(ch, SPELL_LIGHTNING_BOLT);
