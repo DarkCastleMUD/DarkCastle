@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.36 2006/11/04 14:57:22 jhhudso Exp $
+| $Id: wizard.cpp,v 1.37 2006/11/25 03:11:18 jhhudso Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -726,8 +726,8 @@ void mob_stat(struct char_data *ch, struct char_data *k)
           k->conditions[FULL],
           k->conditions[DRUNK]);
   send_to_char(buf, ch);
-	sprintf(buf, "$3Melee$R: [%d] $3Spell$R: [%d] $3Song$R: [%d]\r\n", 
-		k->melee_mitigation, k->spell_mitigation, k->song_mitigation);
+	sprintf(buf, "$3Melee$R: [%d] $3Spell$R: [%d] $3Song$R: [%d] $3Reflect$R: [%d]\r\n", 
+		k->melee_mitigation, k->spell_mitigation, k->song_mitigation, k->spell_reflect);
 	send_to_char(buf,ch);
 
   sprintf(buf, "$3Tracking$R: '%s'\n\r", ((k->hunting) ? k->hunting : "NOBODY"));
