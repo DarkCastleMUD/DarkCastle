@@ -16,7 +16,7 @@
 /* 12/08/2003   Onager   Added chop_half() to work like half_chop() but    */
 /*                       chopping off the last word.                       */
 /***************************************************************************/
-/* $Id: interp.cpp,v 1.109 2006/11/01 01:34:14 jhhudso Exp $ */
+/* $Id: interp.cpp,v 1.110 2006/11/25 00:45:28 jhhudso Exp $ */
 
 extern "C"
 {
@@ -112,7 +112,7 @@ struct command_info cmd_info[] =
     { "scan",		do_scan,	POSITION_RESTING, 1, 9, 0, 25 },
     { "stand",		do_stand,	POSITION_RESTING, 0, 9, COM_CHARMIE_OK, 0 },
     { "switch",		do_switch,	POSITION_RESTING, 0, 9, 0, 25 },
-    { "tell",		do_tell,	POSITION_RESTING, 0, 9, 0, 1 },
+    { "tell",		do_tell,	POSITION_PARALYZED, 0, 9, 0, 1 },
     { "wield",		do_wield,	POSITION_RESTING, 0, 9, COM_CHARMIE_OK, 25 },
     { "innate",		do_innate,	POSITION_SLEEPING, 0, 9, 0, 1 },
 
@@ -247,7 +247,7 @@ struct command_info cmd_info[] =
     // Miscellaneous commands
     { "autojoin",	do_autojoin,	POSITION_SLEEPING, 0, 9, 0, 1 },
     { "visible",	do_visible,	POSITION_SLEEPING, 0, 9, 0, 1 },
-    { "ctell",		do_ctell,	POSITION_SLEEPING, 0, 9, 0, 1 },
+    { "ctell",		do_ctell,	POSITION_PARALYZED, 0, 9, 0, 1 },
     { "outcast",	do_outcast,	POSITION_RESTING, 0, 9, 0, 1 },
     { "accept",		do_accept,	POSITION_RESTING, 0, 9, 0, 1 },
     { "whoclan",	do_whoclan,	POSITION_DEAD, 0, 9, 0, 1 },
@@ -669,12 +669,6 @@ int command_interpreter( CHAR_DATA *ch, char *pcomm, bool procced  )
     GET_AC(ch) -= 30;
     }
 
-  // Paralysis
-  if (IS_AFFECTED(ch, AFF_PARALYSIS)) {
-    send_to_char("You've been paralyzed and are unable to move.\r\n", ch);
-    return eSUCCESS;
-    }
-
   // Strip initial spaces OR tab characters and parse command word.
   // Translate to lower case.  We need to translate tabs for the MOBProgs to work
   if (ch && ch->desc && ch->desc->connected == CON_EDITING) {
@@ -723,6 +717,9 @@ int command_interpreter( CHAR_DATA *ch, char *pcomm, bool procced  )
           case POSITION_SLEEPING:
             send_to_char( "In your dreams, or what?\r\n", ch );
             break;
+	  case POSITION_PARALYZED:
+	    send_to_char("You've been paralyzed and are unable to move.\r\n", ch);
+	    break;
           case POSITION_RESTING:
             send_to_char( "Nah... You feel too relaxed...\r\n", ch);
             break;
