@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.141 2006/11/13 08:16:53 jhhudso Exp $ */
+/* $Id: handler.cpp,v 1.142 2006/11/25 00:45:59 jhhudso Exp $ */
     
 extern "C"
 {
@@ -1383,6 +1383,9 @@ void affect_remove( CHAR_DATA *ch, struct affected_type *af, int flags)
       // Put anything here that MUST go away whenever the spell wears off
       // That isn't handled in affect_modify
 
+      case SPELL_PARALYZE:
+	 GET_POS(ch) = POSITION_SITTING;
+	 break;
       case SPELL_IRON_ROOTS:
          REMBIT(ch->affected_by, AFF_NO_FLEE);
          break;
