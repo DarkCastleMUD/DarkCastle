@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.198 2006/11/25 03:41:40 jhhudso Exp $ */
+/* $Id: spells.cpp,v 1.199 2006/11/25 03:51:13 jhhudso Exp $ */
 
 extern "C"
 {
@@ -1751,8 +1751,8 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
 	      if (IS_AFFECTED(tar_char, AFF_REFLECT) && 
 		  number(0,99) < tar_char->spell_reflect) {
 		if(ch == tar_char) { // some idiot was shooting at himself
-		  act("Your spell reflects into the unknown.", ch, 0, 0, TO_CHAR, 0);
-		  act("$n's spell rebounds into the unknown.", ch, 0, 0, TO_ROOM, 0);
+		  act("The spell harmlessly reflects off you and disperses.", tar_char, 0, 0, TO_CHAR, 0);
+		  act("The spell harmlessly reflects off $n and disperses.", tar_char, 0, 0, TO_ROOM, 0);
 		  return eSUCCESS;
 		} else {
 		  act("$n's spell bounces back at $m.", ch, 0, tar_char, TO_VICT, 0);
@@ -1764,8 +1764,8 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
 		  // Ping-pong
 		  if (IS_AFFECTED(tar_char, AFF_REFLECT) && 
 		      number(0,99) < tar_char->spell_reflect) {
-		    act("Your spell reflects into the unknown.", tar_char, 0, 0, TO_CHAR, 0);
-		    act("$n's spell rebounds into the unknown.", tar_char, 0, 0, TO_ROOM, 0);
+		    act("The spell harmlessly reflects off you and disperses.", tar_char, 0, 0, TO_CHAR, 0);
+		    act("The spell harmlessly reflects off $n and disperses.", tar_char, 0, 0, TO_ROOM, 0);
 		    return eSUCCESS;
 		  }
 		}
