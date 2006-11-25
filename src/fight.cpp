@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.380 2006/11/07 01:20:55 jhhudso Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.381 2006/11/25 03:06:33 jhhudso Exp $ */
 
 extern "C"
 {
@@ -1645,25 +1645,6 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
     dam += elemental_damage_bonus(attacktype, ch);
   //
 
-  if(typeofdamage == DAMAGE_TYPE_MAGIC)  
-  {
-    if(IS_AFFECTED(victim, AFF_REFLECT)  && 
-       number(1,101) < 6)
-    {
-      if(ch == victim) { // some idiot was shooting at himself
-        act("Your spell reflects into the unknown.", ch, 0, 0, TO_CHAR, 0);
-        act("$n's spell rebounds into the unknown.", ch, 0, 0, TO_ROOM, 0);
-        return eSUCCESS;
-      } else {
-        act("$n's spell bounces back at him.", ch, 0, victim, TO_VICT, 0);
-        act("Oh SHIT! Your spell bounces off of $N and heads right back at you.", ch, 0, victim, TO_CHAR, 0);
-        act("$n's spell reflects off of $N's magical aura", ch, 0, victim, TO_ROOM, NOTVICT);
-        victim = ch;
-        reflected = TRUE;
-	SET_BIT(retval,eEXTRA_VAL2);
-      }
-    }
- 
     if(IS_SET(victim->combat, COMBAT_REPELANCE))
     {
        if(GET_LEVEL(ch) > 70)
