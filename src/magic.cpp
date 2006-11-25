@@ -4202,64 +4202,67 @@ int spell_lightning_breath(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct
 // TODO - make this use skill
 int spell_fear(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
-	int retval;
-	 assert(victim && ch);
-         char buf[256]; 
-	 if(IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_STUPID)) {
-           sprintf(buf, "%s doesn't understand your psychological tactics.\n\r",
-                   GET_SHORT(victim));
-           send_to_char(buf, ch);
-	   return eFAILURE;
-         }
-         if(GET_POS(victim) == POSITION_SLEEPING) {
-           send_to_char("How do you expect a sleeping person to be scared?\r\n", ch);
-           return eFAILURE;
-         }
-         if(IS_AFFECTED(victim, AFF_FEARLESS)) {
-            act("$N seems to be quite unafraid of anything.", ch, 0, victim, TO_CHAR, 0);
-            act("You laugh at $n's feeble attempt to frighten you.", ch, 0, victim, TO_VICT, 0);
-            act("$N laughs at $n's futile attempt at scaring $M.", ch, 0, victim, TO_ROOM, NOTVICT);
-           return eFAILURE;
-         }
+  if (!victim || !ch)
+    return eFAILURE;
+  
+  if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_STUPID)) {
+    csendf(ch, "%s doesn't understand your psychological tactics.\n\r",
+	   GET_SHORT(victim));
+    return eFAILURE;
+  }
+  
+  if (GET_POS(victim) == POSITION_SLEEPING) {
+    send_to_char("How do you expect a sleeping person to be scared?\r\n", ch);
+    return eFAILURE;
+  }
+  
+  if (IS_AFFECTED(victim, AFF_FEARLESS)) {
+    act("$N seems to be quite unafraid of anything.", ch, 0, victim, TO_CHAR, 0);
+    act("You laugh at $n's feeble attempt to frighten you.", ch, 0, victim, TO_VICT, 0);
+    act("$N laughs at $n's futile attempt at scaring $M.", ch, 0, victim, TO_ROOM, NOTVICT);
+    return eFAILURE;
+  }
 
-         set_cantquit( ch, victim );
+  if (IS_SET(victim->combat, COMBAT_BERSERK)) {
+    act("$N looks at you with glazed over eyes, drools, and continues to fight!", ch, NULL, victim, TO_CHAR, 0);
+    act("$N smiles madly, drool running down his chin as he ignores $n's magic!", ch, NULL, victim, TO_ROOM, 0);
+    act("You grin as $n realizes you have no target for his mental attack!",
+	ch, NULL, victim, TO_VICT, 0);
+    return eFAILURE;
+  }
 
-         if(IS_SET(victim->combat, COMBAT_BERSERK)) {
-           act("$N looks at you with glazed over eyes, drools, and continues to fight!",
-               ch, NULL, victim, TO_CHAR, 0);
-           act("$N smiles madly, drool running down his chin as he ignores $n's magic!",
-               ch, NULL, victim, TO_ROOM, 0);
-           act("You grin as $n realizes you have no target for his mental attack!",
-               ch, NULL, victim, TO_VICT, 0);
-           return eFAILURE;
-         }
- set_cantquit( ch, victim );
+  set_cantquit( ch, victim );
+  
+  int retval = 0;
 
-   if (malediction_res(ch, victim, SPELL_FEAR)) {
-      act("$N resists your attempt to scare $M!", ch, NULL, victim, TO_CHAR,0);
-      act("$N resists $n's attempt to scare $M!", ch, NULL, victim, TO_ROOM,NOTVICT);
-      act("You resist $n's attempt to scare you!",ch,NULL,victim,TO_VICT,0);
-      if (IS_NPC(victim) && (!victim->fighting) && GET_POS(ch) > POSITION_SLEEPING) {
-         retval = attack(victim, ch, TYPE_UNDEFINED);
-         retval = SWAP_CH_VICT(retval);
-         return retval;
-      }
+  if (malediction_res(ch, victim, SPELL_FEAR)) {
+    act("$N resists your attempt to scare $M!", ch, NULL, victim, TO_CHAR,0);
+    act("$N resists $n's attempt to scare $M!", ch, NULL, victim, TO_ROOM,NOTVICT);
+    act("You resist $n's attempt to scare you!",ch,NULL,victim,TO_VICT,0);
+    if (IS_NPC(victim) && (!victim->fighting) && GET_POS(ch) > POSITION_SLEEPING) {
+      retval = attack(victim, ch, TYPE_UNDEFINED);
+      retval = SWAP_CH_VICT(retval);
+      return retval;
+    }
+    
+    return eFAILURE;
+  }
 
-     return eFAILURE;
-   }
-
-	 if((saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC) >= 0) || (!number(0, 5))) {
-		send_to_char("For a moment you feel compelled to run away, but you fight back the urge.\n\r", victim);
-		act("$N doesnt seem to be the yellow-bellied slug you thought!", ch, NULL, victim, TO_CHAR, 0);
-		if (IS_NPC(victim)) {
-		retval = one_hit(victim, ch, TYPE_UNDEFINED, FIRST);
-		retval = SWAP_CH_VICT(retval);
-		} else retval = eFAILURE;
-		return retval;
-	 }
-	 send_to_char("You suddenly feel very frightened, and you attempt to flee!\n\r", victim);
-	 do_flee(victim, "", 151);
-
+  if (saves_spell(ch, victim, 0, SAVE_TYPE_COLD) >= 0) {
+    send_to_char("For a moment you feel compelled to run away, but you fight back the urge.\n\r", victim);
+    act("$N doesnt seem to be the yellow-bellied slug you thought!", ch, NULL, victim, TO_CHAR, 0);
+    if (IS_NPC(victim)) {
+      retval = one_hit(victim, ch, TYPE_UNDEFINED, FIRST);
+      retval = SWAP_CH_VICT(retval);
+    } else {
+      retval = eFAILURE;
+    }
+    return retval;
+  }
+  
+  send_to_char("You suddenly feel very frightened, and you attempt to flee!\n\r", victim);
+  do_flee(victim, "", 151);
+   
   return eSUCCESS;
 }
 
