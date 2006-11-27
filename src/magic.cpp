@@ -1513,7 +1513,7 @@ int spell_paralyze(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
   af.bitvector = AFF_PARALYSIS;
   affect_to_char(victim, &af);
 
-  GET_POS(victim) = POSITION_PARALYZED;
+  GET_POS(victim) = POSITION_SLEEPING;
   return eSUCCESS;
 }
 
