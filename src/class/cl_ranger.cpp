@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: cl_ranger.cpp,v 1.78 2006/09/03 07:34:25 shane Exp $ | cl_ranger.C  *
+ * $Id: cl_ranger.cpp,v 1.79 2006/11/27 21:21:25 pirahna Exp $ | cl_ranger.C  *
  * Description: Ranger skills/spells                                          *
  *                                                                            *
  * Revision History                                                           *
@@ -728,7 +728,9 @@ int do_forage(CHAR_DATA *ch, char *arg, int cmd)
   struct affected_type af;
 
   if(affected_by_spell(ch, SKILL_FORAGE)) {
-    send_to_char("You already foraged recently.  Give mother nature a break!\n\r", ch);
+    if(number(0,1) == 0 )
+        send_to_char("You already foraged recently.  Give mother nature a break!\n\r", ch);
+    else send_to_char("There's a limit to how often you can play with your nuts.  Give it some time.\n\r", ch);
     return eFAILURE;
   }
   
