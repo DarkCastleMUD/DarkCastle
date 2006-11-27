@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.213 2006/11/24 19:29:27 jhhudso Exp $ */
+/* $Id: const.cpp,v 1.214 2006/11/27 04:48:35 jhhudso Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1936,7 +1936,6 @@ char *position_types[] =
     "Incapacitated",
     "Stunned",
     "Sleeping",
-    "Paralyzed",
     "Resting",
     "Sitting",
     "Fighting",
