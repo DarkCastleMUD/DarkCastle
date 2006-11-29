@@ -1150,10 +1150,10 @@ int do_prompt(CHAR_DATA *ch, char *arg, int cmd)
   if (GET_LAST_PROMPT(ch))
     dc_free(GET_LAST_PROMPT(ch));
 
-  GET_LAST_PROMPT(ch) = str_dup(GET_PROMPT(ch));
-
-  if(GET_PROMPT(ch))
+  if(GET_PROMPT(ch)) {
+    GET_LAST_PROMPT(ch) = str_dup(GET_PROMPT(ch));
     dc_free(GET_PROMPT(ch));
+  }
 
   GET_PROMPT(ch) = str_dup(arg);
   send_to_char("Ok.\n\r", ch);
