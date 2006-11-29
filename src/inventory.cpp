@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.81 2006/11/09 01:45:15 jhhudso Exp $
+| $Id: inventory.cpp,v 1.82 2006/11/29 11:24:38 jhhudso Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -1504,7 +1504,6 @@ struct obj_data * search_char_for_item(char_data * ch, int16 item_number, bool w
 
 int find_door(CHAR_DATA *ch, char *type, char *dir)
 {
-    char buf[MAX_STRING_LENGTH];
     int door;
     char *dirs[] =
     {
@@ -1531,16 +1530,12 @@ int find_door(CHAR_DATA *ch, char *type, char *dir)
                     return(door);
                 else
                 {
-                    sprintf(buf, "There is no %s there.\n\r", type);
-                    send_to_char(buf, ch);
                     return(-1);
                 }
             else
                 return(door);
         else
         {   
-            sprintf(buf, "There is no %s there.\n\r", type);
-            send_to_char(buf, ch);
             return(-1);
         }
     }
@@ -1552,8 +1547,6 @@ int find_door(CHAR_DATA *ch, char *type, char *dir)
                     if (isname(type, EXIT(ch, door)->keyword))
                         return(door);
                         
-        sprintf(buf, "I see no %s here.\n\r", type);
-        send_to_char(buf, ch);
         return(-1);
     }
 }
@@ -1561,6 +1554,7 @@ int find_door(CHAR_DATA *ch, char *type, char *dir)
 
 int do_open(CHAR_DATA *ch, char *argument, int cmd)
 {
+  bool found = false;
    int door, other_room, retval;
    char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
    struct room_direction_data *back;
@@ -1578,6 +1572,7 @@ int do_open(CHAR_DATA *ch, char *argument, int cmd)
       send_to_char("Open what?\n\r", ch);
    else if ((door = find_door(ch, type, dir)) >= 0)
    { 
+     found = true;
       if (!IS_SET(EXIT(ch, door)->exit_info, EX_ISDOOR))
          send_to_char("That's impossible, I'm afraid.\n\r", ch);
       else if (!IS_SET(EXIT(ch, door)->exit_info, EX_CLOSED))
@@ -1653,6 +1648,7 @@ int do_open(CHAR_DATA *ch, char *argument, int cmd)
    }
    else if (generic_find(argument, FIND_OBJ_INV | FIND_OBJ_ROOM, ch, &victim, &obj))
    {
+     found = true;
       // this is an object
       if (obj->obj_flags.type_flag != ITEM_CONTAINER)
          send_to_char("That's not a container.\n\r", ch);
@@ -1670,6 +1666,10 @@ int do_open(CHAR_DATA *ch, char *argument, int cmd)
       }
    }
 
+   if (found == false) {
+     csendf(ch, "I see no %s here.\n\r", type);
+   }
+
    // in case ch died or anything
    if(retval)
       return retval;
@@ -1678,6 +1678,7 @@ int do_open(CHAR_DATA *ch, char *argument, int cmd)
 
 int do_close(CHAR_DATA *ch, char *argument, int cmd)
 {
+  bool found = false;
    int door, other_room;
    char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
    struct room_direction_data *back;
@@ -1690,6 +1691,7 @@ int do_close(CHAR_DATA *ch, char *argument, int cmd)
       send_to_char("Close what?\n\r", ch);
    else if ((door = find_door(ch, type, dir)) >= 0)
    {    
+     found = true;
       if (!IS_SET(EXIT(ch, door)->exit_info, EX_ISDOOR))
          send_to_char("That's absurd.\n\r", ch);
       else if (IS_SET(EXIT(ch, door)->exit_info, EX_CLOSED))
@@ -1723,6 +1725,7 @@ int do_close(CHAR_DATA *ch, char *argument, int cmd)
    }
    else if (generic_find(argument, FIND_OBJ_INV | FIND_OBJ_ROOM, ch, &victim, &obj))
    {     
+     found = true;
       if (obj->obj_flags.type_flag != ITEM_CONTAINER)
          send_to_char("That's not a container.\n\r", ch);
       else if (IS_SET(obj->obj_flags.value[1], CONT_CLOSED))
@@ -1735,6 +1738,10 @@ int do_close(CHAR_DATA *ch, char *argument, int cmd)
          send_to_char("Ok.\n\r", ch);
          act("$n closes $p.", ch, obj, 0, TO_ROOM, 0);
       }
+   }
+
+   if (found == false) {
+     csendf(ch, "I see no %s here.\n\r", type);
    }
 
    return eSUCCESS;
