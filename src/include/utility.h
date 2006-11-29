@@ -16,7 +16,7 @@
  *  10/21/2003   Onager    Changed IS_ANONYMOUS() to handle mobs without   *
  *                         crashing                                        *
  ***************************************************************************/
-/* $Id: utility.h,v 1.54 2006/11/24 19:29:49 jhhudso Exp $ */
+/* $Id: utility.h,v 1.55 2006/11/29 10:50:16 jhhudso Exp $ */
 
 #ifndef UTILITY_H_
 #define UTILITY_H_
@@ -200,6 +200,7 @@ bool IS_DARK( int room );
         ((long)(VALID_ROOM_RNUM(rnum) ? world[(rnum)].number : NOWHERE))
 
 #define GET_PROMPT(ch)  ((ch)->pcdata->prompt)
+#define GET_LAST_PROMPT(ch)  ((ch)->pcdata->last_prompt)
 #define GET_TOGGLES(ch) ((ch)->pcdata->toggles)
 
 #define GET_CLASS(ch)   ((ch)->c_class)
