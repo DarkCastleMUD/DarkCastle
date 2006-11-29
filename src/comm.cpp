@@ -1104,6 +1104,16 @@ void echo_on(struct descriptor_data *d)
   SEND_TO_Q(on_string, d);
 }
 
+int do_lastprompt(CHAR_DATA *ch, char *arg, int cmd) 
+{
+  if (GET_LAST_PROMPT(ch))
+    csendf(ch, "Last prompt: %s\n\r", GET_LAST_PROMPT(ch));
+  else
+    send_to_char("Last prompt: unset\n\r", ch);
+
+  return eSUCCESS;
+}
+
 int do_prompt(CHAR_DATA *ch, char *arg, int cmd) 
 {
   while(*arg == ' ')
@@ -1120,6 +1130,13 @@ int do_prompt(CHAR_DATA *ch, char *arg, int cmd)
        send_to_char("Current prompt:  ", ch);
        send_to_char(GET_PROMPT(ch), ch);
        send_to_char("\n\r", ch);
+       send_to_char("Last prompt: ", ch);
+       if (GET_LAST_PROMPT(ch)) {
+	 send_to_char(GET_LAST_PROMPT(ch), ch);
+       } else {
+	 send_to_char("unset", ch);
+       }
+       send_to_char("\n\r", ch);
     }
     return eSUCCESS;
   }
@@ -1130,8 +1147,14 @@ int do_prompt(CHAR_DATA *ch, char *arg, int cmd)
     return eFAILURE;
   }
 
+  if (GET_LAST_PROMPT(ch))
+    dc_free(GET_LAST_PROMPT(ch));
+
+  GET_LAST_PROMPT(ch) = str_dup(GET_PROMPT(ch));
+
   if(GET_PROMPT(ch))
     dc_free(GET_PROMPT(ch));
+
   GET_PROMPT(ch) = str_dup(arg);
   send_to_char("Ok.\n\r", ch);
   return eSUCCESS;
@@ -1202,16 +1225,54 @@ char * cond_txtc[] = {
   "dead as a doornail"
 };
 
+char * cond_colorcodes[] = {
+  BOLD GREEN,
+  GREEN,
+  BOLD YELLOW ,
+  YELLOW,
+  RED,
+  BOLD RED,
+  BOLD GREY,
+};
+
+
+string calc_name(CHAR_DATA *ch, bool colour = FALSE)
+{
+  int percent;
+  string name;
+
+  if(GET_HIT(ch) == 0 || GET_MAX_HIT(ch) == 0)
+    percent = 0;
+  else
+    percent = GET_HIT(ch) * 100 / GET_MAX_HIT(ch);
+
+  if (colour == TRUE) {
+    if(percent >= 100)
+      name = cond_colorcodes[0];
+    else if(percent >= 90)
+      name = cond_colorcodes[1];
+    else if(percent >= 75)
+      name = cond_colorcodes[2];
+    else if(percent >= 50)
+      name = cond_colorcodes[3];
+    else if(percent >= 30)
+      name = cond_colorcodes[4];
+    else if(percent >= 15)
+      name = cond_colorcodes[5];
+    else if(percent >= 0) 
+      name = cond_colorcodes[6];
+  }
+
+  name += ch->name;
+
+  return name;
+}
 
 char * calc_condition(CHAR_DATA *ch, bool colour = FALSE)
 {
   int percent;
   char *cond_txt[8];// = cond_txtz;
 
- // if (colour)
- //  cond_txt = cond_txtc;
- // else
- //  cond_txt = cond_txtz;
   if (colour)
    memcpy(cond_txt, cond_txtc, sizeof(cond_txtc));
   else
@@ -1310,8 +1371,15 @@ void generate_prompt(CHAR_DATA *ch, char *prompt)
        default:
          strcat(prompt, "There is a fucked up code in your prompt> ");
          return;
-       case 'p':
-         sprintf(pro, "%d", GET_PLATINUM(ch));
+        case 'p':
+	  if (ch->fighting && ch->fighting->fighting) {
+	    sprintf(pro, "%s", calc_name(ch->fighting->fighting).c_str());
+	  }
+	  break;
+        case 'P':
+	  if (ch->fighting && ch->fighting->fighting) {
+	    sprintf(pro, "%s", calc_name(ch->fighting->fighting,TRUE).c_str());
+	  }
          break;
        case 'g':
          sprintf(pro, "%d", GET_GOLD(ch));
@@ -1458,9 +1526,6 @@ void generate_prompt(CHAR_DATA *ch, char *prompt)
          break;
        case '8':
          sprintf(pro, "%s", BOLD);
-         break;
-       case '9':
-         sprintf(pro, "%s", FLASH);
          break;
        case 'r':
          sprintf(pro, "%c%c", '\n', '\r');
