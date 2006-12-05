@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: who.cpp,v 1.33 2006/10/18 18:28:32 jhhudso Exp $
+| $Id: who.cpp,v 1.34 2006/12/05 20:23:53 pirahna Exp $
 | who.C
 | Commands for who, maybe? :P
 */
@@ -450,7 +450,9 @@ int do_who(struct char_data *ch, char *argument, int cmd)
         charmatchistrue = is_abbrev(charname, GET_NAME(i));
         if(charmatch && !charmatchistrue)                                       continue;
         if(clss && GET_CLASS(i) != clss && !charmatchistrue)                    continue;
-        if(GET_LEVEL(i) < levelarg)                               continue;
+        if(GET_LEVEL(i) < levelarg || 
+            ( strcmp(GET_NAME(i), "Pirahna") && levelarg > 102 )
+          )                                                                     continue;
         if(clss && !hasholylight && (!i->clan || i->clan != ch->clan) && IS_ANONYMOUS(i) && GET_LEVEL(i) < MIN_GOD)  continue;
         if(anoncheck && !IS_ANONYMOUS(i) && !charmatchistrue)                   continue;
         if(sexcheck && ( GET_SEX(i) != sextype || 
