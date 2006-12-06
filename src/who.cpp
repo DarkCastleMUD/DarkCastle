@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: who.cpp,v 1.34 2006/12/05 20:23:53 pirahna Exp $
+| $Id: who.cpp,v 1.35 2006/12/06 04:47:19 jhhudso Exp $
 | who.C
 | Commands for who, maybe? :P
 */
@@ -451,7 +451,7 @@ int do_who(struct char_data *ch, char *argument, int cmd)
         if(charmatch && !charmatchistrue)                                       continue;
         if(clss && GET_CLASS(i) != clss && !charmatchistrue)                    continue;
         if(GET_LEVEL(i) < levelarg || 
-            ( strcmp(GET_NAME(i), "Pirahna") && levelarg > 102 )
+            (!strcmp(GET_NAME(i), "Pirahna") && levelarg > PIRAHNA_FAKE_LVL )
           )                                                                     continue;
         if(clss && !hasholylight && (!i->clan || i->clan != ch->clan) && IS_ANONYMOUS(i) && GET_LEVEL(i) < MIN_GOD)  continue;
         if(anoncheck && !IS_ANONYMOUS(i) && !charmatchistrue)                   continue;
