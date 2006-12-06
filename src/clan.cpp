@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.58 2006/09/03 07:34:02 shane Exp $ */
+/* $Id: clan.cpp,v 1.59 2006/12/06 06:34:41 jhhudso Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -64,6 +64,7 @@ char * clan_rights[] = {
    "channel",
    "area",
    "vault",
+   "vaultlog",
    "\n"
 };
 

@@ -337,14 +337,38 @@ int do_vault(CHAR_DATA *ch, char *argument, int cmd)
   } else if (GET_LEVEL(ch) > IMMORTAL && !strncmp(arg, "stats", strlen(arg))) {
       vault_stats(ch, arg1);
  
-  // show how much gold in vault
+  // show vault log
   } else if (!strncmp(arg, "log", strlen(arg))) {
-    if(*arg1 && !str_cmp(arg1, "clan") && ch->clan && has_right(ch, CLAN_RIGHTS_VAULT))
-       strcpy(arg1, clanVName(ch->clan));
-    if(!*arg1 || GET_LEVEL(ch) < IMMORTAL)
-       sprintf(arg1, "%s", GET_NAME(ch));
-    show_vault_log(ch, arg1);
+    if (*arg1) {
+      if (!strcasecmp(arg1, clanVName(ch->clan))) {
+	struct clan_data *clan = get_clan(ch);
+	if (clan == false) {
+	  send_to_char("You are not a member of any clan.\n\r", ch);
+	  return eFAILURE;
+	}
 
+	// Clan leader or a clan member with the vaultlog right can view log.
+	if ((clan->leader && !strcmp(clan->leader, GET_NAME(ch))) || has_right(ch, CLAN_RIGHTS_VAULTLOG)) {
+	  stringstream clanName;
+
+	  clanName << "clan" << clan->number;
+	  sprintf(arg1, "%s", clanName.str().c_str());
+
+	  show_vault_log(ch, arg1);
+	} else {
+	  send_to_char("You don't have access to view the clan's vault log.\n\r", ch);
+	  return eFAILURE;	  
+	}
+      } else if (GET_LEVEL(ch) >= IMMORTAL) {
+	show_vault_log(ch, arg1);
+      } else {
+	send_to_char("Syntax: vault log <clan>\n\r", ch);
+	return eFAILURE;
+      }
+    } else {
+      sprintf(arg1, "%s", GET_NAME(ch));
+      show_vault_log(ch, arg1);
+    }
   // putting this here so that anything below it requires you to be in a safe room.
   } else if (!IS_SET(world[ch->in_room].room_flags, SAFE)) {
     send_to_char("You don't feel safe enough to manage your valuables.\r\n", ch);
