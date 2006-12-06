@@ -292,7 +292,7 @@ char *vault_usage = "Syntax: vault <list | balance> [name of vault owner]\r\n"
                     "        vault <put | get> <object> [name of vault owner]\r\n"
                     "        vault <deposit | withdraw> <amount>\r\n"
                     "        vault <access | myaccess> [name to add/remove access]\r\n"
-                    "        vault log\r\n";
+                    "        vault log <clan>\r\n";
 
 char *imm_vault_usage = "         vault <stats> [name]\r\n";
 
