@@ -1,4 +1,4 @@
-/* $Id: levels.h,v 1.4 2006/07/29 21:05:31 jhhudso Exp $ */
+/* $Id: levels.h,v 1.5 2006/12/06 04:46:50 jhhudso Exp $ */
 /* This is purely to define god levels as #defines. */
 #ifndef LEVELS_H_
 #define LEVELS_H_
@@ -38,6 +38,7 @@
 #define MAX_MORTAL 50
 #define MIN_GOD IMMORTAL
 
+#define PIRAHNA_FAKE_LVL 102
 
 struct bestowable_god_commands_type
 {
