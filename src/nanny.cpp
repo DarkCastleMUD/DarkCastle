@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.145 2006/09/06 11:01:23 shane Exp $ */
+/* $Id: nanny.cpp,v 1.146 2006/12/06 04:41:01 jhhudso Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -1722,8 +1722,14 @@ void update_command_lag_and_poison()
    for(i = character_list; i; i = next_dude) 
    {
       next_dude = i->next;
+
+      if (IS_AFFECTED(i, AFF_POISON) && !(affected_by_spell(i, SPELL_POISON))) {
+	logf(IMMORTAL, LOG_BUG, "Player %s affected by poison but not under poison spell. Removing poison affect.", i->name);
+	REMBIT(i->affected_by, AFF_POISON);
+      }
+
       // handle poison
-      if(IS_AFFECTED(i, AFF_POISON) && !i->fighting && affected_by_spell(i, SPELL_POISON)->location == APPLY_NONE) {
+      if(IS_AFFECTED(i, AFF_POISON) && !i->fighting && affected_by_spell(i, SPELL_POISON) && affected_by_spell(i, SPELL_POISON)->location == APPLY_NONE) {
         int tmp = number(1,2) + affected_by_spell(i, SPELL_POISON)->duration;
         if(get_saves(i, SAVE_TYPE_POISON) > number(1,101)) {
            tmp *= get_saves(i, SAVE_TYPE_POISON) / 100;
