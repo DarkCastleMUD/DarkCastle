@@ -1387,6 +1387,9 @@ void generate_prompt(CHAR_DATA *ch, char *prompt)
        case 'G':
          sprintf(pro, "%d", (int32) (GET_GOLD(ch)/20000));
          break;
+       case '$':
+         sprintf(pro, "%d", GET_PLATINUM(ch));
+         break;
        case 'h':
          sprintf(pro, "%d", GET_HIT(ch));
          break;
