@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.382 2006/11/25 03:07:49 jhhudso Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.383 2006/12/13 16:50:34 jhhudso Exp $ */
 
 extern "C"
 {
@@ -1592,6 +1592,29 @@ int damage_retval(CHAR_DATA * ch, CHAR_DATA * vict, int value)
   return value;
 }
 
+bool is_bingo(int dam, int weapon_type, int attacktype)
+{
+  if (weapon_type != TYPE_UNDEFINED)
+    return false;
+
+  switch (attacktype) {
+  case SKILL_BACKSTAB:
+    if (dam == 9999999)
+      return true;
+    break;
+  case SKILL_SKEWER:
+    if (dam == 99999)
+      return true;
+    break;
+  case SKILL_SONG_WHISTLE_SHARP:
+    if (dam == 9999999)
+      return true;
+    break;
+  }
+
+  return false;
+}
+
 // returns standard returnvals.h return codes
 int damage(CHAR_DATA * ch, CHAR_DATA * victim,
            int dam, int weapon_type, int attacktype, int weapon)
@@ -1608,8 +1631,16 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
   int percent;
   int learned;
   int ethereal = 0;
-  bool reflected = FALSE;  
+  bool reflected = FALSE;
   char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH], buf3[MAX_STRING_LENGTH];
+
+  bool bingo;
+  if (is_bingo(dam, weapon_type, attacktype)) {
+    bingo = true;
+  } else {
+    bingo = false;
+  }
+
   SET_BIT(retval, eSUCCESS);
   weapon_bit = get_weapon_bit(weapon_type);
   if(!weapon)
@@ -1645,7 +1676,7 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
     dam += elemental_damage_bonus(attacktype, ch);
   //
 
-    if(IS_SET(victim->combat, COMBAT_REPELANCE))
+    if(IS_SET(victim->combat, COMBAT_REPELANCE) && !bingo)
     {
        if(GET_LEVEL(ch) > 70)
          send_to_char("The power of the spell bursts through your mental barriers as if they weren't there!\r\n", victim);
