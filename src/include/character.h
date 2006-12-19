@@ -1,7 +1,7 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.53 2006/11/29 10:50:44 jhhudso Exp $
+| $Id: character.h,v 1.54 2006/12/19 14:54:02 dcastle Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
@@ -175,6 +175,7 @@ struct vault_access_data
   bool withdraw;
 };
 
+
 struct player_vault
 {
   char *segment[20];
@@ -186,6 +187,13 @@ struct player_vault
   struct vault_access_data *acc;
 };
 */
+
+struct player_spec
+{ // specialization stuff
+  int spec;
+  
+};
+
 
 // DO NOT change most of these types without checking the save files
 // first, or you will probably end up corrupting all the pfiles

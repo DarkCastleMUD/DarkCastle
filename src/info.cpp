@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.124 2006/11/11 17:32:49 jhhudso Exp $ */
+/* $Id: info.cpp,v 1.125 2006/12/19 14:53:58 dcastle Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -2706,7 +2706,7 @@ void check_leaderboard()
          }
       }
       for(i=0;i<5;i++) {
-         if(GET_LEVEL(d->character) < 50) break;
+         if(GET_LEVEL(d->character) < 60) break;
          if((int)GET_RDEATHS(d->character) > rdactive[i]) {
             for(j=4;j>i;j--) {
                rdactive[j] = rdactive[j-1];
@@ -2786,7 +2786,7 @@ void check_leaderboard()
          }
       }
       for(i=0;i<5;i++) {
-         if(GET_LEVEL(d->character) < 50) break;
+         if(GET_LEVEL(d->character) < 60) break;
          if((int)GET_RDEATHS(d->character) > rdactiveclass[k][i]) {
             for(j=4;j>i;j--) {
                rdactiveclass[k][j] = rdactiveclass[k][j-1];

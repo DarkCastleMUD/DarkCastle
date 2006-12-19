@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.384 2006/12/17 05:23:57 jhhudso Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.385 2006/12/19 14:53:58 dcastle Exp $ */
 
 extern "C"
 {
@@ -1104,8 +1104,10 @@ int get_monk_bare_damage(char_data * ch) {
       dam = dice(4, 4);
     else if(GET_LEVEL(ch) < 50)
       dam = dice(4, 5);
-    else if(GET_LEVEL(ch) < 51)
+    else if(GET_LEVEL(ch) < 60)
       dam = dice(5, 5);
+    else if (GET_LEVEL(ch) < 61)
+      dam = dice(6, 5);
     else if(GET_LEVEL(ch) < IMMORTAL)
       dam = dice(10, 6);
     else if(GET_LEVEL(ch) < IMP)
@@ -1278,7 +1280,7 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
     if(IS_SET(ch->combat, COMBAT_CIRCLE)) {
       if(GET_LEVEL(ch) <= MORTAL)
          dam *= ((backstab_mult[(int)GET_LEVEL(ch)]) / 2);
-      else dam *= 20;
+      else dam *= 25;
       REMOVE_BIT(ch->combat, COMBAT_CIRCLE);
     }
     else if((GET_CLASS(ch) == CLASS_THIEF) ||
@@ -1286,11 +1288,11 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
     {
       if(GET_LEVEL(ch) <= MORTAL)
       {
-         if(GET_CLASS(ch) == CLASS_ANTI_PAL)
-           dam *= (backstab_mult[(int)GET_LEVEL(ch)]+1);
-         else dam *= backstab_mult[(int)GET_LEVEL(ch)];
+//         if(GET_CLASS(ch) == CLASS_ANTI_PAL)
+ //          dam *= (backstab_mult[(int)GET_LEVEL(ch)]+1);
+         dam *= backstab_mult[(int)GET_LEVEL(ch)];
       }
-      else dam *= 20;
+      else dam *= 25;
     }
   }
 

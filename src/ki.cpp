@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.57 2006/11/06 23:23:40 jhhudso Exp $ */
+/* $Id: ki.cpp,v 1.58 2006/12/19 14:53:58 dcastle Exp $ */
 
 extern "C"
 {
@@ -329,60 +329,6 @@ int do_ki(CHAR_DATA *ch, char *argument, int cmd)
     return eFAILURE;
   }
   return eFAILURE;
-}
-
-/* Now some ki maintenance procedures */
-/* This procedure takes the character and returns the type */
-/* of effect that happens.  Most of the time it will be no */
-/* effect, but ths varies greatly with amount of ki	   */
-
-int ki_check(CHAR_DATA *ch)
-{
-	int percent = 0;
-	if(GET_KI(ch) < MIN_REACT_KI)
-		return NO_EFFECT;
-
-	if(GET_KI(ch) >= MAXIMUM_KI)
-	{
-		if(rand()%2) /* 50% of the time */
-		{
-			switch(rand()%6)
-			{
-				case 0: return NO_EFFECT;
-				case 1: return NO_EFFECT;
-				case 2: return DIVINE;
-				case 3: return MIRACLE;
-				case 4: return MAJOR_EFFECT;
-				case 5: return MINOR_EFFECT;
-			}
-		}
-	}	
-	/* Still here?  You can have an effect  - randomly */
-	if(GET_LEVEL(ch) >= IMMORTAL)
-		return NO_EFFECT;	/* gods don't need effects */
-	if(GET_LEVEL(ch) > (MAX_MORTAL - 1))
-		percent += 10;
-	else if(GET_LEVEL(ch) > 35)
-	    percent += GET_LEVEL(ch) / 5;		
-	else if(GET_LEVEL(ch) > 15)
-		percent += GET_LEVEL(ch) / 10;
-	/* No bonus under 15th level */
-	if(GET_CLASS(ch) == CLASS_MONK)
-		percent += GET_LEVEL(ch) / 4;
-	percent += GET_KI(ch) / 2;	/* Add half their ki to it */
-	percent += dice(1, 50);
-	if(percent > 100) percent = 100;
-
-	if(percent > 95)	/* wow! */
-		return DIVINE;
-	else if(percent > 85)
-		return MIRACLE;
-	else if(percent > 80)
-		return MAJOR_EFFECT;
-	else if(percent > 75)
-		return MINOR_EFFECT;
-	else
-		return NO_EFFECT;	
 }
 
 void reduce_ki(CHAR_DATA *ch, int type)

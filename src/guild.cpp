@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.101 2006/11/22 13:06:38 dcastle Exp $
+| $Id: guild.cpp,v 1.102 2006/12/19 14:53:58 dcastle Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -548,6 +548,7 @@ int guild(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
          case CLASS_CLERIC: skl = SPELL_DIVINE_INTER; break;
  	 case CLASS_ANTI_PAL: skl = SPELL_VAMPIRIC_AURA; break;
          case CLASS_DRUID: skl = SPELL_CONJURE_ELEMENTAL; break;   
+	 case CLASS_BARD: skl = SKILL_SONG_HYPNOTIC_HARMONY; break;
        }
        if (!has_skill(ch, skl))
        {
@@ -569,9 +570,10 @@ int guild(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     GET_LEVEL(ch) +=1;
     advance_level(ch, 0);
     GET_EXP(ch) -= (int)exp_needed;
-    int bonus = (GET_LEVEL(ch)-50)*600;
+    int bonus = (GET_LEVEL(ch)-50)*500;
     if (bonus > 0)
     {
+//TODOFOR60
 //	char b[MAX_STRING_LENGTH];
 //TODOTODOTODO
 //sprintf(buf, "",GET_NAME(ch),GET_PLATINUM(ch));
