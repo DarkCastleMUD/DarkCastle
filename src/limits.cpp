@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.79 2006/10/16 06:09:45 jhhudso Exp $ */
+/* $Id: limits.cpp,v 1.80 2006/12/21 12:45:35 dcastle Exp $ */
 
 extern "C"
 {
@@ -903,4 +903,30 @@ void update_corpses_and_portals(void)
   //log(buf, 108, LOG_BUG);
   /* Now process the portals */
  // process_portals();
+}
+
+void prepare_character_for_sixty(CHAR_DATA *ch)
+{
+      if (!IS_NPC(ch) && MAX_MORTAL == 60) {
+        int skl = -1;
+        switch (GET_CLASS(ch))
+        {
+          case CLASS_MAGE: skl = SKILL_SPELLCRAFT; break;
+          case CLASS_BARBARIAN: skl = SKILL_BULLRUSH; break;
+          case CLASS_PALADIN: skl = SPELL_HOLY_AURA; break;
+          case CLASS_MONK: skl = KI_OFFSET+KI_MEDITATION; break;
+          case CLASS_WARRIOR: skl = SKILL_COMBAT_MASTERY; break;
+          case CLASS_THIEF: skl = SKILL_CRIPPLE; break;
+          case CLASS_RANGER: skl = SKILL_NAT_SELECT; break;
+          case CLASS_CLERIC: skl = SPELL_DIVINE_INTER; break;
+          case CLASS_ANTI_PAL: skl = SPELL_VAMPIRIC_AURA; break;
+          case CLASS_DRUID: skl = SPELL_CONJURE_ELEMENTAL; break;
+          case CLASS_BARD: skl = SKILL_SONG_HYPNOTIC_HARMONY; break;
+        }
+        if (has_skill(ch, skl) && !IS_SET(ch->pcdata->toggles, PLR_50PLUS))
+        {
+		SET_BIT(ch->pcdata->toggles, PLR_50PLUS);
+		ch->exp = 0;
+        }
+      }
 }
