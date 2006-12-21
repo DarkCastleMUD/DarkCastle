@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.146 2006/12/06 04:41:01 jhhudso Exp $ */
+/* $Id: nanny.cpp,v 1.147 2006/12/21 13:35:18 dcastle Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -609,6 +609,9 @@ void do_on_login_stuff(char_data * ch)
 	GET_RAW_MOVE(ch) += new_ - ometa;                  
   }
   /* end meta reimbursement */
+
+
+  prepare_character_for_sixty(ch);
 }
 
 void roll_and_display_stats(CHAR_DATA * ch)

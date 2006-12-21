@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.102 2006/12/19 14:53:58 dcastle Exp $
+| $Id: guild.cpp,v 1.103 2006/12/21 13:35:18 dcastle Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -150,6 +150,10 @@ int learn_skill(char_data * ch, int skill, int amount, int maximum)
     curr->learned = amount;
     curr->next = ch->skills;
     ch->skills = curr;
+
+   // could save processing power by making it's own function since skillnum is already known
+   // but *shrug*
+    prepare_character_for_sixty(ch);
     return 1;
   }
   return 0;
