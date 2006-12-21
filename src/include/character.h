@@ -1,7 +1,7 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.54 2006/12/19 14:54:02 dcastle Exp $
+| $Id: character.h,v 1.55 2006/12/21 13:05:01 dcastle Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
@@ -188,13 +188,6 @@ struct player_vault
 };
 */
 
-struct player_spec
-{ // specialization stuff
-  int spec;
-  
-};
-
-
 // DO NOT change most of these types without checking the save files
 // first, or you will probably end up corrupting all the pfiles
 struct pc_data
@@ -269,6 +262,7 @@ struct pc_data
     int16  quest_pass[QUEST_PASS];
     uint32 quest_complete[QUEST_TOTAL/ASIZE+1];
     char *last_prompt;
+    int spec;
 };
 
 struct mob_data
@@ -495,6 +489,6 @@ struct char_file_u
 
 void clear_hunt(void *arg1, void *arg2, void *arg3);
 void clear_hunt(char *arg1, CHAR_DATA *arg2, void *arg3);
-
+void prepare_character_for_sixty(CHAR_DATA *ch);
 
 #endif
