@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.80 2006/12/21 12:45:35 dcastle Exp $ */
+/* $Id: limits.cpp,v 1.81 2006/12/22 09:11:15 dcastle Exp $ */
 
 extern "C"
 {
@@ -926,6 +926,12 @@ void prepare_character_for_sixty(CHAR_DATA *ch)
         if (has_skill(ch, skl) && !IS_SET(ch->pcdata->toggles, PLR_50PLUS))
         {
 		SET_BIT(ch->pcdata->toggles, PLR_50PLUS);
+		int i = (ch->exp / 100000000) * 500000;
+		if (i > 0) {
+		  csendf(ch, "$B$3You have been credited %d gold coins for your %lld experience.$R\r\n",
+			i, ch->exp);
+		  ch->gold += i;
+		}
 		ch->exp = 0;
         }
       }
