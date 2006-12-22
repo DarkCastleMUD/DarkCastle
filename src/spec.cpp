@@ -61,7 +61,7 @@ int do_spec(CHAR_DATA *ch, char *argument, int cmd)
   if (IS_NPC(ch)) return eFAILURE;
   if (!str_cmp(arg, "list"))
   {
-    for (int i = 0; spec_list[i].name != NULL; i++)
+   for (int i = 0; spec_list[i].name != NULL; i++)
     {
        if (spec_list[i].pcclass != GET_CLASS(ch)) continue;
        sprintf(buf, "%d. %s : %s\r\n",i+1, spec_list[i].name, 
@@ -103,6 +103,7 @@ int do_spec(CHAR_DATA *ch, char *argument, int cmd)
        ch->saves[SAVE_TYPE_MAGIC] -= (GET_LEVEL(ch) == 60?1:0 + GET_LEVEL(ch) > 56 ? 1 : 0 + GET_LEVEL(ch) > 53 ? 1 : 0 + GET_LEVEL(ch) > 50 ? 1 : 0);
        ch->saves[SAVE_TYPE_POISON] -= (GET_LEVEL(ch) == 60?1:0 + GET_LEVEL(ch) > 56 ? 1 : 0 + GET_LEVEL(ch) > 53 ? 1 : 0 + GET_LEVEL(ch) > 50 ? 1 : 0);
        GET_LEVEL(ch) = 50;
+       send_to_char("You forget your specilization.\r\n",ch);
 
   }
   return eSUCCESS;
