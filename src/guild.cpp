@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.104 2006/12/22 08:53:25 dcastle Exp $
+| $Id: guild.cpp,v 1.105 2006/12/25 23:12:05 jhhudso Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -578,7 +578,7 @@ int guild(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     if (bonus > 0 && MAX_MORTAL == 60)
     {
 	char buf[MAX_STRING_LENGTH];
-	sprintf(buf, "Well done, %s! Here's your share of the guilds profits: %d platinum coins.",GET_NAME(ch),GET_PLATINUM(ch));
+	sprintf(buf, "Well done, %s! Here's your share of the guild's profits: %d platinum coins.",GET_NAME(ch), bonus);
 	send_to_char(buf,ch);
 	GET_PLATINUM(ch) += bonus;
     }
