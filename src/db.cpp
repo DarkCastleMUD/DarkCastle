@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.139 2006/12/21 13:35:18 dcastle Exp $ */
+/* $Id: db.cpp,v 1.140 2006/12/27 05:17:37 jhhudso Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -748,7 +748,12 @@ void update_wizlist(CHAR_DATA *ch)
          return;
        dc_free(wizlist[x].name);
        wizlist[x].name  = str_dup(GET_NAME(ch));
-       wizlist[x].level = GET_LEVEL(ch);
+
+       if (!strcmp(GET_NAME(ch), "Pirahna"))
+	 wizlist[x].level = PIRAHNA_FAKE_LVL;
+       else
+	 wizlist[x].level = GET_LEVEL(ch);
+
        wizlist[x+1].name  = str_dup("@");
        wizlist[x+1].level = 0;
        break;
