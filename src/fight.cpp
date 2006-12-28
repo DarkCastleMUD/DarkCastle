@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.385 2006/12/19 14:53:58 dcastle Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.386 2006/12/28 06:46:37 jhhudso Exp $ */
 
 extern "C"
 {
@@ -1966,10 +1966,10 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
   if (attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING)
   {
    
-    if(check_parry(ch, victim,attacktype)) {
+    if(check_parry(ch, victim, attacktype)) {
       if(typeofdamage == DAMAGE_TYPE_PHYSICAL)
       {
-        return damage_retval(ch, victim, check_riposte(ch, victim));
+        return damage_retval(ch, victim, check_riposte(ch, victim, attacktype));
       }
     }
     if (check_dodge(ch, victim, attacktype))
@@ -2547,33 +2547,47 @@ void fight_kill(CHAR_DATA *ch, CHAR_DATA *vict, int type, int spec_type)
 // check riposte never returns eSUCCESS because that would
 // get returned from damage as a successful damage, which it's
 // not.
-int check_riposte(CHAR_DATA * ch, CHAR_DATA * victim)
+int check_riposte(CHAR_DATA * ch, CHAR_DATA * victim, int attacktype)
 {
-  //int percent;
- // int learned;
- // int chance;
   int retval;
   
   if((IS_SET(victim->combat, COMBAT_STUNNED)) ||
-    (ch->equipment[WIELD] == NULL && number(1, 101) >= 50) ||
-    (IS_SET(victim->combat, COMBAT_STUNNED2)) ||
-    (IS_SET(victim->combat, COMBAT_BASH1)) ||
-    (IS_SET(victim->combat, COMBAT_BASH2)) ||
-    (IS_AFFECTED(victim, AFF_PARALYSIS)))
+     (ch->equipment[WIELD] == NULL && number(1, 101) >= 50) ||
+     (IS_SET(victim->combat, COMBAT_STUNNED2)) ||
+     (IS_SET(victim->combat, COMBAT_BASH1)) ||
+     (IS_SET(victim->combat, COMBAT_BASH2)) ||
+     (IS_AFFECTED(victim, AFF_PARALYSIS)) ||
+     (IS_SET(victim->combat, COMBAT_BLADESHIELD1)) ||
+     (IS_SET(victim->combat, COMBAT_BLADESHIELD2)) ||
+     (IS_SET(ch->combat, COMBAT_BLADESHIELD1)) || 
+     (IS_SET(ch->combat, COMBAT_BLADESHIELD2)))
     return eFAILURE;
-  bool b = FALSE;
 
-  if(IS_SET(victim->combat, COMBAT_BLADESHIELD1) || IS_SET(victim->combat, COMBAT_BLADESHIELD2)) 
+  int modifier = 0;
+  if (IS_NPC(victim))
   {
-    if(IS_SET(ch->combat, COMBAT_BLADESHIELD1) || IS_SET(ch->combat, COMBAT_BLADESHIELD2))
-      return eFAILURE;
-    b = TRUE;
-  }
+    switch(GET_CLASS(victim)) {
+      case CLASS_WARRIOR:       modifier = 15;   break;
+      case CLASS_THIEF:         modifier = 1;   break;
+      case CLASS_MONK:          modifier = -5;   break;
+      case CLASS_BARD:          modifier = 1; break;
+      case CLASS_RANGER:        modifier = 5;   break;
+      case CLASS_PALADIN:       modifier = 10;   break;
+      case CLASS_ANTI_PAL:      modifier = 5;   break;
+      case CLASS_BARBARIAN:     modifier = 5;   break;
+      case CLASS_MAGIC_USER:    modifier = -5; break;
+      case CLASS_CLERIC:        modifier = -5; break;
+      case CLASS_NECROMANCER:   modifier = -5; break;
+      default:                  modifier = 0; break;
+    }
+  } else if (!has_skill(victim, SKILL_RIPOSTE))
+    return eFAILURE;
 
-  if (IS_NPC(victim) && number(0,4)) return eFAILURE;
-  else if (!IS_NPC(victim) && !has_skill(victim, SKILL_RIPOSTE)) return eFAILURE;
+  modifier += speciality_bonus(ch, attacktype, GET_LEVEL(victim));
+  modifier -= GET_DEX(ch) / 2;
+  modifier -= 10;
 
-  if (b || skill_success(victim, ch, SKILL_RIPOSTE))
+  if (!skill_success(victim, ch, SKILL_RIPOSTE, modifier))
     return eFAILURE;
  
   act("$n turns $N's attack into one of $s own!", victim, NULL, ch, TO_ROOM, NOTVICT);
@@ -3712,7 +3726,7 @@ int do_skewer(CHAR_DATA *ch, CHAR_DATA *vict, int dam, int wt, int wt2, int weap
       //act("$2$n dodges $N's skewer!!$R", ch, 0, vict, TO_ROOM, NOTVICT);
       return 0;
     }
-    if(check_parry(ch, vict,type)) {
+    if(check_parry(ch, vict, type)) {
      // act("$2$n parries the $N's skewer!!$R", ch, 0, vict, TO_ROOM, NOTVICT);
       return 0;
     }
