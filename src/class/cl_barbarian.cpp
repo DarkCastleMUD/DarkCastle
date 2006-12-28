@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_barbarian.cpp,v 1.68 2006/11/04 03:44:15 jhhudso Exp $
+| $Id: cl_barbarian.cpp,v 1.69 2006/12/28 06:12:44 jhhudso Exp $
 | cl_barbarian.C
 | Description:  Commands for the barbarian class.
 */
@@ -264,7 +264,7 @@ int do_headbutt(struct char_data *ch, char *argument, int cmd)
 
   if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
     ;
-  else if(!has_skill(ch, SKILL_SHOCK)) {
+  else if(!has_skill(ch, SKILL_HEADBUTT)) {
     send_to_char("You'd bonk yourself silly without proper training.\r\n", ch);
     return eFAILURE;
   }
@@ -288,10 +288,11 @@ int do_headbutt(struct char_data *ch, char *argument, int cmd)
   if(!can_attack(ch) || !can_be_attacked(ch, victim))
     return eFAILURE;
 
-  if(IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE) && has_skill(ch, SKILL_SHOCK) < 86) {
+  if(IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE) && has_skill(ch, SKILL_HEADBUTT) < 86) {
     send_to_char("You're too puny to headbutt someone that HUGE!\n\r",ch);
     return eFAILURE;
   }
+
   if(IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_NOHEADBUTT)) {
     send_to_char("That would be like smashing your head into a wall!\n\r",ch);
     return eFAILURE;
@@ -303,7 +304,7 @@ int do_headbutt(struct char_data *ch, char *argument, int cmd)
 0);
      act("$N shakes off $n's attempt to immobilize them.",ch, NULL, victim, TO_ROOM, NOTVICT);
      act("$N shakes off your attempt to immobilize them.",ch, NULL, victim, TO_CHAR, NOTVICT);
-     WAIT_STATE(ch, PULSE_VIOLENCE*4);
+     WAIT_STATE(ch, PULSE_VIOLENCE*3);
         return eSUCCESS;
   }
   
@@ -311,43 +312,22 @@ int do_headbutt(struct char_data *ch, char *argument, int cmd)
   if(IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE))
      mod = -25;
 
-  if (!skill_success(ch,victim,SKILL_SHOCK,mod) ) 
+  if (!skill_success(ch, victim, SKILL_HEADBUTT, mod) ) 
   {
-//    act( "$n tries to headbutt you but fails miserably.", ch, NULL, 
-//victim, TO_VICT , 0);
-//    act( "You try to headbutt $N, but fail miserably.", ch, NULL, 
-//victim, TO_CHAR , 0);
-//    act( "$n tries to headbutt $N, but fails miserably.", ch, NULL, 
-//victim, TO_ROOM, NOTVICT );
-    if(has_skill(ch,SKILL_SHOCK) > 60 && !number(0, 3)) {
-       send_to_char("With your advanced knowledge of headbutt, you recover more quickly.\r\n", ch);
-       WAIT_STATE(ch, PULSE_VIOLENCE*2);
-    }
-    else WAIT_STATE(ch, PULSE_VIOLENCE*3);
-    retval = damage (ch, victim, 0, TYPE_CRUSH, SKILL_SHOCK, 0);
+    WAIT_STATE(ch, PULSE_VIOLENCE*3);
+    retval = damage (ch, victim, 0, TYPE_CRUSH, SKILL_HEADBUTT, 0);
     // the damage call here takes care of starting combat and such
     retval = eSUCCESS;
-  }
-  else {
-    //act( "$n slams $s forehead into your face! You are SHOCKED!", ch, 
-//NULL, victim, TO_VICT , 0);
-  //  act( "You slam your forehead into $N's face! $N looks SHOCKED!", ch, 
-//NULL, victim, TO_CHAR , 0);
-//    act( "$n slams $s forehead into $N's face! $N looks SHOCKED!", ch, 
-//NULL, victim, TO_ROOM, NOTVICT );
-
+  } else {
     if (IS_SET(victim->combat, COMBAT_BERSERK))
        REMOVE_BIT(victim->combat, COMBAT_BERSERK);
 
     set_fighting(victim, ch);
-  if(IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE))
-    WAIT_STATE(ch, PULSE_VIOLENCE*6);
-  else
-    WAIT_STATE(ch, PULSE_VIOLENCE*4);
+    WAIT_STATE(ch, PULSE_VIOLENCE*3);
   
     WAIT_STATE(victim, PULSE_VIOLENCE*2);
     SET_BIT(victim->combat, COMBAT_SHOCKED2);
-    retval = damage (ch, victim, 50, TYPE_CRUSH, SKILL_SHOCK, 0);
+    retval = damage (ch, victim, 50, TYPE_CRUSH, SKILL_HEADBUTT, 0);
     if (!SOMEONE_DIED(retval) && !number(0,9) &&
 	  ch->equipment[WEAR_HEAD] && obj_index[ch->equipment[WEAR_HEAD]->item_number].virt == 508)
     {

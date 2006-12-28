@@ -14,7 +14,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.h,v 1.89 2006/10/16 06:09:28 jhhudso Exp $ */
+/* $Id: spells.h,v 1.90 2006/12/28 06:12:44 jhhudso Exp $ */
 #include <structs.h> // ubyte, int16
 
 #define MAX_BUF_LENGTH               240
@@ -253,7 +253,7 @@ void check_maxes(CHAR_DATA *ch);
 #define SKILL_DEATHSTROKE            306
 #define SKILL_CIRCLE                 307
 #define SKILL_BERSERK                308
-#define SKILL_SHOCK                  309
+#define SKILL_HEADBUTT               309
 #define SKILL_EAGLE_CLAW             310
 #define SKILL_QUIVERING_PALM         311
 #define SKILL_PALM                   312

@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.215 2006/12/19 14:53:58 dcastle Exp $ */
+/* $Id: const.cpp,v 1.216 2006/12/28 06:12:43 jhhudso Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1135,7 +1135,7 @@ struct class_skill_defines w_skills[] = { // warrior skills
 {    "rescue",          SKILL_RESCUE,             5,    70,     {WIS,INT} },
 {    "double",          SKILL_SECOND_ATTACK,      7,    90,     {STR,DEX} },
 {    "disarm",          SKILL_DISARM,             10,   70,     {DEX,WIS} },
-{    "headbutt",        SKILL_SHOCK,              12,   85,     {CON,WIS} },
+{    "headbutt",        SKILL_HEADBUTT,           12,   85,     {CON,WIS} },
 {    "shield block",    SKILL_SHIELDBLOCK,        15,   85,     {STR,DEX} },
 {    "retreat",         SKILL_RETREAT,            17,   98,     {WIS,INT} },
 {    "frenzy",          SKILL_FRENZY,             18,   80,     {CON,INT} },
@@ -1314,7 +1314,7 @@ struct class_skill_defines b_skills[] = { // barbarian skills
 {    "bludgeoning",     SKILL_BLUDGEON_WEAPONS,   30,   85,  {STR,DEX} },
 {    "crushing",        SKILL_CRUSHING_WEAPONS,   30,   85,  {STR,DEX} },
 {    "ferocity",        SKILL_FEROCITY,           31,   98,  {INT,STR} },
-{    "headbutt",        SKILL_SHOCK,              33,   90,  {CON,WIS} },
+{    "headbutt",        SKILL_HEADBUTT,           33,   90,  {CON,WIS} },
 {    "two handers",     SKILL_TWO_HANDED_WEAPONS, 35,   90,  {STR,CON} },
 {    "archery",         SKILL_ARCHERY,            38,   80,  {DEX,WIS} },
 {    "berserk",         SKILL_BERSERK,            40,   98,  {STR,CON} },
