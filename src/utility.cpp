@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.64 2006/10/16 06:07:47 jhhudso Exp $ */
+/* $Id: utility.cpp,v 1.65 2006/12/28 11:18:50 jhhudso Exp $ */
 
 extern "C"
 {
@@ -291,9 +291,9 @@ void log( const char *str, int god_level, long type, char_data *vict)
           exit(1);
         }
         break;
-      case LOG_CHAOS:
+      case LOG_ARENA:
         f = &chaos_log;
-        if(!(*f = dc_fopen(CHAOS_LOG, "a"))) {
+        if(!(*f = dc_fopen(ARENA_LOG, "a"))) {
           fprintf(stderr, "Unable to open chaos log.\n");
           exit(1);
         }

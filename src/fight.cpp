@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.386 2006/12/28 06:46:37 jhhudso Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.387 2006/12/28 11:18:50 jhhudso Exp $ */
 
 extern "C"
 {
@@ -4989,7 +4989,7 @@ void arena_kill(CHAR_DATA *ch, CHAR_DATA *victim, int type)
     sprintf(killer_message, "\n\r## %s [%s] just SLAUGHTERED %s [%s] in the arena!\n\r", 
          ((IS_NPC(ch) && ch->master) ? GET_NAME(ch->master) : GET_NAME(ch)), clan ? clan->name : "no clan", 
          GET_NAME(victim), clan2 ? clan2->name : "no clan");
-    logf(105, LOG_CHAOS, "%s [%s] killed %s [%s]", GET_NAME(ch),
+    logf(105, LOG_ARENA, "%s [%s] killed %s [%s]", GET_NAME(ch),
          clan ? clan->name : "no clan", GET_NAME(victim), 
          clan2 ? clan2->name : "no clan");
   }

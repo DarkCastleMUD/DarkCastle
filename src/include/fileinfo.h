@@ -1,7 +1,7 @@
 #ifndef FILEINFO_H_
 #define FILEINFO_H_
 /*
-| $Id: fileinfo.h,v 1.21 2006/12/22 08:53:30 dcastle Exp $
+| $Id: fileinfo.h,v 1.22 2006/12/28 11:18:50 jhhudso Exp $
 | fileinfo.h
 | Description:  Contains information for loading files, ie "../lib", etc..
 */
@@ -78,7 +78,7 @@
 #define PLAYER_FILE         "../log/player.log"
 #define PLAYER_DIR          "../log/player/"
 #define WORLD_LOG           "../log/world.log"
-#define CHAOS_LOG           "../log/chaos.log"
+#define ARENA_LOG           "../log/arena.log"
 #define CLAN_LOG            "../log/clan.log" 
 #define HMM_LOG             "../log/give.log" 
 #define SAC_LOG		    "../log/sacrifice.log"
@@ -90,7 +90,7 @@
 #define SOCKET_FILE         "socket.log"
 #define PLAYER_FILE         "player.log"
 #define WORLD_LOG           "world.log"
-#define CHAOS_LOG           "chaos.log"
+#define ARENA_LOG           "arena.log"
 #define CLAN_LOG            "clan.log" 
 #define SAC_LOG 	    "sacrifice.log"
 #endif

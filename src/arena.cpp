@@ -7,7 +7,7 @@
 /* Revision History                                                          */
 /* 12/09/2003   Onager   Tweaked do_join() to remove combat-related bits     */
 /*****************************************************************************/
-/* $Id: arena.cpp,v 1.12 2005/05/28 18:56:09 shane Exp $ */
+/* $Id: arena.cpp,v 1.13 2006/12/28 11:18:50 jhhudso Exp $ */
 
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
@@ -100,7 +100,7 @@ int do_arena(CHAR_DATA *ch, char *arg, int cmd)
       if(arena[2] == -2) {
           sprintf(buf, "## Only clan members can join the bloodbath!\r\n");
           send_info(buf);
-          logf(111, LOG_CHAOS, "%s started a CC.", GET_NAME(ch));
+          logf(111, LOG_ARENA, "%s started a Clan Chaos arena.", GET_NAME(ch));
       }
       if(arena[2] == -3) {
           sprintf(buf, "##$4$B Special POTATO Arena!!$R\r\n");

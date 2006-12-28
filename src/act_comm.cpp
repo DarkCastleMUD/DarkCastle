@@ -136,8 +136,8 @@ int send_to_gods(const char *str, int god_level, long type)
     case LOG_WORLD:
       sprintf(typestr, "world");
       break;
-    case LOG_CHAOS:
-      sprintf(typestr, "chaos");
+    case LOG_ARENA:
+      sprintf(typestr, "arena");
       break;
     case LOG_CLAN:
       sprintf(typestr, "logclan");
