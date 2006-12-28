@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.76 2006/07/02 20:44:40 urizen Exp $
+| $Id: objects.cpp,v 1.77 2006/12/28 10:50:15 jhhudso Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -794,8 +794,8 @@ int do_drink(struct char_data *ch, char *argument, int cmd)
 
         
         if (GET_COND(ch,FULL) != -1)  {
-          GET_COND(ch,FULL) = 25;
-          GET_COND(ch,THIRST) = 25;
+          GET_COND(ch,FULL) = 22 + number(0,5);
+          GET_COND(ch,THIRST) = 22 + number(0,5);
         }
         
         return eSUCCESS;
