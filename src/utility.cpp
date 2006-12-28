@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.65 2006/12/28 11:18:50 jhhudso Exp $ */
+/* $Id: utility.cpp,v 1.66 2006/12/28 11:20:40 jhhudso Exp $ */
 
 extern "C"
 {
@@ -216,7 +216,7 @@ FILE * mortal_file = 0;
 FILE * socket_file = 0;
 FILE * player_file = 0;
 FILE * world_log   = 0;
-FILE * chaos_log   = 0;
+FILE * arena_log   = 0;
 FILE * clan_log   = 0;
 FILE * hmm_log = 0;
 // writes a string to the log 
@@ -292,9 +292,9 @@ void log( const char *str, int god_level, long type, char_data *vict)
         }
         break;
       case LOG_ARENA:
-        f = &chaos_log;
+        f = &arena_log;
         if(!(*f = dc_fopen(ARENA_LOG, "a"))) {
-          fprintf(stderr, "Unable to open chaos log.\n");
+          fprintf(stderr, "Unable to open arena log.\n");
           exit(1);
         }
         break;
