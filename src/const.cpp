@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.216 2006/12/28 06:12:43 jhhudso Exp $ */
+/* $Id: const.cpp,v 1.217 2006/12/29 03:03:17 jhhudso Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -572,8 +572,8 @@ L(22 M),    L(24 M),    L(26 M),    L(28 M),    L(31 M),   // level 35
 L(34 M),    L(37 M),    L(40 M),    L(45 M),    L(50 M),   // level 40
 L(60 M),    L(70 M),    L(80 M),    L(90 M),    L(100 M),  // level 45
 L(120 M),   L(140 M),   L(160 M),   L(180 M),   L(200 M),  // level 50
-L(400 M),   L(600 M),     L(800 M),     L(1000 M),     L(1200 M),    // level 55
-L(1400 M),     L(1600 M),     L(1800 M),     L(2000 M),     L(2000 M),   // level 60
+L(400 M),   L(600 M),   L(800 M),   L(1000 M),  L(1200 M), // level 55
+L(1400 M),  L(1600 M),  L(1800 M),  L(2000 M),  L(2000 M), // level 60
 L(0x7FFFFFFF)
 };
 
