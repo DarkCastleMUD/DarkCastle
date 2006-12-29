@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.105 2006/12/25 23:12:05 jhhudso Exp $
+| $Id: guild.cpp,v 1.106 2006/12/29 03:25:13 jhhudso Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -570,6 +570,7 @@ int guild(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     }
 
     send_to_char ("You raise a level!\n\r", ch);
+    logf(IMMORTAL, LOG_MORTAL, "%s (%s) just gained level %d.", GET_NAME(ch), GET_CLASS(ch), GET_LEVEL(ch)+1);
 
     GET_LEVEL(ch) +=1;
     advance_level(ch, 0);
