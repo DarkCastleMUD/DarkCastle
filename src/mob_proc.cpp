@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.126 2006/11/16 03:06:33 apocalypse Exp $ */
+/* $Id: mob_proc.cpp,v 1.127 2006/12/29 12:32:07 dcastle Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -3151,7 +3151,8 @@ static char *dethSayText [ ] =
   "Two fish are in a tank.  One says to the other, \"Do you know how to drive this thing?\"",
   "Two birds are sitting on a perch.  One says to the other, \"Do you smell fish?\"",
   "If a canyon ate too much, do you think it would gorge itself?",
-  "Hey guys, do you mind if I add a whole bunch of dumb jokes to my material?"
+  "Hey guys, do you mind if I add a whole bunch of dumb jokes to my material?",
+  "Time is a great healer. Unless you've got a rash, then you're better off with ointment."
 };
 
 // ENDOFCHAIN
