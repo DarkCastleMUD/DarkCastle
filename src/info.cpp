@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.125 2006/12/19 14:53:58 dcastle Exp $ */
+/* $Id: info.cpp,v 1.126 2006/12/29 21:39:34 dcastle Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -774,6 +774,14 @@ int do_look(struct char_data *ch, char *argument, int cmd)
          case 4 :
          case 5 :
          {
+	 /* Check if there is an extra-desc with "up"(or whatever) and use that instead */
+            tmp_desc = find_ex_description(arg1, world[ch->in_room].ex_description);
+            if (tmp_desc)
+            {
+               page_string(ch->desc, tmp_desc, 0);
+               return eSUCCESS; 
+            }
+
             if (EXIT(ch, keyword_no)) 
             {
                if (EXIT(ch, keyword_no)->general_description &&
