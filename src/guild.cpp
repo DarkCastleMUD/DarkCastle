@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.106 2006/12/29 03:25:13 jhhudso Exp $
+| $Id: guild.cpp,v 1.107 2006/12/29 12:41:22 dcastle Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -578,10 +578,19 @@ int guild(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     int bonus = (GET_LEVEL(ch)-50)*500;
     if (bonus > 0 && MAX_MORTAL == 60)
     {
-	char buf[MAX_STRING_LENGTH];
-	sprintf(buf, "Well done, %s! Here's your share of the guild's profits: %d platinum coins.",GET_NAME(ch), bonus);
-	send_to_char(buf,ch);
-	GET_PLATINUM(ch) += bonus;
+        char buf[MAX_STRING_LENGTH];
+        if (GET_LEVEL(ch) == 60)
+	{
+	     GET_COND(ch, THIRST) = -1;
+	     GET_COND(ch, FULL)   = -1;
+	     sprintf(buf, "You have truly reached the highest level of <class> mastery.  As such, the guild will imbue into you some of our most powerful magic and grant you freedom from hunger and thirst!\r\n");
+	     send_to_char(buf, ch);
+	} else {
+	 extern char *pc_clss_types3[];
+	 sprintf(buf, "Well done master %s, the guild has collected a tithe to reward your continued support of our profession.\r\nYour guildmaster gives you %d platinum coins.\r\n", pc_clss_types3[GET_CLASS(ch)],bonus);
+	 send_to_char(buf,ch);
+	 GET_PLATINUM(ch) += bonus;
+	}
     }
     return eSUCCESS;
   }
