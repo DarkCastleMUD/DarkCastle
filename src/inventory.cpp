@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.82 2006/11/29 11:24:38 jhhudso Exp $
+| $Id: inventory.cpp,v 1.83 2006/12/30 18:47:16 dcastle Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -109,6 +109,10 @@ void get(struct char_data *ch, struct obj_data *obj_object, struct obj_data *sub
            send_info(buffer);
         }
     }
+    if (sub_object && sub_object->obj_flags.value[3] == 1 && 
+           isname("pc",sub_object->name))
+        do_save(ch, "", 666);
+
 
     if((obj_object->obj_flags.type_flag == ITEM_MONEY) && 
 	(obj_object->obj_flags.value[0]>=1)) {
