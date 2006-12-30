@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.147 2006/12/21 13:35:18 dcastle Exp $ */
+/* $Id: nanny.cpp,v 1.148 2006/12/30 18:37:25 dcastle Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -1038,7 +1038,7 @@ void nanny(struct descriptor_data *d, char *arg)
             ch->desc->stats = NULL;
             SEND_TO_Q("\n\rChoose a race(races you can select are marked with a *).\n\r", d );
             sprintf(buf, "  %c1: Human\n\r  %c2: Elf\n\r  %c3: Dwarf\n\r"
-               "  %c4: Hobbit\n\r  %c5: Pixie\n\r  %c6: Giant\n\r"
+               "  %c4: Hobbit\n\r  %c5: Pixie\n\r  %c6: Ogre\n\r"
                "  %c7: Gnome\r\n  %c8: Orc\r\n  %c9: Troll\r\n"
                "\n\rSelect a race(Type help <race> for more information)-> ",
 is_race_eligible(ch,1)?'*':' ',is_race_eligible(ch,2)?'*':' ',is_race_eligible(ch,3)?'*':' ',is_race_eligible(ch,4)?'*':' '

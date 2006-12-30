@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: who.cpp,v 1.35 2006/12/06 04:47:19 jhhudso Exp $
+| $Id: who.cpp,v 1.36 2006/12/30 18:37:25 dcastle Exp $
 | who.C
 | Commands for who, maybe? :P
 */
@@ -329,7 +329,7 @@ int do_who(struct char_data *ch, char *argument, int cmd)
         "dwarf",
         "hobbit",
         "pixie",
-        "giant",
+        "ogre",
         "gnome",
         "orc",
         "troll",

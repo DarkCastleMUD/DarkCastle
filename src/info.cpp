@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.126 2006/12/29 21:39:34 dcastle Exp $ */
+/* $Id: info.cpp,v 1.127 2006/12/30 18:37:25 dcastle Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -1705,7 +1705,7 @@ int do_count(struct char_data *ch, char *arg, int cmd)
    csendf(ch, "%d paladins, %d antipaladins, %d bards, %d druids, and %d rangers.\n\r",
       clss[CLASS_PALADIN], clss[CLASS_ANTI_PAL], clss[CLASS_BARD], clss[CLASS_DRUID], clss[CLASS_RANGER]);
    csendf(ch, "%d humans, %d elves, %d dwarves, %d hobbits, %d pixies,\n\r", race[RACE_HUMAN], race[RACE_ELVEN], race[RACE_DWARVEN], race[RACE_HOBBIT], race[RACE_PIXIE]);
-   csendf(ch, "%d giants, %d gnomes, %d orcs, %d trolls.\n\r", race[RACE_GIANT], race[RACE_GNOME], race[RACE_ORC], race[RACE_TROLL]);
+   csendf(ch, "%d ogres, %d gnomes, %d orcs, %d trolls.\n\r", race[RACE_GIANT], race[RACE_GNOME], race[RACE_ORC], race[RACE_TROLL]);
    csendf(ch, "The maximum number of players since "
       "last reboot was %d.\n\r", max_who); 
    return eSUCCESS;
