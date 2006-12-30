@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.388 2006/12/30 18:55:49 dcastle Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.389 2006/12/30 19:05:02 dcastle Exp $ */
 
 extern "C"
 {
@@ -3104,12 +3104,16 @@ void stop_fighting(CHAR_DATA * ch, int clearlag)
   // This is in the command interpreter now, so berserk lasts
   // until you are totally done fighting.
   // -Sadus
-  if (IS_NPC(ch)) // Npcs still need it here.
   if (IS_SET(ch->combat, COMBAT_BERSERK)) {
-  REMOVE_BIT(ch->combat, COMBAT_BERSERK);
-  act("$n settles down.", ch, 0, 0, TO_ROOM, 0);
-  act("You settle down.", ch, 0, 0, TO_CHAR, 0);
-  GET_AC(ch) -= 80;
+   bool keepZerk = FALSE; 
+   for (tmp = world[ch->in_room].people;tmp;tmp = tmp->next_in_room)
+     if (tmp->fighting == ch) keepZerk = TRUE;
+   if (!keepZerk) {
+    REMOVE_BIT(ch->combat, COMBAT_BERSERK);
+    act("$n settles down.", ch, 0, 0, TO_ROOM, 0);
+    act("You settle down.", ch, 0, 0, TO_CHAR, 0);
+    GET_AC(ch) -= 30;
+   }
   }
   
   
