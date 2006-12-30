@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.83 2006/12/30 18:47:16 dcastle Exp $
+| $Id: inventory.cpp,v 1.84 2006/12/30 19:39:22 jhhudso Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -33,11 +33,11 @@ extern "C"
 #include <returnvals.h>
 #include <spells.h>
 #include <clan.h>
+#include <arena.h>
+
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
-
-
 
 /* extern variables */
 
@@ -1175,7 +1175,6 @@ int do_give(struct char_data *ch, char *argument, int cmd)
   char arg[80], allbuf[80];
   int amount;
   int retval;
-  extern int arena[4];
   extern int top_of_world;
   struct char_data *vict;
   struct obj_data *obj;
@@ -1376,7 +1375,7 @@ int do_give(struct char_data *ch, char *argument, int cmd)
     {
        if((ch->in_room >= 0 && ch->in_room <= top_of_world) && !strcmp(obj_name, "potato") &&
           IS_SET(world[ch->in_room].room_flags, ARENA) && IS_SET(world[vict->in_room].room_flags, ARENA) &&
-          arena[2] == -3) {
+          arena.type == POTATO) {
          ;
        } else {
          act("$N seems to have $S hands full.", ch, 0, vict, TO_CHAR, 0);
@@ -1387,7 +1386,7 @@ int do_give(struct char_data *ch, char *argument, int cmd)
     {
       if((ch->in_room >= 0 && ch->in_room <= top_of_world) && !strcmp(obj_name, "potato") &&
          IS_SET(world[ch->in_room].room_flags, ARENA) && IS_SET(world[vict->in_room].room_flags, ARENA) &&
-         arena[2] == -3) {
+         arena.type == POTATO) {
          ;
       } else {
         act("$E can't carry that much weight.", ch, 0, vict, TO_CHAR, 0);
@@ -1422,7 +1421,7 @@ int do_give(struct char_data *ch, char *argument, int cmd)
                           obj_index[loop_obj->item_number].virt);
 
     if((vict->in_room >= 0 && vict->in_room <= top_of_world) && GET_LEVEL(vict) < IMMORTAL && 
-      IS_SET(world[vict->in_room].room_flags, ARENA) && arena[2] == -3 && obj_index[obj->item_number].virt == 393) {
+      IS_SET(world[vict->in_room].room_flags, ARENA) && arena.type == POTATO && obj_index[obj->item_number].virt == 393) {
       send_to_char("Here, have some for some potato lag!!\n\r", vict);
       WAIT_STATE(vict, PULSE_VIOLENCE *2);
     }

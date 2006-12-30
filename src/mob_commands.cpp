@@ -51,6 +51,7 @@ extern "C"
 #include <comm.h>
 #include <returnvals.h>
 #include <innate.h>
+#include <arena.h>
 
 // external vars
 
@@ -461,7 +462,6 @@ int do_mpoload( CHAR_DATA *ch, char *argument, int cmd )
     char arg1[ MAX_INPUT_LENGTH ];
     OBJ_DATA       *obj;
     int             realnum;
-    extern int arena[4];
     extern struct index_data *obj_index;
 
     if ( !IS_NPC( ch ) )
@@ -487,7 +487,7 @@ int do_mpoload( CHAR_DATA *ch, char *argument, int cmd )
     obj = clone_object( realnum );
 
     if (obj_index[obj->item_number].virt == 393 && IS_SET(world[ch->in_room].room_flags, ARENA) && 
-        arena[2] == -3 && ArenaIsOpen()) {
+        arena.type == POTATO && ArenaIsOpen()) {
 	return eFAILURE;
     }
 

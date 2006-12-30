@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.151 2006/11/07 03:24:20 jhhudso Exp $
+| $Id: cl_thief.cpp,v 1.152 2006/12/30 19:39:22 jhhudso Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -22,13 +22,14 @@
 #include <string.h>
 #include <returnvals.h>
 #include <clan.h>
+#include <arena.h>
+
 extern int rev_dir[];
 extern CWorld world;
  
 extern struct index_data *mob_index;
 extern struct index_data *obj_index;
 extern int top_of_world;
-extern int arena[4];
 extern struct zone_data *zone_table;
 
 int find_door(CHAR_DATA *ch, char *type, char *dir);
@@ -532,7 +533,7 @@ int do_sneak(CHAR_DATA *ch, char *argument, int cmd)
    affected_type af;
 
    if((ch->in_room >= 0 && ch->in_room <= top_of_world) &&
-     IS_SET(world[ch->in_room].room_flags, ARENA) && arena[2] == -3) {
+     IS_SET(world[ch->in_room].room_flags, ARENA) && arena.type == POTATO) {
        send_to_char("You can't do that in a potato arena ya sneaky bastard!\n\r", ch);
        return eFAILURE;
   }
@@ -638,7 +639,7 @@ int do_hide(CHAR_DATA *ch, char *argument, int cmd)
   } 
 
   if((ch->in_room >= 0 && ch->in_room <= top_of_world) &&
-     IS_SET(world[ch->in_room].room_flags, ARENA) && arena[2] == -3) {
+     IS_SET(world[ch->in_room].room_flags, ARENA) && arena.type == POTATO) {
        send_to_char("You can't do that in a potato arena ya sneaky bastard!\n\r", ch);
        return eFAILURE;
   }

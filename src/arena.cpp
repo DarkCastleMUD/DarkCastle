@@ -7,7 +7,7 @@
 /* Revision History                                                          */
 /* 12/09/2003   Onager   Tweaked do_join() to remove combat-related bits     */
 /*****************************************************************************/
-/* $Id: arena.cpp,v 1.13 2006/12/28 11:18:50 jhhudso Exp $ */
+/* $Id: arena.cpp,v 1.14 2006/12/30 19:39:22 jhhudso Exp $ */
 
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
@@ -27,27 +27,14 @@
 #include <string.h>
 #include <returnvals.h>
 
-/*
-THIS STUFF NOW DEFINED IN ARENA.H
-#define ARENA_LOW 500
-#define ARENA_HI  562
-*/
-/*
-#define ARENA_LOW 14600
-#define ARENA_HI  14681
-*/
-
-int arena[4] = { 0, 0, 0, 0 };
-
-/* External functions */
-void half_chop(char *string, char *arg1, char *arg2);
 void send_info(char *messg);
 
 extern CWorld world;
+struct _arena arena;
 
-int do_arena(CHAR_DATA *ch, char *arg, int cmd)
+int do_arena(CHAR_DATA *ch, char *argument, int cmd)
 {
-  char buf[256], buf2[256], buf3[256], crap[256];
+  char arg1[256], arg2[256], arg3[256], arg4[256], buf[256];
   int low, high;
 
   if(!has_skill(ch, COMMAND_ARENA)) {
@@ -55,58 +42,75 @@ int do_arena(CHAR_DATA *ch, char *arg, int cmd)
         return eFAILURE;
   }
 
-  half_chop(arg, buf, crap);
-  half_chop(crap, buf2, buf3);
-  if(!*buf || !*buf2) {
-    sprintf(buf, "Currently open for levels: %d %d\n\r", arena[0], arena[1]);
+  argument = one_argument(argument, arg1);
+  argument = one_argument(argument, arg2);
+  argument = one_argument(argument, arg3);
+  argument = one_argument(argument, arg4);
+
+  if(!*arg1 || !*arg2) {
+    sprintf(buf, "Currently open for levels: %d %d\n\r", arena.low, arena.high);
     send_to_char(buf, ch);
-    send_to_char("Syntax: arena <lowest level> <highest level> <Num Mortals>\n\r"
+    send_to_char("Syntax: arena <lowest level> <highest level> [num mortals] [type]\n\r"
+		 "Valid types: chaos, potato, prize\n\r"
+		 "Use -1 for no limit on number of mortals.\n\r"
                  "Use arena 0 0 to close the arena.\n\r"
-                 "Do *NOT* leave the arena open, people will be stuck there"
-                 " forever!\n\r"
+                 "Do *NOT* leave the arena open, people will be stuck there forever!\n\r"
                  "Also the arena can be opened without specifying the number"
                  " of mortals allowed to join.\n\r", ch);
     return eSUCCESS;
   }
 
-  if(!(low = atoi(buf)) || !(high = atoi(buf2)) || low > high) {
-    arena[0] = 0;
-    arena[1] = 0;
+  if(!(low = atoi(arg1)) || !(high = atoi(arg2)) || low > high) {
+    arena.low = 0;
+    arena.high = 0;
+    arena.status = CLOSED;
     send_to_char("Closing the arena.\n\r", ch);
     send_info("## The Arena has been CLOSED!\n\r");
-//    arena[2] = 0; commented out for chaos purposes.
-// shouldn't effect anything since we always asign it below
-    arena[3] = 0;
     return eSUCCESS;
   }
 
-  arena[0] = low;
-  arena[1] = high;
+  arena.low = low;
+  arena.high = high;
+  arena.status = OPENED;
   sprintf(buf, "## The Arena has been OPENED for levels %d - %d.\n\r"
-               "## Type JOINARENA to enter the Bloodbath!\n\r",
-          low, high);
+               "## Type JOINARENA to enter the Bloodbath!\n\r", low, high);
   send_info(buf);
-  arena[2] = -1;
-  if(*buf3) {
-      arena[2] = atoi(buf3);
-      if(!strcmp(buf3, "chaos"))
-        arena[2] = -2;
-      if(!strcmp(buf3, "potato"))
-        arena[2] = -3;
-      if(arena[2] > 0) {
-          sprintf(buf, "## Only %d can join the bloodbath!\n\r", arena[2]);
-          send_info(buf);
-      }
-      if(arena[2] == -2) {
-          sprintf(buf, "## Only clan members can join the bloodbath!\r\n");
-          send_info(buf);
-          logf(111, LOG_ARENA, "%s started a Clan Chaos arena.", GET_NAME(ch));
-      }
-      if(arena[2] == -3) {
-          sprintf(buf, "##$4$B Special POTATO Arena!!$R\r\n");
-          send_info(buf);
-      }
+
+  if(*arg3) {
+    arena.num = atoi(arg3);
+    if(arena.num > 0) {
+      sprintf(buf, "## Only %d can join the bloodbath!\n\r", arena.num);
+      send_info(buf);
+    }
+  } else {
+    arena.num = 0;
   }
+
+  arena.cur_num = 0;
+
+  if (*arg4) {
+    if(!strcmp(arg4, "chaos")) {
+      arena.type = CHAOS; // -2
+      sprintf(buf, "## Only clan members can join the bloodbath!\r\n");
+      send_info(buf);
+      logf(111, LOG_ARENA, "%s started a Clan Chaos arena.", GET_NAME(ch));
+    }
+
+    if(!strcmp(arg4, "potato")) {
+      arena.type = POTATO; // -3
+      sprintf(buf, "##$4$B Special POTATO Arena!!$R\r\n");
+      send_info(buf);
+    }
+
+    if(!strcmp(arg4, "prize")) {
+      arena.type = PRIZE; // -3
+      sprintf(buf, "##$4$B Prize Arena!!$R\r\n");
+      send_info(buf);
+    }    
+  } else {
+    arena.type = NORMAL;
+  }
+
   send_to_char("The Arena has been opened for the specified levels.\n\r", ch); 
   return eSUCCESS;
 }
@@ -119,7 +123,7 @@ int do_joinarena(CHAR_DATA *ch, char *arg, int cmd)
   int pot_low = 6362;
   int pot_hi  = 6379;
 
-  if(arena[0] > GET_LEVEL(ch) || arena[1] < GET_LEVEL(ch)) {
+  if(arena.low > GET_LEVEL(ch) || arena.high < GET_LEVEL(ch)) {
     send_to_char("The arena is not open for anyone your level.\n\r", ch);
     return eFAILURE;
   }
@@ -127,21 +131,19 @@ int do_joinarena(CHAR_DATA *ch, char *arg, int cmd)
     send_to_char("You have been banned from arenas.\n\r", ch);
     return eFAILURE;
   }
-  if (affected_by_spell(ch,FUCK_PTHIEF) || affected_by_spell(ch,FUCK_GTHIEF))
-  {
+  if (affected_by_spell(ch,FUCK_PTHIEF) || affected_by_spell(ch,FUCK_GTHIEF)) {
     send_to_char("They don't allow criminals in the arena.\r\n",ch);
     return eFAILURE;
   }
-  if(arena[2] == -2 && !ch->clan) {
+  if(arena.type == CHAOS && !ch->clan) {
     send_to_char("Only clan members may join this arena.\r\n", ch);
     return eFAILURE;
   }
-
   if(IS_SET(world[ch->in_room].room_flags, ARENA)) {
     send_to_char("You are already there!\n\r", ch);
     return eFAILURE; 
   }
-  if((arena[2] > 0) && (arena[3] >= arena[2])) {
+  if(arena.cur_num >= arena.num && arena.num > 0) {
     send_to_char("The arena is already full!\n\r", ch);
     return eFAILURE;
   }
@@ -155,7 +157,7 @@ int do_joinarena(CHAR_DATA *ch, char *arg, int cmd)
     do_wake(ch, "", 9);
   }
 
-  arena[3]++;
+  arena.cur_num++;
   for(af = ch->affected; af; af = next_af) {
      next_af = af->next;
      if(af->type != FUCK_CANTQUIT)
@@ -170,11 +172,10 @@ int do_joinarena(CHAR_DATA *ch, char *arg, int cmd)
   GET_HIT(ch)  = GET_MAX_HIT(ch);
   GET_KI(ch)   = GET_MAX_KI(ch);
  
-  act("$n disappears in a glorious flash of heroism.", ch, 0, 0,
-      TO_ROOM, 0);
+  act("$n disappears in a glorious flash of heroism.", ch, 0, 0, TO_ROOM, 0);
   while(send_to == NOWHERE)
   {
-    if (arena[2] == -3) { // potato arena
+    if (arena.type == POTATO) { // potato arena
       send_to = real_room(number(pot_low, pot_hi));
     } else {
       send_to = real_room(number(ARENA_LOW, ARENA_HI-1));
@@ -189,8 +190,8 @@ int do_joinarena(CHAR_DATA *ch, char *arg, int cmd)
 }
 
 bool ArenaIsOpen() {
-   if((arena[0] != 0) && (arena[1] != 0)) {
-      return(true);
-   }
-   return(false);
+  if (arena.status == OPENED)
+    return true;
+  else
+    return false;
 }

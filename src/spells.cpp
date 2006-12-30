@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.200 2006/12/28 06:12:43 jhhudso Exp $ */
+/* $Id: spells.cpp,v 1.201 2006/12/30 19:39:22 jhhudso Exp $ */
 
 extern "C"
 {
@@ -52,6 +52,7 @@ extern "C"
 #include <returnvals.h> 
 #include <ki.h>
 #include <sing.h>
+#include <arena.h>
 
 // Global data 
 
@@ -1987,12 +1988,19 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
             send_to_char("Your sleep is restless.\r\n",tar_char);
 	 skill_increase_check(ch, spl, learned,500+ spell_info[spl].difficulty);
 
-	 if (tar_char && tar_char != ch && !IS_NPC(ch) && !IS_NPC(tar_char) && tar_char->desc
-	     && ch->desc && (!strcmp(tar_char->desc->host, ch->desc->host))) {
-	   sprintf( log_buf, "Multi: %s casted '%s' on %s", GET_NAME(ch),
-		    get_skill_name(spl), GET_NAME(tar_char));
-	   log( log_buf, 110, LOG_PLAYER, ch );
+	 if (tar_char && tar_char != ch && !IS_NPC(ch) && !IS_NPC(tar_char) && tar_char->desc && ch->desc) {
+	   if (!strcmp(tar_char->desc->host, ch->desc->host)) {
+	     sprintf( log_buf, "Multi: %s casted '%s' on %s", GET_NAME(ch),
+		      get_skill_name(spl), GET_NAME(tar_char));
+	     log( log_buf, 110, LOG_PLAYER, ch );
+	   }
+
+	   if ((arena.type == CHAOS || arena.type == PRIZE) && IS_SET(world[ch->in_room].room_flags, ARENA)) {
+	     logf( 105, LOG_ARENA, "%s casted '%s' on %s", GET_NAME(ch), get_skill_name(spl),
+		   GET_NAME(tar_char));
+	   }
 	 }
+
 	int retval = ((*spell_info[spl].spell_pointer) (GET_LEVEL(ch), ch, argument, SPELL_TYPE_SPELL, tar_char, tar_obj, learned));
 
 	if (oldroom && !IS_SET(retval, eCH_DIED)) {

@@ -213,7 +213,7 @@ int do_channel(struct char_data *ch, char *arg, int cmd)
     "newbie",
     "shout",
     "world",    // 15
-    "chaos",
+    "arena",
     "logclan",
     "warnings",
     "help",

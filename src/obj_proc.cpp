@@ -26,6 +26,8 @@
 #include <string.h> // strstr()
 #include <returnvals.h>
 #include <set.h>
+#include <arena.h>
+
 #define EMOTING_FILE "emoting-objects.txt"
 
 extern CWorld world;
@@ -2494,7 +2496,6 @@ int hot_potato(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
                    CHAR_DATA *invoker)
 {
    extern int top_of_world;
-   extern int arena[4];
    int dropped = 0;
    char_data * vict = NULL;
 
@@ -2517,7 +2518,7 @@ int hot_potato(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
          return eSUCCESS;
       }
       if((vict->in_room >= 0 && vict->in_room <= top_of_world) &&
-        IS_SET(world[vict->in_room].room_flags, ARENA) && arena[2] == -3 && ArenaIsOpen()) {
+        IS_SET(world[vict->in_room].room_flags, ARENA) && arena.type == POTATO && ArenaIsOpen()) {
           send_to_char("Wait until the potato arena is open before you try blowing yourself up!\n\r", vict);
           return eSUCCESS;
       }
@@ -2567,7 +2568,7 @@ int hot_potato(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
          return eSUCCESS;
       }
       if((vict->in_room >= 0 && vict->in_room <= top_of_world) &&
-        IS_SET(world[vict->in_room].room_flags, ARENA) && arena[2] == -3 && ArenaIsOpen() && GET_LEVEL(vict) < IMMORTAL) {
+        IS_SET(world[vict->in_room].room_flags, ARENA) && arena.type == POTATO && ArenaIsOpen() && GET_LEVEL(vict) < IMMORTAL) {
           send_to_char("Wait until the potato arena is open before you start passing out the potatos!\n\r", vict);
           return eSUCCESS;
       }
@@ -2635,7 +2636,7 @@ int hot_potato(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
        if(!IS_SET(world[vict->in_room].room_flags, ARENA))
            fight_kill(vict, vict, TYPE_PKILL, KILL_POTATO);
        else 
-         if (arena[2] == -3) 
+         if (arena.type == POTATO) 
            fight_kill(vict, vict, TYPE_ARENA_KILL, KILL_MASHED);
          else 
            fight_kill(vict, vict, TYPE_ARENA_KILL, KILL_POTATO);

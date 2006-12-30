@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.389 2006/12/30 19:05:02 dcastle Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.390 2006/12/30 19:39:22 jhhudso Exp $ */
 
 extern "C"
 {
@@ -48,6 +48,8 @@ extern "C"
 #include <innate.h>
 #include <token.h>
 #include <vault.h>
+#include <arena.h>
+
 extern int top_of_world;
 extern CHAR_DATA *character_list;
 extern struct descriptor_data *descriptor_list;
@@ -4959,7 +4961,6 @@ void arena_kill(CHAR_DATA *ch, CHAR_DATA *victim, int type)
   CHAR_DATA * tmp = NULL;
   struct clan_data * clan = NULL;
   struct clan_data * clan2 = NULL;
-  extern int arena[4];
   int eliminated = 1;
   void move_player_home(CHAR_DATA *victim);
   
@@ -4986,7 +4987,7 @@ void arena_kill(CHAR_DATA *ch, CHAR_DATA *victim, int type)
   
   while(victim->affected)
     affect_remove(victim, victim->affected, SUPPRESS_ALL);  
-  if(ch && arena[2] == -2)
+  if(ch && arena.type == CHAOS)
   {
     if(ch && ch->clan && GET_LEVEL(ch) < IMMORTAL)        clan  = get_clan(ch);
     if(victim->clan && GET_LEVEL(victim) < IMMORTAL)      clan2 = get_clan(victim);  
@@ -4996,26 +4997,29 @@ void arena_kill(CHAR_DATA *ch, CHAR_DATA *victim, int type)
     logf(105, LOG_ARENA, "%s [%s] killed %s [%s]", GET_NAME(ch),
          clan ? clan->name : "no clan", GET_NAME(victim), 
          clan2 ? clan2->name : "no clan");
-  }
-  else if(ch)
+  } else if (ch) {
     if (type == KILL_POTATO) 
       sprintf(killer_message, "\n\r## %s just got POTATOED in the arena!\n\r", GET_SHORT(victim));
     else if (type == KILL_MASHED) 
       sprintf(killer_message, "\n\r## %s just got MASHED in the potato arena!\n\r", GET_SHORT(victim));
     else 
       sprintf(killer_message, "\n\r## %s just SLAUGHTERED %s in the arena!\n\r", (IS_NPC(ch) && (ch->master) ? GET_SHORT(ch->master) : GET_SHORT(ch)), GET_SHORT(victim));
-  else
+  } else {
     if (type == KILL_POTATO) 
       sprintf(killer_message, "\n\r## %s just got POTATOED in the arena!\n\r", GET_SHORT(victim));
     else if (type == KILL_MASHED) 
       sprintf(killer_message, "\n\r## %s just got MASHED in the potato arena!\n\r", GET_SHORT(victim));
     else
       sprintf(killer_message, "\n\r## %s just DIED in the arena!\n\r", GET_SHORT(victim));
-  
+  }
   send_info(killer_message);
   
+  if (ch && victim && arena.type == PRIZE) {
+    logf(105, LOG_ARENA, "%s killed %s", GET_NAME(ch), GET_NAME(victim));
+  }
+
   // if it's a chaos, see if the clan was eliminated
-  if(victim && arena[2] == -2 && clan2)
+  if(victim && arena.type == CHAOS && clan2)
   {
      for(tmp = character_list; tmp; tmp = tmp->next) {
       if (IS_SET(world[tmp->in_room].room_flags, ARENA))
@@ -5056,8 +5060,6 @@ int is_stunned(CHAR_DATA *ch)
 
 int can_attack(CHAR_DATA *ch)
 {
-  extern int arena[4];
-
   if((ch->in_room >= 0 && ch->in_room <= top_of_world) &&
     IS_SET(world[ch->in_room].room_flags, ARENA) && ArenaIsOpen()) {
     send_to_char("Wait until it closes!\n\r", ch);
@@ -5065,7 +5067,7 @@ int can_attack(CHAR_DATA *ch)
   }
 
   if((ch->in_room >= 0 && ch->in_room <= top_of_world) &&
-    IS_SET(world[ch->in_room].room_flags, ARENA) && arena[2] == -3) {
+    IS_SET(world[ch->in_room].room_flags, ARENA) && arena.type == POTATO) {
     send_to_char("You can't attack in a potato arena, go find a potato would ya?!\n\r", ch);
     return FALSE;
   }
@@ -5092,6 +5094,12 @@ int can_be_attacked(CHAR_DATA *ch, CHAR_DATA *vict)
   if (!IS_NPC(vict) && GET_LEVEL(ch) < vict->pcdata->wizinvis)
     return FALSE;
 
+  if (IS_SET(world[ch->in_room].room_flags, ARENA) && arena.type == PRIZE
+      && vict->fighting && vict->fighting != ch) {
+    logf(105, LOG_ARENA, "%s tried to attack %s who is fighting %s.",
+	 GET_NAME(ch), GET_NAME(vict), GET_NAME(vict->fighting));
+  }
+  
   if (IS_NPC(vict))
   if (ISSET(vict->mobdata->actflags, ACT_NOATTACK))
   {

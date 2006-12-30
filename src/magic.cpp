@@ -56,7 +56,7 @@ extern "C"
 #include <arena.h>
 #include <innate.h>
 #include <returnvals.h>
-
+#include <arena.h>
 
 /* Extern Structures */
 
@@ -1293,7 +1293,6 @@ int spell_teleport(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
 {
   int to_room;
   char buf[100]; 
-  extern int arena[4];
   extern int top_of_world;      /* ref to the top element of world */
 
   if(!victim) {
@@ -1302,7 +1301,7 @@ int spell_teleport(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
   }
 
   if((ch->in_room >= 0 && ch->in_room <= top_of_world) &&
-    IS_SET(world[ch->in_room].room_flags, ARENA) && arena[2] == -3) {
+    IS_SET(world[ch->in_room].room_flags, ARENA) && arena.type == POTATO) {
     send_to_char("You can't teleport in potato arenas!\n\r", ch);
     return eFAILURE;
   }
