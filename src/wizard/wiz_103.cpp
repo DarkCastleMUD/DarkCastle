@@ -221,6 +221,7 @@ int do_fighting(struct char_data *ch, char *argument, int cmd)
     }
   
     // If they're in a clan
+    ch_clan_name[0] = '\0';
     if ((ch_clan = get_clan(i)))
       snprintf(ch_clan_name, CLANTAG_LEN, "[%s]", ch_clan->name);    
 
