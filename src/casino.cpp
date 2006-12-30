@@ -1987,7 +1987,7 @@ void reel_spin(void *arg1, void *arg2, void *arg3)
          }
       }
       if(payout) {
-         send_to_room("Lights flash and noises eminate from the slot machine!\n\r", machine->obj->in_room);
+         send_to_room("Lights flash and noises emanate from the slot machine!\n\r", machine->obj->in_room);
          machine->lastwin = machine->cost * payout * machine->bet;
          sprintf(buf, "$BWinner!!$R  You win %d %s!\n\r", machine->lastwin, machine->gold?"coins":"plats");
          if(machine->gold)
