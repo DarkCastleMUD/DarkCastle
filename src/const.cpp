@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.219 2006/12/30 18:20:24 apocalypse Exp $ */
+/* $Id: const.cpp,v 1.220 2006/12/30 18:24:24 dcastle Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1027,7 +1027,7 @@ char *pc_clss_types[] =
     "UNDEFINED",
     "Magic User",
     "Cleric",
-    "Rogue",
+    "Thief",
     "Warrior",
     "AntiPaladin",
     "Paladin",
@@ -1045,7 +1045,7 @@ char *pc_clss_types2[] =
     "UNDEFINED",
     "MagicUser",
     "Cleric",
-    "Rogue",
+    "Thief",
     "Warrior",
     "AntiPaladin",
     "Paladin",
@@ -1063,7 +1063,7 @@ char *pc_clss_types3[] =
     "UNDEFINED",
     "mage",
     "cleric",
-    "rogue",
+    "thief",
     "warrior",
     "anti-paladin",
     "paladin",
@@ -1633,7 +1633,7 @@ char *languages[] =
   "dwarven",
   "halfling",
   "brownie",
-  "giant",
+  "ogrish",
   "gnomish",
   "drow",
   "orcish",
@@ -1654,7 +1654,7 @@ char *race_types[] =
     "Dwarven",
     "Hobbit",
     "Pixie",
-    "Giant",
+    "Ogre",
     "Gnome",
     "Orc",
     "Troll",
@@ -1669,7 +1669,7 @@ char *race_abbrev[] =
     "Dwf",
     "Hob",
     "Pix",
-    "Gia",
+    "Ogr",
     "Gno",
     "Orc",
     "Tro",
@@ -1724,7 +1724,7 @@ struct race_shit race_info[] =
 {  "Dwarf",     "Dwarves",     63,         0,       128,       0,      1<<1|1<<5,     0,     200,     60,    AFF_IGNORE_WEAPON_WEIGHT|AFF_INFRARED, "uppercut" },
 {  "Hobbit",    "Hobbits",     63,         0,         0,       0,      1<<7|1<<8,     0,     100,     35,    AFF_IGNORE_WEAPON_WEIGHT|AFF_HIDE, "jab" },
 {  "Pixie",     "Pixies",      63,         0,         0,       0,      1<<5|1<<8,     0,      50,     20,    AFF_IGNORE_WEAPON_WEIGHT|AFF_INFRARED|AFF_FLYING, "bite" },
-{  "Giant",     "Giants",      63,         0,         0,       0,      1<<2|1<<4,     0,     500,    125,    AFF_IGNORE_WEAPON_WEIGHT, "smash" },
+{  "Ogre",      "Ogres",       63,         0,         0,       0,      1<<2|1<<4,     0,     500,    125,    AFF_IGNORE_WEAPON_WEIGHT, "smash" },
 {  "Gnome",     "Gnomes",      63,         0,         0,       0,      1<<9|1<<11,    0,     125,     55,    AFF_IGNORE_WEAPON_WEIGHT|AFF_INFRARED, "cuff" },
 {  "Orc",       "Orcs",        63,         0,         0,       0,      1<<1|1<<3,     0,     225,     90,    AFF_IGNORE_WEAPON_WEIGHT|AFF_INFRARED, "punch" },
 {  "Troll",     "Trolls",      63,         0,       128,      80,      1<<3|1<<4,     0,     300,    115,    AFF_IGNORE_WEAPON_WEIGHT|AFF_INFRARED, "claw" },
@@ -1762,7 +1762,7 @@ int mob_race_mod[][5] =
 {   0,   0,   0,   0,   0 }, // dwarf
 {   0,   0,   0,   0,   0 }, // hobbit
 {   0,   0,   0,   0,   0 }, // pixie
-{   0,   0,   0,   0,   0 }, // giant
+{   0,   0,   0,   0,   0 }, // ogre
 {   0,   0,   0,   0,   0 }, // gnome
 {   0,   0,   0,   0,   0 }, // orc
 {   0,   0,   0,   0,   0 }, // troll
