@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.390 2006/12/30 19:39:22 jhhudso Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.391 2006/12/30 21:06:51 jhhudso Exp $ */
 
 extern "C"
 {
@@ -2565,33 +2565,27 @@ int check_riposte(CHAR_DATA * ch, CHAR_DATA * victim, int attacktype)
      (IS_SET(ch->combat, COMBAT_BLADESHIELD2)))
     return eFAILURE;
 
-  int modifier = 0;
-  if (IS_NPC(victim))
-  {
-    switch(GET_CLASS(victim)) {
-      case CLASS_WARRIOR:       modifier = 15;   break;
-      case CLASS_THIEF:         modifier = 1;   break;
-      case CLASS_MONK:          modifier = -5;   break;
-      case CLASS_BARD:          modifier = 1; break;
-      case CLASS_RANGER:        modifier = 5;   break;
-      case CLASS_PALADIN:       modifier = 10;   break;
-      case CLASS_ANTI_PAL:      modifier = 5;   break;
-      case CLASS_BARBARIAN:     modifier = 5;   break;
-      case CLASS_MAGIC_USER:    modifier = -5; break;
-      case CLASS_CLERIC:        modifier = -5; break;
-      case CLASS_NECROMANCER:   modifier = -5; break;
-      default:                  modifier = 0; break;
+  // 25% chance of success for mobs
+  if (IS_NPC(victim)) {
+    if (number(0,3) > 0) {
+      return eFAILURE;
     }
-  } else if (!has_skill(victim, SKILL_RIPOSTE))
-    return eFAILURE;
+  } else {
+    if (!has_skill(victim, SKILL_RIPOSTE)) {
+      return eFAILURE;
+    } else {
+      int modifier = 0;
+      
+      modifier += speciality_bonus(ch, attacktype, GET_LEVEL(victim));
+      modifier -= GET_DEX(ch) / 2;
+      modifier -= 10;
+      
+      if (!skill_success(victim, ch, SKILL_RIPOSTE, modifier)) {
+	return eFAILURE;
+      }
+    }
+  }
 
-  modifier += speciality_bonus(ch, attacktype, GET_LEVEL(victim));
-  modifier -= GET_DEX(ch) / 2;
-  modifier -= 10;
-
-  if (!skill_success(victim, ch, SKILL_RIPOSTE, modifier))
-    return eFAILURE;
- 
   act("$n turns $N's attack into one of $s own!", victim, NULL, ch, TO_ROOM, NOTVICT);
   act("$n turns your attack against you!", victim, NULL, ch, TO_VICT, 0);
   act("You turn $N's attack against $M.", victim, NULL, ch, TO_CHAR, 0);
