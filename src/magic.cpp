@@ -9486,6 +9486,8 @@ int cast_herb_lore(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *v
 		act("Your eyes blur and the world around you seems to come closer.", victim, 0, 0, TO_CHAR, 0);
 		break;
       case LIGHTNING_SHIELD_VNUM: 
+		if (find_spell_shield(ch, victim))
+		{ send_to_char("You cannot do that.\r\n",ch); return eFAILURE; }
 		aff = AFF_LIGHTNINGSHIELD; spl = SPELL_LIGHTNING_SHIELD;
     if (affected_by_spell(victim, spl)) { send_to_char("They are already affected by that spell.\r\n",ch); return eFAILURE; }
 		act("$n is surrounded by $B$5electricity$R.", victim, 0, 0, TO_ROOM, 0);
