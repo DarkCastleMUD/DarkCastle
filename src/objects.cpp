@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.78 2006/12/30 18:42:18 dcastle Exp $
+| $Id: objects.cpp,v 1.79 2006/12/30 20:04:43 dcastle Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -1252,9 +1252,6 @@ int do_taste(struct char_data *ch, char *argument, int cmd)
 void perform_wear(struct char_data *ch, struct obj_data *obj_object,
         int keyword)
 {
-    if (obj_object->carried_by || obj_object->in_room)
-	return; // Zapped
-
     switch(keyword) {
         case 0 : 
             act("$n wears $p on $s finger.", ch, obj_object,0,TO_ROOM, INVIS_NULL);
