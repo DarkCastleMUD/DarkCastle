@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.145 2006/11/29 11:03:21 jhhudso Exp $ */
+/* $Id: handler.cpp,v 1.146 2006/12/30 19:47:41 dcastle Exp $ */
     
 extern "C"
 {
@@ -1965,6 +1965,12 @@ int equip_char(CHAR_DATA *ch, struct obj_data *obj, int pos, int flag)
        log("Already equipped in equip_char!", ANGEL, LOG_BUG);
        return 0;
     }
+    if (IS_AFFECTED(ch, AFF_CHARM) && pos == WIELD || pos == SECOND_WIELD)
+	{ // best indentation ever
+	recheck_height_wears(ch);
+	obj_to_char(obj,ch);
+     return 0;
+	}
 
     if (obj->carried_by) {
 	log("EQUIP: Obj is carried_by when equip.", ANGEL, LOG_BUG);
