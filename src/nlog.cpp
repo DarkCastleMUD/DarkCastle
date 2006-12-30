@@ -1,4 +1,4 @@
-/* $Id: nlog.cpp,v 1.7 2006/10/08 09:18:30 jhhudso Exp $ */
+/* $Id: nlog.cpp,v 1.8 2006/12/30 20:24:18 dcastle Exp $ */
 
 extern "C"
 {
@@ -115,7 +115,7 @@ void logf(int level, long type, char *arg, ...)
   char s[MAX_STRING_LENGTH];
 
   va_start(args, arg);
-  vsprintf(s, arg, args);
+  vsnprintf(s, MAX_STRING_LENGTH, arg, args);
   va_end(args);
 
   log(s, level, type);
