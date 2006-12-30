@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.387 2006/12/28 11:18:50 jhhudso Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.388 2006/12/30 18:55:49 dcastle Exp $ */
 
 extern "C"
 {
@@ -2053,21 +2053,21 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
     
     if(wielded) 
     {
-      if ((IS_SET(victim->immune, ISR_MAGIC)) &&
-        (IS_SET(wielded->obj_flags.extra_flags, ITEM_MAGIC)) )
-        weapon_bit += ISR_MAGIC;
+//      if ((IS_SET(victim->immune, ISR_MAGIC)) &&
+  //      (IS_SET(wielded->obj_flags.extra_flags, ITEM_MAGIC)) )
+    //    weapon_bit += ISR_MAGIC;
       if ((IS_SET(victim->immune, ISR_NON_MAGIC)) &&
         (!IS_SET(wielded->obj_flags.extra_flags, ITEM_MAGIC)) )
         weapon_bit += ISR_NON_MAGIC;
-      if ((IS_SET(victim->suscept, ISR_MAGIC)) &&
-        (IS_SET(wielded->obj_flags.extra_flags, ITEM_MAGIC)) )
-        weapon_bit += ISR_MAGIC;
+//      if ((IS_SET(victim->suscept, ISR_MAGIC)) &&
+//        (IS_SET(wielded->obj_flags.extra_flags, ITEM_MAGIC)) )
+//        weapon_bit += ISR_MAGIC;
       if ((IS_SET(victim->suscept, ISR_NON_MAGIC)) &&
         (!IS_SET(wielded->obj_flags.extra_flags, ITEM_MAGIC)) )
         weapon_bit += ISR_NON_MAGIC;
-      if ((IS_SET(victim->resist, ISR_MAGIC)) &&
-        (IS_SET(wielded->obj_flags.extra_flags, ITEM_MAGIC)) )
-        weapon_bit += ISR_MAGIC;
+//      if ((IS_SET(victim->resist, ISR_MAGIC)) &&
+ //       (IS_SET(wielded->obj_flags.extra_flags, ITEM_MAGIC)) )
+ //       weapon_bit += ISR_MAGIC;
       if ((IS_SET(victim->resist, ISR_NON_MAGIC)) &&
         (!IS_SET(wielded->obj_flags.extra_flags, ITEM_MAGIC)) )
         weapon_bit += ISR_NON_MAGIC;
