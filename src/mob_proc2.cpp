@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.73 2006/09/05 18:27:04 shane Exp $ */
+/* $Id: mob_proc2.cpp,v 1.74 2006/12/30 19:19:03 dcastle Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -1496,9 +1496,8 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     csendf(ch, "$B11)$R Add to your movement points:   You cannot do this.\r\n");
 
     if(!IS_MOB(ch) && ki_cost && ki_exp) {   // mobs can't meta ki
-      if(GET_KI_METAS(ch) > 4)
-        send_to_char("12) Your ki is already meta'd fully.\n\r", ch);
-      else csendf(ch, "$B12)$R Add a point of ki:        %d experience points and %d Platinum.\n\r", ki_exp, ki_cost);
+//        send_to_char("12) Your ki is already meta'd fully.\n\r", ch);
+      csendf(ch, "$B12)$R Add a point of ki:        %d experience points and %d Platinum.\n\r", ki_exp, ki_cost);
     }
     else if (!IS_MOB(ch))
     csendf(ch, "$B12)$R Add a point of ki:        You cannot do this.\r\n");
@@ -1892,11 +1891,11 @@ ch);
     if(GET_PLATINUM(ch) < (uint32)(ki_cost)) {
       send_to_char("$B$2The Meta-physician tells you, 'You can't afford my services!  SCRAM!'$R\n\r", ch);
       return eSUCCESS;
-    }
+    }/*
     if(GET_KI_METAS(ch) > 4) {
       send_to_char("$B$2The Meta-physician tells you, 'You have already meta'd your ki to the maximum.'$R\n\r", ch);
       return eSUCCESS;
-    }
+    }*/
 
     GET_EXP(ch) -= ki_exp;
     GET_PLATINUM(ch) -= ki_cost;
