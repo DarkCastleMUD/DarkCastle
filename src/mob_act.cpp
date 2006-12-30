@@ -19,7 +19,7 @@
 /* 12/06/2003   Onager   Modified mobile_activity() to prevent charmie    */
 /*                       scavenging                                       */
 /**************************************************************************/
-/* $Id: mob_act.cpp,v 1.40 2006/08/05 20:12:58 shane Exp $ */
+/* $Id: mob_act.cpp,v 1.41 2006/12/30 19:42:44 dcastle Exp $ */
 
 extern "C"
 {
@@ -633,6 +633,7 @@ void scavenge(struct char_data *ch)
   max      = 1;
   done     = 0;
   best_obj = 0;
+  if (IS_AFFECTED(ch, AFF_CHARM)) return;
   for(obj = world[ch->in_room].contents; obj; obj = obj->next_content) 
   {
     if(!CAN_GET_OBJ(ch, obj))
