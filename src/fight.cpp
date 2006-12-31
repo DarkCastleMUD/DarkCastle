@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.393 2006/12/31 04:30:45 jhhudso Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.394 2006/12/31 04:31:43 jhhudso Exp $ */
 
 extern "C"
 {
@@ -2380,7 +2380,7 @@ void do_dam_msgs(CHAR_DATA *ch, CHAR_DATA *victim, int dam, int attacktype, int 
   extern struct message_list fight_messages[MAX_MESSAGES];
   struct message_type *messages,*messages2;
   int i,j,  nr;
-  if (is_bingo(dam, weapon_type, attacktype)) return;
+  if (is_bingo(dam, weapon, attacktype)) return;
   for (i = 0; i < MAX_MESSAGES; i++)
   {
     if (fight_messages[i].a_type != attacktype)
