@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_barbarian.cpp,v 1.69 2006/12/28 06:12:44 jhhudso Exp $
+| $Id: cl_barbarian.cpp,v 1.70 2006/12/31 03:29:57 jhhudso Exp $
 | cl_barbarian.C
 | Description:  Commands for the barbarian class.
 */
@@ -285,9 +285,6 @@ int do_headbutt(struct char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if(!can_attack(ch) || !can_be_attacked(ch, victim))
-    return eFAILURE;
-
   if(IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE) && has_skill(ch, SKILL_HEADBUTT) < 86) {
     send_to_char("You're too puny to headbutt someone that HUGE!\n\r",ch);
     return eFAILURE;
@@ -297,6 +294,9 @@ int do_headbutt(struct char_data *ch, char *argument, int cmd)
     send_to_char("That would be like smashing your head into a wall!\n\r",ch);
     return eFAILURE;
   }
+
+  if(!can_attack(ch) || !can_be_attacked(ch, victim))
+    return eFAILURE;
 
   if (IS_SET(victim->combat, COMBAT_BERSERK) && (IS_NPC(victim) || has_skill(victim, SKILL_BERSERK) > 80))
   {
@@ -649,16 +649,16 @@ int do_knockback(struct char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
+  if(IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE)) {
+    send_to_char("You're too tiny to knock someone that HUGE anywhere!\n\r", 
+		 ch);
+    return eFAILURE;
+  }
+
   if(!can_attack(ch) || !can_be_attacked(ch, victim))
     return eFAILURE;
 
   learned = has_skill(ch, SKILL_KNOCKBACK);
-  if(IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE)) {
-    send_to_char("You're too tiny to knock someone that HUGE anywhere!\n\r",ch);
-    return eFAILURE;
-  }
-
-
   dam = 100;
 
   if(*where) {

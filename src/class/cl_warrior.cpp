@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.54 2006/11/07 03:27:08 jhhudso Exp $
+| $Id: cl_warrior.cpp,v 1.55 2006/12/31 03:29:57 jhhudso Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -150,9 +150,6 @@ int do_deathstroke(struct char_data *ch, char *argument, int cmd)
 	return eFAILURE;
     }
 
-    if(!can_attack(ch) || !can_be_attacked(ch, victim))
-          return eFAILURE;
-
     if(!ch->equipment[WIELD])
     {
        send_to_char("You must be wielding a weapon to deathstrike someone.\r\n", ch);
@@ -164,6 +161,10 @@ int do_deathstroke(struct char_data *ch, char *argument, int cmd)
        send_to_char("Your opponent isn't in a vulnerable enough position!\r\n", ch);
        return eFAILURE;
     }
+
+    if(!can_attack(ch) || !can_be_attacked(ch, victim))
+          return eFAILURE;
+
     int i = has_skill(ch, SKILL_DEATHSTROKE);
     if (i > 40) failchance -= 5;
     if (i > 60) failchance -= 5;
@@ -420,9 +421,6 @@ int do_bash(struct char_data *ch, char *argument, int cmd)
        return eFAILURE;
     }
 
-    if(!can_attack(ch) || !can_be_attacked(ch, victim))
-      return eFAILURE;
-
     if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE)) {
       send_to_char("You can't bash something that HUGE!\n\r", ch);
          return eFAILURE;
@@ -432,6 +430,9 @@ int do_bash(struct char_data *ch, char *argument, int cmd)
 	send_to_char("Aren't we funny today...\n\r", ch);
 	return eFAILURE;
     }
+
+    if(!can_attack(ch) || !can_be_attacked(ch, victim))
+      return eFAILURE;
 
     if(affected_by_spell(victim, SPELL_IRON_ROOTS)) {
         act("You try to bash $N but tree roots around $S legs keep him upright.", ch, 0, victim, TO_CHAR, 0);
@@ -637,14 +638,14 @@ int do_disarm( struct char_data *ch, char *argument, int cmd )
 	return eFAILURE;
     }
 
-    if(!can_attack(ch) || !can_be_attacked(ch, victim))
-          return eFAILURE;
-
     if ( victim->equipment[WIELD] == NULL )
     {
 	send_to_char( "Your opponent is not wielding a weapon!\n\r", ch );
 	return eFAILURE;
     }
+
+    if(!can_attack(ch) || !can_be_attacked(ch, victim))
+          return eFAILURE;
 
     set_cantquit(ch, victim);
 
@@ -736,12 +737,6 @@ int do_rescue(struct char_data *ch, char *argument, int cmd)
 	return eFAILURE;
     }
 
-    if(!can_be_attacked(ch, victim->fighting))
-    {
-       send_to_char("You cannot complete the rescue!\n\r", ch);
-       return eFAILURE;
-    }
-
     if ( !IS_NPC(ch) && (IS_NPC(victim) && !IS_AFFECTED(victim, AFF_CHARM)))
     {
 	send_to_char( "Doesn't need your help!\n\r", ch );
@@ -751,6 +746,11 @@ int do_rescue(struct char_data *ch, char *argument, int cmd)
     if (ch->fighting == victim) {
 	send_to_char("How can you rescue someone you are trying to kill?\n\r",ch);
 	return eFAILURE;
+    }
+
+    if(!can_be_attacked(ch, victim->fighting)) {
+       send_to_char("You cannot complete the rescue!\n\r", ch);
+       return eFAILURE;
     }
 
     for (tmp_ch=world[ch->in_room].people; tmp_ch &&

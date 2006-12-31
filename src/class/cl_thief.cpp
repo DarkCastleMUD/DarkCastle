@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.153 2006/12/31 03:00:07 jhhudso Exp $
+| $Id: cl_thief.cpp,v 1.154 2006/12/31 03:29:57 jhhudso Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -131,14 +131,15 @@ int do_eyegouge(CHAR_DATA *ch, char *argument, int cmd)
     send_to_char("That sounds...stupid.\n\r", ch);
     return eFAILURE;
   }
- if(!can_be_attacked(ch, victim) || !can_attack(ch))
-    return eFAILURE;
 
-  if (!level)
-  {
+  if (!level) {
     send_to_char("You would...if you knew how.\r\n",ch);
     return eFAILURE;
   }
+
+  if(!can_be_attacked(ch, victim) || !can_attack(ch))
+    return eFAILURE;
+
   int retval = 0;
   if (!skill_success(ch,victim, SKILL_EYEGOUGE))
   {
@@ -364,15 +365,15 @@ int do_circle(CHAR_DATA *ch, char *argument, int cmd)
       return eFAILURE;
    }
     
-   // Check the killer/victim
-   if ((GET_LEVEL(ch) < G_POWER) || IS_NPC(ch)) {
-      if (!can_attack(ch) || !can_be_attacked(ch, victim))
-         return eFAILURE;
-      }
-
    if (!ch->equipment[WIELD]) {
       send_to_char("You need to wield a weapon to make it a success.\n\r", ch);
       return eFAILURE;
+   }
+
+   // Check the killer/victim
+   if ((GET_LEVEL(ch) < G_POWER) || IS_NPC(ch)) {
+     if (!can_attack(ch) || !can_be_attacked(ch, victim))
+       return eFAILURE;
    }
 
    bool blackjack = FALSE;
@@ -1804,13 +1805,15 @@ int do_blackjack(struct char_data *ch, char *argument, int cmd)
     act("$E is too alert and nervous looking and you are unable to sneak behind!", ch,0,victim, TO_CHAR, 0);
     return eFAILURE;
   }  
-  if((GET_LEVEL(ch) < G_POWER) || IS_NPC(ch)) {
-      if(!can_attack(ch) || !can_be_attacked(ch, victim))
-      return eFAILURE;
-  }
+
   if(IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE)) {
     send_to_char("You can't blackjack someone that HUGE!\r\n", ch);
     return eFAILURE;
+  }
+
+  if((GET_LEVEL(ch) < G_POWER) || IS_NPC(ch)) {
+      if(!can_attack(ch) || !can_be_attacked(ch, victim))
+      return eFAILURE;
   }
 
   set_cantquit(ch, victim);
@@ -2010,14 +2013,14 @@ int do_cripple(CHAR_DATA *ch, char *argument, int cmd)
       return eFAILURE;
    }
 
-   if((GET_LEVEL(ch) < IMMORTAL) || IS_NPC(ch))
-      if(!can_attack(ch) || !can_be_attacked(ch, vict))
-         return eFAILURE;
-
    if(IS_AFFECTED(vict, AFF_CRIPPLE)) {
       act("$N has already been crippled!", ch, 0, vict, TO_CHAR, 0);
       return eFAILURE;
    }
+
+   if((GET_LEVEL(ch) < IMMORTAL) || IS_NPC(ch))
+      if(!can_attack(ch) || !can_be_attacked(ch, vict))
+         return eFAILURE;
 
    WAIT_STATE(ch, PULSE_VIOLENCE * 2);
   // Make 'em fight eachother

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_monk.cpp,v 1.27 2006/01/26 09:44:27 eas Exp $
+| $Id: cl_monk.cpp,v 1.28 2006/12/31 03:29:57 jhhudso Exp $
 | cl_monk.C
 | Description:  Monk skills.
 */
@@ -130,9 +130,6 @@ int do_quivering_palm(struct char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if(!can_attack(ch) || !can_be_attacked(ch, victim))
-     return eFAILURE;
-	   
   if (IS_SET(world[ch->in_room].room_flags, NO_KI)) {
     send_to_char("You find yourself unable to focus your energy here.\n\r", ch);
     return eFAILURE;
@@ -143,6 +140,9 @@ int do_quivering_palm(struct char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
+  if(!can_attack(ch) || !can_be_attacked(ch, victim))
+     return eFAILURE;
+	   
   GET_KI(ch) -= 40;
 
   if(!skill_success(ch,victim,SKILL_QUIVERING_PALM)) {
@@ -200,9 +200,6 @@ int do_stun(struct char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if(!can_attack(ch) || !can_be_attacked(ch, victim))
-    return eFAILURE;
-
   if(GET_LEVEL(victim) == IMP) {
     send_to_char("You gotta be kidding!\n\r",ch);
     return eFAILURE;
@@ -213,6 +210,9 @@ int do_stun(struct char_data *ch, char *argument, int cmd)
     send_to_char("You cannot stun something that HUGE!\n\r", ch);
     return eFAILURE;
   }
+
+  if(!can_attack(ch) || !can_be_attacked(ch, victim))
+    return eFAILURE;
 
   if (IS_SET(victim->combat, COMBAT_BERSERK) && (IS_NPC(victim) || has_skill(victim, SKILL_BERSERK) > 80))
   {
