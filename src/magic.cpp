@@ -9345,12 +9345,12 @@ int cast_creeping_death(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DA
 	
    if (bingo > 0) {    
      if (number(1, 100) <= bingo && GET_LEVEL(victim) < IMMORTAL) {
-        dam = GET_HIT(victim)*5 + 20;
+        dam = 9999999;
         send_to_char("The insects are crawling in your mouth, out of your eyes, "
                      "through your stomach!\n\r", victim);
         act("$N is completely consumed by insects!", ch, 0, victim, TO_ROOM, NOTVICT);
         act("$N is completely consumed by your insects!", ch, 0, victim, TO_CHAR, 0);
-        return damage(ch, victim, dam, TYPE_MAGIC, SPELL_CREEPING_DEATH, 0);
+        return damage(ch, victim, dam, TYPE_UNDEFINED, SPELL_CREEPING_DEATH, 0);
      }
    }
    return eSUCCESS;

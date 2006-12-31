@@ -2,7 +2,7 @@
 #define FIGHT_H_
 
 /************************************************************************
-| $Id: fight.h,v 1.30 2006/12/28 06:46:37 jhhudso Exp $
+| $Id: fight.h,v 1.31 2006/12/31 04:02:17 jhhudso Exp $
 | fight.h
 | This file defines the header information for fight.
 */
@@ -99,6 +99,7 @@ void eq_destroyed(char_data * ch, obj_data * obj, int pos);
 #define KILL_SUICIDE      4
 #define KILL_POTATO       5
 #define KILL_MASHED       6
+#define KILL_BINGO        7
 
 #define COMBAT_SHOCKED      1
 #define COMBAT_BASH1        1<<1

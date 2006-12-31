@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.391 2006/12/30 21:06:51 jhhudso Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.392 2006/12/31 04:02:17 jhhudso Exp $ */
 
 extern "C"
 {
@@ -1603,15 +1603,10 @@ bool is_bingo(int dam, int weapon_type, int attacktype)
     return false;
 
   switch (attacktype) {
-  case SKILL_BACKSTAB:
-    if (dam == 9999999)
-      return true;
-    break;
   case SKILL_SKEWER:
-    if (dam == 99999)
-      return true;
-    break;
+  case SKILL_BACKSTAB:
   case SKILL_SONG_WHISTLE_SHARP:
+  case SPELL_CREEPING_DEATH:
     if (dam == 9999999)
       return true;
     break;
@@ -2236,8 +2231,12 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
     group_gain(ch, victim);
     if (attacktype == SPELL_POISON)
       fight_kill(ch, victim, TYPE_CHOOSE, KILL_POISON);
-    else
-      fight_kill(ch, victim, TYPE_CHOOSE, 0);
+    else {
+      if (bingo)
+	fight_kill(ch, victim, TYPE_CHOOSE, KILL_BINGO);
+      else
+	fight_kill(ch, victim, TYPE_CHOOSE, 0);
+    }
     return damage_retval(ch, victim, (eSUCCESS|eVICT_DIED));
     } else {
   
@@ -2381,7 +2380,7 @@ void do_dam_msgs(CHAR_DATA *ch, CHAR_DATA *victim, int dam, int attacktype, int 
   extern struct message_list fight_messages[MAX_MESSAGES];
   struct message_type *messages,*messages2;
   int i,j,  nr;
-  if (dam > 100000) return; //bingo
+  if (is_bingo(dam, weapon_type, attacktype)) return;
   for (i = 0; i < MAX_MESSAGES; i++)
   {
     if (fight_messages[i].a_type != attacktype)
@@ -3754,7 +3753,7 @@ int do_skewer(CHAR_DATA *ch, CHAR_DATA *vict, int dam, int wt, int wt2, int weap
       act("$n's weapon rips through $N's chest sending gore and entrails flying for yards!\r\n", ch, 0, vict, NOTVICT, 0);
    //duplicate message   act("$n is DEAD!!", vict, 0, 0, TO_ROOM, INVIS_NULL);
       send_to_char("You have been SKEWERED!!\n\r\n\r", vict);
-      damage(ch, vict, 99999, TYPE_UNDEFINED, SKILL_SKEWER, weapon);
+      damage(ch, vict, 9999999, TYPE_UNDEFINED, SKILL_SKEWER, weapon);
 //      update_pos(vict);
       return eSUCCESS|eVICT_DIED;
     }
@@ -4769,7 +4768,10 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim, int type)
 
   // have to be level 20 and linkalive to count as a pkill and not yourself
   if (ch != NULL) {
-    if (type == KILL_POTATO)
+    if (type == KILL_BINGO)
+      sprintf(killer_message,"\n\r##%s was just BINGOED by %s!\n\r", 
+            GET_NAME(victim), GET_NAME(ch));
+    else if (type == KILL_POTATO)
       sprintf(killer_message,"\n\r##%s just got POTATOED!!\n\r", GET_NAME(victim));
     else if (type == KILL_POISON)
       sprintf(killer_message,"\n\r##%s has perished from %s's POISON!\n\r", GET_NAME(victim), GET_NAME(ch));
