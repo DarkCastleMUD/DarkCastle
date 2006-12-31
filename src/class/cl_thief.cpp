@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.152 2006/12/30 19:39:22 jhhudso Exp $
+| $Id: cl_thief.cpp,v 1.153 2006/12/31 03:00:07 jhhudso Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -197,12 +197,6 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  // Check the killer/victim
-  if((GET_LEVEL(ch) < G_POWER) || IS_NPC(ch)) {
-      if(!can_attack(ch) || !can_be_attacked(ch, victim))
-      return eFAILURE;
-  }
-
   if(!ch->equipment[WIELD]) {
     send_to_char("You need to wield a weapon to make it a success.\n\r", ch);
     return eFAILURE;
@@ -218,6 +212,11 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
     return eFAILURE;
   }
   
+  // Check the killer/victim
+  if((GET_LEVEL(ch) < G_POWER) || IS_NPC(ch)) {
+      if(!can_attack(ch) || !can_be_attacked(ch, victim))
+      return eFAILURE;
+  }
  
   int itemp = number(1, 100);
   if (!IS_NPC(ch) && !IS_NPC(victim))
