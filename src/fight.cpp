@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.397 2007/01/01 19:08:27 jhhudso Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.398 2007/01/01 19:18:28 jhhudso Exp $ */
 
 extern "C"
 {
@@ -5115,7 +5115,7 @@ int can_be_attacked(CHAR_DATA *ch, CHAR_DATA *vict)
     return FALSE;
   }
 
-  if (IS_SET(world[ch->in_room].room_flags, ARENA) && arena.type == PRIZE) {
+  if (IS_SET(world[ch->in_room].room_flags, ARENA) && arena.type == PRIZE && IS_PC(ch)) {
     if (ch->fighting && ch->fighting != victim) {
       logf(105, LOG_ARENA, "%s, whom was fighting %s tried to attack %s.",
 	   GET_NAME(ch), GET_NAME(ch->fighting), GET_NAME(vict));
