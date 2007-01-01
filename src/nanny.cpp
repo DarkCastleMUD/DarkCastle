@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.148 2006/12/30 18:37:25 dcastle Exp $ */
+/* $Id: nanny.cpp,v 1.149 2007/01/01 20:22:18 dcastle Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -835,11 +835,11 @@ void nanny(struct descriptor_data *d, char *arg)
          return;
       }
       
-      if (bport && GET_LEVEL(ch) < 100 && strcmp(GET_NAME(ch), "Ubertestchar"))
-	{
-		send_to_char("Mortals not allowed on this port.\r\n",ch);
-		close_socket(d);
-	}
+//      if (bport && GET_LEVEL(ch) < 100 && strcmp(GET_NAME(ch), "Ubertestchar"))
+//	{
+//		send_to_char("Mortals not allowed on this port.\r\n",ch);
+//		close_socket(d);
+//	}
       if ( fOld ) {
          /* Old player */
          SEND_TO_Q( "Password: ", d );

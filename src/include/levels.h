@@ -1,12 +1,12 @@
-/* $Id: levels.h,v 1.6 2006/12/22 08:53:30 dcastle Exp $ */
+/* $Id: levels.h,v 1.7 2007/01/01 20:22:22 dcastle Exp $ */
 /* This is purely to define god levels as #defines. */
 #ifndef LEVELS_H_
 #define LEVELS_H_
 
 #include "structs.h"
 
-#define MORTAL 50
-#define MAX_MORTAL 50
+#define MORTAL 60
+#define MAX_MORTAL 60
 /* #define GLADIATOR */
 
 //#define IMMORTAL 101

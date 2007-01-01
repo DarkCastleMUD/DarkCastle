@@ -1082,6 +1082,10 @@ int do_mpteachskill( CHAR_DATA *ch, char *argument, int cmd )
           send_to_char(skill, boro);
         }
     }*/
+   
+    extern void prepare_character_for_sixty(CHAR_DATA *ch);
+    prepare_character_for_sixty(ch);
+
     sprintf(skill,"$N has learned the basics of %s.",skillname);
     act(skill, ch, 0, victim, TO_ROOM, NOTVICT);
 

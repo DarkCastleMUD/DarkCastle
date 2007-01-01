@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.81 2006/12/22 09:11:15 dcastle Exp $ */
+/* $Id: limits.cpp,v 1.82 2007/01/01 20:22:18 dcastle Exp $ */
 
 extern "C"
 {
@@ -178,7 +178,7 @@ int mana_gain(CHAR_DATA *ch)
   }
 
 
-  if((GET_COND(ch,FULL)==0)||(GET_COND(ch,THIRST)==0))
+  if((GET_COND(ch,FULL)==0)||(GET_COND(ch,THIRST)==0)&&GET_LEVEL(ch) < 60)
     gain >>= 2;
   gain /= 4;
   gain /= divisor; 
@@ -250,7 +250,7 @@ int hit_gain(CHAR_DATA *ch, int position)
   if(learned && skill_success(ch, NULL, SKILL_ENHANCED_REGEN))
      gain += 3 + learned / 5;
 
-  if((GET_COND(ch, FULL)==0) || (GET_COND(ch, THIRST)==0))
+  if((GET_COND(ch, FULL)==0) || (GET_COND(ch, THIRST)==0)&&GET_LEVEL(ch) < 60)
     gain >>= 2;
   gain /= 4;
 //  gain -= MIN(age(ch).year,100) / 10;
@@ -302,7 +302,7 @@ int move_gain(CHAR_DATA *ch)
     }
 
 
-    if((GET_COND(ch,FULL)==0)||(GET_COND(ch,THIRST)==0))
+    if((GET_COND(ch,FULL)==0)||(GET_COND(ch,THIRST)==0)&&GET_LEVEL(ch) <60)
 	gain >>= 2;
    gain /= divisor;
    gain -= MIN(100, age(ch).year) / 10;
@@ -645,8 +645,8 @@ void gain_condition(CHAR_DATA *ch,int condition,int value)
 {
     bool intoxicated;
 
-    if(GET_COND(ch, condition)==-1) /* No change */
-	return;
+//    if(GET_COND(ch, condition)==-1) /* No change */
+//	return;
 
     if(condition == FULL && IS_AFFECTED(ch, AFF_BOUNT_SONNET_HUNGER))
        return;
@@ -660,7 +660,7 @@ void gain_condition(CHAR_DATA *ch,int condition,int value)
     GET_COND(ch,condition) = MAX(0,(int)GET_COND(ch,condition));
     GET_COND(ch,condition) = MIN(24,(int)GET_COND(ch,condition));
 
-    if(GET_COND(ch,condition))
+    if(GET_COND(ch,condition) || GET_LEVEL(ch) >= 60)
 	return;
 
     switch(condition){
@@ -709,7 +709,7 @@ void food_update( void )
 	obj_index[i->equipment[WEAR_FACE]->item_number].virt == 536)
 		amt = -3;
     gain_condition(i,FULL,amt);
-    if(!GET_COND(i, FULL)) { // i'm hungry
+    if(!GET_COND(i, FULL) && GET_LEVEL(i) < 60) { // i'm hungry
       if(!IS_MOB(i) && IS_SET(i->pcdata->toggles, PLR_AUTOEAT) && (GET_POS(i) > POSITION_SLEEPING)) {
         if(IS_DARK(i->in_room) && !IS_MOB(i) && !i->pcdata->holyLite && !affected_by_spell(i, SPELL_INFRAVISION))
           send_to_char("It's too dark to see what's safe to eat!\n\r", i);
@@ -722,7 +722,7 @@ void food_update( void )
     }
     gain_condition(i,DRUNK,-1);
     gain_condition(i,THIRST,amt);
-    if(!GET_COND(i, THIRST)) { // i'm thirsty
+    if(!GET_COND(i, THIRST) && GET_LEVEL(i) < 60) { // i'm thirsty
       if(!IS_MOB(i) && IS_SET(i->pcdata->toggles, PLR_AUTOEAT) && (GET_POS(i) > POSITION_SLEEPING)) {
         if(IS_DARK(i->in_room) && !IS_MOB(i) && !i->pcdata->holyLite && !affected_by_spell(i, SPELL_INFRAVISION))
           send_to_char("It's too dark to see if there's any potable liquid around!\n\r", i);
@@ -931,6 +931,8 @@ void prepare_character_for_sixty(CHAR_DATA *ch)
 		  csendf(ch, "$B$3You have been credited %d gold coins for your %lld experience.$R\r\n",
 			i, ch->exp);
 		  ch->gold += i;
+		} else if (ch->exp > 0) {
+		  csendf(ch, "Since you already have your Quest Skill, your experience has been set to 0 to allow advancement to level 60.");
 		}
 		ch->exp = 0;
         }

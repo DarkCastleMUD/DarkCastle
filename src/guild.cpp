@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.108 2006/12/30 20:38:38 jhhudso Exp $
+| $Id: guild.cpp,v 1.109 2007/01/01 20:22:18 dcastle Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -531,7 +531,7 @@ int guild(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
   if(cmd == 171 && !IS_MOB(ch)) {         /*   gain crap...  */
 
     if((GET_LEVEL(ch) >= IMMORTAL) || (GET_LEVEL(ch) == MAX_MORTAL)) {
-      send_to_char("Only a god can level you now.\n\r", ch);
+      send_to_char("You have already reached the highest level!\n\r", ch);
       return eSUCCESS;
     }
 
@@ -556,7 +556,7 @@ int guild(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
        }
        if (!has_skill(ch, skl))
        {
-	 send_to_char("You need to learn your questkill before you can progress further.\r\n",ch);
+	 send_to_char("You need to learn your Quest Skill before you can progress further.\r\n",ch);
          return eSUCCESS;
        }
     }
@@ -577,19 +577,23 @@ int guild(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     GET_LEVEL(ch) +=1;
     advance_level(ch, 0);
     GET_EXP(ch) -= (int)exp_needed;
-    int bonus = (GET_LEVEL(ch)-50)*500;
+    int bonus = (GET_LEVEL(ch)-50)*250;
     if (bonus > 0 && MAX_MORTAL == 60)
     {
         char buf[MAX_STRING_LENGTH];
         if (GET_LEVEL(ch) == 60)
 	{
-	     GET_COND(ch, THIRST) = -1;
-	     GET_COND(ch, FULL)   = -1;
-	     sprintf(buf, "You have truly reached the highest level of <class> mastery.  As such, the guild will imbue into you some of our most powerful magic and grant you freedom from hunger and thirst!\r\n");
-	     send_to_char(buf, ch);
+	     extern char* pc_clss_types3[];
+	     sprintf(buf, "You have truly reached the highest level of %s mastery.", pc_clss_types3[GET_CLASS(ch)]);
+	     do_say(owner, buf, 9);
+ 	     do_say(owner,"As such, the guild will imbue into you some of our most powerful magic and grant you freedom from hunger and thirst!",9);
+//	     send_to_char(buf, ch);
 	} else {
 	 extern char *pc_clss_types3[];
-	 sprintf(buf, "Well done master %s, the guild has collected a tithe to reward your continued support of our profession.\r\nYour guildmaster gives you %d platinum coins.\r\n", pc_clss_types3[GET_CLASS(ch)],bonus);
+	 sprintf(buf, "Well done master %s, the guild has collected a tithe to reward your continued support of our profession.",pc_clss_types3[GET_CLASS(ch)]);
+
+	 do_say(owner, buf, 9);
+	sprintf(buf, "Your guildmaster gives you %d platinum coins.\r\n", bonus);
 	 send_to_char(buf,ch);
 	 GET_PLATINUM(ch) += bonus;
 	}

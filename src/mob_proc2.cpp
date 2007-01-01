@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.74 2006/12/30 19:19:03 dcastle Exp $ */
+/* $Id: mob_proc2.cpp,v 1.75 2007/01/01 20:22:18 dcastle Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -1512,7 +1512,6 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     "$B19)$R A deep blue potion of healing. Cost: 25 Platinum coins.\r\n"
     "$B20)$R A deep red vial of mana. Cost: 50 Platinum coins.\r\n"
     "$B21)$R Buy a practice session for 25 plats.\r\n"
-    "$B22)$R Freedom from HUNGER and THIRST:  Currently out of stock.\r\n"
                  , ch);
 
     return eSUCCESS;
