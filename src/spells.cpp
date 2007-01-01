@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.203 2007/01/01 19:16:17 jhhudso Exp $ */
+/* $Id: spells.cpp,v 1.204 2007/01/01 19:20:09 jhhudso Exp $ */
 
 extern "C"
 {
@@ -1988,7 +1988,7 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
             send_to_char("Your sleep is restless.\r\n",tar_char);
 	 skill_increase_check(ch, spl, learned,500+ spell_info[spl].difficulty);
 
-	 if (tar_char && tar_char != ch && !IS_NPC(ch) && !IS_NPC(tar_char) && tar_char->desc && ch->desc) {
+	 if (tar_char && tar_char != ch && IS_PC(ch) && IS_PC(tar_char) && tar_char->desc && ch->desc) {
 	   if (!strcmp(tar_char->desc->host, ch->desc->host)) {
 	     sprintf( log_buf, "Multi: %s casted '%s' on %s", GET_NAME(ch),
 		      get_skill_name(spl), GET_NAME(tar_char));
