@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.395 2007/01/01 18:42:11 jhhudso Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.396 2007/01/01 18:48:13 jhhudso Exp $ */
 
 extern "C"
 {
@@ -4989,9 +4989,18 @@ void arena_kill(CHAR_DATA *ch, CHAR_DATA *victim, int type)
   {
     if(ch && ch->clan && GET_LEVEL(ch) < IMMORTAL)        clan  = get_clan(ch);
     if(victim->clan && GET_LEVEL(victim) < IMMORTAL)      clan2 = get_clan(victim);  
-    sprintf(killer_message, "\n\r## %s [%s] just SLAUGHTERED %s [%s] in the arena!\n\r", 
-         ((IS_NPC(ch) && ch->master) ? GET_NAME(ch->master) : GET_NAME(ch)), clan ? clan->name : "no clan", 
-         GET_NAME(victim), clan2 ? clan2->name : "no clan");
+    if (type == KILL_BINGO) {
+      sprintf(killer_message, "\n\r## %s [%s] just BINGOED %s [%s] in the arena!\n\r", 
+	      ((IS_NPC(ch) && ch->master) ? GET_NAME(ch->master) : GET_NAME(ch)),
+	      clan ? clan->name : "no clan", 
+	      GET_NAME(victim), clan2 ? clan2->name : "no clan");
+    } else {
+      sprintf(killer_message, "\n\r## %s [%s] just SLAUGHTERED %s [%s] in the arena!\n\r", 
+	      ((IS_NPC(ch) && ch->master) ? GET_NAME(ch->master) : GET_NAME(ch)),
+	      clan ? clan->name : "no clan", 
+	      GET_NAME(victim), clan2 ? clan2->name : "no clan");
+    }
+
     logf(105, LOG_ARENA, "%s [%s] killed %s [%s]", GET_NAME(ch),
          clan ? clan->name : "no clan", GET_NAME(victim), 
          clan2 ? clan2->name : "no clan");
@@ -5000,8 +5009,15 @@ void arena_kill(CHAR_DATA *ch, CHAR_DATA *victim, int type)
       sprintf(killer_message, "\n\r## %s just got POTATOED in the arena!\n\r", GET_SHORT(victim));
     else if (type == KILL_MASHED) 
       sprintf(killer_message, "\n\r## %s just got MASHED in the potato arena!\n\r", GET_SHORT(victim));
-    else 
-      sprintf(killer_message, "\n\r## %s just SLAUGHTERED %s in the arena!\n\r", (IS_NPC(ch) && (ch->master) ? GET_SHORT(ch->master) : GET_SHORT(ch)), GET_SHORT(victim));
+    else {
+      if (type == KILL_BINGO) {
+	sprintf(killer_message, "\n\r## %s just BINGOED %s in the arena!\n\r",
+		(IS_NPC(ch) && (ch->master) ? GET_SHORT(ch->master) : GET_SHORT(ch)), GET_SHORT(victim));
+      } else {
+	sprintf(killer_message, "\n\r## %s just SLAUGHTERED %s in the arena!\n\r",
+		(IS_NPC(ch) && (ch->master) ? GET_SHORT(ch->master) : GET_SHORT(ch)), GET_SHORT(victim));
+      }
+    }
   } else {
     if (type == KILL_POTATO) 
       sprintf(killer_message, "\n\r## %s just got POTATOED in the arena!\n\r", GET_SHORT(victim));
