@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.147 2006/12/30 20:01:32 dcastle Exp $ */
+/* $Id: handler.cpp,v 1.148 2007/01/01 20:00:12 jhhudso Exp $ */
     
 extern "C"
 {
@@ -1514,6 +1514,14 @@ void affect_remove( CHAR_DATA *ch, struct affected_type *af, int flags)
       case SKILL_BLADESHIELD:
          if (!(flags & SUPPRESS_MESSAGES))
             send_to_char("The draining affect of the blade shield technique has worn off.\r\n", ch);
+         break;
+      case SKILL_CLANAREA_CLAIM:
+         if (!(flags & SUPPRESS_MESSAGES))
+            send_to_char("You can attempt to claim an area again.\r\n", ch);
+         break;
+      case SKILL_CLANAREA_CHALLENGE:
+         if (!(flags & SUPPRESS_MESSAGES))
+            send_to_char("You can attempt to challenge an area again.\r\n", ch);
          break;
       case SKILL_FOCUSED_REPELANCE:
          REMOVE_BIT(ch->combat, COMBAT_REPELANCE);

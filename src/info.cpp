@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.127 2006/12/30 18:37:25 dcastle Exp $ */
+/* $Id: info.cpp,v 1.128 2007/01/01 20:00:12 jhhudso Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -1418,6 +1418,12 @@ int do_score(struct char_data *ch, char *argument, int cmd)
              break;
            case SKILL_BLOOD_FURY:
              aff_name = "blood fury reuse timer";
+             break;
+           case SKILL_CLANAREA_CLAIM:
+             aff_name = "clanarea claim timer";
+             break;
+           case SKILL_CLANAREA_CHALLENGE:
+             aff_name = "clanarea challenge timer";
              break;
            case SKILL_CRAZED_ASSAULT:
 	     if (strcmp(apply_types[(int)aff->location], "HITROLL"))

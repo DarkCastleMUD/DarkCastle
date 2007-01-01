@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.59 2006/12/06 06:34:41 jhhudso Exp $ */
+/* $Id: clan.cpp,v 1.60 2007/01/01 20:00:12 jhhudso Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -2853,6 +2853,11 @@ int do_clanarea(CHAR_DATA *ch, char *argument, int cmd)
   }  
   if (!str_cmp(arg, "claim"))
   {
+    if (affected_by_spell(ch, SKILL_CLANAREA_CLAIM)) {
+      send_to_char("You need to wait before you can attempt to claim an area.\n\r", ch);
+      return eFAILURE;
+    }
+  
     if (zone_table[world[ch->in_room].zone].clanowner > 0)
     {
 	csendf(ch, "This area is claimed by %s, you need to challenge to obtain ownership.\r\n",
@@ -2870,6 +2875,15 @@ int do_clanarea(CHAR_DATA *ch, char *argument, int cmd)
 	send_to_char("You cannot claim any more areas.\r\n",ch);
 	return eFAILURE;
     }
+
+    struct affected_type af;
+    af.type = SKILL_CLANAREA_CLAIM;
+    af.duration = 30;
+    af.modifier = 0;
+    af.location = APPLY_NONE;
+    af.bitvector = -1;
+    affect_to_char(ch, &af, PULSE_TIMER);
+
     send_to_char("You claim the area on behalf of your clan.\r\n",ch);
     char buf[MAX_STRING_LENGTH];
     sprintf(buf, "\r\n##%s has been claimed by %s!\r\n",
@@ -2958,6 +2972,11 @@ int do_clanarea(CHAR_DATA *ch, char *argument, int cmd)
 	}
     return eSUCCESS;
   } else if (!str_cmp(arg, "challenge")) {
+    if (affected_by_spell(ch, SKILL_CLANAREA_CHALLENGE)) {
+      send_to_char("You need to wait before you can attempt to challenge an area.\n\r", ch);
+      return eFAILURE;
+    }
+
     // most annoying one for last.
     if (zone_table[world[ch->in_room].zone].clanowner == 0)
     {
@@ -2979,6 +2998,14 @@ int do_clanarea(CHAR_DATA *ch, char *argument, int cmd)
 	send_to_char("You cannot own any more areas.\r\n",ch);
 	return eFAILURE;
     }
+
+    struct affected_type af;
+    af.type = SKILL_CLANAREA_CHALLENGE;
+    af.duration = 60;
+    af.modifier = 0;
+    af.location = APPLY_NONE;
+    af.bitvector = -1;
+    affect_to_char(ch, &af, PULSE_TIMER);
 
     // no point checking for noclaim flag, at this point it already IS under someone's control    
     struct takeover_pulse_data *pl;
