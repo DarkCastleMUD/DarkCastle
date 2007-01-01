@@ -1797,15 +1797,49 @@ struct machine_data
 };
 
 char *reel1[] = {
-"$5Orange$R", "$B$2 Melon$R", "$B$6 Plum $R", "$B$4Cherry$R", "$B$6 Plum $R", "$5Orange$R", "$B   7  $R", 
-"$B$3Bl$R/$B$0BAR$R", "$5Orange$R", "$B$4Cherry$R", "$B$0  BAR $R", "$B$6 Plum $R", "$5Orange$R", "$B$6 Plum $R", 
-"$B$2 Melon$R", "$B$6 Plum $R", "$5Orange$R", "$B$6 Plum $R", "$B$0  BAR $R", "$B$6 Plum $R"
+"$5Orange$R",
+"$B$2 Melon$R",
+"$B$6 Plum $R",
+"$B$4Cherry$R",
+"$B$6 Plum $R",
+"$5Orange$R",
+"$B   7  $R", 
+"$B$3Bl$R/$B$0BAR$R",
+"$5Orange$R",
+"$B$4Cherry$R",
+"$B$0  BAR $R",
+"$B$6 Plum $R",
+"$5Orange$R",
+"$B$6 Plum $R", 
+"$B$2 Melon$R",
+"$B$6 Plum $R",
+"$5Orange$R",
+"$B$6 Plum $R",
+"$B$0  BAR $R",
+"$B$6 Plum $R"
 };
 
 char *reel2[] = {
-"$B$4Cherry$R", "$B$6 Plum $R", "$B$4Cherry$R", "$B7$R/$5Orng$R", "$B$4Cherry$R", "$B$3 Bell $R", 
-"$B$6Pl$R/$B$0BAR$R", "$B$3 Bell $R", "$B$4Cherry$R", "$5Orange$R", "$B$3 Bell $R", "$B$2Mln$R/$5Or$R", "$B$6 Plum $R",
-"$B$3 Bell $R", "$B$4Cherry$R", "$B$0 BAR  $R", "$5Orange$R", "$B$4Cherry$R", "$B$3 Bell $R", "$B$2Mln$R/$5Or$R"
+"$B$4Cherry$R",
+"$B$6 Plum $R",
+"$B$4Cherry$R",
+"$B7$R/$5Orng$R",
+"$B$4Cherry$R",
+"$B$3 Bell $R", 
+"$B$6Pl$R/$B$0BAR$R",
+"$B$3 Bell $R",
+"$B$4Cherry$R",
+"$5Orange$R",
+"$B$3 Bell $R",
+"$B$2Mln$R/$5Or$R",
+"$B$6 Plum $R",
+"$B$3 Bell $R",
+"$B$4Cherry$R",
+"$B$0 BAR  $R",
+"$5Orange$R",
+"$B$4Cherry$R",
+"$B$3 Bell $R",
+"$B$2Mln$R/$5Or$R"
 };
 
 char *reel3[] = {
