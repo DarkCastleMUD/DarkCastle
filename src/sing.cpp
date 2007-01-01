@@ -1721,7 +1721,7 @@ int execute_song_insane_chant( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA 
    act("$n's singing starts to drive you INSANE!!!", ch, 0, 0, TO_ROOM, 0);
    send_to_char("Your singing drives you INSANE!!!\r\n", ch);
 
-   for(victim = world[ch->in_room].people; victim; victim = victim->next_in_room)
+   for(victim = world[ch->in_room].people; victim && victim != ch; victim = victim->next_in_room)
    {
      // don't effect gods unless it was a higher level god singing
      if(GET_LEVEL(victim) >= IMMORTAL && GET_LEVEL(ch) <= GET_LEVEL(victim))
