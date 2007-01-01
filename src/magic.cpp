@@ -789,9 +789,12 @@ int spell_earthquake(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
          {
                   if(IS_NPC(ch) && IS_NPC(tmp_victim)) // mobs don't earthquake each other
                     continue;
-                  if(IS_AFFECTED(tmp_victim, AFF_FREEFLOAT) || IS_AFFECTED(tmp_victim, AFF_FLYING))
+                  if(IS_AFFECTED(tmp_victim, AFF_FREEFLOAT) || IS_AFFECTED(tmp_victim, AFF_FLYING)) {
                      send_to_char("You float over the shaking ground.\n\r", tmp_victim);
-                  else retval = damage(ch, tmp_victim, dam, TYPE_MAGIC, SPELL_EARTHQUAKE, 0);
+		     dam = 0;
+		  }
+
+		  retval = damage(ch, tmp_victim, dam, TYPE_MAGIC, SPELL_EARTHQUAKE, 0);
 	 } 
          else if (world[ch->in_room].zone == world[tmp_victim->in_room].zone)
            send_to_char("The earth trembles and shivers.\n\r", tmp_victim);
