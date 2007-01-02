@@ -360,6 +360,7 @@ int spell_drown(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *
 int spell_energy_drain(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
    int mult = GET_EXP(victim) / 20;
+   mult = MIN(10000, mult);
    if(IS_SET(world[ch->in_room].room_flags, SAFE))
      return eFAILURE;
 

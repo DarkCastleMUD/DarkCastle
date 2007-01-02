@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.109 2007/01/01 20:22:18 dcastle Exp $
+| $Id: guild.cpp,v 1.110 2007/01/02 19:38:45 dcastle Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -413,11 +413,27 @@ int skills_guild(struct char_data *ch, char *arg, struct char_data *owner)
    }
    else {
       struct skill_quest *sq;
-     if ((sq=find_sq(skilllist[skillnumber].skillname)) != NULL && sq->message && IS_SET(sq->clas, 1<<(GET_CLASS(ch)-1)))
-     {
-	mprog_driver(sq->message, owner, ch, NULL, NULL);
-	return eSUCCESS;
-     }
+      if ((sq=find_sq(skilllist[skillnumber].skillname)) != NULL && sq->message && IS_SET(sq->clas, 1<<(GET_CLASS(ch)-1)))
+      {
+	  mprog_driver(sq->message, owner, ch, NULL, NULL);
+	  switch(skillnumber)
+	  {
+	      case SPELL_VAMPIRIC_AURA:
+	      case SPELL_DIVINE_INTER:
+	      case SKILL_BULLRUSH:
+	      case SPELL_HOLY_AURA:
+	      case SKILL_SPELLCRAFT:
+	      case SKILL_COMBAT_MASTERY:
+	      case KI_MEDITATION+KI_OFFSET:
+	      case SKILL_CRIPPLE:
+	      case SKILL_NAT_SELECT:
+		do_say(owner, "Alternately, should you feel that you are not up to the task of an exciting quest, you can seek the Skills Master west of town.",9);
+		do_say(owner, "Rumour has it he will teach certain skills for a hefty fee.  He'll give you a LIST of what he has to offer.",9);
+		return eFAILURE;
+	      default: break;
+	  }
+	  return eSUCCESS;
+      }
    }
 
 //    if(skilllist[skillnumber].clue && mob_index[owner->mobdata->nr].virt 
@@ -466,7 +482,8 @@ int skills_guild(struct char_data *ch, char *arg, struct char_data *owner)
       case KI_MEDITATION+KI_OFFSET:
       case SKILL_CRIPPLE:
       case SKILL_NAT_SELECT:
-	do_say(owner, "I cannot teach you that. You need to learn it by yourself.\r\n",9);
+	do_say(owner, "I cannot teach you that. You need to learn it by yourself.",9);
+
 	return eFAILURE;
       default: break;
   }
@@ -630,7 +647,6 @@ int guild(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 int skill_master(struct char_data *ch, struct obj_data *obj, int cmd, char *arg, 
                  struct char_data * invoker)
 {
-
   char buf[MAX_STRING_LENGTH];
   int number, i, percent;
   int learned = 0;
@@ -641,10 +657,68 @@ int skill_master(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     return eFAILURE;
   }
 
-  if ((cmd != 164) && (cmd != 170)) 
+  if ((cmd != 164) && (cmd != 170) && (cmd != 56) && cmd != 59 )
     return eFAILURE;
   
   for(; *arg==' '; arg++);
+
+  int skl = -1;
+  switch (GET_CLASS(ch))
+  {
+    case CLASS_MAGE: skl = SKILL_SPELLCRAFT; break;
+    case CLASS_BARBARIAN: skl = SKILL_BULLRUSH; break;
+    case CLASS_PALADIN: skl = SPELL_HOLY_AURA; break;
+    case CLASS_MONK: skl = KI_OFFSET+KI_MEDITATION; break;
+    case CLASS_WARRIOR: skl = SKILL_COMBAT_MASTERY; break;
+    case CLASS_THIEF: skl = SKILL_CRIPPLE; break;
+    case CLASS_RANGER: skl = SKILL_NAT_SELECT; break;
+    case CLASS_CLERIC: skl = SPELL_DIVINE_INTER; break;
+    case CLASS_ANTI_PAL: skl = SPELL_VAMPIRIC_AURA; break;
+    case CLASS_DRUID: skl = SPELL_CONJURE_ELEMENTAL; break;
+    case CLASS_BARD: skl = SKILL_SONG_HYPNOTIC_HARMONY; break;
+  }
+  if (cmd == 59)
+  {
+    char buf[MAX_STRING_LENGTH];
+   
+    sprintf(buf, "This is what is available:\r\n[2000 platinum] %s (type $B$2buy questskill$R to purchase it)\r\n",get_skill_name(skl));
+    send_to_char(buf,ch);
+    return eSUCCESS;
+  }
+  if (cmd == 56)
+  {
+    if (GET_LEVEL(ch) < 50)
+    {
+	do_say(invoker,"You have not obtained a high enough level to buy anything from me.",9);
+        return eSUCCESS;
+    }
+    if (str_cmp(arg, "questskill"))
+    {
+      do_say(invoker,"I cannot teach you that. Type LIST to see what is available.",9);
+//      do_say(invoker,"I could teach you your Quest Skill, for a price of 2000 platinum coins.",9);
+ //     do_say(invoker,"Just \"buy questskill\" to obtain it.",9);
+      return eSUCCESS;
+    }
+    if (has_skill(ch, skl))
+    {
+      do_say(invoker,"I cannot teach you anything further.",9);
+      return eSUCCESS;
+    }
+    if (GET_PLATINUM(ch) < 2000)
+    {
+      do_say(invoker,"You can't afford it, you need 2000 platinum!",9);
+      return eSUCCESS;
+    }
+    GET_PLATINUM(ch) -= 2000;
+    do_say(invoker, "Okay, you've got a deal!",9);
+    learn_skill(ch, skl, 1, 1);
+
+    extern void prepare_character_for_sixty(CHAR_DATA *ch);
+    prepare_character_for_sixty(ch);
+    sprintf(buf, "$BYou have learned the basics of %s.$R\n\r", get_skill_name(skl));
+    send_to_char(buf,ch);
+    return eSUCCESS;
+  }
 
   if (!*arg) {
       sprintf(buf,"You have %d practice sessions left.\n\r", ch->pcdata->practices);
