@@ -9265,7 +9265,7 @@ int cast_bee_swarm(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *v
 
    act("$n calls upon the insect world!\n\r", ch, 0, 0, TO_ROOM, INVIS_NULL);
 
-   for(tmp_victim = character_list; tmp_victim; tmp_victim = temp) {
+   for(tmp_victim = character_list; tmp_victim && tmp_victim != (char_data *)0x95959595; tmp_victim = temp) {
       temp = tmp_victim->next;
       if ((ch->in_room == tmp_victim->in_room) && (ch != tmp_victim) &&
           (!ARE_GROUPED(ch,tmp_victim)) && can_be_attacked(ch, tmp_victim)) {
