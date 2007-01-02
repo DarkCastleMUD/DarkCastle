@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: who.cpp,v 1.37 2007/01/02 11:20:32 dcastle Exp $
+| $Id: who.cpp,v 1.38 2007/01/02 11:26:16 dcastle Exp $
 | who.C
 | Commands for who, maybe? :P
 */
@@ -237,7 +237,7 @@ int do_whosolo(struct char_data *ch, char *argument, int cmd)
 
       if (GET_LEVEL(i) <= MORTAL)
          if (!IS_AFFECTED(i, AFF_GROUP)) {
-            if (!IS_ANONYMOUS(i) || (i->clan && i->clan == ch->clan))
+            if (!IS_ANONYMOUS(i) || (i->clan && i->clan == ch->clan) || 1)
                sprintf(tempbuffer,
                  "   %-15s %-9s %-13s %2d     %-4d%-7d%d\n\r",
                  i->name,
@@ -453,7 +453,7 @@ int do_who(struct char_data *ch, char *argument, int cmd)
         if(GET_LEVEL(i) < levelarg || 
             (!strcmp(GET_NAME(i), "Pirahna") && levelarg > PIRAHNA_FAKE_LVL )
           )                                                                     continue;
-        if(clss && !hasholylight && (!i->clan || i->clan != ch->clan) && IS_ANONYMOUS(i) && GET_LEVEL(i) < MIN_GOD)  continue;
+        if(clss && !hasholylight && (!i->clan || i->clan != ch->clan) && IS_ANONYMOUS(i) && GET_LEVEL(i) < MIN_GOD && 0)  continue;
         if(anoncheck && !IS_ANONYMOUS(i) && !charmatchistrue)                   continue;
         if(sexcheck && ( GET_SEX(i) != sextype || 
                          ( IS_ANONYMOUS(i) && !hasholylight) 
@@ -509,7 +509,7 @@ int do_who(struct char_data *ch, char *argument, int cmd)
             numImmort++;
         }
         else {
-            if(!IS_ANONYMOUS(i) || (ch->clan && ch->clan == i->clan) || hasholylight) {
+            if(!IS_ANONYMOUS(i) || (ch->clan && ch->clan == i->clan) || hasholylight || 1) {
                 sprintf(infoBuf, " $B$5%2d$7-$1%s  $2%s$R$7 ",
                     GET_LEVEL(i), pc_clss_abbrev[(int)GET_CLASS(i)], race_abbrev[(int)GET_RACE(i)]);
             }
