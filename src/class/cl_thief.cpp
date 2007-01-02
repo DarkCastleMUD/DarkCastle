@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.154 2006/12/31 03:29:57 jhhudso Exp $
+| $Id: cl_thief.cpp,v 1.155 2007/01/02 20:18:41 dcastle Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -2008,7 +2008,7 @@ int do_cripple(CHAR_DATA *ch, char *argument, int cmd)
       return eFAILURE;
    }
 
-   if(IS_MOB(vict) && ISSET(vict->mobdata->actflags, ACT_HUGE)) {
+   if(IS_MOB(vict) && ISSET(vict->mobdata->actflags, ACT_HUGE) && skill < 81) {
       send_to_char("You can't cripple someone that HUGE!\r\n", ch);
       return eFAILURE;
    }
