@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.128 2007/01/02 22:01:37 pirahna Exp $ */
+/* $Id: mob_proc.cpp,v 1.129 2007/01/02 22:12:58 pirahna Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -3153,7 +3153,20 @@ static char *dethSayText [ ] =
   "If a canyon ate too much, do you think it would gorge itself?",
   "Hey guys, do you mind if I add a whole bunch of dumb jokes to my material?",
   "Time is a great healer. Unless you've got a rash, then you're better off with ointment.",
-  "Sex workers in Roman times charged the equivalent price of eight glasses of red wine."
+  // These few are real facts actually
+  "Sex workers in Roman times charged the equivalent price of eight glasses of red wine.",
+  "The lion costume in the film Wizard of Oz was made from real lions.",
+  "Standard-sized condoms are too big for most Indian men.",
+  "The Pope's been known to wear red Prada shoes.",
+  "One third of all the cod fished in the world is consumed in the UK.",
+  "The brain is soft and gelatinous - its consistency is something between jelly and cooked pasta.",
+  "Eating a packet of potato chips a day is equivalent to drinking five litres of cooking oil a year.",
+  "The medical name for the part of the brain associated with teenage sulking is \"superior temporal sulcus\".",
+  "Cows can have regional accents, says a professor of phonetics, after studying cattle in Somerset.",
+  "The clitoris derives its name from the ancient Greek word kleitoris, meaning \"little hill\".",
+  "Hexakosioihexekontahexaphobiacs is the term for people who fear the number 666.",
+  "The age limit for marriage in France was, until recently, 15 for girls, but 18 for boys. The age for girls was raised to 18 in 2006."
+  // End real facts :)
 };
 
 // ENDOFCHAIN
