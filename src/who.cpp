@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: who.cpp,v 1.36 2006/12/30 18:37:25 dcastle Exp $
+| $Id: who.cpp,v 1.37 2007/01/02 11:20:32 dcastle Exp $
 | who.C
 | Commands for who, maybe? :P
 */
@@ -145,7 +145,7 @@ int do_whogroup(struct char_data *ch, char *argument, int cmd)
             foundtarget = 1;
 
          // First, if they're not anonymous
-         if (!IS_MOB(ch) && hasholylight || (!IS_ANONYMOUS(k) || (k->clan == ch->clan && ch->clan))) 
+         if (!IS_MOB(ch) && hasholylight || (!IS_ANONYMOUS(k) || (k->clan == ch->clan && ch->clan)) || 1) 
          {
              sprintf(tempbuffer,
                  "   $B%-18s %-10s %-14s   Level %2d      $1($7Leader$1)$R \n\r",
