@@ -16,7 +16,7 @@
  *  10/21/2003   Onager    Changed IS_ANONYMOUS() to handle mobs without   *
  *                         crashing                                        *
  ***************************************************************************/
-/* $Id: utility.h,v 1.55 2006/11/29 10:50:16 jhhudso Exp $ */
+/* $Id: utility.h,v 1.56 2007/01/02 12:02:14 dcastle Exp $ */
 
 #ifndef UTILITY_H_
 #define UTILITY_H_
@@ -264,7 +264,8 @@ bool IS_DARK( int room );
 
 #define AWAKE(ch) (GET_POS(ch)  != POSITION_SLEEPING)
 
-#define IS_ANONYMOUS(ch) (IS_MOB(ch) ? 1 : ( (GET_LEVEL(ch) >= 101) ? 0 : IS_SET((ch)->pcdata->toggles, PLR_ANONYMOUS)))
+//#define IS_ANONYMOUS(ch) (IS_MOB(ch) ? 1 : ( (GET_LEVEL(ch) >= 101) ? 0 : IS_SET((ch)->pcdata->toggles, PLR_ANONYMOUS)))
+#define IS_ANONYMOUS(ch) (0)
 /*
 inline const short IS_ANONYMOUS(CHAR_DATA *ch)
 {
