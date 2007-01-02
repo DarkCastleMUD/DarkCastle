@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.127 2006/12/29 12:32:07 dcastle Exp $ */
+/* $Id: mob_proc.cpp,v 1.128 2007/01/02 22:01:37 pirahna Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -3152,7 +3152,8 @@ static char *dethSayText [ ] =
   "Two birds are sitting on a perch.  One says to the other, \"Do you smell fish?\"",
   "If a canyon ate too much, do you think it would gorge itself?",
   "Hey guys, do you mind if I add a whole bunch of dumb jokes to my material?",
-  "Time is a great healer. Unless you've got a rash, then you're better off with ointment."
+  "Time is a great healer. Unless you've got a rash, then you're better off with ointment.",
+  "Sex workers in Roman times charged the equivalent price of eight glasses of red wine."
 };
 
 // ENDOFCHAIN
