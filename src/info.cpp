@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.128 2007/01/01 20:00:12 jhhudso Exp $ */
+/* $Id: info.cpp,v 1.129 2007/01/03 20:26:27 shane Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -2800,7 +2800,7 @@ void check_leaderboard()
          }
       }
       for(i=0;i<5;i++) {
-         if(GET_LEVEL(d->character) < 60) break;
+         if(GET_LEVEL(d->character) < MAX_MORTAL) break;
          if((int)GET_RDEATHS(d->character) > rdactiveclass[k][i]) {
             for(j=4;j>i;j--) {
                rdactiveclass[k][j] = rdactiveclass[k][j-1];
@@ -3036,7 +3036,7 @@ int do_leaderboard(struct char_data *ch, char *argument, int cmd)
          }
       }
       for(i=0;i<5;i++) {
-         if(GET_LEVEL(d->character) < 50) break;
+         if(GET_LEVEL(d->character) < MAX_MORTAL) break;
          if((int)GET_RDEATHS(d->character) > rdonline[i]) {
             for(j=4;j>i;j--) {
                rdonline[j] = rdonline[j-1];
@@ -3119,7 +3119,7 @@ int do_leaderboard(struct char_data *ch, char *argument, int cmd)
    }
    placea=1;placeb=1;placec=1;placed=1;skippeda=0;skippedb=0;skippedc=0;skippedd=0;
    strcat(buf, "(*)                                                                           (*)\n");
-   strcat(buf, "(*)        $2$BPlayer Death Score                    Real Deaths (Level 50)$R       (*)\n");
+   strcat(buf, "(*)        $2$BPlayer Death Score                    Real Deaths (Level 60)$R       (*)\n");
    sprintf(buf2, "(*) 1) $5$B%-12s$R1) $5$B%-12s$R        1) $5$B%-12s$R1) $5$B%-12s$R      (*)\n",pdonlinename[0],pdactivename[0],rdonlinename[0],rdactivename[0]);
    strcat(buf,buf2);
    for(i=1;i<5;i++) {
