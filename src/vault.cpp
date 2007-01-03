@@ -57,7 +57,7 @@ struct vault_data *has_vault(char *name) {
     if (vault && vault->owner && !strcasecmp(vault->owner, name))
       return vault;
   char_data *ch = find_owner(name);
-  if (ch && GET_LEVEL(ch) > 10) {
+  if (ch && GET_LEVEL(ch) >= 10) {
      add_new_vault(GET_NAME(ch), 0);
      for (vault = vault_table;vault;vault = vault->next)
        if (vault && vault->owner && !strcasecmp(vault->owner, name)) {
