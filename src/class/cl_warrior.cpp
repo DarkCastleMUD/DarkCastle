@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.55 2006/12/31 03:29:57 jhhudso Exp $
+| $Id: cl_warrior.cpp,v 1.56 2007/01/06 20:20:45 dcastle Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -910,7 +910,7 @@ void stop_guarding(char_data * guard)
    if(curr) {
       // found the guard, remove him from list
       if(last)
-        last = curr->next;
+        last->next = curr->next;
       else victim->guarded_by = curr->next;
    }
    // if we didn't find guard, return, since we wanted to remove um anyway:)
