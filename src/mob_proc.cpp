@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.129 2007/01/02 22:12:58 pirahna Exp $ */
+/* $Id: mob_proc.cpp,v 1.130 2007/01/06 03:37:11 apocalypse Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -3133,24 +3133,14 @@ static char *dethSayText [ ] =
   "If you can wave a fan, and you can wave a club, can you wave a fan club?",
   "Smoking cures weight problems...eventually...",
   "Is \"tired old cliche\" one?",
-  "The sign said \"eight items or less\". So I changed my name to Les.",
   "I xeroxed a mirror. Now I have an extra xerox machine.",
   "You know the guy who writes all those bumper stickers?  He hates New York.",
   "If a word in the dictionary were misspelled, how would we know?",
   "When I was a little kid we had a sand box. It was a quicksand box. I was an only child....eventually.",
   "For my birthday I got a humidifier and a de-humidifier...I put them in the same room and let them fight it out.",
-  "Have you heard about the new corduroy pillows?  They're making headlines all over.",
-  "I said to my doctor \"There's a strawberry growing out of my head!\" The doc said \"Let me give you some cream to put on it.\"",
   "She criticized my apartment, so I knocked her flat.",
-  "Did you hear about the guy who stayed up all night to find out where the sun went?  In the morning it dawned on him.",
   "If you jumped off the bridge in Paris and swam in the river that goes through the city people would say you were insane.",
-  "If you make lots of telephone calls in China there's a good chance you'll get the Wong number.",
-  "What do John The Baptist and Kermit The Frog have in common?    Same middle name.",
-  "Why do soldiers in Helsinki wash their tanks and trucks so often?   They're trying to protect the Finnish.",
   "Two fonts walk into a bar.  The barman says to them, \"Get out. We don't serve your type here.\"",
-  "Two fish are in a tank.  One says to the other, \"Do you know how to drive this thing?\"",
-  "Two birds are sitting on a perch.  One says to the other, \"Do you smell fish?\"",
-  "If a canyon ate too much, do you think it would gorge itself?",
   "Hey guys, do you mind if I add a whole bunch of dumb jokes to my material?",
   "Time is a great healer. Unless you've got a rash, then you're better off with ointment.",
   // These few are real facts actually
