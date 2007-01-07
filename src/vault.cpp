@@ -756,13 +756,19 @@ void add_vault_access(CHAR_DATA *ch, char *name, struct vault_data *vault) {
 
   // must be done to clear out "d" before it is used
   memset((char *) &d, 0, sizeof(struct descriptor_data));
+  extern CHAR_DATA *get_pc(char *name);
+
+  if (!get_pc(name))
   if(!(load_char_obj(&d, name))) {
     send_to_char("You can't give access to someone who doesn't exist.\n\r", ch);
     return;
   }
+  
 
   if (has_vault_access(name, vault)) {
     send_to_char("That person already has access to your vault.\r\n", ch);
+    if (d.character) 
+      free_char(d.character);
     return;   
   }
  
@@ -773,6 +779,8 @@ void add_vault_access(CHAR_DATA *ch, char *name, struct vault_data *vault) {
   vault->access	= access;
 
   save_char_obj(ch);
+  if (d.character) 
+    free_char(d.character);
 }
 
 void remove_vault_access(CHAR_DATA *ch, char *name, struct vault_data *vault) {
