@@ -50,7 +50,7 @@ struct spec_data
 const struct spec_data spec_list[] =
 {
    { "Blah", "Blehe", 1, {0,0,0,0,0,0,0,0,0,0} },
-   { NULL, NULL, 0,   {0,0,0,0,0,0,0,0,0,0} }
+   { NULL, NULL,      0, {0,0,0,0,0,0,0,0,0,0} }
 };
 
 int do_spec(CHAR_DATA *ch, char *argument, int cmd)
@@ -69,7 +69,7 @@ int do_spec(CHAR_DATA *ch, char *argument, int cmd)
     }
     send_to_char(buf, ch);
   } else if (!str_cmp(arg, "unlearn")) {
-       if (ch->pcdata->spec == 0)
+       if (ch->spec == 0)
        {
 	 send_to_char("You do not have a specialization.\r\n",ch);
 	 return eFAILURE;
@@ -85,7 +85,7 @@ int do_spec(CHAR_DATA *ch, char *argument, int cmd)
          while(curr)
 	 {
            cnext = curr->next;
-           if(curr->skillnum == spec_list[ch->pcdata->spec].skills[i])
+           if(curr->skillnum == spec_list[ch->spec].skills[i])
            {
 	     if (prev) prev->next = curr->next;
 	     else ch->skills = curr->next;
@@ -94,7 +94,7 @@ int do_spec(CHAR_DATA *ch, char *argument, int cmd)
 	   curr = cnext;
 	 }
        }
-       ch->pcdata->spec = 0;
+       ch->spec = 0;
        GET_PLATINUM(ch) -= 10000;
        ch->saves[SAVE_TYPE_FIRE] -= (GET_LEVEL(ch) == 60?1:0 + GET_LEVEL(ch) > 56 ? 1 : 0 + GET_LEVEL(ch) > 53 ? 1 : 0 + GET_LEVEL(ch) > 50 ? 1 : 0);
        ch->saves[SAVE_TYPE_COLD] -= (GET_LEVEL(ch) == 60?1:0 + GET_LEVEL(ch) > 56 ? 1 : 0 + GET_LEVEL(ch) > 53 ? 1 : 0 + GET_LEVEL(ch) > 50 ? 1 : 0);
