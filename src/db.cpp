@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.141 2006/12/27 20:51:31 jhhudso Exp $ */
+/* $Id: db.cpp,v 1.142 2007/01/07 18:51:03 dcastle Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -4825,10 +4825,10 @@ void init_char(CHAR_DATA *ch)
 
   ch->armor = 100;
   ch->altar = NULL;
+  ch->spec = 0;
   GET_PROMPT(ch)          = 0;
   GET_LAST_PROMPT(ch)          = 0;
   ch->pcdata->skillchange = 0;
-  ch->pcdata->spec = 0;
   ch->pcdata->joining = 0;
   ch->pcdata->practices   = 0;
   ch->pcdata->time.birth  = time(0);
