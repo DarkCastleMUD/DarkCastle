@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.66 2006/12/28 11:20:40 jhhudso Exp $ */
+/* $Id: utility.cpp,v 1.67 2007/01/07 18:45:57 dcastle Exp $ */
 
 extern "C"
 {
@@ -1071,7 +1071,7 @@ int do_recall( CHAR_DATA *ch, char *argument, int cmd )
 
   // calculate the gold needed
   level = GET_LEVEL(victim);
-  if ((level > 10) && (level < 51))
+  if ((level > 10) && (level <= MAX_MORTAL))
   {
     cf   = 1 + ((level - 11) * .347f);
     cost = (int)(3440 * cf);
