@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.82 2007/01/01 20:22:18 dcastle Exp $ */
+/* $Id: limits.cpp,v 1.83 2007/01/07 22:23:12 dcastle Exp $ */
 
 extern "C"
 {
@@ -178,7 +178,7 @@ int mana_gain(CHAR_DATA *ch)
   }
 
 
-  if((GET_COND(ch,FULL)==0)||(GET_COND(ch,THIRST)==0)&&GET_LEVEL(ch) < 60)
+  if(((GET_COND(ch,FULL)==0)||(GET_COND(ch,THIRST)==0))&&GET_LEVEL(ch) < 60)
     gain >>= 2;
   gain /= 4;
   gain /= divisor; 
@@ -250,8 +250,9 @@ int hit_gain(CHAR_DATA *ch, int position)
   if(learned && skill_success(ch, NULL, SKILL_ENHANCED_REGEN))
      gain += 3 + learned / 5;
 
-  if((GET_COND(ch, FULL)==0) || (GET_COND(ch, THIRST)==0)&&GET_LEVEL(ch) < 60)
+  if(((GET_COND(ch, FULL)==0) || (GET_COND(ch, THIRST)==0))&&GET_LEVEL(ch) < 60)
     gain >>= 2;
+
   gain /= 4;
 //  gain -= MIN(age(ch).year,100) / 10;
 
@@ -302,7 +303,7 @@ int move_gain(CHAR_DATA *ch)
     }
 
 
-    if((GET_COND(ch,FULL)==0)||(GET_COND(ch,THIRST)==0)&&GET_LEVEL(ch) <60)
+    if(((GET_COND(ch,FULL)==0)||(GET_COND(ch,THIRST)==0))&&GET_LEVEL(ch) <60)
 	gain >>= 2;
    gain /= divisor;
    gain -= MIN(100, age(ch).year) / 10;
