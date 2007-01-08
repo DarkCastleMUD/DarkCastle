@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.131 2007/01/08 01:21:43 jhhudso Exp $ */
+/* $Id: info.cpp,v 1.132 2007/01/08 06:18:39 jhhudso Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -666,6 +666,11 @@ int do_botcheck(struct char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
+  if (victim->pcdata->lastseen.size() == 0) {
+    send_to_char("This character has not seen any mobs recently.\n\r", ch);
+    return eFAILURE;
+  }
+
   int nr;
   timeval seen, targeted, interval;
   for(multimap<int, pair<timeval, timeval> >::iterator i = victim->pcdata->lastseen.begin();
@@ -701,7 +706,7 @@ void list_char_to_char(struct char_data *list, struct char_data *ch, int mode)
    timeval tv, tv_zero = {0,0};
    
 
-   if (IS_PC(ch)) {
+   if (IS_PC(ch) && 0) {
      ch->pcdata->lastseen.clear();
    }
 
@@ -714,7 +719,7 @@ void list_char_to_char(struct char_data *list, struct char_data *ch, int mode)
       if ( IS_AFFECTED(ch, AFF_SENSE_LIFE) || CAN_SEE(ch, i)) {
          show_char_to_char(i, ch, 0);
 	 
-	 if (IS_PC(ch) && IS_NPC(i)) {
+	 if (IS_PC(ch) && IS_NPC(i) && 0) {
 	   gettimeofday(&tv, NULL);
 	   ch->pcdata->lastseen.insert(pair<int, pair<timeval, timeval> >(i->mobdata->nr, pair<timeval, timeval>(tv, tv_zero)));
 	 }
