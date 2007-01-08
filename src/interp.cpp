@@ -16,7 +16,7 @@
 /* 12/08/2003   Onager   Added chop_half() to work like half_chop() but    */
 /*                       chopping off the last word.                       */
 /***************************************************************************/
-/* $Id: interp.cpp,v 1.114 2006/12/01 02:08:52 jhhudso Exp $ */
+/* $Id: interp.cpp,v 1.115 2007/01/08 00:29:52 jhhudso Exp $ */
 
 extern "C"
 {
@@ -471,6 +471,7 @@ struct command_info cmd_info[] =
     { "listpathsbyzone",do_listPathsByZone,POSITION_DEAD, 108, 9, 0, 1 },
     { "listallpaths",	do_listAllPaths,POSITION_DEAD, 108, 9, 0, 1 },
     { "dopathpath",	do_pathpath,	POSITION_DEAD, 108, 9, 0, 1 },
+    { "lastseen",	do_lastseen,	POSITION_DEAD, 108, 9, 0, 1 },
 
     // Bug way down here after 'buy'
     { "bug",	do_bug,	POSITION_DEAD, 0, 9, 0, 1 },

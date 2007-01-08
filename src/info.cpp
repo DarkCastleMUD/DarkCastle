@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.129 2007/01/03 20:26:27 shane Exp $ */
+/* $Id: info.cpp,v 1.130 2007/01/08 00:29:52 jhhudso Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -635,6 +635,51 @@ void show_char_to_char(struct char_data *i, struct char_data *ch, int mode)
     }
 }
 
+#include <vector>
+using namespace std;
+
+int do_lastseen(struct char_data *ch, char *argument, int cmd)
+{
+  char_data *victim;
+  char name[MAX_STRING_LENGTH];
+
+  argument = one_argument(argument, name);
+
+  victim = get_char(name);
+  if (victim == NULL) {
+    send_to_char("Character not found.\n\r", ch);
+    return eFAILURE;
+  }
+
+  if (GET_LEVEL(victim) > GET_LEVEL(ch)) {
+    send_to_char("The character is a higher level than you.\n\r", ch);
+    return eFAILURE;
+  }
+
+  if (IS_NPC(victim)) {
+    send_to_char("The character is a mob.\n\r", ch);
+    return eFAILURE;
+  }
+
+  int vnum, seen, targeted, interval, nr;
+  for(multimap<int, pair<int,int> >::iterator i = victim->pcdata->lastseen.begin();
+      i != victim->pcdata->lastseen.end();
+      ++i) {
+    nr = (*i).first;
+    seen = (*i).second.first;
+    targeted = (*i).second.second;
+    interval = targeted - seen;
+    if (interval < 0)
+      interval = -1;
+    
+    if (nr >=0) {
+      csendf(ch, "[%4d] [%5d] [%s]\n\r", interval, mob_index[nr].virt,
+	     ((struct char_data *)(mob_index[nr].item))->short_desc);
+    }
+  }
+
+  return eSUCCESS;
+}
 
 
 void list_char_to_char(struct char_data *list, struct char_data *ch, int mode)
@@ -642,16 +687,24 @@ void list_char_to_char(struct char_data *list, struct char_data *ch, int mode)
    struct char_data *i;
    int known = has_skill(ch, SKILL_BLINDFIGHTING);
 
+   if (IS_PC(ch)) {
+     ch->pcdata->lastseen.clear();
+   }
+
    for (i = list; i ; i = i->next_in_room) {
       if (ch == i)
          continue;
       if(!IS_MOB(i) && (i->pcdata->wizinvis > GET_LEVEL(ch)))
          if(!i->pcdata->incognito || !( ch->in_room == i->in_room))
             continue;
-      if ( IS_AFFECTED(ch, AFF_SENSE_LIFE) || CAN_SEE(ch, i))
+      if ( IS_AFFECTED(ch, AFF_SENSE_LIFE) || CAN_SEE(ch, i)) {
          show_char_to_char(i, ch, 0);
-      else if (IS_DARK(ch->in_room))
-      {
+	 
+	 if (IS_PC(ch) && IS_NPC(i)) {
+	   ch->pcdata->lastseen.insert(pair<int, pair<int,int> >(i->mobdata->nr, make_pair(time(NULL), 0)));
+	 }
+
+      } else if (IS_DARK(ch->in_room)) {
          if(known && skill_success(ch,NULL,SKILL_BLINDFIGHTING))
             send_to_char("Your blindfighting awareness alerts you to a presense in the area.\n\r", ch);
          else if(number(1, 10) == 1)

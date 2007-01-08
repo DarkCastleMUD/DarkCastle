@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.148 2007/01/01 20:00:12 jhhudso Exp $ */
+/* $Id: handler.cpp,v 1.149 2007/01/08 00:29:52 jhhudso Exp $ */
     
 extern "C"
 {
@@ -3239,6 +3239,37 @@ CHAR_DATA *get_rand_other_char_room_vis(CHAR_DATA *ch)
 
 }
 
+void lastseen_targeted(char_data *ch, char_data *victim)
+{
+  static char_data *last_ch;
+  static char_data *last_victim;
+
+  // Check if we just ran this function already
+  if (last_ch == ch && last_victim == victim) {
+    return;
+  } else {
+    last_ch = ch;
+    last_victim = victim;
+  }
+
+  if (ch == 0 || victim == 0 || IS_PC(victim) || IS_NPC(ch))
+    return;
+
+  int nr = victim->mobdata->nr;
+
+  multimap<int, pair<int, int> >::iterator i;
+  i = ch->pcdata->lastseen.find(nr);
+
+  for (unsigned int j=0; j < ch->pcdata->lastseen.count(nr); j++) {
+    if ((*i).second.second == 0) {
+      (*i).second.second = time(NULL);
+      return;
+    }
+    i++;
+  }
+
+  return;
+}
 
 CHAR_DATA *get_char_room_vis(CHAR_DATA *ch, char *name)
 {
@@ -3271,8 +3302,10 @@ CHAR_DATA *get_char_room_vis(CHAR_DATA *ch, char *name)
       if (number == 0 && IS_NPC(i)) continue;
       if (number == 1 || number == 0)
          {
-         if (isname(tmp, GET_NAME(i))&& CAN_SEE(ch,i))
-            return(i);
+	   if (isname(tmp, GET_NAME(i))&& CAN_SEE(ch,i)) {
+	     lastseen_targeted(ch, i);
+	     return(i);
+	   }
          else if (isname2(tmp, GET_NAME(i))&& CAN_SEE(ch,i))
             {
             if (partial_match) 
@@ -3289,12 +3322,17 @@ CHAR_DATA *get_char_room_vis(CHAR_DATA *ch, char *name)
          if(isname(tmp, GET_NAME(i)) && CAN_SEE(ch,i))
             {
 	    j++;
-            if(j == number)
-               return(i);
+            if(j == number) {
+	      // here
+	      lastseen_targeted(ch, i);
+	      return(i);
+	    }
             }
          }
 	   }
-    return(partial_match);
+   // here
+   lastseen_targeted(ch, partial_match);
+   return(partial_match);
 }
 
 CHAR_DATA *get_mob_room_vis(CHAR_DATA *ch, char *name)
