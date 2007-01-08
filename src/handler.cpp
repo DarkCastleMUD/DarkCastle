@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.149 2007/01/08 00:29:52 jhhudso Exp $ */
+/* $Id: handler.cpp,v 1.150 2007/01/08 01:21:43 jhhudso Exp $ */
     
 extern "C"
 {
@@ -50,6 +50,7 @@ extern "C"
 #include <returnvals.h>
 #include <innate.h>
 #include <set.h>
+#include <sys/time.h>
 
 extern CWorld world;
  
@@ -3257,12 +3258,19 @@ void lastseen_targeted(char_data *ch, char_data *victim)
 
   int nr = victim->mobdata->nr;
 
-  multimap<int, pair<int, int> >::iterator i;
+  multimap<int, pair<timeval, timeval> >::iterator i;
   i = ch->pcdata->lastseen.find(nr);
 
+  //  struct timeval {
+  //    time_t      tv_sec;     /* seconds */
+  //    suseconds_t tv_usec;    /* microseconds */
+  //  };
+
+  timeval tv;
   for (unsigned int j=0; j < ch->pcdata->lastseen.count(nr); j++) {
-    if ((*i).second.second == 0) {
-      (*i).second.second = time(NULL);
+    if ((*i).second.second.tv_sec == 0) {
+      gettimeofday(&tv, NULL);
+      (*i).second.second = tv;
       return;
     }
     i++;

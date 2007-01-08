@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.130 2007/01/08 00:29:52 jhhudso Exp $ */
+/* $Id: info.cpp,v 1.131 2007/01/08 01:21:43 jhhudso Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -42,6 +42,9 @@ extern "C"
 #include <set.h>
 #include <returnvals.h>
 #include <fileinfo.h>
+#include <map>
+
+using namespace std;
 
 /* extern variables */
 
@@ -635,15 +638,17 @@ void show_char_to_char(struct char_data *i, struct char_data *ch, int mode)
     }
 }
 
-#include <vector>
-using namespace std;
-
-int do_lastseen(struct char_data *ch, char *argument, int cmd)
+int do_botcheck(struct char_data *ch, char *argument, int cmd)
 {
   char_data *victim;
   char name[MAX_STRING_LENGTH];
 
   argument = one_argument(argument, name);
+
+  if (name == NULL) {
+    send_to_char("botcheck <player>\n\r\n\r", ch);
+    return eFAILURE;
+  }
 
   victim = get_char(name);
   if (victim == NULL) {
@@ -661,19 +666,26 @@ int do_lastseen(struct char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  int vnum, seen, targeted, interval, nr;
-  for(multimap<int, pair<int,int> >::iterator i = victim->pcdata->lastseen.begin();
+  int nr;
+  timeval seen, targeted, interval;
+  for(multimap<int, pair<timeval, timeval> >::iterator i = victim->pcdata->lastseen.begin();
       i != victim->pcdata->lastseen.end();
       ++i) {
     nr = (*i).first;
     seen = (*i).second.first;
     targeted = (*i).second.second;
-    interval = targeted - seen;
-    if (interval < 0)
-      interval = -1;
+    interval.tv_sec = targeted.tv_sec - seen.tv_sec;
+    interval.tv_usec = targeted.tv_usec - seen.tv_usec;
+    if (interval.tv_sec < 0) {
+      interval.tv_sec = -1;
+    }
+
+    if (interval.tv_usec < 0) {
+      interval.tv_usec = -1;
+    }
     
     if (nr >=0) {
-      csendf(ch, "[%4d] [%5d] [%s]\n\r", interval, mob_index[nr].virt,
+      csendf(ch, "[%2d %6d] [%5d] [%s]\n\r", interval.tv_sec, interval.tv_usec, mob_index[nr].virt,
 	     ((struct char_data *)(mob_index[nr].item))->short_desc);
     }
   }
@@ -686,6 +698,8 @@ void list_char_to_char(struct char_data *list, struct char_data *ch, int mode)
 {
    struct char_data *i;
    int known = has_skill(ch, SKILL_BLINDFIGHTING);
+   timeval tv, tv_zero = {0,0};
+   
 
    if (IS_PC(ch)) {
      ch->pcdata->lastseen.clear();
@@ -701,7 +715,8 @@ void list_char_to_char(struct char_data *list, struct char_data *ch, int mode)
          show_char_to_char(i, ch, 0);
 	 
 	 if (IS_PC(ch) && IS_NPC(i)) {
-	   ch->pcdata->lastseen.insert(pair<int, pair<int,int> >(i->mobdata->nr, make_pair(time(NULL), 0)));
+	   gettimeofday(&tv, NULL);
+	   ch->pcdata->lastseen.insert(pair<int, pair<timeval, timeval> >(i->mobdata->nr, pair<timeval, timeval>(tv, tv_zero)));
 	 }
 
       } else if (IS_DARK(ch->in_room)) {

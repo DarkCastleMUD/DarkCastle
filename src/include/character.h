@@ -1,7 +1,7 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.57 2007/01/08 00:29:52 jhhudso Exp $
+| $Id: character.h,v 1.58 2007/01/08 01:21:43 jhhudso Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
@@ -19,6 +19,7 @@
 #include <queue>
 #include <quest.h>
 #include <map>
+#include <sys/time.h>
 
 #define START_ROOM        3001 // Where you login
 #define CFLAG_HOME        3014 // Where the champion flag normally rests
@@ -263,7 +264,7 @@ struct pc_data
     int16  quest_pass[QUEST_PASS];
     uint32 quest_complete[QUEST_TOTAL/ASIZE+1];
     char *last_prompt;
-    std::multimap<int, std::pair<int, int> > lastseen;
+    std::multimap<int, std::pair<timeval, timeval> > lastseen;
 };
 
 struct mob_data
