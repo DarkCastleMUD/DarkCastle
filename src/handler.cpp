@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.151 2007/01/08 06:18:39 jhhudso Exp $ */
+/* $Id: handler.cpp,v 1.152 2007/01/10 19:53:08 jhhudso Exp $ */
     
 extern "C"
 {
@@ -3245,8 +3245,6 @@ void lastseen_targeted(char_data *ch, char_data *victim)
   static char_data *last_ch;
   static char_data *last_victim;
 
-  return;
-
   // Check if we just ran this function already
   if (last_ch == ch && last_victim == victim) {
     return;
@@ -3258,18 +3256,16 @@ void lastseen_targeted(char_data *ch, char_data *victim)
   if (ch == 0 || victim == 0 || IS_PC(victim) || IS_NPC(ch))
     return;
 
+  if (ch->pcdata->lastseen == 0)
+    ch->pcdata->lastseen = new multimap<int, pair<timeval, timeval> >;
+
   int nr = victim->mobdata->nr;
 
   multimap<int, pair<timeval, timeval> >::iterator i;
-  i = ch->pcdata->lastseen.find(nr);
-
-  //  struct timeval {
-  //    time_t      tv_sec;     /* seconds */
-  //    suseconds_t tv_usec;    /* microseconds */
-  //  };
+  i = ch->pcdata->lastseen->find(nr);
 
   timeval tv;
-  for (unsigned int j=0; j < ch->pcdata->lastseen.count(nr); j++) {
+  for (unsigned int j=0; j < ch->pcdata->lastseen->count(nr); j++) {
     if ((*i).second.second.tv_sec == 0) {
       gettimeofday(&tv, NULL);
       (*i).second.second = tv;

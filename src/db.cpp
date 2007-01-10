@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.142 2007/01/07 18:51:03 dcastle Exp $ */
+/* $Id: db.cpp,v 1.143 2007/01/10 19:53:08 jhhudso Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -4610,7 +4610,10 @@ void free_char( CHAR_DATA *ch )
       }
 
       if (ch->pcdata->away_msgs)
-	free(ch->pcdata->away_msgs); //Allocated using new, not dc_alloc
+	delete ch->pcdata->away_msgs;
+
+      if (ch->pcdata->lastseen)
+	delete ch->pcdata->lastseen;
 
       dc_free(ch->pcdata);
     }

@@ -1,7 +1,7 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.58 2007/01/08 01:21:43 jhhudso Exp $
+| $Id: character.h,v 1.59 2007/01/10 19:53:08 jhhudso Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
@@ -264,7 +264,7 @@ struct pc_data
     int16  quest_pass[QUEST_PASS];
     uint32 quest_complete[QUEST_TOTAL/ASIZE+1];
     char *last_prompt;
-    std::multimap<int, std::pair<timeval, timeval> > lastseen;
+    std::multimap<int, std::pair<timeval, timeval> > *lastseen;
 };
 
 struct mob_data

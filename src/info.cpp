@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.132 2007/01/08 06:18:39 jhhudso Exp $ */
+/* $Id: info.cpp,v 1.133 2007/01/10 19:53:08 jhhudso Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -644,53 +644,75 @@ int do_botcheck(struct char_data *ch, char *argument, int cmd)
   char name[MAX_STRING_LENGTH];
 
   argument = one_argument(argument, name);
-
-  if (name == NULL) {
-    send_to_char("botcheck <player>\n\r\n\r", ch);
+  if (!*name) {
+    send_to_char("botcheck <player> or all\n\r\n\r", ch);
     return eFAILURE;
   }
 
   victim = get_char(name);
+
+  if (victim == NULL && name != NULL && !strcmp(name, "all")) {
+    descriptor_data *d;
+    char_data *i;
+
+    for(d = descriptor_list; d; d = d->next) {
+      if(d->connected || !d->character)
+	continue;
+      if(!(i = d->original))
+	i = d->character;
+      if(!CAN_SEE(ch, i))
+	continue;
+      csendf(ch, "\n\r%s\n\r", GET_NAME(i));
+      send_to_char("----------\n\r", ch);
+      do_botcheck(ch, GET_NAME(i), 9);
+    }
+    return eSUCCESS;
+  }
+
   if (victim == NULL) {
-    send_to_char("Character not found.\n\r", ch);
+    csendf(ch, "Unable to find %s.\n\r", name);
     return eFAILURE;
   }
 
   if (GET_LEVEL(victim) > GET_LEVEL(ch)) {
-    send_to_char("The character is a higher level than you.\n\r", ch);
+    send_to_char("Unable to show information.\n\r", ch);
+    csendf(ch, "%s is a higher level than you.\n\r", GET_NAME(victim)); 
     return eFAILURE;
   }
 
   if (IS_NPC(victim)) {
-    send_to_char("The character is a mob.\n\r", ch);
+    send_to_char("Unable to show information.\n\r", ch);
+    csendf(ch, "%s is a mob.\n\r", GET_NAME(victim));
     return eFAILURE;
   }
 
-  if (victim->pcdata->lastseen.size() == 0) {
-    send_to_char("This character has not seen any mobs recently.\n\r", ch);
+  if (victim->pcdata->lastseen == 0)
+    victim->pcdata->lastseen = new multimap<int, pair<timeval, timeval> >;
+
+  if (victim->pcdata->lastseen->size() == 0) {
+    csendf(ch, "%s has not seen any mobs recently.\n\r", GET_NAME(victim));
     return eFAILURE;
   }
 
-  int nr;
-  timeval seen, targeted, interval;
-  for(multimap<int, pair<timeval, timeval> >::iterator i = victim->pcdata->lastseen.begin();
-      i != victim->pcdata->lastseen.end();
-      ++i) {
+  int nr, ms;
+  timeval seen, targeted;
+  double ts1,ts2;
+  for(multimap<int, pair<timeval, timeval> >::iterator i = victim->pcdata->lastseen->begin(); i != victim->pcdata->lastseen->end(); ++i) {
     nr = (*i).first;
     seen = (*i).second.first;
     targeted = (*i).second.second;
-    interval.tv_sec = targeted.tv_sec - seen.tv_sec;
-    interval.tv_usec = targeted.tv_usec - seen.tv_usec;
-    if (interval.tv_sec < 0) {
-      interval.tv_sec = -1;
+
+    ts1 = seen.tv_sec + ((double)seen.tv_usec/1000000.0);
+    ts2 = targeted.tv_sec + ((double)targeted.tv_usec/1000000.0);
+
+    if (ts2 > ts1) {
+      ms = (int)((ts2 - ts1)*1000.0);
+    } else {
+      ms = 0;
     }
 
-    if (interval.tv_usec < 0) {
-      interval.tv_usec = -1;
-    }
-    
     if (nr >=0) {
-      csendf(ch, "[%2d %6d] [%5d] [%s]\n\r", interval.tv_sec, interval.tv_usec, mob_index[nr].virt,
+      csendf(ch, "[%4dms] [%5d] [%s]\n\r", ms, mob_index[nr].virt,
 	     ((struct char_data *)(mob_index[nr].item))->short_desc);
     }
   }
@@ -701,15 +723,11 @@ int do_botcheck(struct char_data *ch, char *argument, int cmd)
 
 void list_char_to_char(struct char_data *list, struct char_data *ch, int mode)
 {
-   struct char_data *i;
-   int known = has_skill(ch, SKILL_BLINDFIGHTING);
-   timeval tv, tv_zero = {0,0};
+  bool clear_lastseen = false;
+  struct char_data *i;
+  int known = has_skill(ch, SKILL_BLINDFIGHTING);
+  timeval tv, tv_zero = {0,0};
    
-
-   if (IS_PC(ch) && 0) {
-     ch->pcdata->lastseen.clear();
-   }
-
    for (i = list; i ; i = i->next_in_room) {
       if (ch == i)
          continue;
@@ -719,9 +737,17 @@ void list_char_to_char(struct char_data *list, struct char_data *ch, int mode)
       if ( IS_AFFECTED(ch, AFF_SENSE_LIFE) || CAN_SEE(ch, i)) {
          show_char_to_char(i, ch, 0);
 	 
-	 if (IS_PC(ch) && IS_NPC(i) && 0) {
+	 if (IS_PC(ch) && IS_NPC(i)) {
+	   if (ch->pcdata->lastseen == 0)
+	     ch->pcdata->lastseen = new multimap<int, pair<timeval, timeval> >;
+
+	   if (clear_lastseen == false) {
+	     ch->pcdata->lastseen->clear();
+	     clear_lastseen = true;
+	   }
+
 	   gettimeofday(&tv, NULL);
-	   ch->pcdata->lastseen.insert(pair<int, pair<timeval, timeval> >(i->mobdata->nr, pair<timeval, timeval>(tv, tv_zero)));
+	   ch->pcdata->lastseen->insert(pair<int, pair<timeval, timeval> >(i->mobdata->nr, pair<timeval, timeval>(tv, tv_zero)));
 	 }
 
       } else if (IS_DARK(ch->in_room)) {
