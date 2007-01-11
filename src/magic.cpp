@@ -1102,7 +1102,7 @@ int spell_heroes_feast(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
     if ( (ch->in_room == tmp_victim->in_room) && (ch != tmp_victim) &&
 		(ARE_GROUPED(ch,tmp_victim) ))
     {
-       if (GET_COND(tmp_victim, FULL) > -1) 
+       if (GET_COND(tmp_victim, FULL) > -1 && GET_LEVEL(tmp_victim) < 60) 
        {
           GET_COND(tmp_victim, FULL) = result;
           GET_COND(tmp_victim, THIRST) = result;
