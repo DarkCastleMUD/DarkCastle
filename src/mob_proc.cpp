@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.130 2007/01/06 03:37:11 apocalypse Exp $ */
+/* $Id: mob_proc.cpp,v 1.131 2007/01/11 15:22:38 dcastle Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -3155,8 +3155,20 @@ static char *dethSayText [ ] =
   "Cows can have regional accents, says a professor of phonetics, after studying cattle in Somerset.",
   "The clitoris derives its name from the ancient Greek word kleitoris, meaning \"little hill\".",
   "Hexakosioihexekontahexaphobiacs is the term for people who fear the number 666.",
-  "The age limit for marriage in France was, until recently, 15 for girls, but 18 for boys. The age for girls was raised to 18 in 2006."
+  "The age limit for marriage in France was, until recently, 15 for girls, but 18 for boys. The age for girls was raised to 18 in 2006.",
   // End real facts :)
+
+  "A mind is a terrible thing to waste; I'm glad they didn't waste one on you.",
+  "If idiots could fly this place would be an airport.",
+  "How do I set a laser printer to stun?",
+  "I will always cherish the initial misconceptions I had about your being competent.",
+  "Too many freaks, not enough circuses.",
+  "I have plenty of talent and vision. I just don't give a fuck.",
+  "I like cats too. Let's exchange recipes.",
+  "If I throw a stick, will you go away?", 
+  "Those of you who think you know everything are very annoying to those of us who do.",
+  "It's not that I wish any harm to the Dingo, I'm just saying I could happily sit by while someone beheads him.",
+  "It is just you."
 };
 
 // ENDOFCHAIN
