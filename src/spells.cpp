@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.204 2007/01/01 19:20:09 jhhudso Exp $ */
+/* $Id: spells.cpp,v 1.205 2007/01/11 07:25:35 jhhudso Exp $ */
 
 extern "C"
 {
@@ -1557,6 +1557,11 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
 //  if (IS_NPC(ch))
 //    return eFAILURE;
 // Need to allow mob_progs to use cast without allowing charmies to
+
+  if (IS_NPC(ch) && ch->desc && ch->desc->original && ch->desc->original != ch->desc->character && GET_LEVEL(ch->desc->original) < IMMORTAL) {
+    send_to_char("You can't cast in this form.\n\r", ch);
+    return eFAILURE;
+  }
   
   if(IS_AFFECTED(ch, AFF_CHARM))
   {
