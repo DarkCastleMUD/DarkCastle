@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.221 2007/01/13 02:18:03 dcastle Exp $ */
+/* $Id: const.cpp,v 1.222 2007/01/13 02:29:30 dcastle Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1119,7 +1119,7 @@ struct class_skill_defines g_skills[] = { // all-class skills
 {    "consider",        SKILL_CONSIDER,         1,      90,     {INT,WIS} },
 {    "scan",            SKILL_SCAN,             3,      90,     {CON,WIS} },
 {    "switch",          SKILL_SWITCH,           5,      90,     {DEX,INT} },
-{    "rapid join",      SKILL_FASTJOIN,         7,      98,     {DEX, STR} },
+{    "rapid join",      SKILL_FASTJOIN,         7,      90,     {DEX, STR} },
 {    "release",         SKILL_RELEASE,          10,     90,     {WIS,INT} },
 {    "\n",              0,                      1,      0,      {0,0} }
 };
