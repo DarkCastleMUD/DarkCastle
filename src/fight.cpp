@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.402 2007/01/13 02:14:59 dcastle Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.403 2007/01/13 04:12:43 jhhudso Exp $ */
 
 extern "C"
 {
@@ -810,7 +810,25 @@ int do_lightning_shield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
       dam -= (int)(dam * (double)save/100);
     }
   }
-      
+
+  if ((learned = has_skill(ch, SKILL_DODGE)) >= 80) {
+    if (learned/3 > number(0,99)) {
+      act("$n steps quickly aside, avoiding the burst of $B$5lightning$R from your shield!", ch, 0, vict, TO_VICT, 0);
+      act("You step quickly aside, avoiding the burst of $B$5lightning$R from $N's shield!", ch, 0, vict, TO_CHAR, 0);
+      act("$n steps quickly aside, avoiding the burst of $B$5lightning$R from $N's shield!", ch, 0, vict, TO_ROOM, NOTVICT);
+      return eFAILURE;
+    }
+  }
+  
+  if ((learned = has_skill(ch, SKILL_SHIELDBLOCK)) >= 80 && ch->equipment[WEAR_SHIELD]) {
+    if (learned/3 > number(0,99)) {
+      act("$n deftly blocks your burst of $B$5lightning$R with $s $p!", ch, ch->equipment[WEAR_SHIELD], vict, TO_VICT, 0);
+      act("You defly block $N's burst of $B$5lightning$R with your $p!", ch, ch->equipment[WEAR_SHIELD], vict, TO_CHAR, 0);
+      act("$n deftly blocks $N's burst of $B$5lightning$R with $s $p!", ch, ch->equipment[WEAR_SHIELD], vict, TO_ROOM, NOTVICT);
+      return eFAILURE;
+    }
+  }
+     
   GET_HIT(ch) -= dam;
   do_dam_msgs(vict, ch, dam, SPELL_LIGHTNING_SHIELD, WIELD);
   update_pos(ch);
@@ -910,6 +928,24 @@ int do_fireshield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
     }
   }
     
+  if ((learned = has_skill(ch, SKILL_DODGE)) >= 80) {
+    if (learned/3 > number(0,99)) {
+      act("$n steps quickly aside, avoiding the burst of $B$4flame$R from your shield!", ch, 0, vict, TO_VICT, 0);
+      act("You step quickly aside, avoiding the burst of $B$4flame$R from $N's shield!", ch, 0, vict, TO_CHAR, 0);
+      act("$n steps quickly aside, avoiding the burst of $B$4flame$R from $N's shield!", ch, 0, vict, TO_ROOM, NOTVICT);
+      return eFAILURE;
+    }
+  }
+
+  if ((learned = has_skill(ch, SKILL_SHIELDBLOCK)) >= 80 && ch->equipment[WEAR_SHIELD]) {
+    if (learned/3 > number(0,99)) {
+      act("$n deftly blocks your burst of $B$4flame$R with $s $p!", ch, ch->equipment[WEAR_SHIELD], vict, TO_VICT, 0);
+      act("You defly block $N's burst of $B$4flame$R with your $p!", ch, ch->equipment[WEAR_SHIELD], vict, TO_CHAR, 0);
+      act("$n deftly blocks $N's burst of $B$4flame$R with $s $p!", ch, ch->equipment[WEAR_SHIELD], vict, TO_ROOM, NOTVICT);
+      return eFAILURE;
+    }
+  }
+
   GET_HIT(ch) -= dam;
   do_dam_msgs(vict, ch, dam, SPELL_FIRESHIELD, WIELD);                         
   update_pos(ch);
@@ -978,7 +1014,25 @@ int do_acidshield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
       dam -= (int)(dam * (double)save/100);
     }
   }
-    
+
+  if ((learned = has_skill(ch, SKILL_DODGE)) >= 80) {
+    if (learned/3 > number(0,99)) {
+      act("$n steps quickly aside, avoiding the burst of $B$2acid$R from your shield!", ch, 0, vict, TO_VICT, 0);
+      act("You step quickly aside, avoiding the burst of $B$2acid$R from $N's shield!", ch, 0, vict, TO_CHAR, 0);
+      act("$n steps quickly aside, avoiding the burst of $B$2acid$R from $N's shield!", ch, 0, vict, TO_ROOM, NOTVICT);
+      return eFAILURE;
+    }
+  }
+
+  if ((learned = has_skill(ch, SKILL_SHIELDBLOCK)) >= 80 && ch->equipment[WEAR_SHIELD]) {
+    if (learned/3 > number(0,99)) {
+      act("$n deftly blocks your burst of $B$2acid$R with $s $p!", ch, ch->equipment[WEAR_SHIELD], vict, TO_VICT, 0);
+      act("You defly block $N's burst of $B$2acid$R with your $p!", ch, ch->equipment[WEAR_SHIELD], vict, TO_CHAR, 0);
+      act("$n deftly blocks $N's burst of $B$2acid$R with $s $p!", ch, ch->equipment[WEAR_SHIELD], vict, TO_ROOM, NOTVICT);
+      return eFAILURE;
+    }
+  }
+   
   GET_HIT(ch) -= dam;
   do_dam_msgs(vict, ch, dam, SPELL_ACID_SHIELD, WIELD);
   update_pos(ch);
