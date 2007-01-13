@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.400 2007/01/13 01:45:08 dcastle Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.401 2007/01/13 02:14:13 dcastle Exp $ */
 
 extern "C"
 {
@@ -445,7 +445,7 @@ bool gets_dual_wield_attack(char_data * ch)
   if(!has_skill(ch, SKILL_DUAL_WIELD))
     return FALSE;
 
-  if(!skill_success(ch,NULL,SKILL_DUAL_WIELD))
+  if(!skill_success(ch,NULL,SKILL_DUAL_WIELD,15))
     return FALSE;
 
   return TRUE;
@@ -5374,7 +5374,7 @@ int second_attack(CHAR_DATA *ch)
   if((IS_NPC(ch)) && (ISSET(ch->mobdata->actflags, ACT_2ND_ATTACK)))
     return TRUE;
   learned = has_skill(ch, SKILL_SECOND_ATTACK);
-  if(learned && skill_success(ch,NULL, SKILL_SECOND_ATTACK)) {
+  if(learned && skill_success(ch,NULL, SKILL_SECOND_ATTACK,15)) {
     return TRUE;
   }
   return FALSE;
@@ -5387,7 +5387,7 @@ int third_attack(CHAR_DATA *ch)
   if((IS_NPC(ch)) && (ISSET(ch->mobdata->actflags, ACT_3RD_ATTACK)))
     return TRUE;
   learned = has_skill(ch, SKILL_THIRD_ATTACK);
-  if(learned && skill_success(ch,NULL,SKILL_THIRD_ATTACK)) {
+  if(learned && skill_success(ch,NULL,SKILL_THIRD_ATTACK,15)) {
     return TRUE;
   }
   return FALSE;
