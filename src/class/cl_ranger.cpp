@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: cl_ranger.cpp,v 1.79 2006/11/27 21:21:25 pirahna Exp $ | cl_ranger.C  *
+ * $Id: cl_ranger.cpp,v 1.80 2007/01/13 03:55:53 dcastle Exp $ | cl_ranger.C  *
  * Description: Ranger skills/spells                                          *
  *                                                                            *
  * Revision History                                                           *
@@ -747,7 +747,6 @@ int do_forage(CHAR_DATA *ch, char *arg, int cmd)
     return eFAILURE;
   }
 
-  skill_increase_check(ch, SKILL_FORAGE, learned, SKILL_INCREASE_HARD);
 
   int pick = number(1, 100);
   int ovnum;
@@ -800,6 +799,7 @@ int do_forage(CHAR_DATA *ch, char *arg, int cmd)
   af.bitvector = -1;
   affect_to_char(ch, &af, PULSE_VIOLENCE);
   
+  skill_increase_check(ch, SKILL_FORAGE, learned, SKILL_INCREASE_HARD);
   if(!new_obj) {
     act("$n forages around for some food, but turns up nothing.", ch, 0, 0, TO_ROOM, 0);
     act("You forage around for some food, but turn up nothing.", ch, 0, 0, TO_CHAR, 0);
