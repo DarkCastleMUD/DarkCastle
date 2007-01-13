@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.135 2007/01/13 03:49:22 dcastle Exp $ */
+/* $Id: info.cpp,v 1.136 2007/01/13 04:37:16 dcastle Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -2330,7 +2330,7 @@ int do_consider(struct char_data *ch, char *argument, int cmd)
    else if ( x <=   1 ) y = 4;
    else if ( x <=   2 ) y = 5;
    else if ( x <=   4 ) y = 6;
-   else if ( x <=   9 ) y = 6;
+   else if ( x <=   9 ) y = 7;
    else						y = 8;
    
    send_to_char("Level comparison: ", ch);
