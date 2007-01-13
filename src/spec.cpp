@@ -69,6 +69,13 @@ int do_spec(CHAR_DATA *ch, char *argument, int cmd)
     }
     send_to_char(buf, ch);
   } else if (!str_cmp(arg, "unlearn")) {
+       argument = one_argument(argument,arg);
+       if (str_cmp(arg,"iamsure"))
+       {
+     // messagemoose, couple below too
+	 send_to_char("You will have to type \"profession unlearn iamsure\"\r\nThis costs 10,000 platinum coins and is not reversable.\r\n",ch);
+	 return eFAILURE;
+       }
        if (ch->spec == 0)
        {
 	 send_to_char("You do not have a specialization.\r\n",ch);
@@ -102,9 +109,12 @@ int do_spec(CHAR_DATA *ch, char *argument, int cmd)
        ch->saves[SAVE_TYPE_ACID] -= (GET_LEVEL(ch) == 60?1:0 + GET_LEVEL(ch) > 56 ? 1 : 0 + GET_LEVEL(ch) > 53 ? 1 : 0 + GET_LEVEL(ch) > 50 ? 1 : 0);
        ch->saves[SAVE_TYPE_MAGIC] -= (GET_LEVEL(ch) == 60?1:0 + GET_LEVEL(ch) > 56 ? 1 : 0 + GET_LEVEL(ch) > 53 ? 1 : 0 + GET_LEVEL(ch) > 50 ? 1 : 0);
        ch->saves[SAVE_TYPE_POISON] -= (GET_LEVEL(ch) == 60?1:0 + GET_LEVEL(ch) > 56 ? 1 : 0 + GET_LEVEL(ch) > 53 ? 1 : 0 + GET_LEVEL(ch) > 50 ? 1 : 0);
-       GET_LEVEL(ch) = 50;
-       send_to_char("You forget your specilization.\r\n",ch);
+       GET_LEVEL(ch) = 51;
 
+      //messagemoose
+       send_to_char("You forget your specilization.\r\n",ch);
+  } else if (!str_cmp(arg, "learn")) {
+   	
   }
   return eSUCCESS;
 }

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.37 2006/11/25 03:11:18 jhhudso Exp $
+| $Id: wizard.cpp,v 1.38 2007/01/13 03:49:26 dcastle Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -276,7 +276,7 @@ void boro_mob_stat(struct char_data *ch, struct char_data *k)
 
 	buf2, // who the mob hates
 	k->level,
-	GET_MOVE(k),move_limit(k),move_gain(k),
+	GET_MOVE(k),move_limit(k),move_gain(k,0),
 	/* end of first line */
 	
 	buf3, // who the mob fears, if anyone
@@ -621,7 +621,7 @@ void mob_stat(struct char_data *ch, struct char_data *k)
   sprintf(buf, "$3Mana$R:[%5d/%5d+%-4d]  $3Hit$R:[%5d/%5d+%-3d]  $3Move$R:[%5d/%5d+%-3d]  $3Ki$R:[%3d/%3d]\n\r",
           GET_MANA(k),mana_limit(k),mana_gain(k),
           GET_HIT(k),hit_limit(k),hit_gain(k),
-          GET_MOVE(k),move_limit(k),move_gain(k),
+          GET_MOVE(k),move_limit(k),move_gain(k,0),
           GET_KI(k), ki_limit(k));
   send_to_char(buf,ch);
      

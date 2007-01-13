@@ -39,7 +39,7 @@ struct obj_data *  obj_store_to_char(CHAR_DATA *ch, FILE *fpsave, struct obj_dat
 extern int hit_gain(CHAR_DATA *ch);
 extern int mana_gain(CHAR_DATA*ch);
 extern int ki_gain(CHAR_DATA *ch);
-extern int move_gain(CHAR_DATA *ch);
+extern int move_gain(CHAR_DATA *ch, int extra);
 
 // const.cpp
 extern struct race_shit race_info[];
@@ -354,7 +354,7 @@ int do_golem_score(struct char_data *ch, char *argument, int cmd)
       GET_CON(ch), GET_RAW_CON(ch), GET_LEVEL(ch), GET_MOVE(ch), GET_MAX_MOVE(ch),
       GET_INT(ch), GET_RAW_INT(ch), GET_HEIGHT(ch), GET_KI(ch),  GET_MAX_KI(ch),
       GET_WIS(ch), GET_RAW_WIS(ch), GET_WEIGHT(ch),
-      hit_gain(ch), mana_gain(ch), move_gain(ch), ki_gain(ch), GET_AGE(ch), GET_ALIGNMENT(ch));
+      hit_gain(ch), mana_gain(ch), move_gain(ch,0), ki_gain(ch), GET_AGE(ch), GET_ALIGNMENT(ch));
    send_to_char(buf, master);
 
      sprintf(buf,

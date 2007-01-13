@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.134 2007/01/13 03:23:22 dcastle Exp $ */
+/* $Id: info.cpp,v 1.135 2007/01/13 03:49:22 dcastle Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -82,7 +82,7 @@ char *str_str(char *first, char *second);
 extern int hit_gain(CHAR_DATA *ch, int position);
 extern int mana_gain(CHAR_DATA*ch);
 extern int ki_gain(CHAR_DATA *ch);
-extern int move_gain(CHAR_DATA *ch);
+extern int move_gain(CHAR_DATA *ch, int extra);
 /* intern functions */
 
 void list_obj_to_char(struct obj_data *list,struct char_data *ch, int mode, bool show);
@@ -1445,7 +1445,7 @@ int do_score(struct char_data *ch, char *argument, int cmd)
       GET_CON(ch), GET_RAW_CON(ch), GET_LEVEL(ch), GET_MOVE(ch), GET_MAX_MOVE(ch),
       GET_INT(ch), GET_RAW_INT(ch), GET_HEIGHT(ch), GET_KI(ch),  GET_MAX_KI(ch), 
       GET_WIS(ch), GET_RAW_WIS(ch), GET_WEIGHT(ch), hit_gain(ch, 777), 
-      mana_gain(ch), move_gain(ch), ki_gain(ch), GET_AGE(ch), 
+      mana_gain(ch), move_gain(ch,777), ki_gain(ch), GET_AGE(ch), 
       GET_ALIGNMENT(ch));
    send_to_char(buf, ch);
 

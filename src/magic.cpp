@@ -11190,7 +11190,7 @@ int spell_debility(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
   extern int hit_gain(CHAR_DATA *ch);
   extern int mana_gain(CHAR_DATA*ch);
   extern int ki_gain(CHAR_DATA *ch);
-  extern int move_gain(CHAR_DATA *ch);
+  extern int move_gain(CHAR_DATA *ch, int extra);
 
   if(affected_by_spell(victim, SPELL_DEBILITY)) {
      send_to_char("Your victim has already been debilitized.\r\n", ch);
@@ -11228,7 +11228,7 @@ int spell_debility(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
     af.bitvector = -1;
     affect_to_char(victim, &af);
     af.location = APPLY_MOVE_REGEN;
-    af.modifier = 0 - (int)((double)move_gain(victim) * (percent / 100));
+    af.modifier = 0 - (int)((double)move_gain(victim,0) * (percent / 100));
     affect_to_char(victim, &af);
     af.location = APPLY_KI_REGEN;
     af.modifier = 0 - (int)((double)ki_gain(victim) * (percent / 100));

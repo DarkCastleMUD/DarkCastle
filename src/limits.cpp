@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.83 2007/01/07 22:23:12 dcastle Exp $ */
+/* $Id: limits.cpp,v 1.84 2007/01/13 03:49:22 dcastle Exp $ */
 
 extern "C"
 {
@@ -210,6 +210,11 @@ int hit_gain(CHAR_DATA *ch, int position)
   struct affected_type * af;
   int divisor =1;
   int learned = has_skill(ch, SKILL_ENHANCED_REGEN);
+  bool improve = TRUE;
+  if (position == 777) {
+    improve = FALSE;
+    position = GET_POS(ch);
+  }
  /* Neat and fast */
   if(IS_NPC(ch))
   {
@@ -221,6 +226,7 @@ int hit_gain(CHAR_DATA *ch, int position)
     gain = (int)(ch->max_hit * (float)hit_regens[GET_CLASS(ch)] /100);
 
     /* Position calculations    */
+
     switch (position) {
       case POSITION_SLEEPING: divisor = 1; break;
       case POSITION_RESTING:  divisor = 2; break;
@@ -247,7 +253,7 @@ int hit_gain(CHAR_DATA *ch, int position)
   if (ISSET(ch->affected_by, AFF_REGENERATION))
     gain += (gain/2);
 
-  if(learned && skill_success(ch, NULL, SKILL_ENHANCED_REGEN))
+  if(learned && (!improve || skill_success(ch, NULL, SKILL_ENHANCED_REGEN)))
      gain += 3 + learned / 5;
 
   if(((GET_COND(ch, FULL)==0) || (GET_COND(ch, THIRST)==0))&&GET_LEVEL(ch) < 60)
@@ -275,13 +281,15 @@ int hit_gain(CHAR_DATA *ch)
    return hit_gain(ch, GET_POS(ch));
 }
 
-int move_gain(CHAR_DATA *ch)
+int move_gain(CHAR_DATA *ch, int extra)
 /* move gain pr. game hour */
 {
     int gain;
     int divisor = 100000;
     int learned = has_skill(ch, SKILL_ENHANCED_REGEN);
     struct affected_type * af;
+    bool improve = TRUE;
+    if (extra == 777) improve = FALSE;
 
     if(IS_NPC(ch)) {
 	return(GET_LEVEL(ch));  
@@ -311,7 +319,7 @@ int move_gain(CHAR_DATA *ch)
   if (ch->move_regen > 0)
    gain += ch->move_regen;
 
-  if(learned && skill_success(ch, NULL, SKILL_ENHANCED_REGEN))
+  if(learned && (!improve || skill_success(ch, NULL, SKILL_ENHANCED_REGEN)))
      gain += 3 + learned / 10;
 
   if (GET_LEVEL(ch) < 50)
@@ -781,7 +789,7 @@ void point_update( void )
       if (!affected_by_spell(i, SPELL_DIV_INT_TIMER2))
 	GET_MANA(i) = MIN(GET_MANA(i) + mana_gain(i), mana_limit(i));
 
-      GET_MOVE(i) = MIN(GET_MOVE(i) + move_gain(i), move_limit(i));
+      GET_MOVE(i) = MIN(GET_MOVE(i) + move_gain(i,0), move_limit(i));
       GET_KI(i)   = MIN(GET_KI(i)   + ki_gain(i),   ki_limit(i));
     }
     else if( !IS_MOB(i) && GET_LEVEL(i) < 2 && !i->desc ) {
