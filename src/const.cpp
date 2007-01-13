@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.220 2006/12/30 18:24:24 dcastle Exp $ */
+/* $Id: const.cpp,v 1.221 2007/01/13 02:18:03 dcastle Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1527,7 +1527,7 @@ struct class_skill_defines c_skills[] = { // cleric skills
 {    "detect invisibility",  SPELL_DETECT_INVISIBLE,  12,     85,     {INT,DEX} },
 {    "remove poison",        SPELL_REMOVE_POISON,     13,     90,     {CON,WIS} },
 {    "dispel minor",         SPELL_DISPEL_MINOR,      14,     85,     {INT,CON} },
-{    "dual wield",           SKILL_DUAL_WIELD,        15,     55,     {DEX,CON} },
+{    "dual wield",           SKILL_DUAL_WIELD,        15,     40,     {DEX,CON} },
 {    "remove blind",         SPELL_REMOVE_BLIND,      16,     98,     {INT,WIS} },
 {    "sense life",           SPELL_SENSE_LIFE,        17,     85,     {CON,INT} },     
 {    "sanctuary",            SPELL_SANCTUARY,         18,     90,     {WIS,INT} },     
