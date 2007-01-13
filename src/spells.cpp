@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.205 2007/01/11 07:25:35 jhhudso Exp $ */
+/* $Id: spells.cpp,v 1.206 2007/01/13 02:13:55 dcastle Exp $ */
 
 extern "C"
 {
@@ -1519,8 +1519,12 @@ bool skill_success(CHAR_DATA *ch, CHAR_DATA *victim, int skillnum, int mod )
 	|| GET_CLASS(ch) == CLASS_THIEF )
        i += int_app[GET_INT(ch)].conc_bonus;
   else i += wis_app[GET_WIS(ch)].conc_bonus;
-  
-  i = MIN(95, i);
+
+
+  if (skillnum != SKILL_THIRD_ATTACK && skillnum != SKILL_SECOND_ATTACK && skillnum != SKILL_DOUBLE_ATTACK)
+    i = MIN(95, i);
+  else i = MIN(98,i);
+
   i = skillmax(ch, skillnum, i);
   if (IS_AFFECTED(ch, AFF_FOCUS) && 
 ((skillnum >= SKILL_SONG_BASE && 
