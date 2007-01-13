@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.133 2007/01/10 19:53:08 jhhudso Exp $ */
+/* $Id: info.cpp,v 1.134 2007/01/13 03:23:22 dcastle Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -79,7 +79,7 @@ struct time_info_data age(struct char_data *ch);
 void page_string(struct descriptor_data *d, char *str, int keep_internal);
 struct clan_data * get_clan(struct char_data *);
 char *str_str(char *first, char *second);
-extern int hit_gain(CHAR_DATA *ch);
+extern int hit_gain(CHAR_DATA *ch, int position);
 extern int mana_gain(CHAR_DATA*ch);
 extern int ki_gain(CHAR_DATA *ch);
 extern int move_gain(CHAR_DATA *ch);
@@ -737,7 +737,7 @@ void list_char_to_char(struct char_data *list, struct char_data *ch, int mode)
       if ( IS_AFFECTED(ch, AFF_SENSE_LIFE) || CAN_SEE(ch, i)) {
          show_char_to_char(i, ch, 0);
 	 
-	 if (IS_PC(ch) && IS_NPC(i)) {
+/*	 if (IS_PC(ch) && IS_NPC(i)) {
 	   if (ch->pcdata->lastseen == 0)
 	     ch->pcdata->lastseen = new multimap<int, pair<timeval, timeval> >;
 
@@ -749,7 +749,7 @@ void list_char_to_char(struct char_data *list, struct char_data *ch, int mode)
 	   gettimeofday(&tv, NULL);
 	   ch->pcdata->lastseen->insert(pair<int, pair<timeval, timeval> >(i->mobdata->nr, pair<timeval, timeval>(tv, tv_zero)));
 	 }
-
+*/
       } else if (IS_DARK(ch->in_room)) {
          if(known && skill_success(ch,NULL,SKILL_BLINDFIGHTING))
             send_to_char("Your blindfighting awareness alerts you to a presense in the area.\n\r", ch);
@@ -1444,7 +1444,7 @@ int do_score(struct char_data *ch, char *argument, int cmd)
       GET_DEX(ch), GET_RAW_DEX(ch), pc_clss_types[(int)GET_CLASS(ch)], GET_MANA(ch), GET_MAX_MANA(ch),
       GET_CON(ch), GET_RAW_CON(ch), GET_LEVEL(ch), GET_MOVE(ch), GET_MAX_MOVE(ch),
       GET_INT(ch), GET_RAW_INT(ch), GET_HEIGHT(ch), GET_KI(ch),  GET_MAX_KI(ch), 
-      GET_WIS(ch), GET_RAW_WIS(ch), GET_WEIGHT(ch), hit_gain(ch), 
+      GET_WIS(ch), GET_RAW_WIS(ch), GET_WEIGHT(ch), hit_gain(ch, 777), 
       mana_gain(ch), move_gain(ch), ki_gain(ch), GET_AGE(ch), 
       GET_ALIGNMENT(ch));
    send_to_char(buf, ch);
