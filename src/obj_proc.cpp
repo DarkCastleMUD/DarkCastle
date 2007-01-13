@@ -343,12 +343,12 @@ int pushwand(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
 int holyavenger(CHAR_DATA *ch, struct obj_data *obj,  int cmd, char *arg, 
                    CHAR_DATA *invoker)
 {
-   // struct obj_data *wielded;
+  // struct obj_data *wielded;
    int percent, chance;
    CHAR_DATA *vict; 
 
    if(!(vict = ch->fighting)) {
-       return eFAILURE;
+     return eFAILURE;
    }
    if(GET_HIT(vict) < 3500) {
        percent = (100 * GET_HIT(vict)) / GET_MAX_HIT(vict);
@@ -361,34 +361,34 @@ int holyavenger(CHAR_DATA *ch, struct obj_data *obj,  int cmd, char *arg,
                if(chance > (2 * percent)) {
                    chance = number(0, 101);
                    if(chance > (2 * percent) && !IS_SET(vict->immune, ISR_SLASH)) {
-   if ((vict->equipment[WEAR_NECK_1] && obj_index[vict->equipment[WEAR_NECK_1]->item_number].virt == 518) ||
-(vict->equipment[WEAR_NECK_2] && obj_index[vict->equipment[WEAR_NECK_2]->item_number].virt == 518) 
-  && !number(0,1))
-   { // tarrasque's leash..
-	act("You attempt to behead $N, but your sword bounces of $S neckwear.",ch, 0, vict, TO_CHAR, 0);
-	act("$n attempts to behead $N, but fails.", ch, 0, vict, TO_ROOM, NOTVICT);
-	act("$n attempts to behead you, but cannot cut through your neckwear.",ch,0,vict,TO_VICT,0);
-	return eSUCCESS;
-   }
-   if(IS_AFFECTED(vict, AFF_NO_BEHEAD)) {
-      act("$N deftly dodges your beheading attempt!", ch, 0, vict, TO_CHAR, 0);
-      act("$N deftly dodges $n's attempt to behead $M!", ch, 0, vict, TO_ROOM, NOTVICT);
-      act("You deftly avoid $n's attempt to lop your head off!", ch, 0, vict, TO_VICT, 0);
-      return eSUCCESS;
-   }
-                       act("You feel your life end as $n's sword SLICES YOUR HEAD OFF!", ch, 0, vict, TO_VICT, 0);
-                       act("You SLICE $N's head CLEAN OFF $S body!", ch, 0, vict, TO_CHAR, 0);
-                       act("$n cleanly slices $N's head off $S body!", ch, 0, vict, TO_ROOM, NOTVICT);
-                       GET_HIT(vict) = -20;
-                       make_head(vict);
-                       group_gain(ch, vict); 
-                       fight_kill(ch, vict, TYPE_CHOOSE, 0);
-                       return eSUCCESS|eVICT_DIED; /* Zero means kill it! */
-			// it died..
+		     if ((vict->equipment[WEAR_NECK_1] && obj_index[vict->equipment[WEAR_NECK_1]->item_number].virt == 518) ||
+			 (vict->equipment[WEAR_NECK_2] && obj_index[vict->equipment[WEAR_NECK_2]->item_number].virt == 518) 
+			 && !number(0,1))
+		       { // tarrasque's leash..
+			 act("You attempt to behead $N, but your sword bounces of $S neckwear.",ch, 0, vict, TO_CHAR, 0);
+			 act("$n attempts to behead $N, but fails.", ch, 0, vict, TO_ROOM, NOTVICT);
+			 act("$n attempts to behead you, but cannot cut through your neckwear.",ch,0,vict,TO_VICT,0);
+			 return eSUCCESS;
+		       }
+		     if(IS_AFFECTED(vict, AFF_NO_BEHEAD)) {
+		       act("$N deftly dodges your beheading attempt!", ch, 0, vict, TO_CHAR, 0);
+		       act("$N deftly dodges $n's attempt to behead $M!", ch, 0, vict, TO_ROOM, NOTVICT);
+		       act("You deftly avoid $n's attempt to lop your head off!", ch, 0, vict, TO_VICT, 0);
+		       return eSUCCESS;
+		     }
+		     act("You feel your life end as $n's sword SLICES YOUR HEAD OFF!", ch, 0, vict, TO_VICT, 0);
+		     act("You SLICE $N's head CLEAN OFF $S body!", ch, 0, vict, TO_CHAR, 0);
+		     act("$n cleanly slices $N's head off $S body!", ch, 0, vict, TO_ROOM, NOTVICT);
+		     GET_HIT(vict) = -20;
+		     make_head(vict);
+		     group_gain(ch, vict); 
+		     fight_kill(ch, vict, TYPE_CHOOSE, 0);
+		     return eSUCCESS|eVICT_DIED; /* Zero means kill it! */
+		     // it died..
                    } else { /* You MISS the fucker! */
-                       act("You feel $n's sword slice by your head!", ch, 0, vict, TO_VICT, 0);
-                       act("You miss your attempt to behead $N.", ch, 0, vict, TO_CHAR, 0);
-                       act("$N jumps back as $n makes an attempt to BEHEAD $M!", ch, 0, vict, TO_ROOM, NOTVICT);
+		     act("You hear the SWOOSH sound of wind as $n's sword attempts to slice off your head!", ch, 0, vict, TO_VICT, 0);
+		     act("You miss your attempt to behead $N.", ch, 0, vict, TO_CHAR, 0);
+		     act("$N jumps back as $n makes an attempt to BEHEAD $M!", ch, 0, vict, TO_ROOM, NOTVICT);
                    }
                }
            }
