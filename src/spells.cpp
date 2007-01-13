@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.207 2007/01/13 02:15:58 dcastle Exp $ */
+/* $Id: spells.cpp,v 1.208 2007/01/13 04:45:25 jhhudso Exp $ */
 
 extern "C"
 {
@@ -1745,6 +1745,15 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
 	 	ok_self = TRUE;
 	   }
 	   target_ok = TRUE;
+
+	   // Reduce timer on paralyze even the victim is hit by a lightning bolt
+	   affected_type *af;
+	   if ((af = affected_by_spell(tar_char, SPELL_PARALYZE)) != NULL) {
+	     af->duration--;
+	     if (af->duration <= 0) {
+	       affect_remove(tar_char, af, 0);
+	     }
+	   }
 	 }
 	 spellcraft(ch, SPELL_LIGHTNING_BOLT);
       }
