@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.156 2007/01/14 20:42:31 jhhudso Exp $
+| $Id: cl_thief.cpp,v 1.157 2007/01/14 22:48:15 jhhudso Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -145,9 +145,12 @@ int do_eyegouge(CHAR_DATA *ch, char *argument, int cmd)
   {
      retval = damage(ch,victim, 0, TYPE_PIERCE, SKILL_EYEGOUGE, 0);
   } else {
-     SETBIT(victim->affected_by, AFF_BLIND);
-     SET_BIT(victim->combat, COMBAT_THI_EYEGOUGE);
-     retval = damage(ch, victim, level*2, TYPE_PIERCE, SKILL_EYEGOUGE, 0);
+    if (!IS_SET(victim->immune, TYPE_PIERCE)) {
+      SETBIT(victim->affected_by, AFF_BLIND);
+      SET_BIT(victim->combat, COMBAT_THI_EYEGOUGE);
+    }
+
+    retval = damage(ch, victim, level*2, TYPE_PIERCE, SKILL_EYEGOUGE, 0);
   }
 
   if(!SOMEONE_DIED(retval) || (!IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_WIMPY)))
