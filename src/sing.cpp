@@ -1432,6 +1432,9 @@ int song_stop( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int ski
       ch->song_data = 0;
    }
  
+   skill_increase_check(ch, SKILL_SONG_STOP,
+			has_skill(ch, song_info[SKILL_SONG_STOP].skill_num), SKILL_INCREASE_EASY);
+
    send_to_char("You finish off your song with a flourish...\n\r", ch);
    act("$n finishes $s song in a flourish and a bow.", ch, 0, 0, TO_ROOM, 0);
    ch->song_timer = 0;
