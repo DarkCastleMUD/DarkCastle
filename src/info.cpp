@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.137 2007/01/14 04:54:56 jhhudso Exp $ */
+/* $Id: info.cpp,v 1.138 2007/01/14 23:31:16 dcastle Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -1426,20 +1426,20 @@ int do_score(struct char_data *ch, char *argument, int cmd)
    
    sprintf(buf,
       "$7($5:$7)================================================="
-      "=======================($5:$7)\n\r"
-      "|=|  %-29s -- Character Attributes (DarkCastleMUD) |=|\n\r"
+      "========================($5:$7)\n\r"
+      "|=|  %-29s  -- Character Attributes (DarkCastleMUD) |=|\n\r"
       "($5:$7)===========================($5:$7)==================="
-      "=======================($5:$7)\n\r", GET_SHORT(ch));
+      "========================($5:$7)\n\r", GET_SHORT(ch));
    
    send_to_char(buf, ch);
    
    sprintf(buf,
-      "|\\|  $4Strength$7:      %4d (%2d) |/|  $1Race$7:   %-10s $1HitPts$7:%5d$1/$7(%5d) |~|\n\r"
-      "|~|  $4Dexterity$7:     %4d (%2d) |o|  $1Class$7:  %-11s$1Mana$7:   %4d$1/$7(%5d) |\\|\n\r"
-      "|/|  $4Constitution$7:  %4d (%2d) |\\|  $1Lvl$7:    %-8d   $1Fatigue$7:%4d$1/$7(%5d) |o|\n\r"
-      "|o|  $4Intelligence$7:  %4d (%2d) |~|  $1Height$7: %3d        $1Ki$7:     %4d$1/$7(%5d) |/|\n\r"
-      "|\\|  $4Wisdom$7:        %4d (%2d) |/|  $1Weight$7: %3d                             |~|\n\r"
-      "|~|  $3Rgn$7: $4H$7:%2d $4M$7:%2d $4V$7:%2d $4K$7:%2d |o|  $1Age$7:    %3d yrs    $1Align$7: %+5d         |\\|\n\r",
+      "|\\|  $4Strength$7:      %4d (%2d)   |/|  $1Race$7:  %-10s$1 HitPts$7:%5d$1/$7(%5d) |~|\n\r"
+      "|~|  $4Dexterity$7:     %4d (%2d)   |o|  $1Class$7: %-11s$1Mana$7:   %4d$1/$7(%5d) |\\|\n\r"
+      "|/|  $4Constitution$7:  %4d (%2d)   |\\|  $1Level$7:  %-6d    $1Fatigue$7:%4d$1/$7(%5d) |o|\n\r"
+      "|o|  $4Intelligence$7:  %4d (%2d)   |~|  $1Height$7: %3d       $1Ki$7:     %4d$1/$7(%5d) |/|\n\r"
+      "|\\|  $4Wisdom$7:        %4d (%2d)   |/|  $1Weight$7: %3d                            |~|\n\r"
+      "|~|  $3Rgn$7: $4H$7:%2d $4M$7:%3d $4V$7:%3d $4K$7:%2d |o|  $1Age$7:    %3d yrs   $1Align$7: %+5d         |\\|\n\r",
       GET_STR(ch), GET_RAW_STR(ch), race, GET_HIT(ch), GET_MAX_HIT(ch),
       GET_DEX(ch), GET_RAW_DEX(ch), pc_clss_types[(int)GET_CLASS(ch)], GET_MANA(ch), GET_MAX_MANA(ch),
       GET_CON(ch), GET_RAW_CON(ch), GET_LEVEL(ch), GET_MOVE(ch), GET_MAX_MOVE(ch),
@@ -1452,15 +1452,15 @@ int do_score(struct char_data *ch, char *argument, int cmd)
    if(!IS_NPC(ch)) // mobs can't view this part
    {
      sprintf(buf,
-      "($5:$7)===========================($5:$7)===($5:$7)====================================($5:$7)\n\r"
-      "|/|  $2Combat Statistics:$7             |\\|   $2Equipment and Valuables:$7         |o|\n\r"
-      "|o|   $3Armor$7:   %5d $3Pkills$7:  %5d |~|    $3Items Carried$7:  %-3d/(%-3d)       |/|\n\r"
-      "|\\|   $3BonusHit$7: %+4d $3PDeaths$7: %5d |/|    $3Weight Carried$7: %-3d/(%-4d)      |~|\n\r"
-      "|~|   $3BonusDam$7: %+4d $3RDeaths$7: %5d |o|    $3Experience$7:     %-10lld      |\\|\n\r"
-      "|/|   $B$4FIRE$R[%+3d] $B$3COLD$R[%+3d] $B$5NRGY$R[%+3d] |\\|    $3ExpTillLevel$7:   %-10lld      |o|\n\r"
-      "|o|   $B$2ACID$R[%+3d] $B$7MAGK$R[%+3d] $2POIS$7[%+3d] |~|    $3Gold$7: %-9d $3Platinum$7: %-5d |/|\n\r"
-      "|\\|   $3MELE$R[%+3d] $3SPEL$R[%+3d] $3SONG$R[%+3d] |/|    $3Bank$7: %-9d $3QPoints$7:  %-5d |-|\n\r"
-      "($5:$7)=================================($5:$7)====================================($5:$7)\n\r",
+      "($5:$7)===========================($5:$7)===($5:$7)=====================================($5:$7)\n\r"
+      "|/|  $2Combat Statistics:$7             |\\|   $2Equipment and Valuables:$7          |o|\n\r"
+      "|o|   $3Armor$7:   %5d $3Pkills$7:  %5d |~|    $3Items Carried$7:  %-3d/(%-3d)        |/|\n\r"
+      "|\\|   $3BonusHit$7: %+4d $3PDeaths$7: %5d |/|    $3Weight Carried$7: %-3d/(%-4d)       |~|\n\r"
+      "|~|   $3BonusDam$7: %+4d $3RDeaths$7: %5d |o|    $3Experience$7:     %-10lld       |\\|\n\r"
+      "|/|   $B$4FIRE$R[%+3d] $B$3COLD$R[%+3d] $B$5NRGY$R[%+3d] |\\|    $3ExpTillLevel$7:   %-10lld       |o|\n\r"
+      "|o|   $B$2ACID$R[%+3d] $B$7MAGK$R[%+3d] $2POIS$7[%+3d] |~|    $3Gold$7: %-9d $3Platinum$7: %-5d  |/|\n\r"
+      "|\\|   $3MELE$R[%+3d] $3SPEL$R[%+3d] $3SONG$R[%+3d] |/|    $3Bank$7: %-9d $3QPoints$7:  %-5d  |-|\n\r"
+      "($5:$7)=================================($5:$7)=====================================($5:$7)\n\r",
    GET_ARMOR(ch), GET_PKILLS(ch),   IS_CARRYING_N(ch), CAN_CARRY_N(ch),
    to_hit, GET_PDEATHS(ch),  IS_CARRYING_W(ch), CAN_CARRY_W(ch),
    to_dam, GET_RDEATHS(ch), GET_EXP(ch),
@@ -1472,7 +1472,7 @@ int do_score(struct char_data *ch, char *argument, int cmd)
      send_to_char(buf, ch);
    }
    else send_to_char(
-      "($5:$7)=================================($5:$7)===================================($5:$7)\n\r", ch);
+      "($5:$7)=================================($5:$7)====================================($5:$7)\n\r", ch);
    int found = FALSE;
 
    if((aff = ch->affected))
@@ -1549,7 +1549,7 @@ int do_score(struct char_data *ch, char *argument, int cmd)
          if(!aff_name) // not one we want displayed
            continue;
 
-         sprintf(buf, "|%c| Affected by %-25s %s Modifier %-13s  |%c|\n\r",						 
+         sprintf(buf, "|%c| Affected by %-25s %s Modifier %-13s   |%c|\n\r",						 
                scratch, aff_name,
                ((IS_AFFECTED(ch, AFF_DETECT_MAGIC) && aff->duration < 3) ? 
                           "$2(fading)$7" : "        "),modifyOutput?
@@ -1563,7 +1563,7 @@ int do_score(struct char_data *ch, char *argument, int cmd)
    }
    if (flying == 0 && IS_AFFECTED(ch, AFF_FLYING)) {
      scratch = frills[level];
-     sprintf(buf, "|%c| Affected by fly                                Modifier NONE           |%c|\n\r",
+     sprintf(buf, "|%c| Affected by fly                                Modifier NONE            |%c|\n\r",
              scratch, scratch);
      send_to_char(buf, ch);
      found = TRUE;
@@ -1574,7 +1574,7 @@ int do_score(struct char_data *ch, char *argument, int cmd)
    else elemental_score(ch,level);
 
    if(found)
-     send_to_char("($5:$7)========================================================================($5:$7)\n\r", ch);
+     send_to_char("($5:$7)=========================================================================($5:$7)\n\r", ch);
 
 
    if(!IS_NPC(ch)) // mob can't view this part
