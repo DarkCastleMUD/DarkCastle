@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.155 2007/01/02 20:18:41 dcastle Exp $
+| $Id: cl_thief.cpp,v 1.156 2007/01/14 20:42:31 jhhudso Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -238,10 +238,31 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
   // record the room I'm in.  Used to make sure a dual can go off.
   was_in = ch->in_room;
 
-  // failure
-  if(AWAKE(victim) && !skill_success(ch,victim,SKILL_BACKSTAB))
-    retval = damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_BACKSTAB, 0);
+  // Will this be a single or dual backstab this round?
+  bool perform_dual_backstab = false;
+  if(((GET_CLASS(ch) == CLASS_THIEF) || (GET_LEVEL(ch) >= ARCHANGEL)) &&
+     (ch->equipment[SECOND_WIELD])                                    &&
+     ((ch->equipment[SECOND_WIELD]->obj_flags.value[3] == 11) ||
+      (ch->equipment[SECOND_WIELD]->obj_flags.value[3] == 9))        &&
+     has_skill(ch, SKILL_DUAL_BACKSTAB)
+     )
+    {
+      if(skill_success(ch,victim,SKILL_DUAL_BACKSTAB)) {
+	perform_dual_backstab = true;
+      }
+    }
 
+  // failure
+  if(AWAKE(victim) && !skill_success(ch,victim,SKILL_BACKSTAB)) {
+    // If this is stab 1 of 2 for a dual backstab, we dont want people autojoining on the first stab
+    if (perform_dual_backstab && IS_PC(ch)) {
+      ch->pcdata->unjoinable = true;
+      retval = damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_BACKSTAB, 0);
+      ch->pcdata->unjoinable = false;
+    } else {
+      retval = damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_BACKSTAB, 0);
+    }
+  }
   // success
   else if(
           ( ( GET_LEVEL(victim) < IMMORTAL && !IS_NPC(victim) ) 
@@ -264,8 +285,16 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
         "before you.", ch, 0, victim, TO_CHAR, 0);
     return damage(ch, victim, 9999999, TYPE_UNDEFINED, SKILL_BACKSTAB, 0); 
   }
-  else
-    retval = attack(ch, victim, SKILL_BACKSTAB, FIRST);
+  else {
+    // If this is stab 1 of 2 for a dual backstab, we dont want people autojoining on the first stab
+    if (perform_dual_backstab && IS_PC(ch)) {
+      ch->pcdata->unjoinable = true;
+      retval = attack(ch, victim, SKILL_BACKSTAB, FIRST);
+      ch->pcdata->unjoinable = false;
+    } else {
+      retval = attack(ch, victim, SKILL_BACKSTAB, FIRST);
+    }
+  }
 
   if (retval & eVICT_DIED && !retval & eCH_DIED)
   {
@@ -285,30 +314,31 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
   if (!charExists(victim))// heh
       return eSUCCESS|eVICT_DIED;
 
-  // dual backstab
-  if((was_in == ch->in_room)                                          && 
-     ((GET_CLASS(ch) == CLASS_THIEF) || (GET_LEVEL(ch) >= ARCHANGEL)) &&
-     (ch->equipment[SECOND_WIELD])                                    &&
-     ((ch->equipment[SECOND_WIELD]->obj_flags.value[3] == 11) ||
-       (ch->equipment[SECOND_WIELD]->obj_flags.value[3] == 9))        &&
-     has_skill(ch, SKILL_DUAL_BACKSTAB)
-    )
-  {
-     if(skill_success(ch,victim,SKILL_DUAL_BACKSTAB)) {
-        if (AWAKE(victim) && !skill_success(ch,victim, SKILL_BACKSTAB))
-           retval = damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_BACKSTAB, SECOND);
-        else
-           retval = attack(ch, victim, SKILL_BACKSTAB, SECOND);
-
-        if (retval & eVICT_DIED && !retval & eCH_DIED) {
-	    if(!IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_WIMPY))
-	        WAIT_STATE(ch, PULSE_VIOLENCE * 2);
-	     else
-	       WAIT_STATE(ch, PULSE_VIOLENCE);
+  // If we're intended to have a dual backstab AND we still can
+  if (perform_dual_backstab == true) {
+    if (was_in == ch->in_room) {
+      if (AWAKE(victim) && !skill_success(ch,victim, SKILL_BACKSTAB)) {
+	retval = damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_BACKSTAB, SECOND);
+      } else {
+	retval = attack(ch, victim, SKILL_BACKSTAB, SECOND);
+      }
+      
+      if (retval & eVICT_DIED && !retval & eCH_DIED) {
+	if(!IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_WIMPY)) {
+	  WAIT_STATE(ch, PULSE_VIOLENCE * 2);
+	} else {
+	  WAIT_STATE(ch, PULSE_VIOLENCE);
 	}
-
-     }
+      }
+    } else {
+      // We were intended to have a dual backstab so we were unjoinable
+      // for the first stab, but apparently we moved, so there will be no
+      // second stab. We will kick off check_autojoiner now since it didnt
+      // run last time.
+      check_autojoiners(ch, 0);
+    }
   }
+
   if (!SOMEONE_DIED(retval)) {
     SET_BIT(retval, check_autojoiners(ch,1));
     if (!SOMEONE_DIED(retval))
