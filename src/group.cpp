@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: group.cpp,v 1.24 2006/08/22 09:51:02 shane Exp $
+| $Id: group.cpp,v 1.25 2007/01/14 11:08:07 jhhudso Exp $
 | group.C
 | Description:  Group related commands; join, abandon, follow, etc..
 */
@@ -27,9 +27,10 @@ extern "C"
 #include <string.h>
 #include <returnvals.h>
 #include <spells.h>
+#include <terminal.h>
 
 extern CWorld world;
- 
+char * calc_color(int hit, int max_hit);
 
 int do_abandon(CHAR_DATA *ch, char *argument, int cmd)
 {
@@ -270,18 +271,38 @@ void setup_group_buf(char * report, char_data * j, char_data *i)
   }
   else
   {
-    if(GET_CLASS(j) == CLASS_MONK || GET_CLASS(j) == CLASS_BARD)
-      sprintf(report, "[Lv %3d| %6d/%-6dhp %5d/%-5dk %5d/%-5dmv]",
-                   GET_LEVEL(j), GET_HIT(j), GET_MAX_HIT(j), GET_KI(j),
-                   GET_MAX_KI(j), GET_MOVE(j), GET_MAX_MOVE(j));
-    else if(GET_CLASS(j) == CLASS_WARRIOR || GET_CLASS(j) == CLASS_THIEF ||
-                   GET_CLASS(j) == CLASS_BARBARIAN) 
-      sprintf(report, "[Lv %3d| %6d/%-6dhp    -====-    %5d/%-5dmv]",
-                   GET_LEVEL(j), GET_HIT(j), GET_MAX_HIT(j), 
-                   GET_MOVE(j), GET_MAX_MOVE(j));
-    else sprintf(report, "[Lv %3d| %6d/%-6dhp %5d/%-5dm %5d/%-5dmv]",
+    if (IS_SET(i->pcdata->toggles, PLR_ANSI)) {
+      if(GET_CLASS(j) == CLASS_MONK || GET_CLASS(j) == CLASS_BARD)
+	sprintf(report, "[Lv %3d| %s%6d%s/%-6dhp %s%5d%s/%-5dk %s%5d%s/%-5dmv]",
+		GET_LEVEL(j),
+		calc_color(GET_HIT(j), GET_MAX_HIT(j)), GET_HIT(j), NTEXT, GET_MAX_HIT(j),
+		calc_color(GET_KI(j), GET_MAX_KI(j)), GET_KI(j), NTEXT, GET_MAX_KI(j),
+		calc_color(GET_MOVE(j), GET_MAX_MOVE(j)), GET_MOVE(j), NTEXT, GET_MAX_MOVE(j));
+      else if(GET_CLASS(j) == CLASS_WARRIOR || GET_CLASS(j) == CLASS_THIEF ||
+	      GET_CLASS(j) == CLASS_BARBARIAN) 
+	sprintf(report, "[Lv %3d| %s%6d%s/%-6dhp    -====-    %s%5d%s/%-5dmv]",
+		GET_LEVEL(j),
+		calc_color(GET_HIT(j), GET_MAX_HIT(j)), GET_HIT(j), NTEXT, GET_MAX_HIT(j),
+		calc_color(GET_MOVE(j), GET_MAX_MOVE(j)), GET_MOVE(j), NTEXT, GET_MAX_MOVE(j));
+      else sprintf(report, "[Lv %3d| %s%6d%s/%-6dhp %s%5d%s/%-5dm %s%5d%s/%-5dmv]",
+		   GET_LEVEL(j),
+		   calc_color(GET_HIT(j), GET_MAX_HIT(j)), GET_HIT(j), NTEXT, GET_MAX_HIT(j),
+		   calc_color(GET_MANA(j), GET_MAX_MANA(j)), GET_MANA(j), NTEXT, GET_MAX_MANA(j),
+		   calc_color(GET_MOVE(j), GET_MAX_MOVE(j)), GET_MOVE(j), NTEXT, GET_MAX_MOVE(j));
+    } else {
+      if(GET_CLASS(j) == CLASS_MONK || GET_CLASS(j) == CLASS_BARD)
+	sprintf(report, "[Lv %3d| %6d/%-6dhp %5d/%-5dk %5d/%-5dmv]",
+		GET_LEVEL(j), GET_HIT(j), GET_MAX_HIT(j), GET_KI(j),
+		GET_MAX_KI(j), GET_MOVE(j), GET_MAX_MOVE(j));
+      else if(GET_CLASS(j) == CLASS_WARRIOR || GET_CLASS(j) == CLASS_THIEF ||
+	      GET_CLASS(j) == CLASS_BARBARIAN)
+	sprintf(report, "[Lv %3d| %6d/%-6dhp    -====-    %5d/%-5dmv]",
+		GET_LEVEL(j), GET_HIT(j), GET_MAX_HIT(j),
+		GET_MOVE(j), GET_MAX_MOVE(j));
+      else sprintf(report, "[Lv %3d| %6d/%-6dhp %5d/%-5dm %5d/%-5dmv]",
                    GET_LEVEL(j), GET_HIT(j), GET_MAX_HIT(j), GET_MANA(j),
                    GET_MAX_MANA(j), GET_MOVE(j), GET_MAX_MOVE(j));
+    }
   }
 }
 
