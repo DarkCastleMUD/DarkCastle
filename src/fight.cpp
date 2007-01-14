@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.405 2007/01/14 10:45:18 jhhudso Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.406 2007/01/14 20:39:08 jhhudso Exp $ */
 
 extern "C"
 {
@@ -104,7 +104,8 @@ int check_autojoiners(CHAR_DATA *ch, int skill = 0)
 {
   if (IS_NPC(ch)) return eFAILURE; // irrelevant
   if (!ch->fighting) return eFAILURE; 
-  
+  if (ch->pcdata && ch->pcdata->unjoinable == true) return eFAILURE;
+
   CHAR_DATA *tmp;
   for (tmp = world[ch->in_room].people;tmp; tmp = tmp->next_in_room)
   {
@@ -517,10 +518,14 @@ int attack(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
     }
   assert(vict);
 
-  if(has_skill(ch, SKILL_NAT_SELECT) && affected_by_spell(ch, SKILL_NAT_SELECT) &&
-      affected_by_spell(ch, SKILL_NAT_SELECT)->modifier == GET_RACE(vict) && !number(0,3))
-    skill_increase_check(ch, SKILL_NAT_SELECT, has_skill(ch, SKILL_NAT_SELECT), SKILL_INCREASE_HARD);
-
+  if(has_skill(ch, SKILL_NAT_SELECT) &&
+     affected_by_spell(ch, SKILL_NAT_SELECT) &&
+     affected_by_spell(ch, SKILL_NAT_SELECT)->modifier == GET_RACE(vict) &&
+     number(0,3) == 0)
+    {
+      skill_increase_check(ch, SKILL_NAT_SELECT, has_skill(ch, SKILL_NAT_SELECT),
+			   SKILL_INCREASE_HARD);
+    }
   /* if it's backstab send it to one_hit so it can be handled */
   if(type == SKILL_BACKSTAB)  {
     return one_hit(ch, vict, SKILL_BACKSTAB, weapon);
