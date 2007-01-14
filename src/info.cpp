@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.136 2007/01/13 04:37:16 dcastle Exp $ */
+/* $Id: info.cpp,v 1.137 2007/01/14 04:54:56 jhhudso Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -737,7 +737,7 @@ void list_char_to_char(struct char_data *list, struct char_data *ch, int mode)
       if ( IS_AFFECTED(ch, AFF_SENSE_LIFE) || CAN_SEE(ch, i)) {
          show_char_to_char(i, ch, 0);
 	 
-/*	 if (IS_PC(ch) && IS_NPC(i)) {
+	 if (IS_PC(ch) && IS_NPC(i)) {
 	   if (ch->pcdata->lastseen == 0)
 	     ch->pcdata->lastseen = new multimap<int, pair<timeval, timeval> >;
 
@@ -749,7 +749,7 @@ void list_char_to_char(struct char_data *list, struct char_data *ch, int mode)
 	   gettimeofday(&tv, NULL);
 	   ch->pcdata->lastseen->insert(pair<int, pair<timeval, timeval> >(i->mobdata->nr, pair<timeval, timeval>(tv, tv_zero)));
 	 }
-*/
+	 
       } else if (IS_DARK(ch->in_room)) {
          if(known && skill_success(ch,NULL,SKILL_BLINDFIGHTING))
             send_to_char("Your blindfighting awareness alerts you to a presense in the area.\n\r", ch);

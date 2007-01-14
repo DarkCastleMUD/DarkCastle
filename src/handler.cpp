@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.153 2007/01/13 03:49:22 dcastle Exp $ */
+/* $Id: handler.cpp,v 1.154 2007/01/14 04:54:56 jhhudso Exp $ */
     
 extern "C"
 {
@@ -3242,7 +3242,6 @@ CHAR_DATA *get_rand_other_char_room_vis(CHAR_DATA *ch)
 
 void lastseen_targeted(char_data *ch, char_data *victim)
 {
-  return;
   static char_data *last_ch;
   static char_data *last_victim;
 
@@ -3310,7 +3309,7 @@ CHAR_DATA *get_char_room_vis(CHAR_DATA *ch, char *name)
       if (number == 1 || number == 0)
          {
 	   if (isname(tmp, GET_NAME(i))&& CAN_SEE(ch,i)) {
-//	     lastseen_targeted(ch, i);
+	     lastseen_targeted(ch, i);
 	     return(i);
 	   }
          else if (isname2(tmp, GET_NAME(i))&& CAN_SEE(ch,i))
@@ -3330,13 +3329,13 @@ CHAR_DATA *get_char_room_vis(CHAR_DATA *ch, char *name)
             {
 	    j++;
             if(j == number) {
-//	      lastseen_targeted(ch, i);
+	      lastseen_targeted(ch, i);
 	      return(i);
 	    }
             }
          }
 	   }
-//   lastseen_targeted(ch, partial_match);
+   lastseen_targeted(ch, partial_match);
    return(partial_match);
 }
 
