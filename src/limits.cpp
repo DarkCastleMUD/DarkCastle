@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.84 2007/01/13 03:49:22 dcastle Exp $ */
+/* $Id: limits.cpp,v 1.85 2007/01/14 23:47:33 dcastle Exp $ */
 
 extern "C"
 {
@@ -855,8 +855,19 @@ void update_corpses_and_portals(void)
         {
           next_thing2 = jj->next_content; /* Next in inventory */
 
+          if (GET_ITEM_TYPE(jj) == ITEM_CONTAINER)
+          {
+	     OBJ_DATA *oo, *oon;
+	     for (oo = jj->contains; oo; oo = oon)
+	     {
+		oon = oo->next_content;
+
+                if(IS_SET(oo->obj_flags.more_flags, ITEM_NO_TRADE))
+                  extract_obj(oo);
+	     }
+	  }
           if (j->in_obj) {
-            if(IS_SET(jj->obj_flags.more_flags, ITEM_NO_TRADE)|| (GET_ITEM_TYPE(jj) == ITEM_CONTAINER && contains_no_trade_item(jj)))
+            if(IS_SET(jj->obj_flags.more_flags, ITEM_NO_TRADE))
             {
              if (next_thing == jj)
                 next_thing = jj->next;
@@ -868,7 +879,7 @@ void update_corpses_and_portals(void)
               move_obj(jj, j->in_obj);
           }
           else if (j->carried_by) {
-            if(IS_SET(jj->obj_flags.more_flags, ITEM_NO_TRADE)|| (GET_ITEM_TYPE(jj) == ITEM_CONTAINER && contains_no_trade_item(jj)))
+            if(IS_SET(jj->obj_flags.more_flags, ITEM_NO_TRADE))
             {
              if (next_thing == jj)
                next_thing = jj->next;
@@ -881,9 +892,7 @@ void update_corpses_and_portals(void)
           }
           else if (j->in_room != NOWHERE)
           {
-            // no trade objects disappear when the corpse decays
-	    // Caused a crasher. Fixed it. 
-            if(IS_SET(jj->obj_flags.more_flags, ITEM_NO_TRADE)|| (GET_ITEM_TYPE(jj) == ITEM_CONTAINER && contains_no_trade_item(jj)))
+            if(IS_SET(jj->obj_flags.more_flags, ITEM_NO_TRADE))
             {
 	     if (next_thing == jj)
 	       next_thing = jj->next;
