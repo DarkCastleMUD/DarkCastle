@@ -863,7 +863,7 @@ void do_solar_blind(CHAR_DATA *ch, CHAR_DATA *tmp_victim)
   }
   if (tmp_victim->in_room != ch->in_room) return;
   if (has_skill(ch, SPELL_SOLAR_GATE) < 81) return;
-   if (number(0,4)) return;
+   if (number(0,9)) return;
     if(!IS_AFFECTED(tmp_victim, AFF_BLIND)) 
     {
       act("$n seems to be blinded!", tmp_victim, 0, 0, TO_ROOM, INVIS_NULL);
