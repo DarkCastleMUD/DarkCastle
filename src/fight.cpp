@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.406 2007/01/14 20:39:08 jhhudso Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.407 2007/01/16 05:53:50 jhhudso Exp $ */
 
 extern "C"
 {
@@ -2221,13 +2221,23 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
   if ((attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING) || (IS_NPC(ch) && 
 	mob_index[ch->mobdata->nr].virt > 87 && mob_index[ch->mobdata->nr].virt < 92))
   {
-    if (ch->equipment[weapon] == NULL)
+    if (ch->equipment[weapon] == NULL) {
       dam_message(dam, ch, victim, TYPE_HIT, modifier);
-    else dam_message(dam, ch, victim, attacktype, modifier);
+    } else {
+      dam_message(dam, ch, victim, attacktype, modifier);
+    }
     
     GET_HIT(victim) -= dam;
     update_pos(victim);
   } else {
+    affected_type *af;
+    if (dam >= 350 && (af = affected_by_spell(victim, SPELL_PARALYZE))) {
+      act("The overpowering magic from $n's spell disrupts the paralysis surrounding you!", ch, 0, victim, TO_VICT, 0);
+      act("The powerful magic from your spell has disrupted the paralysis surrounding $N!", ch, 0, victim, TO_CHAR, 0);
+      act("The powerful magic of $n's spell has disrupted the paralysis surrounding $N!", ch, 0, victim, TO_ROOM, NOTVICT);
+      affect_remove(victim, af, 0);
+    }
+
     GET_HIT(victim) -= dam;
     update_pos(victim);
     do_dam_msgs(ch, victim, dam, attacktype, weapon);
