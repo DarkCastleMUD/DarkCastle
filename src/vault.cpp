@@ -505,20 +505,6 @@ void reload_vaults(void) {
   load_vaults();
 }
 
-int do_fixvault(char_data *ch, char *argument, int cmd)
-{
-  char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
-  argument = one_argument(argument, arg1);
-  argument = one_argument(argument, arg2);
-  if (!arg1[0] || !arg2[0])
-  {
-    send_to_char("Syntax: Fixvault <oldname> <newname>\r\n",ch);
-    return eFAILURE;
-  }
-  rename_vault_owner(arg1, arg2);
-  return eSUCCESS;
-}
-
 void rename_vault_owner(char *oldname, char *newname) {
   struct vault_data *vault;
   struct vault_access_data *access;
