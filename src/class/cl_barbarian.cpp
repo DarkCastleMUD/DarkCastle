@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_barbarian.cpp,v 1.70 2006/12/31 03:29:57 jhhudso Exp $
+| $Id: cl_barbarian.cpp,v 1.71 2007/01/18 02:50:18 jhhudso Exp $
 | cl_barbarian.C
 | Description:  Commands for the barbarian class.
 */
@@ -695,6 +695,7 @@ int do_knockback(struct char_data *ch, char *argument, int cmd)
     WAIT_STATE(ch, PULSE_VIOLENCE);
     return eFAILURE;
   } else if(CAN_GO(victim, dir) &&
+       !affected_by_spell(victim, SPELL_IRON_ROOTS) &&
        !IS_SET(world[EXIT(victim, dir)->to_room].room_flags, IMP_ONLY) &&
        !IS_SET(world[EXIT(victim, dir)->to_room].room_flags, NO_TRACK)){
 //need to do more checks on if the victim can actually be knocked into 
