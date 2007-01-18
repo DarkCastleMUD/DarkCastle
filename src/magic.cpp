@@ -1002,6 +1002,8 @@ int spell_solar_gate(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 		if(GET_POS(tmp_victim) != POSITION_STANDING)
                     GET_POS(tmp_victim) = POSITION_STANDING;
 		  if(!IS_AFFECTED(tmp_victim, AFF_BLIND) &&
+		     !IS_AFFECTED(tmp_victim, AFF_PARALYSIS) &&
+		     !affected_by_spell(tmp_victim, SPELL_IRON_ROOTS) &&
                      !ISSET(tmp_victim->mobdata->actflags, ACT_STUPID)&&
   		     !tmp_victim->fighting)
 		    do_move(tmp_victim, "", to_charge[i]);
