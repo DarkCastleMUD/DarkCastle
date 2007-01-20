@@ -335,38 +335,40 @@ int do_golem_score(struct char_data *ch, char *argument, int cmd)
 
    sprintf(buf,
       "$7($5:$7)================================================="
-      "=======================($5:$7)\n\r"
-      "|=|  %-29s -- Character Attributes (DarkCastleMUD) |=|\n\r"
-      "($5:$7)===========================($5:$7)==================="
-      "=======================($5:$7)\n\r", GET_SHORT(ch));
+      "========================($5:$7)\n\r"
+      "|=| %-30s  -- Character Attributes (DarkCastleMUD) |=|\n\r"
+      "($5:$7)=============================($5:$7)================="
+      "========================($5:$7)\n\r", GET_SHORT(ch));
 
    send_to_char(buf, master);
 
    sprintf(buf,
-      "|\\|  $4Strength$7:      %4d (%2d) |/|  $1Race$7:   %-10s $1HitPts$7:%5d$1/$7(%5d) |~|\n\r"
-      "|~|  $4Dexterity$7:     %4d (%2d) |o|  $1Class$7:  %-11s$1Mana$7:   %4d$1/$7(%5d) |\\|\n\r"
-      "|/|  $4Constitution$7:  %4d (%2d) |\\|  $1Lvl$7:    %-8d   $1Fatigue$7:%4d$1/$7(%5d) |o|\n\r"
-      "|o|  $4Intelligence$7:  %4d (%2d) |~|  $1Height$7: %3d        $1Ki$7:     %4d$1/$7(%5d) |/|\n\r"
-      "|\\|  $4Wisdom$7:        %4d (%2d) |/|  $1Weight$7: %3d                             |~|\n\r"
-      "|~|  $3Rgn$7: $4H$7:%2d $4M$7:%2d $4V$7:%2d $4K$7:%2d |o|  $1Age$7:    %3d yrs    $1Align$7: %+5d         |\\|\n\r",
-       GET_STR(ch), GET_RAW_STR(ch), race, GET_HIT(ch), GET_MAX_HIT(ch),
+      "|\\| $4Strength$7:        %4d  (%2d) |/| $1Race$7:  %-10s  $1HitPts$7:%5d$1/$7(%5d) |~|\n\r"
+      "|~| $4Dexterity$7:       %4d  (%2d) |o| $1Class$7: %-11s $1Mana$7:   %4d$1/$7(%5d) |\\|\n\r"
+      "|/| $4Constitution$7:    %4d  (%2d) |\\| $1Level$7:  %-6d     $1Fatigue$7:%4d$1/$7(%5d) |o|\n\r"
+      "|o| $4Intelligence$7:    %4d  (%2d) |~| $1Height$7: %3d        $1Ki$7:     %4d$1/$7(%5d) |/|\n\r"
+      "|\\| $4Wisdom$7:          %4d  (%2d) |/| $1Weight$7: %3d                             |~|\n\r"
+      "|~| $3Rgn$7: $4H$7:%3d $4M$7:%3d $4V$7:%3d $4K$7:%2d |o| $1Age$7:    %3d yrs    $1Align$7: %+5d         |\\|\n\r",
+      GET_STR(ch), GET_RAW_STR(ch), race, GET_HIT(ch), GET_MAX_HIT(ch),
       GET_DEX(ch), GET_RAW_DEX(ch), pc_clss_types[(int)GET_CLASS(ch)], GET_MANA(ch), GET_MAX_MANA(ch),
       GET_CON(ch), GET_RAW_CON(ch), GET_LEVEL(ch), GET_MOVE(ch), GET_MAX_MOVE(ch),
       GET_INT(ch), GET_RAW_INT(ch), GET_HEIGHT(ch), GET_KI(ch),  GET_MAX_KI(ch),
-      GET_WIS(ch), GET_RAW_WIS(ch), GET_WEIGHT(ch),
-      hit_gain(ch), mana_gain(ch), move_gain(ch,0), ki_gain(ch), GET_AGE(ch), GET_ALIGNMENT(ch));
+      GET_WIS(ch), GET_RAW_WIS(ch), GET_WEIGHT(ch), hit_gain(ch),
+      mana_gain(ch), move_gain(ch, 0), ki_gain(ch), GET_AGE(ch),
+      GET_ALIGNMENT(ch));
+
    send_to_char(buf, master);
 
      sprintf(buf,
-      "($5:$7)===========================($5:$7)===($5:$7)====================================($5:$7)\n\r"
-      "|/|  $2Combat Statistics:$7             |\\|   $2Equipment and Valuables:$7         |o|\n\r"
-      "|o|   $3Armor$7:   %5d $3Pkills$7:  %5d |~|    $3Items Carried$7:  %-3d/(%-3d)       |/|\n\r"
-      "|\\|   $3BonusHit$7: %+4d $3PDeaths$7: %5d |/|    $3Weight Carried$7: %-3d/(%-4d)      |~|\n\r"
-      "|~|   $3BonusDam$7: %+4d $3RDeaths$7: %5d |o|    $3Experience$7:     %-10lld      |\\|\n\r"
-      "|/|   $B$4FIRE$R[%+3d] $BCOLD$R[%+3d] $B$5NRGY$R[%+3d] |\\|    $3ExpTillLevel$7:   %-10lld      |o|\n\r"
-      "|o|   $B$2ACID$R[%+3d] $B$3MAGK$R[%+3d] $2POIS$7[%+3d] |~|    $3Gold$7: %-9d $3Platinum$7: %-5d |/|\n\r"
-      "|\\|   $3MELE$R[%+3d] $3SPEL$R[%+3d] $3SONG$R[%+3d] |/|    $3Bank$7: %-10d                |-|\n\r"
-      "($5:$7)=================================($5:$7)====================================($5:$7)\n\r",
+      "($5:$7)=============================($5:$7)===($5:$7)===================================($5:$7)\n\r"
+      "|/| $2Combat Statistics:$7                |\\| $2Equipment and Valuables:$7          |o|\n\r"
+      "|o|  $3Armor$7:   %5d   $3Pkills$7:  %5d  |~|  $3Items Carried$7:  %-3d/(%-3d)        |/|\n\r"
+      "|\\|  $3BonusHit$7: %+4d   $3PDeaths$7: %5d  |/|  $3Weight Carried$7: %-3d/(%-4d)       |~|\n\r"
+      "|~|  $3BonusDam$7: %+4d   $3RDeaths$7: %5d  |o|  $3Experience$7:     %-10lld       |\\|\n\r"
+      "|/|  $B$4FIRE$R[%+3d]  $B$3COLD$R[%+3d]  $B$5NRGY$R[%+3d]  |\\|  $3ExpTillLevel$7:   %-10lld       |o|\n\r"
+      "|o|  $B$2ACID$R[%+3d]  $B$7MAGK$R[%+3d]  $2POIS$7[%+3d]  |~|  $3Gold$7: %-10d $3Platinum$7: %-5d |/|\n\r"
+      "|\\|  $3MELE$R[%+3d]  $3SPEL$R[%+3d]   $3KI$R [%+3d]  |/|  $3Bank$7: %-10d                 |-|\n\r"
+      "($5:$7)===================================($5:$7)===================================($5:$7)\n\r",
    GET_ARMOR(ch),         0,   IS_CARRYING_N(ch), CAN_CARRY_N(ch),
    to_hit, 0, IS_CARRYING_W(ch), CAN_CARRY_W(ch),
    to_dam, 0, GET_EXP(ch),
