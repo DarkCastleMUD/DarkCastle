@@ -748,7 +748,8 @@ int gem_assembler(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
       // Could not locate obj in data array
       sprintf(buf, "Item %d has gem_assembler proc with invalid data.", obj_index[obj->item_number].virt);
       log(buf, ANGEL, LOG_BUG); // 102
-      return eFAILURE;
+      send_to_char("You can't seem to assemble that.", ch);
+      return eSUCCESS;
    }
 
    done = 1;
