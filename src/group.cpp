@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: group.cpp,v 1.25 2007/01/14 11:08:07 jhhudso Exp $
+| $Id: group.cpp,v 1.26 2007/01/20 00:26:02 jhhudso Exp $
 | group.C
 | Description:  Group related commands; join, abandon, follow, etc..
 */
@@ -271,7 +271,7 @@ void setup_group_buf(char * report, char_data * j, char_data *i)
   }
   else
   {
-    if (IS_SET(i->pcdata->toggles, PLR_ANSI)) {
+    if (IS_PC(i) && IS_SET(i->pcdata->toggles, PLR_ANSI)) {
       if(GET_CLASS(j) == CLASS_MONK || GET_CLASS(j) == CLASS_BARD)
 	sprintf(report, "[Lv %3d| %s%6d%s/%-6dhp %s%5d%s/%-5dk %s%5d%s/%-5dmv]",
 		GET_LEVEL(j),
