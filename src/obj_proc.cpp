@@ -1008,10 +1008,10 @@ int devilsword(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
    if(*junk)
       return eFAILURE;
 
-   if(!str_cmp("pierce",arg1))
+   if(!str_cmp("infrendeo",arg1))
    {
       act("$n mutters something into $s hands.", ch, 0, 0, TO_ROOM, 0);
-      if(ch->equipment[WIELD]->obj_flags.value[3] == 11)
+      if(ch->equipment[WIELD]->obj_flags.value[3] == 8)
       {
          send_to_char("Nothing happens.\r\n", ch);
          return TRUE;
@@ -1020,13 +1020,13 @@ int devilsword(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
       act("Venom-flecked fangs grow and bristle from the bedeviled Cestus!", ch, 0, 0, TO_ROOM, 0);
       send_to_char("Huge fangs spring forth from your weapon!\r\n", ch);
 
-      ch->equipment[WIELD]->obj_flags.value[3] = 11;
+      ch->equipment[WIELD]->obj_flags.value[3] = 8;
       return eSUCCESS;
    }
-   if(!str_cmp("crush",arg1))
+   if(!str_cmp("pulsus",arg1))
    {
       act("$n mutters something into $s hands.", ch, 0, 0, TO_ROOM, 0);
-      if(ch->equipment[WIELD]->obj_flags.value[3] == 6)
+      if(ch->equipment[WIELD]->obj_flags.value[3] == 7)
       {
          send_to_char("Nothing happens.\r\n", ch);
          return eSUCCESS;
@@ -1035,7 +1035,7 @@ int devilsword(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
       act("The fangs of $n's weapon retract magically into the metal.", ch, 0, 0, TO_ROOM, 0);
       send_to_char("The fangs retract magically into the metal.\r\n", ch);
 
-      ch->equipment[WIELD]->obj_flags.value[3] = 6;
+      ch->equipment[WIELD]->obj_flags.value[3] = 7;
       return eSUCCESS;
    }
    
