@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.408 2007/01/16 06:03:12 jhhudso Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.409 2007/01/20 02:51:55 jhhudso Exp $ */
 
 extern "C"
 {
@@ -4246,7 +4246,7 @@ void group_gain(CHAR_DATA * ch, CHAR_DATA * victim)
     return; // non charmies/familiars get out
 
   // if i'm charmie/familiar and not grouped, give my master the credit if he's in room
-  if(IS_NPC(ch) && !IS_AFFECTED(ch, AFF_GROUP) && ch->master 
+  if(IS_NPC(ch) && ch->master 
                 && ch->in_room == ch->master->in_room)
     ch = ch->master;
 
@@ -4277,6 +4277,11 @@ void group_gain(CHAR_DATA * ch, CHAR_DATA * victim)
 
        tmp_ch = loop_followers(&f);
        continue;
+    }
+
+    // Charmies dont steal xp whether they're in a group or not
+    if (IS_NPC(tmp_ch) && (IS_AFFECTED(tmp_ch, AFF_CHARM) || IS_AFFECTED(tmp_ch, AFF_FAMILIAR))) {
+      continue;
     }
 
     /* calculate base XP value */

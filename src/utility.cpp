@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.67 2007/01/07 18:45:57 dcastle Exp $ */
+/* $Id: utility.cpp,v 1.68 2007/01/20 02:51:55 jhhudso Exp $ */
 
 extern "C"
 {
@@ -617,6 +617,16 @@ bool ARE_GROUPED( struct char_data *sub, struct char_data *obj)
 
    if (obj == sub)
       return TRUE;
+
+   if (obj == NULL || sub == NULL)
+     return FALSE;
+
+   if (IS_PC(sub) &&
+       IS_NPC(obj) &&
+       obj->master &&
+       ARE_GROUPED(sub, obj->master) &&
+       (IS_AFFECTED(obj, AFF_CHARM) || IS_AFFECTED(obj, AFF_FAMILIAR)))
+     return TRUE;
 
    if (!(k=sub->master))
       k = sub;
