@@ -1722,7 +1722,7 @@ int execute_song_insane_chant( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA 
    af.bitvector = -1;
 
    act("$n's singing starts to drive you INSANE!!!", ch, 0, 0, TO_ROOM, 0);
-   send_to_char("Your singing drives you INSANE!!!\r\n", ch);
+   send_to_char("Your singing drives everyone around you INSANE!!!\r\n", ch);
 
    for(victim = world[ch->in_room].people; victim && victim != ch; victim = victim->next_in_room)
    {
