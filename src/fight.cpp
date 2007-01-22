@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.411 2007/01/20 03:36:48 jhhudso Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.412 2007/01/22 09:04:03 jhhudso Exp $ */
 
 extern "C"
 {
@@ -1595,10 +1595,10 @@ void eq_damage(CHAR_DATA * ch, CHAR_DATA * victim,
 
 void pir_stat_loss(char_data * victim,int chance,  bool heh, bool zz)
 {
-  if (GET_LEVEL(victim) < 50) return;
+  if (GET_LEVEL(victim) < 60) return;
   chance /= 2;
   /* Pir's extra stat loss.  Bwahahah */
-  if((heh || (number(1,100) <= chance)) && !IS_NPC(victim)) 
+  if((heh || (number(0,99) < chance)) && !IS_NPC(victim)) 
   {
     switch(number(1,5)) 
     {
@@ -3082,7 +3082,7 @@ void set_fighting(CHAR_DATA * ch, CHAR_DATA * vict)
      if (!ISSET(vict->mobdata->actflags, ACT_STUPID) && !vict->hunting)
      {
        if (GET_LEVEL(ch) - (GET_LEVEL(vict)/2) > 0
-	|| GET_LEVEL(ch) == 50)
+	|| GET_LEVEL(ch) == 60)
           {
                 add_memory(vict, GET_NAME(ch), 't');
                 struct timer_data *timer;
@@ -3102,7 +3102,7 @@ void set_fighting(CHAR_DATA * ch, CHAR_DATA * vict)
      if (!ISSET(ch->mobdata->actflags, ACT_STUPID) && !ch->hunting)
      {
        if (GET_LEVEL(vict) - (GET_LEVEL(ch)/2) > 0 || 
-		GET_LEVEL(vict) == 50)
+		GET_LEVEL(vict) == 60)
           {
                 add_memory(ch, GET_NAME(vict), 't');
                 struct timer_data *timer;
@@ -4050,9 +4050,9 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
        {
 	int chance = ch?GET_LEVEL(ch)/10:50 /10;
 	chance += GET_LEVEL(victim) /2;
-	if (GET_LEVEL(victim) == 50)
+	if (GET_LEVEL(victim) == 60)
 	  chance += (int)(25.0*(float)((float)(ch?GET_LEVEL(ch):50)/100.0)*(float)((float)(ch?GET_LEVEL(ch):50)/100.0));
-        if (number(1,101) < chance)
+        if (number(0,99) < chance)
         {
               if (GET_RACE(victim) != RACE_TROLL) {
                 GET_CON(victim) -= 1;
@@ -4095,8 +4095,11 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
              "         \\               /\\ |\r\n"
              "          \\             /  \\|\r\n"
              "           `-----------`\r\n", victim);
-	   remove_vault(GET_NAME(victim));
+	   char name[100];
+	   strncpy(name, GET_NAME(victim), 100);
            do_quit(victim, "", 666);
+	   remove_vault(name);
+
            unlink(buf1);
            sprintf(buf2, "%s permanently dies.", buf1);
            log(buf2, ANGEL, LOG_MORTAL);
@@ -4134,8 +4137,11 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
 "           8   88MM::::::::::::::::::::::M:::M::::::::MM\r\n",victim);
 
 
-	   remove_vault(GET_NAME(victim));
+	   char name[100];
+	   strncpy(name, GET_NAME(victim), 100);
            do_quit(victim, "", 666);
+	   remove_vault(name);
+
            unlink(buf1);
            sprintf(buf2, "%s sees tits.", buf1);
            log(buf2, ANGEL, LOG_MORTAL);
@@ -4152,9 +4158,11 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
 	"          /     (___)     \\\r\n"
 	"         /.-.-./ \" \" \\.-.-.\\\r\n",victim);
 
-
-	   remove_vault(GET_NAME(victim));
+	   char name[100];
+	   strncpy(name, GET_NAME(victim), 100);
            do_quit(victim, "", 666);
+	   remove_vault(name);
+
            unlink(buf1);
            sprintf(buf2, "%s gets batted to death.", buf1);
            log(buf2, ANGEL, LOG_MORTAL);
@@ -4177,8 +4185,11 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
   "       `''\\/-.                        |\r\n"
   "              \\                       | \r\n"
   "              |                       |\r\n",victim);
-	   remove_vault(GET_NAME(victim));
+	   char name[100];
+	   strncpy(name, GET_NAME(victim), 100);
            do_quit(victim, "", 666);
+	   remove_vault(name);
+
            unlink(buf1);
            sprintf(buf2, "%s goes to moose heaven.", buf1);
            log(buf2, ANGEL, LOG_MORTAL);
@@ -4210,8 +4221,11 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
 		"      \\|    /   /               \\   \\   |/\r\n"
 		"       `\\   VVV~                 ~VVV  /'$R\r\n",victim);
 
-	   remove_vault(GET_NAME(victim));
+	   char name[100];
+	   strncpy(name, GET_NAME(victim), 100);
            do_quit(victim, "", 666);
+	   remove_vault(name);
+
            unlink(buf1);
            sprintf(buf2, "%s permanently dies the horrible dex-death.",buf1);
            log(buf2, ANGEL, LOG_MORTAL);
