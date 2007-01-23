@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.412 2007/01/22 09:04:03 jhhudso Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.413 2007/01/23 04:30:24 jhhudso Exp $ */
 
 extern "C"
 {
@@ -1595,7 +1595,7 @@ void eq_damage(CHAR_DATA * ch, CHAR_DATA * victim,
 
 void pir_stat_loss(char_data * victim,int chance,  bool heh, bool zz)
 {
-  if (GET_LEVEL(victim) < 60) return;
+  if (GET_LEVEL(victim) < 50) return;
   chance /= 2;
   /* Pir's extra stat loss.  Bwahahah */
   if((heh || (number(0,99) < chance)) && !IS_NPC(victim)) 
@@ -4050,8 +4050,12 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
        {
 	int chance = ch?GET_LEVEL(ch)/10:50 /10;
 	chance += GET_LEVEL(victim) /2;
-	if (GET_LEVEL(victim) == 60)
+	if (GET_LEVEL(victim) >= 50) {
 	  chance += (int)(25.0*(float)((float)(ch?GET_LEVEL(ch):50)/100.0)*(float)((float)(ch?GET_LEVEL(ch):50)/100.0));
+	  // An extra 1% for each level over 50.
+	  chance += GET_LEVEL(victim)-50;
+	}
+
         if (number(0,99) < chance)
         {
               if (GET_RACE(victim) != RACE_TROLL) {
