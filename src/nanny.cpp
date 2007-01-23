@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.151 2007/01/23 06:38:04 jhhudso Exp $ */
+/* $Id: nanny.cpp,v 1.152 2007/01/23 07:01:59 jhhudso Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -57,6 +57,7 @@ extern "C" {
 #include <handler.h>
 #include <string.h>
 #include <vault.h>
+#include <queue>
 
 #define STATE(d)    ((d)->connected)
 
@@ -614,15 +615,22 @@ void do_on_login_stuff(char_data * ch)
 
   // Check for deleted characters listed in access list
   char buf[255];
+  std::queue<char *> todelete;
   struct vault_data *vault = has_vault(GET_NAME(ch));
   if (vault) {
     for (vault_access_data *access = vault->access; access && access != (vault_access_data *)0x95959595; access = access->next) {
       if (access->name) {
+	snprintf(buf, 255, "%s/%c/%s", SAVE_DIR, UPPER(access->name[0]), access->name);
 	if (!file_exists(buf)) {
-	  remove_vault_access(ch, access->name, vault);
+	  todelete.push(access->name);
 	}
       }
     }
+  }
+
+  while (!todelete.empty()) {
+    remove_vault_access(ch, todelete.front(), vault);
+    todelete.pop();
   }
 }
 
