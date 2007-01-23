@@ -9705,8 +9705,29 @@ int cast_feline_agility(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DA
 }
 
 /* OAKEN FORTITUDE */
+int cast_oaken_fortitude(ubyte level, CHAR_DATA *ch, char *arg, int type,
+                    CHAR_DATA *victim, struct obj_data * tar_obj, int skill)
+{
+   switch (type) {
+      case SPELL_TYPE_SPELL:
+         if (!OUTSIDE(ch)) {
+            send_to_char("Your spell is more draining because you are indoors!\n\r", ch);
+            GET_MANA(ch) -= level / 2;
+            if(GET_MANA(ch) < 0)
+               GET_MANA(ch) = 0;
+         }
+         return spell_oaken_fortitude(level, ch, victim, 0, skill);
+         break;
+      case SPELL_TYPE_POTION:
+	 return spell_oaken_fortitude(level, ch, ch, 0, skill);
+      default :
+	 log("Serious screw-up in bee sting!", ANGEL, LOG_BUG);
+	 break;
+	 }
+  return eFAILURE;
+}
 
-int cast_oaken_fortitude(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA  *victim, struct obj_data * tar_obj, int skill)
+int spell_oaken_fortitude(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 { // Feline agility rip
         struct affected_type af;
 
