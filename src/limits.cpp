@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.85 2007/01/14 23:47:33 dcastle Exp $ */
+/* $Id: limits.cpp,v 1.86 2007/01/23 05:39:25 jhhudso Exp $ */
 
 extern "C"
 {
@@ -946,11 +946,11 @@ void prepare_character_for_sixty(CHAR_DATA *ch)
 		SET_BIT(ch->pcdata->toggles, PLR_50PLUS);
 		int i = (ch->exp / 100000000) * 500000;
 		if (i > 0) {
-		  csendf(ch, "$B$3You have been credited %d gold coins for your %lld experience.$R\r\n",
+		  csendf(ch, "$B$3You have been credited %d gold coins for your %lld experience.$R\n\r",
 			i, ch->exp);
 		  ch->gold += i;
 		} else if (ch->exp > 0) {
-		  csendf(ch, "Since you already have your Quest Skill, your experience has been set to 0 to allow advancement to level 60.");
+		  csendf(ch, "Since you already have your Quest Skill, your experience has been set to 0 to allow advancement to level 60.\n\r");
 		}
 		ch->exp = 0;
         }
