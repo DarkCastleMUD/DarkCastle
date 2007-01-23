@@ -9257,8 +9257,29 @@ int cast_bee_sting(ubyte level, CHAR_DATA *ch, char *arg, int type,
 }
 
 /* BEE SWARM */
+int cast_bee_swarm(ubyte level, CHAR_DATA *ch, char *arg, int type,
+                    CHAR_DATA *victim, struct obj_data * tar_obj, int skill)
+{
+   switch (type) {
+      case SPELL_TYPE_SPELL:
+         if (!OUTSIDE(ch)) {
+            send_to_char("Your spell is more draining because you are indoors!\n\r", ch);
+            GET_MANA(ch) -= level / 2;
+            if(GET_MANA(ch) < 0)
+               GET_MANA(ch) = 0;
+         }
+         return spell_bee_swarm(level, ch, victim, 0, skill);
+         break;
+      case SPELL_TYPE_POTION:
+	 return spell_bee_swarm(level, ch, ch, 0, skill);
+      default :
+	 log("Serious screw-up in bee swarm!", ANGEL, LOG_BUG);
+	 break;
+	 }
+  return eFAILURE;
+}
 
-int cast_bee_swarm(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *victim, struct obj_data * tar_obj, int skill)
+int spell_bee_swarm(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
    int dam;
    int retval;
@@ -9363,14 +9384,34 @@ int cast_creeping_death(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DA
 }
 
 /* BARKSKIN */
+int cast_barkskin(ubyte level, CHAR_DATA *ch, char *arg, int type,
+                    CHAR_DATA *victim, struct obj_data * tar_obj, int skill)
+{
+   switch (type) {
+      case SPELL_TYPE_SPELL:
+         if (!OUTSIDE(ch)) {
+            send_to_char("Your spell is more draining because you are indoors!\n\r", ch);
+            GET_MANA(ch) -= level / 2;
+            if(GET_MANA(ch) < 0)
+               GET_MANA(ch) = 0;
+         }
+         return spell_barkskin(level, ch, victim, 0, skill);
+         break;
+      case SPELL_TYPE_POTION:
+	 return spell_barkskin(level, ch, ch, 0, skill);
+      default :
+	 log("Serious screw-up in barkskin!", ANGEL, LOG_BUG);
+	 break;
+	 }
+  return eFAILURE;
+}
 
-int cast_barkskin(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *victim, struct obj_data * tar_obj, int skill)
+int spell_barkskin(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
   struct affected_type af;
 
   if(affected_by_spell(victim, SPELL_BARKSKIN)) {
     send_to_char("You cannot make your skin any stronger!\n\r", ch);
-//    GET_MANA(ch) += 20;
     return eFAILURE;
   }
 
@@ -9387,13 +9428,6 @@ int cast_barkskin(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *vi
 
   send_to_char("Your skin turns stiff and bark-like.\n\r", victim);
   act("$N begins to look rather woody.", ch, 0, victim, TO_ROOM, INVIS_NULL|NOTVICT);
-  if(!OUTSIDE(ch))
-  {
-    send_to_char("Your spell is more draining because you are indoors!\n\r", ch);
-    GET_MANA(ch) -= 25;
-    if(GET_MANA(ch) < 0)
-       GET_MANA(ch) = 0;
-  }
   return eSUCCESS;
 }
 
@@ -9605,14 +9639,28 @@ int cast_call_follower(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DAT
 }
 
 /* ENTANGLE */
+int cast_entangle(ubyte level, CHAR_DATA *ch, char *arg, int type,
+                    CHAR_DATA *victim, struct obj_data * tar_obj, int skill)
+{
+   switch (type) {
+      case SPELL_TYPE_SPELL:
+         return spell_entangle(level, ch, victim, 0, skill);
+         break;
+      case SPELL_TYPE_POTION:
+	 return spell_entangle(level, ch, ch, 0, skill);
+      default :
+	 log("Serious screw-up in entangle!", ANGEL, LOG_BUG);
+	 break;
+	 }
+  return eFAILURE;
+}
 
-int cast_entangle(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *victim, struct obj_data * tar_obj, int skill)
+int spell_entangle(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
 
 	if(!OUTSIDE(ch))
 	{
 		send_to_char("You must be outside to cast this spell!\n\r", ch);
-	//	GET_MANA(ch) += 10; /*Mana kludge */
 		return eFAILURE;
 	}
 	set_cantquit(ch, victim);
@@ -9640,8 +9688,29 @@ int cast_entangle(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *vi
 }
 
 /* EYES OF THE OWL */
+int cast_eyes_of_the_owl(ubyte level, CHAR_DATA *ch, char *arg, int type,
+                    CHAR_DATA *victim, struct obj_data * tar_obj, int skill)
+{
+   switch (type) {
+      case SPELL_TYPE_SPELL:
+         if (!OUTSIDE(ch)) {
+            send_to_char("Your spell is more draining because you are indoors!\n\r", ch);
+            GET_MANA(ch) -= level / 2;
+            if(GET_MANA(ch) < 0)
+               GET_MANA(ch) = 0;
+         }
+         return spell_eyes_of_the_owl(level, ch, victim, 0, skill);
+         break;
+      case SPELL_TYPE_POTION:
+	 return spell_eyes_of_the_owl(level, ch, ch, 0, skill);
+      default :
+	 log("Serious screw-up in eyes of the owl!", ANGEL, LOG_BUG);
+	 break;
+	 }
+  return eFAILURE;
+}
 
-int cast_eyes_of_the_owl(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *victim, struct obj_data * tar_obj, int skill)
+int spell_eyes_of_the_owl(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
 	struct affected_type af;
 
@@ -9666,8 +9735,29 @@ int cast_eyes_of_the_owl(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_D
 }
 
 /* FELINE AGILITY */
+int cast_feline_agility(ubyte level, CHAR_DATA *ch, char *arg, int type,
+                    CHAR_DATA *victim, struct obj_data * tar_obj, int skill)
+{
+   switch (type) {
+      case SPELL_TYPE_SPELL:
+         if (!OUTSIDE(ch)) {
+            send_to_char("Your spell is more draining because you are indoors!\n\r", ch);
+            GET_MANA(ch) -= level / 2;
+            if(GET_MANA(ch) < 0)
+               GET_MANA(ch) = 0;
+         }
+         return spell_feline_agility(level, ch, victim, 0, skill);
+         break;
+      case SPELL_TYPE_POTION:
+	 return spell_feline_agility(level, ch, ch, 0, skill);
+      default :
+	 log("Serious screw-up in feline agility!", ANGEL, LOG_BUG);
+	 break;
+	 }
+  return eFAILURE;
+}
 
-int cast_feline_agility(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *victim, struct obj_data * tar_obj, int skill)
+int spell_feline_agility(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
 	struct affected_type af;
 
@@ -9694,13 +9784,6 @@ int cast_feline_agility(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DA
 	af.location	= APPLY_DEX;
 	affect_to_char(victim, &af);
 
-	if(!OUTSIDE(ch))
-	{
-		send_to_char("Your spell is more draining because you are indoors!\n\r", ch);
-		GET_MANA(ch) -= level / 2; /* If they are NOT outside it costs extra mana */
-		if(GET_MANA(ch) < 0)
-			GET_MANA(ch) = 0;
-	}
 	return eSUCCESS;
 }
 
@@ -9721,7 +9804,7 @@ int cast_oaken_fortitude(ubyte level, CHAR_DATA *ch, char *arg, int type,
       case SPELL_TYPE_POTION:
 	 return spell_oaken_fortitude(level, ch, ch, 0, skill);
       default :
-	 log("Serious screw-up in bee sting!", ANGEL, LOG_BUG);
+	 log("Serious screw-up in oaken fortitude!", ANGEL, LOG_BUG);
 	 break;
 	 }
   return eFAILURE;
@@ -10543,6 +10626,12 @@ int cast_lighted_path( ubyte level, CHAR_DATA *ch, char *arg, int type,
 {
   switch (type) {
 	case SPELL_TYPE_SPELL:
+                  if (!OUTSIDE(ch)) {
+                     send_to_char("Your spell is more draining because you are indoors!\n\r", ch);
+                     GET_MANA(ch) -= level / 2;
+                     if(GET_MANA(ch) < 0)
+                        GET_MANA(ch) = 0;
+                  }
 		 return spell_lighted_path(level,ch, "", SPELL_TYPE_SPELL, tar_ch,0, skill);
 		 break;
 	case SPELL_TYPE_POTION:
@@ -10777,6 +10866,12 @@ int cast_iron_roots(ubyte level, CHAR_DATA *ch, char *arg, int type,
                         CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill) {
   switch(type) {
     case SPELL_TYPE_SPELL:
+      if (!OUTSIDE(ch)) {
+         send_to_char("Your spell is more draining because you are indoors!\n\r", ch);
+         GET_MANA(ch) -= level / 2;
+         if(GET_MANA(ch) < 0)
+            GET_MANA(ch) = 0;
+      }
       return spell_iron_roots(level, ch, 0, 0, skill);
       break;
     case SPELL_TYPE_POTION:

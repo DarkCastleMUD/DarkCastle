@@ -5,7 +5,7 @@
  *                                                                           *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-/* $Id: magic.h,v 1.30 2007/01/23 16:00:44 pirahna Exp $ */
+/* $Id: magic.h,v 1.31 2007/01/23 17:54:29 pirahna Exp $ */
 #ifndef MAGIC_H_
 #define MAGIC_H_
 
@@ -38,6 +38,8 @@ int spell_resist_magic(ubyte level, CHAR_DATA * ch,
    CHAR_DATA * victim, struct obj_data * obj, int skill);
 
 int spell_bee_sting(ubyte level, CHAR_DATA *ch,
+   CHAR_DATA *victim, struct obj_data *obj, int skill);
+int spell_bee_swarm(ubyte level, CHAR_DATA *ch,
    CHAR_DATA *victim, struct obj_data *obj, int skill);
 int spell_bless(ubyte level, CHAR_DATA * ch,
    CHAR_DATA * victim, struct obj_data * obj, int skill);
@@ -169,6 +171,10 @@ int spell_haste(ubyte level, CHAR_DATA * ch,
 int spell_detect_poison(ubyte level, CHAR_DATA * ch,
    CHAR_DATA * victim, struct obj_data * obj, int skill);
 int spell_enchant_weapon(ubyte level, CHAR_DATA * ch,
+   CHAR_DATA * victim, struct obj_data * obj, int skill);
+int spell_eyes_of_the_owl(ubyte level, CHAR_DATA * ch,
+   CHAR_DATA * victim, struct obj_data * obj, int skill);
+int spell_feline_agility(ubyte level, CHAR_DATA * ch,
    CHAR_DATA * victim, struct obj_data * obj, int skill);
 int spell_heal(ubyte level, CHAR_DATA * ch,
    CHAR_DATA * victim, struct obj_data * obj, int skill);
@@ -578,6 +584,10 @@ int spell_globe_of_darkness(ubyte level, CHAR_DATA * ch,
 int cast_globe_of_darkness(ubyte level, CHAR_DATA * ch, char *arg, int type,
    CHAR_DATA * victim, struct obj_data * tar_obj, int skill);
 
+int spell_barkskin(ubyte level, CHAR_DATA * ch,
+   CHAR_DATA * victim, struct obj_data * obj, int skill);
+int spell_entangle(ubyte level, CHAR_DATA * ch,
+   CHAR_DATA * victim, struct obj_data * obj, int skill);
 int spell_eyes_of_the_eagle(ubyte level, CHAR_DATA * ch,
    CHAR_DATA * victim, struct obj_data * obj, int skill);
 int cast_eyes_of_the_eagle(ubyte level, CHAR_DATA * ch, char *arg, int type,
