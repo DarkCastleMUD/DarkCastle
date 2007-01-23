@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.150 2007/01/23 05:39:08 jhhudso Exp $ */
+/* $Id: nanny.cpp,v 1.151 2007/01/23 06:38:04 jhhudso Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -616,7 +616,7 @@ void do_on_login_stuff(char_data * ch)
   char buf[255];
   struct vault_data *vault = has_vault(GET_NAME(ch));
   if (vault) {
-    for (vault_access_data *access = vault->access; access; access = access->next) {
+    for (vault_access_data *access = vault->access; access && access != (vault_access_data *)0x95959595; access = access->next) {
       if (access->name) {
 	if (!file_exists(buf)) {
 	  remove_vault_access(ch, access->name, vault);
