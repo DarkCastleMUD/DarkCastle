@@ -16,7 +16,7 @@
 /* 12/08/2003   Onager   Added chop_half() to work like half_chop() but    */
 /*                       chopping off the last word.                       */
 /***************************************************************************/
-/* $Id: interp.cpp,v 1.119 2007/01/24 20:27:33 pirahna Exp $ */
+/* $Id: interp.cpp,v 1.120 2007/01/24 20:41:34 pirahna Exp $ */
 
 extern "C"
 {
@@ -787,9 +787,14 @@ int command_interpreter( CHAR_DATA *ch, char *pcomm, bool procced  )
       // -- Furey
       number( 0, 0 );
       return retval;
-      }
+    }
     // end if((found = find_cmd_in_radix(pcomm)))
 
+  // If we're at this point, Paralyze stops everything so get out.
+  if (IS_AFFECTED(ch, AFF_PARALYSIS) ) {
+    send_to_char("You've been paralyzed and are unable to move.\r\n", ch);
+    return eSUCCESS;
+  }
   // Check social table
   if (check_social( ch, pcomm, look_at, &pcomm[look_at]))
     return eSUCCESS;
