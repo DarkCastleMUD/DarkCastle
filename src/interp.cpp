@@ -16,7 +16,7 @@
 /* 12/08/2003   Onager   Added chop_half() to work like half_chop() but    */
 /*                       chopping off the last word.                       */
 /***************************************************************************/
-/* $Id: interp.cpp,v 1.118 2007/01/18 02:29:46 jhhudso Exp $ */
+/* $Id: interp.cpp,v 1.119 2007/01/24 20:27:33 pirahna Exp $ */
 
 extern "C"
 {
@@ -154,8 +154,8 @@ struct command_info cmd_info[] =
     { ":",		do_emote,	POSITION_RESTING, 0, 9, COM_CHARMIE_OK, 0 },    
     { "gossip",		do_gossip,	POSITION_DEAD, 0, 9, 0, 1 },
     { "trivia",		do_trivia,	POSITION_DEAD, 0, 9, 0, 1 },
-    { "gtell",		do_grouptell,	POSITION_DEAD, 0, 9, 0, 1 },
-    { ".",		do_grouptell,	POSITION_DEAD, 0, 9, 0, 1 },
+    { "gtell",		do_grouptell,	POSITION_DEAD, 0, 200, 0, 1 },
+    { ".",		do_grouptell,	POSITION_DEAD, 0, 200, 0, 1 },
     { "ignore",		do_ignore,	POSITION_DEAD, 0, 9, 0, 1 },
     { "insult",		do_insult,	POSITION_RESTING, 0, 9, COM_CHARMIE_OK, 0 },
     { "reply",		do_reply,	POSITION_RESTING, 0, 9, 0, 1 },
@@ -247,7 +247,7 @@ struct command_info cmd_info[] =
     // Miscellaneous commands
     { "autojoin",	do_autojoin,	POSITION_SLEEPING, 0, 9, 0, 1 },
     { "visible",	do_visible,	POSITION_SLEEPING, 0, 9, 0, 1 },
-    { "ctell",		do_ctell,	POSITION_SLEEPING, 0, 9, 0, 1 },
+    { "ctell",		do_ctell,	POSITION_SLEEPING, 0, 201, 0, 1 },
     { "outcast",	do_outcast,	POSITION_RESTING, 0, 9, 0, 1 },
     { "accept",		do_accept,	POSITION_RESTING, 0, 9, 0, 1 },
     { "whoclan",	do_whoclan,	POSITION_DEAD, 0, 9, 0, 1 },
@@ -670,11 +670,6 @@ int command_interpreter( CHAR_DATA *ch, char *pcomm, bool procced  )
     GET_AC(ch) -= 30;
     }
 
-  // Paralysis
-  if (IS_AFFECTED(ch, AFF_PARALYSIS)) {
-    send_to_char("You've been paralyzed and are unable to move.\r\n", ch);
-    return eSUCCESS;
-    }
 
   // Strip initial spaces OR tab characters and parse command word.
   // Translate to lower case.  We need to translate tabs for the MOBProgs to work
@@ -709,6 +704,15 @@ int command_interpreter( CHAR_DATA *ch, char *pcomm, bool procced  )
   // Old method used a linear search. *yuck* (Sadus)
   if((found = find_cmd_in_radix(pcomm)))
     if(GET_LEVEL(ch) >= found->minimum_level && found->command_pointer != NULL) {
+      // Paralysis stops everything but ...
+      if (IS_AFFECTED(ch, AFF_PARALYSIS) && 
+          found->command_number != 200 &&  // gtell
+          found->command_number != 201     // ctell
+         ) 
+      {
+        send_to_char("You've been paralyzed and are unable to move.\r\n", ch);
+        return eSUCCESS;
+      }
       // Character not in position for command?
 	if (GET_POS(ch) == POSITION_FIGHTING && !ch->fighting)
 	  GET_POS(ch) = POSITION_STANDING;
