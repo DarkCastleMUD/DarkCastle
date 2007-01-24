@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.60 2007/01/01 20:00:12 jhhudso Exp $ */
+/* $Id: clan.cpp,v 1.61 2007/01/24 03:12:24 jhhudso Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -856,6 +856,9 @@ int do_accept(CHAR_DATA *ch, char *arg, int cmd)
 
   sprintf(buf, "%s just joined clan [%s].", GET_NAME(victim), clan->name);
   log(buf, 110, LOG_CLAN);
+
+  add_totem_stats(victim);
+    
   return eSUCCESS;
 }
 
