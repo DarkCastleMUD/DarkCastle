@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.413 2007/01/23 04:30:24 jhhudso Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.414 2007/01/25 18:45:38 pirahna Exp $ */
 
 extern "C"
 {
@@ -2142,31 +2142,22 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
       SET_BIT(retval,eEXTRA_VALUE);
     }
   }
- 
-/*  else if (IS_SET(victim->suscept, weapon_bit)) 
+  else if (IS_SET(victim->suscept, weapon_bit)) 
   {
-    dam = (int)(dam * 1.3);
+    //    magic stuff is handled elsewhere
     if (attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING) {
+      dam = (int)(dam * 1.3);
       SET_BIT(modifier, COMBAT_MOD_SUSCEPT);
-    } else {
-      act("You shudder from the power of $n's spell.", ch, 0, victim, TO_VICT, 0);
-      act("$N shudders from the power of your spell.", ch, 0, victim, TO_CHAR, 0);
-      act("$N shudders from the power of $n's spell.", ch, 0, victim, TO_ROOM, NOTVICT);
     }
   } 
   else if (IS_SET(victim->resist, weapon_bit)) 
   {
-    dam = (int)(dam * 0.7);
+    //    magic stuff is handled elsewhere
     if (attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING)  {
+        dam = (int)(dam * 0.7);
         SET_BIT(modifier, COMBAT_MOD_RESIST);
     } 
-    else {
-      act("You resist against the power of $n's spell.", ch, 0, victim, TO_VICT, 0);
-      act("$N resists against the power of your spell.", ch, 0, victim, TO_CHAR, 0);
-      act("$N resists against the power of $n's spell.", ch, 0, victim, TO_ROOM, NOTVICT);
-    }
   }
-  */
   if (dam < 0)
     dam = 0;
 
