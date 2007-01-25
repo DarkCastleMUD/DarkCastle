@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.79 2006/12/30 20:04:43 dcastle Exp $
+| $Id: objects.cpp,v 1.80 2007/01/25 17:55:24 pirahna Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -1556,6 +1556,7 @@ void wear(struct char_data *ch, struct obj_data *obj_object, int keyword)
         act("You are already wearing $p on your right ring-finger.", ch, ch->equipment[WEAR_FINGER_R], 0, TO_CHAR, 0);
       }
       else {
+        perform_wear(ch,obj_object,keyword);
         if(ch->equipment[WEAR_FINGER_L]) {
           sprintf(buffer, "You put the %s on your right ring-finger.\n\r", 
                   fname(obj_object->name));
@@ -1570,7 +1571,6 @@ void wear(struct char_data *ch, struct obj_data *obj_object, int keyword)
           obj_from_char(obj_object);
           equip_char(ch, obj_object, WEAR_FINGER_L);
         }
-        perform_wear(ch,obj_object,keyword);
       }
     }
     else
@@ -1586,6 +1586,7 @@ void wear(struct char_data *ch, struct obj_data *obj_object, int keyword)
         act("You are already wearing $p on your neck.", ch, ch->equipment[WEAR_NECK_2], 0, TO_CHAR, 0);
       }
       else {
+        perform_wear(ch,obj_object,keyword);
         if(ch->equipment[WEAR_NECK_1]) {
           obj_from_char(obj_object);
           equip_char(ch, obj_object, WEAR_NECK_2);
@@ -1594,7 +1595,6 @@ void wear(struct char_data *ch, struct obj_data *obj_object, int keyword)
           obj_from_char(obj_object);
           equip_char(ch, obj_object, WEAR_NECK_1);
         }
-        perform_wear(ch,obj_object,keyword);
       }
     }
     else
@@ -1609,8 +1609,8 @@ void wear(struct char_data *ch, struct obj_data *obj_object, int keyword)
       }
       else {
         obj_from_char(obj_object);
-        equip_char(ch,  obj_object, WEAR_BODY);
         perform_wear(ch,obj_object,keyword);
+        equip_char(ch,  obj_object, WEAR_BODY);
       }
     }
     else
@@ -1625,8 +1625,8 @@ void wear(struct char_data *ch, struct obj_data *obj_object, int keyword)
       }
       else {
         obj_from_char(obj_object);
-        equip_char(ch, obj_object, WEAR_HEAD);
         perform_wear(ch,obj_object,keyword);
+        equip_char(ch, obj_object, WEAR_HEAD);
       }
     }
     else
@@ -1641,8 +1641,8 @@ void wear(struct char_data *ch, struct obj_data *obj_object, int keyword)
       }
       else {
         obj_from_char(obj_object);
-        equip_char(ch, obj_object, WEAR_LEGS);
         perform_wear(ch, obj_object, keyword);
+        equip_char(ch, obj_object, WEAR_LEGS);
       }
     }
     else
@@ -1657,8 +1657,8 @@ void wear(struct char_data *ch, struct obj_data *obj_object, int keyword)
       }
       else {
         obj_from_char(obj_object);
-        equip_char(ch, obj_object, WEAR_FEET);
         perform_wear(ch, obj_object, keyword);
+        equip_char(ch, obj_object, WEAR_FEET);
       }
     }
     else
@@ -1673,8 +1673,8 @@ void wear(struct char_data *ch, struct obj_data *obj_object, int keyword)
       }
       else {
         obj_from_char(obj_object);
-        equip_char(ch, obj_object, WEAR_HANDS);
         perform_wear(ch,obj_object,keyword);
+        equip_char(ch, obj_object, WEAR_HANDS);
       }
     }
     else
@@ -1689,8 +1689,8 @@ void wear(struct char_data *ch, struct obj_data *obj_object, int keyword)
       }
       else {
         obj_from_char(obj_object);
-        equip_char(ch, obj_object, WEAR_ARMS);
         perform_wear(ch,obj_object,keyword);
+        equip_char(ch, obj_object, WEAR_ARMS);
       }
     }
     else
@@ -1705,8 +1705,8 @@ void wear(struct char_data *ch, struct obj_data *obj_object, int keyword)
       }
       else {
         obj_from_char(obj_object);
-        equip_char(ch, obj_object, WEAR_ABOUT);
         perform_wear(ch,obj_object,keyword);
+        equip_char(ch, obj_object, WEAR_ABOUT);
       }
     }
     else
@@ -1721,8 +1721,8 @@ void wear(struct char_data *ch, struct obj_data *obj_object, int keyword)
       }
       else {
         obj_from_char(obj_object);
-        equip_char(ch,  obj_object, WEAR_WAISTE);
         perform_wear(ch, obj_object, keyword);
+        equip_char(ch,  obj_object, WEAR_WAISTE);
       }
     }
     else
@@ -1739,6 +1739,7 @@ void wear(struct char_data *ch, struct obj_data *obj_object, int keyword)
       }
       else {
         obj_from_char(obj_object);
+        perform_wear(ch,obj_object,keyword);
         if(ch->equipment[WEAR_WRIST_L]) {
           sprintf(buffer,"You wear the %s around your right wrist.\n\r", 
                   fname(obj_object->name));
@@ -1751,7 +1752,6 @@ void wear(struct char_data *ch, struct obj_data *obj_object, int keyword)
           send_to_char(buffer, ch);
           equip_char(ch, obj_object, WEAR_WRIST_L);
         }
-        perform_wear(ch,obj_object,keyword);
       }
     }
     else
@@ -1767,8 +1767,8 @@ void wear(struct char_data *ch, struct obj_data *obj_object, int keyword)
       }
       else {
         obj_from_char(obj_object);
-        equip_char(ch, obj_object, WEAR_FACE);
         perform_wear(ch,obj_object,keyword);
+        equip_char(ch, obj_object, WEAR_FACE);
       }
     }
     else
@@ -1796,11 +1796,11 @@ MIN(GET_STR(ch)/2, get_max_stat(ch, STR)/2) &&
       }
       else {
         obj_from_char(obj_object);
+        perform_wear(ch,obj_object,keyword);
         if(ch->equipment[WIELD])
           equip_char(ch, obj_object, SECOND_WIELD);
         else
           equip_char(ch, obj_object, WIELD);
-        perform_wear(ch,obj_object,keyword);
       }
     }
     else
@@ -1824,8 +1824,8 @@ MIN(GET_STR(ch)/2, get_max_stat(ch, STR)/2) &&
 
       else {
         obj_from_char(obj_object);
-        equip_char(ch, obj_object, WEAR_SHIELD);
         perform_wear(ch,obj_object,keyword);
+        equip_char(ch, obj_object, WEAR_SHIELD);
       }
     }
 
@@ -1851,10 +1851,10 @@ MIN(GET_STR(ch)/2, get_max_stat(ch, STR)/2) &&
 	}
       else {
         obj_from_char(obj_object);
+        perform_wear(ch,obj_object,keyword);
 	if (ch->equipment[HOLD])
 	equip_char(ch, obj_object, HOLD2);
       else  equip_char(ch, obj_object, HOLD);
-        perform_wear(ch,obj_object,keyword);
       }
     }
     else
@@ -1871,6 +1871,7 @@ MIN(GET_STR(ch)/2, get_max_stat(ch, STR)/2) &&
         act("You already wearing $p on your right ear.", ch, ch->equipment[WEAR_EAR_R], 0, TO_CHAR, 0);
       }
       else {
+        perform_wear(ch,obj_object,keyword);
         if(ch->equipment[WEAR_EAR_L]) {
           act("You wear $p in your right ear.",ch,obj_object,0,TO_CHAR,0);
           obj_from_char(obj_object);
@@ -1881,7 +1882,6 @@ MIN(GET_STR(ch)/2, get_max_stat(ch, STR)/2) &&
           obj_from_char(obj_object);
           equip_char(ch, obj_object, WEAR_EAR_L);
         }
-        perform_wear(ch,obj_object,keyword);
       }
     }
     else
@@ -1905,8 +1905,8 @@ MIN(GET_STR(ch)/2, get_max_stat(ch, STR)/2) &&
       send_to_char("That isn't a light you cheating fuck!\n\r", ch);
     else {
       obj_from_char(obj_object);
-      equip_char(ch, obj_object, WEAR_LIGHT);
       perform_wear(ch,obj_object,keyword);
+      equip_char(ch, obj_object, WEAR_LIGHT);
     }
   } break;
 
