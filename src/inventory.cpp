@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.85 2007/01/26 01:51:58 dcastle Exp $
+| $Id: inventory.cpp,v 1.86 2007/01/26 02:24:24 dcastle Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -53,14 +53,14 @@ void save_corpses(void);
 char *fname(char *namelist);
 int isname(char *arg, char *arg2);
 struct obj_data *create_money( int amount );
-int palm  (struct char_data *ch, struct obj_data *obj_object, struct obj_data *sub_object);
+int palm  (struct char_data *ch, struct obj_data *obj_object, struct obj_data *sub_object, bool has_consent);
 void special_log(char *arg);
 struct obj_data * bring_type_to_front(char_data * ch, int item_type);
 struct obj_data * search_char_for_item(char_data * ch, int16 item_number, bool wearonly = FALSE);
 void send_info(char *);
 
 /* procedures related to get */
-void get(struct char_data *ch, struct obj_data *obj_object, struct obj_data *sub_object)
+void get(struct char_data *ch, struct obj_data *obj_object, struct obj_data *sub_object, bool has_consent)
 {
     char buffer[MAX_STRING_LENGTH];
    
@@ -90,6 +90,54 @@ void get(struct char_data *ch, struct obj_data *obj_object, struct obj_data *sub
     }
 
     if (sub_object) {
+			sprintf(buffer,"%s_consent",GET_NAME(ch));
+		      if (has_consent && obj_object->obj_flags.type_flag != ITEM_MONEY) {
+                                if (isname("lootable",sub_object->name) && !isname(buffer,sub_object->name))
+                                {
+				  SET_BIT(sub_object->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED);;
+                                  struct affected_type pthiefaf;
+				  WAIT_STATE(ch, PULSE_VIOLENCE*2);
+				  send_to_char("You suddenly feel very guilty...shame on you stealing from the dead!\r\n",ch);
+
+                                  pthiefaf.type = FUCK_PTHIEF;
+                                  pthiefaf.duration = 10;
+                                  pthiefaf.modifier = 0;
+                                  pthiefaf.location = APPLY_NONE;
+                                  pthiefaf.bitvector = -1;
+
+                                  if(affected_by_spell(ch, FUCK_PTHIEF))
+                                  {
+                                        affect_from_char(ch, FUCK_PTHIEF);
+                                        affect_to_char(ch, &pthiefaf);
+                                  }
+                                  else
+                                        affect_to_char(ch, &pthiefaf);
+
+                                }
+		      } else if (has_consent && obj_object->obj_flags.type_flag == ITEM_MONEY && !isname(buffer,sub_object->name)) {
+                                if (isname("lootable",sub_object->name))
+                                {
+                                  struct affected_type pthiefaf;
+
+                                  pthiefaf.type = FUCK_GTHIEF;
+                                  pthiefaf.duration = 10;
+                                  pthiefaf.modifier = 0;
+                                  pthiefaf.location = APPLY_NONE;
+                                  pthiefaf.bitvector = -1;
+				  WAIT_STATE(ch, PULSE_VIOLENCE);
+				  send_to_char("You suddenly feel very guilty...shame on you stealing from the dead!\r\n",ch);
+
+                                  if(affected_by_spell(ch, FUCK_GTHIEF))
+                                  {
+                                        affect_from_char(ch, FUCK_GTHIEF);
+                                        affect_to_char(ch, &pthiefaf);
+                                  }
+                                  else
+                                        affect_to_char(ch, &pthiefaf);
+
+                                }
+		      }
+
 	move_obj(obj_object, ch);
 	if (sub_object->carried_by == ch) {
 	    act("You get $p from $P.", ch, obj_object, sub_object, TO_CHAR, 0);
@@ -345,7 +393,7 @@ int do_get(struct char_data *ch, char *argument, int cmd)
 		    }
 		    else if (CAN_WEAR(obj_object,ITEM_TAKE)) 
 		    {
-			get(ch,obj_object,sub_object);
+			get(ch,obj_object,sub_object,0);
 			found = TRUE;
 		    } else 
 		    {
@@ -353,7 +401,7 @@ int do_get(struct char_data *ch, char *argument, int cmd)
 			fail = TRUE;
 		    }
 		} else if (CAN_SEE_OBJ(ch, obj_object) && GET_LEVEL(ch) >= IMMORTAL && CAN_WEAR(obj_object,ITEM_TAKE)) {
-		    get(ch,obj_object,sub_object);
+		    get(ch,obj_object,sub_object,0);
                     found = TRUE;
                 }
 	    } // of for loop
@@ -415,14 +463,14 @@ int do_get(struct char_data *ch, char *argument, int cmd)
 		     fail = TRUE;	
                   } else {
                      csendf(ch, "The aura of the donation room allows you to pick up %s.\n\r", obj_object->short_description);
-                     get (ch, obj_object, sub_object);
+                     get (ch, obj_object, sub_object,0);
                      do_save(ch,"", 666);
                      found = TRUE;
                   }
 		} else if (CAN_WEAR(obj_object,ITEM_TAKE)) 
                 {
-                    if(cmd == 10) palm(ch, obj_object, sub_object);
-		    else          get (ch, obj_object, sub_object);
+                    if(cmd == 10) palm(ch, obj_object, sub_object,0);
+		    else          get (ch, obj_object, sub_object,0);
                     do_save(ch,"", 666);
 		    found = TRUE;
 		} else {
@@ -547,7 +595,7 @@ fname(obj_object->name));
 			}
 
 		          if (CAN_WEAR(obj_object,ITEM_TAKE)) {
-			    get(ch,obj_object,sub_object);
+			    get(ch,obj_object,sub_object,0);
 			    found = TRUE;
 		          } else {
 			    send_to_char("You can't take that.\n\r", ch);
@@ -693,55 +741,8 @@ fname(obj_object->name));
                     }
 		    else if (CAN_WEAR(obj_object,ITEM_TAKE)) 
                     {
-			sprintf(buffer,"%s_consent",GET_NAME(ch));
-		      if (has_consent && obj_object->obj_flags.type_flag != ITEM_MONEY) {
-                                if (isname("lootable",sub_object->name) && !isname(buffer,sub_object->name))
-                                {
-				  SET_BIT(sub_object->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED);;
-                                  struct affected_type pthiefaf;
-				  WAIT_STATE(ch, PULSE_VIOLENCE*2);
-				  send_to_char("You suddenly feel very guilty...shame on you stealing from the dead!\r\n",ch);
-
-                                  pthiefaf.type = FUCK_PTHIEF;
-                                  pthiefaf.duration = 10;
-                                  pthiefaf.modifier = 0;
-                                  pthiefaf.location = APPLY_NONE;
-                                  pthiefaf.bitvector = -1;
-
-                                  if(affected_by_spell(ch, FUCK_PTHIEF))
-                                  {
-                                        affect_from_char(ch, FUCK_PTHIEF);
-                                        affect_to_char(ch, &pthiefaf);
-                                  }
-                                  else
-                                        affect_to_char(ch, &pthiefaf);
-
-                                }
-		      } else if (has_consent && obj_object->obj_flags.type_flag == ITEM_MONEY && !isname(buffer,sub_object->name)) {
-                                if (isname("lootable",sub_object->name))
-                                {
-                                  struct affected_type pthiefaf;
-
-                                  pthiefaf.type = FUCK_GTHIEF;
-                                  pthiefaf.duration = 10;
-                                  pthiefaf.modifier = 0;
-                                  pthiefaf.location = APPLY_NONE;
-                                  pthiefaf.bitvector = -1;
-				  WAIT_STATE(ch, PULSE_VIOLENCE);
-				  send_to_char("You suddenly feel very guilty...shame on you stealing from the dead!\r\n",ch);
-
-                                  if(affected_by_spell(ch, FUCK_GTHIEF))
-                                  {
-                                        affect_from_char(ch, FUCK_GTHIEF);
-                                        affect_to_char(ch, &pthiefaf);
-                                  }
-                                  else
-                                        affect_to_char(ch, &pthiefaf);
-
-                                }
-		      }
-                      if(cmd == 10) palm(ch, obj_object, sub_object);
-		      else          get (ch, obj_object, sub_object);
+                      if(cmd == 10) palm(ch, obj_object, sub_object,has_consent);
+		      else          get (ch, obj_object, sub_object,has_consent);
 		      found = TRUE;
                       if(blindlag) WAIT_STATE(ch, PULSE_VIOLENCE);
 		    } else {
@@ -1532,7 +1533,7 @@ struct obj_data * bring_type_to_front(char_data * ch, int item_type)
   //  if(GET_ITEM_TYPE(i) == ITEM_CONTAINER) { // search inside if open
       for(j = i->contains; j ; j = j->next_content) {
         if(GET_ITEM_TYPE(j) == item_type) {
-          get(ch, j, i);
+          get(ch, j, i,0);
           return j;
         }
       }
