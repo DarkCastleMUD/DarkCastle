@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.86 2007/01/26 02:24:24 dcastle Exp $
+| $Id: inventory.cpp,v 1.87 2007/01/26 15:52:14 dcastle Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -650,7 +650,7 @@ fname(obj_object->name));
                sprintf(buffer, "%s_consent", GET_NAME(ch));
 	       if((isname("thiefcorpse", sub_object->name) && !isname(GET_NAME(ch), sub_object->name)) || isname(buffer, sub_object->name))
                  has_consent = TRUE;
-               if (isname("lootable", sub_object->name) && !IS_SET(sub_object->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED) &&
+               if (!isname(GET_NAME(ch), sub_object->name) && isname("lootable", sub_object->name) && !IS_SET(sub_object->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED) &&
 			!IS_SET(world[ch->in_room].room_flags, SAFE) && GET_LEVEL(ch) >= 50)
 		 has_consent = TRUE;
 	       if(!has_consent && !isname(GET_NAME(ch), sub_object->name)) {
