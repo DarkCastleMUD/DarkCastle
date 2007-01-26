@@ -956,6 +956,7 @@ struct obj_data *exists_in_vault(struct vault_data *vault, obj_data *obj)
 
 void get_from_vault(CHAR_DATA *ch, char *object, char *owner) {
   char buf[MAX_INPUT_LENGTH];
+  char obj_list[50][100];
   struct obj_data *obj, *tmp_obj;
   struct vault_items_data *items;
   struct vault_data *vault;
@@ -979,6 +980,26 @@ void get_from_vault(CHAR_DATA *ch, char *object, char *owner) {
 
   if (sscanf(object, "%d.%s", &num, object) != 2)
     num = 1;
+
+  if (!strcmp(object, "all")) {
+    bool ioverload = FALSE;
+    for (items = vault->items, i=0; items; items=items->next) {
+      obj = items->obj?items->obj:get_obj(items->item_vnum);
+      for(int j = 0; j < items->count ; j++, i++) {
+        strcpy(obj_list[i],fname(obj->name));
+        if(i>49) {
+          send_to_char("You can only take out 50 items at a time.\n\r", ch);
+          ioverload=TRUE;
+          break;
+        }
+      }
+      if(ioverload) break;
+    }
+    int amount=i;
+    for (i=0;i<amount;i++)
+      get_from_vault(ch, obj_list[i], owner);
+    return;
+  }
 
   if (sscanf(object, "all.%s", object)) {
     num = 0;  // count the number of items that match that keyword so we know how many to get
