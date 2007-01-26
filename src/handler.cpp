@@ -1,3 +1,4 @@
+
 /***************************************************************************
  *  file: handler.c , Handler module.                      Part of DIKUMUD *
  *  Usage: Various routines for moving about objects/players               *
@@ -12,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.154 2007/01/14 04:54:56 jhhudso Exp $ */
+/* $Id: handler.cpp,v 1.155 2007/01/26 04:22:34 shane Exp $ */
     
 extern "C"
 {
@@ -1647,9 +1648,9 @@ void affect_remove( CHAR_DATA *ch, struct affected_type *af, int flags)
          if(!(flags & SUPPRESS_MESSAGES))
          send_to_char("The gods smile upon you and are ready to intervene on your behalf again.\n\r", ch);
          break;
-      case SPELL_DIV_INT_TIMER2:
+      case SPELL_NO_CAST_TIMER:
          if(!(flags & SUPPRESS_MESSAGES))
-         send_to_char("You feel mana regenerating within you again.\n\r", ch);
+         send_to_char("You feel able to concentrate on spellcasting once again.\n\r", ch);
          break;
       case SKILL_QUIVERING_PALM:
          if(!(flags & SUPPRESS_MESSAGES))

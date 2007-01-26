@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_barbarian.cpp,v 1.71 2007/01/18 02:50:18 jhhudso Exp $
+| $Id: cl_barbarian.cpp,v 1.72 2007/01/26 04:22:42 shane Exp $
 | cl_barbarian.C
 | Description:  Commands for the barbarian class.
 */
@@ -687,6 +687,9 @@ int do_knockback(struct char_data *ch, char *argument, int cmd)
 
   dam = (int)(dam * (1.0 + dampercent / 100.0));
 
+  char buf2[MAX_STRING_LENGTH], dammsg[20];
+  int prevhps = GET_HIT(victim);
+
   if(!skill_success(ch, victim, SKILL_KNOCKBACK, 0-(learned/4 * 3))) {
     act("You lunge forward in an attempt to smash $N but fall, missing $M completely.", ch, 0, victim, TO_CHAR, 0);
     act("$n lunges forward in an attempt to smash into you but falls flat on $s face, missing completely.", ch, 0, victim, TO_VICT, 0);
@@ -712,15 +715,19 @@ int do_knockback(struct char_data *ch, char *argument, int cmd)
        return retval; // this too, just in case it gets called from  a
 		      // proc later on, it returns correct stuff
     } else {
+       sprintf(dammsg, "$B%d$R", prevhps - GET_HIT(victim));
+       sprintf(buf2, "Your smash for | damage sends %s reeling %s.", GET_SHORT(victim), dirs[dir]);
        sprintf(buf, "Your smash sends %s reeling %s.", GET_SHORT(victim), dirs[dir]);
-       act(buf, ch, 0, victim, TO_CHAR, 0);
+       send_damage(buf2, ch, 0, victim, dammsg, buf, TO_CHAR);
+       sprintf(buf2, "%s smashes into you for | damage, sending you reeling %s.", GET_NAME(ch), dirs[dir]);
        sprintf(buf, "%s smashes into you, sending you reeling %s.", GET_NAME(ch), dirs[dir]);
-       act(buf, ch, 0, victim, TO_VICT, 0);
+       send_damage(buf2, ch, 0, victim,dammsg, buf, TO_VICT);
 	extern bool selfpurge;
 	if (selfpurge)
 		return eSUCCESS|eVICT_DIED;	
+       sprintf(buf2, "%s smashes into %s for | damage and sends $S reeling to the %s.", GET_NAME(ch), GET_SHORT(victim), dirs[dir]);
        sprintf(buf, "%s smashes into %s and sends $S reeling to the %s.", GET_NAME(ch), GET_SHORT(victim), dirs[dir]);
-       act(buf, ch, 0, victim, TO_ROOM, NOTVICT);
+       send_damage(buf2, ch, 0, victim, dammsg, buf, TO_ROOM);
        if(victim->fighting) {
           if(IS_NPC(victim)) {
              add_memory(victim, GET_NAME(ch), 'h');
@@ -735,13 +742,26 @@ int do_knockback(struct char_data *ch, char *argument, int cmd)
     WAIT_STATE(ch, PULSE_VIOLENCE);
     return eSUCCESS;
   } else {
-    act("$N backpeddles across the room due to $n's smash.", ch, 0, victim, TO_ROOM, NOTVICT);
-    act("$N barely keeps $S footing, stumbling backwards after your smash.", ch, 0, victim, TO_CHAR, 0);
-    act("$n knocks you back across the room.", ch, 0, victim, TO_VICT, 0);
-    WAIT_STATE(ch, PULSE_VIOLENCE);
+    char temp[256];
+    sprintf(temp,"%s",GET_SHORT(victim));
     retval = damage(ch, victim, dam, TYPE_CRUSH, SKILL_KNOCKBACK ,0);
-    if(!SOMEONE_DIED(retval))
-       return attack(victim, ch, TYPE_UNDEFINED);
+    if(SOMEONE_DIED(retval)) {
+       sprintf(buf, "You smash %s apart!",temp);
+       act(buf, ch, 0, 0, TO_CHAR, 0);
+       sprintf(buf, "$n smashes %s to pieces!", temp);
+       act(buf, ch, 0, 0, TO_ROOM, 0);
+       return retval;
+    } else {
+       sprintf(dammsg, "$B%d$R", prevhps - GET_HIT(victim));
+       send_damage("$N backpeddles across the room due to $n's smash for | damage.", ch, 0, victim, dammsg,
+                   "$N backpessles across the room due to $n's smash.", TO_ROOM);
+       send_damage("$N barely keeps $S footing, stumbling backwards after your smash and taking | damage.", ch, 0, victim, dammsg,
+                   "$N barely keeps $S footing, stumbling backwards after your smash.", TO_CHAR);
+       send_damage("$n knocks you back across the room for | damage.", ch, 0, victim, dammsg, 
+                   "$n knocks you back across the room.", TO_VICT);
+       WAIT_STATE(ch, PULSE_VIOLENCE);
+       return attack(victim, ch, TYPE_UNDEFINED);       
+    }
   }
   return eSUCCESS;
 }

@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.208 2007/01/13 04:45:25 jhhudso Exp $ */
+/* $Id: spells.cpp,v 1.209 2007/01/26 04:22:35 shane Exp $ */
 
 extern "C"
 {
@@ -421,7 +421,7 @@ struct spell_info_type spell_info [] =
 
  { /* 161 */ 12, POSITION_STANDING, 10, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_clarity, SKILL_INCREASE_MEDIUM },
 
- { /* 162 */ 12, POSITION_STUNNED, 1, TAR_CHAR_ROOM|TAR_SELF_DEFAULT|TAR_SELF_ONLY, cast_divine_intervention, SKILL_INCREASE_EASY }
+ { /* 162 */ 12, POSITION_STUNNED, 200, TAR_CHAR_ROOM|TAR_SELF_DEFAULT|TAR_SELF_ONLY, cast_divine_intervention, SKILL_INCREASE_EASY }
 
 };
 
@@ -1563,13 +1563,18 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
 // Need to allow mob_progs to use cast without allowing charmies to
 
   if (IS_NPC(ch) && ch->desc && ch->desc->original && ch->desc->original != ch->desc->character && GET_LEVEL(ch->desc->original) < IMMORTAL) {
-    send_to_char("You can't cast in this form.\n\r", ch);
+    send_to_char("You cannot cast in this form.\n\r", ch);
+    return eFAILURE;
+  }
+
+  if(affected_by_spell(ch, SPELL_NO_CAST_TIMER)) {
+    send_to_char("You seem unable to concentrate enough to cast any spells.\n\r", ch);
     return eFAILURE;
   }
   
   if(IS_AFFECTED(ch, AFF_CHARM))
   {
-    send_to_char("You can't cast while charmed!\n\r", ch);
+    send_to_char("You cannot cast while charmed!\n\r", ch);
     return eFAILURE;
   }
 

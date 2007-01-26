@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.139 2007/01/20 21:07:05 shane Exp $ */
+/* $Id: info.cpp,v 1.140 2007/01/26 04:22:34 shane Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -1537,8 +1537,8 @@ int do_score(struct char_data *ch, char *argument, int cmd)
            case SPELL_DIV_INT_TIMER:
              aff_name = "divine intervention timer";
              break;
-           case SPELL_DIV_INT_TIMER2:
-             aff_name = "div. int. no regen timer";
+           case SPELL_NO_CAST_TIMER:
+             aff_name = "cannot cast timer";
              break;
            case SKILL_NAT_SELECT:
              aff_name = "natural selection";

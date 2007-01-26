@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.58 2006/12/19 14:53:58 dcastle Exp $ */
+/* $Id: ki.cpp,v 1.59 2007/01/26 04:22:34 shane Exp $ */
 
 extern "C"
 {
@@ -420,12 +420,16 @@ int ki_blast( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
       }
    else /* There is no exit there */
 	{
-		act("$N is blasted across the room by $n!", ch, 0, vict,
-		  TO_ROOM, NOTVICT);
-		act("$N is thrown to the ground by your blast!", ch, 0, vict,
-		  TO_CHAR, 0);
-		act("$n blasts you across the room, causing you to fall!", ch, 0, vict, TO_VICT, 0);
-		damage(ch,vict,100, TYPE_KI,KI_OFFSET+KI_BLAST,0);
+      char buf[20];
+      int prev = GET_HIT(vict);
+      damage(ch,vict,100, TYPE_KI,KI_OFFSET+KI_BLAST,0);
+      sprintf(buf, "$B%d$R", prev - GET_HIT(vict));
+      send_damage("$N is blasted across the room by $n for | damage!", ch, 0, vict, buf,
+		  "$N is blasted across the room by $n!", TO_ROOM);
+      send_damage("$N is thrown to the ground by your blast and suffers | damage!", ch, 0, vict, buf,
+		  "$N is thrown to the ground by your blast!", TO_CHAR);
+      send_damage("$n blasts you across the room, causing you to fall and take | damage!", ch, 0, vict, buf,
+                  "$n blasts you across the room, causing you to fall!", TO_VICT);
                 GET_POS(vict) = POSITION_SITTING;
 		if(!vict->fighting && IS_NPC(vict))
 			return attack(vict, ch, TYPE_UNDEFINED);
