@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.157 2007/01/14 22:48:15 jhhudso Exp $
+| $Id: cl_thief.cpp,v 1.158 2007/01/26 02:24:54 dcastle Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -44,7 +44,7 @@ extern int check_joincharmie(CHAR_DATA *ch, int skill = 0);
 
 
 int palm(CHAR_DATA *ch, struct obj_data *obj_object,
-          struct obj_data *sub_object)
+          struct obj_data *sub_object, bool has_consent)
 {
   char buffer[MAX_STRING_LENGTH];
     
@@ -73,6 +73,57 @@ int palm(CHAR_DATA *ch, struct obj_data *obj_object,
            send_info(buffer);
   }
 
+  if (sub_object)
+  {
+                        sprintf(buffer,"%s_consent",GET_NAME(ch));
+                      if (has_consent && obj_object->obj_flags.type_flag != ITEM_MONEY) {
+                                if (isname("lootable",sub_object->name) && !isname(buffer,sub_object->name))
+                                {
+                                  SET_BIT(sub_object->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED);;
+                                  struct affected_type pthiefaf;
+                                  WAIT_STATE(ch, PULSE_VIOLENCE*2);
+                                  send_to_char("You suddenly feel very guilty...shame on you stealing from the dead!\r\n",ch);
+
+                                  pthiefaf.type = FUCK_PTHIEF;
+                                  pthiefaf.duration = 10;
+                                  pthiefaf.modifier = 0;
+                                  pthiefaf.location = APPLY_NONE;
+                                  pthiefaf.bitvector = -1;
+
+                                  if(affected_by_spell(ch, FUCK_PTHIEF))
+                                  {
+                                        affect_from_char(ch, FUCK_PTHIEF);
+                                        affect_to_char(ch, &pthiefaf);
+                                  }
+                                  else
+                                        affect_to_char(ch, &pthiefaf);
+
+                                }
+                      } else if (has_consent && obj_object->obj_flags.type_flag == ITEM_MONEY && !isname(buffer,sub_object->name)) {
+                                if (isname("lootable",sub_object->name))
+                                {
+                                  struct affected_type pthiefaf;
+
+                                  pthiefaf.type = FUCK_GTHIEF;
+                                  pthiefaf.duration = 10;
+                                  pthiefaf.modifier = 0;
+                                  pthiefaf.location = APPLY_NONE;
+                                  pthiefaf.bitvector = -1;
+                                  WAIT_STATE(ch, PULSE_VIOLENCE);
+                                  send_to_char("You suddenly feel very guilty...shame on you stealing from the dead!\r\n",ch);
+
+                                  if(affected_by_spell(ch, FUCK_GTHIEF))
+                                  {
+                                        affect_from_char(ch, FUCK_GTHIEF);
+                                        affect_to_char(ch, &pthiefaf);
+                                  }
+                                  else
+                                        affect_to_char(ch, &pthiefaf);
+
+                                }
+                      }
+
+  }
   move_obj(obj_object, ch);
   
   if(skill_success(ch,NULL,SKILL_PALM)) {
