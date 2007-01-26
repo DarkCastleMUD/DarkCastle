@@ -1460,6 +1460,12 @@ void do_astral_chanty_movement(CHAR_DATA *victim, CHAR_DATA *target)
 {
   int retval;
 
+  if (affected_by_spell(victim, FUCK_PTHIEF))
+  {
+    send_to_char("Your attempt to transport stolen goods through the astral planes fails!\r\n",victim);
+    return;
+  }
+
   retval = move_char(victim, target->in_room);
 
   if(!IS_SET(retval, eSUCCESS)) {
