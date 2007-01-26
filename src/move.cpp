@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.75 2006/08/16 00:36:03 jhhudso Exp $
+| $Id: move.cpp,v 1.76 2007/01/26 01:49:13 dcastle Exp $
 | move.C
 | Movement commands and stuff.
 *************************************************************************
@@ -1012,6 +1012,11 @@ int do_enter(CHAR_DATA *ch, char *argument, int cmd)
     return eFAILURE;
     }
 
+  if (affected_by_spell(ch, FUCK_PTHIEF))
+  {
+    send_to_char("Your attempt to transport stolen goods through planes of magic fails!\r\n",ch);
+    return eFAILURE;
+  }
   if (!IS_MOB(ch) &&
       (affected_by_spell(ch, FUCK_PTHIEF) || affected_by_spell(ch, FUCK_GTHIEF) || IS_AFFECTED(ch, AFF_CHAMPION)) &&
       (IS_SET(world[real_room(portal->obj_flags.value[0])].room_flags, CLAN_ROOM) ||
