@@ -1024,7 +1024,6 @@ act("You resist $n's whistle sharp!",ch,NULL,victim,TO_VICT,0);
    int wait = song_info[ch->song_number].beats - (skill / 10);
    wait = MAX(wait, 2);
 
-   if (level != 51)
    WAIT_STATE(ch, wait);
    return eSUCCESS;
 }
