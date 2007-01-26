@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: cl_ranger.cpp,v 1.80 2007/01/13 03:55:53 dcastle Exp $ | cl_ranger.C  *
+ * $Id: cl_ranger.cpp,v 1.81 2007/01/26 02:25:42 dcastle Exp $ | cl_ranger.C  *
  * Description: Ranger skills/spells                                          *
  *                                                                            *
  * Revision History                                                           *
@@ -1111,7 +1111,7 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
   bool enchantmentused = FALSE;
   extern char * dirs[];
 
-  void get(struct char_data *, struct obj_data *, struct obj_data *);
+  void get(struct char_data *, struct obj_data *, struct obj_data *, bool);
   
   victim = NULL;
   *direct = '\0';
@@ -1348,13 +1348,13 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
          && isname("quiver", ch->equipment[WEAR_ABOUT]->name))
         {found = find_arrow(ch->equipment[WEAR_ABOUT]);
         if(found)
-           get(ch,found,ch->equipment[WEAR_ABOUT]); }
+           get(ch,found,ch->equipment[WEAR_ABOUT],0); }
    if(!found && ch->equipment[WEAR_WAISTE])
     if((ch->equipment[WEAR_WAISTE]->obj_flags.type_flag == ITEM_CONTAINER) 
         && isname("quiver", ch->equipment[WEAR_WAISTE]->name))
         {found = find_arrow(ch->equipment[WEAR_WAISTE]);
         if(found)
-           get(ch,found,ch->equipment[WEAR_WAISTE]); }
+           get(ch,found,ch->equipment[WEAR_WAISTE],0); }
 
    if(!found)
    {
