@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.76 2007/01/26 01:49:13 dcastle Exp $
+| $Id: move.cpp,v 1.77 2007/01/26 16:29:27 pirahna Exp $
 | move.C
 | Movement commands and stuff.
 *************************************************************************
@@ -536,7 +536,7 @@ int do_simple_move(CHAR_DATA *ch, int cmd, int following)
 
   if (rm->sector_type != world[ch->in_room].sector_type &&
     ch->desc && ch->desc->original &&
-    ch->desc->original->level < 51) {
+    ch->desc->original->level <= MAX_MORTAL) {
     int s2 = rm->sector_type, s1 = world[ch->in_room].sector_type;
     if ((s1 == SECT_CITY && (s2 != SECT_INSIDE && s2 != SECT_PAVED_ROAD)) ||
       (s1 == SECT_INSIDE && (s2 != SECT_CITY && s2 != SECT_PAVED_ROAD)) ||
