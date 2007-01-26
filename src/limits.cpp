@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.86 2007/01/23 05:39:25 jhhudso Exp $ */
+/* $Id: limits.cpp,v 1.87 2007/01/26 02:25:17 dcastle Exp $ */
 
 extern "C"
 {
@@ -586,6 +586,8 @@ void advance_level(CHAR_DATA *ch, int is_conversion)
       send_to_char("You will no longer keep your equipment when you die.\r\n", ch);
     if(GET_LEVEL(ch) == 11)
       send_to_char("It now costs you gold every time you recall.\r\n", ch);
+    if (GET_LEVEL(ch) == 50)
+      send_to_char("The protective covenant of your corpse weakens, upon death players may steal 1 item from you. (See help LOOT for details)\r\n",ch);
 }   
 
 void gain_exp( CHAR_DATA *ch, int64 gain )
