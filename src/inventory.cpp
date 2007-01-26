@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.87 2007/01/26 15:52:14 dcastle Exp $
+| $Id: inventory.cpp,v 1.88 2007/01/26 15:58:55 dcastle Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -97,6 +97,13 @@ void get(struct char_data *ch, struct obj_data *obj_object, struct obj_data *sub
 				  SET_BIT(sub_object->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED);;
                                   struct affected_type pthiefaf;
 				  WAIT_STATE(ch, PULSE_VIOLENCE*2);
+
+				  char log_buf[MAX_STRING_LENGTH];
+			          sprintf(log_buf,"%s looted %s[%d] from %s",
+			                 GET_NAME(ch), obj_object->short_description,
+                			 obj_index[obj_object->item_number].virt, sub_object->name);
+         			  log(log_buf, ANGEL, LOG_MORTAL);
+
 				  send_to_char("You suddenly feel very guilty...shame on you stealing from the dead!\r\n",ch);
 
                                   pthiefaf.type = FUCK_PTHIEF;
@@ -126,6 +133,11 @@ void get(struct char_data *ch, struct obj_data *obj_object, struct obj_data *sub
                                   pthiefaf.bitvector = -1;
 				  WAIT_STATE(ch, PULSE_VIOLENCE);
 				  send_to_char("You suddenly feel very guilty...shame on you stealing from the dead!\r\n",ch);
+
+				  char log_buf[MAX_STRING_LENGTH];
+			          sprintf(log_buf,"%s looted %d coins from %s",
+			                 GET_NAME(ch), obj_object->obj_flags.value[0], sub_object->name);
+         			  log(log_buf, ANGEL, LOG_MORTAL);
 
                                   if(affected_by_spell(ch, FUCK_GTHIEF))
                                   {
@@ -722,6 +734,12 @@ fname(obj_object->name));
 				  pthiefaf.modifier = 0;
 				  pthiefaf.location = APPLY_NONE;
 				  pthiefaf.bitvector = -1;
+
+				  char log_buf[MAX_STRING_LENGTH];
+			          sprintf(log_buf,"%s poofed %s[%d] from %s",
+			                 GET_NAME(ch), obj_object->short_description,
+                			 obj_index[obj_object->item_number].virt, sub_object->name);
+         			  log(log_buf, ANGEL, LOG_MORTAL);
  
 				  WAIT_STATE(ch, PULSE_VIOLENCE*2);
 				  send_to_char("You suddenly feel very guilty...shame on you stealing from the dead!\r\n",ch);
