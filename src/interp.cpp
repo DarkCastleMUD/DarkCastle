@@ -16,7 +16,7 @@
 /* 12/08/2003   Onager   Added chop_half() to work like half_chop() but    */
 /*                       chopping off the last word.                       */
 /***************************************************************************/
-/* $Id: interp.cpp,v 1.120 2007/01/24 20:41:34 pirahna Exp $ */
+/* $Id: interp.cpp,v 1.121 2007/01/26 16:24:48 pirahna Exp $ */
 
 extern "C"
 {
@@ -745,7 +745,7 @@ int command_interpreter( CHAR_DATA *ch, char *pcomm, bool procced  )
         if((IS_AFFECTED(ch, AFF_FAMILIAR) || IS_AFFECTED(ch, AFF_CHARM)) && !IS_SET(found->flags, COM_CHARMIE_OK))
           return do_say(ch, "I'm sorry master, I cannot do that.", 9);
       if (IS_NPC(ch) && ch->desc && ch->desc->original &&
-        ch->desc->original->level < 51 && !IS_SET(found->flags, COM_CHARMIE_OK)) {
+        ch->desc->original->level <= MAX_MORTAL && !IS_SET(found->flags, COM_CHARMIE_OK)) {
         send_to_char("The spirit cannot perform that action.\r\n",ch);
         return eFAILURE;
         }
