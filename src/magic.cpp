@@ -1283,11 +1283,7 @@ int spell_divine_fury(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
   int dam;
   set_cantquit( ch, victim );
   dam = 100 + GET_ALIGNMENT(ch) / 4;
-  extern void zap_eq_check(char_data *ch);
 
-  if(IS_GOOD(victim)) GET_ALIGNMENT(ch) -= 5;
-  if(IS_NEUTRAL(victim)) GET_ALIGNMENT(ch) -= 2;
-  zap_eq_check(ch);
   return damage(ch, victim, dam, TYPE_MAGIC, SPELL_DIVINE_FURY, 0);
 }
 
