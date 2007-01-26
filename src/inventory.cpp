@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.84 2006/12/30 19:39:22 jhhudso Exp $
+| $Id: inventory.cpp,v 1.85 2007/01/26 01:51:58 dcastle Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -602,6 +602,9 @@ fname(obj_object->name));
                sprintf(buffer, "%s_consent", GET_NAME(ch));
 	       if((isname("thiefcorpse", sub_object->name) && !isname(GET_NAME(ch), sub_object->name)) || isname(buffer, sub_object->name))
                  has_consent = TRUE;
+               if (isname("lootable", sub_object->name) && !IS_SET(sub_object->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED) &&
+			!IS_SET(world[ch->in_room].room_flags, SAFE) && GET_LEVEL(ch) >= 50)
+		 has_consent = TRUE;
 	       if(!has_consent && !isname(GET_NAME(ch), sub_object->name)) {
 		 send_to_char("You don't have consent to touch the "
 		               "corpse.\n\r", ch);
@@ -631,8 +634,7 @@ fname(obj_object->name));
                   fail = TRUE;
                 }
 
-		else if (sub_object->carried_by != ch && obj_object->obj_flags.eq_level 
-> 9 && GET_LEVEL(ch) < 5)
+		else if (sub_object->carried_by != ch && obj_object->obj_flags.eq_level > 9 && GET_LEVEL(ch) < 5)
 		{
 		  csendf(ch, "%s is too powerful for you to possess.\r\n", obj_object->short_description);
 		 fail = TRUE;	
@@ -656,11 +658,34 @@ fname(obj_object->name));
                   // to pick up no_trade items because it is someone else's corpse.  If I am
                   // the other of the corpse, has_consent will be false.
                       if (GET_LEVEL(ch) < 100) {
-                              if (isname(obj_object->name, "thiefcorpse"))
+                              if (isname("thiefcorpse",sub_object->name) || isname("lootable",sub_object->name))
                                 {
                         csendf(ch, "Whoa!  The %s poofed into thin air!\r\n", obj_object->short_description);
                         extract_obj(obj_object);
 			fail = TRUE;
+				sprintf(buffer,"%s_consent",GET_NAME(ch));
+				if (isname("lootable",sub_object->name) && !isname(buffer, sub_object->name))
+				{
+				  SET_BIT(sub_object->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED);
+				  struct affected_type pthiefaf;
+
+				  pthiefaf.type = FUCK_PTHIEF;
+				  pthiefaf.duration = 10;
+				  pthiefaf.modifier = 0;
+				  pthiefaf.location = APPLY_NONE;
+				  pthiefaf.bitvector = -1;
+ 
+				  WAIT_STATE(ch, PULSE_VIOLENCE*2);
+				  send_to_char("You suddenly feel very guilty...shame on you stealing from the dead!\r\n",ch);
+		                  if(affected_by_spell(ch, FUCK_PTHIEF))
+             			  {
+			                affect_from_char(ch, FUCK_PTHIEF);
+                			affect_to_char(ch, &pthiefaf);
+		                  }
+              			  else
+		                	affect_to_char(ch, &pthiefaf);
+					
+				  }
                                 } else {
                         csendf(ch, "%s : It seems magically attached to the corpse.\n\r", fname(obj_object->name));
                         fail = TRUE; }
@@ -668,6 +693,53 @@ fname(obj_object->name));
                     }
 		    else if (CAN_WEAR(obj_object,ITEM_TAKE)) 
                     {
+			sprintf(buffer,"%s_consent",GET_NAME(ch));
+		      if (has_consent && obj_object->obj_flags.type_flag != ITEM_MONEY) {
+                                if (isname("lootable",sub_object->name) && !isname(buffer,sub_object->name))
+                                {
+				  SET_BIT(sub_object->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED);;
+                                  struct affected_type pthiefaf;
+				  WAIT_STATE(ch, PULSE_VIOLENCE*2);
+				  send_to_char("You suddenly feel very guilty...shame on you stealing from the dead!\r\n",ch);
+
+                                  pthiefaf.type = FUCK_PTHIEF;
+                                  pthiefaf.duration = 10;
+                                  pthiefaf.modifier = 0;
+                                  pthiefaf.location = APPLY_NONE;
+                                  pthiefaf.bitvector = -1;
+
+                                  if(affected_by_spell(ch, FUCK_PTHIEF))
+                                  {
+                                        affect_from_char(ch, FUCK_PTHIEF);
+                                        affect_to_char(ch, &pthiefaf);
+                                  }
+                                  else
+                                        affect_to_char(ch, &pthiefaf);
+
+                                }
+		      } else if (has_consent && obj_object->obj_flags.type_flag == ITEM_MONEY && !isname(buffer,sub_object->name)) {
+                                if (isname("lootable",sub_object->name))
+                                {
+                                  struct affected_type pthiefaf;
+
+                                  pthiefaf.type = FUCK_GTHIEF;
+                                  pthiefaf.duration = 10;
+                                  pthiefaf.modifier = 0;
+                                  pthiefaf.location = APPLY_NONE;
+                                  pthiefaf.bitvector = -1;
+				  WAIT_STATE(ch, PULSE_VIOLENCE);
+				  send_to_char("You suddenly feel very guilty...shame on you stealing from the dead!\r\n",ch);
+
+                                  if(affected_by_spell(ch, FUCK_GTHIEF))
+                                  {
+                                        affect_from_char(ch, FUCK_GTHIEF);
+                                        affect_to_char(ch, &pthiefaf);
+                                  }
+                                  else
+                                        affect_to_char(ch, &pthiefaf);
+
+                                }
+		      }
                       if(cmd == 10) palm(ch, obj_object, sub_object);
 		      else          get (ch, obj_object, sub_object);
 		      found = TRUE;
