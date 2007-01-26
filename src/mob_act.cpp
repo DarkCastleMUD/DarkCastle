@@ -19,7 +19,7 @@
 /* 12/06/2003   Onager   Modified mobile_activity() to prevent charmie    */
 /*                       scavenging                                       */
 /**************************************************************************/
-/* $Id: mob_act.cpp,v 1.41 2006/12/30 19:42:44 dcastle Exp $ */
+/* $Id: mob_act.cpp,v 1.42 2007/01/26 02:25:30 dcastle Exp $ */
 
 extern "C"
 {
@@ -63,7 +63,7 @@ void perform_wear(CHAR_DATA *ch, struct obj_data *obj_object,
                   int keyword);
 char * get_random_hate(CHAR_DATA *ch);
 void get(struct char_data *ch, struct obj_data *obj_object,
-    struct obj_data *sub_object);
+    struct obj_data *sub_object,bool has_consent);
 
 int fighter_non_combat(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,        
           struct char_data *owner);
@@ -237,7 +237,7 @@ void mobile_activity(void)
       {
           // This should get rid of all the "gold coins" in mobs inventories.
           // -Pirahna 12/11/00
-          get(ch, best_obj, 0);
+          get(ch, best_obj, 0,0);
 //        move_obj( best_obj, ch );
 //        act( "$n gets $p.",  ch, best_obj, 0, TO_ROOM, 0);
       }
