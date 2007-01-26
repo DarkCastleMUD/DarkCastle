@@ -1311,6 +1311,11 @@ int spell_teleport(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
     send_to_char("You can't teleport in potato arenas!\n\r", ch);
     return eFAILURE;
   }
+  if (affected_by_spell(ch, FUCK_PTHIEF))
+  {
+    send_to_char("Your attempt to transport stolen goods through planes of magic fails!!\r\n",ch);
+    return eFAILURE;
+  }
 
   if(IS_SET(world[victim->in_room].room_flags, TELEPORT_BLOCK) ||
      IS_AFFECTED(victim, AFF_SOLIDITY)) {
@@ -3418,6 +3423,12 @@ int spell_word_of_recall(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct o
      send_to_char("Something blocks your attempt to recall.\r\n",ch);
 	return eSUCCESS;
   }
+  if (affected_by_spell(victim, FUCK_PTHIEF))
+  {
+    send_to_char("Your attempt to transport stolen goods through planes of magic fails!\r\n",victim);
+    return eFAILURE;
+  }
+
   if (IS_NPC(victim))
     location = real_room(GET_HOME(victim));
   else
@@ -10288,6 +10299,13 @@ int spell_beacon(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *vic
       send_to_char("You have no beacon set!\r\n", ch);
       return eFAILURE;
    }
+
+
+  if (affected_by_spell(ch, FUCK_PTHIEF))
+  {
+    send_to_char("Your attempt to transport stolen goods through the astral planes fails!!\r\n",ch);
+    return eFAILURE;
+  }
 
    if(ch->beacon->in_room < 1) {
       send_to_char("Your magical beacon has been lost!\r\n", ch);
