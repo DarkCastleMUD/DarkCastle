@@ -1584,7 +1584,11 @@ int spell_create_food(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
 {
   struct obj_data *tmp_obj;
 
-  tmp_obj = clone_object(real_object(7));
+  if (GET_CLASS(ch) == CLASS_CLERIC || GET_CLASS(ch) == CLASS_PALADIN)
+    tmp_obj = clone_object(real_object(8));
+  else
+    tmp_obj = clone_object(real_object(7));
+
   tmp_obj->obj_flags.value[0] += skill/2;
 
   obj_to_room(tmp_obj, ch->in_room);
