@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.59 2007/01/26 04:22:34 shane Exp $ */
+/* $Id: ki.cpp,v 1.60 2007/01/27 17:12:57 jhhudso Exp $ */
 
 extern "C"
 {
@@ -422,7 +422,7 @@ int ki_blast( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
 	{
       char buf[20];
       int prev = GET_HIT(vict);
-      damage(ch,vict,100, TYPE_KI,KI_OFFSET+KI_BLAST,0);
+
       sprintf(buf, "$B%d$R", prev - GET_HIT(vict));
       send_damage("$N is blasted across the room by $n for | damage!", ch, 0, vict, buf,
 		  "$N is blasted across the room by $n!", TO_ROOM);
@@ -430,6 +430,7 @@ int ki_blast( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
 		  "$N is thrown to the ground by your blast!", TO_CHAR);
       send_damage("$n blasts you across the room, causing you to fall and take | damage!", ch, 0, vict, buf,
                   "$n blasts you across the room, causing you to fall!", TO_VICT);
+      damage(ch,vict,100, TYPE_KI,KI_OFFSET+KI_BLAST,0);
                 GET_POS(vict) = POSITION_SITTING;
 		if(!vict->fighting && IS_NPC(vict))
 			return attack(vict, ch, TYPE_UNDEFINED);
