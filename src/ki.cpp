@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.60 2007/01/27 17:12:57 jhhudso Exp $ */
+/* $Id: ki.cpp,v 1.61 2007/01/27 17:16:28 dcastle Exp $ */
 
 extern "C"
 {
@@ -430,11 +430,12 @@ int ki_blast( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
 		  "$N is thrown to the ground by your blast!", TO_CHAR);
       send_damage("$n blasts you across the room, causing you to fall and take | damage!", ch, 0, vict, buf,
                   "$n blasts you across the room, causing you to fall!", TO_VICT);
-      damage(ch,vict,100, TYPE_KI,KI_OFFSET+KI_BLAST,0);
-                GET_POS(vict) = POSITION_SITTING;
-		if(!vict->fighting && IS_NPC(vict))
-			return attack(vict, ch, TYPE_UNDEFINED);
-		return 1;
+      GET_POS(vict) = POSITION_SITTING;
+      int retval = damage(ch,vict,100, TYPE_KI,KI_OFFSET+KI_BLAST,0);
+      
+      if(!SOMEONE_DIED(retval) && !vict->fighting && IS_NPC(vict))
+	return attack(vict, ch, TYPE_UNDEFINED);
+      return 1;
 	}
 	/* still here?  It was unsuccessful */
 	return eSUCCESS;
