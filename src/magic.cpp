@@ -12100,15 +12100,24 @@ int spell_divine_intervention(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, OBJ
   af.bitvector = -1;
   affect_to_char(ch, &af);
 
+<<<<<<< magic.cpp
+  af.type = SPELL_DIV_INT_TIMER2;
+  af.duration = 6 + skill/15;
+=======
   af.type = SPELL_NO_CAST_TIMER;
   af.duration = 6 + skill / 15;
+>>>>>>> 1.342
   af.modifier = 0;
   af.location = 0;
   af.bitvector = -1;
   affect_to_char(ch, &af, PULSE_VIOLENCE);
 
   af.type = SPELL_DIVINE_INTER;
+<<<<<<< magic.cpp
+  af.duration = 4 + skill/15;
+=======
   af.duration = 4 + skill / 15;
+>>>>>>> 1.342
   af.modifier = 10 - skill / 10;
   affect_to_char(ch, &af, PULSE_VIOLENCE);
 
