@@ -821,7 +821,7 @@ int do_qedit(CHAR_DATA *ch, char *argument, int cmd)
    int i, lownum, highnum;
    struct quest_info *quest = NULL;
 
-   argument = one_argument(argument, arg);
+   half_chop(argument, arg, argument);
    for(; *argument==' ';argument++);
 
    if(!*arg) {
@@ -874,8 +874,13 @@ int do_qedit(CHAR_DATA *ch, char *argument, int cmd)
       }
    }
 
-   argument = one_argument(argument, field);
+   half_chop(argument, field, argument);
    for(; *argument==' ';argument++);
+
+   if (*arg && is_number(arg) && !*field) {
+     show_quest_info(ch, atoi(arg));
+     return eSUCCESS;
+   }
 
    if(is_abbrev(arg, "show")) {
       if(!*field || !is_number(field)) send_to_char("Usage: qedit show <number>\n\r", ch);
@@ -884,7 +889,7 @@ int do_qedit(CHAR_DATA *ch, char *argument, int cmd)
       return eSUCCESS;
    }
 
-   argument = one_argument(argument, value);
+   half_chop(argument, value, argument);
    for(; *argument==' ';argument++);
 
    if(is_abbrev(arg, "list") && !*field) {
@@ -924,7 +929,7 @@ int do_qedit(CHAR_DATA *ch, char *argument, int cmd)
    }
 
    if(!*field) {
-      send_to_char("Valid fields: level, objnum, objshort, objlong, objkey, mobnum, timer, reward or hints.\n\r", ch);
+      send_to_char("Valid fields: name, level, objnum, objshort, objlong, objkey, mobnum, timer, reward or hints.\n\r", ch);
       return eFAILURE;
    }
 
