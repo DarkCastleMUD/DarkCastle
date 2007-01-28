@@ -2812,7 +2812,7 @@ int execute_song_crushing_crescendo( ubyte level, CHAR_DATA *ch, char *arg, CHAR
    get_instrument_bonus(ch, combat, non_combat);
 
    int i;
-   dam = 75;
+   dam = 100;
    for (i = 0; i < (int)ch->song_data; i++)
       dam = dam * 2;
    dam += combat * 5; // Make it hurt some more.
