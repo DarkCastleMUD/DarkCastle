@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.131 2007/01/11 15:22:38 dcastle Exp $ */
+/* $Id: mob_proc.cpp,v 1.132 2007/01/28 03:24:29 dcastle Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -3168,7 +3168,9 @@ static char *dethSayText [ ] =
   "If I throw a stick, will you go away?", 
   "Those of you who think you know everything are very annoying to those of us who do.",
   "It's not that I wish any harm to the Dingo, I'm just saying I could happily sit by while someone beheads him.",
-  "It is just you."
+  "It is just you.",
+  "Pack the bags, we're going on a guilt trip.",
+  "For an enhanced playing experience, take red pill now."
 };
 
 // ENDOFCHAIN
