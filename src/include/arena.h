@@ -2,7 +2,7 @@
 #define ARENA_H_
 
 /************************************************************************
-| $Id: arena.h,v 1.3 2006/12/30 19:39:22 jhhudso Exp $
+| $Id: arena.h,v 1.4 2007/01/28 03:35:45 dcastle Exp $
 | arena.h
 | This contains the arena stuff
 */
@@ -12,7 +12,7 @@
 #define ARENA_DEATHTRAP 14680
 
 enum ARENA_TYPE { NORMAL, CHAOS, POTATO, PRIZE };
-enum ARENA_STATUS { OPENED, CLOSED };
+enum ARENA_STATUS { CLOSED, OPENED };
 
 struct _arena {
   int low;
