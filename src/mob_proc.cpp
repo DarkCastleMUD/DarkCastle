@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.132 2007/01/28 03:24:29 dcastle Exp $ */
+/* $Id: mob_proc.cpp,v 1.133 2007/01/28 20:35:36 dcastle Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -3170,7 +3170,13 @@ static char *dethSayText [ ] =
   "It's not that I wish any harm to the Dingo, I'm just saying I could happily sit by while someone beheads him.",
   "It is just you.",
   "Pack the bags, we're going on a guilt trip.",
-  "For an enhanced playing experience, take red pill now."
+  "For an enhanced playing experience, take red pill now.",
+  "Lottery: A tax on people who are bad at math.",
+  "Reality? That's where the pizza delivery guy comes from!",
+  "Damn! Jesus is coming, everyone look busy.",
+  "Erotic is using a feather. Kinky is using the whole chicken.",
+  "Your ridiculous little opinion has been noted.",
+  "We have enough youth, how about a fountain of SMART?"
 };
 
 // ENDOFCHAIN
