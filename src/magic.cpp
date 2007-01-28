@@ -5141,7 +5141,7 @@ int spell_flamestrike(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
    }
 
    set_cantquit (ch, victim);
-   dam = 400;
+   dam = 375;
 
    retval = damage(ch, victim, dam, TYPE_FIRE, SPELL_FLAMESTRIKE, 0);
 
@@ -5153,7 +5153,7 @@ int spell_flamestrike(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
 
    if(skill > 70) {
       char buf[MAX_STRING_LENGTH];
-      int mamount = number(50, 75), kamount = number(1,7);
+      int mamount = GET_MANA(victim)/20, kamount = GET_KI(victim)/10;
       if(GET_MANA(victim) - mamount < 0) mamount = GET_MANA(victim);
       if(GET_KI(victim) - kamount < 0) kamount = GET_KI(victim);
       GET_MANA(victim) -= mamount;
