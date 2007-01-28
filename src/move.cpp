@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.77 2007/01/26 16:29:27 pirahna Exp $
+| $Id: move.cpp,v 1.78 2007/01/28 03:42:55 dcastle Exp $
 | move.C
 | Movement commands and stuff.
 *************************************************************************
@@ -993,7 +993,7 @@ int do_enter(CHAR_DATA *ch, char *argument, int cmd)
     return eFAILURE;
     }
 
-  if (IS_NPC(ch) && ch->master) {
+  if (IS_NPC(ch) && ch->master && mob_index[ch->mobdata->nr].virt == 8) {
     sesame = ch->master;
     if (IS_SET(world[real_room(portal->obj_flags.value[0])].room_flags, CLAN_ROOM)) {
       send_to_char("You are a mob, not a clan member.\r\n", ch);
