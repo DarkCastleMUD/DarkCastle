@@ -12105,7 +12105,7 @@ int spell_divine_intervention(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, OBJ
   affect_to_char(ch, &af);
 
   af.type = SPELL_NO_CAST_TIMER;
-  af.duration = 6 + skill / 15;
+  af.duration = 5 + skill / 15;
   af.modifier = 0;
   af.location = 0;
   af.bitvector = -1;
