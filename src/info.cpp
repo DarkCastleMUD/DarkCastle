@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.140 2007/01/26 04:22:34 shane Exp $ */
+/* $Id: info.cpp,v 1.141 2007/01/29 22:15:36 shane Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -3341,4 +3341,11 @@ void check_champion()
        log("CHAMPION_ITEM obj not found. Please create one.", 0, LOG_MISC);
      }
    }
+}
+
+int do_sector(CHAR_DATA *ch, char *arg, int cmd)
+{
+  if(ch->desc && ch->in_room)
+    csendf(ch, "You are currently in a %s area.\n\r", sector_types[world[ch->in_room].sector_type]);
+  return eSUCCESS;
 }

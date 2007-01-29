@@ -22,6 +22,7 @@ extern void string_to_file(FILE *, char *);
 extern int keywordfind(OBJ_DATA *);
 extern void wear(CHAR_DATA *, OBJ_DATA *, int);
 extern CHAR_DATA *character_list;
+extern struct index_data *mob_index;
 
 int load_quests()
 {
@@ -208,7 +209,7 @@ void show_quest_info(CHAR_DATA *ch, int num)
 		"$3Reward:$R %d qpoints\n\r"
 		"$3Timer:$R  %d\n\r"
 		"$3----------------------------------------$R\n\r"
-		"$3Quest Mob Vnum:$R %d\n\r"
+		"$3Quest Mob Vnum:$R %d (%s)\n\r"
 		"$3----------------------------------------$R\n\r"
 		"$3Quest Object Vnum:$R %d\n\r"
 		"$3Keywords:$R          %s\n\r"
@@ -220,7 +221,9 @@ void show_quest_info(CHAR_DATA *ch, int num)
 		"$32.$R %s\n\r"
 		"$33.$R %s\n\r",
 		quest->number, quest->name, quest->level, get_quest_price(quest),
-                quest->reward, quest->timer, quest->mobnum, quest->objnum, quest->objkey,
+                quest->reward, quest->timer, quest->mobnum,
+                real_mobile(quest->mobnum) > 0 ? ((CHAR_DATA *)(mob_index[real_mobile(quest->mobnum)].item))->short_desc : "no current mob",
+                quest->objnum, quest->objkey,
                 quest->objshort, quest->objlong,quest->hint1, quest->hint2, quest->hint3);
          return;
       }

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.158 2007/01/26 02:24:54 dcastle Exp $
+| $Id: cl_thief.cpp,v 1.159 2007/01/29 22:15:46 shane Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -668,7 +668,8 @@ int do_stalk(CHAR_DATA *ch, char *argument, int cmd)
   } 
 
   if(!(*argument)) {
-    send_to_char("Pick a name, any name.\n\r", ch);
+    if(ch->master) csendf(ch, "You are currently stalking %s.\n\r", GET_SHORT(ch->master));
+    else send_to_char("Pick a name, any name.\n\r", ch);
     return eFAILURE;
   }
 

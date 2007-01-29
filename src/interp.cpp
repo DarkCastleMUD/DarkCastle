@@ -16,7 +16,7 @@
 /* 12/08/2003   Onager   Added chop_half() to work like half_chop() but    */
 /*                       chopping off the last word.                       */
 /***************************************************************************/
-/* $Id: interp.cpp,v 1.121 2007/01/26 16:24:48 pirahna Exp $ */
+/* $Id: interp.cpp,v 1.122 2007/01/29 22:15:36 shane Exp $ */
 
 extern "C"
 {
@@ -346,11 +346,11 @@ struct command_info cmd_info[] =
     { "gaze",		do_not_here,	POSITION_STANDING, 0, 1820, 0, 0 },
     { "tremor",		do_not_here,	POSITION_FIGHTING, 0, 188, 0, 0 },
     { "bet",		do_not_here,	POSITION_STANDING, 0, 189, 0, 0 },
-    { "insurance",		do_not_here,	POSITION_STANDING, 0, 190, 0, 0 },
+    { "insurance",	do_not_here,	POSITION_STANDING, 0, 190, 0, 0 },
     { "double",		do_not_here,	POSITION_STANDING, 0, 191, 0, 0 },
     { "stay",		do_not_here,	POSITION_STANDING, 0, 192, 0, 0 },
-
     { "select",		do_natural_selection, POSITION_RESTING, 0, 9, 0, 0},
+    { "sector",		do_sector,	POSITION_RESTING, 0, 9, 0, 1 },
      
     // Immortal commands
     { "thunder",	do_thunder,	POSITION_DEAD, IMP, 9, 0, 1 },

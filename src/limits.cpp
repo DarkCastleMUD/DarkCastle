@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.88 2007/01/26 04:22:34 shane Exp $ */
+/* $Id: limits.cpp,v 1.89 2007/01/29 22:15:36 shane Exp $ */
 
 extern "C"
 {
@@ -577,6 +577,11 @@ void advance_level(CHAR_DATA *ch, int is_conversion)
     if(GET_LEVEL(ch) % 3 == 0)
       for(int i = 0; i <= SAVE_TYPE_MAX; i++)
         ch->saves[i]++;
+
+    GET_HIT(ch) = GET_MAX_HIT(ch);
+    GET_MANA(ch) = GET_MAX_MANA(ch);
+    GET_MOVE(ch) = GET_MAX_MOVE(ch);
+    GET_KI(ch) = GET_MAX_KI(ch);
 
     if (GET_LEVEL(ch) > IMMORTAL)
 	for (i = 0; i < 3; i++)
