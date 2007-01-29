@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.143 2007/01/10 19:53:08 jhhudso Exp $ */
+/* $Id: db.cpp,v 1.144 2007/01/29 01:07:51 jhhudso Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -101,7 +101,11 @@ struct quest_info *quest_list = 0; /* global l-list of quests */
 
 room_data & CWorld::operator[](int rnum)
 {
-   assert(rnum <= top_of_world);
+  if (rnum > top_of_world)
+    throw overrun();
+  else if (rnum < 0)
+    throw underrun();
+
    return *world_array[rnum]; 
 }
 

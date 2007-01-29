@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: db.h,v 1.21 2006/08/17 11:36:26 jhhudso Exp $ */
+/* $Id: db.h,v 1.22 2007/01/29 01:07:51 jhhudso Exp $ */
 #ifndef DB_H_
 #define DB_H_
 
@@ -22,7 +22,8 @@ extern "C" {
 }
 
 #include <character.h>
-#include "weather.h"
+#include <weather.h>
+#include <handler.h>
 
 #define WORLD_MAX_ROOM        50000  // should never get this high...
                                      // it's just to keep builders/imps from 
@@ -237,9 +238,9 @@ struct world_file_list_item
 
 // The CWorld class, to control the world a bit better.
 
-class CWorld
+class CWorld : public ErrorHandler
 {
-public:
+ public:
    room_data & operator[](int rnum);
 };
 

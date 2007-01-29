@@ -9265,17 +9265,27 @@ int spell_bee_swarm(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
 
    for(tmp_victim = character_list; tmp_victim && tmp_victim != (char_data *)0x95959595; tmp_victim = temp) {
       temp = tmp_victim->next;
-      if ((ch->in_room == tmp_victim->in_room) && (ch != tmp_victim) &&
-          (!ARE_GROUPED(ch,tmp_victim)) && can_be_attacked(ch, tmp_victim)) {
-         set_cantquit(ch, tmp_victim);
-         retval = damage(ch, tmp_victim, dam, TYPE_MAGIC, SPELL_BEE_SWARM, 0);
-         if(IS_SET(retval, eCH_DIED))
-           return retval;
-         }
-      else if(world[ch->in_room].zone == world[tmp_victim->in_room].zone)
-         send_to_char("You hear the buzzing of hundreds of bees.\n\r",
-	              tmp_victim);
+      try {
+	if ((ch->in_room == tmp_victim->in_room) && (ch != tmp_victim) &&
+	    (!ARE_GROUPED(ch,tmp_victim)) && can_be_attacked(ch, tmp_victim)) {
+	  set_cantquit(ch, tmp_victim);
+	  retval = damage(ch, tmp_victim, dam, TYPE_MAGIC, SPELL_BEE_SWARM, 0);
+	  if(IS_SET(retval, eCH_DIED))
+	    return retval;
+	} else if(world[ch->in_room].zone == world[tmp_victim->in_room].zone) {
+	  send_to_char("You hear the buzzing of hundreds of bees.\n\r",
+		       tmp_victim);
+	}
+      } catch(CWorld::underrun) {
+	log("Underrun exception occurred in spell_bee_swarm.", IMMORTAL, LOG_BUG);
+	produce_coredump();
+	return eFAILURE;
+      } catch(CWorld::overrun) {
+	log("Overrun exception occurred in spell_bee_swarm.", IMMORTAL, LOG_BUG);
+	produce_coredump();
+	return eFAILURE;
       }
+   }
   return eSUCCESS;
 }
 

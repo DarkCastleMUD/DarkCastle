@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.h,v 1.22 2006/11/06 23:27:43 jhhudso Exp $ */
+/* $Id: handler.h,v 1.23 2007/01/29 01:07:51 jhhudso Exp $ */
 
 #ifndef HANDLER_H_
 #define HANDLER_H_
@@ -126,4 +126,13 @@ int get_number(char **name);
 #define FIND_OBJ_EQUIP     32
 
 bool is_wearing(CHAR_DATA *ch, OBJ_DATA *item);
+
+class ErrorHandler {
+ public:
+  class underrun {};
+  class overrun {};
+};
+
+void produce_coredump(void);
+
 #endif

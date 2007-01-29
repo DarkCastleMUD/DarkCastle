@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.68 2007/01/20 02:51:55 jhhudso Exp $ */
+/* $Id: utility.cpp,v 1.69 2007/01/29 01:07:51 jhhudso Exp $ */
 
 extern "C"
 {
@@ -1760,4 +1760,21 @@ bool is_in_game(char_data *ch)
   }
 }
 
+void produce_coredump(void)
+{
+  pid_t pid;
+
+  pid = fork();
+  if (pid == 0) {
+    //Child process
+    log("Error detected: Producing coredump.", IMMORTAL, LOG_BUG);
+    abort();
+  } else if (pid > 0) {
+    //Parent process
+  } else {
+    log("Error detected: Unable to fork process.", IMMORTAL, LOG_BUG);
+  }
+  
+  return;
+}
 
