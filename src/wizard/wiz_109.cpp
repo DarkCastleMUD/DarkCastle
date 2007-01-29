@@ -387,6 +387,7 @@ int do_shutdown(struct char_data *ch, char *argument, int cmd)
                      "   hot: Keep players links active, and come back up.\n\r"
                      "  cold: Go ahead and kill the links.\n\r"
                      " crash: Crash the mud by referencing an invalid pointer.\n\r"
+                     "  core: Produce a core file.\n\r"
                      "  auto: Toggle auto-hotboot on crash setting.\n\r"
                      "   die: Kill boot script and crash mud so it won't reboot.\r\n", ch);
         return eFAILURE;
@@ -425,6 +426,10 @@ int do_shutdown(struct char_data *ch, char *argument, int cmd)
         char_data * blahblah = NULL;
         int chode = blahblah->in_room;
         chode = 1; // we never get here, but it gets rid of the compile warning
+    }
+    else if (!strcmp(arg, "core")) {
+      produce_coredump();
+      log("Corefile produced.", IMMORTAL, LOG_BUG);
     }
     else if(!strcmp(arg, "die")) {
         fclose(fopen("died_in_bootup", "w"));
