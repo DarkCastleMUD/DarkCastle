@@ -526,7 +526,7 @@ void rename_vault_owner(char *oldname, char *newname) {
     if (!num) continue; // skip 0 cause its null
 
     for (access = vault->access;access;access = access->next) {
-      if (!strncasecmp(access->name, oldname, strlen(oldname))) {
+      if (!strcasecmp(access->name, oldname)) {
         sprintf(buf, "Replaced '%s' with '%s' in %s's vault access list.", access->name, newname, vault->owner);
         vault_log(buf, vault->owner);
         free(access->name);
@@ -799,7 +799,7 @@ void remove_vault_accesses(char *name) {
 
     for (access = vault->access;access;access = next_access) {
       next_access = access->next;
-      if (!strncasecmp(access->name, name, strlen(name))) {
+      if (!strcasecmp(access->name, name)) {
         sprintf(buf, "Removed %s's access to %s's vault.", name, vault->owner);
         vault_log(buf, vault->owner);
         access_remove(name, vault);
