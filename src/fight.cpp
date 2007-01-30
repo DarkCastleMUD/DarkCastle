@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.416 2007/01/26 04:22:34 shane Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.417 2007/01/30 02:58:02 jhhudso Exp $ */
 
 extern "C"
 {
@@ -4857,7 +4857,8 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim, int type)
   move_player_home(victim);
   
   GET_POS(victim) = POSITION_RESTING;
-  
+  GET_COND(victim, DRUNK) = 0;
+
   save_char_obj(victim);
 
   // have to be level 20 and linkalive to count as a pkill and not yourself
