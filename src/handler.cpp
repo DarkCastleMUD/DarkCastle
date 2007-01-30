@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.156 2007/01/30 04:04:19 jhhudso Exp $ */
+/* $Id: handler.cpp,v 1.157 2007/01/30 06:19:25 jhhudso Exp $ */
     
 extern "C"
 {
@@ -1364,6 +1364,9 @@ void affect_remove( CHAR_DATA *ch, struct affected_type *af, int flags)
       }
       hjp->next = af->next; /* skip the af element */
    }
+
+    if (af->next && af->next != (affected_type *)0x95959595 && (af->next->type == af->type))
+      flags = SUPPRESS_MESSAGES;
 
    switch( af->type ) 
    {

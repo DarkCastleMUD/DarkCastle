@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.209 2007/01/26 04:22:35 shane Exp $ */
+/* $Id: spells.cpp,v 1.210 2007/01/30 06:19:25 jhhudso Exp $ */
 
 extern "C"
 {
@@ -855,6 +855,10 @@ void affect_update( int32 duration_type )
 //      if(!IS_NPC(i) ) // && !(i->desc)) Linkdeadness doens't save you 
 //now.
   //      continue; 
+      for (a=0; a < 20; a++)
+	faded_spells[a] = 0;
+      a=0;
+
       for (af = i->affected; af; af = next_af_dude) {
 	next_af_dude = af->next;
 	if (af->duration_type == 0 && duration_type == PULSE_TIME) {
@@ -863,9 +867,6 @@ void affect_update( int32 duration_type )
 	  continue;
 	}
 //	while (next_af_dude && next_af_dude->type == af->type) next_af_dude = next_af_dude->next;
-        for (; a < 20; a++)
-          faded_spells[a] = 0;
-        a=0;
 
         // This doesn't really belong here, but it beats creating an "update" just for it.
         // That way we don't have to traverse the entire list all over again
@@ -900,7 +901,7 @@ void affect_update( int32 duration_type )
 		} 
 		if (fadeit) {
 		if (a < 19)
-  		  faded_spells[a++] = af->type;
+  		  faded_spells[a++] = af->type;	
 	        send_to_char(spell_wear_off_msg[af->type], i);
 	        send_to_char("\n\r", i);
 		}
