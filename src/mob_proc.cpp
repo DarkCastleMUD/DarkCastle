@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.134 2007/01/29 11:13:41 dcastle Exp $ */
+/* $Id: mob_proc.cpp,v 1.135 2007/01/30 17:30:16 pirahna Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -3177,7 +3177,8 @@ static char *dethSayText [ ] =
   "Erotic is using a feather. Kinky is using the whole chicken.",
   "Your ridiculous little opinion has been noted.",
   "We have enough youth, how about a fountain of SMART?",
-  "Wait a second, did you rip off your own arm as a joke?" // Futurama > you
+  "Wait a second, did you rip off your own arm as a joke?", // Futurama > you
+  "4 8 15 16 23 42"
 };
 
 // ENDOFCHAIN
