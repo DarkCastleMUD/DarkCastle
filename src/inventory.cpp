@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.88 2007/01/26 15:58:55 dcastle Exp $
+| $Id: inventory.cpp,v 1.89 2007/01/30 03:09:49 jhhudso Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -1362,8 +1362,8 @@ int do_give(struct char_data *ch, char *argument, int cmd)
          }
       }
       GET_GOLD(vict) += amount;
-      do_save(ch, "", 666);
-      do_save(vict, "", 666);
+      do_save(ch, "", 10);
+      do_save(vict, "", 10);
       // bribe trigger automatically removes any gold given to mob
       mprog_bribe_trigger( vict, ch, amount );
 
@@ -1518,8 +1518,8 @@ int do_give(struct char_data *ch, char *argument, int cmd)
     }
 
 //    send_to_char("Ok.\n\r", ch);
-    do_save(ch,"",666);
-    do_save(vict,"",666);
+    do_save(ch,"",10);
+    do_save(vict,"",10);
     // if I gave a no_trade item to a mob, the mob needs to destroy it
     // otherwise it defeats the purpose of no_trade:)
 
