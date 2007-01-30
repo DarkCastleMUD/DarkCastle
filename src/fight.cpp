@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.417 2007/01/30 02:58:02 jhhudso Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.418 2007/01/30 03:40:17 jhhudso Exp $ */
 
 extern "C"
 {
@@ -2222,7 +2222,7 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
     update_pos(victim);
   } else {
     affected_type *af;
-    if (dam >= 350 && (af = affected_by_spell(victim, SPELL_PARALYZE))) {
+    if (dam >= 350 && (af = affected_by_spell(victim, SPELL_PARALYZE)) && IS_PC(victim)) {
       act("The overpowering magic from $n's spell disrupts the paralysis surrounding you!", ch, 0, victim, TO_VICT, 0);
       act("The powerful magic from your spell has disrupted the paralysis surrounding $N!", ch, 0, victim, TO_CHAR, 0);
       act("The powerful magic of $n's spell has disrupted the paralysis surrounding $N!", ch, 0, victim, TO_ROOM, NOTVICT);
