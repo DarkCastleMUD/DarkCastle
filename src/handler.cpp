@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.155 2007/01/26 04:22:34 shane Exp $ */
+/* $Id: handler.cpp,v 1.156 2007/01/30 04:04:19 jhhudso Exp $ */
     
 extern "C"
 {
@@ -1674,7 +1674,7 @@ void affect_remove( CHAR_DATA *ch, struct affected_type *af, int flags)
 
 
 /* Call affect_remove with every spell of spelltype "skill" */
-void affect_from_char( CHAR_DATA *ch, int skill)
+void affect_from_char( CHAR_DATA *ch, int skill, int flags)
 {
     struct affected_type *hjp, *afc,*recheck;
 //    bool aff2Fix;
@@ -1684,7 +1684,7 @@ void affect_from_char( CHAR_DATA *ch, int skill)
     for(hjp = ch->affected; hjp; hjp = afc) {
         afc = hjp->next;
 	if (hjp->type == (unsigned)skill)
-	    affect_remove( ch, hjp, 0);
+	    affect_remove( ch, hjp, flags);
 	bool a = TRUE;
 	for (recheck = ch->affected;recheck;recheck = recheck->next)
 	if (recheck == afc) a= FALSE;

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_barbarian.cpp,v 1.72 2007/01/26 04:22:42 shane Exp $
+| $Id: cl_barbarian.cpp,v 1.73 2007/01/30 04:04:19 jhhudso Exp $
 | cl_barbarian.C
 | Description:  Commands for the barbarian class.
 */
@@ -575,8 +575,8 @@ int do_ferocity(struct char_data *ch, char *argument, int cmd)
       if(!ARE_GROUPED(ch, tmp_char))
         continue;
 
-      affect_from_char(tmp_char, SKILL_FEROCITY);
-      affect_from_char(tmp_char, SKILL_FEROCITY);
+      affect_from_char(tmp_char, SKILL_FEROCITY, SUPPRESS_MESSAGES);
+      affect_from_char(tmp_char, SKILL_FEROCITY, SUPPRESS_MESSAGES);
       act("$n's fierce roar gets your adrenaline pumping!", ch, 0, tmp_char, TO_VICT, 0);
 
       af.type      = SKILL_FEROCITY;

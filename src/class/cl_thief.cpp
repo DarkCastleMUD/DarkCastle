@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.159 2007/01/29 22:15:46 shane Exp $
+| $Id: cl_thief.cpp,v 1.160 2007/01/30 04:04:19 jhhudso Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -1833,8 +1833,8 @@ int do_deceit(struct char_data *ch, char *argument, int cmd)
         continue;
       if(!ARE_GROUPED(ch, tmp_char))
         continue;
-      affect_from_char(tmp_char, SKILL_DECEIT);
-      affect_from_char(tmp_char, SKILL_DECEIT);
+      affect_from_char(tmp_char, SKILL_DECEIT, SUPPRESS_MESSAGES);
+      affect_from_char(tmp_char, SKILL_DECEIT, SUPPRESS_MESSAGES);
       act ("$n lures your mind into the thought patterns of the morally corrupt.", ch, 0, tmp_char, TO_VICT, 0);
   
       af.type      = SKILL_DECEIT;

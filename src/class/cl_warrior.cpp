@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.57 2007/01/14 22:16:20 apocalypse Exp $
+| $Id: cl_warrior.cpp,v 1.58 2007/01/30 04:04:19 jhhudso Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -1019,8 +1019,8 @@ int do_tactics(struct char_data *ch, char *argument, int cmd)
         continue;
       if(!ARE_GROUPED(ch, tmp_char))
         continue;
-      affect_from_char(tmp_char, SKILL_TACTICS);
-      affect_from_char(tmp_char, SKILL_TACTICS);
+      affect_from_char(tmp_char, SKILL_TACTICS, SUPPRESS_MESSAGES);
+      affect_from_char(tmp_char, SKILL_TACTICS, SUPPRESS_MESSAGES);
   
       act("$n's leadership makes you feel more comfortable with battle.", ch, 0, tmp_char, TO_VICT, 0);
       af.type      = SKILL_TACTICS;

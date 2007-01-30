@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.h,v 1.23 2007/01/29 01:07:51 jhhudso Exp $ */
+/* $Id: handler.h,v 1.24 2007/01/30 04:04:19 jhhudso Exp $ */
 
 #ifndef HANDLER_H_
 #define HANDLER_H_
@@ -30,7 +30,7 @@
 void affect_total(CHAR_DATA *ch);
 void affect_modify(CHAR_DATA *ch, int32 loc, int32 mod, long bitv, bool add, int flag = 0);
 void affect_to_char( CHAR_DATA *ch, struct affected_type *af, int32 duration_type = PULSE_TIME);
-void affect_from_char( CHAR_DATA *ch, int skill);
+void affect_from_char( CHAR_DATA *ch, int skill, int flags = 0);
 void affect_remove( CHAR_DATA *ch, struct affected_type *af, int flags);
 affected_type * affected_by_spell( CHAR_DATA *ch, int skill );
 void affect_join( CHAR_DATA *ch, struct affected_type *af,
