@@ -1785,7 +1785,7 @@ int execute_song_flight_of_bee( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA
       if(affected_by_spell(fvictim->follower, SPELL_FLY))
       {
          affect_from_char(fvictim->follower, SPELL_FLY);
-         send_to_char("Your fly spells dissapates.", fvictim->follower);
+         send_to_char("Your fly spells dissipates.", fvictim->follower);
       }
       SETBIT(fvictim->follower->affected_by, AFF_FLYING);
       send_to_char("Your feet feel like air.\r\n", fvictim->follower);

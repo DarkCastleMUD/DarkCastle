@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.80 2007/01/25 17:55:24 pirahna Exp $
+| $Id: objects.cpp,v 1.81 2007/01/30 03:27:02 apocalypse Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -608,7 +608,7 @@ int do_use(struct char_data *ch, char *argument, int cmd)
   if ((ch->equipment[HOLD] == 0 || !isname(buf, ch->equipment[HOLD]->name)) &&
 	(ch->equipment[HOLD2] == 0 || !isname(buf, ch->equipment[HOLD2]->name)))
 	 {
-    act("You do not hold that item in your hand.",ch,0,0,TO_CHAR, 0);
+    act("You must be holding an item in order to to use it.",ch,0,0,TO_CHAR, 0);
     return eFAILURE;
   }
   if (ch->equipment[HOLD] && isname(buf, ch->equipment[HOLD]->name))
