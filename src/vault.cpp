@@ -551,9 +551,6 @@ void remove_vault(char *name) {
 
   name[0] = UPPER(name[0]);
 
-  if (!(vault = has_vault(name)))
-    return;
-
   sprintf(h, "../vaults/%c/%s.vault", *name, name);
   unlink(h);
   sprintf(h, "../vaults/%c/%s.vault.log", *name, name);
@@ -565,6 +562,9 @@ void remove_vault(char *name) {
   sprintf(buf, "Deleting %s's vault.\r\n", name);
   log(buf, ANGEL, LOG_VAULT);
   
+  if (!(vault = has_vault(name)))
+    return;
+
   if (vault && vault->items) {
     for (items = vault->items; items; items = titems) {
       titems = items->next;
