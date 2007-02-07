@@ -4968,6 +4968,13 @@ int spell_dispel_magic(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
               act("The $B$5electricity$R crackling around $n's body fades away.", victim, 0, 0, TO_ROOM, 0);
               done = TRUE;
            }
+           else if (IS_AFFECTED(victim, AFF_LIGHTNINGSHIELD))
+           {
+	      REMBIT(victim->affected_by, AFF_LIGHTNINGSHIELD);
+              act("Your crackling shield of $B$5electricity$R vanishes!", ch, 0,victim, TO_VICT, 0);
+              act("The $B$5electricity$R crackling around $n's body fades away.", victim, 0, 0, TO_ROOM, 0);
+              done = TRUE;
+           }
            break;
 	 case 8: 
            if (affected_by_spell(victim, SPELL_FIRESHIELD))
