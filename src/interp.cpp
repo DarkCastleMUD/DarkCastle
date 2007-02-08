@@ -16,7 +16,7 @@
 /* 12/08/2003   Onager   Added chop_half() to work like half_chop() but    */
 /*                       chopping off the last word.                       */
 /***************************************************************************/
-/* $Id: interp.cpp,v 1.122 2007/01/29 22:15:36 shane Exp $ */
+/* $Id: interp.cpp,v 1.123 2007/02/08 22:12:08 dcastle Exp $ */
 
 extern "C"
 {
@@ -60,11 +60,16 @@ extern CWorld world;
 char last_processed_cmd[MAX_INPUT_LENGTH];
 char last_char_name[MAX_INPUT_LENGTH];
 int  last_char_room;
+unsigned int cmd_size = 0;
 
 void update_wizlist(CHAR_DATA *ch);
 // int system(const char *); 
+	
+bool can_use_command(CHAR_DATA *ch, int cmdnum);
 
 void add_command_to_radix(struct command_info *cmd);
+
+struct command_lag *command_lag_list = NULL;
 
 
 // Temp removal to perfect system. 1/25/06 Eas
@@ -258,8 +263,8 @@ struct command_info cmd_info[] =
     { "ambush",		do_ambush,	POSITION_RESTING, 0, 9, 0, 1 },
     { "whoarena",	do_whoarena,	POSITION_SLEEPING, 0, 9, 0, 1 },
     { "joinarena",	do_joinarena,	POSITION_SLEEPING, 0, 9, 0, 0 },
-    { "backstab",	do_backstab,	POSITION_STANDING, 0, 9, 0, 0 },
-    { "bs",		do_backstab,	POSITION_STANDING, 0, 9, 0, 0 },
+    { "backstab",	do_backstab,	POSITION_STANDING, 0, 13, 0, 0 },
+    { "bs",		do_backstab,	POSITION_STANDING, 0, 13, 0, 0 },
     { "boss",		do_boss,	POSITION_DEAD, 0, 9, 0, 1 },
     { "blackjack",	do_blackjack,	POSITION_STANDING, 0, 9, 0, 0 },
     { "enter",		do_enter,	POSITION_STANDING, 0, 60, COM_CHARMIE_OK, 20 },
@@ -542,8 +547,9 @@ void add_commands_to_radix(void)
   cmd_radix->command = &cmd_info[0];
   cmd_radix->left    = 0;
   cmd_radix->right   = 0;
-  
-  for(x = 1; (unsigned) x < (sizeof(cmd_info)/sizeof(cmd_info[0]) - 1); x++) 
+  cmd_size = (sizeof(cmd_info)/sizeof(cmd_info[0]) - 1 );  
+
+  for(x = 1; (unsigned) x < cmd_size; x++) 
     add_command_to_radix(&cmd_info[x]); 
 }
 
@@ -770,6 +776,11 @@ int command_interpreter( CHAR_DATA *ch, char *pcomm, bool procced  )
       sprintf(DEBUGbuf, "%s: %s", GET_NAME(ch), pcomm); 
       log (DEBUGbuf, 0, LOG_MISC);
 */
+      if (!can_use_command(ch, found->command_number))
+      {
+	send_to_char("You are still recovering from your last attempt.\r\n",ch);
+        return eSUCCESS;
+      }
       // We're going to execute, check for useable special proc.
       retval = special( ch, found->command_number, &pcomm[look_at] );
       if(IS_SET(retval, eSUCCESS) || IS_SET(retval, eCH_DIED))
@@ -1215,6 +1226,56 @@ int special(CHAR_DATA *ch, int cmd, char *arg)
   return eFAILURE;
 }
 
+void add_command_lag(CHAR_DATA *ch, int cmdnum, int lag)
+{
+  if (!ch) return;
+
+  struct command_lag *cmdl;
+#ifdef LEAK_CHECK
+        cmdl = (struct command_lag *)
+                        calloc(1, sizeof(struct command_lag));
+#else
+        cmdl = (struct command_lag *)
+                        dc_alloc(1, sizeof(struct command_lag));
+#endif
+  cmdl->next = command_lag_list;
+  command_lag_list = cmdl;
+  cmdl->ch = ch;
+  cmdl->cmd_number = cmdnum;
+  cmdl->lag = lag;
+}
+
+bool can_use_command(CHAR_DATA *ch, int cmdnum)
+{
+  struct command_lag *cmdl;
+  for (cmdl = command_lag_list; cmdl; cmdl = cmdl->next)
+  {
+    csendf(ch,"%s num %d lag %d", cmdl->ch->name, cmdl->cmd_number, cmdl->lag);
+    
+    if (cmdl->ch == ch && cmdl->cmd_number == cmdnum)
+	return FALSE;
+  }
+ return TRUE;
+}
+
+void pulse_command_lag()
+{
+  struct command_lag *cmdl, *cmdlp = NULL, *cmdlnext = NULL;
+
+  for (cmdl = command_lag_list; cmdl; cmdl = cmdlnext)
+  {
+     cmdlnext = cmdl->next;
+     if ((cmdl->lag--) <= 0)
+     {
+	if (cmdlp) cmdlp->next = cmdl->next;
+        else command_lag_list = cmdl->next;
+
+	cmdl->ch = 0;
+        dc_free(cmdl);
+     } else cmdlp = cmdl;
+  }
+  
+}
 
 // The End
 
