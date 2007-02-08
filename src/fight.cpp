@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.419 2007/02/08 10:17:05 jhhudso Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.420 2007/02/08 14:32:42 dcastle Exp $ */
 
 extern "C"
 {
@@ -5606,8 +5606,10 @@ int do_flee(struct char_data *ch, char *argument, int cmd)
     return eFAILURE;
   
   if (IS_AFFECTED(ch, AFF_SNEAK))
+  {
     affect_from_char(ch, SKILL_SNEAK);
-
+    REMBIT(ch->affected_by, AFF_SNEAK); // Mobs don't always have the affect
+  }
   if(GET_CLASS(ch) == CLASS_BARD && IS_SINGING(ch))
      do_sing(ch, "stop", 9);
 
