@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.81 2007/01/30 03:27:02 apocalypse Exp $
+| $Id: objects.cpp,v 1.82 2007/02/08 10:49:32 jhhudso Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -1106,7 +1106,6 @@ int do_pour(struct char_data *ch, char *argument, int cmd)
 
 int do_sip(struct char_data *ch, char *argument, int cmd)
 {
-    struct affected_type af;
     char arg[MAX_STRING_LENGTH];
     char buf[MAX_STRING_LENGTH];
     struct obj_data *temp;
@@ -1154,21 +1153,8 @@ int do_sip(struct char_data *ch, char *argument, int cmd)
     if(GET_COND(ch,DRUNK)>10)
         act("You feel drunk.",ch,0,0,TO_CHAR, 0);
 
-    if(temp->obj_flags.value[3] && !IS_AFFECTED(ch,AFF_POISON)
-    && GET_LEVEL(ch) <IMMORTAL) /* The shit was poisoned ! */
-    {
-        act("But it also had a strange taste!",ch,0,0,TO_CHAR, 0);
-        if(number(1,100) < get_saves(ch,SAVE_TYPE_POISON) + 15) {
-           send_to_char("Luckily, your body rejects the poison almost immediately.\n\r",ch);
-        } else {
-           af.type = SPELL_POISON;
-           af.duration = 3;
-           af.modifier = 0;
-           af.location = APPLY_NONE;
-           af.bitvector = AFF_POISON;
-           affect_to_char(ch,&af);
-        }
-    }
+    if(temp->obj_flags.value[3] == 1 && !IS_AFFECTED(ch,AFF_POISON))
+      act("But it also had a strange taste!",ch,0,0,TO_CHAR, 0);
 
     temp->obj_flags.value[1]--;
 
@@ -1184,10 +1170,6 @@ int do_sip(struct char_data *ch, char *argument, int cmd)
 
 int do_taste(struct char_data *ch, char *argument, int cmd)
 {
-    // TODO - fix this...it crashes
-    return eFAILURE;
-
-    struct affected_type af;
     char arg[MAX_STRING_LENGTH];
     struct obj_data *temp;
 
@@ -1219,20 +1201,8 @@ int do_taste(struct char_data *ch, char *argument, int cmd)
     act("$n tastes the $o",  ch, temp, 0, TO_ROOM, INVIS_NULL);
     act("You taste the $o",  ch, temp, 0, TO_CHAR, 0);
 
-    if(temp->obj_flags.value[3]&&!IS_AFFECTED(ch,AFF_POISON)
-    && GET_LEVEL(ch) <IMMORTAL) /* The shit was poisoned ! */
-    {
-        act("Oops, it did not taste good at all!",ch,0,0,TO_CHAR, 0);
-        if(number(1,100) < get_saves(ch,SAVE_TYPE_POISON) + 15) {
-           send_to_char("Luckily, your body rejects the poison almost immediately.\n\r",ch);
-        } else {
-           af.type = SPELL_POISON;
-           af.duration = 2;
-           af.modifier = 0;
-           af.location = APPLY_NONE;
-           af.bitvector = AFF_POISON;
-          affect_to_char(ch,&af);
-        }
+    if(temp->obj_flags.value[3] == 1 && !IS_AFFECTED(ch,AFF_POISON)) {
+      act("Oops, it did not taste good at all!",ch,0,0,TO_CHAR, 0);
     }
 
     temp->obj_flags.value[0]--;
