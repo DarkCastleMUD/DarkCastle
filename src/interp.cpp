@@ -16,7 +16,7 @@
 /* 12/08/2003   Onager   Added chop_half() to work like half_chop() but    */
 /*                       chopping off the last word.                       */
 /***************************************************************************/
-/* $Id: interp.cpp,v 1.123 2007/02/08 22:12:08 dcastle Exp $ */
+/* $Id: interp.cpp,v 1.124 2007/02/08 22:26:45 dcastle Exp $ */
 
 extern "C"
 {
@@ -1250,7 +1250,6 @@ bool can_use_command(CHAR_DATA *ch, int cmdnum)
   struct command_lag *cmdl;
   for (cmdl = command_lag_list; cmdl; cmdl = cmdl->next)
   {
-    csendf(ch,"%s num %d lag %d", cmdl->ch->name, cmdl->cmd_number, cmdl->lag);
     
     if (cmdl->ch == ch && cmdl->cmd_number == cmdnum)
 	return FALSE;
