@@ -109,9 +109,18 @@ void golem_gain_exp(CHAR_DATA *ch)
 }
 
 int  verify_existing_components(CHAR_DATA *ch, int golemtype)
-{ // check_components didn't suit me.
-  int i;
+{ 
   int retval = 0;
+
+  // OVERSEERS or higher don't need components
+  if (GET_LEVEL(ch) >= OVERSEER) {
+    SET_BIT(retval, eSUCCESS);
+    SET_BIT(retval, eEXTRA_VALUE); // Special effect.
+    return retval;
+  }
+
+    // check_components didn't suit me.
+  int i;
   struct obj_data *curr, *next_content;
   char buf[MAX_STRING_LENGTH];
   SET_BIT(retval, eSUCCESS);
@@ -229,7 +238,7 @@ void load_golem_data(CHAR_DATA *ch, int golemtype)
   char file[200];
   FILE *fpfile = NULL;
   struct char_data *golem; 
-  if (IS_NPC(ch) || GET_CLASS(ch) != CLASS_MAGIC_USER || ch->pcdata->golem) return;
+  if (IS_NPC(ch) || (GET_CLASS(ch) != CLASS_MAGIC_USER && GET_LEVEL(ch) < OVERSEER) || ch->pcdata->golem) return;
   if (golemtype < 0 || golemtype > 1) return; // Say what?
   sprintf(file,"%s/%c/%s.%d",FAMILIAR_DIR, ch->name[0], ch->name, golemtype);
   if (!(fpfile = dc_fopen(file,"r")))
