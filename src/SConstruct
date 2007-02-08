@@ -2,11 +2,11 @@ import glob
 
 env = Environment()
 env.Append(CCFLAGS = '-ggdb2 -Wall -m32')
-env.Append(LINKFLAGS = '-Wall -m32')
+env.Append(LINKFLAGS = '-ggdb2 -Wall -m32 -nopie')
 
 base_src = glob.glob('*.cpp')
 wizard_src = glob.glob('wizard/*.cpp')
 class_src = glob.glob('class/*.cpp')
 backend_src = glob.glob('Backend/*.cpp')
 
-env.Program('research.debug', [base_src,wizard_src,class_src,backend_src], CPPPATH = ['include'], CPPDEFINES=['LINUX'], LIBS=['crypt']);
+env.Program('research.debug', [base_src,wizard_src,class_src,backend_src], CPPPATH = ['include'], CPPDEFINES=['LINUX'], LIBS=['crypt', 'mcheck', 'z'], LIBPATH=['/emul/linux/x86/lib']);
