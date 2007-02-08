@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.78 2007/01/28 03:42:55 dcastle Exp $
+| $Id: move.cpp,v 1.79 2007/02/08 10:16:41 jhhudso Exp $
 | move.C
 | Movement commands and stuff.
 *************************************************************************
@@ -996,14 +996,17 @@ int do_enter(CHAR_DATA *ch, char *argument, int cmd)
   if (IS_NPC(ch) && ch->master && mob_index[ch->mobdata->nr].virt == 8) {
     sesame = ch->master;
     if (IS_SET(world[real_room(portal->obj_flags.value[0])].room_flags, CLAN_ROOM)) {
-      send_to_char("You are a mob, not a clan member.\r\n", ch);
-      act("$n finds $mself unable to enter!", ch, 0, 0, TO_ROOM, 0);
-      return eFAILURE;
+      // Is golem's master not a member of this clan
+      if (others_clan_room(sesame, &world[real_room(portal->obj_flags.value[0])]) == true) {
+	send_to_char("Your master is not from that clan.\r\n", ch);
+	act("$n finds $mself unable to enter!", ch, 0, 0, TO_ROOM, 0);
+	do_say(ch, "I may not enter.", 9);
+	return eFAILURE;
       }
     }
-  else {
+  } else {
     sesame = ch;
-    }
+  }
 
   // should probably just combine this with 'if' below it, but i'm lazy
   if(IS_SET(portal->obj_flags.value[3], PORTAL_NO_ENTER)) {
