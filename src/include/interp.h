@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.h,v 1.68 2007/01/29 22:15:47 shane Exp $ */
+/* $Id: interp.h,v 1.69 2007/02/08 22:10:34 dcastle Exp $ */
 
 #ifndef INTERP_H_
 #define INTERP_H_
@@ -32,6 +32,7 @@ void chop_half(char *string, char *arg1, char *arg2);
 void nanny(struct descriptor_data *d, char *arg);
 int is_abbrev(char *arg1, char *arg2);
 int len_cmp(char *s1, char *s2);
+void add_command_lag(CHAR_DATA *ch, int cmdnum, int lag);
 
 
 /*
@@ -48,6 +49,14 @@ struct command_info
     int command_number;           /* Passed to function as argument   */
     int flags;                      // what flags the skills has 
     ubyte toggle_hide;
+};
+
+struct command_lag
+{
+   struct command_lag *next;
+   CHAR_DATA *ch;
+   int cmd_number;
+   int lag;
 };
 
 #define COM_CHARMIE_OK       1
