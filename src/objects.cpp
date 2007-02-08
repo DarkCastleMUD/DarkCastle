@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.82 2007/02/08 10:49:32 jhhudso Exp $
+| $Id: objects.cpp,v 1.83 2007/02/08 22:11:22 dcastle Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -1198,8 +1198,8 @@ int do_taste(struct char_data *ch, char *argument, int cmd)
         return eFAILURE;
     }
 
-    act("$n tastes the $o",  ch, temp, 0, TO_ROOM, INVIS_NULL);
-    act("You taste the $o",  ch, temp, 0, TO_CHAR, 0);
+    act("$n tastes the $o.",  ch, temp, 0, TO_ROOM, INVIS_NULL);
+    act("You taste the $o.",  ch, temp, 0, TO_CHAR, 0);
 
     if(temp->obj_flags.value[3] == 1 && !IS_AFFECTED(ch,AFF_POISON)) {
       act("Oops, it did not taste good at all!",ch,0,0,TO_CHAR, 0);
