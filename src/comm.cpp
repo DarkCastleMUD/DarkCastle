@@ -195,6 +195,7 @@ int isbanned(char *hostname);
 void time_update();
 void weather_update();
 void send_hint();
+extern void pulse_command_lag();
 
 //extern char greetings1[MAX_STRING_LENGTH];
 //extern char greetings2[MAX_STRING_LENGTH];
@@ -1016,6 +1017,7 @@ void heartbeat()
   {
      pulse_short = PULSE_SHORT;
      short_activity();
+     pulse_command_lag();
   }
   // TODO - need to eventually modify this so it works for casters too so I can delay certain
   if (--pulse_bard < 1) 
