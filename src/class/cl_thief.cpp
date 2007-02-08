@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.161 2007/02/08 22:10:49 dcastle Exp $
+| $Id: cl_thief.cpp,v 1.162 2007/02/08 22:14:20 dcastle Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -355,18 +355,23 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
     if(!IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_WIMPY))
       WAIT_STATE(ch, PULSE_VIOLENCE * 2);
     else
-      add_command_lag(ch, cmd, PULSE_VIOLENCE * 1); 
+      add_command_lag(ch, cmd, PULSE_VIOLENCE * 2); 
     return retval;
   }
 
   if (retval & eCH_DIED) return retval;
-  add_command_lag(ch, cmd, PULSE_VIOLENCE * 1); 
 
   if (retval & eVICT_DIED)
-     return retval;
+  {
+    add_command_lag(ch, cmd, PULSE_VIOLENCE * 2); 
+    return retval;
+  }
   extern bool charExists(char_data *ch);
   if (!charExists(victim))// heh
+  {
+    add_command_lag(ch, cmd, PULSE_VIOLENCE * 2); 
       return eSUCCESS|eVICT_DIED;
+  }
   WAIT_STATE(ch, PULSE_VIOLENCE*2);
 
   // If we're intended to have a dual backstab AND we still can
