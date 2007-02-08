@@ -2,6 +2,14 @@
 | Level 110 wizard commands
 | 11/20/95 -- Azrack
 **********************/
+extern "C"
+{
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+#include <stdio.h>
+}
+
 #include "wizard.h"
 #include <assert.h>
 #include <utility.h>
@@ -13,6 +21,7 @@
 #include <clan.h>
 #include <returnvals.h>
 #include <spells.h>
+#include <interp.h>
 
 #ifdef WIN32
 char *crypt(const char *key, const char *salt);
@@ -674,6 +683,7 @@ int do_thing(CHAR_DATA *ch, char *argument, int cmd)
      return eFAILURE;
   }
   char buf[MAX_STRING_LENGTH];
+
   sprintf(buf, "Hps metad: %d Mana metad: %d Moves Metad: %d\r\n",
 	GET_HP_METAS(victim), GET_MANA_METAS(victim), GET_MOVE_METAS(ch));
   send_to_char(buf,ch);
@@ -698,6 +708,17 @@ r_new_meta_exp_cost(0, mana_exp_spent(victim))+GET_RAW_MANA(victim)-GET_MANA_MET
 r_new_meta_platinum_cost(0,moves_plats_spent(victim))+GET_RAW_MOVE(victim)-GET_MOVE_METAS(victim),
 	r_new_meta_exp_cost(0,moves_exp_spent(victim))+GET_RAW_MOVE(victim)-GET_MOVE_METAS(victim));
   send_to_char(buf,ch);
-  
+
+
+  buf[0] = '\0';
+  unsigned int i = 1,l = 0;
+  extern struct command_info cmd_info[];
+  extern unsigned int cmd_size;
+  for(; i < cmd_size; i++)
+  {
+     if ((l++ % 10) == 0) sprintf(buf, "%s\r\n",buf);
+     sprintf(buf,"%s%d ",buf,cmd_info[i].command_number);
+  }
+  send_to_char(buf,ch);
   return eSUCCESS;
 }
