@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.160 2007/01/30 04:04:19 jhhudso Exp $
+| $Id: cl_thief.cpp,v 1.161 2007/02/08 22:10:49 dcastle Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -305,7 +305,7 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
 	perform_dual_backstab = true;
       }
     }
-
+  WAIT_STATE(ch, PULSE_VIOLENCE*2);
   // failure
   if(AWAKE(victim) && !skill_success(ch,victim,SKILL_BACKSTAB)) {
     // If this is stab 1 of 2 for a dual backstab, we dont want people autojoining on the first stab
@@ -353,20 +353,21 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
   if (retval & eVICT_DIED && !retval & eCH_DIED)
   {
     if(!IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_WIMPY))
-       WAIT_STATE(ch, PULSE_VIOLENCE *2);
+      WAIT_STATE(ch, PULSE_VIOLENCE * 2);
     else
-       WAIT_STATE(ch, PULSE_VIOLENCE);
+      add_command_lag(ch, cmd, PULSE_VIOLENCE * 1); 
     return retval;
   }
 
   if (retval & eCH_DIED) return retval;
-  WAIT_STATE(ch, PULSE_VIOLENCE*2);
+  add_command_lag(ch, cmd, PULSE_VIOLENCE * 1); 
 
   if (retval & eVICT_DIED)
      return retval;
   extern bool charExists(char_data *ch);
   if (!charExists(victim))// heh
       return eSUCCESS|eVICT_DIED;
+  WAIT_STATE(ch, PULSE_VIOLENCE*2);
 
   // If we're intended to have a dual backstab AND we still can
   if (perform_dual_backstab == true) {
@@ -399,7 +400,8 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
 
     if (IS_AFFECTED(ch, AFF_CHARM)) SET_BIT(retval, check_joincharmie(ch,1));
     if (SOMEONE_DIED(retval)) return retval;
-  }
+  } else
+    add_command_lag(ch, cmd, (int)((double)PULSE_VIOLENCE * 1.5)); 
 
   return retval;
 }
