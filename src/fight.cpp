@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.418 2007/01/30 03:40:17 jhhudso Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.419 2007/02/08 10:17:05 jhhudso Exp $ */
 
 extern "C"
 {
@@ -5217,6 +5217,10 @@ int can_be_attacked(CHAR_DATA *ch, CHAR_DATA *vict)
 	   GET_NAME(ch), GET_NAME(vict), GET_NAME(vict->fighting));
     }
   }
+
+  // Golem cannot attack players
+  if (IS_NPC(ch) && mob_index[ch->mobdata->nr].virt == 8 && IS_PC(vict))
+    return FALSE;
   
   if(IS_NPC(vict))
   {
