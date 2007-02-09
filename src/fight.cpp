@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.420 2007/02/08 14:32:42 dcastle Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.421 2007/02/09 01:51:26 dcastle Exp $ */
 
 extern "C"
 {
@@ -1794,7 +1794,7 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
       default:
         break;
     }
-  int v = 0;
+ /* int v = 0;
   if (GET_CLASS(ch) == CLASS_MAGIC_USER) {
   //spellcraft
     v = has_skill(ch, SKILL_SPELLCRAFT);
@@ -1802,7 +1802,7 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
         if (save && dam!=0 && attacktype && attacktype < TYPE_HIT)
           save -= GET_INT(ch) / 3;
      }
-   }
+   }*/
 
    if (save < 0 && !imm)
    { double mult = 0 - save; // Turns positive.
