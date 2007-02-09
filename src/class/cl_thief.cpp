@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.162 2007/02/08 22:14:20 dcastle Exp $
+| $Id: cl_thief.cpp,v 1.163 2007/02/09 00:51:36 dcastle Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -355,7 +355,7 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
     if(!IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_WIMPY))
       WAIT_STATE(ch, PULSE_VIOLENCE * 2);
     else
-      add_command_lag(ch, cmd, PULSE_VIOLENCE * 2); 
+      add_command_lag(ch, cmd, PULSE_VIOLENCE*1.5); 
     return retval;
   }
 
@@ -363,13 +363,13 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
 
   if (retval & eVICT_DIED)
   {
-    add_command_lag(ch, cmd, PULSE_VIOLENCE * 2); 
+    add_command_lag(ch, cmd, PULSE_VIOLENCE *1.5); 
     return retval;
   }
   extern bool charExists(char_data *ch);
   if (!charExists(victim))// heh
   {
-    add_command_lag(ch, cmd, PULSE_VIOLENCE * 2); 
+    add_command_lag(ch, cmd, PULSE_VIOLENCE *1.5); 
       return eSUCCESS|eVICT_DIED;
   }
   WAIT_STATE(ch, PULSE_VIOLENCE*2);
@@ -406,7 +406,7 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
     if (IS_AFFECTED(ch, AFF_CHARM)) SET_BIT(retval, check_joincharmie(ch,1));
     if (SOMEONE_DIED(retval)) return retval;
   } else
-    add_command_lag(ch, cmd, (int)((double)PULSE_VIOLENCE * 1.5)); 
+    add_command_lag(ch, cmd, (int)((double)PULSE_VIOLENCE )); 
 
   return retval;
 }
