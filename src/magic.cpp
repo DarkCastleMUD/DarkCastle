@@ -1464,7 +1464,7 @@ int spell_paralyze(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
 
 
 	// paralyze vs sleep modifier
-  int save = 0;
+  int save = get_saves(victim, SAVE_TYPE_MAGIC);
   if (affected_by_spell(victim,SPELL_SLEEP))
     save = -15; // Above check takes care of sleep.
   int spellret = saves_spell(ch, victim, save, SAVE_TYPE_MAGIC);
