@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.421 2007/02/09 01:51:26 dcastle Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.422 2007/02/10 19:51:45 dcastle Exp $ */
 
 extern "C"
 {
@@ -4285,7 +4285,7 @@ void group_gain(CHAR_DATA * ch, CHAR_DATA * victim)
        continue;
     }
     
-    if(GET_LEVEL(tmp_ch) - GET_LEVEL(highest) <= -20 && !IS_NPC(tmp_ch)) {
+    if(GET_LEVEL(tmp_ch) - GET_LEVEL(highest) <= -25 && !IS_NPC(tmp_ch)) {
        act("You are too low for this group.  You gain no experience.", tmp_ch, 0, 0, TO_CHAR, 0);
 
        tmp_ch = loop_followers(&f);
