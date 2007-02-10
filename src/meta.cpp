@@ -42,6 +42,11 @@
 #include <returnvals.h>
 
 
+/*
+
+  START META-PHYSICIAN
+
+*/
 long long  new_meta_platinum_cost(int start, int end)
 { // This is the laziest function ever. I didn't feel like
   // figuring out a formulae to work with the ranges, so I didn't.
@@ -991,3 +996,213 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
   return eSUCCESS;
 }
 
+/*
+
+ END META-PHYSICIAN
+
+*/
+
+/*
+
+ START CARDINAL THELONIUS
+
+*/
+
+void undo_race_saves(char_data * ch)
+{
+   switch(GET_RACE(ch)) {
+     case RACE_HUMAN:
+       ch->saves[SAVE_TYPE_FIRE]   -= RACE_HUMAN_FIRE_MOD;
+       ch->saves[SAVE_TYPE_COLD]   -= RACE_HUMAN_COLD_MOD;
+       ch->saves[SAVE_TYPE_ENERGY] -= RACE_HUMAN_ENERGY_MOD;
+       ch->saves[SAVE_TYPE_ACID]   -= RACE_HUMAN_ACID_MOD;
+       ch->saves[SAVE_TYPE_MAGIC]  -= RACE_HUMAN_MAGIC_MOD;
+       ch->saves[SAVE_TYPE_POISON] -= RACE_HUMAN_POISON_MOD;
+       break;
+     case RACE_ELVEN:
+       ch->saves[SAVE_TYPE_FIRE]   -= RACE_ELVEN_FIRE_MOD;
+       ch->saves[SAVE_TYPE_COLD]   -= RACE_ELVEN_COLD_MOD;
+       ch->saves[SAVE_TYPE_ENERGY] -= RACE_ELVEN_ENERGY_MOD;
+       ch->saves[SAVE_TYPE_ACID]   -= RACE_ELVEN_ACID_MOD;
+       ch->saves[SAVE_TYPE_MAGIC]  -= RACE_ELVEN_MAGIC_MOD;
+       ch->saves[SAVE_TYPE_POISON] -= RACE_ELVEN_POISON_MOD;
+       break;
+     case RACE_DWARVEN:
+       ch->saves[SAVE_TYPE_FIRE]   -= RACE_DWARVEN_FIRE_MOD;
+       ch->saves[SAVE_TYPE_COLD]   -= RACE_DWARVEN_COLD_MOD;
+       ch->saves[SAVE_TYPE_ENERGY] -= RACE_DWARVEN_ENERGY_MOD;
+       ch->saves[SAVE_TYPE_ACID]   -= RACE_DWARVEN_ACID_MOD;
+       ch->saves[SAVE_TYPE_MAGIC]  -= RACE_DWARVEN_MAGIC_MOD;
+       ch->saves[SAVE_TYPE_POISON] -= RACE_DWARVEN_POISON_MOD;
+       break;
+     case RACE_TROLL:
+       ch->saves[SAVE_TYPE_FIRE]   -= RACE_TROLL_FIRE_MOD;
+       ch->saves[SAVE_TYPE_COLD]   -= RACE_TROLL_COLD_MOD;
+       ch->saves[SAVE_TYPE_ENERGY] -= RACE_TROLL_ENERGY_MOD;
+       ch->saves[SAVE_TYPE_ACID]   -= RACE_TROLL_ACID_MOD;
+       ch->saves[SAVE_TYPE_MAGIC]  -= RACE_TROLL_MAGIC_MOD;
+       ch->saves[SAVE_TYPE_POISON] -= RACE_TROLL_POISON_MOD;
+       break;
+     case RACE_GIANT:
+       ch->saves[SAVE_TYPE_FIRE]   -= RACE_GIANT_FIRE_MOD;
+       ch->saves[SAVE_TYPE_COLD]   -= RACE_GIANT_COLD_MOD;
+       ch->saves[SAVE_TYPE_ENERGY] -= RACE_GIANT_ENERGY_MOD;
+       ch->saves[SAVE_TYPE_ACID]   -= RACE_GIANT_ACID_MOD;
+       ch->saves[SAVE_TYPE_MAGIC]  -= RACE_GIANT_MAGIC_MOD;
+       ch->saves[SAVE_TYPE_POISON] -= RACE_GIANT_POISON_MOD;
+       break;
+     case RACE_PIXIE:
+       ch->saves[SAVE_TYPE_FIRE]   -= RACE_PIXIE_FIRE_MOD;
+       ch->saves[SAVE_TYPE_COLD]   -= RACE_PIXIE_COLD_MOD;
+       ch->saves[SAVE_TYPE_ENERGY] -= RACE_PIXIE_ENERGY_MOD;
+       ch->saves[SAVE_TYPE_ACID]   -= RACE_PIXIE_ACID_MOD;
+       ch->saves[SAVE_TYPE_MAGIC]  -= RACE_PIXIE_MAGIC_MOD;
+       ch->saves[SAVE_TYPE_POISON] -= RACE_PIXIE_POISON_MOD;
+       break;
+     case RACE_HOBBIT:
+       ch->saves[SAVE_TYPE_FIRE]   -= RACE_HOBBIT_FIRE_MOD;
+       ch->saves[SAVE_TYPE_COLD]   -= RACE_HOBBIT_COLD_MOD;
+       ch->saves[SAVE_TYPE_ENERGY] -= RACE_HOBBIT_ENERGY_MOD;
+       ch->saves[SAVE_TYPE_ACID]   -= RACE_HOBBIT_ACID_MOD;
+       ch->saves[SAVE_TYPE_MAGIC]  -= RACE_HOBBIT_MAGIC_MOD;
+       ch->saves[SAVE_TYPE_POISON] -= RACE_HOBBIT_POISON_MOD;
+       break;
+     case RACE_GNOME:
+       ch->saves[SAVE_TYPE_FIRE]   -= RACE_GNOME_FIRE_MOD;
+       ch->saves[SAVE_TYPE_COLD]   -= RACE_GNOME_COLD_MOD;
+       ch->saves[SAVE_TYPE_ENERGY] -= RACE_GNOME_ENERGY_MOD;
+       ch->saves[SAVE_TYPE_ACID]   -= RACE_GNOME_ACID_MOD;
+       ch->saves[SAVE_TYPE_MAGIC]  -= RACE_GNOME_MAGIC_MOD;
+       ch->saves[SAVE_TYPE_POISON] -= RACE_GNOME_POISON_MOD;
+       break;
+     case RACE_ORC:
+       ch->saves[SAVE_TYPE_FIRE]   -= RACE_ORC_FIRE_MOD;
+       ch->saves[SAVE_TYPE_COLD]   -= RACE_ORC_COLD_MOD;
+       ch->saves[SAVE_TYPE_ENERGY] -= RACE_ORC_ENERGY_MOD;
+       ch->saves[SAVE_TYPE_ACID]   -= RACE_ORC_ACID_MOD;
+       ch->saves[SAVE_TYPE_MAGIC]  -= RACE_ORC_MAGIC_MOD;
+       ch->saves[SAVE_TYPE_POISON] -= RACE_ORC_POISON_MOD;
+       break;
+     default:
+       break;
+   }
+}
+
+
+bool is_race_applicable(char_data *ch, int race)
+{
+  if (GET_CLASS(ch) == CLASS_PALADIN && (race != RACE_HUMAN && race != RACE_ELVEN))
+    return FALSE;
+  if (GET_CLASS(ch) == CLASS_ANTI_PAL && (race != RACE_HUMAN && race != RACE_ORC))
+    return FALSE;
+  switch (race)
+  {
+      case RACE_ELVEN:
+	 if (GET_RAW_DEX(ch) - 2 < 10 || GET_RAW_INT(ch) - 2 < 10)
+	   return FALSE;
+         break;
+      case RACE_DWARVEN:
+	 if (GET_RAW_CON(ch) - 2 < 10 || GET_RAW_WIS(ch) - 2 < 10)
+           return FALSE;
+	  break;
+      case RACE_HOBBIT:
+	 if (GET_RAW_DEX(ch) - 2 < 10)
+           return FALSE;
+	  break;
+      case RACE_PIXIE:
+	 if (GET_RAW_INT(ch) - 2 < 10)
+           return FALSE;
+	  break;
+      case RACE_GIANT:
+	 if (GET_RAW_STR(ch) - 2 < 12)
+           return FALSE;
+	  break;
+      case RACE_GNOME:
+	 if (GET_RAW_WIS(ch) - 2 < 12)
+           return FALSE;
+	  break;
+      case RACE_ORC:
+	 if (GET_RAW_CON(ch) - 2 < 10 || GET_RAW_STR(ch) - 2 < 10)
+           return FALSE;
+	  break;
+      case RACE_TROLL:
+	 if (GET_RAW_CON(ch) - 2 < 12)
+           return FALSE;
+	  break;
+      default: break;
+  }
+  return TRUE;
+}
+
+bool would_die(char_data *ch)
+{
+  if (GET_RAW_STR(ch) < 8 || GET_RAW_CON(ch) < 8 || GET_RAW_WIS(ch) < 8 || GET_RAW_INT(ch) < 8 || GET_RAW_DEX(ch) < 8)
+    return TRUE;
+
+  return FALSE;
+}
+
+int changecost(int oldrace, int newrace)
+{
+  int oldsize;
+  switch (oldrace)
+  {
+     case RACE_GIANT:
+     case RACE_TROLL:
+	if (newrace == RACE_PIXIE || newrace == RACE_HOBBIT) return 7000;
+	else if (newrace == RACE_DWARVEN || newrace == RACE_GNOME) return 6500;
+	else if (newrace == RACE_HUMAN) return 6000;
+	else if (newrace == RACE_ELVEN || newrace == RACE_ORC) return 5500;
+	else if (newrace == RACE_GIANT || newrace == RACE_TROLL) return 5000;
+        break;
+    case RACE_HOBBIT:
+    case RACE_PIXIE:
+	if (newrace == RACE_PIXIE || newrace == RACE_HOBBIT) return 5000;
+	else if (newrace == RACE_DWARVEN || newrace == RACE_GNOME) return 5500;
+	else if (newrace == RACE_HUMAN) return 6000;
+	else if (newrace == RACE_ELVEN || newrace == RACE_ORC) return 6500;
+	else if (newrace == RACE_GIANT || newrace == RACE_TROLL) return 7000;
+        break;
+    case RACE_DWARVEN:
+    case RACE_GNOME:
+	if (newrace == RACE_PIXIE || newrace == RACE_HOBBIT) return 5500;
+	else if (newrace == RACE_DWARVEN || newrace == RACE_GNOME) return 5000;
+	else if (newrace == RACE_HUMAN) return 5500;
+	else if (newrace == RACE_ELVEN || newrace == RACE_ORC) return 6000;
+	else if (newrace == RACE_GIANT || newrace == RACE_TROLL) return 6500;
+        break;
+    case RACE_ELVEN:
+    case RACE_ORC:
+	if (newrace == RACE_PIXIE || newrace == RACE_HOBBIT) return 6500;
+	else if (newrace == RACE_DWARVEN || newrace == RACE_GNOME) return 6000;
+	else if (newrace == RACE_HUMAN) return 5500;
+	else if (newrace == RACE_ELVEN || newrace == RACE_ORC) return 5000;
+	else if (newrace == RACE_GIANT || newrace == RACE_TROLL) return 5500;
+        break;
+    case RACE_HUMAN:
+	if (newrace == RACE_PIXIE || newrace == RACE_HOBBIT) return 6000;
+	else if (newrace == RACE_DWARVEN || newrace == RACE_GNOME) return 5500;
+	else if (newrace == RACE_HUMAN) return 5000;
+	else if (newrace == RACE_ELVEN || newrace == RACE_ORC) return 5500;
+	else if (newrace == RACE_GIANT || newrace == RACE_TROLL) return 6000;
+        break;
+    default:
+       return 1000000;
+  }
+  return 100000;
+}
+
+
+int cardinal(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
+          struct char_data *owner)
+{
+  
+
+}
+
+
+/*
+
+ END CARDINAL THELONIUS
+
+*/
