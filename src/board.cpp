@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: board.cpp,v 1.20 2006/10/08 01:04:34 dcastle Exp $
+| $Id: board.cpp,v 1.21 2007/02/10 20:17:10 jhhudso Exp $
 | board.C
 | Description:  This file contains the implementation for the board
 |   code.  It's old and should be rewritten --Morc XXX
@@ -158,7 +158,7 @@ char save_file[NUM_BOARDS][42] = {
   "board/tayledras",
   "board/knightsabertwo",
   "board/solaris",
-  "board/overlords",
+  "board/overlords", // 40
   "board/punishment",
   "board/anaphro",
   "board/coder",
@@ -168,7 +168,7 @@ char save_file[NUM_BOARDS][42] = {
   "board/warrior",
   "board/anti",
   "board/pal",
-  "board/barb",
+  "board/barb", // 50
   "board/monk",
   "board/ranger",
   "board/bard",
