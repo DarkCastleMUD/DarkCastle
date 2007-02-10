@@ -249,15 +249,12 @@ int meta_get_stat_exp_cost(char_data * ch, ubyte stat)
         break;
       case DEXTERITY:
         curr_stat = ch->raw_dex;
-//        xp_price = ((GET_LEVEL(ch)*4)*10000)+((ch->raw_dex*8)*30000);
         break;
       case INTELLIGENCE:
         curr_stat = ch->raw_intel;
-//        xp_price = ((GET_LEVEL(ch)*4)*10000)+((ch->raw_intel*8)*30000);
         break;
       case WISDOM:
         curr_stat = ch->raw_wis;
-//        xp_price = ((GET_LEVEL(ch)*4)*10000)+((ch->raw_wis*8)*30000);
         break;
       default:
         xp_price = 9999999;
@@ -324,15 +321,6 @@ int meta_get_stat_plat_cost(char_data * ch, ubyte targetstat)
   else if (stat < 28) plat_cost = 250 + ((stat-12) *50);
   else if (stat == 28) plat_cost = 1250;
   else plat_cost = 1500;
-/*  if(stat >= 18) {
-     plat_cost = 500;
-     if(ch->pcdata->statmetas > 0)
-        plat_cost += ch->pcdata->statmetas * 20;
-  } else {
-     plat_cost = 100;
-     if(ch->pcdata->statmetas > 0)
-        plat_cost += ch->pcdata->statmetas * 10;
-  }*/
 
   return plat_cost;
 }
@@ -525,7 +513,6 @@ int meta_get_ki_plat_cost(char_data * ch)
 int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
           struct char_data *owner)
 {
-  //char buf[256];
   char argument[256];
 
   int stat;
@@ -534,14 +521,8 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
   int hit_cost, mana_cost, move_cost, ki_cost, hit_exp, move_exp, mana_exp, ki_exp;
   int statplatprice, max_stat;
 
-  //long gold;
-
-  //truct obj_data *new_new_obj;
   sbyte *pstat;
   int pprice;
-
-  //const double EXPCONV  = 400000000.0;
-  //const double GOLDCONV = 1000000.0;
 
   if((cmd != 59) && (cmd != 56))
     return eFAILURE;
@@ -614,7 +595,6 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     csendf(ch, "$B11)$R Add to your movement points:   You cannot do this.\r\n");
 
     if(!IS_MOB(ch) && ki_cost && ki_exp) {   // mobs can't meta ki
-//        send_to_char("12) Your ki is already meta'd fully.\n\r", ch);
       csendf(ch, "$B12)$R Add a point of ki:        %d experience points and %d Platinum.\n\r", ki_exp, ki_cost);
     }
     else if (!IS_MOB(ch))
@@ -853,65 +833,46 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
      redo_mana(ch);
      return eSUCCESS;
    }
-
-/*   if(choice == 22) {
-     price = 100000000;
-     if(GET_COND(ch, FULL) == -1) {
-       send_to_char("$B$2The Meta-physician tells you, 'You already have freedom from hunger and thirst!'$R\n\r",
-ch);
-       return eSUCCESS;
-     }
-
-     if(GET_EXP(ch) < price) {
-       send_to_char("$B$2The Meta-physician tells you, 'You lack the experience.'$R\n\r", ch);
-       return eSUCCESS;
-     }
-
-     if(GET_PLATINUM(ch) < 2000) {
-       send_to_char("$B$2The Meta-physician tells you, 'You can't afford my services!  SCRAM!'$R\n\r", ch);
-       return eSUCCESS;
-     }
-
-     GET_EXP(ch) -= price;
-     GET_PLATINUM(ch) -= 2000;
-
-     GET_COND(ch,THIRST) = -1;
-     GET_COND(ch, FULL) = -1;
-
-     act("The Meta-physician touches $n.",  ch, 0, 0, TO_ROOM, 0);
-     act("The Meta-physician touches you.",  ch, 0, 0, TO_CHAR, 0);
-
-     return eSUCCESS;
-   }
-*/
-  if (choice == 19 || choice == 20)
-  {
-   int vnum = choice == 19 ? 27903: 27904;
-   unsigned int cost = choice == 19 ? 25:50;
-   if (GET_PLATINUM(ch) < cost)
-   {
-      send_to_char("$B$2The Meta-physician tells you, 'You can't afford that!'$R\r\n",ch);
+  if(choice == 12 && ki_exp && ki_cost) {
+    if(IS_MOB(ch)) {
+      send_to_char("Mobs cannot meta ki.\r\n", ch);
       return eSUCCESS;
-   }
-   struct obj_data *obj = clone_object(real_object(vnum));
-   if ( IS_CARRYING_N(ch) + 1 > CAN_CARRY_N(ch) )
-    {
-        send_to_char( "You can't carry that many items.\n\r", ch );
-        extract_obj(obj);
-        return eSUCCESS;
+    }
+    if(GET_EXP(ch) < ki_exp) {
+      send_to_char("$B$2The Meta-physician tells you, 'You lack the experience.'$R\n\r", ch);
+      return eSUCCESS;
+    }
+    if(GET_PLATINUM(ch) < (uint32)(ki_cost)) {
+      send_to_char("$B$2The Meta-physician tells you, 'You can't afford my services!  SCRAM!'$R\n\r", ch);
+      return eSUCCESS;
     }
 
-    if ( IS_CARRYING_W(ch) + obj->obj_flags.weight > CAN_CARRY_W(ch) )
-    {
-        send_to_char( "You can't carry that much weight.\n\r", ch );
-        extract_obj(obj);
-        return eSUCCESS;
-   }
-   GET_PLATINUM(ch) -= cost;
-   obj_to_char(obj,ch);
-   send_to_char("$B$2The Meta-physician tells you, 'Here is your potion.'$R\r\n",ch);
-   return eSUCCESS;
+    GET_EXP(ch) -= ki_exp;
+    GET_PLATINUM(ch) -= ki_cost;
+
+    ch->raw_ki += 1;
+    GET_KI_METAS(ch) += 1;
+    redo_ki(ch);
+    act("The Meta-physician touches $n.",  ch, 0, 0, TO_ROOM, 0);
+    act("The Meta-physician touches you.",  ch, 0, 0, TO_CHAR, 0);
+    return eSUCCESS;
   }
+
+   if(choice == 13) {
+     if (affected_by_spell(ch, FUCK_GTHIEF))
+     {
+        send_to_char("$B$2The Meta-physician tells you, 'You cannot do this because of your criminal actions!'$R\r\n",ch);
+        return eSUCCESS;
+     }
+     if(GET_GOLD(ch) < 20000) {
+       send_to_char("$B$2The Meta-physician tells you, 'You can't afford that.  SCRAM!'$R\n\r", ch);
+       return eSUCCESS;
+     }
+     GET_GOLD(ch) -= 20000;
+     GET_PLATINUM(ch) += 1;
+     send_to_char("Ok.\n\r", ch);
+     return eSUCCESS;
+   }
    if(choice == 14) {
      if (affected_by_spell(ch, FUCK_GTHIEF))
      {
@@ -925,21 +886,6 @@ ch);
 
      GET_GOLD(ch) -= 100000;
      GET_PLATINUM(ch) += 5;
-     send_to_char("Ok.\n\r", ch);
-     return eSUCCESS;
-   }
-   if(choice == 13) {
-     if (affected_by_spell(ch, FUCK_GTHIEF))
-     {
-        send_to_char("$B$2The Meta-physician tells you, 'You cannot do this because of your criminal actions!'$R\r\n",ch);
-        return eSUCCESS;
-     }
-     if(GET_GOLD(ch) < 20000) {
-       send_to_char("$B$2The Meta-physician tells you, 'You can't afford that.  SCRAM!'$R\n\r", ch);
-       return eSUCCESS;
-     }
-     GET_GOLD(ch) -= 20000;
-     GET_PLATINUM(ch) += 1;
      send_to_char("Ok.\n\r", ch);
      return eSUCCESS;
    }
@@ -980,51 +926,6 @@ ch);
     send_to_char("Ok.\n\r", ch);
     return eSUCCESS;
   }
-
-
-  if(choice == 21) {
-    if (GET_PLATINUM(ch) < 25) {
-       send_to_char ("Costs 25 plats...which you don't have.\n\r", ch);
-       return eSUCCESS;
-    }
-    if (IS_MOB(ch)) {
-       send_to_char ("You can't buy practices chode...\r\n", ch);
-       return eSUCCESS;
-    }
-    send_to_char("The Meta-Physician gives you a practice session.\n\r", ch);
-
-    GET_PLATINUM(ch) -= 25;
-    ch->pcdata->practices += 1;
-    return eSUCCESS;
-  }
-  if(choice == 12 && ki_exp && ki_cost) {
-    if(IS_MOB(ch)) {
-      send_to_char("Mobs cannot meta ki.\r\n", ch);
-      return eSUCCESS;
-    }
-    if(GET_EXP(ch) < ki_exp) {
-      send_to_char("$B$2The Meta-physician tells you, 'You lack the experience.'$R\n\r", ch);
-      return eSUCCESS;
-    }
-    if(GET_PLATINUM(ch) < (uint32)(ki_cost)) {
-      send_to_char("$B$2The Meta-physician tells you, 'You can't afford my services!  SCRAM!'$R\n\r", ch);
-      return eSUCCESS;
-    }/*
-    if(GET_KI_METAS(ch) > 4) {
-      send_to_char("$B$2The Meta-physician tells you, 'You have already meta'd your ki to the maximum.'$R\n\r", ch);
-      return eSUCCESS;
-    }*/
-
-    GET_EXP(ch) -= ki_exp;
-    GET_PLATINUM(ch) -= ki_cost;
-
-    ch->raw_ki += 1;
-    GET_KI_METAS(ch) += 1;
-    redo_ki(ch);
-    act("The Meta-physician touches $n.",  ch, 0, 0, TO_ROOM, 0);
-    act("The Meta-physician touches you.",  ch, 0, 0, TO_CHAR, 0);
-    return eSUCCESS;
-  }
   if (choice == 18) {
     if (GET_EXP(ch) < 100000000) {
       send_to_char("$B$2The Meta-physician tells you, 'You lack the experience.'$R\n\r", ch);
@@ -1040,6 +941,49 @@ ch);
 
     act("The Meta-physician touches $n.",  ch, 0, 0, TO_ROOM, 0);
     act("The Meta-physician touches you.",  ch, 0, 0, TO_CHAR, 0);
+    return eSUCCESS;
+  }
+  if (choice == 19 || choice == 20)
+  {
+   int vnum = choice == 19 ? 27903: 27904;
+   unsigned int cost = choice == 19 ? 25:50;
+   if (GET_PLATINUM(ch) < cost)
+   {
+      send_to_char("$B$2The Meta-physician tells you, 'You can't afford that!'$R\r\n",ch);
+      return eSUCCESS;
+   }
+   struct obj_data *obj = clone_object(real_object(vnum));
+   if ( IS_CARRYING_N(ch) + 1 > CAN_CARRY_N(ch) )
+    {
+        send_to_char( "You can't carry that many items.\n\r", ch );
+        extract_obj(obj);
+        return eSUCCESS;
+    }
+
+    if ( IS_CARRYING_W(ch) + obj->obj_flags.weight > CAN_CARRY_W(ch) )
+    {
+        send_to_char( "You can't carry that much weight.\n\r", ch );
+        extract_obj(obj);
+        return eSUCCESS;
+   }
+   GET_PLATINUM(ch) -= cost;
+   obj_to_char(obj,ch);
+   send_to_char("$B$2The Meta-physician tells you, 'Here is your potion.'$R\r\n",ch);
+   return eSUCCESS;
+  }
+  if(choice == 21) {
+    if (GET_PLATINUM(ch) < 25) {
+       send_to_char ("Costs 25 plats...which you don't have.\n\r", ch);
+       return eSUCCESS;
+    }
+    if (IS_MOB(ch)) {
+       send_to_char ("You can't buy practices chode...\r\n", ch);
+       return eSUCCESS;
+    }
+    send_to_char("The Meta-Physician gives you a practice session.\n\r", ch);
+
+    GET_PLATINUM(ch) -= 25;
+    ch->pcdata->practices += 1;
     return eSUCCESS;
   }
  }
