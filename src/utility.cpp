@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.69 2007/01/29 01:07:51 jhhudso Exp $ */
+/* $Id: utility.cpp,v 1.70 2007/02/10 05:34:10 jhhudso Exp $ */
 
 extern "C"
 {
@@ -750,7 +750,7 @@ bool CAN_SEE_OBJ( struct char_data *sub, struct obj_data *obj, bool blindfightin
          return FALSE;
 
    // only see beacons if you have detect magic up
-   if (GET_ITEM_TYPE(obj) == ITEM_BEACON) {
+   if (GET_ITEM_TYPE(obj) == ITEM_BEACON && IS_SET(obj->obj_flags.extra_flags, ITEM_INVISIBLE)) {
      if (!IS_AFFECTED(sub, AFF_DETECT_MAGIC)) {
        return FALSE;
      } else {

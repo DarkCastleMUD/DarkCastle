@@ -2317,11 +2317,25 @@ int execute_song_glitter_dust( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA 
    for(victim = world[ch->in_room].people; victim; victim = victim->next_in_room)
    {
      // don't effect gods unless it was a higher level god singing
-     if(GET_LEVEL(victim) >= IMMORTAL)
+     if(GET_LEVEL(victim) >= IMMORTAL && GET_LEVEL(ch) <= GET_LEVEL(victim))
        continue;
+
+     bool pre_see = CAN_SEE(ch, victim);
      affect_to_char(victim, &af);
+     bool post_see = CAN_SEE(ch, victim);
+     if (!pre_see && post_see) {
+       csendf(ch, "Your glitter reveals %s.\n\r", GET_SHORT(victim));
+     }
    }
-      
+   
+   obj_data *item;
+   for (item = world[ch->in_room].contents; item; item = item->next_content) {
+     if (GET_ITEM_TYPE(item) == ITEM_BEACON && IS_SET(item->obj_flags.extra_flags, ITEM_INVISIBLE)) {
+       send_to_char("Your glitter reveals a beacon.\n\r", ch);
+       REMOVE_BIT(item->obj_flags.extra_flags, ITEM_INVISIBLE);
+     }
+   }
+
    return eSUCCESS;
 }
 
