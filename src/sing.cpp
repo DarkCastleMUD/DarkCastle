@@ -2459,16 +2459,19 @@ int execute_song_dischordant_dirge( ubyte level, CHAR_DATA *ch, char *arg, CHAR_
    {
      act("$n shatters $N's bond with this realm, and the creature vanishes.",ch, 0, target, TO_ROOM, NOTVICT);
      act("At your dirge's completion, $N vanishes.", ch, 0, target, TO_CHAR,0);
+     make_dust(target);
      extract_char(target, TRUE);
      return eSUCCESS;
    }
    if (type == 4)
    {
       act("$n shatters!", target, 0, 0, TO_ROOM, 0);
+      make_dust(target);
       extract_char(target, FALSE);
       return eSUCCESS;
    } else if (type == 2) {
         act("$n's mind is set free, and the body falls onto the ground", target, 0, 0, TO_ROOM, 0);
+	make_dust(target);
 	extract_char(target, TRUE);
 	return eSUCCESS;
    }
