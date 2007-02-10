@@ -116,7 +116,12 @@ int do_innate(CHAR_DATA *ch, char *arg, int cmd)
 	{
 	   struct affected_type af;
 	   af.type = SKILL_INNATE_TIMER;
-	   af.duration = !str_cmp(buf, "repair")?12:18;
+
+	   if (!str_cmp(buf, "repair") || !str_cmp(buf, "bloodlust")) {
+	     af.duration = 12;
+	   } else {
+	     af.duration = 18;
+	   }
 		// repair is every 12 ticks
 	   af.modifier = 0;
 	   af.location = 0;
