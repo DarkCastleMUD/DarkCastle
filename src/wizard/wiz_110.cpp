@@ -354,12 +354,14 @@ int do_rename_char(struct char_data *ch, char *arg, int cmd)
   char strsave[MAX_INPUT_LENGTH];
   char oldname[MAX_INPUT_LENGTH];
   char newname[MAX_INPUT_LENGTH];
+  char arg3[MAX_INPUT_LENGTH];
 
   FILE * fl;
   int iWear;
 
   arg = one_argument(arg, oldname);
   arg = one_argument(arg, newname);
+  arg = one_argument(arg, arg3);
 
   if (!has_skill(ch, COMMAND_RENAME))
   {
@@ -369,7 +371,7 @@ int do_rename_char(struct char_data *ch, char *arg, int cmd)
   fprintf(stderr, "[%s] [%s]\n", oldname, newname);
 
   if(!(*oldname) || !(*newname)) {
-    send_to_char("Usage: rename <oldname> <newname>\n\r", ch);
+    send_to_char("Usage: rename <oldname> <newname> [takeplats]\n\r", ch);
     return eFAILURE;
   }
 
@@ -392,6 +394,19 @@ int do_rename_char(struct char_data *ch, char *arg, int cmd)
   {
     send_to_char("New name too long.\r\n", ch);
     return eFAILURE;
+  }
+
+  if (!strcmp(arg3, "takeplats")) {
+    if (GET_PLATINUM(victim) < 500) {
+      send_to_char("They don't have enough plats.\n\r", ch);
+      return eFAILURE;
+    } else {
+      GET_PLATINUM(victim) -= 500;
+      csendf(ch, "You reach into %s's soul and remove 500 platinum.\n\r", GET_SHORT(victim));
+      send_to_char("You feel the hand of god slip into your soul and remove 500 platinum.\n\r", victim);
+      sprintf(name, "500 platinum removed from %s for rename.", GET_NAME(victim));
+      log(name, GET_LEVEL(ch), LOG_GOD);
+    }
   }
 
 //extern short bport;
