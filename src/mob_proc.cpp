@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.136 2007/02/08 22:09:08 dcastle Exp $ */
+/* $Id: mob_proc.cpp,v 1.137 2007/02/10 01:16:51 jhhudso Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -3179,7 +3179,7 @@ static char *dethSayText [ ] =
   "We have enough youth, how about a fountain of SMART?",
   "Wait a second, did you rip off your own arm as a joke?", // Futurama > you
   "4 8 15 16 23 42",
-  "I'm so embarrased. I wish everybody else was dead."
+  "I'm so embarrassed. I wish everybody else was dead."
 };
 
 // ENDOFCHAIN
