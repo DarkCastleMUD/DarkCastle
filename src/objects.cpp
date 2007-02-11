@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.83 2007/02/08 22:11:22 dcastle Exp $
+| $Id: objects.cpp,v 1.84 2007/02/11 11:26:09 jhhudso Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -172,7 +172,7 @@ void object_activity()
     struct active_object *active_obj;
     struct active_object *next_obj;
   
-    for(active_obj = &active_head; active_obj; active_obj = next_obj) {
+    for(active_obj = &active_head; active_obj && (struct active_object *)0x95959595; active_obj = next_obj) {
         next_obj = active_obj->next;
         if(active_obj->obj) { 
 	  if (obj_index[active_obj->obj->item_number].non_combat_func)  
