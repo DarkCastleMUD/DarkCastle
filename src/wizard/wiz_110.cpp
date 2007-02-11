@@ -8,10 +8,12 @@ extern "C"
 #include <string.h>
 #include <ctype.h>
 #include <stdio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <assert.h>
 }
 
 #include "wizard.h"
-#include <assert.h>
 #include <utility.h>
 #include <levels.h>
 #include <player.h>
@@ -22,6 +24,7 @@ extern "C"
 #include <returnvals.h>
 #include <spells.h>
 #include <interp.h>
+
 
 #ifdef WIN32
 char *crypt(const char *key, const char *salt);
@@ -368,7 +371,6 @@ int do_rename_char(struct char_data *ch, char *arg, int cmd)
     send_to_char("Huh?\r\n",ch);
     return eFAILURE;
   }
-  fprintf(stderr, "[%s] [%s]\n", oldname, newname);
 
   if(!(*oldname) || !(*newname)) {
     send_to_char("Usage: rename <oldname> <newname> [takeplats]\n\r", ch);
@@ -465,15 +467,25 @@ int do_rename_char(struct char_data *ch, char *arg, int cmd)
 
   system(name);
 
-  // Golems
-  sprintf(name, "cp %s/%c/%s.1 %s/%c/%s.1", FAMILIAR_DIR, victim->name[0],
-	  GET_NAME(victim), FAMILIAR_DIR, newname[0], newname);
-  system(name);
+  char src_filename[256];
+  char dst_filename[256];
+  struct stat buf;
 
-  // Golems
-  sprintf(name, "cp %s/%c/%s.0 %s/%c/%s.0", FAMILIAR_DIR, victim->name[0],
-	  GET_NAME(victim), FAMILIAR_DIR, newname[0], newname);
-  system(name);
+  // Only copy golems if they exist
+  for (int i=0; i < MAX_GOLEMS; i++) {
+    snprintf(src_filename, 256, "%s/%c/%s.%d", FAMILIAR_DIR, victim->name[0], GET_NAME(victim), i);
+    if (0 == stat(src_filename, &buf)) { 
+      // Make backup
+      snprintf(dst_filename, 256, "%s/%c/%s.%d.old", FAMILIAR_DIR, victim->name[0], GET_NAME(victim), i);
+      sprintf(name, "cp %s %s", src_filename, dst_filename);
+      system(name);
+      
+      // Rename
+      snprintf(dst_filename, 256, "%s/%c/%s.%d", FAMILIAR_DIR, newname[0], newname, i);
+      sprintf(name, "mv %s %s", src_filename, dst_filename);
+      system(name);
+    }
+  }
 
   sprintf(name, "%s renamed to %s.", GET_NAME(victim), newname);
   log(name, GET_LEVEL(ch), LOG_GOD);
