@@ -1546,7 +1546,7 @@ int spell_blindness(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
   if (affected_by_spell(victim, SPELL_BLINDNESS) || IS_AFFECTED(victim, AFF_BLIND))
     return eFAILURE;
 
-  int spellret = saves_spell(ch, victim, 0 - get_saves(victim, SAVE_TYPE_MAGIC)/3, SAVE_TYPE_MAGIC);
+  int spellret = saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC);
 
   if(spellret >= 0 && (victim != ch)) {
       act("$N seems to be unaffected!", ch, NULL, victim, TO_CHAR, 0);
