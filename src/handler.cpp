@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.157 2007/01/30 06:19:25 jhhudso Exp $ */
+/* $Id: handler.cpp,v 1.158 2007/02/11 18:34:37 dcastle Exp $ */
     
 extern "C"
 {
@@ -1443,7 +1443,11 @@ void affect_remove( CHAR_DATA *ch, struct affected_type *af, int flags)
          break;
       case SKILL_CRAZED_ASSAULT:
          if (!(flags & SUPPRESS_MESSAGES))
-            send_to_char("Your craziness has subsided.\r\n", ch);
+	 {
+	    if (af->location == APPLY_HITROLL)
+              send_to_char("Your craziness has subsided.\r\n", ch);
+	    else send_to_char("You feel ready to go crazy again.\r\n",ch);
+	  }
          break;
       case SKILL_INNATE_BLOODLUST:
          if (!(flags & SUPPRESS_MESSAGES))
