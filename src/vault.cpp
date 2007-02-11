@@ -559,7 +559,7 @@ void remove_vault(char *name) {
   system(h);
   unlink(VAULT_INDEX_FILE);
   rename(VAULT_INDEX_FILE_TMP, VAULT_INDEX_FILE);
-  sprintf(buf, "Deleting %s's vault.\r\n", name);
+  sprintf(buf, "Deleting %s's vault.", name);
   log(buf, ANGEL, LOG_VAULT);
   
   if (!(vault = has_vault(name)))
