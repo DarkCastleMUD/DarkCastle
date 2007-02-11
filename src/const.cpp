@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.224 2007/01/26 01:52:09 dcastle Exp $ */
+/* $Id: const.cpp,v 1.225 2007/02/11 17:26:34 apocalypse Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1302,7 +1302,7 @@ struct class_skill_defines b_skills[] = { // barbarian skills
 {    "double",          SKILL_SECOND_ATTACK,      8,    85,  {STR,DEX} },
 {    "dodge",           SKILL_DODGE,  	          10,   80,  {DEX,INT} },
 {    "blood fury",      SKILL_BLOOD_FURY,         12,   98,  {CON,WIS} },
-{    "crazedassault",   SKILL_CRAZED_ASSAULT,     15,   98,  {WIS,STR} },
+{    "crazed assault",  SKILL_CRAZED_ASSAULT,     15,   98,  {WIS,STR} },
 {    "frenzy",          SKILL_FRENZY,             18,   90,  {CON,INT} },
 {    "rage",            SKILL_RAGE,               20,   98,  {CON,STR} },
 {"enhanced regeneration",SKILL_ENHANCED_REGEN,    22,   90,  {CON,WIS} },
