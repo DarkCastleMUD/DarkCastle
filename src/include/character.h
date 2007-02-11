@@ -1,7 +1,7 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.60 2007/01/14 20:42:31 jhhudso Exp $
+| $Id: character.h,v 1.61 2007/02/11 03:22:43 jhhudso Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
@@ -20,6 +20,8 @@
 #include <quest.h>
 #include <map>
 #include <sys/time.h>
+
+#define MAX_GOLEMS           2 // amount of golems above +1
 
 #define START_ROOM        3001 // Where you login
 #define CFLAG_HOME        3014 // Where the champion flag normally rests

@@ -80,8 +80,6 @@ const struct golem_data golem_list[] = {
    }
 };
 
-#define MAX_GOLEMS 2 // amount of golems above +1
-
 void shatter_message(CHAR_DATA *ch)
 {
    int golemtype = !IS_AFFECTED(ch, AFF_GOLEM); // 0 or 1
