@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.110 2007/01/02 19:38:45 dcastle Exp $
+| $Id: guild.cpp,v 1.111 2007/02/12 00:14:54 dcastle Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -900,6 +900,20 @@ if (ch->in_room && IS_SET(world[ch->in_room].room_flags, NOLEARN))
    // increase the skill by one
    learn_skill(ch, skill, 1, maximum);
    csendf(ch, "You feel more competent in your %s ability.\r\n", skillname);
+}
+
+
+void verify_max_stats(CHAR_DATA *ch)
+{
+          struct char_skill_data * curr = ch->skills;
+          while(curr) {
+
+	   if (get_max(ch, curr->skillnum) > curr->learned)
+		curr->learned = get_max(ch, curr->skillnum);
+	
+	   curr = curr->next;
+          }
+  
 }
 
 int get_max(CHAR_DATA *ch, int skill)
