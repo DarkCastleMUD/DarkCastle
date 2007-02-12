@@ -169,6 +169,10 @@ void assign_non_combat_procs() {
     SPEC_FUN    startrek_miles;
     SPEC_FUN    generic_area_guard;
     SPEC_FUN    pthief_hater;
+    SPEC_FUN    cardinal;
+
+    assign_one_mob_non(3071, cardinal);
+
     assign_one_mob_non(1203, Executioner);
     assign_one_mob_non(501, arena_only);
     assign_one_mob_non(502, arena_only);
