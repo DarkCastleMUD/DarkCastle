@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.61 2007/01/27 17:16:28 dcastle Exp $ */
+/* $Id: ki.cpp,v 1.62 2007/02/12 22:19:14 pirahna Exp $ */
 
 extern "C"
 {
@@ -396,7 +396,8 @@ int ki_blast( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
 
    if (CAN_GO(vict, exit) &&
        !IS_SET(world[EXIT(vict, exit)->to_room].room_flags, IMP_ONLY) &&
-       !IS_SET(world[EXIT(vict, exit)->to_room].room_flags, NO_TRACK)) {
+       !IS_SET(world[EXIT(vict, exit)->to_room].room_flags, NO_TRACK)) 
+   {
       sprintf(buf, "$N is blasted out of the room %s by $n!", dirswards[exit]);
       act(buf, ch, 0, vict, TO_ROOM, NOTVICT);
       sprintf(buf, "You watch as $N goes flailing out of the room %s!", dirswards[exit]);
@@ -417,9 +418,9 @@ int ki_blast( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
       move_char(vict, (world[(ch)->in_room].dir_option[exit])->to_room);
       GET_POS(vict) = POSITION_SITTING;
       return eSUCCESS;
-      }
+   }
    else /* There is no exit there */
-	{
+   {
       char buf[20];
       int prev = GET_HIT(vict);
 
@@ -434,11 +435,11 @@ int ki_blast( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
       int retval = damage(ch,vict,100, TYPE_KI,KI_OFFSET+KI_BLAST,0);
       
       if(!SOMEONE_DIED(retval) && !vict->fighting && IS_NPC(vict))
-	return attack(vict, ch, TYPE_UNDEFINED);
-      return 1;
-	}
-	/* still here?  It was unsuccessful */
-	return eSUCCESS;
+         return attack(vict, ch, TYPE_UNDEFINED);
+      return retval;
+   }
+   /* still here?  It was unsuccessful */
+   return eSUCCESS;
 }
 
 int ki_punch( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
