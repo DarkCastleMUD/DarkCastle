@@ -1,7 +1,7 @@
 #ifndef RACE_H_
 #define RACE_H_
 /************************************************************************
-| $Id: race.h,v 1.11 2005/05/09 05:08:44 shane Exp $
+| $Id: race.h,v 1.12 2007/02/12 00:14:34 dcastle Exp $
 | race.h
 | This file defines racial information.
 */
@@ -15,6 +15,8 @@
 #define RACE_GNOME        7
 #define RACE_ORC          8
 #define RACE_TROLL        9
+
+#define MAX_PC_RACE 	  9
 /* Not player races from here down */
 #define RACE_GOBLIN      10
 #define RACE_REPTILE     11
