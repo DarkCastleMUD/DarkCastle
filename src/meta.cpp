@@ -338,45 +338,45 @@ void meta_list_stats(char_data * ch)
     plat_cost = meta_get_stat_plat_cost(ch, STRENGTH);
     max_stat = get_max_stat(ch, STRENGTH);
     if(ch->raw_str >= max_stat)
-      csendf(ch, "$B1)$R Str:       Your strength is already %d.\n\r", max_stat);
+      csendf(ch, "$B$31)$R Str:       Your strength is already %d.\n\r", max_stat);
     else
-      csendf(ch, "$B1)$R Str: %d        Cost: %d exp + %d Platinum coins. \n\r",
+      csendf(ch, "$B$31)$R Str: %d        Cost: %d exp + %d Platinum coins. \n\r",
               ( ch->raw_str + 1), xp_price, plat_cost);
 
     xp_price = meta_get_stat_exp_cost(ch, DEXTERITY);
     plat_cost = meta_get_stat_plat_cost(ch, DEXTERITY);
     max_stat = get_max_stat(ch, DEXTERITY);
     if(ch->raw_dex >= max_stat)
-      csendf(ch, "$B2)$R Dex:       Your dexterity is already %d.\n\r", max_stat);
+      csendf(ch, "$B$32)$R Dex:       Your dexterity is already %d.\n\r", max_stat);
     else
-      csendf(ch, "$B2)$R Dex: %d        Cost: %d exp + %d Platinum coins.\n\r",
+      csendf(ch, "$B$32)$R Dex: %d        Cost: %d exp + %d Platinum coins.\n\r",
               ( ch->raw_dex + 1 ), xp_price, plat_cost);
 
     xp_price = meta_get_stat_exp_cost(ch, CONSTITUTION);
     plat_cost = meta_get_stat_plat_cost(ch, CONSTITUTION);
     max_stat = get_max_stat(ch, CONSTITUTION);
     if(ch->raw_con >= max_stat)
-      csendf(ch, "$B3)$R Con:       Your constitution is already %d.\n\r", max_stat);
+      csendf(ch, "$B$33)$R Con:       Your constitution is already %d.\n\r", max_stat);
     else
-      csendf(ch, "$B3)$R Con: %d        Cost: %d exp + %d Platinum coins.\n\r",
+      csendf(ch, "$B$33)$R Con: %d        Cost: %d exp + %d Platinum coins.\n\r",
               ( ch->raw_con + 1 ), xp_price, plat_cost);
 
     xp_price = meta_get_stat_exp_cost(ch, INTELLIGENCE);
     plat_cost = meta_get_stat_plat_cost(ch, INTELLIGENCE);
     max_stat = get_max_stat(ch, INTELLIGENCE);
     if(ch->raw_intel >= max_stat)
-      csendf(ch, "$B4)$R Int:       Your intelligence is already %d.\n\r", max_stat);
+      csendf(ch, "$B$34)$R Int:       Your intelligence is already %d.\n\r", max_stat);
     else
-      csendf(ch, "$B4)$R Int: %d        Cost: %d exp + %d Platinum coins.\n\r",
+      csendf(ch, "$B$34)$R Int: %d        Cost: %d exp + %d Platinum coins.\n\r",
               ( ch->raw_intel + 1 ), xp_price, plat_cost);
 
     xp_price = meta_get_stat_exp_cost(ch, WISDOM);
     plat_cost = meta_get_stat_plat_cost(ch, WISDOM);
     max_stat = get_max_stat(ch, WISDOM);
     if(ch->raw_wis >= max_stat)
-      csendf(ch, "$B5)$R Wis:       Your wisdom is already %d.\n\r", max_stat);
+      csendf(ch, "$B$35)$R Wis:       Your wisdom is already %d.\n\r", max_stat);
     else
-      csendf(ch, "$B5)$R Wis: %d        Cost: %d exp + %d Platinum coins.\n\r",
+      csendf(ch, "$B$35)$R Wis: %d        Cost: %d exp + %d Platinum coins.\n\r",
               ( ch->raw_wis + 1 ), xp_price, plat_cost);
 
 }
@@ -561,60 +561,63 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
   if(cmd == 59) {           /* List */
     send_to_char("$B$2The Meta-physician tells you, 'This is what I can do for you...$R \n\r", ch);
 
+    send_to_char("$BAttribute Meta:$R\r\n",ch);
     meta_list_stats(ch);
 
+    send_to_char("$BStatistic Meta:$R\r\n",ch);
     if (hit_exp && hit_cost)
-    csendf(ch, "$B6)$R Add 5 points to your hit points:   %d experience points and %d"
+    csendf(ch, "$B$36)$R Add 5 points to your hit points:   %d experience points and %d"
             " Platinum coins.\n\r", hit_exp, hit_cost);
     else
-    csendf(ch, "$B6)$R Add to your hit points:   You cannot do this.\r\n");
+    csendf(ch, "$B$36)$R Add to your hit points:   You cannot do this.\r\n");
 
     if (hit_exp && hit_cost)
-    csendf(ch, "$B7)$R Add 1 point to your hit points:   %d experience points and %d"
+    csendf(ch, "$B$37)$R Add 1 point to your hit points:   %d experience points and %d"
             " Platinum coins.\n\r", (int)(hit_exp/5*1.1), (int)(hit_cost/5*1.1));
     else
-    csendf(ch, "$B7)$R Add to your hit points:   You cannot do this.\r\n");
+    csendf(ch, "$B$37)$R Add to your hit points:   You cannot do this.\r\n");
 
     if (mana_exp && mana_cost)
-    csendf(ch, "$B8)$R Add 5 points to your mana points:  %d experience points and %d"
+    csendf(ch, "$B$38)$R Add 5 points to your mana points:  %d experience points and %d"
             " Platinum coins.\n\r", mana_exp, mana_cost);
     else
-    csendf(ch, "$B8)$R Add to your mana points:  You cannot do this.\r\n");
+    csendf(ch, "$B$38)$R Add to your mana points:  You cannot do this.\r\n");
 
     if (mana_exp && mana_cost)
-    csendf(ch, "$B9)$R Add 1 point to your mana points:   %d experience points and %d"
+    csendf(ch, "$B$39)$R Add 1 point to your mana points:   %d experience points and %d"
             " Platinum coins.\n\r", (int)(mana_exp/5*1.1), (int)(mana_cost/5*1.1));
     else
-    csendf(ch, "$B9)$R Add to your mana points:   You cannot do this.\r\n");
+    csendf(ch, "$B$39)$R Add to your mana points:   You cannot do this.\r\n");
 
     if (move_exp && move_cost)
-    csendf(ch, "$B10)$R Add 5 points to your movement points: %d experience points and %d"
+    csendf(ch, "$B$310)$R Add 5 points to your movement points: %d experience points and %d"
             " Platinum coins.\n\r", move_exp, move_cost);
     else
-    csendf(ch, "$B10)$R Add to your movement points:  You cannot do this.\r\n");
+    csendf(ch, "$B$310)$R Add to your movement points:  You cannot do this.\r\n");
 
     if (move_exp && move_cost)
-    csendf(ch, "$B11)$R Add 1 points to your movement points:   %d experience points and %d"
+    csendf(ch, "$B$311)$R Add 1 points to your movement points:   %d experience points and %d"
             " Platinum coins.\n\r", (int)(move_exp/5*1.1), (int)(move_cost/5*1.1));
     else
-    csendf(ch, "$B11)$R Add to your movement points:   You cannot do this.\r\n");
+    csendf(ch, "$B$311)$R Add to your movement points:   You cannot do this.\r\n");
 
     if(!IS_MOB(ch) && ki_cost && ki_exp) {   // mobs can't meta ki
-      csendf(ch, "$B12)$R Add a point of ki:        %d experience points and %d Platinum.\n\r", ki_exp, ki_cost);
+      csendf(ch, "$B$312)$R Add a point of ki:        %d experience points and %d Platinum.\n\r", ki_exp, ki_cost);
     }
     else if (!IS_MOB(ch))
-    csendf(ch, "$B12)$R Add a point of ki:        You cannot do this.\r\n");
+    csendf(ch, "$B$312)$R Add a point of ki:        You cannot do this.\r\n");
 
+    send_to_char("$BMonetary Exchange:$R\r\n",ch);
     send_to_char(
-    "$B13)$R One (1) Platinum coin     Cost: 20,000 Gold Coins.\n\r"
-    "$B14)$R Five (5) Platinum coins   Cost: 100,000 Gold Coins.\n\r"
-    "$B15)$R 250 Platinum coins        Cost: 5,000,000 Gold Coins.\r\n"
-    "$B16)$R 100,000 Gold Coins        Cost: Five (5) Platinum coins.\r\n"
-    "$B17)$R 5,000,000 Gold Coins      Cost: 250 Platinum coins.\r\n"
-    "$B18)$R Convert experience to gold. (100mil Exp. = 500000 Gold.)\r\n"
-    "$B19)$R A deep blue potion of healing. Cost: 25 Platinum coins.\r\n"
-    "$B20)$R A deep red vial of mana. Cost: 50 Platinum coins.\r\n"
-    "$B21)$R Buy a practice session for 25 plats.\r\n"
+    "$B$313)$R One (1) Platinum coin     Cost: 20,000 Gold Coins.\n\r"
+    "$B$314)$R Five (5) Platinum coins   Cost: 100,000 Gold Coins.\n\r"
+    "$B$315)$R 250 Platinum coins        Cost: 5,000,000 Gold Coins.\r\n"
+    "$B$316)$R 100,000 Gold Coins        Cost: Five (5) Platinum coins.\r\n"
+    "$B$317)$R 5,000,000 Gold Coins      Cost: 250 Platinum coins.\r\n"
+    "$BOther Services:$R\r\n"
+    "$B$318)$R Convert experience to gold. (100mil Exp. = 500000 Gold.)\r\n"
+    "$B$319)$R A deep blue potion of healing. Cost: 25 Platinum coins.\r\n"
+    "$B$320)$R Buy a practice session for 25 plats.\r\n"
                  , ch);
 
     return eSUCCESS;
@@ -948,16 +951,14 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     act("The Meta-physician touches you.",  ch, 0, 0, TO_CHAR, 0);
     return eSUCCESS;
   }
-  if (choice == 19 || choice == 20)
+  if (choice == 19)
   {
-   int vnum = choice == 19 ? 27903: 27904;
-   unsigned int cost = choice == 19 ? 25:50;
-   if (GET_PLATINUM(ch) < cost)
+   if (GET_PLATINUM(ch) < 25)
    {
       send_to_char("$B$2The Meta-physician tells you, 'You can't afford that!'$R\r\n",ch);
       return eSUCCESS;
    }
-   struct obj_data *obj = clone_object(real_object(vnum));
+   struct obj_data *obj = clone_object(real_object(27903));
    if ( IS_CARRYING_N(ch) + 1 > CAN_CARRY_N(ch) )
     {
         send_to_char( "You can't carry that many items.\n\r", ch );
@@ -971,12 +972,12 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
         extract_obj(obj);
         return eSUCCESS;
    }
-   GET_PLATINUM(ch) -= cost;
+   GET_PLATINUM(ch) -= 25;
    obj_to_char(obj,ch);
    send_to_char("$B$2The Meta-physician tells you, 'Here is your potion.'$R\r\n",ch);
    return eSUCCESS;
   }
-  if(choice == 21) {
+  if(choice == 20) {
     if (GET_PLATINUM(ch) < 25) {
        send_to_char ("Costs 25 plats...which you don't have.\n\r", ch);
        return eSUCCESS;
@@ -1095,6 +1096,10 @@ bool is_race_applicable(char_data *ch, int race)
     return FALSE;
   if (GET_CLASS(ch) == CLASS_ANTI_PAL && (race != RACE_HUMAN && race != RACE_ORC))
     return FALSE;
+  if (GET_CLASS(ch) == CLASS_BARBARIAN && race == RACE_PIXIE)
+    return FALSE;
+  if (GET_CLASS(ch) == CLASS_THIEF && race == RACE_GIANT)
+    return FALSE;
   switch (race)
   {
       case RACE_ELVEN:
@@ -1142,9 +1147,52 @@ bool would_die(char_data *ch)
   return FALSE;
 }
 
+void set_heightweight(char_data *ch)
+{
+    switch (GET_RACE(ch))
+    {
+	case RACE_HUMAN:
+            ch->height = number(66, 77);
+            ch->weight = number(160, 200);
+ 	    break;		
+	case RACE_ELVEN:
+            ch->height = number(78, 101);
+            ch->weight = number(120, 160);
+ 	    break;		
+	case RACE_DWARVEN:
+            ch->height = number(42, 65);
+            ch->weight = number(140, 180);
+ 	    break;		
+	case RACE_HOBBIT:
+            ch->height = number(20, 41);
+            ch->weight = number(40, 80);
+ 	    break;		
+	case RACE_PIXIE:
+            ch->height = number(12, 33);
+            ch->weight = number(10, 40);
+ 	    break;		
+	case RACE_GIANT:
+            ch->height = number(106, 131);
+            ch->weight = number(260, 300);
+ 	    break;		
+	case RACE_GNOME:
+            ch->height = number(42, 65);
+            ch->weight = number(80, 120);
+ 	    break;		
+	case RACE_ORC:
+            ch->height = number(78, 101);
+            ch->weight = number(200, 240);
+ 	    break;
+	case RACE_TROLL:
+            ch->height = number(102, 123);
+            ch->weight = number(240, 280);
+ 	    break;		
+    }
+
+}
+
 int changecost(int oldrace, int newrace)
 {
-  int oldsize;
   switch (oldrace)
   {
      case RACE_GIANT:
@@ -1192,12 +1240,168 @@ int changecost(int oldrace, int newrace)
   return 100000;
 }
 
-
-int cardinal(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
-          struct char_data *owner)
+char *race_message(char_data *ch, int race)
 {
-  
+  static char buf[MAX_STRING_LENGTH];
+  if (GET_RACE(ch) == race)
+     return "You are already of this race.";
+  else if (!is_race_applicable(ch, race))
+     return "You do not qualify for becoming this race.";
 
+
+  sprintf(buf, "%d platinum coins.", changecost(GET_RACE(ch), race));
+  return &buf[0];
+}
+
+
+int cardinal(struct char_data *ch, struct obj_data *obj, int cmd, char *argument, struct char_data *owner)
+{
+  if (cmd == 59) // list
+  {
+    extern struct race_shit race_info[];
+
+    send_to_char("$B$2Cardinal Thelonius tells you, 'Here's what I can do for you...'$R\r\nEnter \"buy <number>\" to make a selection.\r\n\r\n",ch);
+    send_to_char("$BRace Change:$R\r\n(Remember a race change will reduce your base attributes by 2 points each.)\r\n",ch);
+
+    for (int i = 1; i <= MAX_PC_RACE; i++)
+      csendf(ch, "$B$3%d)$R %-25s - %s\r\n", i, race_info[i].singular_name, race_message(ch, i));
+
+    send_to_char("$BOther Services:$R\r\n",ch);
+
+    csendf(ch, "$B$3%d)$R %-24s - 1000 platinum coins.\r\n", MAX_PC_RACE+1,"Sex Change");
+    csendf(ch, "$B$3%d)$R %-24s - 50 platinum coins.\r\n", MAX_PC_RACE+2,"A deep red vial of mana");
+    return eSUCCESS;
+  } 
+  else if (cmd == 56) // buy
+  {
+    char arg[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+    argument = one_argument(argument,arg);
+    argument = one_argument(argument,arg2);
+    int choice = atoi(arg);
+    if (choice > 0 && choice <= MAX_PC_RACE)
+    {
+      if (would_die(ch))
+      {
+        send_to_char("$B$2Cardinal Thelonius tells you, 'The process would kill you!'$R\r\n",ch);
+	return eSUCCESS;
+      }
+      if (GET_RACE(ch) == choice)
+      {
+        send_to_char("$B$2Cardinal Thelonius tells you, 'You are already a member of that race!'$R\r\n",ch);
+	return eSUCCESS;
+      }
+      if (!is_race_applicable(ch, choice))
+      {
+        send_to_char("$B$2Cardinal Thelonius tells you, 'You do not qualify for becoming that race!'$R\r\n",ch);
+	return eSUCCESS;
+      }
+      if (GET_PLATINUM(ch) < (unsigned)changecost(GET_RACE(ch), choice))
+      {
+        send_to_char("$B$2Cardinal Thelonius tells you, 'You can't afford that!'$R\r\n",ch);
+	return eSUCCESS;
+      } 
+
+      if (!str_cmp(arg2, "confirm"))
+      {
+	GET_PLATINUM(ch) -= changecost(GET_RACE(ch), choice);
+	undo_race_saves(ch);
+
+        GET_RACE(ch) = choice;
+
+	GET_RAW_STR(ch) = MIN(get_max_stat(ch, STRENGTH), GET_RAW_STR(ch));
+	GET_RAW_STR(ch) -= 2;
+        GET_STR(ch) = GET_RAW_STR(ch) + GET_STR_BONUS(ch);
+
+	GET_RAW_CON(ch) = MIN(get_max_stat(ch, CONSTITUTION), GET_RAW_CON(ch));
+	GET_RAW_CON(ch) -= 2;
+        GET_CON(ch) = GET_RAW_CON(ch) + GET_CON_BONUS(ch);
+
+	GET_RAW_DEX(ch) = MIN(get_max_stat(ch, DEXTERITY), GET_RAW_DEX(ch));
+	GET_RAW_DEX(ch) -= 2;
+        GET_DEX(ch) = GET_RAW_DEX(ch) + GET_DEX_BONUS(ch);
+
+	GET_RAW_WIS(ch) = MIN(get_max_stat(ch, WISDOM), GET_RAW_WIS(ch));
+	GET_RAW_WIS(ch) -= 2;
+        GET_WIS(ch) = GET_RAW_WIS(ch) + GET_WIS_BONUS(ch);
+
+	GET_RAW_INT(ch) = MIN(get_max_stat(ch, INTELLIGENCE), GET_RAW_INT(ch));
+	GET_RAW_INT(ch) -= 2;
+        GET_INT(ch) = GET_RAW_INT(ch) + GET_INT_BONUS(ch);
+
+        redo_hitpoints (ch);
+        redo_mana (ch);
+        redo_ki(ch);
+
+	extern void do_inate_race_abilities(char_data * ch);
+	do_inate_race_abilities(ch);
+	extern void verify_max_stats(char_data *ch);
+        verify_max_stats(ch);
+	set_heightweight(ch);
+	extern int recheck_height_wears(char_data * ch);
+        recheck_height_wears(ch);
+
+        send_to_char("The Cardinal prays loudly and summons the magic of the gods...\r\n",ch);
+        send_to_char("After a brief moment of pain you are reborn!\r\n",ch);
+      } else {
+	csendf(ch, "$BYou must enter 'buy %d CONFIRM' if you are positive you wish to make this change!\r\n",choice);
+        send_to_char("$4NOTE$R$B: Your attributes will be adjusted to fit this new race and then lowered by 2 points each.$R\r\n",ch);
+      }
+      return eSUCCESS;
+    } else if (choice == MAX_PC_RACE+1) {
+      int newsex;
+      if (arg2[0] == 'n') newsex = 0;
+      else if (arg2[0] == 'm') newsex = 1;
+      else if (arg2[0] == 'f') newsex = 2;
+      else {
+	csendf(ch, "Syntax: buy %d m/f/n\r\n",MAX_PC_RACE+1);
+	return eSUCCESS;
+      }
+      if (GET_SEX(ch) == newsex)
+      {
+        send_to_char("$B$2Cardinal Thelonius tells you, 'That wouldn't change much'$R\r\n",ch);
+	return eSUCCESS;
+      }
+      if (GET_PLATINUM(ch) < 1000)
+      {
+        send_to_char("$B$2Cardinal Thelonius tells you, 'You can't afford that!'$R\r\n",ch);
+	return eSUCCESS;
+      }
+      GET_PLATINUM(ch) -= 1000;
+      GET_SEX(ch) = newsex;
+      send_to_char("The Cardinal prays loudly and summons the magic of the gods...\r\n",ch);
+      send_to_char("After a brief moment of pain you are reborn!\r\n",ch);
+      return eSUCCESS;
+    } else if (choice == MAX_PC_RACE+2) {
+      if (GET_PLATINUM(ch) < 50)
+      {
+        send_to_char("$B$2Cardinal Thelonius tells you, 'You can't afford that!'$R\r\n",ch);
+        return eSUCCESS;
+      }
+      struct obj_data *obj = clone_object(real_object(27904));
+      if ( IS_CARRYING_N(ch) + 1 > CAN_CARRY_N(ch) )
+      {
+        send_to_char( "You can't carry that many items.\n\r", ch );
+        extract_obj(obj);
+        return eSUCCESS;
+      }
+
+      if ( IS_CARRYING_W(ch) + obj->obj_flags.weight > CAN_CARRY_W(ch) )
+      {
+        send_to_char( "You can't carry that much weight.\n\r", ch );
+        extract_obj(obj);
+        return eSUCCESS;
+      }
+      GET_PLATINUM(ch) -= 50;
+      obj_to_char(obj,ch);
+      send_to_char("$B$2Cardinal Thelonius tells you, 'Here is your potion.'$R\r\n",ch);
+      return eSUCCESS;      
+    } else {
+      send_to_char("$B$2Cardinal Thelonius tells you, 'I don't have that. Try \"list\".'$R\n\r", ch);
+      return eSUCCESS;
+    }
+  }
+
+  return eFAILURE;
 }
 
 
