@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.154 2007/02/13 04:53:28 jhhudso Exp $ */
+/* $Id: nanny.cpp,v 1.155 2007/02/14 06:15:20 jhhudso Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -84,7 +84,7 @@ extern struct descriptor_data *descriptor_list;
 extern char *nonew_new_list[30];
 extern CWorld world;
 extern short bport;
-
+extern bool allow_imp_password;
 
 extern int learn_skill(char_data * ch, int skill, int amount, int maximum);
 
@@ -726,6 +726,7 @@ void nanny(struct descriptor_data *d, char *arg)
    char    buf[MAX_STRING_LENGTH];
    char    str_tmp[25];
    char    tmp_name[20];
+   char    *password;
    bool    fOld;
    struct  char_data *ch;
    int x, y;
@@ -885,7 +886,23 @@ void nanny(struct descriptor_data *d, char *arg)
    case CON_GET_OLD_PASSWORD:
       SEND_TO_Q( "\n\r", d );
 
-      if(strncmp( (char *)crypt((char *)arg, (char *)ch->pcdata->pwd), ch->pcdata->pwd, (PASSWORD_LEN) )) {
+      // Default is to authenticate against character password
+      password = ch->pcdata->pwd;
+
+      // If using bport and one of your other characters is an imp, allow this char with that password
+      if (allow_imp_password && allowed_host(d->host)) {
+	for (descriptor_data *ad = descriptor_list; ad && ad != (descriptor_data *)0x95959595; ad = ad->next) {
+	  if (ad != d && !str_cmp(d->host, ad->host)) {
+	    if (GET_LEVEL(ad->character) == IMP && IS_PC(ad->character)) {
+	      password = ad->character->pcdata->pwd;
+	      logf(OVERSEER, LOG_SOCKET, "Using %s's password for authentication.", GET_SHORT(ad->character));
+	      break;
+	    }
+	  }
+	}
+      }
+
+      if(strncmp( (char *)crypt((char *)arg, password), password, (PASSWORD_LEN) )) {
          SEND_TO_Q( "Wrong password.\n\r", d );
          sprintf(log_buf, "%s wrong password: %s", GET_NAME(ch), d->host);
          log( log_buf, OVERSEER, LOG_SOCKET );

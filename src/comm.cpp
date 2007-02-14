@@ -88,6 +88,7 @@ short code_testing_mode = 0;
 short code_testing_mode_mob = 0;
 short code_testing_mode_world = 0;
 short bport = 0;
+bool allow_imp_password = false;
 unsigned mother_desc, other_desc, third_desc, fourth_desc;
 
 // This is turned on right before we call game_loop
@@ -282,6 +283,9 @@ int main(int argc, char **argv)
        port3 = 1502;
        port4 = 1503;
        break;
+    case 'P':
+      allow_imp_password = true;
+      break;
     default:
       sprintf(buf, "SYSERR: Unknown option -%c in argument string.", *(argv[pos] + 1));
       log(buf, 0, LOG_MISC);
