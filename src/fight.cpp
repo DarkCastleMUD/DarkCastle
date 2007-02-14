@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.423 2007/02/13 14:23:39 dcastle Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.424 2007/02/14 07:36:52 jhhudso Exp $ */
 
 extern "C"
 {
@@ -4863,10 +4863,7 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim, int type)
 
   // have to be level 20 and linkalive to count as a pkill and not yourself
   if (ch != NULL) {
-    if (type == KILL_BINGO)
-      sprintf(killer_message,"\n\r##%s was just BINGOED by %s!\n\r", 
-            GET_NAME(victim), GET_NAME(ch));
-    else if (type == KILL_POTATO)
+    if (type == KILL_POTATO)
       sprintf(killer_message,"\n\r##%s just got POTATOED!!\n\r", GET_NAME(victim));
     else if (type == KILL_POISON)
       sprintf(killer_message,"\n\r##%s has perished from %s's POISON!\n\r", GET_NAME(victim), GET_NAME(ch));
@@ -4894,6 +4891,9 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim, int type)
             GET_NAME(victim), GET_NAME(ch));
     else if( GET_LEVEL(ch) > MORTAL )
       sprintf(killer_message,"\n\r##%s was just SMITED...er..SMOTED..err PKILLED by %s!\n\r", GET_NAME(victim), GET_NAME(ch));
+    else if (type == KILL_BINGO)
+      sprintf(killer_message,"\n\r##%s was just BINGOED by %s!\n\r", 
+            GET_NAME(victim), GET_NAME(ch));
     else switch(GET_CLASS(ch))
     {
       case CLASS_MAGIC_USER:
