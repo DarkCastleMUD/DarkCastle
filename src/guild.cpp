@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.112 2007/02/15 09:19:21 dcastle Exp $
+| $Id: guild.cpp,v 1.113 2007/02/15 21:42:18 shane Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -305,7 +305,26 @@ void output_praclist(struct char_data *ch, class_skill_defines *skilllist)
 	sprintf(buf, " Move: $B%4d$R ",25);
 	send_to_char(buf,ch);
       }
-
+      else if(skilllist[i].skillnum == 380) // fire arrows
+      {
+        sprintf(buf, " Mana: $B%4d$R ", 30);
+        send_to_char(buf, ch);
+      }
+      else if(skilllist[i].skillnum == 381) //ice arrows
+      {
+        sprintf(buf, " Mana: $B%4d$R ", 20);
+        send_to_char(buf, ch);
+      }
+      else if(skilllist[i].skillnum == 382) //tempest arrows
+      {
+        sprintf(buf, " Mana: $B%4d$R ", 10);
+        send_to_char(buf, ch);
+      }
+      else if(skilllist[i].skillnum == 383) //granite arrows
+      {
+        sprintf(buf, " Mana: $B%4d$R ", 40);
+        send_to_char(buf, ch);
+      }
 	else send_to_char("            ", ch);
       if (skilllist[i].attrs[0])
       {

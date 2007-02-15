@@ -992,6 +992,10 @@ void get_from_vault(CHAR_DATA *ch, char *object, char *owner) {
           ioverload=TRUE;
           break;
         }
+        if(IS_CARRYING_N(ch) + i > CAN_CARRY_N(ch)) {
+          ioverload=TRUE;
+          break;
+        }
       }
       if(ioverload) break;
     }
@@ -1040,10 +1044,14 @@ void get_from_vault(CHAR_DATA *ch, char *object, char *owner) {
     } 
   
     if ((IS_CARRYING_W(ch) + GET_OBJ_WEIGHT(obj)) > CAN_CARRY_W(ch)) {
-      send_to_char("You can't hold any more.\r\n", ch);
+      send_to_char("You cannot hold any more.\r\n", ch);
       return;
     }
 
+    if(IS_CARRYING_N(ch) + 1 > CAN_CARRY_N(ch)) {
+      send_to_char("You cannot carry any more items.\n\r", ch);
+      return;
+    }
 
     if (GET_LEVEL(ch) < IMMORTAL)
       sprintf(buf, "%s removed %s from %s's vault.", GET_NAME(ch), GET_OBJ_SHORT(obj), owner);

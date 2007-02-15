@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.62 2007/02/12 22:19:14 pirahna Exp $ */
+/* $Id: ki.cpp,v 1.63 2007/02/15 21:42:19 shane Exp $ */
 
 extern "C"
 {
@@ -421,19 +421,25 @@ int ki_blast( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
    }
    else /* There is no exit there */
    {
-      char buf[20];
+      char buf[MAX_STRING_LENGTH], name[100];
       int prev = GET_HIT(vict);
-
-      sprintf(buf, "$B%d$R", prev - GET_HIT(vict));
-      send_damage("$N is blasted across the room by $n for | damage!", ch, 0, vict, buf,
-		  "$N is blasted across the room by $n!", TO_ROOM);
-      send_damage("$N is thrown to the ground by your blast and suffers | damage!", ch, 0, vict, buf,
-		  "$N is thrown to the ground by your blast!", TO_CHAR);
-      send_damage("$n blasts you across the room, causing you to fall and take | damage!", ch, 0, vict, buf,
-                  "$n blasts you across the room, causing you to fall!", TO_VICT);
+      
+      strcpy(name, GET_SHORT(vict));
       GET_POS(vict) = POSITION_SITTING;
       int retval = damage(ch,vict,100, TYPE_KI,KI_OFFSET+KI_BLAST,0);
-      
+      if(!SOMEONE_DIED(retval)) {
+        sprintf(buf, "$B%d$R", prev - GET_HIT(vict));
+        send_damage("$N is blasted across the room by $n for | damage!", ch, 0, vict, buf,
+		    "$N is blasted across the room by $n!", TO_ROOM);
+        send_damage("$N is thrown to the ground by your blast and suffers | damage!", ch, 0, vict, buf,
+		    "$N is thrown to the ground by your blast!", TO_CHAR);
+        send_damage("$n blasts you across the room, causing you to fall and take | damage!", ch, 0, vict, buf,
+                    "$n blasts you across the room, causing you to fall!", TO_VICT);
+      } else {
+        csendf(ch, "You blast %s to bits!", name);
+        sprintf(buf, "$N blasts %s to bits!", name);
+        act(buf, ch, 0, 0, TO_ROOM, 0);
+      }
       if(!SOMEONE_DIED(retval) && !vict->fighting && IS_NPC(vict))
          return attack(vict, ch, TYPE_UNDEFINED);
       return retval;

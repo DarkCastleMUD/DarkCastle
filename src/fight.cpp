@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.424 2007/02/14 07:36:52 jhhudso Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.425 2007/02/15 21:42:18 shane Exp $ */
 
 extern "C"
 {
@@ -1995,7 +1995,7 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
     // we do this AFTER all the multipliers but BEFORE all the reducers
     // to make it cause the smallest impact
     if (dam) // misses turned to tickles
-    dam += victim->melee_mitigation;
+      dam = (dam * (100 - victim->melee_mitigation))/100;
 
     if (affected_by_spell(victim, SPELL_HOLY_AURA) && affected_by_spell(victim, SPELL_HOLY_AURA)->modifier == 50)
       dam /= 2; // half damage against physical attacks
@@ -2004,9 +2004,9 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
 	dam /= 2;
   }
   if(typeofdamage == DAMAGE_TYPE_MAGIC && dam)
-    dam += victim->spell_mitigation;
+    dam = (dam * (100 - victim->spell_mitigation))/100;
   else if(typeofdamage == DAMAGE_TYPE_SONG && dam)
-    dam += victim->song_mitigation;
+    dam = (dam * (100 - victim->song_mitigation))/100;
 
   if (IS_AFFECTED(victim, AFF_EAS))
     dam /= 4;

@@ -1715,6 +1715,8 @@ int spell_cure_critic(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
 
   if (!can_heal(ch,victim, SPELL_CURE_CRITIC)) return eFAILURE;
   healpoints = dam_percent(skill, 100);
+  healpoints = number(healpoints-(healpoints/10), healpoints+(healpoints/10));
+
   if ( (healpoints + GET_HIT(victim)) > hit_limit(victim) ) {
     healpoints = hit_limit(victim) - GET_HIT(victim);
 	 GET_HIT(victim) = hit_limit(victim);
@@ -1769,6 +1771,7 @@ int spell_cure_light(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 
   if (!can_heal(ch,victim, SPELL_CURE_LIGHT)) return eFAILURE;
   healpoints = dam_percent(skill, 25);
+  healpoints = number(healpoints-(healpoints/10), healpoints+(healpoints/10));
   if ( (healpoints+GET_HIT(victim)) > hit_limit(victim) ) {
      healpoints = hit_limit(victim) - GET_HIT(victim);
 	 GET_HIT(victim) = hit_limit(victim);
@@ -2267,11 +2270,12 @@ int spell_heal(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
 
   if (!can_heal(ch,victim,SPELL_HEAL)) return eFAILURE;
   healy = dam_percent(skill,250);
+  healy = number(healy-(healy/10), healy+(healy/10));
   GET_HIT(victim) += healy;
 
   if (GET_HIT(victim) >= hit_limit(victim)) {
-     healy += hit_limit(victim) - GET_HIT(victim) - dice(1,4);
-	 GET_HIT(victim) = hit_limit(victim)-dice(1,4);
+     healy += hit_limit(victim) - GET_HIT(victim);
+	 GET_HIT(victim) = hit_limit(victim);
   }
 
   update_pos( victim );
@@ -2318,11 +2322,12 @@ int spell_power_heal(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 
   if (!can_heal(ch,victim, SPELL_POWER_HEAL)) return eFAILURE;
   healy = dam_percent(skill, 300);
+  healy = number(healy-(healy/10), healy+(healy/10));
   GET_HIT(victim) += healy;
 
   if (GET_HIT(victim) >= hit_limit(victim)) {
-     healy += hit_limit(victim)-GET_HIT(victim)-dice(1,4);
-	 GET_HIT(victim) = hit_limit(victim)-dice(1,4);
+     healy += hit_limit(victim)-GET_HIT(victim);
+	 GET_HIT(victim) = hit_limit(victim);
   }
 
   update_pos( victim );
@@ -2372,10 +2377,13 @@ int spell_full_heal(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
   else if(GET_ALIGNMENT(ch) > 349)
     healamount += (skill / 2 + 5);
 
+  healamount = number(healamount-(healamount/10), healamount+(healamount/10));
   GET_HIT(victim) += healamount;
 
-  if (GET_HIT(victim) >= hit_limit(victim))
-	 GET_HIT(victim) = hit_limit(victim)-dice(1,4);
+  if (GET_HIT(victim) >= hit_limit(victim)) {
+         healamount += hit_limit(victim) - GET_HIT(victim);         
+	 GET_HIT(victim) = hit_limit(victim);
+  }
 
   update_pos( victim );
 
@@ -2849,16 +2857,27 @@ int spell_fireshield(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 
 int spell_mend_golem(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
+  int heal;
+  char dammsg[30];
   struct follow_type *fol;
   for (fol = ch->followers; fol; fol = fol->next)
     if (IS_NPC(fol->follower) && mob_index[fol->follower->mobdata->nr].virt == 8)
     {
-      GET_HIT(fol->follower) += (int)(GET_MAX_HIT(fol->follower) * (0.12 + level / 1000.0));
-      if (GET_HIT(fol->follower) > GET_MAX_HIT(fol->follower))
-        GET_HIT(fol->follower) = GET_MAX_HIT(fol->follower);
+      heal = (int)(GET_MAX_HIT(fol->follower) * (0.12 + level / 1000.0));
+      heal = number(heal-(heal/10), heal+(heal/10));
 
-      act("$n focuses $s magical energy and many of the scratches on $s golem are fixed.\n\r", ch, 0, 0, TO_ROOM, 0);
-      send_to_char("You focus your magical energy and many of the scratches on your golem are fixed.\n\r", ch);
+      GET_HIT(fol->follower) += heal;
+
+      if (GET_HIT(fol->follower) > GET_MAX_HIT(fol->follower)) {
+        heal += GET_MAX_HIT(fol->follower) - GET_HIT(fol->follower);
+        GET_HIT(fol->follower) = GET_MAX_HIT(fol->follower);
+      }
+      sprintf(dammsg, "$B%d$R", heal);
+
+      send_damage("$n focuses $s magical energy and | of the scratches on $s golem are fixed.", ch, 0, 0, 
+		dammsg, "$n focuses $s magical energy and many of the scratches on $s golem are fixed.", TO_ROOM);
+      send_damage("You focus your magical energy and | of the scratches on your golem are fixed.", ch, 0, 0, 
+		dammsg, "You focus your magical enery and many of the scratches on your golem are fixed.", TO_CHAR);
       return eSUCCESS;
     }
   send_to_char("You don't have a golem.\r\n",ch);
@@ -5051,6 +5070,8 @@ int spell_cure_serious(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
 
   if (!can_heal(ch,victim, SPELL_CURE_SERIOUS)) return eFAILURE;
       healpoints = dam_percent(skill,50);
+  healpoints = number(healpoints-(healpoints/10), healpoints+(healpoints/10));
+
   if ((healpoints + GET_HIT(victim)) > hit_limit(victim)) {
     healpoints = hit_limit(victim) - GET_HIT(victim);
     GET_HIT(victim) = hit_limit(victim);
@@ -9440,15 +9461,17 @@ int cast_herb_lore(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *v
 
   if (can_heal(ch,victim, SPELL_HERB_LORE)) {
      healamount = dam_percent(skill,180);
-     if(OUTSIDE(ch))    GET_HIT(victim) += healamount;
+     healamount = number(healamount-(healamount/10), healamount+(healamount/10));
+     if(OUTSIDE(ch))    GET_HIT(victim) += healamount;   
      else { /* if not outside */
        healamount = dam_percent(skill,80);
+       healamount = number(healamount-(healamount/10), healamount+(healamount/10));
        GET_HIT(victim) += healamount;
        send_to_char("Your spell is less effective because you are indoors!\n\r", ch);
      }
      if (GET_HIT(victim) >= hit_limit(victim)) {
-        healamount += hit_limit(victim)-GET_HIT(victim)-dice(1,4);
-        GET_HIT(victim) = hit_limit(victim)-dice(1,4);
+        healamount += hit_limit(victim)-GET_HIT(victim);
+        GET_HIT(victim) = hit_limit(victim);
      }
 
      update_pos( victim );

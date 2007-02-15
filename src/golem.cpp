@@ -193,6 +193,7 @@ void advance_golem_level(CHAR_DATA *golem)
   golem->damroll += golem_list[golemtype].dam / 20;
   golem->armor += golem_list[golemtype].ac / 20;
   golem->exp = 0;
+  redo_hitpoints(golem);
 }
 
 void set_golem(CHAR_DATA *golem, int golemtype)

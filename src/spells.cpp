@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.211 2007/02/11 02:05:02 apocalypse Exp $ */
+/* $Id: spells.cpp,v 1.212 2007/02/15 21:42:19 shane Exp $ */
 
 extern "C"
 {
@@ -1770,32 +1770,8 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
         if (*name) 
         {
           if (IS_SET(spell_info[spl].targets, TAR_CHAR_ROOM))
-            if ( ( tar_char = get_char_room_vis(ch, name) ) != NULL ) {
+            if ( ( tar_char = get_char_room_vis(ch, name) ) != NULL )
               target_ok = TRUE;
-
-	      if (IS_AFFECTED(tar_char, AFF_REFLECT) && 
-		  number(0,99) < tar_char->spell_reflect) {
-		if(ch == tar_char) { // some idiot was shooting at himself
-		  act("The spell harmlessly reflects off you and disperses.", tar_char, 0, 0, TO_CHAR, 0);
-		  act("The spell harmlessly reflects off $n and disperses.", tar_char, 0, 0, TO_ROOM, 0);
-		  return eSUCCESS;
-		} else {
-		  act("$n's spell bounces back at $m.", ch, 0, tar_char, TO_VICT, 0);
-		  act("Oh SHIT! Your spell bounces off of $N and heads right back at you.", ch, 0, tar_char, TO_CHAR, 0);
-		  act("$n's spell reflects off of $N's magical aura", ch, 0, tar_char, TO_ROOM, NOTVICT);
-		  tar_char = ch;
-		  ok_self = TRUE;
-
-		  // Ping-pong
-		  if (IS_AFFECTED(tar_char, AFF_REFLECT) && 
-		      number(0,99) < tar_char->spell_reflect) {
-		    act("The spell harmlessly reflects off you and disperses.", tar_char, 0, 0, TO_CHAR, 0);
-		    act("The spell harmlessly reflects off $n and disperses.", tar_char, 0, 0, TO_ROOM, 0);
-		    return eSUCCESS;
-		  }
-		}
-	      }
-	    }
 
           if (!target_ok && IS_SET(spell_info[spl].targets, TAR_CHAR_WORLD))
 	{
@@ -2029,6 +2005,26 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
 	     }
 	   }
   	 }
+
+         if (IS_AFFECTED(tar_char, AFF_REFLECT) && number(0,99) < tar_char->spell_reflect) {
+           if(ch == tar_char) { // some idiot was shooting at himself
+//out		  act("The spell harmlessly reflects off you and disperses.", tar_char, 0, 0, TO_CHAR, 0);
+//for		  act("The spell harmlessly reflects off $n and disperses.", tar_char, 0, 0, TO_ROOM, 0);
+//heals		  return eSUCCESS;
+	   } else {
+		  act("$n's spell bounces back at $m.", ch, 0, tar_char, TO_VICT, 0);
+		  act("Oh SHIT! Your spell bounces off of $N and heads right back at you.", ch, 0, tar_char, TO_CHAR, 0);
+		  act("$n's spell reflects off of $N's magical aura", ch, 0, tar_char, TO_ROOM, NOTVICT);
+		  tar_char = ch;
+
+		  // Ping-pong
+		   if (IS_AFFECTED(tar_char, AFF_REFLECT) && number(0,99) < tar_char->spell_reflect) {
+		     act("The spell harmlessly reflects off you and disperses.", tar_char, 0, 0, TO_CHAR, 0);
+		     act("The spell harmlessly reflects off $n and disperses.", tar_char, 0, 0, TO_ROOM, 0);
+		     return eSUCCESS;
+	           }
+	    }
+        }
 
 	int retval = ((*spell_info[spl].spell_pointer) (GET_LEVEL(ch), ch, argument, SPELL_TYPE_SPELL, tar_char, tar_obj, learned));
 
