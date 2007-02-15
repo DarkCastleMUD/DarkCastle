@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.158 2007/02/11 18:34:37 dcastle Exp $ */
+/* $Id: handler.cpp,v 1.159 2007/02/15 08:29:28 jhhudso Exp $ */
     
 extern "C"
 {
@@ -276,8 +276,8 @@ int get_max_stat(char_data * ch, ubyte stat)
           case STRENGTH:      return 20;
           case DEXTERITY:     return 28;
           case INTELLIGENCE:  return 30;
-          case WISDOM:        return 25;
-          case CONSTITUTION:  return 22;
+          case WISDOM:        return 27;
+          case CONSTITUTION:  return 20;
         }
 
       case RACE_GIANT:
