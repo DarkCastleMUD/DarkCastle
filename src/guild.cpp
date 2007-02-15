@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.111 2007/02/12 00:14:54 dcastle Exp $
+| $Id: guild.cpp,v 1.112 2007/02/15 09:19:21 dcastle Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -908,7 +908,7 @@ void verify_max_stats(CHAR_DATA *ch)
           struct char_skill_data * curr = ch->skills;
           while(curr) {
 
-	   if (get_max(ch, curr->skillnum) > curr->learned)
+	   if (get_max(ch, curr->skillnum) < curr->learned)
 		curr->learned = get_max(ch, curr->skillnum);
 	
 	   curr = curr->next;
