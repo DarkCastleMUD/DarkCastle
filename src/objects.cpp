@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.86 2007/02/11 12:07:34 jhhudso Exp $
+| $Id: objects.cpp,v 1.87 2007/02/16 02:48:00 dcastle Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -172,9 +172,9 @@ void object_activity()
     struct active_object *active_obj;
     struct active_object *next_obj;
   
-    for(active_obj = &active_head; active_obj && active_obj != (struct active_object *)0x95959595; active_obj = next_obj) {
-        next_obj = active_obj->next;
-        if(active_obj->obj && active_obj->obj != (struct obj_data *)0x9595959) { 
+    for(active_obj = &active_head; active_obj && (struct active_object *)0x95959595; active_obj = next_obj) {
+        next_obj = active_obj->next;                                
+        if(active_obj->obj && active_obj->obj != (struct obj_data *)0x95959595) { 
 	  if (obj_index[active_obj->obj->item_number].non_combat_func)  
             obj_index[active_obj->obj->item_number].non_combat_func(NULL, active_obj->obj, 0, "", NULL);
 	  else if (active_obj->obj->obj_flags.type_flag == ITEM_MEGAPHONE
