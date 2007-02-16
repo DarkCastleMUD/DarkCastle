@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.159 2007/02/15 08:29:28 jhhudso Exp $ */
+/* $Id: handler.cpp,v 1.160 2007/02/16 03:34:33 apocalypse Exp $ */
     
 extern "C"
 {
@@ -494,10 +494,10 @@ void add_set_stats(char_data *ch, obj_data *obj, int flag, int pos)
 	    af.modifier = 15;
 	    affect_to_char(ch, &af);
 	    af.location = APPLY_MELEE_DAMAGE;
-	    af.modifier = -5;
+	    af.modifier = 5;
 	    affect_to_char(ch, &af);
 	    af.location = APPLY_SONG_DAMAGE;
-	    af.modifier = -5;
+	    af.modifier = 5;
 	    affect_to_char(ch, &af);
 	   break;
           case SET_WHITECRYSTAL:
