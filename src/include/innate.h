@@ -15,4 +15,5 @@
 #define SKILL_INNATE_SHADOWSLIP		1506
 #define SKILL_INNATE_REPAIR		1507
 #define SKILL_INNATE_TIMER		1508
-#define SKILL_INNATE_MAX                1508
+#define SKILL_INNATE_FLY                1509
+#define SKILL_INNATE_MAX                1509

@@ -43,6 +43,7 @@ DO_FUN innate_focus;
 DO_FUN innate_evasion;
 DO_FUN innate_shadowslip;
 DO_FUN innate_bloodlust;
+DO_FUN innate_fly;
 
 ////////////////////////////////////////////////////////////////////////////
 // local definitions
@@ -61,20 +62,22 @@ const struct in_skills innates[] = {
   { "focus", RACE_ELVEN, innate_focus},
   { "evasion", RACE_PIXIE, innate_evasion},
   { "shadowslip", RACE_HOBBIT, innate_shadowslip},
+  { "fly", RACE_PIXIE, innate_fly},
   { "\n", 0, NULL}
 };
 
 char * innate_skills[] = 
 {
-   "Powerwield",
-   "Focus",
-   "Regeneration",
-   "Bloodlust",
-   "Illusion",
-   "Evasion",
-   "Shadowslip",
+   "powerwield",
+   "focus",
+   "regeneration",
+   "bloodlust",
+   "illusion",
+   "evasion",
+   "shadowslip",
    "!repair!",
    "innate skill timer",
+   "fly",
    "\n"
 };
 
@@ -88,6 +91,7 @@ int do_innate(CHAR_DATA *ch, char *arg, int cmd)
     return eFAILURE;
   }
 
+  bool found = false;
   int i;
   char buf[512];
   arg = one_argument(arg,buf);
@@ -97,10 +101,10 @@ int do_innate(CHAR_DATA *ch, char *arg, int cmd)
     {
       if (buf[0] == '\0')
       {
-        csendf(ch, "Your race has access to the %s innate ability.\r\n",innates[i].name);
-	return eSUCCESS;
+        csendf(ch, "Your race has access to the $B%s$R innate ability.\r\n",innates[i].name);
+	found = true;
       } else if (!str_cmp(innates[i].name,buf)) {
-	if (affected_by_spell(ch,SKILL_INNATE_TIMER))
+	if (str_cmp(buf, "fly") && affected_by_spell(ch,SKILL_INNATE_TIMER))
         {
 	  send_to_char("You cannot use that yet.\r\n",ch);
 	  return eFAILURE;
@@ -117,7 +121,9 @@ int do_innate(CHAR_DATA *ch, char *arg, int cmd)
 	   struct affected_type af;
 	   af.type = SKILL_INNATE_TIMER;
 
-	   if (!str_cmp(buf, "repair") || !str_cmp(buf, "bloodlust")) {
+	   if (!str_cmp(buf, "fly"))
+	     return retval;
+	   else if (!str_cmp(buf, "repair") || !str_cmp(buf, "bloodlust")) {
 	     af.duration = 12;
 	   } else {
 	     af.duration = 18;
@@ -129,14 +135,19 @@ int do_innate(CHAR_DATA *ch, char *arg, int cmd)
 	   affect_to_char(ch, &af);
 	}
 	return retval;
-      } else {
-	send_to_char("You do not have access to any such ability.\r\n",ch);
-	return eFAILURE;
       }
     }
   }
-  send_to_char("Your race has no innate abilities.\r\n",ch);
-  return eFAILURE;
+  if (!found) {
+    if (buf[0] == 0) {
+      send_to_char("Your race has no innate abilities.\r\n",ch);
+    } else {
+      send_to_char("You do not have access to any such ability.\r\n",ch);
+    }
+    return eFAILURE;
+  } else {
+    return eSUCCESS;
+  }
 }
 
 int innate_regeneration(CHAR_DATA *ch, char *arg, int cmd)
@@ -289,4 +300,25 @@ int innate_shadowslip(CHAR_DATA *ch, char *arg, int cmd)
    affect_to_char(ch, &af);
    send_to_char("You blend with the shadows, preventing people from reaching you magically.\r\n",ch);
    return eSUCCESS;
+}
+
+int innate_fly(CHAR_DATA *ch, char *arg, int cmd)
+{
+  if (affected_by_spell(ch, SKILL_INNATE_FLY)) {
+    affect_from_char(ch, SKILL_INNATE_FLY);
+    send_to_char("You fold your wings smoothly behind you and settle gently to the ground.\n\r", ch);
+   act("$n folds $s wings smoothly behind $m and settles gently to the ground.", ch, NULL, NULL, TO_ROOM, 0);
+  } else {
+   struct affected_type af;
+   af.type = SKILL_INNATE_FLY;
+   af.duration = 0;
+   af.modifier = 0;
+   af.location = 0;
+   af.bitvector = AFF_FLYING;
+   affect_to_char(ch, &af);
+   send_to_char("You spread your delicate wings and lift lightly into the air.\n\r", ch);
+   act("$n spreads $s delicate wings and lifts lightly into the air.", ch, NULL, NULL, TO_ROOM, 0);
+  }
+
+  return eSUCCESS;
 }
