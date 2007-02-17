@@ -776,12 +776,20 @@ int spell_earthquake(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
   int retval = 0;
   CHAR_DATA *tmp_victim, *temp;
   dam = 150;
-  send_to_char("The earth trembles beneath your feet!\n\r", ch);
-  act("$n makes the earth tremble and shiver.\n\r",
-		ch, 0, 0, TO_ROOM, 0);
 
-  for(tmp_victim = character_list; (tmp_victim && !IS_SET(retval, eCH_DIED)); tmp_victim = temp)
-  {
+  if(world[ch->in_room].sector_type == SECT_AIR) {
+   send_to_char("You attempt to cause an earthquake in the air, but nothing happens.\n\r", ch);
+   act("$n attempted to cause an earthquake in the air, what an idiot.", ch, 0, 0, TO_ROOM, 0);
+  } else if(world[ch->in_room].sector_type == SECT_WATER_SWIM || world[ch->in_room].sector_type == SECT_WATER_NOSWIM 
+            || world[ch->in_room].sector_type == SECT_UNDERWATER) {
+   send_to_char("You attempt to cause an earthquake in the water, but nothing happens.\n\r", ch);
+   act("$n attempted to cause an earthquake in the water, what an idiot.", ch, 0, 0, TO_ROOM, 0);
+  } else {
+   send_to_char("The earth trembles beneath your feet!\n\r", ch);
+   act("$n makes the earth tremble and shiver.\n\r",
+		ch, 0, 0, TO_ROOM, 0);
+   for(tmp_victim = character_list; (tmp_victim && !IS_SET(retval, eCH_DIED)); tmp_victim = temp)
+   {
 	 temp = tmp_victim->next;
 	 if ( (ch->in_room == tmp_victim->in_room) 
            && (ch != tmp_victim) 
@@ -791,7 +799,7 @@ int spell_earthquake(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
                   if(IS_NPC(ch) && IS_NPC(tmp_victim)) // mobs don't earthquake each other
                     continue;
                   if(IS_AFFECTED(tmp_victim, AFF_FREEFLOAT) || IS_AFFECTED(tmp_victim, AFF_FLYING)) {
-                     send_to_char("You float over the shaking ground.\n\r", tmp_victim);
+                     send_to_char("The shaking ground has no effect on you.\n\r", tmp_victim);
 		     dam = 0;
 		  }
 
@@ -799,6 +807,7 @@ int spell_earthquake(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 	 } 
          else if (world[ch->in_room].zone == world[tmp_victim->in_room].zone)
            send_to_char("The earth trembles and shivers.\n\r", tmp_victim);
+   }
   }
   return eSUCCESS;
 }
@@ -10731,13 +10740,15 @@ int spell_sun_ray(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data
 
   dam = MIN((int)GET_MANA(ch), 725);
 
-  if (OUTSIDE(ch) && (weather_info.sky <= SKY_CLOUDY)) {
+  if (OUTSIDE(ch) && (weather_info.sky <= SKY_CLOUDY) && (weather_info.sunlight > SUN_DARK) ) {
 
 //	 if(saves_spell(ch, victim, 0, SAVE_TYPE_ENERGY) >= 0)
 //		dam >>= 1;
 
 	 return damage(ch, victim, dam, TYPE_ENERGY, SPELL_SUN_RAY, 0);
-  }
+  } else
+     act("The sun ray cannot reach $N!", ch, 0, victim, TO_CHAR, 0);
+
   return eFAILURE;
 }
 
