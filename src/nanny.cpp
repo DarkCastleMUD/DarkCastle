@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.157 2007/02/14 07:13:05 jhhudso Exp $ */
+/* $Id: nanny.cpp,v 1.158 2007/02/17 23:59:25 shane Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -377,6 +377,22 @@ void do_on_login_stuff(char_data * ch)
     }
     if (ch->pcdata->time.logon < 1151504181)
        SET_BIT(ch->misc, CHANNEL_TELL);
+
+    if (ch->pcdata->time.logon < 1171754181) {
+      switch (GET_CLASS(ch)) {
+        case CLASS_MAGE: ch->armor += 100; break;
+        case CLASS_DRUID: ch->armor += 85; break;
+        case CLASS_CLERIC: ch->armor += 70; break;
+        case CLASS_ANTI_PAL: ch->armor += 55; break;
+        case CLASS_THIEF: ch->armor += 40; break;
+        case CLASS_BARD: ch->armor += 25; break;
+        case CLASS_BARBARIAN: ch->armor += 10; break;
+        case CLASS_RANGER: ch->armor -= 5; break;
+        case CLASS_PALADIN: ch->armor -= 20; break;
+        case CLASS_WARRIOR: ch->armor -= 35; break;
+        case CLASS_MONK: ch->armor -= 50; break;
+      };
+    }
 
     if (GET_RACE(ch) == RACE_PIXIE) {
        if(GET_RAW_WIS(ch) == 27) {

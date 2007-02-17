@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.144 2007/01/29 01:07:51 jhhudso Exp $ */
+/* $Id: db.cpp,v 1.145 2007/02/17 23:59:25 shane Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -4830,7 +4830,21 @@ void init_char(CHAR_DATA *ch)
   ch->hit   = GET_MAX_HIT(ch);
   ch->move  = GET_MAX_MOVE(ch);
 
-  ch->armor = 100;
+  switch (GET_CLASS(ch)) {
+    case CLASS_MAGE: ch->armor = 200; break;
+    case CLASS_DRUID: ch->armor = 185; break;
+    case CLASS_CLERIC: ch->armor = 170; break;
+    case CLASS_ANTI_PAL: ch->armor = 155; break;
+    case CLASS_THIEF: ch->armor = 140; break;
+    case CLASS_BARD: ch->armor = 125; break;
+    case CLASS_BARBARIAN: ch->armor = 110; break;
+    case CLASS_RANGER: ch->armor = 95; break;
+    case CLASS_PALADIN: ch->armor = 80; break;
+    case CLASS_WARRIOR: ch->armor = 65; break;
+    case CLASS_MONK: ch->armor = 50; break;
+    default: ch->armor = 100;
+  };
+
   ch->altar = NULL;
   ch->spec = 0;
   GET_PROMPT(ch)          = 0;

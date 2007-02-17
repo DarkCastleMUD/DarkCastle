@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.141 2007/01/29 22:15:36 shane Exp $ */
+/* $Id: info.cpp,v 1.142 2007/02/17 23:59:25 shane Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -1648,9 +1648,11 @@ int do_time(struct char_data *ch, char *argument, int cmd)
    // Changed to the below code without seconds in an attempt to stop
    // the timing of bingos... - pir 2/7/1999
    ct = time(0);
-   // 	sprintf( buf, "The system time is %s", ctime(&ct) );
+   if(GET_LEVEL(ch) > IMMORTAL) {
+  	sprintf( buf, "The system time is %ld.\n\r", ct );
    
-   // 	send_to_char(buf, ch);
+    	send_to_char(buf, ch);
+   }
    
    pTime = localtime(&ct);
    if(!pTime)
