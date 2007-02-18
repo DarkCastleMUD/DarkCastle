@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.428 2007/02/18 04:52:35 apocalypse Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.429 2007/02/18 21:52:41 dcastle Exp $ */
 
 extern "C"
 {
@@ -228,22 +228,6 @@ void perform_violence(void)
            // log(debug, OVERSEER, LOG_BUG);
 	  } else {
             ;
-/*          retval = 0;
-          switch(GET_CLASS(ch)) {
-           case CLASS_WARRIOR:       retval = fighter(ch, NULL, 0, "", ch);           break;
-           case CLASS_THIEF:         retval = thief(ch, NULL, 0, "", ch);             break;
-           case CLASS_MONK:          retval = monk(ch, NULL, 0, "", ch);              break;
-           case CLASS_BARD:          retval = bard_combat(ch, NULL, 0, "", ch);       break;
-           case CLASS_RANGER:        retval = ranger_combat(ch, NULL, 0, "", ch);     break;
-           case CLASS_PALADIN:       retval = paladin(ch, NULL, 0, "", ch);           break;
-           case CLASS_ANTI_PAL:      retval = antipaladin(ch, NULL, 0, "", ch);       break;
-           case CLASS_BARBARIAN:     retval = barbarian(ch, NULL, 0, "", ch);         break;
-           case CLASS_DRUID:         retval = druid_combat(ch, NULL, 0, "", ch);      break;
-           case CLASS_NECROMANCER:   retval = active_necro(ch, NULL, 0, "", ch);      break;
-           default:                  break;
-          }
-          if(SOMEONE_DIED(retval))
-            continue;*/
            }
         }
       } // if is_mob
