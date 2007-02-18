@@ -103,27 +103,19 @@ void assign_one_obj_com(int obj_num, int (*func)(CHAR_DATA*, struct obj_data *, 
 }
 
 void assign_non_combat_procs() {
-    SPEC_FUN    cityguard;
     SPEC_FUN    guild;
     SPEC_FUN    guild_guard;
     SPEC_FUN	deth;
     SPEC_FUN	fido;
     SPEC_FUN	janitor;
     SPEC_FUN	mayor;
-    SPEC_FUN    robber;
-    SPEC_FUN    ring_keeper;
     SPEC_FUN    backstabber;
-    SPEC_FUN    gossip;
     SPEC_FUN    mud_school_adept;
     SPEC_FUN    adept;    
-    SPEC_FUN    baby_troll;
     SPEC_FUN    frosty;
     SPEC_FUN    Thalos_citizen;
-    SPEC_FUN    Executioner;
-    SPEC_FUN    annoyingbirthdayshout;
     SPEC_FUN    platinumsmith;
     SPEC_FUN    platmerchant;
-    SPEC_FUN    moritician;
     SPEC_FUN    meta_dude;
     SPEC_FUN    sleazy_vault_guy;
     SPEC_FUN    quest_master;
@@ -135,25 +127,17 @@ void assign_non_combat_procs() {
     SPEC_FUN    repair_shop;
     SPEC_FUN    stofficer;
     SPEC_FUN    stcrew;
-    SPEC_FUN    summonbash; 
     SPEC_FUN    poet;
     SPEC_FUN    clan_guard;
-    SPEC_FUN    halfling_people;
     SPEC_FUN    mortician;
     SPEC_FUN    apiary_worker;
     SPEC_FUN    newbie_zone_guard;
-    SPEC_FUN    charon;
     SPEC_FUN    humaneater;
     SPEC_FUN    pir_slut;
-    SPEC_FUN    ranger_non_combat;
     SPEC_FUN    generic_guard;
     SPEC_FUN    portal_guard;
     SPEC_FUN    doorcloser;
     SPEC_FUN    panicprisoner;
-    SPEC_FUN    areanotopen;
-    SPEC_FUN    alakarbodyguard;
-    SPEC_FUN    mithaxequest;
-    SPEC_FUN    turtle_green;
     SPEC_FUN    iasenko_non_combat;
     SPEC_FUN    koban_non_combat;
     SPEC_FUN    arena_only;
@@ -168,12 +152,10 @@ void assign_non_combat_procs() {
     SPEC_FUN    generic_doorpick_blocker;
     SPEC_FUN    startrek_miles;
     SPEC_FUN    generic_area_guard;
-    SPEC_FUN    pthief_hater;
     SPEC_FUN    cardinal;
 
     assign_one_mob_non(3071, cardinal);
 
-    assign_one_mob_non(1203, Executioner);
     assign_one_mob_non(501, arena_only);
     assign_one_mob_non(502, arena_only);
     assign_one_mob_non(503, arena_only);
@@ -188,15 +170,12 @@ void assign_non_combat_procs() {
    assign_one_mob_non(89, druid_elemental);
    assign_one_mob_non(90, druid_elemental);
    assign_one_mob_non(91, druid_elemental);
-    //assign_one_mob_non(69,  areanotopen);
     assign_one_mob_non(70,  pir_slut);
     assign_one_mob_non(200,  mud_school_adept);
     assign_one_mob_non(207,  adept);
     assign_one_mob_non(208,  adept);
     assign_one_mob_non(214,  fido);
     assign_one_mob_non(222,  newbie_zone_guard);
-    assign_one_mob_non(250,  annoyingbirthdayshout);
-    assign_one_mob_non(1203,  Executioner);
     assign_one_mob_non(1334, generic_doorpick_blocker);
     assign_one_mob_non(1935,  guild);
     assign_one_mob_non(1937,  guild);
@@ -223,17 +202,13 @@ void assign_non_combat_procs() {
     assign_one_mob_non(1938,  guild_guard);
     assign_one_mob_non(1940,  guild_guard);
     assign_one_mob_non(3709,  generic_doorpick_blocker);
-    assign_one_mob_non(4103,  robber);
     assign_one_mob_non(4712,  backstabber);
     assign_one_mob_non(4714,  backstabber);
     assign_one_mob_non(4901,  humaneater);
-    assign_one_mob_non(5900,  turtle_green);
     assign_one_mob_non(6437,  generic_blocker);
-    assign_one_mob_non(6500,  pthief_hater);
 //    assign_one_mob_non(6902,  guild); // master shaolin monks teach 'stun'
     assign_one_mob_non(8542,  iasenko_non_combat);
     assign_one_mob_non(8543,  koban_non_combat);
-    assign_one_mob_non(9042,  robber);
     assign_one_mob_non(2300,  clan_guard);
     assign_one_mob_non(2312,  clan_guard);
     assign_one_mob_non(2311,  clan_guard);
@@ -272,16 +247,12 @@ void assign_non_combat_procs() {
     assign_one_mob_non(1927,  guild_guard);
     assign_one_mob_non(1928,  guild);
     assign_one_mob_non(14537, apiary_worker);
-    assign_one_mob_non(17604,  alakarbodyguard);
-    assign_one_mob_non(17605,  alakarbodyguard);
-    assign_one_mob_non(17606,  alakarbodyguard);
     assign_one_mob_non(1930,  guild);
     assign_one_mob_non(19304, generic_area_guard);
     assign_one_mob_non(20700, generic_guard);
     assign_one_mob_non(20701, portal_guard);
     assign_one_mob_non(20744, panicprisoner);
     assign_one_mob_non(20745, doorcloser);
-    assign_one_mob_non(22310,  robber);
     assign_one_mob_non(26715, startrek_miles);
     assign_one_mob_non(26721,  stofficer);
     assign_one_mob_non(26711,  stcrew);
@@ -298,10 +269,7 @@ void assign_non_combat_procs() {
 
 
 void assign_combat_procs() {
-    SPEC_FUN	snake;
-    SPEC_FUN    secret_agent;
     SPEC_FUN	red_dragon;
-    SPEC_FUN	blue_dragon;
     SPEC_FUN	green_dragon;
     SPEC_FUN	black_dragon;
     SPEC_FUN	white_dragon;
@@ -310,18 +278,15 @@ void assign_combat_procs() {
     SPEC_FUN mage_familiar_gremlin;
     SPEC_FUN    active_grandmaster;
     SPEC_FUN    active_tarrasque;
-    SPEC_FUN	cry_dragon;
+    SPEC_FUN	mother_moat_and_moad;
     SPEC_FUN    bee;
     SPEC_FUN    hellstreamer;
     SPEC_FUN    firestormer;
-    SPEC_FUN    ranger_combat;
     SPEC_FUN    clutchdrone_combat;
     SPEC_FUN    blindingparrot;
     SPEC_FUN    bounder;
     SPEC_FUN    dispelguy;
     SPEC_FUN    marauder;
-    SPEC_FUN    acidhellstreamer;
-    SPEC_FUN    turtle_green_combat;
     SPEC_FUN    foggy_combat;
     SPEC_FUN    iasenko_combat;
     SPEC_FUN    koban_combat;
@@ -347,14 +312,8 @@ void assign_combat_procs() {
     assign_one_mob_com(3059,  fighter);
     assign_one_mob_com(5005,  brass_dragon);
     assign_one_mob_com(5010,  red_dragon);
-    assign_one_mob_com(5900,  turtle_green_combat);
     assign_one_mob_com(6112,  green_dragon);
-    assign_one_mob_com(6113,  snake);
-    assign_one_mob_com(6114,  snake);
     assign_one_mob_com(6296,  fighter);
-    assign_one_mob_com(6302,  red_dragon);
-    assign_one_mob_com(6316,  green_dragon);
-    assign_one_mob_com(6317,  green_dragon);
     assign_one_mob_com(6500,  fighter);
     assign_one_mob_com(6508,  fighter);
     assign_one_mob_com(6517,  fighter);
@@ -393,7 +352,6 @@ void assign_combat_procs() {
     assign_one_mob_com(9335,  fighter);
     assign_one_mob_com(9340,  fighter);
     assign_one_mob_com(9344,  fighter);
-    assign_one_mob_com(10010,  secret_agent);
     assign_one_mob_com(13302,  clutchdrone_combat);
     assign_one_mob_com(14527,  bee);
     assign_one_mob_com(14528,  bee);
@@ -401,7 +359,6 @@ void assign_combat_procs() {
     assign_one_mob_com(14539,  bee);
     assign_one_mob_com(15009,  fighter);
     assign_one_mob_com(15010,  fighter);
-    assign_one_mob_com(17601,  acidhellstreamer);
     assign_one_mob_com(20713,  hellstreamer);
     assign_one_mob_com(20714,  hellstreamer);
     assign_one_mob_com(20715,  hellstreamer);
@@ -416,9 +373,9 @@ void assign_combat_procs() {
     assign_one_mob_com(20742,  hellstreamer);
     assign_one_mob_com(20747,  bounder);
     assign_one_mob_com(20733,  blindingparrot);
-    assign_one_mob_com(22014,  cry_dragon);
+    assign_one_mob_com(22014,  mother_moat_and_moad);
     assign_one_mob_com(22019,  foggy_combat);
-    assign_one_mob_com(22340,  cry_dragon);    
+    assign_one_mob_com(22340,  mother_moat_and_moad);    
     assign_one_mob_com(22701,  marauder);
     assign_one_mob_com(26208,  fighter);
     assign_one_mob_com(26200,  fighter);
