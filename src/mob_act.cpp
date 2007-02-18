@@ -19,7 +19,7 @@
 /* 12/06/2003   Onager   Modified mobile_activity() to prevent charmie    */
 /*                       scavenging                                       */
 /**************************************************************************/
-/* $Id: mob_act.cpp,v 1.42 2007/01/26 02:25:30 dcastle Exp $ */
+/* $Id: mob_act.cpp,v 1.43 2007/02/18 21:52:22 dcastle Exp $ */
 
 extern "C"
 {
@@ -65,28 +65,6 @@ char * get_random_hate(CHAR_DATA *ch);
 void get(struct char_data *ch, struct obj_data *obj_object,
     struct obj_data *sub_object,bool has_consent);
 
-int fighter_non_combat(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,        
-          struct char_data *owner);
-int passive_magic_user(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,        
-          struct char_data *owner);
-int passive_necro(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,        
-          struct char_data *owner);
-int ranger_non_combat(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,        
-          struct char_data *owner);
-int paladin_non_combat(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,        
-          struct char_data *owner);
-int antipaladin_non_combat(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
-          struct char_data *owner);
-int thief_non_combat(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,        
-          struct char_data *owner);
-int barbarian_non_combat(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
-          struct char_data *owner);
-int monk_non_combat(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,        
-          struct char_data *owner);
-int druid_non_combat(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,        
-          struct char_data *owner);
-int passive_cleric(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,        
-          struct char_data *owner);
 bool is_protected(struct char_data *vict, struct char_data *ch);
 void scavenge(struct char_data *ch);
 bool is_r_denied(CHAR_DATA *ch, int room)
