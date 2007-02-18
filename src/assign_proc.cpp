@@ -108,14 +108,10 @@ void assign_non_combat_procs() {
     SPEC_FUN	deth;
     SPEC_FUN	fido;
     SPEC_FUN	janitor;
-    SPEC_FUN	mayor;
     SPEC_FUN    backstabber;
     SPEC_FUN    mud_school_adept;
     SPEC_FUN    adept;    
     SPEC_FUN    frosty;
-    SPEC_FUN    Thalos_citizen;
-    SPEC_FUN    platinumsmith;
-    SPEC_FUN    platmerchant;
     SPEC_FUN    meta_dude;
     SPEC_FUN    sleazy_vault_guy;
     SPEC_FUN    quest_master;
@@ -151,7 +147,6 @@ void assign_non_combat_procs() {
     SPEC_FUN    generic_blocker;
     SPEC_FUN    generic_doorpick_blocker;
     SPEC_FUN    startrek_miles;
-    SPEC_FUN    generic_area_guard;
     SPEC_FUN    cardinal;
 
     assign_one_mob_non(3071, cardinal);
@@ -161,7 +156,6 @@ void assign_non_combat_procs() {
     assign_one_mob_non(503, arena_only);
     assign_one_mob_non(8, mage_golem);
     assign_one_mob_non(1,  deth);
-    assign_one_mob_non(3,  platmerchant);
     assign_one_mob_non(5,  mage_familiar_imp_non);
    assign_one_mob_non(4, mage_familiar_gremlin_non);
     assign_one_mob_non(6,  druid_familiar_chipmunk_non);
@@ -248,7 +242,6 @@ void assign_non_combat_procs() {
     assign_one_mob_non(1928,  guild);
     assign_one_mob_non(14537, apiary_worker);
     assign_one_mob_non(1930,  guild);
-    assign_one_mob_non(19304, generic_area_guard);
     assign_one_mob_non(20700, generic_guard);
     assign_one_mob_non(20701, portal_guard);
     assign_one_mob_non(20744, panicprisoner);
