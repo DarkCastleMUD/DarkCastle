@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.145 2007/02/17 23:59:25 shane Exp $ */
+/* $Id: db.cpp,v 1.146 2007/02/18 21:41:19 dcastle Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -4732,7 +4732,21 @@ void reset_char(CHAR_DATA *ch)
   ch->position = POSITION_STANDING;
   ch->carry_weight = 0;
   ch->carry_items = 0;
-  GET_AC(ch) = 100;
+
+  switch (GET_CLASS(ch)) {
+    case CLASS_MAGE: GET_AC(ch) = 200; break;
+    case CLASS_DRUID: GET_AC(ch) = 185; break;
+    case CLASS_CLERIC: GET_AC(ch) = 170; break;
+    case CLASS_ANTI_PAL: GET_AC(ch) = 155; break;
+    case CLASS_THIEF: GET_AC(ch) = 140; break;
+    case CLASS_BARD: GET_AC(ch) = 125; break;
+    case CLASS_BARBARIAN: GET_AC(ch) = 110; break;
+    case CLASS_RANGER: GET_AC(ch) = 95; break;
+    case CLASS_PALADIN: GET_AC(ch) = 80; break;
+    case CLASS_WARRIOR: GET_AC(ch) = 65; break;
+    case CLASS_MONK: GET_AC(ch) = 50; break;
+    default: GET_AC(ch) = 100; break;
+  }
 
   ch->song_data = NULL;
   ch->song_number = 0;
@@ -4831,19 +4845,19 @@ void init_char(CHAR_DATA *ch)
   ch->move  = GET_MAX_MOVE(ch);
 
   switch (GET_CLASS(ch)) {
-    case CLASS_MAGE: ch->armor = 200; break;
-    case CLASS_DRUID: ch->armor = 185; break;
-    case CLASS_CLERIC: ch->armor = 170; break;
-    case CLASS_ANTI_PAL: ch->armor = 155; break;
-    case CLASS_THIEF: ch->armor = 140; break;
-    case CLASS_BARD: ch->armor = 125; break;
-    case CLASS_BARBARIAN: ch->armor = 110; break;
-    case CLASS_RANGER: ch->armor = 95; break;
-    case CLASS_PALADIN: ch->armor = 80; break;
-    case CLASS_WARRIOR: ch->armor = 65; break;
-    case CLASS_MONK: ch->armor = 50; break;
-    default: ch->armor = 100;
-  };
+    case CLASS_MAGE: GET_AC(ch) = 200; break;
+    case CLASS_DRUID: GET_AC(ch) = 185; break;
+    case CLASS_CLERIC: GET_AC(ch) = 170; break;
+    case CLASS_ANTI_PAL: GET_AC(ch) = 155; break;
+    case CLASS_THIEF: GET_AC(ch) = 140; break;
+    case CLASS_BARD: GET_AC(ch) = 125; break;
+    case CLASS_BARBARIAN: GET_AC(ch) = 110; break;
+    case CLASS_RANGER: GET_AC(ch) = 95; break;
+    case CLASS_PALADIN: GET_AC(ch) = 80; break;
+    case CLASS_WARRIOR: GET_AC(ch) = 65; break;
+    case CLASS_MONK: GET_AC(ch) = 50; break;
+    default: GET_AC(ch) = 100; break;
+  }
 
   ch->altar = NULL;
   ch->spec = 0;

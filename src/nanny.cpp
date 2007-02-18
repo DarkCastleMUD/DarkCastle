@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.158 2007/02/17 23:59:25 shane Exp $ */
+/* $Id: nanny.cpp,v 1.159 2007/02/18 21:41:19 dcastle Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -378,20 +378,21 @@ void do_on_login_stuff(char_data * ch)
     if (ch->pcdata->time.logon < 1151504181)
        SET_BIT(ch->misc, CHANNEL_TELL);
 
-    if (ch->pcdata->time.logon < 1171754181) {
+    if (ch->pcdata->time.logon < 1171757100) {
       switch (GET_CLASS(ch)) {
-        case CLASS_MAGE: ch->armor += 100; break;
-        case CLASS_DRUID: ch->armor += 85; break;
-        case CLASS_CLERIC: ch->armor += 70; break;
-        case CLASS_ANTI_PAL: ch->armor += 55; break;
-        case CLASS_THIEF: ch->armor += 40; break;
-        case CLASS_BARD: ch->armor += 25; break;
-        case CLASS_BARBARIAN: ch->armor += 10; break;
-        case CLASS_RANGER: ch->armor -= 5; break;
-        case CLASS_PALADIN: ch->armor -= 20; break;
-        case CLASS_WARRIOR: ch->armor -= 35; break;
-        case CLASS_MONK: ch->armor -= 50; break;
-      };
+        case CLASS_MAGE: GET_AC(ch) += 100; break;
+        case CLASS_DRUID: GET_AC(ch) += 85; break;
+        case CLASS_CLERIC: GET_AC(ch) += 70; break;
+        case CLASS_ANTI_PAL: GET_AC(ch) += 55; break;
+        case CLASS_THIEF: GET_AC(ch) += 40; break;
+        case CLASS_BARD: GET_AC(ch) += 25; break;
+        case CLASS_BARBARIAN: GET_AC(ch) += 10; break;
+        case CLASS_RANGER: GET_AC(ch) -= 5; break;
+        case CLASS_PALADIN: GET_AC(ch) -= 20; break;
+        case CLASS_WARRIOR: GET_AC(ch) -= 35; break;
+        case CLASS_MONK: GET_AC(ch) -= 50; break;
+        default: break;
+      }
     }
 
     if (GET_RACE(ch) == RACE_PIXIE) {

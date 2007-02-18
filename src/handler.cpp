@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.160 2007/02/16 03:34:33 apocalypse Exp $ */
+/* $Id: handler.cpp,v 1.161 2007/02/18 21:41:19 dcastle Exp $ */
     
 extern "C"
 {
@@ -3181,8 +3181,20 @@ void extract_char(CHAR_DATA *ch, bool pull)
         omast->pcdata->golem = 0; // Reset the golem flag.
     }
 
-
-    GET_AC(ch) = 100;
+    switch (GET_CLASS(ch)) {
+      case CLASS_MAGE: GET_AC(ch) = 200; break;
+      case CLASS_DRUID: GET_AC(ch) = 185; break;
+      case CLASS_CLERIC: GET_AC(ch) = 170; break;
+      case CLASS_ANTI_PAL: GET_AC(ch) = 155; break;
+      case CLASS_THIEF: GET_AC(ch) = 140; break;
+      case CLASS_BARD: GET_AC(ch) = 125; break;
+      case CLASS_BARBARIAN: GET_AC(ch) = 110; break;
+      case CLASS_RANGER: GET_AC(ch) = 95; break;
+      case CLASS_PALADIN: GET_AC(ch) = 80; break;
+      case CLASS_WARRIOR: GET_AC(ch) = 65; break;
+      case CLASS_MONK: GET_AC(ch) = 50; break;
+      default: GET_AC(ch) = 100;
+    }
 
     if ( ch->desc && ch->desc->original )
 	do_return( ch, "", 12 );

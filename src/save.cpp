@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: save.cpp,v 1.46 2006/10/08 09:17:07 jhhudso Exp $ */
+/* $Id: save.cpp,v 1.47 2007/02/18 21:41:19 dcastle Exp $ */
 
 extern "C"
 {
@@ -1410,7 +1410,20 @@ void char_to_store(CHAR_DATA *ch, struct char_file_u *st, struct time_data & tmp
     st->afected_by[x] = -1;*/
   }
   else { 
-    st->armor   = 100;
+    switch(GET_CLASS(ch)) {
+      case CLASS_MAGE: st->armor = 200; break;
+      case CLASS_DRUID: st->armor = 185; break;
+      case CLASS_CLERIC: st->armor = 170; break;
+      case CLASS_ANTI_PAL: st->armor = 155; break;
+      case CLASS_THIEF: st->armor = 140; break;
+      case CLASS_BARD: st->armor = 125; break;
+      case CLASS_BARBARIAN: st->armor = 110; break;
+      case CLASS_RANGER: st->armor = 95; break;
+      case CLASS_PALADIN: st->armor = 80; break;
+      case CLASS_WARRIOR: st->armor = 65; break;
+      case CLASS_MONK: st->armor = 50; break;
+      default: st->armor   = 100; break;
+    }
     st->hitroll =  0;
     st->damroll =  0;
     st->afected_by = 0;
