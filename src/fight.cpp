@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.427 2007/02/18 04:45:40 jhhudso Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.428 2007/02/18 04:52:35 apocalypse Exp $ */
 
 extern "C"
 {
@@ -1898,7 +1898,7 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
     REMBIT(ch->affected_by, AFF_INVISIBLE);
   }
 
-  // Frost Shield won't effect a backstab -pir
+  // Frost Shield won't affect a backstab
   if(attacktype != SKILL_BACKSTAB &&  GET_HIT(victim) > 0 &&
      (typeofdamage == DAMAGE_TYPE_PHYSICAL || attacktype == TYPE_PHYSICAL_MAGIC))
     if(do_frostshield(ch, victim)) {
@@ -1913,15 +1913,14 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
     if (IS_SET(ch->combat, COMBAT_HITALL))
       dam = (int)(dam * 2);
     if (IS_SET(ch->combat, COMBAT_ORC_BLOODLUST1)) {
-      dam = (int)(dam * 1.5); 
+      dam = (int)(dam * 1.7); 
 //      REMOVE_BIT(ch->combat, COMBAT_ORC_BLOODLUST1);
 //      SET_BIT(ch->combat, COMBAT_ORC_BLOODLUST2);
     }
     if (IS_SET(ch->combat, COMBAT_ORC_BLOODLUST2)) {
-      dam = (int)(dam * 1.5);
+      dam = (int)(dam * 1.7);
 //      REMOVE_BIT(ch->combat, COMBAT_ORC_BLOODLUST2);
     }
-
     percent = (int) (( ((float)GET_HIT(ch)) / ((float)GET_MAX_HIT(ch)) ) * 100);
     if( percent < 40 && (learned = has_skill(ch, SKILL_FRENZY))) 
     {
@@ -1952,7 +1951,7 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
   if (IS_AFFECTED(victim, AFF_EAS))
     dam /= 4;
 
-  // sanct damage now based on caster align (25% = evil, 30% = neut, 35% = good)
+  // sanct damage now 35% for all aligns
   if (IS_AFFECTED(victim, AFF_SANCTUARY))
   {
     int mod = affected_by_spell(victim, SPELL_SANCTUARY)? affected_by_spell(victim, SPELL_SANCTUARY)->modifier:35;
