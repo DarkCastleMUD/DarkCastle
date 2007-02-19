@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.141 2007/02/19 12:45:10 dcastle Exp $ */
+/* $Id: mob_proc.cpp,v 1.142 2007/02/19 15:56:51 dcastle Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -1698,7 +1698,6 @@ static char *dethSayText [ ] =
   "Your ridiculous little opinion has been noted.",
   "We have enough youth, how about a fountain of SMART?",
   "Wait a second, did you rip off your own arm as a joke?", // Futurama > you
-  "4 8 15 16 23 42",
   "42",
   "I'm so embarrassed. I wish everybody else was dead.",
   "Hey Taint, I have lots of hit points too! Lets measure penises!",
