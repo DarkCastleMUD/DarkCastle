@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.225 2007/02/11 17:26:34 apocalypse Exp $ */
+/* $Id: const.cpp,v 1.226 2007/02/19 20:55:07 shane Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -802,6 +802,25 @@ char *sector_types[] =
     "frozen tundra",
     "arctic",
     "\n"
+};
+
+char *time_look[] =
+{
+    "night time",
+    "sun rise",
+    "day time",
+    "sun set",
+    "/n"
+};
+
+char *sky_look[] =
+{
+    "cloudless",
+    "cloudy",
+    "rainy",
+    "pouring rain",
+    "lit by flashes of lightning",
+    "/n"
 };
 
 char *equipment_types[] =

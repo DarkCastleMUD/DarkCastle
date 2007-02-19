@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.161 2007/02/18 21:41:19 dcastle Exp $ */
+/* $Id: handler.cpp,v 1.162 2007/02/19 20:55:07 shane Exp $ */
     
 extern "C"
 {
@@ -1301,6 +1301,11 @@ void affect_total(CHAR_DATA *ch)
     add_totem_stats(ch);
 	if (!already)
     REMBIT(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT); // so weapons stop fall off
+
+    redo_hitpoints(ch);
+    redo_mana(ch);
+    redo_ki(ch);
+
 }
 
 
@@ -1376,9 +1381,6 @@ void affect_remove( CHAR_DATA *ch, struct affected_type *af, int flags)
       case SPELL_IRON_ROOTS:
          REMBIT(ch->affected_by, AFF_NO_FLEE);
          break;
-      case SPELL_OAKEN_FORTITUDE:
-	 redo_hitpoints(ch);
-	break;
       case SPELL_STONE_SKIN:  /* Stone skin wears off... Remove resistance */
          REMOVE_BIT(ch->resist, ISR_PIERCE);
          break;

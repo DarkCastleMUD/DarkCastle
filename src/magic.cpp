@@ -3498,12 +3498,12 @@ int spell_word_of_recall(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct o
   }
 
   if(IS_SET(world[location].room_flags, CLAN_ROOM) && IS_AFFECTED(victim, AFF_CHAMPION)) {
-     send_to_char("No recalling into a clan hall whilst Champion.\n\r", victim);
-     return eFAILURE;
+     send_to_char("No recalling into a clan hall whilst Champion, go to the Tavern!\n\r", victim);
+     location = real_room(START_ROOM);
   }
   if(location >= 1900 && location <= 1999 && IS_AFFECTED(victim, AFF_CHAMPION)) {
-     send_to_char("No recalling into a guild hall whilst Champion.\n\r", victim);
-     return eFAILURE;
+     send_to_char("No recalling into a guild hall whilst Champion, go to the Tavern!\n\r", victim);
+     location = real_room(START_ROOM);
   }
 
   if (!IS_NPC(victim) && victim->pcdata->golem && victim->pcdata->golem->in_room == victim->in_room)

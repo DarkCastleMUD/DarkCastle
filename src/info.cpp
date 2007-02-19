@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.142 2007/02/17 23:59:25 shane Exp $ */
+/* $Id: info.cpp,v 1.143 2007/02/19 20:55:07 shane Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -65,6 +65,7 @@ extern char *where[];
 extern char *color_liquid[];
 extern char *fullness[];
 extern char *sector_types[];
+extern char *sky_look[];
 extern char *room_bits[];
 extern struct race_shit race_info[];
 extern char *race_types[];
@@ -1683,12 +1684,6 @@ int do_weather(struct char_data *ch, char *argument, int cmd)
 {
    extern struct weather_data weather_info;
    char buf[256];
-   static char *sky_look[5]= {
-      "cloudless",
-      "cloudy",
-      "rainy",
-      "pouring rain",
-      "lit by flashes of lightning"};
 
    if(GET_POS(ch) <= POSITION_SLEEPING) {
       send_to_char("You dream of being on a tropical island surrounded by beautiful members of the attractive sex.\n\r", ch);

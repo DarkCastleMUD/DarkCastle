@@ -117,6 +117,8 @@ extern int top_of_world;	/* In db.c */
 extern struct time_info_data time_info;		/* In db.c */
 extern char help[];
 extern char * sector_types[];
+extern char *time_look[];
+extern char *sky_look[];
 extern struct room_data ** world_array;
 extern struct char_data *character_list;
 void check_leaderboard(void);
@@ -1386,6 +1388,12 @@ void generate_prompt(CHAR_DATA *ch, char *prompt)
 	  if (ch->fighting && ch->fighting->fighting) {
 	    sprintf(pro, "%s", calc_name(ch->fighting->fighting,TRUE).c_str());
 	  }
+         break;
+       case 'd':
+         sprintf(pro, "%s", time_look[weather_info.sunlight]);
+         break;
+       case 'D':
+         sprintf(pro, "%s", sky_look[weather_info.sky]);
          break;
        case 'g':
          sprintf(pro, "%d", GET_GOLD(ch));
