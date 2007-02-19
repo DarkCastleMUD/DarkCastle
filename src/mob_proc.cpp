@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.140 2007/02/19 02:04:53 apocalypse Exp $ */
+/* $Id: mob_proc.cpp,v 1.141 2007/02/19 12:45:10 dcastle Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -1698,6 +1698,7 @@ static char *dethSayText [ ] =
   "Your ridiculous little opinion has been noted.",
   "We have enough youth, how about a fountain of SMART?",
   "Wait a second, did you rip off your own arm as a joke?", // Futurama > you
+  "4 8 15 16 23 42",
   "42",
   "I'm so embarrassed. I wish everybody else was dead.",
   "Hey Taint, I have lots of hit points too! Lets measure penises!",
@@ -1710,7 +1711,8 @@ static char *dethSayText [ ] =
   "That's hot.",
   "Wanna fuck? *puts on robe and wizard hat*",
   "Note to self: Salmon and Marguaritas just don't mix.",
-  "If this is Canada, where the hell are all the Moose?!? - Feb. 4, 2007."
+  "If this is Canada, where the hell are all the Moose?!? - Feb. 4, 2007.",
+  "God shouldn't be the only one allowed to play God." // Steve Jobs said that, interestingly enough
 };
 
 // ENDOFCHAIN
