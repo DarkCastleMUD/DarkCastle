@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.139 2007/02/19 01:57:23 apocalypse Exp $ */
+/* $Id: mob_proc.cpp,v 1.140 2007/02/19 02:04:53 apocalypse Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -1708,7 +1708,9 @@ static char *dethSayText [ ] =
   "Goooooooooooooooooooooaaaaaaaaaaaaaaaaaalllllllllllllllllllll!!!!!!!!!",
   "cArEbEaR sTaRe!",
   "That's hot.",
-  "Wanna fuck? *puts on robe and wizard hat*"
+  "Wanna fuck? *puts on robe and wizard hat*",
+  "Note to self: Salmon and Marguaritas just don't mix.",
+  "If this is Canada, where the hell are all the Moose?!? - Feb. 4, 2007."
 };
 
 // ENDOFCHAIN
