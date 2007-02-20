@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.226 2007/02/19 20:55:07 shane Exp $ */
+/* $Id: const.cpp,v 1.227 2007/02/20 08:53:36 dcastle Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1045,7 +1045,7 @@ char *apply_types[] =
 char *pc_clss_types[] =
 {
     "UNDEFINED",
-    "Magic User",
+    "Mage",
     "Cleric",
     "Thief",
     "Warrior",
@@ -1063,7 +1063,7 @@ char *pc_clss_types[] =
 char *pc_clss_types2[] =
 {
     "UNDEFINED",
-    "MagicUser",
+    "Mage",
     "Cleric",
     "Thief",
     "Warrior",
