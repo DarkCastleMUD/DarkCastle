@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.159 2007/02/18 21:41:19 dcastle Exp $ */
+/* $Id: nanny.cpp,v 1.160 2007/02/20 08:53:19 dcastle Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -1259,7 +1259,7 @@ is_race_eligible(ch,7)?'*':' ',is_race_eligible(ch,8)?'*':' ',is_race_eligible(c
          SEND_TO_Q("\n\rA '*' denotes a class that fits your chosen stats.\n\r", d );
          sprintf(buf, " %c 1: Warrior\n\r"
                       " %c 2: Cleric\n\r"
-                      " %c 3: Magic User\n\r"
+                      " %c 3: Mage\n\r"
                       " %c 4: Thief\n\r"
                       " %c 5: Anti-Paladin\n\r"
                       " %c 6: Paladin\n\r"
