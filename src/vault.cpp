@@ -753,8 +753,8 @@ void add_vault_access(CHAR_DATA *ch, char *name, struct vault_data *vault) {
 
   if (has_vault_access(name, vault)) {
     send_to_char("That person already has access to your vault.\r\n", ch);
-    //if (d.character) 
-     // free_char(d.character);
+    if (d.character) 
+      free_char(d.character);
     return;   
   }
  
@@ -765,8 +765,8 @@ void add_vault_access(CHAR_DATA *ch, char *name, struct vault_data *vault) {
   vault->access	= access;
 
   save_char_obj(ch);
-//  if (d.character) 
-  //  free_char(d.character);
+  if (d.character) 
+    free_char(d.character);
 }
 
 void remove_vault_access(CHAR_DATA *ch, char *name, struct vault_data *vault) {
