@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.38 2007/01/13 03:49:26 dcastle Exp $
+| $Id: wizard.cpp,v 1.39 2007/02/20 23:09:18 dcastle Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -1437,4 +1437,311 @@ void special_log(char *arg)
 
   fprintf(fl, "%s\n", arg);
   dc_fclose(fl);
+}
+
+
+// Scavenger hunts..
+
+struct hunt_data
+{
+  struct hunt_data *next;
+  char *huntname;
+  int itemnum;
+  int time;
+};
+
+struct hunt_items
+{ // Bleh, don't wanna make it go through every item in the game everyone someone checks the list
+   struct hunt_items *next;
+   struct hunt_data *hunt;
+   struct obj_data *obj;
+   char *mobname;
+};
+
+struct hunt_data *hunt_list = NULL;
+struct hunt_items *hunt_items_list = NULL;
+
+extern void send_info(char *messg);
+
+void check_end_of_hunt(struct hunt_data *h)
+{
+  struct hunt_items *i,*p=NULL,*in;
+  int items = 0;
+
+  for (i = hunt_items_list;  i;i = in)
+  {
+    in = i->next;
+    if (i->hunt == h)
+    {
+      if (h->time <= 0)
+      {
+	//obj_from_char(i->obj);
+	if (p) p->next = in;
+	else hunt_items_list = in;
+
+	extract_obj(i->obj);
+	dc_free(i->mobname);
+        dc_free(i);
+	continue;
+      } else items++; 
+    }
+    p = i;
+  }
+  char buf[MAX_STRING_LENGTH];
+  if (items == 0)
+  {
+     if (h->huntname) {
+       if (h->time <= 0) sprintf(buf,"\r\n## The time limit on hunt '%s' has expired and all unrecovered prizes have been removed.\r\n",h->huntname);
+       else sprintf(buf,"\r\n## All prizes have been recovered on hunt '%s'\r\n",h->huntname);
+	} else {
+       if (h->time <= 0) sprintf(buf,"\r\n## The time limit on the hunt for '%s' has expired and all unrecovered prizes have been removed.\r\n",((OBJ_DATA*)obj_index[real_object(h->itemnum)].item)->short_description);
+       else sprintf(buf,"\r\n## All prizes have been recovered on the hunt for '%s'\r\n",((OBJ_DATA*)obj_index[real_object(h->itemnum)].item)->short_description);
+	}
+     send_info(buf);
+
+     struct hunt_data *hl,*p=NULL;
+     for (hl = hunt_list;hl;hl = hl->next)
+     {
+	if (hl == h)
+	{
+	  if (p) p->next = hl->next;
+	  else hunt_list = hl->next;
+	  break;
+	}
+	p = hl;
+     }
+     dc_free(h->huntname);
+     dc_free(h);     
+  }
+}
+
+void huntclear_item(struct obj_data *obj)
+{
+  struct hunt_items *hi,*hin,*hip = NULL;
+  for (hi = hunt_items_list;hi;hi = hin)
+  {
+    hin = hi->next;
+    if (hi->obj == obj)
+    {
+	if (hip) hip->next = hin;
+	else hunt_items_list = hin;
+	dc_free(hi->mobname);
+	dc_free(hi);
+	continue; // Hopefully there's not two in the list, but just in case.
+    }
+    hip = hi;
+  }
+}
+
+void begin_hunt(int item, int time, int amount, char *huntname)
+{ // time, itme, item
+  struct hunt_data *n;
+  
+#ifdef LEAK_CHECK
+  n = (struct hunt_data *)calloc(1, sizeof(struct hunt_data));
+#else
+  n = (struct hunt_data *)dc_alloc(1, sizeof(struct hunt_data));
+#endif
+  n->next = hunt_list;
+  hunt_list = n;
+  n->itemnum = item;
+  n->time = time;
+  if (huntname) n->huntname = str_dup(huntname);
+
+  int rnum = real_object(item);
+  extern int top_of_mobt;
+  if (rnum < 0) return;
+
+  for (int i = 0; i < amount;i++)
+  {
+    int mob = -1;
+    CHAR_DATA *vict;
+    while (1)
+    {
+	mob = number(1,top_of_mobt);
+	int vnum = mob_index[mob].virt; // debug
+	if (!(mob_index[mob].virt > 300 &&
+        (mob_index[mob].virt < 2300 || mob_index[mob].virt > 2499) &&
+	(mob_index[mob].virt < 29200 || mob_index[mob].virt > 29299) && 
+	(mob_index[mob].virt < 5600 || mob_index[mob].virt > 5699) && 
+	(mob_index[mob].virt < 16200 || mob_index[mob].virt > 16399) && 
+	(mob_index[mob].virt < 1900 || mob_index[mob].virt > 1999) && 
+	(mob_index[mob].virt < 10500 || mob_index[mob].virt > 10622) && 
+	(mob_index[mob].virt < 8500 || mob_index[mob].virt > 8699 ))) continue;
+        if (mob_index[mob].number <= 0) continue;
+	if (!(vict = get_random_mob_vnum(vnum))) continue;
+	if (strlen(vict->short_desc) > 34) continue; // They suck
+
+	break;
+    }
+    struct obj_data *obj = clone_object(rnum);
+    obj_to_char(obj, vict);
+    struct hunt_items *ni;
+#ifdef LEAK_CHECK
+  ni = (struct hunt_items *)calloc(1, sizeof(struct hunt_items));
+#else
+  ni = (struct hunt_items *)dc_alloc(1, sizeof(struct hunt_items));
+#endif
+    ni->hunt = n;
+    ni->obj = obj;
+    ni->mobname = str_dup(vict->short_desc);
+    ni->next = hunt_items_list;
+    hunt_items_list = ni;
+  }
+}
+
+void pick_up_item(struct char_data *ch, struct obj_data *obj)
+{
+  struct hunt_items *i,*p = NULL,*in;
+  char buf[MAX_STRING_LENGTH];
+
+  for (i = hunt_items_list; i; i = in)
+  {
+     in = i->next;
+     if (i->obj == obj)
+     {
+	if (p) p->next = in;
+	else hunt_items_list = in;
+	int vnum = obj_index[obj->item_number].virt;
+	sprintf(buf, "\r\n## %s has been recovered from %s by %s!\r\n",
+		obj->short_description,i->mobname,ch->name);
+	send_info(buf);
+	struct hunt_data *h = i->hunt;
+	dc_free(i->mobname);
+	dc_free(i);
+	check_end_of_hunt(h);
+	switch (vnum)
+	{
+		case 27915:
+		case 27916:
+		case 27917:
+		case 27918:
+		  int gold = obj->obj_flags.value[0];
+		  sprintf(buf, "As if by magic, the gold beads transform into %d gold!\r\n",
+			gold);
+		  send_to_char(buf,ch);
+
+		  GET_GOLD(ch) += gold;
+		  obj_from_char(obj);
+		  obj_to_room(obj, 6345);
+//		  extract_obj(obj);
+		  break;
+	}
+	continue;
+     }
+     p = i;
+  }
+}
+
+void pulse_hunts()
+{
+  struct hunt_data *h,*hn;
+
+  for (h = hunt_list;h;h = hn)
+  {
+     hn = h->next;
+     h->time--;
+     check_end_of_hunt(h);
+  }
+
+  struct obj_data *obj,*onext;
+  for (obj = world[6345].contents;obj;obj = onext)
+  {
+    onext = obj->next_content;
+    extract_obj(obj);
+  }
+}
+
+int do_showhunt(CHAR_DATA *ch, char *arg, int cmd)
+{
+  char buf[MAX_STRING_LENGTH];
+  struct hunt_data *h;
+  struct hunt_items *hi;
+
+  if (!hunt_list) send_to_char("There are no active hunts at the moment.\r\n",ch);
+  else send_to_char("The following hunts are currently active:\r\n",ch);
+
+  for (h = hunt_list;h;h = h->next)
+  {
+	if (h->huntname)
+	 sprintf(buf,"\r\n%s for '%s'(%d minutes remaining):\r\n",h->huntname,
+			((OBJ_DATA*)obj_index[real_object(h->itemnum)].item)->short_description,h->time);
+	else
+	 sprintf(buf,"\r\nThe hunt for '%s'(%d minutes remaining):\r\n",
+			((OBJ_DATA*)obj_index[real_object(h->itemnum)].item)->short_description,h->time);
+	send_to_char(buf,ch);
+	int itemsleft = 0;
+	buf[0] = '\0';
+	for (hi = hunt_items_list;hi;hi = hi->next)
+	{
+		if (hi->hunt != h) continue;
+		itemsleft++;
+		sprintf(buf,"%s| %-35s  ",
+			buf,hi->mobname);
+		if ((itemsleft % 2) == 0)
+		{
+		  sprintf(buf,"%s|\r\n",buf);
+		  send_to_char(buf,ch);
+		  buf[0] = '\0';
+		}
+	}
+	if (buf[0] != '\0') {
+	  sprintf(buf,"%s|\r\n",buf);
+	  send_to_char(buf,ch);
+	}
+  }
+ return eSUCCESS;
+}
+
+int do_huntstart(struct char_data *ch, char *argument, int cmd)
+{
+  char arg[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
+  argument = one_argument(argument,arg);
+  argument = one_argument(argument,arg2);
+  argument = one_argument(argument,arg3);
+
+  if (arg3[0] == '\0')
+  {
+     send_to_char("Syntax: huntstart <vnum> <# of items> <time limit> [hunt name]\r\n",ch);
+     return eSUCCESS;
+  }
+  int vnum = atoi(arg), num = atoi(arg2), time = atoi(arg3);
+  if (vnum <= 0 || real_object(vnum) < 0)
+  {
+    send_to_char("Non-existent item.\r\n",ch);
+    return eSUCCESS;
+  }
+  if (num <= 0 || num > 500)
+  {
+    send_to_char("Invalid #.\r\n",ch);
+    return eSUCCESS;
+  }
+  if (time <= 0)
+  {
+    send_to_char("Invalid duration.\r\n",ch);
+    return eSUCCESS;
+  }
+  struct hunt_data *h;
+  for (h = hunt_list;h;h = h->next)
+  if (h->itemnum == vnum)
+  {
+    send_to_char("A hunt for that item is already ongoing!\r\n",ch);
+    return eSUCCESS;
+  }
+  char huntname[200];
+  if (argument && *argument) 
+  {
+	strcpy(huntname,argument);
+	begin_hunt(vnum, time, num, argument);
+  }
+  else
+  {
+	strcpy(huntname, "A hunt");
+	begin_hunt(vnum,time,num,0);
+  }
+
+  char buf[MAX_STRING_LENGTH];
+  sprintf(buf,"\r\n## %s has been started! There are a total of %d items and %d minutes to find them all!\r\n## Type 'huntitems' to get the locations!\r\n",huntname,num,time);
+  send_info(buf);
+  return eSUCCESS;
 }

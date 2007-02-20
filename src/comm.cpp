@@ -993,6 +993,7 @@ void game_loop(unsigned mother_desc, unsigned other_desc, unsigned third_desc, u
   }
 }
 
+extern void pulse_hunts(); 
 void init_heartbeat()
 {
   pulse_mobile    = PULSE_MOBILE;
@@ -1069,6 +1070,7 @@ void heartbeat()
     quest_update();
     check_champion();
     save_slot_machines();
+    pulse_hunts();
   }
 }
 

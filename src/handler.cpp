@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.162 2007/02/19 20:55:07 shane Exp $ */
+/* $Id: handler.cpp,v 1.163 2007/02/20 23:09:11 dcastle Exp $ */
     
 extern "C"
 {
@@ -2659,6 +2659,9 @@ int obj_to_char(struct obj_data *object, CHAR_DATA *ch)
     object->in_room = NOWHERE;
     IS_CARRYING_W(ch) += GET_OBJ_WEIGHT(object);
     IS_CARRYING_N(ch)++;
+    extern void pick_up_item(struct char_data *ch, struct obj_data *obj);
+    
+    pick_up_item(ch, object);
     return 1;
 /*
   }
@@ -2939,6 +2942,10 @@ void extract_obj(struct obj_data *obj)
                          *last_active = NULL;
 
 bool has_random(OBJ_DATA *obj);
+
+
+    extern void huntclear_item(struct obj_data *obj);
+    huntclear_item(obj);
 
     if(obj_index[obj->item_number].non_combat_func ||
 	obj->obj_flags.type_flag == ITEM_MEGAPHONE ||
@@ -3485,6 +3492,26 @@ OBJ_DATA *get_obj_vnum(int vnum)
       return i;
   return NULL;
 }
+
+
+CHAR_DATA *get_random_mob_vnum(int vnum)
+{
+  CHAR_DATA *i;
+  int num = real_mobile(vnum);
+  int total = mob_index[num].number;
+  int which = number(1,total);
+
+  for(i = character_list; i; i = i->next)
+  {
+    if(IS_NPC(i) && i->mobdata->nr == num)
+    {
+      if (total == which) return i;
+      else total--;
+    }
+  }
+  return NULL;
+}
+
 
 CHAR_DATA *get_mob_vnum(int vnum)
 {

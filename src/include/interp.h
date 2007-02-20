@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.h,v 1.69 2007/02/08 22:10:34 dcastle Exp $ */
+/* $Id: interp.h,v 1.70 2007/02/20 23:09:14 dcastle Exp $ */
 
 #ifndef INTERP_H_
 #define INTERP_H_
@@ -63,6 +63,7 @@ struct command_lag
 
 DO_FUN  do_boro;
 DO_FUN do_clanarea;
+DO_FUN do_huntstart;
 
 DO_FUN do_thing;
 DO_FUN  do_reload;
@@ -353,6 +354,7 @@ DO_FUN  do_sedit;
 DO_FUN  do_send;
 DO_FUN  do_set;
 DO_FUN  do_shout;
+DO_FUN do_showhunt;
 DO_FUN  do_skills;
 DO_FUN  do_social;
 DO_FUN  do_songs;
