@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: weather.cpp,v 1.12 2006/05/06 03:52:41 shane Exp $ */
+/* $Id: weather.cpp,v 1.13 2007/02/21 21:20:11 shane Exp $ */
 
 extern "C"
 {
@@ -68,11 +68,11 @@ void another_hour(int mode)
       switch (time_info.hours) 
       {
          case 5 :
-            weather_info.sunlight = SUN_LIGHT;
+            weather_info.sunlight = SUN_RISE;
             send_to_outdoor("The morning sky lightens to pale blue.\n\r");
             break;  
          case 6 :
-            weather_info.sunlight = SUN_RISE;
+            weather_info.sunlight = SUN_LIGHT;
             if(weather_info.sky == SKY_CLOUDLESS)
               send_to_outdoor("The sun crests the horizon sending down rays of warmth from the cloudless blue skies.\n\r");
             else send_to_outdoor("Orange flares join the sun touching the morning sky.\n\r");

@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.70 2007/02/10 05:34:10 jhhudso Exp $ */
+/* $Id: utility.cpp,v 1.71 2007/02/21 21:20:11 shane Exp $ */
 
 extern "C"
 {
@@ -1235,6 +1235,8 @@ mob_index[fol->follower->mobdata->nr].virt == 8)
     }
   }
   affect_from_char(ch, SPELL_IRON_ROOTS);
+  affect_from_char(ch, SPELL_DIVINE_INTER);  //sloppy sloppy
+  affect_from_char(ch, SPELL_NO_CAST_TIMER); //*sigh*
 
   if(ch->beacon)
     extract_obj(ch->beacon);

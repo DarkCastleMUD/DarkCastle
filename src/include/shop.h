@@ -34,6 +34,7 @@ struct shop_data
     int type[MAX_TRADE];    /* Types of things shop will buy.       */
     float profit_buy;       /* Factor to multiply cost with.        */
     float profit_sell;      /* Factor to multiply cost with.        */
+    float profit_buy_base;
     char *no_such_item1;    /* Message if keeper hasn't got an item */
     char *no_such_item2;    /* Message if player hasn't got an item */
     char *missing_cash1;    /* Message if keeper hasn't got cash    */
@@ -48,5 +49,7 @@ struct shop_data
     struct obj_data *inventory;  /* list of things shop never runs out of  
 */
 };
+
+void redo_shop_profit(void);
 
 #endif

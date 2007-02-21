@@ -66,6 +66,7 @@
 #include <comm.h>
 #include <returnvals.h>
 #include <quest.h>
+#include <shop.h>
 
 #include <sstream>
 #include <iostream>
@@ -1071,6 +1072,8 @@ void heartbeat()
     check_champion();
     save_slot_machines();
     pulse_hunts();
+    if(!number(0,47))
+      redo_shop_profit();
   }
 }
 

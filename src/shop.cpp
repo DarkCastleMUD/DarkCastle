@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: shop.cpp,v 1.25 2006/06/24 20:04:12 jhhudso Exp $ */
+/* $Id: shop.cpp,v 1.26 2007/02/21 21:20:11 shane Exp $ */
 
 extern "C"
 {
@@ -769,13 +769,14 @@ void boot_the_shops()
         for ( count = 0; count < 6; count++ )
             fscanf( fp, "%d \n", &temp );
 
-        fscanf( fp, "%f \n", &shop_index[max_shop].profit_buy  );
+        fscanf( fp, "%f \n", &shop_index[max_shop].profit_buy_base  );
         fscanf( fp, "%f \n", &shop_index[max_shop].profit_sell );
         for( count = 0; count < MAX_TRADE; count++ )
         {
             fscanf( fp, "%d \n", &shop_index[max_shop].type[count] );
         }
 
+        shop_index[max_shop].profit_buy = shop_index[max_shop].profit_buy_base;
         shop_index[max_shop].no_such_item1      = fread_string( fp , 0);
         shop_index[max_shop].no_such_item2      = fread_string( fp, 0 );
         shop_index[max_shop].do_not_buy         = fread_string( fp , 0);
@@ -823,6 +824,7 @@ void boot_the_shops()
     }
 
     dc_fclose( fp );
+
 }
 
 
@@ -1491,4 +1493,27 @@ void assign_the_player_shopkeepers( )
    mob_index[real_mobile(PLAYER_SHOP_KEEPER)].non_combat_func = player_shop_keeper;
 }
 
-
+void redo_shop_profit()
+{
+  switch(number(0,3)) {
+    case 0:
+      break;
+    case 1:
+      for(int i = 0; i < 58; i++) {
+        shop_index[i].profit_buy = shop_index[i].profit_buy_base;
+      }
+      break;
+    case 2:
+      for(int i = 0; i < 58; i++)
+        shop_index[i].profit_buy *= 1.0 + number(10, 50) / 100.0;
+      break;
+    case 3:
+      for(int i = 0; i < 58; i++) {
+        shop_index[i].profit_buy *= 1.0 - number(10, 50) / 100.0;
+        shop_index[i].profit_buy = MAX(shop_index[i].profit_buy, shop_index[i].profit_sell + 0.1);
+      }
+      break;
+    default:
+      break;
+  }
+}
