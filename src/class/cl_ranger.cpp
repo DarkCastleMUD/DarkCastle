@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: cl_ranger.cpp,v 1.81 2007/01/26 02:25:42 dcastle Exp $ | cl_ranger.C  *
+ * $Id: cl_ranger.cpp,v 1.82 2007/02/21 06:17:37 jhhudso Exp $ | cl_ranger.C  *
  * Description: Ranger skills/spells                                          *
  *                                                                            *
  * Revision History                                                           *
@@ -1492,20 +1492,27 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
         }
      }
 
+     char buffer[100];
      if(!SOMEONE_DIED(retval)) {
         switch(artype) {
            case 1:
               dam = 90;
-              act("The flames surrounding the arrow burns your wound!", ch, 0, victim, TO_VICT, 0);
-              act("The flames surrounding the arrow burns $n's wound!", victim, 0, 0, TO_ROOM, 0);
+	      snprintf(buffer, 100, "%d", dam);
+              send_damage("The flames surrounding the arrow burns your wound for | damage!", ch, 0, victim, buffer,
+			  "The flames surrounding the arrow burns your wound!", TO_VICT);
+              send_damage("The flames surrounding the arrow burns $n's wound for | damage!", victim, 0, 0, buffer,
+			  "The flames surrounding the arrow burns $n's wound!", TO_ROOM);
               retval = damage(ch, victim, dam, TYPE_FIRE, SKILL_FIRE_ARROW, 0);
               skill_increase_check(ch, SKILL_FIRE_ARROW, has_skill(ch, SKILL_FIRE_ARROW), get_difficulty(SKILL_FIRE_ARROW));
               enchantmentused = TRUE;
               break;
            case 2:
               dam = 50;
-              act("The stray ice shards impale you!", ch, 0, victim, TO_VICT, 0);
-              act("The stray ice shards impale $n!", victim, 0, 0, TO_ROOM, 0);
+	      snprintf(buffer, 100, "%d", dam);
+              send_damage("The stray ice shards impale you for | damage!", ch, 0, victim, buffer,
+			  "The stray ice shards impale you!", TO_VICT);
+              send_damage("The stray ice shards impale $n for | damage!", victim, 0, 0, buffer,
+			  "The stray ice shards impale $n!", TO_ROOM);
               if(number(1, 100) < has_skill(ch, SKILL_ICE_ARROW) / 4 ) {
                  act("Your body slows down for a second!", ch, 0, victim, TO_VICT, 0);
                  act("$n's body seems a bit slower!", victim, 0, 0, TO_ROOM, 0);
@@ -1517,16 +1524,22 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
               break;
            case 3:
               dam = 30;
-              act("The storm cloud enveloping the arrow shocks you!", ch, 0, victim, TO_VICT, 0);
-              act("The storm cloud enveloping the arrow shocks $n!", victim, 0, ch, TO_ROOM, 0);
+	      snprintf(buffer, 100, "%d", dam);
+              send_damage("The storm cloud enveloping the arrow shocks you for | damage!", ch, 0, victim, buffer,
+			  "The storm cloud enveloping the arrow shocks you!", TO_VICT);
+              send_damage("The storm cloud enveloping the arrow shocks $n for | damage!", victim, 0, ch, buffer,
+			  "The storm cloud enveloping the arrow shocks $n!", TO_ROOM);
               retval = damage(ch, victim, dam, TYPE_ENERGY, SKILL_TEMPEST_ARROW, 0);
               skill_increase_check(ch, SKILL_TEMPEST_ARROW, has_skill(ch, SKILL_TEMPEST_ARROW), get_difficulty(SKILL_TEMPEST_ARROW));
               enchantmentused = TRUE;
               break;
            case 4:
               dam = 70;
-              act("The magical stones surrounding the arrow smack into you, hard.", ch, 0, victim, TO_VICT, 0);
-              act("The magical stones surrounding the arrow smack hard into $n.", victim, 0, 0, TO_ROOM, 0);
+	      snprintf(buffer, 100, "%d", dam);
+              send_damage("The magical stones surrounding the arrow smack into you, hard for | damage.", ch, 0, victim, buffer,
+		  "The magical stones surrounding the arrow smack into you, hard.", TO_VICT);
+              send_damage("The magical stones surrounding the arrow smack hard into $n for | damage.", victim, 0, 0, buffer,
+		  "The magical stones surrounding the arrow smack hard into $n.", TO_ROOM);
               if(number(1, 100) < has_skill(ch, SKILL_GRANITE_ARROW) / 4) {
                  act("The stones knock you flat on your ass!", ch, 0, victim, TO_VICT, 0);
                  act("The stones knock $n flat on $s ass!", victim, 0, 0, TO_ROOM, 0);
