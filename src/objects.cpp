@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.88 2007/02/21 04:37:28 jhhudso Exp $
+| $Id: objects.cpp,v 1.89 2007/02/21 22:21:59 shane Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -762,62 +762,6 @@ int do_drink(struct char_data *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
-    one_argument(argument,buf);
-
-    // TODO - this needs to be done better
-    if (!str_cmp(buf, "fountain") || !str_cmp(buf, "river")) 
-    {
-      if (FOUNTAINisPresent(ch)) 
-      {
-        if((GET_COND(ch,DRUNK)>10)&&(GET_COND(ch,THIRST)>0))
-        {
-          act("You simply fail to reach your mouth!", ch, 0, 0, TO_CHAR, 0);
-          act("$n tried to drink but missed $s mouth!", ch, 0, 0, TO_ROOM, INVIS_NULL);
-          return eFAILURE;
-        }
-        
-        if((GET_COND(ch,FULL)>20)&&(GET_COND(ch,THIRST)>20)) /* Stomach full */
-        {
-          act("Your stomach can't contain anymore!",ch,0,0,TO_CHAR, 0);
-          act("You are full already!",ch,0,0,TO_CHAR, 0);
-          act("You are not thirsty yet.",ch,0,0,TO_CHAR, 0);
-          return eFAILURE;
-        }
-        
-        act("You drink from the fountain.", ch, 0, 0, TO_CHAR, 0);
-        act("$n drinks from the fountain.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-        act("You are full.", ch, 0, 0, TO_CHAR, 0);
-        act("You are not thirsty anymore.",ch, 0, 0, TO_CHAR, 0);
-
-        if (GET_LEVEL(ch)>=IMMORTAL)
-          return eSUCCESS;
-
-        
-        if (GET_COND(ch,FULL) != -1)  {
-          GET_COND(ch,FULL) = 22 + number(0,5);
-          GET_COND(ch,THIRST) = 22 + number(0,5);
-        }
-        
-        return eSUCCESS;
-      }
-      else {
-        act("You can't find the fountain!",ch,0,0,TO_CHAR, 0);
-        return eFAILURE;
-      }
-    }
-
-    if(!(temp = get_obj_in_list_vis(ch,buf,ch->carrying)))
-    {
-      act("You can't find it!",ch,0,0,TO_CHAR, 0);
-      return eFAILURE;
-    }
-
-    if (temp->obj_flags.type_flag!=ITEM_DRINKCON)
-    {
-      act("You can't drink from that!",ch,0,0,TO_CHAR, 0);
-      return eFAILURE;
-    }
-      
     if((GET_COND(ch,DRUNK)>10)&&(GET_COND(ch,THIRST)>0)) /* The pig is drunk */
     {
       act("You simply fail to reach your mouth!", ch, 0, 0, TO_CHAR, 0);
@@ -825,9 +769,46 @@ int do_drink(struct char_data *ch, char *argument, int cmd)
       return eFAILURE;
     }
       
-    if((GET_COND(ch,FULL)>20)&&(GET_COND(ch,THIRST)>0)) /* Stomach full */
+    if(GET_COND(ch,FULL) > 20 && GET_COND(ch,THIRST) > 20) /* Stomach full */
     {
-      act("Your stomach can't contain anymore!",ch,0,0,TO_CHAR, 0);
+      act("Your stomach cannot contain anymore!",ch,0,0,TO_CHAR, 0);
+      return eFAILURE;
+    }
+      
+    one_argument(argument,buf);
+
+    if((temp = get_obj_in_list_vis(ch,buf,world[ch->in_room].contents)) && temp->obj_flags.type_flag == ITEM_FOUNTAIN && CAN_SEE_OBJ(ch, temp))
+    {
+      act("You drink from $p.", ch, temp, 0, TO_CHAR, 0);
+      act("$n drinks from $p.", ch, temp, 0, TO_ROOM, INVIS_NULL);
+      act("You are full.", ch, 0, 0, TO_CHAR, 0);
+      act("You are not thirsty anymore.",ch, 0, 0, TO_CHAR, 0);
+
+      if (GET_LEVEL(ch)>=IMMORTAL)
+        return eSUCCESS;
+        
+      if (GET_COND(ch,FULL) != -1)
+        GET_COND(ch,FULL) = 22 + number(0,5);
+      if (GET_COND(ch, THIRST) != -1)
+        GET_COND(ch,THIRST) = 22 + number(0,5);
+        
+      return eSUCCESS;
+    }
+
+    if(GET_COND(ch, THIRST) > 20) {
+      send_to_char("Your stomach cannot contain anymore liquid!", ch);
+      return eFAILURE;
+    }
+
+    if(!(temp = get_obj_in_list_vis(ch,buf,ch->carrying)))
+    {
+      act("You cannot find it!",ch,0,0,TO_CHAR, 0);
+      return eFAILURE;
+    }
+
+    if (temp->obj_flags.type_flag!=ITEM_DRINKCON)
+    {
+      act("You can't drink from that!",ch,0,0,TO_CHAR, 0);
       return eFAILURE;
     }
       
