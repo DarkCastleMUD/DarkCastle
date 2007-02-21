@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.142 2007/02/19 15:56:51 dcastle Exp $ */
+/* $Id: mob_proc.cpp,v 1.143 2007/02/21 16:55:31 pirahna Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -1711,7 +1711,8 @@ static char *dethSayText [ ] =
   "Wanna fuck? *puts on robe and wizard hat*",
   "Note to self: Salmon and Marguaritas just don't mix.",
   "If this is Canada, where the hell are all the Moose?!? - Feb. 4, 2007.",
-  "God shouldn't be the only one allowed to play God." // Steve Jobs said that, interestingly enough
+  "God shouldn't be the only one allowed to play God.", // Steve Jobs said that, interestingly enough
+  "Have you been beating off?  There's no Honolulu."  // 2007 Tahoe ski trip
 };
 
 // ENDOFCHAIN
