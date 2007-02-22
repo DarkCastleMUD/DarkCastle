@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: cl_ranger.cpp,v 1.82 2007/02/21 06:17:37 jhhudso Exp $ | cl_ranger.C  *
+ * $Id: cl_ranger.cpp,v 1.83 2007/02/22 20:38:57 shane Exp $ | cl_ranger.C  *
  * Description: Ranger skills/spells                                          *
  *                                                                            *
  * Revision History                                                           *
@@ -1231,93 +1231,90 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
   cur_room = ch->in_room;
 
   if(target) {
-     if(dir >= 0) {
-        if(world[cur_room].dir_option[dir] && 
-         !(world[cur_room].dir_option[dir]->to_room == NOWHERE) && 
-         !IS_SET(world[cur_room].dir_option[dir]->exit_info, EX_CLOSED))
-        {
-           new_room = world[cur_room].dir_option[dir]->to_room;
-           if(IS_SET(world[new_room].room_flags, SAFE)) {
-              send_to_char("Don't shoot into a safe room!  You might hit someone!\r\n", ch);
-              return eFAILURE;
+     if(!ch->fighting) {
+        if(dir >= 0) {
+           if(world[cur_room].dir_option[dir] && 
+            !(world[cur_room].dir_option[dir]->to_room == NOWHERE) && 
+            !IS_SET(world[cur_room].dir_option[dir]->exit_info, EX_CLOSED))
+           {
+              new_room = world[cur_room].dir_option[dir]->to_room;
+              if(IS_SET(world[new_room].room_flags, SAFE)) {
+                 send_to_char("Don't shoot into a safe room!  You might hit someone!\r\n", ch);
+                 return eFAILURE;
+              }
+              char_from_room(ch, false);
+              if(!char_to_room(ch, new_room)) {
+                 /* put ch into a room before we exit */
+                 char_to_room(ch, cur_room);
+                 send_to_char("Error moving you to room in do_fire\r\n", ch);
+                 return eFAILURE;
+              }
+              victim = get_char_room_vis(ch, target);
            }
-           char_from_room(ch);
-           if(!char_to_room(ch, new_room)) {
-              /* put ch into a room before we exit */
-              char_to_room(ch, cur_room);
-              send_to_char("Error moving you to room in do_fire\r\n", ch);
-              return eFAILURE;
-           }
-           victim = get_char_room_vis(ch, target);
         }
-     }
-     if(!victim && artype == 3 && dir >= 0) {
-        if(world[new_room].dir_option[dir] && 
-         !(world[new_room].dir_option[dir]->to_room == NOWHERE) && 
-         !IS_SET(world[new_room].dir_option[dir]->exit_info, EX_CLOSED))
-        {
-           new_room = world[new_room].dir_option[dir]->to_room;
-           if(IS_SET(world[new_room].room_flags, SAFE)) {
-              send_to_char("Don't shoot into a safe room!  You might hit someone!\r\n", ch);
-              return eFAILURE;
+        if(!victim && artype == 3 && dir >= 0) {
+           if(world[new_room].dir_option[dir] && 
+            !(world[new_room].dir_option[dir]->to_room == NOWHERE) && 
+            !IS_SET(world[new_room].dir_option[dir]->exit_info, EX_CLOSED))
+           {
+              new_room = world[new_room].dir_option[dir]->to_room;
+              char_from_room(ch, false);
+              if(IS_SET(world[new_room].room_flags, SAFE)) {
+                 send_to_char("Don't shoot into a safe room!  You might hit someone!\r\n", ch);
+                 char_to_room(ch, cur_room);
+                 return eFAILURE;
+              }
+              if(!char_to_room(ch, new_room)) {
+                 /* put ch into a room before we exit */
+                 char_to_room(ch, cur_room);
+                 send_to_char("Error moving you to room in do_fire\r\n", ch);
+                 return eFAILURE;
+              }
+              victim = get_char_room_vis(ch, target);
            }
-           char_from_room(ch);
-           if(!char_to_room(ch, new_room)) {
-              /* put ch into a room before we exit */
-              char_to_room(ch, cur_room);
-              send_to_char("Error moving you to room in do_fire\r\n", ch);
-              return eFAILURE;
-           }
-           victim = get_char_room_vis(ch, target);
         }
-     }
-     if(!victim && artype == 3 && affected_by_spell(ch, SPELL_FARSIGHT) && dir >= 0) {
-        if(world[new_room].dir_option[dir] && 
-         !(world[new_room].dir_option[dir]->to_room == NOWHERE) && 
-         !IS_SET(world[new_room].dir_option[dir]->exit_info, EX_CLOSED))
-        {
-           new_room = world[new_room].dir_option[dir]->to_room;
-           if(IS_SET(world[new_room].room_flags, SAFE)) {
-              send_to_char("Don't shoot into a safe room!  You might hit someone!\r\n", ch);
-              return eFAILURE;
-           }
-           char_from_room(ch);
-           if(!char_to_room(ch, new_room)) {
-              /* put ch into a room before we exit */
-              char_to_room(ch, cur_room);
-              send_to_char("Error moving you to room in do_fire\r\n", ch);
-              return eFAILURE;
-           }
-           victim = get_char_room_vis(ch, target);
-        }        
+        if(!victim && artype == 3 && affected_by_spell(ch, SPELL_FARSIGHT) && dir >= 0) {
+           if(world[new_room].dir_option[dir] && 
+            !(world[new_room].dir_option[dir]->to_room == NOWHERE) && 
+            !IS_SET(world[new_room].dir_option[dir]->exit_info, EX_CLOSED))
+           {
+              new_room = world[new_room].dir_option[dir]->to_room;
+              char_from_room(ch, false);
+              if(IS_SET(world[new_room].room_flags, SAFE)) {
+                 send_to_char("Don't shoot into a safe room!  You might hit someone!\r\n", ch);
+                 char_to_room(ch, cur_room);
+                 return eFAILURE;
+              }
+              if(!char_to_room(ch, new_room)) {
+                 /* put ch into a room before we exit */
+                 char_to_room(ch, cur_room);
+                 send_to_char("Error moving you to room in do_fire\r\n", ch);
+                 return eFAILURE;
+              }
+              victim = get_char_room_vis(ch, target);
+           }        
+        }
+        /* put char back */
+        char_from_room(ch, false);
+        char_to_room(ch, cur_room);
      }
      if(!victim && has_skill(ch, SKILL_ARCHERY) > 80) {
-        char_from_room(ch);
-        char_to_room(ch, cur_room);
-        victim = get_char_room_vis(ch, target);
-        dir = -1;
-     }
-     else if(dir < 0) {
+        if((victim = get_char_room_vis(ch, target)))
+           dir = -1;
+     } else if(dir < 0) {
         send_to_char("You aren't skilled enough to fire at a target this close.\n\r", ch);
-        char_from_room(ch);
-        char_to_room(ch, cur_room);
         return eFAILURE;
      }
      if(!victim) {
-        send_to_char("You can't seem to locate your target.\r\n", ch);
-        /* put char back */
-        char_from_room(ch);
-        char_to_room(ch, cur_room);
+        if(dir >= 0)
+           send_to_char("You cannot concentrate enough to fire into an adjacent room while fighting.\n\r", ch);
+        else send_to_char("You cannot seem to locate your target.\r\n", ch);
         return eFAILURE;
      }
-  }
-  else {
+  } else {
     send_to_char("Sorry, you must specify a target.\r\n", ch);
     return eFAILURE;
   }
-  /* put ch back in original room after successful targeting */
-  char_from_room(ch);
-  char_to_room(ch, cur_room);
 
 /* check for accidental targeting of self */
   if(victim == ch)
@@ -1467,7 +1464,7 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
 
      if(!SOMEONE_DIED(retval)) {
         cur_room = ch->in_room;
-        char_from_room(ch);
+        char_from_room(ch, false);
         if(!char_to_room(ch, victim->in_room)) {
            char_to_room(ch, cur_room);
            send_to_char("Error moving you to room in do_fire.\n\r", ch);
@@ -1487,7 +1484,7 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
               }
            }
         } else {
-           char_from_room(ch);
+           char_from_room(ch, false);
            char_to_room(ch, cur_room);
         }
      }

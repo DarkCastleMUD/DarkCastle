@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.59 2007/02/08 16:42:41 dcastle Exp $
+| $Id: cl_warrior.cpp,v 1.60 2007/02/22 20:38:58 shane Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -340,7 +340,7 @@ int do_hitall(struct char_data *ch, char *argument, int cmd)
              add_memory(vict, GET_NAME(ch), 'h');
          }
       }
-    WAIT_STATE(ch, PULSE_VIOLENCE*3);
+    WAIT_STATE(ch, PULSE_VIOLENCE*2);
 
    } else 
    {
