@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.213 2007/02/16 02:07:53 jhhudso Exp $ */
+/* $Id: spells.cpp,v 1.214 2007/02/22 11:44:58 shane Exp $ */
 
 extern "C"
 {
@@ -1711,6 +1711,10 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
 		send_to_char("You cannot do that.\r\n",ch);
 		return eFAILURE;
 	   }
+           if(ch->fighting) {
+             send_to_char("You cannot concentrate enough to fire a bolt of lightning into another room!\n\r", ch);
+             return eFAILURE;
+           }
 	   int new_room = world[ch->in_room].dir_option[dir]->to_room;
 	   if(IS_SET(world[new_room].room_flags, SAFE) || IS_SET(world[new_room].room_flags, NO_MAGIC))
 	   {
