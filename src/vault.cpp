@@ -1511,14 +1511,20 @@ void add_new_vault(char *name, int indexonly) {
 
 
   // now create a new vault for the player
-  sprintf(fname, "../vaults/%c/%s.vault", UPPER(*name), name);
+
+  CHAR_DATA *ch = find_owner(name);
+
+   sprintf(fname, "../vaults/%c/%s.vault", UPPER(*name), name);
   if (!(pvfl = dc_fopen(fname, "w"))) {
     sprintf(buf, "add_new_vault: error opening new vault file [%s].", fname);
     log(buf, IMMORTAL, LOG_BUG);
     return;
   }
 
-  fprintf(pvfl, "S %d\n", VAULT_BASE_SIZE);
+  if(ch)
+    fprintf(pvfl, "S %d\n", VAULT_BASE_SIZE * GET_LEVEL(ch) );
+  else
+    fprintf(pvfl, "S %d\n", VAULT_BASE_SIZE);
   fprintf(pvfl, "$\n");
   dc_fclose(pvfl);
 
@@ -1531,7 +1537,10 @@ void add_new_vault(char *name, int indexonly) {
   CREATE(vault, struct vault_data, 1);
 
   vault->owner 	= str_dup(name);
-  vault->size	= VAULT_BASE_SIZE;
+  if(ch)
+    vault->size	= VAULT_BASE_SIZE * GET_LEVEL(ch);
+  else
+    vault->size = VAULT_BASE_SIZE;
   vault->weight	= 0;
   vault->access	= NULL;
   vault->items 	= NULL;
@@ -1750,8 +1759,10 @@ int sleazy_vault_guy(struct char_data *ch, struct obj_data *obj, int cmd, char *
 		GET_PLATINUM(ch) -= 1000;
 		add_new_vault(clanVName(ch->clan),0);
 		save_char_obj(ch);
+                cvault = has_vault(clanVName(ch->clan));
+                cvault->size = 500;
 		save_vault(clanVName(ch->clan));
-		send_to_char("You have purchased vault for your clan's perusal.\r\n",ch);
+		send_to_char("You have purchased a vault for your clan's perusal.\r\n",ch);
 		return eSUCCESS;
 	case 3:
 		if (!cvault) 

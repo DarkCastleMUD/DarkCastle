@@ -2020,18 +2020,6 @@ void reel_spin(void *arg1, void *arg2, void *arg3)
             ((OBJ_DATA *)obj_index[machine->obj->item_number].item)->description = str_hsh(buf);
          }
       }
-      if(payout) {
-         send_to_room("Lights flash and noises emanate from the slot machine!\n\r", machine->obj->in_room);
-         machine->lastwin = machine->cost * payout * machine->bet;
-         sprintf(buf, "$BWinner!!$R  You win %d %s!\n\r", machine->lastwin, machine->gold?"coins":"plats");
-         if(machine->gold)
-            GET_GOLD(machine->ch) += machine->lastwin;
-         else GET_PLATINUM(machine->ch) += machine->lastwin;
-         send_to_char(buf, machine->ch);
-         send_to_char("A tiny panel flips open on the slot machine, revealing red and black buttons.\n\r", machine->ch);
-         machine->button = TRUE;
-         machine->prch = machine->ch;
-      }
       if(payout == 200 && machine->bet == 5) {
          send_to_room("The jackpot lights flash and loud noises come from all around you!\n\r", machine->obj->in_room);
          csendf(machine->ch, "$BJACKPOT!!!!!!  You win the jackpot of %d %s!!$R\n\r", (int)machine->jackpot, machine->gold?"coins":"plats");
@@ -2042,7 +2030,7 @@ void reel_spin(void *arg1, void *arg2, void *arg3)
          if(machine->gold)
             GET_GOLD(machine->ch) += (int)machine->jackpot;
          else GET_PLATINUM(machine->ch) += (int)machine->jackpot;
-         machine->jackpot = machine->cost * 25;
+         machine->jackpot = machine->cost * 1000;
          if(machine->linkedto) {
             update_linked_slots(machine);
          } else {
@@ -2052,6 +2040,17 @@ void reel_spin(void *arg1, void *arg2, void *arg3)
             ((OBJ_DATA *)obj_index[machine->obj->item_number].item)->description = str_hsh(buf);
          }
          save_slot_machines();
+      } else if(payout) {
+         send_to_room("Lights flash and noises emanate from the slot machine!\n\r", machine->obj->in_room);
+         machine->lastwin = machine->cost * payout * machine->bet;
+         sprintf(buf, "$BWinner!!$R  You win %d %s!\n\r", machine->lastwin, machine->gold?"coins":"plats");
+         if(machine->gold)
+            GET_GOLD(machine->ch) += machine->lastwin;
+         else GET_PLATINUM(machine->ch) += machine->lastwin;
+         send_to_char(buf, machine->ch);
+         send_to_char("A tiny panel flips open on the slot machine, revealing red and black buttons.\n\r", machine->ch);
+         machine->button = TRUE;
+         machine->prch = machine->ch;
       }
       machine->busy = FALSE;
    } else { //something bad happened

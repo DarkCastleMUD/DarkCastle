@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.89 2007/01/29 22:15:36 shane Exp $ */
+/* $Id: limits.cpp,v 1.90 2007/02/23 04:09:47 shane Exp $ */
 
 extern "C"
 {
@@ -46,6 +46,7 @@ extern "C"
 #include <returnvals.h>
 #include <interp.h>
 #include <clan.h> //totem
+#include <vault.h>
 
 extern CHAR_DATA *character_list;
 extern struct obj_data *object_list;
@@ -587,8 +588,20 @@ void advance_level(CHAR_DATA *ch, int is_conversion)
 	for (i = 0; i < 3; i++)
 	    ch->conditions[i] = -1;
 
-    if(GET_LEVEL(ch) == 10)
+    if(GET_LEVEL(ch) > 10) {
+      struct vault_data *vault = has_vault(GET_NAME(ch));
+      if(vault) {
+        send_to_char("10 lbs has been added to your vault!\n\r", ch);
+        vault->size += 10;
+        save_vault(vault->owner);
+      }
+    }
+
+    if(GET_LEVEL(ch) == 10) {
       send_to_char("You will no longer keep your equipment when you die.\r\n", ch);
+      send_to_char("However, you have been given a vault to place your valuables.\n\rRead HELP VAULT for more information.\n\r", ch);
+      add_new_vault(GET_NAME(ch), 0);
+    }
     if(GET_LEVEL(ch) == 11)
       send_to_char("It now costs you gold every time you recall.\r\n", ch);
     if (GET_LEVEL(ch) == 50)

@@ -1,5 +1,5 @@
 #define VAULT_UPGRADE_COST 100 // plats
-#define VAULT_BASE_SIZE 500  // weight
+#define VAULT_BASE_SIZE 10  // weight
 #define VAULT_MAX_SIZE  10000 // weight
 
 #define VAULT_MAX_DEPWITH 2000000000 // 2 bil max to add/remove from bank at a time

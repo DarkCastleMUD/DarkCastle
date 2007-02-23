@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.113 2007/02/15 21:42:18 shane Exp $
+| $Id: guild.cpp,v 1.114 2007/02/23 04:09:47 shane Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -846,6 +846,8 @@ if (ch->in_room && IS_SET(world[ch->in_room].room_flags, NOLEARN))
    class_skill_defines * skilllist = get_skill_list(ch);
    if(!skilllist)
      return;  // class has no skills by default
+
+   if(skill == SKILL_COMBAT_MASTERY && number(0,8)) return;
 
    maximum = 0;
    int i;

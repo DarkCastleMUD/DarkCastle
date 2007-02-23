@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.430 2007/02/21 21:46:36 dcastle Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.431 2007/02/23 04:09:46 shane Exp $ */
 
 extern "C"
 {
@@ -1690,26 +1690,34 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
   if (IS_SET(victim->immune, weapon_bit))
    imm = TRUE;
 
-  if (has_skill(victim, SKILL_MAGIC_RESIST))
-    skill_increase_check(victim, SKILL_MAGIC_RESIST, has_skill(victim,SKILL_MAGIC_RESIST), SKILL_INCREASE_HARD);
+  learned = has_skill(victim, SKILL_MAGIC_RESIST);
+
   int save = 0;
    if (!imm)
     switch(weapon_type) {
        case TYPE_FIRE:
             save = get_saves(victim, SAVE_TYPE_FIRE);
             sprintf(buf, "$B$4fire$R and sustain");
+            if (learned)
+               skill_increase_check(victim, SKILL_MAGIC_RESIST, learned, SKILL_INCREASE_MEDIUM);
             break;
       case TYPE_COLD:
             save = get_saves(victim, SAVE_TYPE_COLD);
             sprintf(buf, "$B$3cold$R and sustain");
+            if (learned)
+               skill_increase_check(victim, SKILL_MAGIC_RESIST, learned, SKILL_INCREASE_MEDIUM);
             break;
       case TYPE_ENERGY:
             save = get_saves(victim, SAVE_TYPE_ENERGY);
             sprintf(buf, "$B$5energy$R and sustain");
+            if (learned)
+               skill_increase_check(victim, SKILL_MAGIC_RESIST, learned, SKILL_INCREASE_MEDIUM);
             break;
     case TYPE_ACID:
             save = get_saves(victim, SAVE_TYPE_ACID);
             sprintf(buf, "$B$2acid$R and sustain");
+            if (learned)
+               skill_increase_check(victim, SKILL_MAGIC_RESIST, learned, SKILL_INCREASE_MEDIUM);
             break;
       case TYPE_MAGIC:
             save = get_saves(victim,SAVE_TYPE_MAGIC);
@@ -1718,6 +1726,8 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
       case TYPE_POISON:
             save = get_saves(victim,SAVE_TYPE_POISON);
             sprintf(buf, "$2poison$R and sustain");
+            if (learned)
+               skill_increase_check(victim, SKILL_MAGIC_RESIST, learned, SKILL_INCREASE_MEDIUM);
             break;
       default:
         break;
