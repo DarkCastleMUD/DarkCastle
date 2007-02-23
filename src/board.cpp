@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: board.cpp,v 1.21 2007/02/10 20:17:10 jhhudso Exp $
+| $Id: board.cpp,v 1.22 2007/02/23 22:52:55 dcastle Exp $
 | board.C
 | Description:  This file contains the implementation for the board
 |   code.  It's old and should be rewritten --Morc XXX
@@ -98,7 +98,7 @@ int min_remove_level[] = { IMMORTAL, IMMORTAL, OVERSEER, IMMORTAL, SERAPH, 0,
 	
 int board_clan[] = { -1,
                      -1, -1, -1, -1,  1,  2,  8, 9, 9, 4, // 1 through 10
-                     15,  8, 10,  7, 24,  9, 17, -1, 19, 11, // 11 through 20
+                     15,  8, 10,  7, 12,  9, 17, -1, 19, 11, // 11 through 20
                      -1,  3, 20, 13, 27, 18,  5,  14, 6,  15, // 21 - 30
                      16, -1, 9, 13, -1, -1, 10, 26, 19, 15, // 31 - 40
                      -1, 21, -1, -1, -1, -1, -1, -1, -1, -1,
@@ -234,7 +234,7 @@ int find_board(CHAR_DATA *ch)
        return(13); 
      else if (!(strcmp(i->name, "board clan studs")))
        return(14); 
-     else if (!(strcmp(i->name, "board clan jaguar smoke")))
+     else if (!(strcmp(i->name, "board window kobal")))
        return(15);
      else if (!(strcmp(i->name, "board clan sng")))
        return(16);
