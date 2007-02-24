@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.145 2007/02/23 22:53:34 dcastle Exp $ */
+/* $Id: mob_proc.cpp,v 1.146 2007/02/24 14:37:59 dcastle Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -1715,7 +1715,11 @@ static char *dethSayText [ ] =
   "If this is Canada, where the hell are all the Moose?!? - Feb. 4, 2007.",
   "God shouldn't be the only one allowed to play God.", // Steve Jobs said that, interestingly enough
   "A good icebreaker is to ask people what gender they are.",
-  "Have you been beating off?  There's no Honolulu."  // 2007 Tahoe ski trip
+  "Have you been beating off?  There's no Honolulu.",  // 2007 Tahoe ski trip
+  "I once prayed to god for a bike, but quickly found out he didnt work that way...so I stole a bike and prayed for his forgiveness.",
+  "My god carries a hammer. Your god died nailed to a tree. Any questions?" //Thor did it! Damn those Swedes.
+
+
 };
 
 // ENDOFCHAIN
