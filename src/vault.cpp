@@ -187,6 +187,10 @@ void save_vault(char *name) {
   if (!(vault = has_vault(name)))
     return;
 
+  CHAR_DATA *ch = find_owner(name);
+  if(ch)
+    if(vault->size < GET_LEVEL(ch) * 10) vault->size = GET_LEVEL(ch) * 10;
+
   *name = UPPER(*name);
   sprintf(fname, "../vaults/%c/%s.vault", UPPER(*name), name);
   if(!(fl = dc_fopen(fname, "w"))) {
