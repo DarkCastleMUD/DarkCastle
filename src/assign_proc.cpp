@@ -203,6 +203,7 @@ void assign_non_combat_procs() {
 //    assign_one_mob_non(6902,  guild); // master shaolin monks teach 'stun'
     assign_one_mob_non(8542,  iasenko_non_combat);
     assign_one_mob_non(8543,  koban_non_combat);
+    assign_one_mob_non(2318,  clan_guard);
     assign_one_mob_non(2300,  clan_guard);
     assign_one_mob_non(2312,  clan_guard);
     assign_one_mob_non(2311,  clan_guard);
