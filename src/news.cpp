@@ -128,7 +128,7 @@ void loadnews()
 
 const char *newsify(char *string)
 {
-  char tmp[MAX_STRING_LENGTH*2];
+  static char tmp[MAX_STRING_LENGTH*2];
   int i, a=0;
   tmp[0] = '\0';
   for (i = 0; *(string+i) != '\0';i++)
