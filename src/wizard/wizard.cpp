@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.39 2007/02/20 23:09:18 dcastle Exp $
+| $Id: wizard.cpp,v 1.40 2007/02/25 13:53:23 dcastle Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -1463,7 +1463,7 @@ struct hunt_items *hunt_items_list = NULL;
 
 extern void send_info(char *messg);
 
-void check_end_of_hunt(struct hunt_data *h)
+void check_end_of_hunt(struct hunt_data *h, bool forced = FALSE)
 {
   struct hunt_items *i,*p=NULL,*in;
   int items = 0;
@@ -1490,6 +1490,7 @@ void check_end_of_hunt(struct hunt_data *h)
   char buf[MAX_STRING_LENGTH];
   if (items == 0)
   {
+    if (!forced) {
      if (h->huntname) {
        if (h->time <= 0) sprintf(buf,"\r\n## The time limit on hunt '%s' has expired and all unrecovered prizes have been removed.\r\n",h->huntname);
        else sprintf(buf,"\r\n## All prizes have been recovered on hunt '%s'\r\n",h->huntname);
@@ -1497,6 +1498,13 @@ void check_end_of_hunt(struct hunt_data *h)
        if (h->time <= 0) sprintf(buf,"\r\n## The time limit on the hunt for '%s' has expired and all unrecovered prizes have been removed.\r\n",((OBJ_DATA*)obj_index[real_object(h->itemnum)].item)->short_description);
        else sprintf(buf,"\r\n## All prizes have been recovered on the hunt for '%s'\r\n",((OBJ_DATA*)obj_index[real_object(h->itemnum)].item)->short_description);
 	}
+      } else {
+      if (h->huntname) {
+         sprintf(buf,"\r\n## Hunt '%s' has been ended.\r\n",h->huntname);
+	} else {
+        sprintf(buf,"\r\n## The hunt for '%s' has been ended.\r\n",((OBJ_DATA*)obj_index[real_object(h->itemnum)].item)->short_description);
+	}
+      }
      send_info(buf);
 
      struct hunt_data *hl,*p=NULL;
@@ -1512,6 +1520,28 @@ void check_end_of_hunt(struct hunt_data *h)
      }
      dc_free(h->huntname);
      dc_free(h);     
+  }
+}
+
+int do_huntclear(struct char_data *ch, char *arg, int cmd)
+{
+  char arg1[MAX_INPUT_LENGTH];
+  arg = one_argument(arg,arg1);
+  
+  if (str_cmp(arg1, "doit"))
+  {
+    send_to_char("Syntax: huntclear doit\r\nClears all currently running treasure hunts.\r\n",ch);
+    return eSUCCESS;
+  } else {
+    struct hunt_data *h,*hn;
+    for (h = hunt_list;h; h = hn)
+    {
+       hn = h->next;
+       h->time = -1;
+       check_end_of_hunt(h,TRUE);
+    }
+    send_to_char("Done!\r\n",ch);
+    return eSUCCESS;
   }
 }
 
