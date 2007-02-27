@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.161 2007/02/23 04:09:47 shane Exp $ */
+/* $Id: nanny.cpp,v 1.162 2007/02/27 00:49:23 dcastle Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -368,10 +368,11 @@ void do_on_login_stuff(char_data * ch)
        ch->pcdata->quest_current[i] = 0;
        ch->pcdata->quest_current_ticksleft[i] = 0;
     }
-    if(ch->pcdata->time.logon < 1172203936) {
+    if(ch->pcdata->time.logon < 1172204700) {
       struct vault_data *vault = has_vault(GET_NAME(ch));
       if(vault) {
         int adder = GET_LEVEL(ch) - 50;
+	if (adder < 0) adder = 0; // Heh :P
         vault->size += adder * 10;
         if(vault->size < 100) vault->size = 100;
         save_vault(vault->owner);
