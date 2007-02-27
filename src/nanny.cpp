@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.162 2007/02/27 00:49:23 dcastle Exp $ */
+/* $Id: nanny.cpp,v 1.163 2007/02/27 00:55:35 dcastle Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -368,8 +368,8 @@ void do_on_login_stuff(char_data * ch)
        ch->pcdata->quest_current[i] = 0;
        ch->pcdata->quest_current_ticksleft[i] = 0;
     }
+    struct vault_data *vault = has_vault(GET_NAME(ch));
     if(ch->pcdata->time.logon < 1172204700) {
-      struct vault_data *vault = has_vault(GET_NAME(ch));
       if(vault) {
         int adder = GET_LEVEL(ch) - 50;
 	if (adder < 0) adder = 0; // Heh :P
@@ -378,6 +378,13 @@ void do_on_login_stuff(char_data * ch)
         save_vault(vault->owner);
       }
     }
+
+    if(vault) {
+      if (GET_LEVEL(ch) < 50) vault->size = GET_LEVEL(ch) * 10;
+      else if (vault->size < GET_LEVEL(ch)*10) vault->size = GET_LEVEL(ch) * 10;
+      save_vault(vault->owner);
+    }
+    
     if(ch->pcdata->time.logon < 1151506181) {
        ch->pcdata->quest_points = 0;
        for(int i=0;i<QUEST_PASS;i++)
@@ -643,7 +650,7 @@ void do_on_login_stuff(char_data * ch)
   // Check for deleted characters listed in access list
   char buf[255];
   std::queue<char *> todelete;
-  struct vault_data *vault = has_vault(GET_NAME(ch));
+  vault = has_vault(GET_NAME(ch));
   if (vault) {
     for (vault_access_data *access = vault->access; access && access != (vault_access_data *)0x95959595; access = access->next) {
       if (access->name) {
