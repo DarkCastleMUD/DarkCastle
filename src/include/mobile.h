@@ -1,7 +1,7 @@
 #ifndef MOBILE_H_
 #define MOBILE_H_
 /************************************************************************
-| $Id: mobile.h,v 1.19 2006/11/04 02:54:16 jhhudso Exp $
+| $Id: mobile.h,v 1.20 2007/02/27 14:49:27 dcastle Exp $
 | mobile.h
 | Description:  This file contains the header information for mobile
 |   control.
@@ -69,8 +69,10 @@ struct race_shit
   long suscept;     /* bitvector for susceptibilities */
   long hate_fear;   /* bitvector for hate/fear        */
   long friendly;    /* bitvector for friendliness     */
-  int  weight;      /* average weight of ths race    */
-  int  height;      /* average height for ths race   */
+  int  min_weight;      /* min weight */
+  int  max_weight;
+  int  min_height;      
+  int  max_height;
   int affects;      /* automatically added affects   */
   char *unarmed;    // unarmed attack message
 };
