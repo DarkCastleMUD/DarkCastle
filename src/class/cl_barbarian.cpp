@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_barbarian.cpp,v 1.74 2007/02/09 01:51:45 dcastle Exp $
+| $Id: cl_barbarian.cpp,v 1.75 2007/02/28 16:23:07 dcastle Exp $
 | cl_barbarian.C
 | Description:  Commands for the barbarian class.
 */
@@ -366,7 +366,7 @@ int do_bloodfury(struct char_data *ch, char *argument, int cmd)
   {
     act("$n starts breathing heavily, then chokes and tries to clear $s head.", ch, NULL, NULL, TO_ROOM, NOTVICT);
     send_to_char("You try to pysch yourself up and choke on the taste of blood.\r\n", ch);
-    duration = 28 - (GET_LEVEL(ch) / 5);
+    duration = 30 - (GET_LEVEL(ch) / 6);
   }
   else 
   {
@@ -381,7 +381,7 @@ int do_bloodfury(struct char_data *ch, char *argument, int cmd)
     GET_HIT(ch) += (int)((float)GET_MAX_HIT(ch) * modifier);
     if(GET_HIT(ch) > GET_MAX_HIT(ch))
       GET_HIT(ch) = GET_MAX_HIT(ch);
-    duration = 36 - (GET_LEVEL(ch) / 4);
+    duration = 36 - (GET_LEVEL(ch) / 6);
   }
 
   af.type      = SKILL_BLOOD_FURY;
