@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.164 2007/02/28 16:34:42 dcastle Exp $ */
+/* $Id: nanny.cpp,v 1.165 2007/02/28 17:58:49 dcastle Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -756,14 +756,35 @@ bool allowed_host(char *host)
   return FALSE;
 }
 extern struct race_shit race_info[];
+void heightweight(char_data *ch, bool add)
+{
+  int i, j;
+  for (i=0; i<MAX_WEAR; i++)
+  {
+    if (ch->equipment[i])
+      for (j=0; j<ch->equipment[i]->num_affects; j++)
+      {
+        if (ch->equipment[i]->affected[j].location == APPLY_CHAR_HEIGHT)
+          affect_modify(ch, ch->equipment[i]->affected[j].location,
+                           ch->equipment[i]->affected[j].modifier,
+                           -1, add);
+	else if (ch->equipment[i]->affected[j].location == APPLY_CHAR_WEIGHT)
+          affect_modify(ch, ch->equipment[i]->affected[j].location,
+                           ch->equipment[i]->affected[j].modifier,
+                           -1, add);
+      }
+  }
+}
 
 void check_hw(char_data *ch)
 {
+  heightweight(ch, FALSE);
   if (ch->height > race_info[ch->race].max_height) ch->height = race_info[ch->race].max_height;
   if (ch->height < race_info[ch->race].min_height) ch->height = race_info[ch->race].min_height;
 
   if (ch->weight > race_info[ch->race].max_weight) ch->weight = race_info[ch->race].max_weight;
   if (ch->weight < race_info[ch->race].min_weight) ch->weight = race_info[ch->race].min_weight;
+  heightweight(ch, TRUE);
 }
 
 void set_hw(char_data *ch)
