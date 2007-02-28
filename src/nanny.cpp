@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.163 2007/02/27 00:55:35 dcastle Exp $ */
+/* $Id: nanny.cpp,v 1.164 2007/02/28 16:34:42 dcastle Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -111,6 +111,7 @@ void isr_set(CHAR_DATA *ch);
 bool check_reconnect( struct descriptor_data *d, char *name, bool fReconnect );
 bool check_playing( struct descriptor_data *d, char *name );
 bool on_forbidden_name_list(char *name);
+void check_hw(char_data *ch);
 
 char *str_str(char *first, char *second);
 
@@ -310,6 +311,7 @@ void do_on_login_stuff(char_data * ch)
     redo_mana (ch);
     redo_ki(ch);
     do_inate_race_abilities(ch);
+    check_hw(ch);
     /* Add a character's skill item's to the list. */
     ch->pcdata->skillchange = NULL;
     ch->spellcraftglyph = 0;
@@ -753,6 +755,23 @@ bool allowed_host(char *host)
       return TRUE;
   return FALSE;
 }
+extern struct race_shit race_info[];
+
+void check_hw(char_data *ch)
+{
+  if (ch->height > race_info[ch->race].max_height) ch->height = race_info[ch->race].max_height;
+  if (ch->height < race_info[ch->race].min_height) ch->height = race_info[ch->race].min_height;
+
+  if (ch->weight > race_info[ch->race].max_weight) ch->weight = race_info[ch->race].max_weight;
+  if (ch->weight < race_info[ch->race].min_weight) ch->weight = race_info[ch->race].min_weight;
+}
+
+void set_hw(char_data *ch)
+{
+  ch->height = number(race_info[ch->race].min_height, race_info[ch->race].max_height);
+  ch->weight = number(race_info[ch->race].min_weight, race_info[ch->race].max_weight);
+}
+
 
 // Deal with sockets that haven't logged in yet.
 void nanny(struct descriptor_data *d, char *arg)
@@ -1134,8 +1153,6 @@ is_race_eligible(ch,7)?'*':' ',is_race_eligible(ch,8)?'*':' ',is_race_eligible(c
             
          case '1':
             ch->race = RACE_HUMAN;
-            ch->height = number(66, 77);
-            ch->weight = number(160, 200);
             GET_RAW_STR(ch) += RACE_HUMAN_STR_MOD;
             GET_RAW_INT(ch) += RACE_HUMAN_INT_MOD;
             GET_RAW_WIS(ch) += RACE_HUMAN_WIS_MOD;
@@ -1150,8 +1167,6 @@ is_race_eligible(ch,7)?'*':' ',is_race_eligible(ch,8)?'*':' ',is_race_eligible(c
 		return;
 	    }
             ch->race = RACE_ELVEN;
-            ch->height = number(78, 101);
-            ch->weight = number(120, 160);
             ch->alignment = 1000;
             GET_RAW_STR(ch) += RACE_ELVEN_STR_MOD;
             GET_RAW_INT(ch) += RACE_ELVEN_INT_MOD;
@@ -1167,8 +1182,6 @@ is_race_eligible(ch,7)?'*':' ',is_race_eligible(ch,8)?'*':' ',is_race_eligible(c
                 return;
             }
             ch->race = RACE_DWARVEN;
-            ch->height = number(42, 65);
-            ch->weight = number(140, 180);
             GET_RAW_STR(ch) += RACE_DWARVEN_STR_MOD;
             GET_RAW_INT(ch) += RACE_DWARVEN_INT_MOD;
             GET_RAW_WIS(ch) += RACE_DWARVEN_WIS_MOD;
@@ -1183,8 +1196,6 @@ is_race_eligible(ch,7)?'*':' ',is_race_eligible(ch,8)?'*':' ',is_race_eligible(c
                 return;
             }
             ch->race = RACE_HOBBIT;
-            ch->height = number(20, 41);
-            ch->weight = number(40, 80);
             GET_RAW_STR(ch) += RACE_HOBBIT_STR_MOD;
             GET_RAW_INT(ch) += RACE_HOBBIT_INT_MOD;
             GET_RAW_WIS(ch) += RACE_HOBBIT_WIS_MOD;
@@ -1199,8 +1210,6 @@ is_race_eligible(ch,7)?'*':' ',is_race_eligible(ch,8)?'*':' ',is_race_eligible(c
                 return;
             }
             ch->race = RACE_PIXIE;
-            ch->height = number(12, 33);
-            ch->weight = number(10, 40);
             GET_RAW_STR(ch) += RACE_PIXIE_STR_MOD;
             GET_RAW_INT(ch) += RACE_PIXIE_INT_MOD;
             GET_RAW_WIS(ch) += RACE_PIXIE_WIS_MOD;
@@ -1214,8 +1223,6 @@ is_race_eligible(ch,7)?'*':' ',is_race_eligible(ch,8)?'*':' ',is_race_eligible(c
                 send_to_char("Your stats do not qualify for that race.\r\n",ch);
                 return;
             }            ch->race = RACE_GIANT;
-            ch->height = number(106, 131);
-            ch->weight = number(260, 300);
             GET_RAW_STR(ch) += RACE_GIANT_STR_MOD;
             GET_RAW_INT(ch) += RACE_GIANT_INT_MOD;
             GET_RAW_WIS(ch) += RACE_GIANT_WIS_MOD;
@@ -1230,8 +1237,6 @@ is_race_eligible(ch,7)?'*':' ',is_race_eligible(ch,8)?'*':' ',is_race_eligible(c
                 return;
             }
             ch->race = RACE_GNOME;
-            ch->height = number(42, 65);
-            ch->weight = number(80, 120);
             GET_RAW_STR(ch) += RACE_GNOME_STR_MOD;
             GET_RAW_INT(ch) += RACE_GNOME_INT_MOD;
             GET_RAW_WIS(ch) += RACE_GNOME_WIS_MOD;
@@ -1247,8 +1252,6 @@ is_race_eligible(ch,7)?'*':' ',is_race_eligible(ch,8)?'*':' ',is_race_eligible(c
             }
 
             ch->race = RACE_ORC;
-            ch->height = number(78, 101);
-            ch->weight = number(200, 240);
             ch->alignment = -1000;
             GET_RAW_STR(ch) += RACE_ORC_STR_MOD;
             GET_RAW_INT(ch) += RACE_ORC_INT_MOD;
@@ -1263,8 +1266,6 @@ is_race_eligible(ch,7)?'*':' ',is_race_eligible(ch,8)?'*':' ',is_race_eligible(c
                 return;
             }
 	    ch->race = RACE_TROLL;
-            ch->height = number(102, 123);
-            ch->weight = number(240, 280);
 	    ch->alignment = 0;
             GET_RAW_STR(ch) += RACE_TROLL_STR_MOD;
             GET_RAW_INT(ch) += RACE_TROLL_INT_MOD;
@@ -1272,7 +1273,8 @@ is_race_eligible(ch,7)?'*':' ',is_race_eligible(ch,8)?'*':' ',is_race_eligible(c
             GET_RAW_DEX(ch) += RACE_TROLL_DEX_MOD;
             GET_RAW_CON(ch) += RACE_TROLL_CON_MOD;
          }
-         
+
+	 set_hw(ch);         
          SEND_TO_Q("\n\rA '*' denotes a class that fits your chosen stats.\n\r", d );
          sprintf(buf, " %c 1: Warrior\n\r"
                       " %c 2: Cleric\n\r"
