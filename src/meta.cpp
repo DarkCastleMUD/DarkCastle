@@ -1360,7 +1360,10 @@ int cardinal(struct char_data *ch, struct obj_data *obj, int cmd, char *argument
 	do_inate_race_abilities(ch);
 	extern void verify_max_stats(char_data *ch);
         verify_max_stats(ch);
-	set_heightweight(ch);
+	//set_heightweight(ch);
+	extern void check_hw(char_data *ch);
+	check_hw(ch);
+
 	extern int recheck_height_wears(char_data * ch);
         recheck_height_wears(ch);
 
