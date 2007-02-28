@@ -1,7 +1,7 @@
 #ifndef MOBILE_H_
 #define MOBILE_H_
 /************************************************************************
-| $Id: mobile.h,v 1.20 2007/02/27 14:49:27 dcastle Exp $
+| $Id: mobile.h,v 1.21 2007/02/28 16:35:07 dcastle Exp $
 | mobile.h
 | Description:  This file contains the header information for mobile
 |   control.
@@ -12,7 +12,7 @@ void    mprog_driver            ( char* com_list, CHAR_DATA* mob,
                                        void* vo );
 
 
-#define BASE_STAT      13
+#define BASE_STAT      0
 
 //#define NOTHING      0
 #define ACT_SPEC       1
