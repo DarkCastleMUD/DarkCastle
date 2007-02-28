@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: db.h,v 1.22 2007/01/29 01:07:51 jhhudso Exp $ */
+/* $Id: db.h,v 1.23 2007/02/28 16:34:06 dcastle Exp $ */
 #ifndef DB_H_
 #define DB_H_
 
@@ -47,7 +47,8 @@ extern "C" {
 #define ZONE_MODIFIED      1<<2
 #define ZONE_UNUSED        1<<3
 #define ZONE_BPORT	   1<<4
-#define ZONE_NOCLAIM        1<<5 // cannot claim this area
+#define ZONE_NOCLAIM       1<<5 // cannot claim this area
+#define ZONE_NOHUNT        1<<6
 // Remember to update const.C  zone_bits[] if you change this
 
 
