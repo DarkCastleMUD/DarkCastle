@@ -1254,11 +1254,12 @@ char *race_message(char_data *ch, int race)
 }
 
 
+extern struct race_shit race_info[];
+
 int cardinal(struct char_data *ch, struct obj_data *obj, int cmd, char *argument, struct char_data *owner)
 {
   if (cmd == 59) // list
   {
-    extern struct race_shit race_info[];
 
     send_to_char("$B$2Cardinal Thelonius tells you, 'Here's what I can do for you...'$R\r\nEnter \"buy <number>\" to make a selection.\r\n\r\n",ch);
     send_to_char("$BRace Change:$R\r\n(Remember a race change will reduce your base attributes by 2 points each.)\r\n",ch);
@@ -1270,6 +1271,29 @@ int cardinal(struct char_data *ch, struct obj_data *obj, int cmd, char *argument
 
     csendf(ch, "$B$3%d)$R %-24s - 1000 platinum coins.\r\n", MAX_PC_RACE+1,"Sex Change");
     csendf(ch, "$B$3%d)$R %-24s - 50 platinum coins.\r\n", MAX_PC_RACE+2,"A deep red vial of mana");
+
+    send_to_char("$BHeight/Weight Change:$R\r\n",ch);
+
+    if (ch->height < race_info[ch->race].max_height) 
+	csendf(ch,"$B$3%d)$R %-24s - 250 platinum coins.\r\n", MAX_PC_RACE+3, "Increase your height by 1");
+    else
+	csendf(ch,"$B$3%d)$R %-24s.\r\n", MAX_PC_RACE+3, "You cannot increase your height further");
+
+    if (ch->height > race_info[ch->race].min_height)
+	csendf(ch,"$B$3%d)$R %-24s - 250 platinum coins.\r\n", MAX_PC_RACE+4, "Decrease your height by 1");
+    else
+	csendf(ch,"$B$3%d)$R %-24s.\r\n", MAX_PC_RACE+4, "You cannot decrease your height further");
+
+    if (ch->weight < race_info[ch->race].max_weight) 
+	csendf(ch,"$B$3%d)$R %-24s - 250 platinum coins.\r\n", MAX_PC_RACE+5, "Increase your weight by 1");
+    else
+	csendf(ch,"$B$3%d)$R %-24s.\r\n", MAX_PC_RACE+5, "You cannot increase your weight further");
+
+    if (ch->weight > race_info[ch->race].min_weight)
+	csendf(ch,"$B$3%d)$R %-24s - 250 platinum coins.\r\n", MAX_PC_RACE+6, "Decrease your weight by 1");
+    else
+	csendf(ch,"$B$3%d)$R %-24s.\r\n", MAX_PC_RACE+6, "You cannot decrease your weight further");
+
     return eSUCCESS;
   } 
   else if (cmd == 56) // buy
@@ -1395,6 +1419,30 @@ int cardinal(struct char_data *ch, struct obj_data *obj, int cmd, char *argument
       obj_to_char(obj,ch);
       send_to_char("$B$2Cardinal Thelonius tells you, 'Here is your potion.'$R\r\n",ch);
       return eSUCCESS;      
+    } else if (choice >= MAX_PC_RACE+3 && choice <= MAX_PC_RACE+6) {
+      choice -= MAX_PC_RACE;
+
+      if (choice == 3 && ch->height >= race_info[ch->race].max_height)
+      { send_to_char("You cannot increase your height any more.\r\n",ch); return eSUCCESS;}    
+      else if (choice == 4 && ch->height <= race_info[ch->race].max_height)
+      { send_to_char("You cannot decrease your height any more.\r\n",ch); return eSUCCESS;} 
+      else if (choice == 5 && ch->weight >= race_info[ch->race].max_weight)
+      { send_to_char("You cannot increase your weight any more.\r\n",ch); return eSUCCESS;}  
+      else if (choice == 6 && ch->weight <= race_info[ch->race].max_weight)
+      { send_to_char("You cannot decrease your weight any more.\r\n",ch); return eSUCCESS;}
+      
+      if (GET_PLATINUM(ch) < 250)
+      {
+	send_to_char("You cannot afford it.\r\n",ch);
+	return eSUCCESS;
+      }
+      GET_PLATINUM(ch) -= 250;
+      send_to_char("Cardinal Thelonius gropes you.\r\n",ch);
+      if (choice == 3) ch->height++;
+      if (choice == 4) ch->height--;
+      if (choice == 5) ch->weight++;
+      if (choice == 6) ch->weight--;
+      return eSUCCESS;
     } else {
       send_to_char("$B$2Cardinal Thelonius tells you, 'I don't have that. Try \"list\".'$R\n\r", ch);
       return eSUCCESS;
