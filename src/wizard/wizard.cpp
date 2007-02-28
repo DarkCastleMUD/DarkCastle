@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.40 2007/02/25 13:53:23 dcastle Exp $
+| $Id: wizard.cpp,v 1.41 2007/02/28 16:33:55 dcastle Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -1598,8 +1598,12 @@ void begin_hunt(int item, int time, int amount, char *huntname)
 	(mob_index[mob].virt < 1900 || mob_index[mob].virt > 1999) && 
 	(mob_index[mob].virt < 10500 || mob_index[mob].virt > 10622) && 
 	(mob_index[mob].virt < 8500 || mob_index[mob].virt > 8699 ))) continue;
+
+
         if (mob_index[mob].number <= 0) continue;
 	if (!(vict = get_random_mob_vnum(vnum))) continue;
+        if (IS_SET(zone_table[world[vict->in_room].zone].zone_flags, ZONE_NOHUNT)) continue;
+
 	if (strlen(vict->short_desc) > 34) continue; // They suck
 
 	break;
