@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.90 2007/02/28 16:34:22 dcastle Exp $
+| $Id: objects.cpp,v 1.91 2007/03/01 02:39:17 shane Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -429,6 +429,7 @@ int do_recite(struct char_data *ch, char *argument, int cmd)
             ((ubyte) scroll->obj_flags.value[0], ch, "", SPELL_TYPE_SCROLL, victim, obj, lvl));
           if(SOMEONE_DIED(retval))
             break;
+          if(victim && ch->in_room != victim->in_room) break;
         }
       }
     }
