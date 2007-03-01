@@ -1265,7 +1265,7 @@ int cardinal(struct char_data *ch, struct obj_data *obj, int cmd, char *argument
     send_to_char("$BRace Change:$R\r\n(Remember a race change will reduce your base attributes by 2 points each.)\r\n",ch);
 
     for (int i = 1; i <= MAX_PC_RACE; i++)
-      csendf(ch, "$B$3%d)$R %-25s - %s\r\n", i, race_info[i].singular_name, race_message(ch, i));
+      csendf(ch, "$B$3%d)$R  %-24s - %s\r\n", i, race_info[i].singular_name, race_message(ch, i));
 
     send_to_char("$BOther Services:$R\r\n",ch);
 
