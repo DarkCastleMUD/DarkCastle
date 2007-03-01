@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: who.cpp,v 1.42 2007/02/10 19:40:21 dcastle Exp $
+| $Id: who.cpp,v 1.43 2007/03/01 02:18:14 shane Exp $
 | who.C
 | Commands for who, maybe? :P
 */
@@ -282,11 +282,14 @@ int do_who(struct char_data *ch, char *argument, int cmd)
     char  arg[MAX_INPUT_LENGTH];
     char  oneword[MAX_INPUT_LENGTH];
     char  buf[MAX_STRING_LENGTH];
+    char  immbuf[MAX_STRING_LENGTH];
     int   charmatch = 0;
     char  charname[MAX_INPUT_LENGTH];
     int   charmatchistrue = 0;
     int   clss = 0;
     int   levelarg = 0;
+    int   lowlevel = 0;
+    int   highlevel = 110;
     int   anoncheck = 0;
     int   sexcheck = 0;
     int   sextype = 0;
@@ -296,7 +299,9 @@ int do_who(struct char_data *ch, char *argument, int cmd)
     int   lfgcheck = 0;
     int   guidecheck = 0;
     int   race = 0;
+    bool  addimmbuf;
     charname[0] = '\0';
+    immbuf[0] = '\0';
     char* immortFields[] = {
         "   Immortal  ",
         "  Architect  ",
@@ -341,8 +346,16 @@ int do_who(struct char_data *ch, char *argument, int cmd)
     //  Loop through all our arguments
     for(half_chop(argument, oneword, arg);  strlen(oneword);  half_chop(arg, oneword, arg))
     {
-        if((levelarg = atoi(oneword))) 
-            continue;
+        if((levelarg = atoi(oneword))) {
+          if(!lowlevel) lowlevel = levelarg;
+          else if(lowlevel > levelarg) {
+            highlevel = lowlevel;
+            lowlevel = levelarg;
+          } else {
+            highlevel = levelarg;
+          }
+            continue;        
+        }
 
         currentmatch = 0;
 
@@ -450,16 +463,17 @@ int do_who(struct char_data *ch, char *argument, int cmd)
         charmatchistrue = is_abbrev(charname, GET_NAME(i));
         if(charmatch && !charmatchistrue)                                       continue;
         if(clss && GET_CLASS(i) != clss && !charmatchistrue)                    continue;
-        if(GET_LEVEL(i) < levelarg || 
-            (!strcmp(GET_NAME(i), "Pirahna") && levelarg > PIRAHNA_FAKE_LVL )
+        if(GET_LEVEL(i) < lowlevel || 
+            (!strcmp(GET_NAME(i), "Pirahna") && lowlevel > PIRAHNA_FAKE_LVL )
           )                                                                     continue;
+        if(GET_LEVEL(i) > highlevel)                                            continue;
         if(clss && !hasholylight && (!i->clan || i->clan != ch->clan) && IS_ANONYMOUS(i) && GET_LEVEL(i) < MIN_GOD)  continue;
         if(anoncheck && !IS_ANONYMOUS(i) && !charmatchistrue)                   continue;
         if(sexcheck && ( GET_SEX(i) != sextype || 
                          ( IS_ANONYMOUS(i) && !hasholylight) 
                        ) && !charmatchistrue
           )                                                                     continue;
-        if(levelarg > 0 && IS_ANONYMOUS(i) && !hasholylight)                    continue;
+        if(lowlevel > 0 && IS_ANONYMOUS(i) && !hasholylight)                    continue;
         if(lfgcheck && !IS_SET(i->pcdata->toggles, PLR_LFG))                    continue;
         if(guidecheck && !IS_SET(i->pcdata->toggles, PLR_GUIDE_TOG))            continue;
         if(race && GET_RACE(i) != race && !charmatchistrue) continue;
@@ -467,13 +481,10 @@ int do_who(struct char_data *ch, char *argument, int cmd)
         infoField = infoBuf;
         extraBuf[0] = '\0';
         buf[0]      = '\0';
+        addimmbuf = FALSE;
         if(GET_LEVEL(i) > MORTAL) {
             /* Immortals can't be anonymous */
             infoField = immortFields[GET_LEVEL(i) - IMMORTAL];
-	    //	    if (!strcmp(GET_NAME(i),"Julian")) {
-	    //	  	infoField = infoBuf;
-	    //		sprintf(infoBuf, "    Lackey   ");
-	    //	    }
 	     if (!str_cmp(GET_NAME(i), "Urizen")) {
 		infoField = infoBuf;
 		sprintf(infoBuf, "   Meatball  ");
@@ -511,6 +522,7 @@ int do_who(struct char_data *ch, char *argument, int cmd)
                 else sprintf(extraBuf," (WizInvis %ld)", i->pcdata->wizinvis);
             }
             numImmort++;
+            addimmbuf = TRUE;
         }
         else {
             if(!IS_ANONYMOUS(i) || (ch->clan && ch->clan == i->clan) || hasholylight) {
@@ -548,8 +560,12 @@ int do_who(struct char_data *ch, char *argument, int cmd)
                 infoField,   preBuf, GET_SHORT(i),   i->title,
                 extraBuf,    tailBuf);
         
-        add_to_who(buf);
+        if(addimmbuf) strcat(immbuf, buf);
+        else add_to_who(buf);
     }
+
+    if(numPC && numImmort) add_to_who("\n\r");
+    if(numImmort) add_to_who(immbuf);
     
     if ((numPC + numImmort) > max_who)
         max_who = numPC + numImmort;

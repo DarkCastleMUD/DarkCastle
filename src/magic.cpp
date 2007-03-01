@@ -207,6 +207,7 @@ int spell_magic_missile(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct ob
   int dam;
   int count = 1;
   int retval = eSUCCESS;
+  int weap_spell = obj?WIELD:0;
 
   set_cantquit( ch, victim );
   dam = 50;
@@ -215,7 +216,7 @@ int spell_magic_missile(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct ob
 	/* Spellcraft Effect */
     if (spellcraft(ch, SPELL_MAGIC_MISSILE)) count++;
     while(!SOMEONE_DIED(retval) && count--)
-    retval = damage(ch, victim, dam, TYPE_MAGIC, SPELL_MAGIC_MISSILE, 0);
+    retval = damage(ch, victim, dam, TYPE_MAGIC, SPELL_MAGIC_MISSILE, weap_spell);
   return retval;
 }
 
@@ -227,7 +228,8 @@ int spell_chill_touch(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
   struct affected_type af;
   int dam = 250;
   int save;
-  int retval = damage(ch, victim, dam, TYPE_COLD, SPELL_CHILL_TOUCH, 0);
+  int weap_spell = obj?WIELD:0;
+  int retval = damage(ch, victim, dam, TYPE_COLD, SPELL_CHILL_TOUCH, weap_spell);
 
   bool hasSpellcraft = spellcraft(ch, SPELL_CHILL_TOUCH);
 
@@ -283,9 +285,10 @@ int spell_shocking_grasp(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct o
 int spell_lightning_bolt(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
   int dam;
+  int weap_spell = obj?WIELD:0;
   set_cantquit( ch, victim );
   dam = 200;
-  return damage(ch, victim, dam, TYPE_ENERGY, SPELL_LIGHTNING_BOLT, 0);
+  return damage(ch, victim, dam, TYPE_ENERGY, SPELL_LIGHTNING_BOLT, weap_spell);
 }
 
 
@@ -294,9 +297,10 @@ int spell_lightning_bolt(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct o
 int spell_colour_spray(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
    int dam;
+   int weap_spell = obj?WIELD:0;
    set_cantquit( ch, victim );
    dam = 350;
-   int retval = damage(ch, victim, dam, TYPE_MAGIC, SPELL_COLOUR_SPRAY, 0);
+   int retval = damage(ch, victim, dam, TYPE_MAGIC, SPELL_COLOUR_SPRAY, weap_spell);
 
    if(SOMEONE_DIED(retval))
      return retval;
@@ -320,6 +324,7 @@ int spell_drown(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *
 {
    char buf[256];
    int dam, retval;
+   int weap_spell = obj?WIELD:0;
 
 	/* Does not work in Desert or Underwater */
    if(world[ch->in_room].sector_type == SECT_DESERT) {
@@ -333,7 +338,7 @@ int spell_drown(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *
 
    set_cantquit( ch, victim );
    dam = 250;
-   retval = damage(ch, victim, dam, TYPE_WATER, SPELL_DROWN, 0);
+   retval = damage(ch, victim, dam, TYPE_WATER, SPELL_DROWN, weap_spell);
    if(SOMEONE_DIED(retval))
      return retval;
 
@@ -432,6 +437,7 @@ int spell_souldrain(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
 int spell_vampiric_touch (ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
   int dam;
+  int weap_spell = obj?WIELD:0;
   set_cantquit( ch, victim );
   dam = 225;
   int adam = dam_percent(skill, 225); // Actual damage, for drainy purposes.
@@ -442,7 +448,7 @@ int spell_vampiric_touch (ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct 
   }
 
   int i = GET_HIT(victim);
-  int retval =  damage (ch, victim, dam,TYPE_COLD, SPELL_VAMPIRIC_TOUCH, 0);
+  int retval =  damage (ch, victim, dam,TYPE_COLD, SPELL_VAMPIRIC_TOUCH, weap_spell);
   if (!SOMEONE_DIED(retval) && GET_HIT(victim) >= i) return retval;
       
   if (!SOMEONE_DIED(retval))
@@ -461,10 +467,11 @@ int spell_vampiric_touch (ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct 
 int spell_meteor_swarm(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
   int dam;
+  int weap_spell = obj?WIELD:0;
   set_cantquit( ch, victim );
   dam = 500;
   int retval;
-  retval = damage(ch, victim, dam,TYPE_PHYSICAL_MAGIC, SPELL_METEOR_SWARM, 0);
+  retval = damage(ch, victim, dam,TYPE_PHYSICAL_MAGIC, SPELL_METEOR_SWARM, weap_spell);
 
 	/* Spellcraft Effect */
   if (!SOMEONE_DIED(retval) && spellcraft(ch, SPELL_METEOR_SWARM)
@@ -485,9 +492,10 @@ int spell_meteor_swarm(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
 int spell_fireball(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
    int dam;
+   int weap_spell = obj?WIELD:0;
    set_cantquit( ch, victim );
    dam = 300;
-   int retval = damage(ch, victim, dam, TYPE_FIRE, SPELL_FIREBALL, 0);
+   int retval = damage(ch, victim, dam, TYPE_FIRE, SPELL_FIREBALL, weap_spell);
 
    if(SOMEONE_DIED(retval) || ch->in_room != victim->in_room)
      return retval;
@@ -497,7 +505,7 @@ int spell_fireball(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
    if(IS_SET(retval,eEXTRA_VALUE)) return retval;
 
 	/* Fireball Recombining Effect */
-   if (has_skill(ch, SPELL_FIREBALL) > 80)
+   if (skill > 80)
    if(number(0, 100) < ( skill / 5 ) ) {
      act("The expanding $B$4flames$R suddenly recombine and fly at $N again!", ch, 0, victim, TO_ROOM, 0);
      act("The expanding $B$4flames$R suddenly recombine and fly at $N again!", ch, 0, victim, TO_CHAR, 0);
@@ -512,9 +520,10 @@ int spell_fireball(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
 int spell_sparks(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
    int dam;
+   int weap_spell = obj?WIELD:0;
    set_cantquit( ch, victim );
    dam = dice(level, 6);
-   return damage(ch, victim, dam, TYPE_FIRE, SPELL_SPARKS, 0);
+   return damage(ch, victim, dam, TYPE_FIRE, SPELL_SPARKS, weap_spell);
 }
 
 
@@ -524,13 +533,14 @@ int spell_howl(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
 {
    char_data * tmp_char;
    int retval;
+   int weap_spell = obj?WIELD:0;
    set_cantquit( ch, victim );
 
    if(saves_spell(ch, victim, 5, SAVE_TYPE_MAGIC) >= 0)
     {
-      return damage(ch, victim, 0, TYPE_SONG, SPELL_HOWL, 0);
+      return damage(ch, victim, 0, TYPE_SONG, SPELL_HOWL, weap_spell);
     }
-   retval = damage(ch, victim, 300, TYPE_SONG, SPELL_HOWL, 0);
+   retval = damage(ch, victim, 300, TYPE_SONG, SPELL_HOWL, weap_spell);
 
    if(SOMEONE_DIED(retval))
      return retval;
@@ -774,6 +784,7 @@ int spell_earthquake(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 {
   int dam;
   int retval = 0;
+  int weap_spell = obj?WIELD:0;
   CHAR_DATA *tmp_victim, *temp;
   dam = 150;
 
@@ -803,7 +814,7 @@ int spell_earthquake(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 		     dam = 0;
 		  }
 
-		  retval = damage(ch, tmp_victim, dam, TYPE_MAGIC, SPELL_EARTHQUAKE, 0);
+		  retval = damage(ch, tmp_victim, dam, TYPE_MAGIC, SPELL_EARTHQUAKE, weap_spell);
 	 } 
          else if (world[ch->in_room].zone == world[tmp_victim->in_room].zone)
            send_to_char("The earth trembles and shivers.\n\r", tmp_victim);
@@ -818,6 +829,7 @@ int spell_earthquake(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 int spell_life_leech(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
   int dam,retval = eSUCCESS;
+  int weap_spell = obj?WIELD:0;
   CHAR_DATA *tmp_victim, *temp;
 
   if(IS_SET(world[ch->in_room].room_flags, SAFE)) 
@@ -853,7 +865,7 @@ int spell_life_leech(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 
 		 if (GET_HIT(ch) > GET_MAX_HIT(ch))
 		  GET_HIT(ch) = GET_MAX_HIT(ch);
-		 retval &= damage (ch, tmp_victim, dam,TYPE_POISON, SPELL_LIFE_LEECH, 0);
+		 retval &= damage (ch, tmp_victim, dam,TYPE_POISON, SPELL_LIFE_LEECH, weap_spell);
 	}
   }
   return retval;
@@ -1032,17 +1044,16 @@ int spell_group_recall(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
 {
   CHAR_DATA *tmp_victim, *temp;
   int chance;
-  int learned = has_skill(ch, SPELL_GROUP_RECALL);
 
-  if (learned < 40) {
+  if (skill < 40) {
     chance = 5;
-  } else if (learned > 40 && learned <= 60) {
+  } else if (skill > 40 && skill <= 60) {
     chance = 4;
-  } else if (learned > 60 && learned <= 80) {
+  } else if (skill > 60 && skill <= 80) {
     chance = 3;
-  } else if (learned > 80 && learned <= 90) {
+  } else if (skill > 80 && skill <= 90) {
     chance = 2;
-  } else if (learned > 90) {
+  } else if (skill > 90) {
     chance = 1;
   }
 
@@ -1201,6 +1212,7 @@ int spell_firestorm(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
 int spell_dispel_evil(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
   int dam, align;
+  int weap_spell = obj?WIELD:0;
   set_cantquit( ch, victim );
   if (IS_EVIL(ch))
 	 victim = ch;
@@ -1213,7 +1225,7 @@ int spell_dispel_evil(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
   if(align < 0) align = 0-align;
   dam = 350 + align / 10;
 
-  return damage(ch, victim, dam, TYPE_COLD, SPELL_DISPEL_EVIL, 0);
+  return damage(ch, victim, dam, TYPE_COLD, SPELL_DISPEL_EVIL, weap_spell);
 }
 
 
@@ -1221,7 +1233,7 @@ int spell_dispel_evil(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
 
 int spell_dispel_good(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
-  int dam, align;
+  int dam, align;  int weap_spell = obj?WIELD:0;
   set_cantquit( ch, victim );
   if (IS_GOOD(ch))
 	 victim = ch;
@@ -1234,7 +1246,7 @@ int spell_dispel_good(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
   if(align < 0) align = 0-align;
   dam = 350 + align / 10;
 
-  return damage(ch, victim, dam, TYPE_COLD, SPELL_DISPEL_GOOD, 0);
+  return damage(ch, victim, dam, TYPE_COLD, SPELL_DISPEL_GOOD, weap_spell);
 }
 
 
@@ -1260,10 +1272,11 @@ int spell_call_lightning(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct o
 int spell_harm(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
   int dam;
+  int weap_spell = obj?WIELD:0;
   set_cantquit( ch, victim );
   dam = 150;
 
-  return damage(ch, victim, dam, TYPE_MAGIC, SPELL_HARM, 0);
+  return damage(ch, victim, dam, TYPE_MAGIC, SPELL_HARM, weap_spell);
 }
 
 
@@ -1272,6 +1285,7 @@ int spell_harm(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
 int spell_power_harm(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
   int dam;
+  int weap_spell = obj?WIELD:0;
   set_cantquit( ch, victim );
 
   if(IS_EVIL(ch))
@@ -1281,7 +1295,7 @@ int spell_power_harm(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
   else
      dam = 300;
 
-  return damage(ch, victim, dam, TYPE_MAGIC, SPELL_POWER_HARM, 0);
+  return damage(ch, victim, dam, TYPE_MAGIC, SPELL_POWER_HARM, weap_spell);
 }
 
 
@@ -1521,9 +1535,8 @@ int spell_paralyze(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
   af.location  = APPLY_NONE;
   af.modifier  = 0;
   af.duration  = 2;
-  int learned = has_skill(ch, SPELL_PARALYZE);
-  if (learned > 75) af.duration++;
-  if (learned > 50) af.duration++;
+  if (skill > 75) af.duration++;
+  if (skill > 50) af.duration++;
   if (spellcraft(ch, SPELL_PARALYZE))  af.duration++;
   af.bitvector = AFF_PARALYSIS;
   affect_to_char(victim, &af);
@@ -1816,7 +1829,7 @@ int spell_curse(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *
   struct affected_type af;
   int retval;
 
-  if (obj) {
+  if (obj && obj != ch->equipment[WIELD] && obj != ch->equipment[SECOND_WIELD]) {  //hack for weapon spells
 	 SET_BIT(obj->obj_flags.extra_flags, ITEM_NODROP);
          act("$p glows $4red$R momentarily, before returning to its original color.", ch, obj, 0, TO_CHAR, 0);
 	 /* LOWER ATTACK DICE BY -1 */
@@ -2047,7 +2060,6 @@ int spell_infravision(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
 int spell_detect_magic(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
   struct affected_type af;
-  int learned = has_skill(ch, SPELL_DETECT_MAGIC);
 
   if(!victim)
   {
@@ -2060,7 +2072,7 @@ int spell_detect_magic(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
 
   af.type      = SPELL_DETECT_MAGIC;
   af.duration  = 6 + skill / 2;
-  af.modifier  = learned;
+  af.modifier  = skill;
   af.location  = APPLY_NONE;
   af.bitvector = AFF_DETECT_MAGIC;
 
@@ -2841,7 +2853,6 @@ bool find_spell_shield(CHAR_DATA *ch, CHAR_DATA *victim)
 int spell_fireshield(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
   struct affected_type af;
-  int learned = has_skill(ch, SPELL_FIRESHIELD);
 
   if (find_spell_shield(ch, victim) && IS_PC(victim))
     return eFAILURE;
@@ -2853,7 +2864,7 @@ int spell_fireshield(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 
     af.type      = SPELL_FIRESHIELD;
     af.duration  = 1 + skill / 23;
-    af.modifier  = learned;
+    af.modifier  = skill;
     af.location  = APPLY_NONE;
     af.bitvector = AFF_FIRESHIELD;
     affect_to_char(victim, &af);
@@ -4541,7 +4552,6 @@ int spell_know_alignment(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct o
 {
   int duration;
   struct affected_type af, *cur_af;
-  int learned = has_skill(ch, SPELL_KNOW_ALIGNMENT);
 
   if(!ch) {
     log("NULL ch sent to know_alignment!", ANGEL, LOG_BUG);
@@ -4551,13 +4561,13 @@ int spell_know_alignment(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct o
   if((cur_af = affected_by_spell(victim, SPELL_KNOW_ALIGNMENT)))
     affect_remove(victim, cur_af, SUPPRESS_ALL);
 
-  if (learned <= 40)
+  if (skill <= 40)
     duration = level / 5;
-  else if (learned > 40 && learned <= 60)
+  else if (skill > 40 && skill <= 60)
     duration = level / 4;
-  else if (learned > 60 && learned <= 80)
+  else if (skill > 60 && skill <= 80)
     duration = level / 3;
-  else if (learned > 80)
+  else if (skill > 80)
     duration = level /2;
 
   if (skill == 150) duration = 2;
@@ -4566,7 +4576,7 @@ int spell_know_alignment(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct o
 
   af.type      = SPELL_KNOW_ALIGNMENT;
   af.duration  = duration;
-  af.modifier  = learned;
+  af.modifier  = skill;
   af.location  = APPLY_NONE;
   af.bitvector = AFF_KNOW_ALIGN;
   affect_to_char(ch, &af);
@@ -4639,10 +4649,9 @@ int spell_dispel_minor(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
    }
 
    int savebonus = 0;
-   int learned = has_skill(ch, SPELL_DISPEL_MINOR);
-   if (learned < 41) savebonus = 20;
-   else if (learned < 61) savebonus = 15;
-   else if (learned < 81) savebonus = 10;
+   if (skill < 41) savebonus = 20;
+   else if (skill < 61) savebonus = 15;
+   else if (skill < 81) savebonus = 10;
    else savebonus = 5;
     
    if (spell && savebonus != 5)
@@ -4883,10 +4892,9 @@ int spell_dispel_magic(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
       victim = ch;
    }*/
    int savebonus = 0;
-   int learned = has_skill(ch, SPELL_DISPEL_MAGIC);
-        if (learned < 41) savebonus = 20;
-   else if (learned < 61) savebonus = 15;
-   else if (learned < 81) savebonus = 10;
+        if (skill < 41) savebonus = 20;
+   else if (skill < 61) savebonus = 15;
+   else if (skill < 81) savebonus = 10;
    else savebonus = 5;
 
    if (spell && savebonus != 5)
@@ -5115,7 +5123,8 @@ int spell_cure_serious(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
 int spell_cause_light(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
    int dam;
-   
+   int weap_spell = obj?WIELD:0;
+
    if (!ch || !victim) {
       log("Null ch or victim sent to cause_light", ANGEL, LOG_BUG);
       return eFAILURE;
@@ -5123,7 +5132,7 @@ int spell_cause_light(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
 
    set_cantquit(ch, victim);
    dam = dice(1, 8) + (skill/3);
-   return damage(ch, victim, dam, TYPE_MAGIC, SPELL_CAUSE_LIGHT, 0);
+   return damage(ch, victim, dam, TYPE_MAGIC, SPELL_CAUSE_LIGHT, weap_spell);
 }
 
 
@@ -5132,6 +5141,7 @@ int spell_cause_light(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
 int spell_cause_critical(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
     int dam;
+    int weap_spell = obj?WIELD:0;
 
     if(!ch || !victim)
     {
@@ -5143,7 +5153,7 @@ int spell_cause_critical(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct o
     
     dam = dice(3,8)-6+skill/2;
 
-    return damage(ch, victim, dam, TYPE_MAGIC, SPELL_CAUSE_CRITICAL, 0);
+    return damage(ch, victim, dam, TYPE_MAGIC, SPELL_CAUSE_CRITICAL, weap_spell);
 }
 
 
@@ -5171,6 +5181,7 @@ int spell_cause_serious(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct ob
 int spell_flamestrike(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
    int dam, retval;
+   int weap_spell = obj?WIELD:0;
 
    if (!ch || !victim) {
       log("NULL ch or victim sent to flamestrike!", ANGEL, LOG_BUG);
@@ -5180,7 +5191,7 @@ int spell_flamestrike(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
    set_cantquit (ch, victim);
    dam = 375;
 
-   retval = damage(ch, victim, dam, TYPE_FIRE, SPELL_FLAMESTRIKE, 0);
+   retval = damage(ch, victim, dam, TYPE_FIRE, SPELL_FLAMESTRIKE, weap_spell);
 
    if(SOMEONE_DIED(retval))
       return retval;
@@ -5418,7 +5429,6 @@ int spell_weaken(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data 
     struct affected_type * cur_af;
     int retval;
     int duration = 0, str = 0, con = 0;
-    int learned = has_skill(ch, SPELL_WEAKEN);
     void check_weapon_weights(char_data * ch);
 
     if(!ch || !victim)
@@ -5427,19 +5437,19 @@ int spell_weaken(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data 
         return eFAILURE;
     }
 
-     if (learned < 40) { 
+     if (skill < 40) { 
        duration = 2; 
        str = -4; 
        con = -1; 
-     } else if (learned > 40 && learned <= 60) { 
+     } else if (skill > 40 && skill <= 60) { 
        duration = 3; 
        str = -8; 
        con = -2; 
-     } else if (learned > 60 && learned <= 80) { 
+     } else if (skill > 60 && skill <= 80) { 
        duration = 4; 
        str = -10; 
        con = -3; 
-     } else if (learned > 80) {
+     } else if (skill > 80) {
        duration = 5; 
        str = -12;  
        con = -4;
@@ -5532,10 +5542,10 @@ int spell_mass_invis(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 int spell_acid_blast(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
    int dam;
-
+   int weap_spell = obj?WIELD:0;
    set_cantquit (ch, victim);
    dam = 375;
-   return damage(ch, victim, dam,TYPE_ACID, SPELL_ACID_BLAST, 0);
+   return damage(ch, victim, dam,TYPE_ACID, SPELL_ACID_BLAST, weap_spell);
 }
 
 
@@ -9220,10 +9230,11 @@ int spell_bee_sting(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
    int i;
    set_cantquit(ch, victim);
    dam = dice (4, 3) + skill/3;
+   int weap_spell = obj?WIELD:0;
 
    for (i = 0; i < bees; i++) {
 
-   retval = damage(ch, victim, dam, TYPE_PHYSICAL_MAGIC, SPELL_BEE_STING, 0);
+   retval = damage(ch, victim, dam, TYPE_PHYSICAL_MAGIC, SPELL_BEE_STING, weap_spell);
    if(SOMEONE_DIED(retval))
       return retval;
    }
@@ -9694,11 +9705,10 @@ int spell_entangle(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
 	act("$n raises the plants which attack $N!", ch, 0, victim,
 		TO_ROOM, NOTVICT);
 
-        int learned = has_skill(ch, SPELL_ENTANGLE);
-	if (learned)
+	if (skill)
         {
-        learned = 800 / learned - 1; // get the number for percentage
-        if(!number(0, learned))
+        skill = 800 / skill - 1; // get the number for percentage
+        if(!number(0, skill))
            spell_blindness(level, ch, victim, 0, 0);       /* The plants blind the victim . . */
 	}
 	if (GET_POS(victim) > POSITION_SITTING)
@@ -10807,26 +10817,25 @@ int cast_sun_ray( ubyte level, CHAR_DATA *ch, char *arg, int type,
 int spell_rapid_mend(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
     struct affected_type af;
-    int learned = has_skill(ch, SPELL_RAPID_MEND);
     int regen = 0, duration = 0;
 
     if(!affected_by_spell(victim, SPELL_RAPID_MEND)) {
        act("$n starts to heal more quickly.", victim, 0, 0, TO_ROOM, INVIS_NULL);
        send_to_char("You feel your body begin to heal more quickly.\n\r", victim);
 
-       if (learned < 40) {
+       if (skill < 40) {
          duration = 3;
          regen = 4;
-       } else if (learned > 40 && learned <= 60) {
+       } else if (skill > 40 && skill <= 60) {
          duration = 3;
          regen = 6;
-       } else if (learned > 60 && learned <= 80) {
+       } else if (skill > 60 && skill <= 80) {
          duration = 4;
          regen = 8;
-       } else if (learned > 80 && learned <= 90) {
+       } else if (skill > 80 && skill <= 90) {
          duration = 5;
          regen = 10;
-       } else if (learned > 90) {
+       } else if (skill > 90) {
          duration = 6;
          regen = 12;
        }
@@ -10927,7 +10936,6 @@ int cast_iron_roots(ubyte level, CHAR_DATA *ch, char *arg, int type,
 int spell_acid_shield(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
   struct affected_type af;
-  int learned = has_skill(ch, SPELL_ACID_SHIELD);
 
   if (find_spell_shield(ch, victim) && IS_PC(victim))
     return eFAILURE;
@@ -10939,7 +10947,7 @@ int spell_acid_shield(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
 
     af.type      = SPELL_ACID_SHIELD;
     af.duration  = 2 + (skill / 23);
-    af.modifier  = learned;
+    af.modifier  = skill;
     af.location  = APPLY_NONE;
     af.bitvector = -1;
     affect_to_char(victim, &af);
@@ -11039,25 +11047,24 @@ int cast_water_breathing( ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_
 int spell_globe_of_darkness(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
   obj_data * globe;
-  int learned = has_skill(ch, SPELL_GLOBE_OF_DARKNESS);
   int dur = 0, mod = 0;
 
-  if (learned <= 20) {
+  if (skill <= 20) {
     dur = 2;
     mod = 10;
-  } else if (learned > 20 && learned <= 40) {
+  } else if (skill > 20 && skill <= 40) {
     dur = 3;
     mod = 15;
-  } else if (learned > 40 && learned <= 60) {
+  } else if (skill > 40 && skill <= 60) {
     dur = 3;
     mod = 15;
-  } else if (learned > 60 && learned <= 80) {
+  } else if (skill > 60 && skill <= 80) {
     dur = 4;
     mod = 20;
-  } else if (learned > 80 && learned <= 90) {
+  } else if (skill > 80 && skill <= 90) {
     dur = 4;
     mod = 20;
-  } else if (learned > 90) {
+  } else if (skill > 90) {
     dur = 5;
     mod = 25;
   }
@@ -11205,7 +11212,6 @@ int cast_ice_shards( ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA 
 int spell_lightning_shield(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
   struct affected_type af;
-  int learned = has_skill(ch, SPELL_LIGHTNING_SHIELD);
 
   if (find_spell_shield(ch, victim) && IS_PC(victim))
     return eFAILURE;
@@ -11217,7 +11223,7 @@ int spell_lightning_shield(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct
 
     af.type      = SPELL_LIGHTNING_SHIELD;
     af.duration  = 2 + skill / 23;
-    af.modifier  = learned;
+    af.modifier  = skill;
     af.location  = APPLY_NONE;
     af.bitvector = AFF_LIGHTNINGSHIELD;
     affect_to_char(victim, &af);
@@ -11336,7 +11342,6 @@ int spell_debility(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
   struct affected_type af;
   int retval = eSUCCESS, duration = 0;
   double percent = 0;
-  int learned = has_skill(ch, SPELL_DEBILITY);
   extern int hit_gain(CHAR_DATA *ch);
   extern int mana_gain(CHAR_DATA*ch);
   extern int ki_gain(CHAR_DATA *ch);
@@ -11347,19 +11352,19 @@ int spell_debility(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
      return eSUCCESS;
   }
 
-  if (learned < 40) { 
+  if (skill < 40) { 
     percent = 30; 
     duration = 2;
-  } else if (learned > 40 && learned <= 60) { 
+  } else if (skill > 40 && skill <= 60) { 
     percent = 45; 
     duration = 3;
-  } else if (learned > 60 && learned <= 80) { 
+  } else if (skill > 60 && skill <= 80) { 
     percent =  60;
     duration =  4;
-  } else if (learned > 80 && learned <= 90) { 
+  } else if (skill > 80 && skill <= 90) { 
     percent =  75; 
     duration =  5;
-  } else if (learned > 90) {
+  } else if (skill > 90) {
     percent =  90;
     duration =  6;
   }
@@ -11449,30 +11454,29 @@ int spell_attrition(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
   struct affected_type af;
   int retval = eSUCCESS;
   int acmod = 0, tohit = 0, duration = 0;
-  int learned = has_skill(ch, SPELL_ATTRITION);
 
   if(affected_by_spell(victim, SPELL_ATTRITION)) {
      send_to_char("Your victim is already suffering from the affects of that spell.\r\n", ch);
      return eSUCCESS;
   }
 
-  if (learned < 40) { 
+  if (skill < 40) { 
     acmod = 30; 
     tohit = -3; 
     duration = 2;
-  } else if (learned > 40 && learned <= 60 ) { 
+  } else if (skill > 40 && skill <= 60 ) { 
     acmod = 45; 
     tohit = -6;
     duration = 3;
-  } else if (learned > 60 && learned <= 80 ) { 
+  } else if (skill > 60 && skill <= 80 ) { 
     acmod = 60; 
     tohit = -9;
     duration = 4;
-  } else if (learned > 80 && learned <= 90 ) { 
+  } else if (skill > 80 && skill <= 90 ) { 
     acmod = 75; 
     tohit = -12; 
     duration = 5;
-  } else if (learned > 90 ) {
+  } else if (skill > 90 ) {
     acmod = 90;
     tohit = -15;
     duration = 6;
