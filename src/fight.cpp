@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.432 2007/03/01 02:18:14 shane Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.433 2007/03/01 03:47:23 dcastle Exp $ */
 
 extern "C"
 {
@@ -1041,9 +1041,11 @@ int do_acidshield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
 void check_weapon_skill_bonus(char_data * ch, int type, obj_data *wielded, 
                               int & weapon_skill_hit_bonus, int & weapon_skill_dam_bonus)
 {
+   int specialization;
    int skill,learned;
    switch(type) {
       case TYPE_BLUDGEON:
+ 
          skill = SKILL_BLUDGEON_WEAPONS;
          break;
       case TYPE_WHIP:
@@ -1072,8 +1074,18 @@ void check_weapon_skill_bonus(char_data * ch, int type, obj_data *wielded,
   learned = has_skill(ch,skill);
    if(skill_success(ch,NULL,skill))
    {
-      weapon_skill_hit_bonus = learned / 10;
+      // rare skill increases
+      specialization = learned / 100;
+      learned = learned % 100;
+
+      weapon_skill_hit_bonus = learned / 5;
       weapon_skill_dam_bonus = number(1, learned / 10);
+
+      if(specialization)
+      {
+         weapon_skill_hit_bonus += 4;
+         weapon_skill_dam_bonus += number(1, 5);
+      }
    }
 
    // now check for two-handed weapons
@@ -1085,8 +1097,17 @@ void check_weapon_skill_bonus(char_data * ch, int type, obj_data *wielded,
       if(0 == number(0, 5))
          skill_increase_check(ch, SKILL_TWO_HANDED_WEAPONS, learned, SKILL_INCREASE_HARD);
 
-      weapon_skill_hit_bonus += learned / 12;
+      specialization = learned / 100;
+      learned = learned % 100;
+
+      weapon_skill_hit_bonus += learned / 6;
       weapon_skill_dam_bonus += number(1, learned / 10);
+
+      if(specialization)
+      {
+         weapon_skill_hit_bonus += 5;
+         weapon_skill_dam_bonus += number(1, 5);
+      }
    }
 }
 
@@ -1162,13 +1183,16 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
   struct obj_data *wielded;	/* convenience */
   int w_type;			/* Holds type info for damage() */
   int weapon_type;
+//  int victim_ac, calc_thaco;	/* Holders for Calculation */
   int dam;			/* Self explan. */
+//  int diceroll;			/* ... */
   int retval = 0;
-  int chance, vict_ac;
+  int chance;
   int weapon_skill_hit_bonus = 0;
   int weapon_skill_dam_bonus = 0;  
 
  
+//  extern int thaco[8][61];
   extern ubyte backstab_mult[];
   
   int do_say(struct char_data *ch, char *argument, int cmd);
@@ -1212,33 +1236,63 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
   if(type == SKILL_BLACKJACK)
     w_type = SKILL_BLACKJACK;
   
+  /* Calculate thac0 vs. armor clss.  Thac0 for mobs is in hitroll */
+//  if(!IS_NPC(ch))
+//    calc_thaco = thaco[(int)GET_CLASS(ch) - 1][(int)GET_LEVEL(ch)];
+//  else /* ch is a mob */
+//    calc_thaco = 20;
+  
+//  calc_thaco -= str_app[STRENGTH_APPLY_INDEX(ch)].tohit;
+//  calc_thaco -= GET_HITROLL(ch);
+  
+  /* Calculate victim's ac */
+//  victim_ac = GET_AC(vict) / 10;
+//  victim_ac = MAX(-20, victim_ac);
+  
+  /* Roll the dice! */
+//  diceroll = number(1, 20);
+  
+  /* Can't miss a victim with these effects! */
+//  if(IS_AFFECTED(vict, AFF_PARALYSIS) || !AWAKE(vict) ||
+//    IS_SET(vict->combat, COMBAT_STUNNED) ||
+//    IS_SET(vict->combat, COMBAT_STUNNED2) ||
+//    IS_SET(vict->combat, COMBAT_SHOCKED2) ||
+//    IS_SET(vict->combat, COMBAT_SHOCKED))
+//    diceroll = 20;
+  
+  /* miss! */
+//  if(diceroll < 20 && AWAKE(vict) &&
+//    (diceroll == 1 || diceroll < calc_thaco - victim_ac)) { 
+//    return damage(ch, vict, 0, w_type, w_type, weapon);
+//  }
+
   if(IS_AFFECTED(vict, AFF_PARALYSIS) || !AWAKE(vict) || is_stunned(vict))
     chance = 102; // can't miss
   else {
-    vict_ac = MIN(GET_ARMOR(vict), 100);
-    vict_ac = MAX(vict_ac, -2000);
-
-    chance = GET_REAL_HITROLL(ch) / 2 + (1000 + vict_ac) / 22;  //wonderful new ac formula
-
+    chance = 45;
+    if (IS_NPC(vict)) chance += 25;
+    chance += (GET_LEVEL(ch) - GET_LEVEL(vict))/2;
+    chance += GET_REAL_HITROLL(ch);
     if(has_skill(ch, SKILL_NAT_SELECT) && affected_by_spell(ch, SKILL_NAT_SELECT))
       if(affected_by_spell(ch, SKILL_NAT_SELECT)->modifier == GET_RACE(vict))
-        chance += has_skill(ch, SKILL_NAT_SELECT)/10;
+        chance += 15 + has_skill(ch, SKILL_NAT_SELECT)/10;
+  //  chance += dex_app[GET_DEX(ch)].tohit;
+    chance += ( GET_ARMOR(vict) / 10 );  // (positive ac hurts you, negative helps)
     if(has_skill(vict, SKILL_NAT_SELECT) && affected_by_spell(vict, SKILL_NAT_SELECT))
       if(affected_by_spell(vict, SKILL_NAT_SELECT)->modifier == GET_RACE(ch))
-        chance -= has_skill(vict, SKILL_NAT_SELECT) / 10;
-
+        chance -= 40 - has_skill(vict, SKILL_NAT_SELECT) / 5;
     chance += weapon_skill_hit_bonus;
 
     if(IS_SET(vict->combat, COMBAT_BASH1) ||
        IS_SET(vict->combat, COMBAT_BASH2))
       chance += 10;
 
-    chance = MIN(99, chance);
-    chance = MAX(0, chance);
-  }
+    if(IS_NPC(ch))
+      chance += 15;
 
-  if (type < TYPE_HIT || type > TYPE_CRUSH)
-	chance = 101;
+    chance = MIN(90, chance);  // 10 - 90
+    chance = MAX(10, chance);  // 10 - 90
+  }
 
   if(number(0, 101) > chance) 
     return damage(ch, vict, 0, w_type, w_type, weapon); // miss
@@ -1279,6 +1333,8 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
     {
       if(GET_LEVEL(ch) <= MORTAL)
       {
+//         if(GET_CLASS(ch) == CLASS_ANTI_PAL)
+ //          dam *= (backstab_mult[(int)GET_LEVEL(ch)]+1);
          dam *= backstab_mult[(int)GET_LEVEL(ch)];
       }
       else dam *= 25;
@@ -1648,7 +1704,7 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
     if (IS_NPC(ch) && ch->master)
        l *= (ch->master->level / 50);
  //   if (l || !IS_NPC(ch))
-    if(weapon) l = 70; //weapon spell
+    if(weapon) l = 50; //weapon spell
     dam = dam_percent(l, dam);
     dam = number(dam-(dam/10), dam+(dam/10)); // +- 10%
     if (IS_NPC(ch)) dam =  (int)(dam * 0.6);
@@ -1693,33 +1749,32 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
    imm = TRUE;
 
   learned = has_skill(victim, SKILL_MAGIC_RESIST);
-
   int save = 0;
    if (!imm)
     switch(weapon_type) {
        case TYPE_FIRE:
             save = get_saves(victim, SAVE_TYPE_FIRE);
             sprintf(buf, "$B$4fire$R and sustain");
-            if (learned)
-               skill_increase_check(victim, SKILL_MAGIC_RESIST, learned, SKILL_INCREASE_MEDIUM);
+            if(learned)
+              skill_increase_check(victim, SKILL_MAGIC_RESIST, learned, SKILL_INCREASE_MEDIUM);
             break;
       case TYPE_COLD:
             save = get_saves(victim, SAVE_TYPE_COLD);
             sprintf(buf, "$B$3cold$R and sustain");
-            if (learned)
-               skill_increase_check(victim, SKILL_MAGIC_RESIST, learned, SKILL_INCREASE_MEDIUM);
+            if(learned)
+              skill_increase_check(victim, SKILL_MAGIC_RESIST, learned, SKILL_INCREASE_MEDIUM);
             break;
       case TYPE_ENERGY:
             save = get_saves(victim, SAVE_TYPE_ENERGY);
             sprintf(buf, "$B$5energy$R and sustain");
-            if (learned)
-               skill_increase_check(victim, SKILL_MAGIC_RESIST, learned, SKILL_INCREASE_MEDIUM);
+            if(learned)
+              skill_increase_check(victim, SKILL_MAGIC_RESIST, learned, SKILL_INCREASE_MEDIUM);
             break;
     case TYPE_ACID:
             save = get_saves(victim, SAVE_TYPE_ACID);
             sprintf(buf, "$B$2acid$R and sustain");
-            if (learned)
-               skill_increase_check(victim, SKILL_MAGIC_RESIST, learned, SKILL_INCREASE_MEDIUM);
+            if(learned)
+              skill_increase_check(victim, SKILL_MAGIC_RESIST, learned, SKILL_INCREASE_MEDIUM);
             break;
       case TYPE_MAGIC:
             save = get_saves(victim,SAVE_TYPE_MAGIC);
@@ -1728,8 +1783,8 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
       case TYPE_POISON:
             save = get_saves(victim,SAVE_TYPE_POISON);
             sprintf(buf, "$2poison$R and sustain");
-            if (learned)
-               skill_increase_check(victim, SKILL_MAGIC_RESIST, learned, SKILL_INCREASE_MEDIUM);
+            if(learned)
+              skill_increase_check(victim, SKILL_MAGIC_RESIST, learned, SKILL_INCREASE_HARD);
             break;
       default:
         break;
@@ -1897,7 +1952,7 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
     REMBIT(ch->affected_by, AFF_INVISIBLE);
   }
 
-  // Frost Shield won't affect a backstab
+  // Frost Shield won't effect a backstab
   if(attacktype != SKILL_BACKSTAB &&  GET_HIT(victim) > 0 &&
      (typeofdamage == DAMAGE_TYPE_PHYSICAL || attacktype == TYPE_PHYSICAL_MAGIC))
     if(do_frostshield(ch, victim)) {
@@ -1950,7 +2005,7 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
   if (IS_AFFECTED(victim, AFF_EAS))
     dam /= 4;
 
-  // sanct damage now 35% for all aligns
+  // sanct damage now 35% for all caster aligns
   if (IS_AFFECTED(victim, AFF_SANCTUARY))
   {
     int mod = affected_by_spell(victim, SPELL_SANCTUARY)? affected_by_spell(victim, SPELL_SANCTUARY)->modifier:35;
