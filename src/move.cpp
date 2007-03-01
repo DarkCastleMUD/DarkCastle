@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.79 2007/02/08 10:16:41 jhhudso Exp $
+| $Id: move.cpp,v 1.80 2007/03/01 23:33:53 shane Exp $
 | move.C
 | Movement commands and stuff.
 *************************************************************************
@@ -865,7 +865,7 @@ int attempt_move(CHAR_DATA *ch, int cmd, int is_retreat = 0)
             send_to_char("The roots bracing your legs make it impossible to run!\r\n", k->follower);
           else
             send_to_char("Your legs are too tired for running away!\r\n", k->follower);
-          return eFAILURE;
+          continue; //keep going through the groupies
           }
         if(CAN_SEE(k->follower, ch))
           sprintf(tmp, "You follow %s.\n\r\n\r", GET_SHORT(ch));

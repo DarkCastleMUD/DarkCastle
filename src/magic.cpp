@@ -4897,11 +4897,11 @@ int spell_dispel_magic(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
    else if (skill < 81) savebonus = 10;
    else savebonus = 5;
 
-   if (spell && savebonus != 5)
+/*   if (spell && savebonus != 5)
    {
       send_to_char("You do not yet know this spell well enough to target it.\r\n",ch);
       return eFAILURE;
-   }
+   }*/
    if (spell)
      savebonus = 20;
 
