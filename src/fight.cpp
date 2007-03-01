@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.433 2007/03/01 03:47:23 dcastle Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.434 2007/03/01 18:42:38 pirahna Exp $ */
 
 extern "C"
 {
@@ -1704,7 +1704,7 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
     if (IS_NPC(ch) && ch->master)
        l *= (ch->master->level / 50);
  //   if (l || !IS_NPC(ch))
-    if(weapon) l = 50; //weapon spell
+    if(weapon && attacktype <= MAX_SPL_LIST) {l = 70;dam/=2;} //weapon spell
     dam = dam_percent(l, dam);
     dam = number(dam-(dam/10), dam+(dam/10)); // +- 10%
     if (IS_NPC(ch)) dam =  (int)(dam * 0.6);

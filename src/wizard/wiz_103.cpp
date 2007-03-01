@@ -101,6 +101,42 @@ int do_boot(struct char_data *ch, char *arg, int cmd)
 "              \\__/$R\n\r", victim);
 
 }
+    if(!strcmp(type, "kitty")) {
+       send_to_char("\n\r"
+"                __                             ___            _yygL\n\r"
+"i wuv u!       #####gy_,                    y#######g   __g########g\n\r"
+"    \\        g#F   `M##bg.                g#\"'    ###g####~'    9##L\n\r"
+"             ##F       `###g____yyyyy_____j#\"        ###          ##E\n\r"
+"            a#F           3##\"#~~~~~~~#####\"          ##g          ##\n\r"
+"           j#F                           5#      ____ _##y__       ##1\n\r"
+"           a#                           y##    _g##~####\"#M##g     ##1\n\r"
+"           #E                           J#L    ##  g#\"'     `#########g_\n\r"
+"          o#1                           ##     ## y#E         ##L     9#,\n\r"
+"           #g                           ##      ####F         3#g      ##\n\r"
+"          a#F                           3#L       ##L         ##M#.    ##!\n\r"
+"         g#F                             ##_     _##g       _g#F #g   y##\n\r"
+"        _#F                               ~###g###~M##g_   y###yg#'  y##'\n\r"
+"        ##                                           `?\"M###        g##F\n\r"
+"       ##'                                                ?#,      ###L\n\r"
+"       #E                                                  ##g___g#\"###\n\r"
+"      J#F                                                    `M##'   ##L\n\r"
+"      ##                                                              ##\n\r"
+"      ##                                                              ##\n\r"
+"      ##                                                              ##L\n\r"
+"   ___##y_.      a#o                                                __##1\n\r"
+"##\"\"F~5#F        ###L                                 __          #M#M###M##\n\r"
+"      J#K        ###L                                g##g             ##\n\r"
+"     _y##ga       ~           _amog                  ####            ##F\n\r"
+" a###~'\"#1                   d#   \"#                 \"##          #wy##L.\n\r"
+"        3#,                   #g__g\"                                ##\"\"5##g\n\r"
+"         ##g#                    ''                                a##    '~\n\r"
+"    __y#\"FH#_                                                  y_ g##\n\r"
+"   ##\"'     ##g                                                 \"###g_\n\r"
+"   ~         `9#g_                                            _g##'\"9##gg,\n\r"
+"                 ?##gy_.                                   _y##\"'      `##\n\r"
+"                     ~\"####ggy_____                  ___g###F'\n\r"
+"                             \"~~~~~##################~~~\"\n\r", victim);
+    }
     move_char(victim, real_room(3001));
     do_quit(victim, "", 666);
   }

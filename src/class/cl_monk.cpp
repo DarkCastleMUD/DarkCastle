@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_monk.cpp,v 1.28 2006/12/31 03:29:57 jhhudso Exp $
+| $Id: cl_monk.cpp,v 1.29 2007/03/01 18:42:38 pirahna Exp $
 | cl_monk.C
 | Description:  Monk skills.
 */
@@ -68,7 +68,7 @@ int do_eagle_claw(struct char_data *ch, char *argument, int cmd)
   if (!can_attack(ch) || !can_be_attacked(ch, victim))
     return eFAILURE;
 
-  WAIT_STATE(ch, PULSE_VIOLENCE * 3);
+  WAIT_STATE(ch, PULSE_VIOLENCE * 2);
 
   if (!skill_success(ch,victim, SKILL_EAGLE_CLAW))
     retval = damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_EAGLE_CLAW, 0);
