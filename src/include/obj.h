@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: obj.h,v 1.26 2007/01/26 01:48:41 dcastle Exp $ */
+/* $Id: obj.h,v 1.27 2007/03/02 15:17:36 dcastle Exp $ */
 #ifndef OBJ_H_
 #define OBJ_H_
 
@@ -136,7 +136,7 @@ int recheck_height_wears(char_data *ch);
 
 #define ITEM_NPC_CORPSE		1<<7
 #define ITEM_PC_CORPSE_LOOTED   1<<8
-
+#define ITEM_NO_SCRAP 		1<<9
 
 /* Bitvector for 'size' */
 #define SIZE_ANY		1
