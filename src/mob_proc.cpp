@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.147 2007/03/01 19:20:32 dcastle Exp $ */
+/* $Id: mob_proc.cpp,v 1.148 2007/03/02 20:00:37 pirahna Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -1721,7 +1721,8 @@ static char *dethSayText [ ] =
   "The bible rocks. AFK to go stone some disobedient children to death.",
   "It looks like English, but I can.t understand a damn word you.re saying.",
   "I thought I wanted a career; turns out I just wanted a salary.",
-  "Thank you. We're all refreshed and challenged by your unique point of view."
+  "Thank you. We're all refreshed and challenged by your unique point of view.",
+  "She offered her honor. He honored her offer.  And all night long, honor, offer, honor, offer."
 };
 
 // ENDOFCHAIN
