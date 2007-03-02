@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.434 2007/03/01 18:42:38 pirahna Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.435 2007/03/02 03:10:24 shane Exp $ */
 
 extern "C"
 {
@@ -3873,7 +3873,7 @@ void do_combatmastery(CHAR_DATA *ch, CHAR_DATA *vict, int weapon)
         act("$n's crushing blow causes $N's attacks to momentarily weaken!", ch, 0, vict, TO_ROOM, NOTVICT);
      }
   }
-  if(type == TYPE_WHIP) {
+  if(type == TYPE_WHIP && !affected_by_spell(ch, SKILL_CM_TIMER)) {
      if(GET_POS(vict) > POSITION_SITTING && !affected_by_spell(vict, SPELL_IRON_ROOTS)) {
         GET_POS(vict) = POSITION_SITTING;
         SET_BIT(vict->combat, COMBAT_BASH2);
@@ -3881,6 +3881,14 @@ void do_combatmastery(CHAR_DATA *ch, CHAR_DATA *vict, int weapon)
         act("Your whipping attack trips up $N and $E goes down!", ch, 0, vict, TO_CHAR, 0);
         act("$n's whipping attack trips you up, causing you to stumble and fall!", ch, 0, vict, TO_VICT, 0);
         act("$n's whipping attack trips up $N causing $M to stumble and fall!", ch, 0, vict, TO_ROOM, NOTVICT);
+
+        struct affected_type af;
+        af.type      = SKILL_CM_TIMER;
+        af.location  = 0;
+        af.modifier  = 0;
+        af.duration  = 5;
+        af.bitvector = -1;
+        affect_to_char(ch, &af, PULSE_VIOLENCE);
      }
   }
 
