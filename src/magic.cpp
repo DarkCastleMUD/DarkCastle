@@ -4870,6 +4870,7 @@ int spell_dispel_magic(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
    int done = FALSE;
    int retval;
    int spell = (int) obj;
+
    if(!ch || !victim)
    {
       log("Null ch or victim sent to dispel_magic!", ANGEL, LOG_BUG);
@@ -4901,7 +4902,9 @@ int spell_dispel_magic(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
    {
       send_to_char("You do not yet know this spell well enough to target it.\r\n",ch);
       return eFAILURE;
-   }*/
+   } 
+had to get rid of this for now :(
+*/
    if (spell)
      savebonus = 20;
 
@@ -4926,7 +4929,8 @@ int spell_dispel_magic(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
 // Number of spells in the switch statement goes here
    while(!done && ((rots += 1) < 15))
    {
-     int x = spell != 0? spell : number(1,10);
+     if(spell < 1 || spell > 10) spell = number(1,10); //weapon spell or non-spell-targetted cast
+     int x = spell;
      switch(x) 
      {
         case 1: 
