@@ -4898,14 +4898,13 @@ int spell_dispel_magic(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
    else if (skill < 81) savebonus = 10;
    else savebonus = 5;
 
-/*   if (spell && savebonus != 5)
+   if (spell < 11 && spell > 0 && savebonus != 5) // spell-targetted cast
    {
       send_to_char("You do not yet know this spell well enough to target it.\r\n",ch);
       return eFAILURE;
    } 
-had to get rid of this for now :(
-*/
-   if (spell)
+
+   if (spell < 11 && spell > 0)
      savebonus = 20;
 
 // If victim higher level, they get a save vs magic for no effect
@@ -4929,7 +4928,7 @@ had to get rid of this for now :(
 // Number of spells in the switch statement goes here
    while(!done && ((rots += 1) < 15))
    {
-     if(spell < 1 || spell > 10) spell = number(1,10); //weapon spell or non-spell-targetted cast
+     if(spell < 1 || spell > 10) spell = number(1,10); //weapon spell or non-spell-targetted cast, probably ;)
      int x = spell;
      switch(x) 
      {
