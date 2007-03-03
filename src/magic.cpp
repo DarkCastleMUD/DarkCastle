@@ -4928,8 +4928,9 @@ int spell_dispel_magic(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
 // Number of spells in the switch statement goes here
    while(!done && ((rots += 1) < 15))
    {
-     if(spell < 1 || spell > 10) spell = number(1,10); //weapon spell or non-spell-targetted cast, probably ;)
-     int x = spell;
+     int x;
+     if(spell < 1 || spell > 10) x = number(1,10); //weapon spell or non-spell-targetted cast, probably ;)
+     else x = spell;
      switch(x) 
      {
         case 1: 
