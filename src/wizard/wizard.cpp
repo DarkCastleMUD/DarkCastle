@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.41 2007/02/28 16:33:55 dcastle Exp $
+| $Id: wizard.cpp,v 1.42 2007/03/07 18:16:31 dcastle Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -1651,8 +1651,8 @@ void pick_up_item(struct char_data *ch, struct obj_data *obj)
 		case 27917:
 		case 27918:
 		  int gold = obj->obj_flags.value[0];
-		  sprintf(buf, "As if by magic, the gold beads transform into %d gold!\r\n",
-			gold);
+		  sprintf(buf, "As if by magic, %s transform into %d gold!\r\n",
+			obj->short_description,gold);
 		  send_to_char(buf,ch);
 
 		  GET_GOLD(ch) += gold;
