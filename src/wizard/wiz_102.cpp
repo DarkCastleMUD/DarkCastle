@@ -899,8 +899,15 @@ int do_zedit(struct char_data *ch, char *argument, int cmd)
 		else
 		send_to_char("Noteleport turned off.\r\n",ch);
       }
+      else if(!strcmp(text, "nohunt")) {
+		TOGGLE_BIT(zone_table[zone].zone_flags, ZONE_NOHUNT);
+		if (IS_SET(zone_table[zone].zone_flags, ZONE_NOHUNT))
+		send_to_char("Nohunt turned on.\r\n",ch);
+		else
+		send_to_char("Nohunt turned off.\r\n",ch);
+      }
       else {
-        sprintf(buf, "'%s' invalid.  Enter 'noclaim' or 'noteleport'.\r\n", text);
+        sprintf(buf, "'%s' invalid.  Enter 'noclaim', 'noteleport' or 'nohunt'.\r\n", text);
         send_to_char(buf, ch);
         return eFAILURE;
       }
