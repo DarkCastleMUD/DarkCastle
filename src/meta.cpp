@@ -1027,6 +1027,7 @@ void undo_race_saves(char_data * ch)
        ch->saves[SAVE_TYPE_ACID]   -= RACE_ELVEN_ACID_MOD;
        ch->saves[SAVE_TYPE_MAGIC]  -= RACE_ELVEN_MAGIC_MOD;
        ch->saves[SAVE_TYPE_POISON] -= RACE_ELVEN_POISON_MOD;
+       ch->spell_mitigation -= 1;
        break;
      case RACE_DWARVEN:
        ch->saves[SAVE_TYPE_FIRE]   -= RACE_DWARVEN_FIRE_MOD;
@@ -1035,6 +1036,7 @@ void undo_race_saves(char_data * ch)
        ch->saves[SAVE_TYPE_ACID]   -= RACE_DWARVEN_ACID_MOD;
        ch->saves[SAVE_TYPE_MAGIC]  -= RACE_DWARVEN_MAGIC_MOD;
        ch->saves[SAVE_TYPE_POISON] -= RACE_DWARVEN_POISON_MOD;
+       ch->melee_mitigation -= 1;
        break;
      case RACE_TROLL:
        ch->saves[SAVE_TYPE_FIRE]   -= RACE_TROLL_FIRE_MOD;
@@ -1043,6 +1045,7 @@ void undo_race_saves(char_data * ch)
        ch->saves[SAVE_TYPE_ACID]   -= RACE_TROLL_ACID_MOD;
        ch->saves[SAVE_TYPE_MAGIC]  -= RACE_TROLL_MAGIC_MOD;
        ch->saves[SAVE_TYPE_POISON] -= RACE_TROLL_POISON_MOD;
+       ch->spell_mitigation -= 2;
        break;
      case RACE_GIANT:
        ch->saves[SAVE_TYPE_FIRE]   -= RACE_GIANT_FIRE_MOD;
@@ -1051,6 +1054,7 @@ void undo_race_saves(char_data * ch)
        ch->saves[SAVE_TYPE_ACID]   -= RACE_GIANT_ACID_MOD;
        ch->saves[SAVE_TYPE_MAGIC]  -= RACE_GIANT_MAGIC_MOD;
        ch->saves[SAVE_TYPE_POISON] -= RACE_GIANT_POISON_MOD;
+       ch->melee_mitigation -= 2;
        break;
      case RACE_PIXIE:
        ch->saves[SAVE_TYPE_FIRE]   -= RACE_PIXIE_FIRE_MOD;
@@ -1059,6 +1063,7 @@ void undo_race_saves(char_data * ch)
        ch->saves[SAVE_TYPE_ACID]   -= RACE_PIXIE_ACID_MOD;
        ch->saves[SAVE_TYPE_MAGIC]  -= RACE_PIXIE_MAGIC_MOD;
        ch->saves[SAVE_TYPE_POISON] -= RACE_PIXIE_POISON_MOD;
+       ch->spell_mitigation -= 2;
        break;
      case RACE_HOBBIT:
        ch->saves[SAVE_TYPE_FIRE]   -= RACE_HOBBIT_FIRE_MOD;
@@ -1067,6 +1072,7 @@ void undo_race_saves(char_data * ch)
        ch->saves[SAVE_TYPE_ACID]   -= RACE_HOBBIT_ACID_MOD;
        ch->saves[SAVE_TYPE_MAGIC]  -= RACE_HOBBIT_MAGIC_MOD;
        ch->saves[SAVE_TYPE_POISON] -= RACE_HOBBIT_POISON_MOD;
+       ch->melee_mitigation -= 2;
        break;
      case RACE_GNOME:
        ch->saves[SAVE_TYPE_FIRE]   -= RACE_GNOME_FIRE_MOD;
@@ -1075,6 +1081,7 @@ void undo_race_saves(char_data * ch)
        ch->saves[SAVE_TYPE_ACID]   -= RACE_GNOME_ACID_MOD;
        ch->saves[SAVE_TYPE_MAGIC]  -= RACE_GNOME_MAGIC_MOD;
        ch->saves[SAVE_TYPE_POISON] -= RACE_GNOME_POISON_MOD;
+       ch->spell_mitigation -= 1;
        break;
      case RACE_ORC:
        ch->saves[SAVE_TYPE_FIRE]   -= RACE_ORC_FIRE_MOD;
@@ -1083,6 +1090,7 @@ void undo_race_saves(char_data * ch)
        ch->saves[SAVE_TYPE_ACID]   -= RACE_ORC_ACID_MOD;
        ch->saves[SAVE_TYPE_MAGIC]  -= RACE_ORC_MAGIC_MOD;
        ch->saves[SAVE_TYPE_POISON] -= RACE_ORC_POISON_MOD;
+       ch->melee_mitigation -= 1;
        break;
      default:
        break;
