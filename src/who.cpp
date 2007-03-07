@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: who.cpp,v 1.43 2007/03/01 02:18:14 shane Exp $
+| $Id: who.cpp,v 1.44 2007/03/07 13:55:16 dcastle Exp $
 | who.C
 | Commands for who, maybe? :P
 */
@@ -415,10 +415,8 @@ int do_who(struct char_data *ch, char *argument, int cmd)
 
         if(get_pc_vis(ch, oneword)) {
             strcpy(charname, oneword);
-            // a players name matches an above arg, so put it in so they show up
-            // but don't force a "charmatch" type matching
-            if(!currentmatch)
-               charmatch = 1;
+
+            charmatch = 1;
             continue;
         }
 
@@ -460,8 +458,10 @@ int do_who(struct char_data *ch, char *argument, int cmd)
 	   && strcmp(GET_NAME(ch), "Urizen"))
 	  continue;
 
-        charmatchistrue = is_abbrev(charname, GET_NAME(i));
-        if(charmatch && !charmatchistrue)                                       continue;
+        if (charmatch) 
+          charmatchistrue = is_abbrev(charname, GET_NAME(i));
+	else charmatchistrue = FALSE; 
+
         if(clss && GET_CLASS(i) != clss && !charmatchistrue)                    continue;
         if(GET_LEVEL(i) < lowlevel || 
             (!strcmp(GET_NAME(i), "Pirahna") && lowlevel > PIRAHNA_FAKE_LVL )
