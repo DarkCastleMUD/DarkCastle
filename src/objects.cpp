@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.91 2007/03/01 02:39:17 shane Exp $
+| $Id: objects.cpp,v 1.92 2007/03/07 18:36:03 dcastle Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -797,7 +797,7 @@ int do_drink(struct char_data *ch, char *argument, int cmd)
     }
 
     if(GET_COND(ch, THIRST) > 20) {
-      send_to_char("Your stomach cannot contain anymore liquid!", ch);
+      send_to_char("Your stomach cannot contain anymore liquid!\r\n", ch);
       return eFAILURE;
     }
 
