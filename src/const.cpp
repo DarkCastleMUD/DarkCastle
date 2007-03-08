@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.230 2007/03/02 15:17:25 dcastle Exp $ */
+/* $Id: const.cpp,v 1.231 2007/03/08 06:47:06 apocalypse Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -668,15 +668,15 @@ char *zone_bits[] =
 // new obj flags
 char *extra_bits[] =
 {
-    "GLOW",
-    "HUM",
+    "GLOWING",
+    "HUMMING",
     "DARK",
     "LOCK",
-    "ANY_CLASS",
+    "ANY-CLASS",
     "INVISIBLE",
     "MAGICAL",
-    "NODROP",
-    "BLESS",
+    "CURSED",
+    "BLESSED",
     "ANTI-GOOD",
     "ANTI-EVIL",
     "ANTI-NEUTRAL",
@@ -685,7 +685,7 @@ char *extra_bits[] =
     "THIEF",
     "CLERIC",
     "PALADIN",
-    "ANTI_PAL",
+    "ANTI-PALADIN",
     "BARBARIAN",
     "MONK",
     "RANGER",
@@ -843,8 +843,8 @@ char *equipment_types[] =
     "Worn Waist",
     "Worn Right Wrist",
     "Worn Left Wrist",
-    "Wielded",
-    "Second Wield",
+    "Primary Wield",
+    "Secondary Wield",
     "Held",
     "Worn Face",
     "Worn Right Ear",
