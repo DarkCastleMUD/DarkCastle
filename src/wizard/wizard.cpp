@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.42 2007/03/07 18:16:31 dcastle Exp $
+| $Id: wizard.cpp,v 1.43 2007/03/08 23:28:00 dcastle Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -1448,6 +1448,7 @@ struct hunt_data
   char *huntname;
   int itemnum;
   int time;
+  int itemsAvail[50];
 };
 
 struct hunt_items
@@ -1563,6 +1564,47 @@ void huntclear_item(struct obj_data *obj)
   }
 }
 
+int get_rand_obj(struct hunt_data *h)
+{
+  int i,v;
+
+  for (i = 49;i > 0;i--)
+    if (h->itemsAvail[i] > 0)
+      break;
+
+  if (i < 0) return -1;
+
+  v = number(0,i);
+  int c = h->itemsAvail[v];
+  h->itemsAvail[v] = h->itemsAvail[i];
+  h->itemsAvail[i] = -1;
+
+  return c;
+}
+
+void init_random_hunt_items(struct hunt_data *h)
+{
+  FILE *f;
+  if ((f= dc_fopen("huntitems.txt","r"))==NULL)
+  {
+    for (int i = 0; i < 50;i++)
+	h->itemsAvail[i] = -1;
+    return; 
+  }
+  int a, i;
+  bool over = FALSE;
+  for (a = 0; a < 50;a++)
+  {
+    if (!over) {
+      i = fread_int(f, 0, INT_MAX);
+      if (i == 0) over = TRUE;
+      else { h->itemsAvail[a] = i; continue; }
+    }
+    h->itemsAvail[a] = -1;
+  }
+  dc_fclose(f);
+}
+
 void begin_hunt(int item, int time, int amount, char *huntname)
 { // time, itme, item
   struct hunt_data *n;
@@ -1577,7 +1619,7 @@ void begin_hunt(int item, int time, int amount, char *huntname)
   n->itemnum = item;
   n->time = time;
   if (huntname) n->huntname = str_dup(huntname);
-
+  if (item == 76) init_random_hunt_items(n);
   int rnum = real_object(item);
   extern int top_of_mobt;
   if (rnum < 0) return;
@@ -1641,9 +1683,6 @@ void pick_up_item(struct char_data *ch, struct obj_data *obj)
 		obj->short_description,i->mobname,ch->name);
 	send_info(buf);
 	struct hunt_data *h = i->hunt;
-	dc_free(i->mobname);
-	dc_free(i);
-	check_end_of_hunt(h);
 	switch (vnum)
 	{
 		case 27915:
@@ -1658,9 +1697,29 @@ void pick_up_item(struct char_data *ch, struct obj_data *obj)
 		  GET_GOLD(ch) += gold;
 		  obj_from_char(obj);
 		  obj_to_room(obj, 6345);
-//		  extract_obj(obj);
+		  break;
+		case 76:
+		  obj_from_char(obj);
+		  obj_to_room(obj, 6345);
+		  int r1 = real_object(get_rand_obj(h));
+		  if (r1 > 0)
+		  {
+		    struct obj_data *oitem = clone_object(r1);
+		    obj_to_char(oitem, ch);
+		    sprintf(buf, "As if by magic, %s transforms into %s!\r\n",
+			obj->short_description, oitem->short_description);
+		    send_to_char(buf,ch);
+		    sprintf(buf, "\r\n## %s turned into %s!\r\n",
+			obj->short_description,oitem->short_description);
+		    send_info(buf);
+		  } else {
+		    send_to_char("Brick turned into a non-existent item. Tell an imm.\r\n",ch);
+		  }
 		  break;
 	}
+	dc_free(i->mobname);
+	dc_free(i);
+	check_end_of_hunt(h);
 	continue;
      }
      p = i;
@@ -1745,7 +1804,7 @@ int do_huntstart(struct char_data *ch, char *argument, int cmd)
     send_to_char("Non-existent item.\r\n",ch);
     return eSUCCESS;
   }
-  if (num <= 0 || num > 500)
+  if (num <= 0 || num > 50)
   {
     send_to_char("Invalid #.\r\n",ch);
     return eSUCCESS;
