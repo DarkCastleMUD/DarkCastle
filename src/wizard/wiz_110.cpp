@@ -128,10 +128,25 @@ int do_bestow(struct char_data *ch, char *arg, int cmd)
                    "-----------------------------------\r\n\r\n", ch);
       for(i = 0; *bestowable_god_commands[i].name != '\n'; i++)
       {
-         sprintf(buf, "%22s %s\r\n", bestowable_god_commands[i].name,
-                      has_skill(vict, bestowable_god_commands[i].num) ? "YES" : "---");
-         send_to_char(buf, ch);
+	if (bestowable_god_commands[i].testcmd == false) {
+	  sprintf(buf, "%22s %s\r\n", bestowable_god_commands[i].name,
+		  has_skill(vict, bestowable_god_commands[i].num) ? "YES" : "---");
+	  send_to_char(buf, ch);
+	}
       }
+
+      send_to_char("\n\r", ch);
+      send_to_char("Test Command           Has command?\r\n"
+                   "-----------------------------------\r\n\r\n", ch);
+      for(i = 0; *bestowable_god_commands[i].name != '\n'; i++)
+      {
+	if (bestowable_god_commands[i].testcmd == true) {
+	  sprintf(buf, "%22s %s\r\n", bestowable_god_commands[i].name,
+		  has_skill(vict, bestowable_god_commands[i].num) ? "YES" : "---");
+	  send_to_char(buf, ch);
+	}
+      }
+
       return eSUCCESS;
    }
 

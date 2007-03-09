@@ -16,7 +16,7 @@
 /* 12/08/2003   Onager   Added chop_half() to work like half_chop() but    */
 /*                       chopping off the last word.                       */
 /***************************************************************************/
-/* $Id: interp.cpp,v 1.127 2007/03/09 05:31:43 jhhudso Exp $ */
+/* $Id: interp.cpp,v 1.128 2007/03/09 06:08:04 jhhudso Exp $ */
 
 extern "C"
 {
@@ -466,19 +466,19 @@ struct command_info cmd_info[] =
     { "imotd",		do_imotd,	POSITION_DEAD, IMMORTAL, 9, 0, 1 },
     { "mhelp",		do_mortal_help,	POSITION_DEAD, IMMORTAL, 9, 0, 1 },
     { "sqsave",		do_write_skillquest,	POSITION_DEAD, GIFTED_COMMAND, 9, 0, 1 },
-    { "testhand", do_testhand, POSITION_DEAD, 110, 9, 0, 1},    
+    { "testhand",       do_testhand,    POSITION_DEAD, GIFTED_COMMAND, 9, 0, 1},    
     { "varstat",		do_varstat,	POSITION_DEAD, 103, 9, 0, 1 },
     // Special procedure commands placed to not disrupt god commands
     { "setup",		do_mortal_set,	POSITION_STANDING, 0,  9,  0, 1 },
-    { "do_the_thing",	do_thing,	POSITION_DEAD, 110, 9, 0, 1 },
+    { "do_the_thing",	do_thing,	POSITION_DEAD, GIFTED_COMMAND, 9, 0, 1 },
     
-    { "findpath",	do_findPath,	POSITION_DEAD, 108, 9, 0, 1 },
-    { "findpath2",	do_findpath,	POSITION_DEAD, 108, 9, 0, 1 },
-    { "addroom",	do_addRoom,	POSITION_DEAD, 108, 9, 0, 1 },
-    { "newpath",	do_newPath,	POSITION_DEAD, 108, 9, 0, 1 },
-    { "listpathsbyzone",do_listPathsByZone,POSITION_DEAD, 108, 9, 0, 1 },
-    { "listallpaths",	do_listAllPaths,POSITION_DEAD, 108, 9, 0, 1 },
-    { "dopathpath",	do_pathpath,	POSITION_DEAD, 108, 9, 0, 1 },
+    { "findpath",	do_findPath,	POSITION_DEAD, GIFTED_COMMAND, 9, 0, 1 },
+    { "findpath2",	do_findpath,	POSITION_DEAD, GIFTED_COMMAND, 9, 0, 1 },
+    { "addroom",	do_addRoom,	POSITION_DEAD, GIFTED_COMMAND, 9, 0, 1 },
+    { "newpath",	do_newPath,	POSITION_DEAD, GIFTED_COMMAND, 9, 0, 1 },
+    { "listpathsbyzone",do_listPathsByZone,POSITION_DEAD, GIFTED_COMMAND, 9, 0, 1 },
+    { "listallpaths",	do_listAllPaths,POSITION_DEAD, GIFTED_COMMAND, 9, 0, 1 },
+    { "dopathpath",	do_pathpath,	POSITION_DEAD, GIFTED_COMMAND, 9, 0, 1 },
     { "botcheck",	do_botcheck,	POSITION_DEAD, 108, 9, 0, 1 },
 
     // Bug way down here after 'buy'

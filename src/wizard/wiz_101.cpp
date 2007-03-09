@@ -28,9 +28,11 @@ int do_wizhelp(struct char_data *ch, char *argument, int cmd_arg)
 
   char buf[MAX_STRING_LENGTH];
   char buf2[MAX_STRING_LENGTH];
+  char buf3[MAX_STRING_LENGTH];
   int cmd, i;
   int no = 6;
   int no2 = 6;
+  int no3 = 6;
   extern bestowable_god_commands_type bestowable_god_commands[];
 
   if(IS_NPC(ch))
@@ -68,11 +70,18 @@ int do_wizhelp(struct char_data *ch, char *argument, int cmd_arg)
        if(!has_skill(ch, bestowable_god_commands[i].num))
           continue;
 
-       sprintf(buf2 + strlen(buf2), "[GFT]%-11s", cmd_info[cmd].command_name);
+       if (bestowable_god_commands[i].testcmd == false) {
+	 sprintf(buf2 + strlen(buf2), "[GFT]%-11s", cmd_info[cmd].command_name);
+	 if((no2) % 5 == 0)
+	   strcat(buf2, "\n\r");
+	 no2++;
+       } else {
+	 sprintf(buf3 + strlen(buf3), "[TST]%-11s", cmd_info[cmd].command_name);
+	 if((no3) % 5 == 0)
+	   strcat(buf3, "\n\r");
+	 no3++;
+       }
 
-       if((no2) % 5 == 0)
-         strcat(buf2, "\n\r");
-       no2++;
        continue;
      }
      if (cmd_info[cmd].minimum_level != v || cmd_info[cmd].minimum_level == GIFTED_COMMAND) continue;
@@ -90,6 +99,10 @@ int do_wizhelp(struct char_data *ch, char *argument, int cmd_arg)
               "Here are the godly powers that have been gifted to you:\n\r\n\r");
   strcat(buf, buf2);
   strcat(buf, "\r\n");
+  strcat(buf, "Here are the godly test powers that have been gifted to you:\n\r\n\r");
+  strcat(buf, buf3);
+  strcat(buf, "\r\n");
+
   send_to_char(buf, ch);
   return eSUCCESS;
 }
