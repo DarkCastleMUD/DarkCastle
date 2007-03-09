@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: who.cpp,v 1.44 2007/03/07 13:55:16 dcastle Exp $
+| $Id: who.cpp,v 1.45 2007/03/09 16:56:40 pirahna Exp $
 | who.C
 | Commands for who, maybe? :P
 */
@@ -412,20 +412,11 @@ int do_who(struct char_data *ch, char *argument, int cmd)
             }
            }
         }
-
-        if(get_pc_vis(ch, oneword)) {
-            strcpy(charname, oneword);
-
-            charmatch = 1;
-            continue;
-        }
-
-        if(!currentmatch) {
-            // If we get here, then we didn't match a player/class/sex/etc
-            // so we can just break out, and then not show anything cause it won't match anything
-            nomatch = 1;
-            break;
-        }
+        // if there's anything left, we'll assume it's a partial name.
+        // and we only take the "last" one in the list, so 'who warrior thief' only matches thief
+        // This is consistant with how the class stuff works too
+        strcpy(charname, oneword);
+        charmatch = 1;
 
     } // while strlen(oneword)
     
@@ -457,26 +448,36 @@ int do_who(struct char_data *ch, char *argument, int cmd)
         if(!CAN_SEE(ch, i) && strcmp(GET_NAME(ch), "Apocalypse")
 	   && strcmp(GET_NAME(ch), "Urizen"))
 	  continue;
-
-        if (charmatch) 
-          charmatchistrue = is_abbrev(charname, GET_NAME(i));
-	else charmatchistrue = FALSE; 
-
-        if(clss && GET_CLASS(i) != clss && !charmatchistrue)                    continue;
+        // Level checks.  These happen no matter what
         if(GET_LEVEL(i) < lowlevel || 
             (!strcmp(GET_NAME(i), "Pirahna") && lowlevel > PIRAHNA_FAKE_LVL )
           )                                                                     continue;
         if(GET_LEVEL(i) > highlevel)                                            continue;
         if(clss && !hasholylight && (!i->clan || i->clan != ch->clan) && IS_ANONYMOUS(i) && GET_LEVEL(i) < MIN_GOD)  continue;
-        if(anoncheck && !IS_ANONYMOUS(i) && !charmatchistrue)                   continue;
-        if(sexcheck && ( GET_SEX(i) != sextype || 
-                         ( IS_ANONYMOUS(i) && !hasholylight) 
-                       ) && !charmatchistrue
-          )                                                                     continue;
         if(lowlevel > 0 && IS_ANONYMOUS(i) && !hasholylight)                    continue;
-        if(lfgcheck && !IS_SET(i->pcdata->toggles, PLR_LFG))                    continue;
-        if(guidecheck && !IS_SET(i->pcdata->toggles, PLR_GUIDE_TOG))            continue;
-        if(race && GET_RACE(i) != race && !charmatchistrue) continue;
+
+        // Skip string based checks if our name matches
+        if(!charmatch || !is_abbrev(charname, GET_NAME(i))) 
+        {
+           if(clss && GET_CLASS(i) != clss && !charmatchistrue)                 continue;
+           if(anoncheck && !IS_ANONYMOUS(i) && !charmatchistrue)                continue;
+           if(sexcheck && ( GET_SEX(i) != sextype || 
+                            ( IS_ANONYMOUS(i) && !hasholylight) 
+                          ) && !charmatchistrue
+             )                                                                  continue;
+           if(lfgcheck && !IS_SET(i->pcdata->toggles, PLR_LFG))                 continue;
+           if(guidecheck && !IS_SET(i->pcdata->toggles, PLR_GUIDE_TOG))         continue;
+           if(race && GET_RACE(i) != race && !charmatchistrue)                  continue;
+        }
+
+        // At this point, we either pass a filter or our name matches.
+        if( ! ( clss || anoncheck || sexcheck || lfgcheck ||guidecheck || race ) )
+        {
+            // If there were no filters, the it's only a name match so filter out
+            // anyone that doesn't match the filters
+            if(charmatch && !is_abbrev(charname, GET_NAME(i)))
+                continue;
+        }
         
         infoField = infoBuf;
         extraBuf[0] = '\0';
