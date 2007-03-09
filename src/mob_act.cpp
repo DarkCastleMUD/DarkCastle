@@ -19,7 +19,7 @@
 /* 12/06/2003   Onager   Modified mobile_activity() to prevent charmie    */
 /*                       scavenging                                       */
 /**************************************************************************/
-/* $Id: mob_act.cpp,v 1.43 2007/02/18 21:52:22 dcastle Exp $ */
+/* $Id: mob_act.cpp,v 1.44 2007/03/09 05:31:43 jhhudso Exp $ */
 
 extern "C"
 {
@@ -46,6 +46,7 @@ extern "C"
 #include <race.h> // Race defines used in align-aggro messages.
 #include <comm.h>
 #include <connect.h>
+#include <inventory.h>
 
 extern CHAR_DATA *character_list;
 extern struct index_data *mob_index;
@@ -62,9 +63,6 @@ int hands_are_free(CHAR_DATA *ch, int number);
 void perform_wear(CHAR_DATA *ch, struct obj_data *obj_object,
                   int keyword);
 char * get_random_hate(CHAR_DATA *ch);
-void get(struct char_data *ch, struct obj_data *obj_object,
-    struct obj_data *sub_object,bool has_consent);
-
 bool is_protected(struct char_data *vict, struct char_data *ch);
 void scavenge(struct char_data *ch);
 bool is_r_denied(CHAR_DATA *ch, int room)
@@ -215,7 +213,7 @@ void mobile_activity(void)
       {
           // This should get rid of all the "gold coins" in mobs inventories.
           // -Pirahna 12/11/00
-          get(ch, best_obj, 0,0);
+          get(ch, best_obj, 0,0, 9);
 //        move_obj( best_obj, ch );
 //        act( "$n gets $p.",  ch, best_obj, 0, TO_ROOM, 0);
       }

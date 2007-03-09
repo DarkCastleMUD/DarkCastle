@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.90 2007/01/31 06:53:28 jhhudso Exp $
+| $Id: inventory.cpp,v 1.91 2007/03/09 05:31:43 jhhudso Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -34,6 +34,7 @@ extern "C"
 #include <spells.h>
 #include <clan.h>
 #include <arena.h>
+#include <inventory.h>
 
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
@@ -60,7 +61,7 @@ struct obj_data * search_char_for_item(char_data * ch, int16 item_number, bool w
 void send_info(char *);
 
 /* procedures related to get */
-void get(struct char_data *ch, struct obj_data *obj_object, struct obj_data *sub_object, bool has_consent)
+void get(struct char_data *ch, struct obj_data *obj_object, struct obj_data *sub_object, bool has_consent, int cmd)
 {
     char buffer[MAX_STRING_LENGTH];
    
@@ -92,7 +93,7 @@ void get(struct char_data *ch, struct obj_data *obj_object, struct obj_data *sub
     if (sub_object) {
 			sprintf(buffer,"%s_consent",GET_NAME(ch));
 		      if (has_consent && obj_object->obj_flags.type_flag != ITEM_MONEY) {
-                                if (isname("lootable",sub_object->name) && !isname(buffer,sub_object->name))
+                                if ((cmd==195 && isname("lootable",sub_object->name)) && !isname(buffer,sub_object->name))
                                 {
 				  SET_BIT(sub_object->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED);;
                                   struct affected_type pthiefaf;
@@ -122,7 +123,7 @@ void get(struct char_data *ch, struct obj_data *obj_object, struct obj_data *sub
 
                                 }
 		      } else if (has_consent && obj_object->obj_flags.type_flag == ITEM_MONEY && !isname(buffer,sub_object->name)) {
-                                if (isname("lootable",sub_object->name))
+                                if (cmd==195 && isname("lootable",sub_object->name))
                                 {
                                   struct affected_type pthiefaf;
 
@@ -307,16 +308,30 @@ int do_get(struct char_data *ch, char *argument, int cmd)
       return eFAILURE; 
     }
 
-    if((cmd == 10) && (type != 2) && (type != 6)) {
+    if(cmd == 10 && type != 2 && type != 6) {
       send_to_char("You can only palm objects that are in the same room, "
                    "one at a time.\n\r", ch);
       return eFAILURE; 
     }
 
+    if (cmd == 195 && type != 0 && type != 6) {
+      send_to_char("You can only loot 1 item from a non-consented corpse.\n\r", ch);
+      return eFAILURE;
+    }
+
     switch (type) {
 	/* get */
 	case 0:{ 
+	  switch(cmd) {
+	  case 10:
+	    send_to_char("Palm what?\n\r", ch); 
+	    break;
+	  case 195:
+	    send_to_char("Loot what?\n\r", ch); 
+	    break;
+	  default:
 	    send_to_char("Get what?\n\r", ch); 
+	  }
 	} break;
 	/* get all */
 	case 1:{ 
@@ -405,7 +420,7 @@ int do_get(struct char_data *ch, char *argument, int cmd)
 		    }
 		    else if (CAN_WEAR(obj_object,ITEM_TAKE)) 
 		    {
-			get(ch,obj_object,sub_object,0);
+			get(ch, obj_object, sub_object, 0, cmd);
 			found = TRUE;
 		    } else 
 		    {
@@ -413,7 +428,7 @@ int do_get(struct char_data *ch, char *argument, int cmd)
 			fail = TRUE;
 		    }
 		} else if (CAN_SEE_OBJ(ch, obj_object) && GET_LEVEL(ch) >= IMMORTAL && CAN_WEAR(obj_object,ITEM_TAKE)) {
-		    get(ch,obj_object,sub_object,0);
+		    get(ch, obj_object, sub_object, 0, cmd);
                     found = TRUE;
                 }
 	    } // of for loop
@@ -475,16 +490,19 @@ int do_get(struct char_data *ch, char *argument, int cmd)
 		     fail = TRUE;	
                   } else {
                      csendf(ch, "The aura of the donation room allows you to pick up %s.\n\r", obj_object->short_description);
-                     get (ch, obj_object, sub_object,0);
+                     get(ch, obj_object, sub_object, 0, cmd);
                      do_save(ch,"", 666);
                      found = TRUE;
                   }
 		} else if (CAN_WEAR(obj_object,ITEM_TAKE)) 
                 {
-                    if(cmd == 10) palm(ch, obj_object, sub_object,0);
-		    else          get (ch, obj_object, sub_object,0);
-                    do_save(ch,"", 666);
-		    found = TRUE;
+		  if (cmd == 10)
+		    palm(ch, obj_object, sub_object, 0);
+		  else
+		    get(ch, obj_object, sub_object, 0, cmd);
+
+		  do_save(ch,"", 666);
+		  found = TRUE;
 		} else {
 		    send_to_char("You can't take that.\n\r", ch);
 		    fail = TRUE;
@@ -581,7 +599,7 @@ fname(obj_object->name));
                             // if I have consent and i'm touching the corpse, then I shouldn't be able
                             // to pick up no_trade items because it is someone else's corpse.  If I am
                             // the other of the corpse, has_consent will be false.
-                            if (GET_LEVEL(ch) < 100) {
+                            if (GET_LEVEL(ch) < IMMORTAL) {
 			       if (isname(obj_object->name, "thiefcorpse"))
 				{
                         csendf(ch, "Whoa!  The %s poofed into thin air!\r\n", obj_object->short_description);
@@ -607,7 +625,7 @@ fname(obj_object->name));
 			}
 
 		          if (CAN_WEAR(obj_object,ITEM_TAKE)) {
-			    get(ch,obj_object,sub_object,0);
+			    get(ch,obj_object, sub_object, 0, cmd);
 			    found = TRUE;
 		          } else {
 			    send_to_char("You can't take that.\n\r", ch);
@@ -645,12 +663,17 @@ fname(obj_object->name));
 	  send_to_char(
 	    "You can't take a thing from more than one container.\n\r", ch);
 	} break;
-	case 6:{
+        case 6:{ // get ??? ???
 	  found = FALSE;
 	  fail  = FALSE;
 	  sub_object = get_obj_in_list_vis(ch, arg2, 
 			   world[ch->in_room].contents);
 	  if (!sub_object){
+	    if (cmd==195) {
+	      send_to_char("You can only loot 1 item from a non-consented corpse.\n\r", ch);
+	      return eFAILURE;
+	    }
+
 	    sub_object = get_obj_in_list_vis(ch, arg2, ch->carrying, TRUE);
             inventorycontainer = TRUE;
 	  }
@@ -660,9 +683,9 @@ fname(obj_object->name));
 	       isname("pc", sub_object->name)) || isname("thiefcorpse",sub_object->name))) 
             {
                sprintf(buffer, "%s_consent", GET_NAME(ch));
-	       if((isname("thiefcorpse", sub_object->name) && !isname(GET_NAME(ch), sub_object->name)) || isname(buffer, sub_object->name))
+	       if(cmd != 195 && (isname("thiefcorpse", sub_object->name) && !isname(GET_NAME(ch), sub_object->name)) || isname(buffer, sub_object->name))
                  has_consent = TRUE;
-               if (!isname(GET_NAME(ch), sub_object->name) && isname("lootable", sub_object->name) && !IS_SET(sub_object->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED) &&
+               if (!isname(GET_NAME(ch), sub_object->name) && (cmd==195 && isname("lootable", sub_object->name)) && !IS_SET(sub_object->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED) &&
 			!IS_SET(world[ch->in_room].room_flags, SAFE) && GET_LEVEL(ch) >= 50)
 		 has_consent = TRUE;
 	       if(!has_consent && !isname(GET_NAME(ch), sub_object->name)) {
@@ -717,14 +740,14 @@ fname(obj_object->name));
                   // if I have consent and i'm touching the corpse, then I shouldn't be able
                   // to pick up no_trade items because it is someone else's corpse.  If I am
                   // the other of the corpse, has_consent will be false.
-                      if (GET_LEVEL(ch) < 100) {
-                              if (isname("thiefcorpse",sub_object->name) || isname("lootable",sub_object->name))
+                      if (GET_LEVEL(ch) < IMMORTAL) {
+			if (isname("thiefcorpse",sub_object->name) || (cmd==195 && isname("lootable",sub_object->name)))
                                 {
                         csendf(ch, "Whoa!  The %s poofed into thin air!\r\n", obj_object->short_description);
                         extract_obj(obj_object);
 			fail = TRUE;
 				sprintf(buffer,"%s_consent",GET_NAME(ch));
-				if (isname("lootable",sub_object->name) && !isname(buffer, sub_object->name))
+				if ((cmd==195 && isname("lootable",sub_object->name)) && !isname(buffer, sub_object->name))
 				{
 				  SET_BIT(sub_object->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED);
 				  struct affected_type pthiefaf;
@@ -759,8 +782,10 @@ fname(obj_object->name));
                     }
 		    else if (CAN_WEAR(obj_object,ITEM_TAKE)) 
                     {
-                      if(cmd == 10) palm(ch, obj_object, sub_object,has_consent);
-		      else          get (ch, obj_object, sub_object,has_consent);
+                      if(cmd == 10)
+			palm(ch, obj_object, sub_object,has_consent);
+		      else
+			get(ch, obj_object, sub_object, has_consent, cmd);
 		      found = TRUE;
                       if(blindlag) WAIT_STATE(ch, PULSE_VIOLENCE);
 		    } else {
@@ -1551,7 +1576,7 @@ struct obj_data * bring_type_to_front(char_data * ch, int item_type)
   //  if(GET_ITEM_TYPE(i) == ITEM_CONTAINER) { // search inside if open
       for(j = i->contains; j ; j = j->next_content) {
         if(GET_ITEM_TYPE(j) == item_type) {
-          get(ch, j, i,0);
+          get(ch, j, i, 0, 9);
           return j;
         }
       }

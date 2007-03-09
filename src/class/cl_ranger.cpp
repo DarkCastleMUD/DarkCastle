@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: cl_ranger.cpp,v 1.83 2007/02/22 20:38:57 shane Exp $ | cl_ranger.C  *
+ * $Id: cl_ranger.cpp,v 1.84 2007/03/09 05:31:43 jhhudso Exp $ | cl_ranger.C  *
  * Description: Ranger skills/spells                                          *
  *                                                                            *
  * Revision History                                                           *
@@ -31,6 +31,7 @@ extern "C"  {
 #include <act.h>
 #include <fileinfo.h> // SAVE_DIR
 #include <returnvals.h>
+#include <inventory.h>
 
 extern CWorld world;
 extern struct zone_data *zone_table;
@@ -1111,8 +1112,6 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
   bool enchantmentused = FALSE;
   extern char * dirs[];
 
-  void get(struct char_data *, struct obj_data *, struct obj_data *, bool);
-  
   victim = NULL;
   *direct = '\0';
   *arrow = '\0';
@@ -1345,13 +1344,13 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
          && isname("quiver", ch->equipment[WEAR_ABOUT]->name))
         {found = find_arrow(ch->equipment[WEAR_ABOUT]);
         if(found)
-           get(ch,found,ch->equipment[WEAR_ABOUT],0); }
+           get(ch,found,ch->equipment[WEAR_ABOUT],0,9); }
    if(!found && ch->equipment[WEAR_WAISTE])
     if((ch->equipment[WEAR_WAISTE]->obj_flags.type_flag == ITEM_CONTAINER) 
         && isname("quiver", ch->equipment[WEAR_WAISTE]->name))
         {found = find_arrow(ch->equipment[WEAR_WAISTE]);
         if(found)
-           get(ch,found,ch->equipment[WEAR_WAISTE],0); }
+           get(ch,found,ch->equipment[WEAR_WAISTE],0,9); }
 
    if(!found)
    {
