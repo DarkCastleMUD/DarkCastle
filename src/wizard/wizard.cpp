@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.43 2007/03/08 23:28:00 dcastle Exp $
+| $Id: wizard.cpp,v 1.44 2007/03/09 04:27:45 jhhudso Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -1670,6 +1670,7 @@ void pick_up_item(struct char_data *ch, struct obj_data *obj)
 {
   struct hunt_items *i,*p = NULL,*in;
   char buf[MAX_STRING_LENGTH];
+  int gold = 0;
 
   for (i = hunt_items_list; i; i = in)
   {
@@ -1689,9 +1690,9 @@ void pick_up_item(struct char_data *ch, struct obj_data *obj)
 		case 27916:
 		case 27917:
 		case 27918:
-		  int gold = obj->obj_flags.value[0];
+		  gold = obj->obj_flags.value[0];
 		  sprintf(buf, "As if by magic, %s transform into %d gold!\r\n",
-			obj->short_description,gold);
+			obj->short_description, gold);
 		  send_to_char(buf,ch);
 
 		  GET_GOLD(ch) += gold;
