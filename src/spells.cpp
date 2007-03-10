@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.216 2007/03/10 18:31:59 dcastle Exp $ */
+/* $Id: spells.cpp,v 1.217 2007/03/10 18:57:18 jhhudso Exp $ */
 
 extern "C"
 {
@@ -1335,7 +1335,7 @@ int do_release(CHAR_DATA *ch, char *argument, int cmd)
        }
 
        for (aff = ch->affected; aff; aff = aff_next)
-       {
+	 {
         aff_next = aff->next;
 	while (aff_next && aff_next->type == aff->type)
          aff_next = aff_next->next;
@@ -1351,6 +1351,7 @@ int do_release(CHAR_DATA *ch, char *argument, int cmd)
 	       if (!done && !skill_success(ch,NULL, SKILL_RELEASE))
        {
          send_to_char("You failed to release the spell, and are left momentarily dazed.\r\n",ch);
+	 act( "$n fails to release the magic surrounding $m and is left momentarily dazed.", ch, 0, 0, TO_ROOM , INVIS_NULL);
          WAIT_STATE(ch,PULSE_VIOLENCE/2);
 	 ch->move -= 10;
          return eFAILURE;
@@ -1359,6 +1360,9 @@ int do_release(CHAR_DATA *ch, char *argument, int cmd)
 	if (!done)
 	  ch->move -= 25;
 	send_to_char("You release the spell.\r\n",ch);
+	char buffer[255];
+	snprintf(buffer, 255, "$n concentrates for a moment and releases their %s.", get_skill_name(aff->type));
+	act( buffer, ch, 0, 0, TO_ROOM , INVIS_NULL);
              if (*spell_wear_off_msg[aff->type]) {
                 send_to_char(spell_wear_off_msg[aff->type], ch);
                 send_to_char("\n\r", ch);
@@ -1366,7 +1370,7 @@ int do_release(CHAR_DATA *ch, char *argument, int cmd)
 	  affect_from_char(ch, aff->type);
 //	  affect_remove(ch,aff,0);
 	 done = TRUE;
-       }
+	 }
     }
     if (!done)
     send_to_char("No such spell to release.\r\n",ch);
