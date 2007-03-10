@@ -12148,11 +12148,6 @@ int spell_divine_intervention(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, OBJ
 {
   struct affected_type af;
 
-  if(affected_by_spell(ch, SPELL_DIV_INT_TIMER)) {
-    send_to_char("The gods are unwilling to intervene on your behalf again so soon.\n\r", ch);
-    return eFAILURE;
-  }
-
   act("Light pours down from above bathing you in a shell of divine protection.", ch, 0, 0, TO_CHAR, 0);
   act("Light pours down from above and surrounds $n in a shell of divine protection.", ch, 0, 0, TO_ROOM, 0);
 
