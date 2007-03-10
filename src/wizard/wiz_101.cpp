@@ -40,6 +40,7 @@ int do_wizhelp(struct char_data *ch, char *argument, int cmd_arg)
 
   buf[0] = '\0';
   buf2[0] = '\0';
+  buf3[0] = '\0';
 
   if (argument && *argument)
   {
