@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.215 2007/02/28 17:09:29 dcastle Exp $ */
+/* $Id: spells.cpp,v 1.216 2007/03/10 18:31:59 dcastle Exp $ */
 
 extern "C"
 {
@@ -1636,6 +1636,10 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
   spl = old_search_block(argument, 1, qend-1, spells, 0);
   if (spl <= 0) {
     send_to_char("Your lips do not move, no magic appears.\n\r",ch);
+    return eFAILURE;
+  }
+  if (spl == SPELL_DIVINE_INTER && affected_by_spell(ch, SPELL_DIV_INT_TIMER)) {
+    send_to_char("The gods are unwilling to intervene on your behalf again so soon.\n\r", ch);
     return eFAILURE;
   }
 
