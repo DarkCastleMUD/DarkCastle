@@ -116,7 +116,7 @@ void loadnews()
 	char buf[MAX_STRING_LENGTH];
 	for (i = 0; i < (int)strlen(nnews->news);i++)
 	{
-	  if (*(nnews->news+i) != '\r') buf[v++] = *(nnews->news+i);
+	 	buf[v++] = *(nnews->news+i);
 	}
 	buf[v] = '\0';
 	nnews->news = str_dup(buf);
