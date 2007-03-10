@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.44 2007/03/09 04:27:45 jhhudso Exp $
+| $Id: wizard.cpp,v 1.45 2007/03/10 18:18:17 dcastle Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -1684,8 +1684,30 @@ void pick_up_item(struct char_data *ch, struct obj_data *obj)
 		obj->short_description,i->mobname,ch->name);
 	send_info(buf);
 	struct hunt_data *h = i->hunt;
+	struct obj_data *oitem = NULL;
 	switch (vnum)
 	{
+		case 76:
+		  obj_from_char(obj);
+		  obj_to_room(obj, 6345);
+		  int r1 = real_object(get_rand_obj(h));
+		  if (r1 > 0)
+		  {
+		    oitem = clone_object(r1);
+		    obj_to_char(oitem, ch);
+		    sprintf(buf, "As if by magic, %s transforms into %s!\r\n",
+			obj->short_description, oitem->short_description);
+		    send_to_char(buf,ch);
+		    sprintf(buf, "## %s turned into %s!\r\n",
+			obj->short_description,oitem->short_description);
+		    send_info(buf);
+		  } else {
+		    send_to_char("Brick turned into a non-existent item. Tell an imm.\r\n",ch);
+		    break;
+		  }
+		  if (obj_index[oitem->item_number].virt < 27915 || obj_index[oitem->item_number].virt > 27918)
+			  break;
+		  else obj = oitem; // Gold! Continue on to the next cases.
 		case 27915:
 		case 27916:
 		case 27917:
@@ -1699,24 +1721,7 @@ void pick_up_item(struct char_data *ch, struct obj_data *obj)
 		  obj_from_char(obj);
 		  obj_to_room(obj, 6345);
 		  break;
-		case 76:
-		  obj_from_char(obj);
-		  obj_to_room(obj, 6345);
-		  int r1 = real_object(get_rand_obj(h));
-		  if (r1 > 0)
-		  {
-		    struct obj_data *oitem = clone_object(r1);
-		    obj_to_char(oitem, ch);
-		    sprintf(buf, "As if by magic, %s transforms into %s!\r\n",
-			obj->short_description, oitem->short_description);
-		    send_to_char(buf,ch);
-		    sprintf(buf, "\r\n## %s turned into %s!\r\n",
-			obj->short_description,oitem->short_description);
-		    send_info(buf);
-		  } else {
-		    send_to_char("Brick turned into a non-existent item. Tell an imm.\r\n",ch);
-		  }
-		  break;
+
 	}
 	dc_free(i->mobname);
 	dc_free(i);
