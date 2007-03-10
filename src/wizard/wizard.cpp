@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.45 2007/03/10 18:18:17 dcastle Exp $
+| $Id: wizard.cpp,v 1.46 2007/03/10 18:55:56 jhhudso Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -1685,12 +1685,13 @@ void pick_up_item(struct char_data *ch, struct obj_data *obj)
 	send_info(buf);
 	struct hunt_data *h = i->hunt;
 	struct obj_data *oitem = NULL;
+	int r1 = 0;
 	switch (vnum)
 	{
 		case 76:
 		  obj_from_char(obj);
 		  obj_to_room(obj, 6345);
-		  int r1 = real_object(get_rand_obj(h));
+		  r1 = real_object(get_rand_obj(h));
 		  if (r1 > 0)
 		  {
 		    oitem = clone_object(r1);
