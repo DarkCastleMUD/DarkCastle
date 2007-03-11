@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: non_off.cpp,v 1.44 2006/10/18 04:30:13 jhhudso Exp $
+| $Id: non_off.cpp,v 1.45 2007/03/11 17:29:39 dcastle Exp $
 | non_off.C
 | Description:  Implementation of generic, non-offensive commands.
 */
@@ -38,8 +38,8 @@ extern "C"
 extern CWorld world;
 extern struct index_data *obj_index;
  
-void log_sacrifice(CHAR_DATA *ch, OBJ_DATA *obj)
-{
+void log_sacrifice(CHAR_DATA *ch, OBJ_DATA *obj, bool decay = FALSE)
+{ //decay variable means it's from a decaying corpse, not a player
   FILE *fl;
   long ct;
   char *tmstr;
@@ -54,8 +54,10 @@ void log_sacrifice(CHAR_DATA *ch, OBJ_DATA *obj)
   ct = time(0);
   tmstr = asctime(localtime(&ct));
   *(tmstr + strlen(tmstr) - 1) = '\0';
-
-  fprintf(fl, "%s :: %s just sacrificed %s [obj num: %d]\n", tmstr, GET_NAME(ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj));
+  if (!decay)
+    fprintf(fl, "%s :: %s just sacrificed %s [obj num: %d]\n", tmstr, GET_NAME(ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj));
+  else
+    fprintf(fl, "%s :: %s just poofed from decaying corpse %s [obj num: %d]\n", tmstr, GET_OBJ_SHORT((OBJ_DATA*)ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj));
 
   dc_fclose(fl);
 }
@@ -255,6 +257,18 @@ int do_donate(struct char_data *ch, char *argument, int cmd)
   act("$n donates $p.", ch, obj, 0, TO_ROOM, 0);
   act("You donate $p.", ch, obj, 0, TO_CHAR, 0);
  
+  if (obj->obj_flags.type_flag != ITEM_MONEY)
+  {
+     sprintf(log_buf, "%s donates %s[%d]", GET_NAME(ch), obj->name, obj_index[obj->item_number].virt);
+     log(log_buf, 110, LOG_GIVE);
+     for(OBJ_DATA *loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
+       logf(IMP, LOG_GIVE, "The %s contained %s[%d]", obj->short_description,
+                          loop_obj->short_description,
+                          obj_index[loop_obj->item_number].virt);
+  }
+
+
+
   location = real_room(room);
   origin = ch->in_room;
   move_char(ch, location);

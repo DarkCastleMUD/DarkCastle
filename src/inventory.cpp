@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.91 2007/03/09 05:31:43 jhhudso Exp $
+| $Id: inventory.cpp,v 1.92 2007/03/11 17:29:39 dcastle Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -151,6 +151,19 @@ void get(struct char_data *ch, struct obj_data *obj_object, struct obj_data *sub
                                 }
 		      }
 
+        if (sub_object->in_room && obj_object->obj_flags.type_flag != ITEM_MONEY)
+	{ // Logging gold gets from corpses would just be too much.
+  	    sprintf(log_buf, "%s gets %s[%d] from %s", GET_NAME(ch), obj_object->name, obj_index[obj_object->item_number].virt,
+                sub_object->name);
+	    log(log_buf, 110, LOG_GIVE);
+ 	    for(OBJ_DATA *loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
+              logf(IMP, LOG_GIVE, "The %s contained %s[%d]",
+                          obj_object->short_description,
+                          loop_obj->short_description,
+                          obj_index[loop_obj->item_number].virt);
+
+	  
+	}
 	move_obj(obj_object, ch);
 	if (sub_object->carried_by == ch) {
 	    act("You get $p from $P.", ch, obj_object, sub_object, TO_CHAR, 0);
@@ -164,6 +177,18 @@ void get(struct char_data *ch, struct obj_data *obj_object, struct obj_data *sub
 	move_obj(obj_object, ch);
 	act("You get $p.", ch, obj_object, 0, TO_CHAR, 0);
 	act("$n gets $p.", ch, obj_object, 0, TO_ROOM, INVIS_NULL);
+        if (obj_object->obj_flags.type_flag != ITEM_MONEY)
+        {
+            sprintf(log_buf, "%s gets %s[%d] from room %d", GET_NAME(ch), obj_object->name, obj_index[obj_object->item_number].virt,
+                ch->in_room);
+            log(log_buf, 110, LOG_GIVE);
+            for(OBJ_DATA *loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
+              logf(IMP, LOG_GIVE, "The %s contained %s[%d]",
+                          obj_object->short_description,
+                          loop_obj->short_description,
+                          obj_index[loop_obj->item_number].virt);
+        }
+
         if(obj_index[obj_object->item_number].virt == CHAMPION_ITEM) {
            SETBIT(ch->affected_by, AFF_CHAMPION);
            sprintf(buffer, "\n\r##%s has just picked up the Champion flag!\n\r", GET_NAME(ch));
@@ -1019,6 +1044,17 @@ int do_drop(struct char_data *ch, char *argument, int cmd)
             else
                send_to_char("You drop something.\n\r", ch);
 
+            if (tmp_object->obj_flags.type_flag != ITEM_MONEY)
+            {
+              sprintf(log_buf, "%s drops %s[%d] in room %d", GET_NAME(ch), tmp_object->name, obj_index[tmp_object->item_number].virt,ch->in_room);
+              log(log_buf, 110, LOG_GIVE);
+              for(OBJ_DATA *loop_obj = tmp_object->contains; loop_obj; loop_obj = loop_obj->next_content)
+                logf(IMP, LOG_GIVE, "The %s contained %s[%d]",
+                          tmp_object->short_description,
+                          loop_obj->short_description,
+                          obj_index[loop_obj->item_number].virt);
+	    }
+	    
             act("$n drops $p.", ch, tmp_object, 0, TO_ROOM, INVIS_NULL);
             move_obj(tmp_object, ch->in_room);
             test = TRUE;
@@ -1066,6 +1102,17 @@ int do_drop(struct char_data *ch, char *argument, int cmd)
           sprintf(buffer, "You drop the %s.\n\r", fname(tmp_object->name));
           send_to_char(buffer, ch);
           act("$n drops $p.", ch, tmp_object, 0, TO_ROOM, INVIS_NULL);
+          if (tmp_object->obj_flags.type_flag != ITEM_MONEY)
+          {
+            sprintf(log_buf, "%s drops %s[%d] in room %d", GET_NAME(ch), tmp_object->name, obj_index[tmp_object->item_number].virt,ch->in_room);
+            log(log_buf, 110, LOG_GIVE);
+            for(OBJ_DATA *loop_obj = tmp_object->contains; loop_obj; loop_obj = loop_obj->next_content)
+              logf(IMP, LOG_GIVE, "The %s contained %s[%d]",
+                          tmp_object->short_description,
+                          loop_obj->short_description,
+                          obj_index[loop_obj->item_number].virt);
+          }
+
 
           move_obj(tmp_object, ch->in_room);
           return eSUCCESS;

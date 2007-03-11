@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.164 2007/03/02 03:12:19 dcastle Exp $
+| $Id: cl_thief.cpp,v 1.165 2007/03/11 17:29:42 dcastle Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -125,6 +125,26 @@ int palm(CHAR_DATA *ch, struct obj_data *obj_object,
 
   }
   move_obj(obj_object, ch);
+  char log_buf[MAX_STRING_LENGTH];
+  if (sub_object && sub_object->in_room && obj_object->obj_flags.type_flag != ITEM_MONEY)
+  { // Logging gold gets from corpses would just be too much.
+    sprintf(log_buf, "%s palms %s[%d] from %s", GET_NAME(ch), obj_object->name, obj_index[obj_object->item_number].virt,
+                sub_object->name);
+    log(log_buf, 110, LOG_GIVE);
+    for(OBJ_DATA *loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
+      logf(IMP, LOG_GIVE, "The %s contained %s[%d]", obj_object->short_description, loop_obj->short_description,
+                          obj_index[loop_obj->item_number].virt);
+
+
+  } else if (!sub_object && obj_object->obj_flags.type_flag != ITEM_MONEY) {
+    sprintf(log_buf, "%s palms %s[%d] from room %d", GET_NAME(ch), obj_object->name, obj_index[obj_object->item_number].virt,
+                ch->in_room);
+    log(log_buf, 110, LOG_GIVE);
+    for(OBJ_DATA *loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
+      logf(IMP, LOG_GIVE, "The %s contained %s[%d]", obj_object->short_description, loop_obj->short_description,
+                        obj_index[loop_obj->item_number].virt);
+  }
+
   
   if(skill_success(ch,NULL,SKILL_PALM)) {
     act("You successfully snag $p, no one saw you do it!",  ch, 

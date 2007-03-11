@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.90 2007/02/23 04:09:47 shane Exp $ */
+/* $Id: limits.cpp,v 1.91 2007/03/11 17:29:39 dcastle Exp $ */
 
 extern "C"
 {
@@ -47,6 +47,7 @@ extern "C"
 #include <interp.h>
 #include <clan.h> //totem
 #include <vault.h>
+#include <inventory.h>
 
 extern CHAR_DATA *character_list;
 extern struct obj_data *object_list;
@@ -882,7 +883,10 @@ void update_corpses_and_portals(void)
 		oon = oo->next_content;
 
                 if(IS_SET(oo->obj_flags.more_flags, ITEM_NO_TRADE))
+		{
+		  log_sacrifice((CHAR_DATA*)j, oo, TRUE);
                   extract_obj(oo);
+		}
 	     }
 	  }
           if (j->in_obj) {
@@ -892,6 +896,7 @@ void update_corpses_and_portals(void)
                 next_thing = jj->next;
              while (next_thing && next_thing->in_obj == jj)
                 next_thing = next_thing->next;
+  	     log_sacrifice((CHAR_DATA*)j, jj, TRUE);
              extract_obj(jj);
             }
             else
@@ -904,6 +909,7 @@ void update_corpses_and_portals(void)
                next_thing = jj->next;
              while (next_thing->in_obj == jj)
                 next_thing = next_thing->next;
+  	     log_sacrifice((CHAR_DATA*)j, jj, TRUE);
              extract_obj(jj);
             }
             else
@@ -917,6 +923,7 @@ void update_corpses_and_portals(void)
 	       next_thing = jj->next;
 	     while (next_thing && next_thing->in_obj == jj)
 		next_thing = next_thing->next;
+  	     log_sacrifice((CHAR_DATA*)j, jj, TRUE);
 	     extract_obj(jj);
 	    }
 	    else

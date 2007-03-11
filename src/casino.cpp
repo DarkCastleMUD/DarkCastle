@@ -2027,6 +2027,8 @@ void reel_spin(void *arg1, void *arg2, void *arg3)
  	 extern void send_info(char *messg);
 	 send_info(buf);
 
+         logf( IMMORTAL, LOG_MORTAL, "Jackpot win! %s won the jackpot of %d %s!",
+			GET_NAME(machine->ch), (int)machine->jackpot, machine->gold?"coins":"plats");
          if(machine->gold)
             GET_GOLD(machine->ch) += (int)machine->jackpot;
          else GET_PLATINUM(machine->ch) += (int)machine->jackpot;
