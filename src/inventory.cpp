@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.92 2007/03/11 17:29:39 dcastle Exp $
+| $Id: inventory.cpp,v 1.93 2007/03/13 13:58:42 dcastle Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -151,7 +151,7 @@ void get(struct char_data *ch, struct obj_data *obj_object, struct obj_data *sub
                                 }
 		      }
 
-        if (sub_object->in_room && obj_object->obj_flags.type_flag != ITEM_MONEY)
+        if (sub_object->in_room && obj_object->obj_flags.type_flag != ITEM_MONEY && sub_object->carried_by != ch)
 	{ // Logging gold gets from corpses would just be too much.
   	    sprintf(log_buf, "%s gets %s[%d] from %s", GET_NAME(ch), obj_object->name, obj_index[obj_object->item_number].virt,
                 sub_object->name);
