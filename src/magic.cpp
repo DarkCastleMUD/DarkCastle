@@ -5668,27 +5668,15 @@ int spell_portal(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data 
      IS_SET(world[victim->in_room].room_flags, IMP_ONLY) ||
      IS_SET(world[victim->in_room].room_flags, NO_PORTAL) )  {
     send_to_char ("You can't seem to find a path.\n\r", ch);
-    if(GET_CLASS(ch) == CLASS_CLERIC)
-      GET_MANA(ch) += 100;
-    else
-      GET_MANA(ch) += 25;
     return eFAILURE;
   }
 
   if((!IS_NPC(victim)) && (GET_LEVEL(victim) >= IMMORTAL)) {
     send_to_char("Just who do you think you are?\n\r", ch);
-    if(GET_CLASS(ch) == CLASS_CLERIC)
-      GET_MANA(ch) += 100;
-    else
-      GET_MANA(ch) += 25;
     return eFAILURE;
   }
   if(IS_AFFECTED(victim, AFF_SHADOWSLIP)) {
     send_to_char("You can't seem to find a definite path.\n\r", ch);
-    if(GET_CLASS(ch) == CLASS_CLERIC)
-      GET_MANA(ch) += 100;
-    else
-      GET_MANA(ch) += 25;
     return eFAILURE;
   }
   if(IS_SET(zone_table[world[victim->in_room].zone].zone_flags, ZONE_NO_TELEPORT))
@@ -5713,10 +5701,6 @@ int spell_portal(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data 
     send_to_char("A portal shimmers into view, then fades away again.\n\r",ch);
     act("A portal shimmers into view, then fades away again.",
         ch, 0, 0, TO_ROOM, 0);
-    if(GET_CLASS(ch) == CLASS_CLERIC)
-      GET_MANA(ch) += 125;
-    else
-      GET_MANA(ch) += 50;
     return eFAILURE;
   }
 
