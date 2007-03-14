@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.150 2007/03/13 13:37:53 dcastle Exp $ */
+/* $Id: mob_proc.cpp,v 1.151 2007/03/14 14:47:39 pirahna Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -1182,7 +1182,7 @@ static char *dethSayText [ ] =
   "I'm so big and sexy!  GET IN MAH BELLY!!!",
   "Why is it called tourist season if we aren't allowed to shoot them?",
   "This mud sucks!  I'm going to go play on Nodeka!",
-  "Raha!  When am I getting my 321 plats back?!?!?",
+  "Raha!  When am I getting my 321 plats back?!?!?",  // - He stole them from Antijag
   "I fucked your mom...  No no, really, I fucked your mom.",
   "smoking.",
   "My aunt's a piece of ass.",
