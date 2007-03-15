@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.233 2007/03/09 06:08:04 jhhudso Exp $ */
+/* $Id: const.cpp,v 1.234 2007/03/15 03:22:55 jhhudso Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -79,6 +79,7 @@ bestowable_god_commands_type bestowable_god_commands[] =
 { "testhand",   COMMAND_TESTHAND, true },
 { "dopathpath", COMMAND_DOPATHPATH, true },
 { "do_the_thing", COMMAND_DO_THE_THING, true },
+{ "quest", COMMAND_QUEST, true },
 { "\n",		-1 }
 };
 
