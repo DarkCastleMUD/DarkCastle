@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.46 2007/03/10 18:55:56 jhhudso Exp $
+| $Id: wizard.cpp,v 1.47 2007/03/15 22:26:23 shane Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -97,7 +97,7 @@ void do_mload(struct char_data *ch, int rnum, int cnt)
   sprintf(buf,"You create %i %s!\n\r",cnt, mob->short_desc);
   send_to_char(buf, ch);
   if (cnt > 1) {
-    snprintf(buf, 100, "%s loads %i copies of mob %d (%s) at room %d (%s).",
+    snprintf(buf, MAX_STRING_LENGTH, "%s loads %i copies of mob %d (%s) at room %d (%s).",
 	     GET_NAME(ch),
 	     cnt,
 	     mob_index[rnum].virt,
@@ -105,7 +105,7 @@ void do_mload(struct char_data *ch, int rnum, int cnt)
 	     world[ch->in_room].number,
 	     world[ch->in_room].name);
   } else {
-    snprintf(buf, 100, "%s loads %i copy of mob %d (%s) at room %d (%s).",
+    snprintf(buf, MAX_STRING_LENGTH, "%s loads %i copy of mob %d (%s) at room %d (%s).",
 	     GET_NAME(ch),
 	     cnt,
 	     mob_index[rnum].virt,
@@ -142,7 +142,7 @@ void do_oload(struct char_data *ch, int rnum, int cnt)
   sprintf(buf, "You create %i %s.\n\r", cnt, obj->short_description);
   send_to_char(buf, ch);
   if (cnt > 1) {
-    snprintf(buf, 100, "%s loads %i copies of obj %d (%s) at room %d (%s).",
+    snprintf(buf, MAX_STRING_LENGTH, "%s loads %i copies of obj %d (%s) at room %d (%s).",
 	     GET_NAME(ch),
 	     cnt,
 	     GET_OBJ_VNUM(obj),
@@ -150,7 +150,7 @@ void do_oload(struct char_data *ch, int rnum, int cnt)
 	     world[ch->in_room].number,
 	     world[ch->in_room].name);
   } else {
-    snprintf(buf, 100, "%s loads %i copy of obj %d (%s) at room %d (%s).",
+    snprintf(buf, MAX_STRING_LENGTH, "%s loads %i copy of obj %d (%s) at room %d (%s).",
 	     GET_NAME(ch),
 	     cnt,
 	     GET_OBJ_VNUM(obj),
