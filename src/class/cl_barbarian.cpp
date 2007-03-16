@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_barbarian.cpp,v 1.75 2007/02/28 16:23:07 dcastle Exp $
+| $Id: cl_barbarian.cpp,v 1.76 2007/03/16 03:07:34 jhhudso Exp $
 | cl_barbarian.C
 | Description:  Commands for the barbarian class.
 */
@@ -654,6 +654,14 @@ int do_knockback(struct char_data *ch, char *argument, int cmd)
   if(IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE)) {
     send_to_char("You're too tiny to knock someone that HUGE anywhere!\n\r", 
 		 ch);
+    return eFAILURE;
+  }
+
+  if(IS_AFFECTED(victim, AFF_STABILITY) && number(0,3) == 0) {
+    act("You bounce off of $N and crash into the ground.", ch, 0, victim, TO_CHAR, 0);
+    act("$n bounces off of you and crashes into the ground.", ch, 0, victim, TO_VICT, 0);
+    act("$n bounces off of $N and crashes into the ground.", ch, 0, victim, TO_ROOM, NOTVICT);
+    WAIT_STATE(ch, PULSE_VIOLENCE);
     return eFAILURE;
   }
 
