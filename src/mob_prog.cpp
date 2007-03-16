@@ -2496,7 +2496,7 @@ int mprog_wordlist_check( char *arg, CHAR_DATA *mob, CHAR_DATA *actor,
 {
 
   char        temp1[ MAX_STRING_LENGTH ];
-  char        temp2[ MAX_INPUT_LENGTH ];
+  char        temp2[ MAX_STRING_LENGTH ];
   char        word[ MAX_INPUT_LENGTH ];
   MPROG_DATA *mprg;
   MPROG_DATA *next;
