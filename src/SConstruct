@@ -1,8 +1,8 @@
 import glob
 
 env = Environment()
-env.Append(CCFLAGS = '-ggdb2 -Wall -m32 -nopie')
-env.Append(LINKFLAGS = '-ggdb2 -Wall -m32 -nopie')
+env.Append(CCFLAGS = '-ggdb2 -Wall -m32')
+env.Append(LINKFLAGS = '-ggdb2 -Wall -m32')
 
 base_src = glob.glob('*.cpp')
 wizard_src = glob.glob('wizard/*.cpp')
