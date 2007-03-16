@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.72 2007/03/02 03:10:24 shane Exp $ */
+/* $Id: utility.cpp,v 1.73 2007/03/16 22:43:39 shane Exp $ */
 
 extern "C"
 {
@@ -1244,6 +1244,13 @@ mob_index[fol->follower->mobdata->nr].virt == 8)
 
   if(IS_AFFECTED(ch, AFF_CHAMPION)) {
      REMBIT(ch->affected_by, AFF_CHAMPION);
+     struct affected_type af;
+     af.type      = OBJ_CHAMPFLAG_TIMER;
+     af.duration  = 5;
+     af.modifier  = 0;
+     af.location  = APPLY_NONE;
+     af.bitvector = -1;
+     affect_to_char(ch, &af);
      sprintf(buf, "\n\r##%s has just logged out, watch for the Champion flag to reappear!\n\r", GET_NAME(ch));
      send_info(buf);
   }

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: non_off.cpp,v 1.45 2007/03/11 17:29:39 dcastle Exp $
+| $Id: non_off.cpp,v 1.46 2007/03/16 22:43:39 shane Exp $
 | non_off.C
 | Description:  Implementation of generic, non-offensive commands.
 */
@@ -197,6 +197,14 @@ int do_donate(struct char_data *ch, char *argument, int cmd)
 	sprintf(buf, "\n\r##%s has just yielded the Champion flag!\n\r",
 		GET_NAME(ch));
 	send_info(buf);
+
+        struct affected_type af;
+        af.type      = OBJ_CHAMPFLAG_TIMER;
+        af.duration  = 5;
+        af.modifier  = 0;
+        af.location  = APPLY_NONE;
+        af.bitvector = -1;
+        affect_to_char(ch, &af);
 
 	act("$n yields $p.", ch, obj, 0, TO_ROOM, 0);
 	act("You yield $p.", ch, obj, 0, TO_CHAR, 0);

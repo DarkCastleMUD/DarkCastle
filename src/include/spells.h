@@ -14,7 +14,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.h,v 1.95 2007/03/15 03:22:55 jhhudso Exp $ */
+/* $Id: spells.h,v 1.96 2007/03/16 22:43:44 shane Exp $ */
 #include <structs.h> // ubyte, int16
 
 #define MAX_BUF_LENGTH               240
@@ -494,7 +494,7 @@ void check_maxes(CHAR_DATA *ch);
 #define SPELL_DIV_INT_TIMER	     4002
 #define SPELL_NO_CAST_TIMER	     4003
 #define SKILL_CM_TIMER               4004
-
+#define OBJ_CHAMPFLAG_TIMER          4005
 
 
 #define TAR_IGNORE         1
