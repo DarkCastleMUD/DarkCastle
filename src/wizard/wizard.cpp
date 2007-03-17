@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.47 2007/03/15 22:26:23 shane Exp $
+| $Id: wizard.cpp,v 1.48 2007/03/17 04:13:42 jhhudso Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -121,7 +121,7 @@ void do_mload(struct char_data *ch, int rnum, int cnt)
 void do_oload(struct char_data *ch, int rnum, int cnt)
 {    
   struct obj_data *obj;
-  char buf[100];
+  char buf[MAX_STRING_LENGTH];
   int i;
      
   if (cnt == 0) cnt = 1;
@@ -139,7 +139,7 @@ void do_oload(struct char_data *ch, int rnum, int cnt)
   }  
   act("$n makes a strange magical gesture.", ch, 0, 0, TO_ROOM, INVIS_NULL);
   act("$n has created $p!", ch, obj, 0, TO_ROOM, 0);
-  sprintf(buf, "You create %i %s.\n\r", cnt, obj->short_description);
+  snprintf(buf, MAX_STRING_LENGTH, "You create %i %s.\n\r", cnt, obj->short_description);
   send_to_char(buf, ch);
   if (cnt > 1) {
     snprintf(buf, MAX_STRING_LENGTH, "%s loads %i copies of obj %d (%s) at room %d (%s).",
