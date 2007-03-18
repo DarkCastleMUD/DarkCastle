@@ -19,7 +19,7 @@
 /* 12/06/2003   Onager   Modified mobile_activity() to prevent charmie    */
 /*                       scavenging                                       */
 /**************************************************************************/
-/* $Id: mob_act.cpp,v 1.44 2007/03/09 05:31:43 jhhudso Exp $ */
+/* $Id: mob_act.cpp,v 1.45 2007/03/18 21:17:50 dcastle Exp $ */
 
 extern "C"
 {
@@ -393,7 +393,9 @@ void mobile_activity(void)
 	     (int)GET_RACE(ch) == (int)GET_RACE(tmp_ch)) &&
 
            !(IS_NPC(tmp_ch->fighting) && !IS_AFFECTED(tmp_ch->fighting, AFF_CHARM))
-		&& !IS_SET(race_info[(int)GET_RACE(ch)].friendly, GET_BITV(tmp_ch->fighting)))
+		&& !IS_SET(race_info[(int)GET_RACE(ch)].friendly, GET_BITV(tmp_ch->fighting)) &&
+	!affected_by_spell(tmp_ch, FUCK_PTHIEF) && !affected_by_spell(tmp_ch, FUCK_GTHIEF)
+)
         {
           tmp_race = GET_RACE(tmp_ch);
           if(GET_RACE(ch) == tmp_race)
