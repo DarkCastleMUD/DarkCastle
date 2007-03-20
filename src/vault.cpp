@@ -958,6 +958,42 @@ struct obj_data *exists_in_vault(struct vault_data *vault, obj_data *obj)
   return 0;
 }
 
+// Function to ensure an item is not bugged. If it is, replace it with the original.
+bool verify_item(struct obj_data **obj)
+{
+ extern int top_of_objt;
+
+  if (!str_cmp((*obj)->short_description, ((struct obj_data*)obj_index[(*obj)->item_number].item)->short_description))
+    return FALSE;
+
+
+  int newitem = -1;
+  for (int i = 1; ; i++)
+  {
+
+    if ((*obj)->item_number - i < 0 && (*obj)->item_number + i > top_of_objt)
+	break; // No item at all found, it's a restring or deleted.
+
+    if ((*obj)->item_number - i >= 0)
+      if (!str_cmp((*obj)->short_description, ((struct obj_data*)obj_index[(*obj)->item_number - i].item)->short_description))
+      {
+		newitem = (*obj)->item_number - i;
+		break;
+      }
+
+    if ((*obj)->item_number + i <= top_of_objt)
+      if (!str_cmp((*obj)->short_description, ((struct obj_data*)obj_index[(*obj)->item_number + i].item)->short_description))
+      {
+		newitem = (*obj)->item_number + i;
+		break;
+      }
+  }
+  if (newitem == -1) return FALSE;
+
+  *obj = clone_object(newitem); // Fixed!
+  return TRUE;
+}
+
 void get_from_vault(CHAR_DATA *ch, char *object, char *owner) {
   char buf[MAX_INPUT_LENGTH];
   char obj_list[50][100];
@@ -1073,6 +1109,10 @@ void get_from_vault(CHAR_DATA *ch, char *object, char *owner) {
     {
       tmp_obj = clone_object(real_object(GET_OBJ_VNUM(obj)));
       copySaveData(tmp_obj,obj);
+
+      if (verify_item(&tmp_obj))
+	copySaveData(tmp_obj,obj);
+
       if (!exists_in_vault(vault, obj))
 	extract_obj(obj);
     }
