@@ -2326,7 +2326,7 @@ void send_roulette_message(struct wheel_data *wheel)
       "Clacking noises fill the air as the ball hits the",
    };
    char *endbuf[] = {
-      "and immediatly bounces out.\n\r",
+      "and immediately bounces out.\n\r",
       "and bounces almost straight up in the air.\n\r",
       "then short-hops a couple of spaces.\n\r",
       "and gets knocked slightly backwards.\n\r",
