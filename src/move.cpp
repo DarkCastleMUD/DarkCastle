@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.80 2007/03/01 23:33:53 shane Exp $
+| $Id: move.cpp,v 1.81 2007/03/22 23:35:44 urizen Exp $
 | move.C
 | Movement commands and stuff.
 *************************************************************************
@@ -765,6 +765,25 @@ int do_simple_move(CHAR_DATA *ch, int cmd, int following)
     do_muddy(ch);
     }
 */
+  if ((GET_CLASS(ch) == CLASS_BARD && has_skill(ch, SKILL_SONG_HYPNOTIC_HARMONY)) || GET_CLASS(ch) == CLASS_RANGER)
+  for (CHAR_DATA *tmp_ch = world[ch->in_room].people; tmp_ch; tmp_ch = tmp_ch->next_in_room)
+  {
+    if (!IS_NPC(tmp_ch)) continue;
+    if (IS_AFFECTED(tmp_ch, AFF_CHARM)) continue;
+    if (tmp_ch->fighting) continue;
+    if (IS_SET(tmp_ch->immune, ISR_CHARM)) continue;
+    if (!number(0,1)) continue;
+
+    if (GET_CLASS(ch) == CLASS_BARD && ISSET(tmp_ch->mobdata->actflags, ACT_BARDCHARM))
+    {
+	    act("$N looks at you expectantly, perhaps hoping for a song?", ch, NULL, tmp_ch, TO_CHAR, 0);
+	    act("$N looks at $n expectantly, perhaps hoping for a song?", ch, NULL, tmp_ch, TO_ROOM, INVIS_NULL);
+    } else if (GET_CLASS(ch) == CLASS_RANGER && ISSET(tmp_ch->mobdata->actflags, ACT_CHARM) && GET_LEVEL(ch) >= GET_LEVEL(tmp_ch))
+    {
+	    act("$N moves submissively out of your way.", ch, NULL, tmp_ch, TO_CHAR, 0);
+	    act("$N moves submissively out of $n's way.", ch, NULL, tmp_ch, TO_ROOM, INVIS_NULL);
+    }
+  }
 
   // let our mobs know they're here
   retval = mprog_entry_trigger( ch );
@@ -776,6 +795,8 @@ int do_simple_move(CHAR_DATA *ch, int cmd, int following)
   retval = oprog_greet_trigger( ch );
   if(SOMEONE_DIED(retval))
     return retval|eSUCCESS;
+
+
 
   return eSUCCESS;
 }
