@@ -223,7 +223,7 @@ int main(int argc, char **argv)
   // Make a copy of our executable so that in the event of a crash we have a
   // known good copy to debug with.
   stringstream cmd;
-  cmd << "cp " << argv[0] << " " << argv[0] << ".`pidof " << argv[0] << "`";
+  cmd << "cp " << argv[0] << " " << argv[0] << ".`/sbin/pidof " << argv[0] << "`";
   if (int retval = system(cmd.str().c_str()) != 0) {
     cerr << "Unable to make backup of executable due to system error: "
 	 << retval << endl;
