@@ -309,6 +309,11 @@ int innate_fly(CHAR_DATA *ch, char *arg, int cmd)
     send_to_char("You fold your wings smoothly behind you and settle gently to the ground.\n\r", ch);
    act("$n folds $s wings smoothly behind $m and settles gently to the ground.", ch, NULL, NULL, TO_ROOM, 0);
   } else {
+    if (ISSET(ch->affected_by, AFF_FLYING)) {
+      send_to_char("You are already flying.\n\r", ch);
+      return eFAILURE;
+    }
+
    struct affected_type af;
    af.type = SKILL_INNATE_FLY;
    af.duration = 0;
