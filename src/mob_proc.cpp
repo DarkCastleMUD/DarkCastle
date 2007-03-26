@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.151 2007/03/14 14:47:39 pirahna Exp $ */
+/* $Id: mob_proc.cpp,v 1.152 2007/03/26 00:42:02 urizen Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -1240,7 +1240,7 @@ static char *dethSayText [ ] =
   "CAUTION! Do not look into laser with remaining eye.",
   "Coarse and violent nudity.  Occasional language.",
   "Cosmetics: preventing men from reading between the lines",
-  "Democracy: 3 wolves and a sheep voting on dinner",
+  "Democracy: 3 wolves and a sheep voting on dinner. Liberty is a well-armed sheep.",
   "Don't drink water, fish fuck in it",
   "Earth is shutting down in five minutes--please save all files and log out.",
   "Ever noticed how fast Windows runs? Me neither.",
