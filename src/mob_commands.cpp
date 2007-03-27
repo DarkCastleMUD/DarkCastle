@@ -1474,7 +1474,7 @@ int do_mppause( CHAR_DATA *ch, char *argument, int cmd )
   // add to delay list
   throwitem->next = g_mprog_throw_list;
   g_mprog_throw_list = throwitem;
-  return eSUCCESS;
+  return eSUCCESS|eDELAYED_EXEC;
 }
 
 int do_mppeace( struct char_data *ch, char *argument, int cmd )
