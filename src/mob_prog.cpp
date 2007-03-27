@@ -390,6 +390,8 @@ void translate_value(char *leftptr, char *rightptr, int16 **vali, uint32 **valui
 		case 't': target = (CHAR_DATA*)vo;break;
 		case 'o': otarget = obj;break;
 		case 'p': otarget = (OBJ_DATA*)vo;break;
+		case 'f': if (actor) target = actor->fighting; break;
+		case 'g': if (mob) target = mob->fighting; break;
 		case 'v':
 			char buf[MAX_STRING_LENGTH];
 			buf[0] = '\0';
@@ -3134,8 +3136,11 @@ void update_mprog_throws()
       // This is done this way in case the 'catch' does a 'throw' inside of it
 
       // if !vict, oh well....remove it anyway.  Someone killed him.
-      if (action->data_num == -999 && vict) // 'tis a pause
+      if (action->data_num == -999 && vict) { // 'tis a pause
 	mprog_driver(action->orig, vict, action->actor, action->obj,action->vo, action);
+	dc_free(action->orig);
+	action->orig = 0;
+ 	}
       else if(vict)  // activate
         mprog_catch_trigger(vict, action->data_num, action->var,action->opt,action->actor, action->obj, action->vo);
       else if (vobj)
