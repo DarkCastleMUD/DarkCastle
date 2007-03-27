@@ -16,7 +16,7 @@
  *  10/21/2003   Onager    Changed IS_ANONYMOUS() to handle mobs without   *
  *                         crashing                                        *
  ***************************************************************************/
-/* $Id: utility.h,v 1.59 2007/03/27 11:26:00 dcastle Exp $ */
+/* $Id: utility.h,v 1.60 2007/03/27 13:56:53 dcastle Exp $ */
 
 #ifndef UTILITY_H_
 #define UTILITY_H_
@@ -482,8 +482,26 @@ int 	mprog_catch_trigger	(char_data * mob, int catch_num, char
 *var, int opt, char_data *actor,obj_data *obj, void *vo);
 int 	mprog_attack_trigger	(char_data * mob, CHAR_DATA* ch);
 int     mprog_load_trigger      (CHAR_DATA *mob);
+int mprog_can_see_trigger( CHAR_DATA *ch, CHAR_DATA *mob );
+
 int oprog_catch_trigger(obj_data *obj, int catch_num, char *var, int opt, char_data *actor, obj_data *obj, void *vo);
+int oprog_act_trigger( char *txt, CHAR_DATA *ch );
+int oprog_speech_trigger( char *txt, CHAR_DATA *ch );
+int oprog_command_trigger( char *txt, CHAR_DATA *ch );
+int oprog_weapon_trigger( CHAR_DATA *ch, OBJ_DATA *item );
+int oprog_armour_trigger( CHAR_DATA *ch, OBJ_DATA *item );
+int oprog_rand_trigger( OBJ_DATA *item);
+int oprog_arand_trigger( OBJ_DATA *item);
+int oprog_greet_trigger( CHAR_DATA *ch);
+int oprog_load_trigger( OBJ_DATA *item);
+int oprog_can_see_trigger( CHAR_DATA *ch, OBJ_DATA *item );
+
+
 bool is_in_game(char_data *ch);
+
+
+
+
 int get_stat(CHAR_DATA *ch, int stat);
 
 #define MAX_THROW_NAME     60

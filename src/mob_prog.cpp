@@ -1988,7 +1988,7 @@ char *mprog_process_if( char *ifchck, char *com_list, CHAR_DATA *mob,
        }
 
        if (!thrw || cmnd >= thrw->orig + thrw->startPos) {
-         mprog_cur_result = mprog_process_cmnd( cmnd, mob, actor, obj, vo, rndm );
+         mprog_cur_result &= mprog_process_cmnd( cmnd, mob, actor, obj, vo, rndm );
          if(IS_SET(mprog_cur_result, eCH_DIED) || IS_SET(mprog_cur_result, eDELAYED_EXEC))
            return null;
 	}
@@ -2068,7 +2068,7 @@ char *mprog_process_if( char *ifchck, char *com_list, CHAR_DATA *mob,
 	   return com_list; 
 
 	 if (!thrw || cmnd >= thrw->startPos + thrw->orig) {
-	   mprog_cur_result = mprog_process_cmnd( cmnd, mob, actor, obj, vo, rndm );
+	   mprog_cur_result &= mprog_process_cmnd( cmnd, mob, actor, obj, vo, rndm );
            if(IS_SET(mprog_cur_result, eCH_DIED) || IS_SET(mprog_cur_result, eDELAYED_EXEC))
              return null;
 	 }
@@ -3003,6 +3003,15 @@ int mprog_arandom_trigger( CHAR_DATA *mob)
    return mprog_cur_result;
 }
  
+int mprog_can_see_trigger( CHAR_DATA *ch, CHAR_DATA *mob )
+{
+  mprog_cur_result = eSUCCESS;
+  if (mob_index[mob->mobdata->nr].progtypes & CAN_SEE_PROG)
+     mprog_percent_check(mob,ch,NULL,NULL,CAN_SEE_PROG);
+
+ return mprog_cur_result;
+}
+
 
 int mprog_speech_trigger( char *txt, CHAR_DATA *mob )
 {
@@ -3179,6 +3188,23 @@ void end_oproc(CHAR_DATA *ch)
   extract_char(ch, TRUE);
   mob_index[real_mobile(12)].progtypes = 0;
   mob_index[real_mobile(12)].mobprogs = 0;
+}
+
+
+int oprog_can_see_trigger( CHAR_DATA *ch, OBJ_DATA *item )
+{
+
+  CHAR_DATA *vmob;
+  mprog_cur_result = eSUCCESS;
+
+  if (obj_index[item->item_number].progtypes & CAN_SEE_PROG)
+     {
+        vmob = initiate_oproc(ch, item);
+        mprog_percent_check(vmob, ch, item, NULL, CAN_SEE_PROG);
+        end_oproc(vmob);
+        return mprog_cur_result;
+     }
+ return mprog_cur_result;
 }
 
 

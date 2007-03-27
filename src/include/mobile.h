@@ -1,7 +1,7 @@
 #ifndef MOBILE_H_
 #define MOBILE_H_
 /************************************************************************
-| $Id: mobile.h,v 1.23 2007/03/27 11:26:00 dcastle Exp $
+| $Id: mobile.h,v 1.24 2007/03/27 13:56:53 dcastle Exp $
 | mobile.h
 | Description:  This file contains the header information for mobile
 |   control.
@@ -80,16 +80,6 @@ struct race_shit
   int affects;      /* automatically added affects   */
   char *unarmed;    // unarmed attack message
 };
-
-int oprog_act_trigger( char *txt, CHAR_DATA *ch );
-int oprog_speech_trigger( char *txt, CHAR_DATA *ch );
-int oprog_command_trigger( char *txt, CHAR_DATA *ch );
-int oprog_weapon_trigger( CHAR_DATA *ch, OBJ_DATA *item );
-int oprog_armour_trigger( CHAR_DATA *ch, OBJ_DATA *item );
-int oprog_rand_trigger( OBJ_DATA *item);
-int oprog_arand_trigger( OBJ_DATA *item);
-int oprog_greet_trigger( CHAR_DATA *ch);
-int oprog_load_trigger( OBJ_DATA *item);
 
 struct mob_matrix_data
 {

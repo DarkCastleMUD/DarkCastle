@@ -2409,7 +2409,10 @@ int do_mpedit(struct char_data *ch, char *argument, int cmd)
                        " 12 -     catch_prog\r\n"
                        " 13 -    attack_prog\r\n"
 		       " 14 -     arand_prog\r\n"
-		       " 15 -      load_prog\r\n", ch);
+		       " 15 -      load_prog\r\n"
+		       " 16 -      can_see_prog\r\n"
+		  
+							, ch);
 		       
           return eFAILURE;
         }
@@ -2428,7 +2431,7 @@ int do_mpedit(struct char_data *ch, char *argument, int cmd)
           return eFAILURE;
         }
 
-        if(!check_range_valid_and_convert(intval, buf3, 1, 15)) {
+        if(!check_range_valid_and_convert(intval, buf3, 1, 16)) {
           send_to_char("Invalid prog number.\r\n", ch);
           return eFAILURE;
         }
@@ -2449,6 +2452,7 @@ int do_mpedit(struct char_data *ch, char *argument, int cmd)
           case 13:  currprog->type = ATTACK_PROG;    break;
 	  case 14:  currprog->type = ARAND_PROG; break;
 	  case 15:  currprog->type = LOAD_PROG; break;
+	  case 16:  currprog->type = CAN_SEE_PROG; break;
         }
 
 

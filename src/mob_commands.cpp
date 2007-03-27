@@ -1499,3 +1499,23 @@ int do_mppeace( struct char_data *ch, char *argument, int cmd )
     send_to_char( "You stop all fighting in this room.\n\r", ch );
     return eSUCCESS;
 }
+
+
+int do_mpretval( struct char_data *ch, char *argument, int cmd )
+{
+  char *retvals[] =
+  {
+     "true",
+     "false",
+     "\n"
+  };
+  char arg[MAX_INPUT_LENGTH];
+  one_argument(argument,arg);
+  int retval = eSUCCESS;
+
+  for (int i = 0; retvals[i][0] != '\n'; i++)
+   if (!str_cmp(arg,retvals[i]))
+    retval &= 1<<(5+i);
+
+  return retval;
+}

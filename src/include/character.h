@@ -1,7 +1,7 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.61 2007/02/11 03:22:43 jhhudso Exp $
+| $Id: character.h,v 1.62 2007/03/27 13:56:53 dcastle Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
@@ -119,7 +119,7 @@ struct  mob_prog_data
 #define COMMAND_PROG   16384 <<1
 #define WEAPON_PROG    16384 <<2
 #define ARMOUR_PROG    16384 <<3
-#define GREET_ALL_PROG 16384 <<4
+#define CAN_SEE_PROG   16384 <<4
 #define MPROG_MAX_TYPE_VALUE (16384 << 5)
 
 // * ------- End MOBProg stuff ----------- *

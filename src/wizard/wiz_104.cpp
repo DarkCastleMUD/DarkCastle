@@ -1864,6 +1864,7 @@ int do_opedit(char_data *ch, char *argument, int cmd)
 	case 8: a = COMMAND_PROG; break;
 	case 9: a = WEAPON_PROG; break;
 	case 10: a = ARMOUR_PROG; break;
+	case 11: a = CAN_SEE_PROG; break;
 	default: send_to_char("Invalid progtype.\r\n",ch); return eFAILURE;
     }
     currprog->type = a;

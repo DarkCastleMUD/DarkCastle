@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.234 2007/03/15 03:22:55 jhhudso Exp $ */
+/* $Id: const.cpp,v 1.235 2007/03/27 13:56:51 dcastle Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -124,6 +124,7 @@ char *obj_types[] = {
  "command_prog",
  "weapon_prog",
  "armour_prog",
+ "can_see_prog",
  "\n"
 };
 
