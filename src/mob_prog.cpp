@@ -61,6 +61,7 @@ void *activeVo;
 
 char *activeProg;
 char *activePos;
+char *activeProgTmpBuf;
 // Global defined here
 
 bool  MOBtrigger;
@@ -1913,7 +1914,7 @@ char *mprog_process_if( char *ifchck, char *com_list, CHAR_DATA *mob,
  while( loopdone == FALSE ) /*scan over any existing or statements */
  {
      cmnd     = com_list;
-     com_list = mprog_next_command( com_list );
+     activePos = com_list = mprog_next_command( com_list );
      while ( *cmnd == ' ' )
        cmnd++;
      if ( *cmnd == '\0' )
@@ -1957,7 +1958,7 @@ char *mprog_process_if( char *ifchck, char *com_list, CHAR_DATA *mob,
 	   if ( *com_list == '\0' )
 	     return null;
 	   cmnd     = com_list;
-	   com_list = mprog_next_command( com_list );
+	   activePos = com_list = mprog_next_command( com_list );
 	   morebuf  = one_argument( cmnd,buf );
 	   continue;
        }
@@ -1970,7 +1971,7 @@ char *mprog_process_if( char *ifchck, char *com_list, CHAR_DATA *mob,
 	   while ( str_cmp( buf, "endif" ) ) 
 	   {
 	       cmnd     = com_list;
-	       com_list = mprog_next_command( com_list );
+	       activePos = com_list = mprog_next_command( com_list );
 	       while ( *cmnd == ' ' )
 		 cmnd++;
 	       if ( *cmnd == '\0' )
@@ -1986,11 +1987,11 @@ char *mprog_process_if( char *ifchck, char *com_list, CHAR_DATA *mob,
 
        if (!thrw || cmnd >= thrw->orig + thrw->startPos) {
          mprog_cur_result = mprog_process_cmnd( cmnd, mob, actor, obj, vo, rndm );
-         if(IS_SET(mprog_cur_result, eCH_DIED))
+         if(IS_SET(mprog_cur_result, eCH_DIED) || IS_SET(mprog_cur_result, eDELAYED_EXEC))
            return null;
 	}
        cmnd     = com_list;
-       com_list = mprog_next_command( com_list );
+       activePos = com_list = mprog_next_command( com_list );
        while ( *cmnd == ' ' )
 	 cmnd++;
        if ( *cmnd == '\0' )
@@ -2010,7 +2011,7 @@ char *mprog_process_if( char *ifchck, char *com_list, CHAR_DATA *mob,
         if (!nest&&!str_cmp(buf,"else")) break;
 
 	 cmnd     = com_list;
-	 com_list = mprog_next_command( com_list );
+	 activePos = com_list = mprog_next_command( com_list );
 	 while ( *cmnd == ' ' )
 	   cmnd++;
 	 if ( *cmnd == '\0' )
@@ -2026,7 +2027,7 @@ char *mprog_process_if( char *ifchck, char *com_list, CHAR_DATA *mob,
      if ( !str_cmp( buf, "endif" ) )
        return com_list;
      cmnd     = com_list;
-     com_list = mprog_next_command( com_list );
+     activePos = com_list = mprog_next_command( com_list );
      while ( *cmnd == ' ' )
        cmnd++;
      if ( *cmnd == '\0' )
@@ -2049,7 +2050,7 @@ char *mprog_process_if( char *ifchck, char *com_list, CHAR_DATA *mob,
 	     if ( *com_list == '\0' )
 	       return null;
 	     cmnd     = com_list;
-	     com_list = mprog_next_command( com_list );
+	     activePos = com_list = mprog_next_command( com_list );
 	     morebuf  = one_argument( cmnd,buf );
 	     continue;
 	   }
@@ -2066,11 +2067,11 @@ char *mprog_process_if( char *ifchck, char *com_list, CHAR_DATA *mob,
 
 	 if (!thrw || cmnd >= thrw->startPos + thrw->orig) {
 	   mprog_cur_result = mprog_process_cmnd( cmnd, mob, actor, obj, vo, rndm );
-           if(IS_SET(mprog_cur_result, eCH_DIED))
+           if(IS_SET(mprog_cur_result, eCH_DIED) || IS_SET(mprog_cur_result, eDELAYED_EXEC))
              return null;
 	 }
 	 cmnd     = com_list;
-	 com_list = mprog_next_command( com_list );
+	 activePos = com_list = mprog_next_command( com_list );
 	 while ( *cmnd == ' ' )
 	   cmnd++;
 	 if ( *cmnd == '\0' )
@@ -2405,7 +2406,6 @@ int mprog_process_cmnd( char *cmnd, CHAR_DATA *mob, CHAR_DATA *actor,
   while ( *str == ' ' )
     str++;
 
-  activePos = cmnd;
   while (*str != '\0')
   {
      if ((*str == '=' || *str == '+' || *str == '-' || *str == '&' || *str == '|' ||
@@ -2534,7 +2534,6 @@ void mprog_driver ( char *com_list, CHAR_DATA *mob, CHAR_DATA *actor,
    return;
  selfpurge = FALSE;
  mprog_cur_result = eSUCCESS;
- extern bool charExists(CHAR_DATA *ch);
 
 
  //int cIfs[256]; // for MPPAUSE
@@ -2548,7 +2547,9 @@ void mprog_driver ( char *com_list, CHAR_DATA *mob, CHAR_DATA *actor,
  activeActor = actor;
  activeObj = obj;
  activeVo = vo;
+
  activeProg = com_list;
+
  if(!com_list) // this can happen when someone is editing
    return;
 // int count2 = 0;
@@ -2584,16 +2585,19 @@ void mprog_driver ( char *com_list, CHAR_DATA *mob, CHAR_DATA *actor,
  }
 
  strcpy( tmpcmndlst, com_list );
+
  command_list = tmpcmndlst;
  cmnd         = command_list;
- command_list = mprog_next_command( command_list );
+ activeProgTmpBuf = command_list;
+ activePos = command_list = mprog_next_command( command_list );
+ 
  if (thrw) thrw->orig = &tmpcmndlst[0];
  while ( *cmnd != '\0' )
    {
      morebuf = one_argument( cmnd, buf );
 
      if ( !str_cmp( buf, "if" ) ) {
-       command_list = mprog_process_if( morebuf, command_list, mob,
+       activePos = command_list = mprog_process_if( morebuf, command_list, mob,
 				       actor, obj, vo, rndm, thrw );
        if(IS_SET(mprog_cur_result, eCH_DIED) || IS_SET(mprog_cur_result,eDELAYED_EXEC))
          return;
@@ -2608,7 +2612,7 @@ void mprog_driver ( char *com_list, CHAR_DATA *mob, CHAR_DATA *actor,
 	}	
      }
      cmnd         = command_list;
-     command_list = mprog_next_command( command_list );
+     activePos = command_list = mprog_next_command( command_list );
    }
  return;
 
@@ -3096,19 +3100,22 @@ void update_mprog_throws()
         continue;
       }
 	vobj = NULL;
-      vict = NULL;
-	if (curr->mob) {
-      // find target
-      if(*curr->target_mob_name) { // find me by name
-        vict = get_mob(curr->target_mob_name);
-      }
-      else {                 // find me by num
-        vict = get_mob_vnum(curr->target_mob_num);
-      }
+        vict = NULL;
+	if (curr->tMob && charExists(curr->tMob))
+	{
+	 vict = curr->tMob;
+	}else if (curr->mob) {
+    	 	 // find target
+     		 if(*curr->target_mob_name) { // find me by name
+       		    vict = get_mob(curr->target_mob_name);
+      		 }
+    		 else {                 // find me by num
+     		    vict = get_mob_vnum(curr->target_mob_num);
+      		 }
 	} else {
-	if (*curr->target_mob_name)
-	vobj = get_obj(curr->target_mob_name);
-	else vobj = get_obj_vnum(curr->target_mob_num);
+  	  if (*curr->target_mob_name)
+	    vobj = get_obj(curr->target_mob_name);
+	  else vobj = get_obj_vnum(curr->target_mob_num);
        }
       // remove from list
       if(last) {
@@ -3123,10 +3130,13 @@ void update_mprog_throws()
         curr = g_mprog_throw_list;
       }
 
+     
       // This is done this way in case the 'catch' does a 'throw' inside of it
 
       // if !vict, oh well....remove it anyway.  Someone killed him.
-      if(vict)  // activate
+      if (action->data_num == -999 && vict) // 'tis a pause
+	mprog_driver(action->orig, vict, action->actor, action->obj,action->vo, action);
+      else if(vict)  // activate
         mprog_catch_trigger(vict, action->data_num, action->var,action->opt,action->actor, action->obj, action->vo);
       else if (vobj)
 	oprog_catch_trigger(vobj, action->data_num, action->var,action->opt, action->actor, action->obj, action->vo);

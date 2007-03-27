@@ -1447,6 +1447,7 @@ int do_mppause( CHAR_DATA *ch, char *argument, int cmd )
   throwitem = (struct mprog_throw_type *)dc_alloc(1, sizeof(struct mprog_throw_type));
   throwitem->target_mob_num = mob_index[ch->mobdata->nr].virt;
   throwitem->target_mob_name[0] = '\0';
+  throwitem->tMob = ch;
   throwitem->data_num = -999;
   throwitem->delay = delay;
   throwitem->mob = TRUE; // This is, suprisingly, a mob
@@ -1461,13 +1462,14 @@ int do_mppause( CHAR_DATA *ch, char *argument, int cmd )
 
   extern char *activeProg;
   extern char *activePos;
+  extern char *activeProgTmpBuf;
   throwitem->orig = str_dup(activeProg);
 
   extern int cIfs[256];
   throwitem->cPos = 0;
   memcpy(&throwitem->ifchecks[0], &cIfs[0], sizeof(int) * 256);
 
-  throwitem->startPos = activeProg - mprog_next_command(activePos);
+  throwitem->startPos = activePos - activeProgTmpBuf;
 
   throwitem->var = NULL;
   throwitem->opt = 0;

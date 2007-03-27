@@ -16,7 +16,7 @@
  *  10/21/2003   Onager    Changed IS_ANONYMOUS() to handle mobs without   *
  *                         crashing                                        *
  ***************************************************************************/
-/* $Id: utility.h,v 1.58 2007/03/27 10:53:15 urizen Exp $ */
+/* $Id: utility.h,v 1.59 2007/03/27 11:26:00 dcastle Exp $ */
 
 #ifndef UTILITY_H_
 #define UTILITY_H_
@@ -507,6 +507,7 @@ struct mprog_throw_type {
    void *vo;
 
  // new mppause crap below..
+   CHAR_DATA *tMob; // it should NOT throw it to another similar mob :P
    int ifchecks[256]; // Let's hope noone nests more ifs than that.
    int startPos;
    int cPos;
