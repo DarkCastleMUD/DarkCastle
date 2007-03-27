@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.436 2007/03/02 15:18:27 dcastle Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.437 2007/03/27 19:09:02 dcastle Exp $ */
 
 extern "C"
 {
@@ -1540,7 +1540,7 @@ void eq_damage(CHAR_DATA * ch, CHAR_DATA * victim,
     eqdam = damage_eq_once(obj);
 
     if (obj_index[obj->item_number].progtypes & ARMOUR_PROG)
-      oprog_armour_trigger(ch, obj);
+      oprog_armour_trigger(victim, obj);
     // determine if time to scrap it              
     if(eqdam >= eq_max_damage(obj))
       eq_destroyed(victim, obj, pos);
@@ -2056,7 +2056,7 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
        {
         int eqdam = damage_eq_once(victim->equipment[WEAR_SHIELD]);
         if (obj_index[victim->equipment[WEAR_SHIELD]->item_number].progtypes & ARMOUR_PROG)
-          oprog_armour_trigger(ch, victim->equipment[WEAR_SHIELD]);
+          oprog_armour_trigger(victim, victim->equipment[WEAR_SHIELD]);
         if(eqdam >= eq_max_damage(victim->equipment[WEAR_SHIELD]))
           eq_destroyed(victim, victim->equipment[WEAR_SHIELD], WEAR_SHIELD);
         else {
