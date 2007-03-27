@@ -94,6 +94,7 @@ char *mprog_type_to_name( int type )
     case CATCH_PROG:		return "catch_prog";
     case ATTACK_PROG:		return "attack_prog";
     case LOAD_PROG:		return "load_prog";
+    case CAN_SEE_PROG:		return "can_see_prog";
     default:                    return "ERROR_PROG";
     }
 }
@@ -1515,7 +1516,7 @@ int do_mpretval( struct char_data *ch, char *argument, int cmd )
 
   for (int i = 0; retvals[i][0] != '\n'; i++)
    if (!str_cmp(arg,retvals[i]))
-    retval &= 1<<(5+i);
+     SET_BIT(retval, 1<<(5+i));
 
   return retval;
 }

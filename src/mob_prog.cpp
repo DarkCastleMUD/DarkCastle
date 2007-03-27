@@ -1802,20 +1802,20 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
   if ( !str_cmp( buf, "cansee" ) )
     {
       if (fvict)
-	return CAN_SEE(mob, fvict);
+	return CAN_SEE(mob, fvict, TRUE);
 	if (ye) return FALSE;
       switch ( arg[1] )  /* arg should be "$*" so just get the letter */
 	{
 	case 'z': return 1; // can always see holder
 	case 'i': return 1;
 	case 'n': if ( actor )
-	             return CAN_SEE(mob, actor );
+	             return CAN_SEE(mob, actor,TRUE );
 	          else return -1;
 	case 't': if ( vict )
-                     return CAN_SEE(mob, vict );
+                     return CAN_SEE(mob, vict,TRUE );
 	          else return -1;
 	case 'r': if ( rndm )
-	             return CAN_SEE(mob, rndm );
+	             return CAN_SEE(mob, rndm,TRUE );
 	          else return -1;
 	default:
 	  logf( IMMORTAL, LOG_WORLD, "Mob: %d bad argument to 'isnpc'", mob_index[mob->mobdata->nr].virt ); 
@@ -1988,7 +1988,7 @@ char *mprog_process_if( char *ifchck, char *com_list, CHAR_DATA *mob,
        }
 
        if (!thrw || cmnd >= thrw->orig + thrw->startPos) {
-         mprog_cur_result &= mprog_process_cmnd( cmnd, mob, actor, obj, vo, rndm );
+	 SET_BIT(mprog_cur_result, mprog_process_cmnd( cmnd, mob, actor, obj, vo, rndm ));
          if(IS_SET(mprog_cur_result, eCH_DIED) || IS_SET(mprog_cur_result, eDELAYED_EXEC))
            return null;
 	}
@@ -2068,7 +2068,7 @@ char *mprog_process_if( char *ifchck, char *com_list, CHAR_DATA *mob,
 	   return com_list; 
 
 	 if (!thrw || cmnd >= thrw->startPos + thrw->orig) {
-	   mprog_cur_result &= mprog_process_cmnd( cmnd, mob, actor, obj, vo, rndm );
+	   SET_BIT(mprog_cur_result, mprog_process_cmnd( cmnd, mob, actor, obj, vo, rndm ));
            if(IS_SET(mprog_cur_result, eCH_DIED) || IS_SET(mprog_cur_result, eDELAYED_EXEC))
              return null;
 	 }
@@ -2557,7 +2557,7 @@ void mprog_driver ( char *com_list, CHAR_DATA *mob, CHAR_DATA *actor,
 // int count2 = 0;
  // count valid random victs in room
  for ( vch = world[mob->in_room].people; vch; vch = vch->next_in_room )
-   if (  CAN_SEE( mob, vch ) )
+   if (  CAN_SEE( mob, vch, TRUE ) )
        count++;
   // else if (CAN_SEE(mob,vch))
    //    count2++;
@@ -2569,7 +2569,7 @@ void mprog_driver ( char *com_list, CHAR_DATA *mob, CHAR_DATA *actor,
   {
     for (vch = world[mob->in_room].people; vch && count2;)
     {
-    if (CAN_SEE(mob,vch))
+    if (CAN_SEE(mob,vch,TRUE))
 	count2--;
 	if (count2) vch = vch->next_in_room;
     }
@@ -2579,7 +2579,7 @@ void mprog_driver ( char *com_list, CHAR_DATA *mob, CHAR_DATA *actor,
  {
    for ( vch = world[mob->in_room].people; vch && count; )
    {
-     if ( CAN_SEE( mob, vch ) )
+     if ( CAN_SEE( mob, vch,TRUE ) )
        count--;
      if (count) vch = vch->next_in_room;
   }
@@ -2608,7 +2608,7 @@ void mprog_driver ( char *com_list, CHAR_DATA *mob, CHAR_DATA *actor,
 
        if (!thrw || cmnd - &tmpcmndlst[0] >= thrw->startPos)
        {
-	     mprog_cur_result = mprog_process_cmnd( cmnd, mob, actor, obj, vo, rndm );
+	     SET_BIT(mprog_cur_result, mprog_process_cmnd( cmnd, mob, actor, obj, vo, rndm ));
        	     if(IS_SET(mprog_cur_result, eCH_DIED) || selfpurge || IS_SET(mprog_cur_result, eDELAYED_EXEC))
 	         return;
 	}	

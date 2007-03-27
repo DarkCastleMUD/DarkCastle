@@ -243,7 +243,7 @@ char * TokenList::Interpret(CHAR_DATA *from, OBJ_DATA *obj,
       #endif
       switch((current->GetBuf())[1])
       {
-        case 'n': if(!CAN_SEE(send_to, from))
+        case 'n': if(!CAN_SEE(send_to, from,TRUE))
 		  {
 		    if(flags & INVIS_NULL) return(0);
 		    else if(flags & INVIS_VISIBLE)
@@ -255,7 +255,7 @@ char * TokenList::Interpret(CHAR_DATA *from, OBJ_DATA *obj,
                     strcat(interp, GET_SHORT(from));
 		  }
 		  break; 
-	case 'N': if(!CAN_SEE(send_to, (CHAR_DATA *)vict_obj))
+	case 'N': if(!CAN_SEE(send_to, (CHAR_DATA *)vict_obj,TRUE))
 		  {
 		    if(flags & INVIS_NULL) return(0);
 		    else if(flags & INVIS_VISIBLE)

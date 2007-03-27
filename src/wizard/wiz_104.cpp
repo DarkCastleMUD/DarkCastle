@@ -1662,6 +1662,7 @@ char *oprog_type_to_name(int type)
      case CATCH_PROG: return "catch_prog";
      case SPEECH_PROG: return "speech_prog";
      case RAND_PROG: return "rand_prog";
+     case CAN_SEE_PROG: return "can_see_prog";
      default: return "ERROR_PROG";
   }
 }

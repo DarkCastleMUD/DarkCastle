@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.74 2007/03/27 13:56:51 dcastle Exp $ */
+/* $Id: utility.cpp,v 1.75 2007/03/27 14:24:23 dcastle Exp $ */
 
 extern "C"
 {
@@ -665,7 +665,7 @@ bool SOMEONE_DIED(int value)
    return FALSE;
 }
 
-bool CAN_SEE( struct char_data *sub, struct char_data *obj )
+bool CAN_SEE( struct char_data *sub, struct char_data *obj, bool noprog )
 {
    if (obj == sub)
       return TRUE;
@@ -695,7 +695,7 @@ bool CAN_SEE( struct char_data *sub, struct char_data *obj )
    if ( !IS_MOB(sub) && sub->pcdata->holyLite )
       return TRUE;
 
-   if (IS_NPC(obj))
+   if (!noprog && IS_NPC(obj))
    {
       int prog = mprog_can_see_trigger(sub,obj);
       if (IS_SET(prog, eEXTRA_VALUE)) return TRUE;
