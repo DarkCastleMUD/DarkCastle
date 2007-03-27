@@ -59,16 +59,21 @@ CHAR_DATA *activeActor;
 OBJ_DATA *activeObj;
 void *activeVo;
 
+char *activeProg;
+char *activePos;
 // Global defined here
 
 bool  MOBtrigger;
 struct mprog_throw_type *g_mprog_throw_list = 0;   // holds all pending mprog throws
 bool selfpurge = FALSE;
+
+int cIfs[256]; // for MPPAUSE
+int ifpos;
+
 /*
  * Local function prototypes
  */
 
-char *	mprog_next_command	( char* clist );
 int	mprog_seval		( char* lhs, char* opr, char* rhs );
 int	mprog_veval		( int lhs, char* opr, int rhs );
 int	mprog_do_ifchck		( char* ifchck, CHAR_DATA* mob,
@@ -77,16 +82,13 @@ int	mprog_do_ifchck		( char* ifchck, CHAR_DATA* mob,
 char *	mprog_process_if	( char* ifchck, char* com_list, 
 				       CHAR_DATA* mob, CHAR_DATA* actor,
 				       OBJ_DATA* obj, void* vo,
-				       CHAR_DATA* rndm );
+				       CHAR_DATA* rndm, struct mprog_throw_type *thrw = NULL );
 void	mprog_translate		( char ch, char* t, CHAR_DATA* mob,
 				       CHAR_DATA* actor, OBJ_DATA* obj,
 				       void* vo, CHAR_DATA* rndm );
 int	mprog_process_cmnd	( char* cmnd, CHAR_DATA* mob, 
 				       CHAR_DATA* actor, OBJ_DATA* obj,
 				       void* vo, CHAR_DATA* rndm );
-void	mprog_driver		( char* com_list, CHAR_DATA* mob,
-				       CHAR_DATA* actor, OBJ_DATA* obj,
-				       void* vo );
 
 /***************************************************************************
  * Local function code and brief comments.
@@ -204,9 +206,58 @@ int mprog_seval( char *lhs, char *opr, char *rhs )
 
 }
 
-int mprog_veval( int lhs, char *opr, int rhs )
+int mprog_veval( int lhs, char *opr, int rhs ) 
 {
 
+  if ( !str_cmp( opr, "==" ) )
+    return ( lhs == rhs );
+  if ( !str_cmp( opr, "!=" ) )
+    return ( lhs != rhs );
+  if ( !str_cmp( opr, ">" ) )
+    return ( lhs > rhs );
+  if ( !str_cmp( opr, "<" ) )
+    return ( lhs < rhs );
+  if ( !str_cmp( opr, "<=" ) )
+    return ( lhs <= rhs );
+  if ( !str_cmp( opr, ">=" ) )
+    return ( lhs >= rhs );
+  if ( !str_cmp( opr, "&" ) )
+    return ( lhs & rhs );
+  if ( !str_cmp( opr, "|" ) )
+    return ( lhs | rhs );
+
+  logf( IMMORTAL, LOG_WORLD,  "Improper MOBprog operator\n\r", 0 );
+  return 0;
+
+}
+
+int mprog_veval( int64 lhs, char *opr, int rhs ) 
+{
+
+  if ( !str_cmp( opr, "==" ) )
+    return ( lhs == rhs );
+  if ( !str_cmp( opr, "!=" ) )
+    return ( lhs != rhs );
+  if ( !str_cmp( opr, ">" ) )
+    return ( lhs > rhs );
+  if ( !str_cmp( opr, "<" ) )
+    return ( lhs < rhs );
+  if ( !str_cmp( opr, "<=" ) )
+    return ( lhs <= rhs );
+  if ( !str_cmp( opr, ">=" ) )
+    return ( lhs >= rhs );
+  if ( !str_cmp( opr, "&" ) )
+    return ( lhs & rhs );
+  if ( !str_cmp( opr, "|" ) )
+    return ( lhs | rhs );
+
+  logf( IMMORTAL, LOG_WORLD,  "Improper MOBprog operator\n\r", 0 );
+  return 0;
+
+}
+
+int mprog_veval( uint32 lhs, char *opr, uint rhs ) 
+{
   if ( !str_cmp( opr, "==" ) )
     return ( lhs == rhs );
   if ( !str_cmp( opr, "!=" ) )
@@ -239,16 +290,49 @@ bool istank(CHAR_DATA *ch)
   return FALSE;
 }
 
-void translate_value(char *left, char *right, int16 **vali, uint32 **valui,
+void translate_value(char *leftptr, char *rightptr, int16 **vali, uint32 **valui,
 		char **valstr, int64 **vali64, sbyte **valb, CHAR_DATA *mob, CHAR_DATA *actor, 
 		OBJ_DATA *obj, void *vo, CHAR_DATA *rndm)
 {
+/*
+  $n.age
+  '$n' = left
+  'age' = right
+
+  $n,7.hasskill
+  '$n' = left
+  '7' = half
+  'hasskill' = right
+*/
+
+
   CHAR_DATA *target = NULL;
   OBJ_DATA *otarget = NULL;
   int rtarget = -1, ztarget = -1;
   int val = 0;
   bool valset = FALSE; // done like that to determine if value is set, since it can be 0 
-	          struct tempvariable *eh = mob->tempVariable;
+  struct tempvariable *eh = mob->tempVariable;
+  
+
+  char *tmp,half[MAX_INPUT_LENGTH];
+  half[0] ='\0'; 
+  if ((tmp = strchr(leftptr, ',')) != NULL)
+  {
+    *tmp = '\0';
+    tmp++;
+    one_argument(half, tmp); // strips whatever spaces
+  }
+
+
+// Less nitpicky about the mobprogs with this stuff below in.
+  char larr[MAX_INPUT_LENGTH];
+  one_argument(leftptr, larr);
+  char *left = &larr[0];
+
+  char rarr[MAX_INPUT_LENGTH];
+  one_argument(rightptr, rarr);
+  char *right = &rarr[0]; 
+
 
   if (!str_cmp(left, "world")) {
     left += 5;
@@ -342,7 +426,7 @@ void translate_value(char *left, char *right, int16 **vali, uint32 **valui,
 
   if ( !target && !otarget && ztarget == -1 && rtarget == -1 && !valset && str_cmp(right,"numpcs"))
     {
-        logf( IMMORTAL, LOG_WORLD,  "Mob: %d invalid target in mobprog", mob_index[mob->mobdata->nr].virt ); 
+        logf( IMMORTAL, LOG_WORLD,  "translate_value: Mob: %d invalid target in mobprog", mob_index[mob->mobdata->nr].virt ); 
       return;
     }   
   // target acquired. fucking boring code.
@@ -464,7 +548,20 @@ void translate_value(char *left, char *right, int16 **vali, uint32 **valui,
 		}
 		break;
 	case 'h':
-		if (!str_cmp(right,"height"))
+		if (!str_cmp(right,"hasskill"))
+		{
+		  if (!target) tError = TRUE;
+		  else { 
+		  int skl = 0;
+		if (!half || *half == '\0' || (skl = atoi(half)) < 0) {
+	          logf( IMMORTAL, LOG_WORLD,  "translate_value: Mob: %d invalid skillnumber in hasskill", mob_index[mob->mobdata->nr].virt ); 
+		  tError = TRUE;
+		}
+		  int16 sklint = has_skill(target,skl);
+		  intval = &sklint;
+		  }
+		}
+		else if (!str_cmp(right,"height"))
 		{
 		   if (!target) tError = TRUE;
 		  else sbval = (sbyte*)(&target->height);
@@ -903,8 +1000,9 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
 
   if (lvali)
     return mprog_veval(*lvali, opr, atoi(val));
+
   if (lvalui)
-    return mprog_veval(*lvalui, opr, atoi(val));
+    return mprog_veval(*lvalui, opr, (uint)atoi(val));
   if (lvali64)
     return mprog_veval((int)*lvali64,opr, atoi(val));
   if (lvalb)
@@ -1784,7 +1882,7 @@ int  mprog_cur_result;
 
 char *mprog_process_if( char *ifchck, char *com_list, CHAR_DATA *mob,
 		       CHAR_DATA *actor, OBJ_DATA *obj, void *vo,
-		       CHAR_DATA *rndm )
+		       CHAR_DATA *rndm, struct mprog_throw_type *thrw )
 {
 
  char buf[ MAX_INPUT_LENGTH ];
@@ -1796,12 +1894,21 @@ char *mprog_process_if( char *ifchck, char *com_list, CHAR_DATA *mob,
 
  *null = '\0';
 
- /* check for trueness of the ifcheck */
- if ( ( legal = mprog_do_ifchck( ifchck, mob, actor, obj, vo, rndm ) ) )
-   if ( legal >= 1 )
-     flag = TRUE;
-   else
-     return null;
+ if (!thrw || ifchck - thrw->orig >= thrw->startPos)
+ {
+   /* check for trueness of the ifcheck */
+   if ( ( cIfs[ifpos++] = legal = mprog_do_ifchck( ifchck, mob, actor, obj, vo, rndm ) ) )
+   {
+     if ( legal >= 1 )
+       flag = TRUE;
+     else
+       return null;
+   }
+ } else {
+  legal = thrw->ifchecks[thrw->cPos++];
+  if (legal >= 1) flag = TRUE;
+  else if (legal < 0) return NULL;
+ }
 
  while( loopdone == FALSE ) /*scan over any existing or statements */
  {
@@ -1817,11 +1924,21 @@ char *mprog_process_if( char *ifchck, char *com_list, CHAR_DATA *mob,
      morebuf = one_argument( cmnd, buf );
      if ( !str_cmp( buf, "or" ) )
      {
-	 if ( ( legal = mprog_do_ifchck( morebuf,mob,actor,obj,vo,rndm ) ) )
-	   if ( legal == 1 )
-	     flag = TRUE;
-	   else
-	     return null;
+
+	 if (!thrw || morebuf - thrw->orig >= thrw->startPos)
+	 {
+	   if ( ( cIfs[ifpos++] = legal = mprog_do_ifchck( morebuf, mob, actor, obj, vo, rndm ) ) )
+	   {
+	     if ( legal == 1 )
+	       flag = TRUE;
+	     else
+	       return null;
+	   }
+	 } else {
+	  legal = thrw->ifchecks[thrw->cPos++];
+	  if (legal == 1) flag = TRUE;
+	  else if (legal < 0) return NULL;
+	 }
      }
      else
        loopdone = TRUE;
@@ -1831,8 +1948,8 @@ char *mprog_process_if( char *ifchck, char *com_list, CHAR_DATA *mob,
    for ( ; ; ) /*ifcheck was true, do commands but ignore else to endif*/ 
    {
        if ( !str_cmp( buf, "if" ) )
-       { 
-	   com_list = mprog_process_if(morebuf,com_list,mob,actor,obj,vo,rndm);
+       {
+	   com_list = mprog_process_if(morebuf,com_list,mob,actor,obj,vo,rndm,thrw);
            if(IS_SET(mprog_cur_result, eCH_DIED))
              return null;
 	   while ( *cmnd==' ' )
@@ -1867,10 +1984,11 @@ char *mprog_process_if( char *ifchck, char *com_list, CHAR_DATA *mob,
 	   return com_list; 
        }
 
-       mprog_cur_result = mprog_process_cmnd( cmnd, mob, actor, obj, vo, rndm );
-       if(IS_SET(mprog_cur_result, eCH_DIED))
-         return null;
-
+       if (!thrw || cmnd >= thrw->orig + thrw->startPos) {
+         mprog_cur_result = mprog_process_cmnd( cmnd, mob, actor, obj, vo, rndm );
+         if(IS_SET(mprog_cur_result, eCH_DIED))
+           return null;
+	}
        cmnd     = com_list;
        com_list = mprog_next_command( com_list );
        while ( *cmnd == ' ' )
@@ -1923,7 +2041,7 @@ char *mprog_process_if( char *ifchck, char *com_list, CHAR_DATA *mob,
 	 if ( !str_cmp( buf, "if" ) )
 	   { 
 	     com_list = mprog_process_if( morebuf, com_list, mob, actor,
-					 obj, vo, rndm );
+					 obj, vo, rndm, thrw );
              if(IS_SET(mprog_cur_result, eCH_DIED))
                return null;
 	     while ( *cmnd == ' ' )
@@ -1946,10 +2064,11 @@ char *mprog_process_if( char *ifchck, char *com_list, CHAR_DATA *mob,
 	 if ( !str_cmp( buf, "endif" ) )
 	   return com_list; 
 
-	 mprog_cur_result = mprog_process_cmnd( cmnd, mob, actor, obj, vo, rndm );
-         if(IS_SET(mprog_cur_result, eCH_DIED))
-           return null;
-
+	 if (!thrw || cmnd >= thrw->startPos + thrw->orig) {
+	   mprog_cur_result = mprog_process_cmnd( cmnd, mob, actor, obj, vo, rndm );
+           if(IS_SET(mprog_cur_result, eCH_DIED))
+             return null;
+	 }
 	 cmnd     = com_list;
 	 com_list = mprog_next_command( com_list );
 	 while ( *cmnd == ' ' )
@@ -2286,6 +2405,7 @@ int mprog_process_cmnd( char *cmnd, CHAR_DATA *mob, CHAR_DATA *actor,
   while ( *str == ' ' )
     str++;
 
+  activePos = cmnd;
   while (*str != '\0')
   {
      if ((*str == '=' || *str == '+' || *str == '-' || *str == '&' || *str == '|' ||
@@ -2323,8 +2443,8 @@ int mprog_process_cmnd( char *cmnd, CHAR_DATA *mob, CHAR_DATA *actor,
 	  sprintf(buf, "%sLvalstr: %s\n", buf,lvalstr);
 	sprintf(buf,"%sLeft: %s\n",buf,left);
 	sprintf(buf,"%sRight: %s\n",buf,right);
-        if (actor)
-	  send_to_char(buf, actor);
+//        if (actor)
+//	  send_to_char(buf, actor);
 	return eSUCCESS;
      }
      str++;
@@ -2399,7 +2519,7 @@ bool objExists(OBJ_DATA *obj)
  *  complex procedures, everything is farmed out to the other guys.
  */
 void mprog_driver ( char *com_list, CHAR_DATA *mob, CHAR_DATA *actor,
-		   OBJ_DATA *obj, void *vo)
+		   OBJ_DATA *obj, void *vo, struct mprog_throw_type *thrw )
 {
 
  char tmpcmndlst[ MAX_STRING_LENGTH ];
@@ -2416,12 +2536,19 @@ void mprog_driver ( char *com_list, CHAR_DATA *mob, CHAR_DATA *actor,
  mprog_cur_result = eSUCCESS;
  extern bool charExists(CHAR_DATA *ch);
 
+
+ //int cIfs[256]; // for MPPAUSE
+ //int ifpos;
+ ifpos = 0;
+ memset(&cIfs[0], 0, sizeof(int) * 256);
+
  if (!charExists(actor)) actor = NULL; 
  if (!objExists(obj)) obj = NULL; 
 
  activeActor = actor;
  activeObj = obj;
  activeVo = vo;
+ activeProg = com_list;
  if(!com_list) // this can happen when someone is editing
    return;
 // int count2 = 0;
@@ -2460,19 +2587,25 @@ void mprog_driver ( char *com_list, CHAR_DATA *mob, CHAR_DATA *actor,
  command_list = tmpcmndlst;
  cmnd         = command_list;
  command_list = mprog_next_command( command_list );
+ if (thrw) thrw->orig = &tmpcmndlst[0];
  while ( *cmnd != '\0' )
    {
      morebuf = one_argument( cmnd, buf );
+
      if ( !str_cmp( buf, "if" ) ) {
        command_list = mprog_process_if( morebuf, command_list, mob,
-				       actor, obj, vo, rndm );
-       if(IS_SET(mprog_cur_result, eCH_DIED))
+				       actor, obj, vo, rndm, thrw );
+       if(IS_SET(mprog_cur_result, eCH_DIED) || IS_SET(mprog_cur_result,eDELAYED_EXEC))
          return;
      }
      else {
-       mprog_cur_result = mprog_process_cmnd( cmnd, mob, actor, obj, vo, rndm );
-       if(IS_SET(mprog_cur_result, eCH_DIED) || selfpurge)
-         return;
+
+       if (!thrw || cmnd - &tmpcmndlst[0] >= thrw->startPos)
+       {
+	     mprog_cur_result = mprog_process_cmnd( cmnd, mob, actor, obj, vo, rndm );
+       	     if(IS_SET(mprog_cur_result, eCH_DIED) || selfpurge || IS_SET(mprog_cur_result, eDELAYED_EXEC))
+	         return;
+	}	
      }
      cmnd         = command_list;
      command_list = mprog_next_command( command_list );

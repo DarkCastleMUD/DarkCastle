@@ -15,7 +15,9 @@ enum {
   eINTERNAL_ERROR   = 1<<4,
   eEXTRA_VALUE 	    = 1<<5, // Added to act like a flag, setting if something
 		           // Special happened in the function.. (verify_existing_components use at the moment)
-  eEXTRA_VAL2       = 1<<6 // damage() needs two
+  eEXTRA_VAL2       = 1<<6, // damage() needs two
+
+  eDELAYED_EXEC     = 1<<7 // Mobprogs, MPPAUSE
 };
 
 #endif // _RETURNVALS_H_

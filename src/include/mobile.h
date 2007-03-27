@@ -1,7 +1,7 @@
 #ifndef MOBILE_H_
 #define MOBILE_H_
 /************************************************************************
-| $Id: mobile.h,v 1.21 2007/02/28 16:35:07 dcastle Exp $
+| $Id: mobile.h,v 1.22 2007/03/27 10:53:15 urizen Exp $
 | mobile.h
 | Description:  This file contains the header information for mobile
 |   control.
@@ -9,7 +9,8 @@
 void rebuild_rnum_references(int startAt, int type);
 void    mprog_driver            ( char* com_list, CHAR_DATA* mob,
                                        CHAR_DATA* actor, OBJ_DATA* obj,
-                                       void* vo );
+                                       void* vo, struct mprog_throw_type *thrw = NULL );
+char *  mprog_next_command      ( char* clist );
 
 
 #define BASE_STAT      0

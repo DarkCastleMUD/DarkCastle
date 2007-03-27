@@ -1431,22 +1431,13 @@ int do_mpbestow(CHAR_DATA *ch, char *argument, int cmd)
 int do_mppause( CHAR_DATA *ch, char *argument, int cmd )
 {
   struct mprog_throw_type * throwitem = NULL;
-  int catch_num;
   int delay;
 
   char first[MAX_INPUT_LENGTH];
-  char second[MAX_INPUT_LENGTH];
 
   argument = one_argument(argument, first);
-  argument = one_argument(argument, second);
 
-  if(!check_range_valid_and_convert(catch_num, first, MPROG_CATCH_MIN, MPROG_CATCH_MAX)) {
-    logf( IMMORTAL, LOG_WORLD, "Mppause - Invalid catch_num: vnum %d.",
-	  	mob_index[ch->mobdata->nr].virt );
-    return eFAILURE;
-  }
-
-  if(!check_range_valid_and_convert(delay, second, 0, 500)) {
+  if(!check_range_valid_and_convert(delay, first, 0, 65536)) {
     logf( IMMORTAL, LOG_WORLD, "Mppause - Invalid delay: vnum %d.",
 	  	mob_index[ch->mobdata->nr].virt );
     return eFAILURE;
@@ -1456,16 +1447,33 @@ int do_mppause( CHAR_DATA *ch, char *argument, int cmd )
   throwitem = (struct mprog_throw_type *)dc_alloc(1, sizeof(struct mprog_throw_type));
   throwitem->target_mob_num = mob_index[ch->mobdata->nr].virt;
   throwitem->target_mob_name[0] = '\0';
-  throwitem->data_num = catch_num;
+  throwitem->data_num = -999;
   throwitem->delay = delay;
   throwitem->mob = TRUE; // This is, suprisingly, a mob
-  
+
+  extern CHAR_DATA *activeActor;
+  extern OBJ_DATA *activeObj;
+  extern void *activeVo;
+  throwitem->actor = activeActor;
+  throwitem->obj = activeObj;
+  throwitem->vo = activeVo;
+
+
+  extern char *activeProg;
+  extern char *activePos;
+  throwitem->orig = str_dup(activeProg);
+
+  extern int cIfs[256];
+  throwitem->cPos = 0;
+  memcpy(&throwitem->ifchecks[0], &cIfs[0], sizeof(int) * 256);
+
+  throwitem->startPos = activeProg - mprog_next_command(activePos);
+
   throwitem->var = NULL;
   throwitem->opt = 0;
   // add to delay list
   throwitem->next = g_mprog_throw_list;
   g_mprog_throw_list = throwitem;
-
   return eSUCCESS;
 }
 
