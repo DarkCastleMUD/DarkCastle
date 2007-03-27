@@ -1203,9 +1203,10 @@ int do_mpdamage( CHAR_DATA *ch, char *argument, int cmd )
 	return eSUCCESS;
     }
 
-    half_chop(argument, arg, temp);
-    // arg = victim or 'all'
-    // attacktype contains rest of string
+    argument = one_argument(argument,arg);
+    argument = one_argument(argument,damroll);
+    argument = one_argument(argument,attacktype);
+    argument = one_argument(argument,temp);
 
     if ( arg[0] == '\0' )
     {
@@ -1224,9 +1225,6 @@ int do_mpdamage( CHAR_DATA *ch, char *argument, int cmd )
        if (!victim)
            return eFAILURE;  // not an error, just couldn't get valid vict
     }
-
-    // at this point, victim is either NULL (all) or pointing to valid vict
-    half_chop(temp, damroll, attacktype);
 
     int numdice, sizedice;
     numdice = sizedice = 0;
@@ -1247,17 +1245,54 @@ int do_mpdamage( CHAR_DATA *ch, char *argument, int cmd )
     }
 
     // do the damage
-    if(victim)
-       return damage(ch, victim, dice(numdice, sizedice), damtype, TYPE_UNDEFINED, 0);
+    if(victim) {
+       if (!temp[0] || !str_cmp(temp,"hitpoints"))
+         return damage(ch, victim, dice(numdice, sizedice), damtype, TYPE_UNDEFINED, 0);
+       else if (!str_cmp(temp, "mana"))
+       {
+	   GET_MANA(victim) -= dice(numdice, sizedice);
+	   if (GET_MANA(victim) < 0) GET_MANA(victim) = 0;
+       } else if (!str_cmp(temp, "ki"))
+       {
+	   GET_KI(victim) -= dice(numdice, sizedice);
+	   if (GET_KI(victim) < 0) GET_KI(victim) = 0;
+       } else if (!str_cmp(temp, "move"))
+       {
+	   GET_MOVE(victim) -= dice(numdice, sizedice);
+	   if (GET_MOVE(victim) < 0) GET_MOVE(victim) = 0;
+       } else {
+           logf( IMMORTAL, LOG_WORLD, "Mpdamage - Must damage either ki,mana,hitpoints or move: vnum %d", mob_index[ch->mobdata->nr].virt);
+           return eFAILURE|eINTERNAL_ERROR;
+       }
+       return eSUCCESS;
+    }
 
     char_data * next_vict;
-    int retval;
+    int retval = eSUCCESS;
     for(victim = world[ch->in_room].people; victim; victim = next_vict)
     {
         next_vict = victim->next_in_room;
         if(IS_MOB(victim) || GET_LEVEL(victim) > MORTAL)
            continue;
-        retval = damage(ch, victim, dice(numdice, sizedice), damtype, TYPE_UNDEFINED, 0);
+        if (!temp[0] || !str_cmp(temp,"hitpoints"))
+          retval = damage(ch, victim, dice(numdice, sizedice), damtype, TYPE_UNDEFINED, 0);
+        else if (!str_cmp(temp, "mana"))
+        {
+           GET_MANA(victim) -= dice(numdice, sizedice);
+           if (GET_MANA(victim) < 0) GET_MANA(victim) = 0;
+        } else if (!str_cmp(temp, "ki"))
+        {
+           GET_KI(victim) -= dice(numdice, sizedice);
+           if (GET_KI(victim) < 0) GET_KI(victim) = 0;
+        } else if (!str_cmp(temp, "move"))
+        {
+           GET_MOVE(victim) -= dice(numdice, sizedice);
+           if (GET_MOVE(victim) < 0) GET_MOVE(victim) = 0;
+        } else {
+           logf( IMMORTAL, LOG_WORLD, "Mpdamage - Must damage either ki,mana,hitpoints or move: vnum %d", mob_index[ch->mobdata->nr].virt);
+           return eFAILURE|eINTERNAL_ERROR;
+        }
+
         if(IS_SET(retval, eCH_DIED))
            return retval;
     }
