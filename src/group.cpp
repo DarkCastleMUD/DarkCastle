@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: group.cpp,v 1.26 2007/01/20 00:26:02 jhhudso Exp $
+| $Id: group.cpp,v 1.27 2007/03/27 15:22:44 dcastle Exp $
 | group.C
 | Description:  Group related commands; join, abandon, follow, etc..
 */
@@ -726,6 +726,7 @@ int do_autojoin(CHAR_DATA *ch, char *argument, int cmd)
   }
   if (strlen(tmp2) > 200)
   {
+     ch->pcdata->joining = str_dup(tmp);
      send_to_char("You cannot keep track of that many people.\r\n",ch);
      return eFAILURE; 
   }
