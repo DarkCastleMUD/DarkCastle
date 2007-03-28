@@ -1228,7 +1228,12 @@ int do_mpdamage( CHAR_DATA *ch, char *argument, int cmd )
 
     int numdice, sizedice;
     numdice = sizedice = 0;
-    sscanf(damroll, "%dd%d", &numdice, &sizedice);
+    bool perc = TRUE;
+    if (sscanf(damroll, "%dd%d%%", &numdice, &sizedice) != 2)
+    {
+ 	sscanf(damroll,"%dd%d",&numdice, &sizedice);
+	perc = FALSE;
+    }
 
     if(!numdice || !sizedice)
     {
@@ -1245,20 +1250,34 @@ int do_mpdamage( CHAR_DATA *ch, char *argument, int cmd )
     }
 
     // do the damage
+    // half of the casts are probably pointless, but whatever
     if(victim) {
-       if (!temp[0] || !str_cmp(temp,"hitpoints"))
+       if (!temp[0] || !str_cmp(temp,"hitpoints")) {
+	if (perc)
+         return damage(ch, victim, (int)((double)GET_HIT(victim) / 100.0 * (double)dice(numdice, sizedice)), damtype, TYPE_UNDEFINED, 0);
+	else
          return damage(ch, victim, dice(numdice, sizedice), damtype, TYPE_UNDEFINED, 0);
+       }
        else if (!str_cmp(temp, "mana"))
        {
-	   GET_MANA(victim) -= dice(numdice, sizedice);
+	   if (perc)
+		   GET_MANA(victim) -= (int)((double)GET_MANA(victim) / 100.0 * (double)dice(numdice, sizedice));
+	   else
+		   GET_MANA(victim) -= dice(numdice, sizedice);
 	   if (GET_MANA(victim) < 0) GET_MANA(victim) = 0;
        } else if (!str_cmp(temp, "ki"))
        {
+	  if (perc)
+	   GET_KI(victim) -= (int)((double)GET_KI(victim) / 100.0 * (double)dice(numdice, sizedice));
+	  else
 	   GET_KI(victim) -= dice(numdice, sizedice);
 	   if (GET_KI(victim) < 0) GET_KI(victim) = 0;
        } else if (!str_cmp(temp, "move"))
        {
-	   GET_MOVE(victim) -= dice(numdice, sizedice);
+	   if (perc)
+	   	GET_MOVE(victim) -= (int)((double)GET_MOVE(victim) / 100.0 * (double)dice(numdice, sizedice));
+	   else
+	   	GET_MOVE(victim) -= dice(numdice, sizedice);
 	   if (GET_MOVE(victim) < 0) GET_MOVE(victim) = 0;
        } else {
            logf( IMMORTAL, LOG_WORLD, "Mpdamage - Must damage either ki,mana,hitpoints or move: vnum %d", mob_index[ch->mobdata->nr].virt);
@@ -1275,18 +1294,32 @@ int do_mpdamage( CHAR_DATA *ch, char *argument, int cmd )
         if(IS_MOB(victim) || GET_LEVEL(victim) > MORTAL)
            continue;
         if (!temp[0] || !str_cmp(temp,"hitpoints"))
-          retval = damage(ch, victim, dice(numdice, sizedice), damtype, TYPE_UNDEFINED, 0);
+	{
+          if (perc)
+            retval =  damage(ch, victim, (int)((double)GET_HIT(victim) / 100.0 * (double)dice(numdice, sizedice)), damtype, TYPE_UNDEFINED, 0);
+          else
+            retval = damage(ch, victim, dice(numdice, sizedice), damtype, TYPE_UNDEFINED, 0);
+	}
         else if (!str_cmp(temp, "mana"))
         {
-           GET_MANA(victim) -= dice(numdice, sizedice);
+           if (perc)
+                   GET_MANA(victim) -= (int)((double)GET_MANA(victim) / 100.0 * (double)dice(numdice, sizedice));
+           else
+                   GET_MANA(victim) -= dice(numdice, sizedice);
            if (GET_MANA(victim) < 0) GET_MANA(victim) = 0;
         } else if (!str_cmp(temp, "ki"))
         {
+          if (perc)
+           GET_KI(victim) -= (int)((double)GET_KI(victim) / 100.0 * (double)dice(numdice, sizedice));
+          else
            GET_KI(victim) -= dice(numdice, sizedice);
            if (GET_KI(victim) < 0) GET_KI(victim) = 0;
         } else if (!str_cmp(temp, "move"))
         {
-           GET_MOVE(victim) -= dice(numdice, sizedice);
+           if (perc)
+                GET_MOVE(victim) -= (int)((double)GET_MOVE(victim) / 100.0 * (double)dice(numdice, sizedice));
+           else
+                GET_MOVE(victim) -= dice(numdice, sizedice);
            if (GET_MOVE(victim) < 0) GET_MOVE(victim) = 0;
         } else {
            logf( IMMORTAL, LOG_WORLD, "Mpdamage - Must damage either ki,mana,hitpoints or move: vnum %d", mob_index[ch->mobdata->nr].virt);
