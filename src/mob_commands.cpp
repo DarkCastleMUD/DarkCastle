@@ -1269,12 +1269,15 @@ int do_mpdamage( CHAR_DATA *ch, char *argument, int cmd )
     int numdice, sizedice;
     numdice = sizedice = 0;
     bool perc = TRUE;
-    char t;
-    if (sscanf(damroll, "%dd%d%c", &numdice, &sizedice,&t) != 3 || t != '%')
-    {
- 	sscanf(damroll,"%dd%d",&numdice, &sizedice);
+    char t,l;
+    int plus = 0;
+    if (sscanf(damroll, "%dd%d%c%c%d", &numdice, &sizedice, &t, &l, &plus) != 5 || l != '+' || t != '%')
+      if (sscanf(damroll, "%dd%d%c", &numdice, &sizedice,&t) != 3 || t != '%')
+      {
 	perc = FALSE;
-    }
+	if (sscanf(damroll, "%dd%d%c%d", &numdice, &sizedice, &l, &plus) != 4 || l != '+')
+	  	sscanf(damroll,"%dd%d",&numdice, &sizedice);
+      }
 
     if(!numdice || !sizedice)
     {
@@ -1299,6 +1302,7 @@ int do_mpdamage( CHAR_DATA *ch, char *argument, int cmd )
 	else
 	 dam = dice(numdice, sizedice);
 	 //add_dmg(victim,dam);
+       dam += plus;
        if (!temp[0] || !str_cmp(temp,"hitpoints")) {
          return damage(ch, victim, dam, damtype, TYPE_UNDEFINED, 0);
        }
@@ -1332,6 +1336,7 @@ int do_mpdamage( CHAR_DATA *ch, char *argument, int cmd )
          dam = (int)((double)GET_HIT(victim) / 100.0 * (double)dice(numdice, sizedice));
         else
          dam = dice(numdice, sizedice);
+        dam += plus;
         if (!temp[0] || !str_cmp(temp,"hitpoints"))
 	{
             retval = damage(ch, victim, dam, damtype, TYPE_UNDEFINED, 0);
