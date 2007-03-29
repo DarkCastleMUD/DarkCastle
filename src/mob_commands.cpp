@@ -1269,7 +1269,8 @@ int do_mpdamage( CHAR_DATA *ch, char *argument, int cmd )
     int numdice, sizedice;
     numdice = sizedice = 0;
     bool perc = TRUE;
-    if (sscanf(damroll, "%dd%d%%", &numdice, &sizedice) != 2)
+    char t;
+    if (sscanf(damroll, "%dd%d%c", &numdice, &sizedice,&t) != 3 || t != '%')
     {
  	sscanf(damroll,"%dd%d",&numdice, &sizedice);
 	perc = FALSE;
