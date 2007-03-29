@@ -1196,7 +1196,7 @@ int do_mpsetalign(CHAR_DATA *ch, char *argument, int cmd)
 struct damage_list
 {
   struct damage_list *next;
-  char name[256];
+  char name[512];
   int damage;               // Damage #
 };
 
@@ -1210,11 +1210,24 @@ void free_dmg_list()
      n = c->next;
      dc_free(c);
   }
+  dmg_list = NULL;
 }
 
 void add_dmg(CHAR_DATA *ch, int dmg)
 {
   struct damage_list *c;
+
+  for (c = dmg_list;c;c = c->next)
+  {
+    if ((IS_NPC(ch) && !str_cmp(c->name, GET_SHORT(ch))) ||
+	(!IS_NPC(ch) && !str_cmp(c->name, GET_NAME(ch))))
+    {
+       c->damage += dmg;
+       return;
+    }
+  }
+
+
 #ifdef LEAK_CHECK
   c = (struct damage_list *)calloc(1, sizeof(struct damage_list));
 #else
@@ -1236,7 +1249,7 @@ int do_mpdamage( CHAR_DATA *ch, char *argument, int cmd )
     char damroll[ MAX_INPUT_LENGTH ];
     char attacktype[ MAX_INPUT_LENGTH ];
 
-    //free_dmg_list();
+    free_dmg_list();
     if ( !IS_NPC( ch ) )
     {
 	send_to_char( "Huh?\n\r", ch );
@@ -1244,9 +1257,7 @@ int do_mpdamage( CHAR_DATA *ch, char *argument, int cmd )
     }
 
     argument = one_argument(argument,arg);
-    argument = one_argument(argument,damroll);
-    argument = one_argument(argument,attacktype);
-    argument = one_argument(argument,temp);
+
 
     if ( arg[0] == '\0' )
     {
@@ -1266,45 +1277,55 @@ int do_mpdamage( CHAR_DATA *ch, char *argument, int cmd )
            return eFAILURE;  // not an error, just couldn't get valid vict
     }
 
-    int numdice, sizedice;
-    numdice = sizedice = 0;
-    bool perc = TRUE;
-    char t,l;
-    int plus = 0;
-    if (sscanf(damroll, "%dd%d%c%c%d", &numdice, &sizedice, &t, &l, &plus) != 5 || l != '+' || t != '%')
-      if (sscanf(damroll, "%dd%d%c", &numdice, &sizedice,&t) != 3 || t != '%')
-      {
-	perc = FALSE;
-	if (sscanf(damroll, "%dd%d%c%d", &numdice, &sizedice, &l, &plus) != 4 || l != '+')
-	  	sscanf(damroll,"%dd%d",&numdice, &sizedice);
-      }
-
-    if(!numdice || !sizedice)
+    int retval = eSUCCESS;
+    while (1)
     {
+      argument = one_argument(argument,damroll);
+      argument = one_argument(argument,attacktype);
+      argument = one_argument(argument,temp);
+
+      if (damroll[0] == '\0')
+	break;
+      int numdice, sizedice;
+      numdice = sizedice = 0;
+      bool perc = TRUE;
+      char t,l;
+      int plus = 0;
+      if (sscanf(damroll, "%dd%d%c%c%d", &numdice, &sizedice, &t, &l, &plus) != 5 || l != '+' || t != '%')
+        if (sscanf(damroll, "%dd%d%c", &numdice, &sizedice,&t) != 3 || t != '%')
+        {
+ 	  perc = FALSE;
+	  if (sscanf(damroll, "%dd%d%c%d", &numdice, &sizedice, &l, &plus) != 4 || l != '+')
+	  	sscanf(damroll,"%dd%d",&numdice, &sizedice);
+        }
+
+      if(!numdice || !sizedice)
+      {
         logf( IMMORTAL, LOG_WORLD, "Mpdamage - Invalid damroll: vnum %d", mob_index[ch->mobdata->nr].virt);
         return eFAILURE|eINTERNAL_ERROR;
-    }
+      }
 
     // figure out attack type
-    int damtype = determine_attack_type(attacktype);
-    if(!damtype)
-    {
+      int damtype = determine_attack_type(attacktype);
+      if(!damtype)
+      {
         logf( IMMORTAL, LOG_WORLD, "Mpdamage - Invalid damtype: vnum %d", mob_index[ch->mobdata->nr].virt);
         return eFAILURE|eINTERNAL_ERROR;
-    }
-    int dam = 0;
+      }
+      int dam = 0;
     // do the damage
     // half of the casts are probably pointless, but whatever
 
-    if(victim) {
+      if(victim) {
 	if (perc)
          dam = (int)((double)GET_HIT(victim) / 100.0 * (double)dice(numdice, sizedice));
 	else
 	 dam = dice(numdice, sizedice);
-	 //add_dmg(victim,dam);
        dam += plus;
+       add_dmg(victim,dam);
        if (!temp[0] || !str_cmp(temp,"hitpoints")) {
-         return damage(ch, victim, dam, damtype, TYPE_UNDEFINED, 0);
+	 retval = damage(ch, victim, dam, damtype, TYPE_UNDEFINED, 0);
+	 if (IS_SET(retval, eCH_DIED)) return retval;
        }
        else if (!str_cmp(temp, "mana"))
        {
@@ -1322,13 +1343,12 @@ int do_mpdamage( CHAR_DATA *ch, char *argument, int cmd )
            logf( IMMORTAL, LOG_WORLD, "Mpdamage - Must damage either ki,mana,hitpoints or move: vnum %d", mob_index[ch->mobdata->nr].virt);
            return eFAILURE|eINTERNAL_ERROR;
        }
-       return eSUCCESS;
-    }
+	continue;
+      }
 
-    char_data * next_vict;
-    int retval = eSUCCESS;
-    for(victim = world[ch->in_room].people; victim; victim = next_vict)
-    {
+      char_data * next_vict;
+      for(victim = world[ch->in_room].people; victim; victim = next_vict)
+      {
         next_vict = victim->next_in_room;
         if(IS_MOB(victim) || GET_LEVEL(victim) > MORTAL)
            continue;
@@ -1337,9 +1357,12 @@ int do_mpdamage( CHAR_DATA *ch, char *argument, int cmd )
         else
          dam = dice(numdice, sizedice);
         dam += plus;
+	 add_dmg(victim,dam);
         if (!temp[0] || !str_cmp(temp,"hitpoints"))
 	{
             retval = damage(ch, victim, dam, damtype, TYPE_UNDEFINED, 0);
+  	    if (IS_SET(retval, eCH_DIED)) return retval;
+
 	}
         else if (!str_cmp(temp, "mana"))
         {
@@ -1359,8 +1382,8 @@ int do_mpdamage( CHAR_DATA *ch, char *argument, int cmd )
         }
         if(IS_SET(retval, eCH_DIED))
            return retval;
+      }
     }
-
     return eSUCCESS;
 }
 
