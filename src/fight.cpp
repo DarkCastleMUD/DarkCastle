@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.437 2007/03/27 19:09:02 dcastle Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.438 2007/03/29 14:47:43 dcastle Exp $ */
 
 extern "C"
 {
@@ -1700,7 +1700,7 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
 	attacktype == SPELL_POISON)) 
      return retval;
   int l=0;
-  if (dam!=0 && attacktype && attacktype < TYPE_HIT)
+  if (dam!=0 && attacktype && attacktype < TYPE_HIT && attacktype != TYPE_UNDEFINED)
   { // Skill damages based on learned %
     l = has_skill(ch, attacktype);
     if (IS_NPC(ch)) l = 50;
@@ -1720,7 +1720,7 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
 
   extern int elemental_damage_bonus(int spell, char_data *ch);
 
-  if (attacktype && attacktype < MAX_SPL_LIST)
+  if (attacktype && attacktype < MAX_SPL_LIST && attacktype != TYPE_UNDEFINED)
     dam += elemental_damage_bonus(attacktype, ch);
   //
 
@@ -2046,7 +2046,7 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
     if (check_dodge(ch, victim,attacktype))
       return eFAILURE;
   }*/
-  if (attacktype <= MAX_SPL_LIST)
+  if (attacktype <= MAX_SPL_LIST  && attacktype != TYPE_UNDEFINED)
   {
    int reduce = 0;
     if ((reduce = check_magic_block(ch, victim, attacktype))) {
