@@ -878,7 +878,7 @@ int do_zedit(struct char_data *ch, char *argument, int cmd)
       argument = one_argumentnolow(argument, text);
       if(!*text)
       {   
-        send_to_char("$3Usage$R: zedit flags <noteleport|noclaim>\r\n",ch);
+        send_to_char("$3Usage$R: zedit flags <noteleport|noclaim|nohunt>\r\n",ch);
         return eFAILURE;
       }
       
