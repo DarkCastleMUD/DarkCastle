@@ -235,6 +235,58 @@ int do_mpkill( CHAR_DATA *ch, char *argument, int cmd )
 }
 
 
+int do_mphit( CHAR_DATA *ch, char *argument, int cmd )
+{
+    char      arg[ MAX_INPUT_LENGTH ];
+    CHAR_DATA *victim;
+
+    if ( !IS_NPC( ch ) )
+    {
+        send_to_char( "Huh?\n\r", ch );
+	return eSUCCESS;
+    }
+
+    one_argument( argument, arg );
+
+    if ( arg[0] == '\0' )
+    {
+	logf( IMMORTAL, LOG_WORLD, "MpKill - no argument: vnum %d.",
+		mob_index[ch->mobdata->nr].virt );
+	return eFAILURE|eINTERNAL_ERROR;
+    }
+
+    if ( ( victim = get_char_room_vis( ch, arg ) ) == NULL )
+    {
+	logf( IMMORTAL, LOG_WORLD, "MpKill - Victim not in room: vnum %d.",
+	    mob_index[ch->mobdata->nr].virt );
+	return eFAILURE|eINTERNAL_ERROR;
+    }
+
+    if ( victim == ch )
+    {
+	logf( IMMORTAL, LOG_WORLD, "MpKill - Bad victim to attack: vnum %d.",
+	    mob_index[ch->mobdata->nr].virt );
+	return eFAILURE|eINTERNAL_ERROR;
+    }
+
+    if ( IS_AFFECTED( ch, AFF_CHARM ) && ch->master == victim )
+    {
+	logf( IMMORTAL, LOG_WORLD, "MpKill - Charmed mob attacking master: vnum %d.",
+	    mob_index[ch->mobdata->nr].virt );
+	return eFAILURE|eINTERNAL_ERROR;
+    }
+
+/*    if ( ch->position == POSITION_FIGHTING )
+    {	
+	logf( IMMORTAL, LOG_WORLD, "MpKill - Already fighting: vnum %d",
+	    mob_index[ch->mobdata->nr].virt );
+	return eFAILURE|eINTERNAL_ERROR;
+    }*/
+
+    return one_hit( ch, victim, TYPE_UNDEFINED, FIRST );
+}
+
+
 /* lets the mobile destroy an object in its inventory
    it can also destroy a worn object and it can destroy 
    just plain everything  */
@@ -1289,16 +1341,26 @@ int do_mpdamage( CHAR_DATA *ch, char *argument, int cmd )
       int numdice, sizedice;
       numdice = sizedice = 0;
       bool perc = TRUE;
-      char t,l;
+      char t,l,o;
       int plus = 0;
-      if (sscanf(damroll, "%dd%d%c%c%d", &numdice, &sizedice, &t, &l, &plus) != 5 || l != '+' || t != '%')
+      bool plusPerc = TRUE;
+
+      if (sscanf(damroll, "%dd%d%c%c%d%c", &numdice, &sizedice, &t, &l, &plus, &o) != 6 || l != '+' || t != '%' || o != '%')
+      {
+       plusPerc = FALSE;
+       if (sscanf(damroll, "%dd%d%c%c%d", &numdice, &sizedice, &t, &l, &plus) != 5 || l != '+' || t != '%')
         if (sscanf(damroll, "%dd%d%c", &numdice, &sizedice,&t) != 3 || t != '%')
         {
  	  perc = FALSE;
-	  if (sscanf(damroll, "%dd%d%c%d", &numdice, &sizedice, &l, &plus) != 4 || l != '+')
+	  plusPerc = TRUE;
+	  if (sscanf(damroll, "%dd%d%c%d%c", &numdice, &sizedice, &l, &plus,&o) != 5 || l != '+' || o != '%')
+	  {
+	    plusPerc = FALSE;
+  	    if (sscanf(damroll, "%dd%d%c%d", &numdice, &sizedice, &l, &plus) != 4 || l != '+')
 	  	sscanf(damroll,"%dd%d",&numdice, &sizedice);
+	  }
         }
-
+      }
       if(!numdice || !sizedice)
       {
         logf( IMMORTAL, LOG_WORLD, "Mpdamage - Invalid damroll: vnum %d", mob_index[ch->mobdata->nr].virt);
@@ -1317,16 +1379,36 @@ int do_mpdamage( CHAR_DATA *ch, char *argument, int cmd )
     // half of the casts are probably pointless, but whatever
 
       if(victim) {
+	int *data = NULL;
+	if (!temp[0] || !str_cmp(temp,"hitpoints"))
+	  data = &GET_HIT(victim);
+	else if (!str_cmp(temp, "mana"))
+	  data = &GET_MANA(victim);
+	else if (!str_cmp(temp, "ki"))
+	  data = &GET_KI(victim);
+	else if (!str_cmp(temp, "move"))
+	  data = &GET_MOVE(victim);
+	else {
+           logf( IMMORTAL, LOG_WORLD, "Mpdamage - Must damage either ki,mana,hitpoints or move: vnum %d", mob_index[ch->mobdata->nr].virt);
+           return eFAILURE|eINTERNAL_ERROR;
+	}
 	if (perc)
-         dam = (int)((double)GET_HIT(victim) / 100.0 * (double)dice(numdice, sizedice));
+         dam = (int)((double)(*data) / 100.0 * (double)dice(numdice, sizedice));
 	else
 	 dam = dice(numdice, sizedice);
-       dam += plus;
+       if (plusPerc)
+         dam += (int)((double)(*data) / 100.0 * (double)plus);
+       else
+         dam += plus;
        add_dmg(victim,dam);
        if (!temp[0] || !str_cmp(temp,"hitpoints")) {
 	 retval = damage(ch, victim, dam, damtype, TYPE_UNDEFINED, 0);
-	 if (IS_SET(retval, eCH_DIED)) return retval;
+	 if (SOMEONE_DIED(retval)) return retval;
+       } else {
+	 *data -= dam;
+	 if (*data < 0) *data = 0;
        }
+/*
        else if (!str_cmp(temp, "mana"))
        {
 	   GET_MANA(victim) -= dam;
@@ -1342,7 +1424,7 @@ int do_mpdamage( CHAR_DATA *ch, char *argument, int cmd )
        } else {
            logf( IMMORTAL, LOG_WORLD, "Mpdamage - Must damage either ki,mana,hitpoints or move: vnum %d", mob_index[ch->mobdata->nr].virt);
            return eFAILURE|eINTERNAL_ERROR;
-       }
+       }*/
 	continue;
       }
 
@@ -1350,13 +1432,46 @@ int do_mpdamage( CHAR_DATA *ch, char *argument, int cmd )
       for(victim = world[ch->in_room].people; victim; victim = next_vict)
       {
         next_vict = victim->next_in_room;
-        if(IS_MOB(victim) || GET_LEVEL(victim) > MORTAL)
+        if((!IS_NPC(victim) && GET_LEVEL(victim) > MORTAL) || victim==ch)
            continue;
+        int *data = NULL;
+        if (!temp[0] || !str_cmp(temp,"hitpoints"))
+          data = &GET_HIT(victim);
+        else if (!str_cmp(temp, "mana"))
+          data = &GET_MANA(victim);
+        else if (!str_cmp(temp, "ki"))
+          data = &GET_KI(victim);
+        else if (!str_cmp(temp, "move"))
+          data = &GET_MOVE(victim);
+        else {
+           logf( IMMORTAL, LOG_WORLD, "Mpdamage - Must damage either ki,mana,hitpoints or move: vnum %d", mob_index[ch->mobdata->nr].virt);
+           return eFAILURE|eINTERNAL_ERROR;
+        }
+        if (perc)
+         dam = (int)((double)(*data) / 100.0 * (double)dice(numdice, sizedice));
+        else
+         dam = dice(numdice, sizedice);
+       if (plusPerc)
+         dam += (int)((double)(*data) / 100.0 * (double)plus);
+       else
+         dam += plus;
+       add_dmg(victim,dam);
+       if (!temp[0] || !str_cmp(temp,"hitpoints")) {
+         retval = damage(ch, victim, dam, damtype, TYPE_UNDEFINED, 0);
+         if (IS_SET(retval, eCH_DIED)) return retval;
+       } else {
+         *data -= dam;
+         if (*data < 0) *data = 0;
+       }
+/*
         if (perc)
          dam = (int)((double)GET_HIT(victim) / 100.0 * (double)dice(numdice, sizedice));
         else
          dam = dice(numdice, sizedice);
-        dam += plus;
+       if (plusPerc)
+         dam += (int)((double)GET_HIT(victim) / 100.0 * (double)plus);
+       else
+         dam += plus;
 	 add_dmg(victim,dam);
         if (!temp[0] || !str_cmp(temp,"hitpoints"))
 	{
@@ -1379,7 +1494,7 @@ int do_mpdamage( CHAR_DATA *ch, char *argument, int cmd )
         } else {
            logf( IMMORTAL, LOG_WORLD, "Mpdamage - Must damage either ki,mana,hitpoints or move: vnum %d", mob_index[ch->mobdata->nr].virt);
            return eFAILURE|eINTERNAL_ERROR;
-        }
+        }*/
         if(IS_SET(retval, eCH_DIED))
            return retval;
       }

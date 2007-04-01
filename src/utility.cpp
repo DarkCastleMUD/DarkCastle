@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.75 2007/03/27 14:24:23 dcastle Exp $ */
+/* $Id: utility.cpp,v 1.76 2007/04/01 19:03:21 dcastle Exp $ */
 
 extern "C"
 {
@@ -1712,7 +1712,7 @@ void init_random()
   gettimeofday(&time_, NULL);
   now_ = (time_t) time_.tv_sec;
   mmstate[0] = now_ &((1<<30)-1);
- mmstate[1] = 1;
+  mmstate[1] = 1;
   for (i = 2; i < 55; i++)
     mmstate[i] = (((mmstate[i-1] + mmstate[i-2])) )&((1<<30)-1);
   j = 24;

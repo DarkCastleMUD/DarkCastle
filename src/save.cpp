@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: save.cpp,v 1.47 2007/02/18 21:41:19 dcastle Exp $ */
+/* $Id: save.cpp,v 1.48 2007/04/01 19:03:21 dcastle Exp $ */
 
 extern "C"
 {
@@ -500,6 +500,15 @@ int char_to_store_variable_data(CHAR_DATA * ch, FILE * fpsave)
        fwrite(&(af->bitvector), sizeof(af->bitvector), 1, fpsave);
     }
   }
+
+  struct tempvariable *mpv;
+  for (mpv = ch->tempVariable;mpv;mpv = mpv->next)
+  {
+    if (!mpv->save) continue;
+    fwrite("MPV", sizeof(char),3, fpsave);
+    fwrite_var_string(mpv->name,fpsave);
+    fwrite_var_string(mpv->data,fpsave);
+  }
   
   // Any future additions to this save file will need to be placed LAST here with a 3 letter code
   // and appropriate strcmp statement in the read_mob_data object
@@ -575,6 +584,21 @@ int store_to_char_variable_data(CHAR_DATA * ch, FILE * fpsave)
     fread(&typeflag, sizeof(char), 3, fpsave);
   }
 
+  while (!strcmp(typeflag, "MPV"))
+  {  // MobProgVars
+     struct tempvariable *mpv;
+#ifdef LEAK_CHECK
+     mpv = (struct tempvariable *)calloc(1, sizeof(struct tempvariable));
+#else
+     mpv = (struct tempvariable *)dc_alloc(1, sizeof(struct tempvariable));
+#endif
+     mpv->name = fread_var_string(fpsave);
+     mpv->data = fread_var_string(fpsave);
+     mpv->save = 1;
+     mpv->next = ch->tempVariable;
+     ch->tempVariable = mpv;
+     fread(&typeflag, sizeof(char), 3, fpsave);
+  }
 
   // Add new items in this format
 //  if(!strcmp(typeflag, "XXX"))
