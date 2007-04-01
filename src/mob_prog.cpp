@@ -2593,7 +2593,7 @@ void mprog_driver ( char *com_list, CHAR_DATA *mob, CHAR_DATA *actor,
  activeProgTmpBuf = command_list;
  activePos = command_list = mprog_next_command( command_list );
  
- if (thrw) thrw->orig = &tmpcmndlst[0];
+// if (thrw) thrw->orig = &tmpcmndlst[0];
  while ( *cmnd != '\0' )
    {
      morebuf = one_argument( cmnd, buf );
