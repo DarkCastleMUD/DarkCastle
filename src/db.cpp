@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.147 2007/03/27 13:56:51 dcastle Exp $ */
+/* $Id: db.cpp,v 1.148 2007/04/02 15:28:09 dcastle Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -5029,6 +5029,7 @@ int mprog_name_to_type ( char *name )
    if ( !str_cmp( name, "weapon_prog")) return WEAPON_PROG;
    if ( !str_cmp(name, "armour_prog")) return ARMOUR_PROG;
    if ( !str_cmp(name, "can_see_prog")) return CAN_SEE_PROG;
+   if ( !str_cmp(name, "damage_prog")) return DAMAGE_PROG;
    return( ERROR_PROG );
 }
 

@@ -2829,6 +2829,36 @@ int mprog_bribe_trigger( CHAR_DATA *mob, CHAR_DATA *ch, int amount )
 
 }
 
+int mprog_damage_trigger( CHAR_DATA *mob, CHAR_DATA *ch, int amount )
+{
+
+  MPROG_DATA *mprg;
+  MPROG_DATA *next;
+  OBJ_DATA   *obj;
+  bool done = FALSE;
+  if ( IS_NPC( mob )
+      && ( mob_index[mob->mobdata->nr].progtypes & DAMAGE_PROG ) )
+    {
+	 mprg = mob_index[mob->mobdata->nr].mobprogs;
+	 if (!mprg) { done = TRUE; mprg = mob_index[mob->mobdata->nr].mobspec; }
+	 for ( ; mprg != NULL; mprg = next )
+	{
+	next = mprg->next;
+	if ( ( mprg->type & DAMAGE_PROG )
+	    && ( amount >= atoi( mprg->arglist ) ) )
+	  {
+	    mprog_driver( mprg->comlist, mob, ch, obj, NULL );
+		if (selfpurge) return mprog_cur_result;
+	    break;
+	  }
+	   if (!next && !done) { next = mob_index[mob->mobdata->nr].mobspec; done = TRUE;}
+	}
+    }
+  
+  return mprog_cur_result;
+
+}
+
 int mprog_death_trigger( CHAR_DATA *mob, CHAR_DATA *killer )
 {
 

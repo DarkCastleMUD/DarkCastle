@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.438 2007/03/29 14:47:43 dcastle Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.439 2007/04/02 15:28:09 dcastle Exp $ */
 
 extern "C"
 {
@@ -2205,6 +2205,8 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
   if(affected_by_spell(victim, SPELL_DIVINE_INTER) && dam > affected_by_spell(victim, SPELL_DIVINE_INTER)->modifier)
     dam = affected_by_spell(victim, SPELL_DIVINE_INTER)->modifier;
 
+
+
   // Check for parry, mob disarm, and trip. Print a suitable damage message. 
   if ((attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING) || (IS_NPC(ch) && 
 	mob_index[ch->mobdata->nr].virt > 87 && mob_index[ch->mobdata->nr].virt < 92))
@@ -2230,6 +2232,8 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
     update_pos(victim);
     do_dam_msgs(ch, victim, dam, attacktype, weapon);
   }
+  mprog_damage_trigger( victim, ch, dam );
+
 
   if(ethereal) {
     send_to_char("The ethereal stones protecting you shatter and fade into nothing.\r\n", victim);

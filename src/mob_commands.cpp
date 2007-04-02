@@ -95,6 +95,7 @@ char *mprog_type_to_name( int type )
     case ATTACK_PROG:		return "attack_prog";
     case LOAD_PROG:		return "load_prog";
     case CAN_SEE_PROG:		return "can_see_prog";
+    case DAMAGE_PROG:		return "damage_prog";
     default:                    return "ERROR_PROG";
     }
 }
@@ -250,40 +251,71 @@ int do_mphit( CHAR_DATA *ch, char *argument, int cmd )
 
     if ( arg[0] == '\0' )
     {
-	logf( IMMORTAL, LOG_WORLD, "MpKill - no argument: vnum %d.",
+	logf( IMMORTAL, LOG_WORLD, "MpHit - no argument: vnum %d.",
 		mob_index[ch->mobdata->nr].virt );
 	return eFAILURE|eINTERNAL_ERROR;
     }
 
     if ( ( victim = get_char_room_vis( ch, arg ) ) == NULL )
     {
-	logf( IMMORTAL, LOG_WORLD, "MpKill - Victim not in room: vnum %d.",
+	logf( IMMORTAL, LOG_WORLD, "MpHit - Victim not in room: vnum %d.",
 	    mob_index[ch->mobdata->nr].virt );
 	return eFAILURE|eINTERNAL_ERROR;
     }
 
     if ( victim == ch )
     {
-	logf( IMMORTAL, LOG_WORLD, "MpKill - Bad victim to attack: vnum %d.",
+	logf( IMMORTAL, LOG_WORLD, "MpHit - Bad victim to attack: vnum %d.",
 	    mob_index[ch->mobdata->nr].virt );
 	return eFAILURE|eINTERNAL_ERROR;
     }
 
     if ( IS_AFFECTED( ch, AFF_CHARM ) && ch->master == victim )
     {
-	logf( IMMORTAL, LOG_WORLD, "MpKill - Charmed mob attacking master: vnum %d.",
+	logf( IMMORTAL, LOG_WORLD, "MpHit - Charmed mob attacking master: vnum %d.",
 	    mob_index[ch->mobdata->nr].virt );
 	return eFAILURE|eINTERNAL_ERROR;
     }
 
-/*    if ( ch->position == POSITION_FIGHTING )
-    {	
-	logf( IMMORTAL, LOG_WORLD, "MpKill - Already fighting: vnum %d",
+    return one_hit( ch, victim, TYPE_UNDEFINED, FIRST );
+}
+
+int do_mpaddlag( CHAR_DATA *ch, char *argument, int cmd )
+{
+    char      arg[ MAX_INPUT_LENGTH ];
+    char      arg1[ MAX_INPUT_LENGTH ];
+    CHAR_DATA *victim;
+
+    if ( !IS_NPC( ch ) )
+    {
+        send_to_char( "Huh?\n\r", ch );
+	return eSUCCESS;
+    }
+
+    argument = one_argument( argument, arg );
+    argument = one_argument( argument, arg1 );
+
+    if ( arg[0] == '\0' )
+    {
+	logf( IMMORTAL, LOG_WORLD, "MpAddlag - no argument: vnum %d.",
+		mob_index[ch->mobdata->nr].virt );
+	return eFAILURE|eINTERNAL_ERROR;
+    }
+
+    if ( ( victim = get_char_room_vis( ch, arg ) ) == NULL )
+    {
+	logf( IMMORTAL, LOG_WORLD, "MpAddlag - Victim not in room: vnum %d.",
 	    mob_index[ch->mobdata->nr].virt );
 	return eFAILURE|eINTERNAL_ERROR;
-    }*/
-
-    return one_hit( ch, victim, TYPE_UNDEFINED, FIRST );
+    }
+    if (!arg1[0] || !is_number(arg))
+    {
+	logf( IMMORTAL, LOG_WORLD, "MpAddlag - Invalid duration: vnum %d.",
+	    mob_index[ch->mobdata->nr].virt );
+	return eFAILURE|eINTERNAL_ERROR;
+    }
+    WAIT_STATE(victim, atoi(arg1));
+    return eSUCCESS;
 }
 
 

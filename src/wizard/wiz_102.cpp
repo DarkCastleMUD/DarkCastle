@@ -2411,6 +2411,7 @@ int do_mpedit(struct char_data *ch, char *argument, int cmd)
 		       " 14 -     arand_prog\r\n"
 		       " 15 -      load_prog\r\n"
 		       " 16 -      can_see_prog\r\n"
+		       " 17 -      damage_prog\r\n"
 		  
 							, ch);
 		       
@@ -2431,7 +2432,7 @@ int do_mpedit(struct char_data *ch, char *argument, int cmd)
           return eFAILURE;
         }
 
-        if(!check_range_valid_and_convert(intval, buf3, 1, 16)) {
+        if(!check_range_valid_and_convert(intval, buf3, 1, 17)) {
           send_to_char("Invalid prog number.\r\n", ch);
           return eFAILURE;
         }
@@ -2453,6 +2454,7 @@ int do_mpedit(struct char_data *ch, char *argument, int cmd)
 	  case 14:  currprog->type = ARAND_PROG; break;
 	  case 15:  currprog->type = LOAD_PROG; break;
 	  case 16:  currprog->type = CAN_SEE_PROG; break;
+	  case 17:  currprog->type = DAMAGE_PROG; break;
         }
 
 
@@ -3027,7 +3029,7 @@ mob_index[mob_num].virt);
           send_to_char("$3Valid Range$R: -50 to 100\r\n", ch);
           return eFAILURE;
         }
-        if(!check_range_valid_and_convert(intval, buf4, -50, 100)) {
+        if(!check_range_valid_and_convert(intval, buf4, -50, 300)) {
           send_to_char("Value out of valid range.\r\n", ch);
           return eFAILURE;
         }
@@ -3086,10 +3088,10 @@ mob_index[mob_num].virt);
                        "$3Current$R: ", ch);
           sprintf(buf, "%d\n", (int)((char_data *)mob_index[mob_num].item)->exp);
           send_to_char(buf, ch);
-          send_to_char("$3Valid Range$R: 0 to 5000000\r\n", ch);
+          send_to_char("$3Valid Range$R: 0 to 20000000\r\n", ch);
           return eFAILURE;
         }
-        if(!check_range_valid_and_convert(intval, buf4, 0, 5000000)) {
+        if(!check_range_valid_and_convert(intval, buf4, 0, 20000000)) {
           send_to_char("Value out of valid range.\r\n", ch);
           return eFAILURE;
         }
