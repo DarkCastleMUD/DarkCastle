@@ -967,8 +967,8 @@ int do_zedit(struct char_data *ch, char *argument, int cmd)
       {
         if(!has_skill(ch, COMMAND_RANGE) && zone != k)
            continue;
-
-        for(i = 0; i < last_cmd; i++)
+	
+        for(i = 0; i < zone_table[k].reset_total; i++)
           switch(zone_table[k].cmd[i].command) {
             case 'M':
               if( rmob == zone_table[k].cmd[i].arg1 )
