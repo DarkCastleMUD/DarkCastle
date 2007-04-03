@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.148 2007/04/02 15:28:09 dcastle Exp $ */
+/* $Id: db.cpp,v 1.149 2007/04/03 15:10:52 dcastle Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -1589,185 +1589,59 @@ char * read_next_worldfile_name(FILE * flWorldIndex)
   return temp;
 }
 
-// room should be the realroom number in memory
-bool can_modify_this_room(char_data * ch, long room)
+bool can_modify_this_room(char_data * ch, long vnum)
 {
-  world_file_list_item * curr = world_file_list;
+  if (has_skill(ch, COMMAND_RANGE)) return TRUE;
 
-  if(!GET_RANGE(ch))
-    return 0;
-
-  while(curr && strcmp(curr->filename, GET_RANGE(ch)))
-    curr = curr->next;
-
-  if(!curr) {
-    send_to_char("You have a non-existant range.  Tell an imp.\r\n", ch);
-    return 0;
-  }
-
-  if(room >= curr->firstnum && room <= curr->lastnum)
-    return 1;
-
-  return 0;
+  if (ch->pcdata->buildLowVnum <= 0 || ch->pcdata->buildHighVnum <= 0)
+    return FALSE;
+  if (ch->pcdata->buildLowVnum > vnum) return FALSE;
+  if (ch->pcdata->buildHighVnum < vnum) return FALSE;
+  return TRUE;
 }
 
-bool can_modify_room(char_data * ch, long room)
+bool can_modify_room(char_data * ch, long vnum)
 {
-   int ok = can_modify_this_room(ch, room);
+  if (has_skill(ch, COMMAND_RANGE)) return TRUE;
 
-   if(ok)
-      return 1;
-
-   if(!has_skill(ch, COMMAND_RANGE))
-      return 0;
-
-   // we have range, but we're in the wrong one
-   if(GET_RANGE(ch))
-   {
-      csendf(ch, "Leave existing range %s...\r\n", GET_RANGE(ch));
-      dc_free(GET_RANGE(ch));
-      GET_RANGE(ch) = NULL;
-   }
-   for(world_file_list_item * curr = world_file_list; curr; curr = curr->next)
-      if(room >= curr->firstnum && room <= curr->lastnum)
-      {
-         GET_RANGE(ch) = str_dup(curr->filename);
-         csendf(ch, "Range set to '%s'...\r\n", GET_RANGE(ch));
-         break;
-      }
-
-   if(!GET_RANGE(ch)) {
-      send_to_char("Error, could not find range for this value.\r\n", ch);
-      return 0;
-   }
-   return 1;
+  if (ch->pcdata->buildLowVnum <= 0 || ch->pcdata->buildHighVnum <= 0)
+    return FALSE;
+  if (ch->pcdata->buildLowVnum > vnum) return FALSE;
+  if (ch->pcdata->buildHighVnum < vnum) return FALSE;
+  return TRUE;
 }
 
-// mob realnum
-bool can_modify_this_mobile(char_data * ch, long mob)
+bool can_modify_this_mobile(char_data * ch, long vnum)
 {
-  world_file_list_item * curr = mob_file_list;
-  if(!GET_MOB_RANGE(ch))
-    return 0;
+  if (has_skill(ch, COMMAND_RANGE)) return TRUE;
 
-  while(curr && strcmp(curr->filename,GET_MOB_RANGE(ch)))
-    curr = curr->next;
-  
-  if(!curr) {
-    send_to_char("You have a non-existant range.  Tell an imp.\r\n", ch);
-    return 0;
-  }
-  world_file_list_item * curr2 = world_file_list;
-  while (curr2 && 
-(curr2->firstnum / 100 != mob_index[curr->firstnum].virt / 100) && 
-(mob_index[curr->lastnum].virt / 100 != curr2->lastnum))
-     curr2 = curr2->next;
-
-  if (!curr2) {
-     send_to_char("Cannot find corresponding room range.\r\n",ch);
-     return 0;
-  }
-
-  if(mob >= curr2->firstnum && mob <= curr2->lastnum)
-    return 1;
-
-  return 0;
+  if (ch->pcdata->buildMLowVnum <= 0 || ch->pcdata->buildMHighVnum <= 0)
+    return FALSE;
+  if (ch->pcdata->buildMLowVnum > vnum) return FALSE;
+  if (ch->pcdata->buildMHighVnum < vnum) return FALSE;
+  return TRUE;
 }
 
 bool can_modify_mobile(char_data * ch, long mob)
 {
-   int ok = can_modify_this_mobile(ch, mob);
-
-   if(ok)
-      return 1;
-
-   if(!has_skill(ch, COMMAND_RANGE))
-      return 0;
-
-   // we have range, but we're in the wrong one
-   if(GET_MOB_RANGE(ch))
-   {
-      csendf(ch, "Leave existing range %s...\r\n", GET_MOB_RANGE(ch));
-      dc_free(GET_MOB_RANGE(ch));
-      GET_MOB_RANGE(ch) = NULL;
-   }
-   for(world_file_list_item * curr = mob_file_list; curr; curr = curr->next)
-      if(real_mobile(mob) >= curr->firstnum && real_mobile(mob) <= curr->lastnum)
-      {
-         GET_MOB_RANGE(ch) = str_dup(curr->filename);
-         csendf(ch, "Range set to '%s'...\r\n", GET_MOB_RANGE(ch));
-         break;
-      }
-
-   if(!GET_MOB_RANGE(ch)) {
-      send_to_char("Error, could not find range for this value.\r\n", ch);
-      return 0;
-   }
-   return 1;
+  return can_modify_this_mobile(ch, mob);
 }
 
-// obj realnum
-bool can_modify_this_object(char_data * ch, long obj)
+bool can_modify_this_object(char_data * ch, long vnum)
 {
-  world_file_list_item * curr = obj_file_list;
+  if (has_skill(ch, COMMAND_RANGE)) return TRUE;
 
-  if(!GET_OBJ_RANGE(ch))
-    return 0;
+  if (ch->pcdata->buildOLowVnum <= 0 || ch->pcdata->buildOHighVnum <= 0)
+    return FALSE;
+  if (ch->pcdata->buildOLowVnum > vnum) return FALSE;
+  if (ch->pcdata->buildOHighVnum < vnum) return FALSE;
+  return TRUE;
 
-  while(curr && strcmp(GET_OBJ_RANGE(ch), curr->filename))
-    curr = curr->next;
-
-  if(!curr) {
-    send_to_char("You have a non-existant range.  Tell an imp.\r\n", ch);
-    return 0;
-  }
-  world_file_list_item * curr2 = world_file_list;
-  while (curr2 &&
-(curr2->firstnum / 100 != obj_index[curr->firstnum].virt / 100) &&
-(obj_index[curr->lastnum].virt / 100 != curr2->lastnum))
-     curr2 = curr2->next;
-
-  if (!curr2) {
-     send_to_char("Cannot find corresponding room range.\r\n",ch);
-     return 0;
-  }
-
-  if (obj>= curr2->firstnum && obj <= curr2->lastnum)
-    return 1;
-
-  return 0;
 }
 
 bool can_modify_object(char_data * ch, long obj)
 {
-   int ok = can_modify_this_object(ch, obj);
-
-   if(ok)
-      return 1;
-
-   if(!has_skill(ch, COMMAND_RANGE))
-      return 0;
-
-   // we have range, but we're in the wrong one
-   if(GET_OBJ_RANGE(ch))
-   {
-      csendf(ch, "Leave existing range %s...\r\n", GET_OBJ_RANGE(ch));
-      dc_free(GET_OBJ_RANGE(ch));
-      GET_OBJ_RANGE(ch) = NULL;
-   }
-   for(world_file_list_item * curr = obj_file_list; curr; curr = curr->next)
-      if(real_object(obj) >= curr->firstnum && real_object(obj) <= curr->lastnum)  
-      {
-         GET_OBJ_RANGE(ch) = str_dup(curr->filename);
-         csendf(ch, "Range set to '%s'...\r\n", GET_OBJ_RANGE(ch));
-         break;
-      }
-
-   if(!GET_OBJ_RANGE(ch)) {
-      send_to_char("Error, could not find range for this value.\r\n", ch);
-      return 0;
-   }
-   return 1;
+   return can_modify_this_object(ch, obj);
 }
 
 void set_zone_saved_zone(long room)
@@ -4581,12 +4455,6 @@ void free_char( CHAR_DATA *ch )
       ch->pcdata->skillchange = 0;
       if(ch->pcdata->last_site)
         dc_free(ch->pcdata->last_site);
-      if(ch->pcdata->rooms)
-        dc_free(ch->pcdata->rooms);
-      if(ch->pcdata->mobiles)
-        dc_free(ch->pcdata->mobiles);
-      if(ch->pcdata->objects)
-        dc_free(ch->pcdata->objects);
       if(ch->pcdata->ignoring)
         dc_free(ch->pcdata->ignoring);
       if(ch->pcdata->poofin)

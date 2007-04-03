@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.144 2007/02/21 21:20:11 shane Exp $ */
+/* $Id: info.cpp,v 1.145 2007/04/03 15:10:52 dcastle Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -1590,17 +1590,19 @@ int do_score(struct char_data *ch, char *argument, int cmd)
 
    if(!IS_NPC(ch)) // mob can't view this part
    {
-      if(GET_RANGE(ch) && GET_LEVEL(ch) > IMMORTAL) {
-         sprintf(buf, "R RANGE: %s\n\r", GET_RANGE(ch));
+      if (GET_LEVEL(ch) > IMMORTAL && ch->pcdata->buildLowVnum && ch->pcdata->buildHighVnum) {
+	if (ch->pcdata->buildLowVnum == ch->pcdata->buildOLowVnum &&
+		ch->pcdata->buildLowVnum == ch->pcdata->buildMLowVnum) {
+         sprintf(buf, "CREATION RANGE: %d-%d\n\r", ch->pcdata->buildLowVnum, ch->pcdata->buildHighVnum);
          send_to_char(buf, ch);
-      }
-      if(GET_MOB_RANGE(ch) && GET_LEVEL(ch) > IMMORTAL) {
-         sprintf(buf, "M RANGE: %s\n\r", GET_MOB_RANGE(ch));
+	} else {
+         sprintf(buf, "ROOM RANGE: %d-%d\n\r", ch->pcdata->buildLowVnum, ch->pcdata->buildHighVnum);
          send_to_char(buf, ch);
-      }
-      if(GET_OBJ_RANGE(ch) && GET_LEVEL(ch) > IMMORTAL) {
-         sprintf(buf, "O RANGE: %s\n\r", GET_OBJ_RANGE(ch));
+         sprintf(buf, "MOB RANGE: %d-%d\n\r", ch->pcdata->buildMLowVnum, ch->pcdata->buildMHighVnum);
          send_to_char(buf, ch);
+         sprintf(buf, "OBJ RANGE: %d-%d\n\r", ch->pcdata->buildOLowVnum, ch->pcdata->buildOHighVnum);
+         send_to_char(buf, ch);
+	}
       }
    }
    return eSUCCESS;

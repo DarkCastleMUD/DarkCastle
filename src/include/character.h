@@ -1,7 +1,7 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.63 2007/04/02 15:28:11 dcastle Exp $
+| $Id: character.h,v 1.64 2007/04/03 15:10:55 dcastle Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
@@ -239,9 +239,9 @@ struct pc_data
     char *poofout;      /* poofout message */    
     char *prompt;       /* Sadus' disguise.. unused */
 
-    char *rooms;       /*  Builder Room Range   */
-    char *mobiles;     /*  Builder Mobile Range */
-    char *objects;     /*  Builder Object Range */
+    int16 buildLowVnum, buildHighVnum;
+    int16 buildMLowVnum, buildMHighVnum;
+    int16 buildOLowVnum, buildOHighVnum;
     obj_data *skillchange; /* Skill changing equipment. */
 
      int32 last_mob_edit;       // vnum of last mob edited

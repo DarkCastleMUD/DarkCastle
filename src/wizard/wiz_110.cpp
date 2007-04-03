@@ -619,26 +619,30 @@ int do_range(struct char_data *ch, char *arg, int cmd)
   struct char_data *victim;
   char name[160], buf[160];
   char kind[160], buf2[160];
+  char trail[160];
   char message[256];
   int zonenum, i;
   char ** target;
 
   world_file_list_item * curr = NULL;
-
+/*
   extern world_file_list_item * world_file_list;
   extern world_file_list_item *   mob_file_list;
   extern world_file_list_item *   obj_file_list;
-
+*/
   if(!has_skill(ch, COMMAND_RANGE)) {
     send_to_char("Huh?\r\n", ch);
     return eFAILURE;
   }
 
-  half_chop(arg, name, buf2);
-  half_chop(buf2, kind, buf);
+  arg = one_argument(arg, name);
+  arg = one_argument(arg, kind);
+  arg = one_argument(arg, buf);
+  arg = one_argument(arg, trail);
 
   if(!(*name) || !(*buf) || !(*kind)) {
-    send_to_char("Syntax: range <god> <r|m|o> <number|'none'>\n\r", ch);
+    send_to_char("Syntax: range <god> <low vnum> <high vnum>\n\r", ch);
+    send_to_char("Syntax: range <god> <r/m/o> <low vnum> <high vnum>\n\r", ch);
     return eFAILURE;
   }
 
@@ -646,58 +650,68 @@ int do_range(struct char_data *ch, char *arg, int cmd)
     send_to_char("Set whose range?!\n\r", ch);
     return eFAILURE;
   }
-
-  if(!isdigit(*buf)) {
-    send_to_char("Choose a valid zone number from 'show wfiles/ofiles/mfiles'.\r\n", ch);
-    return eFAILURE;
-  }
-
-  switch(*kind) {
-    case 'r':  target = &(GET_RANGE(victim));      curr = world_file_list;  break;
-    case 'm':  target = &(GET_MOB_RANGE(victim));  curr =   mob_file_list;  break;
-    case 'o':  target = &(GET_OBJ_RANGE(victim));  curr =   obj_file_list;  break;
-    default:
-      send_to_char("Illegal kind of range.   Must be 'r', 'm', or 'o'.\r\n", ch);
+  int low,high;
+  if (trail[0] != '\0') {
+    if(!isdigit(*buf) || !isdigit(*trail)) {
+      send_to_char("Specify valid numbers. To remove, set the ranges to 0 low and 0 high.\r\n", ch);
       return eFAILURE;
+   }
+   low = atoi(buf);
+   high = atoi(trail);
   }
-  
-  if(!strcmp(buf, "none")) {
-    if(*target)
-      dc_free(*target);
-    target = NULL;
-//    FREE(GET_RANGE(victim));
-//    GET_RANGE(victim) = NULL;
-    sprintf(message, "%s's range has been removed.\r\n", GET_NAME(victim));
+  else {
+    if(!isdigit(*buf) || !isdigit(*kind)) {
+      send_to_char("Specify valid numbers. To remove, set the ranges to 0 low and 0 high.\r\n", ch);
+      return eFAILURE;
+   }
+   low = atoi(kind);
+   high = atoi(buf);
+ }
+  if (low < 0 || high < 0)
+  {
+    send_to_char("The number needs to be positive.\r\n",ch);
+    return eFAILURE;
+  }
+  if (trail[0])
+  {
+    switch(LOWER(kind[0]))
+    {
+	case 'm':
+	    victim->pcdata->buildMLowVnum = low;
+	    victim->pcdata->buildMHighVnum = high;
+	    sprintf(message, "%s M range set to %d-%d.\r\n", GET_NAME(victim), low, high);
+	    send_to_char(message, ch);
+	    sprintf(message, "Your M range has been set to %d-%d.\r\n", low, high);
+	    send_to_char(message, victim);
+	  return eSUCCESS;
+	case 'o':
+	    victim->pcdata->buildOLowVnum = low;
+	    victim->pcdata->buildOHighVnum = high;
+	    sprintf(message, "%s O range set to %d-%d.\r\n", GET_NAME(victim), low, high);
+	    send_to_char(message, ch);
+	    sprintf(message, "Your O range has been set to %d-%d.\r\n", low, high);
+	    send_to_char(message, victim);
+	  return eSUCCESS;
+	case 'r':
+	    victim->pcdata->buildLowVnum = low;
+	    victim->pcdata->buildHighVnum = high;
+	    sprintf(message, "%s R range set to %d-%d.\r\n", GET_NAME(victim), low, high);
+	    send_to_char(message, ch);
+	    sprintf(message, "Your R range has been set to %d-%d.\r\n", low, high);
+	    send_to_char(message, victim);
+	  return eSUCCESS;
+	default: 
+	  send_to_char("Invalid type. Valid ones are r/o/m.\r\n",ch);
+	  return eFAILURE;
+    }    
+  } else {
+    victim->pcdata->buildLowVnum = victim->pcdata->buildOLowVnum = victim->pcdata->buildMLowVnum = low;
+    victim->pcdata->buildHighVnum = victim->pcdata->buildOHighVnum = victim->pcdata->buildMHighVnum = high;
+    sprintf(message, "%s range set to %d-%d.\r\n", GET_NAME(victim), low, high);
     send_to_char(message, ch);
-    send_to_char("Your range has been removed.\r\n", victim);
-    return eSUCCESS;
+    sprintf(message, "Your range has been set to %d-%d.\r\n", low, high);
+    send_to_char(message, victim);
   }
-
-  if(!check_range_valid_and_convert(zonenum, buf, 0, 300)) {
-    send_to_char("Use a valid range id.\r\n", ch);
-    return eFAILURE;
-  }
-
-  for(i = 0;
-      curr && i != zonenum;
-      i++, curr = curr->next)
-    ;
-
-  if(!curr) {
-    send_to_char("Number too high.  Use 'show rfiles/mfiles/ofiles' to see valid zones.\r\n", ch);
-    return eFAILURE;
-  }
-
-//  FREE(GET_RANGE(victim));
-//  GET_RANGE(victim) = str_dup(curr->filename);
-  if(*target)
-    dc_free(*target);
-  *target = str_dup(curr->filename);
-
-  sprintf(message, "%s %c range set to %s.\r\n", GET_NAME(victim), UPPER(*kind), *target);
-  send_to_char(message, ch);
-  sprintf(message, "Your %c range has been set to %s.\r\n", UPPER(*kind), *target);
-  send_to_char(message, victim);
   return eSUCCESS;
 }
 

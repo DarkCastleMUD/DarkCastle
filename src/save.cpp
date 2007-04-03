@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: save.cpp,v 1.48 2007/04/01 19:03:21 dcastle Exp $ */
+/* $Id: save.cpp,v 1.49 2007/04/03 15:10:52 dcastle Exp $ */
 
 extern "C"
 {
@@ -256,9 +256,7 @@ void save_pc_data(struct pc_data * i, FILE * fpsave, struct time_data tmpage)
   fwrite_var_string(i->poofin, fpsave);
   fwrite_var_string(i->poofout, fpsave);
   fwrite_var_string(i->prompt, fpsave);
-  fwrite_var_string(i->rooms, fpsave);
-  fwrite_var_string(i->mobiles, fpsave);
-  fwrite_var_string(i->objects, fpsave);
+  fwrite_var_string("NewSaveType",fpsave);
 
   // Quest bitvector one
   if(i->quest_bv1) {
@@ -297,6 +295,31 @@ void save_pc_data(struct pc_data * i, FILE * fpsave, struct time_data tmpage)
     fwrite(&(i->quest_pass[j]), sizeof(i->quest_pass[j]), 1, fpsave);
   for(int j=0;j<=QUEST_TOTAL/ASIZE;j++)
     fwrite(&(i->quest_complete[j]), sizeof(i->quest_complete[j]), 1, fpsave);
+  if (i->buildLowVnum) {
+    fwrite("BLO", sizeof(char), 3, fpsave);
+    fwrite(&(i->buildLowVnum), sizeof(i->buildLowVnum), 1, fpsave);
+  }
+  if (i->buildHighVnum) {
+    fwrite("BHI", sizeof(char), 3, fpsave);
+    fwrite(&(i->buildHighVnum), sizeof(i->buildHighVnum), 1, fpsave);
+  }
+  if (i->buildMLowVnum) {
+    fwrite("BMO", sizeof(char), 3, fpsave);
+    fwrite(&(i->buildMLowVnum), sizeof(i->buildMLowVnum), 1, fpsave);
+  }
+  if (i->buildMHighVnum) {
+    fwrite("BMI", sizeof(char), 3, fpsave);
+    fwrite(&(i->buildMHighVnum), sizeof(i->buildMHighVnum), 1, fpsave);
+  }
+  if (i->buildOLowVnum) {
+    fwrite("BOO", sizeof(char), 3, fpsave);
+    fwrite(&(i->buildOLowVnum), sizeof(i->buildOLowVnum), 1, fpsave);
+  }
+  if (i->buildOHighVnum) {
+    fwrite("BOI", sizeof(char), 3, fpsave);
+    fwrite(&(i->buildOHighVnum), sizeof(i->buildOHighVnum), 1, fpsave);
+  }
+   
 
   // Any future additions to this save file will need to be placed LAST here with a 3 letter code
   // and appropriate strcmp statement in the read_mob_data object
@@ -344,9 +367,15 @@ void read_pc_data(struct char_data *ch, FILE* fpsave)
   i->poofin    = fread_var_string(fpsave);
   i->poofout   = fread_var_string(fpsave);
   i->prompt    = fread_var_string(fpsave);
-  i->rooms     = fread_var_string(fpsave);
-  i->mobiles   = fread_var_string(fpsave);
-  i->objects   = fread_var_string(fpsave);
+  char *tmp = fread_var_string(fpsave);
+  if (str_cmp(tmp,"NewSaveType"))
+  {
+    dc_free(tmp);
+    tmp = fread_var_string(fpsave);
+    dc_free(tmp);
+    tmp = fread_var_string(fpsave);
+    dc_free(tmp);
+  } else dc_free(tmp);
   i->skillchange = 0;
   typeflag[3] = '\0';
   fread(&typeflag, sizeof(char), 3, fpsave);
@@ -395,6 +424,37 @@ void read_pc_data(struct char_data *ch, FILE* fpsave)
       fread(&(i->quest_complete[j]), sizeof(i->quest_complete[j]), 1, fpsave);
    fread(&typeflag, sizeof(char), 3, fpsave);
   }
+  if (!strcmp("BLO", typeflag))
+  {
+    fread(&i->buildLowVnum, sizeof(i->buildLowVnum), 1, fpsave);
+    fread(&typeflag, sizeof(char), 3, fpsave);
+  }
+  if (!strcmp("BHI", typeflag))
+  {
+    fread(&i->buildHighVnum, sizeof(i->buildHighVnum), 1, fpsave);
+    fread(&typeflag, sizeof(char), 3, fpsave);
+  }
+  if (!strcmp("BMO", typeflag))
+  {
+    fread(&i->buildMLowVnum, sizeof(i->buildMLowVnum), 1, fpsave);
+    fread(&typeflag, sizeof(char), 3, fpsave);
+  }
+  if (!strcmp("BMI", typeflag))
+  {
+    fread(&i->buildMHighVnum, sizeof(i->buildMHighVnum), 1, fpsave);
+    fread(&typeflag, sizeof(char), 3, fpsave);
+  }
+  if (!strcmp("BOO", typeflag))
+  {
+    fread(&i->buildOLowVnum, sizeof(i->buildOLowVnum), 1, fpsave);
+    fread(&typeflag, sizeof(char), 3, fpsave);
+  }
+  if (!strcmp("BOI", typeflag))
+  {
+    fread(&i->buildOHighVnum, sizeof(i->buildOHighVnum), 1, fpsave);
+    fread(&typeflag, sizeof(char), 3, fpsave);
+  }
+
   i->skillchange = 0;
   // Add new items in this format
 //  if(!strcmp(typeflag, "XXX"))

@@ -2109,16 +2109,16 @@ int do_oedit(struct char_data *ch, char *argument, int cmd)
 	  return eFAILURE;
 	}
      */
-	if (!has_skill(ch, COMMAND_RANGE))
+	/*if (!has_skill(ch, COMMAND_RANGE))
 	{
 	  send_to_char("You cannot create items.\r\n",ch);
 	  return eFAILURE;
-	}/*
+	}*/
         if (!can_modify_object(ch, intval))
         {
 	  send_to_char("You cannot create items in that range.\r\n",ch);
 	  return eFAILURE;
-        }*/
+        }
 /*
         if(!can_modify_object(ch, intval)) {
           send_to_char("You are unable to work creation outside of your range.\n\r", ch);
@@ -2664,6 +2664,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd)
     }
     else {
       mob_num = ch->pcdata->last_mob_edit;
+      mobvnum = mob_index[mob_num].virt;
       // put the buffs where they should be
       if(*buf4)
         sprintf(buf2, "%s %s", buf3, buf4);
@@ -3280,17 +3281,17 @@ mob_index[mob_num].virt);
         if(!check_range_valid_and_convert(intval, buf4, 0, 35000)) {
           send_to_char("Please specifiy a valid number.\r\n", ch);
           return eFAILURE;
-        }/*
+        }
         if (!can_modify_mobile(ch, intval))
         {
           send_to_char("You cannot create mobiles in that range.\r\n",ch);
           return eFAILURE;
-        }*/
+        }/*
         if (!has_skill(ch, COMMAND_RANGE))
         {
           send_to_char("You cannot create mobiles in that range.\r\n",ch);
           return eFAILURE;
-	}
+	}*/
         x = create_blank_mobile(intval);
         if(x < 0) {
           csendf(ch, "Could not create mobile '%d'.  Max index hit or mob already exists.\r\n",intval);
@@ -3834,11 +3835,6 @@ int do_zsave(struct char_data *ch, char *arg, int cmd)
 
   extern struct zone_data *zone_table;
 
-  if(!GET_RANGE(ch)) {
-    send_to_char("You aren't assigned a range.\n\r", ch);
-    return eFAILURE;
-  }
-
   if(!can_modify_room(ch, ch->in_room)) {
     send_to_char("You may only zsave inside of the room range you are assigned to.\n\r", ch);
     return eFAILURE;
@@ -3883,14 +3879,17 @@ int do_rsave(struct char_data *ch, char *arg, int cmd)
 
   extern world_file_list_item * world_file_list;
 
-  if(!GET_RANGE(ch)) {
-    send_to_char("You aren't assigned a range.\n\r", ch);
+  if(!can_modify_room(ch, ch->in_room)) {
+    send_to_char("You may only rsave inside of the room range you are assigned to.\n\r", ch);
     return eFAILURE;
   }
 
   curr = world_file_list;
-  while(curr && strcmp(curr->filename, GET_RANGE(ch)))
-    curr = curr->next;
+  while(curr)
+   if (curr->firstnum < ch->in_room && curr->lastnum > ch->in_room)
+	break;
+   else curr = curr->next;
+
 
   if(!curr) {
     send_to_char("That range doesn't seem to exist...tell an imp.\r\n", ch);
@@ -3933,14 +3932,23 @@ int do_msave(struct char_data *ch, char *arg, int cmd)
 
   extern world_file_list_item * mob_file_list;
 
-  if(!GET_MOB_RANGE(ch)) {
-    send_to_char("You aren't assigned a mob range.\n\r", ch);
+  if (ch->pcdata->last_mob_edit <= 0)
+  {
+    send_to_char("You have not recently edited a mobile.\r\n",ch);
+    return eFAILURE;
+  }
+
+  int v = mob_index[ch->pcdata->last_mob_edit].virt;
+  if(!can_modify_mobile(ch, v)) {
+    send_to_char("You may only msave inside of the room range you are assigned to.\n\r", ch);
     return eFAILURE;
   }
 
   curr = mob_file_list;
-  while(curr && strcmp(curr->filename, GET_MOB_RANGE(ch)))
-    curr = curr->next;
+  while(curr)
+   if (curr->firstnum < v && curr->lastnum > v)
+	break;
+   else curr = curr->next;
 
   if(!curr) {
     send_to_char("That range doesn't seem to exist...tell an imp.\r\n", ch);
@@ -3983,14 +3991,22 @@ int do_osave(struct char_data *ch, char *arg, int cmd)
 
   extern world_file_list_item * obj_file_list;
 
-  if(!GET_OBJ_RANGE(ch)) {
-    send_to_char("You aren't assigned an obj range.\n\r", ch);
+  if (ch->pcdata->last_obj_edit <= 0)
+  {
+    send_to_char("You have not recently edited an item.\r\n",ch);
+    return eFAILURE;
+  }
+  int v = obj_index[ch->pcdata->last_obj_edit].virt;
+  if(!can_modify_object(ch, v)) {
+    send_to_char("You may only msave inside of the room range you are assigned to.\n\r", ch);
     return eFAILURE;
   }
 
   curr = obj_file_list;
-  while(curr && strcmp(curr->filename, GET_OBJ_RANGE(ch)))
-    curr = curr->next;
+  while(curr)
+   if (curr->firstnum < v && curr->lastnum > v)
+        break;
+   else curr = curr->next;
 
   if(!curr) {
     send_to_char("That range doesn't seem to exist...tell an imp.\r\n", ch);
@@ -4046,12 +4062,12 @@ int do_instazone(struct char_data *ch, char *arg, int cmd)
 // Remember if you change this that it uses string_to_file which now appends a ~\n to the end
 // of the string.  This command does NOT take that into consideration currently.
 
-    if(!GET_RANGE(ch)) {
+/*    if(!GET_RANGE(ch)) {
     send_to_char("You don't have a zone assigned to you!\n\r", ch);
     return eFAILURE;
       }
 
-    half_chop(GET_RANGE(ch), buf, bufl);
+    half_chop(GET_RANGE(ch), buf, bufl);*/
       low = atoi(buf);
      high = atoi(bufl);
 

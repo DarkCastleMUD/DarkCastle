@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.48 2007/03/17 04:13:42 jhhudso Exp $
+| $Id: wizard.cpp,v 1.49 2007/04/03 15:10:57 dcastle Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -457,14 +457,13 @@ void boro_mob_stat(struct char_data *ch, struct char_data *k)
     sprintf(buf, "$3Stealth$R:  %s\n\r", ((k->pcdata->stealth) ? "ON"  :
       "OFF"));
     send_to_char(buf, ch);
-    sprintf(buf, "$3RRange$R: %s  ", GET_RANGE(k) ? GET_RANGE(k) : "None");
-    send_to_char(buf, ch);
-    sprintf(buf, "$3ORange$R: %s  ", GET_OBJ_RANGE(k) ? GET_OBJ_RANGE(k) :
-      "None");
-    send_to_char(buf, ch);
-    sprintf(buf, "$3MRange$R: %s\n\r", GET_MOB_RANGE(k) ? GET_MOB_RANGE(k) :
-      "None");
-    send_to_char(buf, ch);
+
+    sprintf(buf, "$3R Range$R:  %d-%d  \r\n", k->pcdata->buildLowVnum, k->pcdata->buildHighVnum);
+    send_to_char(buf,ch);
+    sprintf(buf, "$3M Range$R:  %d-%d  \r\n", k->pcdata->buildMLowVnum, k->pcdata->buildMHighVnum);
+    send_to_char(buf,ch);
+    sprintf(buf, "$3O Range$R:  %d-%d  \r\n", k->pcdata->buildOLowVnum, k->pcdata->buildOHighVnum);
+    send_to_char(buf,ch);
   }
 
   if(k->affected) 
@@ -776,11 +775,11 @@ void mob_stat(struct char_data *ch, struct char_data *k)
     send_to_char(buf, ch);
     sprintf(buf, "$3Stealth$R:  %s\n\r", ((k->pcdata->stealth) ? "ON"  : "OFF"));
     send_to_char(buf, ch);
-    sprintf(buf, "$3RRange$R: %s  ", GET_RANGE(k) ? GET_RANGE(k) : "None");
+    sprintf(buf, "$3R Range$R:  %d-%d  \r\n", k->pcdata->buildLowVnum, k->pcdata->buildHighVnum);
     send_to_char(buf, ch);
-    sprintf(buf, "$3ORange$R: %s  ", GET_OBJ_RANGE(k) ? GET_OBJ_RANGE(k) : "None");
+    sprintf(buf, "$3M Range$R:  %d-%d  \r\n", k->pcdata->buildMLowVnum, k->pcdata->buildMHighVnum);
     send_to_char(buf, ch);
-    sprintf(buf, "$3MRange$R: %s\n\r", GET_MOB_RANGE(k) ? GET_MOB_RANGE(k) : "None");
+    sprintf(buf, "$3O Range$R:  %d-%d  \r\n", k->pcdata->buildOLowVnum, k->pcdata->buildOHighVnum);
     send_to_char(buf, ch);
   }  
 
