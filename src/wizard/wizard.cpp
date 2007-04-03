@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.49 2007/04/03 15:10:57 dcastle Exp $
+| $Id: wizard.cpp,v 1.50 2007/04/03 15:21:16 dcastle Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -458,12 +458,19 @@ void boro_mob_stat(struct char_data *ch, struct char_data *k)
       "OFF"));
     send_to_char(buf, ch);
 
+    if (k->pcdata->buildLowVnum == k->pcdata->buildMLowVnum == k->pcdata->buildOLowVnum  &&
+	k->pcdata->buildHighVnum == k->pcdata->buildMHighVnum == k->pcdata->buildOHighVnum)
+   {
+    sprintf(buf, "$3Creation Range$R:  %d-%d  \r\n", k->pcdata->buildLowVnum, k->pcdata->buildHighVnum);
+    send_to_char(buf,ch);
+   } else {
     sprintf(buf, "$3R Range$R:  %d-%d  \r\n", k->pcdata->buildLowVnum, k->pcdata->buildHighVnum);
     send_to_char(buf,ch);
     sprintf(buf, "$3M Range$R:  %d-%d  \r\n", k->pcdata->buildMLowVnum, k->pcdata->buildMHighVnum);
     send_to_char(buf,ch);
     sprintf(buf, "$3O Range$R:  %d-%d  \r\n", k->pcdata->buildOLowVnum, k->pcdata->buildOHighVnum);
     send_to_char(buf,ch);
+   }
   }
 
   if(k->affected) 
@@ -775,12 +782,19 @@ void mob_stat(struct char_data *ch, struct char_data *k)
     send_to_char(buf, ch);
     sprintf(buf, "$3Stealth$R:  %s\n\r", ((k->pcdata->stealth) ? "ON"  : "OFF"));
     send_to_char(buf, ch);
+    if (k->pcdata->buildLowVnum == k->pcdata->buildMLowVnum == k->pcdata->buildOLowVnum  &&
+        k->pcdata->buildHighVnum == k->pcdata->buildMHighVnum == k->pcdata->buildOHighVnum)
+   {
+    sprintf(buf, "$3Creation Range$R:  %d-%d  \r\n", k->pcdata->buildLowVnum, k->pcdata->buildHighVnum);
+    send_to_char(buf,ch);
+   } else {
     sprintf(buf, "$3R Range$R:  %d-%d  \r\n", k->pcdata->buildLowVnum, k->pcdata->buildHighVnum);
-    send_to_char(buf, ch);
+    send_to_char(buf,ch);
     sprintf(buf, "$3M Range$R:  %d-%d  \r\n", k->pcdata->buildMLowVnum, k->pcdata->buildMHighVnum);
-    send_to_char(buf, ch);
+    send_to_char(buf,ch);
     sprintf(buf, "$3O Range$R:  %d-%d  \r\n", k->pcdata->buildOLowVnum, k->pcdata->buildOHighVnum);
-    send_to_char(buf, ch);
+    send_to_char(buf,ch);
+   }
   }  
 
   csendf(ch, "$3Lag Left$R:  %d\r\n", (GET_WAIT(k) ? GET_WAIT(k) : 0));
