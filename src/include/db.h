@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: db.h,v 1.23 2007/02/28 16:34:06 dcastle Exp $ */
+/* $Id: db.h,v 1.24 2007/04/03 12:09:07 dcastle Exp $ */
 #ifndef DB_H_
 #define DB_H_
 
@@ -24,6 +24,8 @@ extern "C" {
 #include <character.h>
 #include <weather.h>
 #include <handler.h>
+
+extern struct obj_data  *object_list;
 
 #define WORLD_MAX_ROOM        50000  // should never get this high...
                                      // it's just to keep builders/imps from 

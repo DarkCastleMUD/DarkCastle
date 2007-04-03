@@ -1981,7 +1981,10 @@ int do_oclone(struct char_data *ch, char *argument, int cmd)
     r2 = real_object(v2); // oedit new changes it
   }
   obj = clone_object(r2);
-  otmp = (OBJ_DATA*)obj_index[r1].item;  
+  if (!obj) {csendf(ch, "Failure. Unable to clone item.\r\n"); return eFAILURE; }
+
+  object_list = object_list->next;
+  otmp = (OBJ_DATA*)obj_index[r1].item;
   obj->item_number = r1;
   obj_index[r1].item = (void*)obj;
   extract_obj(otmp);
@@ -2027,13 +2030,23 @@ int do_mclone(struct char_data *ch, char *argument, int cmd)
     src = real_mobile(vsrc); // medit new changes it
   }
   mob = clone_mobile(src);
+  if (!mob) {csendf(ch, "Failure. Unable to copy mobile.\r\n"); return eFAILURE;}
+
+  // clone_mobile assigns the start of character_list to be mob
+  // This undos the change
+  character_list = character_list->next;
   mob->mobdata->nr = dst;
 
-  // Find old mobile in world and remove
+   // Find old mobile in world and remove
   char_data *old_mob = (CHAR_DATA*)mob_index[dst].item;
-  if (old_mob && old_mob->in_room != NOWHERE) {
-    csendf(ch, "%d\n\r", old_mob->in_room);
-    extract_char(old_mob, TRUE);
+  if (old_mob && old_mob->mobdata) {
+     char_data *tmpch,*tmpchn = NULL;
+     for (tmpch = character_list;tmpch; tmpch = tmpchn)
+     {
+        tmpchn = tmpch->next;
+	if (!tmpch->mobdata) continue;
+        if (old_mob->mobdata->nr == tmpch->mobdata->nr) extract_char(tmpch, TRUE);
+     }
   }
 
   // Overwrite old mob with new mob
