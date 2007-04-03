@@ -1,7 +1,7 @@
 #ifndef MOBILE_H_
 #define MOBILE_H_
 /************************************************************************
-| $Id: mobile.h,v 1.24 2007/03/27 13:56:53 dcastle Exp $
+| $Id: mobile.h,v 1.25 2007/04/03 22:47:17 dcastle Exp $
 | mobile.h
 | Description:  This file contains the header information for mobile
 |   control.
@@ -90,5 +90,10 @@ struct mob_matrix_data
   int armor;
   int gold;
 };
+
+
+void translate_value(char *leftptr, char *rightptr, int16 **vali, uint32 **valui,
+                char **valstr, int64 **vali64, sbyte **valb, CHAR_DATA *mob, CHAR_DATA *actor,
+                OBJ_DATA *obj, void *vo, CHAR_DATA *rndm);
 
 #endif

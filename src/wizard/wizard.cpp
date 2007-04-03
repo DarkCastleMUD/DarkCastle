@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.50 2007/04/03 15:21:16 dcastle Exp $
+| $Id: wizard.cpp,v 1.51 2007/04/03 22:47:18 dcastle Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -663,11 +663,11 @@ void mob_stat(struct char_data *ch, struct char_data *k)
   send_to_char(buf, ch);
 
   if(IS_NPC(k)) {
-    strcpy(buf,"$3NPC flags$R: ");
+    sprintf(buf, "$3NPC flags$R: [%d %d]", k->mobdata->actflags[0], k->mobdata->actflags[1]);
     sprintbit(k->mobdata->actflags, action_bits,buf2);
   }  
   else {
-    strcpy(buf,"$3PC flags$R: ");
+    sprintf(buf, "$3PC flags$R: [%d]", k->pcdata->toggles);
     sprintbit(k->pcdata->toggles, player_bits,buf2);
   }  
   strcat(buf, buf2);
@@ -764,16 +764,16 @@ void mob_stat(struct char_data *ch, struct char_data *k)
      display_punishes(ch, k);
     
   sprintbit(k->affected_by, affected_bits, buf);
-  csendf(ch, "$3Affected by$R: %s\r\n", buf);
+  csendf(ch, "$3Affected by$R: [%d %d] %s\r\n", k->affected_by[0], k->affected_by[1], buf);
 
   sprintbit(k->immune, isr_bits, buf);
-  csendf(ch, "$3Immune$R: %s\n\r", buf);
+  csendf(ch, "$3Immune$R: [%d] %s\n\r", k->immune, buf);
      
   sprintbit(k->suscept, isr_bits, buf);
-  csendf(ch, "$3Susceptible$R: %s\n\r", buf);
+  csendf(ch, "$3Susceptible$R: [%d] %s\n\r", k->suscept,buf);
      
   sprintbit(k->resist, isr_bits, buf);
-  csendf(ch, "$3Resistant$R: %s\n\r", buf);
+  csendf(ch, "$3Resistant$R: [%d] %s\n\r", k->resist, buf);
      
   if(!IS_MOB(k)) {
     sprintf(buf, "$3WizInvis$R:  %ld  ", k->pcdata->wizinvis);
@@ -788,9 +788,9 @@ void mob_stat(struct char_data *ch, struct char_data *k)
     sprintf(buf, "$3Creation Range$R:  %d-%d  \r\n", k->pcdata->buildLowVnum, k->pcdata->buildHighVnum);
     send_to_char(buf,ch);
    } else {
-    sprintf(buf, "$3R Range$R:  %d-%d  \r\n", k->pcdata->buildLowVnum, k->pcdata->buildHighVnum);
+    sprintf(buf, "$3R Range$R:  %d-%d  ", k->pcdata->buildLowVnum, k->pcdata->buildHighVnum);
     send_to_char(buf,ch);
-    sprintf(buf, "$3M Range$R:  %d-%d  \r\n", k->pcdata->buildMLowVnum, k->pcdata->buildMHighVnum);
+    sprintf(buf, "$3M Range$R:  %d-%d  ", k->pcdata->buildMLowVnum, k->pcdata->buildMHighVnum);
     send_to_char(buf,ch);
     sprintf(buf, "$3O Range$R:  %d-%d  \r\n", k->pcdata->buildOLowVnum, k->pcdata->buildOHighVnum);
     send_to_char(buf,ch);

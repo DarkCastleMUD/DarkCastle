@@ -61,6 +61,12 @@ extern struct descriptor_data *descriptor_list;
 extern bool MOBtrigger;
 extern struct mprog_throw_type *g_mprog_throw_list;
 
+extern CHAR_DATA *activeActor;
+extern CHAR_DATA *activeRndm;
+extern CHAR_DATA *activeTarget;
+extern OBJ_DATA *activeObj;
+extern void *activeVo;
+
 struct obj_data *get_object_in_equip_vis(struct char_data *ch, char *arg, struct obj_data *equipment[], int *j, bool blindfighting);
 
 /*
@@ -1072,9 +1078,6 @@ int do_mpthrow( CHAR_DATA *ch, char *argument, int cmd )
   throwitem->data_num = catch_num;
   throwitem->delay = delay;
   throwitem->mob = TRUE; // This is, suprisingly, a mob
-  extern CHAR_DATA *activeActor;
-  extern OBJ_DATA *activeObj;
-  extern void *activeVo;
   throwitem->actor = activeActor;
   throwitem->obj = activeObj;
   throwitem->vo = activeVo;
@@ -1756,17 +1759,30 @@ int do_mppeace( struct char_data *ch, char *argument, int cmd )
         send_to_char( "Huh?\n\r", ch );
 	return eSUCCESS;
     }
+    char arg[MAX_INPUT_LENGTH];
+    argument = one_argument(argument, arg);
 
-    struct char_data *rch;
+    struct char_data *rch,*vict = NULL;
 
+    if (arg[0]) {
+      vict = get_char_room(arg,ch->in_room);
+      if (!vict) {
+	    logf( IMMORTAL, LOG_WORLD, "Mppeace - Vict not found: vnum %d.",
+	  	mob_index[ch->mobdata->nr].virt );
+	    return eFAILURE;
+      }
+      if ( IS_MOB(rch) && rch->mobdata->hatred != NULL )
+        remove_memory(rch, 'h');
+      if ( rch->fighting != NULL )
+        stop_fighting(rch);
+     return eSUCCESS;
+    }
     for (rch = world[ch->in_room].people; rch!=NULL; rch = rch->next_in_room) {
         if ( IS_MOB(rch) && rch->mobdata->hatred != NULL )
             remove_memory(rch, 'h');
         if ( rch->fighting != NULL )
             stop_fighting(rch);
     }
-    act("$n makes a gesture and all fighting stops.", ch,0,0,TO_ROOM, 0);
-    send_to_char( "You stop all fighting in this room.\n\r", ch );
     return eSUCCESS;
 }
 
@@ -1788,4 +1804,247 @@ int do_mpretval( struct char_data *ch, char *argument, int cmd )
      SET_BIT(retval, 1<<(5+i));
 
   return retval;
+}
+
+
+
+
+// Yes, I'm sure there's a better way to do this. Stop whining.
+int process_math(char_data *ch, char *string)
+{
+  int result = 0,curr = 0; 
+  char lastsign = '\0';
+  bool numproc = FALSE;
+
+  while (1)
+  {
+    if (*string == ' ') { string++; continue; }
+    if (isdigit(*string))
+    {
+      numproc = TRUE;
+      curr *= 10;
+      curr += (*string - '0');
+      string++;
+      continue;
+    } else if (numproc) {
+      if (lastsign == '\0')
+	result = curr;
+      else
+      {
+	switch (lastsign)
+	{
+	  case '+':		result += curr;break;
+	  case '-':		result -= curr;break;
+	  case '/':		result /= curr;break;
+	  case '*':		result *= curr;break;
+	}
+      }
+      curr = 0;
+    }
+    if (*string == '\0') break; 
+    switch (*string)
+    {
+	case '+': 
+	case '-': 
+        case '/': 
+	case '*': 
+	  curr = 0;
+	  lastsign = *string;
+	  break;
+	default:
+	    logf( IMMORTAL, LOG_WORLD, "Mpsetmath - Unknown symbol: %c: vnum %d.",
+	  	*string, mob_index[ch->mobdata->nr].virt );
+	    return result;
+	  break;
+    };
+    string++;
+  }
+  return result;
+}
+
+
+// Unreadable code > you
+char *expand_data(char_data *ch, char *orig)
+{
+  static char buf[MAX_STRING_LENGTH];
+  char buf1[MAX_STRING_LENGTH];
+  strcpy(buf1,orig);
+  orig = &buf1[0];
+  buf[0] = '\0';
+  char *ptr;
+  int i = 0,l,r,z = 0,o;
+  char c;
+  while (1)
+  {
+    char left[MAX_INPUT_LENGTH];
+    char right[MAX_INPUT_LENGTH];
+    ptr = strchr(orig, '.');
+    if (ptr == orig) break;
+    if (!ptr) break;
+    *ptr = '#';
+    for (l = 1; ; l++)
+    {
+       if ((ptr-l) == orig)
+        break;
+       if (!isalpha(*(ptr-l)) && (*(ptr-l) != ','))
+	break;
+    }
+    *(ptr) = '\0';
+    strcpy(left, (ptr-l));
+    *(ptr) = '#';
+    *(ptr-l) = '~';
+    for (r = 1; ; r++)
+    {
+       if ((ptr+r) == '\0')
+        break;
+       if (!isalpha(*(ptr+r)) && (*(ptr+r) != ','))
+	break;
+    }
+    c = *(ptr+r);
+    *(ptr+r) = '\0';    
+    strcpy(right, ptr+1);
+    *(ptr+r) = c;
+    r--;
+    if (!c == '\0')
+      *(ptr+r) = '~';
+    
+    int16 *lvali = 0;
+    uint32 *lvalui = 0;
+    char *lvalstr = 0;
+    int64 *lvali64 = 0;
+    sbyte *lvalb = 0;
+    translate_value(left,right,&lvali,&lvalui, &lvalstr,&lvali64, &lvalb,ch,activeActor, activeObj, activeVo, activeRndm);
+
+    if (!lvali && !lvalui && !lvalb)
+    {
+	    logf( IMMORTAL, LOG_WORLD, "Mpsetmath - Expand_data - Accessing unknown data: vnum %d.",
+	  	mob_index[ch->mobdata->nr].virt );
+	    return NULL;
+    }
+
+    for (o = z; ; o++)
+    {
+      if (*(orig+o) == '~' || *(orig+o) == '\0')
+       break;
+      buf[i++] = *(orig+o);
+    }
+    char tmp[MAX_INPUT_LENGTH];
+    if (lvali)
+      sprintf(tmp, "%d",*lvali);
+    if (lvalui)
+      sprintf(tmp, "%u",*lvalui);
+    if (lvalb)
+      sprintf(tmp, "%d",*lvalb);
+    strcat(buf,tmp);
+    i += strlen(tmp);
+    z = (ptr-orig)+r+1;
+  }
+
+
+  for (o = z; ; o++)
+  {
+    if (*(orig+o) == '~' || *(orig+o) == '\0')
+       break;
+    buf[i++] = *(orig+o);
+  }
+  buf[i] = '\0';
+  return &buf[0];
+}
+
+
+char *allowedData[] = {
+ "hitpoints", "mana", "move", NULL
+};
+
+int do_mpsetmath(char_data *ch, char *arg, int cmd)
+{
+  char_data *vict = get_pc("Urizen");
+  if (!vict) return eFAILURE;
+/*
+  csendf(vict, "%s\r\n",expand_data(ch, "9-$n.intelligence+3...4*$i.intelligence"));
+
+  csendf(vict, "%s\r\n",expand_data(ch, "..."));
+
+  csendf(vict, "%s\r\n",expand_data(ch, ".intelligence+34*$i."));
+
+  return eSUCCESS;*/
+  char arg1[MAX_INPUT_LENGTH];
+  char arg2[MAX_INPUT_LENGTH];
+  arg = one_argument(arg,arg1);
+  char *r = NULL;
+
+  if ((r = strchr(arg1, '.')) != NULL)
+  {
+    *r = '\0';
+    r++;
+    one_argument(r, arg2);
+  }
+
+  bool allowed = FALSE;
+
+  int16 *lvali = 0;
+  uint32 *lvalui = 0;
+  char *lvalstr = 0;
+  int64 *lvali64 = 0;
+  sbyte *lvalb = 0;
+  translate_value(arg1,r,&lvali,&lvalui, &lvalstr,&lvali64, &lvalb,ch,activeActor, activeObj, activeVo, activeRndm);
+
+
+  vict = activeTarget;
+  if (!vict)
+  {
+	    logf( IMMORTAL, LOG_WORLD, "Mpsetmath - No target: vnum %d.",
+	  	mob_index[ch->mobdata->nr].virt );
+	    return eFAILURE;
+  }
+  if (IS_NPC(vict)) allowed = TRUE;
+  else
+    for (int i = 0; allowedData[i]; i++)
+      if (!str_cmp(allowedData[i],r))
+	allowed = TRUE;
+  if (!allowed)
+  {
+	    logf( IMMORTAL, LOG_WORLD, "Mpsetmath - Accessing unallowed data: vnum %d.",
+	  	mob_index[ch->mobdata->nr].virt );
+	    return eFAILURE;
+  }
+
+  if (!lvalui && !lvali && !lvalb)
+  {
+	    logf( IMMORTAL, LOG_WORLD, "Mpsetmath - Accessing unknown data: vnum %d.",
+	  	mob_index[ch->mobdata->nr].virt );
+	    return eFAILURE;
+  }
+
+  char *fixed = expand_data(ch, arg);
+
+  int i = process_math(ch, fixed);
+
+  if (lvali)
+  {
+    *lvali = i;
+    logf( IMMORTAL, LOG_WORLD, "Mpsetmath - %s set to %d: vnum %d.",
+  	r, i, mob_index[ch->mobdata->nr].virt );
+  }
+  if (lvalb)
+  {
+    *lvalb = (sbyte)i;
+    logf( IMMORTAL, LOG_WORLD, "Mpsetmath - %s set to %d: vnum %d.",
+  	r, i, mob_index[ch->mobdata->nr].virt );
+  }
+  if (lvalui)
+  {
+    *lvalui = (unsigned int)i;
+    logf( IMMORTAL, LOG_WORLD, "Mpsetmath - %s set to %d: vnum %d.",
+  	r, i, mob_index[ch->mobdata->nr].virt );
+  }
+
+
+/*  csendf(vict, "%d\r\n%d\r\n%d\r\n%d\r\n",
+		process_math(ch, "1+1-3+5*10"),
+		process_math(ch, "1-3+5*10/2"),
+		process_math(ch, "1+101-34+5*10*2/8"),
+		process_math(ch, "1+101-34+5*10*2/8")
+		);
+  */return eSUCCESS;
 }

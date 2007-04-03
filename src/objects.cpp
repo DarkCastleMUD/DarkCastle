@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.93 2007/03/27 13:15:34 dcastle Exp $
+| $Id: objects.cpp,v 1.94 2007/04/03 22:47:15 dcastle Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -2628,7 +2628,6 @@ struct char_data *get_vault_owner(char_data *ch, char *vault, descriptor_data *d
   char_data *vict;
   memset((char *) d, 0, sizeof(struct descriptor_data));
 
-extern CHAR_DATA *get_pc(char *name);
   vict = get_pc(vault);
   if (vict) { 
     if (vict->pcdata && !vict->pcdata->vault)

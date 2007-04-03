@@ -55,9 +55,11 @@ extern struct index_data *obj_index;
 CHAR_DATA *rndm2;
 extern struct obj_data  *object_list;
 
-CHAR_DATA *activeActor;
-OBJ_DATA *activeObj;
-void *activeVo;
+CHAR_DATA *activeActor = NULL;
+CHAR_DATA *activeRndm = NULL;
+CHAR_DATA *activeTarget = NULL;
+OBJ_DATA *activeObj = NULL;
+void *activeVo = NULL;
 
 char *activeProg;
 char *activePos;
@@ -314,7 +316,7 @@ void translate_value(char *leftptr, char *rightptr, int16 **vali, uint32 **valui
   bool valset = FALSE; // done like that to determine if value is set, since it can be 0 
   struct tempvariable *eh = mob->tempVariable;
   
-
+  activeTarget = NULL;
   char *tmp,half[MAX_INPUT_LENGTH];
   half[0] ='\0'; 
   if ((tmp = strchr(leftptr, ',')) != NULL)
@@ -333,7 +335,7 @@ void translate_value(char *leftptr, char *rightptr, int16 **vali, uint32 **valui
   char rarr[MAX_INPUT_LENGTH];
   one_argument(rightptr, rarr);
   char *right = &rarr[0]; 
-
+  bool silent = FALSE;
 
   if (!str_cmp(left, "world")) {
     left += 5;
@@ -386,7 +388,7 @@ void translate_value(char *leftptr, char *rightptr, int16 **vali, uint32 **valui
 	{
 		case 'n': target = actor;break;
 		case 'i': target = mob;break;
-		case 'r': target = rndm;break;
+		case 'r': target = rndm;silent = TRUE;break;
 		case 't': target = (CHAR_DATA*)vo;break;
 		case 'o': otarget = obj;break;
 		case 'p': otarget = (OBJ_DATA*)vo;break;
@@ -429,9 +431,11 @@ void translate_value(char *leftptr, char *rightptr, int16 **vali, uint32 **valui
 
   if ( !target && !otarget && ztarget == -1 && rtarget == -1 && !valset && str_cmp(right,"numpcs"))
     {
+        if (!silent)
         logf( IMMORTAL, LOG_WORLD,  "translate_value: Mob: %d invalid target in mobprog", mob_index[mob->mobdata->nr].virt ); 
       return;
-    }   
+    }
+  activeTarget = target;
   // target acquired. fucking boring code.
   // more boring code. FUCK.
   int16 *intval = NULL;
@@ -452,6 +456,18 @@ void translate_value(char *leftptr, char *rightptr, int16 **vali, uint32 **valui
 		if (!str_cmp(right, "armor"))
 		{  if (!target) tError = TRUE;
 		  else {intval = &target->armor;break;}
+		} else if (!str_cmp(right, "actflags1"))
+		{  if (!target || !IS_NPC(target)) tError = TRUE;
+		  else {uintval = &target->mobdata->actflags[0];break;}
+		} else if (!str_cmp(right, "actflags2"))
+		{  if (!target || !IS_NPC(target)) tError = TRUE;
+		  else {uintval = &target->mobdata->actflags[1];break;}
+		} else if (!str_cmp(right, "affected1"))
+		{  if (!target) tError = TRUE;
+		  else {uintval = &target->affected_by[0];break;}
+		} else if (!str_cmp(right, "affected2"))
+		{  if (!target) tError = TRUE;
+		  else {uintval = &target->affected_by[1];break;}
 		} else if (!str_cmp(right, "alignment"))
 		{  if (!target) tError = TRUE;
 		  else {intval = &target->alignment;break;}
@@ -599,7 +615,7 @@ void translate_value(char *leftptr, char *rightptr, int16 **vali, uint32 **valui
 		} else if (!str_cmp(right,"intelligence"))
 		{
 		   if (!target) tError = TRUE;
-		  else uintval = (uint32*)&target->intel;
+		  else sbval = (sbyte*)&target->intel;
 		}
 		break;
 	case 'l':
@@ -2553,11 +2569,16 @@ void mprog_driver ( char *com_list, CHAR_DATA *mob, CHAR_DATA *actor,
  activeProg = com_list;
 
  if(!com_list) // this can happen when someone is editing
+ {
+   activeActor = activeRndm = NULL;
+   activeObj = NULL;
+   activeVo = NULL;
    return;
+ }
 // int count2 = 0;
  // count valid random victs in room
  for ( vch = world[mob->in_room].people; vch; vch = vch->next_in_room )
-   if (  CAN_SEE( mob, vch, TRUE ) )
+   if ( !IS_NPC(vch) && CAN_SEE( mob, vch, TRUE ) )
        count++;
   // else if (CAN_SEE(mob,vch))
    //    count2++;
@@ -2579,13 +2600,13 @@ void mprog_driver ( char *com_list, CHAR_DATA *mob, CHAR_DATA *actor,
  {
    for ( vch = world[mob->in_room].people; vch && count; )
    {
-     if ( CAN_SEE( mob, vch,TRUE ) )
+     if ( !IS_NPC(vch) && CAN_SEE( mob, vch,TRUE ) )
        count--;
      if (count) vch = vch->next_in_room;
   }
    rndm = vch;
  }
-
+ activeRndm = rndm;
  strcpy( tmpcmndlst, com_list );
 
  command_list = tmpcmndlst;
@@ -2602,7 +2623,12 @@ void mprog_driver ( char *com_list, CHAR_DATA *mob, CHAR_DATA *actor,
        activePos = command_list = mprog_process_if( morebuf, command_list, mob,
 				       actor, obj, vo, rndm, thrw );
        if(IS_SET(mprog_cur_result, eCH_DIED) || IS_SET(mprog_cur_result,eDELAYED_EXEC))
+	{
+	   activeActor = activeRndm = NULL;
+	   activeObj = NULL;
+	   activeVo = NULL;
          return;
+	}
      }
      else {
 
@@ -2610,12 +2636,20 @@ void mprog_driver ( char *com_list, CHAR_DATA *mob, CHAR_DATA *actor,
        {
 	     SET_BIT(mprog_cur_result, mprog_process_cmnd( cmnd, mob, actor, obj, vo, rndm ));
        	     if(IS_SET(mprog_cur_result, eCH_DIED) || selfpurge || IS_SET(mprog_cur_result, eDELAYED_EXEC))
+		{
+		   activeActor = activeRndm = NULL;
+		   activeObj = NULL;
+		   activeVo = NULL;
 	         return;
+		}
 	}	
      }
      cmnd         = command_list;
      activePos = command_list = mprog_next_command( command_list );
    }
+   activeActor = activeRndm = NULL;
+   activeObj = NULL;
+   activeVo = NULL;
  return;
 
 }

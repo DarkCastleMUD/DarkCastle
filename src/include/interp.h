@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.h,v 1.74 2007/04/02 15:28:11 dcastle Exp $ */
+/* $Id: interp.h,v 1.75 2007/04/03 22:47:17 dcastle Exp $ */
 
 #ifndef INTERP_H_
 #define INTERP_H_
@@ -260,8 +260,9 @@ DO_FUN( do_mpforce      );
 DO_FUN( do_mpgoto       );
 DO_FUN( do_mpjunk       );
 DO_FUN( do_mpkill       );
-DO_FUN( do_mphit       );
-DO_FUN( do_mpaddlag       );
+DO_FUN( do_mphit        );
+DO_FUN( do_mpsetmath    );
+DO_FUN( do_mpaddlag     );
 DO_FUN( do_mpmload      );
 DO_FUN( do_mpoload      );
 DO_FUN( do_mppause      );
