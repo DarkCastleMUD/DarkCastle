@@ -1815,6 +1815,7 @@ int process_math(char_data *ch, char *string)
   int result = 0,curr = 0; 
   char lastsign = '\0';
   bool numproc = FALSE;
+  if (!string) return -9839;
 
   while (1)
   {
@@ -1958,16 +1959,7 @@ char *allowedData[] = {
 
 int do_mpsetmath(char_data *ch, char *arg, int cmd)
 {
-  char_data *vict = get_pc("Urizen");
-  if (!vict) return eFAILURE;
-/*
-  csendf(vict, "%s\r\n",expand_data(ch, "9-$n.intelligence+3...4*$i.intelligence"));
-
-  csendf(vict, "%s\r\n",expand_data(ch, "..."));
-
-  csendf(vict, "%s\r\n",expand_data(ch, ".intelligence+34*$i."));
-
-  return eSUCCESS;*/
+  char_data *vict;
   char arg1[MAX_INPUT_LENGTH];
   char arg2[MAX_INPUT_LENGTH];
   arg = one_argument(arg,arg1);
@@ -2020,6 +2012,12 @@ int do_mpsetmath(char_data *ch, char *arg, int cmd)
 
   int i = process_math(ch, fixed);
 
+  if (i == -9839)
+  {
+    logf( IMMORTAL, LOG_WORLD, "Mpsetmath - Invalid string: vnum %d.",
+  	mob_index[ch->mobdata->nr].virt );
+    return eFAILURE;
+  }
   if (lvali)
   {
     *lvali = i;
