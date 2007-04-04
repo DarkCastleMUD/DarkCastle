@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.153 2007/03/26 05:48:20 dcastle Exp $ */
+/* $Id: mob_proc.cpp,v 1.154 2007/04/04 23:58:24 dcastle Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -1722,7 +1722,8 @@ static char *dethSayText [ ] =
   "She offered her honor. He honored her offer.  And all night long, honor, offer, honor, offer.",
   "I find pink poodles highly offensive. Please remove them from the game.",
   "You have insulted my honour and beliefs...I challenge you to a DUEL!",
-  "Stromboli keeps telling offensive jokes. :( Can't you gods do something?"
+  "Stromboli keeps telling offensive jokes. :( Can't you gods do something?",
+  "I remember my first blowjob...I did so well the pastor told me I could skip church the next week!"
 };
 
 // ENDOFCHAIN
