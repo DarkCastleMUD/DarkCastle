@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: save.cpp,v 1.49 2007/04/03 15:10:52 dcastle Exp $ */
+/* $Id: save.cpp,v 1.50 2007/04/04 09:07:19 dcastle Exp $ */
 
 extern "C"
 {
@@ -367,15 +367,13 @@ void read_pc_data(struct char_data *ch, FILE* fpsave)
   i->poofin    = fread_var_string(fpsave);
   i->poofout   = fread_var_string(fpsave);
   i->prompt    = fread_var_string(fpsave);
+
   char *tmp = fread_var_string(fpsave);
-  if (str_cmp(tmp,"NewSaveType"))
+  if (!tmp || str_cmp(tmp,"NewSaveType"))
   {
-    dc_free(tmp);
     tmp = fread_var_string(fpsave);
-    dc_free(tmp);
     tmp = fread_var_string(fpsave);
-    dc_free(tmp);
-  } else dc_free(tmp);
+  }
   i->skillchange = 0;
   typeflag[3] = '\0';
   fread(&typeflag, sizeof(char), 3, fpsave);

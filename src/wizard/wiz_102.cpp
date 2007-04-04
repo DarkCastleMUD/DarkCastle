@@ -3886,7 +3886,7 @@ int do_rsave(struct char_data *ch, char *arg, int cmd)
 
   curr = world_file_list;
   while(curr)
-   if (curr->firstnum < ch->in_room && curr->lastnum > ch->in_room)
+   if (curr->firstnum <= ch->in_room && curr->lastnum >= ch->in_room)
 	break;
    else curr = curr->next;
 
@@ -3944,9 +3944,11 @@ int do_msave(struct char_data *ch, char *arg, int cmd)
     return eFAILURE;
   }
 
+  int r = real_mobile(v);
+
   curr = mob_file_list;
   while(curr)
-   if (curr->firstnum < v && curr->lastnum > v)
+   if (curr->firstnum <= r && curr->lastnum >= r)
 	break;
    else curr = curr->next;
 
@@ -4001,10 +4003,10 @@ int do_osave(struct char_data *ch, char *arg, int cmd)
     send_to_char("You may only msave inside of the room range you are assigned to.\n\r", ch);
     return eFAILURE;
   }
-
+  int r = real_object(v);
   curr = obj_file_list;
   while(curr)
-   if (curr->firstnum < v && curr->lastnum > v)
+   if (curr->firstnum <= r && curr->lastnum >= r)
         break;
    else curr = curr->next;
 
