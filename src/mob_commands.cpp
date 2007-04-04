@@ -1911,7 +1911,7 @@ char *expand_data(char_data *ch, char *orig)
     
     int16 *lvali = 0;
     uint32 *lvalui = 0;
-    char *lvalstr = 0;
+    char **lvalstr = 0;
     int64 *lvali64 = 0;
     sbyte *lvalb = 0;
     translate_value(left,right,&lvali,&lvalui, &lvalstr,&lvali64, &lvalb,ch,activeActor, activeObj, activeVo, activeRndm);
@@ -1960,9 +1960,13 @@ char *allowedData[] = {
 int do_mpsetmath(char_data *ch, char *arg, int cmd)
 {
   char_data *vict;
+  if (activeActor) csendf(activeActor, "{%s}\r\n", arg);
+  vict = get_pc("Urizen");
+  if (vict) csendf(vict, "{%s}\r\n", arg);
+
   char arg1[MAX_INPUT_LENGTH];
   char arg2[MAX_INPUT_LENGTH];
-  arg = one_argument(arg,arg1);
+  arg = one_argument(arg, arg1);
   char *r = NULL;
 
   if ((r = strchr(arg1, '.')) != NULL)
@@ -1971,16 +1975,20 @@ int do_mpsetmath(char_data *ch, char *arg, int cmd)
     r++;
     one_argument(r, arg2);
   }
-
+  if (!r || !*r || !arg1 || !*arg1)
+  {
+	    logf( IMMORTAL, LOG_WORLD, "Mpsetmath - Invalid primary data: vnum %d.",
+	  	mob_index[ch->mobdata->nr].virt );
+	     return eFAILURE;
+  }
   bool allowed = FALSE;
 
   int16 *lvali = 0;
   uint32 *lvalui = 0;
-  char *lvalstr = 0;
+  char **lvalstr = 0;
   int64 *lvali64 = 0;
   sbyte *lvalb = 0;
   translate_value(arg1,r,&lvali,&lvalui, &lvalstr,&lvali64, &lvalb,ch,activeActor, activeObj, activeVo, activeRndm);
-
 
   vict = activeTarget;
   if (!vict)
@@ -2001,6 +2009,21 @@ int do_mpsetmath(char_data *ch, char *arg, int cmd)
 	    return eFAILURE;
   }
 
+  if (lvalstr)
+  {
+    char nw[MAX_INPUT_LENGTH];
+    arg = one_argument_long(arg,nw);
+    if (!nw[0])
+    {
+	    logf( IMMORTAL, LOG_WORLD, "Mpsetmath - Invalid string: vnum %d.",
+	  	mob_index[ch->mobdata->nr].virt );
+	    return eFAILURE;
+    }
+    *lvalstr = str_dup(nw);    
+//    vict = get_pc("Urizen");
+//    if (vict) csendf(vict, "{%s}\r\n", nw);
+    return eSUCCESS;
+  }
   if (!lvalui && !lvali && !lvalb)
   {
 	    logf( IMMORTAL, LOG_WORLD, "Mpsetmath - Accessing unknown data: vnum %d.",
@@ -2014,7 +2037,7 @@ int do_mpsetmath(char_data *ch, char *arg, int cmd)
 
   if (i == -9839)
   {
-    logf( IMMORTAL, LOG_WORLD, "Mpsetmath - Invalid string: vnum %d.",
+    logf( IMMORTAL, LOG_WORLD, "Mpsetmath - Invalid math-string: vnum %d.",
   	mob_index[ch->mobdata->nr].virt );
     return eFAILURE;
   }

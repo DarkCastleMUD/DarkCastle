@@ -16,7 +16,7 @@
 /* 12/08/2003   Onager   Added chop_half() to work like half_chop() but    */
 /*                       chopping off the last word.                       */
 /***************************************************************************/
-/* $Id: interp.cpp,v 1.134 2007/04/03 22:47:15 dcastle Exp $ */
+/* $Id: interp.cpp,v 1.135 2007/04/04 22:48:59 dcastle Exp $ */
 
 extern "C"
 {
@@ -979,6 +979,10 @@ char *one_argument_long(char *argument, char *first_arg )
       begin++;
       }
 
+  if (*(argument+begin) == '{') {
+   end = TRUE;
+   begin++;
+  }
   /* Find length of first word */
   for (look_at=0; ; look_at++)
     if (!end && *(argument+begin+look_at) <= ' ')

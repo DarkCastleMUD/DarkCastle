@@ -294,7 +294,7 @@ bool istank(CHAR_DATA *ch)
 }
 
 void translate_value(char *leftptr, char *rightptr, int16 **vali, uint32 **valui,
-		char **valstr, int64 **vali64, sbyte **valb, CHAR_DATA *mob, CHAR_DATA *actor, 
+		char ***valstr, int64 **vali64, sbyte **valb, CHAR_DATA *mob, CHAR_DATA *actor, 
 		OBJ_DATA *obj, void *vo, CHAR_DATA *rndm)
 {
 /*
@@ -440,7 +440,7 @@ void translate_value(char *leftptr, char *rightptr, int16 **vali, uint32 **valui
   // more boring code. FUCK.
   int16 *intval = NULL;
   uint32 *uintval = NULL;
-  char *stringval = NULL;
+  char **stringval = NULL;
   int64 *llval = NULL;
   sbyte *sbval = NULL;
   bool tError = FALSE;
@@ -488,10 +488,10 @@ void translate_value(char *leftptr, char *rightptr, int16 **vali, uint32 **valui
     case 'c':
 	        if (!str_cmp(right, "carriedby"))
 		{  if (!otarget) tError = TRUE;
-		  else if (otarget->carried_by) {stringval = otarget->carried_by->name;}
-		  else if (otarget->equipped_by) {stringval = otarget->equipped_by->name;}
-		  else if (otarget->in_obj && otarget->in_obj->carried_by) {stringval = otarget->in_obj->carried_by->name;}
-		  else if (otarget->in_obj && otarget->in_obj->equipped_by) {stringval = otarget->in_obj->equipped_by->name;}
+		  else if (otarget->carried_by) {stringval = &otarget->carried_by->name;}
+		  else if (otarget->equipped_by) {stringval = &otarget->equipped_by->name;}
+		  else if (otarget->in_obj && otarget->in_obj->carried_by) {stringval = &otarget->in_obj->carried_by->name;}
+		  else if (otarget->in_obj && otarget->in_obj->equipped_by) {stringval = &otarget->in_obj->equipped_by->name;}
 		  else stringval = NULL;
 		} else if (!str_cmp(right, "carryingitems"))
 		{  if (!target) tError = TRUE;
@@ -521,8 +521,8 @@ void translate_value(char *leftptr, char *rightptr, int16 **vali, uint32 **valui
 		} else if (!str_cmp(right,"description"))
 		{
 		   if (!target && !otarget) tError = TRUE;
-		   else if (otarget) { stringval = otarget->description; }
-		   else {stringval = target->description; }
+		   else if (otarget) { stringval = &otarget->description; }
+		   else {stringval = &target->description; }
 		} else if (!str_cmp(right,"dexterity"))
 		{
 		   if (!target) tError = TRUE;
@@ -627,7 +627,7 @@ void translate_value(char *leftptr, char *rightptr, int16 **vali, uint32 **valui
 		} else if (!str_cmp(right,"long"))
 		{
 		   if (!target) tError = TRUE;
-		   else {stringval= target->long_desc;}
+		   else {stringval= &target->long_desc;}
 		}
 		break;
 	case 'k':
@@ -684,7 +684,7 @@ void translate_value(char *leftptr, char *rightptr, int16 **vali, uint32 **valui
 		if (!str_cmp(right, "name"))
 		{
 		  if (!target) tError = TRUE;
-		  else stringval = target->name;
+		  else stringval = &target->name;
 		}
 		break;
 	case 'o':
@@ -755,8 +755,8 @@ void translate_value(char *leftptr, char *rightptr, int16 **vali, uint32 **valui
 		   else { intval = (int16*)&otarget->obj_flags.size; }
 		} else if (!str_cmp(right, "short"))
 		{  if (!target && !otarget) tError = TRUE;
-		   else if (otarget) { stringval = otarget->short_description; }
-		  else stringval = target->short_desc;
+		   else if (otarget) { stringval = &otarget->short_description; }
+		  else stringval = &target->short_desc;
 		} else if (!str_cmp(right, "songmit"))
 		{  if (!target) tError = TRUE;
 		  else intval = &target->song_mitigation;
@@ -778,7 +778,7 @@ void translate_value(char *leftptr, char *rightptr, int16 **vali, uint32 **valui
 		if (!str_cmp(right, "title"))
 		{
 		  if (!target) tError = TRUE;
-		  else stringval = target->title;
+		  else stringval = &target->title;
 		} else if (!str_cmp(right, "type"))
 		{
 		  if (!otarget) tError = TRUE;
@@ -1006,7 +1006,7 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
   
   int16 *lvali = 0;
   uint32 *lvalui = 0;
-  char *lvalstr = 0;
+  char **lvalstr = 0;
   int64 *lvali64 = 0;
   sbyte *lvalb = 0; 
   //  int type = 0;
@@ -1027,7 +1027,7 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
   if (lvalb)
     return mprog_veval((int)*lvalb, opr, atoi(val));
   if (lvalstr)
-    return mprog_seval(lvalstr, opr, val);
+    return mprog_seval(*lvalstr, opr, val);
   if ( !str_cmp( buf, "rand" ) )
     {
       return ( number(1, 100) <= atoi(arg) );
@@ -2423,7 +2423,7 @@ int mprog_process_cmnd( char *cmnd, CHAR_DATA *mob, CHAR_DATA *actor,
   left[0] = right[0] = '\0';
   while ( *str == ' ' )
     str++;
-
+/*
   while (*str != '\0')
   {
      if ((*str == '=' || *str == '+' || *str == '-' || *str == '&' || *str == '|' ||
@@ -2431,7 +2431,7 @@ int mprog_process_cmnd( char *cmnd, CHAR_DATA *mob, CHAR_DATA *actor,
      {
 	  int16 *lvali = 0;
 	  uint32 *lvalui = 0;
-	  char *lvalstr = 0;
+	  char **lvalstr = 0;
 	  int64 *lvali64 = 0;
 	  sbyte *lvalb = 0; 
 	  *str = '\0';
@@ -2466,7 +2466,7 @@ int mprog_process_cmnd( char *cmnd, CHAR_DATA *mob, CHAR_DATA *actor,
 	return eSUCCESS;
      }
      str++;
-  }
+  }*/
   str = cmnd;
   while ( *str != '\0' )
   {
