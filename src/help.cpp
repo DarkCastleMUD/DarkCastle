@@ -87,7 +87,7 @@ int do_new_help(struct char_data *ch, char *argument, int cmd)
       send_to_char(buf, ch);
       sprintf(buf, "'%s' has no help entry.  %s just tried to call it.",
 	      upper_argument, GET_NAME(ch));
-      log(buf, DEITY, LOG_HELP);
+      log(buf, IMMORTAL, LOG_HELP);
 
       dc_free(upper_argument);    
       return eFAILURE;
