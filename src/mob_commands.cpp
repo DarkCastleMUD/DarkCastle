@@ -314,7 +314,7 @@ int do_mpaddlag( CHAR_DATA *ch, char *argument, int cmd )
 	    mob_index[ch->mobdata->nr].virt );
 	return eFAILURE|eINTERNAL_ERROR;
     }
-    if (!arg1[0] || !is_number(arg))
+    if (!arg1[0] || !is_number(arg1))
     {
 	logf( IMMORTAL, LOG_WORLD, "MpAddlag - Invalid duration: vnum %d.",
 	    mob_index[ch->mobdata->nr].virt );
