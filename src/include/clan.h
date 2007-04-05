@@ -2,7 +2,7 @@
 #define CLAN_H_
 
 /************************************************************************
-| $Id: clan.h,v 1.22 2006/12/06 06:34:41 jhhudso Exp $
+| $Id: clan.h,v 1.23 2007/04/05 12:00:25 dcastle Exp $
 | clan.h
 | Description:  Header information for clans.
 */
@@ -13,6 +13,15 @@ int has_right(char_data * ch, uint32 bit);
 struct clan_data * get_clan(int nClan);
 struct clan_data * get_clan(CHAR_DATA *ch);
 void save_clans();
+int plr_rights(struct char_data * ch);
+
+void add_clan(struct clan_data * new_new_clan);
+void add_clan_member(struct clan_data * theClan, struct clan_member_data * new_new_member);
+void add_clan_member(struct clan_data * theClan, struct char_data * ch);
+void remove_clan_member(struct clan_data * theClan, struct char_data * ch);
+void remove_clan_member(int clannumber, struct char_data * ch);
+void free_member(struct clan_member_data * member);
+struct clan_member_data * get_member(char * strName, int nClanId);
 
 #define MAX_CLAN_LEN             15
 #define CLAN_RIGHTS_ACCEPT       1

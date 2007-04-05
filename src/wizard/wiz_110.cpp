@@ -467,6 +467,7 @@ int do_rename_char(struct char_data *ch, char *arg, int cmd)
     obj = obj->next_content;
   }
 
+  int clan = GET_CLAN(victim), rights = plr_rights(victim);
   do_outcast(victim, GET_NAME(victim), 9);
 
   do_fsave(ch, GET_NAME(victim), 9);
@@ -518,6 +519,15 @@ int do_rename_char(struct char_data *ch, char *arg, int cmd)
   }
   do_name(victim, " %", 9);
 
+  struct clan_member_data * pmember = NULL;
+
+  if (clan) { 
+    struct clan_data *tc = get_clan(clan);
+    victim->clan = clan;
+    add_clan_member(tc, victim);  
+    if((pmember = get_member(GET_NAME(victim), ch->clan)))
+      pmember->member_rights = rights;
+  }
   extern void rename_vault_owner(char *arg1, char *arg2);
   extern void rename_leaderboard(char *, char *);
 

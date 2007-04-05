@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.61 2007/01/24 03:12:24 jhhudso Exp $ */
+/* $Id: clan.cpp,v 1.62 2007/04/05 12:00:23 dcastle Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -40,14 +40,6 @@ struct clan_data * clan_list = 0;
 struct clan_data * end_clan_list = 0;
 
 #define MAX_CLAN_DESC_LENGTH 1022
-
-void add_clan(struct clan_data * new_new_clan);
-void add_clan_member(struct clan_data * theClan, struct clan_member_data * new_new_member);
-void add_clan_member(struct clan_data * theClan, struct char_data * ch);
-void remove_clan_member(struct clan_data * theClan, struct char_data * ch);
-void remove_clan_member(int clannumber, struct char_data * ch);
-void free_member(struct clan_member_data * member);
-struct clan_member_data * get_member(char * strName, int nClanId);
 
 char * clan_rights[] = {
    "accept",
@@ -608,6 +600,16 @@ void delete_clan(struct clan_data * dead_clan)
       last = curr;
       curr = curr->next;
     }
+}
+
+int plr_rights(struct char_data * ch)
+{
+  struct clan_member_data * pmember = NULL;
+  
+  if(!ch || !(pmember = get_member(GET_NAME(ch), ch->clan)))
+    return FALSE;
+
+  return pmember->member_rights;  
 }
 
 // see if ch has rights to 'bit' in his clan
