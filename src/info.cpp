@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.145 2007/04/03 15:10:52 dcastle Exp $ */
+/* $Id: info.cpp,v 1.146 2007/04/07 21:16:10 dcastle Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -1469,7 +1469,7 @@ int do_score(struct char_data *ch, char *argument, int cmd)
       "|\\|  $3BonusHit$7: %+4d   $3PDeaths$7: %5d  |/|  $3Weight Carried$7: %-3d/(%-4d)       |~|\n\r"
       "|~|  $3BonusDam$7: %+4d   $3RDeaths$7: %5d  |o|  $3Experience$7:     %-10lld       |\\|\n\r"
       "|/|  $B$4FIRE$R[%+3d]  $B$3COLD$R[%+3d]  $B$5NRGY$R[%+3d]  |\\|  $3ExpTillLevel$7:   %-10lld       |o|\n\r"
-      "|o|  $B$2ACID$R[%+3d]  $B$7MAGK$R[%+3d]  $2POIS$7[%+3d]  |~|  $3Gold$7: %-10d $3Platinum$7: %-5d |/|\n\r"
+      "|o|  $B$2ACID$R[%+3d]  $B$7MAGK$R[%+3d]  $2POIS$7[%+3d]  |~|  $3Gold$7: %-10lld $3Platinum$7: %-5d |/|\n\r"
       "|\\|  $3MELE$R[%+3d]  $3SPEL$R[%+3d]   $3KI$R [%+3d]  |/|  $3Bank$7: %-10d $3QPoints$7:  %-5d |-|\n\r"
       "($5:$7)===================================($5:$7)===================================($5:$7)\n\r",
    GET_ARMOR(ch), GET_PKILLS(ch),   IS_CARRYING_N(ch), CAN_CARRY_N(ch),
@@ -1477,7 +1477,7 @@ int do_score(struct char_data *ch, char *argument, int cmd)
    to_dam, GET_RDEATHS(ch), GET_EXP(ch),
    get_saves(ch,SAVE_TYPE_FIRE), get_saves(ch, SAVE_TYPE_COLD), get_saves(ch, SAVE_TYPE_ENERGY), GET_LEVEL(ch) == IMP ? 0 
 : exp_needed, 
-   get_saves(ch, SAVE_TYPE_ACID), get_saves(ch, SAVE_TYPE_MAGIC), get_saves(ch, SAVE_TYPE_POISON), (int)GET_GOLD(ch), (int)GET_PLATINUM(ch),
+   get_saves(ch, SAVE_TYPE_ACID), get_saves(ch, SAVE_TYPE_MAGIC), get_saves(ch, SAVE_TYPE_POISON), GET_GOLD(ch), (int)GET_PLATINUM(ch),
    ch->melee_mitigation, ch->spell_mitigation, ch->song_mitigation, (int)GET_BANK(ch), GET_QPOINTS(ch));
 
      send_to_char(buf, ch);

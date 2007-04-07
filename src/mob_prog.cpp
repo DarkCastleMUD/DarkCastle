@@ -559,7 +559,7 @@ void translate_value(char *leftptr, char *rightptr, int16 **vali, uint32 **valui
 		if (!str_cmp(right,"gold"))
 		{
 		   if (!target) tError = TRUE;
-		  else uintval = &target->gold;
+		  else llval = &target->gold;
 		} else if (!str_cmp(right,"glowfactor"))
 		{
 		   if (!target) tError = TRUE;
@@ -875,6 +875,11 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
   int       lhsvl;
   int       rhsvl;
 
+
+  if (mob_index[mob->mobdata->nr].virt == 2017)
+  {
+    debugpoint();
+  }
   if ( *point == '\0' ) 
     {
       logf( IMMORTAL, LOG_WORLD,  "Mob: %d null ifchck", mob_index[mob->mobdata->nr].virt ); 
@@ -962,7 +967,7 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
 	point++;
       for( ; ; )
 	{
-	  if (*point == '.') { *valpt = '\0'; valpt = val2; traditional2 = FALSE;}
+	  if (*point == '.') { *valpt = '\0'; valpt = val2; traditional2 = FALSE; point++;}
 	  else if ( ( *point != ' ' ) && ( *point == '\0' ) )
 	    break;
 	  else

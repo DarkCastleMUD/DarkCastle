@@ -502,12 +502,12 @@ char *findPath(int from, int to, char_data *ch = NULL)
   start = world[from].paths->p;
   if (world[to].paths)
   {
-     csendf(ch, "Ending in path %s.\r\n", world[from].paths->p->name);
+     csendf(ch, "Ending in path %s.\r\n", world[to].paths->p->name);
   } 
   else 
   {
     map<int,int> z; 
-    from = find_closest_path(to, 1, &buf[0], z);
+    to = find_closest_path(to, 1, &buf[0], z);
     if (to && world[to].paths)
     csendf(ch, "Ending in path %s.\r\n", world[to].paths->p->name);
   }

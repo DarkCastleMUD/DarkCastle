@@ -1241,7 +1241,7 @@ void vault_deposit(CHAR_DATA *ch, unsigned int amount, char *owner) {
     vault_log(buf, owner);
     csendf(ch, "Done!  The current balance is now %llu gold.\r\n", vault->gold);
   } else {
-    csendf(ch, "But you only have %ld gold coins!\r\n", GET_GOLD(ch));
+    csendf(ch, "But you only have %lld gold coins!\r\n", GET_GOLD(ch));
   }
 }
 
@@ -1277,10 +1277,10 @@ void vault_withdraw(CHAR_DATA *ch, unsigned int amount, char *owner) {
   }
 
   if (vault->gold >= (long long unsigned int)amount) {
-    if (amount + GET_GOLD(ch) > 2000000000) {
+/*    if (amount + GET_GOLD(ch) > 2000000000) {
       csendf(ch, "You can't hold that much gold.  The most you could get is %ld.\r\n", 2000000000 - GET_GOLD(ch));
       return;
-    }
+    }*/
     vault->gold -= amount;
     GET_GOLD(ch) += amount;
     save_char_obj(ch);

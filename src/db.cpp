@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.149 2007/04/03 15:10:52 dcastle Exp $ */
+/* $Id: db.cpp,v 1.150 2007/04/07 21:16:10 dcastle Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -2734,7 +2734,7 @@ void write_mobile(char_data * mob, FILE *fl)
 
     fprintf(fl, "%d %d %d\n"
             "%d %d %dd%d+%d %dd%d+%d\n"
-            "%d %lld\n"
+            "%lld %lld\n"
             "%d %d %d %d %d %d\n",
                          mob->alignment,
                          GET_RACE(mob),

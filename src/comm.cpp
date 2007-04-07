@@ -1401,7 +1401,7 @@ void generate_prompt(CHAR_DATA *ch, char *prompt)
          sprintf(pro, "%s", sky_look[weather_info.sky]);
          break;
        case 'g':
-         sprintf(pro, "%d", GET_GOLD(ch));
+         sprintf(pro, "%lld", GET_GOLD(ch));
          break;
        case 'G':
          sprintf(pro, "%d", (int32) (GET_GOLD(ch)/20000));

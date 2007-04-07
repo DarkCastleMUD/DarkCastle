@@ -1,7 +1,7 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.64 2007/04/03 15:10:55 dcastle Exp $
+| $Id: character.h,v 1.65 2007/04/07 21:16:15 dcastle Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
@@ -229,7 +229,7 @@ struct pc_data
 
      int16 saves_mods[SAVE_TYPE_MAX+1];  // Character dependant mods to saves (meta'able)
 
-    uint32 bank;           /* gold in bank                            */
+     uint32 bank;           /* gold in bank                            */
 
     uint32 toggles;            // Bitvector for toggles.  (Was specials.act)
     uint32 punish;             // flags for punishments
@@ -328,7 +328,7 @@ struct char_data
     ubyte height;       /* PC/NPC's height */
 
     int16 hometown;      /* PC/NPC home town */
-    uint32 gold;           /* Money carried                           */
+    int64 gold;           /* Money carried                           */
     uint32 plat;           /* Platinum                                */
      int64 exp;            /* The experience of the player            */
 			   /* Changed to a long long */

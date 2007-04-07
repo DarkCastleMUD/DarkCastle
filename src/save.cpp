@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: save.cpp,v 1.50 2007/04/04 09:07:19 dcastle Exp $ */
+/* $Id: save.cpp,v 1.51 2007/04/07 21:16:11 dcastle Exp $ */
 
 extern "C"
 {
@@ -568,6 +568,9 @@ int char_to_store_variable_data(CHAR_DATA * ch, FILE * fpsave)
     fwrite_var_string(mpv->data,fpsave);
   }
   
+  fwrite("GLD",sizeof(char),3,fpsave);
+  fwrite(&ch->gold, sizeof(ch->gold), 1, fpsave);
+
   // Any future additions to this save file will need to be placed LAST here with a 3 letter code
   // and appropriate strcmp statement in the read_mob_data object
 
@@ -657,7 +660,11 @@ int store_to_char_variable_data(CHAR_DATA * ch, FILE * fpsave)
      ch->tempVariable = mpv;
      fread(&typeflag, sizeof(char), 3, fpsave);
   }
-
+  if (!strcmp(typeflag, "GLD"))
+  {
+      fread(&(ch->gold), sizeof(ch->gold), 1, fpsave);
+      fread(&typeflag, sizeof(char), 3, fpsave);
+  }
   // Add new items in this format
 //  if(!strcmp(typeflag, "XXX"))
 //    do_something
@@ -1460,7 +1467,8 @@ void char_to_store(CHAR_DATA *ch, struct char_file_u *st, struct time_data & tmp
 //  gets set outside
 //  st->load_room = world[ch->in_room].number;
 
-  st->gold      = GET_GOLD(ch);
+//  st->gold      = GET_GOLD(ch);
+  st->gold      = 0; // Moved
   st->plat      = GET_PLATINUM(ch);
   st->exp       = GET_EXP(ch);
   st->immune    = ch->immune;

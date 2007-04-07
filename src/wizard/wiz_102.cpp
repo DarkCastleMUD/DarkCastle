@@ -150,7 +150,7 @@ int do_check(struct char_data *ch, char *arg, int cmd) {
           pc_clss_types[(int)(GET_CLASS(vict))], GET_LEVEL(vict),
           (connected ? world[vict->in_room].number : -1));
   send_to_char(buf, ch);  
-  sprintf(buf, "$3Exp$R: %-10lld $3Gold$R: %-10d $3Bank$R: %-9d $3Align$R: %d\n\r",
+  sprintf(buf, "$3Exp$R: %-10lld $3Gold$R: %-10lld $3Bank$R: %-9d $3Align$R: %d\n\r",
           GET_EXP(vict), GET_GOLD(vict), GET_BANK(vict), GET_ALIGNMENT(vict));
   send_to_char(buf, ch);
   if(GET_LEVEL(ch) >= SERAPH) {
@@ -3064,7 +3064,7 @@ mob_index[mob_num].virt);
          if(!*buf4) {
           send_to_char("$3Syntax$R: medit [mob_num] gold <goldamount>\n\r"
                        "$3Current$R: ", ch);
-          sprintf(buf, "%d\n", ((char_data *)mob_index[mob_num].item)->gold);
+          sprintf(buf, "%lld\n", ((char_data *)mob_index[mob_num].item)->gold);
           send_to_char(buf, ch);
           send_to_char("$3Valid Range$R: 0 to 5000000\r\n", ch);
           return eFAILURE;

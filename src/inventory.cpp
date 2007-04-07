@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.94 2007/03/16 22:43:39 shane Exp $
+| $Id: inventory.cpp,v 1.95 2007/04/07 21:16:10 dcastle Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -1337,7 +1337,7 @@ int do_give(struct char_data *ch, char *argument, int cmd)
 {
   char obj_name[MAX_INPUT_LENGTH+1], vict_name[MAX_INPUT_LENGTH+1], buf[200];
   char arg[80], allbuf[80];
-  int amount;
+  long long amount;
   int retval;
   extern int top_of_world;
   struct char_data *vict;
@@ -1367,7 +1367,7 @@ int do_give(struct char_data *ch, char *argument, int cmd)
       send_to_char("Number field too large.\n\r", ch);
       return eFAILURE;
     }*/
-    amount = atoi(obj_name);
+    amount = atoll(obj_name);
     argument = one_argument(argument, arg);
     if(str_cmp("gold", arg) && str_cmp("coins",arg) && str_cmp("coin",arg)) { 
       send_to_char("Sorry, you can't do that (yet)...\n\r",ch);
@@ -1377,7 +1377,7 @@ int do_give(struct char_data *ch, char *argument, int cmd)
       send_to_char("Sorry, you can't do that!\n\r",ch);
       return eFAILURE;
     }
-    if(GET_GOLD(ch) < (uint32)amount && GET_LEVEL(ch) < DEITY) 
+    if(GET_GOLD(ch) < amount && GET_LEVEL(ch) < DEITY) 
     {
       send_to_char("You haven't got that many coins!\n\r",ch);
       return eFAILURE;
@@ -1397,20 +1397,20 @@ int do_give(struct char_data *ch, char *argument, int cmd)
          send_to_char("Umm okay, you give it to yourself.\r\n", ch);
          return eFAILURE;
       }
-
+/*
       if(GET_GOLD(vict) > 2000000000) {
          send_to_char("They can't hold that much gold!\r\n", ch);
          return eFAILURE;
       }
-
-      csendf(ch, "You give %ld coin%s to %s.\n\r", (long) amount,
+*/
+      csendf(ch, "You give %lld coin%s to %s.\n\r", amount,
              amount == 1 ? "" : "s", GET_SHORT(vict));
 
-        sprintf(buf, "%s gives %d coins to %s", GET_NAME(ch), amount,
+        sprintf(buf, "%s gives %lld coins to %s", GET_NAME(ch), amount,
                 GET_NAME(vict));
         log(buf, 110, LOG_GIVE);
       
-      sprintf(buf, "%s gives you %d gold coin%s.", PERS(ch, vict), amount,
+      sprintf(buf, "%s gives you %lld gold coin%s.", PERS(ch, vict), amount,
                amount == 1 ? "" : "s");
       act(buf, ch, 0, vict, TO_VICT, INVIS_NULL);
       act("$n gives some gold to $N.", ch, 0, vict,TO_ROOM,INVIS_NULL|NOTVICT);
@@ -1429,7 +1429,7 @@ int do_give(struct char_data *ch, char *argument, int cmd)
          GET_GOLD(ch) = 0;
          send_to_char("Warning:  You are giving out more gold than you had.\r\n", ch);
          if(GET_LEVEL(ch) < IMP) {
-           sprintf(buf, "%s gives %d coins to %s (negative!)", GET_NAME(ch), 
+           sprintf(buf, "%s gives %lld coins to %s (negative!)", GET_NAME(ch), 
                    amount, GET_NAME(vict));
            special_log(buf);
          }

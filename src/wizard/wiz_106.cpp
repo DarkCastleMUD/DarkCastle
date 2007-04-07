@@ -44,7 +44,7 @@ int do_plats (struct char_data *ch, char *argument, int cmd)
       if (GET_PLATINUM(i) < (uint32)minamt)
          continue;
 
-      sprintf(buf, "%15d - %s\n\r", GET_PLATINUM(i), GET_NAME(i));
+      sprintf(buf, "%15d - %s - %lld - %d\n\r", GET_PLATINUM(i), GET_NAME(i),GET_GOLD(i), GET_BANK(i));
       send_to_char (buf, ch);
       }
    return eSUCCESS;

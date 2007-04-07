@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.52 2007/04/04 09:07:20 dcastle Exp $
+| $Id: wizard.cpp,v 1.53 2007/04/07 21:16:21 dcastle Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -432,8 +432,8 @@ void boro_mob_stat(struct char_data *ch, struct char_data *k)
 	}
 
 	if(!IS_MOB(k)) {
-		sprintf(buf, "$3Coins$R:[%ld]  $3Bank$R:[%ld]\n\r", (long)GET_GOLD(k),
-		(long)k->pcdata->bank );
+		sprintf(buf, "$3Coins$R:[%lld]  $3Bank$R:[%d]\n\r", GET_GOLD(k),
+		k->pcdata->bank );
 		send_to_char(buf, ch);
 	}
 
@@ -631,7 +631,7 @@ void mob_stat(struct char_data *ch, struct char_data *k)
           GET_KI(k), ki_limit(k));
   send_to_char(buf,ch);
      
-  sprintf(buf, "$3AC$R:[%d]  $3Exp$R:[%lld]  $3Hitroll$R:[%d]  $3Damroll$R:[%d]  $3Gold$R: [$B$5%d$R]\n\r",
+  sprintf(buf, "$3AC$R:[%d]  $3Exp$R:[%lld]  $3Hitroll$R:[%d]  $3Damroll$R:[%d]  $3Gold$R: [$B$5%lld$R]\n\r",
           GET_ARMOR(k), GET_EXP(k), GET_REAL_HITROLL(k), GET_REAL_DAMROLL(k), GET_GOLD(k) );
   send_to_char(buf, ch);
 
