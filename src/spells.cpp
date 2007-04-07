@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.217 2007/03/10 18:57:18 jhhudso Exp $ */
+/* $Id: spells.cpp,v 1.218 2007/04/07 22:14:03 shane Exp $ */
 
 extern "C"
 {
@@ -1318,7 +1318,8 @@ int do_release(CHAR_DATA *ch, char *argument, int cmd)
 	  send_to_char("You can release the following spells:\r\n",ch);
 	  printed=TRUE;
        }
-       if (spell_info[aff->type].targets & TAR_SELF_DEFAULT)
+       if ( (spell_info[aff->type].targets & TAR_SELF_DEFAULT) || 
+             aff->type == SPELL_HOLY_AURA )
        { // Spells that default to self seems a good measure of
 	 // allow to release spells..
          char * aff_name = get_skill_name(aff->type);
@@ -1345,7 +1346,7 @@ int do_release(CHAR_DATA *ch, char *argument, int cmd)
 	 if (str_prefix(argument,get_skill_name(aff->type)))
             continue;
 	if (aff->type > MAX_SPL_LIST) continue;
-          if (!IS_SET(spell_info[aff->type].targets, TAR_SELF_DEFAULT))
+          if (!IS_SET(spell_info[aff->type].targets, TAR_SELF_DEFAULT) && aff->type != SPELL_HOLY_AURA)
             continue;
          if ((aff->type > 0) && (aff->type <= MAX_SPL_LIST))
 	       if (!done && !skill_success(ch,NULL, SKILL_RELEASE))
