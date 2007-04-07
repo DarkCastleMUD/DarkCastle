@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.60 2007/02/22 20:38:58 shane Exp $
+| $Id: cl_warrior.cpp,v 1.61 2007/04/07 21:55:51 shane Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -422,7 +422,17 @@ int do_bash(struct char_data *ch, char *argument, int cmd)
     }
 
     if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE)) {
-      send_to_char("You can't bash something that HUGE!\n\r", ch);
+      send_to_char("You cannot bash something that HUGE!\n\r", ch);
+         return eFAILURE;
+    }
+
+    if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_SWARM)) {
+      send_to_char("You cannot pick just one to bash!\n\r", ch);
+         return eFAILURE;
+    }
+
+    if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_TINY)) {
+      send_to_char("You cannot target something that tiny!\n\r", ch);
          return eFAILURE;
     }
 

@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.235 2007/03/27 13:56:51 dcastle Exp $ */
+/* $Id: const.cpp,v 1.236 2007/04/07 21:55:48 shane Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1856,6 +1856,9 @@ char
     "BOSS",
     "NOHEADBUTT",
     "NOATTACKS",
+    "nodontuse",
+    "IS_SWARM",
+    "IS_TINY",
     "\n"
 };
 

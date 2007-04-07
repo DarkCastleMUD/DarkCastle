@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.166 2007/04/06 18:50:12 pirahna Exp $
+| $Id: cl_thief.cpp,v 1.167 2007/04/07 21:55:51 shane Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -255,7 +255,17 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
   }
 
   if(IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE)) {
-    send_to_char("You can't backstab someone that HUGE!\r\n", ch);
+    send_to_char("You cannot backstab someone that HUGE!\r\n", ch);
+    return eFAILURE;
+  }
+
+  if(IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_SWARM)) {
+    send_to_char("You cannot target just one to backstab!\r\n", ch);
+    return eFAILURE;
+  }
+
+  if(IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_TINY)) {
+    send_to_char("You cannot target someone that tiny to backstab!\r\n", ch);
     return eFAILURE;
   }
 
@@ -461,6 +471,18 @@ int do_circle(CHAR_DATA *ch, char *argument, int cmd)
    if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE) &&
 	has_skill(ch, SKILL_CIRCLE) <= 80) {
       send_to_char("You cannot circle behind someone that HUGE!\n\r", ch);
+      return eFAILURE;
+   }
+
+   if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_SWARM) &&
+	has_skill(ch, SKILL_CIRCLE) <= 80) {
+      send_to_char("You cannot pick just one to circle behind!\n\r", ch);
+      return eFAILURE;
+   }
+
+   if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_TINY) &&
+	has_skill(ch, SKILL_CIRCLE) <= 80) {
+      send_to_char("You cannot target something that tiny to circle behind!\n\r", ch);
       return eFAILURE;
    }
 
@@ -1924,7 +1946,17 @@ int do_blackjack(struct char_data *ch, char *argument, int cmd)
   }  
 
   if(IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE)) {
-    send_to_char("You can't blackjack someone that HUGE!\r\n", ch);
+    send_to_char("You cannot blackjack someone that HUGE!\r\n", ch);
+    return eFAILURE;
+  }
+
+  if(IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_SWARM)) {
+    send_to_char("You cannot target just one to blackjack!\r\n", ch);
+    return eFAILURE;
+  }
+
+  if(IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_TINY)) {
+    send_to_char("You cannot target someone that tiny to blackjack!\r\n", ch);
     return eFAILURE;
   }
 
@@ -2126,7 +2158,17 @@ int do_cripple(CHAR_DATA *ch, char *argument, int cmd)
    }
 
    if(IS_MOB(vict) && ISSET(vict->mobdata->actflags, ACT_HUGE) && skill < 81) {
-      send_to_char("You can't cripple someone that HUGE!\r\n", ch);
+      send_to_char("You cannot cripple someone that HUGE!\r\n", ch);
+      return eFAILURE;
+   }
+
+   if(IS_MOB(vict) && ISSET(vict->mobdata->actflags, ACT_SWARM) && skill < 81) {
+      send_to_char("You cannot pick just one to cripple!\r\n", ch);
+      return eFAILURE;
+   }
+
+   if(IS_MOB(vict) && ISSET(vict->mobdata->actflags, ACT_TINY) && skill < 81) {
+      send_to_char("You cannot target someone that tiny to cripple!\r\n", ch);
       return eFAILURE;
    }
 

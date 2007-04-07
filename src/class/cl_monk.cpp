@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_monk.cpp,v 1.29 2007/03/01 18:42:38 pirahna Exp $
+| $Id: cl_monk.cpp,v 1.30 2007/04/07 21:55:51 shane Exp $
 | cl_monk.C
 | Description:  Monk skills.
 */
@@ -208,6 +208,18 @@ int do_stun(struct char_data *ch, char *argument, int cmd)
   if(IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE))
   {
     send_to_char("You cannot stun something that HUGE!\n\r", ch);
+    return eFAILURE;
+  }
+
+  if(IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_SWARM))
+  {
+    send_to_char("You cannot pick just one of them to stun!\n\r", ch);
+    return eFAILURE;
+  }
+
+  if(IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_TINY))
+  {
+    act("$N's small size proves impossible to target a stunning blow upon!", ch, 0, victim, TO_CHAR, 0);
     return eFAILURE;
   }
 

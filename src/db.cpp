@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.150 2007/04/07 21:16:10 dcastle Exp $ */
+/* $Id: db.cpp,v 1.151 2007/04/07 21:55:48 shane Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -2721,6 +2721,8 @@ void write_mobile(char_data * mob, FILE *fl)
 
     while(i < ACT_MAX/ASIZE+1) {
        fprintf(fl, "%d ", mob->mobdata->actflags[i]);
+extern void send_info(char *);
+send_info("wrote one actflag line\n\r");
        i++;
     }
     fprintf(fl,"-1\n");
@@ -2977,6 +2979,8 @@ void handle_automatic_mob_settings(char_data * mob)
   if (ISSET(mob->mobdata->actflags, ACT_STUPID)) alevel += 3.0;
   if (ISSET(mob->mobdata->actflags, ACT_HUGE)) alevel -= 1.5;
   if (ISSET(mob->mobdata->actflags, ACT_DRAINY)) alevel -= 2.0;
+  if (ISSET(mob->mobdata->actflags, ACT_SWARM)) alevel -= 1.5;
+  if (ISSET(mob->mobdata->actflags, ACT_TINY)) alevel -= 1.5;
 
   if (!c&& IS_AFFECTED(mob,AFF_SANCTUARY)) alevel -= 0.5;
   if (!c&& IS_AFFECTED(mob,AFF_FIRESHIELD)) alevel -= 0.5;

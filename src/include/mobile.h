@@ -1,7 +1,7 @@
 #ifndef MOBILE_H_
 #define MOBILE_H_
 /************************************************************************
-| $Id: mobile.h,v 1.26 2007/04/04 22:49:00 dcastle Exp $
+| $Id: mobile.h,v 1.27 2007/04/07 21:55:54 shane Exp $
 | mobile.h
 | Description:  This file contains the header information for mobile
 |   control.
@@ -58,8 +58,10 @@ bool charExists(CHAR_DATA *ch);
 #define ACT_BOSS 	    29
 #define ACT_NOHEADBUTT      30
 #define ACT_NOATTACK        31
-#define ACT_MAX             31
 //#define CHECKTHISACT      32 //Do not change unless ASIZE changes
+#define ACT_SWARM           33
+#define ACT_TINY            34
+#define ACT_MAX             34
 //#define CHECKTHISACT      64 //Do not chance unless ASIZE changes
 
 struct race_shit

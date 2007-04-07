@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.53 2007/04/07 21:16:21 dcastle Exp $
+| $Id: wizard.cpp,v 1.54 2007/04/07 21:55:57 shane Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -663,7 +663,7 @@ void mob_stat(struct char_data *ch, struct char_data *k)
   send_to_char(buf, ch);
 
   if(IS_NPC(k)) {
-    sprintf(buf, "$3NPC flags$R: [%d]", k->mobdata->actflags[0]);
+    sprintf(buf, "$3NPC flags$R: [%d %d]", k->mobdata->actflags[0], k->mobdata->actflags[1]);
     sprintbit(k->mobdata->actflags, action_bits,buf2);
   }  
   else {

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_barbarian.cpp,v 1.76 2007/03/16 03:07:34 jhhudso Exp $
+| $Id: cl_barbarian.cpp,v 1.77 2007/04/07 21:55:51 shane Exp $
 | cl_barbarian.C
 | Description:  Commands for the barbarian class.
 */
@@ -288,7 +288,17 @@ int do_headbutt(struct char_data *ch, char *argument, int cmd)
   }
 
   if(IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE) && has_skill(ch, SKILL_HEADBUTT) < 86) {
-    send_to_char("You're too puny to headbutt someone that HUGE!\n\r",ch);
+    send_to_char("You are too puny to headbutt someone that HUGE!\n\r",ch);
+    return eFAILURE;
+  }
+
+  if(IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_SWARM)) {
+    send_to_char("You cannot pick just one to headbutt!\n\r", ch);
+    return eFAILURE;
+  }
+
+  if(IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_TINY)) {
+    act("$N's small size makes it impossible to target just $S head!", ch, 0, victim, TO_CHAR, 0);
     return eFAILURE;
   }
 
@@ -652,8 +662,18 @@ int do_knockback(struct char_data *ch, char *argument, int cmd)
   }
 
   if(IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE)) {
-    send_to_char("You're too tiny to knock someone that HUGE anywhere!\n\r", 
+    send_to_char("You are too tiny to knock someone that HUGE anywhere!\n\r", 
 		 ch);
+    return eFAILURE;
+  }
+
+  if(IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_SWARM)) {
+    send_to_char("You cannot pick just one to knockback!\n\r", ch);
+    return eFAILURE;
+  }
+
+  if(IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_TINY)) {
+    act("$N would evade your knockback attempt with ease!", ch, 0, victim, TO_CHAR, 0);
     return eFAILURE;
   }
 
