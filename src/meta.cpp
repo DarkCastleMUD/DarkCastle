@@ -958,7 +958,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
       send_to_char("$B$2The Meta-physician tells you, 'You can't afford that!'$R\r\n",ch);
       return eSUCCESS;
    }
-   struct obj_data *obj = clone_object(real_object(27903));
+   struct obj_data *obj = clone_object(real_object(10003));
    if ( IS_CARRYING_N(ch) + 1 > CAN_CARRY_N(ch) )
     {
         send_to_char( "You can't carry that many items.\n\r", ch );
@@ -1412,7 +1412,7 @@ int cardinal(struct char_data *ch, struct obj_data *obj, int cmd, char *argument
         send_to_char("$B$2Cardinal Thelonius tells you, 'You can't afford that!'$R\r\n",ch);
         return eSUCCESS;
       }
-      struct obj_data *obj = clone_object(real_object(27904));
+      struct obj_data *obj = clone_object(real_object(10004));
       if ( IS_CARRYING_N(ch) + 1 > CAN_CARRY_N(ch) )
       {
         send_to_char( "You can't carry that many items.\n\r", ch );
