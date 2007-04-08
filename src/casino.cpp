@@ -1934,8 +1934,7 @@ void update_linked_slots(struct machine_data *machine)
      // and update their v1 jackpot, their machine's jackpot (if applicable)
      // and their long description
       if(slot_obj->obj_flags.value[3] == machine->linkedto) {
-         dc_free(slot_obj->description);
-	 slot_obj->description = str_dup(ldesc);
+	 slot_obj->description = str_hsh(ldesc);
          slot_obj->obj_flags.value[1] = (int)machine->jackpot;
 	 if (slot_obj->slot)
 	   slot_obj->slot->jackpot = machine->jackpot;
@@ -1943,8 +1942,7 @@ void update_linked_slots(struct machine_data *machine)
 	 // Update instances of the original slot obj
          for(OBJ_DATA *j=object_list; j; j = j->next) {
 	   if(j->item_number == real_object(i)) {
-             dc_free(j->description);
-	     j->description = str_dup(ldesc);
+	     j->description = str_hsh(ldesc);
 	     j->obj_flags.value[1] = (int)machine->jackpot;
 	     if (j->slot)
 	       j->slot->jackpot = machine->jackpot;
@@ -2018,10 +2016,8 @@ void reel_spin(void *arg1, void *arg2, void *arg3)
          } else {
             ((OBJ_DATA *)obj_index[machine->obj->item_number].item)->obj_flags.value[1] = (int)machine->jackpot;
             sprintf(buf, "A slot machine which displays '$R$BJackpot: %d %s!$1' sits here.", (int)machine->jackpot, machine->gold?"coins":"plats");
-            dc_free(machine->obj->description);
-            machine->obj->description = str_dup(buf);
-            dc_free( ((OBJ_DATA *)obj_index[machine->obj->item_number].item)->description );
-            ((OBJ_DATA *)obj_index[machine->obj->item_number].item)->description = str_dup(buf);
+            machine->obj->description = str_hsh(buf);
+            ((OBJ_DATA *)obj_index[machine->obj->item_number].item)->description = str_hsh(buf);
          }
       }
       if(payout == 200 && machine->bet == 5) {
@@ -2042,10 +2038,8 @@ void reel_spin(void *arg1, void *arg2, void *arg3)
          } else {
             ((OBJ_DATA *)obj_index[machine->obj->item_number].item)->obj_flags.value[1] = (int)machine->jackpot;
             sprintf(buf, "A slot machine which displays '$R$BJackpot: %d %s!$1' sits here.", (int)machine->jackpot, machine->gold?"coins":"plats");
-            dc_free(machine->obj->description);
-            machine->obj->description = str_dup(buf);
-            dc_free( ((OBJ_DATA *)obj_index[machine->obj->item_number].item)->description );
-            ((OBJ_DATA *)obj_index[machine->obj->item_number].item)->description = str_dup(buf);
+            machine->obj->description = str_hsh(buf);
+            ((OBJ_DATA *)obj_index[machine->obj->item_number].item)->description = str_hsh(buf);
          }
          save_slot_machines();
       } else if(payout) {
