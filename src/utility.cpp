@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.76 2007/04/01 19:03:21 dcastle Exp $ */
+/* $Id: utility.cpp,v 1.77 2007/04/08 23:12:34 dcastle Exp $ */
 
 extern "C"
 {
@@ -646,11 +646,12 @@ bool ARE_GROUPED( struct char_data *sub, struct char_data *obj)
 
 int SWAP_CH_VICT(int value)
 {
-  int newretval;
+  int newretval = 0;
 
   if(IS_SET(value, eCH_DIED))
     SET_BIT(newretval, eVICT_DIED);
   else REMOVE_BIT(newretval, eVICT_DIED);
+
   if(IS_SET(value, eVICT_DIED)) 
     SET_BIT(newretval, eCH_DIED);
   else REMOVE_BIT(newretval, eCH_DIED);
