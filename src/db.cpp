@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.151 2007/04/07 21:55:48 shane Exp $ */
+/* $Id: db.cpp,v 1.152 2007/04/08 23:30:07 shane Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -2721,8 +2721,6 @@ void write_mobile(char_data * mob, FILE *fl)
 
     while(i < ACT_MAX/ASIZE+1) {
        fprintf(fl, "%d ", mob->mobdata->actflags[i]);
-extern void send_info(char *);
-send_info("wrote one actflag line\n\r");
        i++;
     }
     fprintf(fl,"-1\n");
