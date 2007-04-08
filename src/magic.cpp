@@ -783,7 +783,7 @@ int cast_greater_stone_shield( ubyte level, CHAR_DATA *ch, char *arg, int type, 
 int spell_earthquake(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
   int dam;
-  int retval = 0;
+  int retval = eSUCCESS;
   int weap_spell = obj?WIELD:0;
   CHAR_DATA *tmp_victim, *temp;
   dam = 150;
@@ -813,14 +813,20 @@ int spell_earthquake(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
                      send_to_char("The shaking ground has no effect on you.\n\r", tmp_victim);
 		     dam = 0;
 		  }
+		int retval2 = 0;
+		retval2 = damage(ch, tmp_victim, dam, TYPE_MAGIC, SPELL_EARTHQUAKE, weap_spell);
 
-		  retval = damage(ch, tmp_victim, dam, TYPE_MAGIC, SPELL_EARTHQUAKE, weap_spell);
+		if (victim == tmp_victim && IS_SET(retval2, eVICT_DIED))
+			SET_BIT(retval, eVICT_DIED);
+		else if (IS_SET(retval2, eCH_DIED))
+		  	{ SET_BIT(retval, eCH_DIED); break; }
+		  
 	 } 
          else if (world[ch->in_room].zone == world[tmp_victim->in_room].zone)
            send_to_char("The earth trembles and shivers.\n\r", tmp_victim);
    }
   }
-  return eSUCCESS;
+  return retval;
 }
 
 
