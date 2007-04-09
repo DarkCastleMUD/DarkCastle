@@ -16,7 +16,7 @@
  *  10/21/2003   Onager    Changed IS_ANONYMOUS() to handle mobs without   *
  *                         crashing                                        *
  ***************************************************************************/
-/* $Id: utility.h,v 1.63 2007/04/03 15:10:55 dcastle Exp $ */
+/* $Id: utility.h,v 1.64 2007/04/09 09:51:55 shane Exp $ */
 
 #ifndef UTILITY_H_
 #define UTILITY_H_
@@ -327,6 +327,7 @@ inline const short IS_ANONYMOUS(CHAR_DATA *ch)
 #define IS_SINGING(ch) ((ch)->song_timer != 0)
 
 char *str_hsh(char *);
+bool ishashed(char *);
 void double_dollars(char * destination, char * source);
 
 void    clan_death      (char* b, char_data *ch);
