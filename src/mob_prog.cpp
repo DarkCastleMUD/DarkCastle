@@ -323,7 +323,7 @@ void translate_value(char *leftptr, char *rightptr, int16 **vali, uint32 **valui
   {
     *tmp = '\0';
     tmp++;
-    one_argument(half, tmp); // strips whatever spaces
+    one_argument(tmp, half); // strips whatever spaces
   }
 
 
@@ -775,7 +775,12 @@ void translate_value(char *leftptr, char *rightptr, int16 **vali, uint32 **valui
 		}
 		break;
 	case 't':
-		if (!str_cmp(right, "title"))
+		if (!str_cmp(right,"temp"))
+		{
+		  if (!half[0] || !target) tError = TRUE;
+		  else { char  *tmp = getTemp(target, half); stringval = &tmp; }
+		}
+		else if (!str_cmp(right, "title"))
 		{
 		  if (!target) tError = TRUE;
 		  else stringval = &target->title;
@@ -874,9 +879,9 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
   char     *point = ifchck;
   int       lhsvl;
   int       rhsvl;
+  val2[0] = '\0';
 
-
-  if (mob_index[mob->mobdata->nr].virt == 2017)
+  if (mob_index[mob->mobdata->nr].virt == 2018)
   {
     debugpoint();
   }
@@ -1022,17 +1027,37 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
       // new ifchecks
   translate_value(arg,buf,&lvali,&lvalui, &lvalstr,&lvali64, &lvalb, mob,actor, obj, vo, rndm);
 
-  if (lvali)
-    return mprog_veval(*lvali, opr, atoi(val));
 
-  if (lvalui)
-    return mprog_veval(*lvalui, opr, (uint)atoi(val));
-  if (lvali64)
-    return mprog_veval((int)*lvali64,opr, atoi(val));
-  if (lvalb)
-    return mprog_veval((int)*lvalb, opr, atoi(val));
-  if (lvalstr)
-    return mprog_seval(*lvalstr, opr, val);
+  if (val2[0] == '\0') {
+    if (lvali)   return mprog_veval(*lvali, opr, atoi(val));
+    if (lvalui)  return mprog_veval(*lvalui, opr, (uint)atoi(val));
+    if (lvali64) return mprog_veval((int)*lvali64,opr, atoi(val));
+    if (lvalb)   return mprog_veval((int)*lvalb, opr, atoi(val));  
+    if (lvalstr) return mprog_seval(*lvalstr, opr, val);
+  } else {
+    int16 *rvali = 0;
+    uint32 *rvalui = 0;
+    char **rvalstr = 0;
+    int64 *rvali64 = 0;
+    sbyte *rvalb = 0; 
+    translate_value(val,val2,&rvali,&rvalui, &rvalstr,&rvali64, &rvalb,mob,actor, obj, vo, rndm);
+    int64 rval;
+    if (rvalstr || rvali || rvalui || rvali64 || rvalb)
+    {
+      if (rvalstr && lvalstr) return mprog_seval(*lvalstr, opr, *rvalstr);
+      // The rest fit in an int64, so let's just use that.
+      if (rvalstr) rval = atoi(*rvalstr);
+      if (rvali) rval = *rvali;
+      if (rvalui) rval = *rvalui;
+      if (rvalb) rval = *rvalb;
+      if (rvali64) rval = *rvali64;
+
+      if (lvali)   return mprog_veval(*lvali, opr, rval);
+      if (lvalui)  return mprog_veval(*lvalui, opr, rval);
+      if (lvali64) return mprog_veval(*lvali64,opr, rval);
+      if (lvalb)   return mprog_veval((int)*lvalb, opr, rval);  
+    }
+ }
   if ( !str_cmp( buf, "rand" ) )
     {
       return ( number(1, 100) <= atoi(arg) );
@@ -1753,7 +1778,6 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
       *buf4pt = '\0';
       if (val[0] == '$' && val[1])
         mprog_translate(val[1], val, mob, actor, obj, vo, rndm);
-	char *getTemp(CHAR_DATA *ch, char *name);
 
       if (fvict)
        return mprog_seval(getTemp(fvict, buf4), opr, val);
