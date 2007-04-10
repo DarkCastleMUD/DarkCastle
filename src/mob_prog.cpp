@@ -2481,6 +2481,31 @@ int mprog_process_cmnd( char *cmnd, CHAR_DATA *mob, CHAR_DATA *actor,
       continue;
     }
     str++;
+    if (*str == '\0') break; // panic!
+    if (*(str+1) == '.')
+    {
+	int16 *lvali = 0;
+	uint32 *lvalui = 0;
+	char **lvalstr = 0;
+	int64 *lvali64 = 0;
+	sbyte *lvalb = 0;
+	char left[MAX_INPUT_LENGTH], right[MAX_INPUT_LENGTH];
+        left[0] = '$'; left[1] = *str; left[2] = '\0';
+	str = one_argument(str+2, right);
+        translate_value(left,right,&lvali,&lvalui, &lvalstr,&lvali64, &lvalb,mob,actor, obj, vo, rndm);
+	char buf[MAX_STRING_LENGTH];
+	buf[0] = '\0';
+	if (lvali) sprintf(buf, "%d", *lvali);
+	if (lvalui) sprintf(buf, "%u", *lvalui);
+	if (lvalstr) sprintf(buf, "%s", *lvalstr);
+	if (lvali64) sprintf(buf, "%lld", *lvali64);
+	if (lvalb) sprintf(buf, "%d", *lvalb);
+        for (int i = 0; buf[i];i++)
+	  *point++ = buf[i];
+	continue;
+    }
+
+
     if (LOWER(*str) == 'v' || LOWER(*str) == 'w')
     {
       char a = *str;
