@@ -2,7 +2,7 @@
 #define AFFECT_H_
 
 /************************************************************************
-| $Id: affect.h,v 1.28 2006/07/16 17:49:13 shane Exp $
+| $Id: affect.h,v 1.29 2007/04/13 09:55:54 dcastle Exp $
 | affect.h
 | This contains the bits for affected_by
 */
@@ -78,7 +78,8 @@
 #define AFF_CRIPPLE             66
 #define AFF_CHAMPION		67
 #define AFF_BLACKJACK           68
-#define AFF_MAX                 68
+#define AFF_NO_REGEN            69
+#define AFF_MAX                 69
 //#define AFF_CHECKTHISASIZE     96 //do not change unless ASIZE changes
 //#define AFF_CHECKTHISASIZE	128
 

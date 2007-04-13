@@ -1,7 +1,7 @@
 #ifndef MOBILE_H_
 #define MOBILE_H_
 /************************************************************************
-| $Id: mobile.h,v 1.27 2007/04/07 21:55:54 shane Exp $
+| $Id: mobile.h,v 1.28 2007/04/13 09:55:54 dcastle Exp $
 | mobile.h
 | Description:  This file contains the header information for mobile
 |   control.
@@ -14,6 +14,8 @@ char *  mprog_next_command      ( char* clist );
 
 
 bool charExists(CHAR_DATA *ch);
+
+char *getTemp(CHAR_DATA *ch, char *name);
 
 
 #define BASE_STAT      0

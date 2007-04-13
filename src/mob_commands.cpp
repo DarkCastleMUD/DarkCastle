@@ -1960,9 +1960,9 @@ char *allowedData[] = {
 int do_mpsetmath(char_data *ch, char *arg, int cmd)
 {
   char_data *vict;
-  if (activeActor) csendf(activeActor, "{%s}\r\n", arg);
-  vict = get_pc("Urizen");
-  if (vict) csendf(vict, "{%s}\r\n", arg);
+//  if (activeActor) csendf(activeActor, "{%s}\r\n", arg);
+//  vict = get_pc("Urizen");
+//  if (vict) csendf(vict, "{%s}\r\n", arg);
 
   char arg1[MAX_INPUT_LENGTH];
   char arg2[MAX_INPUT_LENGTH];
@@ -2020,8 +2020,6 @@ int do_mpsetmath(char_data *ch, char *arg, int cmd)
 	    return eFAILURE;
     }
     *lvalstr = str_dup(nw);    
-//    vict = get_pc("Urizen");
-//    if (vict) csendf(vict, "{%s}\r\n", nw);
     return eSUCCESS;
   }
   if (!lvalui && !lvali && !lvalb)
