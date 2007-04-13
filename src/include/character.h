@@ -1,7 +1,7 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.65 2007/04/07 21:16:15 dcastle Exp $
+| $Id: character.h,v 1.66 2007/04/13 11:08:59 shane Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
@@ -141,7 +141,7 @@ struct class_skill_defines
     int16  skillnum;          // ID # of skill
     int16  levelavailable;    // what level class can get it
     int16  maximum;           // maximum value PC can train it to (1-100)
-    int attrs[2];		      // What attributes the skill is based on
+    int16  attrs;	      // What attributes the skill is based on
 };
 
 /* Used in CHAR_FILE_U *DO*NOT*CHANGE* */

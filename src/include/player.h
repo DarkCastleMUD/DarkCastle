@@ -1,7 +1,7 @@
 #ifndef PLAYER_H_
 #define PLAYER_H_
 /************************************************************************
-| $Id: player.h,v 1.34 2006/12/28 11:18:50 jhhudso Exp $
+| $Id: player.h,v 1.35 2007/04/13 11:08:59 shane Exp $
 | player.h
 | Description: This file defines the player vectors..punishment, specials,
 |   etc...
@@ -83,6 +83,10 @@
 #define PLR_50PLUS	 1<<23
 #define PLR_ASCII         1<<24
 #define PLR_DAMAGE       1<<25
+#define PLR_CLS_TREE_A   1<<26
+#define PLR_CLS_TREE_B   1<<27
+#define PLR_CLS_TREE_C   1<<28 //might happen one day
+
 /************************************************************************
 | Class types for PCs
 */
@@ -247,6 +251,20 @@
 */
 /* RESERVED: 100-150 for more weapon affects */
 /* Morc XXX */
+
+
+//different stat combos for skill groups
+#define STRDEX 1
+#define STRCON 2
+#define STRINT 3
+#define STRWIS 4
+#define DEXCON 5
+#define DEXINT 6
+#define DEXWIS 7
+#define CONINT 8
+#define CONWIS 9
+#define INTWIS 10
+
 
 // Constructor commented out for const.C initialization purposes
 struct str_app_type

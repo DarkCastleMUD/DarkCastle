@@ -36,6 +36,38 @@ extern "C" {
 #endif
 extern short bport;
 int get_max(CHAR_DATA *, int);
+
+int get_max_stat_bonus(CHAR_DATA *ch, int attrs)
+{
+  int bonus = 0;
+
+  switch(attrs) {
+    case STRDEX:
+      bonus = MAX(0,get_max_stat(ch,STRENGTH)-15) + MAX(0,get_max_stat(ch, DEXTERITY)-15);break;
+    case STRCON:
+      bonus = MAX(0,get_max_stat(ch,STRENGTH)-15) + MAX(0,get_max_stat(ch, CONSTITUTION)-15);break;
+    case STRINT:
+      bonus = MAX(0,get_max_stat(ch,STRENGTH)-15) + MAX(0,get_max_stat(ch, INTELLIGENCE)-15);break;
+    case STRWIS:
+      bonus = MAX(0,get_max_stat(ch,STRENGTH)-15) + MAX(0,get_max_stat(ch, WISDOM)-15);break;
+    case DEXCON:
+      bonus = MAX(0,get_max_stat(ch,DEXTERITY)-15) + MAX(0,get_max_stat(ch, CONSTITUTION)-15);break;
+    case DEXINT:
+      bonus = MAX(0,get_max_stat(ch,DEXTERITY)-15) + MAX(0,get_max_stat(ch, INTELLIGENCE)-15);break;
+    case DEXWIS:
+      bonus = MAX(0,get_max_stat(ch,DEXTERITY)-15) + MAX(0,get_max_stat(ch, WISDOM)-15);break;
+    case CONINT:
+      bonus = MAX(0,get_max_stat(ch,CONSTITUTION)-15) + MAX(0,get_max_stat(ch, INTELLIGENCE)-15);break;
+    case CONWIS:
+      bonus = MAX(0,get_max_stat(ch,CONSTITUTION)-15) + MAX(0,get_max_stat(ch, WISDOM)-15);break;
+    case INTWIS:
+      bonus = MAX(0,get_max_stat(ch,INTELLIGENCE)-15) + MAX(0,get_max_stat(ch, WISDOM)-15);break;
+    default: bonus = 0;
+  }
+
+  return bonus;
+}
+
 // List skill maxes.
 int do_maxes(struct char_data *ch, char *argument, int cmd)
 {
@@ -75,20 +107,16 @@ int do_maxes(struct char_data *ch, char *argument, int cmd)
 	GET_RACE(ch) = i;
 	for (i = 0; *classskill[i].skillname != '\n'; i++)
 	{
-	  int max = classskill[i].maximum - 3;
+	  int max = classskill[i].maximum;
 
-	  if (classskill[i].attrs[0])
+          float percent = max*0.75;
+	  if (classskill[i].attrs)
 	  {
-	       int thing = get_max_stat(ch,classskill[i].attrs[0])-20;
-	       if (thing >= 8 ) max += 2;
+	       percent += max/100.0 * get_max_stat_bonus(ch,classskill[i].attrs);
 	  }
-	  if (classskill[i].attrs[1])
-	  {
-	       int thing = get_max_stat(ch,classskill[i].attrs[1])-20;
-	       if (thing > 6) max += 1;
-	  }
-
-	  csendf(ch, "%s: %d\n\r", classskill[i].skillname, max);
+          percent = MIN(max, percent);
+          percent = MAX(max*0.75, percent);
+	  csendf(ch, "%s: %d\n\r", classskill[i].skillname, (int)percent);
 	}
 	GET_RACE(ch) = orace;
 	return eSUCCESS;

@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.218 2007/04/07 22:14:03 shane Exp $ */
+/* $Id: spells.cpp,v 1.219 2007/04/13 11:08:56 shane Exp $ */
 
 extern "C"
 {
@@ -2204,49 +2204,38 @@ int do_skills(CHAR_DATA *ch, char *arg, int cmd)
          }
       }
       if(mage) {
-         sprintf(buf + strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Reqs:$R %s (%s)  $B$7Class:$R ",
-               UPPER(*m_skills[mage].skillname),m_skills[mage].skillname+1,attrname(m_skills[mage].attrs[0]),
-               attrname(m_skills[mage].attrs[1]));
+         sprintf(buf + strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Class:$R ",
+               UPPER(*m_skills[mage].skillname),m_skills[mage].skillname+1);
       } else if(cleric) {
-         sprintf(buf + strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Reqs:$R %s (%s)  $B$7Class:$R ",
-               UPPER(*c_skills[cleric].skillname),c_skills[cleric].skillname+1,attrname(c_skills[cleric].attrs[0]),
-               attrname(c_skills[cleric].attrs[1]));
+         sprintf(buf + strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Class:$R ",
+               UPPER(*c_skills[cleric].skillname),c_skills[cleric].skillname+1);
       } else if(thief) {
-         sprintf(buf + strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Reqs:$R %s (%s)  $B$7Class:$R ",
-               UPPER(*t_skills[thief].skillname),t_skills[thief].skillname+1,attrname(t_skills[thief].attrs[0]),
-               attrname(t_skills[thief].attrs[1]));
+         sprintf(buf + strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Class:$R ",
+               UPPER(*t_skills[thief].skillname),t_skills[thief].skillname+1);
       } else if(warrior) {
-         sprintf(buf + strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Reqs:$R %s (%s)  $B$7Class:$R ",
-               UPPER(*w_skills[warrior].skillname),w_skills[warrior].skillname+1,attrname(w_skills[warrior].attrs[0]),
-               attrname(w_skills[warrior].attrs[1]));
+         sprintf(buf + strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Class:$R ",
+               UPPER(*w_skills[warrior].skillname),w_skills[warrior].skillname+1);
       } else if(anti) {
-         sprintf(buf + strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Reqs:$R %s (%s)  $B$7Class:$R ",
-               UPPER(*a_skills[anti].skillname),a_skills[anti].skillname+1,attrname(a_skills[anti].attrs[0]),
-               attrname(a_skills[anti].attrs[1]));
+         sprintf(buf + strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Class:$R ",
+               UPPER(*a_skills[anti].skillname),a_skills[anti].skillname+1);
       } else if(pal) {
-         sprintf(buf + strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Reqs:$R %s (%s)  $B$7Class:$R ",
-               UPPER(*p_skills[pal].skillname),p_skills[pal].skillname+1,attrname(p_skills[pal].attrs[0]),
-               attrname(p_skills[pal].attrs[1]));
+         sprintf(buf + strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Class:$R ",
+               UPPER(*p_skills[pal].skillname),p_skills[pal].skillname+1);
       } else if(barb) {
-         sprintf(buf + strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Reqs:$R %s (%s)  $B$7Class:$R ",
-               UPPER(*b_skills[barb].skillname),b_skills[barb].skillname+1,attrname(b_skills[barb].attrs[0]),
-               attrname(b_skills[barb].attrs[1]));
+         sprintf(buf + strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Class:$R ",
+               UPPER(*b_skills[barb].skillname),b_skills[barb].skillname+1);
       } else if(monk) {
-         sprintf(buf + strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Reqs:$R %s (%s)  $B$7Class:$R ",
-               UPPER(*k_skills[monk].skillname),k_skills[monk].skillname+1,attrname(k_skills[monk].attrs[0]),
-               attrname(k_skills[monk].attrs[1]));
+         sprintf(buf + strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Class:$R ",
+               UPPER(*k_skills[monk].skillname),k_skills[monk].skillname+1);
       } else if(ranger) {
-         sprintf(buf + strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Reqs:$R %s (%s)  $B$7Class:$R ",
-               UPPER(*r_skills[ranger].skillname),r_skills[ranger].skillname+1,attrname(r_skills[ranger].attrs[0]),
-               attrname(r_skills[ranger].attrs[1]));
+         sprintf(buf + strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Class:$R ",
+               UPPER(*r_skills[ranger].skillname),r_skills[ranger].skillname+1);
       } else if(bard) {
-         sprintf(buf + strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Reqs:$R %s (%s)  $B$7Class:$R ",
-               UPPER(*d_skills[bard].skillname),d_skills[bard].skillname+1,attrname(d_skills[bard].attrs[0]),
-               attrname(d_skills[bard].attrs[1]));
+         sprintf(buf + strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Class:$R ",
+               UPPER(*d_skills[bard].skillname),d_skills[bard].skillname+1);
       } else if(druid) {
-         sprintf(buf + strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Reqs:$R %s (%s)  $B$7Class:$R ",
-               UPPER(*u_skills[druid].skillname),u_skills[druid].skillname+1,attrname(u_skills[druid].attrs[0]),
-               attrname(u_skills[druid].attrs[1]));
+         sprintf(buf + strlen(buf), "$B$7Skill:$R %c%-20s  $B$7Class:$R ",
+               UPPER(*u_skills[druid].skillname),u_skills[druid].skillname+1);
       } else continue;
 
       strcat(buf, buf2);
@@ -2270,9 +2259,9 @@ int do_songs(CHAR_DATA *ch, char *arg, int cmd)
 
    for(int i = 0; d_skills[i].skillnum; i++) {
       if(d_skills[i].skillnum >= SKILL_SONG_BASE && d_skills[i].skillnum <= SKILL_SONG_MAX) {
-         sprintf(buf + strlen(buf), "$B$7Song:$R %c%-22s  $B$7Reqs:$R %s (%s)  $B$7Ki:$R %-3d  $B$7Class:$R %s (%d)",
-               UPPER(*d_skills[i].skillname),d_skills[i].skillname+1, attrname(d_skills[i].attrs[0]), 
-               attrname(d_skills[i].attrs[1]), song_info[d_skills[i].skillnum - SKILL_SONG_BASE].min_useski,
+         sprintf(buf + strlen(buf), "$B$7Song:$R %c%-22s  $B$7Ki:$R %-3d  $B$7Class:$R %s (%d)",
+               UPPER(*d_skills[i].skillname),d_skills[i].skillname+1,
+               song_info[d_skills[i].skillnum - SKILL_SONG_BASE].min_useski,
                "Brd", d_skills[i].levelavailable);
          strcat(buf, "\n\r");
       }
@@ -2356,29 +2345,23 @@ int do_spells(CHAR_DATA *ch, char *arg, int cmd)
          }
       }
       if(mage) {
-         sprintf(buf + strlen(buf), "$B$7Spell:$R %c%-20s  $B$7Reqs:$R %s (%s)  $B$7Mana:$R %-3d  $B$7Class:$R ",
-               UPPER(*m_skills[mage].skillname),m_skills[mage].skillname+1,attrname(m_skills[mage].attrs[0]),
-               attrname(m_skills[mage].attrs[1]),spell_info[mage].min_usesmana);
+         sprintf(buf + strlen(buf), "$B$7Spell:$R %c%-20s  $B$7Mana:$R %-3d  $B$7Class:$R ",
+               UPPER(*m_skills[mage].skillname),m_skills[mage].skillname+1,spell_info[mage].min_usesmana);
       } else if(cleric) {
-         sprintf(buf + strlen(buf), "$B$7Spell:$R %c%-20s  $B$7Reqs:$R %s (%s)  $B$7Mana:$R %-3d  $B$7Class:$R ",
-               UPPER(*c_skills[cleric].skillname),c_skills[cleric].skillname+1,attrname(c_skills[cleric].attrs[0]),
-               attrname(c_skills[cleric].attrs[1]),spell_info[cleric].min_usesmana);
+         sprintf(buf + strlen(buf), "$B$7Spell:$R %c%-20s  $B$7Mana:$R %-3d  $B$7Class:$R ",
+               UPPER(*c_skills[cleric].skillname),c_skills[cleric].skillname+1,spell_info[cleric].min_usesmana);
       } else if(anti) {
-         sprintf(buf + strlen(buf), "$B$7Spell:$R %c%-20s  $B$7Reqs:$R %s (%s)  $B$7Mana:$R %-3d  $B$7Class:$R ",
-               UPPER(*a_skills[anti].skillname),a_skills[anti].skillname+1,attrname(a_skills[anti].attrs[0]),
-               attrname(a_skills[anti].attrs[1]),spell_info[anti].min_usesmana);
+         sprintf(buf + strlen(buf), "$B$7Spell:$R %c%-20s  $B$7Mana:$R %-3d  $B$7Class:$R ",
+               UPPER(*a_skills[anti].skillname),a_skills[anti].skillname+1,spell_info[anti].min_usesmana);
       } else if(pal) {
-         sprintf(buf + strlen(buf), "$B$7Spell:$R %c%-20s  $B$7Reqs:$R %s (%s)  $B$7Mana:$R %-3d  $B$7Class:$R ",
-               UPPER(*p_skills[pal].skillname),p_skills[pal].skillname+1,attrname(p_skills[pal].attrs[0]),
-               attrname(p_skills[pal].attrs[1]),spell_info[pal].min_usesmana);
+         sprintf(buf + strlen(buf), "$B$7Spell:$R %c%-20s  $B$7Mana:$R %-3d  $B$7Class:$R ",
+               UPPER(*p_skills[pal].skillname),p_skills[pal].skillname+1,spell_info[pal].min_usesmana);
       } else if(ranger) {
-         sprintf(buf + strlen(buf), "$B$7Spell:$R %c%-20s  $B$7Reqs:$R %s (%s)  $B$7Mana:$R %-3d  $B$7Class:$R ",
-               UPPER(*r_skills[ranger].skillname),r_skills[ranger].skillname+1,attrname(r_skills[ranger].attrs[0]),
-               attrname(r_skills[ranger].attrs[1]),spell_info[ranger].min_usesmana);
+         sprintf(buf + strlen(buf), "$B$7Spell:$R %c%-20s  $B$7Mana:$R %-3d  $B$7Class:$R ",
+               UPPER(*r_skills[ranger].skillname),r_skills[ranger].skillname+1,spell_info[ranger].min_usesmana);
       } else if(druid) {
-         sprintf(buf + strlen(buf), "$B$7Spell:$R %c%-20s  $B$7Reqs:$R %s (%s)  $B$7Mana:$R %-3d  $B$7Class:$R ",
-               UPPER(*u_skills[druid].skillname),u_skills[druid].skillname+1,attrname(u_skills[druid].attrs[0]),
-               attrname(u_skills[druid].attrs[1]),spell_info[druid].min_usesmana);
+         sprintf(buf + strlen(buf), "$B$7Spell:$R %c%-20s  $B$7Mana:$R %-3d  $B$7Class:$R ",
+               UPPER(*u_skills[druid].skillname),u_skills[druid].skillname+1,spell_info[druid].min_usesmana);
       } else continue;
 
       strcat(buf, buf2);
