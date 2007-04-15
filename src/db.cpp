@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.152 2007/04/08 23:30:07 shane Exp $ */
+/* $Id: db.cpp,v 1.153 2007/04/15 00:42:49 dcastle Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -1323,6 +1323,7 @@ struct index_data *generate_obj_indices(int *top,
          break;
      }
      else {
+       fprintf(stderr, "Error in \'%s\'.\n\r", endfile);
        perror("generate obj indices");
        abort();
      }
@@ -1918,7 +1919,7 @@ void boot_world(void)
     for(;!world_array[pItem->firstnum]; pItem->firstnum++)
       ;
 
-    pItem->lastnum = room_nr;
+    pItem->lastnum = room_nr / 100 * 100 + 99;
 
     room_nr++;
 
