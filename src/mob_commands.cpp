@@ -1771,10 +1771,10 @@ int do_mppeace( struct char_data *ch, char *argument, int cmd )
 	  	mob_index[ch->mobdata->nr].virt );
 	    return eFAILURE;
       }
-      if ( IS_MOB(rch) && rch->mobdata->hatred != NULL )
-        remove_memory(rch, 'h');
-      if ( rch->fighting != NULL )
-        stop_fighting(rch);
+      if ( IS_MOB(vict) && vict->mobdata->hatred != NULL )
+        remove_memory(vict, 'h');
+      if ( vict->fighting != NULL )
+        stop_fighting(vict);
      return eSUCCESS;
     }
     for (rch = world[ch->in_room].people; rch!=NULL; rch = rch->next_in_room) {
