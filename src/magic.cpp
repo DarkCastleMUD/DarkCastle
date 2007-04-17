@@ -240,19 +240,20 @@ int spell_chill_touch(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
   save = saves_spell(ch, victim, (level/2), SAVE_TYPE_COLD);
   if(save < 0 && skill > 50) // if failed
    {
+    if (affected_by_spell(victim, SPELL_CHILL_TOUCH)) return retval;
     af.type      = SPELL_CHILL_TOUCH;
     af.duration  = skill/18;
     af.modifier  = - skill/18;
     af.location  = APPLY_STR;
     af.bitvector = -1;
-    affect_join(victim, &af, TRUE, FALSE);
+    affect_to_char(victim, &af);
 
 	/* Spellcraft Effect */
     if (hasSpellcraft)
          {
 	  af.modifier = - skill/18;
 	  af.location = APPLY_DEX;
-	  affect_join(victim, &af, TRUE, FALSE);
+	  affect_to_char(victim, &af);
 	 }
    } 
   return retval;
