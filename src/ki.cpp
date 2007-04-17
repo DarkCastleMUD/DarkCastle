@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.63 2007/02/15 21:42:19 shane Exp $ */
+/* $Id: ki.cpp,v 1.64 2007/04/17 09:43:55 urizen Exp $ */
 
 extern "C"
 {
@@ -425,8 +425,8 @@ int ki_blast( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
       int prev = GET_HIT(vict);
       
       strcpy(name, GET_SHORT(vict));
-      GET_POS(vict) = POSITION_SITTING;
       int retval = damage(ch,vict,100, TYPE_KI,KI_OFFSET+KI_BLAST,0);
+      GET_POS(vict) = POSITION_SITTING;
       if(!SOMEONE_DIED(retval)) {
         sprintf(buf, "$B%d$R", prev - GET_HIT(vict));
         send_damage("$N is blasted across the room by $n for | damage!", ch, 0, vict, buf,
