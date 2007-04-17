@@ -1948,10 +1948,6 @@ int do_oclone(struct char_data *ch, char *argument, int cmd)
   char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
   argument = one_argument(argument, arg1);
   one_argument(argument, arg2);
-  if (!has_skill(ch, COMMAND_OCLONE))
-  {
-     send_to_char("Huh?\r\n",ch); return eFAILURE;   
-  }
   if (!arg1[0] || !arg2[0] || !is_number(arg1) || !is_number(arg2))
   {
     send_to_char("Syntax: oclone <destination vnum> <source vnum>\r\n",ch);
@@ -1997,10 +1993,6 @@ int do_mclone(struct char_data *ch, char *argument, int cmd)
   char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
   argument = one_argument(argument, arg1);
   one_argument(argument, arg2);
-  if (!has_skill(ch, COMMAND_OCLONE))
-  {
-     send_to_char("Huh?\r\n",ch); return eFAILURE;   
-  }
   if (!arg1[0] || !arg2[0] || !is_number(arg1) || !is_number(arg2))
   {
     send_to_char("Syntax: mclone <destination vnum> <source vnum>\r\n",ch);
