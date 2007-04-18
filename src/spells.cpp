@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.220 2007/04/18 21:56:23 dcastle Exp $ */
+/* $Id: spells.cpp,v 1.221 2007/04/18 23:15:14 dcastle Exp $ */
 
 extern "C"
 {
@@ -1939,7 +1939,7 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
           chance = 50;
         }
         else
-	chance = 50;
+	chance = 38;
 	
 
 	chance += learned / 2;
@@ -1948,7 +1948,7 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
 	  chance += int_app[GET_INT(ch)].conc_bonus;
 	else 
           chance += wis_app[GET_WIS(ch)].conc_bonus;
-	chance = MIN(95, chance);
+	chance = MIN(97, chance);
 	int o = GET_LEVEL(ch)*2+1;
         if (chance > o) o = chance + 1;
 	if (o > 101) o = 101; // imms/mobs
