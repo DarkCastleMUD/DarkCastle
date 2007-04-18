@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.h,v 1.76 2007/04/04 22:49:00 dcastle Exp $ */
+/* $Id: interp.h,v 1.77 2007/04/18 21:56:25 dcastle Exp $ */
 
 #ifndef INTERP_H_
 #define INTERP_H_
@@ -71,6 +71,7 @@ DO_FUN do_thing;
 DO_FUN  do_reload;
 DO_FUN  do_abandon;
 DO_FUN  do_accept;
+DO_FUN  do_acfinder;
 DO_FUN  do_action;
 DO_FUN  do_addnews;
 DO_FUN  do_addRoom;
@@ -123,7 +124,6 @@ DO_FUN  do_cinfo;
 DO_FUN  do_circle;
 DO_FUN  do_clans; 
 DO_FUN  do_clear;
-DO_FUN  do_testhand;
 DO_FUN  do_clearaff;
 DO_FUN  do_climb;
 DO_FUN  do_close;
@@ -402,6 +402,8 @@ DO_FUN  do_tap;
 DO_FUN  do_taste;
 DO_FUN  do_teleport;
 DO_FUN  do_tell;
+DO_FUN  do_testhand;
+DO_FUN  do_testhit;
 DO_FUN  do_thunder;
 DO_FUN	do_tick;
 DO_FUN  do_time;

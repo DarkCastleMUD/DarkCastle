@@ -553,6 +553,10 @@ void translate_value(char *leftptr, char *rightptr, int16 **vali, uint32 **valui
 		{
 		   if (!target) tError = TRUE;
 		  else intval = &target->saves[SAVE_TYPE_FIRE];
+		} else if (!str_cmp(right,"flags"))
+		{
+		  if (!rtarget) tError = TRUE;
+		  else uintval = &world[rtarget].room_flags;
 		}
 		break;
 	case 'g':

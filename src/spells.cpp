@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.219 2007/04/13 11:08:56 shane Exp $ */
+/* $Id: spells.cpp,v 1.220 2007/04/18 21:56:23 dcastle Exp $ */
 
 extern "C"
 {
@@ -1516,21 +1516,16 @@ bool skill_success(CHAR_DATA *ch, CHAR_DATA *victim, int skillnum, int mod )
 	else if (GET_LEVEL(ch) < 50) i =40;
 	else if (GET_LEVEL(ch) < 70) i =60;
 	else if (GET_LEVEL(ch) < 90) i =70;
-	else i =75;
+	else i = 75;
    }
     if (stat && victim)
 	i -= stat_mod[get_stat(victim,stat)] * GET_LEVEL(ch) / 50; // less impact on low levels..
   i += mod;
-//  if (i < 55) i = 55;
 
-  if (GET_CLASS(ch) == CLASS_MAGIC_USER || GET_CLASS(ch) == CLASS_ANTI_PAL 
-	|| GET_CLASS(ch) == CLASS_THIEF )
-       i += int_app[GET_INT(ch)].conc_bonus;
-  else i += wis_app[GET_WIS(ch)].conc_bonus;
-
+  i = 50 + i / 2;
 
   if (skillnum != SKILL_THIRD_ATTACK && skillnum != SKILL_SECOND_ATTACK && skillnum != SKILL_DUAL_WIELD)
-    i = MIN(95, i);
+    i = MIN(96, i);
   else i = MIN(98,i);
 
   i = skillmax(ch, skillnum, i);
@@ -1937,22 +1932,7 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
         send_to_char("Sorry, this magic has not yet been implemented :(\n\r", ch);
       else 
       {
-/****
-| The new one:  people have a skill that runs from 0 to 100.  So we roll a 
-|   random number between 1 and 105 (inclusive).  We take their skill, and
-|   subtract some amount based on their wisdom (it does something now!); bonuses
-|   to people with over 20 wisdom (it adds instead of subtracting).  So
-|   with 25 you could still conceivably fail on a really crappy roll, but only
-|   1/105 chance ;).  Mobs have 0 wisdom, and so are except.  If the random
-|   number is higher than their modified skill, they fail the spell.  Otherwise
-|   it works. Morc 24 Apr 1997
-| Modified: 
-|   Skills should only go to 99 max. -pir
-*/
-        // make sure we don't count any specialization in the casting:)
-        learned = learned % 100;
-
-        int chance;
+	int chance;
 
         if(IS_MOB(ch)) {
           learned = GET_LEVEL(ch);

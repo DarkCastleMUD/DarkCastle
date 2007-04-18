@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: db.h,v 1.24 2007/04/03 12:09:07 dcastle Exp $ */
+/* $Id: db.h,v 1.25 2007/04/18 21:56:25 dcastle Exp $ */
 #ifndef DB_H_
 #define DB_H_
 
@@ -122,7 +122,7 @@ struct obj_data  *read_object(int nr, FILE *fl, bool zz = FALSE);
 CHAR_DATA *read_mobile(int nr, FILE *fl);
 struct obj_data  *clone_object(int nr);
 CHAR_DATA *clone_mobile(int nr);
-
+extern int top_of_objt;
 
 extern time_t start_time; /* mud start time */
 

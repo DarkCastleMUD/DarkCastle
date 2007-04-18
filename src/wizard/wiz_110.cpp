@@ -816,3 +816,86 @@ r_new_meta_platinum_cost(0,moves_plats_spent(victim))+GET_RAW_MOVE(victim)-GET_M
   send_to_char(buf,ch);
   return eSUCCESS;
 }
+
+
+int do_acfinder(CHAR_DATA *ch, char *argument, int cmdnum)
+{
+  char arg[MAX_STRING_LENGTH];
+  argument = one_argument(argument,arg);
+
+  if (!arg[0])
+  {
+      send_to_char("Syntax: acfinder <wear slot>\r\n",ch);
+      return eFAILURE;
+  }
+  extern char *wear_bits[];
+  int i = 1;
+  for (; wear_bits[i][0] != '\n'; i++)
+     if (!str_cmp(wear_bits[i],arg))
+       break;
+  if (wear_bits[i][0] == '\n')
+  {
+      send_to_char("Syntax: acfinder <wear slot>\r\n",ch);
+      return eFAILURE;
+  }
+  i = 1 << i;
+  int r,o = 1;
+  OBJ_DATA *obj;
+  char buf[MAX_STRING_LENGTH];
+  for (r = 0; r < top_of_objt; r++)
+  {
+    obj = (OBJ_DATA*) obj_index[r].item;
+    if (GET_ITEM_TYPE(obj) != ITEM_ARMOR) continue;
+    if (!CAN_WEAR(obj, i)) continue;
+    int ac = 0 - obj->obj_flags.value[0];
+    for (int z = 0; z < obj->num_affects; z++)
+       if (obj->affected[z].location == APPLY_ARMOR)
+	 ac += obj->affected[z].modifier;
+    sprintf(buf, "$B%s%d. %-50s Vnum: %d AC Apply: %d\r\n$R",
+		o%2==0?"$2":"$1",o, obj->short_description, obj_index[r].virt, ac);
+    send_to_char(buf,ch);
+    o++;
+    if (o == 150) { send_to_char("Max number of items hit.\r\n",ch); return eSUCCESS; }
+  }
+  return eSUCCESS;
+}
+
+int do_testhit(char_data *ch, char *argument, int cmd)
+{
+ char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
+ argument = one_argument(argument, arg1);
+ argument = one_argument(argument, arg2);
+ argument = one_argument(argument, arg3);
+  
+ if (!arg3[0])
+ {
+    send_to_char("Syntax: <tohit> <level> <target level>\r\n",ch);
+    return eFAILURE;
+ }
+ int toHit = atoi(arg1), tlevel = atoi(arg3), level = atoi(arg2);
+ float lvldiff = level - tlevel;
+
+ if (lvldiff > 15 && lvldiff < 25) toHit += 5;
+ else if (lvldiff > 5) toHit += 7;
+ else if (lvldiff >= 0) toHit += 10;
+ else if (lvldiff >= -5) toHit += 7;
+
+ float lvl = (50.0 - level - tlevel / 2.0)/10.0;
+
+ if (lvl >= 1.0) 
+   toHit *= lvl;
+
+ for (int AC = 100; AC > -1010; AC -= 10)
+ {
+   float num1 = 1.0 - (-300.0 - (float)AC) * 4.761904762 * 0.0001;
+   float num2 = 20.0 + (-300.0 - (float)AC) * 0.0095238095;
+
+   float percent = 30+num1*(float)(toHit)-num2;
+
+   csendf(ch, "%d AC - %f%% chance to hit\r\n", AC, 
+			percent);
+
+  }
+  return eSUCCESS;
+
+}

@@ -4349,7 +4349,7 @@ int do_rstat(struct char_data *ch, char *argument, int cmd)
 
             send_to_char("Room flags: ", ch);
             sprintbit((long) rm->room_flags,room_bits,buf);
-            strcat(buf,"\n\r");
+	    sprintf(buf,"%s [ %u ]\r\n", buf, rm->room_flags);
             send_to_char(buf,ch);
 
             send_to_char("Description:\n\r", ch);

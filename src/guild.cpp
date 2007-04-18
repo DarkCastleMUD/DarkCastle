@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.115 2007/04/13 11:08:56 shane Exp $
+| $Id: guild.cpp,v 1.116 2007/04/18 21:56:23 dcastle Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -223,17 +223,17 @@ char *attrname(int clss, int attr)
   switch (attr)
   {
     case STRDEX:
-      if(clss == CLASS_WARRIOR)		return "Offensive Tactics";
+      if(clss == CLASS_WARRIOR)		return "Offensive";
       else if(clss == CLASS_THIEF)	return "Assassination";
-      else if(clss == CLASS_ANTI_PAL)	return "Combat Training";
-      else if(clss == CLASS_MONK)	return "Tiger Style";
-      else if(clss == CLASS_RANGER)	return "Combat Training";
-      else if(clss == CLASS_BARD)	return "Physical Training";
+      else if(clss == CLASS_ANTI_PAL)	return "Combat";
+      else if(clss == CLASS_MONK)	return "Tiger";
+      else if(clss == CLASS_RANGER)	return "Physical Prowess";
+      else if(clss == CLASS_BARD)	return "Melee";
       else if(clss == CLASS_DRUID)	return "Retribution";
       else return "ERR1";
     case STRCON:
-      if(clss == CLASS_WARRIOR)		return "Defensive Tactics";
-      else if(clss == CLASS_PALADIN)	return "Judgment";
+      if(clss == CLASS_WARRIOR)		return "Defensive";
+      else if(clss == CLASS_PALADIN)	return "Judgement";
       else if(clss == CLASS_BARBARIAN)	return "Fury";
       else if(clss == CLASS_RANGER)	return "Feral Summoning";
       else if(clss == CLASS_DRUID)	return "Prevention";
@@ -251,13 +251,13 @@ char *attrname(int clss, int attr)
       else return "ERR4";
     case DEXCON:
       if(clss == CLASS_BARBARIAN)	return "Reflex";
-      else if(clss == CLASS_BARD)	return "Combat";
+      else if(clss == CLASS_BARD)	return "Assault";
       else return "ERR5";
     case DEXINT:
-      if(clss == CLASS_WARRIOR)		return "Strategic Manouvers";
+      if(clss == CLASS_WARRIOR)		return "Strategy";
       else if(clss == CLASS_THIEF)	return "Subtlety";
       else if(clss == CLASS_ANTI_PAL)	return "Treachery";
-      else if(clss == CLASS_PALADIN)	return "Martial Training";
+      else if(clss == CLASS_PALADIN)	return "Battle";
       else if(clss == CLASS_RANGER)	return "Hunter's Lore";
       else if(clss == CLASS_CLERIC)	return "Augury";
       else if(clss == CLASS_MAGIC_USER)	return "Enchantment";
@@ -265,23 +265,23 @@ char *attrname(int clss, int attr)
     case DEXWIS:
       if(clss == CLASS_THIEF)		return "Deception";
       else if(clss == CLASS_BARBARIAN)	return "Arsenal";
-      else if(clss == CLASS_MONK)	return "Monkey Style";
+      else if(clss == CLASS_MONK)	return "Monkey";
       else if(clss == CLASS_DRUID)	return "Natural";
       else if(clss == CLASS_CLERIC)	return "Divinity";
       else if(clss == CLASS_MAGIC_USER)	return "Invocation";
       else return "ERR7";
     case CONINT:
-      if(clss == CLASS_THIEF)		return "Combat Training";
+      if(clss == CLASS_THIEF)		return "Martial";
       else if(clss == CLASS_ANTI_PAL)	return "Desecration";
-      else if(clss == CLASS_MONK)	return "Dragon Style";
+      else if(clss == CLASS_MONK)	return "Dragon";
       else if(clss == CLASS_BARD)	return "Charm";
       else if(clss == CLASS_DRUID)	return "Elemental";
       else return "ERR8";
     case CONWIS:
-      if(clss == CLASS_WARRIOR)		return "Weapon Proficiencies";
+      if(clss == CLASS_WARRIOR)		return "Weapons";
       else if(clss == CLASS_ANTI_PAL)	return "Necromancy";
       else if(clss == CLASS_PALADIN)	return "Sanctification";
-      else if(clss == CLASS_MONK)	return "Crane Style";
+      else if(clss == CLASS_MONK)	return "Crane";
       else if(clss == CLASS_RANGER)	return "Protective Instincts";
       else if(clss == CLASS_BARD)	return "Enhancement";
       else if(clss == CLASS_DRUID)	return "Malediction";
@@ -329,8 +329,8 @@ void output_praclist(struct char_data *ch, class_skill_defines *skilllist)
       known = has_skill(ch, skilllist[i].skillnum);
       if(!known && GET_LEVEL(ch) < skilllist[i].levelavailable)
           continue;
-      known = known % 100;
-      sprintf(buf, " %c%-24s%s%14s $B$0($R%c %s%2d$B$0)$R   $B%2d$R   ", UPPER(*skilllist[i].skillname), (skilllist[i].skillname+1),
+//      known = known % 100;
+      sprintf(buf, " %c%-24s%s%14s $B$0($R%c%s%3d$B$0)$R   $B%2d$R   ", UPPER(*skilllist[i].skillname), (skilllist[i].skillname+1),
                    per_col(known), how_good(known),charthing(ch, known,skilllist[i].skillnum, skilllist[i].maximum), per_col(known), known,
 		skilllist[i].levelavailable);
       send_to_char(buf, ch);
@@ -400,28 +400,28 @@ void output_praclist(struct char_data *ch, class_skill_defines *skilllist)
         if(skilllist != g_skills) {
 	  sprintf(buf, " %s",attrname(GET_CLASS(ch), skilllist[i].attrs));
 	  send_to_char(buf, ch);
-        } else send_to_char(" General Skill", ch);
+        } else send_to_char(" General", ch);
       }
       if(skilllist[i].skillnum == SKILL_SONG_DISARMING_LIMERICK) { 
-        send_to_char("#\n\r", ch);
+        send_to_char("$B        #$R\n\r", ch);
       }
       else if(skilllist[i].skillnum == SKILL_SONG_FANATICAL_FANFARE) { 
-        send_to_char("#\n\r", ch);
+        send_to_char("$B  #$R\n\r", ch);
       }
       else if(skilllist[i].skillnum == SKILL_SONG_SEARCHING_SONG) { 
-        send_to_char("#\n\r", ch);
+        send_to_char("$B    #$R\n\r", ch);
       }
       else if(skilllist[i].skillnum == SKILL_SONG_VIGILANT_SIREN) { 
-        send_to_char("#\n\r", ch);
+        send_to_char("$B  #$R\n\r", ch);
       }
       else if(skilllist[i].skillnum == SKILL_SONG_MKING_CHARGE) { 
-        send_to_char("#\n\r", ch);
+        send_to_char("$B      #$R\n\r", ch);
       }
       else if(skilllist[i].skillnum == SKILL_SONG_HYPNOTIC_HARMONY) { 
-        send_to_char("#\n\r", ch);
+        send_to_char("$B        #$R\n\r", ch);
       }
       else if(skilllist[i].skillnum == SKILL_SONG_SHATTERING_RESO) { 
-        send_to_char("#\n\r", ch);
+        send_to_char("$B        #$R\n\r", ch);
       }
       else send_to_char("\n\r", ch);
     }
@@ -446,18 +446,21 @@ int skills_guild(struct char_data *ch, char *arg, struct char_data *owner)
     send_to_char("You can practice any of these skills:\n\r\r\n", ch);
 
     send_to_char("$BUniversal skills:$R\r\n",ch);
-    send_to_char(" Ability:                  Expertise:          Lvl:  Cost:      Skill Group:\r\n",ch);
+    send_to_char(" Ability:                  Expertise:          Lvl:  Cost:      Ability Group:\r\n",ch);
     send_to_char("--------------------------------------------------------------------------------\r\n",ch);
     output_praclist(ch, g_skills);
      extern char *pc_clss_types[];
     sprintf(buf, "\r\n$B%c%s skills:$R\r\n", UPPER(*pc_clss_types[GET_CLASS(ch)]), (1+pc_clss_types[GET_CLASS(ch)]));
     send_to_char(buf, ch);
-    send_to_char(" Ability:                  Expertise:          Lvl:  Cost:      Skill Group:\r\n",ch);
+    if (GET_CLASS(ch) != CLASS_MONK)
+    send_to_char(" Ability:                  Expertise:          Lvl:  Cost:      Ability Group:\r\n",ch);
+    else
+    send_to_char(" Ability:                  Expertise:          Lvl:  Cost:      Style:\r\n",ch);
     send_to_char("--------------------------------------------------------------------------------\r\n",ch);
     output_praclist(ch, skilllist);
      send_to_char("\r\n",ch);
     if(GET_CLASS(ch) == CLASS_BARD)
-       send_to_char("# denotes a song which requires an instrument.\n\r", ch);
+       send_to_char("$B#$R denotes a song which requires an instrument.\n\r", ch);
     send_to_char("$B*$R indicates this skill is at its maximum for your race and class.\r\n"
 		"$B+$R indicates you can still use practice sessions to improve this skill.\r\n"
 		"$B=$R indicates you must use this skill to continue improving.\r\n",ch);
@@ -1035,6 +1038,9 @@ int get_max(CHAR_DATA *ch, int skill)
      }
    }
 
+  if (skilllist == g_skills) 
+ 	return maximum;
+
    float percent = maximum*0.75;
 
    if (maximum && skilllist[i].attrs)
@@ -1076,4 +1082,22 @@ void check_maxes(CHAR_DATA *ch)
 	  if (curr) curr->learned = (int)percent;
        }
    }
+   skilllist = g_skills;
+   for(i = 0; *skilllist[i].skillname != '\n'; i++)
+     {
+       maximum = skilllist[i].maximum;
+
+       if (has_skill(ch,skilllist[i].skillnum) > maximum)
+       {
+	  struct char_skill_data * curr = ch->skills;
+
+  	  while(curr)
+    	  if(curr->skillnum == skilllist[i].skillnum)
+      	  break;
+    	  else curr = curr->next;
+
+	  if (curr) curr->learned = maximum;
+       }
+   }
+
 }

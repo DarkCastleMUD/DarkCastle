@@ -886,7 +886,7 @@ int do_mptransfer( CHAR_DATA *ch, char *argument, int cmd )
 	{
 	    if ( d->connected == CON_PLAYING
 	    &&   d->character != ch
-	    &&   d->character->in_room
+	    &&   d->character->in_room == ch->in_room
 	    &&   CAN_SEE( ch, d->character ) )
 	    {
 		char buf[MAX_STRING_LENGTH];
