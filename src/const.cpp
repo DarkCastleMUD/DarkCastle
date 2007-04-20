@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.239 2007/04/19 00:55:12 apocalypse Exp $ */
+/* $Id: const.cpp,v 1.240 2007/04/20 02:58:23 apocalypse Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1320,7 +1320,7 @@ struct class_skill_defines b_skills[] = { // barbarian skills
 
 //   Ability Name       Ability File            Level  Max   Requisites
 //   ------------       ------------            -----  ---   ----------
-{    "dual wield",      SKILL_DUAL_WIELD,         1,    85,  DEXWIS },
+{    "dual wield",      SKILL_DUAL_WIELD,         1,    85,  DEXCON },
 {    "bash",            SKILL_BASH,               2,    90,  STRINT },
 {    "kick",            SKILL_KICK,               3,    80,  STRINT },
 {    "parry",           SKILL_PARRY,              5,    70,  DEXCON },
