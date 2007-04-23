@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.116 2007/04/18 21:56:23 dcastle Exp $
+| $Id: guild.cpp,v 1.117 2007/04/23 20:57:21 dcastle Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -217,6 +217,23 @@ class_skill_defines * get_skill_list(char_data * ch)
 }
 void debug_here()
 {}
+
+char *attrstring(int attr)
+{
+  switch(attr) {
+    case STRDEX: return "Str/Dex";
+    case STRCON: return "Str/Con";
+    case STRINT: return "Str/Int";
+    case STRWIS: return "Str/Wis";
+    case DEXCON: return "Dex/Con";
+    case DEXINT: return "Dex/Int";
+    case DEXWIS: return "Dex/Wis";
+    case CONINT: return "Con/Int";
+    case CONWIS: return "Con/Wis";
+    case INTWIS: return "Int/Wis";
+    default: return "oh shit!";
+  }
+}
 
 char *attrname(int clss, int attr)
 {
@@ -960,7 +977,7 @@ if (ch->in_room && IS_SET(world[ch->in_room].room_flags, NOLEARN))
    percent = MIN(maximum, percent);
    percent = MAX(maximum*0.75, percent);
 
-   if(learned >= percent)
+   if(learned >= (int)percent)
      return;
 
    chance = number(1, 101);
@@ -1006,7 +1023,7 @@ void verify_max_stats(CHAR_DATA *ch)
           struct char_skill_data * curr = ch->skills;
           while(curr) {
 
-	   if (get_max(ch, curr->skillnum) < curr->learned)
+	   if (get_max(ch, curr->skillnum) && get_max(ch, curr->skillnum) < curr->learned)
 		curr->learned = get_max(ch, curr->skillnum);
 	
 	   curr = curr->next;
@@ -1069,6 +1086,8 @@ void check_maxes(CHAR_DATA *ch)
 
        percent = MIN(maximum, percent);
        percent = MAX(maximum*0.75, percent);
+
+       percent = (int)percent;
 
        if (has_skill(ch,skilllist[i].skillnum) > percent)
        {

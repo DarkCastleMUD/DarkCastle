@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.156 2007/04/10 15:35:13 dcastle Exp $ */
+/* $Id: mob_proc.cpp,v 1.157 2007/04/23 20:57:21 dcastle Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -1725,7 +1725,9 @@ static char *dethSayText [ ] =
   "Stromboli keeps telling offensive jokes. :( Can't you gods do something?",
   "I remember my first blowjob...I did so well the pastor told me I could skip church the next week!",
   "The Trinity? Or Jesus multiplaying?",
-  "If I ever had twins, I'd use one for parts."
+  "If I ever had twins, I'd use one for parts.",
+  "Unattended newbies will be sold to Madonna.",
+  "God? I have an imaginary friend too. His name is Bob."
 
 };
 

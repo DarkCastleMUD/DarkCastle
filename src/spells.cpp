@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.221 2007/04/18 23:15:14 dcastle Exp $ */
+/* $Id: spells.cpp,v 1.222 2007/04/23 20:57:21 dcastle Exp $ */
 
 extern "C"
 {
@@ -68,8 +68,8 @@ extern struct class_skill_defines k_skills[];
 extern struct class_skill_defines u_skills[];
 extern struct class_skill_defines c_skills[];
 extern struct class_skill_defines m_skills[];
+extern char * attrstring(int);
 extern CHAR_DATA *character_list;
-extern char *attrname(int);
 extern struct song_info_type song_info[];
 extern struct ki_info_type ki_info[];
 extern char *spell_wear_off_msg[];
@@ -1507,6 +1507,7 @@ bool skill_success(CHAR_DATA *ch, CHAR_DATA *victim, int skillnum, int mod )
        }
   int i = 0,learned = 0;
 
+ if (!IS_NPC(ch)) debug_point();
     if (!IS_MOB(ch)) {
         i = learned = has_skill(ch, skillnum);
         if(!learned) return FALSE;
@@ -1522,6 +1523,7 @@ bool skill_success(CHAR_DATA *ch, CHAR_DATA *victim, int skillnum, int mod )
 	i -= stat_mod[get_stat(victim,stat)] * GET_LEVEL(ch) / 50; // less impact on low levels..
   i += mod;
 
+  if (!IS_NPC(ch))
   i = 50 + i / 2;
 
   if (skillnum != SKILL_THIRD_ATTACK && skillnum != SKILL_SECOND_ATTACK && skillnum != SKILL_DUAL_WIELD)
@@ -1535,10 +1537,12 @@ skillnum <= SKILL_SONG_MAX) || (skillnum >= KI_OFFSET && skillnum <= (KI_OFFSET+
    i = 101; // auto success on songs and ki with focus
 
   int a = get_difficulty(skillnum);
-  int o = GET_LEVEL(ch)*2+1;
+/*  int o = GET_LEVEL(ch)*2+1;
   if (o > 101 || IS_NPC(ch)) o = 101;
   if (i > o) o = i+1;
-  if (i > number(1,o) || GET_LEVEL(ch) >= IMMORTAL)
+*/
+
+  if (i > number(1,101) || GET_LEVEL(ch) >= IMMORTAL)
   {
     if(skillnum != SKILL_ENHANCED_REGEN || ( skillnum == SKILL_ENHANCED_REGEN && GET_HIT(ch) + 50 < GET_MAX_HIT(ch) && ( GET_POS(ch) == POSITION_RESTING || GET_POS(ch) == POSITION_SLEEPING ) ) )
       skill_increase_check(ch,skillnum,learned,a+500);
@@ -1939,7 +1943,7 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
           chance = 50;
         }
         else
-	chance = 38;
+	chance = 40;
 	
 
 	chance += learned / 2;
@@ -1948,15 +1952,22 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
 	  chance += int_app[GET_INT(ch)].conc_bonus;
 	else 
           chance += wis_app[GET_WIS(ch)].conc_bonus;
-	chance = MIN(97, chance);
-	int o = GET_LEVEL(ch)*2+1;
-        if (chance > o) o = chance + 1;
-	if (o > 101) o = 101; // imms/mobs
-        if ((float)((float)chance/(float)o) < 0.4) chance = (int)(o*0.4);
+	extern int get_max(CHAR_DATA *ch, int skill);
+
+//	chance = MIN(get_max(ch, spl), chance);
+        if (GET_RACE(ch) == RACE_HUMAN)
+  	  chance = MIN(95, chance);
+	else
+	  chance = MIN(97, chance);
+//	int o = GET_LEVEL(ch)*2+1;
+ //       if (chance > o) o = chance + 1;
+//	if (o > 101) o = 101; // imms/mobs
+//        if ((float)((float)chance/(float)o) < 0.4) chance = (int)(o*0.4);
+
 	if (GET_LEVEL(ch) == 1) chance++;
         if(IS_AFFECTED(ch, AFF_CRIPPLE) && affected_by_spell(ch, SKILL_CRIPPLE))
            chance -= 1 + affected_by_spell(ch, SKILL_CRIPPLE)->modifier/10;
-        if(GET_LEVEL(ch) < IMMORTAL && number(1,o) > chance && !IS_AFFECTED(ch,AFF_FOCUS))
+        if(GET_LEVEL(ch) < IMMORTAL && number(1,101) > chance && !IS_AFFECTED(ch,AFF_FOCUS))
         {
           csendf(ch, "You lost your concentration and are unable to cast %s!\n\r", spells[spl-1]);
           GET_MANA(ch) -= (use_mana(ch, spl) >> 1);

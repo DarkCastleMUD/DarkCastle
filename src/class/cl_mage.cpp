@@ -67,7 +67,7 @@ SKILL_INCREASE_HARD);
   }
   if (spell == SPELL_SOLAR_GATE && a > 90)
   {
-    if (a < 98) skill_increase_check(ch, SKILL_SPELLCRAFT, a,
+    if (a < 100) skill_increase_check(ch, SKILL_SPELLCRAFT, a,
 SKILL_INCREASE_HARD);
     return eSUCCESS;
   }
