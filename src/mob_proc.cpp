@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.157 2007/04/23 20:57:21 dcastle Exp $ */
+/* $Id: mob_proc.cpp,v 1.158 2007/04/25 17:41:38 dcastle Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -1727,8 +1727,8 @@ static char *dethSayText [ ] =
   "The Trinity? Or Jesus multiplaying?",
   "If I ever had twins, I'd use one for parts.",
   "Unattended newbies will be sold to Madonna.",
-  "God? I have an imaginary friend too. His name is Bob."
-
+  "God? I have an imaginary friend too. His name is Bob.",
+  "Fuck it. I'm moving to 581 c."
 };
 
 // ENDOFCHAIN
