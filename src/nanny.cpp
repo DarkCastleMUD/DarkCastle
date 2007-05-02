@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.167 2007/03/26 05:32:51 jhhudso Exp $ */
+/* $Id: nanny.cpp,v 1.168 2007/05/02 03:48:54 jhhudso Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -1539,12 +1539,41 @@ is_race_eligible(ch,7)?'*':' ',is_race_eligible(ch,8)?'*':' ',is_race_eligible(c
           log(buf, IMMORTAL, LOG_MORTAL);
           if(d->character->clan)
              remove_clan_member(d->character->clan, d->character);
-          sprintf(buf, "rm -f %s/%c/%s", SAVE_DIR, d->character->name[0], d->character->name);
+
+	  extern short bport;
+	  char f[100];
+
+	  // Backup player file
+	  if (bport) {
+	    snprintf(f, 100, "mv %s/%c/%s ../archive/selfdeleted", BSAVE_DIR,
+		     d->character->name[0], d->character->name);
+	    system(f);
+	  } else {
+	    snprintf(f, 100, "mv %s/%c/%s ../archive/selfdeleted", SAVE_DIR,
+		     d->character->name[0], d->character->name);
+	    system(f);
+	  }
+
+	  // Backup golem/familiar files
+	  snprintf(f, 100, "mv %s/%c/%s.0 ../archive/selfdeleted", FAMILIAR_DIR,
+		   d->character->name[0], d->character->name);
+	  system(f);
+	  snprintf(f, 100, "mv %s/%c/%s.1 ../archive/selfdeleted", FAMILIAR_DIR,
+		   d->character->name[0], d->character->name);
+	  system(f);
+	  
+	  // Backup vault file
+	  snprintf(f, 100, "mv ../vaults/%c/%s.vault ../archive/selfdeleted",
+		   d->character->name[0], d->character->name);
+	  system(f);
+	  snprintf(f, 100, "mv ../vaults/%c/%s.vault.log ../archive/selfdeleted",
+		   d->character->name[0], d->character->name);
+	  system(f);
+
           update_wizlist(d->character);
           remove_vault(d->character->name);
           close_socket(d); 
           d = NULL;
-          system (buf);
        }
        else {
           STATE(d) = CON_SELECT_MENU;
