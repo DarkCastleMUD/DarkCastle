@@ -4656,18 +4656,18 @@ int spell_dispel_minor(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
    }
 
    int savebonus = 0;
-   if (skill < 41) savebonus = 20;
-   else if (skill < 61) savebonus = 15;
-   else if (skill < 81) savebonus = 10;
-   else savebonus = 5;
+   if (skill < 41) savebonus = 0;
+   else if (skill < 61) savebonus = -5;
+   else if (skill < 81) savebonus = -10;
+   else savebonus = -20;
     
-   if (spell && savebonus != 5)
+   if (spell && savebonus != -20)
    {
       send_to_char("You do not know this spell well enough to target it.\r\n",ch);
       return eFAILURE;
    }
    if (spell)
-     savebonus = 10; 
+     savebonus = -5; 
 
  set_cantquit( ch, victim );
    // If victim higher level, they get a save vs magic for no effect
@@ -4900,19 +4900,25 @@ int spell_dispel_magic(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
       victim = ch;
    }*/
    int savebonus = 0;
-        if (skill < 41) savebonus = 20;
-   else if (skill < 61) savebonus = 15;
-   else if (skill < 81) savebonus = 10;
-   else savebonus = 5;
+  if (IS_NPC(victim)) {
+        if (skill < 41) savebonus = 15;
+   else if (skill < 61) savebonus = 10;
+   else if (skill < 81) savebonus = 5;
+  } else {
+        if (skill < 41) savebonus = 5;
+   else if (skill < 61) savebonus = 0;
+   else if (skill < 81) savebonus = -5;
+   else savebonus = -10;
+  }
 
-   if (spell < 11 && spell > 0 && savebonus != 5) // spell-targetted cast
+   if (spell < 11 && spell > 0 && skill < 81) // spell-targetted cast
    {
       send_to_char("You do not yet know this spell well enough to target it.\r\n",ch);
       return eFAILURE;
    } 
 
    if (spell < 11 && spell > 0)
-     savebonus = 20;
+     savebonus = 0;
 
 // If victim higher level, they get a save vs magic for no effect
 //      if((GET_LEVEL(victim) > GET_LEVEL(ch)) && 0 > saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC))
@@ -4922,11 +4928,11 @@ int spell_dispel_magic(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
 	act("$N resists your attempt to dispel magic!", ch, NULL, victim, TO_CHAR,0);
 	act("$N resists $n's attempt to dispel magic!", ch, NULL, victim, TO_ROOM,NOTVICT);
 	act("You resist $n's attempt to dispel magic!",ch,NULL,victim,TO_VICT,0);
-      if (IS_NPC(victim) && (!victim->fighting) && GET_POS(ch) > POSITION_SLEEPING) {
-         retval = attack(victim, ch, TYPE_UNDEFINED);
-         retval = SWAP_CH_VICT(retval);
-         return retval;
-      }
+        if (IS_NPC(victim) && (!victim->fighting) && GET_POS(ch) > POSITION_SLEEPING) {
+          retval = attack(victim, ch, TYPE_UNDEFINED);
+          retval = SWAP_CH_VICT(retval);
+          return retval;
+       }
 
      return eFAILURE;
    }

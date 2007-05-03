@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.64 2007/04/17 09:43:55 urizen Exp $ */
+/* $Id: ki.cpp,v 1.65 2007/05/03 21:11:02 dcastle Exp $ */
 
 extern "C"
 {
@@ -697,10 +697,19 @@ int ki_disrupt( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim)
       return eFAILURE;
    }
 
+
+   int savebonus = 0;
+
+   if (learned < 41) savebonus = 10;
+   else if (learned < 61) savebonus = 5;
+   else if (learned < 81) savebonus = 0;
+   else savebonus = -5;
+
+
    if (IS_NPC(victim))
-     success_chance = learned - get_saves(victim, SAVE_TYPE_MAGIC) - (GET_LEVEL(victim)/3);
+     success_chance = 100 - get_saves(victim, SAVE_TYPE_MAGIC) - savebonus - (GET_LEVEL(victim)/4);
    else
-     success_chance = learned - get_saves(victim, SAVE_TYPE_MAGIC);
+     success_chance = 90 - get_saves(victim, SAVE_TYPE_MAGIC) - savebonus;
      
    int retval = 0;
 

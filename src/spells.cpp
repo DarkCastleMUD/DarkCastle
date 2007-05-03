@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.222 2007/04/23 20:57:21 dcastle Exp $ */
+/* $Id: spells.cpp,v 1.223 2007/05/03 21:11:03 dcastle Exp $ */
 
 extern "C"
 {
@@ -1926,8 +1926,7 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
       if (spl != SPELL_VENTRILOQUATE) /* :-) */
 	say_spell(ch, spl, oldroom);
 
-	if ((spl != SPELL_MAGIC_MISSILE && spl != SPELL_FIREBALL) ||
-	  !spellcraft(ch,spl))
+	if (!spellcraft(ch, spl) || (spl != SPELL_MAGIC_MISSILE && spl != SPELL_FIREBALL) )
       WAIT_STATE(ch, spell_info[spl].beats);
 	else 
 	WAIT_STATE(ch, (int)(spell_info[spl].beats/1.5));

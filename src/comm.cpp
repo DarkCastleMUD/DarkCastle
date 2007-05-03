@@ -1276,7 +1276,10 @@ string calc_name(CHAR_DATA *ch, bool colour = FALSE)
       name = cond_colorcodes[6];
   }
 
-  name += ch->name;
+  if(!IS_NPC(ch)) name += ch->name;
+  else name += ch->short_desc;
+
+  name += NTEXT;
 
   return name;
 }
@@ -1388,12 +1391,26 @@ void generate_prompt(CHAR_DATA *ch, char *prompt)
 	  if (ch->fighting && ch->fighting->fighting) {
 	    sprintf(pro, "%s", calc_name(ch->fighting->fighting).c_str());
 	  }
+          else sprintf(pro, " ");
 	  break;
         case 'P':
 	  if (ch->fighting && ch->fighting->fighting) {
 	    sprintf(pro, "%s", calc_name(ch->fighting->fighting,TRUE).c_str());
 	  }
-         break;
+          else sprintf(pro, " ");
+        break;
+        case 'q':
+	  if (ch->fighting) {
+	    sprintf(pro, "%s", calc_name(ch->fighting).c_str());
+	  }
+          else sprintf(pro, " ");
+	  break;
+        case 'Q':
+	  if (ch->fighting) {
+	    sprintf(pro, "%s", calc_name(ch->fighting,TRUE).c_str());
+	  }
+          else sprintf(pro, " ");
+        break;
        case 'd':
          sprintf(pro, "%s", time_look[weather_info.sunlight]);
          break;
