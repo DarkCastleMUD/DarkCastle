@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.65 2007/05/03 21:11:02 dcastle Exp $ */
+/* $Id: ki.cpp,v 1.66 2007/05/04 13:10:07 apocalypse Exp $ */
 
 extern "C"
 {
@@ -667,13 +667,13 @@ int ki_disrupt( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim)
      int level_diff = GET_LEVEL(ch) - GET_LEVEL(victim);
 
      if (level_diff >= 0) {
-       success_chance = 5;
+       success_chance = 6;
      } else if (level_diff >= -20) {
-       success_chance = 3;
+       success_chance = 5;
      } else if (level_diff >= -100) {
-       success_chance = 1;
+       success_chance = 4;
      } else {
-       success_chance = 0;
+       success_chance = 1;
      }
 
      if (success_chance >= number(1,100)) {
