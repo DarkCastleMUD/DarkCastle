@@ -4656,9 +4656,9 @@ int spell_dispel_minor(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
    }
 
    int savebonus = 0;
-   if (skill < 41) savebonus = 0;
-   else if (skill < 61) savebonus = -5;
-   else if (skill < 81) savebonus = -10;
+   if (skill < 41) savebonus = -5;
+   else if (skill < 61) savebonus = -10;
+   else if (skill < 81) savebonus = -15;
    else savebonus = -20;
     
    if (spell && savebonus != -20)
