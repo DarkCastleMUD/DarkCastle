@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.62 2007/04/05 12:00:23 dcastle Exp $ */
+/* $Id: clan.cpp,v 1.63 2007/05/05 13:25:34 jhhudso Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -29,6 +29,9 @@ extern "C"
 #include <room.h> // CLAN_ROOM flag
 #include <returnvals.h>
 #include <spells.h>
+#include <fstream>
+#include <iostream>
+#include <sstream>
 
 extern CHAR_DATA *character_list;
 extern struct descriptor_data *descriptor_list;
@@ -57,6 +60,7 @@ char * clan_rights[] = {
    "area",
    "vault",
    "vaultlog",
+   "log",
    "\n"
 };
 
@@ -2046,6 +2050,7 @@ void do_leader_clans(CHAR_DATA *ch, char *arg, int cmd)
           "rights",
           "motd",
           "help",
+	  "log",
           "\n"
   };
 
@@ -2060,6 +2065,7 @@ void do_leader_clans(CHAR_DATA *ch, char *arg, int cmd)
           CLAN_RIGHTS_RIGHTS,
           CLAN_RIGHTS_INFO,
           0,
+	  CLAN_RIGHTS_LOG,
           -1
   };
 
@@ -2176,6 +2182,7 @@ void do_leader_clans(CHAR_DATA *ch, char *arg, int cmd)
                    " members - Shows list of current clan members\r\n"
                    " rights  - Shows/Changes clan members rights\r\n"
                    " motd    - Changes clan message of the day\r\n"
+		   " log     - Show clan log\r\n"
                    " help    - duh....\r\n"
                    "\r\n"
                    "$3Clan Members Rights$R\r\n"
@@ -2192,6 +2199,11 @@ void do_leader_clans(CHAR_DATA *ch, char *arg, int cmd)
                    , ch);
       break; 
     }
+  case 10: // log
+    {
+      show_clan_log(ch);
+      break;
+    }
     default: {
       send_to_char("Default hit in clans switch statement.\r\n", ch);
       return;
@@ -2199,6 +2211,40 @@ void do_leader_clans(CHAR_DATA *ch, char *arg, int cmd)
     }
   }
 }
+
+void log_clan(CHAR_DATA *ch, char *buf)
+{
+  stringstream fname;
+  ofstream fout;
+  fout.exceptions(ofstream::failbit | ofstream::badbit);
+  
+  try {
+    fname << "../lib/clans/clan" << ch->clan << ".log";
+    fout.open(fname.str().c_str(), ios_base::app);
+    fout << buf;
+    fout.close();
+  } catch (ofstream::failure e) {
+    stringstream errormsg;
+    errormsg << "Exception while writing to " << fname.str() << ".";
+    log(errormsg.str().c_str(), 108, LOG_MISC);
+  }
+}
+
+void show_clan_log(CHAR_DATA *ch)
+{
+  stringstream fname;
+
+  fname << "../lib/clans/clan" << ch->clan << ".log";
+
+  ifstream fin;
+  fin.open(fname.str().c_str());
+  stringstream buffer;
+  buffer << "The following are your clan's most recent log entries (Times are UTC):\n\r";
+  buffer << fin.rdbuf();
+
+  page_string(ch->desc, const_cast<char *>(buffer.str().c_str()), 1);
+}
+
 
 int needs_clan_command(char_data * ch)
 {
@@ -2423,9 +2469,22 @@ int do_cdeposit(CHAR_DATA *ch, char *arg, int cmd)
   }
   GET_GOLD(ch) -= dep;
   get_clan(ch)->balance += dep;
-  csendf(ch,"You deposit %d gold coins into your clan's account.\r\n",dep);
+  if (dep == 1) {
+    csendf(ch,"You deposit 1 gold coin into your clan's account.\r\n");
+  } else {
+    csendf(ch,"You deposit %d gold coins into your clan's account.\r\n",dep);
+  }
   save_clans();
-  do_save(ch,"",666);
+  do_save(ch,"",0);
+
+  char buf[MAX_INPUT_LENGTH];
+  if (dep == 1) {
+    snprintf(buf, MAX_INPUT_LENGTH, "%s deposited 1 gold coin in the clan bank account.\r\n", ch->name);
+  } else {
+    snprintf(buf, MAX_INPUT_LENGTH, "%s deposited %d gold coins in the clan bank account.\r\n", ch->name, dep);
+  }
+  log_clan(ch, buf);
+
   return eSUCCESS;
 }
 
@@ -2462,9 +2521,22 @@ int do_cwithdraw(CHAR_DATA *ch, char *arg, int cmd)
   }
   GET_GOLD(ch) += (int)wdraw;
   get_clan(ch)->balance -= wdraw;
-  csendf(ch,"You withdraw %d gold coins.",wdraw);
+  if (wdraw == 1) {
+    csendf(ch,"You withdraw 1 gold coin.\r\n",wdraw);
+  } else {
+    csendf(ch,"You withdraw %d gold coins.\r\n",wdraw);
+  }
   save_clans();
   do_save(ch, "", 0);
+
+  char buf[MAX_INPUT_LENGTH];
+  if (wdraw == 1) {
+    snprintf(buf, MAX_INPUT_LENGTH, "%s withdrew 1 gold coin from the clan bank account.\r\n", ch->name);
+  } else {
+    snprintf(buf, MAX_INPUT_LENGTH, "%s withdrew %ld gold coins from the clan bank account.\r\n", ch->name, wdraw);
+  }
+  log_clan(ch, buf);
+
   return eSUCCESS;
 }
 
