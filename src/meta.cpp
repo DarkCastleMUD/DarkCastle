@@ -1100,9 +1100,9 @@ void undo_race_saves(char_data * ch)
 
 bool is_race_applicable(char_data *ch, int race)
 {
-  if (GET_CLASS(ch) == CLASS_PALADIN && (race != RACE_HUMAN && race != RACE_ELVEN))
+  if (GET_CLASS(ch) == CLASS_PALADIN && (race != RACE_HUMAN && race != RACE_ELVEN && race != RACE_DWARVEN))
     return FALSE;
-  if (GET_CLASS(ch) == CLASS_ANTI_PAL && (race != RACE_HUMAN && race != RACE_ORC))
+  if (GET_CLASS(ch) == CLASS_ANTI_PAL && (race != RACE_HUMAN && race != RACE_ORC && race != RACE_DWARVEN))
     return FALSE;
   if (GET_CLASS(ch) == CLASS_BARBARIAN && race == RACE_PIXIE)
     return FALSE;

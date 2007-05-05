@@ -478,6 +478,18 @@ int do_rename_char(struct char_data *ch, char *arg, int cmd)
       sprintf(tmp,"%s %s",tmp, newname);
       victim->equipment[iWear]->name = str_hsh(tmp);
     }
+    if(victim->equipment[iWear] && victim->equipment[iWear]->obj_flags.type_flag == ITEM_CONTAINER)
+    {
+      for(obj = victim->equipment[iWear]->contains; obj ; obj = obj->next_content) {
+        if(IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL)) {
+          char tmp[256];
+          sprintf(tmp,"%s",obj->name);
+          tmp[strlen(tmp)-strlen(GET_NAME(victim))-1] = '\0';
+          sprintf(tmp,"%s %s",tmp, newname);
+          obj->name = str_hsh(tmp);
+        }
+      }
+    }
   }
  
   obj = victim->carrying;
@@ -491,7 +503,19 @@ int do_rename_char(struct char_data *ch, char *arg, int cmd)
       sprintf(tmp,"%s %s",tmp, newname);
       obj->name = str_hsh(tmp);
     }
-
+    if(GET_ITEM_TYPE(obj) == ITEM_CONTAINER)
+    {
+      OBJ_DATA *obj2;
+      for(obj2 = obj->contains; obj2 ; obj2 = obj2->next_content) {
+        if(IS_SET(obj2->obj_flags.extra_flags, ITEM_SPECIAL)) {
+          char tmp[256];
+          sprintf(tmp,"%s",obj2->name);
+          tmp[strlen(tmp)-strlen(GET_NAME(victim))-1] = '\0';
+          sprintf(tmp,"%s %s",tmp, newname);
+          obj2->name = str_hsh(tmp);
+        }
+      }
+    }
     obj = obj->next_content;
   }
 

@@ -512,6 +512,7 @@ void reload_vaults(void) {
 void rename_vault_owner(char *oldname, char *newname) {
   struct vault_data *vault;
   struct vault_access_data *access;
+  struct vault_items_data *items;
   char buf[MAX_INPUT_LENGTH];
   int num = 0;
 
@@ -525,6 +526,17 @@ void rename_vault_owner(char *oldname, char *newname) {
     sprintf(buf, "Vault owner changed from '%s' to '%s'.", oldname, newname);
     vault_log(buf, newname);
   }
+
+  for(items = vault->items; items; items = items->next) {
+    if(items->obj && IS_SET(items->obj->obj_flags.extra_flags, ITEM_SPECIAL)) {
+      char tmp[256];
+      sprintf(tmp,"%s",items->obj->name);
+      tmp[strlen(tmp)-strlen(oldname)-1] = '\0';
+      sprintf(tmp,"%s %s",tmp, newname);
+      items->obj->name = str_hsh(tmp);
+    }
+  }
+  save_vault(newname);
 
   for (vault = vault_table;vault;vault = vault->next, num++) {
     if (!num) continue; // skip 0 cause its null

@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.443 2007/05/03 21:11:02 dcastle Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.444 2007/05/05 22:23:39 dcastle Exp $ */
 
 extern "C"
 {
@@ -2414,28 +2414,34 @@ void send_damage(char *buf, CHAR_DATA *ch, OBJ_DATA *obj, CHAR_DATA *victim, cha
  TokenList *tokens,*tokens2;
  tokens = new TokenList(string1);
  tokens2 = new TokenList(string2);
+
+ if((IS_AFFECTED(ch, AFF_HIDE) || ISSET(ch->affected_by, AFF_FOREST_MELD)) && to != TO_CHAR) {
+   REMBIT(ch->affected_by, AFF_HIDE);
+   affect_from_char(ch, SPELL_FOREST_MELD);
+ }
+
  if (to == TO_ROOM) {
- for (tmpch = world[ch->in_room].people;tmpch;tmpch = tmpch->next_in_room)
- {
-    if (tmpch == ch || tmpch == victim) continue;
+   for (tmpch = world[ch->in_room].people;tmpch;tmpch = tmpch->next_in_room)
+   {
+     if (tmpch == ch || tmpch == victim) continue;
      if (!IS_NPC(tmpch) && IS_SET(tmpch->pcdata->toggles, PLR_DAMAGE))
 	send_message(tokens, ch, obj, victim, 0, tmpch);
      else
 	send_message(tokens2, ch, obj, victim, 0, tmpch);
-  }
-  } else if (to == TO_CHAR) {
+   }
+ } else if (to == TO_CHAR) {
      if (!IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_DAMAGE))
 	send_message(tokens, ch, obj, victim, 0, ch);
      else
 	send_message(tokens2, ch, obj, victim, 0, ch);
-  } else if (to == TO_VICT) {
+ } else if (to == TO_VICT) {
      if (!IS_NPC(victim) && IS_SET(victim->pcdata->toggles, PLR_DAMAGE))
 	send_message(tokens, ch, obj, victim, 0, victim);
      else
 	send_message(tokens2, ch, obj, victim, 0, victim);
-  }
-  delete tokens;
-  delete tokens2;
+ }
+ delete tokens;
+ delete tokens2;
 }
 
 
