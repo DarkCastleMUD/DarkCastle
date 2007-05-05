@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: who.cpp,v 1.45 2007/03/09 16:56:40 pirahna Exp $
+| $Id: who.cpp,v 1.46 2007/05/05 18:07:44 dcastle Exp $
 | who.C
 | Commands for who, maybe? :P
 */
@@ -219,7 +219,7 @@ int do_whosolo(struct char_data *ch, char *argument, int cmd)
     "$B$7($4:$7)=======================================================================($4:$7)\n\r"
     "$7|$5/$7|                      $5Current SOLO Adventurers                         $7|$5/$7|\n\r"
     "$7($4:$7)=======================================================================($4:$7)$R\n\r"
-    "   Name            Race      Class        Level  PKs Deaths Avg-vict-level\n\r", ch);
+    "   $BName            Race      Class        Level  PKs Deaths Avg-vict-level$R\n\r", ch);
 
    clear_who_buffer();
 
