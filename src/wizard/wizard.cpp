@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.55 2007/05/05 22:23:44 dcastle Exp $
+| $Id: wizard.cpp,v 1.56 2007/05/09 19:09:10 dcastle Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -1720,7 +1720,7 @@ void pick_up_item(struct char_data *ch, struct obj_data *obj)
                       if(search_char_for_item(ch, oitem->item_number)) {
                         send_to_char("The item's uniqueness causes it to poof into thin air!\r\n", ch);
                         extract_obj(oitem);
-                      }
+                      } else obj_to_char(oitem, ch);
                     }
 		    else obj_to_char(oitem, ch);
 		  } else {
