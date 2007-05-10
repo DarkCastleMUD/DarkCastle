@@ -442,8 +442,8 @@ int write_hotboot_file(char **new_argv)
   if(-1 == execv(argv[0], argv)) {
     log("Hotboot execv call failed.", 0, LOG_MISC);
     perror(argv[0]);
-    unlink("hotboot"); // wipe the file since we can't use it anyway
     chdir(DFLT_DIR);
+    unlink("hotboot"); // wipe the file since we can't use it anyway
     return 0;
   }
 
