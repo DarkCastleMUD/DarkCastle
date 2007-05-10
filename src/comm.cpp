@@ -218,6 +218,8 @@ void gettimeofday(struct timeval *t, struct timezone *dummy)
 *  main game loop and related stuff                                    *
 ********************************************************************* */
 
+char **orig_argv;
+
 int main(int argc, char **argv)
 {
   // Make a copy of our executable so that in the event of a crash we have a
@@ -228,6 +230,14 @@ int main(int argc, char **argv)
     cerr << "Unable to make backup of executable due to system error: "
 	 << retval << endl;
   }
+
+  fprintf(stderr, "Arguments: ");
+  orig_argv = argv;
+  int index=0;
+  do {
+    fprintf(stderr, "[%s] ", orig_argv[index++]);
+  } while (orig_argv[index] != 0);
+  fprintf(stderr, "\n");
 
   char buf[512];
   int pos = 1;
@@ -347,7 +357,7 @@ int main(int argc, char **argv)
 
 // writes all the descriptors to file so we can open them back up after
 // a reboot
-int write_hotboot_file() 
+int write_hotboot_file(char **new_argv) 
 {
   FILE *fp;
   struct descriptor_data *d;
@@ -410,21 +420,32 @@ int write_hotboot_file()
   fclose(fp);
   log("Hotboot descriptor file successfully written.", 0, LOG_MISC);
   
-  // note, for debug mode, you have to put the "-c", "6969", in there
-  if (!bport) {
-    if(-1 == execl("../src/research1", "research1",(char*)NULL)) {
+  chdir("../src/");
+
+  char **argv;
+  if (new_argv) {
+    argv = new_argv;
+  } else {
+    argv = orig_argv;
+  }
+  
+  // convert array to string
+  int index = 0;
+  stringstream argv_string;
+  while(argv[index] != 0) {
+    argv_string << argv[index++];
+    argv_string << " ";
+  }
+
+  logf(108, LOG_GOD, "Hotbooting %s.", argv_string.str().c_str());
+
+  if(-1 == execv(argv[0], argv)) {
     log("Hotboot execv call failed.", 0, LOG_MISC);
-    perror("../src/research1");
+    perror(argv[0]);
     unlink("hotboot"); // wipe the file since we can't use it anyway
+    chdir(DFLT_DIR);
     return 0;
-  } } 
-  else {
-    if(-1 == execl("../src/research1.b", "research1.b","-b", (char *)NULL)) {
-    log("Hotboot execv call failed.", 0, LOG_MISC);
-    perror("../src/research1.b");
-    unlink("hotboot"); // wipe the file since we can't use it anyway
-    return 0;
-  } } 
+  }
 
   return 1;
 }
@@ -2385,7 +2406,7 @@ void crash_hotboot()
       write_to_descriptor(d->descriptor,"Attempting to recover with a hotboot.\n\r");
     }
     log("Attempting to hotboot from the crash.", ANGEL, LOG_BUG);
-    write_hotboot_file();
+    write_hotboot_file(0);
     // we shouldn't return from there unless we failed
     log("Hotboot crash recovery failed.  Exiting.", ANGEL, LOG_BUG);
     for (d=descriptor_list;d && died_from_sigsegv < 2;d=d->next) {

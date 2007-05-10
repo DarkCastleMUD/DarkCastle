@@ -14,6 +14,7 @@
 #include <interp.h>
 #include <db.h>
 #include <returnvals.h>
+#include <comm.h>
 
 #ifdef BANDWIDTH
   #include <bandwidth.h>
@@ -76,6 +77,7 @@ int do_linkload(struct char_data *ch, char *arg, int cmd)
   act("$n gestures sharply and $N comes into existence!", ch,
       0, new_new, TO_ROOM, 0);
   act("You linkload $N.", ch, 0, new_new, TO_CHAR, 0); 
+  logf(108, LOG_GOD, "You linkload %s.", GET_NAME(new_new));
   return eSUCCESS;
 }
 
@@ -365,12 +367,11 @@ int do_global(struct char_data *ch, char *argument, int cmd)
 
 int do_shutdown(struct char_data *ch, char *argument, int cmd)
 {
-    char buf[MAX_INPUT_LENGTH];
-    char arg[MAX_INPUT_LENGTH];
-    int write_hotboot_file();
-    extern int _shutdown;
-    extern int try_to_hotboot_on_crash;
-    extern int do_not_save_corpses;
+  char buf[MAX_INPUT_LENGTH];
+  extern int _shutdown;
+  extern int try_to_hotboot_on_crash;
+  extern int do_not_save_corpses;
+  char **new_argv = 0;
 
     if (IS_NPC(ch))
         return eFAILURE;
@@ -380,38 +381,65 @@ int do_shutdown(struct char_data *ch, char *argument, int cmd)
         return eFAILURE;
     }
 
-    one_argument(argument, arg);
+    char arg1[MAX_INPUT_LENGTH];
+    argument = one_argument(argument, arg1);
 
-    if (!*arg) {
-        send_to_char("Syntax:  shutdown <hot/cold/auto>\n\r"
-                     "   hot: Keep players links active, and come back up.\n\r"
-                     "  cold: Go ahead and kill the links.\n\r"
-                     " crash: Crash the mud by referencing an invalid pointer.\n\r"
-                     "  core: Produce a core file.\n\r"
-                     "  auto: Toggle auto-hotboot on crash setting.\n\r"
-                     "   die: Kill boot script and crash mud so it won't reboot.\r\n", ch);
+    // If there was more than 1 argument, create an argument array
+    if (*argument != 0) {
+      char argN[MAX_INPUT_LENGTH];
+      queue<char *> arg_list;
+
+      while (*argument != 0) {
+	argument = one_argumentnolow(argument, argN);
+	arg_list.push(strdup(argN));
+      }
+
+      if (arg_list.size() > 0) {
+	new_argv = new char*[arg_list.size()+1];
+
+	int index = 0;
+	while (! arg_list.empty()) {
+	  new_argv[index++] = arg_list.front();
+	  arg_list.pop();
+	}
+
+	new_argv[index] = 0;
+      }
+    }
+
+    if (!*arg1) {
+        send_to_char("Syntax:  shutdown [sub command] [options ...]\n\r"
+		     " Sub Commands:\n\r"
+		     "--------------\n\r"
+                     "   hot - Rerun current DC filename and keep players' links active.\n\r"
+		     "         Options: [path/dc executable] [dc options ...]\n\r"
+                     "  cold - Go ahead and kill the links.\n\r"
+                     " crash - Crash the mud by referencing an invalid pointer.\n\r"
+                     "  core - Produce a core file.\n\r"
+                     "  auto - Toggle auto-hotboot on crash setting.\n\r"
+                     "   die - Kill boot script and crash mud so it won't reboot.\r\n", ch);
         return eFAILURE;
     }
 
-    if(!strcmp(arg, "cold")) {
+    if(!strcmp(arg1, "cold")) {
         sprintf(buf, "Shutdown by %s.\n\r", GET_SHORT(ch) );
         send_to_all(buf);
         log(buf, ANGEL, LOG_GOD);
         _shutdown = 1;
     }
-    else if(!strcmp(arg, "hot")) {
+    else if(!strcmp(arg1, "hot")) {
         do_not_save_corpses = 1;
         sprintf(buf, "Hot reboot by %s.\n\r", GET_SHORT(ch) );
         send_to_all(buf);
         log(buf, ANGEL, LOG_GOD);
         log("Writing sockets to file for hotboot recovery.", 0, LOG_MISC);
 	do_force(ch, "all save",123);
-        if(!write_hotboot_file()) {
+        if(!write_hotboot_file(new_argv)) {
            log("Hotboot failed.  Closing all sockets.", 0, LOG_MISC);
            send_to_char("Hot reboot failed.\n\r", ch);
         }
     }
-    else if(!strcmp(arg, "auto")) {
+    else if(!strcmp(arg1, "auto")) {
         if(try_to_hotboot_on_crash) {
           send_to_char("Mud will not try to hotboot when it crashes next.\n\r", ch);
           try_to_hotboot_on_crash = 0;
@@ -421,17 +449,17 @@ int do_shutdown(struct char_data *ch, char *argument, int cmd)
           try_to_hotboot_on_crash = 1;
         }
     }
-    else if(!strcmp(arg, "crash")) {
+    else if(!strcmp(arg1, "crash")) {
         // let's crash the mud!
         char_data * blahblah = NULL;
         int chode = blahblah->in_room;
         chode = 1; // we never get here, but it gets rid of the compile warning
     }
-    else if (!strcmp(arg, "core")) {
+    else if (!strcmp(arg1, "core")) {
       produce_coredump();
       log("Corefile produced.", IMMORTAL, LOG_BUG);
     }
-    else if(!strcmp(arg, "die")) {
+    else if(!strcmp(arg1, "die")) {
         fclose(fopen("died_in_bootup", "w"));
         try_to_hotboot_on_crash = 0;
         // let's crash the mud!

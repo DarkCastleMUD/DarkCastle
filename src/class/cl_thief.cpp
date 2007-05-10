@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.167 2007/04/07 21:55:51 shane Exp $
+| $Id: cl_thief.cpp,v 1.168 2007/05/10 06:38:41 jhhudso Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -130,18 +130,18 @@ int palm(CHAR_DATA *ch, struct obj_data *obj_object,
   { // Logging gold gets from corpses would just be too much.
     sprintf(log_buf, "%s palms %s[%d] from %s", GET_NAME(ch), obj_object->name, obj_index[obj_object->item_number].virt,
                 sub_object->name);
-    log(log_buf, 110, LOG_GIVE);
+    log(log_buf, IMP, LOG_OBJECTS);
     for(OBJ_DATA *loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
-      logf(IMP, LOG_GIVE, "The %s contained %s[%d]", obj_object->short_description, loop_obj->short_description,
+      logf(IMP, LOG_OBJECTS, "The %s contained %s[%d]", obj_object->short_description, loop_obj->short_description,
                           obj_index[loop_obj->item_number].virt);
 
 
   } else if (!sub_object && obj_object->obj_flags.type_flag != ITEM_MONEY) {
     sprintf(log_buf, "%s palms %s[%d] from room %d", GET_NAME(ch), obj_object->name, obj_index[obj_object->item_number].virt,
                 ch->in_room);
-    log(log_buf, 110, LOG_GIVE);
+    log(log_buf, IMP, LOG_OBJECTS);
     for(OBJ_DATA *loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
-      logf(IMP, LOG_GIVE, "The %s contained %s[%d]", obj_object->short_description, loop_obj->short_description,
+      logf(IMP, LOG_OBJECTS, "The %s contained %s[%d]", obj_object->short_description, loop_obj->short_description,
                         obj_index[loop_obj->item_number].virt);
   }
 
@@ -1640,7 +1640,7 @@ int do_slip(struct char_data *ch, char *argument, int cmd)
 
         sprintf(buf, "%s slips %d coins to %s", GET_NAME(ch), amount,
                 GET_NAME(vict));
-        log(buf, 110, LOG_GIVE);
+        log(buf, IMP, LOG_OBJECTS);
 
     
          if (IS_NPC(ch) || (GET_LEVEL(ch) < DEITY))
@@ -1791,7 +1791,7 @@ int do_slip(struct char_data *ch, char *argument, int cmd)
   */ 
         sprintf(buf, "%s slips %s to %s", GET_NAME(ch), obj->name,
                 GET_NAME(vict));
-        log(buf, 110, LOG_GIVE);
+        log(buf, IMP, LOG_OBJECTS);
 
       move_obj(obj, vict);
       act("$n slips $p to $N.", ch, obj, vict, TO_ROOM, GODS|NOTVICT);

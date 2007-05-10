@@ -1,7 +1,7 @@
 #ifndef FILEINFO_H_
 #define FILEINFO_H_
 /*
-| $Id: fileinfo.h,v 1.22 2006/12/28 11:18:50 jhhudso Exp $
+| $Id: fileinfo.h,v 1.23 2007/05/10 06:38:41 jhhudso Exp $
 | fileinfo.h
 | Description:  Contains information for loading files, ie "../lib", etc..
 */
@@ -9,7 +9,6 @@
  * Revision History                                                      *
  * 10/16/2003   Onager     Added FORBIDDEN_NAME_FILE                     *
  *************************************************************************/
-#ifndef WIN32
 #define  DFLT_DIR            "../lib"
 #define  SAVE_DIR            "../save"
 #define  BSAVE_DIR            "../bsave"
@@ -23,21 +22,6 @@
 #define  FORBIDDEN_NAME_FILE "../lib/forbidden_names.txt"
 #define  SKILL_QUEST_FILE    "../lib/skill_quests.txt"
 #define  FAMILIAR_DIR        "../familiar"
-#else
-#define DFLT_DIR             "lib"
-#define QSAVE_DIR	     "save/qdata"
-#define  SAVE_DIR            "save"
-#define  BSAVE_DIR            "bsave"
-#define  NEWSAVE_DIR         "newsave"
-#define  ARCHIVE_DIR         "archive"
-#define  MOB_DIR             "MOBProgs/"
-#define  BAN_FILE            "banned.txt"
-#define  SHOP_DIR            "shops"
-#define  PLAYER_SHOP_DIR     "playershops"
-#define  FORBIDDEN_NAME_FILE "forbidden_names.txt"
-#define SKILL_QUEST_FILE "skill_quests.txt"
-#define FAMILIAR_DIR		"familiar"
-#endif
 
 // TODO - Remove tinyworld.shp and divide the stops up into some meaningful
 //        format in their own directory like the world/mob/obj files
@@ -54,8 +38,8 @@
 #define  IMOTD_FILE         "motdimm.txt"
 #define  STORY_FILE         "story.txt"
 #define  TIME_FILE          "time.txt"
-#define  IDEA_FILE          "ideas.txt"
-#define  TYPO_FILE          "typos.txt"
+#define  IDEA_LOG           "ideas.log"
+#define  TYPO_LOG           "typos.log"
 #define  MESS_FILE          "messages.txt"
 #define  MESS2_FILE         "messages2.txt"
 #define  SOCIAL_FILE        "social.txt"
@@ -70,30 +54,17 @@
 #define  LEADERBOARD_FILE    "leaderboard.txt"
 #define  QUEST_FILE         "quests.txt"
 
-#ifndef WIN32
-#define BUG_FILE            "../log/bug.log"
-#define GOD_FILE            "../log/god.log"
-#define MORTAL_FILE         "../log/mortal.log"
-#define SOCKET_FILE         "../log/socket.log"
-#define PLAYER_FILE         "../log/player.log"
+#define BUG_LOG            "../log/bug.log"
+#define GOD_LOG            "../log/god.log"
+#define MORTAL_LOG         "../log/mortal.log"
+#define SOCKET_LOG         "../log/socket.log"
+#define PLAYER_LOG         "../log/player.log"
 #define PLAYER_DIR          "../log/player/"
 #define WORLD_LOG           "../log/world.log"
 #define ARENA_LOG           "../log/arena.log"
 #define CLAN_LOG            "../log/clan.log" 
-#define HMM_LOG             "../log/give.log" 
-#define SAC_LOG		    "../log/sacrifice.log"
-#else
-#define HMM_LOG            "give.log" 
-#define BUG_FILE            "bug.log"
-#define GOD_FILE            "god.log"
-#define MORTAL_FILE         "mortal.log"
-#define SOCKET_FILE         "socket.log"
-#define PLAYER_FILE         "player.log"
-#define WORLD_LOG           "world.log"
-#define ARENA_LOG           "arena.log"
-#define CLAN_LOG            "clan.log" 
-#define SAC_LOG 	    "sacrifice.log"
-#endif
+#define OBJECTS_LOG         "../log/objects.log" 
+
 #define  WORLD_INDEX_FILE  "worldindex"
 #define  OBJECT_INDEX_FILE "objectindex"
 #define  MOB_INDEX_FILE    "mobindex"

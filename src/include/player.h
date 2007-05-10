@@ -1,7 +1,7 @@
 #ifndef PLAYER_H_
 #define PLAYER_H_
 /************************************************************************
-| $Id: player.h,v 1.35 2007/04/13 11:08:59 shane Exp $
+| $Id: player.h,v 1.36 2007/05/10 06:38:41 jhhudso Exp $
 | player.h
 | Description: This file defines the player vectors..punishment, specials,
 |   etc...
@@ -38,8 +38,8 @@
 #define LOG_WARNINGS       1<<18
 #define LOG_HELP	   1<<19
 
-#define LOG_DATABASE	1<<20
-#define LOG_GIVE 1<<21
+#define LOG_DATABASE	   1<<20
+#define LOG_OBJECTS        1<<21
 #define CHANNEL_TELL       1<<22
 #define CHANNEL_HINTS      1<<23
 #define LOG_VAULT          1<<24

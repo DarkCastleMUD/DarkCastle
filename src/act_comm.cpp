@@ -154,8 +154,8 @@ int send_to_gods(const char *str, int god_level, long type)
     case LOG_HELP:
       sprintf(typestr, "help");
       break;
-    case LOG_GIVE:
-      sprintf(typestr, "give");
+    case LOG_OBJECTS:
+      sprintf(typestr, "objects");
       break;
     default:
       sprintf(typestr, "unknown");
@@ -218,7 +218,7 @@ int do_channel(struct char_data *ch, char *arg, int cmd)
     "warnings",
     "help",
     "database",   // 20
-    "give",
+    "objects",
     "tell",
     "hints",
     "vault",   

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: non_off.cpp,v 1.46 2007/03/16 22:43:39 shane Exp $
+| $Id: non_off.cpp,v 1.47 2007/05/10 06:38:41 jhhudso Exp $
 | non_off.C
 | Description:  Implementation of generic, non-offensive commands.
 */
@@ -46,8 +46,8 @@ void log_sacrifice(CHAR_DATA *ch, OBJ_DATA *obj, bool decay = FALSE)
 
   if(GET_OBJ_RNUM(obj) == NOWHERE) return;
 
-  if(!(fl = dc_fopen(SAC_LOG, "a"))) {
-    log("Could not open the sacrifice log file.", IMMORTAL, LOG_BUG);
+  if(!(fl = dc_fopen(OBJECTS_LOG, "a"))) {
+    log("Could not open the objects log file.", IMMORTAL, LOG_BUG);
     return;
   }
 
@@ -55,9 +55,17 @@ void log_sacrifice(CHAR_DATA *ch, OBJ_DATA *obj, bool decay = FALSE)
   tmstr = asctime(localtime(&ct));
   *(tmstr + strlen(tmstr) - 1) = '\0';
   if (!decay)
-    fprintf(fl, "%s :: %s just sacrificed %s [obj num: %d]\n", tmstr, GET_NAME(ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj));
+    fprintf(fl, "%s :: %s just sacrificed %s[%d]\n", tmstr, GET_NAME(ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj));
   else
-    fprintf(fl, "%s :: %s just poofed from decaying corpse %s [obj num: %d]\n", tmstr, GET_OBJ_SHORT((OBJ_DATA*)ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj));
+    fprintf(fl, "%s :: %s just poofed from decaying corpse %s[%d]\n", tmstr, GET_OBJ_SHORT((OBJ_DATA*)ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj));
+
+  for(OBJ_DATA *loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content) {
+    fprintf(fl, "%s :: The %s contained %s[%d]\n",
+	    tmstr,
+	    GET_OBJ_SHORT(obj),
+	    GET_OBJ_SHORT(loop_obj),
+	    GET_OBJ_VNUM(loop_obj));
+  }
 
   dc_fclose(fl);
 }
@@ -268,9 +276,9 @@ int do_donate(struct char_data *ch, char *argument, int cmd)
   if (obj->obj_flags.type_flag != ITEM_MONEY)
   {
      sprintf(log_buf, "%s donates %s[%d]", GET_NAME(ch), obj->name, obj_index[obj->item_number].virt);
-     log(log_buf, 110, LOG_GIVE);
+     log(log_buf, IMP, LOG_OBJECTS);
      for(OBJ_DATA *loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
-       logf(IMP, LOG_GIVE, "The %s contained %s[%d]", obj->short_description,
+       logf(IMP, LOG_OBJECTS, "The %s contained %s[%d]", obj->short_description,
                           loop_obj->short_description,
                           obj_index[loop_obj->item_number].virt);
   }

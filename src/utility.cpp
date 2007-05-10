@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.78 2007/05/03 21:11:03 dcastle Exp $ */
+/* $Id: utility.cpp,v 1.79 2007/05/10 06:38:41 jhhudso Exp $ */
 
 extern "C"
 {
@@ -210,15 +210,16 @@ int str_n_nosp_cmp( char *arg1, char *arg2, int size)
 }
 
 // TODO - Declare these in a more appropriate place
-FILE * bug_file = 0;
-FILE * god_file = 0;
-FILE * mortal_file = 0;
-FILE * socket_file = 0;
-FILE * player_file = 0;
+FILE * bug_log = 0;
+FILE * god_log = 0;
+FILE * mortal_log = 0;
+FILE * socket_log = 0;
+FILE * player_log = 0;
 FILE * world_log   = 0;
 FILE * arena_log   = 0;
 FILE * clan_log   = 0;
-FILE * hmm_log = 0;
+FILE * objects_log = 0;
+
 // writes a string to the log 
 void log( const char *str, int god_level, long type, char_data *vict)
 {
@@ -232,9 +233,9 @@ void log( const char *str, int god_level, long type, char_data *vict)
 	stream = 0;
 	break;
       case LOG_BUG:
-         f = &bug_file;
-         if(!(*f = dc_fopen(BUG_FILE, "a"))) {
-           fprintf(stderr, "Unable to open bug file.\n");
+         f = &bug_log;
+         if(!(*f = dc_fopen(BUG_LOG, "a"))) {
+           fprintf(stderr, "Unable to open bug log.\n");
            exit(1);
          }
 
@@ -247,39 +248,39 @@ void log( const char *str, int god_level, long type, char_data *vict)
 
 	break;
       case LOG_GOD:
-        f = &god_file;
-        if(!(*f = dc_fopen(GOD_FILE, "a"))) {
-          fprintf(stderr, "Unable to open god file.\n");
+        f = &god_log;
+        if(!(*f = dc_fopen(GOD_LOG, "a"))) {
+          fprintf(stderr, "Unable to open god log.\n");
           exit(1);
         }
 	break;
       case LOG_MORTAL:
-        f = &mortal_file;
-        if(!(*f = dc_fopen(MORTAL_FILE, "a"))) {
-          fprintf(stderr, "Unable to open mortal file.\n");
+        f = &mortal_log;
+        if(!(*f = dc_fopen(MORTAL_LOG, "a"))) {
+          fprintf(stderr, "Unable to open mortal log.\n");
           exit(1);
         }
  	break;
      case LOG_SOCKET:
-        f = &socket_file;
-        if(!(*f = dc_fopen(SOCKET_FILE, "a"))) {
-          fprintf(stderr, "Unable to open socket file: %s\n", SOCKET_FILE);
+        f = &socket_log;
+        if(!(*f = dc_fopen(SOCKET_LOG, "a"))) {
+          fprintf(stderr, "Unable to open socket log: %s\n", SOCKET_LOG);
           exit(1);
         }
 	break;
       case LOG_PLAYER:
-        f = &player_file;
+        f = &player_log;
         if (vict && vict->name) {
 	  stringstream filepath;
 	  filepath << PLAYER_DIR << vict->name;
           if(!(*f = dc_fopen(filepath.str().c_str(), "a"))) {
-            fprintf(stderr, "Unable to open player file '%s'.\n",
+            fprintf(stderr, "Unable to open player log '%s'.\n",
 		    filepath.str().c_str());
             exit(1);
           }
         } else {
-          if(!(*f = dc_fopen(PLAYER_FILE, "a"))) {
-            fprintf(stderr, "Unable to open player file.\n");
+          if(!(*f = dc_fopen(PLAYER_LOG, "a"))) {
+            fprintf(stderr, "Unable to open player log.\n");
             exit(1);
           }
         }
@@ -305,10 +306,10 @@ void log( const char *str, int god_level, long type, char_data *vict)
           exit(1);
         }
         break;
-      case LOG_GIVE:
-        f = &hmm_log;
-        if(!(*f = dc_fopen(HMM_LOG, "a"))) {
-          fprintf(stderr, "Unable to open give log.\n");
+      case LOG_OBJECTS:
+        f = &objects_log;
+        if(!(*f = dc_fopen(OBJECTS_LOG, "a"))) {
+          fprintf(stderr, "Unable to open objects log.\n");
           exit(1);
         }
         break;
@@ -892,9 +893,9 @@ int do_idea(struct char_data *ch, char *argument, int cmd)
 	return eFAILURE;
     }
 
-    if (!(fl = dc_fopen(IDEA_FILE, "a"))) {
+    if (!(fl = dc_fopen(IDEA_LOG, "a"))) {
 	perror ("do_idea");
-	send_to_char("Could not open the idea-file.\n\r", ch);
+	send_to_char("Could not open the idea log.\n\r", ch);
 	return eFAILURE;
     }
 
@@ -923,10 +924,10 @@ int do_typo(struct char_data *ch, char *argument, int cmd)
 	return eFAILURE;
     }
 
-    if (!(fl = dc_fopen(TYPO_FILE, "a")))
+    if (!(fl = dc_fopen(TYPO_LOG, "a")))
     {
 	perror ("do_typo");
-	send_to_char("Could not open the typo-file.\n\r", ch);
+	send_to_char("Could not open the typo log.\n\r", ch);
 	return eFAILURE;
     }
 
@@ -956,9 +957,9 @@ int do_bug(struct char_data *ch, char *argument, int cmd)
 	return eFAILURE;
     }
 
-    if (!(fl = dc_fopen(BUG_FILE, "a"))) {
+    if (!(fl = dc_fopen(BUG_LOG, "a"))) {
 	perror ("do_bug");
-	send_to_char("Could not open the bug-file.\n\r", ch);
+	send_to_char("Could not open the bug log.\n\r", ch);
 	return eFAILURE;
     }
 
@@ -1800,3 +1801,11 @@ void produce_coredump(void)
   return;
 }
 
+char *pluralize(int qty, char *ending)
+{
+  if (qty == 0 || qty > 1) {
+    return ending;
+  } else {
+    return "";
+  }
+}

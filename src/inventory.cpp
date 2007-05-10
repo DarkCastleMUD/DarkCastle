@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.95 2007/04/07 21:16:10 dcastle Exp $
+| $Id: inventory.cpp,v 1.96 2007/05/10 06:38:41 jhhudso Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -156,9 +156,9 @@ void get(struct char_data *ch, struct obj_data *obj_object, struct obj_data *sub
 	{ // Logging gold gets from corpses would just be too much.
   	    sprintf(log_buf, "%s gets %s[%d] from %s", GET_NAME(ch), obj_object->name, obj_index[obj_object->item_number].virt,
                 sub_object->name);
-	    log(log_buf, 110, LOG_GIVE);
+	    log(log_buf, 110, LOG_OBJECTS);
  	    for(OBJ_DATA *loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
-              logf(IMP, LOG_GIVE, "The %s contained %s[%d]",
+              logf(IMP, LOG_OBJECTS, "The %s contained %s[%d]",
                           obj_object->short_description,
                           loop_obj->short_description,
                           obj_index[loop_obj->item_number].virt);
@@ -182,9 +182,9 @@ void get(struct char_data *ch, struct obj_data *obj_object, struct obj_data *sub
         {
             sprintf(log_buf, "%s gets %s[%d] from room %d", GET_NAME(ch), obj_object->name, obj_index[obj_object->item_number].virt,
                 ch->in_room);
-            log(log_buf, 110, LOG_GIVE);
+            log(log_buf, IMP, LOG_OBJECTS);
             for(OBJ_DATA *loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
-              logf(IMP, LOG_GIVE, "The %s contained %s[%d]",
+              logf(IMP, LOG_OBJECTS, "The %s contained %s[%d]",
                           obj_object->short_description,
                           loop_obj->short_description,
                           obj_index[loop_obj->item_number].virt);
@@ -1048,9 +1048,9 @@ int do_drop(struct char_data *ch, char *argument, int cmd)
             if (tmp_object->obj_flags.type_flag != ITEM_MONEY)
             {
               sprintf(log_buf, "%s drops %s[%d] in room %d", GET_NAME(ch), tmp_object->name, obj_index[tmp_object->item_number].virt,ch->in_room);
-              log(log_buf, 110, LOG_GIVE);
+              log(log_buf, IMP, LOG_OBJECTS);
               for(OBJ_DATA *loop_obj = tmp_object->contains; loop_obj; loop_obj = loop_obj->next_content)
-                logf(IMP, LOG_GIVE, "The %s contained %s[%d]",
+                logf(IMP, LOG_OBJECTS, "The %s contained %s[%d]",
                           tmp_object->short_description,
                           loop_obj->short_description,
                           obj_index[loop_obj->item_number].virt);
@@ -1106,9 +1106,9 @@ int do_drop(struct char_data *ch, char *argument, int cmd)
           if (tmp_object->obj_flags.type_flag != ITEM_MONEY)
           {
             sprintf(log_buf, "%s drops %s[%d] in room %d", GET_NAME(ch), tmp_object->name, obj_index[tmp_object->item_number].virt,ch->in_room);
-            log(log_buf, 110, LOG_GIVE);
+            log(log_buf, IMP, LOG_OBJECTS);
             for(OBJ_DATA *loop_obj = tmp_object->contains; loop_obj; loop_obj = loop_obj->next_content)
-              logf(IMP, LOG_GIVE, "The %s contained %s[%d]",
+              logf(IMP, LOG_OBJECTS, "The %s contained %s[%d]",
                           tmp_object->short_description,
                           loop_obj->short_description,
                           obj_index[loop_obj->item_number].virt);
@@ -1406,9 +1406,9 @@ int do_give(struct char_data *ch, char *argument, int cmd)
       csendf(ch, "You give %lld coin%s to %s.\n\r", amount,
              amount == 1 ? "" : "s", GET_SHORT(vict));
 
-        sprintf(buf, "%s gives %lld coins to %s", GET_NAME(ch), amount,
-                GET_NAME(vict));
-        log(buf, 110, LOG_GIVE);
+        sprintf(buf, "%s gives %lld coin%s to %s", GET_NAME(ch), amount,
+                pluralize(amount), GET_NAME(vict));
+        log(buf, IMP, LOG_OBJECTS);
       
       sprintf(buf, "%s gives you %lld gold coin%s.", PERS(ch, vict), amount,
                amount == 1 ? "" : "s");
@@ -1577,9 +1577,9 @@ int do_give(struct char_data *ch, char *argument, int cmd)
 
     sprintf(buf, "%s gives %s to %s", GET_NAME(ch), obj->name,
                 GET_NAME(vict));
-    log(buf, 110, LOG_GIVE);
+    log(buf, IMP, LOG_OBJECTS);
     for(OBJ_DATA *loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
-              logf(IMP, LOG_GIVE, "The %s contained %s[%d]", 
+              logf(IMP, LOG_OBJECTS, "The %s contained %s[%d]", 
                           obj->short_description,
                           loop_obj->short_description,
                           obj_index[loop_obj->item_number].virt);

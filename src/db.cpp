@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.153 2007/04/15 00:42:49 dcastle Exp $ */
+/* $Id: db.cpp,v 1.154 2007/05/10 06:38:40 jhhudso Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -4546,7 +4546,7 @@ int file_to_string(const char *name, char *buf)
 
     if (!(fl = dc_fopen(name, "r")))
     {
-    perror("file-to-string");
+    perror(name);
     *buf = '\0';
     return(-1);
     }
