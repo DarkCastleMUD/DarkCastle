@@ -77,7 +77,7 @@ int do_linkload(struct char_data *ch, char *arg, int cmd)
   act("$n gestures sharply and $N comes into existence!", ch,
       0, new_new, TO_ROOM, 0);
   act("You linkload $N.", ch, 0, new_new, TO_CHAR, 0); 
-  logf(108, LOG_GOD, "You linkload %s.", GET_NAME(new_new));
+  logf(GET_LEVEL(ch), LOG_GOD, "%s linkloads %s.", GET_NAME(ch), GET_NAME(new_new));
   return eSUCCESS;
 }
 
