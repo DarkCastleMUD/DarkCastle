@@ -1,7 +1,7 @@
 #ifndef FILEINFO_H_
 #define FILEINFO_H_
 /*
-| $Id: fileinfo.h,v 1.23 2007/05/10 06:38:41 jhhudso Exp $
+| $Id: fileinfo.h,v 1.24 2007/05/12 10:43:13 jhhudso Exp $
 | fileinfo.h
 | Description:  Contains information for loading files, ie "../lib", etc..
 */
@@ -22,6 +22,7 @@
 #define  FORBIDDEN_NAME_FILE "../lib/forbidden_names.txt"
 #define  SKILL_QUEST_FILE    "../lib/skill_quests.txt"
 #define  FAMILIAR_DIR        "../familiar"
+#define  VAULT_DIR           "../vaults"
 
 // TODO - Remove tinyworld.shp and divide the stops up into some meaningful
 //        format in their own directory like the world/mob/obj files

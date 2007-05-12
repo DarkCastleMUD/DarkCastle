@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.169 2007/05/05 22:23:39 dcastle Exp $ */
+/* $Id: nanny.cpp,v 1.170 2007/05/12 10:43:13 jhhudso Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -1537,41 +1537,16 @@ is_race_eligible(ch,7)?'*':' ',is_race_eligible(ch,8)?'*':' ',is_race_eligible(c
        if(!strcmp(arg, "ERASE ME")) {
           sprintf(buf, "%s just deleted themself.  Their visit here must have sucked.", d->character->name);
           log(buf, IMMORTAL, LOG_MORTAL);
-          if(d->character->clan)
-             remove_clan_member(d->character->clan, d->character);
 
-	  extern short bport;
-	  char f[100];
-
-	  // Backup player file
-	  if (bport) {
-	    snprintf(f, 100, "mv %s/%c/%s ../archive/selfdeleted", BSAVE_DIR,
-		     d->character->name[0], d->character->name);
-	    system(f);
-	  } else {
-	    snprintf(f, 100, "mv %s/%c/%s ../archive/selfdeleted", SAVE_DIR,
-		     d->character->name[0], d->character->name);
-	    system(f);
+	  // To remove the vault from memory
+	  remove_familiars(d->character->name, SELFDELETED);
+	  remove_vault(d->character->name, SELFDELETED);
+          if(d->character->clan) {
+	    remove_clan_member(d->character->clan, d->character);
 	  }
-
-	  // Backup golem/familiar files
-	  snprintf(f, 100, "mv %s/%c/%s.0 ../archive/selfdeleted", FAMILIAR_DIR,
-		   d->character->name[0], d->character->name);
-	  system(f);
-	  snprintf(f, 100, "mv %s/%c/%s.1 ../archive/selfdeleted", FAMILIAR_DIR,
-		   d->character->name[0], d->character->name);
-	  system(f);
+	  remove_character(d->character->name, SELFDELETED);
 	  
-	  // Backup vault file
-	  snprintf(f, 100, "mv ../vaults/%c/%s.vault ../archive/selfdeleted",
-		   d->character->name[0], d->character->name);
-	  system(f);
-	  snprintf(f, 100, "mv ../vaults/%c/%s.vault.log ../archive/selfdeleted",
-		   d->character->name[0], d->character->name);
-	  system(f);
-
           update_wizlist(d->character);
-          remove_vault(d->character->name);
           close_socket(d); 
           d = NULL;
        }

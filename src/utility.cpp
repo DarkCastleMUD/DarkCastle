@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.79 2007/05/10 06:38:41 jhhudso Exp $ */
+/* $Id: utility.cpp,v 1.80 2007/05/12 10:43:13 jhhudso Exp $ */
 
 extern "C"
 {
@@ -55,6 +55,10 @@ extern "C"
 #include <fight.h>
 #include <returnvals.h>
 #include <set.h>
+
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 #include <iostream>
 #include <sstream>
@@ -1808,4 +1812,114 @@ char *pluralize(int qty, char *ending)
   } else {
     return "";
   }
+}
+
+void remove_character(char *name, BACKUP_TYPE backup)
+{
+  char src_filename[256];
+  char dst_dir[256] = {0};
+  char syscmd[512];
+  struct stat statbuf;
+  extern short bport;
+
+  if (name == NULL) {
+    return;
+  }
+
+  name[0] = UPPER(name[0]);
+
+  switch(backup) {
+  case SELFDELETED:
+    strncpy(dst_dir, "../archive/selfdeleted/", 256);
+    break;
+  case CONDEATH:
+    strncpy(dst_dir, "../archive/condeath/", 256);
+    break;
+  case ZAPPED:
+    strncpy(dst_dir, "../archive/zapped/", 256);
+    break;
+  case NONE:
+    break;
+  default:
+    logf(108, LOG_GOD, "remove_character passed invalid BACKUP_TYPE %d for %s.", backup,
+	 name);
+    break;
+  }
+
+  if (bport) {
+    snprintf(src_filename, 256, "%s/%c/%s", BSAVE_DIR, name[0], name);
+  } else {
+    snprintf(src_filename, 256, "%s/%c/%s", SAVE_DIR, name[0], name);
+  }
+  
+  if (0 == stat(src_filename, &statbuf)) { 
+    if (dst_dir[0] != 0) {
+      snprintf(syscmd, 512, "mv %s %s", src_filename, dst_dir);
+      system(syscmd);
+    } else {
+      unlink(src_filename);
+    }
+  }
+
+  if (bport) {
+    snprintf(src_filename, 256, "%s/%c/%s.backup", BSAVE_DIR, name[0], name);
+  } else {
+    snprintf(src_filename, 256, "%s/%c/%s.backup", SAVE_DIR, name[0], name);
+  }
+  
+  if (0 == stat(src_filename, &statbuf)) { 
+    if (dst_dir[0] != 0) {
+      snprintf(syscmd, 512, "mv %s %s", src_filename, dst_dir);
+      system(syscmd);
+    } else {
+      unlink(src_filename);
+    }
+  }
+
+}
+
+void remove_familiars(char *name, BACKUP_TYPE backup)
+{
+  char src_filename[256];
+  char dst_dir[256] = {0};
+  char syscmd[512];
+  struct stat statbuf;
+
+  if (name == NULL) {
+    return;
+  }
+
+  name[0] = UPPER(name[0]);
+
+  switch(backup) {
+  case SELFDELETED:
+    strncpy(dst_dir, "../archive/selfdeleted/", 256);
+    break;
+  case CONDEATH:
+    strncpy(dst_dir, "../archive/condeath/", 256);
+    break;
+  case ZAPPED:
+    strncpy(dst_dir, "../archive/zapped/", 256);
+    break;
+  case NONE:
+    break;
+  default:
+    logf(108, LOG_GOD, "remove_familiars passed invalid BACKUP_TYPE %d for %s.",
+	 backup, name);
+    break;
+  }
+  
+  for (int i=0; i < MAX_GOLEMS; i++) {
+    snprintf(src_filename, 256, "%s/%c/%s.%d", FAMILIAR_DIR, name[0], name, i);
+    
+    if (0 == stat(src_filename, &statbuf)) { 
+      if (dst_dir[0] != 0) {
+	snprintf(syscmd, 512, "mv %s %s", src_filename, dst_dir);
+	system(syscmd);
+      } else {
+	unlink(src_filename);
+      }
+    }
+  }
+
 }

@@ -15,6 +15,12 @@
 #include <db.h>
 #include <returnvals.h>
 #include <comm.h>
+#include <vault.h>
+#include <utility.h>
+
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 #ifdef BANDWIDTH
   #include <bandwidth.h>
@@ -261,15 +267,15 @@ int do_advance(struct char_data *ch, char *argument, int cmd)
 }
 
 
-int do_zap(struct char_data *ch, char *arg, int cmd)
+int do_zap(struct char_data *ch, char *argument, int cmd)
 {
   struct char_data *victim;
   int room;
-  char name[100], buf[500], f[100];
+  char name[100], buf[500];
 
   void remove_clan_member(int clannumber, struct char_data * ch);
 
-  one_argument(arg,name);
+  one_argument(argument, name);
 
   if(!(*name)) {
     send_to_char("Zap who??\n\rOh, BTW this deletes anyone "
@@ -311,24 +317,22 @@ int do_zap(struct char_data *ch, char *arg, int cmd)
             GET_NAME(victim), GET_SHORT(victim),
             GET_SHORT(ch));
 
-    sprintf(name, "%s has deleted %s.", ch->name, victim->name);
-    extern short bport;
-     if (bport)
-    sprintf(f, "mv %s/%c/%s ../archive/zapped", BSAVE_DIR, victim->name[0], victim->name);
-    else
-    sprintf(f, "mv %s/%c/%s ../archive/zapped", SAVE_DIR, victim->name[0], victim->name);
-
-    if(ch->clan)
-      remove_clan_member(ch->clan, ch);
+    remove_familiars(victim->name, ZAPPED);
+    remove_vault(victim->name, ZAPPED);
 
     GET_LEVEL(victim) = 1;
     update_wizlist(victim);
 
-    log(name, ANGEL, LOG_GOD);
-    system(f);
+    if(ch->clan)
+      remove_clan_member(ch->clan, ch);
+
+    snprintf(buf, 500, "%s has deleted %s.", ch->name, victim->name);
+    remove_character(victim->name, ZAPPED);
+
     do_quit(victim, "", 666);
     send_to_room(buf, room);
     send_to_all("You hear an ominous clap of thunder in the distance.\n\r");
+    log(buf, ANGEL, LOG_GOD);
   }
 
   else

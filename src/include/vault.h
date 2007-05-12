@@ -22,7 +22,7 @@ void show_vault(CHAR_DATA *ch, char *owner);
 void add_new_vault(char *name, int indexonly);
 void reload_vaults(void);
 void vault_cost(CHAR_DATA *ch, char *object, char *arg);
-void remove_vault(char *name);
+void remove_vault(char *name, BACKUP_TYPE backup = NONE);
 void rename_vault_owner(char *oldname, char *newname);
 void access_remove(char *name, struct vault_data *vault);
 void remove_vault_accesses(char *name);

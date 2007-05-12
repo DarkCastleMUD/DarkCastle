@@ -27,6 +27,11 @@ extern "C"
 #include <fstream>
 #include <sstream>
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
+
 using namespace std;
 
 extern CWorld world;
@@ -557,7 +562,69 @@ void rename_vault_owner(char *oldname, char *newname) {
   remove_vault(oldname);
 }
 
-void remove_vault(char *name) {
+void remove_vault(char *name, BACKUP_TYPE backup) {
+  char src_filename[256];
+  char dst_dir[256] = {0};
+  char syscmd[512];
+  struct stat statbuf;
+
+  if (name == NULL) {
+    return;
+  }
+
+  name[0] = UPPER(name[0]);
+
+  switch(backup) {
+  case SELFDELETED:
+    strncpy(dst_dir, "../archive/selfdeleted/", 256);
+    break;
+  case CONDEATH:
+    strncpy(dst_dir, "../archive/condeath/", 256);
+    break;
+  case ZAPPED:
+    strncpy(dst_dir, "../archive/zapped/", 256);
+    break;
+  case NONE:
+    break;
+  default:
+    logf(108, LOG_GOD, "remove_vault passed invalid BACKUP_TYPE %d for %s.", backup,
+	 name);
+    break;
+  }
+
+  snprintf(src_filename, 256, "%s/%c/%s.vault", VAULT_DIR, name[0], name);
+  
+  if (0 == stat(src_filename, &statbuf)) { 
+    if (dst_dir[0] != 0) {
+      snprintf(syscmd, 512, "mv %s %s", src_filename, dst_dir);
+      system(syscmd);
+    } else {
+      unlink(src_filename);
+    }
+  }
+
+  snprintf(src_filename, 256, "%s/%c/%s.vault.backup", VAULT_DIR, name[0], name);
+  
+  if (0 == stat(src_filename, &statbuf)) { 
+    if (dst_dir[0] != 0) {
+      snprintf(syscmd, 512, "mv %s %s", src_filename, dst_dir);
+      system(syscmd);
+    } else {
+      unlink(src_filename);
+    }
+  }
+
+  snprintf(src_filename, 256, "%s/%c/%s.vault.log", VAULT_DIR, name[0], name);
+  
+  if (0 == stat(src_filename, &statbuf)) { 
+    if (dst_dir[0] != 0) {
+      snprintf(syscmd, 512, "mv %s %s", src_filename, dst_dir);
+      system(syscmd);
+    } else {
+      unlink(src_filename);
+    }
+  }
+
   struct vault_data *vault, *next_vault, *prev_vault;
   struct vault_items_data *items, *titems;
   struct vault_access_data *access, *taccess;
@@ -565,12 +632,6 @@ void remove_vault(char *name) {
   char buf[MAX_INPUT_LENGTH];
   char h[MAX_INPUT_LENGTH];
 
-  name[0] = UPPER(name[0]);
-
-  sprintf(h, "../vaults/%c/%s.vault", *name, name);
-  unlink(h);
-  sprintf(h, "../vaults/%c/%s.vault.log", *name, name);
-  unlink(h);
   sprintf(h, "cat %s| grep -iv '^%s$' > %s", VAULT_INDEX_FILE, name, VAULT_INDEX_FILE_TMP);
   system(h);
   unlink(VAULT_INDEX_FILE);

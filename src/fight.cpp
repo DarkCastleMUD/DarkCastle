@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.444 2007/05/05 22:23:39 dcastle Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.445 2007/05/12 10:43:13 jhhudso Exp $ */
 
 extern "C"
 {
@@ -3926,7 +3926,7 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
 {
   CHAR_DATA *i=0;
   char buf[MAX_STRING_LENGTH];
-  char buf1[100], buf2[100];
+  char buf2[100];
   int is_thief = 0;
   int death_room = 0;
   
@@ -4112,7 +4112,6 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
          // hmm
          if(GET_CON(victim) <= 4)
          {
-           sprintf(buf1, "%s/%c/%s", SAVE_DIR, victim->name[0], victim->name);
            send_to_char("Your Constitution has reached 4...you are permanently dead!\n\r", victim);
            send_to_char("\r\n"
              "         (buh bye, - pirahna)\r\n"
@@ -4126,16 +4125,20 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
 	   char name[100];
 	   strncpy(name, GET_NAME(victim), 100);
            do_quit(victim, "", 666);
-	   remove_vault(name);
 
-           unlink(buf1);
-           sprintf(buf2, "%s permanently dies.", buf1);
+	   remove_familiars(name, CONDEATH);
+	   remove_vault(name, CONDEATH);
+	   if(victim->clan) {
+	     remove_clan_member(victim->clan, victim);
+	   }
+	   remove_character(name, CONDEATH);
+
+           sprintf(buf2, "%s permanently dies.", name);
            log(buf2, ANGEL, LOG_MORTAL);
            return;
 	}
          else if(GET_INT(victim) <= 4)
          {
-           sprintf(buf1, "%s/%c/%s", SAVE_DIR, victim->name[0], victim->name);
            send_to_char("Your Intelligence has reached 4...you are permanently dead!\n\r", victim);
            send_to_char("\r\n"
   "                     At least you have something nice to look at before your character is erased! - Wendy\r\n"
@@ -4168,16 +4171,20 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
 	   char name[100];
 	   strncpy(name, GET_NAME(victim), 100);
            do_quit(victim, "", 666);
-	   remove_vault(name);
 
-           unlink(buf1);
-           sprintf(buf2, "%s sees tits.", buf1);
+	   remove_familiars(name, CONDEATH);
+	   remove_vault(name, CONDEATH);
+	   if(victim->clan) {
+	     remove_clan_member(victim->clan, victim);
+	   }
+	   remove_character(name, CONDEATH);
+
+           sprintf(buf2, "%s sees tits.", name);
            log(buf2, ANGEL, LOG_MORTAL);
            return;
         } 
  	else if(GET_WIS(victim) <= 4)
          {
-           sprintf(buf1, "%s/%c/%s", SAVE_DIR, victim->name[0], victim->name);
            send_to_char("Your Wisdom has reached 4...you are permanently dead!\n\r", victim);
            send_to_char("\r\n"
 	"    	The other stat deaths have alot fancier ASCII pics.\r\n"
@@ -4189,16 +4196,20 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
 	   char name[100];
 	   strncpy(name, GET_NAME(victim), 100);
            do_quit(victim, "", 666);
-	   remove_vault(name);
 
-           unlink(buf1);
-           sprintf(buf2, "%s gets batted to death.", buf1);
+	   remove_familiars(name, CONDEATH);
+	   remove_vault(name, CONDEATH);
+	   if(victim->clan) {
+	     remove_clan_member(victim->clan, victim);
+	   }
+	   remove_character(name, CONDEATH);
+
+           sprintf(buf2, "%s gets batted to death.", name);
            log(buf2, ANGEL, LOG_MORTAL);
            return;
          }
          else if(GET_STR(victim) <= 4)
          {
-           sprintf(buf1, "%s/%c/%s", SAVE_DIR, victim->name[0], victim->name);
            send_to_char("Your Strength has reached 4...you are permanently dead!\n\r", victim);
            send_to_char("\r\n"
   "           To moose heaven with you! - Apoc\r\n"
@@ -4216,14 +4227,18 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
 	   char name[100];
 	   strncpy(name, GET_NAME(victim), 100);
            do_quit(victim, "", 666);
-	   remove_vault(name);
 
-           unlink(buf1);
-           sprintf(buf2, "%s goes to moose heaven.", buf1);
+	   remove_familiars(name, CONDEATH);
+	   remove_vault(name, CONDEATH);
+	   if(victim->clan) {
+	     remove_clan_member(victim->clan, victim);
+	   }
+	   remove_character(name, CONDEATH);
+
+           sprintf(buf2, "%s goes to moose heaven.", name);
            log(buf2, ANGEL, LOG_MORTAL);
            return;
          } else if (GET_DEX(victim) <= 4 && GET_RACE(victim) == RACE_TROLL) {
-            sprintf(buf1, "%s/%c/%s", SAVE_DIR, victim->name[0], victim->name);
             send_to_char("Your Dexterity has reached 4...you are permanently dead!\r\n",victim);
 		send_to_char("\r\n"
 		" Dear Mudder, you suck.\r\nSincerely - Urizen\r\n"
@@ -4252,10 +4267,15 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
 	   char name[100];
 	   strncpy(name, GET_NAME(victim), 100);
            do_quit(victim, "", 666);
-	   remove_vault(name);
 
-           unlink(buf1);
-           sprintf(buf2, "%s permanently dies the horrible dex-death.",buf1);
+	   remove_familiars(name, CONDEATH);
+	   remove_vault(name, CONDEATH);
+	   if(victim->clan) {
+	     remove_clan_member(victim->clan, victim);
+	   }
+	   remove_character(name, CONDEATH);
+
+           sprintf(buf2, "%s permanently dies the horrible dex-death.",name);
            log(buf2, ANGEL, LOG_MORTAL);
            return;
          }
