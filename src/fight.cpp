@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.445 2007/05/12 10:43:13 jhhudso Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.446 2007/05/16 21:23:32 dcastle Exp $ */
 
 extern "C"
 {
@@ -105,6 +105,7 @@ int check_autojoiners(CHAR_DATA *ch, int skill = 0)
   if (IS_NPC(ch)) return eFAILURE; // irrelevant
   if (!ch->fighting) return eFAILURE; 
   if (ch->pcdata && ch->pcdata->unjoinable == true) return eFAILURE;
+  if (IS_SET(world[ch->in_room].room_flags, SAFE)) return eFAILURE;
 
   CHAR_DATA *tmp;
   for (tmp = world[ch->in_room].people;tmp; tmp = tmp->next_in_room)
@@ -3377,8 +3378,8 @@ void make_corpse(CHAR_DATA * ch)
     GET_OBJ_VROOM(corpse) = GET_ROOM_VNUM(ch->in_room);
   }
 
-  // level 1-9 PC's can keep their eq
-  if(IS_MOB(ch) || GET_LEVEL(ch) > 9)
+  // level 1-19 PC's can keep their eq
+  if(IS_MOB(ch) || GET_LEVEL(ch) > 19)
   {  
     for(i = 0; i < MAX_WEAR; i++)
       if(ch->equipment[i])
