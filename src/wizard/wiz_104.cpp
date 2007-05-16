@@ -21,6 +21,8 @@
 extern struct room_data ** world_array;
 void save_corpses(void);
 extern char *obj_types[];
+extern struct active_object active_head;
+
 
 int do_thunder(struct char_data *ch, char *argument, int cmd)
 {
@@ -1977,12 +1979,41 @@ int do_oclone(struct char_data *ch, char *argument, int cmd)
     r2 = real_object(v2); // oedit new changes it
   }
   obj = clone_object(r2);
+  extern bool has_random(OBJ_DATA *obj);
   if (!obj) {csendf(ch, "Failure. Unable to clone item.\r\n"); return eFAILURE; }
+  struct active_object *active_obj = NULL,*last_active = NULL;
+  if(obj_index[obj->item_number].non_combat_func ||
+        obj->obj_flags.type_flag == ITEM_MEGAPHONE ||
+        has_random(obj)) {
+       active_obj = &active_head;
+       while(active_obj) {
+           if((active_obj->obj == obj) && (last_active)) {
+                last_active->next = active_obj->next;
+                dc_free(active_obj);
+                break;
+            } else if(active_obj->obj == obj) {
+                active_head.obj = active_obj->next->obj;
+                active_head.next = active_obj->next->next;
+                dc_free(active_obj);
+                break;
+            }
+            last_active = active_obj;
+            active_obj = active_obj->next;
+        }
+  }
+
+
 
   object_list = object_list->next;
   otmp = (OBJ_DATA*)obj_index[r1].item;
   obj->item_number = r1;
   obj_index[r1].item = (void*)obj;
+  obj_index[r1].non_combat_func = 0;
+  obj_index[r1].number = 0;
+  obj_index[r1].virt = v1;
+  obj_index[r1].mobprogs = NULL;
+  obj_index[r1].combat_func = 0;
+  obj_index[r1].mobspec = 0;
   extract_obj(otmp);
   send_to_char("Done!\r\n",ch);
   return eSUCCESS;
