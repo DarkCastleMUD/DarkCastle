@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.159 2007/05/03 21:11:03 dcastle Exp $ */
+/* $Id: mob_proc.cpp,v 1.160 2007/05/19 02:02:02 jhhudso Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -1440,7 +1440,7 @@ static char *dethSayText [ ] =
   "You have no chance to survive make your time.",
   "Someone set up us the bomb.",
   "Why did the belt get arrested?  ...  For holding up the pants!",
-  "Sometimes I like to rub icy hot over my entire body, and sit naked fondling myself as I watch excercise videos.",
+  "Sometimes I like to rub icy hot over my entire body, and sit naked fondling myself as I watch exercise videos.",
   "Oh, it's just a RAM upgrade...I can back up those files later.",
   "Why do they call it common sense if so few people seem to have it?",
   "Oh whatever.  MUDing won't affect my GPA.  I can handle it.",
@@ -1610,7 +1610,7 @@ static char *dethSayText [ ] =
     // Sneaky repeating of messages to make the fuckers vote.
   "I've lost 3 girlfriends to voting for Dark Castle on Mudconnect(through www.dcastle.info), but it was worth it.",
   "Good: Your wife meets you naked at the door. Bad: She's coming home.",
-  "Good: Your boyfriend's excercising. Bad: So he'll fit in your clothes.",
+  "Good: Your boyfriend's exercising. Bad: So he'll fit in your clothes.",
   "What do you have when 100 lawyers are buried up to their neck in sand?  Not enough sand",
   "When a girl says \"No\" she actually means \"Yes\", but not with you.",
   "Quidquid latine dictum sit, altum viditur.",
