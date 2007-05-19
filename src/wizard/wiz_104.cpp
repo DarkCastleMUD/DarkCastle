@@ -2057,6 +2057,7 @@ int do_mclone(struct char_data *ch, char *argument, int cmd)
 
   // clone_mobile assigns the start of character_list to be mob
   // This undos the change
+  mob_index[src].number--;
   character_list = character_list->next;
   mob->mobdata->nr = dst;
 
