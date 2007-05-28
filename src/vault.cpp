@@ -532,6 +532,8 @@ void rename_vault_owner(char *oldname, char *newname) {
     vault_log(buf, newname);
   }
 
+  if (!vault) return;
+
   for(items = vault->items; items; items = items->next) {
     if(items->obj && IS_SET(items->obj->obj_flags.extra_flags, ITEM_SPECIAL)) {
       char tmp[256];
