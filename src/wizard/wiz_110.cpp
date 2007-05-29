@@ -680,13 +680,10 @@ int do_range(struct char_data *ch, char *arg, int cmd)
 {
   struct char_data *victim;
   char name[160], buf[160];
-  char kind[160], buf2[160];
+  char kind[160];
   char trail[160];
   char message[256];
-  int zonenum, i;
-  char ** target;
 
-  world_file_list_item * curr = NULL;
 /*
   extern world_file_list_item * world_file_list;
   extern world_file_list_item *   mob_file_list;
@@ -907,7 +904,7 @@ int do_testhit(char_data *ch, char *argument, int cmd)
  float lvl = (50.0 - level - tlevel / 2.0)/10.0;
 
  if (lvl >= 1.0) 
-   toHit *= lvl;
+   toHit = (int)(toHit * lvl);
 
  for (int AC = 100; AC > -1010; AC -= 10)
  {
