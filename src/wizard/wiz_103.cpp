@@ -317,8 +317,8 @@ int do_matrixinfo(struct char_data *ch, char *argument, int cmd)
 
     char hatbuf[MAX_STRING_LENGTH], fribuf[MAX_STRING_LENGTH];
     hatbuf[0] = fribuf[0] = '\0';
-    sprintbit(race_info[i].hate_fear, race_abbrev, hatbuf);
-    sprintbit(race_info[i].friendly, race_abbrev, fribuf);
+    sprintbit(race_info[i].hate_fear<<1, race_abbrev, hatbuf);
+    sprintbit(race_info[i].friendly<<1, race_abbrev, fribuf);
 
     sprintf(buf, "%s %s - Imm: %s Res: %s Sus: %s\r\n    Hates: %s Friend: %s\r\n",
 		buf, race_info[i].plural_name, immbuf, resbuf, susbuf, hatbuf, fribuf);
