@@ -15,6 +15,7 @@
 #include <returnvals.h>
 #include <spells.h>
 #include <clan.h>
+#include <race.h>
 
 int do_boot(struct char_data *ch, char *arg, int cmd)
 {
@@ -297,3 +298,31 @@ int do_peace( struct char_data *ch, char *argument, int cmd )
 }
 
 
+int do_matrixinfo(struct char_data *ch, char *argument, int cmd)
+{
+  extern struct race_shit race_info[];
+  extern char *isr_bits[];
+  extern char *race_abbrev[];
+
+  char buf[MAX_STRING_LENGTH];
+  int i = 0;
+  buf[0] = '\0';
+  for (; i < MAX_RACE; i++)
+  {
+    char immbuf[MAX_STRING_LENGTH], resbuf[MAX_STRING_LENGTH], susbuf[MAX_STRING_LENGTH];
+    immbuf[0] = resbuf[0] = susbuf[0] = '\0';
+    sprintbit(race_info[i].immune, isr_bits, immbuf);
+    sprintbit(race_info[i].resist, isr_bits, resbuf);
+    sprintbit(race_info[i].suscept, isr_bits, susbuf);
+
+    char hatbuf[MAX_STRING_LENGTH], fribuf[MAX_STRING_LENGTH];
+    hatbuf[0] = fribuf[0] = '\0';
+    sprintbit(race_info[i].hate_fear, race_abbrev, hatbuf);
+    sprintbit(race_info[i].friendly, race_abbrev, fribuf);
+
+    sprintf(buf, "%s %s - Imm: %s Res: %s Sus: %s\r\n    Hates: %s Friend: %s\r\n",
+		buf, race_info[i].plural_name, immbuf, resbuf, susbuf, hatbuf, fribuf);
+  }
+  send_to_char(buf,ch);
+  return eSUCCESS;
+}
