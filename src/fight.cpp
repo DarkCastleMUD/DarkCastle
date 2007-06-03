@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.447 2007/06/03 16:17:38 urizen Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.448 2007/06/03 16:26:29 dcastle Exp $ */
 
 extern "C"
 {
@@ -2031,20 +2031,23 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
     int type = 0;
     if (IS_SET((retval2 = isHit(ch, victim, attacktype, type, reduce)), eSUCCESS))
     {
+	if (SOMEONE_DIED(retval2)) // Riposte
+		return damage_retval(ch, victim, retval2);
 	switch(type)
 	{
-		case 0: break;
+		case 0: return eFAILURE; // Dodge or parry
 
 		case 1:
 		case 2:	SET_BIT(modifier, COMBAT_MOD_REDUCED);
 			dam -= (int) ((float)dam  *((float)reduce/100));
 			break;
+			// Shield block or Mdefense
 
 		case 3:
 			dam = 0; // Miss!
 			break;
 		default:
-			break;
+			return eFAILURE; // Shouldn't happen
 			
 	}
     }
@@ -2709,7 +2712,7 @@ int isHit(CHAR_DATA *ch, CHAR_DATA *victim, int attacktype, int &type, int &redu
     act("$n parries $N's attack.", victim, NULL, ch, TO_ROOM, NOTVICT);
     act("$n parries your attack.", victim, NULL, ch, TO_VICT, 0);
     act("You parry $N's attack.", victim, NULL, ch, TO_CHAR, 0);
-    check_riposte(ch, victim, attacktype);
+    return check_riposte(ch, victim, attacktype);
   } else if (what < (parry+dodge))
   { // Dodge
     act("$n dodges $N's attack.", victim, NULL, ch, TO_ROOM, NOTVICT);
