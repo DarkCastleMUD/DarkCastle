@@ -574,7 +574,9 @@ int spell_howl(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
 	     do_say(tmp_char,"Screw this! I'm going home!", 9);
 	     if (tmp_char->fighting->fighting == tmp_char)
 	         stop_fighting(tmp_char->fighting);
-	         stop_fighting(tmp_char);
+
+            stop_fighting(tmp_char);
+
 	    }
          }
     } // for loop through people in the room
