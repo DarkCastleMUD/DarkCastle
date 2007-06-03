@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.446 2007/05/16 21:23:32 dcastle Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.447 2007/06/03 16:17:38 urizen Exp $ */
 
 extern "C"
 {
@@ -88,6 +88,10 @@ long count_xp_eligibles(CHAR_DATA *leader, CHAR_DATA *killer,
 CHAR_DATA *get_highest_level_killer(CHAR_DATA *leader, CHAR_DATA *killer);
  
 CHAR_DATA *combat_list = NULL, *combat_next_dude = NULL;
+
+
+int isHit(CHAR_DATA *ch, CHAR_DATA *victim, int attacktype, int &type, int &reduce);
+
 
 bool someone_fighting(CHAR_DATA *ch)
 {
@@ -969,7 +973,7 @@ int do_acidshield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
   
   if(GET_POS(vict) == POSITION_DEAD)            return eFAILURE;
   if(!IS_NPC(ch) && GET_LEVEL(ch) >= IMMORTAL)  return eFAILURE;
-  if(!affected_by_spell(vict, SPELL_ACID_SHIELD)) return eFAILURE;
+  if(!IS_AFFECTED(vict, AFF_ACID_SHIELD)) return eFAILURE;
 
   if (IS_SET(race_info[(int)GET_RACE(ch)].immune, ISR_ACID))
     dam = 0;
@@ -2023,7 +2027,29 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
   if (can_miss == 1) {
   if (attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING)
   {
-   
+    int retval2 = 0;
+    int type = 0;
+    if (IS_SET((retval2 = isHit(ch, victim, attacktype, type, reduce)), eSUCCESS))
+    {
+	switch(type)
+	{
+		case 0: break;
+
+		case 1:
+		case 2:	SET_BIT(modifier, COMBAT_MOD_REDUCED);
+			dam -= (int) ((float)dam  *((float)reduce/100));
+			break;
+
+		case 3:
+			dam = 0; // Miss!
+			break;
+		default:
+			break;
+			
+	}
+    }
+
+    /* Old Hitcode!
     if(check_parry(ch, victim, attacktype)) {
       if(typeofdamage == DAMAGE_TYPE_PHYSICAL)
       {
@@ -2038,6 +2064,8 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
 	SET_BIT(modifier, COMBAT_MOD_REDUCED);
 	dam -= (int)((float) dam * ((float)reduce/100));
      }
+   */
+
   }
 /* Never heard of it.
   if (attacktype == TYPE_PHYSICAL_MAGIC)
@@ -2616,6 +2644,92 @@ void fight_kill(CHAR_DATA *ch, CHAR_DATA *vict, int type, int spec_type)
     case TYPE_ARENA_KILL: arena_kill(ch, vict, spec_type); break;
   }
 }
+
+// New toHit code
+
+int isHit(CHAR_DATA *ch, CHAR_DATA *victim, int attacktype, int &type, int &reduce)
+{
+  int lvldiff = GET_LEVEL(ch) - GET_LEVEL(victim);
+
+  // Figure out toHit value.
+  int toHit = GET_HITROLL(ch);
+  toHit += speciality_bonus(ch, attacktype, GET_LEVEL(victim));
+  
+  // Hitting stuff close to your level gives you a bonus,   
+  if (lvldiff > 25);
+  else if (lvldiff > 15) toHit += 5;
+  else if (lvldiff > 5) toHit += 7;
+  else if (lvldiff >= 0) toHit += 10;
+  else if (lvldiff >= -5) toHit += 5;  
+
+  // Give a tohit bonus to low level players.
+  float lowlvlmod = (50.0 - (float)GET_LEVEL(ch) - (GET_LEVEL(victim)/2.0))/10.0;
+  if (lowlvlmod > 1.0)
+    toHit = (int)((float)toHit*lowlvlmod);
+
+  // The stuff.
+  float num1 = 1.0 - (-300.0 - (float)GET_AC(victim)) * 4.761904762 * 0.0001;
+  float num2 = 20.0 + (-300.0 - (float)GET_AC(victim)) * 0.0095238095;
+  float percent = num1*(float)(toHit)-num2;
+  
+  // "percent" now contains the maximum avoidance rate. If they do not have two maxed defensive skills, it will actually be less.
+  
+  // Determine defensive skills.
+  int parry = IS_NPC(victim)?ISSET(victim->mobdata->actflags, ACT_PARRY)?GET_LEVEL(victim):0:has_skill(victim, SKILL_PARRY);
+  int dodge = IS_NPC(victim)?ISSET(victim->mobdata->actflags, ACT_DODGE)?GET_LEVEL(victim):0:has_skill(victim, SKILL_DODGE);
+  int block = has_skill(victim, SKILL_SHIELDBLOCK);
+  int martial = has_skill(victim, SKILL_DEFENSE);
+
+  if (!victim->equipment[WEAR_SHIELD]) block = 0;
+  else if (IS_NPC(victim)) block = GET_LEVEL(victim);
+
+
+  // Modify defense rate accordingly
+  int amt = parry + dodge + block + martial;
+  float scale = (float)amt / 196.0; // Mobs can get a bonus if they can perform 3+.
+  
+  percent = percent + 30.0 * scale; 
+
+  if (parry) skill_increase_check(victim, SKILL_PARRY, parry, SKILL_INCREASE_HARD+500);
+  if (dodge) skill_increase_check(victim, SKILL_DODGE, dodge, SKILL_INCREASE_HARD+500);
+  if (block) skill_increase_check(victim, SKILL_SHIELDBLOCK, block, SKILL_INCREASE_HARD+500);
+  if (martial) skill_increase_check(victim, SKILL_DEFENSE, martial, SKILL_INCREASE_HARD+500);
+
+  // Ze random stuff.
+  if (number(1,101) < percent && !IS_SET(victim->combat, COMBAT_BLADESHIELD1) && !IS_SET(victim->combat, COMBAT_BLADESHIELD2)) return eFAILURE;
+
+  // Miss, determine a message
+
+  amt += 15; // Chance for a pure miss.
+
+  int what = number(1,amt);
+  
+  if (what < parry || IS_SET(victim->combat, COMBAT_BLADESHIELD1) || IS_SET(victim->combat, COMBAT_BLADESHIELD2))
+  { // Parry. Riposte-check goes here.
+    act("$n parries $N's attack.", victim, NULL, ch, TO_ROOM, NOTVICT);
+    act("$n parries your attack.", victim, NULL, ch, TO_VICT, 0);
+    act("You parry $N's attack.", victim, NULL, ch, TO_CHAR, 0);
+    check_riposte(ch, victim, attacktype);
+  } else if (what < (parry+dodge))
+  { // Dodge
+    act("$n dodges $N's attack.", victim, NULL, ch, TO_ROOM, NOTVICT);
+    act("$n dodges your attack.", victim, NULL, ch, TO_VICT, 0);
+    act("You dodge $N's attack.", victim, NULL, ch, TO_CHAR, 0);
+  } else if (what < (parry+dodge+block))
+  { // Shieldblock
+     type = 1;
+  } else if (what < (parry+dodge+block+martial))
+  { // Mdefense
+     type = 2;
+  } else 
+  { // Miss
+     type = 3;
+  }
+
+ return eSUCCESS;
+}
+
+
 
 // check riposte never returns eSUCCESS because that would
 // get returned from damage as a successful damage, which it's

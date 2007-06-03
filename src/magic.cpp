@@ -2842,7 +2842,7 @@ bool find_spell_shield(CHAR_DATA *ch, CHAR_DATA *victim)
     return TRUE;
   }
 
-  if (affected_by_spell(victim, SPELL_ACID_SHIELD))
+  if (IS_AFFECTED(victim, AFF_ACID_SHIELD))
   {
     if (ch == victim)
       send_to_char("You are already protected by a shield of acid.\n\r", ch);
@@ -5049,6 +5049,13 @@ int spell_dispel_magic(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
            if (affected_by_spell(victim, SPELL_ACID_SHIELD))
            {
               affect_from_char(victim, SPELL_ACID_SHIELD);
+              act("Your shield of $B$2acid$R dissolves to nothing!", ch, 0,victim, TO_VICT, 0);
+              act("The $B$2acid$R swirling about $n's body dissolves to nothing!", victim, 0, 0, TO_ROOM, 0);
+              done = TRUE;
+           }
+           if (IS_AFFECTED(victim, AFF_ACID_SHIELD))
+           {
+              REMBIT(victim->affected_by, AFF_ACID_SHIELD);
               act("Your shield of $B$2acid$R dissolves to nothing!", ch, 0,victim, TO_VICT, 0);
               act("The $B$2acid$R swirling about $n's body dissolves to nothing!", victim, 0, 0, TO_ROOM, 0);
               done = TRUE;
@@ -10957,7 +10964,7 @@ int spell_acid_shield(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
     af.duration  = 2 + (skill / 23);
     af.modifier  = skill;
     af.location  = APPLY_NONE;
-    af.bitvector = -1;
+    af.bitvector = AFF_ACID_SHIELD;
     affect_to_char(victim, &af);
   }
   return eSUCCESS;
