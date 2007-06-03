@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.160 2007/05/19 02:02:02 jhhudso Exp $ */
+/* $Id: mob_proc.cpp,v 1.161 2007/06/03 16:26:07 dcastle Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -1729,7 +1729,8 @@ static char *dethSayText [ ] =
   "Unattended newbies will be sold to Madonna.",
   "God? I have an imaginary friend too. His name is Bob.",
   "Fuck it. I'm moving to 581 c.",
-  "Let Moose and Mountie unite!"
+  "Let Moose and Mountie unite!",
+  "WARNING: the Imm staff is not responsible for Stromboli's \"activities\" should you make personal data available to other players."
 };
 
 // ENDOFCHAIN
