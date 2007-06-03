@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.448 2007/06/03 16:26:29 dcastle Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.449 2007/06/03 18:09:55 dcastle Exp $ */
 
 extern "C"
 {
@@ -2656,7 +2656,8 @@ int isHit(CHAR_DATA *ch, CHAR_DATA *victim, int attacktype, int &type, int &redu
 
   // Figure out toHit value.
   int toHit = GET_HITROLL(ch);
-  toHit += speciality_bonus(ch, attacktype, GET_LEVEL(victim));
+//  toHit += speciality_bonus(victim, attacktype, GET_LEVEL(ch));
+  if (toHit < 1) toHit = 1;
   
   // Hitting stuff close to your level gives you a bonus,   
   if (lvldiff > 25);
@@ -2673,7 +2674,7 @@ int isHit(CHAR_DATA *ch, CHAR_DATA *victim, int attacktype, int &type, int &redu
   // The stuff.
   float num1 = 1.0 - (-300.0 - (float)GET_AC(victim)) * 4.761904762 * 0.0001;
   float num2 = 20.0 + (-300.0 - (float)GET_AC(victim)) * 0.0095238095;
-  float percent = num1*(float)(toHit)-num2;
+  float percent =  30+num1*(float)(toHit)-num2;
   
   // "percent" now contains the maximum avoidance rate. If they do not have two maxed defensive skills, it will actually be less.
   
@@ -2686,20 +2687,22 @@ int isHit(CHAR_DATA *ch, CHAR_DATA *victim, int attacktype, int &type, int &redu
   if (!victim->equipment[WEAR_SHIELD]) block = 0;
   else if (IS_NPC(victim)) block = GET_LEVEL(victim);
 
-
   // Modify defense rate accordingly
   int amt = parry + dodge + block + martial;
-  float scale = (float)amt / 196.0; // Mobs can get a bonus if they can perform 3+.
+  float scale = (float)amt / (196.0*3.0); // Mobs can get a bonus if they can perform 3+.
   
-  percent = percent + 30.0 * scale; 
+  
+  percent = percent * scale; 
 
   if (parry) skill_increase_check(victim, SKILL_PARRY, parry, SKILL_INCREASE_HARD+500);
   if (dodge) skill_increase_check(victim, SKILL_DODGE, dodge, SKILL_INCREASE_HARD+500);
   if (block) skill_increase_check(victim, SKILL_SHIELDBLOCK, block, SKILL_INCREASE_HARD+500);
   if (martial) skill_increase_check(victim, SKILL_DEFENSE, martial, SKILL_INCREASE_HARD+500);
 
+  csendf(ch, "%f\r\n", percent);
+  csendf(victim, "%f\r\n", percent);
   // Ze random stuff.
-  if (number(1,101) < percent && !IS_SET(victim->combat, COMBAT_BLADESHIELD1) && !IS_SET(victim->combat, COMBAT_BLADESHIELD2)) return eFAILURE;
+  if (number(1,101) > percent && !IS_SET(victim->combat, COMBAT_BLADESHIELD1) && !IS_SET(victim->combat, COMBAT_BLADESHIELD2)) return eFAILURE;
 
   // Miss, determine a message
 
@@ -2712,7 +2715,8 @@ int isHit(CHAR_DATA *ch, CHAR_DATA *victim, int attacktype, int &type, int &redu
     act("$n parries $N's attack.", victim, NULL, ch, TO_ROOM, NOTVICT);
     act("$n parries your attack.", victim, NULL, ch, TO_VICT, 0);
     act("You parry $N's attack.", victim, NULL, ch, TO_CHAR, 0);
-    return check_riposte(ch, victim, attacktype);
+    int retval = check_riposte(ch, victim, attacktype);
+    if (SOMEONE_DIED(retval)) return retval;
   } else if (what < (parry+dodge))
   { // Dodge
     act("$n dodges $N's attack.", victim, NULL, ch, TO_ROOM, NOTVICT);
