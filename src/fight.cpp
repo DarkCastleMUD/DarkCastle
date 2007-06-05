@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.449 2007/06/03 18:09:55 dcastle Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.450 2007/06/05 12:52:35 dcastle Exp $ */
 
 extern "C"
 {
@@ -2656,7 +2656,7 @@ int isHit(CHAR_DATA *ch, CHAR_DATA *victim, int attacktype, int &type, int &redu
 
   // Figure out toHit value.
   int toHit = GET_HITROLL(ch);
-//  toHit += speciality_bonus(victim, attacktype, GET_LEVEL(ch));
+//  toHit += speciality_bonus(ch, attacktype, GET_LEVEL(victim));
   if (toHit < 1) toHit = 1;
   
   // Hitting stuff close to your level gives you a bonus,   
@@ -2689,10 +2689,11 @@ int isHit(CHAR_DATA *ch, CHAR_DATA *victim, int attacktype, int &type, int &redu
 
   // Modify defense rate accordingly
   int amt = parry + dodge + block + martial;
-  float scale = (float)amt / (196.0*3.0); // Mobs can get a bonus if they can perform 3+.
-  
-  
-  percent = percent * scale; 
+
+  float scale = (float)amt / (196.0); // Mobs can get a bonus if they can perform 3+.
+
+  percent *= (0.8 - scale/5.0);
+
 
   if (parry) skill_increase_check(victim, SKILL_PARRY, parry, SKILL_INCREASE_HARD+500);
   if (dodge) skill_increase_check(victim, SKILL_DODGE, dodge, SKILL_INCREASE_HARD+500);
@@ -2701,14 +2702,15 @@ int isHit(CHAR_DATA *ch, CHAR_DATA *victim, int attacktype, int &type, int &redu
 
   csendf(ch, "%f\r\n", percent);
   csendf(victim, "%f\r\n", percent);
+
   // Ze random stuff.
-  if (number(1,101) > percent && !IS_SET(victim->combat, COMBAT_BLADESHIELD1) && !IS_SET(victim->combat, COMBAT_BLADESHIELD2)) return eFAILURE;
+  if (number(1,101) < percent && !IS_SET(victim->combat, COMBAT_BLADESHIELD1) && !IS_SET(victim->combat, COMBAT_BLADESHIELD2)) return eFAILURE;
 
   // Miss, determine a message
 
-  amt += 15; // Chance for a pure miss.
+  amt += 8; // Chance for a pure miss.
 
-  int what = number(1,amt);
+  int what = number(0,amt);
   
   if (what < parry || IS_SET(victim->combat, COMBAT_BLADESHIELD1) || IS_SET(victim->combat, COMBAT_BLADESHIELD2))
   { // Parry. Riposte-check goes here.
