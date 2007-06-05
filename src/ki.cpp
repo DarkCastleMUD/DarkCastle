@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.66 2007/05/04 13:10:07 apocalypse Exp $ */
+/* $Id: ki.cpp,v 1.67 2007/06/05 17:58:30 dcastle Exp $ */
 
 extern "C"
 {
@@ -968,7 +968,7 @@ int ki_agility( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
       af.location  = APPLY_MOVE_REGEN;
       af.bitvector = -1;
       affect_to_char(tmp_char, &af);
-      af.modifier  = -20;
+      af.modifier  = -10 - learned / 4;
       af.location  = APPLY_ARMOR;
       affect_to_char(tmp_char, &af);
     }
