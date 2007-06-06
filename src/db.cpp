@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.154 2007/05/10 06:38:40 jhhudso Exp $ */
+/* $Id: db.cpp,v 1.155 2007/06/06 19:00:36 apocalypse Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -2976,31 +2976,49 @@ void handle_automatic_mob_settings(char_data * mob)
   if (!c&& ISSET(mob->mobdata->actflags, ACT_DODGE)) alevel -= 0.5;
   if (ISSET(mob->mobdata->actflags, ACT_WIMPY)) alevel -= 1.0;
   if (ISSET(mob->mobdata->actflags, ACT_STUPID)) alevel += 3.0;
-  if (ISSET(mob->mobdata->actflags, ACT_HUGE)) alevel -= 1.5;
+  if (ISSET(mob->mobdata->actflags, ACT_HUGE)) alevel -= 1.0;
   if (ISSET(mob->mobdata->actflags, ACT_DRAINY)) alevel -= 2.0;
-  if (ISSET(mob->mobdata->actflags, ACT_SWARM)) alevel -= 1.5;
-  if (ISSET(mob->mobdata->actflags, ACT_TINY)) alevel -= 1.5;
+  if (ISSET(mob->mobdata->actflags, ACT_SWARM)) alevel -= 1.0;
+  if (ISSET(mob->mobdata->actflags, ACT_TINY)) alevel -= 1.0;
 
   if (!c&& IS_AFFECTED(mob,AFF_SANCTUARY)) alevel -= 0.5;
   if (!c&& IS_AFFECTED(mob,AFF_FIRESHIELD)) alevel -= 0.5;
   if (!c&& IS_AFFECTED(mob,AFF_LIGHTNINGSHIELD)) alevel -= 0.5;
   if (!c&& IS_AFFECTED(mob,AFF_FROSTSHIELD)) alevel -= 0.5;
+  if (!c&& IS_AFFECTED(mob,AFF_ACID_SHIELD)) alevel -= 0.5;
   if (IS_AFFECTED(mob,AFF_EAS)) alevel -= 2.0;
   if (!c&& IS_AFFECTED(mob,AFF_HASTE)) alevel -= 0.5;
-  if (!c&& IS_AFFECTED(mob,AFF_REFLECT)) alevel -= 0.5;
+  if (IS_AFFECTED(mob,AFF_REFLECT)) alevel -= 0.5;
   if (!c&& IS_AFFECTED(mob,AFF_INVISIBLE)) alevel -= 0.5;
   if (!c&& IS_AFFECTED(mob,AFF_SNEAK)) alevel -= 0.5;
-//  if (!c&& IS_AFFECTED(mob,AFF_HIDE)) alevel -= 1.0;
+  if (!c&& IS_AFFECTED(mob,AFF_HIDE)) alevel -= 0.5;
   if (!c&& IS_AFFECTED(mob,AFF_RAGE)) alevel -= 1.0;
+  if (IS_AFFECTED(mob,AFF_SOLIDITY)) alevel -= 0.5;
   if (!c&& IS_AFFECTED(mob,AFF_DETECT_INVISIBLE)) alevel -= 0.5;
   if (!c&& IS_AFFECTED(mob,AFF_SENSE_LIFE)) alevel -= 0.5;
   if (!c&& IS_AFFECTED(mob,AFF_INFRARED)) alevel -= 0.5;
   if (!c&& IS_AFFECTED(mob,AFF_TRUE_SIGHT)) alevel -= 1.0;
-  if (IS_AFFECTED(mob,AFF_BLIND)) alevel += 2.0;
+  if (IS_AFFECTED(mob,AFF_BLIND)) alevel += 3.0;
   if (IS_AFFECTED(mob,AFF_CURSE)) alevel += 1.0;
   if (IS_AFFECTED(mob,AFF_POISON)) alevel += 2.0;
   if (IS_AFFECTED(mob,AFF_PARALYSIS)) alevel += 5.0;
-  if (IS_AFFECTED(mob,AFF_SLEEP)) alevel += 1.0;
+  if (IS_AFFECTED(mob,AFF_SLEEP)) alevel += 2.0;
+  if (!c&& IS_AFFECTED(mob,AFF_FOREST_MELD)) alevel -= 0.5;
+  if (!c&& IS_AFFECTED(mob,AFF_ALERT)) alevel -= 1.0;
+  if (!c&& IS_AFFECTED(mob,AFF_NO_FLEE)) alevel -= 1.0;
+  if (IS_AFFECTED(mob,AFF_POWERWIELD)) alevel -= 0.5;
+  if (IS_AFFECTED(mob,AFF_REGENERATION)) alevel -= 0.5;
+  if (IS_AFFECTED(mob,AFF_NOKI)) alevel -= 1.0;
+  if (IS_AFFECTED(mob,AFF_NOHEADBUTT)) alevel -= 2.0;
+  if (IS_AFFECTED(mob,AFF_NOATTACK)) alevel += 4.0;
+  if (IS_AFFECTED(mob,AFF_NODISPEL)) alevel -= -2.0;
+  if (IS_AFFECTED(mob,AFF_AMBUSH_ALERT)) alevel -= 0.5;
+  if (IS_AFFECTED(mob,AFF_BLACKJACK_ALERT)) alevel -= 0.5;
+  if (IS_AFFECTED(mob,AFF_FEARLESS)) alevel -= 0.5;
+  if (IS_AFFECTED(mob,AFF_NO_PARA)) alevel -= 0.5;
+  if (IS_AFFECTED(mob,AFF_NO_CIRCLE)) alevel -= 0.5;
+  if (IS_AFFECTED(mob,AFF_NO_BEHEAD)) alevel -= 0.5;
+  if (IS_AFFECTED(mob,AFF_NO_REGEN)) alevel += 3.0;
 
   if (mob->gold != 0)
   mob->gold = mob_matrix[baselevel].gold + number(0-(mob_matrix[baselevel].gold/10), mob_matrix[baselevel].gold/10);
@@ -3015,7 +3033,7 @@ void handle_automatic_mob_settings(char_data * mob)
   temp = mob->suscept;
   for (; temp; temp <<= 1)
     if (temp & 1)
-      alevel += 0.5;
+      alevel += 1;
  
   baselevel = MAX(alevel > 0? (int)alevel:1, baselevel - 4);
   
