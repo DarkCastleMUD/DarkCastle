@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.155 2007/06/06 19:00:36 apocalypse Exp $ */
+/* $Id: db.cpp,v 1.156 2007/06/08 23:51:46 dcastle Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -2764,12 +2764,15 @@ void write_mobile(char_data * mob, FILE *fl)
     if(mob->c_class) 
       fprintf(fl, "C %d\n", mob->c_class);
 
-    if(mob->raw_str != BASE_STAT + mob_race_mod[GET_RACE(mob)][0] || 
-     mob->raw_dex != BASE_STAT + mob_race_mod[GET_RACE(mob)][1] || 
-     mob->raw_con != BASE_STAT + mob_race_mod[GET_RACE(mob)][2] ||
-     mob->raw_intel != BASE_STAT + mob_race_mod[GET_RACE(mob)][3] || 
-     mob->raw_wis != BASE_STAT + mob_race_mod[GET_RACE(mob)][4] ) { 
-       fprintf(fl, "T %d %d %d %d %d 0\n", mob->raw_str, mob->raw_intel, mob->raw_wis, mob->raw_dex, mob->raw_con);
+    if((mob->raw_str != 11 || mob->raw_dex != 11 || mob->raw_con != 11 ||
+        mob->raw_intel != 11 || mob->raw_wis != 11 ) && 
+     ( mob->raw_str != BASE_STAT + mob_race_mod[GET_RACE(mob)][0] || 
+       mob->raw_dex != BASE_STAT + mob_race_mod[GET_RACE(mob)][1] || 
+       mob->raw_con != BASE_STAT + mob_race_mod[GET_RACE(mob)][2] ||
+       mob->raw_intel != BASE_STAT + mob_race_mod[GET_RACE(mob)][3] || 
+       mob->raw_wis != BASE_STAT + mob_race_mod[GET_RACE(mob)][4]) )
+    { 
+      fprintf(fl, "T %d %d %d %d %d 0\n", mob->raw_str, mob->raw_intel, mob->raw_wis, mob->raw_dex, mob->raw_con);
     }
 
     if(mob_index[mob->mobdata->nr].mobprogs) {
@@ -3008,10 +3011,10 @@ void handle_automatic_mob_settings(char_data * mob)
   if (!c&& IS_AFFECTED(mob,AFF_NO_FLEE)) alevel -= 1.0;
   if (IS_AFFECTED(mob,AFF_POWERWIELD)) alevel -= 0.5;
   if (IS_AFFECTED(mob,AFF_REGENERATION)) alevel -= 0.5;
-  if (IS_AFFECTED(mob,AFF_NOKI)) alevel -= 1.0;
-  if (IS_AFFECTED(mob,AFF_NOHEADBUTT)) alevel -= 2.0;
-  if (IS_AFFECTED(mob,AFF_NOATTACK)) alevel += 4.0;
-  if (IS_AFFECTED(mob,AFF_NODISPEL)) alevel -= -2.0;
+  if (ISSET(mob->mobdata->actflags, ACT_NOKI)) alevel -=12.0;
+  if (ISSET(mob->mobdata->actflags, ACT_NOHEADBUTT)) alevel -= 2.0;
+  if (ISSET(mob->mobdata->actflags, ACT_NOATTACK)) alevel += 4.0;
+  if (ISSET(mob->mobdata->actflags, ACT_NODISPEL)) alevel -= 2.0;
   if (IS_AFFECTED(mob,AFF_AMBUSH_ALERT)) alevel -= 0.5;
   if (IS_AFFECTED(mob,AFF_BLACKJACK_ALERT)) alevel -= 0.5;
   if (IS_AFFECTED(mob,AFF_FEARLESS)) alevel -= 0.5;

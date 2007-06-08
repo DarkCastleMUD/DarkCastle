@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.67 2007/06/05 17:58:30 dcastle Exp $ */
+/* $Id: ki.cpp,v 1.68 2007/06/08 23:51:46 dcastle Exp $ */
 
 extern "C"
 {
@@ -696,7 +696,11 @@ int ki_disrupt( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim)
      act("The golem seems to ignore $n's disrupting energy!", ch, 0, 0, TO_ROOM, 0);
       return eFAILURE;
    }
-
+  if(IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_NODISPEL)) {
+     act("$N seems to ignore $n's disrupting energy!", ch, 0, victim, TO_ROOM, 0);
+     act("$N seems to ignore your disrupting energy!", ch, 0, victim, TO_CHAR, 0);
+      return eFAILURE;
+  }
 
    int savebonus = 0;
 

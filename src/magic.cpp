@@ -4671,7 +4671,15 @@ int spell_dispel_minor(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
    if (spell)
      savebonus = -5; 
 
+
  set_cantquit( ch, victim );
+
+  if(IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_NODISPEL)) {
+     act("$N seems to ignore $n's spell!", ch, 0, victim, TO_ROOM, 0);
+     act("$N seems to ignore your spell!", ch, 0, victim, TO_CHAR, 0);
+      return eFAILURE;
+  }
+
    // If victim higher level, they get a save vs magic for no effect
    if (number(1,101) < get_saves(victim, SAVE_TYPE_MAGIC) + savebonus)
    {
@@ -4887,6 +4895,12 @@ int spell_dispel_magic(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
    }
 
    set_cantquit(ch, victim);
+
+  if(IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_NODISPEL)) {
+     act("$N seems to ignore $n's spell!", ch, 0, victim, TO_ROOM, 0);
+     act("$N seems to ignore your spell!", ch, 0, victim, TO_CHAR, 0);
+      return eFAILURE;
+  }
 
    if(ISSET(victim->affected_by, AFF_GOLEM)) {
       send_to_char("The golem seems to shrug off your dispel attempt!\r\n", ch);

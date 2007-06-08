@@ -873,7 +873,7 @@ int do_acfinder(CHAR_DATA *ch, char *argument, int cmdnum)
        if (obj->affected[z].location == APPLY_ARMOR)
 	 ac += obj->affected[z].modifier;
     sprintf(buf, "$B%s%d. %-50s Vnum: %d AC Apply: %d\r\n$R",
-		o%2==0?"$2":"$1",o, obj->short_description, obj_index[r].virt, ac);
+		o%2==0?"$2":"$3",o, obj->short_description, obj_index[r].virt, ac);
     send_to_char(buf,ch);
     o++;
     if (o == 150) { send_to_char("Max number of items hit.\r\n",ch); return eSUCCESS; }

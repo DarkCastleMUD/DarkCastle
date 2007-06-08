@@ -2589,6 +2589,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd)
     extern char *affected_bits[];
     extern char *isr_bits[];
     extern char *position_types[];
+    extern int mob_race_mod[][5];
 
     char *fields[] = 
     {
@@ -2822,6 +2823,13 @@ mob_index[mob_num].virt);
             csendf(ch, "Mob race set to %s.\r\n", race_info[i].singular_name);
             ((char_data *)mob_index[mob_num].item)->race = i;
             race_set = 1;
+
+            ((char_data *)mob_index[mob_num].item)->raw_str   = ((char_data *)mob_index[mob_num].item)->str   = BASE_STAT + mob_race_mod[GET_RACE(((char_data *)mob_index[mob_num].item))][0];
+            ((char_data *)mob_index[mob_num].item)->raw_dex   = ((char_data *)mob_index[mob_num].item)->dex   = BASE_STAT + mob_race_mod[GET_RACE(((char_data *)mob_index[mob_num].item))][1];
+            ((char_data *)mob_index[mob_num].item)->raw_con   = ((char_data *)mob_index[mob_num].item)->con   = BASE_STAT + mob_race_mod[GET_RACE(((char_data *)mob_index[mob_num].item))][2];
+            ((char_data *)mob_index[mob_num].item)->raw_intel = ((char_data *)mob_index[mob_num].item)->intel = BASE_STAT + mob_race_mod[GET_RACE(((char_data *)mob_index[mob_num].item))][3];
+            ((char_data *)mob_index[mob_num].item)->raw_wis   = ((char_data *)mob_index[mob_num].item)->wis   = BASE_STAT + mob_race_mod[GET_RACE(((char_data *)mob_index[mob_num].item))][4];
+
           }
         }
         if(!race_set) {

@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.450 2007/06/05 12:52:35 dcastle Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.451 2007/06/08 23:51:46 dcastle Exp $ */
 
 extern "C"
 {
@@ -2700,8 +2700,8 @@ int isHit(CHAR_DATA *ch, CHAR_DATA *victim, int attacktype, int &type, int &redu
   if (block) skill_increase_check(victim, SKILL_SHIELDBLOCK, block, SKILL_INCREASE_HARD+500);
   if (martial) skill_increase_check(victim, SKILL_DEFENSE, martial, SKILL_INCREASE_HARD+500);
 
-  csendf(ch, "%f\r\n", percent);
-  csendf(victim, "%f\r\n", percent);
+  //csendf(ch, "%f\r\n", percent);
+  //csendf(victim, "%f\r\n", percent);
 
   // Ze random stuff.
   if (number(1,101) < percent && !IS_SET(victim->combat, COMBAT_BLADESHIELD1) && !IS_SET(victim->combat, COMBAT_BLADESHIELD2)) return eFAILURE;
@@ -2727,9 +2727,11 @@ int isHit(CHAR_DATA *ch, CHAR_DATA *victim, int attacktype, int &type, int &redu
   } else if (what < (parry+dodge+block))
   { // Shieldblock
      type = 1;
+     reduce = has_skill(victim, SKILL_SHIELDBLOCK);
   } else if (what < (parry+dodge+block+martial))
   { // Mdefense
      type = 2;
+     reduce = 100 * has_skill(victim, SKILL_DEFENSE) / 125;
   } else 
   { // Miss
      type = 3;
