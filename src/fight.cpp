@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.451 2007/06/08 23:51:46 dcastle Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.452 2007/06/09 20:14:04 dcastle Exp $ */
 
 extern "C"
 {
@@ -2785,13 +2785,10 @@ int check_riposte(CHAR_DATA * ch, CHAR_DATA * victim, int attacktype)
   act("$n turns $N's attack into one of $s own!", victim, NULL, ch, TO_ROOM, NOTVICT);
   act("$n turns your attack against you!", victim, NULL, ch, TO_VICT, 0);
   act("You turn $N's attack against $M.", victim, NULL, ch, TO_CHAR, 0);
-  
+  retval = eSUCCESS;  
   retval = one_hit(victim, ch, TYPE_UNDEFINED, FIRST);
   retval = SWAP_CH_VICT(retval);
 
-  REMOVE_BIT(retval, eSUCCESS);
-  SET_BIT(retval, eFAILURE);
-  
   return retval;  
 }
 
