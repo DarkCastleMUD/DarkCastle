@@ -600,7 +600,7 @@ int spell_aegis(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *
 
   af.type      = spl;
   af.duration  =  10 + skill / 4;
-  af.modifier  = -10 - skill / 4;
+  af.modifier  = -7 - skill / 3;
   af.location  = APPLY_AC;
   af.bitvector = -1;
 
@@ -627,7 +627,7 @@ int spell_armor(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *
 
   af.type      = SPELL_ARMOR;
   af.duration  =  10 + skill / 3;
-  af.modifier  = -10 - skill / 3;
+  af.modifier  = 0 - skill / 2;
   af.location  = APPLY_AC;
   af.bitvector = -1;
 
@@ -883,7 +883,7 @@ int spell_life_leech(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 
 /* SOLAR GATE BLIND EFFECT (Spellcraft Effect) */
 
-void do_solar_blind(CHAR_DATA *ch, CHAR_DATA *tmp_victim)
+void do_solar_blind(CHAR_DATA *ch, CHAR_DATA *tmp_victim, int skill)
 {
   struct affected_type af;
   if(!ch || !tmp_victim)
@@ -907,7 +907,7 @@ void do_solar_blind(CHAR_DATA *ch, CHAR_DATA *tmp_victim)
       af.bitvector = AFF_BLIND;
       affect_to_char(tmp_victim, &af);
       af.location = APPLY_AC;
-      af.modifier  = has_skill(tmp_victim,SKILL_BLINDFIGHTING)?skill_success(tmp_victim,0,SKILL_BLINDFIGHTING)?+45:90:90;
+      af.modifier  = has_skill(tmp_victim,SKILL_BLINDFIGHTING)?skill_success(tmp_victim,0,SKILL_BLINDFIGHTING)?skill/4:skill/2:skill/2;
       affect_to_char(tmp_victim, &af);
     } 	// if affect by blind
 }
@@ -968,7 +968,7 @@ int spell_solar_gate(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 	 return retval;
        if(IS_SET(retval,eEXTRA_VALUE)) return retval;
        if(!IS_SET(retval, eVICT_DIED) && spellcraft(ch, SPELL_SOLAR_GATE) && !IS_SET(retval, eEXTRA_VAL2))
-         do_solar_blind(ch, tmp_victim);
+         do_solar_blind(ch, tmp_victim,skill);
      }  // if are grouped, etc
   } 	// for
 
@@ -1603,7 +1603,7 @@ int spell_blindness(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
   affect_to_char(victim, &af);
 
   af.location = APPLY_AC;
-  af.modifier  = has_skill(victim,SKILL_BLINDFIGHTING)?skill_success(victim,0,SKILL_BLINDFIGHTING)?+25:50:50;
+  af.modifier  = has_skill(victim,SKILL_BLINDFIGHTING)?skill_success(victim,0,SKILL_BLINDFIGHTING)?skill/4:skill/2:skill/2;
   affect_to_char(victim, &af);
   return eSUCCESS;
 }
@@ -2468,7 +2468,7 @@ int spell_invisibility(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
 
 	af.type      = SPELL_INVISIBLE;
 	af.duration  = (int) ( skill / 3.75 );
-	af.modifier  = -50;
+	af.modifier  = -10 + skill/6;
 	af.location  = APPLY_AC;
 	af.bitvector = AFF_INVISIBLE;
 	affect_to_char(victim, &af);
@@ -5416,7 +5416,7 @@ int spell_stone_skin(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 
 	af.type = SPELL_STONE_SKIN;
 	af.duration = 3 + skill/6;
-	af.modifier = -(10 + skill/3);
+	af.modifier = -(10 + skill/4);
 	af.location = APPLY_AC;
 	af.bitvector = -1;
 	affect_to_char(ch, &af);
@@ -5452,7 +5452,7 @@ int spell_shield(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data 
 
   af.type = SPELL_SHIELD;
   af.duration = 6 + skill / 3;
-  af.modifier = - ( 9 + skill / 15 );
+  af.modifier = - ( 10 + skill / 10 );
   af.location = APPLY_AC;
   af.bitvector = -1;
   affect_to_char(victim, &af);
@@ -5567,7 +5567,7 @@ int spell_mass_invis(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 
 		af.type = SPELL_INVISIBLE;
 		af.duration = 24;
-		af.modifier = -40;
+		af.modifier = -10 - skill/6;
 		af.location = APPLY_AC;
 		af.bitvector = AFF_INVISIBLE;
 		affect_to_char(tmp_victim, &af);
@@ -9481,7 +9481,7 @@ int spell_barkskin(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
 
   af.type      = SPELL_BARKSKIN;
   af.duration  = 5 + level/7;
-  af.modifier  = -20;
+  af.modifier  = -10 - skill/5;
   af.location  = APPLY_AC;
   af.bitvector = -1;
 
@@ -9839,7 +9839,7 @@ int spell_feline_agility(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct o
 
 	af.type 	= SPELL_FELINE_AGILITY;
 	af.duration	= 1+(level/4);
-	af.modifier	= -10 -skill/5; 		/* AC bonus */
+	af.modifier	= -10 -skill/6; 		/* AC bonus */
 	af.location 	= APPLY_AC;
 	af.bitvector	= -1;
 	affect_to_char(victim, &af);
@@ -9892,7 +9892,7 @@ int spell_oaken_fortitude(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct 
 
         af.type         = SPELL_OAKEN_FORTITUDE;
         af.duration     = 1+(level/4);
-        af.modifier     = -10 - skill/5;             /* AC apply */
+        af.modifier     = -9 - skill/6;             /* AC apply */
         af.location     = APPLY_AC;
         af.bitvector    = -1;
         affect_to_char(victim, &af);
@@ -11490,25 +11490,20 @@ int spell_attrition(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
      send_to_char("Your victim is already suffering from the affects of that spell.\r\n", ch);
      return eSUCCESS;
   }
-
+  acmod = skill;
   if (skill < 40) { 
-    acmod = 30; 
     tohit = -3; 
     duration = 2;
   } else if (skill > 40 && skill <= 60 ) { 
-    acmod = 45; 
     tohit = -6;
     duration = 3;
   } else if (skill > 60 && skill <= 80 ) { 
-    acmod = 60; 
     tohit = -9;
     duration = 4;
   } else if (skill > 80 && skill <= 90 ) { 
-    acmod = 75; 
     tohit = -12; 
     duration = 5;
   } else if (skill > 90 ) {
-    acmod = 90;
     tohit = -15;
     duration = 6;
   }
