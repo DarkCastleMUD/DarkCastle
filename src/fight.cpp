@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.454 2007/06/12 04:52:52 jhhudso Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.455 2007/06/12 15:21:03 dcastle Exp $ */
 
 extern "C"
 {
@@ -2023,12 +2023,11 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
   }
   if(IS_SET(victim->combat, COMBAT_MONK_STANCE))  // half damage
       dam /= 2;
-  int reduce = 0;
+  int reduce = 0,type = 0;
   if (can_miss == 1) {
   if (attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING)
   {
     int retval2 = 0;
-    int type = 0;
 
     retval2 = isHit(ch, victim, attacktype, type, reduce);
     if (SOMEONE_DIED(retval2)) // Riposte
@@ -2268,8 +2267,8 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
     update_pos(victim);
     do_dam_msgs(ch, victim, dam, attacktype, weapon);
   }
-  mprog_damage_trigger( victim, ch, dam );
 
+  mprog_damage_trigger( victim, ch, dam );
 
   if(ethereal) {
     send_to_char("The ethereal stones protecting you shatter and fade into nothing.\r\n", victim);
@@ -2291,6 +2290,14 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
    attacktype == SKILL_ICE_ARROW || attacktype == SKILL_TEMPEST_ARROW ||
    attacktype == SKILL_GRANITE_ARROW || attacktype == SPELL_POISON)) // Wimpy
       return retval;   
+
+
+  if (typeofdamage == DAMAGE_TYPE_PHYSICAL && type == 1 && reduce > 0 && dam > 0 && ch != victim)
+  { // Shieldblock riposte..
+     int retval2 = check_riposte(ch, victim, attacktype);
+     if (SOMEONE_DIED(retval2)) return damage_retval(ch, victim, retval2);
+  }
+
   if(typeofdamage == DAMAGE_TYPE_PHYSICAL && dam > 0 && ch != victim && attacktype != SKILL_ARCHERY)
   {
     int retval2;
