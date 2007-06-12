@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.96 2007/05/10 06:38:41 jhhudso Exp $
+| $Id: inventory.cpp,v 1.97 2007/06/12 03:28:44 dcastle Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -1257,10 +1257,10 @@ int do_put(struct char_data *ch, char *argument, int cmd)
                  return eFAILURE;
               }
 	      if (((sub_object->obj_flags.weight) + 
-               (obj_object->obj_flags.weight)) <
+               (obj_object->obj_flags.weight)) <=
                (sub_object->obj_flags.value[0]) &&
                (obj_index[sub_object->item_number].virt != 536 || 
-               weight_in(sub_object) + obj_object->obj_flags.weight < 200))
+               weight_in(sub_object) + obj_object->obj_flags.weight <= 200))
               {
 		if(bits == FIND_OBJ_INV) {
 		  obj_from_char(obj_object);

@@ -896,10 +896,11 @@ int do_testhit(char_data *ch, char *argument, int cmd)
  int toHit = atoi(arg1), tlevel = atoi(arg3), level = atoi(arg2);
  float lvldiff = level - tlevel;
 
- if (lvldiff > 15 && lvldiff < 25) toHit += 5;
- else if (lvldiff > 5) toHit += 7;
+  toHit += lvldiff;
+/* if (lvldiff > 15 && lvldiff < 25) toHit += 25;
+ else if (lvldiff > 5) toHit += 15;
  else if (lvldiff >= 0) toHit += 10;
- else if (lvldiff >= -5) toHit += 7;
+ else if (lvldiff >= -5) toHit += 5; */
 
  float lvl = (50.0 - level - tlevel / 2.0)/10.0;
 
@@ -911,7 +912,7 @@ int do_testhit(char_data *ch, char *argument, int cmd)
    float num1 = 1.0 - (-300.0 - (float)AC) * 4.761904762 * 0.0001;
    float num2 = 20.0 + (-300.0 - (float)AC) * 0.0095238095;
 
-   float percent = 30+num1*(float)(toHit)-num2;
+   float percent = 40+num1*(float)(toHit)-num2;
 
    csendf(ch, "%d AC - %f%% chance to hit\r\n", AC, 
 			percent);

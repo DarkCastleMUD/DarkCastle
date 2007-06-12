@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.61 2007/04/07 21:55:51 shane Exp $
+| $Id: cl_warrior.cpp,v 1.62 2007/06/12 03:28:49 dcastle Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -215,7 +215,9 @@ int do_retreat(struct char_data *ch, char *argument, int cmd)
    char buf[MAX_INPUT_LENGTH];
    // Azrack -- retval should be initialized to something
    int retval = 0;
+   CHAR_DATA *chTemp, *loop_ch;
 
+   extern struct char_data *combat_list;
    int is_stunned(CHAR_DATA *ch);
 
    if (is_stunned(ch))
@@ -279,11 +281,18 @@ int do_retreat(struct char_data *ch, char *argument, int cmd)
           return retval;
 
       retval = attempt_move(ch, attempt + 1, 1);
-      if(IS_SET(retval, eSUCCESS))
+      if(IS_SET(retval, eSUCCESS)) {
+         // They got away.  Stop fighting for everyone not in the new room from fighting
+         for (chTemp = combat_list; chTemp; chTemp = loop_ch) 
+         {
+           loop_ch = chTemp->next_fighting;
+           if (chTemp->fighting == ch && chTemp->in_room != ch->in_room) 
+             stop_fighting(chTemp);
+         } // for
+         stop_fighting(ch);
          // The escape has succeded
          return retval;
-	  
-      else {
+      } else {
          if (!IS_SET(retval, eCH_DIED))
 	    act("$n tries to retreat, but is too exhausted!", ch, 0, 0, TO_ROOM, INVIS_NULL);
          return retval;

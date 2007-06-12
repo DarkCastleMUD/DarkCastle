@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.147 2007/05/03 21:11:02 dcastle Exp $ */
+/* $Id: info.cpp,v 1.148 2007/06/12 03:28:43 dcastle Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -970,15 +970,20 @@ int do_look(struct char_data *ch, char *argument, int cmd)
                         switch (bits)
                         {
                         case FIND_OBJ_INV :
-                           send_to_char(" (carried) : \n\r", ch);
+                           send_to_char(" (carried) ", ch);
                            break;
                         case FIND_OBJ_ROOM :
-                           send_to_char(" (here) : \n\r", ch);
+                           send_to_char(" (here) ", ch);
                            break;
                         case FIND_OBJ_EQUIP :
-                           send_to_char(" (used) : \n\r", ch);
+                           send_to_char(" (used) ", ch);
                            break;
                         }
+                        if(tmp_object->obj_flags.value[0])
+                          temp=((tmp_object->obj_flags.weight*3)
+                             /tmp_object->obj_flags.value[0]);
+                        else temp = 3;
+                        csendf(ch, "(%sfull) : \n\r", fullness[temp]);
                         list_obj_to_char(tmp_object->contains,
                            ch, 2, TRUE);
                      }

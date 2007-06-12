@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.156 2007/06/08 23:51:46 dcastle Exp $ */
+/* $Id: db.cpp,v 1.157 2007/06/12 03:28:43 dcastle Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -3042,7 +3042,10 @@ void handle_automatic_mob_settings(char_data * mob)
   
   mob->hitroll = mob_matrix[baselevel].tohit;
   mob->damroll = mob_matrix[baselevel].todam;
-  mob->armor = mob_matrix[baselevel].armor;
+  if(ISSET(mob->mobdata->actflags, ACT_BOSS))
+    mob->armor = (int) (mob_matrix[baselevel].armor * 1.5);
+  else
+    mob->armor = mob_matrix[baselevel].armor;
   mob->max_hit = mob->raw_hit = mob->hit = mob_matrix[baselevel].hitpoints 
 + ((mob_matrix[baselevel].hitpoints/100)*percent) ;
 }

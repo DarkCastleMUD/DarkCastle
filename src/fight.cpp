@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.452 2007/06/09 20:14:04 dcastle Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.453 2007/06/12 03:28:43 dcastle Exp $ */
 
 extern "C"
 {
@@ -2652,6 +2652,15 @@ void fight_kill(CHAR_DATA *ch, CHAR_DATA *vict, int type, int spec_type)
 
 int isHit(CHAR_DATA *ch, CHAR_DATA *victim, int attacktype, int &type, int &reduce)
 {
+  if((IS_SET(victim->combat, COMBAT_STUNNED)) ||
+    (IS_SET(victim->combat, COMBAT_STUNNED2)) ||
+    (IS_SET(victim->combat, COMBAT_BASH1)) ||
+    (IS_SET(victim->combat, COMBAT_BASH2)) ||
+    (IS_SET(victim->combat, COMBAT_SHOCKED)) ||
+    (IS_SET(victim->combat, COMBAT_SHOCKED2)) ||
+    (IS_AFFECTED(victim, AFF_PARALYSIS)))
+  return eFAILURE; //always hit
+
   int lvldiff = GET_LEVEL(ch) - GET_LEVEL(victim);
 
   // Figure out toHit value.
@@ -2660,11 +2669,12 @@ int isHit(CHAR_DATA *ch, CHAR_DATA *victim, int attacktype, int &type, int &redu
   if (toHit < 1) toHit = 1;
   
   // Hitting stuff close to your level gives you a bonus,   
-  if (lvldiff > 25);
+   toHit += lvldiff;
+/*  if (lvldiff > 25);
   else if (lvldiff > 15) toHit += 5;
   else if (lvldiff > 5) toHit += 7;
   else if (lvldiff >= 0) toHit += 10;
-  else if (lvldiff >= -5) toHit += 5;  
+  else if (lvldiff >= -5) toHit += 5;  */
 
   // Give a tohit bonus to low level players.
   float lowlvlmod = (50.0 - (float)GET_LEVEL(ch) - (GET_LEVEL(victim)/2.0))/10.0;
@@ -2674,7 +2684,7 @@ int isHit(CHAR_DATA *ch, CHAR_DATA *victim, int attacktype, int &type, int &redu
   // The stuff.
   float num1 = 1.0 - (-300.0 - (float)GET_AC(victim)) * 4.761904762 * 0.0001;
   float num2 = 20.0 + (-300.0 - (float)GET_AC(victim)) * 0.0095238095;
-  float percent =  30+num1*(float)(toHit)-num2;
+  float percent =  40+num1*(float)(toHit)-num2;
   
   // "percent" now contains the maximum avoidance rate. If they do not have two maxed defensive skills, it will actually be less.
   
@@ -2683,6 +2693,8 @@ int isHit(CHAR_DATA *ch, CHAR_DATA *victim, int attacktype, int &type, int &redu
   int dodge = IS_NPC(victim)?ISSET(victim->mobdata->actflags, ACT_DODGE)?GET_LEVEL(victim):0:has_skill(victim, SKILL_DODGE);
   int block = has_skill(victim, SKILL_SHIELDBLOCK);
   int martial = has_skill(victim, SKILL_DEFENSE);
+
+  if(victim->equipment[WIELD] == NULL) parry = 0;
 
   if (!victim->equipment[WEAR_SHIELD]) block = 0;
   else if (IS_NPC(victim)) block = GET_LEVEL(victim);
@@ -2699,9 +2711,6 @@ int isHit(CHAR_DATA *ch, CHAR_DATA *victim, int attacktype, int &type, int &redu
   if (dodge) skill_increase_check(victim, SKILL_DODGE, dodge, SKILL_INCREASE_HARD+500);
   if (block) skill_increase_check(victim, SKILL_SHIELDBLOCK, block, SKILL_INCREASE_HARD+500);
   if (martial) skill_increase_check(victim, SKILL_DEFENSE, martial, SKILL_INCREASE_HARD+500);
-
-  //csendf(ch, "%f\r\n", percent);
-  //csendf(victim, "%f\r\n", percent);
 
   // Ze random stuff.
   if (number(1,101) < percent && !IS_SET(victim->combat, COMBAT_BLADESHIELD1) && !IS_SET(victim->combat, COMBAT_BLADESHIELD2)) return eFAILURE;
@@ -4837,9 +4846,9 @@ PLR_DAMAGE)?dammsg:"", attack, shield, punct);
      if (w_type == 0)
      {
        attack = race_info[GET_RACE(ch)].unarmed;
-	int a;
-	if (IS_NPC(ch) && (a = mob_index[ch->mobdata->nr].virt) < 92 && a > 87)
-	 attack = elem_type[a-88];
+       int a;
+       if (IS_NPC(ch) && (a = mob_index[ch->mobdata->nr].virt) < 92 && a > 87)
+        attack = elem_type[a-88];
        sprintf(buf1, "$n's %s%s %s $N%s|%c", modstring, attack, vp, vx, punct);
        sprintf(buf2, "Your %s%s %s $N%s%s%c", modstring, attack, vp, vx,!IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_DAMAGE)?dammsg:"", punct);
        sprintf(buf3, "$n's %s%s %s you%s%s%c", modstring, attack, vp, vx, !IS_NPC(victim) && IS_SET(victim->pcdata->toggles, PLR_DAMAGE)?dammsg:"", punct);

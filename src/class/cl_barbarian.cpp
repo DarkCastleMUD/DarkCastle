@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_barbarian.cpp,v 1.77 2007/04/07 21:55:51 shane Exp $
+| $Id: cl_barbarian.cpp,v 1.78 2007/06/12 03:28:49 dcastle Exp $
 | cl_barbarian.C
 | Description:  Commands for the barbarian class.
 */
@@ -116,6 +116,11 @@ int do_battlecry(struct char_data *ch, char *argument, int cmd)
      return eFAILURE;
   }
 
+  if(ch->master || !ch->followers) {
+    send_to_char("You must be leading a group in order to battlecry.\n\r", ch);
+    return eFAILURE;
+  }
+
   if (!skill_success(ch,NULL,SKILL_BATTLECRY)) {
      act ("You give a cry of defiance, but trip over your own feet!", ch, 0, 0, TO_CHAR, 0);
      act ("$n gives a cry of defiance, but trips over $s own feet!", ch, 0, 0, TO_ROOM, 0);
@@ -127,17 +132,7 @@ int do_battlecry(struct char_data *ch, char *argument, int cmd)
      act ("You give a battlecry, sounding your defiance!", ch, 0, 0, TO_CHAR, 0);
      act ("$n yells 'They can take our lives, but they'll never take OUR FREEDOM!'", ch, 0, 0, TO_ROOM, 0);
 
-     SET_BIT(ch->combat, COMBAT_RAGE1);
      if (ch->followers) f = ch->followers;
-     else if (ch->master) 
-     {
-	f = ch->master->followers;
-        act ("You give a battlecry, sounding your defiance!", ch->master, 0, 0, TO_CHAR, 0);
-        act ("$n gives a loud cry of agreement!", ch->master, 0, 0, TO_ROOM, 0);
-        SET_BIT(f->follower->combat, COMBAT_RAGE1);
-
-     }
-     else f = NULL;
 
      for(; f; f = f->next) {
         if (!IS_AFFECTED(f->follower, AFF_GROUP) ||
@@ -147,12 +142,18 @@ int do_battlecry(struct char_data *ch, char *argument, int cmd)
 	    (f->follower->in_room != ch->in_room) ||
             (!f->follower->fighting))
            continue;
-	if (f->follower == ch) continue;
-        act ("You give a battlecry, sounding your defiance!", f->follower, 0, 0, TO_CHAR, 0);
-        act ("$n gives a loud cry of agreement!", f->follower, 0, 0, TO_ROOM, 0);
-        SET_BIT(f->follower->combat, COMBAT_RAGE1);
+
+        if(number(1, 101) > has_skill(ch, SKILL_BATTLECRY)) {
+          act("You look away sheepishly, unaffected by the rage.", f->follower, 0, 0, TO_CHAR, 0);
+          act("$n looks away sheepishly, unaffected by the rage.", f->follower, 0, 0, TO_ROOM, 0);
+          continue;
+        } else {
+          act ("You give a battlecry, sounding your defiance!", f->follower, 0, 0, TO_CHAR, 0);
+          act ("$n gives a loud cry of agreement!", f->follower, 0, 0, TO_ROOM, 0);
+          SET_BIT(f->follower->combat, COMBAT_RAGE1);
 	}
      }
+   }
 
    if(has_skill(ch,SKILL_BATTLECRY) > 40 && !number(0, 4))
       WAIT_STATE(ch, PULSE_VIOLENCE * 2);
