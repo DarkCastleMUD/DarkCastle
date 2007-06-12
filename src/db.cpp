@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.157 2007/06/12 03:28:43 dcastle Exp $ */
+/* $Id: db.cpp,v 1.158 2007/06/12 15:36:07 pirahna Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -411,7 +411,8 @@ char * funnybootmessages[] =
   "Brewing Canadian beer...\r\n"
   "Searching for intelligent players....searching....searching....searching\n\r"
   "Coding bug...\r\n"
-  "Uploading Urizen's ABBA mp3s...\r\n"
+  "Uploading Urizen's ABBA mp3s...\r\n",
+  "09 F9 11 02 9D 74 E3 5B D8 41 56 C5 63 56 88 C0\r\n"
 };
 
 void funny_boot_message()
