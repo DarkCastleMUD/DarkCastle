@@ -912,7 +912,7 @@ int do_testhit(char_data *ch, char *argument, int cmd)
    float num1 = 1.0 - (-300.0 - (float)AC) * 4.761904762 * 0.0001;
    float num2 = 20.0 + (-300.0 - (float)AC) * 0.0095238095;
 
-   float percent = 40+num1*(float)(toHit)-num2;
+   float percent = 30+num1*(float)(toHit)-num2;
 
    csendf(ch, "%d AC - %f%% chance to hit\r\n", AC, 
 			percent);

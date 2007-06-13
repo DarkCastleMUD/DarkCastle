@@ -6,7 +6,7 @@ noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) 
 subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
 mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.455 2007/06/12 15:21:03 dcastle Exp $ */
+****************************************************************************** */ /* $Id: fight.cpp,v 1.456 2007/06/13 22:57:49 dcastle Exp $ */
 
 extern "C"
 {
@@ -1272,7 +1272,7 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
 //    return damage(ch, vict, 0, w_type, w_type, weapon);
 //  }
 
-  if(IS_AFFECTED(vict, AFF_PARALYSIS) || !AWAKE(vict) || is_stunned(vict))
+/*  if(IS_AFFECTED(vict, AFF_PARALYSIS) || !AWAKE(vict) || is_stunned(vict))
     chance = 102; // can't miss
   else {
     chance = 45;
@@ -1304,7 +1304,7 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
 
   if(number(0, 101) > chance) 
     return damage(ch, vict, 0, w_type, w_type, weapon); // miss
-
+*/
   if(wielded)  {
     dam = dice(wielded->obj_flags.value[1], wielded->obj_flags.value[2]);
     if(IS_NPC(ch)) {
@@ -2668,14 +2668,44 @@ int isHit(CHAR_DATA *ch, CHAR_DATA *victim, int attacktype, int &type, int &redu
     (IS_SET(victim->combat, COMBAT_BASH2)) ||
     (IS_SET(victim->combat, COMBAT_SHOCKED)) ||
     (IS_SET(victim->combat, COMBAT_SHOCKED2)) ||
-    (IS_AFFECTED(victim, AFF_PARALYSIS)))
+    (IS_AFFECTED(victim, AFF_PARALYSIS)) ||
+    (!AWAKE(victim)))
   return eFAILURE; //always hit
 
   int lvldiff = GET_LEVEL(ch) - GET_LEVEL(victim);
+  int skill = 0;
 
   // Figure out toHit value.
-  int toHit = GET_HITROLL(ch);
+  int toHit = GET_REAL_HITROLL(ch);
 //  toHit += speciality_bonus(ch, attacktype, GET_LEVEL(victim));
+
+  switch(attacktype) {
+    case TYPE_BLUDGEON:
+      skill = SKILL_BLUDGEON_WEAPONS;
+      break;
+    case TYPE_WHIP:
+      skill = SKILL_WHIPPING_WEAPONS;
+      break;
+    case TYPE_CRUSH:
+      skill = SKILL_CRUSHING_WEAPONS;
+      break;
+    case TYPE_SLASH:
+      skill = SKILL_SLASHING_WEAPONS;
+      break;
+    case TYPE_PIERCE:
+      skill = SKILL_PIERCEING_WEAPONS;
+      break;
+    case TYPE_STING:
+      skill = SKILL_STINGING_WEAPONS;
+      break;
+    case TYPE_HIT:
+      skill = SKILL_HAND_TO_HAND;
+      break;
+    default:
+      break;
+  }
+  if(skill) toHit += has_skill(ch, skill)/8;
+
   if (toHit < 1) toHit = 1;
   
   // Hitting stuff close to your level gives you a bonus,   
@@ -2694,27 +2724,27 @@ int isHit(CHAR_DATA *ch, CHAR_DATA *victim, int attacktype, int &type, int &redu
   // The stuff.
   float num1 = 1.0 - (-300.0 - (float)GET_AC(victim)) * 4.761904762 * 0.0001;
   float num2 = 20.0 + (-300.0 - (float)GET_AC(victim)) * 0.0095238095;
-  float percent =  40+num1*(float)(toHit)-num2;
+  float percent =  30+num1*(float)(toHit)-num2;
   
   // "percent" now contains the maximum avoidance rate. If they do not have two maxed defensive skills, it will actually be less.
   
   // Determine defensive skills.
-  int parry = IS_NPC(victim)?ISSET(victim->mobdata->actflags, ACT_PARRY)?GET_LEVEL(victim):0:has_skill(victim, SKILL_PARRY);
-  int dodge = IS_NPC(victim)?ISSET(victim->mobdata->actflags, ACT_DODGE)?GET_LEVEL(victim):0:has_skill(victim, SKILL_DODGE);
+  int parry = IS_NPC(victim)?ISSET(victim->mobdata->actflags, ACT_PARRY)?GET_LEVEL(victim)/2:0:has_skill(victim, SKILL_PARRY);
+  int dodge = IS_NPC(victim)?ISSET(victim->mobdata->actflags, ACT_DODGE)?GET_LEVEL(victim)/2:0:has_skill(victim, SKILL_DODGE);
   int block = has_skill(victim, SKILL_SHIELDBLOCK);
   int martial = has_skill(victim, SKILL_DEFENSE);
 
   if(victim->equipment[WIELD] == NULL) parry = 0;
 
   if (!victim->equipment[WEAR_SHIELD]) block = 0;
-  else if (IS_NPC(victim)) block = GET_LEVEL(victim);
+  else if (IS_NPC(victim)) block = GET_LEVEL(victim)/2;
 
   // Modify defense rate accordingly
   int amt = parry + dodge + block + martial;
 
   float scale = (float)amt / (196.0); // Mobs can get a bonus if they can perform 3+.
 
-  percent *= (0.8 - scale/5.0);
+  percent *= (1.0 - scale/5.0);
 
 
   if (parry) skill_increase_check(victim, SKILL_PARRY, parry, SKILL_INCREASE_HARD+500);
@@ -2723,7 +2753,7 @@ int isHit(CHAR_DATA *ch, CHAR_DATA *victim, int attacktype, int &type, int &redu
   if (martial) skill_increase_check(victim, SKILL_DEFENSE, martial, SKILL_INCREASE_HARD+500);
 
   // Ze random stuff.
-  if (number(1,101) < percent && !IS_SET(victim->combat, COMBAT_BLADESHIELD1) && !IS_SET(victim->combat, COMBAT_BLADESHIELD2)) return eFAILURE;
+  if (number(1,101) < (int)percent && !IS_SET(victim->combat, COMBAT_BLADESHIELD1) && !IS_SET(victim->combat, COMBAT_BLADESHIELD2)) return eFAILURE;
 
   // Miss, determine a message
 
@@ -3012,6 +3042,7 @@ int speciality_bonus(CHAR_DATA *ch,int attacktype, int level)
    }
    level -= GET_LEVEL(ch);
    if (!skill) return 0;
+   else return has_skill(ch,skill)/10;
 
    if (level < -20 && IS_NPC(ch)) return 0 - (int)(GET_LEVEL(ch)/2.4);
    else if (level < -10 && IS_NPC(ch)) return 0 - (int)(GET_LEVEL(ch)/2.6);
@@ -4805,10 +4836,10 @@ void dam_message(int dam, CHAR_DATA * ch, CHAR_DATA * victim,
    {
       switch (number(0,3))
       {
-	case 0: sprintf(shield,"shin");break;
-	case 1: sprintf(shield,"hand");break;
-	case 2: sprintf(shield,"foot");break;
-	case 3: sprintf(shield,"forearm");break;
+	case 0: sprintf(shield,"your shin");break;
+	case 1: sprintf(shield,"your hand");break;
+	case 2: sprintf(shield,"your foot");break;
+	case 3: sprintf(shield,"your forearm");break;
 	default: sprintf(shield,"error");break;
       }
    }

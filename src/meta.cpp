@@ -1435,11 +1435,11 @@ int cardinal(struct char_data *ch, struct obj_data *obj, int cmd, char *argument
 
       if (choice == 3 && ch->height >= race_info[ch->race].max_height)
       { send_to_char("You cannot increase your height any more.\r\n",ch); return eSUCCESS;}    
-      else if (choice == 4 && ch->height <= race_info[ch->race].max_height)
+      else if (choice == 4 && ch->height <= race_info[ch->race].min_height)
       { send_to_char("You cannot decrease your height any more.\r\n",ch); return eSUCCESS;} 
       else if (choice == 5 && ch->weight >= race_info[ch->race].max_weight)
       { send_to_char("You cannot increase your weight any more.\r\n",ch); return eSUCCESS;}  
-      else if (choice == 6 && ch->weight <= race_info[ch->race].max_weight)
+      else if (choice == 6 && ch->weight <= race_info[ch->race].min_weight)
       { send_to_char("You cannot decrease your weight any more.\r\n",ch); return eSUCCESS;}
       
       if (GET_PLATINUM(ch) < 250)

@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.148 2007/06/12 03:28:43 dcastle Exp $ */
+/* $Id: info.cpp,v 1.149 2007/06/13 22:57:49 dcastle Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -388,7 +388,7 @@ void show_spells(char_data * i, char_data * ch)
       sprintf(send_buf, "%s$B$3frost! ", send_buf);
       has_spells = 1;
    }
-   if (affected_by_spell(i, SPELL_ACID_SHIELD)) {
+   if (IS_AFFECTED(i, AFF_ACID_SHIELD)) {
       sprintf(send_buf, "%s$B$2acid! ", send_buf);
       has_spells = 1;
    }
