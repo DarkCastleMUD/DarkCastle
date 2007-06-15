@@ -85,11 +85,6 @@ using namespace std;
 #endif
 
 extern bool MOBtrigger;
-short code_testing_mode = 0;
-short code_testing_mode_mob = 0;
-short code_testing_mode_world = 0;
-short bport = 0;
-bool allow_imp_password = false;
 unsigned mother_desc, other_desc, third_desc, fourth_desc;
 
 // This is turned on right before we call game_loop
@@ -98,7 +93,7 @@ int try_to_hotboot_on_crash = 0;
 int was_hotboot = 0;
 int died_from_sigsegv = 0;
 
-//char ** ext_argv = 0;
+extern char **orig_argv;
 
 /* these are here for the eventual addition of ban */
 int num_invalid = 0;
@@ -110,8 +105,6 @@ extern int restrict;
 //extern int mini_mud;
 //extern int no_rent_check;
 extern FILE *player_fl;
-int DFLT_PORT = 6667, DFLT_PORT2 = 6666, DFLT_PORT3 =4000;
-int DFLT_PORT4 =6669;
 
 extern CWorld world;	/* In db.c */
 extern int top_of_world;	/* In db.c */
@@ -134,13 +127,11 @@ int buf_overflows = 0;		/* # of overflows of output */
 int buf_switches = 0;		/* # of switches from small to large buf */
 int _shutdown = 0;		/* clean shutdown */
 int tics = 0;			/* for extern checkpointing */
-int scheck = 0;			/* for syntax checking mode */
 //int nameserver_is_slow = 0;	/* see config.c */
 //extern int auto_save;		/* see config.c */
 //extern int autosave_time;	/* see config.c */
 struct timeval null_time;	/* zero-valued time structure */
 time_t start_time;
-int port, port2, port3, port4;
 
 // heartbeat globals
 int pulse_timer;
@@ -182,7 +173,6 @@ void report_debug_logging();
 /* extern fcnts */
 void pulse_takeover(void);
 void boot_db(void);
-void boot_world(void);
 void zone_update(void);
 void affect_update(int32 duration_type);	/* In spells.c */
 void point_update(void);	/* In limits.c */
@@ -214,146 +204,6 @@ void gettimeofday(struct timeval *t, struct timezone *dummy)
   t->tv_usec = (millisec % 1000) * 1000;
 }
 #endif
-/* *********************************************************************
-*  main game loop and related stuff                                    *
-********************************************************************* */
-
-char **orig_argv;
-
-int main(int argc, char **argv)
-{
-  // Make a copy of our executable so that in the event of a crash we have a
-  // known good copy to debug with.
-  stringstream cmd;
-  cmd << "cp " << argv[0] << " " << argv[0] << ".`/sbin/pidof " << argv[0] << "`";
-  if (int retval = system(cmd.str().c_str()) != 0) {
-    cerr << "Unable to make backup of executable due to system error: "
-	 << retval << endl;
-  }
-
-  fprintf(stderr, "Arguments: ");
-  orig_argv = argv;
-  int index=0;
-  do {
-    fprintf(stderr, "[%s] ", orig_argv[index++]);
-  } while (orig_argv[index] != 0);
-  fprintf(stderr, "\n");
-
-  char buf[512];
-  int pos = 1;
-  char dir[256];
-  strcpy(dir, (char *)DFLT_DIR);
-  
-  extern void init_random();
-  init_random();
-
-  port = DFLT_PORT;
-  port2 = DFLT_PORT2;
-  port3 = DFLT_PORT3;
-  port4 = DFLT_PORT4;
-  //  ext_argv = argv;
-
-  while ((pos < argc) && (*(argv[pos]) == '-')) {
-    switch (*(argv[pos] + 1)) {
-
-    case 'w':
-       code_testing_mode = 1;
-       code_testing_mode_world = 1;
-       log("Mud in world checking mode.  TinyTinyworld being used. (WLD)"
-           "\r\nDo NOT have mortals login when in this mode.", 0, LOG_MISC);
-       break;
-
-    case 'c':
-       code_testing_mode = 1;
-       log("Mud in testing mode. TinyTinyworld being used. (OBJ)", 0, LOG_MISC);
-       break;
-                                                
-    case 'm':
-       code_testing_mode = 1;
-       code_testing_mode_mob = 1;
-       log("Mud in testing mode. TinyTinyworld being used. (MOB,OBJ)", 0, LOG_MISC);
-       break;
-    case 'b': // Buildin' port.
-	bport = 1;
-	port = 7000;
-	port2 = 7001;
-	port3 = 7002;
-	port4 = 7003;
-	break;                                                             
-    case 'd':
-       if(argv[pos][2] != '\0')
-           strcpy(dir, &argv[pos][2]);
-	   else if(++pos < argc)
-           strcpy(dir, &argv[pos][0]);
-	   else {
-           fprintf(stderr, "Directory arg expected after -d.\n\r");
-           exit(1);
-       }
-       break;
-    case 'p':
-       port = 1500;
-       port2 = 1501;
-       port3 = 1502;
-       port4 = 1503;
-       break;
-    case 'P':
-      allow_imp_password = true;
-      break;
-    default:
-      sprintf(buf, "SYSERR: Unknown option -%c in argument string.", *(argv[pos] + 1));
-      log(buf, 0, LOG_MISC);
-      break;
-    }
-    pos++;
-  }
-
-  if (pos < argc) {
-    if (!isdigit(*argv[pos])) {
-      fprintf(stderr, "Usage: %s [-c] [-m] [-q] [-r] [-s] [-d pathname] [port #]\n", argv[0]);
-      exit(1);
-    } else if ((port = atoi(argv[pos])) <= 1024) {
-      fprintf(stderr, "Illegal port number.\n");
-      exit(1);
-    }
-  }
-
-   if (port != DFLT_PORT) { 
-     port2 = port + 1; 
-     port3 = port + 2;
-     port4 = port + 3;
-     }
-#ifndef WIN32
-  if (chdir(dir) < 0) {
-    perror("Fatal error changing to data directory");
-    exit(1);
-  }
-#else
-  for(unsigned i = 0; i < strlen(dir); i++)
-  {
-	  if(dir[i] == '/')
-	  {
-		  dir[i] = '\\';
-	  }
-  }
-  if(_chdir(dir) < 0) {
-	  perror("Fatal error changing to data directory");
-	  exit(1);
-  }
-#endif
-  sprintf(buf, "Using %s as data directory.", dir);
-  log(buf, 0, LOG_MISC);
-
-  if (scheck) {
-    boot_world();
-    log("Done.", 0, LOG_MISC);
-    exit(0);
-  } else {
-    sprintf(buf, "Running game on port %d, %d and %d.", port, port2, port3);
-    log(buf, 0, LOG_MISC);
-    init_game(port, port2, port3, port4);
-  }
-  return 0;
-}
 
 // writes all the descriptors to file so we can open them back up after
 // a reboot
