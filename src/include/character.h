@@ -1,7 +1,7 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.66 2007/04/13 11:08:59 shane Exp $
+| $Id: character.h,v 1.67 2007/06/15 16:00:15 jhhudso Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
@@ -21,6 +21,7 @@
 #include <map>
 #include <sys/time.h>
 
+#define ASIZE 32
 #define MAX_GOLEMS           2 // amount of golems above +1
 
 #define START_ROOM        3001 // Where you login
