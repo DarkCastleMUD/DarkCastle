@@ -46,43 +46,44 @@ void rebuild_rnum_references(int startAt, int type)
 {
     int zone, comm;
 
-    for (zone = 0; zone <= top_of_zone_table; zone++)
-    for (comm = 0; zone_table[zone].cmd[comm].command != 'S'; comm++)
-    {
-        switch(zone_table[zone].cmd[comm].command)
-        {
-        case 'M':
-          if (type==1 && zone_table[zone].cmd[comm].arg1 >= startAt)
-	      zone_table[zone].cmd[comm].arg1++;
-        break;
-        case 'O':
-          if (type==2 && zone_table[zone].cmd[comm].arg1 >= startAt)
-	      zone_table[zone].cmd[comm].arg1++;
-        break;
-        case 'G':
-          if (type==2 && zone_table[zone].cmd[comm].arg1 >= startAt)
-	      zone_table[zone].cmd[comm].arg1++;
-        break;
-        case 'E':
-          if (type==2 && zone_table[zone].cmd[comm].arg1 >= startAt)
-	      zone_table[zone].cmd[comm].arg1++;
-        break;
-        case 'P':
-          if (type==2 && zone_table[zone].cmd[comm].arg1 >= startAt)
-	      zone_table[zone].cmd[comm].arg1++;
-          if (type==2 && zone_table[zone].cmd[comm].arg3 >= startAt)
-	      zone_table[zone].cmd[comm].arg3++;
-        break;
-        case '%':
-        case 'K':
-        case 'D':
-        case 'X':
-        case '*':
-        case 'J':
-        break;
-        default:
-          log("Illegal char hit in rebuild_rnum_references", 0, LOG_WORLD);
-          break;
+    for (zone = 0; zone <= top_of_zone_table; zone++) {
+      for (comm = 0; zone_table[zone].cmd && zone_table[zone].cmd[comm].command != 'S'; comm++)
+	{
+	  switch(zone_table[zone].cmd[comm].command)
+	    {
+	    case 'M':
+	      if (type==1 && zone_table[zone].cmd[comm].arg1 >= startAt)
+		zone_table[zone].cmd[comm].arg1++;
+	      break;
+	    case 'O':
+	      if (type==2 && zone_table[zone].cmd[comm].arg1 >= startAt)
+		zone_table[zone].cmd[comm].arg1++;
+	      break;
+	    case 'G':
+	      if (type==2 && zone_table[zone].cmd[comm].arg1 >= startAt)
+		zone_table[zone].cmd[comm].arg1++;
+	      break;
+	    case 'E':
+	      if (type==2 && zone_table[zone].cmd[comm].arg1 >= startAt)
+		zone_table[zone].cmd[comm].arg1++;
+	      break;
+	    case 'P':
+	      if (type==2 && zone_table[zone].cmd[comm].arg1 >= startAt)
+		zone_table[zone].cmd[comm].arg1++;
+	      if (type==2 && zone_table[zone].cmd[comm].arg3 >= startAt)
+		zone_table[zone].cmd[comm].arg3++;
+	      break;
+	    case '%':
+	    case 'K':
+	    case 'D':
+	    case 'X':
+	    case '*':
+	    case 'J':
+	      break;
+	    default:
+	      log("Illegal char hit in rebuild_rnum_references", 0, LOG_WORLD);
+	      break;
+	    }
 	}
     }
 }
