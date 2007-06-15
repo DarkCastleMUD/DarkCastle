@@ -12,14 +12,15 @@
  *  main game loop and related stuff                                  *
  **********************************************************************/
 
-char **orig_argv;
-short code_testing_mode = 0;
-short code_testing_mode_mob = 0;
-short code_testing_mode_world = 0;
-bool allow_imp_password = false;
+extern char **orig_argv;
+extern short code_testing_mode;
+extern short code_testing_mode_mob;
+extern short code_testing_mode_world;
+extern short bport;
+extern bool allow_imp_password;
+
 int scheck = 0;			/* for syntax checking mode */
 
-short bport = 0;
 int port, port2, port3, port4;
 int DFLT_PORT = 6667, DFLT_PORT2 = 6666, DFLT_PORT3 = 4000, DFLT_PORT4 = 6669;
 

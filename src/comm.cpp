@@ -93,7 +93,12 @@ int try_to_hotboot_on_crash = 0;
 int was_hotboot = 0;
 int died_from_sigsegv = 0;
 
-extern char **orig_argv;
+char **orig_argv;
+short code_testing_mode = 0;
+short code_testing_mode_mob = 0;
+short code_testing_mode_world = 0;
+short bport = 0;
+bool allow_imp_password = false;
 
 /* these are here for the eventual addition of ban */
 int num_invalid = 0;
