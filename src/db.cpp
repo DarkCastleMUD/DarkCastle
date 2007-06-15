@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.158 2007/06/12 15:36:07 pirahna Exp $ */
+/* $Id: db.cpp,v 1.159 2007/06/15 16:51:51 jhhudso Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -3677,7 +3677,12 @@ struct obj_data *clone_object(int nr)
   clear_object(obj); 
   old = ((struct obj_data *)obj_index[nr].item); /* cast the void pointer */
 
-  memcpy(obj, old, sizeof(struct obj_data));
+  if (old != 0) {
+    memcpy(obj, old, sizeof(struct obj_data));
+  } else {
+    fprintf(stderr, "clone_object(%d): Obj not found in obj_index.\n", nr);
+    return 0;
+  }
 
   /* *** extra descriptions *** */
   obj->ex_description = 0;
