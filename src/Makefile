@@ -15,8 +15,8 @@ PROF_FLAGS = $(DEBUG_FLAGS) -pg
 #LDFLAGS = -lg++ -lgcc -lm -lc -lg -lWiz -lClass
 #Changed when we switched to Linux Mandrake - Pir
 #LDFLAGS = -lstdc++ -lcrypt -lgcc -lm -lc -lg -lWiz -lClass
-LDFLAGS = -L/emul/linux/x86/lib -lcrypt -lmcheck -lz
-IN_CXXFLAGS = -Wall -I./include -DLINUX -m32
+LDFLAGS = -L/emul/linux/x86/lib -lcrypt -lmcheck -lz -lpq
+IN_CXXFLAGS = -Wall -I./include -DLINUX -DUSE_SQL -m32
 
 BASENAME = research# Base product name -- NO SPACES
 
@@ -32,16 +32,12 @@ default:
 	@echo "simple	Make with no libraries/flags"
 	@echo "fast	Make with optimization flags"
 	@echo "profile  Make with debug & profile libraries/flags"
-	@echo "sql      Make debug with Postgresql support"
 	@echo ""
 
 profile:
 	@$(MAKE) darkcastle PROGNAME=$(BASENAME).prof CXXFLAGS="$(IN_CXXFLAGS) $(PROF_FLAGS)"
 debug:
 	@$(MAKE) darkcastle PROGNAME=$(BASENAME).debug CXXFLAGS="$(IN_CXXFLAGS) $(DEBUG_FLAGS)"
-
-sql:
-	$(MAKE) darkcastle PROGNAME=$(BASENAME).debug CXXFLAGS="$(IN_CXXFLAGS) $(DEBUG_FLAGS) -DUSE_SQL" LDFLAGS="$(LDFLAGS) -lpq"
 
 simple:
 	@$(MAKE) darkcastle PROGNAME=$(BASENAME).simple CXXFLAGS=$(IN_CXXFLAGS)
