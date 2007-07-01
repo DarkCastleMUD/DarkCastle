@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.149 2007/06/13 22:57:49 dcastle Exp $ */
+/* $Id: info.cpp,v 1.150 2007/07/01 01:56:03 jhhudso Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -979,10 +979,20 @@ int do_look(struct char_data *ch, char *argument, int cmd)
                            send_to_char(" (used) ", ch);
                            break;
                         }
-                        if(tmp_object->obj_flags.value[0])
-                          temp=((tmp_object->obj_flags.weight*3)
-                             /tmp_object->obj_flags.value[0]);
-                        else temp = 3;
+			
+                        if (tmp_object->obj_flags.value[0] && tmp_object->obj_flags.weight) {
+			  temp = ((tmp_object->obj_flags.weight*3) / tmp_object->obj_flags.value[0]);
+			} else {
+			  temp = 3;
+			}
+			
+			if (temp < 0) {
+			  temp = 0;
+			} else if (temp > 3) {
+			  temp = 3;
+			  logf(IMMORTAL, LOG_WORLD, "Bug in object %d. Weight: %d v1: %d", obj_index[tmp_object->item_number].virt, tmp_object->obj_flags.weight, tmp_object->obj_flags.value[0]);
+			}
+
                         csendf(ch, "(%sfull) : \n\r", fullness[temp]);
                         list_obj_to_char(tmp_object->contains,
                            ch, 2, TRUE);
