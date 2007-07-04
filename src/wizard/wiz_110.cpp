@@ -559,7 +559,7 @@ int do_rename_char(struct char_data *ch, char *arg, int cmd)
   log(name, GET_LEVEL(ch), LOG_GOD);
 
   // Get rid of the existing one
-  do_zap(ch, GET_NAME(victim), 9);
+  do_zap(ch, GET_NAME(victim), 10);
 
   // load the new guy
   do_linkload(ch, newname, 9);
@@ -895,12 +895,10 @@ int do_testhit(char_data *ch, char *argument, int cmd)
  }
  int toHit = atoi(arg1), tlevel = atoi(arg3), level = atoi(arg2);
  float lvldiff = level - tlevel;
-
-  toHit += lvldiff;
-/* if (lvldiff > 15 && lvldiff < 25) toHit += 25;
+ if (lvldiff > 15 && lvldiff < 25) toHit += 25;
  else if (lvldiff > 5) toHit += 15;
  else if (lvldiff >= 0) toHit += 10;
- else if (lvldiff >= -5) toHit += 5; */
+ else if (lvldiff >= -5) toHit += 5;
 
  float lvl = (50.0 - level - tlevel / 2.0)/10.0;
 

@@ -318,8 +318,9 @@ int do_zap(struct char_data *ch, char *argument, int cmd)
             GET_SHORT(ch));
 
     remove_familiars(victim->name, ZAPPED);
-    remove_vault(victim->name, ZAPPED);
-
+    if (cmd == 9) // cmd9 = someone typed it. 10 = rename.
+      remove_vault(victim->name, ZAPPED);
+ 
     GET_LEVEL(victim) = 1;
     update_wizlist(victim);
 
