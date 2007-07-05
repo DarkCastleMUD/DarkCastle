@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: save.cpp,v 1.51 2007/04/07 21:16:11 dcastle Exp $ */
+/* $Id: save.cpp,v 1.52 2007/07/05 01:56:56 apocalypse Exp $ */
 
 extern "C"
 {
@@ -1501,17 +1501,17 @@ void char_to_store(CHAR_DATA *ch, struct char_file_u *st, struct time_data & tmp
   }
   else { 
     switch(GET_CLASS(ch)) {
-      case CLASS_MAGE: st->armor = 200; break;
-      case CLASS_DRUID: st->armor = 185; break;
-      case CLASS_CLERIC: st->armor = 170; break;
-      case CLASS_ANTI_PAL: st->armor = 155; break;
-      case CLASS_THIEF: st->armor = 140; break;
-      case CLASS_BARD: st->armor = 125; break;
-      case CLASS_BARBARIAN: st->armor = 110; break;
-      case CLASS_RANGER: st->armor = 95; break;
-      case CLASS_PALADIN: st->armor = 80; break;
-      case CLASS_WARRIOR: st->armor = 65; break;
-      case CLASS_MONK: st->armor = 50; break;
+      case CLASS_MAGE: st->armor = 150; break;
+      case CLASS_DRUID: st->armor = 140; break;
+      case CLASS_CLERIC: st->armor = 130; break;
+      case CLASS_ANTI_PAL: st->armor = 120; break;
+      case CLASS_THIEF: st->armor = 110; break;
+      case CLASS_BARD: st->armor = 100; break;
+      case CLASS_BARBARIAN: st->armor = 80; break;
+      case CLASS_RANGER: st->armor = 60 break;
+      case CLASS_PALADIN: st->armor = 40; break;
+      case CLASS_WARRIOR: st->armor = 20; break;
+      case CLASS_MONK: st->armor = 0; break;
       default: st->armor   = 100; break;
     }
     st->hitroll =  0;
