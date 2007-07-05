@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.68 2007/06/08 23:51:46 dcastle Exp $ */
+/* $Id: ki.cpp,v 1.69 2007/07/05 15:43:45 dcastle Exp $ */
 
 extern "C"
 {
@@ -592,6 +592,15 @@ int ki_speed( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
   af.bitvector = AFF_HASTE;
  
   affect_to_char(vict, &af);
+
+  af.type = SPELL_HASTE;
+  af.duration = 2;
+  af.modifier = -has_skill(ch, KI_OFFSET+KI_SPEED)/4;
+  af.location = APPLY_AC;
+  af.bitvector = -1;
+
+  affect_to_char(vict, &af);
+
   send_to_char("You feel a quickening in your limbs!\n\r", vict); 
   return eSUCCESS;
 }
@@ -909,8 +918,10 @@ int ki_stance( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
    send_to_char("You take a defensive stance and try to aborb the energies seeking to harm you.\r\n", ch);
 
    // chance of failure - can be meta'd past that point though
-   if(number(1, 100) > ( GET_DEX(ch) * 4 ) )
+   if(number(1, 100) > ( GET_DEX(ch) * 4 ) ) {
+      send_to_char("You accidently stub your toe and fall out of the defenseive stance.\n\r", ch);
       return eSUCCESS;
+   }
 
    SET_BIT(ch->combat, COMBAT_MONK_STANCE);
 
