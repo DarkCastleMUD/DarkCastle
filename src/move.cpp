@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.81 2007/03/22 23:35:44 urizen Exp $
+| $Id: move.cpp,v 1.82 2007/07/05 15:44:07 dcastle Exp $
 | move.C
 | Movement commands and stuff.
 *************************************************************************
@@ -507,7 +507,7 @@ int do_simple_move(CHAR_DATA *ch, int cmd, int following)
           if(ch->equipment[x])
             if(ch->equipment[x]->obj_flags.type_flag == ITEM_BOAT)
               has_boat = TRUE;
-      if (!has_boat && !IS_AFFECTED(ch, AFF_FLYING) &&
+      if (!has_boat && !IS_AFFECTED(ch, AFF_FLYING) && GET_LEVEL(ch) < IMMORTAL && 
         GET_RACE(ch) != RACE_FISH && GET_RACE(ch) != RACE_SLIME && !IS_AFFECTED(ch, AFF_FREEFLOAT)) {
         send_to_char("You need a boat to go there.\n\r", ch);
         return eFAILURE;
