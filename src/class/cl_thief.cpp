@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.168 2007/05/10 06:38:41 jhhudso Exp $
+| $Id: cl_thief.cpp,v 1.169 2007/07/05 15:41:55 dcastle Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -219,6 +219,13 @@ int do_eyegouge(CHAR_DATA *ch, char *argument, int cmd)
     if (!IS_SET(victim->immune, TYPE_PIERCE)) {
       SETBIT(victim->affected_by, AFF_BLIND);
       SET_BIT(victim->combat, COMBAT_THI_EYEGOUGE);
+      struct affected_type af;
+      af.type = SKILL_EYEGOUGE;
+      af.location = APPLY_AC;
+      af.modifier = level / 2;
+      af.duration = 1;
+      af.bitvector = -1;
+      affect_to_char(victim, &af, PULSE_VIOLENCE);
     }
 
     retval = damage(ch, victim, level*2, TYPE_PIERCE, SKILL_EYEGOUGE, 0);
@@ -1991,6 +1998,9 @@ int do_blackjack(struct char_data *ch, char *argument, int cmd)
       // victim's next target will be random
       af.modifier = 1;     
       affect_to_char(victim, &af, PULSE_VIOLENCE);
+      af.location = APPLY_AC;
+      af.modifier = learned*1.5;
+      affect_to_char(victim, &af, PULSE_VIOLENCE);
       retval = damage(ch, victim, 25, TYPE_BLUDGEON, SKILL_BLACKJACK, 0);
     } else if ( fail_percentage < value &&
 		value <= (fail_percentage+work_percentage)) {
@@ -2000,6 +2010,9 @@ int do_blackjack(struct char_data *ch, char *argument, int cmd)
       af.modifier = 2;
       GET_POS(victim) = POSITION_SITTING;
       SET_BIT(victim->combat, COMBAT_BASH1);
+      affect_to_char(victim, &af, PULSE_VIOLENCE);
+      af.location = APPLY_AC;
+      af.modifier = learned*1.5;
       affect_to_char(victim, &af, PULSE_VIOLENCE);
       retval = damage(ch, victim, 25, TYPE_BLUDGEON, SKILL_BLACKJACK, 0);
       // victim's next attack will fail
