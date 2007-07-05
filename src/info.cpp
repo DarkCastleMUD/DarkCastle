@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.150 2007/07/01 01:56:03 jhhudso Exp $ */
+/* $Id: info.cpp,v 1.151 2007/07/05 15:43:21 dcastle Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -3331,9 +3331,11 @@ void rename_leaderboard(char *oldname, char *newname)
 
 int do_show_exp(CHAR_DATA *ch, char *arg, int cmd)
 {
-   if(GET_LEVEL(ch) < MAX_MORTAL)
-      csendf(ch, "You require %ld experience to advance to level %d.\n\r",
-                 exp_table[(int)GET_LEVEL(ch) + 1] - GET_EXP(ch), GET_LEVEL(ch) + 1);
+   if(GET_LEVEL(ch) < MAX_MORTAL) {
+     csendf(ch, "You require %ld experience to advance to level",
+                 exp_table[(int)GET_LEVEL(ch) + 1] - GET_EXP(ch));
+     csendf(ch, " %d.\n\r", GET_LEVEL(ch) + 1); //weirdest. bug. ever.
+   }
    else send_to_char("You require 7399928377275452622483 experience to advance to the next level.\n\r", ch);
 
    return eSUCCESS;
