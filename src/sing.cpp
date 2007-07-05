@@ -1076,7 +1076,17 @@ int execute_song_healing_melody( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DAT
       if(GET_HIT(master) > GET_MAX_HIT(master))
          GET_HIT(master) = GET_MAX_HIT(master);
    }
-
+   if(ch->followers)  // handle the bards charmies
+     for(fvictim = ch->followers; fvictim; fvictim = fvictim->next) {
+       if(IS_AFFECTED(fvictim->follower, AFF_CHARM) && IS_MOB(fvictim->follower) &&
+           ch->in_room == fvictim->follower->in_room) {
+         send_to_char("You feel a little better.\r\n", fvictim->follower);
+         GET_HIT(fvictim->follower) += number(skill/4, heal);
+         if(GET_HIT(fvictim->follower) > GET_MAX_HIT(fvictim->follower))
+           GET_HIT(fvictim->follower) = GET_MAX_HIT(fvictim->follower);
+       }
+     }
+       
    if(!skill_success(ch, NULL, SKILL_SONG_HEALING_MELODY)  ) {
       send_to_char("You run out of lyrics and end the song.\r\n", ch);
       return eSUCCESS;
@@ -1340,6 +1350,17 @@ int execute_song_soothing_remembrance( ubyte level, CHAR_DATA *ch, char *arg, CH
       if(GET_MANA(master) > GET_MAX_MANA(master))
          GET_MANA(master) = GET_MAX_MANA(master);
    }
+   if(ch->followers)  // handle the bards charmies
+     for(fvictim = ch->followers; fvictim; fvictim = fvictim->next) {
+       if(IS_AFFECTED(fvictim->follower, AFF_CHARM) && IS_MOB(fvictim->follower) &&
+           ch->in_room == fvictim->follower->in_room) {
+         send_to_char("You feel soothed.\r\n", fvictim->follower);
+         GET_MANA(fvictim->follower) += number(skill/15 + 1, heal);
+         if(GET_MANA(fvictim->follower) > GET_MAX_MANA(fvictim->follower))
+           GET_MANA(fvictim->follower) = GET_MAX_MANA(fvictim->follower);
+       }
+     }
+       
 
   if(!skill_success(ch, NULL, SKILL_SONG_SOOTHING_REMEM)  ) {
       send_to_char("You run out of lyrics and end the song.\r\n", ch);
@@ -1367,8 +1388,7 @@ int execute_song_traveling_march( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DA
    int heal;
    char_data * master = NULL;
    follow_type * fvictim = NULL;
-   int specialization = skill / 100;
-   skill %= 100;
+   struct affected_type af;
 
    heal = ((GET_LEVEL(ch)/3)+1)*2;
 
@@ -1377,13 +1397,16 @@ int execute_song_traveling_march( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DA
 
    heal += non_combat;
 
-   if(specialization > 0)
-      heal = (int) (heal * 1.5);
-
    if(ch->master && ch->master->in_room == ch->in_room && 
                     ISSET(ch->affected_by, AFF_GROUP))
       master = ch->master;
    else master = ch;
+
+   af.type = SKILL_SONG_TRAVELING_MARCH;
+   af.modifier  = -10 - has_skill(ch, SKILL_SONG_TRAVELING_MARCH)/3;
+   af.duration  = 1;
+   af.location  = APPLY_AC;
+   af.bitvector = -1;
 
    for(fvictim = master->followers; fvictim; fvictim = fvictim->next)
    {
@@ -1395,6 +1418,8 @@ int execute_song_traveling_march( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DA
       GET_MOVE(fvictim->follower) += number(1, heal);
       if(GET_MOVE(fvictim->follower) > GET_MAX_MOVE(fvictim->follower))
          GET_MOVE(fvictim->follower) = GET_MAX_MOVE(fvictim->follower);
+
+      
    }
    if(ch->in_room == master->in_room)
    {
@@ -1403,6 +1428,16 @@ int execute_song_traveling_march( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DA
       if(GET_MOVE(master) > GET_MAX_MOVE(master))
          GET_MOVE(master) = GET_MAX_MOVE(master);
    }
+   if(ch->followers)  // handle the bards charmies
+     for(fvictim = ch->followers; fvictim; fvictim = fvictim->next) {
+       if(IS_AFFECTED(fvictim->follower, AFF_CHARM) && IS_MOB(fvictim->follower) &&
+           ch->in_room == fvictim->follower->in_room) {
+         send_to_char("Your feet feel lighter.\r\n", fvictim->follower);
+         GET_MOVE(fvictim->follower) += number(1, heal);
+         if(GET_MOVE(fvictim->follower) > GET_MAX_MOVE(fvictim->follower))
+           GET_MOVE(fvictim->follower) = GET_MAX_MOVE(fvictim->follower);
+       }
+     }
 
   if(!skill_success(ch, NULL, SKILL_SONG_TRAVELING_MARCH)  ) {
       send_to_char("You run out of lyrics and end the song.\r\n", ch);
@@ -1736,11 +1771,9 @@ int execute_song_insane_chant( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA 
        continue;
    if (number(1,101) < get_saves(victim, SAVE_TYPE_POISON))
    {
-act("$N resists your insane chant!", ch, NULL, victim, 
-TO_CHAR,0);
-act("$N resists $n's insane chant!", ch, NULL, victim, TO_ROOM,
-NOTVICT);
-act("You resist $n's insane chant!",ch,NULL,victim,TO_VICT,0);
+     act("$N resists your insane chant!", ch, NULL, victim, TO_CHAR,0);
+     act("$N resists $n's insane chant!", ch, NULL, victim, TO_ROOM,NOTVICT);
+     act("You resist $n's insane chant!",ch,NULL,victim,TO_VICT,0);
      continue;
    }
 
@@ -2304,12 +2337,19 @@ int song_glitter_dust( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim,
 int execute_song_glitter_dust( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    struct affected_type af;
+   struct affected_type af2;
 
    af.type      = SKILL_GLITTER_DUST;
    af.duration  = (GET_LEVEL(ch) > 25) ? 2 : 1;
    af.modifier  = 0;
    af.location  = APPLY_GLITTER_DUST;
    af.bitvector = -1;
+
+   af2.type = SKILL_GLITTER_DUST;
+   af2.duration = (GET_LEVEL(ch) > 25) ? 2 : 1;
+   af2.modifier = 10 + has_skill(ch, SKILL_SONG_GLITTER_DUST)/3;
+   af2.location = APPLY_AC;
+   af2.bitvector = -1;
 
    act("The dust in the air clings to you, and begins to shine!", ch, 0, 0, TO_ROOM, 0);
    send_to_char("Your dust clings to everyone, showing where they are!\r\n", ch);
@@ -2322,6 +2362,7 @@ int execute_song_glitter_dust( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA 
 
      bool pre_see = CAN_SEE(ch, victim);
      affect_to_char(victim, &af);
+     affect_to_char(victim, &af2);
      bool post_see = CAN_SEE(ch, victim);
      if (!pre_see && post_see) {
        csendf(ch, "Your glitter reveals %s.\n\r", GET_SHORT(victim));
