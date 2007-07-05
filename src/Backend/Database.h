@@ -12,7 +12,7 @@
 
 using namespace std;
 
-#define CONN_OPTS "dbname=dcastle user=dcastle password=W2dFF83"
+#define CONN_OPTS "dbname=dcastle user=dcastle password=wm42LyP1"
 
 typedef vector<pair<string, string> > PrepareVector;
 

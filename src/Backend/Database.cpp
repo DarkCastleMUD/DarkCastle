@@ -22,7 +22,7 @@ Database::Database()
       errormsg << "Unable to connect to database in save_char_obj_db: " << PQerrorMessage(conn);
 
       cerr << errormsg << endl;
-      log(errormsg.str().c_str(), ANGEL, LOG_BUG);
+      log(errormsg.str().c_str(), ANGEL, LOG_DATABASE);
       return;
     }
 //  } else {
