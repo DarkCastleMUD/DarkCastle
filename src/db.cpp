@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.160 2007/07/10 21:57:16 pirahna Exp $ */
+/* $Id: db.cpp,v 1.161 2007/07/10 21:58:27 pirahna Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -3028,7 +3028,7 @@ void handle_automatic_mob_settings(char_data * mob)
   mob->gold = mob_matrix[baselevel].gold + number(0-(mob_matrix[baselevel].gold/10), mob_matrix[baselevel].gold/10);
   mob->exp = mob_matrix[baselevel].experience+ ((mob_matrix[baselevel].experience/100)*percent) ;
 
-  mob->alignment = (int) ( (float)mob->alignment * ( 1 + ((number(0,30) - 15)/100) ) );
+  mob->alignment = (int) ( (float)mob->alignment * ( 1 + (((float)number(0,30) - 15)/100) ) );
 
   int temp = mob->immune;
   for (; temp; temp <<= 1)
