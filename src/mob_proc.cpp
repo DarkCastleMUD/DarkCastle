@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.161 2007/06/03 16:26:07 dcastle Exp $ */
+/* $Id: mob_proc.cpp,v 1.162 2007/07/26 17:06:24 pirahna Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -1654,7 +1654,6 @@ static char *dethSayText [ ] =
   "Sorry guys, I can't build right now...I have to work on my Psychology degree, its very serious.",
   "Dark Castle MUD is like a box of chocolates.....thrown into a room full of starving psychotic teenagers with weapons.",
   "Wow guys, you shoulda seen this goat's balls, they were HUGE!  I couldn't stop droo...err stari...err yeah they were huge!",
-  "My girlfiend said to me in bed last night, \"You're a pervert.\" I said, \"That's a big word for a girl who's only seven.\"",
   "So what's the speed of dark?",
   "A conclusion is the place where you got tired of thinking.",
   "If you think nobody cares about you, try missing a couple of payments.",
