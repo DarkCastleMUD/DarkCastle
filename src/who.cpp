@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: who.cpp,v 1.47 2007/06/18 08:20:42 dcastle Exp $
+| $Id: who.cpp,v 1.48 2007/07/31 19:21:40 dcastle Exp $
 | who.C
 | Commands for who, maybe? :P
 */
@@ -508,6 +508,11 @@ int do_who(struct char_data *ch, char *argument, int cmd)
 	   {
                 infoField = infoBuf;
                 sprintf(infoBuf, " $B$5Swedish $1Chef$R");
+   	    }
+	   if (!strcmp(GET_NAME(i),"Monkey"))
+	   {
+                infoField = infoBuf;
+                sprintf(infoBuf, "    $R$5Simian   $R");
    	    }
             if(!strcmp(GET_NAME(i), "Pirahna")) {
                 infoField = infoBuf;
