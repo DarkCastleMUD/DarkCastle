@@ -1250,6 +1250,11 @@ int restring_machine(struct char_data *ch, struct obj_data *obj, int cmd, char *
     return eSUCCESS;
   }
 
+  if( strlen(buf) > 80 ) {
+    send_to_char("'The description cannot be longer than 80 characters. *beep*'\n", ch);
+    return eSUCCESS;
+  }
+
   if(GET_PLATINUM(ch) < (uint32)(GET_LEVEL(ch)) )
   {
     send_to_char("'Insufficient platinum.  *beep*'\n", ch);
