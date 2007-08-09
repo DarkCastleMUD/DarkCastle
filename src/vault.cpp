@@ -766,22 +766,23 @@ void load_vaults(void) {
   	    obj = read_object(real_object(vnum), fl, TRUE);
 	    items->obj = obj;
 	  }
-
+	  
           if (!obj) {
-            sprintf(buf, "boot_vaults: bad item vnum (#%d)", vnum);
+            sprintf(buf, "boot_vaults: bad item vnum (#%d) in vault: %s", vnum,
+		    vault->owner);
             log(buf, 1, LOG_MISC);
-            exit(1);
-          }
-          vault->weight += (GET_OBJ_WEIGHT(obj) * count);
-          items->item_vnum  	= vnum;
-          items->count	= count;
-          items->next  	= vault->items;
-          vault->items 	= items;
-          sprintf(buf, "boot_vaults: got item [%s(%d)(%d)(%d)] from file [%s].", GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), count, vnum, fname);
-	  if (items->obj && ((items->obj->obj_flags.wear_flags != get_obj(vnum)->obj_flags.wear_flags)||
-(items->obj->obj_flags.size != get_obj(vnum)->obj_flags.size)||(items->obj->obj_flags.eq_level != get_obj(vnum)->obj_flags.eq_level)))
-            log(buf, IMMORTAL, LOG_BUG);
-          break;
+          } else {
+	    vault->weight += (GET_OBJ_WEIGHT(obj) * count);
+	    items->item_vnum  	= vnum;
+	    items->count	= count;
+	    items->next  	= vault->items;
+	    vault->items 	= items;
+	    sprintf(buf, "boot_vaults: got item [%s(%d)(%d)(%d)] from file [%s].", GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), count, vnum, fname);
+	    if (items->obj && ((items->obj->obj_flags.wear_flags != get_obj(vnum)->obj_flags.wear_flags)||
+			       (items->obj->obj_flags.size != get_obj(vnum)->obj_flags.size)||(items->obj->obj_flags.eq_level != get_obj(vnum)->obj_flags.eq_level)))
+	      log(buf, IMMORTAL, LOG_BUG);
+	  }
+	  break;
         case 'A':
           sscanf(type, "%s %s", tmp, value);
           CREATE(access, struct vault_access_data, 1);
