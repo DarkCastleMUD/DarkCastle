@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.82 2007/07/05 15:44:07 dcastle Exp $
+| $Id: move.cpp,v 1.83 2007/08/09 01:16:15 jhhudso Exp $
 | move.C
 | Movement commands and stuff.
 *************************************************************************
@@ -778,7 +778,7 @@ int do_simple_move(CHAR_DATA *ch, int cmd, int following)
     {
 	    act("$N looks at you expectantly, perhaps hoping for a song?", ch, NULL, tmp_ch, TO_CHAR, 0);
 	    act("$N looks at $n expectantly, perhaps hoping for a song?", ch, NULL, tmp_ch, TO_ROOM, INVIS_NULL);
-    } else if (GET_CLASS(ch) == CLASS_RANGER && ISSET(tmp_ch->mobdata->actflags, ACT_CHARM) && GET_LEVEL(ch) >= GET_LEVEL(tmp_ch))
+    } else if (GET_CLASS(ch) == CLASS_RANGER && ISSET(tmp_ch->mobdata->actflags, ACT_CHARM) && GET_LEVEL(ch) >= GET_LEVEL(tmp_ch) && CAN_SEE(tmp_ch, ch))
     {
 	    act("$N moves submissively out of your way.", ch, NULL, tmp_ch, TO_CHAR, 0);
 	    act("$N moves submissively out of $n's way.", ch, NULL, tmp_ch, TO_ROOM, INVIS_NULL);
