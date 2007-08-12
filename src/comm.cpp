@@ -2504,15 +2504,16 @@ void ansi_color( char *txt, CHAR_DATA *ch )
                  IS_SET(GET_TOGGLES(ch), PLR_VT100) &&
                 !IS_SET(GET_TOGGLES(ch), PLR_ANSI ) )
       {
-         if ( ( txt == GREEN )
-           || ( txt == RED )
-           || ( txt == BLUE )
-           || ( txt == BLACK )
-           || ( txt == CYAN )
-           || ( txt == GREY )
-           || ( txt == EEEE )
-           || ( txt == YELLOW )
-           || ( txt == PURPLE ) ) return;
+         if ( (!strcmp(txt,GREEN))
+           || (!strcmp(txt,RED))
+           || (!strcmp(txt,BLUE))
+           || (!strcmp(txt,BLACK))
+           || (!strcmp(txt,CYAN))
+           || (!strcmp(txt,GREY))
+           || (!strcmp(txt,EEEE))
+           || (!strcmp(txt,YELLOW))
+           || (!strcmp(txt,PURPLE)))
+	   return;
       }
      send_to_char( txt, ch );
      return;
