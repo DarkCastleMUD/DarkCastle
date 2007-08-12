@@ -4664,7 +4664,7 @@ int do_punish(struct char_data *ch, char *arg, int cmd)
 
   one_argument(arg, name);
 
-  if (!name || !*name) {
+  if (!name[0]) {
      display_punishes(ch, vict);
      return eFAILURE;
   }

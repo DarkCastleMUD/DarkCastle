@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.63 2007/05/05 13:25:34 jhhudso Exp $ */
+/* $Id: clan.cpp,v 1.64 2007/08/12 18:01:56 jhhudso Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -2350,7 +2350,7 @@ int do_whoclan(CHAR_DATA *ch, char *arg, int cmd)
   one_argument (arg, buf2);
   int clan_num = 0;
   
-  if (buf2)
+  if (buf2[0])
     clan_num = atoi (buf2);
 
   for(clan = clan_list; clan; clan = clan->next) {
