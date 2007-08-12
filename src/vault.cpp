@@ -194,7 +194,8 @@ void save_vault(char *name) {
 
   CHAR_DATA *ch = find_owner(name);
   if(ch)
-    if(vault->size < GET_LEVEL(ch) * 10) vault->size = GET_LEVEL(ch) * 10;
+    if(vault->size < (unsigned)(GET_LEVEL(ch) * 10))
+      vault->size = GET_LEVEL(ch) * 10;
 
   *name = UPPER(*name);
   sprintf(fname, "../vaults/%c/%s.vault", UPPER(*name), name);
