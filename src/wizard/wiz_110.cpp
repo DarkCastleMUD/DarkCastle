@@ -335,8 +335,6 @@ int do_chpwd(struct char_data *ch, char *arg, int cmd)
 
   half_chop(arg, name, buf);
 
-  if(!name) return eFAILURE;
-
   if(!*name) {
     send_to_char("Change whose password?\n\r", ch);
     return eFAILURE;

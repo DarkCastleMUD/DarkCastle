@@ -238,12 +238,13 @@ int do_sqedit(struct char_data *ch, char *argument, int cmd)
      return eFAILURE;
   }*/
   int i;
-  for (i = 0; fields[i] != "\n"; i++)
-  {	
-     if (!str_cmp((char*)fields[i], command))
-       break;
+  for (i = 0;; i++) {
+    if (!str_cmp((char*)fields[i], command) ||
+	!str_cmp((char*)fields[i], "\n"))
+      break;
   }
-  if (fields[i] == "\n")
+
+  if (!str_cmp((char*)fields[i], "\n"))
   {
 
      send_to_char("$3Syntax:$R sqedit <message/level/class> <skill> <value> OR\r\n"
@@ -265,7 +266,7 @@ int do_sqedit(struct char_data *ch, char *argument, int cmd)
   }
   if (skill==NULL && (skill = find_sq(arg1))==NULL && i!=0 && i!=6)
   {
-    send_to_char("Unknown skill.",ch);
+    send_to_char("Unknown skill.\r\n",ch);
     return eFAILURE;
   }
   struct skill_quest *curren,*last = NULL;

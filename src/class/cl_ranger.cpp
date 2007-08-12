@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: cl_ranger.cpp,v 1.84 2007/03/09 05:31:43 jhhudso Exp $ | cl_ranger.C  *
+ * $Id: cl_ranger.cpp,v 1.85 2007/08/12 18:31:37 jhhudso Exp $ | cl_ranger.C  *
  * Description: Ranger skills/spells                                          *
  *                                                                            *
  * Revision History                                                           *
@@ -1229,7 +1229,7 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
 /* put ch in the targets room to check if they are visible */
   cur_room = ch->in_room;
 
-  if(target) {
+  if(target[0]) {
      if(!ch->fighting) {
         if(dir >= 0) {
            if(world[cur_room].dir_option[dir] && 

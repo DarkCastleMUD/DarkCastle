@@ -150,7 +150,7 @@ int do_load(struct char_data *ch, char *arg, int cmd)
   if (cmd == 9) {
   half_chop (arg2, name, arg3);
 
-  if (arg3) cnt = atoi(arg3);
+  if (arg3[0]) cnt = atoi(arg3);
 
   if(cnt > 50)
   {
