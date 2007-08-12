@@ -88,7 +88,8 @@ char *Path::determineRoute(char_data *ch, int from, int to)
   i = 1000;
   resetPath();
   leastSteps(from, to, 1, &i);
-  char buf[MAX_STRING_LENGTH];
+  static char buf[MAX_STRING_LENGTH];
+  buf[0] = 0;
   if (ch && GET_LEVEL(ch) >= 105)
     csendf(ch, "# of steps: %d\r\n",i);
   resetPath();
@@ -484,7 +485,7 @@ int Path::connectRoom(class Path *z)
 char *findPath(int from, int to, char_data *ch = NULL)
 {
   char buf[MAX_STRING_LENGTH];
-  char endbuf[MAX_STRING_LENGTH];
+  static char endbuf[MAX_STRING_LENGTH];
   endbuf[0] = buf[0] = '\0';
   class Path *start,*stop;  
   if (world[from].paths)
