@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.151 2007/07/05 15:43:21 dcastle Exp $ */
+/* $Id: info.cpp,v 1.152 2007/08/12 18:05:32 jhhudso Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -1413,7 +1413,7 @@ int do_exits(struct char_data *ch, char *argument, int cmd)
    
    send_to_char("You scan around the exits to see where they lead.\n\r", ch);
    
-   if(buf)
+   if(buf[0])
       send_to_char(buf, ch);
    else send_to_char("None.\n\r", ch);
 
