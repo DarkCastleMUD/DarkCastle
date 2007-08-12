@@ -1975,7 +1975,7 @@ int do_mpsetmath(char_data *ch, char *arg, int cmd)
     r++;
     one_argument(r, arg2);
   }
-  if (!r || !*r || !arg1 || !*arg1)
+  if (!r || !*r || !*arg1)
   {
 	    logf( IMMORTAL, LOG_WORLD, "Mpsetmath - Invalid primary data: vnum %d.",
 	  	mob_index[ch->mobdata->nr].virt );

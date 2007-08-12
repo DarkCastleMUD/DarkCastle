@@ -576,7 +576,7 @@ void translate_value(char *leftptr, char *rightptr, int16 **vali, uint32 **valui
 		  if (!target) tError = TRUE;
 		  else { 
 		  int skl = 0;
-		if (!half || *half == '\0' || (skl = atoi(half)) < 0) {
+		if (*half == '\0' || (skl = atoi(half)) < 0) {
 	          logf( IMMORTAL, LOG_WORLD,  "translate_value: Mob: %d invalid skillnumber in hasskill", mob_index[mob->mobdata->nr].virt ); 
 		  tError = TRUE;
 		}
