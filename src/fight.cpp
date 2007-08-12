@@ -1,12 +1,27 @@
-/* Fight1.c written from the original by Morcallen 1/17/95 * This contains all the 
-fight starting mechanisms as well * as damage. *
-****************************************************************************** * Revision History * * 10/23/2003 Onager Added checks for ch == NULL
-in raw_kill() to prevent * * crashes from non-(N)PC deaths * * Changed raw_kill() to make imms immune to stat loss * * 11/09/2003 Onager Added
-noncombat_damage() to do noncombat-related * * damage (such as falls, drowning) that may kill * * 11/24/2003 Onager Totally revamped group_gain();
-subbed out a lot of * * the code and revised exp calculations for soloers * * and groups.  * * 12/01/2003 Onager Re-revised group_gain() to divide up
-mob exp among * * groupies * * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm * * with smaller changes in alignment * *
-12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead * * of just race stuff
-****************************************************************************** */ /* $Id: fight.cpp,v 1.457 2007/07/05 15:43:03 dcastle Exp $ */
+/**************************************************************************
+ * Fight1.c written from the original by Morcallen 1/17/95                *
+ * This contains all the fight starting mechanisms as well                *
+ * as damage.                                                             *
+ *                                                                        *
+ **************************************************************************
+ * Revision History                                                       *
+ * 10/23/2003 Onager Added checks for ch == NULL in raw_kill() to prevent *
+ * crashes from non-(N)PC deaths                                          *
+ * Changed raw_kill() to make imms immune to stat loss                    *
+ * 11/09/2003 Onager Added noncombat_damage() to do noncombat-related     *
+ * damage (such as falls, drowning) that may kill                         *
+ * 11/24/2003 Onager Totally revamped group_gain(); subbed out a lot of   *
+ * the code and revised exp calculations for soloers                      *
+ * and groups.                                                            *
+ * 12/01/2003 Onager Re-revised group_gain() to divide up mob exp among   *
+ * groupies                                                               *
+ * 12/08/2003 Onager Changed change_alignment() to a simpler algorithm    *
+ * with smaller changes in alignment                                      *
+ * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
+ * of just race stuff                                                     *
+ **************************************************************************
+ * $Id: fight.cpp,v 1.458 2007/08/12 17:40:54 jhhudso Exp $               *
+ **************************************************************************/
 
 extern "C"
 {
@@ -524,7 +539,7 @@ int attack(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
   }
   else if(GET_CLASS(ch) == CLASS_MONK && wielded == FALSE)
   {
-    if(GET_LEVEL(ch) > MORTAL) {
+    if(GET_LEVEL(ch) >= MORTAL) {
       result = one_hit(ch, vict, type, FIRST);
       if(SOMEONE_DIED(result))       return result;
     }
