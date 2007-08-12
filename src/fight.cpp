@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.458 2007/08/12 17:40:54 jhhudso Exp $               *
+ * $Id: fight.cpp,v 1.459 2007/08/12 18:04:47 jhhudso Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -1208,7 +1208,6 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
   int dam;			/* Self explan. */
 //  int diceroll;			/* ... */
   int retval = 0;
-  int chance;
   int weapon_skill_hit_bonus = 0;
   int weapon_skill_dam_bonus = 0;  
 
