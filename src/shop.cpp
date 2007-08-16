@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: shop.cpp,v 1.26 2007/02/21 21:20:11 shane Exp $ */
+/* $Id: shop.cpp,v 1.27 2007/08/16 15:04:22 dcastle Exp $ */
 
 extern "C"
 {
@@ -342,6 +342,14 @@ void shopping_sell( char *arg, CHAR_DATA *ch,
         return;
     }
 
+    int virt = obj_index[obj->item_number].virt;
+    if (virt >= 13400 && virt <= 13707 &&
+	  mob_index[keeper->mobdata->nr].virt != 13416)
+    {
+	sprintf(buf, "%s There is only one merchant in the land that deals with such fine jewels.", GET_NAME(ch));
+	do_tell(keeper,buf,0);
+        return;
+    }
     cost = (int) ( obj->obj_flags.cost * shop_index[shop_nr].profit_sell );
     if ( GET_GOLD(keeper) < cost )
     {
