@@ -17,6 +17,9 @@
 #include <clan.h>
 #include <race.h>
 
+extern char* pc_clss_types[];
+extern struct room_data ** world_array;
+
 int do_boot(struct char_data *ch, char *arg, int cmd)
 {
   struct char_data *victim;
@@ -26,7 +29,8 @@ int do_boot(struct char_data *ch, char *arg, int cmd)
   half_chop(arg,name,type);
 
   if(!(*name)) {
-    send_to_char("Boot who?\n\r", ch);
+    send_to_char("Syntax: boot <victim> [boot]\n\r", ch);
+    send_to_char("The boot option causes the victim to see a large ASCII boot.\n\r", ch);
     return eFAILURE;
   }
   
@@ -326,3 +330,161 @@ int do_matrixinfo(struct char_data *ch, char *argument, int cmd)
   send_to_char(buf,ch);
   return eSUCCESS;
 }
+
+int lookupClass(char_data *ch, char *str)
+{
+  int c_class;
+
+  if (str != 0) {
+    str[0] = toupper(str[0]);
+    for(c_class=1; c_class <= CLASS_MAX; c_class++) {
+      if(is_abbrev(str, pc_clss_types[c_class])) {
+	return c_class;
+      }
+    }
+  }
+
+  if (ch != 0) {
+    send_to_char("Invalid class.\n\r\n\r", ch);
+    send_to_char("Valid classes:\n\r", ch);
+    for (c_class=1; c_class <= CLASS_MAX; c_class++) {
+      csendf(ch, "%s\n\r", pc_clss_types[c_class]);
+    }
+  }
+
+  return -1;
+}
+
+int lookupRoom(char_data *ch, char *str)
+{
+  if (str == 0)
+    return -1;
+
+  int room = atoi(str);
+
+  if (room < 0 || room > top_of_world || world_array[room] == 0 || (room == 0 && str[0] != '0')) {
+    if (ch) {
+      send_to_char("No such room exists.\n\r", ch);
+    }
+
+    return -1;
+  }
+
+  return room;
+}
+
+int do_guild(struct char_data *ch, char *argument, int cmd)
+{
+  int c_class = 0, room = 0, old_room = 0;
+  char arg1[MAX_STRING_LENGTH] = { 0 };
+  char arg2[MAX_STRING_LENGTH] = { 0 };
+
+  if (IS_NPC(ch))
+    return eFAILURE;
+
+  argument = one_argument(argument, arg1);
+  argument = one_argument(argument, arg2);
+
+  // No arguments
+  if (arg1[0] == 0) {
+    send_to_char("Syntax:\n\r", ch);
+    send_to_char("guild <room #>           - List all classes allowed in room\n\r", ch);
+    send_to_char("guild <class>            - List all rooms that allow that class\n\r", ch);   
+    send_to_char("guild <class> <room #>   - Toggle allow/deny class in room\n\r\n\r", ch);
+    return eFAILURE;
+  }
+
+  // guild <room #> or guild <class>
+  if (arg2[0] == 0) {
+    if (is_number(arg1)) {
+      // guild <room #>
+      room = lookupRoom(ch, arg1);
+      if (room == -1) {
+	return eFAILURE;
+      }
+
+      csendf(ch, "Allow list for room #%d: ", room);
+      bool found = FALSE;
+      for(c_class=1; c_class <= CLASS_MAX; c_class++) {
+	if (world_array[room]->allow_class[c_class] == TRUE) {
+	  found = TRUE;
+	  csendf(ch, "%s ", pc_clss_types[c_class]);
+	}
+      }
+      
+      if (found) {
+	send_to_char("\n\r", ch);
+      } else {
+	send_to_char("All\n\r", ch);
+      }
+      
+      return eSUCCESS;
+    } else {
+      // guild <class>
+      c_class = lookupClass(ch, arg1);
+      if (c_class == -1) {
+	return eFAILURE;
+      }
+
+      int count = 0;
+      csendf(ch, "%s only rooms:\n\r", pc_clss_types[c_class]);
+
+      int cols = 0;
+      for (int r = 0; r < top_of_world; r++) {
+	if (world_array[r] && world_array[r]->allow_class[c_class] == TRUE) {
+	  csendf(ch, "%5d ", r);
+	  
+	  count++;
+	  cols++;
+	  if (cols == 11) {
+	    cols = 0;
+	    send_to_char("\n\r", ch);
+	  }
+	}
+      }
+
+      if (count == 0) {
+	send_to_char("None found.\n\r", ch);
+      } else {
+	send_to_char("\n\r", ch);
+      }
+
+      return eSUCCESS;
+    }
+  }
+
+  // guild <class> <room #>
+  c_class = lookupClass(ch, arg1);
+  if (c_class == -1) {
+    return eFAILURE;
+  }
+
+  room = lookupRoom(ch, arg2);
+  if (room == -1) {
+    return eFAILURE;
+  }
+
+  if(!can_modify_room(ch, room)) {
+    send_to_char("You are unable to work creation outside of your range.\n\r", ch);
+    return eFAILURE;
+  }
+
+  if (world_array[room]->allow_class[c_class] == TRUE) {
+    csendf(ch, "Removed %s class from room #%d's allow list.\n\r", pc_clss_types[c_class], room);
+    world_array[room]->allow_class[c_class] = FALSE;
+  } else {
+    csendf(ch, "Added %s class to room #%d's allow list.\n\r", pc_clss_types[c_class], room);
+    world_array[room]->allow_class[c_class] = TRUE;
+  }
+  
+  set_zone_modified_world(room);
+  
+  old_room = ch->in_room;
+  ch->in_room = room;
+  do_rsave(ch, "", 9);
+  ch->in_room = old_room;
+  
+  return eSUCCESS;
+}
+
+
