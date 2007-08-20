@@ -45,7 +45,7 @@ int do_linkload(struct char_data *ch, char *arg, int cmd)
 
   one_argument(arg, buf);
 
-  if(get_pc(buf)) {
+  if(get_all_pc(buf)) {
     send_to_char("That person is already on the game!\n\r", ch);
     return eFAILURE;
   }

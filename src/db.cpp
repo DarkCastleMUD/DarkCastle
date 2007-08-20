@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.161 2007/07/10 21:58:27 pirahna Exp $ */
+/* $Id: db.cpp,v 1.162 2007/08/20 01:52:32 jhhudso Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -1398,6 +1398,14 @@ void write_one_room(FILE * f, int a)
   struct deny_data *deni;
   for (deni = world[a].denied;deni;deni = deni->next)
     fprintf(f,"B\n%d\n",deni->vnum);
+
+  // Write out allowed classes if any
+  for (int i=0; i < CLASS_MAX; i++) {
+    if (world[a].allow_class[i] == TRUE) {
+      fprintf(f, "C%d\n", i); 
+    }
+  }
+
   fprintf(f, "S\n");
 }
 
@@ -1558,6 +1566,10 @@ int read_one_room(FILE *fl, int & room_nr)
       }
       else if (ch == 'S')   /* end of current room */
         break;
+      else if (ch == 'C') {
+	int c_class = fread_int(fl, 0, CLASS_MAX);
+	world[room_nr].allow_class[c_class] = TRUE;
+      }
     } // of for (;;) (get directions and extra descs)
 
     return TRUE;

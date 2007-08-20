@@ -1,7 +1,7 @@
 #ifndef __ROOM_H__
 #define __ROOM_H__
 /************************************************************************
-| $Id: room.h,v 1.15 2006/07/08 13:18:40 urizen Exp $
+| $Id: room.h,v 1.16 2007/08/20 01:52:33 jhhudso Exp $
 | room.h
 | Description:  This file contains all of the room header file/constant
 |   information.  It also contains information about the 'world' structs.
@@ -9,6 +9,7 @@
 #include <structs.h> // ubyte
 #include <obj.h> // ubyte
 #include <MobActivity.h> // struct path_data
+#include <player.h> // CLASS_MAX
 
 // The following defs are for room_data
 
@@ -148,6 +149,7 @@ struct room_data
     void              FreeTracks();
     int 	      iFlags; // Internal flags. These do NOT save.
     struct path_data *paths;
+    bool              allow_class[CLASS_MAX];
 };
 
 #endif // __ROOM_H__

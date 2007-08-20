@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.163 2007/02/20 23:09:11 dcastle Exp $ */
+/* $Id: handler.cpp,v 1.164 2007/08/20 01:52:32 jhhudso Exp $ */
     
 extern "C"
 {
@@ -3582,7 +3582,6 @@ CHAR_DATA *get_pc(char *name)
 {
    CHAR_DATA *i;
 
-
    for(i = character_list; i; i = i->next)
       if(!IS_NPC(i) && isname(name, GET_NAME(i)))
         return i; 
@@ -3618,6 +3617,25 @@ CHAR_DATA *get_active_pc(char *name)
       }
 
   return(partial_match);
+}
+
+CHAR_DATA *get_all_pc(char *name)
+{
+   CHAR_DATA *i;
+   struct descriptor_data *d;
+   extern struct descriptor_data *descriptor_list;
+
+   for(d = descriptor_list; d; d = d->next) {
+     if(!(i = d->character)) {
+       continue;
+     }
+
+     if (isname(name, GET_NAME(i))) {
+       return i;
+     }
+   }
+
+   return 0;
 }
 
 CHAR_DATA *get_pc_vis(CHAR_DATA *ch, char *name)

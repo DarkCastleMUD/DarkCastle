@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.83 2007/08/09 01:16:15 jhhudso Exp $
+| $Id: move.cpp,v 1.84 2007/08/20 01:52:32 jhhudso Exp $
 | move.C
 | Movement commands and stuff.
 *************************************************************************
@@ -571,6 +571,23 @@ int do_simple_move(CHAR_DATA *ch, int cmd, int following)
       return eFAILURE;
       }
     }
+
+  if (GET_LEVEL(ch) < IMMORTAL) {
+    bool classRestrictions = FALSE;
+    // Determine if any class restrictions are in place
+    for (int c_class=1; c_class <= CLASS_MAX; c_class++) {
+      if (rm->allow_class[c_class] == TRUE) {
+	classRestrictions = TRUE;
+      }
+    }
+
+    if (classRestrictions) {
+      if (rm->allow_class[GET_CLASS(ch)] != TRUE) {
+	send_to_char("Your class is not allowed there.\r\n", ch);
+	return eFAILURE;
+      }
+    }
+  }
 
   if (IS_SET(rm->room_flags, PRIVATE)) {
     int ppl = 0;
