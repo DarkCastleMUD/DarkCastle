@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.223 2007/05/03 21:11:03 dcastle Exp $ */
+/* $Id: spells.cpp,v 1.224 2007/08/20 03:48:48 jhhudso Exp $ */
 
 extern "C"
 {
@@ -2002,10 +2002,10 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
 
 	   if (IS_SET(world[ch->in_room].room_flags, ARENA) && arena.type == PRIZE) {
 	     if (ch->fighting && ch->fighting != tar_char) {
-	       logf(105, LOG_ARENA, "%s, whom was fighting %s, casted '%s' on %s.", GET_NAME(ch),
+	       logf(IMMORTAL, LOG_ARENA, "%s, whom was fighting %s, casted '%s' on %s.", GET_NAME(ch),
 		    GET_NAME(ch->fighting), get_skill_name(spl), GET_NAME(tar_char));
 	     } else if (tar_char->fighting && tar_char->fighting != ch) {
-	       logf(105, LOG_ARENA, "%s casted '%s' on %s who was fighting %s.", GET_NAME(ch),
+	       logf(IMMORTAL, LOG_ARENA, "%s casted '%s' on %s who was fighting %s.", GET_NAME(ch),
 		    get_skill_name(spl), GET_NAME(tar_char), GET_NAME(tar_char->fighting));
 	     }
 	   }

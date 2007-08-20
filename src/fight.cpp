@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.459 2007/08/12 18:04:47 jhhudso Exp $               *
+ * $Id: fight.cpp,v 1.460 2007/08/20 03:48:48 jhhudso Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -5332,7 +5332,7 @@ void arena_kill(CHAR_DATA *ch, CHAR_DATA *victim, int type)
 	      GET_NAME(victim), clan2 ? clan2->name : "no clan");
     }
 
-    logf(105, LOG_ARENA, "%s [%s] killed %s [%s]", GET_NAME(ch),
+    logf(IMMORTAL, LOG_ARENA, "%s [%s] killed %s [%s]", GET_NAME(ch),
          clan ? clan->name : "no clan", GET_NAME(victim), 
          clan2 ? clan2->name : "no clan");
   } else if (ch) {
@@ -5360,7 +5360,7 @@ void arena_kill(CHAR_DATA *ch, CHAR_DATA *victim, int type)
   send_info(killer_message);
   
   if (ch && victim && arena.type == PRIZE) {
-    logf(105, LOG_ARENA, "%s killed %s", GET_NAME(ch), GET_NAME(victim));
+    logf(IMMORTAL, LOG_ARENA, "%s killed %s", GET_NAME(ch), GET_NAME(victim));
   }
 
   // if it's a chaos, see if the clan was eliminated
@@ -5448,10 +5448,10 @@ int can_be_attacked(CHAR_DATA *ch, CHAR_DATA *vict)
 
   if (IS_SET(world[ch->in_room].room_flags, ARENA) && arena.type == PRIZE && IS_PC(ch) && IS_PC(vict)) {
     if (ch->fighting && ch->fighting != vict) {
-      logf(105, LOG_ARENA, "%s, whom was fighting %s tried to attack %s.",
+      logf(IMMORTAL, LOG_ARENA, "%s, whom was fighting %s tried to attack %s.",
 	   GET_NAME(ch), GET_NAME(ch->fighting), GET_NAME(vict));
     } else if (vict->fighting && vict->fighting != ch) {
-      logf(105, LOG_ARENA, "%s tried to attack %s who is fighting %s.",
+      logf(IMMORTAL, LOG_ARENA, "%s tried to attack %s who is fighting %s.",
 	   GET_NAME(ch), GET_NAME(vict), GET_NAME(vict->fighting));
     }
   }
