@@ -337,7 +337,7 @@ void translate_value(char *leftptr, char *rightptr, int16 **vali, uint32 **valui
   char *right = &rarr[0]; 
   bool silent = FALSE;
 
-  if (!str_prefix(left, "world_")) {
+  if (!str_prefix("world_",left)) {
     left += 6;
     CHAR_DATA *tmp;
     for (tmp = character_list; tmp; tmp = tmp->next)
@@ -345,7 +345,8 @@ void translate_value(char *leftptr, char *rightptr, int16 **vali, uint32 **valui
 	if (isname(left, GET_NAME(tmp)))
 	 { target = tmp; break; }
     }
-  } else if (!str_prefix(left, "zone_")) {
+    debugpoint();
+  } else if (!str_prefix("zone_", left)) {
     left += 5;
     CHAR_DATA *tmp;
     for (tmp = character_list; tmp; tmp = tmp->next)
@@ -354,16 +355,16 @@ void translate_value(char *leftptr, char *rightptr, int16 **vali, uint32 **valui
 	if (isname(left, GET_NAME(tmp)))
 	 { target = tmp; break; }
     }
-  } else if (!str_prefix(left, "room_")) {
+  } else if (!str_prefix("room_",left)) {
     left += 5;
     if (is_number(left))
 	rtarget = real_room(atoi(left));
     else
 	rtarget = mob->in_room;
-  } else if (!str_prefix(left, "oworld_")) {
+  } else if (!str_prefix("oworld_",left)) {
     left += 7;
     otarget = get_obj(left);
-  } else if (!str_prefix(left, "ozone_")) {
+  } else if (!str_prefix("ozone_",left)) {
     left += 6;
     OBJ_DATA *otmp;
     int z = world[mob->in_room].zone;
@@ -377,10 +378,10 @@ void translate_value(char *leftptr, char *rightptr, int16 **vali, uint32 **valui
 		{ otarget = otmp; break; }	
     }
     otarget = get_obj(left);
-  } else if (!str_prefix(left, "oroom_")) {
+  } else if (!str_prefix("oroom_",left)) {
     left += 6;
     otarget = get_obj_in_list(left, world[mob->in_room].contents);
-  } else if (!str_prefix(left, "zone_")) {
+  } else if (!str_prefix("zone_",left)) {
     ztarget = world[mob->in_room].zone;
     left += 5;
   } else if (*left == '$') {

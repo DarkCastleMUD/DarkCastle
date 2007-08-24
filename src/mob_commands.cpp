@@ -1869,6 +1869,7 @@ char *expand_data(char_data *ch, char *orig)
 {
   static char buf[MAX_STRING_LENGTH];
   char buf1[MAX_STRING_LENGTH];
+  while (*orig == ' ') orig++;
   strcpy(buf1,orig);
   orig = &buf1[0];
   buf[0] = '\0';
@@ -1887,8 +1888,11 @@ char *expand_data(char_data *ch, char *orig)
     {
        if ((ptr-l) == orig)
         break;
-       if (!isalpha(*(ptr-l)) && (*(ptr-l) != ','))
+       if (!isalpha(*(ptr-l)) && (*(ptr-l) != ',') &&
+	(*(ptr-l) != '_'))
+	// Failsafe to ensure no 'reserved' characters are being used, ie. # ~
 	break;
+
     }
     *(ptr) = '\0';
     strcpy(left, (ptr-l));
@@ -1898,7 +1902,7 @@ char *expand_data(char_data *ch, char *orig)
     {
        if ((ptr+r) == '\0')
         break;
-       if (!isalpha(*(ptr+r)) && (*(ptr+r) != ','))
+       if (!isalpha(*(ptr+r)) && (*(ptr+r) != ',') && (*(ptr-l) != '_'))
 	break;
     }
     c = *(ptr+r);
