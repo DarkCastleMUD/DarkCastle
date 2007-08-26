@@ -345,7 +345,6 @@ void translate_value(char *leftptr, char *rightptr, int16 **vali, uint32 **valui
 	if (isname(left, GET_NAME(tmp)))
 	 { target = tmp; break; }
     }
-    debugpoint();
   } else if (!str_prefix("zone_", left)) {
     left += 5;
     CHAR_DATA *tmp;
@@ -886,10 +885,6 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
   int       rhsvl;
   val2[0] = '\0';
 
-  if (mob_index[mob->mobdata->nr].virt == 2018)
-  {
-    debugpoint();
-  }
   if ( *point == '\0' ) 
     {
       logf( IMMORTAL, LOG_WORLD,  "Mob: %d null ifchck", mob_index[mob->mobdata->nr].virt ); 
@@ -1932,6 +1927,7 @@ char null[ 1 ];
 // make sure this is not true when returning from an if check or the
 // mob's pointer is no longer valid
 int  mprog_cur_result;
+#define DIFF(a,b) ((a-b) > 0?(a-b):(b-a))
 
 char *mprog_process_if( char *ifchck, char *com_list, CHAR_DATA *mob,
 		       CHAR_DATA *actor, OBJ_DATA *obj, void *vo,
@@ -1947,7 +1943,11 @@ char *mprog_process_if( char *ifchck, char *com_list, CHAR_DATA *mob,
 
  *null = '\0';
 
- if (!thrw || ifchck - thrw->orig >= thrw->startPos)
+ CHAR_DATA *ur = NULL;
+
+ if (ur) send_to_char("\r\nProg initiated.\r\n",ur);
+
+ if (!thrw || DIFF(ifchck, activeProgTmpBuf) >= thrw->startPos)
  {
    /* check for trueness of the ifcheck */
    if ( ( cIfs[ifpos++] = legal = mprog_do_ifchck( ifchck, mob, actor, obj, vo, rndm ) ) )
@@ -1957,10 +1957,12 @@ char *mprog_process_if( char *ifchck, char *com_list, CHAR_DATA *mob,
      else
        return null;
    }
+  if (ur) csendf(ur,"%d>%d\r\n",ifpos-1,legal);
  } else {
   legal = thrw->ifchecks[thrw->cPos++];
   if (legal >= 1) flag = TRUE;
   else if (legal < 0) return NULL;
+  if (ur) csendf(ur,"%d>-%d\r\n",thrw->cPos-1,legal);
  }
 
  while( loopdone == FALSE ) /*scan over any existing or statements */
@@ -1978,19 +1980,21 @@ char *mprog_process_if( char *ifchck, char *com_list, CHAR_DATA *mob,
      if ( !str_cmp( buf, "or" ) )
      {
 
-	 if (!thrw || morebuf - thrw->orig >= thrw->startPos)
+	 if (!thrw || DIFF(morebuf, activeProgTmpBuf) >= thrw->startPos)
 	 {
-	   if ( ( cIfs[ifpos] = legal = mprog_do_ifchck( morebuf, mob, actor, obj, vo, rndm ) ) )
+	   if ( ( cIfs[ifpos++] = legal = mprog_do_ifchck( morebuf, mob, actor, obj, vo, rndm ) ) )
 	   {
 	     if ( legal == 1 )
 	       flag = TRUE;
 	     else
 	       return null;
 	   }
+	  if (ur) csendf(ur,"%d<%d\r\n",ifpos-1,legal);
 	 } else {
-	  legal = thrw->ifchecks[thrw->cPos];
+	  legal = thrw->ifchecks[thrw->cPos++];
 	  if (legal == 1) flag = TRUE;
 	  else if (legal < 0) return NULL;
+	  if (ur) csendf(ur,"%d<-%d\r\n",thrw->cPos-1,legal);
 	 }
      }
      else
@@ -2036,8 +2040,10 @@ char *mprog_process_if( char *ifchck, char *com_list, CHAR_DATA *mob,
 	   }
 	   return com_list; 
        }
+	
+        if (mob_index[mob->mobdata->nr].virt == 12623) debugpoint();
 
-       if (!thrw || cmnd >= thrw->orig + thrw->startPos) {
+       if (!thrw || DIFF(cmnd, activeProgTmpBuf) >= thrw->startPos) {
 	 SET_BIT(mprog_cur_result, mprog_process_cmnd( cmnd, mob, actor, obj, vo, rndm ));
          if(IS_SET(mprog_cur_result, eCH_DIED) || IS_SET(mprog_cur_result, eDELAYED_EXEC))
            return null;
@@ -2117,7 +2123,7 @@ char *mprog_process_if( char *ifchck, char *com_list, CHAR_DATA *mob,
 	 if ( !str_cmp( buf, "endif" ) )
 	   return com_list; 
 
-	 if (!thrw || cmnd >= thrw->startPos + thrw->orig) {
+	 if (!thrw || DIFF(cmnd, activeProgTmpBuf) >= thrw->startPos) {
 	   SET_BIT(mprog_cur_result, mprog_process_cmnd( cmnd, mob, actor, obj, vo, rndm ));
            if(IS_SET(mprog_cur_result, eCH_DIED) || IS_SET(mprog_cur_result, eDELAYED_EXEC))
              return null;
@@ -2469,7 +2475,6 @@ int mprog_process_cmnd( char *cmnd, CHAR_DATA *mob, CHAR_DATA *actor,
 	  int64 *lvali64 = 0;
 	  sbyte *lvalb = 0; 
 	  *str = '\0';
-	  debugpoint();
 	  if (do_bufs(&buf[0], &tmp[0], cmnd)) 
 	    translate_value(buf, tmp, &lvali,&lvalui, &lvalstr,&lvali64, &lvalb,mob,actor, obj, vo, rndm);
 	  else strcpy(left, cmnd);
@@ -2691,7 +2696,7 @@ void mprog_driver ( char *com_list, CHAR_DATA *mob, CHAR_DATA *actor,
      }
      else {
 
-       if (!thrw || cmnd - &tmpcmndlst[0] >= thrw->startPos)
+       if (!thrw || DIFF(cmnd, activeProgTmpBuf) >= thrw->startPos)
        {
 	     SET_BIT(mprog_cur_result, mprog_process_cmnd( cmnd, mob, actor, obj, vo, rndm ));
        	     if(IS_SET(mprog_cur_result, eCH_DIED) || selfpurge || IS_SET(mprog_cur_result, eDELAYED_EXEC))
