@@ -1980,7 +1980,7 @@ char *mprog_process_if( char *ifchck, char *com_list, CHAR_DATA *mob,
 
 	 if (!thrw || morebuf - thrw->orig >= thrw->startPos)
 	 {
-	   if ( ( cIfs[ifpos++] = legal = mprog_do_ifchck( morebuf, mob, actor, obj, vo, rndm ) ) )
+	   if ( ( cIfs[ifpos] = legal = mprog_do_ifchck( morebuf, mob, actor, obj, vo, rndm ) ) )
 	   {
 	     if ( legal == 1 )
 	       flag = TRUE;
@@ -1988,7 +1988,7 @@ char *mprog_process_if( char *ifchck, char *com_list, CHAR_DATA *mob,
 	       return null;
 	   }
 	 } else {
-	  legal = thrw->ifchecks[thrw->cPos++];
+	  legal = thrw->ifchecks[thrw->cPos];
 	  if (legal == 1) flag = TRUE;
 	  else if (legal < 0) return NULL;
 	 }
