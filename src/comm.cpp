@@ -71,6 +71,7 @@
 #include <sstream>
 #include <iostream>
 #include <list>
+#include <xmlrpc.h>
 
 struct multiplayer {
   char *host;
@@ -79,6 +80,7 @@ struct multiplayer {
 };
 
 using namespace std;
+using namespace XmlRpc;
 
 #ifndef INVALID_SOCKET
 #define INVALID_SOCKET -1
@@ -147,6 +149,8 @@ int pulse_weather;
 int pulse_regen;
 int pulse_time;
 int pulse_short; // short timer, for archery
+
+XmlRpcServer *xmlrpc_s;
 
 /* functions in this file */
 void update_mprog_throws(void);
@@ -275,6 +279,9 @@ int write_hotboot_file(char **new_argv)
   fclose(fp);
   log("Hotboot descriptor file successfully written.", 0, LOG_MISC);
   
+  log("Shutting down xmlrpc server.", 0, LOG_MISC);
+  xmlrpc_s->shutdown();
+
   chdir("../src/");
 
   char **argv;
@@ -484,6 +491,9 @@ void init_game(int port, int port2, int port3, int port4)
     log("Connecting hotboot characters to their descriptiors", 0, LOG_MISC);
     finish_hotboot();
   }
+
+  logf(0, LOG_MISC, "Initializing xmlrpc server on port: %d", 8888);
+  xmlrpc_s = xmlrpc_init(8888);
 
   log("Signal trapping.", 0, LOG_MISC);
   signal_setup();
@@ -759,7 +769,7 @@ void game_loop(unsigned mother_desc, unsigned other_desc, unsigned third_desc, u
 	  string_add(d, comm);
         else if(d->hashstr)
           string_hash_add(d, comm);
-        else if(d->strnew)
+        else if(d->strnew && !IS_SET(d->character->pcdata->toggles, PLR_EDITOR_WEB))
           new_string_add(d, comm);
 	else if (d->connected != CON_PLAYING)	/* in menus, etc. */
 	  nanny(d, comm);
@@ -816,6 +826,8 @@ void game_loop(unsigned mother_desc, unsigned other_desc, unsigned third_desc, u
 	// else
 	  // d->prompt_mode = 1;
     }
+
+    xmlrpc_s->work(0);
 
 //gettimeofday(&debugtimer2, NULL);
 //logf(110, LOG_BUG, "Done output.  Time %dsec %dusec.", 
@@ -1206,7 +1218,12 @@ void make_prompt(struct descriptor_data *d, char *prompt)
               d->showstr_page, d->showstr_count);
      strcat(prompt, buf);
      } else if(d->strnew) {
+       if (IS_PC(d->character) &&
+	   IS_SET(d->character->pcdata->toggles, PLR_EDITOR_WEB)) {
+	 strcat(prompt, "Web Editor] ");
+       } else {
          strcat(prompt, "*] ");
+       }
      } else if(d->str || d->hashstr) {
          strcat(prompt, "] ");
      } else if(STATE(d) != CON_PLAYING) {
@@ -2113,7 +2130,7 @@ int close_socket(struct descriptor_data *d)
     strcat(idiotbuf, "\0");
     string_hash_add(d, idiotbuf);
   }
-  if(d->strnew) {
+  if(d->strnew && !IS_SET(d->character->pcdata->toggles, PLR_EDITOR_WEB)) {
     strcpy(idiotbuf, "/s\n\r");
     strcat(idiotbuf, "\0");
     new_string_add(d, idiotbuf);
@@ -2685,4 +2702,43 @@ void warn_if_duplicate_ip(char_data * ch)
      log(buf, highlev, LOG_WARNINGS );
    }
 
+}
+
+int do_editor(CHAR_DATA *ch, char *argument, int cmd)
+{
+  char arg1[MAX_INPUT_LENGTH];
+  if (argument == 0)
+    return eFAILURE;
+
+  if (IS_MOB(ch))
+    return eFAILURE;
+
+  one_argument(argument, arg1);
+
+  if (arg1[0] == 0) {
+    send_to_char("Current editor: ", ch);
+    if (IS_SET(ch->pcdata->toggles, PLR_EDITOR_WEB))
+      send_to_char("web\n\r", ch);
+    else
+      send_to_char("game\n\r", ch);
+    
+    return eSUCCESS;
+  }
+
+  if (!strcmp(arg1, "web")) {
+    SET_BIT(ch->pcdata->toggles, PLR_EDITOR_WEB);
+    send_to_char("Using online web editor.\n\r", ch);
+    send_to_char("Ok.\n\r", ch);
+  } else if (!strcmp(arg1, "game")) {
+    REMOVE_BIT(ch->pcdata->toggles, PLR_EDITOR_WEB);
+    send_to_char("Using in game line editor.\n\r", ch);
+    send_to_char("Ok.\n\r", ch);
+  } else {
+    send_to_char("Syntax: editor <type>\n\r", ch);
+    send_to_char("Types:\n\r", ch);
+    send_to_char("web    - use online web editor\n\r", ch);
+    send_to_char("game   - use in game line editor\n\r", ch);
+  }
+
+  return eSUCCESS;
 }

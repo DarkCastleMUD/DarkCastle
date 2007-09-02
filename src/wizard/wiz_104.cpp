@@ -1917,17 +1917,25 @@ int do_opedit(char_data *ch, char *argument, int cmd)
           send_to_char("Invalid prog number.\r\n", ch);
           return eFAILURE;
         }
-        ch->desc->backstr = NULL;
-     send_to_char("        Write your help entry and stay within the line.(/s saves /h for help)\r\n"
-                     "|--------------------------------------------------------------------------------|\r\n", ch);
 
-        if (currprog->comlist) {
-          ch->desc->backstr = str_dup(currprog->comlist);
-          send_to_char(ch->desc->backstr, ch);
-        }
-        ch->desc->connected = CON_EDIT_MPROG;
+        ch->desc->backstr = NULL;
         ch->desc->strnew = &(currprog->comlist);
         ch->desc->max_str = MAX_MESSAGE_LENGTH;
+
+	if (IS_SET(ch->pcdata->toggles, PLR_EDITOR_WEB)) {
+	  ch->desc->web_connected = CON_EDIT_MPROG;
+	} else {
+	  ch->desc->connected = CON_EDIT_MPROG;
+
+	  send_to_char("        Write your help entry and stay within the line.(/s saves /h for help)\r\n"
+		       "|--------------------------------------------------------------------------------|\r\n", ch);
+
+	  if (currprog->comlist) {
+	    ch->desc->backstr = str_dup(currprog->comlist);
+	    send_to_char(ch->desc->backstr, ch);
+	  }
+	}
+
     	return eSUCCESS;
   } else if (!str_cmp(arg, "list"))
   {

@@ -684,7 +684,8 @@ void new_string_add(struct descriptor_data *d, char *str)
       strcat(*d->strnew, str);
     }
   }
-bool ishashed(char *arg);
+
+  bool ishashed(char *arg);
   if (terminator) {
     if (terminator == 2 || *(d->strnew) == NULL) {
       if ((d->strnew) && (*d->strnew) && (**d->strnew == '\0')

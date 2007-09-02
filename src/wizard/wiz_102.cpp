@@ -2515,27 +2515,24 @@ int do_mpedit(struct char_data *ch, char *argument, int cmd)
           return eFAILURE;
         }
 
-//        dc_free(currprog->comlist);
-  //      currprog->comlist = NULL;
-
         ch->desc->backstr = NULL;
-        send_to_char("        Write your help entry and stay within the line.  (/s saves /h for help)\r\n"
+        ch->desc->strnew = &(currprog->comlist);
+        ch->desc->max_str = MAX_MESSAGE_LENGTH;
+
+       if (IS_SET(ch->pcdata->toggles, PLR_EDITOR_WEB)) {
+          ch->desc->web_connected = CON_EDIT_MPROG;
+        } else {
+          ch->desc->connected = CON_EDIT_MPROG;
+	  
+	  send_to_char("        Write your help entry and stay within the line.  (/s saves /h for help)\r\n"
                      "   |--------------------------------------------------------------------------------|\r\n", ch);
-        //send_to_char("Enter the new command response now."
-        //             " Terminate with '~' on a new line.\n\r\n\r", ch);
+	  
         if (currprog->comlist) {
           ch->desc->backstr = str_dup(currprog->comlist);
           double_dollars(buf3, ch->desc->backstr);
           send_to_char(buf3, ch);
         }
-
-        ch->desc->connected = CON_EDIT_MPROG;
-        ch->desc->strnew = &(currprog->comlist);
-        ch->desc->max_str = MAX_MESSAGE_LENGTH;
-
- //       ch->desc->connected = CON_EDIT_MPROG;
- //       ch->desc->str = &(currprog->comlist);
- //       ch->desc->max_str = MAX_MESSAGE_LENGTH;
+	}
       } break;
 
      // list

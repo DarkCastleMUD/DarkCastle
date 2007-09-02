@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.h,v 1.79 2007/08/20 01:52:33 jhhudso Exp $ */
+/* $Id: interp.h,v 1.80 2007/09/02 23:35:08 jhhudso Exp $ */
 
 #ifndef INTERP_H_
 #define INTERP_H_
@@ -447,5 +447,6 @@ DO_FUN  do_write;
 DO_FUN  do_zap;
 DO_FUN  do_zedit;
 DO_FUN  do_zsave;
+DO_FUN  do_editor;
 
 #endif

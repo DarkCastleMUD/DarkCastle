@@ -1,7 +1,7 @@
 #ifndef CONNECT_H_
 #define CONNECT_H_
 /************************************************************************
-| $Id: connect.h,v 1.10 2005/06/25 18:58:56 shane Exp $
+| $Id: connect.h,v 1.11 2007/09/02 23:35:08 jhhudso Exp $
 | connect.h
 | Description: State of connectedness information.
 */
@@ -53,6 +53,7 @@ struct descriptor_data
     char *	name;			/* Copy of the player name	*/
     char	host[80];              	/* hostname			*/
     int		connected;		/* mode of 'connectedness'	*/
+    int         web_connected;
     int		wait;			/* wait for how many loops	*/
     char *	showstr_head;		/* for paging through texts	*/
     char **     showstr_vector;
