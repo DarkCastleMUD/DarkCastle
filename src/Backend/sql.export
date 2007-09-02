@@ -1,0 +1,110 @@
+--
+-- PostgreSQL database dump
+--
+
+SET client_encoding = 'SQL_ASCII';
+SET check_function_bodies = false;
+SET client_min_messages = warning;
+
+--
+-- Name: SCHEMA public; Type: COMMENT; Schema: -; Owner: postgres
+--
+
+COMMENT ON SCHEMA public IS 'Standard public schema';
+
+
+SET search_path = public, pg_catalog;
+
+SET default_tablespace = '';
+
+SET default_with_oids = false;
+
+--
+-- Name: player_lookup; Type: TABLE; Schema: public; Owner: dcastle; Tablespace: 
+--
+
+CREATE TABLE player_lookup (
+    player_id serial NOT NULL,
+    name text
+);
+
+
+ALTER TABLE public.player_lookup OWNER TO dcastle;
+
+--
+-- Name: player_lookup_player_id_seq; Type: SEQUENCE SET; Schema: public; Owner: dcastle
+--
+
+SELECT pg_catalog.setval(pg_catalog.pg_get_serial_sequence('player_lookup', 'player_id'), 1, true);
+
+
+--
+-- Name: players; Type: TABLE; Schema: public; Owner: dcastle; Tablespace: 
+--
+
+CREATE TABLE players (
+    player_id integer,
+    sex smallint,
+    c_class smallint,
+    race smallint,
+    "level" smallint,
+    raw_str smallint,
+    raw_intel smallint,
+    raw_wis smallint,
+    raw_dex smallint,
+    raw_con smallint,
+    conditions_0 smallint,
+    conditions_1 smallint,
+    conditions_2 smallint,
+    weight smallint
+);
+
+
+ALTER TABLE public.players OWNER TO dcastle;
+
+--
+-- Data for Name: player_lookup; Type: TABLE DATA; Schema: public; Owner: dcastle
+--
+
+COPY player_lookup (player_id, name) FROM stdin;
+\.
+
+
+--
+-- Data for Name: players; Type: TABLE DATA; Schema: public; Owner: dcastle
+--
+
+COPY players (player_id, sex, c_class, race, "level", raw_str, raw_intel, raw_wis, raw_dex, raw_con, conditions_0, conditions_1, conditions_2, weight) FROM stdin;
+\.
+
+
+--
+-- Name: player_lookup_pkey; Type: CONSTRAINT; Schema: public; Owner: dcastle; Tablespace: 
+--
+
+ALTER TABLE ONLY player_lookup
+    ADD CONSTRAINT player_lookup_pkey PRIMARY KEY (player_id);
+
+
+--
+-- Name: players_player_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: dcastle
+--
+
+ALTER TABLE ONLY players
+    ADD CONSTRAINT players_player_id_fkey FOREIGN KEY (player_id) REFERENCES player_lookup(player_id);
+
+
+--
+-- Name: public; Type: ACL; Schema: -; Owner: postgres
+--
+
+REVOKE ALL ON SCHEMA public FROM PUBLIC;
+REVOKE ALL ON SCHEMA public FROM postgres;
+GRANT ALL ON SCHEMA public TO postgres;
+GRANT ALL ON SCHEMA public TO PUBLIC;
+
+
+--
+-- PostgreSQL database dump complete
+--
+
