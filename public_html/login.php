@@ -18,6 +18,9 @@
   }
 }
 ?>
+<html>
+<head><title>Login</title></head>
+<body>
 <form name="login" method="POST">
 <table border=0 cellspacing="3" bgcolor="#CCCCCC" align="center">
 <tr><td align="right">Login</td><td><input name="login" type="text"></td></tr>
@@ -25,3 +28,5 @@
 <tr><td>&nbsp;</td><td><font color="red"><?php if (isset($_SESSION['status'])) echo $_SESSION['status'];?></font></td></tr>
 <tr><td colspan="2" align="center"><input type="submit" name="submit" value="login"></td></tr>
 </form>
+</body>
+</html>
