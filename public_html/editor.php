@@ -34,10 +34,13 @@ opedit 1 command 1<br>
 Click <a href="editor.php">here</a> once done.
 <?php } else { ?>
 <form name="editor" method="POST">
+
 <table border=0 cellspacing="3" align="center">
 <th colspan="2">Editor Type:<?php print_r($type);?></th>
 <tr><td><textarea name="contents" rows=25 cols=80><?php echo $contents;?></textarea></td></tr>
 <tr><td align="center"><input type="submit" name="submit" value="submit"></td></tr>
+</table>
+
 </form>
 <?php } ?>
 </td></tr>
