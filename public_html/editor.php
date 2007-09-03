@@ -18,6 +18,7 @@
 }
 ?>
 <html>
+<head><title>editor</title></head>
 <body>
 <table bgcolor="#CCCCCC" border="0" width="100%">
 <tr bgcolor="#AAAAAA"><td width="100%">Username: <?=$_SESSION['login'];?></td><td nowrap><a href="index.php">Main Menu</a></td><td nowrap><a href="logout.php">Logout</a></td></tr>
