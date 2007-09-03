@@ -208,7 +208,7 @@ function xu_rpc_http_concise($params) {
 		$uri = '/';
 	}
 	if(!$output) {
-	  $output = array(version => 'xmlrpc', escaping => 'non-ascii');
+	  $output = array(version => 'xmlrpc', escaping => array('non-ascii','markup'));
 	}
 
    $response_buf = "";
