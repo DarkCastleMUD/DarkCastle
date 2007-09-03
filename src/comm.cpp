@@ -769,7 +769,7 @@ void game_loop(unsigned mother_desc, unsigned other_desc, unsigned third_desc, u
 	  string_add(d, comm);
         else if(d->hashstr)
           string_hash_add(d, comm);
-        else if(d->strnew && !IS_SET(d->character->pcdata->toggles, PLR_EDITOR_WEB))
+        else if(d->strnew && (IS_MOB(d->character) || !IS_SET(d->character->pcdata->toggles, PLR_EDITOR_WEB)))
           new_string_add(d, comm);
 	else if (d->connected != CON_PLAYING)	/* in menus, etc. */
 	  nanny(d, comm);
@@ -1218,8 +1218,7 @@ void make_prompt(struct descriptor_data *d, char *prompt)
               d->showstr_page, d->showstr_count);
      strcat(prompt, buf);
      } else if(d->strnew) {
-       if (IS_PC(d->character) &&
-	   IS_SET(d->character->pcdata->toggles, PLR_EDITOR_WEB)) {
+       if (IS_PC(d->character) && IS_SET(d->character->pcdata->toggles, PLR_EDITOR_WEB)) {
 	 strcat(prompt, "Web Editor] ");
        } else {
          strcat(prompt, "*] ");
@@ -2130,7 +2129,7 @@ int close_socket(struct descriptor_data *d)
     strcat(idiotbuf, "\0");
     string_hash_add(d, idiotbuf);
   }
-  if(d->strnew && !IS_SET(d->character->pcdata->toggles, PLR_EDITOR_WEB)) {
+  if(d->strnew && (IS_MOB(d->character) || !IS_SET(d->character->pcdata->toggles, PLR_EDITOR_WEB))) {
     strcpy(idiotbuf, "/s\n\r");
     strcat(idiotbuf, "\0");
     new_string_add(d, idiotbuf);

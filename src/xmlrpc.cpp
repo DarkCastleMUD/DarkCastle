@@ -73,7 +73,7 @@ public:
 
     std::string& contents = params[2];
 
-    if (IS_PC(ch) && GET_LEVEL(ch) >= IMMORTAL) {
+    if (IS_PC(ch) && GET_LEVEL(ch) >= IMMORTAL && ch->desc->strnew) {
       switch(ch->desc->web_connected) {
       case CON_EDIT_MPROG:
 	if (!contents.empty()) {
@@ -103,6 +103,8 @@ public:
       default:
 	break;
       }
+    } else {
+      ch->desc->web_connected = CON_PLAYING;
     }
   }
 };
