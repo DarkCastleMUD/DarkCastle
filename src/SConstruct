@@ -9,4 +9,4 @@ wizard_src = glob.glob('wizard/*.cpp')
 class_src = glob.glob('class/*.cpp')
 backend_src = glob.glob('Backend/*.cpp')
 
-env.Program('research.debug', [base_src,wizard_src,class_src,backend_src], CPPPATH = ['include'], CPPDEFINES=['LINUX'], LIBS=['crypt', 'mcheck', 'z', 'pq', 'XmlRpc'], LIBPATH=['/emul/linux/x86/lib', '/usr/local/lib32']);
+env.Program('research.debug', [base_src,wizard_src,class_src,backend_src], CPPPATH = ['include'], CPPDEFINES=['LINUX'], LIBS=['crypt', 'mcheck', 'z', 'pq', 'xmlrpc++'], LIBPATH=['/emul/linux/x86/lib', '/usr/local/lib32']);

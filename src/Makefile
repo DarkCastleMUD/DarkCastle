@@ -15,7 +15,7 @@ PROF_FLAGS = $(DEBUG_FLAGS) -pg
 #LDFLAGS = -lg++ -lgcc -lm -lc -lg -lWiz -lClass
 #Changed when we switched to Linux Mandrake - Pir
 #LDFLAGS = -lstdc++ -lcrypt -lgcc -lm -lc -lg -lWiz -lClass
-LDFLAGS = -L/emul/linux/x86/lib -L/usr/local/lib32 -lcrypt -lmcheck -lz -lpq -lXmlRpc
+LDFLAGS = -L/emul/linux/x86/lib -L/usr/local/lib32 -lcrypt -lmcheck -lz -lpq -lxmlrpc++
 IN_CXXFLAGS = -Wall -I./include -DLINUX -m32 -Wno-write-strings -DUSE_SQL
 
 BASENAME = research# Base product name -- NO SPACES
