@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.162 2007/07/26 17:06:24 pirahna Exp $ */
+/* $Id: mob_proc.cpp,v 1.163 2007/09/10 14:37:40 pirahna Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -1729,7 +1729,8 @@ static char *dethSayText [ ] =
   "God? I have an imaginary friend too. His name is Bob.",
   "Fuck it. I'm moving to 581 c.",
   "Let Moose and Mountie unite!",
-  "WARNING: the Imm staff is not responsible for Stromboli's \"activities\" should you make personal data available to other players."
+  "WARNING: the Imm staff is not responsible for Stromboli's \"activities\" should you make personal data available to other players.",
+  "Build a man a fire and you warm him for a day.  Set a man on fire and you warm him for the rest of his life."
 };
 
 // ENDOFCHAIN
