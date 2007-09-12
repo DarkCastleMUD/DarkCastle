@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.224 2007/08/20 03:48:48 jhhudso Exp $ */
+/* $Id: spells.cpp,v 1.225 2007/09/12 03:55:50 jhhudso Exp $ */
 
 extern "C"
 {
@@ -2000,13 +2000,18 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
 	     log( log_buf, 110, LOG_PLAYER, ch );
 	   }
 
-	   if (IS_SET(world[ch->in_room].room_flags, ARENA) && arena.type == PRIZE) {
+	   // Wizard's eye (88) is ok to cast
+	   if (IS_SET(world[ch->in_room].room_flags, ARENA) && arena.type == PRIZE && spl != 88) {
 	     if (ch->fighting && ch->fighting != tar_char) {
-	       logf(IMMORTAL, LOG_ARENA, "%s, whom was fighting %s, casted '%s' on %s.", GET_NAME(ch),
+	       send_to_char("You can't cast that because you're in a fight with someone else.\n\r", ch);
+	       logf(IMMORTAL, LOG_ARENA, "%s, whom was fighting %s, was prevented from casting '%s' on %s.", GET_NAME(ch),
 		    GET_NAME(ch->fighting), get_skill_name(spl), GET_NAME(tar_char));
+	       return eFAILURE;
 	     } else if (tar_char->fighting && tar_char->fighting != ch) {
-	       logf(IMMORTAL, LOG_ARENA, "%s casted '%s' on %s who was fighting %s.", GET_NAME(ch),
+	       send_to_char("You can't cast that because they are fighting someone else.\n\r", ch);
+	       logf(IMMORTAL, LOG_ARENA, "%s was prevented from casting '%s' on %s who was fighting %s.", GET_NAME(ch),
 		    get_skill_name(spl), GET_NAME(tar_char), GET_NAME(tar_char->fighting));
+	       return eFAILURE;
 	     }
 	   }
   	 }

@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.460 2007/08/20 03:48:48 jhhudso Exp $               *
+ * $Id: fight.cpp,v 1.461 2007/09/12 03:55:49 jhhudso Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -5448,11 +5448,15 @@ int can_be_attacked(CHAR_DATA *ch, CHAR_DATA *vict)
 
   if (IS_SET(world[ch->in_room].room_flags, ARENA) && arena.type == PRIZE && IS_PC(ch) && IS_PC(vict)) {
     if (ch->fighting && ch->fighting != vict) {
-      logf(IMMORTAL, LOG_ARENA, "%s, whom was fighting %s tried to attack %s.",
+      send_to_char("You are already fighting someone.\n\r", ch);
+      logf(IMMORTAL, LOG_ARENA, "%s, whom was fighting %s was prevented from attacking %s.",
 	   GET_NAME(ch), GET_NAME(ch->fighting), GET_NAME(vict));
+      return FALSE;
     } else if (vict->fighting && vict->fighting != ch) {
-      logf(IMMORTAL, LOG_ARENA, "%s tried to attack %s who is fighting %s.",
+      send_to_char("They are already fighting someone.\n\r", ch);
+      logf(IMMORTAL, LOG_ARENA, "%s was prevented from attacking %s who was fighting %s.",
 	   GET_NAME(ch), GET_NAME(vict), GET_NAME(vict->fighting));
+      return FALSE;
     }
   }
 
