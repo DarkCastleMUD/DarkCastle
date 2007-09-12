@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.225 2007/09/12 03:55:50 jhhudso Exp $ */
+/* $Id: spells.cpp,v 1.226 2007/09/12 04:19:50 jhhudso Exp $ */
 
 extern "C"
 {
@@ -2002,6 +2002,13 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
 
 	   // Wizard's eye (88) is ok to cast
 	   if (IS_SET(world[ch->in_room].room_flags, ARENA) && arena.type == PRIZE && spl != 88) {
+	     if (tar_char && tar_char != ch && !IS_SET(spell_info[spl].targets, TAR_FIGHT_VICT)) {
+	       send_to_char("You can't cast that spell on someone in a prize arena.\n\r", ch);
+	       logf(IMMORTAL, LOG_ARENA, "%s was prevented from casting '%s' on %s.",
+		    GET_NAME(ch), get_skill_name(spl), GET_NAME(tar_char));
+	       return eFAILURE;
+	     }
+
 	     if (ch->fighting && ch->fighting != tar_char) {
 	       send_to_char("You can't cast that because you're in a fight with someone else.\n\r", ch);
 	       logf(IMMORTAL, LOG_ARENA, "%s, whom was fighting %s, was prevented from casting '%s' on %s.", GET_NAME(ch),
