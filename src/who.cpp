@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: who.cpp,v 1.48 2007/07/31 19:21:40 dcastle Exp $
+| $Id: who.cpp,v 1.49 2007/09/12 04:34:20 jhhudso Exp $
 | who.C
 | Commands for who, maybe? :P
 */
@@ -625,10 +625,10 @@ int do_whoarena(struct char_data *ch, char *argument, int cmd)
       if (CAN_SEE(ch, tmp)) {
          if (IS_SET(world[tmp->in_room].room_flags, ARENA)) {
             if((tmp->clan) && (clan = get_clan(tmp)) && GET_LEVEL(tmp) < IMMORTAL)
-               csendf(ch, "%-20s  Level: %-2d  Hit: %-4d  Room: %d - [%s$R]\n\r",
+               csendf(ch, "%-20s  Level: %-3d  Hit: %-5d  Room: %-5d - [%s$R]\n\r",
 	           GET_NAME(tmp),
                    GET_LEVEL(tmp), GET_HIT(tmp), tmp->in_room, clan->name);
-            else csendf(ch, "%-20s  Level: %-2d  Hit: %-4d  Room: %d\n\r",
+            else csendf(ch, "%-20s  Level: %-3d  Hit: %-5d  Room: %-5d\n\r",
 	           GET_NAME(tmp),
                    GET_LEVEL(tmp), GET_HIT(tmp), tmp->in_room);
             count++;
