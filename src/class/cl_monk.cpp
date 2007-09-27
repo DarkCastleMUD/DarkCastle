@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_monk.cpp,v 1.30 2007/04/07 21:55:51 shane Exp $
+| $Id: cl_monk.cpp,v 1.31 2007/09/27 03:14:22 jhhudso Exp $
 | cl_monk.C
 | Description:  Monk skills.
 */
@@ -198,6 +198,18 @@ int do_stun(struct char_data *ch, char *argument, int cmd)
   if(victim == ch) {
     send_to_char("Aren't we funny today...\n\r", ch);
     return eFAILURE;
+  }
+
+  if (GET_LEVEL(ch) < IMMORTAL && IS_PC(victim) && GET_LEVEL(victim) >= IMMORTAL) {
+     act("Due to immortal magic, you shake off $n's attempt to immobilize you.", ch, NULL, victim, TO_VICT, 0);
+
+     act("Due to immortal magic, $N shakes off $n's attempt to immobilize them.",ch, NULL, victim, TO_ROOM, NOTVICT);
+     act("$n's stun reflects back to them!",ch, NULL, victim, TO_ROOM, 0);
+
+     act("Due to immortal magic, $N shakes off your attempt to immobilize them.",ch, NULL, victim, TO_CHAR, 0);
+     act("Your stun is reflected back to yourself!",ch, NULL, NULL, TO_CHAR, 0);
+
+     victim = ch;
   }
 
   if(GET_LEVEL(victim) == IMP) {
