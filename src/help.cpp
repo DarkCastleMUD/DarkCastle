@@ -67,7 +67,7 @@ struct ltstr {
 
 int levenshtein(const char *s, const char *t) {
     unsigned int i, j, n, m, cost;
-    unsigned int d[MAX_HELP_KEYWORD_LENGTH+1][MAX_HELP_KEYWORD_LENGTH+1];
+    unsigned int d[MAX_INPUT_LENGTH+1][MAX_HELP_KEYWORD_LENGTH+1];
 
     m = strlen(s);
     n = strlen(t);
