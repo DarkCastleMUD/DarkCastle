@@ -27,6 +27,12 @@ extern "C"
 #include <help.h>
 #include <fileinfo.h>
 
+#include <map>
+#include <vector>
+#include <algorithm>
+
+using namespace std;
+
 // Externs
 extern void skip_spaces(char **string);
 extern struct help_index_element_new *new_help_table;
@@ -51,6 +57,44 @@ int do_mortal_help(struct char_data *ch, char *argument, int cmd) {
   extern char new_help[MAX_STRING_LENGTH];
   send_to_char(new_help, ch);
   return eSUCCESS; 
+}
+
+struct ltstr {
+    bool operator()(int a, int b) const {
+	return a < b;
+    }
+};
+
+int levenshtein(const char *s, const char *t) {
+    unsigned int i, j, n, m, cost;
+    unsigned int d[MAX_HELP_KEYWORD_LENGTH+1][MAX_HELP_KEYWORD_LENGTH+1];
+
+    m = strlen(s);
+    n = strlen(t);
+	  
+    // Zero Matrix
+    for (i=0; i <= m; i++)
+	for (j=0; j <= n; j++)
+	    d[i][j] = 0;
+
+    // Initialize Matrix
+    for (i=0; i <= m; i++)
+	d[i][0] = i;
+    for (j=0; j <= n; j++)
+	d[0][j] = j;
+    
+    for (i=1; i <= m; i++)
+	for (j=1; j <= n; j++) {
+	    if (tolower(s[i]) == tolower(t[j]))
+		cost = 0;
+	    else
+		cost = 1;
+	    d[i][j] = min(min(d[i-1][j] + 1,
+			      d[i][j-1] + 1),
+			  d[i-1][j-1] + cost);
+	}
+    
+    return d[m][n];
 }
 
 int do_new_help(struct char_data *ch, char *argument, int cmd)
@@ -85,13 +129,83 @@ int do_new_help(struct char_data *ch, char *argument, int cmd)
       snprintf(buf, 256, "There is no help entry for \'%s\'.\r\n",
 	       upper_argument);
       send_to_char(buf, ch);
-      sprintf(buf, "'%s' has no help entry.  %s just tried to call it.",
-	      upper_argument, GET_NAME(ch));
-      log(buf, IMMORTAL, LOG_HELP);
+
+      // Find similar help entries based on the Levenshtein distance
+      // between keywords.   
+     
+      int h;
+      unsigned int l;
+      unsigned int argSize = strlen(argument);
+      multimap<unsigned int, char *, ltstr> ltable;
+      multimap<unsigned int, char *, ltstr>::iterator cur;
+     
+      int level = GET_LEVEL(ch) == 0 ? 1 : GET_LEVEL(ch);
+
+      for (h=0; h < new_top_of_helpt; h++) {
+	  if (new_help_table[h].min_level > level) {
+	      continue;
+	  }
+
+	  if (new_help_table[h].keyword1) {
+	      l = levenshtein(argument, new_help_table[h].keyword1);
+	      ltable.insert(pair<int, char *>(l, new_help_table[h].keyword1));
+	  }
+
+	  if (new_help_table[h].keyword2) {
+	      l = levenshtein(argument, new_help_table[h].keyword2);
+	      ltable.insert(pair<int, char *>(l, new_help_table[h].keyword2));
+	  }
+
+	  if (new_help_table[h].keyword3) {
+	      l = levenshtein(argument, new_help_table[h].keyword3);
+	      ltable.insert(pair<int, char *>(l, new_help_table[h].keyword3));
+	  }
+
+	  if (new_help_table[h].keyword4) {
+	      l = levenshtein(argument, new_help_table[h].keyword4);
+	      ltable.insert(pair<int, char *>(l, new_help_table[h].keyword4));
+	  }
+
+	  if (new_help_table[h].keyword5) {
+	      l = levenshtein(argument, new_help_table[h].keyword5);
+	      ltable.insert(pair<int, char *>(l, new_help_table[h].keyword5));
+	  }
+      }
+
+      if (ltable.size() > 0) {
+      }
+
+      vector<char *> results;
+      for(cur = ltable.begin(); cur != ltable.end(); cur++) {
+	  if (find(results.begin(), results.end(), (*cur).second) == results.end()) {
+	      // Skip words which matches less than 50% of the original
+	      if ((*cur).first > argSize/2)
+		  continue;
+
+	      if (results.size() == 0) {
+		  send_to_char("Suggested help entries: ", ch);
+	      }
+
+	      results.push_back((*cur).second);
+	      csendf(ch, "%s", (*cur).second);
+
+	      if (results.size() >= 5) {
+		  send_to_char("\n\r", ch);
+		  break;
+	      } else {
+		  send_to_char(", ", ch);
+	      }
+	  }
+      }
+
 
       dc_free(upper_argument);    
       return eFAILURE;
     }
+
+  sprintf(buf, "'%s' has no help entry.  %s just tried to call it.",
+	  upper_argument, GET_NAME(ch));
+  log(buf, IMMORTAL, LOG_HELP);
 
   dc_free(upper_argument);
   int a = GET_LEVEL(ch) == 0? 1:GET_LEVEL(ch);
