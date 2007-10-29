@@ -389,6 +389,7 @@ void translate_value(char *leftptr, char *rightptr, int16 **vali, uint32 **valui
 		case 'n': target = actor;break;
 		case 'i': target = mob;break;
 		case 'r': target = rndm;silent = TRUE;break;
+		    
 		case 't': target = (CHAR_DATA*)vo;break;
 		case 'o': otarget = obj;break;
 		case 'p': otarget = (OBJ_DATA*)vo;break;
@@ -2639,37 +2640,26 @@ void mprog_driver ( char *com_list, CHAR_DATA *mob, CHAR_DATA *actor,
    activeVo = NULL;
    return;
  }
-// int count2 = 0;
+
  // count valid random victs in room
  for ( vch = world[mob->in_room].people; vch; vch = vch->next_in_room )
-   if ( !IS_NPC(vch) && CAN_SEE( mob, vch, TRUE ) )
+   if ( CAN_SEE( mob, vch, TRUE ) )
        count++;
-  // else if (CAN_SEE(mob,vch))
-   //    count2++;
- // count2 += count;
+
  if(count)
    count = number( 1, count );  // if we have valid victs, choose one
-  /*if (count2) count2 = number(1,count2);
- if (count2)
-  {
-    for (vch = world[mob->in_room].people; vch && count2;)
-    {
-    if (CAN_SEE(mob,vch,TRUE))
-	count2--;
-	if (count2) vch = vch->next_in_room;
-    }
-    //rndm2 = vch;
-  }*/  
+
  if(count) 
  {
    for ( vch = world[mob->in_room].people; vch && count; )
    {
-     if ( !IS_NPC(vch) && CAN_SEE( mob, vch,TRUE ) )
+     if ( CAN_SEE( mob, vch, TRUE ) )
        count--;
      if (count) vch = vch->next_in_room;
   }
    rndm = vch;
  }
+
  activeRndm = rndm;
  strcpy( tmpcmndlst, com_list );
 
