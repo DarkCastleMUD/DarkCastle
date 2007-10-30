@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.152 2007/08/12 18:05:32 jhhudso Exp $ */
+/* $Id: info.cpp,v 1.153 2007/10/30 03:54:40 jhhudso Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -1873,7 +1873,7 @@ int do_equipment(struct char_data *ch, char *argument, int cmd)
       }
    }
    if(!found) {
-      send_to_char(" Nothing.\n\r", ch);
+      send_to_char("Nothing.\n\r", ch);
    }
    return eSUCCESS;
 }
