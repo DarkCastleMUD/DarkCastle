@@ -2569,7 +2569,7 @@ int execute_song_synchronous_chord( ubyte level, CHAR_DATA *ch, char *arg, CHAR_
    char_data * target = NULL;
    char buf[400];
    char * get_random_hate(CHAR_DATA *ch);
-   int learned = has_skill(ch, song_info[SKILL_SONG_SYNC_CHORD].skill_num);
+   int learned = has_skill(ch, song_info[SKILL_SONG_SYNC_CHORD - SKILL_SONG_BASE].skill_num);
 
    extern char *isr_bits[];
 
