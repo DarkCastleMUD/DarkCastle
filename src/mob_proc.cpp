@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.163 2007/09/10 14:37:40 pirahna Exp $ */
+/* $Id: mob_proc.cpp,v 1.164 2007/11/02 21:14:19 pirahna Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -1730,7 +1730,8 @@ static char *dethSayText [ ] =
   "Fuck it. I'm moving to 581 c.",
   "Let Moose and Mountie unite!",
   "WARNING: the Imm staff is not responsible for Stromboli's \"activities\" should you make personal data available to other players.",
-  "Build a man a fire and you warm him for a day.  Set a man on fire and you warm him for the rest of his life."
+  "Build a man a fire and you warm him for a day.  Set a man on fire and you warm him for the rest of his life.",
+  "Urizen likes the runka."
 };
 
 // ENDOFCHAIN
