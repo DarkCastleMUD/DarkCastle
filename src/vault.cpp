@@ -1460,9 +1460,9 @@ void put_in_vault(CHAR_DATA *ch, char *object, char *owner) {
       }
 
     if (GET_LEVEL(ch) < IMMORTAL)
-      sprintf(buf, "%s added %s to %s's vault.", GET_NAME(ch), GET_OBJ_SHORT(obj), owner);
+	snprintf(buf, MAX_INPUT_LENGTH, "%s added %s to %s's vault.", GET_NAME(ch), GET_OBJ_SHORT(obj), owner);
     else
-      sprintf(buf, "%s added %s[%d] to %s's vault.", GET_NAME(ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), owner);
+	snprintf(buf, MAX_INPUT_LENGTH, "%s added %s[%d] to %s's vault.", GET_NAME(ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), owner);
 
       vault_log(buf, owner);
       csendf(ch, "%s has been placed in the vault.\r\n", GET_OBJ_SHORT(obj));
@@ -1484,9 +1484,9 @@ void put_in_vault(CHAR_DATA *ch, char *object, char *owner) {
       }
 
       if (GET_LEVEL(ch) < IMMORTAL)
-	sprintf(buf, "%s added %s to %s's vault.", GET_NAME(ch), GET_OBJ_SHORT(obj), owner);
+	  snprintf(buf, MAX_INPUT_LENGTH, "%s added %s to %s's vault.", GET_NAME(ch), GET_OBJ_SHORT(obj), owner);
       else
-	sprintf(buf, "%s added %s[%d] to %s's vault.", GET_NAME(ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), owner);
+	  snprintf(buf, MAX_INPUT_LENGTH, "%s added %s[%d] to %s's vault.", GET_NAME(ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), owner);
 
       vault_log(buf, owner);
       csendf(ch, "%s has been placed in the vault.\r\n", GET_OBJ_SHORT(obj));
@@ -1509,9 +1509,9 @@ void put_in_vault(CHAR_DATA *ch, char *object, char *owner) {
     }
 
     if (GET_LEVEL(ch) < IMMORTAL)
-      sprintf(buf, "%s added %s to %s's vault.", GET_NAME(ch), GET_OBJ_SHORT(obj), owner);
+	snprintf(buf, MAX_INPUT_LENGTH, "%s added %s to %s's vault.", GET_NAME(ch), GET_OBJ_SHORT(obj), owner);
     else
-      sprintf(buf, "%s added %s[%d] to %s's vault.", GET_NAME(ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), owner);
+	snprintf(buf, MAX_INPUT_LENGTH, "%s added %s[%d] to %s's vault.", GET_NAME(ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), owner);
 
     vault_log(buf, owner);
     csendf(ch, "%s has been placed in the vault.\r\n", GET_OBJ_SHORT(obj));
@@ -1550,21 +1550,21 @@ void show_vault(CHAR_DATA *ch, char *owner) {
   }
 
   if (self)
-    sprintf(buf, "Your vault is at %d of %d maximum pounds and contains:\r\n", vault->weight, vault->size);
+      snprintf(buf, MAX_STRING_LENGTH*4, "Your vault is at %d of %d maximum pounds and contains:\r\n", vault->weight, vault->size);
   else
-    sprintf(buf, "%s's vault is at %d of %d maximum pounds and contains:\r\n", owner, vault->weight, vault->size);
+      snprintf(buf, MAX_STRING_LENGTH*4, "%s's vault is at %d of %d maximum pounds and contains:\r\n", owner, vault->weight, vault->size);
    
   
   for (items = vault->items;items;items = items->next) {
     buf1[0] = '\0';
     if (items->count > 1) {
-      sprintf(buf1, "[$5%d$R] ", items->count);
-      strcat(buf, buf1);
+	snprintf(buf1, MAX_INPUT_LENGTH, "[$5%d$R] ", items->count);
+	strncat(buf, buf1, MAX_STRING_LENGTH*4);
     }
 
 //    obj = get_obj(items->item_vnum);
     obj = items->obj?items->obj:get_obj(items->item_vnum);
-    sprintf(buf1, "%s ", GET_OBJ_SHORT(obj));
+    snprintf(buf1, MAX_INPUT_LENGTH, "%s ", GET_OBJ_SHORT(obj));
 
       if (obj->obj_flags.type_flag == ITEM_ARMOR ||
           obj->obj_flags.type_flag == ITEM_WEAPON ||
@@ -1577,16 +1577,16 @@ void show_vault(CHAR_DATA *ch, char *owner) {
       { 
  extern char *item_condition(struct obj_data *obj);
 
-    sprintf(buf1, "%s %s $3Lvl: %d$R",buf1,
+ snprintf(buf1, MAX_INPUT_LENGTH, "%s %s $3Lvl: %d$R",buf1,
 			item_condition(obj), obj->obj_flags.eq_level);
        }
     if (GET_LEVEL(ch) > IMMORTAL) {
-      sprintf(buf1, "%s [%d]", buf1,items->item_vnum);
+	snprintf(buf1, MAX_INPUT_LENGTH, "%s [%d]", buf1,items->item_vnum);
     }
     objects = 1;
     strcat(buf1,"\r\n");
     if (strlen(buf1) + strlen(buf) < MAX_STRING_LENGTH*4 - 200)
-      strcat(buf,buf1);
+	strncat(buf, buf1, MAX_STRING_LENGTH*4);
     else {
       strcat(buf, "Overflow!!!\r\n"); break; }
   }
