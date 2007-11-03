@@ -1530,8 +1530,9 @@ void show_vault(CHAR_DATA *ch, char *owner) {
   struct vault_data *vault;
   struct obj_data *obj;
   int objects = 0, self = 0;
-  char buf[MAX_STRING_LENGTH*4];
-  char buf1[MAX_INPUT_LENGTH];
+  char sectionbuf[MAX_STRING_LENGTH*4];
+  char linebuf[MAX_INPUT_LENGTH];
+  char buf[MAX_INPUT_LENGTH];
 
   owner[0] = UPPER(owner[0]);
   if (!strcmp(owner, GET_NAME(ch))) self = 1;
@@ -1550,21 +1551,21 @@ void show_vault(CHAR_DATA *ch, char *owner) {
   }
 
   if (self)
-      snprintf(buf, MAX_STRING_LENGTH*4, "Your vault is at %d of %d maximum pounds and contains:\r\n", vault->weight, vault->size);
+      snprintf(sectionbuf, MAX_STRING_LENGTH*4, "Your vault is at %d of %d maximum pounds and contains:\r\n", vault->weight, vault->size);
   else
-      snprintf(buf, MAX_STRING_LENGTH*4, "%s's vault is at %d of %d maximum pounds and contains:\r\n", owner, vault->weight, vault->size);
+      snprintf(sectionbuf, MAX_STRING_LENGTH*4, "%s's vault is at %d of %d maximum pounds and contains:\r\n", owner, vault->weight, vault->size);
    
   
   for (items = vault->items;items;items = items->next) {
-    buf1[0] = '\0';
+    linebuf[0] = '\0';
     if (items->count > 1) {
-	snprintf(buf1, MAX_INPUT_LENGTH, "[$5%d$R] ", items->count);
-	strncat(buf, buf1, MAX_STRING_LENGTH*4);
+	snprintf(linebuf, MAX_INPUT_LENGTH, "[$5%d$R] ", items->count);
+	strncat(sectionbuf, linebuf, MAX_STRING_LENGTH*4);
     }
 
 //    obj = get_obj(items->item_vnum);
     obj = items->obj?items->obj:get_obj(items->item_vnum);
-    snprintf(buf1, MAX_INPUT_LENGTH, "%s ", GET_OBJ_SHORT(obj));
+    snprintf(linebuf, MAX_INPUT_LENGTH, "%s ", GET_OBJ_SHORT(obj));
 
       if (obj->obj_flags.type_flag == ITEM_ARMOR ||
           obj->obj_flags.type_flag == ITEM_WEAPON ||
@@ -1577,18 +1578,19 @@ void show_vault(CHAR_DATA *ch, char *owner) {
       { 
  extern char *item_condition(struct obj_data *obj);
 
- snprintf(buf1, MAX_INPUT_LENGTH, "%s %s $3Lvl: %d$R",buf1,
+ strncpy(buf, linebuf, MAX_INPUT_LENGTH);
+ snprintf(linebuf, MAX_INPUT_LENGTH, "%s %s $3Lvl: %d$R", buf,
 			item_condition(obj), obj->obj_flags.eq_level);
        }
     if (GET_LEVEL(ch) > IMMORTAL) {
-	snprintf(buf1, MAX_INPUT_LENGTH, "%s [%d]", buf1,items->item_vnum);
+	sprintf(linebuf, "%s [%d]", linebuf, items->item_vnum);
     }
     objects = 1;
-    strcat(buf1,"\r\n");
-    if (strlen(buf1) + strlen(buf) < MAX_STRING_LENGTH*4 - 200)
-	strncat(buf, buf1, MAX_STRING_LENGTH*4);
+    strcat(linebuf,"\r\n");
+    if (strlen(linebuf) + strlen(sectionbuf) < MAX_STRING_LENGTH*4 - 200)
+	strncat(sectionbuf, linebuf, MAX_STRING_LENGTH*4);
     else {
-      strcat(buf, "Overflow!!!\r\n"); break; }
+      strcat(sectionbuf, "Overflow!!!\r\n"); break; }
   }
 
   if (!objects)
@@ -1597,7 +1599,7 @@ void show_vault(CHAR_DATA *ch, char *owner) {
     else
       csendf(ch, "%s's vault is currently empty.\r\n", owner);
   else
-    page_string(ch->desc, buf, 1);
+    page_string(ch->desc, sectionbuf, 1);
 }
 
 void add_new_vault(char *name, int indexonly) {
