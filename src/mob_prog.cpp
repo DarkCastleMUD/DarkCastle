@@ -3303,9 +3303,19 @@ CHAR_DATA *initiate_oproc(CHAR_DATA *ch, OBJ_DATA *obj)
 
 void end_oproc(CHAR_DATA *ch)
 {
-  extract_char(ch, TRUE);
-  mob_index[real_mobile(12)].progtypes = 0;
-  mob_index[real_mobile(12)].mobprogs = 0;
+    static int core_counter = 0;
+    if (selfpurge) {
+	logf( IMMORTAL, LOG_BUG, "Crash averted in end_oproc()" );
+
+	if (core_counter++ < 10) {
+	    produce_coredump();
+	    log("Corefile produced.", IMMORTAL, LOG_BUG);
+	}
+    } else {
+	extract_char(ch, TRUE);
+	mob_index[real_mobile(12)].progtypes = 0;
+	mob_index[real_mobile(12)].mobprogs = 0;
+    }
 }
 
 
