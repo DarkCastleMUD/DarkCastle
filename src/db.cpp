@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.162 2007/08/20 01:52:32 jhhudso Exp $ */
+/* $Id: db.cpp,v 1.163 2007/11/09 05:00:51 jhhudso Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -3513,6 +3513,11 @@ struct obj_data *read_object(int nr, FILE *fl, bool zz)
     char chk;
     struct extra_descr_data *new_new_descr;
 
+    if (nr < 0) {
+	logf( IMMORTAL, LOG_BUG, "read_object: nr set too low at %d. Setting to 1.", nr );
+	nr = 0;
+    }
+
 #ifdef LEAK_CHECK
     obj = (struct obj_data *)calloc(1, sizeof(struct obj_data));
 #else
@@ -3526,7 +3531,21 @@ struct obj_data *read_object(int nr, FILE *fl, bool zz)
     // that way, we only have one copy of it in memory at any time
 
     obj->name               = fread_string (fl, 1);
-    obj->short_description  = fread_string (fl, 1);
+    char *tmpptr;
+    
+    tmpptr = fread_string (fl, 1);
+
+    if (strlen(tmpptr) >= MAX_OBJ_SDESC_LENGTH) {
+	tmpptr[MAX_OBJ_SDESC_LENGTH-1] = 0;
+
+	obj->short_description = str_dup(tmpptr);
+	free(tmpptr);
+
+	logf( IMMORTAL, LOG_BUG, "read_object: vnum %d short_description too long.", obj_index[nr].virt );
+    } else {
+	obj->short_description = tmpptr;
+    }
+
     obj->description        = fread_string (fl, 1);
     obj->action_description = fread_string (fl, 1);
     obj->table = 0;
