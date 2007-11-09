@@ -153,8 +153,9 @@ NULL,   SKILL_INCREASE_HARD
 },
 
 { /* 14 */
-	7, POSITION_RESTING, 3, SKILL_SONG_NOTE_OF_KNOWLEDGE, 
-	TAR_OBJ_INV, song_note_of_knowledge,
+        7, POSITION_RESTING, 3, SKILL_SONG_NOTE_OF_KNOWLEDGE, 
+	TAR_OBJ_INV | TAR_OBJ_ROOM | TAR_CHAR_ROOM,
+	song_note_of_knowledge,
 	execute_song_note_of_knowledge, NULL, NULL,
         SKILL_INCREASE_MEDIUM
 },
@@ -1199,7 +1200,7 @@ int execute_song_note_of_knowledge( ubyte level, CHAR_DATA *ch, char *arg, CHAR_
    corpse = get_obj_in_list_vis(ch, ch->song_data, world[ch->in_room].contents);
    if(corpse && (GET_ITEM_TYPE(corpse) != ITEM_CONTAINER || corpse->obj_flags.value[3] != 1))
       corpse = NULL;
-   int learned = has_skill(ch, song_info[SKILL_SONG_NOTE_OF_KNOWLEDGE].skill_num);
+   int learned = has_skill(ch, song_info[SKILL_SONG_NOTE_OF_KNOWLEDGE - SKILL_SONG_BASE].skill_num);
 
    dc_free(ch->song_data);
    ch->song_data = 0;
