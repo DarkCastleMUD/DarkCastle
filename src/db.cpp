@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.163 2007/11/09 05:00:51 jhhudso Exp $ */
+/* $Id: db.cpp,v 1.164 2007/11/10 15:10:42 jhhudso Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -3514,8 +3514,7 @@ struct obj_data *read_object(int nr, FILE *fl, bool zz)
     struct extra_descr_data *new_new_descr;
 
     if (nr < 0) {
-	logf( IMMORTAL, LOG_BUG, "read_object: nr set too low at %d. Setting to 1.", nr );
-	nr = 0;
+	return 0;
     }
 
 #ifdef LEAK_CHECK
