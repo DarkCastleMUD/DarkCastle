@@ -2581,7 +2581,7 @@ int execute_song_synchronous_chord( ubyte level, CHAR_DATA *ch, char *arg, CHAR_
 
    act("$n's song ends with an abrupt stop.", ch, 0, 0, TO_ROOM, 0);
 
-   if(!target || GET_LEVEL(ch) < GET_LEVEL(target))
+   if(!target)
    {
       send_to_char("Your song fades away, its target unknown.\r\n", ch);
       return eFAILURE;
