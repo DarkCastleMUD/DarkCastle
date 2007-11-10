@@ -2604,14 +2604,26 @@ int execute_song_synchronous_chord( ubyte level, CHAR_DATA *ch, char *arg, CHAR_
 
    if(learned > 80) {
       sprintbit(target->resist, isr_bits, buf);
+      if (!strcmp(buf, "NoBits")) {
+	  strcpy(buf, "nothing");
+      }
+
       csendf(ch, "%s is resistant to: %s\n\r", GET_SHORT(target), buf);
    }
    if (learned > 85) {
       sprintbit(target->immune, isr_bits, buf);
+      if (!strcmp(buf, "NoBits")) {
+	  strcpy(buf, "nothing");
+      }
+
       csendf(ch, "%s is immune to: %s\n\r", GET_SHORT(target), buf);
    }
    if (learned > 90) {  
       sprintbit(target->suscept, isr_bits, buf);
+      if (!strcmp(buf, "NoBits")) {
+	  strcpy(buf, "nothing");
+      }
+
       csendf(ch, "%s is susceptible to: %s\n\r", GET_SHORT(target), buf);
    }
 
