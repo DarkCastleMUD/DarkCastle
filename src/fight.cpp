@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.464 2007/11/09 18:58:23 jhhudso Exp $               *
+ * $Id: fight.cpp,v 1.465 2007/11/11 20:43:02 dcastle Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -4154,12 +4154,11 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
   else make_corpse(victim);
   
   if(IS_NPC(victim)) { 
-    extract_char(victim, TRUE);
-
     if (ch == victim) {
 	logf(IMMORTAL, LOG_BUG, "selfpurge on %s to %s", GET_NAME(ch), GET_NAME(victim));
 	selfpurge = 1;
     }
+    extract_char(victim, TRUE);
     return;
   }
   
