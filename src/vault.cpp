@@ -692,6 +692,7 @@ void load_vaults(void) {
   int vnum, full, count;
   long long unsigned int gold = 0;
   char value[128], line[128], buf[MAX_STRING_LENGTH], fname[MAX_INPUT_LENGTH], type[128], tmp[10];
+  bool saveChanges = FALSE;
 
   if(!(index = dc_fopen(VAULT_INDEX_FILE, "r"))) {
     log ("boot_vaults: could not open vault index file, probably doesn't exist.", IMMORTAL, LOG_BUG);
@@ -718,6 +719,8 @@ void load_vaults(void) {
 
   fscanf(index, "%s\n", line);
   while (*line != '$') {
+    saveChanges = FALSE;
+
     *line = UPPER(*line);
     sprintf(fname, "../vaults/%c/%s.vault", UPPER(*line), line);
     if(!(fl = dc_fopen(fname, "r"))) {
@@ -784,6 +787,7 @@ void load_vaults(void) {
 	      sprintf(buf, "boot_vaults: bad item vnum (#%d) in vault: %s", vnum,
 		    vault->owner);
 	      log(buf, 1, LOG_MISC);
+	      saveChanges = TRUE;
           } else {
 	    vault->weight += (GET_OBJ_WEIGHT(obj) * count);
 	    items->item_vnum  	= vnum;
@@ -817,6 +821,12 @@ void load_vaults(void) {
     vault_table = vault;
 
     dc_fclose(fl);
+    
+    if (saveChanges) {
+	logf(LOG_MISC, 0, "boot_vaults: Saving changes to %s's vault.", vault->owner);
+	save_vault(vault->owner);
+    }
+
     fscanf(index, "%s\n", line);
   }
   dc_fclose(index);
