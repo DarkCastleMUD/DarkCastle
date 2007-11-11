@@ -760,12 +760,13 @@ void load_vaults(void) {
             log(buf, 0, LOG_BUG);
             break;
           }
+
           CREATE(items, struct vault_items_data, 1);
+
 	  if (!full) {
             obj = get_obj(vnum);
 	    items->obj = NULL;
-	  }
-	  else {
+	  } else {
 	    char tmp[MAX_INPUT_LENGTH];
 	    get_line(fl, tmp);
   	    obj = read_object(real_object(vnum), fl, TRUE);
@@ -773,9 +774,16 @@ void load_vaults(void) {
 	  }
 	  
           if (!obj) {
-            sprintf(buf, "boot_vaults: bad item vnum (#%d) in vault: %s", vnum,
+	      if (full) {
+		  // Skip the rest of the full item
+		  while (strcmp(type, "S") != 0) {
+		      get_line(fl, type);
+		  }
+	      }
+
+	      sprintf(buf, "boot_vaults: bad item vnum (#%d) in vault: %s", vnum,
 		    vault->owner);
-            log(buf, 1, LOG_MISC);
+	      log(buf, 1, LOG_MISC);
           } else {
 	    vault->weight += (GET_OBJ_WEIGHT(obj) * count);
 	    items->item_vnum  	= vnum;
