@@ -750,6 +750,30 @@ void load_vaults(void) {
           sscanf(type, "%s %d", tmp, &vnum);
           vnum = MIN(vnum, VAULT_MAX_SIZE);
           vault->size	= vnum;
+
+	  if (vault->size > 2000) {
+	      logf(IMMORTAL, LOG_BUG, "boot_vaults: buggy vault size of %d on %s.", vault->size, vault->owner);
+
+	      FILE *oldfl;
+	      char oldfname[MAX_INPUT_LENGTH], oldtype[MAX_INPUT_LENGTH];
+		  
+	      sprintf(oldfname, "../vaults.old/%c/%s.vault", UPPER(*line), line);
+	      if(!(oldfl = dc_fopen(oldfname, "r"))) {
+		  sprintf(buf, "boot_vaults: unable to open file [%s].", oldfname);
+		  log(buf, IMMORTAL, LOG_BUG);
+	      } else {
+		  get_line(oldfl, oldtype);
+
+		  if (*oldtype == 'S') {
+		      sscanf(oldtype, "%s %d", tmp, &vnum);
+		      vault->size = vnum;
+		      logf(IMMORTAL, LOG_BUG, "boot_vaults: Setting %s's vault size to %d.", vault->owner, vault->size);
+		      saveChanges = TRUE;
+		  }
+
+		  dc_fclose(oldfl);
+	      }
+	  }
           break;
         case 'G':
           sscanf(type, "%s %llu", tmp, &gold);
@@ -760,7 +784,7 @@ void load_vaults(void) {
             ;
           } else {
             sprintf(buf, "boot_vaults: Bad 'O' option in file [%s]: %s\r\n", fname, type);
-            log(buf, 0, LOG_BUG);
+            log(buf, IMMORTAL, LOG_BUG);
             break;
           }
 
@@ -786,7 +810,7 @@ void load_vaults(void) {
 
 	      sprintf(buf, "boot_vaults: bad item vnum (#%d) in vault: %s", vnum,
 		    vault->owner);
-	      log(buf, 1, LOG_MISC);
+	      log(buf, IMMORTAL, LOG_BUG);
 	      saveChanges = TRUE;
           } else {
 	    vault->weight += (GET_OBJ_WEIGHT(obj) * count);
@@ -823,7 +847,7 @@ void load_vaults(void) {
     dc_fclose(fl);
     
     if (saveChanges) {
-	logf(LOG_MISC, 0, "boot_vaults: Saving changes to %s's vault.", vault->owner);
+	logf(IMMORTAL, LOG_BUG, "boot_vaults: Saving changes to %s's vault.", vault->owner);
 	save_vault(vault->owner);
     }
 
