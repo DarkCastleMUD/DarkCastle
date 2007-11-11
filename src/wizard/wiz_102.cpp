@@ -2169,7 +2169,7 @@ int do_oedit(struct char_data *ch, char *argument, int cmd)
 		    titems = items->next;
 		    if (items->obj && items->obj->item_number == item_num) {
 			items->obj = 0;
-			logf(0, LOG_MISC, "Removing deleted item %d from %s's vault.", item_num, vault->owner);
+			logf(0, LOG_MISC, "Removing deleted item %d from %s's vault.", itemvnum, vault->owner);
 		    }
 		}
 	    }
