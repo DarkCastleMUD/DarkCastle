@@ -32,6 +32,7 @@ extern "C"
 #include <spells.h>
 #include <race.h>
 #include <returnvals.h>
+#include <vault.h>
 
 #include <string>
 using namespace std;
@@ -2155,6 +2156,24 @@ int do_oedit(struct char_data *ch, char *argument, int cmd)
            if(k->item_number == item_num)
               extract_obj(k);
         }
+
+	struct vault_data *vault, *tvault;
+	struct vault_items_data *items, *titems;
+	int num = 0;
+
+	for (vault = vault_table; vault; vault = tvault, num++) {
+	    tvault = vault->next;
+
+	    if (vault && vault->items) {
+		for (items = vault->items; items; items = titems) {
+		    titems = items->next;
+		    if (items->obj && items->obj->item_number == item_num) {
+			items->obj = 0;
+			logf(0, LOG_MISC, "Removing deleted item %d from %s's vault.", item_num, vault->owner);
+		    }
+		}
+	    }
+	}
 
         // remove the item from index
         delete_item_from_index(item_num);
