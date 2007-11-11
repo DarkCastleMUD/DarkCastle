@@ -751,6 +751,7 @@ void load_vaults(void) {
           vnum = MIN(vnum, VAULT_MAX_SIZE);
           vault->size	= vnum;
 
+	  /*
 	  if (vault->size > 2000) {
 	      logf(IMMORTAL, LOG_BUG, "boot_vaults: buggy vault size of %d on %s.", vault->size, vault->owner);
 
@@ -774,6 +775,8 @@ void load_vaults(void) {
 		  dc_fclose(oldfl);
 	      }
 	  }
+	  */
+
           break;
         case 'G':
           sscanf(type, "%s %llu", tmp, &gold);
