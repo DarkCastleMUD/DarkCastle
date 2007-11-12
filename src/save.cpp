@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: save.cpp,v 1.53 2007/07/05 15:44:59 dcastle Exp $ */
+/* $Id: save.cpp,v 1.54 2007/11/12 21:48:14 dcastle Exp $ */
 
 extern "C"
 {
@@ -1270,6 +1270,7 @@ obj->obj_flags.value[2]    != standard_obj->obj_flags.value[2])
     {
       fwrite("RPR", sizeof(char), 3, fpsave);
       fwrite(&obj->affected[i].modifier,sizeof(obj->affected[i].modifier),1,fpsave);
+      break; // Fixed!
     }
   }
   if(strcmp(obj->name, standard_obj->name))
