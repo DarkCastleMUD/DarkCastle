@@ -678,7 +678,7 @@ int hellmouth_thing(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
    if(*junk)
       return eFAILURE;
   
-  if (str_cmp(arg1, "vanity"))
+   if (strncmp(arg1, "vanity", 6))
     return eFAILURE;
 
   if (invoker->fighting)
