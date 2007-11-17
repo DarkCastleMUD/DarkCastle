@@ -1108,6 +1108,12 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
 	case 'r': if ( rndm )
                      return ( !IS_NPC( rndm ) );
 	          else return 0;
+        case 'f': if (actor && actor->fighting)
+		    return ( !IS_NPC(actor->fighting));
+		  else return 0;
+        case 'g': if (mob && mob->fighting)
+		    return ( !IS_NPC(mob->fighting));
+		  else return 0;
 	default:
 	  logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'ispc'", mob_index[mob->mobdata->nr].virt ); 
 	  return -1;
@@ -2240,6 +2246,50 @@ void mprog_translate( char ch, char *t, CHAR_DATA *mob, CHAR_DATA *actor,
          else logf(IMMORTAL, LOG_WORLD, "Mob %d trying illegal $T in MOBProg.", mob_index[mob->mobdata->nr].virt);
 	 break;
      
+     case 'f':
+	 if (actor && actor->fighting) {
+		if (CAN_SEE(mob, actor->fighting))
+		  one_argument(actor->fighting->name, t);
+		if (!IS_NPC(actor->fighting))
+		 *t = UPPER(*t);
+	 }
+	 break;
+     case 'F':
+	 if (actor && actor->fighting) {
+		if (CAN_SEE(mob, actor->fighting))
+		 {
+		  if (IS_NPC(actor->fighting))
+			strcpy(t, actor->fighting->short_desc);
+		  else {
+ 		   strcpy( t, actor->fighting->name );
+		   strcat( t, " " );
+		   strcat( t, actor->fighting->title );
+		  }
+ 	          }
+	 }
+	 break;
+     case 'g':
+	 if (mob && mob->fighting) {
+		if (CAN_SEE(mob, mob->fighting))
+		  one_argument(mob->fighting->name, t);
+		if (!IS_NPC(mob->fighting))
+		 *t = UPPER(*t);
+	 }
+	 break;
+     case 'G':
+	 if (mob && mob->fighting) {
+		if (CAN_SEE(mob, mob->fighting))
+		 {
+		  if (IS_NPC(mob->fighting))
+			strcpy(t, mob->fighting->short_desc);
+		  else {
+ 		   strcpy( t, mob->fighting->name );
+		   strcat( t, " " );
+		   strcat( t, mob->fighting->title );
+		  }
+ 	          }
+	 }
+	 break;
      case 'r':
          if ( rndm ) {
 	   if ( CAN_SEE( mob, rndm ) )
