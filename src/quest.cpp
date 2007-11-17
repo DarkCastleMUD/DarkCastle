@@ -730,13 +730,8 @@ int quest_master(CHAR_DATA *ch, OBJ_DATA *obj, int cmd, char *arg, CHAR_DATA *ow
 
 
    if(cmd == 59) {
-      sprintf(buf, "%s Here is what I can do for you.", GET_NAME(ch));
-      do_tell(owner, buf, 9);
-      csendf(ch, "1) something\n\r"
-                 "2) something else\n\r"
-                 "3) something fun\n\r"
-                 "\n\r"
-             );
+      show_available_quests(ch);
+      return eSUCCESS;
    }
 
    if(cmd == 56) {
