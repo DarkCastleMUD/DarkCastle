@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.164 2007/11/02 21:14:19 pirahna Exp $ */
+/* $Id: mob_proc.cpp,v 1.165 2007/11/17 09:49:34 dcastle Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -835,6 +835,18 @@ int brass_dragon(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     return cast_lightning_breath(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
 }
   
+int francis_guard(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,        
+          struct char_data *owner)
+{
+  if (cmd != 1) return eFAILURE;
+  if (world[ch->in_room].number == 7077)
+  {
+    do_say(owner, "Oh no you don't!", 9);
+    attack(owner, ch, 0);
+    return eSUCCESS;
+  }
+  return eFAILURE;
+}
 
 /* ********************************************************************
 *  Special procedures for mobiles                                      *
@@ -1731,7 +1743,8 @@ static char *dethSayText [ ] =
   "Let Moose and Mountie unite!",
   "WARNING: the Imm staff is not responsible for Stromboli's \"activities\" should you make personal data available to other players.",
   "Build a man a fire and you warm him for a day.  Set a man on fire and you warm him for the rest of his life.",
-  "Urizen likes the runka."
+  "Urizen likes the runka.",
+  "I'm an agnostic dyslexic insomniac.  I can't sleep at night because I'm wondering if there's a Dog."
 };
 
 // ENDOFCHAIN
