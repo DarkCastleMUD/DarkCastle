@@ -105,6 +105,7 @@ void assign_one_obj_com(int obj_num, int (*func)(CHAR_DATA*, struct obj_data *, 
 void assign_non_combat_procs() {
     SPEC_FUN    guild;
     SPEC_FUN    guild_guard;
+    SPEC_FUN    francis_guard;
     SPEC_FUN	deth;
     SPEC_FUN	fido;
     SPEC_FUN	janitor;
@@ -169,6 +170,7 @@ void assign_non_combat_procs() {
     assign_one_mob_non(207,  adept);
     assign_one_mob_non(208,  adept);
     assign_one_mob_non(214,  fido);
+    assign_one_mob_non(7134,  francis_guard);
     assign_one_mob_non(222,  newbie_zone_guard);
     assign_one_mob_non(1334, generic_doorpick_blocker);
     assign_one_mob_non(1935,  guild);
