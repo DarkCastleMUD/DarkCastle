@@ -1495,6 +1495,12 @@ void do_astral_chanty_movement(CHAR_DATA *victim, CHAR_DATA *target)
 {
   int retval;
 
+  if (!victim || !target) {
+      logf(IMMORTAL, LOG_BUG, "do_astral_chanty_movement: NULL pointer passed.");
+      produce_coredump();
+      return;
+  }
+
   if (affected_by_spell(victim, FUCK_PTHIEF))
   {
     send_to_char("Your attempt to transport stolen goods through the astral planes fails!\r\n",victim);
@@ -1518,78 +1524,47 @@ void do_astral_chanty_movement(CHAR_DATA *victim, CHAR_DATA *target)
 
 int execute_song_astral_chanty( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
-  char_data * master = NULL;
-  follow_type * fvictim = NULL;
+    int status = 0;
 
-  if(ch->master && ch->master->in_room == ch->in_room &&
-    ISSET(ch->affected_by, AFF_GROUP))
-    master = ch->master;
-  else
-    master = ch;
+    victim = get_char(ch->song_data);
 
-  victim = get_char(ch->song_data);
+    if (!victim) {
+	send_to_char("You cannot seem to accurately focus your song.\r\n", ch);
+	status = eFAILURE;
+    } else if (GET_LEVEL(victim) > GET_LEVEL(ch)) {
+	send_to_char("Your target resists the song's draw.\r\n", ch);
+	status = eFAILURE;
+    } else if (IS_SET(world[victim->in_room].room_flags, NO_PORTAL) || 
+	       IS_SET(zone_table[world[victim->in_room].zone].zone_flags, ZONE_NO_TELEPORT) ||
+	       (IS_SET(world[victim->in_room].room_flags, ARENA) && 
+		!IS_SET(world[ch->in_room].room_flags, ARENA)) ||
+	       (IS_SET(world[ch->in_room].room_flags, ARENA) &&
+		!IS_SET(world[victim->in_room].room_flags, ARENA))) {
+	send_to_char("A mystical force seems to be keeping you out.\r\n", ch);
+	status = eFAILURE;
+    } else if (!IS_AFFECTED(ch, AFF_GROUP)) {
+	send_to_char("You have no group to command.\r\n", ch);
+	status = eFAILURE;
+    } else {
+	for (char_data * tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room) {
+	    if (!ARE_GROUPED(ch, tmp_char))
+		continue;
 
-  if (!victim) {
-    if(ch->song_data) {
-      dc_free(ch->song_data);
-      ch->song_data = 0;
-      }
-    send_to_char("You cannot seem to accurately focus your song.\r\n", ch);
-    return eFAILURE;
-    }
+	    do_astral_chanty_movement(tmp_char, victim);
+	}
 
-  if (GET_LEVEL(victim) > GET_LEVEL(ch)) {
-    send_to_char("Your target resists the song's draw.\r\n", ch);
-    if(ch->song_data) {
-      dc_free(ch->song_data);
-      ch->song_data = 0;
-      }
-    return eFAILURE;
-    }
-
-  if(IS_SET(world[victim->in_room].room_flags, NO_PORTAL) || 
-     IS_SET(zone_table[world[victim->in_room].zone].zone_flags, ZONE_NO_TELEPORT) ||
-    (IS_SET(world[victim->in_room].room_flags, ARENA) && !IS_SET(world[ch->in_room].room_flags, ARENA)) ||
-    (IS_SET(world[ch->in_room].room_flags, ARENA) && !IS_SET(world[victim->in_room].room_flags, ARENA))
-//  ||    (IS_AFFECTED(victim, AFF_SHADOWSLIP))
-    )
-    send_to_char("A mystical force seems to be keeping you out.\r\n", ch);
-  else {
-    // Move the group, NOT the leader, NOT the bard
-    for (fvictim = master->followers; fvictim; fvictim = fvictim->next) {
-      if (!ISSET(fvictim->follower->affected_by, AFF_GROUP) ||
-        fvictim->follower == ch ||
-        fvictim->follower->in_room != ch->in_room)
-        continue;
-      do_astral_chanty_movement(fvictim->follower, victim);
-      }
-
-    // Move just the group leader, but NEVER the bard
-    if (ch != master && (ISSET(master->affected_by, AFF_GROUP) &&
-      master->in_room == ch->in_room)) {
-      do_astral_chanty_movement(master, victim);
-      }
-
-    // Move the bard's charm
-    for(struct follow_type *k = ch->followers; k; k = k->next)
-      if(IS_MOB(k->follower) && affected_by_spell(k->follower, SPELL_CHARM_PERSON) &&
-        k->follower->in_room == ch->in_room)
-        do_astral_chanty_movement(k->follower, victim);
-
-    send_to_char("Your song completes, and your vision fades.\r\n", ch);
-    act("$n's voice fades off into the ether.", ch, 0, 0, TO_ROOM, 0);
-
-    // Move the bard after the charm because of the same_room check
-    do_astral_chanty_movement(ch, victim);
+	send_to_char("Your song completes, and your vision fades.\r\n", ch);
+	act("$n's voice fades off into the ether.", ch, 0, 0, TO_ROOM, 0);
+	status = eSUCCESS;
     }
 
   // free our stored char name
-  if(ch->song_data) {
-    dc_free(ch->song_data);
-    ch->song_data = 0;
-    }
+  if (ch->song_data) {
+      dc_free(ch->song_data);
+      ch->song_data = 0;
+  }
 
-  return eSUCCESS;
+  return status;
 }
 
 
