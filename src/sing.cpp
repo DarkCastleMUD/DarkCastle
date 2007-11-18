@@ -1542,11 +1542,10 @@ int execute_song_astral_chanty( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA
 		!IS_SET(world[victim->in_room].room_flags, ARENA))) {
 	send_to_char("A mystical force seems to be keeping you out.\r\n", ch);
 	status = eFAILURE;
-    } else if (!IS_AFFECTED(ch, AFF_GROUP)) {
-	send_to_char("You have no group to command.\r\n", ch);
-	status = eFAILURE;
     } else {
-	for (char_data * tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room) {
+	char_data *next_char = 0;
+	for (char_data * tmp_char = world[ch->in_room].people; tmp_char; tmp_char = next_char) {
+	    next_char = tmp_char->next_in_room;
 	    if (!ARE_GROUPED(ch, tmp_char))
 		continue;
 
