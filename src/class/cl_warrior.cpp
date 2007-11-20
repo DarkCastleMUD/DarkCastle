@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.63 2007/11/19 04:10:56 jhhudso Exp $
+| $Id: cl_warrior.cpp,v 1.64 2007/11/20 21:35:33 pirahna Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -67,6 +67,11 @@ int do_kick(struct char_data *ch, char *argument, int cmd)
 
   if (!can_attack(ch) || !can_be_attacked(ch, victim))
     return eFAILURE;
+
+  if (IS_SET(victim->combat, COMBAT_BLADESHIELD1) || IS_SET(victim->combat, COMBAT_BLADESHIELD2)) {
+        send_to_char("Kicking a bladeshielded opponent would be a good way to lose a leg!\n\r", ch);
+        return eFAILURE;
+  }
 
   WAIT_STATE(ch, (int)(PULSE_VIOLENCE*1.5));
 
@@ -164,6 +169,11 @@ int do_deathstroke(struct char_data *ch, char *argument, int cmd)
 
     if(!can_attack(ch) || !can_be_attacked(ch, victim))
           return eFAILURE;
+
+    if (IS_SET(victim->combat, COMBAT_BLADESHIELD1) || IS_SET(victim->combat, COMBAT_BLADESHIELD2)) {
+        send_to_char("Stroking a bladeshielded opponent would be suicide!\n\r", ch);
+        return eFAILURE;
+    }
 
     int i = has_skill(ch, SKILL_DEATHSTROKE);
     if (i > 40) failchance -= 5;
@@ -451,6 +461,11 @@ int do_bash(struct char_data *ch, char *argument, int cmd)
 	return eFAILURE;
     }
 
+    if (IS_SET(victim->combat, COMBAT_BLADESHIELD1) || IS_SET(victim->combat, COMBAT_BLADESHIELD2)) {
+        send_to_char("Bashing a bladeshielded opponent would be suicide!\n\r", ch);
+        return eFAILURE;
+    }
+
     if(!can_attack(ch) || !can_be_attacked(ch, victim))
       return eFAILURE;
 
@@ -666,6 +681,11 @@ int do_disarm( struct char_data *ch, char *argument, int cmd )
 
     if(!can_attack(ch) || !can_be_attacked(ch, victim))
           return eFAILURE;
+
+    if (IS_SET(victim->combat, COMBAT_BLADESHIELD1) || IS_SET(victim->combat, COMBAT_BLADESHIELD2)) {
+        send_to_char("Attempting to disarm a bladeshielded opponent would be suicide!\n\r", ch);
+        return eFAILURE;
+    }
 
     set_cantquit(ch, victim);
 

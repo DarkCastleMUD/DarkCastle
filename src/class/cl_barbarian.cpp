@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_barbarian.cpp,v 1.78 2007/06/12 03:28:49 dcastle Exp $
+| $Id: cl_barbarian.cpp,v 1.79 2007/11/20 21:35:33 pirahna Exp $
 | cl_barbarian.C
 | Description:  Commands for the barbarian class.
 */
@@ -310,6 +310,11 @@ int do_headbutt(struct char_data *ch, char *argument, int cmd)
 
   if(!can_attack(ch) || !can_be_attacked(ch, victim))
     return eFAILURE;
+
+  if (IS_SET(victim->combat, COMBAT_BLADESHIELD1) || IS_SET(victim->combat, COMBAT_BLADESHIELD2)) {
+        send_to_char("Headbutting a bladeshielded opponent would be asking for decapitation!\n\r", ch);
+        return eFAILURE;
+  }
 
   if (IS_SET(victim->combat, COMBAT_BERSERK) && (IS_NPC(victim) || has_skill(victim, SKILL_BERSERK) > 80))
   {

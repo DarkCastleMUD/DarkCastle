@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_monk.cpp,v 1.31 2007/09/27 03:14:22 jhhudso Exp $
+| $Id: cl_monk.cpp,v 1.32 2007/11/20 21:35:33 pirahna Exp $
 | cl_monk.C
 | Description:  Monk skills.
 */
@@ -65,6 +65,11 @@ int do_eagle_claw(struct char_data *ch, char *argument, int cmd)
     return eFAILURE;
     }
 
+  if (IS_SET(victim->combat, COMBAT_BLADESHIELD1) || IS_SET(victim->combat, COMBAT_BLADESHIELD2)) {
+        send_to_char("Clawing a bladeshielded opponent would be suicide!\n\r", ch);
+        return eFAILURE;
+  }
+
   if (!can_attack(ch) || !can_be_attacked(ch, victim))
     return eFAILURE;
 
@@ -128,6 +133,11 @@ int do_quivering_palm(struct char_data *ch, char *argument, int cmd)
   if(victim == ch) {
     send_to_char("Masturbate on your own time.\n\r", ch);
     return eFAILURE;
+  }
+
+  if (IS_SET(victim->combat, COMBAT_BLADESHIELD1) || IS_SET(victim->combat, COMBAT_BLADESHIELD2)) {
+        send_to_char("Palming a bladeshielded opponent would be suicide!\n\r", ch);
+        return eFAILURE;
   }
 
   if (IS_SET(world[ch->in_room].room_flags, NO_KI)) {
@@ -198,6 +208,11 @@ int do_stun(struct char_data *ch, char *argument, int cmd)
   if(victim == ch) {
     send_to_char("Aren't we funny today...\n\r", ch);
     return eFAILURE;
+  }
+
+  if (IS_SET(victim->combat, COMBAT_BLADESHIELD1) || IS_SET(victim->combat, COMBAT_BLADESHIELD2)) {
+      send_to_char("Stunning a bladeshielded opponent would be suicide!\n\r", ch);
+      return eFAILURE;
   }
 
   if (GET_LEVEL(ch) < IMMORTAL && IS_PC(victim) && GET_LEVEL(victim) >= IMMORTAL) {
