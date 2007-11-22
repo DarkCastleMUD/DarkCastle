@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.165 2007/11/17 09:49:34 dcastle Exp $ */
+/* $Id: mob_proc.cpp,v 1.166 2007/11/22 07:52:50 jhhudso Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -930,7 +930,7 @@ int clan_guard(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
         (in_room == real_room(2380) && cmd != 1) || // north
         (in_room == real_room(2400) && cmd != 4) || // west
         (in_room == real_room(2430) && cmd != 3) || // south
-        (in_room == real_room(2440) && cmd != 2) || // east
+        (in_room == real_room(2440) && cmd != 1) || // north
 	(in_room == real_room(2460) && cmd != 1) || // north
         (in_room == real_room(2450) && cmd != 4))   // west
         return eFAILURE;
