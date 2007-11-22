@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.h,v 1.80 2007/09/02 23:35:08 jhhudso Exp $ */
+/* $Id: interp.h,v 1.81 2007/11/22 12:51:41 jhhudso Exp $ */
 
 #ifndef INTERP_H_
 #define INTERP_H_
@@ -406,6 +406,7 @@ DO_FUN  do_teleport;
 DO_FUN  do_tell;
 DO_FUN  do_testhand;
 DO_FUN  do_testhit;
+DO_FUN  do_testport;
 DO_FUN  do_thunder;
 DO_FUN	do_tick;
 DO_FUN  do_time;
