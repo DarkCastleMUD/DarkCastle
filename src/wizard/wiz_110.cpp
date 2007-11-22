@@ -290,7 +290,7 @@ int do_revoke(struct char_data *ch, char *arg, int cmd)
    sprintf(buf, "%s has had %s revoked.\r\n", GET_NAME(vict), 
                 bestowable_god_commands[i].name);
    send_to_char(buf, ch);
-   sprintf(buf, "%s has had %s revoked by %s.\r\n", GET_NAME(vict), 
+   sprintf(buf, "%s has had %s revoked by %s.", GET_NAME(vict), 
                 bestowable_god_commands[i].name, GET_NAME(ch));
    log(buf, GET_LEVEL(ch), LOG_GOD);
    sprintf(buf, "%s has revoked %s from you.\r\n", GET_NAME(ch), 
