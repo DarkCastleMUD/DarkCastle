@@ -1088,6 +1088,18 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
     return mprog_veval( count, opr, atoi(val) );
   }
   
+  if ( !str_cmp(buf, "numofmobsinroom") ) {
+      struct char_data *p;
+      int target = atoi(arg);
+      int count = 0;
+
+    for (p = world[mob->in_room].people; p; p = p->next_in_room)
+      if (IS_MOB(p) && mob_index[p->mobdata->nr].virt == target)
+	count++;
+
+    return mprog_veval( count, opr, atoi(val) );
+  }
+  
   if ( !str_cmp( buf, "ispc" ) )
     {
 	if (fvict)
