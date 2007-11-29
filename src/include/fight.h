@@ -2,7 +2,7 @@
 #define FIGHT_H_
 
 /************************************************************************
-| $Id: fight.h,v 1.32 2007/02/10 06:22:39 jhhudso Exp $
+| $Id: fight.h,v 1.33 2007/11/29 07:10:14 jhhudso Exp $
 | fight.h
 | This file defines the header information for fight.
 */
@@ -124,6 +124,7 @@ void eq_destroyed(char_data * ch, obj_data * obj, int pos);
 #define COMBAT_THI_EYEGOUGE2 1<<19
 #define COMBAT_FLEEING       1<<20
 #define COMBAT_SHOCKED2      1<<21
+#define COMBAT_CRUSH_BLOW    1<<22
 
 #define DAMAGE_TYPE_PHYSICAL  0
 #define DAMAGE_TYPE_MAGIC     1

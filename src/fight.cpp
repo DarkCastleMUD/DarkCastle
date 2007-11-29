@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.465 2007/11/11 20:43:02 dcastle Exp $               *
+ * $Id: fight.cpp,v 1.466 2007/11/29 07:10:14 jhhudso Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -666,6 +666,12 @@ void update_flags(CHAR_DATA *vict)
     REMOVE_BIT(vict->combat, COMBAT_RAGE2);
     act("$n calms down a bit.", vict, 0, 0, TO_ROOM, 0);
     act("Your mind seems a bit clearer now.", vict, 0, 0, TO_CHAR, 0);
+  }
+
+  if (IS_SET(vict->combat, COMBAT_CRUSH_BLOW)) {
+      REMOVE_BIT(vict->combat, COMBAT_CRUSH_BLOW);
+      act("$n shrugs off $s weakness!", vict, 0, 0, TO_ROOM, 0);
+      act("You shrug off your weakness.!", vict, 0, 0, TO_CHAR, 0);
   }
 
   if (IS_SET(vict->combat, COMBAT_BLADESHIELD1)) {
@@ -1385,8 +1391,8 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
       dam += 15 + has_skill(ch, SKILL_NAT_SELECT)/10;
   
   do_combatmastery(ch, vict, weapon);
-  if(ISSET(ch->affected_by, AFF_CMAST_WEAKEN))
-     dam *= MAX(GET_LEVEL(ch), 50) / 100;
+  if (IS_SET(vict->combat, COMBAT_CRUSH_BLOW))
+     dam *= 0.5;
 
   if (w_type == TYPE_HIT && IS_NPC(ch))
   {
@@ -4032,18 +4038,26 @@ int do_skewer(CHAR_DATA *ch, CHAR_DATA *vict, int dam, int wt, int wt2, int weap
 
 void do_combatmastery(CHAR_DATA *ch, CHAR_DATA *vict, int weapon)
 {
-  if((GET_CLASS(ch) != CLASS_WARRIOR) && GET_LEVEL(ch) < ARCHANGEL)  return;
-  if(!IS_NPC(vict) && GET_LEVEL(vict) >= IMMORTAL)                   return;	
-  if(!ch->equipment[weapon])                                         return;
-  if (!has_skill(ch, SKILL_COMBAT_MASTERY)) return;
-  if (ch->in_room != vict->in_room) return;
+  if ((GET_CLASS(ch) != CLASS_WARRIOR) && GET_LEVEL(ch) < ARCHANGEL)
+      return;
+  if (IS_PC(vict) && GET_LEVEL(vict) >= IMMORTAL)
+      return;	
+  if (!ch->equipment[weapon])                                        
+      return;
+  if (!has_skill(ch, SKILL_COMBAT_MASTERY))
+      return;
+  if (ch->in_room != vict->in_room)
+      return;
 
   int type = get_weapon_damage_type(ch->equipment[weapon]);
-  if( ! (type == TYPE_STING || type == TYPE_WHIP || type == TYPE_CRUSH || type == TYPE_BLUDGEON ))  return;
+  if (type != TYPE_STING && type != TYPE_WHIP && type != TYPE_CRUSH && type != TYPE_BLUDGEON )
+      return;
 
-  if(!skill_success(ch,vict, SKILL_COMBAT_MASTERY))                  return;
+  if(!skill_success(ch,vict, SKILL_COMBAT_MASTERY))
+      return;
 
-  if (number(0,8)) return; // Chance lowered
+  if (number(0,8))
+      return; // Chance lowered
 
   if(type == TYPE_STING) {
      if(!IS_AFFECTED(vict, AFF_BLIND)) {
@@ -4083,8 +4097,8 @@ void do_combatmastery(CHAR_DATA *ch, CHAR_DATA *vict, int weapon)
         act("You easily avoid $n's slow, crushing blow!", ch, 0, vict, TO_VICT, 0);
         return;
      }     
-     if(!IS_AFFECTED(vict, AFF_CMAST_WEAKEN)) {
-        SETBIT(vict->affected_by, AFF_CMAST_WEAKEN);
+     if(!IS_SET(vict->combat, COMBAT_CRUSH_BLOW)) {
+        SET_BIT(vict->combat, COMBAT_CRUSH_BLOW);
         act("Your crushing blow causes $N's attacks to momentarily weaken!", ch, 0, vict, TO_CHAR, 0);
         act("$n's crushing blow causes your attacks to momentarily weaken!", ch, 0, vict, TO_VICT, 0);
         act("$n's crushing blow causes $N's attacks to momentarily weaken!", ch, 0, vict, TO_ROOM, NOTVICT);
