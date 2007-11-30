@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.166 2007/11/22 07:52:50 jhhudso Exp $ */
+/* $Id: mob_proc.cpp,v 1.167 2007/11/30 16:16:49 apocalypse Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -1744,7 +1744,14 @@ static char *dethSayText [ ] =
   "WARNING: the Imm staff is not responsible for Stromboli's \"activities\" should you make personal data available to other players.",
   "Build a man a fire and you warm him for a day.  Set a man on fire and you warm him for the rest of his life.",
   "Urizen likes the runka.",
-  "I'm an agnostic dyslexic insomniac.  I can't sleep at night because I'm wondering if there's a Dog."
+  "I'm an agnostic dyslexic insomniac.  I can't sleep at night because I'm wondering if there's a Dog.",
+  "Real coders don't document...if it was hard to write, it should be hard to understand.",
+  "Math illiteracy affects 8 out of every 5 people.",
+  "Despite the rising cost of living, have you noticed how it still remains so popular?",
+  "I'm busy now. Can I ignore you some other time?",
+  "I love deadlines...especially the sound they make as they go whooshing by!",
+  "Urizen told me that even though hard work never killed anyone, he doesn't want to chance it.",
+  "Tell me what you need and I'll tell you how to get along with out it."
 };
 
 // ENDOFCHAIN
