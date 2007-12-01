@@ -492,8 +492,13 @@ void init_game(int port, int port2, int port3, int port4)
     finish_hotboot();
   }
 
-  logf(0, LOG_MISC, "Initializing xmlrpc server on port: %d", 8888);
-  xmlrpc_s = xmlrpc_init(8888);
+  if (bport) {
+      logf(0, LOG_MISC, "Initializing xmlrpc server on port: %d", 8889);
+      xmlrpc_s = xmlrpc_init(8889);
+  } else {
+      logf(0, LOG_MISC, "Initializing xmlrpc server on port: %d", 8888);
+      xmlrpc_s = xmlrpc_init(8888);
+  }
 
   log("Signal trapping.", 0, LOG_MISC);
   signal_setup();
