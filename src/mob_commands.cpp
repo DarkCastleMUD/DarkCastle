@@ -1940,6 +1940,7 @@ char *expand_data(char_data *ch, char *orig)
        break;
       buf[i++] = *(orig+o);
     }
+    buf[i] = '\0';
     char tmp[MAX_INPUT_LENGTH];
     if (lvali)
       sprintf(tmp, "%d",*lvali);
