@@ -1100,6 +1100,9 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
     return mprog_veval( count, opr, atoi(val) );
   }
   
+// Ugh.
+// TODO: redo these to define target before all these ifs, so the target-finding code doesn't have to be repeated
+
   if ( !str_cmp( buf, "ispc" ) )
     {
 	if (fvict)
@@ -1463,6 +1466,12 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
 		if (rndm)
 		if (IS_AFFECTED(rndm, AFF_FLYING)) return TRUE;
 		break;
+        case 'f': if (actor && actor->fighting)
+                    if (IS_AFFECTED(actor->fighting, AFF_FLYING)) return TRUE;
+		break;
+        case 'g': if (mob && mob->fighting)
+                    if (IS_AFFECTED(mob->fighting, AFF_FLYING)) return TRUE;
+		break;
      }
    
 
@@ -1491,6 +1500,14 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
 		if (rndm)
                 return (int)(affected_by_spell(rndm, find_skill_num(val)));
 		return -1;
+        case 'f': if (actor && actor->fighting)
+                    return (int)(affected_by_spell(actor->fighting, find_skill_num(val)));
+                  else return -1;
+        case 'g': if (mob && mob->fighting)
+                    return (int)(affected_by_spell(mob->fighting, find_skill_num(val)));
+                  else return 0;
+
+
      }
   }
   if ( !str_cmp( buf, "isaffected" ) )
@@ -1979,9 +1996,11 @@ char *mprog_process_if( char *ifchck, char *com_list, CHAR_DATA *mob,
   if (ur) csendf(ur,"%d>%d\r\n",ifpos-1,legal);
  } else {
   legal = thrw->ifchecks[thrw->cPos++];
+  cIfs[ifpos++] = legal;
   if (legal >= 1) flag = TRUE;
   else if (legal < 0) return NULL;
   if (ur) csendf(ur,"%d>-%d\r\n",thrw->cPos-1,legal);
+  
  }
 
  while( loopdone == FALSE ) /*scan over any existing or statements */
@@ -2011,6 +2030,7 @@ char *mprog_process_if( char *ifchck, char *com_list, CHAR_DATA *mob,
 	  if (ur) csendf(ur,"%d<%d\r\n",ifpos-1,legal);
 	 } else {
 	  legal = thrw->ifchecks[thrw->cPos++];
+	  cIfs[ifpos++] = legal;
 	  if (legal == 1) flag = TRUE;
 	  else if (legal < 0) return NULL;
 	  if (ur) csendf(ur,"%d<-%d\r\n",thrw->cPos-1,legal);
