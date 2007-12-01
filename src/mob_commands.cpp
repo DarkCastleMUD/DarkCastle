@@ -1893,10 +1893,12 @@ char *expand_data(char_data *ch, char *orig)
        if ((ptr-l) == orig)
         break;
        if (!isalpha(*(ptr-l)) && (*(ptr-l) != ',') &&
-	(*(ptr-l) != '_'))
+	(*(ptr-l) != '_')) 
+  	{
 	// Failsafe to ensure no 'reserved' characters are being used, ie. # ~
-	break;
-
+	  l--;
+  	  break;
+	}
     }
     *(ptr) = '\0';
     strcpy(left, (ptr-l));
@@ -1908,6 +1910,7 @@ char *expand_data(char_data *ch, char *orig)
         break;
        if (!isalpha(*(ptr+r)) && (*(ptr+r) != ',') && (*(ptr-l) != '_'))
 	break;
+ 
     }
     c = *(ptr+r);
     *(ptr+r) = '\0';    
