@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.467 2007/11/30 22:30:25 dcastle Exp $               *
+ * $Id: fight.cpp,v 1.468 2007/12/01 16:35:22 dcastle Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -4709,7 +4709,7 @@ void dam_message(int dam, CHAR_DATA * ch, CHAR_DATA * victim,
 
   char buf1[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH], buf3[MAX_STRING_LENGTH];
   char *vs, *vp, *vx;
-  char *attack;
+  char *attack=0;
   char punct;
   char modstring[200];
   char endstring[200];
@@ -4830,6 +4830,28 @@ void dam_message(int dam, CHAR_DATA * ch, CHAR_DATA * victim,
      w_type = 0;
    }
 
+  // Custom damage messages.
+   if (IS_NPC(ch))
+     switch (mob_index[ch->mobdata->nr].virt)
+     {
+	case 13434:
+		attack = "$2poison$R";
+		break;
+	case 13435:
+		attack = "$B$4fire$R";
+		break;
+	case 13436:
+		attack = "$B$2acid$R";
+		break;
+	case 13437:
+		attack = "$B$5lightning$R";
+		break;
+	case 13438:
+		attack = "$B$3frost$R";
+		break;
+	default: break;
+     };   
+
    punct = (dam <= 29) ? '.' : '!';
 
    if(IS_SET(modifier, COMBAT_MOD_FRENZY)) {
@@ -4881,7 +4903,7 @@ void dam_message(int dam, CHAR_DATA * ch, CHAR_DATA * victim,
      if (GET_CLASS(victim) == CLASS_MONK) {
        if (w_type == 0)
        {
-         attack = race_info[GET_RACE(ch)].unarmed;
+         if (!attack) attack = race_info[GET_RACE(ch)].unarmed;
          sprintf(buf1, "$n's %s %s $N%s| as it deflects off $S %s%c", attack, vp, vx,  shield,punct);
          sprintf(buf2, "You %s $N%s%s as $E raises $S %s to deflect your %s%c", vs, vx, !IS_NPC(ch) && IS_SET(ch->pcdata->toggles, 
 PLR_DAMAGE)?dammsg:"", shield, attack, punct);
@@ -4890,7 +4912,7 @@ PLR_DAMAGE)?dammsg:"", attack, shield, punct);
        }
        else
        {
-         attack = attack_table[w_type];
+         if (!attack) attack = attack_table[w_type];
          sprintf(buf1, "$n's %s %s $N%s| as it deflects off $S %s%c", attack, vp, vx, shield,punct);
          sprintf(buf2, "You %s $N%s%s as $E raises $S %s to deflect your %s%c", vs, vx, !IS_NPC(ch) && IS_SET(ch->pcdata->toggles, 
 PLR_DAMAGE)?dammsg:"", shield, attack, punct);
@@ -4900,7 +4922,7 @@ PLR_DAMAGE)?dammsg:"", attack, shield, punct);
      } else {
        if (w_type == 0)
        {
-         attack = race_info[GET_RACE(ch)].unarmed;
+         if (!attack) attack = race_info[GET_RACE(ch)].unarmed;
          sprintf(buf1, "$n's %s %s $N%s| as it strikes $S %s%c", attack, vp, vx, shield, punct);
          sprintf(buf2, "You %s $N%s%s as $E raises $S %s to deflect your %s%c", vs, vx, !IS_NPC(ch) && IS_SET(ch->pcdata->toggles, 
 PLR_DAMAGE)?dammsg:"", shield, attack, punct);
@@ -4909,7 +4931,7 @@ PLR_DAMAGE)?dammsg:"", attack, shield, punct);
        }
        else
        {
-         attack = attack_table[w_type];
+         if (!attack) attack = attack_table[w_type];
          sprintf(buf1, "$n's %s %s $N%s| as it strikes $S %s%c", attack, vp, vx, shield, punct);
          sprintf(buf2, "You %s $N%s%s as $E raises $S %s to deflect your %s%c", vs, vx, !IS_NPC(ch) && IS_SET(ch->pcdata->toggles, 
 PLR_DAMAGE)?dammsg:"", shield, attack, punct);
@@ -4921,7 +4943,7 @@ PLR_DAMAGE)?dammsg:"", attack, shield, punct);
    else {
      if (w_type == 0)
      {
-       attack = race_info[GET_RACE(ch)].unarmed;
+       if (!attack) attack = race_info[GET_RACE(ch)].unarmed;
        int a;
        if (IS_NPC(ch) && (a = mob_index[ch->mobdata->nr].virt) < 92 && a > 87)
         attack = elem_type[a-88];
@@ -4931,7 +4953,7 @@ PLR_DAMAGE)?dammsg:"", attack, shield, punct);
      }
      else
      {
-       attack = attack_table[w_type];
+       if (!attack) attack = attack_table[w_type];
        sprintf(buf1, "$n's %s%s %s $N%s|%c", modstring, attack, vp, vx, punct);
        sprintf(buf2, "Your %s%s %s $N%s%s%c", modstring, attack, vp, vx,!IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_DAMAGE)?dammsg:"", punct);
        sprintf(buf3, "$n's %s%s %s you%s%s%c", modstring, attack, vp, vx, !IS_NPC(victim) && IS_SET(victim->pcdata->toggles, PLR_DAMAGE)?dammsg:"", punct);
