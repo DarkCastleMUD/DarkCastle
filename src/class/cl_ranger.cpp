@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: cl_ranger.cpp,v 1.85 2007/08/12 18:31:37 jhhudso Exp $ | cl_ranger.C  *
+ * $Id: cl_ranger.cpp,v 1.86 2007/12/01 12:47:34 dcastle Exp $ | cl_ranger.C  *
  * Description: Ranger skills/spells                                          *
  *                                                                            *
  * Revision History                                                           *
@@ -1338,19 +1338,18 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
 /* check for arrows here */
 
   found = NULL;
-  if(ch->equipment[WEAR_ABOUT])
-    if(ch->equipment[WEAR_ABOUT]->obj_flags.type_flag == ITEM_CONTAINER)
-      if((ch->equipment[WEAR_ABOUT]->obj_flags.type_flag == ITEM_CONTAINER) 
-         && isname("quiver", ch->equipment[WEAR_ABOUT]->name))
-        {found = find_arrow(ch->equipment[WEAR_ABOUT]);
-        if(found)
-           get(ch,found,ch->equipment[WEAR_ABOUT],0,9); }
-   if(!found && ch->equipment[WEAR_WAISTE])
-    if((ch->equipment[WEAR_WAISTE]->obj_flags.type_flag == ITEM_CONTAINER) 
-        && isname("quiver", ch->equipment[WEAR_WAISTE]->name))
-        {found = find_arrow(ch->equipment[WEAR_WAISTE]);
-        if(found)
-           get(ch,found,ch->equipment[WEAR_WAISTE],0,9); }
+  int where = 0;
+  for (; where < MAX_WEAR; where++)
+  {
+    if(ch->equipment[where])
+     if((ch->equipment[where]->obj_flags.type_flag == ITEM_CONTAINER) 
+         && isname("quiver", ch->equipment[where]->name))
+        {found = find_arrow(ch->equipment[where]);
+        if(found) {
+           get(ch,found,ch->equipment[where],0,9); }
+	   break;
+	}
+  }
 
    if(!found)
    {
