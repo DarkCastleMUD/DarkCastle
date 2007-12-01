@@ -1980,7 +1980,7 @@ char *mprog_process_if( char *ifchck, char *com_list, CHAR_DATA *mob,
  *null = '\0';
 
  CHAR_DATA *ur = NULL;
-
+ if (mob && mob_index[mob->mobdata->nr].virt == 12603) debugpoint();
  if (ur) send_to_char("\r\nProg initiated.\r\n",ur);
 
  if (!thrw || DIFF(ifchck, activeProgTmpBuf) >= thrw->startPos)
@@ -2063,8 +2063,11 @@ char *mprog_process_if( char *ifchck, char *com_list, CHAR_DATA *mob,
 	 return com_list; 
        if ( !str_cmp( buf, "else" ) ) 
        {
-	   while ( str_cmp( buf, "endif" ) ) 
+	   int nest = 0;
+	   while ( str_cmp( buf, "endif" ) || nest > 0)
 	   {
+	       if (!str_cmp(buf, "if")) nest++;
+	       if (!str_cmp(buf, "endif")) nest--;
 	       cmnd     = com_list;
 	       activePos = com_list = mprog_next_command( com_list );
 	       while ( *cmnd == ' ' )
@@ -2080,8 +2083,6 @@ char *mprog_process_if( char *ifchck, char *com_list, CHAR_DATA *mob,
 	   return com_list; 
        }
 	
-        if (mob_index[mob->mobdata->nr].virt == 12623) debugpoint();
-
        if (!thrw || DIFF(cmnd, activeProgTmpBuf) >= thrw->startPos) {
 	 SET_BIT(mprog_cur_result, mprog_process_cmnd( cmnd, mob, actor, obj, vo, rndm ));
          if(IS_SET(mprog_cur_result, eCH_DIED) || IS_SET(mprog_cur_result, eDELAYED_EXEC))
