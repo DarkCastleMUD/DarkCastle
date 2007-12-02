@@ -2174,7 +2174,7 @@ char *mprog_process_if( char *ifchck, char *com_list, CHAR_DATA *mob,
 	   cmnd++;
 	 if ( *cmnd == '\0' )
 	   {
-	     logf( IMMORTAL, LOG_WORLD,  "Mob:%d missing endif in else section",
+	     logf( IMMORTAL, LOG_WORLD,  "Mob: %d missing endif in else section",
 		  mob_index[mob->mobdata->nr].virt ); 
 	     return null;
 	   }
