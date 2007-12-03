@@ -1063,6 +1063,10 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
     {
       return ( number(1, 100) <= atoi(arg) );
     }
+  if ( !str_cmp( buf, "rand1k" ) )
+    {
+      return ( number(1, 1000) <= atoi(arg) );
+    }
   if (!str_cmp(buf, "amtitems"))
   {
      return mprog_veval(obj_index[real_object(atoi(arg))].number,opr,atoi(val));
