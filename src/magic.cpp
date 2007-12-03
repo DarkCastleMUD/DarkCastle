@@ -2116,7 +2116,7 @@ int spell_haste(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *
 
   affect_to_char(victim, &af);
   send_to_char("You feel fast!\n\r", victim);
-  act("$n begins to move faster.\r\n", victim, 0, 0, TO_ROOM, 0);
+  act("$n begins to move faster.", victim, 0, 0, TO_ROOM, 0);
   return eSUCCESS;
 }
 
