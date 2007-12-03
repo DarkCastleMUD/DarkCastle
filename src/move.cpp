@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.84 2007/08/20 01:52:32 jhhudso Exp $
+| $Id: move.cpp,v 1.85 2007/12/03 17:10:13 dcastle Exp $
 | move.C
 | Movement commands and stuff.
 *************************************************************************
@@ -905,6 +905,11 @@ int attempt_move(CHAR_DATA *ch, int cmd, int is_retreat = 0)
             send_to_char("Your legs are too tired for running away!\r\n", k->follower);
           continue; //keep going through the groupies
           }
+        if (is_retreat && number(1, 101) > (100 - (26 - has_skill(ch, SKILL_RETREAT)/4) - (15 - GET_DEX(ch)/2)))
+        {
+		send_to_char("Oops! You tripped and fell while everyone else was in full retreat.\r\n",k->follower);
+		continue;
+        }
         if(CAN_SEE(k->follower, ch))
           sprintf(tmp, "You follow %s.\n\r\n\r", GET_SHORT(ch));
         else
