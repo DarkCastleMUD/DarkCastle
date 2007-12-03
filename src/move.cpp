@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.85 2007/12/03 17:10:13 dcastle Exp $
+| $Id: move.cpp,v 1.86 2007/12/03 19:54:46 dcastle Exp $
 | move.C
 | Movement commands and stuff.
 *************************************************************************
@@ -908,6 +908,7 @@ int attempt_move(CHAR_DATA *ch, int cmd, int is_retreat = 0)
         if (is_retreat && number(1, 101) > (100 - (26 - has_skill(ch, SKILL_RETREAT)/4) - (15 - GET_DEX(ch)/2)))
         {
 		send_to_char("Oops! You tripped and fell while everyone else was in full retreat.\r\n",k->follower);
+		WAIT_STATE(k->follower, 8);
 		continue;
         }
         if(CAN_SEE(k->follower, ch))
