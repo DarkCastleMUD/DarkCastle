@@ -67,6 +67,10 @@ extern CHAR_DATA *activeTarget;
 extern OBJ_DATA *activeObj;
 extern void *activeVo;
 
+extern struct zone_data *zone_table;
+extern int top_of_world;     
+extern room_data ** world_array;
+
 struct obj_data *get_object_in_equip_vis(struct char_data *ch, char *arg, struct obj_data *equipment[], int *j, bool blindfighting);
 
 /*
@@ -1754,6 +1758,74 @@ int do_mppause( CHAR_DATA *ch, char *argument, int cmd )
   throwitem->next = g_mprog_throw_list;
   g_mprog_throw_list = throwitem;
   return eSUCCESS|eDELAYED_EXEC;
+}
+
+
+int do_mpteleport(struct char_data *ch, char *argument, int cmd)
+{
+    struct char_data *victim;
+    char person[MAX_INPUT_LENGTH], type[MAX_INPUT_LENGTH], buf[MAX_INPUT_LENGTH];
+    int to_room = 0;
+    
+    if (IS_PC(ch))
+	return eFAILURE;
+
+    half_chop(argument, person, type);
+
+    if (!*person) {
+	send_to_char("Who do you wish to teleport?\n\r", ch);
+	return eFAILURE;
+    } /* if */
+
+   if (!(victim = get_char_vis(ch, person))) {
+      send_to_char("No-one by that name around.\n\r", ch);
+      return eFAILURE;
+    } /* if */
+
+  if(IS_SET(world[victim->in_room].room_flags, TELEPORT_BLOCK) ||
+     IS_AFFECTED(victim, AFF_SOLIDITY)) {
+      send_to_char("You find yourself unable to.\n\r", ch);
+      if(ch != victim) {
+          snprintf(buf, MAX_INPUT_LENGTH, "%s just tried to teleport you.\n\r", GET_SHORT(ch));
+          send_to_char(buf, victim);
+      }
+      return eFAILURE;
+  }
+
+  int i = world[ch->in_room].zone,
+      low = zone_table[i].bottom_rnum,
+      high = zone_table[i].top_rnum,
+      attempts = 0;
+
+  do {
+      if (*type && !strcmp(type, "area")) {
+	  to_room = number(low, high);
+
+	  // Check to see if we're in an endless loop
+	  if (attempts++ > high-low) {
+	      return eFAILURE;
+	  }
+      } else {
+	  to_room = number(0, top_of_world);
+      }
+  } while (!world_array[to_room] ||
+	   IS_SET(world[to_room].room_flags, PRIVATE) ||
+	   IS_SET(world[to_room].room_flags, IMP_ONLY) ||
+	   IS_SET(world[to_room].room_flags, NO_TELEPORT) ||
+	   IS_SET(world[to_room].room_flags, ARENA) ||
+	   world[to_room].sector_type == SECT_UNDERWATER ||
+	   IS_SET(zone_table[world[to_room].zone].zone_flags, ZONE_NO_TELEPORT) ||
+	   ( (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_STAY_NO_TOWN)) ? 
+	     (IS_SET(zone_table[world[to_room].zone].zone_flags, ZONE_IS_TOWN)) : FALSE ) ||
+	   ( IS_AFFECTED(victim, AFF_CHAMPION) && (IS_SET(world[to_room].room_flags, CLAN_ROOM) ||
+						   to_room >= 1900 && to_room <= 1999) ) );
+
+  act("$n slowly fades out of existence.", victim, 0, 0, TO_ROOM, 0);
+  move_char(victim, to_room);
+  act("$n slowly fades into existence.", victim, 0, 0, TO_ROOM, 0);
+
+  do_look(victim, "", 0);
+  return eSUCCESS;
 }
 
 int do_mppeace( struct char_data *ch, char *argument, int cmd )

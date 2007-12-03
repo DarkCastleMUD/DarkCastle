@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.h,v 1.81 2007/11/22 12:51:41 jhhudso Exp $ */
+/* $Id: interp.h,v 1.82 2007/12/03 19:17:57 jhhudso Exp $ */
 
 #ifndef INTERP_H_
 #define INTERP_H_
@@ -251,33 +251,34 @@ DO_FUN  do_maxes;
 DO_FUN  do_mlocate;
 DO_FUN  do_move;
 DO_FUN  do_motd;
-DO_FUN( do_mpretval     );
-DO_FUN( do_mpasound     );
-DO_FUN( do_mpat         );
-DO_FUN( do_mpdamage     );
-DO_FUN( do_mpecho       );
-DO_FUN( do_mpechoaround );
-DO_FUN(do_mpechoaroundnotbad);
-DO_FUN( do_mpechoat     );
-DO_FUN( do_mpforce      );
-DO_FUN( do_mpgoto       );
-DO_FUN( do_mpjunk       );
-DO_FUN( do_mpkill       );
-DO_FUN( do_mphit        );
-DO_FUN( do_mpsetmath    );
-DO_FUN( do_mpaddlag     );
-DO_FUN( do_mpmload      );
-DO_FUN( do_mpoload      );
-DO_FUN( do_mppause      );
-DO_FUN( do_mppeace      );
-DO_FUN( do_mppurge      );
-DO_FUN( do_mpteachskill );
-DO_FUN( do_mpsetalign   );
-DO_FUN( do_mpsettemp);
-DO_FUN( do_mpthrow      );
-DO_FUN( do_mpothrow	);
-DO_FUN( do_mptransfer   );
-DO_FUN( do_mpxpreward   );
+DO_FUN do_mpretval     ;
+DO_FUN do_mpasound     ;
+DO_FUN do_mpat         ;
+DO_FUN do_mpdamage     ;
+DO_FUN do_mpecho       ;
+DO_FUN do_mpechoaround ;
+DO_FUN do_mpechoaroundnotbad;
+DO_FUN do_mpechoat     ;
+DO_FUN do_mpforce      ;
+DO_FUN do_mpgoto       ;
+DO_FUN do_mpjunk       ;
+DO_FUN do_mpkill       ;
+DO_FUN do_mphit;
+DO_FUN do_mpsetmath;
+DO_FUN do_mpaddlag;
+DO_FUN do_mpmload;
+DO_FUN do_mpoload;
+DO_FUN do_mppause;
+DO_FUN do_mppeace;
+DO_FUN do_mppurge;
+DO_FUN do_mpteachskill;
+DO_FUN do_mpsetalign;
+DO_FUN do_mpsettemp;
+DO_FUN do_mpthrow;
+DO_FUN do_mpothrow;
+DO_FUN do_mptransfer;
+DO_FUN do_mpxpreward;
+DO_FUN do_mpteleport;
 DO_FUN  do_murder;
 DO_FUN  do_name;
 DO_FUN  do_natural_selection;
