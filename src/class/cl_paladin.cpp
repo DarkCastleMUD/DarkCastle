@@ -149,10 +149,10 @@ int do_layhands(struct char_data *ch, char *argument, int cmd)
      return eFAILURE;
    }
 
-   if (ch->fighting == victim) {
-     send_to_char("Aren't you a little busy trying to KILL them right now?\n\r",ch);
-     return eFAILURE;
-   }
+//   if (ch->fighting == victim) {
+//     send_to_char("Aren't you a little busy trying to KILL them right now?\n\r",ch);
+//     return eFAILURE;
+//   }
 
    if (affected_by_spell(ch, SKILL_LAY_HANDS)) {
       send_to_char("You have not spent enough time in devotion to your god to warrant such a favor yet.\r\n", ch);
