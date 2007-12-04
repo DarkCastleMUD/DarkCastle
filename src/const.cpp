@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.250 2007/12/04 09:22:30 urizen Exp $ */
+/* $Id: const.cpp,v 1.251 2007/12/04 09:23:34 dcastle Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1929,7 +1929,6 @@ char *combat_bits[] =
     "Fleeing",
     "Shocked2",
     "CrushBlow",
-    "PrimalFury",
     "\n"
 };
 
