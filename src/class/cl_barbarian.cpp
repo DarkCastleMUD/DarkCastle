@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_barbarian.cpp,v 1.79 2007/11/20 21:35:33 pirahna Exp $
+| $Id: cl_barbarian.cpp,v 1.80 2007/12/04 09:49:09 dcastle Exp $
 | cl_barbarian.C
 | Description:  Commands for the barbarian class.
 */
@@ -802,3 +802,65 @@ int do_knockback(struct char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
+
+int do_primal_fury(CHAR_DATA *ch, char *argument, int cmd)
+{
+  struct affected_type af;
+
+  if (affected_by_spell(ch, SKILL_PRIMAL_FURY))
+  {
+    send_to_char("SOMEMESSAGE",ch);
+    return eSUCCESS;
+  }
+  if (!ch->fighting || GET_POS(ch) != POSITION_FIGHTING)
+  {
+    send_to_char("But you're not in combat!\r\n",ch);
+    return eSUCCESS;
+  }
+  if (GET_MOVE(ch) < 40)
+  {
+     send_to_char("SOMEMESSAGE",ch);
+     return eSUCCESS;
+  }
+  if (GET_RAW_STR(ch) < 8)
+  {
+     send_to_char("SOMEMESSAGE",ch);
+     return eSUCCESS;
+  }
+  // Timer applies to both success and failure, so it goes here.
+  af.type      = SKILL_PRIMAL_FURY;
+  af.duration  = 40;
+  af.modifier  = 0;
+  af.location  = 0;
+  af.bitvector = -1;
+  affect_to_char(ch, &af);
+
+  if (!skill_success(ch, NULL, SKILL_PRIMAL_FURY))
+  {
+    affect_to_char(ch, &af);
+    send_to_char("You attempt to let forth a primal scream, but manage only a squeak...how embarassing!\r\n",ch);
+    act("$n attempts to let forth a primal scream, but manages only a squeak...how embarassing!", ch, NULL, NULL, TO_ROOM, 0);
+    GET_MOVE(ch) /= 2;
+    return eSUCCESS;
+  }
+
+  // Success below.
+
+  GET_MOVE(ch) -= 40;
+  if (number(1,101) > (5 + has_skill(ch, SKILL_PRIMAL_FURY)/5))
+  { // Str loss.
+     GET_RAW_STR(ch) -= 1;
+     affect_modify(ch, APPLY_STR, 0, -1, TRUE); 
+     send_to_char("SOMEMESSAGE",ch);
+  }
+
+  // rest already set
+  af.duration = 2 + has_skill(ch, SKILL_PRIMAL_FURY) / 30;
+  af.bitvector = AFF_PRIMAL_FURY;
+  affect_to_char(ch, &af);
+
+  act("$n lets forth a primal scream of anger and begins to fight with terrible fury!", ch, NULL, NULL, TO_ROOM, 0);
+  send_to_char("You let forth a primal scream of anger and fall upon your enemies with a terrible fury!",ch);
+
+  return eSUCCESS;
+}
