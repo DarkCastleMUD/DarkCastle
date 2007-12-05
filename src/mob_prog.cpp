@@ -997,6 +997,30 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
 
   CHAR_DATA *fvict = NULL;
   bool ye = FALSE;
+  if (arg[0] == '$' && arg[1] == 'v')
+  {
+    if (mob && mob_index[mob->mobdata->nr].virt == 12603) debugpoint();
+
+    struct tempvariable *eh = mob->tempVariable;
+    char buf1[MAX_STRING_LENGTH];
+    buf1[0] = '\0';
+    int i;
+    for (i = 2; arg[i]; i++)
+    {
+          if (arg[i] == '[') continue;
+          if (arg[i] == ']')
+          {
+                  buf1[i-3] = '\0';
+                  break;
+          }
+          buf1[i-3] = arg[i];
+    }
+    for (; eh; eh = eh->next)
+     if (!str_cmp(buf1, eh->name))
+       break;
+    if (eh) strcpy(arg, eh->data);
+  }
+
   if (!is_number(arg) && !(arg[0] == '$') && traditional)
   {
     fvict = get_char_room(arg, mob->in_room, TRUE);
@@ -1446,6 +1470,7 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
   if (!str_cmp(buf, "isspelled"))
   {
 	int find_skill_num(char *name);
+
 	if (!str_cmp(val, "fly")) // needs special check.. sigh..
 	{
 	  if (fvict && IS_AFFECTED(fvict, AFF_FLYING)) return TRUE;
@@ -1476,6 +1501,11 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
         case 'g': if (mob && mob->fighting)
                     if (IS_AFFECTED(mob->fighting, AFF_FLYING)) return TRUE;
 		break;
+	default:
+	  logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'isspelled'",
+	       mob_index[mob->mobdata->nr].virt ); 
+	  return -1;
+
      }
    
 
@@ -1510,7 +1540,10 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
         case 'g': if (mob && mob->fighting)
                     return (int)(affected_by_spell(mob->fighting, find_skill_num(val)));
                   else return 0;
-
+	default:
+	  logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'isspelled'",
+	       mob_index[mob->mobdata->nr].virt ); 
+	  return -1;
 
      }
   }
@@ -1984,7 +2017,6 @@ char *mprog_process_if( char *ifchck, char *com_list, CHAR_DATA *mob,
  *null = '\0';
 
  CHAR_DATA *ur = NULL;
- if (mob && mob_index[mob->mobdata->nr].virt == 12603) debugpoint();
  if (ur) send_to_char("\r\nProg initiated.\r\n",ur);
 
  if (!thrw || DIFF(ifchck, activeProgTmpBuf) >= thrw->startPos)
@@ -2472,7 +2504,7 @@ void mprog_translate( char ch, char *t, CHAR_DATA *mob, CHAR_DATA *actor,
 	 break;
 
      default:
-         logf( IMMORTAL, LOG_WORLD, "Mob: %d bad $var", mob_index[mob->mobdata->nr].virt );
+         logf( IMMORTAL, LOG_WORLD, "Mob: %d bad $$var : %c", mob_index[mob->mobdata->nr].virt, ch );
 	 break;
        }
 
