@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.469 2007/12/05 05:46:29 jhhudso Exp $               *
+ * $Id: fight.cpp,v 1.470 2007/12/05 10:37:17 dcastle Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -350,7 +350,8 @@ void perform_violence(void)
          else GET_HIT(ch) -= 25;
          GET_HIT(ch) = MAX(1, GET_HIT(ch));  // doesn't kill only hurts
       }
-      else if (af->type != SPELL_PARALYZE || !someone_fighting(ch))
+ // primal checks bitvecotr instead of type because the timer has type SKILL_PRIMAL_FURY..
+      else if ((af->type != SPELL_PARALYZE && af->bitvector != AFF_PRIMAL_FURY) || !someone_fighting(ch))
          continue;
 
       if (af->duration >= 1)
