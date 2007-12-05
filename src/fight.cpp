@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.468 2007/12/01 16:35:22 dcastle Exp $               *
+ * $Id: fight.cpp,v 1.469 2007/12/05 05:46:29 jhhudso Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -3454,6 +3454,8 @@ void stop_fighting(CHAR_DATA * ch, int clearlag)
     REMOVE_BIT(ch->combat, COMBAT_STUNNED);
   if (IS_SET(ch->combat, COMBAT_STUNNED2))
     REMOVE_BIT(ch->combat, COMBAT_STUNNED2);
+  if (IS_SET(ch->combat, COMBAT_CRUSH_BLOW))
+      REMOVE_BIT(ch->combat, COMBAT_CRUSH_BLOW);
   
   return;
 }
