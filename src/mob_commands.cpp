@@ -1065,7 +1065,7 @@ int do_mpthrow( CHAR_DATA *ch, char *argument, int cmd )
     return eFAILURE;
   }
 
-  if(!check_range_valid_and_convert(delay, third, 0, 500)) {
+  if(!check_range_valid_and_convert(delay, third, 0, 500000)) {
     logf( IMMORTAL, LOG_WORLD, "Mpthrow - Invalid delay: vnum %d.",
 	  	mob_index[ch->mobdata->nr].virt );
     return eFAILURE;
