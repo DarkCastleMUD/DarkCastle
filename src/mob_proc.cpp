@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.167 2007/11/30 16:16:49 apocalypse Exp $ */
+/* $Id: mob_proc.cpp,v 1.168 2007/12/06 23:51:34 dcastle Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -1751,7 +1751,8 @@ static char *dethSayText [ ] =
   "I'm busy now. Can I ignore you some other time?",
   "I love deadlines...especially the sound they make as they go whooshing by!",
   "Urizen told me that even though hard work never killed anyone, he doesn't want to chance it.",
-  "Tell me what you need and I'll tell you how to get along with out it."
+  "Tell me what you need and I'll tell you how to get along with out it.",
+  "Don't worry. I'm from the internet."
 };
 
 // ENDOFCHAIN
