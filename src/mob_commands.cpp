@@ -52,6 +52,7 @@ extern "C"
 #include <returnvals.h>
 #include <innate.h>
 #include <arena.h>
+#include <race.h>
 
 // external vars
 
@@ -1772,15 +1773,19 @@ int do_mpteleport(struct char_data *ch, char *argument, int cmd)
 
     half_chop(argument, person, type);
 
-    if (!*person) {
+    if (!*person || (strcmp(person, "area") && !*type)) {
 	send_to_char("Who do you wish to teleport?\n\r", ch);
 	return eFAILURE;
     } /* if */
 
-   if (!(victim = get_char_vis(ch, person))) {
-      send_to_char("No-one by that name around.\n\r", ch);
-      return eFAILURE;
-    } /* if */
+   if (!(victim = get_char_vis(ch, person))) { 
+       if (!strcmp(person, "area")) {
+	   victim = ch;
+       } else {
+	   send_to_char("No-one by that name around.\n\r", ch);
+	   return eFAILURE;
+       }
+    }
 
   if(IS_SET(world[victim->in_room].room_flags, TELEPORT_BLOCK) ||
      IS_AFFECTED(victim, AFF_SOLIDITY)) {
@@ -1798,7 +1803,8 @@ int do_mpteleport(struct char_data *ch, char *argument, int cmd)
       attempts = 0;
 
   do {
-      if (*type && !strcmp(type, "area")) {
+      if ((*type && !strcmp(type, "area")) || 
+	  (victim == ch && *person && !strcmp(person, "area"))) {
 	  to_room = number(low, high);
 
 	  // Check to see if we're in an endless loop
@@ -1813,7 +1819,7 @@ int do_mpteleport(struct char_data *ch, char *argument, int cmd)
 	   IS_SET(world[to_room].room_flags, IMP_ONLY) ||
 	   IS_SET(world[to_room].room_flags, NO_TELEPORT) ||
 	   IS_SET(world[to_room].room_flags, ARENA) ||
-	   world[to_room].sector_type == SECT_UNDERWATER ||
+	   (world[to_room].sector_type == SECT_UNDERWATER && GET_RACE(victim) != RACE_FISH) ||
 	   IS_SET(zone_table[world[to_room].zone].zone_flags, ZONE_NO_TELEPORT) ||
 	   ( (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_STAY_NO_TOWN)) ? 
 	     (IS_SET(zone_table[world[to_room].zone].zone_flags, ZONE_IS_TOWN)) : FALSE ) ||
