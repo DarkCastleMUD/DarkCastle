@@ -2717,32 +2717,28 @@ int do_editor(CHAR_DATA *ch, char *argument, int cmd)
   if (IS_MOB(ch))
     return eFAILURE;
 
+  csendf(ch, "Current editor: %s\n\r\n\r", IS_SET(ch->pcdata->toggles, PLR_EDITOR_WEB) ? "web" : "game");
+
   one_argument(argument, arg1);
 
-  if (arg1[0] == 0) {
-    send_to_char("Current editor: ", ch);
-    if (IS_SET(ch->pcdata->toggles, PLR_EDITOR_WEB))
-      send_to_char("web\n\r", ch);
-    else
-      send_to_char("game\n\r", ch);
-    
-    return eSUCCESS;
+  if (*arg1) {
+      if (!strcmp(arg1, "web")) {
+	  SET_BIT(ch->pcdata->toggles, PLR_EDITOR_WEB);
+	  send_to_char("Changing to web editor.\n\r", ch);
+	  send_to_char("Ok.\n\r", ch);
+	  return eSUCCESS;
+      } else if (!strcmp(arg1, "game")) {
+	  REMOVE_BIT(ch->pcdata->toggles, PLR_EDITOR_WEB);
+	  send_to_char("Changing to in game line editor.\n\r", ch);
+	  send_to_char("Ok.\n\r", ch);
+	  return eSUCCESS;
+      }
   }
 
-  if (!strcmp(arg1, "web")) {
-    SET_BIT(ch->pcdata->toggles, PLR_EDITOR_WEB);
-    send_to_char("Using online web editor.\n\r", ch);
-    send_to_char("Ok.\n\r", ch);
-  } else if (!strcmp(arg1, "game")) {
-    REMOVE_BIT(ch->pcdata->toggles, PLR_EDITOR_WEB);
-    send_to_char("Using in game line editor.\n\r", ch);
-    send_to_char("Ok.\n\r", ch);
-  } else {
-    send_to_char("Syntax: editor <type>\n\r", ch);
-    send_to_char("Types:\n\r", ch);
-    send_to_char("web    - use online web editor\n\r", ch);
-    send_to_char("game   - use in game line editor\n\r", ch);
-  }
+  send_to_char("Usage: editor <type>\n\r", ch);
+  send_to_char("Where type can be:\n\r", ch);
+  send_to_char("web    - use online web editor\n\r", ch);
+  send_to_char("game   - use in game line editor\n\r", ch);
 
   return eSUCCESS;
 }
