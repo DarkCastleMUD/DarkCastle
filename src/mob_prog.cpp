@@ -354,6 +354,14 @@ void translate_value(char *leftptr, char *rightptr, int16 **vali, uint32 **valui
 	if (isname(left, GET_NAME(tmp)))
 	 { target = tmp; break; }
     }
+  } else if (!str_prefix("mroom_", left)) {
+    left += 6;
+    CHAR_DATA *tmp;
+    for (tmp = world[mob->in_room].people; tmp; tmp = tmp->next_in_room)
+    {
+	if (isname(left, GET_NAME(tmp)))
+	 { target = tmp; break; }
+    }
   } else if (!str_prefix("room_",left)) {
     left += 5;
     if (is_number(left))
@@ -3640,6 +3648,26 @@ int oprog_rand_trigger( OBJ_DATA *item )
      }
  return mprog_cur_result;
 }
+
+int oprog_arand_trigger( OBJ_DATA *item )
+{
+  CHAR_DATA *vmob;
+  CHAR_DATA *ch;
+  mprog_cur_result = eSUCCESS;
+
+  if (item->carried_by) ch=item->carried_by;
+  else ch = NULL;
+    if (obj_index[item->item_number].progtypes & RAND_PROG)
+     {
+        vmob = initiate_oproc(ch, item);
+        mprog_percent_check(vmob, ch, item, NULL, RAND_PROG);
+        end_oproc(vmob);
+        return mprog_cur_result;
+     }
+ return mprog_cur_result;
+}
+
+
 
 int oprog_load_trigger( CHAR_DATA *ch )
 {
