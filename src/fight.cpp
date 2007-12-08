@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.470 2007/12/05 10:37:17 dcastle Exp $               *
+ * $Id: fight.cpp,v 1.471 2007/12/08 15:56:28 dcastle Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -1993,6 +1993,8 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
   if(typeofdamage == DAMAGE_TYPE_PHYSICAL) {
     if (IS_SET(ch->combat, COMBAT_BERSERK))
       dam = (int)(dam * 1.75);
+    if (IS_AFFECTED(ch, AFF_PRIMAL_FURY))
+	dam = dam * 5;
     if (IS_SET(ch->combat, COMBAT_RAGE1) || IS_SET(ch->combat, COMBAT_RAGE2) && attacktype != SKILL_BACKSTAB)
       dam = (int)(dam * 1.4);
     if (IS_SET(ch->combat, COMBAT_HITALL))
@@ -3380,6 +3382,18 @@ void stop_fighting(CHAR_DATA * ch, int clearlag)
    }
   }
   
+  if (IS_AFFECTED(ch, AFF_PRIMAL_FURY))
+  {
+     struct affected_type *af;
+
+    for(af = ch->affected; af; af = af->next) {
+        if (af->bitvector && af->type == SKILL_PRIMAL_FURY )
+	{
+           affect_remove( ch, af, 0);
+	   break;
+	}
+    }
+  }
   
   if (IS_SET(ch->combat, COMBAT_RAGE1)) {
     REMOVE_BIT(ch->combat, COMBAT_RAGE1);
