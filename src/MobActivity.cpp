@@ -112,7 +112,7 @@ extern int rev_dir[];
 
 bool Path::findRoom(int from, int to, int steps, int leastSteps, char *buf)
 {
-  if (steps > leastSteps) return FALSE;
+  if (steps > leastSteps) return FALSE; // Longer than the shortest path known. fuck it.
   if ((*this)[from] <= steps) return FALSE; // already checked this room, circly paths
 
   (*this)[from] = steps;
@@ -559,13 +559,19 @@ char *findPath(int from, int to, char_data *ch = NULL)
 int do_findpath(char_data *ch, char *argument, int cmd)
 {
   char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
-  argument = one_argument(argument, arg1);
+  class Path *p;
+  for (p = mPathList; p; p = p->next)
+    for( map<int, int>::iterator iter = p->begin(); iter != p->end(); iter++ )
+	csendf(ch, "Hmm: %d\r\n", (*iter).first);
+ return eSUCCESS;
+/*  argument = one_argument(argument, arg1);
   argument = one_argument(argument, arg2);
   int i = atoi(arg1), z = atoi(arg2);
   if (!i || !z) { send_to_char("BLeh!\r\n",ch); return eFAILURE; }
   char *t =  findPath(i, z, ch);
   csendf(ch, "Final Path: %s\r\n",t);
   return eSUCCESS;
+*/
 }
 
 /* END PATHFINDING */
