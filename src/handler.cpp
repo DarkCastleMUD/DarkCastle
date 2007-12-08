@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.164 2007/08/20 01:52:32 jhhudso Exp $ */
+/* $Id: handler.cpp,v 1.165 2007/12/08 16:18:16 dcastle Exp $ */
     
 extern "C"
 {
@@ -1534,6 +1534,15 @@ void affect_remove( CHAR_DATA *ch, struct affected_type *af, int flags)
          if (!(flags & SUPPRESS_MESSAGES))
             send_to_char("You can attempt to challenge an area again.\r\n", ch);
          break;
+      case SKILL_PRIMAL_FURY:
+	 if (!af->bitvector) {
+           if (!(flags & SUPPRESS_MESSAGES))
+              send_to_char("TimerEndyMessage.\r\n", ch);
+	 } else {
+           if (!(flags & SUPPRESS_MESSAGES))
+              send_to_char("Your primal fury has abated.\r\n", ch);
+	 }	 
+	break;
       case SKILL_FOCUSED_REPELANCE:
          REMOVE_BIT(ch->combat, COMBAT_REPELANCE);
          if (!(flags & SUPPRESS_MESSAGES))
@@ -4130,5 +4139,21 @@ void add_memory(CHAR_DATA *ch, char *victim, char type)
 }
 
 
+// function for charging moves, to make it easier to have skills that impact ALL(such as vigor)
+bool charge_moves(char_data *ch, int amt, int skill)
+{
+  int i = 0;
+
+  if ((i = has_skill(ch, SKILL_VIGOR)) && skill_success(ch, NULL, SKILL_VIGOR))
+     amt -= MAX(1,number(i/4, i/8));
+     
+  if (GET_MOVE(ch) < amt)
+  {
+    send_to_char("You do not have enough movement to do this!\r\n",ch);
+    return FALSE;
+  }
+  GET_MOVE(ch) -= amt;
+  return TRUE;
+}
 
 
