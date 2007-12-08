@@ -1761,22 +1761,20 @@ int do_mppause( CHAR_DATA *ch, char *argument, int cmd )
   return eSUCCESS|eDELAYED_EXEC;
 }
 
-
 int do_mpteleport(struct char_data *ch, char *argument, int cmd)
 {
     struct char_data *victim;
     char person[MAX_INPUT_LENGTH], type[MAX_INPUT_LENGTH], buf[MAX_INPUT_LENGTH];
     int to_room = 0;
     
-    if (IS_PC(ch))
+    if (IS_PC(ch) && GET_LEVEL(ch) < 110)
 	return eFAILURE;
 
     half_chop(argument, person, type);
 
-    if (!*person || (strcmp(person, "area") && !*type)) {
-	send_to_char("Who do you wish to teleport?\n\r", ch);
-	return eFAILURE;
-    } /* if */
+    if (!*person) {
+	strncpy(person, GET_NAME(ch), MAX_INPUT_LENGTH);
+    }
 
    if (!(victim = get_char_vis(ch, person))) { 
        if (!strcmp(person, "area")) {
