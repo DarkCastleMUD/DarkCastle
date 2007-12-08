@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.h,v 1.27 2007/08/20 01:52:32 jhhudso Exp $ */
+/* $Id: handler.h,v 1.28 2007/12/08 15:54:29 dcastle Exp $ */
 
 #ifndef HANDLER_H_
 #define HANDLER_H_
@@ -138,5 +138,7 @@ class ErrorHandler {
 };
 
 void produce_coredump(void);
+
+bool objExists(OBJ_DATA *obj);
 
 #endif
