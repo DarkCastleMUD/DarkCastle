@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.253 2007/12/08 16:48:00 dcastle Exp $ */
+/* $Id: const.cpp,v 1.254 2007/12/08 16:52:42 dcastle Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1210,14 +1210,14 @@ struct class_skill_defines w_skills[] = { // warrior skills
 {    "skewer",          SKILL_SKEWER,             45,  100,  0,   STRDEX },
 {    "blade shield",    SKILL_BLADESHIELD,        47,  100,  0,   STRCON },
 {    "combat mastery",  SKILL_COMBAT_MASTERY,     50,  100,  0,   DEXINT },
-{    "make camp",       SKILL_MAKE_CAMP,          51,  100,  0,   DEXINT },
-{    "battlesense",     SKILL_BATTLESENSE,        53,  100,  1,   STRCON },
-{    "perseverance",    SKILL_PERSEVERANCE,       53,  100,  2,   CONWIS },
-{    "triage",          SKILL_TRIAGE,             55,  100,  0,   DEXINT },
-{    "smite",           SKILL_SMITE,              57,  100,  1,   STRDEX },
-{    "leadership",      SKILL_LEADERSHIP,         57,  100,  2,   STRDEX },
-{    "execute",         SKILL_EXECUTE,            60,  100,  1,   CONWIS },
-{    "defenders stance",SKILL_DEFENDERS_STANCE,   60,  100,  2,   STRCON },
+//{    "make camp",       SKILL_MAKE_CAMP,          51,  100,  0,   DEXINT },
+//{    "battlesense",     SKILL_BATTLESENSE,        53,  100,  1,   STRCON },
+//{    "perseverance",    SKILL_PERSEVERANCE,       53,  100,  2,   CONWIS },
+//{    "triage",          SKILL_TRIAGE,             55,  100,  0,   DEXINT },
+//{    "smite",           SKILL_SMITE,              57,  100,  1,   STRDEX },
+//{    "leadership",      SKILL_LEADERSHIP,         57,  100,  2,   STRDEX },
+//{    "execute",         SKILL_EXECUTE,            60,  100,  1,   CONWIS },
+//{    "defenders stance",SKILL_DEFENDERS_STANCE,   60,  100,  2,   STRCON },
 {    "\n",              0,                        1,    0,   0,   0 }
 };
 
@@ -1619,14 +1619,14 @@ struct class_skill_defines c_skills[] = { // cleric skills
 {    "heal spray",           SPELL_HEAL_SPRAY,        48,    100,  0,   STRCON },
 {    "group sanctuary",      SPELL_GROUP_SANC,        49,    100,  0,   CONWIS },
 {    "divine intervention",  SPELL_DIVINE_INTER,      50,    100,  0,   CONWIS },
-{    "commune",              SKILL_COMMUNE,           51,    100,  0,   DEXWIS },
-{    "boneshield", 	     SPELL_BONESHIELD,        53,    100,  2,   STRCON },
-{    "silence", 	     SPELL_SILENCE,           53,    100,  1,   CONWIS },
-{    "scribe scroll",        SKILL_SCRIBE_SCROLL,     55,    100,  0,   DEXINT },
-{    "immunity", 	     SPELL_IMMUNITY,          57,    100,  2,   CONWIS },
-{    "atonement", 	     SPELL_ATONEMENT,         57,    100,  1,   STRCON },
-{    "channel", 	     SPELL_CHANNEL,           60,    100,  2,   INTWIS },
-{    "wrath of god", 	     SPELL_WRATH_OF_GOD,      60,    100,  1,   STRINT },
+//{    "commune",              SKILL_COMMUNE,           51,    100,  0,   DEXWIS },
+//{    "boneshield", 	     SPELL_BONESHIELD,        53,    100,  2,   STRCON },
+//{    "silence", 	     SPELL_SILENCE,           53,    100,  1,   CONWIS },
+//{    "scribe scroll",        SKILL_SCRIBE_SCROLL,     55,    100,  0,   DEXINT },
+//{    "immunity", 	     SPELL_IMMUNITY,          57,    100,  2,   CONWIS },
+//{    "atonement", 	     SPELL_ATONEMENT,         57,    100,  1,   STRCON },
+//{    "channel", 	     SPELL_CHANNEL,           60,    100,  2,   INTWIS },
+//{    "wrath of god", 	     SPELL_WRATH_OF_GOD,      60,    100,  1,   STRINT },
 {    "\n",                   0,                        1,      0,  0,   0 }
 };
 
