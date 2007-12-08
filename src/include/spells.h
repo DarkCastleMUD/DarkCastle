@@ -14,7 +14,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.h,v 1.98 2007/12/04 09:30:14 urizen Exp $ */
+/* $Id: spells.h,v 1.99 2007/12/08 16:16:36 dcastle Exp $ */
 #include <structs.h> // ubyte, int16
 
 #define MAX_BUF_LENGTH               240
@@ -339,7 +339,9 @@ void check_maxes(CHAR_DATA *ch);
 #define SKILL_CLANAREA_CLAIM         391
 #define SKILL_CLANAREA_CHALLENGE     392
 #define SKILL_PRIMAL_FURY            393
-#define SKILL_MAX                    393
+#define SKILL_VIGOR		     394
+#define SKILL_MAX                    394
+
 
 // if you add a skill, make sure you update "skills[]" in spells.C
 // as well as SKILL_MAX
