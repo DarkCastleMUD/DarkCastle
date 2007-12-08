@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.94 2007/04/03 22:47:15 dcastle Exp $
+| $Id: objects.cpp,v 1.95 2007/12/08 15:55:19 dcastle Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -182,8 +182,12 @@ void object_activity()
 	    {
   	      active_obj->obj->obj_flags.value[0] = ((obj_data *) obj_index[active_obj->obj->item_number].item)->obj_flags.value[1];
  	      send_to_room(active_obj->obj->ex_description->description, active_obj->obj->in_room, TRUE);
-	    } else 
-		oprog_rand_trigger(active_obj->obj);
+	    } else
+	    {
+		int retval = oprog_rand_trigger(active_obj->obj);
+		if (!SOMEONE_DIED(retval) && objExists(active_obj->obj))
+		  oprog_arand_trigger(active_obj->obj);
+	    }
         } 
         //else {
         //}
