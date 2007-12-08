@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.64 2007/08/12 18:01:56 jhhudso Exp $ */
+/* $Id: clan.cpp,v 1.65 2007/12/08 16:48:00 dcastle Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -35,6 +35,7 @@ extern "C"
 
 extern CHAR_DATA *character_list;
 extern struct descriptor_data *descriptor_list;
+extern struct index_data *obj_index;
 extern CWorld world;
 extern struct zone_data *zone_table;
 extern void send_info(char *messg);
@@ -1357,6 +1358,14 @@ int do_ctell(CHAR_DATA *ch, char *arg, int cmd)
     return eFAILURE;
   }
 
+  OBJ_DATA *tmp_obj;
+  for(tmp_obj = world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
+    if(obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER) {
+      send_to_char("The magical silence prevents you from speaking!\n\r", ch);
+      return eFAILURE;
+    }
+
+
   while(isspace(*arg))
     arg++;
   if (!has_right(ch, CLAN_RIGHTS_CHANNEL) && ch->level < 51)
@@ -1381,14 +1390,25 @@ int do_ctell(CHAR_DATA *ch, char *arg, int cmd)
   ansi_color( NTEXT, ch);
 
   sprintf(buf, "%s tells the clan, '%s'\n\r", GET_SHORT(ch), arg);
+  bool yes;
   for(desc = descriptor_list; desc; desc = desc->next) {
+     yes = FALSE;
      if(desc->connected || !(pch = desc->character))
        continue;
      if(pch == ch || pch->clan != ch->clan || 
         !IS_SET(pch->misc, CHANNEL_CLAN))
        continue;
-     if (!has_right(pch, CLAN_RIGHTS_CHANNEL) && pch->level < 51)
+     if (!has_right(pch, CLAN_RIGHTS_CHANNEL) && pch->level <= MAX_MORTAL)
        continue;
+
+    for(tmp_obj = world[pch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
+      if(obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER) {
+        yes = TRUE;
+        break;
+      }
+
+    if(yes) continue;
+
      ansi_color( GREEN, pch);
      send_to_char(buf, pch);
      ansi_color( NTEXT, pch);

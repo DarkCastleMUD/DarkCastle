@@ -16,7 +16,7 @@
  *  10/21/2003   Onager    Changed IS_ANONYMOUS() to handle mobs without   *
  *                         crashing                                        *
  ***************************************************************************/
-/* $Id: utility.h,v 1.67 2007/12/08 16:16:24 dcastle Exp $ */
+/* $Id: utility.h,v 1.68 2007/12/08 16:48:09 dcastle Exp $ */
 
 #ifndef UTILITY_H_
 #define UTILITY_H_
@@ -72,6 +72,7 @@ bool is_hiding(CHAR_DATA *ch, CHAR_DATA *vict);
 
 // End defines for gradual skill increase code
 
+#define SILENCE_OBJ_NUMBER 407
 
 #define REMOVE_FROM_LIST(item, head, next)      \
    if ((item) == (head))                \
@@ -450,6 +451,9 @@ void parse_bitstrings_into_int(char * bits[], char * strings, char_data * ch, ui
 void display_string_list(char * list[], char_data *ch);
 int contains_no_trade_item(obj_data * obj);
 int contents_cause_unique_problem(obj_data * obj, char_data * vict);
+bool check_make_camp(int);
+int get_leadership_bonus(CHAR_DATA *);
+void update_make_camp_and_leadership(void);
 
 void mob_suprised_sayings(char_data * ch, char_data * aggressor);
 

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.87 2007/12/08 16:18:01 dcastle Exp $
+| $Id: move.cpp,v 1.88 2007/12/08 16:48:03 dcastle Exp $
 | move.C
 | Movement commands and stuff.
 *************************************************************************
@@ -682,6 +682,15 @@ int do_simple_move(CHAR_DATA *ch, int cmd, int following)
     send_to_char("Your crippled body responds slowly.\n\r", ch);
     WAIT_STATE(ch, PULSE_VIOLENCE);
   }
+
+  OBJ_DATA *tmp_obj;
+  for(tmp_obj = world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
+    if(obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
+      send_to_char("The sounds around you fade to nothing as the silence takes hold...\n\r", ch);
+
+  for(tmp_obj = world[was_in].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
+    if(obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
+      send_to_char("The noise around you returns as you leave the silenced area!\n\r", ch);
 
   if (!IS_SET(retval, eSUCCESS)) {
     send_to_char("You fail to move.\n\r", ch);

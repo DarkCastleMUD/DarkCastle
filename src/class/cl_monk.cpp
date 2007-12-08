@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_monk.cpp,v 1.32 2007/11/20 21:35:33 pirahna Exp $
+| $Id: cl_monk.cpp,v 1.33 2007/12/08 16:48:05 dcastle Exp $
 | cl_monk.C
 | Description:  Monk skills.
 */
@@ -294,13 +294,20 @@ int do_stun(struct char_data *ch, char *argument, int cmd)
        return damage (ch, victim, 0,TYPE_UNDEFINED, SKILL_STUN, 0);
     }
 
-    act("$n delivers a HARD BLOW into your solar plexus!  You are STUNNED!", ch, NULL, victim, TO_VICT , 0);
-    act("You deliver a HARD BLOW into $N's solar plexus!  $N is STUNNED!", ch, NULL, victim, TO_CHAR , 0);
-    act("$n delivers a HARD BLOW into $N's solar plexus!  $N is STUNNED!", ch, NULL, victim, TO_ROOM, NOTVICT );
-    WAIT_STATE(victim, PULSE_VIOLENCE*2);
-    if(GET_POS(victim) > POSITION_STUNNED)
-      GET_POS(victim) = POSITION_STUNNED;
-    SET_BIT(victim->combat, COMBAT_STUNNED);
+    if(affected_by_spell(victim, SKILL_BATTLESENSE) &&
+             number(1, 100) < affected_by_spell(victim, SKILL_BATTLESENSE)->modifier) {
+      act("$N's heightened battlesense sees your stun coming from a mile away and $E easily blocks it.", ch, 0, victim, TO_CHAR, 0);
+      act("Your heightened battlesense sees $n's stun coming from a mile away and you easily block it.", ch, 0, victim, TO_VICT, 0);
+      act("$N's heightened battlesense sees $n's stun coming from a mile away and $N easily blocks it.", ch, 0, victim, TO_ROOM, NOTVICT);
+    } else {
+      act("$n delivers a HARD BLOW into your solar plexus!  You are STUNNED!", ch, NULL, victim, TO_VICT , 0);
+      act("You deliver a HARD BLOW into $N's solar plexus!  $N is STUNNED!", ch, NULL, victim, TO_CHAR , 0);
+      act("$n delivers a HARD BLOW into $N's solar plexus!  $N is STUNNED!", ch, NULL, victim, TO_ROOM, NOTVICT );
+      WAIT_STATE(victim, PULSE_VIOLENCE*2);
+      if(GET_POS(victim) > POSITION_STUNNED)
+        GET_POS(victim) = POSITION_STUNNED;
+      SET_BIT(victim->combat, COMBAT_STUNNED);
+    }
     retval = damage (ch, victim, 0, TYPE_UNDEFINED, SKILL_STUN, 0);
   }
   return retval;

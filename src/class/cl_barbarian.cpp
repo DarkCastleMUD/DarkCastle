@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_barbarian.cpp,v 1.82 2007/12/08 16:17:20 dcastle Exp $
+| $Id: cl_barbarian.cpp,v 1.83 2007/12/08 16:48:05 dcastle Exp $
 | cl_barbarian.C
 | Description:  Commands for the barbarian class.
 */
@@ -337,24 +337,35 @@ int do_headbutt(struct char_data *ch, char *argument, int cmd)
     // the damage call here takes care of starting combat and such
     retval = eSUCCESS;
   } else {
-    if (IS_SET(victim->combat, COMBAT_BERSERK))
-       REMOVE_BIT(victim->combat, COMBAT_BERSERK);
+    if(affected_by_spell(victim, SKILL_BATTLESENSE) &&
+             number(1, 100) < affected_by_spell(victim, SKILL_BATTLESENSE)->modifier) {
+      act("$N's heightened battlesense sees your headbutt coming from a mile away.", ch, 0, victim, TO_CHAR, 0);
+      act("Your heightened battlesense sees $n's headbutt coming from a mile away.", ch, 0, victim, TO_VICT, 0);
+      act("$N's heightened battlesense sees $n's headbutt coming from a mile away.", ch, 0, victim, TO_ROOM, NOTVICT);  
+      WAIT_STATE(ch, PULSE_VIOLENCE*3);
+      retval = damage (ch, victim, 0, TYPE_CRUSH, SKILL_HEADBUTT, 0);
+      // the damage call here takes care of starting combat and such
+      retval = eSUCCESS;
+    } else {
+      if (IS_SET(victim->combat, COMBAT_BERSERK))
+         REMOVE_BIT(victim->combat, COMBAT_BERSERK);
 
-    set_fighting(victim, ch);
-    WAIT_STATE(ch, PULSE_VIOLENCE*3);
+      set_fighting(victim, ch);
+      WAIT_STATE(ch, PULSE_VIOLENCE*3);
   
-    WAIT_STATE(victim, PULSE_VIOLENCE*2);
-    SET_BIT(victim->combat, COMBAT_SHOCKED2);
-    retval = damage (ch, victim, 50, TYPE_CRUSH, SKILL_HEADBUTT, 0);
-    if (!SOMEONE_DIED(retval) && !number(0,9) &&
+      WAIT_STATE(victim, PULSE_VIOLENCE*2);
+      SET_BIT(victim->combat, COMBAT_SHOCKED2);
+      retval = damage (ch, victim, 50, TYPE_CRUSH, SKILL_HEADBUTT, 0);
+      if (!SOMEONE_DIED(retval) && !number(0,9) &&
 	  ch->equipment[WEAR_HEAD] && obj_index[ch->equipment[WEAR_HEAD]->item_number].virt == 508)
-    {
+      {
 	act("$n's spiked helmet crackles as it strikes $N's face!", ch, NULL, victim, TO_ROOM,NOTVICT);
 	act("$n's spiked helmet crackles as it strikes your face!", ch, NULL, victim, TO_VICT, 0);
 	act("Your spiked helmet crackles as it strikes $N's face!", ch, NULL, victim, TO_CHAR, 0);
 //	retval = damage(ch, victim, 50, TYPE_PIERCE, TYPE_UNDEFINED, 0);
 	retval = spell_shocking_grasp(50,ch,victim,0,60);
 	// TWEAKME
+      }
     }
   }
 
@@ -733,6 +744,14 @@ int do_knockback(struct char_data *ch, char *argument, int cmd)
     GET_POS(ch) = POSITION_SITTING;
     WAIT_STATE(ch, PULSE_VIOLENCE);
     return eFAILURE;
+  } else if(affected_by_spell(victim, SKILL_BATTLESENSE) &&
+             number(1, 100) < affected_by_spell(victim, SKILL_BATTLESENSE)->modifier) {
+    act("$N's heightened battlesense sees your smash coming from a mile away and $E easily sidesteps it.", ch, 0, victim, TO_CHAR, 0);
+    act("Your heightened battlesense sees $n's smash coming from a mile away and you easily sidestep it.", ch, 0, victim, TO_VICT, 0);
+    act("$N's heightened battlesense sees $n's smash coming from a mile away and $N easily sidesteps it.", ch, 0, victim, TO_ROOM, NOTVICT);  
+    GET_POS(ch) = POSITION_SITTING;
+    WAIT_STATE(ch, PULSE_VIOLENCE);
+    return eFAILURE;
   } else if(CAN_GO(victim, dir) &&
        !affected_by_spell(victim, SPELL_IRON_ROOTS) &&
        !IS_SET(world[EXIT(victim, dir)->to_room].room_flags, IMP_ONLY) &&
@@ -745,7 +764,6 @@ int do_knockback(struct char_data *ch, char *argument, int cmd)
     if(SOMEONE_DIED(retval)) {
       sprintf(buf, "You smash %s apart!",temp);
        act(buf, ch, 0, 0, TO_CHAR, 0);
-//       act("$n smashes you to pieces!", ch, 0, victim, TO_VICT, 0);
        sprintf(buf, "$n smashes %s to pieces!", temp);
        act(buf, ch, 0, 0, TO_ROOM, 0);
        return retval; // this too, just in case it gets called from  a

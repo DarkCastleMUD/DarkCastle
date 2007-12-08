@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.153 2007/10/30 03:54:40 jhhudso Exp $ */
+/* $Id: info.cpp,v 1.154 2007/12/08 16:48:01 dcastle Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -69,6 +69,7 @@ extern char *sky_look[];
 extern char *room_bits[];
 extern struct race_shit race_info[];
 extern char *race_types[];
+extern char *spells[];
 
 /* Used for "who" */
 extern int max_who;
@@ -1566,9 +1567,22 @@ int do_score(struct char_data *ch, char *argument, int cmd)
            case SPELL_NO_CAST_TIMER:
              aff_name = "cannot cast timer";
              break;
+           case SPELL_IMMUNITY:
+             aff_name = "immunity";
+             modifyOutput = TRUE;
+             break;
            case SKILL_NAT_SELECT:
              aff_name = "natural selection";
              modifyOutput = TRUE;
+             break;
+           case SKILL_MAKE_CAMP_TIMER:
+             aff_name = "make camp timer";
+             break;
+           case SKILL_SMITE_TIMER:
+             aff_name = "smite timer";
+             break;
+           case SKILL_LEADERSHIP_BONUS:
+             aff_name = "leadership bonus";
              break;
            default: break;
          }
@@ -1578,8 +1592,9 @@ int do_score(struct char_data *ch, char *argument, int cmd)
          sprintf(buf, "|%c| Affected by %-25s %s Modifier %-13s   |%c|\n\r",						 
                scratch, aff_name,
                ((IS_AFFECTED(ch, AFF_DETECT_MAGIC) && aff->duration < 3) ? 
-                          "$2(fading)$7" : "        "),modifyOutput?
-		race_info[affected_by_spell(ch, SKILL_NAT_SELECT)->modifier].singular_name:
+                          "$2(fading)$7" : "        "),
+                modifyOutput ? affected_by_spell(ch, SKILL_NAT_SELECT) ? race_info[aff->modifier].singular_name :
+		affected_by_spell(ch, SPELL_IMMUNITY) ? spells[aff->modifier] : apply_types[(int)aff->location] :
 		apply_types[(int)aff->location], scratch);
          send_to_char(buf, ch);
          found = TRUE;

@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.92 2007/05/16 21:23:33 dcastle Exp $ */
+/* $Id: limits.cpp,v 1.93 2007/12/08 16:48:02 dcastle Exp $ */
 
 extern "C"
 {
@@ -192,7 +192,7 @@ int mana_gain(CHAR_DATA *ch)
   if (ch->mana_regen > 0)
     gain += ch->mana_regen;
   if (ch->in_room >= 0)
-  if (IS_SET(world[ch->in_room].room_flags, SAFE))
+  if (IS_SET(world[ch->in_room].room_flags, SAFE) || check_make_camp(ch->in_room))
      gain = (int)(gain * 1.25);
 
   if (ch->mana_regen < 0)
@@ -271,7 +271,7 @@ int hit_gain(CHAR_DATA *ch, int position)
   gain = (int)((float)gain * (2.0-(float)GET_LEVEL(ch)/50.0));
 
   if (ch->in_room >= 0)
-  if (IS_SET(world[ch->in_room].room_flags, SAFE))
+  if (IS_SET(world[ch->in_room].room_flags, SAFE) || check_make_camp(ch->in_room))
      gain = (int)(gain * 1.5);
   if (ch->hit_regen < 0)
      gain += ch->hit_regen;
@@ -328,7 +328,7 @@ int move_gain(CHAR_DATA *ch, int extra)
   gain = (int)((float)gain * (2.0-(float)GET_LEVEL(ch)/50.0));
 
   if (ch->in_room >= 0)
-  if (IS_SET(world[ch->in_room].room_flags, SAFE))
+  if (IS_SET(world[ch->in_room].room_flags, SAFE) || check_make_camp(ch->in_room))
      gain = (int)(gain * 1.5);
   if (ch->move_regen < 0)
    gain += ch->move_regen;
@@ -589,7 +589,7 @@ void advance_level(CHAR_DATA *ch, int is_conversion)
 	for (i = 0; i < 3; i++)
 	    ch->conditions[i] = -1;
 
-    if(GET_LEVEL(ch) > 10) {
+    if(GET_LEVEL(ch) > 10 && !IS_SET(ch->pcdata->toggles, PLR_REMORTED)) {
       struct vault_data *vault = has_vault(GET_NAME(ch));
       if(vault) {
         send_to_char("10 lbs has been added to your vault!\n\r", ch);

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.170 2007/11/20 21:35:33 pirahna Exp $
+| $Id: cl_thief.cpp,v 1.171 2007/12/08 16:48:05 dcastle Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -221,7 +221,13 @@ int do_eyegouge(CHAR_DATA *ch, char *argument, int cmd)
   {
      retval = damage(ch,victim, 0, TYPE_PIERCE, SKILL_EYEGOUGE, 0);
   } else {
-    if (!IS_SET(victim->immune, TYPE_PIERCE)) {
+    if(affected_by_spell(victim, SKILL_BATTLESENSE) &&
+             number(1, 100) < affected_by_spell(victim, SKILL_BATTLESENSE)->modifier) {
+      act("$N's heightened battlesense sees your eyegouge coming from a mile away.", ch, 0, victim, TO_CHAR, 0);
+      act("Your heightened battlesense sees $n's eyegouge coming from a mile away.", ch, 0, victim, TO_VICT, 0);
+      act("$N's heightened battlesense sees $n's eyegouge coming from a mile away.", ch, 0, victim, TO_ROOM, NOTVICT);
+      level = 0;
+    } else if (!IS_SET(victim->immune, TYPE_PIERCE)) {
       SETBIT(victim->affected_by, AFF_BLIND);
       SET_BIT(victim->combat, COMBAT_THI_EYEGOUGE);
       struct affected_type af;
@@ -531,7 +537,7 @@ int do_circle(CHAR_DATA *ch, char *argument, int cmd)
        blackjack = TRUE;
      break;
    default:
-     send_to_char("Only certain weapons can be used for backstabbing or blackjacking, this isn't one of them.\n\r", ch);
+     send_to_char("Only certain weapons can be used for backstabbing or blackjacking, this is not one of them.\n\r", ch);
      return eFAILURE;
      break;
    }
@@ -553,6 +559,17 @@ int do_circle(CHAR_DATA *ch, char *argument, int cmd)
        retval = damage(ch, victim, 0,TYPE_UNDEFINED, SKILL_BLACKJACK, FIRST);
      else
        retval = damage(ch, victim, 0,TYPE_UNDEFINED, SKILL_BACKSTAB, FIRST);
+   else if(affected_by_spell(victim, SKILL_BATTLESENSE) &&
+             number(1, 100) < affected_by_spell(victim, SKILL_BATTLESENSE)->modifier)
+   {
+     act("$N's heightened battlesense sees your circle coming from a mile away.", ch, 0, victim, TO_CHAR, 0);
+     act("Your heightened battlesense sees $n's circle coming from a mile away.", ch, 0, victim, TO_VICT, 0);
+     act("$N's heightened battlesense sees $n's circle coming from a mile away.", ch, 0, victim, TO_ROOM, NOTVICT);
+     if (blackjack)
+       retval = damage(ch, victim, 0,TYPE_UNDEFINED, SKILL_BLACKJACK, FIRST);
+     else
+       retval = damage(ch, victim, 0,TYPE_UNDEFINED, SKILL_BACKSTAB, FIRST);
+   }
    else 
    {
       SET_BIT(ch->combat, COMBAT_CIRCLE);
@@ -665,14 +682,21 @@ int do_trip(CHAR_DATA *ch, char *argument, int cmd)
     retval = damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_TRIP, 0);
   }
   else {
-    act("$n trips you and you go down!", ch, NULL, victim, TO_VICT , 0);
-    act("You trip $N and $N goes down!", ch, NULL, victim, TO_CHAR , 0);
-    act("$n trips $N and $N goes down!", ch, NULL, victim, TO_ROOM, NOTVICT );
-    if(GET_POS(victim) > POSITION_SITTING)
-       GET_POS(victim) = POSITION_SITTING;
-    SET_BIT(victim->combat, COMBAT_BASH2);
+    if(affected_by_spell(victim, SKILL_BATTLESENSE) &&
+             number(1, 100) < affected_by_spell(victim, SKILL_BATTLESENSE)->modifier) {
+      act("$N's heightened battlesense sees your trip coming from a mile away.", ch, 0, victim, TO_CHAR, 0);
+      act("Your heightened battlesense sees $n's trip coming from a mile away.", ch, 0, victim, TO_VICT, 0);
+      act("$N's heightened battlesense sees $n's trip coming from a mile away.", ch, 0, victim, TO_ROOM, NOTVICT);
+    } else {
+      act("$n trips you and you go down!", ch, NULL, victim, TO_VICT , 0);
+      act("You trip $N and $N goes down!", ch, NULL, victim, TO_CHAR , 0);
+      act("$n trips $N and $N goes down!", ch, NULL, victim, TO_ROOM, NOTVICT );
+      if(GET_POS(victim) > POSITION_SITTING)
+         GET_POS(victim) = POSITION_SITTING;
+      SET_BIT(victim->combat, COMBAT_BASH2);
+      WAIT_STATE(victim, PULSE_VIOLENCE*1);
+    }
     WAIT_STATE(ch, PULSE_VIOLENCE*2);
-    WAIT_STATE(victim, PULSE_VIOLENCE*1);
     retval = damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_TRIP, 0);
   }
   return retval;
@@ -2216,6 +2240,12 @@ int do_cripple(CHAR_DATA *ch, char *argument, int cmd)
       act("$n quickly lashes out, narrowly missing an attempt to cripple you!", ch, 0, vict, TO_VICT, 0);
       act("$n quickly lashes out but fails to cripple $N.", ch, 0, vict, TO_ROOM, NOTVICT);
    } else {
+    if(affected_by_spell(vict, SKILL_BATTLESENSE) &&
+             number(1, 100) < affected_by_spell(vict, SKILL_BATTLESENSE)->modifier) {
+      act("$N's heightened battlesense sees your strike coming from a mile away.", ch, 0, vict, TO_CHAR, 0);
+      act("Your heightened battlesense sees $n's strike coming from a mile away.", ch, 0, vict, TO_VICT, 0);
+      act("$N's heightened battlesense sees $n's strike coming from a mile away.", ch, 0, vict, TO_ROOM, NOTVICT);
+    } else {
       act("You quickly lash out and strike a crippling blow to $N!", ch, 0, vict, TO_CHAR, 0);
       act("$n lashes out quickly and cripples you with a painful blow!", ch, 0, vict, TO_VICT, 0);
       act("$n quickly lashes out and strikes a crippling blow to $N!", ch, 0, vict, TO_ROOM, NOTVICT);
@@ -2227,6 +2257,7 @@ int do_cripple(CHAR_DATA *ch, char *argument, int cmd)
       af.location  = APPLY_NONE;
       af.bitvector = AFF_CRIPPLE;
       affect_to_char(vict, &af, PULSE_VIOLENCE);
+    }
    }
 
    return eSUCCESS;

@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.h,v 1.83 2007/12/08 15:54:39 dcastle Exp $ */
+/* $Id: interp.h,v 1.84 2007/12/08 16:48:09 dcastle Exp $ */
 
 #ifndef INTERP_H_
 #define INTERP_H_
@@ -100,6 +100,7 @@ DO_FUN  do_bandwidth;
 DO_FUN  do_bard_song_toggle;
 DO_FUN  do_bash;
 DO_FUN  do_battlecry;
+DO_FUN  do_battlesense;
 DO_FUN  do_beacon;
 DO_FUN  do_beep;
 DO_FUN  do_beep_set;
@@ -144,6 +145,7 @@ DO_FUN  do_cripple;
 DO_FUN  do_ctell; 
 DO_FUN  do_deathstroke;
 DO_FUN  do_deceit;
+DO_FUN  do_defenders_stance;
 DO_FUN  do_disarm;
 DO_FUN  do_disband;
 DO_FUN  do_disconnect;
@@ -222,6 +224,7 @@ DO_FUN  do_knockback;
 // DO_FUN  do_land;
 DO_FUN  do_layhands;
 DO_FUN  do_leaderboard;
+DO_FUN  do_leadership;
 DO_FUN  do_leave;
 DO_FUN  do_levels;
 DO_FUN  do_lfg_toggle;
@@ -246,6 +249,7 @@ DO_FUN  do_lock;
 DO_FUN  do_log;
 DO_FUN  do_look;
 DO_FUN  do_botcheck;
+DO_FUN  do_make_camp;
 DO_FUN  do_matrixinfo;
 DO_FUN  do_maxes;
 DO_FUN  do_mlocate;
@@ -305,6 +309,7 @@ DO_FUN  do_pager;
 DO_FUN  do_pardon;
 DO_FUN  do_pathpath;
 DO_FUN  do_peace;
+DO_FUN  do_perseverance;
 DO_FUN  do_pick;
 DO_FUN  do_plats;
 DO_FUN  do_pocket;
@@ -359,6 +364,7 @@ DO_FUN  do_save;
 DO_FUN  do_say;
 DO_FUN  do_scan;
 DO_FUN  do_score;
+DO_FUN  do_scribe;
 DO_FUN  do_sector;
 DO_FUN  do_sedit;
 DO_FUN  do_send;
@@ -383,6 +389,7 @@ DO_FUN  do_sit;
 DO_FUN  do_slay;
 DO_FUN  do_sleep;
 DO_FUN  do_slip;
+DO_FUN  do_smite;
 DO_FUN  do_sneak;
 DO_FUN  do_snoop;
 DO_FUN  do_sockets;
@@ -416,6 +423,7 @@ DO_FUN  do_title;
 DO_FUN  do_toggle;
 DO_FUN  do_track;
 DO_FUN  do_trans;
+DO_FUN  do_triage;
 DO_FUN  do_trip;
 DO_FUN  do_trivia;
 DO_FUN  do_typo;

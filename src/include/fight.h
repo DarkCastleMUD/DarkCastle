@@ -2,7 +2,7 @@
 #define FIGHT_H_
 
 /************************************************************************
-| $Id: fight.h,v 1.33 2007/11/29 07:10:14 jhhudso Exp $
+| $Id: fight.h,v 1.34 2007/12/08 16:48:09 dcastle Exp $
 | fight.h
 | This file defines the header information for fight.
 */
@@ -46,6 +46,8 @@ void make_heart(CHAR_DATA *ch, CHAR_DATA *vict);
 void make_head(CHAR_DATA *ch);
 void make_arm(CHAR_DATA *ch);
 void make_leg(CHAR_DATA *ch);
+void make_bowels(CHAR_DATA *ch);
+void make_blood(CHAR_DATA *ch);
 void make_scraps(CHAR_DATA *ch, struct obj_data *obj);
 void remove_memory(CHAR_DATA *ch, char type);
 void add_memory(CHAR_DATA *ch, char *victim, char type);
@@ -66,7 +68,8 @@ void trip(CHAR_DATA *ch, CHAR_DATA *vict);
 int one_hit(CHAR_DATA*ch, CHAR_DATA *vict, int type, int weapon);
 int do_skewer(CHAR_DATA *ch, CHAR_DATA *vict, int dam, int wt, int wt2, int weapon);
 void do_combatmastery(CHAR_DATA *ch, CHAR_DATA *vict, int weapon);
-int do_behead(CHAR_DATA *ch, CHAR_DATA *victim, int dam, int weapon);
+int do_behead_skill(CHAR_DATA *ch, CHAR_DATA *victim);
+int do_execute_skill(CHAR_DATA *, CHAR_DATA *, int);
 int weapon_spells(CHAR_DATA *ch, CHAR_DATA *vict, int weapon);
 void eq_damage(CHAR_DATA *ch, CHAR_DATA *vict, int dam, int weapon_type, int attacktype);
 void fight_kill(CHAR_DATA *ch, CHAR_DATA *vict, int type, int spec_type);

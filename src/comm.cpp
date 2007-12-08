@@ -125,6 +125,7 @@ extern struct char_data *character_list;
 void check_leaderboard(void);
 void check_champion(void);
 void save_slot_machines(void);
+void check_silence_beacons(void);
 
 /* local globals */
 struct descriptor_data *descriptor_list = NULL;		/* master desc list */
@@ -926,6 +927,7 @@ void heartbeat()
     pulse_bard = PULSE_BARD;
     update_bard_singing();
     update_mprog_throws();  // convienant place to put it
+    update_make_camp_and_leadership();     // and this, too
   }
 
   if (--pulse_violence < 1) 
@@ -934,6 +936,7 @@ void heartbeat()
     perform_violence();
     update_command_lag_and_poison();
     affect_update(PULSE_VIOLENCE);
+    check_silence_beacons();
   }
 
   if(--pulse_weather < 1)

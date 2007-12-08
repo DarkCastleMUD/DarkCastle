@@ -1,7 +1,7 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.67 2007/06/15 16:00:15 jhhudso Exp $
+| $Id: character.h,v 1.68 2007/12/08 16:48:08 dcastle Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
@@ -142,6 +142,7 @@ struct class_skill_defines
     int16  skillnum;          // ID # of skill
     int16  levelavailable;    // what level class can get it
     int16  maximum;           // maximum value PC can train it to (1-100)
+    int16  group;             // which class tree group it is assigned
     int16  attrs;	      // What attributes the skill is based on
 };
 
@@ -416,6 +417,8 @@ struct char_data
     int32 timer;                         // Timer for update
     int32 shotsthisround;                // Arrows fired this round
     int32 spellcraftglyph;               // Used for spellcraft glyphs
+    bool  changeLeadBonus;
+    int32 curLeadBonus;
 
 // TODO - see if we can move the "wait" timer from desc to char
 // since we need something to lag mobs too

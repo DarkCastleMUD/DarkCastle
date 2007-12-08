@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.64 2007/11/20 21:35:33 pirahna Exp $
+| $Id: cl_warrior.cpp,v 1.65 2007/12/08 16:48:05 dcastle Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -82,7 +82,13 @@ int do_kick(struct char_data *ch, char *argument, int cmd)
       return retval;
     }
   else {
-    dam = (GET_DEX(ch) * 3) + (GET_STR(ch) * 2) + (has_skill(ch, SKILL_KICK));
+    if(affected_by_spell(victim, SKILL_BATTLESENSE) &&
+             number(1, 100) < affected_by_spell(victim, SKILL_BATTLESENSE)->modifier) {
+      act("$N's heightened battlesense sees your kick coming from a mile away.", ch, 0, victim, TO_CHAR, 0);
+      act("Your heightened battlesense sees $n's kick coming from a mile away.", ch, 0, victim, TO_VICT, 0);
+      act("$N's heightened battlesense sees $n's kick coming from a mile away.", ch, 0, victim, TO_ROOM, NOTVICT);
+      dam = 0;
+    } else dam = (GET_DEX(ch) * 3) + (GET_STR(ch) * 2) + (has_skill(ch, SKILL_KICK));
     retval = damage(ch, victim, dam, TYPE_BLUDGEON, SKILL_KICK, 0);
     if(SOMEONE_DIED(retval))
       return retval;
@@ -181,8 +187,6 @@ int do_deathstroke(struct char_data *ch, char *argument, int cmd)
     if (i > 80) failchance -= 5;
     if (i > 90) failchance -= 5;
 
-
-
     int to_dam = GET_DAMROLL(ch);
     if(IS_MOB(victim))
        to_dam = (int) ((float)to_dam * .8);
@@ -212,6 +216,13 @@ int do_deathstroke(struct char_data *ch, char *argument, int cmd)
           return eSUCCESS|eCH_DIED;
         }
     } else {
+      if(affected_by_spell(victim, SKILL_BATTLESENSE) && 
+             number(1, 100) < affected_by_spell(victim, SKILL_BATTLESENSE)->modifier) {
+        act("$N's heightened battlesense somehow notices your deathstroke coming from a mile away.", ch, 0, victim, TO_CHAR, 0);
+        act("Your heightened battlesense somehow notices $n's deathstroke coming from a mile away.", ch, 0, victim, TO_VICT, 0);
+        act("$N's heightened battlesense somehow notices $n's deathstroke coming from a mile away.", ch, 0, victim, TO_ROOM, NOTVICT);
+        dam = 0;
+      }
 	retval = damage(ch, victim, dam, attacktype, SKILL_DEATHSTROKE, 0);
     }
 
@@ -526,28 +537,25 @@ int do_bash(struct char_data *ch, char *argument, int cmd)
 
     modifier += stat_mod;
 
-    // if it's a barb
-//    if(ch->equipment[WIELD] && 
-//IS_SET(ch->equipment[WIELD]->obj_flags.extra_flags, ITEM_TWO_HANDED)
-
-
     WAIT_STATE(ch, PULSE_VIOLENCE*3);
 
     if (!skill_success(ch,victim,SKILL_BASH,modifier)) {
 	GET_POS(ch) = POSITION_SITTING;
         SET_BIT(ch->combat, COMBAT_BASH1);
-//        act("As $N avoids your bash, you topple over and fall to the 
-//ground.", ch, NULL, victim, TO_CHAR , 0);
- //       act("You dodge a bash from $n who loses $s balance and falls.", 
-//ch, NULL, victim, TO_VICT , 0);
-  //      act("$N avoids being bashed by $n who loses $s balance and 
-//falls.", ch, NULL, victim, TO_ROOM, NOTVICT);
 	retval = damage(ch, victim, 0, TYPE_BLUDGEON, SKILL_BASH, 0);
     }
     else {
+      if(affected_by_spell(victim, SKILL_BATTLESENSE) && 
+            number(1, 100) < affected_by_spell(victim, SKILL_BATTLESENSE)->modifier) {
+        act("$N's heightened battlesense sees your bash coming from a mile away.", ch, 0, victim, TO_CHAR, 0);
+        act("Your heightened battlesense sees $n's bash coming from a mile away.", ch, 0, victim, TO_VICT, 0);
+        act("$N's heightened battlesense sees $n's bash coming from a mile away.", ch, 0, victim, TO_ROOM, NOTVICT);
+        retval = damage(ch, victim, 0, TYPE_BLUDGEON, SKILL_BASH, 0);
+      } else {
 	GET_POS(victim) = POSITION_SITTING;
         SET_BIT(victim->combat, COMBAT_BASH1);
 	retval = damage(ch, victim, 25, TYPE_BLUDGEON, SKILL_BASH, 0);
+      }
 	if (!(retval & eEXTRA_VALUE)) {
         hit = 1;
         // if they already have 2 rounds of wait, only tack on 1 instead of 2
@@ -556,12 +564,6 @@ int do_bash(struct char_data *ch, char *argument, int cmd)
         if(victim->desc)
           WAIT_STATE(victim, PULSE_VIOLENCE * 2);
 	}
-//	else WAIT_STATE(victim, PULSE_VIOLENCE * 3);
- //       act("Your bash at $N sends $M sprawling.", ch, NULL, victim, 
-//TO_CHAR , 0);
- //       act("$n sends you sprawling.", ch, NULL, victim, TO_VICT , 0);
- //       act("$n sends $N sprawling with a powerful bash.", ch, NULL, 
-//victim, TO_ROOM, NOTVICT);
     }
 
     if(SOMEONE_DIED(retval))
@@ -1079,3 +1081,356 @@ int do_tactics(struct char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
+int do_make_camp(struct char_data *ch, char *argument, int cmd)
+{
+  CHAR_DATA *i, *next_i;
+  int learned = has_skill(ch, SKILL_MAKE_CAMP);
+  struct affected_type af;
+
+  if(!IS_MOB(ch) && GET_LEVEL(ch) <= ARCHANGEL && !learned) {
+    send_to_char("You do not know how to set up a safe camp.\n\r", ch);
+    return eFAILURE;
+  }
+
+  if(IS_SET(world[ch->in_room].room_flags, SAFE) || IS_SET(world[ch->in_room].room_flags, UNSTABLE) ||
+     IS_SET(world[ch->in_room].room_flags, FALL_NORTH) || IS_SET(world[ch->in_room].room_flags, FALL_SOUTH) ||
+     IS_SET(world[ch->in_room].room_flags, FALL_EAST) || IS_SET(world[ch->in_room].room_flags, FALL_WEST) ||
+     IS_SET(world[ch->in_room].room_flags, FALL_UP) || IS_SET(world[ch->in_room].room_flags, FALL_DOWN) )
+  {
+    send_to_char("Something about this area inherently prohibits a rugged camp.\n\r", ch);
+    return eFAILURE;
+  }
+
+  for(i = world[ch->in_room].people; i; i = next_i) {
+    next_i = i->next_in_room;
+
+    if( (IS_MOB(i) && !IS_AFFECTED(i, AFF_CHARM) && !IS_AFFECTED(i, AFF_FAMILIAR) ) || (i->fighting) ) {
+      send_to_char("This area does not yet feel secure enough to rest.\n\r", ch);
+      return eFAILURE;
+    }
+  }
+
+  if(affected_by_spell(ch, SKILL_MAKE_CAMP_TIMER)) {
+    send_to_char("You cannot make another camp so soon.\n\r", ch);
+    return eFAILURE;
+  }
+
+  WAIT_STATE(ch, (int)(PULSE_VIOLENCE * 2.5));
+
+  send_to_char("You scan about for signs of danger as you clear an area to make camp...\n\r", ch);
+  act("$n scans about for signs of danger and clears an area to make camp...", ch, 0, 0, TO_ROOM, 0);
+  if(!skill_success(ch, 0, SKILL_MAKE_CAMP)) {
+    send_to_room("The area does not yet feel secure enough to rest.\n\r", ch->in_room);
+  } else {
+    send_to_room("The area feels secure enough to get some rest.\n\r", ch->in_room);
+
+    af.type = SKILL_MAKE_CAMP_TIMER;
+    af.duration = 2 + learned/9;
+    af.modifier = 0;
+    af.location = 0;
+    af.bitvector = -1;
+
+    affect_to_char(ch, &af);
+
+    af.type = SKILL_MAKE_CAMP;
+    af.duration = 1 + learned/9;
+    af.modifier = ch->in_room;
+    af.location = 0;
+    af.bitvector = -1;
+
+    affect_to_char(ch, &af);
+
+    for(i = world[ch->in_room].people; i; i = next_i) {
+      next_i = i->next_in_room;
+
+      if(!affected_by_spell(i, SPELL_FARSIGHT) && !IS_AFFECTED(i, AFF_FARSIGHT)) {
+        af.type = SPELL_FARSIGHT;
+        af.duration = -1;
+        af.modifier = 111;
+        af.location = 0;
+        af.bitvector = AFF_FARSIGHT;
+
+        affect_to_char(i, &af);
+      }
+    }
+  }
+
+  return eSUCCESS;
+}
+
+int do_triage(struct char_data *ch, char *argument, int cmd)
+{
+  int learned = has_skill(ch, SKILL_TRIAGE);
+  struct affected_type af;
+
+  if(!IS_MOB(ch) && GET_LEVEL(ch) <= ARCHANGEL && !learned) {
+    send_to_char("You do not know how to aid your regeneration in that way.\n\r", ch);
+    return eFAILURE;
+  }
+
+  if(ch->fighting) {
+    send_to_char("You are a little too busy for that right now.\n\r", ch);
+    return eFAILURE;
+  }
+
+  WAIT_STATE(ch, PULSE_VIOLENCE * 2);
+
+  af.type = SKILL_TRIAGE_TIMER;
+  af.modifier = 0;
+  af.duration = 6;
+  af.location = 0;
+  af.bitvector = -1;
+  affect_to_char(ch, &af);
+
+  if(!skill_success(ch, 0, SKILL_TRIAGE)) {
+    send_to_char("You pause to clean and bandage some of your more painful injuries but feel little improvement in your health.\n\r", ch);
+    act("$n pauses to try and bandage some of $s more painful injuries.", ch, 0, 0, TO_ROOM, 0);
+  } else {
+    send_to_char("You pause to clean and bandage some of your more painful injuries and speed the healing process.\n\r", ch);
+    act("$n pauses to try and bandage some of $s more painful injuries.", ch, 0, 0, TO_ROOM, 0);
+
+    af.type = SKILL_TRIAGE;
+    af.modifier = learned/3;
+    af.duration = 2;
+    af.location = APPLY_HP_REGEN;
+    af.bitvector = -1;
+
+    affect_to_char(ch, &af);
+  }
+
+  return eSUCCESS;
+}
+
+int do_battlesense(struct char_data *ch, char *argument, int cmd)
+{
+  int learned = has_skill(ch, SKILL_BATTLESENSE);
+  struct affected_type af;
+
+  if(!IS_MOB(ch) && GET_LEVEL(ch) <= ARCHANGEL && !learned) {
+    send_to_char("You do not know how to heighten your battle awareness.\n\r", ch);
+    return eFAILURE;
+  }
+
+  if(!ch->fighting) {
+    send_to_char("You must be in battle to heighten your combat awareness!\n\r", ch);
+    return eFAILURE;
+  }
+
+  WAIT_STATE(ch, PULSE_VIOLENCE * 2);
+
+  if(!skill_success(ch, 0, SKILL_BATTLESENSE)) {
+    send_to_char("Your body and mind, tired from continued battle, are unable to reach full combat readiness.\n\r", ch);
+  } else {
+    send_to_char("Your awareness heightens dramatically as the rush of battle courses through your body.\n\r", ch);
+    act("$n's movements become quick and calculated as $s senses heighten with the rush of battle.", ch, 0, 0, TO_ROOM, 0);
+
+    af.type = SKILL_BATTLESENSE;
+    af.location = 0;
+    af.modifier = 10 + learned/4;
+    af.duration = 1 + learned/11;
+    af.bitvector = -1;
+
+    affect_to_char(ch, &af, PULSE_VIOLENCE);
+  }
+
+  return eSUCCESS;
+}
+
+int do_smite(struct char_data *ch, char *argument, int cmd)
+{
+  CHAR_DATA *vict = NULL;
+  char name[MAX_STRING_LENGTH];
+  int learned = has_skill(ch, SKILL_SMITE);
+  struct affected_type af;
+
+  if(!IS_MOB(ch) && GET_LEVEL(ch) <= ARCHANGEL && !learned) {
+    send_to_char("You do not know how to smite your enemies effectively.\n\r", ch);
+    return eFAILURE;
+  }
+
+  if(!*argument)
+    if(!ch->fighting) {
+      send_to_char("Smite whom?\n\r", ch);
+      return eFAILURE;
+    } else vict = ch->fighting;
+
+  one_argument(argument, name);
+
+  if(*argument)
+    if( !(vict = get_char_room_vis(ch, name)) ) {
+      send_to_char("Smite whom?\n\r", ch);
+      return eFAILURE;
+    }
+
+  if(ch == vict) {
+    send_to_char("There's a suicide command for that...\n\r", ch);
+    return eFAILURE;
+  }
+
+  if(!can_attack(ch) || !can_be_attacked(ch, vict)) {
+    act("You cannot attack $M", ch, 0, vict, TO_CHAR, 0);
+    return eFAILURE;
+  }
+
+  if(affected_by_spell(ch, SKILL_SMITE_TIMER)) {
+    send_to_char("You cannot smite your enemies again so soon.\n\r", ch);
+    return eFAILURE;
+  }
+
+  af.type = SKILL_SMITE_TIMER;
+  af.location = 0;
+  af.modifier = 0;
+  af.duration = 22 - learned/10;
+  af.bitvector = -1;
+
+  affect_to_char(ch, &af);
+
+  WAIT_STATE(ch, PULSE_VIOLENCE * 4);
+
+  if(!skill_success(ch, vict, SKILL_SMITE)) {
+    act("Your less-than-mighty challenge fails to improve your attack of $N.", ch, 0, vict, TO_CHAR, 0);
+    act("$n makes a pathetic attempt at shouting a challenge as $e attempts to strike you.", ch, 0, vict, TO_VICT, 0);
+    act("$n makes a pathetic attempt at shouting a challenge as $e attempts to strike $N.", ch, 0, vict, TO_ROOM, NOTVICT);
+  } else {
+    act("You shout a mighty challenge and begin to assault $N with lethal efficiency.", ch, 0, vict, TO_CHAR, 0);
+    act("$n shouts a mighty challenge and begins to assault you with lethal efficiency.", ch, 0, vict, TO_VICT, 0);
+    act("$n shouts a mighty challenge and begins to assault $N with lethal efficiency.", ch, 0, vict, TO_ROOM, NOTVICT);
+
+    af.type = SKILL_SMITE;
+    af.location = 0;
+    af.modifier = (int)vict;
+    af.duration = 1 + learned/16;
+    af.bitvector = -1;
+
+    affect_to_char(ch, &af, PULSE_VIOLENCE);
+  }
+
+  return ch->fighting?eSUCCESS:attack(ch, vict, TYPE_UNDEFINED);
+}
+
+int do_leadership(struct char_data *ch, char *argument, int cmd)
+{
+  int learned = has_skill(ch, SKILL_LEADERSHIP);
+  struct affected_type af;
+
+  if(!IS_MOB(ch) && GET_LEVEL(ch) <= ARCHANGEL && !learned) {
+    send_to_char("You do not know that ability.\n\r", ch);
+    return eFAILURE;
+  }
+
+  if(ch->master || !ch->followers) {
+    send_to_char("You must be leading a group to call upon your leadership skills.\n\r", ch);
+    return eFAILURE;
+  }
+
+  if(IS_SET(world[ch->in_room].room_flags, SAFE) || IS_SET(world[ch->in_room].room_flags, QUIET)) {
+    send_to_char("Stop trying to show off.\n\r", ch);
+    return eFAILURE;
+  }
+
+  if(affected_by_spell(ch, SKILL_LEADERSHIP)) {
+    send_to_char("You and your followers are already inspired.\n\r", ch);
+    return eFAILURE;
+  }
+
+  send_to_char("You loudly call, 'Once more unto the breach, dear friends!'\n\r", ch);
+  act("$n loudly calls, 'Once more unto the breach, dear friends!'", ch, 0, 0, TO_ROOM, 0);
+
+  WAIT_STATE(ch, (int)(PULSE_VIOLENCE * 1.5) );
+
+  if(!skill_success(ch, 0, SKILL_LEADERSHIP)) {
+    send_to_char("Your bravery miserably fails to inspire.\n\r", ch);
+    act("$n's bravery miserably fails to inspire.", ch, 0, 0, TO_ROOM, 0);
+  } else {
+    send_to_char("Your bravery lends you additional might and inspires the group!\n\r", ch);
+    act("$n's bravery lends $m additional might and inspires the group!", ch, 0, 0, TO_ROOM, 0);
+
+    af.type = SKILL_LEADERSHIP;
+    af.duration = 1 + learned/20;
+    af.modifier = learned/19; //cap on bonus
+    af.location = 0;
+    af.bitvector = -1;
+
+    affect_to_char(ch, &af);
+
+    ch->changeLeadBonus = TRUE;
+    ch->curLeadBonus = get_leadership_bonus(ch);
+  }
+
+  return eSUCCESS;
+}
+
+int do_perseverance(struct char_data *ch, char *argument, int cmd)
+{
+  int learned = has_skill(ch, SKILL_PERSEVERANCE);
+  struct affected_type af;
+
+  if(!IS_MOB(ch) && GET_LEVEL(ch) <= ARCHANGEL && !learned) {
+    send_to_char("Your lack of fortitude is stunning.\n\r", ch);
+    return eFAILURE;
+  }
+
+  if(!ch->fighting) {
+    send_to_char("What, exactly, are you trying to persevere through?\n\r", ch);
+    return eFAILURE;
+  }
+
+  WAIT_STATE(ch, PULSE_VIOLENCE * 2);
+
+  if(!skill_success(ch, 0, SKILL_PERSEVERANCE)) {
+    send_to_char("Your movements seem unchanged, though you strive to gain some momentum in your actions.\n\r", ch);
+  } else {
+    send_to_char("Your movements seem to build energy and gain momentum as you fight with renewed vigor!\n\r", ch);
+    act("$n seems to build energy and $s movements gain momentum as the battle drags on...", ch, 0, 0, TO_ROOM, 0);
+
+    af.type = SKILL_PERSEVERANCE;
+    af.location = 0;
+    af.duration = 1 + learned/11;
+    af.modifier = learned;
+    af.bitvector = -1;
+
+    affect_to_char(ch, &af, PULSE_VIOLENCE);
+  }
+
+  return eSUCCESS;
+}
+
+int do_defenders_stance(struct char_data *ch, char *argument, int cmd)
+{
+  CHAR_DATA *vict = NULL;
+  int learned = has_skill(ch, SKILL_DEFENDERS_STANCE);
+  struct affected_type af;
+
+  if(!IS_MOB(ch) && GET_LEVEL(ch) <= ARCHANGEL && !learned) {
+    send_to_char("You do not know how to use this to your advantage.\n\r", ch);
+    return eFAILURE;
+  }
+
+  if(!ch->fighting) {
+    send_to_char("From whom are you trying to defend yourself?\n\r", ch);
+    return eFAILURE;
+  }
+
+  vict = ch->fighting;
+  WAIT_STATE(ch, PULSE_VIOLENCE * 3);
+
+  if(!skill_success(ch, 0, SKILL_DEFENDERS_STANCE)) {
+    act("You attempt to brace yourself to defend against $N's onslaught but stumble and fall!", ch, 0, vict, TO_CHAR, 0);
+    act("$n attempts to brace $mself to defend against your onslaught but stumbles and falls!", ch, 0, vict, TO_VICT, 0);
+    act("$n attempts to brace $mself to defend against $N's onslaught but stumbles and falls!", ch, 0, vict, TO_ROOM, NOTVICT);
+    GET_POS(ch) = POSITION_SITTING;
+  } else {
+    act("You brace yourself to defend against $N's onslaught.", ch, 0, vict, TO_CHAR, 0);
+    act("$n braces $mself to defend against your onslaught.", ch, 0, vict, TO_VICT, 0);
+    act("$n braces $mself to defend against $N's onslaught.", ch, 0, vict, TO_ROOM, NOTVICT);
+
+    af.type = SKILL_DEFENDERS_STANCE;
+    af.location = 0;
+    af.modifier = 5 + learned/2;
+    af.duration = 1 + learned/12;
+    af.bitvector = -1;
+
+    affect_to_char(ch, &af, PULSE_VIOLENCE);
+  }
+  return eSUCCESS;
+}

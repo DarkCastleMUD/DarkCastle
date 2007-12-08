@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.471 2007/12/08 15:56:28 dcastle Exp $               *
+ * $Id: fight.cpp,v 1.472 2007/12/08 16:48:01 dcastle Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -82,6 +82,7 @@ int do_lightning_shield(CHAR_DATA *ch, CHAR_DATA *vict, int dam);
 bool do_frostshield(CHAR_DATA *ch, CHAR_DATA *vict);
 int do_fireshield(CHAR_DATA *ch, CHAR_DATA *vict, int dam);
 int do_vampiric_aura(CHAR_DATA *ch, CHAR_DATA *vict);
+int do_boneshield(CHAR_DATA *ch, CHAR_DATA *vict, int dam);
 void do_dam_msgs(CHAR_DATA *ch, CHAR_DATA *victim, int dam, int attacktype, int weapon);
 void inform_victim(CHAR_DATA *ch, CHAR_DATA *vict, int dam);
 void update_stuns(CHAR_DATA *ch);
@@ -1067,6 +1068,64 @@ int do_acidshield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
   return eSUCCESS;
 }
 
+
+int do_boneshield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
+{
+  // ch is the person who just hit the victim
+  // so ch takes the damage from this spell 
+  extern struct race_shit race_info[];
+  struct affected_type * cur_af;
+  int learned = 0;
+
+
+  if (!ch || !vict || ch == vict) {
+    log("Null ch or vict, or ch==vict sent to do_boneshield!", IMP, LOG_BUG);
+    abort();
+  }
+  
+  if(GET_POS(vict) == POSITION_DEAD)            return eFAILURE;
+  if(!IS_NPC(ch) && GET_LEVEL(ch) >= IMMORTAL)  return eFAILURE;
+  if(!affected_by_spell(vict, SPELL_BONESHIELD)) return eFAILURE;
+
+  if (IS_SET(race_info[(int)GET_RACE(ch)].immune, ISR_PHYSICAL) ||
+      IS_SET(ch->immune, ISR_PHYSICAL))
+    dam = 0;
+  else {
+   if ((cur_af = affected_by_spell(vict, SPELL_BONESHIELD)))
+     learned = (int)cur_af->modifier;
+
+    dam = learned;
+
+    dam -= ch->melee_mitigation;
+        
+    if (IS_AFFECTED(ch, AFF_EAS))
+      dam /= 4;
+    if (IS_AFFECTED(ch, AFF_SANCTUARY))
+      dam /= 2;
+    if (affected_by_spell(ch, SPELL_HOLY_AURA) && affected_by_spell(ch, SPELL_HOLY_AURA)->modifier == 25)
+	dam /= 2;
+    if(affected_by_spell(ch, SPELL_DIVINE_INTER) && dam > affected_by_spell(ch, SPELL_DIVINE_INTER)->modifier)
+      dam = affected_by_spell(ch, SPELL_DIVINE_INTER)->modifier;
+
+  }
+    
+  GET_HIT(ch) -= dam;
+  do_dam_msgs(vict, ch, dam, SPELL_BONESHIELD, WIELD);
+  update_pos(ch);
+    
+  if (GET_POS(ch) == POSITION_DEAD) {
+      act("$n is DEAD!!", ch, 0, 0, TO_ROOM, INVIS_NULL);
+      group_gain(vict, ch);
+      if(!IS_NPC(ch))
+         send_to_char("You have been KILLED!!\n\r\n\r", ch);
+      fight_kill(vict, ch, TYPE_CHOOSE, 0);
+      return eSUCCESS|eCH_DIED;
+  }
+
+  return eSUCCESS;
+}
+
+
 void check_weapon_skill_bonus(char_data * ch, int type, obj_data *wielded, 
                               int & weapon_skill_hit_bonus, int & weapon_skill_dam_bonus)
 {
@@ -1213,7 +1272,7 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
   int w_type;			/* Holds type info for damage() */
   int weapon_type;
 //  int victim_ac, calc_thaco;	/* Holders for Calculation */
-  int dam;			/* Self explan. */
+  int dam = 0;			/* Self explan. */
 //  int diceroll;			/* ... */
   int retval = 0;
   int weapon_skill_hit_bonus = 0;
@@ -1328,7 +1387,11 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
     return damage(ch, vict, 0, w_type, w_type, weapon); // miss
 */
   if(wielded)  {
-    dam = dice(wielded->obj_flags.value[1], wielded->obj_flags.value[2]);
+    if(affected_by_spell(ch, SKILL_SMITE) && affected_by_spell(ch, SKILL_SMITE)->modifier == (int)vict)
+      for(int i = 0; i < wielded->obj_flags.value[1]; i++)
+        dam += wielded->obj_flags.value[2] - number(0,1);
+    else 
+      dam = dice(wielded->obj_flags.value[1], wielded->obj_flags.value[2]);
     if(IS_NPC(ch)) {
       dam = dice(ch->mobdata->damnodice, ch->mobdata->damsizedice);
       dam += (dice(wielded->obj_flags.value[1], wielded->obj_flags.value[2])/2);
@@ -1378,6 +1441,18 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
     SET_BIT(vict->combat, COMBAT_SHOCKED2);
     WAIT_STATE(vict, PULSE_VIOLENCE *2);
   }
+
+  if(wielded && IS_SET(wielded->obj_flags.extra_flags, ITEM_TWO_HANDED) && has_skill(ch, SKILL_BEHEAD))
+    if(w_type == TYPE_SLASH && GET_HIT(vict) < 3500 && GET_HIT(vict) * 100 / GET_MAX_HIT(vict) < 30) {
+      retval = do_behead_skill(ch, vict);
+      if(SOMEONE_DIED(retval)) return retval;
+    }
+
+  if(wielded && IS_SET(wielded->obj_flags.extra_flags, ITEM_TWO_HANDED) && has_skill(ch, SKILL_EXECUTE))
+    if(GET_HIT(vict) < 3500 && GET_HIT(vict) * 100 / GET_MAX_HIT(vict) < 15) {
+      retval = do_execute_skill(ch, vict, w_type);
+      if(SOMEONE_DIED(retval)) return retval;
+    }
 
   if(dam < 1)
     dam = 1;
@@ -2337,6 +2412,9 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
     retval2 = do_vampiric_aura(ch, victim);
     if(SOMEONE_DIED(retval2))
       return damage_retval(ch, victim, retval2);
+    retval2 = do_boneshield(ch, victim, dam);
+    if(SOMEONE_DIED(retval2))
+      return damage_retval(ch, victim, retval2);
   }
 
   // Sleep spells.
@@ -2459,8 +2537,8 @@ void send_damage(char *buf, CHAR_DATA *ch, OBJ_DATA *obj, CHAR_DATA *victim, cha
 {
  void send_message(TokenList * tokens, CHAR_DATA *ch, OBJ_DATA * obj, void * vch, int flags, CHAR_DATA *to);
   CHAR_DATA *tmpch;
- char string1[MAX_INPUT_LENGTH], string2[MAX_INPUT_LENGTH];
- 
+ char string1[MAX_INPUT_LENGTH], string2[MAX_INPUT_LENGTH]; 
+
  int i, z = 0, y = 0;
  for (i = 0; i <= (int)strlen(buf); i++)
  {
@@ -3908,6 +3986,99 @@ void make_leg(CHAR_DATA * ch)
    return;
 }
 
+void make_bowels(CHAR_DATA * ch)
+{
+  struct obj_data *corpse;
+  char buf[MAX_STRING_LENGTH];
+  
+#ifdef LEAK_CHECK
+  corpse = (struct obj_data *)calloc(1, sizeof(struct obj_data));
+#else
+  corpse = (struct obj_data *)dc_alloc(1, sizeof(struct obj_data));
+#endif
+  clear_object(corpse);
+  
+  corpse->item_number = NOWHERE;
+  corpse->in_room = NOWHERE;
+  corpse->name = str_hsh("bowels");
+  
+   sprintf(buf, "The steaming bowels of %s is lying here.",
+	    (IS_NPC(ch) ? ch->short_desc : GET_NAME(ch)));
+   corpse->description = str_hsh(buf);
+   
+   sprintf(buf, "Bowels of %s",
+	    (IS_NPC(ch) ? ch->short_desc : GET_NAME(ch)));
+   corpse->short_description = str_hsh(buf);
+   
+   
+   corpse->obj_flags.type_flag = ITEM_TRASH;
+   corpse->obj_flags.wear_flags = ITEM_TAKE + ITEM_HOLD;
+   corpse->obj_flags.value[0] = 0;	/* You can't store stuff in a corpse */
+   corpse->obj_flags.value[3] = 1;	/* corpse identifyer */
+   corpse->obj_flags.weight = 5;
+   corpse->obj_flags.eq_level = 0;
+   if (IS_NPC(ch))
+   {
+     corpse->obj_flags.more_flags = 0;
+     corpse->obj_flags.timer = MAX_NPC_CORPSE_TIME;
+   }
+   else
+   {
+     corpse->obj_flags.more_flags = 0;
+     corpse->obj_flags.timer = MAX_PC_CORPSE_TIME;
+   }
+   
+   obj_to_room(corpse, ch->in_room);
+   
+   return;
+}
+
+void make_blood(CHAR_DATA * ch)
+{
+  struct obj_data *corpse;
+  char buf[MAX_STRING_LENGTH];
+  
+#ifdef LEAK_CHECK
+  corpse = (struct obj_data *)calloc(1, sizeof(struct obj_data));
+#else
+  corpse = (struct obj_data *)dc_alloc(1, sizeof(struct obj_data));
+#endif
+  clear_object(corpse);
+  
+  corpse->item_number = NOWHERE;
+  corpse->in_room = NOWHERE;
+  corpse->name = str_hsh("blood");
+  
+   sprintf(buf, "A pool of %s's blood is here.",
+	    (IS_NPC(ch) ? ch->short_desc : GET_NAME(ch)));
+   corpse->description = str_hsh(buf);
+   
+   sprintf(buf, "Pooled blood of %s",
+	    (IS_NPC(ch) ? ch->short_desc : GET_NAME(ch)));
+   corpse->short_description = str_hsh(buf);
+   
+   
+   corpse->obj_flags.type_flag = ITEM_TRASH;
+   corpse->obj_flags.wear_flags = ITEM_TAKE + ITEM_HOLD;
+   corpse->obj_flags.value[0] = 0;	/* You can't store stuff in a corpse */
+   corpse->obj_flags.value[3] = 1;	/* corpse identifyer */
+   corpse->obj_flags.weight = 5;
+   corpse->obj_flags.eq_level = 0;
+   if (IS_NPC(ch))
+   {
+     corpse->obj_flags.more_flags = 0;
+     corpse->obj_flags.timer = MAX_NPC_CORPSE_TIME;
+   }
+   else
+   {
+     corpse->obj_flags.more_flags = 0;
+     corpse->obj_flags.timer = MAX_PC_CORPSE_TIME;
+   }
+   
+   obj_to_room(corpse, ch->in_room);
+   
+   return;
+}
 
 
 void make_heart(CHAR_DATA * ch, CHAR_DATA * vict)
@@ -4005,6 +4176,8 @@ int do_skewer(CHAR_DATA *ch, CHAR_DATA *vict, int dam, int wt, int wt2, int weap
   // TODO - need to make this take specialization into consideration
   if (ch->in_room != vict->in_room) return 0;
 
+  if(affected_by_spell(ch, SKILL_DEFENDERS_STANCE)) return 0;
+
   int type = get_weapon_damage_type(ch->equipment[weapon]);
   if( ! ( type == TYPE_PIERCE || type == TYPE_SLASH ))  return 0;
   if(!skill_success(ch,vict, SKILL_SKEWER))                          return 0;
@@ -4051,6 +4224,122 @@ int do_skewer(CHAR_DATA *ch, CHAR_DATA *vict, int dam, int wt, int wt2, int weap
   }
   // if they're still here the skewer missed
   return eSUCCESS;
+}
+
+int do_behead_skill(CHAR_DATA *ch, CHAR_DATA *vict)
+{
+  int chance, percent;
+
+  percent = (100 * GET_HIT(vict)) / GET_MAX_HIT(vict);
+  chance = number(0, 101);
+  if(chance > (1.3 * percent)) {
+    percent = (100 * GET_HIT(vict)) / GET_MAX_HIT(vict);
+    chance = number(0, 101);
+    if(chance > (2 * percent)) {
+      chance = number(0, 101);
+      if(chance > (2 * percent)) {
+        chance = number(0, 101);
+        if(chance > (2 * percent) && !IS_SET(vict->immune, ISR_SLASH)
+           && skill_success(ch, vict, SKILL_BEHEAD)) {
+          if ((vict->equipment[WEAR_NECK_1] && obj_index[vict->equipment[WEAR_NECK_1]->item_number].virt == 518) ||
+              (vict->equipment[WEAR_NECK_2] && obj_index[vict->equipment[WEAR_NECK_2]->item_number].virt == 518) 
+              && !number(0,1))
+          { // tarrasque's leash..
+            act("You attempt to behead $N, but your sword bounces of $S neckwear.",ch, 0, vict, TO_CHAR, 0);
+            act("$n attempts to behead $N, but fails.", ch, 0, vict, TO_ROOM, NOTVICT);
+            act("$n attempts to behead you, but cannot cut through your neckwear.",ch,0,vict,TO_VICT,0);
+            return eSUCCESS;
+          }
+          if(IS_AFFECTED(vict, AFF_NO_BEHEAD)) {
+            act("$N deftly dodges your beheading attempt!", ch, 0, vict, TO_CHAR, 0);
+            act("$N deftly dodges $n's attempt to behead $M!", ch, 0, vict, TO_ROOM, NOTVICT);
+            act("You deftly avoid $n's attempt to lop your head off!", ch, 0, vict, TO_VICT, 0);
+            return eSUCCESS;
+          }
+          act("You feel your life end as $n's sword SLICES YOUR HEAD OFF!", ch, 0, vict, TO_VICT, 0);
+          act("You SLICE $N's head CLEAN OFF $S body!", ch, 0, vict, TO_CHAR, 0);
+          act("$n cleanly slices $N's head off $S body!", ch, 0, vict, TO_ROOM, NOTVICT);
+          GET_HIT(vict) = -20;
+          make_head(vict);
+          group_gain(ch, vict); 
+          fight_kill(ch, vict, TYPE_CHOOSE, 0);
+          return eSUCCESS|eVICT_DIED; /* Zero means kill it! */
+          // it died..
+        } else { /* You MISS the fucker! */
+          act("You hear the SWOOSH sound of wind as $n's sword attempts to slice off your head!", ch, 0, vict, TO_VICT, 0);
+          act("You miss your attempt to behead $N.", ch, 0, vict, TO_CHAR, 0);
+          act("$N jumps back as $n makes an attempt to BEHEAD $M!", ch, 0, vict, TO_ROOM, NOTVICT);
+          return eSUCCESS;
+        }
+      }
+    }
+  }
+  return eFAILURE;
+}
+
+int do_execute_skill(CHAR_DATA *ch, CHAR_DATA *vict, int w_type)
+{
+  int chance, percent;
+
+  percent = (100 * GET_HIT(vict)) / GET_MAX_HIT(vict);
+  chance = number(0, 101);
+  if(chance > (1.3 * percent)) {
+    percent = (100 * GET_HIT(vict)) / GET_MAX_HIT(vict);
+    chance = number(0, 101);
+    if(chance > (2 * percent)) {
+      chance = number(0, 101);
+      if(chance > (2 * percent)) {
+        if(IS_AFFECTED(vict, AFF_NO_BEHEAD) ||
+               (w_type == TYPE_SLASH && IS_SET(vict->immune, ISR_SLASH)) ||
+               (w_type == TYPE_PIERCE && IS_SET(vict->immune, ISR_PIERCE)) ||
+               (w_type == TYPE_CRUSH && IS_SET(vict->immune, ISR_CRUSH)) ||
+               (w_type == TYPE_BLUDGEON && IS_SET(vict->immune, ISR_BLUDGEON)) ||
+               (w_type == TYPE_WHIP && IS_SET(vict->immune, ISR_WHIP)) ||
+               (w_type == TYPE_STING && IS_SET(vict->immune, ISR_STING)) ) {
+          act("$N deftly dodges your mortal strike!", ch, 0, vict, TO_CHAR, 0);
+          act("$N deftly dodges $n's mortal strike!", ch, 0, vict, TO_ROOM, NOTVICT);
+          act("You deftly avoid $n's mortal strike!", ch, 0, vict, TO_VICT, 0);
+          return eSUCCESS;
+        } else if(!skill_success(ch, vict, SKILL_EXECUTE)) {
+          act("$N narrowly avoids your lethal blow as you attempt to thrust aside $S defenses!", ch, 0, vict, TO_CHAR, 0);
+          act("You narrowly avoid a lethal blow as $n attempts to thrust aside your defenses!", ch, 0, vict, TO_VICT, 0);
+          act("$N narrowly avoids $n's lethal blow as $e attempts to thrust aside $S defenses! ", ch, 0, vict, TO_ROOM, NOTVICT);
+          return eSUCCESS;
+        } else {
+          act("$n quickly thrusts aside your defenses and strikes a fatal blow!", ch, 0, vict, TO_VICT, 0);
+          act("You feel a flash of pain and your vision dims from $4red$R to $B$0black$R...", ch, 0, vict, TO_VICT, 0);
+          GET_HIT(vict) = -20;
+          act("You quickly thrust aside $N's defenses and strike a fatal blow!", ch, 0, vict, TO_CHAR, 0);
+          act("$n quickly thrusts aside $N's defenses and strikes a lethal blow!", ch, 0, vict, TO_ROOM, NOTVICT);
+          if(w_type == TYPE_SLASH || w_type == TYPE_PIERCE) {
+            if(number(0,1)) {
+              act("$N's arm is neatly severed from $S battered body as it crumples to the ground.", ch, 0, vict, TO_CHAR, 0);
+              act("$N's arm is neatly severed from $S battered body as it crumples to the ground.", ch, 0, vict, TO_ROOM, NOTVICT);
+              make_arm(vict);
+            } else {
+              act("$N's leg is neatly severed from $S battered body as it crumples to the ground.", ch, 0, vict, TO_CHAR, 0);
+              act("$N's leg is neatly severed from $S battered body as it crumples to the ground.", ch, 0, vict, TO_ROOM, NOTVICT);
+              make_leg(vict);
+            }
+          }
+          if(w_type == TYPE_CRUSH || w_type == TYPE_BLUDGEON) {
+            act("$N's guts spill to the ground as $S body is split open like an overripe melon.", ch, 0, vict, TO_CHAR, 0);
+            act("$N's guts spill to the ground as $S body is split open like an overripe melon.", ch, 0, vict, TO_ROOM, NOTVICT);
+            make_bowels(vict);
+          }
+          if(w_type == TYPE_WHIP || w_type == TYPE_STING) {
+            act("$N's blood pools on the ground as the remaining life seeps from $S body.", ch, 0, vict, TO_CHAR, 0);
+            act("$N's blood pools on the ground as the remaining life seeps from $S body.", ch, 0, vict, TO_ROOM, NOTVICT);
+            make_blood(vict);
+          }
+          group_gain(ch, vict); 
+          fight_kill(ch, vict, TYPE_CHOOSE, 0);
+          return eSUCCESS|eVICT_DIED; /* Zero means kill it! */
+        }
+      }
+    }
+  }
+  return eFAILURE;
 }
 
 void do_combatmastery(CHAR_DATA *ch, CHAR_DATA *vict, int weapon)
@@ -5769,6 +6058,7 @@ int second_attack(CHAR_DATA *ch)
 
   if((IS_NPC(ch)) && (ISSET(ch->mobdata->actflags, ACT_2ND_ATTACK)))
     return TRUE;
+  if(affected_by_spell(ch, SKILL_DEFENDERS_STANCE)) return FALSE;
   learned = has_skill(ch, SKILL_SECOND_ATTACK);
   if(learned && skill_success(ch,NULL, SKILL_SECOND_ATTACK,15)) {
     return TRUE;
@@ -5782,6 +6072,7 @@ int third_attack(CHAR_DATA *ch)
 
   if((IS_NPC(ch)) && (ISSET(ch->mobdata->actflags, ACT_3RD_ATTACK)))
     return TRUE;
+  if(affected_by_spell(ch, SKILL_DEFENDERS_STANCE)) return FALSE;
   learned = has_skill(ch, SKILL_THIRD_ATTACK);
   if(learned && skill_success(ch,NULL,SKILL_THIRD_ATTACK,15)) {
     return TRUE;

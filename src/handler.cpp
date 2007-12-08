@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.165 2007/12/08 16:18:16 dcastle Exp $ */
+/* $Id: handler.cpp,v 1.166 2007/12/08 16:48:01 dcastle Exp $ */
     
 extern "C"
 {
@@ -1341,7 +1341,7 @@ void affect_remove( CHAR_DATA *ch, struct affected_type *af, int flags)
     char buf[200];
     short dir;
     bool char_died = FALSE;
-
+    struct follow_type *f, *next_f;
 
    if (!ch->affected) return;
 
@@ -1678,6 +1678,32 @@ void affect_remove( CHAR_DATA *ch, struct affected_type *af, int flags)
          if(!(flags & SUPPRESS_MESSAGES))
          send_to_char("You feel ready to look for \"herb\" again.\n\r", ch);
          break;     
+      case SKILL_TRIAGE_TIMER:
+         if(!(flags & SUPPRESS_MESSAGES))
+         send_to_char("You feel ready to mend your wounds once again.\n\r", ch);
+         break;
+      case SKILL_LEADERSHIP:
+         affect_from_char(ch, SKILL_LEADERSHIP_BONUS);
+         if(ch->followers) {
+           for(f = ch->followers; f; f = next_f) {
+             next_f = f->next;
+             affect_from_char(f->follower, SKILL_LEADERSHIP_BONUS);
+           }
+         }
+         if(!(flags & SUPPRESS_MESSAGES))
+           send_to_char("Your inspirational leadership has ended.\n\r", ch);
+         break;
+      case SKILL_MAKE_CAMP_TIMER:
+         if(!(flags & SUPPRESS_MESSAGES))
+           send_to_char("You feel ready to set up another camp.\n\r", ch);
+         break;
+      case SKILL_SMITE_TIMER:
+         if(!(flags & SUPPRESS_MESSAGES))
+           send_to_char("You feel ready to once again smite your opponents.\n\r", ch);
+         break;
+      case SKILL_PERSEVERANCE:
+        affect_from_char(ch, SKILL_PERSEVERANCE_BONUS);
+        break;
       default:
          break;
    }

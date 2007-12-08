@@ -14,7 +14,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.h,v 1.99 2007/12/08 16:16:36 dcastle Exp $ */
+/* $Id: spells.h,v 1.100 2007/12/08 16:48:09 dcastle Exp $ */
 #include <structs.h> // ubyte, int16
 
 #define MAX_BUF_LENGTH               240
@@ -214,7 +214,13 @@ void check_maxes(CHAR_DATA *ch);
 #define SPELL_MEND_GOLEM            160
 #define SPELL_CLARITY               161
 #define SPELL_DIVINE_INTER	    162
-#define MAX_SPL_LIST                162
+#define SPELL_WRATH_OF_GOD	    163
+#define SPELL_ATONEMENT             164
+#define SPELL_SILENCE               165
+#define SPELL_IMMUNITY              166
+#define SPELL_BONESHIELD            167
+#define SPELL_CHANNEL               168
+#define MAX_SPL_LIST                168
 
 // if you add a spell, make sure you update "spells[]" in spells.C
 
@@ -338,9 +344,21 @@ void check_maxes(CHAR_DATA *ch);
 #define SKILL_NAT_SELECT             390
 #define SKILL_CLANAREA_CLAIM         391
 #define SKILL_CLANAREA_CHALLENGE     392
-#define SKILL_PRIMAL_FURY            393
-#define SKILL_VIGOR		     394
-#define SKILL_MAX                    394
+#define SKILL_COMMUNE                393
+#define SKILL_SCRIBE_SCROLL          394
+#define SKILL_MAKE_CAMP              395
+#define SKILL_BATTLESENSE            396
+#define SKILL_PERSEVERANCE           397
+#define SKILL_TRIAGE                 398
+#define SKILL_SMITE                  399
+#define SKILL_LEADERSHIP             400
+#define SKILL_EXECUTE                401
+#define SKILL_DEFENDERS_STANCE       402
+#define SKILL_BEHEAD                 403
+#define SKILL_PRIMAL_FURY            404
+#define SKILL_VIGOR		     405
+#define SKILL_MAX                    405
+
 
 
 // if you add a skill, make sure you update "skills[]" in spells.C
@@ -499,6 +517,11 @@ void check_maxes(CHAR_DATA *ch);
 #define SPELL_NO_CAST_TIMER	     4003
 #define SKILL_CM_TIMER               4004
 #define OBJ_CHAMPFLAG_TIMER          4005
+#define SKILL_TRIAGE_TIMER           4006
+#define SKILL_SMITE_TIMER            4007
+#define SKILL_MAKE_CAMP_TIMER        4008
+#define SKILL_LEADERSHIP_BONUS       4009
+#define SKILL_PERSEVERANCE_BONUS     4010
 
 
 #define TAR_IGNORE         1

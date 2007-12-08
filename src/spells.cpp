@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.229 2007/12/08 16:17:46 dcastle Exp $ */
+/* $Id: spells.cpp,v 1.230 2007/12/08 16:48:03 dcastle Exp $ */
 
 extern "C"
 {
@@ -73,6 +73,7 @@ extern CHAR_DATA *character_list;
 extern struct song_info_type song_info[];
 extern struct ki_info_type ki_info[];
 extern char *spell_wear_off_msg[];
+extern struct index_data *obj_index;
 
 // Functions used in spells.C
 int spl_lvl(int lev);
@@ -421,7 +422,19 @@ struct spell_info_type spell_info [] =
 
  { /* 161 */ 12, POSITION_STANDING, 10, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_clarity, SKILL_INCREASE_MEDIUM },
 
- { /* 162 */ 12, POSITION_STUNNED, 200, TAR_CHAR_ROOM|TAR_SELF_DEFAULT|TAR_SELF_ONLY, cast_divine_intervention, SKILL_INCREASE_EASY }
+ { /* 162 */ 12, POSITION_STUNNED, 200, TAR_CHAR_ROOM|TAR_SELF_DEFAULT|TAR_SELF_ONLY, cast_divine_intervention, SKILL_INCREASE_EASY },
+
+ { /* 163 */ 16, POSITION_FIGHTING, 75, TAR_IGNORE, cast_wrath_of_god, SKILL_INCREASE_HARD },
+
+ { /* 164 */ 12, POSITION_FIGHTING, 100, TAR_CHAR_ROOM|TAR_SELF_DEFAULT|TAR_SELF_ONLY, cast_atonement, SKILL_INCREASE_EASY },
+
+ { /* 165 */ 16, POSITION_FIGHTING, 150, TAR_IGNORE, cast_silence, SKILL_INCREASE_HARD },
+
+ { /* 166 */ 12, POSITION_STANDING, 180, TAR_CHAR_ROOM|TAR_SELF_DEFAULT|TAR_SELF_ONLY, cast_immunity, SKILL_INCREASE_HARD },
+
+ { /* 167 */ 12, POSITION_STANDING, 150, TAR_CHAR_ROOM, cast_boneshield, SKILL_INCREASE_HARD },
+
+ { /* 168 */ 12, POSITION_FIGHTING, 100, TAR_CHAR_ROOM|TAR_SELF_NONO, cast_channel, SKILL_INCREASE_HARD }
 
 };
 
@@ -519,10 +532,21 @@ struct skill_stuff skill_info[] =
 /* 89 */{"enhanced regeneration", SKILL_INCREASE_HARD},
 /* 90 */             { "cripple", SKILL_INCREASE_HARD },
 /* 91 */   { "natural selection", SKILL_INCREASE_HARD },
-/* 92 */   { "clanarea_claim", 0},
-/* 93 */   { "clanarea_challenge", 0},
-/* 94 */   { "primal fury", SKILL_INCREASE_EASY},
-/* 95 */   { "vigor", SKILL_INCREASE_MEDIUM},
+/* 92 */         {  "ignoreclan", 0 },
+/* 93 */         { "ignoreclan2", 0 },
+/* 94 */             { "commune", SKILL_INCREASE_HARD },
+/* 95 */       { "scribe scroll", SKILL_INCREASE_HARD },
+/* 96 */           { "make camp", SKILL_INCREASE_HARD },
+/* 97 */         { "battlesense", SKILL_INCREASE_HARD },
+/* 98 */        { "perseverance", SKILL_INCREASE_HARD },
+/* 99 */              { "triage", SKILL_INCREASE_HARD },
+/* 100*/               { "smite", SKILL_INCREASE_HARD },
+/* 101*/          { "leadership", SKILL_INCREASE_HARD },
+/* 102*/             { "execute", SKILL_INCREASE_HARD },
+/* 103*/    { "defenders stance", SKILL_INCREASE_HARD },
+/* 104*/              { "behead", SKILL_INCREASE_HARD },
+/* 105 */   { "primal fury", SKILL_INCREASE_EASY},
+/* 106 */   { "vigor", SKILL_INCREASE_MEDIUM},
 
 /*    */                  { "\n", 0 },
 };
@@ -622,8 +646,19 @@ char *skills[]=
   "enhanced regeneration",
   "cripple",
   "natural selection",
-  "clanarea claim",
-  "clanarea challenge",
+  "ignoreclan",
+  "ignoreclan2",
+  "commune",
+  "scribe scroll",
+  "make camp",
+  "battlesense",
+  "perseverance",
+  "triage",
+  "smite",
+  "leadership",
+  "execute",
+  "defenders stance",
+  "behead",
   "primal fury",
   "vigor",
   "\n"
@@ -793,6 +828,12 @@ char *spells[]=
    "mend golem",
    "clarity",
    "divine intervention",
+   "wrath of god",
+   "atonement",
+   "silence",
+   "immunity",
+   "boneshield",
+   "channel",
    "\n"
 };
 
@@ -1327,8 +1368,8 @@ int do_release(CHAR_DATA *ch, char *argument, int cmd)
 	  send_to_char("You can release the following spells:\r\n",ch);
 	  printed=TRUE;
        }
-       if ( (spell_info[aff->type].targets & TAR_SELF_DEFAULT) || 
-             aff->type == SPELL_HOLY_AURA )
+       if ( ((spell_info[aff->type].targets & TAR_SELF_DEFAULT) || 
+             aff->type == SPELL_HOLY_AURA) && aff->type != SPELL_IMMUNITY)
        { // Spells that default to self seems a good measure of
 	 // allow to release spells..
          char * aff_name = get_skill_name(aff->type);
@@ -1519,7 +1560,11 @@ bool skill_success(CHAR_DATA *ch, CHAR_DATA *victim, int skillnum, int mod )
  if (!IS_NPC(ch)) debug_point();
     if (!IS_MOB(ch)) {
         i = learned = has_skill(ch, skillnum);
-        if(!learned) return FALSE;
+        if(affected_by_spell(ch, SKILL_DEFENDERS_STANCE) && skillnum == SKILL_DODGE) {
+          learned = affected_by_spell(ch, SKILL_DEFENDERS_STANCE)->modifier;
+send_to_char("got here", ch);
+}
+        else if(!learned) return FALSE;
     }
     else {
 	if (GET_LEVEL(ch) < 30) i = 30;
@@ -1587,6 +1632,13 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
     send_to_char("You seem unable to concentrate enough to cast any spells.\n\r", ch);
     return eFAILURE;
   }
+  
+  OBJ_DATA *tmp_obj;
+  for(tmp_obj = world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
+    if(obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER) {
+      send_to_char("The magical silence prevents you from casting!\n\r", ch);
+      return eFAILURE;
+    }
   
   if(IS_AFFECTED(ch, AFF_CHARM))
   {
@@ -1702,6 +1754,7 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
       bool ok_self = FALSE;
       int oldroom = 0;
       int dir = -1;
+      bool group_spell = FALSE;
       if (spl == SPELL_LIGHTNING_BOLT && has_skill(ch, SKILL_SPELLCRAFT))
       { // Oh the special cases of spellcraft.
 	 name[0] = '\0';
@@ -1786,18 +1839,51 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
 	 }
 	 spellcraft(ch, SPELL_LIGHTNING_BOLT);
       }
+      if(spl == SPELL_IMMUNITY) {
+        argument = skip_spaces(argument);
+
+        for(int i = 0;i<MAX_SPL_LIST;i++) {
+          if(!strcmp(spells[i], argument)) {
+            ok_self = TRUE;
+            tar_char = ch;
+            target_ok = TRUE;
+            argument = (char *)i;
+            break;
+          }
+        }
+        if(!target_ok) {
+          send_to_char("There is no such known spell in the realms to protect yourself against.\n\r", ch);
+          return eFAILURE;
+        }
+      }
       if (!target_ok && !IS_SET(spell_info[spl].targets, TAR_IGNORE)) 
       {
         argument = one_argument(argument, name);
 
         if (*name) 
         {
-          if (IS_SET(spell_info[spl].targets, TAR_CHAR_ROOM))
+          if (IS_SET(spell_info[spl].targets, TAR_CHAR_ROOM)) {
             if ( ( tar_char = get_char_room_vis(ch, name) ) != NULL )
               target_ok = TRUE;
+            if(!str_cmp(name, "group") && has_skill(ch, SKILL_COMMUNE)) {
+              if( (has_skill(ch, SKILL_COMMUNE) >= 90 && (spl == SPELL_PROTECT_FROM_EVIL || spl == SPELL_PROTECT_FROM_GOOD)) || 
+                  (has_skill(ch, SKILL_COMMUNE) >= 70 && (spl == SPELL_CURE_CRITIC || spl == SPELL_SANCTUARY || spl == SPELL_IRIDESCENT_AURA)) ||
+                  (has_skill(ch, SKILL_COMMUNE) >= 40 && (spl == SPELL_ARMOR || spl == SPELL_REFRESH || spl == SPELL_CURE_SERIOUS || spl == SPELL_BLESS || spl == SPELL_FLY)) || 
+                  (spl == SPELL_DETECT_INVISIBLE || spl == SPELL_DETECT_MAGIC || spl == SPELL_DETECT_POISON || spl == SPELL_CURE_LIGHT))
+              {
+                skill_increase_check(ch, SKILL_COMMUNE, has_skill(ch, SKILL_COMMUNE), SKILL_INCREASE_HARD);
+                target_ok = TRUE;
+                group_spell = TRUE;
+                tar_char = ch;
+              } else {
+                send_to_char("You cannot cast this spell on your entire group at once.\n\r", ch);
+                return eFAILURE;
+              }          
+            }
+          }
 
           if (!target_ok && IS_SET(spell_info[spl].targets, TAR_CHAR_WORLD))
-	{
+	  {
 		bool orig = ISSET(ch->affected_by, AFF_TRUE_SIGHT);
 		if (spl == SPELL_EAGLE_EYE)
 		  SETBIT(ch->affected_by, AFF_TRUE_SIGHT);
@@ -1805,7 +1891,7 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
               target_ok = TRUE;
 		if (!orig)
 		  REMBIT(ch->affected_by, AFF_TRUE_SIGHT);
-      }
+          }
           if (!target_ok && IS_SET(spell_info[spl].targets, TAR_OBJ_INV))
             if ( ( tar_obj = get_obj_in_list_vis(ch, name, ch->carrying)) != NULL )
               target_ok = TRUE;
@@ -1836,6 +1922,7 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
               tar_char = ch;
               target_ok = TRUE;
             }
+
         } else { // !*name No argument was typed 
     
           if (IS_SET(spell_info[spl].targets, TAR_FIGHT_SELF))
@@ -1997,7 +2084,29 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
 
         send_to_char("Ok.\n\r", ch);
 
-        GET_MANA(ch) -= (use_mana(ch, spl));
+        if(group_spell) {
+          CHAR_DATA *leader;
+          if(ch->master) leader = ch->master;
+          else leader = ch;
+
+          struct follow_type *k;
+          int counter = 0;
+
+          for(k = leader->followers; k; k = k->next)
+            if(k->follower->in_room == ch->in_room) 
+              counter++;
+          if(leader->in_room == ch->in_room) counter++;
+
+          counter = MIN(5, counter);
+          if(learned >= 80 && counter > 3) counter--;
+          if(learned >= 90 && counter > 3) counter--;
+          counter *= use_mana(ch, spl);
+          if(GET_MANA(ch) < counter) {
+            send_to_char("You do not have enough mana to cast this group spell.\n\r", ch);
+            return eFAILURE;
+          }
+          GET_MANA(ch) -= counter;
+        } else GET_MANA(ch) -= (use_mana(ch, spl));
         if (tar_char && !AWAKE(tar_char) && ch->in_room == tar_char->in_room && number(1,5) < 3)
             send_to_char("Your sleep is restless.\r\n",tar_char);
 	 skill_increase_check(ch, spl, learned,500+ spell_info[spl].difficulty);
@@ -2050,6 +2159,18 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
 		     return eSUCCESS;
 	           }
 	    }
+        }
+
+        if(group_spell) {
+           send_to_char("You utter a swift prayer to the gods to amplify your powers.\n\r", ch);
+           act("$n utters a swift prayer to the gods to amplify $s powers.", ch, 0, 0, TO_ROOM, 0);
+           strcpy(argument,"communegroupspell");
+        }
+        else if(tar_char && affected_by_spell(tar_char, SPELL_IMMUNITY) && affected_by_spell(tar_char, SPELL_IMMUNITY)->modifier == spl-1) {
+          act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_char, TO_VICT, 0);
+          act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_char, TO_CHAR, 0);
+          act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_char, TO_ROOM, NOTVICT);
+          return eSUCCESS;
         }
 
 	int retval = ((*spell_info[spl].spell_pointer) (GET_LEVEL(ch), ch, argument, SPELL_TYPE_SPELL, tar_char, tar_obj, learned));

@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.171 2007/08/12 18:08:19 jhhudso Exp $ */
+/* $Id: nanny.cpp,v 1.172 2007/12/08 16:48:03 dcastle Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -81,6 +81,8 @@ extern char motd[MAX_STRING_LENGTH];
 extern char imotd[MAX_STRING_LENGTH];
 extern CHAR_DATA *character_list;
 extern struct descriptor_data *descriptor_list;
+extern OBJ_DATA *object_list;
+extern struct index_data *obj_index;
 extern char *nonew_new_list[30];
 extern CWorld world;
 extern short bport;
@@ -373,6 +375,8 @@ void do_on_login_stuff(char_data * ch)
     else if(GET_LEVEL(ch) >=  IMMORTAL)  char_to_room( ch, real_room(17) );
     else                                 char_to_room( ch, real_room(START_ROOM) );
 
+    ch->curLeadBonus = 0;
+    ch->changeLeadBonus = FALSE;
     REMBIT(ch->affected_by, AFF_BLACKJACK_ALERT);
     for(int i=0;i<QUEST_MAX;i++) {
        ch->pcdata->quest_current[i] = 0;
@@ -1821,6 +1825,7 @@ void update_command_lag_and_poison()
    CHAR_DATA *i, *next_dude;
    int tmp, retval;
    char log_msg[MAX_STRING_LENGTH], dammsg[MAX_STRING_LENGTH];
+   struct affected_type af;
    
    for(i = character_list; i; i = next_dude) 
    {
@@ -1886,7 +1891,37 @@ world[i->in_room].sector_type == SECT_UNDERWATER && !(affected_by_spell(i, SPELL
       if(IS_AFFECTED(i, AFF_CMAST_WEAKEN)) REMBIT(i->affected_by, AFF_CMAST_WEAKEN);
       affect_from_char(i, SKILL_COMBAT_MASTERY);
 
+      //perseverance stuff
+      if(affected_by_spell(i, SKILL_PERSEVERANCE)) {
+        affect_from_char(i, SKILL_PERSEVERANCE_BONUS);
+        af.type = SKILL_PERSEVERANCE_BONUS;
+        af.duration = -1;
+        af.modifier = 0 - ( (2 + affected_by_spell(i, SKILL_PERSEVERANCE)->modifier / 10) *
+                            (1 + affected_by_spell(i, SKILL_PERSEVERANCE)->modifier / 11 -
+                                         affected_by_spell(i, SKILL_PERSEVERANCE)->duration ) );
+        af.location = APPLY_AC;
+        af.bitvector = -1;
+        affect_to_char(i, &af);
+
+        GET_MOVE(i) += 5 * (1 + affected_by_spell(i, SKILL_PERSEVERANCE)->modifier/11 - affected_by_spell(i, SKILL_PERSEVERANCE)->duration);
+        GET_MOVE(i) = MIN(GET_MOVE(i), GET_MAX_MOVE(i));
+      }
+
    }
+}
+
+void check_silence_beacons(void)
+{
+  OBJ_DATA *obj, *tmp_obj;
+
+  for(obj = object_list; obj; obj = tmp_obj) {
+    tmp_obj = obj->next;
+    if(obj_index[obj->item_number].virt == SILENCE_OBJ_NUMBER)
+      if(obj->obj_flags.value[0] == 0) extract_obj(obj);
+      else obj->obj_flags.value[0]--;
+  }
+
+  return;
 }
 
 /* check name to see if it is listed in the file of forbidden player names */

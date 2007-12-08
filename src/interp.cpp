@@ -16,7 +16,7 @@
 /* 12/08/2003   Onager   Added chop_half() to work like half_chop() but    */
 /*                       chopping off the last word.                       */
 /***************************************************************************/
-/* $Id: interp.cpp,v 1.141 2007/12/03 19:17:57 jhhudso Exp $ */
+/* $Id: interp.cpp,v 1.142 2007/12/08 16:48:02 dcastle Exp $ */
 
 extern "C"
 {
@@ -200,6 +200,7 @@ struct command_info cmd_info[] =
     { "unlock",		do_unlock,	POSITION_RESTING, 0, 9, COM_CHARMIE_OK, 25 },
     { "use",		do_use,		POSITION_RESTING, 0, 9, COM_CHARMIE_OK, 25 },
     { "wear",		do_wear,	POSITION_RESTING, 0, 9, COM_CHARMIE_OK, 25 },
+    { "scribe",		do_scribe,	POSITION_RESTING, 0, 9, 0, 0 },
     //  { "poisonmaking", do_poisonmaking, POSITION_RESTING, 0, 9,   0, 0 },
     
     // Combat commands
@@ -209,6 +210,10 @@ struct command_info cmd_info[] =
     { "flee",		do_flee,	POSITION_FIGHTING, 0, 28, COM_CHARMIE_OK, 0 }, 
     { "hit",		do_hit,		POSITION_FIGHTING, 0, 194, COM_CHARMIE_OK, 0 },
     { "join",		do_join,	POSITION_FIGHTING, 0, 9, COM_CHARMIE_OK, 0 },
+    { "battlesense",		do_battlesense,	POSITION_FIGHTING, 0, 9, 0, 0 },
+    { "stance",		do_defenders_stance,	POSITION_FIGHTING, 0, 9, 0, 0 },
+    { "perseverance",		do_perseverance,	POSITION_FIGHTING, 0, 9, 0, 0 },
+    { "smite",		do_smite,	POSITION_FIGHTING, 0, 9, 0, 0 },
 
 // Junk movedso join precedes it
     { "junk",		do_tap,		POSITION_RESTING, 0, 92, COM_CHARMIE_OK, 25 },
@@ -244,6 +249,9 @@ struct command_info cmd_info[] =
     { "deceit",		do_deceit,	POSITION_STANDING, 1, 9, 0, 0 },
     { "knockback",	do_knockback,	POSITION_FIGHTING, 1, 9, 0, 0 },
     { "appraise",	do_appraise,	POSITION_STANDING, 1, 9, 0, 1 },
+    { "make camp",		do_make_camp,	POSITION_RESTING, 0, 9, 0, 0 },
+    { "leadership",		do_leadership,	POSITION_RESTING, 0, 9, 0, 0 },
+    { "triage",		do_triage,	POSITION_RESTING, 0, 9, 0, 0 },
 
     // Position commands
     { "sit",	do_sit,		POSITION_RESTING, 0, 9, COM_CHARMIE_OK, 0 },
@@ -359,6 +367,8 @@ struct command_info cmd_info[] =
     { "stay",		do_not_here,	POSITION_STANDING, 0, 192, 0, 0 },
     { "select",		do_natural_selection, POSITION_RESTING, 0, 9, 0, 0},
     { "sector",		do_sector,	POSITION_RESTING, 0, 9, 0, 1 },
+    { "remort",		do_not_here,	POSITION_RESTING, 0, 80, 0, 1 },
+
      
     // Immortal commands
     { "thunder",	do_thunder,	POSITION_DEAD, IMP, 9, 0, 1 },

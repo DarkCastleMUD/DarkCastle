@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.80 2007/05/12 10:43:13 jhhudso Exp $ */
+/* $Id: utility.cpp,v 1.81 2007/12/08 16:48:03 dcastle Exp $ */
 
 extern "C"
 {
@@ -1255,6 +1255,9 @@ mob_index[fol->follower->mobdata->nr].virt == 8)
   affect_from_char(ch, SPELL_DIVINE_INTER);  //sloppy sloppy
   affect_from_char(ch, SPELL_NO_CAST_TIMER); //*sigh*
   affect_from_char(ch, SKILL_CM_TIMER);
+  affect_from_char(ch, SPELL_IMMUNITY);
+  affect_from_char(ch, SKILL_BATTLESENSE);
+  affect_from_char(ch, SKILL_SMITE);
 
   if(ch->beacon)
     extract_obj(ch->beacon);
@@ -1434,6 +1437,10 @@ int has_skill (CHAR_DATA *ch, int16 skill)
   struct char_skill_data * curr = ch->skills;
   struct obj_data *o;
   int bonus = 0;
+
+  if(affected_by_spell(ch, SKILL_DEFENDERS_STANCE) && skill == SKILL_DODGE)
+    return affected_by_spell(ch, SKILL_DEFENDERS_STANCE)->modifier;
+
   while(curr) {
     if(curr->skillnum == skill)
     {
@@ -1923,3 +1930,130 @@ void remove_familiars(char *name, BACKUP_TYPE backup)
   }
 
 }
+
+bool check_make_camp(int room)
+{
+  CHAR_DATA *i, *next_i;
+  bool campok = FALSE;
+
+  for(i = world[room].people; i; i = next_i) {
+    next_i = i->next_in_room;
+
+    if(i->fighting) return FALSE;
+    if(IS_MOB(i) && !(IS_AFFECTED(i, AFF_CHARM) || IS_AFFECTED(i, AFF_FAMILIAR)) ) return FALSE;
+    if(affected_by_spell(i, SKILL_MAKE_CAMP) && affected_by_spell(i, SKILL_MAKE_CAMP)->modifier == room)
+      campok = TRUE;
+  }
+
+  return campok;
+}
+
+int get_leadership_bonus(CHAR_DATA *ch)
+{
+  CHAR_DATA *leader;
+  struct follow_type *f, *next_f;
+  int highlevel = 0, bonus = 0;
+
+  if(ch->master) leader = ch->master;
+  else leader = ch;
+
+  if(!affected_by_spell(leader, SKILL_LEADERSHIP)) return 0;
+  if(IS_MOB(ch) || ch->in_room != leader->in_room) return 0;
+
+  if(affected_by_spell(ch, SKILL_LEADERSHIP) && ch->master)
+    affect_from_char(ch, SKILL_LEADERSHIP);
+
+  for(f = leader->followers; f; f = next_f) {
+    next_f = f->next;
+
+    if(highlevel < GET_LEVEL(f->follower))
+      highlevel = GET_LEVEL(f->follower);
+  }
+
+  for(f = leader->followers; f; f = next_f) {
+    next_f = f->next;
+
+    if(IS_MOB(f->follower)) continue;
+    if(leader->in_room != f->follower->in_room) continue;
+    if(GET_LEVEL(f->follower) + 25 <= highlevel) continue;
+    if(!IS_AFFECTED(f->follower, AFF_GROUP)) continue;
+
+    bonus++;
+  }
+
+  return MIN(bonus, affected_by_spell(leader, SKILL_LEADERSHIP)->modifier);
+}
+
+void update_make_camp_and_leadership(void)
+{
+  CHAR_DATA *i, *next_i;
+  struct affected_type af;
+  int bonus = 0;
+
+  for(i = character_list; i; i = next_i) {
+    next_i = i->next;
+
+    if(!i->fighting) {
+      if(affected_by_spell(i, SKILL_SMITE))
+        affect_from_char(i, SKILL_SMITE);
+
+      if(affected_by_spell(i, SKILL_PERSEVERANCE)) {
+        affect_from_char(i, SKILL_PERSEVERANCE);
+        affect_from_char(i, SKILL_PERSEVERANCE_BONUS);
+      }
+
+      if(affected_by_spell(i, SKILL_BATTLESENSE))
+        affect_from_char(i, SKILL_BATTLESENSE);
+    }
+
+    if(!check_make_camp(i->in_room)) {
+      if(affected_by_spell(i, SKILL_MAKE_CAMP)) {
+        affect_from_char(i, SKILL_MAKE_CAMP);
+        send_to_room("The camp has been disturbed.\n\r", i->in_room);
+      }
+      if(affected_by_spell(i, SPELL_FARSIGHT) && affected_by_spell(i, SPELL_FARSIGHT)->modifier == 111)
+        affect_from_char(i, SPELL_FARSIGHT);
+    } else {
+      if(!affected_by_spell(i, SPELL_FARSIGHT) && !IS_AFFECTED(i, AFF_FARSIGHT)) {
+        af.type = SPELL_FARSIGHT;
+        af.duration = -1;
+        af.modifier = 111;
+        af.location = 0;
+        af.bitvector = AFF_FARSIGHT;
+
+        affect_to_char(i, &af);
+      }
+    }
+
+    bonus = get_leadership_bonus(i);
+    
+    if(i->changeLeadBonus == TRUE) {
+      i->changeLeadBonus = FALSE;
+
+      if(i->curLeadBonus != bonus) {
+        i->curLeadBonus = bonus;
+        affect_from_char(i, SKILL_LEADERSHIP_BONUS);
+
+        if(i->curLeadBonus) {
+          af.type = SKILL_LEADERSHIP_BONUS;
+          af.duration = -1;
+          af.bitvector = -1;
+
+          if(affected_by_spell(i, SKILL_LEADERSHIP)) {
+            af.modifier = bonus * 2;
+            af.location = APPLY_HIT_N_DAM;
+            affect_to_char(i, &af);
+          } else {
+            af.modifier = bonus * -8;
+            af.location = APPLY_AC;
+            affect_to_char(i, &af);
+          }
+        }
+      }
+    }
+
+    if(i->curLeadBonus != bonus)
+      i->changeLeadBonus = TRUE;
+  }
+}
+

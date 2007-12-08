@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.118 2007/05/03 21:11:02 dcastle Exp $
+| $Id: guild.cpp,v 1.119 2007/12/08 16:48:01 dcastle Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -34,6 +34,7 @@ extern struct class_skill_defines u_skills[];
 extern struct class_skill_defines c_skills[];
 extern struct class_skill_defines m_skills[];
 extern struct index_data *mob_index;
+extern char * class_tree_name[11][3];
 
 int get_max(CHAR_DATA *ch, int skill);
 
@@ -534,6 +535,19 @@ int skills_guild(struct char_data *ch, char *arg, struct char_data *owner)
 	  return eSUCCESS;
       }
    }
+
+//if they have a class tree set, let them only practice skils within that class tree
+   if(IS_SET(ch->pcdata->toggles, PLR_CLS_TREE_A) && skilllist[skillnumber].group != 1) {
+     csendf(ch, "You may only practice within the %s profession.\n\r", class_tree_name[GET_CLASS(ch)-1][0]);
+     return eSUCCESS;
+   } else if(IS_SET(ch->pcdata->toggles, PLR_CLS_TREE_B) && skilllist[skillnumber].group != 2) {
+     csendf(ch, "You may only practice within the %s profession.\n\r", class_tree_name[GET_CLASS(ch)-1][1]);
+     return eSUCCESS;
+   } else if(IS_SET(ch->pcdata->toggles, PLR_CLS_TREE_C) && skilllist[skillnumber].group != 3) {
+     csendf(ch, "You may only practice within the %s profession.\n\r", class_tree_name[GET_CLASS(ch)-1][2]);
+     return eSUCCESS;
+   }
+
   }
   if (ch->pcdata->practices <= 0) {
     send_to_char("You do not seem to be able to practice now.\n\r", ch);
@@ -579,6 +593,14 @@ int skills_guild(struct char_data *ch, char *arg, struct char_data *owner)
 	return eFAILURE;
       default: break;
   }
+
+  if(!IS_SET(ch->pcdata->toggles, PLR_CLS_TREE_A) && !IS_SET(ch->pcdata->toggles, PLR_CLS_TREE_B) && !IS_SET(ch->pcdata->toggles, PLR_CLS_TREE_C)) {
+    if(skilllist[skillnumber].group) {
+      SET_BIT(ch->pcdata->toggles, PLR_CLS_TREE_A + skilllist[skillnumber].group - 1);
+      csendf(ch, "You have chosen the %s profession for your class.\n\r", class_tree_name[GET_CLASS(ch)-1][skilllist[skillnumber].group-1]);
+    }
+  }
+
    if (!known)
   switch (GET_CLASS(ch))
   {
@@ -616,6 +638,7 @@ int skills_guild(struct char_data *ch, char *arg, struct char_data *owner)
      do_say(owner, "Nature be with you, young druid.  I can teach you the ability you seek myself if you are willing.",9);
 	break;
   }
+
   send_to_char("You practice for a while...\n\r", ch);
   ch->pcdata->practices--;
 
@@ -709,7 +732,46 @@ int guild(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     }
     return eSUCCESS;
   }
-  
+
+  if(cmd == 80) {  // remort crap
+    int groupnumber;
+
+    if(IS_SET(ch->pcdata->toggles, PLR_CLS_TREE_A)) {
+      REMOVE_BIT(ch->pcdata->toggles, PLR_CLS_TREE_A);
+      groupnumber = 1;
+    } else if(IS_SET(ch->pcdata->toggles, PLR_CLS_TREE_B)) {
+      REMOVE_BIT(ch->pcdata->toggles, PLR_CLS_TREE_B);
+      groupnumber = 2;
+    } else if(IS_SET(ch->pcdata->toggles, PLR_CLS_TREE_C)) {
+      REMOVE_BIT(ch->pcdata->toggles, PLR_CLS_TREE_C);
+      groupnumber = 3;
+    } else {
+      send_to_char("You have not even chosen a profession out of which to remort!\n\r", ch);
+      return eSUCCESS;
+    }
+
+    send_to_char("Your profession skills have been reset.\n\r", ch);
+    struct class_skill_defines * skilllist = get_skill_list(ch);
+    struct char_skill_data * skill;
+
+    for(int i = 0; *skilllist[i].skillname != '\n'; i++) 
+      if(skilllist[i].group == groupnumber) {
+        skill = ch->skills;
+        while(skill) {
+          if(skill->skillnum == skilllist[i].skillnum)
+            skill->learned = 0;
+          skill = skill->next;
+        }
+      }
+
+    send_to_char("You have remorted back to level 50.\n\r", ch);
+    if(GET_LEVEL(ch) <= MAX_MORTAL) GET_LEVEL(ch) = 50;
+    SET_BIT(ch->pcdata->toggles, PLR_REMORTED);
+
+    do_save(ch,"",666);
+    return eSUCCESS;
+  }  
+
   if((cmd != 164)) 
    return eFAILURE;
   
@@ -940,6 +1002,9 @@ if (ch->in_room && IS_SET(world[ch->in_room].room_flags, NOLEARN))
    if( ! ( learned = has_skill(ch, skill) ) )
       return; // get out if i don't have the skill
 
+   if(skill == SKILL_DODGE && affected_by_spell(ch, SKILL_DEFENDERS_STANCE))
+     return;
+
    if(learned >= ( GET_LEVEL(ch) * 2 ))
       return;
 
@@ -971,6 +1036,7 @@ if (ch->in_room && IS_SET(world[ch->in_room].room_flags, NOLEARN))
    }
    if (!maximum) return;
    float percent = maximum*0.75;
+
    if (skilllist[i].attrs)
 	percent += maximum/100.0 * get_stat_bonus(ch,skilllist[i].attrs);
 	
@@ -1102,7 +1168,6 @@ void check_maxes(CHAR_DATA *ch)
    for(i = 0; *skilllist[i].skillname != '\n'; i++)
      {
        maximum = skilllist[i].maximum;
-
        float percent = maximum*0.75;
        if (skilllist[i].attrs)
             percent += maximum/100.0 * get_stat_bonus(ch,skilllist[i].attrs);
