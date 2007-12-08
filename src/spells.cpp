@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.228 2007/12/04 09:49:59 dcastle Exp $ */
+/* $Id: spells.cpp,v 1.229 2007/12/08 16:17:46 dcastle Exp $ */
 
 extern "C"
 {
@@ -522,6 +522,7 @@ struct skill_stuff skill_info[] =
 /* 92 */   { "clanarea_claim", 0},
 /* 93 */   { "clanarea_challenge", 0},
 /* 94 */   { "primal fury", SKILL_INCREASE_EASY},
+/* 95 */   { "vigor", SKILL_INCREASE_MEDIUM},
 
 /*    */                  { "\n", 0 },
 };
@@ -624,6 +625,7 @@ char *skills[]=
   "clanarea claim",
   "clanarea challenge",
   "primal fury",
+  "vigor",
   "\n"
 };
 

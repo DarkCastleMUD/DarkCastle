@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.h,v 1.28 2007/12/08 15:54:29 dcastle Exp $ */
+/* $Id: handler.h,v 1.29 2007/12/08 16:16:57 dcastle Exp $ */
 
 #ifndef HANDLER_H_
 #define HANDLER_H_
@@ -140,5 +140,8 @@ class ErrorHandler {
 void produce_coredump(void);
 
 bool objExists(OBJ_DATA *obj);
+bool charge_moves(char_data *ch, int amt, int skill);
+
 
 #endif
+
