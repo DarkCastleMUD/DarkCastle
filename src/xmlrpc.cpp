@@ -73,6 +73,12 @@ public:
 
     std::string& contents = params[2];
 
+    // Remove \r characters from web input
+    unsigned int index = 0;
+    while((index = contents.find('\r', index)) != string::npos) {
+	contents.erase(index, 1);
+    }
+
     if (IS_PC(ch) && GET_LEVEL(ch) >= IMMORTAL && ch->desc->strnew) {
       switch(ch->desc->web_connected) {
       case CON_EDIT_MPROG:
@@ -97,7 +103,14 @@ public:
 	  ch->desc->strnew = 0;
 	  send_to_char("Entry submitted.\n\r", ch);
 	} else {
-	  result = *(ch->desc->strnew);
+	  string str_result = *(ch->desc->strnew);
+
+	  // Remove \r characters before sending this to the web form
+	  index = 0;
+	  while((index = str_result.find('\r', index)) != string::npos) {
+	      str_result.erase(index, 1);
+	  }
+	  result = str_result.c_str();
 	}
 	break;
       default:
