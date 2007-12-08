@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.86 2007/12/03 19:54:46 dcastle Exp $
+| $Id: move.cpp,v 1.87 2007/12/08 16:18:01 dcastle Exp $
 | move.C
 | Movement commands and stuff.
 *************************************************************************
@@ -615,6 +615,10 @@ int do_simple_move(CHAR_DATA *ch, int cmd, int following)
     IS_SET(zone_table[world[world[ch->in_room].dir_option[cmd]->to_room].zone].zone_flags, ZONE_IS_TOWN))
     return eFAILURE;
 
+  int a = 0;
+  if ((a = has_skill(ch, SKILL_VIGOR)) && number(1,101) < a / 10)
+    need_movement /= 2; // No skill improvement here. Too easy.
+   
   if(GET_MOVE(ch) < need_movement && !IS_NPC(ch)) {
     if(!following)
       send_to_char("You are too exhausted.\n\r",ch);
