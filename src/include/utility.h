@@ -16,7 +16,7 @@
  *  10/21/2003   Onager    Changed IS_ANONYMOUS() to handle mobs without   *
  *                         crashing                                        *
  ***************************************************************************/
-/* $Id: utility.h,v 1.66 2007/05/12 10:43:13 jhhudso Exp $ */
+/* $Id: utility.h,v 1.67 2007/12/08 16:16:24 dcastle Exp $ */
 
 #ifndef UTILITY_H_
 #define UTILITY_H_
@@ -280,7 +280,7 @@ inline const short IS_ANONYMOUS(CHAR_DATA *ch)
 
 #define CAN_WEAR(obj, part) (IS_SET((obj)->obj_flags.wear_flags,part))
 
-#define CAN_CARRY_W(ch) (str_app[STRENGTH_APPLY_INDEX(ch)].carry_w)
+#define CAN_CARRY_W(ch) (str_app[STRENGTH_APPLY_INDEX(ch)].carry_w + has_skill(ch, SKILL_VIGOR))
 #define CAN_CARRY_N(ch) (5+GET_DEX(ch))
 #define IS_CARRYING_W(ch) ((ch)->carry_weight)
 #define IS_CARRYING_N(ch) ((ch)->carry_items)
