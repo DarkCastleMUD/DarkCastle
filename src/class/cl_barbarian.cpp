@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_barbarian.cpp,v 1.81 2007/12/08 15:55:02 dcastle Exp $
+| $Id: cl_barbarian.cpp,v 1.82 2007/12/08 16:17:20 dcastle Exp $
 | cl_barbarian.C
 | Description:  Commands for the barbarian class.
 */
@@ -822,11 +822,8 @@ int do_primalfury(CHAR_DATA *ch, char *argument, int cmd)
     send_to_char("You must be in combat in order to use this ability.\r\n",ch);
     return eSUCCESS;
   }
-  if (GET_MOVE(ch) < 40)
-  {
-     send_to_char("You do not have enough movement to do this!\r\n",ch);
-     return eSUCCESS;
-  }
+  if (!charge_moves(ch, 40, SKILL_PRIMAL_FURY)) return eSUCCESS;
+
   if (GET_RAW_STR(ch) < 16)
   {
      send_to_char("You do not possess sufficient strength to attempt this feat.\r\n",ch);
