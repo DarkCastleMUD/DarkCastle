@@ -16,7 +16,7 @@
 /* 12/08/2003   Onager   Added chop_half() to work like half_chop() but    */
 /*                       chopping off the last word.                       */
 /***************************************************************************/
-/* $Id: interp.cpp,v 1.142 2007/12/08 16:48:02 dcastle Exp $ */
+/* $Id: interp.cpp,v 1.143 2007/12/09 12:41:49 dcastle Exp $ */
 
 extern "C"
 {
@@ -239,6 +239,7 @@ struct command_info cmd_info[] =
     { "layhands",	do_layhands,	POSITION_FIGHTING, 1, 9, 0, 0 },
     { "harmtouch",	do_harmtouch,	POSITION_FIGHTING, 1, 9, 0, 0 },
     { "bloodfury",	do_bloodfury,	POSITION_FIGHTING, 1, 9, 0, 0 },
+    { "primalfury",	do_primalfury,	POSITION_FIGHTING, 1, 9, 0, 0 },
     { "bladeshield",	do_bladeshield,	POSITION_FIGHTING, 1, 9, 0, 0 },
     { "repelance",	do_focused_repelance,	POSITION_FIGHTING, 1, 9, 0, 0 },
     { "vitalstrike",	do_vitalstrike,	POSITION_FIGHTING, 1, 9, 0, 0 },
@@ -367,7 +368,7 @@ struct command_info cmd_info[] =
     { "stay",		do_not_here,	POSITION_STANDING, 0, 192, 0, 0 },
     { "select",		do_natural_selection, POSITION_RESTING, 0, 9, 0, 0},
     { "sector",		do_sector,	POSITION_RESTING, 0, 9, 0, 1 },
-    { "remort",		do_not_here,	POSITION_RESTING, 0, 80, 0, 1 },
+    { "remort",		do_not_here,	POSITION_RESTING, IMP, 80, 0, 1 },
 
      
     // Immortal commands
@@ -688,6 +689,11 @@ int command_interpreter( CHAR_DATA *ch, char *pcomm, bool procced  )
     send_to_char( "You've been frozen by an immortal.\r\n", ch );
     return eSUCCESS;
     }
+  if (IS_AFFECTED(ch, AFF_PRIMAL_FURY))
+  {
+     send_to_char("SOMEMESSAGE\r\n",ch);
+     return eSUCCESS;
+  }
 
   // Berserk checks
   if (IS_SET(ch->combat, COMBAT_BERSERK)) {
