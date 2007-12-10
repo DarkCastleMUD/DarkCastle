@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.97 2007/06/12 03:28:44 dcastle Exp $
+| $Id: inventory.cpp,v 1.98 2007/12/10 03:34:41 jhhudso Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -329,12 +329,12 @@ int do_get(struct char_data *ch, char *argument, int cmd)
     }
 
     if((cmd == 10) && (GET_CLASS(ch) != CLASS_THIEF) &&
-      (GET_LEVEL(ch) <= MORTAL)) {
+      (GET_LEVEL(ch) < IMMORTAL)) {
       send_to_char("I bet you think you're a thief.\n\r", ch);
       return eFAILURE; 
     }
 
-    if(cmd == 10 && type != 2 && type != 6) {
+    if(cmd == 10 && type != 2 && type != 6 && type != 0) {
       send_to_char("You can only palm objects that are in the same room, "
                    "one at a time.\n\r", ch);
       return eFAILURE; 
@@ -1735,9 +1735,10 @@ int do_open(CHAR_DATA *ch, char *argument, int cmd)
          
    argument_interpreter(argument, type, dir);
             
-   if (!*type)
+   if (!*type) {
       send_to_char("Open what?\n\r", ch);
-   else if ((door = find_door(ch, type, dir)) >= 0)
+      return eFAILURE;
+   } else if ((door = find_door(ch, type, dir)) >= 0)
    { 
      found = true;
       if (!IS_SET(EXIT(ch, door)->exit_info, EX_ISDOOR))
@@ -1854,9 +1855,10 @@ int do_close(CHAR_DATA *ch, char *argument, int cmd)
     
    argument_interpreter(argument, type, dir);
     
-   if (!*type)
+   if (!*type) {
       send_to_char("Close what?\n\r", ch);
-   else if ((door = find_door(ch, type, dir)) >= 0)
+      return eFAILURE;
+   } else if ((door = find_door(ch, type, dir)) >= 0)
    {    
      found = true;
       if (!IS_SET(EXIT(ch, door)->exit_info, EX_ISDOOR))
@@ -1941,9 +1943,10 @@ int do_lock(CHAR_DATA *ch, char *argument, int cmd)
     
     argument_interpreter(argument, type, dir);
     
-    if (!*type)
+    if (!*type) {
         send_to_char("Lock what?\n\r", ch);
-    else if (generic_find(argument, FIND_OBJ_INV | FIND_OBJ_ROOM,
+	return eFAILURE;
+    } else if (generic_find(argument, FIND_OBJ_INV | FIND_OBJ_ROOM,
         ch, &victim, &obj))
     {    
         /* ths is an object */
@@ -2009,9 +2012,10 @@ int do_unlock(CHAR_DATA *ch, char *argument, int cmd)
     
     argument_interpreter(argument, type, dir);
     
-    if (!*type)
+    if (!*type) {
         send_to_char("Unlock what?\n\r", ch);
-    else if (generic_find(argument, FIND_OBJ_INV | FIND_OBJ_ROOM,
+	return eFAILURE;
+    } else if (generic_find(argument, FIND_OBJ_INV | FIND_OBJ_ROOM,
         ch, &victim, &obj))
     {
         /* ths is an object */
