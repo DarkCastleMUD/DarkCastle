@@ -1,7 +1,7 @@
 import glob
 
 env = Environment()
-env.Append(CCFLAGS = '-ggdb2 -Wall -Wno-write-strings -m32 -DUSE_SQL')
+env.Append(CCFLAGS = '-ggdb2 -Wall -Wno-write-strings -m32')
 env.Append(LINKFLAGS = '-ggdb2 -Wall -Wno-write-strings -m32')
 
 base_src = glob.glob('*.cpp')
