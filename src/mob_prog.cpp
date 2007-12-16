@@ -1307,6 +1307,80 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
 	}
     }
 
+  if ( !str_cmp( buf, "isneutral" ) )
+  {
+      if (fvict)
+	  return IS_NEUTRAL(fvict);
+      if (ye)
+	  return FALSE;
+
+      switch ( arg[1] )  /* arg should be "$*" so just get the letter */
+      {
+	  case 'i':
+	      return IS_NEUTRAL( mob );
+	  case 'z':
+	      if (mob->beacon)
+		  return IS_NEUTRAL(((CHAR_DATA*)mob->beacon));
+	      else
+		  return -1;
+	  case 'n':
+	      if ( actor )
+		  return IS_NEUTRAL( actor );
+	      else
+		  return -1;
+	  case 't':
+	      if ( vict )
+		  return IS_NEUTRAL( vict );
+	      else
+		  return -1;
+	  case 'r':
+	      if ( rndm )
+		  return IS_NEUTRAL( rndm );
+	      else
+		  return -1;
+	  default:
+	      logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'isgood'", mob_index[mob->mobdata->nr].virt ); 
+	      return -1;
+      }
+  }
+
+  if ( !str_cmp( buf, "isevil" ) )
+  {
+      if (fvict)
+	  return IS_EVIL(fvict);
+      if (ye)
+	  return FALSE;
+      
+      switch ( arg[1] )  /* arg should be "$*" so just get the letter */
+      {
+	  case 'i':
+	      return IS_EVIL( mob );
+	  case 'z':
+	      if (mob->beacon)
+		  return IS_EVIL(((CHAR_DATA*)mob->beacon));
+	      else
+		  return -1;
+	  case 'n':
+	      if ( actor )
+		  return IS_EVIL( actor );
+	      else
+		  return -1;
+	  case 't':
+	      if ( vict )
+		  return IS_EVIL( vict );
+	      else
+		  return -1;
+	  case 'r':
+	      if ( rndm )
+		  return IS_EVIL( rndm );
+	      else
+		  return -1;
+	  default:
+	      logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'isgood'", mob_index[mob->mobdata->nr].virt ); 
+	      return -1;
+      }
+  }
+
   if ( !str_cmp( buf, "isworn" ) )
     {
         OBJ_DATA *o;
