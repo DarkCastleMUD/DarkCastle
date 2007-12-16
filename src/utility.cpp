@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.81 2007/12/08 16:48:03 dcastle Exp $ */
+/* $Id: utility.cpp,v 1.82 2007/12/16 23:11:16 jhhudso Exp $ */
 
 extern "C"
 {
@@ -85,6 +85,43 @@ struct timer_data *timer_list = NULL;
 // funcs
 void update_wizlist(CHAR_DATA *ch);
 
+
+size_t nocolor_strlen(const char *s)
+{
+    if (!s) {
+	return 0;
+    }
+
+    size_t len = 0;
+
+    while (*s != '\0') {
+	if (*s == '$') {
+	    s++;
+	    if ((*s <= '9' && *s >= '0') ||
+		*s == 'I' ||
+		*s == 'L' || 
+		*s == '*' ||
+		*s == 'R' ||
+		*s == 'B')
+	    {
+		// Do nothing
+	    } else if (*s == '$') {
+		len++;
+	    } else if (*s == '\0') {
+		len++;
+		break;
+	    } else {
+		len+=2;
+	    }
+	    s++;
+	} else {
+	    len++;
+	    s++;
+	}
+    }
+
+    return len;
+}
 
 // duplicate a string with it's own memory
 char *str_dup( const char *str )
@@ -1472,6 +1509,8 @@ char * get_skill_name(int skillnum)
     extern char *songs[];
     extern char *ki[];
     extern char *innate_skills[];
+    extern char *reserved[];
+
     if(skillnum >= SKILL_SONG_BASE && skillnum <= SKILL_SONG_MAX)
        return songs[skillnum-SKILL_SONG_BASE];
     else if(skillnum >= SKILL_BASE && skillnum <= SKILL_MAX)
@@ -1484,6 +1523,8 @@ char * get_skill_name(int skillnum)
        return innate_skills[skillnum-SKILL_INNATE_BASE];
     else if (skillnum >= BASE_SETS && skillnum <= SET_MAX)
 	return set_list[skillnum-BASE_SETS].SetName;
+    else if (skillnum >= RESERVED_BASE && skillnum <= RESERVED_MAX)
+	return reserved[skillnum-RESERVED_BASE];
    return NULL;      
 }
 
