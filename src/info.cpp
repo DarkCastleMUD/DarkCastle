@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.154 2007/12/08 16:48:01 dcastle Exp $ */
+/* $Id: info.cpp,v 1.155 2007/12/16 22:05:04 jhhudso Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -1555,18 +1555,6 @@ int do_score(struct char_data *ch, char *argument, int cmd)
 	     if (strcmp(apply_types[(int)aff->location], "HITROLL"))
                aff_name = "crazed assault reuse timer";
              break;
-           case SPELL_HOLY_AURA_TIMER:
-             aff_name = "holy aura timer";
-             break;
-           case SPELL_NAT_SELECT_TIMER:
-             aff_name = "natural select timer";
-             break;
-           case SPELL_DIV_INT_TIMER:
-             aff_name = "divine intervention timer";
-             break;
-           case SPELL_NO_CAST_TIMER:
-             aff_name = "cannot cast timer";
-             break;
            case SPELL_IMMUNITY:
              aff_name = "immunity";
              modifyOutput = TRUE;
@@ -1574,15 +1562,6 @@ int do_score(struct char_data *ch, char *argument, int cmd)
            case SKILL_NAT_SELECT:
              aff_name = "natural selection";
              modifyOutput = TRUE;
-             break;
-           case SKILL_MAKE_CAMP_TIMER:
-             aff_name = "make camp timer";
-             break;
-           case SKILL_SMITE_TIMER:
-             aff_name = "smite timer";
-             break;
-           case SKILL_LEADERSHIP_BONUS:
-             aff_name = "leadership bonus";
              break;
            default: break;
          }

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.57 2007/05/14 14:31:35 dcastle Exp $
+| $Id: wizard.cpp,v 1.58 2007/12/16 22:05:03 jhhudso Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -818,9 +818,10 @@ void mob_stat(struct char_data *ch, struct char_data *k)
            aff_name = "Internal Sleeping";
          else if(aff->type == FUCK_CANTQUIT)
            aff_name = "CANT_QUIT";
-         else aff_name = "Unknown!!!";
+         else
+	     aff_name = "Unknown!!!";
       }
-      sprintf(buf, "Spell : '%s'\n\r", aff_name);
+      sprintf(buf, "Spell : '%s' (%d)\n\r", aff_name, aff->type);
       send_to_char(buf, ch);
       sprintf(buf,"     Modifies %s by %d points\n\r",
               apply_types[(int) aff->location], aff->modifier);

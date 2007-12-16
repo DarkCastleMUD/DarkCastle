@@ -14,7 +14,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.h,v 1.100 2007/12/08 16:48:09 dcastle Exp $ */
+/* $Id: spells.h,v 1.101 2007/12/16 22:05:03 jhhudso Exp $ */
 #include <structs.h> // ubyte, int16
 
 #define MAX_BUF_LENGTH               240
@@ -509,8 +509,11 @@ void check_maxes(CHAR_DATA *ch);
 // NOTE  "skill" numbers 1500-1599 are reserved for innate skill abilities
 // These are in innate.h
 
-
-// NOTE 'spell' wear off timers are here.  Reserved messages 4000-4999
+//////////////////////////////////////////////////////////////////////
+// NOTE 'spell' wear off timers are here.  Reserved messages 4000-4099
+// If you change this, update reserved[] in const.cpp
+//////////////////////////////////////////////////////////////////////
+#define RESERVED_BASE                4000
 #define SPELL_HOLY_AURA_TIMER        4000
 #define SPELL_NAT_SELECT_TIMER       4001
 #define SPELL_DIV_INT_TIMER	     4002
@@ -522,7 +525,8 @@ void check_maxes(CHAR_DATA *ch);
 #define SKILL_MAKE_CAMP_TIMER        4008
 #define SKILL_LEADERSHIP_BONUS       4009
 #define SKILL_PERSEVERANCE_BONUS     4010
-
+#define RESERVED_MAX                 4010
+///////////////////////////////////////////////////////////////////////
 
 #define TAR_IGNORE         1
 #define TAR_CHAR_ROOM      1<<1

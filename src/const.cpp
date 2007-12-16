@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.254 2007/12/08 16:52:42 dcastle Exp $ */
+/* $Id: const.cpp,v 1.255 2007/12/16 22:05:04 jhhudso Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -2457,4 +2457,18 @@ struct mob_matrix_data mob_matrix[] =
 /*108 */{10500000,28000, 68, 98, -650, 7000000},
 /*109 */{10750000,29000, 69, 99, -675, 7250000},
 /*110 */{11000000,30000, 70,100, -700, 7500000}
+};
+
+char *reserved[] = {
+    "holy aura timer",
+    "natural select timer",
+    "divine intervention timer",
+    "cannot cast timer",
+    "combat mastery timer",
+    "champion flag timer",
+    "triage timer",
+    "smite timer",
+    "make camp timer",
+    "leadership bonus",
+    "perseverance bonus"
 };
