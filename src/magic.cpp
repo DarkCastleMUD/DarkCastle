@@ -397,6 +397,11 @@ int spell_souldrain(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
    mana = dam_percent(skill,125);
    if(mana > GET_MANA(victim))
    mana = GET_MANA(victim);
+   if (mana <= 0)
+  {
+    send_to_char("There isn't enough magical energy to be drained.\r\n",ch);
+    return eFAILURE;
+  }
    if (number(1,101) < get_saves(victim, SAVE_TYPE_MAGIC)+40)
 
    {
