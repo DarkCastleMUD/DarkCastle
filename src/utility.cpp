@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.83 2007/12/24 01:58:59 jhhudso Exp $ */
+/* $Id: utility.cpp,v 1.84 2007/12/24 03:54:13 jhhudso Exp $ */
 
 extern "C"
 {
@@ -1130,7 +1130,7 @@ int do_recall( CHAR_DATA *ch, char *argument, int cmd )
     return eFAILURE|eINTERNAL_ERROR;
   }
 
-  if(IS_SET(world[location].room_flags, CLAN_ROOM) && IS_AFFECTED(victim, AFF_CHAMPION)) {
+  if((IS_SET(world[location].room_flags, CLAN_ROOM) || location == real_room(2354) || location == real_room(2355)) && IS_AFFECTED(victim, AFF_CHAMPION)) {
      send_to_char("No recalling into a clan hall whilst Champion, go to the Tavern!.\n\r", victim);
      location = real_room(START_ROOM);
   }
