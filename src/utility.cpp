@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.82 2007/12/16 23:11:16 jhhudso Exp $ */
+/* $Id: utility.cpp,v 1.83 2007/12/24 01:58:59 jhhudso Exp $ */
 
 extern "C"
 {
@@ -608,6 +608,13 @@ void util_unarchive(char *char_name, CHAR_DATA *caller)
 
 bool ARE_CLANNED( struct char_data *sub, struct char_data *obj)
 {
+    if (IS_PC(sub) &&
+	IS_MOB(obj) &&
+	obj->master &&
+	ARE_CLANNED(sub, obj->master) &&
+	(IS_AFFECTED(obj, AFF_CHARM) || IS_AFFECTED(obj, AFF_FAMILIAR)))
+	return TRUE;
+
    // make sure we're clanned, and the person we're looking at is in same clan
    // (have to check if we're clanned, cause otherwise two non-clanned people
    // would count as being in "same clan")

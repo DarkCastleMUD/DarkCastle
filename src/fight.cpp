@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.472 2007/12/08 16:48:01 dcastle Exp $               *
+ * $Id: fight.cpp,v 1.473 2007/12/24 01:58:58 jhhudso Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -73,7 +73,6 @@ extern CWorld world;
 extern struct index_data *mob_index;
 extern struct index_data *obj_index;
 extern struct zone_data *zone_table;
-struct clan_data * get_clan(struct char_data *);
 
 /* functions that nobody else should be calling */
 void save_corpses(void); 
@@ -246,7 +245,7 @@ void perform_violence(void)
         {
           if(MOB_WAIT_STATE(ch) > 0) {
            // sprintf(debug, "DEBUG: Mob: %s (Lag: %d)", GET_SHORT(ch), MOB_WAIT_STATE(ch));
-//            MOB_WAIT_STATE(ch) -= PULSE_VIOLENCE; // MIKE
+           // MOB_WAIT_STATE(ch) -= PULSE_VIOLENCE; // MIKE
            // log(debug, OVERSEER, LOG_BUG);
 	  } else {
             ;
@@ -254,27 +253,28 @@ void perform_violence(void)
         }
       } // if is_mob
 
-// DEBUG CODE
+      // DEBUG CODE
       if(last_class != GET_CLASS(ch)) {
          // if this happened, most likely the mob died somehow during the proc and didn't return eCH_DIED and is
          // now invalid memory.  report what class we were and return
          logf(IMP, LOG_BUG, "Crash bug!!!!  fight.cpp last_class changed (%d) Mob=%d", last_class, last_virt);
          break;
       }
-// DEBUG CODE
+      // DEBUG CODE
 
       retval = attack(ch, ch->fighting, TYPE_UNDEFINED);
 
       if(SOMEONE_DIED(retval)) // no point in going anymore
         continue;
 
-/*	      if(ch->equipment[WIELD]) {
-        if(obj_index[ch->equipment[WIELD]->item_number].combat_func) {
-          retval = ((*obj_index[ch->equipment[WIELD]->item_number].combat_func)
-                     (ch, ch->equipment[WIELD], 0, "", ch));
-          if(SOMEONE_DIED(retval))
-            continue;
+/*	if (ch->equipment[WIELD]) {
+        if (obj_index[ch->equipment[WIELD]->item_number].combat_func) {
+	   retval = ((*obj_index[ch->equipment[WIELD]->item_number].combat_func)
+	             (ch, ch->equipment[WIELD], 0, "", ch));
+	   if (SOMEONE_DIED(retval))
+	      continue;
         }
+
         if(ch->equipment[SECOND_WIELD]) {
           if(obj_index[ch->equipment[SECOND_WIELD]->item_number].combat_func) {
             retval = ((*obj_index[ch->equipment[SECOND_WIELD]->item_number].combat_func)
@@ -5635,8 +5635,8 @@ void arena_kill(CHAR_DATA *ch, CHAR_DATA *victim, int type)
   char killer_message[MAX_STRING_LENGTH];
 //  CHAR_DATA *i;
   CHAR_DATA * tmp = NULL;
-  struct clan_data * clan = NULL;
-  struct clan_data * clan2 = NULL;
+  struct clan_data * ch_clan = NULL;
+  struct clan_data * victim_clan = NULL;
   int eliminated = 1;
   void move_player_home(CHAR_DATA *victim);
   
@@ -5665,23 +5665,24 @@ void arena_kill(CHAR_DATA *ch, CHAR_DATA *victim, int type)
     affect_remove(victim, victim->affected, SUPPRESS_ALL);  
   if(ch && arena.type == CHAOS)
   {
-    if(ch && ch->clan && GET_LEVEL(ch) < IMMORTAL)        clan  = get_clan(ch);
-    if(victim->clan && GET_LEVEL(victim) < IMMORTAL)      clan2 = get_clan(victim);  
+    if(ch && ch->clan && GET_LEVEL(ch) < IMMORTAL)
+	ch_clan  = get_clan(ch);
+    if(victim->clan && GET_LEVEL(victim) < IMMORTAL)
+	victim_clan = get_clan(victim);  
+
     if (type == KILL_BINGO) {
       sprintf(killer_message, "\n\r## %s [%s] just BINGOED %s [%s] in the arena!\n\r", 
-	      ((IS_NPC(ch) && ch->master) ? GET_NAME(ch->master) : GET_NAME(ch)),
-	      clan ? clan->name : "no clan", 
-	      GET_NAME(victim), clan2 ? clan2->name : "no clan");
+	      ((IS_NPC(ch) && ch->master) ? GET_NAME(ch->master) : GET_NAME(ch)), get_clan_name(ch_clan), 
+	      GET_NAME(victim), get_clan_name(victim_clan));
     } else {
       sprintf(killer_message, "\n\r## %s [%s] just SLAUGHTERED %s [%s] in the arena!\n\r", 
-	      ((IS_NPC(ch) && ch->master) ? GET_NAME(ch->master) : GET_NAME(ch)),
-	      clan ? clan->name : "no clan", 
-	      GET_NAME(victim), clan2 ? clan2->name : "no clan");
+	      ((IS_NPC(ch) && ch->master) ? GET_NAME(ch->master) : GET_NAME(ch)), get_clan_name(ch_clan),
+	      GET_NAME(victim), get_clan_name(victim_clan));
     }
 
-    logf(IMMORTAL, LOG_ARENA, "%s [%s] killed %s [%s]", GET_NAME(ch),
-         clan ? clan->name : "no clan", GET_NAME(victim), 
-         clan2 ? clan2->name : "no clan");
+    logf(IMMORTAL, LOG_ARENA, "%s [%s] killed %s [%s]",
+	 ((IS_NPC(ch) && ch->master) ? GET_NAME(ch->master) : GET_NAME(ch)), get_clan_name(ch_clan),
+         GET_NAME(victim), get_clan_name(victim_clan));
   } else if (ch) {
     if (type == KILL_POTATO) 
       sprintf(killer_message, "\n\r## %s just got POTATOED in the arena!\n\r", GET_SHORT(victim));
@@ -5706,12 +5707,12 @@ void arena_kill(CHAR_DATA *ch, CHAR_DATA *victim, int type)
   }
   send_info(killer_message);
   
-  if (ch && victim && arena.type == PRIZE) {
+  if (ch && victim && (arena.type == PRIZE || arena.type == CHAOS)) {
     logf(IMMORTAL, LOG_ARENA, "%s killed %s", GET_NAME(ch), GET_NAME(victim));
   }
 
   // if it's a chaos, see if the clan was eliminated
-  if(victim && arena.type == CHAOS && clan2)
+  if(victim && arena.type == CHAOS && victim_clan)
   {
      for(tmp = character_list; tmp; tmp = tmp->next) {
       if (IS_SET(world[tmp->in_room].room_flags, ARENA))
@@ -5719,8 +5720,9 @@ void arena_kill(CHAR_DATA *ch, CHAR_DATA *victim, int type)
           eliminated = 0;
     }
     if(eliminated) {
-      sprintf(killer_message, "## [%s] was just eliminated from the chaos!\n\r", clan2->name);
+	sprintf(killer_message, "## [%s] was just eliminated from the chaos!\n\r", get_clan_name(victim_clan));
       send_info(killer_message);
+      logf(IMMORTAL, LOG_ARENA, "## [%s] was just eliminated from the chaos!", get_clan_name(victim_clan));
     }    
   }
   
@@ -5793,7 +5795,9 @@ int can_be_attacked(CHAR_DATA *ch, CHAR_DATA *vict)
     return FALSE;
   }
 
+  // Prize Arena
   if (IS_SET(world[ch->in_room].room_flags, ARENA) && arena.type == PRIZE && IS_PC(ch) && IS_PC(vict)) {
+      
     if (ch->fighting && ch->fighting != vict) {
       send_to_char("You are already fighting someone.\n\r", ch);
       logf(IMMORTAL, LOG_ARENA, "%s, whom was fighting %s was prevented from attacking %s.",
@@ -5805,6 +5809,21 @@ int can_be_attacked(CHAR_DATA *ch, CHAR_DATA *vict)
 	   GET_NAME(ch), GET_NAME(vict), GET_NAME(vict->fighting));
       return FALSE;
     }
+  }
+
+  // Clan Chaos Arena
+  if (IS_SET(world[ch->in_room].room_flags, ARENA) && arena.type == CHAOS && IS_PC(ch) && IS_PC(vict)) {
+      if (ch->fighting && ch->fighting != vict && !ARE_CLANNED(ch->fighting, vict)) {
+	  send_to_char("You are already fighting someone from another clan.\n\r", ch);
+	  logf(IMMORTAL, LOG_ARENA, "%s [%s], whom was fighting %s [%s] was prevented from attacking %s [%s].",
+	       GET_NAME(ch), get_clan_name(ch), GET_NAME(ch->fighting), get_clan_name(ch->fighting), GET_NAME(vict), get_clan_name(vict));
+	  return FALSE;
+      } else if (vict->fighting && vict->fighting != ch && !ARE_CLANNED(vict->fighting, ch)) {
+	  send_to_char("They are already fighting someone.\n\r", ch);
+	  logf(IMMORTAL, LOG_ARENA, "%s [%s] was prevented from attacking %s [%s] who was fighting %s [%s].",
+	       GET_NAME(ch), get_clan_name(ch), GET_NAME(vict), get_clan_name(vict), GET_NAME(vict->fighting), get_clan_name(vict->fighting));
+	  return FALSE;
+      }
   }
 
   // Golem cannot attack players

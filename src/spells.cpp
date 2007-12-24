@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.230 2007/12/08 16:48:03 dcastle Exp $ */
+/* $Id: spells.cpp,v 1.231 2007/12/24 01:58:58 jhhudso Exp $ */
 
 extern "C"
 {
@@ -53,6 +53,7 @@ extern "C"
 #include <ki.h>
 #include <sing.h>
 #include <arena.h>
+#include <clan.h>
 
 // Global data 
 
@@ -2119,28 +2120,59 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
 	   }
 
 	   // Wizard's eye (88) is ok to cast
+	   // Prize Arena
 	   if (IS_SET(world[ch->in_room].room_flags, ARENA) && arena.type == PRIZE && spl != 88) {
-	     if (tar_char && tar_char != ch && !IS_SET(spell_info[spl].targets, TAR_FIGHT_VICT)) {
-	       send_to_char("You can't cast that spell on someone in a prize arena.\n\r", ch);
-	       logf(IMMORTAL, LOG_ARENA, "%s was prevented from casting '%s' on %s.",
-		    GET_NAME(ch), get_skill_name(spl), GET_NAME(tar_char));
+	       if (tar_char && tar_char != ch && !IS_SET(spell_info[spl].targets, TAR_FIGHT_VICT)) {
+		   send_to_char("You can't cast that spell on someone in a prize arena.\n\r", ch);
+		   logf(IMMORTAL, LOG_ARENA, "%s was prevented from casting '%s' on %s.",
+			GET_NAME(ch), get_skill_name(spl), GET_NAME(tar_char));
+		   return eFAILURE;
+	       }
+
+	       if (ch->fighting && ch->fighting != tar_char) {
+		   send_to_char("You can't cast that because you're in a fight with someone else.\n\r", ch);
+		   logf(IMMORTAL, LOG_ARENA, "%s, whom was fighting %s, was prevented from casting '%s' on %s.", GET_NAME(ch),
+			GET_NAME(ch->fighting), get_skill_name(spl), GET_NAME(tar_char));
+		   return eFAILURE;
+	       } else if (tar_char->fighting && tar_char->fighting != ch) {
+		   send_to_char("You can't cast that because they are fighting someone else.\n\r", ch);
+		   logf(IMMORTAL, LOG_ARENA, "%s was prevented from casting '%s' on %s who was fighting %s.", GET_NAME(ch),
+			get_skill_name(spl), GET_NAME(tar_char), GET_NAME(tar_char->fighting));
+		   return eFAILURE;
+	       }
+	   }
+  	 
+
+	 // Wizard's eye (88) is ok to cast
+	 // Clan Chaos
+	   if (IS_SET(world[ch->in_room].room_flags, ARENA) && arena.type == CHAOS && spl != 88) {
+	       if (tar_char && tar_char != ch && !IS_SET(spell_info[spl].targets, TAR_FIGHT_VICT) && !ARE_CLANNED(ch, tar_char)) {
+	       send_to_char("You can't cast that spell on someone from another clan in a prize arena.\n\r", ch);
+	       logf(IMMORTAL, LOG_ARENA, "%s [%s] was prevented from casting '%s' on %s [%s].",
+		    GET_NAME(ch), get_clan_name(ch), get_skill_name(spl), GET_NAME(tar_char), get_clan_name(tar_char));
 	       return eFAILURE;
 	     }
 
-	     if (ch->fighting && ch->fighting != tar_char) {
+	       if (ch->fighting && ch->fighting != tar_char && !ARE_CLANNED(ch->fighting, tar_char)) {
 	       send_to_char("You can't cast that because you're in a fight with someone else.\n\r", ch);
-	       logf(IMMORTAL, LOG_ARENA, "%s, whom was fighting %s, was prevented from casting '%s' on %s.", GET_NAME(ch),
-		    GET_NAME(ch->fighting), get_skill_name(spl), GET_NAME(tar_char));
+	       logf(IMMORTAL, LOG_ARENA, "%s [%s], whom was fighting %s [%s], was prevented from casting '%s' on %s [%s].", 
+		    GET_NAME(ch), get_clan_name(ch),
+		    GET_NAME(ch->fighting), get_clan_name(ch->fighting),
+		    get_skill_name(spl),
+		    GET_NAME(tar_char), get_clan_name(tar_char));
 	       return eFAILURE;
-	     } else if (tar_char->fighting && tar_char->fighting != ch) {
+	       } else if (tar_char->fighting && tar_char->fighting != ch && !ARE_CLANNED(tar_char->fighting, ch)) {
 	       send_to_char("You can't cast that because they are fighting someone else.\n\r", ch);
-	       logf(IMMORTAL, LOG_ARENA, "%s was prevented from casting '%s' on %s who was fighting %s.", GET_NAME(ch),
-		    get_skill_name(spl), GET_NAME(tar_char), GET_NAME(tar_char->fighting));
+	       logf(IMMORTAL, LOG_ARENA, "%s [%s] was prevented from casting '%s' on %s [%s] who was fighting %s [%s].",
+		    GET_NAME(ch), get_clan_name(ch),
+		    get_skill_name(spl),
+		    GET_NAME(tar_char), get_clan_name(tar_char),
+		    GET_NAME(tar_char->fighting), get_clan_name(tar_char->fighting));
 	       return eFAILURE;
 	     }
 	   }
   	 }
-
+    
          if (tar_char && IS_AFFECTED(tar_char, AFF_REFLECT) && number(0,99) < tar_char->spell_reflect) {
            if(ch == tar_char) { // some idiot was shooting at himself
 //out		  act("The spell harmlessly reflects off you and disperses.", tar_char, 0, 0, TO_CHAR, 0);
@@ -2160,7 +2192,7 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
 	           }
 	    }
         }
-
+    
         if(group_spell) {
            send_to_char("You utter a swift prayer to the gods to amplify your powers.\n\r", ch);
            act("$n utters a swift prayer to the gods to amplify $s powers.", ch, 0, 0, TO_ROOM, 0);
@@ -2208,7 +2240,7 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
 	}
 
         return retval;
-      }
+    }
     }   /* if GET_POS < min_pos */
     return eFAILURE;
   }

@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.65 2007/12/08 16:48:00 dcastle Exp $ */
+/* $Id: clan.cpp,v 1.66 2007/12/24 01:58:59 jhhudso Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -668,6 +668,36 @@ struct clan_data * get_clan(CHAR_DATA *ch)
   ch->clan = 0;
   return 0;
 }
+
+char *get_clan_name(int nClan)
+{
+    
+    clan_data *clan = get_clan(nClan);
+
+    if (clan)
+	return clan->name;
+
+    return "no clan";
+}
+
+char *get_clan_name(CHAR_DATA *ch)
+{
+    clan_data *clan = get_clan(ch);
+
+    if (clan)
+	return clan->name;
+    
+    return "no clan";
+}
+
+char *get_clan_name(clan_data *clan)
+{
+    if (clan)
+	return clan->name;
+    
+    return "no clan";
+}
+
 
 void message_to_clan(char_data *ch, char buf[])
 {
