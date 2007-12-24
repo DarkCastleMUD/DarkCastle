@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.231 2007/12/24 01:58:58 jhhudso Exp $ */
+/* $Id: spells.cpp,v 1.232 2007/12/24 05:00:39 jhhudso Exp $ */
 
 extern "C"
 {
@@ -2153,7 +2153,7 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
 	       return eFAILURE;
 	     }
 
-	       if (ch->fighting && ch->fighting != tar_char && !ARE_CLANNED(ch->fighting, tar_char)) {
+	       if (ch->fighting && ch->fighting != tar_char && !ARE_CLANNED(ch->fighting, tar_char) && IS_SET(spell_info[spl].targets, TAR_FIGHT_VICT)) {
 	       send_to_char("You can't cast that because you're in a fight with someone else.\n\r", ch);
 	       logf(IMMORTAL, LOG_ARENA, "%s [%s], whom was fighting %s [%s], was prevented from casting '%s' on %s [%s].", 
 		    GET_NAME(ch), get_clan_name(ch),
@@ -2161,7 +2161,7 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
 		    get_skill_name(spl),
 		    GET_NAME(tar_char), get_clan_name(tar_char));
 	       return eFAILURE;
-	       } else if (tar_char->fighting && tar_char->fighting != ch && !ARE_CLANNED(tar_char->fighting, ch)) {
+	       } else if (tar_char->fighting && tar_char->fighting != ch && !ARE_CLANNED(tar_char->fighting, ch) && IS_SET(spell_info[spl].targets, TAR_FIGHT_VICT)) {
 	       send_to_char("You can't cast that because they are fighting someone else.\n\r", ch);
 	       logf(IMMORTAL, LOG_ARENA, "%s [%s] was prevented from casting '%s' on %s [%s] who was fighting %s [%s].",
 		    GET_NAME(ch), get_clan_name(ch),
