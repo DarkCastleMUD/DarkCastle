@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.88 2007/12/08 16:48:03 dcastle Exp $
+| $Id: move.cpp,v 1.89 2007/12/26 08:45:59 dcastle Exp $
 | move.C
 | Movement commands and stuff.
 *************************************************************************
@@ -918,9 +918,15 @@ int attempt_move(CHAR_DATA *ch, int cmd, int is_retreat = 0)
             send_to_char("Your legs are too tired for running away!\r\n", k->follower);
           continue; //keep going through the groupies
           }
-        if (is_retreat && number(1, 101) > (100 - (26 - has_skill(ch, SKILL_RETREAT)/4) - (15 - GET_DEX(ch)/2)))
+        if (is_retreat && k->follower->fighting && GET_LEVEL(k->follower->fighting) > 90 && 
+		IS_NPC(k->follower->fighting))
         {
-		send_to_char("Oops! You tripped and fell while everyone else was in full retreat.\r\n",k->follower);
+		int chance = 0;
+	 	if(ISSET(k->follower->fighting->mobdata->actflags, ACT_BOSS))
+			chance = GET_LEVEL(k->follower->fighting) / 2;
+		else chance = GET_LEVEL(k->follower->fighting) / 8;
+		act("$n notices your intent and moves quickly to block your retreat!", k->follower->fighting, NULL, k->follower,  TO_VICT, 0);
+		act("$n notices $N's intent and moves quickly to block $S retreat!", k->follower->fighting, NULL, k->follower, TO_ROOM, NOTVICT);
 		WAIT_STATE(k->follower, 8);
 		continue;
         }
