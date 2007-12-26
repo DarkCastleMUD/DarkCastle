@@ -1843,9 +1843,26 @@ char *reel2[] = {
 };
 
 char *reel3[] = {
-"$B$3 Bell $R", "$5Orange$R", "$B$6 Plum $R", "$B$3 Bell $R", "$5Orange$R", "$B$5Lemon $R", "$B$3 Bell $R",
-"$B$2Mln$R/$5Or$R", "$B$3 Bell $R", "$B$6 Plum $R", "$B$5Lemon $R", "$B$3 Bell $R", "$B$6 Plum $R", "$B$3 Bell $R", 
-"$B 7$R/$B$0BAR$R", "$B$5Lemon $R", "$B$3 Bell $R", "$B$2Mln$R/$5Or$R", "$B$3 Bell $R", "$B$5Lemon $R"
+"$B$3 Bell $R", 
+"$5Orange$R", 
+"$B$6 Plum $R", 
+"$B$3 Bell $R", 
+"$5Orange$R", 
+"$B$5Lemon $R", 
+"$B$3 Bell $R",
+"$B$2Mln$R/$5Or$R",
+"$B$3 Bell $R", 
+"$B$6 Plum $R", 
+"$B$5Lemon $R", 
+"$B$3 Bell $R", 
+"$B$6 Plum $R", 
+"$B$3 Bell $R", 
+"$B 7$R/$B$0BAR$R", 
+"$B$5Lemon $R", 
+"$B$3 Bell $R", 
+"$B$2Mln$R/$5Or$R", 
+"$B$3 Bell $R", 
+"$B$5Lemon $R"
 };
 
 void save_slot_machines()
