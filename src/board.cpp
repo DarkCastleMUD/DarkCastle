@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: board.cpp,v 1.23 2007/12/03 16:50:45 dcastle Exp $
+| $Id: board.cpp,v 1.24 2007/12/26 08:47:22 dcastle Exp $
 | board.C
 | Description:  This file contains the implementation for the board
 |   code.  It's old and should be rewritten --Morc XXX
@@ -230,7 +230,7 @@ int find_board(CHAR_DATA *ch)
        return(11); 
      else if (!(strcmp(i->name, "board clan merc")))
        return(12);
-     else if (!(strcmp(i->name, "board clan moor")))
+     else if (!(strcmp(i->name, "board clan blackaxe")))
        return(13); 
      else if (!(strcmp(i->name, "board clan studs")))
        return(14); 

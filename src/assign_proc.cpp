@@ -531,6 +531,7 @@ void assign_objects(void)
   assign_one_obj_non(2328, board);
   assign_one_obj_non(2360, board);
   assign_one_obj_non(2451, board);
+  assign_one_obj_non(2349, board);
   assign_one_obj_non(2339, board);
   assign_one_obj_non(2410, board);
   assign_one_obj_non(2406, board); /*Urukhai Board */
