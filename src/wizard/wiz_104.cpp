@@ -878,17 +878,22 @@ int do_show(struct char_data *ch, char *argument, int cmd)
        {
 	  if (arg1[0] == '\0') break;
 	  int i;
+	  bool found = FALSE;
 	  for (i = 0; room_bits[i][0] != '\n'; i++)
 	    if (!str_cmp(arg1, room_bits[i])) {
 		SET_BIT(bits, 1<<i);
-		continue;
+		found = TRUE;
+		break;
 	    }
 	   for (i = 0; sector_types[i][0] != '\n'; i++)
 	     if (!str_cmp(arg1,sector_types[i])) {
 		sector = i-1;
-		continue;
+		found = TRUE;
+		break;
 	    }
-	   send_to_char("Unknown room-flag or sector type.\r\n",ch);
+	
+	   if (!found)
+	     send_to_char("Unknown room-flag or sector type.\r\n",ch);
        }
 	if (!bits && !sector)
 	{
