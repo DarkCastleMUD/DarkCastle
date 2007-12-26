@@ -1539,7 +1539,8 @@ int do_mpdamage( CHAR_DATA *ch, char *argument, int cmd )
            logf( IMMORTAL, LOG_WORLD, "Mpdamage - Must damage either ki,mana,hitpoints or move: vnum %d", mob_index[ch->mobdata->nr].virt);
            return eFAILURE|eINTERNAL_ERROR;
         }*/
-        if(IS_SET(retval, eCH_DIED))
+        if (SOMEONE_DIED(retval))
+//        if(IS_SET(retval, eCH_DIED))
            return retval;
       }
     }
