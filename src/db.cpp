@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.164 2007/11/10 15:10:42 jhhudso Exp $ */
+/* $Id: db.cpp,v 1.165 2007/12/26 08:46:27 dcastle Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -3685,7 +3685,8 @@ void write_object(obj_data * obj, FILE *fl)
 }
 bool has_random(OBJ_DATA *obj)
 {
-      return (obj_index[obj->item_number].progtypes & RAND_PROG);
+ 
+      return (obj_index[obj->item_number].progtypes & RAND_PROG || obj_index[obj->item_number].progtypes & ARAND_PROG);
 }
 
 

@@ -3731,10 +3731,10 @@ int oprog_arand_trigger( OBJ_DATA *item )
 
   if (item->carried_by) ch=item->carried_by;
   else ch = NULL;
-    if (obj_index[item->item_number].progtypes & RAND_PROG)
+    if (obj_index[item->item_number].progtypes & ARAND_PROG)
      {
         vmob = initiate_oproc(ch, item);
-        mprog_percent_check(vmob, ch, item, NULL, RAND_PROG);
+        mprog_percent_check(vmob, ch, item, NULL, ARAND_PROG);
         end_oproc(vmob);
         return mprog_cur_result;
      }
