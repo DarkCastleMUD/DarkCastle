@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.166 2007/12/28 05:32:47 jhhudso Exp $ */
+/* $Id: db.cpp,v 1.167 2007/12/28 15:37:23 jhhudso Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -97,7 +97,6 @@ extern short bport;
 
 CHAR_DATA *character_list = 0; /* global l-list of chars          */
 pulse_data *bard_list = 0;      /* global l-list of bards          */
-struct quest_info *quest_list = 0; /* global l-list of quests */
 
 room_data & CWorld::operator[](int rnum)
 {

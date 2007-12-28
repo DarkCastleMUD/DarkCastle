@@ -221,7 +221,8 @@ int do_channel(struct char_data *ch, char *arg, int cmd)
     "objects",
     "tell",
     "hints",
-    "vault",   
+    "vault",
+    "quest",      // 25
  "\\@"
   };
 
@@ -245,7 +246,7 @@ int do_channel(struct char_data *ch, char *arg, int cmd)
       }
     }
     else {
-	int o = GET_LEVEL(ch) == 110? 21:19;
+	int o = GET_LEVEL(ch) == 110 ? 21:19;
       for(x = 0; x <= o; x++) {
          if(IS_SET(ch->misc, (1<<x)))
            y = 1;
@@ -255,24 +256,36 @@ int do_channel(struct char_data *ch, char *arg, int cmd)
          send_to_char(buf2, ch);
       }
     }
+
     if(IS_SET(ch->misc, 1<<22))
        y = 1;
     else
        y = 0;
     sprintf(buf2, "%-9s%s\n\r", types[22], on_off[y]); 
     send_to_char(buf2, ch);
+
     if(IS_SET(ch->misc, 1<<23))
        y = 1;
     else
        y = 0;
     sprintf(buf2, "%-9s%s\n\r", types[23], on_off[y]); 
     send_to_char(buf2, ch);
+    
+    int o = GET_LEVEL(ch) == 110 ? 25:0;
+    for(x = 24; x <= o; x++) {
+	if(IS_SET(ch->misc, (1<<x)))
+	    y = 1;
+	else
+	    y = 0;
+	sprintf(buf2, "%-9s%s\n\r", types[x], on_off[y]); 
+	send_to_char(buf2, ch);
+    }
 
     return eSUCCESS;
   }
 
-  for(x = 0; x <= 24; x++) {
-     if(x == 24) {
+  for(x = 0; x <= 26; x++) {
+     if(x == 26) {
        send_to_char("That type was not found.\n\r", ch);
        return eSUCCESS;
      }

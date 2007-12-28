@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.98 2007/12/10 03:34:41 jhhudso Exp $
+| $Id: inventory.cpp,v 1.99 2007/12/28 15:37:23 jhhudso Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -400,6 +400,12 @@ int do_get(struct char_data *ch, char *argument, int cmd)
 		  continue;	
 		}
 
+		if (IS_SET(obj_object->obj_flags.extra_flags, ITEM_SPECIAL) &&
+		    !isname(GET_NAME(ch), obj_object->name) && GET_LEVEL(ch) < IMP) {
+		    csendf(ch, "The %s appears to be SPECIAL. Only its rightful owner can take it.\n\r", obj_object->short_description);
+		    continue;
+		}
+
                 // PC corpse
 		if ((obj_object->obj_flags.value[3] == 1 && isname("pc", obj_object->name)) || isname("thiefcorpse", obj_object->name))
                 {
@@ -487,7 +493,11 @@ int do_get(struct char_data *ch, char *argument, int cmd)
                    }
                    has_consent = FALSE;  // reset it
                 }
-		if( (IS_CARRYING_N(ch) + 1 > CAN_CARRY_N(ch)) &&
+
+		if (IS_SET(obj_object->obj_flags.extra_flags, ITEM_SPECIAL) &&
+		    !isname(GET_NAME(ch), obj_object->name) && GET_LEVEL(ch) < IMP) {
+		    csendf(ch, "The %s appears to be SPECIAL. Only its rightful owner can take it.\n\r", obj_object->short_description);
+		} else if( (IS_CARRYING_N(ch) + 1 > CAN_CARRY_N(ch)) &&
                    !( GET_ITEM_TYPE(obj_object) == ITEM_MONEY && obj_object->item_number == -1 && GET_LEVEL(ch) < IMMORTAL)
                   )
                 {
@@ -605,6 +615,13 @@ fname(obj_object->name));
                       csendf(ch, "The %s appears to be NO_TRADE so you don't pick it up.\r\n", obj_object->short_description);
                       continue;
                     }
+
+		if (IS_SET(obj_object->obj_flags.extra_flags, ITEM_SPECIAL) &&
+		    !isname(GET_NAME(ch), obj_object->name) && GET_LEVEL(ch) < IMP) {
+		    csendf(ch, "The %s appears to be SPECIAL. Only its rightful owner can take it.\n\r", obj_object->short_description);
+		    continue;
+		}
+
 
 		    if (CAN_SEE_OBJ(ch,obj_object)) 
                     {

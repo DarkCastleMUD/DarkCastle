@@ -60,6 +60,8 @@ struct quest_info {
    int  mobnum;
    int  timer;
    int  reward;
+   int  cost;
+   int  brownie;
    bool active;
    struct quest_info * next;
 };

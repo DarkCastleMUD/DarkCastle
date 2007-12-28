@@ -1,7 +1,7 @@
 #ifndef FILEINFO_H_
 #define FILEINFO_H_
 /*
-| $Id: fileinfo.h,v 1.24 2007/05/12 10:43:13 jhhudso Exp $
+| $Id: fileinfo.h,v 1.25 2007/12/28 15:37:24 jhhudso Exp $
 | fileinfo.h
 | Description:  Contains information for loading files, ie "../lib", etc..
 */
@@ -65,6 +65,7 @@
 #define ARENA_LOG           "../log/arena.log"
 #define CLAN_LOG            "../log/clan.log" 
 #define OBJECTS_LOG         "../log/objects.log" 
+#define QUEST_LOG           "../log/quest.log"
 
 #define  WORLD_INDEX_FILE  "worldindex"
 #define  OBJECT_INDEX_FILE "objectindex"

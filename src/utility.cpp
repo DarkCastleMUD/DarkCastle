@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.84 2007/12/24 03:54:13 jhhudso Exp $ */
+/* $Id: utility.cpp,v 1.85 2007/12/28 15:37:24 jhhudso Exp $ */
 
 extern "C"
 {
@@ -260,6 +260,7 @@ FILE * world_log   = 0;
 FILE * arena_log   = 0;
 FILE * clan_log   = 0;
 FILE * objects_log = 0;
+FILE * quest_log = 0;
 
 // writes a string to the log 
 void log( const char *str, int god_level, long type, char_data *vict)
@@ -351,6 +352,13 @@ void log( const char *str, int god_level, long type, char_data *vict)
         f = &objects_log;
         if(!(*f = dc_fopen(OBJECTS_LOG, "a"))) {
           fprintf(stderr, "Unable to open objects log.\n");
+          exit(1);
+        }
+	break;
+      case LOG_QUEST:
+        f = &quest_log;
+        if(!(*f = dc_fopen(QUEST_LOG, "a"))) {
+          fprintf(stderr, "Unable to open quest log.\n");
           exit(1);
         }
         break;
