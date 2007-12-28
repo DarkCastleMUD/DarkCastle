@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.170 2007/12/21 18:54:07 dcastle Exp $ */
+/* $Id: mob_proc.cpp,v 1.171 2007/12/28 10:44:42 jhhudso Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -1727,7 +1727,7 @@ static char *dethSayText [ ] =
   "God shouldn't be the only one allowed to play God.", // Steve Jobs said that, interestingly enough
   "A good icebreaker is to ask people what gender they are.",
   "Have you been beating off?  There's no Honolulu.",  // 2007 Tahoe ski trip
-  "It looks like English, but I can.t understand a damn word you.re saying.",
+  "It looks like English, but I can't understand a damn word you\'re saying.",
   "I thought I wanted a career; turns out I just wanted a salary.",
   "Thank you. We're all refreshed and challenged by your unique point of view.",
   "She offered her honor. He honored her offer.  And all night long, honor, offer, honor, offer.",
