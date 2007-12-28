@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.165 2007/12/26 08:46:27 dcastle Exp $ */
+/* $Id: db.cpp,v 1.166 2007/12/28 05:32:47 jhhudso Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -76,7 +76,7 @@ int   curr_virtno;
 
 extern bool str_prefix(const char *astr, const char *bstr);
 
-/*  Sizes */
+extern bool verbose_mode;
 
 /**************************************************************************
 *  declarations of most of the 'global' variables                         *
@@ -650,16 +650,24 @@ void boot_db(void)
     assign_objects();
     assign_rooms();
 
-    fprintf( stderr, "\n[ Room  Room]\t{Level}\t  Author\tZone\n" );
+    if (verbose_mode) {
+	fprintf( stderr, "\n[ Room  Room]\t{Level}\t  Author\tZone\n" );
+    }
+
     for (i = 0; i <= top_of_zone_table; i++)
     {
-    fprintf(stderr, "[%5d %5d]\t%s.\n",
-        (i ? (zone_table[i - 1].top + 1) : 0),
-        zone_table[i].top,
-        zone_table[i].name);
-    reset_zone(i);
+	if (verbose_mode) {
+	    fprintf(stderr, "[%5d %5d]\t%s.\n",
+		    (i ? (zone_table[i - 1].top + 1) : 0),
+		    zone_table[i].top,
+		    zone_table[i].name);
+	}
+
+	reset_zone(i);
     }
-    fprintf( stderr, "\n" );
+    if (verbose_mode) {
+	fprintf( stderr, "\n" );
+    }
 
     log ("Loading banned list", 0, LOG_MISC);
     load_banned();
@@ -996,7 +1004,9 @@ struct index_data *generate_mob_indices(int *top, struct index_data *index)
     strcpy(endfile, "mobs/");
     strcat(endfile, temp);
     
-    log(temp, 0, LOG_MISC);
+    if (verbose_mode) {
+	log(temp, 0, LOG_MISC);
+    }
 
     if (!(fl = dc_fopen(endfile, "r"))) 
     {
@@ -1287,7 +1297,9 @@ struct index_data *generate_obj_indices(int *top,
     strcpy(endfile, "objects/");
     strcat(endfile, temp);
     
-    log(temp, 0, LOG_MISC);
+    if (verbose_mode) {
+	log(temp, 0, LOG_MISC);
+    }
 
     if (!(fl = dc_fopen(endfile, "r"))) 
     {
@@ -1912,7 +1924,9 @@ void boot_world(void)
     strcpy(endfile, "world/");
     strcat(endfile, temp);
     
-    log(temp, 0, LOG_MISC);
+    if (verbose_mode) {
+	log(temp, 0, LOG_MISC);
+    }
 
     if (!(fl = dc_fopen(endfile, "r"))) 
     {
@@ -2476,7 +2490,9 @@ void boot_zones(void)
     strcpy(endfile, "zonefiles/");
     strcat(endfile, temp);
   
-    log(temp, 0, LOG_MISC);
+    if (verbose_mode) {
+	log(temp, 0, LOG_MISC);
+    }
   
     if (!(fl = dc_fopen(endfile, "r")))
     {
@@ -4160,18 +4176,13 @@ char *fread_string(FILE *fl, int hasher)
     char *  pBufLast;
     char *  temp;
 
-    for ( pBufLast = buf; pBufLast < &buf[sizeof(buf)-2]; )
+    for ( pBufLast = buf; pBufLast < &buf[MAX_STRING_LENGTH-2]; )
     {
        *pBufLast = getc(fl);
        switch( *pBufLast  )
        {
        default:
            pBufLast++;
-           break;
-
-       case EOF:
-           perror( "fread_string: EOF" );
-           abort();
            break;
 
        case '\n':
@@ -4211,6 +4222,10 @@ char *fread_string(FILE *fl, int hasher)
            }
            return pAlloc;
            // end of ~ case
+       case EOF:
+           perror( "fread_string: EOF" );
+           abort();
+           break;
        } // switch
     } // for
 

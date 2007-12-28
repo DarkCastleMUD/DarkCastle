@@ -16,6 +16,7 @@ extern char **orig_argv;
 extern short code_testing_mode;
 extern short code_testing_mode_mob;
 extern short code_testing_mode_world;
+extern bool verbose_mode = FALSE;
 extern short bport;
 extern bool allow_imp_password;
 
@@ -64,7 +65,26 @@ int main(int argc, char **argv)
 
   while ((pos < argc) && (*(argv[pos]) == '-')) {
     switch (*(argv[pos] + 1)) {
+	case 'v':
+	    verbose_mode = 1;
+	    break;
+	case 'h':
+	case '?':
+	    fprintf(stderr,
+		    "Usage: %s [-v] [-h] [-w] [-c] [-m] [-d directory] [-p] [-P]\n"
+		    "-v\t\tVerbose mode\n"
+		    "-h\t\tUsage information\n"
+		    "-w\t\tWorld testing mode\n"
+		    "-c\t\tObj testing mode\n"
+		    "-m\t\tObj & Mob testing mode\n"
+		    "-b\t\tBuilders' port (7000-7003)\n"
+		    "-d directory\tData directory\n"
+		    "-p\t\tUse port 1500-1503\n"
+		    "-P\t\tAllow imps to use their password\n\n",		    
+		argv[0]);
 
+	    return 0;
+	    break;
     case 'w':
        code_testing_mode = 1;
        code_testing_mode_world = 1;
