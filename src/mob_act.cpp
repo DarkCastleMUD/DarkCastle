@@ -19,7 +19,7 @@
 /* 12/06/2003   Onager   Modified mobile_activity() to prevent charmie    */
 /*                       scavenging                                       */
 /**************************************************************************/
-/* $Id: mob_act.cpp,v 1.45 2007/03/18 21:17:50 dcastle Exp $ */
+/* $Id: mob_act.cpp,v 1.46 2008/01/05 09:20:01 jhhudso Exp $ */
 
 extern "C"
 {
@@ -387,8 +387,9 @@ void mobile_activity(void)
         tmp_bitv = GET_BITV(tmp_ch);
 
         if(ISSET(ch->mobdata->actflags, ACT_FRIENDLY) &&
+	   (!ch->mobdata->hatred || !isname(GET_NAME(tmp_ch), ch->mobdata->hatred)) &&
            tmp_ch->fighting &&
-	  CAN_SEE(ch, tmp_ch) &&
+	   CAN_SEE(ch, tmp_ch) &&
            (IS_SET(race_info[(int)GET_RACE(ch)].friendly, tmp_bitv) ||
 	     (int)GET_RACE(ch) == (int)GET_RACE(tmp_ch)) &&
 
