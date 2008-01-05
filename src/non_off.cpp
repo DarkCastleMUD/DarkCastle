@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: non_off.cpp,v 1.47 2007/05/10 06:38:41 jhhudso Exp $
+| $Id: non_off.cpp,v 1.48 2008/01/05 10:29:59 jhhudso Exp $
 | non_off.C
 | Description:  Implementation of generic, non-offensive commands.
 */
@@ -131,7 +131,7 @@ int do_tap(struct char_data *ch, char *argument, int cmd)
   }
 
   act("$n sacrifices $p to $s god.", ch, obj, 0, TO_ROOM , 0);
-  act("You get one gold coin for your sacrifice.", ch, obj, 0, TO_CHAR , 0);
+  act("You sacrifice $p to the gods and receive one gold coin.", ch, obj, 0, TO_CHAR , 0);
   GET_GOLD(ch) += 1;
   log_sacrifice(ch, obj);
   extract_obj(obj);
