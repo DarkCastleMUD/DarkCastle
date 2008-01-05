@@ -1,8 +1,8 @@
 /************************************************************************
-| $Id: cl_barbarian.cpp,v 1.83 2007/12/08 16:48:05 dcastle Exp $
-| cl_barbarian.C
-| Description:  Commands for the barbarian class.
-*/
+ * $Id: cl_barbarian.cpp,v 1.84 2008/01/05 10:15:01 jhhudso Exp $
+ * cl_barbarian.cpp
+ * Description: Commands for the barbarian class.
+ *************************************************************************/
 #include <structs.h>
 #include <player.h>
 #include <levels.h>
@@ -678,32 +678,40 @@ int do_knockback(struct char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if(IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE)) {
-    send_to_char("You are too tiny to knock someone that HUGE anywhere!\n\r", 
-		 ch);
-    return eFAILURE;
-  }
-
-  if(IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_SWARM)) {
-    send_to_char("You cannot pick just one to knockback!\n\r", ch);
-    return eFAILURE;
-  }
-
-  if(IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_TINY)) {
-    act("$N would evade your knockback attempt with ease!", ch, 0, victim, TO_CHAR, 0);
-    return eFAILURE;
-  }
-
-  if(IS_AFFECTED(victim, AFF_STABILITY) && number(0,3) == 0) {
-    act("You bounce off of $N and crash into the ground.", ch, 0, victim, TO_CHAR, 0);
-    act("$n bounces off of you and crashes into the ground.", ch, 0, victim, TO_VICT, 0);
-    act("$n bounces off of $N and crashes into the ground.", ch, 0, victim, TO_ROOM, NOTVICT);
-    WAIT_STATE(ch, PULSE_VIOLENCE);
-    return eFAILURE;
-  }
-
   if(!can_attack(ch) || !can_be_attacked(ch, victim))
     return eFAILURE;
+
+  bool victim_paralyzed = false;
+  affected_type *af;
+  if ((af = affected_by_spell(victim, SPELL_PARALYZE))) {
+      victim_paralyzed = true;
+      if (af->duration >= 1)
+	  af->duration--;
+  } else {
+      if(IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE)) {
+	  send_to_char("You are too tiny to knock someone that HUGE anywhere!\n\r", 
+		       ch);
+	  return eFAILURE;
+      }
+      
+      if(IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_SWARM)) {
+	  send_to_char("You cannot pick just one to knockback!\n\r", ch);
+	  return eFAILURE;
+      }
+      
+      if(IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_TINY)) {
+	  act("$N would evade your knockback attempt with ease!", ch, 0, victim, TO_CHAR, 0);
+	  return eFAILURE;
+      }
+      
+      if(IS_AFFECTED(victim, AFF_STABILITY) && number(0,3) == 0) {
+	  act("You bounce off of $N and crash into the ground.", ch, 0, victim, TO_CHAR, 0);
+	  act("$n bounces off of you and crashes into the ground.", ch, 0, victim, TO_VICT, 0);
+	  act("$n bounces off of $N and crashes into the ground.", ch, 0, victim, TO_ROOM, NOTVICT);
+	  WAIT_STATE(ch, PULSE_VIOLENCE);
+	  return eFAILURE;
+      }
+  }
 
   learned = has_skill(ch, SKILL_KNOCKBACK);
   dam = 100;
@@ -737,14 +745,14 @@ int do_knockback(struct char_data *ch, char *argument, int cmd)
   char buf2[MAX_STRING_LENGTH], dammsg[20];
   int prevhps = GET_HIT(victim);
 
-  if(!skill_success(ch, victim, SKILL_KNOCKBACK, 0-(learned/4 * 3))) {
+  if(!victim_paralyzed && !skill_success(ch, victim, SKILL_KNOCKBACK, 0-(learned/4 * 3))) {
     act("You lunge forward in an attempt to smash $N but fall, missing $M completely.", ch, 0, victim, TO_CHAR, 0);
     act("$n lunges forward in an attempt to smash into you but falls flat on $s face, missing completely.", ch, 0, victim, TO_VICT, 0);
     act("$n lunges forward in an attempt to smash into $N but falls flat on $s face.", ch, 0, victim, TO_ROOM, NOTVICT);
     GET_POS(ch) = POSITION_SITTING;
     WAIT_STATE(ch, PULSE_VIOLENCE);
     return eFAILURE;
-  } else if(affected_by_spell(victim, SKILL_BATTLESENSE) &&
+  } else if(!victim_paralyzed && affected_by_spell(victim, SKILL_BATTLESENSE) &&
              number(1, 100) < affected_by_spell(victim, SKILL_BATTLESENSE)->modifier) {
     act("$N's heightened battlesense sees your smash coming from a mile away and $E easily sidesteps it.", ch, 0, victim, TO_CHAR, 0);
     act("Your heightened battlesense sees $n's smash coming from a mile away and you easily sidestep it.", ch, 0, victim, TO_VICT, 0);
