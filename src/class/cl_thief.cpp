@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.171 2007/12/08 16:48:05 dcastle Exp $
+| $Id: cl_thief.cpp,v 1.172 2008/01/05 10:24:21 jhhudso Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -1667,7 +1667,8 @@ int do_slip(struct char_data *ch, char *argument, int cmd)
     
       // Success
       else {
-         send_to_char("Ok.\n\r", ch);
+	 csendf(ch, "You slip %d coins to %s.\n\r", amount, GET_NAME(vict));
+
          if (GET_LEVEL(ch) >= IMMORTAL) { 
             sprintf(buf, "%s slips %d coins to %s", GET_NAME(ch), amount,
                     GET_NAME(vict));
@@ -1757,7 +1758,8 @@ int do_slip(struct char_data *ch, char *argument, int cmd)
       // fix weight (move_obj doesn't re-add it, but it removes it)
       if (obj_index[container->item_number].virt != 536)
          IS_CARRYING_W(ch) += GET_OBJ_WEIGHT(obj);
-      send_to_char("Ok.\r\n", ch);
+
+      act("You slip $p in $P.", ch, obj, container, TO_CHAR, 0);
       return eSUCCESS;      
    }
    if (!(vict = get_char_room_vis(ch, vict_name))) {
@@ -1835,9 +1837,9 @@ int do_slip(struct char_data *ch, char *argument, int cmd)
         log(buf, IMP, LOG_OBJECTS);
 
       move_obj(obj, vict);
+      act("You slip $p to $N.", ch, obj, vict, TO_CHAR, 0);
       act("$n slips $p to $N.", ch, obj, vict, TO_ROOM, GODS|NOTVICT);
       act("$n slips you $p.", ch, obj, vict, TO_VICT, GODS);
-      send_to_char("Ok.\n\r", ch);
       do_save(ch, "", 9);
       save_char_obj(vict);
       }
