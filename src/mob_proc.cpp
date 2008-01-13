@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.171 2007/12/28 10:44:42 jhhudso Exp $ */
+/* $Id: mob_proc.cpp,v 1.172 2008/01/13 04:27:31 jhhudso Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -1068,7 +1068,7 @@ static char *dethSayText [ ] =
   "Gods, I need a reimb.  I got killed.",
   "Where's the monks' guild?",
   "You'd be surprised how hard it is to put tab A into slot B.",
-  "Anna Nicole Smith is one sick bitch.",
+  "Anna Nicole Smith was one sick bitch.",
   "The Crawford/Gere split is final! Now's my chance!",
   "Is it 7 yet? I don't want to miss Judge Wapner.",
   "Waz, please don't zap me. I didn't think wiggle was a spammable action.",
