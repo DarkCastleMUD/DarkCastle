@@ -280,6 +280,10 @@ void show_quest_header(CHAR_DATA *ch)
 
 void show_quest_amount(CHAR_DATA *ch, int remaining)
 {
+    
+//    if(check_quest_pass(ch, quest->number))
+//	num_passed = show_one_quest(ch, quest, num_passed);
+
    csendf(ch,
 	  "\n\r $B$2Completed: $7%-4d $2Remaining: $7%-4d $2Total: $7%-4d$R\n\r", quest_list.size()-remaining, remaining, quest_list.size());
    return;
@@ -287,6 +291,40 @@ void show_quest_amount(CHAR_DATA *ch, int remaining)
 
 void show_quest_footer(CHAR_DATA *ch)
 {	     
+   quest_info *quest;
+   int attempting=0;
+   int completed=0;
+   int total=0;
+
+   for (quest_list_t::iterator node = quest_list.begin();
+	node != quest_list.end();
+	node++) {
+       quest = *node;
+
+       if (GET_LEVEL(ch) >= quest->level) {
+	   if (check_quest_current(ch, quest->number)) {
+	       // We are attempting this quest currently
+	       attempting++;
+	   }
+
+	   if (check_quest_complete(ch, quest->number)) {
+	       // We did this quest already
+	       completed++;
+	   }
+
+	   if (!quest->active) {
+	       // No one is doing this quest right now
+	       total++;
+	   }
+
+       }
+   }
+
+   csendf(ch,
+	  "\n\r $B$2Attempting: $7%-4d $B$2Completed: $7%-4d $2Remaining: $7%-4d $2Total: $7%-4d$R\n\r",
+	  attempting, completed, total-completed, total);
+
+
    csendf(ch,"[-----------------------------------------------------------------------------]\n\r" );
    return;
 }
@@ -358,7 +396,7 @@ void show_available_quests(CHAR_DATA *ch)
    if(!count)
        send_to_char("$B$7There are currently no available quests for you, try later.$R\n\r", ch);
    else
-       show_quest_amount(ch, count);
+//       show_quest_amount(ch, count);
 
    show_quest_footer(ch);
 
@@ -378,7 +416,7 @@ void show_pass_quests(CHAR_DATA *ch)
       if(check_quest_pass(ch, quest->number))
          count = show_one_complete_quest(ch, quest, count);
    }
-   show_quest_amount(ch, count);
+//   show_quest_amount(ch, count);
    show_quest_footer(ch);
 
    return;
@@ -393,15 +431,13 @@ void show_current_quests(CHAR_DATA *ch)
 
     for (quest_list_t::iterator node = quest_list.begin(); node != quest_list.end(); node++) {
 	quest = *node;
-	
-	if(check_quest_pass(ch, quest->number))
-	    num_passed = show_one_quest(ch, quest, num_passed);
+
 	if(check_quest_current(ch, quest->number))
 	    num_attempting = show_one_quest(ch, quest, num_attempting);
     }
 
-    csendf(ch, " $B$2Attempting: $7%d$R", num_attempting);
-    show_quest_amount(ch, num_passed);
+//    csendf(ch, " $B$2Attempting: $7%d$R", num_attempting);
+//    show_quest_amount(ch, num_passed);
     show_quest_footer(ch);
 
     return;
@@ -420,7 +456,7 @@ void show_complete_quests(CHAR_DATA *ch)
       if(check_quest_complete(ch, quest->number))
          count = show_one_complete_quest(ch, quest, count);
    }
-   show_quest_amount(ch, count);
+//   show_quest_amount(ch, count);
    show_quest_footer(ch);
 
    return;
@@ -747,6 +783,7 @@ int quest_handler(CHAR_DATA *ch, CHAR_DATA *qmaster, int cmd, char *name)
    return retval;
 }
 
+// Not used currently. Use quest list or quest start <name> instead of list or buy.
 int quest_master(CHAR_DATA *ch, OBJ_DATA *obj, int cmd, char *arg, CHAR_DATA *owner)
 {
    int choice;
@@ -794,13 +831,13 @@ int do_quest(CHAR_DATA *ch, char *arg, int cmd)
 
    half_chop(arg, arg, name);
 
-   if(!*arg)
+   if (is_abbrev(arg, "current"))
       show_current_quests(ch);
    else if(is_abbrev(arg, "passed") && !*name)
       show_pass_quests(ch);
    else if(is_abbrev(arg, "completed"))
       show_complete_quests(ch);
-   else if(is_abbrev(arg, "available")) {
+   else if(is_abbrev(arg, "list")) {
       if(!qmaster) return eFAILURE;
       if(ch->in_room != qmaster->in_room)
          send_to_char("You must ask the Quest Master for available quests.\n\r", ch);
@@ -828,11 +865,11 @@ int do_quest(CHAR_DATA *ch, char *arg, int cmd)
       return retval;
    }
    else {
-      csendf(ch, "Usage: quest              (lists current quests)\n\r"
+      csendf(ch, "Usage: quest current      (lists current quests)\n\r"
                  "       quest completed    (lists completed quests)\n\r"
-                 "       quest passed       (lists passed quests)\n\r"
+                 "       quest passed       (lists passed quests)\n\r\n\r"
                  "The following commands may only be used at the Quest Master.\n\r"
-                 "       quest available    (lists available quests)\n\r"
+                 "       quest list         (lists available quests)\n\r"
                  "       quest pass <name>  (passes a current quest)\n\r"
                  "       quest start <name> (starts a new quest)\n\r"
                  "       quest finish <name>(finishes a current quest)\n\r"
