@@ -499,7 +499,7 @@ int start_quest(CHAR_DATA *ch, struct quest_info *quest)
    }
   
    if (quest->brownie) {
-       brownie = get_obj_in_list_num(real_object(2), ch->carrying);
+       brownie = get_obj_in_list_num(real_object(27906), ch->carrying);
        if (!brownie) {
 	   csendf(ch, "You need a brownie point to start this quest!\n\r", price);
 	   return eEXTRA_VAL2;
