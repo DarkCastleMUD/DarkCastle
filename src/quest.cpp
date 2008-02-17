@@ -312,8 +312,8 @@ void show_quest_footer(CHAR_DATA *ch)
 	       completed++;
 	   }
 
-	   if (!quest->active) {
-	       // No one is doing this quest right now
+	   if (!quest->active || check_quest_current(ch, quest->number)) {
+	       // No other person is doing this quest right now
 	       total++;
 	   }
 
