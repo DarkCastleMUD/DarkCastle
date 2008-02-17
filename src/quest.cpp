@@ -322,7 +322,7 @@ void show_quest_footer(CHAR_DATA *ch)
 
    csendf(ch,
 	  "\n\r $B$2Attempting: $7%-4d $B$2Completed: $7%-4d $2Remaining: $7%-4d $2Total: $7%-4d$R\n\r",
-	  attempting, completed, total-completed, total);
+	  attempting, completed, total-completed-attempting, total);
 
 
    csendf(ch,"[-----------------------------------------------------------------------------]\n\r" );
