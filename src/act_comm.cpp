@@ -110,56 +110,59 @@ int send_to_gods(const char *str, int god_level, long type)
     log("Invalid level sent to send_to_gods!", OVERSEER, LOG_BUG);
     return(0);
   }
-
+  
   switch (type) {
-    case LOG_BUG:
-      sprintf(typestr, "bug");
-      break;
-    case LOG_PRAYER:
-      sprintf(typestr, "pray");
-      break;
-    case LOG_GOD:
-      sprintf(typestr, "god");
-      break;
-    case LOG_MORTAL:
-      sprintf(typestr, "mortal");
-      break;
-    case LOG_SOCKET:
-      sprintf(typestr, "socket");
-      break;
-    case LOG_MISC:
-      sprintf(typestr, "misc");
-      break;
-    case LOG_PLAYER:
-      sprintf(typestr, "player");
-      break;
-    case LOG_WORLD:
-      sprintf(typestr, "world");
-      break;
-    case LOG_ARENA:
-      sprintf(typestr, "arena");
-      break;
-    case LOG_CLAN:
-      sprintf(typestr, "logclan");
-      break;
-    case LOG_WARNINGS:
-      sprintf(typestr, "warnings");
-      break;
-     case LOG_DATABASE:
-	sprintf(typestr, "database");
-	break;
-     case LOG_VAULT:
-	sprintf(typestr, "vault");
-	break;
-    case LOG_HELP:
-      sprintf(typestr, "help");
-      break;
-    case LOG_OBJECTS:
-      sprintf(typestr, "objects");
-      break;
-    default:
-      sprintf(typestr, "unknown");
-      break;
+      case LOG_BUG:
+	  sprintf(typestr, "bug");
+	  break;
+      case LOG_PRAYER:
+	  sprintf(typestr, "pray");
+	  break;
+      case LOG_GOD:
+	  sprintf(typestr, "god");
+	  break;
+      case LOG_MORTAL:
+	  sprintf(typestr, "mortal");
+	  break;
+      case LOG_SOCKET:
+	  sprintf(typestr, "socket");
+	  break;
+      case LOG_MISC:
+	  sprintf(typestr, "misc");
+	  break;
+      case LOG_PLAYER:
+	  sprintf(typestr, "player");
+	  break;
+      case LOG_WORLD:
+	  sprintf(typestr, "world");
+	  break;
+      case LOG_ARENA:
+	  sprintf(typestr, "arena");
+	  break;
+      case LOG_CLAN:
+	  sprintf(typestr, "logclan");
+	  break;
+      case LOG_WARNINGS:
+	  sprintf(typestr, "warnings");
+	  break;
+      case LOG_DATABASE:
+	  sprintf(typestr, "database");
+	  break;
+      case LOG_VAULT:
+	  sprintf(typestr, "vault");
+	  break;
+      case LOG_HELP:
+	  sprintf(typestr, "help");
+	  break;
+      case LOG_OBJECTS:
+	  sprintf(typestr, "objects");
+	  break;
+      case LOG_QUEST:
+	  sprintf(typestr, "quest");
+	  break;
+      default:
+	  sprintf(typestr, "unknown");
+	  break;
   }
 
   sprintf(buf, "//(%s) %s\n\r", typestr, str);
