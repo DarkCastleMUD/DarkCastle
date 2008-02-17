@@ -424,7 +424,7 @@ void show_pass_quests(CHAR_DATA *ch)
 
 void show_current_quests(CHAR_DATA *ch)
 {
-    int num_attempting = 0, num_passed = 0;
+    int num_attempting = 0;
     struct quest_info *quest;
 
     show_quest_header(ch);
@@ -888,6 +888,7 @@ int do_qedit(CHAR_DATA *ch, char *argument, int cmd)
    int  holdernum;
    int i, lownum, highnum;
    struct quest_info *quest = NULL;
+   CHAR_DATA *vict = NULL;
 
    half_chop(argument, arg, argument);
    for(; *argument==' ';argument++);
@@ -899,6 +900,8 @@ int do_qedit(CHAR_DATA *ch, char *argument, int cmd)
                  "       qedit <number> <field> <value>  (edit a quest)\n\r"
                  "       qedit new <name>                (add a quest)\n\r"
                  "       qedit save                      (saves all quests)\n\r"
+	         "       qedit stat <playername>         (show player's current qpoints)\n\r"
+	         "       qedit set <playername> <value>  (alter player's current qpoints)\n\r"
                  "\n\r");
       return eFAILURE;
    }
@@ -950,6 +953,44 @@ int do_qedit(CHAR_DATA *ch, char *argument, int cmd)
    if (*arg && is_number(arg) && !*field) {
      show_quest_info(ch, atoi(arg));
      return eSUCCESS;
+   }
+
+   if (is_abbrev(arg, "stat")) {
+       if (!*field) {
+	   send_to_char("Usage: qedit stat <playername>\n\r", ch);
+	   return eFAILURE;
+       } else {
+	   if (!(vict = get_char_vis(ch, field)) || IS_MOB(vict)) {
+	       send_to_char("No living thing by that name.\n\r", ch);
+	       return eFAILURE;
+	   }
+
+	   csendf(ch, "%s's quest points: %d\n\r", GET_NAME(vict), vict->pcdata->quest_points);
+       }
+       return eSUCCESS;
+   }
+
+   if (is_abbrev(arg, "set")) {
+       half_chop(argument, value, argument);
+       for(; *argument==' ';argument++);
+
+       if (!*field || !*value || !is_number(value)) {
+	   send_to_char("Usage: qedit set <playername> <value>\n\r", ch);
+	   return eFAILURE;
+       } else {
+	   if (!(vict = get_char_vis(ch, field)) || IS_MOB(vict)) {
+	       send_to_char("No living thing by that name.\n\r", ch);
+	       return eFAILURE;
+	   }
+	   
+	   logf(IMMORTAL, LOG_QUEST, "%s set %s's quest points from %d to %d.", GET_NAME(ch), GET_NAME(vict),
+		vict->pcdata->quest_points, atoi(value));
+	   csendf(ch, "Setting %s's quest points from %d to %d.\n\r", GET_NAME(vict),
+		  vict->pcdata->quest_points, atoi(value));
+
+	   vict->pcdata->quest_points = atoi(value);
+       }
+       return eSUCCESS;
    }
 
    if(is_abbrev(arg, "show")) {
