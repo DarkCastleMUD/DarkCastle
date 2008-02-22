@@ -161,11 +161,13 @@ int do_add_quest(CHAR_DATA *ch, char *name)
    quest->cost = 0;
 
    if (quest_list.empty() == true)
-       quest->number = quest_list.back()->number + 1;
-   else
        quest->number = 1;
+   else
+       quest->number = quest_list.back()->number + 1;
 
-   csendf(ch, "Quest number %d added.\n\r", quest->number);
+   quest_list.push_back(quest);
+
+   csendf(ch, "Quest number %d added.\n\r\n\r", quest->number);
    show_quest_info(ch, quest->number);
 
    return eSUCCESS;
