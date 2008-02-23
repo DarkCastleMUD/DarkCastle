@@ -16,7 +16,7 @@
 /* 12/08/2003   Onager   Added chop_half() to work like half_chop() but    */
 /*                       chopping off the last word.                       */
 /***************************************************************************/
-/* $Id: interp.cpp,v 1.144 2007/12/30 21:49:05 jhhudso Exp $ */
+/* $Id: interp.cpp,v 1.145 2008/02/23 22:55:01 jhhudso Exp $ */
 
 extern "C"
 {
@@ -296,7 +296,7 @@ struct command_info cmd_info[] =
     { "leave",		do_leave,	POSITION_STANDING, 0, 187, COM_CHARMIE_OK, 20 },
     { "name",		do_name,	POSITION_DEAD, 1, 9, 0, 1 },
     { "pick",		do_pick,	POSITION_STANDING, 0, 35, 0, 20 },
-    { "quest",          do_quest,       POSITION_DEAD, GIFTED_COMMAND, 9, 0, 1 },
+    { "quest",          do_quest,       POSITION_DEAD, 0, 9, 0, 1 },
     { "qui",		do_qui,		POSITION_DEAD, 0, 9, 0, 1 },
     { "levels",		do_levels,	POSITION_DEAD, 0, 9, 0, 1 },
     { "quit",		do_quit,	POSITION_DEAD, 0, 91, 0, 1 },
@@ -817,6 +817,7 @@ int command_interpreter( CHAR_DATA *ch, char *pcomm, bool procced  )
       retval = special( ch, found->command_number, &pcomm[look_at] );
       if(IS_SET(retval, eSUCCESS) || IS_SET(retval, eCH_DIED))
         return retval;
+
       // Normal dispatch
       retval = (*(found->command_pointer)) (ch, &pcomm[look_at], found->command_number);
       // Next bit for the DUI client, they needed it.
@@ -829,6 +830,7 @@ int command_interpreter( CHAR_DATA *ch, char *pcomm, bool procced  )
       // previous call, which screws up the debugger call stack.
       // -- Furey
       number( 0, 0 );
+
       return retval;
     }
     // end if((found = find_cmd_in_radix(pcomm)))
