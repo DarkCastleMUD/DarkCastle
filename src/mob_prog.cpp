@@ -1193,7 +1193,7 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
                      return ( rndm->equipment[WIELD] )?1:0;
                   else return 0;
         default:
-          logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'ispc'", mob_index[mob->mobdata->nr].virt);
+          logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'iswielding'", mob_index[mob->mobdata->nr].virt);
           return -1;
       }
   }
