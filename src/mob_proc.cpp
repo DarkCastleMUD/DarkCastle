@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.173 2008/02/17 19:11:10 dcastle Exp $ */
+/* $Id: mob_proc.cpp,v 1.174 2008/03/05 18:21:01 pirahna Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -1754,7 +1754,8 @@ static char *dethSayText [ ] =
   "Tell me what you need and I'll tell you how to get along with out it.",
   "Don't worry. I'm from the internet.",
   "God, root, what is difference?", // Written like that on purpose
-  "You will never steal anything again while I'm not afk."
+  "You will never steal anything again while I'm not afk.",
+  "People call me Hadoken because I'm down-right-fierce."
  };
 
 // ENDOFCHAIN
