@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.474 2008/03/07 14:53:38 dcastle Exp $               *
+ * $Id: fight.cpp,v 1.475 2008/03/07 23:58:23 urizen Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -1858,8 +1858,15 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
   {
      if (attacktype != SPELL_MAGIC_MISSILE &&
 	 attacktype != SPELL_BEE_STING &&
-	 attacktype != SPELL_BLUE_BIRD) // Handled separately in magic.cpp
+	 attacktype != SPELL_BLUE_BIRD && // Handled separately in magic.cpp
+	 attacktype != SPELL_LIGHTNING_SHIELD && 
+	 attacktype != SPELL_FIRESHIELD && 
+	 attacktype != SPELL_ACID_SHIELD
+
+
+	)
              dam += ch->spelldamage;
+
   }
 
   learned = has_skill(victim, SKILL_MAGIC_RESIST);
