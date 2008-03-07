@@ -5795,7 +5795,7 @@ int spell_portal(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data 
  extern struct obj_data * search_char_for_item(char_data * ch, int16 item_number, bool wearonly = FALSE);
 
   for (tmpch = world[victim->in_room].people; tmpch; tmpch = tmpch->next_in_room)
-     if (search_char_for_item(tmpch, real_object(76)))
+     if (search_char_for_item(tmpch, real_object(76)) || search_char_for_item(tmpch, real_object(51)))
 	portal = (obj_data*)1; // Makes the below produce an error. And yeah, I'm lazy. Go away.
 
   if(portal || IS_ARENA(victim->in_room) || IS_ARENA(ch->in_room)) {
