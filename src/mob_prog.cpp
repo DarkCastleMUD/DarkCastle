@@ -1192,6 +1192,10 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
         case 'r': if ( rndm )
                      return ( rndm->equipment[WIELD] )?1:0;
                   else return 0;
+        case 'f': if (actor && actor->fighting) return (actor->fighting->equipment[WIELD])?1:0;
+                   else return 0;
+        case 'g': if (mob && mob->fighting) return (mob->fighting->equipment[WIELD])?1:0;
+                   else return 0;
         default:
           logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'iswielding'", mob_index[mob->mobdata->nr].virt);
           return -1;
