@@ -53,6 +53,9 @@ const struct spec_data spec_list[] =
    { NULL, NULL,      0, {0,0,0,0,0,0,0,0,0,0} }
 };
 
+extern char *class_tree_name[11][3];
+
+
 int do_spec(CHAR_DATA *ch, char *argument, int cmd)
 {
   char buf[MAX_STRING_LENGTH];
@@ -61,12 +64,16 @@ int do_spec(CHAR_DATA *ch, char *argument, int cmd)
   if (IS_NPC(ch)) return eFAILURE;
   if (!str_cmp(arg, "list"))
   {
+/*
    for (int i = 0; spec_list[i].name != NULL; i++)
     {
        if (spec_list[i].pcclass != GET_CLASS(ch)) continue;
        sprintf(buf, "%d. %s : %s\r\n",i+1, spec_list[i].name, 
 		spec_list[i].description);
     }
+*/
+    
+
     send_to_char(buf, ch);
   } else if (!str_cmp(arg, "unlearn")) {
        argument = one_argument(argument,arg);

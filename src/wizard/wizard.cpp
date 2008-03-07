@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.58 2007/12/16 22:05:03 jhhudso Exp $
+| $Id: wizard.cpp,v 1.59 2008/03/07 08:50:01 dcastle Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -19,6 +19,7 @@
 #include <returnvals.h>
 
 extern struct obj_data * search_char_for_item(char_data * ch, int16 item_number, bool wearonly = FALSE);
+extern void debug_point();
 
 int number_or_name(char **name, int *num)
 {
@@ -1687,7 +1688,6 @@ void pick_up_item(struct char_data *ch, struct obj_data *obj)
   struct hunt_items *i,*p = NULL,*in;
   char buf[MAX_STRING_LENGTH];
   int gold = 0;
-
   for (i = hunt_items_list; i; i = in)
   {
      in = i->next;
