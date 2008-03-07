@@ -211,13 +211,17 @@ int spell_magic_missile(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct ob
   int weap_spell = obj?WIELD:0;
 
   set_cantquit( ch, victim );
-  dam = 50;
+  dam = 50 + ch->spelldamage;
     count += (skill > 15) + (skill > 35) + (skill > 55) + (skill > 75); 
 
 	/* Spellcraft Effect */
     if (spellcraft(ch, SPELL_MAGIC_MISSILE)) count++;
+
     while(!SOMEONE_DIED(retval) && count--)
+    {
     retval = damage(ch, victim, dam, TYPE_MAGIC, SPELL_MAGIC_MISSILE, weap_spell);
+    if (dam > 50) dam = 50; // spelldamage only applies to 1st missile
+    }
   return retval;
 }
 
@@ -9649,12 +9653,13 @@ int spell_bee_sting(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
    affected_type af;
    int i;
    set_cantquit(ch, victim);
-   dam = dice (4, 3) + skill/3;
+   dam = dice (4, 3) + skill/3 +ch->spelldamage;
    int weap_spell = obj?WIELD:0;
 
    for (i = 0; i < bees; i++) {
 
    retval = damage(ch, victim, dam, TYPE_PHYSICAL_MAGIC, SPELL_BEE_STING, weap_spell);
+   dam = dice (4, 3) + skill/3;
    if(SOMEONE_DIED(retval))
       return retval;
    }
@@ -11708,9 +11713,11 @@ int spell_blue_bird(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
 
   }
   
+   
+     dam = number(10, GET_LEVEL(ch) + 5) + ch->spelldamage;
   while(!SOMEONE_DIED(retval) && count--) {
-     dam = number(10, GET_LEVEL(ch) + 5);
      retval = damage(ch, victim, dam, TYPE_PHYSICAL_MAGIC, SPELL_BLUE_BIRD, 0);
+     dam = number(10, GET_LEVEL(ch) + 5);
   }
 
   return retval;

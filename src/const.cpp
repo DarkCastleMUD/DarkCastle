@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.255 2007/12/16 22:05:04 jhhudso Exp $ */
+/* $Id: const.cpp,v 1.256 2008/03/07 14:53:38 dcastle Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1056,7 +1056,7 @@ char *apply_types[] =
     "SONG MITIGATION",
     "RESIST MAGIC",
     "ALL SAVES",
-    "SPELLEFFECT",
+    "SPELLDAMAGE",
     "FREEDOM FROM HUNGER",
     "FREEDOM FROM THIRST",
     "AFF BLIND",
