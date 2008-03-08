@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.157 2008/03/08 04:04:19 kevin Exp $ */
+/* $Id: info.cpp,v 1.158 2008/03/08 11:54:04 kevin Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -85,6 +85,8 @@ extern int hit_gain(CHAR_DATA *ch, int position);
 extern int mana_gain(CHAR_DATA*ch);
 extern int ki_gain(CHAR_DATA *ch);
 extern int move_gain(CHAR_DATA *ch, int extra);
+extern int getRealSpellDamage(CHAR_DATA *ch);
+
 /* intern functions */
 
 void list_obj_to_char(struct obj_data *list,struct char_data *ch, int mode, bool show);
@@ -1449,18 +1451,8 @@ int do_score(struct char_data *ch, char *argument, int cmd)
    
    to_hit = GET_REAL_HITROLL(ch);
    to_dam = GET_REAL_DAMROLL(ch);
-   if (GET_CLASS(ch) == CLASS_MAGE || GET_CLASS(ch) == CLASS_ANTI_PAL || GET_CLASS(ch) == CLASS_RANGER )
-   {
-    spell_dam = GET_SPELLDAMAGE(ch) + int_app[GET_INT(ch)].spell_dam_bonus;
-   }
-   else if (GET_CLASS(ch) == CLASS_CLERIC || GET_CLASS(ch) == CLASS_DRUID || GET_CLASS(ch) == CLASS_PALADIN )
-   {       
-       spell_dam = GET_SPELLDAMAGE(ch) + wis_app[GET_INT(ch)].spell_dam_bonus;
-   }
-   else
-   { 
-     spell_dam = GET_SPELLDAMAGE(ch);
-   }
+   spell_dam = getRealSpellDamage(ch);
+
    sprintf(buf,
       "$7($5:$7)================================================="
       "========================($5:$7)\n\r"

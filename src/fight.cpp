@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.476 2008/03/08 04:04:19 kevin Exp $               *
+ * $Id: fight.cpp,v 1.477 2008/03/08 11:54:04 kevin Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -1764,6 +1764,22 @@ bool is_bingo(int dam, int weapon_type, int attacktype)
   return false;
 }
 
+int getRealSpellDamage( CHAR_DATA * ch)
+{
+  int spell_dam;
+
+  if (GET_CLASS(ch) == CLASS_MAGE || GET_CLASS(ch) == CLASS_ANTI_PAL || GET_CLASS(ch) == CLASS_RANGER )
+     spell_dam = (GET_SPELLDAMAGE(ch) + int_app[GET_INT(ch)].spell_dam_bonus);
+  else
+    if (GET_CLASS(ch) == CLASS_CLERIC || GET_CLASS(ch) == CLASS_DRUID || GET_CLASS(ch) == CLASS_PALADIN )
+       spell_dam = (GET_SPELLDAMAGE(ch) + wis_app[GET_WIS(ch)].spell_dam_bonus);
+  else
+       spell_dam = GET_SPELLDAMAGE(ch);
+  return spell_dam;
+}
+
+
+
 // returns standard returnvals.h return codes
 int damage(CHAR_DATA * ch, CHAR_DATA * victim,
            int dam, int weapon_type, int attacktype, int weapon)
@@ -1865,15 +1881,7 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
 
 
 	)
-//             dam += ch->spelldamage;
-         if (GET_CLASS(ch) == CLASS_MAGE || GET_CLASS(ch) == CLASS_ANTI_PAL || GET_CLASS(ch) == CLASS_RANGER )
-           dam += (GET_SPELLDAMAGE(ch) + int_app[GET_INT(ch)].spell_dam_bonus);
-         else
-         if (GET_CLASS(ch) == CLASS_CLERIC || GET_CLASS(ch) == CLASS_DRUID || GET_CLASS(ch) == CLASS_PALADIN )
-           dam += (GET_SPELLDAMAGE(ch) + wis_app[GET_INT(ch)].spell_dam_bonus);
-         else
-           dam += GET_SPELLDAMAGE(ch);
-
+     dam += getRealSpellDamage(ch);
   }
 
   learned = has_skill(victim, SKILL_MAGIC_RESIST);
