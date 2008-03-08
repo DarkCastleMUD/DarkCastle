@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.475 2008/03/07 23:58:23 urizen Exp $               *
+ * $Id: fight.cpp,v 1.476 2008/03/08 04:04:19 kevin Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -1865,7 +1865,14 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
 
 
 	)
-             dam += ch->spelldamage;
+//             dam += ch->spelldamage;
+         if (GET_CLASS(ch) == CLASS_MAGE || GET_CLASS(ch) == CLASS_ANTI_PAL || GET_CLASS(ch) == CLASS_RANGER )
+           dam += (GET_SPELLDAMAGE(ch) + int_app[GET_INT(ch)].spell_dam_bonus);
+         else
+         if (GET_CLASS(ch) == CLASS_CLERIC || GET_CLASS(ch) == CLASS_DRUID || GET_CLASS(ch) == CLASS_PALADIN )
+           dam += (GET_SPELLDAMAGE(ch) + wis_app[GET_INT(ch)].spell_dam_bonus);
+         else
+           dam += GET_SPELLDAMAGE(ch);
 
   }
 

@@ -1,7 +1,7 @@
 #ifndef PLAYER_H_
 #define PLAYER_H_
 /************************************************************************
-| $Id: player.h,v 1.39 2007/12/28 15:37:24 jhhudso Exp $
+| $Id: player.h,v 1.40 2008/03/08 04:04:52 kevin Exp $
 | player.h
 | Description: This file defines the player vectors..punishment, specials,
 |   etc...
@@ -294,6 +294,7 @@ struct wis_app_type
 		      /* practice pr. level                 */
     int16 energy_resistance;
     int16 conc_bonus;
+    int16 spell_dam_bonus; // For Cleric/Druid/Paladins naturally
 };
 
 // Constructor commented out for const.C initialization purposes
@@ -307,6 +308,7 @@ struct int_app_type
     int16 learn_bonus;
     int16 magic_resistance;
     int16 conc_bonus;
+    int16 spell_dam_bonus; // For Mage/Anti/Bard
 };
 
 // Constructor commented out for const.C initialization purposes

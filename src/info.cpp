@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.156 2008/03/07 14:53:38 dcastle Exp $ */
+/* $Id: info.cpp,v 1.157 2008/03/08 04:04:19 kevin Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -1433,7 +1433,7 @@ int do_score(struct char_data *ch, char *argument, int cmd)
    char race[100];
    char buf[MAX_STRING_LENGTH], scratch;
    int  level = 0;
-   int to_dam, to_hit;
+   int to_dam, to_hit, spell_dam;
    int flying = 0;
    bool modifyOutput;
    
@@ -1449,8 +1449,18 @@ int do_score(struct char_data *ch, char *argument, int cmd)
    
    to_hit = GET_REAL_HITROLL(ch);
    to_dam = GET_REAL_DAMROLL(ch);
-   
-   
+   if (GET_CLASS(ch) == CLASS_MAGE || GET_CLASS(ch) == CLASS_ANTI_PAL || GET_CLASS(ch) == CLASS_RANGER )
+   {
+    spell_dam = GET_SPELLDAMAGE(ch) + int_app[GET_INT(ch)].spell_dam_bonus;
+   }
+   else if (GET_CLASS(ch) == CLASS_CLERIC || GET_CLASS(ch) == CLASS_DRUID || GET_CLASS(ch) == CLASS_PALADIN )
+   {       
+       spell_dam = GET_SPELLDAMAGE(ch) + wis_app[GET_INT(ch)].spell_dam_bonus;
+   }
+   else
+   { 
+     spell_dam = GET_SPELLDAMAGE(ch);
+   }
    sprintf(buf,
       "$7($5:$7)================================================="
       "========================($5:$7)\n\r"
@@ -1490,7 +1500,7 @@ int do_score(struct char_data *ch, char *argument, int cmd)
       "($5:$7)===================================($5:$7)===================================($5:$7)\n\r",
    GET_ARMOR(ch), GET_PKILLS(ch),   IS_CARRYING_N(ch), CAN_CARRY_N(ch),
    to_hit, GET_PDEATHS(ch),  IS_CARRYING_W(ch), CAN_CARRY_W(ch),
-   to_dam, ch->spelldamage, GET_EXP(ch),
+   to_dam, spell_dam, GET_EXP(ch),
    get_saves(ch,SAVE_TYPE_FIRE), get_saves(ch, SAVE_TYPE_COLD), get_saves(ch, SAVE_TYPE_ENERGY), GET_LEVEL(ch) == IMP ? 0 
 : exp_needed, 
    get_saves(ch, SAVE_TYPE_ACID), get_saves(ch, SAVE_TYPE_MAGIC), get_saves(ch, SAVE_TYPE_POISON), GET_GOLD(ch), (int)GET_PLATINUM(ch),
