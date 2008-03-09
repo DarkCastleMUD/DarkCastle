@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.65 2007/12/08 16:48:05 dcastle Exp $
+| $Id: cl_warrior.cpp,v 1.66 2008/03/09 00:57:16 kevin Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -1042,6 +1042,10 @@ int do_tactics(struct char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }   
       
+  if(IS_AFFECTED(ch, SKILL_TACTICS)) {
+    send_to_char("You will need more to time to work out your tactics.\r\n", ch);
+    return eFAILURE;
+  }   
   if(!IS_AFFECTED(ch, AFF_GROUP)) {
     send_to_char("You have no group to command.\r\n", ch);
     return eFAILURE;
@@ -1075,7 +1079,14 @@ int do_tactics(struct char_data *ch, char *argument, int cmd)
       affect_to_char(tmp_char, &af);
     }   
   }
-    
+      af.type      = SKILL_TACTICS;
+      af.duration  = 1 + has_skill(ch,SKILL_TACTICS) / 10;
+      af.modifier  = 0;
+      af.location  = APPLY_NONE;
+      af.bitvector = -1;
+      affect_to_char(ch, &af);
+  
+  
   WAIT_STATE(ch, PULSE_VIOLENCE * 2);
   GET_MOVE(ch) /= 2;
   return eSUCCESS;

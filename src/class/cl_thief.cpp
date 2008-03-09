@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.173 2008/03/07 08:49:58 dcastle Exp $
+| $Id: cl_thief.cpp,v 1.174 2008/03/09 00:57:16 kevin Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -1913,6 +1913,10 @@ int do_deceit(struct char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }   
       
+  if(IS_AFFECTED(ch, SKILL_DECEIT)) {
+    send_to_char("You have to wait to be more deceitful!\r\n", ch);
+    return eFAILURE;
+  }   
   if(!IS_AFFECTED(ch, AFF_GROUP)) {
     send_to_char("You have no group to instruct!\r\n", ch);
     return eFAILURE;
@@ -1948,6 +1952,12 @@ int do_deceit(struct char_data *ch, char *argument, int cmd)
       affect_to_char(tmp_char, &af);
     }   
   }
+      af.type      = SKILL_DECEIT;
+      af.duration  = 1 + has_skill(ch,SKILL_DECEIT) / 10;
+      af.modifier  = 0;
+      af.location  = APPLY_NONE;
+      af.bitvector = -1;
+      affect_to_char(ch, &af);
     
   //skill_increase_check(ch, SKILL_DECEIT, has_skill(ch,SKILL_DECEIT), SKILL_INCREASE_EASY);
   WAIT_STATE(ch, PULSE_VIOLENCE * 2);

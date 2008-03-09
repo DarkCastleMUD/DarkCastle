@@ -1,5 +1,5 @@
 /************************************************************************
- * $Id: cl_barbarian.cpp,v 1.84 2008/01/05 10:15:01 jhhudso Exp $
+ * $Id: cl_barbarian.cpp,v 1.85 2008/03/09 00:57:16 kevin Exp $
  * cl_barbarian.cpp
  * Description: Commands for the barbarian class.
  *************************************************************************/
@@ -583,7 +583,10 @@ int do_ferocity(struct char_data *ch, char *argument, int cmd)
     send_to_char("You're just not angry enough!\r\n", ch);
     return eFAILURE;
   }
-
+  if(IS_AFFECTED(ch, SKILL_FEROCITY)) {
+    send_to_char("It is too soon to try and rile up the masses!\r\n",ch);
+    return eFAILURE;
+  }
   if(!IS_AFFECTED(ch, AFF_GROUP)) {
     send_to_char("You have no group to inspire.\r\n", ch);
     return eFAILURE;
@@ -619,6 +622,13 @@ int do_ferocity(struct char_data *ch, char *argument, int cmd)
       affect_to_char(tmp_char, &af);
     }
   }
+     logf(OVERSEER, LOG_MORTAL, "%s used ferocity, attempting to timer them", GET_NAME(ch));
+     af.type     = SKILL_FEROCITY;
+     af.duration = 1 + has_skill(ch,SKILL_FEROCITY) / 10;
+     af.location = APPLY_NONE;
+     af.bitvector= -1;
+     af.modifier = 0;
+     affect_to_char(ch,&af);
 
   WAIT_STATE(ch, PULSE_VIOLENCE * 2);
   GET_MOVE(ch) /= 2;
