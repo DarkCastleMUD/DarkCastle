@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.67 2008/03/09 01:08:28 kevin Exp $
+| $Id: cl_warrior.cpp,v 1.68 2008/03/09 05:40:58 jhhudso Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -1042,7 +1042,7 @@ int do_tactics(struct char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }   
       
-  if(IS_AFFECTED(ch, SKILL_TACTICS)) {
+  if(IS_AFFECTED(ch, SKILL_TACTICS_TIMER)) {
     send_to_char("You will need more to time to work out your tactics.\r\n", ch);
     return eFAILURE;
   }   
@@ -1059,10 +1059,10 @@ int do_tactics(struct char_data *ch, char *argument, int cmd)
     act ("$n takes command coordinating $s group's efforts.", ch, 0, 0, TO_ROOM, 0);
     send_to_char("You take command coordinating the group's attacks.\r\n", ch);
 
-    af.type      = SKILL_TACTICS;
+    af.type      = SKILL_TACTICS_TIMER;
     af.duration  = 1 + has_skill(ch,SKILL_TACTICS) / 10;
     af.modifier  = 0;
-    af.location  = APPLY_NONE;
+    af.location  = 0;
     af.bitvector = -1;
     affect_to_char(ch, &af);
     
@@ -1086,8 +1086,7 @@ int do_tactics(struct char_data *ch, char *argument, int cmd)
       affect_to_char(tmp_char, &af);
     }   
   }
-  
-  
+    
   WAIT_STATE(ch, PULSE_VIOLENCE * 2);
   GET_MOVE(ch) /= 2;
   return eSUCCESS;
