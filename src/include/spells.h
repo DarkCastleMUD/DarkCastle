@@ -14,7 +14,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.h,v 1.101 2007/12/16 22:05:03 jhhudso Exp $ */
+/* $Id: spells.h,v 1.102 2008/03/09 05:40:11 jhhudso Exp $ */
 #include <structs.h> // ubyte, int16
 
 #define MAX_BUF_LENGTH               240
@@ -525,7 +525,10 @@ void check_maxes(CHAR_DATA *ch);
 #define SKILL_MAKE_CAMP_TIMER        4008
 #define SKILL_LEADERSHIP_BONUS       4009
 #define SKILL_PERSEVERANCE_BONUS     4010
-#define RESERVED_MAX                 4010
+#define SKILL_DECEIT_TIMER           4011
+#define SKILL_FEROCITY_TIMER         4012
+#define SKILL_TACTICS_TIMER          4013
+#define RESERVED_MAX                 4013
 ///////////////////////////////////////////////////////////////////////
 
 #define TAR_IGNORE         1

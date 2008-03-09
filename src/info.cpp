@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.159 2008/03/09 00:56:02 kevin Exp $ */
+/* $Id: info.cpp,v 1.160 2008/03/09 05:40:11 jhhudso Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -1547,12 +1547,15 @@ int do_score(struct char_data *ch, char *argument, int cmd)
            case SKILL_BLOOD_FURY:
              aff_name = "blood fury reuse timer";
              break;
+           case SKILL_FEROCITY_TIMER:
            case SKILL_FEROCITY:
              aff_name = "ferocity reuse timer";
              break;
-           case SKILL_DECEIT:
+	    case SKILL_DECEIT_TIMER:
+	    case SKILL_DECEIT:
              aff_name = "deceit reuse timer";
              break;
+           case SKILL_TACTICS_TIMER:
            case SKILL_TACTICS:
              aff_name = "tactics reuse timer";
              break;

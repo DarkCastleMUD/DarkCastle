@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.166 2007/12/08 16:48:01 dcastle Exp $ */
+/* $Id: handler.cpp,v 1.167 2008/03/09 05:40:11 jhhudso Exp $ */
     
 extern "C"
 {
@@ -1654,6 +1654,18 @@ void affect_remove( CHAR_DATA *ch, struct affected_type *af, int flags)
          if (!(flags & SUPPRESS_MESSAGES))
          send_to_char("You feel capable of studying a new enemy of choice.\n\r", ch);
          break;
+       case SKILL_DECEIT_TIMER:
+	   if (!(flags & SUPPRESS_MESSAGES))
+	       send_to_char("You feel like you could be deceitful again.\n\r", ch);
+	   break;
+       case SKILL_FEROCITY_TIMER:
+	   if (!(flags & SUPPRESS_MESSAGES))
+	       send_to_char("You feel like you could be fierce again.\n\r", ch);
+	   break;
+       case SKILL_TACTICS_TIMER:
+	   if (!(flags & SUPPRESS_MESSAGES))
+	       send_to_char("You feel like you could be tactical again.\n\r", ch);
+	   break;
       case SKILL_LAY_HANDS:
          if(!(flags & SUPPRESS_MESSAGES))
          send_to_char("Your god returns your ability to fill others with life.\n\r", ch);
