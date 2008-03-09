@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.85 2007/12/28 15:37:24 jhhudso Exp $ */
+/* $Id: utility.cpp,v 1.86 2008/03/09 18:06:40 kevin Exp $ */
 
 extern "C"
 {
@@ -1083,6 +1083,13 @@ int do_recall( CHAR_DATA *ch, char *argument, int cmd )
      send_to_char( "Whom do you want to recall?\n\r", ch );
      return eFAILURE;
   }
+
+  if(victim->fighting && !IS_NPC(victim->fighting)) //PvP fight?
+  {
+     send_to_char("The gods refuse to answer your prayers while you're fighting!\r\n",victim);
+     return eFAILURE;
+  }
+
 
   if(affected_by_spell(victim, FUCK_PTHIEF) || affected_by_spell(victim, FUCK_GTHIEF)) {
      send_to_char("The gods frown upon your thieving ways and refuse to aid your escape.\n\r", victim);
