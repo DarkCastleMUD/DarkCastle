@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.59 2008/03/07 08:50:01 dcastle Exp $
+| $Id: wizard.cpp,v 1.60 2008/03/09 12:35:47 kevin Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -20,6 +20,7 @@
 
 extern struct obj_data * search_char_for_item(char_data * ch, int16 item_number, bool wearonly = FALSE);
 extern void debug_point();
+extern int getRealSpellDamage(char_data * ch);
 
 int number_or_name(char **name, int *num)
 {
@@ -574,7 +575,7 @@ void mob_stat(struct char_data *ch, struct char_data *k)
           k->alignment);
   strcat(buf, buf2);
   send_to_char(buf, ch);
-  sprintf(buf, "$3Spelldamage$R:[%d] ", k->spelldamage);
+  sprintf(buf, "$3Spelldamage$R:[%d] ", getRealSpellDamage(k));
   send_to_char(buf,ch);
   sprintf(buf,"$3Race$R: %s\r\n", race_info[(int)(GET_RACE(k))].singular_name);
   send_to_char(buf, ch);
