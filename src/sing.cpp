@@ -1043,9 +1043,10 @@ int song_healing_melody( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victi
 
 int execute_song_healing_melody( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
-   int heal;
+   int heal, healtmp = 0;
    char_data * master = NULL;
    follow_type * fvictim = NULL;
+   char buf[MAX_STRING_LENGTH];
 
    heal = 3*(GET_LEVEL(ch)/5);
 
@@ -1065,15 +1066,33 @@ int execute_song_healing_melody( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DAT
          IS_UNDEAD(fvictim->follower))
          continue;
 
-      send_to_char("You feel a little better.\r\n", fvictim->follower);
-      GET_HIT(fvictim->follower) += number(skill/4, heal);
+      healtmp = number(skill/4, heal);
+
+      if (IS_SET(fvictim->follower->pcdata->toggles, PLR_DAMAGE)) 
+      {  
+        sprintf(buf, "You feel %s's Healing Melody soothes %d point(s) of your health.\r\n", GET_NAME(master), healtmp);
+        send_to_char(buf,fvictim->follower); 
+      } 
+      else     
+       send_to_char("You feel a little better.\r\n", fvictim->follower);
+
+      GET_HIT(fvictim->follower) += healtmp; // OLD:number(skill/4, heal);
       if(GET_HIT(fvictim->follower) > GET_MAX_HIT(fvictim->follower))
          GET_HIT(fvictim->follower) = GET_MAX_HIT(fvictim->follower);
+    
    }
    if(ch->in_room == master->in_room && !IS_UNDEAD(master))
    {
-      send_to_char("You feel a little better.\r\n", master);
-      GET_HIT(master) += number(skill/4, heal);
+      healtmp = number(skill/4, heal);
+
+      if (IS_SET(ch->pcdata->toggles, PLR_DAMAGE))
+      {
+        sprintf(buf, "You feel your Healing Melody soothing %d point(s) of your health.\r\n", healtmp);
+        send_to_char(buf,master);
+      }
+      else
+        send_to_char("You feel a little better.\r\n", master);
+      GET_HIT(master) += healtmp;
       if(GET_HIT(master) > GET_MAX_HIT(master))
          GET_HIT(master) = GET_MAX_HIT(master);
    }
@@ -1317,9 +1336,10 @@ int song_soothing_remembrance( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA 
 
 int execute_song_soothing_remembrance( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
-   int heal;
+   int heal, healtmp = 0;
    char_data * master = NULL;
    follow_type * fvictim = NULL;
+   char buf[MAX_STRING_LENGTH];
 
    heal = GET_LEVEL(ch)/5;
 
@@ -1339,15 +1359,32 @@ int execute_song_soothing_remembrance( ubyte level, CHAR_DATA *ch, char *arg, CH
          fvictim->follower->in_room != ch->in_room)
          continue;
 
-      send_to_char("You feel soothed.\r\n", fvictim->follower);
-      GET_MANA(fvictim->follower) += number(skill/15 + 1, heal);
+      healtmp = number(skill/15, heal);
+
+      if (IS_SET(fvictim->follower->pcdata->toggles, PLR_DAMAGE))
+      {
+        sprintf(buf, "You feel %s's Soothing Rememberance revitalize %d point(s) of your mana.\r\n", GET_NAME(master),healtmp);
+        send_to_char(buf,fvictim->follower);
+      }
+      else
+        send_to_char("You feel soothed.\r\n", fvictim->follower);
+ 
+     GET_MANA(fvictim->follower) += healtmp;
       if(GET_MANA(fvictim->follower) > GET_MAX_MANA(fvictim->follower))
          GET_MANA(fvictim->follower) = GET_MAX_MANA(fvictim->follower);
    }
    if(ch->in_room == master->in_room)
    {
-      send_to_char("You feel soothed.\r\n", master);
-      GET_MANA(master) += number(skill/15 + 1, heal);
+      healtmp = number(skill/15, heal);
+
+      if (IS_SET(ch->pcdata->toggles, PLR_DAMAGE))
+      {
+        sprintf(buf, "You feel your Soothing Rememberance revitalize %d point(s) of your mana.\r\n", healtmp);
+        send_to_char(buf,master);
+      }
+      else
+        send_to_char("You feel soothed.\r\n", master);
+      GET_MANA(master) += healtmp;
       if(GET_MANA(master) > GET_MAX_MANA(master))
          GET_MANA(master) = GET_MAX_MANA(master);
    }
@@ -1386,10 +1423,11 @@ int song_traveling_march( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict
 
 int execute_song_traveling_march( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
-   int heal;
+   int heal, healtmp;
    char_data * master = NULL;
    follow_type * fvictim = NULL;
    struct affected_type af;
+   char buf[MAX_STRING_LENGTH];
 
    heal = ((GET_LEVEL(ch)/3)+1)*2;
 
@@ -1415,8 +1453,16 @@ int execute_song_traveling_march( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DA
          fvictim->follower->in_room != ch->in_room)
          continue;
 
-      send_to_char("Your feet feel lighter.\r\n", fvictim->follower);
-      GET_MOVE(fvictim->follower) += number(1, heal);
+     healtmp = number(1, heal);
+
+      if (IS_SET(fvictim->follower->pcdata->toggles, PLR_DAMAGE))
+      {
+        sprintf(buf, "You feel %s's Travelling March recover %d move(s) for you.\r\n", GET_NAME(master),healtmp);
+        send_to_char(buf,fvictim->follower);
+      }
+      else
+        send_to_char("Your feet feel lighter.\r\n", fvictim->follower);
+      GET_MOVE(fvictim->follower) += healtmp;
       if(GET_MOVE(fvictim->follower) > GET_MAX_MOVE(fvictim->follower))
          GET_MOVE(fvictim->follower) = GET_MAX_MOVE(fvictim->follower);
 
@@ -1424,8 +1470,16 @@ int execute_song_traveling_march( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DA
    }
    if(ch->in_room == master->in_room)
    {
-      send_to_char("Your feet feel lighter.\r\n", master);
-      GET_MOVE(master) += number(1, heal);
+      healtmp = number(1, heal);
+
+      if (IS_SET(ch->pcdata->toggles, PLR_DAMAGE))
+      {
+        sprintf(buf, "You feel your Travelling March recover %d of your move(s).\r\n", healtmp);
+        send_to_char(buf,master);
+      }
+      else      
+        send_to_char("Your feet feel lighter.\r\n", master);
+      GET_MOVE(master) += healtmp;
       if(GET_MOVE(master) > GET_MAX_MOVE(master))
          GET_MOVE(master) = GET_MAX_MOVE(master);
    }
