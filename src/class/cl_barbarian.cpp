@@ -1,5 +1,5 @@
 /************************************************************************
- * $Id: cl_barbarian.cpp,v 1.85 2008/03/09 00:57:16 kevin Exp $
+ * $Id: cl_barbarian.cpp,v 1.86 2008/03/09 01:08:28 kevin Exp $
  * cl_barbarian.cpp
  * Description: Commands for the barbarian class.
  *************************************************************************/
@@ -600,6 +600,12 @@ int do_ferocity(struct char_data *ch, char *argument, int cmd)
     act ("$n lets out a deafening roar!", ch, 0, 0, TO_ROOM, 0);
     send_to_char("Your heart beats adrenaline though your body and you roar with ferocity!\r\n", ch);
 
+     af.type     = SKILL_FEROCITY;
+     af.duration = 1 + has_skill(ch,SKILL_FEROCITY) / 10;
+     af.location = APPLY_NONE;
+     af.bitvector= -1;
+     af.modifier = 0;
+     affect_to_char(ch,&af);
     for(char_data * tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
     {
       if(tmp_char == ch)
@@ -622,13 +628,6 @@ int do_ferocity(struct char_data *ch, char *argument, int cmd)
       affect_to_char(tmp_char, &af);
     }
   }
-     logf(OVERSEER, LOG_MORTAL, "%s used ferocity, attempting to timer them", GET_NAME(ch));
-     af.type     = SKILL_FEROCITY;
-     af.duration = 1 + has_skill(ch,SKILL_FEROCITY) / 10;
-     af.location = APPLY_NONE;
-     af.bitvector= -1;
-     af.modifier = 0;
-     affect_to_char(ch,&af);
 
   WAIT_STATE(ch, PULSE_VIOLENCE * 2);
   GET_MOVE(ch) /= 2;

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.66 2008/03/09 00:57:16 kevin Exp $
+| $Id: cl_warrior.cpp,v 1.67 2008/03/09 01:08:28 kevin Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -1058,6 +1058,13 @@ int do_tactics(struct char_data *ch, char *argument, int cmd)
   else {
     act ("$n takes command coordinating $s group's efforts.", ch, 0, 0, TO_ROOM, 0);
     send_to_char("You take command coordinating the group's attacks.\r\n", ch);
+
+    af.type      = SKILL_TACTICS;
+    af.duration  = 1 + has_skill(ch,SKILL_TACTICS) / 10;
+    af.modifier  = 0;
+    af.location  = APPLY_NONE;
+    af.bitvector = -1;
+    affect_to_char(ch, &af);
     
     for(char_data * tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
     { 
@@ -1079,12 +1086,6 @@ int do_tactics(struct char_data *ch, char *argument, int cmd)
       affect_to_char(tmp_char, &af);
     }   
   }
-      af.type      = SKILL_TACTICS;
-      af.duration  = 1 + has_skill(ch,SKILL_TACTICS) / 10;
-      af.modifier  = 0;
-      af.location  = APPLY_NONE;
-      af.bitvector = -1;
-      affect_to_char(ch, &af);
   
   
   WAIT_STATE(ch, PULSE_VIOLENCE * 2);
