@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.68 2008/03/09 05:40:58 jhhudso Exp $
+| $Id: cl_warrior.cpp,v 1.69 2008/03/09 23:39:09 kevin Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -1042,8 +1042,8 @@ int do_tactics(struct char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }   
       
-  if(IS_AFFECTED(ch, SKILL_TACTICS_TIMER)) {
-    send_to_char("You will need more to time to work out your tactics.\r\n", ch);
+  if(affected_by_spell(ch, SKILL_TACTICS_TIMER)) {
+    send_to_char("You will need more time to work out your tactics.\r\n", ch);
     return eFAILURE;
   }   
   if(!IS_AFFECTED(ch, AFF_GROUP)) {

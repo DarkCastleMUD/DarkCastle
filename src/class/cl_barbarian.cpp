@@ -1,5 +1,5 @@
 /************************************************************************
- * $Id: cl_barbarian.cpp,v 1.87 2008/03/09 05:41:40 jhhudso Exp $
+ * $Id: cl_barbarian.cpp,v 1.88 2008/03/09 23:39:09 kevin Exp $
  * cl_barbarian.cpp
  * Description: Commands for the barbarian class.
  *************************************************************************/
@@ -583,7 +583,7 @@ int do_ferocity(struct char_data *ch, char *argument, int cmd)
     send_to_char("You're just not angry enough!\r\n", ch);
     return eFAILURE;
   }
-  if(IS_AFFECTED(ch, SKILL_FEROCITY_TIMER)) {
+  if(affected_by_spell(ch, SKILL_FEROCITY_TIMER)) {
     send_to_char("It is too soon to try and rile up the masses!\r\n",ch);
     return eFAILURE;
   }
