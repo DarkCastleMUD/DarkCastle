@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.176 2008/03/09 05:41:14 jhhudso Exp $
+| $Id: cl_thief.cpp,v 1.177 2008/03/09 15:59:13 kevin Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -923,7 +923,7 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
   if(IS_MOB(ch))
      return eFAILURE;
 
-  if((GET_LEVEL(ch) < (GET_LEVEL(victim) - 10))) {
+  if((GET_LEVEL(ch) < (GET_LEVEL(victim) - 19))) {
     send_to_char("That person is far too experienced for you to steal from.\r\n", ch);
     return eFAILURE;
   }
