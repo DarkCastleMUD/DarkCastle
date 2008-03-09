@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.257 2008/03/08 04:04:19 kevin Exp $ */
+/* $Id: const.cpp,v 1.258 2008/03/09 00:56:01 kevin Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -2470,5 +2470,5 @@ char *reserved[] = {
     "smite timer",
     "make camp timer",
     "leadership bonus",
-    "perseverance bonus"
+    "perseverance bonus",
 };

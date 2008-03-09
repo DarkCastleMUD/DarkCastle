@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.477 2008/03/08 11:54:04 kevin Exp $               *
+ * $Id: fight.cpp,v 1.478 2008/03/09 00:56:01 kevin Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -1767,15 +1767,23 @@ bool is_bingo(int dam, int weapon_type, int attacktype)
 int getRealSpellDamage( CHAR_DATA * ch)
 {
   int spell_dam;
-
-  if (GET_CLASS(ch) == CLASS_MAGE || GET_CLASS(ch) == CLASS_ANTI_PAL || GET_CLASS(ch) == CLASS_RANGER )
+  switch(GET_CLASS(ch))
+  {
+    case CLASS_MAGE:
+    case CLASS_ANTI_PAL:
+    case CLASS_RANGER:
      spell_dam = (GET_SPELLDAMAGE(ch) + int_app[GET_INT(ch)].spell_dam_bonus);
-  else
-    if (GET_CLASS(ch) == CLASS_CLERIC || GET_CLASS(ch) == CLASS_DRUID || GET_CLASS(ch) == CLASS_PALADIN )
+     break;
+    case CLASS_CLERIC:
+    case CLASS_PALADIN:
+    case CLASS_DRUID:
        spell_dam = (GET_SPELLDAMAGE(ch) + wis_app[GET_WIS(ch)].spell_dam_bonus);
-  else
+       break;
+    default:
        spell_dam = GET_SPELLDAMAGE(ch);
-  return spell_dam;
+       break;
+   }
+   return spell_dam;
 }
 
 
