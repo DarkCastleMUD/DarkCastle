@@ -1,5 +1,5 @@
 /************************************************************************
- * $Id: cl_barbarian.cpp,v 1.86 2008/03/09 01:08:28 kevin Exp $
+ * $Id: cl_barbarian.cpp,v 1.87 2008/03/09 05:41:40 jhhudso Exp $
  * cl_barbarian.cpp
  * Description: Commands for the barbarian class.
  *************************************************************************/
@@ -583,7 +583,7 @@ int do_ferocity(struct char_data *ch, char *argument, int cmd)
     send_to_char("You're just not angry enough!\r\n", ch);
     return eFAILURE;
   }
-  if(IS_AFFECTED(ch, SKILL_FEROCITY)) {
+  if(IS_AFFECTED(ch, SKILL_FEROCITY_TIMER)) {
     send_to_char("It is too soon to try and rile up the masses!\r\n",ch);
     return eFAILURE;
   }
@@ -600,12 +600,13 @@ int do_ferocity(struct char_data *ch, char *argument, int cmd)
     act ("$n lets out a deafening roar!", ch, 0, 0, TO_ROOM, 0);
     send_to_char("Your heart beats adrenaline though your body and you roar with ferocity!\r\n", ch);
 
-     af.type     = SKILL_FEROCITY;
+     af.type     = SKILL_FEROCITY_TIMER;
      af.duration = 1 + has_skill(ch,SKILL_FEROCITY) / 10;
-     af.location = APPLY_NONE;
+     af.location = 0;
      af.bitvector= -1;
      af.modifier = 0;
      affect_to_char(ch,&af);
+
     for(char_data * tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
     {
       if(tmp_char == ch)
