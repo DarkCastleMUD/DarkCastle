@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.80 2007/05/04 17:24:30 dcastle Exp $ */
+/* $Id: mob_proc2.cpp,v 1.81 2008/03/10 06:49:08 jhhudso Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -542,11 +542,15 @@ int mortician(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 }
 
 
-char *gl_item(OBJ_DATA *obj, int number, CHAR_DATA *ch)
+char *gl_item(OBJ_DATA *obj, int number, CHAR_DATA *ch, bool platinum = TRUE)
 {
   char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH],buf3[MAX_STRING_LENGTH];
   int length,i = 0;
-  sprintf(buf,"$B$7%-2d$R) %s ", number+1, obj->short_description);
+  if (platinum) 
+      sprintf(buf,"$B$7%-2d$R) %s ", number+1, obj->short_description);
+  else
+      sprintf(buf,"$B$7%-2d$R) $3$B%s$R ", number+1, obj->short_description);
+
   extern char* apply_types[];
   if (obj->obj_flags.type_flag == ITEM_WEAPON) { // weapon
     sprintf(buf, "%s%dd%d, %s, ", buf, obj->obj_flags.value[1], obj->obj_flags.value[2],
@@ -570,7 +574,7 @@ char *gl_item(OBJ_DATA *obj, int number, CHAR_DATA *ch)
       if (length + strlen(buf3) > 90)
       {
 	length = 0;
-	sprintf(buf, "%s\r\n     %s",buf,buf3);
+	sprintf(buf, "%s\r\n    %s",buf,buf3);
       } else {
 	length += strlen(buf3);
 	sprintf(buf, "%s%s",buf,buf3);
@@ -583,22 +587,29 @@ char *gl_item(OBJ_DATA *obj, int number, CHAR_DATA *ch)
       if (length + strlen(buf2) > 90)
       {
 	length = 0;
-	sprintf(buf, "%s\r\n     %s",buf,buf2);
+	sprintf(buf, "%s\r\n    %s",buf,buf2);
       } else {
   	length += strlen(buf2);
   	sprintf(buf, "%s%s",buf,buf2);
       }
 
     }
-    sprintf(buf2,"costing %d coins.\r\n",obj->obj_flags.cost/10);
+
+    if (platinum) {
+	sprintf(buf2,"costing %d coins.\r\n",obj->obj_flags.cost/10);
+    } else {
+	sprintf(buf2,"costing %d qpoints.\r\n", obj->obj_flags.cost/10000);
+    }
+
     if (length + strlen(buf2) > 90)
     {
 	length = 0;
-	sprintf(buf, "%s\r\n     %s",buf,buf2);
+	sprintf(buf, "%s\r\n    %s",buf,buf2);
     } else {
 	length += strlen(buf2);
 	sprintf(buf, "%s%s",buf,buf2);
     }
+
   return str_dup(buf);
 }
 

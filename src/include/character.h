@@ -1,7 +1,7 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.68 2007/12/08 16:48:08 dcastle Exp $
+| $Id: character.h,v 1.69 2008/03/10 06:49:08 jhhudso Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
@@ -359,6 +359,8 @@ struct char_data
     uint32 hpmetas;             // total number of times meta'd hps
     uint32 manametas;           // total number of times meta'd mana
     uint32 movemetas;           // total number of times meta'd moves
+    uint32 acmetas;             // total number of times meta'd ac
+     int32 agemetas;            // number of years age has been meta'd
 
      int16 hit_regen;           // modifier to hp regen
      int16 mana_regen;          // modifier to mana regen

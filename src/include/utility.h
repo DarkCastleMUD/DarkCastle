@@ -16,7 +16,7 @@
  *  10/21/2003   Onager    Changed IS_ANONYMOUS() to handle mobs without   *
  *                         crashing                                        *
  ***************************************************************************/
-/* $Id: utility.h,v 1.70 2008/03/08 04:04:52 kevin Exp $ */
+/* $Id: utility.h,v 1.71 2008/03/10 06:49:08 jhhudso Exp $ */
 
 #ifndef UTILITY_H_
 #define UTILITY_H_
@@ -168,6 +168,8 @@ bool IS_DARK( int room );
 #define GET_HP_METAS(ch)   ((ch)->hpmetas)
 #define GET_MANA_METAS(ch) ((ch)->manametas)
 #define GET_MOVE_METAS(ch) ((ch)->movemetas)
+#define GET_AC_METAS(ch)   ((ch)->acmetas)
+#define GET_AGE_METAS(ch)  ((ch)->agemetas)
 #define GET_KI_METAS(ch)   ((ch)->pcdata->kimetas)
 
 #define GET_POS(ch)     ((ch)->position)
