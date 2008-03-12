@@ -1068,7 +1068,7 @@ int execute_song_healing_melody( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DAT
 
       healtmp = number(skill/4, heal);
 
-      if (IS_PC(fvictim->follower)&& IS_SET(fvictim->follower->pcdata->toggles, PLR_DAMAGE)) 
+      if (IS_PC(fvictim->follower) && IS_SET(fvictim->follower->pcdata->toggles, PLR_DAMAGE)) 
       {  
         sprintf(buf, "You feel %s's Healing Melody soothing %d point%sof your health.\r\n", GET_NAME(master), 
 healtmp, (healtmp>1?"s ":" "));
@@ -1086,7 +1086,7 @@ healtmp, (healtmp>1?"s ":" "));
    {
       healtmp = number(skill/4, heal);
 
-      if (IS_PC(fvictim->follower)&& IS_SET(ch->pcdata->toggles, PLR_DAMAGE))
+      if (IS_PC(master) && IS_SET(master->pcdata->toggles, PLR_DAMAGE))
       {
         sprintf(buf, "You feel your Healing Melody soothing %d point%sof your health.\r\n", healtmp, (healtmp>1?"s ":" ") );
         send_to_char(buf,master);
@@ -1362,7 +1362,7 @@ int execute_song_soothing_remembrance( ubyte level, CHAR_DATA *ch, char *arg, CH
 
       healtmp = number(skill/15, heal);
 
-      if (IS_PC(fvictim->follower)&& IS_SET(fvictim->follower->pcdata->toggles, PLR_DAMAGE))
+      if (IS_PC(fvictim->follower) && IS_SET(fvictim->follower->pcdata->toggles, PLR_DAMAGE))
       {
         sprintf(buf, "You feel %s's Soothing Rememberance revitalize %d point%sof your mana.\r\n", 
 GET_NAME(master),healtmp, (healtmp>1?"s ":" "));
@@ -1379,7 +1379,7 @@ GET_NAME(master),healtmp, (healtmp>1?"s ":" "));
    {
       healtmp = number(skill/15, heal);
 
-      if (IS_PC(fvictim->follower)&& IS_SET(ch->pcdata->toggles, PLR_DAMAGE))
+      if (IS_PC(master) && IS_SET(master->pcdata->toggles, PLR_DAMAGE))
       {
         sprintf(buf, "You feel your Soothing Rememberance revitalize %d point%sof your mana.\r\n", healtmp, 
 (healtmp>1?"s ":" "));
@@ -1458,7 +1458,7 @@ int execute_song_traveling_march( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DA
 
      healtmp = number(1, heal);
 
-      if (IS_PC(fvictim->follower)&& IS_SET(fvictim->follower->pcdata->toggles, PLR_DAMAGE))
+      if (IS_PC(fvictim->follower) && IS_SET(fvictim->follower->pcdata->toggles, PLR_DAMAGE))
       {
         sprintf(buf, "You feel %s's Travelling March recovering %d move%sfor you.\r\n", GET_NAME(master),healtmp, 
 (healtmp>1?"s ":" "));
@@ -1476,7 +1476,7 @@ int execute_song_traveling_march( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DA
    {
       healtmp = number(1, heal);
 
-      if ( IS_PC(fvictim->follower)&& IS_SET(ch->pcdata->toggles, PLR_DAMAGE))
+      if ( IS_PC(master) && IS_SET(master->pcdata->toggles, PLR_DAMAGE))
       {
         sprintf(buf, "You feel your Travelling March recover %d move%sfor you.\r\n", healtmp, (healtmp>1?"s ":" "));
         send_to_char(buf,master);
