@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.259 2008/03/09 23:00:51 kevin Exp $ */
+/* $Id: const.cpp,v 1.260 2008/03/20 20:08:05 apocalypse Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1469,7 +1469,7 @@ struct class_skill_defines d_skills[] = { // bard skills
 { "stop",                  SKILL_SONG_STOP,                2,     100,  0,   CONINT },
 { "irresistable ditty",    SKILL_SONG_UNRESIST_DITTY,      3,     100,  0,   INTWIS },
 { "dodge",                 SKILL_DODGE,                    5,      80,  0,   STRDEX },
-{ "hide",                  SKILL_HIDE,                     7,      70,  0,   STRDEX },
+{ "sneak",                 SKILL_SNEAK,                    7,      70,  0,   STRDEX },
 { "travelling march",      SKILL_SONG_TRAVELING_MARCH,     9,     100,  0,   CONWIS },
 { "trip",                  SKILL_TRIP,                     10,     70,  0,   STRDEX },
 { "bountiful sonnet",      SKILL_SONG_BOUNT_SONNET,        12,    100,  0,   CONWIS },
