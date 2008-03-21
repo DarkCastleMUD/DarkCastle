@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.172 2007/12/08 16:48:03 dcastle Exp $ */
+/* $Id: nanny.cpp,v 1.173 2008/03/21 14:53:51 dcastle Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -542,6 +542,20 @@ void do_on_login_stuff(char_data * ch)
 	    }
 	    else { prev = curr; curr = curr->next; }
 	
+     }
+     if (GET_CLASS(ch) == CLASS_BARD && has_skill(ch, SKILL_HIDE))
+     {
+	  struct char_skill_data * curr = ch->skills, *prev = NULL;
+	  while(curr)
+	    if(curr->skillnum == SKILL_HIDE)
+    	    {
+		if (prev) prev->next = curr->next;
+		else ch->skills = curr->next;
+		FREE(curr);
+		break;
+	    }
+	    else { prev = curr; curr = curr->next; }
+
      }
    // Remove listsongs
      if (GET_CLASS(ch) == CLASS_BARD && has_skill(ch, SKILL_SONG_LIST_SONGS)) {
