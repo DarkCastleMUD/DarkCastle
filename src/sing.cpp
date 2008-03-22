@@ -1610,7 +1610,9 @@ int execute_song_astral_chanty( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA
           { 
              send_to_char("$B$1Phire whispers, 'You had to know I wouldn't make it THAT easy now didn't you? You're just going to have to walk!$R\r\n",ch);
              status = eFAILURE;
-          } else {
+          }
+
+	if (status != eFAILURE) {
    	        char_data *next_char = 0;
   		for (char_data * tmp_char = world[ch->in_room].people; tmp_char; tmp_char = next_char) {
 	    	  next_char = tmp_char->next_in_room;
