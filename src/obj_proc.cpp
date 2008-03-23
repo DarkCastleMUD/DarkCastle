@@ -3075,10 +3075,6 @@ int spellcraft_glyphs(struct char_data*ch, struct obj_data *obj, int cmd, char*a
 
    if(cmd != 93) return eFAILURE; //put
    
-   if(ch->in_room != 14060) {
-      send_to_char("There's no place around to put this special item.\n\r", ch);
-      return eFAILURE;
-   }
    argi = one_argument(argi, arg);
    argi = one_argument(argi, target);
 
@@ -3087,6 +3083,11 @@ int spellcraft_glyphs(struct char_data*ch, struct obj_data *obj, int cmd, char*a
    heartglyph = get_obj_in_list_vis(ch, 6353, ch->carrying);
 
    if(!str_cmp(arg, "power")) {
+     if(ch->in_room != 14060) {
+        send_to_char("There's no place around to put this special item.\n\r", ch);
+        return eFAILURE;
+     }
+
       if(sunglyph == NULL) {
          send_to_char("Put what where?\n\r", ch);
          return eFAILURE;
@@ -3106,6 +3107,10 @@ int spellcraft_glyphs(struct char_data*ch, struct obj_data *obj, int cmd, char*a
          return eFAILURE;
      }
    } else if(!str_cmp(arg, "wisdom")) {
+      if(ch->in_room != 14060) {
+        send_to_char("There's no place around to put this special item.\n\r", ch);
+        return eFAILURE;
+     }
       if(bookglyph == NULL) {
          send_to_char("Put what where?\n\r", ch);
          return eFAILURE;
@@ -3125,6 +3130,11 @@ int spellcraft_glyphs(struct char_data*ch, struct obj_data *obj, int cmd, char*a
          return eFAILURE;
      }
    } else if(!str_cmp(arg, "will")) {
+     if(ch->in_room != 14060) {
+        send_to_char("There's no place around to put this special item.\n\r", ch);
+        return eFAILURE;
+     }
+
       if(heartglyph == NULL) {
          send_to_char("Put what where?\n\r", ch);
          return eFAILURE;
@@ -3143,8 +3153,8 @@ int spellcraft_glyphs(struct char_data*ch, struct obj_data *obj, int cmd, char*a
          send_to_char("Put it where?\n\r", ch);
          return eFAILURE;
      }
-   } else
-      send_to_char("Which glyph?\n\r", ch);
+   } else return eFAILURE;
+//      send_to_char("Which glyph?\n\r", ch);
    if(ch->spellcraftglyph == 7) {
       if(GET_CLASS(ch) == CLASS_MAGIC_USER && GET_LEVEL(ch) >= 50 && !has_skill(ch, SKILL_SPELLCRAFT)) {
          send_to_room("The glyph receptacles glow an eerie pale white.\n\rThe book shoots out a beams of light from the pages.\n\r", ch->in_room);
