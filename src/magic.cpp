@@ -10767,6 +10767,11 @@ int spell_beacon(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *vic
       return eFAILURE;
    }
 
+   if( ch->beacon->in_room == ch->in_room ) {
+      send_to_char("Hey genius.  Poof.  You're already there.\r\n", ch);
+      return eFAILURE;
+   }
+
    if((!IS_SET(world[ch->in_room].room_flags, ARENA) &&
        IS_SET(world[ch->beacon->in_room].room_flags, ARENA)
       ) ||
