@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.174 2008/03/05 18:21:01 pirahna Exp $ */
+/* $Id: mob_proc.cpp,v 1.175 2008/03/28 14:46:30 apocalypse Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -1752,10 +1752,11 @@ static char *dethSayText [ ] =
   "I love deadlines...especially the sound they make as they go whooshing by!",
   "Urizen told me that even though hard work never killed anyone, he doesn't want to chance it.",
   "Tell me what you need and I'll tell you how to get along with out it.",
-  "Don't worry. I'm from the internet.",
+  "Don't worry. I'm from the Internet.",
   "God, root, what is difference?", // Written like that on purpose
-  "You will never steal anything again while I'm not afk.",
-  "People call me Hadoken because I'm down-right-fierce."
+  "You will never steal anything again while I'm not AFK.",
+  "People call me Hadoken because I'm down-right-fierce.",
+  "I wish my lawn was Emo so it would cut itself."
  };
 
 // ENDOFCHAIN
