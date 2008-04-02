@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.479 2008/03/09 03:35:19 kevin Exp $               *
+ * $Id: fight.cpp,v 1.480 2008/04/02 20:55:30 dcastle Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -4463,7 +4463,7 @@ void do_combatmastery(CHAR_DATA *ch, CHAR_DATA *vict, int weapon)
         af.type      = SKILL_CM_TIMER;
         af.location  = 0;
         af.modifier  = 0;
-        af.duration  = 5;
+        af.duration  = number(3,4);
         af.bitvector = -1;
         affect_to_char(ch, &af, PULSE_VIOLENCE);
      }
