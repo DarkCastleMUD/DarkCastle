@@ -1253,7 +1253,7 @@ int quest_vendor(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
       struct obj_data *obj;
       obj = clone_object(rnum);
 
-      if (class_restricted(ch, obj)) {
+/*      if (class_restricted(ch, obj)) {
 	  sprintf(buf, "%s That item is meant for another class.", GET_NAME(ch));
 	  do_tell(owner, buf, 0);
 	  extract_obj(obj);
@@ -1263,7 +1263,8 @@ int quest_vendor(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 	  do_tell(owner, buf, 0);
 	  extract_obj(obj);
 	  return eSUCCESS;
-      } else if (IS_SET(obj->obj_flags.more_flags, ITEM_UNIQUE) &&
+      } else */
+      if (IS_SET(obj->obj_flags.more_flags, ITEM_UNIQUE) &&
 		 search_char_for_item(ch, obj->item_number)) {
 	  sprintf(buf, "%s You already have one of those.", GET_NAME(ch));
 	  do_tell(owner, buf, 0);
