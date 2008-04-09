@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.81 2008/03/10 06:49:08 jhhudso Exp $ */
+/* $Id: mob_proc2.cpp,v 1.82 2008/04/09 21:55:42 dcastle Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -581,18 +581,38 @@ char *gl_item(OBJ_DATA *obj, int number, CHAR_DATA *ch, bool platinum = TRUE)
       }
       
     }
-    if (class_restricted(ch, obj) || size_restricted(ch, obj))
+    if (ch->in_room != 3055)
     {
-      sprintf(buf2,"$4[restricted]$R, ");
-      if (length + strlen(buf2) > 90)
+      if (class_restricted(ch, obj) || size_restricted(ch, obj))
       {
-	length = 0;
-	sprintf(buf, "%s\r\n    %s",buf,buf2);
-      } else {
-  	length += strlen(buf2);
-  	sprintf(buf, "%s%s",buf,buf2);
+        sprintf(buf2,"$4[restricted]$R, ");
+        if (length + strlen(buf2) > 90)
+        {
+  	  length = 0;
+	  sprintf(buf, "%s\r\n    %s",buf,buf2);
+        } else {
+  	  length += strlen(buf2);
+    	  sprintf(buf, "%s%s",buf,buf2);
+        }
       }
+    } else {
+       extern char *extra_bits[];
 
+       uint32 a = obj->obj_flags.extra_flags;
+       a &= ALL_CLASSES;
+       sprintbit(a,extra_bits,buf2);
+       buf2[strlen(buf2)-1] = '\0'; // remove extra space;
+       sprintf(buf2,"%s]$R, ",buf2);
+       if (a) {
+         if (length + strlen(buf2) + 1 > 90)
+         {
+  	  length = 0;
+	  sprintf(buf, "%s\r\n    $4[%s",buf,buf2);
+         } else {
+  	  length += strlen(buf2);
+    	  sprintf(buf, "%s$4[%s",buf,buf2);
+         }
+ 	}
     }
 
     if (platinum) {
@@ -697,6 +717,7 @@ int godload_sales(struct char_data *ch, struct obj_data *obj, int cmd, char *arg
   }
    struct obj_data *obj;
    obj = clone_object(real_object(platsmith_list[o].sales[k]));
+
    if (class_restricted(ch, obj) || size_restricted(ch, obj) ||search_char_for_item(ch, obj->item_number) )
    {
     sprintf(buf, "%s That item is not available to you.",GET_NAME(ch));
