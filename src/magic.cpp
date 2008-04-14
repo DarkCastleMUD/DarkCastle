@@ -358,7 +358,7 @@ int spell_drown(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *
         send_to_char(buf, victim);
         act("$N is torn apart by the force of $n's watery blast and killed instantly!", ch, 0, victim, TO_ROOM, NOTVICT);
         act("$N is torn apart by the force of your watery blast and killed instantly!", ch, 0, victim, TO_CHAR, 0);
-        return damage(ch, victim, dam, TYPE_COLD, SPELL_DROWN, 0);
+        return damage(ch, victim, dam, TYPE_WATER, SPELL_DROWN, 0);
      }
    }
    return eSUCCESS;
