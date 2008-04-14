@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.69 2008/03/09 23:39:09 kevin Exp $
+| $Id: cl_warrior.cpp,v 1.70 2008/04/14 14:03:53 apocalypse Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -492,7 +492,7 @@ int do_bash(struct char_data *ch, char *argument, int cmd)
         act("You bounce off of $N and crash into the ground.", ch, 0, victim, TO_CHAR, 0);
         act("$n bounces off of you and crashes into the ground.", ch, 0, victim, TO_VICT, 0);
         act("$n bounces off of $N and crashes into the ground.", ch, 0, victim, TO_ROOM, NOTVICT);
-        WAIT_STATE(ch, 3 * PULSE_VIOLENCE);
+        WAIT_STATE(ch, 2 * PULSE_VIOLENCE);
         return eFAILURE;
     }
 
