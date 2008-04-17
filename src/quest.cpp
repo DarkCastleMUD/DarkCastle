@@ -253,10 +253,10 @@ bool check_quest_current(CHAR_DATA *ch, int number)
    return FALSE;
 }
 
-bool check_quest_pass(CHAR_DATA *ch, int number)
+bool check_quest_cancel(CHAR_DATA *ch, int number)
 {
-   for(int i = 0;i<QUEST_PASS;i++)
-      if(ch->pcdata->quest_pass[i] == number)
+   for(int i = 0;i<QUEST_CANCEL;i++)
+      if(ch->pcdata->quest_cancel[i] == number)
          return TRUE;
    return FALSE;
 }
@@ -288,10 +288,6 @@ void show_quest_header(CHAR_DATA *ch)
 
 void show_quest_amount(CHAR_DATA *ch, int remaining)
 {
-    
-//    if(check_quest_pass(ch, quest->number))
-//	num_passed = show_one_quest(ch, quest, num_passed);
-
    csendf(ch,
 	  "\n\r $B$2Completed: $7%-4d $2Remaining: $7%-4d $2Total: $7%-4d$R\n\r", quest_list.size()-remaining, remaining, quest_list.size());
    return;
@@ -411,7 +407,7 @@ void show_available_quests(CHAR_DATA *ch)
    return;
 }
 
-void show_pass_quests(CHAR_DATA *ch)
+void show_canceled_quests(CHAR_DATA *ch)
 {
    int count = 0;
    struct quest_info *quest;
@@ -421,7 +417,7 @@ void show_pass_quests(CHAR_DATA *ch)
     for (quest_list_t::iterator node = quest_list.begin(); node != quest_list.end(); node++) {
 	quest = *node;
 	
-      if(check_quest_pass(ch, quest->number))
+      if(check_quest_cancel(ch, quest->number))
          count = show_one_complete_quest(ch, quest, count);
    }
 //   show_quest_amount(ch, count);
@@ -443,9 +439,6 @@ void show_current_quests(CHAR_DATA *ch)
 	if(check_quest_current(ch, quest->number))
 	    num_attempting = show_one_quest(ch, quest, num_attempting);
     }
-
-//    csendf(ch, " $B$2Attempting: $7%d$R", num_attempting);
-//    show_quest_amount(ch, num_passed);
     show_quest_footer(ch);
 
     return;
@@ -537,9 +530,9 @@ int start_quest(CHAR_DATA *ch, struct quest_info *quest)
    ch->pcdata->quest_current_ticksleft[count] = quest->timer;
    quest->active = TRUE;
    count = 0;
-   while(count < QUEST_PASS) {
-      if(ch->pcdata->quest_pass[count] == quest->number) {
-         ch->pcdata->quest_pass[count] = 0;
+   while(count < QUEST_CANCEL) {
+      if(ch->pcdata->quest_cancel[count] == quest->number) {
+         ch->pcdata->quest_cancel[count] = 0;
          break;
       }
       count++;
@@ -556,23 +549,23 @@ int start_quest(CHAR_DATA *ch, struct quest_info *quest)
    return eSUCCESS;
 }
 
-int pass_quest(CHAR_DATA *ch, struct quest_info *quest)
+int cancel_quest(CHAR_DATA *ch, struct quest_info *quest)
 {
    int count = 0;
 
    if(!quest) return eFAILURE;
    if(!check_quest_current(ch, quest->number)) return eFAILURE;
 
-   while(count < QUEST_PASS) {
-      if(!ch->pcdata->quest_pass[count])
+   while(count < QUEST_CANCEL) {
+      if(!ch->pcdata->quest_cancel[count])
          break;
       count++;
-      if(count >= QUEST_PASS) return eEXTRA_VALUE;
+      if(count >= QUEST_CANCEL) return eEXTRA_VALUE;
    }
 
-   logf(IMMORTAL, LOG_QUEST, "%s passed quest %d (%s).", GET_NAME(ch), quest->number, quest->name);
+   logf(IMMORTAL, LOG_QUEST, "%s canceled quest %d (%s).", GET_NAME(ch), quest->number, quest->name);
 
-   ch->pcdata->quest_pass[count] = quest->number;
+   ch->pcdata->quest_cancel[count] = quest->number;
 
    return stop_current_quest(ch, quest);
 }
@@ -728,13 +721,13 @@ int quest_handler(CHAR_DATA *ch, CHAR_DATA *qmaster, int cmd, char *name)
          show_available_quests(ch);
          break;
       case 2:
-         retval = pass_quest(ch, quest);
+         retval = cancel_quest(ch, quest);
          if(IS_SET(retval, eSUCCESS)) {
             sprintf(buf, "%s You may begin this quest again if you speak with me.", GET_NAME(ch));
             do_psay(qmaster, buf, 9);
          }
          else if(IS_SET(retval, eEXTRA_VALUE)) {
-            sprintf(buf, "%s You cannot pass up any more quests without completing some of them.", GET_NAME(ch));
+            sprintf(buf, "%s You cannot cancel up any more quests without completing some of them.", GET_NAME(ch));
             do_psay(qmaster, buf, 9);
          }
          else {
@@ -846,8 +839,8 @@ int do_quest(CHAR_DATA *ch, char *arg, int cmd)
 
    if (is_abbrev(arg, "current"))
       show_current_quests(ch);
-   else if(is_abbrev(arg, "passed") && !*name)
-      show_pass_quests(ch);
+   else if(is_abbrev(arg, "canceled") && !*name)
+      show_canceled_quests(ch);
    else if(is_abbrev(arg, "completed"))
       show_complete_quests(ch);
    else if(is_abbrev(arg, "list")) {
@@ -856,7 +849,7 @@ int do_quest(CHAR_DATA *ch, char *arg, int cmd)
          send_to_char("You must ask the Quest Master for available quests.\n\r", ch);
       else retval = quest_handler(ch, qmaster, 1, 0);
    }
-   else if(is_abbrev(arg, "passed") && *name) {
+   else if(is_abbrev(arg, "cancel") && *name) {
       if(!qmaster) return eFAILURE;
       if(ch->in_room != qmaster->in_room)
          send_to_char("You must let the Quest Master know of your intentions.\n\r", ch);
@@ -878,14 +871,14 @@ int do_quest(CHAR_DATA *ch, char *arg, int cmd)
       return retval;
    }
    else {
-      csendf(ch, "Usage: quest current      (lists current quests)\n\r"
-                 "       quest completed    (lists completed quests)\n\r"
-                 "       quest passed       (lists passed quests)\n\r\n\r"
+      csendf(ch, "Usage: quest current       (lists current quests)\n\r"
+                 "       quest completed     (lists completed quests)\n\r"
+                 "       quest canceled      (lists canceled quests)\n\r\n\r"
                  "The following commands may only be used at the Quest Master.\n\r"
-                 "       quest list         (lists available quests)\n\r"
-                 "       quest pass <name>  (passes a current quest)\n\r"
-                 "       quest start <name> (starts a new quest)\n\r"
-                 "       quest finish <name>(finishes a current quest)\n\r"
+                 "       quest list          (lists available quests)\n\r"
+                 "       quest cancel <name> (cancel the current quest)\n\r"
+                 "       quest start <name>  (starts a new quest)\n\r"
+                 "       quest finish <name> (finishes a current quest)\n\r"
                  "\n\r");
       return eFAILURE;
    }
