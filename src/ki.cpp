@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.70 2007/12/08 16:48:02 dcastle Exp $ */
+/* $Id: ki.cpp,v 1.71 2008/04/17 02:37:19 jhhudso Exp $ */
 
 extern "C"
 {
@@ -535,7 +535,7 @@ int ki_storm( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
 //  send_to_char("Your wholeness of spirit purges the souls of those around you!\n\r", ch);
 //  act("$n's eyes flash as $e pools the energy within $m!\n\rA burst of energy slams into you!\r\n",
   int32 room = ch->in_room;
-  for(tmp_victim = world[ch->in_room].people; tmp_victim; tmp_victim = temp)
+  for(tmp_victim = world[ch->in_room].people; tmp_victim && tmp_victim != (char_data *)0x95959595; tmp_victim = temp)
   {
 	 temp = tmp_victim->next_in_room;
 	 if ( (ch->in_room == tmp_victim->in_room) && (ch != tmp_victim) &&
