@@ -1,7 +1,7 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.69 2008/03/10 06:49:08 jhhudso Exp $
+| $Id: character.h,v 1.70 2008/04/18 01:27:17 jhhudso Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
@@ -267,7 +267,7 @@ struct pc_data
     uint32 quest_points;
     int16  quest_current[QUEST_MAX];
     uint32 quest_current_ticksleft[QUEST_MAX];
-    int16  quest_pass[QUEST_PASS];
+    int16  quest_cancel[QUEST_CANCEL];
     uint32 quest_complete[QUEST_TOTAL/ASIZE+1];
     char *last_prompt;
     std::multimap<int, std::pair<timeval, timeval> > *lastseen;
@@ -496,7 +496,9 @@ struct char_file_u
     int16 clan; 
     int32 load_room;                  // Which room to place char in
 
-    int32 extra_ints[5];             // available just in case
+    uint32 acmetas;
+    int32 agemetas;
+    int32 extra_ints[3];             // available just in case
 };
 
 

@@ -24,6 +24,24 @@ using namespace std;
 typedef vector<quest_info *> quest_list_t;
 quest_list_t quest_list;
 
+char *valid_fields[] = {
+    "name",
+    "level",
+    "objnum",
+    "objshort",
+    "objlong",
+    "objkey",
+    "mobnum",
+    "timer",
+    "reward",
+    "hint1",
+    "hint2",
+    "hint3",
+    "cost",
+    "brownie",
+    NULL
+};
+
 extern void string_to_file(FILE *, char *);
 extern int keywordfind(OBJ_DATA *);
 extern void wear(CHAR_DATA *, OBJ_DATA *, int);
@@ -908,7 +926,22 @@ int do_qedit(CHAR_DATA *ch, char *argument, int cmd)
                  "       qedit save                      (saves all quests)\n\r"
 	         "       qedit stat <playername>         (show player's current qpoints)\n\r"
 	         "       qedit set <playername> <value>  (alter player's current qpoints)\n\r"
-                 "\n\r");
+                 "\n\r"
+	         "Valid qedit fields:\n\r");
+
+      // Display all of qedit's valid fields in rows of 4 columns
+      //
+      char **tmp = valid_fields;
+      int i=0;
+      while (*tmp != NULL) {
+	  csendf(ch, "%s\t", *tmp);
+	  if (++i % 4 == 0) {
+	      csendf(ch, "\n\r");
+	  }
+	  tmp++;
+      }
+      csendf(ch, "\n\r");
+	      
       return eFAILURE;
    }
 
@@ -916,24 +949,6 @@ int do_qedit(CHAR_DATA *ch, char *argument, int cmd)
       send_to_char("Quests saved.\n\r", ch);
       return save_quests();
    }
-
-   char *valid_fields[] = {
-      "name",
-      "level",
-      "objnum",
-      "objshort",
-      "objlong",
-      "objkey",
-      "mobnum",
-      "timer",
-      "reward",
-      "hint1",
-      "hint2",
-      "hint3",
-      "cost",
-      "brownie",
-      NULL
-   };
 
    if(is_abbrev(arg, "new")) {
       if(!*argument) {

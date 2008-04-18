@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.167 2007/12/28 15:37:23 jhhudso Exp $ */
+/* $Id: db.cpp,v 1.168 2008/04/18 01:27:16 jhhudso Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -4819,8 +4819,8 @@ void init_char(CHAR_DATA *ch)
   ch->pcdata->toggles = 0;
   ch->pcdata->golem = 0;
   ch->pcdata->quest_points = 0;
-  for(int j=0;j<QUEST_PASS;j++)
-    ch->pcdata->quest_pass[j] = 0;
+  for(int j=0;j<QUEST_CANCEL;j++)
+    ch->pcdata->quest_cancel[j] = 0;
   for(int j=0;j<=QUEST_TOTAL/ASIZE;j++)
     ch->pcdata->quest_complete[j] = 0;
 

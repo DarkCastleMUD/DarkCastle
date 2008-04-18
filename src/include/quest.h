@@ -8,7 +8,7 @@ one liner quest shit
 
 #define QUEST_MAX    1     //max quests at a time
 #define QUEST_SHOW   10    //max quests shown at a time
-#define QUEST_PASS   15    //max quests passed at a time
+#define QUEST_CANCEL 15    //max quests canceled at a time
 #define QUEST_TOTAL  500   //max total quests in file
 #define QUEST_MASTER 10027 //vnum of questmaster
 

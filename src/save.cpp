@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: save.cpp,v 1.54 2007/11/12 21:48:14 dcastle Exp $ */
+/* $Id: save.cpp,v 1.55 2008/04/18 01:27:17 jhhudso Exp $ */
 
 extern "C"
 {
@@ -291,8 +291,8 @@ void save_pc_data(struct pc_data * i, FILE * fpsave, struct time_data tmpage)
 
   fwrite("QST", sizeof(char), 3, fpsave);
   fwrite(&(i->quest_points), sizeof(i->quest_points), 1, fpsave);
-  for(int j=0;j<QUEST_PASS;j++)
-    fwrite(&(i->quest_pass[j]), sizeof(i->quest_pass[j]), 1, fpsave);
+  for(int j=0;j<QUEST_CANCEL;j++)
+    fwrite(&(i->quest_cancel[j]), sizeof(i->quest_cancel[j]), 1, fpsave);
   for(int j=0;j<=QUEST_TOTAL/ASIZE;j++)
     fwrite(&(i->quest_complete[j]), sizeof(i->quest_complete[j]), 1, fpsave);
   if (i->buildLowVnum) {
@@ -344,8 +344,8 @@ void read_pc_data(struct char_data *ch, FILE* fpsave)
 
   i->golem = 0;
   i->quest_points = 0;
-  for(int j=0;j<QUEST_PASS;j++)
-	i->quest_pass[j] = 0;
+  for(int j=0;j<QUEST_CANCEL;j++)
+	i->quest_cancel[j] = 0;
   for(int j=0;j<=QUEST_TOTAL/ASIZE;j++)
 	i->quest_complete[j] = 0;
 
@@ -416,8 +416,8 @@ void read_pc_data(struct char_data *ch, FILE* fpsave)
   if (!strcmp("QST", typeflag))
   {
     fread(&(i->quest_points), sizeof(i->quest_points), 1, fpsave);
-    for(int j = 0;j<QUEST_PASS;j++)
-      fread(&(i->quest_pass[j]), sizeof(i->quest_pass[j]), 1, fpsave);
+    for(int j = 0;j<QUEST_CANCEL;j++)
+      fread(&(i->quest_cancel[j]), sizeof(i->quest_cancel[j]), 1, fpsave);
     for(int j=0;j<=QUEST_TOTAL/ASIZE;j++)
       fread(&(i->quest_complete[j]), sizeof(i->quest_complete[j]), 1, fpsave);
    fread(&typeflag, sizeof(char), 3, fpsave);
@@ -1493,14 +1493,13 @@ void char_to_store(CHAR_DATA *ch, struct char_file_u *st, struct time_data & tmp
     st->damroll =  ch->damroll;
     st->afected_by = ch->affected_by[0];
     st->afected_by2 = ch->affected_by[1];
-/*    x=0;
-    while(ch->afected_by[x] != -1) {
-       st->afected_by[x] = ch->affected_by[x];
-       x++;
-    }
-    st->afected_by[x] = -1;*/
-  }
-  else { 
+//  x=0;
+//  while(ch->afected_by[x] != -1) {
+//     st->afected_by[x] = ch->affected_by[x];
+//     x++;
+//  }
+//  st->afected_by[x] = -1;
+  } else { 
     switch(GET_CLASS(ch)) {
       case CLASS_MAGE: st->armor = 150; break;
       case CLASS_DRUID: st->armor = 140; break;
@@ -1519,6 +1518,8 @@ void char_to_store(CHAR_DATA *ch, struct char_file_u *st, struct time_data & tmp
     st->damroll =  0;
     st->afected_by = 0;
     st->afected_by2 = 0;
+    st->acmetas = GET_AC_METAS(ch);
+    st->agemetas = GET_AGE_METAS(ch);
     tmpage = ch->pcdata->time;
   }
 
