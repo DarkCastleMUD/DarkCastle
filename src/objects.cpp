@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.96 2007/12/30 22:21:54 dcastle Exp $
+| $Id: objects.cpp,v 1.97 2008/04/30 18:14:13 pirahna Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -187,7 +187,7 @@ void object_activity()
 		int retval = 0;
 		extern struct zone_data *zone_table;
 
-		if (active_obj->obj->in_room) {
+		if (active_obj->obj->in_room != NOWHERE) {
 		    if(zone_table[world[active_obj->obj->in_room].zone].players)
 			retval = oprog_rand_trigger(active_obj->obj);
 		} else  retval = oprog_rand_trigger(active_obj->obj);
