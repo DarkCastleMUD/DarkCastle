@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.161 2008/03/09 05:48:50 jhhudso Exp $ */
+/* $Id: info.cpp,v 1.162 2008/05/04 10:31:25 dcastle Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -1473,7 +1473,7 @@ int do_score(struct char_data *ch, char *argument, int cmd)
       GET_DEX(ch), GET_RAW_DEX(ch), pc_clss_types[(int)GET_CLASS(ch)], GET_MANA(ch), GET_MAX_MANA(ch),
       GET_CON(ch), GET_RAW_CON(ch), GET_LEVEL(ch), GET_MOVE(ch), GET_MAX_MOVE(ch),
       GET_INT(ch), GET_RAW_INT(ch), GET_HEIGHT(ch), GET_KI(ch),  GET_MAX_KI(ch), 
-      GET_WIS(ch), GET_RAW_WIS(ch), GET_WEIGHT(ch), GET_RDEATHS(ch), hit_gain(ch, 777), 
+      GET_WIS(ch), GET_RAW_WIS(ch), GET_WEIGHT(ch), IS_NPC(ch) ? 0 : GET_RDEATHS(ch), hit_gain(ch, 777), 
       mana_gain(ch), move_gain(ch,777), ki_gain(ch), GET_AGE(ch), 
       GET_ALIGNMENT(ch));
    send_to_char(buf, ch);
