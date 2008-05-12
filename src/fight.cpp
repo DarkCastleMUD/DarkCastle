@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.480 2008/04/02 20:55:30 dcastle Exp $               *
+ * $Id: fight.cpp,v 1.481 2008/05/12 19:53:52 kkoons Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -4281,8 +4281,8 @@ int do_behead_skill(CHAR_DATA *ch, CHAR_DATA *vict)
         chance = number(0, 101);
         if(chance > (2 * percent) && !IS_SET(vict->immune, ISR_SLASH)
            && skill_success(ch, vict, SKILL_BEHEAD)) {
-          if ((vict->equipment[WEAR_NECK_1] && obj_index[vict->equipment[WEAR_NECK_1]->item_number].virt == 518) ||
-              (vict->equipment[WEAR_NECK_2] && obj_index[vict->equipment[WEAR_NECK_2]->item_number].virt == 518) 
+          if (((vict->equipment[WEAR_NECK_1] && obj_index[vict->equipment[WEAR_NECK_1]->item_number].virt == 518) ||
+              (vict->equipment[WEAR_NECK_2] && obj_index[vict->equipment[WEAR_NECK_2]->item_number].virt == 518)) 
               && !number(0,1))
           { // tarrasque's leash..
             act("You attempt to behead $N, but your sword bounces of $S neckwear.",ch, 0, vict, TO_CHAR, 0);
