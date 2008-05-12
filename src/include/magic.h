@@ -5,7 +5,7 @@
  *                                                                           *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-/* $Id: magic.h,v 1.32 2007/12/08 16:48:09 dcastle Exp $ */
+/* $Id: magic.h,v 1.33 2008/05/12 20:24:06 kkoons Exp $ */
 #ifndef MAGIC_H_
 #define MAGIC_H_
 
@@ -627,6 +627,15 @@ int spell_holy_aura(ubyte level, CHAR_DATA * ch,
    CHAR_DATA * victim, struct obj_data * obj, int skill);
 int cast_holy_aura(ubyte level, CHAR_DATA * ch, char *arg, int type,
    CHAR_DATA * victim, struct obj_data * tar_obj, int skill);
+
+
+
+
+int spell_release_elemental(ubyte level, CHAR_DATA * ch,
+   CHAR_DATA * victim, struct obj_data * obj, int skill);
+int cast_release_elemental(ubyte level, CHAR_DATA * ch, char *arg, int type,
+   CHAR_DATA * victim, struct obj_data * tar_obj, int skill);
+
 
 int spell_dismiss_familiar(ubyte level, CHAR_DATA * ch,
    CHAR_DATA * victim, struct obj_data * obj, int skill);

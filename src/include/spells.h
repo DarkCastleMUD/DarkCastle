@@ -14,7 +14,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.h,v 1.102 2008/03/09 05:40:11 jhhudso Exp $ */
+/* $Id: spells.h,v 1.103 2008/05/12 20:24:06 kkoons Exp $ */
 #include <structs.h> // ubyte, int16
 
 #define MAX_BUF_LENGTH               240
@@ -220,7 +220,8 @@ void check_maxes(CHAR_DATA *ch);
 #define SPELL_IMMUNITY              166
 #define SPELL_BONESHIELD            167
 #define SPELL_CHANNEL               168
-#define MAX_SPL_LIST                168
+#define SPELL_RELEASE_ELEMENTAL     169
+#define MAX_SPL_LIST                169
 
 // if you add a spell, make sure you update "spells[]" in spells.C
 
@@ -571,6 +572,11 @@ struct spell_info_type
 #define SPELL_TYPE_STAFF    3
 #define SPELL_TYPE_SCROLL   4
 
+
+#define FIRE_ELEMENTAL	88
+#define WATER_ELEMENTAL	89
+#define AIR_ELEMENTAL	90
+#define EARTH_ELEMENTAL	91
 
 /*
  * Attack types with grammar.
