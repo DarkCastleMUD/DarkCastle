@@ -398,7 +398,7 @@ int spell_souldrain(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
       send_to_char("You cannot do this in a safe room!\r\n", ch);
       return eFAILURE;
       }
-   mana = dam_percent(skill,125);
+   mana = dam_percent(skill,125 + ch->spelldamage);
    if(mana > GET_MANA(victim))
    mana = GET_MANA(victim);
    if (mana <= 0)
@@ -1781,7 +1781,7 @@ int spell_cure_critic(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
   }
 
   if (!can_heal(ch,victim, SPELL_CURE_CRITIC)) return eFAILURE;
-  healpoints = dam_percent(skill, 100);
+  healpoints = dam_percent(skill, 100 + ch->spelldamage);
   healpoints = number(healpoints-(healpoints/10), healpoints+(healpoints/10));
 
   if ( (healpoints + GET_HIT(victim)) > hit_limit(victim) ) {
@@ -1837,7 +1837,7 @@ int spell_cure_light(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
   }
 
   if (!can_heal(ch,victim, SPELL_CURE_LIGHT)) return eFAILURE;
-  healpoints = dam_percent(skill, 25);
+  healpoints = dam_percent(skill, 25 + ch->spelldamage);
   healpoints = number(healpoints-(healpoints/10), healpoints+(healpoints/10));
   if ( (healpoints+GET_HIT(victim)) > hit_limit(victim) ) {
      healpoints = hit_limit(victim) - GET_HIT(victim);
@@ -2335,7 +2335,7 @@ int spell_heal(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
   }
 
   if (!can_heal(ch,victim,SPELL_HEAL)) return eFAILURE;
-  healy = dam_percent(skill,250);
+  healy = dam_percent(skill,250 + ch->spelldamage);
   healy = number(healy-(healy/10), healy+(healy/10));
   GET_HIT(victim) += healy;
 
@@ -2387,7 +2387,7 @@ int spell_power_heal(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
   }
 
   if (!can_heal(ch,victim, SPELL_POWER_HEAL)) return eFAILURE;
-  healy = dam_percent(skill, 300);
+  healy = dam_percent(skill, 300 + ch->spelldamage);
   healy = number(healy-(healy/10), healy+(healy/10));
   GET_HIT(victim) += healy;
 
@@ -2437,7 +2437,7 @@ int spell_full_heal(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
 
   if (!can_heal(ch,victim, SPELL_FULL_HEAL)) return eFAILURE;
 
-  healamount = 10 * (skill/2 + 5);
+  healamount = 10 * (skill/2 + 5) + ch->spelldamage;
   if(GET_ALIGNMENT(ch) < -349)
     healamount -= 2* (skill/2 + 5);
   else if(GET_ALIGNMENT(ch) > 349)
@@ -5188,7 +5188,7 @@ int spell_cure_serious(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
   }
 
   if (!can_heal(ch,victim, SPELL_CURE_SERIOUS)) return eFAILURE;
-      healpoints = dam_percent(skill,50);
+      healpoints = dam_percent(skill,50 + ch->spelldamage);
   healpoints = number(healpoints-(healpoints/10), healpoints+(healpoints/10));
 
   if ((healpoints + GET_HIT(victim)) > hit_limit(victim)) {
