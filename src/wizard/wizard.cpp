@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.60 2008/03/09 12:35:47 kevin Exp $
+| $Id: wizard.cpp,v 1.61 2008/05/12 21:09:50 kkoons Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -1464,6 +1464,7 @@ struct hunt_data
 {
   struct hunt_data *next;
   char *huntname;
+  char *hunttime;
   int itemnum;
   int time;
   int itemsAvail[50];
@@ -1538,6 +1539,7 @@ void check_end_of_hunt(struct hunt_data *h, bool forced = FALSE)
 	p = hl;
      }
      dc_free(h->huntname);
+	 dc_free(h->hunttime);
      dc_free(h);     
   }
 }
@@ -1623,10 +1625,13 @@ void init_random_hunt_items(struct hunt_data *h)
   dc_fclose(f);
 }
 
-void begin_hunt(int item, int time, int amount, char *huntname)
+void begin_hunt(int item, int hunttime, int amount, char *huntname)
 { // time, itme, item
   struct hunt_data *n;
-  
+  char buf[100];
+  struct tm *pTime = NULL;
+  long ct;  
+
 #ifdef LEAK_CHECK
   n = (struct hunt_data *)calloc(1, sizeof(struct hunt_data));
 #else
@@ -1635,8 +1640,25 @@ void begin_hunt(int item, int time, int amount, char *huntname)
   n->next = hunt_list;
   hunt_list = n;
   n->itemnum = item;
-  n->time = time;
+  n->time = hunttime;
   if (huntname) n->huntname = str_dup(huntname);
+  
+  ct = time(0);
+  pTime = localtime(&ct);
+  if(NULL != pTime)
+  {
+     sprintf(buf, "%d/%d/%d (%d:%02d) %s\n\r",
+           pTime->tm_mon+1,
+	   pTime->tm_mday,
+	   pTime->tm_year+1900,
+	   pTime->tm_hour,
+	   pTime->tm_min,
+	   pTime->tm_zone);
+  }
+  else
+     sprintf(buf, "UNKNOWN\n\r");
+  
+  n->hunttime = str_dup(buf);
   if (item == 76) init_random_hunt_items(n);
   int rnum = real_object(item);
   extern int top_of_mobt;
@@ -1782,7 +1804,12 @@ int do_showhunt(CHAR_DATA *ch, char *arg, int cmd)
   struct hunt_data *h;
   struct hunt_items *hi;
 
-  if (!hunt_list) send_to_char("There are no active hunts at the moment.\r\n",ch);
+  if (!hunt_list) 
+  {
+     send_to_char("There are no active hunts at the moment.\r\n",ch);
+	 sprintf(buf, "Last hunt was run: %s\n\r", h->hunttime);
+	 send_to_char(buf, ch);
+  }
   else send_to_char("The following hunts are currently active:\r\n",ch);
 
   for (h = hunt_list;h;h = h->next)
