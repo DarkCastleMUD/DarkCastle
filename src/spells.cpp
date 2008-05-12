@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.234 2008/05/12 20:23:36 kkoons Exp $ */
+/* $Id: spells.cpp,v 1.235 2008/05/12 21:27:12 kkoons Exp $ */
 
 extern "C"
 {
@@ -2065,7 +2065,7 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
 	if (GET_LEVEL(ch) == 1) chance++;
         if(IS_AFFECTED(ch, AFF_CRIPPLE) && affected_by_spell(ch, SKILL_CRIPPLE))
            chance -= 1 + affected_by_spell(ch, SKILL_CRIPPLE)->modifier/10;
-        if(GET_LEVEL(ch) < IMMORTAL && number(1,101) > chance && !IS_AFFECTED(ch,AFF_FOCUS))
+        if(GET_LEVEL(ch) < IMMORTAL && number(1,101) > chance && !IS_AFFECTED(ch,AFF_FOCUS) && !IS_SET(world[ch->in_room].room_flags, SAFE) )
         {
           csendf(ch, "You lost your concentration and are unable to cast %s!\n\r", spells[spl-1]);
           GET_MANA(ch) -= (use_mana(ch, spl) >> 1);
