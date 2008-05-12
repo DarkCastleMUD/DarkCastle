@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.61 2008/05/12 21:09:50 kkoons Exp $
+| $Id: wizard.cpp,v 1.62 2008/05/12 21:13:57 kkoons Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -1625,7 +1625,7 @@ void init_random_hunt_items(struct hunt_data *h)
   dc_fclose(f);
 }
 
-void begin_hunt(int item, int hunttime, int amount, char *huntname)
+void begin_hunt(int item, int duration, int amount, char *huntname)
 { // time, itme, item
   struct hunt_data *n;
   char buf[100];
@@ -1640,7 +1640,7 @@ void begin_hunt(int item, int hunttime, int amount, char *huntname)
   n->next = hunt_list;
   hunt_list = n;
   n->itemnum = item;
-  n->time = hunttime;
+  n->time = duration;
   if (huntname) n->huntname = str_dup(huntname);
   
   ct = time(0);
