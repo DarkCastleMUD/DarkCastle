@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.119 2007/12/08 16:48:01 dcastle Exp $
+| $Id: guild.cpp,v 1.120 2008/05/12 20:23:35 kkoons Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -871,6 +871,15 @@ int skill_master(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     prepare_character_for_sixty(ch);
     sprintf(buf, "$BYou have learned the basics of %s.$R\n\r", get_skill_name(skl));
     send_to_char(buf,ch);
+
+    switch (GET_CLASS(ch))
+    {
+        case CLASS_DRUID:
+        learn_skill(ch, SPELL_RELEASE_ELEMENTAL, 1, 1);
+        sprintf(buf, "$BYou have learned the basics of %s.$R\n\r", get_skill_name(SPELL_RELEASE_ELEMENTAL));
+        send_to_char(buf, ch);
+        break;
+    }
     return eSUCCESS;
   }
 

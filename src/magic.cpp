@@ -12249,6 +12249,86 @@ int cast_dismiss_corpse( ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_D
   return eFAILURE;
 }
 
+
+
+
+
+
+/* RELEASE ELEMENTAL */
+
+int spell_release_elemental(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
+{
+   victim = NULL;
+   //send_to_char("Disabled.\r\n",ch);
+   //return eFAILURE;
+
+   for(struct follow_type *k = ch->followers; k; k = k->next)
+     if(IS_MOB(k->follower) && affected_by_spell(k->follower, AFF_CHARM))
+     {
+        victim = k->follower;
+        break;
+     }
+
+   if (NULL == victim) {
+      send_to_char("You don't have an elemental!\n\r", ch);
+      return eFAILURE;
+   }
+
+   switch (mob_index[victim->mobdata->nr].virt)
+   {
+      case FIRE_ELEMENTAL:
+         act("The room begins to cool as $n returns to it's own plane of existance.", victim, 0, 0, TO_ROOM, INVIS_NULL);
+         break;
+      case WATER_ELEMENTAL:
+         act("$n melts into a puddle and vanishes as it is released from its servitude.", victim, 0, 0, TO_ROOM, INVIS_NULL);
+         break;
+      case AIR_ELEMENTAL:
+         act("$n suddenly vanishes, leaving only the strong scent of ozone.", victim, 0, 0, TO_ROOM, INVIS_NULL);
+         break;
+      case EARTH_ELEMENTAL:
+         act("Rocks fly everywhere as $n returns to its own plane of existance.", victim, 0, 0, TO_ROOM, INVIS_NULL);
+         break;
+      default:
+         log("Serious screw-up in spell_release_elemental!", ANGEL, LOG_BUG);
+         break;
+   }
+
+   extract_char(victim, TRUE);
+	 
+   return eSUCCESS;
+}
+
+/* RELEASE ELEMENTAL (wands, scrolls, potions, staves) */
+
+int cast_release_elemental( ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill )
+{
+  switch (type) 
+  {
+    case SPELL_TYPE_SPELL:
+       return spell_release_elemental(level, ch, tar_ch, 0, skill);
+       break;
+    case SPELL_TYPE_POTION:
+       return spell_release_elemental(level, ch, ch, 0, skill);
+       break;
+    case SPELL_TYPE_SCROLL:
+       if(tar_obj)
+          return eFAILURE;
+       if(!tar_ch) tar_ch = ch;
+          return spell_release_elemental(level, ch, tar_ch, 0, skill);
+       break;
+    case SPELL_TYPE_STAFF:
+       for (tar_ch = world[ch->in_room].people ; tar_ch ; tar_ch = tar_ch->next_in_room)
+          spell_release_elemental(level,ch,tar_ch,0, skill);
+       break;
+    default :
+       log("Serious screw-up in cast_release_elemental!", ANGEL, LOG_BUG);
+       break;
+  }
+  return eFAILURE;
+}
+
+
+
 /* VISAGE OF HATE */
 
 int spell_visage_of_hate(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)

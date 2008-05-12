@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.260 2008/03/20 20:08:05 apocalypse Exp $ */
+/* $Id: const.cpp,v 1.261 2008/05/12 20:23:35 kkoons Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -300,7 +300,8 @@ char *spell_wear_off_msg[] =
   "!SILENCE!",
   "The $Bs$3h$5i$7m$3m$5e$7r$3i$5n$7g$3 l$5i$7g$3h$5t$R surrounding your body slowly fades.",
   "!BONESHIELD!",
-  "!CHANNEL!"
+  "!CHANNEL!",
+  "!RELEASEELEMENTAL!"
 };
 
 
@@ -1559,6 +1560,7 @@ struct class_skill_defines u_skills[] = { // druid skills
 {    "colour spray",         SPELL_COLOUR_SPRAY,         48,    100,  0,   STRDEX },
 {    "summon",               SPELL_SUMMON,               49,    100,  0,   STRCON },
 {    "conjure elemental",    SPELL_CONJURE_ELEMENTAL,    50,    100,  0,   CONINT },
+{    "release elemental",    SPELL_RELEASE_ELEMENTAL,    50,    100,  0,   CONINT },
 {    "\n",                   0,                          1,      0,   0,   0 }
 };
 

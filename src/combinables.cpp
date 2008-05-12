@@ -600,6 +600,7 @@ int do_scribe(struct char_data *ch, char *argument, int cmd)
     case SPELL_GHOSTWALK:
     case SPELL_MEND_GOLEM:
     case SPELL_CLARITY:
+    case SPELL_RELEASE_ELEMENTAL:
     case SPELL_DIVINE_INTER:
       scrollok = TRUE;
       break;
