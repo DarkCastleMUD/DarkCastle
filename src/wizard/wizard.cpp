@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.62 2008/05/12 21:13:57 kkoons Exp $
+| $Id: wizard.cpp,v 1.63 2008/05/13 01:46:16 kkoons Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -1464,7 +1464,6 @@ struct hunt_data
 {
   struct hunt_data *next;
   char *huntname;
-  char *hunttime;
   int itemnum;
   int time;
   int itemsAvail[50];
@@ -1539,7 +1538,6 @@ void check_end_of_hunt(struct hunt_data *h, bool forced = FALSE)
 	p = hl;
      }
      dc_free(h->huntname);
-	 dc_free(h->hunttime);
      dc_free(h);     
   }
 }
@@ -1625,10 +1623,28 @@ void init_random_hunt_items(struct hunt_data *h)
   dc_fclose(f);
 }
 
+char * last_hunt_time(char * last_hunt)
+{
+   static char *time_of_last_hunt = NULL;
+   char buf[MAX_STRING_LENGTH];
+
+   if(!time_of_last_hunt)
+   {
+      sprintf(buf, "There have been no hunts since the last reboot.       \n\r");
+      time_of_last_hunt = str_dup(buf);
+   }
+   
+   if(last_hunt)
+      time_of_last_hunt = last_hunt;
+
+   return time_of_last_hunt;
+}
+
 void begin_hunt(int item, int duration, int amount, char *huntname)
 { // time, itme, item
   struct hunt_data *n;
-  char buf[100];
+  char buf[MAX_STRING_LENGTH];
+  char *tmp;
   struct tm *pTime = NULL;
   long ct;  
 
@@ -1645,9 +1661,12 @@ void begin_hunt(int item, int duration, int amount, char *huntname)
   
   ct = time(0);
   pTime = localtime(&ct);
+  tmp = last_hunt_time(NULL);
+
   if(NULL != pTime)
   {
-     sprintf(buf, "%d/%d/%d (%d:%02d) %s\n\r",
+     
+     sprintf(tmp, "%d/%d/%d (%d:%02d) %s\n\r",
            pTime->tm_mon+1,
 	   pTime->tm_mday,
 	   pTime->tm_year+1900,
@@ -1655,10 +1674,8 @@ void begin_hunt(int item, int duration, int amount, char *huntname)
 	   pTime->tm_min,
 	   pTime->tm_zone);
   }
-  else
-     sprintf(buf, "UNKNOWN\n\r");
   
-  n->hunttime = str_dup(buf);
+  
   if (item == 76) init_random_hunt_items(n);
   int rnum = real_object(item);
   extern int top_of_mobt;
@@ -1807,8 +1824,10 @@ int do_showhunt(CHAR_DATA *ch, char *arg, int cmd)
   if (!hunt_list) 
   {
      send_to_char("There are no active hunts at the moment.\r\n",ch);
-	 sprintf(buf, "Last hunt was run: %s\n\r", h->hunttime);
-	 send_to_char(buf, ch);
+     	 
+     sprintf(buf, "Last hunt was run: %s \n\r", last_hunt_time(NULL));
+     
+     send_to_char(buf, ch);
   }
   else send_to_char("The following hunts are currently active:\r\n",ch);
 
