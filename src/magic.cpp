@@ -88,6 +88,27 @@ extern struct index_data *obj_index;
 extern struct race_shit race_info[];
 extern char* spells[];
 
+
+bool player_resist_reallocation(CHAR_DATA *victim, int skill)
+{
+  int savebonus = 0;
+  //only PC get a resist check for reallocation
+  if (IS_NPC(victim))
+    return false;
+  
+  if (skill < 41) savebonus = 5;
+  else if (skill < 61) savebonus = 0;
+  else if (skill < 81) savebonus = -5;
+  else savebonus = -10;
+
+  if ( number(1, 101) < (get_saves(victim, SAVE_TYPE_MAGIC) + savebonus) )
+    return true;
+  else
+    return false;
+}
+
+
+
 bool malediction_res(CHAR_DATA *ch, CHAR_DATA *victim, int spell)
 {
   // A lower level character cannot resist a Deity+ immortal
@@ -6693,13 +6714,25 @@ int cast_aegis( ubyte level, CHAR_DATA *ch, char *arg, int type,
 }
 
 
+
+int targetted_teleport(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
+{
+  if (player_resist_reallocation(victim, skill))
+  {
+    csendf(ch, "%s resists your attempt to teleport %s.\r\n", GET_NAME(victim), HMHR(victim));
+    csendf(victim, "You resist %s's attempt to teleport you!\r\n", GET_NAME(ch));
+    return eFAILURE;
+  }
+  else
+    return spell_teleport(level, ch, victim, 0, skill);
+}
+
 /* TELEPORT (potion, scroll, wand, staff) */
 
 int cast_teleport( ubyte level, CHAR_DATA *ch, char *arg, int type,
   CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill )
 {
   switch (type) {
-  case SPELL_TYPE_SCROLL:
   case SPELL_TYPE_POTION:
   case SPELL_TYPE_SPELL:
 	 if (!tar_ch)
@@ -6707,16 +6740,18 @@ int cast_teleport( ubyte level, CHAR_DATA *ch, char *arg, int type,
 	 return spell_teleport(level, ch, tar_ch, 0, skill);
 	 break;
 
+
+  case SPELL_TYPE_SCROLL:
   case SPELL_TYPE_WAND:
 	 if(!tar_ch) tar_ch = ch;
-	 return spell_teleport(level, ch, tar_ch, 0, skill);
+	 return targetted_teleport(level, ch, tar_ch, 0, skill);
 	 break;
 
   case SPELL_TYPE_STAFF:
 	for (tar_ch = world[ch->in_room].people ;
 		tar_ch ; tar_ch = tar_ch->next_in_room)
 	 if ( IS_NPC(tar_ch) )
-		spell_teleport(level, ch, tar_ch, 0, skill);
+		targetted_teleport(level, ch, tar_ch, 0, skill);
 	return eSUCCESS;
 		break;
 
@@ -8278,7 +8313,19 @@ int cast_ventriloquate( ubyte level, CHAR_DATA *ch, char *arg, int type,
 }
 
 
+int targetted_word_of_recall(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
+{
+  if (player_resist_reallocation(victim, skill))
+  {
+    csendf(ch, "%s resists your attempt to recall %s.\r\n", GET_NAME(victim), HMHR(victim));
+    csendf(victim, "You resist %s's attempt to recall you!\r\n", GET_NAME(ch));
+    return eFAILURE;
+  }
+  else
+    return spell_word_of_recall(level, ch, victim, 0, skill);
+}
 
+/* WORD OF RECALL (spell, potion, wand, staff, scroll)*/
 int cast_word_of_recall( ubyte level, CHAR_DATA *ch, char *arg, int type,
   CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill )
 {
@@ -8286,19 +8333,15 @@ int cast_word_of_recall( ubyte level, CHAR_DATA *ch, char *arg, int type,
 
   switch (type) {
 	 case SPELL_TYPE_SPELL:
-		 return spell_word_of_recall(level, ch, ch, 0, skill);
-		 break;
 	 case SPELL_TYPE_POTION:
 		 return spell_word_of_recall(level, ch, ch, 0, skill);
 		 break;
+	
 	 case SPELL_TYPE_SCROLL:
-	 if(tar_obj) return eFAILURE;
-	 if (!tar_ch) tar_ch = ch;
-	 return spell_word_of_recall(level, ch, tar_ch, 0, skill);
-	 break;
 	 case SPELL_TYPE_WAND:
 	 if(tar_obj) return eFAILURE;
-	 return spell_word_of_recall(level, ch, tar_ch, 0, skill);
+	 if (!tar_ch) tar_ch = ch;
+	 return targetted_word_of_recall(level, ch, tar_ch, 0, skill);
 	 break;
 	 case SPELL_TYPE_STAFF:
 	for (tar_ch = world[ch->in_room].people ;
@@ -8306,7 +8349,7 @@ int cast_word_of_recall( ubyte level, CHAR_DATA *ch, char *arg, int type,
 	{
 		 tar_ch_next = tar_ch->next_in_room;
 		 if ( !IS_NPC(tar_ch) )
-		spell_word_of_recall(level,ch,tar_ch,0, skill);
+		targetted_word_of_recall(level,ch,tar_ch,0, skill);
 	}
 	break;
 	 default :
