@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.482 2008/05/13 21:30:06 kkoons Exp $               *
+ * $Id: fight.cpp,v 1.483 2008/05/13 23:21:57 kkoons Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -107,6 +107,36 @@ CHAR_DATA *combat_list = NULL, *combat_next_dude = NULL;
 
 
 int isHit(CHAR_DATA *ch, CHAR_DATA *victim, int attacktype, int &type, int &reduce);
+
+
+#define MAX_CHAMP_DEATH_MESSAGE		8
+char *champ_death_messages[] = 
+{
+/*0*/	"\n\r##Somewhere a village has been deprived of their idiot.\n\r",
+  	"\n\r##Don't feel bad %s. A lot of people have no talent!\n\r",
+	"\n\r##If at first you don't succeed, failure may be your style.\n\r",
+	"\n\r##%s just found the cure for stupidity. Death.\n\r",
+	"\n\r##%s just succumbed to a fatal case of stupidity.\n\r",
+/*5*/	"\n\r##%s: About as useful as a windshield wiper on a goat's ass.\n\r",
+	"\n\r##Proof of reincarnation. Nobody could be as stupid as %s in one lifetime.\n\r",
+	"\n\r##%s: The poster child for birth control.\n\r"
+};
+
+
+void do_champ_flag_death(CHAR_DATA *victim)
+{
+
+  char buf[MAX_STRING_LENGTH];
+  OBJ_DATA *obj; 
+      obj = get_obj_in_list_num(real_object(CHAMPION_ITEM), victim->carrying);
+      obj_from_char(obj);
+      obj_to_room(obj, 3014);
+      snprintf(buf, 200, champ_death_messages[number(0,MAX_CHAMP_DEATH_MESSAGE)], GET_NAME(victim));
+      send_info(buf);
+      snprintf(buf, 200, "##%s has just died with the Champion flag, watch for it to reappear!\n\r", GET_NAME(victim));
+      send_info(buf);
+    
+}
 
 
 bool someone_fighting(CHAR_DATA *ch)
@@ -856,7 +886,11 @@ int do_lightning_shield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
       act("$n is DEAD!!", ch, 0, 0, TO_ROOM, INVIS_NULL);
       group_gain(vict, ch);
       if(!IS_NPC(ch))
+      {
          send_to_char("You have been KILLED!!\n\r\n\r", ch);
+         if (IS_AFFECTED(ch, AFF_CHAMPION))
+           do_champ_flag_death(ch);
+      }
       fight_kill(vict, ch, TYPE_CHOOSE, 0);
       return eSUCCESS|eCH_DIED;
   }
@@ -973,7 +1007,11 @@ int do_fireshield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
       act("$n is DEAD!!", ch, 0, 0, TO_ROOM, INVIS_NULL);
       group_gain(vict, ch);
       if(!IS_NPC(ch))
-         send_to_char("You have been KILLED!!\n\r\n\r", ch);
+      {
+        send_to_char("You have been KILLED!!\n\r\n\r", ch);
+        if (IS_AFFECTED(ch, AFF_CHAMPION))
+          do_champ_flag_death(ch);
+      }
       fight_kill(vict, ch, TYPE_CHOOSE, 0);
       return eSUCCESS|eCH_DIED;
   }
@@ -1060,7 +1098,11 @@ int do_acidshield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
       act("$n is DEAD!!", ch, 0, 0, TO_ROOM, INVIS_NULL);
       group_gain(vict, ch);
       if(!IS_NPC(ch))
+      {
          send_to_char("You have been KILLED!!\n\r\n\r", ch);
+         if (IS_AFFECTED(ch, AFF_CHAMPION))
+           do_champ_flag_death(ch);
+      }
       fight_kill(vict, ch, TYPE_CHOOSE, 0);
       return eSUCCESS|eCH_DIED;
   }
@@ -1117,7 +1159,11 @@ int do_boneshield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
       act("$n is DEAD!!", ch, 0, 0, TO_ROOM, INVIS_NULL);
       group_gain(vict, ch);
       if(!IS_NPC(ch))
+      {
          send_to_char("You have been KILLED!!\n\r\n\r", ch);
+         if (IS_AFFECTED(ch, AFF_CHAMPION))
+           do_champ_flag_death(ch);
+      }
       fight_kill(vict, ch, TYPE_CHOOSE, 0);
       return eSUCCESS|eCH_DIED;
   }
@@ -6157,12 +6203,11 @@ int second_wield(CHAR_DATA *ch)
 }	
 */
 
+
 void inform_victim(CHAR_DATA *ch, CHAR_DATA *victim, int dam)
 {
   int max_hit;
-  char buf[MAX_STRING_LENGTH];
-  OBJ_DATA *obj; 
- 
+   
   switch (GET_POS(victim))
   {
   case POSITION_STUNNED:
@@ -6177,13 +6222,8 @@ void inform_victim(CHAR_DATA *ch, CHAR_DATA *victim, int dam)
     act("$n is DEAD!!", victim, 0, 0, TO_ROOM, INVIS_NULL);
     send_to_char("You have been KILLED!!\n\r\n\r", victim);
     if (IS_AFFECTED(victim, AFF_CHAMPION))
-    {
-      obj = get_obj_in_list_num(real_object(CHAMPION_ITEM), victim->carrying);
-      obj_from_char(obj);
-      obj_to_room(obj, 3014);
-      snprintf(buf, 200, "\n\r##%s has just died with the Champion flag, watch for it to reappear!\n\r", GET_NAME(victim));
-      send_info(buf);
-    }
+      do_champ_flag_death(victim);
+  
     break;
   default:
     max_hit = hit_limit(victim);
