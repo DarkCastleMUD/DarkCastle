@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.235 2008/05/12 21:27:12 kkoons Exp $ */
+/* $Id: spells.cpp,v 1.236 2008/05/13 03:44:29 kkoons Exp $ */
 
 extern "C"
 {
@@ -837,6 +837,7 @@ char *spells[]=
    "immunity",
    "boneshield",
    "channel",
+   "release elemental",
    "\n"
 };
 

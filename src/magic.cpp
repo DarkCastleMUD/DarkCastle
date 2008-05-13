@@ -12263,7 +12263,7 @@ int spell_release_elemental(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struc
    //return eFAILURE;
 
    for(struct follow_type *k = ch->followers; k; k = k->next)
-     if(IS_MOB(k->follower) && affected_by_spell(k->follower, AFF_CHARM))
+     if(IS_MOB(k->follower) && ISSET(k->follower->affected_by, AFF_CHARM))
      {
         victim = k->follower;
         break;
@@ -12545,22 +12545,22 @@ int spell_conjure_elemental(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vi
 //  OBJ_DATA *container  = NULL;
   if (!str_cmp(arg, "fire"))
   {
-	virt = 88;
+	virt = FIRE_ELEMENTAL;
 	liquid = 13;
   }
   else if (!str_cmp(arg, "water"))
   {
-	virt = 89;
+	virt = WATER_ELEMENTAL;
 	liquid = 17;
   }
   else if (!str_cmp(arg, "air"))
   {
-	virt = 90;
+	virt = AIR_ELEMENTAL;
 	liquid = 2;
   }
   else if (!str_cmp(arg, "earth"))
   {
-	virt = 91;
+	virt = EARTH_ELEMENTAL;
 	liquid = 9;
   }
   else {
@@ -12583,22 +12583,22 @@ int spell_conjure_elemental(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vi
   obj->obj_flags.value[1] -= 5;
   switch (virt)
   {
-	case 88:
+	case FIRE_ELEMENTAL:
           act("Your container of blood burns hotly as a denizen of the elemental plane of fire arrives in a blast of flame!", ch, NULL,NULL, TO_CHAR, 0);
           act("$n's container of blood burns hotly as a denizen of the elemental plane of fire arrives in a blast of flame!", ch, NULL,NULL, TO_ROOM, 
 0);
 	  break;
-	case 89:
+	case WATER_ELEMENTAL:
           act("Your holy water bubbles briefly as an icy denizen of the elemental plane of water crystalizes into existence.", ch, NULL,NULL, 
 TO_CHAR, 0);
           act("$n's holy water bubbles briefly as an icy denizen of the elemental plane of water crystalizes intoto existence.", ch, NULL,NULL, 
 TO_ROOM, 0);
 	  break;
-	case 91:
+	case EARTH_ELEMENTAL:
           act("Your dirty water churns violently as a denizen of the elemental plane of earth rises from the ground.", ch, NULL,NULL, TO_CHAR, 0);
           act("$n's dirty water churns violently as a denizen of the elemental plane of earth rises from the ground.", ch, NULL,NULL, TO_ROOM, 0);
 	  break;
-	case 90:
+	case AIR_ELEMENTAL:
           act("Your wine boils with energy as a denizen of the elemental plane of air crackles into existance.", ch, NULL,NULL, TO_CHAR, 0);
           act("$n's wine boils with energy as a denizen of the elemental plane of air crackles into existance.", ch, NULL,NULL, TO_ROOM, 0);
 	  break;
