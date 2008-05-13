@@ -2407,6 +2407,17 @@ int execute_song_glitter_dust( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA 
      if(GET_LEVEL(victim) >= IMMORTAL && GET_LEVEL(ch) <= GET_LEVEL(victim))
        continue;
 
+     //don't want it affecting the bard
+     if(victim == ch)
+       continue; 
+
+     //prevent stacking
+     if(IS_AFFECTED(victim, AFF_GLITTER_DUST))
+     {
+       csendf(ch, "%s is already covered in glitter.\n\r", GET_SHORT(victim));
+       continue;    
+     }
+
      bool pre_see = CAN_SEE(ch, victim);
      affect_to_char(victim, &af);
      affect_to_char(victim, &af2);
