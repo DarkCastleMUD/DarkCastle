@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.99 2007/12/28 15:37:23 jhhudso Exp $
+| $Id: inventory.cpp,v 1.100 2008/05/13 20:23:15 kkoons Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -163,7 +163,14 @@ void get(struct char_data *ch, struct obj_data *obj_object, struct obj_data *sub
                           loop_obj->short_description,
                           obj_index[loop_obj->item_number].virt);
 
-	  
+          if(obj_index[obj_object->item_number].virt == CHAMPION_ITEM)
+          {
+            SETBIT(ch->affected_by, AFF_CHAMPION);
+            sprintf(buffer, "\n\r##%s has just picked up the Champion flag!\n\r", GET_NAME(ch));
+            send_info(buffer);
+          }	 
+
+ 
 	}
 	move_obj(obj_object, ch);
 	if (sub_object->carried_by == ch) {
