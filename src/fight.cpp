@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.481 2008/05/12 19:53:52 kkoons Exp $               *
+ * $Id: fight.cpp,v 1.482 2008/05/13 21:30:06 kkoons Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -6160,7 +6160,9 @@ int second_wield(CHAR_DATA *ch)
 void inform_victim(CHAR_DATA *ch, CHAR_DATA *victim, int dam)
 {
   int max_hit;
-  
+  char buf[MAX_STRING_LENGTH];
+  OBJ_DATA *obj; 
+ 
   switch (GET_POS(victim))
   {
   case POSITION_STUNNED:
@@ -6174,6 +6176,14 @@ void inform_victim(CHAR_DATA *ch, CHAR_DATA *victim, int dam)
   case POSITION_DEAD:
     act("$n is DEAD!!", victim, 0, 0, TO_ROOM, INVIS_NULL);
     send_to_char("You have been KILLED!!\n\r\n\r", victim);
+    if (IS_AFFECTED(victim, AFF_CHAMPION))
+    {
+      obj = get_obj_in_list_num(real_object(CHAMPION_ITEM), victim->carrying);
+      obj_from_char(obj);
+      obj_to_room(obj, 3014);
+      snprintf(buf, 200, "\n\r##%s has just died with the Champion flag, watch for it to reappear!\n\r", GET_NAME(victim));
+      send_info(buf);
+    }
     break;
   default:
     max_hit = hit_limit(victim);
