@@ -2,7 +2,7 @@
 #define FIGHT_H_
 
 /************************************************************************
-| $Id: fight.h,v 1.34 2007/12/08 16:48:09 dcastle Exp $
+| $Id: fight.h,v 1.35 2008/05/14 18:13:10 kkoons Exp $
 | fight.h
 | This file defines the header information for fight.
 */
@@ -26,7 +26,7 @@ int  damage(CHAR_DATA *ch, CHAR_DATA *victim, int dam,
 int noncombat_damage(CHAR_DATA * ch, int dam, char *char_death_msg,
                      char *room_death_msg, char *death_log_msg, int type);
 void send_damage(char *, CHAR_DATA *, OBJ_DATA *, CHAR_DATA *, char *, char *, int);
-
+int getRealSpellDamage(CHAR_DATA *ch);
  
 extern CHAR_DATA *character_list;
 /* extern CHAR_DATA *combat_list = NULL, *combat_next_dude = NULL; */
