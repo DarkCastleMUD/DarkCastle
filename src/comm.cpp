@@ -1318,7 +1318,7 @@ void generate_prompt(CHAR_DATA *ch, char *prompt)
 	 if (OUTSIDE(ch))
            sprintf(pro, "%s", sky_look[weather_info.sky]);
 	 else
-	   sprintf(pro, "Indoors");
+	   sprintf(pro, "indoors");
          break;
        case 'g':
          sprintf(pro, "%lld", GET_GOLD(ch));
