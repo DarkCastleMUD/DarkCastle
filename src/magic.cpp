@@ -232,7 +232,7 @@ int spell_magic_missile(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct ob
   int weap_spell = obj?WIELD:0;
 
   set_cantquit( ch, victim );
-  dam = 50 + ch->spelldamage;
+  dam = 50 + getRealSpellDamage(ch);
     count += (skill > 15) + (skill > 35) + (skill > 55) + (skill > 75); 
 
 	/* Spellcraft Effect */
@@ -419,7 +419,7 @@ int spell_souldrain(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
       send_to_char("You cannot do this in a safe room!\r\n", ch);
       return eFAILURE;
       }
-   mana = dam_percent(skill,125 + ch->spelldamage);
+   mana = dam_percent(skill,125 + getRealSpellDamage(ch));
    if(mana > GET_MANA(victim))
    mana = GET_MANA(victim);
    if (mana <= 0)
@@ -1802,7 +1802,7 @@ int spell_cure_critic(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
   }
 
   if (!can_heal(ch,victim, SPELL_CURE_CRITIC)) return eFAILURE;
-  healpoints = dam_percent(skill, 100 + ch->spelldamage);
+  healpoints = dam_percent(skill, 100 + getRealSpellDamage(ch));
   healpoints = number(healpoints-(healpoints/10), healpoints+(healpoints/10));
 
   if ( (healpoints + GET_HIT(victim)) > hit_limit(victim) ) {
@@ -1858,7 +1858,7 @@ int spell_cure_light(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
   }
 
   if (!can_heal(ch,victim, SPELL_CURE_LIGHT)) return eFAILURE;
-  healpoints = dam_percent(skill, 25 + ch->spelldamage);
+  healpoints = dam_percent(skill, 25 + getRealSpellDamage(ch));
   healpoints = number(healpoints-(healpoints/10), healpoints+(healpoints/10));
   if ( (healpoints+GET_HIT(victim)) > hit_limit(victim) ) {
      healpoints = hit_limit(victim) - GET_HIT(victim);
@@ -2356,7 +2356,7 @@ int spell_heal(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
   }
 
   if (!can_heal(ch,victim,SPELL_HEAL)) return eFAILURE;
-  healy = dam_percent(skill,250 + ch->spelldamage);
+  healy = dam_percent(skill,250 + getRealSpellDamage(ch));
   healy = number(healy-(healy/10), healy+(healy/10));
   GET_HIT(victim) += healy;
 
@@ -2408,7 +2408,7 @@ int spell_power_heal(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
   }
 
   if (!can_heal(ch,victim, SPELL_POWER_HEAL)) return eFAILURE;
-  healy = dam_percent(skill, 300 + ch->spelldamage);
+  healy = dam_percent(skill, 300 + getRealSpellDamage(ch));
   healy = number(healy-(healy/10), healy+(healy/10));
   GET_HIT(victim) += healy;
 
@@ -2458,7 +2458,7 @@ int spell_full_heal(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
 
   if (!can_heal(ch,victim, SPELL_FULL_HEAL)) return eFAILURE;
 
-  healamount = 10 * (skill/2 + 5) + ch->spelldamage;
+  healamount = 10 * (skill/2 + 5) + getRealSpellDamage(ch);
   if(GET_ALIGNMENT(ch) < -349)
     healamount -= 2* (skill/2 + 5);
   else if(GET_ALIGNMENT(ch) > 349)
@@ -5209,7 +5209,7 @@ int spell_cure_serious(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
   }
 
   if (!can_heal(ch,victim, SPELL_CURE_SERIOUS)) return eFAILURE;
-      healpoints = dam_percent(skill,50 + ch->spelldamage);
+      healpoints = dam_percent(skill,50 + getRealSpellDamage(ch));
   healpoints = number(healpoints-(healpoints/10), healpoints+(healpoints/10));
 
   if ((healpoints + GET_HIT(victim)) > hit_limit(victim)) {
@@ -9698,7 +9698,7 @@ int spell_bee_sting(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
    affected_type af;
    int i;
    set_cantquit(ch, victim);
-   dam = dice (4, 3) + skill/3 +ch->spelldamage;
+   dam = dice (4, 3) + skill/3 + getRealspellDamage(ch);
    int weap_spell = obj?WIELD:0;
 
    for (i = 0; i < bees; i++) {
@@ -11764,7 +11764,7 @@ int spell_blue_bird(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
   }
   
    
-     dam = number(10, GET_LEVEL(ch) + 5) + ch->spelldamage;
+     dam = number(10, GET_LEVEL(ch) + 5) + getRealSpellDamage(ch);
   while(!SOMEONE_DIED(retval) && count--) {
      retval = damage(ch, victim, dam, TYPE_PHYSICAL_MAGIC, SPELL_BLUE_BIRD, 0);
      dam = number(10, GET_LEVEL(ch) + 5);
