@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.86 2008/03/09 18:06:40 kevin Exp $ */
+/* $Id: utility.cpp,v 1.87 2008/05/14 00:51:17 jhhudso Exp $ */
 
 extern "C"
 {
@@ -1808,6 +1808,9 @@ int mm_rand()
                           // don't have time to figure out why
 }
 
+//
+// return value can include the from or to variable
+//
 int number( int from, int to )
 {
     int power;
