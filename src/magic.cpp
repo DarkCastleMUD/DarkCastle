@@ -12664,6 +12664,7 @@ TO_ROOM, 0);
   IS_CARRYING_W(mob) = 0;
   IS_CARRYING_N(mob) = 0;
 
+  SETBIT(mob->affected_by, AFF_ELEMENTAL);
   SETBIT(mob->affected_by, AFF_CHARM);
 
   add_follower(mob, ch, 0);
