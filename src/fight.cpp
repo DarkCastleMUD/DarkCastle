@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.484 2008/05/14 00:45:30 kkoons Exp $               *
+ * $Id: fight.cpp,v 1.485 2008/05/14 01:12:42 jhhudso Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -129,13 +129,16 @@ void do_champ_flag_death(CHAR_DATA *victim)
   char buf[MAX_STRING_LENGTH];
   OBJ_DATA *obj; 
       obj = get_obj_in_list_num(real_object(CHAMPION_ITEM), victim->carrying);
-      obj_from_char(obj);
-      obj_to_room(obj, 3014);
-      snprintf(buf, 200, champ_death_messages[number(0,MAX_CHAMP_DEATH_MESSAGE-1)], GET_NAME(victim));
-      send_info(buf);
-      snprintf(buf, 200, "##%s has just died with the Champion flag, watch for it to reappear!\n\r", GET_NAME(victim));
-      send_info(buf);
-    
+      if (obj) {
+	  obj_from_char(obj);
+	  obj_to_room(obj, CFLAG_HOME);
+	  snprintf(buf, 200, champ_death_messages[number(0,MAX_CHAMP_DEATH_MESSAGE-1)], GET_NAME(victim));
+	  send_info(buf);
+	  snprintf(buf, 200, "##%s has just died with the Champion flag, watch for it to reappear!\n\r", GET_NAME(victim));
+	  send_info(buf);
+      } else {
+	  log("Champion without the flag, no bueno amigo!", IMMORTAL, LOG_BUG);
+      }
 }
 
 
