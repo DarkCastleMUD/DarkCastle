@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.64 2008/05/13 04:26:31 kkoons Exp $
+| $Id: wizard.cpp,v 1.65 2008/05/14 22:28:53 kkoons Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -1666,7 +1666,7 @@ void begin_hunt(int item, int duration, int amount, char *huntname)
   if(NULL != pTime)
   {
      
-     snprintf(tmp, strlen(tmp), "%d/%d/%d (%d:%02d) %s\n\r",
+     snprintf(tmp, MAX_STRING_LENGTH-1, "%d/%d/%d (%d:%02d) %s\n\r",
            pTime->tm_mon+1,
 	   pTime->tm_mday,
 	   pTime->tm_year+1900,
