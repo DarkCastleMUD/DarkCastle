@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.70 2008/04/14 14:03:53 apocalypse Exp $
+| $Id: cl_warrior.cpp,v 1.71 2008/05/14 20:36:59 kkoons Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -96,6 +96,10 @@ int do_kick(struct char_data *ch, char *argument, int cmd)
 
   // if our boots have a combat proc, and we did damage, let'um have it!
   if(dam && ch->equipment[WEAR_FEET]) {
+    retval = weapon_spells(ch, victim, WEAR_FEET);
+    if (SOMEONE_DIED(retval))
+      return retval;
+  //leaving this built in proc here incase some new stuff is added, like kick_their_head_off
     if(obj_index[ch->equipment[WEAR_FEET]->item_number].combat_func) {
       retval = ((*obj_index[ch->equipment[WEAR_FEET]->item_number].combat_func)
       (ch, ch->equipment[WEAR_FEET], 0, "", ch));
@@ -119,6 +123,10 @@ int do_kick(struct char_data *ch, char *argument, int cmd)
       return retval;
     // if our boots have a combat proc, and we did damage, let'um have it!
     if (dam && ch->equipment[WEAR_FEET]) {
+      retval = weapon_spells(ch, next_victim, WEAR_FEET);
+      if (SOMEONE_DIED(retval))
+        return retval;
+      //leaving this built in proc here incase some new stuff is added, like kick_their_head_off
       if(obj_index[ch->equipment[WEAR_FEET]->item_number].combat_func) {
         retval = ((*obj_index[ch->equipment[WEAR_FEET]->item_number].combat_func)
         (ch, ch->equipment[WEAR_FEET], 0, "", ch));
