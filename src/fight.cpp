@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.486 2008/05/14 02:40:43 kkoons Exp $               *
+ * $Id: fight.cpp,v 1.487 2008/05/14 16:55:59 kkoons Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -1543,22 +1543,41 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
         }        
       }
     } else { //not wielding a weapon    
-      if (ch->equipment[WEAR_HANDS] && obj_index[ch->equipment[WEAR_HANDS]->item_number].combat_func) { 
-        retval = ((*obj_index[ch->equipment[WEAR_HANDS]->item_number].combat_func)(ch, ch->equipment[WEAR_HANDS], 0, "", ch));
+      if (ch->equipment[WEAR_HANDS]) { 
+      
+      retval = weapon_spells(ch, vict, WEAR_HANDS);     
+      if (SOMEONE_DIED(retval) || !ch->fighting) {
+        return retval | eSUCCESS;
+      }  
+        if (obj_index[ch->equipment[WEAR_HANDS]->item_number].combat_func)  
+          retval = ((*obj_index[ch->equipment[WEAR_HANDS]->item_number].combat_func)(ch, ch->equipment[WEAR_HANDS], 0, "", ch));
         if (SOMEONE_DIED(retval) || !ch->fighting) {
           return retval | eSUCCESS;
         }        
       }
       
-      if (ch->equipment[HOLD] && obj_index[ch->equipment[HOLD]->item_number].combat_func) {
-        retval = ((*obj_index[ch->equipment[HOLD]->item_number].combat_func)(ch, ch->equipment[HOLD], 0, "", ch));
+      if (ch->equipment[HOLD]) {
+        
+      retval = weapon_spells(ch, vict, HOLD);     
+      if (SOMEONE_DIED(retval) || !ch->fighting) {
+        return retval | eSUCCESS;
+      }  
+
+        if (obj_index[ch->equipment[HOLD]->item_number].combat_func)
+          retval = ((*obj_index[ch->equipment[HOLD]->item_number].combat_func)(ch, ch->equipment[HOLD], 0, "", ch));
         if (SOMEONE_DIED(retval) || !ch->fighting) {
           return retval | eSUCCESS;
         }        
       }
 
-      if (ch->equipment[HOLD2] && obj_index[ch->equipment[HOLD2]->item_number].combat_func) {
-        retval = ((*obj_index[ch->equipment[HOLD2]->item_number].combat_func)(ch, ch->equipment[HOLD2], 0, "", ch));
+      if (ch->equipment[HOLD2]) {
+
+      retval = weapon_spells(ch, vict, HOLD2);     
+      if (SOMEONE_DIED(retval) || !ch->fighting) {
+        return retval | eSUCCESS;
+      }  
+        if (obj_index[ch->equipment[HOLD2]->item_number].combat_func)
+          retval = ((*obj_index[ch->equipment[HOLD2]->item_number].combat_func)(ch, ch->equipment[HOLD2], 0, "", ch));
         if (SOMEONE_DIED(retval) || !ch->fighting) {
           return retval | eSUCCESS;
         }        
