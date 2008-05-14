@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.485 2008/05/14 01:12:42 jhhudso Exp $               *
+ * $Id: fight.cpp,v 1.486 2008/05/14 02:40:43 kkoons Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -889,11 +889,9 @@ int do_lightning_shield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
       act("$n is DEAD!!", ch, 0, 0, TO_ROOM, INVIS_NULL);
       group_gain(vict, ch);
       if(!IS_NPC(ch))
-      {
-         send_to_char("You have been KILLED!!\n\r\n\r", ch);
-         if (IS_AFFECTED(ch, AFF_CHAMPION))
-           do_champ_flag_death(ch);
-      }
+        send_to_char("You have been KILLED!!\n\r\n\r", ch);
+      
+      
       fight_kill(vict, ch, TYPE_CHOOSE, 0);
       return eSUCCESS|eCH_DIED;
   }
@@ -1010,11 +1008,8 @@ int do_fireshield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
       act("$n is DEAD!!", ch, 0, 0, TO_ROOM, INVIS_NULL);
       group_gain(vict, ch);
       if(!IS_NPC(ch))
-      {
         send_to_char("You have been KILLED!!\n\r\n\r", ch);
-        if (IS_AFFECTED(ch, AFF_CHAMPION))
-          do_champ_flag_death(ch);
-      }
+            
       fight_kill(vict, ch, TYPE_CHOOSE, 0);
       return eSUCCESS|eCH_DIED;
   }
@@ -1101,11 +1096,8 @@ int do_acidshield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
       act("$n is DEAD!!", ch, 0, 0, TO_ROOM, INVIS_NULL);
       group_gain(vict, ch);
       if(!IS_NPC(ch))
-      {
-         send_to_char("You have been KILLED!!\n\r\n\r", ch);
-         if (IS_AFFECTED(ch, AFF_CHAMPION))
-           do_champ_flag_death(ch);
-      }
+        send_to_char("You have been KILLED!!\n\r\n\r", ch);
+            
       fight_kill(vict, ch, TYPE_CHOOSE, 0);
       return eSUCCESS|eCH_DIED;
   }
@@ -1162,11 +1154,9 @@ int do_boneshield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
       act("$n is DEAD!!", ch, 0, 0, TO_ROOM, INVIS_NULL);
       group_gain(vict, ch);
       if(!IS_NPC(ch))
-      {
-         send_to_char("You have been KILLED!!\n\r\n\r", ch);
-         if (IS_AFFECTED(ch, AFF_CHAMPION))
-           do_champ_flag_death(ch);
-      }
+        send_to_char("You have been KILLED!!\n\r\n\r", ch);
+     
+      
       fight_kill(vict, ch, TYPE_CHOOSE, 0);
       return eSUCCESS|eCH_DIED;
   }
@@ -4539,6 +4529,12 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
     return;
   }
   
+ 
+   if (IS_AFFECTED(victim, AFF_CHAMPION))
+   {
+     REMBIT(victim->affected_by, AFF_CHAMPION);
+     do_champ_flag_death(victim);
+   }
   if(ch && IS_NPC(victim) && !IS_NPC(ch) && GET_LEVEL(ch) >= IMMORTAL) { 
     sprintf(buf, "%s killed %s.", GET_NAME(ch), GET_NAME(victim));
     special_log(buf);
@@ -6224,9 +6220,7 @@ void inform_victim(CHAR_DATA *ch, CHAR_DATA *victim, int dam)
   case POSITION_DEAD:
     act("$n is DEAD!!", victim, 0, 0, TO_ROOM, INVIS_NULL);
     send_to_char("You have been KILLED!!\n\r\n\r", victim);
-    if (IS_AFFECTED(victim, AFF_CHAMPION))
-      do_champ_flag_death(victim);
-  
+     
     break;
   default:
     max_hit = hit_limit(victim);
