@@ -9698,7 +9698,7 @@ int spell_bee_sting(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
    affected_type af;
    int i;
    set_cantquit(ch, victim);
-   dam = dice (4, 3) + skill/3 + getRealspellDamage(ch);
+   dam = dice (4, 3) + skill/3 + getRealSpellDamage(ch);
    int weap_spell = obj?WIELD:0;
 
    for (i = 0; i < bees; i++) {

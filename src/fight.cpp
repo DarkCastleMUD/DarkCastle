@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.487 2008/05/14 16:55:59 kkoons Exp $               *
+ * $Id: fight.cpp,v 1.488 2008/05/14 18:12:47 kkoons Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -2362,8 +2362,11 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
     }
   }
   
-  if (IS_SET(victim->immune, weapon_bit) &&
-    !IS_AFFECTED(victim, AFF_CHARM)) 
+  if (
+      IS_SET(victim->immune, weapon_bit) &&
+      ( !IS_AFFECTED(victim, AFF_CHARM) ||
+        IS_AFFECTED(victim, AFF_ELEMENTAL) )
+     ) 
   {
     dam = 0;
     if (attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING) {
