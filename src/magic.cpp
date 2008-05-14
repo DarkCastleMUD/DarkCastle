@@ -6719,8 +6719,9 @@ int targetted_teleport(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
 {
   if (player_resist_reallocation(victim, skill))
   {
-    csendf(ch, "%s resists your attempt to teleport %s.\r\n", GET_NAME(victim), HMHR(victim));
-    csendf(victim, "You resist %s's attempt to teleport you!\r\n", GET_NAME(ch));
+      act("$N resists your attempt to teleport $M!", ch, NULL, victim,TO_CHAR,0);
+      act("$N resists $n's attempt to teleport $M!", ch, NULL, victim, TO_ROOM,NOTVICT);
+      act("You resist $n's attempt to teleport you!",ch,NULL,victim,TO_VICT,0);
     return eFAILURE;
   }
   else
@@ -8317,8 +8318,9 @@ int targetted_word_of_recall(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, stru
 {
   if (player_resist_reallocation(victim, skill))
   {
-    csendf(ch, "%s resists your attempt to recall %s.\r\n", GET_NAME(victim), HMHR(victim));
-    csendf(victim, "You resist %s's attempt to recall you!\r\n", GET_NAME(ch));
+      act("$N resists your attempt to recall $M!", ch, NULL, victim,TO_CHAR,0);
+      act("$N resists $n's attempt to recall $M!", ch, NULL, victim, TO_ROOM,NOTVICT);
+      act("You resist $n's attempt to recall you!",ch,NULL,victim,TO_VICT,0);
     return eFAILURE;
   }
   else
