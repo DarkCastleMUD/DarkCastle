@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.162 2008/05/04 10:31:25 dcastle Exp $ */
+/* $Id: info.cpp,v 1.163 2008/05/14 01:21:44 jhhudso Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -3356,7 +3356,7 @@ void check_champion()
 
       if((IS_NPC(ch) || !ch->desc) && (obj = get_obj_in_list_num(real_object(CHAMPION_ITEM), ch->carrying))) {
          obj_from_char(obj);
-         obj_to_room(obj, 3014);
+         obj_to_room(obj, CFLAG_HOME);
       }
 
       if(IS_AFFECTED(ch, AFF_CHAMPION) && !(obj = get_obj_in_list_num(real_object(CHAMPION_ITEM), ch->carrying))) {
@@ -3367,7 +3367,7 @@ void check_champion()
 
    if(!(obj = get_obj_num(real_object(CHAMPION_ITEM)))) {
      if ((obj = clone_object(real_object(CHAMPION_ITEM)))) {
-       obj_to_room(obj, 3014);
+       obj_to_room(obj, CFLAG_HOME);
      } else {
        log("CHAMPION_ITEM obj not found. Please create one.", 0, LOG_MISC);
      }
