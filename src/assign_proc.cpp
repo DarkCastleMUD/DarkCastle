@@ -469,8 +469,8 @@ void assign_objects(void)
 
   //Godload procs follow.
     assign_one_obj_com(565,   godload_banshee);
-    assign_one_obj_com(511,   godload_claws);
-    assign_one_obj_com(506,  glove_combat_procs);
+  //  assign_one_obj_com(511,   godload_claws);
+   // assign_one_obj_com(506,  glove_combat_procs);
     assign_one_obj_com(528, godload_leprosy);
 
     assign_one_obj_non(29204, angie_proc);
@@ -581,8 +581,8 @@ void assign_objects(void)
   assign_one_obj_non(3187,  gem_assembler);  
   assign_one_obj_non(28301, gem_assembler);  
 
-  assign_one_obj_com(4818, glove_combat_procs);
-  assign_one_obj_com(4819, glove_combat_procs);
+  //assign_one_obj_com(4818, glove_combat_procs);
+  //assign_one_obj_com(4819, glove_combat_procs);
 
   // Crystalline tir
   assign_one_obj_non(12607, gem_assembler);  
@@ -616,11 +616,11 @@ void assign_objects(void)
   assign_one_obj_com(8208,   shield_combat_procs);
   assign_one_obj_com(9520,   dk_rend);
   assign_one_obj_com(9565, hooktippedsteelhalberd);
-  assign_one_obj_com(21718, glove_combat_procs);
-  assign_one_obj_com(9806,   glove_combat_procs);
+//  assign_one_obj_com(21718, glove_combat_procs);
+//  assign_one_obj_com(9806,   glove_combat_procs);
   assign_one_obj_com(10000,  holyavenger);
   assign_one_obj_com(10001,  holyavenger);
-  assign_one_obj_com(19503,  glove_combat_procs);
+//  assign_one_obj_com(19503,  glove_combat_procs);
   assign_one_obj_com(26807,  goldenbatleth);
   assign_one_obj_com(30627,  eliara_combat);
   assign_one_obj_com(570,  godload_jaelgreth);
