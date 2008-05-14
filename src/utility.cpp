@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.87 2008/05/14 00:51:17 jhhudso Exp $ */
+/* $Id: utility.cpp,v 1.88 2008/05/14 01:23:40 dcastle Exp $ */
 
 extern "C"
 {
@@ -2071,26 +2071,27 @@ void update_make_camp_and_leadership(void)
       if(affected_by_spell(i, SKILL_BATTLESENSE))
         affect_from_char(i, SKILL_BATTLESENSE);
     }
+    
+    if (i->in_room != NOWHERE) {
+      if(!check_make_camp(i->in_room)) {
+        if(affected_by_spell(i, SKILL_MAKE_CAMP)) {
+          affect_from_char(i, SKILL_MAKE_CAMP);
+          send_to_room("The camp has been disturbed.\n\r", i->in_room);
+        }
+        if(affected_by_spell(i, SPELL_FARSIGHT) && affected_by_spell(i, SPELL_FARSIGHT)->modifier == 111)
+          affect_from_char(i, SPELL_FARSIGHT);
+      } else {
+        if(!affected_by_spell(i, SPELL_FARSIGHT) && !IS_AFFECTED(i, AFF_FARSIGHT)) {
+          af.type = SPELL_FARSIGHT;
+          af.duration = -1;
+          af.modifier = 111;
+          af.location = 0;
+          af.bitvector = AFF_FARSIGHT;
 
-    if(!check_make_camp(i->in_room)) {
-      if(affected_by_spell(i, SKILL_MAKE_CAMP)) {
-        affect_from_char(i, SKILL_MAKE_CAMP);
-        send_to_room("The camp has been disturbed.\n\r", i->in_room);
-      }
-      if(affected_by_spell(i, SPELL_FARSIGHT) && affected_by_spell(i, SPELL_FARSIGHT)->modifier == 111)
-        affect_from_char(i, SPELL_FARSIGHT);
-    } else {
-      if(!affected_by_spell(i, SPELL_FARSIGHT) && !IS_AFFECTED(i, AFF_FARSIGHT)) {
-        af.type = SPELL_FARSIGHT;
-        af.duration = -1;
-        af.modifier = 111;
-        af.location = 0;
-        af.bitvector = AFF_FARSIGHT;
-
-        affect_to_char(i, &af);
+          affect_to_char(i, &af);
+        }
       }
     }
-
     bonus = get_leadership_bonus(i);
     
     if(i->changeLeadBonus == TRUE) {

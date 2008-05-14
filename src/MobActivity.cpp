@@ -574,4 +574,20 @@ int do_findpath(char_data *ch, char *argument, int cmd)
 */
 }
 
+void save_paths()
+{ //mkay..
+  class Path *p;
+  bool found = FALSE;
+  for (p = mPathList;p; p=p->next)
+  {
+     // Save pathname
+     for (map<int,int>::iterator iter = p->begin(); iter != p->end(); iter++)
+       ; // Save room #, iter.first()
+  }
+
+
+}
+
+
+
 /* END PATHFINDING */
