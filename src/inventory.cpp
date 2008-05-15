@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.101 2008/05/14 00:31:52 jhhudso Exp $
+| $Id: inventory.cpp,v 1.102 2008/05/15 06:35:35 jhhudso Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -784,14 +784,22 @@ fname(obj_object->name));
                   // to pick up no_trade items because it is someone else's corpse.  If I am
                   // the other of the corpse, has_consent will be false.
                       if (GET_LEVEL(ch) < IMMORTAL) {
-			if (isname("thiefcorpse",sub_object->name) || (cmd==195 && isname("lootable",sub_object->name)))
-                                {
-                        csendf(ch, "Whoa!  The %s poofed into thin air!\r\n", obj_object->short_description);
-                        extract_obj(obj_object);
-			fail = TRUE;
-				sprintf(buffer,"%s_consent",GET_NAME(ch));
-				if ((cmd==195 && isname("lootable",sub_object->name)) && !isname(buffer, sub_object->name))
-				{
+			  if (isname("thiefcorpse",sub_object->name) || (cmd==195 && isname("lootable",sub_object->name)))
+			  {
+			      csendf(ch, "Whoa!  The %s poofed into thin air!\r\n", obj_object->short_description);
+
+			      char log_buf[MAX_STRING_LENGTH];
+			      sprintf(log_buf,"%s poofed %s[%d] from %s",
+				      GET_NAME(ch), obj_object->short_description,
+				      obj_index[obj_object->item_number].virt, sub_object->name);
+			      log(log_buf, ANGEL, LOG_MORTAL);
+ 
+			      extract_obj(obj_object);
+			      fail = TRUE;
+			      sprintf(buffer,"%s_consent",GET_NAME(ch));
+
+			      if ((cmd==195 && isname("lootable",sub_object->name)) && !isname(buffer, sub_object->name))
+			      {
 				  SET_BIT(sub_object->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED);
 				  struct affected_type pthiefaf;
 
@@ -801,12 +809,6 @@ fname(obj_object->name));
 				  pthiefaf.location = APPLY_NONE;
 				  pthiefaf.bitvector = -1;
 
-				  char log_buf[MAX_STRING_LENGTH];
-			          sprintf(log_buf,"%s poofed %s[%d] from %s",
-			                 GET_NAME(ch), obj_object->short_description,
-                			 obj_index[obj_object->item_number].virt, sub_object->name);
-         			  log(log_buf, ANGEL, LOG_MORTAL);
- 
 				  WAIT_STATE(ch, PULSE_VIOLENCE*2);
 				  send_to_char("You suddenly feel very guilty...shame on you stealing from the dead!\r\n",ch);
 		                  if(affected_by_spell(ch, FUCK_PTHIEF))
@@ -818,9 +820,10 @@ fname(obj_object->name));
 		                	affect_to_char(ch, &pthiefaf);
 					
 				  }
-                                } else {
-                        csendf(ch, "%s : It seems magically attached to the corpse.\n\r", fname(obj_object->name));
-                        fail = TRUE; }
+			  } else {
+			      csendf(ch, "%s : It seems magically attached to the corpse.\n\r", fname(obj_object->name));
+			      fail = TRUE;
+			  }
                       }
                     }
 		    else if (CAN_WEAR(obj_object,ITEM_TAKE)) 
