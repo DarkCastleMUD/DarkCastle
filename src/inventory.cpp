@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.102 2008/05/15 06:35:35 jhhudso Exp $
+| $Id: inventory.cpp,v 1.103 2008/05/15 16:34:40 kkoons Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -35,6 +35,7 @@ extern "C"
 #include <clan.h>
 #include <arena.h>
 #include <inventory.h>
+#include <queue>
 
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
@@ -1634,21 +1635,35 @@ bool objExists(OBJ_DATA *obj);
 // and try to put it in his inv.  If sucessful, return pointer to the item.
 struct obj_data * bring_type_to_front(char_data * ch, int item_type)
 {
-  struct obj_data *i = NULL;
-  struct obj_data *j = NULL;
+  struct obj_data *item_carried = NULL;
+  struct obj_data *container_item = NULL;
+  
+  queue <obj_data*> container_queue;
  
-  for(i = ch->carrying; i ; i = i->next_content) {
-    if(GET_ITEM_TYPE(i) == item_type)
-      return i;
-    if(GET_ITEM_TYPE(i) == ITEM_CONTAINER && !IS_SET(i->obj_flags.value[1], CONT_CLOSED)) { // search inside if open
-  //  if(GET_ITEM_TYPE(i) == ITEM_CONTAINER) { // search inside if open
-      for(j = i->contains; j ; j = j->next_content) {
-        if(GET_ITEM_TYPE(j) == item_type) {
-          get(ch, j, i, 0, 9);
-          return j;
-        }
-      }
-    }
+  for(item_carried = ch->carrying; item_carried ; item_carried = item_carried->next_content) 
+  {
+    if(GET_ITEM_TYPE(item_carried) == item_type)
+      return item_carried;
+    if(GET_ITEM_TYPE(item_carried) == ITEM_CONTAINER && !IS_SET(item_carried->obj_flags.value[1], CONT_CLOSED)) 
+	{ // search inside if open
+	  container_queue.push(item_carried);
+	}
+
+  }
+
+    //  if(GET_ITEM_TYPE(i) == ITEM_CONTAINER) { // search inside if open
+  while(container_queue.size() > 0)
+  {
+      item_carried = container_queue.front();
+	  container_queue.pop();
+	  for(container_item = item_carried->contains; container_item ; container_item = container_item->next_content) 
+	  {
+		if(GET_ITEM_TYPE(container_item) == item_type) 
+		{
+		  get(ch, container_item, item_carried, 0, 9);
+		  return container_item;
+		}
+	  }
   }
   return NULL;
 }
