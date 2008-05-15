@@ -5448,7 +5448,7 @@ int spell_staunchblood(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
 	return eFAILURE;
    }
     if(!affected_by_spell(ch, SPELL_STAUNCHBLOOD)) {
-       act("You feel supremely healthy and resistant to $2poison$R!", ch, 0, 0, TO_CHAR, 0);
+       act("You feel supremely healthy and resistant to $2poison$R!", victim, 0, 0, TO_CHAR, 0);
        act("$n looks supremely healthy and begins looking for snakes and spiders to fight.", victim, 0, 0, TO_ROOM, INVIS_NULL);
        af.type = SPELL_STAUNCHBLOOD;
        af.duration = 1 + skill / 10;
