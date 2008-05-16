@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.489 2008/05/16 05:32:11 kkoons Exp $               *
+ * $Id: fight.cpp,v 1.490 2008/05/16 16:32:26 kkoons Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -827,7 +827,9 @@ int do_lightning_shield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
   if(GET_POS(vict) == POSITION_DEAD)            return eFAILURE;
   if(GET_LEVEL(ch) >= IMMORTAL)                 return eFAILURE;
   if(!IS_AFFECTED(vict, AFF_LIGHTNINGSHIELD))   return eFAILURE;
-  if (IS_SET(race_info[(int)GET_RACE(ch)].immune, ISR_ENERGY)) {
+  if (IS_SET(race_info[(int)GET_RACE(ch)].immune, ISR_ENERGY)
+      || IS_SET(ch->immune, ISR_ENERGY)
+     ) {
     dam = 0;
   } else {
     dam = 15;
