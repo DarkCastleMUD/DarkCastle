@@ -1629,7 +1629,7 @@ int skill_aff[] =
   0, SPELL_PROTECT_FROM_GOOD, SKILL_INNATE_POWERWIELD,
   SKILL_INNATE_REGENERATION, SKILL_INNATE_FOCUS,
   SPELL_KNOW_ALIGNMENT, 0, SPELL_WATER_BREATHING, 0, 0,
-  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 
 int do_mpbestow(CHAR_DATA *ch, char *argument, int cmd)
