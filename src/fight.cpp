@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.490 2008/05/16 16:32:26 kkoons Exp $               *
+ * $Id: fight.cpp,v 1.491 2008/05/16 16:33:43 kkoons Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -1037,7 +1037,9 @@ int do_acidshield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
   if(!IS_NPC(ch) && GET_LEVEL(ch) >= IMMORTAL)  return eFAILURE;
   if(!IS_AFFECTED(vict, AFF_ACID_SHIELD)) return eFAILURE;
 
-  if (IS_SET(race_info[(int)GET_RACE(ch)].immune, ISR_ACID))
+  if (IS_SET(race_info[(int)GET_RACE(ch)].immune, ISR_ACID)
+      || IS_SET(ch->immune, ISR_ACID)
+     )
     dam = 0;
   else {
     dam = 20;
