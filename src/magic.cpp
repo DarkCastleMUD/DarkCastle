@@ -3547,12 +3547,18 @@ int spell_word_of_recall(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct o
     return eFAILURE;
   }
 
-  if(IS_AFFECTED(ch, AFF_CHARM))
+  if(IS_AFFECTED(victim, AFF_CHARM))
     return eFAILURE;
-  if (IS_AFFECTED(ch, AFF_CURSE))
+  if (IS_AFFECTED(victim, AFF_CURSE))
   {
-     send_to_char("Something blocks your attempt to recall.\r\n",ch);
-	return eSUCCESS;
+     if (ch == victim)
+       send_to_char("Something blocks your attempt to recall.\r\n",ch);
+     else
+     {
+       act("Something blocks your attempt to recall $N.", ch, 0, victim, TO_CHAR, 0);
+       act("Something blocks $n's attempt to recall you.", ch, 0, victim, TO_VICT, 0);
+     }
+     return eFAILURE;
   }
   if (affected_by_spell(victim, FUCK_PTHIEF))
   {
