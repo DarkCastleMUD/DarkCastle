@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.488 2008/05/14 18:12:47 kkoons Exp $               *
+ * $Id: fight.cpp,v 1.489 2008/05/16 05:32:11 kkoons Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -1599,7 +1599,8 @@ void eq_destroyed(char_data * ch, obj_data * obj, int pos)
 {
   if (IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL)) return;
   if (IS_SET(obj->obj_flags.more_flags, ITEM_NO_SCRAP)) return;
-  if(pos != -1)
+  
+  if(pos != -1) //if its not an inventory item, do this
   {
     unequip_char(ch, pos);
 
@@ -1614,14 +1615,14 @@ void eq_destroyed(char_data * ch, obj_data * obj, int pos)
     }
     act("$p carried by $n is destroyed.", ch, obj, 0, TO_ROOM, 0);
   }
-  else { 
+  else { //if its an inventory item, do this
     act("$p worn by $n is destroyed.", ch, obj, 0, TO_ROOM, 0);
     recheck_height_wears(ch); // Make sure $n can still wear the rest of
 				// the eq
   }
 
   act("Your $p has been destroyed.", ch, obj, 0, TO_CHAR, 0);
-
+  
   while(obj->contains) // drop contents to floor
   {
     if(IS_SET(obj->contains->obj_flags.more_flags, ITEM_NO_TRADE))

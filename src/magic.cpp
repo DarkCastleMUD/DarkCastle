@@ -844,35 +844,81 @@ int spell_earthquake(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 {
   int dam;
   int retval = eSUCCESS;
+  struct obj_data *tmp_obj;
+  struct obj_data *obj_next;
   int weap_spell = obj?WIELD:0;
+  bool capsize = false;
+  bool underwater = false;
   CHAR_DATA *tmp_victim, *temp;
   dam = 150;
 
-  if(world[ch->in_room].sector_type == SECT_AIR) {
-   send_to_char("You attempt to cause an earthquake in the air, but nothing happens.\n\r", ch);
-   act("$n attempted to cause an earthquake in the air, what an idiot.", ch, 0, 0, TO_ROOM, 0);
-  } else if(world[ch->in_room].sector_type == SECT_WATER_SWIM || world[ch->in_room].sector_type == SECT_WATER_NOSWIM 
-            || world[ch->in_room].sector_type == SECT_UNDERWATER) {
-   send_to_char("You attempt to cause an earthquake in the water, but nothing happens.\n\r", ch);
-   act("$n attempted to cause an earthquake in the water, what an idiot.", ch, 0, 0, TO_ROOM, 0);
-  } else {
-   send_to_char("The earth trembles beneath your feet!\n\r", ch);
-   act("$n makes the earth tremble and shiver.\n\r",
-		ch, 0, 0, TO_ROOM, 0);
+  switch(world[ch->in_room].sector_type)
+  {
+	case SECT_AIR:
+      send_to_char("You attempt to cause an earthquake in the air, but nothing happens.\n\r", ch);
+      act("$n attempted to cause an earthquake in the air, what an idiot.", ch, 0, 0, TO_ROOM, 0);
+      return retval;
+	  break;
+
+	case SECT_WATER_NOSWIM:
+	  send_to_char("The water turns violent as the earth beneath it trembles.\n\r", ch);
+	  act("$n's earthquake creates a tsunami that capsizes any ships in the area.", ch, 0, 0, TO_ROOM, 0);
+      capsize = true;
+	  break;
+	case SECT_UNDERWATER:
+	  send_to_char("The earth trembles below you, the water pressure nearly makes you lose consciousness.\n\r", ch);
+	  act("$n's earthquake nearly makes you implode from the water pressure.", ch, 0, 0, TO_ROOM, 0);
+
+	default:
+	  send_to_char("The earth trembles beneath your feet!\n\r", ch);
+      act("$n makes the earth tremble and shiver.\n\r", ch, 0, 0, TO_ROOM, 0);
+	  break;
+  }
+  
+  
    for(tmp_victim = character_list; (tmp_victim && !IS_SET(retval, eCH_DIED)); tmp_victim = temp)
    {
 	 temp = tmp_victim->next;
 	 if ( (ch->in_room == tmp_victim->in_room) 
            && (ch != tmp_victim) 
-	   && (!ARE_GROUPED(ch,tmp_victim))
-	   && can_be_attacked(ch, tmp_victim))
-         {
-                  if(IS_NPC(ch) && IS_NPC(tmp_victim)) // mobs don't earthquake each other
-                    continue;
-                  if(IS_AFFECTED(tmp_victim, AFF_FREEFLOAT) || IS_AFFECTED(tmp_victim, AFF_FLYING)) {
-                     send_to_char("The shaking ground has no effect on you.\n\r", tmp_victim);
-		     dam = 0;
-		  }
+	       && (!ARE_GROUPED(ch,tmp_victim))
+	       && can_be_attacked(ch, tmp_victim) )
+     {
+       if(IS_NPC(ch) && IS_NPC(tmp_victim)) // mobs don't earthquake each other
+         continue;
+       if( !underwater &&
+	       (IS_AFFECTED(tmp_victim, AFF_FREEFLOAT) 
+		   || IS_AFFECTED(tmp_victim, AFF_FLYING)) ) 
+	   {
+         send_to_char("The shaking ground has no effect on you.\n\r", tmp_victim);
+		 dam = 0;
+	   }
+       else
+       {
+	     if (tmp_victim && capsize && IS_PC(tmp_victim))
+		 {  //capsize
+		   dam = 0;
+			 for (tmp_obj = tmp_victim->carrying; tmp_obj; tmp_obj = obj_next)
+			 {
+                           obj_next = tmp_obj->next_content;
+                           if (tmp_obj->obj_flags.type_flag == ITEM_BOAT)
+                           {
+                             act("$p carried by $n has capsized!", tmp_victim, tmp_obj, 0, TO_ROOM, 0);
+                             act("Your $p has capsized!", tmp_victim, tmp_obj, 0, TO_CHAR, 0);
+                             act("$p breaks apart into floating junk.", tmp_victim, tmp_obj, 0, TO_CHAR, 0);
+                             act("$p breaks apart into floating junk.", tmp_victim, tmp_obj, 0, TO_ROOM, 0);
+                             //make_scraps(tmp_victim, tmp_obj);
+                             //extract_obj(tmp_obj);
+                             eq_destroyed(tmp_victim, tmp_obj, -1);
+                           }
+                             
+                          //csendf(ch, "Boat Item is %s\n\r", GET_OBJ_SHORT(tmp_obj));
+	           //if (tmp_obj && (tmp_obj->obj_flags.type_flag == ITEM_BOAT))
+	            // eq_destroyed(tmp_victim, tmp_obj, -1);
+			 }
+
+		 }
+	   }	   
 		int retval2 = 0;
 		retval2 = damage(ch, tmp_victim, dam, TYPE_MAGIC, SPELL_EARTHQUAKE, weap_spell);
 
@@ -885,7 +931,7 @@ int spell_earthquake(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
          else if (world[ch->in_room].zone == world[tmp_victim->in_room].zone)
            send_to_char("The earth trembles and shivers.\n\r", tmp_victim);
    }
-  }
+
   return retval;
 }
 
