@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.163 2008/05/14 01:21:44 jhhudso Exp $ */
+/* $Id: info.cpp,v 1.164 2008/05/16 22:01:49 kkoons Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -1436,7 +1436,8 @@ int do_score(struct char_data *ch, char *argument, int cmd)
    char buf[MAX_STRING_LENGTH], scratch;
    int  level = 0;
    int to_dam, to_hit, spell_dam;
-   int flying = 0;
+  // int flying = 0;
+   bool affect_found[AFF_MAX] = {};
    bool modifyOutput;
    
    struct affected_type *aff;
@@ -1508,6 +1509,9 @@ int do_score(struct char_data *ch, char *argument, int cmd)
    {
 
       for( ; aff; aff = aff->next) {
+
+         if(aff->bitvector)
+           affect_found[aff->bitvector] = true;
          if(aff->type == SKILL_SNEAK)
             continue;
          scratch = frills[level];
@@ -1516,7 +1520,7 @@ int do_score(struct char_data *ch, char *argument, int cmd)
          // figure out the name of the affect (if any)
          char * aff_name = get_skill_name(aff->type);
 	 if (aff_name)
-         if (*aff_name && !str_cmp(aff_name, "fly")) flying = 1; 
+   //      if (*aff_name && !str_cmp(aff_name, "fly")) flying = 1; 
          switch(aff->type) {
 	   case BASE_SETS+SET_RAGER:
 	     if (aff->location == 0)
@@ -1592,17 +1596,43 @@ int do_score(struct char_data *ch, char *argument, int cmd)
             level = 0;
       }
    }
-   if (flying == 0 && IS_AFFECTED(ch, AFF_FLYING)) {
+ /*  if (flying == 0 && IS_AFFECTED(ch, AFF_FLYING)) {
      scratch = frills[level];
      sprintf(buf, "|%c| Affected by fly                                Modifier NONE            |%c|\n\r",
              scratch, scratch);
      send_to_char(buf, ch);
      found = TRUE;
-     level++;
-   }
+     if(++level == 4)
+       level = 0;
+   }*/
    extern bool elemental_score(char_data *ch, int level);
    if (!found) found = elemental_score(ch, level);
    else elemental_score(ch,level);
+
+
+   if(found)
+     send_to_char("($5:$7)=========================================================================($5:$7)\n\r", ch);
+ 
+   found = FALSE; 
+
+   extern char *affected_bits[];
+   for(int aff_idx = 1; aff_idx < AFF_MAX+1; aff_idx++)
+   {
+     if((!affect_found[aff_idx]) 
+        && IS_AFFECTED(ch, aff_idx))
+     {
+       found = TRUE;
+       if(++level == 4)
+         level = 0;
+       scratch = frills[level];
+       sprintf(buf, "|%c| Affected by %-25s          Modifier NONE            |%c|\n\r",
+                    scratch, affected_bits[aff_idx-1], scratch);
+       send_to_char(buf, ch);
+     }
+   }
+
+
+
 
    if(found)
      send_to_char("($5:$7)=========================================================================($5:$7)\n\r", ch);
