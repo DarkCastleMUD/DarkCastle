@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: obj.h,v 1.28 2008/04/09 21:55:55 dcastle Exp $ */
+/* $Id: obj.h,v 1.29 2008/05/17 22:19:52 jhhudso Exp $ */
 #ifndef OBJ_H_
 #define OBJ_H_
 
@@ -122,7 +122,7 @@ int recheck_height_wears(char_data *ch);
 #define ITEM_NOREPAIR           1<<28
 #define ITEM_NEWBIE             1<<29 // Newbie flagged.
 #define ITEM_PC_CORPSE		1<<30
-
+#define ITEM_QUEST              1<<31
 
 #define ALL_CLASSES ITEM_WARRIOR|ITEM_MAGE|ITEM_THIEF|ITEM_CLERIC|ITEM_PAL|ITEM_ANTI|ITEM_BARB|ITEM_MONK|ITEM_RANGER|ITEM_DRUID|ITEM_BARD
 
