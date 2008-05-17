@@ -18,6 +18,7 @@ one liner quest shit
 #include <quest.h>
 #include <spells.h>
 #include <vector>
+#include <string.h>
 
 using namespace std;
 
@@ -534,6 +535,7 @@ int start_quest(CHAR_DATA *ch, struct quest_info *quest)
       obj->name = str_hsh(buf);
 
       SET_BIT(obj->obj_flags.extra_flags, ITEM_SPECIAL);
+      SET_BIT(obj->obj_flags.extra_flags, ITEM_QUEST);
 
       obj_to_char(obj, mob);
       wear(mob, obj, keywordfind(obj));
