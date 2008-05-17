@@ -200,13 +200,20 @@ int do_add_quest(CHAR_DATA *ch, char *name)
 
 void list_quests(CHAR_DATA *ch, int lownum, int highnum)
 {
+    char buffer[MAX_STRING_LENGTH];
     struct quest_info * quest;
     
     for (quest_list_t::iterator node = quest_list.begin(); node != quest_list.end(); node++) {
 	quest = *node;
 	
-	if(quest->number <= highnum && quest->number >= lownum)
-	    csendf(ch, "%2d. %s\n\r", quest->number, quest->name);
+	if(quest->number <= highnum && quest->number >= lownum) {
+	    // Create a format string based on a space offset that takes color codes into account
+	    snprintf(buffer, MAX_STRING_LENGTH,
+		     "%%3d. $B$2Name:$7 %%-%ds$R Cost: %%-4d%%1s Reward: %%-4d Lvl: %%d\n\r",
+		     35 + (strlen(quest->name) - nocolor_strlen(quest->name)));
+
+	    csendf(ch, buffer, quest->number, quest->name, quest->cost, quest->brownie ? "$5*$R" : "", quest->reward, quest->level);
+	}
     }
     
     return;
