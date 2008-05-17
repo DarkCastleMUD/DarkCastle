@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.164 2008/05/16 22:01:49 kkoons Exp $ */
+/* $Id: info.cpp,v 1.165 2008/05/17 22:22:13 jhhudso Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -632,7 +632,10 @@ void show_char_to_char(struct char_data *i, struct char_data *ch, int mode)
           send_to_char("\n\rYou attempt to peek at the inventory:\n\r", ch);
           for(tmp_obj = i->carrying; tmp_obj;
           tmp_obj = tmp_obj->next_content) {
-             if (CAN_SEE_OBJ(ch, tmp_obj) && number(0,MORTAL) < GET_LEVEL(ch))
+	      if ((IS_SET(tmp_obj->obj_flags.extra_flags, ITEM_QUEST) == FALSE ||
+		   GET_LEVEL(ch) > IMMORTAL ) &&
+		  CAN_SEE_OBJ(ch, tmp_obj) &&
+		  number(0,MORTAL) < GET_LEVEL(ch))
              {
                 show_obj_to_char(tmp_obj, ch, 1);
                 found = TRUE;
