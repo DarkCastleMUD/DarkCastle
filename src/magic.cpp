@@ -5499,7 +5499,7 @@ int spell_staunchblood(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
 	send_to_char("You can only cast this on yourself.\r\n",ch);
 	return eFAILURE;
    }
-    if(!affected_by_spell(ch, SPELL_STAUNCHBLOOD)) {
+    if(!affected_by_spell(victim, SPELL_STAUNCHBLOOD)) {
        act("You feel supremely healthy and resistant to $2poison$R!", victim, 0, 0, TO_CHAR, 0);
        act("$n looks supremely healthy and begins looking for snakes and spiders to fight.", victim, 0, 0, TO_ROOM, INVIS_NULL);
        af.type = SPELL_STAUNCHBLOOD;
@@ -5507,7 +5507,7 @@ int spell_staunchblood(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
        af.modifier = 10 + skill / 6;
        af.location = APPLY_SAVING_POISON;
        af.bitvector = -1;
-       affect_to_char(ch, &af);
+       affect_to_char(victim, &af);
     }
   return eSUCCESS;
 }
@@ -9358,6 +9358,7 @@ int cast_staunchblood(ubyte level, CHAR_DATA *ch, char *arg, int type,
                        CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill) {
   switch(type) {
     case SPELL_TYPE_SPELL:
+      if(!tar_ch) tar_ch = ch;
       return spell_staunchblood(level, ch, tar_ch, 0, skill);
       break;
     case SPELL_TYPE_POTION:
