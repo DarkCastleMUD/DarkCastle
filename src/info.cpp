@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.165 2008/05/17 22:22:13 jhhudso Exp $ */
+/* $Id: info.cpp,v 1.166 2008/05/18 07:21:24 kkoons Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -1522,7 +1522,7 @@ int do_score(struct char_data *ch, char *argument, int cmd)
 
          // figure out the name of the affect (if any)
          char * aff_name = get_skill_name(aff->type);
-	 if (aff_name)
+//	 if (aff_name)
    //      if (*aff_name && !str_cmp(aff_name, "fly")) flying = 1; 
          switch(aff->type) {
 	   case BASE_SETS+SET_RAGER:
@@ -1624,6 +1624,11 @@ int do_score(struct char_data *ch, char *argument, int cmd)
      if((!affect_found[aff_idx]) 
         && IS_AFFECTED(ch, aff_idx))
      {
+       if(aff_idx == AFF_HIDE
+          || aff_idx == AFF_GROUP)
+         continue;
+       
+
        found = TRUE;
        if(++level == 4)
          level = 0;
