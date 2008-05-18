@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.167 2008/03/09 05:40:11 jhhudso Exp $ */
+/* $Id: handler.cpp,v 1.168 2008/05/18 03:34:38 jhhudso Exp $ */
     
 extern "C"
 {
@@ -3236,7 +3236,7 @@ void extract_char(CHAR_DATA *ch, bool pull)
         do_save(omast,"",666);
         omast->pcdata->golem = 0; // Reset the golem flag.
     }
-
+/*
     switch (GET_CLASS(ch)) {
       case CLASS_MAGE: GET_AC(ch) = 200; break;
       case CLASS_DRUID: GET_AC(ch) = 185; break;
@@ -3251,6 +3251,26 @@ void extract_char(CHAR_DATA *ch, bool pull)
       case CLASS_MONK: GET_AC(ch) = 50; break;
       default: GET_AC(ch) = 100;
     }
+    *
+    * Changing this to be consistent with char_to_store function
+    */
+
+    switch (GET_CLASS(ch)) {
+      case CLASS_MAGE: GET_AC(ch) = 150; break;
+      case CLASS_DRUID: GET_AC(ch) = 140; break;
+      case CLASS_CLERIC: GET_AC(ch) = 130; break;
+      case CLASS_ANTI_PAL: GET_AC(ch) = 120; break;
+      case CLASS_THIEF: GET_AC(ch) = 110; break;
+      case CLASS_BARD: GET_AC(ch) = 100; break;
+      case CLASS_BARBARIAN: GET_AC(ch) = 80; break;
+      case CLASS_RANGER: GET_AC(ch) = 60; break;
+      case CLASS_PALADIN: GET_AC(ch) = 40; break;
+      case CLASS_WARRIOR: GET_AC(ch) = 20; break;
+      case CLASS_MONK: GET_AC(ch) = 0; break;
+      default: GET_AC(ch) = 100;
+    }
+
+    GET_AC(ch) -= GET_AC_METAS(ch);
 
     if ( ch->desc && ch->desc->original )
 	do_return( ch, "", 12 );
