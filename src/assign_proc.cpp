@@ -609,6 +609,11 @@ void assign_objects(void)
   assign_one_obj_non(17353,  gem_assembler);  
   assign_one_obj_non(17354,  gem_assembler);  
 
+  //the Shield of the Beholder
+  assign_one_obj_non(5260, gem_assembler);
+  assign_one_obj_non(5261, gem_assembler);
+  assign_one_obj_non(5262, gem_assembler);
+
   assign_one_obj_non(22399,  board);  // quests2do Board
 
  // assign_one_obj_com(740,    magic_missile_boots);

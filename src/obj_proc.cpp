@@ -658,6 +658,13 @@ struct assembler_data gem_data[] = {
      { 17349, 17350, 17351, 17352, 17353, 17354, -1, -1, -1, -1, 17348 }
    },
 
+   // Item 6, the Shield of the Beholder
+   { "You place the two gems into the holes on the shield and it seems to hum with power.\n\r",
+     "$n places two precious gemstones into a beholder's carapace to create a shield.\n\r",
+     "You seem to be missing a piece.\n\r",
+     { 5260, 5261, 5262, -1, -1, -1, -1, -1, -1, -1, 5263 }
+   },
+
    // Junk Item.  THIS MUST BE LAST IN THE ARRAY
    { "Capulet",
      "is a fatt",
