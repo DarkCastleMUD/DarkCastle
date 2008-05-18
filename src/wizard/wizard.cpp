@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.66 2008/05/15 05:58:17 kkoons Exp $
+| $Id: wizard.cpp,v 1.67 2008/05/18 02:32:02 jhhudso Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -805,7 +805,7 @@ void mob_stat(struct char_data *ch, struct char_data *k)
 
 
   if (!IS_NPC(k)) {
-     csendf(ch, "$3Hp metas$R: %d, $3Mana metas$R: %d, $3Move metas$R: %d, $3Ki metas$R: %d\r\n",GET_HP_METAS(k), GET_MANA_METAS(k), GET_MOVE_METAS(k), GET_KI_METAS(k));
+      csendf(ch, "$3Hp metas$R: %d, $3Mana metas$R: %d, $3Move metas$R: %d, $3Ki metas$R: %d, $3AC metas$R: %d, $3Age metas$R: %d\r\n",GET_HP_METAS(k), GET_MANA_METAS(k), GET_MOVE_METAS(k), GET_KI_METAS(k), GET_AC_METAS(k), GET_AGE_METAS(k));
   }
 
   if(k->affected) {
