@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: save.cpp,v 1.55 2008/04/18 01:27:17 jhhudso Exp $ */
+/* $Id: save.cpp,v 1.56 2008/05/18 03:35:08 jhhudso Exp $ */
 
 extern "C"
 {
@@ -1383,6 +1383,8 @@ void store_to_char(struct char_file_u *st, CHAR_DATA *ch)
     GET_HP_METAS(ch)   = st->hpmetas;
     GET_MANA_METAS(ch) = st->manametas;
     GET_MOVE_METAS(ch) = st->movemetas;
+    GET_AC_METAS(ch)   = st->acmetas;
+    GET_AGE_METAS(ch)  = st->agemetas;
 
     ch->armor          = st->armor;
     ch->hitroll        = st->hitroll;

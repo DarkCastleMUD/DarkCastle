@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.174 2008/04/18 01:27:17 jhhudso Exp $ */
+/* $Id: nanny.cpp,v 1.175 2008/05/18 03:35:08 jhhudso Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -353,6 +353,8 @@ void do_on_login_stuff(char_data * ch)
        GET_AC(ch) -= (GET_LEVEL(ch) * 2);
     }
     GET_AC(ch) -= has_skill(ch, SKILL_COMBAT_MASTERY)/2;
+
+    GET_AC(ch) -= GET_AC_METAS(ch);
 
     if (affected_by_spell(ch,INTERNAL_SLEEPING))
     {

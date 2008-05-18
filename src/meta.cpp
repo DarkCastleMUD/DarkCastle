@@ -619,6 +619,10 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     "$B$319)$R A deep blue potion of healing. Cost: 25 Platinum coins.\r\n"
     "$B$320)$R Buy a practice session for 25 plats.\r\n"
                  , ch);
+    if (!IS_MOB(ch)) {
+	send_to_char("$B$321)$R Add -2 points of AC for 10 qpoints. (Max -50)\r\n", ch);
+	send_to_char("$B$322)$R Add 2,000,000 experience for 1 qpoint.\r\n", ch);
+    }
 
     return eSUCCESS;
   }
@@ -992,6 +996,50 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     ch->pcdata->practices += 1;
     return eSUCCESS;
   }
+  if (choice == 21) { // -2 AC
+      if (GET_QPOINTS(ch) < 10) {
+	  send_to_char ("Costs 10 qpoints...which you don't have.\n\r", ch);
+	  return eSUCCESS;
+      }
+      if (IS_MOB(ch)) {
+	  send_to_char ("You can't buy AC, chode...\r\n", ch);
+	  return eSUCCESS;
+      }
+      if (GET_AC_METAS(ch) >= 50) {
+	  send_to_char("You've reached the -50 AC limit that can be purchased per character.\r\n", ch);
+	  return eSUCCESS;
+      }
+
+      GET_QPOINTS(ch) -= 10;
+      GET_AC_METAS(ch) += 2;
+      GET_AC(ch) -= 2;
+      act("The Meta-physician touches $n.",  ch, 0, 0, TO_ROOM, 0);
+      act("The Meta-physician touches you.",  ch, 0, 0, TO_CHAR, 0);
+      logf( 110, LOG_MORTAL, "%s metas -2 AC for 10 qpoints.", GET_NAME(ch));
+      do_save(ch, "", 10);
+
+      return eSUCCESS;
+  }
+  if (choice == 22) { // 2,000,000 experience
+      if (GET_QPOINTS(ch) < 1) {
+	  send_to_char ("Costs 1 qpoint...which you don't have.\n\r", ch);
+	  return eSUCCESS;
+      }
+      if (IS_MOB(ch)) {
+	  send_to_char ("You can't buy experience, chode...\r\n", ch);
+	  return eSUCCESS;
+      }
+
+      GET_QPOINTS(ch) -= 1;
+      GET_EXP(ch) += 2000000;
+      act("The Meta-physician touches $n.",  ch, 0, 0, TO_ROOM, 0);
+      act("The Meta-physician touches you.",  ch, 0, 0, TO_CHAR, 0);
+      logf( 110, LOG_MORTAL, "%s metas 2000000 XP for 1 qpoint.", GET_NAME(ch));
+      do_save(ch, "", 10);
+      
+      return eSUCCESS;
+  }
+
  }
   send_to_char("$B$2The Meta-physician tells you, 'Buy what?!'$R\n\r", ch);
   return eSUCCESS;
