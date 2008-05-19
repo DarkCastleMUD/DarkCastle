@@ -857,11 +857,6 @@ int do_quest(CHAR_DATA *ch, char *arg, int cmd)
    char name[MAX_STRING_LENGTH];
    CHAR_DATA *qmaster = get_mob_vnum(QUEST_MASTER);
 
-   if (!has_skill(ch, COMMAND_QUEST)) {
-       send_to_char("Huh?\n\r", ch);
-       return eFAILURE;
-   }
-
    half_chop(arg, arg, name);
 
    if (is_abbrev(arg, "current"))
