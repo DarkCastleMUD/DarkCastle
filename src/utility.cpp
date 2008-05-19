@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.88 2008/05/14 01:23:40 dcastle Exp $ */
+/* $Id: utility.cpp,v 1.89 2008/05/19 05:21:48 jhhudso Exp $ */
 
 extern "C"
 {
@@ -503,6 +503,7 @@ struct time_info_data age(CHAR_DATA *ch)
     player_age = mud_time_passed(time(0),ch->pcdata->time.birth);
 
     player_age.year += 17;   /* All players start at 17 */
+    player_age.year += GET_AGE_METAS(ch);
 
     return player_age;
 }

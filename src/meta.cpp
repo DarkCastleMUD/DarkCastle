@@ -620,7 +620,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     "$B$320)$R Buy a practice session for 25 plats.\r\n"
                  , ch);
     if (!IS_MOB(ch)) {
-	send_to_char("$B$321)$R Add -2 points of AC for 10 qpoints. (Max -50)\r\n", ch);
+	send_to_char("$B$321)$R Add -2 points of AC for 10 qpoints. (-50 Max)\r\n", ch);
 	send_to_char("$B$322)$R Add 2,000,000 experience for 1 qpoint.\r\n", ch);
     }
 
@@ -1321,34 +1321,37 @@ int cardinal(struct char_data *ch, struct obj_data *obj, int cmd, char *argument
     send_to_char("$BRace Change:$R\r\n(Remember a race change will reduce your base attributes by 2 points each.)\r\n",ch);
 
     for (int i = 1; i <= MAX_PC_RACE; i++)
-      csendf(ch, "$B$3%d)$R  %-24s - %s\r\n", i, race_info[i].singular_name, race_message(ch, i));
+      csendf(ch, "$B$3%d)$R  %-32s - %s\r\n", i, race_info[i].singular_name, race_message(ch, i));
 
     send_to_char("$BOther Services:$R\r\n",ch);
 
-    csendf(ch, "$B$3%d)$R %-24s - 1000 platinum coins.\r\n", MAX_PC_RACE+1,"Sex Change");
-    csendf(ch, "$B$3%d)$R %-24s - 50 platinum coins.\r\n", MAX_PC_RACE+2,"A deep red vial of mana");
+    csendf(ch, "$B$3%d)$R %-32s - 1000 platinum coins.\r\n", MAX_PC_RACE+1,"Sex Change");
+    csendf(ch, "$B$3%d)$R %-32s - 50 platinum coins.\r\n", MAX_PC_RACE+2,"A deep red vial of mana");
 
     send_to_char("$BHeight/Weight Change:$R\r\n",ch);
 
     if (ch->height < race_info[ch->race].max_height) 
-	csendf(ch,"$B$3%d)$R %-24s - 250 platinum coins.\r\n", MAX_PC_RACE+3, "Increase your height by 1");
+	csendf(ch,"$B$3%d)$R %-32s - 250 platinum coins.\r\n", MAX_PC_RACE+3, "Increase your height by 1");
     else
-	csendf(ch,"$B$3%d)$R %-24s.\r\n", MAX_PC_RACE+3, "You cannot increase your height further");
+	csendf(ch,"$B$3%d)$R %-32s.\r\n", MAX_PC_RACE+3, "You cannot increase your height further");
 
     if (ch->height > race_info[ch->race].min_height)
-	csendf(ch,"$B$3%d)$R %-24s - 250 platinum coins.\r\n", MAX_PC_RACE+4, "Decrease your height by 1");
+	csendf(ch,"$B$3%d)$R %-32s - 250 platinum coins.\r\n", MAX_PC_RACE+4, "Decrease your height by 1");
     else
-	csendf(ch,"$B$3%d)$R %-24s.\r\n", MAX_PC_RACE+4, "You cannot decrease your height further");
+	csendf(ch,"$B$3%d)$R %-32s.\r\n", MAX_PC_RACE+4, "You cannot decrease your height further");
 
     if (ch->weight < race_info[ch->race].max_weight) 
-	csendf(ch,"$B$3%d)$R %-24s - 250 platinum coins.\r\n", MAX_PC_RACE+5, "Increase your weight by 1");
+	csendf(ch,"$B$3%d)$R %-32s - 250 platinum coins.\r\n", MAX_PC_RACE+5, "Increase your weight by 1");
     else
-	csendf(ch,"$B$3%d)$R %-24s.\r\n", MAX_PC_RACE+5, "You cannot increase your weight further");
+	csendf(ch,"$B$3%d)$R %-32s.\r\n", MAX_PC_RACE+5, "You cannot increase your weight further");
 
     if (ch->weight > race_info[ch->race].min_weight)
-	csendf(ch,"$B$3%d)$R %-24s - 250 platinum coins.\r\n", MAX_PC_RACE+6, "Decrease your weight by 1");
+	csendf(ch,"$B$3%d)$R %-32s - 250 platinum coins.\r\n", MAX_PC_RACE+6, "Decrease your weight by 1");
     else
-	csendf(ch,"$B$3%d)$R %-24s.\r\n", MAX_PC_RACE+6, "You cannot decrease your weight further");
+	csendf(ch,"$B$3%d)$R %-32s.\r\n", MAX_PC_RACE+6, "You cannot decrease your weight further");
+
+    csendf(ch,"$B$3%d)$R %-32s - 5 quest points.\r\n", MAX_PC_RACE+7, "Increase your age by 1 (500 max)");
+    csendf(ch,"$B$3%d)$R %-32s - 5 quest points.\r\n", MAX_PC_RACE+8, "Decrease your age by 1  (18 min)");
 
     return eSUCCESS;
   } 
@@ -1502,6 +1505,50 @@ int cardinal(struct char_data *ch, struct obj_data *obj, int cmd, char *argument
       if (choice == 5) ch->weight++;
       if (choice == 6) ch->weight--;
       return eSUCCESS;
+    } else if (choice == MAX_PC_RACE+7) {
+	if (GET_QPOINTS(ch) < 5) {
+	    send_to_char ("Costs 5 qpoints...which you don't have.\n\r", ch);
+	    return eSUCCESS;
+	}
+	if (IS_MOB(ch)) {
+	    send_to_char ("You can't buy age, chode...\r\n", ch);
+	    return eSUCCESS;
+	}
+	if (GET_AGE(ch) >= 500) {
+	    send_to_char("You've reached the 500 age limit that can be purchased per character.\r\n", ch);
+	    return eSUCCESS;
+	}
+
+	GET_QPOINTS(ch) -= 5;
+	GET_AGE_METAS(ch) += 1;
+	act("The Meta-physician touches $n.",  ch, 0, 0, TO_ROOM, 0);
+	act("The Meta-physician touches you.",  ch, 0, 0, TO_CHAR, 0);
+	logf( 110, LOG_MORTAL, "%s metas 1 age for 5 qpoints.", GET_NAME(ch));
+	do_save(ch, "", 10);
+
+	return eSUCCESS;
+    } else if (choice == MAX_PC_RACE+8) {
+	if (GET_QPOINTS(ch) < 5) {
+	    send_to_char ("Costs 5 qpoints...which you don't have.\n\r", ch);
+	    return eSUCCESS;
+	}
+	if (IS_MOB(ch)) {
+	    send_to_char ("You can't buy age, chode...\r\n", ch);
+	    return eSUCCESS;
+	}
+	if (GET_AGE(ch) <= 18) {
+	    send_to_char("You've reached the age 18 minimum limit that can be purchased per character.\r\n", ch);
+	    return eSUCCESS;
+	}
+
+	GET_QPOINTS(ch) -= 5;
+	GET_AGE_METAS(ch) -= 1;
+	act("The Meta-physician touches $n.",  ch, 0, 0, TO_ROOM, 0);
+	act("The Meta-physician touches you.",  ch, 0, 0, TO_CHAR, 0);
+	logf( 110, LOG_MORTAL, "%s metas -1 age for 5 qpoints.", GET_NAME(ch));
+	do_save(ch, "", 10);
+
+	return eSUCCESS;
     } else {
       send_to_char("$B$2Cardinal Thelonius tells you, 'I don't have that. Try \"list\".'$R\n\r", ch);
       return eSUCCESS;
