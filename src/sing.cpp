@@ -625,7 +625,10 @@ int do_sing(CHAR_DATA *ch, char *arg, int cmd)
          }
       }
 
-      if(spl != 2 && !skill_success(ch,tar_char, spl+SKILL_SONG_BASE)) {
+      if( spl != 2 
+          && !skill_success(ch,tar_char, spl+SKILL_SONG_BASE) 
+          && !IS_SET(world[ch->in_room].room_flags,SAFE) ) {
+
         send_to_char("You forgot the words!\n\r", ch);
         GET_KI(ch) -= use_song(ch, spl)/2;
         return eSUCCESS;
