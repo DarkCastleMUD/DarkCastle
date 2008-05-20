@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.71 2008/04/17 02:37:19 jhhudso Exp $ */
+/* $Id: ki.cpp,v 1.72 2008/05/20 03:35:54 kkoons Exp $ */
 
 extern "C"
 {
@@ -293,7 +293,8 @@ int do_ki(CHAR_DATA *ch, char *argument, int cmd)
     if((ki_info[spl].ki_pointer == NULL) && spl > 0)
       send_to_char("Sorry, this power has not yet been implemented.\n\r", ch);
     else {
-      if(!skill_success(ch, tar_char, spl+KI_OFFSET)) {
+      if(!skill_success(ch, tar_char, spl+KI_OFFSET) 
+         && !IS_SET(world[ch->in_room].room_flags, SAFE)) {
         send_to_char("You lost your concentration!\n\r", ch);
         GET_KI(ch) -= use_ki(ch, spl)/2;
         return eSUCCESS;
