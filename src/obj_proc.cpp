@@ -2960,6 +2960,43 @@ int godload_alignevil(struct char_data*ch, struct obj_data *obj, int cmd, char*a
   return eSUCCESS;
 }
 
+
+
+int quest_wand_of_wonder(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
+                   CHAR_DATA *invoker)
+{
+  char arg1[MAX_INPUT_LENGTH];
+
+  if (cmd != 185 /*PUSH*/||!is_wearing(ch,obj))
+    return eFAILURE;
+
+  arg = one_argument(arg, arg1);
+
+  if (str_cmp(arg1, "wonder") && str_cmp(arg1, "orro")) return eFAILURE;
+
+  for(int i = 0; i < obj->num_affects; i++)
+    if (obj->affected[i].location == WEP_OFFENSIVE)
+    {
+
+       send_to_char("You push the button and the wand begins to glow blue.\r\n",ch);
+       obj->affected[i].location = WEP_DEFENSIVE;
+       return eSUCCESS;
+    } else if (obj->affected[i].location == WEP_DEFENSIVE)
+    {
+
+       send_to_char("You push the button and the wand begins to glow red.\r\n",ch);
+       obj->affected[i].location = WEP_OFFENSIVE; 
+       return eSUCCESS;
+    }
+  send_to_char("Something's bugged with this wand. Report it.\r\n",ch);
+  return eSUCCESS;
+}
+
+
+
+
+
+
 int godload_tovmier(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
                    CHAR_DATA *invoker)
 {
