@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.265 2008/05/19 05:27:10 jhhudso Exp $ */
+/* $Id: const.cpp,v 1.266 2008/05/20 17:14:43 kkoons Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1063,6 +1063,8 @@ char *apply_types[] =
     "AFF BLIND",
     "WATERBREATHING",
     "DETECT MAGIC",
+    "OFFENSIVE MAGIC",
+    "DEFENSIVE MAGIC",
     "\n"
 };
 
