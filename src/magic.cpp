@@ -3029,6 +3029,7 @@ int cast_camouflague(ubyte level, CHAR_DATA *ch, char *arg, int type,
     case SPELL_TYPE_POTION:
       return spell_camouflague(level, ch, ch, 0, skill);
       break;
+    case SPELL_TYPE_WAND:
     case SPELL_TYPE_SCROLL:
       if(tar_obj) {
         return eFAILURE;
@@ -3064,6 +3065,7 @@ int cast_farsight(ubyte level, CHAR_DATA *ch, char *arg, int type,
      case SPELL_TYPE_POTION:
        return spell_farsight(level, ch, ch, 0, skill);
        break;
+     case SPELL_TYPE_WAND:
      case SPELL_TYPE_SCROLL:
        if(tar_obj) {
          return eFAILURE;
@@ -3099,6 +3101,7 @@ int cast_freefloat(ubyte level, CHAR_DATA *ch, char *arg, int type,
     case SPELL_TYPE_POTION:
       return spell_freefloat(level, ch, ch, 0, skill);
       break;
+    case SPELL_TYPE_WAND:
     case SPELL_TYPE_SCROLL:
       if(tar_obj) {
         return eFAILURE;
@@ -3169,6 +3172,7 @@ int cast_shadowslip(ubyte level, CHAR_DATA *ch, char *arg, int type,
     case SPELL_TYPE_POTION:
       return spell_shadowslip(level, ch, ch, 0, skill);
       break;
+    case SPELL_TYPE_WAND:
     case SPELL_TYPE_SCROLL:
       if(tar_obj) {
         return eFAILURE;
@@ -3243,6 +3247,7 @@ int cast_sanctuary( ubyte level, CHAR_DATA *ch, char *arg, int type,
     case SPELL_TYPE_POTION:
       return spell_sanctuary(level, ch, ch, 0, skill);
       break;
+    case SPELL_TYPE_WAND:
     case SPELL_TYPE_SCROLL:
       if(tar_obj)
         return eFAILURE;
@@ -7254,9 +7259,6 @@ int cast_cure_critic( ubyte level, CHAR_DATA *ch, char *arg, int type,
 	 return spell_cure_critic(level,ch,ch,0, skill);
 	 break;
   case SPELL_TYPE_WAND:
-         if(!tar_ch) return eFAILURE;
-         return spell_cure_critic(level, ch, tar_ch, 0, skill);
-         break;
   case SPELL_TYPE_SCROLL:
 	 if (tar_obj) return eFAILURE;
 	 if (!tar_ch) tar_ch = ch;
@@ -7429,6 +7431,9 @@ int cast_true_sight( ubyte level, CHAR_DATA *ch, char *arg, int type,
   case SPELL_TYPE_POTION:
 	 return spell_true_sight(level,ch,ch,0, skill);
 	 break;
+  case SPELL_TYPE_WAND:
+         if (!tar_ch) tar_ch = ch;
+         return spell_true_sight(level, ch, tar_ch, 0, skill);
   case SPELL_TYPE_SCROLL:
 	 if (tar_obj) return eFAILURE;
 	 if (!tar_ch) tar_ch = ch;
@@ -7569,6 +7574,7 @@ int cast_detect_magic( ubyte level, CHAR_DATA *ch, char *arg, int type,
   case SPELL_TYPE_POTION:
 	 return spell_detect_magic(level,ch,ch,0, skill);
 	 break;
+  case SPELL_TYPE_WAND:
   case SPELL_TYPE_SCROLL:
 	 if (tar_obj) return eFAILURE;
 	 if (!tar_ch) tar_ch = ch;
@@ -7602,6 +7608,7 @@ int cast_haste( ubyte level, CHAR_DATA *ch, char *arg, int type,
   case SPELL_TYPE_POTION:
 	 return spell_haste(level,ch,ch,0, skill);
 	 break;
+  case SPELL_TYPE_WAND:
   case SPELL_TYPE_SCROLL:
 	 if (tar_obj) return eFAILURE;
 	 if (!tar_ch) tar_ch = ch;
@@ -7813,6 +7820,7 @@ int cast_mana( ubyte level, CHAR_DATA *ch, char *arg, int type,
   case SPELL_TYPE_SPELL:
     return spell_mana(level, ch, tar_ch, 0, skill);
     break;
+  case SPELL_TYPE_WAND:
   case SPELL_TYPE_SCROLL:
     if (!tar_ch)
       tar_ch = ch;
@@ -7893,6 +7901,10 @@ int cast_full_heal( ubyte level, CHAR_DATA *ch, char *arg, int type,
   CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill )
 {
   switch (type) {
+         case SPELL_TYPE_WAND:
+         case SPELL_TYPE_SCROLL:
+         if (!tar_ch) tar_ch = ch;
+         return spell_full_heal(level, ch, tar_ch, 0, skill);
 	 case SPELL_TYPE_SPELL:
 		 return spell_full_heal(level, ch, tar_ch, 0, skill);
 		 break;
@@ -7989,6 +8001,10 @@ int cast_poison( ubyte level, CHAR_DATA *ch, char *arg, int type,
   char_data * next_v;
 
   switch (type) {
+  case SPELL_TYPE_WAND:
+  case SPELL_TYPE_SCROLL:
+    return spell_poison(level, ch, tar_ch, 0, skill);
+    break;
   case SPELL_TYPE_SPELL:
     if (IS_SET(world[ch->in_room].room_flags, SAFE)){
 	 send_to_char("You can not poison someone in a safe area!\n\r",ch);
@@ -8227,6 +8243,7 @@ int cast_fireshield( ubyte level, CHAR_DATA *ch, char *arg, int type,
 	 case SPELL_TYPE_POTION:
 	 return spell_fireshield(level, ch, ch, 0, skill);
 	 break;
+         case SPELL_TYPE_WAND:
 	 case SPELL_TYPE_SCROLL:
 	 if(tar_obj)
 		return eFAILURE;
@@ -8305,6 +8322,7 @@ int cast_strength( ubyte level, CHAR_DATA *ch, char *arg, int type,
 	 case SPELL_TYPE_POTION:
 		 return spell_strength(level, ch, ch, 0, skill);
 		 break;
+         case SPELL_TYPE_WAND:
 	 case SPELL_TYPE_SCROLL:
 	 if(tar_obj) return eFAILURE;
 	 if (!tar_ch) tar_ch = ch;
@@ -8508,6 +8526,7 @@ int cast_sense_life( ubyte level, CHAR_DATA *ch, char *arg, int type,
   case SPELL_TYPE_POTION:
 	 return spell_sense_life(level, ch, ch, 0, skill);
 	 break;
+  case SPELL_TYPE_WAND:
   case SPELL_TYPE_SCROLL:
 	 if (tar_obj) return eFAILURE;
 	 return spell_sense_life(level, ch, ch, 0, skill);
@@ -9343,6 +9362,7 @@ int cast_resist_cold( ubyte level, CHAR_DATA *ch, char *arg,
   case SPELL_TYPE_POTION:
     return spell_resist_cold(level, ch, tar_ch, 0, skill);
 	 break;
+  case SPELL_TYPE_WAND:
   case SPELL_TYPE_SCROLL:
       if (tar_obj) return eFAILURE;
       if (!tar_ch) tar_ch = ch;
@@ -9364,6 +9384,7 @@ int cast_staunchblood(ubyte level, CHAR_DATA *ch, char *arg, int type,
     case SPELL_TYPE_POTION:
       return spell_staunchblood(level, ch, tar_ch, 0, skill);
       break;
+    case SPELL_TYPE_WAND:
     case SPELL_TYPE_SCROLL:
       if (tar_obj) return eFAILURE;
       if (!tar_ch) tar_ch = ch;
@@ -9385,6 +9406,7 @@ int cast_resist_energy(ubyte level, CHAR_DATA *ch, char *arg, int type,
     case SPELL_TYPE_POTION:
       return spell_resist_energy(level, ch, tar_ch, 0, skill);
       break;
+    case SPELL_TYPE_WAND:
     case SPELL_TYPE_SCROLL:
       if (tar_obj) return eFAILURE;
       if (!tar_ch) tar_ch = ch;
@@ -9408,6 +9430,7 @@ int cast_resist_fire( ubyte level, CHAR_DATA *ch, char *arg,
   case SPELL_TYPE_POTION:
 	 return spell_resist_fire(level, ch, tar_ch, 0, skill);
 	 break;
+  case SPELL_TYPE_WAND:
   case SPELL_TYPE_SCROLL:
       if (tar_obj) return eFAILURE;
       if (!tar_ch) tar_ch = ch;
@@ -9432,6 +9455,7 @@ int cast_resist_magic( ubyte level, CHAR_DATA *ch, char *arg,
   case SPELL_TYPE_POTION:
 	 return spell_resist_magic(level, ch, tar_ch, 0, skill);
 	 break;
+  case SPELL_TYPE_WAND:
   case SPELL_TYPE_SCROLL:
       if (tar_obj) return eFAILURE;
       if (!tar_ch) tar_ch = ch;
@@ -9456,6 +9480,7 @@ int cast_stone_skin( ubyte level, CHAR_DATA *ch, char *arg,
   case SPELL_TYPE_POTION:
 	 return spell_stone_skin(level, ch, 0, 0, skill);
 	 break;
+  case SPELL_TYPE_WAND:
   case SPELL_TYPE_SCROLL:
       if (tar_obj) return eFAILURE;
       if (!tar_ch) tar_ch = ch;
@@ -9703,6 +9728,7 @@ int cast_infravision( ubyte level, CHAR_DATA *ch, char *arg,
   case SPELL_TYPE_SPELL:
 	 return spell_infravision(level, ch, tar_ch, 0, skill);
 	 break;
+  case SPELL_TYPE_WAND:
   case SPELL_TYPE_SCROLL:
 	 if (tar_obj) return eFAILURE;
 	 if (!tar_ch) tar_ch = ch;
@@ -9783,6 +9809,10 @@ int cast_bee_sting(ubyte level, CHAR_DATA *ch, char *arg, int type,
                     CHAR_DATA *victim, struct obj_data * tar_obj, int skill)
 {
    switch (type) {
+      case SPELL_TYPE_WAND:
+      case SPELL_TYPE_SCROLL:
+         return spell_bee_sting(level, ch, victim, 0, skill);
+         break;
       case SPELL_TYPE_SPELL:
          if (!OUTSIDE(ch)) {
             send_to_char("Your spell is more draining because you are indoors!\n\r", ch);
@@ -9943,6 +9973,11 @@ int cast_barkskin(ubyte level, CHAR_DATA *ch, char *arg, int type,
                     CHAR_DATA *victim, struct obj_data * tar_obj, int skill)
 {
    switch (type) {
+      case SPELL_TYPE_WAND:
+      case SPELL_TYPE_SCROLL:
+        if(!victim) victim = ch;
+        return spell_barkskin(level, ch, victim, 0, skill);
+        break;
       case SPELL_TYPE_SPELL:
          if (!OUTSIDE(ch)) {
             send_to_char("Your spell is more draining because you are indoors!\n\r", ch);
@@ -10295,6 +10330,10 @@ int cast_feline_agility(ubyte level, CHAR_DATA *ch, char *arg, int type,
                     CHAR_DATA *victim, struct obj_data * tar_obj, int skill)
 {
    switch (type) {
+      case SPELL_TYPE_WAND:
+      case SPELL_TYPE_SCROLL:
+        if(!victim) victim = ch;
+        return spell_feline_agility(level, ch, victim, 0, skill);
       case SPELL_TYPE_SPELL:
          if (!OUTSIDE(ch)) {
             send_to_char("Your spell is more draining because you are indoors!\n\r", ch);
@@ -10348,6 +10387,11 @@ int cast_oaken_fortitude(ubyte level, CHAR_DATA *ch, char *arg, int type,
                     CHAR_DATA *victim, struct obj_data * tar_obj, int skill)
 {
    switch (type) {
+      case SPELL_TYPE_WAND:
+      case SPELL_TYPE_SCROLL:
+         if(!victim) victim = ch;
+         return spell_oaken_fortitude(level, ch, victim, 0, skill);
+         break;
       case SPELL_TYPE_SPELL:
          if (!OUTSIDE(ch)) {
             send_to_char("Your spell is more draining because you are indoors!\n\r", ch);
@@ -11255,6 +11299,7 @@ int cast_resist_acid(ubyte level, CHAR_DATA *ch, char *arg, int type,
     case SPELL_TYPE_POTION:
       return spell_resist_acid(level, ch, tar_ch, 0, skill);
       break;
+    case SPELL_TYPE_WAND:
     case SPELL_TYPE_SCROLL:
       if (tar_obj) return eFAILURE;
       if (!tar_ch) tar_ch = ch;
@@ -11389,6 +11434,7 @@ int cast_rapid_mend(ubyte level, CHAR_DATA *ch, char *arg, int type,
     case SPELL_TYPE_POTION:
       return spell_rapid_mend(level, ch, tar_ch, 0, skill);
       break;
+    case SPELL_TYPE_WAND:
     case SPELL_TYPE_SCROLL:
       if (tar_obj) return eFAILURE;
       if (!tar_ch) tar_ch = ch;
@@ -11501,6 +11547,7 @@ int cast_acid_shield( ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA
     case SPELL_TYPE_POTION:
        return spell_acid_shield(level, ch, ch, 0, skill);
        break;
+    case SPELL_TYPE_WAND:
     case SPELL_TYPE_SCROLL:
        if(tar_obj)
           return eFAILURE;
@@ -11553,6 +11600,7 @@ int cast_water_breathing( ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_
     case SPELL_TYPE_POTION:
        return spell_water_breathing(level, ch, ch, 0, skill);
        break;
+    case SPELL_TYPE_WAND:
     case SPELL_TYPE_SCROLL:
        if(tar_obj)
           return eFAILURE;
@@ -11771,6 +11819,7 @@ int cast_lightning_shield( ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR
     case SPELL_TYPE_POTION:
        return spell_lightning_shield(level, ch, ch, 0, skill);
        break;
+    case SPELL_TYPE_WAND:
     case SPELL_TYPE_SCROLL:
        if(tar_obj)
           return eFAILURE;
@@ -11950,6 +11999,7 @@ int cast_debility( ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *t
     case SPELL_TYPE_SPELL:
        return spell_debility(level, ch, tar_ch, 0, skill);
        break;
+    case SPELL_TYPE_WAND:
     case SPELL_TYPE_SCROLL:
        if(tar_obj)
           return eFAILURE;
@@ -12054,6 +12104,7 @@ int cast_attrition( ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *
     case SPELL_TYPE_SPELL:
        return spell_attrition(level, ch, tar_ch, 0, skill);
        break;
+    case SPELL_TYPE_WAND:
     case SPELL_TYPE_SCROLL:
        if(tar_obj)
           return eFAILURE;

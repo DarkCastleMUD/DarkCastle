@@ -2961,38 +2961,209 @@ int godload_alignevil(struct char_data*ch, struct obj_data *obj, int cmd, char*a
 }
 
 
-
-int quest_wand_of_wonder(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
+int wand_of_wonder(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
                    CHAR_DATA *invoker)
 {
-  char arg1[MAX_INPUT_LENGTH];
 
-  if (cmd != 185 /*PUSH*/||!is_wearing(ch,obj))
+  if (cmd != 9|| !is_wearing(ch, obj))
     return eFAILURE;
+  int lvl = 0;
+  int aff = 0;
+  int spl = 0;
+  int target_is_charmie = false;
+  int (*spell_to_cast) (ubyte, CHAR_DATA*, char*, int, CHAR_DATA*, struct obj_data *,int) = NULL;
+  CHAR_DATA *tar_ch;
+  char arg1[MAX_INPUT_LENGTH+1];
+  char arg2[MAX_INPUT_LENGTH+1];
 
   arg = one_argument(arg, arg1);
 
-  if (str_cmp(arg1, "wonder") && str_cmp(arg1, "orro")) return eFAILURE;
+  if( strcmp(arg1, "wand") 
+      && strcmp(arg1, "orro") 
+      && strcmp(arg1, "wonder") )
+  {
+    return eFAILURE;
+  }
 
-  for(int i = 0; i < obj->num_affects; i++)
-    if (obj->affected[i].location == WEP_OFFENSIVE)
+  arg = one_argument(arg, arg2);
+
+  if ((tar_ch = get_char_room_vis(ch, arg2)) == NULL)
+  { 
+     send_to_char("What should the wand be pointed at?\n\r", ch);
+     return eSUCCESS;
+  }
+
+
+  act("$n points $p at you.", ch, obj, tar_ch, TO_VICT, INVIS_NULL);
+  act("$n points $p at $N.", ch, obj, tar_ch, TO_ROOM, NOTVICT|INVIS_NULL);
+  act("You point $p at $N.",ch, obj, tar_ch, TO_CHAR, 0);
+
+
+
+  if (obj->obj_flags.value[2] > 0) 
+  { // are there any charges left? 
+    obj->obj_flags.value[2]--;
+    WAIT_STATE(ch,PULSE_VIOLENCE);
+  } 
+  else 
+  {
+    send_to_char("The wand seems powerless.\n\r", ch);
+    return eSUCCESS;
+  }
+
+  lvl = (int) (1.5 * obj->obj_flags.value[0]); 
+
+  for(struct follow_type *k = ch->followers; k; k = k->next)
+    if(IS_MOB(k->follower) && IS_AFFECTED(k->follower, AFF_CHARM))
     {
-
-       send_to_char("You push the button and the wand begins to glow blue.\r\n",ch);
-       obj->affected[i].location = WEP_DEFENSIVE;
-       return eSUCCESS;
-    } else if (obj->affected[i].location == WEP_DEFENSIVE)
-    {
-
-       send_to_char("You push the button and the wand begins to glow red.\r\n",ch);
-       obj->affected[i].location = WEP_OFFENSIVE; 
-       return eSUCCESS;
+       target_is_charmie = true;
+       break;
     }
-  send_to_char("Something's bugged with this wand. Report it.\r\n",ch);
+
+
+int test;
+  if( !ARE_GROUPED(ch, tar_ch)
+      && !ARE_CLANNED(ch, tar_ch)
+      && !target_is_charmie 
+      && (ch != tar_ch) )
+  {
+    switch((test = number(1, 25)))
+    {
+      case 1: spell_to_cast = cast_blindness; break;
+      case 2: spell_to_cast = cast_fear; break;
+      case 3: spell_to_cast = cast_chill_touch; break;
+      case 4: spell_to_cast = cast_dispel_magic; break;
+      case 5: spell_to_cast = cast_colour_spray; break;
+      case 6: spell_to_cast = cast_drown; break;
+      case 7: spell_to_cast = cast_souldrain; break;
+      case 8: spell_to_cast = cast_sparks; break;
+      case 9: spell_to_cast = cast_flamestrike; break;
+      case 10: spell_to_cast = cast_curse; break;
+      case 11: spell_to_cast = cast_weaken; break;
+      case 12: spell_to_cast = cast_acid_blast; break;
+      case 13: spell_to_cast = cast_energy_drain; break;
+      case 14: spell_to_cast = cast_fireball; break;
+      case 15: spell_to_cast = cast_hellstream; break;
+      case 16: spell_to_cast = cast_lightning_bolt; break;
+      case 17: spell_to_cast = cast_power_harm; break;
+      case 18: spell_to_cast = cast_magic_missile; break;
+      case 19: spell_to_cast = cast_poison; break;
+      case 20: spell_to_cast = cast_bee_sting; break;
+      case 21: spell_to_cast = cast_paralyze; break;
+      case 22: spell_to_cast = cast_debility; break;
+      case 23: spell_to_cast = cast_attrition; break;
+      case 24: spell_to_cast = cast_meteor_swarm; break;
+      case 25: spell_to_cast = cast_sleep; break;
+    }
+  }
+  else
+  {
+    switch((test = number(1, 50)))
+    {
+      case 1: spell_to_cast = cast_armor; break;
+      case 2: spell_to_cast = cast_water_breathing; break;
+      case 3: spell_to_cast = cast_teleport; break;
+      case 4: spell_to_cast = cast_bless; break;
+      case 5: spell_to_cast = cast_barkskin; break;
+      case 6: spell_to_cast = cast_iridescent_aura; break;
+      case 7: spell_to_cast = cast_fly; break;
+      case 8: spell_to_cast = cast_feline_agility; break;
+      case 9: spell_to_cast = cast_cure_serious; break;
+      case 10: spell_to_cast = cast_cure_critic; break;
+      case 11: spell_to_cast = cast_camouflague; break;
+      case 12: spell_to_cast = cast_stone_skin; break;
+      case 13: spell_to_cast = cast_farsight; break;
+      case 14: spell_to_cast = cast_shield; break;
+      case 15: spell_to_cast = cast_freefloat; break;
+      case 16: spell_to_cast = cast_detect_invisibility; break;
+      case 17: spell_to_cast = cast_shadowslip; break;
+      case 18: spell_to_cast = cast_detect_magic; break;
+      case 19: spell_to_cast = cast_resist_energy; break;
+      case 20: spell_to_cast = cast_staunchblood; break;
+      case 21: spell_to_cast = cast_heal; break;
+      case 22: spell_to_cast = cast_full_heal; break;
+      case 23: spell_to_cast = cast_greater_stone_shield; break;
+      case 24: spell_to_cast = cast_invisibility; break;
+      case 25: spell_to_cast = cast_lightning_shield; break;
+      case 26: spell_to_cast = cast_protection_from_evil; break;
+      case 27: spell_to_cast = cast_sanctuary; break;
+      case 28: spell_to_cast = cast_fireshield; break;
+      case 29: spell_to_cast = cast_strength; break;
+      case 30: spell_to_cast = cast_true_sight; break;
+      case 31: spell_to_cast = cast_mana; break;
+      case 32: spell_to_cast = cast_word_of_recall; break;
+      case 33: spell_to_cast = cast_protection_from_good; break;
+      case 34: spell_to_cast = cast_sense_life; break;
+      case 35: spell_to_cast = cast_oaken_fortitude; break;
+      case 36:
+      if(IS_AFFECTED(tar_ch, AFF_FROSTSHIELD))
+      {
+        act("You are already protected by a $1frost shield$R.", tar_ch, 0, 0, TO_CHAR, 0);
+        act("$n is already protected by a $1frost shield$R.", ch, 0, 0, TO_CHAR, 0);
+        return eSUCCESS;
+      }
+      act("$n is surrounded by a shield of $1ice$R.", tar_ch, 0, 0, TO_ROOM, 0);
+      act("You become surrounded by a shield of $1ice$R.", tar_ch, 0, 0, TO_CHAR, 0);
+      aff = AFF_FROSTSHIELD;
+      spl = SPELL_FROSTSHIELD;
+      break;
+      case 37:
+      if(IS_AFFECTED(tar_ch, AFF_STABILITY))
+      {
+        act("You already have good balance.", tar_ch, 0, 0, TO_CHAR, 0);
+        act("$n already has good balance.", ch, 0, 0, TO_CHAR, 0);
+        return eSUCCESS;
+      }
+      act("$n suddenly seems very hard to push over.", tar_ch, 0, 0, TO_ROOM, 0);
+      act("You feel very balanced.", tar_ch, 0, 0, TO_CHAR, 0);
+      aff = AFF_STABILITY;
+      spl = SPELL_STABILITY;
+      break;
+      case 38: spell_to_cast = cast_resist_acid; break;
+      case 39: spell_to_cast = cast_resist_fire; break;
+      case 40: spell_to_cast = cast_rapid_mend; break;
+      case 41: spell_to_cast = cast_resist_cold; break;
+      case 42:
+      if(IS_AFFECTED(tar_ch, AFF_SOLIDITY))
+      {
+        act("You are already $6violet$R.", tar_ch, 0, 0, TO_CHAR, 0);
+        act("$n is already $6violet$R.", ch, 0, 0, TO_CHAR, 0);
+        return eSUCCESS;
+      }
+      act("$n is surrounded by a pulsing, $6violet$R aura.", tar_ch, 0, 0, TO_ROOM, 0);
+      act("You become surrounded by a pulsing, $6violet$R aura.", tar_ch, 0, 0, TO_CHAR, 0);
+      aff = AFF_SOLIDITY;
+      spl = SPELL_SOLIDITY;
+      break;
+      case 43: spell_to_cast = cast_acid_shield; break;
+      case 44: spell_to_cast = cast_resist_magic; break;
+      case 45: spell_to_cast = cast_clarity; break;
+      case 46: spell_to_cast = cast_stone_shield; break;
+      case 47: spell_to_cast = cast_haste; break;
+      case 48: spell_to_cast = cast_refresh; break;
+      case 49: spell_to_cast = cast_infravision; break;
+      case 50: spell_to_cast = cast_power_heal; break;
+    }
+  }
+ extern char *spells[]; 
+  csendf(ch, "Effect Used: %d\n\r", test);
+  if(spell_to_cast)
+    (*spell_to_cast)(lvl, ch, arg, SPELL_TYPE_WAND, tar_ch, NULL, lvl);
+  else if(aff)
+  {
+    struct affected_type af;
+    af.type      = spl;
+    af.duration  = lvl/10;
+    af.modifier  = 0;
+    af.location  = 0;
+    af.bitvector = aff; 
+    affect_to_char(tar_ch, &af);
+  }
+  else
+    send_to_char("Something's bugged with this wand. Report it.\n\r",ch);
+
   return eSUCCESS;
 }
-
-
 
 
 
