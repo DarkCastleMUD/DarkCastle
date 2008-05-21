@@ -10364,7 +10364,6 @@ int spell_feline_agility(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct o
 	if(affected_by_spell(victim, SPELL_FELINE_AGILITY))
 	{
 		send_to_char("You cannot be as agile as TWO cats!\n\r", ch);
-		GET_MANA(ch) += 20;
 		return eFAILURE;
 	}
 
