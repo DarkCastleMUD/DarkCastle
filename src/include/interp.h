@@ -12,13 +12,14 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.h,v 1.84 2007/12/08 16:48:09 dcastle Exp $ */
+/* $Id: interp.h,v 1.85 2008/05/22 23:20:01 kkoons Exp $ */
 
 #ifndef INTERP_H_
 #define INTERP_H_
 
 
 
+char *remove_trailing_spaces(char *arg);
 int command_interpreter(CHAR_DATA *ch, char *argument, bool procced = 0 );
 int search_block(char *arg, char **list, bool exact);
 int old_search_block(char *argument,int begin,int length,char **list,int mode);
