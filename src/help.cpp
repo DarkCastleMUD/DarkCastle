@@ -125,6 +125,8 @@ int do_new_help(struct char_data *ch, char *argument, int cmd)
   }
 
   char *upper_argument = str_dup(argument);
+  upper_argument = remove_trailing_spaces(upper_argument);
+
   if (!(this_help = find_help(upper_argument))) {
       snprintf(buf, 256, "There is no help entry for \'%s\'.\r\n",
 	       upper_argument);

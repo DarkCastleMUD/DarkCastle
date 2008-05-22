@@ -16,7 +16,7 @@
 /* 12/08/2003   Onager   Added chop_half() to work like half_chop() but    */
 /*                       chopping off the last word.                       */
 /***************************************************************************/
-/* $Id: interp.cpp,v 1.145 2008/02/23 22:55:01 jhhudso Exp $ */
+/* $Id: interp.cpp,v 1.146 2008/05/22 23:19:47 kkoons Exp $ */
 
 extern "C"
 {
@@ -1312,6 +1312,24 @@ void pulse_command_lag()
      } else cmdlp = cmdl;
   }
   
+}
+
+char *remove_trailing_spaces(char *arg)
+{
+  int len = strlen(arg) - 1;
+
+  if(len < 1)
+    return arg;
+
+  for( ;len > 0 ; len--)
+  {
+    if(arg[len] != ' ')
+    {
+      arg[len+1] = '\0';
+      return arg;
+    }
+  }
+  return arg;
 }
 
 // The End
