@@ -5,13 +5,18 @@
  *                                                                           *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-/* $Id: magic.h,v 1.33 2008/05/12 20:24:06 kkoons Exp $ */
+/* $Id: magic.h,v 1.34 2008/05/22 02:37:42 kkoons Exp $ */
 #ifndef MAGIC_H_
 #define MAGIC_H_
 
 #include <structs.h> // ubyte, etc..
 
 #define GLOBE_OF_DARKNESS_OBJECT      101
+
+
+typedef  int (*SPELL_POINTER) (ubyte, CHAR_DATA*, char*, int, CHAR_DATA*, struct obj_data *,int);
+
+
 bool resist_spell(int perc);
 bool resist_spell(CHAR_DATA *ch, int skill);
 int spellcraft(CHAR_DATA *ch, int spell);
@@ -629,7 +634,29 @@ int cast_holy_aura(ubyte level, CHAR_DATA * ch, char *arg, int type,
    CHAR_DATA * victim, struct obj_data * tar_obj, int skill);
 
 
+SPELL_POINTER get_wild_magic_defensive(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, OBJ_DATA *obj, int skill);
+SPELL_POINTER get_wild_magic_offensive(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, OBJ_DATA *obj, int skill);
 
+int spell_wild_magic(ubyte level, CHAR_DATA * ch,
+   CHAR_DATA * victim, struct obj_data * obj, int skill);
+int cast_wild_magic(ubyte level, CHAR_DATA * ch, char *arg, int type,
+   CHAR_DATA * victim, struct obj_data * tar_obj, int skill);
+
+
+int spell_stability(ubyte level, CHAR_DATA * ch,
+   CHAR_DATA * victim, struct obj_data * obj, int skill);
+int cast_stability(ubyte level, CHAR_DATA * ch, char *arg, int type,
+   CHAR_DATA * victim, struct obj_data * tar_obj, int skill);
+
+int spell_solidity(ubyte level, CHAR_DATA * ch,
+   CHAR_DATA * victim, struct obj_data * obj, int skill);
+int cast_solidity(ubyte level, CHAR_DATA * ch, char *arg, int type,
+   CHAR_DATA * victim, struct obj_data * tar_obj, int skill);
+
+int spell_frostshield(ubyte level, CHAR_DATA * ch,
+   CHAR_DATA * victim, struct obj_data * obj, int skill);
+int cast_frostshield(ubyte level, CHAR_DATA * ch, char *arg, int type,
+   CHAR_DATA * victim, struct obj_data * tar_obj, int skill);
 
 int spell_release_elemental(ubyte level, CHAR_DATA * ch,
    CHAR_DATA * victim, struct obj_data * obj, int skill);

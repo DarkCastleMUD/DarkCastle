@@ -14,10 +14,13 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.h,v 1.103 2008/05/12 20:24:06 kkoons Exp $ */
+/* $Id: spells.h,v 1.104 2008/05/22 02:37:42 kkoons Exp $ */
 #include <structs.h> // ubyte, int16
 
 #define MAX_BUF_LENGTH               240
+
+
+
 
 void extractFamiliar(CHAR_DATA *ch);
 
@@ -221,7 +224,8 @@ void check_maxes(CHAR_DATA *ch);
 #define SPELL_BONESHIELD            167
 #define SPELL_CHANNEL               168
 #define SPELL_RELEASE_ELEMENTAL     169
-#define MAX_SPL_LIST                169
+#define SPELL_WILD_MAGIC	    170
+#define MAX_SPL_LIST                170
 
 // if you add a spell, make sure you update "spells[]" in spells.C
 
@@ -577,6 +581,9 @@ struct spell_info_type
 #define WATER_ELEMENTAL	89
 #define AIR_ELEMENTAL	90
 #define EARTH_ELEMENTAL	91
+
+#define WILD_OFFENSIVE  0
+#define WILD_DEFENSIVE  1
 
 /*
  * Attack types with grammar.

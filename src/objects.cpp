@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.97 2008/04/30 18:14:13 pirahna Exp $
+| $Id: objects.cpp,v 1.98 2008/05/22 02:37:34 kkoons Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -597,6 +597,8 @@ int do_mortal_set(struct char_data *ch, char *argument, int cmd)
 int do_use(struct char_data *ch, char *argument, int cmd)
 {
   char buf[MAX_INPUT_LENGTH+1];
+  char targ[MAX_INPUT_LENGTH+1];
+  char xtra_arg[MAX_INPUT_LENGTH+1];
   struct char_data *tmp_char;
   struct obj_data *tmp_object, *stick;
   int lvl;
@@ -625,7 +627,9 @@ int do_use(struct char_data *ch, char *argument, int cmd)
   if (ch->equipment[HOLD] && isname(buf, ch->equipment[HOLD]->name))
    stick = ch->equipment[HOLD];
   else stick = ch->equipment[HOLD2];
-
+ 
+  argument = one_argument(argument, targ);
+  argument = one_argument(argument, xtra_arg);
   if (stick->obj_flags.type_flag == ITEM_STAFF)
   {
     act("$n taps $p three times on the ground.", ch, stick, 0,TO_ROOM, 0);
@@ -637,7 +641,7 @@ int do_use(struct char_data *ch, char *argument, int cmd)
 	int retval = 0;
       if (spell_info[stick->obj_flags.value[3]].spell_pointer)
       retval = ((*spell_info[stick->obj_flags.value[3]].spell_pointer)
-        ((ubyte) stick->obj_flags.value[0], ch, "", SPELL_TYPE_STAFF, 0, 0, lvl));
+        ((ubyte) stick->obj_flags.value[0], ch, xtra_arg, SPELL_TYPE_STAFF, 0, 0, lvl));
 	else retval= eFAILURE;
       return retval;
     } else {
@@ -645,7 +649,7 @@ int do_use(struct char_data *ch, char *argument, int cmd)
     }
   } else if (stick->obj_flags.type_flag == ITEM_WAND) {
 
-    bits = generic_find(argument, FIND_CHAR_ROOM | FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP, ch, &tmp_char, &tmp_object);
+    bits = generic_find(targ, FIND_CHAR_ROOM | FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP, ch, &tmp_char, &tmp_object);
     if (bits) {
       if (bits == FIND_CHAR_ROOM) {
         act("$n points $p at you.", ch, stick, tmp_char, TO_VICT, INVIS_NULL);
@@ -663,7 +667,7 @@ int do_use(struct char_data *ch, char *argument, int cmd)
 	int retval;
         if (spell_info[stick->obj_flags.value[3]].spell_pointer)
 	retval= ((*spell_info[stick->obj_flags.value[3]].spell_pointer)
-          ((ubyte) stick->obj_flags.value[0], ch, "", SPELL_TYPE_WAND, tmp_char, tmp_object, lvl));
+          ((ubyte) stick->obj_flags.value[0], ch, xtra_arg, SPELL_TYPE_WAND, tmp_char, tmp_object, lvl));
 	else
 	retval = eFAILURE;
 	return retval;

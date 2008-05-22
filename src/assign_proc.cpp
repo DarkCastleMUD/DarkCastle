@@ -394,7 +394,6 @@ void assign_objects(void)
   SPEC_FUN souldrainer;
   SPEC_FUN emoting_object;
   SPEC_FUN returner;
-  SPEC_FUN wand_of_wonder;
   SPEC_FUN pushwand;
   SPEC_FUN barbweap;
   SPEC_FUN gem_assembler;
@@ -509,7 +508,6 @@ void assign_objects(void)
     assign_one_obj_non(594, godload_hammer);
   assign_one_obj_com(555, shield_combat_procs); // GL shield
 
-  assign_one_obj_non(3124, wand_of_wonder);
   assign_one_obj_non(16225, pushwand);
   assign_one_obj_non(11300, moving_portals);
   assign_one_obj_non(11301, moving_portals);

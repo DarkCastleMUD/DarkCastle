@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.266 2008/05/20 17:14:43 kkoons Exp $ */
+/* $Id: const.cpp,v 1.267 2008/05/22 02:37:33 kkoons Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -300,7 +300,8 @@ char *spell_wear_off_msg[] =
   "The $Bs$3h$5i$7m$3m$5e$7r$3i$5n$7g$3 l$5i$7g$3h$5t$R surrounding your body slowly fades.",
   "!BONESHIELD!",
   "!CHANNEL!",
-  "!RELEASEELEMENTAL!"
+  "!RELEASEELEMENTAL!",
+  "!WILDMAGIC!"
 };
 
 
@@ -1063,8 +1064,6 @@ char *apply_types[] =
     "AFF BLIND",
     "WATERBREATHING",
     "DETECT MAGIC",
-    "OFFENSIVE MAGIC",
-    "DEFENSIVE MAGIC",
     "\n"
 };
 

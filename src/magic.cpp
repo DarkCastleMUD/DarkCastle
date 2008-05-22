@@ -403,6 +403,7 @@ int spell_energy_drain(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
    gain_exp(victim, 0-mult);
    GET_HIT(victim) -= GET_HIT(victim) /20;
    send_to_char("Your knees buckle as life force is drained from your body!\n\rYou have lost some experience!\n\r", victim);
+   act("You drain some of $N's experience!", ch, 0, victim, TO_CHAR, 0);
    return eSUCCESS;
 }
 
@@ -8659,7 +8660,6 @@ int cast_fear( ubyte level, CHAR_DATA *ch, char *arg, int type,
 	 break;
   case SPELL_TYPE_WAND:
 	 if (tar_obj) return eFAILURE;
-	 if (!tar_ch) tar_ch = ch;
 	 return spell_fear(level, ch, tar_ch, 0, skill);
 	 break;
   case SPELL_TYPE_STAFF:
@@ -13128,3 +13128,291 @@ int cast_channel(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *tar
   }
   return eFAILURE;
 }
+
+SPELL_POINTER get_wild_magic_offensive(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, OBJ_DATA *obj, int skill)
+{
+  const int MAX_OFFENSIVE = 25;
+  SPELL_POINTER spell_to_cast = NULL;
+int test;
+  switch((test = number(1, MAX_OFFENSIVE)))
+  {
+    case 1: spell_to_cast = cast_blindness; break;
+    case 2: spell_to_cast = cast_fear; break;
+    case 3: spell_to_cast = cast_chill_touch; break;
+    case 4: spell_to_cast = cast_dispel_magic; break;
+    case 5: spell_to_cast = cast_colour_spray; break;
+    case 6: spell_to_cast = cast_drown; break;
+    case 7: spell_to_cast = cast_souldrain; break;
+    case 8: spell_to_cast = cast_sparks; break;
+    case 9: spell_to_cast = cast_flamestrike; break;
+    case 10: spell_to_cast = cast_curse; break;
+    case 11: spell_to_cast = cast_weaken; break;
+    case 12: spell_to_cast = cast_acid_blast; break;
+    case 13: spell_to_cast = cast_energy_drain; break;
+    case 14: spell_to_cast = cast_fireball; break;
+    case 15: spell_to_cast = cast_hellstream; break;
+    case 16: spell_to_cast = cast_lightning_bolt; break;
+    case 17: spell_to_cast = cast_power_harm; break;
+    case 18: spell_to_cast = cast_magic_missile; break;
+    case 19: spell_to_cast = cast_poison; break;
+    case 20: spell_to_cast = cast_bee_sting; break;
+    case 21: spell_to_cast = cast_paralyze; break;
+    case 22: spell_to_cast = cast_debility; break;
+    case 23: spell_to_cast = cast_attrition; break;
+    case 24: spell_to_cast = cast_meteor_swarm; break;
+    case 25: spell_to_cast = cast_sleep; break;
+
+    //default case calls spell wild magic with opposite effect
+    default: 
+    send_to_char("Your magic goes wild and has the opposite effect!\n\r", ch);
+    spell_to_cast = get_wild_magic_defensive(level, ch, victim, obj, skill); break;
+  }
+  csendf(ch, "Effect used: %d\n\r", test);
+  return spell_to_cast;
+}
+
+
+
+int cast_solidity( ubyte level, CHAR_DATA *ch, char *arg,
+		  int type, CHAR_DATA *tar_ch,
+		  struct obj_data *tar_obj, int skill)
+{
+  switch (type) {
+  case SPELL_TYPE_SPELL:
+	 return spell_solidity(level, ch, tar_ch, 0, skill);
+	 break;
+  case SPELL_TYPE_POTION:
+    return spell_solidity(level, ch, tar_ch, 0, skill);
+	 break;
+  case SPELL_TYPE_WAND:
+  case SPELL_TYPE_SCROLL:
+      if (tar_obj) return eFAILURE;
+      if (!tar_ch) tar_ch = ch;
+    return spell_solidity(level, ch, tar_ch, 0, skill);
+    break;
+  default:
+	 log("Serious screw-up in solidity!", ANGEL, LOG_BUG);
+	 break;
+  }
+  return eFAILURE;
+}
+
+
+
+int spell_solidity(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, OBJ_DATA *obj, int skill)
+{
+  struct affected_type af;
+  if(IS_AFFECTED(victim, AFF_SOLIDITY))
+  {
+    act("You are already $6violet$R.", victim, 0, 0, TO_CHAR, 0);
+    act("$n is already $6violet$R.", ch, 0, 0, TO_CHAR, 0);
+    return eSUCCESS;
+  }
+
+  if (!affected_by_spell(victim, AFF_SOLIDITY))
+  {
+    act("$n is surrounded by a pulsing, $6violet$R aura.", victim, 0, 0, TO_ROOM, 0);
+    act("You become surrounded by a pulsing, $6violet$R aura.", victim, 0, 0, TO_CHAR, 0);
+
+    af.type      = SPELL_SOLIDITY;
+    af.duration  = level/10;
+    af.modifier  = 0;
+    af.location  = 0;
+    af.bitvector = AFF_SOLIDITY; 
+    affect_to_char(victim, &af);
+  }
+  return eSUCCESS;
+}
+
+
+int cast_stability( ubyte level, CHAR_DATA *ch, char *arg,
+		  int type, CHAR_DATA *tar_ch,
+		  struct obj_data *tar_obj, int skill)
+{
+  switch (type) {
+  case SPELL_TYPE_SPELL:
+	 return spell_stability(level, ch, tar_ch, 0, skill);
+	 break;
+  case SPELL_TYPE_POTION:
+    return spell_stability(level, ch, tar_ch, 0, skill);
+	 break;
+  case SPELL_TYPE_WAND:
+  case SPELL_TYPE_SCROLL:
+      if (tar_obj) return eFAILURE;
+      if (!tar_ch) tar_ch = ch;
+    return spell_stability(level, ch, tar_ch, 0, skill);
+    break;
+  default:
+	 log("Serious screw-up in stability!", ANGEL, LOG_BUG);
+	 break;
+  }
+  return eFAILURE;
+}
+
+int spell_stability(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, OBJ_DATA *obj, int skill)
+{
+  struct affected_type af;
+  if(IS_AFFECTED(victim, AFF_STABILITY))
+  {
+    act("You already have good balance.", victim, 0, 0, TO_CHAR, 0);
+    act("$n already has good balance.", ch, 0, 0, TO_CHAR, 0);
+    return eSUCCESS;
+  }
+  if (!affected_by_spell(victim, SPELL_STABILITY))
+  {
+    act("$n suddenly seems very hard to push over.", victim, 0, 0, TO_ROOM, 0);
+    act("You feel very balanced.", victim, 0, 0, TO_CHAR, 0);
+
+    af.type      = SPELL_STABILITY;
+    af.duration  = level/10;
+    af.modifier  = 0;
+    af.location  = 0;
+    af.bitvector = AFF_STABILITY; 
+    affect_to_char(victim, &af);
+  }
+  return eSUCCESS;
+}
+
+
+int cast_frostshield( ubyte level, CHAR_DATA *ch, char *arg,
+		  int type, CHAR_DATA *tar_ch,
+		  struct obj_data *tar_obj, int skill)
+{
+  switch (type) {
+  case SPELL_TYPE_SPELL:
+	 return spell_frostshield(level, ch, tar_ch, 0, skill);
+	 break;
+  case SPELL_TYPE_POTION:
+    return spell_frostshield(level, ch, tar_ch, 0, skill);
+	 break;
+  case SPELL_TYPE_WAND:
+  case SPELL_TYPE_SCROLL:
+      if (tar_obj) return eFAILURE;
+      if (!tar_ch) tar_ch = ch;
+    return spell_frostshield(level, ch, tar_ch, 0, skill);
+    break;
+  default:
+	 log("Serious screw-up in frostshield!", ANGEL, LOG_BUG);
+	 break;
+  }
+  return eFAILURE;
+}
+
+
+int spell_frostshield(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, OBJ_DATA *obj, int skill)
+{
+  struct affected_type af;
+  
+  if(IS_AFFECTED(victim, AFF_FROSTSHIELD))
+  {
+    act("You are already protected by a $1frost shield$R.", victim, 0, 0, TO_CHAR, 0);
+    act("$n is already protected by a $1frost shield$R.", ch, 0, 0, TO_CHAR, 0);
+    return eFAILURE;
+  }
+
+  if(!affected_by_spell(victim, SPELL_FROSTSHIELD))
+  {
+    act("$n is surrounded by a shield of $1ice$R.", victim, 0, 0, TO_ROOM, 0);
+    act("You become surrounded by a shield of $1ice$R.", victim, 0, 0, TO_CHAR, 0);
+    af.type      = SPELL_FROSTSHIELD;
+    af.duration  = level/10;
+    af.modifier  = 0;
+    af.location  = 0;
+    af.bitvector = AFF_FROSTSHIELD; 
+    affect_to_char(victim, &af);
+  }
+  return eSUCCESS;
+}
+
+
+SPELL_POINTER get_wild_magic_defensive(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, OBJ_DATA *obj, int skill)
+{
+  const int MAX_DEFENSIVE = 50;
+  SPELL_POINTER spell_to_cast = NULL;
+
+int test;
+  switch((test = number(1, MAX_DEFENSIVE)))
+  {
+    case 1: spell_to_cast = cast_armor; break;
+    case 2: spell_to_cast = cast_water_breathing; break;
+    case 3: spell_to_cast = cast_teleport; break;
+    case 4: spell_to_cast = cast_bless; break;
+    case 5: spell_to_cast = cast_barkskin; break;
+    case 6: spell_to_cast = cast_iridescent_aura; break;
+    case 7: spell_to_cast = cast_fly; break;
+    case 8: spell_to_cast = cast_feline_agility; break;
+    case 9: spell_to_cast = cast_cure_serious; break;
+    case 10: spell_to_cast = cast_cure_critic; break;
+    case 11: spell_to_cast = cast_camouflague; break;
+    case 12: spell_to_cast = cast_stone_skin; break;
+    case 13: spell_to_cast = cast_farsight; break;
+    case 14: spell_to_cast = cast_shield; break;
+    case 15: spell_to_cast = cast_freefloat; break;
+    case 16: spell_to_cast = cast_detect_invisibility; break;
+    case 17: spell_to_cast = cast_shadowslip; break;
+    case 18: spell_to_cast = cast_detect_magic; break;
+    case 19: spell_to_cast = cast_resist_energy; break;
+    case 20: spell_to_cast = cast_staunchblood; break;
+    case 21: spell_to_cast = cast_heal; break;
+    case 22: spell_to_cast = cast_full_heal; break;
+    case 23: spell_to_cast = cast_greater_stone_shield; break;
+    case 24: spell_to_cast = cast_invisibility; break;
+    case 25: spell_to_cast = cast_lightning_shield; break;
+    case 26: spell_to_cast = cast_protection_from_evil; break;
+    case 27: spell_to_cast = cast_sanctuary; break;
+    case 28: spell_to_cast = cast_fireshield; break;
+    case 29: spell_to_cast = cast_strength; break;
+    case 30: spell_to_cast = cast_true_sight; break;
+    case 31: spell_to_cast = cast_mana; break;
+    case 32: spell_to_cast = cast_word_of_recall; break;
+    case 33: spell_to_cast = cast_protection_from_good; break;
+    case 34: spell_to_cast = cast_sense_life; break;
+    case 35: spell_to_cast = cast_oaken_fortitude; break;
+    case 36: spell_to_cast = cast_frostshield; break;
+    case 37: spell_to_cast = cast_stability; break;
+    case 38: spell_to_cast = cast_resist_acid; break;
+    case 39: spell_to_cast = cast_resist_fire; break;
+    case 40: spell_to_cast = cast_rapid_mend; break;
+    case 41: spell_to_cast = cast_resist_cold; break;
+    case 42: spell_to_cast = cast_solidity; break;
+    case 43: spell_to_cast = cast_acid_shield; break;
+    case 44: spell_to_cast = cast_resist_magic; break;
+    case 45: spell_to_cast = cast_clarity; break;
+    case 46: spell_to_cast = cast_stone_shield; break;
+    case 47: spell_to_cast = cast_haste; break;
+    case 48: spell_to_cast = cast_refresh; break;
+    case 49: spell_to_cast = cast_infravision; break;
+    case 50: spell_to_cast = cast_power_heal; break;
+    
+    //default case calls wild magic with opposite effect
+   default: 
+   send_to_char("Your magic goes wild and has the opposite effect!\n\r", ch);
+   spell_to_cast = get_wild_magic_offensive(level, ch, victim, obj, skill); break;
+  }
+  csendf(ch, "Spell Effect: %d\n\r", test);
+  return spell_to_cast;
+}
+
+
+int cast_wild_magic( ubyte level, CHAR_DATA *ch, char *arg,
+		  int type, CHAR_DATA *tar_ch,
+		  struct obj_data *tar_obj, int skill)
+{
+  char off_def[MAX_INPUT_LENGTH+1]; 
+  SPELL_POINTER spell_to_cast = NULL;
+
+  arg = one_argument(arg, off_def);
+  if(off_def[0] == 'o')
+     spell_to_cast = get_wild_magic_offensive(level, ch, tar_ch, 0, skill);
+  else if (off_def[0] == 'd')
+     spell_to_cast = get_wild_magic_defensive(level, ch, tar_ch, 0, skill);
+  else
+  {
+    send_to_char("You need to specify offensive or defensive.\n\r", ch);
+    return eFAILURE;
+  }
+
+  return (*spell_to_cast)(level, ch, arg, type, tar_ch, tar_obj, skill);
+}
+
+
