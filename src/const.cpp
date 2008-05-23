@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.268 2008/05/23 02:16:21 kkoons Exp $ */
+/* $Id: const.cpp,v 1.269 2008/05/23 21:39:57 kkoons Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1896,6 +1896,7 @@ char
     "IS_SWARM",
     "IS_TINY",
     "NODISPEL",
+    "POISONOUS",
     "\n"
 };
 

@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.492 2008/05/23 02:16:21 kkoons Exp $               *
+ * $Id: fight.cpp,v 1.493 2008/05/23 21:39:57 kkoons Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -76,9 +76,9 @@ extern struct zone_data *zone_table;
 
 /* functions that nobody else should be calling */
 void save_corpses(void); 
+int act_poisonous(CHAR_DATA *ch);
 int is_stunned(CHAR_DATA *ch);
 int do_lightning_shield(CHAR_DATA *ch, CHAR_DATA *vict, int dam);
-bool do_frostshield(CHAR_DATA *ch, CHAR_DATA *vict);
 int do_fireshield(CHAR_DATA *ch, CHAR_DATA *vict, int dam);
 int do_vampiric_aura(CHAR_DATA *ch, CHAR_DATA *vict);
 int do_boneshield(CHAR_DATA *ch, CHAR_DATA *vict, int dam);
@@ -643,6 +643,12 @@ int attack(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
       if(SOMEONE_DIED(result))       return result;
     }
 
+    if(act_poisonous(ch)) 
+    {
+      result = cast_poison(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, NULL, GET_LEVEL(ch));
+      if(SOMEONE_DIED(result))       return result;
+    }
+
     // This is here so we only show this after the PC's first
     // attack rather than after every hit.
     if(GET_POS(vict) == POSITION_STUNNED)
@@ -803,7 +809,7 @@ bool do_frostshield(CHAR_DATA *ch, CHAR_DATA *vict)
   if(!IS_AFFECTED(vict, AFF_FROSTSHIELD)) {
     return(false);
   }
-  if(number(0, 100) < 5) {
+  if(number(0, 99) < 5) {
     act("Bits of $Bfrost$R fly as $n's blow bounces off your $B$1icy$R shield.", ch, 0, vict, TO_VICT, 0);
     act("Bits of $Bfrost$R fly as $n's blow bounces off $N's $B$1icy$R shield.", ch, 0, vict, TO_ROOM, NOTVICT);
     act("Bits of $Bfrost$R fly as your blow bounces off $N's $B$1icy$R shield.", ch, 0, vict, TO_CHAR, 0);
@@ -6185,6 +6191,16 @@ int weapon_spells(CHAR_DATA *ch, CHAR_DATA *vict, int weapon)
 
   return eSUCCESS;    
 }  /* spell effects */
+
+int act_poisonous(CHAR_DATA *ch)
+{
+  if(IS_NPC(ch) && ISSET(ch->mobdata->actflags, ACT_POISONOUS))
+  if( !number(0, GET_LEVEL(ch)/10) )
+    return TRUE;  //poisoned
+
+
+  return FALSE;
+}
 
 int second_attack(CHAR_DATA *ch)
 {
