@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.72 2008/05/20 03:35:54 kkoons Exp $ */
+/* $Id: ki.cpp,v 1.73 2008/05/23 18:15:51 kkoons Exp $ */
 
 extern "C"
 {
@@ -158,12 +158,19 @@ int do_ki(CHAR_DATA *ch, char *argument, int cmd)
     return eFAILURE;
   }
   
-   if (((IS_SET(world[ch->in_room].room_flags, SAFE)) && (GET_LEVEL(ch) < IMP)) 
-&& spl != 2 && spl!=4 && spl!=5 && spl!=7 && spl!=8 && spl!=9) {
+   if (IS_SET(world[ch->in_room].room_flags, SAFE) 
+       && (GET_LEVEL(ch) < IMP) 
+       && spl != KI_SENSE 
+       && spl!=KI_SPEED 
+       && spl!=KI_PURIFY 
+       && spl!=KI_STANCE 
+       && spl!=KI_AGILITY 
+       && spl!=KI_MEDITATION) 
+   {
       send_to_char("You feel at peace, calm, relaxed, one with yourself and "
                    "the universe.\n\r", ch);
       return eFAILURE;
-      }
+   }
 
 
   learned = has_skill(ch, (spl+KI_OFFSET));
