@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.491 2008/05/16 16:33:43 kkoons Exp $               *
+ * $Id: fight.cpp,v 1.492 2008/05/23 02:16:21 kkoons Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -6158,6 +6158,9 @@ int weapon_spells(CHAR_DATA *ch, CHAR_DATA *vict, int weapon)
       break;
     case WEP_CREATE_FOOD:
       retval = cast_create_food(GET_LEVEL(ch), ch, "", 0, vict, weap, wep_skill);
+      break;
+    case WEP_WILD_MAGIC:
+      retval = cast_wild_magic(GET_LEVEL(ch), ch, "", 0, vict, NULL, wep_skill);
       break;
 /*
     case WEP_THIEF_POISON:

@@ -5525,6 +5525,11 @@ int spell_resist_energy(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct ob
 {
    struct affected_type af;
 
+   if (GET_CLASS(ch) == CLASS_DRUID && ch != victim)
+   {
+	send_to_char("You can only cast this on yourself.\r\n",ch);
+	return eFAILURE;
+   }
    if(!affected_by_spell(victim, SPELL_RESIST_ENERGY)) {
       act("$n's skin turns $5yellow$R momentarily.", victim, 0, 0, TO_ROOM, INVIS_NULL);
       act("Your skin turns $5yellow$R momentarily.", victim, 0, 0, TO_CHAR, 0);
@@ -8530,7 +8535,7 @@ int cast_sense_life( ubyte level, CHAR_DATA *ch, char *arg, int type,
   case SPELL_TYPE_WAND:
   case SPELL_TYPE_SCROLL:
 	 if (tar_obj) return eFAILURE;
-	 return spell_sense_life(level, ch, ch, 0, skill);
+	 return spell_sense_life(level, ch, tar_ch, 0, skill);
 	 break;
   case SPELL_TYPE_STAFF:
 	 for (tar_ch = world[ch->in_room].people ;
@@ -13134,7 +13139,7 @@ SPELL_POINTER get_wild_magic_offensive(ubyte level, CHAR_DATA *ch, CHAR_DATA *vi
   const int MAX_OFFENSIVE = 25;
   SPELL_POINTER spell_to_cast = NULL;
 int test;
-  switch((test = number(1, MAX_OFFENSIVE)))
+  switch(number(1, MAX_OFFENSIVE))
   {
     case 1: spell_to_cast = cast_blindness; break;
     case 2: spell_to_cast = cast_fear; break;
@@ -13331,7 +13336,7 @@ SPELL_POINTER get_wild_magic_defensive(ubyte level, CHAR_DATA *ch, CHAR_DATA *vi
   SPELL_POINTER spell_to_cast = NULL;
 
 int test;
-  switch((test = number(1, MAX_DEFENSIVE)))
+  switch(number(1, MAX_DEFENSIVE))
   {
     case 1: spell_to_cast = cast_armor; break;
     case 2: spell_to_cast = cast_water_breathing; break;
@@ -13389,7 +13394,6 @@ int test;
    send_to_char("Your magic goes wild and has the opposite effect!\n\r", ch);
    spell_to_cast = get_wild_magic_offensive(level, ch, victim, obj, skill); break;
   }
-  csendf(ch, "Spell Effect: %d\n\r", test);
   return spell_to_cast;
 }
 
@@ -13400,15 +13404,46 @@ int cast_wild_magic( ubyte level, CHAR_DATA *ch, char *arg,
 {
   char off_def[MAX_INPUT_LENGTH+1]; 
   SPELL_POINTER spell_to_cast = NULL;
-
+  int spell_type;
+  bool is_a_charmie = false;
+  if(!tar_ch)
+  {
+    log("null target passed to cast wild magic!", ANGEL, LOG_BUG);
+    return eFAILURE;
+  }
   arg = one_argument(arg, off_def);
   if(off_def[0] == 'o')
+    spell_type = WILD_OFFENSIVE;
+  else if(off_def[0] == 'd')
+    spell_type = WILD_DEFENSIVE;
+  else if(off_def[0] == '\0')
+  {
+    
+   for(struct follow_type *k = ch->followers; k; k = k->next)
+     if(IS_MOB(k->follower) && ISSET(k->follower->affected_by, AFF_CHARM))
+     {
+        is_a_charmie = true;
+        break;
+     }
+
+    if(ch == tar_ch
+       || ARE_GROUPED(ch, tar_ch)
+       || ARE_CLANNED(ch, tar_ch)
+       || is_a_charmie)
+      spell_type = WILD_DEFENSIVE;
+    else
+      spell_type = WILD_OFFENSIVE;
+    
+  }
+    
+ 
+  if(spell_type == WILD_OFFENSIVE)
      spell_to_cast = get_wild_magic_offensive(level, ch, tar_ch, 0, skill);
-  else if (off_def[0] == 'd')
+  else if (WILD_DEFENSIVE)
      spell_to_cast = get_wild_magic_defensive(level, ch, tar_ch, 0, skill);
   else
   {
-    send_to_char("You need to specify offensive or defensive.\n\r", ch);
+    log("Problem in cast_wild_magic.", ANGEL, LOG_BUG);
     return eFAILURE;
   }
 
