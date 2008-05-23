@@ -13138,7 +13138,6 @@ SPELL_POINTER get_wild_magic_offensive(ubyte level, CHAR_DATA *ch, CHAR_DATA *vi
 {
   const int MAX_OFFENSIVE = 25;
   SPELL_POINTER spell_to_cast = NULL;
-int test;
   switch(number(1, MAX_OFFENSIVE))
   {
     case 1: spell_to_cast = cast_blindness; break;
@@ -13172,7 +13171,6 @@ int test;
     send_to_char("Your magic goes wild and has the opposite effect!\n\r", ch);
     spell_to_cast = get_wild_magic_defensive(level, ch, victim, obj, skill); break;
   }
-  csendf(ch, "Effect used: %d\n\r", test);
   return spell_to_cast;
 }
 
@@ -13335,7 +13333,6 @@ SPELL_POINTER get_wild_magic_defensive(ubyte level, CHAR_DATA *ch, CHAR_DATA *vi
   const int MAX_DEFENSIVE = 50;
   SPELL_POINTER spell_to_cast = NULL;
 
-int test;
   switch(number(1, MAX_DEFENSIVE))
   {
     case 1: spell_to_cast = cast_armor; break;
