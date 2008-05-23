@@ -1,5 +1,5 @@
 /************************************************************************
- * $Id: cl_barbarian.cpp,v 1.88 2008/03/09 23:39:09 kevin Exp $
+ * $Id: cl_barbarian.cpp,v 1.89 2008/05/23 21:40:16 kkoons Exp $
  * cl_barbarian.cpp
  * Description: Commands for the barbarian class.
  *************************************************************************/
@@ -330,7 +330,15 @@ int do_headbutt(struct char_data *ch, char *argument, int cmd)
   if(IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE))
      mod = -25;
 
-  if (!skill_success(ch, victim, SKILL_HEADBUTT, mod) ) 
+   
+  long int get_weapon_bit(int weapon_type);
+  long weapon_bit; 
+  weapon_bit = get_weapon_bit(TYPE_CRUSH);
+  
+
+  if (!skill_success(ch, victim, SKILL_HEADBUTT, mod)
+      || IS_SET(victim->immune, weapon_bit) 
+      || do_frostshield(ch, victim)) 
   {
     WAIT_STATE(ch, PULSE_VIOLENCE*3);
     retval = damage (ch, victim, 0, TYPE_CRUSH, SKILL_HEADBUTT, 0);
