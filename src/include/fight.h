@@ -2,7 +2,7 @@
 #define FIGHT_H_
 
 /************************************************************************
-| $Id: fight.h,v 1.35 2008/05/14 18:13:10 kkoons Exp $
+| $Id: fight.h,v 1.36 2008/05/23 21:40:48 kkoons Exp $
 | fight.h
 | This file defines the header information for fight.
 */
@@ -40,6 +40,7 @@ extern CHAR_DATA *character_list;
 #define COMBAT_MOD_IGNORE            1<<3
 #define COMBAT_MOD_REDUCED            1<<4
 void make_dust(CHAR_DATA * ch);
+bool do_frostshield(CHAR_DATA *ch, CHAR_DATA *vict);
 int speciality_bonus(CHAR_DATA *ch, int attacktype, int level);
 void make_husk(CHAR_DATA *ch);
 void make_heart(CHAR_DATA *ch, CHAR_DATA *vict);

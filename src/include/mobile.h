@@ -1,7 +1,7 @@
 #ifndef MOBILE_H_
 #define MOBILE_H_
 /************************************************************************
-| $Id: mobile.h,v 1.29 2007/06/08 23:51:50 dcastle Exp $
+| $Id: mobile.h,v 1.30 2008/05/23 21:40:48 kkoons Exp $
 | mobile.h
 | Description:  This file contains the header information for mobile
 |   control.
@@ -64,7 +64,8 @@ char *getTemp(CHAR_DATA *ch, char *name);
 #define ACT_SWARM           33
 #define ACT_TINY            34
 #define ACT_NODISPEL	    35
-#define ACT_MAX             35
+#define ACT_POISONOUS       36
+#define ACT_MAX             36
 //#define CHECKTHISACT      64 //Do not chance unless ASIZE changes
 
 struct race_shit
