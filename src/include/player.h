@@ -1,7 +1,7 @@
 #ifndef PLAYER_H_
 #define PLAYER_H_
 /************************************************************************
-| $Id: player.h,v 1.41 2008/05/20 03:30:15 kkoons Exp $
+| $Id: player.h,v 1.42 2008/05/23 02:16:32 kkoons Exp $
 | player.h
 | Description: This file defines the player vectors..punishment, specials,
 |   etc...
@@ -245,9 +245,8 @@
 #define APPLY_BLIND            106
 #define APPLY_WATER_BREATHING  107
 #define APPLY_DETECT_MAGIC     108
-#define WEP_OFFENSIVE          109
-#define WEP_DEFENSIVE          110
-#define APPLY_MAXIMUM_VALUE    110
+#define WEP_WILD_MAGIC         109
+#define APPLY_MAXIMUM_VALUE    109
 
 
 /*
