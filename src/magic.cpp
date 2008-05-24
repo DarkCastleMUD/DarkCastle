@@ -13401,50 +13401,24 @@ int cast_wild_magic( ubyte level, CHAR_DATA *ch, char *arg,
 {
   char off_def[MAX_INPUT_LENGTH+1]; 
   SPELL_POINTER spell_to_cast = NULL;
-  int spell_type;
-  bool is_a_charmie = false;
-  if(!tar_ch)
-  {
-    log("null target passed to cast wild magic!", ANGEL, LOG_BUG);
-    return eFAILURE;
-  }
-  arg = one_argument(arg, off_def);
-  if(off_def[0] == 'o')
-    spell_type = WILD_OFFENSIVE;
-  else if(off_def[0] == 'd')
-    spell_type = WILD_DEFENSIVE;
-  else if(off_def[0] == '\0')
-  {
-    
-   for(struct follow_type *k = ch->followers; k; k = k->next)
-     if(IS_MOB(k->follower) && ISSET(k->follower->affected_by, AFF_CHARM))
-     {
-        is_a_charmie = true;
-        break;
-     }
 
-    if(ch == tar_ch
-       || ARE_GROUPED(ch, tar_ch)
-       || ARE_CLANNED(ch, tar_ch)
-       || is_a_charmie)
-      spell_type = WILD_DEFENSIVE;
-    else
-      spell_type = WILD_OFFENSIVE;
-    
-  }
-    
- 
-  if(spell_type == WILD_OFFENSIVE)
+  arg = one_argument(arg, off_def);
+
+  if(off_def[0] == 'o')
      spell_to_cast = get_wild_magic_offensive(level, ch, tar_ch, 0, skill);
-  else if (WILD_DEFENSIVE)
+  else if (off_def[0] == 'd')
      spell_to_cast = get_wild_magic_defensive(level, ch, tar_ch, 0, skill);
   else
   {
-    log("Problem in cast_wild_magic.", ANGEL, LOG_BUG);
+    send_to_char("You need to specify offensive or defensive.\n\r", ch);
     return eFAILURE;
   }
 
-  return (*spell_to_cast)(level, ch, arg, type, tar_ch, tar_obj, skill);
+  if(spell_to_cast)
+    return (*spell_to_cast)(level, ch, arg, type, tar_ch, tar_obj, skill);
+  
+  log("Null spell passed to cast_wild_magic. Needs fixed asap.", ANGEL, LOG_BUG);
+  return eFAILURE;
 }
 
 
