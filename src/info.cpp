@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.166 2008/05/18 07:21:24 kkoons Exp $ */
+/* $Id: info.cpp,v 1.167 2008/05/25 00:08:39 kkoons Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -1633,8 +1633,13 @@ int do_score(struct char_data *ch, char *argument, int cmd)
        if(++level == 4)
          level = 0;
        scratch = frills[level];
-       sprintf(buf, "|%c| Affected by %-25s          Modifier NONE            |%c|\n\r",
-                    scratch, affected_bits[aff_idx-1], scratch);
+       
+       if(aff_idx != AFF_REFLECT)
+         sprintf(buf, "|%c| Affected by %-25s          Modifier NONE            |%c|\n\r",
+                 scratch, affected_bits[aff_idx-1], scratch);
+       else
+         sprintf(buf, "|%c| Affected by %-25s          Modifier (%3d)           |%c|\n\r",
+                 scratch, affected_bits[aff_idx-1], ch->spell_reflect, scratch);
        send_to_char(buf, ch);
      }
    }
