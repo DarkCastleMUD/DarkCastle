@@ -922,7 +922,9 @@ int do_show(struct char_data *ch, char *argument, int cmd)
   else if (is_abbrev(type, "msearch") && has_range)
   {  // Mobile search.
     char arg1[MAX_STRING_LENGTH];
-    int act = 0, clas = 0, levlow = -555, levhigh = -555, affect = 0, immune = 0, race = -1, align = 0;
+    uint32 affect[AFF_MAX/ASIZE+1] = {};
+    uint32 act[ACT_MAX/ASIZE+1] = {};
+    int clas = 0, levlow = -555, levhigh = -555, immune = 0, race = -1, align = 0;
     extern char *action_bits[];
     extern struct race_shit race_info[];
     extern char *isr_bits[];
@@ -951,13 +953,13 @@ int do_show(struct char_data *ch, char *argument, int cmd)
        for (i = 0; *action_bits[i] != '\n' ; i++)
         if (!str_nosp_cmp(action_bits[i],arg1))
         {
-          SET_BIT(act, 1<<i);
+          SETBIT(act, i);
           goto thisLoop;
         }
        for (i = 0; *affected_bits[i] != '\n' ; i++)
         if (!str_nosp_cmp(affected_bits[i],arg1))
         {
-          SET_BIT(affect, 1<<i);
+          SETBIT(affect, i);
           goto thisLoop;
         }
        for (i = 0; i <= MAX_RACE; i++)
@@ -1095,13 +1097,13 @@ int do_show(struct char_data *ch, char *argument, int cmd)
 	if (((struct char_data *)(mob_index[nr].item))->level > levhigh)
 	  continue;
       if(act)
-	for (i = 0; i < 31; i++)
-           if (IS_SET(act,1<<i))
+	for (i = 0; i < ACT_MAX; i++)
+           if (ISSET(act,i))
       if (!ISSET(((struct char_data *)(mob_index[nr].item))->mobdata->actflags, i+1))
          goto eheh;
       if(affect)
-	for (i = 0; i < 31; i++)
-           if (IS_SET(affect,1<<i))
+	for (i = 0; i < AFF_MAX; i++)
+           if (ISSET(affect,i))
       		if (!ISSET(((struct char_data *)(mob_index[nr].item))->affected_by, i+1))
         		goto eheh;
       count++;
