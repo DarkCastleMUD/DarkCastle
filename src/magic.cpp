@@ -5525,7 +5525,7 @@ int spell_resist_energy(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct ob
 {
    struct affected_type af;
 
-   if (GET_CLASS(ch) == CLASS_DRUID && ch != victim)
+   if (GET_CLASS(ch) != CLASS_DRUID && ch != victim)
    {
 	send_to_char("You can only cast this on yourself.\r\n",ch);
 	return eFAILURE;
