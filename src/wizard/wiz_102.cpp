@@ -1103,78 +1103,79 @@ int find_skill_num(char * name)
   extern char * songs[];
   extern char * ki[];
   int i;
+  unsigned int name_length = strlen(name);
 
   // try ki
   for(i = 0; *ki[i] != '\n'; i++)
-    if (strlen(name) <= strlen(ki[i]) && !str_n_nosp_cmp(name, ki[i],strlen(name)))
+    if (name_length <= strlen(ki[i]) && !str_n_nosp_cmp(name, ki[i],name_length))
       return (i + KI_OFFSET);
 
   // try spells
   for(i = 0; *spells[i] != '\n'; i++)
-    if (strlen(name) <= strlen(spells[i]) && !str_n_nosp_cmp(name, spells[i], strlen(name)))
+    if (name_length <= strlen(spells[i]) && !str_n_nosp_cmp(name, spells[i], name_length ))
       return (i + 1);
 
   // try skills
   for(i = 0; *skills[i] != '\n'; i++)
-    if (strlen(name) <= strlen(skills[i]) && !str_n_nosp_cmp(name, skills[i], strlen(name)))
+    if (name_length <= strlen(skills[i]) && !str_n_nosp_cmp(name, skills[i], name_length ))
       return (i + SKILL_BASE);
 
   // try songs
   for(i = 0; *songs[i] != '\n'; i++)
-    if (strlen(name) <= strlen(songs[i]) && !str_n_nosp_cmp(name, songs[i], strlen(name)))
+    if (name_length <= strlen(songs[i]) && !str_n_nosp_cmp(name, songs[i], name_length))
       return (i + SKILL_SONG_BASE);
 
   // sets?
   for (i = 0; *set_list[i].SetName != '\n'; i++)
-    if (strlen(name) <= strlen(set_list[i].SetName) && !str_n_nosp_cmp(name, set_list[i].SetName, strlen(name)))
+    if (name_length <= strlen(set_list[i].SetName) && !str_n_nosp_cmp(name, set_list[i].SetName, name_length))
       return (i + BASE_SETS);
   // timers/other stuff
   switch (LOWER(*name))
   {
     case 'b':
-      if (strlen(name) <= strlen("blood fury reuse timer") && !str_n_nosp_cmp(name, "blood fury reuse timer", strlen(name)))
+      if (name_length <= strlen("blood fury reuse timer") && !str_n_nosp_cmp(name, "blood fury reuse timer", name_length))
         return SKILL_BLOOD_FURY;
 	break;
     case 'c':
-      if (strlen(name) <= strlen("CANT_QUIT") && !str_n_nosp_cmp(name, "CANT_QUIT", strlen(name)))
+      if (name_length <= strlen("CANT_QUIT") && !str_n_nosp_cmp(name, "CANT_QUIT", name_length))
         return FUCK_CANTQUIT;
-      if (strlen(name) <= strlen("clanarea claim timer") && !str_n_nosp_cmp(name, "clanarea claim timer", strlen(name)))
+      if (name_length <= strlen("clanarea claim timer") && !str_n_nosp_cmp(name, "clanarea claim timer", name_length))
         return SKILL_CLANAREA_CLAIM;
-      if (strlen(name) <= strlen("clanarea challenge timer") && !str_n_nosp_cmp(name, "clanarea claim timer", strlen(name)))
+      if (name_length <= strlen("clanarea challenge timer") && !str_n_nosp_cmp(name, "clanarea claim timer", name_length))
         return SKILL_CLANAREA_CHALLENGE;
-      if (strlen(name) <= strlen("cannot cast timer") && !str_n_nosp_cmp(name, "cannot cast timer", strlen(name)))
+      if (name_length <= strlen("cannot cast timer") && !str_n_nosp_cmp(name, "cannot cast timer", name_length))
         return SPELL_NO_CAST_TIMER;
-      if (strlen(name) <= strlen("crazed assault reuse timer") && !str_n_nosp_cmp(name, "crazed assault reuse timer", strlen(name)))
+      if (name_length <= strlen("crazed assault reuse timer") && !str_n_nosp_cmp(name, "crazed assault reuse timer", name_length))
         return SKILL_CRAZED_ASSAULT;
       break;
     case 'd':
-      if (strlen(name) <= strlen("DIRTY_THIEF/CANT_QUIT") && !str_n_nosp_cmp(name, "DIRTY_THIEF/CANT_QUIT", strlen(name)))
+      if (name_length <= strlen("DIRTY_THIEF/CANT_QUIT") && !str_n_nosp_cmp(name, "DIRTY_THIEF/CANT_QUIT", name_length))
         return FUCK_PTHIEF;
-      if (strlen(name) <= strlen("divine intervention timer") && !str_n_nosp_cmp(name, "divine intervention timer", strlen(name)))
+      if (name_length <= strlen("divine intervention timer") && !str_n_nosp_cmp(name, "divine intervention timer", name_length))
         return SPELL_DIV_INT_TIMER;
       break;
     case 'g':
-      if (strlen(name) <= strlen("GOLD_THIEF/CANT_QUIT") && !str_n_nosp_cmp(name, "GOLD_THIEF/CANT_QUIT", strlen(name)))
+      if (name_length <= strlen("GOLD_THIEF/CANT_QUIT") && !str_n_nosp_cmp(name, "GOLD_THIEF/CANT_QUIT", name_length))
         return FUCK_GTHIEF;
       break;
     case 'h':
-      if (strlen(name) <= strlen("harmtouch reuse timer") && !str_n_nosp_cmp(name, "harmtouch reuse timer", strlen(name)))
+      if (name_length <= strlen("harmtouch reuse timer") && !str_n_nosp_cmp(name, "harmtouch reuse timer", name_length))
         return SKILL_HARM_TOUCH;
-      if (strlen(name) <= strlen("holy aura timer") && !str_n_nosp_cmp(name, "holy aura timer", strlen(name)))
+      if (name_length <= strlen("holy aura timer") && !str_n_nosp_cmp(name, "holy aura timer", name_length))
         return SPELL_HOLY_AURA_TIMER;
       break;
     case 'l':
-      if (strlen(name) <= strlen("layhands reuse timer") && !str_n_nosp_cmp(name, "layhands reuse timer", strlen(name)))
+      if (name_length <= strlen("layhands reuse timer") && !str_n_nosp_cmp(name, "layhands reuse timer", name_length))
         return SKILL_LAY_HANDS;
      break;       
     case 'n':
-      if (strlen(name) <= strlen("natural selection") && !str_n_nosp_cmp(name, "natural selection", strlen(name)))
+      if (name_length <= strlen("natural selection") && !str_n_nosp_cmp(name, "natural selection", name_length))
         return SKILL_NAT_SELECT;
-      if (strlen(name) <= strlen("natural select timer") && !str_n_nosp_cmp(name, "natural select timer", strlen(name)))
+      if (name_length <= strlen("natural select timer") && !str_n_nosp_cmp(name, "natural select timer", name_length))
         return SPELL_NAT_SELECT_TIMER;
       break;
      case 'q':
-      if (strlen(name) <= strlen("quiver reuse timer") && !str_n_nosp_cmp(name, "quiver reuse timer", strlen(name)))
+      if (name_length <= strlen("quiver reuse timer") && !str_n_nosp_cmp(name, "quiver reuse timer", name_length))
         return SKILL_QUIVERING_PALM;
       break;
     default: break;
