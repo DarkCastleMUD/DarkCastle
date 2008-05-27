@@ -1,5 +1,5 @@
 /************************************************************************
- * $Id: cl_barbarian.cpp,v 1.89 2008/05/23 21:40:16 kkoons Exp $
+ * $Id: cl_barbarian.cpp,v 1.90 2008/05/27 20:36:12 kkoons Exp $
  * cl_barbarian.cpp
  * Description: Commands for the barbarian class.
  *************************************************************************/
@@ -769,6 +769,7 @@ int do_knockback(struct char_data *ch, char *argument, int cmd)
     act("$n lunges forward in an attempt to smash into $N but falls flat on $s face.", ch, 0, victim, TO_ROOM, NOTVICT);
     GET_POS(ch) = POSITION_SITTING;
     WAIT_STATE(ch, PULSE_VIOLENCE);
+    retval = damage(ch, victim, 0, TYPE_CRUSH, SKILL_KNOCKBACK, 0);
     return eFAILURE;
   } else if(!victim_paralyzed && affected_by_spell(victim, SKILL_BATTLESENSE) &&
              number(1, 100) < affected_by_spell(victim, SKILL_BATTLESENSE)->modifier) {
