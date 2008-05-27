@@ -1123,23 +1123,49 @@ char_data *)(mob_index[nr].item))->level,
   else if (is_abbrev(type, "search") && has_range)
   {  // Object search.
     char arg1[MAX_STRING_LENGTH];
-    int affect = 0, size =0, extra = 0, more = 0, wear = 0,type =0;
+    int affect = 0, size = 0, extra = 0, more = 0, wear = 0,type = 0;
     int levlow = -555, levhigh = -555,dam = 0,lweight = -555, hweight = -555;
     int any = 0;
     extern char *wear_bits[];
     extern char *extra_bits[];
     extern char *more_obj_bits[];
     extern char *size_bitfields[];
+    extern char *spells[];
     extern char *apply_types[];
     extern char *item_types[];
     extern char *strs_damage_types[];
     bool fo = FALSE;
+    int item_type = 0;
     int its;
+    int spellnum = -1;
     while ( ( argument = one_argument(argument, arg1) ) )
     {
        int i;
        if (strlen(arg1) < 2) break;
-	fo = TRUE;
+       fo = TRUE;
+
+     
+       if(!str_nosp_cmp("wand", arg1))
+       {
+         item_type = ITEM_WAND;
+         goto endy;
+       }
+       if(!str_nosp_cmp("staff", arg1))
+       {
+         item_type = ITEM_STAFF;
+         goto endy;
+       }
+       if(!str_nosp_cmp("scroll", arg1))
+       {
+         item_type = ITEM_SCROLL;
+         goto endy;
+       }
+       if(!str_nosp_cmp("potion", arg1))
+       {
+         item_type = ITEM_POTION;
+         goto endy;
+       }
+
        for (i = 0; *wear_bits[i] != '\n' ; i++)
 	if (!str_nosp_cmp(wear_bits[i],arg1))
 	{
@@ -1181,12 +1207,26 @@ char_data *)(mob_index[nr].item))->level,
           SET_BIT(size, 1<<i);
           goto endy;
         }
-       for (i = 0; *apply_types[i] != '\n' ; i++)
-        if (!str_nosp_cmp(apply_types[i],arg1))
-        {
-  	    affect = i;
-            goto endy;
-        }
+
+       if(!item_type)
+       {
+         for (i = 0; *apply_types[i] != '\n' ; i++)
+          if (!str_nosp_cmp(apply_types[i],arg1))
+          {
+              affect = i;
+              goto endy;
+          }
+       }
+       else
+       {
+         for (i = 0; *spells[i] != '\n' ; i++)
+           if (!str_nosp_cmp(spells[i],arg1))
+           {
+             spellnum = i+1;
+             goto endy;
+           }
+       }
+
        if (!str_cmp(arg1,"olevel"))
        {
          argument = one_argument(argument,arg1);
@@ -1359,12 +1399,31 @@ its = get_weapon_damage_type(((struct obj_data *)(obj_index[nr].item)));
 	goto endLoop;
 //      int aff,total = 0;
   //    bool found = FALSE;
-      for (aff = 0; aff < ((struct obj_data *)(obj_index[nr].item))->num_affects;aff++)
-	 if (affect== ((struct obj_data *)(obj_index[nr].item))->affected[aff].location)
-	   found = TRUE;
-     if (affect)
+      if(!item_type)
+        for (aff = 0; aff < ((struct obj_data *)(obj_index[nr].item))->num_affects;aff++)
+          if (affect== ((struct obj_data *)(obj_index[nr].item))->affected[aff].location)
+	    found = TRUE;
+      if (affect && !item_type)
         if (!found)
           continue;
+
+      if (item_type)
+      {
+        bool spell_found = FALSE;
+        if (((struct obj_data *)(obj_index[nr].item))->obj_flags.type_flag != item_type)
+          continue;
+        if (item_type == ITEM_POTION || item_type == ITEM_SCROLL)
+          for (i = 1; i < 4; i++)
+            if ( ((struct obj_data *)(obj_index[nr].item))->obj_flags.value[i] == spellnum )
+              spell_found = TRUE;
+        if (item_type == ITEM_STAFF || item_type == ITEM_WAND) 
+          if ( ((struct obj_data *)(obj_index[nr].item))->obj_flags.value[3] == spellnum )
+            spell_found = TRUE;
+
+        if(!spell_found)
+          continue;
+      }
+
       count++;
       if (count > 200)
       {
