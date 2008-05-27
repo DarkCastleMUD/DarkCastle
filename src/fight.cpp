@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.494 2008/05/24 01:31:52 kkoons Exp $               *
+ * $Id: fight.cpp,v 1.495 2008/05/27 20:56:01 kkoons Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -643,13 +643,7 @@ int attack(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
       if(SOMEONE_DIED(result))       return result;
     }
 
-    if(act_poisonous(ch)) 
-    {
-      result = cast_poison(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, NULL, GET_LEVEL(ch));
-      if(SOMEONE_DIED(result))       return result;
-    }
-
-    // This is here so we only show this after the PC's first
+     // This is here so we only show this after the PC's first
     // attack rather than after every hit.
     if(GET_POS(vict) == POSITION_STUNNED)
       act("$n is $B$0stunned$R, but will probably recover.", vict, 0, 0, TO_ROOM, INVIS_NULL);
@@ -1594,6 +1588,13 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
       }          
     }
   
+    if(act_poisonous(ch)) 
+    {
+      retval = cast_poison(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, NULL, GET_LEVEL(ch));
+      if(SOMEONE_DIED(retval))       
+        return retval | eSUCCESS;
+    }
+
     if (IS_MOB(ch) && ISSET(ch->mobdata->actflags, ACT_DRAINY)) {
       if (number(1,101) <= 10) {
         SET_BIT(retval, spell_energy_drain(1, ch, vict, 0, 0));
