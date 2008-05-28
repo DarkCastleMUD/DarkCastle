@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.66 2007/12/24 01:58:59 jhhudso Exp $ */
+/* $Id: clan.cpp,v 1.67 2008/05/28 19:18:51 kkoons Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -2741,8 +2741,8 @@ bool can_challenge(int clan, int zone)
     if (take->clan2 == -2 && 
 		take->clan1 == clan && zone == take->zone)
 	return FALSE;
-    else if (zone == take->zone && take->clan2 > 0 &&
-		take->clan1 > 0)
+    else if (zone == take->zone && take->clan2 > 0 
+              && take->clan1 > 0)
 	return FALSE;
   return TRUE;  
 }
@@ -2771,17 +2771,28 @@ void claimArea(int clan, bool defend, bool challenge, int clan2, int zone)
   if (challenge) {
     if (!defend) {
 //      zone_table[zone].gold = 0;
-      sprintf(buf, "\r\n##Clan %s has broken clan %s's control of%s!\r\n", 
-	get_clan(clan)->name, get_clan(clan2)->name, zone_table[zone].name);
+      if(clan)
+        sprintf(buf, "\r\n##Clan %s has broken clan %s's control of%s!\r\n", 
+	  get_clan(clan)->name, get_clan(clan2)->name, zone_table[zone].name);
+      else
+        sprintf(buf, "\r\n##Clan %s's control of%s has been broken!\r\n",
+          get_clan(clan2)->name, zone_table[zone].name);
+
       takeover_pause(clan2, zone);
     } else {
       takeover_pause(clan2, zone);
-      sprintf(buf, "\r\n##Clan %s has defended against clan %s's challenge for control of%s!\r\n", 
-	get_clan(clan)->name, get_clan(clan2)->name, zone_table[zone].name);
+      if(clan2)
+        sprintf(buf, "\r\n##Clan %s has defended against clan %s's challenge for control of%s!\r\n", 
+	  get_clan(clan)->name, get_clan(clan2)->name, zone_table[zone].name);
+      else
+        sprintf(buf, "\r\n##Clan %s has defended their control of%s!\r\n",
+          get_clan(clan)->name, zone_table[zone].name);
     }
   } else{
-      sprintf(buf, "\r\n##%s has been claimed by clan %s!", 
-	zone_table[zone].name,get_clan(clan)->name);
+      if(clan)
+        sprintf(buf, "\r\n##%s has been claimed by clan %s!\r\n", 
+	  zone_table[zone].name,get_clan(clan)->name);
+
 //     zone_table[zone].gold = 0;
   }
   zone_table[zone].clanowner = clan;
@@ -2905,7 +2916,7 @@ void check_quitter(CHAR_DATA *ch)
 void pk_check(CHAR_DATA *ch, CHAR_DATA *victim)
 {
   if (!ch || !victim) return;
-  if (!ch->clan || !victim->clan) return; // No point;
+ // if (!ch->clan || !victim->clan) return; // No point;
   struct takeover_pulse_data *plc,*pln;
   for (plc = pulse_list; plc; plc=pln)
   {
@@ -2954,6 +2965,7 @@ void pulse_takeover()
    }
 
     int favour = count_plrs(take->zone, take->clan1) - count_plrs(take->zone, take->clan2);
+
     if (favour > 0)
 	take->clan1points += favour;
      else
@@ -2967,13 +2979,20 @@ int do_clanarea(CHAR_DATA *ch, char *argument, int cmd)
 {
   char arg[MAX_INPUT_LENGTH];
   argument = one_argument(argument, arg);
+  bool clanless_challenge = false;
 
   if (!ch->clan)
   {
-	send_to_char("You're not in a clan!\r\n",ch);
-	return eFAILURE;
+	if(!str_cmp(arg, "challenge"))
+          clanless_challenge = true;
+        else
+        {
+	 send_to_char("You're not in a clan!\r\n",ch);
+	  return eFAILURE;
+	}
   }
-  if (!has_right(ch, CLAN_RIGHTS_AREA))
+
+  if (!has_right(ch, CLAN_RIGHTS_AREA) && !clanless_challenge)
   {
 	send_to_char("You have not been granted that right.\r\n",ch);
 	return eFAILURE;
@@ -2984,7 +3003,14 @@ int do_clanarea(CHAR_DATA *ch, char *argument, int cmd)
       send_to_char("You need to wait before you can attempt to claim an area.\n\r", ch);
       return eFAILURE;
     }
-  
+    
+    if (zone_table[world[ch->in_room].zone].clanowner == 0 
+        && !can_challenge(ch->clan, world[ch->in_room].zone))
+    {
+      send_to_char("You cannot claim this area right now.\n\r", ch);
+      return eFAILURE;
+    }
+
     if (zone_table[world[ch->in_room].zone].clanowner > 0)
     {
 	csendf(ch, "This area is claimed by %s, you need to challenge to obtain ownership.\r\n",
@@ -3115,12 +3141,15 @@ int do_clanarea(CHAR_DATA *ch, char *argument, int cmd)
 	send_to_char("You cannot issue a challenge for this area at the moment.\r\n",ch);
 	return eFAILURE;
     }
-    if (zone_table[world[ch->in_room].zone].clanowner == ch->clan)
+    if (zone_table[world[ch->in_room].zone].clanowner == ch->clan
+        && !clanless_challenge)
     {
 	send_to_char("Your clan already controls this area!\r\n",ch);
 	return eFAILURE;
     }
-    if (count_controlled_areas(ch->clan) >= online_clan_members(ch->clan))
+
+    if (count_controlled_areas(ch->clan) >= online_clan_members(ch->clan)
+        && !clanless_challenge)
     {
 	send_to_char("You cannot own any more areas.\r\n",ch);
 	return eFAILURE;
@@ -3149,9 +3178,14 @@ int do_clanarea(CHAR_DATA *ch, char *argument, int cmd)
     pl->zone = world[ch->in_room].zone;
     pulse_list = pl;
     char buf[MAX_STRING_LENGTH];
-    sprintf(buf, "\r\n##Clan %s has challenged clan %s for control of%s!\r\n",
+    if(!clanless_challenge)
+      sprintf(buf, "\r\n##Clan %s has challenged clan %s for control of%s!\r\n",
 			get_clan(ch)->name, get_clan(pl->clan1)->name, 
 			zone_table[world[ch->in_room].zone].name);
+    else
+      sprintf(buf, "\r\n##%s's control of%s is being challenged!\r\n",
+                        get_clan(pl->clan1)->name,
+                        zone_table[world[ch->in_room].zone].name);
     send_info(buf);
     return eSUCCESS;
   }
