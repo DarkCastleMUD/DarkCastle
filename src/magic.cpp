@@ -204,7 +204,7 @@ bool can_heal(CHAR_DATA *ch, CHAR_DATA *victim, int spellnum)
 
 bool resist_spell(int perc)
 {
-  if (number(1,101) > perc)
+  if (number(1,100) > perc)
     return TRUE;
   return FALSE;
 }
@@ -212,7 +212,7 @@ bool resist_spell(int perc)
 bool resist_spell(CHAR_DATA *ch, int skill)
 {
   int perc = has_skill(ch,skill);
-  if (number(1,101) > perc)
+  if (number(1,100) > perc)
     return TRUE;
   return FALSE;
 }
@@ -335,7 +335,7 @@ int spell_colour_spray(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
    if(IS_SET(retval,eEXTRA_VAL2)) victim = ch;
    if(IS_SET(retval,eEXTRA_VALUE)) return retval;
 	/*  Dazzle Effect */
-   if(number(1,101) > get_saves(victim, SAVE_TYPE_MAGIC) + 40 && (skill > 50 || IS_NPC(ch)) ) {
+   if(number(1,100) > get_saves(victim, SAVE_TYPE_MAGIC) + 40 && (skill > 50 || IS_NPC(ch)) ) {
      act("$N blinks in confusion from the distraction of the colour spray.", ch, 0, victim, TO_ROOM, NOTVICT);
      act("Brilliant streams of colour streak from $n's fingers!  WHOA!  Cool!", ch, 0, victim, TO_VICT, 0 );
      act("Your colours of brilliance dazzle the simpleminded $N.", ch, 0, victim, TO_CHAR, 0 );
@@ -428,7 +428,7 @@ int spell_souldrain(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
     send_to_char("There isn't enough magical energy to be drained.\r\n",ch);
     return eFAILURE;
   }
-   if (number(1,101) < get_saves(victim, SAVE_TYPE_MAGIC)+40)
+   if (number(1,100) < get_saves(victim, SAVE_TYPE_MAGIC)+40)
 
    {
 	act("$N resists your attempt to souldrain $M!", ch, NULL, victim,TO_CHAR,0);
@@ -3459,7 +3459,7 @@ int spell_sleep(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *
   }
  set_cantquit( ch, victim );
 
-   if (number(1,101) <= MIN(MAX((get_saves(ch, SAVE_TYPE_MAGIC) - get_saves(victim, SAVE_TYPE_MAGIC))/2,1), 7))
+   if (number(1,100) <= MIN(MAX((get_saves(ch, SAVE_TYPE_MAGIC) - get_saves(victim, SAVE_TYPE_MAGIC))/2,1), 7))
    {
 	act("$N resists your attempt to sleep $M!", ch, NULL, victim, TO_CHAR,0);
 	act("$N resists $n's attempt to sleep $M!", ch, NULL, victim, TO_ROOM, NOTVICT);
@@ -4822,7 +4822,7 @@ int spell_dispel_minor(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
   }
 
    // If victim higher level, they get a save vs magic for no effect
-   if (number(1,101) < get_saves(victim, SAVE_TYPE_MAGIC) + savebonus)
+   if (number(1,100) < get_saves(victim, SAVE_TYPE_MAGIC) + savebonus)
    {
 	act("$N resists your attempt to dispel minor!", ch, NULL, victim, TO_CHAR,0);
 	act("$N resists $n's attempt to dispel minor!", ch, NULL, victim, TO_ROOM, NOTVICT);
@@ -5080,7 +5080,7 @@ int spell_dispel_magic(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
 // If victim higher level, they get a save vs magic for no effect
 //      if((GET_LEVEL(victim) > GET_LEVEL(ch)) && 0 > saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC))
 //          return eFAILURE;
-   if (number(1,101) < get_saves(victim, SAVE_TYPE_MAGIC) + savebonus && level != GET_LEVEL(ch)-1)
+   if (number(1,100) < get_saves(victim, SAVE_TYPE_MAGIC) + savebonus && level != GET_LEVEL(ch)-1)
    {
 	act("$N resists your attempt to dispel magic!", ch, NULL, victim, TO_CHAR,0);
 	act("$N resists $n's attempt to dispel magic!", ch, NULL, victim, TO_ROOM,NOTVICT);
