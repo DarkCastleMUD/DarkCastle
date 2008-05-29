@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.495 2008/05/27 20:56:01 kkoons Exp $               *
+ * $Id: fight.cpp,v 1.496 2008/05/29 18:23:48 kkoons Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -357,7 +357,7 @@ void perform_violence(void)
       if (af->type == SPELL_POISON && af->location == APPLY_NONE)
       {
         int dam = af->duration * 10 + number(30,50);
-        if(get_saves(ch, SAVE_TYPE_POISON) > number(1,101)) {
+        if(get_saves(ch, SAVE_TYPE_POISON) > number(1,100)) {
            dam = dam * get_saves(ch, SAVE_TYPE_POISON) / 100;
            send_to_char("You feel very sick, but resist the $2poison's$R damage.\n\r", ch);
         }
@@ -858,7 +858,7 @@ int do_lightning_shield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
     if(affected_by_spell(ch, SPELL_DIVINE_INTER) && dam > affected_by_spell(ch, SPELL_DIVINE_INTER)->modifier)
       dam = affected_by_spell(ch, SPELL_DIVINE_INTER)->modifier;
     int save = get_saves(ch, SAVE_TYPE_ENERGY);
-    if (number(1,101) < save || save < 0) {
+    if (number(1,100) < save || save < 0) {
       if(save > 50) save = 50;
       dam -= (int)(dam * (double)save/100);
     }
@@ -978,7 +978,7 @@ int do_fireshield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
     if(affected_by_spell(ch, SPELL_DIVINE_INTER) && dam > affected_by_spell(ch, SPELL_DIVINE_INTER)->modifier)
       dam = affected_by_spell(ch, SPELL_DIVINE_INTER)->modifier;
     int save = get_saves(ch, SAVE_TYPE_FIRE);
-    if (number(1,101) < save || save < 0) {
+    if (number(1,100) < save || save < 0) {
       if(save > 50) save = 50;
       dam -= (int)(dam * (double)save/100);
     }
@@ -1068,7 +1068,7 @@ int do_acidshield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
     if(affected_by_spell(ch, SPELL_DIVINE_INTER) && dam > affected_by_spell(ch, SPELL_DIVINE_INTER)->modifier)
       dam = affected_by_spell(ch, SPELL_DIVINE_INTER)->modifier;
     int save = get_saves(ch, SAVE_TYPE_ACID);
-    if (number(1,101) < save || save < 0) {
+    if (number(1,100) < save || save < 0) {
       if(save > 50) save = 50;
       dam -= (int)(dam * (double)save/100);
     }
@@ -1596,7 +1596,7 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
     }
 
     if (IS_MOB(ch) && ISSET(ch->mobdata->actflags, ACT_DRAINY)) {
-      if (number(1,101) <= 10) {
+      if (number(1,100) <= 10) {
         SET_BIT(retval, spell_energy_drain(1, ch, vict, 0, 0));
       }
     }
@@ -2967,7 +2967,7 @@ int isHit(CHAR_DATA *ch, CHAR_DATA *victim, int attacktype, int &type, int &redu
   if (martial) skill_increase_check(victim, SKILL_DEFENSE, martial, SKILL_INCREASE_HARD+500);
 
   // Ze random stuff.
-  if (number(1,101) < (int)percent && !IS_SET(victim->combat, COMBAT_BLADESHIELD1) && !IS_SET(victim->combat, COMBAT_BLADESHIELD2)) return eFAILURE;
+  if (number(1,100) < (int)percent && !IS_SET(victim->combat, COMBAT_BLADESHIELD1) && !IS_SET(victim->combat, COMBAT_BLADESHIELD2)) return eFAILURE;
 
   // Miss, determine a message
 
@@ -3082,7 +3082,7 @@ int check_magic_block(CHAR_DATA *ch, CHAR_DATA *victim, int attacktype)
   int skill = reduce /10; 
   reduce = (int)((float)reduce*0.75);
 
-  if (number(1,101) > skill)
+  if (number(1,100) > skill)
     return 0;
   if (GET_CLASS(victim) != CLASS_MONK) {
     act("$n blocks part of $N's spell with $p.", victim, victim->equipment[WEAR_SHIELD], ch, TO_ROOM, NOTVICT);

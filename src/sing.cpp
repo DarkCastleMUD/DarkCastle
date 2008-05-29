@@ -926,7 +926,7 @@ int song_disrupt( ubyte level, CHAR_DATA *ch, char
    send_to_char("You sing your funniest limerick!\r\n", ch);
    
    WAIT_STATE(ch, PULSE_VIOLENCE);
-   if (number(1,101) < get_saves(victim, SAVE_TYPE_MAGIC))
+   if (number(1,100) < get_saves(victim, SAVE_TYPE_MAGIC))
    {
 act("$N resists your disarming limerick!", ch, NULL, victim, TO_CHAR,0);
 act("$N resists $n's disarming limerick!", ch, NULL, victim, TO_ROOM,NOTVICT);
@@ -990,7 +990,7 @@ int song_whistle_sharp( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim
 //   act("$n whistles a sharp tune that ravages your ear drums and pierces you to the bone!", ch, 0, victim, TO_VICT, 0);
 //   act("$n whistles a super-high note at $N and blood drips from $S ears!", ch, 0, victim, TO_ROOM, NOTVICT);
 
-   if (number(1,101) < get_saves(victim, SAVE_TYPE_MAGIC))
+   if (number(1,100) < get_saves(victim, SAVE_TYPE_MAGIC))
    {
 act("$N resists your whistle sharp!", ch, NULL, victim, 
 TO_CHAR,0);
@@ -1274,7 +1274,7 @@ int execute_song_terrible_clef( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA
 //   send_to_char("Your singing hurts your opponent!\r\n", ch);
 //   act("$n's singing causes pain in $N's ears!\r\n", ch, 0, victim, TO_ROOM, NOTVICT);
 //   send_to_char("The music!  It hurts!  It hurts!\r\n", victim);
-   if (number(1,101) < get_saves(victim, SAVE_TYPE_MAGIC))
+   if (number(1,100) < get_saves(victim, SAVE_TYPE_MAGIC))
    {
 act("$N resists your terrible clef!", ch, NULL, victim, 
 TO_CHAR,0);
@@ -1819,7 +1819,7 @@ int execute_song_insane_chant( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA 
      // don't effect gods unless it was a higher level god singing
      if(GET_LEVEL(victim) >= IMMORTAL && GET_LEVEL(ch) <= GET_LEVEL(victim))
        continue;
-   if (number(1,101) < get_saves(victim, SAVE_TYPE_POISON))
+   if (number(1,100) < get_saves(victim, SAVE_TYPE_POISON))
    {
      act("$N resists your insane chant!", ch, NULL, victim, TO_CHAR,0);
      act("$N resists $n's insane chant!", ch, NULL, victim, TO_ROOM,NOTVICT);
@@ -2719,7 +2719,7 @@ int execute_song_sticky_lullaby( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DAT
    }
    dc_free(ch->song_data);
    ch->song_data = 0;
-   if (number(1,101) < get_saves(victim, SAVE_TYPE_POISON))
+   if (number(1,100) < get_saves(victim, SAVE_TYPE_POISON))
    {
       act("$N resists your sticky lullaby!", ch, NULL, victim, TO_CHAR,0);
       act("$N resists $n's sticky lullaby!", ch, NULL, victim, TO_ROOM,NOTVICT);
@@ -2893,7 +2893,7 @@ int execute_song_unresistable_ditty( ubyte level, CHAR_DATA *ch, char *arg, CHAR
 
    for (i = world[ch->in_room].people; i; i = i->next_in_room)
    {
-   if (number(1,101) < get_saves(i, SAVE_TYPE_MAGIC))
+   if (number(1,100) < get_saves(i, SAVE_TYPE_MAGIC))
    {
 act("$N resists your irresistible ditty!", ch, NULL, i, 
 TO_CHAR,0);
@@ -2955,7 +2955,7 @@ int execute_song_crushing_crescendo( ubyte level, CHAR_DATA *ch, char *arg, CHAR
       act("You laugh at $n's crushing crescendo.", ch, 0, victim, TO_VICT, 0);
       act("$N laughs at $n's crushing crescendo.", ch, 0, victim, TO_ROOM, NOTVICT);
    } else {
-      if (number(1,101) < get_saves(victim, SAVE_TYPE_MAGIC))
+      if (number(1,100) < get_saves(victim, SAVE_TYPE_MAGIC))
       {
         act("$N resists your crushing crescendo!", ch, NULL, victim, TO_CHAR,0);
         act("$N resists $n's crushing crescendo!", ch, NULL, victim, TO_ROOM,NOTVICT);
