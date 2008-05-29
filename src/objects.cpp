@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.98 2008/05/22 02:37:34 kkoons Exp $
+| $Id: objects.cpp,v 1.99 2008/05/29 18:25:38 kkoons Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -236,7 +236,7 @@ int do_switch(struct char_data *ch, char *arg, int cmd)
   }
   GET_MOVE(ch) -= 4;
 
-  percent = number(1,101);
+  percent = number(1,100);
   learned = has_skill(ch, SKILL_SWITCH);
 
   if (!learned || !skill_success(ch,NULL,SKILL_SWITCH)) {
