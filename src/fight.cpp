@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.496 2008/05/29 18:23:48 kkoons Exp $               *
+ * $Id: fight.cpp,v 1.497 2008/05/29 20:09:49 kkoons Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -2049,7 +2049,7 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
         act(buf2, victim, 0, ch, TO_CHAR, 0);
      }
    }
-   else if (number(1,100) < save && !imm) {
+   else if (number(1,101) < save && !imm) {
       if (save > 50) save = 50;
       dam -= (int)(dam * (double)save/100); // Save chance.
       if(reflected) {
@@ -3082,7 +3082,7 @@ int check_magic_block(CHAR_DATA *ch, CHAR_DATA *victim, int attacktype)
   int skill = reduce /10; 
   reduce = (int)((float)reduce*0.75);
 
-  if (number(1,100) > skill)
+  if (number(1,101) > skill)
     return 0;
   if (GET_CLASS(victim) != CLASS_MONK) {
     act("$n blocks part of $N's spell with $p.", victim, victim->equipment[WEAR_SHIELD], ch, TO_ROOM, NOTVICT);
