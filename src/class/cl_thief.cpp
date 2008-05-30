@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.179 2008/05/30 07:18:50 kkoons Exp $
+| $Id: cl_thief.cpp,v 1.180 2008/05/30 22:59:13 kkoons Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -332,7 +332,6 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
         if (GET_MAX_HIT(victim) * 0.70 > GET_MAX_HIT(ch)) itemp--;
         if (GET_MAX_HIT(victim) * 0.55 > GET_MAX_HIT(ch)) itemp--;
         if (GET_MAX_HIT(victim) * 0.40 > GET_MAX_HIT(ch)) itemp--;
-        if (GET_MAX_HIT(victim) * 0.25 > GET_MAX_HIT(ch)) itemp--;
     }
   }
   
