@@ -1562,6 +1562,24 @@ void do_astral_chanty_movement(CHAR_DATA *victim, CHAR_DATA *target)
       return;
   }
 
+  if(IS_SET(world[target->in_room].room_flags, PRIVATE) ||
+     IS_SET(world[target->in_room].room_flags, IMP_ONLY) ||
+     IS_SET(world[target->in_room].room_flags, NO_PORTAL) )  {
+    send_to_char ("Your astral travels fail to find your destination.\n\r", victim);
+    return;
+  }
+
+  if((!IS_NPC(target)) && (GET_LEVEL(target) >= IMMORTAL)) {
+    send_to_char("Just who do you think you are?\n\r", victim);
+    return;
+  }
+
+  if(IS_AFFECTED(target, AFF_SHADOWSLIP)) {
+    send_to_char("Something seems to block your astral travel to this target.\n\r", victim);
+    return;
+  }
+
+
   if (affected_by_spell(victim, FUCK_PTHIEF))
   {
     send_to_char("Your attempt to transport stolen goods through the astral planes fails!\r\n",victim);

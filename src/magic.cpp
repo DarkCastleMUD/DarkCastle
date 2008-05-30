@@ -5793,7 +5793,7 @@ void make_portal(CHAR_DATA * ch, CHAR_DATA * vict)
   
   chance = ((GET_LEVEL(vict)*2) - GET_LEVEL(ch));
   
-  if (GET_LEVEL(vict) > GET_LEVEL(ch) && chance > number(0, 101)) {
+  if (GET_LEVEL(vict) > GET_LEVEL(ch) && chance > number(0, 100)) {
      while(!good_destination) {
         destination = number(0, top_of_world);
         if(!world_array[destination] ||

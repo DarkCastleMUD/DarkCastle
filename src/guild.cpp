@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.120 2008/05/12 20:23:35 kkoons Exp $
+| $Id: guild.cpp,v 1.121 2008/05/30 18:03:45 kkoons Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -525,6 +525,8 @@ int skills_guild(struct char_data *ch, char *arg, struct char_data *owner)
 	      case SKILL_SPELLCRAFT:
 	      case SKILL_COMBAT_MASTERY:
 	      case KI_MEDITATION+KI_OFFSET:
+              case SPELL_CONJURE_ELEMENTAL:
+              case SPELL_RELEASE_ELEMENTAL:
 	      case SKILL_CRIPPLE:
 	      case SKILL_NAT_SELECT:
 		do_say(owner, "Alternately, should you feel that you are not up to the task of an exciting quest, you can seek the Skills Master west of town.",9);
@@ -587,6 +589,8 @@ int skills_guild(struct char_data *ch, char *arg, struct char_data *owner)
       case SKILL_COMBAT_MASTERY:
       case KI_MEDITATION+KI_OFFSET:
       case SKILL_CRIPPLE:
+      case SPELL_CONJURE_ELEMENTAL:
+      case SPELL_RELEASE_ELEMENTAL:
       case SKILL_NAT_SELECT:
 	do_say(owner, "I cannot teach you that. You need to learn it by yourself.",9);
 
