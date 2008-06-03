@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.89 2007/12/26 08:45:59 dcastle Exp $
+| $Id: move.cpp,v 1.90 2008/06/03 06:14:15 jhhudso Exp $
 | move.C
 | Movement commands and stuff.
 *************************************************************************
@@ -1077,12 +1077,14 @@ int do_enter(CHAR_DATA *ch, char *argument, int cmd)
     act("$n finds $mself unable to enter!", ch, 0, 0, TO_ROOM, 0);
     return eFAILURE;
     }
-
-  if (affected_by_spell(ch, FUCK_PTHIEF))
+  
+  // Thieves arent allowed through cleric portals
+  if (affected_by_spell(ch, FUCK_PTHIEF) && portal->obj_flags.value[1] == 0)
   {
     send_to_char("Your attempt to transport stolen goods through planes of magic fails!\r\n",ch);
     return eFAILURE;
   }
+
   if (!IS_MOB(ch) &&
       (affected_by_spell(ch, FUCK_PTHIEF) || affected_by_spell(ch, FUCK_GTHIEF) || IS_AFFECTED(ch, AFF_CHAMPION)) &&
       (IS_SET(world[real_room(portal->obj_flags.value[0])].room_flags, CLAN_ROOM) ||
