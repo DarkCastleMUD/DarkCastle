@@ -3370,12 +3370,7 @@ mob_index[mob_num].virt);
         {
           send_to_char("You cannot create mobiles in that range.\r\n",ch);
           return eFAILURE;
-        }/*
-        if (!has_skill(ch, COMMAND_RANGE))
-        {
-          send_to_char("You cannot create mobiles in that range.\r\n",ch);
-          return eFAILURE;
-	}*/
+        }
         x = create_blank_mobile(intval);
         if(x < 0) {
           csendf(ch, "Could not create mobile '%d'.  Max index hit or mob already exists.\r\n",intval);
