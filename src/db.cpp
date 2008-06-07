@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.168 2008/04/18 01:27:16 jhhudso Exp $ */
+/* $Id: db.cpp,v 1.169 2008/06/07 04:16:47 jhhudso Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -3319,6 +3319,10 @@ int create_blank_mobile(int nr)
     mob_index[cur_index].non_combat_func = 0;
     mob_index[cur_index].combat_func = 0;
     mob_index[cur_index].item = mob;
+
+    mob_index[cur_index].mobprogs = 0;
+    mob_index[cur_index].mobspec = 0;
+    mob_index[cur_index].progtypes = 0;
 
     // update index of all mobiles in game
     for(curr = character_list; curr; curr = curr->next)
