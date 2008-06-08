@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.497 2008/05/29 20:09:49 kkoons Exp $               *
+ * $Id: fight.cpp,v 1.498 2008/06/08 23:12:30 kkoons Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -4606,13 +4606,12 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
      stop_grouped_bards(victim,!IS_SINGING(victim));
   }
 
-
   if (victim->pcdata->golem)
   {
     void release_message(CHAR_DATA *ch);
     void shatter_message(CHAR_DATA *ch);
 
-    if (number(0, 100) < victim->pcdata->golem->level + 10)
+    if (number(0, 99) < (GET_LEVEL(victim) / 10 + victim->pcdata->golem->level / 5))
     { /* rk */
       char buf[MAX_STRING_LENGTH];
       sprintf(buf, "%s's golem lost a level!", GET_NAME(victim));
