@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.67 2008/05/28 19:18:51 kkoons Exp $ */
+/* $Id: clan.cpp,v 1.68 2008/06/08 21:52:17 kkoons Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -3183,7 +3183,7 @@ int do_clanarea(CHAR_DATA *ch, char *argument, int cmd)
 			get_clan(ch)->name, get_clan(pl->clan1)->name, 
 			zone_table[world[ch->in_room].zone].name);
     else
-      sprintf(buf, "\r\n##%s's control of%s is being challenged!\r\n",
+      sprintf(buf, "\r\n##Clan %s's control of%s is being challenged!\r\n",
                         get_clan(pl->clan1)->name,
                         zone_table[world[ch->in_room].zone].name);
     send_info(buf);
