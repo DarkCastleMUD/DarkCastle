@@ -1389,10 +1389,6 @@ int phish_locator(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
       return eFAILURE;
 
    if(!strstr(arg, "button"))
-      return eFAILURE;
-
-   if(strcmp(GET_NAME(ch), "Jeni")) {
-      send_to_char("Sorry, this device was made for one special girl.  And you are not her.\r\n", ch);
       return eSUCCESS;
    }
 

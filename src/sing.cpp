@@ -2539,7 +2539,7 @@ int execute_song_dischordant_dirge( ubyte level, CHAR_DATA *ch, char *arg, CHAR_
    }
 
    if(ch==target ) {
-      send_to_char("Your loyalties have been broken. And stuff. What did you think?\r\n", ch);
+      send_to_char("Your loyalties have been broken, what did you think?\r\n", ch);
       return eFAILURE;
    }
 
