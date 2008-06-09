@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.180 2008/05/30 22:59:13 kkoons Exp $
+| $Id: cl_thief.cpp,v 1.181 2008/06/09 23:17:31 kkoons Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -341,12 +341,13 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
 
   // Will this be a single or dual backstab this round?
   bool perform_dual_backstab = false;
-  if(((GET_CLASS(ch) == CLASS_THIEF) || (GET_LEVEL(ch) >= ARCHANGEL)) &&
-     (ch->equipment[SECOND_WIELD])                                    &&
-     ((ch->equipment[SECOND_WIELD]->obj_flags.value[3] == 11) ||
-      (ch->equipment[SECOND_WIELD]->obj_flags.value[3] == 9))        &&
-     has_skill(ch, SKILL_DUAL_BACKSTAB)
-     )
+  if( ((GET_CLASS(ch) == CLASS_THIEF) || (GET_LEVEL(ch) >= ARCHANGEL)) 
+      && (ch->equipment[SECOND_WIELD])                                    
+      && ((ch->equipment[SECOND_WIELD]->obj_flags.value[3] == 11) ||
+          (ch->equipment[SECOND_WIELD]->obj_flags.value[3] == 9))        
+      && has_skill(ch, SKILL_DUAL_BACKSTAB) 
+      && (cmd != 14)
+    )
     {
       if(skill_success(ch,victim,SKILL_DUAL_BACKSTAB)) {
 	perform_dual_backstab = true;
