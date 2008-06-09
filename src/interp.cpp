@@ -16,7 +16,7 @@
 /* 12/08/2003   Onager   Added chop_half() to work like half_chop() but    */
 /*                       chopping off the last word.                       */
 /***************************************************************************/
-/* $Id: interp.cpp,v 1.147 2008/06/09 21:57:38 kkoons Exp $ */
+/* $Id: interp.cpp,v 1.148 2008/06/09 23:17:20 kkoons Exp $ */
 
 extern "C"
 {
@@ -72,14 +72,72 @@ void add_command_to_radix(struct command_info *cmd);
 struct command_lag *command_lag_list = NULL;
 
 
-#define CMD_NORTH     1
-#define CMD_EAST      2
-#define CMD_SOUTH     3
-#define CMD_WEST      4
-#define CMD_UP        5
-#define CMD_DOWN      6
+#define CMD_NORTH       1
+#define CMD_EAST        2
+#define CMD_SOUTH       3
+#define CMD_WEST        4
+#define CMD_UP          5
+#define CMD_DOWN        6
 
-#define CMD_DEFAULT   9
+#define CMD_DEFAULT     9
+#define CMD_TRACK       10
+#define CMD_PALM        10
+#define CMD_SAY         11
+#define CMD_LOOK        12
+#define CMD_BACKSTAB    13
+#define CMD_SBS         14
+#define CMD_GLANCE      20
+#define CMD_FLEE        28
+#define CMD_STOCK       56
+#define CMD_BUY         56
+#define CMD_SELL        57
+#define CMD_VALUE       58
+#define CMD_LIST        59
+#define CMD_ENTER       60
+#define CMD_CLIMB       60
+#define CMD_DESIGN      62
+#define CMD_PRICE       65
+#define CMD_REPAIR      66
+#define CMD_READ        67
+#define CMD_REMOVE      69
+#define CMD_ERASE       70
+#define CMD_REMORT      80
+#define CMD_SLIP        87
+#define CMD_GIVE        88
+#define CMD_DROP        89
+#define CMD_DONATE      90
+#define CMD_SACRIFICE   92
+#define CMD_PUT         93
+#define CMD_OPEN        98
+#define CMD_EDITOR      100
+#define CMD_HIT         194
+#define CMD_WATCH       155
+#define CMD_PRACTICE    164
+#define CMD_TRAIN       165
+#define CMD_GAIN        171
+#define CMD_BALANCE     172
+#define CMD_DEPOSIT     173
+#define CMD_WITHDRAW    174
+#define CMD_CLEAN       177
+#define CMD_PLAY        178
+#define CMD_FINISH      179
+#define CMD_VETERNARIAN 180
+#define CMD_FEED        181
+#define CMD_ASSEMBLE    182
+#define CMD_PAY         183
+#define CMD_RESTRING    184
+#define CMD_PUSH        185
+#define CMD_PULL        186
+#define CMD_TREMOR      188
+#define CMD_BET         189
+#define CMD_INSURANCE   190
+#define CMD_DOUBLE      191
+#define CMD_STAY        192
+#define CMD_LOOT        195
+#define CMD_GTELL       200
+#define CMD_CTELL       201
+#define CMD_GAZE        1820
+    // Immortal commands
 
 
 
@@ -118,9 +176,9 @@ struct command_info cmd_info[] =
     { "k",		do_kill,	POSITION_FIGHTING, 0, CMD_DEFAULT, COM_CHARMIE_OK, 0 },
     { "ki",		do_ki,		POSITION_RESTING, 0, CMD_DEFAULT, COM_CHARMIE_OK, 0 },
     { "kill",		do_kill,	POSITION_FIGHTING, 0, CMD_DEFAULT, COM_CHARMIE_OK, 0 },
-    { "look",		do_look,	POSITION_RESTING, 0, 12, COM_CHARMIE_OK, 1 },
-    { "loot",		do_get,		POSITION_RESTING, 0, 195, 0, 0 },
-    { "glance",		do_look,	POSITION_RESTING, 0, 20, COM_CHARMIE_OK, 1 },
+    { "look",		do_look,	POSITION_RESTING, 0, CMD_LOOK, COM_CHARMIE_OK, 1 },
+    { "loot",		do_get,		POSITION_RESTING, 0, CMD_LOOT, 0, 0 },
+    { "glance",		do_look,	POSITION_RESTING, 0, CMD_GLANCE, COM_CHARMIE_OK, 1 },
     { "order",		do_order,	POSITION_RESTING, 0, CMD_DEFAULT, 0, 0 },
     { "rest",		do_rest,	POSITION_RESTING, 0, CMD_DEFAULT, COM_CHARMIE_OK, 0 },
     { "recite",		do_recite,	POSITION_RESTING, 0, CMD_DEFAULT, 0, 0 },
@@ -171,42 +229,42 @@ struct command_info cmd_info[] =
     { ":",		do_emote,	POSITION_RESTING, 0, CMD_DEFAULT, COM_CHARMIE_OK, 0 },    
     { "gossip",		do_gossip,	POSITION_DEAD, 0, CMD_DEFAULT, 0, 1 },
     { "trivia",		do_trivia,	POSITION_DEAD, 0, CMD_DEFAULT, 0, 1 },
-    { "gtell",		do_grouptell,	POSITION_DEAD, 0, 200, 0, 1 },
-    { ".",		do_grouptell,	POSITION_DEAD, 0, 200, 0, 1 },
+    { "gtell",		do_grouptell,	POSITION_DEAD, 0, CMD_GTELL, 0, 1 },
+    { ".",		do_grouptell,	POSITION_DEAD, 0, CMD_GTELL, 0, 1 },
     { "ignore",		do_ignore,	POSITION_DEAD, 0, CMD_DEFAULT, 0, 1 },
     { "insult",		do_insult,	POSITION_RESTING, 0, CMD_DEFAULT, COM_CHARMIE_OK, 0 },
     { "reply",		do_reply,	POSITION_RESTING, 0, CMD_DEFAULT, 0, 1 },
     { "report",		do_report,	POSITION_RESTING, 0, CMD_DEFAULT, COM_CHARMIE_OK, 0 },
-    { "say",		do_say,		POSITION_RESTING, 0, 11, COM_CHARMIE_OK, 0 },
-    { "psay",		do_psay,	POSITION_RESTING, 0, 11, COM_CHARMIE_OK, 0 },
-    { "'",		do_say,		POSITION_RESTING, 0, 11, COM_CHARMIE_OK, 0 },
+    { "say",		do_say,		POSITION_RESTING, 0, CMD_SAY, COM_CHARMIE_OK, 0 },
+    { "psay",		do_psay,	POSITION_RESTING, 0, CMD_SAY, COM_CHARMIE_OK, 0 },
+    { "'",		do_say,		POSITION_RESTING, 0, CMD_SAY, COM_CHARMIE_OK, 0 },
     { "shout",		do_shout,	POSITION_RESTING, 0, CMD_DEFAULT, 0, 1 },
     { "whisper",	do_whisper,	POSITION_RESTING, 0, CMD_DEFAULT, 0, 0 },
 
     // Object manipulation
-    { "slip",		do_slip,	POSITION_STANDING, 0,  87, 0, 1 },
+    { "slip",		do_slip,	POSITION_STANDING, 0,  CMD_SLIP, 0, 1 },
     { "close",		do_close,	POSITION_RESTING, 0, CMD_DEFAULT, COM_CHARMIE_OK, 25 },
-    { "donate",		do_donate,	POSITION_RESTING, 0, 90, COM_CHARMIE_OK, 1 },
+    { "donate",		do_donate,	POSITION_RESTING, 0, CMD_DONATE, COM_CHARMIE_OK, 1 },
     { "drink",		do_drink,	POSITION_RESTING, 0, CMD_DEFAULT, COM_CHARMIE_OK, 25 },
-    { "drop",		do_drop,	POSITION_RESTING, 0, 89, COM_CHARMIE_OK, 25 },
+    { "drop",		do_drop,	POSITION_RESTING, 0, CMD_DROP, COM_CHARMIE_OK, 25 },
     { "eat",		do_eat,		POSITION_RESTING, 0, CMD_DEFAULT, COM_CHARMIE_OK, 25 },
     { "fill",		do_fill,	POSITION_RESTING, 0, CMD_DEFAULT, COM_CHARMIE_OK, 25 },
-    { "give",		do_give,	POSITION_RESTING, 0, 88, COM_CHARMIE_OK, 25 },
+    { "give",		do_give,	POSITION_RESTING, 0, CMD_GIVE, COM_CHARMIE_OK, 25 },
     { "grab",		do_grab,	POSITION_RESTING, 0, CMD_DEFAULT, COM_CHARMIE_OK, 25 },
     { "hold",		do_grab,	POSITION_RESTING, 0, CMD_DEFAULT, COM_CHARMIE_OK, 25 },
     { "lock",		do_lock,	POSITION_RESTING, 0, CMD_DEFAULT, COM_CHARMIE_OK, 25 },
-    { "open",		do_open,	POSITION_RESTING, 0, 98, COM_CHARMIE_OK, 25 },
+    { "open",		do_open,	POSITION_RESTING, 0, CMD_OPEN, COM_CHARMIE_OK, 25 },
     { "pour",		do_pour,	POSITION_RESTING, 0, CMD_DEFAULT, COM_CHARMIE_OK, 25 },
-    { "put",		do_put,		POSITION_RESTING, 0, 93, COM_CHARMIE_OK, 0 },
+    { "put",		do_put,		POSITION_RESTING, 0, CMD_PUT, COM_CHARMIE_OK, 0 },
     { "quaff",		do_quaff,	POSITION_RESTING, 0, CMD_DEFAULT, COM_CHARMIE_OK, 25 },
-    { "read",		do_read,	POSITION_RESTING, 0, 67, 0, 1 },
-    { "remove",		do_remove,	POSITION_RESTING, 0, 69, COM_CHARMIE_OK, 25 },
-    { "erase",		do_not_here,	POSITION_RESTING, 0, 70, 0, 0 },
+    { "read",		do_read,	POSITION_RESTING, 0, CMD_READ, 0, 1 },
+    { "remove",		do_remove,	POSITION_RESTING, 0, CMD_REMOVE, COM_CHARMIE_OK, 25 },
+    { "erase",		do_not_here,	POSITION_RESTING, 0, CMD_ERASE, 0, 0 },
     { "sip",		do_sip,		POSITION_RESTING, 0, CMD_DEFAULT, COM_CHARMIE_OK, 25 },
-    { "track",		do_track,	POSITION_STANDING, 0, 10, 0, 10 },
+    { "track",		do_track,	POSITION_STANDING, 0, CMD_TRACK, 0, 10 },
     { "take",		do_get,		POSITION_RESTING, 0, CMD_DEFAULT, COM_CHARMIE_OK, 0 },
-    { "palm",		do_get,		POSITION_RESTING, 3, 10, 0, 1 },
-    { "sacrifice",	do_tap,		POSITION_RESTING, 0, 92, COM_CHARMIE_OK, 25 },
+    { "palm",		do_get,		POSITION_RESTING, 3, CMD_PALM, 0, 1 },
+    { "sacrifice",	do_tap,		POSITION_RESTING, 0, CMD_SACRIFICE, COM_CHARMIE_OK, 25 },
     { "taste",		do_taste,	POSITION_RESTING, 0, CMD_DEFAULT, COM_CHARMIE_OK, 25 },
     { "unlock",		do_unlock,	POSITION_RESTING, 0, CMD_DEFAULT, COM_CHARMIE_OK, 25 },
     { "use",		do_use,		POSITION_RESTING, 0, CMD_DEFAULT, COM_CHARMIE_OK, 25 },
@@ -218,8 +276,8 @@ struct command_info cmd_info[] =
     { "bash",		do_bash,	POSITION_FIGHTING, 0, CMD_DEFAULT, 0, 0 },
     { "retreat",	do_retreat,	POSITION_FIGHTING, 0, CMD_DEFAULT, 0, 0 },
     { "disarm",		do_disarm,	POSITION_FIGHTING, 2, CMD_DEFAULT, 0, 0 },
-    { "flee",		do_flee,	POSITION_FIGHTING, 0, 28, COM_CHARMIE_OK, 0 }, 
-    { "hit",		do_hit,		POSITION_FIGHTING, 0, 194, COM_CHARMIE_OK, 0 },
+    { "flee",		do_flee,	POSITION_FIGHTING, 0, CMD_FLEE, COM_CHARMIE_OK, 0 }, 
+    { "hit",		do_hit,		POSITION_FIGHTING, 0, CMD_HIT, COM_CHARMIE_OK, 0 },
     { "join",		do_join,	POSITION_FIGHTING, 0, CMD_DEFAULT, COM_CHARMIE_OK, 0 },
     { "battlesense",		do_battlesense,	POSITION_FIGHTING, 0, CMD_DEFAULT, 0, 0 },
     { "stance",		do_defenders_stance,	POSITION_FIGHTING, 0, CMD_DEFAULT, 0, 0 },
@@ -227,7 +285,7 @@ struct command_info cmd_info[] =
     { "smite",		do_smite,	POSITION_FIGHTING, 0, CMD_DEFAULT, 0, 0 },
 
 // Junk movedso join precedes it
-    { "junk",		do_tap,		POSITION_RESTING, 0, 92, COM_CHARMIE_OK, 25 },
+    { "junk",		do_tap,		POSITION_RESTING, 0, CMD_SACRIFICE, COM_CHARMIE_OK, 25 },
 
     { "murder",		do_murder,	POSITION_FIGHTING, 0, CMD_DEFAULT, COM_CHARMIE_OK, 0 },
     { "rescue",		do_rescue,	POSITION_FIGHTING, 0, CMD_DEFAULT, 0, 0 },
@@ -242,7 +300,7 @@ struct command_info cmd_info[] =
     { "stun",		do_stun,	POSITION_FIGHTING, 1, CMD_DEFAULT, 0, 0 },
     { "redirect",	do_redirect,	POSITION_FIGHTING, 1, CMD_DEFAULT, 0, 0 },
     { "hitall",		do_hitall,	POSITION_FIGHTING, 1, CMD_DEFAULT, 0, 0 },
-    { "quiveringpalm",	do_quivering_palm,	POSITION_FIGHTING, 1, CMD_DEFAULT, 0, 0 },
+    { "quiveringpalm",	do_quivering_palm, POSITION_FIGHTING, 1, CMD_DEFAULT, 0, 0 },
     { "eagleclaw",	do_eagle_claw,	POSITION_FIGHTING, 1, CMD_DEFAULT, 0, 0 },
     { "headbutt",	do_headbutt,	POSITION_FIGHTING, 1, CMD_DEFAULT, 0, 0 },
     { "cripple",	do_cripple,	POSITION_FIGHTING, 1, CMD_DEFAULT, 0, 0 },
@@ -271,10 +329,10 @@ struct command_info cmd_info[] =
     { "wake",	do_wake,	POSITION_SLEEPING, 0, CMD_DEFAULT, 0, 0 },
     
     // Miscellaneous commands
-    { "editor",         do_editor,      POSITION_SLEEPING, 100, CMD_DEFAULT, 0, 1 },
+    { "editor",         do_editor,      POSITION_SLEEPING, CMD_EDITOR, CMD_DEFAULT, 0, 1 },
     { "autojoin",	do_autojoin,	POSITION_SLEEPING, 0, CMD_DEFAULT, 0, 1 },
     { "visible",	do_visible,	POSITION_SLEEPING, 0, CMD_DEFAULT, 0, 1 },
-    { "ctell",		do_ctell,	POSITION_SLEEPING, 0, 201, 0, 1 },
+    { "ctell",		do_ctell,	POSITION_SLEEPING, 0, CMD_EDITOR, 0, 1 },
     { "outcast",	do_outcast,	POSITION_RESTING, 0, CMD_DEFAULT, 0, 1 },
     { "accept",		do_accept,	POSITION_RESTING, 0, CMD_DEFAULT, 0, 1 },
     { "whoclan",	do_whoclan,	POSITION_DEAD, 0, CMD_DEFAULT, 0, 1 },
@@ -285,12 +343,13 @@ struct command_info cmd_info[] =
     { "ambush",		do_ambush,	POSITION_RESTING, 0, CMD_DEFAULT, 0, 1 },
     { "whoarena",	do_whoarena,	POSITION_SLEEPING, 0, CMD_DEFAULT, 0, 1 },
     { "joinarena",	do_joinarena,	POSITION_SLEEPING, 0, CMD_DEFAULT, 0, 0 },
-    { "backstab",	do_backstab,	POSITION_STANDING, 0, 13, 0, 0 },
-    { "bs",		do_backstab,	POSITION_STANDING, 0, 13, 0, 0 },
+    { "backstab",	do_backstab,	POSITION_STANDING, 0, CMD_BACKSTAB, 0, 0 },
+    { "bs",		do_backstab,	POSITION_STANDING, 0, CMD_BACKSTAB, 0, 0 },
+    { "sbs",		do_backstab,	POSITION_STANDING, 0, CMD_SBS, 0, 0}, //single backstab
     { "boss",		do_boss,	POSITION_DEAD, 0, CMD_DEFAULT, 0, 1 },
     { "blackjack",	do_blackjack,	POSITION_STANDING, 0, CMD_DEFAULT, 0, 0 },
-    { "enter",		do_enter,	POSITION_STANDING, 0, 60, COM_CHARMIE_OK, 20 },
-    { "climb",		do_climb,	POSITION_STANDING, 0, 60, COM_CHARMIE_OK, 20 },
+    { "enter",		do_enter,	POSITION_STANDING, 0, CMD_ENTER, COM_CHARMIE_OK, 20 },
+    { "climb",		do_climb,	POSITION_STANDING, 0, CMD_CLIMB, COM_CHARMIE_OK, 20 },
     { "examine",	do_examine,	POSITION_RESTING, 0, CMD_DEFAULT, 0, 1 },
     { "follow",		do_follow,	POSITION_RESTING, 0, CMD_DEFAULT, 0, 0 },
     { "stalk",		do_stalk,	POSITION_STANDING, 6, CMD_DEFAULT, 0, 10 },
@@ -343,43 +402,43 @@ struct command_info cmd_info[] =
 
     { "huntitems",       do_showhunt,    POSITION_RESTING, 0, CMD_DEFAULT, 0, 0},
     // Special procedure commands
-    { "design",		do_not_here,	POSITION_STANDING, 0, 62, 0, 0 },
-    { "stock",		do_not_here,	POSITION_STANDING, 0, 61, 0, 0 },
-    { "buy",		do_not_here,	POSITION_STANDING, 0, 56, 0, 0 },
-    { "sell",		do_not_here,	POSITION_STANDING, 0, 57, 0, 0 },
-    { "value",		do_not_here,	POSITION_STANDING, 0, 58, 0, 0 },
-    { "watch",		do_not_here,	POSITION_STANDING, 0, 155, 0, 0},
-    { "list",		do_not_here,	POSITION_STANDING, 0, 59, 0, 0 },
-    { "repair",		do_not_here,	POSITION_STANDING, 0, 66, 0, 0 },
-    { "practice",	do_practice,	POSITION_SLEEPING, 1, 164, 0, 0 },
-    { "practise",	do_practice,	POSITION_SLEEPING, 1, 164, 0, 0 },
+    { "design",		do_not_here,	POSITION_STANDING, 0, CMD_DESIGN, 0, 0 },
+    { "stock",		do_not_here,	POSITION_STANDING, 0, CMD_STOCK, 0, 0 },
+    { "buy",		do_not_here,	POSITION_STANDING, 0, CMD_BUY, 0, 0 },
+    { "sell",		do_not_here,	POSITION_STANDING, 0, CMD_SELL, 0, 0 },
+    { "value",		do_not_here,	POSITION_STANDING, 0, CMD_VALUE, 0, 0 },
+    { "watch",		do_not_here,	POSITION_STANDING, 0, CMD_WATCH, 0, 0},
+    { "list",		do_not_here,	POSITION_STANDING, 0, CMD_LIST, 0, 0 },
+    { "repair",		do_not_here,	POSITION_STANDING, 0, CMD_REPAIR, 0, 0 },
+    { "practice",	do_practice,	POSITION_SLEEPING, 1, CMD_PRACTICE, 0, 0 },
+    { "practise",	do_practice,	POSITION_SLEEPING, 1, CMD_PRACTICE, 0, 0 },
     { "pray",		do_pray,	POSITION_RESTING, 0, CMD_DEFAULT, 0, 1 },
     { "promote",	do_promote,	POSITION_STANDING, 1, CMD_DEFAULT, 0, 0 },
-    { "price",		do_not_here,	POSITION_RESTING, 1, 65, 0, 0 },
-    { "train",		do_not_here,	POSITION_RESTING, 1, 165, 0, 0 },
-    { "gain",		do_not_here,	POSITION_STANDING, 1, 171, 0, 0 },
-    { "balance",	do_not_here,	POSITION_STANDING, 0, 172, 0, 0 },
-    { "deposit",	do_not_here,	POSITION_STANDING, 0, 173, 0, 0 },
-    { "withdraw",	do_not_here,	POSITION_STANDING, 0, 174, 0, 0 },
-    { "clean",		do_not_here,	POSITION_RESTING, 0, 177, 0, 0 },
-    { "play",		do_not_here,	POSITION_RESTING, 0, 178, 0, 0 },
-    { "finish",		do_not_here,	POSITION_RESTING, 0, 179, 0, 0 },
-    { "veternarian",	do_not_here,	POSITION_RESTING, 0, 180, 0, 0 },
-    { "feed",		do_not_here,	POSITION_RESTING, 0, 181, 0, 0 },
-    { "assemble",	do_not_here,	POSITION_RESTING, 0, 182, 0, 0 },
-    { "pay",		do_not_here,	POSITION_STANDING, 0, 183, 0, 0 },
-    { "restring",	do_not_here,	POSITION_STANDING, 0, 184, 0, 0 },
-    { "push",		do_not_here,	POSITION_STANDING, 0, 185, 0, 0 },
-    { "pull",		do_not_here,	POSITION_STANDING, 0, 186, 0, 0 },
-    { "gaze",		do_not_here,	POSITION_STANDING, 0, 1820, 0, 0 },
-    { "tremor",		do_not_here,	POSITION_FIGHTING, 0, 188, 0, 0 },
-    { "bet",		do_not_here,	POSITION_STANDING, 0, 189, 0, 0 },
-    { "insurance",	do_not_here,	POSITION_STANDING, 0, 190, 0, 0 },
-    { "double",		do_not_here,	POSITION_STANDING, 0, 191, 0, 0 },
-    { "stay",		do_not_here,	POSITION_STANDING, 0, 192, 0, 0 },
+    { "price",		do_not_here,	POSITION_RESTING, 1, CMD_PRICE, 0, 0 },
+    { "train",		do_not_here,	POSITION_RESTING, 1, CMD_TRAIN, 0, 0 },
+    { "gain",		do_not_here,	POSITION_STANDING, 1, CMD_GAIN, 0, 0 },
+    { "balance",	do_not_here,	POSITION_STANDING, 0, CMD_BALANCE, 0, 0 },
+    { "deposit",	do_not_here,	POSITION_STANDING, 0, CMD_DEPOSIT, 0, 0 },
+    { "withdraw",	do_not_here,	POSITION_STANDING, 0, CMD_WITHDRAW, 0, 0 },
+    { "clean",		do_not_here,	POSITION_RESTING, 0, CMD_CLEAN, 0, 0 },
+    { "play",		do_not_here,	POSITION_RESTING, 0, CMD_PLAY, 0, 0 },
+    { "finish",		do_not_here,	POSITION_RESTING, 0, CMD_FINISH, 0, 0 },
+    { "veternarian",	do_not_here,	POSITION_RESTING, 0, CMD_VETERNARIAN, 0, 0 },
+    { "feed",		do_not_here,	POSITION_RESTING, 0, CMD_FEED, 0, 0 },
+    { "assemble",	do_not_here,	POSITION_RESTING, 0, CMD_ASSEMBLE, 0, 0 },
+    { "pay",		do_not_here,	POSITION_STANDING, 0, CMD_PAY, 0, 0 },
+    { "restring",	do_not_here,	POSITION_STANDING, 0, CMD_RESTRING, 0, 0 },
+    { "push",		do_not_here,	POSITION_STANDING, 0, CMD_PUSH, 0, 0 },
+    { "pull",		do_not_here,	POSITION_STANDING, 0, CMD_PULL, 0, 0 },
+    { "gaze",		do_not_here,	POSITION_STANDING, 0, CMD_GAZE, 0, 0 },
+    { "tremor",		do_not_here,	POSITION_FIGHTING, 0, CMD_TREMOR, 0, 0 },
+    { "bet",		do_not_here,	POSITION_STANDING, 0, CMD_BET, 0, 0 },
+    { "insurance",	do_not_here,	POSITION_STANDING, 0, CMD_INSURANCE, 0, 0 },
+    { "double",		do_not_here,	POSITION_STANDING, 0, CMD_DOUBLE, 0, 0 },
+    { "stay",		do_not_here,	POSITION_STANDING, 0, CMD_STAY, 0, 0 },
     { "select",		do_natural_selection, POSITION_RESTING, 0, CMD_DEFAULT, 0, 0},
     { "sector",		do_sector,	POSITION_RESTING, 0, CMD_DEFAULT, 0, 1 },
-    { "remort",		do_not_here,	POSITION_RESTING, IMP, 80, 0, 1 },
+    { "remort",		do_not_here,	POSITION_RESTING, IMP, CMD_REMORT, 0, 1 },
 
      
     // Immortal commands
@@ -545,7 +604,7 @@ struct command_info cmd_info[] =
     { "mpteleport",	        do_mpteleport,	POSITION_DEAD, 0, CMD_DEFAULT, 0, 1 },
 
     // End of the line
-    { "",	do_not_here,	POSITION_DEAD, 0, 9, COM_CHARMIE_OK, 0 }
+    { "",	do_not_here,	POSITION_DEAD, 0, CMD_DEFAULT, COM_CHARMIE_OK, 0 }
 };
 
 
