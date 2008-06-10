@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: cl_ranger.cpp,v 1.88 2008/06/10 19:45:24 kkoons Exp $ | cl_ranger.C  *
+ * $Id: cl_ranger.cpp,v 1.89 2008/06/10 19:48:10 kkoons Exp $ | cl_ranger.C  *
  * Description: Ranger skills/spells                                          *
  *                                                                            *
  * Revision History                                                           *
@@ -1409,7 +1409,7 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
 
      retval = damage(ch, victim, dam, TYPE_PIERCE, SKILL_ARCHERY, 0);
 
-     if(SOMEONE_DIED(retval))  {
+     if(IS_SET(retval, eVICT_DIED))  {
         switch(number(1,2)) {
            case 1:
               if(dir < 0) {
