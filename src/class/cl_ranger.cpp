@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: cl_ranger.cpp,v 1.87 2008/06/10 19:19:49 kkoons Exp $ | cl_ranger.C  *
+ * $Id: cl_ranger.cpp,v 1.88 2008/06/10 19:45:24 kkoons Exp $ | cl_ranger.C  *
  * Description: Ranger skills/spells                                          *
  *                                                                            *
  * Revision History                                                           *
@@ -1409,7 +1409,7 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
 
      retval = damage(ch, victim, dam, TYPE_PIERCE, SKILL_ARCHERY, 0);
 
-     if(IS_SET(retval, eVICT_DIED))  {
+     if(SOMEONE_DIED(retval))  {
         switch(number(1,2)) {
            case 1:
               if(dir < 0) {
@@ -1426,7 +1426,7 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
               if(dir < 0) {
                  sprintf(buf, "%s drives through the eye of %s, ending %s life.", found->short_description, victname, victhshr);
                  send_to_room(buf, victroom);
-              } else {
+               else {
                  sprintf(buf, "Your %s drives through the eye of %s ending %s life.\r\n", found->short_description, victname, victhshr);
                  send_to_char(buf, ch);
                  sprintf(buf, "%s from the %s lands with a solid 'thunk.'\r\n%s falls to the ground, an arrow sticking from %s left eye.", found->short_description, dirs[rev_dir[dir]], victname, victhshr);
