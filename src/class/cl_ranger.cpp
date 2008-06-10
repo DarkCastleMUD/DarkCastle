@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: cl_ranger.cpp,v 1.86 2007/12/01 12:47:34 dcastle Exp $ | cl_ranger.C  *
+ * $Id: cl_ranger.cpp,v 1.87 2008/06/10 19:19:49 kkoons Exp $ | cl_ranger.C  *
  * Description: Ranger skills/spells                                          *
  *                                                                            *
  * Revision History                                                           *
@@ -1131,7 +1131,7 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
 
   if(!(ch->equipment[HOLD]->obj_flags.type_flag == ITEM_FIREWEAPON))
   {
-    send_to_char("You need to be holding a bow moron.\r\n", ch);
+    send_to_char("You need to be holding a bow, moron.\r\n", ch);
     return eFAILURE;
   }
 /*
@@ -1323,9 +1323,9 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
   }
 
 /* Protect the newbies! */
-  if(!IS_NPC(victim) && GET_LEVEL(victim) < 2)
+  if(!IS_NPC(victim) && GET_LEVEL(victim) < 6)
   {
-    send_to_char("Don't shoot at a poor level 1! :(\r\n", ch);
+    send_to_char("Don't shoot at a poor defenseless n00b! :(\r\n", ch);
     return eFAILURE;
   }
 /* check if target is fighting */
