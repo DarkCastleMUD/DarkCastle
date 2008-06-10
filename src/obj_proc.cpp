@@ -1390,7 +1390,7 @@ int phish_locator(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
 
    if(!strstr(arg, "button"))
       return eSUCCESS;
-   }
+   
 
    act("$n fiddles with a small fish-shaped device.", ch, 0,0,TO_ROOM, INVIS_NULL);
 
