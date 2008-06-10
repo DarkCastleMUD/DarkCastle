@@ -2006,6 +2006,7 @@ int spell_curse(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *
      {
            mob_suprised_sayings(victim, ch);
            retval = attack(victim, ch, 0);
+           return retval;
      }
   }
   return eSUCCESS;
@@ -4470,7 +4471,7 @@ int spell_fear(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
            retval = attack(victim, ch, 0);
      }
   }
-
+  else
     retval = eFAILURE;
     
     return retval;
@@ -5029,6 +5030,7 @@ int spell_dispel_minor(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
      {
            mob_suprised_sayings(victim, ch);
            retval = attack(victim, ch, 0);
+           return retval;
      }
   }
    return eSUCCESS;
@@ -5257,6 +5259,7 @@ int spell_dispel_magic(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
      {
            mob_suprised_sayings(victim, ch);
            retval = attack(victim, ch, 0);
+           return retval;
      }
   }
    return eSUCCESS;
@@ -5705,6 +5708,7 @@ int spell_weaken(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data 
      {
            mob_suprised_sayings(victim, ch);
            retval = attack(victim, ch, 0);
+           return retval;
      }
   }
   return eSUCCESS;
