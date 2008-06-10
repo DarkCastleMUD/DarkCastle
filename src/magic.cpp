@@ -1999,16 +1999,14 @@ int spell_curse(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *
      }
   }
 
-  if(IS_NPC(victim)) 
+  if(IS_NPC(victim) && !victim->fighting)
   {
-
-     if(!victim->fighting)
-     {
-           mob_suprised_sayings(victim, ch);
-           retval = attack(victim, ch, 0);
-           return retval;
-     }
+    mob_suprised_sayings(victim, ch);
+    retval = attack(victim, ch, 0);
+    SWAP_CH_VICT(retval);
+    return retval;
   }
+  
   return eSUCCESS;
 }
 
@@ -4462,14 +4460,11 @@ int spell_fear(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
     send_to_char("For a moment you feel compelled to run away, but you fight back the urge.\n\r", victim);
     act("$N doesnt seem to be the yellow-bellied slug you thought!", ch, NULL, victim, TO_CHAR, 0);
   
-  if(IS_NPC(victim)) 
+  if(IS_NPC(victim) && !victim->fighting)
   {
-
-     if(!victim->fighting)
-     {
-           mob_suprised_sayings(victim, ch);
-           retval = attack(victim, ch, 0);
-     }
+    mob_suprised_sayings(victim, ch);
+    retval = attack(victim, ch, 0);
+    SWAP_CH_VICT(retval);
   }
   else
     retval = eFAILURE;
@@ -5023,16 +5018,13 @@ int spell_dispel_minor(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
       } // of switch
    } // of while
 
-  if(IS_NPC(victim)) 
-  {
-
-     if(!victim->fighting)
-     {
-           mob_suprised_sayings(victim, ch);
-           retval = attack(victim, ch, 0);
-           return retval;
-     }
-  }
+   if(IS_NPC(victim) && !victim->fighting)
+   {
+      mob_suprised_sayings(victim, ch);
+      retval = attack(victim, ch, 0);
+      SWAP_CH_VICT(retval);
+      return retval;
+   }
    return eSUCCESS;
 }
 
@@ -5252,16 +5244,13 @@ int spell_dispel_magic(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
       } // end of switch
    } // end of while
 
-  if(IS_NPC(victim)) 
-  {
-
-     if(!victim->fighting)
-     {
-           mob_suprised_sayings(victim, ch);
-           retval = attack(victim, ch, 0);
-           return retval;
-     }
-  }
+   if(IS_NPC(victim) &&!victim->fighting)
+   {
+     mob_suprised_sayings(victim, ch);
+     retval = attack(victim, ch, 0);
+     SWAP_CH_VICT(retval);
+     return retval;
+   }
    return eSUCCESS;
 }
 
@@ -12005,16 +11994,13 @@ int spell_debility(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
     act("$N takes on an unhealthy pallor as $n's magic takes hold.", ch, 0, victim, TO_ROOM, NOTVICT);
     act("Your magic $6debilitizes$R $N!",ch,0,victim, TO_CHAR, 0);
   }
-  if(IS_NPC(victim)) 
+  if(IS_NPC(victim) && !victim->fighting)
   {
-
-     if(!victim->fighting)
-     {
-           mob_suprised_sayings(victim, ch);
-           retval = attack(victim, ch, 0);
-     }
+    mob_suprised_sayings(victim, ch);
+    retval = attack(victim, ch, 0);
+    SWAP_CH_VICT(retval);
   }
-
+ 
   return retval;
 }
 
