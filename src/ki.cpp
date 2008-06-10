@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.73 2008/05/23 18:15:51 kkoons Exp $ */
+/* $Id: ki.cpp,v 1.74 2008/06/10 18:53:40 kkoons Exp $ */
 
 extern "C"
 {
@@ -872,7 +872,8 @@ int ki_disrupt( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim)
      act("The shield of stones swirling about $n's body falls to the ground!", victim, 0, 0, TO_ROOM, 0);
    }
    
-   if (af->bitvector == AFF_FROSTSHIELD) {
+   if (af->type == SPELL_FROSTSHIELD || af->bitvector == AFF_FROSTSHIELD) {
+     affect_from_char(victim, SPELL_FROSTSHIELD);
      REMBIT(victim->affected_by, AFF_FROSTSHIELD);
      act("Your shield of $B$3frost$R melts into nothing!.", ch, 0,victim, TO_VICT, 0);
      act("The $B$3frost$R encompassing $n's body melts away.", victim, 0, 0, TO_ROOM, 0);
@@ -903,12 +904,6 @@ int ki_disrupt( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim)
      act("The light, $B$6pulsing$R aura surrounding $n has been disrupted!", victim, 0, 0, TO_ROOM, 0);
    }
 
-   if (IS_NPC(victim) && !victim->fighting) 
-   {
-      retval = one_hit(victim, ch, TYPE_UNDEFINED, FIRST);
-      retval = SWAP_CH_VICT(retval);
-      return retval;
-   }
    return eSUCCESS;
 }
 
