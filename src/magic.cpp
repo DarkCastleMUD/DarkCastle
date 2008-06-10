@@ -4450,8 +4450,8 @@ int spell_fear(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
   if (saves_spell(ch, victim, 0, SAVE_TYPE_COLD) >= 0) {
     send_to_char("For a moment you feel compelled to run away, but you fight back the urge.\n\r", victim);
     act("$N doesnt seem to be the yellow-bellied slug you thought!", ch, NULL, victim, TO_CHAR, 0);
-      retval = eFAILURE;
-    }
+    retval = eFAILURE;
+    
     return retval;
   }
   

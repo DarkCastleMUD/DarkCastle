@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.94 2008/06/09 19:57:34 apocalypse Exp $ */
+/* $Id: limits.cpp,v 1.95 2008/06/10 03:53:45 kkoons Exp $ */
 
 extern "C"
 {
@@ -607,9 +607,7 @@ void advance_level(CHAR_DATA *ch, int is_conversion)
     if(GET_LEVEL(ch) == 11)
       send_to_char("It now costs you gold every time you recall.\r\n", ch);
     if(GET_LEVEL(ch) == 20)
-      send_to_char("You will no longer keep your equipment when you suffer a death to a mob.\n\r
-There is now a chance you may lose attribute points when you die to a mob.\n\r
-Read HELP RDEATH and HELP STAT LOSS for more information.\r\n", ch);
+      send_to_char("You will no longer keep your equipment when you suffer a death to a mob.\n\rThere is now a chance you may lose attribute points when you die to a mob.\n\rRead HELP RDEATH and HELP STAT LOSS for more information.\r\n", ch);
     if (GET_LEVEL(ch) == 50)
       send_to_char("The protective covenant of your corpse weakens, upon death players may steal 1 item from you. (See help LOOT for details)\r\n",ch);
 }   
