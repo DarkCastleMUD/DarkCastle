@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.67 2008/05/18 02:32:02 jhhudso Exp $
+| $Id: wizard.cpp,v 1.68 2008/06/10 20:17:13 jhhudso Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -86,7 +86,7 @@ int number_or_name(char **name, int *num)
 void do_mload(struct char_data *ch, int rnum, int cnt)
 {      
   struct char_data *mob;
-  char buf[100];
+  char buf[MAX_STRING_LENGTH];
   int i; 
  
   if (cnt == 0) cnt = 1;
