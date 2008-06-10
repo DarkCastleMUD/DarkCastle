@@ -1996,8 +1996,8 @@ int spell_curse(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *
 	 affect_to_char(victim, &af);
 	 act("$n briefly reveals a $4red$R aura!", victim, 0, 0, TO_ROOM, 0);
 	 act("You feel very uncomfortable as a curse takes hold of you.",victim,0,0,TO_CHAR, 0);
-     }
-  }
+     
+    }
 
   if(IS_NPC(victim) && !victim->fighting)
   {
@@ -2006,6 +2006,9 @@ int spell_curse(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *
     SWAP_CH_VICT(retval);
     return retval;
   }
+  
+  }
+
   
   return eSUCCESS;
 }
