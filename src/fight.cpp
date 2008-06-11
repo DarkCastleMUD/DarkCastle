@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.498 2008/06/08 23:12:30 kkoons Exp $               *
+ * $Id: fight.cpp,v 1.499 2008/06/11 23:51:04 kkoons Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -2224,13 +2224,13 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
     dam /= 4;
 
   // sanct damage now 35% for all caster aligns
-  if (IS_AFFECTED(victim, AFF_SANCTUARY))
+  if (IS_AFFECTED(victim, AFF_SANCTUARY) && dam > 0)
   {
     int mod = affected_by_spell(victim, SPELL_SANCTUARY)? affected_by_spell(victim, SPELL_SANCTUARY)->modifier:35;
     dam -= (int) (float)((float)dam*((float)mod/100.0));
 
   }
-  if(IS_SET(victim->combat, COMBAT_MONK_STANCE))  // half damage
+  if(IS_SET(victim->combat, COMBAT_MONK_STANCE) && dam > 0)  // half damage
       dam /= 2;
   int reduce = 0,type = 0;
   if (can_miss == 1) {
@@ -2407,7 +2407,8 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
 
   percent = (int) (( ((float)GET_HIT(victim)) / 
 		     ((float)GET_MAX_HIT(victim)) ) * 100);
-  if( percent < 40 && (learned = has_skill(victim, SKILL_FRENZY))) {    
+  if( percent < 40 && (learned = has_skill(victim, SKILL_FRENZY))) 
+  {    
     switch(attacktype) {
     case SPELL_BURNING_HANDS:
     case SPELL_DROWN:
@@ -2449,7 +2450,9 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
     }
   }
 
-  if(affected_by_spell(victim, SPELL_DIVINE_INTER) && dam > affected_by_spell(victim, SPELL_DIVINE_INTER)->modifier)
+  if(dam > 0 
+     && affected_by_spell(victim, SPELL_DIVINE_INTER) 
+     && dam > affected_by_spell(victim, SPELL_DIVINE_INTER)->modifier)
     dam = affected_by_spell(victim, SPELL_DIVINE_INTER)->modifier;
 
 
