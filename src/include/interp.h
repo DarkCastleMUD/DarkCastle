@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.h,v 1.85 2008/05/22 23:20:01 kkoons Exp $ */
+/* $Id: interp.h,v 1.86 2008/06/12 23:36:52 kkoons Exp $ */
 
 #ifndef INTERP_H_
 #define INTERP_H_
@@ -35,6 +35,98 @@ void nanny(struct descriptor_data *d, char *arg);
 int is_abbrev(char *arg1, char *arg2);
 int len_cmp(char *s1, char *s2);
 void add_command_lag(CHAR_DATA *ch, int cmdnum, int lag);
+
+
+#define CMD_NORTH	1
+#define CMD_EAST	2
+#define CMD_SOUTH	3
+#define CMD_WEST	4
+#define CMD_UP		5
+#define CMD_DOWN	6
+
+#define CMD_BELLOW	8
+#define CMD_DEFAULT	9
+#define CMD_TRACK	10
+#define CMD_PALM	10
+#define CMD_SAY		11
+#define CMD_LOOK	12
+#define CMD_BACKSTAB	13
+#define CMD_SBS		14
+#define CMD_GLANCE	20
+#define CMD_FLEE	28
+#define CMD_PICK	35
+#define CMD_STOCK	56
+#define CMD_BUY		56
+#define CMD_SELL	57
+#define CMD_VALUE	58
+#define CMD_LIST	59
+#define CMD_ENTER	60
+#define CMD_CLIMB	60
+#define CMD_DESIGN	62
+#define CMD_PRICE	65
+#define CMD_REPAIR	66
+#define CMD_READ	67
+#define CMD_REMOVE	69
+#define CMD_ERASE	70
+#define CMD_REMORT	80
+#define CMD_SLIP	87
+#define CMD_GIVE	88
+#define CMD_DROP	89
+#define CMD_DONATE	90
+#define CMD_QUIT	91
+#define CMD_SACRIFICE	92
+#define CMD_PUT		93
+#define CMD_OPEN	98
+#define CMD_EDITOR	100
+#define CMD_WRITE	128
+#define CMD_HIT		194
+#define CMD_WATCH	155
+#define CMD_PRACTICE	164
+#define CMD_TRAIN	165
+#define CMD_GAIN	171
+#define CMD_BALANCE	172
+#define CMD_DEPOSIT	173
+#define CMD_WITHDRAW	174
+#define CMD_CLEAN	177
+#define CMD_PLAY        178
+#define CMD_FINISH      179
+#define CMD_VETERNARIAN 180
+#define CMD_FEED        181
+#define CMD_ASSEMBLE    182
+#define CMD_PAY         183
+#define CMD_RESTRING    184
+#define CMD_PUSH        185
+#define CMD_PULL        186
+#define CMD_LEAVE	187
+#define CMD_TREMOR      188
+#define CMD_BET         189
+#define CMD_INSURANCE   190
+#define CMD_DOUBLE      191
+#define CMD_STAY        192
+#define CMD_SPLIT	193
+#define CMD_LOOT        195
+#define CMD_GTELL       200
+#define CMD_CTELL       201
+#define CMD_PRIZE	999
+#define CMD_GAZE	1820
+
+
+
+// Temp removal to perfect system. 1/25/06 Eas
+// WARNING WARNING WARNING WARNING WARNING
+// The command list was modified to account for toggle_hide.
+// The last integer will affect a char being removed from hide when they perform the command.
+
+
+
+
+
+
+
+
+
+
+
 
 
 /*
