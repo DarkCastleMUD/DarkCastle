@@ -16,7 +16,7 @@
 /* 12/08/2003   Onager   Added chop_half() to work like half_chop() but    */
 /*                       chopping off the last word.                       */
 /***************************************************************************/
-/* $Id: interp.cpp,v 1.148 2008/06/09 23:17:20 kkoons Exp $ */
+/* $Id: interp.cpp,v 1.149 2008/06/12 23:29:35 kkoons Exp $ */
 
 extern "C"
 {
@@ -72,53 +72,57 @@ void add_command_to_radix(struct command_info *cmd);
 struct command_lag *command_lag_list = NULL;
 
 
-#define CMD_NORTH       1
-#define CMD_EAST        2
-#define CMD_SOUTH       3
-#define CMD_WEST        4
-#define CMD_UP          5
-#define CMD_DOWN        6
+#define CMD_NORTH	1
+#define CMD_EAST	2
+#define CMD_SOUTH	3
+#define CMD_WEST	4
+#define CMD_UP		5
+#define CMD_DOWN	6
 
-#define CMD_DEFAULT     9
-#define CMD_TRACK       10
-#define CMD_PALM        10
-#define CMD_SAY         11
-#define CMD_LOOK        12
-#define CMD_BACKSTAB    13
-#define CMD_SBS         14
-#define CMD_GLANCE      20
-#define CMD_FLEE        28
-#define CMD_STOCK       56
-#define CMD_BUY         56
-#define CMD_SELL        57
-#define CMD_VALUE       58
-#define CMD_LIST        59
-#define CMD_ENTER       60
-#define CMD_CLIMB       60
-#define CMD_DESIGN      62
-#define CMD_PRICE       65
-#define CMD_REPAIR      66
-#define CMD_READ        67
-#define CMD_REMOVE      69
-#define CMD_ERASE       70
-#define CMD_REMORT      80
-#define CMD_SLIP        87
-#define CMD_GIVE        88
-#define CMD_DROP        89
-#define CMD_DONATE      90
-#define CMD_SACRIFICE   92
-#define CMD_PUT         93
-#define CMD_OPEN        98
-#define CMD_EDITOR      100
-#define CMD_HIT         194
-#define CMD_WATCH       155
-#define CMD_PRACTICE    164
-#define CMD_TRAIN       165
-#define CMD_GAIN        171
-#define CMD_BALANCE     172
-#define CMD_DEPOSIT     173
-#define CMD_WITHDRAW    174
-#define CMD_CLEAN       177
+#define CMD_BELLOW	8
+#define CMD_DEFAULT	9
+#define CMD_TRACK	10
+#define CMD_PALM	10
+#define CMD_SAY		11
+#define CMD_LOOK	12
+#define CMD_BACKSTAB	13
+#define CMD_SBS		14
+#define CMD_GLANCE	20
+#define CMD_FLEE	28
+#define CMD_PICK	35
+#define CMD_STOCK	56
+#define CMD_BUY		56
+#define CMD_SELL	57
+#define CMD_VALUE	58
+#define CMD_LIST	59
+#define CMD_ENTER	60
+#define CMD_CLIMB	60
+#define CMD_DESIGN	62
+#define CMD_PRICE	65
+#define CMD_REPAIR	66
+#define CMD_READ	67
+#define CMD_REMOVE	69
+#define CMD_ERASE	70
+#define CMD_REMORT	80
+#define CMD_SLIP	87
+#define CMD_GIVE	88
+#define CMD_DROP	89
+#define CMD_DONATE	90
+#define CMD_QUIT	91
+#define CMD_SACRIFICE	92
+#define CMD_PUT		93
+#define CMD_OPEN	98
+#define CMD_EDITOR	100
+#define CMD_WRITE	128
+#define CMD_HIT		194
+#define CMD_WATCH	155
+#define CMD_PRACTICE	164
+#define CMD_TRAIN	165
+#define CMD_GAIN	171
+#define CMD_BALANCE	172
+#define CMD_DEPOSIT	173
+#define CMD_WITHDRAW	174
+#define CMD_CLEAN	177
 #define CMD_PLAY        178
 #define CMD_FINISH      179
 #define CMD_VETERNARIAN 180
@@ -128,16 +132,18 @@ struct command_lag *command_lag_list = NULL;
 #define CMD_RESTRING    184
 #define CMD_PUSH        185
 #define CMD_PULL        186
+#define CMD_LEAVE	187
 #define CMD_TREMOR      188
 #define CMD_BET         189
 #define CMD_INSURANCE   190
 #define CMD_DOUBLE      191
 #define CMD_STAY        192
+#define CMD_SPLIT	193
 #define CMD_LOOT        195
 #define CMD_GTELL       200
 #define CMD_CTELL       201
-#define CMD_GAZE        1820
-    // Immortal commands
+#define CMD_PRIZE	999
+#define CMD_GAZE	1820
 
 
 
@@ -363,13 +369,13 @@ struct command_info cmd_info[] =
     { "whosolo",	do_whosolo,	POSITION_SLEEPING, 0, CMD_DEFAULT, 0, 1 },
     { "count",		do_count,	POSITION_SLEEPING, 0, CMD_DEFAULT, 0, 1 },
     { "hide",		do_hide,	POSITION_RESTING, 0, CMD_DEFAULT, 0, 0 },
-    { "leave",		do_leave,	POSITION_STANDING, 0, 187, COM_CHARMIE_OK, 20 },
+    { "leave",		do_leave,	POSITION_STANDING, 0, CMD_LEAVE, COM_CHARMIE_OK, 20 },
     { "name",		do_name,	POSITION_DEAD, 1, CMD_DEFAULT, 0, 1 },
-    { "pick",		do_pick,	POSITION_STANDING, 0, 35, 0, 20 },
+    { "pick",		do_pick,	POSITION_STANDING, 0, CMD_PICK, 0, 20 },
     { "quest",          do_quest,       POSITION_DEAD, 0, CMD_DEFAULT, 0, 1 },
     { "qui",		do_qui,		POSITION_DEAD, 0, CMD_DEFAULT, 0, 1 },
     { "levels",		do_levels,	POSITION_DEAD, 0, CMD_DEFAULT, 0, 1 },
-    { "quit",		do_quit,	POSITION_DEAD, 0, 91, 0, 1 },
+    { "quit",		do_quit,	POSITION_DEAD, 0, CMD_QUIT, 0, 1 },
     { "return",		do_return,	POSITION_DEAD, 0, CMD_DEFAULT, COM_CHARMIE_OK, 1 },
     { "tame",		do_tame,	POSITION_RESTING, 0, CMD_DEFAULT, 0, 0 },
     { "prompt",		do_prompt,	POSITION_DEAD, 0, CMD_DEFAULT, 0, 1 },
@@ -377,7 +383,7 @@ struct command_info cmd_info[] =
     { "save",		do_save,	POSITION_DEAD, 0, CMD_DEFAULT, 0, 1 },
     { "sneak",		do_sneak,	POSITION_STANDING, 1, CMD_DEFAULT, 0, 0 },
     { "home",		do_home,	POSITION_DEAD, 0, CMD_DEFAULT, 0, 1 },
-    { "split",		do_split,	POSITION_RESTING, 0, 193, 0, 0 },
+    { "split",		do_split,	POSITION_RESTING, 0, CMD_SPLIT, 0, 0 },
     { "spells",		do_spells,	POSITION_SLEEPING, 0, CMD_DEFAULT, 0, 1 },
     { "skills",		do_skills,	POSITION_SLEEPING, 0, CMD_DEFAULT, 0, 1 },
     { "songs",		do_songs,	POSITION_SLEEPING, 0, CMD_DEFAULT, 0, 1 },
@@ -390,7 +396,7 @@ struct command_info cmd_info[] =
     { "cwithdraw",	do_cwithdraw,	POSITION_STANDING, 0, CMD_DEFAULT, 0, 0 },
     { "ctax",		do_ctax,	POSITION_STANDING, 0, CMD_DEFAULT, 0, 1 },
     { "where",		do_where,	POSITION_RESTING, 0, CMD_DEFAULT, 0, 1 },
-    { "write",		do_write,	POSITION_STANDING, 0, 128, 0, 0 },
+    { "write",		do_write,	POSITION_STANDING, 0, CMD_WRITE, 0, 0 },
     { "beacon",		do_beacon,	POSITION_RESTING, 0, CMD_DEFAULT, 0, 1 },
     { "leak",		do_memoryleak,	POSITION_RESTING, 0, CMD_DEFAULT, 0, 1 },
     { "beep",		do_beep,	POSITION_DEAD, 0, CMD_DEFAULT, 0, 1 },
@@ -483,10 +489,10 @@ struct command_info cmd_info[] =
     { "log",		do_log,		POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1 },
     { "snoop",		do_snoop,	POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1 },
     { "pview",		do_pview,	POSITION_DEAD, 104, CMD_DEFAULT, 0, 1 },
-    { "/",		do_wiz,		POSITION_DEAD, GIFTED_COMMAND, 8, 0, 1 },
+    { "/",		do_wiz,		POSITION_DEAD, GIFTED_COMMAND, CMD_BELLOW, 0, 1 },
     { "arena",		do_arena,	POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1 },
     { "load",		do_load,	POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1 },
-    { "prize",		do_load,	POSITION_DEAD, GIFTED_COMMAND, 999, 0, 1 },
+    { "prize",		do_load,	POSITION_DEAD, GIFTED_COMMAND, CMD_PRIZE, 0, 1 },
     { "testport",	do_testport,	POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1 },
     { "shutdow",	do_shutdow,	POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1 },
     { "shutdown",	do_shutdown,	POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1 },
@@ -507,7 +513,7 @@ struct command_info cmd_info[] =
     { "hindex",		do_hindex,	POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1 },
     { "reload",		do_reload,	POSITION_DEAD, 108, CMD_DEFAULT, 0, 1 },
     { "plats",		do_plats,	POSITION_DEAD, 108, CMD_DEFAULT, 0, 1 },
-    { "bellow",		do_thunder,	POSITION_DEAD, DEITY, 8, 0, 1 },
+    { "bellow",		do_thunder,	POSITION_DEAD, DEITY, CMD_BELLOW, 0, 1 },
     { "string",		do_string,	POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1 },
     { "transfer",	do_trans,	POSITION_DEAD, DEITY, CMD_DEFAULT, 0, 1 },
     { "gtrans",		do_gtrans,	POSITION_DEAD, DEITY, CMD_DEFAULT, 0, 1 },
