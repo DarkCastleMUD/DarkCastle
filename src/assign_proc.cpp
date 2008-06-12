@@ -203,8 +203,6 @@ void assign_non_combat_procs() {
     assign_one_mob_non(4901,  humaneater);
     assign_one_mob_non(6437,  generic_blocker);
 //    assign_one_mob_non(6902,  guild); // master shaolin monks teach 'stun'
-    assign_one_mob_non(8542,  iasenko_non_combat);
-    assign_one_mob_non(8543,  koban_non_combat);
     assign_one_mob_non(2318,  clan_guard);
     assign_one_mob_non(2300,  clan_guard);
     assign_one_mob_non(2312,  clan_guard);
@@ -313,15 +311,6 @@ void assign_combat_procs() {
     assign_one_mob_com(6500,  fighter);
     assign_one_mob_com(6508,  fighter);
     assign_one_mob_com(6517,  fighter);
-    assign_one_mob_com(8542,  iasenko_combat);
-    assign_one_mob_com(8543,  koban_combat);
-    assign_one_mob_com(8604,  kogiro_combat);
-    assign_one_mob_com(8605,  takahashi_combat);
-    assign_one_mob_com(8645,  askari_combat);
-    assign_one_mob_com(8646,  surimoto_combat);
-    assign_one_mob_com(8656,  hiryushi_combat);
-    assign_one_mob_com(8657,  izumi_combat);
-    assign_one_mob_com(8667,  shogura_combat);
     assign_one_mob_com(9005,  fighter);
     assign_one_mob_com(9007,  fighter);
     assign_one_mob_com(9021,  red_dragon);
