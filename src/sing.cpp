@@ -1586,6 +1586,17 @@ void do_astral_chanty_movement(CHAR_DATA *victim, CHAR_DATA *target)
     return;
   }
 
+
+  CHAR_DATA *tmpch;
+ extern struct obj_data * search_char_for_item(char_data * ch, int16 item_number, bool wearonly = FALSE);
+
+  for (tmpch = world[target->in_room].people; tmpch; tmpch = tmpch->next_in_room)
+     if (search_char_for_item(tmpch, real_object(76)) || search_char_for_item(tmpch, real_object(51)))
+     {
+       send_to_char("Your astral travels fail to find your destination.\n\r", victim);
+       return;
+     }
+
   retval = move_char(victim, target->in_room);
 
   if(!IS_SET(retval, eSUCCESS)) {
