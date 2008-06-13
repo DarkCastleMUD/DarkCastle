@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.500 2008/06/13 01:27:59 jhhudso Exp $               *
+ * $Id: fight.cpp,v 1.501 2008/06/13 01:29:56 jhhudso Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -123,7 +123,7 @@ char *champ_death_messages[] =
 };
 
 
-inline int debug_retval(CHAR_DATA *ch, CHAR_DATA *victim, int retval);
+int debug_retval(CHAR_DATA *ch, CHAR_DATA *victim, int retval);
 
 void do_champ_flag_death(CHAR_DATA *victim)
 {
@@ -6565,7 +6565,7 @@ int damage_type(int weapon_type)
   return(0);
 }
 
-inline int debug_retval(CHAR_DATA *ch, CHAR_DATA *victim, int retval)
+int debug_retval(CHAR_DATA *ch, CHAR_DATA *victim, int retval)
 {
     static int dumped = 0;
     bool bugged = FALSE;
