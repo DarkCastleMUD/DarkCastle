@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.499 2008/06/11 23:51:04 kkoons Exp $               *
+ * $Id: fight.cpp,v 1.500 2008/06/13 01:27:59 jhhudso Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -122,6 +122,8 @@ char *champ_death_messages[] =
 	"\n\r##%s: The poster child for birth control.\n\r"
 };
 
+
+inline int debug_retval(CHAR_DATA *ch, CHAR_DATA *victim, int retval);
 
 void do_champ_flag_death(CHAR_DATA *victim)
 {
@@ -923,7 +925,7 @@ int do_vampiric_aura(CHAR_DATA *ch, CHAR_DATA *vict)
     int level = MAX(1, af->modifier/6);
     int retval = spell_vampiric_touch(level, vict, ch, 0, af->modifier);
     retval = SWAP_CH_VICT( retval );
-    return retval;
+    return debug_retval(ch, vict, retval);
   }
   return eFAILURE;
 }
@@ -1488,13 +1490,13 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
   if(wielded && IS_SET(wielded->obj_flags.extra_flags, ITEM_TWO_HANDED) && has_skill(ch, SKILL_BEHEAD))
     if(w_type == TYPE_SLASH && GET_HIT(vict) < 3500 && GET_HIT(vict) * 100 / GET_MAX_HIT(vict) < 30) {
       retval = do_behead_skill(ch, vict);
-      if(SOMEONE_DIED(retval)) return retval;
+      if(SOMEONE_DIED(retval)) return debug_retval(ch, vict, retval);
     }
 
   if(wielded && IS_SET(wielded->obj_flags.extra_flags, ITEM_TWO_HANDED) && has_skill(ch, SKILL_EXECUTE))
     if(GET_HIT(vict) < 3500 && GET_HIT(vict) * 100 / GET_MAX_HIT(vict) < 15) {
       retval = do_execute_skill(ch, vict, w_type);
-      if(SOMEONE_DIED(retval)) return retval;
+      if(SOMEONE_DIED(retval)) return debug_retval(ch, vict, retval);
     }
 
   if(dam < 1)
@@ -1503,7 +1505,7 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
   
   // Now check for special code that occurs each hit
   retval = do_skewer(ch, vict, dam, weapon_type, w_type,weapon);
-  if (SOMEONE_DIED(retval)) return retval;
+  if (SOMEONE_DIED(retval)) return debug_retval(ch, vict, retval);
 
   if(has_skill(ch, SKILL_NAT_SELECT) && affected_by_spell(ch, SKILL_NAT_SELECT))
     if(affected_by_spell(ch, SKILL_NAT_SELECT)->modifier == GET_RACE(vict))
@@ -1528,7 +1530,7 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
 
   retval = damage(ch, vict, dam, weapon_type, w_type, weapon);
   if (SOMEONE_DIED(retval) || !ch->fighting) {
-    return retval | eSUCCESS;
+    return debug_retval(ch, vict, retval) | eSUCCESS;
   }  
   
   // Was last hit a success?
@@ -1537,13 +1539,13 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
     if (wielded) {
       retval = weapon_spells(ch, vict, weapon);     
       if (SOMEONE_DIED(retval) || !ch->fighting) {
-        return retval | eSUCCESS;
+        return debug_retval(ch, vict, retval) | eSUCCESS;
       }  
 
       if (ch->equipment[weapon] && obj_index[ch->equipment[weapon]->item_number].combat_func) {
         retval = ((*obj_index[ch->equipment[weapon]->item_number].combat_func)(ch, ch->equipment[weapon], 0, "", ch));
         if (SOMEONE_DIED(retval) || !ch->fighting) {
-          return retval | eSUCCESS;
+          return debug_retval(ch, vict, retval) | eSUCCESS;
         }        
       }
     } else { //not wielding a weapon    
@@ -1551,12 +1553,12 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
       
       retval = weapon_spells(ch, vict, WEAR_HANDS);     
       if (SOMEONE_DIED(retval) || !ch->fighting) {
-        return retval | eSUCCESS;
+        return debug_retval(ch, vict, retval) | eSUCCESS;
       }  
         if (obj_index[ch->equipment[WEAR_HANDS]->item_number].combat_func)  
           retval = ((*obj_index[ch->equipment[WEAR_HANDS]->item_number].combat_func)(ch, ch->equipment[WEAR_HANDS], 0, "", ch));
         if (SOMEONE_DIED(retval) || !ch->fighting) {
-          return retval | eSUCCESS;
+          return debug_retval(ch, vict, retval) | eSUCCESS;
         }        
       }
       
@@ -1564,13 +1566,13 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
         
       retval = weapon_spells(ch, vict, HOLD);     
       if (SOMEONE_DIED(retval) || !ch->fighting) {
-        return retval | eSUCCESS;
+        return debug_retval(ch, vict, retval) | eSUCCESS;
       }  
 
         if (obj_index[ch->equipment[HOLD]->item_number].combat_func)
           retval = ((*obj_index[ch->equipment[HOLD]->item_number].combat_func)(ch, ch->equipment[HOLD], 0, "", ch));
         if (SOMEONE_DIED(retval) || !ch->fighting) {
-          return retval | eSUCCESS;
+          return debug_retval(ch, vict, retval) | eSUCCESS;
         }        
       }
 
@@ -1578,12 +1580,12 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
 
       retval = weapon_spells(ch, vict, HOLD2);     
       if (SOMEONE_DIED(retval) || !ch->fighting) {
-        return retval | eSUCCESS;
+        return debug_retval(ch, vict, retval) | eSUCCESS;
       }  
         if (obj_index[ch->equipment[HOLD2]->item_number].combat_func)
           retval = ((*obj_index[ch->equipment[HOLD2]->item_number].combat_func)(ch, ch->equipment[HOLD2], 0, "", ch));
         if (SOMEONE_DIED(retval) || !ch->fighting) {
-          return retval | eSUCCESS;
+          return debug_retval(ch, vict, retval) | eSUCCESS;
         }        
       }          
     }
@@ -1592,7 +1594,7 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
     {
       retval = cast_poison(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, NULL, GET_LEVEL(ch));
       if(SOMEONE_DIED(retval))       
-        return retval | eSUCCESS;
+        return debug_retval(ch, vict, retval) | eSUCCESS;
     }
 
     if (IS_MOB(ch) && ISSET(ch->mobdata->actflags, ACT_DRAINY)) {
@@ -1601,7 +1603,7 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
       }
     }
 
-  return retval | eSUCCESS;  
+  return debug_retval(ch, vict, retval) | eSUCCESS;  
 } // one_hit 
 
 
@@ -1897,7 +1899,7 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
    attacktype == SKILL_FIRE_ARROW || attacktype == SKILL_TEMPEST_ARROW || 
    attacktype == SKILL_GRANITE_ARROW || attacktype == SKILL_ICE_ARROW ||
 	attacktype == SPELL_POISON)) 
-     return retval;
+     return debug_retval(ch, victim, retval);
   int l=0;
   if (dam!=0 && attacktype && attacktype < TYPE_HIT && attacktype != TYPE_UNDEFINED)
   { // Skill damages based on learned %
@@ -1941,7 +1943,7 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
          act("$n's spell streaks at $N and suddenly ceases to be.", ch, 0, victim, TO_ROOM, NOTVICT);
         }
         REMOVE_BIT(victim->combat, COMBAT_REPELANCE);
-        return retval;
+        return debug_retval(ch, victim, retval);
        }
        REMOVE_BIT(victim->combat, COMBAT_REPELANCE);
   //  }
@@ -2172,7 +2174,7 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
   if(attacktype != SKILL_BACKSTAB &&  GET_HIT(victim) > 0 &&
      (typeofdamage == DAMAGE_TYPE_PHYSICAL || attacktype == TYPE_PHYSICAL_MAGIC))
     if(do_frostshield(ch, victim)) {
-      return retval|eEXTRA_VALUE;;
+      return debug_retval(ch, victim, retval)|eEXTRA_VALUE;;
     }
 
   if(typeofdamage == DAMAGE_TYPE_PHYSICAL) {
@@ -2504,7 +2506,7 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
    attacktype == SPELL_LIGHTNING_BOLT || attacktype == SKILL_FIRE_ARROW ||
    attacktype == SKILL_ICE_ARROW || attacktype == SKILL_TEMPEST_ARROW ||
    attacktype == SKILL_GRANITE_ARROW || attacktype == SPELL_POISON)) // Wimpy
-      return retval;   
+      return debug_retval(ch, victim, retval);   
 
 
   if (typeofdamage == DAMAGE_TYPE_PHYSICAL && type == 1 && reduce > 0 && dam > 0 && ch != victim)
@@ -2569,7 +2571,7 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
     SET_BIT(retval, check_autojoiners(ch,1));
     if (!SOMEONE_DIED(retval))
     if (IS_AFFECTED(ch, AFF_CHARM)) SET_BIT(retval, check_joincharmie(ch));
-    if (SOMEONE_DIED(retval)) return retval;
+    if (SOMEONE_DIED(retval)) return debug_retval(ch, victim, retval);
      if(!IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_CHARMIEJOIN) && attacktype != SKILL_AMBUSH) {
        if(ch->followers) {
                struct follow_type *folnext;
@@ -2580,10 +2582,10 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
           }
        }
     }
-    if (SOMEONE_DIED(retval)) return retval;
+    if (SOMEONE_DIED(retval)) return debug_retval(ch, victim, retval);
   }
  }
-  return retval;
+  return debug_retval(ch, victim, retval);
 } 
 
 // this function deals damage in noncombat situations (falls, drowning, etc.)
@@ -2984,7 +2986,7 @@ int isHit(CHAR_DATA *ch, CHAR_DATA *victim, int attacktype, int &type, int &redu
     act("$n parries your attack.", victim, NULL, ch, TO_VICT, 0);
     act("You parry $N's attack.", victim, NULL, ch, TO_CHAR, 0);
     int retval = check_riposte(ch, victim, attacktype);
-    if (SOMEONE_DIED(retval)) return retval;
+    if (SOMEONE_DIED(retval)) return debug_retval(ch, victim, retval);
   } else if (what < (parry+dodge))
   { // Dodge
     act("$n dodges $N's attack.", victim, NULL, ch, TO_ROOM, NOTVICT);
@@ -3058,7 +3060,7 @@ int check_riposte(CHAR_DATA * ch, CHAR_DATA * victim, int attacktype)
   REMOVE_BIT(retval, eSUCCESS);
   SET_BIT(retval, eFAILURE);
 
-  return retval;  
+  return debug_retval(ch, victim, retval);  
 }
 
 int check_magic_block(CHAR_DATA *ch, CHAR_DATA *victim, int attacktype)
@@ -4319,7 +4321,7 @@ int do_skewer(CHAR_DATA *ch, CHAR_DATA *vict, int dam, int wt, int wt2, int weap
 //    if (GET_LEVEL(vict) > GET_LEVEL(ch))
   //    damadd /= GET_LEVEL(vict) - GET_LEVEL(ch);
     int retval = damage(ch, vict, damadd, wt, SKILL_SKEWER, weapon);
-    if (SOMEONE_DIED(retval)) return retval;
+    if (SOMEONE_DIED(retval)) return debug_retval(ch, vict, retval);
     //GET_HIT(vict) -= damadd;
     update_pos(vict);
     inform_victim(ch, vict, damadd); 
@@ -4335,7 +4337,7 @@ int do_skewer(CHAR_DATA *ch, CHAR_DATA *vict, int dam, int wt, int wt2, int weap
 //      update_pos(vict);
       return eSUCCESS|eVICT_DIED;
     }
-    return retval;
+    return debug_retval(ch, vict, retval);
 
   }
   // if they're still here the skewer missed
@@ -6185,7 +6187,7 @@ int weapon_spells(CHAR_DATA *ch, CHAR_DATA *vict, int weapon)
       break;
     } /* switch statement */
     if(SOMEONE_DIED(retval))
-      return retval;      
+      return debug_retval(ch, vict, retval);      
    
   } /* for loop */
 
@@ -6389,7 +6391,7 @@ int do_flee(struct char_data *ch, char *argument, int cmd)
 	  if (ispc) REMOVE_BIT(ch->combat, COMBAT_FLEEING);
 		// so that a player doesn't keep the flag afte rdying
           if(IS_SET(retval, eCH_DIED))
-             return retval;
+	      return retval;
 	  REMOVE_BIT(ch->combat, COMBAT_FLEEING);
           if (IS_SET(retval, eSUCCESS)) 
           {
@@ -6561,4 +6563,28 @@ int damage_type(int weapon_type)
     return(0);
   }  /* end switch */
   return(0);
+}
+
+inline int debug_retval(CHAR_DATA *ch, CHAR_DATA *victim, int retval)
+{
+    static int dumped = 0;
+    bool bugged = FALSE;
+
+    if (ch && ch->name == (char *)0x95959595 && !IS_SET(retval, eCH_DIED)) {
+	log("ch->name == 0x95959595 && !eCH_DIED", IMMORTAL, LOG_BUG);
+	bugged = TRUE;
+    }
+	
+    if (victim && victim->name == (char *)0x95959595 && !IS_SET(retval, eVICT_DIED)) {
+	log("victim->name == 0x95959595 && !eVICT_DIED", IMMORTAL, LOG_BUG);
+	bugged = TRUE;
+    }
+
+    // Only coredump up to 10 times
+    if (bugged && dumped < 10) {
+	produce_coredump();
+	dumped++;
+    }
+
+    return retval;
 }
