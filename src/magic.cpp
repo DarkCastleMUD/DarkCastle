@@ -6815,6 +6815,8 @@ int targetted_teleport(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
 int cast_teleport( ubyte level, CHAR_DATA *ch, char *arg, int type,
   CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill )
 {
+  CHAR_DATA *next_v;
+
   switch (type) {
   case SPELL_TYPE_POTION:
   case SPELL_TYPE_SPELL:
@@ -6831,12 +6833,14 @@ int cast_teleport( ubyte level, CHAR_DATA *ch, char *arg, int type,
 	 break;
 
   case SPELL_TYPE_STAFF:
-	for (tar_ch = world[ch->in_room].people ;
-		tar_ch ; tar_ch = tar_ch->next_in_room)
-	 if ( IS_NPC(tar_ch) )
-		targetted_teleport(level, ch, tar_ch, 0, skill);
-	return eSUCCESS;
-		break;
+    for (tar_ch = world[ch->in_room].people ; tar_ch ; tar_ch = next_v )
+    {
+      //must do it this way to insure staff continues in THIS room
+      next_v = tar_ch->next_in_room;
+      targetted_teleport(level, ch, tar_ch, 0, skill);
+    }
+    return eSUCCESS;
+    break;
 
   default :
 		log("Serious screw-up in teleport!", ANGEL, LOG_BUG);
