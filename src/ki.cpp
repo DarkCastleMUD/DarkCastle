@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.75 2008/06/16 22:13:25 kkoons Exp $ */
+/* $Id: ki.cpp,v 1.76 2008/06/16 22:31:53 kkoons Exp $ */
 
 extern "C"
 {
@@ -908,6 +908,7 @@ int ki_disrupt( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim)
   {
     retval = attack(victim, ch, 0);
     SWAP_CH_VICT(retval);
+    return retval;
   }
    return eSUCCESS;
 }
