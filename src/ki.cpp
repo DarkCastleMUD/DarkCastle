@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.74 2008/06/10 18:53:40 kkoons Exp $ */
+/* $Id: ki.cpp,v 1.75 2008/06/16 22:13:25 kkoons Exp $ */
 
 extern "C"
 {
@@ -904,6 +904,11 @@ int ki_disrupt( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim)
      act("The light, $B$6pulsing$R aura surrounding $n has been disrupted!", victim, 0, 0, TO_ROOM, 0);
    }
 
+  if(IS_NPC(victim) && !victim->fighting)
+  {
+    retval = attack(victim, ch, 0);
+    SWAP_CH_VICT(retval);
+  }
    return eSUCCESS;
 }
 
