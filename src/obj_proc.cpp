@@ -466,7 +466,7 @@ int bank(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
   char buf[MAX_INPUT_LENGTH];
   int32 x;
 
-  if(cmd != CMD_BALANCE || cmd != CMD_DEPOSIT || cmd != CMD_WITHDRAW)
+  if(cmd != CMD_BALANCE && cmd != CMD_DEPOSIT && cmd != CMD_WITHDRAW)
     return eFAILURE;
 
   /* balance */
@@ -530,7 +530,7 @@ int casino_atm(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
   char buf[MAX_INPUT_LENGTH];
   int32 x;
 
-  if(cmd != CMD_BALANCE || cmd != CMD_DEPOSIT || cmd != CMD_WITHDRAW)
+  if(cmd != CMD_BALANCE && cmd != CMD_DEPOSIT && cmd != CMD_WITHDRAW)
     return eFAILURE;
 
   /* balance */
