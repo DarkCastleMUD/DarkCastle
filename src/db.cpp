@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.169 2008/06/07 04:16:47 jhhudso Exp $ */
+/* $Id: db.cpp,v 1.170 2008/06/17 20:52:13 dcastle Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -2408,6 +2408,8 @@ void read_one_zone(FILE * fl, int zon)
       reset_tab[reset_top].arg3 = fread_int (fl, -64000, INT_MAX);
     else reset_tab[reset_top].arg3 = 0;
 
+    reset_tab[reset_top].lastPop = 0;
+
     if (reset_tab[reset_top].arg3 > 64000) reset_tab[reset_top].arg1 = 1;
 
     /* tjs hack - ugly tmp bug fix */
@@ -3856,10 +3858,11 @@ void reset_zone(int zone)
     {
 
         case 'M': /* read a mobile */
-        if((ZCMD.arg2 == -1 || mob_index[ZCMD.arg1].number < ZCMD.arg2)
-           && (mob = clone_mobile(ZCMD.arg1))) 
+        if((ZCMD.arg2 == -1 || mob_index[ZCMD.arg1].number < ZCMD.arg2 ||
+            (ZCMD.lastPop != 0 && !charExists(ZCMD.lastPop))) && (mob = clone_mobile(ZCMD.arg1))) 
         { 
           char_to_room(mob, ZCMD.arg3);
+	  ZCMD.lastPop = mob;
           GET_HOME(mob) = world_array[ZCMD.arg3]->number;
           zone_table[zone].num_mob_on_repop++;
           last_cmd = 1;
