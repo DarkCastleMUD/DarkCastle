@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.501 2008/06/13 01:29:56 jhhudso Exp $               *
+ * $Id: fight.cpp,v 1.502 2008/06/17 03:23:40 jhhudso Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -494,8 +494,6 @@ bool gets_dual_wield_attack(char_data * ch)
   return TRUE;
 }
 
-void debug_point() { return; }
-
 // int attack(...) FUNCTION SHOULD BE CALLED *INSTEAD* OF HIT IN ALL CASES!
 // standard retvals
 int attack(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
@@ -508,7 +506,7 @@ int attack(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
 
   if (!ch || !vict) { 
     log("NULL Victim or Ch sent to attack!  This crashes us!", -1, LOG_BUG);
-   // debug_point();
+    produce_coredump();
     return eINTERNAL_ERROR;
   }
 
@@ -3361,7 +3359,8 @@ void load_messages(char *file, int base)
 //     type += base;
      for (i = 0; (i < MAX_MESSAGES) && (fight_messages[i].a_type != type) &&
        (fight_messages[i].a_type); i++);
-     if (type == 80) debug_point();
+     if (type == 80)
+	 produce_coredump();
      if (i >= MAX_MESSAGES)
      {
        log("Too many combat messages.", ANGEL, LOG_BUG);
@@ -4697,7 +4696,7 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
 
     // update stats
     GET_RDEATHS(victim) += 1;
-    //debug_point();
+
     /* gods don't suffer from stat loss */
     if (GET_LEVEL(victim) < IMMORTAL && GET_LEVEL(victim) > 19)
     {

@@ -16,7 +16,7 @@
  *  10/21/2003   Onager    Changed IS_ANONYMOUS() to handle mobs without   *
  *                         crashing                                        *
  ***************************************************************************/
-/* $Id: utility.h,v 1.72 2008/05/17 03:38:15 jhhudso Exp $ */
+/* $Id: utility.h,v 1.73 2008/06/17 03:23:40 jhhudso Exp $ */
 
 #ifndef UTILITY_H_
 #define UTILITY_H_
@@ -42,6 +42,7 @@ void check_timer();
 
 #define TRUE  1
 #define FALSE 0
+#define COREDUMP_MAX 10
 
 #ifdef WIN32
 inline int random() { return(rand()); }
