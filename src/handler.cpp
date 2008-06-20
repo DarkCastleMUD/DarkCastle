@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.169 2008/06/20 14:07:29 dcastle Exp $ */
+/* $Id: handler.cpp,v 1.170 2008/06/20 14:14:33 dcastle Exp $ */
     
 extern "C"
 {
@@ -3307,6 +3307,8 @@ void extract_char(CHAR_DATA *ch, bool pull)
 /* 
  * Get a random character from the player's current room that is visible to
  * him and not him.
+ *
+ * Remember that this function can return NULL!
  */
 CHAR_DATA *get_rand_other_char_room_vis(CHAR_DATA *ch)
 {
