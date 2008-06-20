@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.168 2008/05/18 03:34:38 jhhudso Exp $ */
+/* $Id: handler.cpp,v 1.169 2008/06/20 14:07:29 dcastle Exp $ */
     
 extern "C"
 {
@@ -3384,7 +3384,8 @@ CHAR_DATA *get_char_room_vis(CHAR_DATA *ch, char *name)
    if (IS_AFFECTED(ch, AFF_BLACKJACK)) {
      struct affected_type *af = affected_by_spell(ch, SKILL_BLACKJACK);
      if (af) {
-       if (af->modifier == 1) {
+       if (af->modifier == 1 && get_rand_other_char_room_vis(ch)) {
+	// Added get_rand.. check above 'cause ch->fighting would get set to NULL.
 	 send_to_char("You're so dizzy you don't know who you're hitting.\n\r", ch);
 	 ch->fighting = get_rand_other_char_room_vis(ch);
 	 return ch->fighting;
