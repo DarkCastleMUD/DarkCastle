@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.502 2008/06/17 03:23:40 jhhudso Exp $               *
+ * $Id: fight.cpp,v 1.503 2008/06/25 18:32:59 dcastle Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -267,6 +267,10 @@ void perform_violence(void)
       }
    }
    if (SOMEONE_DIED(retval)) continue;
+
+  // Fix for null fighty thing. Charmie joins, enemy wimpies. Fighting has stopped, but no code here, until now, detected it.
+  if (!ch->fighting || !ch->fighting->in_room == ch->in_room) continue;
+
 
     if(can_attack(ch)) {
       is_mob = IS_MOB(ch);
@@ -3359,8 +3363,8 @@ void load_messages(char *file, int base)
 //     type += base;
      for (i = 0; (i < MAX_MESSAGES) && (fight_messages[i].a_type != type) &&
        (fight_messages[i].a_type); i++);
-     if (type == 80)
-	 produce_coredump();
+//     if (type == 80)
+//	 produce_coredump();
      if (i >= MAX_MESSAGES)
      {
        log("Too many combat messages.", ANGEL, LOG_BUG);
