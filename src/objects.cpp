@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.99 2008/05/29 18:25:38 kkoons Exp $
+| $Id: objects.cpp,v 1.100 2008/07/01 19:13:30 kkoons Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -216,7 +216,6 @@ void name_from_drinkcon(struct obj_data *obj)
 
 int do_switch(struct char_data *ch, char *arg, int cmd)
 {
-  int percent, learned;
   struct obj_data *between;
 
   if(IS_SET(world[ch->in_room].room_flags, QUIET)) {
@@ -236,10 +235,7 @@ int do_switch(struct char_data *ch, char *arg, int cmd)
   }
   GET_MOVE(ch) -= 4;
 
-  percent = number(1,100);
-  learned = has_skill(ch, SKILL_SWITCH);
-
-  if (!learned || !skill_success(ch,NULL,SKILL_SWITCH)) {
+  if (!has_skill(ch, SKILL_SWITCH) || !skill_success(ch,NULL,SKILL_SWITCH)) {
     act("$n fails to switch $s weapons.", ch,0,0, TO_ROOM, 0);
     act("You fail to switch your weapons.", ch, 0,0, TO_CHAR, 0);
     return eFAILURE;
@@ -1876,6 +1872,46 @@ MIN(GET_STR(ch)/2, get_max_stat(ch, STR)/2) &&
     }
   } break;
 
+
+
+  case 17: //primary
+    if(CAN_WEAR(obj_object,ITEM_WIELD)) 
+    {
+       //if not wielding anything, just call regular wield
+       if(!ch->equipment[WIELD])
+       {
+         wear(ch, obj_object, 12);
+         return;
+       }
+
+       if(!hands_are_free(ch, 1))
+       {
+         send_to_char("Your hands are already full.\n\r", ch);
+         break;
+       }
+
+
+
+       /*if (!has_skill(ch, SKILL_SWITCH) || !skill_success(ch,NULL,SKILL_SWITCH)) 
+       {
+         act("$n fails to switch $s weapons.", ch,0,0, TO_ROOM, 0);
+         act("You fail to switch your weapons.", ch, 0,0, TO_CHAR, 0);
+         return;
+       }*/
+
+       struct obj_data *obj_temp = ch->equipment[WIELD];
+       obj_to_char(unequip_char(ch, WIELD) , ch);
+       wear(ch, obj_object, 12);
+       wear(ch, obj_temp, 12);
+       return;
+    }
+    else
+      send_to_char("You can't wield that.\n\r", ch);
+  break;
+
+
+
+
   case -1: {
     sprintf(buffer,"Wear %s where?.\n\r", fname(obj_object->name));
     send_to_char(buffer, ch);
@@ -1946,6 +1982,7 @@ int do_wear(struct char_data *ch, char *argument, int cmd)
         "hold",
         "ear",
         "light",
+	"primary",
         "\n"
     };
 
@@ -2025,18 +2062,30 @@ int do_wield(struct char_data *ch, char *argument, int cmd)
       }
 
     argument_interpreter(argument, arg1, arg2);
-    if (*arg1) {
+    if (*arg1) 
+    {
         obj_object = get_obj_in_list_vis(ch, arg1, ch->carrying);
-        if(!obj_object && IS_AFFECTED(ch, AFF_BLIND) && has_skill(ch, SKILL_BLINDFIGHTING)) {
+        if(!obj_object && IS_AFFECTED(ch, AFF_BLIND) && has_skill(ch, SKILL_BLINDFIGHTING)) 
+        {
            obj_object = get_obj_in_list_vis(ch, arg1, ch->carrying, TRUE);
            blindlag = TRUE;
         }
-        if (obj_object) {
-            wear(ch, obj_object, keyword);
-            if(blindlag) WAIT_STATE(ch, PULSE_VIOLENCE);
+        if (obj_object) 
+	{
+	  if (*arg2) 
+          {
+            if(arg2[0] == 'p')
+              keyword = 17;
+            if(arg2[0] == 's')
+              keyword = 18;
+          }          
+
+	  wear(ch, obj_object, keyword);
+
+          if(blindlag) WAIT_STATE(ch, PULSE_VIOLENCE);
         } else {
-            sprintf(buffer, "You do not seem to have the '%s'.\n\r",arg1);
-            send_to_char(buffer,ch);
+          sprintf(buffer, "You do not seem to have the '%s'.\n\r",arg1);
+          send_to_char(buffer,ch);
         }
     } else {
         send_to_char("Wield what?\n\r", ch);
