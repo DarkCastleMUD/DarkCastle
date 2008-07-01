@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.100 2008/07/01 19:13:30 kkoons Exp $
+| $Id: objects.cpp,v 1.101 2008/07/01 19:18:36 kkoons Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -2076,8 +2076,6 @@ int do_wield(struct char_data *ch, char *argument, int cmd)
           {
             if(arg2[0] == 'p')
               keyword = 17;
-            if(arg2[0] == 's')
-              keyword = 18;
           }          
 
 	  wear(ch, obj_object, keyword);
