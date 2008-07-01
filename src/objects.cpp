@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.101 2008/07/01 19:18:36 kkoons Exp $
+| $Id: objects.cpp,v 1.102 2008/07/01 19:50:55 kkoons Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -1891,13 +1891,19 @@ MIN(GET_STR(ch)/2, get_max_stat(ch, STR)/2) &&
        }
 
 
+       if (GET_MOVE(ch) < 4) {
+         send_to_char("You are too tired to switch your weapons!", ch);
+         return;
+       }
+       GET_MOVE(ch) -= 4;
 
-       /*if (!has_skill(ch, SKILL_SWITCH) || !skill_success(ch,NULL,SKILL_SWITCH)) 
+
+       if (!has_skill(ch, SKILL_SWITCH) || !skill_success(ch,NULL,SKILL_SWITCH)) 
        {
          act("$n fails to switch $s weapons.", ch,0,0, TO_ROOM, 0);
          act("You fail to switch your weapons.", ch, 0,0, TO_CHAR, 0);
          return;
-       }*/
+       }
 
        struct obj_data *obj_temp = ch->equipment[WIELD];
        obj_to_char(unequip_char(ch, WIELD) , ch);
