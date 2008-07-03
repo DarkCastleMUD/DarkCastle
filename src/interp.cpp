@@ -16,7 +16,7 @@
 /* 12/08/2003   Onager   Added chop_half() to work like half_chop() but    */
 /*                       chopping off the last word.                       */
 /***************************************************************************/
-/* $Id: interp.cpp,v 1.150 2008/06/12 23:36:45 kkoons Exp $ */
+/* $Id: interp.cpp,v 1.151 2008/07/03 12:53:20 dcastle Exp $ */
 
 extern "C"
 {
@@ -740,6 +740,13 @@ int command_interpreter( CHAR_DATA *ch, char *pcomm, bool procced  )
   strncpy(last_processed_cmd, pcomm, (MAX_INPUT_LENGTH-1));
   strncpy(last_char_name, GET_NAME(ch), (MAX_INPUT_LENGTH-1));
   last_char_room = ch->in_room;
+
+
+  if (pcomm && *pcomm) {
+    retval = oprog_command_trigger(pcomm, ch, &pcomm[look_at]);
+    if (SOMEONE_DIED(retval) || IS_SET(retval, eEXTRA_VALUE))
+        return retval;
+  }
   
   // Look for command in command table.
   // Old method used a linear search. *yuck* (Sadus)

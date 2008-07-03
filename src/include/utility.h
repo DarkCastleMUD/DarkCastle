@@ -16,7 +16,7 @@
  *  10/21/2003   Onager    Changed IS_ANONYMOUS() to handle mobs without   *
  *                         crashing                                        *
  ***************************************************************************/
-/* $Id: utility.h,v 1.73 2008/06/17 03:23:40 jhhudso Exp $ */
+/* $Id: utility.h,v 1.74 2008/07/03 12:52:53 dcastle Exp $ */
 
 #ifndef UTILITY_H_
 #define UTILITY_H_
@@ -494,7 +494,7 @@ int mprog_damage_trigger( CHAR_DATA *mob, CHAR_DATA *ch, int amount );
 int oprog_catch_trigger(obj_data *obj, int catch_num, char *var, int opt, char_data *actor, obj_data *obj2, void *vo);
 int oprog_act_trigger( char *txt, CHAR_DATA *ch );
 int oprog_speech_trigger( char *txt, CHAR_DATA *ch );
-int oprog_command_trigger( char *txt, CHAR_DATA *ch );
+int oprog_command_trigger( char *txt, CHAR_DATA *ch, char *arg );
 int oprog_weapon_trigger( CHAR_DATA *ch, OBJ_DATA *item );
 int oprog_armour_trigger( CHAR_DATA *ch, OBJ_DATA *item );
 int oprog_rand_trigger( OBJ_DATA *item);
