@@ -54,12 +54,14 @@ extern struct index_data *mob_index;
 extern struct index_data *obj_index;
 CHAR_DATA *rndm2;
 extern struct obj_data  *object_list;
+extern struct room_data ** world_array;
 
 CHAR_DATA *activeActor = NULL;
 CHAR_DATA *activeRndm = NULL;
 CHAR_DATA *activeTarget = NULL;
 OBJ_DATA *activeObj = NULL;
 void *activeVo = NULL;
+
 
 char *activeProg;
 char *activePos;
@@ -529,8 +531,9 @@ void translate_value(char *leftptr, char *rightptr, int16 **vali, uint32 **valui
 		  else {intval = &target->damroll;}
 		} else if (!str_cmp(right,"description"))
 		{
-		   if (!target && !otarget) tError = TRUE;
+		   if (!target && !otarget && !rtarget) tError = TRUE;
 		   else if (otarget) { stringval = &otarget->description; }
+		   else if (rtarget >= 0) { if (world_array[rtarget]) stringval = &world[rtarget].description; else tError = TRUE; }
 		   else {stringval = &target->description; }
 		} else if (!str_cmp(right,"dexterity"))
 		{
@@ -696,7 +699,8 @@ void translate_value(char *leftptr, char *rightptr, int16 **vali, uint32 **valui
 	case 'n':
 		if (!str_cmp(right, "name"))
 		{
-		  if (!target) tError = TRUE;
+		  if (!target && !rtarget) tError = TRUE;
+		  else if (rtarget >= 0) { if (world_array[rtarget]) stringval = &world[rtarget].name; else tError = TRUE; }
 		  else stringval = &target->name;
 		}
 		break;
@@ -3823,21 +3827,25 @@ int oprog_armour_trigger( CHAR_DATA *ch, OBJ_DATA *item )
    return mprog_cur_result;
 }
 
-int oprog_command_trigger( char *txt, CHAR_DATA *ch )
+int oprog_command_trigger( char *txt, CHAR_DATA *ch, char *arg )
 {
 
   CHAR_DATA *vmob;
   OBJ_DATA *item;
 
-  mprog_cur_result = eSUCCESS;
+  mprog_cur_result = eFAILURE;
 
-
-  for (item = world[ch->in_room].contents; item; item = 
-item->next_content)
+  char buf[MAX_STRING_LENGTH];
+  for (item = world[ch->in_room].contents; item; item = item->next_content)
      if (obj_index[item->item_number].progtypes & COMMAND_PROG)
      {
+	  if (arg && *arg) {
+	    sprintf(buf, "%s lasttyped %s", GET_NAME(ch), arg);
+	    do_mpsettemp(ch, &buf[0], 999);
+	  }
+
 	vmob = initiate_oproc(ch, item);
-	if (mprog_wordlist_check(txt, ch, vmob, NULL, NULL, COMMAND_PROG))
+	if (mprog_wordlist_check(txt, vmob, ch, NULL, NULL, COMMAND_PROG))
         {
  	  end_oproc(vmob);
 	  return mprog_cur_result;
@@ -3847,8 +3855,12 @@ item->next_content)
   for (item = ch->carrying; item; item = item->next_content)
      if (obj_index[item->item_number].progtypes & COMMAND_PROG)
      {
+	  if (arg && *arg) {
+	  sprintf(buf, "lasttyped %s", arg);
+	  do_mpsettemp(ch, &buf[0], 999);
+	  }
 	vmob = initiate_oproc(ch, item);
-	if (mprog_wordlist_check(txt, ch, vmob, NULL, NULL, COMMAND_PROG))
+	if (mprog_wordlist_check(txt, vmob, ch, NULL, NULL, COMMAND_PROG))
         {
  	  end_oproc(vmob);
 	  return mprog_cur_result;
@@ -3858,11 +3870,15 @@ item->next_content)
 
   for (int i = 0; i < MAX_WEAR; i++)
   if (ch->equipment[i])
-     if (obj_index[ch->equipment[i]->item_number].progtypes & 
-COMMAND_PROG)
+     if (obj_index[ch->equipment[i]->item_number].progtypes & COMMAND_PROG)
      {
+	  if (arg && *arg) {
+	  sprintf(buf, "lasttyped %s", arg);
+	  do_mpsettemp(ch, &buf[0], 999);
+	  }
+
 	vmob = initiate_oproc(ch, ch->equipment[i]);
-	if (mprog_wordlist_check(txt, ch, vmob, NULL, NULL, COMMAND_PROG))
+	if (mprog_wordlist_check(txt, vmob, ch, NULL, NULL, COMMAND_PROG))
         {
  	  end_oproc(vmob);
 	  return mprog_cur_result;
