@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.177 2008/06/04 15:22:30 apocalypse Exp $ */
+/* $Id: mob_proc.cpp,v 1.178 2008/07/03 17:37:49 apocalypse Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -1750,7 +1750,14 @@ static char *dethSayText [ ] =
   "I wish my lawn was Emo so it would cut itself.",
   "DON'T TAZE ME BRO!",
   "Online Rage: That's Entertaintment!",
-  "I just ate a Dr. Scholl's gel insert and I don't feel any better. :("
+  "I just ate a Dr. Scholl's gel insert and I don't feel any better. :(",
+  "Mark my words, wireless is a flash in the pan...wires rock!",
+  "You can't take it with you.  Unless its less than 100ml and in a transparent ziplocked bag.",
+  "Surrounding yourself with geekier people will not make you any less of a geek.",
+  "I have delusions of mediocrity.",
+  "I never faked it with you.  Okay, one time.",
+  "The first step is not admitting you have a problem -- the first step is acquiring a problem.",
+  "The time is now!  Anything you start right now will succeed! ...too late."
  };
 
 // ENDOFCHAIN
