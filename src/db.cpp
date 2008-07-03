@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.172 2008/06/19 21:09:08 dcastle Exp $ */
+/* $Id: db.cpp,v 1.173 2008/07/03 12:53:39 dcastle Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -3859,7 +3859,7 @@ void reset_zone(int zone)
 
         case 'M': /* read a mobile */
         if((ZCMD.arg2 == -1 || ZCMD.lastPop == 0 || !charExists(ZCMD.lastPop) 
-	|| (charExists(ZCMD.lastPop) && IS_NPC(ZCMD.lastPop) && ZCMD.lastPop->mobdata->nr != ZCMD.arg1)) && mob_index[ZCMD.arg1].number < ZCMD.arg2 && (mob = clone_mobile(ZCMD.arg1)))
+	|| (charExists(ZCMD.lastPop) && (!IS_NPC(ZCMD.lastPop) || ZCMD.lastPop->mobdata->nr != ZCMD.arg1))) && mob_index[ZCMD.arg1].number < ZCMD.arg2 && (mob = clone_mobile(ZCMD.arg1)))
         { 
           char_to_room(mob, ZCMD.arg3);
 	  ZCMD.lastPop = mob;
