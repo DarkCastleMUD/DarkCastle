@@ -107,6 +107,7 @@ char *mprog_type_to_name( int type )
     case LOAD_PROG:		return "load_prog";
     case CAN_SEE_PROG:		return "can_see_prog";
     case DAMAGE_PROG:		return "damage_prog";
+    case COMMAND_PROG:		return "command_prog";
     default:                    return "ERROR_PROG";
     }
 }
@@ -1215,7 +1216,7 @@ int do_mpsettemp(CHAR_DATA *ch, char *argument, int cmd)
   char arg2[MAX_INPUT_LENGTH];
   char arg3[MAX_INPUT_LENGTH];
   CHAR_DATA *victim;
-  if (!IS_NPC(ch)) {
+  if (!IS_NPC(ch) && cmd != 999) {
     send_to_char("Huh?\r\n",ch);
     return eFAILURE;
   }
@@ -2082,16 +2083,17 @@ int do_mpsetmath(char_data *ch, char *arg, int cmd)
   vict = activeTarget;
   if (!vict)
   {
-	    logf( IMMORTAL, LOG_WORLD, "Mpsetmath - No target: vnum %d.",
-	  	mob_index[ch->mobdata->nr].virt );
-	    return eFAILURE;
+//	    logf( IMMORTAL, LOG_WORLD, "Mpsetmath - No target: vnum %d.",
+//	  	mob_index[ch->mobdata->nr].virt );
+//	    return eFAILURE;
   }
-  if (IS_NPC(vict)) allowed = TRUE;
-  else
+  if (vict && IS_NPC(vict)) allowed = TRUE;
+  else if (vict)
     for (int i = 0; allowedData[i]; i++)
       if (!str_cmp(allowedData[i],r))
 	allowed = TRUE;
-  if (!allowed)
+
+  if (!allowed && vict)
   {
 	    logf( IMMORTAL, LOG_WORLD, "Mpsetmath - Accessing unallowed data: vnum %d.",
 	  	mob_index[ch->mobdata->nr].virt );
