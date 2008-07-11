@@ -19,7 +19,7 @@
 /* 12/06/2003   Onager   Modified mobile_activity() to prevent charmie    */
 /*                       scavenging                                       */
 /**************************************************************************/
-/* $Id: mob_act.cpp,v 1.46 2008/01/05 09:20:01 jhhudso Exp $ */
+/* $Id: mob_act.cpp,v 1.47 2008/07/11 14:44:01 dcastle Exp $ */
 
 extern "C"
 {
@@ -158,7 +158,7 @@ void mobile_activity(void)
         for ( tmp_act = ch->mobdata->mpact; tmp_act != NULL; tmp_act = tmp_act->next )
         {
              mprog_wordlist_check( tmp_act->buf, ch, tmp_act->ch,
-                       tmp_act->obj, tmp_act->vo, ACT_PROG );
+                       tmp_act->obj, tmp_act->vo, ACT_PROG, FALSE );
              retval = mprog_cur_result;
              if(IS_SET(retval, eCH_DIED))
                break; // break so we can continue with the next mob
