@@ -2811,7 +2811,7 @@ bool objExists(OBJ_DATA *obj)
  *  complex procedures, everything is farmed out to the other guys.
  */
 void mprog_driver ( char *com_list, CHAR_DATA *mob, CHAR_DATA *actor,
-		   OBJ_DATA *obj, void *vo, struct mprog_throw_type *thrw )
+		   OBJ_DATA *obj, void *vo, struct mprog_throw_type *thrw, CHAR_DATA *rndm )
 {
 
  char tmpcmndlst[ MAX_STRING_LENGTH ];
@@ -2819,7 +2819,7 @@ void mprog_driver ( char *com_list, CHAR_DATA *mob, CHAR_DATA *actor,
  char *morebuf;
  char *command_list;
  char *cmnd;
- CHAR_DATA *rndm  = NULL;
+// CHAR_DATA *rndm  = NULL;
  CHAR_DATA *vch   = NULL;
  int        count = 0;
  if (IS_AFFECTED( mob, AFF_CHARM ))
@@ -2858,7 +2858,7 @@ void mprog_driver ( char *com_list, CHAR_DATA *mob, CHAR_DATA *actor,
  if(count)
    count = number( 1, count );  // if we have valid victs, choose one
 
- if(count) 
+ if(!rndm && count) 
  {
    for ( vch = world[mob->in_room].people; vch && count; )
    {
@@ -2928,7 +2928,8 @@ void mprog_driver ( char *com_list, CHAR_DATA *mob, CHAR_DATA *actor,
 // Returns TRUE if match
 // FALSE if no match
 int mprog_wordlist_check( char *arg, CHAR_DATA *mob, CHAR_DATA *actor,
-			  OBJ_DATA *obj, void *vo, int type )
+			  OBJ_DATA *obj, void *vo, int type, bool reverse )
+// reverse ALSO IMPLIES IT ALSO ONLY CHECKS THE FIRST WORD
 {
 
   char        temp1[ MAX_STRING_LENGTH ];
@@ -2947,16 +2948,22 @@ int mprog_wordlist_check( char *arg, CHAR_DATA *mob, CHAR_DATA *actor,
 //= next )
  mprg = mob_index[mob->mobdata->nr].mobprogs;
  if (!mprg) { done = TRUE; mprg = mob_index[mob->mobdata->nr].mobspec; }
+
  for ( ; mprg != NULL; mprg = next )
   {
     next = mprg->next;
     if ( mprg->type & type )
       {
-	strcpy( temp1, mprg->arglist );
+	if (!reverse) strcpy( temp1, mprg->arglist );
+	else strcpy(temp1, arg);
+
 	list = temp1;
 	for ( i = 0; i < (signed) strlen( list ); i++ )
 	  list[i] = LOWER( list[i] );
-	strcpy( temp2, arg );
+
+	if (!reverse) strcpy( temp2, arg );
+	else strcpy(temp2, mprg->arglist);
+
 	dupl = temp2;
 	for ( i = 0; i < (signed) strlen( dupl ); i++ )
 	  dupl[i] = LOWER( dupl[i] );
@@ -2975,7 +2982,7 @@ int mprog_wordlist_check( char *arg, CHAR_DATA *mob, CHAR_DATA *actor,
                       || *end == '!' ) )
 		{
                   retval = 1;
-		  mprog_driver( mprg->comlist, mob, actor, obj, vo );
+		  mprog_driver( mprg->comlist, mob, actor, obj, vo, NULL, NULL );
 		if (selfpurge) return retval;
 		  break;
 		}
@@ -2986,6 +2993,7 @@ int mprog_wordlist_check( char *arg, CHAR_DATA *mob, CHAR_DATA *actor,
 	  {
 	    list = one_argument( list, word );
 	    for( ; word[0] != '\0'; list = one_argument( list, word ) )
+	    {
 	      while ( ( start = strstr( dupl, word ) ) )
 		if ( ( start == dupl || *(start-1) == ' ' )
 		    && ( *(end = start + strlen( word ) ) == ' '
@@ -2998,12 +3006,14 @@ int mprog_wordlist_check( char *arg, CHAR_DATA *mob, CHAR_DATA *actor,
                         || *end == '!' ) )
 		  {
                     retval = 1;
-		    mprog_driver( mprg->comlist, mob, actor, obj, vo );
+		    mprog_driver( mprg->comlist, mob, actor, obj, vo, NULL, NULL );
 		if (selfpurge) return retval;
 		    break;
 		  }
 		else
 		  dupl = start+1;
+		if (reverse) break;
+  	    }
 	  }
       }
      if (next == NULL && !done) { done = TRUE;
@@ -3027,7 +3037,7 @@ void mprog_percent_check( CHAR_DATA *mob, CHAR_DATA *actor, OBJ_DATA *obj,
    if ( ( mprg->type & type )
        && ( number(0, 99) < atoi( mprg->arglist ) ) )
      {
-       mprog_driver( mprg->comlist, mob, actor, obj, vo );
+       mprog_driver( mprg->comlist, mob, actor, obj, vo, NULL, NULL );
 		if (selfpurge) return;
        if ( type != GREET_PROG && type != ALL_GREET_PROG )
 	 break;
@@ -3114,7 +3124,7 @@ int mprog_bribe_trigger( CHAR_DATA *mob, CHAR_DATA *ch, int amount )
 	if ( ( mprg->type & BRIBE_PROG )
 	    && ( amount >= atoi( mprg->arglist ) ) )
 	  {
-	    mprog_driver( mprg->comlist, mob, ch, obj, NULL );
+	    mprog_driver( mprg->comlist, mob, ch, obj, NULL, NULL, NULL );
 		if (selfpurge) return mprog_cur_result;
 	    break;
 	  }
@@ -3144,7 +3154,7 @@ int mprog_damage_trigger( CHAR_DATA *mob, CHAR_DATA *ch, int amount )
 	if ( ( mprg->type & DAMAGE_PROG )
 	    && ( amount >= atoi( mprg->arglist ) ) )
 	  {
-	    mprog_driver( mprg->comlist, mob, ch, obj, NULL );
+	    mprog_driver( mprg->comlist, mob, ch, obj, NULL, NULL, NULL );
 		if (selfpurge) return mprog_cur_result;
 	    break;
 	  }
@@ -3225,7 +3235,7 @@ int mprog_give_trigger( CHAR_DATA *mob, CHAR_DATA *ch, OBJ_DATA *obj )
 	       || ( !str_cmp( "all", buf ) ) ) )
 	 {
 	   okay = TRUE;
-	   mprog_driver( mprg->comlist, mob, ch, obj, NULL );
+	   mprog_driver( mprg->comlist, mob, ch, obj, NULL, NULL, NULL );
 		if (selfpurge) return mprog_cur_result;
 	   break;
 	 }
@@ -3292,7 +3302,7 @@ mob_index[mob->mobdata->nr].progtypes & HITPRCNT_PROG ) )
      if ( ( mprg->type & HITPRCNT_PROG )
 	 && ( ( 100*mob->hit / mob->max_hit ) < atoi( mprg->arglist ) ) )
        {
-	 mprog_driver( mprg->comlist, mob, ch, NULL, NULL );
+	 mprog_driver( mprg->comlist, mob, ch, NULL, NULL, NULL, NULL );
 		if (selfpurge) return mprog_cur_result;
 	 break;
        }
@@ -3358,7 +3368,7 @@ int mprog_speech_trigger( char *txt, CHAR_DATA *mob )
 
 }
 
-int mprog_catch_trigger(char_data * mob, int catch_num, char *var, int opt, char_data *actor, obj_data *obj, void *vo)
+int mprog_catch_trigger(char_data * mob, int catch_num, char *var, int opt, char_data *actor, obj_data *obj, void *vo, char_data *rndm)
 {
  MPROG_DATA *mprg;
  MPROG_DATA *next;
@@ -3408,7 +3418,7 @@ int mprog_catch_trigger(char_data * mob, int catch_num, char *var, int opt, char
 
 		}
 	  }
-           mprog_driver( mprg->comlist, mob,actor, obj, vo );
+           mprog_driver( mprg->comlist, mob,actor, obj, vo, NULL, rndm );
 		if (selfpurge) return mprog_cur_result;
 
            break;
@@ -3473,14 +3483,14 @@ void update_mprog_throws()
 
       // if !vict, oh well....remove it anyway.  Someone killed him.
       if (action->data_num == -999 && vict) { // 'tis a pause
-	mprog_driver(action->orig, vict, action->actor, action->obj,action->vo, action);
+	mprog_driver(action->orig, vict, action->actor, action->obj,action->vo, action, action->rndm);
 	dc_free(action->orig);
 	action->orig = 0;
  	}
       else if(vict)  // activate
-        mprog_catch_trigger(vict, action->data_num, action->var,action->opt,action->actor, action->obj, action->vo);
+        mprog_catch_trigger(vict, action->data_num, action->var,action->opt,action->actor, action->obj, action->vo, action->rndm);
       else if (vobj)
-	oprog_catch_trigger(vobj, action->data_num, action->var,action->opt, action->actor, action->obj, action->vo);
+	oprog_catch_trigger(vobj, action->data_num, action->var,action->opt, action->actor, action->obj, action->vo, action->rndm);
       dc_free(action);
    }
 };
@@ -3592,7 +3602,7 @@ int oprog_speech_trigger( char *txt, CHAR_DATA *ch )
 }
 
 
-int oprog_catch_trigger(obj_data *obj, int catch_num, char *var, int opt, char_data *actor, obj_data *obj2, void *vo)
+int oprog_catch_trigger(obj_data *obj, int catch_num, char *var, int opt, char_data *actor, obj_data *obj2, void *vo, char_data *rndm)
 {
  MPROG_DATA *mprg;
  int curr_catch;
@@ -3629,7 +3639,7 @@ int oprog_catch_trigger(obj_data *obj, int catch_num, char *var, int opt, char_d
 	     vmob->tempVariable = eh;
            }
 
-           mprog_driver( mprg->comlist, vmob, actor, obj2, vo );
+           mprog_driver( mprg->comlist, vmob, actor, obj2, vo, NULL, rndm );
 		if (selfpurge) return mprog_cur_result;
 	   end_oproc(vmob);
 	   break;
@@ -3845,7 +3855,7 @@ int oprog_command_trigger( char *txt, CHAR_DATA *ch, char *arg )
 	  }
 
 	vmob = initiate_oproc(ch, item);
-	if (mprog_wordlist_check(txt, vmob, ch, NULL, NULL, COMMAND_PROG))
+	if (mprog_wordlist_check(txt, vmob, ch, NULL, NULL, COMMAND_PROG, TRUE))
         {
  	  end_oproc(vmob);
 	  return mprog_cur_result;
@@ -3856,11 +3866,11 @@ int oprog_command_trigger( char *txt, CHAR_DATA *ch, char *arg )
      if (obj_index[item->item_number].progtypes & COMMAND_PROG)
      {
 	  if (arg && *arg) {
-	  sprintf(buf, "lasttyped %s", arg);
+	  sprintf(buf, "%s lasttyped %s", GET_NAME(ch), arg);
 	  do_mpsettemp(ch, &buf[0], 999);
 	  }
 	vmob = initiate_oproc(ch, item);
-	if (mprog_wordlist_check(txt, vmob, ch, NULL, NULL, COMMAND_PROG))
+	if (mprog_wordlist_check(txt, vmob, ch, NULL, NULL, COMMAND_PROG, TRUE))
         {
  	  end_oproc(vmob);
 	  return mprog_cur_result;
@@ -3873,12 +3883,12 @@ int oprog_command_trigger( char *txt, CHAR_DATA *ch, char *arg )
      if (obj_index[ch->equipment[i]->item_number].progtypes & COMMAND_PROG)
      {
 	  if (arg && *arg) {
-	  sprintf(buf, "lasttyped %s", arg);
+	  sprintf(buf, "%s lasttyped %s", GET_NAME(ch), arg);
 	  do_mpsettemp(ch, &buf[0], 999);
 	  }
 
 	vmob = initiate_oproc(ch, ch->equipment[i]);
-	if (mprog_wordlist_check(txt, vmob, ch, NULL, NULL, COMMAND_PROG))
+	if (mprog_wordlist_check(txt, vmob, ch, NULL, NULL, COMMAND_PROG, TRUE))
         {
  	  end_oproc(vmob);
 	  return mprog_cur_result;
