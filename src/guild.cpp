@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.121 2008/05/30 18:03:45 kkoons Exp $
+| $Id: guild.cpp,v 1.122 2008/07/11 14:42:54 dcastle Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -515,7 +515,7 @@ int skills_guild(struct char_data *ch, char *arg, struct char_data *owner)
       struct skill_quest *sq;
       if ((sq=find_sq(skilllist[skillnumber].skillname)) != NULL && sq->message && IS_SET(sq->clas, 1<<(GET_CLASS(ch)-1)))
       {
-	  mprog_driver(sq->message, owner, ch, NULL, NULL);
+	  mprog_driver(sq->message, owner, ch, NULL, NULL, NULL, NULL);
 	  switch(skillnumber)
 	  {
 	      case SPELL_VAMPIRIC_AURA:
