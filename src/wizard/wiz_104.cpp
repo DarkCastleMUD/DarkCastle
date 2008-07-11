@@ -414,7 +414,14 @@ int show_zone_commands(struct char_data *ch, int i, int start = 0)
       if(zone_table[i].cmd[j].arg2 == -1)
         strcat(buf, "(  always ) in room ");
       else sprintf(buf, "%s(if< [%3d]) in room ", buf, zone_table[i].cmd[j].arg2);
-      sprintf(buf, "%s[%5d].$R\r\n", buf,zone_table[i].cmd[j].arg3);
+      sprintf(buf, "%s[%5d].$R", buf,zone_table[i].cmd[j].arg3);
+      if (ch && !str_cmp(ch->name, "Urizen"))
+      {
+        sprintf(buf,"%s [%d] [%d] %s",buf, 
+ 	zone_table[i].cmd[j].lastPop?1:0, charExists(zone_table[i].cmd[j].lastPop), 
+	charExists(zone_table[i].cmd[j].lastPop)?GET_SHORT(zone_table[i].cmd[j].lastPop):"Unknown");
+      }
+      sprintf(buf, "%s\r\n",buf);
       break;
     case 'O':
       virt = ZCMD.active?obj_index[ZCMD.arg1].virt:ZCMD.arg1;
