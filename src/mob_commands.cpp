@@ -1087,7 +1087,8 @@ int do_mpthrow( CHAR_DATA *ch, char *argument, int cmd )
   throwitem->actor = activeActor;
   throwitem->obj = activeObj;
   throwitem->vo = activeVo;
-  
+  throwitem->rndm = NULL;
+
   if (fourth[0] !='\0')
    throwitem->var = str_dup(fourth);
   else
@@ -1737,11 +1738,13 @@ int do_mppause( CHAR_DATA *ch, char *argument, int cmd )
   throwitem->mob = TRUE; // This is, suprisingly, a mob
 
   extern CHAR_DATA *activeActor;
+  extern CHAR_DATA *activeRndm;
   extern OBJ_DATA *activeObj;
   extern void *activeVo;
   throwitem->actor = activeActor;
   throwitem->obj = activeObj;
   throwitem->vo = activeVo;
+  throwitem->rndm = activeRndm;
 
 
   extern char *activeProg;
