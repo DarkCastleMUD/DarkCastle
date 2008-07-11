@@ -16,7 +16,7 @@
  *  10/21/2003   Onager    Changed IS_ANONYMOUS() to handle mobs without   *
  *                         crashing                                        *
  ***************************************************************************/
-/* $Id: utility.h,v 1.74 2008/07/03 12:52:53 dcastle Exp $ */
+/* $Id: utility.h,v 1.75 2008/07/11 14:42:08 dcastle Exp $ */
 
 #ifndef UTILITY_H_
 #define UTILITY_H_
@@ -465,7 +465,7 @@ void mob_suprised_sayings(char_data * ch, char_data * aggressor);
 // MOBProgs prototypes
 int     mprog_wordlist_check    ( char * arg, CHAR_DATA *mob,
                 			CHAR_DATA* actor, OBJ_DATA* object,
-					void* vo, int type );
+					void* vo, int type, bool reverse = FALSE );
 void    mprog_percent_check     ( CHAR_DATA *mob, CHAR_DATA* actor,
 					OBJ_DATA* object, void* vo,
 					int type );
@@ -485,13 +485,13 @@ int     mprog_random_trigger    ( CHAR_DATA* mob );
 int     mprog_arandom_trigger   ( CHAR_DATA *mob);
 int     mprog_speech_trigger    ( char* txt, CHAR_DATA* mob );
 int 	mprog_catch_trigger	(char_data * mob, int catch_num, char 
-*var, int opt, char_data *actor,obj_data *obj, void *vo);
+*var, int opt, char_data *actor,obj_data *obj, void *vo, char_data *rndm);
 int 	mprog_attack_trigger	(char_data * mob, CHAR_DATA* ch);
 int     mprog_load_trigger      (CHAR_DATA *mob);
 int mprog_can_see_trigger( CHAR_DATA *ch, CHAR_DATA *mob );
 int mprog_damage_trigger( CHAR_DATA *mob, CHAR_DATA *ch, int amount );
 
-int oprog_catch_trigger(obj_data *obj, int catch_num, char *var, int opt, char_data *actor, obj_data *obj2, void *vo);
+int oprog_catch_trigger(obj_data *obj, int catch_num, char *var, int opt, char_data *actor, obj_data *obj2, void *vo, char_data *rndm);
 int oprog_act_trigger( char *txt, CHAR_DATA *ch );
 int oprog_speech_trigger( char *txt, CHAR_DATA *ch );
 int oprog_command_trigger( char *txt, CHAR_DATA *ch, char *arg );
@@ -526,6 +526,7 @@ struct mprog_throw_type {
    CHAR_DATA *actor;
    obj_data *obj;
    void *vo;
+   CHAR_DATA *rndm; // $r
 
  // new mppause crap below..
    CHAR_DATA *tMob; // it should NOT throw it to another similar mob :P
