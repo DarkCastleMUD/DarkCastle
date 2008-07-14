@@ -1,7 +1,7 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.70 2008/04/18 01:27:17 jhhudso Exp $
+| $Id: character.h,v 1.71 2008/07/14 18:27:21 dcastle Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
@@ -292,6 +292,7 @@ struct mob_data
     int32 last_room; // Room rnum the mob was last in. Used
 		      // For !magic,!track changing flags.
     struct threat_struct *threat;
+    struct reset_com *reset;
 };
 
 

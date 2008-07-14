@@ -565,6 +565,53 @@ int do_wiz(struct char_data *ch, char *argument, int cmd)
     return eSUCCESS;
 }
 
+int do_findfix(char_data *ch, char *argument, int cmd)
+{
+  int i, j, z;
+
+  // Lazy code. Nested fors > thinking.
+  char buf[MAX_STRING_LENGTH];
+  buf[0] = '\0';
+  extern int top_of_zonet;
+  for (i = 0; i < top_of_zonet; i++)
+  {
+    for (j = 0; zone_table[i].cmd[j].command != 'S'; j++)
+    {
+      bool first = TRUE, found = FALSE;
+      if (zone_table[i].cmd[j].command != 'M') continue;
+      int vnum = zone_table[i].cmd[j].arg1, max = zone_table[i].cmd[j].arg2;
+      if (zone_table[i].cmd[j].arg2 == 1 ||
+	  zone_table[i].cmd[j].arg2 == -1) continue; // Don't care about those..
+       int amt = 0;
+       for (z = 0; zone_table[i].cmd[z].command != 'S'; z++)
+       {
+         if (zone_table[i].cmd[z].command != 'M') continue;
+	 if (zone_table[i].cmd[z].arg1 != zone_table[i].cmd[j].arg1) continue;
+	 if (z == j && found) { first = FALSE; break; }
+	 found = TRUE;
+         if (zone_table[i].cmd[z].arg2 > max) max = zone_table[i].cmd[z].arg2;
+         amt++;
+       }
+       if (!first) continue;
+       if (amt == max) continue;
+       if (strlen(buf) > MAX_STRING_LENGTH -200)
+       {
+	 i = 10000; // Hack to make it end immediatly.
+	 break;
+       }
+       if (amt > max)
+       {
+	 sprintf(buf, "%sReset %d in zone %d has MORE resets than max in world.\r\n",buf, j, i); 
+       } else {
+	 sprintf(buf, "%sReset %d in zone %d has LESS resets than max in world.\r\n",buf, j, i); 
+       }
+
+    }
+  }
+  send_to_char(buf, ch);
+  return eSUCCESS;
+}
+
 
 int do_varstat(char_data *ch, char *argument, int cmd)
 {

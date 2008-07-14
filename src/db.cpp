@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.173 2008/07/03 12:53:39 dcastle Exp $ */
+/* $Id: db.cpp,v 1.174 2008/07/14 18:27:19 dcastle Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -2565,7 +2565,7 @@ CHAR_DATA *read_mobile(int nr, FILE *fl)
 #else
     mob->mobdata = (mob_data *) dc_alloc(1, sizeof(mob_data));
 #endif
-
+    mob->mobdata->reset = NULL;
     /* *** Numeric data *** */
     j = 0;
     while((tmp = fread_int(fl, LONG_MIN, LONG_MAX)) != -1) {
@@ -3113,6 +3113,7 @@ CHAR_DATA *clone_mobile(int nr)
 
   mob->mobdata->nr = nr;
   mob->desc = 0;
+  mob->mobdata->reset = NULL;
 
   mob->next = character_list;
   character_list = mob;
@@ -3301,7 +3302,7 @@ int create_blank_mobile(int nr)
     mob->mobdata->actflags[i] = 0;
     for (i = 0; i < AFF_MAX/ASIZE+1;i++)
     mob->affected_by[i] = 0;
-
+    mob->mobdata->reset = NULL;
     mob->mobdata->damnodice = 1;
     mob->mobdata->damsizedice = 1;
     mob->mobdata->default_pos = POSITION_STANDING;
@@ -3858,10 +3859,13 @@ void reset_zone(int zone)
     {
 
         case 'M': /* read a mobile */
-        if((ZCMD.arg2 == -1 || ZCMD.lastPop == 0 || !charExists(ZCMD.lastPop) 
-	|| (charExists(ZCMD.lastPop) && (!IS_NPC(ZCMD.lastPop) || ZCMD.lastPop->mobdata->nr != ZCMD.arg1))) && mob_index[ZCMD.arg1].number < ZCMD.arg2 && (mob = clone_mobile(ZCMD.arg1)))
+//        if((ZCMD.arg2 == -1 || ZCMD.lastPop == 0 || !charExists(ZCMD.lastPop) 
+//	|| (charExists(ZCMD.lastPop) && (!IS_NPC(ZCMD.lastPop) || ZCMD.lastPop->mobdata->nr != ZCMD.arg1))) && mob_index[ZCMD.arg1].number < ZCMD.arg2 && (mob = 
+//clone_mobile(ZCMD.arg1)))
+	if ((ZCMD.arg2 == -1 || ZCMD.lastPop == 0) && mob_index[ZCMD.arg1].number < ZCMD.arg2 && (mob = clone_mobile(ZCMD.arg1)))
         { 
           char_to_room(mob, ZCMD.arg3);
+	  mob->mobdata->reset = &zone_table[zone].cmd[cmd_no];	
 	  ZCMD.lastPop = mob;
           GET_HOME(mob) = world_array[ZCMD.arg3]->number;
           zone_table[zone].num_mob_on_repop++;

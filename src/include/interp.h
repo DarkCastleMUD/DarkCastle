@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.h,v 1.86 2008/06/12 23:36:52 kkoons Exp $ */
+/* $Id: interp.h,v 1.87 2008/07/14 18:27:21 dcastle Exp $ */
 
 #ifndef INTERP_H_
 #define INTERP_H_
@@ -161,6 +161,7 @@ DO_FUN do_huntstart;
 DO_FUN do_huntclear;
 
 DO_FUN do_thing;
+DO_FUN do_findfix;
 DO_FUN  do_reload;
 DO_FUN  do_abandon;
 DO_FUN  do_accept;

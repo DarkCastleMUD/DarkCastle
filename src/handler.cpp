@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.170 2008/06/20 14:14:33 dcastle Exp $ */
+/* $Id: handler.cpp,v 1.171 2008/07/14 18:27:19 dcastle Exp $ */
     
 extern "C"
 {
@@ -3145,6 +3145,10 @@ void extract_char(CHAR_DATA *ch, bool pull)
 	log( "Extract_char: NOWHERE", ANGEL, LOG_BUG );
         return;
     }
+
+  if (IS_NPC(ch) && ch->mobdata && ch->mobdata->reset && ch->mobdata->reset->lastPop)
+    ch->mobdata->reset->lastPop = NULL;
+
    remove_totem_stats(ch);
    if (!IS_NPC(ch)) {
 	void shatter_message(CHAR_DATA *ch);
