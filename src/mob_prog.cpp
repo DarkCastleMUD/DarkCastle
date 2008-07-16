@@ -626,8 +626,8 @@ void translate_value(char *leftptr, char *rightptr, int16 **vali, uint32 **valui
 		} else if (!str_cmp(right,"inroom"))
 		{
 		   if (!target && !otarget) tError = TRUE;
-		  else if (target) { uint32 tmp = (uint32)target->in_room; uintval = &tmp; }
-		  else { uint32 tmp = (uint32)otarget->in_room; uintval = &tmp; }
+		   else if (target) { static uint32 tmp; tmp = (uint32)target->in_room; uintval = &tmp; }
+		   else { static uint32 tmp; tmp = (uint32)otarget->in_room; uintval = &tmp; }
 		} else if (!str_cmp(right,"intelligence"))
 		{
 		   if (!target) tError = TRUE;
