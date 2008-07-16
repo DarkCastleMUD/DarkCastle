@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.167 2008/05/25 00:08:39 kkoons Exp $ */
+/* $Id: info.cpp,v 1.168 2008/07/16 04:45:42 jhhudso Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -365,6 +365,7 @@ void list_obj_to_char(struct obj_data *list, struct char_data *ch, int mode,
 void show_spells(char_data * i, char_data * ch)
 {
    char send_buf[MAX_STRING_LENGTH];
+   char buffer[MAX_STRING_LENGTH];
    int has_spells = 0;
 
    if(IS_MOB(i))
@@ -380,7 +381,8 @@ void show_spells(char_data * i, char_data * ch)
       has_spells = 1;
    }
    else if (affected_by_spell(i, SPELL_PROTECT_FROM_GOOD)) {
-      sprintf(send_buf,"%s$R$6$Bpulsing! ", send_buf);
+       snprintf(buffer, MAX_STRING_LENGTH, "%s$R$6$Bpulsing! ", send_buf);
+       strncpy(send_buf, buffer, MAX_STRING_LENGTH);
       has_spells = 1;
    }
    if (IS_AFFECTED(i,AFF_FIRESHIELD)) {
