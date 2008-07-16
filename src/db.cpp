@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.175 2008/07/16 04:06:06 jhhudso Exp $ */
+/* $Id: db.cpp,v 1.176 2008/07/16 04:23:25 jhhudso Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -4853,7 +4853,7 @@ void init_char(CHAR_DATA *ch)
 /* returns the real number of the room with given virt number */
 int real_room(int virt)
 {
-    if(virt > top_of_world)
+    if(virt < 0 || virt > top_of_world)
       return -1;
     if(world_array[virt])
       return virt;
