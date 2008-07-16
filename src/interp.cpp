@@ -16,7 +16,7 @@
 /* 12/08/2003   Onager   Added chop_half() to work like half_chop() but    */
 /*                       chopping off the last word.                       */
 /***************************************************************************/
-/* $Id: interp.cpp,v 1.152 2008/07/14 18:27:19 dcastle Exp $ */
+/* $Id: interp.cpp,v 1.153 2008/07/16 04:51:08 jhhudso Exp $ */
 
 extern "C"
 {
@@ -265,7 +265,7 @@ struct command_info cmd_info[] =
     { "editor",         do_editor,      POSITION_SLEEPING, CMD_EDITOR, CMD_DEFAULT, 0, 1 },
     { "autojoin",	do_autojoin,	POSITION_SLEEPING, 0, CMD_DEFAULT, 0, 1 },
     { "visible",	do_visible,	POSITION_SLEEPING, 0, CMD_DEFAULT, 0, 1 },
-    { "ctell",		do_ctell,	POSITION_SLEEPING, 0, CMD_EDITOR, 0, 1 },
+    { "ctell",		do_ctell,	POSITION_SLEEPING, 0, CMD_CTELL, 0, 1 },
     { "outcast",	do_outcast,	POSITION_RESTING, 0, CMD_DEFAULT, 0, 1 },
     { "accept",		do_accept,	POSITION_RESTING, 0, CMD_DEFAULT, 0, 1 },
     { "whoclan",	do_whoclan,	POSITION_DEAD, 0, CMD_DEFAULT, 0, 1 },
@@ -754,8 +754,8 @@ int command_interpreter( CHAR_DATA *ch, char *pcomm, bool procced  )
     if(GET_LEVEL(ch) >= found->minimum_level && found->command_pointer != NULL) {
       // Paralysis stops everything but ...
       if (IS_AFFECTED(ch, AFF_PARALYSIS) && 
-          found->command_number != 200 &&  // gtell
-          found->command_number != 201     // ctell
+          found->command_number != CMD_GTELL &&  // gtell
+          found->command_number != CMD_CTELL     // ctell
          ) 
       {
         send_to_char("You've been paralyzed and are unable to move.\r\n", ch);
