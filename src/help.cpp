@@ -274,9 +274,11 @@ struct help_index_element_new *find_help(char *keyword)
   return NULL;
 }
 
+#define ENTRY_MAX 32384
+
 int load_new_help(FILE *fl, int reload, struct char_data *ch)
 {     
-  char entry[32384], line[READ_SIZE+1], tmpentry[32384], buf[256];
+  char entry[ENTRY_MAX], line[READ_SIZE+1], tmpentry[ENTRY_MAX], buf[256], tmpbuffer[ENTRY_MAX];
   struct help_index_element_new new_help;
   int version = 0, level = -1, linenum = 0;
       
@@ -323,10 +325,13 @@ int load_new_help(FILE *fl, int reload, struct char_data *ch)
     linenum+=get_line_with_space(fl, line);
     *tmpentry = '\0';
     while (*line != '#') {
-      if (*line == '\0') 
-        sprintf(tmpentry, "%s\r\n", tmpentry);
-      else 
-        sprintf(tmpentry, "%s%s\r\n", tmpentry, line);
+	if (*line == '\0') {
+	    snprintf(tmpbuffer, ENTRY_MAX, "%s\r\n", tmpentry);
+	    strncpy(tmpentry, tmpbuffer, ENTRY_MAX);
+	} else {
+	    snprintf(tmpbuffer, ENTRY_MAX, "%s%s\r\n", tmpentry, line);
+	    strncpy(tmpentry, tmpbuffer, ENTRY_MAX);
+	}
       linenum+=get_line_with_space(fl, line);
     }
 
