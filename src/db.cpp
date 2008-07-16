@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.174 2008/07/14 18:27:19 dcastle Exp $ */
+/* $Id: db.cpp,v 1.175 2008/07/16 04:06:06 jhhudso Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -1941,8 +1941,9 @@ void boot_world(void)
       ;
 
     // push the first num forward until it hits a room, that way it's
-    // accurate
-    for(;!world_array[pItem->firstnum]; pItem->firstnum++)
+    // accurate.
+    // "pItem->firstnum < top_of_world_alloc" check is to insure we dont access memory not allocated to world_array
+    for(;pItem->firstnum < top_of_world_alloc && !world_array[pItem->firstnum]; pItem->firstnum++)
       ;
 
     pItem->lastnum = room_nr / 100 * 100 + 99;
