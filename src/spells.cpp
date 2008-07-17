@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.239 2008/05/27 21:19:53 kkoons Exp $ */
+/* $Id: spells.cpp,v 1.240 2008/07/17 22:01:47 dcastle Exp $ */
 
 extern "C"
 {
@@ -1419,14 +1419,17 @@ int do_release(CHAR_DATA *ch, char *argument, int cmd)
 	  ch->move -= 25;
 	send_to_char("You release the spell.\r\n",ch);
 	char buffer[255];
-	snprintf(buffer, 255, "$n concentrates for a moment and releases their %s.", get_skill_name(aff->type));
-	act( buffer, ch, 0, 0, TO_ROOM , INVIS_NULL);
+	int aftype = aff->type;
+	
              if (*spell_wear_off_msg[aff->type]) {
-                send_to_char(spell_wear_off_msg[aff->type], ch);
+                send_to_char(spell_wear_off_msg[aftype], ch);
                 send_to_char("\n\r", ch);
              }
-	  affect_from_char(ch, aff->type);
+	  affect_from_char(ch, aftype);
 //	  affect_remove(ch,aff,0);
+	snprintf(buffer, 255, "$n concentrates for a moment and releases their %s.", get_skill_name(aftype));
+	act( buffer, ch, 0, 0, TO_ROOM , INVIS_NULL);
+
 	 done = TRUE;
 	 }
     }
