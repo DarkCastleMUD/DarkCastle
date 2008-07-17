@@ -1227,9 +1227,12 @@ int do_mpsettemp(CHAR_DATA *ch, char *argument, int cmd)
   argument = one_argument(argument, arg3);
   if (arg[0] == '\0' || temp[0] == '\0' || arg2[0] == '\0')
   {
-    int num = mob_index[ch->mobdata->nr].virt;
-    sprintf(arg, "Mob %d lacking argument for mpsettemp.", num);
-    log(arg, 104, LOG_BUG);
+    if (IS_NPC(ch)) {
+      int num = mob_index[ch->mobdata->nr].virt;
+      sprintf(arg, "Mob %d lacking argument for mpsettemp.", num);
+      log(arg, 104, LOG_BUG);
+    }
+    return eFAILURE;
   }
   victim = get_char_room( arg, ch->in_room );
   if (!victim) return eFAILURE;
