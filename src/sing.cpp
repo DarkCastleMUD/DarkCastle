@@ -1047,9 +1047,6 @@ int song_healing_melody( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victi
 int execute_song_healing_melody( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    int heal, healtmp = 0;
-   char_data * master = NULL;
-   follow_type * fvictim = NULL;
-   char buf[MAX_STRING_LENGTH];
 
    heal = 3*(GET_LEVEL(ch)/5);
 
@@ -1058,59 +1055,32 @@ int execute_song_healing_melody( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DAT
 
    heal += non_combat;
 
-   if(ch->master && ISSET(ch->affected_by, AFF_GROUP))
-      master = ch->master;
-   else master = ch;
-
-   for(fvictim = master->followers; fvictim; fvictim = fvictim->next)
+   for(char_data * tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
    {
-      if(!ISSET(fvictim->follower->affected_by, AFF_GROUP) || 
-         fvictim->follower->in_room != ch->in_room ||
-         IS_UNDEAD(fvictim->follower))
-         continue;
-
-      healtmp = number(skill/4, heal);
-
-      if (IS_PC(fvictim->follower) && IS_SET(fvictim->follower->pcdata->toggles, PLR_DAMAGE)) 
-      {  
-        sprintf(buf, "You feel %s's Healing Melody soothing %d point%sof your health.\r\n", GET_NAME(master), 
-healtmp, (healtmp>1?"s ":" "));
-        send_to_char(buf,fvictim->follower); 
-      } 
-      else     
-       send_to_char("You feel a little better.\r\n", fvictim->follower);
-
-      GET_HIT(fvictim->follower) += healtmp; // OLD:number(skill/4, heal);
-      if(GET_HIT(fvictim->follower) > GET_MAX_HIT(fvictim->follower))
-         GET_HIT(fvictim->follower) = GET_MAX_HIT(fvictim->follower);
-    
-   }
-   if(ch->in_room == master->in_room && !IS_UNDEAD(master))
-   {
-      healtmp = number(skill/4, heal);
-
-      if (IS_PC(master) && IS_SET(master->pcdata->toggles, PLR_DAMAGE))
-      {
-        sprintf(buf, "You feel your Healing Melody soothing %d point%sof your health.\r\n", healtmp, (healtmp>1?"s ":" ") );
-        send_to_char(buf,master);
-      }
-      else
-        send_to_char("You feel a little better.\r\n", master);
-      GET_HIT(master) += healtmp;
-      if(GET_HIT(master) > GET_MAX_HIT(master))
-         GET_HIT(master) = GET_MAX_HIT(master);
-   }
-   if(ch->followers)  // handle the bards charmies
-     for(fvictim = ch->followers; fvictim; fvictim = fvictim->next) {
-       if(IS_AFFECTED(fvictim->follower, AFF_CHARM) && IS_MOB(fvictim->follower) &&
-           ch->in_room == fvictim->follower->in_room) {
-         send_to_char("You feel a little better.\r\n", fvictim->follower);
-         GET_HIT(fvictim->follower) += number(skill/4, heal);
-         if(GET_HIT(fvictim->follower) > GET_MAX_HIT(fvictim->follower))
-           GET_HIT(fvictim->follower) = GET_MAX_HIT(fvictim->follower);
-       }
-     }
+       if(!ARE_GROUPED(ch, tmp_char))
+	   continue;
+       if(IS_UNDEAD(tmp_char))
+	   continue;
        
+      healtmp = number(skill/4, heal);
+      
+      if (IS_PC(tmp_char) && IS_SET(tmp_char->pcdata->toggles, PLR_DAMAGE)) {  
+	  if (tmp_char == ch) {
+	      csendf(ch, "You feel your Healing Melody soothing %d point%sof your health.\r\n", healtmp, (healtmp>1?"s ":" ") );
+	  } else {
+	      csendf(tmp_char, "You feel %s's Healing Melody soothing %d point%sof your health.\r\n", GET_NAME(ch), healtmp, (healtmp>1?"s ":" "));
+	  }
+      } else {
+	  csendf(tmp_char, "You feel a little better.\r\n");
+      }
+
+      GET_HIT(tmp_char) += healtmp;
+
+      if (GET_HIT(tmp_char) > GET_MAX_HIT(tmp_char)) {
+	  GET_HIT(tmp_char) = GET_MAX_HIT(tmp_char);
+      }
+   }
+   
    if(!skill_success(ch, NULL, SKILL_SONG_HEALING_MELODY)  ) {
       send_to_char("You run out of lyrics and end the song.\r\n", ch);
       return eSUCCESS;
@@ -1121,6 +1091,7 @@ healtmp, (healtmp>1?"s ":" "));
 
    if(GET_LEVEL(ch) > MORTAL)
     ch->song_timer = 1;
+
    return eSUCCESS;
 }
 
