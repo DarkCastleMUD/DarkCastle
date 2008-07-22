@@ -1235,34 +1235,51 @@ int do_mpsettemp(CHAR_DATA *ch, char *argument, int cmd)
     return eFAILURE;
   }
   victim = get_char_room( arg, ch->in_room );
-  if (!victim) return eFAILURE;
-  struct tempvariable *eh;
-  for (eh = victim->tempVariable; eh; eh = eh->next)
+  int type = 0;
+  if (!victim)
   {
-    if (!str_cmp(eh->name, temp))
-      break;
+     if (!str_cmp(arg, "allpc")) type = 1;
+     else if (!str_cmp(arg, "allmob")) type = 2;
+     else if (!str_cmp(arg, "all")) type = 3;
   }
-  if (eh)
+
+  if (!victim && type == 0) return eFAILURE;
+  if (!victim) victim = world[ch->in_room].people;
+
+  for (;victim;victim = victim->next_in_room)
   {
-    dc_free(eh->data);
-    eh->data = str_dup(arg2);
-  } else {
+    if (type == 1 && IS_NPC(victim)) continue;
+    else if (type == 2 && !IS_NPC(victim)) continue;
+
+    struct tempvariable *eh;
+    for (eh = victim->tempVariable; eh; eh = eh->next)
+    {
+      if (!str_cmp(eh->name, temp))
+        break;
+    }
+    if (eh)
+    {
+      dc_free(eh->data);
+      eh->data = str_dup(arg2);
+    } else {
 #ifdef LEAK_CHECK
-        eh = (struct tempvariable *)
+          eh = (struct tempvariable *)
                         calloc(1, sizeof(struct tempvariable));
 #else
        eh = (struct tempvariable *)
                         dc_alloc(1, sizeof(struct tempvariable));
 #endif
 
-     eh->data = str_dup(arg2);
-     eh->name = str_dup(temp);
-     eh->next = victim->tempVariable;
-     victim->tempVariable = eh;
-     if (arg3[0] != '\0' && !str_cmp(arg3, "save"))
-	eh->save = 1;
-     else
-	eh->save = 0;
+       eh->data = str_dup(arg2);
+       eh->name = str_dup(temp);
+       eh->next = victim->tempVariable;
+       victim->tempVariable = eh;
+       if (arg3[0] != '\0' && !str_cmp(arg3, "save"))
+	 eh->save = 1;
+       else
+	 eh->save = 0;
+    }
+    if (type == 0) break;
   }
   return eSUCCESS;
 }
