@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.168 2008/07/16 04:45:42 jhhudso Exp $ */
+/* $Id: info.cpp,v 1.169 2008/08/04 18:06:36 kkoons Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -575,7 +575,12 @@ void show_char_to_char(struct char_data *i, struct char_data *ch, int mode)
           percent = -1; /* How could MAX_HIT be < 1?? */
        
        strcpy(buffer, GET_SHORT(i));
-       
+
+       sprintf(buf, " the %s", 
+               race_info[(int)GET_RACE(i)].singular_name); 
+      
+       strcat(buffer, buf);
+
        if (percent >= 100)
           strcat(buffer, " is in excellent condition.\n\r");
        else if (percent >= 90)
