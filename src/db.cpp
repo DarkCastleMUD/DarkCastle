@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.176 2008/07/16 04:23:25 jhhudso Exp $ */
+/* $Id: db.cpp,v 1.177 2008/08/19 07:38:38 dcastle Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -212,7 +212,7 @@ void load_site_lists(void);
 int 		mprog_name_to_type	( char* name );
 MPROG_DATA *	mprog_file_read 	( char* f, MPROG_DATA* mprg, long i );
 //void		load_mobprogs           ( FILE* fp );
-void   		mprog_read_programs     ( FILE* fp, long i, bool zz = FALSE);
+void   		mprog_read_programs     ( FILE* fp, long i, bool zz);
 
 extern bool MOBtrigger;
 
@@ -1323,7 +1323,8 @@ struct index_data *generate_obj_indices(int *top,
          index[i].number = 0;
          index[i].non_combat_func = 0;
          index[i].combat_func = 0;
-         if(!(index[i].item = (struct obj_data *)read_object(i, fl))) 
+	 index[i].progtypes = 0;
+         if(!(index[i].item = (struct obj_data *)read_object(i, fl, FALSE))) 
          {
            sprintf(log_buf, "Unable to load object %d!\n\r",
                    index[i].virt);
@@ -2674,7 +2675,7 @@ CHAR_DATA *read_mobile(int nr, FILE *fl)
              break;
           case '>':
              ungetc( letter, fl );
-             mprog_read_programs( fl, nr );
+             mprog_read_programs( fl, nr, FALSE );
              break;
           case 'S':
              break;
@@ -4041,6 +4042,14 @@ void reset_zone(int zone)
 	      log(log_buf, IMMORTAL, LOG_WORLD);
 	      break;
 	    }
+	    if (!world_array[ZCMD.arg1])
+	    {
+	      sprintf(log_buf,
+	      "Room %d doesn't exist Z: %d cmd %d", ZCMD.arg1, zone, cmd_no);
+	      log(log_buf, IMMORTAL, LOG_WORLD);
+	      break;
+	    }
+
 	    if(world[ZCMD.arg1].dir_option[ZCMD.arg2] == 0)
 	    {
 	      sprintf(log_buf,
@@ -5070,7 +5079,7 @@ void load_mobprogs(FILE *fp)
   return;
 }
 
-void mprog_read_programs( FILE *fp, long i, bool zz )
+void mprog_read_programs( FILE *fp, long i, bool zz)
 {
   MPROG_DATA *mprog;
   char letter;
@@ -5096,10 +5105,12 @@ void mprog_read_programs( FILE *fp, long i, bool zz )
       mprog_file_read(fread_string(fp, 1), i);
       break;
     default:
+	if (!zz) {
       if (letter == '>')
         SET_BIT(mob_index[i].progtypes, type);
       else
 	SET_BIT(obj_index[i].progtypes, type);
+	}
      if (!zz) {
 #ifdef LEAK_CHECK
       mprog = (MPROG_DATA *) calloc(1, sizeof(MPROG_DATA));
