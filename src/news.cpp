@@ -21,6 +21,7 @@ extern "C"
 #include <dmalloc.h>
 #endif
 
+#include <cstdlib>
 #include <structs.h>
 #include <room.h>
 #include <character.h>
@@ -88,6 +89,9 @@ void savenews()
   }
    fprintf(fl,"0\n");
   dc_fclose(fl);
+  if(std::system(0))
+     std::system("cp ../lib/news.data /var/www/dcastle.org/html/news.data");
+  else log("Cannot save news file to web dir.", 0, LOG_MISC);
 }
 
 void loadnews()
@@ -155,7 +159,6 @@ int do_news(struct char_data *ch, char *argument, int cmd)
    char timez[15],otimez[15];
    buf[0] = '\0';
    otimez[0] = '\0';
-   //int length = 0;
    time_t thetime;
    char arg[MAX_INPUT_LENGTH];
    one_argument(argument, arg);
@@ -171,19 +174,11 @@ int do_news(struct char_data *ch, char *argument, int cmd)
      strftime(&timez[0], 10,"%d/%b/%y", gmtime(&tnews->time));
     
      strcpy(old,buf);
-     const char *newsstring = tnews->news;//newsify(tnews->news);
-//     if (str_cmp(otimez,timez)) {   
+     const char *newsstring = tnews->news;
        if (up)
 	sprintf(buf, "%s$B$4[ $3%-9s $4] \r\n$R%s\r\n", old, timez, newsstring);
        else 
 	sprintf(buf, "$B$4[ $3%-9s$4 ] \r\n$R%s\r\n%s", timez, newsstring, old);
-//	dc_free(newsstring);
-  /*   } else {
-       if (up)
-	sprintf(buf, "%s$B$4            -$R%s\n", old, newsstring);
-       else 
-	sprintf(buf, "$B$4            -$R%s\n%s", newsstring, old);
-     }*/
 	if(strlen(buf) > MAX_STRING_LENGTH-1000) break;
    } 
    page_string(ch->desc,buf, 1);
