@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.68 2008/06/08 21:52:17 kkoons Exp $ */
+/* $Id: clan.cpp,v 1.69 2008/09/15 17:03:27 kkoons Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -2741,8 +2741,8 @@ bool can_challenge(int clan, int zone)
     if (take->clan2 == -2 && 
 		take->clan1 == clan && zone == take->zone)
 	return FALSE;
-    else if (zone == take->zone && take->clan2 > 0 
-              && take->clan1 > 0)
+    else if (zone == take->zone && take->clan2 >= 0 
+              && take->clan1 >= 0)
 	return FALSE;
   return TRUE;  
 }
