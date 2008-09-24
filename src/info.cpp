@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.170 2008/09/08 02:56:43 shane Exp $ */
+/* $Id: info.cpp,v 1.171 2008/09/24 17:20:32 kkoons Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -857,6 +857,7 @@ int do_look(struct char_data *ch, char *argument, int cmd)
       "",  /* Look at '' case */
       "\n" };
       
+int weight_in(struct obj_data *obj);
       if (!ch->desc)
          return 1;
       if (GET_POS(ch) < POSITION_SLEEPING)
@@ -984,7 +985,7 @@ int do_look(struct char_data *ch, char *argument, int cmd)
                         switch (bits)
                         {
                         case FIND_OBJ_INV :
-                           send_to_char(" (carried) ", ch);
+                           send_to_char(" (carried) ", ch); 
                            break;
                         case FIND_OBJ_ROOM :
                            send_to_char(" (here) ", ch);
@@ -994,19 +995,25 @@ int do_look(struct char_data *ch, char *argument, int cmd)
                            break;
                         }
 			
-                        if (tmp_object->obj_flags.value[0] && tmp_object->obj_flags.weight) {
-			  temp = ((tmp_object->obj_flags.weight*3) / tmp_object->obj_flags.value[0]);
+                        if (tmp_object->obj_flags.value[0] && tmp_object->obj_flags.weight) 
+                        {
+
+                          int weight_in(struct obj_data *obj);
+			  if (obj_index[tmp_object->item_number].virt == 536)
+                            temp = (3*weight_in(tmp_object)) / tmp_object->obj_flags.value[0];
+                          else
+			    temp = ((tmp_object->obj_flags.weight*3) / tmp_object->obj_flags.value[0]);
 			} else {
 			  temp = 3;
 			}
 			
-			if (temp < 0) {
+                        if (temp < 0) {
 			  temp = 0;
 			} else if (temp > 3) {
 			  temp = 3;
 			  logf(IMMORTAL, LOG_WORLD, "Bug in object %d. Weight: %d v1: %d", obj_index[tmp_object->item_number].virt, tmp_object->obj_flags.weight, tmp_object->obj_flags.value[0]);
 			}
-
+			
                         csendf(ch, "(%sfull) : \n\r", fullness[temp]);
                         list_obj_to_char(tmp_object->contains,
                            ch, 2, TRUE);
