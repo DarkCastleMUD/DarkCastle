@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.71 2008/05/14 20:36:59 kkoons Exp $
+| $Id: cl_warrior.cpp,v 1.72 2008/09/29 22:49:59 kkoons Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -393,7 +393,9 @@ int do_hitall(struct char_data *ch, char *argument, int cmd)
 	 nxtplr = temp; // nxtplayer is the next 100% safe target.
 
 	 if (nxtplr == (char_data *)0x95959595) {
-	     fprintf(stderr, "Error in hitall, nxtplr with 0x95959595\n\r");
+
+             REMOVE_BIT(ch->combat, COMBAT_HITALL);
+	     log("Error in hitall, next vict 0x95959595 (this would be where hitall got stuck)", ANGEL, LOG_BUG);
 	     produce_coredump();
 	     return eFAILURE;
 	 }
