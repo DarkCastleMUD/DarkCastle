@@ -827,6 +827,36 @@ void save_help(struct char_data *ch) {
   send_to_char("Saved.\n\r", ch);
   sprintf(buf, "%s just saved the help files.", GET_NAME(ch));
   log(buf, OVERSEER, LOG_HELP);
+
+  sprintf(file, "%s", WEB_HELP_FILE);
+  
+  if((f = dc_fopen(file, "w")) == NULL) {
+    send_to_char("Couldn't open web help file for saving.\n\r", ch);
+    perror("Couldn't open web help file for saving.\n\r");
+    return;
+  }
+
+  for (i = 0; i < new_top_of_helpt; i++) {
+    if(new_help_table[i].min_level <= MAX_MORTAL) {
+      help_string_to_file(f, new_help_table[i].keyword1);
+      help_string_to_file(f, new_help_table[i].keyword2);
+      help_string_to_file(f, new_help_table[i].keyword3);
+      help_string_to_file(f, new_help_table[i].keyword4);
+      help_string_to_file(f, new_help_table[i].keyword5);
+      help_string_to_file(f, new_help_table[i].related);
+      fprintf(f, "L: %d\n", new_help_table[i].min_level);
+      fprintf(f, "E:\n");
+      help_string_to_file(f, new_help_table[i].entry);
+      fprintf(f, "#\n");
+      fprintf(f, "~\n");
+    }
+  }
+
+  // end file
+  fprintf(f, "$~\n");
+
+  dc_fclose(f);
+
 }
 
 void help_string_to_file(FILE *f, char *string)
