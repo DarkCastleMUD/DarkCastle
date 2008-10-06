@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.69 2008/09/15 17:03:27 kkoons Exp $ */
+/* $Id: clan.cpp,v 1.70 2008/10/06 22:06:29 kkoons Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -2996,8 +2996,38 @@ int do_clanarea(CHAR_DATA *ch, char *argument, int cmd)
   {
 	send_to_char("You have not been granted that right.\r\n",ch);
 	return eFAILURE;
-  }  
-  if (!str_cmp(arg, "claim"))
+  }
+
+
+  if (!str_cmp(arg, "withdraw"))
+  {
+    if (can_collect(world[ch->in_room].zone))
+    {
+      send_to_char("There is no challenge to withdraw from.\n\r", ch);
+      return eFAILURE;
+    }
+
+    if (!affected_by_spell(ch, SKILL_CLANAREA_CHALLENGE))
+    {
+      send_to_char("You did not issue the challenge, or you have waited too long to withdraw.\n\r", ch);
+      return eFAILURE;
+    }
+
+
+    struct takeover_pulse_data *take;
+    for (take = pulse_list;take; take = take->next)
+	if (take->zone == world[ch->in_room].zone &&
+		take->clan2 == ch->clan)
+	{
+		take->clan1points += 20;
+		check_victory(take);
+		send_to_char("You withdraw your challenge.\r\n",ch);
+		return eSUCCESS;
+	}
+    send_to_char("Your did not issue this challenge.\n\r", ch);
+    return eFAILURE;
+  }
+  else if (!str_cmp(arg, "claim"))
   {
     if (affected_by_spell(ch, SKILL_CLANAREA_CLAIM)) {
       send_to_char("You need to wait before you can attempt to claim an area.\n\r", ch);
