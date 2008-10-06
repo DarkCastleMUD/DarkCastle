@@ -16,7 +16,7 @@
 /* 12/08/2003   Onager   Added chop_half() to work like half_chop() but    */
 /*                       chopping off the last word.                       */
 /***************************************************************************/
-/* $Id: interp.cpp,v 1.153 2008/07/16 04:51:08 jhhudso Exp $ */
+/* $Id: interp.cpp,v 1.154 2008/10/06 17:06:23 kkoons Exp $ */
 
 extern "C"
 {
@@ -407,9 +407,9 @@ struct command_info cmd_info[] =
     { "set",		do_set,		POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1 },
     { "unban",		do_unban,	POSITION_DEAD, 108, CMD_DEFAULT, 0, 1 },
     { "ban",		do_ban,		POSITION_DEAD, 108, CMD_DEFAULT, 0, 1 },
-    { "echo",		do_echo,	POSITION_DEAD, 105, CMD_DEFAULT, 0, 1 },
+    { "echo",		do_echo,	POSITION_DEAD, OVERSEER, CMD_DEFAULT, 0, 1 },
     {"eqmax",		do_eqmax,	POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1 }, 
-    { "send",		do_send,	POSITION_DEAD, 105, CMD_DEFAULT, 0, 1 },
+    { "send",		do_send,	POSITION_DEAD, OVERSEER, CMD_DEFAULT, 0, 1 },
     { "at",		do_at,		POSITION_DEAD, IMMORTAL, CMD_DEFAULT, 0, 1 }, 
     { "fakelog",	do_fakelog,	POSITION_DEAD, 110, CMD_DEFAULT, 0, 1 },
     { "global",		do_global,	POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1 },
@@ -501,6 +501,7 @@ struct command_info cmd_info[] =
     { "listallpaths",	do_listAllPaths,POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1 },
     { "dopathpath",	do_pathpath,	POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1 },
     { "botcheck",	do_botcheck,	POSITION_DEAD, 108, CMD_DEFAULT, 0, 1 },
+    { "showbits",	do_showbits,	POSITION_DEAD, OVERSEER, CMD_DEFAULT, 0, 1 },
 
     // Bug way down here after 'buy'
     { "bug",	do_bug,	POSITION_DEAD, 0, CMD_DEFAULT, 0, 1 },

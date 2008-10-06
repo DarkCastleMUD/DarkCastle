@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.h,v 1.87 2008/07/14 18:27:21 dcastle Exp $ */
+/* $Id: interp.h,v 1.88 2008/10/06 17:05:57 kkoons Exp $ */
 
 #ifndef INTERP_H_
 #define INTERP_H_
@@ -473,6 +473,7 @@ DO_FUN  do_summon_toggle;
 DO_FUN  do_headbutt;
 DO_FUN  do_show;
 DO_FUN  do_show_exp;
+DO_FUN  do_showbits;
 DO_FUN  do_shutdow;
 DO_FUN  do_shutdown;
 DO_FUN  do_silence;
