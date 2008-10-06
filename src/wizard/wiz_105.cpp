@@ -8,6 +8,7 @@
 #include <handler.h>
 #include <room.h>
 #include <player.h>
+#include <fight.h>
 #include <utility.h>
 #include <levels.h>
 #include <interp.h>
@@ -98,6 +99,98 @@ int do_log(struct char_data *ch, char *argument, int cmd)
         log(buf2, GET_LEVEL(ch), LOG_GOD);
     }
   return eSUCCESS;
+}
+
+int do_showbits(struct char_data *ch, char *argument, int cmd)
+{
+    char person[MAX_INPUT_LENGTH];
+    struct char_data *victim;
+
+    one_argument(argument, person);
+
+    if (!*person)
+    {
+        send_to_char("Showbits on whom?\n\r", ch);
+        return eFAILURE;
+    }
+
+    if(!(victim = get_char(person)))
+    {
+        send_to_char("They aren't here.\n\r", ch);
+        return eFAILURE;
+    }
+
+    send_to_char("--------bits--------\n\r", ch);
+
+    if(IS_SET(victim->combat, COMBAT_SHOCKED))
+        send_to_char("COMBAT_SHOCKED\n\r", ch);
+
+    if(IS_SET(victim->combat, COMBAT_BASH1))
+        send_to_char("COMBAT_BASH1\n\r", ch);
+
+    if(IS_SET(victim->combat, COMBAT_BASH2))
+        send_to_char("COMBAT_BASH2\n\r", ch);
+
+    if(IS_SET(victim->combat, COMBAT_STUNNED))
+        send_to_char("COMBAT_STUNNED\n\r", ch);
+
+    if(IS_SET(victim->combat, COMBAT_STUNNED2))
+        send_to_char("COMBAT_STUNNED2\n\r", ch);
+
+    if(IS_SET(victim->combat, COMBAT_CIRCLE))
+        send_to_char("COMBAT_CIRCLE\n\r", ch);
+
+    if(IS_SET(victim->combat, COMBAT_BERSERK))
+        send_to_char("COMBAT_BERSERK\n\r", ch);
+
+    if(IS_SET(victim->combat, COMBAT_HITALL))
+        send_to_char("COMBAT_HITALL\n\r", ch);
+
+    if(IS_SET(victim->combat, COMBAT_RAGE1))
+        send_to_char("COMBAT_RAGE1\n\r", ch);
+
+    if(IS_SET(victim->combat, COMBAT_RAGE1))
+        send_to_char("COMBAT_RAGE2\n\r", ch);
+
+    if(IS_SET(victim->combat, COMBAT_BLADESHIELD1))
+        send_to_char("COMBAT_BLADESHIELD1\n\r", ch);
+
+    if(IS_SET(victim->combat, COMBAT_BLADESHIELD2))
+        send_to_char("COMBAT_BLADESHIELD2\n\r", ch);
+
+    if(IS_SET(victim->combat, COMBAT_REPELANCE))
+        send_to_char("COMBAT_REPELANCE\n\r", ch);
+
+    if(IS_SET(victim->combat, COMBAT_VITAL_STRIKE))
+        send_to_char("COMBAT_VITAL_STRIKE\n\r", ch);
+
+    if(IS_SET(victim->combat, COMBAT_MONK_STANCE))
+        send_to_char("COMBAT_MONK_STANCE\n\r", ch);
+
+    if(IS_SET(victim->combat, COMBAT_MISS_AN_ATTACK))
+        send_to_char("COMBAT_MISS_AN_ATTACK\n\r", ch);
+
+    if(IS_SET(victim->combat, COMBAT_ORC_BLOODLUST1))
+        send_to_char("COMBAT_ORC_BLOODLUST1\n\r", ch);
+
+    if(IS_SET(victim->combat, COMBAT_ORC_BLOODLUST2))
+        send_to_char("COMBAT_ORC_BLOODLUST2\n\r", ch);
+
+    if(IS_SET(victim->combat, COMBAT_THI_EYEGOUGE))
+        send_to_char("COMBAT_THI_EYEGOUGE\n\r", ch);
+
+    if(IS_SET(victim->combat, COMBAT_THI_EYEGOUGE2))
+        send_to_char("COMBAT_THI_EYEGOUGE2\n\r", ch);
+
+    if(IS_SET(victim->combat, COMBAT_FLEEING))
+        send_to_char("COMBAT_FLEEING\n\r", ch);
+
+    if(IS_SET(victim->combat, COMBAT_SHOCKED2))
+        send_to_char("COMBAT_SHOCKED2\n\r", ch);
+
+    send_to_char("--------------------\n\r", ch);
+
+    return eSUCCESS;
 }
 
 int do_pardon(struct char_data *ch, char *argument, int cmd)
