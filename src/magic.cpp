@@ -9801,7 +9801,7 @@ int spell_bee_sting(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
 {
    int dam;
    int retval;
-   int bees = 1 + (GET_LEVEL(ch) / 15) + (GET_LEVEL(ch)==50);
+   int bees = 1 + (GET_LEVEL(ch) / 15) + (GET_LEVEL(ch)==60);
    affected_type af;
    int i;
    set_cantquit(ch, victim);
