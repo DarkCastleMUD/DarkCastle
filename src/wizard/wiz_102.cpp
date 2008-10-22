@@ -2207,6 +2207,42 @@ int do_oedit(struct char_data *ch, char *argument, int cmd)
           return eFAILURE;
         }
 
+        
+	struct vault_data *vault, *tvault;
+	struct vault_items_data *items, *titems;
+	struct obj_data *obj;
+	int num = 0, real_num = 0;
+
+	for (vault = vault_table; vault; vault = tvault, num++) 
+	{
+	    tvault = vault->next;
+
+	    if (vault && vault->items) 
+	    {
+		for (items = vault->items; items; items = titems) 
+		{
+		    titems = items->next;
+		    
+		     
+  		    real_num = real_object(items->item_vnum);
+      		    obj = items->obj?items->obj:((struct obj_data*)obj_index[real_num].item);
+		    if(obj == NULL)
+			continue;
+
+		    if (obj->item_number == item_num) 
+		    {
+
+			void item_remove(obj_data *obj, struct vault_data *vault);
+			item_remove(obj, vault);
+			//items->obj = 0;
+			logf(0, LOG_MISC, "Removing deleted item %d from %s's vault.", itemvnum, vault->owner);
+		    }
+		}
+	    }
+	}
+
+
+
         obj_data * next_k;
         // remove the item from players in world
         for (obj_data * k = object_list; k; k = next_k) 
@@ -2216,23 +2252,7 @@ int do_oedit(struct char_data *ch, char *argument, int cmd)
               extract_obj(k);
         }
 
-	struct vault_data *vault, *tvault;
-	struct vault_items_data *items, *titems;
-	int num = 0;
 
-	for (vault = vault_table; vault; vault = tvault, num++) {
-	    tvault = vault->next;
-
-	    if (vault && vault->items) {
-		for (items = vault->items; items; items = titems) {
-		    titems = items->next;
-		    if (items->obj && items->obj->item_number == item_num) {
-			items->obj = 0;
-			logf(0, LOG_MISC, "Removing deleted item %d from %s's vault.", itemvnum, vault->owner);
-		    }
-		}
-	    }
-	}
 
         // remove the item from index
         delete_item_from_index(item_num);
