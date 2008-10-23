@@ -105,22 +105,24 @@ int do_showbits(struct char_data *ch, char *argument, int cmd)
 {
     char person[MAX_INPUT_LENGTH];
     struct char_data *victim;
-
     one_argument(argument, person);
 
     if (!*person)
     {
-        send_to_char("Showbits on whom?\n\r", ch);
-        return eFAILURE;
+  	for(victim = character_list; victim; victim = victim->next) 
+        {
+           if(IS_NPC(victim)) continue;
+           do_showbits(ch, GET_NAME(victim), cmd);
+        }
+        return eSUCCESS;
     }
-
     if(!(victim = get_char(person)))
     {
         send_to_char("They aren't here.\n\r", ch);
         return eFAILURE;
     }
 
-    send_to_char("--------bits--------\n\r", ch);
+    csendf(ch, "Player: %s\n\r", GET_NAME(victim));
 
     if(IS_SET(victim->combat, COMBAT_SHOCKED))
         send_to_char("COMBAT_SHOCKED\n\r", ch);
@@ -192,7 +194,7 @@ int do_showbits(struct char_data *ch, char *argument, int cmd)
         send_to_char("COMBAT_CRUSH_BLOW\n\r", ch);
    
 
-    send_to_char("--------------------\n\r", ch);
+    send_to_char("--------------------\n\r\n\r", ch);
 
     return eSUCCESS;
 }
