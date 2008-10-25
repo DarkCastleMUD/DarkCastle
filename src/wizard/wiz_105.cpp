@@ -109,10 +109,12 @@ int do_showbits(struct char_data *ch, char *argument, int cmd)
 
     if (!*person)
     {
+        char buf[MAX_STRING_LENGTH];
   	for(victim = character_list; victim; victim = victim->next) 
         {
            if(IS_NPC(victim)) continue;
-           do_showbits(ch, GET_NAME(victim), cmd);
+	   sprintf(buf, "0.%s", GET_NAME(victim));
+           do_showbits(ch, buf, cmd);
         }
         return eSUCCESS;
     }
