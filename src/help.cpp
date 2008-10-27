@@ -843,12 +843,12 @@ void save_help(struct char_data *ch) {
       help_string_to_file(f, new_help_table[i].keyword3);
       help_string_to_file(f, new_help_table[i].keyword4);
       help_string_to_file(f, new_help_table[i].keyword5);
-      help_string_to_file(f, new_help_table[i].related);
-      fprintf(f, "L: %d\n", new_help_table[i].min_level);
-      fprintf(f, "E:\n");
+//      help_string_to_file(f, new_help_table[i].related);
+//      fprintf(f, "L: %d\n", new_help_table[i].min_level);
+//      fprintf(f, "E:\n");
       help_string_to_file(f, new_help_table[i].entry);
       fprintf(f, "#\n");
-      fprintf(f, "~\n");
+//      fprintf(f, "~\n");
     }
   }
 
