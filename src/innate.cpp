@@ -316,7 +316,7 @@ int innate_fly(CHAR_DATA *ch, char *arg, int cmd)
 
    struct affected_type af;
    af.type = SKILL_INNATE_FLY;
-   af.duration = 0;
+   af.duration = -1;
    af.modifier = 0;
    af.location = 0;
    af.bitvector = AFF_FLYING;
