@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.171 2008/09/24 17:20:32 kkoons Exp $ */
+/* $Id: info.cpp,v 1.172 2008/11/06 07:26:42 kkoons Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -667,14 +667,17 @@ int do_botcheck(struct char_data *ch, char *argument, int cmd)
 {
   char_data *victim;
   char name[MAX_STRING_LENGTH];
-
+  char name2[MAX_STRING_LENGTH];
   argument = one_argument(argument, name);
   if (!*name) {
     send_to_char("botcheck <player> or all\n\r\n\r", ch);
     return eFAILURE;
   }
 
-  victim = get_char(name);
+  strcpy(name2, "0.");
+  strncat(name2, name, MAX_STRING_LENGTH);
+  victim = get_char(name2);
+
 
   if (victim == NULL && name != NULL && !strcmp(name, "all")) {
     descriptor_data *d;
