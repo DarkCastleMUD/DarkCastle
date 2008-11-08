@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.177 2008/08/19 07:38:38 dcastle Exp $ */
+/* $Id: db.cpp,v 1.178 2008/11/08 22:35:43 kkoons Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -60,6 +60,7 @@ extern "C"
 #include <shop.h>
 #include <help.h>
 #include <quest.h>
+#include <vault.h>
 
 int load_new_help(FILE *fl, int reload, struct char_data *ch);
 void load_vaults();
@@ -3211,6 +3212,47 @@ int create_blank_item(int nr)
     for(curr = object_list; curr; curr = curr->next)
       if(curr->item_number >= cur_index)
          curr->item_number++;
+
+
+
+
+
+    //update index of all items in vaults
+	struct vault_data *vault, *tvault;
+	struct vault_items_data *vitems, *vtitems;
+	struct obj_data *vobj;
+	int vnum = 0, vreal_num = 0;
+
+	for (vault = vault_table; vault; vault = tvault, vnum++) 
+	{
+	    tvault = vault->next;
+
+	    if (vault && vault->items) 
+	    {
+		for (vitems = vault->items; vitems; vitems = vtitems) 
+		{
+		    vtitems = vitems->next;
+		    
+		     
+  		    vreal_num = real_object(vitems->item_vnum);
+      		    vobj = vitems->obj?vitems->obj:((struct obj_data*)obj_index[vreal_num].item);
+		    if(vobj == NULL)
+			continue;
+
+		    if (vobj->item_number >= cur_index) 
+		    	vobj->item_number++;
+		    
+		}
+	    }
+	}
+
+
+
+
+
+
+
+
 
     // update index of all the obj prototypes
     for(int i = cur_index+1; i <= top_of_objt; i++)
