@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.503 2008/06/25 18:32:59 dcastle Exp $               *
+ * $Id: fight.cpp,v 1.504 2008/11/09 21:22:15 kkoons Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -1515,7 +1515,7 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
   
   do_combatmastery(ch, vict, weapon);
   if (IS_SET(ch->combat, COMBAT_CRUSH_BLOW))
-     dam *= 0.5;
+     dam >>= 1;
 
   if (w_type == TYPE_HIT && IS_NPC(ch))
   {
