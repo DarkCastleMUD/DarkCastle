@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.505 2008/11/09 21:59:58 kkoons Exp $               *
+ * $Id: fight.cpp,v 1.506 2008/11/10 00:45:50 kkoons Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -2326,10 +2326,19 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
      )
     )
   {
-    dam += pspell->modifier;  // modifier is negative
-    if(dam < 1)  dam = 1;
-    pspell->duration--;
-    if(0 == pspell->duration) {
+    
+    if (dam > pspell->modifier)
+    {
+      dam -= pspell->modifier;
+      pspell->duration -= pspell->modifier;
+    }
+    else
+    {
+      pspell->duration -= dam;
+      dam = 1;
+    } 
+    
+    if(0 >= pspell->duration) {
       ethereal = 1;
       affect_from_char(victim, SPELL_STONE_SHIELD);
       affect_from_char(victim, SPELL_GREATER_STONE_SHIELD);
