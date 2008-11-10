@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: board.cpp,v 1.24 2007/12/26 08:47:22 dcastle Exp $
+| $Id: board.cpp,v 1.25 2008/11/10 03:38:16 kkoons Exp $
 | board.C
 | Description:  This file contains the implementation for the board
 |   code.  It's old and should be rewritten --Morc XXX
@@ -76,7 +76,7 @@ extern CWorld world;
 
 const int MAX_MSGS           = 99;       // Max number of messages.
 const int MAX_MESSAGE_LENGTH = 2048;     // that should be enough
-const int NUM_BOARDS         = 55; 
+const int NUM_BOARDS         = 56; 
 
 int min_read_level[]   = {  0, IMMORTAL, OVERSEER, IMMORTAL, 0, 0, 0, 0, 0, 0, 0, 0,
                      0, 0, 0, 0, 0, 0, 0, 0,  0, IMMORTAL, 0, 0, 0,//24
@@ -172,7 +172,8 @@ char save_file[NUM_BOARDS][42] = {
   "board/monk",
   "board/ranger",
   "board/bard",
-  "board/druid"
+  "board/druid",
+  "board/triad"
 };
  
  static struct board_lock_struct {
@@ -314,6 +315,8 @@ int find_board(CHAR_DATA *ch)
         return 53;
      else if (!strcmp(i->name, "board guild druid sheet papyrus"))
         return 54;
+     else if (!strcmp(i->name, "board clan triad chalk"))
+        return 55;
      } 
 
 
