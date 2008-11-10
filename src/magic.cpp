@@ -675,7 +675,7 @@ int spell_stone_shield(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
 {
   struct affected_type af;
   char buf[160];
-
+  int duration, modifier;
   if(affected_by_spell(victim, SPELL_GREATER_STONE_SHIELD))
   {
     sprintf(buf, "%s is already surrounded by a greater stoneshield.\r\n", GET_SHORT(victim));
@@ -686,9 +686,12 @@ int spell_stone_shield(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
   if(affected_by_spell(victim, SPELL_STONE_SHIELD))
      affect_from_char(victim, SPELL_STONE_SHIELD);
 
+  duration = 4 + (skill / 10) + (GET_WIS(ch) > 20);
+  modifier = 15 + skill / 5;
+
   af.type      = SPELL_STONE_SHIELD;
-  af.duration  = 5 + (skill / 10) + (GET_WIS(ch) > 20);
-  af.modifier  = -15 - skill / 5;
+  af.duration  = duration * modifier;
+  af.modifier  = modifier;
   af.location  = 0;
   af.bitvector = -1;
 
@@ -788,16 +791,25 @@ int spell_greater_stone_shield(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, st
 {
   struct affected_type af;
   char buf[160];
-  if(affected_by_spell(victim, SPELL_STONE_SHIELD) || affected_by_spell(victim, SPELL_GREATER_STONE_SHIELD))
+  int duration, modifier;
+  if(affected_by_spell(victim, SPELL_STONE_SHIELD))
   {
     sprintf(buf, "%s is already surrounded by a stone shield.\r\n", GET_SHORT(victim));
     send_to_char(buf, ch);
     return eSUCCESS;
   }
 
+
+  if(affected_by_spell(victim, SPELL_GREATER_STONE_SHIELD))
+     affect_from_char(victim, SPELL_GREATER_STONE_SHIELD);
+
+  modifier = 20 + skill / 4;
+  duration = 5 + (skill / 6) + (GET_WIS(ch) > 20);
+
+
   af.type      = SPELL_GREATER_STONE_SHIELD;
-  af.duration  = 5 + (skill / 6) + (GET_WIS(ch) > 20);
-  af.modifier  = - 20 - skill / 4;
+  af.duration  = duration * modifier;
+  af.modifier  = modifier;
   af.location  = 0;
   af.bitvector = -1;
 
@@ -808,6 +820,7 @@ int spell_greater_stone_shield(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, st
   return eSUCCESS;
 }
 
+
 int cast_greater_stone_shield( ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill )
 {
   switch (type) {
@@ -816,20 +829,20 @@ int cast_greater_stone_shield( ubyte level, CHAR_DATA *ch, char *arg, int type, 
                    send_to_char("The combat disrupts the ether too much to coalesce into stones.\r\n", ch);
                    return eFAILURE;
                  }
-		 return spell_stone_shield(level,ch,tar_ch,0, skill);
+		 return spell_greater_stone_shield(level,ch,tar_ch,0, skill);
 		 break;
 	case SPELL_TYPE_POTION:
-		 return spell_stone_shield(level,ch,ch,0, skill);
+		 return spell_greater_stone_shield(level,ch,ch,0, skill);
 		 break;
 	case SPELL_TYPE_SCROLL:
 		 if (tar_obj) return eFAILURE;
 		 if (!tar_ch) tar_ch = ch;
-		 return spell_stone_shield(level,ch,ch,0,skill);
+		 return spell_greater_stone_shield(level,ch,ch,0,skill);
 		 break;
 	case SPELL_TYPE_WAND:
 		 if (tar_obj) return eFAILURE;
 		 if (!tar_ch) tar_ch = ch;
-		 return spell_stone_shield(level,ch,tar_ch,0, skill);
+		 return spell_greater_stone_shield(level,ch,tar_ch,0, skill);
 		 break;
 		default :
 	 log("Serious screw-up in stone_shield!", ANGEL, LOG_BUG);
