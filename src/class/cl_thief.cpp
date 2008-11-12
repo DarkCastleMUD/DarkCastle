@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.182 2008/06/12 21:30:19 kkoons Exp $
+| $Id: cl_thief.cpp,v 1.183 2008/11/12 18:51:06 kkoons Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -65,7 +65,8 @@ int palm(CHAR_DATA *ch, struct obj_data *obj_object,
      }
   }
 
-  
+  if (!charge_moves(ch, SKILL_PALM_MOVES, SKILL_PALM)) return eSUCCESS; 
+ 
   if(obj_index[obj_object->item_number].virt == CHAMPION_ITEM) {
      if (IS_NPC(ch) || GET_LEVEL(ch) <= 5) return eFAILURE;
            SETBIT(ch->affected_by, AFF_CHAMPION);
@@ -216,6 +217,8 @@ int do_eyegouge(CHAR_DATA *ch, char *argument, int cmd)
         return eFAILURE;
   }
 
+  if (!charge_moves(ch, SKILL_EYEGOUGE_MOVES, SKILL_EYEGOUGE)) return eSUCCESS;
+
   int retval = 0;
   if (!skill_success(ch,victim, SKILL_EYEGOUGE))
   {
@@ -291,6 +294,8 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
     act("$E is too alert and nervous looking; you are unable to sneak behind!", ch,0,victim, TO_CHAR, 0);
     return eFAILURE;
   }
+
+  if (!charge_moves(ch, SKILL_BACKSTAB_MOVES, SKILL_BACKSTAB)) return eSUCCESS;
 
   int min_hp = (int) (GET_MAX_HIT(ch) / 5);
   min_hp = MIN( min_hp, 25 );
@@ -423,7 +428,7 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
   WAIT_STATE(ch, PULSE_VIOLENCE*2);
 
   // If we're intended to have a dual backstab AND we still can
-  if (perform_dual_backstab == true) {
+  if (perform_dual_backstab == true && charge_moves(ch, SKILL_BACKSTAB_MOVES, SKILL_BACKSTAB)) {
     if (was_in == ch->in_room) {
       if (AWAKE(victim) && !skill_success(ch,victim, SKILL_BACKSTAB)) {
 	retval = damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_BACKSTAB, SECOND);
@@ -526,6 +531,8 @@ int do_circle(CHAR_DATA *ch, char *argument, int cmd)
      if (!can_attack(ch) || !can_be_attacked(ch, victim))
        return eFAILURE;
    }
+
+   if (!charge_moves(ch, SKILL_CIRCLE_MOVES, SKILL_CIRCLE)) return eSUCCESS;
 
    bool blackjack = FALSE;
    switch (get_weapon_damage_type(ch->equipment[WIELD])) {
@@ -668,6 +675,8 @@ int do_trip(CHAR_DATA *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
+  if (!charge_moves(ch, SKILL_TRIP_MOVES, SKILL_TRIP)) return eSUCCESS;
+
   int modifier = get_stat(ch, DEX) - get_stat(victim, DEX);
   if (modifier > 10)
     modifier = 10;
@@ -728,6 +737,8 @@ int do_sneak(CHAR_DATA *ch, char *argument, int cmd)
       }
    }
 
+   if (!charge_moves(ch, SKILL_SNEAK_MOVES, SKILL_SNEAK)) return eSUCCESS;
+
    do_hide(ch, "", 12);
 
    send_to_char("You try to move silently for a while.\n\r", ch);
@@ -784,11 +795,8 @@ int do_stalk(CHAR_DATA *ch, char *argument, int cmd)
     send_to_char("You must first abandon your group.\r\n",ch);
     return eFAILURE;
   }
-  if(GET_MOVE(ch) < 10) {
-    send_to_char("You are too tired to stealthily follow somebody.\n\r", ch);
-    return eFAILURE;
-  }
-  GET_MOVE(ch) -= 10;
+
+  if (!charge_moves(ch, SKILL_STALK_MOVES, SKILL_STALK)) return eSUCCESS;
 
   WAIT_STATE(ch, PULSE_VIOLENCE*1);
 
@@ -828,6 +836,8 @@ int do_hide(CHAR_DATA *ch, char *argument, int cmd)
          return eFAILURE;
       }
    }
+
+   if (!charge_moves(ch, SKILL_HIDE_MOVES, SKILL_HIDE)) return eSUCCESS;
 
    send_to_char("You attempt to hide yourself.\n\r", ch);
 
@@ -953,11 +963,7 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
     return eFAILURE;
   }*/
 
-  if(GET_MOVE(ch) < 6) {
-    send_to_char("You are too tired to sneak up on anybody.\n\r", ch);
-    return eFAILURE;
-  }
-  GET_MOVE(ch) -= 6;
+  if (!charge_moves(ch, SKILL_STEAL_MOVES, SKILL_STEAL)) return eSUCCESS;
 
   WAIT_STATE(ch, 12); /* It takes TIME to steal */
 
@@ -1402,11 +1408,7 @@ int do_pocket(CHAR_DATA *ch, char *argument, int cmd)
     return eFAILURE;
   }
  
-  if(GET_MOVE(ch) < 6) {
-    send_to_char("You are too tired to rob gold right now.\n\r", ch);
-    return eFAILURE;
-  }
-  GET_MOVE(ch) -= 6;
+  if (!charge_moves(ch, SKILL_POCKET_MOVES, SKILL_POCKET)) return eSUCCESS;
 
   WAIT_STATE(ch, 20); /* It takes TIME to steal */
 
@@ -1541,6 +1543,8 @@ int do_pick(CHAR_DATA *ch, char *argument, int cmd)
       send_to_char("The lock resists even your best attempts to pick it.\n\r", ch);
   else
   {
+   if (!charge_moves(ch, SKILL_PICKLOCK_MOVES, SKILL_PICK_LOCK)) return eSUCCESS;
+
    if (!skill_success(ch,NULL,SKILL_PICK_LOCK)) {
       send_to_char("You failed to pick the lock.\n\r", ch);
       WAIT_STATE(ch, PULSE_VIOLENCE);
@@ -1564,6 +1568,7 @@ int do_pick(CHAR_DATA *ch, char *argument, int cmd)
       send_to_char("You seem to be unable to pick this lock.\n\r", ch);
   else
   {
+   if (!charge_moves(ch, SKILL_PICKLOCK_MOVES, SKILL_PICK_LOCK)) return eSUCCESS;
       //skill_increase_check(ch, SKILL_PICK_LOCK, has_skill(ch,SKILL_PICK_LOCK), SKILL_INCREASE_MEDIUM);
    if (!skill_success(ch,NULL,SKILL_PICK_LOCK)) {
       send_to_char("You failed to pick the lock.\n\r", ch);
@@ -1650,6 +1655,8 @@ int do_slip(struct char_data *ch, char *argument, int cmd)
          send_to_char("To yourself?!  Very cute...\n\r", ch);
          return eFAILURE;
       }    
+
+      if (!charge_moves(ch, SKILL_SLIP_MOVES, SKILL_SLIP)) return eSUCCESS;
       // Failure
       if (!skill_success(ch,vict,SKILL_SLIP)) {
          send_to_char("Whoops!  You dropped the coins!\n\r", ch);
@@ -1875,7 +1882,8 @@ int do_vitalstrike(struct char_data *ch, char *argument, int cmd)
   }
 
   //skill_increase_check(ch, SKILL_VITAL_STRIKE, has_skill(ch,SKILL_VITAL_STRIKE), SKILL_INCREASE_EASY);
-  
+  if (!charge_moves(ch, SKILL_VITALSTRIKE_MOVES, SKILL_VITAL_STRIKE)) return eSUCCESS;  
+
   if(!skill_success(ch,NULL,SKILL_VITAL_STRIKE)) {
     act("$n starts jabbing $s weapons around $mself and almost chops off $s pinkie finger."
          , ch, 0, 0, TO_ROOM, NOTVICT);
@@ -1926,6 +1934,19 @@ int do_deceit(struct char_data *ch, char *argument, int cmd)
     send_to_char("You have no group to instruct!\r\n", ch);
     return eFAILURE;
   }   
+
+
+  int grpsize = 0;
+  for(char_data * tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+  {
+    if(tmp_char == ch)
+      continue;
+    if(!ARE_GROUPED(ch, tmp_char))
+      continue;
+    grpsize++;
+  }
+
+  if (!charge_moves(ch, SKILL_DECEIT_MOVES, SKILL_DECEIT)) return eSUCCESS;
       
   if (!skill_success(ch,NULL,SKILL_DECEIT)) {
      send_to_char("Your class just isn't up to the task.\r\n", ch);
@@ -1948,6 +1969,7 @@ int do_deceit(struct char_data *ch, char *argument, int cmd)
         continue;
       if(!ARE_GROUPED(ch, tmp_char))
         continue;
+
       affect_from_char(tmp_char, SKILL_DECEIT, SUPPRESS_MESSAGES);
       affect_from_char(tmp_char, SKILL_DECEIT, SUPPRESS_MESSAGES);
       act ("$n lures your mind into the thought patterns of the morally corrupt.", ch, 0, tmp_char, TO_VICT, 0);
@@ -1967,7 +1989,6 @@ int do_deceit(struct char_data *ch, char *argument, int cmd)
     
   //skill_increase_check(ch, SKILL_DECEIT, has_skill(ch,SKILL_DECEIT), SKILL_INCREASE_EASY);
   WAIT_STATE(ch, PULSE_VIOLENCE * 2);
-  GET_MOVE(ch) /= 2;
   return eSUCCESS;
 }
 
@@ -2025,6 +2046,8 @@ int do_blackjack(struct char_data *ch, char *argument, int cmd)
       if(!can_attack(ch) || !can_be_attacked(ch, victim))
       return eFAILURE;
   }
+
+  if (!charge_moves(ch, SKILL_BLACKJACK_MOVES, SKILL_BLACKJACK)) return eSUCCESS;
 
   set_cantquit(ch, victim);
   WAIT_STATE(ch, PULSE_VIOLENCE*3);
@@ -2120,11 +2143,7 @@ int do_appraise(CHAR_DATA *ch, char *argument, int cmd)
      return eFAILURE;
    }
 
-   if(GET_MOVE(ch) < 25) {
-      send_to_char("You're too tired to make a valid assessment.\n\r", ch);
-      return eFAILURE;
-   }
-   GET_MOVE(ch) -=25;
+   if (!charge_moves(ch, SKILL_APPRAISE_MOVES, SKILL_APPRAISE)) return eSUCCESS;
 
    if(obj) {
       appraised = obj->obj_flags.cost;
@@ -2247,6 +2266,8 @@ int do_cripple(CHAR_DATA *ch, char *argument, int cmd)
    if((GET_LEVEL(ch) < IMMORTAL) || IS_NPC(ch))
       if(!can_attack(ch) || !can_be_attacked(ch, vict))
          return eFAILURE;
+
+   if (!charge_moves(ch, SKILL_CRIPPLE_MOVES, SKILL_CRIPPLE)) return eSUCCESS;
 
    WAIT_STATE(ch, PULSE_VIOLENCE * 2);
   // Make 'em fight eachother

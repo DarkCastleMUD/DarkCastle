@@ -1,5 +1,5 @@
 /************************************************************************
- * $Id: cl_barbarian.cpp,v 1.90 2008/05/27 20:36:12 kkoons Exp $
+ * $Id: cl_barbarian.cpp,v 1.91 2008/11/12 18:51:58 kkoons Exp $
  * cl_barbarian.cpp
  * Description: Commands for the barbarian class.
  *************************************************************************/
@@ -67,6 +67,8 @@ int do_rage(struct char_data *ch, char *argument, int cmd)
   if(!can_attack(ch) || !can_be_attacked(ch, victim))
     return eFAILURE;
 
+  if (!charge_moves(ch, SKILL_RAGE_MOVES, SKILL_RAGE)) return eSUCCESS;
+
   if (!skill_success(ch,victim,SKILL_RAGE)) {
     act ("You start advancing towards $N, but trip over your own feet!", 
          ch, 0, victim, TO_CHAR, 0);
@@ -120,6 +122,8 @@ int do_battlecry(struct char_data *ch, char *argument, int cmd)
     send_to_char("You must be leading a group in order to battlecry.\n\r", ch);
     return eFAILURE;
   }
+
+  if (!charge_moves(ch, SKILL_BATTLECRY_MOVES, SKILL_BATTLECRY)) return eSUCCESS;
 
   if (!skill_success(ch,NULL,SKILL_BATTLECRY)) {
      act ("You give a cry of defiance, but trip over your own feet!", ch, 0, 0, TO_CHAR, 0);
@@ -208,6 +212,8 @@ int do_berserk(struct char_data *ch, char *argument, int cmd)
 
   if(!can_attack(ch) || !can_be_attacked(ch, victim))
     return eFAILURE;
+
+  if (!charge_moves(ch, SKILL_BERSERK_MOVES, SKILL_BERSERK)) return eSUCCESS;
 
   if (!skill_success(ch,victim,SKILL_BERSERK)) {
     act ("You start freaking out on $N, but trip over your own feet!", ch, 0, victim, TO_CHAR, 0);
@@ -316,6 +322,8 @@ int do_headbutt(struct char_data *ch, char *argument, int cmd)
         return eFAILURE;
   }
 
+  if (!charge_moves(ch, SKILL_HEADBUTT_MOVES, SKILL_HEADBUTT)) return eSUCCESS;
+
   if (IS_SET(victim->combat, COMBAT_BERSERK) && (IS_NPC(victim) || has_skill(victim, SKILL_BERSERK) > 80))
   {
      act("In your enraged state, you shake off $n's attempt to immobilize you.", ch, NULL, victim, TO_VICT, 
@@ -397,6 +405,8 @@ int do_bloodfury(struct char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
+  if (!charge_moves(ch, SKILL_BLOODFURY_MOVES, SKILL_BLOOD_FURY)) return eSUCCESS;
+
   if (!skill_success(ch,NULL,SKILL_BLOOD_FURY)) 
   {
     act("$n starts breathing heavily, then chokes and tries to clear $s head.", ch, NULL, NULL, TO_ROOM, NOTVICT);
@@ -446,6 +456,8 @@ int do_crazedassault(struct char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
           
+  if (!charge_moves(ch, SKILL_CRAZEDASSAULT_MOVES, SKILL_CRAZED_ASSAULT)) return eSUCCESS;
+
   if(!skill_success(ch,NULL,SKILL_CRAZED_ASSAULT)) {
     send_to_char("You try to psyche yourself up for it but just can't muster the concentration.\r\n", ch);
     duration = 10 - has_skill(ch, SKILL_CRAZED_ASSAULT) / 10;
@@ -531,6 +543,9 @@ int do_bullrush(struct char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
+
+  if (!charge_moves(ch, SKILL_BULLRUSH_MOVES, SKILL_BULLRUSH)) return eSUCCESS;
+
   // before we move anyone, we need to check for any spec procs in the
   // room like guild guards
   retval = special( ch, dir, "" );
@@ -599,6 +614,18 @@ int do_ferocity(struct char_data *ch, char *argument, int cmd)
     send_to_char("You have no group to inspire.\r\n", ch);
     return eFAILURE;
   }
+ 
+  int grpsize = 0;
+  for(char_data * tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+  {
+    if(tmp_char == ch)
+      continue;
+    if(!ARE_GROUPED(ch, tmp_char))
+      continue;
+    grpsize++;
+  }
+
+  if (!charge_moves(ch, SKILL_FEROCITY_MOVES*grpsize, SKILL_FEROCITY)) return eSUCCESS;
 
   if (!skill_success(ch,NULL,SKILL_FEROCITY)) {
      send_to_char("Guess you just weren't that angry.\r\n", ch);
@@ -639,7 +666,6 @@ int do_ferocity(struct char_data *ch, char *argument, int cmd)
   }
 
   WAIT_STATE(ch, PULSE_VIOLENCE * 2);
-  GET_MOVE(ch) /= 2;
   return eSUCCESS;
 }
 
@@ -698,6 +724,8 @@ int do_knockback(struct char_data *ch, char *argument, int cmd)
 
   if(!can_attack(ch) || !can_be_attacked(ch, victim))
     return eFAILURE;
+
+  if (!charge_moves(ch, SKILL_KNOCKBACK_MOVES, SKILL_KNOCKBACK)) return eSUCCESS;
 
   bool victim_paralyzed = false;
   affected_type *af;

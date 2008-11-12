@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: cl_ranger.cpp,v 1.90 2008/06/10 19:49:50 kkoons Exp $ | cl_ranger.C  *
+ * $Id: cl_ranger.cpp,v 1.91 2008/11/12 18:51:36 kkoons Exp $ | cl_ranger.C  *
  * Description: Ranger skills/spells                                          *
  *                                                                            *
  * Revision History                                                           *
@@ -146,6 +146,8 @@ int do_tame(CHAR_DATA *ch, char *arg, int cmd)
      }*/
    }
 
+  if (!charge_moves(ch, SKILL_TAME_MOVES, SKILL_TAME)) return eSUCCESS;
+
   act("$n holds out $s hand to $N and beckons softly.", ch, NULL, victim, TO_ROOM, INVIS_NULL); 
 
   WAIT_STATE(ch, PULSE_VIOLENCE * 1);
@@ -233,9 +235,11 @@ int do_track(CHAR_DATA *ch, char *argument, int cmd)
 
   if(*victim && !IS_NPC(ch) && GET_CLASS(ch) != CLASS_RANGER
      && GET_CLASS(ch) != CLASS_DRUID && GET_LEVEL(ch) < ANGEL) {
-    send_to_char("Only a ranger or a druid could track someone by name.\n\r", ch);
+    send_to_char("Only a ranger could track someone by name.\n\r", ch);
     return eFAILURE;
   }
+
+  if (!charge_moves(ch, SKILL_TRACK_MOVES, SKILL_TRACK)) return eSUCCESS;
 
   act("$n walks about slowly, searching for signs of $s quarry", ch, 0, 0, TO_ROOM, INVIS_NULL);
   send_to_char("You search for signs of your quarry...\n\r\n\r", ch);
@@ -468,6 +472,9 @@ int ambush(CHAR_DATA *ch)
           send_to_char("Your target is far too alert to accomplish an ambush!\r\n", i);
           continue;
        }
+
+
+       if (!charge_moves(ch, SKILL_AMBUSH_MOVES, SKILL_AMBUSH)) return eSUCCESS;
 
        if(skill_success(i,ch, SKILL_AMBUSH)) 
        { 
@@ -735,12 +742,7 @@ int do_forage(CHAR_DATA *ch, char *arg, int cmd)
     return eFAILURE;
   }
   
-  if(GET_MOVE(ch) < 5) {
-    send_to_char("You are too tired to be foraging around right now.\n\r", ch);
-    return eFAILURE;
-  }
-
-  GET_MOVE(ch) -= 5;
+  if (!charge_moves(ch, SKILL_FORAGE_MOVES, SKILL_FORAGE)) return eSUCCESS;
  
   learned = has_skill(ch, SKILL_FORAGE);
   if(!learned) {
@@ -1125,7 +1127,7 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
 
   if (!ch->equipment[HOLD])
   {
-    send_to_char("You need to be holding a bow moron.\r\n", ch);
+    send_to_char("You need to be holding a bow, moron.\r\n", ch);
     return eFAILURE;
   }
 
@@ -1224,6 +1226,8 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
     send_to_char("You don't have enough mana for that arrow.\r\n", ch);
     return eFAILURE;
   }
+
+  if (!charge_moves(ch, SKILL_ARCHERY_MOVES, SKILL_ARCHERY)) return eSUCCESS;
 
 /* check if you can see your target */
 /* put ch in the targets room to check if they are visible */

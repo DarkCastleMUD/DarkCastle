@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.269 2008/05/23 21:39:57 kkoons Exp $ */
+/* $Id: const.cpp,v 1.270 2008/11/12 18:52:45 kkoons Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -2308,6 +2308,118 @@ ubyte backstab_mult[71] =
    19,   /* 70 */
    20
 }; 
+
+
+int skill_move_cost[SKILL_MAX-SKILL_BASE + 1] =
+{
+	SKILL_TRIP_MOVES,
+	0, /* 1 */
+	0,
+	SKILL_DISARM_MOVES,
+	0,
+	0,
+	SKILL_DEATHSTROKE_MOVES,
+	SKILL_CIRCLE_MOVES,
+	SKILL_BERSERK_MOVES,
+	SKILL_HEADBUTT_MOVES,
+	0, /* 10 */
+	SKILL_QUIVER_MOVES,
+	SKILL_PALM_MOVES,
+	SKILL_STALK_MOVES,
+	0,
+	0,
+	SKILL_HITALL_MOVES,
+	SKILL_STUN_MOVES,
+	0,
+	0,
+	0, /* 20 */
+	SKILL_REDIRECT_MOVES, 
+	SKILL_AMBUSH_MOVES,
+	SKILL_FORAGE_MOVES,
+	SKILL_TAME_MOVES,
+	SKILL_TRACK_MOVES,
+	0,
+	SKILL_SLIP_MOVES,
+	SKILL_RETREAT_MOVES,
+	SKILL_RAGE_MOVES,
+	SKILL_BATTLECRY_MOVES, /* 30 */
+	SKILL_ARCHERY_MOVES,
+	0,
+	SKILL_LAYHANDS_MOVES,
+	0,
+	0,
+	SKILL_SNEAK_MOVES,
+	SKILL_HIDE_MOVES,
+	SKILL_STEAL_MOVES,
+	SKILL_BACKSTAB_MOVES,
+	SKILL_PICKLOCK_MOVES, /* 40 */
+	SKILL_KICK_MOVES, 
+	SKILL_BASH_MOVES,
+	SKILL_RESCUE_MOVES,
+	SKILL_BLOODFURY_MOVES,
+	0,
+	SKILL_HARMTOUCH_MOVES,
+	0,
+	SKILL_BLADESHIELD_MOVES,
+	SKILL_POCKET_MOVES,
+	SKILL_GUARD_MOVES, /* 50 */
+	0,
+	0,
+	0,
+	SKILL_VITALSTRIKE_MOVES,
+	SKILL_CRAZEDASSAULT_MOVES,
+	0,
+	0,
+	0,
+	0,
+	0, /* 60 */
+	0, 
+	0,
+	0,
+	SKILL_BULLRUSH_MOVES,
+	SKILL_FEROCITY_MOVES,
+	SKILL_TACTICS_MOVES,
+	SKILL_DECEIT_MOVES,
+	0,
+	0,
+	SKILL_EYEGOUGE_MOVES, /* 70 */
+	0, 
+	0,
+	0,
+	0,
+	SKILL_KNOCKBACK_MOVES,
+	0,
+	SKILL_BLACKJACK_MOVES,
+	SKILL_APPRAISE_MOVES,
+	0,
+	0, /* 80 */
+	0, 
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	SKILL_CRIPPLE_MOVES,
+	0, /* 90 */
+	0, 
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0, /* 100 */
+	0, 
+	0,
+	0,
+	0,
+	0  /* 105 */
+};
+
 
 int mana_bonus[31] =
 {

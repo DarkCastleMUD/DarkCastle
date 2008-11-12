@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_monk.cpp,v 1.34 2008/05/23 21:40:16 kkoons Exp $
+| $Id: cl_monk.cpp,v 1.35 2008/11/12 18:50:52 kkoons Exp $
 | cl_monk.C
 | Description:  Monk skills.
 */
@@ -72,6 +72,8 @@ int do_eagle_claw(struct char_data *ch, char *argument, int cmd)
 
   if (!can_attack(ch) || !can_be_attacked(ch, victim))
     return eFAILURE;
+
+  if (!charge_moves(ch, SKILL_EAGLECLAW_MOVES, SKILL_EAGLE_CLAW)) return eSUCCESS;
 
   WAIT_STATE(ch, PULSE_VIOLENCE * 2);
 
@@ -152,6 +154,8 @@ int do_quivering_palm(struct char_data *ch, char *argument, int cmd)
 
   if(!can_attack(ch) || !can_be_attacked(ch, victim))
      return eFAILURE;
+
+  if (!charge_moves(ch, SKILL_QUIVER_MOVES, SKILL_QUIVERING_PALM)) return eSUCCESS;
 	   
   GET_KI(ch) -= 40;
 
@@ -252,6 +256,8 @@ int do_stun(struct char_data *ch, char *argument, int cmd)
 
   if(!can_attack(ch) || !can_be_attacked(ch, victim))
     return eFAILURE;
+
+  if (!charge_moves(ch, SKILL_STUN_MOVES, SKILL_STUN)) return eSUCCESS;
 
   if (IS_SET(victim->combat, COMBAT_BERSERK) && (IS_NPC(victim) || has_skill(victim, SKILL_BERSERK) > 80))
   {
