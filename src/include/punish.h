@@ -1,7 +1,7 @@
 #ifndef PUNISH_H_
 #define PUNISH_H_
 /************************************************************************
-| $Id: punish.h,v 1.3 2003/01/22 16:18:10 pirahna Exp $
+| $Id: punish.h,v 1.4 2008/11/13 19:10:49 kkoons Exp $
 | punish.h
 | Description: Contains punishment vectors
 */
@@ -19,5 +19,6 @@
 #define PUNISH_NOTITLE      1<<10
 #define PUNISH_UNLUCKY      1<<11
 #define PUNISH_NOTELL       1<<12
+#define PUNISH_NOPRAY       1<<13
 
 #endif
