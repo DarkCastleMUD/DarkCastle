@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.271 2008/11/13 09:17:56 shane Exp $ */
+/* $Id: const.cpp,v 1.272 2008/11/13 16:59:07 shane Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -2419,7 +2419,9 @@ int skill_move_cost[SKILL_MAX-SKILL_BASE + 1] =
 	0,
 	0,
 	0,
-	0  /* 105 */
+	0,  /* 105 */
+	SKILL_ESCAPE_MOVES,
+	0
 };
 
 
