@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.506 2008/11/10 00:45:50 kkoons Exp $               *
+ * $Id: fight.cpp,v 1.507 2008/11/13 09:17:57 shane Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -2283,6 +2283,14 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
 	dam -= (int)((float) dam * ((float)reduce/100));
      }
    */
+
+  if((learned = has_skill(ch, SKILL_CRIT_HIT)) && dam)
+    if(number(1, 101) <= learned/10 + GET_DEX(ch) - GET_DEX(victim)) {
+      dam += (int)(dam * (float)(2 + learned/5)/100);
+      act("Your strike at $N lands with lethal accuracy and inflicts additional damage!", ch, 0, victim, TO_CHAR, 0);
+      act("$n's strike lands with lethal accuracy and inflicts additional damage!", ch, 0, victim, TO_VICT, 0);
+      act("$n's strike at $N lands with lethal accuracy and inflicts additional damage!", ch, 0, victim, TO_ROOM, NOTVICT);
+    }
 
   }
 /* Never heard of it.
@@ -6359,13 +6367,30 @@ int is_fighting_mob(CHAR_DATA *ch)
 
 int do_flee(struct char_data *ch, char *argument, int cmd)
 {
-  int i, attempt, retval;
-  struct char_data * chTemp, * loop_ch;
+  int i, attempt, retval, escape=0;
+  struct char_data * chTemp, * loop_ch, *vict;
   
   if (is_stunned(ch))
     return eFAILURE;
-  
-  if (IS_AFFECTED(ch, AFF_SNEAK))
+
+  if(cmd == CMD_ESCAPE) {
+    if(!(escape=has_skill(ch, SKILL_ESCAPE))) {
+      send_to_char("Huh?\n\r", ch);
+      return eFAILURE;
+    }
+    if(!ch->fighting) {
+      send_to_char("But there is nobody from whom to escape!\n\r", ch);
+      return eFAILURE;
+    } else vict=ch->fighting;
+
+    if(!charge_moves(ch, 25, SKILL_ESCAPE)) return eFAILURE;
+
+    skill_increase_check(ch, SKILL_ESCAPE, escape, SKILL_INCREASE_HARD);
+    if(number(1,101) > MIN((GET_INT(ch) + GET_DEX(ch) + (float)escape/1.5 - GET_INT(vict)/2 - GET_WIS(vict)/2), 100))
+      escape=0;
+  }
+
+  if (IS_AFFECTED(ch, AFF_SNEAK) && !escape)
   {
     affect_from_char(ch, SKILL_SNEAK);
     REMBIT(ch->affected_by, AFF_SNEAK); // Mobs don't always have the affect
@@ -6386,10 +6411,15 @@ int do_flee(struct char_data *ch, char *argument, int cmd)
     if(CAN_GO(ch, attempt))
       if(!IS_NPC(ch) || !IS_SET(world[EXIT(ch, attempt)->to_room].room_flags, NO_TRACK))
       {
+         if(!escape) {
           act("$n panics, and attempts to flee.", ch, 0, 0, TO_ROOM, INVIS_NULL);
           act("You panic, and attempt to flee.", ch, 0, 0, TO_CHAR, 0);
-
-          // The escape has succeded
+         } else {
+          act("You quickly duck $N's attack and attempt to make good your escape!", ch, 0, vict, TO_CHAR, 0);
+          act("$n quickly ducks your attack and attempts to make good a stealthy escape!", ch, 0, vict, TO_VICT, 0);
+          act("$n quickly ducks $N's attack and attempts to make good a stealthy escape!", ch, 0, vict, TO_ROOM, INVIS_NULL|NOTVICT);
+         }
+          // The flee has succeded
           int was_fighting = (int)ch->fighting;
           GET_POS(ch) = POSITION_STANDING;
 

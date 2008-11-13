@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.270 2008/11/12 18:52:45 kkoons Exp $ */
+/* $Id: const.cpp,v 1.271 2008/11/13 09:17:56 shane Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1256,6 +1256,8 @@ struct class_skill_defines t_skills[] = { // thief skills
 {    "eyegouge",        SKILL_EYEGOUGE,         42,    100,  0,  STRDEX },  
 {    "vitalstrike",     SKILL_VITAL_STRIKE,     45,    100,  0,  STRDEX },  
 {    "cripple",		SKILL_CRIPPLE,		50,    100,  0,  STRDEX },
+//{    "escape",		SKILL_ESCAPE,		51,    100,  0,  DEXWIS },
+//{    "critical hit",		SKILL_CRIT_HIT,		55,    100,  0,  CONINT },
 {    "\n",              0,                      1,      0,   0,  0 }
 };
 
