@@ -4904,6 +4904,23 @@ int do_punish(struct char_data *ch, char *arg, int cmd)
     }    
     TOGGLE_BIT(vict->pcdata->punish, PUNISH_UNLUCKY);
   }
+
+  if (!strncasecmp(name, "nopray", i) || !strncasecmp(name, "nemke", i))
+  {
+    if(IS_SET(vict->pcdata->punish, PUNISH_NOPRAY))
+    {
+      send_to_char("The gods will once again hear your prayers.\n\r", vict);
+      send_to_char("But not necessarily answer them...\n\r", vict);
+      send_to_char("NOPRAY (nemke) removed.\n\r", ch);
+    }
+    else
+    {
+      csendf(vict, "%s has removed your ability to pray!\n\r", GET_NAME(ch));
+      send_to_char("NOPRAY (nemke) set.\n\r", ch);
+    }
+    TOGGLE_BIT(vict->pcdata->punish, PUNISH_NOPRAY);
+  }
+
     
   display_punishes(ch, vict);
   return eSUCCESS;
@@ -4948,6 +4965,9 @@ void display_punishes(struct char_data *ch, struct char_data *vict)
 
   if (IS_SET(vict->pcdata->punish, PUNISH_UNLUCKY)) 
      send_to_char("unlucky ", ch);
+
+  if (IS_SET(vict->pcdata->punish, PUNISH_NOPRAY))
+     send_to_char("nopray ", ch);
 
   send_to_char("\n\r", ch);
 
