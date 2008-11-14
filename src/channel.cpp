@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: channel.cpp,v 1.20 2007/12/08 16:48:00 dcastle Exp $
+| $Id: channel.cpp,v 1.21 2008/11/14 03:49:43 kkoons Exp $
 | channel.C
 | Description:  All of the channel - type commands; do_say, gossip, etc..
 */
@@ -178,6 +178,12 @@ int do_pray(struct char_data *ch, char *arg, int cmd)
     send_to_char ("Duh...I'm too stupid!\n\r", ch);
     return eSUCCESS;
     }
+
+  if (!IS_MOB(ch) && IS_SET(ch->pcdata->punish, PUNISH_NOPRAY))
+  {
+    send_to_char("The gods are deaf to your prayers.\n\r", ch);
+    return eSUCCESS;
+  }
 
   sprintf(buf1, "\a$4$B**$R$5 %s prays: %s $4$B**$R\n\r", GET_NAME(ch), arg);
 
