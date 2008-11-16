@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.73 2008/11/12 18:51:16 kkoons Exp $
+| $Id: cl_warrior.cpp,v 1.74 2008/11/16 05:41:45 kkoons Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -721,7 +721,11 @@ int do_disarm( struct char_data *ch, char *argument, int cmd )
           send_to_char("You can't seem to work it loose.\n\r", ch);
           return eFAILURE;
       }
-
+      if(obj_index[ch->equipment[WIELD]->item_number].virt == 27997)
+      {
+        send_to_room("$B$7Ghaerad, Sword of Legends says, 'Sneaky! Sneaky! But you can't catch me!'$R\n\r", ch->in_room);
+        return eSUCCESS;
+      }
       act( "$n disarms $mself!",  ch, NULL, victim, TO_ROOM, NOTVICT );
       send_to_char( "You disarm yourself!  Congratulations!  Try using 'remove' next-time.\n\r", ch );
       obj = unequip_char( ch, WIELD );
