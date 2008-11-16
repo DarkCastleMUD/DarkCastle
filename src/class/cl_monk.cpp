@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_monk.cpp,v 1.35 2008/11/12 18:50:52 kkoons Exp $
+| $Id: cl_monk.cpp,v 1.36 2008/11/16 00:34:52 kkoons Exp $
 | cl_monk.C
 | Description:  Monk skills.
 */
@@ -112,9 +112,7 @@ int do_quivering_palm(struct char_data *ch, char *argument, int cmd)
   int hands = 0;
   if(ch->equipment[WIELD])          hands++;
   if(ch->equipment[SECOND_WIELD])   hands++;
-  if(ch->equipment[HOLD])           hands++;
   if(ch->equipment[WEAR_SHIELD])    hands++;
-  if(ch->equipment[WEAR_LIGHT])     hands++;
 
   if(hands > 1) {
     send_to_char ("You need at least one hand free to perform this!\n\r", ch);
