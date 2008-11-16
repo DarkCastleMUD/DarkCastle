@@ -14,7 +14,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.h,v 1.107 2008/11/13 16:59:11 shane Exp $ */
+/* $Id: spells.h,v 1.108 2008/11/16 05:43:52 dcastle Exp $ */
 #include <structs.h> // ubyte, int16
 
 #define MAX_BUF_LENGTH               240
@@ -559,17 +559,17 @@ void check_maxes(CHAR_DATA *ch);
 #define SKILL_REDIRECT_MOVES		5
 #define SKILL_EAGLECLAW_MOVES		12
 #define SKILL_QUIVER_MOVES		45
-#define SKILL_STUN_MOVES		20
+#define SKILL_STUN_MOVES		15
 
 #define SKILL_BACKSTAB_MOVES		4
 #define SKILL_SNEAK_MOVES		5
-#define SKILL_HIDE_MOVES		3
+#define SKILL_HIDE_MOVES		2
 #define SKILL_HARMTOUCH_MOVES		40
 
 #define SKILL_STALK_MOVES		12
 #define SKILL_POCKET_MOVES		15
 #define SKILL_STEAL_MOVES		20
-#define SKILL_CIRCLE_MOVES		15
+#define SKILL_CIRCLE_MOVES		12
 #define SKILL_DISARM_MOVES		20
 #define SKILL_VITALSTRIKE_MOVES		15
 #define SKILL_DUALBACKSTAB_MOVES	8
