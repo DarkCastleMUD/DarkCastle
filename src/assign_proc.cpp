@@ -426,6 +426,7 @@ void assign_objects(void)
   SPEC_FUN noremove_eq;
   SPEC_FUN glove_combat_procs;
   SPEC_FUN hot_potato;
+  SPEC_FUN talkingsword;
   SPEC_FUN gazeofgaiot;
   SPEC_FUN moving_portals;
   SPEC_FUN spellcraft_glyphs;
@@ -536,6 +537,7 @@ void assign_objects(void)
   assign_one_obj_non(4801, hellmouth_thing);
   assign_one_obj_non(225,  weenie_weedy);
   assign_one_obj_non(393,  hot_potato);
+  assign_one_obj_non(27997, talkingsword);
   assign_one_obj_non(396,  noremove_eq);
   assign_one_obj_non(397,  random_dir_boots);
   assign_one_obj_non(398,  gotta_dance_boots);

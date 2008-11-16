@@ -27,6 +27,9 @@
 #include <returnvals.h>
 #include <set.h>
 #include <arena.h>
+#include <vector>
+#include <string>
+#include <race.h>
 
 #define EMOTING_FILE "emoting-objects.txt"
 
@@ -2500,6 +2503,303 @@ int glove_combat_procs(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
 
    return eFAILURE;
 }
+
+
+
+vector<string> sword_non_combat;
+vector<string> sword_class_specific_combat;
+vector<string> sword_combat;
+
+void do_talking_init()
+{
+
+  string buf;
+
+  /* GENERIC NONCOMBAT MESSAGE */ 
+  buf = "Who wrote such crappy dialogue for me? Pirahna?";
+  sword_non_combat.push_back(buf);
+  buf = "Etala is my bitch.";
+  sword_non_combat.push_back(buf);
+  buf = "I used to get drunk all the time with the Avenger until it found religion and got all holy.";
+  sword_non_combat.push_back(buf);
+  buf = "Do you think these gems on my hilt make me look fat?";
+  sword_non_combat.push_back(buf);
+  buf = "*sigh*";
+  sword_non_combat.push_back(buf);
+  buf = "I'm bored. Go kill something.....";
+  sword_non_combat.push_back(buf);
+  buf = "Dude... just this once. Hold me over your head and shout, \"By the power of Grayskull!\"";
+  sword_non_combat.push_back(buf);
+  buf = "I wish my hilt could do that cool curly thing like in Thundercats.";
+  sword_non_combat.push_back(buf);
+  buf = "Ah, I remember the old days fighting with Musashi.";
+  sword_non_combat.push_back(buf);
+  buf = "The guy that bought me got the material really cheap. He said it was a \"steel\". HA!";
+  sword_non_combat.push_back(buf);
+  buf = "Really... I'm not really with this guy, we just sorta fighting together at the moment.";
+  sword_non_combat.push_back(buf);
+  buf = "Would you just stab him in the back and put me out of this misery?";
+  sword_non_combat.push_back(buf);
+  buf = "10,000 gold if you pinch his ass right now.";
+  sword_non_combat.push_back(buf);
+  buf = "Seriously. How can you stand grouping with this moron?";
+  sword_non_combat.push_back(buf);
+  buf = "Psst! RK him if he goes AFK.";
+  sword_non_combat.push_back(buf);
+  buf = "Pretend to be a chick, get his password, log in as him and just sacrifice me. Please! I'm begging.";
+  sword_non_combat.push_back(buf);
+  buf = "Hey, later on lets stop by and get the latest copy of Sword & Dagger. They've got a hot centerfold this month.";
+  sword_non_combat.push_back(buf);
+  buf = "I just love that Gogo Yubari character; \"Or is it I... who has penetrated you?\" Classic!";
+  sword_non_combat.push_back(buf);
+  buf = "When I was a kid, I wanted to grow up to be a scimitar so I could be a pirate.";
+  sword_non_combat.push_back(buf);
+  buf = "If you don't wipe me down before putting me in the scabbard, I'm going to slice your throat while you're sleeping.";
+  sword_non_combat.push_back(buf);
+  buf = "I miss the old days with Mom and Dad back when I was just a little dagger.";
+  sword_non_combat.push_back(buf);
+  buf = "When they say a sword is an extension of your body, they mean your arm, not penis, you ass.";
+  sword_non_combat.push_back(buf);
+  buf = "I'm the sword that killed Enigo Montoya's father.";
+  sword_non_combat.push_back(buf);
+  buf = "Dude.... I totally think Bedbug likes you.";
+  sword_non_combat.push_back(buf);
+  buf = "That whole sword in the stone thing is bull. Like anyone would ever do that.";
+  sword_non_combat.push_back(buf);
+  buf = "Some swords prefer the waist, and some swords prefer the back. I'm a breast-sword myself.";
+  sword_non_combat.push_back(buf);
+  buf = "Fuck sakes, with how much you use me, I may as well team up with a spoon and a fork and head to Uncle Juan's!";
+  sword_non_combat.push_back(buf);
+  buf = "You know that sweet looking sword Mel Gibson holds in Braveheart? Yeah... I've tagged that.";
+  sword_non_combat.push_back(buf);
+  buf = "Devil-fang Cestus used to complain to me all the time about it's owner. Hairy palms.";
+  sword_non_combat.push_back(buf);
+  buf = "Today is one of those days when you just wanna go out and disembowel some bunnies.";
+  sword_non_combat.push_back(buf);
+  buf = "Hey... Lets head over to Hyperborea and listen to Frosty.";
+  sword_non_combat.push_back(buf);
+
+  
+
+  /* GENERIC COMBAT MESSAGES*/
+  buf = "After this fight, I want you to use me to play air-guiter. Rock on!";
+  sword_combat.push_back(buf);
+  buf =  "If you're happy and you know it, shove me deep! *shove* *shove* ...";
+  sword_combat.push_back(buf);  
+  buf = "No no idiot, swing at his other side!";
+  sword_combat.push_back(buf);
+  buf = "I'm going to wear your entrails like a scarf.";
+  sword_combat.push_back(buf);
+  buf = "At least you can do one thing. If you fought as well as you performed in bed, I'd have a new owner by now.";
+  sword_combat.push_back(buf);
+  buf = "Ooooooh yeah... tickle a little lower under the hilt... OH! I like that!";
+  sword_combat.push_back(buf);
+  buf = "You want me to penetrate THAT?!?";
+  sword_combat.push_back(buf);
+  buf =  "Why don't you try shoving your own 'sword' in there first? I don't know where they've been either.";
+  sword_combat.push_back(buf);
+  buf = "Ohhh gross.... do you know how hard this blood is to get off?";
+  sword_combat.push_back(buf);
+  buf = "Swordfighting is like a dance and *I* get a partner with two left feet.";
+  sword_combat.push_back(buf);
+  buf = "Your liver is going to taste lovely with some fava beans and a nice Chianti!";
+  sword_combat.push_back(buf);
+  buf = "That's MISTER Ghaerad to you, punk!";
+  sword_combat.push_back(buf);
+
+
+
+
+}
+
+
+
+
+
+int talkingsword(struct char_data*ch, struct obj_data *obj, int cmd, char*arg, 
+                   CHAR_DATA *invoker)
+{
+  char_data * vict = NULL;
+  int unequip = -1;
+  static bool init_done = false;
+
+  if(!init_done)
+  {
+    init_done = true;
+    do_talking_init();
+  }
+
+  if (obj->equipped_by)
+    vict = obj->equipped_by;
+  
+  if (!vict)
+    return eFAILURE;
+
+  if (obj->obj_flags.value[0] > 0)
+  {
+    obj->obj_flags.value[0]--;
+  }
+
+
+  if (obj->obj_flags.value[0] == 0)
+  {
+    vector<string> tmp;
+    string buf;
+
+   if(GET_POS(vict) == POSITION_FIGHTING)  
+    {
+      tmp = sword_combat;
+      if(IS_NPC(vict->fighting) && GET_LEVEL(vict->fighting) > 99)
+      {
+        buf = "Are you sure you can win this one? I mean.... I'll be ok, but I'm pretty sure you're screwed.";
+        tmp.push_back(buf);
+      }
+      if(IS_NPC(vict->fighting) 
+         && (GET_LEVEL(vict) - GET_LEVEL(vict->fighting)) > 40)
+      {
+        buf = "Oh come on... this is fuckin' embarrassing...";
+        tmp.push_back(buf);
+        unequip = tmp.size()-1;
+      }
+      switch(GET_RACE(vict->fighting))
+      {
+        case RACE_HOBBIT:
+          buf = "Oh, that is just gross! Like, seriously, shave your feet some time.";
+          tmp.push_back(buf);
+        break;
+        case RACE_PIXIE:
+          buf = "Why are you using me to fight a pixie? Get a fly swatter or something.";
+          tmp.push_back(buf);
+        break;
+        case RACE_ELVEN:
+          buf = "I hate elves. Fuckin' skinnier than I am. Go eat a burger.";
+          tmp.push_back(buf);
+        break;
+        case RACE_DWARVEN:
+          buf = "Cut him off at the knees! Oh, wait... looks like someone already did.";
+          tmp.push_back(buf);
+        break;
+        case RACE_TROLL:
+          buf = "I hate trolls. This smell isn't going to go away for weeks. ARGH!";
+          tmp.push_back(buf);
+        break;
+      } 
+      switch(GET_CLASS(vict->fighting))
+      {
+        case CLASS_MONK:
+          buf = "LOVE MONK AND STUN!";
+          tmp.push_back(buf);
+        break;
+        case CLASS_WARRIOR:
+          buf = "This is horrible... who taught you to fight? That idiot Gireth?";
+          tmp.push_back(buf);
+        break;
+        case CLASS_THIEF:
+          buf = "Look who brought a knife to a sword fight? *snicker*";
+          tmp.push_back(buf);
+        break;
+        case CLASS_PALADIN:
+          buf = "I hate fighting people in platemail. I get such a headache.";
+          tmp.push_back(buf);
+        break;
+        case CLASS_MAGE:
+          buf = "Hey magey, you'd better lose or I'm going to have the gods nerf you again.";
+          tmp.push_back(buf);
+        break;
+      }
+    }  
+    else
+    {
+      tmp = sword_non_combat;
+      if(GET_POS(vict) == POSITION_SLEEPING)
+      {
+        buf = "Hey... someone steal me already... this guy sucks...";
+        tmp.push_back(buf);
+        buf = "Ohhh, if I only had some vasoline and arms to move...";
+        tmp.push_back(buf);
+        buf = "Someone get some markers and write crap on him.";
+        tmp.push_back(buf);
+        buf = "Quick! Take pictures of him with your bare ass next to his head!";
+        tmp.push_back(buf);
+        buf = "Oh come on.... after all the ideas from DC parties none of you is gonna fuck with him?";
+        tmp.push_back(buf);
+      }
+
+      if(vict->in_room == 3001) //tavern
+      {
+        buf = "Are you going to just sit in the Tavern all day? Great... I'm owned by Avalios.";
+        tmp.push_back(buf);
+      }
+      if(IS_SET(world[vict->in_room].room_flags, SAFE))
+      {
+        buf = "Oh... I suppose we're just going to sit here and gossip for the next few hours, huh?";
+        tmp.push_back(buf);
+        buf = "While we're here, why don't we just talk about how badass we are on gossip....";
+        tmp.push_back(buf);
+      }
+      switch(world[vict->in_room].sector_type)
+      {
+        case SECT_UNDERWATER:
+          buf = "Aww man, I hate being under water. I'll rust!";
+          tmp.push_back(buf);
+          buf = "What the fuck, do I LOOK like a harpoon??";
+          tmp.push_back(buf);
+        break;
+        case SECT_FOREST:
+          buf = "If you try to use me like an axe on one of these trees, I am going to shove myself up your ass.";
+          tmp.push_back(buf);
+        break;
+        case SECT_MOUNTAIN:
+          buf = "I like mountains. The iron I was made of comes from a mountain. Know what else is made from iron? Trains.";
+          tmp.push_back(buf);
+        break;
+      }
+    }
+
+    if(!tmp.empty()) 
+    {
+      int rnd = number(0, tmp.size()-1);
+      char buf2[MAX_STRING_LENGTH] = "$B$7Ghaerad, Sword of Legends says, '";
+      strcat(buf2, tmp[rnd].c_str());
+      strcat(buf2, "'$R\n\r");
+      send_to_room(buf2, vict->in_room);
+    
+      if(rnd == unequip)
+      {
+       
+        if(vict->equipment[WIELD] && obj_index[vict->equipment[WIELD]->item_number].virt == 27997)
+        {
+
+          act("Your $p unequips itself.",
+            vict, vict->equipment[WIELD], 0, TO_CHAR, 0);
+          act("$n stops using $p.", vict, vict->equipment[WIELD], 0, TO_ROOM, INVIS_NULL);
+          obj_to_char(unequip_char(vict, WIELD), vict);
+          if(vict->equipment[SECOND_WIELD])
+          {
+            act("You move your $p to be your primary weapon.", vict, vict->equipment[SECOND_WIELD], 0, TO_CHAR, INVIS_NULL);
+            act("$n moves $s $p to be $s primary weapon.", vict, vict->equipment[SECOND_WIELD], 0, TO_ROOM, INVIS_NULL);
+            struct obj_data *weapon;
+            weapon = unequip_char(vict, SECOND_WIELD);
+            equip_char(vict, weapon, WIELD);
+          }
+        }
+        else if(vict->equipment[SECOND_WIELD] && obj_index[vict->equipment[SECOND_WIELD]->item_number].virt == 27997)
+        {
+
+          act("Your $p unequips itself.",
+            vict, vict->equipment[SECOND_WIELD], 0, TO_CHAR, 0);
+          act("$n stops using $p.", vict, vict->equipment[SECOND_WIELD], 0, TO_ROOM, INVIS_NULL);
+          obj_to_char(unequip_char(vict, SECOND_WIELD), vict);
+        }
+
+      }
+    }
+    obj->obj_flags.value[0] = number(8, 10);
+  }
+
+  return eFAILURE;
+}
+
 
 // Fun item to give to mortals...ticks for a while and then when it blows
 // up BOOM!!!

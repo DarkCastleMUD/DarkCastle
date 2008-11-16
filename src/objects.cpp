@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.103 2008/08/04 17:22:03 kkoons Exp $
+| $Id: objects.cpp,v 1.104 2008/11/16 05:41:55 kkoons Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -2204,6 +2204,11 @@ int do_remove(struct char_data *ch, char *argument, int cmd)
           if (ch->equipment[j] && CAN_SEE_OBJ(ch, ch->equipment[j])) 
           {
             obj_object =  ch->equipment[j];
+            if(obj_index[obj_object->item_number].virt == 27997 && number(0,3))
+            {
+              send_to_room("$B$7Ghaerad, Sword of Legends says, 'Haha, nope. Try again.'$R\n\r", ch->in_room);
+              continue;
+            }
             if(IS_SET(obj_object->obj_flags.extra_flags, ITEM_NODROP) && GET_LEVEL(ch) <= MORTAL) 
             {
               sprintf(arg1, "You can't remove %s, it must be CURSED!\n\r", obj_object->short_description);
@@ -2230,6 +2235,11 @@ int do_remove(struct char_data *ch, char *argument, int cmd)
       {
         if(CAN_CARRY_N(ch) != IS_CARRYING_N(ch)) 
         {
+          if(obj_index[obj_object->item_number].virt == 27997 && number(0,3))
+          {
+            send_to_room("$B$7Ghaerad, Sword of Legends says, 'Haha, nope. Try again.'$R\n\r", ch->in_room);
+            return eSUCCESS;
+          }
           if(IS_SET(obj_object->obj_flags.extra_flags, ITEM_NODROP) && GET_LEVEL(ch) <= MORTAL) 
           {
             sprintf(arg1, "You can't remove %s, it must be CURSED!\n\r", obj_object->short_description);
