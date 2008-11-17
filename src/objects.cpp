@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.105 2008/11/17 07:36:17 shane Exp $
+| $Id: objects.cpp,v 1.106 2008/11/17 23:42:36 shane Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -157,7 +157,7 @@ int damage_eq_once(obj_data * obj)
   if(obj_index[obj->item_number].virt == SPIRIT_SHIELD_OBJ_NUMBER && obj->carried_by && obj->carried_by->in_room) {
     send_to_room("The spirit shield shimmers brightly then fades away.\n\r", obj->carried_by->in_room);
     extract_obj(obj);
-    return 1;
+    return 0;
   }
   // look for existing damage
   for(int i = 0; i < obj->num_affects; i++) 

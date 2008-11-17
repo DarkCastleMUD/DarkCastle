@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.508 2008/11/13 16:59:08 shane Exp $               *
+ * $Id: fight.cpp,v 1.509 2008/11/17 23:42:36 shane Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -1716,6 +1716,8 @@ void eq_damage(CHAR_DATA * ch, CHAR_DATA * victim,
     // add a point
     eqdam = damage_eq_once(obj);
 
+    if(!obj) return;
+
     if (obj_index[obj->item_number].progtypes & ARMOUR_PROG)
       oprog_armour_trigger(victim, obj);
     // determine if time to scrap it              
@@ -1741,6 +1743,8 @@ void eq_damage(CHAR_DATA * ch, CHAR_DATA * victim,
     // add a point
     eqdam = damage_eq_once(obj);
  
+    if(!obj) return;
+
    if (obj_index[obj->item_number].progtypes & ARMOUR_PROG)
       oprog_armour_trigger(victim, obj);
  
@@ -2311,13 +2315,15 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
        if (number(1,100) <= MAX(1, dam/150))
        {
         int eqdam = damage_eq_once(victim->equipment[WEAR_SHIELD]);
-        if (obj_index[victim->equipment[WEAR_SHIELD]->item_number].progtypes & ARMOUR_PROG)
-          oprog_armour_trigger(victim, victim->equipment[WEAR_SHIELD]);
-        if(eqdam >= eq_max_damage(victim->equipment[WEAR_SHIELD]))
-          eq_destroyed(victim, victim->equipment[WEAR_SHIELD], WEAR_SHIELD);
-        else {
-          act("$p is damaged by the force of the spell!", victim, victim->equipment[WEAR_SHIELD], 0, TO_CHAR, 0);
-          act("$p worn by $n is damaged by the force of the spell!", victim, victim->equipment[WEAR_SHIELD], 0, TO_ROOM, 0);
+        if(victim->equipment[WEAR_SHIELD]) {
+          if (obj_index[victim->equipment[WEAR_SHIELD]->item_number].progtypes & ARMOUR_PROG)
+            oprog_armour_trigger(victim, victim->equipment[WEAR_SHIELD]);
+          if(eqdam >= eq_max_damage(victim->equipment[WEAR_SHIELD]))
+            eq_destroyed(victim, victim->equipment[WEAR_SHIELD], WEAR_SHIELD);
+          else {
+            act("$p is damaged by the force of the spell!", victim, victim->equipment[WEAR_SHIELD], 0, TO_CHAR, 0);
+            act("$p worn by $n is damaged by the force of the spell!", victim, victim->equipment[WEAR_SHIELD], 0, TO_ROOM, 0);
+           }
          }
        }
      }
