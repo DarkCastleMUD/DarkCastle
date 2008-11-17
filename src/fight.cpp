@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.509 2008/11/17 23:42:36 shane Exp $               *
+ * $Id: fight.cpp,v 1.510 2008/11/17 23:44:15 kkoons Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -3196,7 +3196,7 @@ int check_shieldblock(CHAR_DATA * ch, CHAR_DATA * victim, int attacktype)
   return reduce;
 }
 
-bool check_parry(CHAR_DATA * ch, CHAR_DATA * victim, int attacktype)
+bool check_parry(CHAR_DATA * ch, CHAR_DATA * victim, int attacktype, bool display_results)
 {
   int modifier = 0;  
   if((IS_SET(victim->combat, COMBAT_STUNNED)) ||
@@ -3246,10 +3246,12 @@ bool check_parry(CHAR_DATA * ch, CHAR_DATA * victim, int attacktype)
      !IS_SET(victim->combat, COMBAT_BLADESHIELD2))
      return FALSE;
 
-  act("$n parries $N's attack.", victim, NULL, ch, TO_ROOM, NOTVICT);
-  act("$n parries your attack.", victim, NULL, ch, TO_VICT, 0);
-  act("You parry $N's attack.", victim, NULL, ch, TO_CHAR, 0);
-
+  if(display_results == true)
+  {
+    act("$n parries $N's attack.", victim, NULL, ch, TO_ROOM, NOTVICT);
+    act("$n parries your attack.", victim, NULL, ch, TO_VICT, 0);
+    act("You parry $N's attack.", victim, NULL, ch, TO_CHAR, 0);
+  }
   return TRUE;
 }
 
@@ -3300,7 +3302,7 @@ int speciality_bonus(CHAR_DATA *ch,int attacktype, int level)
 /*
 * Check for dodge.
 */
-bool check_dodge(CHAR_DATA * ch, CHAR_DATA * victim, int attacktype)
+bool check_dodge(CHAR_DATA * ch, CHAR_DATA * victim, int attacktype, bool display_results)
 {
 //  int chance;
    int modifier = 0;  
@@ -3346,9 +3348,12 @@ bool check_dodge(CHAR_DATA * ch, CHAR_DATA * victim, int attacktype)
   if (!skill_success(victim,ch,SKILL_DODGE, modifier))
     return FALSE;
   
-  act("$n dodges $N's attack.", victim, NULL, ch, TO_ROOM, NOTVICT);
-  act("$n dodges your attack.", victim, NULL, ch, TO_VICT, 0);
-  act("You dodge $N's attack.", victim, NULL, ch, TO_CHAR, 0);
+  if(display_results == true)
+  {
+    act("$n dodges $N's attack.", victim, NULL, ch, TO_ROOM, NOTVICT);
+    act("$n dodges your attack.", victim, NULL, ch, TO_VICT, 0);
+    act("You dodge $N's attack.", victim, NULL, ch, TO_CHAR, 0);
+  }
 
   return TRUE;
 }
@@ -4327,12 +4332,16 @@ int do_skewer(CHAR_DATA *ch, CHAR_DATA *vict, int dam, int wt, int wt2, int weap
   if(!skill_success(ch,vict, SKILL_SKEWER))                          return 0;
 
   if (number(0, 100) < 25) {
-    if (check_dodge(ch, vict, type)) {
-      //act("$2$n dodges $N's skewer!!$R", ch, 0, vict, TO_ROOM, NOTVICT);
+    if (check_dodge(ch, vict, type, false)) {
+      act("$n dodges $N's skewer!!", vict, NULL, ch, TO_ROOM, NOTVICT);
+      act("$n dodges your skewer!!", vict, NULL, ch, TO_VICT, 0);
+      act("You dodge $N's skewer!!", vict, NULL, ch, TO_CHAR, 0);
       return 0;
     }
-    if(check_parry(ch, vict, type)) {
-     // act("$2$n parries the $N's skewer!!$R", ch, 0, vict, TO_ROOM, NOTVICT);
+    if(check_parry(ch, vict, type, false)) {
+      act("$n parries $N's skewer!!", vict, NULL, ch, TO_ROOM, NOTVICT);
+      act("$n parries your skewer!!", vict, NULL, ch, TO_VICT, 0);
+      act("You parry $N's skewer!!", vict, NULL, ch, TO_CHAR, 0);
       return 0;
     }
     if(check_shieldblock(ch, vict,type)) {
