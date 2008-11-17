@@ -16,7 +16,7 @@
  *  10/21/2003   Onager    Changed IS_ANONYMOUS() to handle mobs without   *
  *                         crashing                                        *
  ***************************************************************************/
-/* $Id: utility.h,v 1.75 2008/07/11 14:42:08 dcastle Exp $ */
+/* $Id: utility.h,v 1.76 2008/11/17 07:36:21 shane Exp $ */
 
 #ifndef UTILITY_H_
 #define UTILITY_H_
@@ -74,6 +74,7 @@ bool is_hiding(CHAR_DATA *ch, CHAR_DATA *vict);
 // End defines for gradual skill increase code
 
 #define SILENCE_OBJ_NUMBER 407
+#define SPIRIT_SHIELD_OBJ_NUMBER 408
 
 #define REMOVE_FROM_LIST(item, head, next)      \
    if ((item) == (head))                \

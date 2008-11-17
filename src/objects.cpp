@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.104 2008/11/16 05:41:55 kkoons Exp $
+| $Id: objects.cpp,v 1.105 2008/11/17 07:36:17 shane Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -154,6 +154,11 @@ void eq_remove_damage(obj_data * obj)
 // Damage a piece of eq once and return the amount of damage currently on it
 int damage_eq_once(obj_data * obj)
 {
+  if(obj_index[obj->item_number].virt == SPIRIT_SHIELD_OBJ_NUMBER && obj->carried_by && obj->carried_by->in_room) {
+    send_to_room("The spirit shield shimmers brightly then fades away.\n\r", obj->carried_by->in_room);
+    extract_obj(obj);
+    return 1;
+  }
   // look for existing damage
   for(int i = 0; i < obj->num_affects; i++) 
     if(obj->affected[i].location == APPLY_DAMAGED)
@@ -2215,9 +2220,15 @@ int do_remove(struct char_data *ch, char *argument, int cmd)
               send_to_char(arg1, ch);
               continue;
 	    }
-            obj_to_char(unequip_char(ch, j) , ch);
-            act("You stop using $p.",ch,obj_object,0,TO_CHAR, 0);
-            act("$n stops using $p.",ch,obj_object,0,TO_ROOM, INVIS_NULL);
+            if(obj_index[obj_object->item_number].virt == SPIRIT_SHIELD_OBJ_NUMBER)
+            {
+              send_to_room("The spirit shield shimmers brightly then fades away.\n\r", ch->in_room);
+              extract_obj(obj_object);
+            } else {
+              obj_to_char(unequip_char(ch, j) , ch);
+              act("You stop using $p.",ch,obj_object,0,TO_CHAR, 0);
+              act("$n stops using $p.",ch,obj_object,0,TO_ROOM, INVIS_NULL);
+            }
           }
         } else {
           send_to_char("You can't carry that many items.\n\r", ch);
@@ -2256,12 +2267,18 @@ int do_remove(struct char_data *ch, char *argument, int cmd)
             ch->equipment[WIELD] = ch->equipment[SECOND_WIELD];
             ch->equipment[SECOND_WIELD] = 0;
           }
-          else 
+          else if(obj_index[obj_object->item_number].virt == SPIRIT_SHIELD_OBJ_NUMBER)
+          {
+            send_to_room("The spirit shield shimmers brightly then fades away.\n\r", ch->in_room);
+            extract_obj(obj_object);
+            return eSUCCESS;
+          }
+          else {
             obj_to_char(unequip_char(ch, j), ch);
-
-          act("You stop using $p.",ch,obj_object,0,TO_CHAR, 0);
-          act("$n stops using $p.",ch,obj_object,0,TO_ROOM, INVIS_NULL);
-          if(blindlag) WAIT_STATE(ch, PULSE_VIOLENCE);
+            act("You stop using $p.",ch,obj_object,0,TO_CHAR, 0);
+            act("$n stops using $p.",ch,obj_object,0,TO_ROOM, INVIS_NULL);
+            if(blindlag) WAIT_STATE(ch, PULSE_VIOLENCE);
+          }
         } else {
           send_to_char("You can't carry that many items.\n\r", ch);
           j = MAX_WEAR;

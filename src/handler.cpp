@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.171 2008/07/14 18:27:19 dcastle Exp $ */
+/* $Id: handler.cpp,v 1.172 2008/11/17 07:36:17 shane Exp $ */
     
 extern "C"
 {
@@ -3110,7 +3110,15 @@ void update_char_objects( CHAR_DATA *ch )
 
     for(i = 0;i < MAX_WEAR;i++) 
 	if (ch->equipment[i])
-	    update_object(ch->equipment[i],2);
+	    if(obj_index[ch->equipment[i]->item_number].virt == SPIRIT_SHIELD_OBJ_NUMBER) {
+              update_object(ch->equipment[i],1);
+              if(ch->equipment[i]->obj_flags.timer < 1) {
+                send_to_room("The spirit shield shimmers brightly and then fades away.\n\r", ch->in_room);
+                extract_obj(ch->equipment[i]);
+              }
+            }
+            else
+              update_object(ch->equipment[i],2);
 
     if (ch->carrying) update_object(ch->carrying,1);
 }

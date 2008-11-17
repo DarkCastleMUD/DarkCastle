@@ -598,7 +598,7 @@ int spell_howl(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
 	              tmp_char);
           act("$N blinks and shakes its head, clearing its thoughts.",
                  ch, 0, tmp_char, TO_CHAR, 0);
-          act("$N blinks and shakes its head, clearing its thoughts.\n\r",
+          act("$N blinks and shakes its head, clearing its thoughts.",
  	 	 ch, 0, tmp_char, TO_ROOM, NOTVICT);
 
 	  if (tmp_char->fighting)
@@ -13455,3 +13455,54 @@ int cast_wild_magic( ubyte level, CHAR_DATA *ch, char *arg,
 }
 
 
+/* SPIRIT SHIELD */
+
+int spell_spirit_shield(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
+{
+  OBJ_DATA *ssobj = NULL;
+
+  if(ch->equipment[WEAR_SHIELD]) {
+    send_to_char("Your prayers are ignored by the gods as your hands are not free to receive thief gifts.\n\r", ch);
+    return eFAILURE;
+  }
+
+  if(!(ssobj = clone_object(real_object(SPIRIT_SHIELD_OBJ_NUMBER)))) {
+    send_to_char("Error setting spirit shield object.  Tell an immortal.\n\r", ch);
+    return eFAILURE;
+  }
+
+  add_obj_affect(ssobj, APPLY_AC, -10-skill/4);
+  add_obj_affect(ssobj, APPLY_HITROLL, number(1,3) + skill/20);
+  add_obj_affect(ssobj, APPLY_DAMROLL, number(1,3) + skill/25);
+  add_obj_affect(ssobj, APPLY_SAVES, number(1,5) + skill/20);
+  add_obj_affect(ssobj, APPLY_REFLECT, number(1,5) + 1);
+  if(!number(0,49)) add_obj_affect(ssobj, APPLY_SANCTUARY, 100);
+
+  ssobj->obj_flags.timer = 4 + skill/5;
+
+  equip_char(ch, ssobj, WEAR_SHIELD);
+
+  send_to_char("Your prayers to the gods for protection are answered as a glowing shield suddenly appears in your hand!\n\r", ch);
+  act("$n's prays to the gods for protection and a glowing shield appears in $s hand!", ch, 0, 0, TO_ROOM, 0);
+
+  WAIT_STATE(ch, (int)(PULSE_VIOLENCE * 2.5));
+
+  return eSUCCESS;
+}
+
+int cast_spirit_shield(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *victim, OBJ_DATA *tar_obj, int skill)
+{
+  switch (type)
+  {
+    case SPELL_TYPE_SPELL:
+    case SPELL_TYPE_WAND:
+    case SPELL_TYPE_SCROLL:
+    case SPELL_TYPE_STAFF:
+      return spell_spirit_shield(level, ch, victim, 0, skill);
+      break;
+    default:
+      log("Serious screw-up in spirit shield!", ANGEL, LOG_BUG);
+      break;
+  }
+  return eFAILURE;
+}

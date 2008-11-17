@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.272 2008/11/13 16:59:07 shane Exp $ */
+/* $Id: const.cpp,v 1.273 2008/11/17 07:36:17 shane Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1348,6 +1348,8 @@ struct class_skill_defines p_skills[] = { // paladin skills
 {    "resist cold",          SPELL_RESIST_COLD,        46,     70,  0,   STRWIS },
 {    "divine fury",          SPELL_DIVINE_FURY,        48,    100,  0,   STRCON },
 {    "holy aura",            SPELL_HOLY_AURA,          50,    100,  0,   CONWIS },
+//{    "behead",               SKILL_BEHEAD,             51,    100,  0,   STRCON },
+//{    "spirit shield",        SPELL_SPIRIT_SHIELD,      55,    100,  0,   INTWIS },
 {    "\n",                   0,                        1,      0,   0,   0 }
 };
 

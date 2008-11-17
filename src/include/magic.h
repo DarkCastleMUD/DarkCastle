@@ -5,7 +5,7 @@
  *                                                                           *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-/* $Id: magic.h,v 1.34 2008/05/22 02:37:42 kkoons Exp $ */
+/* $Id: magic.h,v 1.35 2008/11/17 07:36:21 shane Exp $ */
 #ifndef MAGIC_H_
 #define MAGIC_H_
 
@@ -698,5 +698,7 @@ int cast_immunity(ubyte level, CHAR_DATA * ch, char *arg, int type,
 int cast_boneshield(ubyte level, CHAR_DATA * ch, char *arg, int type,
    CHAR_DATA * victim, struct obj_data * tar_obj, int skill);
 int cast_channel(ubyte level, CHAR_DATA * ch, char *arg, int type,
+   CHAR_DATA * victim, struct obj_data * tar_obj, int skill);
+int cast_spirit_shield(ubyte level, CHAR_DATA * ch, char *arg, int type,
    CHAR_DATA * victim, struct obj_data * tar_obj, int skill);
 #endif

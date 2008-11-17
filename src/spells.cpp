@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.242 2008/11/13 09:17:57 shane Exp $ */
+/* $Id: spells.cpp,v 1.243 2008/11/17 07:36:18 shane Exp $ */
 
 extern "C"
 {
@@ -440,7 +440,9 @@ struct spell_info_type spell_info [] =
 
  { /* 169 */ 12, POSITION_STANDING, 15, TAR_IGNORE, cast_release_elemental, SKILL_INCREASE_MEDIUM },
  
- { /* 170 */ 12, POSITION_FIGHTING, 50, TAR_CHAR_ROOM|TAR_FIGHT_VICT, cast_wild_magic, SKILL_INCREASE_HARD }
+ { /* 170 */ 12, POSITION_FIGHTING, 50, TAR_CHAR_ROOM|TAR_FIGHT_VICT, cast_wild_magic, SKILL_INCREASE_HARD },
+
+ { /* 171 */ 12, POSITION_FIGHTING, 125, TAR_IGNORE, cast_spirit_shield, SKILL_INCREASE_HARD },
 
 };
 
@@ -846,6 +848,7 @@ char *spells[]=
    "channel",
    "release elemental",
    "wild magic",
+   "spirit shield",
    "\n"
 };
 
@@ -917,6 +920,12 @@ void affect_update( int32 duration_type )
 //      if(!IS_NPC(i) ) // && !(i->desc)) Linkdeadness doens't save you 
 //now.
   //      continue; 
+
+        // This doesn't really belong here, but it beats creating an "update" just for it.
+        // That way we don't have to traverse the entire list all over again
+        if(duration_type == PULSE_TIME && !IS_NPC(i))
+          update_char_objects(i);
+
       for (a=0; a < 20; a++)
 	faded_spells[a] = 0;
       a=0;
@@ -930,10 +939,6 @@ void affect_update( int32 duration_type )
 	}
 //	while (next_af_dude && next_af_dude->type == af->type) next_af_dude = next_af_dude->next;
 
-        // This doesn't really belong here, but it beats creating an "update" just for it.
-        // That way we don't have to traverse the entire list all over again
-        if(!IS_NPC(i))
-          update_char_objects(i);
 	if ((af->type == FUCK_PTHIEF || af->type == FUCK_CANTQUIT || af->type == FUCK_GTHIEF) && !i->desc)
 	  continue;
 	if (af->duration > 1)
