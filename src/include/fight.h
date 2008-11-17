@@ -2,7 +2,7 @@
 #define FIGHT_H_
 
 /************************************************************************
-| $Id: fight.h,v 1.36 2008/05/23 21:40:48 kkoons Exp $
+| $Id: fight.h,v 1.37 2008/11/17 23:42:56 kkoons Exp $
 | fight.h
 | This file defines the header information for fight.
 */
@@ -61,8 +61,8 @@ void group_gain(CHAR_DATA *ch, CHAR_DATA *vict);
 int check_magic_block(CHAR_DATA *ch, CHAR_DATA *victim, int attacktype);
 int check_riposte(CHAR_DATA *ch, CHAR_DATA *vict, int attacktype);
 int check_shieldblock(CHAR_DATA *ch, CHAR_DATA *vict, int attacktype);
-bool check_parry(CHAR_DATA *ch, CHAR_DATA *vict, int attacktype);
-bool check_dodge(CHAR_DATA *ch, CHAR_DATA *vict, int attacktype);
+bool check_parry(CHAR_DATA *ch, CHAR_DATA *vict, int attacktype, bool display_results = true);
+bool check_dodge(CHAR_DATA *ch, CHAR_DATA *vict, int attacktype, bool display_results = true);
 void disarm(CHAR_DATA *ch, CHAR_DATA *vict);
 void trip(CHAR_DATA *ch, CHAR_DATA *vict);
 
