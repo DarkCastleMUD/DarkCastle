@@ -1,11 +1,20 @@
 /************************************************************************
-| $Id: board.cpp,v 1.28 2008/11/18 14:37:54 kkoons Exp $
+| $Id: board.cpp,v 1.29 2008/11/18 16:19:42 kkoons Exp $
 | board.C
 | Description:  This file contains the implementation for the board
 |   code.  It's old and should be rewritten --Morc XXX
 */
 
 /*
+board.cpp version 1.3 - Nov 2008 by Rubicon
+
+1.3 changes:
+   
+   Replaced nearly everything with STL based code.
+   Changed how the new_edit_unlock works by using it as a callback function
+   from new_edit.cpp ( new_add_string() )
+
+
 board.c version 1.2 - Jun 1991 by Twilight.
 
 1.2 changes:
@@ -149,8 +158,13 @@ struct RESERVATION_DATA
   std::map<std::string, BOARD_INFO>::iterator board;
 };
 
+//map to hold callback information for writing
 std::map<CHAR_DATA*, RESERVATION_DATA*> wait_for_write;
 
+
+/*
+Function to populate the board_db with all of the current clan info
+*/
 std::map<std::string, BOARD_INFO> populate_boards()
 {
   std::map<std::string, BOARD_INFO> board_tmp;
@@ -272,29 +286,6 @@ std::map<std::string, BOARD_INFO> populate_boards()
   board_struct.min_write_level = 1;
   board_struct.min_remove_level = 1;
   board_struct.type = CLAN_BOARD;
-  board_struct.owner = NO_OWNER;
-  board_struct.save_file = "board/vig";
-  board_tmp["board clan vig"] = board_struct;
-
-  board_struct.min_write_level = 1;
-  board_struct.min_remove_level = 1;
-  board_struct.type = CLAN_BOARD;
-  board_struct.owner = NO_OWNER;
-  board_struct.save_file = "board/sng";
-  board_tmp["board clan sng"] = board_struct;
-
-  board_struct.min_read_level = 1;
-  board_struct.min_write_level = 1;
-  board_struct.min_remove_level = 1;
-  board_struct.type = CLAN_BOARD;
-  board_struct.owner = NO_OWNER;
-  board_struct.save_file = "board/smkjags";
-  board_tmp["board window kobal"] = board_struct;
-
-  board_struct.min_read_level = 1;
-  board_struct.min_write_level = 1;
-  board_struct.min_remove_level = 1;
-  board_struct.type = CLAN_BOARD;
   board_struct.owner = CLAN_ASKANI;
   board_struct.save_file = "board/askani";
   board_tmp["board askani"] = board_struct;
@@ -314,14 +305,6 @@ std::map<std::string, BOARD_INFO> populate_boards()
   board_struct.owner = CLAN_MERC;
   board_struct.save_file = "board/merc";
   board_tmp["board clan merc"] = board_struct;
-
-  board_struct.min_read_level = 1;
-  board_struct.min_write_level = 1;
-  board_struct.min_remove_level = 1;
-  board_struct.type = CLAN_BOARD;
-  board_struct.owner = NO_OWNER;
-  board_struct.save_file = "board/co.rpse";
-  board_tmp["board clan co.rpse"] = board_struct;
 
   board_struct.min_read_level = 1;
   board_struct.min_write_level = 1;
@@ -354,15 +337,6 @@ std::map<std::string, BOARD_INFO> populate_boards()
   board_struct.owner = CLAN_NAZGUL;
   board_struct.save_file = "board/nazgul";
   board_tmp["board clan nazgul"] = board_struct;
-
-  board_struct.min_read_level = 1;
-  board_struct.min_write_level = 1;
-  board_struct.min_remove_level = 1;
-  board_struct.type = CLAN_BOARD;
-  board_struct.owner = NO_OWNER;
-  board_struct.save_file = "board/eclipse";
-  board_tmp["board clan eclipse"] = board_struct;
-
 
   board_struct.min_read_level = 1;
   board_struct.min_write_level = 1;
@@ -416,15 +390,6 @@ std::map<std::string, BOARD_INFO> populate_boards()
   board_struct.min_write_level = 1;
   board_struct.min_remove_level = 1;
   board_struct.type = CLAN_BOARD;
-  board_struct.owner = NO_OWNER;
-  board_struct.save_file = "board/eclipse2";
-  board_tmp["board eclipse book eclipsebulletin"] = board_struct;
-
-
-  board_struct.min_read_level = 1;
-  board_struct.min_write_level = 1;
-  board_struct.min_remove_level = 1;
-  board_struct.type = CLAN_BOARD;
   board_struct.owner = CLAN_NAZGUL;
   board_struct.save_file = "board/nazgulspecialboard";
   board_tmp["board special nazgul"] = board_struct;
@@ -436,23 +401,6 @@ std::map<std::string, BOARD_INFO> populate_boards()
   board_struct.owner = CLAN_SLACKERS;
   board_struct.save_file = "board/slackers";
   board_tmp["board slackers clanboard"] = board_struct;
-
-  board_struct.min_read_level = 1;
-  board_struct.min_write_level = 1;
-  board_struct.min_remove_level = 1;
-  board_struct.type = CLAN_BOARD;
-  board_struct.owner = NO_OWNER;
-  board_struct.save_file = "board/corpsetwo";
-  board_tmp["board clan Co.Rpse second"] = board_struct;
-
-  board_struct.min_read_level = 1;
-  board_struct.min_write_level = 1;
-  board_struct.min_remove_level = 1;
-  board_struct.type = CLAN_BOARD;
-  board_struct.owner = NO_OWNER;
-  board_struct.save_file = "board/eclipseduvak";
-  board_tmp["board clan eclipse duvak"] = board_struct;
-
 
   board_struct.min_read_level = 1;
   board_struct.min_write_level = 1;
@@ -478,14 +426,6 @@ std::map<std::string, BOARD_INFO> populate_boards()
   board_struct.save_file = "board/solaris";
   board_tmp["board golden bulletin solaris"] = board_struct;
 
-  board_struct.min_read_level = 1;
-  board_struct.min_write_level = 1;
-  board_struct.min_remove_level = 1;
-  board_struct.type = CLAN_BOARD;
-  board_struct.owner = NO_OWNER;
-  board_struct.save_file = "board/overlords";
-  board_tmp["board overlords clan"] = board_struct;
-
   board_struct.min_read_level = IMMORTAL;
   board_struct.min_write_level = IMMORTAL;
   board_struct.min_remove_level = IMMORTAL;
@@ -510,7 +450,6 @@ std::map<std::string, BOARD_INFO> populate_boards()
   board_struct.save_file = "board/coder";
   board_tmp["board coding"] = board_struct;
 
-
   board_struct.min_read_level = 1;
   board_struct.min_write_level = 1;
   board_struct.min_remove_level = IMMORTAL;
@@ -518,7 +457,6 @@ std::map<std::string, BOARD_INFO> populate_boards()
   board_struct.owner = CLASS_MAGE;
   board_struct.save_file = "board/mage";
   board_tmp["board guild mage glyph glyphs column"] = board_struct;
-
 
   board_struct.min_read_level = 1;
   board_struct.min_write_level = 1;
@@ -625,7 +563,10 @@ std::map<std::string,BOARD_INFO> board_db = populate_boards();
  
 
 
-
+/*
+Entry function called from assign_proc.
+handles commands and calls appropriate functions
+*/
 int board(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, CHAR_DATA* invoker)
 {
   static int has_loaded = 0;
@@ -691,6 +632,13 @@ int board(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, CHAR_DATA* in
   }
 }
 
+
+/*
+This function acts as a callback from edit_new 
+function call new_add_string()
+It notifies us when the user is done writing the post
+and we can copy the string to the board
+*/
 void new_edit_board_unlock_board(CHAR_DATA *ch, int abort)
 {
   RESERVATION_DATA *reserve = wait_for_write[ch];
@@ -779,7 +727,8 @@ void board_write_msg(CHAR_DATA *ch, char *arg, std::map<string,BOARD_INFO>::iter
 
   act("$n starts to write a message.", ch, 0, 0, TO_ROOM, INVIS_NULL);
 
-
+  //if the title is Topic, this clears the date to let us know that
+  //during the callback the topic will need updated.
   if (!(strcmp("Topic", arg)) && GET_LEVEL(ch) > IMMORTAL) {
     reserve->new_post.date.clear();
   }
