@@ -14,12 +14,13 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.h,v 1.109 2008/11/17 07:36:21 shane Exp $ */
+/* $Id: spells.h,v 1.110 2008/11/18 14:39:03 kkoons Exp $ */
 #include <structs.h> // ubyte, int16
 
+#include <map>
 #define MAX_BUF_LENGTH               240
 
-
+extern std::map<int,int> skill_cost;
 
 
 void extractFamiliar(CHAR_DATA *ch);
@@ -554,63 +555,6 @@ void check_maxes(CHAR_DATA *ch);
 #define TAR_SELF_DEFAULT   1<<12
 
 
-#define SKILL_KICK_MOVES		5
-#define SKILL_TRIP_MOVES		7
-#define SKILL_RESCUE_MOVES		10
-#define SKILL_REDIRECT_MOVES		5
-#define SKILL_EAGLECLAW_MOVES		12
-#define SKILL_QUIVER_MOVES		45
-#define SKILL_STUN_MOVES		15
-
-#define SKILL_BACKSTAB_MOVES		4
-#define SKILL_SNEAK_MOVES		5
-#define SKILL_HIDE_MOVES		2
-#define SKILL_HARMTOUCH_MOVES		40
-
-#define SKILL_STALK_MOVES		12
-#define SKILL_POCKET_MOVES		15
-#define SKILL_STEAL_MOVES		20
-#define SKILL_CIRCLE_MOVES		12
-#define SKILL_DISARM_MOVES		20
-#define SKILL_VITALSTRIKE_MOVES		15
-#define SKILL_DUALBACKSTAB_MOVES	8
-#define SKILL_EYEGOUGE_MOVES		12
-#define SKILL_BLACKJACK_MOVES		4
-#define SKILL_CRIPPLE_MOVES		30
-#define SKILL_PALM_MOVES		2
-#define SKILL_SLIP_MOVES		2
-#define SKILL_DECEIT_MOVES		15
-#define SKILL_APPRAISE_MOVES		6
-#define SKILL_PICKLOCK_MOVES		3
-#define SKILL_ESCAPE_MOVES		25
-
-#define SKILL_LAYHANDS_MOVES		20
-#define SKILL_BASH_MOVES		10
-
-#define SKILL_REPELANCE_MOVES		45
-
-#define SKILL_BLOODFURY_MOVES		60
-#define SKILL_CRAZEDASSAULT_MOVES	18
-#define SKILL_RAGE_MOVES		6
-#define SKILL_BERSERK_MOVES		12
-#define SKILL_HITALL_MOVES		24
-#define SKILL_BULLRUSH_MOVES		20
-#define SKILL_BATTLECRY_MOVES		24
-#define SKILL_FEROCITY_MOVES		15
-#define SKILL_HEADBUTT_MOVES		12
-#define SKILL_KNOCKBACK_MOVES		20
-#define SKILL_ARCHERY_MOVES 		2
-
-#define SKILL_FORAGE_MOVES		8
-#define SKILL_TAME_MOVES		15
-#define SKILL_AMBUSH_MOVES		24
-#define SKILL_TRACK_MOVES		3
-
-#define SKILL_TACTICS_MOVES		15
-#define SKILL_RETREAT_MOVES		15
-#define SKILL_DEATHSTROKE_MOVES		20
-#define SKILL_BLADESHIELD_MOVES		15
-#define SKILL_GUARD_MOVES		5
 
 
 
