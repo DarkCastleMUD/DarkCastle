@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.122 2008/07/11 14:42:54 dcastle Exp $
+| $Id: guild.cpp,v 1.123 2008/11/18 16:43:16 kkoons Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -355,62 +355,56 @@ void output_praclist(struct char_data *ch, class_skill_defines *skilllist)
       if(skilllist[i].skillnum >= 1 && skilllist[i].skillnum <= MAX_SPL_LIST) 
       {
 	if (skilllist[i].skillnum == SPELL_PORTAL && GET_CLASS(ch) == CLASS_CLERIC)
-	sprintf(buf,"Mana: $B%3d$R ", 150);
+	  sprintf(buf,"Mana: $B%3d$R ", 150);
 	else
-        sprintf(buf,"Mana: $B%3d$R ",use_mana(ch,skilllist[i].skillnum));
+          sprintf(buf,"Mana: $B%3d$R ",use_mana(ch,skilllist[i].skillnum));
         send_to_char(buf, ch);
       }
       else if (skilllist[i].skillnum >= SKILL_SONG_BASE && skilllist[i].skillnum <= SKILL_SONG_MAX)
       {
 	extern struct song_info_type song_info[];
-	sprintf(buf, "Ki: $B%3d$R   ",song_info[skilllist[i].skillnum-SKILL_SONG_BASE].min_useski);
-	send_to_char(buf,ch);
+	csendf(ch, "Ki:   $B%3d$R ",song_info[skilllist[i].skillnum-SKILL_SONG_BASE].min_useski);
       }
       else if (skilllist[i].skillnum >= KI_OFFSET && skilllist[i].skillnum <= KI_OFFSET+MAX_KI_LIST)
       {
 	extern struct ki_info_type ki_info[];
-	sprintf(buf, "Ki: $B%3d$R   ",ki_info[skilllist[i].skillnum-KI_OFFSET].min_useski);
-	send_to_char(buf,ch);
+	csendf(ch, "Ki:   $B%3d$R ",ki_info[skilllist[i].skillnum-KI_OFFSET].min_useski);
       }
       else if (skilllist[i].skillnum == 318) // scan
       {
-	sprintf(buf, "Move: $B%3d$R ",2);
-	send_to_char(buf,ch);
+	csendf(ch, "Move: $B%3d$R ",2);
       }
       else if (skilllist[i].skillnum == 320) // switch
       {
-	sprintf(buf, "Move: $B%3d$R ",4);
-	send_to_char(buf,ch);
+	csendf(ch, "Move: $B%3d$R ",4);
       }
       else if (skilllist[i].skillnum == 319) // consider
       {
-	sprintf(buf, "Move: $B%3d$R ",5);
-	send_to_char(buf,ch);
+	csendf(ch, "Move: $B%3d$R ",5);
       }
       else if (skilllist[i].skillnum == 368) // release
       {
-	sprintf(buf, "Move: $B%3d$R ",25);
-	send_to_char(buf,ch);
+	csendf(ch, "Move: $B%3d$R ",25);
       }
       else if(skilllist[i].skillnum == 380) // fire arrows
       {
-        sprintf(buf, "Mana: $B%3d$R ", 30);
-        send_to_char(buf, ch);
+        csendf(ch, "Mana: $B%3d$R ", 30);
       }
       else if(skilllist[i].skillnum == 381) //ice arrows
       {
-        sprintf(buf, "Mana: $B%3d$R ", 20);
-        send_to_char(buf, ch);
+        csendf(ch, "Mana: $B%3d$R ", 20);
       }
       else if(skilllist[i].skillnum == 382) //tempest arrows
       {
-        sprintf(buf, "Mana: $B%3d$R ", 10);
-        send_to_char(buf, ch);
+        csendf(ch, "Mana: $B%3d$R ", 10);
       }
       else if(skilllist[i].skillnum == 383) //granite arrows
       {
-        sprintf(buf, "Mana: $B%3d$R ", 40);
-        send_to_char(buf, ch);
+        csendf(ch, "Mana: $B%3d$R ", 40);
+      }
+      else if(skill_cost[skilllist[i].skillnum])
+      {
+        csendf(ch, "Move: $B%3d$R ", skill_cost[skilllist[i].skillnum]);
       }
       else send_to_char("          ", ch);
       if (skilllist[i].attrs)
