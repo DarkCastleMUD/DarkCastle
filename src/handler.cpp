@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.172 2008/11/17 07:36:17 shane Exp $ */
+/* $Id: handler.cpp,v 1.173 2008/11/18 14:43:26 kkoons Exp $ */
     
 extern "C"
 {
@@ -4213,9 +4213,10 @@ void add_memory(CHAR_DATA *ch, char *victim, char type)
 
 
 // function for charging moves, to make it easier to have skills that impact ALL(such as vigor)
-bool charge_moves(char_data *ch, int amt, int skill)
+bool charge_moves(char_data *ch, int skill, double modifier)
 {
   int i = 0;
+  int amt = int(skill_cost[skill] * modifier);
 
   if ((i = has_skill(ch, SKILL_VIGOR)) && skill_success(ch, NULL, SKILL_VIGOR))
      amt -= MAX(1,number(i/4, i/8));
