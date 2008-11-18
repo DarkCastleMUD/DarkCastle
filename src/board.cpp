@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: board.cpp,v 1.27 2008/11/13 03:08:35 dcastle Exp $
+| $Id: board.cpp,v 1.28 2008/11/18 14:37:54 kkoons Exp $
 | board.C
 | Description:  This file contains the implementation for the board
 |   code.  It's old and should be rewritten --Morc XXX
@@ -55,17 +55,45 @@ extern "C"
 #include <act.h>
 #include <db.h>
 #include <returnvals.h>
+#include <string>
+#include <map>
+#include <vector>
+#include <interp.h>
+#include <sstream>
+
+#define MAX_MESSAGE_LENGTH 	2048
+
+struct message {
+  std::string date;
+  std::string title;
+  std::string author;
+  std::string text;
+};
+
+struct BOARD_INFO
+{
+  CHAR_DATA *locked_for;
+  bool lock;
+  int min_read_level;
+  int min_write_level;
+  int min_remove_level;
+  int type;
+  int owner;
+  std::string save_file;
+  std::vector<message> msgs;
+};
+
+
 
 // These are the binary files in which to save/load messages
 
-void board_write_msg(CHAR_DATA *ch, char *arg, int bnum);
-int board_display_msg(CHAR_DATA *ch, char *arg, int bnum);
+void board_write_msg(CHAR_DATA *ch, char *arg, std::map<std::string, BOARD_INFO>::iterator board);
+int board_display_msg(CHAR_DATA *ch, char *arg, std::map<std::string, BOARD_INFO>::iterator board);
 char *fread_string(FILE *fl, int hasher);
-int board_remove_msg(CHAR_DATA *ch, char *arg, int bnum);
-void board_save_board(int);
-int board_check_locks (int bnum, CHAR_DATA *ch);
+int board_remove_msg(CHAR_DATA *ch, char *arg, std::map<std::string, BOARD_INFO>::iterator board);
+void board_save_board(std::map<std::string, BOARD_INFO>::iterator board);
 void board_load_board();
-int board_show_board(CHAR_DATA *ch, char *arg, int bnum);
+int board_show_board(CHAR_DATA *ch, char *arg, std::map<std::string, BOARD_INFO>::iterator board);
 int fwrite_string(char *buf, FILE *fl);
 void board_unlock_board(CHAR_DATA *ch);
 void new_edit_board_unlock_board(CHAR_DATA *ch, int abort);
@@ -74,260 +102,536 @@ void check_for_awaymsgs(char_data *ch);
 extern CHAR_DATA *character_list;
 extern CWorld world;
 
-const int MAX_MSGS           = 99;       // Max number of messages.
-const int MAX_MESSAGE_LENGTH = 2048;     // that should be enough
-const int NUM_BOARDS         = 56; 
 
-int min_read_level[]   = {  0, IMMORTAL, OVERSEER, IMMORTAL, 0, 0, 0, 0, 0, 0, 0, 0,
-                     0, 0, 0, 0, 0, 0, 0, 0,  0, IMMORTAL, 0, 0, 0,//24
-		     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                     IMMORTAL, 0 , OVERSEER,
-		     0,0,0,0,0,0,0,0,0,0,0 };
-int min_write_level[]  = {  5, IMMORTAL, OVERSEER, IMMORTAL, SERAPH , 1, 1, 1, 1, 1,
-                     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, IMMORTAL,1,1,1,//24
-		     1,1,1,1,1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-                     IMMORTAL, 0, OVERSEER,
-		     1,1,1,1,1,1,1,1,1,1,1 };
+#define ANY_BOARD 	0
+#define CLASS_BOARD 	1
+#define CLAN_BOARD 	2
 
-int min_remove_level[] = { IMMORTAL, IMMORTAL, OVERSEER, IMMORTAL, SERAPH, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, IMMORTAL, 0, 0, 0,//24
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, IMMORTAL, 0, OVERSEER,
-	IMMORTAL, IMMORTAL, IMMORTAL, IMMORTAL, IMMORTAL, IMMORTAL,
-        IMMORTAL, IMMORTAL, IMMORTAL, IMMORTAL, IMMORTAL
- };
-	
-int board_clan[] = { -1,
-                     -1, -1, -1, -1,  1,  2,  8, 9, 9, 4, // 1 through 10
-                     15,  8, 10,  7, 12,  9, 17, -1, 19, 11, // 11 through 20
-                     -1,  3, 20, 13, 27, 18,  5,  14, 6,  15, // 21 - 30
-                     16, -1, 9, 13, -1, -1, 10, 26, 19, 15, // 31 - 40
-                     -1, 21, -1, -1, -1, -1, -1, -1, -1, -1, // 41 - 50
-		     -1, -1, -1, -1, 11
-		     };
+#define NO_OWNER 		-1
+#define CLAN_ULNHYRR 		1
+#define CLAN_DARKTIDE	 	2
+#define CLAN_ARCANA 		3
+#define CLAN_DARKENED 		4
+#define CLAN_DCGUARD 		5
+#define CLAN_TIMEWARP		6
+#define CLAN_CAREBEAR		7
+#define CLAN_MERC		8
+#define CLAN_NAZGUL		9
+#define CLAN_BLACKAXE		10
+#define CLAN_TRIAD		11
+#define CLAN_KOBAL		12
+#define CLAN_SLACKERS		13
+#define CLAN_KEHUA		14
+#define CLAN_ASKANI		15
+#define CLAN_HOUSELESSROGUES	16
+#define CLAN_THEHORDE		17
+#define CLAN_ANARCHIST		18
+#define CLAN_SOLARIS		19
+#define CLAN_SINDICATE		20
 
-int board_class[] = {
-			-1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1,  //1 - 10
-                        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, //11 - 20
-                        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, //21 - 30
-                        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, //31 - 40
-                        -1, -1, -1, 1, 2, 3, 4, 5, 6, 7, 8, 9, //41 - 50
-			10, 11, -1
-
-//			1947, 1946, 1940, 1944, 1941, 1950, 
-//			1942, 1945, 1943, 1949, 1948, -1, -1
-		    };
-
-char save_file[NUM_BOARDS][42] = { 
-  "board/mortal",  // 0
-  "board/wiz",
-  "board/imp",
-  "board/build",
-  "board/quest",
-  "board/ulnhyrr",
-  "board/tengu",
-  "board/vampyre",
-  "board/nazgul",
-  "board/eclipse",  
-  "board/DC_Guard", // 10
-  "board/co.rpse",
-  "board/merc",
-  "board/askani",
-  "board/studs",
-  "board/smkjags", // 15
-  "board/sng",
-  "board/vig",
-  "board/uruk",      
-  "board/bandaleros", 
-  "board/horde",    // 20
-  "board/quests2do",
-  "board/arcana",   
-  "board/knight_sabers", // (actually sindicate)
-  "board/ferach",
-  "board/kindred",
-  "board/anarchist",
-  "board/bankuul",
-  "board/blackaxe", 
-  "board/timewarp",  
-  "board/epoch2",   // 30
-  "board/darktide",
-  "board/eclipse2",
-  "board/nazgulspecialboard",
-  "board/slackers",
-  "board/corpsetwo",
-  "board/eclipseduvak",
-  "board/tayledras",
-  "board/knightsabertwo",
-  "board/solaris",
-  "board/overlords", // 40
-  "board/punishment",
-  "board/anaphro",
-  "board/coder",
-  "board/mage",
-  "board/cleric",
-  "board/thief",
-  "board/warrior",
-  "board/anti",
-  "board/pal",
-  "board/barb", // 50
-  "board/monk",
-  "board/ranger",
-  "board/bard",
-  "board/druid",
-  "board/triad"
-};
- 
- static struct board_lock_struct {
-  CHAR_DATA *locked_for;
-  bool lock;
-} board_lock[NUM_BOARDS];
-
-struct message {
-  char *date;
-  char *title;
-  char *author;
-  char *text;
-};
-
-struct board {
-  struct message msg[MAX_MSGS + 1];
-  int number;
-};
-
-struct board boards[NUM_BOARDS];
-struct board *curr_board;
+#define CLASS_MAGE		1
+#define CLASS_CLERIC		2
+#define CLASS_THIEF		3
+#define CLASS_WARRIOR		4
+#define CLASS_ANTI		5
+#define CLASS_PAL		6
+#define CLASS_BARB		7
+#define CLASS_MONK		8
+#define CLASS_RANGER		9
+#define CLASS_BARD		10
+#define CLASS_DRUID		11
 
 
-int find_board(CHAR_DATA *ch)
+struct RESERVATION_DATA
 {
-  struct obj_data *i;
+  char *buf;
+  message new_post;
+  std::map<std::string, BOARD_INFO>::iterator board;
+};
 
-  if(!(world[ch->in_room].contents))
-    return (-1);
+std::map<CHAR_DATA*, RESERVATION_DATA*> wait_for_write;
 
-  for(i = world[ch->in_room].contents; i; i = i->next_content) {
-     if(!(strcmp(i->name, "board bulletin")))
-       return (0);
-     else if(!(strcmp(i->name, "board wizard")))
-       return (1);
-     else if(!(strcmp(i->name, "board implementer")))
-       return (2);
-     else if(!(strcmp(i->name, "board builder")))
-       return(3);
-     else if(!(strcmp(i->name, "board quest")))
-       return(4);
-     else if (!(strcmp(i->name, "board clan ulnhyrr")))
-       return(5);
-     else if (!(strcmp(i->name, "board clan darktide")))
-       return(6);
-     else if (!(strcmp(i->name, "board clan vampyre")))
-       return(7);
-     else if (!(strcmp(i->name, "board clan nazgul")))
-       return(8);   
-     else if (!(strcmp(i->name, "board clan eclipse")))
-       return(9);  
-     else if (!(strcmp(i->name, "board clan clanboard dcguard")))
-       return(10);
-     else if (!(strcmp(i->name, "board clan co.rpse")))
-       return(11); 
-     else if (!(strcmp(i->name, "board clan merc")))
-       return(12);
-     else if (!(strcmp(i->name, "board clan blackaxe")))
-       return(13); 
-     else if (!(strcmp(i->name, "board clan studs")))
-       return(14); 
-     else if (!(strcmp(i->name, "board window kobal")))
-       return(15);
-     else if (!(strcmp(i->name, "board clan sng")))
-       return(16);
-     else if (!(strcmp(i->name, "board clan vig")))
-       return(17);
-     else if (!(strcmp(i->name, "board uruk")))
-       return(18);
-     else if (!(strcmp(i->name, "board clan bandaleros")))
-       return(19);
-     else if (!(strcmp(i->name, "board clan horde")))
-       return(20);
-     else if (!(strcmp(i->name, "board quests2do")))
-       return(21);
-     else if (!(strcmp(i->name, "board arcana")))
-       return(22);
-     else if (!(strcmp(i->name, "board clan clanboard sindicate")))
-       return(23);
-     else if (!(strcmp(i->name, "board clan ferach")))
-       return(24);
-     else if (!(strcmp(i->name, "board clan kindred")))
-       return(25);
-     else if (!(strcmp(i->name, "screen window board clan anarchist")))
-       return(26);
-     else if (!(strcmp(i->name, "board clan ban'kuul globe")))
-       return(27);
-     else if (!(strcmp(i->name, "tablet board clanboard black axe")))
-       return(28);
-     else if (!(strcmp(i->name, "board clan timewarp")))
-       return(29);
-     else if (!(strcmp(i->name, "board askani")))
-       return(30);
-     else if (!(strcmp(i->name, "board clan houselessrogues")))
-       return(31);
-     else if (!(strcmp(i->name, "board eclipse book eclipsebulletin")))
-       return(32);
-     else if (!(strcmp(i->name, "board special nazgul")))
-       return(33);
-     else if (!(strcmp(i->name, "board slackers clanboard")))
-       return(34);
-     else if (!(strcmp(i->name, "board clan Co.Rpse second")))
-       return(35);
-     else if (!(strcmp(i->name, "board clan eclipse duvak")))
-       return(36);
-     else if (!(strcmp(i->name, "board tayledras")))
-       return(37);
-     else if (!(strcmp(i->name, "board checklist sabers knight")))
-       return(38);
-     else if (!(strcmp(i->name, "board golden bulletin solaris")))
-       return(39);
-     else if (!(strcmp(i->name, "board overlords clan")))
-       return(40);
-     else if (!(strcmp(i->name, "board punishment")))
-       return(41);
-     else if (!(strcmp(i->name, "board clan anaphrodisia")))
-       return(42);
-     else if (!(strcmp(i->name, "board coding")))
-       return(43);
-     else if (!strcmp(i->name, "board guild mage glyph glyphs column"))
-	return 44;
-     else if (!strcmp(i->name, "board guild cleric"))
-        return 45;
-     else if (!strcmp(i->name, "board guild thief"))
-        return 46;
-     else if (!strcmp(i->name, "board guild warrior"))
-        return 47;
-     else if (!strcmp(i->name, "board guild anti journal"))
-        return 48;
-     else if (!strcmp(i->name, "board guild paladin register"))
-        return 49;
-     else if (!strcmp(i->name, "board guild barb"))
-        return 50;
-     else if (!strcmp(i->name, "board guild monk"))
-        return 51;
-     else if (!strcmp(i->name, "board guild ranger notes tree"))
-        return 52;
-     else if (!strcmp(i->name, "board guild bard bulletin"))
-        return 53;
-     else if (!strcmp(i->name, "board guild druid sheet papyrus"))
-        return 54;
-     else if (!strcmp(i->name, "board clan triad chalk"))
-        return 55;
-     } 
+std::map<std::string, BOARD_INFO> populate_boards()
+{
+  std::map<std::string, BOARD_INFO> board_tmp;
+  BOARD_INFO board_struct;
+
+  board_struct.min_read_level = 0;
+  board_struct.min_write_level =  5;
+  board_struct.min_remove_level = IMMORTAL;
+  board_struct.type = ANY_BOARD;
+  board_struct.owner = NO_OWNER;
+  board_struct.save_file = "board/mortal";
+  board_tmp["board bulletin"] = board_struct;
+
+  board_struct.min_read_level = IMMORTAL;
+  board_struct.min_write_level =  IMMORTAL;
+  board_struct.min_remove_level = IMMORTAL;
+  board_struct.type = ANY_BOARD;
+  board_struct.owner = NO_OWNER;
+  board_struct.save_file = "board/wiz";
+  board_tmp["board wizard"] = board_struct;
+
+  board_struct.min_read_level = OVERSEER;
+  board_struct.min_write_level =  OVERSEER;
+  board_struct.min_remove_level = OVERSEER;
+  board_struct.type = ANY_BOARD;
+  board_struct.owner = NO_OWNER;
+  board_struct.save_file = "board/imp";
+  board_tmp["board implementer"] = board_struct;
+
+  board_struct.min_read_level = IMMORTAL;
+  board_struct.min_write_level =  IMMORTAL;
+  board_struct.min_remove_level = IMMORTAL;
+  board_struct.type = ANY_BOARD;
+  board_struct.owner = NO_OWNER;
+  board_struct.save_file = "board/build";
+  board_tmp["board builder"] = board_struct;
+
+  board_struct.min_read_level = 0;
+  board_struct.min_write_level = SERAPH;
+  board_struct.min_remove_level = SERAPH;
+  board_struct.type = ANY_BOARD;
+  board_struct.owner = NO_OWNER;
+  board_struct.save_file = "board/quest";
+  board_tmp["board quest"] = board_struct;
+
+  board_struct.min_read_level = 1;
+  board_struct.min_write_level = 1;
+  board_struct.min_remove_level = 1;
+  board_struct.type = CLAN_BOARD;
+  board_struct.owner = CLAN_ULNHYRR;
+  board_struct.save_file = "board/ulnhyrr";
+  board_tmp["board clan ulnhyrr"] = board_struct;
+  
+  board_struct.min_read_level = 1;
+  board_struct.min_write_level = 1;
+  board_struct.min_remove_level = 1;
+  board_struct.type = CLAN_BOARD;
+  board_struct.owner = NO_OWNER;
+  board_struct.save_file = "board/kindred";
+  board_tmp["board clan kindred"] = board_struct;
+
+  board_struct.min_read_level = 1;
+  board_struct.min_write_level = 1;
+  board_struct.min_remove_level = 1;
+  board_struct.type = CLAN_BOARD;
+  board_struct.owner = NO_OWNER;
+  board_struct.save_file = "board/ferach";
+  board_tmp["board clan_ferach"] = board_struct;
+
+  board_struct.min_read_level = IMMORTAL;
+  board_struct.min_write_level = IMMORTAL;
+  board_struct.min_remove_level = IMMORTAL;
+  board_struct.type = ANY_BOARD;
+  board_struct.owner = NO_OWNER;
+  board_struct.save_file = "board/quests2do";
+  board_tmp["board quests2do"] = board_struct;
+
+  board_struct.min_read_level = 1;
+  board_struct.min_write_level = 1;
+  board_struct.min_remove_level = 1;
+  board_struct.type = CLAN_BOARD;
+  board_struct.owner = CLAN_ARCANA;
+  board_struct.save_file = "board/arcana";
+  board_tmp["board arcana"] = board_struct;
+
+  board_struct.min_read_level = 1;
+  board_struct.min_write_level = 1;
+  board_struct.min_remove_level = 1;
+  board_struct.type = CLAN_BOARD;
+  board_struct.owner = CLAN_SINDICATE;
+  board_struct.save_file = "board/knight_sabers";
+  board_tmp["board clan clanboard sindicate"] = board_struct;
+
+  board_struct.min_read_level = 1;
+  board_struct.min_write_level = 1;
+  board_struct.min_remove_level = 1;
+  board_struct.type = CLAN_BOARD;
+  board_struct.owner = NO_OWNER;
+  board_struct.save_file = "board/horde";
+  board_tmp["board clan horde"] = board_struct;
+
+  board_struct.min_read_level = 1;
+  board_struct.min_write_level = 1;
+  board_struct.min_remove_level = 1;
+  board_struct.type = CLAN_BOARD;
+  board_struct.owner = NO_OWNER;
+  board_struct.save_file = "board/bandaleros";
+  board_tmp["board clan bandaleros"] = board_struct;
+
+  board_struct.min_read_level = 1;
+  board_struct.min_write_level = 1;
+  board_struct.min_remove_level = 1;
+  board_struct.type = ANY_BOARD;
+  board_struct.owner = NO_OWNER;
+  board_struct.save_file = "board/uruk";
+  board_tmp["board uruk"] = board_struct;
+
+  board_struct.min_read_level = 1;
+  board_struct.min_write_level = 1;
+  board_struct.min_remove_level = 1;
+  board_struct.type = CLAN_BOARD;
+  board_struct.owner = NO_OWNER;
+  board_struct.save_file = "board/vig";
+  board_tmp["board clan vig"] = board_struct;
+
+  board_struct.min_write_level = 1;
+  board_struct.min_remove_level = 1;
+  board_struct.type = CLAN_BOARD;
+  board_struct.owner = NO_OWNER;
+  board_struct.save_file = "board/sng";
+  board_tmp["board clan sng"] = board_struct;
+
+  board_struct.min_read_level = 1;
+  board_struct.min_write_level = 1;
+  board_struct.min_remove_level = 1;
+  board_struct.type = CLAN_BOARD;
+  board_struct.owner = NO_OWNER;
+  board_struct.save_file = "board/smkjags";
+  board_tmp["board window kobal"] = board_struct;
+
+  board_struct.min_read_level = 1;
+  board_struct.min_write_level = 1;
+  board_struct.min_remove_level = 1;
+  board_struct.type = CLAN_BOARD;
+  board_struct.owner = CLAN_ASKANI;
+  board_struct.save_file = "board/askani";
+  board_tmp["board askani"] = board_struct;
+
+  board_struct.min_read_level = 1;
+  board_struct.min_write_level = 1;
+  board_struct.min_remove_level = 1;
+  board_struct.type = CLAN_BOARD;
+  board_struct.owner = NO_OWNER;
+  board_struct.save_file = "board/studs";
+  board_tmp["board clan studs"] = board_struct;
+
+  board_struct.min_read_level = 1;
+  board_struct.min_write_level = 1;
+  board_struct.min_remove_level = 1;
+  board_struct.type = CLAN_BOARD;
+  board_struct.owner = CLAN_MERC;
+  board_struct.save_file = "board/merc";
+  board_tmp["board clan merc"] = board_struct;
+
+  board_struct.min_read_level = 1;
+  board_struct.min_write_level = 1;
+  board_struct.min_remove_level = 1;
+  board_struct.type = CLAN_BOARD;
+  board_struct.owner = NO_OWNER;
+  board_struct.save_file = "board/co.rpse";
+  board_tmp["board clan co.rpse"] = board_struct;
+
+  board_struct.min_read_level = 1;
+  board_struct.min_write_level = 1;
+  board_struct.min_remove_level = 1;
+  board_struct.type = CLAN_BOARD;
+  board_struct.owner = CLAN_DCGUARD;
+  board_struct.save_file = "board/DC_Guard";
+  board_tmp["board clan clanboard dcguard"] = board_struct;
+ 
+  board_struct.min_read_level = 1;
+  board_struct.min_write_level = 1;
+  board_struct.min_remove_level = 1;
+  board_struct.type = CLAN_BOARD;
+  board_struct.owner = CLAN_DARKTIDE;
+  board_struct.save_file = "board/tengu";
+  board_tmp["board clan darktide"] = board_struct;
+
+  board_struct.min_read_level = 1;
+  board_struct.min_write_level = 1;
+  board_struct.min_remove_level = 1;
+  board_struct.type = CLAN_BOARD;
+  board_struct.owner = NO_OWNER;
+  board_struct.save_file = "board/vampyre";
+  board_tmp["board clan vampyre"] = board_struct;
+
+  board_struct.min_read_level = 1;
+  board_struct.min_write_level = 1;
+  board_struct.min_remove_level = 1;
+  board_struct.type = CLAN_BOARD;
+  board_struct.owner = CLAN_NAZGUL;
+  board_struct.save_file = "board/nazgul";
+  board_tmp["board clan nazgul"] = board_struct;
+
+  board_struct.min_read_level = 1;
+  board_struct.min_write_level = 1;
+  board_struct.min_remove_level = 1;
+  board_struct.type = CLAN_BOARD;
+  board_struct.owner = NO_OWNER;
+  board_struct.save_file = "board/eclipse";
+  board_tmp["board clan eclipse"] = board_struct;
 
 
-  return (-1);
+  board_struct.min_read_level = 1;
+  board_struct.min_write_level = 1;
+  board_struct.min_remove_level = 1;
+  board_struct.type = CLAN_BOARD;
+  board_struct.owner = CLAN_ANARCHIST;
+  board_struct.save_file = "board/anarchist";
+  board_tmp["screen window board clan anarchist"] = board_struct;
+
+  board_struct.min_read_level = 1;
+  board_struct.min_write_level = 1;
+  board_struct.min_remove_level = 1;
+  board_struct.type = ANY_BOARD;
+  board_struct.owner = NO_OWNER;
+  board_struct.save_file = "board/bankuul";
+  board_tmp["board clan ban'kuul globe"] = board_struct;
+
+  board_struct.min_read_level = 1;
+  board_struct.min_write_level = 1;
+  board_struct.min_remove_level = 1;
+  board_struct.type = CLAN_BOARD;
+  board_struct.owner = CLAN_BLACKAXE;
+  board_struct.save_file = "board/blackaxe";
+  board_tmp["tablet board clanboard black axe"] = board_struct;
+
+  board_struct.min_read_level = 1;
+  board_struct.min_write_level = 1;
+  board_struct.min_remove_level = 1;
+  board_struct.type = CLAN_BOARD;
+  board_struct.owner = CLAN_TIMEWARP;
+  board_struct.save_file = "board/timewarp";
+  board_tmp["board clan timewarp"] = board_struct;
+
+  board_struct.min_read_level = 1;
+  board_struct.min_write_level = 1;
+  board_struct.min_remove_level = 1;
+  board_struct.type = CLAN_BOARD;
+  board_struct.owner = CLAN_ASKANI;
+  board_struct.save_file = "board/epoch2";
+  board_tmp["board askani"] = board_struct;
+
+  board_struct.min_read_level = 1;
+  board_struct.min_write_level = 1;
+  board_struct.min_remove_level = 1;
+  board_struct.type = CLAN_BOARD;
+  board_struct.owner = CLAN_HOUSELESSROGUES;
+  board_struct.save_file = "board/darktide";
+  board_tmp["board clan houselessrogues"] = board_struct;
+
+  board_struct.min_read_level = 1;
+  board_struct.min_write_level = 1;
+  board_struct.min_remove_level = 1;
+  board_struct.type = CLAN_BOARD;
+  board_struct.owner = NO_OWNER;
+  board_struct.save_file = "board/eclipse2";
+  board_tmp["board eclipse book eclipsebulletin"] = board_struct;
+
+
+  board_struct.min_read_level = 1;
+  board_struct.min_write_level = 1;
+  board_struct.min_remove_level = 1;
+  board_struct.type = CLAN_BOARD;
+  board_struct.owner = CLAN_NAZGUL;
+  board_struct.save_file = "board/nazgulspecialboard";
+  board_tmp["board special nazgul"] = board_struct;
+
+  board_struct.min_read_level = 1;
+  board_struct.min_write_level = 1;
+  board_struct.min_remove_level = 1;
+  board_struct.type = CLAN_BOARD;
+  board_struct.owner = CLAN_SLACKERS;
+  board_struct.save_file = "board/slackers";
+  board_tmp["board slackers clanboard"] = board_struct;
+
+  board_struct.min_read_level = 1;
+  board_struct.min_write_level = 1;
+  board_struct.min_remove_level = 1;
+  board_struct.type = CLAN_BOARD;
+  board_struct.owner = NO_OWNER;
+  board_struct.save_file = "board/corpsetwo";
+  board_tmp["board clan Co.Rpse second"] = board_struct;
+
+  board_struct.min_read_level = 1;
+  board_struct.min_write_level = 1;
+  board_struct.min_remove_level = 1;
+  board_struct.type = CLAN_BOARD;
+  board_struct.owner = NO_OWNER;
+  board_struct.save_file = "board/eclipseduvak";
+  board_tmp["board clan eclipse duvak"] = board_struct;
+
+
+  board_struct.min_read_level = 1;
+  board_struct.min_write_level = 1;
+  board_struct.min_remove_level = 1;
+  board_struct.type = CLAN_BOARD;
+  board_struct.owner = NO_OWNER;
+  board_struct.save_file = "board/tayledras";
+  board_tmp["board tayledras"] = board_struct;
+
+  board_struct.min_read_level = 1;
+  board_struct.min_write_level = 1;
+  board_struct.min_remove_level = 1;
+  board_struct.type = CLAN_BOARD;
+  board_struct.owner = CLAN_SINDICATE;
+  board_struct.save_file = "board/knightsabertwo";
+  board_tmp["board checklist sabers knight"] = board_struct;
+
+  board_struct.min_read_level = 1;
+  board_struct.min_write_level = 1;
+  board_struct.min_remove_level = 1;
+  board_struct.type = CLAN_BOARD;
+  board_struct.owner = CLAN_SOLARIS;
+  board_struct.save_file = "board/solaris";
+  board_tmp["board golden bulletin solaris"] = board_struct;
+
+  board_struct.min_read_level = 1;
+  board_struct.min_write_level = 1;
+  board_struct.min_remove_level = 1;
+  board_struct.type = CLAN_BOARD;
+  board_struct.owner = NO_OWNER;
+  board_struct.save_file = "board/overlords";
+  board_tmp["board overlords clan"] = board_struct;
+
+  board_struct.min_read_level = IMMORTAL;
+  board_struct.min_write_level = IMMORTAL;
+  board_struct.min_remove_level = IMMORTAL;
+  board_struct.type = ANY_BOARD;
+  board_struct.owner = NO_OWNER;
+  board_struct.save_file = "board/punishment";
+  board_tmp["board punishment"] = board_struct;
+
+  board_struct.min_read_level = 1;
+  board_struct.min_write_level = 1;
+  board_struct.min_remove_level = 1;
+  board_struct.type = CLAN_BOARD;
+  board_struct.owner = NO_OWNER;
+  board_struct.save_file = "board/anaphro";
+  board_tmp["board clan anaphrodisia"] = board_struct;
+
+  board_struct.min_read_level = OVERSEER;
+  board_struct.min_write_level = OVERSEER;
+  board_struct.min_remove_level = OVERSEER;
+  board_struct.type = ANY_BOARD;
+  board_struct.owner = NO_OWNER;
+  board_struct.save_file = "board/coder";
+  board_tmp["board coding"] = board_struct;
+
+
+  board_struct.min_read_level = 1;
+  board_struct.min_write_level = 1;
+  board_struct.min_remove_level = IMMORTAL;
+  board_struct.type = CLASS_BOARD;
+  board_struct.owner = CLASS_MAGE;
+  board_struct.save_file = "board/mage";
+  board_tmp["board guild mage glyph glyphs column"] = board_struct;
+
+
+  board_struct.min_read_level = 1;
+  board_struct.min_write_level = 1;
+  board_struct.min_remove_level = IMMORTAL;
+  board_struct.type = CLASS_BOARD;
+  board_struct.owner = CLASS_CLERIC;
+  board_struct.save_file = "board/cleric";
+  board_tmp["board guild cleric"] = board_struct;
+
+  board_struct.min_read_level = 1;
+  board_struct.min_write_level = 1;
+  board_struct.min_remove_level = IMMORTAL;
+  board_struct.type = CLASS_BOARD;
+  board_struct.owner = CLASS_THIEF;
+  board_struct.save_file = "board/thief";
+  board_tmp["board guild thief"] = board_struct;
+
+  board_struct.min_read_level = 1;
+  board_struct.min_write_level = 1;
+  board_struct.min_remove_level = IMMORTAL;
+  board_struct.type = CLASS_BOARD;
+  board_struct.owner = CLASS_WARRIOR;
+  board_struct.save_file = "board/warrior";
+  board_tmp["board guild warrior"] = board_struct;
+
+  board_struct.min_read_level = 1;
+  board_struct.min_write_level = 1;
+  board_struct.min_remove_level = IMMORTAL;
+  board_struct.type = CLASS_BOARD;
+  board_struct.owner = CLASS_ANTI;
+  board_struct.save_file = "board/anti";
+  board_tmp["board guild anti journal"] = board_struct;
+
+  board_struct.min_read_level = 1;
+  board_struct.min_write_level = 1;
+  board_struct.min_remove_level = IMMORTAL;
+  board_struct.type = CLASS_BOARD;
+  board_struct.owner = CLASS_PAL;
+  board_struct.save_file = "board/pal";
+  board_tmp["board guild paladin register"] = board_struct;
+
+  board_struct.min_read_level = 1;
+  board_struct.min_write_level = 1;
+  board_struct.min_remove_level = IMMORTAL;
+  board_struct.type = CLASS_BOARD;
+  board_struct.owner = CLASS_BARB;
+  board_struct.save_file = "board/barb";
+  board_tmp["board guild barb"] = board_struct;
+
+  board_struct.min_read_level = 1;
+  board_struct.min_write_level = 1;
+  board_struct.min_remove_level = IMMORTAL;
+  board_struct.type = CLASS_BOARD;
+  board_struct.owner = CLASS_MONK;
+  board_struct.save_file = "board/monk";
+  board_tmp["board guild monk"] = board_struct;
+
+  board_struct.min_read_level = 1;
+  board_struct.min_write_level = 1;
+  board_struct.min_remove_level = IMMORTAL;
+  board_struct.type = CLASS_BOARD;
+  board_struct.owner = CLASS_RANGER;
+  board_struct.save_file = "board/ranger";
+  board_tmp["board guild ranger notes tree"] = board_struct;
+
+  board_struct.min_read_level = 1;
+  board_struct.min_write_level = 1;
+  board_struct.min_remove_level = IMMORTAL;
+  board_struct.type = CLASS_BOARD;
+  board_struct.owner = CLASS_BARD;
+  board_struct.save_file = "board/bard";
+  board_tmp["board guild bard bulletin"] = board_struct;
+
+  board_struct.min_read_level = 1;
+  board_struct.min_write_level = 1;
+  board_struct.min_remove_level = IMMORTAL;
+  board_struct.type = CLASS_BOARD;
+  board_struct.owner = CLASS_DRUID;
+  board_struct.save_file = "board/druid";
+  board_tmp["board guild druid sheet papyrus"] = board_struct;
+
+  board_struct.min_read_level = 1;
+  board_struct.min_write_level = 1;
+  board_struct.min_remove_level = 1;
+  board_struct.type = CLAN_BOARD;
+  board_struct.owner = CLAN_TRIAD;
+  board_struct.save_file = "board/triad";
+  board_tmp["board clan triad chalk"] = board_struct;
+
+  board_struct.min_read_level = 1;
+  board_struct.min_write_level = OVERSEER;
+  board_struct.min_remove_level = OVERSEER;
+  board_struct.type = ANY_BOARD;
+  board_struct.owner = NO_OWNER;
+  board_struct.save_file = "board/punish";
+  board_tmp["board punishment mortal"] = board_struct;
+
+  return board_tmp;
 }
+
+
+std::map<std::string,BOARD_INFO> board_db = populate_boards();
+
+ 
+
+
 
 int board(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, CHAR_DATA* invoker)
 {
   static int has_loaded = 0;
-  int bnum = -1;
+  
+  std::map<std::string, BOARD_INFO>::iterator board;
+
   if(!cmd) {
     return eFAILURE;
   }
@@ -342,47 +646,45 @@ int board(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, CHAR_DATA* in
 
   // Identify which board we're dealing with
 
-  if((bnum = find_board(ch)) == (-1))
+  if(!obj)
+    return eFAILURE;
+  
+  board = board_db.find(obj->name);
+
+  if(board == board_db.end())
     return eFAILURE;
 
-
   switch (cmd) {
-  case 12:  // look
-    return(board_show_board(ch, arg, bnum));
-  case 128: // write
+  case CMD_LOOK:  // look
+    return(board_show_board(ch, arg, board));
+  case CMD_WRITE: // write
     if(GET_INT(ch) < 9) {
       send_to_char("You are too stupid to know how to write!\r\n", ch);
       return eSUCCESS;
     }
-    board_write_msg(ch, arg, bnum);
+    board_write_msg(ch, arg, board);
     return eSUCCESS;
-  case 67: // read
+  case CMD_READ: // read
     if(GET_INT(ch) < 9) {
       send_to_char("You are too stupid to know how to read!\r\n", ch);
       return eSUCCESS;
     }
-    board_display_msg(ch, arg, bnum);
+    board_display_msg(ch, arg, board);
     return eSUCCESS;
-  case 70: /* erase */
+  case CMD_ERASE: /* erase */
     if(GET_INT(ch) < 9) {
       send_to_char("You are too stupid to read them!\r\nDon't erase them they might be important!\r\n", ch);
       return eSUCCESS;
     }
     if(
-       (bnum == 32 && ch->clan != 16 && GET_LEVEL(ch) < PATRON) ||
-       (bnum == 18 && ch->clan != 34 && GET_LEVEL(ch) < PATRON) ||
-       (bnum == 36 && ch->clan != 16 && GET_LEVEL(ch) < PATRON) ||
-       (bnum == 35 && ch->clan != 22 && GET_LEVEL(ch) < PATRON)
+       ((!strcmp(obj->name, "board uruk")) && ch->clan != CLAN_NAZGUL && GET_LEVEL(ch) < PATRON)
       )
     {
       send_to_char("You can't erase posts from this board.\r\n", ch);
       return eSUCCESS;
-      // This is the eclipse bounty board.  I agreed to it since it is
-      // for clan "roleplay" purposes... -pir
-      // also added this for Uruk'hai and Darna boards so only members
-      // of the clan can remove posts - Duvak too
+      // added this for Uruk'hai board so only members can remove posts
     }
-    board_remove_msg(ch, arg, bnum);
+    board_remove_msg(ch, arg, board);
     return eSUCCESS;
   default:
     return eFAILURE;
@@ -391,275 +693,169 @@ int board(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, CHAR_DATA* in
 
 void new_edit_board_unlock_board(CHAR_DATA *ch, int abort)
 {
-  int x, ind;
+  RESERVATION_DATA *reserve = wait_for_write[ch];
+  message new_msg;
 
-  for(x = 0; x < NUM_BOARDS; x++) {
-    if(board_lock[x].locked_for == ch) {
-      if (!abort) {
-        board_lock[x].lock = 0;
-        board_lock[x].locked_for = NULL;
-        csendf(ch, "Your message is number %d.\n\r", boards[x].number);
-	check_for_awaymsgs(ch);
-      } else {
-        ind = boards[x].number;
-        curr_board = &boards[x];
-        dc_free(curr_board->msg[ind].text);
-        dc_free(curr_board->msg[ind].date);
-        dc_free(curr_board->msg[ind].author);
-        dc_free(curr_board->msg[ind].title);
-        curr_board->msg[ind].text = NULL;
-        curr_board->msg[ind].date = NULL;
-        curr_board->msg[ind].author = NULL;
-        curr_board->msg[ind].title = NULL;
-        for ( ; ind < (curr_board->number) ; ind++ )
-          curr_board->msg[ind] = curr_board->msg[ind+1];
-        curr_board->msg[curr_board->number].text = NULL;
-        curr_board->msg[curr_board->number].date = NULL; 
-        curr_board->msg[curr_board->number].author = NULL;
-        curr_board->msg[curr_board->number].title = NULL;
-        curr_board->number--;
-      }
-      board_save_board(x);
+  new_msg.text = reserve->buf;
+  dc_free(reserve->buf);
+  new_msg.date = reserve->new_post.date;
+  new_msg.author = reserve->new_post.author;
+  new_msg.title = reserve->new_post.title;
+  
+  if(new_msg.date.empty()) //means they were editing Topic
+  {
+    if(!new_msg.text.empty() && !new_msg.title.empty())
+    {
+      reserve->board->second.msgs[0].text = new_msg.text;
+      reserve->board->second.msgs[0].title = new_msg.title;
     }
   }
+  else
+    reserve->board->second.msgs.push_back(new_msg);
+  delete reserve;
 }
 
-void board_unlock_board(CHAR_DATA *ch)
+void board_write_msg(CHAR_DATA *ch, char *arg, std::map<string,BOARD_INFO>::iterator board) 
 {
-  int x;
-  
-  for(x = 0; x < NUM_BOARDS; x++)
-    if(board_lock[x].locked_for == ch) {
-      board_lock[x].lock = 0;
-      board_lock[x].locked_for = NULL;
-      csendf(ch, "Your message is number %d.\n\r", boards[x].number);
-      board_save_board(x);
-    }
-}
-
-void board_write_msg(CHAR_DATA *ch, char *arg, int bnum) {
-
-  int highmessage;
   char buf[MAX_STRING_LENGTH];
   long ct; // clock time
   char *tmstr;
-  struct message *curr_msg;
+  
 
-  if(bnum == -1) {
-    log("Board special procedure called for non-board object", ANGEL, LOG_BUG);
-    send_to_char("This board is not in operation at this time.\n\r", ch);
-    return;
-  }
-
-  curr_board = &boards[bnum];
-
-  if(board_clan[bnum] != -1 && GET_LEVEL(ch) < OVERSEER) {
-    if(ch->clan !=  board_clan[bnum]) {
+  if(board->second.type == CLAN_BOARD && GET_LEVEL(ch) < OVERSEER) 
+  {
+    if(ch->clan !=  board->second.owner) 
+    {
       send_to_char("You aren't in the right clan bucko.\n\r", ch);
       return;
     }
-    if(!has_right(ch, CLAN_RIGHTS_B_WRITE)) {
+    if(!has_right(ch, CLAN_RIGHTS_B_WRITE)) 
+    {
       send_to_char("You don't have the right!  Talk to your clan leader.\n\r", ch);
       return;
     }
   }
-  if (board_class[bnum] != -1 && GET_LEVEL(ch) < IMMORTAL && GET_CLASS(ch) != board_class[bnum]) {
+  if (board->second.type == CLASS_BOARD && GET_LEVEL(ch) < IMMORTAL && GET_CLASS(ch) != board->second.owner) 
+  {
      send_to_char("You do not understand the writings written on this board.\r\n",ch);
      return;
   }
 
-  if ((GET_LEVEL(ch) < min_write_level[bnum])) {
+  if ((GET_LEVEL(ch) < board->second.min_write_level)) 
+  {
     send_to_char("You pick up a quill to write, but realize "
                   "you're not powerful enough\n\rto submit "
                   "intelligent material to this board.\n\r", ch);
     return;
   }
 
- if((curr_board->number) > (MAX_MSGS - 1)) {
-    send_to_char("The board is full already.\n\r", ch);
-    return;
-  }
-
-  // Check for locks, return if lock is found on this board
-
-  if (board_check_locks(bnum, ch))
-    return;
-
   // skip blanks
 
   for(; isspace(*arg); arg++);
 
-  if (!*arg) {
+  if (!*arg) 
+  {
     send_to_char("Need a header, fool.\n\r", ch);
     return;
   }
 
-  // Now we're committed to writing a message.  Let's lock the board.
 
-  board_lock[bnum].lock = 1;
-  board_lock[bnum].locked_for = ch;
+  RESERVATION_DATA *reserve = new RESERVATION_DATA;
 
-  // Lock set
 
-  highmessage = boards[bnum].number;
-  curr_msg = &curr_board->msg[++highmessage];
+  reserve->new_post.title = arg;
 
-  if (!(strcmp("Topic", arg)) && GET_LEVEL(ch) > IMMORTAL) {
-    curr_msg = &curr_board->msg[0];
-    dc_free(curr_msg->title);
-    curr_msg->title = NULL;
-    dc_free(curr_msg->author);
-    curr_msg->author = NULL;
-    dc_free(curr_msg->date);
-    curr_msg->date = NULL;
-    dc_free(curr_msg->text);
-    curr_msg->text = NULL;
-    (boards[bnum].number)--;
-  }
+  reserve->new_post.author = GET_NAME(ch);
 
-#ifdef LEAK_CHECK  
-  curr_msg->title = (char *)calloc(strlen(arg) + 1, sizeof(char));
-#else
-  curr_msg->title = (char *)dc_alloc(strlen(arg) + 1, sizeof(char));
-#endif
-
-  strcpy(curr_msg->title, arg);
-
-#ifdef LEAK_CHECK
-  curr_msg->author = (char *)calloc(strlen(GET_NAME(ch)) + 1, sizeof(char));
-#else
-  curr_msg->author = (char *)dc_alloc(strlen(GET_NAME(ch)) + 1, sizeof(char));
-#endif
-
-  strcpy(curr_msg->author, GET_NAME(ch));
   ct = time(0);
   tmstr = asctime(localtime(&ct));
   *(tmstr + strlen(tmstr) - 1) = '\0';
   sprintf(buf, "%.10s", tmstr);
-#ifdef LEAK_CHECK
-  curr_msg->date = (char *)calloc(strlen(buf) + 1, sizeof(char));
-#else
-  curr_msg->date = (char *)dc_alloc(strlen(buf) + 1, sizeof(char));
-#endif
-  strcpy(curr_msg->date, buf);
+
+  reserve->new_post.date = buf;
+
   send_to_char("        Write your message and stay within the line.  (/s saves /h for help)\r\n"
                "   |--------------------------------------------------------------------------------|\r\n", ch);
- // send_to_char("Write your message. Terminate with a '~'.\n\r\n\r", ch);
+
   act("$n starts to write a message.", ch, 0, 0, TO_ROOM, INVIS_NULL);
 
-  // Take care of free-ing and zeroing if the message text is already
-  // allocated previously
 
-  if (curr_msg->text)
-    dc_free (curr_msg->text);
-  curr_msg->text = 0;
+  if (!(strcmp("Topic", arg)) && GET_LEVEL(ch) > IMMORTAL) {
+    reserve->new_post.date.clear();
+  }
 
-  // Initiate the string_add procedures from comm.c
-
-//  ch->desc->connected = CON_WRITE_BOARD;
-//  ch->desc->str = &curr_msg->text;
-//  ch->desc->max_str = MAX_MESSAGE_LENGTH;
+    reserve->buf = 0; 
+    reserve->board = board;
+    wait_for_write[ch] = reserve;
     ch->desc->connected = CON_WRITE_BOARD;
-    ch->desc->strnew = &curr_msg->text;
+    ch->desc->strnew = &reserve->buf;
     ch->desc->max_str = MAX_MESSAGE_LENGTH;
 
-  (boards[bnum].number)++;
-  
-  if (boards[bnum].number < 0)
-    boards[bnum].number = 0;
+
+
+
 }
 
-int board_remove_msg(CHAR_DATA *ch, char *arg, int bnum) {
 
+int board_remove_msg(CHAR_DATA *ch, char *arg, std::map<std::string, BOARD_INFO>::iterator board) 
+{
   int ind, tmessage;
   char buf[256], number[MAX_INPUT_LENGTH+1];
   
   one_argument(arg, number);
   
   if (!*number || !isdigit(*number))
-    return(0);
+    return eFAILURE;
   
-  if (!(tmessage = atoi(number))) return(0);
+  if (!(tmessage = atoi(number))) return eFAILURE;
   
-  if ( bnum == -1 ) {
-    log("Board special procedure called for non-board object", ANGEL, LOG_BUG);
-    send_to_char("This board is not in operation at this time.\n\r", ch);
-    return 1;
-  }
 
-  curr_board = &boards[bnum];
 
-  if (curr_board->number < 1) {
+  if (board->second.msgs.empty()) 
+  {
     send_to_char("The board is empty!\n\r", ch);
-    return(1);
+    return eSUCCESS;
   }
 
-  if (tmessage < 0 || tmessage > curr_board->number) {
+  if (tmessage < 0 || tmessage >= board->second.msgs.size()) 
+  {
     send_to_char("That message exists only in your imagination..\n\r",
 		 ch);
-    return(1);
+    return eSUCCESS;
   }
 
-  /* Check for board locks, return if lock is found */
-  
-  if (board_check_locks(bnum, ch))
-    return(1);
 
   ind = tmessage;
 
   // if clan board
-  if(board_clan[bnum] != -1 && GET_LEVEL(ch) < OVERSEER) {
-    if(ch->clan !=  board_clan[bnum]) {
+  if(board->second.type == CLAN_BOARD && GET_LEVEL(ch) < OVERSEER) 
+  {
+    if(ch->clan !=  board->second.owner) 
+    {
       send_to_char("You aren't in the right clan bucko.\n\r", ch);
-      return 1;
+      return eSUCCESS;
     }
-    if(!has_right(ch, CLAN_RIGHTS_B_REMOVE) && strcmp(GET_NAME(ch), curr_board->msg[ind].author)) {
+    if(!has_right(ch, CLAN_RIGHTS_B_REMOVE) && board->second.msgs[ind].author.compare(GET_NAME(ch))) 
+    {
       send_to_char("You don't have the right!  Talk to your clan leader.\n\r", ch);
-      return 1;
+      return eSUCCESS;
     }
   }
-  else if (board_class[bnum] != -1 && GET_LEVEL(ch) < IMMORTAL && GET_CLASS(ch) != board_class[bnum]) {
+  else if (board->second.type == CLASS_BOARD && GET_LEVEL(ch) < IMMORTAL && GET_CLASS(ch) != board->second.owner) 
+  {
      send_to_char("You do not understand the writings written on this board.\r\n",ch);
-     return 1;
+     return eSUCCESS;
   }
-  else if((GET_LEVEL(ch) < 
-min_remove_level[bnum] && strcmp(GET_NAME(ch), curr_board->msg[ind].author)
-          ) &&
-           GET_LEVEL(ch) < OVERSEER) 
+  else if((GET_LEVEL(ch) < board->second.min_remove_level && board->second.msgs[ind].author.compare(GET_NAME(ch))) 
+           && GET_LEVEL(ch) < OVERSEER) 
   {
     send_to_char("You try and grab one of the notes of the board but "
                  "get a nasty\n\rshock. Maybe you'd better leave it "
                  "alone.\n\r",ch);
-    return 1;
+    return eSUCCESS;
   }
 
- /* If you change any of this remove stuff you also need to change new_edit_board_unlock_board - Rahz */
-
-  dc_free(curr_board->msg[ind].text);
-  dc_free(curr_board->msg[ind].date);
-  dc_free(curr_board->msg[ind].author);
-  dc_free(curr_board->msg[ind].title);
-  curr_board->msg[ind].text = NULL;
-  curr_board->msg[ind].date = NULL;
-  curr_board->msg[ind].author = NULL;
-  curr_board->msg[ind].title = NULL;
-
-  for ( ; ind < (curr_board->number) ; ind++ )
-    curr_board->msg[ind] = curr_board->msg[ind+1];
-
-/* You MUST do ths, or the next message written after a remove will */
-/* end up doing a free(curr_board->msg[ind].text) because it's not!! */
-/* Causing strange shit to happen, because now the message has a     */
-/* To a memory location that doesn't exist, and if THAT message gets */
-/* Removed, it will destroy what it's pointing to. THIS is the board */
-/* Bug we've been looking for!        -=>White Gold<=-               */
-
-  curr_board->msg[curr_board->number].text = NULL;
-  curr_board->msg[curr_board->number].date = NULL;
-  curr_board->msg[curr_board->number].author = NULL;
-  curr_board->msg[curr_board->number].title = NULL;
-
-  curr_board->number--;
+  board->second.msgs.erase(board->second.msgs.begin() + ind - 1);
 
   send_to_char("Message erased.\n\r", ch);
   sprintf(buf, "$n just erased message %d.", tmessage);
@@ -667,172 +863,95 @@ min_remove_level[bnum] && strcmp(GET_NAME(ch), curr_board->msg[ind].author)
   // Removal message also repaired
   act(buf, ch, 0, 0, TO_ROOM, INVIS_NULL);
 
-  board_save_board(bnum);
-  return(1);
-  }
- 
-char *fix_returns(char *text_string)
-{
-  char *localbuf;
-  int point=0;
-  int point2 = 0;
-
-  if (!text_string) {
-#ifdef LEAK_CHECK
-    localbuf = (char *)calloc(2, sizeof(char));
-#else
-    localbuf = (char *)dc_alloc(2, sizeof(char));
-#endif
-    strcpy(localbuf,"\n");
-    return(localbuf);
+  board_save_board(board);
+  return eSUCCESS;
   }
 
-  if (!(*text_string)) {
-#ifdef LEAK_CHECK
-    localbuf = (char *)calloc(strlen("(NULL)") + 1, sizeof(char));
-#else
-    localbuf = (char *)dc_alloc(strlen("(NULL)") + 1, sizeof(char));
-#endif
-    strcpy(localbuf,"(NULL)");
-    return(localbuf);
-  }
-
-#ifdef LEAK_CHECK
-  localbuf = (char *)calloc(strlen(text_string) + 1, sizeof(char));
-#else
-  localbuf = (char *)dc_alloc(strlen(text_string) + 1, sizeof(char));
-#endif
-
-  while(*(text_string+point) != '\0') 
-    if (*(text_string+point) != '\r') {
-      *(localbuf+point2) = *(text_string+point);
-      point2++;
-      point++;
-    }
-    else
-      point++;
-  *(localbuf + point2) = '\0'; /* You never made sure of null termination */
-  return(localbuf);
-}
-  
-void board_save_board(int bnum) {
+void board_save_board(std::map<string, BOARD_INFO>::iterator board) {
 
   FILE * the_file;
-  int ind;
-  char *temp_add;
-  struct message *curr_msg;
+  unsigned int ind;
 
-  // We're assuming the board number is valid since it was passed by
-  // our own code
+  the_file = dc_fopen(board->second.save_file.c_str(), "w");
 
-  curr_board = &boards[bnum];
-
-  the_file = dc_fopen(save_file[bnum], "w");
-
-  if(!the_file) {
+  if(!the_file) 
+  {
       log("Unable to open/create save file for bulletin board", ANGEL,
           LOG_BUG);
       return;
   }
 
-  fprintf(the_file," %d ", curr_board->number);
-  for (ind = 0; ind <= curr_board->number; ind++) {
-    curr_msg = &curr_board->msg[ind];
-    fwrite_string(curr_msg->title, the_file);
-    fwrite_string(curr_msg->author, the_file);
-    fwrite_string(curr_msg->date, the_file);
-    fwrite_string((temp_add = fix_returns(curr_msg->text)), the_file);
-    dc_free(temp_add);
+  fprintf(the_file," %d ", board->second.msgs.size());
+  for (ind = 0; ind < board->second.msgs.size(); ind++) 
+  {
+    fwrite_string((char*)board->second.msgs[ind].title.c_str(), the_file);
+    fwrite_string((char*)board->second.msgs[ind].author.c_str(), the_file);
+    fwrite_string((char*)board->second.msgs[ind].date.c_str(), the_file);
+    fwrite_string((char*)board->second.msgs[ind].text.c_str(), the_file);
   }
   dc_fclose(the_file);
   return;
-}
-
-void free_boards_from_memory()
-{
-  int bnum = 0;
-  struct message *curr_msg = NULL;
-
-  for (bnum = 0; bnum < NUM_BOARDS; bnum++) 
-  {
-    curr_board = &boards[bnum];
-
-    for (int ind = 0; ind <= curr_board->number; ind++) {
-
-      curr_msg = &curr_board->msg[ind];
-
-      if(curr_msg->title)
-        dc_free(curr_msg->title);
-      if(curr_msg->author)
-        dc_free(curr_msg->author);
-      if(curr_msg->date)
-        dc_free(curr_msg->date);
-      if(curr_msg->text)
-        dc_free(curr_msg->text);
-    }
-  }
 }
 
 void board_load_board() {
 
   FILE *the_file;
   int ind;
-  int bnum;
-  struct message *curr_msg;
-  
-  memset(boards, 0, sizeof(boards)); /* Zero out the array, make sure no */
-                                     /* Funky pointers are left in the   */
-                                     /* Allocated space                  */
+  struct message curr_msg;
+  int number;
+ 
+  std::map<std::string, BOARD_INFO>::iterator map_it;
+ 
+  for ( map_it = board_db.begin() ; map_it != board_db.end(); map_it++ ) 
+  {
+    map_it->second.lock = 0;
+    map_it->second.locked_for = NULL;
 
-  for ( bnum = 0 ; bnum < NUM_BOARDS ; bnum++ ) {
-    board_lock[bnum].lock = 0;
-    board_lock[bnum].locked_for = 0;
-  }
-
-  for (bnum = 0; bnum < NUM_BOARDS; bnum++) {
-    boards[bnum].number = -1;
-    the_file = dc_fopen(save_file[bnum], "r");
+    the_file = dc_fopen((*map_it).second.save_file.c_str(), "r");
     if (!the_file) 
       continue;
 
 
-    fscanf( the_file, " %d ", &boards[bnum].number);
-    if (boards[bnum].number < 0 || boards[bnum].number > MAX_MSGS || 
-	feof(the_file)) {
-      boards[bnum].number = -1;
+    fscanf( the_file, " %d ", &number);
+    if (number < 0 || feof(the_file)) 
+    {
       dc_fclose(the_file);
       continue;
     }
 
-    curr_board = &boards[bnum];
-
-    for (ind = 0; ind <= curr_board->number; ind++) {
-      curr_msg = &curr_board->msg[ind];
-      curr_msg->title = fread_string (the_file, 0);
-      curr_msg->author = fread_string (the_file, 0);
-      curr_msg->date = fread_string (the_file, 0);
-      curr_msg->text = fread_string (the_file, 0);
+    for (ind = 0; ind < number; ind++)
+    {
+      
+      curr_msg.title = fread_string (the_file, 0);
+      curr_msg.author = fread_string (the_file, 0);
+      curr_msg.date = fread_string (the_file, 0);
+      curr_msg.text = fread_string (the_file, 0);
+      map_it->second.msgs.push_back(curr_msg);
     }
+
     dc_fclose(the_file);
   }
 }
 
-int board_display_msg(CHAR_DATA *ch, char *arg, int bnum)
+
+int board_display_msg(CHAR_DATA *ch, char *arg, std::map<std::string, BOARD_INFO>::iterator board)
 {
-  char buf[512], number[MAX_INPUT_LENGTH+1], buffer[MAX_STRING_LENGTH];
-  int tmessage;
-  struct message *curr_msg;
-
+  char buf[512], number[MAX_INPUT_LENGTH+1];
   one_argument(arg, number);
+  int tmessage;
 
-  if(IS_MOB(ch)) {
-    if(!*number) {
+  if(IS_MOB(ch)) 
+  {
+    if(!*number) 
+    {
       send_to_char("Sorry, mobs have to specify the number of the post they want to read.\r\n", ch);
-      return(0);
+      return eFAILURE;
     }
   }
-  else {
-    if (!*number && ch->pcdata->last_mess_read > 0) {
+  else 
+  {
+    if (!*number && ch->pcdata->last_mess_read > 0) 
+    {
       ch->pcdata->last_mess_read++;
       sprintf(number, "%i", ch->pcdata->last_mess_read);
     }
@@ -841,98 +960,99 @@ int board_display_msg(CHAR_DATA *ch, char *arg, int bnum)
   if (!*number || !isdigit(*number))
   {
     send_to_char("Read what?\r\n",ch);
-    return(0);
+    return eFAILURE;
   }
-  if (!(tmessage = atoi(number))) return(0);
-
-  curr_board = &boards[bnum];
+  if (!(tmessage = atoi(number))) return eFAILURE;
 
 
-  if(board_clan[bnum] != -1 && GET_LEVEL(ch) < OVERSEER) {
-    if(ch->clan !=  board_clan[bnum]) {
+  if(board->second.type == CLAN_BOARD && GET_LEVEL(ch) < OVERSEER) 
+  {
+    if(ch->clan !=  board->second.owner) 
+    {
       send_to_char("You aren't in the right clan bucko.\n\r", ch);
-      return 1;
+      return eSUCCESS;
     }
     if(!has_right(ch, CLAN_RIGHTS_B_READ)) {
       send_to_char("You don't have the right!  Talk to your clan leader.\n\r", ch);
-      return 1;
+      return eSUCCESS;
     }
   }
-  if (board_class[bnum] != -1 && GET_LEVEL(ch) < IMMORTAL && GET_CLASS(ch) != board_class[bnum]) {
+  if (board->second.type == CLASS_BOARD && GET_LEVEL(ch) < IMMORTAL && GET_CLASS(ch) != board->second.owner) 
+  {
      send_to_char("You do not understand the writings written on this board.\r\n",ch);
-     return 1;
+     return eSUCCESS;
   }
 
-  if ((GET_LEVEL(ch) < min_read_level[bnum]) &&
-        (GET_LEVEL(ch) < OVERSEER)) 
+  if ((GET_LEVEL(ch) < board->second.min_read_level)) 
   {
     send_to_char("You try and look at the messages on the board but"
                  " you\n\rcannot comprehend their meaning.\n\r\n\r",ch);
     act("$n tries to read the board, but looks bewildered.", ch, 0, 0,
 	TO_ROOM, INVIS_NULL);
-    return(1);
+    return eSUCCESS;
   }
 
-  if(boards[bnum].number == -1) {
+  if(board->second.msgs.empty()) 
+  {
     send_to_char("The board is empty!\n\r", ch);
-    return(1);
+    return eSUCCESS;
   }
   
-  if (tmessage < 0 || tmessage > curr_board->number) {
+  if (tmessage < 0 || tmessage >= board->second.msgs.size()) 
+  {
     send_to_char("That message doesn't exist, moron.\n\r",ch);
-    return(1);
+    return eSUCCESS;
   }
 
   if(!IS_MOB(ch))
     ch->pcdata->last_mess_read = tmessage;
 
-  curr_msg = &curr_board->msg[tmessage];
-
-  sprintf(buf, "$n reads message %d titled: %s", tmessage, curr_msg->title);
+  sprintf(buf, "$n reads message %d titled: %s", tmessage, board->second.msgs[tmessage].title.c_str());
   act(buf, ch, 0, 0, TO_ROOM, INVIS_NULL);
-  if(IS_MOB(ch) || IS_SET(ch->pcdata->toggles, PLR_ANSI))
-    sprintf(buffer, "Message %2d (%s): " RED BOLD "%-14s " YELLOW"- %s"NTEXT,
-         tmessage, curr_msg->date, curr_msg->author, curr_msg->title );
-  else
-    sprintf(buffer, "Message %2d (%s): %-14s - %s",
-         tmessage, curr_msg->date, curr_msg->author, curr_msg->title );
+  act(buf, ch, 0, 0, TO_ROOM, INVIS_NULL);
 
-  sprintf(buffer + strlen(buffer), "\n\r----------\n\r"
-          CYAN"%s"NTEXT, curr_msg->text);
-  page_string(ch->desc, buffer, 1);
-  return(1);
+  if(IS_MOB(ch) || IS_SET(ch->pcdata->toggles, PLR_ANSI))
+    csendf(ch, "Message %2d (%s): " RED BOLD "%-14s " YELLOW"- %s"NTEXT,
+         tmessage, board->second.msgs[tmessage].date.c_str(), 
+         board->second.msgs[tmessage].author.c_str(), board->second.msgs[tmessage].title.c_str() );
+  else
+    csendf(ch, "Message %2d (%s): %-14s - %s", tmessage, board->second.msgs[tmessage].date.c_str(), 
+         board->second.msgs[tmessage].author.c_str(), board->second.msgs[tmessage].title.c_str());
+
+  csendf(ch, "\n\r----------\n\r"CYAN"%s"NTEXT, board->second.msgs[tmessage].text.c_str());
+
+  return eSUCCESS;
 }
-		
-int board_show_board(CHAR_DATA *ch, char *arg, int bnum)
+	
+	
+int board_show_board(CHAR_DATA *ch, char *arg, std::map<std::string, BOARD_INFO>::iterator board)
 {
   int i;
-  char buf[MAX_STRING_LENGTH], tmp[MAX_INPUT_LENGTH+1],tmp2[MAX_STRING_LENGTH];
-  
-  arg = one_argument(arg, tmp);
-  one_argument(arg, tmp2);
-  if (!*tmp)     return eFAILURE;
-  if (!isname(tmp, "board bulletin"))
-    if (!isname(tmp, "at") || !isname(tmp2, "board bulletin"))
-       return eFAILURE;
-  curr_board = &boards[bnum];
+  string buf;
 
-  if(board_clan[bnum] != -1 && GET_LEVEL(ch) < OVERSEER) {
-    if(ch->clan !=  board_clan[bnum]) {
+  std::stringstream ssin; 
+
+  if(board->second.type == CLAN_BOARD && GET_LEVEL(ch) < OVERSEER) 
+  {
+    if(ch->clan !=  board->second.owner) 
+    {
       send_to_char("You aren't in the right clan bucko.\n\r", ch);
       return eSUCCESS;
     }
-    if(!has_right(ch, CLAN_RIGHTS_B_READ)) {
+    if(!has_right(ch, CLAN_RIGHTS_B_READ)) 
+    {
       send_to_char("You don't have the right!  Talk to your clan leader.\n\r", ch);
       return eSUCCESS;
     }
   }
-  if (board_class[bnum] != -1 && GET_LEVEL(ch) < IMMORTAL && GET_CLASS(ch) != board_class[bnum]) {
+  if (board->second.type == CLASS_BOARD && GET_LEVEL(ch) < IMMORTAL && GET_CLASS(ch) != board->second.owner) 
+  {
      send_to_char("You do not understand the writings written on this board.\r\n",ch);
      return eSUCCESS;
   }
 
-  if ((GET_LEVEL(ch) < min_read_level[bnum]) &&
-        (GET_LEVEL(ch) < OVERSEER)) {
+  if ((GET_LEVEL(ch) < board->second.min_read_level)) 
+  {
     send_to_char("You try and look at the messages on the board "
                  "but you\n\rcannot comprehend their meaning.\n\r",ch);
     act("$n tries to read the board, but looks bewildered.",ch, 0, 0,
@@ -940,85 +1060,39 @@ int board_show_board(CHAR_DATA *ch, char *arg, int bnum)
     return eSUCCESS;
   }
 
-  curr_board = &boards[bnum];
 
   act("$n studies the board.", ch, 0, 0, TO_ROOM, INVIS_NULL);
 
-  strcpy(buf,"This is a bulletin board. Usage: "
-         "READ/ERASE <mesg #>, WRITE <header>\n\r");
-  if (boards[bnum].number == -1)
-    strcat(buf, "The board is empty.\n\r");
+  csendf(ch, "This is a bulletin board. Usage: READ/ERASE <mesg #>, WRITE <header>\n\r");
+  if (board->second.msgs.empty())
+    csendf(ch, "The board is empty.\n\r");
   else {
-    sprintf(buf + strlen(buf), "There are %d messages on the board.\n\r",
-	    curr_board->number);
-    sprintf(buf + strlen(buf), "\n\rBoard Topic:\n\r%s------------\n\r",
-            curr_board->msg[0].text);
-    for ( i = curr_board->number ; i >= 1; i-- ) 
+    csendf(ch, "There are %d messages on the board.\n\r", board->second.msgs.size());;
+
+    csendf(ch, "Board Topic:\n\r%s------------\n\r", board->second.msgs[0].text.c_str());
+    std::vector<message>::reverse_iterator msg_it;
+    i = board->second.msgs.size()-1;
+    for (msg_it = board->second.msgs.rbegin(); msg_it < board->second.msgs.rend(); ++msg_it ) 
        if(IS_MOB(ch) || IS_SET(ch->pcdata->toggles, PLR_ANSI))
-         sprintf(buf + strlen(buf), "(%s) "YELLOW"%-14s "RED"%2d: "
-               GREEN"%.47s"NTEXT"\n\r", curr_board->msg[i].date,
-               curr_board->msg[i].author, i, curr_board->msg[i].title);
-       else 
-         sprintf(buf + strlen(buf), "(%s) %-14s %2d: "
-               "%.47s\n\r", curr_board->msg[i].date,
-               curr_board->msg[i].author, i, curr_board->msg[i].title);
+       {
+         csendf(ch, "(%s) "YELLOW"%-14s "RED"%2d: "GREEN"%.47s"NTEXT"\n\r", msg_it->date.c_str(),
+                      msg_it->author.c_str(),i--, msg_it->title.c_str());
+       }
+       else
+       {
+         csendf(ch, "(%s) %-14s %2d: %.47s\n\r", msg_it->date.c_str(),
+               msg_it->author.c_str(), i--, msg_it->title.c_str());
+       }
  
 
   }
-  board_save_board(bnum);
-  page_string(ch->desc, buf, 1);
+  board_save_board(board);
+
   return eSUCCESS;
 }
 
-int board_check_locks (int bnum, CHAR_DATA *ch) {
-  
-  char buf[MAX_INPUT_LENGTH];
-  CHAR_DATA *tmp_char;
-  bool found = FALSE;
-  if (!board_lock[bnum].lock) return(0);
-  
-  /* FIRST lets' see if ths character is even in the game anymore! -WG-*/
-  for(tmp_char = character_list; tmp_char; tmp_char = tmp_char->next) {
-     if(tmp_char == board_lock[bnum].locked_for) {
-       found = TRUE;
-       break;
-     }
-   }
-
-  if(!found) {
-      log("Board: board locked for a user not in game.", ANGEL, LOG_BUG);
-      board_lock[bnum].lock = 0;
-      board_lock[bnum].locked_for = NULL;
-      return(0);
-  }
-
-  /* Check for link-death of lock holder */
-
-  if (!board_lock[bnum].locked_for->desc) {
-    sprintf(buf,"You push %s aside and approach the "
-                "board.\n\r",
-                 board_lock[bnum].locked_for->name);
-    send_to_char(buf, ch);
-  }
-
-  /* Else see if lock holder is still in write-string mode */
-
-  else if (board_lock[bnum].locked_for->desc->str) { /* Lock still holding */
-    sprintf(buf,"You try to approach the board but %s blocks your"
-                " way.\n\r",board_lock[bnum].locked_for->name);
-    send_to_char(buf, ch);
-    return (1);
-  }
-
-  /* Otherwise, the lock has been lifted */
-
-  board_save_board(bnum);
-  board_lock[bnum].lock = 0;
-  board_lock[bnum].locked_for = 0;
-  return(0);
-}
-  
 int fwrite_string (char *buf, FILE *fl)
 {
   return (fprintf(fl, "%s~\n", buf));
 }
+
