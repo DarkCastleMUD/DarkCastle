@@ -84,7 +84,7 @@ int do_harmtouch(struct char_data *ch, char *argument, int cmd)
       return eFAILURE;
    }
 
-   if (!charge_moves(ch, SKILL_HARMTOUCH_MOVES, SKILL_HARM_TOUCH)) return eSUCCESS;
+   if (!charge_moves(ch, SKILL_HARM_TOUCH)) return eSUCCESS;
 
 
    int duration = 24;
@@ -175,7 +175,7 @@ int do_layhands(struct char_data *ch, char *argument, int cmd)
       return eFAILURE;
    }
 
-   if (!charge_moves(ch, SKILL_LAYHANDS_MOVES, SKILL_LAY_HANDS)) return eSUCCESS;
+   if (!charge_moves(ch, SKILL_LAY_HANDS)) return eSUCCESS;
 
    if(!skill_success(ch,victim, SKILL_LAY_HANDS)) {
      send_to_char("Your god refuses you.\r\n", ch);

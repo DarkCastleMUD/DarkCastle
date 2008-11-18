@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: cl_ranger.cpp,v 1.91 2008/11/12 18:51:36 kkoons Exp $ | cl_ranger.C  *
+ * $Id: cl_ranger.cpp,v 1.92 2008/11/18 14:41:02 kkoons Exp $ | cl_ranger.C  *
  * Description: Ranger skills/spells                                          *
  *                                                                            *
  * Revision History                                                           *
@@ -146,7 +146,7 @@ int do_tame(CHAR_DATA *ch, char *arg, int cmd)
      }*/
    }
 
-  if (!charge_moves(ch, SKILL_TAME_MOVES, SKILL_TAME)) return eSUCCESS;
+  if (!charge_moves(ch, SKILL_TAME)) return eSUCCESS;
 
   act("$n holds out $s hand to $N and beckons softly.", ch, NULL, victim, TO_ROOM, INVIS_NULL); 
 
@@ -239,7 +239,7 @@ int do_track(CHAR_DATA *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (!charge_moves(ch, SKILL_TRACK_MOVES, SKILL_TRACK)) return eSUCCESS;
+  if (!charge_moves(ch, SKILL_TRACK)) return eSUCCESS;
 
   act("$n walks about slowly, searching for signs of $s quarry", ch, 0, 0, TO_ROOM, INVIS_NULL);
   send_to_char("You search for signs of your quarry...\n\r\n\r", ch);
@@ -474,7 +474,7 @@ int ambush(CHAR_DATA *ch)
        }
 
 
-       if (!charge_moves(ch, SKILL_AMBUSH_MOVES, SKILL_AMBUSH)) return eSUCCESS;
+       if (!charge_moves(ch, SKILL_AMBUSH)) return eSUCCESS;
 
        if(skill_success(i,ch, SKILL_AMBUSH)) 
        { 
@@ -742,7 +742,7 @@ int do_forage(CHAR_DATA *ch, char *arg, int cmd)
     return eFAILURE;
   }
   
-  if (!charge_moves(ch, SKILL_FORAGE_MOVES, SKILL_FORAGE)) return eSUCCESS;
+  if (!charge_moves(ch, SKILL_FORAGE)) return eSUCCESS;
  
   learned = has_skill(ch, SKILL_FORAGE);
   if(!learned) {
@@ -1227,7 +1227,7 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
     return eFAILURE;
   }
 
-  if (!charge_moves(ch, SKILL_ARCHERY_MOVES, SKILL_ARCHERY)) return eSUCCESS;
+  if (!charge_moves(ch, SKILL_ARCHERY)) return eSUCCESS;
 
 /* check if you can see your target */
 /* put ch in the targets room to check if they are visible */

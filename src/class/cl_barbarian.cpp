@@ -1,5 +1,5 @@
 /************************************************************************
- * $Id: cl_barbarian.cpp,v 1.91 2008/11/12 18:51:58 kkoons Exp $
+ * $Id: cl_barbarian.cpp,v 1.92 2008/11/18 14:40:36 kkoons Exp $
  * cl_barbarian.cpp
  * Description: Commands for the barbarian class.
  *************************************************************************/
@@ -67,7 +67,7 @@ int do_rage(struct char_data *ch, char *argument, int cmd)
   if(!can_attack(ch) || !can_be_attacked(ch, victim))
     return eFAILURE;
 
-  if (!charge_moves(ch, SKILL_RAGE_MOVES, SKILL_RAGE)) return eSUCCESS;
+  if (!charge_moves(ch, SKILL_RAGE)) return eSUCCESS;
 
   if (!skill_success(ch,victim,SKILL_RAGE)) {
     act ("You start advancing towards $N, but trip over your own feet!", 
@@ -123,7 +123,7 @@ int do_battlecry(struct char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (!charge_moves(ch, SKILL_BATTLECRY_MOVES, SKILL_BATTLECRY)) return eSUCCESS;
+  if (!charge_moves(ch, SKILL_BATTLECRY)) return eSUCCESS;
 
   if (!skill_success(ch,NULL,SKILL_BATTLECRY)) {
      act ("You give a cry of defiance, but trip over your own feet!", ch, 0, 0, TO_CHAR, 0);
@@ -213,7 +213,7 @@ int do_berserk(struct char_data *ch, char *argument, int cmd)
   if(!can_attack(ch) || !can_be_attacked(ch, victim))
     return eFAILURE;
 
-  if (!charge_moves(ch, SKILL_BERSERK_MOVES, SKILL_BERSERK)) return eSUCCESS;
+  if (!charge_moves(ch, SKILL_BERSERK)) return eSUCCESS;
 
   if (!skill_success(ch,victim,SKILL_BERSERK)) {
     act ("You start freaking out on $N, but trip over your own feet!", ch, 0, victim, TO_CHAR, 0);
@@ -322,7 +322,7 @@ int do_headbutt(struct char_data *ch, char *argument, int cmd)
         return eFAILURE;
   }
 
-  if (!charge_moves(ch, SKILL_HEADBUTT_MOVES, SKILL_HEADBUTT)) return eSUCCESS;
+  if (!charge_moves(ch, SKILL_HEADBUTT)) return eSUCCESS;
 
   if (IS_SET(victim->combat, COMBAT_BERSERK) && (IS_NPC(victim) || has_skill(victim, SKILL_BERSERK) > 80))
   {
@@ -405,7 +405,7 @@ int do_bloodfury(struct char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (!charge_moves(ch, SKILL_BLOODFURY_MOVES, SKILL_BLOOD_FURY)) return eSUCCESS;
+  if (!charge_moves(ch, SKILL_BLOOD_FURY)) return eSUCCESS;
 
   if (!skill_success(ch,NULL,SKILL_BLOOD_FURY)) 
   {
@@ -456,7 +456,7 @@ int do_crazedassault(struct char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
           
-  if (!charge_moves(ch, SKILL_CRAZEDASSAULT_MOVES, SKILL_CRAZED_ASSAULT)) return eSUCCESS;
+  if (!charge_moves(ch, SKILL_CRAZED_ASSAULT)) return eSUCCESS;
 
   if(!skill_success(ch,NULL,SKILL_CRAZED_ASSAULT)) {
     send_to_char("You try to psyche yourself up for it but just can't muster the concentration.\r\n", ch);
@@ -544,7 +544,7 @@ int do_bullrush(struct char_data *ch, char *argument, int cmd)
   }
 
 
-  if (!charge_moves(ch, SKILL_BULLRUSH_MOVES, SKILL_BULLRUSH)) return eSUCCESS;
+  if (!charge_moves(ch, SKILL_BULLRUSH)) return eSUCCESS;
 
   // before we move anyone, we need to check for any spec procs in the
   // room like guild guards
@@ -625,7 +625,7 @@ int do_ferocity(struct char_data *ch, char *argument, int cmd)
     grpsize++;
   }
 
-  if (!charge_moves(ch, SKILL_FEROCITY_MOVES*grpsize, SKILL_FEROCITY)) return eSUCCESS;
+  if (!charge_moves(ch, SKILL_FEROCITY, grpsize)) return eSUCCESS;
 
   if (!skill_success(ch,NULL,SKILL_FEROCITY)) {
      send_to_char("Guess you just weren't that angry.\r\n", ch);
@@ -725,7 +725,7 @@ int do_knockback(struct char_data *ch, char *argument, int cmd)
   if(!can_attack(ch) || !can_be_attacked(ch, victim))
     return eFAILURE;
 
-  if (!charge_moves(ch, SKILL_KNOCKBACK_MOVES, SKILL_KNOCKBACK)) return eSUCCESS;
+  if (!charge_moves(ch, SKILL_KNOCKBACK)) return eSUCCESS;
 
   bool victim_paralyzed = false;
   affected_type *af;
@@ -895,7 +895,7 @@ int do_primalfury(CHAR_DATA *ch, char *argument, int cmd)
     send_to_char("You must be in combat in order to use this ability.\r\n",ch);
     return eSUCCESS;
   }
-  if (!charge_moves(ch, 40, SKILL_PRIMAL_FURY)) return eSUCCESS;
+  if (!charge_moves(ch, SKILL_PRIMAL_FURY)) return eSUCCESS;
 
   if (GET_RAW_STR(ch) < 16)
   {
