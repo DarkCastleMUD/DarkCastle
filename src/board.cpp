@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: board.cpp,v 1.30 2008/11/18 17:25:23 kkoons Exp $
+| $Id: board.cpp,v 1.31 2008/11/18 21:40:05 kkoons Exp $
 | board.C
 | Description:  This file contains the implementation for the board
 |   code.  It's old and should be rewritten --Morc XXX
@@ -573,17 +573,22 @@ int board(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, CHAR_DATA* in
   
   std::map<std::string, BOARD_INFO>::iterator board;
 
-  if(!cmd) {
+  if(cmd != CMD_LOOK && cmd != CMD_READ && cmd != CMD_WRITE && cmd != CMD_ERASE) 
+  {
     return eFAILURE;
   }
+
+  if (!arg)
+    return eFAILURE;
+
   if(!ch->desc)
     return eFAILURE; /* By MS or all NPC's will be trapped at the board */
-  
-  if(!has_loaded) {
+ 
+  if(!has_loaded) 
+  {
     board_load_board();
     has_loaded = 1;
   }
-
 
   // Identify which board we're dealing with
 
@@ -594,6 +599,13 @@ int board(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, CHAR_DATA* in
 
   if(board == board_db.end())
     return eFAILURE;
+  
+  char arg1[MAX_INPUT_LENGTH];
+  one_argument(arg, arg1);
+
+  if(!isname(arg1, obj->name))
+    return eFAILURE;
+  
 
   switch (cmd) {
   case CMD_LOOK:  // look
