@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.74 2008/11/16 05:41:45 kkoons Exp $
+| $Id: cl_warrior.cpp,v 1.75 2008/11/18 14:40:24 kkoons Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -73,7 +73,7 @@ int do_kick(struct char_data *ch, char *argument, int cmd)
         return eFAILURE;
   }
 
-  if (!charge_moves(ch, SKILL_KICK_MOVES, SKILL_KICK)) return eSUCCESS;
+  if (!charge_moves(ch, SKILL_KICK)) return eSUCCESS;
 
   WAIT_STATE(ch, (int)(PULSE_VIOLENCE*1.5));
 
@@ -191,7 +191,7 @@ int do_deathstroke(struct char_data *ch, char *argument, int cmd)
         return eFAILURE;
     }
 
-    if (!charge_moves(ch, SKILL_DEATHSTROKE_MOVES, SKILL_DEATHSTROKE)) return eSUCCESS;
+    if (!charge_moves(ch, SKILL_DEATHSTROKE)) return eSUCCESS;
 
     int i = has_skill(ch, SKILL_DEATHSTROKE);
     if (i > 40) failchance -= 5;
@@ -288,7 +288,7 @@ int do_retreat(struct char_data *ch, char *argument, int cmd)
    if (IS_AFFECTED(ch, AFF_SNEAK))
       affect_from_char(ch, SKILL_SNEAK);
 
-   if (!charge_moves(ch, SKILL_RETREAT_MOVES, SKILL_RETREAT)) return eSUCCESS;
+   if (!charge_moves(ch, SKILL_RETREAT)) return eSUCCESS;
 
    // failure
    if (!skill_success(ch,NULL,SKILL_RETREAT))
@@ -362,7 +362,7 @@ int do_hitall(struct char_data *ch, char *argument, int cmd)
    if(!can_attack(ch))
      return eFAILURE; 
 
-   if (!charge_moves(ch, SKILL_HITALL_MOVES, SKILL_HITALL)) return eSUCCESS;
+   if (!charge_moves(ch, SKILL_HITALL)) return eSUCCESS;
 
    // TODO - I'm pretty sure we can remove this check....don't feel like checking right now though
    if(IS_SET(ch->combat, COMBAT_HITALL))
@@ -498,7 +498,7 @@ int do_bash(struct char_data *ch, char *argument, int cmd)
     if(!can_attack(ch) || !can_be_attacked(ch, victim))
       return eFAILURE;
 
-    if (!charge_moves(ch, SKILL_BASH_MOVES, SKILL_BASH)) return eSUCCESS;
+    if (!charge_moves(ch, SKILL_BASH)) return eSUCCESS;
 
     if(affected_by_spell(victim, SPELL_IRON_ROOTS)) {
         act("You try to bash $N but tree roots around $S legs keep him upright.", ch, 0, victim, TO_CHAR, 0);
@@ -644,7 +644,7 @@ int do_redirect(struct char_data *ch, char *argument, int cmd)
     if(!can_be_attacked(ch, victim))
        return eFAILURE;
 
-    if (!charge_moves(ch, SKILL_REDIRECT_MOVES, SKILL_REDIRECT)) return eSUCCESS;
+    if (!charge_moves(ch, SKILL_REDIRECT)) return eSUCCESS;
 
     if (!skill_success(ch,victim,SKILL_REDIRECT) ) {
        act( "$n tries to redirect his attacks but $N won't allow it.", ch, NULL, ch->fighting, TO_VICT, 0 );
@@ -712,7 +712,7 @@ int do_disarm( struct char_data *ch, char *argument, int cmd )
         return eFAILURE;
     }
 
-    if (!charge_moves(ch, SKILL_DISARM_MOVES, SKILL_DISARM)) return eSUCCESS;
+    if (!charge_moves(ch, SKILL_DISARM)) return eSUCCESS;
 
     set_cantquit(ch, victim);
 
@@ -833,7 +833,7 @@ int do_rescue(struct char_data *ch, char *argument, int cmd)
 	return eFAILURE;
     }
 
-    if (!charge_moves(ch, SKILL_RESCUE_MOVES, SKILL_RESCUE)) return eSUCCESS;
+    if (!charge_moves(ch, SKILL_RESCUE)) return eSUCCESS;
 
     if (!skill_success(ch,victim, SKILL_RESCUE)) {
         send_to_char("You fail the rescue.\n\r", ch);
@@ -890,7 +890,7 @@ int do_bladeshield(struct char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (!charge_moves(ch, SKILL_BLADESHIELD_MOVES, SKILL_BLADESHIELD)) return eSUCCESS;
+  if (!charge_moves(ch, SKILL_BLADESHIELD)) return eSUCCESS;
 
   if(!skill_success(ch,NULL,SKILL_BLADESHIELD)) {
     act("$n starts swinging $s weapons around but stops before narrowly avoiding dismembering $mself."
@@ -1052,7 +1052,7 @@ int do_guard(struct char_data *ch, char *argument, int cmd)
       return eFAILURE;
    }
 
-   if (!charge_moves(ch, SKILL_GUARD_MOVES, SKILL_GUARD)) return eSUCCESS;
+   if (!charge_moves(ch, SKILL_GUARD)) return eSUCCESS;
 
    if(ch->guarding) {
       stop_guarding(ch);
@@ -1099,7 +1099,7 @@ int do_tactics(struct char_data *ch, char *argument, int cmd)
     grpsize++;
   }
 
-  if (!charge_moves(ch, SKILL_TACTICS_MOVES*grpsize, SKILL_TACTICS)) return eSUCCESS; 
+  if (!charge_moves(ch, SKILL_TACTICS, grpsize)) return eSUCCESS; 
 
   if (!skill_success(ch,NULL,SKILL_TACTICS)) {
      send_to_char("Guess you just weren't the Patton you thought you were.\r\n", ch);
