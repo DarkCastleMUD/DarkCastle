@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.175 2008/05/18 03:35:08 jhhudso Exp $ */
+/* $Id: nanny.cpp,v 1.176 2008/11/18 14:42:23 kkoons Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -1513,7 +1513,7 @@ is_race_eligible(ch,7)?'*':' ',is_race_eligible(ch,8)?'*':' ',is_race_eligible(c
 
  // TODO - what happens if I get to this point, then disconnect, and reconnect?  memory leak?
 
-          d->str     = &ch->description;
+          d->strnew     = &ch->description;
           d->max_str = 539;
           STATE(d)   = CON_EXDSCR;
           break;

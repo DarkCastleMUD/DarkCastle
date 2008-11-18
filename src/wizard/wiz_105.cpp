@@ -429,9 +429,9 @@ int do_sqedit(struct char_data *ch, char *argument, int cmd)
         break;
      break;
     case 2:
-      send_to_char("Enter new message. End with ~.\r\n",ch);
+      send_to_char("Enter new message. End with \\s.\r\n",ch);
       ch->desc->connected = CON_EDITING;
-      ch->desc->str = &(skill->message);
+      ch->desc->strnew = &(skill->message);
       ch->desc->max_str = MAX_MESSAGE_LENGTH;
       break;
     case 3:
