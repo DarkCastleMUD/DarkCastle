@@ -1,5 +1,5 @@
 /************************************************************************
- * $Id: cl_barbarian.cpp,v 1.92 2008/11/18 14:40:36 kkoons Exp $
+ * $Id: cl_barbarian.cpp,v 1.93 2008/11/18 17:57:51 kkoons Exp $
  * cl_barbarian.cpp
  * Description: Commands for the barbarian class.
  *************************************************************************/
@@ -338,7 +338,15 @@ int do_headbutt(struct char_data *ch, char *argument, int cmd)
   if(IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE))
      mod = -25;
 
-   
+  if(victim->equipment[WEAR_HEAD])
+    mod -= victim->equipment[WEAR_HEAD]->obj_flags.value[0];
+
+  mod -= (GET_DEX(victim) / 2);
+  mod += (GET_STR(ch) / 3);
+  
+  if (mod > 0)
+    mod = 0;
+ 
   long int get_weapon_bit(int weapon_type);
   long weapon_bit; 
   weapon_bit = get_weapon_bit(TYPE_CRUSH);
