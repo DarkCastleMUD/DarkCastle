@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: modify.cpp,v 1.17 2006/05/26 18:14:35 jhhudso Exp $ */
+/* $Id: modify.cpp,v 1.18 2008/11/18 14:43:06 kkoons Exp $ */
 
 extern "C"
 {
@@ -84,94 +84,6 @@ char *skill_fields[] =
 //  to players that are offline.  (they get notified when they login, and have to
 //  go pick it up)  Note:  There's a "CON_SEND_MAIL" already defined....not sure
 //  why...
-
-/* ************************************************************************
-*  modification of malloc'ed strings                                      *
-************************************************************************ */
-
-/* Add user input to the 'current' string (as defined by d->str) */
-void string_add(struct descriptor_data *d, char *str)
-{
-    char *scan;
-    int terminator = 0;
-    CHAR_DATA *ch = d->character;
-
-    void board_unlock_board(struct char_data *ch);
-
-    /* determine if ths is the terminal string, and truncate if so */
-    scan = str;
-    while(*scan) { 
-      if((terminator = (*scan == '~') != 0)) { 
-        *scan = '\0';
-        break;
-      } 
-      scan++;
-    }
- 
-    if(!(d->astr)) {
-      if(strlen(str) > (unsigned) d->max_str) {
-	send_to_char("String too long - Truncated.\n\r", d->character);
-	*(str + d->max_str) = '\0';
-	terminator = 1;
-      }
-#ifdef LEAK_CHECK
-      d->astr = (char *)calloc(strlen(str) + 3, sizeof(char));
-#else
-      d->astr = (char *)dc_alloc(strlen(str) + 3, sizeof(char));
-#endif
-      strcpy(d->astr, str);
-    }
-    else {
-      if(strlen(str) + strlen(d->astr) > (unsigned) d->max_str) {
-	send_to_char("String too long. Last line skipped.\n\r", d->character);
-	terminator = 1;
-      }
-
-      else {
-	if(!(d->astr = (char *) realloc(d->astr, strlen(d->astr) + 
-	    strlen(str) + 3))) {
-	  perror("string_add");
-	  abort();
-	}
-
-	strcat(d->astr, str);
-      }
-    }
-
-    if(terminator) {
-      if (d->str && *d->str && **d->str)
-        dc_free(*d->str);
-      *d->str = d->astr;
-      d->str = 0;
-      d->astr = 0;
-      if(d->connected == CON_EXDSCR) {
-        if(GET_LEVEL(d->character) > 1)
-          save_char_obj(d->character);
-        SEND_TO_Q(menu, d);
-	d->connected = CON_SELECT_MENU;
-      }
-      if(d->connected == CON_WRITE_BOARD) {
-        d->connected = CON_PLAYING;
-        if(d->character)
-          board_unlock_board(d->character);
-      }
-      if(d->connected == CON_SEND_MAIL) {
-        d->connected = CON_PLAYING;
-        send_to_char("Ok.\n\r", ch);
-	check_for_awaymsgs(ch);
-        // send_mail();
-      }
-      if(d->connected == CON_EDITING ||
-         d->connected == CON_EDIT_MPROG) 
-      {
-        d->connected = CON_PLAYING;
-        send_to_char("Ok.\n\r", ch);
-	check_for_awaymsgs(ch);
-      }
-    }
-    else
-       strcat(d->astr, "\n\r");
-}
 
 
 void string_hash_add(struct descriptor_data *d, char *str)
@@ -324,7 +236,7 @@ int do_string(CHAR_DATA *ch, char *arg, int cmd)
         if(IS_NPC(mob))
           ch->desc->hashstr = &GET_NAME(mob);
         else
-          ch->desc->str = &GET_NAME(mob);
+          ch->desc->strnew = &GET_NAME(mob);
         if(!IS_NPC(mob))
           send_to_char("WARNING: You have changed the name of a player.\n\r", ch);
         break;
@@ -339,7 +251,7 @@ int do_string(CHAR_DATA *ch, char *arg, int cmd)
         if(IS_NPC(mob))
           ch->desc->hashstr = &mob->short_desc;
         else
-          ch->desc->str = &mob->short_desc;
+          ch->desc->strnew = &mob->short_desc;
         break;
       case 3:
         if(!IS_NPC(mob)) {
@@ -352,14 +264,14 @@ int do_string(CHAR_DATA *ch, char *arg, int cmd)
         if(IS_NPC(mob))
           ch->desc->hashstr = &mob->description;
         else
-          ch->desc->str = &mob->description;
+          ch->desc->strnew = &mob->description;
         break;
       case 5:
         if(IS_NPC(mob)) {
           send_to_char("Monsters have no titles.\n\r", ch);
           return 1;
         }
-        ch->desc->str = &mob->title;
+        ch->desc->strnew = &mob->title;
         break;
       default:
         send_to_char("That field is undefined for monsters.\n\r", ch);
@@ -475,8 +387,8 @@ int do_string(CHAR_DATA *ch, char *arg, int cmd)
       *(string + length[field - 1]) = '\0';
     }
     if(type == TP_MOB && !IS_NPC(mob)) {
-      *ch->desc->str = str_dup(string);
-      ch->desc->str = 0;
+      *ch->desc->strnew = str_dup(string);
+      ch->desc->strnew = 0;
     }
     else {
       *ch->desc->hashstr = str_hsh(string);
@@ -491,9 +403,9 @@ int do_string(CHAR_DATA *ch, char *arg, int cmd)
                  "of a line.\n\r", ch);
     if(type == TP_MOB && !IS_NPC(mob)) 
 #ifdef LEAK_CHECK
-      (*ch->desc->str) = (char *)calloc(length[field - 1], sizeof(char));
+      (*ch->desc->strnew) = (char *)calloc(length[field - 1], sizeof(char));
 #else
-      (*ch->desc->str) = (char *)dc_alloc(length[field - 1], sizeof(char));
+      (*ch->desc->strnew) = (char *)dc_alloc(length[field - 1], sizeof(char));
 #endif
     else
 #ifdef LEAK_CHECK
