@@ -494,7 +494,7 @@ int do_write(struct char_data *ch, char *argument, int cmd)
 	send_to_char("Ok.. go ahead and write.. end the note with a \\@.\n\r",
 	    ch);
 	act("$n begins to jot down a note.", ch, 0,0,TO_ROOM, INVIS_NULL);
-	ch->desc->str = &paper->action_description;
+	ch->desc->strnew = &paper->action_description;
 	ch->desc->max_str = MAX_NOTE_LENGTH;
     }
     return eSUCCESS;
