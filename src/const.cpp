@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.274 2008/11/18 14:38:14 kkoons Exp $ */
+/* $Id: const.cpp,v 1.275 2008/11/18 16:43:04 kkoons Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -129,7 +129,7 @@ std::map<int,int> fill_map()
   skill_cost_map[SKILL_BACKSTAB] = 4;
   skill_cost_map[SKILL_SNEAK] = 5;
   skill_cost_map[SKILL_HIDE] = 2;
-  skill_cost_map[SKILL_HARM_TOUCH] = 40;
+  skill_cost_map[SKILL_HARM_TOUCH] = 30;
   skill_cost_map[SKILL_STALK] = 12;
   skill_cost_map[SKILL_POCKET] = 15;
   skill_cost_map[SKILL_STEAL] = 20;
@@ -145,12 +145,13 @@ std::map<int,int> fill_map()
   skill_cost_map[SKILL_APPRAISE] = 6;
   skill_cost_map[SKILL_PICK_LOCK] = 3;
   skill_cost_map[SKILL_ESCAPE] = 25;
-  skill_cost_map[SKILL_LAY_HANDS] = 20;
+  skill_cost_map[SKILL_LAY_HANDS] = 30;
   skill_cost_map[SKILL_BASH] = 10;
   skill_cost_map[SKILL_FOCUSED_REPELANCE] =45 ;
   skill_cost_map[SKILL_BLOOD_FURY] = 60;
   skill_cost_map[SKILL_CRAZED_ASSAULT] = 18;
   skill_cost_map[SKILL_RAGE] = 6;
+  skill_cost_map[SKILL_BATTLECRY] = 24;
   skill_cost_map[SKILL_BERSERK] = 12;
   skill_cost_map[SKILL_HITALL] = 24;
   skill_cost_map[SKILL_BULLRUSH] = 20;
@@ -166,6 +167,7 @@ std::map<int,int> fill_map()
   skill_cost_map[SKILL_BLADESHIELD] = 15;
   skill_cost_map[SKILL_GUARD] = 5;
   skill_cost_map[SKILL_PRIMAL_FURY] = 40;
+  skill_cost_map[SKILL_HEADBUTT] = 15;
   return skill_cost_map;
 }
 
