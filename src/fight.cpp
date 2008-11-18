@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.510 2008/11/17 23:44:15 kkoons Exp $               *
+ * $Id: fight.cpp,v 1.511 2008/11/18 14:43:36 kkoons Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -6398,7 +6398,7 @@ int do_flee(struct char_data *ch, char *argument, int cmd)
       return eFAILURE;
     } else vict=ch->fighting;
 
-    if(!charge_moves(ch, SKILL_ESCAPE_MOVES, SKILL_ESCAPE)) return eFAILURE;
+    if(!charge_moves(ch, SKILL_ESCAPE)) return eFAILURE;
 
     skill_increase_check(ch, SKILL_ESCAPE, escape, SKILL_INCREASE_HARD);
     if(number(1,101) > MIN((GET_INT(ch) + GET_DEX(ch) + (float)escape/1.5 - GET_INT(vict)/2 - GET_WIS(vict)/2), 100))
