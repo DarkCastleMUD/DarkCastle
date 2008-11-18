@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: board.cpp,v 1.31 2008/11/18 21:40:05 kkoons Exp $
+| $Id: board.cpp,v 1.32 2008/11/18 22:00:48 kkoons Exp $
 | board.C
 | Description:  This file contains the implementation for the board
 |   code.  It's old and should be rewritten --Morc XXX
@@ -603,7 +603,7 @@ int board(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, CHAR_DATA* in
   char arg1[MAX_INPUT_LENGTH];
   one_argument(arg, arg1);
 
-  if(!isname(arg1, obj->name))
+  if(!isname(arg1, obj->name) && cmd == CMD_LOOK)
     return eFAILURE;
   
 
