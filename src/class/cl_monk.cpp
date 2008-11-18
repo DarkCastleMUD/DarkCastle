@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_monk.cpp,v 1.36 2008/11/16 00:34:52 kkoons Exp $
+| $Id: cl_monk.cpp,v 1.37 2008/11/18 14:41:36 kkoons Exp $
 | cl_monk.C
 | Description:  Monk skills.
 */
@@ -73,7 +73,7 @@ int do_eagle_claw(struct char_data *ch, char *argument, int cmd)
   if (!can_attack(ch) || !can_be_attacked(ch, victim))
     return eFAILURE;
 
-  if (!charge_moves(ch, SKILL_EAGLECLAW_MOVES, SKILL_EAGLE_CLAW)) return eSUCCESS;
+  if (!charge_moves(ch, SKILL_EAGLE_CLAW)) return eSUCCESS;
 
   WAIT_STATE(ch, PULSE_VIOLENCE * 2);
 
@@ -153,7 +153,7 @@ int do_quivering_palm(struct char_data *ch, char *argument, int cmd)
   if(!can_attack(ch) || !can_be_attacked(ch, victim))
      return eFAILURE;
 
-  if (!charge_moves(ch, SKILL_QUIVER_MOVES, SKILL_QUIVERING_PALM)) return eSUCCESS;
+  if (!charge_moves(ch, SKILL_QUIVERING_PALM)) return eSUCCESS;
 	   
   GET_KI(ch) -= 40;
 
@@ -255,7 +255,7 @@ int do_stun(struct char_data *ch, char *argument, int cmd)
   if(!can_attack(ch) || !can_be_attacked(ch, victim))
     return eFAILURE;
 
-  if (!charge_moves(ch, SKILL_STUN_MOVES, SKILL_STUN)) return eSUCCESS;
+  if (!charge_moves(ch, SKILL_STUN)) return eSUCCESS;
 
   if (IS_SET(victim->combat, COMBAT_BERSERK) && (IS_NPC(victim) || has_skill(victim, SKILL_BERSERK) > 80))
   {
