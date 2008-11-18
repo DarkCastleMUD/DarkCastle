@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: board.cpp,v 1.29 2008/11/18 16:19:42 kkoons Exp $
+| $Id: board.cpp,v 1.30 2008/11/18 17:25:23 kkoons Exp $
 | board.C
 | Description:  This file contains the implementation for the board
 |   code.  It's old and should be rewritten --Morc XXX
@@ -804,7 +804,7 @@ int board_remove_msg(CHAR_DATA *ch, char *arg, std::map<std::string, BOARD_INFO>
     return eSUCCESS;
   }
 
-  board->second.msgs.erase(board->second.msgs.begin() + ind - 1);
+  board->second.msgs.erase(board->second.msgs.begin() + ind);
 
   send_to_char("Message erased.\n\r", ch);
   sprintf(buf, "$n just erased message %d.", tmessage);
