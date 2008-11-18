@@ -771,8 +771,8 @@ void game_loop(unsigned mother_desc, unsigned other_desc, unsigned third_desc, u
 
 	if (d->showstr_count)	/* reading something w/ pager     */
 	  show_string(d, comm);
-	else if (d->str)		/* writing boards, mail, etc.     */
-	  string_add(d, comm);
+//	else if (d->str)		/* writing boards, mail, etc.     */
+//	  string_add(d, comm);
         else if(d->hashstr)
           string_hash_add(d, comm);
         else if(d->strnew && (IS_MOB(d->character) || !IS_SET(d->character->pcdata->toggles, PLR_EDITOR_WEB)))
@@ -1231,7 +1231,7 @@ void make_prompt(struct descriptor_data *d, char *prompt)
        } else {
          strcat(prompt, "*] ");
        }
-     } else if(d->str || d->hashstr) {
+     } else if(d->hashstr) {
          strcat(prompt, "] ");
      } else if(STATE(d) != CON_PLAYING) {
          return;
@@ -2129,11 +2129,6 @@ int close_socket(struct descriptor_data *d)
   if (d->snoop_by) {
     SEND_TO_Q("Your victim is no longer among us.\r\n", d->snoop_by);
     d->snoop_by->snooping = NULL;
-  }
-  if(d->str) {
-    strcpy(idiotbuf, "\n\r~\n\r");
-    strcat(idiotbuf, "\0");
-    string_add(d, idiotbuf);
   }
   if(d->hashstr) {
     strcpy(idiotbuf, "\n\r~\n\r");
