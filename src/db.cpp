@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.178 2008/11/08 22:35:43 kkoons Exp $ */
+/* $Id: db.cpp,v 1.179 2008/11/19 23:24:16 kkoons Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -412,7 +412,18 @@ char * funnybootmessages[] =
   "Searching for intelligent players....searching....searching....searching\n\r"
   "Coding bug...\r\n"
   "Uploading Urizen's ABBA mp3s...\r\n",
-  "09 F9 11 02 9D 74 E3 5B D8 41 56 C5 63 56 88 C0\r\n"
+  "09 F9 11 02 9D 74 E3 5B D8 41 56 C5 63 56 88 C0\r\n",
+  "Error: Server just accidentally a whole pfile!\r\n",
+  "Redecorating the tavern...\r\n",
+  "Putting cover sheets on TPS reports.\r\n",
+  "Nerfing <insert class>...\r\n",
+  "Smash forehead on keyboard to continue.\r\n",
+  "Enter any 11-digit prime number to continue.\r\n",
+  "This will end your Windows session. Do you want to play another game?\n\r",
+  "Error saving file! Format drive now? (Y/Y)\r\n",
+  "User Error: Replace user.\r\n",
+  "Windows found. Delete? (Y/N)\r\n",
+  "Hard Drive scan indicates pirated software! The police have been nodified.\r\n"
 };
 
 void funny_boot_message()
@@ -3212,41 +3223,6 @@ int create_blank_item(int nr)
     for(curr = object_list; curr; curr = curr->next)
       if(curr->item_number >= cur_index)
          curr->item_number++;
-
-
-
-
-
-    //update index of all items in vaults
-	struct vault_data *vault, *tvault;
-	struct vault_items_data *vitems, *vtitems;
-	struct obj_data *vobj;
-	int vnum = 0, vreal_num = 0;
-
-	for (vault = vault_table; vault; vault = tvault, vnum++) 
-	{
-	    tvault = vault->next;
-
-	    if (vault && vault->items) 
-	    {
-		for (vitems = vault->items; vitems; vitems = vtitems) 
-		{
-		    vtitems = vitems->next;
-		    
-		     
-  		    vreal_num = real_object(vitems->item_vnum);
-      		    vobj = vitems->obj?vitems->obj:((struct obj_data*)obj_index[vreal_num].item);
-		    if(vobj == NULL)
-			continue;
-
-		    if (vobj->item_number >= cur_index) 
-		    	vobj->item_number++;
-		    
-		}
-	    }
-	}
-
-
 
 
 
