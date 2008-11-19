@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.106 2008/11/17 23:42:36 shane Exp $
+| $Id: objects.cpp,v 1.107 2008/11/19 17:33:36 kkoons Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -2224,11 +2224,12 @@ int do_remove(struct char_data *ch, char *argument, int cmd)
             {
               send_to_room("The spirit shield shimmers brightly then fades away.\n\r", ch->in_room);
               extract_obj(obj_object);
-            } else {
-              obj_to_char(unequip_char(ch, j) , ch);
-              act("You stop using $p.",ch,obj_object,0,TO_CHAR, 0);
-              act("$n stops using $p.",ch,obj_object,0,TO_ROOM, INVIS_NULL);
-            }
+              continue;
+            } else 
+               obj_to_char(unequip_char(ch, j) , ch);
+             act("You stop using $p.",ch,obj_object,0,TO_CHAR, 0);
+             act("$n stops using $p.",ch,obj_object,0,TO_ROOM, INVIS_NULL);
+            
           }
         } else {
           send_to_char("You can't carry that many items.\n\r", ch);
@@ -2273,12 +2274,13 @@ int do_remove(struct char_data *ch, char *argument, int cmd)
             extract_obj(obj_object);
             return eSUCCESS;
           }
-          else {
+          else 
             obj_to_char(unequip_char(ch, j), ch);
-            act("You stop using $p.",ch,obj_object,0,TO_CHAR, 0);
-            act("$n stops using $p.",ch,obj_object,0,TO_ROOM, INVIS_NULL);
-            if(blindlag) WAIT_STATE(ch, PULSE_VIOLENCE);
-          }
+
+          act("You stop using $p.",ch,obj_object,0,TO_CHAR, 0);
+          act("$n stops using $p.",ch,obj_object,0,TO_ROOM, INVIS_NULL);
+          if(blindlag) WAIT_STATE(ch, PULSE_VIOLENCE);
+          
         } else {
           send_to_char("You can't carry that many items.\n\r", ch);
           j = MAX_WEAR;
