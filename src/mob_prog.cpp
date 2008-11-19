@@ -46,6 +46,8 @@
 #include <db.h>
 #include <comm.h>
 #include <returnvals.h>
+#include <map>
+#include <string>
 
 // Extern variables
 
@@ -878,6 +880,89 @@ void translate_value(char *leftptr, char *rightptr, int16 **vali, uint32 **valui
 
 // Azrack -- this was originally returning a bool, but its returning all sorts of values,
 // switched it to int 
+
+enum mprog_ifs 
+{
+  eRAND = 1, //start this at 1, map returns 0 if not found
+  eRAND1K,
+  eAMTITEMS,
+  eNUMPCS,
+  eNUMOFMOBSINWORLD,
+  eNUMOFMOBSINROOM,
+  eISPC,
+  eISWIELDING,
+  eISWEAPPRI,
+  eISWEAPSEC,
+  eISNPC,
+  eISGOOD,
+  eISNEUTRAL,
+  eISEVIL,
+  eISWORN,
+  eISFIGHT,
+  eISTANK,
+  eISIMMORT,
+  eISCHARMED,
+  eISFOLLOW,
+  eISSPELLED,
+  eISAFFECTED,
+  eHITPRCNT,
+  eWEARS,
+  eCARRIES,
+  eNUMBER,
+  eTEMPVAR,
+  eISMOBVNUMINROOM,
+  eISOBJVNUMINROOM,
+  eCANSEE,
+  eHASDONEQUEST1
+};
+
+
+std::map<std::string,mprog_ifs> load_ifchecks()
+{
+  std::map<std::string, mprog_ifs> ifcheck_tmp;
+
+  ifcheck_tmp["rand"] = eRAND;
+  ifcheck_tmp["rand1k"] = eRAND1K;
+  ifcheck_tmp["amtitems"] = eAMTITEMS;
+  ifcheck_tmp["numpcs"] = eNUMPCS;
+  ifcheck_tmp["numofmobsinworld"] = eNUMOFMOBSINWORLD;
+
+  ifcheck_tmp["numofmobsinroom"] = eNUMOFMOBSINROOM;
+  ifcheck_tmp["ispc"] = eISPC;
+  ifcheck_tmp["iswielding"] = eISWIELDING;
+  ifcheck_tmp["isweappri"] = eISWEAPPRI;
+  ifcheck_tmp["isweapsec"] = eISWEAPSEC;
+
+  ifcheck_tmp["isnpc"] = eISNPC;
+  ifcheck_tmp["isgood"] = eISGOOD;
+  ifcheck_tmp["isneutral"] = eISNEUTRAL;
+  ifcheck_tmp["isevil"] = eISEVIL;
+  ifcheck_tmp["isfight"] = eISFIGHT;
+
+  ifcheck_tmp["istank"] = eISTANK;
+  ifcheck_tmp["isimmort"] = eISIMMORT;
+  ifcheck_tmp["ischarmed"] = eISCHARMED;
+  ifcheck_tmp["isfollow"] = eISFOLLOW;
+  ifcheck_tmp["isspelled"] = eISSPELLED;
+
+  ifcheck_tmp["isaffected"] = eISAFFECTED;
+  ifcheck_tmp["hitprcnt"] = eHITPRCNT;
+  ifcheck_tmp["wears"] = eWEARS;
+  ifcheck_tmp["carries"] = eCARRIES;
+  ifcheck_tmp["number"] = eNUMBER;
+
+  ifcheck_tmp["tempvar"] = eTEMPVAR;
+  ifcheck_tmp["ismobvnuminroom"] = eISMOBVNUMINROOM;
+  ifcheck_tmp["isobjvnuminroom"] = eISOBJVNUMINROOM;
+  ifcheck_tmp["cansee"] = eCANSEE;
+
+  return ifcheck_tmp;
+}
+
+
+
+std::map<std::string,mprog_ifs> ifcheck = load_ifchecks();
+
 int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
 		     OBJ_DATA *obj, void *vo, CHAR_DATA *rndm)
 {
@@ -894,9 +979,8 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
   char     *oprpt = opr;
   char     *valpt = val;
   char     *point = ifchck;
-  int       lhsvl;
-  int       rhsvl;
   val2[0] = '\0';
+
 
   if ( *point == '\0' ) 
     {
@@ -1095,29 +1179,35 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
       if (lvalb)   return mprog_veval((int)*lvalb, opr, rval);  
     }
  }
-  if ( !str_cmp( buf, "rand" ) )
-    {
+
+
+ switch(ifcheck[buf])
+ {
+   case eRAND:
       return ( number(1, 100) <= atoi(arg) );
-    }
-  if ( !str_cmp( buf, "rand1k" ) )
-    {
+   break;
+
+   case eRAND1K:
       return ( number(1, 1000) <= atoi(arg) );
-    }
-  if (!str_cmp(buf, "amtitems"))
-  {
+   break;
+
+   case eAMTITEMS:
      return mprog_veval(obj_index[real_object(atoi(arg))].number,opr,atoi(val));
-  }
-  if ( !str_cmp(buf, "numpcs"))
-  {
+   break;
+
+   case eNUMPCS:
+   {
      struct char_data *p;
-      int i =0;
+     int count = 0;
      for (p = world[mob->in_room].people;p;p=p->next_in_room)
        if (!IS_NPC(p))
-	i++;
-     return mprog_veval( i, opr, atoi(val) );
-  }
-
-  if ( !str_cmp(buf, "numofmobsinworld") ) {
+	count++;
+     return mprog_veval( count, opr, atoi(val) );
+   }
+   break;
+ 
+   case eNUMOFMOBSINWORLD:  
+   {
     int target = atoi(arg);
     int count = 0;
 
@@ -1126,28 +1216,26 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
 	count++;
 
     return mprog_veval( count, opr, atoi(val) );
-  }
+   }
+   break;
   
-  if ( !str_cmp(buf, "numofmobsinroom") ) {
-      struct char_data *p;
-      int target = atoi(arg);
-      int count = 0;
-
+   case eNUMOFMOBSINROOM:
+   {
+    int target = atoi(arg);
+    struct char_data *p;
+    int count = 0;
     for (p = world[mob->in_room].people; p; p = p->next_in_room)
       if (IS_MOB(p) && mob_index[p->mobdata->nr].virt == target)
 	count++;
 
     return mprog_veval( count, opr, atoi(val) );
-  }
+   }
+   break;
   
-// Ugh.
-// TODO: redo these to define target before all these ifs, so the target-finding code doesn't have to be repeated
-
-  if ( !str_cmp( buf, "ispc" ) )
-    {
-	if (fvict)
-	return !IS_NPC(fvict);
-	if (ye) return FALSE;
+   case eISPC:
+      if (fvict)
+        return !IS_NPC(fvict);
+      if (ye) return FALSE;
       switch ( arg[1] )  /* arg should be "$*" so just get the letter */
 	{
 	case 'i': return 0;
@@ -1173,13 +1261,12 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
 	  logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'ispc'", mob_index[mob->mobdata->nr].virt ); 
 	  return -1;
 	}
-    }
+    break;
 
-  if ( !str_cmp( buf, "iswielding" ) )
-    {
-	if (fvict)
-	  return fvict->equipment[WIELD]?1:0;
-	if (ye) return FALSE;
+    case eISWIELDING:
+      if (fvict)
+        return fvict->equipment[WIELD]?1:0;
+      if (ye) return FALSE;
       switch ( arg[1] )  /* arg should be "$*" so just get the letter */
         {
         case 'i': return (mob->equipment[WIELD] )?1:0;
@@ -1204,14 +1291,14 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
           logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'iswielding'", mob_index[mob->mobdata->nr].virt);
           return -1;
       }
-  }
-	  if ( !str_cmp( buf, "isweappri" ) )
-    {
+    break;
+    
+    case eISWEAPPRI:
 	if (fvict && fvict->equipment[WIELD])
 	  return mprog_veval(fvict->equipment[WIELD]->obj_flags.value[3],opr, atoi(val));
 	if (ye) return FALSE;
       switch ( arg[1] )  /* arg should be "$*" so just get the letter */
-        {
+      {
         case 'i': 
 	if (mob->equipment[WIELD])
 	  return mprog_veval(mob->equipment[WIELD]->obj_flags.value[3],opr, atoi(val));
@@ -1232,14 +1319,14 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
           logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'isweappri'", mob_index[mob->mobdata->nr].virt);
           return -1;
       }
-  }
-  if ( !str_cmp( buf, "isweapsec" ) )
-    {
+    break;
+
+    case eISWEAPSEC:
 	if (fvict && fvict->equipment[SECOND_WIELD])
 	  return mprog_veval(fvict->equipment[SECOND_WIELD]->obj_flags.value[3],opr, atoi(val));
 	if (ye) return FALSE;
       switch ( arg[1] )  /* arg should be "$*" so just get the letter */
-        {
+      {
         case 'i': 
 	if (mob->equipment[SECOND_WIELD])
 	  return mprog_veval(mob->equipment[SECOND_WIELD]->obj_flags.value[3],opr, atoi(val));
@@ -1260,9 +1347,9 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
           logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'isweapsec'", mob_index[mob->mobdata->nr].virt);
           return -1;
       }
-  }
-  if ( !str_cmp( buf, "isnpc" ) )
-    {
+    break;
+  
+   case eISNPC:
 	if (fvict)
 	  return IS_NPC(fvict);
 	if (ye) return FALSE;
@@ -1286,10 +1373,9 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
 	  logf( IMMORTAL, LOG_WORLD, "Mob: %d bad argument to 'isnpc'", mob_index[mob->mobdata->nr].virt ); 
 	  return -1;
 	}
-    }
+    break;
 
-  if ( !str_cmp( buf, "isgood" ) )
-    {
+    case eISGOOD:
 	if (fvict)
 	  return IS_GOOD(fvict);
 	if (ye) return FALSE;
@@ -1313,10 +1399,9 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
 	  logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'isgood'", mob_index[mob->mobdata->nr].virt ); 
 	  return -1;
 	}
-    }
+    break;
 
-  if ( !str_cmp( buf, "isneutral" ) )
-  {
+    case eISNEUTRAL:
       if (fvict)
 	  return IS_NEUTRAL(fvict);
       if (ye)
@@ -1350,10 +1435,9 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
 	      logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'isgood'", mob_index[mob->mobdata->nr].virt ); 
 	      return -1;
       }
-  }
+    break;
 
-  if ( !str_cmp( buf, "isevil" ) )
-  {
+    case eISEVIL:
       if (fvict)
 	  return IS_EVIL(fvict);
       if (ye)
@@ -1387,9 +1471,9 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
 	      logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'isgood'", mob_index[mob->mobdata->nr].virt ); 
 	      return -1;
       }
-  }
+    break;
 
-  if ( !str_cmp( buf, "isworn" ) )
+    case eISWORN:
     {
         OBJ_DATA *o;
 	if ((unsigned int)mob->mobdata->last_room > 50000) // an object
@@ -1416,9 +1500,10 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
 	  logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'isworn'", mob_index[mob->mobdata->nr].virt ); 
 	  return -1;
 	}
-    }
-  if ( !str_cmp( buf, "isfight" ) )
-    {
+     }
+     break;
+     
+     case eISFIGHT:
 	if (fvict)
 	  return fvict->fighting ? 1:0;
 	if (ye) return FALSE;
@@ -1442,9 +1527,9 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
 	  logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'isfight'", mob_index[mob->mobdata->nr].virt ); 
 	  return -1;
 	}
-    }
-  if ( !str_cmp( buf, "istank" ) )
-    {
+    break;
+
+    case eISTANK:
 	if (fvict)
 	  return istank(fvict);
 	if (ye) return FALSE;
@@ -1468,10 +1553,9 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
 	  logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'istank'", mob_index[mob->mobdata->nr].virt ); 
 	  return -1;
 	}
-    }
+    break;
 
-  if ( !str_cmp( buf, "isimmort" ) )
-    {
+    case eISIMMORT:
 	if (fvict)
 	  return GET_LEVEL(fvict) > IMMORTAL;
 	if (ye) return FALSE;
@@ -1495,10 +1579,9 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
 	  logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'isimmort'", mob_index[mob->mobdata->nr].virt ); 
 	  return -1;
 	}
-    }
+    break;
 
-  if ( !str_cmp( buf, "ischarmed" ) )
-    {
+    case eISCHARMED:
 	if (fvict)
 	  return IS_AFFECTED(fvict, AFF_CHARM);
 	if (ye) return FALSE;
@@ -1524,10 +1607,9 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
 	       mob_index[mob->mobdata->nr].virt ); 
 	  return -1;
 	}
-    }
+    break;
 
-  if ( !str_cmp( buf, "isfollow" ) )
-    {
+    case eISFOLLOW:
 	if (fvict)
 	  return (fvict->master != NULL && fvict->master->in_room == fvict->in_room);
 	if (ye) return FALSE;
@@ -1555,50 +1637,47 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
 	  logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'isfollow'", mob_index[mob->mobdata->nr].virt ); 
 	  return -1;
 	}
-    }
+    break;
 
-  if (!str_cmp(buf, "isspelled"))
-  {
+    case eISSPELLED:
+    {
 	int find_skill_num(char *name);
 
 	if (!str_cmp(val, "fly")) // needs special check.. sigh..
 	{
 	  if (fvict && IS_AFFECTED(fvict, AFF_FLYING)) return TRUE;
   	  if (ye) return FALSE;
-     switch (arg[1]) 
-     {
-        case 'i': // mob
-		if (IS_AFFECTED(mob, AFF_FLYING)) return TRUE;
-		break;
-	case 'z': if (mob->beacon)
-		if (IS_AFFECTED(((CHAR_DATA*)mob->beacon), AFF_FLYING)) return TRUE;
-		break;
-	case 'n': // actor
+          switch (arg[1]) 
+          {
+            case 'i': // mob
+	      if (IS_AFFECTED(mob, AFF_FLYING)) return TRUE;
+	    break;
+	    case 'z': if (mob->beacon)
+	      if (IS_AFFECTED(((CHAR_DATA*)mob->beacon), AFF_FLYING)) return TRUE;
+	    break;
+	    case 'n': // actor
 	 	if (actor)
 		if (IS_AFFECTED(actor, AFF_FLYING)) return TRUE;
-		break;
-	case 't': // vict
+	    break;
+	    case 't': // vict
 		if (vict)
 		if (IS_AFFECTED(vict, AFF_FLYING)) return TRUE;
-		break;
-	case 'r': //rand
+	    break;
+	    case 'r': //rand
 		if (rndm)
 		if (IS_AFFECTED(rndm, AFF_FLYING)) return TRUE;
-		break;
-        case 'f': if (actor && actor->fighting)
+	    break;
+            case 'f': if (actor && actor->fighting)
                     if (IS_AFFECTED(actor->fighting, AFF_FLYING)) return TRUE;
-		break;
-        case 'g': if (mob && mob->fighting)
+	    break;
+             case 'g': if (mob && mob->fighting)
                     if (IS_AFFECTED(mob->fighting, AFF_FLYING)) return TRUE;
-		break;
-	default:
-	  logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'isspelled'",
+	    break;
+	    default:
+	       logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'isspelled'",
 	       mob_index[mob->mobdata->nr].virt ); 
-	  return -1;
-
-     }
-   
-
+	       return -1;
+          }
 	}
 
 	if (fvict)
@@ -1637,8 +1716,9 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
 
      }
   }
-  if ( !str_cmp( buf, "isaffected" ) )
-    {
+  break;
+
+  case eISAFFECTED:
 	if (fvict)
 	return (ISSET(fvict->affected_by, atoi(val)));
 	if (ye) return FALSE;
@@ -1664,10 +1744,11 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
 	       mob_index[mob->mobdata->nr].virt ); 
 	  return -1;
 	}
-    }
+  break;
 
-  if ( !str_cmp( buf, "hitprcnt" ) )
-    {
+  case eHITPRCNT:
+  {
+        int lhsvl, rhsvl;
 	if (fvict)
 	{
 	  lhsvl = (fvict->hit*100) / fvict->max_hit;
@@ -1715,9 +1796,10 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
 	  logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'hitprcnt'", mob_index[mob->mobdata->nr].virt ); 
 	  return -1;
 	}
-    }
+  }
+  break;
 
-  if (!str_cmp(buf, "wears"))
+  case eWEARS:
   {
     struct obj_data *obj=0;
     CHAR_DATA *take;
@@ -1778,8 +1860,10 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
       return 1;
     }
     return -1;
-   }
-  if (!str_cmp(buf, "carries"))
+  }
+  break;
+  
+  case eCARRIES:
   {
     struct obj_data *obj=0;
     CHAR_DATA *take;
@@ -1837,10 +1921,12 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
       return 1;
     }
     return -1;
-   }
+  }
+  break;
 
-  if ( !str_cmp( buf, "number" ) )
-    {
+  case eNUMBER:
+  {
+    int lhsvl, rhsvl;
       if (fvict) {
 	if (!IS_NPC(fvict)) return 0;
 	     lhsvl = mob_index[fvict->mobdata->nr].virt;
@@ -1918,10 +2004,11 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
 	  logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'number'", mob_index[mob->mobdata->nr].virt ); 
 	  return -1;
 	}
-    }
+  }
+  break;
 
-  if ( !str_cmp( buf, "tempvar" ) )
-    {
+  case eTEMPVAR:
+  {
       char buf4[MAX_STRING_LENGTH], *buf4pt;
       if (arg[2] != '[')
       {
@@ -1973,11 +2060,12 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
           logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'tempvar'",mob_index[mob->mobdata->nr].virt );
           return -1;
         }
-    }
+  }
+  break;
 
   // search a room for a mob with vnum arg
-  if ( !str_cmp( buf, "ismobvnuminroom" ) )
-    {
+  case eISMOBVNUMINROOM:
+  {
       int target = atoi(arg);
 
       for(char_data * vch = world[mob->in_room].people;
@@ -1990,10 +2078,11 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
           return 1;
       }
       return 0;
-    }
+  }
+  break;
 
   // search a room for a obj with vnum arg
-  if ( !str_cmp( buf, "isobjvnuminroom" ) )
+  case eISOBJVNUMINROOM:
     {
       int target = atoi(arg);
 
@@ -2006,9 +2095,9 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
       }
       return 0;
     }
+  break;
 
-  if ( !str_cmp( buf, "cansee" ) )
-    {
+  case eCANSEE:
       if (fvict)
 	return CAN_SEE(mob, fvict, TRUE);
 	if (ye) return FALSE;
@@ -2029,46 +2118,16 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
 	  logf( IMMORTAL, LOG_WORLD, "Mob: %d bad argument to 'isnpc'", mob_index[mob->mobdata->nr].virt ); 
 	  return -1;
 	}
-    }
+  break;
 
-  // had done the quest 
-  if ( !str_cmp( buf, "hasdonequest1" ) )
-    {
-      int target;
-      if(!check_range_valid_and_convert(target, arg, 1, (1<<31))) {
-        logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'hasdonequest1'", mob_index[mob->mobdata->nr].virt );
-        return -1;
-      }
-
-      switch ( arg[1] )  /* arg should be "$*" so just get the letter */
-	{
-	case 'z': if (mob->beacon && !IS_NPC(((CHAR_DATA*)mob->beacon)))
-		   return IS_SET(((CHAR_DATA*)mob->beacon)->pcdata->quest_bv1, (1<<(target)));
-		else return -1;
-	case 'n': if ( actor && !IS_NPC(actor) )
-	            return IS_SET( actor->pcdata->quest_bv1, (1<<(target)));
-	          else
-		    return -1;
-	case 't': if ( vict && !IS_NPC(vict) )
-	            return IS_SET( vict->pcdata->quest_bv1, (1<<(target)));
-	          else
-		    return -1;
-	case 'r': if ( rndm && !IS_NPC(rndm) )
-	            return IS_SET( rndm->pcdata->quest_bv1, (1<<(target)));
-	          else
-		    return -1;
-	default:
-	  logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'hasdonequest1'", mob_index[mob->mobdata->nr].virt ); 
-	  return -1;
-	}
-    }
-
+  default:
   /* Ok... all the ifchcks are done, so if we didnt find ours then something
    * odd happened.  So report the bug and abort the MOBprogram (return error)
    */
-  logf( IMMORTAL, LOG_WORLD,  "Mob: %d unknown ifchck", mob_index[mob->mobdata->nr].virt ); 
+  logf( IMMORTAL, LOG_WORLD,  "Mob: %d unknown ifchck  \"%s\" value %d", 
+                  mob_index[mob->mobdata->nr].virt, buf, ifcheck[buf] ); 
   return -1;
-
+ }
 }
 /* Quite a long and arduous function, this guy handles the control
  * flow part of MOBprograms.  Basicially once the driver sees an
