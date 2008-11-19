@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: board.cpp,v 1.32 2008/11/18 22:00:48 kkoons Exp $
+| $Id: board.cpp,v 1.33 2008/11/19 23:58:52 kkoons Exp $
 | board.C
 | Description:  This file contains the implementation for the board
 |   code.  It's old and should be rewritten --Morc XXX
@@ -989,9 +989,6 @@ int board_display_msg(CHAR_DATA *ch, char *arg, std::map<std::string, BOARD_INFO
 int board_show_board(CHAR_DATA *ch, char *arg, std::map<std::string, BOARD_INFO>::iterator board)
 {
   int i;
-  string buf;
-
-  std::stringstream ssin; 
 
   if(board->second.type == CLAN_BOARD && GET_LEVEL(ch) < OVERSEER) 
   {
