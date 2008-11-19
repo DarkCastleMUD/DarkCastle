@@ -3508,6 +3508,7 @@ void update_mprog_throws()
       }
 	vobj = NULL;
         vict = NULL;
+        if (curr->data_num == -999) debugpoint();
 	if (curr->tMob && charExists(curr->tMob))
 	{
 	 vict = curr->tMob;
@@ -3537,6 +3538,8 @@ void update_mprog_throws()
         curr = g_mprog_throw_list;
       }
 
+//	if (vict && vict->mobdata && mob_index[vict->mobdata->nr].virt == 1928)
+//		debugpoint();
      
       // This is done this way in case the 'catch' does a 'throw' inside of it
 
