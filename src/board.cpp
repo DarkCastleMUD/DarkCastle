@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: board.cpp,v 1.33 2008/11/19 23:58:52 kkoons Exp $
+| $Id: board.cpp,v 1.34 2008/11/20 02:14:42 kkoons Exp $
 | board.C
 | Description:  This file contains the implementation for the board
 |   code.  It's old and should be rewritten --Morc XXX
@@ -360,7 +360,7 @@ std::map<std::string, BOARD_INFO> populate_boards()
   board_struct.type = CLAN_BOARD;
   board_struct.owner = CLAN_BLACKAXE;
   board_struct.save_file = "board/blackaxe";
-  board_tmp["tablet board clanboard black axe"] = board_struct;
+  board_tmp["board clan blackaxe"] = board_struct;
 
   board_struct.min_read_level = 1;
   board_struct.min_write_level = 1;
