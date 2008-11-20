@@ -42,7 +42,7 @@ typedef int socket_t;
 
 
 //void     write_to_output(const char *txt, struct descriptor_data *d);
-void     write_to_output(char *txt, struct descriptor_data *d);
+void     write_to_output(const char *txt, struct descriptor_data *d);
 void     scramble_text(char * txt);
 void     warn_if_duplicate_ip(char_data * ch);
 void     record_msg(char *messg, char_data *ch);

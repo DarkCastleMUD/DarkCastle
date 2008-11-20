@@ -16,7 +16,7 @@
  *  10/21/2003   Onager    Changed IS_ANONYMOUS() to handle mobs without   *
  *                         crashing                                        *
  ***************************************************************************/
-/* $Id: utility.h,v 1.76 2008/11/17 07:36:21 shane Exp $ */
+/* $Id: utility.h,v 1.77 2008/11/20 23:00:07 kkoons Exp $ */
 
 #ifndef UTILITY_H_
 #define UTILITY_H_
@@ -380,7 +380,7 @@ void	advance_level	(CHAR_DATA *ch, int is_conversion);
 int	close_socket	(struct descriptor_data *d);
 char *	one_argument	(char *argument, char *first_arg);
 int	isname		(char *arg, char *arg2);
-void	page_string	(struct descriptor_data *d, char *str,
+void	page_string	(struct descriptor_data *d, const char *str,
 			    int keep_internal);
 void	gain_exp	(CHAR_DATA *ch, int64 gain);
 void	redo_hitpoints  (CHAR_DATA *ch);       /* Rua's put in  */
@@ -432,7 +432,7 @@ void disarm( CHAR_DATA *ch, CHAR_DATA *victim );
 int shop_keeper( CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, CHAR_DATA * invoker );
 void send_to_all(char *messg);
 void ansi_color(char *txt, CHAR_DATA *ch);
-void send_to_char(char *messg, CHAR_DATA *ch);
+void send_to_char(const char *messg, CHAR_DATA *ch);
 void send_to_char_nosp(char *messg, CHAR_DATA *ch);
 void send_to_room(char *messg, int room, bool awakeonly = FALSE, CHAR_DATA *nta = NULL);
 void record_track_data(CHAR_DATA *ch, int cmd); 
@@ -464,13 +464,13 @@ void update_make_camp_and_leadership(void);
 void mob_suprised_sayings(char_data * ch, char_data * aggressor);
 
 // MOBProgs prototypes
-int     mprog_wordlist_check    ( char * arg, CHAR_DATA *mob,
+int     mprog_wordlist_check    ( const char * arg, CHAR_DATA *mob,
                 			CHAR_DATA* actor, OBJ_DATA* object,
 					void* vo, int type, bool reverse = FALSE );
 void    mprog_percent_check     ( CHAR_DATA *mob, CHAR_DATA* actor,
 					OBJ_DATA* object, void* vo,
 					int type );
-void    mprog_act_trigger       ( char* buf, CHAR_DATA* mob,
+void    mprog_act_trigger       ( const char* buf, CHAR_DATA* mob,
 		                        CHAR_DATA* ch, OBJ_DATA* obj,
 					void* vo );
 int     mprog_bribe_trigger     ( CHAR_DATA* mob, CHAR_DATA* ch,
@@ -493,7 +493,7 @@ int mprog_can_see_trigger( CHAR_DATA *ch, CHAR_DATA *mob );
 int mprog_damage_trigger( CHAR_DATA *mob, CHAR_DATA *ch, int amount );
 
 int oprog_catch_trigger(obj_data *obj, int catch_num, char *var, int opt, char_data *actor, obj_data *obj2, void *vo, char_data *rndm);
-int oprog_act_trigger( char *txt, CHAR_DATA *ch );
+int oprog_act_trigger( const char *txt, CHAR_DATA *ch );
 int oprog_speech_trigger( char *txt, CHAR_DATA *ch );
 int oprog_command_trigger( char *txt, CHAR_DATA *ch, char *arg );
 int oprog_weapon_trigger( CHAR_DATA *ch, OBJ_DATA *item );
