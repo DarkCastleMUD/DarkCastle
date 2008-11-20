@@ -15,6 +15,7 @@ extern "C"
 #include <player.h>
 #include <fileinfo.h>
 #include <obj.h>
+#include <act.h>
 #include <handler.h>
 #include <levels.h>
 #include <connect.h>
@@ -24,7 +25,7 @@ extern "C"
 #include <clan.h> // clan right
 #include <fstream>
 #include <sstream>
-
+#include <string>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -40,7 +41,7 @@ struct obj_data *get_obj(int vnum);
 void item_remove(obj_data *obj, struct vault_data *vault);
 void item_add(int vnum, struct vault_data *vault);
 
-void vault_log(char *message, char *name);
+void vault_log(const char *message, char *name);
 struct char_data *find_owner(char *name);
 void show_vault_log(CHAR_DATA *ch, char *owner);
 int class_restricted(struct char_data *ch, struct obj_data *obj);
@@ -59,7 +60,7 @@ struct vault_data *has_vault(char *name) {
   for (vault = vault_table;vault;vault = vault->next)
     if (vault && vault->owner && !strcasecmp(vault->owner, name))
       return vault;
-  char_data *ch = find_owner(name);
+  char_data *ch = find_owner((char*)name);
   if (ch && GET_LEVEL(ch) >= 10) {
      add_new_vault(GET_NAME(ch), 0);
      for (vault = vault_table;vault;vault = vault->next)
@@ -1121,7 +1122,7 @@ bool verify_item(struct obj_data **obj)
 }
 
 void get_from_vault(CHAR_DATA *ch, char *object, char *owner) {
-  char buf[MAX_INPUT_LENGTH];
+  std::string sbuf;
   char obj_list[50][100];
   struct obj_data *obj, *tmp_obj;
   struct vault_items_data *items;
@@ -1193,8 +1194,7 @@ void get_from_vault(CHAR_DATA *ch, char *object, char *owner) {
 
      //start at end of the list and get each item all the way back to the first one.
     for (i = num; i > 0; i--) {
-      sprintf(buf, "%d.%s", i, object);
-      get_from_vault(ch, buf, owner);
+      get_from_vault(ch, object, owner);
     }
     return;
   } else {
@@ -1225,14 +1225,46 @@ void get_from_vault(CHAR_DATA *ch, char *object, char *owner) {
       return;
     }
 
-    if (GET_LEVEL(ch) < IMMORTAL)
-	snprintf(buf, sizeof(buf), "%s removed %s from %s's vault.", GET_NAME(ch), GET_OBJ_SHORT(obj), owner);
-    else
-	snprintf(buf, sizeof(buf), "%s removed %s[%d] from %s's vault.", GET_NAME(ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), owner);
+    std::stringstream ssin;
 
-    vault_log(buf, owner);
+    if (GET_LEVEL(ch) < IMMORTAL)
+    {
+        sbuf = GET_NAME(ch);
+        sbuf += " removed ";
+        sbuf += GET_OBJ_SHORT(obj);
+        sbuf += " from ";
+        sbuf += owner;
+        sbuf += "'s vault.";
+    }
+    else
+    {
+      ssin << GET_OBJ_VNUM(obj);
+      sbuf = GET_NAME(ch);
+      sbuf += " removed ";
+      sbuf += GET_OBJ_SHORT(obj);
+      sbuf += "[";
+      sbuf += ssin.str();
+      sbuf += "] from ";
+      sbuf += owner;
+      sbuf += "'s vault.";
+    }
+    vault_log(sbuf.c_str(), owner);
     csendf(ch, "%s has been removed from the vault.\r\n", GET_OBJ_SHORT(obj));
   
+    ssin << GET_OBJ_VNUM(obj);
+
+    sbuf = GET_NAME(ch);
+    sbuf += " removed ";
+    sbuf += GET_OBJ_SHORT(obj);
+    sbuf += "[";
+    sbuf += ssin.str();
+    sbuf += "] from ";
+    sbuf += owner;
+    sbuf += "'s vault.";
+
+
+    act(sbuf.c_str(), ch, 0, ch, TO_ROOM, GODS);
+
     item_remove(obj, vault);
    
     if (!fullSave(obj))
@@ -1521,6 +1553,11 @@ void put_in_vault(CHAR_DATA *ch, char *object, char *owner) {
 
       vault_log(buf, owner);
       csendf(ch, "%s has been placed in the vault.\r\n", GET_OBJ_SHORT(obj));
+
+      snprintf(buf, MAX_INPUT_LENGTH, "%s has placed %s[%d] in %s's vault.", 
+                  GET_NAME(ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), owner);
+      act(buf, ch, 0, ch, TO_ROOM, GODS);
+
       if (!fullSave(obj))
          { item_add(GET_OBJ_VNUM(obj), vault); extract_obj(obj); }
       else { obj_from_char(obj); item_add(obj, vault); }
@@ -1792,7 +1829,7 @@ void show_vault_log(CHAR_DATA *ch, char *owner)
   page_string(ch->desc, const_cast<char *>(buffer.str().c_str()), 1);
 }
 
-void vault_log(char *message, char *name) {
+void vault_log(const char *message, char *name) {
   struct tm *tm = NULL;
   long ct;
   FILE *ofile, *nfile;
