@@ -45,7 +45,7 @@ class TokenList
     // Public functions
     //--
 
-    TokenList(char *);
+    TokenList(const char *);
     ~TokenList();
     char * Interpret(CHAR_DATA *from, OBJ_DATA *obj, void *vict_obj,
       CHAR_DATA *send_to, int flags);

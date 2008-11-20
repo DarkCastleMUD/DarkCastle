@@ -44,7 +44,7 @@ void send_message(const char *str, CHAR_DATA *to);
 
 void act
 (
-  char *str,          // Buffer
+  const char *str,          // Buffer
   CHAR_DATA *ch,      // Character from
   OBJ_DATA *obj,      // Object
   void *vict_obj,     // Victim object
