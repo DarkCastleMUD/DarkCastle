@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: board.cpp,v 1.34 2008/11/20 02:14:42 kkoons Exp $
+| $Id: board.cpp,v 1.35 2008/11/20 22:59:30 kkoons Exp $
 | board.C
 | Description:  This file contains the implementation for the board
 |   code.  It's old and should be rewritten --Morc XXX
@@ -970,7 +970,6 @@ int board_display_msg(CHAR_DATA *ch, char *arg, std::map<std::string, BOARD_INFO
 
   sprintf(buf, "$n reads message %d titled: %s", tmessage, board->second.msgs[tmessage].title.c_str());
   act(buf, ch, 0, 0, TO_ROOM, INVIS_NULL);
-  act(buf, ch, 0, 0, TO_ROOM, INVIS_NULL);
 
   if(IS_MOB(ch) || IS_SET(ch->pcdata->toggles, PLR_ANSI))
     csendf(ch, "Message %2d (%s): " RED BOLD "%-14s " YELLOW"- %s"NTEXT,
@@ -989,7 +988,8 @@ int board_display_msg(CHAR_DATA *ch, char *arg, std::map<std::string, BOARD_INFO
 int board_show_board(CHAR_DATA *ch, char *arg, std::map<std::string, BOARD_INFO>::iterator board)
 {
   int i;
-
+  std::string board_msg;
+  char buf[MAX_STRING_LENGTH];
   if(board->second.type == CLAN_BOARD && GET_LEVEL(ch) < OVERSEER) 
   {
     if(ch->clan !=  board->second.owner) 
@@ -1033,19 +1033,23 @@ int board_show_board(CHAR_DATA *ch, char *arg, std::map<std::string, BOARD_INFO>
     for (msg_it = board->second.msgs.rbegin(); msg_it < board->second.msgs.rend(); ++msg_it ) 
        if(IS_MOB(ch) || IS_SET(ch->pcdata->toggles, PLR_ANSI))
        {
-         csendf(ch, "(%s) "YELLOW"%-14s "RED"%2d: "GREEN"%.47s"NTEXT"\n\r", msg_it->date.c_str(),
-                      msg_it->author.c_str(),i--, msg_it->title.c_str());
+         snprintf(buf, MAX_STRING_LENGTH, "(%s) "YELLOW"%-14s "RED"%2d: "GREEN"%.47s"NTEXT"\n\r", 
+                  msg_it->date.c_str(), msg_it->author.c_str(),i--, msg_it->title.c_str());
+         board_msg += buf;
+//         csendf(ch, "(%s) "YELLOW"%-14s "RED"%2d: "GREEN"%.47s"NTEXT"\n\r", msg_it->date.c_str(),
+  //                    msg_it->author.c_str(),i--, msg_it->title.c_str());
        }
        else
        {
-         csendf(ch, "(%s) %-14s %2d: %.47s\n\r", msg_it->date.c_str(),
+         snprintf(buf, MAX_STRING_LENGTH, "(%s) %-14s %2d: %.47s\n\r", msg_it->date.c_str(),
                msg_it->author.c_str(), i--, msg_it->title.c_str());
+         board_msg += buf;
        }
  
 
   }
   board_save_board(board);
-
+  page_string(ch->desc, board_msg.c_str(), 1);
   return eSUCCESS;
 }
 
