@@ -48,33 +48,30 @@ extern struct descriptor_data *descriptor_list;
 |   the types set, &c..
 | Returns: Nothing
 */
-TokenList::TokenList(char *str) : head(0), current(0)
+TokenList::TokenList(const char *str) : head(0), current(0)
 {
 
-  int i;
-  char *strp = str;        // Keeps track of current position
+  int i, stri = 0;
+  const char *strp = str;        // Keeps track of current position
   Token *cur_token;        // Current token
   char temp_str[_MAX_STR]; // Temporary string
 
 
-  // Truncate strings that are too long
-  if(strlen(str) >= (unsigned) _MAX_STR)
-    str[_MAX_STR] = 0;
 
-  while(*strp != 0)
+  while(strp[stri] != 0 && stri < _MAX_STR)
   {
-    if(*strp == '$') /* It's a string code */
+    if(strp[stri] == '$') /* It's a string code */
     {
-      temp_str[0] = *(strp+0);
-      temp_str[1] = *(strp+1);
+      temp_str[0] = strp[stri+0];
+      temp_str[1] = strp[stri+1];
       temp_str[2] = 0;
-      strp += 2;
+      stri += 2;
     }
     else /* Go until we find a string code or end */
     {
-      for(i = 0; (*strp != 0) && (*strp != '$'); i++, strp++)
+      for(i = 0; (strp[stri] != 0) && (strp[stri] != '$') && (stri < _MAX_STR); i++, stri++)
       {
-        temp_str[i] = *strp;
+        temp_str[i] = strp[stri];
       }
       temp_str[i] = 0;
     }
