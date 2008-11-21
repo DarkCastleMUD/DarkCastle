@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: structs.h,v 1.16 2008/11/21 19:10:55 kkoons Exp $
+| $Id: structs.h,v 1.17 2008/11/21 22:59:41 kkoons Exp $
 | structs.h
 | Description:  This file should go away someday - it's stuff that I
 |   wasn't sure how to break up.  --Morc XXX
@@ -105,6 +105,7 @@ public:
   bool StartVote();
   bool EndVote();
   void Reset();
+  bool HasVoted(struct char_data *ch);
   bool Vote(struct char_data *ch, int vote);
   void DisplayVote(struct char_data *ch);
   void DisplayResults(struct char_data *ch);
