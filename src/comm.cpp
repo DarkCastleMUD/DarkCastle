@@ -773,6 +773,8 @@ void game_loop(unsigned mother_desc, unsigned other_desc, unsigned third_desc, u
 	  show_string(d, comm);
 //	else if (d->str)		/* writing boards, mail, etc.     */
 //	  string_add(d, comm);
+        else if (d->strnew && STATE(d) == CON_EXDSCR)
+          new_string_add(d, comm);
         else if(d->hashstr)
           string_hash_add(d, comm);
         else if(d->strnew && (IS_MOB(d->character) || !IS_SET(d->character->pcdata->toggles, PLR_EDITOR_WEB)))

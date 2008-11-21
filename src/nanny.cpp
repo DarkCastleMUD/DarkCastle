@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.176 2008/11/18 14:42:23 kkoons Exp $ */
+/* $Id: nanny.cpp,v 1.177 2008/11/21 02:14:27 kkoons Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -1499,7 +1499,7 @@ is_race_eligible(ch,7)?'*':' ',is_race_eligible(ch,8)?'*':' ',is_race_eligible(c
           
        case '2':
           SEND_TO_Q("Enter a text you'd like others to see when they look at you.\n\r"
-                    "Terminate with an '~'\n\r", d);
+                    "Terminate with \\s \n\r", d);
           if(ch->description) {
              SEND_TO_Q("Old description:\n\r", d);
              SEND_TO_Q(ch->description, d);

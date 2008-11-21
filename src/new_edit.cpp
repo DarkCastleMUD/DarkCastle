@@ -665,6 +665,7 @@ void new_string_add(struct descriptor_data *d, char *str)
     }
 
 
+
   if (!(*d->strnew)) {
     if ((int)strlen(str) > d->max_str) {
       SEND_TO_Q("String too long - Truncated.\r\n", d);
@@ -703,17 +704,28 @@ void new_string_add(struct descriptor_data *d, char *str)
          if(d->character)
            d->connected = CON_PLAYING;
            new_edit_board_unlock_board(d->character, 1);
-       } else {
-         d->connected = CON_PLAYING;
+       } else 
+       {
+         if(d->connected != CON_EXDSCR)
+           d->connected = CON_PLAYING;
+
        }
        send_to_char("Aborted.\r\n", ch);
-       check_for_awaymsgs(ch);
+       if(d->connected == CON_EXDSCR)
+       {
+         extern char menu[];
+         STATE(d) = CON_SELECT_MENU;
+         SEND_TO_Q(menu, d);
+       }
+       else
+         check_for_awaymsgs(ch);
     } else {
       if (strlen(*d->strnew) == 0) {
         SEND_TO_Q("You can't save blank messages, try /a for abort.\r\n", d);
       } else {
+        if(STATE(d) == CON_EXDSCR) save_char_obj(d->character);
         if ((d->strnew) && (*d->strnew) && (**d->strnew == '\0') &&
-	!ishashed(*d->strnew))
+	!ishashed(*d->strnew) && STATE(d))
           dc_free(*d->strnew);
         d->backstr = NULL;
         d->strnew = NULL;
@@ -722,9 +734,19 @@ void new_string_add(struct descriptor_data *d, char *str)
             d->connected = CON_PLAYING;
             new_edit_board_unlock_board(d->character, 0);
         } else {
-          d->connected = CON_PLAYING;
           send_to_char("Ok.\n\r", ch);
-	  check_for_awaymsgs(ch);
+  
+          if(d->connected != CON_EXDSCR)
+          {
+            d->connected = CON_PLAYING;
+	    check_for_awaymsgs(ch);
+          }
+          else
+          {
+            extern char menu[];
+            STATE(d) = CON_SELECT_MENU;
+            SEND_TO_Q( menu, d );
+          }
         }
       }
     }
