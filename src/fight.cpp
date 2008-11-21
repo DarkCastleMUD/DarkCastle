@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.511 2008/11/18 14:43:36 kkoons Exp $               *
+ * $Id: fight.cpp,v 1.512 2008/11/21 19:10:33 kkoons Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -2950,6 +2950,12 @@ int isHit(CHAR_DATA *ch, CHAR_DATA *victim, int attacktype, int &type, int &redu
       break;
   }
   if(skill) toHit += has_skill(ch, skill)/8;
+
+
+  if(IS_SET(ch->combat, COMBAT_BERSERK))
+    toHit = (int) ((float)toHit*0.90) - 5;
+  else if (IS_SET(ch->combat, COMBAT_RAGE1) || IS_SET(ch->combat, COMBAT_RAGE2))
+    toHit = (int) ((float)toHit*0.95) - 2;
 
   if (toHit < 1) toHit = 1;
   
