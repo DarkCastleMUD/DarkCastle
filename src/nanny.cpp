@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.177 2008/11/21 02:14:27 kkoons Exp $ */
+/* $Id: nanny.cpp,v 1.178 2008/11/21 23:00:14 kkoons Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -1493,6 +1493,15 @@ is_race_eligible(ch,7)?'*':' ',is_race_eligible(ch,8)?'*':' ',is_race_eligible(c
 	     do_new_help(ch, "new", 0);
           }
 	  do_look( ch, "", 8 );
+          {
+            extern CVoteData DCVote;
+
+            if(GET_LEVEL(ch) >= 40 && DCVote.IsActive() && !DCVote.HasVoted(ch))
+            {
+               send_to_char("\n\rThere is an active vote in which you have not yet voted.\n\r"
+                            "Enter \"vote\" to see details\n\r\n\r", ch);
+            }
+          }
   	  extern void zap_eq_check(char_data *ch);
 	  zap_eq_check(ch);
           break;
