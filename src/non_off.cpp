@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: non_off.cpp,v 1.49 2008/11/21 00:36:51 kkoons Exp $
+| $Id: non_off.cpp,v 1.50 2008/11/21 02:14:19 kkoons Exp $
 | non_off.C
 | Description:  Implementation of generic, non-offensive commands.
 */
@@ -1192,7 +1192,7 @@ void CVoteData::DisplayVote(struct char_data *ch)
     csendf(ch, "\n\rSorry! There are no active votes right now!\n\r");
     return;
   }
-  csendf(ch, "\n\r--Current Vote Infortmation--\n\r");
+  csendf(ch, "\n\r--Current Vote Infortmation--\n\rTo vote, type vote <#>.\n\r\n\r");
   strncpy(buf, vote_question.c_str(), MAX_STRING_LENGTH);
   csendf(ch, buf);
   csendf(ch, "\n\r");
