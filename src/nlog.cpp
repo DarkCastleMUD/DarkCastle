@@ -1,4 +1,4 @@
-/* $Id: nlog.cpp,v 1.8 2006/12/30 20:24:18 dcastle Exp $ */
+/* $Id: nlog.cpp,v 1.9 2008/11/21 00:37:34 kkoons Exp $ */
 
 extern "C"
 {
@@ -22,7 +22,7 @@ extern "C"
 #include <utility.h>
 
 extern struct descriptor_data* descriptorList;
-void send_to_char(char *messg, CHAR_DATA *ch);
+void send_to_char(const char *messg, CHAR_DATA *ch);
 
 /*
  * logf, str_hsh, and csendf by Sadus, others by Ysafar.
