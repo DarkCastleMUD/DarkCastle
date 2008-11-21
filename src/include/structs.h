@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: structs.h,v 1.14 2007/11/09 05:00:51 jhhudso Exp $
+| $Id: structs.h,v 1.15 2008/11/21 00:37:15 kkoons Exp $
 | structs.h
 | Description:  This file should go away someday - it's stuff that I
 |   wasn't sure how to break up.  --Morc XXX
@@ -11,7 +11,9 @@ extern "C" {
 #include <sys/types.h>
 #include <stdio.h> // FILE
 }
-
+#include <string>
+#include <vector>
+#include <map>
 FILE * dc_fopen(const char *filename, const char *type);
 int dc_fclose(FILE * fl);
 
@@ -88,6 +90,36 @@ struct message_list
     struct message_type *msg2; /* List of messages with toggle damage ON */
 };
 
+struct SVoteData
+{
+  std::string answer;
+  int votes;
+};
+
+class CVoteData
+{
+public:
+  void SetQuestion(std::string question);
+  void AddAnswer(std::string answer);
+  void RemoveAnswer(int answer);
+  bool StartVote();
+  bool EndVote();
+  void Reset();
+  bool Vote(struct char_data *ch, int vote);
+  void DisplayVote(struct char_data *ch);
+  void DisplayResults(struct char_data *ch);
+  bool IsActive() {return active;}
+  CVoteData();
+  ~CVoteData();  
+
+private:
+  bool active;
+  std::string vote_question;
+  std::vector<SVoteData> answers;
+  int total_votes;
+  std::map<std::string, bool> ip_voted;
+};
+
 /*
  * TO types for act() output.
  */
@@ -101,19 +133,5 @@ struct message_list
 
 extern void debugpoint();
 
-struct active_vote_data
-{
-  struct active_vote_data *next;
-  char *ip;
-  char *name;
-  int vote;
-};
-
-struct passive_vote_data
-{
-  struct passive_vote_data *next;
-  char *vote;
-  int number;  
-};
 
 #endif

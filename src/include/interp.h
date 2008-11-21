@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.h,v 1.89 2008/11/13 09:18:03 shane Exp $ */
+/* $Id: interp.h,v 1.90 2008/11/21 00:37:24 kkoons Exp $ */
 
 #ifndef INTERP_H_
 #define INTERP_H_
@@ -108,6 +108,8 @@ void add_command_lag(CHAR_DATA *ch, int cmdnum, int lag);
 #define CMD_LOOT        195
 #define CMD_GTELL       200
 #define CMD_CTELL       201
+#define CMD_SETVOTE	202
+#define CMD_VOTE	203
 #define CMD_PRIZE	999
 #define CMD_GAZE	1820
 
@@ -252,6 +254,8 @@ DO_FUN  do_eat;
 DO_FUN  do_eagle_claw;
 DO_FUN  do_echo;
 DO_FUN  do_emote;
+DO_FUN  do_setvote;
+DO_FUN  do_vote;
 DO_FUN  do_enter;
 DO_FUN  do_equipment;
 DO_FUN  do_eyegouge;

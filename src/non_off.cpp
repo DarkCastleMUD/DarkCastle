@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: non_off.cpp,v 1.48 2008/01/05 10:29:59 jhhudso Exp $
+| $Id: non_off.cpp,v 1.49 2008/11/21 00:36:51 kkoons Exp $
 | non_off.C
 | Description:  Implementation of generic, non-offensive commands.
 */
@@ -32,8 +32,11 @@ extern "C"
 #include <fight.h>
 #include <returnvals.h>
 #include <comm.h>
+#include <structs.h>
 #include <utility.h>
 #include <fileinfo.h>
+#include <string>
+#include <vector>
 
 extern CWorld world;
 extern struct index_data *obj_index;
@@ -1176,25 +1179,188 @@ int do_tag(CHAR_DATA *ch, char *argument, int cmd)
    return eSUCCESS;   
 }
 
-char *vote_description;
-struct passive_vote_data *passive_vote_list;
-int write_vote_data(struct char_data *ch)
+
+
+
+void CVoteData::DisplayVote(struct char_data *ch)
 {
-  FILE *fp;
-  
-  if (!passive_vote_list || !vote_description) return eFAILURE;
-  // No vote happenin'. Just get out.
-  if ((fp = dc_fopen("../lib/vote_data","w"))==NULL)
+  char buf[MAX_STRING_LENGTH];
+  std::vector<SVoteData>::iterator answer_it;
+  int i = 1;
+  if(vote_question.empty())
   {
-    if (ch)
-      send_to_char("Cannot open votedata file.\r\n",ch);
-    return eFAILURE;
+    csendf(ch, "\n\rSorry! There are no active votes right now!\n\r");
+    return;
   }
-  return eSUCCESS;
+  csendf(ch, "\n\r--Current Vote Infortmation--\n\r");
+  strncpy(buf, vote_question.c_str(), MAX_STRING_LENGTH);
+  csendf(ch, buf);
+  csendf(ch, "\n\r");
+  for(answer_it = answers.begin(); answer_it != answers.end(); answer_it++)
+    csendf(ch, "%2d: %s\n\r", i++, answer_it->answer.c_str());
+  csendf(ch, "\n\r");
 }
+
+void CVoteData::RemoveAnswer(int answer)
+{
+  if(active)
+    return;
+  std::vector<SVoteData>::iterator answer_it = answers.begin();
+  answers.erase(answer_it+answer-1);//need to offset by 1
+}
+
+bool CVoteData::StartVote()
+{
+  if(active)
+    return false;
+  if(vote_question.empty())
+    return false;
+  if(answers.empty())
+    return false;
+
+  active = true;
+  return true;
+}
+
+bool CVoteData::EndVote()
+{
+  if(!active)
+   return false;
+
+  active = false;
+  return true;
+}
+
+void CVoteData::AddAnswer(std::string answer)
+{
+  if(active)
+    return;
+  SVoteData tmp;
+  tmp.votes = 0;
+  tmp.answer = answer;
+  answers.push_back(tmp);
+}
+
+bool CVoteData::Vote(struct char_data *ch, int vote)
+{
+  if(!ch->desc)
+  {
+    send_to_char("Monsters don't get to vote!", ch);
+    return false;
+  }
+
+  if(true == ip_voted[ch->desc->host])
+  {
+    send_to_char("You have already voted!", ch);
+    return false;
+  }
+
+  if(vote < 1 || (unsigned int)vote > answers.size())
+  {
+    send_to_char("That answer doesn't exist.", ch);
+    return false;
+  }
+
+  ip_voted[ch->desc->host] = true;
+  total_votes++;
+  answers.at(vote-1).votes++;
+
+  send_to_char("Vote sent!", ch);
+  return true;
+  
+}
+
+void CVoteData::DisplayResults(struct char_data *ch)
+{
+  if(active && !ip_voted[ch->desc->host] && GET_LEVEL(ch) < IMMORTAL)
+  {
+    send_to_char("Sorry, but you have to cast a vote before you can see the results.\n\r", ch);
+    return;
+  }
+  if(!total_votes)
+  {
+    send_to_char("There hasn't been any votes to view the results of.", ch);
+    return;
+  }
+  char buf[MAX_STRING_LENGTH];
+  std::vector<SVoteData>::iterator answer_it;
+  csendf(ch, "--Current Vote Results--\n\r");
+  int percent; 
+  strncpy(buf, vote_question.c_str(), MAX_STRING_LENGTH);
+  csendf(ch, buf);
+  csendf(ch, "\n\r");
+  for(answer_it = answers.begin(); answer_it != answers.end(); answer_it++)
+  {
+    if(GET_LEVEL(ch) < IMMORTAL)
+    {
+      percent = (answer_it->votes * 100) / total_votes ;
+      csendf(ch, "%3d\%: %s\n\r", percent, answer_it->answer.c_str());
+    }
+    else
+      csendf(ch, "%3d: %s\n\r", answer_it->votes, answer_it->answer.c_str());
+  }
+  csendf(ch, "\n\r");
+  
+}
+
+void CVoteData::Reset()
+{
+  if(active)
+    return;
+
+  total_votes = 0;
+  vote_question.clear();
+  answers.clear();
+}
+
+void CVoteData::SetQuestion(std::string question)
+{
+  if(active)
+    return;
+  vote_question = question;
+}
+
+CVoteData::CVoteData()
+{
+  active = false;
+  total_votes = 0;
+}
+
+CVoteData::~CVoteData()
+{}
+ 
+CVoteData DCVote;
 
 int do_vote(struct char_data *ch, char *arg, int cmd)
 {
-return eSUCCESS;  
+  extern CVoteData DCVote;
+  char buf[MAX_STRING_LENGTH];
+  int vote;
+  arg = one_argument(arg, buf);
+ 
+  if(!strcmp(buf, "results"))
+  {
+    DCVote.DisplayResults(ch);
+    return eSUCCESS;
+  }
+
+  if(!DCVote.IsActive())
+  {
+    send_to_char("Sorry, there is nothing to vote on right now.", ch);
+    return eSUCCESS;
+  }
+  if(!strlen(buf))
+  {
+    DCVote.DisplayVote(ch);
+    return eSUCCESS;  
+  }
+
+
+  vote = atoi(buf);
+  DCVote.Vote(ch, vote);
+
+  return eSUCCESS;
+
+
 }
 
