@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: non_off.cpp,v 1.51 2008/11/21 19:30:09 kkoons Exp $
+| $Id: non_off.cpp,v 1.52 2008/11/21 22:59:55 kkoons Exp $
 | non_off.C
 | Description:  Implementation of generic, non-offensive commands.
 */
@@ -1192,7 +1192,8 @@ void CVoteData::DisplayVote(struct char_data *ch)
     csendf(ch, "\n\rSorry! There are no active votes right now!\n\r\n\r");
     return;
   }
-  csendf(ch, "\n\r--Current Vote Infortmation--\n\rTo vote, type vote <#>.\n\r\n\r");
+  csendf(ch, "\n\r--Current Vote Infortmation--\n\rTo vote, type \"vote #\".\n\r"
+             "Enter \"vote results\" to see the current voting demographics.\n\r\n\r");
   strncpy(buf, vote_question.c_str(), MAX_STRING_LENGTH);
   csendf(ch, buf);
   csendf(ch, "\n\r");
@@ -1241,23 +1242,29 @@ void CVoteData::AddAnswer(std::string answer)
   answers.push_back(tmp);
 }
 
+bool CVoteData::HasVoted(struct char_data *ch)
+{
+  return (ip_voted[ch->desc->host] || char_voted[GET_NAME(ch)]);
+
+}
+
 bool CVoteData::Vote(struct char_data *ch, int vote)
 {
   if(!ch->desc)
   {
-    send_to_char("Monsters don't get to vote!", ch);
+    send_to_char("Monsters don't get to vote!\n\r", ch);
     return false;
   }
 
-  if(true == ip_voted[ch->desc->host] || true == char_voted[GET_NAME(ch)])
+  if(this->HasVoted(ch))
   {
-    send_to_char("You have already voted!", ch);
+    send_to_char("You have already voted!\n\r", ch);
     return false;
   }
 
   if(vote < 1 || (unsigned int)vote > answers.size())
   {
-    send_to_char("That answer doesn't exist.", ch);
+    send_to_char("That answer doesn't exist.\n\r", ch);
     return false;
   }
 
@@ -1266,7 +1273,7 @@ bool CVoteData::Vote(struct char_data *ch, int vote)
   total_votes++;
   answers.at(vote-1).votes++;
 
-  send_to_char("Vote sent!", ch);
+  send_to_char("Vote sent!\n\r", ch);
   return true;
   
 }
