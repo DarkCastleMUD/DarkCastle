@@ -34,8 +34,9 @@ extern "C"
 #include <returnvals.h>
 #include <vault.h>
 #include <set.h>
-
+#include <structs.h>
 #include <string>
+#include <vector>
 using namespace std;
 
 // Urizen's rebuild rnum references to enable additions to mob/obj arrays w/out screwing everything up.
@@ -4707,6 +4708,79 @@ int do_sockets(struct char_data *ch, char *argument, int cmd)
   page_string(ch->desc, buf, 1);
   return eSUCCESS;
 }
+
+
+
+int do_setvote(struct char_data *ch, char *arg, int cmd)
+{
+  extern CVoteData DCVote;
+  char buf[MAX_STRING_LENGTH];
+  char buf2[MAX_STRING_LENGTH];
+  void send_info(char*);
+  half_chop(arg, buf, buf2);
+
+  if(!*buf)
+  {
+    send_to_char("Syntax: setvote <question|add|remove> <string>", ch);
+    return eFAILURE;
+  }
+   
+
+
+  if(!strcmp(buf, "start"))
+  {
+    if(!DCVote.StartVote())
+      send_to_char("Unable to start vote.", ch);
+    else
+      send_info("\n\r##Attention! There is now a vote in progress!\n\r##Type Vote for more information!\n\r");
+      return eSUCCESS;
+  }
+
+  if(!strcmp(buf, "clear"))
+  {
+    DCVote.Reset();
+    return eSUCCESS;
+  }
+
+  if(!strcmp(buf, "end"))
+  {
+    if(!DCVote.EndVote())
+      send_to_char("Unable to end vote.", ch);
+    else
+      send_info("\n\r##The vote has ended! Type \"Vote Results\" to see the results!\n\r");
+    return eSUCCESS;
+  } 
+
+
+  if(!*buf2)
+  {
+    send_to_char("Syntax: setvote <question|add|remove> <string>", ch);
+    return eFAILURE;
+  }
+
+  if(!strcmp(buf, "question"))
+  {
+    DCVote.SetQuestion(buf2);
+    send_to_char("\n\rQuestion set!\n\r", ch);
+    return eSUCCESS;
+  }
+  if(!strcmp(buf, "add"))
+  {
+    DCVote.AddAnswer(buf2);
+    send_to_char("\n\rAnswer added!\n\r", ch);
+    return eSUCCESS;
+  }  
+  if(!strcmp(buf, "remove"))
+  {
+    DCVote.RemoveAnswer(atoi(buf2));
+    send_to_char("\n\rAnswer removed!\n\r", ch);
+    return eSUCCESS;
+  }
+ 
+  send_to_char("Syntax: setvote <question|add|remove> <string>", ch);
+  return eFAILURE;
+}
+
 
 #ifdef WIN32
 int strncasecmp(char *s1, const char *s2, int len)
