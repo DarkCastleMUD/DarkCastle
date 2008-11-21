@@ -2986,7 +2986,7 @@ void mprog_driver ( char *com_list, CHAR_DATA *mob, CHAR_DATA *actor,
  */
 // Returns TRUE if match
 // FALSE if no match
-int mprog_wordlist_check( char *arg, CHAR_DATA *mob, CHAR_DATA *actor,
+int mprog_wordlist_check( const char *arg, CHAR_DATA *mob, CHAR_DATA *actor,
 			  OBJ_DATA *obj, void *vo, int type, bool reverse )
 // reverse ALSO IMPLIES IT ALSO ONLY CHECKS THE FIRST WORD
 {
@@ -3115,7 +3115,7 @@ void mprog_percent_check( CHAR_DATA *mob, CHAR_DATA *actor, OBJ_DATA *obj,
  * make sure you remember to modify the variable names to the ones in the
  * trigger calls.
  */
-void mprog_act_trigger( char *buf, CHAR_DATA *mob, CHAR_DATA *ch,
+void mprog_act_trigger( const char *buf, CHAR_DATA *mob, CHAR_DATA *ch,
 		       OBJ_DATA *obj, void *vo)
 {
 
@@ -3714,7 +3714,7 @@ int oprog_catch_trigger(obj_data *obj, int catch_num, char *var, int opt, char_d
 }
 
 
-int oprog_act_trigger( char *txt, CHAR_DATA *ch )
+int oprog_act_trigger( const char *txt, CHAR_DATA *ch )
 {
 
   CHAR_DATA *vmob;

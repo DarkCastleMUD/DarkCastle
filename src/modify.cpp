@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: modify.cpp,v 1.18 2008/11/18 14:43:06 kkoons Exp $ */
+/* $Id: modify.cpp,v 1.19 2008/11/21 00:37:43 kkoons Exp $ */
 
 extern "C"
 {
@@ -636,11 +636,10 @@ void paginate_string(char *str, struct descriptor_data *d)
 
 
 /* The call that gets the paging ball rolling... */
-void page_string(struct descriptor_data *d, char *str, int keep_internal)
+void page_string(struct descriptor_data *d, const char *str, int keep_internal)
 {
   if (!d)
     return;
-
   if (!str || !*str) {
     send_to_char("", d->character);
     return;
@@ -653,13 +652,17 @@ void page_string(struct descriptor_data *d, char *str, int keep_internal)
      return;
   }
 
-  CREATE(d->showstr_vector, char *, d->showstr_count = count_pages(str));
+  char buf[MAX_STRING_LENGTH];
+
+  strncpy(buf, str, MAX_STRING_LENGTH);
+
+  CREATE(d->showstr_vector, char *, d->showstr_count = count_pages(buf));
 
   if (keep_internal) {
-    d->showstr_head = str_dup(str);
+    d->showstr_head = str_dup(buf);
     paginate_string(d->showstr_head, d);
   } else
-    paginate_string(str, d);
+    paginate_string(buf, d);
 
   show_string(d, "");
 }

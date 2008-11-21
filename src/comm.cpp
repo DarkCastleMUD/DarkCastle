@@ -1573,9 +1573,10 @@ void scramble_text( char * txt )
 }
 
 /* Add a new string to a player's output queue */
-void write_to_output(char *txt, struct descriptor_data *t)
+void write_to_output(const char *txt, struct descriptor_data *t)
 {
   int size;
+  char buf[MAX_STRING_LENGTH];
   char * temp = NULL;
   char * handle_ansi(char * s, char_data * ch);
 
@@ -1588,11 +1589,13 @@ void write_to_output(char *txt, struct descriptor_data *t)
     return;
 
   if (t->connected != CON_EDITING && t->connected != CON_WRITE_BOARD && t->connected != CON_EDIT_MPROG) {
-    temp = handle_ansi(txt, t->character);
+    temp = handle_ansi((char*)txt, t->character);
     txt = temp;
   }
 
-  size = strlen(txt);
+  strncpy(buf, txt, MAX_STRING_LENGTH);
+  size = strlen(buf);
+
 
   if(t->character && IS_AFFECTED(t->character, AFF_INSANE) && t->connected == CON_PLAYING)
   {
@@ -1600,12 +1603,12 @@ void write_to_output(char *txt, struct descriptor_data *t)
 //    scramble_text(temp);
 //    txt = temp;
 
-    scramble_text(txt);
+    scramble_text(buf);
   }
 
   /* if we have enough space, just write to buffer and that's it! */
   if (t->bufspace >= size) {
-    strcpy(t->output + t->bufptr, txt);
+    strcpy(t->output + t->bufptr, buf);
     t->bufspace -= size;
     t->bufptr += size;
     if(temp)
@@ -1643,7 +1646,7 @@ void write_to_output(char *txt, struct descriptor_data *t)
 
   strcpy(t->large_outbuf->text, t->output);	/* copy to big buffer */
   t->output = t->large_outbuf->text;	/* make big buffer primary */
-  strcat(t->output, txt);	/* now add new text */
+  strcat(t->output, buf);	/* now add new text */
 
   /* calculate how much space is left in the buffer */
   t->bufspace = LARGE_BUFSIZE - 1 - strlen(t->output);
@@ -2491,7 +2494,7 @@ void check_for_awaymsgs(struct char_data *ch)
   send_to_char("Type awaymsgs to view them.\n\r", ch);
 }
 
-void send_to_char(char *messg, struct char_data *ch)
+void send_to_char(const char *messg, struct char_data *ch)
 {
   extern bool selfpurge;
   if (IS_NPC(ch) && !ch->desc && MOBtrigger && messg)

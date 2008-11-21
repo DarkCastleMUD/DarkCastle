@@ -1,4 +1,5 @@
 /***************************************************************************
+  char buf[MAX_STRING_LENGTH];
 *	file: act_info.c , Implementation of commands.		 Part of DIKUMUD *
 *	Usage : Informative commands. 						*
 *	Copyright (C) 1990, 1991 - see 'license.doc' for complete information. *
@@ -12,7 +13,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.172 2008/11/06 07:26:42 kkoons Exp $ */
+/* $Id: info.cpp,v 1.173 2008/11/21 00:37:59 kkoons Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -79,7 +80,7 @@ extern int max_who;
 
 struct char_data *get_pc_vis(struct char_data *ch, char *name);
 struct time_info_data age(struct char_data *ch);
-void page_string(struct descriptor_data *d, char *str, int keep_internal);
+void page_string(struct descriptor_data *d, const char *str, int keep_internal);
 struct clan_data * get_clan(struct char_data *);
 char *str_str(char *first, char *second);
 extern int hit_gain(CHAR_DATA *ch, int position);
