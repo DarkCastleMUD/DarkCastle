@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: non_off.cpp,v 1.50 2008/11/21 02:14:19 kkoons Exp $
+| $Id: non_off.cpp,v 1.51 2008/11/21 19:30:09 kkoons Exp $
 | non_off.C
 | Description:  Implementation of generic, non-offensive commands.
 */
@@ -1189,7 +1189,7 @@ void CVoteData::DisplayVote(struct char_data *ch)
   int i = 1;
   if(vote_question.empty())
   {
-    csendf(ch, "\n\rSorry! There are no active votes right now!\n\r");
+    csendf(ch, "\n\rSorry! There are no active votes right now!\n\r\n\r");
     return;
   }
   csendf(ch, "\n\r--Current Vote Infortmation--\n\rTo vote, type vote <#>.\n\r\n\r");
@@ -1249,7 +1249,7 @@ bool CVoteData::Vote(struct char_data *ch, int vote)
     return false;
   }
 
-  if(true == ip_voted[ch->desc->host])
+  if(true == ip_voted[ch->desc->host] || true == char_voted[GET_NAME(ch)])
   {
     send_to_char("You have already voted!", ch);
     return false;
@@ -1262,6 +1262,7 @@ bool CVoteData::Vote(struct char_data *ch, int vote)
   }
 
   ip_voted[ch->desc->host] = true;
+  char_voted[GET_NAME(ch)] = true;
   total_votes++;
   answers.at(vote-1).votes++;
 
@@ -1272,14 +1273,14 @@ bool CVoteData::Vote(struct char_data *ch, int vote)
 
 void CVoteData::DisplayResults(struct char_data *ch)
 {
-  if(active && !ip_voted[ch->desc->host] && GET_LEVEL(ch) < IMMORTAL)
+  if(active && GET_LEVEL(ch) > 39 && !ip_voted[ch->desc->host] && GET_LEVEL(ch) < IMMORTAL)
   {
     send_to_char("Sorry, but you have to cast a vote before you can see the results.\n\r", ch);
     return;
   }
   if(!total_votes)
   {
-    send_to_char("There hasn't been any votes to view the results of.", ch);
+    send_to_char("There hasn't been any votes to view the results of.\n\r", ch);
     return;
   }
   char buf[MAX_STRING_LENGTH];
@@ -1311,6 +1312,8 @@ void CVoteData::Reset()
   total_votes = 0;
   vote_question.clear();
   answers.clear();
+  ip_voted.clear();
+  char_voted.clear();
 }
 
 void CVoteData::SetQuestion(std::string question)
@@ -1346,7 +1349,7 @@ int do_vote(struct char_data *ch, char *arg, int cmd)
 
   if(!DCVote.IsActive())
   {
-    send_to_char("Sorry, there is nothing to vote on right now.", ch);
+    send_to_char("Sorry, there is nothing to vote on right now.\n\r", ch);
     return eSUCCESS;
   }
   if(!strlen(buf))
@@ -1355,9 +1358,15 @@ int do_vote(struct char_data *ch, char *arg, int cmd)
     return eSUCCESS;  
   }
 
+  if(GET_LEVEL(ch) < 40)
+  {
+    send_to_char("Sorry, you must be at least level 40 to vote.\n\r", ch);
+    return eSUCCESS;
+  }
 
   vote = atoi(buf);
-  DCVote.Vote(ch, vote);
+  if(true == DCVote.Vote(ch, vote))
+    logf(IMMORTAL, LOG_PLAYER, "%s just voted %d\n\r", GET_NAME(ch), vote);
 
   return eSUCCESS;
 
