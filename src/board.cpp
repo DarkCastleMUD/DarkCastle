@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: board.cpp,v 1.35 2008/11/20 22:59:30 kkoons Exp $
+| $Id: board.cpp,v 1.36 2008/11/21 00:43:32 kkoons Exp $
 | board.C
 | Description:  This file contains the implementation for the board
 |   code.  It's old and should be rewritten --Morc XXX
@@ -897,7 +897,8 @@ void board_load_board() {
 
 int board_display_msg(CHAR_DATA *ch, char *arg, std::map<std::string, BOARD_INFO>::iterator board)
 {
-  char buf[512], number[MAX_INPUT_LENGTH+1];
+  char buf[MAX_STRING_LENGTH], number[MAX_INPUT_LENGTH+1];
+  std::string board_msg;
   one_argument(arg, number);
   int tmessage;
 
@@ -972,15 +973,23 @@ int board_display_msg(CHAR_DATA *ch, char *arg, std::map<std::string, BOARD_INFO
   act(buf, ch, 0, 0, TO_ROOM, INVIS_NULL);
 
   if(IS_MOB(ch) || IS_SET(ch->pcdata->toggles, PLR_ANSI))
-    csendf(ch, "Message %2d (%s): " RED BOLD "%-14s " YELLOW"- %s"NTEXT,
+  {
+    snprintf(buf, MAX_STRING_LENGTH, "Message %2d (%s): " RED BOLD "%-14s " YELLOW"- %s"NTEXT,
          tmessage, board->second.msgs[tmessage].date.c_str(), 
          board->second.msgs[tmessage].author.c_str(), board->second.msgs[tmessage].title.c_str() );
+    board_msg += buf;
+  }
   else
-    csendf(ch, "Message %2d (%s): %-14s - %s", tmessage, board->second.msgs[tmessage].date.c_str(), 
+  {
+    snprintf(buf, MAX_STRING_LENGTH, "Message %2d (%s): %-14s - %s", tmessage, board->second.msgs[tmessage].date.c_str(), 
          board->second.msgs[tmessage].author.c_str(), board->second.msgs[tmessage].title.c_str());
+    board_msg += buf;
+  }
+  
+  snprintf(buf,MAX_STRING_LENGTH, "\n\r----------\n\r"CYAN"%s"NTEXT, board->second.msgs[tmessage].text.c_str());
+  board_msg += buf;
 
-  csendf(ch, "\n\r----------\n\r"CYAN"%s"NTEXT, board->second.msgs[tmessage].text.c_str());
-
+  page_string(ch->desc, board_msg.c_str(), 1);
   return eSUCCESS;
 }
 	
