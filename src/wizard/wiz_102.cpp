@@ -4721,7 +4721,7 @@ int do_setvote(struct char_data *ch, char *arg, int cmd)
 
   if(!*buf)
   {
-    send_to_char("Syntax: setvote <question|add|remove> <string>", ch);
+    send_to_char("Syntax: voteset <question|add|remove|clear|start|end> <string>", ch);
     return eFAILURE;
   }
    
@@ -4754,7 +4754,7 @@ int do_setvote(struct char_data *ch, char *arg, int cmd)
 
   if(!*buf2)
   {
-    send_to_char("Syntax: setvote <question|add|remove> <string>", ch);
+    send_to_char("Syntax: voteset <question|add|remove|clear|start|end> <string>", ch);
     return eFAILURE;
   }
 
@@ -4777,7 +4777,7 @@ int do_setvote(struct char_data *ch, char *arg, int cmd)
     return eSUCCESS;
   }
  
-  send_to_char("Syntax: setvote <question|add|remove> <string>", ch);
+  send_to_char("Syntax: voteset <question|add|remove|clear|start|end> <string>", ch);
   return eFAILURE;
 }
 
