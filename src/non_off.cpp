@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: non_off.cpp,v 1.52 2008/11/21 22:59:55 kkoons Exp $
+| $Id: non_off.cpp,v 1.53 2008/11/22 00:48:27 kkoons Exp $
 | non_off.C
 | Description:  Implementation of generic, non-offensive commands.
 */
@@ -1220,6 +1220,7 @@ bool CVoteData::StartVote()
     return false;
 
   active = true;
+  this->OutToFile();
   return true;
 }
 
@@ -1229,6 +1230,7 @@ bool CVoteData::EndVote()
    return false;
 
   active = false;
+  this->OutToFile();
   return true;
 }
 
@@ -1274,6 +1276,7 @@ bool CVoteData::Vote(struct char_data *ch, int vote)
   answers.at(vote-1).votes++;
 
   send_to_char("Vote sent!\n\r", ch);
+  OutToFile();
   return true;
   
 }
@@ -1323,6 +1326,55 @@ void CVoteData::Reset()
   char_voted.clear();
 }
 
+void CVoteData::OutToFile()
+{
+  
+  FILE * the_file;
+
+  the_file = dc_fopen("vote_data", "w");
+
+  if(!the_file) 
+  {
+      log("Unable to open/create save file for vote data", ANGEL,
+          LOG_BUG);
+      return;
+  }
+  
+  fprintf(the_file,"%d\n", active);
+  fprintf(the_file,"%d\n", total_votes);
+
+  fprintf(the_file,"~%s~\n", vote_question.c_str());
+
+  fprintf(the_file,"%d\n", answers.size());
+
+  std::vector<SVoteData>::iterator answer_it;
+
+  for (answer_it = answers.begin(); answer_it != answers.end(); answer_it++) 
+  {
+    fprintf(the_file, "%d\n", answer_it->votes);
+    fprintf(the_file, "%s\n", answer_it->answer.c_str());
+  }
+
+  std::map<std::string, bool>::iterator ip_it;
+
+  fprintf(the_file,"%d\n", ip_voted.size());
+  for (ip_it = ip_voted.begin(); ip_it != ip_voted.end(); ip_it++) 
+  {
+    fprintf(the_file, "%s\n", ip_it->first.c_str());
+  }
+
+  
+  fprintf(the_file,"%d\n", char_voted.size());
+  for (ip_it = char_voted.begin(); ip_it != char_voted.end(); ip_it++)
+  {
+    fprintf(the_file, "%s\n", ip_it->first.c_str());
+  }
+
+
+  dc_fclose(the_file);
+  return;
+}
+
 void CVoteData::SetQuestion(std::string question)
 {
   if(active)
@@ -1332,8 +1384,96 @@ void CVoteData::SetQuestion(std::string question)
 
 CVoteData::CVoteData()
 {
-  active = false;
-  total_votes = 0;
+  char buf[MAX_STRING_LENGTH];
+  FILE * the_file = NULL;;
+  int num = 0;
+  int i = 0;
+  SVoteData tmp_vote_data;
+ 
+  the_file = dc_fopen("../lib/vote_data", "r");
+  if (!the_file) 
+  {
+    this->Reset();
+    return;
+  }
+
+
+  fscanf( the_file, "%d\n", &num);
+  active = (bool) num;
+
+  if (feof(the_file)) 
+  {
+    dc_fclose(the_file);
+    this->Reset();
+    return;
+  }
+
+  fscanf(the_file, "%d\n", &num);
+  total_votes = num;
+
+  if(!fgets(buf, MAX_STRING_LENGTH, the_file))
+  {
+    dc_fclose(the_file);
+    this->Reset();
+    log("Error reading question from vote file.", 0, LOG_MISC);
+    return;
+  }
+  buf[strlen(buf)-1] = 0;
+  vote_question = buf;
+
+  //ANSWERS
+  fscanf(the_file, "%d\n", &i); 
+  for(;i > 0; i--)
+  {
+    fscanf(the_file, "%d\n", &num);
+    if(!fgets(buf, MAX_STRING_LENGTH, the_file))
+    {
+      dc_fclose(the_file);
+      log("Error reading answers from vote file.", 0, LOG_MISC);
+      this->Reset();
+      return;
+    }
+
+    buf[strlen(buf)-1] = 0;
+    tmp_vote_data.votes = num;
+    tmp_vote_data.answer = buf;
+    answers.push_back(tmp_vote_data);
+  }      
+
+  //IP ADDRESSES
+  fscanf(the_file, "%d\n", &i);
+  for(;i > 0; i--)
+  {
+    if(!fgets(buf, MAX_STRING_LENGTH, the_file))
+    {
+      dc_fclose(the_file);
+      log("Error reading ip addresses from vote file.", 0, LOG_MISC);
+      this->Reset();
+      return;
+    }
+    buf[strlen(buf)-1] = 0;
+    ip_voted[buf] = true;    
+  }      
+
+  //CHAR NAMES
+  fscanf(the_file, "%d\n", &i);
+  for(;i > 0; i--)
+  {
+    if(!fgets(buf, MAX_STRING_LENGTH, the_file))
+    {
+      dc_fclose(the_file);
+      log("Error reading char names from vote file.", 0, LOG_MISC);
+      this->Reset();
+      return;
+    }
+    buf[strlen(buf)-1] = 0;
+    char_voted[buf] = true;   
+  }      
+
+
+
+
+  dc_fclose(the_file);
 }
 
 CVoteData::~CVoteData()
