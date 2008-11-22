@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: non_off.cpp,v 1.53 2008/11/22 00:48:27 kkoons Exp $
+| $Id: non_off.cpp,v 1.54 2008/11/22 00:55:26 kkoons Exp $
 | non_off.C
 | Description:  Implementation of generic, non-offensive commands.
 */
@@ -1343,7 +1343,7 @@ void CVoteData::OutToFile()
   fprintf(the_file,"%d\n", active);
   fprintf(the_file,"%d\n", total_votes);
 
-  fprintf(the_file,"~%s~\n", vote_question.c_str());
+  fprintf(the_file,"%s\n", vote_question.c_str());
 
   fprintf(the_file,"%d\n", answers.size());
 
