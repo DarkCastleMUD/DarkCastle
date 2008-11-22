@@ -14,7 +14,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.h,v 1.110 2008/11/18 14:39:03 kkoons Exp $ */
+/* $Id: spells.h,v 1.111 2008/11/22 21:53:46 kkoons Exp $ */
 #include <structs.h> // ubyte, int16
 
 #include <map>
@@ -603,6 +603,32 @@ struct attack_hit_type
   char *singular;
   char *plural;
 };
+
+#define RARE1_PAPER	1
+#define RARE2_PAPER	1<<1
+#define RARE3_PAPER	1<<2
+#define RARE4_PAPER	1<<3
+#define RARE5_PAPER	1<<4
+//#define FREE_SLOT	1<<5
+
+#define CLERIC_PEN 	1<<6
+#define MAGE_PEN 	1<<7
+#define DRUID_PEN 	1<<8
+#define ANTI_PEN	1<<9
+#define RANGER_PEN	1<<10
+#define NONE_PEN	1<<11
+//#define FREE_SLOT	1<<12
+
+#define MAGIC_INK	1<<13
+#define FIRE_INK	1<<14
+#define EVIL_INK	1<<15
+//#define FREE_SLOT	1<<16
+
+#define FLASHY_DUST	1<<17
+#define EXPLOSIVE_DUST	1<<18
+#define GENERIC_DUST	1<<19
+//#define FREE_SLOT	1<<20
+
 
 
 /*
