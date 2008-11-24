@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.244 2008/11/18 14:42:06 kkoons Exp $ */
+/* $Id: spells.cpp,v 1.245 2008/11/24 22:19:55 kkoons Exp $ */
 
 extern "C"
 {
@@ -1593,7 +1593,7 @@ send_to_char("got here", ch);
 	else i = 75;
    }
     if (stat && victim)
-	i -= stat_mod[get_stat(victim,stat)] * GET_LEVEL(ch) / 50; // less impact on low levels..
+	i -= stat_mod[get_stat(victim,stat)] * GET_LEVEL(ch) / 60; // less impact on low levels..
   i += mod;
 
   if (!IS_NPC(ch))
