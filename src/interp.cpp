@@ -16,7 +16,7 @@
 /* 12/08/2003   Onager   Added chop_half() to work like half_chop() but    */
 /*                       chopping off the last word.                       */
 /***************************************************************************/
-/* $Id: interp.cpp,v 1.162 2008/11/25 21:14:47 kkoons Exp $ */
+/* $Id: interp.cpp,v 1.163 2008/11/25 23:11:31 kkoons Exp $ */
 
 extern "C"
 {
@@ -372,7 +372,7 @@ struct command_info cmd_info[] =
     { "stay",		do_not_here,	POSITION_STANDING, 0, CMD_STAY, 0, 0 },
     { "select",		do_natural_selection, POSITION_RESTING, 0, CMD_DEFAULT, 0, 0},
     { "sector",		do_sector,	POSITION_RESTING, 0, CMD_DEFAULT, 0, 1 },
-    { "remort",		do_not_here,	POSITION_RESTING, IMP, CMD_REMORT, 0, 1 },
+    { "remort",		do_not_here,	POSITION_RESTING, GIFTED_COMMAND, CMD_REMORT, 0, 1 },
 
      
     // Immortal commands
@@ -493,7 +493,7 @@ struct command_info cmd_info[] =
     // Special procedure commands placed to not disrupt god commands
     { "setup",		do_mortal_set,	POSITION_STANDING, 0,  CMD_DEFAULT,  0, 1 },
     { "do_the_thing",	do_thing,	POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1 },
-    { "testhit",	do_testhit,     POSITION_DEAD, 110, CMD_DEFAULT, 0, 1},
+    { "testhit",	do_testhit,     POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1},
     { "acfinder",       do_acfinder,    POSITION_DEAD, 108, CMD_DEFAULT, 0, 1},
     { "findpath",	do_findPath,	POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1 },
     { "findpath2",	do_findpath,	POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1 },
