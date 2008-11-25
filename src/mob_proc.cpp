@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.181 2008/11/25 16:07:54 pirahna Exp $ */
+/* $Id: mob_proc.cpp,v 1.182 2008/11/25 16:17:12 apocalypse Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -1761,7 +1761,11 @@ static char *dethSayText [ ] =
   "The first step is not admitting you have a problem -- the first step is acquiring a problem.",
   "The time is now!  Anything you start right now will succeed! ...too late.",
   "My God has a bigger dick than your God.",
-  "How do you find Ronald McDonald at a nudist colony?   He's the one with sesame seeds on his buns."
+  "How do you find Ronald McDonald at a nudist colony?   He's the one with sesame seeds on his buns.",
+  "Ever find it weird that only one company makes the game Monopoly?",
+  "Mission Accomplished.",
+  "Drill baby! Drill!",
+  "Ch-ch-ch-ch-changes!"
  };
 
 // ENDOFCHAIN
