@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.180 2008/11/10 03:38:43 kkoons Exp $ */
+/* $Id: mob_proc.cpp,v 1.181 2008/11/25 16:07:54 pirahna Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -1760,7 +1760,8 @@ static char *dethSayText [ ] =
   "I never faked it with you.  Okay, one time.",
   "The first step is not admitting you have a problem -- the first step is acquiring a problem.",
   "The time is now!  Anything you start right now will succeed! ...too late.",
-  "My God has a bigger dick than your God."
+  "My God has a bigger dick than your God.",
+  "How do you find Ronald McDonald at a nudist colony?   He's the one with sesame seeds on his buns."
  };
 
 // ENDOFCHAIN
