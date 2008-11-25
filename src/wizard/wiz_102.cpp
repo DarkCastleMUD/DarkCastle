@@ -4816,7 +4816,7 @@ int do_punish(struct char_data *ch, char *arg, int cmd)
    if (!*name) {
       send_to_char("Punish who?\n\r", ch);
       send_to_char("\n\rusage: punish <char> [stupid silence freeze noemote "
-                   "notell noname noarena notitle]\n\r", ch);
+                   "notell noname noarena notitle nopray]\n\r", ch);
       return eFAILURE;
       }
 
