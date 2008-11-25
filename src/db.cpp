@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.179 2008/11/19 23:24:16 kkoons Exp $ */
+/* $Id: db.cpp,v 1.180 2008/11/25 20:52:43 kkoons Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -705,7 +705,7 @@ void boot_db(void)
     mud_is_booting = FALSE;
 }
 
-
+/*
 int do_motdload(CHAR_DATA *ch, char *argument, int cmd)
 {
    file_to_string(MOTD_FILE, motd);
@@ -713,7 +713,7 @@ int do_motdload(CHAR_DATA *ch, char *argument, int cmd)
    send_to_char("Motd and Imotd both reloaded.\r\n", ch);
    return eSUCCESS;
 }
-
+*/
 void do_godlist()
 {
   char bufl[100], buf2[100], buf3[100];
