@@ -16,7 +16,7 @@
 /* 12/08/2003   Onager   Added chop_half() to work like half_chop() but    */
 /*                       chopping off the last word.                       */
 /***************************************************************************/
-/* $Id: interp.cpp,v 1.158 2008/11/21 19:35:01 kkoons Exp $ */
+/* $Id: interp.cpp,v 1.159 2008/11/25 20:49:54 kkoons Exp $ */
 
 extern "C"
 {
@@ -437,7 +437,7 @@ struct command_info cmd_info[] =
     { "sqedit",		do_sqedit,	POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1 },
     { "qedit",		do_qedit,	POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1 },
     { "install",	do_install,	POSITION_DEAD, IMP, CMD_DEFAULT, 0, 1 },
-    { "motdload",       do_motdload,    POSITION_DEAD, IMP, CMD_DEFAULT, 0, 1 },
+  //  { "motdload",       do_motdload,    POSITION_DEAD, IMP, CMD_DEFAULT, 0, 1 },
     { "hedit",		do_hedit,	POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1 },
     { "hindex",		do_hindex,	POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1 },
     { "reload",		do_reload,	POSITION_DEAD, 108, CMD_DEFAULT, 0, 1 },
@@ -478,7 +478,7 @@ struct command_info cmd_info[] =
     { "high5",		do_highfive,	POSITION_DEAD, IMMORTAL, CMD_DEFAULT, 0, 1 },
     { "holylite",	do_holylite,	POSITION_DEAD, IMMORTAL, CMD_DEFAULT, 0, 1 },
     { "immort",		do_wiz,		POSITION_DEAD, IMMORTAL, CMD_DEFAULT, 0, 1 },
-    { ";",		do_wiz,		POSITION_DEAD, IMMORTAL, CMD_DEFAULT, 0, 1 },
+   // { ";",		do_wiz,		POSITION_DEAD, IMMORTAL, CMD_DEFAULT, 0, 1 },
     { "nohassle",	do_nohassle,	POSITION_DEAD, IMMORTAL, CMD_DEFAULT, 0, 1 },
     { "wizinvis",	do_wizinvis,	POSITION_DEAD, IMMORTAL, CMD_DEFAULT, 0, 1 },
     { "poof",		do_poof,	POSITION_DEAD, IMMORTAL, CMD_DEFAULT, 0, 1 },
