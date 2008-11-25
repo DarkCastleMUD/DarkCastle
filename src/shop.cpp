@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: shop.cpp,v 1.27 2007/08/16 15:04:22 dcastle Exp $ */
+/* $Id: shop.cpp,v 1.28 2008/11/25 20:53:48 kkoons Exp $ */
 
 extern "C"
 {
@@ -1400,7 +1400,7 @@ int player_shop_keeper( CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
 
     return eSUCCESS;
 }
-
+/*
 int do_pshopedit(char_data * ch, char * arg, int cmd)
 {
   char buf[MAX_STRING_LENGTH];
@@ -1495,7 +1495,7 @@ int do_pshopedit(char_data * ch, char * arg, int cmd)
 
   return eSUCCESS;
 }
-
+*/
 void assign_the_player_shopkeepers( )
 {
    mob_index[real_mobile(PLAYER_SHOP_KEEPER)].non_combat_func = player_shop_keeper;

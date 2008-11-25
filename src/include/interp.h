@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.h,v 1.91 2008/11/25 20:52:33 kkoons Exp $ */
+/* $Id: interp.h,v 1.92 2008/11/25 20:53:57 kkoons Exp $ */
 
 #ifndef INTERP_H_
 #define INTERP_H_
@@ -424,7 +424,7 @@ DO_FUN  do_prompt;
 DO_FUN  do_lastprompt;
 DO_FUN  do_processes;
 DO_FUN  do_psay;
-DO_FUN  do_pshopedit;
+//DO_FUN  do_pshopedit;
 DO_FUN  do_pview;
 DO_FUN  do_punish;
 DO_FUN  do_purge;
