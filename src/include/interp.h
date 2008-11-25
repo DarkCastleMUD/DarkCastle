@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.h,v 1.90 2008/11/21 00:37:24 kkoons Exp $ */
+/* $Id: interp.h,v 1.91 2008/11/25 20:52:33 kkoons Exp $ */
 
 #ifndef INTERP_H_
 #define INTERP_H_
@@ -336,7 +336,7 @@ DO_FUN  do_load;
 DO_FUN  do_medit;
 DO_FUN  do_memoryleak;
 DO_FUN  do_mortal_set;
-DO_FUN  do_motdload;
+//DO_FUN  do_motdload;
 DO_FUN  do_msave;
 DO_FUN  do_mpedit;
 DO_FUN do_mpbestow;
