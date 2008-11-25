@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: offense.cpp,v 1.25 2007/12/02 17:54:40 jhhudso Exp $
+| $Id: offense.cpp,v 1.26 2008/11/25 21:14:38 kkoons Exp $
 | offense.C
 | Description:  Commands that are generically offensive - that is, the
 |   victim should retaliate.  The class-specific offensive commands are
@@ -185,6 +185,63 @@ int do_murder(struct char_data *ch, char *argument, int cmd)
 }
 
 
+
+int do_slay(struct char_data *ch, char *argument, int cmd)
+{
+  char buf[256];
+  char arg[MAX_STRING_LENGTH];
+  struct char_data *victim;
+  
+  one_argument(argument, arg);
+  
+  if(!*arg) {
+    send_to_char("Slay whom?\n\r", ch);
+    return eFAILURE;
+  }
+  
+  if(!(victim = get_char_room_vis(ch, arg))) {
+    send_to_char("They aren't here.\n\r", ch);
+    return eFAILURE;
+  }
+  
+
+//  if (IS_AFFECTED(ch, AFF_CHARM) && !IS_NPC(ch->master) && GET_CLASS(ch->master) == CLASS_ANTI_PAL && !IS_NPC(victim)) {
+//     act("I can't attack $N master!", ch->master, 0, victim, TO_CHAR, 0);
+//     return eFAILURE;
+//  }
+
+  if (IS_AFFECTED(ch, AFF_FAMILIAR) && !IS_NPC(ch->master)) {
+     act("But $N scares me!!", ch->master, 0, victim, TO_CHAR, 0);
+     return eFAILURE;
+  }
+
+  if (ch == victim)
+      send_to_char("Your mother would be so sad.. :(\n\r", ch);
+    else {
+      if (!strcmp(GET_NAME(victim), "Apocalypse")) {
+        send_to_char("You no make ME into chop suey!\r\n", ch);
+        sprintf(buf,"%s just tried to kill you.\r\n", GET_NAME(ch));
+        send_to_char(buf, victim);
+        if(GET_LEVEL(ch) > IMMORTAL) {
+	  fight_kill(victim, ch, TYPE_RAW_KILL, 0);
+	  send_to_char("Lunch.\r\n", ch);
+	}
+        return eSUCCESS|eCH_DIED;
+      }      
+     
+      act("You chop $M to pieces! Ah! The blood!",
+	  ch, 0, victim, TO_CHAR, 0);
+      act("$N chops you to pieces!", victim, 0, ch, TO_CHAR, 0);
+      act("$n brutally slays $N.", ch, 0, victim, TO_ROOM, NOTVICT);
+      fight_kill(ch, victim, TYPE_RAW_KILL, 0);
+      return eSUCCESS|eVICT_DIED;
+    }
+  
+  return eSUCCESS; // shouldn't get here
+}
+
+
+
 int do_kill(struct char_data *ch, char *argument, int cmd)
 {
   char buf[256];
@@ -228,7 +285,7 @@ int do_kill(struct char_data *ch, char *argument, int cmd)
         sprintf(buf,"%s just tried to kill you.\r\n", GET_NAME(ch));
         send_to_char(buf, victim);
         if(GET_LEVEL(ch) > IMMORTAL) {
-	  fight_kill(victim, ch, TYPE_RAW_KILL, 0);
+	  fight_kill(victim, ch, TYPE_CHOOSE, 0);
 	  send_to_char("Lunch.\r\n", ch);
 	}
         return eSUCCESS|eCH_DIED;
@@ -237,7 +294,7 @@ int do_kill(struct char_data *ch, char *argument, int cmd)
 	  ch, 0, victim, TO_CHAR, 0);
       act("$N chops you to pieces!", victim, 0, ch, TO_CHAR, 0);
       act("$n brutally slays $N.", ch, 0, victim, TO_ROOM, NOTVICT);
-      fight_kill(ch, victim, TYPE_RAW_KILL, 0);
+      fight_kill(ch, victim, TYPE_CHOOSE, 0);
       return eSUCCESS|eVICT_DIED;
     }
   }
