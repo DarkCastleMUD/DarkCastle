@@ -1465,7 +1465,7 @@ int do_mpdamage( CHAR_DATA *ch, char *argument, int cmd )
          dam += plus;
        add_dmg(victim,dam);
        if (!temp[0] || !str_cmp(temp,"hitpoints")) {
-	 retval = damage(ch, victim, dam, damtype, TYPE_UNDEFINED, 0);
+	 retval = damage(ch, victim, dam, damtype, TYPE_UNDEFINED, 0, true);
 	 if (SOMEONE_DIED(retval)) return retval;
        } else {
 	 *data -= dam;
@@ -1523,7 +1523,7 @@ int do_mpdamage( CHAR_DATA *ch, char *argument, int cmd )
          dam += plus;
        add_dmg(victim,dam);
        if (!temp[0] || !str_cmp(temp,"hitpoints")) {
-         retval = damage(ch, victim, dam, damtype, TYPE_UNDEFINED, 0);
+         retval = damage(ch, victim, dam, damtype, TYPE_UNDEFINED, 0, true);
          if (IS_SET(retval, eCH_DIED)) return retval;
        } else {
          *data -= dam;
