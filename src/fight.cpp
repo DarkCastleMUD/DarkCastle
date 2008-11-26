@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.513 2008/11/21 19:34:24 kkoons Exp $               *
+ * $Id: fight.cpp,v 1.514 2008/11/26 19:00:45 kkoons Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -1870,7 +1870,7 @@ int getRealSpellDamage( CHAR_DATA * ch)
 
 // returns standard returnvals.h return codes
 int damage(CHAR_DATA * ch, CHAR_DATA * victim,
-           int dam, int weapon_type, int attacktype, int weapon)
+           int dam, int weapon_type, int attacktype, int weapon, bool is_death_prog)
 {
   int can_miss = 1;
   long weapon_bit;
@@ -2540,7 +2540,11 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
      if (SOMEONE_DIED(retval2)) return damage_retval(ch, victim, retval2);
   }
 
-  if(typeofdamage == DAMAGE_TYPE_PHYSICAL && dam > 0 && ch != victim && attacktype != SKILL_ARCHERY)
+  if(typeofdamage == DAMAGE_TYPE_PHYSICAL 
+     && dam > 0 
+     && ch != victim 
+     && attacktype != SKILL_ARCHERY
+     && !is_death_prog)
   {
     int retval2;
     retval2 = do_fireshield(ch, victim, dam);
