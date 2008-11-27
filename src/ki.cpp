@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.76 2008/06/16 22:31:53 kkoons Exp $ */
+/* $Id: ki.cpp,v 1.77 2008/11/27 09:17:12 kkoons Exp $ */
 
 extern "C"
 {
@@ -393,7 +393,8 @@ int ki_blast( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
    else
       success -= 20; /* more than 300 pounds?! */
 
-   if (number(1, 101) > success) /* 101 is complete failure */
+   if (number(1, 101) > success
+       || affected_by_spell(vict, SPELL_IRON_ROOTS))  /* 101 is complete failure */
       {
       act("$n fails to blast $N!", ch, 0, vict, TO_ROOM, NOTVICT);
       act("You fail to blast $N!", ch, 0, vict, TO_CHAR, 0);
@@ -404,7 +405,7 @@ int ki_blast( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
 
    if (CAN_GO(vict, exit) &&
        !IS_SET(world[EXIT(vict, exit)->to_room].room_flags, IMP_ONLY) &&
-       !IS_SET(world[EXIT(vict, exit)->to_room].room_flags, NO_TRACK)) 
+       !IS_SET(world[EXIT(vict, exit)->to_room].room_flags, NO_TRACK))
    {
       sprintf(buf, "$N is blasted out of the room %s by $n!", dirswards[exit]);
       act(buf, ch, 0, vict, TO_ROOM, NOTVICT);
