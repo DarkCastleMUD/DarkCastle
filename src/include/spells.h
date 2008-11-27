@@ -14,7 +14,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.h,v 1.112 2008/11/25 23:12:02 kkoons Exp $ */
+/* $Id: spells.h,v 1.113 2008/11/27 20:01:56 kkoons Exp $ */
 #include <structs.h> // ubyte, int16
 
 #include <map>
@@ -415,7 +415,6 @@ void check_maxes(CHAR_DATA *ch);
 #define COMMAND_STAT                 602
 #define COMMAND_SNOOP                603
 #define COMMAND_FIND                 604
-#define COMMAND_GLOBAL               605
 #define COMMAND_POSSESS              606
 #define COMMAND_RESTORE              607
 #define COMMAND_PURLOIN              608
@@ -430,7 +429,6 @@ void check_maxes(CHAR_DATA *ch);
 #define COMMAND_MP_EDIT              617
 #define COMMAND_RANGE                618
 #define COMMAND_MPSTAT               619
-#define COMMAND_PSHOPEDIT            620
 #define COMMAND_SEDIT                621
 #define COMMAND_SOCKETS              622
 #define COMMAND_PUNISH               623
@@ -438,7 +436,6 @@ void check_maxes(CHAR_DATA *ch);
 #define COMMAND_OCLONE		     625
 #define COMMAND_RELOAD 		     626
 #define COMMAND_HEDIT		     627
-#define COMMAND_HINDEX		     628
 #define COMMAND_OPSTAT		     629
 #define COMMAND_OPEDIT		     630
 #define COMMAND_EQMAX		     631
