@@ -16,7 +16,7 @@
 /* 12/08/2003   Onager   Added chop_half() to work like half_chop() but    */
 /*                       chopping off the last word.                       */
 /***************************************************************************/
-/* $Id: interp.cpp,v 1.163 2008/11/25 23:11:31 kkoons Exp $ */
+/* $Id: interp.cpp,v 1.164 2008/11/27 20:02:25 kkoons Exp $ */
 
 extern "C"
 {
@@ -414,7 +414,7 @@ struct command_info cmd_info[] =
     { "send",		do_send,	POSITION_DEAD, OVERSEER, CMD_DEFAULT, 0, 1 },
     { "at",		do_at,		POSITION_DEAD, IMMORTAL, CMD_DEFAULT, 0, 1 }, 
     { "fakelog",	do_fakelog,	POSITION_DEAD, 110, CMD_DEFAULT, 0, 1 },
-    { "global",		do_global,	POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1 },
+    { "global",		do_global,	POSITION_DEAD, 108, CMD_DEFAULT, 0, 1 },
     { "log",		do_log,		POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1 },
     { "snoop",		do_snoop,	POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1 },
     { "pview",		do_pview,	POSITION_DEAD, 104, CMD_DEFAULT, 0, 1 },
@@ -439,7 +439,7 @@ struct command_info cmd_info[] =
     { "install",	do_install,	POSITION_DEAD, IMP, CMD_DEFAULT, 0, 1 },
   //  { "motdload",       do_motdload,    POSITION_DEAD, IMP, CMD_DEFAULT, 0, 1 },
     { "hedit",		do_hedit,	POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1 },
-    { "hindex",		do_hindex,	POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1 },
+    { "hindex",		do_hindex,	POSITION_DEAD, IMMORTAL, CMD_DEFAULT, 0, 1 },
     { "reload",		do_reload,	POSITION_DEAD, OVERSEER, CMD_DEFAULT, 0, 1 },
     { "plats",		do_plats,	POSITION_DEAD, 108, CMD_DEFAULT, 0, 1 },
     { "bellow",		do_thunder,	POSITION_DEAD, DEITY, CMD_BELLOW, 0, 1 },

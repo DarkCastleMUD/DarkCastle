@@ -372,10 +372,6 @@ int do_hindex(struct char_data *ch, char *argument, int cmd)
    int i, minlen, count = 0;
    char arg[256];
 
-  if(!has_skill(ch, COMMAND_HINDEX)) {
-      send_to_char("Huh?\r\n", ch);
-      return eFAILURE;
-  }
 
   half_chop(argument, argument, arg);
    if (!*argument) {

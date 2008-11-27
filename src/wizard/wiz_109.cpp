@@ -354,10 +354,6 @@ int do_global(struct char_data *ch, char *argument, int cmd)
     if (IS_NPC(ch))
         return eFAILURE;
 
-    if(!has_skill(ch, COMMAND_GLOBAL)) {
-        send_to_char("Huh?\r\n", ch);
-        return eFAILURE;
-    }
 
     for (i = 0; *(argument + i) == ' '; i++);
 
