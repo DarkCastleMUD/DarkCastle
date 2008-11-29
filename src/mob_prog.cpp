@@ -944,6 +944,7 @@ std::map<std::string,mprog_ifs> load_ifchecks()
   ifcheck_tmp["ischarmed"] = eISCHARMED;
   ifcheck_tmp["isfollow"] = eISFOLLOW;
   ifcheck_tmp["isspelled"] = eISSPELLED;
+  ifcheck_tmp["isworn"] = eISWORN;
 
   ifcheck_tmp["isaffected"] = eISAFFECTED;
   ifcheck_tmp["hitprcnt"] = eHITPRCNT;
