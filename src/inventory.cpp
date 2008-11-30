@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.103 2008/05/15 16:34:40 kkoons Exp $
+| $Id: inventory.cpp,v 1.104 2008/11/30 06:21:49 kkoons Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -1781,7 +1781,11 @@ int do_open(CHAR_DATA *ch, char *argument, int cmd)
       else if (!IS_SET(EXIT(ch, door)->exit_info, EX_CLOSED))
          send_to_char("It's already open!\n\r", ch);
       else if (IS_SET(EXIT(ch, door)->exit_info, EX_LOCKED))
-         send_to_char("It seems to be locked.\n\r", ch);   
+         send_to_char("It seems to be locked.\n\r", ch);  
+      else if (IS_SET(EXIT(ch, door)->exit_info, EX_BROKEN)) 
+         send_to_char("It's already been broken open!\n\r", ch);  
+      else if (IS_SET(EXIT(ch, door)->exit_info, EX_BRACED))
+         send_to_char("It seems to be braced from the other side.\n\r", ch);   
       else if (IS_SET(EXIT(ch, door)->exit_info, EX_IMM_ONLY) && GET_LEVEL(ch) < IMMORTAL)
          send_to_char("It seems to slither and resist your attempt to touch it.\n\r", ch);
       else
@@ -1900,6 +1904,8 @@ int do_close(CHAR_DATA *ch, char *argument, int cmd)
          send_to_char("That's absurd.\n\r", ch);
       else if (IS_SET(EXIT(ch, door)->exit_info, EX_CLOSED))
          send_to_char("It's already closed!\n\r", ch);
+      else if (IS_SET(EXIT(ch, door)->exit_info, EX_BROKEN))
+         send_to_char("It appears to be broken!\n\r", ch);
       else
       {   
          SET_BIT(EXIT(ch, door)->exit_info, EX_CLOSED);
@@ -2011,6 +2017,8 @@ int do_lock(CHAR_DATA *ch, char *argument, int cmd)
             send_to_char("That's absurd.\n\r", ch);
         else if (!IS_SET(EXIT(ch, door)->exit_info, EX_CLOSED))
             send_to_char("You have to close it first, I'm afraid.\n\r", ch);
+        else if (!IS_SET(EXIT(ch, door)->exit_info, EX_BROKEN))
+            send_to_char("You cannot lock it, it is broken.\n\r", ch);
         else if (EXIT(ch, door)->key < 0)
             send_to_char("There does not seem to be any keyholes.\n\r", ch);
         else if (!has_key(ch, EXIT(ch, door)->key))
@@ -2084,6 +2092,8 @@ int do_unlock(CHAR_DATA *ch, char *argument, int cmd)
             send_to_char("You can't seem to spot any keyholes.\n\r", ch);
         else if (!has_key(ch, EXIT(ch, door)->key))
             send_to_char("You do not have the proper key for that.\n\r", ch);
+        else if (!IS_SET(EXIT(ch, door)->exit_info, EX_BROKEN))
+            send_to_char("You cannot unlock it, it is broken!\n\r", ch);
         else if (!IS_SET(EXIT(ch, door)->exit_info, EX_LOCKED))
             send_to_char("It's already unlocked, it seems.\n\r", ch);
         else
