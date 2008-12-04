@@ -16,7 +16,7 @@
  *  10/21/2003   Onager    Changed IS_ANONYMOUS() to handle mobs without   *
  *                         crashing                                        *
  ***************************************************************************/
-/* $Id: utility.h,v 1.77 2008/11/20 23:00:07 kkoons Exp $ */
+/* $Id: utility.h,v 1.78 2008/12/04 04:31:18 jhhudso Exp $ */
 
 #ifndef UTILITY_H_
 #define UTILITY_H_
@@ -116,13 +116,13 @@ bool is_hiding(CHAR_DATA *ch, CHAR_DATA *vict);
 #define FREE(p) do { if((p) != NULL) { dc_free((p)); (p) = 0; } } while (0) 
 
 #define ASIZE 32 //don't change unless you want to be screwed
-#define SETBIT(var,bit) ((var)[(bit)/ASIZE] |= (1 << ((bit)-(((bit)/ASIZE)*ASIZE)-1)))
+#define SETBIT(var,bit) ((var)[(bit)/ASIZE] |= (1 << (((bit)-(((bit)/ASIZE)*ASIZE)-1))))
 // setting with an OR
-#define REMBIT(var,bit) ((var)[(bit)/ASIZE] &= ~(1 << ((bit)-(((bit)/ASIZE)*ASIZE))-1))
+#define REMBIT(var,bit) ((var)[(bit)/ASIZE] &= ~(1 << (((bit)-(((bit)/ASIZE)*ASIZE))-1)))
 // setting with an AND
-#define TOGBIT(var,bit) ((var)[(bit)/ASIZE] ^= (1 << ((bit)-(((bit)/ASIZE)*ASIZE))-1))
+#define TOGBIT(var,bit) ((var)[(bit)/ASIZE] ^= (1 << (((bit)-(((bit)/ASIZE)*ASIZE))-1)))
 // setting with an XOR
-#define ISSET(var,bit) ((var)[(bit)/ASIZE] & (1 << ((bit)-(((bit)/ASIZE)*ASIZE))-1))
+#define ISSET(var,bit) ((var)[(bit)/ASIZE] & (1 << (((bit)-(((bit)/ASIZE)*ASIZE))-1)))
 // using an AND
 
 #define IS_SET(flag,bit)  ((flag) & (bit))
