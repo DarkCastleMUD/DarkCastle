@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.104 2008/11/30 06:21:49 kkoons Exp $
+| $Id: inventory.cpp,v 1.105 2008/12/06 06:07:11 kkoons Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -2017,7 +2017,7 @@ int do_lock(CHAR_DATA *ch, char *argument, int cmd)
             send_to_char("That's absurd.\n\r", ch);
         else if (!IS_SET(EXIT(ch, door)->exit_info, EX_CLOSED))
             send_to_char("You have to close it first, I'm afraid.\n\r", ch);
-        else if (!IS_SET(EXIT(ch, door)->exit_info, EX_BROKEN))
+        else if (IS_SET(EXIT(ch, door)->exit_info, EX_BROKEN))
             send_to_char("You cannot lock it, it is broken.\n\r", ch);
         else if (EXIT(ch, door)->key < 0)
             send_to_char("There does not seem to be any keyholes.\n\r", ch);
@@ -2092,7 +2092,7 @@ int do_unlock(CHAR_DATA *ch, char *argument, int cmd)
             send_to_char("You can't seem to spot any keyholes.\n\r", ch);
         else if (!has_key(ch, EXIT(ch, door)->key))
             send_to_char("You do not have the proper key for that.\n\r", ch);
-        else if (!IS_SET(EXIT(ch, door)->exit_info, EX_BROKEN))
+        else if (IS_SET(EXIT(ch, door)->exit_info, EX_BROKEN))
             send_to_char("You cannot unlock it, it is broken!\n\r", ch);
         else if (!IS_SET(EXIT(ch, door)->exit_info, EX_LOCKED))
             send_to_char("It's already unlocked, it seems.\n\r", ch);
