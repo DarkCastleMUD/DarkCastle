@@ -13,7 +13,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.173 2008/11/21 00:37:59 kkoons Exp $ */
+/* $Id: info.cpp,v 1.174 2008/12/07 23:02:56 shane Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -3040,7 +3040,7 @@ void check_leaderboard()
       for(i=0;i<5;i++) dc_free(rdactiveclassname[j][i]);
    }
    if(std::system(0))
-      std::system("cp ../lib/leaderboard.txt /var/www/dcastle.org/html/leaderboard.txt");
+      std::system("cp ../lib/leaderboard.txt /srv/www/www.dcastle.org/htdocs/leaderboard.txt");
    else log("Cannot save leaderboard file to web dir.", 0, LOG_MISC);
 
 }

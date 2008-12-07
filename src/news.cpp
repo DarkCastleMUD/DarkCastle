@@ -90,7 +90,7 @@ void savenews()
    fprintf(fl,"0\n");
   dc_fclose(fl);
   if(std::system(0))
-     std::system("cp ../lib/news.data /var/www/dcastle.org/html/news.data");
+     std::system("cp ../lib/news.data /srv/www/www.dcastle.org/htdocs/news.data");
   else log("Cannot save news file to web dir.", 0, LOG_MISC);
 }
 
