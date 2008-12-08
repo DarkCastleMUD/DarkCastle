@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.94 2008/12/08 01:55:02 kkoons Exp $ */
+/* $Id: utility.cpp,v 1.95 2008/12/08 03:22:38 kkoons Exp $ */
 
 extern "C"
 {
@@ -1811,8 +1811,10 @@ int number( int from, int to )
 
     if(from > to)
     {
-      log("BACKWARDS usage of number()", ANGEL, LOG_BUG);
-
+      char buf[MAX_STRING_LENGTH];
+      sprintf(buf, "BACKWARDS usage: numbers(%d, %d)!", from, to);
+      log(buf, ANGEL, LOG_BUG);
+      produce_coredump();
       return to;
     }
     int number = (to+1) - from;
