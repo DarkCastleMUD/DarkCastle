@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.93 2008/12/08 01:22:35 kkoons Exp $ */
+/* $Id: utility.cpp,v 1.94 2008/12/08 01:55:02 kkoons Exp $ */
 
 extern "C"
 {
@@ -1817,8 +1817,8 @@ int number( int from, int to )
     }
     int number = (to+1) - from;
 
-    number = (int)((double)rand() / (((double)RAND_MAX + (double)1) / (double)number));
-    return from + number;
+    number = from + (int)((double)number * ((double)rand() / ((double)RAND_MAX + 1.0)));
+    return number;
 }
 
 
