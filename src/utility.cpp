@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.91 2008/12/08 00:25:41 kkoons Exp $ */
+/* $Id: utility.cpp,v 1.92 2008/12/08 00:28:04 kkoons Exp $ */
 
 extern "C"
 {
@@ -1789,6 +1789,7 @@ void init_random()
   if(!the_file)
   {
     log("Unable to open /dev/urandom to seed random number generation!!", 0, LOG_MISC);
+    srand(time(NULL));
     return;
   }
   fscanf(the_file, "%u", &seed);
