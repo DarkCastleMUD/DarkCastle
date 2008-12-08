@@ -55,6 +55,8 @@ int main(int argc, char **argv)
   int pos = 1;
   char dir[256];
   strcpy(dir, (char *)DFLT_DIR);
+
+  
   
   init_random();
 
