@@ -7,7 +7,7 @@
 /* Revision History                                                          */
 /* 12/09/2003   Onager   Tweaked do_join() to remove combat-related bits     */
 /*****************************************************************************/
-/* $Id: arena.cpp,v 1.15 2007/08/20 03:48:48 jhhudso Exp $ */
+/* $Id: arena.cpp,v 1.16 2008/12/08 01:33:34 jhhudso Exp $ */
 
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
@@ -179,7 +179,7 @@ int do_joinarena(CHAR_DATA *ch, char *arg, int cmd)
     if (arena.type == POTATO) { // potato arena
       send_to = real_room(number(pot_low, pot_hi));
     } else {
-      send_to = real_room(number(ARENA_LOW, ARENA_HI-1));
+      send_to = real_room(number(ARENA_LOW, ARENA_HIGH-1));
     }
   }
   if(move_char(ch, send_to) == 0) return eFAILURE;

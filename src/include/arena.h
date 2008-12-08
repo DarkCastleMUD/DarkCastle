@@ -2,13 +2,13 @@
 #define ARENA_H_
 
 /************************************************************************
-| $Id: arena.h,v 1.4 2007/01/28 03:35:45 dcastle Exp $
+| $Id: arena.h,v 1.5 2008/12/08 01:33:35 jhhudso Exp $
 | arena.h
 | This contains the arena stuff
 */
 
-#define ARENA_LOW 14600
-#define ARENA_HI  14680
+#define ARENA_LOW  14600
+#define ARENA_HIGH 14680
 #define ARENA_DEATHTRAP 14680
 
 enum ARENA_TYPE { NORMAL, CHAOS, POTATO, PRIZE };

@@ -1473,9 +1473,19 @@ int spell_teleport(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
   }
 
   if(IS_SET(world[ch->in_room].room_flags, ARENA)) {
-     to_room = real_room(number(ARENA_LOW, ARENA_HI));
-     if(number(1, 4) == 1 && ch == victim )
-        to_room = real_room(ARENA_DEATHTRAP);
+      // If the ch is in a general arena and self-teleporting, there's a 25% chance they will teleport to the deathtrap.
+      if(ch == victim && ch->in_room >= ARENA_LOW && ch->in_room <= ARENA_HIGH && number(1, 4) == 1) {
+	  to_room = real_room(ARENA_DEATHTRAP);
+      } else {
+	  // Find a valid room in whatever arena area the ch is in
+	  int cur_zone = world[ch->in_room].zone;
+	  int cur_zone_bottom = zone_table[cur_zone].bottom_rnum;
+	  int cur_zone_top = zone_table[cur_zone].top_rnum;
+
+	  do {
+	      to_room = number(cur_zone_bottom, cur_zone_top);
+	  } while (real_room(to_room) == -1);
+      }
   } else {
      do {
          to_room = number(0, top_of_world);
