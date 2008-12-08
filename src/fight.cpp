@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.514 2008/11/26 19:00:45 kkoons Exp $               *
+ * $Id: fight.cpp,v 1.515 2008/12/08 03:10:07 jhhudso Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -1214,7 +1214,7 @@ void check_weapon_skill_bonus(char_data * ch, int type, obj_data *wielded,
       learned = learned % 100;
 
       weapon_skill_hit_bonus = learned / 5;
-      weapon_skill_dam_bonus = number(1, learned / 10);
+      weapon_skill_dam_bonus = learned / 10 ? number(1, learned / 10) : 1;
 
       if(specialization)
       {
@@ -1236,7 +1236,7 @@ void check_weapon_skill_bonus(char_data * ch, int type, obj_data *wielded,
       learned = learned % 100;
 
       weapon_skill_hit_bonus += learned / 6;
-      weapon_skill_dam_bonus += number(1, learned / 10);
+      weapon_skill_dam_bonus += learned / 10 ? number(1, learned / 10) : 1;
 
       if(specialization)
       {
