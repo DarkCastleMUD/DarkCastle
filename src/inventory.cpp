@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.105 2008/12/06 06:07:11 kkoons Exp $
+| $Id: inventory.cpp,v 1.106 2008/12/08 01:22:54 kkoons Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -59,6 +59,7 @@ int palm  (struct char_data *ch, struct obj_data *obj_object, struct obj_data *s
 void special_log(char *arg);
 struct obj_data * bring_type_to_front(char_data * ch, int item_type);
 struct obj_data * search_char_for_item(char_data * ch, int16 item_number, bool wearonly = FALSE);
+bool search_container_for_item(obj_data * obj, int item_number);
 void send_info(char *);
 
 /* procedures related to get */
@@ -1277,6 +1278,14 @@ int do_put(struct char_data *ch, char *argument, int cmd)
                  send_to_char("Now, now, no doing that *wink*.\n\r", ch);
                  return eFAILURE;
               }
+              if(IS_SET(obj_object->obj_flags.more_flags, ITEM_UNIQUE)
+                 && (sub_object->carried_by != ch)
+                 && search_container_for_item(sub_object, obj_object->item_number)
+                )
+              {
+                 send_to_char("The objects uniqueness prevents it!\n\r",ch);
+                 return eFAILURE;
+              }
 	      if (((sub_object->obj_flags.weight) + 
                (obj_object->obj_flags.weight)) <=
                (sub_object->obj_flags.value[0]) &&
@@ -1702,6 +1711,20 @@ struct obj_data * search_char_for_item(char_data * ch, int16 item_number, bool w
     }
   }
   return NULL;
+}
+
+bool search_container_for_item(obj_data * obj, int item_number)
+{
+  obj_data *i;
+  if(GET_ITEM_TYPE(obj) != ITEM_CONTAINER)
+    return false;
+  
+  for(i = obj->contains; i; i = i->next_content)
+  {
+    if(i->item_number == item_number)
+      return true;
+  }
+  return false;
 }
 
 int find_door(CHAR_DATA *ch, char *type, char *dir)
