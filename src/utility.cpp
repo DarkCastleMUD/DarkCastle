@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.90 2008/06/17 03:23:40 jhhudso Exp $ */
+/* $Id: utility.cpp,v 1.91 2008/12/08 00:25:41 kkoons Exp $ */
 
 extern "C"
 {
@@ -1778,53 +1778,42 @@ int get_line(FILE * fl, char *buf)
 
 
 
-int mmstate[55],j,k;
-time_t current_time;
+
 
 void init_random()
 { // Initial values.
-  int i;
-  struct timeval time_;
-  time_t now_;
-  gettimeofday(&time_, NULL);
-  now_ = (time_t) time_.tv_sec;
-  mmstate[0] = now_ &((1<<30)-1);
-  mmstate[1] = 1;
-  for (i = 2; i < 55; i++)
-    mmstate[i] = (((mmstate[i-1] + mmstate[i-2])) )&((1<<30)-1);
-  j = 24;
-  k = 54;
+  FILE * the_file;
+  unsigned int seed;
+  char buf[MAX_STRING_LENGTH];
+  the_file = dc_fopen("/dev/urandom", "r");
+  if(!the_file)
+  {
+    log("Unable to open /dev/urandom to seed random number generation!!", 0, LOG_MISC);
+    return;
+  }
+  fscanf(the_file, "%u", &seed);
+  sprintf(buf, "Seeding random numbers with %u", seed);
+  log(buf, 0, LOG_MISC);
+  srand(seed);
+  dc_fclose(the_file);
   return;
 }
 
-int mm_rand()
-{
-  mmstate[k] = (mmstate[j] + mmstate[k]) & ((1<<30)-1);
-  k--;
-  j--;
-  if (k == 0) k = 54;
-  if (j == 0) j = 54;
-  return mmstate[k] >> 4; // Modulus'ing it didn't make it random,
-                          // had to look at another implementation
-                          // don't have time to figure out why
-}
 
 //
 // return value can include the from or to variable
 //
 int number( int from, int to )
 {
-    int power;
-    int number;
+    if(from >= to) 
+    {
+      log("BACKWARDS usage of number()!", ANGEL, LOG_BUG);
+      return to;
+    }
 
-    if ( ( to = to - from + 1 ) <= 1 )
-        return from;
+    int number = (to+1) - from;
 
-    for ( power = 2; power < to; power <<= 1 )
-        ;
-
-    while ( ( number = mm_rand( ) & (power - 1) ) >= to )
-        ;
+    number = (int)((double)rand() / (((double)RAND_MAX + (double)1) / (double)number));
 
     return from + number;
 }
