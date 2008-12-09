@@ -1,7 +1,7 @@
 #ifndef FILEINFO_H_
 #define FILEINFO_H_
 /*
-| $Id: fileinfo.h,v 1.27 2008/12/07 23:02:59 shane Exp $
+| $Id: fileinfo.h,v 1.28 2008/12/09 17:34:50 dcastle Exp $
 | fileinfo.h
 | Description:  Contains information for loading files, ie "../lib", etc..
 */
@@ -50,7 +50,7 @@
 #define  WIZLIST_FILE       "wizlist.txt"
 
 #define  NEW_HELP_FILE	     "new_help.txt"
-#define  WEB_HELP_FILE       "/src/www/www.dcastle.org/htdocs/webhelp.txt"
+#define  WEB_HELP_FILE       "/srv/www/www.dcastle.org/htdocs/webhelp.txt"
 #define  NEW_HELP_PAGE_FILE  "new_help_screen.txt"
 #define  NEW_IHELP_PAGE_FILE "new_ihelp_screen.txt"
 #define  LEADERBOARD_FILE    "leaderboard.txt"
