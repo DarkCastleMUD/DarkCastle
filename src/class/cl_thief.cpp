@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.185 2008/11/18 14:40:45 kkoons Exp $
+| $Id: cl_thief.cpp,v 1.186 2008/12/10 19:22:15 kkoons Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -1948,7 +1948,7 @@ int do_deceit(struct char_data *ch, char *argument, int cmd)
     grpsize++;
   }
 
-  if (!charge_moves(ch, SKILL_DECEIT)) return eSUCCESS;
+  if (!charge_moves(ch, SKILL_DECEIT, grpsize)) return eSUCCESS;
       
   if (!skill_success(ch,NULL,SKILL_DECEIT)) {
      send_to_char("Your class just isn't up to the task.\r\n", ch);
