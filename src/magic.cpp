@@ -11894,7 +11894,8 @@ int spell_blue_bird(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
   int dam;
   int count;
   int retval = eSUCCESS;
-
+  int ch_level = GET_LEVEL(ch);
+  if(ch_level < 5) ch_level = 5;
   set_cantquit( ch, victim );
   switch(world[ch->in_room].sector_type) {
 
@@ -11916,10 +11917,10 @@ int spell_blue_bird(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
   }
   
    
-     dam = number(10, GET_LEVEL(ch) + 5) + getRealSpellDamage(ch);
+     dam = number(10, ch_level + 5) + getRealSpellDamage(ch);
   while(!SOMEONE_DIED(retval) && count--) {
      retval = damage(ch, victim, dam, TYPE_PHYSICAL_MAGIC, SPELL_BLUE_BIRD, 0);
-     dam = number(10, GET_LEVEL(ch) + 5);
+     dam = number(10, ch_level + 5);
   }
 
   return retval;
