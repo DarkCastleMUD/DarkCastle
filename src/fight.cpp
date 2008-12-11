@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.516 2008/12/11 07:06:35 kkoons Exp $               *
+ * $Id: fight.cpp,v 1.517 2008/12/11 17:30:17 kkoons Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -5364,10 +5364,10 @@ void dam_message(int dam, CHAR_DATA * ch, CHAR_DATA * victim,
    {
       switch (number(0,3))
       {
-	case 0: sprintf(shield,"your shin");break;
-	case 1: sprintf(shield,"your hand");break;
-	case 2: sprintf(shield,"your foot");break;
-	case 3: sprintf(shield,"your forearm");break;
+	case 0: sprintf(shield,"shin");break;
+	case 1: sprintf(shield,"hand");break;
+	case 2: sprintf(shield,"foot");break;
+	case 3: sprintf(shield,"forearm");break;
 	default: sprintf(shield,"error");break;
       }
    }
@@ -5381,7 +5381,7 @@ void dam_message(int dam, CHAR_DATA * ch, CHAR_DATA * victim,
          sprintf(buf1, "$n's %s %s $N%s| as it deflects off $S %s%c", attack, vp, vx,  shield,punct);
          sprintf(buf2, "You %s $N%s%s as $E raises $S %s to deflect your %s%c", vs, vx, !IS_NPC(ch) && IS_SET(ch->pcdata->toggles, 
 PLR_DAMAGE)?dammsg:"", shield, attack, punct);
-         sprintf(buf3, "$n %s you%s%s as you deflect $s %s with %s%c", vp, vx, !IS_NPC(victim) && IS_SET(victim->pcdata->toggles, 
+         sprintf(buf3, "$n %s you%s%s as you deflect $s %s with your %s%c", vp, vx, !IS_NPC(victim) && IS_SET(victim->pcdata->toggles, 
 PLR_DAMAGE)?dammsg:"", attack, shield, punct);
        }
        else
@@ -5390,7 +5390,7 @@ PLR_DAMAGE)?dammsg:"", attack, shield, punct);
          sprintf(buf1, "$n's %s %s $N%s| as it deflects off $S %s%c", attack, vp, vx, shield,punct);
          sprintf(buf2, "You %s $N%s%s as $E raises $S %s to deflect your %s%c", vs, vx, !IS_NPC(ch) && IS_SET(ch->pcdata->toggles, 
 PLR_DAMAGE)?dammsg:"", shield, attack, punct);
-         sprintf(buf3, "$n %s you%s%s as you deflect $s %s with %s%c", vp, vx, !IS_NPC(victim) && IS_SET(victim->pcdata->toggles, 
+         sprintf(buf3, "$n %s you%s%s as you deflect $s %s with your %s%c", vp, vx, !IS_NPC(victim) && IS_SET(victim->pcdata->toggles, 
 PLR_DAMAGE)?dammsg:"", attack, shield, punct);
        }
      } else {
