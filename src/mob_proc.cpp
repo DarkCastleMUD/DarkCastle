@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.183 2008/11/28 16:57:33 apocalypse Exp $ */
+/* $Id: mob_proc.cpp,v 1.184 2008/12/11 16:54:49 apocalypse Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -1765,7 +1765,9 @@ static char *dethSayText [ ] =
   "Ever find it weird that only one company makes the game Monopoly?",
   "Mission Accomplished.",
   "Drill baby! Drill!",
-  "Ch-ch-ch-ch-changes!"
+  "Ch-ch-ch-ch-changes!",
+  "The beatings will continue until morale improves.",
+  "If they removed all porn from the internet there would be only one site left, and it would be called 'Bring Back the Porn'."
  };
 
 // ENDOFCHAIN
