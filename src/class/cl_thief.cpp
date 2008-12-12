@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.186 2008/12/10 19:22:15 kkoons Exp $
+| $Id: cl_thief.cpp,v 1.187 2008/12/12 06:36:55 kkoons Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -640,14 +640,20 @@ int do_trip(CHAR_DATA *ch, char *argument, int cmd)
 	return eFAILURE;
     }
   }
-  if(!(victim = get_char_room_vis(ch, name))) {
-    if(ch->fighting)
+
+  if(!*name && ch->fighting) 
+  {
       victim = ch->fighting;
-    else {
-      send_to_char( "Trip whom?\n\r", ch );
-      return eFAILURE;
-    }
   }
+  else
+    victim = get_char_room_vis(ch, name);
+
+  if(!victim)
+  {
+    send_to_char( "Trip whom?\n\r", ch );
+    return eFAILURE;
+  }
+  else
 
   if(ch->in_room != victim->in_room) {
     send_to_char("That person seems to have left.\n\r", ch);
