@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.181 2008/11/28 16:57:33 apocalypse Exp $ */
+/* $Id: db.cpp,v 1.182 2008/12/12 07:39:02 jhhudso Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -2215,12 +2215,15 @@ void free_zones_from_memory()
 
 void write_one_zone(FILE * fl, int zon)
 {
-  fprintf(fl, "#%d\n", (zon ? ((zone_table[zon - 1].top + 1)/100) : 0));
-  fprintf(fl, "%s~\n", zone_table[zon].name);
-  fprintf(fl, "%d %d %d %ld\n", zone_table[zon].top,
-                               zone_table[zon].lifespan,
-                               zone_table[zon].reset_mode,
-                               zone_table[zon].zone_flags);
+    fprintf(fl, "V2\n");
+    fprintf(fl, "#%d\n", (zon ? ((zone_table[zon - 1].top + 1)/100) : 0));
+    fprintf(fl, "%s~\n", zone_table[zon].name);
+    fprintf(fl, "%d %d %d %ld %d\n", zone_table[zon].top,
+	    zone_table[zon].lifespan,
+	    zone_table[zon].reset_mode,
+	    zone_table[zon].zone_flags,
+	    zone_table[zon].continent
+      );
 
   for(int i = 0; zone_table[zon].cmd[i].command != 'S'; i++)
   {
@@ -2312,8 +2315,18 @@ void read_one_zone(FILE * fl, int zon)
   char *check, buf[161], ch;
   int reset_top, i, tmp;
   char * skipper = NULL;
-//  int zon;
+  int version = 1;
+
   ch = fread_char (fl);
+  if (ch == 'V') {
+      version = fread_int (fl, 0, 64000);
+      ch = fread_char (fl);
+  } else {
+      // Old revision detected. We will set the altered flag so
+      // this zone will be saved with new format soon
+      SET_BIT(zone_table[zon].zone_flags, ZONE_MODIFIED);
+  }
+
   tmp = fread_int (fl, 0, 64000);
   check = fread_string(fl, 0);
   //a = fread_int(fl, 0, 64000);
@@ -2355,6 +2368,9 @@ void read_one_zone(FILE * fl, int zon)
   zone_table[zon].lifespan   = fread_int (fl, 0, 64000);
   zone_table[zon].reset_mode = fread_int (fl, 0, 64000);
   zone_table[zon].zone_flags = fread_bitvector (fl, 0, LONG_MAX);
+  if (version > 1) {
+      zone_table[zon].continent = fread_int (fl, 0, 64000);
+  }
 
   /* read the command table */
   reset_top = 0;
