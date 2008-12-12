@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.518 2008/12/12 04:51:31 kkoons Exp $               *
+ * $Id: fight.cpp,v 1.519 2008/12/12 06:45:59 kkoons Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -2846,6 +2846,8 @@ void set_cantquit(CHAR_DATA *ch, CHAR_DATA *vict, bool forced )
   if (realvict == realch)  // killing your own pet was giving you a CQ
     return;
 
+  if(!realch->fighting)  SET_BIT(realch->combat, COMBAT_ATTACKER);
+
   if(is_pkill(realch, realvict) && !ISSET(realvict->affected_by, AFF_CANTQUIT) &&
               !affected_by_spell(realvict, FUCK_GTHIEF) && !IS_AFFECTED(realvict, AFF_CHAMPION) && !IS_AFFECTED(realch, AFF_CHAMPION) &&
 	      !affected_by_spell(realvict, FUCK_PTHIEF) && !forced) { 
@@ -2872,6 +2874,9 @@ void fight_kill(CHAR_DATA *ch, CHAR_DATA *vict, int type, int spec_type)
     log("Null vict sent to fight_kill()!", -1, LOG_BUG);
     return;
   }
+  bool vict_is_attacker = false;
+  if(IS_SET(vict->combat, COMBAT_ATTACKER))
+    vict_is_attacker = true;
 
   if (vict->fighting)
     stop_fighting(vict);
@@ -2897,7 +2902,7 @@ void fight_kill(CHAR_DATA *ch, CHAR_DATA *vict, int type, int spec_type)
       else if(IS_ARENA(vict->in_room))
         arena_kill(ch, vict, spec_type);
       else if(is_pkill(ch, vict))
-        do_pkill(ch, vict, spec_type);
+        do_pkill(ch, vict, spec_type, vict_is_attacker);
       else	
         raw_kill(ch, vict);
       break;
@@ -3619,6 +3624,8 @@ void stop_fighting(CHAR_DATA * ch, int clearlag)
    }
   }
   
+  REMOVE_BIT(ch->combat, COMBAT_ATTACKER);
+
   if (IS_AFFECTED(ch, AFF_PRIMAL_FURY))
   {
      struct affected_type *af;
@@ -5526,7 +5533,7 @@ void trip(CHAR_DATA * ch, CHAR_DATA * victim)
 
 // 'ch' can be null
 // do_pkill should never be called directly, only through "fight_kill"
-void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim, int type)
+void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim, int type, bool vict_is_attacker)
 {
   int num;
   char killer_message[MAX_STRING_LENGTH];
@@ -5567,7 +5574,6 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim, int type)
       save_char_obj(victim);
     }
   }
-
   // Make sure barbs get their ac back
   if (IS_SET(victim->combat, COMBAT_BERSERK)) 
   {
@@ -5709,7 +5715,7 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim, int type)
        && ch->in_room != real_room(START_ROOM) 
        && ch->in_room != real_room(SECOND_START_ROOM))
     {
-      if(level_spread > 20 && !IS_AFFECTED(victim, AFF_CANTQUIT))
+      if(level_spread > 20 && !IS_AFFECTED(victim, AFF_CANTQUIT) && !vict_is_attacker)
       {
         if(GET_PKILLS(ch) > 0)
           GET_PKILLS(ch) -= 1;
@@ -5747,7 +5753,7 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim, int type)
        && ch->in_room != real_room(START_ROOM) 
        && ch->in_room != real_room(SECOND_START_ROOM)) 
     {
-       if(level_spread > 20 && !IS_AFFECTED(victim, AFF_CANTQUIT))
+       if(level_spread > 20 && !IS_AFFECTED(victim, AFF_CANTQUIT) && !vict_is_attacker)
        {
         if(GET_PKILLS(ch) > 0)
           GET_PKILLS(ch) -= 1;
@@ -5784,7 +5790,7 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim, int type)
        && ch->in_room != real_room(START_ROOM) 
        && ch->in_room != real_room(SECOND_START_ROOM)) 
     {
-       if(level_spread > 20 && !IS_AFFECTED(victim, AFF_CANTQUIT))
+       if(level_spread > 20 && !IS_AFFECTED(victim, AFF_CANTQUIT) && !vict_is_attacker)
        {
         if(GET_PKILLS(ch) > 0)
           GET_PKILLS(ch) -= 1;
