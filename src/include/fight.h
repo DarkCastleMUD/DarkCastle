@@ -2,7 +2,7 @@
 #define FIGHT_H_
 
 /************************************************************************
-| $Id: fight.h,v 1.38 2008/11/26 19:00:59 kkoons Exp $
+| $Id: fight.h,v 1.39 2008/12/12 06:54:16 kkoons Exp $
 | fight.h
 | This file defines the header information for fight.
 */
@@ -83,7 +83,7 @@ int second_wield(CHAR_DATA *ch);
 void set_cantquit(CHAR_DATA *, CHAR_DATA *, bool = FALSE);
 int is_pkill(CHAR_DATA *ch, CHAR_DATA *vict);
 void raw_kill(CHAR_DATA *ch, CHAR_DATA *victim);
-void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim, int type);
+void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim, int type, bool vict_is_attacker = false);
 void arena_kill(CHAR_DATA *ch, CHAR_DATA *victim, int type);
 void do_dead(CHAR_DATA *ch, CHAR_DATA *victim);
 bool ArenaIsOpen();
@@ -129,6 +129,7 @@ void eq_destroyed(char_data * ch, obj_data * obj, int pos);
 #define COMBAT_FLEEING       1<<20
 #define COMBAT_SHOCKED2      1<<21
 #define COMBAT_CRUSH_BLOW    1<<22
+#define COMBAT_ATTACKER	     1<<23
 
 #define DAMAGE_TYPE_PHYSICAL  0
 #define DAMAGE_TYPE_MAGIC     1
