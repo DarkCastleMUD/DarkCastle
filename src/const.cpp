@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.279 2008/12/06 06:05:44 kkoons Exp $ */
+/* $Id: const.cpp,v 1.280 2008/12/12 06:54:39 kkoons Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -793,6 +793,21 @@ char *zone_modes[] =
     "Always_Repop",
     "\n"
 };
+
+
+std::vector<std::string> get_cont_names()
+{
+  std::vector<std::string> tmp;
+  tmp.push_back("");
+  tmp.push_back("Sorpigal");
+  tmp.push_back("Kyi Shi'i Kaze");
+  tmp.push_back("The Underdark");
+  tmp.push_back("Behind the Mirror");
+  return tmp;
+}
+
+std::vector<std::string> continent_names = get_cont_names();
+
 
 char *zone_bits[] =
 {
